@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -20,7 +20,7 @@ use Config;
 plan tests => 11;
 
 SKIP: {
-skip "no perlio in this build", 11 unless $Config::Config{useperlio};
+skip "no perlio in this build", 11 unless %Config::Config{useperlio};
 
 pass("SORT OPTIMIZATION");
 

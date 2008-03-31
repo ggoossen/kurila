@@ -8,7 +8,7 @@ BEGIN {
 	@INC = '../lib';
 	require './test.pl';
     }
-    ${^WARN_HOOK} = sub { push @WARN, $_[0]->{description} };
+    ${^WARN_HOOK} = sub { push @WARN, @_[0]->{description} };
 }
 
 require File::Spec;
@@ -87,13 +87,13 @@ sub to_bytes {
     print "ok 7\n";
     print "not " unless length("\N{WHITE SMILING FACE}") == 1;
     print "ok 8\n";
-    print "not " unless sprintf("%vx", "\x{263a}") eq "263a";
+    print "not " unless sprintf("\%vx", "\x{263a}") eq "263a";
     print "ok 9\n";
-    print "not " unless sprintf("%vx", "\N{WHITE SMILING FACE}") eq "263a";
+    print "not " unless sprintf("\%vx", "\N{WHITE SMILING FACE}") eq "263a";
     print "ok 10\n";
-    print "not " unless sprintf("%vx", "\x{FF}\N{WHITE SMILING FACE}") eq "ff.263a";
+    print "not " unless sprintf("\%vx", "\x{FF}\N{WHITE SMILING FACE}") eq "ff.263a";
     print "ok 11\n";
-    print "not " unless sprintf("%vx", "\x{ff}\N{WHITE SMILING FACE}") eq "ff.263a";
+    print "not " unless sprintf("\%vx", "\x{ff}\N{WHITE SMILING FACE}") eq "ff.263a";
     print "ok 12\n";
 }
 
@@ -149,7 +149,7 @@ sub to_bytes {
 
 {
     print "not " unless
-	sprintf("%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
+	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 19\n";
 
     print "not " if
@@ -164,7 +164,7 @@ sub to_bytes {
     print "ok 21\n";
 
     print "not " unless
-	sprintf("%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
+	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 22\n";
 
 }

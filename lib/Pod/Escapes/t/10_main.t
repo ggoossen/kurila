@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -104,17 +104,17 @@ ok e2char('pi'), e2char('x0003C0');
 print "# various hash tests...\n";
 
 ok scalar keys %Name2character;
-ok defined $Name2character{'eacute'};
-ok $Name2character{'lt'} eq '<';
+ok defined %Name2character{'eacute'};
+ok %Name2character{'lt'} eq '<';
 
 ok scalar keys %Latin1Code_to_fallback;
-ok defined $Latin1Code_to_fallback{233};
+ok defined %Latin1Code_to_fallback{233};
 
 ok scalar keys %Latin1Char_to_fallback;
-ok defined $Latin1Char_to_fallback{chr(233)};
+ok defined %Latin1Char_to_fallback{chr(233)};
 
 ok scalar keys %Code2USASCII;
-ok defined $Code2USASCII{65};
-ok $Code2USASCII{65} eq 'A';
+ok defined %Code2USASCII{65};
+ok %Code2USASCII{65} eq 'A';
 
 

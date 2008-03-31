@@ -39,9 +39,9 @@ sub __find_relocations
     my %paths;
     while (my ($raw_key, $raw_val) = each %Config) {
 	my $exp_key = $raw_key . "exp";
-	next unless exists $Config{$exp_key};
+	next unless exists %Config{$exp_key};
 	next unless $raw_val =~ m!\.\.\./!;
-	$paths{$Config{$exp_key}}++;
+	%paths{%Config{$exp_key}}++;
     }
     # Longest prefixes go first in the alternatives
     my $alternations = join "|", map {quotemeta $_}
@@ -69,38 +69,38 @@ return($self);
 
 sub STORE
 {
-$_[0]->{data}->{$_[1]} = $_[2];
+@_[0]->{data}->{@_[1]} = @_[2];
 }
 
 sub FETCH
 {
-return($_[0]->{data}->{$_[1]});
+return(@_[0]->{data}->{@_[1]});
 }
 
 sub FIRSTKEY
 {
-my $reset = scalar(keys(%{$_[0]->{data}}));
-return(each(%{$_[0]->{data}}));
+my $reset = scalar(keys(%{@_[0]->{data}}));
+return(each(%{@_[0]->{data}}));
 }
 
 sub NEXTKEY
 {
-return(each(%{$_[0]->{data}}));
+return(each(%{@_[0]->{data}}));
 }
 
 sub EXISTS
 {
-return(exists($_[0]->{data}->{$_[1]}));
+return(exists(@_[0]->{data}->{@_[1]}));
 }
 
 sub DELETE
 {
-return(delete($_[0]->{data}->{$_[1]}));
+return(delete(@_[0]->{data}->{@_[1]}));
 }
 
 sub CLEAR
 {
-%{$_[0]->{data}} = ();
+%{@_[0]->{data}} = ();
 }
 
 sub DESTROY
@@ -128,7 +128,7 @@ while (defined($line = ~< $fh))
       $key = $1;
       $data = { map { split('=', $_) } split(' ', $2)};
 
-      if ($Config{userelocatableinc} && $data->{relocate_as})
+      if (%Config{userelocatableinc} && $data->{relocate_as})
       {
 	  require File::Spec;
 	  require Cwd;
@@ -155,7 +155,7 @@ open($fh, ">", "$packfile") || die("Can't open file $packfile: $!");
 foreach my $key (sort(keys(%{$self->{data}})))
    {
        my $data = $self->{data}->{$key};
-       if ($Config{userelocatableinc}) {
+       if (%Config{userelocatableinc}) {
 	   $Relocations ||= __find_relocations();
 	   if ($packfile =~ $Relocations) {
 	       # We are writing into a subdirectory of a run-time relocated

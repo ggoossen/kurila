@@ -134,9 +134,9 @@ sub _parseBit
     while ($string =~ s/(.*?)$noPreBS(,|$matchMetaRE)//)
     {
         $out .= quotemeta($1) ;
-        $out .= $mapping{$2} if defined $mapping{$2};
+        $out .= %mapping{$2} if defined %mapping{$2};
 
-        ++ $self->{WildCount} if $wildCount{$2} ;
+        ++ $self->{WildCount} if %wildCount{$2} ;
 
         if ($2 eq ',')
         { 
@@ -201,8 +201,8 @@ sub _parseInputGlob
     while ($string =~ s/(.*?)$noPreBS($matchMetaRE)//)
     {
         $out .= quotemeta($1) ;
-        $out .= $mapping{$2} if defined $mapping{$2};
-        ++ $self->{WildCount} if $wildCount{$2} ;
+        $out .= %mapping{$2} if defined %mapping{$2};
+        ++ $self->{WildCount} if %wildCount{$2} ;
 
         if ($2 eq '(')
         { 
@@ -287,8 +287,8 @@ sub _parseOutputGlob
               )
             }{{
               $1
-                  ? (getpwnam($1))[7]
-                  : ( $ENV{HOME} || $ENV{LOGDIR} )
+                  ? (getpwnam($1))[[7]]
+                  : ( %ENV{HOME} || %ENV{LOGDIR} )
             }}x;
 
     }
@@ -323,7 +323,7 @@ sub _getFiles
 
     foreach my $inFile (@{ $self->{InputFiles} })
     {
-        next if $inFiles{$inFile} ++ ;
+        next if %inFiles{$inFile} ++ ;
 
         my $outFile = $inFile ;
 
@@ -332,12 +332,12 @@ sub _getFiles
             no warnings 'uninitialized';
             eval "\$outFile = $self->{OutputPattern};" ;
 
-            if (defined $outInMapping{$outFile})
+            if (defined %outInMapping{$outFile})
             {
                 $Error =  "multiple input files map to one output file";
                 return undef ;
             }
-            $outInMapping{$outFile} = $inFile;
+            %outInMapping{$outFile} = $inFile;
             push @{ $self->{Pairs} }, [$inFile, $outFile];
         }
     }

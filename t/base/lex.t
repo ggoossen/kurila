@@ -7,7 +7,7 @@ my $x = 'x';
 print "#1	:$x: eq :x:\n";
 if ($x eq 'x') {print "ok 1\n";} else {print "not ok 1\n";}
 
-$x = $#[0];
+$x = @#[0];
 
 if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
@@ -94,25 +94,25 @@ E1
 {
     $foo = 'FOO';
     $bar = 'BAR';
-    $foo{$bar} = 'BAZ';
-    $ary[0] = 'ABC';
+    %foo{$bar} = 'BAZ';
+    @ary[0] = 'ABC';
 }
 
-print "$foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
+print "%foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
 print "${foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
-print "${foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
+print "%{foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
-print "ABC" =~ m/^$ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
+print "ABC" =~ m/^@ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
 #print "FOOZ" =~ m/^$foo[$A-Z]$/ ? "ok 26\n" : "not ok 26\n";
 print "ok 26\n";
 
 # MJD 19980425
 ($X, @X) = qw(a b c d); 
-print "d" =~ m/^$X[-1]$/ ? "ok 27\n" : "not ok 27\n";
-print "a1" !~ m/^$X[-1]$/ ? "ok 28\n" : "not ok 28\n";
+print "d" =~ m/^@X[-1]$/ ? "ok 27\n" : "not ok 27\n";
+print "a1" !~ m/^@X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
 print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ? "ok 29\n" : "not ok 29\n");
 
@@ -267,9 +267,9 @@ my %str = (
 );
 
 my $test = 52;
-print ((exists $str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
-print ((exists $str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
-print ((exists $str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;
+print ((exists %str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
+print ((exists %str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
+print ((exists %str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;
 
 sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;

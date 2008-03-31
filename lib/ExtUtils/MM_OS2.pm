@@ -50,10 +50,10 @@ MAKE_TEXT
 sub dlsyms {
     my($self,%attribs) = @_;
 
-    my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = $attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist) = $attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my($imports)  = $attribs{IMPORTS} || $self->{IMPORTS} || {};
+    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
+    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || [];
+    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || [];
+    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || {};
     my(@m);
     (my $boot = $self->{NAME}) =~ s/:/_/g;
 
@@ -81,10 +81,10 @@ $self->{BASEEXT}.def: Makefile.PL
 	}
 	close $imp or die "Can't close tmpimp.imp";
 	# print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";
-	system "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp" 
+	system "emximp -o tmpimp%Config::Config{lib_ext} tmpimp.imp" 
 	    and die "Cannot make import library: $!, \$?=$?";
 	unlink glob("tmp_imp/*");
-	system "cd tmp_imp; $Config::Config{ar} x ../tmpimp$Config::Config{lib_ext}" 
+	system "cd tmp_imp; %Config::Config{ar} x ../tmpimp%Config::Config{lib_ext}" 
 	    and die "Cannot extract import objects: $!, \$?=$?";      
     }
     join('',@m);
@@ -96,8 +96,8 @@ sub static_lib {
     return $old unless $self->{IMPORTS} && %{$self->{IMPORTS}};
     
     my @chunks = split m/\n{2,}/, $old;
-    shift @chunks unless length $chunks[0]; # Empty lines at the start
-    $chunks[0] .= <<'EOC';
+    shift @chunks unless length @chunks[0]; # Empty lines at the start
+    @chunks[0] .= <<'EOC';
 
 	$(AR) $(AR_STATIC_ARGS) $@ tmp_imp/* && $(RANLIB) $@
 EOC

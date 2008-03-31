@@ -394,7 +394,7 @@ store({}, $file);
     unlink($file);
     ok($info, "got info");
     is($info->{file}, $file, "file set");
-    is($info->{hdrsize}, 11 + length($Config{byteorder}), "hdrsize");
+    is($info->{hdrsize}, 11 + length(%Config{byteorder}), "hdrsize");
     like($info->{version}, q{/^2\.\d+$/}, "sane version");
     is($info->{version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
     is($info->{major}, 2, "sane major");
@@ -409,7 +409,7 @@ store({}, $file);
         map {$_ => 5.004} qw(byteorder intsize longsize)
     );
     for my $attr (keys %attrs) {
-        is($info->{$attr}, $Config{$attr}, "$attr match Config");
+        is($info->{$attr}, %Config{$attr}, "$attr match Config");
     }
 }
 

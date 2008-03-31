@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir('t');
         unshift(@INC, '../lib');
     }

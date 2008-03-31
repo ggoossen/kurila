@@ -9,7 +9,7 @@
 
 BEGIN { $| = 1; print "1..16\n" }
 END   { print "not ok 1\n" unless $loaded }
-delete $ENV{ANSI_COLORS_DISABLED};
+delete %ENV{ANSI_COLORS_DISABLED};
 use Term::ANSIColor qw(:constants color colored uncolor);
 $loaded = 1;
 print "ok 1\n";
@@ -86,7 +86,7 @@ if (join ('|', @names) eq 'bold|on_green|clear') {
 }
 
 # Test ANSI_COLORS_DISABLED.
-$ENV{ANSI_COLORS_DISABLED} = 1;
+%ENV{ANSI_COLORS_DISABLED} = 1;
 if (color ('blue') eq '') {
     print "ok 10\n";
 } else {
@@ -102,7 +102,7 @@ if (GREEN 'testing' eq 'testing') {
 } else {
     print "not ok 12\n";
 }
-delete $ENV{ANSI_COLORS_DISABLED};
+delete %ENV{ANSI_COLORS_DISABLED};
 
 # Make sure DARK is exported.  This was omitted in versions prior to 1.07.
 if (DARK "testing" eq "\e[2mtesting\e[0m") {

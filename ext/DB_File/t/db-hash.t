@@ -6,7 +6,7 @@ use Config;
  
 BEGIN {
     if(-d "lib" && -f "TEST") {
-        if ($Config{'extensions'} !~ m/\bDB_File\b/ ) {
+        if (%Config{'extensions'} !~ m/\bDB_File\b/ ) {
             print "1..0 # Skip: DB_File was not built\n";
             exit 0;
         }
@@ -140,7 +140,7 @@ my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
 
 ok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640) ||
-   $noMode{$^O} );
+   %noMode{$^O} );
 
 my ($key, $value, $i);
 while (($key,$value) = each(%h)) {
@@ -148,35 +148,35 @@ while (($key,$value) = each(%h)) {
 }
 ok(17, !$i );
 
-$h{'goner1'} = 'snork';
+%h{'goner1'} = 'snork';
 
-$h{'abc'} = 'ABC';
-ok(18, $h{'abc'} eq 'ABC' );
-ok(19, !defined $h{'jimmy'} );
-ok(20, !exists $h{'jimmy'} );
-ok(21, exists $h{'abc'} );
+%h{'abc'} = 'ABC';
+ok(18, %h{'abc'} eq 'ABC' );
+ok(19, !defined %h{'jimmy'} );
+ok(20, !exists %h{'jimmy'} );
+ok(21, exists %h{'abc'} );
 
-$h{'def'} = 'DEF';
-$h{'jkl','mno'} = "JKL\034MNO";
-$h{'a',2,3,4,5} = join("\034",'A',2,3,4,5);
-$h{'a'} = 'A';
+%h{'def'} = 'DEF';
+%h{'jkl','mno'} = "JKL\034MNO";
+%h{'a',2,3,4,5} = join("\034",'A',2,3,4,5);
+%h{'a'} = 'A';
 
 #$h{'b'} = 'B';
 $X->STORE('b', 'B') ;
 
-$h{'c'} = 'C';
+%h{'c'} = 'C';
 
 #$h{'d'} = 'D';
 $X->put('d', 'D') ;
 
-$h{'e'} = 'E';
-$h{'f'} = 'F';
-$h{'g'} = 'X';
-$h{'h'} = 'H';
-$h{'i'} = 'I';
+%h{'e'} = 'E';
+%h{'f'} = 'F';
+%h{'g'} = 'X';
+%h{'h'} = 'H';
+%h{'i'} = 'I';
 
-$h{'goner2'} = 'snork';
-delete $h{'goner2'};
+%h{'goner2'} = 'snork';
+delete %h{'goner2'};
 
 
 # IMPORTANT - $X must be undefined before the untie otherwise the
@@ -189,29 +189,29 @@ untie(%h);
 ok(22, $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640) );
 
 # Modify an entry from the previous tie
-$h{'g'} = 'G';
+%h{'g'} = 'G';
 
-$h{'j'} = 'J';
-$h{'k'} = 'K';
-$h{'l'} = 'L';
-$h{'m'} = 'M';
-$h{'n'} = 'N';
-$h{'o'} = 'O';
-$h{'p'} = 'P';
-$h{'q'} = 'Q';
-$h{'r'} = 'R';
-$h{'s'} = 'S';
-$h{'t'} = 'T';
-$h{'u'} = 'U';
-$h{'v'} = 'V';
-$h{'w'} = 'W';
-$h{'x'} = 'X';
-$h{'y'} = 'Y';
-$h{'z'} = 'Z';
+%h{'j'} = 'J';
+%h{'k'} = 'K';
+%h{'l'} = 'L';
+%h{'m'} = 'M';
+%h{'n'} = 'N';
+%h{'o'} = 'O';
+%h{'p'} = 'P';
+%h{'q'} = 'Q';
+%h{'r'} = 'R';
+%h{'s'} = 'S';
+%h{'t'} = 'T';
+%h{'u'} = 'U';
+%h{'v'} = 'V';
+%h{'w'} = 'W';
+%h{'x'} = 'X';
+%h{'y'} = 'Y';
+%h{'z'} = 'Z';
 
-$h{'goner3'} = 'snork';
+%h{'goner3'} = 'snork';
 
-delete $h{'goner1'};
+delete %h{'goner1'};
 $X->DELETE('goner3');
 
 my @keys = keys(%h);
@@ -221,7 +221,7 @@ ok(23, @keys == 30 && @values == 30) ;
 
 $i = 0 ;
 while (($key,$value) = each(%h)) {
-    if ($key eq $keys[$i] && $value eq $values[$i] && $key eq lc($value)) {
+    if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 	$key =~ y/a-z/A-Z/;
 	$i++ if $key eq $value;
     }
@@ -232,15 +232,15 @@ ok(24, $i == 30) ;
 @keys = ('blurfl', keys(%h), 'dyick');
 ok(25, @keys == 32) ;
 
-$h{'foo'} = '';
-ok(26, $h{'foo'} eq '' );
+%h{'foo'} = '';
+ok(26, %h{'foo'} eq '' );
 
 # Berkeley DB from version 2.4.10 to 3.0 does not allow null keys.
 # This feature was reenabled in version 3.1 of Berkeley DB.
 my $result = 0 ;
 if ($null_keys_allowed) {
-    $h{''} = 'bar';
-    $result = ( $h{''} eq 'bar' );
+    %h{''} = 'bar';
+    $result = ( %h{''} eq 'bar' );
 }
 else
   { $result = 1 }
@@ -248,16 +248,16 @@ ok(27, $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i +< 200; $i++) { $h{$i + 0} = $i + 0; }
-for ($i = 1; $i +< 200; $i++) { $ok = 0 unless $h{$i} == $i; }
+for ($i = 1; $i +< 200; $i++) { %h{$i + 0} = $i + 0; }
+for ($i = 1; $i +< 200; $i++) { $ok = 0 unless %h{$i} == $i; }
 ok(28, $ok );
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 ok(29, $size +> 0 );
 
-@h{0..200} = 200..400;
-my @foo = @h{0..200};
+%h{[0..200]} = 200..400;
+my @foo = %h{[0..200]};
 ok(30, join(':',200..400) eq join(':',@foo) );
 
 
@@ -271,7 +271,7 @@ ok(31, $status == 1 );
  
 # check that the value of the key 'x' has not been changed by the 
 # previous test
-ok(32, $h{'x'} eq 'X' );
+ok(32, %h{'x'} eq 'X' );
 
 # standard put
 $status = $X->put('key', 'value') ;
@@ -291,7 +291,7 @@ ok(36, $status == 0 );
 # Make sure that the key deleted, cannot be retrieved
 {
     no warnings 'uninitialized' ;
-    ok(37, $h{'q'} eq undef );
+    ok(37, %h{'q'} eq undef );
 }
 
 # Attempting to delete a non-existant key should fail
@@ -343,7 +343,7 @@ unlink $Dfile;
 
 ok(44, tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 foreach (1 .. 10)
-  { $h{$_} = $_ * 100 }
+  { %h{$_} = $_ * 100 }
 
 # check that there are 10 elements in the hash
 $i = 0 ;
@@ -382,10 +382,10 @@ untie %h ;
     my $filename = "xyz" ;
     my $hi = DB_File::HASHINFO->new() ;
     $::count = 0 ;
-    $hi->{hash} = sub { ++$::count ; length $_[0] } ;
+    $hi->{hash} = sub { ++$::count ; length @_[0] } ;
     ok(49, tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $hi ) ;
-    $h{"abc"} = 123 ;
-    ok(50, $h{"abc"} == 123) ;
+    %h{"abc"} = 123 ;
+    ok(50, %h{"abc"} == 123) ;
     untie %x ;
     unlink $filename ;
     ok(51, $::count +>0) ;
@@ -535,12 +535,12 @@ EOM
 
    $_ = "original" ;
 
-   $h{"fred"} = "joe" ;
+   %h{"fred"} = "joe" ;
    #                   fk   sk     fv   sv
    ok(64, checkOutput( "", "fred", "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(65, $h{"fred"} eq "joe");
+   ok(65, %h{"fred"} eq "joe");
    #                   fk    sk     fv    sv
    ok(66, checkOutput( "", "fred", "joe", "")) ;
 
@@ -564,12 +564,12 @@ EOM
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   $h{"Fred"} = "Joe" ;
+   %h{"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
    ok(71, checkOutput( "", "fred", "", "Jxe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(72, $h{"Fred"} eq "[Jxe]");
+   ok(72, %h{"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
    ok(73, checkOutput( "", "fred", "[Jxe]", "")) ;
 
@@ -589,11 +589,11 @@ EOM
    $db->filter_store_value ($old_sv);
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   $h{"fred"} = "joe" ;
+   %h{"fred"} = "joe" ;
    ok(78, checkOutput( "", "fred", "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(79, $h{"fred"} eq "joe");
+   ok(79, %h{"fred"} eq "joe");
    ok(80, checkOutput( "", "fred", "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
@@ -612,11 +612,11 @@ EOM
    $db->filter_store_value (undef);
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   $h{"fred"} = "joe" ;
+   %h{"fred"} = "joe" ;
    ok(85, checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
-   ok(86, $h{"fred"} eq "joe");
+   ok(86, %h{"fred"} eq "joe");
    ok(87, checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
@@ -651,7 +651,7 @@ EOM
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     $result{$name} = "$name - $count: [@kept]" ;
+		     %result{$name} = "$name - $count: [@kept]" ;
 		   }
     }
 
@@ -662,32 +662,32 @@ EOM
 
     $_ = "original" ;
 
-    $h{"fred"} = "joe" ;
-    ok(93, $result{"store key"} eq "store key - 1: [fred]");
-    ok(94, $result{"store value"} eq "store value - 1: [joe]");
-    ok(95, ! defined $result{"fetch key"} );
-    ok(96, ! defined $result{"fetch value"} );
+    %h{"fred"} = "joe" ;
+    ok(93, %result{"store key"} eq "store key - 1: [fred]");
+    ok(94, %result{"store value"} eq "store value - 1: [joe]");
+    ok(95, ! defined %result{"fetch key"} );
+    ok(96, ! defined %result{"fetch value"} );
     ok(97, $_ eq "original") ;
 
     ok(98, $db->FIRSTKEY() eq "fred") ;
-    ok(99, $result{"store key"} eq "store key - 1: [fred]");
-    ok(100, $result{"store value"} eq "store value - 1: [joe]");
-    ok(101, $result{"fetch key"} eq "fetch key - 1: [fred]");
-    ok(102, ! defined $result{"fetch value"} );
+    ok(99, %result{"store key"} eq "store key - 1: [fred]");
+    ok(100, %result{"store value"} eq "store value - 1: [joe]");
+    ok(101, %result{"fetch key"} eq "fetch key - 1: [fred]");
+    ok(102, ! defined %result{"fetch value"} );
     ok(103, $_ eq "original") ;
 
-    $h{"jim"}  = "john" ;
-    ok(104, $result{"store key"} eq "store key - 2: [fred jim]");
-    ok(105, $result{"store value"} eq "store value - 2: [joe john]");
-    ok(106, $result{"fetch key"} eq "fetch key - 1: [fred]");
-    ok(107, ! defined $result{"fetch value"} );
+    %h{"jim"}  = "john" ;
+    ok(104, %result{"store key"} eq "store key - 2: [fred jim]");
+    ok(105, %result{"store value"} eq "store value - 2: [joe john]");
+    ok(106, %result{"fetch key"} eq "fetch key - 1: [fred]");
+    ok(107, ! defined %result{"fetch value"} );
     ok(108, $_ eq "original") ;
 
-    ok(109, $h{"fred"} eq "joe");
-    ok(110, $result{"store key"} eq "store key - 3: [fred jim fred]");
-    ok(111, $result{"store value"} eq "store value - 2: [joe john]");
-    ok(112, $result{"fetch key"} eq "fetch key - 1: [fred]");
-    ok(113, $result{"fetch value"} eq "fetch value - 1: [joe]");
+    ok(109, %h{"fred"} eq "joe");
+    ok(110, %result{"store key"} eq "store key - 3: [fred jim fred]");
+    ok(111, %result{"store value"} eq "store value - 2: [joe john]");
+    ok(112, %result{"fetch key"} eq "fetch key - 1: [fred]");
+    ok(113, %result{"fetch value"} eq "fetch value - 1: [joe]");
     ok(114, $_ eq "original") ;
 
     undef $db ;
@@ -704,7 +704,7 @@ EOM
 
    ok(115, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
-   $db->filter_store_key (sub { $_ = $h{$_} }) ;
+   $db->filter_store_key (sub { $_ = %h{$_} }) ;
 
    eval '$h{1} = 1234' ;
    ok(116, $@->{description} =~ m/^recursion detected in filter_store_key/ );
@@ -732,16 +732,16 @@ EOM
         or die "Cannot open file 'fruit': $!\n";
 
     # Add a few key/value pairs to the file
-    $h{"apple"} = "red" ;
-    $h{"orange"} = "orange" ;
-    $h{"banana"} = "yellow" ;
-    $h{"tomato"} = "red" ;
+    %h{"apple"} = "red" ;
+    %h{"orange"} = "orange" ;
+    %h{"banana"} = "yellow" ;
+    %h{"tomato"} = "red" ;
 
     # Check for existence of a key
-    print "Banana Exists\n\n" if $h{"banana"} ;
+    print "Banana Exists\n\n" if %h{"banana"} ;
 
     # Delete a key/value pair.
-    delete $h{"apple"} ;
+    delete %h{"apple"} ;
 
     # print the contents of the file
     while (($k, $v) = each %h)
@@ -774,10 +774,10 @@ EOM
     unlink $Dfile;
     my %h ;
     my $a = "";
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
     
     tie %h, 'DB_File', $Dfile or die "Can't open file: $!\n" ;
-    $h{ABC} = undef;
+    %h{ABC} = undef;
     ok(118, $a eq "") ;
     untie %h ;
     unlink $Dfile;
@@ -793,7 +793,7 @@ EOM
     unlink $Dfile;
     my %h ;
     my $a = "";
-    local ${^WARN_HOOK} = sub {$a = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
     
     tie %h, 'DB_File', $Dfile or die "Can't open file: $!\n" ;
     %h = (); ;
@@ -821,11 +821,11 @@ EOM
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
     $db->filter_store_key (sub { $bad_key = 1 if m/^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
-    $h{'Alpha_ABC'} = 2 ;
-    $h{'Alpha_DEF'} = 5 ;
+    %h{'Alpha_ABC'} = 2 ;
+    %h{'Alpha_DEF'} = 5 ;
 
-    ok(121, $h{'Alpha_ABC'} == 2);
-    ok(122, $h{'Alpha_DEF'} == 5);
+    ok(121, %h{'Alpha_ABC'} == 2);
+    ok(122, %h{'Alpha_DEF'} == 5);
 
     my ($k, $v) = ("","");
     while (($k, $v) = each %h) {}
@@ -888,10 +888,10 @@ EOM
     my $h2_count = 0;
     unlink $Dfile, $Dfile2;
     my $dbh1 = DB_File::HASHINFO->new() ;
-    $dbh1->{hash} = sub { ++ $h1_count ; length $_[0] } ;
+    $dbh1->{hash} = sub { ++ $h1_count ; length @_[0] } ;
 
     my $dbh2 = DB_File::HASHINFO->new() ;
-    $dbh2->{hash} = sub { ++ $h2_count ; length $_[0] } ;
+    $dbh2->{hash} = sub { ++ $h2_count ; length @_[0] } ;
  
  
  
@@ -899,13 +899,13 @@ EOM
     ok(127, tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
     ok(128, tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
 
-    $hash1{DEFG} = 5;
-    $hash1{XYZ} = 2;
-    $hash1{ABCDE} = 5;
+    %hash1{DEFG} = 5;
+    %hash1{XYZ} = 2;
+    %hash1{ABCDE} = 5;
 
-    $hash2{defg} = 5;
-    $hash2{xyz} = 2;
-    $hash2{abcde} = 5;
+    %hash2{defg} = 5;
+    %hash2{xyz} = 2;
+    %hash2{abcde} = 5;
 
     ok(129, $h1_count +> 0);
     ok(130, $h1_count == $h2_count);
@@ -960,10 +960,10 @@ EOM
 
    $_ = "original" ;
 
-   $h{"fred"} = "joe" ;
-   ok(137, $h{"fred"} eq "joe");
+   %h{"fred"} = "joe" ;
+   ok(137, %h{"fred"} eq "joe");
 
-   eval { my @r= grep { $h{$_} } (1, 2, 3) };
+   eval { my @r= grep { %h{$_} } (1, 2, 3) };
    ok (138, ! $@);
 
 
@@ -973,13 +973,13 @@ EOM
    $db->filter_fetch_value (undef);
    $db->filter_store_value (undef);
 
-   $h{"fred"} = "joe" ;
+   %h{"fred"} = "joe" ;
 
-   ok(139, $h{"fred"} eq "joe");
+   ok(139, %h{"fred"} eq "joe");
 
    ok(140, $db->FIRSTKEY() eq "fred") ;
    
-   eval { my @r= grep { $h{$_} } (1, 2, 3) };
+   eval { my @r= grep { %h{$_} } (1, 2, 3) };
    ok (141, ! $@);
 
    undef $db ;
@@ -1023,7 +1023,7 @@ EOM
 
    $key = 51 ;
    $value = 454;
-   $h{$key} = $value ;
+   %h{$key} = $value ;
    ok 149, $key == 51;
    ok 150, $value == 454 ;
    ok 151, $_ eq 'fred';
@@ -1051,7 +1051,7 @@ EOM
     ok(152, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
     my $warned = '';
-    local ${^WARN_HOOK} = sub {$warned = $_[0]} ;
+    local ${^WARN_HOOK} = sub {$warned = @_[0]} ;
 
     # db-put with substr of key
     my %remember = () ;
@@ -1059,7 +1059,7 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$key} = $value ;
+        %remember{$key} = $value ;
         $db->put($key, $value) ;
     }
 
@@ -1072,7 +1072,7 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$key} = $value ;
+        %remember{$key} = $value ;
         $db->put($key, $value) ;
     }
 
@@ -1086,8 +1086,8 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$key} = $value ;
-        $h{substr($key,0)} = $value ;
+        %remember{$key} = $value ;
+        %h{substr($key,0)} = $value ;
     }
 
     ok 155, $warned eq '' 
@@ -1100,8 +1100,8 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$key} = $value ;
-        $h{$key} = substr($value,0) ;
+        %remember{$key} = $value ;
+        %h{$key} = substr($value,0) ;
     }
 
     ok 156, $warned eq '' 
@@ -1114,12 +1114,12 @@ EOM
          $status = $db->seq($key, $value, R_NEXT ) ) {
 
         #print "# key [$key] value [$value]\n" ;
-        if (defined $remember{$key} && defined $value && 
-             $remember{$key} eq $value) {
-            delete $remember{$key} ;
+        if (defined %remember{$key} && defined $value && 
+             %remember{$key} eq $value) {
+            delete %remember{$key} ;
         }
         else {
-            $bad{$key} = $value ;
+            %bad{$key} = $value ;
         }
     }
     
@@ -1180,7 +1180,7 @@ EOM
     {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
-        $remember{$key} = $value ;
+        %remember{$key} = $value ;
         $status += $db->put(substr($key,0), substr($value,0)) ;
     }
 
@@ -1202,12 +1202,12 @@ EOM
          $status = $db->seq($key, $value, R_NEXT ) ) {
 
         #print "# key [$key] value [$value]\n" ;
-        if (defined $remember{$key} && defined $value && 
-             $remember{$key} eq $value) {
-            delete $remember{$key} ;
+        if (defined %remember{$key} && defined $value && 
+             %remember{$key} eq $value) {
+            delete %remember{$key} ;
         }
         else {
-            $bad{$key} = $value ;
+            %bad{$key} = $value ;
         }
     }
     

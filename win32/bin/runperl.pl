@@ -2,7 +2,7 @@
 $0 =~ s|\.bat||i;
 unless (-f $0) {
     $0 =~ s|.*[/\\]||;
-    for (".", split ';', $ENV{PATH}) {
+    for (".", split ';', %ENV{PATH}) {
 	$_ = "." if $_ eq "";
 	$0 = "$_/$0" , goto doit if -f "$_/$0";
     }

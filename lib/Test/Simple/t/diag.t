@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -15,7 +15,7 @@ BEGIN {
 # lots of threading bugs.
 use Config;
 BEGIN {
-    if( $Config{useithreads} ) {
+    if( %Config{useithreads} ) {
         require threads;
         'threads'->import;
     }

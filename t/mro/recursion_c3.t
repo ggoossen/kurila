@@ -11,7 +11,7 @@ BEGIN {
 
 require './test.pl';
 
-plan(skip_all => "Your system has no SIGALRM") if !exists $SIG{ALRM};
+plan(skip_all => "Your system has no SIGALRM") if !exists %SIG{ALRM};
 plan(tests => 8);
 
 =pod
@@ -75,7 +75,7 @@ my @loopies = (
 
 foreach my $loopy (@loopies) {
     eval {
-        local $SIG{ALRM} = sub { die "ALRMTimeout" };
+        local %SIG{ALRM} = sub { die "ALRMTimeout" };
         alarm(3);
         $loopy->();
         mro::get_linear_isa('K', 'c3');

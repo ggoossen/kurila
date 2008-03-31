@@ -117,7 +117,7 @@ sub memEQ_clause {
 #    if (memEQ(name, "thingy", 6)) {
   # Which could actually be a character comparison or even ""
   my ($self, $args) = @_;
-  my ($name, $checked_at, $indent) = @{$args}{qw(name checked_at indent)};
+  my ($name, $checked_at, $indent) = %{$args}{[qw(name checked_at indent)]};
   $indent = ' ' x ($indent || 4);
   my $front_chop;
   if (ref $checked_at) {
@@ -208,7 +208,7 @@ I<default_types> and the I<ITEM>s.
 sub dump_names {
   my ($self, $args, @items) = @_;
   my ($default_type, $what, $indent, $declare_types)
-    = @{$args}{qw(default_type what indent declare_types)};
+    = %{$args}{[qw(default_type what indent declare_types)]};
   $indent = ' ' x ($indent || 0);
 
   my $result;
@@ -222,7 +222,7 @@ sub dump_names {
       $_ = {name=>$_};
       $type = $default_type;
     }
-    $used_types{$type}++;
+    %used_types{$type}++;
     if ($type eq $default_type
         # grr 5.6.1
         and length $_->{name}
@@ -241,7 +241,7 @@ sub dump_names {
   if (!defined $declare_types) {
     # Do they pass in any types we weren't already using?
     foreach (keys %$what) {
-      next if $used_types{$_};
+      next if %used_types{$_};
       $declare_types++; # Found one in $what that wasn't used.
       last; # And one is enough to terminate this loop
     }
@@ -299,7 +299,7 @@ sub assign {
   my $self = shift;
   my $args = shift;
   my ($indent, $type, $pre, $post, $item)
-      = @{$args}{qw(indent type pre post item)};
+      = %{$args}{[qw(indent type pre post item)]};
   $post ||= '';
   my $clause;
   my $close;
@@ -350,7 +350,7 @@ sub return_clause {
   my $indent = $args->{indent};
 
   my ($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
-    = @$item{qw (name value default pre post def_pre def_post type)};
+    = %$item{[qw (name value default pre post def_pre def_post type)]};
   $value = $name unless defined $value;
   my $macro = $self->macro_from_item($item);
   $indent = ' ' x ($indent || 6);
@@ -392,7 +392,7 @@ sub return_clause {
 sub match_clause {
   # $offset defined if we have checked an offset.
   my ($self, $args, $item) = @_;
-  my ($offset, $indent) = @{$args}{qw(checked_at indent)};
+  my ($offset, $indent) = %{$args}{[qw(checked_at indent)]};
   $indent = ' ' x ($indent || 4);
   my $body = '';
   my ($no, $yes, $either, $name, $inner_indent);
@@ -437,7 +437,7 @@ each call).
 
 sub switch_clause {
   my ($self, $args, $namelen, $items, @items) = @_;
-  my ($indent, $comment) = @{$args}{qw(indent comment)};
+  my ($indent, $comment) = %{$args}{[qw(indent comment)]};
   $indent = ' ' x ($indent || 2);
 
   local $Text::Wrap::huge = 'overflow';
@@ -453,7 +453,7 @@ sub switch_clause {
   }
   my @safe_names = @names;
   foreach (@safe_names) {
-    die sprintf "Name '$_' is length %d, not $namelen", length
+    die sprintf "Name '$_' is length \%d, not $namelen", length
       unless length == $namelen;
     # Argh. 5.6.1
     # next unless tr/A-Za-z0-9_//c;
@@ -480,7 +480,7 @@ sub switch_clause {
       die "char $ord is out of range" if $ord +> 255;
       $max = $ord if $ord +> $max;
       $min = $ord if $ord +< $min;
-      push @{$spread{$char}}, $_;
+      push @{%spread{$char}}, $_;
       # warn "$_ $char";
     }
     # I'm going to pick the character to split on that minimises the root
@@ -500,14 +500,14 @@ sub switch_clause {
     my $ss;
     $ss += @$_ * @$_ foreach values %spread;
     my $rms = sqrt ($ss / keys %spread);
-    if ($rms +< $best[0] || ($rms == $best[0] && ($max - $min) +< $best[1])) {
+    if ($rms +< @best[0] || ($rms == @best[0] && ($max - $min) +< @best[1])) {
       @best = ($rms, $max - $min, $i, \%spread);
     }
   }
   die "Internal error. Failed to pick a switch point for @names"
-    unless defined $best[2];
+    unless defined @best[2];
   # use Data::Dumper; print Dumper (@best);
-  my ($offset, $best) = @best[2,3];
+  my ($offset, $best) = @best[[2,3]];
   $body .= $indent . "/* Offset $offset gives the best switch position.  */\n";
 
   my $do_front_chop = $offset == 0 && $namelen +> 2;
@@ -517,9 +517,9 @@ sub switch_clause {
     $body .= $indent . "switch (" . $self->name_param() . "[$offset]) \{\n";
   }
   foreach my $char (sort keys %$best) {
-    die sprintf "'$char' is %d bytes long, not 1", length $char
+    die sprintf "'$char' is \%d bytes long, not 1", length $char
       if length ($char) != 1;
-    die sprintf "char %#X is out of range", ord $char if ord ($char) +> 255;
+    die sprintf "char \%#X is out of range", ord $char if ord ($char) +> 255;
     $body .= $indent . "case '" . C_stringify ($char) . "':\n";
     foreach my $thisone (sort {
 	# Deal with the case of an item actually being an array ref to 1 or 2
@@ -532,7 +532,7 @@ sub switch_clause {
 	    or $l->{name} cmp $r->{name}}
 			 # If this looks evil, maybe it is.  $items is a
 			 # hashref, and we're doing a hash slice on it
-			 @{$items}{@{$best->{$char}}}) {
+			 %{$items}{[@{$best->{$char}}]}) {
       # warn "You are here";
       if ($do_front_chop) {
         $body .= $self->match_clause ({indent => 2 + length $indent,
@@ -561,7 +561,7 @@ sub C_constant_prefix_param_defintion {
 }
 
 sub name_param_definition {
-  "const char *" . $_[0]->name_param;
+  "const char *" . @_[0]->name_param;
 }
 
 sub namelen_param {
@@ -569,7 +569,7 @@ sub namelen_param {
 }
 
 sub namelen_param_definition {
-  'size_t ' . $_[0]->namelen_param;
+  'size_t ' . @_[0]->namelen_param;
 }
 
 sub C_constant_other_params {
@@ -631,7 +631,7 @@ sub normalise_items
         if (ref $orig) {
             # Make a copy which is a normalised version of the ref passed in.
             $name = $orig->{name};
-            my ($type, $macro, $value) = @$orig{qw (type macro value)};
+            my ($type, $macro, $value) = %$orig{[qw (type macro value)]};
             $type ||= $default_type;
             $what->{$type} = 1;
             $item = {name=>$name, type=>$type};
@@ -775,7 +775,7 @@ example C<constant_5> for names 5 characters long.  The default I<breakout> is
 sub C_constant {
   my ($self, $args, @items) = @_;
   my ($package, $subname, $default_type, $what, $indent, $breakout) =
-    @{$args}{qw(package subname default_type types indent breakout)};
+    %{$args}{[qw(package subname default_type types indent breakout)]};
   $package ||= 'Foo';
   $subname ||= 'constant';
   # I'm not using this. But a hashref could be used for full formatting without
@@ -833,13 +833,13 @@ sub C_constant {
     # Need to group names of the same length
     my @by_length;
     foreach (@items) {
-      push @{$by_length[length $_->{name}]}, $_;
+      push @{@by_length[length $_->{name}]}, $_;
     }
     foreach my $i (0 .. (@by_length-1)) {
-      next unless $by_length[$i];	# None of this length
+      next unless @by_length[$i];	# None of this length
       $body .= "  case $i:\n";
-      if (@{$by_length[$i]} == 1) {
-        my $only_thing = $by_length[$i]->[0];
+      if (@{@by_length[$i]} == 1) {
+        my $only_thing = @by_length[$i]->[0];
         if ($only_thing->{utf8}) {
           if ($only_thing->{utf8} eq 'yes') {
             # With utf8 on flag item is passed in element 0
@@ -851,14 +851,14 @@ sub C_constant {
         } else {
           $body .= $self->match_clause (undef, $only_thing);
         }
-      } elsif (@{$by_length[$i]} +< $breakout) {
+      } elsif (@{@by_length[$i]} +< $breakout) {
         $body .= $self->switch_clause ({indent=>4},
-				       $i, $items, @{$by_length[$i]});
+				       $i, $items, @{@by_length[$i]});
       } else {
         # Only use the minimal set of parameters actually needed by the types
         # of the names of this length.
         my $what = {};
-        foreach (@{$by_length[$i]}) {
+        foreach (@{@by_length[$i]}) {
           $what->{$_->{type}} = 1;
           $what->{''} = 1 if $_->{utf8};
         }
@@ -868,7 +868,7 @@ sub C_constant {
 					default_type => $default_type,
 					types => $what, indent => $indent,
 					breakout => [$i, $items]},
-				       @{$by_length[$i]});
+				       @{@by_length[$i]});
         $body .= "    return ${subname}_$i ("
 	  # Eg "aTHX_ "
 	  . $self->C_constant_prefix_param($params)

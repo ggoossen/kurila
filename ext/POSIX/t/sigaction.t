@@ -10,7 +10,7 @@ BEGIN{
 	use Config;
 	eval 'use POSIX';
 	if($@ || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' ||
-	   $^O eq 'MacOS' || ($^O eq 'VMS' && !$Config{'d_sigaction'})) {
+	   $^O eq 'MacOS' || ($^O eq 'VMS' && !%Config{'d_sigaction'})) {
 		print "1..0\n";
 		exit 0;
 	}
@@ -48,7 +48,7 @@ my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
 ok($oldaction->{HANDLER} eq 'DEFAULT' ||
    $oldaction->{HANDLER} eq 'IGNORE', $oldaction->{HANDLER});
 
-is($SIG{HUP}, \&foo);
+is(%SIG{HUP}, \&foo);
 
 sigaction(SIGHUP, $newaction, $oldaction);
 is($oldaction->{HANDLER}, \&foo);
@@ -66,9 +66,9 @@ sigaction(SIGHUP, $newaction);
 kill 'HUP', $$;
 ok(!$bad, "SIGHUP ignored");
 
-is($SIG{HUP}, 'IGNORE');
+is(%SIG{HUP}, 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
-is($SIG{HUP}, 'DEFAULT');
+is(%SIG{HUP}, 'DEFAULT');
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
@@ -78,7 +78,7 @@ sigaction(SIGHUP, $newaction);
 }
 ok($ok10, "SIGHUP handler called");
 
-is(ref($SIG{HUP}), 'CODE');
+is(ref(%SIG{HUP}), 'CODE');
 
 sigaction(SIGHUP, POSIX::SigAction->new(\&::foo));
 # Make sure the signal mask gets restored after sigaction croak()s.
@@ -96,7 +96,7 @@ my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
 kill 'HUP', $$;
 ok(!$x && $ok, "signal mask gets restored after early return");
 
-$SIG{HUP}=sub {};
+%SIG{HUP}=sub {};
 sigaction(SIGHUP, $newaction, $oldaction);
 is(ref($oldaction->{HANDLER}), 'CODE');
 
@@ -156,7 +156,7 @@ SKIP: {
 # for this one, use the accessor instead of the attribute
 
 # standard signal handling via %SIG is safe
-$SIG{HUP} = \&foo;
+%SIG{HUP} = \&foo;
 $oldaction = POSIX::SigAction->new;
 sigaction(SIGHUP, undef, $oldaction);
 ok($oldaction->safe, "SIGHUP is safe");
@@ -182,14 +182,14 @@ SKIP: {
     eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
     $@					# POSIX did not exort
     || SIGRTMIN() +< 0 || SIGRTMAX() +< 0	# HP-UX 10.20 exports both as -1
-    || SIGRTMIN() +> $Config{sig_count}	# AIX 4.3.3 exports bogus 888 and 999
+    || SIGRTMIN() +> %Config{sig_count}	# AIX 4.3.3 exports bogus 888 and 999
 	and skip("no SIGRT signals", 4);
     ok(SIGRTMAX() +> SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
     is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");
     my $sigrtmin;
     my $h = sub { $sigrtmin = 1 };
-    $SIGRT{SIGRTMIN} = $h;
-    is($SIGRT{SIGRTMIN}, $h, "handler set & get");
+    %SIGRT{SIGRTMIN} = $h;
+    is(%SIGRT{SIGRTMIN}, $h, "handler set & get");
     kill 'SIGRTMIN', $$;
     is($sigrtmin, 1, "SIGRTMIN handler works");
 }
@@ -198,7 +198,7 @@ SKIP: {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';
     skip("no SA_SIGINFO", 1) if $@;
     sub hiphup {
-	is($_[1]->{signo}, SIGHUP, "SA_SIGINFO got right signal");
+	is(@_[1]->{signo}, SIGHUP, "SA_SIGINFO got right signal");
     }
     my $act = POSIX::SigAction->new(\&hiphup, 0, SA_SIGINFO);
     sigaction(SIGHUP, $act);

@@ -32,7 +32,7 @@ $TESTERR = *STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.
-$ENV{REGRESSION_TEST} = $0;
+%ENV{REGRESSION_TEST} = $0;
 
 
 =head1 NAME
@@ -146,7 +146,7 @@ in a C<BEGIN {...}> block, like so:
 =cut
 
 sub plan {
-    die "Test::plan(%args): odd number of arguments" if @_ ^&^ 1;
+    die "Test::plan(\%args): odd number of arguments" if @_ ^&^ 1;
     die "Test::plan(): should not be called more than once" if $planned;
 
     local($\, $,);   # guard against -l and other things that screw with
@@ -154,14 +154,14 @@ sub plan {
 
     _reset_globals();
 
-    _read_program( (caller)[1] );
+    _read_program( (caller)[[1]] );
 
     my $max=0;
     while (@_) {
 	my ($k,$v) = splice(@_, 0, 2);
 	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
-	       $k eq 'failok') { for (@$v) { $todo{$_}=1; }; }
+	       $k eq 'failok') { for (@$v) { %todo{$_}=1; }; }
 	elsif ($k eq 'onfail') {
 	    ref $v eq 'CODE' or die "Test::plan(onfail => $v): must be CODE";
 	    $ONFAIL = $v;
@@ -185,7 +185,7 @@ sub plan {
       if defined $MacPerl::Version;
 
     printf $TESTOUT
-      "# Current time local: %s\n# Current time GMT:   %s\n",
+      "# Current time local: \%s\n# Current time GMT:   \%s\n",
       scalar(localtime($^T)), scalar(gmtime($^T));
 
     print $TESTOUT "# Using Test.pm version $VERSION\n";
@@ -199,13 +199,13 @@ sub _read_program {
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
   open(SOURCEFILE, "<", "$file") || return;
-  $Program_Lines{$file} = [ ~< *SOURCEFILE];
+  %Program_Lines{$file} = [ ~< *SOURCEFILE];
   close(SOURCEFILE);
 
-  foreach my $x (@{$Program_Lines{$file}})
+  foreach my $x (@{%Program_Lines{$file}})
    { $x =~ tr/\cm\cj\n\r//d }
 
-  unshift @{$Program_Lines{$file}}, '';
+  unshift @{%Program_Lines{$file}}, '';
   return 1;
 }
 
@@ -227,7 +227,7 @@ sub _to_value {
 }
 
 sub _quote {
-    my $str = $_[0];
+    my $str = @_[0];
     return "<UNDEF>" unless defined $str;
     $str =~ s/\\/\\\\/g;
     $str =~ s/"/\\"/g;
@@ -370,7 +370,7 @@ sub ok ($;$$) {
                     # print
 
     my ($pkg,$file,$line) = caller($TestLevel);
-    my $repetition = ++$history{"$file:$line"};
+    my $repetition = ++%history{"$file:$line"};
     my $context = ("$file at line $line".
 		   ($repetition +> 1 ? " fail \#$repetition" : ''));
 
@@ -399,7 +399,7 @@ sub ok ($;$$) {
 	    $ok = $result eq $expected;
 	}
     }
-    my $todo = $todo{$ntest};
+    my $todo = %todo{$ntest};
     if ($todo and $ok) {
 	$context .= ' TODO?!' if $todo;
 	print $TESTOUT "ok $ntest # ($context)\n";
@@ -429,28 +429,28 @@ sub ok ($;$$) {
 
 sub _complain {
     my($result, $expected, $detail) = @_;
-    $$detail{expected} = $expected if defined $expected;
+    %$detail{expected} = $expected if defined $expected;
 
     # Get the user's diagnostic, protecting against multi-line
     # diagnostics.
-    my $diag = $$detail{diagnostic};
+    my $diag = %$detail{diagnostic};
     $diag =~ s/\n/\n#/g if defined $diag;
 
-    $$detail{context} .= ' *TODO*' if $$detail{todo};
-    if (!$$detail{compare}) {
+    %$detail{context} .= ' *TODO*' if %$detail{todo};
+    if (!%$detail{compare}) {
         if (!$diag) {
-            print $TESTERR "# Failed test $ntest in $$detail{context}\n";
+            print $TESTERR "# Failed test $ntest in %$detail{context}\n";
         } else {
-            print $TESTERR "# Failed test $ntest in $$detail{context}: $diag\n";
+            print $TESTERR "# Failed test $ntest in %$detail{context}: $diag\n";
         }
     } else {
         my $prefix = "Test $ntest";
 
         print $TESTERR "# $prefix got: " . _quote($result) .
-                       " ($$detail{context})\n";
+                       " (%$detail{context})\n";
         $prefix = ' ' x (length($prefix) - 5);
-        my $expected_quoted = (defined $$detail{regex})
-         ?  'qr{'.($$detail{regex}).'}'  :  _quote($expected);
+        my $expected_quoted = (defined %$detail{regex})
+         ?  'qr{'.(%$detail{regex}).'}'  :  _quote($expected);
 
         print $TESTERR "# $prefix Expected: $expected_quoted",
            $diag ? " ($diag)" : (), "\n";
@@ -459,13 +459,13 @@ sub _complain {
           if defined($expected) and 2 +< ($expected =~ tr/\n//);
     }
 
-    if(defined $Program_Lines{ $$detail{file} }[ $$detail{line} ]) {
+    if(defined %Program_Lines{ %$detail{file} }[ %$detail{line} ]) {
         print $TESTERR
-          "#  $$detail{file} line $$detail{line} is: $Program_Lines{ $$detail{file} }[ $$detail{line} ]\n"
-         if $Program_Lines{ $$detail{file} }[ $$detail{line} ]
+          "#  %$detail{file} line %$detail{line} is: %Program_Lines{ %$detail{file} }[ %$detail{line} ]\n"
+         if %Program_Lines{ %$detail{file} }[ %$detail{line} ]
           =~ m/[^\s\#\(\)\{\}\[\]\;]/;  # Otherwise it's uninformative
 
-        undef $Program_Lines{ $$detail{file} }[ $$detail{line} ];
+        undef %Program_Lines{ %$detail{file} }[ %$detail{line} ];
          # So we won't repeat it.
     }
 
@@ -477,7 +477,7 @@ sub _complain {
 
 sub _diff_complain {
     my($result, $expected, $detail, $prefix) = @_;
-    return _diff_complain_external(@_) if $ENV{PERL_TEST_DIFF};
+    return _diff_complain_external(@_) if %ENV{PERL_TEST_DIFF};
     return _diff_complain_algdiff(@_)
      if eval { require Algorithm::Diff; Algorithm::Diff->VERSION(1.15); 1; };
 
@@ -494,7 +494,7 @@ EOT
 
 sub _diff_complain_external {
     my($result, $expected, $detail, $prefix) = @_;
-    my $diff = $ENV{PERL_TEST_DIFF} || die "WHAAAA?";
+    my $diff = %ENV{PERL_TEST_DIFF} || die "WHAAAA?";
 
     require File::Temp;
     my($got_fh, $got_filename) = File::Temp::tempfile("test-got-XXXXX");
@@ -543,17 +543,17 @@ sub _diff_complain_algdiff {
 
         my $count_lines = @diff_lines;
         my $s = $count_lines == 1 ? "" : "s";
-        my $first_line = $diff_lines[0][0] + 1;
+        my $first_line = @diff_lines[0][0] + 1;
 
         print $TESTERR "# $prefix ";
         if ($diff_kind eq "GOT") {
             print $TESTERR "Got $count_lines extra line$s at line $first_line:\n";
             for my $i (@diff_lines) {
-                print $TESTERR "# $prefix  + " . _quote($got[$i->[0]]) . "\n";
+                print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
         } elsif ($diff_kind eq "EXP") {
             if ($count_lines +> 1) {
-                my $last_line = $diff_lines[-1][0] + 1;
+                my $last_line = @diff_lines[-1][0] + 1;
                 print $TESTERR "Lines $first_line-$last_line are";
             }
             else {
@@ -561,11 +561,11 @@ sub _diff_complain_algdiff {
             }
             print $TESTERR " missing:\n";
             for my $i (@diff_lines) {
-                print $TESTERR "# $prefix  - " . _quote($exp[$i->[1]]) . "\n";
+                print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
             }
         } elsif ($diff_kind eq "CH") {
             if ($count_lines +> 1) {
-                my $last_line = $diff_lines[-1][0] + 1;
+                my $last_line = @diff_lines[-1][0] + 1;
                 print $TESTERR "Lines $first_line-$last_line are";
             }
             else {
@@ -573,8 +573,8 @@ sub _diff_complain_algdiff {
             }
             print $TESTERR " changed:\n";
             for my $i (@diff_lines) {
-                print $TESTERR "# $prefix  - " . _quote($exp[$i->[1]]) . "\n";
-                print $TESTERR "# $prefix  + " . _quote($got[$i->[0]]) . "\n";
+                print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
+                print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
         }
 

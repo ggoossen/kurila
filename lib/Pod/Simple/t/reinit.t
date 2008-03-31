@@ -1,6 +1,6 @@
 BEGIN {
     chdir 't' if -d 't';
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         @INC = '../lib';
     }
 }
@@ -13,7 +13,7 @@ BEGIN { plan tests => 5 };
 
 sub source_path {
     my $file = shift;
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 'Simple', 't');
@@ -85,7 +85,7 @@ foreach my $file (
       }
     
       ok 0;
-      printf "# Unequal lengths %s and %s\n", length($outstring), length($compstring);
+      printf "# Unequal lengths \%s and \%s\n", length($outstring), length($compstring);
       next;
     }
   }

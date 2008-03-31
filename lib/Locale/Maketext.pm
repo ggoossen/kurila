@@ -35,7 +35,7 @@ sub quant {
   my($handle, $num, @forms) = @_;
 
   return $num if @forms == 0; # what should this mean?
-  return $forms[2] if @forms +> 2 and $num == 0; # special zeroth case
+  return @forms[2] if @forms +> 2 and $num == 0; # special zeroth case
 
   # Normal case:
   # Note that the formatting of $num is preserved.
@@ -51,21 +51,21 @@ sub numerate {
 
   return '' unless @forms;
   if(@forms == 1) { # only the headword form specified
-    return $s ? $forms[0] : ($forms[0] . 's'); # very cheap hack.
+    return $s ? @forms[0] : (@forms[0] . 's'); # very cheap hack.
   } else { # sing and plural were specified
-    return $s ? $forms[0] : $forms[1];
+    return $s ? @forms[0] : @forms[1];
   }
 }
 
 #--------------------------------------------------------------------------
 
 sub numf {
-  my($handle, $num) = @_[0,1];
+  my($handle, $num) = @_[[0,1]];
   if($num +< 10_000_000_000 and $num +> -10_000_000_000 and $num == int($num)) {
     $num += 0;  # Just use normal integer stringification.
          # Specifically, don't let %G turn ten million into 1E+007
   } else {
-    $num = CORE::sprintf("%G", $num);
+    $num = CORE::sprintf("\%G", $num);
      # "CORE::" is there to avoid confusion with the above sub sprintf.
   }
   while( $num =~ s/^([-+]?\d+)(\d{3})/$1,$2/s ) {1}  # right from perlfaq5
@@ -90,7 +90,7 @@ sub sprintf {
 use integer; # vroom vroom... applies to the whole rest of the module
 
 sub language_tag {
-  my $it = ref($_[0]) || $_[0];
+  my $it = ref(@_[0]) || @_[0];
   return undef unless $it =~ m/([^':]+)(?:::)?$/s;
   $it = lc($1);
   $it =~ tr<_><->;
@@ -98,7 +98,7 @@ sub language_tag {
 }
 
 sub encoding {
-  my $it = $_[0];
+  my $it = @_[0];
   return(
    (ref($it) && $it->{'encoding'})
    || "iso-8859-1"   # Latin-1
@@ -116,7 +116,7 @@ sub fallback_language_classes { return () }
 sub fail_with { # an actual attribute method!
   my($handle, @params) = @_;
   return unless ref($handle);
-  $handle->{'fail'} = $params[0] if @params;
+  $handle->{'fail'} = @params[0] if @params;
   return $handle->{'fail'};
 }
 
@@ -157,7 +157,7 @@ sub failure_handler_auto {
 
 sub new {
   # Nothing fancy!
-  my $class = ref($_[0]) || $_[0];
+  my $class = ref(@_[0]) || @_[0];
   my $handle = bless {}, $class;
   $handle->init;
   return $handle;
@@ -180,7 +180,7 @@ sub maketext {
 
   my $value;
   foreach my $h_r (
-    @{  $isa_scan{ref($handle) || $handle} || $handle->_lex_refs  }
+    @{  %isa_scan{ref($handle) || $handle} || $handle->_lex_refs  }
   ) {
     print "* Looking up \"$phrase\" in $h_r\n" if DEBUG;
     if(exists $h_r->{$phrase}) {
@@ -274,7 +274,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   my %seen;
   foreach my $module_name ( map { $base_class . "::" . $_ }  @languages ) {
     next unless length $module_name; # sanity
-    next if $seen{$module_name}++        # Already been here, and it was no-go
+    next if %seen{$module_name}++        # Already been here, and it was no-go
             || !&_try_use($module_name); # Try to use() it, but can't it.
     return($module_name->new); # Make it!
   }
@@ -381,11 +381,11 @@ my %tried = ();
 
 sub _try_use {   # Basically a wrapper around "require Modulename"
   # "Many men have tried..."  "They tried and failed?"  "They tried and died."
-  return $tried{$_[0]} if exists $tried{$_[0]};  # memoization
+  return %tried{@_[0]} if exists %tried{@_[0]};  # memoization
 
-  my $module = $_[0];   # ASSUME sane module name!
+  my $module = @_[0];   # ASSUME sane module name!
   { no strict 'refs';
-    return($tried{$module} = 1)
+    return(%tried{$module} = 1)
      if defined(%{*{Symbol::fetch_glob($module . "::Lexicon")}}) or defined(@{*{Symbol::fetch_glob($module . "::ISA")}});
     # weird case: we never use'd it, but there it is!
   }
@@ -396,10 +396,10 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   }
   if($@) {
     print "Error using $module \: $@\n" if DEBUG +> 1;
-    return $tried{$module} = 0;
+    return %tried{$module} = 0;
   } else {
     print " OK, $module is used\n" if DEBUG;
-    return $tried{$module} = 1;
+    return %tried{$module} = 1;
   }
 }
 
@@ -408,16 +408,16 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
 sub _lex_refs {  # report the lexicon references for this handle's class
   # returns an arrayREF!
   no strict 'refs';
-  my $class = ref($_[0]) || $_[0];
+  my $class = ref(@_[0]) || @_[0];
   print "Lex refs lookup on $class\n" if DEBUG +> 1;
-  return $isa_scan{$class} if exists $isa_scan{$class};  # memoization!
+  return %isa_scan{$class} if exists %isa_scan{$class};  # memoization!
 
   my @lex_refs;
-  my $seen_r = ref($_[1]) ? $_[1] : {};
+  my $seen_r = ref(@_[1]) ? @_[1] : {};
 
   if( defined( *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'} )) {
     push @lex_refs, *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'};
-    print "%" . $class . "::Lexicon contains ",
+    print "\%" . $class . "::Lexicon contains ",
          scalar(keys %{*{Symbol::fetch_glob($class . '::Lexicon')}}), " entries\n" if DEBUG;
   }
 
@@ -429,7 +429,7 @@ sub _lex_refs {  # report the lexicon references for this handle's class
     push @lex_refs, @{&_lex_refs($superclass, $seen_r)};  # call myself
   }
 
-  $isa_scan{$class} = \@lex_refs; # save for next time
+  %isa_scan{$class} = \@lex_refs; # save for next time
   return \@lex_refs;
 }
 

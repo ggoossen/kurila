@@ -7,7 +7,7 @@ BEGIN {
 
 plan tests => 8;
 
-if ($Config{ebcdic} eq 'define') {
+if (%Config{ebcdic} eq 'define') {
     $_ = join "", map chr($_), 129..233;
 
     # 105 characters - 52 letters = 53 backslashes

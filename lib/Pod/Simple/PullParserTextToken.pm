@@ -11,9 +11,9 @@ sub new {  # Class->new(text);
 
 # Purely accessors:
 
-sub text { (@_ == 2) ? ($_[0][1] = $_[1]) : $_[0][1] }
+sub text { (@_ == 2) ? (@_[0][1] = @_[1]) : @_[0][1] }
 
-sub text_r { \ $_[0][1] }
+sub text_r { \ @_[0][1] }
 
 1;
 

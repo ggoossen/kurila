@@ -6,7 +6,7 @@
 # Essentially, this test is a Makefile.PL.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -48,7 +48,7 @@ my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
-    PERL_CORE     => $ENV{PERL_CORE},
+    PERL_CORE     => %ENV{PERL_CORE},
 );
 like( $stdout->read, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
@@ -65,14 +65,14 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-my $config_prefix = $Config{installprefixexp} || $Config{installprefix} ||
-                    $Config{prefixexp}        || $Config{prefix};
+my $config_prefix = %Config{installprefixexp} || %Config{installprefix} ||
+                    %Config{prefixexp}        || %Config{prefix};
 is( $mm->{PERLPREFIX}, $config_prefix,   'PERLPREFIX' );
 
-is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
+is( !!$mm->{PERL_CORE}, !!%ENV{PERL_CORE}, 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
-if( $ENV{PERL_CORE} ) {
+if( %ENV{PERL_CORE} ) {
     $perl_src = File::Spec->catdir($Updir, $Updir);
     $perl_src = File::Spec->canonpath($perl_src);
     $mm_perl_src = File::Spec->canonpath($mm->{PERL_SRC});
@@ -124,7 +124,7 @@ $stdout = tie *STDOUT, 'TieOut' or die;
 $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PERL_CORE     => $ENV{PERL_CORE},
+    PERL_CORE     => %ENV{PERL_CORE},
     INSTALLMAN1DIR       => 'none',
     INSTALLSITEMAN3DIR   => 'none',
     INSTALLVENDORMAN1DIR => 'none',

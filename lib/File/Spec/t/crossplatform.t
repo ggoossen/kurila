@@ -36,8 +36,8 @@ foreach my $platform (@platforms) {
     skip "Can't load $module", $tests_per_platform
       if $@;
     
-    my $v = $volumes{$platform} || '';
-    my $other_v = $other_vols{$platform} || '';
+    my $v = %volumes{$platform} || '';
+    my $other_v = %other_vols{$platform} || '';
     
     # Fake out the environment on MacOS and Win32
     no strict 'refs';

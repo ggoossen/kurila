@@ -20,26 +20,26 @@ while ( ~< *ARGV) {
     if (m/=item (\S+)/ and $level == 1) {
 	my $item = $1;
 	s/=item //; 
-	$next{$cur} = $item;
+	%next{$cur} = $item;
 	$cur = $item;
-	$syn{$cur} .= $_;
+	%syn{$cur} .= $_;
 	next;
     } else { 
 	s,L</,L<perlfunc/,g;
-	push @{$pod{$cur}}, $_ if $cur;
+	push @{%pod{$cur}}, $_ if $cur;
     }
 } 
 
 for $f ( keys %syn ) {
-    next unless $Type{$f};
-    $flavor = $Flavor{$f};
+    next unless %Type{$f};
+    $flavor = %Flavor{$f};
     $orig = $f;
     ($name = $f) =~ s/\W//g;
 
     # deal with several functions sharing a description
     $func = $orig;
-    $func = $next{$func} until $pod{$func};
-    my $body = join "", @{$pod{$func}};
+    $func = %next{$func} until %pod{$func};
+    my $body = join "", @{%pod{$func}};
 
     # deal with unbalanced =over and =back cause by the split
     my $has_over = $body =~ m/^=over/;
@@ -54,7 +54,7 @@ $orig - $flavor
 
 \=head1 SYNOPSIS
 
-$syn{$orig}
+%syn{$orig}
 
 \=head1 DESCRIPTION
 

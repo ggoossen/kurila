@@ -43,7 +43,7 @@ for ( my $i=0; $i+<scalar @$tmpl ; $i+=2 ) {
     no strict 'refs';
     *{Symbol::fetch_glob(__PACKAGE__."::$key")} = sub {
         my $self = shift;
-        $self->{$key} = $_[0] if @_;
+        $self->{$key} = @_[0] if @_;
 
         ### just in case the key is not there or undef or something ###
         {   local $^W = 0;
@@ -206,7 +206,7 @@ sub _new_from_chunk {
     ### filter any arguments on defined-ness of values.
     ### this allows overriding from what the tar-header is saying
     ### about this tar-entry. Particularly useful for @LongLink files
-    my %args  = map { $_ => $hash{$_} } grep { defined $hash{$_} } keys %hash;
+    my %args  = map { $_ => %hash{$_} } grep { defined %hash{$_} } keys %hash;
 
     ### makes it start at 0 actually... :) ###
     my $i = -1;
@@ -264,16 +264,16 @@ sub _new_from_file {
     }
 
     my @items       = qw[mode uid gid size mtime];
-    my %hash        = map { shift(@items), $_ } (lstat $path)[2,4,5,7,9];
+    my %hash        = map { shift(@items), $_ } (lstat $path)[[2,4,5,7,9]];
 
     ### you *must* set size == 0 on symlinks, or the next entry will be
     ### though of as the contents of the symlink, which is wrong.
     ### this fixes bug #7937
-    $hash{size}     = 0 if ($type == DIR or $type == SYMLINK);
-    $hash{mtime}    -= TIME_OFFSET;
+    %hash{size}     = 0 if ($type == DIR or $type == SYMLINK);
+    %hash{mtime}    -= TIME_OFFSET;
 
     ### strip the high bits off the mode, which we don't need to store
-    $hash{mode}     = STRIP_MODE->( $hash{mode} );
+    %hash{mode}     = STRIP_MODE->( %hash{mode} );
 
 
     ### probably requires some file path munging here ... ###
@@ -288,8 +288,8 @@ sub _new_from_file {
                             : '',
         magic       => MAGIC,
         version     => TAR_VERSION,
-        uname       => UNAME->( $hash{uid} ),
-        gname       => GNAME->( $hash{gid} ),
+        uname       => UNAME->( %hash{uid} ),
+        gname       => GNAME->( %hash{gid} ),
         devmajor    => 0,   # not handled
         devminor    => 0,   # not handled
         prefix      => '',
@@ -362,7 +362,7 @@ sub _prefix_and_file {
     ### so sometimes the last element is '' -- probably when trailing
     ### dir slashes are encountered... this is is of course pointless,
     ### so remove it
-    pop @dirs while @dirs and not length $dirs[-1];
+    pop @dirs while @dirs and not length @dirs[-1];
 
     ### if it's a directory, then $file might be empty
     $file = pop @dirs if $self->is_dir and not length $file;
@@ -445,7 +445,7 @@ sub validate {
 
     ### don't know why this one is different from the one we /write/ ###
     substr ($raw, 148, 8, "        ");
-	return unpack ("%16C*", $raw) == $self->chksum ? 1 : 0;
+	return unpack ("\%16C*", $raw) == $self->chksum ? 1 : 0;
 }
 
 =head2 has_content
@@ -591,16 +591,16 @@ Returns true if the file type is C<unknown>
 =cut
 
 #stupid perl5.5.3 needs to warn if it's not numeric
-sub is_file     { local $^W;    FILE      == $_[0]->type }
-sub is_dir      { local $^W;    DIR       == $_[0]->type }
-sub is_hardlink { local $^W;    HARDLINK  == $_[0]->type }
-sub is_symlink  { local $^W;    SYMLINK   == $_[0]->type }
-sub is_chardev  { local $^W;    CHARDEV   == $_[0]->type }
-sub is_blockdev { local $^W;    BLOCKDEV  == $_[0]->type }
-sub is_fifo     { local $^W;    FIFO      == $_[0]->type }
-sub is_socket   { local $^W;    SOCKET    == $_[0]->type }
-sub is_unknown  { local $^W;    UNKNOWN   == $_[0]->type }
-sub is_longlink { local $^W;    LONGLINK  eq $_[0]->type }
-sub is_label    { local $^W;    LABEL     eq $_[0]->type }
+sub is_file     { local $^W;    FILE      == @_[0]->type }
+sub is_dir      { local $^W;    DIR       == @_[0]->type }
+sub is_hardlink { local $^W;    HARDLINK  == @_[0]->type }
+sub is_symlink  { local $^W;    SYMLINK   == @_[0]->type }
+sub is_chardev  { local $^W;    CHARDEV   == @_[0]->type }
+sub is_blockdev { local $^W;    BLOCKDEV  == @_[0]->type }
+sub is_fifo     { local $^W;    FIFO      == @_[0]->type }
+sub is_socket   { local $^W;    SOCKET    == @_[0]->type }
+sub is_unknown  { local $^W;    UNKNOWN   == @_[0]->type }
+sub is_longlink { local $^W;    LONGLINK  eq @_[0]->type }
+sub is_label    { local $^W;    LABEL     eq @_[0]->type }
 
 1;

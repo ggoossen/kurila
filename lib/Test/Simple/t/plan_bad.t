@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -14,7 +14,7 @@ my $tb = Test::Builder->create;
 $tb->level(0);
 
 ok !eval { $tb->plan( tests => 'no_plan' ); };
-is $@->{description}, sprintf "Number of tests must be a positive integer.  You gave it 'no_plan' at %s line %d.\n", $0, __LINE__ - 1;
+is $@->{description}, sprintf "Number of tests must be a positive integer.  You gave it 'no_plan' at \%s line \%d.\n", $0, __LINE__ - 1;
 
 my $foo = [];
 my @foo = ($foo, 2, 3);

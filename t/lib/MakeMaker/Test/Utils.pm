@@ -73,7 +73,7 @@ sub which_perl {
     # VMS should have 'perl' aliased properly
     return $perl if $Is_VMS;
 
-    $perl .= $Config{exe_ext} unless $perl =~ m/$Config{exe_ext}$/i;
+    $perl .= %Config{exe_ext} unless $perl =~ m/%Config{exe_ext}$/i;
 
     my $perlpath = 'File::Spec'->rel2abs( $perl );
     unless( $Is_MacOS || -x $perlpath ) {
@@ -82,7 +82,7 @@ sub which_perl {
         # When building in the core, *don't* go off and find
         # another perl
         die "Can't find a perl to use (\$^X=$^X), (\$perlpath=$perlpath)" 
-          if $ENV{PERL_CORE};
+          if %ENV{PERL_CORE};
 
         foreach my $path ('File::Spec'->path) {
             $perlpath = 'File::Spec'->catfile($path, $perl);
@@ -101,26 +101,26 @@ Sets up environment variables so perl can find its libraries.
 
 =cut
 
-my $old5lib = $ENV{PERL5LIB};
-my $had5lib = exists $ENV{PERL5LIB};
+my $old5lib = %ENV{PERL5LIB};
+my $had5lib = exists %ENV{PERL5LIB};
 sub perl_lib {
                                # perl-src/t/
-    my $lib =  $ENV{PERL_CORE} ? qq{../lib}
+    my $lib =  %ENV{PERL_CORE} ? qq{../lib}
                                # ExtUtils-MakeMaker/t/
                                : qq{../blib/lib};
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = ($lib);
-    push @libs, $ENV{PERL5LIB} if exists $ENV{PERL5LIB};
-    $ENV{PERL5LIB} = join($Config{path_sep}, @libs);
+    push @libs, %ENV{PERL5LIB} if exists %ENV{PERL5LIB};
+    %ENV{PERL5LIB} = join(%Config{path_sep}, @libs);
     unshift @INC, $lib;
 }
 
 END { 
     if( $had5lib ) {
-        $ENV{PERL5LIB} = $old5lib;
+        %ENV{PERL5LIB} = $old5lib;
     }
     else {
-        delete $ENV{PERL5LIB};
+        delete %ENV{PERL5LIB};
     }
 }
 
@@ -161,8 +161,8 @@ Returns a good guess at the make to run.
 =cut
 
 sub make {
-    my $make = $Config{make};
-    $make = $ENV{MAKE} if exists $ENV{MAKE};
+    my $make = %Config{make};
+    $make = %ENV{MAKE} if exists %ENV{MAKE};
 
     return $make;
 }
@@ -232,7 +232,7 @@ sub calibrate_mtime {
     open(FILE, ">", "calibrate_mtime.tmp") || die $!;
     print FILE "foo";
     close FILE;
-    my($mtime) = (stat('calibrate_mtime.tmp'))[9];
+    my($mtime) = (stat('calibrate_mtime.tmp'))[[9]];
     unlink 'calibrate_mtime.tmp';
     return $mtime;
 }

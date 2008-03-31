@@ -16,7 +16,7 @@ sub is {
 ), $test++, $left, $right;
 
     printf q(# Failed test at line %d
-), (caller)[2];
+), (caller)[[2]];
 
     return 0;
 }

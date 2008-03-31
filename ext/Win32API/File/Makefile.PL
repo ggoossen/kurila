@@ -7,7 +7,7 @@ use strict;
 WriteMakefile(
     'NAME'	=> 'Win32API::File',
     'VERSION_FROM' => 'File.pm', # finds $VERSION
-    (  $Config{archname} =~ m/-object\b/i  ?  ( 'CAPI' => 'TRUE' )  :  ()  ),
+    (  %Config{archname} =~ m/-object\b/i  ?  ( 'CAPI' => 'TRUE' )  :  ()  ),
     'AUTHOR'		=> 'Tye McQueen <tye@metronet.com>',
     'ABSTRACT_FROM'	=> 'File.pm',
     'postamble' => { IMPORT_LIST => [qw(/._/ !/[a-z]/ :MEDIA_TYPE)],
@@ -17,7 +17,7 @@ WriteMakefile(
 		     # Comment out next line to rebuild constants defs:
 		     NO_REBUILD => 1,
 		   },
-    (  ! $Config{libperl}  ?  ()  :  ( LIBPERL_A => $Config{libperl} )  ),
+    (  ! %Config{libperl}  ?  ()  :  ( LIBPERL_A => %Config{libperl} )  ),
 );
 
 # Replacement for MakeMaker's "const2perl section" for versions
@@ -36,7 +36,7 @@ sub MY::postamble
 
     # If only one module, can skip one level of indirection:
     my $hvAttr= \%attribs;
-    if(  $attribs{IMPORT_LIST}  ) {
+    if(  %attribs{IMPORT_LIST}  ) {
 	$hvAttr= { $self->{NAME} => \%attribs };
     }
 
@@ -60,14 +60,14 @@ $outfile:	@perlfiles  @cfiles  Makefile" . '
 	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -MExtUtils::Myconst2perl \
 	  -e "my %attribs;" \
 	  ';
-	$m[-1] =~ s/^/##/gm   if  $noreb;
+	@m[-1] =~ s/^/##/gm   if  $noreb;
 	my( $key, $value );
 	while(  ( $key, $value )= each %{$hvAttr->{$module}}  ) {
 	    push @m, '-e "$$attribs{' . $key . '}= '
 	      . neatvalue($value) . qq[;" \\\n\t  ];
-	    $m[-1] =~ s/^/##/gm   if  $noreb;
+	    @m[-1] =~ s/^/##/gm   if  $noreb;
 	}
-	push @m, '-e "Myconst2perl(' . neatvalue($module) . ",%attribs)\"\n";
+	push @m, '-e "Myconst2perl(' . neatvalue($module) . ",\%attribs)\"\n";
 
 	# If requested extra work to generate Perl instead of XS code:
 	if(  $bin  ) {
@@ -85,7 +85,7 @@ $bin:	$outfile" . '
 
 $final: $bin
 	" .  $self->catfile(".",$bin) . " >$final\n";
-	    $m[-1] =~ s/^/##/gm   if  $noreb;
+	    @m[-1] =~ s/^/##/gm   if  $noreb;
 
 	    # Make sure the rarely-used $(INST_ARCHLIB) directory exists:
 	    push @m, $self->dir_target('$(INST_ARCHLIB)');
@@ -105,7 +105,7 @@ ${_final}_to_blib: $final
 	@$(TOUCH) ', $_final, "_to_blib
 
 realclean ::
-	$self->{RM_RF} ", $self->catfile('$(INST_ARCHLIB)', $path[0]), "\n";
+	$self->{RM_RF} ", $self->catfile('$(INST_ARCHLIB)', @path[0]), "\n";
 
 	    push( @clean, $outfile, $bin, $obj, $_final . "_to_blib" );
 	    push( @realclean, $final )   unless  $noreb;

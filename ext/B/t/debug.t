@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	if ($^O eq 'MacOS') {
 	    @INC = qw(: ::lib ::macos:lib);
@@ -13,7 +13,7 @@ BEGIN {
 	unshift @INC, 't';
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -48,7 +48,7 @@ $a =~ s/\s+/ /g;
 $a =~ s/\b(s|foo|bar|ullsv)\b\s?//g;
 $a =~ s/^\s+//;
 $a =~ s/\s+$//;
-my $is_thread = $Config{use5005threads} && $Config{use5005threads} eq 'define';
+my $is_thread = %Config{use5005threads} && %Config{use5005threads} eq 'define';
 if ($is_thread) {
     $b=<<EOF;
 leave enter nextstate label leaveloop enterloop null and defined null

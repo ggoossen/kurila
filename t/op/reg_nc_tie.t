@@ -24,17 +24,17 @@ pass( 'still alive' );
 /x;
 
 # FETCH
-is($+{a}, "h", "FETCH");
-is($+{b}, "l", "FETCH");
-is($-{a}[0], "h", "FETCH");
-is($-{a}[1], "a", "FETCH");
+is(%+{a}, "h", "FETCH");
+is(%+{b}, "l", "FETCH");
+is(%-{a}[0], "h", "FETCH");
+is(%-{a}[1], "a", "FETCH");
 
 # STORE
-eval { $+{a} = "yon" };
+eval { %+{a} = "yon" };
 ok(index($@->{description}, "read-only") != -1, "STORE");
 
 # DELETE
-eval { delete $+{a} };
+eval { delete %+{a} };
 ok(index($@->{description}, "read-only") != -1, "DELETE");
 
 # CLEAR
@@ -42,8 +42,8 @@ eval { %+ = () };
 ok(index($@->{description}, "read-only") != -1, "CLEAR");
 
 # EXISTS
-ok(exists $+{e}, "EXISTS");
-ok(!exists $+{d}, "EXISTS");
+ok(exists %+{e}, "EXISTS");
+ok(!exists %+{d}, "EXISTS");
 
 # FIRSTKEY/NEXTKEY
 is(join('|', sort keys %+), "a|b|e", "FIRSTKEY/NEXTKEY");

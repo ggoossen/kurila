@@ -47,7 +47,7 @@ sub plan {
 	}
     } else {
 	my %plan = @_;
-	$n = $plan{tests};
+	$n = %plan{tests};
     }
     _print "1..$n\n" unless $noplan;
     $planned = $n;
@@ -118,7 +118,7 @@ sub _ok {
 
 sub _where {
     my @caller = caller($Level);
-    return "at $caller[1] line $caller[2]";
+    return "at @caller[1] line @caller[2]";
 }
 
 # DON'T use this for matches. Use like() instead.
@@ -140,7 +140,7 @@ sub _qq {
 # keys are the codes \n etc map to, values are 2 char strings such as \n
 my %backslash_escape;
 foreach my $x (split m//, q|nrtfa\'"|) {
-    $backslash_escape{ord eval "\"\\$x\""} = "\\$x";
+    %backslash_escape{ord eval "\"\\$x\""} = "\\$x";
 }
 # A way to display scalars containing control characters and Unicode.
 # Trying to avoid setting $_, or relying on local $_ to work.
@@ -151,12 +151,12 @@ sub display {
             my $y = '';
             foreach my $c (unpack("U*", $x)) {
                 if ($c +> 255) {
-                    $y .= sprintf "\\x\{%x\}", $c;
-                } elsif ($backslash_escape{$c}) {
-                    $y .= $backslash_escape{$c};
+                    $y .= sprintf "\\x\{\%x\}", $c;
+                } elsif (%backslash_escape{$c}) {
+                    $y .= %backslash_escape{$c};
                 } else {
                     my $z = chr $c; # Maybe we can get away with a literal...
-                    $z = sprintf "\\%03o", $c if $z =~ m/[[:^print:]]/;
+                    $z = sprintf "\\\%03o", $c if $z =~ m/[[:^print:]]/;
                     $y .= $z;
                 }
             }
@@ -430,34 +430,34 @@ sub _create_runperl { # Create the string to qx in runperl().
     my %args = @_;
     my $runperl = $^X =~ m/\s/ ? qq{"$^X"} : $^X;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
-    if ($ENV{PERL_RUNPERL_DEBUG}) {
-	$runperl = "$ENV{PERL_RUNPERL_DEBUG} $runperl";
+    if (%ENV{PERL_RUNPERL_DEBUG}) {
+	$runperl = "%ENV{PERL_RUNPERL_DEBUG} $runperl";
     }
-    unless ($args{nolib}) {
+    unless (%args{nolib}) {
 	if ($is_macos) {
 	    $runperl .= ' -I::lib';
 	    # Use UNIX style error messages instead of MPW style.
-	    $runperl .= ' -MMac::err=unix' if $args{stderr};
+	    $runperl .= ' -MMac::err=unix' if %args{stderr};
 	}
 	else {
 	    $runperl .= ' "-I../lib"'; # doublequotes because of VMS
 	}
     }
-    if ($args{switches}) {
+    if (%args{switches}) {
 	local $Level = 2;
 	die "test.pl:runperl(): 'switches' must be an ARRAYREF " . _where()
-	    unless ref $args{switches} eq "ARRAY";
-	_quote_args(\$runperl, $args{switches});
+	    unless ref %args{switches} eq "ARRAY";
+	_quote_args(\$runperl, %args{switches});
     }
-    if (defined $args{prog}) {
+    if (defined %args{prog}) {
 	die "test.pl:runperl(): both 'prog' and 'progs' cannot be used " . _where()
-	    if defined $args{progs};
-        $args{progs} = [$args{prog}]
+	    if defined %args{progs};
+        %args{progs} = [%args{prog}]
     }
-    if (defined $args{progs}) {
+    if (defined %args{progs}) {
 	die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
-	    unless ref $args{progs} eq "ARRAY";
-        foreach my $prog (@{$args{progs}}) {
+	    unless ref %args{progs} eq "ARRAY";
+        foreach my $prog (@{%args{progs}}) {
             if ($is_mswin || $is_netware || $is_vms) {
                 $runperl .= qq ( -e "$prog" );
             }
@@ -465,31 +465,31 @@ sub _create_runperl { # Create the string to qx in runperl().
                 $runperl .= qq ( -e '$prog' );
             }
         }
-    } elsif (defined $args{progfile}) {
-	$runperl .= qq( "$args{progfile}");
+    } elsif (defined %args{progfile}) {
+	$runperl .= qq( "%args{progfile}");
     } else {
 	# You probaby didn't want to be sucking in from the upstream stdin
 	die "test.pl:runperl(): none of prog, progs, progfile, args, "
 	    . " switches or stdin specified"
-	    unless defined $args{args} or defined $args{switches}
-		or defined $args{stdin};
+	    unless defined %args{args} or defined %args{switches}
+		or defined %args{stdin};
     }
-    if (defined $args{stdin}) {
+    if (defined %args{stdin}) {
 	# so we don't try to put literal newlines and crs onto the
 	# command line.
-	$args{stdin} =~ s/\n/\\n/g;
-	$args{stdin} =~ s/\r/\\r/g;
+	%args{stdin} =~ s/\n/\\n/g;
+	%args{stdin} =~ s/\r/\\r/g;
 
 	if ($is_mswin || $is_netware || $is_vms) {
 	    $runperl = qq{$^X -e "print qq(} .
-		$args{stdin} . q{)" | } . $runperl;
+		%args{stdin} . q{)" | } . $runperl;
 	}
 	elsif ($is_macos) {
 	    # MacOS can only do two processes under MPW at once;
 	    # the test itself is one; we can't do two more, so
 	    # write to temp file
-	    my $stdin = qq{$^X -e 'print qq(} . $args{stdin} . qq{)' > teststdin; };
-	    if ($args{verbose}) {
+	    my $stdin = qq{$^X -e 'print qq(} . %args{stdin} . qq{)' > teststdin; };
+	    if (%args{verbose}) {
 		my $stdindisplay = $stdin;
 		$stdindisplay =~ s/\n/\n\#/g;
 		_print_stderr "# $stdindisplay\n";
@@ -499,15 +499,15 @@ sub _create_runperl { # Create the string to qx in runperl().
 	}
 	else {
 	    $runperl = qq{$^X -e 'print qq(} .
-		$args{stdin} . q{)' | } . $runperl;
+		%args{stdin} . q{)' | } . $runperl;
 	}
     }
-    if (defined $args{args}) {
-	_quote_args(\$runperl, $args{args});
+    if (defined %args{args}) {
+	_quote_args(\$runperl, %args{args});
     }
-    $runperl .= ' 2>&1'          if  $args{stderr} && !$is_macos;
-    $runperl .= " \x[B3] Dev:Null" if !$args{stderr} &&  $is_macos;
-    if ($args{verbose}) {
+    $runperl .= ' 2>&1'          if  %args{stderr} && !$is_macos;
+    $runperl .= " \x[B3] Dev:Null" if !%args{stderr} &&  $is_macos;
+    if (%args{verbose}) {
 	my $runperldisplay = $runperl;
 	$runperldisplay =~ s/\n/\n\#/g;
 	_print_stderr "# $runperldisplay\n";
@@ -517,13 +517,13 @@ sub _create_runperl { # Create the string to qx in runperl().
 
 sub runperl {
     die "test.pl:runperl() does not take a hashref"
-	if ref $_[0] and ref $_[0] eq 'HASH';
+	if ref @_[0] and ref @_[0] eq 'HASH';
     my $runperl = &_create_runperl;
     my $result;
 
     my $tainted = ${^TAINT};
     my %args = @_;
-    exists $args{switches} && grep m/^-T$/, @{$args{switches}} and $tainted = $tainted + 1;
+    exists %args{switches} && grep m/^-T$/, @{%args{switches}} and $tainted = $tainted + 1;
 
     if ($tainted) {
 	# We will assume that if you're running under -T, you really mean to
@@ -536,19 +536,19 @@ sub runperl {
 	    warn "test.pl had problems loading Config: $@";
 	    $sep = ':';
 	} else {
-	    $sep = $Config{path_sep};
+	    $sep = %Config{path_sep};
 	}
 
-	my @keys = grep {exists $ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
-	local @ENV{@keys} = ();
+	my @keys = grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
+	local %ENV{[@keys]} = ();
 	# Untaint, plus take out . and empty string:
-	local $ENV{'DCL$PATH'} = $1 if $is_vms && ($ENV{'DCL$PATH'} =~ m/(.*)/s);
-	$ENV{PATH} =~ m/(.*)/s;
-	local $ENV{PATH} =
+	local %ENV{'DCL$PATH'} = $1 if $is_vms && (%ENV{'DCL$PATH'} =~ m/(.*)/s);
+	%ENV{PATH} =~ m/(.*)/s;
+	local %ENV{PATH} =
 	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
-		($is_mswin or $is_vms or !(stat && (stat '_')[2]^&^0022)) }
+		($is_mswin or $is_vms or !(stat && (stat '_')[[2]]^&^0022)) }
 		    split quotemeta ($sep), $1;
-	$ENV{PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
+	%ENV{PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
 
 	$runperl =~ m/(.*)/s;
 	$runperl = $1;
@@ -584,7 +584,7 @@ sub which_perl {
 	    warn "test.pl had problems loading Config: $@";
 	    $exe = '';
 	} else {
-	    $exe = $Config{_exe};
+	    $exe = %Config{_exe};
 	}
        $exe = '' unless defined $exe;
 
@@ -613,7 +613,7 @@ sub which_perl {
 	warn "which_perl: cannot find $Perl from $^X" unless -f $Perl;
 
 	# For subcommands to use.
-	$ENV{PERLEXE} = $Perl;
+	%ENV{PERLEXE} = $Perl;
     }
     return $Perl;
 }
@@ -708,7 +708,7 @@ sub fresh_perl_is {
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
-		sub { @_ ? $_[0] eq $expected : $expected },
+		sub { @_ ? @_[0] eq $expected : $expected },
 		$runperl_args, $name);
 }
 
@@ -723,7 +723,7 @@ sub fresh_perl_like {
     local $Level = 2;
     _fresh_perl($prog,
 		sub { @_ ?
-			  $_[0] =~ (ref $expected ? $expected : m/$expected/) :
+			  @_[0] =~ (ref $expected ? $expected : m/$expected/) :
 		          $expected },
 		$runperl_args, $name);
 }
@@ -744,7 +744,7 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name = @methods == 1 ? "$class->can('$methods[0]')"
+    $name = @methods == 1 ? "$class->can('@methods[0]')"
                           : "$class->can(...)";
 
     _ok( !@nok, _where(), $name );

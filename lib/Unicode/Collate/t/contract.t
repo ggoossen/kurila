@@ -50,9 +50,9 @@ ok($kjeNoN->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 
 our %sortkeys;
 
-$sortkeys{'KAac'} = $kjeNoN->viewSortKey("\x{043A}\x{0301}");
-$sortkeys{'KAta'} = $kjeNoN->viewSortKey("\x{043A}\x{0334}\x{0301}");
-$sortkeys{'KAat'} = $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}");
+%sortkeys{'KAac'} = $kjeNoN->viewSortKey("\x{043A}\x{0301}");
+%sortkeys{'KAta'} = $kjeNoN->viewSortKey("\x{043A}\x{0334}\x{0301}");
+%sortkeys{'KAat'} = $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}");
 
 eval { require Unicode::Normalize };
 if (!$@) {
@@ -107,9 +107,9 @@ is($kjeNoN->cmp("\x{045C}", "\x{043A}\x{0334}\x{0301}"), 1);
 ok($kjeNoN->eq("\x{043A}", "\x{043A}\x{0334}\x{0301}"));
 ok($kjeNoN->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 
-is($sortkeys{'KAac'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}"));
-is($sortkeys{'KAta'}, $kjeNoN->viewSortKey("\x{043A}\x{0334}\x{0301}"));
-is($sortkeys{'KAat'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}"));
+is(%sortkeys{'KAac'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}"));
+is(%sortkeys{'KAta'}, $kjeNoN->viewSortKey("\x{043A}\x{0334}\x{0301}"));
+is(%sortkeys{'KAat'}, $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}"));
 
 my $aaNoN = Unicode::Collate->new(
     level => 1,

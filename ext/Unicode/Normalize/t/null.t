@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }

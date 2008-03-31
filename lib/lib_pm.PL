@@ -16,12 +16,12 @@ my $Config_inc_version_list;
 # Expand the variables only if explicitly requested because
 # otherwise relocating Perl becomes much harder.
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $useConfig = '';
-    $Config_archname = qq('$Config{archname}');
-    $Config_version  = qq('$Config{version}');
+    $Config_archname = qq('%Config{archname}');
+    $Config_version  = qq('%Config{version}');
     my @Config_inc_version_list =
-	reverse split m/ /, $Config{inc_version_list};
+	reverse split m/ /, %Config{inc_version_list};
     $Config_inc_version_list =
 	@Config_inc_version_list ?
 	    qq(@Config_inc_version_list) : q(());

@@ -6,7 +6,7 @@ BEGIN {
 	# Don't bother if there are no quad offsets.
         our %Config;
 	require Config; Config->import;
-	if ($Config{lseeksize} +< 8) {
+	if (%Config{lseeksize} +< 8) {
 		print "1..0 # Skip: no 64-bit file offsets\n";
 		exit(0);
 	}
@@ -113,8 +113,8 @@ print "# s2 = @s2\n";
 
 zap();
 
-unless ($s1[7] == 1_000_003 && $s2[7] == 2_000_003 &&
-	$s1[11] == $s2[11] && $s1[12] == $s2[12]) {
+unless (@s1[7] == 1_000_003 && @s2[7] == 2_000_003 &&
+	@s1[11] == @s2[11] && @s1[12] == @s2[12]) {
 	print "1..0 # Skip: no sparse files?\n";
 	bye;
 }
@@ -125,7 +125,7 @@ print "# we seem to have sparse files...\n";
 # if we are not, the following will hog 5 gigabytes of disk.  Ooops.
 # This may fail by producing some signal; run in a subprocess first for safety
 
-$ENV{LC_ALL} = "C";
+%ENV{LC_ALL} = "C";
 
 my $r = system '../perl', '-e', <<'EOF';
 open(BIG, ">big");
@@ -163,7 +163,7 @@ unless ($print && $close) {
 
 print "# @s\n";
 
-unless ($s[7] == 5_000_000_003) {
+unless (@s[7] == 5_000_000_003) {
     explain("kernel/fs not configured to use large files?");
     bye();
 }
@@ -185,7 +185,7 @@ sub offset ($$) {
 	} elsif ($offset_want - unpack("L", pack("L", $offset_want)) - 1
 	         == $offset_is) {
 	    print "# 32-bit wraparound suspected in $offset_func() since\n";
-	    printf "# %s - unpack('L', pack('L', %s)) - 1 equals %s.\n",
+	    printf "# \%s - unpack('L', pack('L', \%s)) - 1 equals \%s.\n",
 	        $offset_want,
 	        $offset_want,
 	        $offset_is;
@@ -198,7 +198,7 @@ print "1..17\n";
 
 $fail = 0;
 
-fail unless $s[7] == 5_000_000_003;	# exercizes pp_stat
+fail unless @s[7] == 5_000_000_003;	# exercizes pp_stat
 print "ok 1\n";
 
 fail unless -s "big" == 5_000_000_003;	# exercizes pp_ftsize

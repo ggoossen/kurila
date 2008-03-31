@@ -22,7 +22,7 @@ sub new
 {
     shift;  # class ignored
     my $algorithm = shift;
-    my $impl = $MMAP{$algorithm} || do {
+    my $impl = %MMAP{$algorithm} || do {
 	$algorithm =~ s/\W+//;
 	"Digest::$algorithm";
     };
@@ -33,7 +33,7 @@ sub new
 	my @args;
 	($class, @args) = @$class if ref($class);
 	no strict 'refs';
-	unless (exists ${*{Symbol::fetch_glob("$class\::")}}{"VERSION"}) {
+	unless (exists %{*{Symbol::fetch_glob("$class\::")}}{"VERSION"}) {
 	    eval "require $class";
 	    if ($@) {
 		$err ||= $@;

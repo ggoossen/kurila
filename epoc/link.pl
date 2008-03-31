@@ -2,7 +2,7 @@
 
 $epoc="/usr/local/epoc";
 @objs=@ARGV;
-$basname=$objs[0];
+$basname=@objs[0];
 $basname =~ s/.o//;
 $baspe = $basname . "pe";
 

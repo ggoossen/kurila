@@ -47,7 +47,7 @@ sub new {
     my $class = shift;
     my $dh = gensym;
     if (@_) {
-	DirHandle::open($dh, $_[0])
+	DirHandle::open($dh, @_[0])
 	    or return undef;
     }
     bless $dh, $class;

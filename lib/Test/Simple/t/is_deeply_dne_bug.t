@@ -6,7 +6,7 @@
 # confused with an overloaded object.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -39,8 +39,8 @@ BEGIN {
     }
 
     sub overload_equiv {
-        if (ref($_[0]) ne 'Foo' || ref($_[1]) ne 'Foo') {
-            print ref($_[0]), " ", ref($_[1]), "\n";
+        if (ref(@_[0]) ne 'Foo' || ref(@_[1]) ne 'Foo') {
+            print ref(@_[0]), " ", ref(@_[1]), "\n";
             die "Invalid object passed to overload_equiv\n";
         }
 

@@ -22,7 +22,7 @@ sub ok {
       } else {
         $wrong = '';
       }
-      printf "not ok $test # line %d$wrong\n", (caller)[2];
+      printf "not ok $test # line \%d$wrong\n", (caller)[[2]];
     }
   }
   $test = $test + 1;
@@ -123,7 +123,7 @@ my %up = (1=>2, ab => 'ac');
 my %down = (1=>0, ab => -1);
 
 foreach (keys %inc) {
-  my $ans = $up{$_};
+  my $ans = %up{$_};
   my $up;
   eval {$up = ++$_};
   ok ((defined $up and $up eq $ans), $up, $@);
@@ -132,7 +132,7 @@ foreach (keys %inc) {
 check_same (\%orig, \%inc);
 
 foreach (keys %dec) {
-  my $ans = $down{$_};
+  my $ans = %down{$_};
   my $down;
   eval {$down = --$_};
   ok ((defined $down and $down eq $ans), $down, $@);
@@ -141,7 +141,7 @@ foreach (keys %dec) {
 check_same (\%orig, \%dec);
 
 foreach (keys %postinc) {
-  my $ans = $postinc{$_};
+  my $ans = %postinc{$_};
   my $up;
   eval {$up = $_++};
   ok ((defined $up and $up eq $ans), $up, $@);
@@ -150,7 +150,7 @@ foreach (keys %postinc) {
 check_same (\%orig, \%postinc);
 
 foreach (keys %postdec) {
-  my $ans = $postdec{$_};
+  my $ans = %postdec{$_};
   my $down;
   eval {$down = $_--};
   ok ((defined $down and $down eq $ans), $down, $@);
@@ -204,7 +204,7 @@ sub check_some_code {
     my ($start, $warn, $action, $description) = @_;
     my $warn_line = ($warn ? 'use' : 'no') . " warnings 'imprecision';";
     my @warnings;
-    local ${^WARN_HOOK} = sub {push @warnings, $_[0]->message};
+    local ${^WARN_HOOK} = sub {push @warnings, @_[0]->message};
 
     print "# checking $action under $warn_line\n";
     my $code = <<"EOC";

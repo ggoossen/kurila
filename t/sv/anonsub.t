@@ -11,7 +11,7 @@ my $Is_VMS = $^O eq 'VMS';
 my $Is_MSWin32 = $^O eq 'MSWin32';
 my $Is_MacOS = $^O eq 'MacOS';
 my $Is_NetWare = $^O eq 'NetWare';
-$ENV{PERL5LIB} = "../lib" unless $Is_VMS;
+%ENV{PERL5LIB} = "../lib" unless $Is_VMS;
 
 our $i = 0;
 

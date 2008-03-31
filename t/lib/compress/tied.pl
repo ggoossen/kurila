@@ -141,8 +141,8 @@ sub run
             ok $io->write("xxx\n", 100, -1) == 1;
 
             for (1..3) {
-                printf $io "i(%d)", $_;
-                $io->printf("[%d]\n", $_);
+                printf $io "i(\%d)", $_;
+                $io->printf("[\%d]\n", $_);
             }
             select $io;
             print "\n";
@@ -186,7 +186,7 @@ EOT
                 my @lines = ~< $io;
                 is @lines, 6
                     or print "# Got " . scalar(@lines) . " lines, expected 6\n" ;
-                is $lines[1], "of a paragraph\n" ;
+                is @lines[1], "of a paragraph\n" ;
                 is join('', @lines), $str ;
                 is $., 6; 
                 is $io->tell(), length($str) ;
@@ -207,7 +207,7 @@ EOT
                 ok !$io->eof;
                 my @lines = $io->getlines;
                 ok $io->eof;
-                ok @lines == 1 && $lines[0] eq $str;
+                ok @lines == 1 && @lines[0] eq $str;
             
                 $io = $UncompressClass->new($name);
                 ok ! $io->eof;
@@ -224,9 +224,9 @@ EOT
                 ok $io->eof;
                 ok @lines == 2 
                     or print "# Got " . scalar(@lines) . " lines, expected 2\n" ;
-                ok $lines[0] eq "This is an example\nof a paragraph\n\n\n"
-                    or print "# $lines[0]\n";
-                ok $lines[1] eq "and a single line.\n\n";
+                ok @lines[0] eq "This is an example\nof a paragraph\n\n\n"
+                    or print "# @lines[0]\n";
+                ok @lines[1] eq "and a single line.\n\n";
             }
             
             {
@@ -312,7 +312,7 @@ EOT
                 ok $io->tell() == 0 ;
                 my @lines = ~< $io;
                 ok @lines == 6; 
-                ok $lines[1] eq "of a paragraph\n" ;
+                ok @lines[1] eq "of a paragraph\n" ;
                 ok join('', @lines) eq $str ;
                 ok $. == 6; 
                 ok $io->tell() == length($str) ;
@@ -333,7 +333,7 @@ EOT
                 ok ! $io->eof;
                 my @lines = $io->getlines;
                 ok $io->eof;
-                ok @lines == 1 && $lines[0] eq $str;
+                ok @lines == 1 && @lines[0] eq $str;
             
                 $io = $UncompressClass->new($name);
                 ok ! $io->eof;
@@ -350,9 +350,9 @@ EOT
                 ok $io->eof;
                 ok @lines == 2 
                     or print "# exected 2 lines, got " . scalar(@lines) . "\n";
-                ok $lines[0] eq "This is an example\nof a paragraph\n\n\n"
-                    or print "# [$lines[0]]\n" ;
-                ok $lines[1] eq "and a single line.\n\n";
+                ok @lines[0] eq "This is an example\nof a paragraph\n\n\n"
+                    or print "# [@lines[0]]\n" ;
+                ok @lines[1] eq "and a single line.\n\n";
             }
             
             {

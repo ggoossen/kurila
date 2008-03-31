@@ -15,7 +15,7 @@ sub import {
 
     (my $pm = $module) =~ s{::}{/}g;
     $pm .= '.pm';
-    if (exists $INC{$pm}) {
+    if (exists %INC{$pm}) {
 	vet_import $module;
 	local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
 	# $Exporter::Verbose = 1;
@@ -45,7 +45,7 @@ sub import {
 
         no strict 'refs';
 	my $load_sub = sub {
-	    unless ($INC{$pm}) {
+	    unless (%INC{$pm}) {
 		require $pm;
 		vet_import $module;
 	    }

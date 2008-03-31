@@ -11,7 +11,7 @@ print "The best Shakespearean roles are:\n\n";
 
 print form
 	 "   * \{<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\}   |\{:<<<<<<<>>>>>>>:\}|",
-           $character[$_],                $disclaimer
+           @character[$_],                $disclaimer
 				for 0..(@character-1);
 
 pos $disclaimer = 0;

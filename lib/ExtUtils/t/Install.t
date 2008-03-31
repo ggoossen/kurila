@@ -3,7 +3,7 @@
 # Test ExtUtils::Install.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         @INC = ('../../lib', '../lib', 'lib');
     }
     else {
@@ -23,8 +23,8 @@ use MakeMaker::Test::Setup::BFD;
 
 BEGIN { use_ok('ExtUtils::Install') }
 # ensure the env doesnt pollute our tests
-local $ENV{EU_INSTALL_ALWAYS_COPY};
-local $ENV{EU_ALWAYS_COPY};    
+local %ENV{EU_INSTALL_ALWAYS_COPY};
+local %ENV{EU_ALWAYS_COPY};    
 
 # Check exports.
 foreach my $func (qw(install uninstall pm_to_blib install_default)) {
@@ -86,7 +86,7 @@ close PACKLIST;
 # be lowercase. :(
 my $native_dummy = File::Spec->catfile(qw(install-test lib perl Big Dummy.pm));
 is( keys %packlist, 1 );
-is( lc((keys %packlist)[0]), lc $native_dummy, 'packlist written' );
+is( lc((keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
 
 
 # Test UNINST=1 preserving same versions in other dirs.
@@ -112,7 +112,7 @@ close DUMMY;
   ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
 
   local @INC = ('install-test/lib/perl');
-  local $ENV{PERL5LIB} = '';
+  local %ENV{PERL5LIB} = '';
   install( { 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
@@ -130,10 +130,10 @@ close DUMMY;
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile; 
   local @INC = ('install-test/other_lib/perl','install-test/lib/perl');
-  local $ENV{PERL5LIB} = '';
+  local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local ${^WARN_HOOK}=sub { push @warn, $_[0]->message; return };
+  local ${^WARN_HOOK}=sub { push @warn, @_[0]->message; return };
   my $ok=eval {
     install( { 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -156,10 +156,10 @@ close DUMMY;
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile;
   local @INC = ('install-test/lib/perl','install-test/other_lib/perl');
-  local $ENV{PERL5LIB} = '';
+  local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local ${^WARN_HOOK}=sub { push @warn,$_[0]->message; return };
+  local ${^WARN_HOOK}=sub { push @warn,@_[0]->message; return };
   my $ok=eval {
     install( { 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -179,7 +179,7 @@ close DUMMY;
 # Test UNINST=1 removing other versions in other dirs.
 {
   local @INC = ('install-test/lib/perl');
-  local $ENV{PERL5LIB} = '';
+  local %ENV{PERL5LIB} = '';
   install( { 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'

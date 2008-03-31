@@ -109,7 +109,7 @@ is($@, '', "';&' sub prototype confuses the lexer");
 my %data = ( foo => "\n" );
 print "#";
 print(
-$data{foo});
+%data{foo});
 pass();
 
 # Bug #21875
@@ -327,7 +327,7 @@ EOSTANZA
 	'literal -> after an array subscript within ""');
     @x = ['string'];
     # this used to give "string"
-    dies_like( sub { "$x[0]-> [0]" }, qr/reference as string/ );
+    dies_like( sub { "@x[0]-> [0]" }, qr/reference as string/ );
 }
 
 __END__

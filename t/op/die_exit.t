@@ -43,7 +43,7 @@ print "1..$max\n";
 open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $!";
 
 foreach my $test (1 .. $max) {
-    my($bang, $query, $code) = @{$tests{$test}};
+    my($bang, $query, $code) = @{%tests{$test}};
     $code ||= 'die;';
     if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS') {
         system(qq{$^X -e "\$! = $bang; \$? = $query; $code"});
@@ -57,7 +57,7 @@ foreach my $test (1 .. $max) {
     # the severity bits, which boils down to 4.  See L<perlvms/$?>.
     $bang = 4 if $^O eq 'VMS';
 
-    printf "# 0x%04x  0x%04x  0x%04x\n", $exit, $bang, $query;
+    printf "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
     print "not " unless $exit == (($bang || ($query >> 8) || 255) << 8);
     print "ok $test\n";
 }

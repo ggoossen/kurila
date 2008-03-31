@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -66,11 +66,11 @@ ok(normalize('NFKC', $sNFKC), "\x{90FD}");
 ok($sNFKC, "\x{FA26}");
 
 sub hexNFC {
-  join " ", map sprintf("%04X", $_),
+  join " ", map sprintf("\%04X", $_),
   _unpack_U normalize 'C', _pack_U map hex, split ' ', shift;
 }
 sub hexNFD {
-  join " ", map sprintf("%04X", $_),
+  join " ", map sprintf("\%04X", $_),
   _unpack_U normalize 'D', _pack_U map hex, split ' ', shift;
 }
 

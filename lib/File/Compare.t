@@ -43,7 +43,7 @@ print "not " unless compare_text("TEST","HLAGHLAG") == -1;
 print "ok 7\n";
 
 print "not " unless
-  compare_text("README","README",sub {$_[0] ne $_[1]}) == 0;
+  compare_text("README","README",sub {@_[0] ne @_[1]}) == 0;
 print "ok 8\n";
 
 # filehandle and same file
@@ -94,23 +94,23 @@ eval {
     close($tfhSP);
   }
   seek($tfh,0,0);
-  $donetests[0] = compare($tfh, 'README');
-  $donetests[1] = compare($filename, 'README');
+  @donetests[0] = compare($tfh, 'README');
+  @donetests[1] = compare($filename, 'README');
   unlink0($tfh,$filename);
-  $donetests[2] = compare('README', "$filename ");
+  @donetests[2] = compare('README', "$filename ");
   unlink "$filename ";
 };
 print "# problem '$@' when testing with a temporary file\n" if $@;
 
 if (@donetests == 3) {
-  print "not " unless $donetests[0] == 0;
-  print "ok 11 # fh/file [$donetests[0]]\n";
-  print "not " unless $donetests[1] == 0;
-  print "ok 12 # file/file [$donetests[1]]\n";
-  print "not " unless $donetests[2] == 0;
+  print "not " unless @donetests[0] == 0;
+  print "ok 11 # fh/file [@donetests[0]]\n";
+  print "not " unless @donetests[1] == 0;
+  print "ok 12 # file/file [@donetests[1]]\n";
+  print "not " unless @donetests[2] == 0;
   print "ok 13 # ";
   print "TODO" if $^O eq "cygwin"; # spaces after filename silently trunc'd
-  print " file/fileCR [$donetests[2]]\n";
+  print " file/fileCR [@donetests[2]]\n";
 }
 else {
   print "ok 11# Skip\nok 12 # Skip\nok 13 # Skip Likely due to File::Temp\n";

@@ -1,13 +1,13 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
     require Config;
     Config->import;
-    if ($Config{'extensions'} !~ m/\bOpcode\b/) {
+    if (%Config{'extensions'} !~ m/\bOpcode\b/) {
 	print "1..0\n";
 	exit 0;
     }

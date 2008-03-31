@@ -37,11 +37,11 @@
 
 use strict 'vars';
 
-my $max_chain = $ENV{PERL_TEST_NUMCONVERTS} || 2;
+my $max_chain = %ENV{PERL_TEST_NUMCONVERTS} || 2;
 
 # Bulk out if unsigned type is hopelessly wrong:
 my $max_uv1 = ^~^0;
-my $max_uv2 = sprintf "%u", $max_uv1 ** 6; # 6 is an arbitrary number here
+my $max_uv2 = sprintf "\%u", $max_uv1 ** 6; # 6 is an arbitrary number here
 my $big_iv = do {use integer; $max_uv1 * 16}; # 16 is an arbitrary number here
 my $max_uv_less3 = $max_uv1 - 3;
 
@@ -51,7 +51,7 @@ if ($max_uv1 ne $max_uv2 or $big_iv +> $max_uv1 or $max_uv1 == $max_uv_less3) {
   print "1..0 # skipped: unsigned perl arithmetic is not sane";
   eval { require Config; Config->import };
   use vars qw(%Config);
-  if ($Config{d_quad} eq 'define') {
+  if (%Config{d_quad} eq 'define') {
       print " (common in 64-bit platforms)";
   }
   print "\n";
@@ -102,8 +102,8 @@ my $max_uv_p1 = "$max_uv"; $max_uv_p1+=0; $max_uv_p1++;
 
 my $temp = $max_uv_p1;
 my $max_uv_p1_as_iv;
-{use integer; $max_uv_p1_as_iv = 0 + sprintf "%s", $temp}
-my $max_uv_p1_as_uv = 0 ^|^ sprintf "%s", $temp;
+{use integer; $max_uv_p1_as_iv = 0 + sprintf "\%s", $temp}
+my $max_uv_p1_as_uv = 0 ^|^ sprintf "\%s", $temp;
 
 my @opnames = split m//, "-+UINPuinp";
 
@@ -116,7 +116,7 @@ my $test = 1;
 my $nok;
 for my $num_chain (1..$max_chain) {
   my @ops = map [split m//], grep m/[4-9]/,
-    map { sprintf "%0${num_chain}d", $_ }  0 .. 10**$num_chain - 1;
+    map { sprintf "\%0${num_chain}d", $_ }  0 .. 10**$num_chain - 1;
 
   #@ops = ([]) unless $num_chain;
   #@ops = ([6, 4]);
@@ -154,7 +154,7 @@ for my $num_chain (1..$max_chain) {
 	    #next if $num_chain > 1
 	    #  and "$tmp" ne "$tmp1"; # Already the coercion gives problems...
 
-	    for my $curop (@{$curops[$short]}) {
+	    for my $curop (@{@curops[$short]}) {
 	      if ($curop +< 5) {
 		if ($curop +< 3) {
 		  if ($curop == 0) {
@@ -185,26 +185,26 @@ for my $num_chain (1..$max_chain) {
 	    }
 
 	    if ($last == 2) {
-	      $inpt = sprintf "%u", $inpt; # U 2
+	      $inpt = sprintf "\%u", $inpt; # U 2
 	    } elsif ($last == 3) {
-	      $inpt = sprintf "%d", $inpt; # I 3
+	      $inpt = sprintf "\%d", $inpt; # I 3
 	    } elsif ($last == 4) {
-	      $inpt = sprintf "%g", $inpt; # N 4
+	      $inpt = sprintf "\%g", $inpt; # N 4
 	    } else {
 	      $inpt = "$inpt";	# P 5
 	    }
 	    push @ans, $inpt;
 	  }
-	  if ($ans[0] ne $ans[1]) {
-	    print "# '$ans[0]' ne '$ans[1]',\t$num\t=> @opnames[$first,@{$curops[0]},$last] vs @opnames[$first,@{$curops[1]},$last]\n";
+	  if (@ans[0] ne @ans[1]) {
+	    print "# '@ans[0]' ne '@ans[1]',\t$num\t=> @opnames[[$first,@{@curops[0]},$last]] vs @opnames[[$first,@{@curops[1]},$last]]\n";
 	    # XXX ought to check that "+" was in the list of opnames
-	    if ((($ans[0] eq $max_uv_pp) and ($ans[1] eq $max_uv_p1))
-		or (($ans[1] eq $max_uv_pp) and ($ans[0] eq $max_uv_p1))) {
+	    if (((@ans[0] eq $max_uv_pp) and (@ans[1] eq $max_uv_p1))
+		or ((@ans[1] eq $max_uv_pp) and (@ans[0] eq $max_uv_p1))) {
 	      # string ++ versus numeric ++. Tolerate this little
 	      # bit of insanity
 	      print "# ok, as string ++ of max_uv is \"$max_uv_pp\", numeric is $max_uv_p1\n"
-	    } elsif ($opnames[$last] eq 'I' and $ans[1] eq "-1"
-		     and $ans[0] eq $max_uv_p1_as_iv) {
+	    } elsif (@opnames[$last] eq 'I' and @ans[1] eq "-1"
+		     and @ans[0] eq $max_uv_p1_as_iv) {
               # Max UV plus 1 is NV. This NV may stringify in E notation.
               # And the number of decimal digits shown in E notation will depend
               # on the binary digits in the mantissa. And it may be that
@@ -217,12 +217,12 @@ for my $num_chain (1..$max_chain) {
               # (Only shows up for 64 bit UVs and NVs with 64 bit mantissas,
               #  and on Crays (64 bit integers, 48 bit mantissas) IIRC)
 	      print "# ok, \"$max_uv_p1\" correctly converts to IV \"$max_uv_p1_as_iv\"\n";
-	    } elsif ($opnames[$last] eq 'U' and $ans[1] eq ^~^0
-		     and $ans[0] eq $max_uv_p1_as_uv) {
+	    } elsif (@opnames[$last] eq 'U' and @ans[1] eq ^~^0
+		     and @ans[0] eq $max_uv_p1_as_uv) {
               # as aboce
 	      print "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
-	    } elsif (grep {m/^N$/} @opnames[@{$curops[0]}]
-		     and $ans[0] == $ans[1] and $ans[0] +<= ^~^0
+	    } elsif (grep {m/^N$/} @opnames[[@{@curops[0]}]]
+		     and @ans[0] == @ans[1] and @ans[0] +<= ^~^0
                      # First must be in E notation (ie not just digits) and
                      # second must still be an integer.
 		     # eg 1.84467440737095516e+19
@@ -233,7 +233,7 @@ for my $num_chain (1..$max_chain) {
 		     # Which isn't the string you first thought of.
                      # I can't remember why there isn't symmetry in this
                      # exception, ie why only the first ops are tested for 'N'
-                     and $ans[0] != m/^-?\d+$/ and $ans[1] !~ m/^-?\d+$/) {
+                     and @ans[0] != m/^-?\d+$/ and @ans[1] !~ m/^-?\d+$/) {
 	      print "# ok, numerically equal - notation changed due to adding zero\n";
 	    } else {
 	      $nok++,

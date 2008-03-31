@@ -13,8 +13,8 @@ use IO::Compress::Gzip::Constants v2.006 ;
 
 sub ExtraFieldError
 {
-    return $_[0];
-    return "Error with ExtraField Parameter: $_[0]" ;
+    return @_[0];
+    return "Error with ExtraField Parameter: @_[0]" ;
 }
 
 sub validateExtraFieldPair
@@ -108,9 +108,9 @@ sub mkSubField
 
 sub parseExtraField
 {
-    my $dataRef  = $_[0];
-    my $strict   = $_[1];
-    my $gzipMode = $_[2];
+    my $dataRef  = @_[0];
+    my $strict   = @_[1];
+    my $gzipMode = @_[2];
     #my $lax     = @_ == 2 ? $_[1] : 1;
 
 
@@ -187,7 +187,7 @@ sub parseExtraField
     return ExtraFieldError("Too Large")
         if length $out +> GZIP_FEXTRA_MAX_SIZE;
 
-    $_[0] = $out ;
+    @_[0] = $out ;
 
     return undef;
 }

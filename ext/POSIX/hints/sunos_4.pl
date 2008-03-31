@@ -7,4 +7,4 @@
 # Although <unistd.h> is inappropriate in general for SunOS, we need it
 # in POSIX.xs to get the correct prototype for ttyname().
 
-$self->{CCFLAGS} = $Config{ccflags} . ' -DSTRUCT_TM_HASZONE -DI_UNISTD' ;
+$self->{CCFLAGS} = %Config{ccflags} . ' -DSTRUCT_TM_HASZONE -DI_UNISTD' ;

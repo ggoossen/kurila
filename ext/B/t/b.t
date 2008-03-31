@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	if ($^O eq 'MacOS') {
 	    @INC = qw(: ::lib ::macos:lib);
@@ -13,7 +13,7 @@ BEGIN {
 	unshift @INC, 't';
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -44,13 +44,13 @@ sub hock { "yarrow" }
 package main;
 use vars qw(%Subs);
 local %Subs = ();
-B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { $_[0] =~ m/Foo/ },
+B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::');
 
 sub B::GV::find_syms {
     my($symbol) = @_;
 
-    $main::Subs{$symbol->STASH->NAME . '::' . $symbol->NAME}++;
+    %main::Subs{$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }
 
 my @syms = map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car

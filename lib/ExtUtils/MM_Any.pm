@@ -103,7 +103,7 @@ This is useful for code like:
 sub os_flavor_is {
     my $self = shift;
     my %flavors = map { ($_ => 1) } $self->os_flavor;
-    return (grep { $flavors{$_} } @_) ? 1 : 0;
+    return (grep { %flavors{$_} } @_) ? 1 : 0;
 }
 
 
@@ -207,8 +207,8 @@ sub echo {
                split m/\n/, $text;
     if( $file ) {
         my $redirect = $appending ? '>>' : '>';
-        $cmds[0] .= " $redirect $file";
-        $_ .= " >> $file" foreach @cmds[1..(@cmds-1)];
+        @cmds[0] .= " $redirect $file";
+        $_ .= " >> $file" foreach @cmds[[1..(@cmds-1)]];
     }
 
     return @cmds;
@@ -249,7 +249,7 @@ MakeMaker.
 
 =cut
 
-sub maketext_filter { return $_[1] }
+sub maketext_filter { return @_[1] }
 
 
 =head3 cd  I<Abstract>
@@ -461,11 +461,11 @@ clean :: clean_subdirs
 #                 );
                   
 
-    if( $attribs{FILES} ) {
+    if( %attribs{FILES} ) {
         # Use @dirs because we don't know what's in here.
-        push @dirs, ref $attribs{FILES}                ?
-                        @{$attribs{FILES}}             :
-                        split m/\s+/, $attribs{FILES}   ;
+        push @dirs, ref %attribs{FILES}                ?
+                        @{%attribs{FILES}}             :
+                        split m/\s+/, %attribs{FILES}   ;
     }
 
     push(@files, qw[$(MAKE_APERL_FILE) 
@@ -500,7 +500,7 @@ clean :: clean_subdirs
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
 MAKE
 
-    push(@m, "\t$attribs{POSTOP}\n")   if $attribs{POSTOP};
+    push(@m, "\t%attribs{POSTOP}\n")   if %attribs{POSTOP};
 
     join("", @m);
 }
@@ -734,7 +734,7 @@ MAKE_FRAG
     my $prereq_pm = '';
     foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{PREREQ_PM}} ) {
         my $ver = $self->{PREREQ_PM}{$mod};
-        $prereq_pm .= sprintf "\n    %-30s %s", "$mod:", $ver;
+        $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
 
     my $author_value = defined $self->{AUTHOR}
@@ -760,7 +760,7 @@ MAKE_FRAG
 
         $val = '~' unless defined $val;
 
-        $meta .= sprintf "%-20s %s\n", "$key:", $val;
+        $meta .= sprintf "\%-20s \%s\n", "$key:", $val;
     };
 
     $meta .= <<"YAML";
@@ -835,12 +835,12 @@ sub realclean {
         push @files, qw($(OBJECT));
     }
 
-    if( $attribs{FILES} ) {
-        if( ref $attribs{FILES} ) {
-            push @dirs, @{ $attribs{FILES} };
+    if( %attribs{FILES} ) {
+        if( ref %attribs{FILES} ) {
+            push @dirs, @{ %attribs{FILES} };
         }
         else {
-            push @dirs, split m/\s+/, $attribs{FILES};
+            push @dirs, split m/\s+/, %attribs{FILES};
         }
     }
 
@@ -860,7 +860,7 @@ realclean purge ::  clean realclean_subdirs
 	%s
 MAKE
 
-    $m .= "\t$attribs{POSTOP}\n" if $attribs{POSTOP};
+    $m .= "\t%attribs{POSTOP}\n" if %attribs{POSTOP};
 
     return $m;
 }
@@ -975,7 +975,7 @@ sub special_targets {
 
 MAKE_FRAG
 
-    $make_frag .= <<'MAKE_FRAG' if $ENV{CLEARCASE_ROOT};
+    $make_frag .= <<'MAKE_FRAG' if %ENV{CLEARCASE_ROOT};
 .NO_CONFIG_REC: Makefile
 
 MAKE_FRAG
@@ -1105,40 +1105,40 @@ sub init_INSTALL_from_PREFIX {
         my $k = 'installsiteman'.$num.'dir';
 
         $self->{uc $k} ||= uc "\$(installman${num}dir)"
-          unless $Config{$k};
+          unless %Config{$k};
     }
 
     foreach my $num (1, 3) {
         my $k = 'installvendorman'.$num.'dir';
 
-        unless( $Config{$k} ) {
-            $self->{uc $k}  ||= $Config{usevendorprefix}
+        unless( %Config{$k} ) {
+            $self->{uc $k}  ||= %Config{usevendorprefix}
                               ? uc "\$(installman${num}dir)"
                               : '';
         }
     }
 
     $self->{INSTALLSITEBIN} ||= '$(INSTALLBIN)'
-      unless $Config{installsitebin};
+      unless %Config{installsitebin};
     $self->{INSTALLSITESCRIPT} ||= '$(INSTALLSCRIPT)'
-      unless $Config{installsitescript};
+      unless %Config{installsitescript};
 
-    unless( $Config{installvendorbin} ) {
-        $self->{INSTALLVENDORBIN} ||= $Config{usevendorprefix} 
-                                    ? $Config{installbin}
+    unless( %Config{installvendorbin} ) {
+        $self->{INSTALLVENDORBIN} ||= %Config{usevendorprefix} 
+                                    ? %Config{installbin}
                                     : '';
     }
-    unless( $Config{installvendorscript} ) {
-        $self->{INSTALLVENDORSCRIPT} ||= $Config{usevendorprefix}
-                                       ? $Config{installscript}
+    unless( %Config{installvendorscript} ) {
+        $self->{INSTALLVENDORSCRIPT} ||= %Config{usevendorprefix}
+                                       ? %Config{installscript}
                                        : '';
     }
 
 
-    my $iprefix = $Config{installprefixexp} || $Config{installprefix} || 
-                  $Config{prefixexp}        || $Config{prefix} || '';
-    my $vprefix = $Config{usevendorprefix}  ? $Config{vendorprefixexp} : '';
-    my $sprefix = $Config{siteprefixexp}    || '';
+    my $iprefix = %Config{installprefixexp} || %Config{installprefix} || 
+                  %Config{prefixexp}        || %Config{prefix} || '';
+    my $vprefix = %Config{usevendorprefix}  ? %Config{vendorprefixexp} : '';
+    my $sprefix = %Config{siteprefixexp}    || '';
 
     # 5.005_03 doesn't have a siteprefix.
     $sprefix = $iprefix unless $sprefix;
@@ -1147,7 +1147,7 @@ sub init_INSTALL_from_PREFIX {
     $self->{PREFIX}       ||= '';
 
     if( $self->{PREFIX} ) {
-        @{$self}{qw(PERLPREFIX SITEPREFIX VENDORPREFIX)} =
+        %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
           ('$(PREFIX)') x 3;
     }
     else {
@@ -1160,11 +1160,11 @@ sub init_INSTALL_from_PREFIX {
         $self->{PREFIX} = '$('.uc $self->{INSTALLDIRS}.'PREFIX)';
     }
 
-    my $arch    = $Config{archname};
-    my $version = $Config{version};
+    my $arch    = %Config{archname};
+    my $version = %Config{version};
 
     # default style
-    my $libstyle = $Config{installstyle} || 'lib/perl5';
+    my $libstyle = %Config{installstyle} || 'lib/perl5';
     my $manstyle = '';
 
     if( $self->{LIBSTYLE} ) {
@@ -1176,7 +1176,7 @@ sub init_INSTALL_from_PREFIX {
     # read man pages.
     for my $num (1, 3) {
         $self->{'INSTALLMAN'.$num.'DIR'} ||= 'none'
-          unless $Config{'installman'.$num.'dir'};
+          unless %Config{'installman'.$num.'dir'};
     }
 
     my %bin_layouts = 
@@ -1267,7 +1267,7 @@ sub init_INSTALL_from_PREFIX {
 
             if( $var =~ m/arch/ ) {
                 $self->{$Installvar} ||= 
-                  $self->catdir($self->{LIB}, $Config{archname});
+                  $self->catdir($self->{LIB}, %Config{archname});
             }
             else {
                 $self->{$Installvar} ||= $self->{LIB};
@@ -1282,8 +1282,8 @@ sub init_INSTALL_from_PREFIX {
 
     my %layouts = (%bin_layouts, %man_layouts, %lib_layouts);
     while( my($var, $layout) = each(%layouts) ) {
-        my($s, $t, $d, $style) = @{$layout}{qw(s t d style)};
-        my $r = '$('.$type2prefix{$t}.')';
+        my($s, $t, $d, $style) = %{$layout}{[qw(s t d style)]};
+        my $r = '$('.%type2prefix{$t}.')';
 
         print STDERR "Prefixing $var\n" if $Verbose +>= 2;
 
@@ -1314,17 +1314,17 @@ sub init_INSTALL_from_PREFIX {
 
 my %map = (
            lib      => [qw(lib perl5)],
-           arch     => [('lib', 'perl5', $Config{archname})],
+           arch     => [('lib', 'perl5', %Config{archname})],
            bin      => [qw(bin)],
            man1dir  => [qw(man man1)],
            man3dir  => [qw(man man3)]
           );
-$map{script} = $map{bin};
+%map{script} = %map{bin};
 
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
 
-    @{$self}{qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)} = 
+    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = 
                                                          '$(INSTALL_BASE)';
 
     my %install;
@@ -1333,17 +1333,17 @@ sub init_INSTALL_from_INSTALL_BASE {
             my $uc_thing = uc $thing;
             my $key = "INSTALL".$dir.$uc_thing;
 
-            $install{$key} ||= 
-              $self->catdir('$(INSTALL_BASE)', @{$map{$thing}});
+            %install{$key} ||= 
+              $self->catdir('$(INSTALL_BASE)', @{%map{$thing}});
         }
     }
 
     # Adjust for variable quirks.
-    $install{INSTALLARCHLIB} ||= delete $install{INSTALLARCH};
-    $install{INSTALLPRIVLIB} ||= delete $install{INSTALLLIB};
+    %install{INSTALLARCHLIB} ||= delete %install{INSTALLARCH};
+    %install{INSTALLPRIVLIB} ||= delete %install{INSTALLLIB};
 
     foreach my $key (keys %install) {
-        $self->{$key} ||= $install{$key};
+        $self->{$key} ||= %install{$key};
     }
 
     return 1;
@@ -1530,7 +1530,7 @@ Initialize MAKE from either a MAKE environment variable or $Config{make}.
 sub init_MAKE {
     my $self = shift;
 
-    $self->{MAKE} ||= $ENV{MAKE} || $Config{make};
+    $self->{MAKE} ||= %ENV{MAKE} || %Config{make};
 }
 
 
@@ -1718,7 +1718,7 @@ installation.
 
 sub libscan {
     my($self,$path) = @_;
-    my($dirs,$file) = ($self->splitpath($path))[1,2];
+    my($dirs,$file) = ($self->splitpath($path))[[1,2]];
     return '' if grep m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/, 
                      $self->splitdir($dirs), $file;
 

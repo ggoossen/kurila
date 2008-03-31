@@ -13,9 +13,9 @@ print "1..187\n";
 
 my $test = 1;
 sub test (&) {
-  my $ok = &{$_[0]};
+  my $ok = &{@_[0]};
   print $ok ? "ok $test\n" : "not ok $test\n";
-  printf "# Failed at line %d\n", (caller)[2] unless $ok;
+  printf "# Failed at line \%d\n", (caller)[[2]] unless $ok;
   $test++;
 }
 
@@ -76,99 +76,99 @@ test {&$foo(11)-1 == &$bar()};
 my @foo;
 for (qw(0 1 2 3 4)) {
   my $i = $_;
-  $foo[$_] = sub {$i = shift if @_; $i };
+  @foo[$_] = sub {$i = shift if @_; $i };
 }
 
 test {
-  &{$foo[0]}() == 0 and
-  &{$foo[1]}() == 1 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 3 and
-  &{$foo[4]}() == 4
+  &{@foo[0]}() == 0 and
+  &{@foo[1]}() == 1 and
+  &{@foo[2]}() == 2 and
+  &{@foo[3]}() == 3 and
+  &{@foo[4]}() == 4
   };
 
 for (0 .. 4) {
-  &{$foo[$_]}(4-$_);
+  &{@foo[$_]}(4-$_);
 }
 
 test {
-  &{$foo[0]}() == 4 and
-  &{$foo[1]}() == 3 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 1 and
-  &{$foo[4]}() == 0
+  &{@foo[0]}() == 4 and
+  &{@foo[1]}() == 3 and
+  &{@foo[2]}() == 2 and
+  &{@foo[3]}() == 1 and
+  &{@foo[4]}() == 0
   };
 
 sub barf {
   my @foo;
   for (qw(0 1 2 3 4)) {
     my $i = $_;
-    $foo[$_] = sub {$i = shift if @_; $i };
+    @foo[$_] = sub {$i = shift if @_; $i };
   }
   @foo;
 }
 
 @foo = barf();
 test {
-  &{$foo[0]}() == 0 and
-  &{$foo[1]}() == 1 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 3 and
-  &{$foo[4]}() == 4
+  &{@foo[0]}() == 0 and
+  &{@foo[1]}() == 1 and
+  &{@foo[2]}() == 2 and
+  &{@foo[3]}() == 3 and
+  &{@foo[4]}() == 4
   };
 
 for (0 .. 4) {
-  &{$foo[$_]}(4-$_);
+  &{@foo[$_]}(4-$_);
 }
 
 test {
-  &{$foo[0]}() == 4 and
-  &{$foo[1]}() == 3 and
-  &{$foo[2]}() == 2 and
-  &{$foo[3]}() == 1 and
-  &{$foo[4]}() == 0
+  &{@foo[0]}() == 4 and
+  &{@foo[1]}() == 3 and
+  &{@foo[2]}() == 2 and
+  &{@foo[3]}() == 1 and
+  &{@foo[4]}() == 0
   };
 
 # test if closures get created in optimized for loops
 
 my %foo;
 for my $n ('A'..'E') {
-    $foo{$n} = sub { $n eq $_[0] };
+    %foo{$n} = sub { $n eq @_[0] };
 }
 
 test {
-  &{$foo{A}}('A') and
-  &{$foo{B}}('B') and
-  &{$foo{C}}('C') and
-  &{$foo{D}}('D') and
-  &{$foo{E}}('E')
+  &{%foo{A}}('A') and
+  &{%foo{B}}('B') and
+  &{%foo{C}}('C') and
+  &{%foo{D}}('D') and
+  &{%foo{E}}('E')
 };
 
 for my $n (0..4) {
-    $foo[$n] = sub { $n == $_[0] };
+    @foo[$n] = sub { $n == @_[0] };
 }
 
 test {
-  &{$foo[0]}(0) and
-  &{$foo[1]}(1) and
-  &{$foo[2]}(2) and
-  &{$foo[3]}(3) and
-  &{$foo[4]}(4)
+  &{@foo[0]}(0) and
+  &{@foo[1]}(1) and
+  &{@foo[2]}(2) and
+  &{@foo[3]}(3) and
+  &{@foo[4]}(4)
 };
 
 for my $n (0..4) {
-    $foo[$n] = sub {
+    @foo[$n] = sub {
                      # no intervening reference to $n here
-                     sub { $n == $_[0] }
+                     sub { $n == @_[0] }
 		   };
 }
 
 test {
-  $foo[0]->()->(0) and
-  $foo[1]->()->(1) and
-  $foo[2]->()->(2) and
-  $foo[3]->()->(3) and
-  $foo[4]->()->(4)
+  @foo[0]->()->(0) and
+  @foo[1]->()->(1) and
+  @foo[2]->()->(2) and
+  @foo[3]->()->(3) and
+  @foo[4]->()->(4)
 };
 
 {
@@ -191,7 +191,7 @@ test {
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
     my($code, $inner_sub_test, $expected, $line, $errors, $output);
     my(@inners, $sub_test, $pid);
-    $debugging = 1 if defined($ARGV[0]) and $ARGV[0] eq '-debug';
+    $debugging = 1 if defined(@ARGV[0]) and @ARGV[0] eq '-debug';
 
     # The expected values for these tests
     %expected = (
@@ -263,7 +263,7 @@ END_MARK_TWO
     sub test (&) \{
       my \$ok = &\{\$_[0]\};
       print \$ok ? "ok \$test\n" : "not ok \$test\n";
-      printf "# Failed at line %d\n", (caller)[2] unless \$ok;
+      printf "# Failed at line \%d\n", (caller)[2] unless \$ok;
       \$test++;
     \}
 \}
@@ -272,11 +272,11 @@ END_MARK_TWO
 no strict 'vars';
 \$global_scalar = 1000;
 \@global_array = (2000, 2100, 2200, 2300);
-%global_hash = 3000..3009;
+\%global_hash = 3000..3009;
 
 my \$fs_scalar = 4000;
 my \@fs_array = (5000, 5100, 5200, 5300);
-my %fs_hash = 6000..6009;
+my \%fs_hash = 6000..6009;
 
 END_MARK_THREE
 
@@ -390,7 +390,7 @@ END
 
 	  # Now, we can actually prep to run the tests.
 	  for $inner_sub_test (@inners) {
-	    $expected = $expected{$inner_sub_test} or
+	    $expected = %expected{$inner_sub_test} or
 	      die "expected $inner_sub_test missing";
 
 	    # Named closures won't access the expected vars
@@ -429,7 +429,7 @@ END
 	    $test++;
 	  }
 
-	  if ($Config{d_fork} and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
+	  if (%Config{d_fork} and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
 	    # Fork off a new perl to run the tests.
 	    # (This is so we can catch spurious warnings.)
 	    $| = 1; print ""; $| = 0; # flush output before forking
@@ -479,7 +479,7 @@ END
 	      { local $/; open IN, "<", $outfile; $output = ~< *IN; close IN }
 	    }
 	    if ($?) {
-	      printf "not ok: exited with error code %04X\n", $?;
+	      printf "not ok: exited with error code \%04X\n", $?;
 	      $debugging or do { 1 while unlink @tmpfiles };
 	      exit;
 	    }
@@ -491,10 +491,10 @@ END
 	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
 	    my $lnum = 0;
 	    for $line (split '\n', $code) {
-	      printf "%3d:  %s\n", ++$lnum, $line;
+	      printf "\%3d:  \%s\n", ++$lnum, $line;
 	    }
 	  }
-	  printf "not ok: exited with error code %04X\n", $? if $?;
+	  printf "not ok: exited with error code \%04X\n", $? if $?;
 	  print '#', "-" x 30, "\n" if $debugging;
 
 	}	# End of foreach $within
@@ -506,7 +506,7 @@ END
 {
     no strict 'vars';
     # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
-    BEGIN { $vanishing_pad = sub { eval $_[0] } }
+    BEGIN { $vanishing_pad = sub { eval @_[0] } }
     $some_var = 123;
     test { $vanishing_pad->( '$some_var' ) == 123 };
 }
@@ -582,15 +582,15 @@ fake();
 
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
-sub Watch::new { bless [ $_[1], $_[2] ], $_[0] }
-sub Watch::DESTROY { ${$_[0][0]} .= $_[0][1] }
+sub Watch::new { bless [ @_[1], @_[2] ], @_[0] }
+sub Watch::DESTROY { ${@_[0][0]} .= @_[0][1] }
 
 
 # bugid 1028:
 # nested anon subs (and associated lexicals) not freed early enough
 
 sub linger {
-    my $x = Watch->new($_[0], '2');
+    my $x = Watch->new(@_[0], '2');
     sub {
 	$x;
 	my $y;
@@ -607,7 +607,7 @@ sub linger {
 # obj not freed early enough
 
 sub linger2 { 
-    my $obj = Watch->new($_[0], '2');
+    my $obj = Watch->new(@_[0], '2');
     sub { sub { $obj } };
 }   
 {
@@ -634,9 +634,9 @@ f16302();
 {
     my %a;
     for my $x (7,11) {
-	$a{$x} = sub { $x=$x; sub { eval '$x' } };
+	%a{$x} = sub { $x=$x; sub { eval '$x' } };
     }
-    test { $a{7}->()->() + $a{11}->()->() == 18 };
+    test { %a{7}->()->() + %a{11}->()->() == 18 };
 }
 
 {

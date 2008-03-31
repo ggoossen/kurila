@@ -132,7 +132,7 @@ is(eval { MRO_N->testfunc() }, 123);
 
     # this looks dumb, but it preserves existing behavior for compatibility
     #  (undefined @ISA elements treated as "main")
-    $ISACLEAR::ISA[1] = undef;
+    @ISACLEAR::ISA[1] = undef;
     ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main/, undef, qw/ZZ/]));
 
     # undef the array itself
@@ -176,7 +176,7 @@ is(eval { MRO_N->testfunc() }, 123);
     {
         package SUPERTEST;
         sub new { bless {} => shift }
-        sub foo { $_[1]+1 }
+        sub foo { @_[1]+1 }
 
         package SUPERTEST::MID;
         our @ISA = 'SUPERTEST';
@@ -186,13 +186,13 @@ is(eval { MRO_N->testfunc() }, 123);
         sub foo { my $s = shift; $s->SUPER::foo(@_) }
 
         package SUPERTEST::REBASE;
-        sub foo { $_[1]+3 }
+        sub foo { @_[1]+3 }
     }
 
     my $stk_obj = SUPERTEST::KID->new();
     is($stk_obj->foo(1), 2);
     { no warnings 'redefine';
-      *SUPERTEST::foo = sub { $_[1]+2 };
+      *SUPERTEST::foo = sub { @_[1]+2 };
     }
     is($stk_obj->foo(2), 4);
     @SUPERTEST::MID::ISA = 'SUPERTEST::REBASE';

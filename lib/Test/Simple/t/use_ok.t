@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -54,7 +54,7 @@ use Test::More tests => 13;
     package Foo::seven;
     local ${^WARN_HOOK} = sub {
         # Old perls will warn on X.YY_ZZ style versions.  Not our problem
-        warn @_ unless $_[0] =~ m/^Argument "\d+\.\d+_\d+" isn't numeric/;
+        warn @_ unless @_[0] =~ m/^Argument "\d+\.\d+_\d+" isn't numeric/;
     };
     ::use_ok("Test::More", v0.47);
 }

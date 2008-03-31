@@ -37,13 +37,13 @@ that was selected when it was created.
 sub new {
     @_ +>= 1 && @_ +<= 2 or die 'usage: SelectSaver->new([FILEHANDLE])';
     my $fh = select;
-    my $self = bless \$fh, $_[0];
-    select $_[1] if @_ +> 1;
+    my $self = bless \$fh, @_[0];
+    select @_[1] if @_ +> 1;
     $self;
 }
 
 sub DESTROY {
-    my $self = $_[0];
+    my $self = @_[0];
     select $$self;
 }
 

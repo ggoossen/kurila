@@ -284,14 +284,14 @@ $VERSION = eval $VERSION;
 ##
 
 sub new {
-    my $class = ref($_[0]) || $_[0] || "IO::Handle";
+    my $class = ref(@_[0]) || @_[0] || "IO::Handle";
     @_ == 1 or die "usage: new $class";
     my $io = gensym;
     bless $io, $class;
 }
 
 sub new_from_fd {
-    my $class = ref($_[0]) || $_[0] || "IO::Handle";
+    my $class = ref(@_[0]) || @_[0] || "IO::Handle";
     @_ == 3 or die "usage: new_from_fd $class FD, MODE";
     my $io = gensym;
     shift;
@@ -344,22 +344,22 @@ sub close {
 
 sub opened {
     @_ == 1 or die 'usage: $io->opened()';
-    defined fileno($_[0]);
+    defined fileno(@_[0]);
 }
 
 sub fileno {
     @_ == 1 or die 'usage: $io->fileno()';
-    fileno($_[0]);
+    fileno(@_[0]);
 }
 
 sub getc {
     @_ == 1 or die 'usage: $io->getc()';
-    getc($_[0]);
+    getc(@_[0]);
 }
 
 sub eof {
     @_ == 1 or die 'usage: $io->eof()';
-    eof($_[0]);
+    eof(@_[0]);
 }
 
 sub print {
@@ -392,38 +392,38 @@ sub getlines {
 
 sub truncate {
     @_ == 2 or die 'usage: $io->truncate(LEN)';
-    truncate($_[0], $_[1]);
+    truncate(@_[0], @_[1]);
 }
 
 sub read {
     @_ == 3 || @_ == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
-    read($_[0], $_[1], $_[2], $_[3] || 0);
+    read(@_[0], @_[1], @_[2], @_[3] || 0);
 }
 
 sub sysread {
     @_ == 3 || @_ == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
-    sysread($_[0], $_[1], $_[2], $_[3] || 0);
+    sysread(@_[0], @_[1], @_[2], @_[3] || 0);
 }
 
 sub write {
     @_ +>= 2 && @_ +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
     local($\) = "";
-    $_[2] = length($_[1]) unless defined $_[2];
-    print { $_[0] } substr($_[1], $_[3] || 0, $_[2]);
+    @_[2] = length(@_[1]) unless defined @_[2];
+    print { @_[0] } substr(@_[1], @_[3] || 0, @_[2]);
 }
 
 sub syswrite {
     @_ +>= 2 && @_ +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
-    if (defined($_[2])) {
-	syswrite($_[0], $_[1], $_[2], $_[3] || 0);
+    if (defined(@_[2])) {
+	syswrite(@_[0], @_[1], @_[2], @_[3] || 0);
     } else {
-	syswrite($_[0], $_[1]);
+	syswrite(@_[0], @_[1]);
     }
 }
 
 sub stat {
     @_ == 1 or die 'usage: $io->stat()';
-    stat($_[0]);
+    stat(@_[0]);
 }
 
 ################################################
@@ -431,41 +431,41 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = SelectSaver->new( qualify($_[0], caller));
+    my $old = SelectSaver->new( qualify(@_[0], caller));
     my $prev = $|;
-    $| = @_ +> 1 ? $_[1] : 1;
+    $| = @_ +> 1 ? @_[1] : 1;
     $prev;
 }
 
 sub output_field_separator {
     warn "output_field_separator is not supported on a per-handle basis"
-	if ref($_[0]);
+	if ref(@_[0]);
     my $prev = $,;
-    $, = $_[1] if @_ +> 1;
+    $, = @_[1] if @_ +> 1;
     $prev;
 }
 
 sub output_record_separator {
     warn "output_record_separator is not supported on a per-handle basis"
-	if ref($_[0]);
+	if ref(@_[0]);
     my $prev = $\;
-    $\ = $_[1] if @_ +> 1;
+    $\ = @_[1] if @_ +> 1;
     $prev;
 }
 
 sub input_record_separator {
     warn "input_record_separator is not supported on a per-handle basis"
-	if ref($_[0]);
+	if ref(@_[0]);
     my $prev = $/;
-    $/ = $_[1] if @_ +> 1;
+    $/ = @_[1] if @_ +> 1;
     $prev;
 }
 
 sub input_line_number {
     local $.;
-    () = tell qualify($_[0], caller) if ref($_[0]);
+    () = tell qualify(@_[0], caller) if ref(@_[0]);
     my $prev = $.;
-    $. = $_[1] if @_ +> 1;
+    $. = @_[1] if @_ +> 1;
     $prev;
 }
 
@@ -473,14 +473,14 @@ sub input_line_number {
 sub fcntl {
     @_ == 3 || die 'usage: $io->fcntl( OP, VALUE );';
     my ($io, $op) = @_;
-    return fcntl($io, $op, $_[2]);
+    return fcntl($io, $op, @_[2]);
 }
 
 # XXX undocumented
 sub ioctl {
     @_ == 3 || die 'usage: $io->ioctl( OP, VALUE );';
     my ($io, $op) = @_;
-    return ioctl($io, $op, $_[2]);
+    return ioctl($io, $op, @_[2]);
 }
 
 # this sub is for compatability with older releases of IO that used

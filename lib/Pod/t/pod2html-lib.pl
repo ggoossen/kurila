@@ -26,7 +26,7 @@ sub convert_n_test {
 	local $/;
 	# expected
 	$expect = ~< *DATA;
-	$expect =~ s/\[PERLADMIN\]/$Config::Config{perladmin}/;
+	$expect =~ s/\[PERLADMIN\]/%Config::Config{perladmin}/;
 	if (ord("A") == 193) { # EBCDIC.
 	    $expect =~ s/item_mat_3c_21_3e/item_mat_4c_5a_6e/;
 	}

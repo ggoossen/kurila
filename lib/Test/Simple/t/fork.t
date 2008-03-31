@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -10,10 +10,10 @@ BEGIN {
 use Test::More;
 use Config;
 
-my $Can_Fork = $Config{d_fork} ||
+my $Can_Fork = %Config{d_fork} ||
                (($^O eq 'MSWin32' || $^O eq 'NetWare') and
-                $Config{useithreads} and 
-                $Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
+                %Config{useithreads} and 
+                %Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
                );
 
 if( !$Can_Fork ) {

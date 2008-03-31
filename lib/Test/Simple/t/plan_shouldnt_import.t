@@ -3,7 +3,7 @@
 # plan() used to export functions by mistake [rt.cpan.org 8385]
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }

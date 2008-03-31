@@ -10,8 +10,8 @@ BEGIN {
 use Config;
 
 BEGIN {
-    if($ENV{PERL_CORE}) {
-        if ($Config{'extensions'} !~ m/\bIO\b/) {
+    if(%ENV{PERL_CORE}) {
+        if (%Config{'extensions'} !~ m/\bIO\b/) {
 	    print "1..0 # Skip: IO extension not compiled\n";
 	    exit 0;
         }
@@ -41,7 +41,7 @@ print $stdout "ok 2\n";
 print $stderr "ok 3\n";
 
 # Since some systems don't have echo, we use Perl.
-$echo = qq{$^X -le "print q(ok %d)"};
+$echo = qq{$^X -le "print q(ok \%d)"};
 
 $cmd = sprintf $echo, 4;
 print `$cmd`;

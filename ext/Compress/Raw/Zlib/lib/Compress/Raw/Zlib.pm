@@ -98,7 +98,7 @@ sub ParseParameters
 {
     my $level = shift || 0 ; 
 
-    my $sub = (caller($level + 1))[3] ;
+    my $sub = (caller($level + 1))[[3]] ;
     #local $Carp::CarpLevel = 1 ;
     my $p = Compress::Raw::Zlib::Parameters->new() ;
     $p->parse(@_)
@@ -154,7 +154,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         @entered = () ;
     }
     elsif (@_ == 1) {
-        my $href = $_[0] ;    
+        my $href = @_[0] ;    
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
  
@@ -169,8 +169,8 @@ sub Compress::Raw::Zlib::Parameters::parse
             if $count % 2 != 0 ;
         
         for my $i (0.. $count / 2 - 1) {
-            push @entered, $_[2* $i] ;
-            push @entered, \$_[2* $i+1] ;
+            push @entered, @_[2* $i] ;
+            push @entered, \@_[2* $i+1] ;
         }
     }
 
@@ -195,8 +195,8 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
 
     for my $i (0.. @entered / 2 - 1) {
-        my $key = $entered[2* $i] ;
-        my $value = $entered[2* $i+1] ;
+        my $key = @entered[2* $i] ;
+        my $value = @entered[2* $i+1] ;
 
         #print "Key [$key] Value [$value]" ;
         #print defined $$value ? "[$$value]\n" : "[undef]\n";
@@ -310,8 +310,8 @@ sub Compress::Raw::Zlib::Parameters::value
     if (@_)
     {
         $self->{Got}{lc $name}[OFF_PARSED]  = 1;
-        $self->{Got}{lc $name}[OFF_DEFAULT] = $_[0] ;
-        $self->{Got}{lc $name}[OFF_FIXED]   = $_[0] ;
+        $self->{Got}{lc $name}[OFF_DEFAULT] = @_[0] ;
+        $self->{Got}{lc $name}[OFF_FIXED]   = @_[0] ;
     }
 
     return $self->{Got}{lc $name}[OFF_FIXED] ;
@@ -454,15 +454,15 @@ sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
 sub Compress::Raw::Zlib::inflateScanStream::inflate
 {
     my $self = shift ;
-    my $buffer = $_[1];
-    my $eof = $_[2];
+    my $buffer = @_[1];
+    my $eof = @_[2];
 
     my $status = $self->scan(@_);
 
-    if ($status == Z_OK() && $_[2]) {
+    if ($status == Z_OK() && @_[2]) {
         my $byte = ' ';
         
-        $status = $self->scan(\$byte, $_[1]) ;
+        $status = $self->scan(\$byte, @_[1]) ;
     }
     
     return $status ;

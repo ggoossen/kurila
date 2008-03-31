@@ -62,7 +62,7 @@ sub import {
     require Exporter;
     my $i = 1;
     while ($i +< @_) {
-	if ($_[$i] =~ m/^:(case|nocase|globally)$/) {
+	if (@_[$i] =~ m/^:(case|nocase|globally)$/) {
 	    splice(@_, $i, 1);
 	    $DEFAULT_FLAGS ^&^= ^~^GLOB_NOCASE() if $1 eq 'case';
 	    $DEFAULT_FLAGS ^|^= GLOB_NOCASE() if $1 eq 'nocase';
@@ -82,7 +82,7 @@ XSLoader::load 'File::Glob', $VERSION;
 # Preloaded methods go here.
 
 sub GLOB_ERROR {
-    return (constant('GLOB_ERROR'))[1];
+    return (constant('GLOB_ERROR'))[[1]];
 }
 
 sub GLOB_CSH () {
@@ -139,31 +139,31 @@ sub csh_glob {
 
     # assume global context if not provided one
     $cxix = '_G_' unless defined $cxix;
-    $iter{$cxix} = 0 unless exists $iter{$cxix};
+    %iter{$cxix} = 0 unless exists %iter{$cxix};
 
     # if we're just beginning, do it all first
-    if ($iter{$cxix} == 0) {
+    if (%iter{$cxix} == 0) {
 	if (@pat) {
-	    $entries{$cxix} = [ map { doglob($_, $DEFAULT_FLAGS) } @pat ];
+	    %entries{$cxix} = [ map { doglob($_, $DEFAULT_FLAGS) } @pat ];
 	}
 	else {
-	    $entries{$cxix} = [ doglob($pat, $DEFAULT_FLAGS) ];
+	    %entries{$cxix} = [ doglob($pat, $DEFAULT_FLAGS) ];
 	}
     }
 
     # chuck it all out, quick or slow
     if (wantarray) {
-        delete $iter{$cxix};
-        return @{delete $entries{$cxix}};
+        delete %iter{$cxix};
+        return @{delete %entries{$cxix}};
     }
     else {
-        if ($iter{$cxix} = scalar @{$entries{$cxix}}) {
-            return shift @{$entries{$cxix}};
+        if (%iter{$cxix} = scalar @{%entries{$cxix}}) {
+            return shift @{%entries{$cxix}};
         }
         else {
             # return undef for EOL
-            delete $iter{$cxix};
-            delete $entries{$cxix};
+            delete %iter{$cxix};
+            delete %entries{$cxix};
             return undef;
         }
     }

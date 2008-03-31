@@ -35,20 +35,20 @@ use Class::ISA ();
   while(@stack) {
     $this = shift @stack;
     die "Too many packages?" if ++$count +> 1000;
-    next if exists $v{$this};
+    next if exists %v{$this};
     next if $this eq 'main'; # %main:: is %::
 
     #print "Peeking at $this => ${$this . '::VERSION'}\n";
     
     if(defined ${*{Symbol::fetch_glob($this . '::VERSION')}} ) {
-      $v{$this} = ${*{Symbol::fetch_glob($this . '::VERSION')}}
+      %v{$this} = ${*{Symbol::fetch_glob($this . '::VERSION')}}
     } elsif(
        defined *{Symbol::fetch_glob($this . '::ISA')} or defined &{Symbol::fetch_glob($this . '::import')}
        or ($this ne '' and grep defined *{$_}{'CODE'}, values %{*{Symbol::fetch_glob($this . "::")}})
        # If it has an ISA, an import, or any subs...
     ) {
       # It's a class/module with no version.
-      $v{$this} = undef;
+      %v{$this} = undef;
     } else {
       # It's probably an unpopulated package.
       ## $v{$this} = '...';
@@ -59,12 +59,12 @@ use Class::ISA ();
     #print "Stack: @stack\n";
   }
   push @out, " Modules in memory:\n";
-  delete @v{'', '[none]'};
+  delete %v{['', '[none]']};
   foreach my $p (sort {lc($a) cmp lc($b)} keys %v) {
     $indent = ' ' x (2 + ($p =~ tr/:/:/));
-    push @out,  '  ', $indent, $p, defined($v{$p}) ? " v$v{$p};\n" : ";\n";
+    push @out,  '  ', $indent, $p, defined(%v{$p}) ? " v%v{$p};\n" : ";\n";
   }
-  push @out, sprintf "[at %s (local) / %s (GMT)]\n",
+  push @out, sprintf "[at \%s (local) / \%s (GMT)]\n",
     scalar(gmtime), scalar(localtime);
   my $x = join '', @out;
   $x =~ s/^/#/mg;
@@ -80,7 +80,7 @@ print "# \@INC:\n", map("#   [$_]\n", @INC), "#\n#\n";
 
 print "# \%INC:\n";
 foreach my $x (sort {lc($a) cmp lc($b)} keys %INC) {
-  print "#   [$x] = [", $INC{$x} || '', "]\n";
+  print "#   [$x] = [", %INC{$x} || '', "]\n";
 }
 
 ok 1;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -26,8 +26,8 @@ BEGIN {
 package Overloaded;
 
 use overload
-        q{""}    => sub { $_[0]->{string} },
-        q{0+}    => sub { $_[0]->{num} };
+        q{""}    => sub { @_[0]->{string} },
+        q{0+}    => sub { @_[0]->{num} };
 
 sub new {
     my $class = shift;
@@ -38,7 +38,7 @@ sub new {
 package main;
 
 local ${^DIE_HOOK} = sub {
-    my($call_file, $call_line) = (caller)[1,2];
+    my($call_file, $call_line) = (caller)[[1,2]];
     fail("SIGDIE accidentally called");
     diag("From $call_file at $call_line");
 };

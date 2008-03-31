@@ -1,5 +1,5 @@
 BEGIN { 
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir '../lib/Archive/Extract' if -d '../lib/Archive/Extract';
         unshift @INC, '../../..', '../../../..';
     }
@@ -37,12 +37,12 @@ use Module::Load::Conditional   qw[check_install];
 #         Archive::Extract::extract('Archive::Extract=HASH(0x966eac)','to','/Users/kane/sources/p4/other/archive-extract/t/out') called at t/01_Archive-Extract.t line 180
 #BEGIN { $SIG{__WARN__} = sub { require Carp; Carp::cluck(@_) } };
 
-if ((IS_WIN32 or IS_CYGWIN) && ! $ENV{PERL_CORE}) {
+if ((IS_WIN32 or IS_CYGWIN) && ! %ENV{PERL_CORE}) {
     diag( "Older versions of Archive::Zip may cause File::Spec warnings" );
     diag( "See bug #19713 in rt.cpan.org. It is safe to ignore them" );
 }
 
-my $Debug   = $ARGV[0] ? 1 : 0;
+my $Debug   = @ARGV[0] ? 1 : 0;
 my $Me      = basename( $0 );
 my $Class   = 'Archive::Extract';
 my $Self    = File::Spec->rel2abs( 

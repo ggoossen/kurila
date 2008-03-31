@@ -26,8 +26,8 @@ print "Extracting $file (with variable substitutions)\n";
 # You can use $Config{...} to use Configure variables.
 
 print OUT <<"!GROK!THIS!";
-$Config{startperl}
-    eval 'exec $Config{perlpath} -S \$0 \$\{1+"\$@"\}'
+%Config{startperl}
+    eval 'exec %Config{perlpath} -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
 !GROK!THIS!
 
@@ -44,5 +44,5 @@ if (open(INSTMODSH, "<", $instmodsh)) {
 
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
-exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
+exec("%Config{'eunicefix'} $file") if %Config{'eunicefix'} ne ':';
 chdir $origdir;

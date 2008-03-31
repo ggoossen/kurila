@@ -13,8 +13,8 @@ while ($work)
     if (m/^(.*):(\d+):\s+\`(\w+)'\s+undeclared/ && -f $1 )
      {
       my ($file,$line,$var) = ($1,$2,$3);
-      $fix{$file} = [] unless exists $fix{$file}; 
-      push(@{$fix{$file}},[$line => $var]) unless ($var =~ m/^PL_/ || $file =~ m/\.h$/);
+      %fix{$file} = [] unless exists %fix{$file}; 
+      push(@{%fix{$file}},[$line => $var]) unless ($var =~ m/^PL_/ || $file =~ m/\.h$/);
      }
     print;
    }
@@ -24,7 +24,7 @@ while ($work)
   my $changed = 0;
   foreach my $file (keys %fix)
    {          
-    my @ar = sort( { $a->[0] <+> $b->[0] } @{delete $fix{$file}});
+    my @ar = sort( { $a->[0] <+> $b->[0] } @{delete %fix{$file}});
     my @miss;
     my $fixed = 0;
     unless (-w $file)
@@ -36,7 +36,7 @@ while ($work)
     local $^I = '.sav';
     while ( ~< *ARGV)
      {
-      while (@ar && $. == $ar[0][0])
+      while (@ar && $. == @ar[0][0])
        {
         my ($line,$var) = @{shift(@ar)};
         if (s/\b$var\b/PL_$var/)

@@ -16,7 +16,7 @@ use Locale::Constants;
 #	Public Global Variables
 #-----------------------------------------------------------------------
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
-$VERSION   = sprintf("%d.%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
+$VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(code2country country2code
                 all_country_codes all_country_names
@@ -52,7 +52,7 @@ sub code2country
     if ($codeset == LOCALE_CODE_NUMERIC)
     {
 	return undef if ($code =~ m/\D/);
-	$code = sprintf("%.3d", $code);
+	$code = sprintf("\%.3d", $code);
     }
     else
     {
@@ -274,7 +274,7 @@ sub _code2codeset
         chop;
         ($alpha2, $alpha3, $numeric, @countries) = split(m/:/, $_);
 
-        $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = $countries[0];
+        $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = @countries[0];
 	foreach $country (@countries)
 	{
 	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{lc "$country"} = $alpha2;
@@ -282,7 +282,7 @@ sub _code2codeset
 
 	if ($alpha3)
 	{
-            $CODES->[LOCALE_CODE_ALPHA_3]->{$alpha3} = $countries[0];
+            $CODES->[LOCALE_CODE_ALPHA_3]->{$alpha3} = @countries[0];
 	    foreach $country (@countries)
 	    {
 		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{lc "$country"} = $alpha3;
@@ -291,7 +291,7 @@ sub _code2codeset
 
 	if ($numeric)
 	{
-            $CODES->[LOCALE_CODE_NUMERIC]->{$numeric} = $countries[0];
+            $CODES->[LOCALE_CODE_NUMERIC]->{$numeric} = @countries[0];
 	    foreach $country (@countries)
 	    {
 		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{lc "$country"} = $numeric;

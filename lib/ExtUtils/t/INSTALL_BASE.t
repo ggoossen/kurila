@@ -3,7 +3,7 @@
 # Tests INSTALL_BASE
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -59,8 +59,8 @@ my @installed_files =
   ('../dummy-install/lib/perl5/Big/Dummy.pm',
    '../dummy-install/lib/perl5/Big/Liar.pm',
    '../dummy-install/bin/program',
-   "../dummy-install/lib/perl5/$Config{archname}/perllocal.pod",
-   "../dummy-install/lib/perl5/$Config{archname}/auto/Big/Dummy/.packlist"
+   "../dummy-install/lib/perl5/%Config{archname}/perllocal.pod",
+   "../dummy-install/lib/perl5/%Config{archname}/auto/Big/Dummy/.packlist"
   );
 
 foreach my $file (@installed_files) {

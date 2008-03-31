@@ -12,8 +12,8 @@ sub TIESCALAR {
 }
 
 sub FETCH {
-  print "# FETCH!  ${$_[0]}\n";
-  return ${$_[0]}--;
+  print "# FETCH!  ${@_[0]}\n";
+  return ${@_[0]}--;
 }
 
 
@@ -27,8 +27,8 @@ my ($a, $b, $c);
 
 $! = 1;
 $a = $!;
-my $a_str = sprintf "%s", $a;
-my $a_num = sprintf "%d", $a;
+my $a_str = sprintf "\%s", $a;
+my $a_num = sprintf "\%d", $a;
 
 $c = $a || $b;
 

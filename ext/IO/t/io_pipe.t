@@ -16,19 +16,19 @@ BEGIN {
 use Config;
 
 BEGIN {
-    my $can_fork = $Config{d_fork} ||
+    my $can_fork = %Config{d_fork} ||
 		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and
-		     $Config{useithreads} and 
-		     $Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
+		     %Config{useithreads} and 
+		     %Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
 		    );
     my $reason;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
 	$reason = 'IO extension unavailable';
     }
     elsif (!$can_fork) {
         $reason = 'no fork';
     }
-    elsif ($^O eq 'MSWin32' && !$ENV{TEST_IO_PIPE}) {
+    elsif ($^O eq 'MSWin32' && !%ENV{TEST_IO_PIPE}) {
 	$reason = 'Win32 testing environment not set';
     }
     if ($reason) {
@@ -129,7 +129,7 @@ if ($is_win32) {
     $pipe = IO::Pipe->new();
     $pipe->writer;
 
-    $SIG{'PIPE'} = \&broken_pipe;
+    %SIG{'PIPE'} = \&broken_pipe;
 
     sub broken_pipe {
     print "ok 9\n";

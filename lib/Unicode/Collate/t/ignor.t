@@ -4,7 +4,7 @@ BEGIN {
 	    "cannot stringify a Unicode code point\n";
 	exit 0;
     }
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -25,7 +25,7 @@ my $trad = Unicode::Collate->new(
   ignoreName => qr/HANGUL|HIRAGANA|KATAKANA|BOPOMOFO/,
   level => 3,
   entry => << 'ENTRIES',
- 0063 0068 ; [.0A3F.0020.0002.0063] % "ch" in traditional Spanish
+ 0063 0068 ; [.0A3F.0020.0002.0063] \% "ch" in traditional Spanish
  0043 0068 ; [.0A3F.0020.0007.0043] # "Ch" in traditional Spanish
  0043 0048 ; [.0A3F.0020.0008.0043] # "CH" in traditional Spanish
 ENTRIES
@@ -135,7 +135,7 @@ my $c = Unicode::Collate->new(
   UCA_Version => 14,
   entry => << 'ENTRIES',
 034F  ; [.0000.0000.0000.034F] # COMBINING GRAPHEME JOINER
-0063 0068 ; [.0A3F.0020.0002.0063] % "ch" in traditional Spanish
+0063 0068 ; [.0A3F.0020.0002.0063] \% "ch" in traditional Spanish
 0043 0068 ; [.0A3F.0020.0007.0043] # "Ch" in traditional Spanish
 0043 0048 ; [.0A3F.0020.0008.0043] # "CH" in traditional Spanish
 ENTRIES

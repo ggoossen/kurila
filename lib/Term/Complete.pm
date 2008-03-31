@@ -91,8 +91,8 @@ sub Complete {
     $r      = 0;
 
     $prompt = shift;
-    if (ref $_[0] || $_[0] =~ m/^\*/) {
-	@cmp_lst = sort @{$_[0]};
+    if (ref @_[0] || @_[0] =~ m/^\*/) {
+	@cmp_lst = sort @{@_[0]};
     }
     else {
 	@cmp_lst = sort(@_);

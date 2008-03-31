@@ -4,7 +4,7 @@
 # MakeMaker has to support.  And we do mean backwards.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }

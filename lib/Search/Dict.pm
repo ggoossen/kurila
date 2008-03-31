@@ -57,11 +57,11 @@ sub look {
 	$comp = $params->{comp} if exists $params->{comp};
 	$xfrm = $params->{xfrm} if exists $params->{xfrm};
     }
-    $comp = sub { $_[0] cmp $_[1] } unless defined $comp;
+    $comp = sub { @_[0] cmp @_[1] } unless defined $comp;
     local($_);
     my(@stat) = stat($fh)
 	or return -1;
-    my($size, $blksize) = @stat[7,11];
+    my($size, $blksize) = @stat[[7,11]];
     $blksize ||= 8192;
     $key =~ s/[^\w\s]//g if $dict;
     $key = lc $key       if $fold;

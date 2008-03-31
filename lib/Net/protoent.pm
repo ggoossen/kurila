@@ -24,9 +24,9 @@ struct 'Net::protoent' => [
 sub populate (@) {
     return unless @_;
     my $pob = new();
-    $p_name 	 =    $pob->[0]     	     = $_[0];
-    @p_aliases	 = @{ $pob->[1] } = split ' ', $_[1];
-    $p_proto	 =    $pob->[2] 	     = $_[2];
+    $p_name 	 =    $pob->[0]     	     = @_[0];
+    @p_aliases	 = @{ $pob->[1] } = split ' ', @_[1];
+    $p_proto	 =    $pob->[2] 	     = @_[2];
     return $pob;
 } 
 
@@ -36,7 +36,7 @@ sub getprotobynumber ($)  { populate(CORE::getprotobynumber(shift)) }
 
 sub getproto ($;$) {
     no strict 'refs';
-    return &{'getprotoby' . ($_[0]=~m/^\d+$/ ? 'number' : 'name')}(@_);
+    return &{'getprotoby' . (@_[0]=~m/^\d+$/ ? 'number' : 'name')}(@_);
 }
 
 1;

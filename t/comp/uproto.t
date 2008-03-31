@@ -67,10 +67,10 @@ like( $@->message, qr/Malformed prototype for main::wrong1/, 'wrong1' );
 eval q{ sub wrong2 ($__); wrong2(1,2) };
 like( $@->message, qr/Malformed prototype for main::wrong2/, 'wrong2' );
 
-sub opt ($;_) { is($_[0], "seen"); ok(!defined $_[1], "; has precedence over _") }
+sub opt ($;_) { is(@_[0], "seen"); ok(!defined @_[1], "; has precedence over _") }
 opt("seen");
 
-sub unop (_) { is($_[0], 11, "unary op") }
+sub unop (_) { is(@_[0], 11, "unary op") }
 unop 11, 22; # takes only the first parameter into account
 
 sub mymkdir (_;$) { is("@_", $expected, "mymkdir") }
@@ -80,7 +80,7 @@ $expected = "foo 493"; mymkdir foo => 0755;
 
 # $_ says modifiable, it's not passed by copy
 
-sub double(_) { $_[0] *= 2 }
+sub double(_) { @_[0] *= 2 }
 $_ = 21;
 double();
 is( $_, 42, '$_ is modifiable' );

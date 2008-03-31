@@ -28,8 +28,8 @@ sub getsym {
   my($val,$table);
 
   if (($val,$table) = _getsym($name)) {
-    if ($table eq 'GLOBAL') { $Gblsyms{$name} = $val; }
-    else                    { $Locsyms{$name} = $val; }
+    if ($table eq 'GLOBAL') { %Gblsyms{$name} = $val; }
+    else                    { %Locsyms{$name} = $val; }
   }
   wantarray ? ($val,$table) : $val;
 }
@@ -39,8 +39,8 @@ sub setsym {
 
   $table = $self->{TYPE} unless $table;
   if (_setsym($name,$val,$table)) {
-    if ($table eq 'GLOBAL') { $Gblsyms{$name} = $val; }
-    else                    { $Locsyms{$name} = $val; }
+    if ($table eq 'GLOBAL') { %Gblsyms{$name} = $val; }
+    else                    { %Locsyms{$name} = $val; }
     1;
   }
   else { 0; }
@@ -51,8 +51,8 @@ sub delsym {
 
   $table = $self->{TYPE} unless $table;
   if (_delsym($name,$table)) {
-    if ($table eq 'GLOBAL') { delete $Gblsyms{$name}; }
-    else                    { delete $Locsyms{$name}; }
+    if ($table eq 'GLOBAL') { delete %Gblsyms{$name}; }
+    else                    { delete %Locsyms{$name}; }
     1;
   }
   else { 0; }
@@ -73,7 +73,7 @@ sub clearcache {
 #====> TIEHASH methods
 
 sub TIEHASH {
-  $_[0]->new(@_);
+  @_[0]->new(@_);
 }
 
 sub FETCH {
@@ -109,8 +109,8 @@ sub FIRSTKEY {
         or carp "VMS::DCLsym: unparseable line $_";
       $name =~ s#\*##;
       $val =~ s/"(.*)"$/$1/ or $val =~ s/^(\S+).*/$1/;
-      if ($eqs eq '==') { $Gblsyms{$name} = $val; }
-      else              { $Locsyms{$name} = $val; }
+      if ($eqs eq '==') { %Gblsyms{$name} = $val; }
+      else              { %Locsyms{$name} = $val; }
     }
     close P;
     $Cache_set = 1;
@@ -136,7 +136,7 @@ sub NEXTKEY {
 }
 
 
-sub EXISTS { defined($_[0]->FETCH(@_)) ? 1 : 0 }
+sub EXISTS { defined(@_[0]->FETCH(@_)) ? 1 : 0 }
 
 sub CLEAR { }
 

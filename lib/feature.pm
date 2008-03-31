@@ -16,7 +16,7 @@ my %feature_bundle = (
 );
 
 # special case
-$feature_bundle{"5.9.5"} = $feature_bundle{"5.10"};
+%feature_bundle{"5.9.5"} = %feature_bundle{"5.10"};
 
 # TODO:
 # - think about versioned features (use feature switch => 2)
@@ -143,19 +143,19 @@ sub import {
 	my $name = shift(@_);
 	if (substr($name, 0, 1) eq ":") {
 	    my $v = substr($name, 1);
-	    if (!exists $feature_bundle{$v}) {
+	    if (!exists %feature_bundle{$v}) {
 		$v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
-		if (!exists $feature_bundle{$v}) {
+		if (!exists %feature_bundle{$v}) {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, @{$feature_bundle{$v}};
+	    unshift @_, @{%feature_bundle{$v}};
 	    next;
 	}
-	if (!exists $feature{$name}) {
+	if (!exists %feature{$name}) {
 	    unknown_feature($name);
 	}
-	$^H{$feature{$name}} = 1;
+	%^H{%feature{$name}} = 1;
     }
 }
 
@@ -164,7 +164,7 @@ sub unimport {
 
     # A bare C<no feature> should disable *all* features
     if (!@_) {
-	delete @^H{ values(%feature) };
+	delete %^H{[values(%feature) ]};
 	return;
     }
 
@@ -172,20 +172,20 @@ sub unimport {
 	my $name = shift;
 	if (substr($name, 0, 1) eq ":") {
 	    my $v = substr($name, 1);
-	    if (!exists $feature_bundle{$v}) {
+	    if (!exists %feature_bundle{$v}) {
 		$v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
-		if (!exists $feature_bundle{$v}) {
+		if (!exists %feature_bundle{$v}) {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, @{$feature_bundle{$v}};
+	    unshift @_, @{%feature_bundle{$v}};
 	    next;
 	}
-	if (!exists($feature{$name})) {
+	if (!exists(%feature{$name})) {
 	    unknown_feature($name);
 	}
 	else {
-	    delete $^H{$feature{$name}};
+	    delete %^H{%feature{$name}};
 	}
     }
 }

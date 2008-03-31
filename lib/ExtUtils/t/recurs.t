@@ -3,7 +3,7 @@
 # This tests MakeMaker against recursive builds
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -21,7 +21,7 @@ use MakeMaker::Test::Setup::Recurs;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
+delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';

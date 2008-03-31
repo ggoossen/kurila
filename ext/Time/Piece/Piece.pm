@@ -47,7 +47,7 @@ use constant 'c_epoch' => 9;
 use constant 'c_islocal' => 10;
 
 sub localtime {
-    unshift @_, __PACKAGE__ unless eval { $_[0]->isa('Time::Piece') };
+    unshift @_, __PACKAGE__ unless eval { @_[0]->isa('Time::Piece') };
     my $class = shift;
     my $time  = shift;
     $time = time if (!defined $time);
@@ -55,7 +55,7 @@ sub localtime {
 }
 
 sub gmtime {
-    unshift @_, __PACKAGE__ unless eval { $_[0]->isa('Time::Piece') };
+    unshift @_, __PACKAGE__ unless eval { @_[0]->isa('Time::Piece') };
     my $class = shift;
     my $time  = shift;
     $time = time if (!defined $time);
@@ -90,9 +90,9 @@ sub parse {
     }
     else {
         @components = shift =~ m/(\d+)$DATE_SEP(\d+)$DATE_SEP(\d+)(?:(?:T|\s+)(\d+)$TIME_SEP(\d+)(?:$TIME_SEP(\d+)))/;
-        @components = reverse(@components[0..5]);
+        @components = reverse(@components[[0..5]]);
     }
-    return $class->new(_strftime("%s", @components));
+    return $class->new(_strftime("\%s", @components));
 }
 
 sub _mktime {
@@ -113,17 +113,17 @@ sub _mktime {
 }
 
 my %_special_exports = (
-  localtime => sub { my $c = $_[0]; sub { $c->localtime(@_) } },
-  gmtime    => sub { my $c = $_[0]; sub { $c->gmtime(@_)    } },
+  localtime => sub { my $c = @_[0]; sub { $c->localtime(@_) } },
+  gmtime    => sub { my $c = @_[0]; sub { $c->gmtime(@_)    } },
 );
 
 sub export {
   my ($class, $to, @methods) = @_;
   for my $method (@methods) {
-    if (exists $_special_exports{$method}) {
+    if (exists %_special_exports{$method}) {
       no strict 'refs';
       no warnings 'redefine';
-      *{Symbol::fetch_glob($to . "::$method")} = $_special_exports{$method}->($class);
+      *{Symbol::fetch_glob($to . "::$method")} = %_special_exports{$method}->($class);
     } else {
       $class->SUPER::export($to, $method);
     }
@@ -134,12 +134,12 @@ sub import {
     # replace CORE::GLOBAL localtime and gmtime if required
     my $class = shift;
     my %params;
-    map($params{$_}++,@_,@EXPORT);
-    if (delete $params{':override'}) {
+    map(%params{$_}++,@_,@EXPORT);
+    if (delete %params{':override'}) {
         $class->export('CORE::GLOBAL', keys %params);
     }
     else {
-        $class->export((caller)[0], keys %params);
+        $class->export((caller)[[0]], keys %params);
     }
 }
 
@@ -184,10 +184,10 @@ sub _mon {
 sub month {
     my $time = shift;
     if (@_) {
-        return $_[$time->[c_mon]];
+        return @_[$time->[c_mon]];
     }
     elsif (@MON_LIST) {
-        return $MON_LIST[$time->[c_mon]];
+        return @MON_LIST[$time->[c_mon]];
     }
     else {
         return $time->strftime('%b');
@@ -199,10 +199,10 @@ sub month {
 sub fullmonth {
     my $time = shift;
     if (@_) {
-        return $_[$time->[c_mon]];
+        return @_[$time->[c_mon]];
     }
     elsif (@FULLMON_LIST) {
-        return $FULLMON_LIST[$time->[c_mon]];
+        return @FULLMON_LIST[$time->[c_mon]];
     }
     else {
         return $time->strftime('%B');
@@ -240,10 +240,10 @@ sub _wday {
 sub wdayname {
     my $time = shift;
     if (@_) {
-        return $_[$time->[c_wday]];
+        return @_[$time->[c_wday]];
     }
     elsif (@DAY_LIST) {
-        return $DAY_LIST[$time->[c_wday]];
+        return @DAY_LIST[$time->[c_wday]];
     }
     else {
         return $time->strftime('%a');
@@ -255,10 +255,10 @@ sub wdayname {
 sub fullday {
     my $time = shift;
     if (@_) {
-        return $_[$time->[c_wday]];
+        return @_[$time->[c_wday]];
     }
     elsif (@FULLDAY_LIST) {
-        return $FULLDAY_LIST[$time->[c_wday]];
+        return @FULLDAY_LIST[$time->[c_wday]];
     }
     else {
         return $time->strftime('%A');
@@ -310,9 +310,9 @@ sub epoch {
     }
     else {
         my $epoch = $time->[c_islocal] ?
-          timelocal(@{$time}[c_sec .. c_mon], $time->[c_year]+1900)
+          timelocal(@{$time}[[c_sec .. c_mon]], $time->[c_year]+1900)
           :
-          timegm(@{$time}[c_sec .. c_mon], $time->[c_year]+1900);
+          timegm(@{$time}[[c_sec .. c_mon]], $time->[c_year]+1900);
         $time->[c_epoch] = $epoch;
         return $epoch;
     }
@@ -321,7 +321,7 @@ sub epoch {
 sub hms {
     my $time = shift;
     my $sep = @_ ? shift(@_) : $TIME_SEP;
-    sprintf("%02d$sep%02d$sep%02d", $time->[c_hour], $time->[c_min], $time->[c_sec]);
+    sprintf("\%02d$sep\%02d$sep\%02d", $time->[c_hour], $time->[c_min], $time->[c_sec]);
 }
 
 *time = \&hms;
@@ -329,7 +329,7 @@ sub hms {
 sub ymd {
     my $time = shift;
     my $sep = @_ ? shift(@_) : $DATE_SEP;
-    sprintf("%d$sep%02d$sep%02d", $time->year, $time->mon, $time->[c_mday]);
+    sprintf("\%d$sep\%02d$sep\%02d", $time->year, $time->mon, $time->[c_mday]);
 }
 
 *date = \&ymd;
@@ -337,19 +337,19 @@ sub ymd {
 sub mdy {
     my $time = shift;
     my $sep = @_ ? shift(@_) : $DATE_SEP;
-    sprintf("%02d$sep%02d$sep%d", $time->mon, $time->[c_mday], $time->year);
+    sprintf("\%02d$sep\%02d$sep\%d", $time->mon, $time->[c_mday], $time->year);
 }
 
 sub dmy {
     my $time = shift;
     my $sep = @_ ? shift(@_) : $DATE_SEP;
-    sprintf("%02d$sep%02d$sep%d", $time->[c_mday], $time->mon, $time->year);
+    sprintf("\%02d$sep\%02d$sep\%d", $time->[c_mday], $time->mon, $time->year);
 }
 
 sub datetime {
     my $time = shift;
     my %seps = (date => $DATE_SEP, T => 'T', time => $TIME_SEP, @_);
-    return join($seps{T}, $time->date($seps{date}), $time->time($seps{time}));
+    return join(%seps{T}, $time->date(%seps{date}), $time->time(%seps{time}));
 }
 
 
@@ -445,13 +445,13 @@ sub month_last_day {
     my $time = shift;
     my $year = $time->year;
     my $_mon = $time->_mon;
-    return $MON_LAST[$_mon] + ($_mon == 1 ? _is_leap_year($year) : 0);
+    return @MON_LAST[$_mon] + ($_mon == 1 ? _is_leap_year($year) : 0);
 }
 
 sub strftime {
     my $time = shift;
     my $tzname = $time->[c_islocal] ? '%Z' : 'UTC';
-    my $format = @_ ? shift(@_) : "%a, %d %b %Y %H:%M:%S $tzname";
+    my $format = @_ ? shift(@_) : "\%a, \%d \%b \%Y \%H:\%M:\%S $tzname";
     if (!defined $time->[c_wday]) {
         if ($time->[c_islocal]) {
             return _strftime($format, CORE::localtime($time->epoch));
@@ -460,20 +460,20 @@ sub strftime {
             return _strftime($format, CORE::gmtime($time->epoch));
         }
     }
-    return _strftime($format, (@$time)[c_sec..c_isdst]);
+    return _strftime($format, (@$time)[[c_sec..c_isdst]]);
 }
 
 sub strptime {
     my $time = shift;
     my $string = shift;
-    my $format = @_ ? shift(@_) : "%a, %d %b %Y %H:%M:%S %Z";
+    my $format = @_ ? shift(@_) : "\%a, \%d \%b \%Y \%H:\%M:\%S \%Z";
     my @vals = _strptime($string, $format);
 #    warn(sprintf("got vals: %d-%d-%d %d:%d:%d\n", reverse(@vals)));
     return scalar $time->_mktime(\@vals, (ref($time) ? $time->[c_islocal] : 0));
 }
 
 sub day_list {
-    shift if ref($_[0]) && $_[0]->isa(__PACKAGE__); # strip first if called as a method
+    shift if ref(@_[0]) && @_[0]->isa(__PACKAGE__); # strip first if called as a method
     my @old = @DAY_LIST;
     if (@_) {
         @DAY_LIST = @_;
@@ -482,7 +482,7 @@ sub day_list {
 }
 
 sub mon_list {
-    shift if ref($_[0]) && $_[0]->isa(__PACKAGE__); # strip first if called as a method
+    shift if ref(@_[0]) && @_[0]->isa(__PACKAGE__); # strip first if called as a method
     my @old = @MON_LIST;
     if (@_) {
         @MON_LIST = @_;
@@ -491,19 +491,19 @@ sub mon_list {
 }
 
 sub time_separator {
-    shift if ref($_[0]) && $_[0]->isa(__PACKAGE__);
+    shift if ref(@_[0]) && @_[0]->isa(__PACKAGE__);
     my $old = $TIME_SEP;
     if (@_) {
-        $TIME_SEP = $_[0];
+        $TIME_SEP = @_[0];
     }
     return $old;
 }
 
 sub date_separator {
-    shift if ref($_[0]) && $_[0]->isa(__PACKAGE__);
+    shift if ref(@_[0]) && @_[0]->isa(__PACKAGE__);
     my $old = $DATE_SEP;
     if (@_) {
-        $DATE_SEP = $_[0];
+        $DATE_SEP = @_[0];
     }
     return $old;
 }
@@ -610,7 +610,7 @@ sub add_months {
     my $string = ($time->year + $num_years) . "-" .
                  ($final_month + 1) . "-" .
                  ($time->mday) . " " . $time->hms;
-    my $format = "%Y-%m-%d %H:%M:%S";
+    my $format = "\%Y-\%m-\%d \%H:\%M:\%S";
     #warn("Parsing string: $string\n");
     my @vals = _strptime($string, $format);
 #    warn(sprintf("got vals: %d-%d-%d %d:%d:%d\n", reverse(@vals)));

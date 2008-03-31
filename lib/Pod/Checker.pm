@@ -605,27 +605,27 @@ The error level, should be 'WARNING' or 'ERROR'.
 # Invoked as $self->poderror( @args ), or $self->poderror( {%opts}, @args )
 sub poderror {
     my $self = shift;
-    my %opts = (ref $_[0]) ? %{shift()} : ();
+    my %opts = (ref @_[0]) ? %{shift()} : ();
 
     ## Retrieve options
-    chomp( my $msg  = ($opts{-msg} || "")."@_" );
-    my $line = (exists $opts{-line}) ? " at line $opts{-line}" : "";
-    my $file = (exists $opts{-file}) ? " in file $opts{-file}" : "";
-    unless (exists $opts{-severity}) {
+    chomp( my $msg  = (%opts{-msg} || "")."@_" );
+    my $line = (exists %opts{-line}) ? " at line %opts{-line}" : "";
+    my $file = (exists %opts{-file}) ? " in file %opts{-file}" : "";
+    unless (exists %opts{-severity}) {
        ## See if can find severity in message prefix
-       $opts{-severity} = $1  if ( $msg =~ s/^\**\s*([A-Z]{3,}):\s+// );
+       %opts{-severity} = $1  if ( $msg =~ s/^\**\s*([A-Z]{3,}):\s+// );
     }
-    my $severity = (exists $opts{-severity}) ? "*** $opts{-severity}: " : "";
+    my $severity = (exists %opts{-severity}) ? "*** %opts{-severity}: " : "";
 
     ## Increment error count and print message "
     ++($self->{_NUM_ERRORS}) 
-        if(!%opts || ($opts{-severity} && $opts{-severity} eq 'ERROR'));
+        if(!%opts || (%opts{-severity} && %opts{-severity} eq 'ERROR'));
     ++($self->{_NUM_WARNINGS})
-        if(!%opts || ($opts{-severity} && $opts{-severity} eq 'WARNING'));
+        if(!%opts || (%opts{-severity} && %opts{-severity} eq 'WARNING'));
     unless($self->{-quiet}) {
       my $out_fh = $self->output_handle() || \*STDERR;
       print $out_fh ($severity, $msg, $line, $file, "\n")
-        if($self->{-warnings} || !%opts || $opts{-severity} ne 'WARNING');
+        if($self->{-warnings} || !%opts || %opts{-severity} ne 'WARNING');
     }
 }
 
@@ -638,7 +638,7 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors {
-   return (@_ +> 1) ? ($_[0]->{_NUM_ERRORS} = $_[1]) : $_[0]->{_NUM_ERRORS};
+   return (@_ +> 1) ? (@_[0]->{_NUM_ERRORS} = @_[1]) : @_[0]->{_NUM_ERRORS};
 }
 
 ##################################
@@ -650,7 +650,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings {
-   return (@_ +> 1) ? ($_[0]->{_NUM_WARNINGS} = $_[1]) : $_[0]->{_NUM_WARNINGS};
+   return (@_ +> 1) ? (@_[0]->{_NUM_WARNINGS} = @_[1]) : @_[0]->{_NUM_WARNINGS};
 }
 
 ##################################
@@ -663,8 +663,8 @@ found in the C<=head1 NAME> section.
 =cut
 
 sub name {
-    return (@_ +> 1 && $_[1]) ?
-        ($_[0]->{-name} = $_[1]) : $_[0]->{-name};  
+    return (@_ +> 1 && @_[1]) ?
+        (@_[0]->{-name} = @_[1]) : @_[0]->{-name};  
 }
 
 ##################################
@@ -732,9 +732,9 @@ number and C<Pod::Hyperlink> object.
 # set/return hyperlinks of the current POD
 sub hyperlink {
     my $self = shift;
-    if($_[0]) {
-        push(@{$self->{_links}}, $_[0]);
-        return $_[0];
+    if(@_[0]) {
+        push(@{$self->{_links}}, @_[0]);
+        return @_[0];
     }
     @{$self->{_links}};
 }
@@ -761,15 +761,15 @@ sub end_pod {
     # first build the node names from the paragraph text
     my %nodes;
     foreach($self->node()) {
-        $nodes{$_} = 1;
+        %nodes{$_} = 1;
         if(m/^(\S+)\s+\S/) {
             # we have more than one word. Use the first as a node, too.
             # This is used heavily in perlfunc.pod
-            $nodes{$1} ||= 2; # derived node
+            %nodes{$1} ||= 2; # derived node
         }
     }
     foreach($self->idx()) {
-        $nodes{$_} = 3; # index node
+        %nodes{$_} = 3; # index node
     }
     foreach($self->hyperlink()) {
         my ($line,$link) = @$_;
@@ -778,7 +778,7 @@ sub end_pod {
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink') {
             my $node = $self->_check_ptree($self->parse_text($link->node(),
                 $line), $line, $infile, 'L');
-            if($node && !$nodes{$node}) {
+            if($node && !%nodes{$node}) {
                 $self->poderror({ -line => $line || '', -file => $infile,
                     -severity => 'ERROR',
                     -msg => "unresolved internal link '$node'"});
@@ -807,7 +807,7 @@ sub command {
     my ($file, $line) = $pod_para->file_line;
     ## Check the command syntax
     my $arg; # this will hold the command argument
-    if (! $VALID_COMMANDS{$cmd}) {
+    if (! %VALID_COMMANDS{$cmd}) {
        $self->poderror({ -line => $line, -file => $file, -severity => 'ERROR',
                          -msg => "Unknown command '$cmd'" });
     }
@@ -1092,7 +1092,7 @@ sub _check_ptree {
         my $contents = $_->parse_tree();
         ($file,$line) = $_->file_line();
         # check for valid tag
-        if (! $VALID_SEQUENCES{$cmd}) {
+        if (! %VALID_SEQUENCES{$cmd}) {
             $self->poderror({ -line => $line, -file => $file,
                  -severity => 'ERROR', 
                  -msg => qq(Unknown interior-sequence '$cmd')});
@@ -1109,13 +1109,13 @@ sub _check_ptree {
         }
         if($cmd eq 'E') {
             # preserve entities
-            if(@$contents +> 1 || ref $$contents[0] || $$contents[0] !~ m/^\w+$/) {
+            if(@$contents +> 1 || ref @$contents[0] || @$contents[0] !~ m/^\w+$/) {
                 $self->poderror({ -line => $line, -file => $file,
                     -severity => 'ERROR', 
                     -msg => "garbled entity " . $_->raw_text()});
                 next;
             }
-            my $ent = $$contents[0];
+            my $ent = @$contents[0];
             my $val;
             if($ent =~ m/^0x[0-9a-f]+$/i) {
                 # hexadec entity
@@ -1139,9 +1139,9 @@ sub _check_ptree {
                         -msg => "Entity number out of range " . $_->raw_text()});
                 }
             }
-            elsif($ENTITIES{$ent}) {
+            elsif(%ENTITIES{$ent}) {
                 # known ISO entity
-                $text .= $ENTITIES{$ent};
+                $text .= %ENTITIES{$ent};
             }
             else {
                 $self->poderror({ -line => $line, -file => $file,
@@ -1241,8 +1241,8 @@ sub textblock {
 sub _preproc_par
 {
     my $self = shift;
-    $_[0] =~ s/[\s\n]+$//;
-    if($_[0]) {
+    @_[0] =~ s/[\s\n]+$//;
+    if(@_[0]) {
         $self->{_commands_in_head}++;
         $self->{_list_item_contents}++ if(defined $self->{_list_item_contents});
         if(@{$self->{_list_stack}} && !$self->{_list_stack}->[0]->item()) {

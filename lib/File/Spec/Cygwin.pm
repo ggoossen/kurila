@@ -56,7 +56,7 @@ sub catdir {
     return unless @_;
 
     # Don't create something that looks like a //network/path
-    if ($_[0] and ($_[0] eq '/' or $_[0] eq '\')) {
+    if (@_[0] and (@_[0] eq '/' or @_[0] eq '\')) {
         shift;
         return $self->SUPER::catdir('', @_);
     }
@@ -99,7 +99,7 @@ variables are tainted, they are not used.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = $_[0]->_tmpdir( $ENV{TMPDIR}, "/tmp", $ENV{'TMP'}, $ENV{'TEMP'}, 'C:/temp' );
+    $tmpdir = @_[0]->_tmpdir( %ENV{TMPDIR}, "/tmp", %ENV{'TMP'}, %ENV{'TEMP'}, 'C:/temp' );
 }
 
 =item case_tolerant

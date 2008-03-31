@@ -13,7 +13,7 @@ require Exporter;
 #	Public Global Variables
 #-----------------------------------------------------------------------
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION      = sprintf("%d.%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
+$VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(&code2language &language2code
                    &all_language_codes &all_language_names );
@@ -37,9 +37,9 @@ sub code2language
 
     return undef unless defined $code;
     $code = lc($code);
-    if (exists $CODES{$code})
+    if (exists %CODES{$code})
     {
-        return $CODES{$code};
+        return %CODES{$code};
     }
     else
     {
@@ -63,9 +63,9 @@ sub language2code
 
     return undef unless defined $lang;
     $lang = lc($lang);
-    if (exists $LANGUAGES{$lang})
+    if (exists %LANGUAGES{$lang})
     {
-        return $LANGUAGES{$lang};
+        return %LANGUAGES{$lang};
     }
     else
     {
@@ -113,8 +113,8 @@ sub all_language_names
         next unless m/\S/;
         chop;
         ($code, $language) = split(m/:/, $_, 2);
-        $CODES{$code} = $language;
-        $LANGUAGES{lc "$language"} = $code;
+        %CODES{$code} = $language;
+        %LANGUAGES{lc "$language"} = $code;
     }
 
     close(DATA);

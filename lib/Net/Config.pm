@@ -40,7 +40,7 @@ $^O eq 'MacOS' and eval <<TRY_INTERNET_CONFIG;
 use Mac::InternetConfig;
 
 \{
-my %nc = (
+my \%nc = (
     nntp_hosts      => [ \$InternetConfig\{ kICNNTPHost() \} ],
     pop3_hosts      => [ \$InternetConfig\{ kICMailAccount() \} =~ /\@(.*)/ ],
     smtp_hosts      => [ \$InternetConfig\{ kICSMTPHost() \} ],
@@ -53,7 +53,7 @@ my %nc = (
     ftp_firewall    => 
     	\$InternetConfig\{ kICUseFTPProxy() \} ? [ \$InternetConfig\{ kICFTPProxyHost() \} ] : [],
 );
-\@NetConfig\{keys %nc\} = values %nc;
+\@NetConfig\{keys \%nc\} = values \%nc;
 \}
 TRY_INTERNET_CONFIG
 
@@ -68,8 +68,8 @@ if (-f $file) {
   }
 }
 if ($< == $> and !$CONFIGURE) {
-  my $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
-  $home ||= $ENV{HOMEDRIVE} . ($ENV{HOMEPATH} || '') if defined $ENV{HOMEDRIVE};
+  my $home = eval { (getpwuid($>))[[7]] } || %ENV{HOME};
+  $home ||= %ENV{HOMEDRIVE} . (%ENV{HOMEPATH} || '') if defined %ENV{HOMEDRIVE};
   if (defined $home) {
     $file      = $home . "/.libnetrc";
     $ref       = eval { do $file } if -f $file;
@@ -79,7 +79,7 @@ if ($< == $> and !$CONFIGURE) {
 }
 my ($k, $v);
 while (($k, $v) = each %NetConfig) {
-  $NetConfig{$k} = [$v]
+  %NetConfig{$k} = [$v]
     if ($k =~ m/_hosts$/ and $k ne "test_hosts" and defined($v) and !ref($v));
 }
 
@@ -90,14 +90,14 @@ sub requires_firewall {
   shift;    # ignore package
   my $host = shift;
 
-  return 0 unless defined $NetConfig{'ftp_firewall'};
+  return 0 unless defined %NetConfig{'ftp_firewall'};
 
   $host = inet_aton($host) or return -1;
   $host = inet_ntoa($host);
 
-  if (exists $NetConfig{'local_netmask'}) {
+  if (exists %NetConfig{'local_netmask'}) {
     my $quad = unpack("N", pack("C*", split(m/\./, $host)));
-    my $list = $NetConfig{'local_netmask'};
+    my $list = %NetConfig{'local_netmask'};
     $list = [$list] unless ref($list);
     foreach (@$list) {
       my ($net, $bits) = (m#^(\d+\.\d+\.\d+\.\d+)/(\d+)$#) or next;

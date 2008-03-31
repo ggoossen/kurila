@@ -26,14 +26,14 @@ sub test ($$$) {
   } else {
     my ($valstr, $resstr);
     if ($act eq 'hex' or $string =~ m/x/) {
-      $valstr = sprintf "0x%X", $value;
-      $resstr = sprintf "0x%X", $result;
+      $valstr = sprintf "0x\%X", $value;
+      $resstr = sprintf "0x\%X", $result;
     } elsif ($string =~ m/b/) {
-      $valstr = sprintf "0b%b", $value;
-      $resstr = sprintf "0b%b", $result;
+      $valstr = sprintf "0b\%b", $value;
+      $resstr = sprintf "0b\%b", $result;
     } else {
-      $valstr = sprintf "0%o", $value;
-      $resstr = sprintf "0%o", $result;
+      $valstr = sprintf "0\%o", $value;
+      $resstr = sprintf "0\%o", $result;
     }
     print "not ok $test # $act \"$string\" gives \"$result\" ($resstr), not $value ($valstr)\n";
   }

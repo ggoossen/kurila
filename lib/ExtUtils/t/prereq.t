@@ -4,7 +4,7 @@
 # WriteMakefile.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -39,7 +39,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     ok( my $stdout = tie *STDOUT, 'TieOut' );
     my $warnings = '';
     local ${^WARN_HOOK} = sub {
-        $warnings .= $_[0]->{description};
+        $warnings .= @_[0]->{description};
     };
 
     WriteMakefile(
@@ -58,7 +58,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
         }
     );
     is $warnings, 
-    sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",
+    sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n",
             strict->VERSION);
 
     $warnings = '';
@@ -81,7 +81,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     );
     is $warnings, 
     "Warning: prerequisite I::Do::Not::Exist 0 not found.\n".
-    sprintf("Warning: prerequisite strict 99999 not found. We have %s.\n",
+    sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n",
             strict->VERSION);
     
     $warnings = '';

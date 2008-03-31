@@ -554,11 +554,11 @@ sub _error {
 
 sub mkpath {
     my $old_style = (
-        UNIVERSAL::isa($_[0],'ARRAY')
-        or (@_ == 2 and ((defined $_[1] && ! ref $_[1]) ? $_[1] =~ m/\A\d+\z/ : 1))
+        UNIVERSAL::isa(@_[0],'ARRAY')
+        or (@_ == 2 and ((defined @_[1] && ! ref @_[1]) ? @_[1] =~ m/\A\d+\z/ : 1))
         or (@_ == 3
-            and ((defined $_[1] && ! ref $_[1]) ? $_[1] =~ m/\A\d+\z/ : 1)
-            and ((defined $_[2] && ! ref $_[2]) ? $_[2] =~ m/\A\d+\z/ : 1)
+            and ((defined @_[1] && ! ref @_[1]) ? @_[1] =~ m/\A\d+\z/ : 1)
+            and ((defined @_[2] && ! ref @_[2]) ? @_[2] =~ m/\A\d+\z/ : 1)
         )
     ) ? 1 : 0;
 
@@ -573,14 +573,14 @@ sub mkpath {
         $arg->{mode}    = defined $mode    ? $mode    : 0777;
     }
     else {
-        if (@_ +> 0 and UNIVERSAL::isa($_[-1], 'HASH')) {
+        if (@_ +> 0 and UNIVERSAL::isa(@_[-1], 'HASH')) {
             $arg = pop @_;
             exists $arg->{mask} and $arg->{mode} = delete $arg->{mask};
             $arg->{mode} = 0777 unless exists $arg->{mode};
             ${$arg->{error}} = [] if exists $arg->{error};
         }
         else {
-            @{$arg}{qw(verbose mode)} = (0, 0777);
+            %{$arg}{[qw(verbose mode)]} = (0, 0777);
         }
         $paths = [@_];
     }
@@ -630,7 +630,7 @@ sub _mkpath {
 }
 
 sub rmtree {
-    my $old_style = (UNIVERSAL::isa($_[0],'ARRAY')) ? 1 : 0;
+    my $old_style = (UNIVERSAL::isa(@_[0],'ARRAY')) ? 1 : 0;
 
     my $arg;
     my $paths;
@@ -650,13 +650,13 @@ sub rmtree {
         }
     }
     else {
-        if (@_ +> 0 and UNIVERSAL::isa($_[-1],'HASH')) {
+        if (@_ +> 0 and UNIVERSAL::isa(@_[-1],'HASH')) {
             $arg = pop @_;
             ${$arg->{error}}  = [] if exists $arg->{error};
             ${$arg->{result}} = [] if exists $arg->{result};
         }
         else {
-            @{$arg}{qw(verbose safe)} = (0, 0);
+            %{$arg}{[qw(verbose safe)]} = (0, 0);
     }
         $paths = [@_];
     }
@@ -670,7 +670,7 @@ sub rmtree {
     };
     for ($arg->{cwd}) { m/\A(.*)\Z/; $_ = $1 } # untaint
 
-    @{$arg}{qw(device inode)} = (stat $arg->{cwd})[0,1] or do {
+    %{$arg}{[qw(device inode)]} = (stat $arg->{cwd})[[0,1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{cwd});
         return 0;
     };
@@ -708,7 +708,7 @@ sub _rmtree {
             : $root
         ;
 
-        my ($ldev, $lino, $perm) = (lstat $root)[0,1,2] or next ROOT_DIR;
+        my ($ldev, $lino, $perm) = (lstat $root)[[0,1,2]] or next ROOT_DIR;
 
 	if ( -d _ ) {
             $root = VMS::Filespec::pathify($root) if $Is_VMS;
@@ -727,7 +727,7 @@ sub _rmtree {
                 }
             }
 
-            my ($device, $inode, $perm) = (stat $curdir)[0,1,2] or do {
+            my ($device, $inode, $perm) = (stat $curdir)[[0,1,2]] or do {
                 _error($arg, "cannot stat current working directory", $canon);
                 next ROOT_DIR;
             };
@@ -778,7 +778,7 @@ sub _rmtree {
             if (@files) {
                 # remove the contained files before the directory itself
                 my $narg = {%$arg};
-                @{$narg}{qw(device inode cwd prefix depth)}
+                %{$narg}{[qw(device inode cwd prefix depth)]}
                     = ($device, $inode, $updir, $canon, $arg->{depth}+1);
                 $count += _rmtree($narg, \@files);
             }
@@ -796,7 +796,7 @@ sub _rmtree {
 
             # ensure that a chdir upwards didn't take us somewhere other
             # than we expected (see CVE-2002-0435)
-            ($device, $inode) = (stat $curdir)[0,1]
+            ($device, $inode) = (stat $curdir)[[0,1]]
                 or _croak("cannot stat prior working directory $arg->{cwd}: $!, aborting.");
 
             ($arg->{device} eq $device and $arg->{inode} eq $inode)
@@ -822,7 +822,7 @@ sub _rmtree {
                     _error($arg, "cannot remove directory", $canon);
                     if (!chmod($perm, ($Is_VMS ? VMS::Filespec::fileify($root) : $root))
                     ) {
-                        _error($arg, sprintf("cannot restore permissions to 0%o",$perm), $canon);
+                        _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon);
                     }
                 }
             }
@@ -856,7 +856,7 @@ sub _rmtree {
                 else {
                     _error($arg, "cannot unlink file", $canon);
                     $Force_Writeable and chmod($perm, $root) or
-                        _error($arg, sprintf("cannot restore permissions to 0%o",$perm), $canon);
+                        _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon);
 		    last;
 		}
 		++$count;

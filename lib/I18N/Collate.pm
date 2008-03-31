@@ -128,7 +128,7 @@ our($LOCALE, $C);
 
 our $please_use_I18N_Collate_even_if_deprecated = 0;
 sub new {
-  my $new = $_[1];
+  my $new = @_[1];
 
   if (warnings::enabled()) {
     unless ($please_use_I18N_Collate_even_if_deprecated) {
@@ -158,15 +158,15 @@ ___EOD___
 }
 
 sub setlocale {
- my ($category, $locale) = @_[0,1];
+ my ($category, $locale) = @_[[0,1]];
 
  POSIX::setlocale($category, $locale) if (defined $category);
  # the current $LOCALE 
- $LOCALE = $locale || $ENV{'LC_COLLATE'} || $ENV{'LC_ALL'} || '';
+ $LOCALE = $locale || %ENV{'LC_COLLATE'} || %ENV{'LC_ALL'} || '';
 }
 
 sub C {
-  my $s = ${$_[0]};
+  my $s = ${@_[0]};
 
   $C->{$LOCALE}->{$s} = collate_xfrm($s)
     unless (defined $C->{$LOCALE}->{$s}); # cache when met
@@ -175,7 +175,7 @@ sub C {
 }
 
 sub collate_xfrm {
-  my $s = $_[0];
+  my $s = @_[0];
   my $x = '';
   
   for (split(m/(\000+)/, $s)) {
@@ -186,7 +186,7 @@ sub collate_xfrm {
 }
 
 sub collate_cmp {
-  &C($_[0]) cmp &C($_[1]);
+  &C(@_[0]) cmp &C(@_[1]);
 }
 
 # init $LOCALE

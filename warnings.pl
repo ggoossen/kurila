@@ -94,12 +94,12 @@ sub valueWalk
 
     foreach $k (sort keys %$tre) {
 	$v = $tre->{$k};
-	die "duplicate key $k\n" if defined $list{$k} ;
+	die "duplicate key $k\n" if defined %list{$k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 
 	my ($ver, $rest) = @{ $v } ;
-	push @{ $v_list{$ver} }, $k;
+	push @{ %v_list{$ver} }, $k;
 	
 	if (ref $rest)
 	  { valueWalk ($rest) }
@@ -112,9 +112,9 @@ sub orderValues
 {
     my $index = 0;
     foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
-        foreach my $name (@{ $v_list{$ver} } ) {
-	    $ValueToName{ $index } = [ uc $name, $ver ] ;
-	    $NameToValue{ uc $name } = $index ++ ;
+        foreach my $name (@{ %v_list{$ver} } ) {
+	    %ValueToName{ $index } = [ uc $name, $ver ] ;
+	    %NameToValue{ uc $name } = $index ++ ;
         }
     }
 
@@ -131,19 +131,19 @@ sub walk
 
     foreach $k (sort keys %$tre) {
 	$v = $tre->{$k};
-	die "duplicate key $k\n" if defined $list{$k} ;
+	die "duplicate key $k\n" if defined %list{$k} ;
 	#$Value{$index} = uc $k ;
 	die "Can't find key '$k'"
-	    if ! defined $NameToValue{uc $k} ;
-        push @{ $list{$k} }, $NameToValue{uc $k} ;
+	    if ! defined %NameToValue{uc $k} ;
+        push @{ %list{$k} }, %NameToValue{uc $k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 	
 	my ($ver, $rest) = @{ $v } ;
 	if (ref $rest)
-	  { push (@{ $list{$k} }, walk ($rest)) }
+	  { push (@{ %list{$k} }, walk ($rest)) }
 
-	push @list, @{ $list{$k} } ;
+	push @list, @{ %list{$k} } ;
     }
 
    return @list ;
@@ -159,8 +159,8 @@ sub mkRange
 
 
     for ($i = 1 ; $i +< @a; ++ $i) {
-      	$out[$i] = ".."
-          if $a[$i] == $a[$i - 1] + 1 && $a[$i] + 1 == $a[$i + 1] ;
+      	@out[$i] = ".."
+          if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[$i + 1] ;
     }
 
     my $out = join(",",@out);
@@ -176,7 +176,7 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = (sort {$a <+> $b} map { length $_ } keys %$tre)[-1] ;
+    my $max = (sort {$a <+> $b} map { length $_ } keys %$tre)[[-1]] ;
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {
@@ -221,14 +221,14 @@ sub mkHex
     }
 
     foreach (unpack("C*", $mask)) {
-        $string .= sprintf("%2.2x", $_);
+        $string .= sprintf("\%2.2x", $_);
     }
     return "\\x[$string]";
 }
 
 ###########################################################################
 
-if (@ARGV && $ARGV[0] eq "tree")
+if (@ARGV && @ARGV[0] eq "tree")
 {
     printTree($tree, "    ") ;
     exit ;
@@ -291,7 +291,7 @@ my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 my $k ;
 my $last_ver = 0;
 foreach $k (sort { $a <+> $b } keys %ValueToName) {
-    my ($name, $version) = @{ $ValueToName{$k} };
+    my ($name, $version) = @{ %ValueToName{$k} };
     print $warn "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
     print $warn tab(5, "#define WARN_$name"), "$k\n" ;
@@ -360,9 +360,9 @@ while ( ~< *DATA) {
 #$list{'all'} = [ $offset .. 8 * ($warn_size/2) - 1 ] ;
 
 $last_ver = 0;
-print $pm "our %Offsets = (\n" ;
+print $pm "our \%Offsets = (\n" ;
 foreach my $k (sort { $a <+> $b } keys %ValueToName) {
-    my ($name, $version) = @{ $ValueToName{$k} };
+    my ($name, $version) = @{ %ValueToName{$k} };
     $name = lc $name;
     $k *= 2 ;
     if ( $last_ver != $version ) {
@@ -376,10 +376,10 @@ foreach my $k (sort { $a <+> $b } keys %ValueToName) {
 
 print $pm "  );\n\n" ;
 
-print $pm "our %Bits = (\n" ;
+print $pm "our \%Bits = (\n" ;
 foreach $k (sort keys  %list) {
 
-    my $v = $list{$k} ;
+    my $v = %list{$k} ;
     my @list = sort { $a <+> $b } @$v ;
 
     print $pm tab(4, "    '$k'"), '=> "',
@@ -390,10 +390,10 @@ foreach $k (sort keys  %list) {
 
 print $pm "  );\n\n" ;
 
-print $pm "our %DeadBits = (\n" ;
+print $pm "our \%DeadBits = (\n" ;
 foreach $k (sort keys  %list) {
 
-    my $v = $list{$k} ;
+    my $v = %list{$k} ;
     my @list = sort { $a <+> $b } @$v ;
 
     print $pm tab(4, "    '$k'"), '=> "',

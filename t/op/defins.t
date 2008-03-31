@@ -7,7 +7,7 @@
 our $warns;
 
 BEGIN {
-    ${^WARN_HOOK} = sub { $warns++; warn $_[0] };
+    ${^WARN_HOOK} = sub { $warns++; warn @_[0] };
 }
 require './test.pl';
 plan( tests => 19 );
@@ -56,9 +56,9 @@ cmp_ok($seen,'==',1,'seen in while() ternary');
 seek(FILE,0,0);
 $seen = 0;
 my %where;
-while ($where{$seen} = ~< *FILE)
+while (%where{$seen} = ~< *FILE)
  {
-  $seen++ if $where{$seen} eq '0';
+  $seen++ if %where{$seen} eq '0';
  }
 cmp_ok($seen,'==',1,'seen in hash while()');
 close FILE;
@@ -83,9 +83,9 @@ cmp_ok($seen,'+>',0,'saw file in while() ternary');
 
 rewinddir(DIR);
 $seen = 0;
-while ($where{$seen} = readdir(DIR))
+while (%where{$seen} = readdir(DIR))
  {
-  $seen++ if $where{$seen} eq $wanted_filename;
+  $seen++ if %where{$seen} eq $wanted_filename;
  }
 cmp_ok($seen,'==',1,'saw file in hash while()');
 
@@ -105,9 +105,9 @@ while (($seen ? $dummy : $name) = glob('*'))
 cmp_ok($seen,'+>',0,'saw file in glob hash while() ternary');
 
 $seen = 0;
-while ($where{$seen} = glob('*'))
+while (%where{$seen} = glob('*'))
  {
-  $seen++ if $where{$seen} eq $wanted_filename;
+  $seen++ if %where{$seen} eq $wanted_filename;
  }
 cmp_ok($seen,'==',1,'seen in glob hash while()');
 
@@ -132,9 +132,9 @@ while (($seen ? $dummy : my $name) = each %hash)
 cmp_ok($seen,'==',1,'seen in each ternary');
 
 $seen = 0;
-while ($where{$seen} = each %hash)
+while (%where{$seen} = each %hash)
  {
-  $seen++ if $where{$seen} eq '0';
+  $seen++ if %where{$seen} eq '0';
  }
 cmp_ok($seen,'==',1,'seen in each hash');
 

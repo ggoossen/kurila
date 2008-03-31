@@ -172,7 +172,7 @@ plan tests => 99;
         elsif (m/^(COMMENT|CODE|ARGS|SWITCHES|EXPECT|SKIP|SKIP_OS)
                  (?::\s+(.*))?$/sx) {
             $key = $1;
-            $progs [-1] {$key} = '' unless exists $progs [-1] {$key};
+            @progs [-1] {$key} = '' unless exists @progs [-1] {$key};
             next unless defined $2;
             $_ = $2;
         }
@@ -180,11 +180,11 @@ plan tests => 99;
             next;
         }
 
-        if (ref ($progs [-1] {$key})) {
-            push @{$progs [-1] {$key}} => $_;
+        if (ref (@progs [-1] {$key})) {
+            push @{@progs [-1] {$key}} => $_;
         }
         else {
-            $progs [-1] {$key} .=  $_;
+            @progs [-1] {$key} .=  $_;
         }
     }
 

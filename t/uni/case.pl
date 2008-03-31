@@ -7,7 +7,7 @@ use utf8;
 use strict;
 
 sub unidump {
-    join " ", map { sprintf "%04X", $_ } unpack "U*", $_[0];
+    join " ", map { sprintf "\%04X", $_ } unpack "U*", @_[0];
 }
 
 sub casetest {
@@ -17,9 +17,9 @@ sub casetest {
     my $ballast = chr (0x2672) x 3;
     @funcs = map {my $f = $_;
 		  ($f,
-		   sub {my $r = $f->($_[0] . $ballast); # Add it before
+		   sub {my $r = $f->(@_[0] . $ballast); # Add it before
 			$r =~ s/$ballast\z//so # Remove it afterwards
-			    or die "'$_[0]' to '$r' mangled";
+			    or die "'@_[0]' to '$r' mangled";
 			$r; # Result with $ballast removed.
 		    },
 		   )} @funcs;
@@ -31,19 +31,19 @@ sub casetest {
     my %simple;
     for my $i (split(m/\n/, $simple)) {
 	my ($k, $v) = split(' ', $i);
-	$simple{$k} = $v;
+	%simple{$k} = $v;
     }
     my %seen;
 
     for my $i (sort keys %simple) {
-	$seen{$i}++;
+	%seen{$i}++;
     }
     print "# ", scalar keys %simple, " simple mappings\n";
 
     my $both;
 
     for my $i (sort keys %$spec) {
-	if (++$seen{$i} == 2) {
+	if (++%seen{$i} == 2) {
 	    warn sprintf "$base: $i seen twice\n";
 	    $both++;
 	}
@@ -54,9 +54,9 @@ sub casetest {
 
     my %none;
     for my $i (map { ord } split m//,
-	       "\e !\"#\$%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b") {
+	       "\e !\"#\$\%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b") {
 	next if pack("U0U", $i) =~ m/\w/;
-	$none{$i}++ unless $seen{$i};
+	%none{$i}++ unless %seen{$i};
     }
     print "# ", scalar keys %none, " noncase mappings\n";
 
@@ -69,12 +69,12 @@ sub casetest {
     my $test = 1;
 
     for my $i (sort keys %simple) {
-	my $w = $simple{$i};
+	my $w = %simple{$i};
 	my $c = pack "U0U", hex $i;
 	foreach my $func (@funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
-	    print $d eq pack("U0U", hex $simple{$i}) ?
+	    print $d eq pack("U0U", hex %simple{$i}) ?
 		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
 		$test++;
 	}
@@ -142,7 +142,7 @@ sub casetest {
     }
 
     for my $i (sort { $a <+> $b } keys %none) {
-	my $w = $i = sprintf "%04X", $i;
+	my $w = $i = sprintf "\%04X", $i;
 	my $c = pack "U0U", hex $i;
 	foreach my $func (@funcs) {
 	    my $d = $func->($c);

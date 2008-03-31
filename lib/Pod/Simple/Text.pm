@@ -34,40 +34,40 @@ sub new {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub handle_text {  $_[0]{'Thispara'} .= $_[1] }
+sub handle_text {  @_[0]{'Thispara'} .= @_[1] }
 
-sub start_Para  {  $_[0]{'Thispara'} = '' }
-sub start_head1 {  $_[0]{'Thispara'} = '' }
-sub start_head2 {  $_[0]{'Thispara'} = '' }
-sub start_head3 {  $_[0]{'Thispara'} = '' }
-sub start_head4 {  $_[0]{'Thispara'} = '' }
+sub start_Para  {  @_[0]{'Thispara'} = '' }
+sub start_head1 {  @_[0]{'Thispara'} = '' }
+sub start_head2 {  @_[0]{'Thispara'} = '' }
+sub start_head3 {  @_[0]{'Thispara'} = '' }
+sub start_head4 {  @_[0]{'Thispara'} = '' }
 
-sub start_Verbatim    { $_[0]{'Thispara'} = ''   }
-sub start_item_bullet { $_[0]{'Thispara'} = $FREAKYMODE ? '' : '* ' }
-sub start_item_number { $_[0]{'Thispara'} = $FREAKYMODE ? '' : "$_[1]{'number'}. "  }
-sub start_item_text   { $_[0]{'Thispara'} = ''   }
+sub start_Verbatim    { @_[0]{'Thispara'} = ''   }
+sub start_item_bullet { @_[0]{'Thispara'} = $FREAKYMODE ? '' : '* ' }
+sub start_item_number { @_[0]{'Thispara'} = $FREAKYMODE ? '' : "@_[1]{'number'}. "  }
+sub start_item_text   { @_[0]{'Thispara'} = ''   }
 
-sub start_over_bullet  { ++$_[0]{'Indent'} }
-sub start_over_number  { ++$_[0]{'Indent'} }
-sub start_over_text    { ++$_[0]{'Indent'} }
-sub start_over_block   { ++$_[0]{'Indent'} }
+sub start_over_bullet  { ++@_[0]{'Indent'} }
+sub start_over_number  { ++@_[0]{'Indent'} }
+sub start_over_text    { ++@_[0]{'Indent'} }
+sub start_over_block   { ++@_[0]{'Indent'} }
 
-sub   end_over_bullet  { --$_[0]{'Indent'} }
-sub   end_over_number  { --$_[0]{'Indent'} }
-sub   end_over_text    { --$_[0]{'Indent'} }
-sub   end_over_block   { --$_[0]{'Indent'} }
+sub   end_over_bullet  { --@_[0]{'Indent'} }
+sub   end_over_number  { --@_[0]{'Indent'} }
+sub   end_over_text    { --@_[0]{'Indent'} }
+sub   end_over_block   { --@_[0]{'Indent'} }
 
 
 # . . . . . Now the actual formatters:
 
-sub end_head1       { $_[0]->emit_par(-4) }
-sub end_head2       { $_[0]->emit_par(-3) }
-sub end_head3       { $_[0]->emit_par(-2) }
-sub end_head4       { $_[0]->emit_par(-1) }
-sub end_Para        { $_[0]->emit_par( 0) }
-sub end_item_bullet { $_[0]->emit_par( 0) }
-sub end_item_number { $_[0]->emit_par( 0) }
-sub end_item_text   { $_[0]->emit_par(-2) }
+sub end_head1       { @_[0]->emit_par(-4) }
+sub end_head2       { @_[0]->emit_par(-3) }
+sub end_head3       { @_[0]->emit_par(-2) }
+sub end_head4       { @_[0]->emit_par(-1) }
+sub end_Para        { @_[0]->emit_par( 0) }
+sub end_item_bullet { @_[0]->emit_par( 0) }
+sub end_item_number { @_[0]->emit_par( 0) }
+sub end_item_text   { @_[0]->emit_par(-2) }
 
 sub emit_par {
   my($self, $tweak_indent) = splice(@_,0,2);

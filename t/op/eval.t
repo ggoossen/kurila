@@ -148,7 +148,7 @@ sub recurse {
   }
 }
 {
-  local ${^WARN_HOOK} = sub { die "not ok $x\n" if $_[0] =~ m/^Deep recurs/ };
+  local ${^WARN_HOOK} = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
   recurse($x-5);
 }
 $x++;
@@ -394,7 +394,7 @@ $test++;
 # eval for a build with copy on write
 {
   my %h;
-  $h{a}=1;
+  %h{a}=1;
   foreach my $k (keys %h) {
     if (defined $k and $k eq 'a') {
       print "ok $test\n";

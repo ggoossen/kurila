@@ -53,8 +53,8 @@ my %style =
     . "(?(\top_sv\t\t#svaddr\n)?)",
     "    GOTO #addr\n",
     "#addr"],
-   "env" => [$ENV{B_CONCISE_FORMAT}, $ENV{B_CONCISE_GOTO_FORMAT},
-	     $ENV{B_CONCISE_TREE_FORMAT}],
+   "env" => [%ENV{B_CONCISE_FORMAT}, %ENV{B_CONCISE_GOTO_FORMAT},
+	     %ENV{B_CONCISE_TREE_FORMAT}],
   );
 
 # Renderings, ie how Concise prints, is controlled by these vars
@@ -92,16 +92,16 @@ sub set_style {
 sub add_style {
     my ($newstyle,@args) = @_;
     die "style '$newstyle' already exists, choose a new name\n"
-	if exists $style{$newstyle};
+	if exists %style{$newstyle};
     die "expecting 3 style-format args\n" unless @args == 3;
-    $style{$newstyle} = [@args];
+    %style{$newstyle} = [@args];
     $stylename = $newstyle; # update rendering state
 }
 
 sub set_style_standard {
     ($stylename) = @_; # update rendering state
-    die "err: style '$stylename' unknown\n" unless exists $style{$stylename};
-    set_style(@{$style{$stylename}});
+    die "err: style '$stylename' unknown\n" unless exists %style{$stylename};
+    set_style(@{%style{$stylename}});
 }
 
 sub add_callback {
@@ -119,7 +119,7 @@ sub walk_output { # updates $walkHandle
     if (ref $handle eq 'SCALAR') {
 	require Config;
 	die "no perlio in this build, can't call walk_output (\\\$scalar)\n"
-	    unless $Config::Config{useperlio};
+	    unless %Config::Config{useperlio};
 	# in 5.8+, open(FILEHANDLE,MODE,REFERENCE) writes to string
 	open my $tmp, '>', $handle;	# but cant re-set existing STDOUT
 	$walkHandle = $tmp;		# so use my $tmp as intermediate var
@@ -186,7 +186,7 @@ sub concise_cv_obj {
 	# walk_topdown($cv->ROOT, sub { $_[0]->concise($_[1]) }, 0);
 	my $root = $cv->ROOT;
 	unless (ref $root eq 'B::NULL') {
-	    walk_topdown($root, sub { $_[0]->concise($_[1]) }, 0);
+	    walk_topdown($root, sub { @_[0]->concise(@_[1]) }, 0);
 	} else {
 	    print $walkHandle "B::NULL encountered doing ROOT on $cv. avoiding disaster\n";
 	}
@@ -208,7 +208,7 @@ sub concise_main {
     } elsif ($order eq "basic") {
 	return if class(main_root) eq "NULL";
 	walk_topdown(main_root,
-		     sub { $_[0]->concise($_[1]) }, 0);
+		     sub { @_[0]->concise(@_[1]) }, 0);
     }
 }
 
@@ -293,7 +293,7 @@ sub compileOpts {
 	    push @render_packs, $pkg;
 	}
 	# line-style options
-	elsif (exists $style{substr($o, 1)}) {
+	elsif (exists %style{substr($o, 1)}) {
 	    $stylename = substr($o, 1);
 	    set_style_standard($stylename);
 	} else {
@@ -431,8 +431,8 @@ sub reset_sequence {
 
 sub seq {
     my($op) = @_;
-    return "-" if not exists $sequence_num{$$op};
-    return base_n($sequence_num{$$op});
+    return "-" if not exists %sequence_num{$$op};
+    return base_n(%sequence_num{$$op});
 }
 
 sub walk_topdown {
@@ -471,7 +471,7 @@ sub walk_exec {
     my @todo = ([$top, \@lines]);
     while (@todo and my($op, $targ) = @{shift @todo}) {
 	for (; $$op; $op = $op->next) {
-	    last if $opsseen{$$op}++;
+	    last if %opsseen{$$op}++;
 	    push @$targ, $op;
 	    my $name = $op->name;
 	    if (class($op) eq "LOGOP") {
@@ -483,9 +483,9 @@ sub walk_exec {
 		push @$targ, $ar;
 		push @todo, [$op->pmreplstart, $ar];
 	    } elsif ($name =~ m/^enter(loop|iter)$/) {
-                $labels{${$op->nextop}} = "NEXT";
-                $labels{${$op->lastop}} = "LAST";
-                $labels{${$op->redoop}} = "REDO";
+                %labels{${$op->nextop}} = "NEXT";
+                %labels{${$op->lastop}} = "LAST";
+                %labels{${$op->redoop}} = "REDO";
 	    }
 	}
     }
@@ -496,14 +496,14 @@ sub walk_exec {
 sub sequence {
     my($op) = @_;
     my $oldop = 0;
-    return if class($op) eq "NULL" or exists $sequence_num{$$op};
+    return if class($op) eq "NULL" or exists %sequence_num{$$op};
     for (; $$op; $op = $op->next) {
-	last if exists $sequence_num{$$op};
+	last if exists %sequence_num{$$op};
 	my $name = $op->name;
 	if ($name =~ m/^(null|scalar|lineseq|scope)$/) {
 	    next if $oldop and $ {$op->next};
 	} else {
-	    $sequence_num{$$op} = $seq_max++;
+	    %sequence_num{$$op} = $seq_max++;
 	    if (class($op) eq "LOGOP") {
 		my $other = $op->other;
 		$other = $other->next while $other->name eq "null";
@@ -554,7 +554,7 @@ sub fmt_line {    # generate text-line for op.
 }/gs;
 
     # spec: #varN
-    $text =~ s/\#([a-zA-Z]+)(\d+)/{sprintf("%-$2s", $hr->{$1})}/g;
+    $text =~ s/\#([a-zA-Z]+)(\d+)/{sprintf("\%-$2s", $hr->{$1})}/g;
 
     $text =~ s/\#([a-zA-Z]+)/{$hr->{$1}}/g;	# populate #var's
     $text =~ s/[ \t]*~+[ \t]*/ /g;		# squeeze tildes
@@ -568,30 +568,30 @@ sub fmt_line {    # generate text-line for op.
 
 our %priv; # used to display each opcode's BASEOP.op_private values
 
-$priv{$_}{128} = "LVINTRO"
+%priv{$_}{128} = "LVINTRO"
   for ("pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv",
        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv",
        "padav", "padhv", "enteriter");
-$priv{$_}{64} = "REFC" for ("leave", "leavesub", "leavesublv", "leavewrite");
-$priv{"aassign"}{64} = "COMMON";
-$priv{"aassign"}{32} = "STATE";
-$priv{"sassign"}{32} = "STATE";
-$priv{"sassign"}{64} = "BKWARD";
-$priv{$_}{64} = "RTIME" for ("match", "subst", "substcont", "qr");
-@{$priv{"trans"}}{1,2,4,8,16,64} = ("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
+%priv{$_}{64} = "REFC" for ("leave", "leavesub", "leavesublv", "leavewrite");
+%priv{"aassign"}{64} = "COMMON";
+%priv{"aassign"}{32} = "STATE";
+%priv{"sassign"}{32} = "STATE";
+%priv{"sassign"}{64} = "BKWARD";
+%priv{$_}{64} = "RTIME" for ("match", "subst", "substcont", "qr");
+%{%priv{"trans"}}{[1,2,4,8,16,64]} = ("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
 				    "COMPL", "GROWS");
-$priv{"repeat"}{64} = "DOLIST";
-$priv{"leaveloop"}{64} = "CONT";
-@{$priv{$_}}{32,64,96} = ("DREFAV", "DREFHV", "DREFSV")
+%priv{"repeat"}{64} = "DOLIST";
+%priv{"leaveloop"}{64} = "CONT";
+%{%priv{$_}}{[32,64,96]} = ("DREFAV", "DREFHV", "DREFSV")
   for (qw(rv2gv rv2sv padsv aelem helem));
-$priv{$_}{16} = "STATE" for ("padav", "padhv", "padsv");
-@{$priv{"entersub"}}{16,32,64} = ("DBG","TARG","NOMOD");
-@{$priv{$_}}{4,8,128} = ("INARGS","AMPER","NO()") for ("entersub", "rv2cv");
-$priv{"gv"}{32} = "EARLYCV";
-$priv{"aelem"}{16} = $priv{"helem"}{16} = "LVDEFER";
-$priv{$_}{16} = "OURINTR" for ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
+%priv{$_}{16} = "STATE" for ("padav", "padhv", "padsv");
+%{%priv{"entersub"}}{[16,32,64]} = ("DBG","TARG","NOMOD");
+%{%priv{$_}}{[4,8,128]} = ("INARGS","AMPER","NO()") for ("entersub", "rv2cv");
+%priv{"gv"}{32} = "EARLYCV";
+%priv{"aelem"}{16} = %priv{"helem"}{16} = "LVDEFER";
+%priv{$_}{16} = "OURINTR" for ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter");
-$priv{$_}{16} = "TARGMY"
+%priv{$_}{16} = "TARGMY"
   for (map(($_,"s$_"),"chop", "chomp"),
        map(($_,"i_$_"), "postinc", "postdec", "multiply", "divide", "modulo",
 	   "add", "subtract", "negate"), "pow", "concat", "stringify",
@@ -603,47 +603,47 @@ $priv{$_}{16} = "TARGMY"
        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system",
        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority",
        "setpriority", "time", "sleep");
-$priv{$_}{4} = "REVERSED" for ("enteriter", "iter");
-@{$priv{"const"}}{4,8,16,32,64,128} = ("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
-$priv{"flip"}{64} = $priv{"flop"}{64} = "LINENUM";
-$priv{"list"}{64} = "GUESSED";
-$priv{"delete"}{64} = "SLICE";
-$priv{"exists"}{64} = "SUB";
-@{$priv{"sort"}}{1,2,4,8,16,32,64} = ("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE");
-$priv{"threadsv"}{64} = "SVREFd";
-@{$priv{$_}}{16,32,64,128} = ("INBIN","INCR","OUTBIN","OUTCR")
+%priv{$_}{4} = "REVERSED" for ("enteriter", "iter");
+%{%priv{"const"}}{[4,8,16,32,64,128]} = ("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
+%priv{"flip"}{64} = %priv{"flop"}{64} = "LINENUM";
+%priv{"list"}{64} = "GUESSED";
+%priv{"delete"}{64} = "SLICE";
+%priv{"exists"}{64} = "SUB";
+%{%priv{"sort"}}{[1,2,4,8,16,32,64]} = ("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE");
+%priv{"threadsv"}{64} = "SVREFd";
+%{%priv{$_}}{[16,32,64,128]} = ("INBIN","INCR","OUTBIN","OUTCR")
   for ("open", "backtick");
-$priv{"exit"}{128} = "VMS";
-$priv{$_}{2} = "FTACCESS"
+%priv{"exit"}{128} = "VMS";
+%priv{$_}{2} = "FTACCESS"
   for ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec");
-$priv{"entereval"}{2} = "HAS_HH";
+%priv{"entereval"}{2} = "HAS_HH";
 {
   # Stacked filetests are post 5.8.x
-  $priv{$_}{4} = "FTSTACKED"
+  %priv{$_}{4} = "FTSTACKED"
     for ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
          "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime",
 	 "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir",
 	 "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext",
 	 "ftbinary");
   # Lexical $_ is post 5.8.x
-  $priv{$_}{2} = "GREPLEX"
+  %priv{$_}{2} = "GREPLEX"
     for ("mapwhile", "mapstart", "grepwhile", "grepstart");
 }
 
 our %hints; # used to display each COP's op_hints values
 
 # strict refs, subs, vars
-@hints{2,512,1024} = ('$', '&', '*');
+%hints{[2,512,1024]} = ('$', '&', '*');
 # integers, locale, bytes
-@hints{1,4,8,16} = ('i', 'l', 'b');
+%hints{[1,4,8,16]} = ('i', 'l', 'b');
 # block scope, localise %^H, $^OPEN (in), $^OPEN (out)
-@hints{256,131072,262144,524288} = ('{','%','<','>');
+%hints{[256,131072,262144,524288]} = ('{','%','<','>');
 # overload new integer, float, binary, string, re
-@hints{4096,8192,16384,32768,65536} = ('I', 'F', 'B', 'S', 'R');
+%hints{[4096,8192,16384,32768,65536]} = ('I', 'F', 'B', 'S', 'R');
 # taint and eval
-@hints{1048576,2097152} = ('T', 'E');
+%hints{[1048576,2097152]} = ('T', 'E');
 # filetest access, UTF-8
-@hints{4194304,8388608} = ('X', 'U');
+%hints{[4194304,8388608]} = ('X', 'U');
 
 sub _flags {
     my($hash, $x) = @_;
@@ -660,7 +660,7 @@ sub _flags {
 
 sub private_flags {
     my($name, $x) = @_;
-    _flags($priv{$name}, $x);
+    _flags(%priv{$name}, $x);
 }
 
 sub hints_flags {
@@ -674,7 +674,7 @@ sub concise_sv {
     $hr->{svclass} = "UV"
       if $hr->{svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;
     warn("bad concise_sv: $sv") unless $sv and $$sv;
-    $hr->{svaddr} = sprintf("%#x", $$sv);
+    $hr->{svaddr} = sprintf("\%#x", $$sv);
     if ($hr->{svclass} eq "GV") {
 	my $gv = $sv;
 	my $stash = $gv->STASH->NAME;
@@ -715,7 +715,7 @@ my %srclines;
 sub fill_srclines {
     my $fullnm = shift;
     if ($fullnm eq '-e') {
-	$srclines{$fullnm} = [ $fullnm, "-src not supported for -e" ];
+	%srclines{$fullnm} = [ $fullnm, "-src not supported for -e" ];
 	return;
     }
     open (my $fh, '<', $fullnm)
@@ -724,31 +724,31 @@ sub fill_srclines {
     my @l = ~< $fh;
     chomp @l;
     unshift @l, $fullnm; # like @{_<$fullnm} in debug, array starts at 1
-    $srclines{$fullnm} = \@l;
+    %srclines{$fullnm} = \@l;
 }
 
 sub concise_op {
     my ($op, $level, $format) = @_;
     my %h;
-    $h{exname} = $h{name} = $op->name;
-    $h{NAME} = uc $h{name};
-    $h{class} = class($op);
-    $h{extarg} = $h{targ} = $op->targ;
-    $h{extarg} = "" unless $h{extarg};
-    if ($h{name} eq "null" and $h{targ}) {
+    %h{exname} = %h{name} = $op->name;
+    %h{NAME} = uc %h{name};
+    %h{class} = class($op);
+    %h{extarg} = %h{targ} = $op->targ;
+    %h{extarg} = "" unless %h{extarg};
+    if (%h{name} eq "null" and %h{targ}) {
 	# targ holds the old type
-	$h{exname} = "ex-" . substr(ppname($h{targ}), 3);
-	$h{extarg} = "";
+	%h{exname} = "ex-" . substr(ppname(%h{targ}), 3);
+	%h{extarg} = "";
     } elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
 	if ($op->private ^&^ 64) {
-	    my $refs = "ref" . ($h{targ} != 1 ? "s" : "");
-	    $h{targarglife} = $h{targarg} = "$h{targ} $refs";
+	    my $refs = "ref" . (%h{targ} != 1 ? "s" : "");
+	    %h{targarglife} = %h{targarg} = "%h{targ} $refs";
 	}
-    } elsif ($h{targ}) {
-	my $padname = (($curcv->PADLIST->ARRAY)[0]->ARRAY)[$h{targ}];
+    } elsif (%h{targ}) {
+	my $padname = (($curcv->PADLIST->ARRAY)[[0]]->ARRAY)[[%h{targ}]];
 	if (defined $padname and class($padname) ne "SPECIAL") {
-	    $h{targarg}  = $padname->PVX;
+	    %h{targarg}  = $padname->PVX;
 	    if ($padname->FLAGS ^&^ SVf_FAKE) {
 		    # These changes relate to the jumbo closure fix.
 		    # See changes 19939 and 20005
@@ -759,21 +759,21 @@ sub concise_op {
 		   	if $padname->PARENT_FAKELEX_FLAGS ^&^ PAD_FAKELEX_MULTI;
 		    $fake .= ':' . $padname->PARENT_PAD_INDEX
 			if $curcv->CvFLAGS ^&^ CVf_ANON;
-		    $h{targarglife} = "$h{targarg}:FAKE:$fake";
+		    %h{targarglife} = "%h{targarg}:FAKE:$fake";
 	    }
 	    else {
 		my $intro = $padname->COP_SEQ_RANGE_LOW - $cop_seq_base;
 		my $finish = int($padname->COP_SEQ_RANGE_HIGH) - $cop_seq_base;
 		$finish = "end" if $finish == 999999999 - $cop_seq_base;
-		$h{targarglife} = "$h{targarg}:$intro,$finish";
+		%h{targarglife} = "%h{targarg}:$intro,$finish";
 	    }
 	} else {
-	    $h{targarglife} = $h{targarg} = "t" . $h{targ};
+	    %h{targarglife} = %h{targarg} = "t" . %h{targ};
 	}
     }
-    $h{arg} = "";
-    $h{svclass} = $h{svaddr} = $h{svval} = "";
-    if ($h{class} eq "PMOP") {
+    %h{arg} = "";
+    %h{svclass} = %h{svaddr} = %h{svval} = "";
+    if (%h{class} eq "PMOP") {
 	my $precomp = $op->precomp;
 	if (defined $precomp) {
 	    $precomp = cstring($precomp); # Escape literal control sequences
@@ -786,26 +786,26 @@ sub concise_op {
 	if (ref($pmreplroot) eq "B::GV") {
 	    # with C<@stash_array = split(/pat/, str);>,
 	    #  *stash_array is stored in /pat/'s pmreplroot.
-	    $h{arg} = "($precomp => \@" . $pmreplroot->NAME . ")";
+	    %h{arg} = "($precomp => \@" . $pmreplroot->NAME . ")";
 	} elsif (!ref($pmreplroot) and $pmreplroot) {
 	    # same as the last case, except the value is actually a
 	    # pad offset for where the GV is kept (this happens under
 	    # ithreads)
-	    my $gv = (($curcv->PADLIST->ARRAY)[1]->ARRAY)[$pmreplroot];
-	    $h{arg} = "($precomp => \@" . $gv->NAME . ")";
+	    my $gv = (($curcv->PADLIST->ARRAY)[[1]]->ARRAY)[[$pmreplroot]];
+	    %h{arg} = "($precomp => \@" . $gv->NAME . ")";
 	} elsif ($ {$op->pmreplstart}) {
 	    undef $lastnext;
 	    $pmreplstart = "replstart->" . seq($op->pmreplstart);
-	    $h{arg} = "(" . join(" ", $precomp, $pmreplstart) . ")";
+	    %h{arg} = "(" . join(" ", $precomp, $pmreplstart) . ")";
 	} else {
-	    $h{arg} = "($precomp)";
+	    %h{arg} = "($precomp)";
 	}
-    } elsif ($h{class} eq "PVOP" and $h{name} ne "trans") {
-	$h{arg} = '("' . $op->pv . '")';
-	$h{svval} = '"' . $op->pv . '"';
-    } elsif ($h{class} eq "COP") {
+    } elsif (%h{class} eq "PVOP" and %h{name} ne "trans") {
+	%h{arg} = '("' . $op->pv . '")';
+	%h{svval} = '"' . $op->pv . '"';
+    } elsif (%h{class} eq "COP") {
 	my $label = $op->label;
-	$h{coplabel} = $label;
+	%h{coplabel} = $label;
 	$label = $label ? "$label: " : "";
 	my $loc = $op->file;
 	my $pathnm = $loc;
@@ -813,57 +813,57 @@ sub concise_op {
 	my $ln = $op->line;
 	$loc .= ":$ln";
 	my($stash, $cseq) = ($op->stash->NAME, $op->cop_seq - $cop_seq_base);
-	$h{arg} = "($label$stash $cseq $loc)";
+	%h{arg} = "($label$stash $cseq $loc)";
 	if ($show_src) {
-	    fill_srclines($pathnm) unless exists $srclines{$pathnm};
-	    $h{src} = "$ln: " . ($srclines{$pathnm}[$ln]
+	    fill_srclines($pathnm) unless exists %srclines{$pathnm};
+	    %h{src} = "$ln: " . (%srclines{$pathnm}[$ln]
 				 // "-src unavailable under -e");
 	}
-    } elsif ($h{class} eq "LOOP") {
-	$h{arg} = "(next->" . seq($op->nextop) . " last->" . seq($op->lastop)
+    } elsif (%h{class} eq "LOOP") {
+	%h{arg} = "(next->" . seq($op->nextop) . " last->" . seq($op->lastop)
 	  . " redo->" . seq($op->redoop) . ")";
-    } elsif ($h{class} eq "LOGOP") {
+    } elsif (%h{class} eq "LOGOP") {
 	undef $lastnext;
-	$h{arg} = "(other->" . seq($op->other) . ")";
+	%h{arg} = "(other->" . seq($op->other) . ")";
     }
-    elsif ($h{class} eq "SVOP" or $h{class} eq "PADOP") {
-	unless ($h{name} eq 'aelemfast' and $op->flags ^&^ OPf_SPECIAL) {
-	    my $idx = ($h{class} eq "SVOP") ? $op->targ : $op->padix;
-	    my $preferpv = $h{name} eq "method_named";
-	    if ($h{class} eq "PADOP" or !${$op->sv}) {
-		my $sv = (($curcv->PADLIST->ARRAY)[1]->ARRAY)[$idx];
-		$h{arg} = "[" . concise_sv($sv, \%h, $preferpv) . "]";
-		$h{targarglife} = $h{targarg} = "";
+    elsif (%h{class} eq "SVOP" or %h{class} eq "PADOP") {
+	unless (%h{name} eq 'aelemfast' and $op->flags ^&^ OPf_SPECIAL) {
+	    my $idx = (%h{class} eq "SVOP") ? $op->targ : $op->padix;
+	    my $preferpv = %h{name} eq "method_named";
+	    if (%h{class} eq "PADOP" or !${$op->sv}) {
+		my $sv = (($curcv->PADLIST->ARRAY)[[1]]->ARRAY)[[$idx]];
+		%h{arg} = "[" . concise_sv($sv, \%h, $preferpv) . "]";
+		%h{targarglife} = %h{targarg} = "";
 	    } else {
-		$h{arg} = "(" . concise_sv($op->sv, \%h, $preferpv) . ")";
+		%h{arg} = "(" . concise_sv($op->sv, \%h, $preferpv) . ")";
 	    }
 	}
     }
-    $h{seq} = $h{hyphseq} = seq($op);
-    $h{seq} = "" if $h{seq} eq "-";
-    $h{opt} = $op->opt;
-    $h{label} = $labels{$$op};
-    $h{next} = $op->next;
-    $h{next} = (class($h{next}) eq "NULL") ? "(end)" : seq($h{next});
-    $h{nextaddr} = sprintf("%#x", $ {$op->next});
-    $h{sibaddr} = sprintf("%#x", $ {$op->sibling});
-    $h{firstaddr} = sprintf("%#x", $ {$op->first}) if $op->can("first");
-    $h{lastaddr} = sprintf("%#x", $ {$op->last}) if $op->can("last");
+    %h{seq} = %h{hyphseq} = seq($op);
+    %h{seq} = "" if %h{seq} eq "-";
+    %h{opt} = $op->opt;
+    %h{label} = %labels{$$op};
+    %h{next} = $op->next;
+    %h{next} = (class(%h{next}) eq "NULL") ? "(end)" : seq(%h{next});
+    %h{nextaddr} = sprintf("\%#x", $ {$op->next});
+    %h{sibaddr} = sprintf("\%#x", $ {$op->sibling});
+    %h{firstaddr} = sprintf("\%#x", $ {$op->first}) if $op->can("first");
+    %h{lastaddr} = sprintf("\%#x", $ {$op->last}) if $op->can("last");
 
-    $h{classsym} = $opclass{$h{class}};
-    $h{flagval} = $op->flags;
-    $h{flags} = op_flags($op->flags);
-    $h{privval} = $op->private;
-    $h{private} = private_flags($h{name}, $op->private);
+    %h{classsym} = %opclass{%h{class}};
+    %h{flagval} = $op->flags;
+    %h{flags} = op_flags($op->flags);
+    %h{privval} = $op->private;
+    %h{private} = private_flags(%h{name}, $op->private);
     if ($op->can("hints")) {
-      $h{hintsval} = $op->hints;
-      $h{hints} = hints_flags($h{hintsval});
+      %h{hintsval} = $op->hints;
+      %h{hints} = hints_flags(%h{hintsval});
     } else {
-      $h{hintsval} = $h{hints} = '';
+      %h{hintsval} = %h{hints} = '';
     }
-    $h{addr} = sprintf("%#x", $$op);
-    $h{typenum} = $op->type;
-    $h{noise} = $linenoise[$op->type];
+    %h{addr} = sprintf("\%#x", $$op);
+    %h{typenum} = $op->type;
+    %h{noise} = @linenoise[$op->type];
 
     return fmt_line(\%h, $op, $format, $level);
 }
@@ -873,7 +873,7 @@ sub B::OP::concise {
     if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
 	# insert a 'goto' line
 	my $synth = {"seq" => seq($lastnext), "class" => class($lastnext),
-		     "addr" => sprintf("%#x", $$lastnext),
+		     "addr" => sprintf("\%#x", $$lastnext),
 		     "goto" => seq($lastnext), # simplify goto '-' removal
 	     };
 	print $walkHandle fmt_line($synth, $op, $gotofmt, $level+1);
@@ -900,19 +900,19 @@ sub b_terse {
     if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
 	# insert a 'goto'
 	my $h = {"seq" => seq($lastnext), "class" => class($lastnext),
-		 "addr" => sprintf("%#x", $$lastnext)};
+		 "addr" => sprintf("\%#x", $$lastnext)};
 	print # $walkHandle
-	    fmt_line($h, $op, $style{"terse"}[1], $level+1);
+	    fmt_line($h, $op, %style{"terse"}[1], $level+1);
     }
     $lastnext = $op->next;
     print # $walkHandle 
-	concise_op($op, $level, $style{"terse"}[0]);
+	concise_op($op, $level, %style{"terse"}[0]);
 }
 
 sub tree {
     my $op = shift;
     my $level = shift;
-    my $style = $tree_decorations[$tree_style];
+    my $style = @tree_decorations[$tree_style];
     my($space, $single, $kids, $kid, $nokid, $last, $lead, $size) = @$style;
     my $name = concise_op($op, $level, $treefmt);
     if (not $op->flags ^&^ OPf_KIDS) {
@@ -923,21 +923,21 @@ sub tree {
 	push @lines, tree($kid, $level+1);
     }
     my $i;
-    for ($i = (@lines-1); substr($lines[$i], 0, 1) eq " "; $i--) {
-	$lines[$i] = $space . $lines[$i];
+    for ($i = (@lines-1); substr(@lines[$i], 0, 1) eq " "; $i--) {
+	@lines[$i] = $space . @lines[$i];
     }
     if ($i +> 0) {
-	$lines[$i] = $last . $lines[$i];
+	@lines[$i] = $last . @lines[$i];
 	while ($i-- +> 1) {
-	    if (substr($lines[$i], 0, 1) eq " ") {
-		$lines[$i] = $nokid . $lines[$i];
+	    if (substr(@lines[$i], 0, 1) eq " ") {
+		@lines[$i] = $nokid . @lines[$i];
 	    } else {
-		$lines[$i] = $kid . $lines[$i];
+		@lines[$i] = $kid . @lines[$i];
 	    }
 	}
-	$lines[$i] = $kids . $lines[$i];
+	@lines[$i] = $kids . @lines[$i];
     } else {
-	$lines[0] = $single . $lines[0];
+	@lines[0] = $single . @lines[0];
     }
     return("$name$lead" . shift @lines,
            map(" " x (length($name)+$size) . $_, @lines));

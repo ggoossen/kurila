@@ -7,4 +7,4 @@ BEGIN {
 }
 
 diag( "Testing Sys::Syslog $Sys::Syslog::VERSION, Perl $^V, $^X" )
-    unless $ENV{PERL_CORE};
+    unless %ENV{PERL_CORE};

@@ -41,7 +41,7 @@ package main;
 # Unbalanced string table refcount: (1) for "A::" during global destruction.
 # for ithreads.
 {
-    local $ENV{PERL_DESTRUCT_LEVEL} = 2;
+    local %ENV{PERL_DESTRUCT_LEVEL} = 2;
     fresh_perl_is(
 		  'package A; sub a { m// }; %::=""',
 		  '',

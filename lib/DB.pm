@@ -104,14 +104,14 @@ sub DB {
   }
 
   my ($stop, $action);
-  if (($stop,$action) = split(m/\0/,$DB::dbline{$DB::lineno})) {
+  if (($stop,$action) = split(m/\0/,%DB::dbline{$DB::lineno})) {
     if ($stop eq '1') {
       $DB::signal ^|^= 1;
     }
     else {
       $stop = 0 unless $stop;			# avoid un_init warning
       $evalarg = "\$DB::signal |= do \{ $stop; \}"; &eval;
-      $DB::dbline{$DB::lineno} =~ s/;9($|\0)/$1/;    # clear any temp breakpt
+      %DB::dbline{$DB::lineno} =~ s/;9($|\0)/$1/;    # clear any temp breakpt
     }
   }
   if ($DB::single || $DB::trace || $DB::signal) {
@@ -219,7 +219,7 @@ sub cont {
   my $i = shift;
   $s->set_tbreak($i) if $i;
   for ($i = 0; $i +<=( @stack-1);) {
-	$stack[$i++] ^&^= ^~^1;
+	@stack[$i++] ^&^= ^~^1;
   }
   $DB::single = 0;
   $running = 1;
@@ -234,7 +234,7 @@ sub ret {
   my $s = shift;
   my $i = shift;      # how many levels to get to DB sub
   $i = 0 unless defined $i;
-  $stack[(@stack-1)-$i] ^|^= 1;
+  @stack[(@stack-1)-$i] ^|^= 1;
   $DB::single = 0;
   $running = 1;
 }
@@ -254,8 +254,8 @@ sub backtrace {
     for (@a) {
       s/'/\\'/g;
       s/([^\0]*)/'$1'/ unless m/^-?[\d.]+$/;
-      s/([\200-\377])/{sprintf("M-%c",ord($1)^&^0177)}/g;
-      s/([\0-\37\177])/{sprintf("^%c",ord($1)^^^64)}/g;
+      s/([\200-\377])/{sprintf("M-\%c",ord($1)^&^0177)}/g;
+      s/([\0-\37\177])/{sprintf("^\%c",ord($1)^^^64)}/g;
     }
     $w = $w ? '@ = ' : '$ = ';
     $a = $h ? '(' . join(', ', @a) . ')' : '';
@@ -298,8 +298,8 @@ sub subs {
     my(@ret) = ();
     while (@_) {
       my $name = shift;
-      push @ret, [$DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/] 
-	if exists $DB::sub{$name};
+      push @ret, [%DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/] 
+	if exists %DB::sub{$name};
     }
     return @ret;
   }
@@ -315,7 +315,7 @@ sub filesubs {
   my $s = shift;
   my $fname = shift;
   $fname = $DB::filename unless $fname;
-  return grep { $DB::sub{$_} =~ m/^$fname/ } keys %DB::sub;
+  return grep { %DB::sub{$_} =~ m/^$fname/ } keys %DB::sub;
 }
 
 ####
@@ -342,13 +342,13 @@ sub lines {
 sub loadfile {
   my $s = shift;
   my($file, $line) = @_;
-  if (!defined $main::{'_<' . $file}) {
+  if (!defined %main::{'_<' . $file}) {
     my $try;
     if (($try) = grep(m|^_<.*$file|, keys %main::)) {  
       $file = substr($try,2);
     }
   }
-  if (defined($main::{'_<' . $file})) {
+  if (defined(%main::{'_<' . $file})) {
     my $c;
 #    _outputall("Loading file $file..");
     *DB::dbline = "::_<$file";
@@ -370,8 +370,8 @@ sub lineevents {
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
   for ($i = 1; $i +<=( @DB::dbline-1); $i++) {
-    $ret{$i} = [$DB::dbline[$i], split(m/\0/, $DB::dbline{$i})] 
-      if defined $DB::dbline{$i};
+    %ret{$i} = [@DB::dbline[$i], split(m/\0/, %DB::dbline{$i})] 
+      if defined %DB::dbline{$i};
   }
   return %ret;
 }
@@ -385,11 +385,11 @@ sub set_break {
   $i = _find_subline($i) if ($i =~ m/\D/);
   $s->output("Subroutine not found.\n") unless $i;
   if ($i) {
-    if ($DB::dbline[$i] == 0) {
+    if (@DB::dbline[$i] == 0) {
       $s->output("Line $i not breakable.\n");
     }
     else {
-      $DB::dbline{$i} =~ s/^[^\0]*/$cond/;
+      %DB::dbline{$i} =~ s/^[^\0]*/$cond/;
     }
   }
 }
@@ -400,11 +400,11 @@ sub set_tbreak {
   $i = _find_subline($i) if ($i =~ m/\D/);
   $s->output("Subroutine not found.\n") unless $i;
   if ($i) {
-    if ($DB::dbline[$i] == 0) {
+    if (@DB::dbline[$i] == 0) {
       $s->output("Line $i not breakable.\n");
     }
     else {
-      $DB::dbline{$i} =~ s/($|\0)/;9$1/; # add one-time-only b.p.
+      %DB::dbline{$i} =~ s/($|\0)/;9$1/; # add one-time-only b.p.
     }
   }
 }
@@ -414,10 +414,10 @@ sub _find_subline {
   $name =~ s/\'/::/;
   $name = "${DB::package}\:\:" . $name if $name !~ m/::/;
   $name = "main" . $name if substr($name,0,2) eq "::";
-  my($fname, $from, $to) = ($DB::sub{$name} =~ m/^(.*):(\d+)-(\d+)$/);
+  my($fname, $from, $to) = (%DB::sub{$name} =~ m/^(.*):(\d+)-(\d+)$/);
   if ($from) {
     local *DB::dbline = "::_<$fname";
-    ++$from while $DB::dbline[$from] == 0 && $from +< $to;
+    ++$from while @DB::dbline[$from] == 0 && $from +< $to;
     return $from;
   }
   return undef;
@@ -431,20 +431,20 @@ sub clr_breaks {
       $i = shift;
       $i = _find_subline($i) if ($i =~ m/\D/);
       $s->output("Subroutine not found.\n") unless $i;
-      if (defined $DB::dbline{$i}) {
-        $DB::dbline{$i} =~ s/^[^\0]+//;
-        if ($DB::dbline{$i} =~ s/^\0?$//) {
-          delete $DB::dbline{$i};
+      if (defined %DB::dbline{$i}) {
+        %DB::dbline{$i} =~ s/^[^\0]+//;
+        if (%DB::dbline{$i} =~ s/^\0?$//) {
+          delete %DB::dbline{$i};
         }
       }
     }
   }
   else {
     for ($i = 1; $i +<=( @DB::dbline-1) ; $i++) {
-      if (defined $DB::dbline{$i}) {
-        $DB::dbline{$i} =~ s/^[^\0]+//;
-        if ($DB::dbline{$i} =~ s/^\0?$//) {
-          delete $DB::dbline{$i};
+      if (defined %DB::dbline{$i}) {
+        %DB::dbline{$i} =~ s/^[^\0]+//;
+        if (%DB::dbline{$i} =~ s/^\0?$//) {
+          delete %DB::dbline{$i};
         }
       }
     }
@@ -458,12 +458,12 @@ sub set_action {
   $i = _find_subline($i) if ($i =~ m/\D/);
   $s->output("Subroutine not found.\n") unless $i;
   if ($i) {
-    if ($DB::dbline[$i] == 0) {
+    if (@DB::dbline[$i] == 0) {
       $s->output("Line $i not actionable.\n");
     }
     else {
-      $DB::dbline{$i} =~ s/\0[^\0]*//;
-      $DB::dbline{$i} .= "\0" . $act;
+      %DB::dbline{$i} =~ s/\0[^\0]*//;
+      %DB::dbline{$i} .= "\0" . $act;
     }
   }
 }
@@ -476,17 +476,17 @@ sub clr_actions {
       my $i = shift;
       $i = _find_subline($i) if ($i =~ m/\D/);
       $s->output("Subroutine not found.\n") unless $i;
-      if ($i && $DB::dbline[$i] != 0) {
-	$DB::dbline{$i} =~ s/\0[^\0]*//;
-	delete $DB::dbline{$i} if $DB::dbline{$i} =~ s/^\0?$//;
+      if ($i && @DB::dbline[$i] != 0) {
+	%DB::dbline{$i} =~ s/\0[^\0]*//;
+	delete %DB::dbline{$i} if %DB::dbline{$i} =~ s/^\0?$//;
       }
     }
   }
   else {
     for ($i = 1; $i +<=( @DB::dbline-1) ; $i++) {
-      if (defined $DB::dbline{$i}) {
-	$DB::dbline{$i} =~ s/\0[^\0]*//;
-	delete $DB::dbline{$i} if $DB::dbline{$i} =~ s/^\0?$//;
+      if (defined %DB::dbline{$i}) {
+	%DB::dbline{$i} =~ s/\0[^\0]*//;
+	delete %DB::dbline{$i} if %DB::dbline{$i} =~ s/^\0?$//;
       }
     }
   }
@@ -545,7 +545,7 @@ sub output {}
 #
 for (@clients) { $_->init }
 
-$SIG{'INT'} = \&DB::catch;
+%SIG{'INT'} = \&DB::catch;
 
 # disable this if stepping through END blocks is desired
 # (looks scary and deconstructivist with Swat)

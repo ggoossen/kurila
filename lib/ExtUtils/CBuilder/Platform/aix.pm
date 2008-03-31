@@ -14,7 +14,7 @@ sub link {
   my ($self, %args) = @_;
   my $cf = $self->{config};
 
-  (my $baseext = $args{module_name}) =~ s/.*:://;
+  (my $baseext = %args{module_name}) =~ s/.*:://;
   my $perl_inc = $self->perl_inc();
 
   # Massage some very naughty bits in %Config

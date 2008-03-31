@@ -21,21 +21,21 @@ sub import {
 	$_ = shift;
 	if (m/^[A-Z][A-Z0-9]*$/) {
 	    $saw_sig++;
-	    unless ($untrapped and $SIG{$_} and $SIG{$_} ne 'DEFAULT') {
+	    unless ($untrapped and %SIG{$_} and %SIG{$_} ne 'DEFAULT') {
 		print "Installing handler {dump::view($handler)} for $_\n" if $Verbose;
-		$SIG{$_} = $handler;
+		%SIG{$_} = $handler;
 	    }
 	}
 	elsif ($_ eq 'normal-signals') {
-	    unshift @_, grep(exists $SIG{$_}, qw(HUP INT PIPE TERM));
+	    unshift @_, grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
 	}
 	elsif ($_ eq 'error-signals') {
-	    unshift @_, grep(exists $SIG{$_},
+	    unshift @_, grep(exists %SIG{$_},
 			     qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
 	}
 	elsif ($_ eq 'old-interface-signals') {
 	    unshift @_,
-	    grep(exists $SIG{$_},
+	    grep(exists %SIG{$_},
 		 qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
 	}
     	elsif ($_ eq 'stack-trace') {
@@ -50,7 +50,7 @@ sub import {
 	    unless (ref $handler or $handler eq 'IGNORE'
 			or $handler eq 'DEFAULT') {
     	    	require Symbol;
-		$handler = Symbol::qualify($handler, (caller)[0]);
+		$handler = Symbol::qualify($handler, (caller)[[0]]);
 	    }
 	}
 	elsif ($_ eq 'untrapped') {
@@ -74,15 +74,15 @@ sub import {
 }
 
 sub handler_die {
-    die "Caught a SIG$_[0]";
+    die "Caught a SIG@_[0]";
 }
 
 sub handler_traceback {
     package DB;		# To get subroutine args.
-    $SIG{'ABRT'} = 'DEFAULT';
+    %SIG{'ABRT'} = 'DEFAULT';
     kill 'ABRT', $$ if $panic++;
     syswrite(STDERR, 'Caught a SIG', 12);
-    syswrite(STDERR, $_[0], length($_[0]));
+    syswrite(STDERR, @_[0], length(@_[0]));
     syswrite(STDERR, ' at ', 4);
     ($pack,$file,$line) = caller;
     syswrite(STDERR, $file, length($file));
@@ -97,8 +97,8 @@ sub handler_traceback {
 	    s/([\'\\])/\\$1/g;
 	    s/([^\0]*)/'$1'/
 	      unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
-	    s/([\200-\377])/{sprintf("M-%c",ord($1)^&^0177)}/g;
-	    s/([\0-\37\177])/{sprintf("^%c",ord($1)^^^64)}/g;
+	    s/([\200-\377])/{sprintf("M-\%c",ord($1)^&^0177)}/g;
+	    s/([\0-\37\177])/{sprintf("^\%c",ord($1)^^^64)}/g;
 	    push(@a, $_);
 	}
 	$w = $w ? '@ = ' : '$ = ';

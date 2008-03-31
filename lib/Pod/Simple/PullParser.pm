@@ -40,7 +40,7 @@ sub filter {
 
 sub parse_string_document {
   my $this = shift;
-  $this->set_source(\ $_[0]);
+  $this->set_source(\ @_[0]);
   $this->run;
 }
 
@@ -55,13 +55,13 @@ sub parse_file {
 
 sub run {
   use Carp ();
-  if( __PACKAGE__ eq ref($_[0]) || $_[0]) { # I'm not being subclassed!
+  if( __PACKAGE__ eq ref(@_[0]) || @_[0]) { # I'm not being subclassed!
     Carp::croak "You can call run() only on subclasses of "
      . __PACKAGE__;
   } else {
     Carp::croak join '',
       "You can't call run() because ",
-      ref($_[0]) || $_[0], " didn't define a run() method";
+      ref(@_[0]) || @_[0], " didn't define a run() method";
   }
 }
 
@@ -125,8 +125,8 @@ sub get_token {
         local $/ = $Pod::Simple::NL;
         push @lines, scalar( ~< $fh); # readline
         DEBUG +> 3 and print "  Line is: ",
-          defined($lines[-1]) ? $lines[-1] : "<undef>\n";
-        unless( defined $lines[-1] ) {
+          defined(@lines[-1]) ? @lines[-1] : "<undef>\n";
+        unless( defined @lines[-1] ) {
           DEBUG and print "That's it for that source fh!  Killing.\n";
           delete $self->{'source_fh'}; # so it can be GC'd
           last;
@@ -233,34 +233,34 @@ sub set_source {
   my $self = shift @_;
   return $self->{'source_fh'} unless @_;
   my $handle;
-  if(!defined $_[0]) {
+  if(!defined @_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");
-  } elsif(ref(\( $_[0] )) eq 'GLOB') {
-    $self->{'source_filename'} = '*' . Symbol::glob_name($handle = $_[0]);
-    DEBUG and print "$self 's source is glob " . Symbol::glob_name($_[0]) . "\n";
+  } elsif(ref(\( @_[0] )) eq 'GLOB') {
+    $self->{'source_filename'} = '*' . Symbol::glob_name($handle = @_[0]);
+    DEBUG and print "$self 's source is glob " . Symbol::glob_name(@_[0]) . "\n";
     # and fall thru   
-  } elsif(ref( $_[0] ) eq 'SCALAR') {
-    $self->{'source_scalar_ref'} = $_[0];
-    DEBUG and print "$self 's source is scalar ref $_[0]\n";
+  } elsif(ref( @_[0] ) eq 'SCALAR') {
+    $self->{'source_scalar_ref'} = @_[0];
+    DEBUG and print "$self 's source is scalar ref @_[0]\n";
     return;
-  } elsif(ref( $_[0] ) eq 'ARRAY') {
-    $self->{'source_arrayref'} = $_[0];
-    DEBUG and print "$self 's source is array ref $_[0]\n";
+  } elsif(ref( @_[0] ) eq 'ARRAY') {
+    $self->{'source_arrayref'} = @_[0];
+    DEBUG and print "$self 's source is array ref @_[0]\n";
     return;
-  } elsif(ref $_[0]) {
-    $self->{'source_filename'} = dump::view($handle = $_[0]);
-    DEBUG and print "$self 's source is fh-obj $_[0]\n";
-  } elsif(!length $_[0]) {
+  } elsif(ref @_[0]) {
+    $self->{'source_filename'} = dump::view($handle = @_[0]);
+    DEBUG and print "$self 's source is fh-obj @_[0]\n";
+  } elsif(!length @_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");
   } else {  # It's a filename!
-    DEBUG and print "$self 's source is filename $_[0]\n";
+    DEBUG and print "$self 's source is filename @_[0]\n";
     {
       local *PODSOURCE;
-      open(PODSOURCE, "<", "$_[0]") || Carp::croak "Can't open $_[0]: $!";
+      open(PODSOURCE, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $!";
       $handle = *PODSOURCE{IO};
     }
-    $self->{'source_filename'} = $_[0];
-    DEBUG and print "  Its name is $_[0].\n";
+    $self->{'source_filename'} = @_[0];
+    DEBUG and print "  Its name is @_[0].\n";
 
     # TODO: file-discipline things here!
   }
@@ -315,10 +315,10 @@ sub _get_titled_section {
   # Based on a get_title originally contributed by Graham Barr
   my($self, $titlename, %options) = (@_);
   
-  my $max_token            = delete $options{'max_token'};
-  my $desperate_for_title  = delete $options{'desperate'};
-  my $accept_verbatim      = delete $options{'accept_verbatim'};
-  my $max_content_length   = delete $options{'max_content_length'};
+  my $max_token            = delete %options{'max_token'};
+  my $desperate_for_title  = delete %options{'desperate'};
+  my $accept_verbatim      = delete %options{'accept_verbatim'};
+  my $max_content_length   = delete %options{'max_content_length'};
   $max_content_length = 120 unless defined $max_content_length;
 
   Carp::croak( "Unknown " . ((1 == keys %options) ? "option: " : "options: ")
@@ -327,10 +327,10 @@ sub _get_titled_section {
    if keys %options;
 
   my %content_containers;
-  $content_containers{'Para'} = 1;
+  %content_containers{'Para'} = 1;
   if($accept_verbatim) {
-    $content_containers{'Verbatim'} = 1;
-    $content_containers{'VerbatimFormatted'} = 1;
+    %content_containers{'Verbatim'} = 1;
+    %content_containers{'VerbatimFormatted'} = 1;
   }
 
   my $token_count = 0;
@@ -403,7 +403,7 @@ sub _get_titled_section {
     
     elsif($state == 2) {
       # seeking start of para (which must immediately follow)
-      if($token->is_start and $content_containers{ $token->tagname }) {
+      if($token->is_start and %content_containers{ $token->tagname }) {
         DEBUG and print "  Found start of Para.  Accumulating content...\n";
         $para_text_content = '';
         ++$state;
@@ -421,7 +421,7 @@ sub _get_titled_section {
         $para_text_content .= $token->text;
         # and keep looking
         
-      } elsif( $token->is_end and $content_containers{ $token->tagname } ) {
+      } elsif( $token->is_end and %content_containers{ $token->tagname } ) {
         DEBUG and print "  Found end of Para.  Considering content: ",
           $para_text_content, "\n";
 
@@ -467,7 +467,7 @@ sub _get_titled_section {
 
 sub _handle_element_start {
   my $self = shift;   # leaving ($element_name, $attr_hash_r)
-  DEBUG +> 2 and print "++ $_[0] (", map("<$_> ", %{$_[1]}), ")\n";
+  DEBUG +> 2 and print "++ @_[0] (", map("<$_> ", %{@_[1]}), ")\n";
   
   push @{ $self->{'token_buffer'} },
        $self->{'start_token_class'}->new(@_);
@@ -476,7 +476,7 @@ sub _handle_element_start {
 
 sub _handle_text {
   my $self = shift;   # leaving ($text)
-  DEBUG +> 2 and print "== $_[0]\n";
+  DEBUG +> 2 and print "== @_[0]\n";
   push @{ $self->{'token_buffer'} },
        $self->{'text_token_class'}->new(@_);
   return;
@@ -484,7 +484,7 @@ sub _handle_text {
 
 sub _handle_element_end {
   my $self = shift;   # leaving ($element_name);
-  DEBUG +> 2 and print "-- $_[0]\n";
+  DEBUG +> 2 and print "-- @_[0]\n";
   push @{ $self->{'token_buffer'} }, 
        $self->{'end_token_class'}->new(@_);
   return;

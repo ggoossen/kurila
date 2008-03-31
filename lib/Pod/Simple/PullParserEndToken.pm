@@ -11,11 +11,11 @@ sub new {  # Class->new(tagname);
 
 # Purely accessors:
 
-sub tagname { (@_ == 2) ? ($_[0][1] = $_[1]) : $_[0][1] }
+sub tagname { (@_ == 2) ? (@_[0][1] = @_[1]) : @_[0][1] }
 sub tag { shift->tagname(@_) }
 
 # shortcut:
-sub is_tagname { $_[0][1] eq $_[1] }
+sub is_tagname { @_[0][1] eq @_[1] }
 sub is_tag { shift->is_tagname(@_) }
 
 1;

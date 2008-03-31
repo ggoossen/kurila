@@ -32,7 +32,7 @@ $UnzipError = '';
 @ISA    = qw(IO::Uncompress::RawInflate Exporter);
 @EXPORT_OK = qw( $UnzipError unzip );
 %EXPORT_TAGS = %IO::Uncompress::RawInflate::EXPORT_TAGS ;
-push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
+push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 %headerLookup = (
@@ -236,7 +236,7 @@ sub chkTrailer
         my $sig = unpack("V", $magic) ;
 
         my $hdr;
-        if ($hdr = $headerLookup{$sig})
+        if ($hdr = %headerLookup{$sig})
         {
             if (&$hdr($self, $magic) != STATUS_OK ) {
                 if (*$self->{Strict}) {
@@ -535,14 +535,14 @@ sub _readZipHeader($)
         my %Extra ;
         for (@EXTRA)
         {
-            $Extra{$_->[0]} = \$_->[1];
+            %Extra{$_->[0]} = \$_->[1];
         }
         
-        if (defined $Extra{ZIP_EXTRA_ID_ZIP64()})
+        if (defined %Extra{ZIP_EXTRA_ID_ZIP64()})
         {
             $zip64 = 1 ;
 
-            my $buff = ${ $Extra{ZIP_EXTRA_ID_ZIP64()} };
+            my $buff = ${ %Extra{ZIP_EXTRA_ID_ZIP64()} };
 
             # TODO - This code assumes that all the fields in the Zip64
             # extra field aren't necessarily present. The spec says that
@@ -664,7 +664,7 @@ sub filterUncompressed
     my $self = shift ;
 
     if (*$self->{ZipData}{Method} == 12) {
-        *$self->{ZipData}{CRC32} = crc32(${$_[0]}, *$self->{ZipData}{CRC32});
+        *$self->{ZipData}{CRC32} = crc32(${@_[0]}, *$self->{ZipData}{CRC32});
     }
     else {
         *$self->{ZipData}{CRC32} = *$self->{Uncomp}->crc32() ;

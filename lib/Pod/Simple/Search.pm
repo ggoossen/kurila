@@ -113,7 +113,7 @@ sub survey {
     }
   }
   $self->progress and $self->progress->done(
-   "Noted $$self{'_scan_count'} Pod files total");
+   "Noted %$self{'_scan_count'} Pod files total");
 
   return unless defined wantarray; # void
   return $self->name2path unless wantarray; # scalar
@@ -123,7 +123,7 @@ sub survey {
 
 #==========================================================================
 sub _make_search_callback {
-  my $self = $_[0];
+  my $self = @_[0];
 
   # Put the options in variables, for easy access
   my(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
@@ -236,11 +236,11 @@ sub _path2modname {
 
   # Shaving off leading naughty-bits
   while(@m
-    and defined($x = lc( $m[0] ))
+    and defined($x = lc( @m[0] ))
     and(  $x eq 'site_perl'
        or($x eq 'pod' and @m == 1 and $shortname =~ m{^perl.*\.pod$}s )
        or $x =~ m{\\d+\\.z\\d+([_.]?\\d+)?}  # if looks like a vernum
-       or $x eq lc( $Config::Config{'archname'} )
+       or $x eq lc( %Config::Config{'archname'} )
   )) { shift @m }
 
   my $name = join '::', @m, $shortname;
@@ -362,7 +362,7 @@ sub run {
   # A function, useful in one-liners
 
   my $self = __PACKAGE__->new;
-  $self->limit_glob($ARGV[0]) if @ARGV;
+  $self->limit_glob(@ARGV[0]) if @ARGV;
   $self->callback( sub {
     my($file, $name) = @_;
     my $version = '';
@@ -397,7 +397,7 @@ sub run {
           ;
            
           # Like in sprintf("%d.%s", map {s/_//g; $_} q$Name: release-0_55-public $ =~ /-(\d+)_([\d_]+)/)
-          $_ = sprintf("v%d.%s",
+          $_ = sprintf("v\%d.\%s",
             map {s/_//g; $_}
               $1 =~ m/-(\d+)_([\d_]+)/) # snare just the numeric part
            if m{\$Name:\s*([^\$]+)\$}s 
@@ -437,13 +437,13 @@ sub simplify_name {
 sub _simplify_base {   # Internal method only
 
   # strip Perl's own extensions
-  $_[1] =~ s/\.(pod|pm|plx?)\z//i;
+  @_[1] =~ s/\.(pod|pm|plx?)\z//i;
 
   # strip meaningless extensions on Win32 and OS/2
-  $_[1] =~ s/\.(bat|exe|cmd)\z//i if $^O =~ m/mswin|os2/i;
+  @_[1] =~ s/\.(bat|exe|cmd)\z//i if $^O =~ m/mswin|os2/i;
 
   # strip meaningless extensions on VMS
-  $_[1] =~ s/\.(com)\z//i if $^O eq 'VMS';
+  @_[1] =~ s/\.(com)\z//i if $^O eq 'VMS';
 
   return;
 }
@@ -487,7 +487,7 @@ sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
 #==========================================================================
 
 sub _limit_glob_to_limit_re {
-  my $self = $_[0];
+  my $self = @_[0];
   my $limit_glob = $self->{'limit_glob'} || return;
 
   my $limit_re = '^' . quotemeta($limit_glob) . '$';
@@ -544,7 +544,7 @@ sub find {
     #  if -d $perlpoddir;
 
     # Add location of binaries such as pod2text:
-    push @search_dirs, $Config::Config{'scriptdir'};
+    push @search_dirs, %Config::Config{'scriptdir'};
      # and if that's undef or q{} or nonexistent, we just ignore it later
   }
 
@@ -552,8 +552,8 @@ sub find {
  Dir:
   foreach my $dir ( @search_dirs ) {
     next unless defined $dir and length $dir;
-    next if $seen_dir{$dir};
-    $seen_dir{$dir} = 1;
+    next if %seen_dir{$dir};
+    %seen_dir{$dir} = 1;
     unless(-d $dir) {
       print "Directory $dir does not exist\n" if $verbose;
       next Dir;
@@ -621,14 +621,14 @@ sub _accessorize {  # A simple-minded method-maker
       use strict;
       $Carp::CarpLevel = 1,  Carp::croak(
        "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
-      ) unless (@_ == 1 or @_ == 2) and ref $_[0];
+      ) unless (@_ == 1 or @_ == 2) and ref @_[0];
 
       # Read access:
-      return $_[0]->{$attrname} if @_ == 1;
+      return @_[0]->{$attrname} if @_ == 1;
 
       # Write access:
-      $_[0]->{$attrname} = $_[1];
-      return $_[0]; # RETURNS MYSELF!
+      @_[0]->{$attrname} = @_[1];
+      return @_[0]; # RETURNS MYSELF!
     };
   }
   # Ya know, they say accessories make the ensemble!
@@ -637,7 +637,7 @@ sub _accessorize {  # A simple-minded method-maker
 
 #==========================================================================
 sub _state_as_string {
-  my $self = $_[0];
+  my $self = @_[0];
   return '' unless ref $self;
   my @out = "\{\n  # State of {dump::view($self)} ...\n";
   foreach my $k (sort keys %$self) {

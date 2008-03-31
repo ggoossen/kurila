@@ -47,8 +47,8 @@ my $txt;
 sub alias (@)
 {
   @_ or return %alias3;
-  my $alias = ref $_[0] ? $_[0] : { @_ };
-  @alias3{keys %$alias} = values %$alias;
+  my $alias = ref @_[0] ? @_[0] : { @_ };
+  %alias3{[keys %$alias]} = values %$alias;
 } # alias
 
 sub alias_file ($)
@@ -64,7 +64,7 @@ sub alias_file ($)
     die "Charnames alias files can only have identifier characters";
   }
   if (my @alias = do $file) {
-    @alias == 1 && !defined $alias[0] and
+    @alias == 1 && !defined @alias[0] and
       die "$file cannot be used as alias file for charnames";
     @alias % 2 and
       die "$file did not return a (valid) list of alias pairs";
@@ -80,16 +80,16 @@ sub charnames
 {
   my $name = shift;
 
-  if (exists $alias1{$name}) {
-    $name = $alias1{$name};
+  if (exists %alias1{$name}) {
+    $name = %alias1{$name};
   }
-  elsif (exists $alias2{$name}) {
+  elsif (exists %alias2{$name}) {
     require warnings;
-    warnings::warnif('deprecated', qq{Unicode character name "$name" is deprecated, use "$alias2{$name}" instead});
-    $name = $alias2{$name};
+    warnings::warnif('deprecated', qq{Unicode character name "$name" is deprecated, use "%alias2{$name}" instead});
+    $name = %alias2{$name};
   }
-  elsif (exists $alias3{$name}) {
-    $name = $alias3{$name};
+  elsif (exists %alias3{$name}) {
+    $name = %alias3{$name};
   }
 
   my $ord;
@@ -109,20 +109,20 @@ sub charnames
     ## end of the name as we find it.
 
     ## If :full, look for the name exactly
-    if ($^H{charnames_full} and $txt =~ m/\t\t\Q$name\E$/m) {
-      @off = ($-[0], $+[0]);
+    if (%^H{charnames_full} and $txt =~ m/\t\t\Q$name\E$/m) {
+      @off = (@-[0], @+[0]);
     }
 
     ## If we didn't get above, and :short allowed, look for the short name.
     ## The short name is like "greek:Sigma"
     unless (@off) {
-      if ($^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
+      if (%^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
         my $uc_cname = uc($cname);
         my $uc_script = uc($script);
 	if ($txt =~ m/\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m) {
-	  @off = ($-[0], $+[0]);
+	  @off = (@-[0], @+[0]);
 	}
       }
     }
@@ -131,10 +131,10 @@ sub charnames
     ## scripts.
     if (not @off) {
       my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
-      for my $script (@{$^H{charnames_scripts}}) {
+      for my $script (@{%^H{charnames_scripts}}) {
         my $ucname = uc($name);
 	if ($txt =~ m/\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
-	  @off = ($-[0], $+[0]);
+	  @off = (@-[0], @+[0]);
 	  last;
 	}
       }
@@ -159,19 +159,19 @@ sub charnames
     ## The +1 after the rindex() is to skip past the newline we're finding,
     ## or, if the rindex() fails, to put us to an offset of zero.
     ##
-    my $hexstart = rindex($txt, "\n", $off[0]) + 1;
+    my $hexstart = rindex($txt, "\n", @off[0]) + 1;
 
     ## we know where it starts, so turn into number -
     ## the ordinal for the char.
-    $ord = CORE::hex substr($txt, $hexstart, $off[0] - $hexstart);
+    $ord = CORE::hex substr($txt, $hexstart, @off[0] - $hexstart);
   }
 
   if ($^H ^&^ $bytes::hint_bits) {	# "use bytes" in effect?
     use bytes;
     return chr $ord if $ord +<= 255;
-    my $hex = sprintf "%04x", $ord;
+    my $hex = sprintf "\%04x", $ord;
     if (not defined $fname) {
-      $fname = substr $txt, $off[0] + 2, $off[1] - $off[0] - 2;
+      $fname = substr $txt, @off[0] + 2, @off[1] - @off[0] - 2;
     }
     die "Character 0x$hex with name '$fname' is above 0xFF";
   }
@@ -187,7 +187,7 @@ sub import
   if (not @_) {
     warn("`use charnames' needs explicit imports list");
   }
-  $^H{charnames} = \&charnames ;
+  %^H{charnames} = \&charnames ;
 
   ##
   ## fill %h keys with our @_ args.
@@ -220,20 +220,20 @@ sub import
     push @args, $arg;
   }
   @args == 0 && $promote and @args = (":full");
-  @h{@args} = (1) x @args;
+  %h{[@args]} = (1) x @args;
 
-  $^H{charnames_full} = delete $h{':full'};
-  $^H{charnames_short} = delete $h{':short'};
-  $^H{charnames_scripts} = [map uc, keys %h];
+  %^H{charnames_full} = delete %h{':full'};
+  %^H{charnames_short} = delete %h{':short'};
+  %^H{charnames_scripts} = [map uc, keys %h];
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,
   ## see if at least we can find one letter of each script.
   ##
-  if (warnings::enabled('utf8') && @{$^H{charnames_scripts}}) {
+  if (warnings::enabled('utf8') && @{%^H{charnames_scripts}}) {
     $txt = do "unicore/Name.pl" unless $txt;
 
-    for my $script (@{$^H{charnames_scripts}}) {
+    for my $script (@{%^H{charnames_scripts}}) {
       if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /) {
 	warnings::warn('utf8',  "No such script: '$script'");
       }
@@ -256,7 +256,7 @@ sub viacode
   # function _getcode (), but it avoids the overhead of loading it
   my $hex;
   if ($arg =~ m/^[1-9]\d*$/) {
-    $hex = sprintf "%04X", $arg;
+    $hex = sprintf "\%04X", $arg;
   } elsif ($arg =~ m/^(?:[Uu]\+|0[xX])?([[:xdigit:]]+)$/) {
     $hex = $1;
   } else {
@@ -270,13 +270,13 @@ sub viacode
     return;
   }
 
-  return $viacode{$hex} if exists $viacode{$hex};
+  return %viacode{$hex} if exists %viacode{$hex};
 
   $txt = do "unicore/Name.pl" unless $txt;
 
   return unless $txt =~ m/^$hex\t\t(.+)/m;
 
-  $viacode{$hex} = $1;
+  %viacode{$hex} = $1;
 } # viacode
 
 my %vianame;
@@ -292,7 +292,7 @@ sub vianame
 
   return chr CORE::hex $1 if $arg =~ m/^U\+([0-9a-fA-F]+)$/;
 
-  return $vianame{$arg} if exists $vianame{$arg};
+  return %vianame{$arg} if exists %vianame{$arg};
 
   $txt = do "unicore/Name.pl" unless $txt;
 
@@ -300,7 +300,7 @@ sub vianame
   if ($[ +<= $pos) {
     my $posLF = rindex $txt, "\n", $pos;
     (my $code = substr $txt, $posLF + 1, 6) =~ tr/\t//d;
-    return $vianame{$arg} = CORE::hex $code;
+    return %vianame{$arg} = CORE::hex $code;
 
     # If $pos is at the 1st line, $posLF must be $[ - 1 (not found);
     # then $posLF + 1 equals to $[ (at the beginning of $txt).

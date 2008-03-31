@@ -64,11 +64,11 @@ sub done {
 # Simple accessors:
 
 sub delay {
-  return $_[0]{'delay'} if @_ == 1; $_[0]{'delay'} = $_[1]; return $_[0] }
+  return @_[0]{'delay'} if @_ == 1; @_[0]{'delay'} = @_[1]; return @_[0] }
 sub goal {
-  return $_[0]{'goal' } if @_ == 1; $_[0]{'goal' } = $_[1]; return $_[0] }
+  return @_[0]{'goal' } if @_ == 1; @_[0]{'goal' } = @_[1]; return @_[0] }
 sub to   {
-  return $_[0]{'to'   } if @_ == 1; $_[0]{'to'   } = $_[1]; return $_[0] }
+  return @_[0]{'to'   } if @_ == 1; @_[0]{'to'   } = @_[1]; return @_[0] }
 
 #--------------------------------------------------------------------------
 

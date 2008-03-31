@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = qw(../lib lib);
     }
@@ -53,8 +53,8 @@ isa_ok(\42, 'SCALAR');
 {
        local *Foo::can;
        local *Foo::isa;
-       *Foo::can = sub { $_[0]->[0] };
-       *Foo::isa = sub { $_[0]->[0] };
+       *Foo::can = sub { @_[0]->[0] };
+       *Foo::isa = sub { @_[0]->[0] };
        my $foo = bless([0], 'Foo');
        ok( ! $foo->can('bar') );
        ok( ! $foo->isa('bar') );

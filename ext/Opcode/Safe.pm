@@ -12,7 +12,7 @@ $Safe::VERSION = "2.16";
 sub lexless_anon_sub {
 		 # $_[0] is package;
 		 # $_[1] is strict flag;
-    my $__ExPr__ = $_[2];   # must be a lexical to create the closure that
+    my $__ExPr__ = @_[2];   # must be a lexical to create the closure that
 			    # can be used to pass the value into the safe
 			    # world
 
@@ -21,7 +21,7 @@ sub lexless_anon_sub {
     # (eval on one line to keep line numbers as expected by caller)
     eval sprintf
     'package %s; %s strict; sub { @_=(); eval q[my $__ExPr__;] . $__ExPr__; }',
-		$_[0], $_[1] ? 'use' : 'no';
+		@_[0], @_[1] ? 'use' : 'no';
 }
 
 use Carp;
@@ -260,7 +260,7 @@ sub share_record {
     my $vars = shift;
     my $shares = \%{$obj->{Shares} ||= {}};
     # Record shares using keys of $obj->{Shares}. See reinit.
-    @{$shares}{@$vars} = ($pkg) x @$vars if @$vars;
+    %{$shares}{[@$vars]} = ($pkg) x @$vars if @$vars;
 }
 sub share_redo {
     my $obj = shift;

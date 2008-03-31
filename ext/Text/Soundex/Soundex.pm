@@ -50,7 +50,7 @@ sub soundex_noxs
 	}
     } @_;
 
-    wantarray ? @results : $results[0];
+    wantarray ? @results : @results[0];
 }
 
 sub soundex_nara
@@ -73,7 +73,7 @@ sub soundex_nara
 	}
     } @_;
 
-    wantarray ? @results : $results[0];
+    wantarray ? @results : @results[0];
 }
 
 sub soundex_unicode

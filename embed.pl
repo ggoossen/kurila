@@ -121,7 +121,7 @@ sub munge_c_files () {
     }
     walk_table {
 	if (@_ +> 1) {
-	    $functions->{$_[2]} = \@_ if $_[@_-1] =~ m/\.\.\./;
+	    $functions->{@_[2]} = \@_ if @_[@_-1] =~ m/\.\.\./;
 	}
     } '/dev/null', '', '';
     local $^I = '.bak';
@@ -242,15 +242,15 @@ sub write_protos {
 	    my $prefix	= $has_context ? 'pTHX_' : '';
 	    my $args	= scalar @args;
  	    my $pat	= $args - 1;
-	    my $macro	= @nonnull && $nonnull[-1] == $pat  
+	    my $macro	= @nonnull && @nonnull[-1] == $pat  
 				? '__attribute__format__'
 				: '__attribute__format__null_ok__';
-	    push @attrs, sprintf "%s(__printf__,%s%d,%s%d)", $macro,
+	    push @attrs, sprintf "\%s(__printf__,\%s\%d,\%s\%d)", $macro,
 				$prefix, $pat, $prefix, $args;
 	}
 	if ( @nonnull ) {
 	    my @pos = map { $has_context ? "pTHX_$_" : $_ } @nonnull;
-	    push @attrs, map { sprintf( "__attribute__nonnull__(%s)", $_ ) } @pos;
+	    push @attrs, map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } @pos;
 	}
 	if ( @attrs ) {
 	    $ret .= "\n";
@@ -276,7 +276,7 @@ sub write_protos {
 	  my ($flags,$retval,$func,@args) = @_;
 	  # If a function is defined twice, for example before and after an
 	  # #else, only process the flags on the first instance for global.sym
-	  return $ret if $seen{$func}++;
+	  return $ret if %seen{$func}++;
 	  if ($flags =~ m/[AX]/ && $flags !~ m/[xm]/
 	      || $flags =~ m/b/) { # public API, so export
 	      $func = "Perl_$func" if $flags =~ m/[pbX]/;
@@ -324,8 +324,8 @@ sub readsyms (\%$) {
 	if (m/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
 	    warn "duplicate symbol $sym while processing $file line $.\n"
-		if exists $$syms{$sym};
-	    $$syms{$sym} = 1;
+		if exists %$syms{$sym};
+	    %$syms{$sym} = 1;
 	}
     }
     close(FILE);
@@ -345,8 +345,8 @@ sub readvars(\%$$@) {
 	    my $sym = $1;
 	    $sym = $pre . $sym if $keep_pre;
 	    warn "duplicate symbol $sym while processing $file line $.\n"
-		if exists $$syms{$sym};
-	    $$syms{$sym} = $pre || 1;
+		if exists %$syms{$sym};
+	    %$syms{$sym} = $pre || 1;
 	}
     }
     close(FILE);
@@ -484,7 +484,7 @@ walk_table {
 	my ($flags,$retval,$func,@args) = @_;
 	unless ($flags =~ m/[om]/) {
 	    my $args = scalar @args;
-	    if ($args and $args[$args-1] =~ m/\.\.\./) {
+	    if ($args and @args[$args-1] =~ m/\.\.\./) {
 	        # we're out of luck for varargs functions under CPP
 	    }
 	    elsif ($flags =~ m/n/) {
@@ -496,7 +496,7 @@ walk_table {
 		}
 	    }
 	    else {
-		my $alist = join(",", @az[0..$args-1]);
+		my $alist = join(",", @az[[0..$args-1]]);
 		$ret = "#define $func($alist)";
 		my $t = int(length($ret) / 8);
 		$ret .=  "\t" x ($t +< 4 ? 4 - $t : 1);

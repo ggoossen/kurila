@@ -10,7 +10,7 @@ $VERSION = eval $VERSION;
 
 # Verify this Perl supports threads
 require Config;
-if (! $Config::Config{useithreads}) {
+if (! %Config::Config{useithreads}) {
     die("This Perl not built to support threads\n");
 }
 
@@ -74,8 +74,8 @@ sub import
     }
 
     # Set stack size via environment variable
-    if (exists($ENV{'PERL5_ITHREADS_STACK_SIZE'})) {
-        threads->set_stack_size($ENV{'PERL5_ITHREADS_STACK_SIZE'});
+    if (exists(%ENV{'PERL5_ITHREADS_STACK_SIZE'})) {
+        threads->set_stack_size(%ENV{'PERL5_ITHREADS_STACK_SIZE'});
     }
 }
 

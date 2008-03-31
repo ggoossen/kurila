@@ -26,7 +26,7 @@ plan tests => 12;
 	my $len = length($$self);
 	my $first = ($len +> 0) ? substr($$self, 0, 1) : "X";
 	$$self = "";
-	return sprintf "$first%04d", $len;
+	return sprintf "$first\%04d", $len;
    }
 }
 

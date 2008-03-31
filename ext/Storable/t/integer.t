@@ -13,14 +13,14 @@
 # are encountered.
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -37,7 +37,7 @@ my $max_uv_m1 = ^~^0 ^^^ 1;
 # use integer.
 my $max_iv_p1 = $max_uv ^^^ ($max_uv >> 1);
 my $lots_of_9C = do {
-  my $temp = sprintf "%#x", ^~^0;
+  my $temp = sprintf "\%#x", ^~^0;
   $temp =~ s/ff/9c/g;
   local $^W;
   eval $temp;
@@ -169,7 +169,7 @@ foreach (@processes) {
                      "$process $copy1 (sign)");
 
       unless ($bit and $sign) {
-        printf "# Passed in %s  (%#x, %i)\n# got back '%s' (%#x, %i)\n",
+        printf "# Passed in \%s  (\%#x, \%i)\n# got back '\%s' (\%#x, \%i)\n",
           $copy1, $copy1, $copy1, $copy_s1, $copy_s1, $copy_s1;
         # use Devel::Peek; Dump $number; Dump $copy1; Dump $copy_s1;
       }

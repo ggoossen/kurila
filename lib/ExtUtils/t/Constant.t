@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
     use Config;
-    unless ($Config{usedl}) {
+    unless (%Config{usedl}) {
 	print "1..0 # no usedl, skipping\n";
 	exit 0;
     }
@@ -35,12 +35,12 @@ $perl = File::Spec->rel2abs ($perl);
 # whereas we will run the child with the full path in $perl. So make $^X for
 # us the same as our child will see.
 $^X = $perl;
-my $lib = $ENV{PERL_CORE} ? '../../../lib' : '../../blib/lib';
+my $lib = %ENV{PERL_CORE} ? '../../../lib' : '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
 print "# perl=$perl\n";
 
-my $make = $Config{make};
-$make = $ENV{MAKE} if exists $ENV{MAKE};
+my $make = %Config{make};
+$make = %ENV{MAKE} if exists %ENV{MAKE};
 if ($^O eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
 
 # VMS may be using something other than MMS/MMK
@@ -115,7 +115,7 @@ sub check_for_bonus_files {
   opendir DIR, $dir or die "opendir '$dir': $!";
   while (defined (my $entry = readdir DIR)) {
     $entry =~ s/\.$// if $^O eq 'VMS';  # delete trailing dot that indicates no extension
-    next if $expect{$entry};
+    next if %expect{$entry};
     print "# Extra file '$entry'\n";
     $fail = 1;
   }
@@ -131,7 +131,7 @@ sub check_for_bonus_files {
 
 sub build_and_run {
   my ($tests, $expect, $files) = @_;
-  my $core = $ENV{PERL_CORE} ? ' PERL_CORE=1' : '';
+  my $core = %ENV{PERL_CORE} ? ' PERL_CORE=1' : '';
   my @perlout = `$runperl Makefile.PL $core`;
   if ($?) {
     print "not ok $realtest # $runperl Makefile.PL failed: $?\n";
@@ -193,7 +193,7 @@ sub build_and_run {
 
   if ($^O eq 'VMS') { $make =~ s{ all}{}; }
 
-  if ($Config{usedl}) {
+  if (%Config{usedl}) {
     print "ok $realtest # This is dynamic linking, so no need to make perl\n";
   } else {
     my $makeperl = "$make perl";
@@ -740,7 +740,7 @@ if (\$rfc1149 ne "$parent_rfc1149") \{
 \$test++;
 
 if (\$rfc1149 != 1149) \{
-  printf "not ok \$test # %d != 1149\n", \$rfc1149;
+  printf "not ok \$test # \%d != 1149\n", \$rfc1149;
 \} else \{
   print "ok \$test\n";
 \}
@@ -807,7 +807,7 @@ sub simple {
   my $test_header;
   my $test_body = "my \$value;\n";
   foreach my $counter (1 .. (@_-1)) {
-    my $thisname = $_[$counter];
+    my $thisname = @_[$counter];
     $test_header .= "#define $thisname $counter\n";
     $test_body .= <<"EOT";
 \$value = $thisname;

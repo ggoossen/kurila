@@ -1,6 +1,6 @@
 ### Log::Message::Config test suite ###
 BEGIN { 
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir '../lib/Log/Message' if -d '../lib/Log/Message';
         unshift @INC, '../../..';
     }

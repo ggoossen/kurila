@@ -1,1 +1,1 @@
-$self->{CCFLAGS} = $Config{ccflags} . ' -D_POSIX_SOURCE' ;
+$self->{CCFLAGS} = %Config{ccflags} . ' -D_POSIX_SOURCE' ;
