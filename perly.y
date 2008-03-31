@@ -894,12 +894,21 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	'(' expr ')' '[' expr ']'            /* list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
-					oopsAV($2),
+					oopsAV(convert(OP_ANONLIST, OPf_SPECIAL, $2)),
 					scalar($5));
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			  TOKEN_GETMAD($4,$$,'[');
 			  TOKEN_GETMAD($6,$$,']');
+			}
+	|	'(' ')' '[' expr ']'            /* empty list element */
+			{ $$ = newBINOP(OP_AELEM, 0,
+					oopsAV(convert(OP_ANONLIST, OPf_SPECIAL, (OP*)NULL)),
+					scalar($4));
+			  TOKEN_GETMAD($1,$$,'(');
+			  TOKEN_GETMAD($2,$$,')');
+			  TOKEN_GETMAD($3,$$,'[');
+			  TOKEN_GETMAD($5,$$,']');
 			}
     ;
 
