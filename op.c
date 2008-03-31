@@ -5882,6 +5882,10 @@ Perl_oopsAV(pTHX_ OP *o)
 	ref(o, OP_RV2AV);
 	break;
 
+    case OP_LIST:
+	o = convert(OP_ANONLIST, OPf_SPECIAL, o);
+	return ref(newAVREF(o), OP_RV2AV);
+
     default:
 	if (ckWARN_d(WARN_INTERNAL))
 	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL), "oops: oopsAV");
