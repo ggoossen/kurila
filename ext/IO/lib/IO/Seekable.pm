@@ -110,17 +110,17 @@ $VERSION = eval $VERSION;
 
 sub seek {
     @_ == 3 or die 'usage: $io->seek(POS, WHENCE)';
-    seek($_[0], $_[1], $_[2]);
+    seek(@_[0], @_[1], @_[2]);
 }
 
 sub sysseek {
     @_ == 3 or die 'usage: $io->sysseek(POS, WHENCE)';
-    sysseek($_[0], $_[1], $_[2]);
+    sysseek(@_[0], @_[1], @_[2]);
 }
 
 sub tell {
     @_ == 1 or die 'usage: $io->tell()';
-    tell($_[0]);
+    tell(@_[0]);
 }
 
 1;

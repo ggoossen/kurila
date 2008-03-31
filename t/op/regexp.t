@@ -193,8 +193,8 @@ EOFCODE
 	    print "not ok $test # todo", length($reason) ? " - $reason" : '', "\n";
 	    next TEST;
 	}
-	elsif ($@) {
-	    print "not ok $test $input => error `$err'\n$code\n$@\n"; next TEST;
+	elsif ($err) {
+	    print "not ok $test $input => error: '{$@->message}'\n{dump::view($code)}\n"; next TEST;
 	}
 	elsif ($result =~ m/^n/) {
 	    if ($match) { print "not ok $test ($study) $input => false positive\n"; next TEST }

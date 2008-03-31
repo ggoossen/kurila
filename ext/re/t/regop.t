@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bre\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bre\b/) ){
 	print "1..0 # Skip -- Perl configured without re module\n";
 	exit 0;
     }
@@ -20,7 +20,7 @@ $out =~ s/\cJ//g if $^O = 'VMS';
 my @tests = grep { m/\S/ } split m/(?=Compiling REx)/, $out;
 # on debug builds we get an EXECUTING... message in there at the top
 shift @tests
-    if $tests[0] =~ m/EXECUTING.../;
+    if @tests[0] =~ m/EXECUTING.../;
 
 plan( @tests + 2 + ( @strs - grep { !$_ or m/^---/ } @strs ));
 

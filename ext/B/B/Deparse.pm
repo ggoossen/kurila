@@ -4319,7 +4319,7 @@ LISP, or if you want to see how perl parses your input. If you say
 
     if ($var & 0x7f == 65) {print "Gimme an A!"}
     print ($which ? $a : $b), "\n";
-    $name = $ENV{USER} or "Bob";
+    $name = %ENV{USER} or "Bob";
 
 C<B::Deparse,-p> will print
 
@@ -4327,7 +4327,7 @@ C<B::Deparse,-p> will print
         print('Gimme an A!')
     };
     (print(($which ? $a : $b)), '???');
-    (($name = $ENV{'USER'}) or '???')
+    (($name = %ENV{'USER'}) or '???')
 
 which probably isn't what you intended (the C<'???'> is a sign that
 perl optimized away a constant value).

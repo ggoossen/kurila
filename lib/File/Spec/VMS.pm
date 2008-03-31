@@ -93,7 +93,7 @@ sub catdir {
 
     my $rslt;
     if (@dirs) {
-	my $path = (@dirs == 1 ? $dirs[0] : $self->catdir(@dirs));
+	my $path = (@dirs == 1 ? @dirs[0] : $self->catdir(@dirs));
 	my ($spath,$sdir) = ($path,$dir);
 	$spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
 	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
@@ -127,7 +127,7 @@ sub catfile {
 
     my $rslt;
     if (@files) {
-	my $path = (@files == 1 ? $files[0] : $self->catdir(@files));
+	my $path = (@files == 1 ? @files[0] : $self->catdir(@files));
 	my $spath = $path;
 	$spath =~ s/\.dir\Z(?!\n)//;
 	if ($spath =~ m/^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
@@ -179,9 +179,9 @@ Returns a string representation of the first writable directory
 from the following list or '' if none are writable:
 
     sys$scratch:
-    $ENV{TMPDIR}
+    %ENV{TMPDIR}
 
-Since perl 5.8.0, if running under taint mode, and if $ENV{TMPDIR}
+Since perl 5.8.0, if running under taint mode, and if %ENV{TMPDIR}
 is tainted, it is not used.
 
 =cut
@@ -189,7 +189,7 @@ is tainted, it is not used.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = $_[0]->_tmpdir( 'sys$scratch:', $ENV{TMPDIR} );
+    $tmpdir = @_[0]->_tmpdir( 'sys$scratch:', %ENV{TMPDIR} );
 }
 
 =item updir (override)
@@ -215,13 +215,13 @@ sub case_tolerant {
 =item path (override)
 
 Translate logical name DCL$PATH as a searchlist, rather than trying
-to C<split> string value of C<$ENV{'PATH'}>.
+to C<split> string value of C<%ENV{'PATH'}>.
 
 =cut
 
 sub path {
     my (@dirs,$dir,$i);
-    while ($dir = $ENV{'DCL$PATH;' . $i++}) { push(@dirs,$dir); }
+    while ($dir = %ENV{'DCL$PATH;' . $i++}) { push(@dirs,$dir); }
     return @dirs;
 }
 
@@ -234,7 +234,7 @@ Checks for VMS directory spec as well as Unix separators.
 sub file_name_is_absolute {
     my ($self,$file) = @_;
     # If it's a logical name, expand it.
-    $file = $ENV{$file} while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && $ENV{$file};
+    $file = %ENV{$file} while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && %ENV{$file};
     return scalar($file =~ m!^/!s             ||
 		  $file =~ m![<\[][^.\-\]>]!  ||
 		  $file =~ m/:[^<\[]/);
@@ -280,7 +280,7 @@ sub splitdir {
     $dirspec = "[$dirspec]" unless $dirspec =~ m/[\[<]/; # make legal
     $dirspec =~ s/^(\[|<)\./$1/;
     @dirs = split m/(?<!\^)\./, vmspath($dirspec);
-    $dirs[0] =~ s/^[\[<]//s;  $dirs[-1] =~ s/[\]>]\Z(?!\n)//s;
+    @dirs[0] =~ s/^[\[<]//s;  @dirs[-1] =~ s/[\]>]\Z(?!\n)//s;
     @dirs;
 }
 
@@ -343,14 +343,14 @@ sub abs2rel {
     # Now, remove all leading components that are the same
     my @pathchunks = $self->splitdir( $path_directories );
     my $pathchunks = @pathchunks;
-    unshift(@pathchunks,'000000') unless $pathchunks[0] eq '000000';
+    unshift(@pathchunks,'000000') unless @pathchunks[0] eq '000000';
     my @basechunks = $self->splitdir( $base_directories );
     my $basechunks = @basechunks;
-    unshift(@basechunks,'000000') unless $basechunks[0] eq '000000';
+    unshift(@basechunks,'000000') unless @basechunks[0] eq '000000';
 
     while ( @pathchunks && 
             @basechunks && 
-            lc( $pathchunks[0] ) eq lc( $basechunks[0] ) 
+            lc( @pathchunks[0] ) eq lc( @basechunks[0] ) 
           ) {
         shift @pathchunks ;
         shift @basechunks ;

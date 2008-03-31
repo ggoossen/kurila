@@ -1099,7 +1099,7 @@ INSTALLDIRS according to the following table:
   INST_MAN3DIR   INSTALLMAN3DIR  INSTALLSITEMAN3DIR  INSTALLVENDORMAN3DIR
 
 The INSTALL... macros in turn default to their %Config
-($Config{installprivlib}, $Config{installarchlib}, etc.) counterparts.
+(%Config{installprivlib}, %Config{installarchlib}, etc.) counterparts.
 
 You can check the values of these variables on your system with
 
@@ -1135,7 +1135,7 @@ Like PREFIX, it sets several INSTALL* attributes at once.  Unlike
 PREFIX it is easy to predict where the module will end up.  The
 installation pattern looks like this:
 
-    INSTALLARCHLIB     INSTALL_BASE/lib/perl5/$Config{archname}
+    INSTALLARCHLIB     INSTALL_BASE/lib/perl5/%Config{archname}
     INSTALLPRIVLIB     INSTALL_BASE/lib/perl5
     INSTALLBIN         INSTALL_BASE/bin
     INSTALLSCRIPT      INSTALL_BASE/bin
@@ -1188,9 +1188,9 @@ INSTALLSITELIB, INSTALLSITEARCH (and they are not affected by PREFIX);
 
 =item *
 
-without LIB, setting PREFIX replaces the initial C<$Config{prefix}>
+without LIB, setting PREFIX replaces the initial C<%Config{prefix}>
 part of those INSTALL* arguments, even if the latter are explicitly
-set (but are set to still start with C<$Config{prefix}>).
+set (but are set to still start with C<%Config{prefix}>).
 
 =back
 
@@ -1574,7 +1574,7 @@ perl, site or vendor.  Defaults to site.
 =item INSTALLMAN3DIR
 
 These directories get the man pages at 'make install' time if
-INSTALLDIRS=perl.  Defaults to $Config{installman*dir}.
+INSTALLDIRS=perl.  Defaults to %Config{installman*dir}.
 
 If set to 'none', no man pages will be installed.
 
@@ -1583,7 +1583,7 @@ If set to 'none', no man pages will be installed.
 Used by 'make install', which copies files from INST_LIB to this
 directory if INSTALLDIRS is set to perl.
 
-Defaults to $Config{installprivlib}.
+Defaults to %Config{installprivlib}.
 
 =item INSTALLSCRIPT
 
@@ -1682,7 +1682,7 @@ INSTALLSCRIPT.
 
 Program to be used to link libraries for dynamic loading.
 
-Defaults to $Config{ld}.
+Defaults to %Config{ld}.
 
 =item LDDLFLAGS
 
@@ -1690,7 +1690,7 @@ Any special flags that might need to be passed to ld to create a
 shared library suitable for dynamic loading.  It is up to the makefile
 to use it.  (See L<Config/lddlflags>)
 
-Defaults to $Config{lddlflags}.
+Defaults to %Config{lddlflags}.
 
 =item LDFROM
 
@@ -1759,7 +1759,7 @@ takes precedent.
 Currently the only significant values are 'dmake' and 'nmake' for Windows
 users.
 
-Defaults to $Config{make}.
+Defaults to %Config{make}.
 
 =item MAKEAPERL
 
@@ -1845,7 +1845,7 @@ List of object files, defaults to '$(BASEEXT)$(OBJ_EXT)', but can be a long
 string containing all object files, e.g. "tkpBind.o
 tkpButton.o tkpCanvas.o"
 
-(Where BASEEXT is the last component of NAME, and OBJ_EXT is $Config{obj_ext}.)
+(Where BASEEXT is the last component of NAME, and OBJ_EXT is %Config{obj_ext}.)
 
 =item OPTIMIZE
 
@@ -1914,9 +1914,9 @@ of memory allocations, etc.
 
 Directory under which core modules are to be installed.
 
-Defaults to $Config{installprefixexp} falling back to
-$Config{installprefix}, $Config{prefixexp} or $Config{prefix} should
-$Config{installprefixexp} not exist.
+Defaults to %Config{installprefixexp} falling back to
+%Config{installprefix}, %Config{prefixexp} or %Config{prefix} should
+%Config{installprefixexp} not exist.
 
 Overridden by PREFIX.
 
@@ -2107,9 +2107,9 @@ RedHatism for C<PREREQ_PRINT>.  The output format is different, though:
 
 Like PERLPREFIX, but only for the site install locations.
 
-Defaults to $Config{siteprefixexp}.  Perls prior to 5.6.0 didn't have
+Defaults to %Config{siteprefixexp}.  Perls prior to 5.6.0 didn't have
 an explicit siteprefix in the Config.  In those cases
-$Config{installprefix} will be used.
+%Config{installprefix} will be used.
 
 Overridable by PREFIX
 
@@ -2144,7 +2144,7 @@ typemap has lowest precedence.
 
 Like PERLPREFIX, but only for the vendor install locations.
 
-Defaults to $Config{vendorprefixexp}.
+Defaults to %Config{vendorprefixexp}.
 
 Overridable by PREFIX
 

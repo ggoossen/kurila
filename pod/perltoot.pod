@@ -1300,9 +1300,9 @@ different:
 	return $closure;
     }
 
-    sub name   { &{ $_[0] }("NAME",  @_[ 1 .. $#_ ] ) }
-    sub age    { &{ $_[0] }("AGE",   @_[ 1 .. $#_ ] ) }
-    sub peers  { &{ $_[0] }("PEERS", @_[ 1 .. $#_ ] ) }
+    sub name   { &{ @_[0] }("NAME",  @_[ 1 .. $#_ ] ) }
+    sub age    { &{ @_[0] }("AGE",   @_[ 1 .. $#_ ] ) }
+    sub peers  { &{ @_[0] }("PEERS", @_[ 1 .. $#_ ] ) }
 
     1;
 
@@ -1322,7 +1322,7 @@ zeroth argument is the invoking object--just as it is with all method
 calls.  But in this case, it's our code reference (something like a
 function pointer in C++, but with deep binding of lexical variables).
 There's not a lot to be done with a code reference beyond calling it, so
-that's just what we do when we say C<&{$_[0]}>.  This is just a regular
+that's just what we do when we say C<&{@_[0]}>.  This is just a regular
 function call, not a method call.  The initial argument is the string
 "NAME", and any remaining arguments are whatever had been passed to the
 method itself.
@@ -1632,11 +1632,11 @@ Here's the whole implementation:
     sub populate (@) {
 	return unless @_;
 	my $hob = new();  # Class::Struct made this!
-	$h_name     =    $hob->[0]              = $_[0];
-	@h_aliases  = @{ $hob->[1] } = split ' ', $_[1];
-	$h_addrtype =    $hob->[2]              = $_[2];
-	$h_length   =    $hob->[3]              = $_[3];
-	$h_addr     =                             $_[4];
+	$h_name     =    $hob->[0]              = @_[0];
+	@h_aliases  = @{ $hob->[1] } = split ' ', @_[1];
+	$h_addrtype =    $hob->[2]              = @_[2];
+	$h_length   =    $hob->[3]              = @_[3];
+	$h_addr     =                             @_[4];
 	@h_addr_list = @{ $hob->[4] } =         @_[ (4 .. $#_) ];
 	return $hob;
     }
@@ -1652,7 +1652,7 @@ Here's the whole implementation:
     }
 
     sub gethost($) {
-	if ($_[0] =~ /^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
+	if (@_[0] =~ /^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
 	   require Socket;
 	   &gethostbyaddr(Socket::inet_aton(shift));
 	} else {

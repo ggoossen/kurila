@@ -203,7 +203,7 @@ sub default_loc {
 	return sub {
 	    my $str = shift;
             $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
-                     {$1%$2}g;
+                     {$1\%$2}g;
             $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
                      {{"$1\%$2(" . _escape($3) . ')'}}g;
 	    _default_gettext($str, @_);

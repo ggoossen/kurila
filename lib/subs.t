@@ -111,7 +111,7 @@ BEGIN not safe after errors--compilation aborted at - line 4.
 # AOK
 use subs qw( Fred) ;
 Fred 1,2 ;
-sub Fred { print $_[0] + $_[1], "\n" }
+sub Fred { print @_[0] + @_[1], "\n" }
 EXPECT
 3
 ########
@@ -119,14 +119,14 @@ EXPECT
 # override a built-in function
 use subs qw( open ) ;
 open 1,2 ;
-sub open { print $_[0] + $_[1], "\n" }
+sub open { print @_[0] + @_[1], "\n" }
 EXPECT
 3
 ########
 
 # override a built-in function, call after definition
 use subs qw( open ) ;
-sub open { print $_[0] + $_[1], "\n" }
+sub open { print @_[0] + @_[1], "\n" }
 open 1,2 ;
 EXPECT
 3
@@ -135,14 +135,14 @@ EXPECT
 # override a built-in function, call with ()
 use subs qw( open ) ;
 open (1,2) ;
-sub open { print $_[0] + $_[1], "\n" }
+sub open { print @_[0] + @_[1], "\n" }
 EXPECT
 3
 ########
 
 # override a built-in function, call with () after definition
 use subs qw( open ) ;
-sub open { print $_[0] + $_[1], "\n" }
+sub open { print @_[0] + @_[1], "\n" }
 open (1,2) ;
 EXPECT
 3
@@ -154,7 +154,7 @@ Fred 1,2 ;
 --FILE--
 use subs qw( Fred ) ;
 require "./abc" ;
-sub Fred { print $_[0] + $_[1], "\n" }
+sub Fred { print @_[0] + @_[1], "\n" }
 EXPECT
 3
 ########
@@ -164,6 +164,6 @@ EXPECT
     use subs qw( Fred ) ;
 }
 Fred 1, 2;
-sub Fred { print $_[0] + $_[1], "\n" }
+sub Fred { print @_[0] + @_[1], "\n" }
 EXPECT
 3

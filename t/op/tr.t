@@ -313,17 +313,17 @@ is($@, '',  '   no error');
 
 
 my @foo = ();
-eval '$foo[-1] =~ tr/N/N/';
+eval '@foo[-1] =~ tr/N/N/';
 is( $@, '',         'implicit count outside array bounds, index negative' );
 is( scalar @foo, 0, "    doesn't extend the array");
 
-eval '$foo[1] =~ tr/N/N/';
+eval '@foo[1] =~ tr/N/N/';
 is( $@, '',         'implicit count outside array bounds, index positive' );
 is( scalar @foo, 0, "    doesn't extend the array");
 
 
 my %foo = ();
-eval '$foo{bar} =~ tr/N/N/';
+eval '%foo{bar} =~ tr/N/N/';
 is( $@, '',         'implicit count outside hash bounds' );
 is( scalar keys %foo, 0,   "    doesn't extend the hash");
 

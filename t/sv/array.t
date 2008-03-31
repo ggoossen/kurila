@@ -264,7 +264,7 @@ is ($got, '');
 
 {
     my @a;
-    eval_dies_like( '$a[-1] = 0', 
+    eval_dies_like( '@a[-1] = 0', 
                     qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0");
 }
 

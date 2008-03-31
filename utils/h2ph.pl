@@ -696,14 +696,14 @@ sub queue_includes_from
 }
 
 
-# Determine include directories; $Config{usrinc} should be enough for (all
+# Determine include directories; %Config{usrinc} should be enough for (all
 # non-GCC?) C compilers, but gcc uses an additional include directory.
 sub inc_dirs
 {
-    my $from_gcc    = `LC_ALL=C $Config{cc} -v 2>&1`;
+    my $from_gcc    = `LC_ALL=C %Config{cc} -v 2>&1`;
     if( !( $from_gcc =~ s:^Reading specs from (.*?)/specs\b.*:$1/include:s ) )
     { # gcc-4+ :
-       $from_gcc   = `LC_ALL=C $Config{cc} -print-search-dirs 2>&1`;
+       $from_gcc   = `LC_ALL=C %Config{cc} -print-search-dirs 2>&1`;
        if ( !($from_gcc =~ s/^install:\s*([^\s]+[^\s\/])([\s\/]*).*$/$1\/include/s) )
        {
            $from_gcc = '';
@@ -831,7 +831,7 @@ If run with no arguments, filters standard input to standard output.
 =item -d destination_dir
 
 Put the resulting B<.ph> files beneath B<destination_dir>, instead of
-beneath the default Perl library location (C<$Config{'installsitearch'}>).
+beneath the default Perl library location (C<%Config{'installsitearch'}>).
 
 =item -r
 

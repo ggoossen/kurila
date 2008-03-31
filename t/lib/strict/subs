@@ -385,13 +385,13 @@ Compilation failed in regexp at - line 3.
 ########
 #  [perl #27628] strict 'subs' didn't warn on bareword array index
 use strict 'subs';
-my @a; my $x=$a[FOO];
+my @a; my $x=@a[FOO];
 EXPECT
 Bareword "FOO" not allowed while "strict subs" in use
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 use strict 'subs';
-my @a;my $x=$a[FOO];
+my @a;my $x=@a[FOO];
 EXPECT
 Bareword "FOO" not allowed while "strict subs" in use
 Execution of - aborted due to compilation errors. at - line 2.

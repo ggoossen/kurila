@@ -13,7 +13,7 @@ our (%Config, $where);
 eval { require Config; Config->import; };
 my $reason;
 if (%Config{'i_grp'} ne 'define') {
-	$reason = '$Config{i_grp} not defined';
+	$reason = '%Config{i_grp} not defined';
 }
 elsif (not -f "/etc/group" ) { # Play safe.
 	$reason = 'no /etc/group file';

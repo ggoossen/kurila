@@ -195,7 +195,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   ok (values %utf8c == 1, 'values on utf8 comma hash');
   # defeat any tokeniser or optimiser cunning
   is (%utf8c{"" . $key}, $value, 'is key present? (unoptimised)');
-  my $tempval = sprintf '$utf8c{"\x{%x}"}', $chr;
+  my $tempval = sprintf '%%utf8c{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
@@ -214,7 +214,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   ok (keys %temp == 1, 'keys on copy of utf8 comma hash');
   ok (values %temp == 1, 'values on copy of utf8 comma hash');
   is (%temp{"" . $key}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '$temp{"\x{%x}"}', $chr;
+  $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
@@ -237,7 +237,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   ok (values %utf8a == 1, 'values on utf8 arrow hash');
   # defeat any tokeniser or optimiser cunning
   is (%utf8a{$key . ""}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '$utf8a{"\x{%x}"}', $chr;
+  $tempval = sprintf '%%utf8a{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
@@ -256,7 +256,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   ok (keys %temp == 1, 'keys on copy of utf8 arrow hash');
   ok (values %temp == 1, 'values on copy of utf8 arrow hash');
   is (%temp{'' . $key}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '$temp{"\x{%x}"}', $chr;
+  $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";

@@ -401,7 +401,7 @@ sub bar {"bar"}
     my $ok = 0;
     my %foo = ("bar", 0);
     given(0) {
-	when(exists $foo{bar}) {
+	when(exists %foo{bar}) {
 	    $ok = 1;
 	}
     }

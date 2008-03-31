@@ -138,7 +138,7 @@ Execution of - aborted due to compilation errors. at - line 6.
 # Without the feature, no 'Unambiguous use of' warning:
 use warnings;
 @break = ($break = "break");
-print ${break}, ${break[0]};
+print ${break}, @{break[0]};
 EXPECT
 breakbreak
 ########
@@ -146,9 +146,9 @@ breakbreak
 use warnings;
 use feature 'switch';
 @break = ($break = "break");
-print ${break}, ${break[0]};
+print ${break}, @{break[0]};
 EXPECT
 Ambiguous use of ${break} resolved to $break at - line 5.
-Ambiguous use of ${break[...]} resolved to $break[...] at - line 5.
+Ambiguous use of @{break[...]} resolved to @break[...] at - line 5.
 breakbreak
 ########

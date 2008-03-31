@@ -17,18 +17,18 @@
 # thread when it starts
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
-    unless ($Config{'useithreads'} and eval { require threads; 1 }) {
+    unless (%Config{'useithreads'} and eval { require threads; 1 }) {
         print "1..0 # Skip: no threads\n";
         exit 0;
     }

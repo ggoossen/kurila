@@ -259,14 +259,14 @@ $@="\145\143\150\157\040\042\112\165\163\164\040\141\156\157\164".
 SKIP: Unix specific
 
 #######  sprintf fun 1.
-sub f{sprintf$_[0],$_[1],$_[2]}print f('%c%s',74,f('%c%s',117,f('%c%s',115,f(
+sub f{sprintf@_[0],@_[1],@_[2]}print f('%c%s',74,f('%c%s',117,f('%c%s',115,f(
 '%c%s',116,f('%c%s',32,f('%c%s',97,f('%c%s',0x6e,f('%c%s',111,f('%c%s',116,f(
 '%c%s',104,f('%c%s',0x65,f('%c%s',114,f('%c%s',32,f('%c%s',80,f('%c%s',101,f(
 '%c%s',114,f('%c%s',0x6c,f('%c%s',32,f('%c%s',0x48,f('%c%s',97,f('%c%s',99,f(
 '%c%s',107,f('%c%s',101,f('%c%s',114,f('%c%s',10,)))))))))))))))))))))))))
 
 #######  sprintf fun 2.
-sub f{sprintf'%c%s',$_[0],$_[1]}print f(74,f(117,f(115,f(116,f(32,f(97,
+sub f{sprintf'%c%s',@_[0],@_[1]}print f(74,f(117,f(115,f(116,f(32,f(97,
 f(110,f(111,f(116,f(104,f(0x65,f(114,f(32,f(80,f(101,f(114,f(0x6c,f(32,
 f(0x48,f(97,f(99,f(107,f(101,f(114,f(10,q ff)))))))))))))))))))))))))
 
@@ -327,7 +327,7 @@ m//=>"IGrACVGQ\x02GJCWVhP\x02PL\x02jNMP"));print+(map{$_^q^"^}@[),"\n"
 SKIP: Solaris specific.
 
 #######  print and __PACKAGE__
-package Just_another_Perl_Hacker; sub print {($_=$_[0])=~ s/_/ /g;
+package Just_another_Perl_Hacker; sub print {($_=@_[0])=~ s/_/ /g;
                                       print } sub __PACKAGE__ { &
                                       print (     __PACKAGE__)} &
                                                   __PACKAGE__

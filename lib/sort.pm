@@ -32,8 +32,7 @@ sub import {
 	} elsif ($_ eq 'defaults') {
 	    %^H{sort} =   0;
 	} else {
-	    require Carp;
-	    Carp::croak("sort: unknown subpragma '$_'");
+	    die("sort: unknown subpragma '$_'");
 	}
     }
 }
@@ -41,8 +40,7 @@ sub import {
 sub unimport {
     shift;
     if (@_ == 0) {
-	require Carp;
-	Carp::croak("sort pragma requires arguments");
+	die("sort pragma requires arguments");
     }
     local $_;
     no warnings 'uninitialized';	# bitops would warn
@@ -54,8 +52,7 @@ sub unimport {
 	} elsif ($_ eq 'stable') {
 	    %^H{sort} ^&^= ^~^$sort::stable_bit;
 	} else {
-	    require Carp;
-	    Carp::croak("sort: unknown subpragma '$_'");
+	    die("sort: unknown subpragma '$_'");
 	}
     }
 }

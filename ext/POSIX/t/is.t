@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($^O ne 'VMS' and $Config{'extensions'} !~ m/\bPOSIX\b/) {
+    if ($^O ne 'VMS' and %Config{'extensions'} !~ m/\bPOSIX\b/) {
 	print "1..0\n";
 	exit 0;
     }
@@ -15,7 +15,7 @@ use strict ;
 
 # E.g. \t might or might not be isprint() depending on the locale,
 # so let's reset to the default.
-setlocale(LC_ALL, 'C') if $Config{d_setlocale};
+setlocale(LC_ALL, 'C') if %Config{d_setlocale};
 
 $| = 1;
 
@@ -64,10 +64,10 @@ my %classes =
 # listed above.
 my %functions;
 foreach my $s (keys %classes) {
-    $classes{$s} = { map {
-	$functions{"is$_"}++;	# Keep track of all the 'is<xxx>' functions
+    %classes{$s} = { map {
+	%functions{"is$_"}++;	# Keep track of all the 'is<xxx>' functions
 	"is$_" => 1;		# Our return value: is<xxx>($s) should pass.
-    } @{$classes{$s}} };
+    } @{%classes{$s}} };
 }
 
 # Expected number of tests is one each for every combination of a
@@ -84,7 +84,7 @@ plan(tests => keys(%classes) * keys(%functions));
 #
 foreach my $s (sort keys %classes) {
     foreach my $f (sort keys %functions) {
-	my $expected = exists $classes{$s}->{$f};
+	my $expected = exists %classes{$s}->{$f};
 	my $actual   = eval "POSIX::$f( \$s )";
 
 	ok( $actual == $expected, "$f('$s') == $actual");

@@ -57,7 +57,7 @@ sub try {
 for (1..5) { try() }
 pass();
 
-# bug #21542 local $_[0] causes reify problems and coredumps
+# bug #21542 local @_[0] causes reify problems and coredumps
 
 sub local1 { local @_[0] }
 my $foo = 'foo'; local1($foo); local1($foo);

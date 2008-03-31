@@ -1417,15 +1417,15 @@ foreach my $file (0, 1)
 
 #    sub deepCopy
 #    {
-#        if (! ref $_[0] || ref $_[0] eq 'SCALAR')
+#        if (! ref @_[0] || ref @_[0] eq 'SCALAR')
 #        {
-#            return $_[0] ;
+#            return @_[0] ;
 #        }
 #
-#        if (ref $_[0] eq 'ARRAY')
+#        if (ref @_[0] eq 'ARRAY')
 #        {
 #            my @a ;
-#            for my $x ( @{ $_[0] })
+#            for my $x ( @{ @_[0] })
 #            {
 #                push @a, deepCopy($x);
 #            }
@@ -1433,41 +1433,41 @@ foreach my $file (0, 1)
 #            return \@a ;
 #        }
 #
-#        croak "bad! $_[0]";
+#        croak "bad! @_[0]";
 #
 #    }
 #
 #    sub deepSubst
 #    {
 #        #my $data = shift ;
-#        my $from = $_[1] ;
-#        my $to   = $_[2] ;
+#        my $from = @_[1] ;
+#        my $to   = @_[2] ;
 #
-#        if (! ref $_[0])
+#        if (! ref @_[0])
 #        {
-#            $_[0] = $to 
-#                if $_[0] eq $from ;
+#            @_[0] = $to 
+#                if @_[0] eq $from ;
 #            return ;    
 #
 #        }
 #
-#        if (ref $_[0] eq 'SCALAR')
+#        if (ref @_[0] eq 'SCALAR')
 #        {
-#            $_[0] = \$to 
-#                if defined ${ $_[0] } && ${ $_[0] } eq $from ;
+#            @_[0] = \$to 
+#                if defined ${ @_[0] } && ${ @_[0] } eq $from ;
 #            return ;    
 #
 #        }
 #
-#        if (ref $_[0] eq 'ARRAY')
+#        if (ref @_[0] eq 'ARRAY')
 #        {
-#            for my $x ( @{ $_[0] })
+#            for my $x ( @{ @_[0] })
 #            {
 #                deepSubst($x, $from, $to);
 #            }
 #            return ;
 #        }
-#        #croak "bad! $_[0]";
+#        #croak "bad! @_[0]";
 #    }
 
 #    {

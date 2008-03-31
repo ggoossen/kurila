@@ -4,7 +4,7 @@ BEGIN {
     @INC = '../lib';
     push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bXS\/APItest\b/) {
+    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
         print "1..0 # Skip: XS::APItest was not built\n";
         exit 0;
     }
@@ -97,13 +97,13 @@ is($XS::APItest::END_called_PP, undef, "END not yet called");
 
 {
     my @trap;
-    local ${^WARN_HOOK} = sub { push @trap, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @trap, @_[0]->{description} };
     require XS::APItest;
 
     @trap = sort @trap;
     is(scalar @trap, 2, "There were 2 warnings");
-    is($trap[0], "Too late to run CHECK block");
-    is($trap[1], "Too late to run INIT block");
+    is(@trap[0], "Too late to run CHECK block");
+    is(@trap[1], "Too late to run INIT block");
 }
 
 print "# Second body\n";

@@ -20,7 +20,7 @@ our $VERSION = "0.08";
 #use strict;
 
 # enable debug/trace messages from DynaLoader perl code
-# $dl_debug = $ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
+# $dl_debug = %ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
 
 EOT
 
@@ -41,7 +41,7 @@ sub load {
 
     die q{XSLoader::load('Your::Module', $Your::Module::VERSION)} unless @_;
 
-    my($module) = $_[0];
+    my($module) = @_[0];
 
     # work with static linking too
     my $b = "$module\::bootstrap";
@@ -50,7 +50,7 @@ sub load {
     goto retry unless $module and defined &dl_load_file;
 
     my @modparts = split(m/::/,$module);
-    my $modfname = $modparts[-1];
+    my $modfname = @modparts[-1];
 
 EOT
 
@@ -143,7 +143,7 @@ print OUT <<'EOT';
 sub bootstrap_inherit {
     package DynaLoader;
 
-    my $module = $_[0];
+    my $module = @_[0];
     local *DynaLoader::isa = *{Symbol::fetch_glob("$module\::ISA")};
     local @DynaLoader::isa = (@DynaLoader::isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?

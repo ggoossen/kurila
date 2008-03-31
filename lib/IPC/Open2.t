@@ -5,15 +5,15 @@ BEGIN {
     @INC = '../lib';
     our %Config;
     require Config; Config->import;
-    if (!$Config{'d_fork'}
+    if (!%Config{'d_fork'}
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
-       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || $Config{'cc'} =~ m/^bcc/i))
+       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || %Config{'cc'} =~ m/^bcc/i))
     {
 	print "1..0\n";
 	exit 0;
     }
     # make warnings fatal
-    $SIG{__WARN__} = sub { die @_ };
+    ${^WARN_HOOK} = sub { die @_ };
 }
 
 use strict;
@@ -35,10 +35,10 @@ sub ok {
 
 sub cmd_line {
 	if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-		return qq/"$_[0]"/;
+		return qq/"@_[0]"/;
 	}
 	else {
-		return $_[0];
+		return @_[0];
 	}
 }
 

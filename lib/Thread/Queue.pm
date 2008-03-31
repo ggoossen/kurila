@@ -5,7 +5,7 @@ use warnings;
 
 our $VERSION = '2.06';
 
-use threads::shared 0.96;
+use threads::shared v0.96;
 use Scalar::Util v1.10 qw(looks_like_number);
 
 # Predeclarations for internal functions

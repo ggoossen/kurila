@@ -11,8 +11,8 @@ use vmsish qw(hushed);
 
 $| = 1;				# flush stdout
 
-$ENV{LC_ALL}   = 'C';		# Forge English error messages.
-$ENV{LANGUAGE} = 'C';		# Ditto in GNU.
+%ENV{LC_ALL}   = 'C';		# Forge English error messages.
+%ENV{LANGUAGE} = 'C';		# Ditto in GNU.
 
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_Win32 = $^O eq 'MSWin32';
@@ -97,7 +97,7 @@ unless( ok($rc == 255 << 8 or $rc == -1 or $rc == 256 or $rc == 512) ) {
 unless ( ok( $! == 2  or  $! =~ m/\bno\b.*\bfile/i or  
              $! == 13 or  $! =~ m/permission denied/i or
              $! == 22 or  $! =~ m/invalid argument/i  ) ) {
-    printf "# \$! eq %d, '%s'\n", $!, $!;
+    printf "# \$! eq \%d, '\%s'\n", $!, $!;
 }
 
 

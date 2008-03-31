@@ -133,7 +133,7 @@ sub test_dbz {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
-	(\$bad) = (\$@->\{description\} =~ m/(.+)/);
+	(\$bad) = (\$\@->\{description\} =~ m/(.+)/);
 	print "# $test op = $op divbyzero? \$bad... \$\@->\{description\}\n";
 	print 'not ' unless (\$\@->\{description\} =~ m/Division by zero/);
 EOT
@@ -393,7 +393,7 @@ test_atan2();
 test_decplx();
 
 print "1..$test\n";
-#print @script, "\n";
+print @script, "\n";
 eval join '', @script;
 die if $@;
 

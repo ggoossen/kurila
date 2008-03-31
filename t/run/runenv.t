@@ -8,7 +8,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    unless ($Config{'d_fork'}) {
+    unless (%Config{'d_fork'}) {
         print "1..0 # Skip: no fork\n";
 	    exit 0;
     }
@@ -20,12 +20,12 @@ plan tests => 17;
 
 my $STDOUT = './results-0';
 my $STDERR = './results-1';
-my $PERL = $ENV{PERL} || './perl';
+my $PERL = %ENV{PERL} || './perl';
 my $FAILURE_CODE = 119;
 
-delete $ENV{PERLLIB};
-delete $ENV{PERL5LIB};
-delete $ENV{PERL5OPT};
+delete %ENV{PERLLIB};
+delete %ENV{PERL5LIB};
+delete %ENV{PERL5OPT};
 
 # Run perl with specified environment and arguments returns a list.
 # First element is true if Perl's stdout and stderr match the
@@ -40,9 +40,9 @@ sub runperl {
   $stdout = '' unless defined $stdout;
   $stderr = '' unless defined $stderr;
   local %ENV = %ENV;
-  delete $ENV{PERLLIB};
-  delete $ENV{PERL5LIB};
-  delete $ENV{PERL5OPT};
+  delete %ENV{PERLLIB};
+  delete %ENV{PERL5LIB};
+  delete %ENV{PERL5OPT};
   my $pid = fork;
   return (0, "Couldn't fork: $!") unless defined $pid;   # failure
   if ($pid) {                   # parent
@@ -50,9 +50,9 @@ sub runperl {
     wait;
     return (0, "Failure in child.\n") if ($?>>8) == $FAILURE_CODE;
 
-    open F, "<", "$STDOUT" or return (0, "Couldn't read $STDOUT file");
+    open F, "<", $STDOUT or return (0, "Couldn't read $STDOUT file");
     { local $/; $actual_stdout = ~< *F }
-    open F, "<", "$STDERR" or return (0, "Couldn't read $STDERR file");
+    open F, "<", $STDERR or return (0, "Couldn't read $STDERR file");
     { local $/; $actual_stderr = ~< *F }
 
     if ($actual_stdout ne $stdout) {
@@ -64,10 +64,10 @@ sub runperl {
     }
   } else {                      # child
     for my $k (keys %$env) {
-      $ENV{$k} = $env->{$k};
+      %ENV{$k} = $env->{$k};
     }
-    open STDOUT, ">", "$STDOUT" or exit $FAILURE_CODE;
-    open STDERR, ">", "$STDERR" or it_didnt_work();
+    open STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
+    open STDERR, ">", $STDERR or it_didnt_work();
     { exec $PERL, @$args }
     it_didnt_work();
   }
@@ -142,12 +142,12 @@ try({PERL5OPT => '-MExporter -MExporter'}, ['-e0'],
     "");
 
 try({PERL5OPT => '-Mstrict -Mwarnings'}, 
-    ['-e', 'print "ok" if $INC{"strict.pm"} and $INC{"warnings.pm"}'],
+    ['-e', 'print "ok" if %INC{"strict.pm"} and %INC{"warnings.pm"}'],
     "ok",
     "");
 
 try({PERL5OPT => '-w -w'},
-    ['-e', 'print $ENV{PERL5OPT}'],
+    ['-e', 'print %ENV{PERL5OPT}'],
     '-w -w',
     '');
 
@@ -156,22 +156,22 @@ try({PERL5OPT => '-t'},
     '-1',
     '');
 
-try({PERLLIB => "foobar$Config{path_sep}42"},
+try({PERLLIB => "foobar%Config{path_sep}42"},
     ['-e', 'print grep { $_ eq "foobar" } @INC'],
     'foobar',
     '');
 
-try({PERLLIB => "foobar$Config{path_sep}42"},
+try({PERLLIB => "foobar%Config{path_sep}42"},
     ['-e', 'print grep { $_ eq "42" } @INC'],
     '42',
     '');
 
-try({PERL5LIB => "foobar$Config{path_sep}42"},
+try({PERL5LIB => "foobar%Config{path_sep}42"},
     ['-e', 'print grep { $_ eq "foobar" } @INC'],
     'foobar',
     '');
 
-try({PERL5LIB => "foobar$Config{path_sep}42"},
+try({PERL5LIB => "foobar%Config{path_sep}42"},
     ['-e', 'print grep { $_ eq "42" } @INC'],
     '42',
     '');

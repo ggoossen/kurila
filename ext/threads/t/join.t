@@ -57,7 +57,7 @@ sub ok {
 }
 
 sub skip {
-    ok(1, '# skip: ' . $_[0]);
+    ok(1, '# skip: ' . @_[0]);
 }
 
 
@@ -93,13 +93,13 @@ sub skip {
 }
 {
     my $test = "hi";
-    my $retval = threads->create(sub { return $_[0]}, \$test)->join();
+    my $retval = threads->create(sub { return @_[0]}, \$test)->join();
     ok($$retval eq 'hi','');
 }
 {
     my $test = "hi";
     share($test);
-    my $retval = threads->create(sub { return $_[0]}, \$test)->join();
+    my $retval = threads->create(sub { return @_[0]}, \$test)->join();
     ok($$retval eq 'hi','');
     $test = "foo";
     ok($$retval eq 'foo','');
@@ -189,7 +189,7 @@ if ($^O eq 'linux') {
         cond_wait($go) until $go;
     }); 
 
-    my $joiner = threads->create(sub { $_[0]->join }, $t);
+    my $joiner = threads->create(sub { @_[0]->join }, $t);
 
     threads->yield();
     sleep 1;
@@ -217,7 +217,7 @@ if ($^O eq 'linux') {
     my $t = threads->create( sub {
         lock($go);  cond_wait($go) until $go;
     });
-    my $joiner = threads->create(sub { $_[0]->join; }, $t);
+    my $joiner = threads->create(sub { @_[0]->join; }, $t);
 
     threads->yield();
     sleep 1;

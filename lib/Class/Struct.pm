@@ -140,16 +140,16 @@ sub struct {
             %refs{$name}++;
             $type = $1;
         }
-        my $init = "defined(\$init\{'$name'\}) ? \$init\{'$name'\} :";
+        my $init = "defined(\%init\{'$name'\}) ? \%init\{'$name'\} :";
         if( $type eq '@' ){
             $out .= "    die 'Initializer for $name must be array reference'\n"; 
-            $out .= "        if defined(\$init\{'$name'\}) && ref(\$init\{'$name'\}) ne 'ARRAY';\n";
+            $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n";
             $out .= "    \$r->$elem = $init [];$cmt\n"; 
             %arrays{$name}++;
         }
         elsif( $type eq '%' ){
             $out .= "    die 'Initializer for $name must be hash reference'\n";
-            $out .= "        if defined(\$init\{'$name'\}) && ref(\$init\{'$name'\}) ne 'HASH';\n";
+            $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n";
             $out .= "    \$r->$elem = $init \{\};$cmt\n";
             %hashes{$name}++;
         }
@@ -157,11 +157,11 @@ sub struct {
             $out .= "    \$r->$elem = $init undef;$cmt\n";
         }
         elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
-            $out .= "    if (defined(\$init\{'$name'\})) \{\n";
-           $out .= "       if (ref \$init\{'$name'\} eq 'HASH')\n";
-            $out .= "            \{ \$r->$elem = $type->new(\%\{\$init\{'$name'\}\}) \} $cmt\n";
-           $out .= "       elsif (UNIVERSAL::isa(\$init\{'$name'\}, '$type'))\n";
-            $out .= "            \{ \$r->$elem = \$init\{'$name'\} \} $cmt\n";
+            $out .= "    if (defined(\%init\{'$name'\})) \{\n";
+           $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n";
+            $out .= "            \{ \$r->$elem = $type->new(\%\{\%init\{'$name'\}\}) \} $cmt\n";
+           $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n";
+            $out .= "            \{ \$r->$elem = \%init\{'$name'\} \} $cmt\n";
             $out .= "       else \{ die 'Initializer for $name must be hash or $type reference' \}\n";
             $out .= "    \}\n";
             %classes{$name} = $type;
@@ -210,7 +210,7 @@ sub struct {
                 $sel = "->\{\$i\}";
             }
             elsif( defined %classes{$name} ){
-                $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\$_[0], '%classes{$name}');\n";
+                $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\@_[0], '%classes{$name}');\n";
             }
             $out .= "    die 'Too many args to $name' if \@_ +> 1;\n";
             $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";

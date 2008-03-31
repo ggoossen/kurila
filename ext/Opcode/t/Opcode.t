@@ -6,7 +6,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
+    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
     }

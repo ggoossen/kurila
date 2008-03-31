@@ -87,11 +87,11 @@ print "# which now works inside evals\n";
     is(hint_fetch('dooot'), 6 * 7);
     eval "is(hint_fetch('dooot'), 6 * 7); 1" or die $@;
     BEGIN {
-	$^H{dooot} = 54;
+	%^H{dooot} = 54;
     }
     is(hint_fetch('dooot'), 54);
     eval "is(hint_fetch('dooot'), 54); 1" or die $@;
-    eval 'BEGIN { $^H{dooot} = -1; }; 1' or die $@;
+    eval 'BEGIN { %^H{dooot} = -1; }; 1' or die $@;
     is(hint_fetch('dooot'), 54);
     eval "is(hint_fetch('dooot'), 54); 1" or die $@;
 EOE

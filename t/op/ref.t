@@ -287,7 +287,7 @@ $test = curr_test();
 }
 curr_test($test + 2);
 
-# test if $_[0] is properly protected in DESTROY()
+# test if @_[0] is properly protected in DESTROY()
 
 {
     my $test = curr_test();

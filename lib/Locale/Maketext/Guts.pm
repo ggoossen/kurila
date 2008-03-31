@@ -77,7 +77,7 @@ sub _compile {
               push @code, q{ '} . @c[-1] . "',\n";
               @c[-1] = ''; # reuse this slot
             } else {
-              push @code, ' $c[' . (@c-1) . "],\n";
+              push @code, ' @c[' . (@c-1) . "],\n";
               push @c, ''; # new chunk
             }
           }
@@ -142,7 +142,7 @@ sub _compile {
               #  the right package, and that seems just not worth the bother,
               #  unless someone convinces me otherwise.
             
-            push @code, ' $_[0]->' . $m . '(';
+            push @code, ' @_[0]->' . $m . '(';
           } else {
             # TODO: implement something?  or just too icky to consider?
             $target->_die_pointing(
@@ -157,12 +157,12 @@ sub _compile {
           
           foreach my $p (@params) {
             if($p eq '_*') {
-              # Meaning: all parameters except $_[0]
+              # Meaning: all parameters except @_[0]
               @code[-1] .= ' @_[1 .. $#_], ';
                # and yes, that does the right thing for all @_ < 3
             } elsif($p =~ m<^_(-?\d+)$>s) {
-              # _3 meaning $_[3]
-              @code[-1] .= '$_[' . (0 + $1) . '], ';
+              # _3 meaning @_[3]
+              @code[-1] .= '@_[' . (0 + $1) . '], ';
             } elsif($USE_LITERALS and (
               (ord('A') == 65)
                ? $p !~ m<[^\x20-\x7E]>s
@@ -245,7 +245,7 @@ sub _compile {
 
   print @code if DEBUG;
   my $sub = eval(join '', @code);
-  die "$@ while evalling" . join('', @code) if $@; # Should be impossible.
+  die "{$@->message} while evalling" . join('', @code) if $@; # Should be impossible.
   return $sub;
 }
 
@@ -254,7 +254,7 @@ sub _compile {
 sub _die_pointing {
   # This is used by _compile to throw a fatal error
   my $target = shift; # class name
-  # ...leaving $_[0] the error-causing text, and $_[1] the error message
+  # ...leaving @_[0] the error-causing text, and @_[1] the error message
   
   my $i = index(@_[0], "\n");
 

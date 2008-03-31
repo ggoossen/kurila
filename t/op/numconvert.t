@@ -14,26 +14,26 @@
 
 # obviously, 0, 1 and 2, 3 are destructive.  (XXXX 64-bit? 4 destructive too)
 
-# *0 = sub {--$_[0]};		# -
-# *1 = sub {++$_[0]};		# +
+# *0 = sub {--@_[0]};		# -
+# *1 = sub {++@_[0]};		# +
 
 # # Converters
-# *2 = sub { $_[0] = $max_uv & $_[0]}; # U
-# *3 = sub { use integer; $_[0] += $zero}; # I
-# *4 = sub { $_[0] += $zero};	# N
-# *5 = sub { $_[0] = "$_[0]" };	# P
+# *2 = sub { @_[0] = $max_uv & @_[0]}; # U
+# *3 = sub { use integer; @_[0] += $zero}; # I
+# *4 = sub { @_[0] += $zero};	# N
+# *5 = sub { @_[0] = "@_[0]" };	# P
 
 # # Side effects
-# *6 = sub { $max_uv & $_[0]};	# u
-# *7 = sub { use integer; $_[0] + $zero};	# i
-# *8 = sub { $_[0] + $zero};	# n
-# *9 = sub { $_[0] . "" };	# p
+# *6 = sub { $max_uv & @_[0]};	# u
+# *7 = sub { use integer; @_[0] + $zero};	# i
+# *8 = sub { @_[0] + $zero};	# n
+# *9 = sub { @_[0] . "" };	# p
 
 # # Reporters
-# sub a2 { sprintf "%u", $_[0] }	# U
-# sub a3 { sprintf "%d", $_[0] }	# I
-# sub a4 { sprintf "%g", $_[0] }	# N
-# sub a5 { "$_[0]" }		# P
+# sub a2 { sprintf "%u", @_[0] }	# U
+# sub a3 { sprintf "%d", @_[0] }	# I
+# sub a4 { sprintf "%g", @_[0] }	# N
+# sub a5 { "@_[0]" }		# P
 
 use strict 'vars';
 

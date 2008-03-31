@@ -54,7 +54,7 @@ my $PERL = %ENV{PERL}
        $Is_MSWin32            ? '.\perl' :
        './perl');
 
-eval '$ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
+eval '%ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
 if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }
@@ -83,9 +83,9 @@ else {
 
     $| = 1;		# command buffering
 
-    $SIG{"INT"} = \&ok3;     kill "INT",$$; sleep 1;
-    $SIG{"INT"} = "IGNORE";  kill "INT",$$; sleep 1; print "ok 4\n";
-    $SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
+    %SIG{"INT"} = \&ok3;     kill "INT",$$; sleep 1;
+    %SIG{"INT"} = "IGNORE";  kill "INT",$$; sleep 1; print "ok 4\n";
+    %SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
 
     sub ok3 {
 	if ((my $x = pop(@_)) eq "INT") {
@@ -113,13 +113,13 @@ END
 	return sub { $x };
     }
     $| = 1;		# command buffering
-    $SIG{"INT"} = \&ok5;
+    %SIG{"INT"} = \&ok5;
     {
-	local $SIG{"INT"}=x();
+	local %SIG{"INT"}=x();
 	print ""; # Needed to expose failure in 5.8.0 (why?)
     }
     sleep 1;
-    delete $SIG{"INT"};
+    delete %SIG{"INT"};
     kill "INT",$$; sleep 1;
     sub ok5 {
 	print "ok 5\n";
