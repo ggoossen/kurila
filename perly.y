@@ -892,6 +892,15 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($3,$$,'[');
 			  TOKEN_GETMAD($5,$$,']');
 			}
+	|	'(' expr ')' '[' expr ']'            /* list element */
+			{ $$ = newBINOP(OP_AELEM, 0,
+					oopsAV($2),
+					scalar($5));
+			  TOKEN_GETMAD($1,$$,'(');
+			  TOKEN_GETMAD($3,$$,')');
+			  TOKEN_GETMAD($4,$$,'[');
+			  TOKEN_GETMAD($6,$$,']');
+			}
     ;
 
 /* Binary operators between terms */

@@ -557,7 +557,7 @@ See L<perlmodlib/Pragmatic Modules> and L<perllexwarn>.
 
 KEYWORDS
 
-our $All = "" ; vec($All, $Offsets{'all'}, 2) = 3 ;
+our $All = "" ; vec($All, %Offsets{'all'}, 2) = 3 ;
 
 sub bits
 {
@@ -579,10 +579,10 @@ sub bits
 	    $fatal = 0;
 	    $no_fatal = 1;
 	}
-	elsif ($catmask = $Bits{$word}) {
+	elsif ($catmask = %Bits{$word}) {
 	    $mask ^|^= $catmask ;
-	    $mask ^|^= $DeadBits{$word} if $fatal ;
-	    $mask ^&^= ^~^($DeadBits{$word}^|^$All) if $no_fatal ;
+	    $mask ^|^= %DeadBits{$word} if $fatal ;
+	    $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
 	}
 	else
           { die("Unknown warnings category '$word'")}
@@ -601,9 +601,9 @@ sub import
 
     my $mask = ${^WARNING_BITS} ;
 
-    if (vec($mask, $Offsets{'all'}, 1)) {
-        $mask ^|^= $Bits{'all'} ;
-        $mask ^|^= $DeadBits{'all'} if vec($mask, $Offsets{'all'}+1, 1);
+    if (vec($mask, %Offsets{'all'}, 1)) {
+        $mask ^|^= %Bits{'all'} ;
+        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
     }
     
     push @_, 'all' unless @_;
@@ -617,10 +617,10 @@ sub import
 	    $fatal = 0;
 	    $no_fatal = 1;
 	}
-	elsif ($catmask = $Bits{$word}) {
+	elsif ($catmask = %Bits{$word}) {
 	    $mask ^|^= $catmask ;
-	    $mask ^|^= $DeadBits{$word} if $fatal ;
-	    $mask ^&^= ^~^($DeadBits{$word}^|^$All) if $no_fatal ;
+	    $mask ^|^= %DeadBits{$word} if $fatal ;
+	    $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
 	}
 	else
           { die("Unknown warnings category '$word'")}
@@ -636,9 +636,9 @@ sub unimport
     my $catmask ;
     my $mask = ${^WARNING_BITS} ;
 
-    if (vec($mask, $Offsets{'all'}, 1)) {
-        $mask ^|^= $Bits{'all'} ;
-        $mask ^|^= $DeadBits{'all'} if vec($mask, $Offsets{'all'}+1, 1);
+    if (vec($mask, %Offsets{'all'}, 1)) {
+        $mask ^|^= %Bits{'all'} ;
+        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
     }
 
     push @_, 'all' unless @_;
@@ -647,8 +647,8 @@ sub unimport
 	if ($word eq 'FATAL') {
 	    next; 
 	}
-	elsif ($catmask = $Bits{$word}) {
-	    $mask ^&^= ^~^($catmask ^|^ $DeadBits{$word} ^|^ $All);
+	elsif ($catmask = %Bits{$word}) {
+	    $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All);
 	}
 	else
           { die("Unknown warnings category '$word'")}
@@ -657,7 +657,7 @@ sub unimport
     ${^WARNING_BITS} = $mask ;
 }
 
-my %builtin_type; @builtin_type{qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)} = ();
+my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
 
 sub __chk
 {
@@ -670,17 +670,17 @@ sub __chk
         $category = shift ;
         if (my $type = ref $category) {
             die("not an object")
-                if exists $builtin_type{$type};
+                if exists %builtin_type{$type};
 	    $category = $type;
             $isobj = 1 ;
         }
-        $offset = $Offsets{$category};
+        $offset = %Offsets{$category};
         die("Unknown warnings category '$category'")
 	    unless defined $offset;
     }
     else {
         $category = (caller(1))[0] ;
-        $offset = $Offsets{$category};
+        $offset = %Offsets{$category};
         die("package '$category' not registered for warnings")
 	    unless defined $offset ;
     }
@@ -691,7 +691,7 @@ sub __chk
 
     if ($isobj) {
         while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
-            last unless @DB::args && $DB::args[0] =~ m/^$category=/ ;
+            last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;
     }
@@ -712,7 +712,7 @@ sub enabled
 
     return 0 unless defined $callers_bitmask ;
     return vec($callers_bitmask, $offset, 1) ||
-           vec($callers_bitmask, $Offsets{'all'}, 1) ;
+           vec($callers_bitmask, %Offsets{'all'}, 1) ;
 }
 
 
@@ -725,7 +725,7 @@ sub warn
     my ($callers_bitmask, $offset, $i) = __chk(@_) ;
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
-	   vec($callers_bitmask, $Offsets{'all'}+1, 1) ;
+	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
     CORE::warn($message) ;
 }
 
@@ -740,11 +740,11 @@ sub warnif
     return
         unless defined $callers_bitmask &&
             	(vec($callers_bitmask, $offset, 1) ||
-            	vec($callers_bitmask, $Offsets{'all'}, 1)) ;
+            	vec($callers_bitmask, %Offsets{'all'}, 1)) ;
 
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
-	   vec($callers_bitmask, $Offsets{'all'}+1, 1) ;
+	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
 
     CORE::warn($message) ;
 }
