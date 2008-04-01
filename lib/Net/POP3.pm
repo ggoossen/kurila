@@ -28,21 +28,21 @@ sub new {
   }
   else {
     %arg  = @_;
-    $host = delete $arg{Host};
+    $host = delete %arg{Host};
   }
-  my $hosts = defined $host ? [$host] : $NetConfig{pop3_hosts};
+  my $hosts = defined $host ? [$host] : %NetConfig{pop3_hosts};
   my $obj;
-  my @localport = exists $arg{ResvPort} ? (LocalPort => $arg{ResvPort}) : ();
+  my @localport = exists %arg{ResvPort} ? (LocalPort => %arg{ResvPort}) : ();
 
   my $h;
   foreach $h (@{$hosts}) {
     $obj = $type->SUPER::new(
       PeerAddr => ($host = $h),
-      PeerPort => $arg{Port} || 'pop3(110)',
+      PeerPort => %arg{Port} || 'pop3(110)',
       Proto => 'tcp',
       @localport,
-      Timeout => defined $arg{Timeout}
-      ? $arg{Timeout}
+      Timeout => defined %arg{Timeout}
+      ? %arg{Timeout}
       : 120
       )
       and last;
@@ -51,17 +51,17 @@ sub new {
   return undef
     unless defined $obj;
 
-  ${*$obj}{'net_pop3_host'} = $host;
+  %{*$obj}{'net_pop3_host'} = $host;
 
   $obj->autoflush(1);
-  $obj->debug(exists $arg{Debug} ? $arg{Debug} : undef);
+  $obj->debug(exists %arg{Debug} ? %arg{Debug} : undef);
 
   unless ($obj->response() == CMD_OK) {
     $obj->close();
     return undef;
   }
 
-  ${*$obj}{'net_pop3_banner'} = $obj->message;
+  %{*$obj}{'net_pop3_banner'} = $obj->message;
 
   $obj;
 }
@@ -69,7 +69,7 @@ sub new {
 
 sub host {
   my $me = shift;
-  ${*$me}{'net_pop3_host'};
+  %{*$me}{'net_pop3_host'};
 }
 
 ##
@@ -78,7 +78,7 @@ sub host {
 ##
 
 
-sub debug_text { $_[2] =~ m/^(pass|rpop)/i ? "$1 ....\n" : $_[2]; }
+sub debug_text { @_[2] =~ m/^(pass|rpop)/i ? "$1 ....\n" : @_[2]; }
 
 
 sub login {
@@ -112,7 +112,7 @@ sub apop {
   }
 
   return undef
-    unless ($banner = (${*$me}{'net_pop3_banner'} =~ m/(<.*>)/)[0]);
+    unless ($banner = (%{*$me}{'net_pop3_banner'} =~ m/(<.*>)/)[0]);
 
   if (@_ +<= 2) {
     ($user, $pass) = $me->_lookup_credentials($user);
@@ -129,7 +129,7 @@ sub apop {
 
 sub user {
   @_ == 2 or croak 'usage: $pop3->user( USER )';
-  $_[0]->_USER($_[1]) ? 1 : undef;
+  @_[0]->_USER(@_[1]) ? 1 : undef;
 }
 
 
@@ -153,9 +153,9 @@ sub reset {
   return 0
     unless ($me->_RSET);
 
-  if (defined ${*$me}{'net_pop3_mail'}) {
+  if (defined %{*$me}{'net_pop3_mail'}) {
     local $_;
-    foreach (@{${*$me}{'net_pop3_mail'}}) {
+    foreach (@{%{*$me}{'net_pop3_mail'}}) {
       delete $_->{'net_pop3_deleted'};
     }
   }
@@ -166,7 +166,7 @@ sub last {
   @_ == 1 or croak 'usage: $obj->last()';
 
   return undef
-    unless $_[0]->_LAST && $_[0]->message =~ m/(\d+)/;
+    unless @_[0]->_LAST && @_[0]->message =~ m/(\d+)/;
 
   return $1;
 }
@@ -177,7 +177,7 @@ sub top {
   my $me = shift;
 
   return undef
-    unless $me->_TOP($_[0], $_[1] || 0);
+    unless $me->_TOP(@_[0], @_[1] || 0);
 
   $me->read_until_dot;
 }
@@ -239,7 +239,7 @@ sub delete {
   @_ == 2 or croak 'usage: $pop3->delete( MSGNUM )';
   my $me = shift;
   return 0 unless $me->_DELE(@_);
-  ${*$me}{'net_pop3_deleted'} = 1;
+  %{*$me}{'net_pop3_deleted'} = 1;
 }
 
 
@@ -283,12 +283,12 @@ sub _lookup_credentials {
   require Net::Netrc;
 
        $user ||= eval { (getpwuid($>))[0] }
-    || $ENV{NAME}
-    || $ENV{USER}
-    || $ENV{LOGNAME};
+    || %ENV{NAME}
+    || %ENV{USER}
+    || %ENV{LOGNAME};
 
-  my $m = Net::Netrc->lookup(${*$me}{'net_pop3_host'}, $user);
-  $m ||= Net::Netrc->lookup(${*$me}{'net_pop3_host'});
+  my $m = Net::Netrc->lookup(%{*$me}{'net_pop3_host'}, $user);
+  $m ||= Net::Netrc->lookup(%{*$me}{'net_pop3_host'});
 
   my $pass = $m
     ? $m->password || ""
@@ -300,7 +300,7 @@ sub _lookup_credentials {
 
 sub _get_mailbox_count {
   my ($me) = @_;
-  my $ret = ${*$me}{'net_pop3_count'} =
+  my $ret = %{*$me}{'net_pop3_count'} =
     ($me->message =~ m/(\d+)\s+message/io) ? $1 : ($me->popstat)[0];
 
   $ret ? $ret : "0E0";
@@ -309,20 +309,20 @@ sub _get_mailbox_count {
 
 sub _STAT { shift->command('STAT')->response() == CMD_OK }
 sub _LIST { shift->command('LIST', @_)->response() == CMD_OK }
-sub _RETR { shift->command('RETR', $_[0])->response() == CMD_OK }
-sub _DELE { shift->command('DELE', $_[0])->response() == CMD_OK }
+sub _RETR { shift->command('RETR', @_[0])->response() == CMD_OK }
+sub _DELE { shift->command('DELE', @_[0])->response() == CMD_OK }
 sub _NOOP { shift->command('NOOP')->response() == CMD_OK }
 sub _RSET { shift->command('RSET')->response() == CMD_OK }
 sub _QUIT { shift->command('QUIT')->response() == CMD_OK }
 sub _TOP  { shift->command('TOP', @_)->response() == CMD_OK }
 sub _UIDL { shift->command('UIDL', @_)->response() == CMD_OK }
-sub _USER { shift->command('USER', $_[0])->response() == CMD_OK }
-sub _PASS { shift->command('PASS', $_[0])->response() == CMD_OK }
+sub _USER { shift->command('USER', @_[0])->response() == CMD_OK }
+sub _PASS { shift->command('PASS', @_[0])->response() == CMD_OK }
 sub _APOP { shift->command('APOP', @_)->response() == CMD_OK }
-sub _PING { shift->command('PING', $_[0])->response() == CMD_OK }
+sub _PING { shift->command('PING', @_[0])->response() == CMD_OK }
 
 
-sub _RPOP { shift->command('RPOP', $_[0])->response() == CMD_OK }
+sub _RPOP { shift->command('RPOP', @_[0])->response() == CMD_OK }
 sub _LAST { shift->command('LAST')->response() == CMD_OK }
 
 
@@ -340,7 +340,7 @@ sub quit {
 sub DESTROY {
   my $me = shift;
 
-  if (defined fileno($me) and ${*$me}{'net_pop3_deleted'}) {
+  if (defined fileno($me) and %{*$me}{'net_pop3_deleted'}) {
     $me->reset;
     $me->quit;
   }
@@ -369,8 +369,8 @@ sub response {
     $str =~ s/^-ERR\s*//io;
   }
 
-  ${*$cmd}{'net_cmd_resp'} = [$str];
-  ${*$cmd}{'net_cmd_code'} = $code;
+  %{*$cmd}{'net_cmd_resp'} = [$str];
+  %{*$cmd}{'net_cmd_code'} = $code;
 
   substr($code, 0, 1);
 }
@@ -381,10 +381,10 @@ sub capa {
   my ($capa, %capabilities);
 
   # Fake a capability here
-  $capabilities{APOP} = '' if ($this->banner() =~ m/<.*>/);
+  %capabilities{APOP} = '' if ($this->banner() =~ m/<.*>/);
 
   if ($this->_CAPA()) {
-    $capabilities{CAPA} = 1;
+    %capabilities{CAPA} = 1;
     $capa = $this->read_until_dot();
     %capabilities = (%capabilities, map {m/^\s*(\S+)\s*(.*)/} @$capa);
   }
@@ -393,18 +393,18 @@ sub capa {
     # Check AUTH for SASL capabilities
     if ($this->command('AUTH')->response() == CMD_OK) {
       my $mechanism = $this->read_until_dot();
-      $capabilities{SASL} = join " ", map {m/([A-Z0-9_-]+)/} @{$mechanism};
+      %capabilities{SASL} = join " ", map {m/([A-Z0-9_-]+)/} @{$mechanism};
     }
   }
 
-  return ${*$this}{'net_pop3e_capabilities'} = \%capabilities;
+  return %{*$this}{'net_pop3e_capabilities'} = \%capabilities;
 }
 
 
 sub capabilities {
   my $this = shift;
 
-  ${*$this}{'net_pop3e_capabilities'} || $this->capa;
+  %{*$this}{'net_pop3e_capabilities'} || $this->capa;
 }
 
 
@@ -426,11 +426,11 @@ sub auth {
     my $user_mech = $sasl->mechanism || '';
     my @user_mech = split(m/\s+/, $user_mech);
     my %user_mech;
-    @user_mech{@user_mech} = ();
+    %user_mech{[@user_mech]} = ();
 
     my @server_mech = split(m/\s+/, $mechanisms);
     my @mech = @user_mech
-      ? grep { exists $user_mech{$_} } @server_mech
+      ? grep { exists %user_mech{$_} } @server_mech
       : @server_mech;
     unless (@mech) {
       $self->set_status(
@@ -460,7 +460,7 @@ sub auth {
 
   # We should probably allow the user to pass the host, but I don't
   # currently know and SASL mechanisms that are used by smtp that need it
-  my ($hostname) = split m/:/, ${*$self}{'net_pop3_host'};
+  my ($hostname) = split m/:/, %{*$self}{'net_pop3_host'};
   my $client = eval { $sasl->client_new('pop', $hostname, 0) };
 
   unless ($client) {
@@ -521,7 +521,7 @@ sub auth {
 sub banner {
   my $this = shift;
 
-  return ${*$this}{'net_pop3_banner'};
+  return %{*$this}{'net_pop3_banner'};
 }
 
 1;

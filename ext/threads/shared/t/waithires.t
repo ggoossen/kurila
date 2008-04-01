@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -33,7 +33,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -182,7 +182,7 @@ SYNC_SHARED: {
   # cond_timedwait timeout (relative timeout)
   sub ctw_fail {
     my $to = shift;
-    if ($^O eq "hpux" && $Config{osvers} +<= 10.20) {
+    if ($^O eq "hpux" && %Config{osvers} +<= 10.20) {
       # The lock obtaining would pass, but the wait will not.
       ok(1,1, "$test: obtained initial lock");
       ok(2,0, "# SKIP see perl583delta");
@@ -289,7 +289,7 @@ SYNCH_REFS: {
   sub ctw_fail2 {
     my $to = shift;
 
-    if ($^O eq "hpux" && $Config{osvers} +<= 10.20) {
+    if ($^O eq "hpux" && %Config{osvers} +<= 10.20) {
       # The lock obtaining would pass, but the wait will not.
       ok(1,1, "$test: obtained initial lock");
       ok(2,0, "# SKIP see perl583delta");

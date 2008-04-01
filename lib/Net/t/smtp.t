@@ -16,7 +16,7 @@ BEGIN {
 use Net::Config;
 use Net::SMTP;
 
-unless(@{$NetConfig{smtp_hosts}} && $NetConfig{test_hosts}) {
+unless(@{%NetConfig{smtp_hosts}} && %NetConfig{test_hosts}) {
     print "1..0\n";
     exit 0;
 }

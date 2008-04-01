@@ -4329,7 +4329,7 @@ Perl_yylex(pTHX)
 	    if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
 		&& intuit_more(s)) {
 		if (*s == '[') {
-		    Perl_croak("array element should be @%s[...] instead of $%s[...]",
+		    Perl_croak(aTHX_ "array element should be @%s[...] instead of $%s[...]",
 			       &PL_tokenbuf[1], &PL_tokenbuf[1]);
 		    PL_tokenbuf[0] = '@';
 		}

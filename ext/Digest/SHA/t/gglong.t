@@ -8,13 +8,13 @@ use FileHandle;
 my $MODULE;
 
 BEGIN {
-	$MODULE = ($ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
+	$MODULE = (%ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
 	eval "require $MODULE" || die $@;
 	$MODULE->import(qw());
 }
 
 BEGIN {
-	if ($ENV{PERL_CORE}) {
+	if (%ENV{PERL_CORE}) {
 		chdir 't' if -d 't';
 		@INC = '../lib';
 	}
@@ -118,16 +118,16 @@ my $testnum = 1;
 my $state110 = state110();
 for ($i = 0; $i +< @vec110/2; $i++) {
 	my $state = $state110->clone;
-	$state->add_bits($vec110[2*$i]);
-	print "not " unless $state->hexdigest eq $vec110[2*$i+1];
+	$state->add_bits(@vec110[2*$i]);
+	print "not " unless $state->hexdigest eq @vec110[2*$i+1];
 	print "ok ", $testnum++, "\n";
 }
 
 my $state011 = state011();
 for ($i = 0; $i +< @vec011/2; $i++) {
 	my $state = $state011->clone;
-	$state->add_bits($vec011[2*$i]);
-	print "not " unless $state->hexdigest eq $vec011[2*$i+1];
+	$state->add_bits(@vec011[2*$i]);
+	print "not " unless $state->hexdigest eq @vec011[2*$i+1];
 	print "ok ", $testnum++, "\n";
 }
 

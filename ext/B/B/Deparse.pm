@@ -2785,14 +2785,13 @@ sub pp_aelemfast {
     my $name;
     if ($op->flags ^&^ OPf_SPECIAL) { # optimised PADAV
 	$name = $self->padname($op->targ);
-	$name =~ s/^@/\$/;
     }
     else {
 	my $gv = $self->gv_or_padgv($op);
 	$name = $self->gv_name($gv);
 	$name = $self->{'curstash'}."::$name"
 	    if $name !~ m/::/ && $self->lex_in_scope('@'.$name);
-	$name = '$' . $name;
+	$name = '@' . $name;
     }
 
     return $name . "[" .  ($op->private) . "]";
@@ -2969,7 +2968,7 @@ sub elem {
     }
     if (my $array_name=$self->elem_or_slice_array_name
 	    ($array, $left, $padname, 1)) {
-	return "\$" . $array_name . $left . $idx . $right;
+	return ($padname eq "padav" ? '@' : '%') . $array_name . $left . $idx . $right;
     } else {
 	# $x[20][3]{hi} or expr->[20]
 	my $arrow = is_subscriptable($array) ? "" : "->";
@@ -3018,7 +3017,7 @@ sub slice {
     } else {
 	$list = $self->elem_or_slice_single_index($kid);
     }
-    return "\@" . $array . $left . $list . $right;
+    return ($regname eq "rv2av" ? '@' : '%') . $array . $left . $list . $right;
 }
 
 sub pp_aslice { maybe_local(@_, slice(@_, "[", "]", "rv2av", "padav")) }
@@ -3032,7 +3031,7 @@ sub pp_lslice {
     my(@elems, $kid);
     $list = $self->deparse($list, 1);
     $idx = $self->deparse($idx, 1);
-    return "($list)" . "[$idx]";
+    return "($list)" . "[[$idx]]";
 }
 
 sub want_scalar {

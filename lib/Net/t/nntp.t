@@ -17,7 +17,7 @@ use Net::Config;
 use Net::NNTP;
 use Net::Cmd qw(CMD_REJECT);
 
-unless(@{$NetConfig{nntp_hosts}} && $NetConfig{test_hosts}) {
+unless(@{%NetConfig{nntp_hosts}} && %NetConfig{test_hosts}) {
     print "1..0\n";
     exit;
 }
@@ -47,8 +47,8 @@ print "not " unless @grp;
 print "ok 2\n";
 
 
-if(@grp && $grp[2] +> $grp[1]) {
-    $nntp->head($grp[1]) or print "not ";
+if(@grp && @grp[2] +> @grp[1]) {
+    $nntp->head(@grp[1]) or print "not ";
 }
 print "ok 3\n";
 

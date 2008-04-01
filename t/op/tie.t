@@ -256,7 +256,7 @@ EXPECT
 tie FH, 'main';
 EXPECT
 Can't modify constant item in tie at - line 3, near "'main';"
-Bareword "FH" not allowed while "strict subs" in use
+Bareword "FH" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 

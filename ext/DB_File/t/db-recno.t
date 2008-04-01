@@ -310,12 +310,12 @@ ok(53, @h[-1] eq @data[-1] );
 ok(54, @h[-1] eq @h[ ($FA ? @h : $X->length) -1] );
 
 # get the first element using a negative subscript
-eval '$h[ - ( $FA ? @h : $X->length)] = "abcd"' ;
+eval '@h[ - ( $FA ? @h : $X->length)] = "abcd"' ;
 ok(55, $@ eq "" );
 ok(56, @h[0] eq "abcd" );
 
 # now try to read before the start of the array
-eval '$h[ - (1 + ($FA ? @h : $X->length))] = 1234' ;
+eval '@h[ - (1 + ($FA ? @h : $X->length))] = 1234' ;
 ok(57, $@->{description} =~ '^Modification of non-creatable array value attempted' );
 
 # IMPORTANT - $X must be undefined before the untie otherwise the
@@ -452,8 +452,8 @@ unlink $Dfile;
 
    sub get { 
 	my $self = shift ;
-        $self->SUPER::get($_[0], $_[1]) ;
-	$_[1] -= 2 ;
+        $self->SUPER::get(@_[0], @_[1]) ;
+	@_[1] -= 2 ;
    }
 
    sub A_new_method
@@ -481,7 +481,7 @@ EOM
 
     main::ok(73, $@ eq "") ;
 
-    my $ret = eval '$h[3] = 3 ; return $h[3] ' ;
+    my $ret = eval '@h[3] = 3 ; return @h[3] ' ;
     main::ok(74, $@ eq "") ;
     main::ok(75, $ret == 5) ;
 
@@ -756,7 +756,7 @@ EOM
 
    $db->filter_store_key (sub { $_ = @h[0] }) ;
 
-   eval '$h[1] = 1234' ;
+   eval '@h[1] = 1234' ;
    ok(146, $@->{description} =~ m/^recursion detected in filter_store_key/ );
    
    undef $db ;

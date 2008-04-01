@@ -16,12 +16,10 @@ BEGIN {
     %INC{'IO/Socket/INET.pm'} = 1;
 }
 
-use Test::More tests => 12;
+use Test::More tests => 10;
 
 # cannot use(), otherwise it will use IO::Socket and IO::Select
-eval{ require Net::Time; };
-ok( !$@, 'should be able to require() Net::Time safely' );
-ok( exists %INC{'Net/Time.pm'}, 'should be able to use Net::Time' );
+require Net::Time;
 
 # force the socket to fail
 make_fail('IO::Socket::INET', 'new');

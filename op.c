@@ -358,11 +358,9 @@ S_no_bareword_allowed(pTHX_ const OP *o)
 {
     PERL_ARGS_ASSERT_NO_BAREWORD_ALLOWED;
 
-    if (PL_madskills)
-	return;		/* various ok barewords are hidden in extra OP_NULL */
-    qerror(Perl_mess(aTHX_
-		     "Bareword \"%"SVf"\" not allowed while \"strict subs\" in use\n",
-		     SVfARG(cSVOPo_sv)));
+    yyerror(Perl_form(aTHX_
+		      "Bareword \"%"SVf"\" not allowed while \"strict subs\" in use",
+		      SVfARG(cSVOPo_sv)));
 }
 
 /* "register" allocation */

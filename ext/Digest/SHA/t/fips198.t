@@ -3,13 +3,13 @@ use strict;
 my $MODULE;
 
 BEGIN {
-	$MODULE = ($ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
+	$MODULE = (%ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
 	eval "require $MODULE" || die $@;
 	$MODULE->import(qw(hmac_sha1_hex));
 }
 
 BEGIN {
-	if ($ENV{PERL_CORE}) {
+	if (%ENV{PERL_CORE}) {
 		chdir 't' if -d 't';
 		@INC = '../lib';
 	}
@@ -26,10 +26,10 @@ my @out = (
 
 my @keys = ("", "", "", "");
 
-for (0x00 .. 0x00+63) { $keys[0] .= chr($_) }
-for (0x30 .. 0x30+19) { $keys[1] .= chr($_) }
-for (0x50 .. 0x50+99) { $keys[2] .= chr($_) }
-for (0x70 .. 0x70+48) { $keys[3] .= chr($_) }
+for (0x00 .. 0x00+63) { @keys[0] .= chr($_) }
+for (0x30 .. 0x30+19) { @keys[1] .= chr($_) }
+for (0x50 .. 0x50+99) { @keys[2] .= chr($_) }
+for (0x70 .. 0x70+48) { @keys[3] .= chr($_) }
 
 my $numtests = scalar @data;
 print "1..$numtests\n";

@@ -152,7 +152,7 @@ EONT_EONT
 # chunk: {
     %hash = ();
     foreach $_ (@array) {
-	$hash{getkey($_)} = $_;
+	%hash{getkey($_)} = $_;
     }
 }
 
@@ -160,7 +160,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{{ %hash = (); foreach $_ (@array) { $hash{getkey($_)} = $_; } } },
+	    code   => q{{ %hash = (); foreach $_ (@array) { %hash{getkey($_)} = $_; } } },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 478 (eval 10):1) v:{
 # 2  <{> enterloop(next->u last->u redo->3) 
@@ -182,7 +182,7 @@ checkOptree(note   => q{},
 # g      <;> nextstate(main 475 (eval 10):1) v:{
 # h      <#> gvsv[*_] s
 # i      <#> gv[*hash] s
-# j      <1> rv2hv sKR/1
+# j      <1> rv2hv[t4] sKR/1
 # k      <0> pushmark s
 # l      <#> gvsv[*_] s
 # m      <#> gv[*getkey] s/EARLYCV
@@ -215,7 +215,7 @@ EOT_EOT
 # g      <;> nextstate(main 559 (eval 15):1) v:{
 # h      <$> gvsv(*_) s
 # i      <$> gv(*hash) s
-# j      <1> rv2hv sKR/1
+# j      <1> rv2hv[t4] sKR/1
 # k      <0> pushmark s
 # l      <$> gvsv(*_) s
 # m      <$> gv(*getkey) s/EARLYCV

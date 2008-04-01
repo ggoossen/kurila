@@ -23,12 +23,12 @@ my $failed = 0;
 
 print "1..".NTESTS."\n";
 
-eval 'sub t1 ($) { use attrs "locked"; $_[0]++ }';
+eval 'sub t1 ($) { use attrs "locked"; @_[0]++ }';
 (print "not "), $failed=1 if $@;
 print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
-eval 'sub t2 { use attrs "locked"; $_[0]++ }';
+eval 'sub t2 { use attrs "locked"; @_[0]++ }';
 (print "not "), $failed=1 if $@;
 print "ok ",++$test,"\n";
 BEGIN {++$ntests}
@@ -44,19 +44,19 @@ print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 my $anon1;
-eval '$anon1 = sub ($) { use attrs qw(locked method); $_[0]++ }';
+eval '$anon1 = sub ($) { use attrs qw(locked method); @_[0]++ }';
 (print "not "), $failed=1 if $@;
 print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 my $anon2;
-eval '$anon2 = sub { use attrs qw(locked method); $_[0]++ }';
+eval '$anon2 = sub { use attrs qw(locked method); @_[0]++ }';
 (print "not "), $failed=1 if $@;
 print "ok ",++$test,"\n";
 BEGIN {++$ntests}
 
 my $anon3;
-eval '$anon3 = sub { use attrs "method"; $_[0]->[1] }';
+eval '$anon3 = sub { use attrs "method"; @_[0]->[1] }';
 (print "not "), $failed=1 if $@;
 print "ok ",++$test,"\n";
 BEGIN {++$ntests}
@@ -121,7 +121,7 @@ BEGIN {++$ntests}
 {
     my $w = "" ;
     local ${^WARN_HOOK} = sub {$w = shift->message} ;
-    eval 'sub w1 ($) { use warnings "deprecated"; use attrs "locked"; $_[0]++ }';
+    eval 'sub w1 ($) { use warnings "deprecated"; use attrs "locked"; @_[0]++ }';
     (print "not "), $failed=1 if $@;
     print "ok ",++$test,"\n";
     BEGIN {++$ntests}

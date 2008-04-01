@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -23,7 +23,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -36,7 +36,7 @@ BEGIN {
 
 use threads;
 
-if ($threads::VERSION && ! exists($ENV{'PERL_CORE'})) {
+if ($threads::VERSION && ! exists(%ENV{'PERL_CORE'})) {
     print(STDERR "# Testing threads $threads::VERSION\n");
 }
 
@@ -47,12 +47,12 @@ ok(1, 1, 'Loaded');
 ok(2, 1 == $threads::threads, "Check that threads::threads is true");
 
 sub test1 {
-    ok(3,'bar' eq $_[0], "Test that argument passing works");
+    ok(3,'bar' eq @_[0], "Test that argument passing works");
 }
 threads->create(\&test1, 'bar')->join();
 
 sub test2 {
-    ok(4,'bar' eq $_[0]->[0]->{'foo'}, "Test that passing arguments as references work");
+    ok(4,'bar' eq @_[0]->[0]->{'foo'}, "Test that passing arguments as references work");
 }
 threads->create(\&test2, [{'foo' => 'bar'}])->join();
 

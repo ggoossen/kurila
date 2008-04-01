@@ -47,62 +47,62 @@ sub new {
   }
   else {
     %arg  = @_;
-    $peer = delete $arg{Host};
+    $peer = delete %arg{Host};
   }
 
   my $host      = $peer;
   my $fire      = undef;
   my $fire_type = undef;
 
-  if (exists($arg{Firewall}) || Net::Config->requires_firewall($peer)) {
-         $fire = $arg{Firewall}
-      || $ENV{FTP_FIREWALL}
-      || $NetConfig{ftp_firewall}
+  if (exists(%arg{Firewall}) || Net::Config->requires_firewall($peer)) {
+         $fire = %arg{Firewall}
+      || %ENV{FTP_FIREWALL}
+      || %NetConfig{ftp_firewall}
       || undef;
 
     if (defined $fire) {
       $peer = $fire;
-      delete $arg{Port};
-           $fire_type = $arg{FirewallType}
-        || $ENV{FTP_FIREWALL_TYPE}
-        || $NetConfig{firewall_type}
+      delete %arg{Port};
+           $fire_type = %arg{FirewallType}
+        || %ENV{FTP_FIREWALL_TYPE}
+        || %NetConfig{firewall_type}
         || undef;
     }
   }
 
   my $ftp = $pkg->SUPER::new(
     PeerAddr  => $peer,
-    PeerPort  => $arg{Port} || 'ftp(21)',
-    LocalAddr => $arg{'LocalAddr'},
+    PeerPort  => %arg{Port} || 'ftp(21)',
+    LocalAddr => %arg{'LocalAddr'},
     Proto     => 'tcp',
-    Timeout   => defined $arg{Timeout}
-    ? $arg{Timeout}
+    Timeout   => defined %arg{Timeout}
+    ? %arg{Timeout}
     : 120
     )
     or return undef;
 
-  ${*$ftp}{'net_ftp_host'}    = $host;                             # Remote hostname
-  ${*$ftp}{'net_ftp_type'}    = 'A';                               # ASCII/binary/etc mode
-  ${*$ftp}{'net_ftp_blksize'} = abs($arg{'BlockSize'} || 10240);
+  %{*$ftp}{'net_ftp_host'}    = $host;                             # Remote hostname
+  %{*$ftp}{'net_ftp_type'}    = 'A';                               # ASCII/binary/etc mode
+  %{*$ftp}{'net_ftp_blksize'} = abs(%arg{'BlockSize'} || 10240);
 
-  ${*$ftp}{'net_ftp_localaddr'} = $arg{'LocalAddr'};
+  %{*$ftp}{'net_ftp_localaddr'} = %arg{'LocalAddr'};
 
-  ${*$ftp}{'net_ftp_firewall'} = $fire
+  %{*$ftp}{'net_ftp_firewall'} = $fire
     if (defined $fire);
-  ${*$ftp}{'net_ftp_firewall_type'} = $fire_type
+  %{*$ftp}{'net_ftp_firewall_type'} = $fire_type
     if (defined $fire_type);
 
-  ${*$ftp}{'net_ftp_passive'} =
-      int exists $arg{Passive} ? $arg{Passive}
-    : exists $ENV{FTP_PASSIVE} ? $ENV{FTP_PASSIVE}
-    : defined $fire            ? $NetConfig{ftp_ext_passive}
-    : $NetConfig{ftp_int_passive};    # Whew! :-)
+  %{*$ftp}{'net_ftp_passive'} =
+      int exists %arg{Passive} ? %arg{Passive}
+    : exists %ENV{FTP_PASSIVE} ? %ENV{FTP_PASSIVE}
+    : defined $fire            ? %NetConfig{ftp_ext_passive}
+    : %NetConfig{ftp_int_passive};    # Whew! :-)
 
-  $ftp->hash(exists $arg{Hash} ? $arg{Hash} : 0, 1024);
+  $ftp->hash(exists %arg{Hash} ? %arg{Hash} : 0, 1024);
 
   $ftp->autoflush(1);
 
-  $ftp->debug(exists $arg{Debug} ? $arg{Debug} : undef);
+  $ftp->debug(exists %arg{Debug} ? %arg{Debug} : undef);
 
   unless ($ftp->response() == CMD_OK) {
     $ftp->close();
@@ -120,7 +120,7 @@ sub new {
 
 sub host {
   my $me = shift;
-  ${*$me}{'net_ftp_host'};
+  %{*$me}{'net_ftp_host'};
 }
 
 
@@ -129,13 +129,13 @@ sub hash {
 
   my ($h, $b) = @_;
   unless ($h) {
-    delete ${*$ftp}{'net_ftp_hash'};
+    delete %{*$ftp}{'net_ftp_hash'};
     return [\*STDERR, 0];
   }
   ($h, $b) = (ref($h) ? $h : \*STDERR, $b || 1024);
   select((select($h), $| = 1)[0]);
   $b = 512 if $b +< 512;
-  ${*$ftp}{'net_ftp_hash'} = [$h, $b];
+  %{*$ftp}{'net_ftp_hash'} = [$h, $b];
 }
 
 
@@ -227,7 +227,7 @@ sub size {
     my @files = $ftp->dir($file);
     if (@files) {
       return (split(m/\s+/, $1))[4]
-        if $files[0] =~ m/^([-rwxSsTt]{10}.*)$/;
+        if @files[0] =~ m/^([-rwxSsTt]{10}.*)$/;
     }
   }
   undef;
@@ -241,7 +241,7 @@ sub login {
   unless (defined $user) {
     require Net::Netrc;
 
-    my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_host'});
+    my $rc = Net::Netrc->lookup(%{*$ftp}{'net_ftp_host'});
 
     ($user, $pass, $acct) = $rc->lpa()
       if ($rc);
@@ -250,31 +250,31 @@ sub login {
   $user ||= "anonymous";
   $ruser = $user;
 
-  $fwtype = ${*$ftp}{'net_ftp_firewall_type'}
-    || $NetConfig{'ftp_firewall_type'}
+  $fwtype = %{*$ftp}{'net_ftp_firewall_type'}
+    || %NetConfig{'ftp_firewall_type'}
     || 0;
 
-  if ($fwtype && defined ${*$ftp}{'net_ftp_firewall'}) {
+  if ($fwtype && defined %{*$ftp}{'net_ftp_firewall'}) {
     if ($fwtype == 1 || $fwtype == 7) {
-      $user .= '@' . ${*$ftp}{'net_ftp_host'};
+      $user .= '@' . %{*$ftp}{'net_ftp_host'};
     }
     else {
       require Net::Netrc;
 
-      my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'});
+      my $rc = Net::Netrc->lookup(%{*$ftp}{'net_ftp_firewall'});
 
       my ($fwuser, $fwpass, $fwacct) = $rc ? $rc->lpa() : ();
 
       if ($fwtype == 5) {
-        $user = join('@', $user, $fwuser, ${*$ftp}{'net_ftp_host'});
+        $user = join('@', $user, $fwuser, %{*$ftp}{'net_ftp_host'});
         $pass = $pass . '@' . $fwpass;
       }
       else {
         if ($fwtype == 2) {
-          $user .= '@' . ${*$ftp}{'net_ftp_host'};
+          $user .= '@' . %{*$ftp}{'net_ftp_host'};
         }
         elsif ($fwtype == 6) {
-          $fwuser .= '@' . ${*$ftp}{'net_ftp_host'};
+          $fwuser .= '@' . %{*$ftp}{'net_ftp_host'};
         }
 
         $ok = $ftp->_USER($fwuser);
@@ -289,10 +289,10 @@ sub login {
           if defined($fwacct);
 
         if ($fwtype == 3) {
-          $ok = $ftp->command("SITE", ${*$ftp}{'net_ftp_host'})->response;
+          $ok = $ftp->command("SITE", %{*$ftp}{'net_ftp_host'})->response;
         }
         elsif ($fwtype == 4) {
-          $ok = $ftp->command("OPEN", ${*$ftp}{'net_ftp_host'})->response;
+          $ok = $ftp->command("OPEN", %{*$ftp}{'net_ftp_host'})->response;
         }
 
         return 0 unless $ok == CMD_OK || $ok == CMD_MORE;
@@ -310,7 +310,7 @@ sub login {
     unless (defined $pass) {
       require Net::Netrc;
 
-      my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_host'}, $ruser);
+      my $rc = Net::Netrc->lookup(%{*$ftp}{'net_ftp_host'}, $ruser);
 
       ($ruser, $pass, $acct) = $rc->lpa()
         if ($rc);
@@ -325,7 +325,7 @@ sub login {
   $ok = $ftp->_ACCT($acct)
     if (defined($acct) && ($ok == CMD_MORE || $ok == CMD_OK));
 
-  if ($fwtype == 7 && $ok == CMD_OK && defined ${*$ftp}{'net_ftp_firewall'}) {
+  if ($fwtype == 7 && $ok == CMD_OK && defined %{*$ftp}{'net_ftp_firewall'}) {
     my ($f, $auth, $resp) = _auth_id($ftp);
     $ftp->authorize($auth, $resp) if defined($resp);
   }
@@ -348,10 +348,10 @@ sub _auth_id {
   unless (defined $resp) {
     require Net::Netrc;
 
-    $auth ||= eval { (getpwuid($>))[0] } || $ENV{NAME};
+    $auth ||= eval { (getpwuid($>))[0] } || %ENV{NAME};
 
-    my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'}, $auth)
-      || Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'});
+    my $rc = Net::Netrc->lookup(%{*$ftp}{'net_ftp_firewall'}, $auth)
+      || Net::Netrc->lookup(%{*$ftp}{'net_ftp_firewall'});
 
     ($auth, $resp) = $rc->lpa()
       if ($rc);
@@ -387,7 +387,7 @@ sub rename {
 sub type {
   my $ftp    = shift;
   my $type   = shift;
-  my $oldval = ${*$ftp}{'net_ftp_type'};
+  my $oldval = %{*$ftp}{'net_ftp_type'};
 
   return $oldval
     unless (defined $type);
@@ -395,7 +395,7 @@ sub type {
   return undef
     unless ($ftp->_TYPE($type, @_));
 
-  ${*$ftp}{'net_ftp_type'} = join(" ", $type, @_);
+  %{*$ftp}{'net_ftp_type'} = join(" ", $type, @_);
 
   $oldval;
 }
@@ -404,7 +404,7 @@ sub type {
 sub alloc {
   my $ftp    = shift;
   my $size   = shift;
-  my $oldval = ${*$ftp}{'net_ftp_allo'};
+  my $oldval = %{*$ftp}{'net_ftp_allo'};
 
   return $oldval
     unless (defined $size);
@@ -412,7 +412,7 @@ sub alloc {
   return undef
     unless ($ftp->_ALLO($size, @_));
 
-  ${*$ftp}{'net_ftp_allo'} = join(" ", $size, @_);
+  %{*$ftp}{'net_ftp_allo'} = join(" ", $size, @_);
 
   $oldval;
 }
@@ -425,8 +425,8 @@ sub abort {
 
   $ftp->command(pack("C", $TELNET_DM) . "ABOR");
 
-  ${*$ftp}{'net_ftp_dataconn'}->close()
-    if defined ${*$ftp}{'net_ftp_dataconn'};
+  %{*$ftp}{'net_ftp_dataconn'}->close()
+    if defined %{*$ftp}{'net_ftp_dataconn'};
 
   $ftp->response();
 
@@ -448,11 +448,11 @@ sub get {
   croak("Bad remote filename '$remote'\n")
     if $remote =~ m/[\r\n]/s;
 
-  ${*$ftp}{'net_ftp_rest'} = $where if defined $where;
-  my $rest = ${*$ftp}{'net_ftp_rest'};
+  %{*$ftp}{'net_ftp_rest'} = $where if defined $where;
+  my $rest = %{*$ftp}{'net_ftp_rest'};
 
-  delete ${*$ftp}{'net_ftp_port'};
-  delete ${*$ftp}{'net_ftp_pasv'};
+  delete %{*$ftp}{'net_ftp_port'};
+  delete %{*$ftp}{'net_ftp_pasv'};
 
   $data = $ftp->retr($remote)
     or return undef;
@@ -481,9 +481,9 @@ sub get {
   my ($count, $hashh, $hashb, $ref) = (0);
 
   ($hashh, $hashb) = @$ref
-    if ($ref = ${*$ftp}{'net_ftp_hash'});
+    if ($ref = %{*$ftp}{'net_ftp_hash'});
 
-  my $blksize = ${*$ftp}{'net_ftp_blksize'};
+  my $blksize = %{*$ftp}{'net_ftp_blksize'};
   local $\;    # Just in case
 
   while (1) {
@@ -542,7 +542,7 @@ sub cwd {
 
 sub cdup {
   @_ == 1 or croak 'usage: $ftp->cdup()';
-  $_[0]->_CDUP;
+  @_[0]->_CDUP;
 }
 
 
@@ -609,7 +609,7 @@ sub restart {
 
   my ($ftp, $where) = @_;
 
-  ${*$ftp}{'net_ftp_rest'} = $where;
+  %{*$ftp}{'net_ftp_rest'} = $where;
 
   return undef;
 }
@@ -663,7 +663,7 @@ sub mkdir {
 sub delete {
   @_ == 2 || croak 'usage: $ftp->delete( FILENAME )';
 
-  $_[0]->_DELE($_[1]);
+  @_[0]->_DELE(@_[1]);
 }
 
 
@@ -694,8 +694,8 @@ sub _store_cmd {
     require File::Basename;
     $remote = File::Basename::basename($local);
   }
-  if (defined ${*$ftp}{'net_ftp_allo'}) {
-    delete ${*$ftp}{'net_ftp_allo'};
+  if (defined %{*$ftp}{'net_ftp_allo'}) {
+    delete %{*$ftp}{'net_ftp_allo'};
   }
   else {
 
@@ -726,8 +726,8 @@ sub _store_cmd {
     return undef;
   }
 
-  delete ${*$ftp}{'net_ftp_port'};
-  delete ${*$ftp}{'net_ftp_pasv'};
+  delete %{*$ftp}{'net_ftp_port'};
+  delete %{*$ftp}{'net_ftp_pasv'};
 
   $sock = $ftp->_data_cmd($cmd, $remote)
     or return undef;
@@ -735,12 +735,12 @@ sub _store_cmd {
   $remote = ($ftp->message =~ m/FILE:\s*(.*)/)[0]
     if 'STOU' eq uc $cmd;
 
-  my $blksize = ${*$ftp}{'net_ftp_blksize'};
+  my $blksize = %{*$ftp}{'net_ftp_blksize'};
 
   my ($count, $hashh, $hashb, $ref) = (0);
 
   ($hashh, $hashb) = @$ref
-    if ($ref = ${*$ftp}{'net_ftp_hash'});
+    if ($ref = %{*$ftp}{'net_ftp_hash'});
 
   while (1) {
     last unless $len = read($loc, $buf = "", $blksize);
@@ -789,31 +789,31 @@ sub port {
   my ($ftp, $port) = @_;
   my $ok;
 
-  delete ${*$ftp}{'net_ftp_intern_port'};
+  delete %{*$ftp}{'net_ftp_intern_port'};
 
   unless (defined $port) {
 
     # create a Listen socket at same address as the command socket
 
-    ${*$ftp}{'net_ftp_listen'} ||= IO::Socket::INET->new(
+    %{*$ftp}{'net_ftp_listen'} ||= IO::Socket::INET->new(
       Listen    => 5,
       Proto     => 'tcp',
       Timeout   => $ftp->timeout,
       LocalAddr => $ftp->sockhost,
     );
 
-    my $listen = ${*$ftp}{'net_ftp_listen'};
+    my $listen = %{*$ftp}{'net_ftp_listen'};
 
     my ($myport, @myaddr) = ($listen->sockport, split(m/\./, $listen->sockhost));
 
     $port = join(',', @myaddr, $myport >> 8, $myport ^&^ 0xff);
 
-    ${*$ftp}{'net_ftp_intern_port'} = 1;
+    %{*$ftp}{'net_ftp_intern_port'} = 1;
   }
 
   $ok = $ftp->_PORT($port);
 
-  ${*$ftp}{'net_ftp_port'} = $port;
+  %{*$ftp}{'net_ftp_port'} = $port;
 
   $ok;
 }
@@ -828,17 +828,17 @@ sub pasv {
 
   my $ftp = shift;
 
-  delete ${*$ftp}{'net_ftp_intern_port'};
+  delete %{*$ftp}{'net_ftp_intern_port'};
 
   $ftp->_PASV && $ftp->message =~ m/(\d+(,\d+)+)/
-    ? ${*$ftp}{'net_ftp_pasv'} = $1
+    ? %{*$ftp}{'net_ftp_pasv'} = $1
     : undef;
 }
 
 
 sub unique_name {
   my $ftp = shift;
-  ${*$ftp}{'net_ftp_unique'} || undef;
+  %{*$ftp}{'net_ftp_unique'} || undef;
 }
 
 
@@ -846,7 +846,7 @@ sub supported {
   @_ == 2 or croak 'usage: $ftp->supported( CMD )';
   my $ftp  = shift;
   my $cmd  = uc shift;
-  my $hash = ${*$ftp}{'net_ftp_supported'} ||= {};
+  my $hash = %{*$ftp}{'net_ftp_supported'} ||= {};
 
   return $hash->{$cmd}
     if exists $hash->{$cmd};
@@ -920,29 +920,29 @@ sub _dataconn {
 
   $pkg =~ s/ /_/g;
 
-  delete ${*$ftp}{'net_ftp_dataconn'};
+  delete %{*$ftp}{'net_ftp_dataconn'};
 
-  if (defined ${*$ftp}{'net_ftp_pasv'}) {
-    my @port = map { 0 + $_ } split(m/,/, ${*$ftp}{'net_ftp_pasv'});
+  if (defined %{*$ftp}{'net_ftp_pasv'}) {
+    my @port = map { 0 + $_ } split(m/,/, %{*$ftp}{'net_ftp_pasv'});
 
     $data = $pkg->new(
       PeerAddr  => join(".", @port[0 .. 3]),
-      PeerPort  => $port[4] * 256 + $port[5],
-      LocalAddr => ${*$ftp}{'net_ftp_localaddr'},
+      PeerPort  => @port[4] * 256 + @port[5],
+      LocalAddr => %{*$ftp}{'net_ftp_localaddr'},
       Proto     => 'tcp'
     );
   }
-  elsif (defined ${*$ftp}{'net_ftp_listen'}) {
-    $data = ${*$ftp}{'net_ftp_listen'}->accept($pkg);
-    close(delete ${*$ftp}{'net_ftp_listen'});
+  elsif (defined %{*$ftp}{'net_ftp_listen'}) {
+    $data = %{*$ftp}{'net_ftp_listen'}->accept($pkg);
+    close(delete %{*$ftp}{'net_ftp_listen'});
   }
 
   if ($data) {
-    ${*$data} = "";
+    %{*$data} = "";
     $data->timeout($ftp->timeout);
-    ${*$ftp}{'net_ftp_dataconn'} = $data;
-    ${*$data}{'net_ftp_cmd'}     = $ftp;
-    ${*$data}{'net_ftp_blksize'} = ${*$ftp}{'net_ftp_blksize'};
+    %{*$ftp}{'net_ftp_dataconn'} = $data;
+    %{*$data}{'net_ftp_cmd'}     = $ftp;
+    %{*$data}{'net_ftp_blksize'} = %{*$ftp}{'net_ftp_blksize'};
   }
 
   $data;
@@ -953,8 +953,8 @@ sub _list_cmd {
   my $ftp = shift;
   my $cmd = uc shift;
 
-  delete ${*$ftp}{'net_ftp_port'};
-  delete ${*$ftp}{'net_ftp_pasv'};
+  delete %{*$ftp}{'net_ftp_port'};
+  delete %{*$ftp}{'net_ftp_pasv'};
 
   my $data = $ftp->_data_cmd($cmd, @_);
 
@@ -966,7 +966,7 @@ sub _list_cmd {
 
   my $databuf = '';
   my $buf     = '';
-  my $blksize = ${*$ftp}{'net_ftp_blksize'};
+  my $blksize = %{*$ftp}{'net_ftp_blksize'};
 
   while ($data->read($databuf, $blksize)) {
     $buf .= $databuf;
@@ -990,7 +990,7 @@ sub _data_cmd {
   my $ftp   = shift;
   my $cmd   = uc shift;
   my $ok    = 1;
-  my $where = delete ${*$ftp}{'net_ftp_rest'} || 0;
+  my $where = delete %{*$ftp}{'net_ftp_rest'} || 0;
   my $arg;
 
   for $arg (@_) {
@@ -998,9 +998,9 @@ sub _data_cmd {
       if $arg =~ m/[\r\n]/s;
   }
 
-  if ( ${*$ftp}{'net_ftp_passive'}
-    && !defined ${*$ftp}{'net_ftp_pasv'}
-    && !defined ${*$ftp}{'net_ftp_port'})
+  if ( %{*$ftp}{'net_ftp_passive'}
+    && !defined %{*$ftp}{'net_ftp_pasv'}
+    && !defined %{*$ftp}{'net_ftp_port'})
   {
     my $data = undef;
 
@@ -1024,8 +1024,8 @@ sub _data_cmd {
   }
 
   $ok = $ftp->port
-    unless (defined ${*$ftp}{'net_ftp_port'}
-    || defined ${*$ftp}{'net_ftp_pasv'});
+    unless (defined %{*$ftp}{'net_ftp_port'}
+    || defined %{*$ftp}{'net_ftp_pasv'});
 
   $ok = $ftp->_REST($where)
     if $ok && $where;
@@ -1036,12 +1036,12 @@ sub _data_cmd {
   $ftp->command($cmd, @_);
 
   return 1
-    if (defined ${*$ftp}{'net_ftp_pasv'});
+    if (defined %{*$ftp}{'net_ftp_pasv'});
 
   $ok = CMD_INFO == $ftp->response();
 
   return $ok
-    unless exists ${*$ftp}{'net_ftp_intern_port'};
+    unless exists %{*$ftp}{'net_ftp_intern_port'};
 
   if ($ok) {
     my $data = $ftp->_dataconn();
@@ -1053,7 +1053,7 @@ sub _data_cmd {
   }
 
 
-  close(delete ${*$ftp}{'net_ftp_listen'});
+  close(delete %{*$ftp}{'net_ftp_listen'});
 
   return undef;
 }
@@ -1063,13 +1063,13 @@ sub _data_cmd {
 ##
 
 
-sub debug_text { $_[2] =~ m/^(pass|resp|acct)/i ? "$1 ....\n" : $_[2]; }
+sub debug_text { @_[2] =~ m/^(pass|resp|acct)/i ? "$1 ....\n" : @_[2]; }
 
 
 sub command {
   my $ftp = shift;
 
-  delete ${*$ftp}{'net_ftp_port'};
+  delete %{*$ftp}{'net_ftp_port'};
   $ftp->SUPER::command(@_);
 }
 
@@ -1078,7 +1078,7 @@ sub response {
   my $ftp  = shift;
   my $code = $ftp->SUPER::response();
 
-  delete ${*$ftp}{'net_ftp_pasv'}
+  delete %{*$ftp}{'net_ftp_pasv'}
     if ($code != CMD_MORE && $code != CMD_INFO);
 
   $code;
@@ -1087,15 +1087,15 @@ sub response {
 
 sub parse_response {
   return ($1, $2 eq "-")
-    if $_[1] =~ s/^(\d\d\d)([- ]?)//o;
+    if @_[1] =~ s/^(\d\d\d)([- ]?)//o;
 
   my $ftp = shift;
 
   # Darn MS FTP server is a load of CRAP !!!!
   return ()
-    unless ${*$ftp}{'net_cmd_code'} + 0;
+    unless %{*$ftp}{'net_cmd_code'} + 0;
 
-  (${*$ftp}{'net_cmd_code'}, 1);
+  (%{*$ftp}{'net_cmd_code'}, 1);
 }
 
 ##
@@ -1164,7 +1164,7 @@ sub feature {
   @_ == 2 or croak 'usage: $ftp->feature( NAME )';
   my ($ftp, $feat) = @_;
 
-  my $feature = ${*$ftp}{net_ftp_feature} ||= do {
+  my $feature = %{*$ftp}{net_ftp_feature} ||= do {
     my @feat;
 
     # Example response

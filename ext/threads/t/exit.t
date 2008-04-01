@@ -2,15 +2,15 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
 
-    require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+    require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         skip_all(q/Perl not compiled with 'useithreads'/);
     }
 }
@@ -60,8 +60,8 @@ ok(! defined($rc), 'Exited: threads->exit()');
 run_perl(prog => 'use threads v1.67;' .
                  'threads->exit(86);' .
                  'exit(99);',
-         nolib => ($ENV{PERL_CORE}) ? 0 : 1,
-         switches => ($ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
+         nolib => (%ENV{PERL_CORE}) ? 0 : 1,
+         switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
 {
     local $TODO = 'VMS exit semantics not like POSIX exit semantics' if $^O eq 'VMS';
     is($?>>8, 86, 'thread->exit(status) in main');
@@ -110,8 +110,8 @@ ok(! defined($rc), 'Exited: $thr->set_thread_exit_only');
 run_perl(prog => 'use threads v1.67 qw(exit thread_only);' .
                  'threads->create(sub { exit(99); })->join();' .
                  'exit(86);',
-         nolib => ($ENV{PERL_CORE}) ? 0 : 1,
-         switches => ($ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
+         nolib => (%ENV{PERL_CORE}) ? 0 : 1,
+         switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
 {
     local $TODO = 'VMS exit semantics not like POSIX exit semantics' if $^O eq 'VMS';
     is($?>>8, 86, "'use threads 'exit' => 'thread_only'");
@@ -123,8 +123,8 @@ my $out = run_perl(prog => 'use threads v1.67;' .
                            '});' .
                            'sleep(1);' .
                            'exit(86);',
-                   nolib => ($ENV{PERL_CORE}) ? 0 : 1,
-                   switches => ($ENV{PERL_CORE}) ? [] : [ '-Mblib' ],
+                   nolib => (%ENV{PERL_CORE}) ? 0 : 1,
+                   switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ],
                    stderr => 1);
 {
     local $TODO = 'VMS exit semantics not like POSIX exit semantics' if $^O eq 'VMS';
@@ -140,8 +140,8 @@ $out = run_perl(prog => 'use threads v1.67 qw(exit thread_only);' .
                         '});' .
                         'sleep(1);' .
                         'exit(86);',
-                nolib => ($ENV{PERL_CORE}) ? 0 : 1,
-                switches => ($ENV{PERL_CORE}) ? [] : [ '-Mblib' ],
+                nolib => (%ENV{PERL_CORE}) ? 0 : 1,
+                switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ],
                 stderr => 1);
 {
     local $TODO = 'VMS exit semantics not like POSIX exit semantics' if $^O eq 'VMS';
@@ -156,8 +156,8 @@ run_perl(prog => 'use threads v1.67;' .
                  '   die();' .
                  '})->join();' .
                  'exit(86);',
-         nolib => ($ENV{PERL_CORE}) ? 0 : 1,
-         switches => ($ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
+         nolib => (%ENV{PERL_CORE}) ? 0 : 1,
+         switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
 {
     local $TODO = 'VMS exit semantics not like POSIX exit semantics' if $^O eq 'VMS';
     is($?>>8, 99, "exit(status) in thread warn handler");
