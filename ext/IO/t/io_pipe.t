@@ -54,7 +54,7 @@ if ($is_win32) {
     }
     $pipe->close or print "# \$!=$!\nnot ";
     print "ok 2\n";
-    $cmd = 'BEGIN{$SIG{ALRM} = sub {print qq(not ok 4\n); exit}; alarm 10} s/not //';
+    $cmd = 'BEGIN{%SIG{ALRM} = sub {print qq(not ok 4\n); exit}; alarm 10} s/not //';
     $pipe = IO::Pipe->new()->writer($perl, '-pe', $cmd);
     print $pipe "not ok 3\n" ;
     $pipe->close or print "# \$!=$!\nnot ";

@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -23,7 +23,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -48,10 +48,10 @@ my @av;
 share(@av);
 push(@av, $sv);
 
-ok(2, $av[0] eq "hi", 'Array holds value');
+ok(2, @av[0] eq "hi", 'Array holds value');
 
 push(@av, "foo");
-ok(3, $av[1] eq 'foo', 'Array holds 2nd value');
+ok(3, @av[1] eq 'foo', 'Array holds 2nd value');
 
 my $av = threads->create(sub {
     my $av;
@@ -66,7 +66,7 @@ my $av = threads->create(sub {
 ok(4,$av->[0] eq "bar", 'Thread added to array');
 ok(5,$av->[1]->[0] eq 'hi', 'Shared in shared');
 
-threads->create(sub { $av[0] = "hihi" })->join();
+threads->create(sub { @av[0] = "hihi" })->join();
 ok(6,$av->[1]->[0] eq 'hihi', 'Replaced shared in shared');
 ok(7, pop(@{$av->[1]}) eq "foo", 'Pop shared array');
 ok(8, scalar(@{$av->[1]}) == 1, 'Array size');
@@ -85,7 +85,7 @@ threads->create(sub {
 ok(10, ref($av->[0]) eq 'ARRAY', 'Array in array');
 
 threads->create(sub { push @{$av->[0]}, \@av })->join();
-threads->create(sub { $av[0] = 'testtest'})->join();
+threads->create(sub { @av[0] = 'testtest'})->join();
 threads->create(sub { ok(11, $av->[0]->[0]->[0] eq 'testtest', 'Nested'); })->join();
 
 ok(12, is_shared($sv), "Check for sharing");

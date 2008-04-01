@@ -273,13 +273,13 @@ EONT_EONT
 
 # chunk: # this sorts the %age hash by value instead of key
 # using an in-line function
-@eldest = sort { $age{$b} <=> $age{$a} } keys %age;
+@eldest = sort { %age{$b} <=> %age{$a} } keys %age;
 
 =cut
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@eldest = sort { $age{$b} <+> $age{$a} } keys %age; },
+	    code   => q{@eldest = sort { %age{$b} <+> %age{$a} } keys %age; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 592 (eval 28):1) v
 # 2  <0> pushmark s
@@ -313,7 +313,7 @@ EONT_EONT
 
 # chunk: # sort using explicit subroutine name
 sub byage {
-    $age{$a} <=> $age{$b};  # presuming numeric
+    %age{$a} <=> %age{$b};  # presuming numeric
 }
 @sortedclass = sort byage @class;
 
@@ -321,7 +321,7 @@ sub byage {
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sub byage { $age{$a} <+> $age{$b}; } @sortedclass = sort byage @class; },
+	    code   => q{sub byage { %age{$a} <+> %age{$b}; } @sortedclass = sort byage @class; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 597 (eval 30):1) v
 # 2  <0> pushmark s

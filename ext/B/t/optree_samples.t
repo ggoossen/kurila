@@ -542,8 +542,8 @@ EOT_EOT
 # m  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
-checkOptree ( name	=> '%h=(); for $_(@a){$h{getkey($_)} = $_}',
-	      code	=> '%h=(); for $_(@a){$h{getkey($_)} = $_}',
+checkOptree ( name	=> '%h=(); for $_(@a){%h{getkey($_)} = $_}',
+	      code	=> '%h=(); for $_(@a){%h{getkey($_)} = $_}',
 	      bcopts	=> '-exec',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 505 (eval 24):1) v
@@ -564,7 +564,7 @@ checkOptree ( name	=> '%h=(); for $_(@a){$h{getkey($_)} = $_}',
 # e      <;> nextstate(main 505 (eval 24):1) v:{
 # f      <#> gvsv[*_] s
 # g      <#> gv[*h] s
-# h      <1> rv2hv sKR/1
+# h      <1> rv2hv[t4] sKR/1
 # i      <0> pushmark s
 # j      <#> gvsv[*_] s
 # k      <#> gv[*getkey] s/EARLYCV
@@ -594,7 +594,7 @@ EOT_EOT
 # e      <;> nextstate(main 505 (eval 24):1) v:{
 # f      <$> gvsv(*_) s
 # g      <$> gv(*h) s
-# h      <1> rv2hv sKR/1
+# h      <1> rv2hv[t4] sKR/1
 # i      <0> pushmark s
 # j      <$> gvsv(*_) s
 # k      <$> gv(*getkey) s/EARLYCV

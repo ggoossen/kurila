@@ -120,18 +120,18 @@ sub writer {
     return undef
 	unless(ref($me) || ref($me = $me->new));
 
-    my $fh  = ${*$me}[1];
+    my $fh  = @{*$me}[1];
     my $pid;
     $pid = $me->_doit(1, $fh, @_)
         if(@_);
 
-    close ${*$me}[0];
+    close @{*$me}[0];
     bless $me, ref($fh);
     *$me = *$fh;          # Alias self to handle
     $me->fdopen($fh->fileno,"w")
 	unless defined($me->fileno);
     bless $fh;                  # Really wan't un-bless here
-    ${*$me}{'io_pipe_pid'} = $pid
+    %{*$me}{'io_pipe_pid'} = $pid
         if defined $pid;
 
     $me;
@@ -147,8 +147,8 @@ sub close {
     my $fh = shift;
     my $r = $fh->SUPER::close(@_);
 
-    waitpid(${*$fh}{'io_pipe_pid'},0)
-	if(defined ${*$fh}{'io_pipe_pid'});
+    waitpid(%{*$fh}{'io_pipe_pid'},0)
+	if(defined %{*$fh}{'io_pipe_pid'});
 
     $r;
 }

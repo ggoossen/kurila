@@ -194,11 +194,11 @@ print $main::x;
 ####
 # 11
 my @x;
-print $main::x[1];
+print @main::x[1];
 ####
 # 12
 my %x;
-$x{warn()};
+%x{warn()};
 ####
 # 13
 my $foo;

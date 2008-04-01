@@ -445,8 +445,8 @@ untie %h ;
 
    sub get { 
 	my $self = shift ;
-        $self->SUPER::get($_[0], $_[1]) ;
-	$_[1] -= 2 ;
+        $self->SUPER::get(@_[0], @_[1]) ;
+	@_[1] -= 2 ;
    }
 
    sub A_new_method
@@ -473,13 +473,13 @@ EOM
 
     main::ok(54, $@ eq "") ;
 
-    my $ret = eval '$h{"fred"} = 3 ; return $h{"fred"} ' ;
-    main::ok(55, $@ eq "") ;
+    my $ret = eval '%h{"fred"} = 3 ; return %h{"fred"} ' ;
+    main::ok(55, ! $@ ) ;
     main::ok(56, $ret == 5) ;
 
     my $value = 0;
     $ret = eval '$X->put("joe", 4) ; $X->get("joe", $value) ; return $value' ;
-    main::ok(57, $@ eq "") ;
+    main::ok(57, ! $@ ) ;
     main::ok(58, $ret == 10) ;
 
     $ret = eval ' R_NEXT eq main::R_NEXT ' ;
@@ -706,7 +706,7 @@ EOM
 
    $db->filter_store_key (sub { $_ = %h{$_} }) ;
 
-   eval '$h{1} = 1234' ;
+   eval '%h{1} = 1234' ;
    ok(116, $@->{description} =~ m/^recursion detected in filter_store_key/ );
    
    undef $db ;

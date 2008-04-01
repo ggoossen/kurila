@@ -5,7 +5,7 @@ BEGIN {
     print "1..0 # Skip: FIX B-OP\n";
     exit 0;
 
-    if ($Config{'usethreads'}) {
+    if (%Config{'usethreads'}) {
         print "1..0 # Skip: B-OP replacements don't work with threads\n";
         exit 0;
     }

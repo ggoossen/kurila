@@ -55,9 +55,9 @@ my %want =
      RADIXCHAR	=> ".",
      AM_STR	=> qr{^(?:am|a\.m\.)$}i,
      THOUSEP	=> "",
-     D_T_FMT	=> qr{^%a %b %[de] %H:%M:%S %Y$},
-     D_FMT	=> qr{^%m/%d/%y$},
-     T_FMT	=> qr{^%H:%M:%S$},
+     D_T_FMT	=> qr{^\%a \%b \%[de] \%H:\%M:\%S \%Y$},
+     D_FMT	=> qr{^\%m/\%d/\%y$},
+     T_FMT	=> qr{^\%H:\%M:\%S$},
      );
 
     

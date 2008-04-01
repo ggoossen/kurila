@@ -197,19 +197,6 @@ syntax error at - line 7, near "s/(ab)/{\1}/e"
 Execution of - aborted due to compilation errors. at - line 7.
 ########
 # toke.c
-use warnings 'reserved' ;
-$a = abc;
-$a = { def
-
-=> 1 };
-no warnings 'reserved' ;
-$a = abc;
-EXPECT
-Bareword "abc" not allowed while "strict subs" in use
-Bareword "abc" not allowed while "strict subs" in use
-Execution of - aborted due to compilation errors. at - line 8.
-########
-# toke.c
 use warnings 'qw' ;
 @a = qw(a, b, c) ;
 no warnings 'qw' ;
@@ -614,10 +601,10 @@ Operator or semicolon missing before *foo at - line 8.
 Ambiguous use of * resolved as operator * at - line 8.
 Operator or semicolon missing before *foo at - line 10.
 Ambiguous use of * resolved as operator * at - line 10.
-Bareword "foo" not allowed while "strict subs" in use
-Bareword "foo" not allowed while "strict subs" in use
-Bareword "foo" not allowed while "strict subs" in use
-Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use at - line 3, at EOF
+Bareword "foo" not allowed while "strict subs" in use at - line 6, at EOF
+Bareword "foo" not allowed while "strict subs" in use at - line 8, at EOF
+Bareword "foo" not allowed while "strict subs" in use at - line 10, at EOF
 Execution of - aborted due to compilation errors. at - line 10.
 ########
 # toke.c
