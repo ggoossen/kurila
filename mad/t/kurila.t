@@ -886,10 +886,12 @@ $#$foo
 my @foo;
 $foo[1];
 $foo[$a];
+sub x { $_[1]++; }
 ----
 my @foo;
 @foo[1];
 @foo[$a];
+sub x { @_[1]++; }
 ====
 my %foo;
 $foo{1};
@@ -900,6 +902,28 @@ my %foo;
 %foo{1};
 %foo{$a};
 exists %foo{$a};
+====
+@foo{@bar};
+my %mfoo;
+@mfoo{@bar};
+----
+%foo{[@bar]};
+my %mfoo;
+%mfoo{[@bar]};
+====
+@foo[1,2];
+(1,2,3)[0..2];
+----
+@foo[[1,2]];
+(1,2,3)[[0..2]];
+====
+"%"
+----
+"\%"
+====
+split m/$foo::baz{bar}/, $a;
+----
+split m/%foo::baz{bar}/, $a;
 ====
 END
 }

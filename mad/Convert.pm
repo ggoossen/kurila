@@ -18,8 +18,9 @@ sub convert {
     $infile->print($input);
     close $infile or die;
     $options{switches} ||= '';
-    if( $input =~ m/^[#][!].*perl([^#\n]*)/) {
+    if( $input =~ m/^[#][!].*?perl([^#\n]*)/) {
         $options{switches} .= " " . $1;
+        $options{switches} =~ s/-\*-[^-]*-\*-//g;
     }
 
     # XML dump
