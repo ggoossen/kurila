@@ -47,8 +47,8 @@ is(ref(\$baa), 'GLOB');
 #        (I hope.)
 
 { package Foo::Bar; no warnings 'once'; $test=1; }
-ok(exists $Foo::{'Bar::'});
-is(Symbol::glob_name($Foo::{'Bar::'}), 'Foo::Bar::');
+ok(exists %Foo::{'Bar::'});
+is(Symbol::glob_name(%Foo::{'Bar::'}), 'Foo::Bar::');
 
 
 # test undef operator clearing out entire glob
@@ -63,7 +63,7 @@ is (scalar %foo, 0);
 {
     # test warnings from assignment of undef to glob
     my $msg = '';
-    local ${^WARN_HOOK} = sub { $msg = $_[0]->message };
+    local ${^WARN_HOOK} = sub { $msg = @_[0]->message };
     use warnings;
     *foo = 'bar';
     is($msg, '');
@@ -75,15 +75,15 @@ is (scalar %foo, 0);
     my $copy = *PWOMPF;
     foreach ($copy, *SKREEE) {
 	$msg = '';
-	eval { $victim = sprintf "%d", $_ };
+	eval { $victim = sprintf "\%d", $_ };
         like($@->{description}, qr/Tried to use glob as number/);
 
-	eval { $victim = sprintf "%u", $_ };
+	eval { $victim = sprintf "\%u", $_ };
         like($@->{description}, qr/Tried to use glob as number/);
-	eval { $victim = sprintf "%e", $_ };
+	eval { $victim = sprintf "\%e", $_ };
         like($@->{description}, qr/Tried to use glob as number/);
 
-	eval { $victim = sprintf "%s", $_ };
+	eval { $victim = sprintf "\%s", $_ };
         like($@->{description}, qr/Tried to use glob as string/);
     }
 }
@@ -111,7 +111,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 
     my $warn;
     local ${^WARN_HOOK} = sub {
-	$warn .= $_[0]->message;
+	$warn .= @_[0]->message;
     };
     my $val = *x{FILEHANDLE};
     print {*x{IO}} ($warn =~ m/is deprecated/
@@ -173,8 +173,8 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 $j=1; %j=(a=>1); @j=(1); local *j=*j; *j = sub{};
 
 is($j, 1);
-is($j{a}, 1);
-is($j[0], 1);
+is(%j{a}, 1);
+is(@j[0], 1);
 
 {
     # does pp_readline() handle glob-ness correctly?
@@ -185,7 +185,7 @@ is($j[0], 1);
 
 {
     my $w = '';
-    local ${^WARN_HOOK} = sub { $w = $_[0]->message };
+    local ${^WARN_HOOK} = sub { $w = @_[0]->message };
     sub abc1 ();
     local *abc1 = sub { };
     is ($w, '');
@@ -210,9 +210,9 @@ is($j[0], 1);
 {
     # test the assignment of a GLOB to an LVALUE
     my $e = '';
-    local ${^DIE_HOOK} = sub { $e = $_[0]->message };
+    local ${^DIE_HOOK} = sub { $e = @_[0]->message };
     my $v;
-    sub f { $_[0] = 0; $_[0] = "a"; $_[0] = *DATA }
+    sub f { @_[0] = 0; @_[0] = "a"; @_[0] = *DATA }
     f($v);
     is (Symbol::glob_name($v), 'main::DATA');
     my $x = ~< $v;
@@ -222,16 +222,16 @@ is($j[0], 1);
 {
     $e = '';
     # GLOB assignment to tied element
-    local ${^DIE_HOOK} = sub { $e = $_[0]->message };
+    local ${^DIE_HOOK} = sub { $e = @_[0]->message };
     sub T::TIEARRAY  { bless [] => "T" }
-    sub T::STORE     { $_[0]->[ $_[1] ] = $_[2] }
-    sub T::FETCH     { $_[0]->[ $_[1] ] }
-    sub T::FETCHSIZE { @{$_[0]} }
+    sub T::STORE     { @_[0]->[ @_[1] ] = @_[2] }
+    sub T::FETCH     { @_[0]->[ @_[1] ] }
+    sub T::FETCHSIZE { @{@_[0]} }
     tie my @ary => "T";
-    $ary[0] = *DATA;
-    is ($ary[0], '*main::DATA');
+    @ary[0] = *DATA;
+    is (@ary[0], '*main::DATA');
     is ($e, '');
-    my $x = readline Symbol::fetch_glob($ary[0]);
+    my $x = readline Symbol::fetch_glob(@ary[0]);
     is($x, "rocks\n");
 }
 
@@ -241,7 +241,7 @@ is($j[0], 1);
     my $output = runperl(prog => <<'EOPROG');
 package M;
 $| = 1;
-sub DESTROY {eval {die qq{Farewell {dump::view($_[0])}}}; print $@->{description}}
+sub DESTROY {eval {die qq{Farewell {dump::view(@_[0])}}}; print $@->{description}}
 package main;
 
 bless \$A::B, q{M};
@@ -257,11 +257,11 @@ EOPROG
 # GVs
 
 foreach (qw (oonk ga_shloip)) {
-    ok(!exists $::{$_}, "no symbols of any sort to start with for $_");
+    ok(!exists %::{$_}, "no symbols of any sort to start with for $_");
 }
 
 # A string in place of the typeglob is promoted to the function prototype
-$::{oonk} = "pie";
+%::{oonk} = "pie";
 my $proto = eval 'prototype \&oonk';
 die if $@;
 is ($proto, "pie", "String is promoted to prototype");
@@ -271,8 +271,8 @@ is ($proto, "pie", "String is promoted to prototype");
 foreach my $value (3, "Perl rules", \42, qr/whatever/, [1,2,3], {1=>2},
 		   \*STDIN, \&ok, \undef, *STDOUT) {
     local $TODO = "glob get stringified somewhere";
-    delete $::{oonk};
-    $::{oonk} = \$value;
+    delete %::{oonk};
+    %::{oonk} = \$value;
     $proto = eval 'prototype \&oonk';
     die if $@;
     is ($proto, '', "Prototype for a constant subroutine is empty");
@@ -285,27 +285,27 @@ foreach my $value (3, "Perl rules", \42, qr/whatever/, [1,2,3], {1=>2},
 
 {
     local $TODO = "Figure out what this should do";
-    delete $::{oonk};
-    $::{oonk} = \"Value";
+    delete %::{oonk};
+    %::{oonk} = \"Value";
     *{Symbol::fetch_glob("ga_shloip")} = \&{Symbol::fetch_glob("oonk")};
 
-    is (ref $::{ga_shloip}, 'SCALAR', "Export of proxy constant as is");
-    is (ref $::{oonk}, 'SCALAR', "Export doesn't affect original");
+    is (ref %::{ga_shloip}, 'SCALAR', "Export of proxy constant as is");
+    is (ref %::{oonk}, 'SCALAR', "Export doesn't affect original");
     is (eval 'ga_shloip', "Value", "Constant has correct value");
-    is (ref $::{ga_shloip}, 'SCALAR',
+    is (ref %::{ga_shloip}, 'SCALAR',
         "Inlining of constant doesn't change represenatation");
 
-    delete $::{ga_shloip};
+    delete %::{ga_shloip};
 
     eval 'sub ga_shloip (); 1' or die $@;
-    is ($::{ga_shloip}, '', "Prototype is stored as an empty string");
+    is (%::{ga_shloip}, '', "Prototype is stored as an empty string");
 
     # Check that a prototype expands.
     *{Symbol::fetch_glob("ga_shloip")} = \&{Symbol::fetch_glob("oonk")};
 
-    is (ref $::{oonk}, 'SCALAR', "Export doesn't affect original");
+    is (ref %::{oonk}, 'SCALAR', "Export doesn't affect original");
     is (eval 'ga_shloip', "Value", "Constant has correct value");
-    is (ref \$::{ga_shloip}, 'GLOB', "Symbol table has full typeglob");
+    is (ref \%::{ga_shloip}, 'GLOB', "Symbol table has full typeglob");
 }
 
 
@@ -316,14 +316,14 @@ my $ref_oonk = ''; # Was 'SCALAR';
 # Check that assignment to an existing typeglob works
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = $_[0]->message };
+  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
   *{Symbol::fetch_glob("zwot")} = \&{Symbol::fetch_glob("oonk")};
   is($w, '', "Should be no warning");
 }
 
-is (ref $::{oonk}, $ref_oonk, "Export doesn't affect original");
+is (ref %::{oonk}, $ref_oonk, "Export doesn't affect original");
 is (eval 'zwot', "Value", "Constant has correct value");
-is (ref \$::{zwot}, 'GLOB', "Symbol table has full typeglob");
+is (ref \%::{zwot}, 'GLOB', "Symbol table has full typeglob");
 is (join ('!', @::zwot), 'Zwot!', "Existing array still in typeglob");
 
 sub spritsits () {
@@ -333,21 +333,21 @@ sub spritsits () {
 # Check that assignment to an existing subroutine works
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = $_[0]->message };
+  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
   *{Symbol::fetch_glob("spritsits")} = \&{Symbol::fetch_glob("oonk")};
   like($w, qr/^Constant subroutine main::spritsits redefined/,
        "Redefining a constant sub should warn");
 }
 
-is (ref $::{oonk}, $ref_oonk, "Export doesn't affect original");
+is (ref %::{oonk}, $ref_oonk, "Export doesn't affect original");
 is (eval 'spritsits', "Value", "Constant has correct value");
-is (ref \$::{spritsits}, 'GLOB', "Symbol table has full typeglob");
+is (ref \%::{spritsits}, 'GLOB', "Symbol table has full typeglob");
 
 my $result;
 # Check that assignment to an existing typeglob works
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = $_[0]->message };
+  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
   $result = *{Symbol::fetch_glob("plunk")} = \&{Symbol::fetch_glob("oonk")};
   is($w, '', "Should be no warning");
 }
@@ -355,22 +355,22 @@ my $result;
 is (ref \$result, 'GLOB',
     "Non void assignment should still return a typeglob");
 
-is (ref $::{oonk}, $ref_oonk, "Export doesn't affect original");
+is (ref %::{oonk}, $ref_oonk, "Export doesn't affect original");
 is (eval 'plunk', "Value", "Constant has correct value");
-is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
+is (ref \%::{plunk}, 'GLOB', "Symbol table has full typeglob");
 
 my $gr = eval '\*plunk' or die;
 
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = $_[0]->message };
+  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
   $result = *{$gr} = \&{Symbol::fetch_glob("oonk")};
   is($w, '', "Redefining a constant sub to another constant sub with the same underlying value should not warn (It's just re-exporting, and that was always legal)");
 }
 
-is (ref $::{oonk}, $ref_oonk, "Export doesn't affect original");
+is (ref %::{oonk}, $ref_oonk, "Export doesn't affect original");
 is (eval 'plunk', "Value", "Constant has correct value");
-is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
+is (ref \%::{plunk}, 'GLOB', "Symbol table has full typeglob");
 
 {
     use vars qw($glook $smek $foof);
@@ -422,23 +422,23 @@ is (ref \$::{plunk}, 'GLOB', "Symbol table has full typeglob");
 
     is(slosh->isa('swoosh'), '');
 
-    $CORE::GLOBAL::{"lock"}=[];
+    %CORE::GLOBAL::{"lock"}=[];
     eval "no warnings; lock";
     like($@->{description}, qr/^Not enough arguments for lock/,
        "Can't trip up general keyword overloading");
 
-    $CORE::GLOBAL::{"readline"}=[];
+    %CORE::GLOBAL::{"readline"}=[];
     eval "~< *STDOUT if 0";
     is($@, '', "Can't trip up readline overloading");
 
-    $CORE::GLOBAL::{"readpipe"}=[];
+    %CORE::GLOBAL::{"readpipe"}=[];
     eval "`` if 0";
     is($@, '', "Can't trip up readpipe overloading");
 }
 
 {
-    die if exists $::{BONK};
-    $::{BONK} = \"powie";
+    die if exists %::{BONK};
+    %::{BONK} = \"powie";
     *{Symbol::fetch_glob("BONK")} = \&{Symbol::fetch_glob("BONK")};
     eval 'is(BONK(), "powie",
              "Assigment works when glob created midway (bug 45607)"); 1'

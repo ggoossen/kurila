@@ -24,10 +24,10 @@ sub myfail {
     my ($f) = @_;
     ok(@$f, 1);
 
-    my $t = $$f[0];
-    ok($$t{diagnostic}, $why);
-    ok($$t{'package'}, 'main');
-    ok($$t{repetition}, 1);
-    ok($$t{result}, 0);
-    ok($$t{expected}, 1);
+    my $t = @$f[0];
+    ok(%$t{diagnostic}, $why);
+    ok(%$t{'package'}, 'main');
+    ok(%$t{repetition}, 1);
+    ok(%$t{result}, 0);
+    ok(%$t{expected}, 1);
 }

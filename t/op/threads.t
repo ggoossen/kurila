@@ -5,11 +5,11 @@ BEGIN {
      $| = 1;
 
      require Config;
-     if (!$Config::Config{useithreads}) {
+     if (!%Config::Config{useithreads}) {
         print "1..0 # Skip: no ithreads\n";
         exit 0;
      }
-     if ($ENV{PERL_CORE_MINITEST}) {
+     if (%ENV{PERL_CORE_MINITEST}) {
        print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
        exit 0;
      }
@@ -25,7 +25,7 @@ use threads;
 # Attempt to free unreferenced scalar: SV 0x40173f3c
 fresh_perl_is(<<'EOI', 'ok', { }, 'delete() under threads');
 use threads;
-threads->create(sub { my %h=(1,2); delete $h{1}})->join for 1..2;
+threads->create(sub { my %h=(1,2); delete %h{1}})->join for 1..2;
 print "ok";
 EOI
 
@@ -158,8 +158,8 @@ EOI
 }
 
 sub matchit {
-    is (ref $_[1], "Regexp");
-    like ($_[0], $_[1]);
+    is (ref @_[1], "Regexp");
+    like (@_[0], @_[1]);
 }
 
 threads->new(\&matchit, "Pie", qr/pie/i)->join();

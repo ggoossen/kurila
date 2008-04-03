@@ -11,9 +11,9 @@ sub import
  while (@_)
   {
    my $layer = shift;
-   if (exists $alias{$layer})
+   if (exists %alias{$layer})
     {
-     $layer = $alias{$layer}
+     $layer = %alias{$layer}
     }
    else
     {

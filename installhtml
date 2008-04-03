@@ -171,7 +171,7 @@ usage("") unless @ARGV;
 
 # Overcome shell's p1,..,p8 limitation.  
 # See vms/descrip_mms.template -> descrip.mms for invokation.
-if ( $^O eq 'VMS' ) { @ARGV = split(m/\s+/,$ARGV[0]); }
+if ( $^O eq 'VMS' ) { @ARGV = split(m/\s+/,@ARGV[0]); }
 
 use vars qw( %Options );
 
@@ -254,7 +254,7 @@ foreach my $dir (@splithead) {
 	$_ =~ s{href="#(.*)">}{{
 	    my $url = "$pod/$1.html" ;
 	    $url = Pod::Html::relativize_url( $url, "$file.html" )
-	    if ( ! defined $Options{htmlroot} || $Options{htmlroot} eq '' );
+	    if ( ! defined %Options{htmlroot} || %Options{htmlroot} eq '' );
 	    "href=\"$url\">" ;
 	}}gi;
 	push @data, $_;
@@ -278,26 +278,26 @@ sub usage {
 
 
 sub parse_command_line {
-    usage() if defined $Options{help};
-    $Options{help} = ""; 	    	    # make -w shut up
+    usage() if defined %Options{help};
+    %Options{help} = ""; 	    	    # make -w shut up
 
     # list of directories
-    @podpath   = split(":", $Options{podpath}) if defined $Options{podpath};
+    @podpath   = split(":", %Options{podpath}) if defined %Options{podpath};
 
     # lists of files
-    @splithead = split(",", $Options{splithead}) if defined $Options{splithead};
-    @splititem = split(",", $Options{splititem}) if defined $Options{splititem};
-    @libpods   = split(",", $Options{libpods}) if defined $Options{libpods};
+    @splithead = split(",", %Options{splithead}) if defined %Options{splithead};
+    @splititem = split(",", %Options{splititem}) if defined %Options{splititem};
+    @libpods   = split(",", %Options{libpods}) if defined %Options{libpods};
 
-    $htmldir  = $Options{htmldir}	    if defined $Options{htmldir};
-    $htmlroot = $Options{htmlroot}	    if defined $Options{htmlroot};
-    $podroot  = $Options{podroot}	    if defined $Options{podroot};
-    $splitpod = $Options{splitpod}	    if defined $Options{splitpod};
+    $htmldir  = %Options{htmldir}	    if defined %Options{htmldir};
+    $htmlroot = %Options{htmlroot}	    if defined %Options{htmlroot};
+    $podroot  = %Options{podroot}	    if defined %Options{podroot};
+    $splitpod = %Options{splitpod}	    if defined %Options{splitpod};
 
-    $recurse  = $Options{recurse}	    if defined $Options{recurse};
-    $verbose  = $Options{verbose}	    if defined $Options{verbose};
+    $recurse  = %Options{recurse}	    if defined %Options{recurse};
+    $verbose  = %Options{verbose}	    if defined %Options{verbose};
 
-    @ignore = map "$podroot/$_", split(",", $Options{ignore}) if defined $Options{ignore};
+    @ignore = map "$podroot/$_", split(",", %Options{ignore}) if defined %Options{ignore};
 }
 
 
@@ -336,7 +336,7 @@ sub create_index {
 	    ($lcp1,$lcp2) = ($name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi);
 	}
 	my $url= "$pod/$file" ;
-	if ( ! defined $Options{htmlroot} || $Options{htmlroot} eq '' ) {
+	if ( ! defined %Options{htmlroot} || %Options{htmlroot} eq '' ) {
 	    $url = Pod::Html::relativize_url( "$pod/$file", $html ) ;
 	}
 
@@ -366,7 +366,7 @@ sub split_on_head {
     my($pod, $dirname, $filename);
 
     # split the files specified in @splithead on =head[1-6] pod directives
-    print "splitting files by head.\n" if $verbose && $#splithead +>= 0;
+    print "splitting files by head.\n" if $verbose &&( @splithead-1) +>= 0;
     foreach $pod (@splithead) {
 	# figure out the directory name and filename
 	$pod      =~ s,^([^/]*)$,/$1,;
@@ -388,7 +388,7 @@ sub split_on_item {
     my($podroot, $splitdirs, $ignore, @splititem) = @_;
     my($pwd, $dirname, $filename);
 
-    print "splitting files by item.\n" if $verbose && $#splititem +>= 0;
+    print "splitting files by item.\n" if $verbose &&( @splititem-1) +>= 0;
     $pwd = getcwd();
     my $splitter = File::Spec->rel2abs("$splitpod/splitpod", $pwd);
     my $perl = File::Spec->rel2abs($^X, $pwd);
@@ -442,19 +442,19 @@ sub splitpod {
 
     # restore the file internally by =head[1-6] sections
     @poddata = ();
-    for ($i = 0, $j = -1; $i +<= $#filedata; $i++) {
-	$j++ if ($filedata[$i] =~ m/^\s*=head[1-6]/);
+    for ($i = 0, $j = -1; $i +<=( @filedata-1); $i++) {
+	$j++ if (@filedata[$i] =~ m/^\s*=head[1-6]/);
 	if ($j +>= 0) { 
-	    $poddata[$j]  = "" unless defined $poddata[$j];
-	    $poddata[$j] .= "\n$filedata[$i]" if $j +>= 0;
+	    @poddata[$j]  = "" unless defined @poddata[$j];
+	    @poddata[$j] .= "\n@filedata[$i]" if $j +>= 0;
 	}
     }
 
     # create list of =head[1-6] sections so that we can rewrite
     #  L<> links as necessary.
     my %heads = ();
-    foreach $i (0..$#poddata) {
-	$heads{anchorify($1)} = 1 if $poddata[$i] =~ m/=head[1-6]\s+(.*)/;
+    foreach $i (0..(@poddata-1)) {
+	%heads{anchorify($1)} = 1 if @poddata[$i] =~ m/=head[1-6]\s+(.*)/;
     }
 
     # create a directory of a similar name and store all the
@@ -467,17 +467,17 @@ sub splitpod {
 	die "$0: could not create directory $poddir/$dir: $!\n"
 	unless -d "$poddir/$dir";
 
-    $poddata[0] =~ m/^\s*=head[1-6]\s+(.*)/;
+    @poddata[0] =~ m/^\s*=head[1-6]\s+(.*)/;
     $section    = "";
     $nextsec    = $1;
 
     # for each section of the file create a separate pod file
-    for ($i = 0; $i +<= $#poddata; $i++) {
+    for ($i = 0; $i +<=( @poddata-1); $i++) {
 	# determine the "prev" and "next" links
 	$prevsec = $section;
 	$section = $nextsec;
-	if ($i +< $#poddata) {
-	    $poddata[$i+1] =~ m/^\s*=head[1-6]\s+(.*)/;
+	if ($i +<( @poddata-1)) {
+	    @poddata[$i+1] =~ m/^\s*=head[1-6]\s+(.*)/;
 	    $nextsec       = $1;
 	} else {
 	    $nextsec = "";
@@ -492,10 +492,10 @@ sub splitpod {
 	print "\tcreating $poddir/$file\n" if $verbose;
 	open(SPLITOUT, ">$poddir/$file") ||
 	    die "$0: error opening $poddir/$file for output: $!\n";
-	$poddata[$i] =~ s,L<([^<>]*)>,{
-			defined $heads{anchorify($1)} ? "L<$dir/$1>" : "L<$1>"
+	@poddata[$i] =~ s,L<([^<>]*)>,{
+			defined %heads{anchorify($1)} ? "L<$dir/$1>" : "L<$1>"
 		     },g;
-	print SPLITOUT $poddata[$i]."\n\n";
+	print SPLITOUT @poddata[$i]."\n\n";
 	print SPLITOUT "=over 4\n\n";
 	print SPLITOUT "=item *\n\nBack to L<$dir/\"$prevsec\">\n\n" if $prevsec;
 	print SPLITOUT "=item *\n\nForward to L<$dir/\"$nextsec\">\n\n" if $nextsec;
@@ -586,12 +586,12 @@ sub runpod2html {
     # make sure the destination directories exist
     @dirs = split("/", $html);
     $dir  = "$htmldir/";
-    for ($i = 0; $i +< $#dirs; $i++) {
-	if (! -d "$dir$dirs[$i]") {
-	    mkdir("$dir$dirs[$i]", 0755) ||
-		die "$0: error creating directory $dir$dirs[$i]: $!\n";
+    for ($i = 0; $i +<( @dirs-1); $i++) {
+	if (! -d "$dir@dirs[$i]") {
+	    mkdir("$dir@dirs[$i]", 0755) ||
+		die "$0: error creating directory $dir@dirs[$i]: $!\n";
 	}
-	$dir .= "$dirs[$i]/";
+	$dir .= "@dirs[$i]/";
     }
 
     # invoke pod2html
@@ -604,7 +604,7 @@ sub runpod2html {
 	"--header",
 	($doindex ? "--index" : "--noindex"),
 	"--" . ($recurse ? "" : "no") . "recurse",
-	($#libpods +>= 0) ? "--libpods=" . join(":", @libpods) : "",
+	((@libpods-1) +>= 0) ? "--libpods=" . join(":", @libpods) : "",
 	"--infile=$podroot/$pod", "--outfile=$htmldir/$html");
     die "$0: error running $pod2html: $!\n" if $?;
 }

@@ -76,13 +76,13 @@ pod2html("--title=eol", "--infile=$$.in", "--outfile=$$.o3");
 local $/;
 
 open(IN, "<", "$$.o1") or die "$$.o1: $!";
-my $cksum1 = unpack("%32C*", ~< *IN);
+my $cksum1 = unpack("\%32C*", ~< *IN);
 
 open(IN, "<", "$$.o2") or die "$$.o2: $!";
-my $cksum2 = unpack("%32C*", ~< *IN);
+my $cksum2 = unpack("\%32C*", ~< *IN);
 
 open(IN, "<", "$$.o3") or die "$$.o3: $!";
-my $cksum3 = unpack("%32C*", ~< *IN);
+my $cksum3 = unpack("\%32C*", ~< *IN);
 
 ok($cksum1 == $cksum2, "CR vs LF");
 ok($cksum1 == $cksum3, "CR vs CRLF");

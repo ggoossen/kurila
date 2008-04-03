@@ -8,7 +8,7 @@ use B qw(peekop class walkoptree walkoptree_exec
 # <=5.008 had @specialsv_name exported from B::Asmdata
 BEGIN {
     use Config;
-    my $ithreads = $Config{'useithreads'} eq 'define';
+    my $ithreads = %Config{'useithreads'} eq 'define';
     eval qq{
 	sub ITHREADS() \{ $ithreads \}
     }; die $@ if $@;
@@ -20,7 +20,7 @@ sub _printop {
   my $op = shift;
   my $addr = ${$op} ? $op->ppaddr : '';
   $addr =~ s/^PL_ppaddr// if $addr;
-  return sprintf "0x%x %s %s", ${$op}, ${$op} ? class($op) : '', $addr;
+  return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ? class($op) : '', $addr;
 }
 
 sub B::OP::debug {
@@ -45,13 +45,13 @@ EOT
 sub B::UNOP::debug {
     my ($op) = @_;
     $op->B::OP::debug();
-    printf "\top_first\t%s\n", _printop($op->first);
+    printf "\top_first\t\%s\n", _printop($op->first);
 }
 
 sub B::BINOP::debug {
     my ($op) = @_;
     $op->B::UNOP::debug();
-    printf "\top_last \t%s\n", _printop($op->last);
+    printf "\top_last \t\%s\n", _printop($op->last);
 }
 
 sub B::LOOP::debug {
@@ -67,29 +67,29 @@ EOT
 sub B::LOGOP::debug {
     my ($op) = @_;
     $op->B::UNOP::debug();
-    printf "\top_other\t%s\n", _printop($op->other);
+    printf "\top_other\t\%s\n", _printop($op->other);
 }
 
 sub B::LISTOP::debug {
     my ($op) = @_;
     $op->B::BINOP::debug();
-    printf "\top_children\t%d\n", $op->children;
+    printf "\top_children\t\%d\n", $op->children;
 }
 
 sub B::PMOP::debug {
     my ($op) = @_;
     $op->B::LISTOP::debug();
-    printf "\top_pmreplroot\t0x%x\n", ${$op->pmreplroot};
-    printf "\top_pmreplstart\t0x%x\n", ${$op->pmreplstart};
+    printf "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
+    printf "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
     if (ITHREADS) {
-      printf "\top_pmstashpv\t%s\n", cstring($op->pmstashpv);
-      printf "\top_pmoffset\t%d\n", $op->pmoffset;
+      printf "\top_pmstashpv\t\%s\n", cstring($op->pmstashpv);
+      printf "\top_pmoffset\t\%d\n", $op->pmoffset;
     } else {
-      printf "\top_pmstash\t%s\n", cstring($op->pmstash);
+      printf "\top_pmstash\t\%s\n", cstring($op->pmstash);
     }
-    printf "\top_precomp->precomp\t%s\n", cstring($op->precomp);
-    printf "\top_pmflags\t0x%x\n", $op->pmflags;
-    printf "\top_reflags\t0x%x\n", $op->reflags;
+    printf "\top_precomp->precomp\t\%s\n", cstring($op->precomp);
+    printf "\top_pmflags\t0x\%x\n", $op->pmflags;
+    printf "\top_reflags\t0x\%x\n", $op->reflags;
     $op->pmreplroot->debug;
 }
 
@@ -111,20 +111,20 @@ EOT
 sub B::SVOP::debug {
     my ($op) = @_;
     $op->B::OP::debug();
-    printf "\top_sv\t\t0x%x\n", ${$op->sv};
+    printf "\top_sv\t\t0x\%x\n", ${$op->sv};
     $op->sv->debug;
 }
 
 sub B::PVOP::debug {
     my ($op) = @_;
     $op->B::OP::debug();
-    printf "\top_pv\t\t%s\n", cstring($op->pv);
+    printf "\top_pv\t\t\%s\n", cstring($op->pv);
 }
 
 sub B::PADOP::debug {
     my ($op) = @_;
     $op->B::OP::debug();
-    printf "\top_padix\t%ld\n", $op->padix;
+    printf "\top_padix\t\%ld\n", $op->padix;
 }
 
 sub B::NULL::debug {
@@ -132,7 +132,7 @@ sub B::NULL::debug {
     if ($$sv == ${sv_undef()}) {
 	print "&sv_undef\n";
     } else {
-	printf "NULL (0x%x)\n", $$sv;
+	printf "NULL (0x\%x)\n", $$sv;
     }
 }
 
@@ -171,41 +171,41 @@ EOT
 sub B::IV::debug {
     my ($sv) = @_;
     $sv->B::SV::debug();
-    printf "\txiv_iv\t\t%d\n", $sv->IV;
+    printf "\txiv_iv\t\t\%d\n", $sv->IV;
 }
 
 sub B::NV::debug {
     my ($sv) = @_;
     $sv->B::IV::debug();
-    printf "\txnv_nv\t\t%s\n", $sv->NV;
+    printf "\txnv_nv\t\t\%s\n", $sv->NV;
 }
 
 sub B::PVIV::debug {
     my ($sv) = @_;
     $sv->B::PV::debug();
-    printf "\txiv_iv\t\t%d\n", $sv->IV;
+    printf "\txiv_iv\t\t\%d\n", $sv->IV;
 }
 
 sub B::PVNV::debug {
     my ($sv) = @_;
     $sv->B::PVIV::debug();
-    printf "\txnv_nv\t\t%s\n", $sv->NV;
+    printf "\txnv_nv\t\t\%s\n", $sv->NV;
 }
 
 sub B::PVLV::debug {
     my ($sv) = @_;
     $sv->B::PVNV::debug();
-    printf "\txlv_targoff\t%d\n", $sv->TARGOFF;
-    printf "\txlv_targlen\t%u\n", $sv->TARGLEN;
-    printf "\txlv_type\t%s\n", cstring(chr($sv->TYPE));
+    printf "\txlv_targoff\t\%d\n", $sv->TARGOFF;
+    printf "\txlv_targlen\t\%u\n", $sv->TARGLEN;
+    printf "\txlv_type\t\%s\n", cstring(chr($sv->TYPE));
 }
 
 sub B::BM::debug {
     my ($sv) = @_;
     $sv->B::PVNV::debug();
-    printf "\txbm_useful\t%d\n", $sv->USEFUL;
-    printf "\txbm_previous\t%u\n", $sv->PREVIOUS;
-    printf "\txbm_rare\t%s\n", cstring(chr($sv->RARE));
+    printf "\txbm_useful\t\%d\n", $sv->USEFUL;
+    printf "\txbm_previous\t\%u\n", $sv->PREVIOUS;
+    printf "\txbm_rare\t\%s\n", cstring(chr($sv->RARE));
 }
 
 sub B::CV::debug {
@@ -248,8 +248,8 @@ EOT
 
 sub B::GV::debug {
     my ($gv) = @_;
-    if ($done_gv{$$gv}++) {
-	printf "GV %s::%s\n", $gv->STASH->NAME, $gv->SAFENAME;
+    if (%done_gv{$$gv}++) {
+	printf "GV \%s::\%s\n", $gv->STASH->NAME, $gv->SAFENAME;
 	return;
     }
     my ($sv) = $gv->SV;
@@ -278,7 +278,7 @@ EOT
 
 sub B::SPECIAL::debug {
     my $sv = shift;
-    print $specialsv_name[$$sv], "\n";
+    print @specialsv_name[$$sv], "\n";
 }
 
 sub compile {

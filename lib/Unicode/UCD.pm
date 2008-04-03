@@ -161,18 +161,18 @@ if ($hasHangulUtil) {
 sub hangul_decomp { # internal: called from charinfo
     if ($hasHangulUtil) {
 	my @tmp = decomposeHangul(shift);
-	return sprintf("%04X %04X",      @tmp) if @tmp == 2;
-	return sprintf("%04X %04X %04X", @tmp) if @tmp == 3;
+	return sprintf("\%04X \%04X",      @tmp) if @tmp == 2;
+	return sprintf("\%04X \%04X \%04X", @tmp) if @tmp == 3;
     }
     return;
 }
 
 sub hangul_charname { # internal: called from charinfo
-    return sprintf("HANGUL SYLLABLE-%04X", shift);
+    return sprintf("HANGUL SYLLABLE-\%04X", shift);
 }
 
 sub han_charname { # internal: called from charinfo
-    return sprintf("CJK UNIFIED IDEOGRAPH-%04X", shift);
+    return sprintf("CJK UNIFIED IDEOGRAPH-\%04X", shift);
 }
 
 my @CharinfoRanges = (
@@ -205,43 +205,43 @@ sub charinfo {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinfo: unknown code '$arg'"
 	unless defined $code;
-    my $hexk = sprintf("%06X", $code);
+    my $hexk = sprintf("\%06X", $code);
     my($rcode,$rname,$rdec);
     foreach my $range (@CharinfoRanges){
       if ($range->[0] +<= $code && $code +<= $range->[1]) {
         $rcode = $hexk;
 	$rcode =~ s/^0+//;
-	$rcode =  sprintf("%04X", hex($rcode));
+	$rcode =  sprintf("\%04X", hex($rcode));
         $rname = $range->[2] ? $range->[2]->($code) : '';
         $rdec  = $range->[3] ? $range->[3]->($code) : '';
-        $hexk  = sprintf("%06X", $range->[0]); # replace by the first
+        $hexk  = sprintf("\%06X", $range->[0]); # replace by the first
         last;
       }
     }
     openunicode(\$UNICODEFH, "UnicodeData.txt");
     if (defined $UNICODEFH) {
 	use Search::Dict v1.02;
-	if (look($UNICODEFH, "$hexk;", { xfrm => sub { $_[0] =~ m/^([^;]+);(.+)/; sprintf "%06X;$2", hex($1) } } ) +>= 0) {
+	if (look($UNICODEFH, "$hexk;", { xfrm => sub { @_[0] =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } } ) +>= 0) {
 	    my $line = ~< $UNICODEFH;
 	    return unless defined $line;
 	    chomp $line;
 	    my %prop;
-	    @prop{qw(
+	    %prop{[qw(
 		     code name category
 		     combining bidi decomposition
 		     decimal digit numeric
 		     mirrored unicode10 comment
 		     upper lower title
-		    )} = split(m/;/, $line, -1);
+		    )]} = split(m/;/, $line, -1);
 	    $hexk =~ s/^0+//;
-	    $hexk =  sprintf("%04X", hex($hexk));
-	    if ($prop{code} eq $hexk) {
-		$prop{block}  = charblock($code);
-		$prop{script} = charscript($code);
+	    $hexk =  sprintf("\%04X", hex($hexk));
+	    if (%prop{code} eq $hexk) {
+		%prop{block}  = charblock($code);
+		%prop{script} = charscript($code);
 		if(defined $rname){
-                    $prop{code} = $rcode;
-                    $prop{name} = $rname;
-                    $prop{decomposition} = $rdec;
+                    %prop{code} = $rcode;
+                    %prop{name} = $rname;
+                    %prop{decomposition} = $rdec;
                 }
 		return \%prop;
 	    }
@@ -275,7 +275,7 @@ sub charinrange {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
 	unless defined $code;
-    _search($range, 0, $#$range, $code);
+    _search($range, 0, (@$range-1), $code);
 }
 
 =head2 charblock
@@ -316,7 +316,7 @@ sub _charblocks {
 		    my ($lo, $hi) = (hex($1), hex($2));
 		    my $subrange = [ $lo, $hi, $3 ];
 		    push @BLOCKS, $subrange;
-		    push @{$BLOCKS{$3}}, $subrange;
+		    push @{%BLOCKS{$3}}, $subrange;
 		}
 	    }
 	    close($BLOCKSFH);
@@ -332,10 +332,10 @@ sub charblock {
     my $code = _getcode($arg);
 
     if (defined $code) {
-	_search(\@BLOCKS, 0, $#BLOCKS, $code);
+	_search(\@BLOCKS, 0, (@BLOCKS-1), $code);
     } else {
-	if (exists $BLOCKS{$arg}) {
-	    return dclone $BLOCKS{$arg};
+	if (exists %BLOCKS{$arg}) {
+	    return dclone %BLOCKS{$arg};
 	} else {
 	    return;
 	}
@@ -380,7 +380,7 @@ sub _charscripts {
 		    $script =~ s/\b(\w)/{uc($1)}/g;
 		    my $subrange = [ $lo, $hi, $script ];
 		    push @SCRIPTS, $subrange;
-		    push @{$SCRIPTS{$script}}, $subrange;
+		    push @{%SCRIPTS{$script}}, $subrange;
 		}
 	    }
 	    close($SCRIPTSFH);
@@ -397,10 +397,10 @@ sub charscript {
     my $code = _getcode($arg);
 
     if (defined $code) {
-	_search(\@SCRIPTS, 0, $#SCRIPTS, $code);
+	_search(\@SCRIPTS, 0, (@SCRIPTS-1), $code);
     } else {
-	if (exists $SCRIPTS{$arg}) {
-	    return dclone $SCRIPTS{$arg};
+	if (exists %SCRIPTS{$arg}) {
+	    return dclone %SCRIPTS{$arg};
 	} else {
 	    return;
 	}
@@ -624,7 +624,7 @@ sub _compexcl {
 	    while ( ~< $COMPEXCLFH) {
 		if (m/^([0-9A-F]+)\s+\#\s+/) {
 		    my $code = hex($1);
-		    $COMPEXCL{$code} = undef;
+		    %COMPEXCL{$code} = undef;
 		}
 	    }
 	    close($COMPEXCLFH);
@@ -640,7 +640,7 @@ sub compexcl {
 
     _compexcl() unless %COMPEXCL;
 
-    return exists $COMPEXCL{$code};
+    return exists %COMPEXCL{$code};
 }
 
 =head2 casefold
@@ -695,7 +695,7 @@ sub _casefold {
 	    while ( ~< $CASEFOLDFH) {
 		if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
 		    my $code = hex($1);
-		    $CASEFOLD{$code} = { code    => $1,
+		    %CASEFOLD{$code} = { code    => $1,
 					 status  => $2,
 					 mapping => $3 };
 		}
@@ -713,7 +713,7 @@ sub casefold {
 
     _casefold() unless %CASEFOLD;
 
-    return $CASEFOLD{$code};
+    return %CASEFOLD{$code};
 }
 
 =head2 casespec
@@ -778,21 +778,21 @@ sub _casespec {
 		    my ($hexcode, $lower, $title, $upper, $condition) =
 			($1, $2, $3, $4, $5);
 		    my $code = hex($hexcode);
-		    if (exists $CASESPEC{$code}) {
-			if (exists $CASESPEC{$code}->{code}) {
+		    if (exists %CASESPEC{$code}) {
+			if (exists %CASESPEC{$code}->{code}) {
 			    my ($oldlower,
 				$oldtitle,
 				$oldupper,
 				$oldcondition) =
-				    @{$CASESPEC{$code}}{qw(lower
+				    %{%CASESPEC{$code}}{[qw(lower
 							   title
 							   upper
-							   condition)};
+							   condition)]};
 			    if (defined $oldcondition) {
 				my ($oldlocale) =
 				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
-				delete $CASESPEC{$code};
-				$CASESPEC{$code}->{$oldlocale} =
+				delete %CASESPEC{$code};
+				%CASESPEC{$code}->{$oldlocale} =
 				{ code      => $hexcode,
 				  lower     => $oldlower,
 				  title     => $oldtitle,
@@ -802,14 +802,14 @@ sub _casespec {
 			}
 			my ($locale) =
 			    ($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
-			$CASESPEC{$code}->{$locale} =
+			%CASESPEC{$code}->{$locale} =
 			{ code      => $hexcode,
 			  lower     => $lower,
 			  title     => $title,
 			  upper     => $upper,
 			  condition => $condition };
 		    } else {
-			$CASESPEC{$code} =
+			%CASESPEC{$code} =
 			{ code      => $hexcode,
 			  lower     => $lower,
 			  title     => $title,
@@ -831,7 +831,7 @@ sub casespec {
 
     _casespec() unless %CASESPEC;
 
-    return ref $CASESPEC{$code} ? dclone $CASESPEC{$code} : $CASESPEC{$code};
+    return ref %CASESPEC{$code} ? dclone %CASESPEC{$code} : %CASESPEC{$code};
 }
 
 =head2 namedseq()
@@ -865,7 +865,7 @@ sub _namedseq {
 		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my ($n, $s) = ($1, $2);
 		    my @s = map { chr(hex($_)) } split(' ', $s);
-		    $NAMEDSEQ{$n} = join("", @s);
+		    %NAMEDSEQ{$n} = join("", @s);
 		}
 	    }
 	    close($NAMEDSEQFH);
@@ -881,11 +881,11 @@ sub namedseq {
 	    if (@_ == 0) {
 		return %NAMEDSEQ;
 	    } elsif (@_ == 1) {
-		my $s = $NAMEDSEQ{ $_[0] };
+		my $s = %NAMEDSEQ{ @_[0] };
 		return defined $s ? map { ord($_) } split('', $s) : ();
 	    }
 	} elsif (@_ == 1) {
-	    return $NAMEDSEQ{ $_[0] };
+	    return %NAMEDSEQ{ @_[0] };
 	}
     }
     return;

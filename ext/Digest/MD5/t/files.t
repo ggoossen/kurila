@@ -1,5 +1,5 @@
 BEGIN {
-	if ($ENV{PERL_CORE}) {
+	if (%ENV{PERL_CORE}) {
         	chdir 't' if -d 't';
         	@INC = '../lib';
         }
@@ -62,7 +62,7 @@ for (split m/^/, $EXPECT) {
      my($md5hex, $file) = split ' ';
      my $base = $file;
 #     print "# $base\n";
-     if ($ENV{PERL_CORE}) {
+     if (%ENV{PERL_CORE}) {
          if ($file eq 'rfc1321.txt') { # Don't have it in core.
 	     print "ok ", ++$testno, " # Skip: PERL_CORE\n";
 	     next;
@@ -80,14 +80,14 @@ for (split m/^/, $EXPECT) {
 	warn "No such file: $file\n";
 	next;
      }
-     if ($ENV{EBCDIC_MD5SUM}) {
+     if (%ENV{EBCDIC_MD5SUM}) {
          require Encode;
 	 my $data = cat_file($file);	
 	 Encode::from_to($data, 'latin1', 'cp1047');
 	 print md5_hex($data), "  $base\n";
 	 next;
      }
-     if ($ENV{MAC_MD5SUM}) {
+     if (%ENV{MAC_MD5SUM}) {
          require Encode;
 	 my $data = cat_file($file);	
 	 Encode::from_to($data, 'latin1', 'MacRoman');

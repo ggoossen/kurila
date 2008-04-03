@@ -12,7 +12,7 @@ BEGIN {
     unless ($haspw) { print "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config;
     # VMS's pwd.h struct passwd conflicts with the one in vmsish.h
-    $haspw = 0 unless ( $Config{'i_pwd'} eq 'define' || $^O eq 'VMS' );
+    $haspw = 0 unless ( %Config{'i_pwd'} eq 'define' || $^O eq 'VMS' );
     unless ($haspw) { print "1..0 # Skip: no pwd.h\n"; exit 0 }
 }
 
@@ -47,33 +47,33 @@ else {
 }
 print "ok 2\n";
 
-print "not " unless $pwent->name   eq $pwent[0];
+print "not " unless $pwent->name   eq @pwent[0];
 print "ok 3\n";
 
 if ($^O eq 'os390') {
     print "not "
 	unless not defined $pwent->passwd &&
-	       $pwent[1] eq '0'; # go figure
+	       @pwent[1] eq '0'; # go figure
 } else {
-    print "not " unless $pwent->passwd eq $pwent[1];
+    print "not " unless $pwent->passwd eq @pwent[1];
 }
 print "ok 4\n";
 
-print "not " unless $pwent->uid    == $pwent[2];
+print "not " unless $pwent->uid    == @pwent[2];
 print "ok 5\n";
 
-print "not " unless $pwent->gid    == $pwent[3];
+print "not " unless $pwent->gid    == @pwent[3];
 print "ok 6\n";
 
 # The quota and comment fields are unportable.
 
-print "not " unless $pwent->gecos  eq $pwent[6];
+print "not " unless $pwent->gecos  eq @pwent[6];
 print "ok 7\n";
 
-print "not " unless $pwent->dir    eq $pwent[7];
+print "not " unless $pwent->dir    eq @pwent[7];
 print "ok 8\n";
 
-print "not " unless $pwent->shell  eq $pwent[8];
+print "not " unless $pwent->shell  eq @pwent[8];
 print "ok 9\n";
 
 # The expire field is unportable.

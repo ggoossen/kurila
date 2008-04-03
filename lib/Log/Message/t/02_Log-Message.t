@@ -1,6 +1,6 @@
 ### Log::Message test suite ###
 BEGIN { 
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir '../lib/Log/Message' if -d '../lib/Log/Message';
         unshift @INC, '../../..';
     }
@@ -135,7 +135,7 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
     ### store errors
     {   ### dont make it print
         my $warnings;
-        local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
+        local ${^WARN_HOOK} = sub { $warnings .= @_[0]->message };
     
         my $rv  = $log->store();
         ok( !$rv,                       q[Logging empty message failed] );
@@ -145,7 +145,7 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
     ### retrieve errors
     {   ### dont make it print
         my $warnings;
-        local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
+        local ${^WARN_HOOK} = sub { $warnings .= @_[0]->message };
     
         ### XXX whitebox test!
         local $Params::Check::VERBOSE = 1; # so the warnings are emitted

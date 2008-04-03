@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     } else {
@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -82,7 +82,7 @@ is ($@, '', "walk_output() accepts obj that can print");
 # test that walk_output accepts a HANDLE arg
 SKIP: {
     skip("no perlio in this build", 4)
-        unless $Config::Config{useperlio};
+        unless %Config::Config{useperlio};
 
     foreach my $foo (\*STDOUT, \*STDERR) {
 	eval {  walk_output($foo) };
@@ -142,7 +142,7 @@ sub render {
 SKIP: {
     # tests output to GLOB, using perlio feature directly
     skip "no perlio on this build", 127
-	unless $Config::Config{useperlio};
+	unless %Config::Config{useperlio};
     
     set_style_standard('concise');  # MUST CALL before output needed
     
@@ -267,15 +267,15 @@ SKIP: {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($style, $mode);
-	    $combos{"$style$mode"} = $sample;
+	    %combos{"$style$mode"} = $sample;
 	}
     }
     # crosscheck that samples are all text-different
     my @list = sort keys %combos;
-    for my $i (0..$#list) {
-	for my $j ($i+1..$#list) {
-	    isnt ($combos{$list[$i]}, $combos{$list[$j]},
-		  "combos for $list[$i] and $list[$j] are different, as expected");
+    for my $i (0..(@list-1)) {
+	for my $j ($i+1..(@list-1)) {
+	    isnt (%combos{@list[$i]}, %combos{@list[$j]},
+		  "combos for @list[$i] and @list[$j] are different, as expected");
 	}
     }
     
@@ -285,14 +285,14 @@ SKIP: {
 	    reset_sequence();
 	    walk_output(\$sample);
 	    $walker->($mode, $style);
-	    $combos{"$mode$style"} = $sample;
+	    %combos{"$mode$style"} = $sample;
 	}
     }
     # test commutativity of flags, ie that AB == BA
     for my $mode (@modes) {
 	for my $style (@styles) {
-	    is ( $combos{"$style$mode"},
-		 $combos{"$mode$style"},
+	    is ( %combos{"$style$mode"},
+		 %combos{"$mode$style"},
 		 "results for $style$mode vs $mode$style are the same" );
 	}
     }
@@ -309,15 +309,15 @@ SKIP: {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($mode);
-	    $combos{"$style/$mode"} = $sample;
+	    %combos{"$style/$mode"} = $sample;
 	}
     }
     # crosscheck that samples are all text-different
     my @nm = sort keys %combos;
-    for my $i (0..$#nm) {
-	for my $j ($i+1..$#nm) {
-	    isnt ($combos{$nm[$i]}, $combos{$nm[$j]},
-		  "results for $nm[$i] and $nm[$j] are different, as expected");
+    for my $i (0..(@nm-1)) {
+	for my $j ($i+1..(@nm-1)) {
+	    isnt (%combos{@nm[$i]}, %combos{@nm[$j]},
+		  "results for @nm[$i] and @nm[$j] are different, as expected");
 	}
     }
     
@@ -330,14 +330,14 @@ SKIP: {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($style);
-	    $combos{"$mode/$style"} = $sample;
+	    %combos{"$mode/$style"} = $sample;
 	}
     }
     # test commutativity of flags, ie that AB == BA
     for my $mode (@modes) {
 	for my $style (@styles) {
-	    is ( $combos{"$style/$mode"},
-		 $combos{"$mode/$style"},
+	    is ( %combos{"$style/$mode"},
+		 %combos{"$mode/$style"},
 		 "results for $style/$mode vs $mode/$style are the same" );
 	}
     }
@@ -350,20 +350,20 @@ SKIP: {
     for my $mode (@modes) {
 	for my $style (@styles) {
 
-	    is ( $combos{"$style$mode"},
-		 $combos{"$style/$mode"},
+	    is ( %combos{"$style$mode"},
+		 %combos{"$style/$mode"},
 		 "$style$mode VS $style/$mode are the same" );
 
-	    is ( $combos{"$mode$style"},
-		 $combos{"$mode/$style"},
+	    is ( %combos{"$mode$style"},
+		 %combos{"$mode/$style"},
 		 "$mode$style VS $mode/$style are the same" );
 
-	    is ( $combos{"$style$mode"},
-		 $combos{"$mode/$style"},
+	    is ( %combos{"$style$mode"},
+		 %combos{"$mode/$style"},
 		 "$style$mode VS $mode/$style are the same" );
 
-	    is ( $combos{"$mode$style"},
-		 $combos{"$style/$mode"},
+	    is ( %combos{"$mode$style"},
+		 %combos{"$style/$mode"},
 		 "$mode$style VS $style/$mode are the same" );
 	}
     }

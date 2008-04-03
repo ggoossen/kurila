@@ -24,37 +24,37 @@ print "# First entry is '$first'\n";
 # cheating, but there was briefly a bug where the key got a bonus newline.
 my ($first_each) = each %Config;
 is($first_each, $first, "First key from each is correct");
-ok(exists($Config{$first_each}), "First key exists");
-ok(!exists($Config{"\n$first"}),
+ok(exists(%Config{$first_each}), "First key exists");
+ok(!exists(%Config{"\n$first"}),
    "Check that first key with prepended newline isn't falsely existing");
 
-is($Config{PERL_REVISION}, undef, "No PERL_REVISION");
-is($Config{KURILA_VERSION}, 1, "KURILA_REVISION 1");
+is(%Config{PERL_REVISION}, undef, "No PERL_REVISION");
+is(%Config{KURILA_VERSION}, 1, "KURILA_REVISION 1");
 
-ok( exists $Config{cc},      "has cc");
+ok( exists %Config{cc},      "has cc");
 
-ok( exists $Config{ccflags}, "has ccflags");
+ok( exists %Config{ccflags}, "has ccflags");
 
-ok(!exists $Config{python},  "has no python");
+ok(!exists %Config{python},  "has no python");
 
-ok( exists $Config{d_fork},  "has d_fork");
+ok( exists %Config{d_fork},  "has d_fork");
 
-ok(!exists $Config{d_bork},  "has no d_bork");
+ok(!exists %Config{d_bork},  "has no d_bork");
 
-like($Config{ivsize}, qr/^(4|8)$/, "ivsize is 4 or 8 (it is $Config{ivsize})");
+like(%Config{ivsize}, qr/^(4|8)$/, "ivsize is 4 or 8 (it is %Config{ivsize})");
 
 # byteorder is virtual, but it has rules.
 
-like($Config{byteorder}, qr/^(1234|4321|12345678|87654321)$/,
+like(%Config{byteorder}, qr/^(1234|4321|12345678|87654321)$/,
      "byteorder is 1234 or 4321 or 12345678 or 87654321 "
-     . "(it is $Config{byteorder})");
+     . "(it is %Config{byteorder})");
 
-is(length $Config{byteorder}, $Config{ivsize},
-   "byteorder is as long as ivsize (which is $Config{ivsize})");
+is(length %Config{byteorder}, %Config{ivsize},
+   "byteorder is as long as ivsize (which is %Config{ivsize})");
 
 # ccflags_nolargefiles is virtual, too.
 
-ok(exists $Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
+ok(exists %Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
 
 # Utility functions.
 
@@ -68,8 +68,8 @@ ok(exists $Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
     }
 }
 
-like(Config::myconfig(), qr/osname=\Q$Config{osname}\E/,   "myconfig");
-like(Config::config_sh(), qr/osname='\Q$Config{osname}\E'/, "config_sh");
+like(Config::myconfig(), qr/osname=\Q%Config{osname}\E/,   "myconfig");
+like(Config::config_sh(), qr/osname='\Q%Config{osname}\E'/, "config_sh");
 like(Config::config_sh(), qr/byteorder='[1-8]+'/,
      "config_sh has a valid byteorder");
 foreach my $line (Config::config_re('c.*')) {
@@ -89,38 +89,38 @@ $out->clear;
 undef $out;
 untie *STDOUT;
 
-like($out1, qr/^cc='\Q$Config{cc}\E';/, "found config_var cc");
+like($out1, qr/^cc='\Q%Config{cc}\E';/, "found config_var cc");
 like($out2, qr/^d_bork='UNKNOWN';/, "config_var d_bork is UNKNOWN");
 
 # Read-only.
 
 undef $@;
-eval { $Config{d_bork} = 'borkbork' };
+eval { %Config{d_bork} = 'borkbork' };
 like($@->{description}, qr/Config is read-only/, "no STORE");
 
-ok(!exists $Config{d_bork}, "still no d_bork");
+ok(!exists %Config{d_bork}, "still no d_bork");
 
 undef $@;
-eval { delete $Config{d_fork} };
+eval { delete %Config{d_fork} };
 like($@->{description}, qr/Config is read-only/, "no DELETE");
 
-ok( exists $Config{d_fork}, "still d_fork");
+ok( exists %Config{d_fork}, "still d_fork");
 
 undef $@;
 eval { %Config = () };
 like($@->{description}, qr/Config is read-only/, "no CLEAR");
 
-ok( exists $Config{d_fork}, "still d_fork");
+ok( exists %Config{d_fork}, "still d_fork");
 
 {
     package FakeOut;
 
     sub TIEHANDLE {
-	bless(\(my $text), $_[0]);
+	bless(\(my $text), @_[0]);
     }
 
     sub clear {
-	${ $_[0] } = '';
+	${ @_[0] } = '';
     }
 
     sub PRINT {
@@ -132,8 +132,8 @@ ok( exists $Config{d_fork}, "still d_fork");
 # Signal-related variables
 # (this is actually a regression test for Configure.)
 
-is($Config{sig_num_init}  =~ tr/,/,/, $Config{sig_size}, "sig_num_init size");
-is($Config{sig_name_init} =~ tr/,/,/, $Config{sig_size}, "sig_name_init size");
+is(%Config{sig_num_init}  =~ tr/,/,/, %Config{sig_size}, "sig_num_init size");
+is(%Config{sig_name_init} =~ tr/,/,/, %Config{sig_size}, "sig_name_init size");
 
 # Test the troublesome virtual stuff
 my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
@@ -144,14 +144,14 @@ my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
 
 foreach my $pain ($first, @virtual) {
   # No config var is named with anything that is a regexp metachar
-  ok(exists $Config{$pain}, "\$config('$pain') exists");
+  ok(exists %Config{$pain}, "\$config('$pain') exists");
 
-  my @result = $Config{$pain};
+  my @result = %Config{$pain};
   is (scalar @result, 1, "single result for \$config('$pain')");
 
   @result = Config::config_re($pain);
   is (scalar @result, 1, "single result for config_re('$pain')");
-  like ($result[0], qr/^$pain=(['"])\Q$Config{$pain}\E\1$/, # grr '
+  like (@result[0], qr/^$pain=(['"])\Q%Config{$pain}\E\1$/, # grr '
 	"which is the expected result for $pain");
 }
 
@@ -168,20 +168,20 @@ die "This perl is $^V at $^X; other perl is $ver (at $path) "
   . '- failed to find this perl' unless $^V eq $ver;
 
 my %orig_inc;
-@orig_inc{@orig_inc} = ();
+%orig_inc{[@orig_inc]} = ();
 
 my $failed;
 # This is the order that directories are pushed onto @INC in perl.c:
 foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
 		     vendorarchexp vendorlibexp vendorlib_stem)) {
-  my $dir = $Config{$lib};
+  my $dir = %Config{$lib};
   SKIP: {
     skip "lib $lib not in \@INC on Win32" if $^O eq 'MSWin32';
     skip "lib $lib not defined" unless defined $dir;
     skip "lib $lib not set" unless length $dir;
     # So we expect to find it in @INC
 
-    ok (exists $orig_inc{$dir}, "Expect $lib '$dir' to be in \@INC")
+    ok (exists %orig_inc{$dir}, "Expect $lib '$dir' to be in \@INC")
       or $failed++;
   }
 }

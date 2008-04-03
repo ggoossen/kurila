@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -23,7 +23,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -43,34 +43,34 @@ ok(1, 1, 'Loaded');
 my @foo;
 share(@foo);
 ok(2,1,"shared \@foo");
-$foo[0] = "hi";
-ok(3, $foo[0] eq 'hi', "Check assignment works");
-$foo[0] = "bar";
-ok(4, $foo[0] eq 'bar', "Check overwriting works");
-ok(5, !defined $foo[1], "Check undef value");
-$foo[2] = "test";
-ok(6, $foo[2] eq "test", "Check extending the array works");
-ok(7, !defined $foo[1], "Check undef value again");
+@foo[0] = "hi";
+ok(3, @foo[0] eq 'hi', "Check assignment works");
+@foo[0] = "bar";
+ok(4, @foo[0] eq 'bar', "Check overwriting works");
+ok(5, !defined @foo[1], "Check undef value");
+@foo[2] = "test";
+ok(6, @foo[2] eq "test", "Check extending the array works");
+ok(7, !defined @foo[1], "Check undef value again");
 ok(8, scalar(@foo) == 3, "Check the length of the array");
-ok(9,$#foo == 2, "Check last element of array");
-threads->create(sub { $foo[0] = "thread1" })->join;
-ok(10, $foo[0] eq "thread1", "Check that a value can be changed in another thread");
+ok(9,@foo == 3, "Check last element of array");
+threads->create(sub { @foo[0] = "thread1" })->join;
+ok(10, @foo[0] eq "thread1", "Check that a value can be changed in another thread");
 push(@foo, "another value");
-ok(11, $foo[3] eq "another value", "Check that push works");
+ok(11, @foo[3] eq "another value", "Check that push works");
 push(@foo, 1,2,3);
-ok(12, $foo[-1] == 3, "More push");
-ok(13, $foo[-2] == 2, "More push");
-ok(14, $foo[4] == 1, "More push");
+ok(12, @foo[-1] == 3, "More push");
+ok(13, @foo[-2] == 2, "More push");
+ok(14, @foo[4] == 1, "More push");
 threads->create(sub { push @foo, "thread2" })->join();
-ok(15, $foo[7] eq "thread2", "Check push in another thread");
+ok(15, @foo[7] eq "thread2", "Check push in another thread");
 unshift(@foo, "start");
-ok(16, $foo[0] eq "start", "Check unshift");
+ok(16, @foo[0] eq "start", "Check unshift");
 unshift(@foo, 1,2,3);
-ok(17, $foo[0] == 1, "Check multiple unshift");
-ok(18, $foo[1] == 2, "Check multiple unshift");
-ok(19, $foo[2] == 3, "Check multiple unshift");
+ok(17, @foo[0] == 1, "Check multiple unshift");
+ok(18, @foo[1] == 2, "Check multiple unshift");
+ok(19, @foo[2] == 3, "Check multiple unshift");
 threads->create(sub { unshift @foo, "thread3" })->join();
-ok(20, $foo[0] eq "thread3", "Check unshift from another thread");
+ok(20, @foo[0] eq "thread3", "Check unshift from another thread");
 my $var = pop(@foo);
 ok(21, $var eq "thread2", "Check pop");
 threads->create(sub { my $foo = pop @foo; ok(22, $foo == 3, "Check pop works in a thread")})->join();
@@ -102,28 +102,27 @@ ok(31, $ref->[0] eq "thread4", "Check that it works after another thread");
 undef($ref);
 threads->create(sub { @foo = () })->join();
 ok(32, @foo == 0, "Check that array is empty");
-ok(33, exists($foo[0]) == 0, "Check that zero index doesn't index");
+ok(33, exists(@foo[0]) == 0, "Check that zero index doesn't index");
 @foo = ("sky");
-ok(34, exists($foo[0]) == 1, "Check that zero index exists now");
-ok(35, $foo[0] eq "sky", "And check that it also contains the right value");
-$#foo = 20;
-$foo[20] = "sky";
-ok(36, delete($foo[20]) eq "sky", "Check delete works");
+ok(34, exists(@foo[0]) == 1, "Check that zero index exists now");
+ok(35, @foo[0] eq "sky", "And check that it also contains the right value");
+@foo[20] = "sky";
+ok(36, delete(@foo[20]) eq "sky", "Check delete works");
 
-threads->create(sub { delete($foo[0])})->join();
-ok(37, !defined delete($foo[0]), "Check that delete works from a thread");
+threads->create(sub { delete(@foo[0])})->join();
+ok(37, !defined delete(@foo[0]), "Check that delete works from a thread");
 
 @foo = (1,2,3,4,5);
 
 {
-    my ($t1,$t2) = @foo[2,3];
+    my ($t1,$t2) = @foo[[2,3]];
     ok(38, $t1 == 3, "Check slice");
     ok(39, $t2 == 4, "Check slice again");
-    my @t1 = @foo[1...4];
-    ok(40, $t1[0] == 2, "Check slice list");
-    ok(41, $t1[2] == 4, "Check slice list 2");
-    threads->create(sub { @foo[0,1] = ("hej","hop") })->join();
-    ok(42,$foo[0] eq "hej", "Check slice assign");
+    my @t1 = @foo[[1...4]];
+    ok(40, @t1[0] == 2, "Check slice list");
+    ok(41, @t1[2] == 4, "Check slice list 2");
+    threads->create(sub { @foo[[0,1]] = ("hej","hop") })->join();
+    ok(42,@foo[0] eq "hej", "Check slice assign");
 }
 {
     eval {

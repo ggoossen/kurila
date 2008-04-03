@@ -569,10 +569,10 @@ sub Head1Level {
    my $self = shift;
    if (@_) {
      my $arg = shift;
-     if ($arg =~ m/^\d$/ && $arg +<= $#LatexSections) {
+     if ($arg =~ m/^\d$/ && $arg +< @LatexSections) {
        $self->{Head1Level} = $arg;
      } else {
-       carp "Head1Level supplied ($arg) must be integer in range 0 to ".$#LatexSections . "- Ignoring\n";
+       carp "Head1Level supplied ($arg) must be integer in range 0 to ".(@LatexSections-1) . "- Ignoring\n";
      }
    }
    return $self->{Head1Level};
@@ -874,9 +874,9 @@ sub begin_pod {
 
   # Comment message to say where this came from
   my $comment = << "__TEX_COMMENT__";
-%%  Latex generated from POD in document $infile
-%%  Using the perl module $class
-%%  Converted on $date
+\%\%  Latex generated from POD in document $infile
+\%\%  Using the perl module $class
+\%\%  Converted on $date
 __TEX_COMMENT__
 
   # Write the preamble
@@ -891,7 +891,7 @@ __TEX_COMMENT__
       $preamble = $self->UserPreamble;
 
       # Add the description of where this came from
-      $preamble .=  "\n$comment\n%%  Preamble supplied by user.\n\n";
+      $preamble .=  "\n$comment\n\%\%  Preamble supplied by user.\n\n";
 
     } else {
 
@@ -1201,7 +1201,7 @@ sub textblock {
     # as subsections of the main name section unless we are already
     # at maximum [Head1Level() could check this itself - CHECK]
     $self->Head1Level( $self->Head1Level() + 1)
-      unless $self->Head1Level == $#LatexSections;
+      unless $self->Head1Level == @LatexSections-1;
 
     # Now write out the new latex paragraph
     $purpose = ucfirst($purpose);
@@ -1237,8 +1237,8 @@ sub interior_sequence {
     if ($seq_argument =~ m/^\d+$/) {
       return chr($seq_argument);
     # Look up escape in hash table
-    } elsif (exists $HTML_Escapes{$seq_argument}) {
-      return $HTML_Escapes{$seq_argument};
+    } elsif (exists %HTML_Escapes{$seq_argument}) {
+      return %HTML_Escapes{$seq_argument};
 
     } else {
       my ($file, $line) = $pod_seq->file_line();
@@ -1518,18 +1518,18 @@ sub head {
   my $level = $self->Head1Level() - 1 + $num;
 
   # Warn if heading to large
-  if ($num +> $#LatexSections) {
+  if ($num +>= @LatexSections) {
     my $line = $parobj->file_line;
     my $file = $self->input_file;
     warn "Heading level too large ($level) for LaTeX at line $line of file $file\n";
-    $level = $#LatexSections;
+    $level = @LatexSections-1;
   }
 
   # Check to see whether section should be unnumbered
   my $star = ($level +>= $self->LevelNoNum ? '*' : '');
 
   # Section
-  $self->_output("\\" .$LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
+  $self->_output("\\" .@LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
 
 }
 
@@ -1610,7 +1610,7 @@ sub _replace_special_chars {
 
   # Must be done after escape of \ since this command adds latex escapes
   # Replace characters that can be escaped
-  $paragraph =~ s/([\$\#&%_{}])/\\$1/g;
+  $paragraph =~ s/([\$\#&\%_\{\}])/\\$1/g;
 
   # Replace ^ characters with \^{} so that $^F works okay
   $paragraph =~ s/(\^)/\\$1\{\}/g;

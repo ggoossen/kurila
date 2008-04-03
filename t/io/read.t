@@ -8,7 +8,7 @@ BEGIN {
 
 use strict;
 eval 'use Errno';
-die $@ if $@ and !$ENV{PERL_CORE_MINITEST};
+die $@ if $@ and !%ENV{PERL_CORE_MINITEST};
 
 plan tests => 2;
 

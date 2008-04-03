@@ -76,42 +76,43 @@
      EQOP = 291,
      MULOP = 292,
      ADDOP = 293,
-     DOLSHARP = 294,
-     DO = 295,
-     HASHBRACK = 296,
-     NOAMP = 297,
-     LOCAL = 298,
-     MY = 299,
-     MYSUB = 300,
-     REQUIRE = 301,
-     COLONATTR = 302,
-     PREC_LOW = 303,
-     DOROP = 304,
-     OROP = 305,
-     ANDOP = 306,
-     NOTOP = 307,
-     ASSIGNOP = 308,
-     DORDOR = 309,
-     OROR = 310,
-     ANDAND = 311,
-     BITOROP = 312,
-     BITANDOP = 313,
-     SHIFTOP = 314,
-     MATCHOP = 315,
-     REFGEN = 316,
-     UMINUS = 317,
-     POWOP = 318,
-     POSTDEC = 319,
-     POSTINC = 320,
-     PREDEC = 321,
-     PREINC = 322,
-     DEREFAMP = 323,
-     DEREFSTAR = 324,
-     DEREFHSH = 325,
-     DEREFARY = 326,
-     DEREFSCL = 327,
-     ARROW = 328,
-     PEG = 329
+     DO = 294,
+     HASHBRACK = 295,
+     NOAMP = 296,
+     HSLICE = 297,
+     ASLICE = 298,
+     LOCAL = 299,
+     MY = 300,
+     MYSUB = 301,
+     REQUIRE = 302,
+     COLONATTR = 303,
+     PREC_LOW = 304,
+     DOROP = 305,
+     OROP = 306,
+     ANDOP = 307,
+     NOTOP = 308,
+     ASSIGNOP = 309,
+     DORDOR = 310,
+     OROR = 311,
+     ANDAND = 312,
+     BITOROP = 313,
+     BITANDOP = 314,
+     SHIFTOP = 315,
+     MATCHOP = 316,
+     REFGEN = 317,
+     UMINUS = 318,
+     POWOP = 319,
+     POSTDEC = 320,
+     POSTINC = 321,
+     PREDEC = 322,
+     PREINC = 323,
+     DEREFAMP = 324,
+     DEREFSTAR = 325,
+     DEREFHSH = 326,
+     DEREFARY = 327,
+     DEREFSCL = 328,
+     ARROW = 329,
+     PEG = 330
    };
 #endif
 /* Tokens.  */
@@ -151,42 +152,43 @@
 #define EQOP 291
 #define MULOP 292
 #define ADDOP 293
-#define DOLSHARP 294
-#define DO 295
-#define HASHBRACK 296
-#define NOAMP 297
-#define LOCAL 298
-#define MY 299
-#define MYSUB 300
-#define REQUIRE 301
-#define COLONATTR 302
-#define PREC_LOW 303
-#define DOROP 304
-#define OROP 305
-#define ANDOP 306
-#define NOTOP 307
-#define ASSIGNOP 308
-#define DORDOR 309
-#define OROR 310
-#define ANDAND 311
-#define BITOROP 312
-#define BITANDOP 313
-#define SHIFTOP 314
-#define MATCHOP 315
-#define REFGEN 316
-#define UMINUS 317
-#define POWOP 318
-#define POSTDEC 319
-#define POSTINC 320
-#define PREDEC 321
-#define PREINC 322
-#define DEREFAMP 323
-#define DEREFSTAR 324
-#define DEREFHSH 325
-#define DEREFARY 326
-#define DEREFSCL 327
-#define ARROW 328
-#define PEG 329
+#define DO 294
+#define HASHBRACK 295
+#define NOAMP 296
+#define HSLICE 297
+#define ASLICE 298
+#define LOCAL 299
+#define MY 300
+#define MYSUB 301
+#define REQUIRE 302
+#define COLONATTR 303
+#define PREC_LOW 304
+#define DOROP 305
+#define OROP 306
+#define ANDOP 307
+#define NOTOP 308
+#define ASSIGNOP 309
+#define DORDOR 310
+#define OROR 311
+#define ANDAND 312
+#define BITOROP 313
+#define BITANDOP 314
+#define SHIFTOP 315
+#define MATCHOP 316
+#define REFGEN 317
+#define UMINUS 318
+#define POWOP 319
+#define POSTDEC 320
+#define POSTINC 321
+#define PREDEC 322
+#define PREINC 323
+#define DEREFAMP 324
+#define DEREFSTAR 325
+#define DEREFHSH 326
+#define DEREFARY 327
+#define DEREFSCL 328
+#define ARROW 329
+#define PEG 330
 
 
 

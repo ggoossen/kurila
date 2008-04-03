@@ -2,16 +2,16 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
-    if ($^O eq 'hpux' && $Config{osvers} +<= 10.20) {
+    if ($^O eq 'hpux' && %Config{osvers} +<= 10.20) {
         print("1..0 # Skip: Broken under HP-UX 10.20\n");
         exit(0);
     }
@@ -45,7 +45,7 @@ use threads::shared;
 
     my @threads;
     for (1..$cnt) {
-        $threads[$_] = threads->create(sub {
+        @threads[$_] = threads->create(sub {
                             my $tnum = shift;
                             my $timeout = time() + $TIMEOUT;
 
@@ -79,7 +79,7 @@ use threads::shared;
     # Gather thread results
     my ($okay, $failures, $timeouts, $unknown) = (0, 0, 0, 0);
     for (1..$cnt) {
-        my $rc = $threads[$_]->join();
+        my $rc = @threads[$_]->join();
         if (! $rc) {
             $failures++;
         } elsif ($rc =~ m/^timed out/) {

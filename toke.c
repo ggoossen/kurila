@@ -192,7 +192,7 @@ static const char* const lex_state_names[] = {
  * Convenience functions to return different tokens and prime the
  * lexer for the next token.  They all take an argument.
  *
- * TOKEN        : generic token (used for '(', DOLSHARP, etc)
+ * TOKEN        : generic token (used for '(', etc)
  * OPERATOR     : generic operator
  * AOPERATOR    : assignment operator
  * PREBLOCK     : beginning the block after an if, while, foreach, ...
@@ -305,7 +305,6 @@ static struct debug_tokens {
     { CONTINUE,		TOKENTYPE_NONE,		"CONTINUE" },
     { DEFAULT,		TOKENTYPE_NONE,		"DEFAULT" },
     { DO,		TOKENTYPE_NONE,		"DO" },
-    { DOLSHARP,		TOKENTYPE_NONE,		"DOLSHARP" },
     { DORDOR,		TOKENTYPE_NONE,		"DORDOR" },
     { DOROP,		TOKENTYPE_OPNUM,	"DOROP" },
     { DOTDOT,		TOKENTYPE_IVAL,		"DOTDOT" },
@@ -2131,6 +2130,14 @@ S_scan_const(pTHX_ char *start)
 	    if (!in_pat && (s[1] == '+' || s[1] == '-'))
 		break; /* in regexp, neither @+ nor @- are interpolated */
 	}
+	else if (*s == '%' && s[1]) {
+	    if (isALNUM_lazy_if(s+1,UTF))
+		break;
+	    if (strchr(":'{$", s[1]))
+		break;
+	    if (!in_pat && (s[1] == '+' || s[1] == '-'))
+		break; /* in regexp, neither %+ nor %- are interpolated */
+	}
 
 	/* check for embedded scalars.  only stop if we're sure it's a
 	   variable.
@@ -3737,13 +3744,20 @@ Perl_yylex(pTHX)
 	}
 	Perl_croak(aTHX_ "Unknown operator '~' found");
     case '[':
-	PL_lex_brackets++;
-	/* FALL THROUGH */
-    case ',':
-	{
-	    const char tmp = *s++;
-	    OPERATOR(tmp);
+	s++;
+	if (PL_expect == XOPERATOR && *s == '[') {
+	    s++;
+	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_expect = XSTATE;
+	    TOKEN(ASLICE);
+	    /* NOT REACHED */
 	}
+	PL_lex_brackets++;
+	OPERATOR('[');
+    case ',':
+	s++;
+	OPERATOR(',');
     case ':':
 	if (s[1] == ':') {
 	    len = 0;
@@ -3948,6 +3962,14 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
 	    OPERATOR(HASHBRACK);
 	case XOPERATOR:
+	    if (*s == '[') {
+		s++;
+		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+		PL_expect = XSTATE;
+		TOKEN(HSLICE);
+		/* NOT REACHED */
+	    }
 	    while (s < PL_bufend && SPACE_OR_TAB(*s))
 		s++;
 	    d = s;
@@ -4284,16 +4306,7 @@ Perl_yylex(pTHX)
 	CLINE;
 
 	if (s[1] == '#' && (isIDFIRST_lazy_if(s+2,UTF) || strchr("{$:+-", s[2]))) {
-	    PL_tokenbuf[0] = '@';
-	    s = scan_ident(s + 1, PL_bufend, PL_tokenbuf + 1,
-			   sizeof PL_tokenbuf - 1, FALSE);
-	    if (PL_expect == XOPERATOR)
-		no_op("Array length", s);
-	    if (!PL_tokenbuf[1])
-		PREREF(DOLSHARP);
-	    PL_expect = XOPERATOR;
-	    PL_pending_ident = '#';
-	    TOKEN(DOLSHARP);
+	    Perl_croak(aTHX_ "$# is not allowed");
 	}
 
 	PL_tokenbuf[0] = '$';
@@ -4316,44 +4329,13 @@ Perl_yylex(pTHX)
 	    if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
 		&& intuit_more(s)) {
 		if (*s == '[') {
+		    Perl_croak(aTHX_ "array element should be @%s[...] instead of $%s[...]",
+			       &PL_tokenbuf[1], &PL_tokenbuf[1]);
 		    PL_tokenbuf[0] = '@';
-		    if (ckWARN(WARN_SYNTAX)) {
-			char *t = s+1;
-
-			while (isSPACE(*t) || isALNUM_lazy_if(t,UTF) || *t == '$')
-			    t++;
-			if (*t++ == ',') {
-			    PL_bufptr = PEEKSPACE(PL_bufptr); /* XXX can realloc */
-			    while (t < PL_bufend && *t != ']')
-				t++;
-			    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-					"Multidimensional syntax %.*s not supported",
-				    (int)((t - PL_bufptr) + 1), PL_bufptr);
-			}
-		    }
 		}
 		else if (*s == '{') {
-		    char *t;
-		    PL_tokenbuf[0] = '%';
-		    if (strEQ(PL_tokenbuf+1, "SIG")  && ckWARN(WARN_SYNTAX)
-			&& (t = strchr(s, '}')) && (t = strchr(t, '=')))
-			{
-			    char tmpbuf[sizeof PL_tokenbuf];
-			    do {
-				t++;
-			    } while (isSPACE(*t));
-			    if (isIDFIRST_lazy_if(t,UTF)) {
-				STRLEN len;
-				t = scan_word(t, tmpbuf, sizeof tmpbuf, TRUE,
-					      &len);
-				while (isSPACE(*t))
-				    t++;
-				if (*t == ';' && get_cvn_flags(tmpbuf, len, 0))
-				    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-						"You need to quote \"%s\"",
-						tmpbuf);
-			    }
-			}
+		    Perl_croak(aTHX_ "hash element should be %%%s{...} instead of $%s{...}",
+			       &PL_tokenbuf[1], &PL_tokenbuf[1]);
 		}
 	    }
 
@@ -4413,22 +4395,26 @@ Perl_yylex(pTHX)
 	if (PL_lex_state == LEX_NORMAL)
 	    s = SKIPSPACE1(s);
 	if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop) && intuit_more(s)) {
-	    if (*s == '{')
+	    if (*s == '{') {
+		Perl_croak(aTHX_ "hash slice should be %%%s{[...]} instead of @%s{...}",
+			   PL_tokenbuf+1, PL_tokenbuf+1);
 		PL_tokenbuf[0] = '%';
+	    }
 
-	    /* Warn about @ where they meant $. */
-	    if (*s == '[' || *s == '{') {
+	    /* Warn about @...[...] where they meant @...[[...]]. */
+	    if (*s == '[') {
 		if (ckWARN(WARN_SYNTAX)) {
-		    const char *t = s + 1;
-		    while (*t && (isALNUM_lazy_if(t,UTF) || strchr(" \t$#+-'\"", *t)))
+		    char *t = s+1;
+
+		    while (isSPACE(*t) || isALNUM_lazy_if(t,UTF) || *t == '$')
 			t++;
-		    if (*t == '}' || *t == ']') {
-			t++;
+		    if (*t++ == ',') {
 			PL_bufptr = PEEKSPACE(PL_bufptr); /* XXX can realloc */
+			while (t < PL_bufend && *t != ']')
+			    t++;
 			Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-			    "Scalar value %.*s better written as $%.*s",
-			    (int)(t-PL_bufptr), PL_bufptr,
-			    (int)(t-PL_bufptr-1), PL_bufptr+1);
+				    "Multidimensional syntax %.*s not supported",
+				    (int)((t - PL_bufptr) + 1), PL_bufptr);
 		    }
 		}
 	    }
@@ -4509,7 +4495,7 @@ Perl_yylex(pTHX)
 	/* FIXME. I think that this can be const if char *d is replaced by
 	   more localised variables.  */
 	for (d = SvPV(PL_lex_stuff.str_sv, len); len; len--, d++) {
-	    if (*d == '{' || *d == '$' || *d == '@' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
+	    if (*d == '{' || *d == '$' || *d == '@' || *d == '%' || *d == '\\' || !UTF8_IS_INVARIANT(*d)) {
 		pl_yylval.ival = OP_STRINGIFY;
 		break;
 	    }
@@ -10713,7 +10699,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     }
 
 
-    assert(str_info->str_sv == NULL);
+    /*     assert(str_info->str_sv == NULL); */ /* Might fail if compilation was aborted inside a s///  */
     str_info->str_sv = sv;
 
     return s;

@@ -172,7 +172,7 @@ sub open {
     @_ +>= 2 && @_ +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
     my ($fh, $file) = @_;
     if (@_ +> 2) {
-	my ($mode, $perms) = @_[2, 3];
+	my ($mode, $perms) = @_[[2, 3]];
 	if ($mode =~ m/^\d+$/) {
 	    defined $perms or $perms = 0666;
 	    return sysopen($fh, $file, $mode, $perms);

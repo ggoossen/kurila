@@ -1,7 +1,7 @@
 #!perl -T
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -23,14 +23,14 @@ my $is_Win32  = $^O =~ m/win32/i;
 my $is_Cygwin = $^O =~ m/cygwin/i;
 
 # if testing in core, check that the module is at least available
-if ($ENV{PERL_CORE}) {
+if (%ENV{PERL_CORE}) {
     plan skip_all => "Sys::Syslog was not build" 
-        unless $Config{'extensions'} =~ m/\bSyslog\b/;
+        unless %Config{'extensions'} =~ m/\bSyslog\b/;
 }
 
 # we also need Socket
 plan skip_all => "Socket was not build" 
-    unless $Config{'extensions'} =~ m/\bSocket\b/;
+    unless %Config{'extensions'} =~ m/\bSocket\b/;
 
 my $tests;
 plan tests => $tests;
@@ -165,7 +165,7 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
 
         # syslog() with level "info" (as a macro), should pass
         { local $! = 1;
-          $r = eval { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: %m") } || 0;
+          $r = eval { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: \%m") } || 0;
         }
         is( $@, '', "[$sock_type] syslog() called with level 'info' (macro)" );
         ok( $r, "[$sock_type] syslog() should return true: {dump::view($r)}" );

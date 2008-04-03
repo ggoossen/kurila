@@ -11,7 +11,7 @@ use Test::More tests => 8;
 use vars qw( $complete );
 
 SKIP: {
-    skip('PERL_SKIP_TTY_TEST', 8) if $ENV{PERL_SKIP_TTY_TEST};
+    skip('PERL_SKIP_TTY_TEST', 8) if %ENV{PERL_SKIP_TTY_TEST};
     
     use_ok( 'Term::Complete' );
   
@@ -98,16 +98,16 @@ sub GETC {
 package FakeOut;
 
 sub TIEHANDLE {
-	bless(\(my $text), $_[0]);
+	bless(\(my $text), @_[0]);
 }
 
 sub clear {
-	${ $_[0] } = '';
+	${ @_[0] } = '';
 }
 
 # remove the bell character
 sub scrub {
-	${ $_[0] } =~ tr/\a//d;
+	${ @_[0] } =~ tr/\a//d;
 }
 
 # must shift off self

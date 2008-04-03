@@ -39,7 +39,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     $path_to_README = File::Spec->rel2abs('README');
 
     my @warnings;
-    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->{description} };
 
     eval {
         $num_warnings = validate qq{
@@ -68,7 +68,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 {
     my ($num_warnings, @warnings);
 
-    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->{description} };
 
     eval {
         $num_warnings = validate qq{
@@ -78,7 +78,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     };
 
     if ( !$@ && @warnings == 1
-             && $warnings[0] =~ m/lib is not a plain file/
+             && @warnings[0] =~ m/lib is not a plain file/
              && defined($num_warnings)
              && $num_warnings == 1 )
     {
@@ -97,7 +97,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 {
     my ($num_warnings, @warnings);
 
-    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->{description} };
 
     eval {
         $num_warnings = validate q{
@@ -109,9 +109,9 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     };
 
     if ( !$@ && @warnings == 3
-             && $warnings[0] =~ m/lib is not a plain file/
-             && $warnings[1] =~ m/README is not a directory/
-             && $warnings[2] =~ m/my warning: lib/
+             && @warnings[0] =~ m/lib is not a plain file/
+             && @warnings[1] =~ m/README is not a directory/
+             && @warnings[2] =~ m/my warning: lib/
              && defined($num_warnings)
              && $num_warnings == 3 )
     {
@@ -130,7 +130,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     $path_to_libFile = File::Spec->rel2abs(File::Spec->catdir('lib','File'));
     $path_to_dist    = File::Spec->rel2abs(File::Spec->curdir);
 
-    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->{description} };
 
     eval {
         $num_warnings = validate qq{
@@ -146,8 +146,8 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     };
 
     if ( !$@ && @warnings == 2
-             && $warnings[0] =~ m/Spec is not a plain file/
-             && $warnings[1] =~ m/INSTALL is not a directory/
+             && @warnings[0] =~ m/Spec is not a plain file/
+             && @warnings[1] =~ m/INSTALL is not a directory/
              && defined($num_warnings)
              && $num_warnings == 2 )
     {

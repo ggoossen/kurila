@@ -58,9 +58,9 @@ SKIP: {
     my $tstfile = "filetest.tst";
     skip("No $chflags available", 4) if !-x $chflags;
 
-    my $skip_eff_user_tests = (!$Config{d_setreuid} && !$Config{d_setresuid})
+    my $skip_eff_user_tests = (!%Config{d_setreuid} && !%Config{d_setresuid})
 	                                            ||
-			      (!$Config{d_setregid} && !$Config{d_setresgid});
+			      (!%Config{d_setregid} && !%Config{d_setresgid});
 
     eval {
 	if (!-e $tstfile) {

@@ -36,7 +36,7 @@ use strict;
 
 my $bison = 'bison';
 
-if (@ARGV +>= 2 and $ARGV[0] eq '-b') {
+if (@ARGV +>= 2 and @ARGV[0] eq '-b') {
     shift;
     $bison = shift;
 }
@@ -237,11 +237,11 @@ sub make_type_tab {
 	next unless m/^%(token|type)/;
 	s/^%(token|type)\s+<(\w+)>\s+//
 	    or die "$y_file: unparseable token/type line: $_";
-	$tokens{$_} = $2 for (split ' ', $_);
-	$types{$2} = 1;
+	%tokens{$_} = $2 for (split ' ', $_);
+	%types{$2} = 1;
     }
     die "$y_file: no __DEFAULT__ token defined\n" unless $default_token;
-    $types{$default_token} = 1;
+    %types{$default_token} = 1;
 
     $tablines =~ m/^\Qstatic const char *const yytname[] =\E\n
 	    {\n
@@ -252,7 +252,7 @@ sub make_type_tab {
     my $fields = $1;
     $fields =~ s{"([^"]+)"}
 		{{ "toketype_" .
-		    (defined $tokens{$1} ? $tokens{$1} : $default_token)
+		    (defined %tokens{$1} ? %tokens{$1} : $default_token)
 		}}g;
     $fields =~ s/, \s* 0 \s* $//x
 	or die "make_type_tab: couldn't delete trailing ',0'\n";
@@ -274,10 +274,10 @@ sub my_system {
 	die "failed to execute command '@_': $!\n";
     }
     elsif ($? ^&^ 127) {
-	die sprintf "command '@_' died with signal %d\n",
+	die sprintf "command '@_' died with signal \%d\n",
 	    ($? ^&^ 127);
     }
     elsif ($? >> 8) {
-	die sprintf "command '@_' exited with value %d\n", $? >> 8;
+	die sprintf "command '@_' exited with value \%d\n", $? >> 8;
     }
 }

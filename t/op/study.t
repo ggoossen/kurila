@@ -8,10 +8,10 @@ sub ok ($;$) {
     local $_;
 
     # You have to do it this way or VMS will get confused.
-    printf "%s $test%s\n", $ok   ? 'ok' : 'not ok',
+    printf "\%s $test\%s\n", $ok   ? 'ok' : 'not ok',
                            $name ? " - $name" : '';
 
-    printf "# Failed test at line %d\n", (caller($Ok_Level))[2] unless $ok;
+    printf "# Failed test at line \%d\n", (caller($Ok_Level))[[2]] unless $ok;
 
     $test++;
     return $ok;
@@ -24,11 +24,11 @@ sub nok ($;$) {
 }
 
 use Config;
-my $have_alarm = $Config{d_alarm};
+my $have_alarm = %Config{d_alarm};
 sub alarm_ok (&) {
     my $test = shift;
 
-    local $SIG{ALRM} = sub { die "timeout\n" };
+    local %SIG{ALRM} = sub { die "timeout\n" };
     
     my $match;
     eval { 

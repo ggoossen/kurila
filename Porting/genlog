@@ -28,10 +28,10 @@ USAGE
 my @changes;
 
 my %editkind;
-@editkind{ qw(   add      edit    delete integrate   branch )}
+%editkind{[qw(   add      edit    delete integrate   branch )]}
          = qw(     +         !         -        !>       +> );
 
-my $p4port = $ENV{P4PORT} || 'localhost:1666';
+my $p4port = %ENV{P4PORT} || 'localhost:1666';
 
 my @branch_include;
 my @branch_exclude;
@@ -41,7 +41,7 @@ my %branch_exclude;
 while (@ARGV) {
     $_ = shift;
     if (m/^(\d+)\.\.(\d+)?$/) {
-        push @changes, $1 .. ($2 || (split(' ', `p4 changes -m 1`))[1]);
+        push @changes, $1 .. ($2 || (split(' ', `p4 changes -m 1`))[[1]]);
     }
     elsif (m/^\d+$/) {
         push @changes, $_;
@@ -62,8 +62,8 @@ while (@ARGV) {
 
 @changes = sort { $b <+> $a } @changes;
 
-@branch_include{@branch_include} = @branch_include if @branch_include;
-@branch_exclude{@branch_exclude} = @branch_exclude if @branch_exclude;
+%branch_include{[@branch_include]} = @branch_include if @branch_include;
+%branch_exclude{[@branch_exclude]} = @branch_exclude if @branch_exclude;
 
 my @desc = `p4 -p $p4port describe -s @changes`;
 if ($?) {
@@ -92,14 +92,14 @@ else {
 		    if (m{^\.\.\. //depot/(.*?perl|[^/]*)/([^#]+)#\d+ (\w+)\s*$}) {
 			($branch,$file,$type) = ($1,$2,$3);
  		        $nbranch++;
-		        if (exists $branch_exclude{$branch} or
+		        if (exists %branch_exclude{$branch} or
 			    @branch_include and
-			    not exists $branch_include{$branch}) {
+			    not exists %branch_include{$branch}) {
 			    $skip++;
 			}
-			$files{$branch} = {} unless exists $files{$branch};
-			$files{$branch}{$type} = [] unless exists $files{$branch}{$type};
-			push @{$files{$branch}{$type}}, $file;
+			%files{$branch} = {} unless exists %files{$branch};
+			%files{$branch}{$type} = [] unless exists %files{$branch}{$type};
+			push @{%files{$branch}{$type}}, $file;
 		    }
 		    else {
 			warn "Unknown line [$_], ignoring\n";
@@ -110,7 +110,7 @@ else {
 	next if ((not $change) or $skip);
 	my $output = ("_" x 76) . "\n";
 	$output .= sprintf <<EOT, $change, $who, $date, $time;
-[%6s] By: %-25s             on %9s %9s
+[\%6s] By: \%-25s             on \%9s \%9s
 EOT
 	$output .= "        Log: ";
 	my $i = 0;
@@ -125,17 +125,17 @@ EOT
 	    }
 	}
 	for my $branch (sort keys %files) {
-	    $output .= sprintf "%11s: $branch\n", 'Branch';
-	    for my $kind (sort keys %{$files{$branch}}) {
-	        warn("### $kind ###\n"), next unless exists $editkind{$kind};
-		my $files = $files{$branch}{$kind};
+	    $output .= sprintf "\%11s: $branch\n", 'Branch';
+	    for my $kind (sort keys %{%files{$branch}}) {
+	        warn("### $kind ###\n"), next unless exists %editkind{$kind};
+		my $files = %files{$branch}{$kind};
 		# don't show large branches and integrations
 		$files = ["($kind " . scalar(@$files) . ' files)']
 		    if (@$files +> 25 && ($kind eq 'integrate'
 		    			 || $kind eq 'branch'))
 		       || @$files +> 100;
-	        print wrap(sprintf("%12s ", $editkind{$kind}),
-			   sprintf("%12s ", $editkind{$kind}),
+	        print wrap(sprintf("\%12s ", %editkind{$kind}),
+			   sprintf("\%12s ", %editkind{$kind}),
 			   "@$files\n");
             }
 	}

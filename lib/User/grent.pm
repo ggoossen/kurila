@@ -25,15 +25,15 @@ struct 'User::grent' => [
 sub populate (@) {
     return unless @_;
     my $gob = new();
-    ($gr_name, $gr_passwd, $gr_gid) = @$gob[0,1,2] = @_[0,1,2];
-    @gr_members = @{$gob->[3]} = split ' ', $_[3];
+    ($gr_name, $gr_passwd, $gr_gid) = @$gob[[0,1,2]] = @_[[0,1,2]];
+    @gr_members = @{$gob->[3]} = split ' ', @_[3];
     return $gob;
 } 
 
 sub getgrent ( ) { populate(CORE::getgrent()) } 
 sub getgrnam ($) { populate(CORE::getgrnam(shift)) } 
 sub getgrgid ($) { populate(CORE::getgrgid(shift)) } 
-sub getgr    ($) { ($_[0] =~ m/^\d+/) ? &getgrgid : &getgrnam } 
+sub getgr    ($) { (@_[0] =~ m/^\d+/) ? &getgrgid : &getgrnam } 
 
 1;
 __END__

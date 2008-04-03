@@ -2,15 +2,15 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
 
-    require($ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
+    require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         skip_all(q/Perl not compiled with 'useithreads'/);
     }
 }
@@ -97,7 +97,7 @@ $t->join->join;
 
 sub testsprintf {
     my $testno = shift;
-    my $same = sprintf( "%0.f", $testno);
+    my $same = sprintf( '%0.f', $testno);
     return $testno eq $same;
 }
 
@@ -163,7 +163,7 @@ package main;
     # since it tests using rand()
     my %rand : shared;
     rand(10);
-    threads->create( sub { $rand{int(rand(10000000000))}++ } ) foreach 1..25;
+    threads->create( sub { %rand{int(rand(10000000000))}++ } ) foreach 1..25;
     $_->join foreach threads->list;
     ok((keys %rand +>= 23), "Check that rand() is randomized in new threads");
 }
@@ -173,8 +173,8 @@ package main;
 run_perl(prog => 'use threads v1.67;' .
                  'sub a{threads->create(shift)} $t = a sub{};' .
                  '$t->tid; $t->join; $t->tid',
-         nolib => ($ENV{PERL_CORE}) ? 0 : 1,
-         switches => ($ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
+         nolib => (%ENV{PERL_CORE}) ? 0 : 1,
+         switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
 is($?, 0, 'coredump in global destruction');
 
 # Attempt to free unreferenced scalar...
@@ -186,9 +186,9 @@ fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via scalar');
 EOI
 
 # Attempt to free unreferenced scalar...
-fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via $_[0]');
+fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via @_[0]');
     use threads;
-    sub thr { threads->new($_[0]); }
+    sub thr { threads->new(@_[0]); }
     thr(sub { })->join;
     print 'ok';
 EOI
@@ -210,13 +210,13 @@ SKIP: {
     # ---
 
     package A;
-    sub CLONE_SKIP { $c{"A-$_[0]"}++; 1; }
-    sub DESTROY    { $d{"A-". ref $_[0]}++ }
+    sub CLONE_SKIP { %c{"A-@_[0]"}++; 1; }
+    sub DESTROY    { %d{"A-". ref @_[0]}++ }
 
     package A1;
     our @ISA = qw(A);
-    sub CLONE_SKIP { $c{"A1-$_[0]"}++; 1; }
-    sub DESTROY    { $d{"A1-". ref $_[0]}++ }
+    sub CLONE_SKIP { %c{"A1-@_[0]"}++; 1; }
+    sub DESTROY    { %d{"A1-". ref @_[0]}++ }
 
     package A2;
     our @ISA = qw(A1);
@@ -224,13 +224,13 @@ SKIP: {
     # ---
 
     package B;
-    sub CLONE_SKIP { $c{"B-$_[0]"}++; 0; }
-    sub DESTROY    { $d{"B-" . ref $_[0]}++ }
+    sub CLONE_SKIP { %c{"B-@_[0]"}++; 0; }
+    sub DESTROY    { %d{"B-" . ref @_[0]}++ }
 
     package B1;
     our @ISA = qw(B);
-    sub CLONE_SKIP { $c{"B1-$_[0]"}++; 1; }
-    sub DESTROY    { $d{"B1-" . ref $_[0]}++ }
+    sub CLONE_SKIP { %c{"B1-@_[0]"}++; 1; }
+    sub DESTROY    { %d{"B1-" . ref @_[0]}++ }
 
     package B2;
     our @ISA = qw(B1);
@@ -238,13 +238,13 @@ SKIP: {
     # ---
 
     package C;
-    sub CLONE_SKIP { $c{"C-$_[0]"}++; 1; }
-    sub DESTROY    { $d{"C-" . ref $_[0]}++ }
+    sub CLONE_SKIP { %c{"C-@_[0]"}++; 1; }
+    sub DESTROY    { %d{"C-" . ref @_[0]}++ }
 
     package C1;
     our @ISA = qw(C);
-    sub CLONE_SKIP { $c{"C1-$_[0]"}++; 0; }
-    sub DESTROY    { $d{"C1-" . ref $_[0]}++ }
+    sub CLONE_SKIP { %c{"C1-@_[0]"}++; 0; }
+    sub DESTROY    { %d{"C1-" . ref @_[0]}++ }
 
     package C2;
     our @ISA = qw(C1);
@@ -252,7 +252,7 @@ SKIP: {
     # ---
 
     package D;
-    sub DESTROY    { $d{"D-" . ref $_[0]}++ }
+    sub DESTROY    { %d{"D-" . ref @_[0]}++ }
 
     package D1;
     our @ISA = qw(D);

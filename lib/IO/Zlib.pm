@@ -307,8 +307,8 @@ use Symbol;
 use Tie::Handle;
 
 # These might use some $^O logic.
-my $gzip_read_open   = "gzip -dc %s";
-my $gzip_write_open  = "gzip > %s";
+my $gzip_read_open   = 'gzip -dc %s';
+my $gzip_write_open  = 'gzip > %s';
 
 my $gzip_external;
 my $gzip_used;
@@ -336,7 +336,7 @@ sub can_gunzip {
 sub _import {
     my $import = shift;
     while (@_) {
-	if ($_[0] eq ':gzip_external') {
+	if (@_[0] eq ':gzip_external') {
 	    shift;
 	    if (@_) {
 		$gzip_external = shift;
@@ -344,22 +344,22 @@ sub _import {
 		croak "$import: ':gzip_external' requires an argument";
 	    }
 	}
-	elsif ($_[0] eq ':gzip_read_open') {
+	elsif (@_[0] eq ':gzip_read_open') {
 	    shift;
 	    if (@_) {
 		$gzip_read_open = shift;
 		croak "$import: ':gzip_read_open' '$gzip_read_open' is illegal"
-		    unless $gzip_read_open =~ m/^.+%s.+$/;
+		    unless $gzip_read_open =~ m/^.+\%s.+$/;
 	    } else {
 		croak "$import: ':gzip_read_open' requires an argument";
 	    }
 	}
-	elsif ($_[0] eq ':gzip_write_open') {
+	elsif (@_[0] eq ':gzip_write_open') {
 	    shift;
 	    if (@_) {
 		$gzip_write_open = shift;
 		croak "$import: ':gzip_write_open' '$gzip_read_open' is illegal"
-		    unless $gzip_write_open =~ m/^.+%s.*$/;
+		    unless $gzip_write_open =~ m/^.+\%s.*$/;
 	    } else {
 		croak "$import: ':gzip_write_open' requires an argument";
 	    }
@@ -452,9 +452,9 @@ sub CLOSE
 sub READ
 {
     my $self = shift;
-    my $bufref = \$_[0];
-    my $nbytes = $_[1];
-    my $offset = $_[2] || 0;
+    my $bufref = \@_[0];
+    my $nbytes = @_[1];
+    my $offset = @_[2] || 0;
 
     croak "IO::Zlib::READ: NBYTES must be specified" unless defined($nbytes);
 
@@ -618,7 +618,7 @@ sub gzread_external {
     # mix reads and readlines, and we don't want to mess
     # the stdio buffering.  See also gzreadline_external()
     # and gzwrite_external().
-    my $nread = read($_[0], $_[1], @_ == 3 ? $_[2] : 4096);
+    my $nread = read(@_[0], @_[1], @_ == 3 ? @_[2] : 4096);
     defined $nread ? $nread : -1;
 }
 
@@ -626,22 +626,22 @@ sub gzwrite_external {
     # Using syswrite() is okay (cf. gzread_external())
     # since the bytes leave this process and buffering
     # is therefore not an issue.
-    my $nwrote = syswrite($_[0], $_[1]);
+    my $nwrote = syswrite(@_[0], @_[1]);
     defined $nwrote ? $nwrote : -1;
 }
 
 sub gzreadline_external {
     # See the comment in gzread_external().
-    $_[1] = readline($_[0]);
-    return defined $_[1] ? length($_[1]) : -1;
+    @_[1] = readline(@_[0]);
+    return defined @_[1] ? length(@_[1]) : -1;
 }
 
 sub gzeof_external {
-    return eof($_[0]);
+    return eof(@_[0]);
 }
 
 sub gzclose_external {
-    close($_[0]);
+    close(@_[0]);
     # I am not entirely certain why this is needed but it seems
     # the above close() always fails (as if the stream would have
     # been already closed - something to do with using external

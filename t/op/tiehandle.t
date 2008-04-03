@@ -11,10 +11,10 @@ sub compare {
     return unless @expect;
     return ::fail() unless(@_ == @expect);
 
-    for my $i (0..$#_) {
-        next if ref $_[$i] and $_[$i] \== $expect[$i];
-	next if $_[$i] eq $expect[$i];
-	return ::fail( " '$_[$i]' eq '$expect[$i]' " );
+    for my $i (0..@_-1) {
+        next if ref @_[$i] and @_[$i] \== @expect[$i];
+	next if @_[$i] eq @expect[$i];
+	return ::fail( " '@_[$i]' eq '@expect[$i]' " );
     }
 
     ::pass();
@@ -51,13 +51,13 @@ sub GETC {
 
 sub READ {
     ::compare(READ => @_);
-    substr($_[1],$_[3] || 0, undef, substr($data,0,$_[2]));
+    substr(@_[1],@_[3] || 0, undef, substr($data,0,@_[2]));
     3;
 }
 
 sub WRITE {
     ::compare(WRITE => @_);
-    $data = substr($_[1],$_[3] || 0, $_[2]);
+    $data = substr(@_[1],@_[3] || 0, @_[2]);
     length($data);
 }
 
@@ -81,14 +81,14 @@ is(ref($ob),  'Implement');
 cmp_ok(tied(*$fh), '\==', $ob);
 
 @expect = (PRINT => $ob,"some","text");
-$r = print $fh @expect[2,3];
+$r = print $fh @expect[[2,3]];
 is($r, 1);
 
-@expect = (PRINTF => $ob,"%s","text");
-$r = printf $fh @expect[2,3];
+@expect = (PRINTF => $ob,"\%s","text");
+$r = printf $fh @expect[[2,3]];
 is($r, 2);
 
-$text = (@data = ("the line\n"))[0];
+$text = (@data = ("the line\n"))[[0]];
 @expect = (READLINE => $ob);
 $ln = ~< $fh;
 is($ln, $text);
@@ -147,7 +147,7 @@ is($r, 5);
 # Does aliasing work with tied FHs?
 *ALIAS = *$fh;
 @expect = (PRINT => $ob,"some","text");
-$r = print ALIAS @expect[2,3];
+$r = print ALIAS @expect[[2,3]];
 is($r, 1);
 
 {
@@ -156,7 +156,7 @@ is($r, 1);
     # to dump core when warnings were enabled
     local *STDERR = *$fh;
     @expect = (PRINT => $ob,"some","text");
-    $r = print STDERR @expect[2,3];
+    $r = print STDERR @expect[[2,3]];
     is($r, 1);
 }
 
@@ -167,7 +167,7 @@ is($r, 1);
     sub TIEHANDLE { bless {} }
     my $cnt = 'a';
     sub READ {
-	$_[1] = $cnt++;
+	@_[1] = $cnt++;
 	1;
     }
     sub do_read {
@@ -226,7 +226,7 @@ is($r, 1);
     use warnings;
     print undef;
 
-    like($received[1], qr/Use of uninitialized value/);
+    like(@received[1], qr/Use of uninitialized value/);
 }
 
 {
@@ -238,7 +238,7 @@ is($r, 1);
     is($data, 'foobar', '[ID 20020713.001]');
 
     package CHOMP;
-    sub TIEHANDLE { bless {}, $_[0] }
+    sub TIEHANDLE { bless {}, @_[0] }
     sub READLINE { "foobar\n" }
 }
 

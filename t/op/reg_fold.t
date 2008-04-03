@@ -29,9 +29,9 @@ while (~< $fh) {
         my $expr="$str =~ m/$fc/ix";
         push @tests,
             qq[ok($expr,'$chr =~ m/$fc/ix - $comment')];
-        $tests[-1]="TODO: \{ local \$TODO='[13:41] <BinGOs> cue *It is all Greek to me* joke.';\n$tests[-1] \}"
+        @tests[-1]="TODO: \{ local \$TODO='[13:41] <BinGOs> cue *It is all Greek to me* joke.';\n@tests[-1] \}"
             if $cp eq '0390' or $cp eq '03B0';
-        $tests[-1]="TODO: \{ local \$TODO='Multi codepoints matches';\n$tests[-1] \}" if @fc +> 1;
+        @tests[-1]="TODO: \{ local \$TODO='Multi codepoints matches';\n@tests[-1] \}" if @fc +> 1;
         $count++;
     }
 }

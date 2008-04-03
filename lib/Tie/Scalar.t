@@ -58,7 +58,7 @@ is( $flag, 1, 'and DESTROY() works' );
 use warnings;
 my $warn;
 local ${^WARN_HOOK} = sub {
-	$warn = $_[0];
+	$warn = @_[0];
 };
 
 # Tie::Scalar::TIEHANDLE should find and call TieTest::new and complain
@@ -68,7 +68,7 @@ like( $warn->{description}, qr/WARNING: calling TieTest->new/, 'caught warning f
 package DestroyAction;
 
 sub new {
-	bless( \(my $self), $_[0] );
+	bless( \(my $self), @_[0] );
 }
 
 sub DESTROY {

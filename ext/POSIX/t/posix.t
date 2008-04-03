@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($^O ne 'VMS' and $Config{'extensions'} !~ m/\bPOSIX\b/) {
+    if ($^O ne 'VMS' and %Config{'extensions'} !~ m/\bPOSIX\b/) {
 	print "1..0\n";
 	exit 0;
     }
@@ -36,8 +36,8 @@ TODO:
 {
     local $TODO = "read to array element not working";
 
-    read($testfd, $buffer[1], 5) if $testfd +> 2;
-    is( $buffer[1], "perl\n",	               '    read to array element' );
+    read($testfd, @buffer[1], 5) if $testfd +> 2;
+    is( @buffer[1], "perl\n",	               '    read to array element' );
 }
 
 write(1,"ok 4\nnot ok 4\n", 5);
@@ -47,10 +47,10 @@ SKIP: {
     skip("no pipe() support on DOS", 2) if $Is_Dos;
 
     @fds = POSIX::pipe();
-    ok( $fds[0] +> $testfd,      'POSIX::pipe' );
+    ok( @fds[0] +> $testfd,      'POSIX::pipe' );
 
-    CORE::open($reader = \*READER, "<&=", $fds[0]);
-    CORE::open($writer = \*WRITER, ">&=", $fds[1]);
+    CORE::open($reader = \*READER, "<&=", @fds[0]);
+    CORE::open($writer = \*WRITER, ">&=", @fds[1]);
     print $writer "ok 6\n";
     close $writer;
     print ~< $reader;
@@ -74,15 +74,15 @@ SKIP: {
 	my $mask   = POSIX::SigSet->new( &SIGINT);
 	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
 	sigaction(&SIGHUP, $action);
-	$SIG{'INT'} = \&SigINT;
+	%SIG{'INT'} = \&SigINT;
 
 	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
 	# But not NetBSD 1.6 & 1.6.1: the test makes perl crash.
 	# So the kill() must not be done with this config in order to
 	# finish the test.
 	# For others (darwin & freebsd), let the test fail without crashing.
-	my $todo = $^O eq 'netbsd' && $Config{osvers}=~m/^1\.6/;
-	my $why_todo = "# TODO $^O $Config{osvers} seems to lose blocked signals";
+	my $todo = $^O eq 'netbsd' && %Config{osvers}=~m/^1\.6/;
+	my $why_todo = "# TODO $^O %Config{osvers} seems to lose blocked signals";
 	if (!$todo) { 
 	  kill 'HUP', $$; 
 	} else {
@@ -92,8 +92,8 @@ SKIP: {
 	sleep 1;
 
 	$todo = 1 if ($^O eq 'freebsd')
-		  || ($^O eq 'darwin' && $Config{osvers} +<= v6.6);
-	printf "%s 11 - masked SIGINT received %s\n",
+		  || ($^O eq 'darwin' && %Config{osvers} +<= v6.6);
+	printf "\%s 11 - masked SIGINT received \%s\n",
 	    $sigint_called ? "ok" : "not ok",
 	    $todo ? $why_todo : '';
 
@@ -118,7 +118,7 @@ SKIP: {
 
 SKIP: {
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE;
-    skip("_POSIX_OPEN_MAX undefined ($fds[1])",  1) unless &_POSIX_OPEN_MAX;
+    skip("_POSIX_OPEN_MAX undefined (@fds[1])",  1) unless &_POSIX_OPEN_MAX;
 
     ok( &_POSIX_OPEN_MAX +>= 16, "The minimum allowed values according to susv2" );
 
@@ -139,19 +139,19 @@ like( getcwd(), qr/$pat/, 'getcwd' );
 # Check string conversion functions.
 
 SKIP: { 
-    skip("strtod() not present", 1) unless $Config{d_strtod};
+    skip("strtod() not present", 1) unless %Config{d_strtod};
 
-    $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC, 'C') if $Config{d_setlocale};
+    $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC, 'C') if %Config{d_setlocale};
 
     # we're just checking that strtod works, not how accurate it is
     ($n, $x) = &POSIX::strtod('3.14159_OR_SO');
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
-    &POSIX::setlocale(&POSIX::LC_NUMERIC, $lc) if $Config{d_setlocale};
+    &POSIX::setlocale(&POSIX::LC_NUMERIC, $lc) if %Config{d_setlocale};
 }
 
 SKIP: {
-    skip("strtol() not present", 2) unless $Config{d_strtol};
+    skip("strtol() not present", 2) unless %Config{d_strtol};
 
     ($n, $x) = &POSIX::strtol('21_PENGUINS');
     is($n, 21, 'strtol() number');
@@ -159,7 +159,7 @@ SKIP: {
 }
 
 SKIP: {
-    skip("strtoul() not present", 2) unless $Config{d_strtoul};
+    skip("strtoul() not present", 2) unless %Config{d_strtoul};
 
     ($n, $x) = &POSIX::strtoul('88_TEARS');
     is($n, 88, 'strtoul() number');
@@ -173,23 +173,23 @@ ok( &POSIX::acos(1.0) == 0.0,   'dynamic loading' );
 # didn't detect it.  If this fails, try adding
 # -DSTRUCT_TM_HASZONE to your cflags when compiling ext/POSIX/POSIX.c.
 # See ext/POSIX/hints/sunos_4.pl and ext/POSIX/hints/linux.pl 
-print POSIX::strftime("ok 21 # %H:%M, on %m/%d/%y\n", localtime());
+print POSIX::strftime('ok 21 # %H:%M, on %m/%d/%y' . "\n", localtime());
 next_test();
 
 # If that worked, validate the mini_mktime() routine's normalisation of
 # input fields to strftime().
 sub try_strftime {
     my $expect = shift;
-    my $got = POSIX::strftime("%a %b %d %H:%M:%S %Y %j", @_);
+    my $got = POSIX::strftime('%a %b %d %H:%M:%S %Y %j', @_);
     is($got, $expect, "validating mini_mktime() and strftime(): $expect");
 }
 
-$lc = &POSIX::setlocale(&POSIX::LC_TIME, 'C') if $Config{d_setlocale};
+$lc = &POSIX::setlocale(&POSIX::LC_TIME, 'C') if %Config{d_setlocale};
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
-	if ($Is_W32 and (($Config{cc} eq 'cl' and
-	                 $Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) or
+	if ($Is_W32 and ((%Config{cc} eq 'cl' and
+	                 %Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) or
 	                 (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);
@@ -201,7 +201,7 @@ try_strftime("Mon Feb 28 00:00:00 2000 059", 0,0,0, 28,1,100);
 try_strftime("Tue Feb 29 00:00:00 2000 060", 0,0,0, 0,2,100);
 try_strftime("Wed Mar 01 00:00:00 2000 061", 0,0,0, 1,2,100);
 try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
-&POSIX::setlocale(&POSIX::LC_TIME, $lc) if $Config{d_setlocale};
+&POSIX::setlocale(&POSIX::LC_TIME, $lc) if %Config{d_setlocale};
 
 {
     for my $test (0, 1) {
@@ -286,8 +286,8 @@ if ($^O eq 'vos') {
  # The following line assumes buffered output, which may be not true:
  print '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
                             $Is_VMS ||
-			    (defined $ENV{PERLIO} &&
-			     $ENV{PERLIO} eq 'unix' &&
-			     $Config::Config{useperlio}));
+			    (defined %ENV{PERLIO} &&
+			     %ENV{PERLIO} eq 'unix' &&
+			     %Config::Config{useperlio}));
  _exit(0);
 }

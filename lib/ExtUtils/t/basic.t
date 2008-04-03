@@ -4,7 +4,7 @@
 # build, test and installation of the Big::Fat::Dummy module.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -26,13 +26,13 @@ use File::Path;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
+delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
 # GNV logical interferes with testing
-$ENV{'bin'} = '[.bin]' if $Is_VMS;
+%ENV{'bin'} = '[.bin]' if $Is_VMS;
 
 chdir 't';
 
@@ -69,7 +69,7 @@ ok( grep(m/^Current package is: main$/,
 ok( -e $makefile,       'Makefile exists' );
 
 # -M is flakey on VMS
-my $mtime = (stat($makefile))[9];
+my $mtime = (stat($makefile))[[9]];
 cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
@@ -78,7 +78,7 @@ my $make = make_run();
 
 {
     # Supress 'make manifest' noise
-    local $ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
+    local %ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
     my $manifest_out = run("$make manifest");
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
     ok( -s 'MANIFEST',      '  its not empty' );
@@ -104,10 +104,10 @@ like( $ppd_html,
 like( $ppd_html, qr{^\s*<IMPLEMENTATION>}m,          '  <IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*<DEPENDENCY NAME="strict" VERSION="0,0,0,0" />}m,
                                                            '  <DEPENDENCY>' );
-like( $ppd_html, qr{^\s*<OS NAME="$Config{osname}" />}m,
+like( $ppd_html, qr{^\s*<OS NAME="%Config{osname}" />}m,
                                                            '  <OS>'      );
-my $archname = $Config{archname};
-$archname .= "-". substr($Config{version},0,3);
+my $archname = %Config{archname};
+$archname .= "-". substr(%Config{version},0,3);
 like( $ppd_html, qr{^\s*<ARCHITECTURE NAME="$archname" />}m,
                                                            '  <ARCHITECTURE>');
 like( $ppd_html, qr{^\s*<CODEBASE HREF="" />}m,            '  <CODEBASE>');
@@ -148,13 +148,13 @@ find( sub {
     # VMS likes to put dots on the end of things that don't have them.
     $file =~ s/\.$// if $Is_VMS;
 
-    $files{$file} = $File::Find::name; 
+    %files{$file} = $File::Find::name; 
 }, '../dummy-install' );
-ok( $files{'dummy.pm'},     '  Dummy.pm installed' );
-ok( $files{'liar.pm'},      '  Liar.pm installed'  );
-ok( $files{'program'},      '  program installed'  );
-ok( $files{'.packlist'},    '  packlist created'   );
-ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+ok( %files{'dummy.pm'},     '  Dummy.pm installed' );
+ok( %files{'liar.pm'},      '  Liar.pm installed'  );
+ok( %files{'program'},      '  program installed'  );
+ok( %files{'.packlist'},    '  packlist created'   );
+ok( %files{'perllocal.pod'},'  perllocal.pod created' );
 
 
 SKIP: {
@@ -167,12 +167,12 @@ SKIP: {
 
     ok( -r 'elsewhere',     '  install dir created' );
     %files = ();
-    find( sub { $files{$_} = $File::Find::name; }, 'elsewhere' );
-    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    find( sub { %files{$_} = $File::Find::name; }, 'elsewhere' );
+    ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( %files{'program'},      '  program installed'  );
+    ok( %files{'.packlist'},    '  packlist created'   );
+    ok( %files{'perllocal.pod'},'  perllocal.pod created' );
     rmtree('elsewhere');
 }
 
@@ -190,16 +190,16 @@ SKIP: {
     %files = ();
     my $perllocal;
     find( sub { 
-        $files{$_} = $File::Find::name;
+        %files{$_} = $File::Find::name;
     }, 'other' );
-    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( %files{'program'},      '  program installed'  );
+    ok( %files{'.packlist'},    '  packlist created'   );
+    ok( %files{'perllocal.pod'},'  perllocal.pod created' );
 
-    ok( open(PERLLOCAL, "<", $files{'perllocal.pod'} ) ) || 
-        diag("Can't open $files{'perllocal.pod'}: $!");
+    ok( open(PERLLOCAL, "<", %files{'perllocal.pod'} ) ) || 
+        diag("Can't open %files{'perllocal.pod'}: $!");
     { local $/;
       unlike( ~< *PERLLOCAL, qr/other/, 'DESTDIR should not appear in perllocal');
     }
@@ -230,12 +230,12 @@ SKIP: {
     ok( !-d 'elsewhere',       '  install dir not created' );
     ok( -d 'other/elsewhere',  '  destdir created' );
     %files = ();
-    find( sub { $files{$_} = $File::Find::name; }, 'other/elsewhere' );
-    ok( $files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( $files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( $files{'program'},      '  program installed'  );
-    ok( $files{'.packlist'},    '  packlist created'   );
-    ok( $files{'perllocal.pod'},'  perllocal.pod created' );
+    find( sub { %files{$_} = $File::Find::name; }, 'other/elsewhere' );
+    ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
+    ok( %files{'program'},      '  program installed'  );
+    ok( %files{'.packlist'},    '  packlist created'   );
+    ok( %files{'perllocal.pod'},'  perllocal.pod created' );
     rmtree('other');
 }
 

@@ -16,6 +16,6 @@ use Perl6::Form;
 print "I couldn't do my English Lit homework because...\n\n";
 
 print form "   \{>>>\} \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
-			   10-$_.'.',   $reason[$_],
+			   10-$_.'.',   @reason[$_],
 			   ""
-					for 0..$#reason;
+					for 0..(@reason-1);

@@ -15,7 +15,7 @@ my $IsVMS   = $^O eq 'VMS';
 my $IsMacOS = $^O eq 'MacOS';
 
 # For an op regression test, I don't want to rely on "use constant" working.
-my $has_fchdir = ($Config{d_fchdir} || "") eq "define";
+my $has_fchdir = (%Config{d_fchdir} || "") eq "define";
 
 # Might be a little early in the testing process to start using these,
 # but I can't think of a way to write this test without them.
@@ -47,7 +47,7 @@ $Cwd = abs_path;
 
 SKIP: {
     skip("no fchdir", 16) unless $has_fchdir;
-    my $has_dirfd = ($Config{d_dirfd} || $Config{d_dir_dd_fd} || "") eq "define";
+    my $has_dirfd = (%Config{d_dirfd} || %Config{d_dir_dd_fd} || "") eq "define";
     ok(opendir(my $dh, "."), "opendir .");
     ok(open(my $fh, "<", "op"), "open op");
     ok(chdir($fh), "fchdir op");
@@ -123,18 +123,18 @@ sub check_env {
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );
-        is( abs_path, $ENV{$key}, '  abs_path() agrees' );
+        is( abs_path, %ENV{$key}, '  abs_path() agrees' );
         chdir($Cwd);
         is( abs_path, $Cwd,       '  and back again' );
 
         my $warning = '';
-        local ${^WARN_HOOK} = sub { $warning .= $_[0]->{description} . "\n" };
+        local ${^WARN_HOOK} = sub { $warning .= @_[0]->{description} . "\n" };
 
 
         # Check the deprecated chdir(undef) feature.
 #line 64
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
-        is( abs_path, $ENV{$key},   '  abs_path() agrees' );
+        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir
 Use of chdir('') or chdir(undef) as chdir() is deprecated
@@ -146,7 +146,7 @@ WARNING
         $warning = '';
 #line 76
         ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
-        is( abs_path, $ENV{$key},   '  abs_path() agrees' );
+        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
@@ -158,33 +158,33 @@ WARNING
 my %Saved_Env = ();
 sub clean_env {
     foreach my $env (@magic_envs) {
-        $Saved_Env{$env} = $ENV{$env};
+        %Saved_Env{$env} = %ENV{$env};
 
         # Can't actually delete SYS$ stuff on VMS.
         next if $IsVMS && $env eq 'SYS$LOGIN';
-        next if $IsVMS && $env eq 'HOME' && !$Config{'d_setenv'};
+        next if $IsVMS && $env eq 'HOME' && !%Config{'d_setenv'};
 
         unless ($IsMacOS) { # ENV on MacOS is "special" :-)
             # On VMS, %ENV is many layered.
-            delete $ENV{$env} while exists $ENV{$env};
+            delete %ENV{$env} while exists %ENV{$env};
         }
     }
 
     # The following means we won't really be testing for non-existence,
     # but in Perl we can only delete from the process table, not the job 
     # table.
-    $ENV{'SYS$LOGIN'} = '' if $IsVMS;
+    %ENV{'SYS$LOGIN'} = '' if $IsVMS;
 }
 
 END {
     no warnings 'uninitialized';
 
     # Restore the environment for VMS (and doesn't hurt for anyone else)
-    @ENV{@magic_envs} = @Saved_Env{@magic_envs};
+    %ENV{[@magic_envs]} = %Saved_Env{[@magic_envs]};
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.
-    delete $ENV{'SYS$LOGIN'} if $IsVMS;
+    delete %ENV{'SYS$LOGIN'} if $IsVMS;
 }
 
 
@@ -193,14 +193,14 @@ foreach my $key (@magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    $ENV{$key} = catdir $Cwd, ($IsVMS ? 'OP' : 'op');
+    %ENV{$key} = catdir $Cwd, ($IsVMS ? 'OP' : 'op');
 
     check_env($key);
 }
 
 {
     clean_env;
-    if (($IsVMS || $IsMacOS) && !$Config{'d_setenv'}) {
+    if (($IsVMS || $IsMacOS) && !%Config{'d_setenv'}) {
         pass("Can't reset HOME, so chdir() test meaningless");
     } else {
         ok( !chdir(),                   'chdir() w/o any ENV set' );

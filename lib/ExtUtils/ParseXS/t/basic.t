@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 BEGIN {
-  if ($ENV{PERL_CORE}) {
+  if (%ENV{PERL_CORE}) {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
       or die "Can't chdir to lib/ExtUtils/ParseXS: $!";
@@ -34,7 +34,7 @@ process_file(filename => 'XSTest.xs', output => $source_file, prototypes => 0);
 ok -e $source_file, 1, "Create an output file";
 
 # TEST doesn't like extraneous output
-my $quiet = $ENV{PERL_CORE} && !$ENV{HARNESS_ACTIVE};
+my $quiet = %ENV{PERL_CORE} && !%ENV{HARNESS_ACTIVE};
 
 # Try to compile the file!  Don't get too fancy, though.
 my $b = ExtUtils::CBuilder->new(quiet => $quiet);
@@ -58,8 +58,8 @@ if ($b->have_compiler) {
   # dl_unload_file was missing on Win32 prior to perl change #24679!
   if ($^O eq 'MSWin32' and defined &DynaLoader::dl_unload_file) {
     for (my $i = 0; $i +< @DynaLoader::dl_modules; $i++) {
-      if ($DynaLoader::dl_modules[$i] eq $module) {
-        DynaLoader::dl_unload_file($DynaLoader::dl_librefs[$i]);
+      if (@DynaLoader::dl_modules[$i] eq $module) {
+        DynaLoader::dl_unload_file(@DynaLoader::dl_librefs[$i]);
         last;
       }
     }

@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -25,7 +25,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -124,17 +124,17 @@ $Base++;
     push @locks2, lock_factory2() for 1..2;
 
     ok(1,1,"lock factory: locking all locks");
-    lock $locks1[0];
-    lock $locks1[1];
-    lock $locks1[2];
-    lock $locks1[3];
+    lock @locks1[0];
+    lock @locks1[1];
+    lock @locks1[2];
+    lock @locks1[3];
     ok(2,1,"lock factory: locked all locks");
     $tr = async {
         ok(3,1,"lock factory: child: locking all locks");
-        lock $locks2[0];
-        lock $locks2[1];
-        lock $locks2[2];
-        lock $locks2[3];
+        lock @locks2[0];
+        lock @locks2[1];
+        lock @locks2[2];
+        lock @locks2[3];
         ok(4,1,"lock factory: child: locked all locks");
     };
     $tr->join;

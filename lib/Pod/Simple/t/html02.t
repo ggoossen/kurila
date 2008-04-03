@@ -1,7 +1,7 @@
 # t/html-styles.t
 
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -15,8 +15,8 @@ BEGIN { plan tests => 7};
 use Pod::Simple::HTML;
 
 sub x ($) { Pod::Simple::HTML->_out(
-  sub{  $_[0]->bare_output(1)  },
-  "=pod\n\n$_[0]",
+  sub{  @_[0]->bare_output(1)  },
+  "=pod\n\n@_[0]",
 ) }
 
 ok 1;
@@ -31,7 +31,7 @@ my @pairs = (
  
  
 foreach( @pairs ) {
-  print "# Testing pod source $$_[0] ...\n" unless $_->[0] =~ m/\n/;
+  print "# Testing pod source @$_[0] ...\n" unless $_->[0] =~ m/\n/;
   ok( x($_->[0]), $_->[1] )
 }
 print "# And one for the road...\n";

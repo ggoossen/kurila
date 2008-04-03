@@ -4,13 +4,13 @@ use FileHandle;
 my $MODULE;
 
 BEGIN {
-	$MODULE = ($ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
+	$MODULE = (%ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
 	eval "require $MODULE" || die $@;
 	$MODULE->import(qw());
 }
 
 BEGIN {
-	if ($ENV{PERL_CORE}) {
+	if (%ENV{PERL_CORE}) {
 		chdir 't' if -d 't';
 		@INC = '../lib';
 	}

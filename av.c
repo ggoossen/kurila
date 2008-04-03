@@ -983,26 +983,6 @@ Perl_av_exists(pTHX_ AV *av, I32 key)
 	return FALSE;
 }
 
-SV **
-Perl_av_arylen_p(pTHX_ AV *av) {
-    dVAR;
-    MAGIC *mg;
-
-    PERL_ARGS_ASSERT_AV_ARYLEN_P;
-    assert(SvTYPE(av) == SVt_PVAV);
-
-    mg = mg_find((SV*)av, PERL_MAGIC_arylen_p);
-
-    if (!mg) {
-	mg = sv_magicext((SV*)av, 0, PERL_MAGIC_arylen_p, &PL_vtbl_arylen_p,
-			 0, 0);
-	assert(mg);
-	/* sv_magicext won't set this for us because we pass in a NULL obj  */
-	mg->mg_flags |= MGf_REFCOUNTED;
-    }
-    return &(mg->mg_obj);
-}
-
 /*
  * Local variables:
  * c-indentation-style: bsd

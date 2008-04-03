@@ -27,7 +27,7 @@ sub num_equal {
           } elsif ($left !~ tr/0-9//c) {
             print "# Got $left\n";
           } else {
-            $left =~ s/([^-a-zA-Z0-9_+])/{sprintf "\\%03o", ord $1}/g;
+            $left =~ s/([^-a-zA-Z0-9_+])/{sprintf "\\\%03o", ord $1}/g;
             print "# Got \"$left\"\n";
           }
         }
@@ -83,22 +83,22 @@ sub recursive_dump {
 	# We don't want to duplicate data. Retrieval will know how to
 	# relink from the previously seen object.
 
-	if ($link && $dumped{$addr}++) {
-		my $num = $object{$addr};
+	if ($link && %dumped{$addr}++) {
+		my $num = %object{$addr};
 		$dumped .= "OBJECT #$num seen\n";
 		return;
 	}
 
 	my $objcount = $count++;
-	$object{$addr} = $objcount;
+	%object{$addr} = $objcount;
 
 	# Call the appropriate dumping routine based on the reference type.
 	# If the referenced was blessed, we bless it once the object is dumped.
 	# The retrieval code will perform the same on the last object retrieved.
 
-	croak "Unknown simple type '$ref'" unless defined $dump{$ref};
+	croak "Unknown simple type '$ref'" unless defined %dump{$ref};
 
-	&{*{Symbol::fetch_glob($dump{$ref})}}($object);	# Dump object
+	&{*{Symbol::fetch_glob(%dump{$ref})}}($object);	# Dump object
 	&bless($bless) if $bless;	# Mark it as blessed, if necessary
 
 	$dumped .= "OBJECT $objcount\n";

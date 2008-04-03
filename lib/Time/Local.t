@@ -58,11 +58,11 @@ my @years =
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or
 # greater).
-my $neg_epoch_ok = defined ((localtime(-259200))[0]) ? 1 : 0;
+my $neg_epoch_ok = defined ((localtime(-259200))[[0]]) ? 1 : 0;
 
 # use vmsish 'time' makes for oddness around the Unix epoch
 if ($^O eq 'VMS') {
-    $time[0][2]++;
+    @time[0][2]++;
     $neg_epoch_ok = 0; # time_t is unsigned
 }
 
@@ -71,7 +71,7 @@ $tests += @neg_time * 12;
 $tests += @bad_time;
 $tests += @years;
 $tests += 10;
-$tests += 8 if $ENV{MAINTAINER};
+$tests += 8 if %ENV{MAINTAINER};
 
 plan tests => $tests;
 
@@ -123,7 +123,7 @@ for (@bad_time) {
 
     eval { timegm($sec,$min,$hour,$mday,$mon,$year) };
 
-    like($@->{description}, qr/.*out of range.*/, 'invalid time caused an error');
+    like($@ && $@->{description}, qr/.*out of range.*/, 'invalid time caused an error');
 }
 
 {
@@ -144,7 +144,7 @@ for (@bad_time) {
 # treated like 03:00:00 rather than 01:00:00 - negative zone offsets used
 # to do the latter
 {
-    my $hour = (localtime(timelocal(0, 0, 2, 7, 3, 102)))[2];
+    my $hour = (localtime(timelocal(0, 0, 2, 7, 3, 102)))[[2]];
     # testers in US/Pacific should get 3,
     # other testers should get 2
     ok($hour == 2 || $hour == 3, 'hour should be 2 or 3');
@@ -164,11 +164,11 @@ SKIP:
         unless $neg_epoch_ok;
 
     eval { timegm(0,0,0,29,1,1900) };
-    like($@->{description}, qr/Day '29' out of range 1\.\.28/,
+    like($@ && $@->{description}, qr/Day '29' out of range 1\.\.28/,
          'does not accept leap day in 1900');
 
     eval { timegm(0,0,0,29,1,200) };
-    like($@->{description}, qr/Day '29' out of range 1\.\.28/,
+    like($@ && $@->{description}, qr/Day '29' out of range 1\.\.28/,
          'does not accept leap day in 2100 (year passed as 200)');
 
     eval { timegm(0,0,0,29,1,0) };
@@ -184,10 +184,10 @@ SKIP:
     is($@, '', 'no error with leap day of 1996 (year passed as 96)');
 }
 
-if ($ENV{MAINTAINER}) {
+if (%ENV{MAINTAINER}) {
     require POSIX;
 
-    local $ENV{TZ} = 'Europe/Vienna';
+    local %ENV{TZ} = 'Europe/Vienna';
     POSIX::tzset();
 
     # 2001-10-28 02:30:00 - could be either summer or standard time,
@@ -196,7 +196,7 @@ if ($ENV{MAINTAINER}) {
     is($time, 1004229000,
        'timelocal prefers earlier epoch in the presence of a DST change');
 
-    local $ENV{TZ} = 'America/Chicago';
+    local %ENV{TZ} = 'America/Chicago';
     POSIX::tzset();
 
     # Same local time in America/Chicago.  There is a transition here
@@ -209,7 +209,7 @@ if ($ENV{MAINTAINER}) {
     is($time, 986113800,
        'timelocal for non-existent time gives you the time one hour later');
 
-    local $ENV{TZ} = 'Australia/Sydney';
+    local %ENV{TZ} = 'Australia/Sydney';
     POSIX::tzset();
     # 2001-03-25 02:30:00 in Australia/Sydney.  This is the transition
     # _to_ summer time.  The southern hemisphere transitions are
@@ -222,7 +222,7 @@ if ($ENV{MAINTAINER}) {
     is($time, 1004200200,
        'timelocal for non-existent time gives you the time one hour later');
 
-    local $ENV{TZ} = 'Europe/London';
+    local %ENV{TZ} = 'Europe/London';
     POSIX::tzset();
     $time = timelocal( localtime(1111917720) );
     is($time, 1111917720,
@@ -231,9 +231,9 @@ if ($ENV{MAINTAINER}) {
     # There is no 1:00 AM on this date, as it leaps forward to
     # 2:00 on the DST change - this should return 2:00 per the
     # docs.
-    is( ( localtime( timelocal( 0, 0, 1, 27, 2, 2005 ) ) )[2], 2,
+    is( ( localtime( timelocal( 0, 0, 1, 27, 2, 2005 ) ) )[[2]], 2,
         'hour is 2 when given 1:00 AM on Europe/London date change' );
 
-    is( ( localtime( timelocal( 0, 0, 2, 27, 2, 2005 ) ) )[2], 2,
+    is( ( localtime( timelocal( 0, 0, 2, 27, 2, 2005 ) ) )[[2]], 2,
         'hour is 2 when given 2:00 AM on Europe/London date change' );
 }

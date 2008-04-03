@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -28,9 +28,9 @@ sub TIESCALAR {
     my ($class, $instance) = @_;
     return bless \$instance => $class;
 }
-sub FETCH   { return ${$_[0]}++ }
-sub STORE   { return ${$_[0]} = $_[1] }
-sub DESTROY { undef ${$_[0]} }
+sub FETCH   { return ${@_[0]}++ }
+sub STORE   { return ${@_[0]} = @_[1] }
+sub DESTROY { undef ${@_[0]} }
 
 #########################
 

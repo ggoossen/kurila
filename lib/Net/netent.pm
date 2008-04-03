@@ -28,10 +28,10 @@ struct 'Net::netent' => [
 sub populate (@) {
     return unless @_;
     my $nob = new();
-    $n_name 	 =    $nob->[0]     	     = $_[0];
-    @n_aliases	 = @{ $nob->[1] } = split ' ', $_[1];
-    $n_addrtype  =    $nob->[2] 	     = $_[2];
-    $n_net	 =    $nob->[3] 	     = $_[3];
+    $n_name 	 =    $nob->[0]     	     = @_[0];
+    @n_aliases	 = @{ $nob->[1] } = split ' ', @_[1];
+    $n_addrtype  =    $nob->[2] 	     = @_[2];
+    $n_net	 =    $nob->[3] 	     = @_[3];
     return $nob;
 } 
 
@@ -46,7 +46,7 @@ sub getnetbyaddr ($;$) {
 } 
 
 sub getnet($) {
-    if ($_[0] =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
+    if (@_[0] =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
 	require Socket;
 	&getnetbyaddr(Socket::inet_aton(shift));
     } else {

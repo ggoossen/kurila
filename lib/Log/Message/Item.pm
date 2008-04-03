@@ -44,7 +44,7 @@ sub remove {
 }
 
 for my $name (qw|when id message parent level tag longmess shortmess|) {
-    Symbol::fetch_glob($name)->* = sub { return $_[0]->{$name} };
+    Symbol::fetch_glob($name)->* = sub { return @_[0]->{$name} };
 }
 
 for my $name (keys Symbol::stash("Log::Message::Handlers")->%) {

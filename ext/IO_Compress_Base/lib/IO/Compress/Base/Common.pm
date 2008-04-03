@@ -99,23 +99,23 @@ sub setBinModeOutput($)
 sub isaFilehandle($)
 {
     use utf8; # Pragma needed to keep Perl 5.6.0 happy
-    return (defined $_[0] and 
-             (UNIVERSAL::isa($_[0],'GLOB') or 
-              UNIVERSAL::isa($_[0],'IO::Handle') or
-              UNIVERSAL::isa(\$_[0],'GLOB')) 
+    return (defined @_[0] and 
+             (UNIVERSAL::isa(@_[0],'GLOB') or 
+              UNIVERSAL::isa(@_[0],'IO::Handle') or
+              UNIVERSAL::isa(\@_[0],'GLOB')) 
           )
 }
 
 sub isaFilename($)
 {
-    return (defined $_[0] and 
-           ! ref $_[0]    and 
-           UNIVERSAL::isa(\$_[0], 'SCALAR'));
+    return (defined @_[0] and 
+           ! ref @_[0]    and 
+           UNIVERSAL::isa(\@_[0], 'SCALAR'));
 }
 
 sub isaFileGlobString
 {
-    return defined $_[0] && $_[0] =~ m/^<.*>$/;
+    return defined @_[0] && @_[0] =~ m/^<.*>$/;
 }
 
 sub cleanFileGlobString
@@ -137,11 +137,11 @@ sub whatIsInput($;$)
 {
     my $got = whatIs(@_);
     
-    if (defined $got && $got eq 'filename' && defined $_[0] && $_[0] eq '-')
+    if (defined $got && $got eq 'filename' && defined @_[0] && @_[0] eq '-')
     {
         #use IO::File;
         $got = 'handle';
-        $_[0] = *STDIN;
+        @_[0] = *STDIN;
         #$_[0] = new IO::File("<-");
     }
 
@@ -152,10 +152,10 @@ sub whatIsOutput($;$)
 {
     my $got = whatIs(@_);
     
-    if (defined $got && $got eq 'filename' && defined $_[0] && $_[0] eq '-')
+    if (defined $got && $got eq 'filename' && defined @_[0] && @_[0] eq '-')
     {
         $got = 'handle';
-        $_[0] = *STDOUT;
+        @_[0] = *STDOUT;
         #$_[0] = new IO::File(">-");
     }
     
@@ -164,32 +164,32 @@ sub whatIsOutput($;$)
 
 sub whatIs ($;$)
 {
-    return 'handle' if isaFilehandle($_[0]);
+    return 'handle' if isaFilehandle(@_[0]);
 
-    my $wantCode = defined $_[1] && $_[1] ^&^ WANT_CODE ;
-    my $extended = defined $_[1] && $_[1] ^&^ WANT_EXT ;
-    my $undef    = defined $_[1] && $_[1] ^&^ WANT_UNDEF ;
-    my $hash     = defined $_[1] && $_[1] ^&^ WANT_HASH ;
+    my $wantCode = defined @_[1] && @_[1] ^&^ WANT_CODE ;
+    my $extended = defined @_[1] && @_[1] ^&^ WANT_EXT ;
+    my $undef    = defined @_[1] && @_[1] ^&^ WANT_UNDEF ;
+    my $hash     = defined @_[1] && @_[1] ^&^ WANT_HASH ;
 
-    return 'undef'  if ! defined $_[0] && $undef ;
+    return 'undef'  if ! defined @_[0] && $undef ;
 
-    if (ref $_[0]) {
-        return ''       if blessed($_[0]); # is an object
+    if (ref @_[0]) {
+        return ''       if blessed(@_[0]); # is an object
         #return ''       if UNIVERSAL::isa($_[0], 'UNIVERSAL'); # is an object
-        return 'buffer' if UNIVERSAL::isa($_[0], 'SCALAR');
-        return 'array'  if UNIVERSAL::isa($_[0], 'ARRAY')  && $extended ;
-        return 'hash'   if UNIVERSAL::isa($_[0], 'HASH')   && $hash ;
-        return 'code'   if UNIVERSAL::isa($_[0], 'CODE')   && $wantCode ;
+        return 'buffer' if UNIVERSAL::isa(@_[0], 'SCALAR');
+        return 'array'  if UNIVERSAL::isa(@_[0], 'ARRAY')  && $extended ;
+        return 'hash'   if UNIVERSAL::isa(@_[0], 'HASH')   && $hash ;
+        return 'code'   if UNIVERSAL::isa(@_[0], 'CODE')   && $wantCode ;
         return '';
     }
 
-    return 'fileglob' if $extended && isaFileGlobString($_[0]);
+    return 'fileglob' if $extended && isaFileGlobString(@_[0]);
     return 'filename';
 }
 
 sub oneTarget
 {
-    return $_[0] =~ m/^(code|handle|buffer|filename)$/;
+    return @_[0] =~ m/^(code|handle|buffer|filename)$/;
 }
 
 sub Validator::new
@@ -209,11 +209,11 @@ sub Validator::new
 
     local $Carp::CarpLevel = 1;
 
-    my $inType    = $data{inType}    = whatIsInput($_[0], WANT_EXT^|^WANT_HASH);
-    my $outType   = $data{outType}   = whatIsOutput($_[1], WANT_EXT^|^WANT_HASH);
+    my $inType    = %data{inType}    = whatIsInput(@_[0], WANT_EXT^|^WANT_HASH);
+    my $outType   = %data{outType}   = whatIsOutput(@_[1], WANT_EXT^|^WANT_HASH);
 
-    my $oneInput  = $data{oneInput}  = oneTarget($inType);
-    my $oneOutput = $data{oneOutput} = oneTarget($outType);
+    my $oneInput  = %data{oneInput}  = oneTarget($inType);
+    my $oneOutput = %data{oneOutput} = oneTarget($outType);
 
     if (! $inType)
     {
@@ -247,24 +247,24 @@ sub Validator::new
 
     if ($inType eq 'fileglob' && $outType eq 'fileglob')
     {
-        $data{GlobMap} = 1 ;
-        $data{inType} = $data{outType} = 'filename';
-        my $mapper = File::GlobMapper->new($_[0], $_[1]);
+        %data{GlobMap} = 1 ;
+        %data{inType} = %data{outType} = 'filename';
+        my $mapper = File::GlobMapper->new(@_[0], @_[1]);
         if ( ! $mapper )
         {
             return $obj->saveErrorString($File::GlobMapper::Error) ;
         }
-        $data{Pairs} = $mapper->getFileMap();
+        %data{Pairs} = $mapper->getFileMap();
 
         return $obj;
     }
     
     die("$reportClass: input and output $inType are identical")
-        if $inType eq $outType && (ref $_[0] ? $_[0] \== $_[1] : $_[0] eq $_[1] && $_[0] ne '-' );
+        if $inType eq $outType && (ref @_[0] ? @_[0] \== @_[1] : @_[0] eq @_[1] && @_[0] ne '-' );
 
     if ($inType eq 'fileglob') # && $outType ne 'fileglob'
     {
-        my $glob = cleanFileGlobString($_[0]);
+        my $glob = cleanFileGlobString(@_[0]);
         my @inputs = glob($glob);
 
         if (@inputs == 0)
@@ -274,45 +274,45 @@ sub Validator::new
         }
         elsif (@inputs == 1)
         {
-            $obj->validateInputFilenames($inputs[0])
+            $obj->validateInputFilenames(@inputs[0])
                 or return undef;
-            $_[0] = $inputs[0]  ;
-            $data{inType} = 'filename' ;
-            $data{oneInput} = 1;
+            @_[0] = @inputs[0]  ;
+            %data{inType} = 'filename' ;
+            %data{oneInput} = 1;
         }
         else
         {
             $obj->validateInputFilenames(@inputs)
                 or return undef;
-            $_[0] = [ @inputs ] ;
-            $data{inType} = 'filenames' ;
+            @_[0] = [ @inputs ] ;
+            %data{inType} = 'filenames' ;
         }
     }
     elsif ($inType eq 'filename')
     {
-        $obj->validateInputFilenames($_[0])
+        $obj->validateInputFilenames(@_[0])
             or return undef;
     }
     elsif ($inType eq 'array')
     {
-        $data{inType} = 'filenames' ;
-        $obj->validateInputArray($_[0])
+        %data{inType} = 'filenames' ;
+        $obj->validateInputArray(@_[0])
             or return undef ;
     }
 
     return $obj->saveErrorString("$reportClass: output buffer is read-only")
-        if $outType eq 'buffer' && readonly(${ $_[1] });
+        if $outType eq 'buffer' && readonly(${ @_[1] });
 
     if ($outType eq 'filename' )
     {
         $obj->croakError("$reportClass: output filename is undef or null string")
-            if ! defined $_[1] || $_[1] eq ''  ;
+            if ! defined @_[1] || @_[1] eq ''  ;
 
-        if (-e $_[1])
+        if (-e @_[1])
         {
             if (-d _ )
             {
-                return $obj->saveErrorString("output file '$_[1]' is a directory");
+                return $obj->saveErrorString("output file '@_[1]' is a directory");
             }
         }
     }
@@ -331,8 +331,8 @@ sub Validator::saveErrorString
 sub Validator::croakError
 {
     my $self   = shift ;
-    $self->saveErrorString($_[0]);
-    croak $_[0];
+    $self->saveErrorString(@_[0]);
+    croak @_[0];
 }
 
 
@@ -371,12 +371,12 @@ sub Validator::validateInputArray
 {
     my $self = shift ;
 
-    if ( @{ $_[0] } == 0 )
+    if ( @{ @_[0] } == 0 )
     {
         return $self->saveErrorString("empty array reference") ;
     }    
 
-    foreach my $element ( @{ $_[0] } )
+    foreach my $element ( @{ @_[0] } )
     {
         my $inType  = whatIsInput($element);
     
@@ -425,7 +425,7 @@ sub Validator::validateInputArray
 
 sub createSelfTiedObject
 {
-    my $class = shift || (caller)[0] ;
+    my $class = shift || (caller)[[0]] ;
     my $error_ref = shift ;
 
     my $obj = bless Symbol::gensym(), ref($class) || $class;
@@ -449,14 +449,14 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-$EXPORT_TAGS{Parse} = [qw( ParseParameters 
+%EXPORT_TAGS{Parse} = [qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar
                          )
                       ];              
 
-push @EXPORT, @{ $EXPORT_TAGS{Parse} } ;
+push @EXPORT, @{ %EXPORT_TAGS{Parse} } ;
 
 use constant Parse_any      => 0x01;
 use constant Parse_unsigned => 0x02;
@@ -483,7 +483,7 @@ sub ParseParameters
 {
     my $level = shift || 0 ; 
 
-    my $sub = (caller($level + 1))[3] ;
+    my $sub = (caller($level + 1))[[3]] ;
     local $Carp::CarpLevel = 1 ;
     my $p = IO::Compress::Base::Parameters->new() ;
     $p->parse(@_)
@@ -544,7 +544,7 @@ sub IO::Compress::Base::Parameters::parse
         @entered = () ;
     }
     elsif (@_ == 1) {
-        my $href = $_[0] ;    
+        my $href = @_[0] ;    
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
  
@@ -559,8 +559,8 @@ sub IO::Compress::Base::Parameters::parse
             if $count % 2 != 0 ;
         
         for my $i (0.. $count / 2 - 1) {
-            push @entered, $_[2* $i] ;
-            push @entered, \$_[2* $i+1] ;
+            push @entered, @_[2* $i] ;
+            push @entered, \@_[2* $i+1] ;
         }
     }
 
@@ -589,8 +589,8 @@ sub IO::Compress::Base::Parameters::parse
 
     my %parsed = ();
     for my $i (0.. @entered / 2 - 1) {
-        my $key = $entered[2* $i] ;
-        my $value = $entered[2* $i+1] ;
+        my $key = @entered[2* $i] ;
+        my $value = @entered[2* $i+1] ;
 
         #print "Key [$key] Value [$value]" ;
         #print defined $$value ? "[$$value]\n" : "[undef]\n";
@@ -602,8 +602,8 @@ sub IO::Compress::Base::Parameters::parse
                                   ! $got->{$canonkey}[OFF_FIRST_ONLY]  ))
         {
             my $type = $got->{$canonkey}[OFF_TYPE] ;
-            my $parsed = $parsed{$canonkey};
-            ++ $parsed{$canonkey};
+            my $parsed = %parsed{$canonkey};
+            ++ %parsed{$canonkey};
 
             return $self->setError("Muliple instances of '$key' found") 
                 if $parsed && ($type ^&^ Parse_multiple) == 0 ;
@@ -740,8 +740,8 @@ sub IO::Compress::Base::Parameters::value
     if (@_)
     {
         $self->{Got}{lc $name}[OFF_PARSED]  = 1;
-        $self->{Got}{lc $name}[OFF_DEFAULT] = $_[0] ;
-        $self->{Got}{lc $name}[OFF_FIXED]   = $_[0] ;
+        $self->{Got}{lc $name}[OFF_DEFAULT] = @_[0] ;
+        $self->{Got}{lc $name}[OFF_FIXED]   = @_[0] ;
     }
 
     return $self->{Got}{lc $name}[OFF_FIXED] ;
@@ -775,7 +775,7 @@ sub IO::Compress::Base::Parameters::clone
     my %got ;
 
     while (my ($k, $v) = each %{ $self->{Got} }) {
-        $got{$k} = [ @$v ];
+        %got{$k} = [ @$v ];
     }
 
     $obj->{Error} = $self->{Error};

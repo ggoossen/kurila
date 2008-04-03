@@ -18,8 +18,8 @@ sub bits {
     my $bits = 0;
     my @wrong;
     foreach my $s (@_) {
-	push @wrong, $s unless exists $bitmask{$s};
-        $bits ^|^= $bitmask{$s} || 0;
+	push @wrong, $s unless exists %bitmask{$s};
+        $bits ^|^= %bitmask{$s} || 0;
     }
     if (@wrong) {
         die("Unknown 'strict' tag(s) '{dump::view(\@wrong)}'");

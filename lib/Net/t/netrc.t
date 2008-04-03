@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -20,7 +20,7 @@ use Cwd;
 use Test::More tests => 20;
 
 # for testing _readrc
-$ENV{HOME} = Cwd::cwd();
+%ENV{HOME} = Cwd::cwd();
 
 # avoid "used only once" warning
 local (*CORE::GLOBAL::getpwuid, *CORE::GLOBAL::stat);
@@ -36,12 +36,12 @@ my @stat;
 };
 
 # for testing _readrc
-$INC{'FileHandle.pm'} = 1;
+%INC{'FileHandle.pm'} = 1;
 
 # now that the tricks are out of the way...
 eval { require Net::Netrc; };
 ok( !$@, 'should be able to require() Net::Netrc safely' );
-ok( exists $INC{'Net/Netrc.pm'}, 'should be able to use Net::Netrc' );
+ok( exists %INC{'Net/Netrc.pm'}, 'should be able to use Net::Netrc' );
 
 SKIP: {
 	skip('incompatible stat() handling for OS', 4), next SKIP 
@@ -53,14 +53,14 @@ SKIP: {
 	};
 
 	# add write access for group/other
-	$stat[2] = 077;
+	@stat[2] = 077;
 	ok( !defined(Net::Netrc::_readrc()),
 		'_readrc() should not read world-writable file' );
 	ok( scalar($warn->message =~ m/^Bad permissions:/),
 		'... and should warn about it' );
 
 	# the owner field should still not match
-	$stat[2] = 0;
+	@stat[2] = 0;
 
         if ($<) { 
           ok( !defined(Net::Netrc::_readrc()), 
@@ -73,7 +73,7 @@ SKIP: {
 }
 
 # this field must now match, to avoid the last-tested warning
-$stat[4] = $<;
+@stat[4] = $<;
 
 # this curious mix of spaces and quotes tests a regex at line 79 (version 2.11)
 FileHandle::set_lines(split(m/\n/, <<LINES));
@@ -132,11 +132,11 @@ package FileHandle;
 
 sub new {
 	tie *FH, 'FileHandle', @_;
-	bless \*FH, $_[0];
+	bless \*FH, @_[0];
 }
 
 sub TIEHANDLE {
-	my ($class, $file, $mode) = @_[0,2,3];
+	my ($class, $file, $mode) = @_[[0,2,3]];
 	bless({ file => $file, mode => $mode }, $class);
 }
 

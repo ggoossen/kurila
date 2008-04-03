@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -31,7 +31,7 @@ like( $@->{description}, qr/^prompt function called without an argument/,
 my $stdout = tie *STDOUT, 'TieOut' or die;
 
 
-$ENV{PERL_MM_USE_DEFAULT} = 1;
+%ENV{PERL_MM_USE_DEFAULT} = 1;
 is( prompt("Foo?"), '',     'no default' );
 like( $stdout->read,  qr/^Foo\?\s*\n$/,      '  question' );
 
@@ -43,7 +43,7 @@ like( $stdout->read,  qr/^Foo\? \[Bar!\]\s+Bar!\n$/,      '  question' );
 
 
 {
-    $ENV{PERL_MM_USE_DEFAULT} = 0;
+    %ENV{PERL_MM_USE_DEFAULT} = 0;
     close STDIN;
     my $stdin = tie *STDIN, 'TieIn' or die;
     $stdin->write("From STDIN");

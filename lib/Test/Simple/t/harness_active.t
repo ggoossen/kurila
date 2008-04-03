@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -46,7 +46,7 @@ Test::More->import(tests => 4);
 Test::More->builder->no_ending(1);
 
 {
-    local $ENV{HARNESS_ACTIVE} = 0;
+    local %ENV{HARNESS_ACTIVE} = 0;
 
 #line 62
     fail( "this fails" );
@@ -65,7 +65,7 @@ ERR
 }
 
 {
-    local $ENV{HARNESS_ACTIVE} = 1;
+    local %ENV{HARNESS_ACTIVE} = 1;
                    
 #line 71
     fail( "this fails" );

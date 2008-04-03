@@ -98,20 +98,20 @@ sub import {
 }
 
 sub TIESCALAR {
-    bless \($_[1]);
+    bless \(@_[1]);
 }
 
 sub FETCH {
     my ($self) = @_;
-    $ENV{$$self};
+    %ENV{$$self};
 }
 
 sub STORE {
     my ($self, $value) = @_;
     if (defined($value)) {
-	$ENV{$$self} = $value;
+	%ENV{$$self} = $value;
     } else {
-	delete $ENV{$$self};
+	delete %ENV{$$self};
     }
 }
 
@@ -124,87 +124,93 @@ use Tie::Array;
 
 @ISA = qw(Tie::Array);
 
-my $sep = $Config::Config{path_sep};
+my $sep = %Config::Config{path_sep};
 
 sub TIEARRAY {
-    bless \($_[1]);
+    bless \(@_[1]);
 }
 
 sub FETCHSIZE {
     my ($self) = @_;
-    my @temp = split($sep, $ENV{$$self});
+    my @temp = split($sep, %ENV{$$self});
     return scalar(@temp);
 }
 
 sub STORESIZE {
     my ($self, $size) = @_;
-    my @temp = split($sep, $ENV{$$self});
-    $#temp = $size - 1;
-    $ENV{$$self} = join($sep, @temp);
+    my @temp = split($sep, %ENV{$$self});
+    if (@temp +> $size) {
+        splice @temp, $size;
+    } else {
+        @temp[$size-1] = @tem[$size-1];
+    }
+    %ENV{$$self} = join($sep, @temp);
 }
 
 sub CLEAR {
     my ($self) = @_;
-    $ENV{$$self} = '';
+    %ENV{$$self} = '';
 }
 
 sub FETCH {
     my ($self, $index) = @_;
-    return (split($sep, $ENV{$$self}))[$index];
+    return (split($sep, %ENV{$$self}))[[$index]];
 }
 
 sub STORE {
     my ($self, $index, $value) = @_;
-    my @temp = split($sep, $ENV{$$self});
-    $temp[$index] = $value;
-    $ENV{$$self} = join($sep, @temp);
+    my @temp = split($sep, %ENV{$$self});
+    @temp[$index] = $value;
+    %ENV{$$self} = join($sep, @temp);
     return $value;
 }
 
 sub PUSH {
     my $self = shift;
-    my @temp = split($sep, $ENV{$$self});
+    my @temp = split($sep, %ENV{$$self});
     push @temp, @_;
-    $ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, @temp);
     return scalar(@temp);
 }
 
 sub POP {
     my ($self) = @_;
-    my @temp = split($sep, $ENV{$$self});
+    my @temp = split($sep, %ENV{$$self});
     my $result = pop @temp;
-    $ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, @temp);
     return $result;
 }
 
 sub UNSHIFT {
     my $self = shift;
-    my @temp = split($sep, $ENV{$$self});
+    my @temp = split($sep, %ENV{$$self});
     my $result = unshift @temp, @_;
-    $ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, @temp);
     return $result;
 }
 
 sub SHIFT {
     my ($self) = @_;
-    my @temp = split($sep, $ENV{$$self});
+    my @temp = split($sep, %ENV{$$self});
     my $result = shift @temp;
-    $ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, @temp);
     return $result;
 }
 
 sub SPLICE {
     my $self = shift;
-    my $offset = shift;
-    my $length = shift;
-    my @temp = split($sep, $ENV{$$self});
+    my @temp = split($sep, %ENV{$$self});
     if (wantarray) {
-	my @result = splice @temp, $self, $offset, $length, @_;
-	$ENV{$$self} = join($sep, @temp);
+	my @result = @_ +>= 2 ? splice @temp, shift, shift, @_
+          : @_ +>= 1 ?
+            splice @temp, shift : splice @temp;
+	%ENV{$$self} = join($sep, @temp);
 	return @result;
     } else {
-	my $result = scalar splice @temp, $offset, $length, @_;
-	$ENV{$$self} = join($sep, @temp);
+	my $result = @_ +>= 2 ? splice @temp, shift, shift, @_
+          : @_ +>= 1 ?
+            splice @temp, shift : splice @temp;
+	%ENV{$$self} = join($sep, @temp);
 	return $result;
     }
 }
@@ -217,19 +223,19 @@ use Tie::Array;
 @ISA = qw(Tie::Array);
  
 sub TIEARRAY {
-    bless \($_[1]);
+    bless \(@_[1]);
 }
 
 sub FETCHSIZE {
     my ($self) = @_;
     my $i = 0;
-    while ($i +< 127 and defined $ENV{$$self . ';' . $i}) { $i++; };
+    while ($i +< 127 and defined %ENV{$$self . ';' . $i}) { $i++; };
     return $i;
 }
 
 sub FETCH {
     my ($self, $index) = @_;
-    return $ENV{$$self . ';' . $index};
+    return %ENV{$$self . ';' . $index};
 }
 
 1;

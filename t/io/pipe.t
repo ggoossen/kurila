@@ -7,7 +7,7 @@ BEGIN {
     require Config; Config->import;
     require './test.pl';
 
-    if (!$Config{'d_fork'}) {
+    if (!%Config{'d_fork'}) {
         skip_all("fork required to pipe");
     }
     else {
@@ -95,7 +95,7 @@ SKIP: {
     next_test();
 
     SKIP: {
-        skip "fork required", 2 unless $Config{d_fork};
+        skip "fork required", 2 unless %Config{d_fork};
 
         pipe(READER,'WRITER') || die "Can't open pipe";
 
@@ -131,10 +131,10 @@ wait;				# Collect from $pid
 pipe(READER,'WRITER') || die "Can't open pipe";
 close READER;
 
-$SIG{'PIPE'} = \&broken_pipe;
+%SIG{'PIPE'} = \&broken_pipe;
 
 sub broken_pipe {
-    $SIG{'PIPE'} = 'IGNORE';       # loop preventer
+    %SIG{'PIPE'} = 'IGNORE';       # loop preventer
     printf "ok %d - SIGPIPE\n", curr_test;
 }
 
@@ -158,10 +158,10 @@ SKIP: {
         # BeOS will not write to broken pipes, either.
         # Nor does POSIX-BC.
         skip "Won't report failure on broken pipe", 1
-          if $Config{d_sfio} || $^O eq 'machten' || $^O eq 'beos' || 
+          if %Config{d_sfio} || $^O eq 'machten' || $^O eq 'beos' || 
              $^O eq 'posix-bc';
 
-        local $SIG{PIPE} = 'IGNORE';
+        local %SIG{PIPE} = 'IGNORE';
         open NIL, '|-', qq{$Perl -e "exit 0"} or die "open failed: $!";
         sleep 5;
         if (print NIL 'foo') {
@@ -194,7 +194,7 @@ SKIP: {
                 exit 37;
             }
             my $pipe = open *FH, "-|", "sleep 2;exit 13" or die "Open: $!\n";
-            $SIG{ALRM} = sub { return };
+            %SIG{ALRM} = sub { return };
             alarm(1);
             is( close FH, '',   'close failure for... umm, something' );
             is( $?, 13*256,     '       status' );
@@ -234,7 +234,7 @@ SKIP: {
 
   my $child = 0;
   eval {
-    local $SIG{ALRM} = sub { die; };
+    local %SIG{ALRM} = sub { die; };
     alarm 2;
     $child = wait;
     alarm 0;

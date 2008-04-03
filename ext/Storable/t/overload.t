@@ -7,14 +7,14 @@
 #  
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -30,7 +30,7 @@ print "1..16\n";
 package OVERLOADED;
 
 use overload
-	'""' => sub { $_[0][0] };
+	'""' => sub { @_[0][0] };
 
 package main;
 
@@ -63,7 +63,7 @@ package OVER;
 
 use overload
 	'+'		=> \&plus,
-	'""'	=> sub { ref $_[0] };
+	'""'	=> sub { ref @_[0] };
 
 sub plus {
 	return 314;

@@ -13,7 +13,7 @@ BEGIN {
     $hasgr = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($hasgr) { plan skip_all => "no getgrgid"; }
     use Config;
-    $hasgr = 0 unless $Config{'i_grp'} eq 'define';
+    $hasgr = 0 unless %Config{'i_grp'} eq 'define';
     unless ($hasgr) { plan skip_all => "no grp.h"; }
 }
 
@@ -34,11 +34,11 @@ can_ok(__PACKAGE__, 'getgrgid');
 
 my $grent = getgrgid $gid;
 
-is( $grent->name, $grent[0],    'name matches core getgrgid' );
+is( $grent->name, @grent[0],    'name matches core getgrgid' );
 
-is( $grent->passwd, $grent[1],  '   passwd' );
+is( $grent->passwd, @grent[1],  '   passwd' );
 
-is( $grent->gid, $grent[2],     '   gid' );
+is( $grent->gid, @grent[2],     '   gid' );
 
 
 # Testing pretty much anything else is unportable.

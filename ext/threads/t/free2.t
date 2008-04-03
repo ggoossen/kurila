@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -50,7 +50,7 @@ sub ok
             print("ok $id - $name\n");
         } else {
             print("not ok $id - $name\n");
-            printf("# Failed test at line %d\n", (caller)[2]);
+            printf("# Failed test at line \%d\n", (caller)[2]);
         }
     }
 }
@@ -91,10 +91,10 @@ sub th_start
         }
 
         # Wait until signalled by another thread
-        while (! exists($READY{$tid})) {
+        while (! exists(%READY{$tid})) {
             cond_wait(%READY);
         }
-        $other = delete($READY{$tid});
+        $other = delete(%READY{$tid});
     }
     $q->enqueue($tid, "Thread $tid received signal from $other");
     threads->yield();
@@ -123,7 +123,7 @@ sub th_signal
     $q->enqueue($tid, "Thread $tid signalling $other");
 
     lock(%READY);
-    $READY{$other} = $tid;
+    %READY{$other} = $tid;
     cond_broadcast(%READY);
 }
 

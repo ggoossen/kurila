@@ -29,10 +29,10 @@ use Carp;  our $VERSION = $Carp::VERSION;
 our (%CarpInternal, %Internal);
 
 # disable these by default, so they can live w/o require Carp
-$CarpInternal{Carp}++;
-$CarpInternal{warnings}++;
-$Internal{Exporter}++;
-$Internal{'Exporter::Heavy'}++;
+%CarpInternal{Carp}++;
+%CarpInternal{warnings}++;
+%Internal{Exporter}++;
+%Internal{'Exporter::Heavy'}++;
 
 
 our ($CarpLevel, $MaxArgNums, $MaxEvalLen, $MaxArgLen, $Verbose);
@@ -48,7 +48,7 @@ sub  longmess_real {
     # by one.  Other code began calling longmess and expecting this
     # behaviour, so the replacement has to emulate that behaviour.
     my $call_pack = caller();
-    if ($Internal{$call_pack} or $CarpInternal{$call_pack}) {
+    if (%Internal{$call_pack} or %CarpInternal{$call_pack}) {
       return longmess_heavy(@_);
     }
     else {
@@ -73,8 +73,8 @@ sub shortmess_real {
 # is forcibly reloaded, but $INC{"Carp/Heavy.pm"} remains true.
 # Hence the extra hack of deleting the previous typeglob first.
 
-delete $Carp::{shortmess_jmp};
-delete $Carp::{longmess_jmp};
+delete %Carp::{shortmess_jmp};
+delete %Carp::{longmess_jmp};
 *longmess_jmp  = *longmess_real;
 *shortmess_jmp = *shortmess_real;
 
@@ -83,25 +83,25 @@ sub caller_info {
   my $i = shift(@_) + 1;
   package DB;
   my %call_info;
-  @call_info{
+  %call_info{[
     qw(pack file line sub has_args wantarray evaltext is_require)
-  } = caller($i);
+  ]} = caller($i);
   
-  unless (defined $call_info{pack}) {
+  unless (defined %call_info{pack}) {
     return ();
   }
 
   my $sub_name = Carp::get_subname(\%call_info);
-  if ($call_info{has_args}) {
+  if (%call_info{has_args}) {
     my @args = map {Carp::format_arg($_)} @DB::args;
     if ($MaxArgNums and @args +> $MaxArgNums) { # More than we want to show?
-      $#args = $MaxArgNums;
+      splice @args, $MaxArgNums;
       push @args, '...';
     }
     # Push the args onto the subroutine
     $sub_name .= '(' . join (', ', @args) . ')';
   }
-  $call_info{sub_name} = $sub_name;
+  %call_info{sub_name} = $sub_name;
   return wantarray() ? %call_info : \%call_info;
 }
 
@@ -163,16 +163,16 @@ sub long_error_loc {
         return 2;
       }
     }
-    redo if $CarpInternal{$pkg};
+    redo if %CarpInternal{$pkg};
     redo unless 0 +> --$lvl;
-    redo if $Internal{$pkg};
+    redo if %Internal{$pkg};
   }
   return $i - 1;
 }
 
 
 sub longmess_heavy {
-  return @_ if ref($_[0]); # don't break references as exceptions
+  return @_ if ref(@_[0]); # don't break references as exceptions
   my $i = long_error_loc();
   return ret_backtrace($i, @_);
 }
@@ -192,10 +192,10 @@ sub ret_backtrace {
   }
 
   my %i = caller_info($i);
-  $mess = "$err at $i{file} line $i{line}$tid_msg\n";
+  $mess = "$err at %i{file} line %i{line}$tid_msg\n";
 
   while (my %i = caller_info(++$i)) {
-      $mess .= "\t$i{sub_name} called at $i{file} line $i{line}$tid_msg\n";
+      $mess .= "\t%i{sub_name} called at %i{file} line %i{line}$tid_msg\n";
   }
   
   return $mess;
@@ -213,7 +213,7 @@ sub ret_summary {
   }
 
   my %i = caller_info($i);
-  return "$err at $i{file} line $i{line}$tid_msg\n";
+  return "$err at %i{file} line %i{line}$tid_msg\n";
 }
 
 
@@ -229,9 +229,9 @@ sub short_error_loc {
     my $caller = caller($i);
 
     return 0 unless defined($caller); # What happened?
-    redo if $Internal{$caller};
-    redo if $CarpInternal{$caller};
-    redo if $CarpInternal{$called};
+    redo if %Internal{$caller};
+    redo if %CarpInternal{$caller};
+    redo if %CarpInternal{$called};
     redo if trusts($called, $caller, $cache);
     redo if trusts($caller, $called, $cache);
     redo unless 0 +> --$lvl;
@@ -242,7 +242,7 @@ sub short_error_loc {
 
 sub shortmess_heavy {
   return longmess_heavy(@_) if $Verbose;
-  return @_ if ref($_[0]); # don't break references as exceptions
+  return @_ if ref(@_[0]); # don't break references as exceptions
   my $i = short_error_loc();
   if ($i) {
     ret_summary($i, @_);
@@ -280,7 +280,7 @@ sub trusts {
         $known->{$anc}++;
         my ($anc_knows, $anc_partial) = get_status($cache, $anc);
         my @found = keys %$anc_knows;
-        @$known{@found} = ();
+        %$known{[@found]} = ();
         push @$partial, @$anc_partial;
     }
     return exists $known->{$parent};

@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -64,7 +64,7 @@ TODO: {
 
 {
     my $warning;
-    local ${^WARN_HOOK} = sub { $warning = $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warning = @_[0]->message };
     TODO: {
         # perl gets the line number a little wrong on the first
         # statement inside a block.

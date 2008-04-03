@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -25,7 +25,7 @@ use Test::More tests => 63;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
-my $mandirs =  !!$Config{man1direxp} + !!$Config{man3direxp};
+my $mandirs =  !!%Config{man1direxp} + !!%Config{man3direxp};
 
 # saves having to qualify package name for class methods
 my $ei = bless( {}, 'ExtUtils::Installed' );
@@ -45,7 +45,7 @@ ok( $ei->_is_type(0, 'all'), '_is_type() should be true for type of "all"' );
 
 foreach my $path (qw( man1dir man3dir )) {
     SKIP: {
-        my $dir = $Config{$path.'exp'};
+        my $dir = %Config{$path.'exp'};
         skip("no man directory $path on this system", 2 ) unless $dir;
 
         my $file = $dir . '/foo';
@@ -55,14 +55,14 @@ foreach my $path (qw( man1dir man3dir )) {
 }
 
 # VMS 5.6.1 doesn't seem to have $Config{prefixexp}
-my $prefix = $Config{prefix} || $Config{prefixexp};
+my $prefix = %Config{prefix} || %Config{prefixexp};
 
 # You can concatenate /foo but not foo:, which defaults in the current
 # directory
 $prefix = VMS::Filespec::unixify($prefix) if $Is_VMS;
 
 # ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
-$prefix = $Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
+$prefix = %Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
 
 ok( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'),
         "... should find prog file under $prefix" );
@@ -120,7 +120,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
     my $realei = ExtUtils::Installed->new();
     isa_ok( $realei, 'ExtUtils::Installed' );
     isa_ok( $realei->{Perl}{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}{version}, $Config{version},
+    is( $realei->{Perl}{version}, %Config{version},
         'new() should set Perl version from %Config' );
 
     ok( exists $realei->{FakeMod}, 'new() should find modules with .packlists');
@@ -131,7 +131,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 
 # Now try this using PERL5LIB
 {
-    local $ENV{PERL5LIB} = join $Config{path_sep}, $fake_mod_dir;
+    local %ENV{PERL5LIB} = join %Config{path_sep}, $fake_mod_dir;
     local *ExtUtils::Installed::Config;
     %ExtUtils::Installed::Config = (
         %Config,
@@ -142,7 +142,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
     my $realei = ExtUtils::Installed->new();
     isa_ok( $realei, 'ExtUtils::Installed' );
     isa_ok( $realei->{Perl}{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}{version}, $Config{version},
+    is( $realei->{Perl}{version}, %Config{version},
         'new() should set Perl version from %Config' );
 
     ok( exists $realei->{FakeMod},
@@ -207,11 +207,11 @@ is( $ei->modules, 3,    'modules() in scalar context' );
 # files
 $ei->{goodmod} = {
         packlist => {
-                ($Config{man1direxp} ?
-                    (File::Spec->catdir($Config{man1direxp}, 'foo') => 1) :
+                (%Config{man1direxp} ?
+                    (File::Spec->catdir(%Config{man1direxp}, 'foo') => 1) :
                         ()),
-                ($Config{man3direxp} ?
-                    (File::Spec->catdir($Config{man3direxp}, 'bar') => 1) :
+                (%Config{man3direxp} ?
+                    (File::Spec->catdir(%Config{man3direxp}, 'bar') => 1) :
                         ()),
                 File::Spec->catdir($prefix, 'foobar') => 1,
                 foobaz  => 1,
@@ -226,8 +226,8 @@ like( $@->{description}, qr/type must be/,'files() should croak given bad type' 
 my @files;
 SKIP: {
     skip('no man directory man1dir on this system', 2)
-      unless $Config{man1direxp};
-    @files = $ei->files('goodmod', 'doc', $Config{man1direxp});
+      unless %Config{man1direxp};
+    @files = $ei->files('goodmod', 'doc', %Config{man1direxp});
     is( scalar @files, 1, '... should find doc file under given dir' );
     is( (grep { m/foo$/ } @files), 1, '... checking file name' );
 }
@@ -241,7 +241,7 @@ SKIP: {
 is( scalar @files, 0, '... should find no doc files given wrong dirs' );
 @files = $ei->files('goodmod', 'prog');
 is( scalar @files, 1, '... should find doc file in correct dir' );
-like( $files[0], qr/foobar[>\]]?$/, '... checking file name' );
+like( @files[0], qr/foobar[>\]]?$/, '... checking file name' );
 @files = $ei->files('goodmod');
 is( scalar @files, 2 + $mandirs, '... should find all files with no type specified' );
 my %dirnames = map { lc($_) => dirname($_) } @files;
@@ -257,19 +257,19 @@ SKIP: {
 }
 @dirs = $ei->directories('goodmod');
 is( scalar @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = sort map { exists $dirnames{lc($_)} ? $dirnames{lc($_)} : '' } @files;
+@files = sort map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } @files;
 is( join(' ', @files), join(' ', @dirs), '... should sort output' );
 
 # directory_tree
 my $expectdirs =
        ($mandirs == 2) &&
-       (dirname($Config{man1direxp}) eq dirname($Config{man3direxp}))
+       (dirname(%Config{man1direxp}) eq dirname(%Config{man3direxp}))
        ? 3 : 2;
 
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = $ei->directory_tree('goodmod', 'doc', $Config{man1direxp} ?
-       dirname($Config{man1direxp}) : dirname($Config{man3direxp}));
+    @dirs = $ei->directory_tree('goodmod', 'doc', %Config{man1direxp} ?
+       dirname(%Config{man1direxp}) : dirname(%Config{man3direxp}));
     is( scalar @dirs, $expectdirs,
         'directory_tree() should report intermediate dirs to those requested' );
 }

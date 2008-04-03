@@ -7,14 +7,14 @@
 #
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -72,7 +72,7 @@ sub STORABLE_thaw {
 	my @keys = split(m/:/, $keys);
 	my @values = split(m/:/, $values);
 	for (my $i = 0; $i +< @keys; $i++) {
-		$self->{$keys[$i]} = $values[$i];
+		$self->{@keys[$i]} = @values[$i];
 	}
 	$main::hash_hook2++;
 }
@@ -156,11 +156,11 @@ $d = tie @array, 'TIED_ARRAY';
 tie $scalar, 'TIED_SCALAR';
 
 $scalar = 'foo';
-$hash{'attribute'} = 'plain value';
-$array[0] = dump::view(\$scalar);
-$array[1] = dump::view($c);
-$array[2] = dump::view(\@array);
-$array[3] = "plaine scalaire";
+%hash{'attribute'} = 'plain value';
+@array[0] = dump::view(\$scalar);
+@array[1] = dump::view($c);
+@array[2] = dump::view(\@array);
+@array[3] = "plaine scalaire";
 
 @tied = (\$scalar, \@array, \%hash);
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
@@ -185,7 +185,7 @@ ok 6, length($f) == length($g);
 
 # Ensure the tied items in the retrieved image work
 @old = ($scalar_fetch, $array_fetch, $hash_fetch);
-@tied = ($tscalar, $tarray, $thash) = @{$root->[$#{$root}]};
+@tied = ($tscalar, $tarray, $thash) = @{$root->[@$root-1]};
 @type = qw(SCALAR  ARRAY  HASH);
 
 ok 7, tied $$tscalar;
@@ -197,8 +197,8 @@ ok 9, tied %{$thash};
 
 # Tests 10..15
 for ($i = 0; $i +< @new; $i++) {
-	ok 10 + 2*$i, $new[$i] == $old[$i] + 1;		# Tests 10,12,14
-	ok 11 + 2*$i, ref $tied[$i] eq $type[$i];	# Tests 11,13,15
+	ok 10 + 2*$i, @new[$i] == @old[$i] + 1;		# Tests 10,12,14
+	ok 11 + 2*$i, ref @tied[$i] eq @type[$i];	# Tests 11,13,15
 }
 
 ok 16, $$tscalar eq 'foo';

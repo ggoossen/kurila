@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib/');
     }
@@ -29,7 +29,7 @@ my $Is_VMS = $^O eq 'VMS';
 my $perl = which_perl();
 
 # GNV logical interferes with testing
-$ENV{'bin'} = '[.bin]' if $Is_VMS;
+%ENV{'bin'} = '[.bin]' if $Is_VMS;
 
 chdir 't';
 

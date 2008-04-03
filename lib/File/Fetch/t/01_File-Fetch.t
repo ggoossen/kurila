@@ -12,10 +12,10 @@ use Data::Dumper;
 use_ok('File::Fetch');
 
 ### optionally set debugging ###
-$File::Fetch::DEBUG = $File::Fetch::DEBUG   = 1 if $ARGV[0];
-$IPC::Cmd::DEBUG    = $IPC::Cmd::DEBUG      = 1 if $ARGV[0];
+$File::Fetch::DEBUG = $File::Fetch::DEBUG   = 1 if @ARGV[0];
+$IPC::Cmd::DEBUG    = $IPC::Cmd::DEBUG      = 1 if @ARGV[0];
 
-unless( $ENV{PERL_CORE} ) {
+unless( %ENV{PERL_CORE} ) {
     warn qq[
 
 ####################### NOTE ##############################
@@ -190,7 +190,7 @@ sub _fetch_uri {
 
     SKIP: {
         skip "'$method' fetching tests disabled under perl core", 4
-                if $ENV{PERL_CORE};
+                if %ENV{PERL_CORE};
     
         ### stupid warnings ###
         $File::Fetch::METHODS =

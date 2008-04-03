@@ -19,7 +19,7 @@ WriteMakefile(
     dist                => { SUFFIX => 'gz', COMPRESS => 'gzip -f' },
 );
 
-my $ivtype = $Config{ivtype};
+my $ivtype = %Config{ivtype};
 
 # I don't know if the VMS folks ever supported long long on 5.6.x
 if ($ivtype and $ivtype eq 'long long' and $^O !~ m/^MSWin/) {

@@ -10,7 +10,7 @@ my $Is_VMS = $^O eq 'VMS';
 my $Is_MSWin32 = $^O eq 'MSWin32';
 my $Is_NetWare = $^O eq 'NetWare';
 my $Is_MacOS = $^O eq 'MacOS';
-$ENV{PERL5LIB} = "../lib" unless $Is_VMS;
+%ENV{PERL5LIB} = "../lib" unless $Is_VMS;
 
 $|=1;
 
@@ -191,8 +191,8 @@ sub sortfn {
   my (@y) = ( 4, 6, 5);
   @y = sort { $a <+> $b } @y;
   my $t = "sortfn ".join(', ', @y)."\n";
-  print $t if ($seen{$t}++ == 0);
-  return $_[0] <+> $_[1];
+  print $t if (%seen{$t}++ == 0);
+  return @_[0] <+> @_[1];
 }
 our @x = ( 3, 2, 1 );
 @x = sort { &sortfn($a, $b) } @x;
@@ -308,7 +308,7 @@ END { print "foobar\n" }
 EXPECT
 foobar
 ########
-$SIG{__DIE__} = sub {
+%SIG{__DIE__} = sub {
     print "In DIE\n";
     my $i = 0;
     while (my ($p,$f,$l,$s) = caller(++$i)) {
@@ -326,7 +326,7 @@ Nothing
 package TEST;
  
 sub TIEARRAY {
-  return bless [qw(foo fee fie foe)], $_[0];
+  return bless [qw(foo fee fie foe)], @_[0];
 }
 sub FETCH {
   my ($s,$i) = @_;
@@ -339,17 +339,17 @@ bbb:
  
 package main;
 tie my @bar, 'TEST';
-print join('|', @bar[0..3]), "\n"; 
+print join('|', @bar[[0..3]]), "\n"; 
 EXPECT
 foo|fee|fie|foe
 ########
 package TH;
 sub TIEHASH { bless {}, 'TH' }
-sub STORE { eval { print "@_[1,2]\n" }; die "bar\n" }
+sub STORE { eval { print "@_[[1,2]]\n" }; die "bar\n" }
 tie our %h, 'TH';
-eval { $h{A} = 1; print "never\n"; };
+eval { %h{A} = 1; print "never\n"; };
 print $@->{description};
-eval { $h{B} = 2; };
+eval { %h{B} = 2; };
 print $@->{description};
 EXPECT
 A 1
@@ -382,7 +382,7 @@ EXPECT
 recursive die
 ########
 sub TIEHANDLE { bless {} }
-sub PRINT { print "[TIE] $_[1]" }
+sub PRINT { print "[TIE] @_[1]" }
 
 tie *STDERR, '';
 die "DIE";
@@ -394,7 +394,7 @@ sub TIEHANDLE { bless {} }
 sub PRINT { 
     (split(m/./, 'x'x10000))[0];
     eval('die("test\n")');
-    warn "[TIE] $_[1]";
+    warn "[TIE] @_[1]";
 }
 open OLDERR, '>&', \*STDERR;
 tie *STDERR, '';

@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -62,8 +62,8 @@ open(IN, "<", $tmpfile) or die $!;
 my @lines = ~< *IN;
 close IN;
 
-ok($lines[0] =~ m/hi!/);
-ok($lines[1] =~ m/Hello!/);
+ok(@lines[0] =~ m/hi!/);
+ok(@lines[1] =~ m/Hello!/);
 
 
 

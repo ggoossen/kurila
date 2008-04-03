@@ -5,7 +5,7 @@ BEGIN {
 
 BEGIN {
     use Config;
-    unless ($Config{d_fork}) {
+    unless (%Config{d_fork}) {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }
@@ -47,10 +47,10 @@ if ($child_pid) {
 	my $ret = waitpid( -1, WNOHANG );          
 	my $elapsed_time = time() - $begin_time;
 	
-	printf( "# waitpid(-1,WNOHANG) returned %d after %.2f seconds\n",
+	printf( "# waitpid(-1,WNOHANG) returned \%d after \%.2f seconds\n",
 		$ret, $elapsed_time );
 	if ($elapsed_time +> 0.5) {
-	    printf( "# %.2f seconds in non-blocking waitpid is too long!\n",
+	    printf( "# \%.2f seconds in non-blocking waitpid is too long!\n",
 		    $elapsed_time );
 	    $ok = 0;
 	    last;

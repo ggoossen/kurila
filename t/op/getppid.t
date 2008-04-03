@@ -12,7 +12,7 @@ use Config;
 
 BEGIN {
     for my $syscall (qw(pipe fork waitpid getppid)) {
-	if (!$Config{"d_$syscall"}) {
+	if (!%Config{"d_$syscall"}) {
 	    print "1..0 # Skip: no $syscall\n";
 	    exit;
 	}

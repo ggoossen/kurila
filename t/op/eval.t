@@ -94,7 +94,7 @@ my $x = 25;
 eval <<'EOT'; die if $@;
   print "# $x\n";	# clone into eval's pad
   sub do_eval1 {
-     eval $_[0]; die if $@;
+     eval @_[0]; die if $@;
   }
 EOT
 do_eval1('print "ok $x\n"');
@@ -108,7 +108,7 @@ $x++;
 
 eval <<'EOT'; die if $@;
   sub do_eval2 {
-     eval $_[0]; die if $@;
+     eval @_[0]; die if $@;
   }
 do_eval2('print "ok $x\n"');
 $x++;
@@ -125,7 +125,7 @@ my $ok = 'ok';
 eval <<'EOT'; die if $@;
   # $x unbound here
   sub do_eval3 {
-     eval $_[0]; die if $@;
+     eval @_[0]; die if $@;
   }
 EOT
 {
@@ -148,7 +148,7 @@ sub recurse {
   }
 }
 {
-  local ${^WARN_HOOK} = sub { die "not ok $x\n" if $_[0] =~ m/^Deep recurs/ };
+  local ${^WARN_HOOK} = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
   recurse($x-5);
 }
 $x++;
@@ -250,7 +250,7 @@ my $zzz = 1;
 
 eval q{
     sub fred1 {
-	eval q{ print eval '$zzz' == 1 ? 'ok' : 'not ok', " $_[0]\n"}
+	eval q{ print eval '$zzz' == 1 ? 'ok' : 'not ok', " @_[0]\n"}
     }
     fred1(47);
     { my $zzz = 2; fred1(48) }
@@ -258,7 +258,7 @@ eval q{
 
 eval q{
     sub fred2 {
-	print eval('$zzz') == 1 ? 'ok' : 'not ok', " $_[0]\n";
+	print eval('$zzz') == 1 ? 'ok' : 'not ok', " @_[0]\n";
     }
 };
 fred2(49);
@@ -379,7 +379,7 @@ require './test.pl';
 our $NO_ENDING = 1;
 # [perl #19022] used to end up with shared hash warnings
 # The program should generate no output, so anything we see is on stderr
-my $got = runperl (prog => 'our %h; $h{a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
+my $got = runperl (prog => 'our %h; %h{a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
 		   stderr => 1);
 
 if ($got eq '') {
@@ -394,7 +394,7 @@ $test++;
 # eval for a build with copy on write
 {
   my %h;
-  $h{a}=1;
+  %h{a}=1;
   foreach my $k (keys %h) {
     if (defined $k and $k eq 'a') {
       print "ok $test\n";

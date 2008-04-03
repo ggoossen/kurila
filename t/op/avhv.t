@@ -7,11 +7,11 @@ require Tie::Array;
 
 package Tie::BasicArray;
 our @ISA = 'Tie::Array';
-sub TIEARRAY  { bless [], $_[0] }
-sub STORE     { $_[0]->[$_[1]] = $_[2] }
-sub FETCH     { $_[0]->[$_[1]] }
-sub FETCHSIZE { scalar(@{$_[0]})} 
-sub STORESIZE { $#{$_[0]} = $_[1]+1 }
+sub TIEARRAY  { bless [], @_[0] }
+sub STORE     { @_[0]->[@_[1]] = @_[2] }
+sub FETCH     { @_[0]->[@_[1]] }
+sub FETCHSIZE { scalar(@{@_[0]})} 
+sub STORESIZE { (@{@_[0]} = @_[1]+2)-1 }
 
 package main;
 
@@ -22,7 +22,7 @@ plan(tests => 40);
 sub not_hash {
     my($err) = shift;
     like( $err->{description}, qr/^Not a HASH reference/ ) ||
-      printf STDERR "# at %s line %d.\n", (caller)[1,2];
+      printf STDERR "# at \%s line \%d.\n", (caller)[[1,2]];
 }
 
 # Something to place inside if blocks and while loops that won't get
@@ -124,7 +124,7 @@ not_hash($@);
 
 # hash slice
 eval {
-    my $slice = join('', 'x',@$a{'abc','def'},'x');
+    my $slice = join('', 'x',%$a{['abc','def']},'x');
 };
 not_hash($@);
 
@@ -155,8 +155,8 @@ not_hash($@);
 
 # check if defelem magic works
 sub f {
-    print "not " unless $_[0] eq 'a';
-    $_[0] = 'b';
+    print "not " unless @_[0] eq 'a';
+    @_[0] = 'b';
     print "ok 11\n";
 }
 $a = [{key => 1}, 'a'];
@@ -220,7 +220,7 @@ eval {
 };
 not_hash($@);
 eval {
-    @x = delete @{$avhv}{'foo','pants'};
+    @x = delete %{$avhv}{['foo','pants']};
 };
 not_hash($@);
 eval {
@@ -275,6 +275,6 @@ not_hash($@);
 # Check hash slices (BUG ID 20010423.002)
 $avhv = [{foo=>1, bar=>2}];
 eval {
-    @$avhv{"foo", "bar"} = (42, 53);
+    %$avhv{["foo", "bar"]} = (42, 53);
 };
 not_hash($@);

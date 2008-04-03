@@ -26,7 +26,7 @@ sub all_encodings {
 }
 
 sub encoding_is_available {
-  return exists $Supported{lc $_[1]};
+  return exists %Supported{lc @_[1]};
 }
 
 sub encmodver {
@@ -34,7 +34,7 @@ sub encmodver {
 }
 
 sub make_transcoder {
-  my($e) = $_[1];
+  my($e) = @_[1];
   die "WHAT ENCODING!?!?" unless $e;
   my $x;
   if ($e eq "latin1") {

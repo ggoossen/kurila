@@ -12,7 +12,7 @@ sub dooot {
 	is(hint_fetch('dooot', 1), 54);
     }
     BEGIN {
-	$^H{dooot} = 42;
+	%^H{dooot} = 42;
     }
     is(hint_fetch('dooot'), 6 * 7);
     if ($::testing_caller) {
@@ -20,13 +20,13 @@ sub dooot {
     }
 
     BEGIN {
-	$^H{dooot} = undef;
+	%^H{dooot} = undef;
     }
     is(hint_fetch('dooot'), undef);
     ok(hint_exists('dooot'));
 
     BEGIN {
-	delete $^H{dooot};
+	delete %^H{dooot};
     }
     is(hint_fetch('dooot'), undef);
     ok(!hint_exists('dooot'));
@@ -38,8 +38,8 @@ sub dooot {
     is(hint_fetch('dooot'), undef);
     is(hint_fetch('thikoosh'), undef);
     BEGIN {
-	$^H{dooot} = 1;
-	$^H{thikoosh} = "SKREECH";
+	%^H{dooot} = 1;
+	%^H{thikoosh} = "SKREECH";
     }
     if ($::testing_caller) {
 	is(hint_fetch('dooot'), 1);
@@ -47,18 +47,18 @@ sub dooot {
     is(hint_fetch('thikoosh'), "SKREECH");
 
     BEGIN {
-	$^H{dooot} = 42;
+	%^H{dooot} = 42;
     }
     {
 	{
 	    BEGIN {
-		$^H{dooot} = 6 * 9;
+		%^H{dooot} = 6 * 9;
 	    }
 	    is(hint_fetch('dooot'), 54);
 	    is(hint_fetch('thikoosh'), "SKREECH");
 	    {
 		BEGIN {
-		    delete $^H{dooot};
+		    delete %^H{dooot};
 		}
 		is(hint_fetch('dooot'), undef);
 		ok(!hint_exists('dooot'));
@@ -77,7 +77,7 @@ print "# which now works inside evals\n";
 
 {
     BEGIN {
-	$^H{dooot} = 42;
+	%^H{dooot} = 42;
     }
     is(hint_fetch('dooot'), 6 * 7);
 
@@ -87,11 +87,11 @@ print "# which now works inside evals\n";
     is(hint_fetch('dooot'), 6 * 7);
     eval "is(hint_fetch('dooot'), 6 * 7); 1" or die $@;
     BEGIN {
-	$^H{dooot} = 54;
+	%^H{dooot} = 54;
     }
     is(hint_fetch('dooot'), 54);
     eval "is(hint_fetch('dooot'), 54); 1" or die $@;
-    eval 'BEGIN { $^H{dooot} = -1; }; 1' or die $@;
+    eval 'BEGIN { %^H{dooot} = -1; }; 1' or die $@;
     is(hint_fetch('dooot'), 54);
     eval "is(hint_fetch('dooot'), 54); 1" or die $@;
 EOE
@@ -99,17 +99,17 @@ EOE
 
 {
     BEGIN {
-	$^H{dooot} = "FIP\0FOP\0FIDDIT\0FAP";
+	%^H{dooot} = "FIP\0FOP\0FIDDIT\0FAP";
     }
     is(hint_fetch('dooot'), "FIP\0FOP\0FIDDIT\0FAP", "Can do embedded 0 bytes");
 
     BEGIN {
-	$^H{dooot} = -42;
+	%^H{dooot} = -42;
     }
     is(hint_fetch('dooot'), -42, "Can do IVs");
 
     BEGIN {
-	$^H{dooot} = ^~^0;
+	%^H{dooot} = ^~^0;
     }
     cmp_ok(hint_fetch('dooot'), '+>', 42, "Can do UVs");
 }
@@ -125,10 +125,10 @@ EOE
 	utf8::encode $k2;
 	utf8::encode $k4;
 
-	$^H{$k1} = 1;
-	$^H{$k2} = 2;
-	$^H{$k3} = 3;
-	$^H{$k4} = 4;
+	%^H{$k1} = 1;
+	%^H{$k2} = 2;
+	%^H{$k3} = 3;
+	%^H{$k4} = 4;
     }
 
 	
@@ -148,9 +148,9 @@ EOE
     my ($k1, $k2, $k3);
     BEGIN {
 	($k1, $k2, $k3) = ("\0", "\0\0", "\0\0\0");
-	$^H{$k1} = 1;
-	$^H{$k2} = 2;
-	$^H{$k3} = 3;
+	%^H{$k1} = 1;
+	%^H{$k2} = 2;
+	%^H{$k3} = 3;
     }
 
     is(hint_fetch($k1), 1, "Keys with the same hash value don't clash");
@@ -158,9 +158,9 @@ EOE
     is(hint_fetch($k3), 3, "Keys with the same hash value don't clash");
 
     BEGIN {
-	$^H{$k1} = "a";
-	$^H{$k2} = "b";
-	$^H{$k3} = "c";
+	%^H{$k1} = "a";
+	%^H{$k2} = "b";
+	%^H{$k3} = "c";
     }
 
     is(hint_fetch($k1), "a", "Keys with the same hash value don't clash");

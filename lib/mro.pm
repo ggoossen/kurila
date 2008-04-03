@@ -16,10 +16,10 @@ our $VERSION = '1.00';
 package # hide me from PAUSE
     next;
 
-sub can { mro::_nextcan($_[0], 0) }
+sub can { mro::_nextcan(@_[0], 0) }
 
 sub method {
-    my $method = mro::_nextcan($_[0], 1);
+    my $method = mro::_nextcan(@_[0], 1);
     goto &$method;
 }
 
@@ -27,7 +27,7 @@ package # hide me from PAUSE
     maybe::next;
 
 sub method {
-    my $method = mro::_nextcan($_[0], 0);
+    my $method = mro::_nextcan(@_[0], 0);
     goto &$method if defined $method;
     return;
 }

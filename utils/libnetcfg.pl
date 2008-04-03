@@ -87,7 +87,7 @@ sub valid_host
 {
  my $h = shift;
 
- defined($h) && (($cfg{'test_exist'} == 0) || gethostbyname($h));
+ defined($h) && ((%cfg{'test_exist'} == 0) || gethostbyname($h));
 }
 
 ##
@@ -173,7 +173,7 @@ sub get_hostname
  while(1)
   {
    my $ans = Prompt($prompt,$def);
-   $host = ($ans =~ m/(\S*)/)[0];
+   $host = ($ans =~ m/(\S*)/)[[0]];
    last
 	if(!length($host) || valid_host($host));
 
@@ -220,7 +220,7 @@ sub get_netmask ($$)
  chomp($prompt);
 
  my %list;
- @list{@$def} = ();
+ %list{[@$def]} = ();
 
 MASK:
  while(1) {
@@ -243,7 +243,7 @@ MASK:
    }
 
    my($remove,$bits,@ip) = ($1,$3,split(m/\./, $2),0,0,0);
-   if ( $ip[0] +< 1 || $bits +< 1 || $bits +> 32) {
+   if ( @ip[0] +< 1 || $bits +< 1 || $bits +> 32) {
      warn "Bad netmask '$ans'\n";
      next MASK;
    }
@@ -254,13 +254,13 @@ MASK:
      }
    } 
 
-   my $mask = sprintf("%d.%d.%d.%d/%d",@ip[0..3],$bits); 
+   my $mask = sprintf("\%d.\%d.\%d.\%d/\%d",@ip[[0..3]],$bits); 
 
    if ($remove) {
-     delete $list{$mask};
+     delete %list{$mask};
    }
    else {
-     $list{$mask} = 1;
+     %list{$mask} = 1;
    }
 
   }
@@ -315,7 +315,7 @@ elsif (eval { require Net::Config })
   %oldcfg = %Net::Config::NetConfig;
  }
 
-map { $cfg{lc $_} = $cfg{$_}; delete $cfg{$_} if m/[A-Z]/ } keys %cfg;
+map { %cfg{lc $_} = %cfg{$_}; delete %cfg{$_} if m/[A-Z]/ } keys %cfg;
 
 #---------------------------------------------------------------------------
 
@@ -348,8 +348,8 @@ EOU
 {
    my $oldcfgfile;
    my @inc;
-   push @inc, $ENV{PERL5LIB} if exists $ENV{PERL5LIB};
-   push @inc, $ENV{PERLLIB}  if exists $ENV{PERLLIB};
+   push @inc, %ENV{PERL5LIB} if exists %ENV{PERL5LIB};
+   push @inc, %ENV{PERLLIB}  if exists %ENV{PERLLIB};
    push @inc, @INC;
    for (@inc) {
     my $trycfgfile = File::Spec->catfile($_, $libnet_cfg_in);
@@ -360,8 +360,8 @@ EOU
    }
    print "# old config $oldcfgfile\n" if defined $oldcfgfile;
    for (sort keys %oldcfg) {
-	printf "%-20s %s\n", $_,
-               ref $oldcfg{$_} ? @{$oldcfg{$_}} : $oldcfg{$_};
+	printf "\%-20s \%s\n", $_,
+               ref %oldcfg{$_} ? @{%oldcfg{$_}} : %oldcfg{$_};
    }
    unless ($opt_c || $opt_d) {
     print "# $0 -h for help\n";
@@ -371,8 +371,8 @@ EOU
 
 #---------------------------------------------------------------------------
 
-$oldcfg{'test_exist'} = 1 unless exists $oldcfg{'test_exist'};
-$oldcfg{'test_hosts'} = 1 unless exists $oldcfg{'test_hosts'};
+%oldcfg{'test_exist'} = 1 unless exists %oldcfg{'test_exist'};
+%oldcfg{'test_hosts'} = 1 unless exists %oldcfg{'test_hosts'};
 
 #---------------------------------------------------------------------------
 
@@ -404,9 +404,9 @@ it will require you to be on-line.
 Do you want me to perform hostname lookups (y|n) ?
 EDQ
 
-$cfg{'test_exist'} = get_bool($msg, $oldcfg{'test_exist'});
+%cfg{'test_exist'} = get_bool($msg, %oldcfg{'test_exist'});
 
-print <<EDQ unless $cfg{'test_exist'};
+print <<EDQ unless %cfg{'test_exist'};
 
 *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 
@@ -430,60 +430,60 @@ EDQ
 
 $msg = 'Enter a list of available NNTP hosts :';
 
-$def = $oldcfg{'nntp_hosts'} ||
-	[ default_hostname($ENV{NNTPSERVER},$ENV{NEWSHOST},'news') ];
+$def = %oldcfg{'nntp_hosts'} ||
+	[ default_hostname(%ENV{NNTPSERVER},%ENV{NEWSHOST},'news') ];
 
-$cfg{'nntp_hosts'} = get_host_list($msg,$def);
+%cfg{'nntp_hosts'} = get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
 $msg = 'Enter a list of available SMTP hosts :';
 
-$def = $oldcfg{'smtp_hosts'} ||
-	[ default_hostname(split(m/:/,$ENV{SMTPHOSTS} || ""), 'mailhost') ];
+$def = %oldcfg{'smtp_hosts'} ||
+	[ default_hostname(split(m/:/,%ENV{SMTPHOSTS} || ""), 'mailhost') ];
 
-$cfg{'smtp_hosts'} = get_host_list($msg,$def);
+%cfg{'smtp_hosts'} = get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
 $msg = 'Enter a list of available POP3 hosts :';
 
-$def = $oldcfg{'pop3_hosts'} || [];
+$def = %oldcfg{'pop3_hosts'} || [];
 
-$cfg{'pop3_hosts'} = get_host_list($msg,$def);
+%cfg{'pop3_hosts'} = get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
 $msg = 'Enter a list of available SNPP hosts :';
 
-$def = $oldcfg{'snpp_hosts'} || [];
+$def = %oldcfg{'snpp_hosts'} || [];
 
-$cfg{'snpp_hosts'} = get_host_list($msg,$def);
+%cfg{'snpp_hosts'} = get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
 $msg = 'Enter a list of available PH Hosts   :'  ;
 
-$def = $oldcfg{'ph_hosts'} ||
+$def = %oldcfg{'ph_hosts'} ||
 	[ default_hostname('dirserv') ];
 
-$cfg{'ph_hosts'}   =  get_host_list($msg,$def);
+%cfg{'ph_hosts'}   =  get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
 $msg = 'Enter a list of available TIME Hosts   :'  ;
 
-$def = $oldcfg{'time_hosts'} || [];
+$def = %oldcfg{'time_hosts'} || [];
 
-$cfg{'time_hosts'} = get_host_list($msg,$def);
+%cfg{'time_hosts'} = get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
 $msg = 'Enter a list of available DAYTIME Hosts   :'  ;
 
-$def = $oldcfg{'daytime_hosts'} || $oldcfg{'time_hosts'};
+$def = %oldcfg{'daytime_hosts'} || %oldcfg{'time_hosts'};
 
-$cfg{'daytime_hosts'} = get_host_list($msg,$def);
+%cfg{'daytime_hosts'} = get_host_list($msg,$def);
 
 #---------------------------------------------------------------------------
 
@@ -542,21 +542,21 @@ fwuser/fwpass => firewall user & password
 
 Choice:
 EDQ
- $def = exists $oldcfg{'ftp_firewall_type'}  ? $oldcfg{'ftp_firewall_type'} : 1;
+ $def = exists %oldcfg{'ftp_firewall_type'}  ? %oldcfg{'ftp_firewall_type'} : 1;
  $ans = Prompt($msg,$def);
- $cfg{'ftp_firewall_type'} = 0+$ans;
- $def = $oldcfg{'ftp_firewall'} || $ENV{FTP_FIREWALL};
+ %cfg{'ftp_firewall_type'} = 0+$ans;
+ $def = %oldcfg{'ftp_firewall'} || %ENV{FTP_FIREWALL};
 
- $cfg{'ftp_firewall'} = get_hostname("FTP proxy hostname :", $def);
+ %cfg{'ftp_firewall'} = get_hostname("FTP proxy hostname :", $def);
 }
 else {
- delete $cfg{'ftp_firewall'};
+ delete %cfg{'ftp_firewall'};
 }
 
 
 #---------------------------------------------------------------------------
 
-if (defined $cfg{'ftp_firewall'})
+if (defined %cfg{'ftp_firewall'})
  {
   print <<EDQ;
 
@@ -570,9 +570,9 @@ form x.x.x.x/y, for example 127.0.0.0/8 or 214.8.16.32/24
 
 EDQ
 $def = [];
-if(ref($oldcfg{'local_netmask'}))
+if(ref(%oldcfg{'local_netmask'}))
  {
-  $def = $oldcfg{'local_netmask'};
+  $def = %oldcfg{'local_netmask'};
    print "Your current netmasks are :\n\n\t",
 	join("\n\t",@{$def}),"\n\n";
  }
@@ -585,7 +585,7 @@ current list and an empty line to continue with Configure.
 ";
 
   my $mask = get_netmask("netmask :",$def);
-  $cfg{'local_netmask'} = $mask if ref($mask) && @$mask;
+  %cfg{'local_netmask'} = $mask if ref($mask) && @$mask;
  }
 
 #---------------------------------------------------------------------------
@@ -617,12 +617,12 @@ protocol. In these situations the client must make the connection to the
 server, this is called a passive transfer.
 EDQ
 
-if (defined $cfg{'ftp_firewall'}) {
+if (defined %cfg{'ftp_firewall'}) {
   $msg = "\nShould all FTP connections via a firewall/proxy be passive (y|n) ?";
 
-  $def = $oldcfg{'ftp_ext_passive'} || 0;
+  $def = %oldcfg{'ftp_ext_passive'} || 0;
 
-  $cfg{'ftp_ext_passive'} = get_bool($msg,$def);
+  %cfg{'ftp_ext_passive'} = get_bool($msg,$def);
 
   $msg = "\nShould all other FTP connections be passive (y|n) ?";
 
@@ -631,18 +631,18 @@ else {
   $msg = "\nShould all FTP connections be passive (y|n) ?";
 }
 
-$def = $oldcfg{'ftp_int_passive'} || 0;
+$def = %oldcfg{'ftp_int_passive'} || 0;
 
-$cfg{'ftp_int_passive'} = get_bool($msg,$def);
+%cfg{'ftp_int_passive'} = get_bool($msg,$def);
 
 
 #---------------------------------------------------------------------------
 
-$def = $oldcfg{'inet_domain'} || $ENV{LOCALDOMAIN};
+$def = %oldcfg{'inet_domain'} || %ENV{LOCALDOMAIN};
 
 $ans = Prompt("\nWhat is your local internet domain name :",$def);
 
-$cfg{'inet_domain'} = ($ans =~ m/(\S+)/)[0];
+%cfg{'inet_domain'} = ($ans =~ m/(\S+)/)[[0]];
 
 #---------------------------------------------------------------------------
 
@@ -658,7 +658,7 @@ unless the hosts are local.
 Do you want me to run these tests (y|n) ?
 EDQ
 
-$cfg{'test_hosts'} = get_bool($msg,$oldcfg{'test_hosts'});
+%cfg{'test_hosts'} = get_bool($msg,%oldcfg{'test_hosts'});
 
 #---------------------------------------------------------------------------
 
@@ -670,8 +670,8 @@ should allow anonymous access and have a /pub directory
 What host can I use :
 EDQ
 
-$cfg{'ftp_testhost'} = get_hostname($msg,$oldcfg{'ftp_testhost'})
-	if $cfg{'test_hosts'};
+%cfg{'ftp_testhost'} = get_hostname($msg,%oldcfg{'ftp_testhost'})
+	if %cfg{'test_hosts'};
 
 
 print "\n";
@@ -687,7 +687,7 @@ print $fh "\{\n";
 
 my $key;
 foreach $key (keys %cfg) {
-    my $val = $cfg{$key};
+    my $val = %cfg{$key};
     if(!defined($val)) {
 	$val = "undef";
     }

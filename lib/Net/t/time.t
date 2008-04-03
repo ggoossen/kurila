@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -11,17 +11,15 @@ BEGIN {
     if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
 	print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
     }
-    $INC{'IO/Socket.pm'} = 1;
-    $INC{'IO/Select.pm'} = 1;
-    $INC{'IO/Socket/INET.pm'} = 1;
+    %INC{'IO/Socket.pm'} = 1;
+    %INC{'IO/Select.pm'} = 1;
+    %INC{'IO/Socket/INET.pm'} = 1;
 }
 
-use Test::More tests => 12;
+use Test::More tests => 10;
 
 # cannot use(), otherwise it will use IO::Socket and IO::Select
-eval{ require Net::Time; };
-ok( !$@, 'should be able to require() Net::Time safely' );
-ok( exists $INC{'Net/Time.pm'}, 'should be able to use Net::Time' );
+require Net::Time;
 
 # force the socket to fail
 make_fail('IO::Socket::INET', 'new');
@@ -64,41 +62,41 @@ sub make_fail {
 	my ($pack, $func, $num) = @_;
 	$num = 1 unless defined $num;
 
-	$fail{$pack}{$func} = $num;
+	%fail{$pack}{$func} = $num;
 }
 
 package IO::Socket::INET;
 
-$fail{'IO::Socket::INET'} = {
+%fail{'IO::Socket::INET'} = {
 	new		=> 0,
 	'send'	=> 0,
 };
 
 sub new {
 	my $class = shift;
-	return if $fail{$class}{new} and $fail{$class}{new}--;
+	return if %fail{$class}{new} and %fail{$class}{new}--;
 	bless( { @_ }, $class );
 }
 
 sub send {
 	my $self = shift;
 	my $class = ref($self);
-	return if $fail{$class}{'send'} and $fail{$class}{'send'}--;
+	return if %fail{$class}{'send'} and %fail{$class}{'send'}--;
 	$self->{sent} .= shift;
 }
 
 my $msg;
 sub set_message {
-	if (ref($_[0])) {
-		$_[0]->{msg} = $_[1];
+	if (ref(@_[0])) {
+		@_[0]->{msg} = @_[1];
 	} else {
 		$msg = shift;
 	}
 }
 
 sub do_recv  {
-	my ($len, $msg) = @_[1,2];
-	$_[0] .= substr($msg, 0, $len);
+	my ($len, $msg) = @_[[1,2]];
+	@_[0] .= substr($msg, 0, $len);
 }
 
 sub recv {
@@ -107,7 +105,7 @@ sub recv {
 		$self->{msg} : $msg;
 
 	if (defined($message)) {
-		do_recv($_[1], $length, $message);
+		do_recv(@_[1], $length, $message);
 	}
 	1;
 }
@@ -116,14 +114,14 @@ package IO::Select;
 
 sub new {
 	my $class = shift;
-	return if defined $fail{$class}{new} and $fail{$class}{new}--;
+	return if defined %fail{$class}{new} and %fail{$class}{new}--;
 	bless({sock => shift}, $class);
 }
 
 sub can_read {
 	my ($self, $timeout) = @_;
 	my $class = ref($self);
-	return if defined $fail{$class}{can_read} and $fail{class}{can_read}--;
+	return if defined %fail{$class}{can_read} and %fail{class}{can_read}--;
 	$self->{sock}{timeout} = $timeout;
 	1;
 }

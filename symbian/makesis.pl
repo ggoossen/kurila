@@ -8,8 +8,8 @@ use lib "symbian";
 do "sanity.pl" or die $@;
 
 my %VERSION = %{ do "version.pl" or die $@ };
-my $VERSION = "$VERSION{REVISION}$VERSION{VERSION}$VERSION{SUBVERSION}";
-my $R_V_SV  = "$VERSION{REVISION}.$VERSION{VERSION}.$VERSION{SUBVERSION}";
+my $VERSION = "%VERSION{REVISION}%VERSION{VERSION}%VERSION{SUBVERSION}";
+my $R_V_SV  = "%VERSION{REVISION}.%VERSION{VERSION}.%VERSION{SUBVERSION}";
 
 my ($SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION) =
     @{ do "sdk.pl" or die $@ };
@@ -17,11 +17,11 @@ my $UID  = do "uid.pl" or die $@;
 my %PORT = %{ do "port.pl" or die $@ };
 
 my $ARM = 'thumb'; # TODO
-my $S60SDK = $ENV{S60SDK}; # from sdk.pl
-my $S80SDK = $ENV{S80SDK}; # from sdk.pl
-my $S90SDK = $ENV{S90SDK}; # from sdk.pl
+my $S60SDK = %ENV{S60SDK}; # from sdk.pl
+my $S80SDK = %ENV{S80SDK}; # from sdk.pl
+my $S90SDK = %ENV{S90SDK}; # from sdk.pl
 
-my $UREL = $ENV{UREL}; # from sdk.pl
+my $UREL = %ENV{UREL}; # from sdk.pl
 $UREL =~ s/-ARM-/$ARM/;
 
 my $app = '!:\System\Apps\Perl';
@@ -36,7 +36,7 @@ my @target = @ARGV
   );
 
 my %suffix;
-@suffix{ "miniperl", "perl", "perl$VERSION" } = ( "exe", "exe", "dll", );
+%suffix{["miniperl", "perl", "perl$VERSION" ]} = ( "exe", "exe", "dll", );
 
 for my $target (@target) {
     $target = "perl${VERSION}" if $target eq "perl${VERSION}dll";
@@ -45,32 +45,32 @@ for my $target (@target) {
     my $pkg = "$target.pkg";
     print "\nCreating $pkg...\n";
 
-    my $suffix = $suffix{$target} || "";
+    my $suffix = %suffix{$target} || "";
     my $dst = $suffix eq "dll" ? $lib : $app;
 
     my $srctarget = "$UREL\\$target.$suffix";
 
     if ( $target =~ m/^(miniperl|perl|perl${VERSION}(?:dll)?)$/ ) {
-        $copy{$srctarget} = "$dst\\$target.$suffix";
+        %copy{$srctarget} = "$dst\\$target.$suffix";
         print "\t$target.$suffix\n";
     }
     if ( $target eq "perl${VERSION}lib" ) {
         print "Libraries...\n";
 
         print "\tConfig.pm\n";
-        $copy{"lib\\Config.pm"} =
+        %copy{"lib\\Config.pm"} =
           "$lib\\Perl\\$R_V_SV\\thumb-symbian\\Config.pm";
 
         print "\tConfig_heavy.pl\n";
-        $copy{"xlib\\symbian\\Config_heavy.pl"} =
+        %copy{"xlib\\symbian\\Config_heavy.pl"} =
           "$lib\\Perl\\$R_V_SV\\thumb-symbian\\Config_heavy.pl";
 
         print "\tDynaLoader.pm\n";
-        $copy{"ext\\DynaLoader\\DynaLoader.pm"} =
+        %copy{"ext\\DynaLoader\\DynaLoader.pm"} =
           "$lib\\Perl\\$R_V_SV\\DynaLoader.pm";
 
         print "\tErrno.pm\n";
-        $copy{"ext\\Errno\\Errno.pm"} = "$lib\\Perl\\$R_V_SV\\Errno.pm";
+        %copy{"ext\\Errno\\Errno.pm"} = "$lib\\Perl\\$R_V_SV\\Errno.pm";
 
         open( my $cfg, "<", "symbian/install.cfg" )
           or die "$!: symbian/install.cfg: $!\n";
@@ -83,7 +83,7 @@ for my $target (@target) {
 		next;
 	    }
             $f =~ s:/:\\:g;
-            $copy{"lib\\$f"} = "$lib\\Perl\\$R_V_SV\\$f";
+            %copy{"lib\\$f"} = "$lib\\Perl\\$R_V_SV\\$f";
             print "\t$f\n";
         }
         close($cfg);
@@ -102,7 +102,7 @@ for my $target (@target) {
                 while ( ~< $pkg) {
                     if (m!^"(.+)"-"(.+)"$!) {
                         my ( $src, $dst ) = ( $1, $2 );
-                        $copy{$src} = $dst;
+                        %copy{$src} = $dst;
                     }
                     else {
                         warn "$0: $lst: $.: unknown syntax\n";
@@ -120,7 +120,7 @@ for my $target (@target) {
         warn "$0: $file does not exist\n" unless -f $file;
     }
 
-    my @copy = map { qq["$_"-"$copy{$_}"] } sort keys %copy;
+    my @copy = map { qq["$_"-"%copy{$_}"] } sort keys %copy;
     my $copy = join( "\n", @copy );
 
     my %UID = (
@@ -135,17 +135,17 @@ for my $target (@target) {
         "perlappmin"        => $UID + 5,
     );
 
-    die "$0: target has no UID\n" unless defined $UID{$target};
+    die "$0: target has no UID\n" unless defined %UID{$target};
 
-    my $uid = sprintf( "0x%08X", $UID{$target} );
+    my $uid = sprintf( "0x\%08X", %UID{$target} );
 
     my ( $MAJOR, $MINOR, $PATCH ) = ( 0, 0, 0 );
 
     if ( $target =~ m:^perl$VERSION(dll|ext|lib)?$: ) {
         my $pkg = defined $1 ? $1 : "dll";
-        $MAJOR = $PORT{$pkg}->{MAJOR};
-        $MINOR = $PORT{$pkg}->{MINOR};
-        $PATCH = $PORT{$pkg}->{PATCH};
+        $MAJOR = %PORT{$pkg}->{MAJOR};
+        $MINOR = %PORT{$pkg}->{MINOR};
+        $PATCH = %PORT{$pkg}->{PATCH};
     }
 
     die "$0: Bad version for $target\n"

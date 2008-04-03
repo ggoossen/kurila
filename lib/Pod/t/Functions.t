@@ -41,7 +41,7 @@ my @catagories = qw(
 ok( eq_array( \@Type_Order, \@catagories ),
     '@Type_Order' );
 
-my @cat_keys = grep exists $Type_Description{ $_ } => @Type_Order;
+my @cat_keys = grep exists %Type_Description{ $_ } => @Type_Order;
 
 ok( eq_array( \@cat_keys, \@catagories ),
     'keys() %Type_Description' );

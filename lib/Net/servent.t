@@ -11,7 +11,7 @@ BEGIN {
     $hasse = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasse) { print "1..0 # Skip: no getservbyname\n"; exit 0 }
     use Config;
-    $hasse = 0 unless $Config{'i_netdb'} eq 'define';
+    $hasse = 0 unless %Config{'i_netdb'} eq 'define';
     unless ($hasse) { print "1..0 # Skip: no netdb.h\n"; exit 0 }
 }
 
@@ -32,10 +32,10 @@ print "ok 1\n";
 
 my $servent = getservbyname "echo", "tcp"; # This is the OO getservbyname.
 
-print "not " unless $servent->name   eq $servent[0];
+print "not " unless $servent->name   eq @servent[0];
 print "ok 2\n";
 
-print "not " unless $servent->port  == $servent[2];
+print "not " unless $servent->port  == @servent[2];
 print "ok 3\n";
 
 # Testing pretty much anything else is unportable.

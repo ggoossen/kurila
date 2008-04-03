@@ -2,14 +2,14 @@
 # Tests that all ops can be trapped by a Safe compartment
 
 BEGIN {
-    if (not $ENV{PERL_CORE}) {
+    if (not %ENV{PERL_CORE}) {
 	# this won't work outside of the core, so exit
         print "1..0\n"; exit 0;
     }
 }
 use Config;
 BEGIN {
-    if ($Config{'extensions'} !~ m/\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
+    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
         print "1..0\n"; exit 0;
     }
 }
@@ -25,7 +25,7 @@ my %code;
 while ( ~< *DATA) {
     chomp;
     die "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/;
-    $code{$1} = $2;
+    %code{$1} = $2;
 }
 
 open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $!";
@@ -36,7 +36,7 @@ while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
     my ($op, $opname) = split m/\t+/;
-    push @op, [$op, $opname, $code{$op}];
+    push @op, [$op, $opname, %code{$op}];
 }
 close $fh;
 
@@ -81,7 +81,6 @@ padany		SKIP (not implemented)
 pushre		SKIP split m/foo/
 rv2gv		*x
 rv2sv		$x
-av2arylen	$#x
 rv2cv		f()
 anoncode	sub { }
 prototype	prototype 'foo'
@@ -190,22 +189,22 @@ lc		lc
 quotemeta	quotemeta
 rv2av		@a
 aelemfast	SKIP (set by optimizer)
-aelem		$a[1]
-aslice		@a[1,2]
+aelem		@a[1]
+aslice		@a[[1,2]]
 each		each %h
 values		values %h
 keys		keys %h
-delete		delete $h{Key}
-exists		exists $h{Key}
+delete		delete %h{Key}
+exists		exists %h{Key}
 rv2hv		%h
-helem		$h{kEy}
-hslice		@h{kEy}
+helem		%h{kEy}
+hslice		%h{[kEy]}
 unpack		unpack
 pack		pack
 split		split m/foo/
 join		join $a, @b
 list		@x = (1,2)
-lslice		SKIP @x[1,2]
+lslice		SKIP @x[[1,2]]
 anonlist	[1,2]
 anonhash	{ a => 1 }
 splice		splice @x, 1, 2, 3

@@ -160,7 +160,7 @@ EXPECT
 ########
 
 # Forbidden aggregate self-ties
-sub Self::TIEHASH { bless $_[1], $_[0] }
+sub Self::TIEHASH { bless @_[1], @_[0] }
 {
     my %c;
     tie %c, 'Self', \%c;
@@ -171,7 +171,7 @@ Self-ties of arrays and hashes are not supported at - line 6.
 
 # Allowed scalar self-ties
 my $destroyed = 0;
-sub Self::TIESCALAR { bless $_[1], $_[0] }
+sub Self::TIESCALAR { bless @_[1], @_[0] }
 sub Self::DESTROY   { $destroyed = 1; }
 {
     my $c = 42;
@@ -184,7 +184,7 @@ EXPECT
 # Allowed glob self-ties
 my $destroyed = 0;
 my $printed   = 0;
-sub Self2::TIEHANDLE { bless $_[1], $_[0] }
+sub Self2::TIEHANDLE { bless @_[1], @_[0] }
 sub Self2::DESTROY   { $destroyed = 1; }
 sub Self2::PRINT     { $printed = 1; }
 {
@@ -200,7 +200,7 @@ EXPECT
 
 # Allowed IO self-ties
 my $destroyed = 0;
-sub Self3::TIEHANDLE { bless $_[1], $_[0] }
+sub Self3::TIEHANDLE { bless @_[1], @_[0] }
 sub Self3::DESTROY   { $destroyed = 1; }
 sub Self3::PRINT     { $printed = 1; }
 {
@@ -216,7 +216,7 @@ EXPECT
 
 # TODO IO "self-tie" via TEMP glob
 my $destroyed = 0;
-sub Self3::TIEHANDLE { bless $_[1], $_[0] }
+sub Self3::TIEHANDLE { bless @_[1], @_[0] }
 sub Self3::DESTROY   { $destroyed = 1; }
 sub Self3::PRINT     { $printed = 1; }
 {
@@ -246,9 +246,9 @@ EXPECT
 # correct unlocalisation of tied hashes (patch #16431)
 use Tie::Hash ;
 tie %tied, 'Tie::StdHash';
-{ local $hash{'foo'} } warn "plain hash bad unlocalize" if exists $hash{'foo'};
-{ local $tied{'foo'} } warn "tied hash bad unlocalize" if exists $tied{'foo'};
-{ local $ENV{'foo'}  } warn "%ENV bad unlocalize" if exists $ENV{'foo'};
+{ local %hash{'foo'} } warn "plain hash bad unlocalize" if exists %hash{'foo'};
+{ local %tied{'foo'} } warn "tied hash bad unlocalize" if exists %tied{'foo'};
+{ local %ENV{'foo'}  } warn "\%ENV bad unlocalize" if exists %ENV{'foo'};
 EXPECT
 ########
 
@@ -256,25 +256,25 @@ EXPECT
 tie FH, 'main';
 EXPECT
 Can't modify constant item in tie at - line 3, near "'main';"
-Bareword "FH" not allowed while "strict subs" in use
+Bareword "FH" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 
 # localizing tied hash slices
-$ENV{FooA} = 1;
-$ENV{FooB} = 2;
-print exists $ENV{FooA} ? 1 : 0, "\n";
-print exists $ENV{FooB} ? 2 : 0, "\n";
-print exists $ENV{FooC} ? 3 : 0, "\n";
+%ENV{FooA} = 1;
+%ENV{FooB} = 2;
+print exists %ENV{FooA} ? 1 : 0, "\n";
+print exists %ENV{FooB} ? 2 : 0, "\n";
+print exists %ENV{FooC} ? 3 : 0, "\n";
 {
-    local @ENV{qw(FooA FooC)};
-    print exists $ENV{FooA} ? 4 : 0, "\n";
-    print exists $ENV{FooB} ? 5 : 0, "\n";
-    print exists $ENV{FooC} ? 6 : 0, "\n";
+    local %ENV{[qw(FooA FooC)]};
+    print exists %ENV{FooA} ? 4 : 0, "\n";
+    print exists %ENV{FooB} ? 5 : 0, "\n";
+    print exists %ENV{FooC} ? 6 : 0, "\n";
 }
-print exists $ENV{FooA} ? 7 : 0, "\n";
-print exists $ENV{FooB} ? 8 : 0, "\n";
-print exists $ENV{FooC} ? 9 : 0, "\n"; # this should not exist
+print exists %ENV{FooA} ? 7 : 0, "\n";
+print exists %ENV{FooB} ? 8 : 0, "\n";
+print exists %ENV{FooC} ? 9 : 0, "\n"; # this should not exist
 EXPECT
 1
 2
@@ -303,11 +303,11 @@ my @f1;
 tie @f1, 'F1';
 
 sub F2::TIEARRAY { bless [2], 'F2' }
-sub F2::FETCH { my $self = shift; my $x = $f1[3]; $self }
+sub F2::FETCH { my $self = shift; my $x = @f1[3]; $self }
 my @f2;
 tie @f2, 'F2';
 
-print $f2[4][0],"\n";
+print @f2[4][0],"\n";
 
 sub F3::TIEHASH { bless [], 'F3' }
 sub F3::FETCH { 1 }
@@ -315,11 +315,11 @@ my %f3;
 tie %f3, 'F3';
 
 sub F4::TIEHASH { bless [3], 'F4' }
-sub F4::FETCH { my $self = shift; my $x = $f3{3}; $self }
+sub F4::FETCH { my $self = shift; my $x = %f3{3}; $self }
 my %f4;
 tie %f4, 'F4';
 
-print $f4{'foo'}[0],"\n";
+print %f4{'foo'}[0],"\n";
 
 EXPECT
 2
@@ -351,8 +351,8 @@ sub FETCH {1}
 my (%h, @a);
 tie %h, 'X';
 tie @a, 'X';
-my $r1 = \$h{1};
-my $r2 = \$a[0];
+my $r1 = \%h{1};
+my $r2 = \@a[0];
 my $s = ref($r1) . " " . ref($r2);
 $s=~ s/\(0x\w+\)//g;
 print $s, "\n";
@@ -360,7 +360,7 @@ EXPECT
 SCALAR SCALAR
 ########
 # [perl #23287] segfault in untie
-sub TIESCALAR { bless $_[1], $_[0] }
+sub TIESCALAR { bless @_[1], @_[0] }
 my $var;
 tie $var, 'main', \$var;
 untie $var;
@@ -486,27 +486,27 @@ sub TIEHASH {
 }
 
 sub STORE {
-    $_[0]->{$_[1]} = $_[2];
+    @_[0]->{@_[1]} = @_[2];
 }
 
 sub FETCH {
-    $_[0]->{$_[1]}
+    @_[0]->{@_[1]}
 }
 
 sub CLEAR {
-    %{ $_[0] } = ();
+    %{ @_[0] } = ();
 }
 
 sub SCALAR {
     print "SCALAR\n";
-    return 0 if ! keys %{$_[0]};
-    sprintf "%i/%i", scalar keys %{$_[0]}, scalar keys %{$_[0]};
+    return 0 if ! keys %{@_[0]};
+    sprintf '%i/%i', scalar keys %{@_[0]}, scalar keys %{@_[0]};
 }
 
 package main;
 tie my %h => "TieScalar";
-$h{key1} = "val1";
-$h{key2} = "val2";
+%h{key1} = "val1";
+%h{key2} = "val2";
 print scalar %h, "\n";
 %h = ();
 print scalar %h, "\n";
@@ -525,18 +525,18 @@ sub TIEHASH {
     bless { } => $pkg;
 }
 sub STORE {
-    $_[0]->{$_[1]} = $_[2];
+    @_[0]->{@_[1]} = @_[2];
 }
 sub FETCH {
-    $_[0]->{$_[1]}
+    @_[0]->{@_[1]}
 }
 sub CLEAR {
-    %{ $_[0] } = ();
+    %{ @_[0] } = ();
 }
 sub FIRSTKEY {
-    my $a = keys %{ $_[0] };
+    my $a = keys %{ @_[0] };
     print "FIRSTKEY\n";
-    each %{ $_[0] };
+    each %{ @_[0] };
 }
 
 package main;
@@ -548,7 +548,7 @@ if (!%h) {
     print "not empty\n";
 }
 
-$h{key1} = "val1";
+%h{key1} = "val1";
 print "not empty\n" if %h;
 print "not empty\n" if %h;
 print "-->\n";
@@ -585,8 +585,8 @@ print $h.$h;
 EXPECT
 01
 ########
-sub TIESCALAR { my $foo = $_[1]; bless \$foo, $_[0] }
-sub FETCH { ${$_[0]} }
+sub TIESCALAR { my $foo = @_[1]; bless \$foo, @_[0] }
+sub FETCH { ${@_[0]} }
 tie my $x, "main", 2;
 tie my $y, "main", 8;
 print $x ^|^ $y;
@@ -594,17 +594,17 @@ EXPECT
 10
 ########
 # Bug 36267
-sub TIEHASH  { bless {}, $_[0] }
-sub STORE    { $_[0]->{$_[1]} = $_[2] }
-sub FIRSTKEY { my $a = scalar keys %{$_[0]}; each %{$_[0]} }
-sub NEXTKEY  { each %{$_[0]} }
-sub DELETE   { delete $_[0]->{$_[1]} }
-sub CLEAR    { %{$_[0]} = () }
-$h{b}=1;
-delete $h{b};
+sub TIEHASH  { bless {}, @_[0] }
+sub STORE    { @_[0]->{@_[1]} = @_[2] }
+sub FIRSTKEY { my $a = scalar keys %{@_[0]}; each %{@_[0]} }
+sub NEXTKEY  { each %{@_[0]} }
+sub DELETE   { delete @_[0]->{@_[1]} }
+sub CLEAR    { %{@_[0]} = () }
+%h{b}=1;
+delete %h{b};
 print scalar keys %h, "\n";
 tie %h, 'main';
-$i{a}=1;
+%i{a}=1;
 %h = %i;
 untie %h;
 print scalar keys %h, "\n";
@@ -613,8 +613,8 @@ EXPECT
 0
 ########
 # Bug 37731
-sub foo::TIESCALAR { bless {value => $_[1]}, $_[0] }
-sub foo::FETCH { $_[0]->{value} }
+sub foo::TIESCALAR { bless {value => @_[1]}, @_[0] }
+sub foo::FETCH { @_[0]->{value} }
 tie my $VAR, 'foo', '42';
 foreach my $var ($VAR) {
     print +($var eq $VAR) ? "yes\n" : "no\n";

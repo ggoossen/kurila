@@ -7,12 +7,12 @@ BEGIN {
 
     my $reason;
 
-    if ($Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
+    if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
       $reason = 'IPC::SysV was not built';
-    } elsif ($Config{'d_sem'} ne 'define') {
-      $reason = '$Config{d_sem} undefined';
-    } elsif ($Config{'d_msg'} ne 'define') {
-      $reason = '$Config{d_msg} undefined';
+    } elsif (%Config{'d_sem'} ne 'define') {
+      $reason = '%Config{d_sem} undefined';
+    } elsif (%Config{'d_msg'} ne 'define') {
+      $reason = '%Config{d_msg} undefined';
     }
     if ($reason) {
 	print "1..0 # Skip: $reason\n";

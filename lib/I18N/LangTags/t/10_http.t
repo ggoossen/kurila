@@ -64,17 +64,17 @@ foreach my $in (@in) {
 
   if($in eq 'NIX') { $in = ''; @should = (); }
 
-  local $ENV{'HTTP_ACCEPT_LANGUAGE'};
+  local %ENV{'HTTP_ACCEPT_LANGUAGE'};
   
   foreach my $modus (
     sub {
       print "# Testing with arg...\n";
-      $ENV{'HTTP_ACCEPT_LANGUAGE'} = 'PLORK';
-      return $_[0];
+      %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'PLORK';
+      return @_[0];
     },
     sub {
       print "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
-      $ENV{'HTTP_ACCEPT_LANGUAGE'} = $_[0];
+      %ENV{'HTTP_ACCEPT_LANGUAGE'} = @_[0];
      return();
     },
   ) {

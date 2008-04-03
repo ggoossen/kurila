@@ -85,7 +85,7 @@ is( $$fake_out, $pod, 'select( DESCRIPTION/!.+ )' );
 
 package CatchOut;
 sub TIEHANDLE { bless \( my $self ), shift }
-sub PRINT     { my $self = shift; $$self .= $_[0] }
+sub PRINT     { my $self = shift; $$self .= @_[0] }
 
 __END__
 

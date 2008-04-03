@@ -21,11 +21,11 @@
 
 # this sorts the %age hash by value instead of key
 # using an in-line function
-@eldest = sort { $age{$b} <+> $age{$a} } keys %age;
+@eldest = sort { %age{$b} <+> %age{$a} } keys %age;
 
 # sort using explicit subroutine name
 sub byage {
-    $age{$a} <+> $age{$b};  # presuming numeric
+    %age{$a} <+> %age{$b};  # presuming numeric
 }
 @sortedclass = sort byage @class;
 
@@ -42,10 +42,10 @@ print sort @george, 'to', @harry;
 # inefficiently sort by descending numeric compare using
 # the first integer after the first = sign, or the
 # whole record case-insensitively otherwise
-@new = @old[ sort {
-    $nums[$b] <+> $nums[$a]
-	|| $caps[$a] cmp $caps[$b]
-	} 0..$#old  ];
+@new = @old[[ sort {
+    @nums[$b] <+> @nums[$a]
+	|| @caps[$a] cmp @caps[$b]
+	} 0..(@old-1)  ]];
 
 # same thing, but without any temps
 @new = map { $_->[0] }
@@ -56,12 +56,12 @@ sort { $b->[1] <+> $a->[1]
 # using a prototype allows you to use any comparison subroutine
 # as a sort subroutine (including other package's subroutines)
 package other;
-sub backwards ($$) { $_[1] cmp $_[0]; }     # $a and $b are not set here
+sub backwards ($$) { @_[1] cmp @_[0]; }     # $a and $b are not set here
 package main;
 @new = sort other::backwards @old;
 
 # repeat, condensed. $main::a and $b are unaffected
-sub other::backwards ($$) { $_[1] cmp $_[0]; }
+sub other::backwards ($$) { @_[1] cmp @_[0]; }
 @new = sort other::backwards @old;
 
 # guarantee stability, regardless of algorithm

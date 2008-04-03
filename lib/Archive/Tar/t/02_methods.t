@@ -1,5 +1,5 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir '../lib/Archive/Tar' if -d '../lib/Archive/Tar';
     }       
     use lib '../../..';
@@ -68,7 +68,7 @@ my $TOO_LONG    =   ($^O eq 'MSWin32' or $^O eq 'cygwin' or $^O eq 'VMS')
 
 ### warn if we are going to skip long file names
 if ($TOO_LONG) {
-    diag("No long filename support - long filename extraction disabled") if ! $ENV{PERL_CORE};
+    diag("No long filename support - long filename extraction disabled") if ! %ENV{PERL_CORE};
 } else {
     push @EXPECT_NORMAL, [ [], $LONG_FILE, qr/^hello\s*$/];
 }
@@ -76,10 +76,10 @@ if ($TOO_LONG) {
 my @ROOT        = grep { length }   'src', $TOO_LONG ? 'short' : 'long';
 
 my $ZLIB        = eval { require IO::Zlib; 1 } ? 1 : 0;
-my $NO_UNLINK   = $ARGV[0] ? 1 : 0;
+my $NO_UNLINK   = @ARGV[0] ? 1 : 0;
 
 ### enable debugging?
-$Archive::Tar::DEBUG = 1 if $ARGV[1];
+$Archive::Tar::DEBUG = 1 if @ARGV[1];
 
 ### tests for binary and x/x files
 my $TARBIN      = Archive::Tar->new;
@@ -244,17 +244,17 @@ chmod 0644, $COMPRESS_FILE;
 
         is( scalar @files, scalar @add,
                                     "Adding files");
-        is( $files[0]->name, 'b',   "   Proper name" );
+        is( @files[0]->name, 'b',   "   Proper name" );
 
         SKIP: {
             skip( "You are building perl using symlinks", 1)
-                if ($ENV{PERL_CORE} and $Config{config_args} =~m/Dmksymlinks/);
+                if (%ENV{PERL_CORE} and %Config{config_args} =~m/Dmksymlinks/);
 
-            is( $files[0]->is_file, 1,  
+            is( @files[0]->is_file, 1,  
                                     "   Proper type" );
         }
 
-        like( $files[0]->get_content, qr/^bbbbbbbbbbb\s*$/,
+        like( @files[0]->get_content, qr/^bbbbbbbbbbb\s*$/,
                                     "   Content OK" );
 
         ### check if we have then in our tar object
@@ -279,7 +279,7 @@ chmod 0644, $COMPRESS_FILE;
         my @dirs      = $tar2->add_files( @add_dirs );
         is( scalar @dirs, scalar @add_dirs,
                                     "Adding dirs");
-        ok( $dirs[0]->is_dir,       "   Proper type" );
+        ok( @dirs[0]->is_dir,       "   Proper type" );
     }
 }
 
@@ -297,9 +297,9 @@ chmod 0644, $COMPRESS_FILE;
         my $obj = $tar->add_data( @to_add );
 
         ok( $obj,                   "Adding data" );
-        is( $obj->name, $to_add[0], "   Proper name" );
+        is( $obj->name, @to_add[0], "   Proper name" );
         is( $obj->is_file, 1,       "   Proper type" );
-        like( $obj->get_content, qr/^$to_add[1]\s*$/,
+        like( $obj->get_content, qr/^@to_add[1]\s*$/,
                                     "   Content OK" );
     }
 
@@ -491,7 +491,7 @@ SKIP: {
 ### limited read + extract tests ###
 {   my $tar     = Archive::Tar->new;
     my @files   = $tar->read( $TAR_FILE, 0, { limit => 1 } );
-    my $obj     = $files[0];
+    my $obj     = @files[0];
 
     is( scalar @files, 1,           "Limited read" );
 

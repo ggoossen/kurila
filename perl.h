@@ -3780,12 +3780,10 @@ Gid_t getegid (void);
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
 #define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
 					smart parameter vivification */
-#define PERL_MAGIC_arylen	  '#' /* Array length ($#ary) */
 #define PERL_MAGIC_pos		  '.' /* pos() lvalue */
 #define PERL_MAGIC_backref	  '<' /* for weak ref data */
 #define PERL_MAGIC_symtab	  ':' /* extra data for symbol tables */
 #define PERL_MAGIC_rhash	  '%' /* extra data for restricted hashes */
-#define PERL_MAGIC_arylen_p	  '@' /* to move arylen out of XPVAV */
 #define PERL_MAGIC_ext		  '~' /* Available for use by extensions */
 
 #if defined(DEBUGGING) 
@@ -4542,7 +4540,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_dbline,
     want_vtbl_isa,
     want_vtbl_isaelem,
-    want_vtbl_arylen,
     want_vtbl_glob,
     want_vtbl_mglob,
     want_vtbl_nkeys,
@@ -4561,7 +4558,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_backref,
     want_vtbl_utf8,
     want_vtbl_symtab,
-    want_vtbl_arylen_p,
     want_vtbl_hintselem
 };
 
@@ -4960,30 +4956,6 @@ MGVTBL_SET(
     0,
     0,
     0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET_CONST_MAGIC_GET(
-    PL_vtbl_arylen,
-    MEMBER_TO_FPTR(Perl_magic_getarylen),
-    MEMBER_TO_FPTR(Perl_magic_setarylen),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_arylen_p,
-    0,
-    0,
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_freearylen_p),
     0,
     0,
     0

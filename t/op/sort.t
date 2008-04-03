@@ -331,25 +331,25 @@ package main;
 {
     my ($r1,$r2,@a);
     our @g;
-    @g = (3,2,1); $r1 = \$g[2]; @g = sort @g; $r2 = \$g[0];
+    @g = (3,2,1); $r1 = \@g[2]; @g = sort @g; $r2 = \@g[0];
     cmp_ok($r1, '\==', $r2);
     is "@g", "1 2 3", "inplace sort of global";
 
-    @a = qw(b a c); $r1 = \$a[1]; @a = sort @a; $r2 = \$a[0];
+    @a = qw(b a c); $r1 = \@a[1]; @a = sort @a; $r2 = \@a[0];
     cmp_ok($r1, '\==', $r2);
     is "@a", "a b c", "inplace sort of lexical";
 
-    @g = (2,3,1); $r1 = \$g[1]; @g = sort { $b <+> $a } @g; $r2 = \$g[0];
+    @g = (2,3,1); $r1 = \@g[1]; @g = sort { $b <+> $a } @g; $r2 = \@g[0];
     cmp_ok($r1, '\==', $r2);
     is "@g", "3 2 1", "inplace reversed sort of global";
 
     @g = (2,3,1);
-    $r1 = \$g[1]; @g = sort { $a+<$b?1:$a+>$b?-1:0 } @g; $r2 = \$g[0];
+    $r1 = \@g[1]; @g = sort { $a+<$b?1:$a+>$b?-1:0 } @g; $r2 = \@g[0];
     cmp_ok($r1, '\==', $r2);
     is "@g", "3 2 1", "inplace custom sort of global";
 
     sub mysort { $b cmp $a };
-    @a = qw(b c a); $r1 = \$a[1]; @a = sort mysort @a; $r2 = \$a[0];
+    @a = qw(b c a); $r1 = \@a[1]; @a = sort mysort @a; $r2 = \@a[0];
     cmp_ok($r1, '\==', $r2);
     is "@a", "c b a", "inplace sort with function of lexical";
 
@@ -399,12 +399,12 @@ package main;
     use overload ('""' => \&stringify, '0+' => \&numify, fallback => 1);
 
     sub new {
-	bless [$_[1], $_[2]], $_[0];
+	bless [@_[1], @_[2]], @_[0];
     }
 
-    sub stringify { $_[0]->[0] }
+    sub stringify { @_[0]->[0] }
 
-    sub numify { $_[0]->[1] }
+    sub numify { @_[0]->[1] }
 }
 
 sub generate {
@@ -755,7 +755,7 @@ sub min {
     $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
     $a <+> $b;
   } @_;
-  $list[0];
+  @list[0];
 }
 
 # Bug 7567 - an array shouldn't be modifiable while it's being

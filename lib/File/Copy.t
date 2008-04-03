@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-   if( $ENV{PERL_CORE} ) {
+   if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -16,7 +16,7 @@ plan tests => 60;
 
 # We're going to override rename() later on but Perl has to see an override
 # at compile time to honor it.
-BEGIN { *CORE::GLOBAL::rename = sub { CORE::rename($_[0], $_[1]) }; }
+BEGIN { *CORE::GLOBAL::rename = sub { CORE::rename(@_[0], @_[1]) }; }
 
 
 use File::Copy;
@@ -104,7 +104,7 @@ for my $cross_partition_test (0..1) {
   # Recheck the mtime rather than rely on utime in case we're on a
   # system where utime doesn't work or there's no mtime at all.
   # The destination file will reflect the same difficulties.
-  my $mtime = (stat("copy-$$"))[9];
+  my $mtime = (stat("copy-$$"))[[9]];
 
   ok move("copy-$$", "file-$$"), 'move';
   ok -e "file-$$",              '  destination exists';
@@ -115,7 +115,7 @@ for my $cross_partition_test (0..1) {
   TODO: {
     local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^O eq 'VMS';
 
-    my $dest_mtime = (stat("file-$$"))[9];
+    my $dest_mtime = (stat("file-$$"))[[9]];
     is $dest_mtime, $mtime,
       "mtime preserved by copy()". 
       ($cross_partition_test ? " while testing cross-partition" : "");
@@ -136,7 +136,7 @@ for my $cross_partition_test (0..1) {
 
   { 
     my $warnings = '';
-    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warnings .= @_[0]->{description} };
     ok copy("file-$$", "file-$$"), 'copy(fn, fn) succeeds';
 
     like $warnings, qr/are identical/, 'but warns';
@@ -150,7 +150,7 @@ for my $cross_partition_test (0..1) {
   unlink "lib/file-$$" or die "unlink: $!";
 
   SKIP: {
-    skip "Testing symlinks", 3 unless $Config{d_symlink};
+    skip "Testing symlinks", 3 unless %Config{d_symlink};
 
     open(F, ">", "file-$$") or die $!;
     print F "dummy content\n";
@@ -158,7 +158,7 @@ for my $cross_partition_test (0..1) {
     symlink("file-$$", "symlink-$$") or die $!;
 
     my $warnings = '';
-    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warnings .= @_[0]->{description} };
     ok !copy("file-$$", "symlink-$$"), 'copy to itself (via symlink) fails';
 
     like $warnings, qr/are identical/, 'emits a warning';
@@ -171,7 +171,7 @@ for my $cross_partition_test (0..1) {
 
   SKIP: {
     skip "Testing hard links", 3 
-         if !$Config{d_link} or $^O eq 'MSWin32' or $^O eq 'cygwin';
+         if !%Config{d_link} or $^O eq 'MSWin32' or $^O eq 'cygwin';
 
     open(F, ">", "file-$$") or die $!;
     print F "dummy content\n";
@@ -179,7 +179,7 @@ for my $cross_partition_test (0..1) {
     link("file-$$", "hardlink-$$") or die $!;
 
     my $warnings = '';
-    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warnings .= @_[0]->{description} };
     ok !copy("file-$$", "hardlink-$$"), 'copy to itself (via hardlink) fails';
 
     like $warnings, qr/are identical/, 'emits a warning';

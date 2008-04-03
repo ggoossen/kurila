@@ -28,8 +28,8 @@ print "Extracting $file (with variable substitutions)\n";
 # You can use $Config{...} to use Configure variables.
 
 print OUT <<"!GROK!THIS!";
-$Config{'startperl'}
-    eval 'exec $Config{'perlpath'} -S \$0 \$\{1+"\$@"\}'
+%Config{'startperl'}
+    eval 'exec %Config{'perlpath'} -S \$0 \$\{1+"\$@"\}'
         if \$running_under_some_shell;
 !GROK!THIS!
 
@@ -84,13 +84,13 @@ my $tests_total = 0;
 # We cannot merely check the variable `$^X' in general since on many 
 # Unixes it is the basename rather than the full path to the perl binary.
 my $perlpath = '';
-if (defined($Config{'perlpath'})) { $perlpath = $Config{'perlpath'}; }
+if (defined(%Config{'perlpath'})) { $perlpath = %Config{'perlpath'}; }
 
 # The useithreads Config variable plays a role in whether or not
 # threads and threads/shared work when C<use>d.  They apparently always
 # get installed on systems that can run Configure.
 my $useithreads = '';
-if (defined($Config{'useithreads'})) { $useithreads = $Config{'useithreads'}; }
+if (defined(%Config{'useithreads'})) { $useithreads = %Config{'useithreads'}; }
 
 print OUT <<"!GROK!THIS!";
 my \$perlpath = '$perlpath';
@@ -499,6 +499,6 @@ Peter Prymmer
 
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
-exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
+exec("%Config{'eunicefix'} $file") if %Config{'eunicefix'} ne ':';
 chdir $origdir;
 

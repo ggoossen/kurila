@@ -29,10 +29,10 @@ our @ISA = qw(ExtUtils::MM_Win32);
 
 use ExtUtils::MakeMaker qw( &neatvalue );
 
-$ENV{EMXSHELL} = 'sh'; # to run `commands`
+%ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND  = $Config{'cc'} =~ m/^bcc/i;
-my $GCC      = $Config{'cc'} =~ m/^gcc/i;
+my $BORLAND  = %Config{'cc'} =~ m/^bcc/i;
+my $GCC      = %Config{'cc'} =~ m/^gcc/i;
 
 
 =item os_flavor
@@ -68,20 +68,20 @@ sub init_platform {
 
     # incpath is copied to makefile var INCLUDE in constants sub, here just 
     # make it empty
-    my $libpth = $Config{'libpth'};
+    my $libpth = %Config{'libpth'};
     $libpth =~ s( )(;);
     $self->{'LIBPTH'} = $libpth;
 
-    $self->{'BASE_IMPORT'} = $Config{'base_import'};
+    $self->{'BASE_IMPORT'} = %Config{'base_import'};
 
     # Additional import file specified from Makefile.pl
     if($self->{'base_import'}) {
         $self->{'BASE_IMPORT'} .= ', ' . $self->{'base_import'};
     }
  
-    $self->{'NLM_VERSION'} = $Config{'nlm_version'};
-    $self->{'MPKTOOL'}	= $Config{'mpktool'};
-    $self->{'TOOLPATH'}	= $Config{'toolpath'};
+    $self->{'NLM_VERSION'} = %Config{'nlm_version'};
+    $self->{'MPKTOOL'}	= %Config{'mpktool'};
+    $self->{'TOOLPATH'}	= %Config{'toolpath'};
 
     (my $boot = $self->{'NAME'}) =~ s/:/_/g;
     $self->{'BOOT_SYMBOL'}=$boot;
@@ -94,7 +94,7 @@ sub init_platform {
 
     # Get the include path and replace the spaces with ;
     # Copy this to makefile as INCLUDE = d:\...;d:\;
-    ($self->{INCLUDE} = $Config{'incpath'}) =~ s/([ ]*)-I/;/g;
+    ($self->{INCLUDE} = %Config{'incpath'}) =~ s/([ ]*)-I/;/g;
 
     # Set the path to CodeWarrior binaries which might not have been set in
     # any other place
@@ -197,8 +197,8 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
+    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
+    my($inst_dynamic_dep) = %attribs{INST_DYNAMIC_DEP} || "";
     my($ldfrom) = '$(LDFROM)';
 
     (my $boot = $self->{NAME}) =~ s/:/_/g;

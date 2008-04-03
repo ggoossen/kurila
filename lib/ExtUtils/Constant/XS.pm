@@ -79,7 +79,7 @@ sub header {
 
 sub valid_type {
   my ($self, $type) = @_;
-  return exists $XS_TypeSet{$type};
+  return exists %XS_TypeSet{$type};
 }
 
 # This might actually be a return statement
@@ -87,15 +87,15 @@ sub assignment_clause_for_type {
   my $self = shift;
   my $args = shift;
   my $type = $args->{type};
-  my $typeset = $XS_TypeSet{$type};
+  my $typeset = %XS_TypeSet{$type};
   if (ref $typeset) {
     die "Type $type is aggregate, but only single value given"
       if @_ == 1;
-    return map {"$typeset->[$_]$_[$_];"} 0 .. $#$typeset;
+    return map {"$typeset->[$_]@_[$_];"} 0 .. (@$typeset-1);
   } elsif (defined $typeset) {
     die "Aggregate value given for type $type"
       if @_ +> 1;
-    return "$typeset$_[0];";
+    return "$typeset@_[0];";
   }
   return ();
 }
@@ -143,7 +143,7 @@ sub memEQ {
 sub params {
   my ($self, $what) = @_;
   foreach (sort keys %$what) {
-    warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined $XS_Constant{$_};
+    warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{$_};
   }
   my $params = {};
   $params->{''} = 1 if $what->{''};
@@ -164,7 +164,7 @@ sub C_constant_prefix_param_defintion {
 }
 
 sub namelen_param_definition {
-  'STRLEN ' . $_[0] -> namelen_param;
+  'STRLEN ' . @_[0] -> namelen_param;
 }
 
 sub C_constant_other_params_defintion {
@@ -190,7 +190,7 @@ sub C_constant_other_params {
 sub dogfood {
   my ($self, $args, @items) = @_;
   my ($package, $subname, $default_type, $what, $indent, $breakout) =
-    @{$args}{qw(package subname default_type what indent breakout)};
+    %{$args}{[qw(package subname default_type what indent breakout)]};
   my $result = <<"EOT";
   /* When generated this function returned values for the list of names given
      in this section of perl code.  Rather than manually editing these functions

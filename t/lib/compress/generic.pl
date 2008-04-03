@@ -618,8 +618,8 @@ EOM
     is $io->write("xxx\n", 100, -1), 1, "  write 1";
 
     for (1..3) {
-        $io->printf("i(%d)", $_);
-        $io->printf("[%d]\n", $_);
+        $io->printf("i(\%d)", $_);
+        $io->printf("[\%d]\n", $_);
     }
     $io->print("\n");
 
@@ -668,7 +668,7 @@ EOT
         my @lines = $io->getlines();
         is @lines, 6
             or print "# Got " . scalar(@lines) . " lines, expected 6\n" ;
-        is $lines[1], "of a paragraph\n" ;
+        is @lines[1], "of a paragraph\n" ;
         is join('', @lines), $str ;
         is $., 6; 
         is $io->input_line_number, 6; 
@@ -694,7 +694,7 @@ EOT
         is $., 1; 
         is $io->input_line_number, 1; 
         ok $io->eof;
-        ok @lines == 1 && $lines[0] eq $str;
+        ok @lines == 1 && @lines[0] eq $str;
 
         $io = $UncompressClass->new($name);
         ok ! $io->eof;
@@ -715,9 +715,9 @@ EOT
         ok $io->eof;
         ok @lines == 2 
             or print "# Got " . scalar(@lines) . " lines, expected 2\n" ;
-        ok $lines[0] eq "This is an example\nof a paragraph\n\n\n"
-            or print "# $lines[0]\n";
-        ok $lines[1] eq "and a single line.\n\n";
+        ok @lines[0] eq "This is an example\nof a paragraph\n\n\n"
+            or print "# @lines[0]\n";
+        ok @lines[1] eq "and a single line.\n\n";
     }
 
     {
@@ -738,9 +738,9 @@ EOT
         ok $io->eof;
         is @lines, $expected_records, 
             "Got $expected_records records\n" ;
-        ok $lines[0] eq substr($str, 0, $reclen)
-            or print "# $lines[0]\n";
-        ok $lines[1] eq substr($str, $reclen, $reclen);
+        ok @lines[0] eq substr($str, 0, $reclen)
+            or print "# @lines[0]\n";
+        ok @lines[1] eq substr($str, $reclen, $reclen);
     }
 
     {
@@ -828,7 +828,7 @@ EOT
         ok $io->tell() == 0 ;
         my @lines = $io->getlines();
         is @lines, 6; 
-        ok $lines[1] eq "of a paragraph\n" ;
+        ok @lines[1] eq "of a paragraph\n" ;
         ok join('', @lines) eq $str ;
         is $., 6; 
         is $io->input_line_number, 6; 
@@ -852,7 +852,7 @@ EOT
         is $., 1; 
         is $io->input_line_number, 1; 
         ok $io->eof;
-        ok @lines == 1 && $lines[0] eq $str;
+        ok @lines == 1 && @lines[0] eq $str;
 
         $io = $UncompressClass->new($name);
         ok ! $io->eof;
@@ -873,9 +873,9 @@ EOT
         ok $io->eof;
         ok @lines == 2 
             or print "# exected 2 lines, got " . scalar(@lines) . "\n";
-        ok $lines[0] eq "This is an example\nof a paragraph\n\n\n"
-            or print "# [$lines[0]]\n" ;
-        ok $lines[1] eq "and a single line.\n\n";
+        ok @lines[0] eq "This is an example\nof a paragraph\n\n\n"
+            or print "# [@lines[0]]\n" ;
+        ok @lines[1] eq "and a single line.\n\n";
     }
 
     {
@@ -896,9 +896,9 @@ EOT
         ok $io->eof;
         is @lines, $expected_records, 
             "Got $expected_records records\n" ;
-        ok $lines[0] eq substr($str, 0, $reclen)
-            or print "# $lines[0]\n";
-        ok $lines[1] eq substr($str, $reclen, $reclen);
+        ok @lines[0] eq substr($str, 0, $reclen)
+            or print "# @lines[0]\n";
+        ok @lines[1] eq substr($str, $reclen, $reclen);
     }
 
     {
@@ -1417,15 +1417,15 @@ foreach my $file (0, 1)
 
 #    sub deepCopy
 #    {
-#        if (! ref $_[0] || ref $_[0] eq 'SCALAR')
+#        if (! ref @_[0] || ref @_[0] eq 'SCALAR')
 #        {
-#            return $_[0] ;
+#            return @_[0] ;
 #        }
 #
-#        if (ref $_[0] eq 'ARRAY')
+#        if (ref @_[0] eq 'ARRAY')
 #        {
 #            my @a ;
-#            for my $x ( @{ $_[0] })
+#            for my $x ( @{ @_[0] })
 #            {
 #                push @a, deepCopy($x);
 #            }
@@ -1433,41 +1433,41 @@ foreach my $file (0, 1)
 #            return \@a ;
 #        }
 #
-#        croak "bad! $_[0]";
+#        croak "bad! @_[0]";
 #
 #    }
 #
 #    sub deepSubst
 #    {
 #        #my $data = shift ;
-#        my $from = $_[1] ;
-#        my $to   = $_[2] ;
+#        my $from = @_[1] ;
+#        my $to   = @_[2] ;
 #
-#        if (! ref $_[0])
+#        if (! ref @_[0])
 #        {
-#            $_[0] = $to 
-#                if $_[0] eq $from ;
+#            @_[0] = $to 
+#                if @_[0] eq $from ;
 #            return ;    
 #
 #        }
 #
-#        if (ref $_[0] eq 'SCALAR')
+#        if (ref @_[0] eq 'SCALAR')
 #        {
-#            $_[0] = \$to 
-#                if defined ${ $_[0] } && ${ $_[0] } eq $from ;
+#            @_[0] = \$to 
+#                if defined ${ @_[0] } && ${ @_[0] } eq $from ;
 #            return ;    
 #
 #        }
 #
-#        if (ref $_[0] eq 'ARRAY')
+#        if (ref @_[0] eq 'ARRAY')
 #        {
-#            for my $x ( @{ $_[0] })
+#            for my $x ( @{ @_[0] })
 #            {
 #                deepSubst($x, $from, $to);
 #            }
 #            return ;
 #        }
-#        #croak "bad! $_[0]";
+#        #croak "bad! @_[0]";
 #    }
 
 #    {

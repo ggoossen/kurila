@@ -1,7 +1,7 @@
 #! perl -w
 
 BEGIN {
-  if ($ENV{PERL_CORE}) {
+  if (%ENV{PERL_CORE}) {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
@@ -18,7 +18,7 @@ use File::Spec;
 ok 1;
 
 # TEST doesn't like extraneous output
-my $quiet = $ENV{PERL_CORE} && !$ENV{HARNESS_ACTIVE};
+my $quiet = %ENV{PERL_CORE} && !%ENV{HARNESS_ACTIVE};
 
 my $b = ExtUtils::CBuilder->new(quiet => $quiet);
 ok $b;
@@ -55,11 +55,11 @@ for ($source_file, $object_file, $lib_file) {
 my @words = $b->split_like_shell(' foo bar');
 if ($^O eq 'MSWin32') {
   ok @words, 1;
-  ok $words[0], ' foo bar';
+  ok @words[0], ' foo bar';
   skip 'No splitting in split_like_shell() on Win32';
 }
 else {
   ok @words, 2;
-  ok $words[0], 'foo';
-  ok $words[1], 'bar';
+  ok @words[0], 'foo';
+  ok @words[1], 'bar';
 }

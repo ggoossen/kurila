@@ -55,35 +55,35 @@ find(sub {
 	while (defined ($line = ~< *F)) {
 	    if ($line =~ m/\b(\w+_r)\b/) {
 		#warn "$1 => $File::Find::name\n";
-		$rfuncs{$1}->{$File::Find::name}++;
+		%rfuncs{$1}->{$File::Find::name}++;
 	    }
 	}
 	close F;
      }, @INCDIRS);
 
 # delete bogus symbols grepped out of comments and such
-delete $rfuncs{setlocale_r} if $^O eq 'linux';
+delete %rfuncs{setlocale_r} if $^O eq 'linux';
 
 # delete obsolete (as promised by man pages) symbols
 my $netdb_r_obsolete;
 if ($^O eq 'hpux') {
-    delete $rfuncs{crypt_r};
-    delete $rfuncs{drand48_r};
-    delete $rfuncs{endgrent_r};
-    delete $rfuncs{endpwent_r};
-    delete $rfuncs{getgrent_r};
-    delete $rfuncs{getpwent_r};
-    delete $rfuncs{setlocale_r};
-    delete $rfuncs{srand48_r};
-    delete $rfuncs{strerror_r};
+    delete %rfuncs{crypt_r};
+    delete %rfuncs{drand48_r};
+    delete %rfuncs{endgrent_r};
+    delete %rfuncs{endpwent_r};
+    delete %rfuncs{getgrent_r};
+    delete %rfuncs{getpwent_r};
+    delete %rfuncs{setlocale_r};
+    delete %rfuncs{srand48_r};
+    delete %rfuncs{strerror_r};
     $netdb_r_obsolete = 1;
 } elsif ($^O eq 'dec_osf') {
-    delete $rfuncs{crypt_r};
-    delete $rfuncs{strerror_r};
+    delete %rfuncs{crypt_r};
+    delete %rfuncs{strerror_r};
     $netdb_r_obsolete = 1;
 }
 if ($netdb_r_obsolete) {
-    delete @rfuncs{qw(endhostent_r
+    delete %rfuncs{[qw(endhostent_r
 		      endnetent_r
 		      endprotoent_r
 		      endservent_r
@@ -102,7 +102,7 @@ if ($netdb_r_obsolete) {
 		      sethostent_r
 		      setnetent_r
 		      setprotoent_r
-		      setservent_r)};
+		      setservent_r)]};
 }
 
 my %syms;
@@ -117,7 +117,7 @@ for my $exe (@EXES) {
         next if $sym =~ m/\s/;
         $sym =~ s/\@.*\z//;	# remove @@GLIBC_2.0 etc
         # warn "#### $sym\n";
-        if (exists $rfuncs{"${sym}_r"} && ! $syms{"$sym:$exe"}++) {
+        if (exists %rfuncs{"${sym}_r"} && ! %syms{"$sym:$exe"}++) {
     	    push @syms, $sym;
         }
     }
@@ -125,7 +125,7 @@ for my $exe (@EXES) {
     if (@syms) {
         print "\nFollowing symbols in $exe have reentrant versions:\n";
         for my $sym (@syms) {
-	    my @f = sort keys %{$rfuncs{$sym . '_r'}};
+	    my @f = sort keys %{%rfuncs{$sym . '_r'}};
     	    print "$sym => $sym" . "_r (@f)\n";
         }
     }

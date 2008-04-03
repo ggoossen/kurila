@@ -961,7 +961,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",HUSH_VMSISH");
     }
     else if (PL_check[optype] != MEMBER_TO_FPTR(Perl_ck_ftst)) {
-	if (OP_IS_FILETEST_ACCESS(o) && o->op_private & OPpFT_ACCESS)
+	if (OP_IS_FILETEST_ACCESS(optype) && o->op_private & OPpFT_ACCESS)
 	    sv_catpv(tmpsv, ",FT_ACCESS");
 	if (o->op_private & OPpFT_STACKED)
 	    sv_catpv(tmpsv, ",FT_STACKED");
@@ -1157,12 +1157,10 @@ Perl_gv_dump(pTHX_ GV *gv)
 
 static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_sv,             "sv(\\0)" },
-	{ PERL_MAGIC_arylen,         "arylen(#)" },
 	{ PERL_MAGIC_rhash,          "rhash(%)" },
 	{ PERL_MAGIC_pos,            "pos(.)" },
 	{ PERL_MAGIC_symtab,         "symtab(:)" },
 	{ PERL_MAGIC_backref,        "backref(<)" },
-	{ PERL_MAGIC_arylen_p,       "arylen_p(@)" },
 	{ PERL_MAGIC_overload,       "overload(A)" },
 	{ PERL_MAGIC_bm,             "bm(B)" },
 	{ PERL_MAGIC_regdata,        "regdata(D)" },
@@ -1221,7 +1219,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_packelem)   s = "packelem";
             else if (v == &PL_vtbl_dbline)     s = "dbline";
             else if (v == &PL_vtbl_isa)        s = "isa";
-            else if (v == &PL_vtbl_arylen)     s = "arylen";
             else if (v == &PL_vtbl_mglob)      s = "mglob";
             else if (v == &PL_vtbl_nkeys)      s = "nkeys";
             else if (v == &PL_vtbl_taint)      s = "taint";
@@ -1237,7 +1234,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
 	    else if (v == &PL_vtbl_amagicelem) s = "amagicelem";
 	    else if (v == &PL_vtbl_backref)    s = "backref";
 	    else if (v == &PL_vtbl_utf8)       s = "utf8";
-            else if (v == &PL_vtbl_arylen_p)   s = "arylen_p";
             else if (v == &PL_vtbl_hintselem)  s = "hintselem";
 	    else			       s = NULL;
 	    if (s)
@@ -1628,7 +1624,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    PerlIO_putc(file, '\n');
 	Perl_dump_indent(aTHX_ level, file, "  FILL = %"IVdf"\n", (IV)AvFILLp(sv));
 	Perl_dump_indent(aTHX_ level, file, "  MAX = %"IVdf"\n", (IV)AvMAX(sv));
-	Perl_dump_indent(aTHX_ level, file, "  ARYLEN = 0x%"UVxf"\n", SvMAGIC(sv) ? PTR2UV(AvARYLEN(sv)) : 0);
 	sv_setpvn(d, "", 0);
 	if (AvREAL(sv))	sv_catpv(d, ",REAL");
 	if (AvREIFY(sv))	sv_catpv(d, ",REIFY");
@@ -2510,7 +2505,6 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { '[', "square_open" },
     { ']', "square_close" },
     { '+', "unary_plus" },
-    { 'l', "arylen" },
     { '*', "star" },
     { 'v', "for" },
     { 'P', "package" },

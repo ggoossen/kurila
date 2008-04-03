@@ -72,7 +72,7 @@ sub doglob {
 	$pat =~ s/\?/.?/g;
 
 	#print "regex: '$pat', head: '$head'\n";
-	my $matchsub = sub { $_[0] =~ m|^$pat\z|is };
+	my $matchsub = sub { @_[0] =~ m|^$pat\z|is };
       INNER:
 	for my $e (@leaves) {
 	    next INNER if $e eq '.' or $e eq '..';
@@ -350,7 +350,7 @@ sub glob {
 		#FIXME: There should be checking for this.
 		#  How or what should be done about failure is beond me.
 	}
-	if ( $#appendpat != -1
+	if (( @appendpat-1) != -1
 		) {
 	    #print "LOOP\n";
 	    #FIXME: Max loop, no way! :")
@@ -369,34 +369,34 @@ sub glob {
  
     # assume global context if not provided one
     $cxix = '_G_' unless defined $cxix;
-    $iter{$cxix} = 0 unless exists $iter{$cxix};
+    %iter{$cxix} = 0 unless exists %iter{$cxix};
 
     # if we're just beginning, do it all first
-    if ($iter{$cxix} == 0) {
+    if (%iter{$cxix} == 0) {
 	if ($^O eq 'MacOS') {
 		# first, take care of updirs and trailing colons
 		@pat = _preprocess_pattern(@pat);
 		# expand volume names
 		@pat = _expand_volume(@pat);
-		$entries{$cxix} = (@pat) ? [_un_escape( doglob_Mac(1,@pat) )] : [()];
+		%entries{$cxix} = (@pat) ? [_un_escape( doglob_Mac(1,@pat) )] : [()];
 	} else {
-		$entries{$cxix} = [doglob(1,@pat)];
+		%entries{$cxix} = [doglob(1,@pat)];
     }
 	}
 
     # chuck it all out, quick or slow
     if (wantarray) {
-	delete $iter{$cxix};
-	return @{delete $entries{$cxix}};
+	delete %iter{$cxix};
+	return @{delete %entries{$cxix}};
     }
     else {
-	if ($iter{$cxix} = scalar @{$entries{$cxix}}) {
-	    return shift @{$entries{$cxix}};
+	if (%iter{$cxix} = scalar @{%entries{$cxix}}) {
+	    return shift @{%entries{$cxix}};
 	}
 	else {
 	    # return undef for EOL
-	    delete $iter{$cxix};
-	    delete $entries{$cxix};
+	    delete %iter{$cxix};
+	    delete %entries{$cxix};
 	    return undef;
 	}
     }

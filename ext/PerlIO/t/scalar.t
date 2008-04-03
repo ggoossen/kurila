@@ -8,7 +8,7 @@ BEGIN {
 	exit 0;
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m!\bPerlIO/scalar\b!) ){
+    if ((%Config::Config{'extensions'} !~ m!\bPerlIO/scalar\b!) ){
         print "1..0 # Skip -- Perl configured without PerlIO::scalar module\n";
         exit 0;
     }
@@ -116,7 +116,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local $SIG{__WARN__} = sub { $warn++ };
+    local ${^WARN_HOOK} = sub { $warn++ };
     for (1..2) {
         open my $fh, '>', \my $scalar;
         close $fh;
@@ -127,7 +127,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local $SIG{__WARN__} = sub { $warn++ };
+    local ${^WARN_HOOK} = sub { $warn++ };
 
     my $fetch = 0;
     {
@@ -146,7 +146,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local $SIG{__WARN__} = sub { $warn++ };
+    local ${^WARN_HOOK} = sub { $warn++ };
     my $scalar = 3;
     undef $scalar;
     open my $fh, '<', \$scalar;

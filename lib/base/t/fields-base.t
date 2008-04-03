@@ -5,11 +5,11 @@ my $W;
 BEGIN {
     $W = 0;
     ${^WARN_HOOK} = sub {
-        if ($_[0]->{description} =~ m/^Hides field '.*?' in base class/) {
+        if (@_[0]->{description} =~ m/^Hides field '.*?' in base class/) {
             $W++;
         }
         else {
-            warn $_[0];
+            warn @_[0];
         }
     };
 }
@@ -134,10 +134,10 @@ while(my($class, $efields) = each %EXPECT) {
     foreach my $idx (1..@$efields) {
         my $key = $efields->[$idx-1];
         next unless $key;
-        $expected_fields{$key} = $idx;
+        %expected_fields{$key} = $idx;
     }
 
-    ::is_deeply(\%fields, \%expected_fields, "%FIELDS check:  $class");
+    ::is_deeply(\%fields, \%expected_fields, "\%FIELDS check:  $class");
 }
 
 # Did we get the appropriate amount of warnings?
@@ -152,11 +152,11 @@ $obj2->{b1} = "D3";
 
 # Slices
 
-@$obj1{"_b1", "b1"} = (17, 29);
+%$obj1{["_b1", "b1"]} = (17, 29);
 is( $obj1->{_b1}, 17 );
 is( $obj1->{b1},  29 );
 
-@$obj1{'_b1', 'b1'} = (44,28);
+%$obj1{['_b1', 'b1']} = (44,28);
 is( $obj1->{_b1}, 44 );
 is( $obj1->{b1},  28 );
 
@@ -185,7 +185,7 @@ eval {
 package B9;
 use fields qw(b1);
 
-sub _mk_obj { fields::new($_[0])->{'b1'} };
+sub _mk_obj { fields::new(@_[0])->{'b1'} };
 
 package D9;
 use base qw(B9);
@@ -194,7 +194,7 @@ package main;
 
 {
     my $w = 0;
-    local $SIG{__WARN__} = sub { $w++ };
+    local %SIG{__WARN__} = sub { $w++ };
     
     B9->_mk_obj();
     # used tp emit a warning that pseudohashes are deprecated, because

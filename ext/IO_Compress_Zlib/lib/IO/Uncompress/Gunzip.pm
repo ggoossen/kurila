@@ -22,7 +22,7 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GunzipError);
 @ISA = qw( IO::Uncompress::RawInflate Exporter );
 @EXPORT_OK = qw( $GunzipError gunzip );
 %EXPORT_TAGS = %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ;
-push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
+push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 $GunzipError = '';
@@ -254,8 +254,8 @@ sub _readGzipHeader($)
         'Comment'       => $comment,
         'Time'          => $mtime,
         'OsID'          => $os,
-        'OsName'        => defined $GZIP_OS_Names{$os} 
-                                 ? $GZIP_OS_Names{$os} : "Unknown",
+        'OsName'        => defined %GZIP_OS_Names{$os} 
+                                 ? %GZIP_OS_Names{$os} : "Unknown",
         'HeaderCRC'     => $HeaderCRC,
         'Flags'         => $flag,
         'ExtraFlags'    => $xfl,

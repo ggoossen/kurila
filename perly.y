@@ -75,7 +75,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DOLSHARP DO HASHBRACK NOAMP
+%token <i_tkval> DO HASHBRACK NOAMP HSLICE ASLICE
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -87,7 +87,7 @@
 %type <opval> decl subrout mysubrout package use peg
 
 %type <opval> block mblock lineseq line loop cond else
-%type <opval> expr term subscripted scalar ary hsh arylen star amper sideff
+%type <opval> expr term subscripted scalar ary hsh star amper sideff
 %type <opval> argexpr nexpr texpr iexpr mexpr mnexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
@@ -792,7 +792,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             $$ = newCVREF(0, $1);
                             TOKEN_GETMAD($2,$$,'a');
                         }
-	|	scalar '[' expr ']'          /* $array[$element] */
+	|	ary '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
@@ -805,6 +805,28 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($3,$$,'[');
 			  TOKEN_GETMAD($5,$$,']');
 			}
+	|	term ARROW HSLICE expr ']' ';' '}'    /* someref->{[bar();]} */
+			{ $$ = prepend_elem(OP_HSLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_HSLICE, 0,
+					list($4),
+					ref(newHVREF($1), OP_HSLICE)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'a');
+			  TOKEN_GETMAD($3,$$,'{');
+			  TOKEN_GETMAD($5,$$,';');
+			  TOKEN_GETMAD($6,$$,'}');
+			}
+	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
+			{ $$ = prepend_elem(OP_ASLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_ASLICE, 0,
+					list($4),
+					ref(newAVREF($1), OP_ASLICE)));
+			  TOKEN_GETMAD($2,$$,'a');
+			  TOKEN_GETMAD($3,$$,'[');
+			  TOKEN_GETMAD($5,$$,']');
+			}
 	|	subscripted '[' expr ']'    /* $foo->[$bar]->[$baz] */
 			{ $$ = newBINOP(OP_AELEM, 0,
 					ref(newAVREF($1),OP_RV2AV),
@@ -812,7 +834,38 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
 			}
-	|	scalar '{' expr ';' '}'    /* $foo->{bar();} */
+	|	subscripted HSLICE expr ']' ';' '}'    /* $foo->{[bar();]} */
+			{ $$ = prepend_elem(OP_HSLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_HSLICE, 0,
+					list($3),
+					ref(newHVREF($1), OP_HSLICE)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'{');
+			  TOKEN_GETMAD($4,$$,';');
+			  TOKEN_GETMAD($5,$$,'}');
+			}
+	|	subscripted ASLICE expr ']' ']'                     /* $foo->[[...]] */
+			{ $$ = prepend_elem(OP_ASLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_ASLICE, 0,
+					list($3),
+					ref(newAVREF($1), OP_ASLICE)));
+			  TOKEN_GETMAD($2,$$,'[');
+			  TOKEN_GETMAD($4,$$,']');
+			}
+	|	hsh HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
+			{ $$ = prepend_elem(OP_HSLICE,
+				newOP(OP_PUSHMARK, 0),
+				    newLISTOP(OP_HSLICE, 0,
+					list($3),
+					ref($1, OP_HSLICE)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'{');
+			  TOKEN_GETMAD($4,$$,';');
+			  TOKEN_GETMAD($5,$$,'}');
+			}
+	|	hsh '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
 			{ $$ = newBINOP(OP_HELEM, 0, oopsHV($1), jmaybe($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
@@ -867,15 +920,33 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			}
-	|	'(' expr ')' '[' expr ']'            /* list slice */
+	|	'(' expr ')' ASLICE expr ']' ']'            /* list slice */
 			{ $$ = newSLICEOP(0, $5, $2);
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			  TOKEN_GETMAD($4,$$,'[');
 			  TOKEN_GETMAD($6,$$,']');
 			}
-	|	'(' ')' '[' expr ']'                 /* empty list slice! */
+	|	'(' ')' ASLICE expr ']' ']'                 /* empty list slice! */
 			{ $$ = newSLICEOP(0, $4, (OP*)NULL);
+			  TOKEN_GETMAD($1,$$,'(');
+			  TOKEN_GETMAD($2,$$,')');
+			  TOKEN_GETMAD($3,$$,'[');
+			  TOKEN_GETMAD($5,$$,']');
+			}
+	|	'(' expr ')' '[' expr ']'            /* list element */
+			{ $$ = newBINOP(OP_AELEM, 0,
+					oopsAV(convert(OP_ANONLIST, OPf_SPECIAL, $2)),
+					scalar($5));
+			  TOKEN_GETMAD($1,$$,'(');
+			  TOKEN_GETMAD($3,$$,')');
+			  TOKEN_GETMAD($4,$$,'[');
+			  TOKEN_GETMAD($6,$$,']');
+			}
+	|	'(' ')' '[' expr ']'            /* empty list element */
+			{ $$ = newBINOP(OP_AELEM, 0,
+					oopsAV(convert(OP_ANONLIST, OPf_SPECIAL, (OP*)NULL)),
+					scalar($4));
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
 			  TOKEN_GETMAD($3,$$,'[');
@@ -1143,11 +1214,9 @@ term	:	termbinop
 			{ $$ = $1; }
 	|	ary 	%prec '('
 			{ $$ = $1; }
-	|	arylen 	%prec '('                    /* $#x, $#{ something } */
-			{ $$ = newUNOP(OP_AV2ARYLEN, 0, ref($1, OP_AV2ARYLEN));}
 	|       subscripted
 			{ $$ = $1; }
-	|	ary '[' expr ']'                     /* array slice */
+	|	ary ASLICE expr ']' ']'                     /* array slice */
 			{ $$ = prepend_elem(OP_ASLICE,
 				newOP(OP_PUSHMARK, 0),
 				    newLISTOP(OP_ASLICE, 0,
@@ -1155,17 +1224,6 @@ term	:	termbinop
 					ref($1, OP_ASLICE)));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
-			}
-	|	ary '{' expr ';' '}'                 /* @hash{@keys} */
-			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_HSLICE, 0,
-					list($3),
-					ref(oopsHV($1), OP_HSLICE)));
-			    PL_parser->expect = XOPERATOR;
-			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
-			  TOKEN_GETMAD($5,$$,'}');
 			}
 	|	THING	%prec '('
 			{ $$ = $1; }
@@ -1373,12 +1431,6 @@ ary	:	'@' indirob
 hsh	:	'%' indirob
 			{ $$ = newHVREF($2);
 			  TOKEN_GETMAD($1,$$,'%');
-			}
-	;
-
-arylen	:	DOLSHARP indirob
-			{ $$ = newAVREF($2);
-			  TOKEN_GETMAD($1,$$,'l');
 			}
 	;
 

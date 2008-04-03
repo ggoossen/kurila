@@ -27,7 +27,7 @@ open OUT, ">", "$file" or die "Can't create $file: $!";
 open PATCH_LEVEL, "<", catfile(updir, "patchlevel.h")
     or die "Can't open patchlevel.h: $!";
 
-my $patchlevel_date = (stat *PATCH_LEVEL)[9];
+my $patchlevel_date = (stat *PATCH_LEVEL)[[9]];
 
 while ( ~< *PATCH_LEVEL) {
     last if $_ =~ m/^\s*static\s+(?:const\s+)?char.*?local_patches\[\]\s*=\s*{\s*$/;
@@ -61,14 +61,14 @@ print "Extracting $file (with variable substitutions)\n";
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.
 
-my $extract_version = sprintf("%vd", $^V);
+my $extract_version = sprintf("\%vd", $^V);
 
 print OUT <<"!GROK!THIS!";
-$Config{startperl}
-    eval 'exec $Config{perlpath} -S \$0 \$\{1+"\$@"\}'
+%Config{startperl}
+    eval 'exec %Config{perlpath} -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
 
-my \$config_tag1 = '$extract_version - $Config{cf_time}';
+my \$config_tag1 = '$extract_version - %Config{cf_time}';
 
 my \$patchlevel_date = $patchlevel_date;
 my \$patch_tags = '$patch_tags';
@@ -1381,5 +1381,5 @@ None known (guess what must have been used to report them?)
 
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
-exec("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
+exec("%Config{'eunicefix'} $file") if %Config{'eunicefix'} ne ':';
 chdir $origdir;

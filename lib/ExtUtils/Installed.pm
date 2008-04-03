@@ -69,7 +69,7 @@ sub _is_type {
 
 sub _is_under {
     my ($self, $path, @under) = @_;
-    $under[0] = "" if (! @under);
+    @under[0] = "" if (! @under);
     foreach my $dir (@under) {
         return(1) if ($self->_is_prefix($path, $dir));
     }
@@ -85,9 +85,9 @@ sub new {
 
     my $self = {};
 
-    if ($args{config_override}) {
+    if (%args{config_override}) {
         eval {
-            $self->{':private:'}{Config} = { %{$args{config_override}} };
+            $self->{':private:'}{Config} = { %{%args{config_override}} };
         } or Carp::croak(
             "The 'config_override' parameter must be a hash reference."
         );
@@ -100,9 +100,9 @@ sub new {
                    [ extra_libs => EXTRA => [] ]) 
     {
         my ($arg,$key,$val)=@$tuple;
-        if ( $args{$arg} ) {
+        if ( %args{$arg} ) {
             eval {
-                $self->{':private:'}{$key} = [ @{$args{$arg}} ];
+                $self->{':private:'}{$key} = [ @{%args{$arg}} ];
             } or Carp::croak(
                 "The '$arg' parameter must be an array reference."
             );
@@ -113,14 +113,14 @@ sub new {
     }
     {
         my %dupe;
-        @{$self->{':private:'}{INC}} = grep { -e $_ && !$dupe{$_}++ }
+        @{$self->{':private:'}{INC}} = grep { -e $_ && !%dupe{$_}++ }
             @{$self->{':private:'}{INC}}, @{$self->{':private:'}{EXTRA}};        
     }                
-    my $perl5lib = defined $ENV{PERL5LIB} ? $ENV{PERL5LIB} : "";
+    my $perl5lib = defined %ENV{PERL5LIB} ? %ENV{PERL5LIB} : "";
 
     my @dirs = ( $self->{':private:'}{Config}{archlibexp},
                  $self->{':private:'}{Config}{sitearchexp},
-                 split(m/\Q$Config{path_sep}\E/, $perl5lib),
+                 split(m/\Q%Config{path_sep}\E/, $perl5lib),
                  @{$self->{':private:'}{EXTRA}},
                );   
     
@@ -133,7 +133,7 @@ sub new {
     if ($DOSISH) {
         s|\\|/|g for @dirs;
     }
-    my $archlib = $dirs[0];
+    my $archlib = @dirs[0];
     
     # Read the core packlist
     $self->{Perl}{packlist} =
@@ -177,7 +177,7 @@ sub new {
           ExtUtils::Packlist->new($File::Find::name);
     };
     my %dupe;
-    @dirs= grep { -e $_ && !$dupe{$_}++ } @dirs;
+    @dirs= grep { -e $_ && !%dupe{$_}++ } @dirs;
     $self->{':private:'}{LIBDIRS} = \@dirs;    
     find($sub, @dirs) if @dirs;
 
@@ -245,7 +245,7 @@ sub directories {
     my ($self, $module, $type, @under) = @_;
     my (%dirs);
     foreach my $file ($self->files($module, $type, @under)) {
-        $dirs{dirname($file)}++;
+        %dirs{dirname($file)}++;
     }
     return sort keys %dirs;
 }
@@ -254,13 +254,13 @@ sub directory_tree {
     my ($self, $module, $type, @under) = @_;
     my (%dirs);
     foreach my $dir ($self->directories($module, $type, @under)) {
-        $dirs{$dir}++;
+        %dirs{$dir}++;
         my ($last) = ("");
         while ($last ne $dir) {
             $last = $dir;
             $dir = dirname($dir);
             last if !$self->_is_under($dir, @under);
-            $dirs{$dir}++;
+            %dirs{$dir}++;
         }
     }
     return(sort(keys(%dirs)));

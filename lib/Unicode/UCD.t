@@ -9,7 +9,7 @@ BEGIN {
     @INC = "::lib" if $^O eq 'MacOS'; # module parses @INC itself
     our %Config;
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built; Unicode::UCD uses Storable\n";
         exit 0;
     }
@@ -345,10 +345,10 @@ is(namedseq(), undef);
 is(namedseq(qw(foo bar)), undef);
 my @ns = namedseq("KATAKANA LETTER AINU P");
 is(scalar @ns, 2);
-is($ns[0], 0x31F7);
-is($ns[1], 0x309A);
+is(@ns[0], 0x31F7);
+is(@ns[1], 0x309A);
 my %ns = namedseq();
-is($ns{"KATAKANA LETTER AINU P"}, "\x{31F7}\x{309A}");
+is(%ns{"KATAKANA LETTER AINU P"}, "\x{31F7}\x{309A}");
 @ns = namedseq(42);
 is(@ns, 0);
 

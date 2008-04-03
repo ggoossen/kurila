@@ -123,17 +123,17 @@ chop;
 is ($_, "\x{1234}");
 
 my @stuff = qw(this that);
-is (chop(@stuff[0,1]), 't');
+is (chop(@stuff[[0,1]]), 't');
 
 # bug id 20010305.012
 @stuff = qw(ab cd ef);
 is (chop(@stuff = @stuff), 'f');
 
 @stuff = qw(ab cd ef);
-is (chop(@stuff[0, 2]), 'f');
+is (chop(@stuff[[0, 2]]), 'f');
 
 my %stuff = (1..4);
-is (chop(@stuff{1, 3}), '4');
+is (chop(%stuff{[1, 3]}), '4');
 
 }
 
@@ -159,7 +159,7 @@ foreach (keys %chomp) {
     $err =~ s/\n$//s;
     fail ("\$\@ = \"$err\"");
   } else {
-    is ($_, $chomp{$key}, "chomp hash key");
+    is ($_, %chomp{$key}, "chomp hash key");
   }
 }
 
@@ -171,7 +171,7 @@ foreach (keys %chop) {
     $err =~ s/\n$//s;
     fail ("\$\@ = \"$err\"");
   } else {
-    is ($_, $chop{$key}, "chop hash key");
+    is ($_, %chop{$key}, "chop hash key");
   }
 }
 

@@ -9,13 +9,13 @@ BEGIN {
     @INC = '../lib';
     push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bXS\/APItest\b/) {
+    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
 	# Look, I'm using this fully-qualified variable more than once!
 	my $arch = $MacPerl::Architecture;
         print "1..0 # Skip: XS::APItest was not built\n";
         exit 0;
     }
-    $threads = $Config{'useithreads'};
+    $threads = %Config{'useithreads'};
     # must 'use threads' before 'use Test::More'
     eval 'use threads' if $threads;
 }

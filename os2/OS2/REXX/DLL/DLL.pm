@@ -5,7 +5,7 @@ our $VERSION = '1.03';
 use Carp;
 use XSLoader;
 
-@libs = split(m/;/, $ENV{'PERL5REXX'} || $ENV{'PERLREXX'} || $ENV{'LIBPATH'} || $ENV{'PATH'});
+@libs = split(m/;/, %ENV{'PERL5REXX'} || %ENV{'PERLREXX'} || %ENV{'LIBPATH'} || %ENV{'PATH'});
 %dlls = ();
 
 # Preloaded methods go here.  Autoload methods go after __END__, and are
@@ -15,7 +15,7 @@ use XSLoader;
 
 my $load_with_dirs = sub {
 	my ($class, $file, @where) = (@_);
-	return $dlls{$file} if $dlls{$file};
+	return %dlls{$file} if %dlls{$file};
 	my $handle;
 	foreach (@where) {
 		$handle = DynaLoader::dl_load_file("$_/$file.dll");
@@ -23,11 +23,11 @@ my $load_with_dirs = sub {
 	}
 	$handle = DynaLoader::dl_load_file($file) unless $handle;
 	return undef unless $handle;
-	my @packs = $INC{'OS2/REXX.pm'} ? qw(OS2::DLL::dll OS2::REXX) : 'OS2::DLL::dll';
+	my @packs = %INC{'OS2/REXX.pm'} ? qw(OS2::DLL::dll OS2::REXX) : 'OS2::DLL::dll';
 	my $p = "OS2::DLL::dll::$file";
 	@{"$p\::ISA"} = @packs;
 	*{"$p\::AUTOLOAD"} = \&OS2::DLL::dll::AUTOLOAD;
-	return $dlls{$file} = 
+	return %dlls{$file} = 
 	  bless {Handle => $handle, File => $file, Queue => 'SESSION' }, $p;
 };
 
@@ -54,7 +54,7 @@ sub module {
 }
 
 sub load {
-  confess 'Usage: load OS2::DLL <file> [<dirs>]' unless $#_ +>= 1;
+  confess 'Usage: load OS2::DLL <file> [<dirs>]' unless (@_-1) +>= 1;
   $load_with_dirs->(@_, @libs);
 }
 
@@ -82,7 +82,7 @@ sub AUTOLOAD {
       or confess("Undefined subroutine &$AUTOLOAD called");
     return undef if $1 eq "DESTROY";
     die "AUTOLOAD loop" if $1 eq "AUTOLOAD";
-    $_[0]->find($1) or confess($@);
+    @_[0]->find($1) or confess($@);
     goto &$AUTOLOAD;
 }
 
@@ -112,7 +112,7 @@ sub find
 	my $p	   = ref $self;
 	foreach (@_) {
 		my $f = eval {$self->wrapper_REXX($_)} or return 0;
-		${"${p}::"}{$_} = sub { shift; $f->(@_) };
+		%{"${p}::"}{$_} = sub { shift; $f->(@_) };
 	}
 	return 1;
 }

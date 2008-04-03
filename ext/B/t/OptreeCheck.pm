@@ -16,7 +16,7 @@ our @EXPORT = qw( checkOptree plan skip skip_all pass is like unlike
 # The approach taken is to put the hints-with-open in the golden results, and
 # flag that they need to be taken out if ${^OPEN} is set.
 
-if (((caller 0)[10]||{})->{'open<'}) {
+if (((caller 0)[[10]]||{})->{'open<'}) {
     $using_open = 1;
 }
 
@@ -292,7 +292,7 @@ use Carp;
 use B::Concise qw(walk_output);
 
 BEGIN {
-    $^{WARN_HOOK} = sub {
+    %^{WARN_HOOK} = sub {
 	my $err = shift->{description};
 	$err =~ m/Subroutine re::(un)?install redefined/ and return;
     };
@@ -351,7 +351,7 @@ our %gOpts = 	# values are replaced at runtime !!
 # in the interim. So it's nice for tests to all pass.
 
 our $threaded = 1
-  if $Config::Config{useithreads} || $Config::Config{use5005threads};
+  if %Config::Config{useithreads} || %Config::Config{use5005threads};
 our $platform = ($threaded) ? "threaded" : "plain";
 our $thrstat = ($threaded)  ? "threaded" : "nonthreaded";
 
@@ -386,7 +386,7 @@ sub getCmdLine {	# import assistant
     foreach my $opt (keys %gOpts) {
 
 	# scan ARGV for known params
-	if (ref $gOpts{$opt} eq 'ARRAY') {
+	if (ref %gOpts{$opt} eq 'ARRAY') {
 
 	    # $opt is a One-Of construct
 	    # replace with valid selection from the list
@@ -396,30 +396,30 @@ sub getCmdLine {	# import assistant
 	    my $tval;  # temp
 	    if (grep s/$opt=(\w+)/{$tval=$1}/, @ARGV) {
 		# check val before accepting
-		my @allowed = @{$gOpts{$opt}};
+		my @allowed = @{%gOpts{$opt}};
 		if (grep { $_ eq $tval } @allowed) {
-		    $gOpts{$opt} = $tval;
+		    %gOpts{$opt} = $tval;
 		}
 		else {die "invalid value: '$tval' for $opt\n"}
 	    }
 
 	    # take 1st val as default
-	    $gOpts{$opt} = ${$gOpts{$opt}}[0]
-		if ref $gOpts{$opt} eq 'ARRAY';
+	    %gOpts{$opt} = @{%gOpts{$opt}}[0]
+		if ref %gOpts{$opt} eq 'ARRAY';
         }
         else { # handle scalars
 
 	    # if 'opt' is present, true
-	    $gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
+	    %gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
 
 	    # override with 'foo' if 'opt=foo' appears
-	    grep s/$opt=(.*)/{$gOpts{$opt}=$1}/, @ARGV;
+	    grep s/$opt=(.*)/{%gOpts{$opt}=$1}/, @ARGV;
 	}
      }
     print("$0 heres current state:\n", mydumper(\%gOpts))
-	if $gOpts{help} or $gOpts{dump};
+	if %gOpts{help} or %gOpts{dump};
 
-    exit if $gOpts{help};
+    exit if %gOpts{help};
 }
 # the above arg-handling cruft should be replaced by a Getopt call
 
@@ -434,17 +434,17 @@ sub checkOptree {
     SKIP: {
 	skip("$tc->{skip} $tc->{name}", 1) if $tc->{skip};
 
-	return runSelftest($tc) if $gOpts{selftest};
+	return runSelftest($tc) if %gOpts{selftest};
 
 	$tc->getRendering();	# get the actual output
 	$tc->checkErrs();
 
 	local $Level = $Level + 2;
       TODO:
-	foreach my $want (@{$modes{$gOpts{testmode}}}) {
+	foreach my $want (@{%modes{%gOpts{testmode}}}) {
 	    local $TODO = $tc->{todo} if $tc->{todo};
 
-	    $tc->{cross} = $msgs{"$want-$thrstat"};
+	    $tc->{cross} = %msgs{"$want-$thrstat"};
 
 	    $tc->mkCheckRex($want);
 	    $tc->mylike();
@@ -462,8 +462,8 @@ sub newTestCases {
 
     # cpy globals into each test
     foreach my $k (keys %gOpts) {
-	if ($gOpts{$k}) {
-	    $tc->{$k} = $gOpts{$k} unless defined $tc->{$k};
+	if (%gOpts{$k}) {
+	    $tc->{$k} = %gOpts{$k} unless defined $tc->{$k};
 	}
     }
     # transform errs to self-hash for efficient set-math
@@ -473,7 +473,7 @@ sub newTestCases {
 	}
 	elsif (ref $tc->{errs} eq 'ARRAY') {
 	    my %errs;
-	    @errs{@{$tc->{errs}}} = (1) x @{$tc->{errs}};
+	    %errs{[@{$tc->{errs}}]} = (1) x @{$tc->{errs}};
 	    $tc->{errs} = \%errs;
 	}
 	elsif (ref $tc->{errs} eq 'Regexp') {
@@ -584,12 +584,12 @@ sub checkErrs {
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
     $tc->{goterrs} ||= [];
-    @goterrs{@{$tc->{goterrs}}} = (1) x scalar @{$tc->{goterrs}};
+    %goterrs{[@{$tc->{goterrs}}]} = (1) x scalar @{$tc->{goterrs}};
     
     foreach my $k (keys %{$tc->{errs}}) {
 	if (@got = grep m/^$k$/, keys %goterrs) {
 	    delete $tc->{errs}{$k};
-	    delete $goterrs{$_} foreach @got;
+	    delete %goterrs{$_} foreach @got;
 	}
     }
     $tc->{goterrs} = \%goterrs;
@@ -598,7 +598,7 @@ sub checkErrs {
     if (%{$tc->{errs}} or %{$tc->{goterrs}}) {
 	$tc->diag_or_fail();
     }
-    fail("FORCED: $tc->{name}:\n") if $gOpts{fail}; # silly ?
+    fail("FORCED: $tc->{name}:\n") if %gOpts{fail}; # silly ?
 }
 
 sub diag_or_fail {
@@ -613,10 +613,10 @@ sub diag_or_fail {
 	unshift @lines, $tc->{name};
 	my $report = join("\n", @lines);
 
-	if    ($gOpts{report} eq 'diag')	{ _diag ($report) }
-	elsif ($gOpts{report} eq 'fail')	{ fail  ($report) }
+	if    (%gOpts{report} eq 'diag')	{ _diag ($report) }
+	elsif (%gOpts{report} eq 'fail')	{ fail  ($report) }
 	else					{ print ($report) }
-	next unless $gOpts{errcont}; # skip block
+	next unless %gOpts{errcont}; # skip block
     }
 }
 

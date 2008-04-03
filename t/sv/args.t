@@ -57,14 +57,14 @@ sub try {
 for (1..5) { try() }
 pass();
 
-# bug #21542 local $_[0] causes reify problems and coredumps
+# bug #21542 local @_[0] causes reify problems and coredumps
 
-sub local1 { local $_[0] }
+sub local1 { local @_[0] }
 my $foo = 'foo'; local1($foo); local1($foo);
 print "got [$foo], expected [foo]\nnot " if $foo ne 'foo';
 pass();
 
-sub local2 { local $_[0]; last L }
+sub local2 { local @_[0]; last L }
 L: { local2 }
 pass();
 
@@ -88,7 +88,7 @@ for (1..3) {
     my $flag = 0;
     sub X::DESTROY { $flag = 1 }
     sub f {
-	delete $_[0];
+	delete @_[0];
 	ok(!$flag, 'delete $_[0] : in f');
     }
     {

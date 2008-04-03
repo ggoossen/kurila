@@ -5,18 +5,18 @@ use File::Copy qw(copy);
 my $name = $0;
 $name =~ s#^(.*)\.PL$#../$1.SH#;
 my %opt;
-while (@ARGV && $ARGV[0] =~ m/^([\w_]+)=(.*)$/)
+while (@ARGV && @ARGV[0] =~ m/^([\w_]+)=(.*)$/)
  {
-  $opt{$1}=$2;
+  %opt{$1}=$2;
   shift(@ARGV);
  }
  
- $opt{CONFIG_H} ||= 'config.h';
+ %opt{CONFIG_H} ||= 'config.h';
  
-my $patchlevel = $opt{INST_VER};
+my $patchlevel = %opt{INST_VER};
 $patchlevel =~ s|^[\\/]||;
-$patchlevel =~ s|~VERSION~|$Config{version}|g;
-$patchlevel ||= $Config{version};
+$patchlevel =~ s|~VERSION~|%Config{version}|g;
+$patchlevel ||= %Config{version};
 $patchlevel = qq["$patchlevel"];
 
 open(SH, "<","$name") || die "Cannot open $name:$!";
@@ -25,7 +25,7 @@ while ( ~< *SH)
   last if m/^sed/;
  }
 ($term,$file,$pat) = m/^sed\s+<<(\S+)\s+>(\S+)\s+(.*)$/;
-$file =~ s/^\$(\w+)$/$opt{$1}/g;
+$file =~ s/^\$(\w+)$/%opt{$1}/g;
 
 my $str = "sub munge\n\{\n";
 
@@ -95,7 +95,7 @@ else
 sub Config
 {
  my $var = shift;
- my $val = $Config{$var};
+ my $val = %Config{$var};
  $val = 'undef' unless defined $val;
  $val =~ s/\\/\\\\/g;
  return $val;

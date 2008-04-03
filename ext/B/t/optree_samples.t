@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -19,7 +19,7 @@ use OptreeCheck;
 use Config;
 plan tests	=> 20;
 SKIP: {
-    skip "no perlio in this build", 20 unless $Config::Config{useperlio};
+    skip "no perlio in this build", 20 unless %Config::Config{useperlio};
 
 pass("GENERAL OPTREE EXAMPLES");
 
@@ -542,8 +542,8 @@ EOT_EOT
 # m  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
-checkOptree ( name	=> '%h=(); for $_(@a){$h{getkey($_)} = $_}',
-	      code	=> '%h=(); for $_(@a){$h{getkey($_)} = $_}',
+checkOptree ( name	=> '%h=(); for $_(@a){%h{getkey($_)} = $_}',
+	      code	=> '%h=(); for $_(@a){%h{getkey($_)} = $_}',
 	      bcopts	=> '-exec',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 505 (eval 24):1) v
@@ -564,7 +564,7 @@ checkOptree ( name	=> '%h=(); for $_(@a){$h{getkey($_)} = $_}',
 # e      <;> nextstate(main 505 (eval 24):1) v:{
 # f      <#> gvsv[*_] s
 # g      <#> gv[*h] s
-# h      <1> rv2hv sKR/1
+# h      <1> rv2hv[t4] sKR/1
 # i      <0> pushmark s
 # j      <#> gvsv[*_] s
 # k      <#> gv[*getkey] s/EARLYCV
@@ -594,7 +594,7 @@ EOT_EOT
 # e      <;> nextstate(main 505 (eval 24):1) v:{
 # f      <$> gvsv(*_) s
 # g      <$> gv(*h) s
-# h      <1> rv2hv sKR/1
+# h      <1> rv2hv[t4] sKR/1
 # i      <0> pushmark s
 # j      <$> gvsv(*_) s
 # k      <$> gv(*getkey) s/EARLYCV

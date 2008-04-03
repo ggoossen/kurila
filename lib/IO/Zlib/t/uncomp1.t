@@ -1,5 +1,5 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
 	@INC = '../lib';
 	chdir 't';
     }

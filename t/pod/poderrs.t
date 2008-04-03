@@ -8,7 +8,7 @@ BEGIN {
 
 my %options = map { $_ => 1 } @ARGV;  ## convert cmdline to options-hash
 my $passed  = testpodchecker \%options, $0;
-exit( ($passed == 1) ? 0 : -1 )  unless $ENV{HARNESS_ACTIVE};
+exit( ($passed == 1) ? 0 : -1 )  unless %ENV{HARNESS_ACTIVE};
 
 ### Deliberately throw in some blank but non-empty lines
                                         

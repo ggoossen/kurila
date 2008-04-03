@@ -30,21 +30,21 @@ sub new {
   }
   else {
     %arg  = @_;
-    $host = delete $arg{Host};
+    $host = delete %arg{Host};
   }
-  my $hosts = defined $host ? $host : $NetConfig{smtp_hosts};
+  my $hosts = defined $host ? $host : %NetConfig{smtp_hosts};
   my $obj;
 
   my $h;
   foreach $h (@{ref($hosts) ? $hosts : [$hosts]}) {
     $obj = $type->SUPER::new(
       PeerAddr => ($host = $h),
-      PeerPort => $arg{Port} || 'smtp(25)',
-      LocalAddr => $arg{LocalAddr},
-      LocalPort => $arg{LocalPort},
+      PeerPort => %arg{Port} || 'smtp(25)',
+      LocalAddr => %arg{LocalAddr},
+      LocalPort => %arg{LocalPort},
       Proto     => 'tcp',
-      Timeout   => defined $arg{Timeout}
-      ? $arg{Timeout}
+      Timeout   => defined %arg{Timeout}
+      ? %arg{Timeout}
       : 120
       )
       and last;
@@ -55,20 +55,20 @@ sub new {
 
   $obj->autoflush(1);
 
-  $obj->debug(exists $arg{Debug} ? $arg{Debug} : undef);
+  $obj->debug(exists %arg{Debug} ? %arg{Debug} : undef);
 
   unless ($obj->response() == CMD_OK) {
     $obj->close();
     return undef;
   }
 
-  ${*$obj}{'net_smtp_exact_addr'} = $arg{ExactAddresses};
-  ${*$obj}{'net_smtp_host'}       = $host;
+  %{*$obj}{'net_smtp_exact_addr'} = %arg{ExactAddresses};
+  %{*$obj}{'net_smtp_host'}       = $host;
 
-  (${*$obj}{'net_smtp_banner'}) = $obj->message;
-  (${*$obj}{'net_smtp_domain'}) = $obj->message =~ m/\A\s*(\S+)/;
+  (%{*$obj}{'net_smtp_banner'}) = $obj->message;
+  (%{*$obj}{'net_smtp_domain'}) = $obj->message =~ m/\A\s*(\S+)/;
 
-  unless ($obj->hello($arg{Hello} || "")) {
+  unless ($obj->hello(%arg{Hello} || "")) {
     $obj->close();
     return undef;
   }
@@ -79,7 +79,7 @@ sub new {
 
 sub host {
   my $me = shift;
-  ${*$me}{'net_smtp_host'};
+  %{*$me}{'net_smtp_host'};
 }
 
 ##
@@ -90,14 +90,14 @@ sub host {
 sub banner {
   my $me = shift;
 
-  return ${*$me}{'net_smtp_banner'} || undef;
+  return %{*$me}{'net_smtp_banner'} || undef;
 }
 
 
 sub domain {
   my $me = shift;
 
-  return ${*$me}{'net_smtp_domain'} || undef;
+  return %{*$me}{'net_smtp_domain'} || undef;
 }
 
 
@@ -139,7 +139,7 @@ sub auth {
 
   # We should probably allow the user to pass the host, but I don't
   # currently know and SASL mechanisms that are used by smtp that need it
-  my $client = $sasl->client_new('smtp', ${*$self}{'net_smtp_host'}, 0);
+  my $client = $sasl->client_new('smtp', %{*$self}{'net_smtp_host'}, 0);
   my $str    = $client->client_start;
 
   # We dont support sasl mechanisms that encrypt the socket traffic.
@@ -171,7 +171,7 @@ sub hello {
   my @msg    = $me->message;
 
   if ($ok) {
-    my $h = ${*$me}{'net_smtp_esmtp'} = {};
+    my $h = %{*$me}{'net_smtp_esmtp'} = {};
     my $ln;
     foreach $ln (@msg) {
       $h->{uc $1} = $2
@@ -185,7 +185,7 @@ sub hello {
 
   return undef unless $ok;
 
-  $msg[0] =~ m/\A\s*(\S+)/;
+  @msg[0] =~ m/\A\s*(\S+)/;
   return ($1 || " ");
 }
 
@@ -193,8 +193,8 @@ sub hello {
 sub supports {
   my $self = shift;
   my $cmd  = uc shift;
-  return ${*$self}{'net_smtp_esmtp'}->{$cmd}
-    if exists ${*$self}{'net_smtp_esmtp'}->{$cmd};
+  return %{*$self}{'net_smtp_esmtp'}->{$cmd}
+    if exists %{*$self}{'net_smtp_esmtp'}->{$cmd};
   $self->set_status(@_)
     if @_;
   return;
@@ -206,7 +206,7 @@ sub _addr {
   my $addr = shift;
   $addr = "" unless defined $addr;
 
-  if (${*$self}{'net_smtp_exact_addr'}) {
+  if (%{*$self}{'net_smtp_exact_addr'}) {
     return $1 if $addr =~ m/^\s*(<.*>)\s*$/s;
   }
   else {
@@ -227,19 +227,19 @@ sub mail {
     my %opt = @_;
     my ($k, $v);
 
-    if (exists ${*$me}{'net_smtp_esmtp'}) {
-      my $esmtp = ${*$me}{'net_smtp_esmtp'};
+    if (exists %{*$me}{'net_smtp_esmtp'}) {
+      my $esmtp = %{*$me}{'net_smtp_esmtp'};
 
-      if (defined($v = delete $opt{Size})) {
+      if (defined($v = delete %opt{Size})) {
         if (exists $esmtp->{SIZE}) {
-          $opts .= sprintf " SIZE=%d", $v + 0;
+          $opts .= sprintf ' SIZE=%d', $v + 0;
         }
         else {
           carp 'Net::SMTP::mail: SIZE option not supported by host';
         }
       }
 
-      if (defined($v = delete $opt{Return})) {
+      if (defined($v = delete %opt{Return})) {
         if (exists $esmtp->{DSN}) {
           $opts .= " RET=" . ((uc($v) eq "FULL") ? "FULL" : "HDRS");
         }
@@ -248,7 +248,7 @@ sub mail {
         }
       }
 
-      if (defined($v = delete $opt{Bits})) {
+      if (defined($v = delete %opt{Bits})) {
         if ($v eq "8") {
           if (exists $esmtp->{'8BITMIME'}) {
             $opts .= " BODY=8BITMIME";
@@ -260,7 +260,7 @@ sub mail {
         elsif ($v eq "binary") {
           if (exists $esmtp->{'BINARYMIME'} && exists $esmtp->{'CHUNKING'}) {
             $opts .= " BODY=BINARYMIME";
-            ${*$me}{'net_smtp_chunking'} = 1;
+            %{*$me}{'net_smtp_chunking'} = 1;
           }
           else {
             carp 'Net::SMTP::mail: BINARYMIME option not supported by host';
@@ -274,7 +274,7 @@ sub mail {
         }
       }
 
-      if (defined($v = delete $opt{Transaction})) {
+      if (defined($v = delete %opt{Transaction})) {
         if (exists $esmtp->{CHECKPOINT}) {
           $opts .= " TRANSID=" . _addr($me, $v);
         }
@@ -283,7 +283,7 @@ sub mail {
         }
       }
 
-      if (defined($v = delete $opt{Envelope})) {
+      if (defined($v = delete %opt{Envelope})) {
         if (exists $esmtp->{DSN}) {
           $v =~ s/([^\041-\176]|=|\+)/{sprintf "+%02x", ord($1)}/sg;
           $opts .= " ENVID=$v";
@@ -293,7 +293,7 @@ sub mail {
         }
       }
 
-      if (defined($v = delete $opt{ENVID})) {
+      if (defined($v = delete %opt{ENVID})) {
 
         # expected to be in a format as required by RFC 3461, xtext-encoded
         if (exists $esmtp->{DSN}) {
@@ -304,7 +304,7 @@ sub mail {
         }
       }
 
-      if (defined($v = delete $opt{AUTH})) {
+      if (defined($v = delete %opt{AUTH})) {
 
         # expected to be in a format as required by RFC 2554,
         # rfc2821-quoted and xtext-encoded, or <>
@@ -317,7 +317,7 @@ sub mail {
         }
       }
 
-      if (defined($v = delete $opt{XVERP})) {
+      if (defined($v = delete %opt{XVERP})) {
         if (exists $esmtp->{'XVERP'}) {
           $opts .= " XVERP";
         }
@@ -338,16 +338,16 @@ sub mail {
 }
 
 
-sub send          { my $me = shift; $me->_SEND("FROM:" . _addr($me, $_[0])) }
-sub send_or_mail  { my $me = shift; $me->_SOML("FROM:" . _addr($me, $_[0])) }
-sub send_and_mail { my $me = shift; $me->_SAML("FROM:" . _addr($me, $_[0])) }
+sub send          { my $me = shift; $me->_SEND("FROM:" . _addr($me, @_[0])) }
+sub send_or_mail  { my $me = shift; $me->_SOML("FROM:" . _addr($me, @_[0])) }
+sub send_and_mail { my $me = shift; $me->_SAML("FROM:" . _addr($me, @_[0])) }
 
 
 sub reset {
   my $me = shift;
 
   $me->dataend()
-    if (exists ${*$me}{'net_smtp_lastch'});
+    if (exists %{*$me}{'net_smtp_lastch'});
 
   $me->_RSET();
 }
@@ -358,16 +358,16 @@ sub recipient {
   my $opts     = "";
   my $skip_bad = 0;
 
-  if (@_ && ref($_[-1])) {
+  if (@_ && ref(@_[-1])) {
     my %opt = %{pop(@_)};
     my $v;
 
-    $skip_bad = delete $opt{'SkipBad'};
+    $skip_bad = delete %opt{'SkipBad'};
 
-    if (exists ${*$smtp}{'net_smtp_esmtp'}) {
-      my $esmtp = ${*$smtp}{'net_smtp_esmtp'};
+    if (exists %{*$smtp}{'net_smtp_esmtp'}) {
+      my $esmtp = %{*$smtp}{'net_smtp_esmtp'};
 
-      if (defined($v = delete $opt{Notify})) {
+      if (defined($v = delete %opt{Notify})) {
         if (exists $esmtp->{DSN}) {
           $opts .= " NOTIFY=" . join(",", map { uc $_ } @$v);
         }
@@ -376,7 +376,7 @@ sub recipient {
         }
       }
 
-      if (defined($v = delete $opt{ORcpt})) {
+      if (defined($v = delete %opt{ORcpt})) {
         if (exists $esmtp->{DSN}) {
           $opts .= " ORCPT=" . $v;
         }
@@ -417,7 +417,7 @@ BEGIN {
 sub data {
   my $me = shift;
 
-  if (exists ${*$me}{'net_smtp_chunking'}) {
+  if (exists %{*$me}{'net_smtp_chunking'}) {
     carp 'Net::SMTP::data: CHUNKING extension in use, must call bdat instead';
   }
   else {
@@ -433,7 +433,7 @@ sub data {
 sub bdat {
   my $me = shift;
 
-  if (exists ${*$me}{'net_smtp_chunking'}) {
+  if (exists %{*$me}{'net_smtp_chunking'}) {
     my $data = shift;
 
     $me->_BDAT(length $data)
@@ -449,7 +449,7 @@ sub bdat {
 sub bdatlast {
   my $me = shift;
 
-  if (exists ${*$me}{'net_smtp_chunking'}) {
+  if (exists %{*$me}{'net_smtp_chunking'}) {
     my $data = shift;
 
     $me->_BDAT(length $data, "LAST")

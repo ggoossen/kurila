@@ -11,7 +11,7 @@ sub import {
     my $self = shift(@_);
     my($sym, $pkg);
     my $void = 0;
-    $pkg = (caller)[0];
+    $pkg = (caller)[[0]];
     foreach $sym (@_) {
 	if ($sym eq ":void") {
 	    $void = 1;
@@ -28,9 +28,9 @@ sub fill_protos {
   while ($proto =~ m/\S/) {
     $n++;
     push(@out1,[$n,@out]) if $seen_semi;
-    push(@out, $1 . "\{\$_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
-    push(@out, "\$_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
-    push(@out, "\@_[$n..\$#_]"), last if $proto =~ s/^\s*(;\s*)?\@//;
+    push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
+    push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
+    push(@out, "\@_[[$n..\@_-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
     $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
@@ -41,7 +41,7 @@ sub fill_protos {
 sub write_invocation {
   my ($core, $call, $name, $void, @argvs) = @_;
   if (@argvs == 1) {		# No optional arguments
-    my @argv = @{$argvs[0]};
+    my @argv = @{@argvs[0]};
     shift @argv;
     return "\t" . one_invocation($core, $call, $name, $void, @argv) . ";\n";
   } else {

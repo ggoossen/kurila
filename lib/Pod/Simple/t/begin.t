@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -25,9 +25,9 @@ $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output
 
 
-sub moj {$_[0]->accept_target('mojojojo')}
-sub mojtext {$_[0]->accept_target_as_text('mojojojo')}
-sub any {$_[0]->accept_target_as_text('*')}
+sub moj {@_[0]->accept_target('mojojojo')}
+sub mojtext {@_[0]->accept_target_as_text('mojojojo')}
+sub any {@_[0]->accept_target_as_text('*')}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print "# Testing non-matching complaint...\n";

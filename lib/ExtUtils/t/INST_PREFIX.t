@@ -6,7 +6,7 @@
 # Essentially, this test is a Makefile.PL.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -51,7 +51,7 @@ my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
-    PERL_CORE     => $ENV{PERL_CORE},
+    PERL_CORE     => %ENV{PERL_CORE},
 );
 
 like( $stdout->read, qr{
@@ -79,7 +79,7 @@ $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => {},
-    PERL_CORE     => $ENV{PERL_CORE},
+    PERL_CORE     => %ENV{PERL_CORE},
     PREFIX        => $PREFIX,
 );
 like( $stdout->read, qr{
@@ -98,10 +98,10 @@ foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
     is( $mm->{$prefix}, '$(PREFIX)', "\$(PREFIX) overrides $prefix" );
 }
 
-is( !!$mm->{PERL_CORE}, !!$ENV{PERL_CORE}, 'PERL_CORE' );
+is( !!$mm->{PERL_CORE}, !!%ENV{PERL_CORE}, 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
-if( $ENV{PERL_CORE} ) {
+if( %ENV{PERL_CORE} ) {
     $perl_src = File::Spec->catdir($Updir, $Updir);
     $perl_src = File::Spec->canonpath($perl_src);
     $mm_perl_src = File::Spec->canonpath($mm->{PERL_SRC});
@@ -125,7 +125,7 @@ while( my($type, $vars) = each %Install_Vars) {
         skip "VMS must expand macros in INSTALL* vars", scalar @$vars 
           if $Is_VMS;    
         skip '$Config{usevendorprefix} not set', scalar @$vars
-          if $type eq 'VENDOR' and !$Config{usevendorprefix};
+          if $type eq 'VENDOR' and !%Config{usevendorprefix};
 
         foreach my $var (@$vars) {
             my $installvar = "install$var";
@@ -138,7 +138,7 @@ while( my($type, $vars) = each %Install_Vars) {
                 # support for man page skipping
                 $prefix = 'none' if $type eq 'PERL' && 
                                     $var =~ m/man/ && 
-                                    !$Config{$installvar};
+                                    !%Config{$installvar};
                 like( $mm->{uc $installvar}, qr/^\Q$prefix\E/, 
                       "$prefix + $var" );
             }
@@ -158,7 +158,7 @@ while( my($type, $vars) = each %Install_Vars) {
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
                            PREREQ_PM     => {},
-                           PERL_CORE     => $ENV{PERL_CORE},
+                           PERL_CORE     => %ENV{PERL_CORE},
                            PREFIX        => $PREFIX,
                            INSTALLMAN1DIR=> $wibble,
                           );
@@ -180,7 +180,7 @@ while( my($type, $vars) = each %Install_Vars) {
                    NAME          => 'Big::Dummy',
                    VERSION_FROM  => 'lib/Big/Dummy.pm',
                    PREREQ_PM     => {},
-                   PERL_CORE     => $ENV{PERL_CORE},
+                   PERL_CORE     => %ENV{PERL_CORE},
 
                    # In case the local installation doesn't have man pages.
                    INSTALLMAN1DIR=> 'foo/bar/baz',
@@ -210,7 +210,7 @@ while( my($type, $vars) = each %Install_Vars) {
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
-                           PERL_CORE     => $ENV{PERL_CORE},
+                           PERL_CORE     => %ENV{PERL_CORE},
                           );
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
@@ -243,7 +243,7 @@ while( my($type, $vars) = each %Install_Vars) {
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
-                           PERL_CORE     => $ENV{PERL_CORE},
+                           PERL_CORE     => %ENV{PERL_CORE},
                           );
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
@@ -261,10 +261,10 @@ while( my($type, $vars) = each %Install_Vars) {
 sub _set_config {
     my($k,$v) = @_;
     (my $k_no_install = $k) =~ s/^install//i;
-    $Config{$k} = $v;
+    %Config{$k} = $v;
 
     # Because VMS's config has traditionally been underpopulated, it will
     # fall back to the install-less versions in desperation.
-    $Config{$k_no_install} = $v if $Is_VMS;
+    %Config{$k_no_install} = $v if $Is_VMS;
     return;
 }

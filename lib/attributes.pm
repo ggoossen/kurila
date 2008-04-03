@@ -19,7 +19,7 @@ use strict;
 BEGIN { attributes->bootstrap }
 
 sub import {
-    @_ +> 2 && ref $_[2] or do {
+    @_ +> 2 && ref @_[2] or do {
 	require Exporter;
 	goto &Exporter::import;
     };
@@ -60,7 +60,7 @@ sub import {
 }
 
 sub get ($) {
-    @_ == 1  && ref $_[0] or
+    @_ == 1  && ref @_[0] or
 	die 'Usage: '.__PACKAGE__.'::get $ref';
     my $svref = shift;
     my $svtype = uc reftype $svref;

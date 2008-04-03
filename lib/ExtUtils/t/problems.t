@@ -1,7 +1,7 @@
 # Test problems in Makefile.PL's and hint files.
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -35,7 +35,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
     my $stdout = tie *STDOUT, 'TieOut' or die;
 
     my $warning = '';
-    local ${^WARN_HOOK} = sub { $warning = $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { $warning = @_[0]->{description} };
     eval { $MM->eval_in_subdirs; };
 
     is( $stdout->read, qq{\@INC has .\n}, 'cwd in @INC' );

@@ -29,20 +29,20 @@ sub mkUncompObject
 sub uncompr
 {
     my $self = shift;
-    my $eof = $_[2];
+    my $eof = @_[2];
 
-    if (defined ${ $_[0] } && length ${ $_[0] }) {
-        $self->{CompSize} += length ${ $_[0] } ;
+    if (defined ${ @_[0] } && length ${ @_[0] }) {
+        $self->{CompSize} += length ${ @_[0] } ;
         $self->{UnCompSize} = $self->{CompSize} ;
 
-        $self->{CRC32} = Compress::Raw::Zlib::crc32($_[0],  $self->{CRC32})
+        $self->{CRC32} = Compress::Raw::Zlib::crc32(@_[0],  $self->{CRC32})
             if $self->{wantCRC32};
 
-        $self->{ADLER32} = Compress::Zlib::adler32($_[0],  $self->{ADLER32})
+        $self->{ADLER32} = Compress::Zlib::adler32(@_[0],  $self->{ADLER32})
             if $self->{wantADLER32};
 
-        ${ $_[1] } .= ${ $_[0] };
-        ${ $_[0] } = "";
+        ${ @_[1] } .= ${ @_[0] };
+        ${ @_[0] } = "";
     }
 
     return STATUS_ENDSTREAM if $eof;

@@ -36,7 +36,7 @@ sub new {
     @_ == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )';
     my $class = shift;
 
-    my $id = semget($_[0],$_[1],$_[2]);
+    my $id = semget(@_[0],@_[1],@_[2]);
 
     defined($id)
 	? bless \$id, $class
@@ -50,7 +50,7 @@ sub id {
 
 sub remove {
     my $self = shift;
-    (semctl($$self,0,IPC_RMID,0), undef $$self)[0];
+    (semctl($$self,0,IPC_RMID,0), undef $$self)[[0]];
 }
 
 sub getncnt {

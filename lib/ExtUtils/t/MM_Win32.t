@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -37,7 +37,7 @@ my $MM = bless {
                 MAKEFILE => 'Makefile',
                 RM_RF   => 'rm -rf',
                 MV      => 'mv',
-                MAKE    => $Config{make}
+                MAKE    => %Config{make}
                }, 'MM';
 
 
@@ -51,8 +51,8 @@ my $MM = bless {
 
 # maybe_command()
 SKIP: {
-    skip( '$ENV{COMSPEC} not set', 2 )
-        unless $ENV{COMSPEC} =~ m!((?:[a-z]:)?[^|<>]+)!i;
+    skip( '%ENV{COMSPEC} not set', 2 )
+        unless %ENV{COMSPEC} =~ m!((?:[a-z]:)?[^|<>]+)!i;
     my $comspec = $1;
     is( $MM->maybe_command( $comspec ), 
         $comspec, 'COMSPEC is a maybe_command()' );
@@ -62,14 +62,14 @@ SKIP: {
           'maybe_command() without extension' );
 }
 
-my $had_pathext = exists $ENV{PATHEXT};
+my $had_pathext = exists %ENV{PATHEXT};
 {
-    local $ENV{PATHEXT} = '.exe';
+    local %ENV{PATHEXT} = '.exe';
     ok( ! $MM->maybe_command( 'not_a_command.com' ), 
         'not a maybe_command()' );
 }
-# Bug in Perl.  local $ENV{FOO} won't delete the key afterward.
-delete $ENV{PATHEXT} unless $had_pathext;
+# Bug in Perl.  local %ENV{FOO} won't delete the key afterward.
+delete %ENV{PATHEXT} unless $had_pathext;
 
 # file_name_is_absolute() [Does not support UNC-paths]
 {
@@ -153,7 +153,7 @@ delete $ENV{PATHEXT} unless $had_pathext;
     foreach my $regex (
          qr|^NAME       \s* = \s* TestMM_Win32 \s* $|xms,
          qr|^VERSION    \s* = \s* 1\.00 \s* $|xms,
-         qr|^MAKEMAKER  \s* = \s* \Q$INC{'ExtUtils/MakeMaker.pm'}\E \s* $|xms,
+         qr|^MAKEMAKER  \s* = \s* \Q%INC{'ExtUtils/MakeMaker.pm'}\E \s* $|xms,
          qr|^MM_VERSION \s* = \s* \Q$ExtUtils::MakeMaker::VERSION\E \s* $|xms,
          qr|^TO_INST_PM \s* = \s* \Q$s_PM\E \s* $|xms,
          qr|^PM_TO_BLIB \s* = \s* \Q$k_PM\E \s* $|xms,
@@ -176,7 +176,7 @@ delete $ENV{PATHEXT} unless $had_pathext;
 # init_linker
 {
     my $libperl = File::Spec->catfile('$(PERL_INC)', 
-                                      $Config{libperl} || 'libperl.a');
+                                      %Config{libperl} || 'libperl.a');
     my $export  = '$(BASEEXT).def';
     my $after   = '';
     $MM->init_linker;
@@ -243,7 +243,7 @@ unlink "${script_name}$script_ext" if -f "${script_name}$script_ext";
 
 # pasthru()
 {
-    my $pastru = "PASTHRU = " . ($Config{make} =~ /^nmake/i ? "-nologo" : "");
+    my $pastru = "PASTHRU = " . (%Config{make} =~ /^nmake/i ? "-nologo" : "");
     is( $MM->pasthru(), $pastru, 'pasthru()' );
 }
 

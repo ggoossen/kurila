@@ -90,7 +90,7 @@ sub eqtime
 {
  my ($src,$dst) = @ARGV;
  local @ARGV = ($dst);  touch();  # in case $dst doesn't exist
- utime((stat($src))[8,9],$dst);
+ utime((stat($src))[[8,9]],$dst);
 }
 
 =item rm_rf
@@ -226,17 +226,17 @@ sub chmod {
     expand_wildcards();
 
     if( $Is_VMS ) {
-        foreach my $idx (0..$#ARGV) {
-            my $path = $ARGV[$idx];
+        foreach my $idx (0..(@ARGV-1)) {
+            my $path = @ARGV[$idx];
             next unless -d $path;
 
             # chmod 0777, [.foo.bar] doesn't work on VMS, you have to do
             # chmod 0777, [.foo]bar.dir
             my @dirs = File::Spec->splitdir( $path );
-            $dirs[-1] .= '.dir';
+            @dirs[-1] .= '.dir';
             $path = File::Spec->catfile(@dirs);
 
-            $ARGV[$idx] = $path;
+            @ARGV[$idx] = $path;
         }
     }
 
@@ -268,7 +268,7 @@ shell's idea of true and false).
 
 sub test_f
 {
- exit(-f $ARGV[0] ? 0 : 1);
+ exit(-f @ARGV[0] ? 0 : 1);
 }
 
 =item test_d
@@ -282,7 +282,7 @@ not (ie. shell's idea of true and false).
 
 sub test_d
 {
- exit(-d $ARGV[0] ? 0 : 1);
+ exit(-d @ARGV[0] ? 0 : 1);
 }
 
 =item dos2unix

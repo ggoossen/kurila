@@ -9,7 +9,7 @@
 {
     %hash = ();
     foreach $_ (@array) {
-	$hash{getkey($_)} = $_;
+	%hash{getkey($_)} = $_;
     }
 }
 

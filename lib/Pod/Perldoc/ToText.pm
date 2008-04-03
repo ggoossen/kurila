@@ -18,7 +18,7 @@ sub quotes    { shift->_perldoc_elem('quotes'  , @_) }
 sub sentence  { shift->_perldoc_elem('sentence', @_) }
 sub width     { shift->_perldoc_elem('width'   , @_) }
 
-sub new { return bless {}, ref($_[0]) || $_[0] }
+sub new { return bless {}, ref(@_[0]) || @_[0] }
 
 sub parse_from_file {
   my $self = shift;

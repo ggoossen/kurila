@@ -12,16 +12,16 @@ use Config;
 BEGIN {
     my $reason;
 
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bSocket\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
       $reason = 'Socket was not built';
     }
-    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
+    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
       $reason = 'IO was not built';
     }
     elsif ($^O eq 'apollo') {
       $reason = "unknown *FIXME*";
     }
-    undef $reason if $^O eq 'VMS' and $Config{d_socket};
+    undef $reason if $^O eq 'VMS' and %Config{d_socket};
     if ($reason) {
 	print "1..0 # Skip: $reason\n";
 	exit 0;
@@ -35,9 +35,9 @@ sub compare_addr {
     if (length($a) != length $b) {
 	my $min = (length($a) +< length $b) ? length($a) : length $b;
 	if ($min and substr($a, 0, $min) eq substr($b, 0, $min)) {
-	    printf "# Apparently: %d bytes junk at the end of %s\n# %s\n",
+	    printf "# Apparently: \%d bytes junk at the end of \%s\n# \%s\n",
 		abs(length($a) - length ($b)),
-		$_[length($a) +< length ($b) ? 1 : 0],
+		@_[length($a) +< length ($b) ? 1 : 0],
 		"consider decreasing bufsize of recfrom.";
 	    substr($a, $min, undef, "");
 	    substr($b, $min, undef, "");
@@ -46,7 +46,7 @@ sub compare_addr {
     }
     my @a = unpack_sockaddr_in($a);
     my @b = unpack_sockaddr_in($b);
-    "$a[0]$a[1]" eq "$b[0]$b[1]";
+    "@a[0]@a[1]" eq "@b[0]@b[1]";
 }
 
 $| = 1;

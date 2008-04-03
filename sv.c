@@ -516,7 +516,7 @@ static void
 do_clean_all(pTHX_ SV *const sv)
 {
     dVAR;
-    if (sv == PL_fdpid || sv == PL_strtab) /* don't clean pid table and strtab */
+    if (sv == (SV*)PL_fdpid || sv == (SV*)PL_strtab) /* don't clean pid table and strtab */
 	return;
     DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning loops: SV at 0x%"UVxf"\n", PTR2UV(sv)) ));
     SvFLAGS(sv) |= SVf_BREAK;
@@ -4169,7 +4169,6 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 
     */
     if (!obj || obj == sv ||
-	how == PERL_MAGIC_arylen ||
 	how == PERL_MAGIC_symtab ||
 	(SvTYPE(obj) == SVt_PVGV &&
 	    (GvSV(obj) == sv || GvHV(obj) == (HV*)sv || GvAV(obj) == (AV*)sv ||
@@ -4354,7 +4353,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_vec:
 	vtable = &PL_vtbl_vec;
 	break;
-    case PERL_MAGIC_arylen_p:
     case PERL_MAGIC_rhash:
     case PERL_MAGIC_symtab:
     case PERL_MAGIC_vstring:
@@ -4365,9 +4363,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_defelem:
 	vtable = &PL_vtbl_defelem;
-	break;
-    case PERL_MAGIC_arylen:
-	vtable = &PL_vtbl_arylen;
 	break;
     case PERL_MAGIC_pos:
 	vtable = &PL_vtbl_pos;
@@ -11457,13 +11452,11 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
 
     if (subscript_type == FUV_SUBSCRIPT_HASH) {
 	SV * const sv = newSV(0);
-	*SvPVX(name) = '$';
 	Perl_sv_catpvf(aTHX_ name, "{%s}",
 	    pv_display(sv,SvPVX_const(keyname), SvCUR(keyname), 0, 32));
 	SvREFCNT_dec(sv);
     }
     else if (subscript_type == FUV_SUBSCRIPT_ARRAY) {
-	*SvPVX(name) = '$';
 	Perl_sv_catpvf(aTHX_ name, "[%"IVdf"]", (IV)aindex);
     }
     else if (subscript_type == FUV_SUBSCRIPT_WITHIN)
@@ -11578,7 +11571,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 		if (!svp || *svp != uninit_sv)
 		    break;
 	    }
-	    return varname(NULL, '$', obase->op_targ,
+	    return varname(NULL, '@', obase->op_targ,
 		    NULL, (I32)obase->op_private, FUV_SUBSCRIPT_ARRAY);
 	}
 	else {
@@ -11594,7 +11587,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 		if (!svp || *svp != uninit_sv)
 		    break;
 	    }
-	    return varname(gv, '$', 0,
+	    return varname(gv, '@', 0,
 		    NULL, (I32)obase->op_private, FUV_SUBSCRIPT_ARRAY);
 	}
 	break;

@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 use ExtUtils::Constant v0.11 'WriteConstants';
 use Config;
 my $rt_signals;
-if ($Config{sig_name} =~ m/\bRTMIN\b/ && $Config{sig_name} =~ m/\bRTMAX\b/) {
+if (%Config{sig_name} =~ m/\bRTMIN\b/ && %Config{sig_name} =~ m/\bRTMAX\b/) {
     # Yes, it really has them. (Some systems define the C pre-processor
     # symbols, but they depend on other macros that are only defined during
     # kernel compilation

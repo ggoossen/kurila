@@ -11,7 +11,7 @@ BEGIN {
     $BigWidth  = 6;				# Digits in $BigEnough-1
     $BigEnough = 10**$BigWidth;			# Largest array we'll attempt
     $RootWidth = int(($BigWidth+1)/2);		# Digits in sqrt($BigEnough-1)
-    $ItemFormat = "%0${RootWidth}d%0${BigWidth}d";	# Array item format
+    $ItemFormat = "\%0${RootWidth}d\%0${BigWidth}d";	# Array item format
     @TestSizes = (0, 1, 2);			# Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)
@@ -45,10 +45,10 @@ sub genarray {
 
     if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
     elsif ($size +> $BigEnough) { $size = $BigEnough; }
-    $#a = $size - 1;			# preallocate array
+    @a = $size;			# preallocate array
     $items = int(sqrt($size));		# number of distinct items
     for ($i = 0; $i +< $size; ++$i) {
-	$a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
+	@a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
     }
     return \@a;
 }
@@ -61,7 +61,7 @@ sub checkorder {
     my $status = '';			# so far, so good
     my ($i, $disorder);
 
-    for ($i = 0; $i +< $#$aref; ++$i) {
+    for ($i = 0; $i +< @$aref-1; ++$i) {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
@@ -133,27 +133,27 @@ sub main {
 }
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
+main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
 
 {
     use sort qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
-    main(sub { sort {&{$_[0]}} @{$_[1]} }, 1);
+    main(sub { sort {&{@_[0]}} @{@_[1]} }, 1);
 }
 
 {
     use sort qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
-    main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
+    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
 }
 
 {
     use sort qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
-    main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
+    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
 }
 
 # Tests added to check "defaults" subpragma, and "no sort"
@@ -163,7 +163,7 @@ main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
     no sort qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
-    main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
+    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
 }
 
 {
@@ -177,5 +177,5 @@ main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
     use sort qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
-    main(sub { sort {&{$_[0]}} @{$_[1]} }, 0);
+    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
 }

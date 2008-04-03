@@ -7,14 +7,14 @@
 #
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -107,7 +107,7 @@ print "not " unless $VAR2->[3] eq $VAR1->[3];
 print "ok 14\n";
 
 # Test the workaround for LVALUE bug in perl 5.004_04 -- from Gisle Aas
-sub foo { $_[0] = 1 }
+sub foo { @_[0] = 1 }
 $foo = [];
 foo($foo->[1]);
 eval { freeze($foo) };
@@ -138,9 +138,9 @@ thaw $frozen;			# used to segfault here
 ok 19, 1;
 
     eval '
-        $a = []; $#$a = 2; $a->[1] = undef;
+        $a = [undef, undef];
         $b = thaw freeze $a;
-        @a = map { exists $a->[$_] } 0 .. $#$a;
-        @b = map { exists $b->[$_] } 0 .. $#$b;
+        @a = map { exists $a->[$_] } 0 .. @$a-1;
+        @b = map { exists $b->[$_] } 0 .. @$b-1;
         ok 20, "@a" eq "@b";
     ';

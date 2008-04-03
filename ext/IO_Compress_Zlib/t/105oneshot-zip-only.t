@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = ("../lib", "lib/compress");
     }
@@ -223,7 +223,7 @@ for my $stream (0, 1)
                 ok unzip($zipfile => \$got, Name => $file), "  unzip $file ok"
                     or diag $UnzipError ;
 
-                is $got, $content{$file}, "  content ok";
+                is $got, %content{$file}, "  content ok";
             }
         }
     }

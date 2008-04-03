@@ -30,11 +30,11 @@ print defined($a) ? "ok 8\n" : "not ok 8\n";
 $a = shift(@ary);
 print defined($a) ? "not ok 9\n" : "ok 9\n";
 
-$ary{'foo'} = 'hi';
-print defined($ary{'foo'}) ? "ok 10\n" : "not ok 10\n";
-print defined($ary{'bar'}) ? "not ok 11\n" : "ok 11\n";
-undef $ary{'foo'};
-print defined($ary{'foo'}) ? "not ok 12\n" : "ok 12\n";
+%ary{'foo'} = 'hi';
+print defined(%ary{'foo'}) ? "ok 10\n" : "not ok 10\n";
+print defined(%ary{'bar'}) ? "not ok 11\n" : "ok 11\n";
+undef %ary{'foo'};
+print defined(%ary{'foo'}) ? "not ok 12\n" : "ok 12\n";
 
 print defined(@ary) ? "ok 13\n" : "not ok 13\n";
 print defined(%ary) ? "ok 14\n" : "not ok 14\n";
@@ -97,5 +97,5 @@ sub X::DESTROY {
     print "not " if keys   %hash; print "ok $test\n"; $test++;
     print "not " if values %hash; print "ok $test\n"; $test++;
     print "not " if each   %hash; print "ok $test\n"; $test++;
-    print "not " if defined delete $hash{'key2'}; print "ok $test\n"; $test++;
+    print "not " if defined delete %hash{'key2'}; print "ok $test\n"; $test++;
 }

@@ -15,7 +15,7 @@ use Locale::Maketext::Simple    Style => 'gettext';
 
 ### solaris has silly /bin/tar output ###
 use constant ON_SOLARIS     => $^O eq 'solaris' ? 1 : 0;
-use constant FILE_EXISTS    => sub { -e $_[0] ? 1 : 0 };
+use constant FILE_EXISTS    => sub { -e @_[0] ? 1 : 0 };
 
 ### VMS may require quoting upper case command options
 use constant ON_VMS         => $^O eq 'VMS' ? 1 : 0;
@@ -134,7 +134,7 @@ my $Mapping = {
         no strict 'refs';
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
-                        $self->{$method} = $_[0] if @_;
+                        $self->{$method} = @_[0] if @_;
                         return $self->{$method};
                     }
     }
@@ -224,7 +224,7 @@ Returns a C<Archive::Extract> object on success, or false on failure.
         }
 
         ### don't know what type of file it is ###
-        return __PACKAGE__->_error(loc("Cannot determine file type for '%1'",
+        return __PACKAGE__->_error(loc("Cannot determine file type for '\%1'",
                                 $parsed->{archive} )) unless $parsed->{type};
 
         return bless $parsed, $class;
@@ -318,7 +318,7 @@ sub extract {
     unless( -d $dir ) {
         eval { mkpath( $dir ) };
 
-        return $self->_error(loc("Could not create path '%1': %2", $dir, $@))
+        return $self->_error(loc("Could not create path '\%1': \%2", $dir, $@))
             if $@;
     }
 
@@ -330,7 +330,7 @@ sub extract {
 
         ### chdir to the target dir ###
         unless( chdir $dir ) {
-            $self->_error(loc("Could not chdir to '%1': %2", $dir, $!));
+            $self->_error(loc("Could not chdir to '\%1': \%2", $dir, $!));
             $ok = 0; last EXTRACT;
         }
 
@@ -357,7 +357,7 @@ sub extract {
 
     ### and chdir back ###
     unless( chdir $cwd ) {
-        $self->_error(loc("Could not chdir back to start dir '%1': %2'",
+        $self->_error(loc("Could not chdir back to start dir '\%1': \%2'",
                             $cwd, $!));
     }
 
@@ -436,14 +436,14 @@ See the C<new()> method for details.
 =cut
 
 ### quick check methods ###
-sub is_tgz  { return $_[0]->type eq TGZ }
-sub is_tar  { return $_[0]->type eq TAR }
-sub is_gz   { return $_[0]->type eq GZ  }
-sub is_zip  { return $_[0]->type eq ZIP }
-sub is_tbz  { return $_[0]->type eq TBZ }
-sub is_bz2  { return $_[0]->type eq BZ2 }
-sub is_Z    { return $_[0]->type eq Z   }
-sub is_lzma { return $_[0]->type eq LZMA }
+sub is_tgz  { return @_[0]->type eq TGZ }
+sub is_tar  { return @_[0]->type eq TAR }
+sub is_gz   { return @_[0]->type eq GZ  }
+sub is_zip  { return @_[0]->type eq ZIP }
+sub is_tbz  { return @_[0]->type eq TBZ }
+sub is_bz2  { return @_[0]->type eq BZ2 }
+sub is_Z    { return @_[0]->type eq Z   }
+sub is_lzma { return @_[0]->type eq LZMA }
 
 =pod
 
@@ -542,7 +542,7 @@ sub _untar {
         $self->_extractor($method) && return 1 if $self->?$method();
     }
 
-    return $self->_error(loc("Unable to untar file '%1'", $self->archive));
+    return $self->_error(loc("Unable to untar file '\%1'", $self->archive));
 }
 
 ### use /bin/tar to extract ###
@@ -550,14 +550,14 @@ sub _untar_bin {
     my $self = shift;
 
     ### check for /bin/tar ###
-    return $self->_error(loc("No '%1' program found", '/bin/tar'))
+    return $self->_error(loc("No '\%1' program found", '/bin/tar'))
         unless $self->bin_tar;
 
     ### check for /bin/gzip if we need it ###
-    return $self->_error(loc("No '%1' program found", '/bin/gzip'))
+    return $self->_error(loc("No '\%1' program found", '/bin/gzip'))
         if $self->is_tgz && !$self->bin_gzip;
 
-    return $self->_error(loc("No '%1' program found", '/bin/bunzip2'))
+    return $self->_error(loc("No '\%1' program found", '/bin/bunzip2'))
         if $self->is_tbz && !$self->bin_bunzip2;
 
     ### XXX figure out how to make IPC::Run do this in one call --
@@ -586,7 +586,7 @@ sub _untar_bin {
                             verbose => $DEBUG )
         ) {
             return $self->_error(loc(
-                            "Error listing contents of archive '%1': %2",
+                            "Error listing contents of archive '\%1': \%2",
                             $self->archive, $buffer ));
         }
 
@@ -627,7 +627,7 @@ sub _untar_bin {
                             buffer  => \$buffer,
                             verbose => $DEBUG )
         ) {
-            return $self->_error(loc("Error extracting archive '%1': %2",
+            return $self->_error(loc("Error extracting archive '\%1': \%2",
                             $self->archive, $buffer ));
         }
 
@@ -654,7 +654,7 @@ sub _untar_at {
 
         unless( can_load( modules => $use_list ) ) {
 
-            return $self->_error(loc("You do not have '%1' installed - " .
+            return $self->_error(loc("You do not have '\%1' installed - " .
                                  "Please install it as soon as possible.",
                                  'Archive::Tar'));
         }
@@ -674,7 +674,7 @@ sub _untar_at {
             my $which = join '/', sort keys %$use_list;
 
             return $self->_error(loc(
-                                "You do not have '%1' installed - Please ".
+                                "You do not have '\%1' installed - Please ".
                                 "install it as soon as possible.", $which));
 
         }
@@ -682,13 +682,13 @@ sub _untar_at {
         my $use_list = { 'IO::Uncompress::Bunzip2' => '0.0' };
         unless( can_load( modules => $use_list ) ) {
             return $self->_error(loc(
-                    "You do not have '%1' installed - Please " .
+                    "You do not have '\%1' installed - Please " .
                     "install it as soon as possible.", 
                      'IO::Uncompress::Bunzip2'));
         }
 
         my $bz = IO::Uncompress::Bunzip2->new( $self->archive ) or
-            return $self->_error(loc("Unable to open '%1': %2",
+            return $self->_error(loc("Unable to open '\%1': \%2",
                             $self->archive,
                             $IO::Uncompress::Bunzip2::Bunzip2Error));
 
@@ -700,7 +700,7 @@ sub _untar_at {
     ### only tell it it's compressed if it's a .tgz, as we give it a file
     ### handle if it's a .tbz
     unless( $tar->read( $fh_to_read, ( $self->is_tgz ? 1 : 0 ) ) ) {
-        return $self->_error(loc("Unable to read '%1': %2", $self->archive,
+        return $self->_error(loc("Unable to read '\%1': \%2", $self->archive,
                                     $Archive::Tar::error));
     }
 
@@ -722,7 +722,7 @@ sub _untar_at {
         ### older archive::tar always returns $self, return value slightly
         ### fux0r3d because of it.
         $tar->extract()
-            or return $self->_error(loc("Unable to extract '%1': %2",
+            or return $self->_error(loc("Unable to extract '\%1': \%2",
                                     $self->archive, $Archive::Tar::error ));
     }
 
@@ -739,7 +739,7 @@ sub _untar_at {
     return 1 if -d $self->extract_path;
 
     ### no dir, we failed ###
-    return $self->_error(loc("Unable to extract '%1': %2",
+    return $self->_error(loc("Unable to extract '\%1': \%2",
                                 $self->archive, $Archive::Tar::error ));
 }
 
@@ -761,19 +761,19 @@ sub _gunzip {
         $self->_extractor($method) && return 1 if $self->?$method();
     }
 
-    return $self->_error(loc("Unable to gunzip file '%1'", $self->archive));
+    return $self->_error(loc("Unable to gunzip file '\%1'", $self->archive));
 }
 
 sub _gunzip_bin {
     my $self = shift;
 
     ### check for /bin/gzip -- we need it ###
-    return $self->_error(loc("No '%1' program found", '/bin/gzip'))
+    return $self->_error(loc("No '\%1' program found", '/bin/gzip'))
         unless $self->bin_gzip;
 
 
     my $fh = FileHandle->new($self->_gunzip_to, '>') or
-        return $self->_error(loc("Could not open '%1' for writing: %2",
+        return $self->_error(loc("Could not open '\%1' for writing: \%2",
                             $self->_gunzip_to, $! ));
 
     my $cmd = [ $self->bin_gzip, '-cdf', $self->archive ];
@@ -783,7 +783,7 @@ sub _gunzip_bin {
                         verbose => $DEBUG,
                         buffer  => \$buffer )
     ) {
-        return $self->_error(loc("Unable to gunzip '%1': %2",
+        return $self->_error(loc("Unable to gunzip '\%1': \%2",
                                     $self->archive, $buffer));
     }
 
@@ -808,16 +808,16 @@ sub _gunzip_cz {
 
     my $use_list = { 'Compress::Zlib' => '0.0' };
     unless( can_load( modules => $use_list ) ) {
-        return $self->_error(loc("You do not have '%1' installed - Please " .
+        return $self->_error(loc("You do not have '\%1' installed - Please " .
                         "install it as soon as possible.", 'Compress::Zlib'));
     }
 
     my $gz = Compress::Zlib::gzopen( $self->archive, "rb" ) or
-                return $self->_error(loc("Unable to open '%1': %2",
+                return $self->_error(loc("Unable to open '\%1': \%2",
                             $self->archive, $Compress::Zlib::gzerrno));
 
     my $fh = FileHandle->new($self->_gunzip_to, ">") or
-        return $self->_error(loc("Could not open '%1' for writing: %2",
+        return $self->_error(loc("Could not open '\%1' for writing: \%2",
                             $self->_gunzip_to, $! ));
 
     my $buffer;
@@ -850,19 +850,19 @@ sub _uncompress {
         $self->_extractor($method) && return 1 if $self->?$method();
     }
 
-    return $self->_error(loc("Unable to untar file '%1'", $self->archive));
+    return $self->_error(loc("Unable to untar file '\%1'", $self->archive));
 }
 
 sub _uncompress_bin {
     my $self = shift;
 
     ### check for /bin/gzip -- we need it ###
-    return $self->_error(loc("No '%1' program found", '/bin/uncompress'))
+    return $self->_error(loc("No '\%1' program found", '/bin/uncompress'))
         unless $self->bin_uncompress;
 
 
     my $fh = FileHandle->new($self->_gunzip_to, '>') or
-        return $self->_error(loc("Could not open '%1' for writing: %2",
+        return $self->_error(loc("Could not open '\%1' for writing: \%2",
                             $self->_gunzip_to, $! ));
 
     my $cmd = [ $self->bin_uncompress, '-c', $self->archive ];
@@ -872,7 +872,7 @@ sub _uncompress_bin {
                         verbose => $DEBUG,
                         buffer  => \$buffer )
     ) {
-        return $self->_error(loc("Unable to uncompress '%1': %2",
+        return $self->_error(loc("Unable to uncompress '\%1': \%2",
                                     $self->archive, $buffer));
     }
 
@@ -911,14 +911,14 @@ sub _unzip {
         $self->_extractor($method) && return 1 if $self->?$method();
     }
 
-    return $self->_error(loc("Unable to gunzip file '%1'", $self->archive));
+    return $self->_error(loc("Unable to gunzip file '\%1'", $self->archive));
 }
 
 sub _unzip_bin {
     my $self = shift;
 
     ### check for /bin/gzip if we need it ###
-    return $self->_error(loc("No '%1' program found", '/bin/unzip'))
+    return $self->_error(loc("No '\%1' program found", '/bin/unzip'))
         unless $self->bin_unzip;
 
 
@@ -934,7 +934,7 @@ sub _unzip_bin {
                             verbose => $DEBUG,
                             buffer  => \$buffer )
         ) {
-            return $self->_error(loc("Unable to unzip '%1': %2",
+            return $self->_error(loc("Unable to unzip '\%1': \%2",
                                         $self->archive, $buffer));
         }
 
@@ -955,7 +955,7 @@ sub _unzip_bin {
                             verbose => $DEBUG,
                             buffer  => \$buffer )
         ) {
-            return $self->_error(loc("Unable to unzip '%1': %2",
+            return $self->_error(loc("Unable to unzip '\%1': \%2",
                                         $self->archive, $buffer));
         }
 
@@ -975,14 +975,14 @@ sub _unzip_az {
 
     my $use_list = { 'Archive::Zip' => '0.0' };
     unless( can_load( modules => $use_list ) ) {
-        return $self->_error(loc("You do not have '%1' installed - Please " .
+        return $self->_error(loc("You do not have '\%1' installed - Please " .
                         "install it as soon as possible.", 'Archive::Zip'));
     }
 
     my $zip = Archive::Zip->new();
 
     unless( $zip->read( $self->archive ) == &Archive::Zip::AZ_OK ) {
-        return $self->_error(loc("Unable to read '%1'", $self->archive));
+        return $self->_error(loc("Unable to read '\%1'", $self->archive));
     }
 
     my @files;
@@ -991,7 +991,7 @@ sub _unzip_az {
         push @files, $member->{fileName};
 
         unless( $zip->extractMember($member) == &Archive::Zip::AZ_OK ) {
-            return $self->_error(loc("Extraction of '%1' from '%2' failed",
+            return $self->_error(loc("Extraction of '\%1' from '\%2' failed",
                         $member->{fileName}, $self->archive ));
         }
     }
@@ -1063,26 +1063,26 @@ sub _bunzip2 {
         $self->_extractor($method) && return 1 if $self->?$method();
     }
 
-    return $self->_error(loc("Unable to bunzip2 file '%1'", $self->archive));
+    return $self->_error(loc("Unable to bunzip2 file '\%1'", $self->archive));
 }
 
 sub _bunzip2_bin {
     my $self = shift;
 
     ### check for /bin/gzip -- we need it ###
-    return $self->_error(loc("No '%1' program found", '/bin/bunzip2'))
+    return $self->_error(loc("No '\%1' program found", '/bin/bunzip2'))
         unless $self->bin_bunzip2;
 
 
     my $fh = FileHandle->new($self->_gunzip_to, '>') or
-        return $self->_error(loc("Could not open '%1' for writing: %2",
+        return $self->_error(loc("Could not open '\%1' for writing: \%2",
                             $self->_gunzip_to, $! ));
     
     ### guard against broken bunzip2. See ->have_old_bunzip2()
     ### for details
     if( $self->have_old_bunzip2 and $self->archive !~ m/\.bz2$/i ) {
         return $self->_error(loc("Your bunzip2 version is too old and ".
-                                 "can only extract files ending in '%1'",
+                                 "can only extract files ending in '\%1'",
                                  '.bz2'));
     }
 
@@ -1093,7 +1093,7 @@ sub _bunzip2_bin {
                         verbose => $DEBUG,
                         buffer  => \$buffer )
     ) {
-        return $self->_error(loc("Unable to bunzip2 '%1': %2",
+        return $self->_error(loc("Unable to bunzip2 '\%1': \%2",
                                     $self->archive, $buffer));
     }
 
@@ -1150,13 +1150,13 @@ sub _bunzip2_cz2 {
 
     my $use_list = { 'IO::Uncompress::Bunzip2' => '0.0' };
     unless( can_load( modules => $use_list ) ) {
-        return $self->_error(loc("You do not have '%1' installed - Please " .
+        return $self->_error(loc("You do not have '\%1' installed - Please " .
                         "install it as soon as possible.",
                         'IO::Uncompress::Bunzip2'));
     }
 
     IO::Uncompress::Bunzip2::bunzip2($self->archive => $self->_gunzip_to)
-        or return $self->_error(loc("Unable to uncompress '%1': %2",
+        or return $self->_error(loc("Unable to uncompress '\%1': \%2",
                             $self->archive,
                             $IO::Uncompress::Bunzip2::Bunzip2Error));
 
@@ -1186,18 +1186,18 @@ sub _unlzma {
         $self->_extractor($method) && return 1 if $self->?$method();
     }
 
-    return $self->_error(loc("Unable to unlzma file '%1'", $self->archive));
+    return $self->_error(loc("Unable to unlzma file '\%1'", $self->archive));
 }
 
 sub _unlzma_bin {
     my $self = shift;
 
     ### check for /bin/unlzma -- we need it ###
-    return $self->_error(loc("No '%1' program found", '/bin/unlzma'))
+    return $self->_error(loc("No '\%1' program found", '/bin/unlzma'))
         unless $self->bin_unlzma;
 
     my $fh = FileHandle->new($self->_gunzip_to, '>') or
-        return $self->_error(loc("Could not open '%1' for writing: %2",
+        return $self->_error(loc("Could not open '\%1' for writing: \%2",
                             $self->_gunzip_to, $! ));
 
     my $cmd = [ $self->bin_unlzma, '-c', $self->archive ];
@@ -1207,7 +1207,7 @@ sub _unlzma_bin {
                         verbose => $DEBUG,
                         buffer  => \$buffer )
     ) {
-        return $self->_error(loc("Unable to unlzma '%1': %2",
+        return $self->_error(loc("Unable to unlzma '\%1': \%2",
                                     $self->archive, $buffer));
     }
 
@@ -1232,18 +1232,18 @@ sub _unlzma_cz {
 
     my $use_list = { 'Compress::unLZMA' => '0.0' };
     unless( can_load( modules => $use_list ) ) {
-        return $self->_error(loc("You do not have '%1' installed - Please " .
+        return $self->_error(loc("You do not have '\%1' installed - Please " .
                        "install it as soon as possible.", 'Compress::unLZMA'));
     }
 
     my $fh = FileHandle->new('>'. $self->_gunzip_to) or
-        return $self->_error(loc("Could not open '%1' for writing: %2",
+        return $self->_error(loc("Could not open '\%1' for writing: \%2",
                             $self->_gunzip_to, $! ));
 
     my $buffer;
     $buffer = Compress::unLZMA::uncompressfile( $self->archive );
     unless ( defined $buffer ) {
-        return $self->_error(loc("Could not unlzma '%1': %2",
+        return $self->_error(loc("Could not unlzma '\%1': \%2",
                                     $self->archive, $@));
     }
 
@@ -1289,13 +1289,13 @@ sub _no_buffer_files {
     my $self = shift;
     my $file = shift or return;
     return loc("No buffer captured, unable to tell ".
-               "extracted files or extraction dir for '%1'", $file);
+               "extracted files or extraction dir for '\%1'", $file);
 }
 
 sub _no_buffer_content {
     my $self = shift;
     my $file = shift or return;
-    return loc("No buffer captured, unable to get content for '%1'", $file);
+    return loc("No buffer captured, unable to get content for '\%1'", $file);
 }
 1;
 

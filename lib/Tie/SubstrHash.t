@@ -17,42 +17,42 @@ my %a;
 
 tie %a, 'Tie::SubstrHash', 3, 3, 3;
 
-$a{abc} = 123;
-$a{bcd} = 234;
+%a{abc} = 123;
+%a{bcd} = 234;
 
-print "not " unless $a{abc} == 123;
+print "not " unless %a{abc} == 123;
 print "ok 1\n";
 
 print "not " unless keys %a == 2;
 print "ok 2\n";
 
-delete $a{abc};
+delete %a{abc};
 
-print "not " unless $a{bcd} == 234;
+print "not " unless %a{bcd} == 234;
 print "ok 3\n";
 
-print "not " unless (values %a)[0] == 234;
+print "not " unless (values %a)[[0]] == 234;
 print "ok 4\n";
 
-eval { $a{abcd} = 123 };
-print "not " unless $@->{description} =~ m/Key "abcd" is not 3 characters long/;
+eval { %a{abcd} = 123 };
+print "not " unless $@ && $@->{description} =~ m/Key "abcd" is not 3 characters long/;
 print "ok 5\n";
 
-eval { $a{abc} = 1234 };
-print "not " unless $@->{description} =~ m/Value "1234" is not 3 characters long/;
+eval { %a{abc} = 1234 };
+print "not " unless $@ && $@->{description} =~ m/Value "1234" is not 3 characters long/;
 print "ok 6\n";
 
-eval { $a = $a{abcd}; $a++  };
-print "not " unless $@->{description} =~ m/Key "abcd" is not 3 characters long/;
+eval { $a = %a{abcd}; $a++  };
+print "not " unless $@ && $@->{description} =~ m/Key "abcd" is not 3 characters long/;
 print "ok 7\n";
 
-@a{qw(abc cde)} = qw(123 345); 
+%a{[qw(abc cde)]} = qw(123 345); 
 
-print "not " unless $a{cde} == 345;
+print "not " unless %a{cde} == 345;
 print "ok 8\n";
 
-eval { $a{def} = 456 };
-print "not " unless $@->{description} =~ m/Table is full \(3 elements\)/;
+eval { %a{def} = 456 };
+print "not " unless $@ && $@->{description} =~ m/Table is full \(3 elements\)/;
 print "ok 9\n";
 
 %a = ();
@@ -69,13 +69,13 @@ tie %test, "Tie::SubstrHash", 13, 86, $hashsize;
 for (my $i = 1; $i +<= $hashsize; $i++) {
         my $key1 = $i + 100_000;           # fix to uniform 6-digit numbers
         my $key2 = "abcdefg$key1";
-        $test{$key2} = ("abcdefgh" x 10) . "$key1";
+        %test{$key2} = ("abcdefgh" x 10) . "$key1";
 }
 
 for (my $i = 1; $i +<= $hashsize; $i++) {
         my $key1 = $i + 100_000;
         my $key2 = "abcdefg$key1";
-	unless ($test{$key2}) {
+	unless (%test{$key2}) {
 		print "not ";
 		last;
 	}

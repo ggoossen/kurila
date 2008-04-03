@@ -20,7 +20,7 @@ use Exporter;
 #use Cwd qw(abs_path);
 
 use vars qw($MYPKG @EXPORT @ISA);
-$MYPKG = eval { (caller)[0] };
+$MYPKG = eval { (caller)[[0]] };
 @EXPORT = qw(&testpodplaintext);
 BEGIN {
     require Pod::PlainText;
@@ -30,7 +30,7 @@ BEGIN {
 
 ## Hardcode settings for TERMCAP and COLUMNS so we can try to get
 ## reproducible results between environments
-@ENV{qw(TERMCAP COLUMNS)} = ('co=76:do=^J', 76);
+%ENV{[qw(TERMCAP COLUMNS)]} = ('co=76:do=^J', 76);
 
 sub catfile(@) { 'File::Spec'->catfile(@_); }
 
@@ -95,7 +95,7 @@ sub command {
 }
 
 sub begin_input {
-   $_[0]->{_INFILE} = VMS::Filespec::unixify($_[0]->{_INFILE}) if $^O eq 'VMS';
+   @_[0]->{_INFILE} = VMS::Filespec::unixify(@_[0]->{_INFILE}) if $^O eq 'VMS';
 }
 
 sub podinc2plaintext( $ $ ) {
@@ -107,9 +107,9 @@ sub podinc2plaintext( $ $ ) {
 
 sub testpodinc2plaintext( @ ) {
    my %args = @_;
-   my $infile  = $args{'-In'}  || die "No input file given!";
-   my $outfile = $args{'-Out'} || die "No output file given!";
-   my $cmpfile = $args{'-Cmp'} || die "No compare-result file given!";
+   my $infile  = %args{'-In'}  || die "No input file given!";
+   my $outfile = %args{'-Out'} || die "No output file given!";
+   my $cmpfile = %args{'-Cmp'} || die "No compare-result file given!";
 
    my $different = '';
    my $testname = basename $cmpfile, '.t', '.xr';
@@ -133,7 +133,7 @@ sub testpodinc2plaintext( @ ) {
 }
 
 sub testpodplaintext( @ ) {
-   my %opts = (ref $_[0] eq 'HASH') ? %{shift()} : ();
+   my %opts = (ref @_[0] eq 'HASH') ? %{shift()} : ();
    my @testpods = @_;
    my ($testname, $testdir) = ("", "");
    my ($podfile, $cmpfile) = ("", "");
@@ -142,7 +142,7 @@ sub testpodplaintext( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar @testpods, "\n"  unless ($opts{'-xrgen'});
+   print "1..", scalar @testpods, "\n"  unless (%opts{'-xrgen'});
 
    for $podfile (@testpods) {
       ($testname, $_) = fileparse($podfile);
@@ -151,8 +151,8 @@ sub testpodplaintext( @ ) {
       $cmpfile   =  $testdir . $testname . '.xr';
       $outfile   =  $testdir . $testname . '.OUT';
 
-      if ($opts{'-xrgen'}) {
-          if ($opts{'-force'} or ! -e $cmpfile) {
+      if (%opts{'-xrgen'}) {
+          if (%opts{'-force'} or ! -e $cmpfile) {
              ## Create the comparison file
              print "# Creating expected result for \"$testname\"" .
                    " pod2plaintext test ...\n";

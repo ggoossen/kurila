@@ -48,7 +48,7 @@ is(A->d, "D::d");		# Update hash table;
 {
     local @A::ISA = qw(C);	# Update hash table with split() assignment
     is(A->d, "C::d");
-    $#A::ISA = -1;
+    @A::ISA = 0;
     is(eval { A->d } || "fail", "fail");
 }
 is(A->d, "D::d");
@@ -71,20 +71,20 @@ is(A->d, "B::d2");		# Update hash table;
 # after `delete $B::{d}; sub B::d {}' would reach an old subroutine.
 
 undef &B::d;
-delete $B::{d};
+delete %B::{d};
 is(A->d, "C::d");		# Update hash table;
 
 eval 'sub B::d {"B::d3"}';	# Import now.
 is(A->d, "B::d3");		# Update hash table;
 
-delete $B::{d};
+delete %B::{d};
 *dummy::dummy = sub {};		# Mark as updated
 is(A->d, "C::d");
 
 eval 'sub B::d {"B::d4"}';	# Import now.
 is(A->d, "B::d4");		# Update hash table;
 
-delete $B::{d};			# Should work without any help too
+delete %B::{d};			# Should work without any help too
 is(A->d, "C::d");
 
 {
@@ -149,26 +149,26 @@ is(do { eval '$e = bless {}, "UNIVERSAL"; $e->E::F::foo()';
 # TODO: we need some tests for the SUPER:: pseudoclass
 
 # failed method call or UNIVERSAL::can() should not autovivify packages
-is( $::{"Foo::"} || "none", "none");  # sanity check 1
-is( $::{"Foo::"} || "none", "none");  # sanity check 2
+is( %::{"Foo::"} || "none", "none");  # sanity check 1
+is( %::{"Foo::"} || "none", "none");  # sanity check 2
 
 is( UNIVERSAL::can("Foo", "boogie") ? "yes":"no", "no" );
-is( $::{"Foo::"} || "none", "none");  # still missing?
+is( %::{"Foo::"} || "none", "none");  # still missing?
 
 is( Foo->UNIVERSAL::can("boogie")   ? "yes":"no", "no" );
-is( $::{"Foo::"} || "none", "none");  # still missing?
+is( %::{"Foo::"} || "none", "none");  # still missing?
 
 is( Foo->can("boogie")              ? "yes":"no", "no" );
-is( $::{"Foo::"} || "none", "none");  # still missing?
+is( %::{"Foo::"} || "none", "none");  # still missing?
 
 is( eval 'Foo->boogie(); 1'         ? "yes":"no", "no" );
-is( $::{"Foo::"} || "none", "none");  # still missing?
+is( %::{"Foo::"} || "none", "none");  # still missing?
 
 is(do { eval 'Foo->boogie()';
 	  $@->message =~ m/^\QCan't locate object method "boogie" via package "Foo" (perhaps / ? 1 : $@}, 1);
 
 eval 'sub Foo::boogie { "yes, sir!" }';
-is( $::{"Foo::"} ? "ok" : "none", "ok");  # should exist now
+is( %::{"Foo::"} ? "ok" : "none", "ok");  # should exist now
 is( Foo->boogie(), "yes, sir!");
 
 # TODO: universal.t should test NoSuchPackage->isa()/can()
@@ -185,7 +185,7 @@ package Bminor;
 use base qw(Amajor);
 package main;
 sub Bminor::test {
-    $_[0]->Bminor::SUPER::test('x', 'y');
+    @_[0]->Bminor::SUPER::test('x', 'y');
     push @main::X, 'Bminor', @_;
 }
 Bminor->test('y', 'z');

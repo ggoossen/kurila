@@ -9,7 +9,7 @@ $VERSION = eval $VERSION;
 
 BEGIN {
     use Config;
-    if (! $Config{useithreads}) {
+    if (! %Config{useithreads}) {
         die("This Perl not built to support threads\n");
     }
 }

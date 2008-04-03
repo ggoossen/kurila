@@ -5,11 +5,11 @@
 our $warn;
 BEGIN {
     $warn = "";
-    ${^WARN_HOOK} = sub { $warn .= $_[0]->message }
+    ${^WARN_HOOK} = sub { $warn .= @_[0]->message }
 }
 
 sub ok ($$) { 
-    print $_[1] ? "ok " : "not ok ", $_[0], "\n";
+    print @_[1] ? "ok " : "not ok ", @_[0], "\n";
 }
 
 print "1..20\n";

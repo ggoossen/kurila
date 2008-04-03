@@ -1,5 +1,5 @@
 BEGIN {				# Magic Perl CORE pragma
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -8,7 +8,7 @@ BEGIN {				# Magic Perl CORE pragma
         exit 0;
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m!\bPerlIO/via\b!) ){
+    if ((%Config::Config{'extensions'} !~ m!\bPerlIO/via\b!) ){
         print "1..0 # Skip -- Perl configured without PerlIO::via module\n";
         exit 0;
     }

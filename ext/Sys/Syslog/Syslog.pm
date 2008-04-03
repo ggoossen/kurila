@@ -50,12 +50,12 @@ require Exporter;
     );
 
     @EXPORT = (
-        @{$EXPORT_TAGS{standard}}, 
+        @{%EXPORT_TAGS{standard}}, 
     );
 
     @EXPORT_OK = (
-        @{$EXPORT_TAGS{extended}}, 
-        @{$EXPORT_TAGS{macros}}, 
+        @{%EXPORT_TAGS{extended}}, 
+        @{%EXPORT_TAGS{macros}}, 
     );
 
     eval {
@@ -117,7 +117,7 @@ my @defaultMethods = @connectMethods;
 my @fallbackMethods = ();
 
 # coderef for a nicer handling of errors
-my $err_sub = $options{nofatal} ? \&warnings::warnif : \&croak;
+my $err_sub = %options{nofatal} ? \&warnings::warnif : \&croak;
 
 
 sub openlog {
@@ -129,11 +129,11 @@ sub openlog {
     $facility ||= LOG_USER();
 
     for my $opt (split m/\b/, $logopt) {
-        $options{$opt} = 1 if exists $options{$opt}
+        %options{$opt} = 1 if exists %options{$opt}
     }
 
-    $err_sub = $options{nofatal} ? \&warnings::warnif : \&croak;
-    return 1 unless $options{ndelay};
+    $err_sub = %options{nofatal} ? \&warnings::warnif : \&croak;
+    return 1 unless %options{ndelay};
     connect_log();
 } 
 
@@ -144,7 +144,7 @@ sub closelog {
 
 sub setlogmask {
     my $oldmask = $maskpri;
-    $maskpri = shift unless $_[0] == 0;
+    $maskpri = shift unless @_[0] == 0;
     $oldmask;
 }
  
@@ -299,11 +299,11 @@ sub syslog {
 
     connect_log() unless $connected;
 
-    if ($mask =~ m/%m/) {
+    if ($mask =~ m/\%m/) {
         # escape percent signs for sprintf()
-        $error =~ s/%/%%/g if @_;
+        $error =~ s/%/\%\%/g if @_;
         # replace %m with $error, if preceded by an even number of percent signs
-        $mask =~ s/(?<!%)((?:%%)*)%m/$1$error/g;
+        $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g;
     }
 
     $mask .= "\n" unless $mask =~ m/\n$/;
@@ -321,12 +321,12 @@ sub syslog {
     }
     else {
         my $whoami = $ident;
-        $whoami .= "[$$]" if $options{pid};
+        $whoami .= "[$$]" if %options{pid};
 
         $sum = $numpri + $numfac;
         my $oldlocale = setlocale(LC_TIME);
         setlocale(LC_TIME, 'C');
-        my $timestamp = strftime "%b %e %T", localtime;
+        my $timestamp = strftime "\%b \%e \%T", localtime;
         setlocale(LC_TIME, $oldlocale);
         $buf = "<$sum>$timestamp $whoami: $message\0";
     }
@@ -378,7 +378,7 @@ sub _syslog_send_console {
     # to the caller.
     if (my $pid = fork) {
 
-	if ($options{nowait}) {
+	if (%options{nowait}) {
 	    return 1;
 	} else {
 	    if (waitpid($pid, 0) +>= 0) {
@@ -659,7 +659,7 @@ sub connect_native {
 
     # reconstruct the numeric equivalent of the options
     for my $opt (keys %options) {
-        $logopt += xlate($opt) if $options{$opt}
+        $logopt += xlate($opt) if %options{$opt}
     }
 
     eval { openlog_xs($ident, $logopt, xlate($facility)) };

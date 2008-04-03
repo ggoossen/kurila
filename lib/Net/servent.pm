@@ -25,10 +25,10 @@ struct 'Net::servent' => [
 sub populate (@) {
     return unless @_;
     my $sob = new();
-    $s_name 	 =    $sob->[0]     	     = $_[0];
-    @s_aliases	 = @{ $sob->[1] } = split ' ', $_[1];
-    $s_port	 =    $sob->[2] 	     = $_[2];
-    $s_proto	 =    $sob->[3] 	     = $_[3];
+    $s_name 	 =    $sob->[0]     	     = @_[0];
+    @s_aliases	 = @{ $sob->[1] } = split ' ', @_[1];
+    $s_port	 =    $sob->[2] 	     = @_[2];
+    $s_proto	 =    $sob->[3] 	     = @_[3];
     return $sob;
 }
 
@@ -38,7 +38,7 @@ sub getservbyport ($;$) { populate(CORE::getservbyport(shift,shift||'tcp')) }
 
 sub getserv ($;$) {
     no strict 'refs';
-    return &{'getservby' . ($_[0]=~m/^\d+$/ ? 'port' : 'name')}(@_);
+    return &{'getservby' . (@_[0]=~m/^\d+$/ ? 'port' : 'name')}(@_);
 }
 
 1;

@@ -28,22 +28,22 @@ sub new {
 
 sub _handle_element_start {
   # ($self, $element_name, $attr_hash_r)
-  my $fh = $_[0]{'output_fh'};
+  my $fh = @_[0]{'output_fh'};
   my($key, $value);
-  DEBUG and print "++ $_[1]\n";
-  print $fh "<", $_[1];
+  DEBUG and print "++ @_[1]\n";
+  print $fh "<", @_[1];
   if($SORT_ATTRS) {
-    foreach my $key (sort keys %{$_[2]}) {
+    foreach my $key (sort keys %{@_[2]}) {
       unless($key =~ m/^~/s) {
-        next if $key eq 'start_line' and $_[0]{'hide_line_numbers'};
-        _xml_escape($value = $_[2]{$key});
+        next if $key eq 'start_line' and @_[0]{'hide_line_numbers'};
+        _xml_escape($value = @_[2]{$key});
         print $fh $ATTR_PAD, $key, '="', $value, '"';
       }
     }
   } else { # faster
-    while(($key,$value) = each %{$_[2]}) {
+    while(($key,$value) = each %{@_[2]}) {
       unless($key =~ m/^~/s) {
-        next if $key eq 'start_line' and $_[0]{'hide_line_numbers'};
+        next if $key eq 'start_line' and @_[0]{'hide_line_numbers'};
         _xml_escape($value);
         print $fh $ATTR_PAD, $key, '="', $value, '"';
       }
@@ -54,18 +54,18 @@ sub _handle_element_start {
 }
 
 sub _handle_text {
-  DEBUG and print "== \"$_[1]\"\n";
-  if(length $_[1]) {
-    my $text = $_[1];
+  DEBUG and print "== \"@_[1]\"\n";
+  if(length @_[1]) {
+    my $text = @_[1];
     _xml_escape($text);
-    print {$_[0]{'output_fh'}} $text;
+    print {@_[0]{'output_fh'}} $text;
   }
   return;
 }
 
 sub _handle_element_end {
-  DEBUG and print "-- $_[1]\n";
-  print {$_[0]{'output_fh'}} "</", $_[1], ">";
+  DEBUG and print "-- @_[1]\n";
+  print {@_[0]{'output_fh'}} "</", @_[1], ">";
   return;
 }
 

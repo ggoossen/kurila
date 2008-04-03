@@ -44,11 +44,11 @@ like( $warn, qr/Unknown PerlIO layer/,
 
 # see if it sets the magic variables appropriately
 import( 'IN', ':crlf' );
-is( $^H{'open_IN'}, 'crlf', 'should have set crlf layer' );
+is( %^H{'open_IN'}, 'crlf', 'should have set crlf layer' );
 
 # it should reset them appropriately, too
 import( 'IN', ':raw' );
-is( $^H{'open_IN'}, 'raw', 'should have reset to raw layer' );
+is( %^H{'open_IN'}, 'raw', 'should have reset to raw layer' );
 
 # it dies if you don't set IN, OUT, or IO
 eval { import( 'sideways', ':raw' ) };
@@ -58,7 +58,7 @@ like( $@->{description}, qr/Unknown PerlIO layer class/, 'should croak with unkn
 import( 'IO', ':raw :crlf' );
 is( ${^OPEN}, ":raw :crlf\0:raw :crlf",
 	'should set multi types, multi layer' );
-is( $^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
+is( %^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
 SKIP: {
     skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));
@@ -83,7 +83,7 @@ EOE
 
     sub systell {
         use Fcntl 'SEEK_CUR';
-        sysseek($_[0], 0, SEEK_CUR);
+        sysseek(@_[0], 0, SEEK_CUR);
     }
 
     require bytes; # not use
@@ -145,7 +145,7 @@ EOE
 	$ok = $a = 0;
 	for (@a) {
 	    unless (
-		    ($c = $actions{$key}($_)) == 1 &&
+		    ($c = %actions{$key}($_)) == 1 &&
 		    systell('G')                == ($a += bytes::length($_))
 		   ) {
 		diagnostics();

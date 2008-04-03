@@ -35,7 +35,7 @@ sub _expansion {
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg in $&"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my ($if,$el) = ($1,$2);
-        if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
             return $if
         }
         else {
@@ -44,7 +44,7 @@ sub _expansion {
     }
     else {
         # #if;#endif
-        if (($op eq 'eq' and ($^O eq $os || $Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || $Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
             return $expr
         }
         else {
@@ -95,7 +95,7 @@ use Config;
 
 # enable debug/trace messages from DynaLoader perl code
 our $dl_debug;
-$dl_debug = $ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
+$dl_debug = %ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
 
 #
 # Flags to alter dl_load_file behaviour.  Assigned bits:
@@ -112,15 +112,15 @@ sub dl_load_flags { 0x00 }
 
 EOT
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (",
-              to_string($Config{'dlext'}), ",",
-              to_string($Config{'so'}), ",",
-              to_string($Config{'dlsrc'}), ")\n;" ;
+              to_string(%Config{'dlext'}), ",",
+              to_string(%Config{'so'}), ",",
+              to_string(%Config{'dlsrc'}), ")\n;" ;
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = @Config::Config{qw(dlext so dlsrc)};
+our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[qw(dlext so dlsrc)]};
 EOT
 }
 
@@ -155,7 +155,7 @@ our @dl_modules;              # Modules we have loaded
 EOT
 
 my $cfg_dl_library_path = <<'EOT';
-push(@dl_library_path, split(' ', $Config::Config{libpth}));
+push(@dl_library_path, split(' ', %Config::Config{libpth}));
 EOT
 
 sub dquoted_comma_list {
@@ -164,12 +164,12 @@ sub dquoted_comma_list {
 
 our @dl_library_path;
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     eval $cfg_dl_library_path;
-    if (!$ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
+    if (!%ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
         my $dl_library_path = dquoted_comma_list(@dl_library_path);
         print OUT <<EOT;
-# The below \@dl_library_path has been expanded (%Config) in Perl build time.
+# The below \@dl_library_path has been expanded (\%Config) in Perl build time.
 
 \@dl_library_path = ($dl_library_path);
 
@@ -190,15 +190,15 @@ my $ldlibpthname;
 my $ldlibpthname_defined;
 my $pthsep;
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
-    $ldlibpthname         = to_string($Config::Config{ldlibpthname});
-    $ldlibpthname_defined = to_string(defined $Config::Config{ldlibpthname} ? 1 : 0);
-    $pthsep               = to_string($Config::Config{path_sep});
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+    $ldlibpthname         = to_string(%Config::Config{ldlibpthname});
+    $ldlibpthname_defined = to_string(defined %Config::Config{ldlibpthname} ? 1 : 0);
+    $pthsep               = to_string(%Config::Config{path_sep});
 }
 else {
-    $ldlibpthname         = q($Config::Config{ldlibpthname});
-    $ldlibpthname_defined = q(defined $Config::Config{ldlibpthname});
-    $pthsep               = q($Config::Config{path_sep});
+    $ldlibpthname         = q(%Config::Config{ldlibpthname});
+    $ldlibpthname_defined = q(defined %Config::Config{ldlibpthname});
+    $pthsep               = q(%Config::Config{path_sep});
 }
 print OUT <<EOT;
 my \$ldlibpthname         = $ldlibpthname;
@@ -209,20 +209,20 @@ EOT
 
 my $env_dl_library_path = <<'EOT';
 if ($ldlibpthname_defined &&
-    exists $ENV{$ldlibpthname}) {
-    push(@dl_library_path, split(m/$pthsep/, $ENV{$ldlibpthname}));
+    exists %ENV{$ldlibpthname}) {
+    push(@dl_library_path, split(m/$pthsep/, %ENV{$ldlibpthname}));
 }
 
 # E.g. HP-UX supports both its native SHLIB_PATH *and* LD_LIBRARY_PATH.
 
 if ($ldlibpthname_defined &&
     $ldlibpthname ne 'LD_LIBRARY_PATH' &&
-    exists $ENV{LD_LIBRARY_PATH}) {
-    push(@dl_library_path, split(m/$pthsep/, $ENV{LD_LIBRARY_PATH}));
+    exists %ENV{LD_LIBRARY_PATH}) {
+    push(@dl_library_path, split(m/$pthsep/, %ENV{LD_LIBRARY_PATH}));
 }
 EOT
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && $ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && %ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
     eval $env_dl_library_path;
 }
 else {
@@ -235,10 +235,10 @@ $env_dl_library_path
 EOT
 }
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && $ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && %ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
     my $dl_library_path = dquoted_comma_list(@dl_library_path);
     print OUT <<EOT;
-# The below \@dl_library_path has been expanded (%Config, %ENV)
+# The below \@dl_library_path has been expanded (\%Config, \%ENV)
 # in Perl build time.
 
 \@dl_library_path = ($dl_library_path);
@@ -263,13 +263,11 @@ if ($dl_debug) {
 1; # End of main code
 
 
-sub croak   { require Carp; Carp::croak(@_)   }
-
 use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
             @do_expand);
 
 sub bootstrap_inherit {
-    my $module = $_[0];
+    my $module = @_[0];
     local *isa = *{Symbol::fetch_glob("$module\::ISA")};
     local @isa = (@isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
@@ -282,17 +280,16 @@ sub bootstrap_inherit {
 sub bootstrap {
     # use local vars to enable $module.bs script to edit values
     local(@args) = @_;
-    local($module) = $args[0];
+    local($module) = @args[0];
     local(@dirs, $file);
 
     unless ($module) {
-	require Carp;
-	Carp::confess("Usage: DynaLoader::bootstrap(module)");
+	die("Usage: DynaLoader::bootstrap(module)");
     }
 
     # A common error on platforms which don't support dynamic loading.
     # Since it's fatal and potentially confusing we give a detailed message.
-    croak("Can't load module $module, dynamic loading not available in this perl.\n".
+    die("Can't load module $module, dynamic loading not available in this perl.\n".
 	"  (You may need to build a new perl executable which either supports\n".
 	"  dynamic loading or has the $module module statically linked into it.)\n")
 	unless defined(&dl_load_file);
@@ -304,7 +301,7 @@ sub bootstrap {
 
     <</$^O-eq-os2>>
     my @modparts = split(m/::/,$module);
-    my $modfname = $modparts[-1];
+    my $modfname = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
@@ -352,10 +349,10 @@ sub bootstrap {
     # last resort, let dl_findfile have a go in all known locations
     $file = dl_findfile(map("-L$_",@dirs,@INC), $modfname) unless $file;
 
-    croak("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
+    die("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
 	unless $file;	# wording similar to error from 'require'
 
-    <<$^O-eq-VMS>>$file = uc($file) if $Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>
+    <<$^O-eq-VMS>>$file = uc($file) if %Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
     @dl_require_symbols = ($bootname);
@@ -387,18 +384,17 @@ sub bootstrap {
     # it executed.
 
     my $libref = dl_load_file($file, $module->dl_load_flags) or
-	croak("Can't load '$file' for module $module: ".dl_error());
+	die("Can't load '$file' for module $module: ".dl_error());
 
     push(@dl_librefs,$libref);  # record loaded object
 
     my @unresolved = dl_undef_symbols();
     if (@unresolved) {
-	require Carp;
-	Carp::carp("Undefined symbols present after loading $file: @unresolved\n");
+	die("Undefined symbols present after loading $file: @unresolved\n");
     }
 
     $boot_symbol_ref = dl_find_symbol($libref, $bootname) or
-         croak("Can't find '$bootname' symbol in $file\n");
+         die("Can't find '$bootname' symbol in $file\n");
 
     push(@dl_modules, $module); # record loaded module
 
@@ -429,8 +425,8 @@ sub dl_findfile {
     my (@args) = @_;
     my (@dirs,  $dir);   # which directories to search
     my (@found);         # full paths to real files we have found
-    #my $dl_ext= <<=to_string($Config::Config{'dlext'})>>; # $Config::Config{'dlext'} suffix for perl extensions
-    #my $dl_so = <<=to_string($Config::Config{'so'})>>; # $Config::Config{'so'} suffix for shared libraries
+    #my $dl_ext= <<=to_string(%Config::Config{'dlext'})>>; # %Config::Config{'dlext'} suffix for perl extensions
+    #my $dl_so = <<=to_string(%Config::Config{'so'})>>; # %Config::Config{'so'} suffix for shared libraries
 
     print STDERR "dl_findfile(@args)\n" if $dl_debug;
 
@@ -542,7 +538,7 @@ sub dl_findfile {
         }
         print STDERR "dl_findfile found: @found\n";
     }
-    return $found[0] unless wantarray;
+    return @found[0] unless wantarray;
     @found;
 }
 
@@ -565,8 +561,7 @@ sub dl_expandspec {
 
     <<$^O-eq-VMS>>
         # dl_expandspec should be defined in dl_vms.xs
-	require Carp;
-	Carp::croak("dl_expandspec: should be defined in XS file!\n");
+	die("dl_expandspec: should be defined in XS file!\n");
     <<|$^O-eq-VMS>>
 	return undef unless -f $file;
     <</$^O-eq-VMS>>
@@ -654,10 +649,10 @@ DynaLoader Interface Summary
 
 The standard/default list of directories in which dl_findfile() will
 search for libraries etc.  Directories are searched in order:
-$dl_library_path[0], [1], ... etc
+@dl_library_path[0], [1], ... etc
 
 @dl_library_path is initialised to hold the list of 'normal' directories
-(F</usr/lib>, etc) determined by B<Configure> (C<$Config{'libpth'}>).  This should
+(F</usr/lib>, etc) determined by B<Configure> (C<%Config{'libpth'}>).  This should
 ensure portability across a wide range of platforms.
 
 @dl_library_path should also be initialised with any other directories
@@ -736,7 +731,7 @@ Currently setting $dl_debug only affects the Perl side of the
 DynaLoader.  These messages should help an application developer to
 resolve any DynaLoader usage problems.
 
-$dl_debug is set to C<$ENV{'PERL_DL_DEBUG'}> if defined.
+$dl_debug is set to C<%ENV{'PERL_DL_DEBUG'}> if defined.
 
 For the DynaLoader developer/porter there is a similar debugging
 variable added to the C code (see dlutils.c) and enabled if Perl was
@@ -818,7 +813,7 @@ current values of @dl_require_symbols and @dl_resolve_using if required.
     HP-UX: shl_load($filename)
     Linux: dld_create_reference(@dl_require_symbols); dld_link($filename)
     NeXT:  rld_load($filename, @dl_resolve_using)
-    VMS:   lib$find_image_symbol($filename,$dl_require_symbols[0])
+    VMS:   lib$find_image_symbol($filename,@dl_require_symbols[0])
 
 (The dlopen() function is also used by Solaris and some versions of
 Linux, and is a common choice when providing a "wrapper" on other

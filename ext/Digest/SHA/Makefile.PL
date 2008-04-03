@@ -8,16 +8,16 @@ getopts('tx', \%opts);
 
 my @defines = ('-DSHA_PERL_MODULE');
 
-push(@defines, '-DSHA_THREAD_SAFE') if $opts{'t'};
-push(@defines, '-DNO_SHA_384_512')  if $opts{'x'};
+push(@defines, '-DSHA_THREAD_SAFE') if %opts{'t'};
+push(@defines, '-DNO_SHA_384_512')  if %opts{'x'};
 
 	# Configure SHA source to use static arrays for
 	# message schedules if compiling on Intel platforms.
 	# This seems to speed things up a bit.  However,
 	# DON'T do this if thread-safe option is in force.
 	
-if ($Config{archname} =~ m/^i[3456]86/) {
-	push(@defines, '-DSHA_STO_CLASS=static') unless $opts{'t'};
+if (%Config{archname} =~ m/^i[3456]86/) {
+	push(@defines, '-DSHA_STO_CLASS=static') unless %opts{'t'};
 }
 
 my $define = join(' ', @defines);

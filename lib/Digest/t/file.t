@@ -23,7 +23,7 @@ plan tests => 5;
 
    sub digest {
 	my $self = shift;
-	return sprintf "%04d", length($$self);
+	return sprintf "\%04d", length($$self);
    }
 }
 

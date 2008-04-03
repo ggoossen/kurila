@@ -36,7 +36,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     use Config;
-    if (!$Config{'d_fcntl'}) {
+    if (!%Config{'d_fcntl'}) {
         print("1..0 # Skip: fcntl() is not available\n");
         exit(0);
     }
@@ -120,8 +120,8 @@ sub test_inherited {
     my @lines = split(m/^/, $out);
     cmp_ok( $out =~ tr/\n//, '==', 2, 'child stdout: has 2 newlines' );
     cmp_ok( scalar(@lines),  '==', 2, 'child stdout: split into 2 lines' );
-    is( $lines[0], "childfd=$expected_fd\n", 'child stdout: fd' );
-    is( $lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );
+    is( @lines[0], "childfd=$expected_fd\n", 'child stdout: fd' );
+    is( @lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );
 }
 
 $^F == 2 or print STDERR "# warning: \$^F is $^F (not 2)\n";

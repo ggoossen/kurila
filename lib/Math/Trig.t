@@ -9,7 +9,7 @@
 # -- Jarkko Hietaniemi, April 1997
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -44,10 +44,10 @@ if ($^O eq 'unicos') { # See lib/Math/Complex.pm and t/lib/complex.t.
 }
 
 sub near ($$;$) {
-    my $e = defined $_[2] ? $_[2] : $eps;
-    my $d = $_[1] ? abs($_[0]/$_[1] - 1) : abs($_[0]);
-    print "# near? $_[0] $_[1] : $d : $e\n";
-    $_[1] ? ($d +< $e) : abs($_[0]) +< $e;
+    my $e = defined @_[2] ? @_[2] : $eps;
+    my $d = @_[1] ? abs(@_[0]/@_[1] - 1) : abs(@_[0]);
+    print "# near? @_[0] @_[1] : $d : $e\n";
+    @_[1] ? ($d +< $e) : abs(@_[0]) +< $e;
 }
 
 print "# Sanity checks\n";
@@ -193,7 +193,7 @@ use Math::Trig ':radial';
 {
     my $R2D = 57.295779513082320876798154814169;
 
-    sub frac { $_[0] - int($_[0]) }
+    sub frac { @_[0] - int(@_[0]) }
 
     my $lotta_radians = deg2rad(1E+20, 1);
     ok(near($lotta_radians,  1E+20/$R2D));
@@ -242,15 +242,15 @@ use Math::Trig ':radial';
 
     ($lon, $lat) = great_circle_waypoint(@London, @Tokyo, 0.0);
 
-    ok(near($lon, $London[0]));
+    ok(near($lon, @London[0]));
 
-    ok(near($lat, $London[1]));
+    ok(near($lat, @London[1]));
 
     ($lon, $lat) = great_circle_waypoint(@London, @Tokyo, 1.0);
 
-    ok(near($lon, $Tokyo[0]));
+    ok(near($lon, @Tokyo[0]));
 
-    ok(near($lat, $Tokyo[1]));
+    ok(near($lat, @Tokyo[1]));
 
     ($lon, $lat) = great_circle_waypoint(@London, @Tokyo, 0.5);
 
@@ -283,24 +283,24 @@ use Math::Trig ':radial';
 
     ($lon, $lat) = great_circle_destination(@London, $dir1, $dst1);
 
-    ok(near($lon, $Tokyo[0]));
+    ok(near($lon, @Tokyo[0]));
 
-    ok(near($lat, $pip2 - $Tokyo[1]));
+    ok(near($lat, $pip2 - @Tokyo[1]));
 
     my $dir2 = great_circle_direction(@Tokyo, @London);
     my $dst2 = great_circle_distance(@Tokyo,  @London);
 
     ($lon, $lat) = great_circle_destination(@Tokyo, $dir2, $dst2);
 
-    ok(near($lon, $London[0]));
+    ok(near($lon, @London[0]));
 
-    ok(near($lat, $pip2 - $London[1]));
+    ok(near($lat, $pip2 - @London[1]));
 
-    my $dir3 = (great_circle_destination(@London, $dir1, $dst1))[2];
+    my $dir3 = (great_circle_destination(@London, $dir1, $dst1))[[2]];
 
     ok(near($dir3, 2.69379263839118)); # about 154.343 deg
 
-    my $dir4 = (great_circle_destination(@Tokyo,  $dir2, $dst2))[2];
+    my $dir4 = (great_circle_destination(@Tokyo,  $dir2, $dst2))[[2]];
 
     ok(near($dir4, 3.6993902625701)); # about 211.959 deg
 
@@ -312,7 +312,7 @@ print "# Infinity\n";
 my $BigDouble = 1e40;
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
-local $SIG{FPE} = { };
+local %SIG{FPE} = { };
 
 ok(Inf() +> $BigDouble);  # This passes in netbsd-alpha.
 ok(Inf() + $BigDouble +> $BigDouble); # This coredumps in netbsd-alpha.

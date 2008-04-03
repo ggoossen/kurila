@@ -96,15 +96,15 @@ my %Special_Sigs = (
  test       => 'HASH',
 );
 
-@Att_Sigs{keys %Recognized_Att_Keys} = ('') x keys %Recognized_Att_Keys;
-@Att_Sigs{keys %Special_Sigs} = values %Special_Sigs;
+%Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x keys %Recognized_Att_Keys;
+%Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs;
 
 
 sub _verify_att {
     my($att) = @_;
 
     while( my($key, $val) = each %$att ) {
-        my $sig = $Att_Sigs{$key};
+        my $sig = %Att_Sigs{$key};
         unless( defined $sig ) {
             warn "WARNING: $key is not a known parameter.\n";
             next;
@@ -148,7 +148,7 @@ sub prompt ($;$) {  ## no critic
     print "$mess $dispdef";
 
     my $ans;
-    if ($ENV{PERL_MM_USE_DEFAULT} || (!$isa_tty && eof STDIN)) {
+    if (%ENV{PERL_MM_USE_DEFAULT} || (!$isa_tty && eof STDIN)) {
         print "$def\n";
     }
     else {
@@ -299,7 +299,7 @@ sub full_setup {
     push @Overridable, "postamble";
 
     # All sections are valid keys.
-    @Recognized_Att_Keys{@MM_Sections} = (1) x @MM_Sections;
+    %Recognized_Att_Keys{[@MM_Sections]} = (1) x @MM_Sections;
 
     # we will use all these variables in the Makefile
     @Get_from_Config = 
@@ -313,11 +313,11 @@ sub full_setup {
     push @Get_from_Config, qw( vendorarchexp vendorlibexp );
 
     foreach my $item (@attrib_help){
-        $Recognized_Att_Keys{$item} = 1;
+        %Recognized_Att_Keys{$item} = 1;
     }
     foreach my $item (@Get_from_Config) {
-        $Recognized_Att_Keys{uc $item} = $Config{$item};
-        print "Attribute '".uc($item)."' => '$Config{$item}'\n"
+        %Recognized_Att_Keys{uc $item} = %Config{$item};
+        print "Attribute '".uc($item)."' => '%Config{$item}'\n"
             if ($Verbose +>= 2);
     }
 
@@ -401,22 +401,22 @@ sub new {
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
         if ($@) {
-            warn sprintf "Warning: prerequisite %s %s not found.\n", 
+            warn sprintf "Warning: prerequisite \%s \%s not found.\n", 
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
-            $unsatisfied{$prereq} = 'not installed';
+            %unsatisfied{$prereq} = 'not installed';
         } elsif ($pr_version +< $self->{PREREQ_PM}->{$prereq} ){
-            warn sprintf "Warning: prerequisite %s %s not found. We have %s.\n",
+            warn sprintf "Warning: prerequisite \%s \%s not found. We have \%s.\n",
               $prereq, $self->{PREREQ_PM}{$prereq}, 
                 ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
-            $unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
+            %unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
               $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
         }
     }
     
      if (%unsatisfied && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join "\n", map {"    $_ $unsatisfied{$_}"} 
+        my $failedprereqs = join "\n", map {"    $_ %unsatisfied{$_}"} 
                             sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
 MakeMaker FATAL: prerequisites not found.
@@ -446,8 +446,8 @@ END
         @{*{Symbol::fetch_glob("$newclass\:\:ISA")}} = 'MM';
     }
 
-    if (defined $Parent[-2]){
-        $self->{PARENT} = $Parent[-2];
+    if (defined @Parent[-2]){
+        $self->{PARENT} = @Parent[-2];
         for my $key (@Prepend_parent) {
             next unless defined $self->{PARENT}{$key};
 
@@ -467,8 +467,8 @@ END
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
                 my @cmd = split m/\s+/, $self->{$key};
-                $cmd[1] = $self->catfile('[-]',$cmd[1])
-                  unless (@cmd +< 2) || $self->file_name_is_absolute($cmd[1]);
+                @cmd[1] = $self->catfile('[-]',@cmd[1])
+                  unless (@cmd +< 2) || $self->file_name_is_absolute(@cmd[1]);
                 $self->{$key} = join(' ', @cmd);
             }
         }
@@ -486,7 +486,7 @@ END
         my @fm = grep m/^FIRST_MAKEFILE=/, @ARGV;
         parse_args($self,@fm) if @fm;
     } else {
-        parse_args($self,split(' ', $ENV{PERL_MM_OPT} || ''),@ARGV);
+        parse_args($self,split(' ', %ENV{PERL_MM_OPT} || ''),@ARGV);
     }
 
 
@@ -512,8 +512,8 @@ END
 
     if (! $self->{PERL_SRC} ) {
         require VMS::Filespec if $Is_VMS;
-        my($pthinks) = $self->canonpath($INC{'Config.pm'});
-        my($cthinks) = $self->catfile($Config{'archlibexp'},'Config.pm');
+        my($pthinks) = $self->canonpath(%INC{'Config.pm'});
+        my($cthinks) = $self->catfile(%Config{'archlibexp'},'Config.pm');
         $pthinks = VMS::Filespec::vmsify($pthinks) if $Is_VMS;
         if ($pthinks ne $cthinks &&
             !($Is_Win32 and lc($pthinks) eq lc($cthinks))) {
@@ -528,7 +528,7 @@ END
 Your perl and your Config.pm seem to have different ideas about the 
 architecture they are running on.
 Perl thinks: [$pthinks]
-Config says: [$Config{archname}]
+Config says: [%Config{archname}]
 This may or may not cause problems. Please check your installation of perl 
 if you have problems building this extension.
 END
@@ -559,7 +559,7 @@ END
     foreach my $key (sort keys %initial_att){
         next if $key eq 'ARGS';
 
-        my($v) = neatvalue($initial_att{$key});
+        my($v) = neatvalue(%initial_att{$key});
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
         $v =~ tr/\n/ /s;
         push @{$self->{RESULT}}, "#     $key => $v";
@@ -574,7 +574,7 @@ END
         if (scalar(keys %configure_att) +> 0) {
             foreach my $key (sort keys %configure_att){
                next if $key eq 'ARGS';
-               my($v) = neatvalue($configure_att{$key});
+               my($v) = neatvalue(%configure_att{$key});
                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
                $v =~ tr/\n/ /s;
                push @{$self->{RESULT}}, "#     $key => $v";
@@ -686,8 +686,8 @@ sub parse_args{
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
                 [{$1 ?
-                 ((getpwnam($1))[7] || "~$1") :
-                 (getpwuid($>))[7]
+                 ((getpwnam($1))[[7]] || "~$1") :
+                 (getpwuid($>))[[7]]
                  }]x;
         }
 
@@ -740,7 +740,7 @@ sub parse_args{
         next if $mmkey eq 'ARGS';
         print STDOUT "  $mmkey => ", neatvalue($self->{$mmkey}), "\n" if $Verbose;
         print STDOUT "'$mmkey' is not a known MakeMaker parameter name.\n"
-            unless exists $Recognized_Att_Keys{$mmkey};
+            unless exists %Recognized_Att_Keys{$mmkey};
     }
     $| = 1 if $Verbose;
 }
@@ -756,7 +756,7 @@ sub check_hints {
     return unless -d $hint_dir;
 
     # First we look for the best hintsfile we have
-    my($hint)="${^O}_$Config{osvers}";
+    my($hint)="${^O}_%Config{osvers}";
     $hint =~ s/\./_/g;
     $hint =~ s/_$//;
     return unless $hint;
@@ -802,7 +802,7 @@ sub mv_all_methods {
 
     local ${^WARN_HOOK} = sub { 
         # can't use 'no warnings redefined', 5.6 only
-        warn $_[0]->message unless $_[0]->message =~ m/^Subroutine .* redefined/ 
+        warn @_[0]->message unless @_[0]->message =~ m/^Subroutine .* redefined/ 
     };
     foreach my $method (@Overridable) {
 
@@ -901,11 +901,11 @@ sub flush {
 
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
         foreach (keys %$self) { # safe memory
-            delete $self->{$_} unless $keep{$_};
+            delete $self->{$_} unless %keep{$_};
         }
     }
 
-    system("$Config::Config{eunicefix} $finalname") unless $Config::Config{eunicefix} eq ":";
+    system("%Config::Config{eunicefix} $finalname") unless %Config::Config{eunicefix} eq ":";
 }
 
 
@@ -1099,7 +1099,7 @@ INSTALLDIRS according to the following table:
   INST_MAN3DIR   INSTALLMAN3DIR  INSTALLSITEMAN3DIR  INSTALLVENDORMAN3DIR
 
 The INSTALL... macros in turn default to their %Config
-($Config{installprivlib}, $Config{installarchlib}, etc.) counterparts.
+(%Config{installprivlib}, %Config{installarchlib}, etc.) counterparts.
 
 You can check the values of these variables on your system with
 
@@ -1135,7 +1135,7 @@ Like PREFIX, it sets several INSTALL* attributes at once.  Unlike
 PREFIX it is easy to predict where the module will end up.  The
 installation pattern looks like this:
 
-    INSTALLARCHLIB     INSTALL_BASE/lib/perl5/$Config{archname}
+    INSTALLARCHLIB     INSTALL_BASE/lib/perl5/%Config{archname}
     INSTALLPRIVLIB     INSTALL_BASE/lib/perl5
     INSTALLBIN         INSTALL_BASE/bin
     INSTALLSCRIPT      INSTALL_BASE/bin
@@ -1188,9 +1188,9 @@ INSTALLSITELIB, INSTALLSITEARCH (and they are not affected by PREFIX);
 
 =item *
 
-without LIB, setting PREFIX replaces the initial C<$Config{prefix}>
+without LIB, setting PREFIX replaces the initial C<%Config{prefix}>
 part of those INSTALL* arguments, even if the latter are explicitly
-set (but are set to still start with C<$Config{prefix}>).
+set (but are set to still start with C<%Config{prefix}>).
 
 =back
 
@@ -1574,7 +1574,7 @@ perl, site or vendor.  Defaults to site.
 =item INSTALLMAN3DIR
 
 These directories get the man pages at 'make install' time if
-INSTALLDIRS=perl.  Defaults to $Config{installman*dir}.
+INSTALLDIRS=perl.  Defaults to %Config{installman*dir}.
 
 If set to 'none', no man pages will be installed.
 
@@ -1583,7 +1583,7 @@ If set to 'none', no man pages will be installed.
 Used by 'make install', which copies files from INST_LIB to this
 directory if INSTALLDIRS is set to perl.
 
-Defaults to $Config{installprivlib}.
+Defaults to %Config{installprivlib}.
 
 =item INSTALLSCRIPT
 
@@ -1682,7 +1682,7 @@ INSTALLSCRIPT.
 
 Program to be used to link libraries for dynamic loading.
 
-Defaults to $Config{ld}.
+Defaults to %Config{ld}.
 
 =item LDDLFLAGS
 
@@ -1690,7 +1690,7 @@ Any special flags that might need to be passed to ld to create a
 shared library suitable for dynamic loading.  It is up to the makefile
 to use it.  (See L<Config/lddlflags>)
 
-Defaults to $Config{lddlflags}.
+Defaults to %Config{lddlflags}.
 
 =item LDFROM
 
@@ -1759,7 +1759,7 @@ takes precedent.
 Currently the only significant values are 'dmake' and 'nmake' for Windows
 users.
 
-Defaults to $Config{make}.
+Defaults to %Config{make}.
 
 =item MAKEAPERL
 
@@ -1845,7 +1845,7 @@ List of object files, defaults to '$(BASEEXT)$(OBJ_EXT)', but can be a long
 string containing all object files, e.g. "tkpBind.o
 tkpButton.o tkpCanvas.o"
 
-(Where BASEEXT is the last component of NAME, and OBJ_EXT is $Config{obj_ext}.)
+(Where BASEEXT is the last component of NAME, and OBJ_EXT is %Config{obj_ext}.)
 
 =item OPTIMIZE
 
@@ -1914,9 +1914,9 @@ of memory allocations, etc.
 
 Directory under which core modules are to be installed.
 
-Defaults to $Config{installprefixexp} falling back to
-$Config{installprefix}, $Config{prefixexp} or $Config{prefix} should
-$Config{installprefixexp} not exist.
+Defaults to %Config{installprefixexp} falling back to
+%Config{installprefix}, %Config{prefixexp} or %Config{prefix} should
+%Config{installprefixexp} not exist.
 
 Overridden by PREFIX.
 
@@ -2107,9 +2107,9 @@ RedHatism for C<PREREQ_PRINT>.  The output format is different, though:
 
 Like PERLPREFIX, but only for the site install locations.
 
-Defaults to $Config{siteprefixexp}.  Perls prior to 5.6.0 didn't have
+Defaults to %Config{siteprefixexp}.  Perls prior to 5.6.0 didn't have
 an explicit siteprefix in the Config.  In those cases
-$Config{installprefix} will be used.
+%Config{installprefix} will be used.
 
 Overridable by PREFIX
 
@@ -2144,7 +2144,7 @@ typemap has lowest precedence.
 
 Like PERLPREFIX, but only for the vendor install locations.
 
-Defaults to $Config{vendorprefixexp}.
+Defaults to %Config{vendorprefixexp}.
 
 Overridable by PREFIX
 

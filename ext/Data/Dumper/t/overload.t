@@ -9,7 +9,7 @@ package Foo;
 use overload '""' => \&as_string;
 
 sub new { bless { foo => "bar" }, shift }
-sub as_string { "%%%%" }
+sub as_string { "\%\%\%\%" }
 
 package main;
 

@@ -55,7 +55,7 @@ $r = runperl(
 is( $r, "foo\0bar\0baz\0", "-0 before a -l" );
 
 $r = runperl(
-    switches	=> [ sprintf("-0%o", ord 'x') ],
+    switches	=> [ sprintf('-0%o', ord 'x') ],
     stdin	=> 'fooxbarxbazx',
     prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
@@ -118,7 +118,7 @@ SWTEST
 # Tests for -l
 
 $r = runperl(
-    switches	=> [ sprintf("-l%o", ord 'x') ],
+    switches	=> [ sprintf('-l%o', ord 'x') ],
     prog	=> 'print for qw/foo bar/'
 );
 is( $r, 'fooxbarx', '-l with octal number' );
@@ -272,7 +272,7 @@ SWTESTPM
 
     my (undef, $v) = split m/-/, $^V;
     like( runperl( switches => ['-v'] ),
-	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q$Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
+	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q%Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
           '-v looks okay' );
 
 }
@@ -283,7 +283,7 @@ SWTESTPM
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => ['-h'] ),
-	  qr/Usage: .+(?i:perl(?:$Config{_exe})?).+switches.+programfile.+arguments/,
+	  qr/Usage: .+(?i:perl(?:%Config{_exe})?).+switches.+programfile.+arguments/,
           '-h looks okay' );
 
 }

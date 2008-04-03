@@ -153,27 +153,27 @@ sub xfork {
 }
 
 sub xpipe {
-    pipe $_[0], $_[1] or croak "$Me: pipe(" . Symbol::glob_name($_[0]) . ", " . Symbol::glob_name($_[1]) . ") failed: $!";
+    pipe @_[0], @_[1] or croak "$Me: pipe(" . Symbol::glob_name(@_[0]) . ", " . Symbol::glob_name(@_[1]) . ") failed: $!";
 }
 
 # I tried using a * prototype character for the filehandle but it still
 # disallows a bearword while compiling under strict subs.
 
 sub xopen {
-    open $_[0], $_[1], $_[2] or croak "$Me: open(...)"; # . Symbol::glob_name($_[0]) . ", $_[1], " . Symbol::glob_name($_[2]) . ") failed: $!";
+    open @_[0], @_[1], @_[2] or croak "$Me: open(...)"; # . Symbol::glob_name($_[0]) . ", $_[1], " . Symbol::glob_name($_[2]) . ") failed: $!";
 }
 
 sub xclose {
-    close $_[0] or croak "$Me: close(*" . Symbol::glob_name($_[0]) . ") failed: $!";
+    close @_[0] or croak "$Me: close(*" . Symbol::glob_name(@_[0]) . ") failed: $!";
 }
 
 sub fh_is_fd {
-    return ref \$_[0] eq "SCALAR" && $_[0] =~ m/\A=?(\d+)\z/;
+    return ref \@_[0] eq "SCALAR" && @_[0] =~ m/\A=?(\d+)\z/;
 }
 
 sub xfileno {
-    return $1 if ref \$_[0] eq "SCALAR" and $_[0] =~ m/\A=?(\d+)\z/;  # deal with fh just being an fd
-    return fileno $_[0];
+    return $1 if ref \@_[0] eq "SCALAR" and @_[0] =~ m/\A=?(\d+)\z/;  # deal with fh just being an fd
+    return fileno @_[0];
 }
 
 my $do_spawn = $^O eq 'os2' || $^O eq 'MSWin32';
@@ -183,7 +183,7 @@ sub _open3 {
     my($package, $dad_wtr, $dad_rdr, $dad_err, @cmd) = @_;
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
-    if (@cmd +> 1 and $cmd[0] eq '-') {
+    if (@cmd +> 1 and @cmd[0] eq '-') {
 	croak "Arguments don't make sense when the command is '-'"
     }
 
@@ -192,8 +192,8 @@ sub _open3 {
     # tchrist 5-Mar-00
 
     unless (eval  {
-	$dad_wtr = $_[1] = gensym unless defined $dad_wtr;
-	$dad_rdr = $_[2] = gensym unless defined $dad_rdr;
+	$dad_wtr = @_[1] = gensym unless defined $dad_wtr;
+	$dad_rdr = @_[2] = gensym unless defined $dad_rdr;
 	1; }) 
     {
 	# must strip crud for croak to add back, or looks ugly
@@ -261,7 +261,7 @@ sub _open3 {
 	} else {
 	    xopen \*STDERR, ">&", \*STDOUT if fileno(STDERR) != fileno(STDOUT);
 	}
-	return 0 if ($cmd[0] eq '-');
+	return 0 if (@cmd[0] eq '-');
 	local($")=(" ");
 	exec @cmd or do {
 	    carp "$Me: exec of @cmd failed";
@@ -318,7 +318,7 @@ sub _open3 {
     # of it.
     xclose $dad_wtr if $dup_wtr;
 
-    select((select($dad_wtr), $| = 1)[0]); # unbuffer pipe
+    select((select($dad_wtr), $| = 1)[[0]]); # unbuffer pipe
     $kidpid;
 }
 
@@ -338,21 +338,21 @@ sub spawn_with_handles {
 
     foreach $fd (@$fds) {
 	$fd->{tmp_copy} = IO::Handle->new_from_fd($fd->{handle}, $fd->{mode});
-	$saved{fileno $fd->{handle}} = $fd->{tmp_copy};
+	%saved{fileno $fd->{handle}} = $fd->{tmp_copy};
     }
     foreach $fd (@$fds) {
 	bless $fd->{handle}, 'IO::Handle'
 	    unless eval { $fd->{handle}->isa('IO::Handle') } ;
 	# If some of handles to redirect-to coincide with handles to
 	# redirect, we need to use saved variants:
-	$fd->{handle}->fdopen($saved{fileno $fd->{open_as}} || $fd->{open_as},
+	$fd->{handle}->fdopen(%saved{fileno $fd->{open_as}} || $fd->{open_as},
 			      $fd->{mode});
     }
     unless ($^O eq 'MSWin32') {
 	# Stderr may be redirected below, so we save the err text:
 	foreach $fd (@$close_in_child) {
 	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $!"
-		unless $saved{fileno $fd}; # Do not close what we redirect!
+		unless %saved{fileno $fd}; # Do not close what we redirect!
 	}
     }
 

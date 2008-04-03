@@ -229,7 +229,7 @@ if ($check) {
 		($sum, $modesym, $fname) = m/^(\S+) (.)(.*)$/;
 		($binary, $portable, $text) =
 			map { $_ eq $modesym } ('*', '?', ' ');
-		unless ($alg = $len2alg{length($sum)}) {
+		unless ($alg = %len2alg{length($sum)}) {
 			warn("shasum: $checkfile: $.: improperly " .
 				"formatted SHA checksum line\n") if $warn;
 			next;

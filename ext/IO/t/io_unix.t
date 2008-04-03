@@ -11,10 +11,10 @@ use Config;
 
 BEGIN {
     my $reason;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bSocket\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
 	$reason = 'Socket extension unavailable';
     }
-    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
+    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
 	$reason = 'IO extension unavailable';
     }
     elsif ($^O eq 'os2') {
@@ -27,7 +27,7 @@ BEGIN {
     elsif ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {
 	$reason = "UNIX domain sockets not implemented on $^O";
     }
-    elsif (! $Config{'d_fork'}) {
+    elsif (! %Config{'d_fork'}) {
 	$reason = 'no fork';
     }
     if ($reason) {
@@ -69,7 +69,7 @@ unless (defined $listen) {
     eval { require File::Temp };
     unless ($@) {
 	File::Temp->import( 'mktemp');
-	for my $TMPDIR ($ENV{TMPDIR}, "/tmp") {
+	for my $TMPDIR (%ENV{TMPDIR}, "/tmp") {
 	    if (defined $TMPDIR && -d $TMPDIR && -w $TMPDIR) {
 		$PATH = mktemp("$TMPDIR/sXXXXXXXX");
 		last if $listen = IO::Socket::UNIX->new(Local => $PATH,

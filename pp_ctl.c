@@ -939,7 +939,6 @@ Perl_die_where(pTHX_ SV *msv)
 
     my_failure_exit();
     /* NOTREACHED */
-    return;
 }
 
 PP(pp_xor)

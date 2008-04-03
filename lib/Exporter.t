@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-   if( $ENV{PERL_CORE} ) {
+   if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -13,10 +13,10 @@ sub ok ($;$) {
     my($ok, $name) = @_;
 
     # You have to do it this way or VMS will get confused.
-    printf "%sok %d%s\n", ($ok ? '' : 'not '), $test,
+    printf "\%sok \%d\%s\n", ($ok ? '' : 'not '), $test,
       (defined $name ? " - $name" : '');
 
-    printf "# Failed test at line %d\n", (caller)[2] unless $ok;
+    printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
     
     $test++;
     return $ok;
@@ -86,7 +86,7 @@ my %tags     = map { $_ => 1 } map { @$_ } values %EXPORT_TAGS;
 my %exportok = map { $_ => 1 } @EXPORT_OK;
 my $ok = 1;
 foreach my $tag (keys %tags) {
-    $ok = exists $exportok{$tag};
+    $ok = exists %exportok{$tag};
 }
 ::ok( $ok, 'export_ok_tags()' );
 
@@ -128,7 +128,7 @@ my @tags = qw(:This :tray);
 Testing->import(@tags);
 
 ::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
-             map { @$_ } @{$Testing::EXPORT_TAGS{@tags}}),
+             map { @$_ } @{%Testing::EXPORT_TAGS{@tags}}),
       'import by tags' );
 
 

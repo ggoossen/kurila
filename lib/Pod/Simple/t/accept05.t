@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -19,13 +19,13 @@ print "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
 
 my $x = 'Pod::Simple::XMLOutStream';
-sub accept_Q    { $_[0]->accept_codes('Q') }
-sub accept_prok { $_[0]->accept_codes('prok') }
-sub accept_zing_prok { $_[0]->accept_codes('zing:prok') }
-sub accept_zing_superprok { $_[0]->accept_codes('z.i_ng:Prok-12') }
+sub accept_Q    { @_[0]->accept_codes('Q') }
+sub accept_prok { @_[0]->accept_codes('prok') }
+sub accept_zing_prok { @_[0]->accept_codes('zing:prok') }
+sub accept_zing_superprok { @_[0]->accept_codes('z.i_ng:Prok-12') }
 sub accept_zing_superduperprok {
-  $_[0]->accept_codes('A');
-  $_[0]->accept_codes('z.i_ng:Prok-12');
+  @_[0]->accept_codes('A');
+  @_[0]->accept_codes('z.i_ng:Prok-12');
 }
 
 

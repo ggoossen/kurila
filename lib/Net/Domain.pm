@@ -31,7 +31,7 @@ sub _hostname {
 
   if ($^O eq 'MSWin32') {
     require Socket;
-    my ($name, $alias, $type, $len, @addr) = gethostbyname($ENV{'COMPUTERNAME'} || 'localhost');
+    my ($name, $alias, $type, $len, @addr) = gethostbyname(%ENV{'COMPUTERNAME'} || 'localhost');
     while (@addr) {
       my $a = shift(@addr);
       $host = gethostbyaddr($a, Socket::AF_INET());
@@ -47,8 +47,8 @@ sub _hostname {
     chomp($host = `hostname`);
   }
   elsif ($^O eq 'VMS') {    ## multiple varieties of net s/w makes this hard
-    $host = $ENV{'UCX$INET_HOST'}      if defined($ENV{'UCX$INET_HOST'});
-    $host = $ENV{'MULTINET_HOST_NAME'} if defined($ENV{'MULTINET_HOST_NAME'});
+    $host = %ENV{'UCX$INET_HOST'}      if defined(%ENV{'UCX$INET_HOST'});
+    $host = %ENV{'MULTINET_HOST_NAME'} if defined(%ENV{'MULTINET_HOST_NAME'});
     if (index($host, '.') +> 0) {
       $fqdn = $host;
       ($host, $domain) = $fqdn =~ m/^([^\.]+)\.(.*)$/;
@@ -79,7 +79,7 @@ sub _hostname {
       # POSIX
       || eval {
       require POSIX;
-      $host = (POSIX::uname())[1];
+      $host = (POSIX::uname())[[1]];
       }
 
       # trusty old hostname command
@@ -93,7 +93,7 @@ sub _hostname {
       }
 
       # Apollo pre-SR10
-      || eval { $host = (split(m/[:\. ]/, `/com/host`, 6))[0]; }
+      || eval { $host = (split(m/[:\. ]/, `/com/host`, 6))[[0]]; }
 
       || eval { $host = ""; };
   }
@@ -113,8 +113,8 @@ sub _hostdomain {
   return $domain
     if (defined $domain);
 
-  return $domain = $NetConfig{'inet_domain'}
-    if defined $NetConfig{'inet_domain'};
+  return $domain = %NetConfig{'inet_domain'}
+    if defined %NetConfig{'inet_domain'};
 
   # try looking in /etc/resolv.conf
   # putting this here and assuming that it is correct, eliminates
@@ -161,8 +161,8 @@ sub _hostdomain {
     };
 
     if ($^O eq 'VMS') {
-      $dom ||= $ENV{'TCPIP$INET_DOMAIN'}
-        || $ENV{'UCX$INET_DOMAIN'};
+      $dom ||= %ENV{'TCPIP$INET_DOMAIN'}
+        || %ENV{'UCX$INET_DOMAIN'};
     }
 
     chop($dom = `domainname 2>/dev/null`)
@@ -188,7 +188,7 @@ sub _hostdomain {
 
     # look at real name & aliases
     my $site;
-    foreach $site ($info[0], split(m/ /, $info[1])) {
+    foreach $site (@info[0], split(m/ /, @info[1])) {
       if (rindex($site, ".") +> 0) {
 
         # Extract domain from FQDN
@@ -201,7 +201,7 @@ sub _hostdomain {
 
   # Look for environment variable
 
-  $domain ||= $ENV{LOCALDOMAIN} || $ENV{DOMAIN};
+  $domain ||= %ENV{LOCALDOMAIN} || %ENV{DOMAIN};
 
   if (defined $domain) {
     $domain =~ s/[\r\n\0]+//g;
@@ -248,7 +248,7 @@ LOOP:
     my @h = @host;
     while (@h) {
       my $tmp = join(".", @h, @d);
-      if ((gethostbyname($tmp))[0]) {
+      if ((gethostbyname($tmp))[[0]]) {
         @fqdn = (@h, @d);
         $fqdn = $tmp;
         last LOOP;
@@ -260,7 +260,7 @@ LOOP:
 
   if (@fqdn) {
     $host = shift @fqdn;
-    until ((gethostbyname($host))[0]) {
+    until ((gethostbyname($host))[[0]]) {
       $host .= "." . shift @fqdn;
     }
     $domain = join(".", @fqdn);

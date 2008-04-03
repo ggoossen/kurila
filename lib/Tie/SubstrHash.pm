@@ -44,8 +44,6 @@ The hash does not support exists().
 our ($self, $key, $klen, $vlen, $tsize, $rlen, $offset, $hash,
      $record, $val, $entries, $iterix, $hashbase);
 
-use Carp;
-
 sub TIEHASH {
     my $pack = shift;
     my ($klen, $vlen, $tsize) = @_;
@@ -53,24 +51,24 @@ sub TIEHASH {
     $tsize = [$tsize,
 	      findgteprime($tsize * 1.1)]; # Allow 10% empty.
     local $self = bless ["\0", $klen, $vlen, $tsize, $rlen, 0, -1];
-    $$self[0] x= $rlen * $tsize->[1];
+    @$self[0] x= $rlen * $tsize->[1];
     $self;
 }
 
 sub CLEAR {
     local($self) = @_;
-    $$self[0] = "\0" x ($$self[4] * $$self[3]->[1]);
-    $$self[5] =  0;
-    $$self[6] = -1;
+    @$self[0] = "\0" x (@$self[4] * @$self[3]->[1]);
+    @$self[5] =  0;
+    @$self[6] = -1;
 }
 
 sub FETCH {
     local($self,$key) = @_;
-    local($klen, $vlen, $tsize, $rlen) = @$self[1..4];
+    local($klen, $vlen, $tsize, $rlen) = @$self[[1..4]];
     &hashkey;
     for (;;) {
 	$offset = $hash * $rlen;
-	$record = substr($$self[0], $offset, $rlen);
+	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
 	    return undef;
 	}
@@ -85,22 +83,22 @@ sub FETCH {
 
 sub STORE {
     local($self,$key,$val) = @_;
-    local($klen, $vlen, $tsize, $rlen) = @$self[1..4];
-    croak("Table is full ($tsize->[0] elements)") if $$self[5] +> $tsize->[0];
-    croak(qq/Value "$val" is not $vlen characters long/)
+    local($klen, $vlen, $tsize, $rlen) = @$self[[1..4]];
+    die("Table is full ($tsize->[0] elements)") if @$self[5] +> $tsize->[0];
+    die(qq/Value "$val" is not $vlen characters long/)
 	if length($val) != $vlen;
     my $writeoffset;
 
     &hashkey;
     for (;;) {
 	$offset = $hash * $rlen;
-	$record = substr($$self[0], $offset, $rlen);
+	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
 	    $record = "\2". $key . $val;
 	    die "panic" unless length($record) == $rlen;
 	    $writeoffset = $offset unless defined $writeoffset;
-	    substr($$self[0], $writeoffset, $rlen, $record);
-	    ++$$self[5];
+	    substr(@$self[0], $writeoffset, $rlen, $record);
+	    ++@$self[5];
 	    return;
 	}
 	elsif (ord($record) == 1) {
@@ -109,7 +107,7 @@ sub STORE {
 	elsif (substr($record, 1, $klen) eq $key) {
 	    $record = "\2". $key . $val;
 	    die "panic" unless length($record) == $rlen;
-	    substr($$self[0], $offset, $rlen, $record);
+	    substr(@$self[0], $offset, $rlen, $record);
 	    return;
 	}
 	&rehash;
@@ -118,20 +116,20 @@ sub STORE {
 
 sub DELETE {
     local($self,$key) = @_;
-    local($klen, $vlen, $tsize, $rlen) = @$self[1..4];
+    local($klen, $vlen, $tsize, $rlen) = @$self[[1..4]];
     &hashkey;
     for (;;) {
 	$offset = $hash * $rlen;
-	$record = substr($$self[0], $offset, $rlen);
+	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
 	    return undef;
 	}
 	elsif (ord($record) == 1) {
 	}
 	elsif (substr($record, 1, $klen) eq $key) {
-	    substr($$self[0], $offset, 1, "\1");
+	    substr(@$self[0], $offset, 1, "\1");
 	    return substr($record, 1+$klen, $vlen);
-	    --$$self[5];
+	    --@$self[5];
 	}
 	&rehash;
     }
@@ -139,28 +137,28 @@ sub DELETE {
 
 sub FIRSTKEY {
     local($self) = @_;
-    $$self[6] = -1;
+    @$self[6] = -1;
     &NEXTKEY;
 }
 
 sub NEXTKEY {
     local($self) = @_;
-    local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = @$self[1..6];
+    local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = @$self[[1..6]];
     for (++$iterix; $iterix +< $tsize->[1]; ++$iterix) {
-	next unless substr($$self[0], $iterix * $rlen, 1) eq "\2";
-	$$self[6] = $iterix;
-	return substr($$self[0], $iterix * $rlen + 1, $klen);
+	next unless substr(@$self[0], $iterix * $rlen, 1) eq "\2";
+	@$self[6] = $iterix;
+	return substr(@$self[0], $iterix * $rlen + 1, $klen);
     }
-    $$self[6] = -1;
+    @$self[6] = -1;
     undef;
 }
 
 sub EXISTS {
-    croak "Tie::SubstrHash does not support exists()";
+    die "Tie::SubstrHash does not support exists()";
 }
 
 sub hashkey {
-    croak(qq/Key "$key" is not $klen characters long/)
+    die(qq/Key "$key" is not $klen characters long/)
 	if length($key) != $klen;
     $hash = 2;
     for (unpack('C*', $key)) {

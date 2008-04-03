@@ -42,7 +42,7 @@ print "Generating  t/nwauto.pl ...\n\n\n";
 open(FHWA, ">", "t/nwauto.pl") or die "Unable to open the file,  t/nwauto.pl  for writing.\n";
 seek(FHWA, 0, 0);	# seek to the beginning of the file.
 
-$version = sprintf("%vd",$^V);
+$version = sprintf("\%vd",$^V);
 print FHWA "\n\nprint \"Automated Unit Testing of Perl$version for NetWare\\n\\n\\n\"\;\n\n\n";
 
 

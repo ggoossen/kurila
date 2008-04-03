@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' and @INC = '../lib' if $ENV{PERL_CORE};
+    chdir 't' and @INC = '../lib' if %ENV{PERL_CORE};
 }
 
 my $t = 1;
@@ -18,7 +18,7 @@ my $v_minus = $x - 1;
 
 unless (eval 'use open ":std"; 1') {
   # pretend that open.pm is present
-  $INC{'open.pm'} = 'open.pm';
+  %INC{'open.pm'} = 'open.pm';
   eval 'sub open::foo{}';		# Just in case...
 }
 

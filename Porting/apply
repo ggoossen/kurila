@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 my $file = pop(@ARGV);
 my %meta;
-$ENV{'P4PORT'} ||= 'bactrian:1667';
-$ENV{'P4CLIENT'} ||= 'ni-s';
+%ENV{'P4PORT'} ||= 'bactrian:1667';
+%ENV{'P4CLIENT'} ||= 'ni-s';
 open(FILE, "<",$file) || die "Cannot open $file:$!";
 while ( ~< *FILE)
  {
   if (m/^(From|Subject|Date|Message-ID):(.*)$/i)
    {
-    $meta{lc($1)} = $2;
+    %meta{lc($1)} = $2;
    }
  }
 my @results = `patch @ARGV <$file 2>&1`;
@@ -32,10 +32,10 @@ if ($code == 0)
   print PIPE "Description:\n";
   foreach my $key (qw(Subject From Date Message-Id))
    {
-    if (exists $meta{lc($key)})
+    if (exists %meta{lc($key)})
      {
-      print PIPE "\t$key: ",$meta{lc($key)},"\n";
-      print "$key: ",$meta{lc($key)},"\n";
+      print PIPE "\t$key: ",%meta{lc($key)},"\n";
+      print "$key: ",%meta{lc($key)},"\n";
      }
    }
   print PIPE "Files:\n";

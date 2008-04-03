@@ -8,21 +8,21 @@ our (@oops, @ops, %files, $not, @glops, $x);
 @oops = @ops = glob("op/*");
 
 if ($^O eq 'MSWin32') {
-  map { $files{lc($_)}++ } glob("op/*");
-  map { delete $files{"op/$_"} } split m/[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
+  map { %files{lc($_)}++ } glob("op/*");
+  map { delete %files{"op/$_"} } split m/[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
 }
 elsif ($^O eq 'VMS') {
-  map { $files{lc($_)}++ } glob("[.op]*");
-  map { s/;.*$//; delete $files{lc($_)}; } split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
+  map { %files{lc($_)}++ } glob("[.op]*");
+  map { s/;.*$//; delete %files{lc($_)}; } split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
 }
 elsif ($^O eq 'MacOS') {
   @oops = @ops = glob(":op:*");
-  map { $files{$_}++ } glob(":op:*");
-  map { delete $files{$_} } split m/[\s\n]/, `echo :op:\x[c5]`;
+  map { %files{$_}++ } glob(":op:*");
+  map { delete %files{$_} } split m/[\s\n]/, `echo :op:\x[c5]`;
 }
 else {
-  map { $files{$_}++ } glob("op/*");
-  map { delete $files{$_} } split m/[\s\n]/, `echo op/*`;
+  map { %files{$_}++ } glob("op/*");
+  map { delete %files{$_} } split m/[\s\n]/, `echo op/*`;
 }
 ok( !(keys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
 
@@ -66,7 +66,7 @@ cmp_ok($i,'==',2,'remore File::Glob stash');
 
 SKIP: {
     skip('no File::Glob to emulate Unix-ism', 1)
-	unless $INC{'File/Glob.pm'};
+	unless %INC{'File/Glob.pm'};
     my $ok = 0;
     $ok = 1 while my $var = glob("0");
     ok($ok,'define versus truth');

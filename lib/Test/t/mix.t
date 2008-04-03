@@ -47,7 +47,7 @@ EXPECT
 
 
 sub commentless {
-  my $in = $_[0];
+  my $in = @_[0];
   $in =~ s/^#[^\n]*\n//mg;
   $in =~ s/\n#[^\n]*$//mg;
   return $in;

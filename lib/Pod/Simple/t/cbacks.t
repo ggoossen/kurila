@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -41,8 +41,8 @@ while(@from) {
   ok scalar($got = $x->_out(
     # Mutor:
     sub {
-     $_[0]->code_handler(sub { $more .= $_[1] . ":" . $_[0] . "\n"       } );
-     $_[0]->cut_handler( sub { $more .= "~" . $_[1] . ":" .  $_[0]. "\n" } );
+     @_[0]->code_handler(sub { $more .= @_[1] . ":" . @_[0] . "\n"       } );
+     @_[0]->cut_handler( sub { $more .= "~" . @_[1] . ":" .  @_[0]. "\n" } );
     } => join "\n",
     "",
     "\t# This is handy...",

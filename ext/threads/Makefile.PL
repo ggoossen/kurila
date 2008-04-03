@@ -12,7 +12,7 @@ sub check_cc
 {
     require File::Spec;
 
-    my $cmd = $_[0];
+    my $cmd = @_[0];
     if (-x $cmd or MM->maybe_command($cmd)) {
         return (1);       # CC command found
     }
@@ -31,7 +31,7 @@ sub have_cc
     if ($@) {
         eval { require Config; };   # Everyone else
     }
-    my @chunks = split(m/ /, $Config::Config{cc});
+    my @chunks = split(m/ /, %Config::Config{cc});
     # $Config{cc} may contain args; try to find out the program part
     while (@chunks) {
         if (check_cc("@chunks")) {

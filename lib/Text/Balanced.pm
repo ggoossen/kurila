@@ -55,8 +55,8 @@ sub _succeed
 	$@ = undef;
 	my ($wantarray,$textref) = splice @_, 0, 2;
 	my ($extrapos, $extralen) = @_+>18 ? splice(@_, -2, 2) : (0,0);
-	my ($startlen, $oppos) = @_[5,6];
-	my $remainderpos = $_[2];
+	my ($startlen, $oppos) = @_[[5,6]];
+	my $remainderpos = @_[2];
 	if ($wantarray)
 	{
 		my @res;
@@ -65,8 +65,8 @@ sub _succeed
 			push @res, substr($$textref,$from,$len);
 		}
 		if ($extralen) {	# CORRECT FILLET
-			my $extra = substr($res[0], $extrapos-$oppos, $extralen, "\n");
-			$res[1] = "$extra$res[1]";
+			my $extra = substr(@res[0], $extrapos-$oppos, $extralen, "\n");
+			@res[1] = "$extra@res[1]";
 			eval { substr($$textref,$remainderpos,0, $extra);
 			       substr($$textref,$extrapos,$extralen,"\n")} ;
 				#REARRANGE HERE DOC AND FILLET IF POSSIBLE
@@ -79,12 +79,12 @@ sub _succeed
 	}
 	else
 	{
-		my $match = substr($$textref,$_[0],$_[1]);
-		substr($match,$extrapos-$_[0]-$startlen,$extralen,"") if $extralen;
+		my $match = substr($$textref,@_[0],@_[1]);
+		substr($match,$extrapos-@_[0]-$startlen,$extralen,"") if $extralen;
 		my $extra = $extralen
 			? substr($$textref, $extrapos, $extralen)."\n" : "";
-		eval {substr($$textref,$_[4],$_[1]+$_[5],$extra)} ;	#CHOP OUT PREFIX & MATCH, IF POSSIBLE
-		pos($$textref) = $_[4];				# RESET \G
+		eval {substr($$textref,@_[4],@_[1]+@_[5],$extra)} ;	#CHOP OUT PREFIX & MATCH, IF POSSIBLE
+		pos($$textref) = @_[4];				# RESET \G
 		return $match;
 	}
 }
@@ -123,11 +123,11 @@ sub gen_delimited_pat($;$)  # ($delimiters;$escapes)
 
 sub extract_delimited (;$$$$)
 {
-	my $textref = defined $_[0] ? \$_[0] : \$_;
+	my $textref = defined @_[0] ? \@_[0] : \$_;
 	my $wantarray = wantarray;
-	my $del  = defined $_[1] ? $_[1] : qq{\'\"\`};
-	my $pre  = defined $_[2] ? $_[2] : '\s*';
-	my $esc  = defined $_[3] ? $_[3] : qq{\\};
+	my $del  = defined @_[1] ? @_[1] : qq{\'\"\`};
+	my $pre  = defined @_[2] ? @_[2] : '\s*';
+	my $esc  = defined @_[3] ? @_[3] : qq{\\};
 	my $pat = gen_delimited_pat($del, $esc);
 	my $startpos = pos $$textref || 0;
 	return _fail($wantarray, $textref, "Not a delimited pattern", 0)
@@ -143,9 +143,9 @@ sub extract_delimited (;$$$$)
 
 sub extract_bracketed (;$$$)
 {
-	my $textref = defined $_[0] ? \$_[0] : \$_;
-	my $ldel = defined $_[1] ? $_[1] : '{([<';
-	my $pre  = defined $_[2] ? $_[2] : '\s*';
+	my $textref = defined @_[0] ? \@_[0] : \$_;
+	my $ldel = defined @_[1] ? @_[1] : '{([<';
+	my $pre  = defined @_[2] ? @_[2] : '\s*';
 	my $wantarray = wantarray;
 	my $qdel = "";
 	my $quotelike;
@@ -158,7 +158,7 @@ sub extract_bracketed (;$$$)
 	unless ($rdel =~ tr/[(\{</])\}>/)
         {
 		return _fail $wantarray, $textref,
-			     "Did not find a suitable bracket in delimiter: \"$_[1]\"",
+			     "Did not find a suitable bracket in delimiter: \"@_[1]\"",
 			     0;
 	}
 	my $posbug = pos;
@@ -172,9 +172,9 @@ sub extract_bracketed (;$$$)
 	return _fail ($wantarray, $textref) unless @match;
 
 	return _succeed ( $wantarray, $textref,
-			  $match[2], $match[5]+2,	# MATCH
-			  @match[8,9],			# REMAINDER
-			  @match[0,1],			# PREFIX
+			  @match[2], @match[5]+2,	# MATCH
+			  @match[[8,9]],			# REMAINDER
+			  @match[[0,1]],			# PREFIX
 			);
 }
 
@@ -211,7 +211,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 		elsif ($$textref =~ m/\G($rdel)/gc)
 		{
 			my ($found, $brackettype) = ($1, $1);
-			if ($#nesting +< 0)
+			if (!@nesting)
 			{
 				_failmsg "Unmatched closing bracket: \"$found\"",
 					 pos $$textref;
@@ -227,7 +227,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 				pos $$textref = $startpos;
 			        return;
 			}
-			last if $#nesting +< 0;
+			last if ! @nesting;
 		}
 		elsif ($qdel && $$textref =~ m/\G([$qdel])/gc)
 		{
@@ -244,7 +244,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 
 		else { $$textref =~ m/\G(?:[a-zA-Z0-9]+|.)/gcs }
 	}
-	if ($#nesting+>=0)
+	if (@nesting)
 	{
 		_failmsg "Unmatched opening bracket(s): "
 				. join("..",@nesting)."..",
@@ -266,7 +266,7 @@ sub _match_bracketed($$$$$$)	# $textref, $pre, $ldel, $qdel, $quotelike, $rdel
 
 sub _revbracket($)
 {
-	my $brack = reverse $_[0];
+	my $brack = reverse @_[0];
 	$brack =~ tr/[(\{</])\}>/;
 	return $brack;
 }
@@ -275,18 +275,18 @@ my $XMLNAME = q{[a-zA-Z_:][a-zA-Z0-9_:.-]*};
 
 sub extract_tagged (;$$$$$) # ($text, $opentag, $closetag, $pre, \%options)
 {
-	my $textref = defined $_[0] ? \$_[0] : \$_;
-	my $ldel    = $_[1];
-	my $rdel    = $_[2];
-	my $pre     = defined $_[3] ? $_[3] : '\s*';
-	my %options = defined $_[4] ? %{$_[4]} : ();
-	my $omode   = defined $options{fail} ? $options{fail} : '';
-	my $bad     = ref($options{reject}) eq 'ARRAY' ? join('|', @{$options{reject}})
-		    : defined($options{reject})	       ? $options{reject}
+	my $textref = defined @_[0] ? \@_[0] : \$_;
+	my $ldel    = @_[1];
+	my $rdel    = @_[2];
+	my $pre     = defined @_[3] ? @_[3] : '\s*';
+	my %options = defined @_[4] ? %{@_[4]} : ();
+	my $omode   = defined %options{fail} ? %options{fail} : '';
+	my $bad     = ref(%options{reject}) eq 'ARRAY' ? join('|', @{%options{reject}})
+		    : defined(%options{reject})	       ? %options{reject}
 		    :					 ''
 		    ;
-	my $ignore  = ref($options{ignore}) eq 'ARRAY' ? join('|', @{$options{ignore}})
-		    : defined($options{ignore})	       ? $options{ignore}
+	my $ignore  = ref(%options{ignore}) eq 'ARRAY' ? join('|', @{%options{ignore}})
+		    : defined(%options{ignore})	       ? %options{ignore}
 		    :					 ''
 		    ;
 
@@ -297,8 +297,8 @@ sub extract_tagged (;$$$$$) # ($text, $opentag, $closetag, $pre, \%options)
 
 	return _fail(wantarray, $textref) unless @match;
 	return _succeed wantarray, $textref,
-			$match[2], $match[3]+$match[5]+$match[7],	# MATCH
-			@match[8..9,0..1,2..7];				# REM, PRE, BITS
+			@match[2], @match[3]+@match[5]+@match[7],	# MATCH
+			@match[[8..9,0..1,2..7]];				# REM, PRE, BITS
 }
 
 sub _match_tagged	# ($$$$$$$)
@@ -326,7 +326,7 @@ sub _match_tagged	# ($$$$$$$)
 
 	if (!defined $rdel)
 	{
-		$rdelspec = substr($$textref, $-[0], $+[0] - $-[0]);
+		$rdelspec = substr($$textref, @-[0], @+[0] - @-[0]);
 		unless ($rdelspec =~ s/\A([[(<\{]+)($XMLNAME).*/{ quotemeta "$1\/$2". _revbracket($1) }/os)
 		{
 			_failmsg "Unable to construct closing tag to match: $rdel",
@@ -341,8 +341,7 @@ sub _match_tagged	# ($$$$$$$)
 			for (qw,~ ! ^ & * ) _ + - = } ] : " ; ' > . ? / | ',)
 				{ next if $rdel =~ m/\Q$_/; $del = $_; last }
 			unless ($del) {
-				use Carp;
-				croak "Can't interpolate right delimiter $rdel"
+				die "Can't interpolate right delimiter $rdel"
 			}
 			eval "qq$del$rdel$del";
 		};
@@ -422,16 +421,16 @@ failed:
 
 sub extract_variable (;$$)
 {
-	my $textref = defined $_[0] ? \$_[0] : \$_;
+	my $textref = defined @_[0] ? \@_[0] : \$_;
 	return ("","","") unless defined $$textref;
-	my $pre  = defined $_[1] ? $_[1] : '\s*';
+	my $pre  = defined @_[1] ? @_[1] : '\s*';
 
 	my @match = _match_variable($textref,$pre);
 
 	return _fail wantarray, $textref unless @match;
 
 	return _succeed wantarray, $textref,
-			@match[2..3,4..5,0..1];		# MATCH, REMAINDER, PREFIX
+			@match[[2..3,4..5,0..1]];		# MATCH, REMAINDER, PREFIX
 }
 
 sub _match_variable($$)
@@ -491,12 +490,12 @@ sub _match_variable($$)
 
 sub extract_codeblock (;$$$$$)
 {
-	my $textref = defined $_[0] ? \$_[0] : \$_;
+	my $textref = defined @_[0] ? \@_[0] : \$_;
 	my $wantarray = wantarray;
-	my $ldel_inner = defined $_[1] ? $_[1] : '{';
-	my $pre        = defined $_[2] ? $_[2] : '\s*';
-	my $ldel_outer = defined $_[3] ? $_[3] : $ldel_inner;
-	my $rd         = $_[4];
+	my $ldel_inner = defined @_[1] ? @_[1] : '{';
+	my $pre        = defined @_[2] ? @_[2] : '\s*';
+	my $ldel_outer = defined @_[3] ? @_[3] : $ldel_inner;
+	my $rd         = @_[4];
 	my $rdel_inner = $ldel_inner;
 	my $rdel_outer = $ldel_outer;
 	my $posbug = pos;
@@ -514,7 +513,7 @@ sub extract_codeblock (;$$$$$)
 				     $rd);
 	return _fail($wantarray, $textref) unless @match;
 	return _succeed($wantarray, $textref,
-			@match[2..3,4..5,0..1]	# MATCH, REMAINDER, PREFIX
+			@match[[2..3,4..5,0..1]]	# MATCH, REMAINDER, PREFIX
 		       );
 
 }
@@ -644,18 +643,18 @@ my %mods   = (
 
 sub extract_quotelike (;$$)
 {
-	my $textref = $_[0] ? \$_[0] : \$_;
+	my $textref = @_[0] ? \@_[0] : \$_;
 	my $wantarray = wantarray;
-	my $pre  = defined $_[1] ? $_[1] : '\s*';
+	my $pre  = defined @_[1] ? @_[1] : '\s*';
 
 	my @match = _match_quotelike($textref,$pre,1,0);
 	return _fail($wantarray, $textref) unless @match;
 	return _succeed($wantarray, $textref,
-			$match[2], $match[18]-$match[2],	# MATCH
-			@match[18,19],				# REMAINDER
-			@match[0,1],				# PREFIX
-			@match[2..17],				# THE BITS
-			@match[20,21],				# ANY FILLET?
+			@match[2], @match[18]-@match[2],	# MATCH
+			@match[[18,19]],				# REMAINDER
+			@match[[0,1]],				# PREFIX
+			@match[[2..17]],				# THE BITS
+			@match[[20,21]],				# ANY FILLET?
 		       );
 };
 
@@ -699,7 +698,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 
 		if ($initial eq '/' || $initial eq '?') 
 		{
-			$$textref =~ m/\G$mods{none}/gc
+			$$textref =~ m/\G%mods{none}/gc
 		}
 
 		my $endpos = pos($$textref);
@@ -843,7 +842,7 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 
 	$modpos = pos $$textref;
 
-	$$textref =~ m/\G($mods{$op})/gc;
+	$$textref =~ m/\G(%mods{$op})/gc;
 	my $endpos = pos $$textref;
 
 	return (
@@ -862,31 +861,30 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 
 my $def_func = 
 [
-	sub { extract_variable($_[0], '') },
-	sub { extract_quotelike($_[0],'') },
-	sub { extract_codeblock($_[0],'{}','') },
+	sub { extract_variable(@_[0], '') },
+	sub { extract_quotelike(@_[0],'') },
+	sub { extract_codeblock(@_[0],'{}','') },
 ];
 
 sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunknown)
 {
-	my $textref = defined($_[0]) ? \$_[0] : \$_;
+	my $textref = defined(@_[0]) ? \@_[0] : \$_;
 	my $posbug = pos;
 	my ($lastpos, $firstpos);
 	my @fields = ();
 
 	#for ($$textref)
 	{
-		my @func = defined $_[1] ? @{$_[1]} : @{$def_func};
-		my $max  = defined $_[2] && $_[2]+>0 ? $_[2] : 1_000_000_000;
-		my $igunk = $_[3];
+		my @func = defined @_[1] ? @{@_[1]} : @{$def_func};
+		my $max  = defined @_[2] && @_[2]+>0 ? @_[2] : 1_000_000_000;
+		my $igunk = @_[3];
 
 		pos $$textref ||= 0;
 
 		unless (wantarray)
 		{
-			use Carp;
-			carp "extract_multiple reset maximal count to 1 in scalar context"
-				if $^W && defined($_[2]) && $max +> 1;
+			warn "extract_multiple reset maximal count to 1 in scalar context"
+				if $^W && defined(@_[2]) && $max +> 1;
 			$max = 1
 		}
 
@@ -899,8 +897,8 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 		{
 			if (ref($func) eq 'HASH')
 			{
-				push @class, (keys %$func)[0];
-				$func = (values %$func)[0];
+				push @class, (keys %$func)[[0]];
+				$func = (values %$func)[[0]];
 			}
 			else
 			{
@@ -912,11 +910,11 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 		{
 			my ($field, $rem);
 			my @bits;
-			foreach my $i ( 0..$#func )
+			foreach my $i ( 0..@func-1 )
 			{
 				my $pref;
-				$func = $func[$i];
-				$class = $class[$i];
+				$func = @func[$i];
+				$class = @class[$i];
 				$lastpos = pos $$textref;
 				if (ref($func) eq 'CODE')
 					{ ($field,$rem,$pref) = @bits = $func->($$textref) }
@@ -925,7 +923,7 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 				elsif( $$textref =~ m/\G$func/gc )
 					{ @bits = $field = defined($1)
                                 ? $1
-                                : substr($$textref, $-[0], $+[0] - $-[0])
+                                : substr($$textref, @-[0], @+[0] - @-[0])
                     }
 				$pref ||= "";
 				if (defined($field) && length($field))
@@ -972,23 +970,23 @@ sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunkno
 	$firstpos ||= 0;
 	eval { substr($$textref,$firstpos,$lastpos-$firstpos,"");
 	       pos $$textref = $firstpos };
-	return $fields[0];
+	return @fields[0];
 }
 
 
 sub gen_extract_tagged # ($opentag, $closetag, $pre, \%options)
 {
-	my $ldel    = $_[0];
-	my $rdel    = $_[1];
-	my $pre     = defined $_[2] ? $_[2] : '\s*';
-	my %options = defined $_[3] ? %{$_[3]} : ();
-	my $omode   = defined $options{fail} ? $options{fail} : '';
-	my $bad     = ref($options{reject}) eq 'ARRAY' ? join('|', @{$options{reject}})
-		    : defined($options{reject})	       ? $options{reject}
+	my $ldel    = @_[0];
+	my $rdel    = @_[1];
+	my $pre     = defined @_[2] ? @_[2] : '\s*';
+	my %options = defined @_[3] ? %{@_[3]} : ();
+	my $omode   = defined %options{fail} ? %options{fail} : '';
+	my $bad     = ref(%options{reject}) eq 'ARRAY' ? join('|', @{%options{reject}})
+		    : defined(%options{reject})	       ? %options{reject}
 		    :					 ''
 		    ;
-	my $ignore  = ref($options{ignore}) eq 'ARRAY' ? join('|', @{$options{ignore}})
-		    : defined($options{ignore})	       ? $options{ignore}
+	my $ignore  = ref(%options{ignore}) eq 'ARRAY' ? join('|', @{%options{ignore}})
+		    : defined(%options{ignore})	       ? %options{ignore}
 		    :					 ''
 		    ;
 
@@ -1000,13 +998,13 @@ sub gen_extract_tagged # ($opentag, $closetag, $pre, \%options)
 
 	my $closure = sub
 	{
-		my $textref = defined $_[0] ? \$_[0] : \$_;
+		my $textref = defined @_[0] ? \@_[0] : \$_;
 		my @match = Text::Balanced::_match_tagged($textref, $pre, $ldel, $rdel, $omode, $bad, $ignore);
 
 		return _fail(wantarray, $textref) unless @match;
 		return _succeed wantarray, $textref,
-				$match[2], $match[3]+$match[5]+$match[7],	# MATCH
-				@match[8..9,0..1,2..7];				# REM, PRE, BITS
+				@match[2], @match[3]+@match[5]+@match[7],	# MATCH
+				@match[[8..9,0..1,2..7]];				# REM, PRE, BITS
 	};
 
 	bless $closure, 'Text::Balanced::Extractor';
@@ -1016,12 +1014,12 @@ package Text::Balanced::Extractor;
 
 sub extract($$)	# ($self, $text)
 {
-	&{$_[0]}($_[1]);
+	&{@_[0]}(@_[1]);
 }
 
 package Text::Balanced::ErrorMsg;
 
-use overload '""' => sub { "$_[0]->{error}, detected at offset $_[0]->{pos}" };
+use overload '""' => sub { "@_[0]->{error}, detected at offset @_[0]->{pos}" };
 
 1;
 

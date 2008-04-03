@@ -162,10 +162,8 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
     case PERL_MAGIC_defelem:
-    case PERL_MAGIC_arylen:
     case PERL_MAGIC_pos:
     case PERL_MAGIC_backref:
-    case PERL_MAGIC_arylen_p:
     case PERL_MAGIC_rhash:
     case PERL_MAGIC_symtab:
 	return 0;
@@ -326,9 +324,9 @@ Perl_mg_length(pTHX_ SV *sv)
     {
 	/* You can't know whether it's UTF-8 until you get the string again...
 	 */
-        const U8 *s = (U8*)SvPV_const(sv, len);
+        const char *s = SvPV_const(sv, len);
 
-	if (DO_UTF8(sv)) {
+	if (IN_CODEPOINTS) {
 	    len = utf8_length(s, s + len);
 	}
     }
@@ -1835,65 +1833,6 @@ Perl_magic_setdbline(pTHX_ SV *sv, MAGIC *mg)
             else
                 o->op_flags &= ~OPf_SPECIAL;
         }
-    }
-    return 0;
-}
-
-int
-Perl_magic_getarylen(pTHX_ SV *sv, const MAGIC *mg)
-{
-    dVAR;
-    const AV * const obj = (AV*)mg->mg_obj;
-
-    PERL_ARGS_ASSERT_MAGIC_GETARYLEN;
-
-    if (obj) {
-        sv_setiv(sv, AvFILL(obj));
-    } else {
-        SvOK_off(sv);
-    }
-    return 0;
-}
-
-int
-Perl_magic_setarylen(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    AV * const obj = (AV*)mg->mg_obj;
-
-    PERL_ARGS_ASSERT_MAGIC_SETARYLEN;
-
-    if (obj) {
-        av_fill(obj, SvIV(sv));
-    } else {
-        if (ckWARN(WARN_MISC))
-            Perl_warner(aTHX_ packWARN(WARN_MISC),
-                        "Attempt to set length of freed array");
-    }
-    return 0;
-}
-
-int
-Perl_magic_freearylen_p(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_MAGIC_FREEARYLEN_P;
-    PERL_UNUSED_ARG(sv);
-
-    /* during global destruction, mg_obj may already have been freed */
-    if (PL_in_clean_all)
-        return 0;
-
-    mg = mg_find (mg->mg_obj, PERL_MAGIC_arylen);
-
-    if (mg) {
-        /* arylen scalar holds a pointer back to the array, but doesn't own a
-           reference. Hence the we (the array) are about to go away with it
-           still pointing at us. Clear its pointer, else it would be pointing
-           at free memory. See the comment in sv_magic about reference loops,
-           and why it can't own a reference to us.  */
-        mg->mg_obj = 0;
     }
     return 0;
 }

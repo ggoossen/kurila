@@ -443,7 +443,7 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name = @methods == 1 ? "$class->can('$methods[0]')" 
+    $name = @methods == 1 ? "$class->can('@methods[0]')" 
                           : "$class->can(...)";
 
     my $ok = $tb->ok( !@nok, $name );
@@ -620,19 +620,19 @@ sub use_ok ($;@) {
     my($pack,$filename,$line) = caller;
 
     my $code;
-    if( @imports == 1 and $imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
+    if( @imports == 1 and @imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         $code = <<USE;
 package $pack;
-use $module $imports[0];
+use $module @imports[0];
 1;
 USE
     }
     else {
         $code = <<USE;
 package $pack;
-use $module \@\{\$args[0]\};
+use $module \@\{\@args[0]\};
 1;
 USE
     }
@@ -754,7 +754,7 @@ use vars qw(@Data_Stack %Refs_Seen);
 my $DNE = bless [], 'Does::Not::Exist';
 
 sub _dne {
-    ref $_[0] eq ref $DNE;
+    ref @_[0] eq ref $DNE;
 }
 
 
@@ -763,7 +763,7 @@ sub is_deeply {
 
     unless( @_ == 2 or @_ == 3 ) {
         my $msg = <<WARNING;
-is_deeply() takes two or three args, you gave %d.
+is_deeply() takes two or three args, you gave \%d.
 This usually means you passed an array or hash instead 
 of a reference to it
 WARNING
@@ -821,19 +821,18 @@ sub _format_stack {
         }
     }
 
-    my @vals = @{$Stack[-1]{vals}}[0,1];
+    my @vals = @{@Stack[-1]{vals}}[[0,1]];
     my @vars = ();
-    ($vars[0] = $var) =~ s/\$FOO/     \$got/;
-    ($vars[1] = $var) =~ s/\$FOO/\$expected/;
+    (@vars[0] = $var) =~ s/\$FOO/     \$got/;
+    (@vars[1] = $var) =~ s/\$FOO/\$expected/;
 
     my $out = "Structures begin differing at:\n";
-    foreach my $idx (0..$#vals) {
-        my $val = $vals[$idx];
-        $vals[$idx] = _dne($val)    ? "Does not exist" : dump::view($val);
+    foreach my $val (@vals) {
+        $val = _dne($val)    ? "Does not exist" : dump::view($val);
     }
 
-    $out .= "$vars[0] = $vals[0]\n";
-    $out .= "$vars[1] = $vals[1]\n";
+    $out .= "@vars[0] = @vals[0]\n";
+    $out .= "@vars[1] = @vals[1]\n";
 
     $out =~ s/^/    /msg;
     return $out;
@@ -1158,10 +1157,10 @@ sub _eq_array  {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $max = $#$a1 +> $#$a2 ? $#$a1 : $#$a2;
-    for (0..$max) {
-        my $e1 = $_ +> $#$a1 ? $DNE : $a1->[$_];
-        my $e2 = $_ +> $#$a2 ? $DNE : $a2->[$_];
+    my $max = @$a1 +> @$a2 ? @$a1 : @$a2;
+    for (0..$max-1) {
+        my $e1 = $_ +> @$a1-1 ? $DNE : $a1->[$_];
+        my $e2 = $_ +> @$a2-1 ? $DNE : $a2->[$_];
 
         push @Data_Stack, { type => 'ARRAY', idx => $_, vals => [$e1, $e2] };
         $ok = _deep_check($e1,$e2);
@@ -1211,10 +1210,10 @@ sub _deep_check {
 	    $ok = 0;
 	}
         else {
-            if( $Refs_Seen{ref::address($e1)} ) {
-                return $Refs_Seen{ref::address($e1)} eq ref::address($e2);
+            if( %Refs_Seen{ref::address($e1)} ) {
+                return %Refs_Seen{ref::address($e1)} eq ref::address($e2);
             }
-            $Refs_Seen{ref::address $e1} = ref::address $e2;
+            %Refs_Seen{ref::address $e1} = ref::address $e2;
 
             my $type = _type($e1);
             $type = 'DIFFERENT' unless _type($e2) eq $type;

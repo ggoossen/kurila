@@ -1,7 +1,7 @@
 #!/usr/bin/perl -wT
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -16,7 +16,7 @@ my $db_file;
 BEGIN {
     use Config;
     foreach (qw/DB_File/) {
-        if ($Config{extensions} =~ m/\b$_\b/) {
+        if (%Config{extensions} =~ m/\b$_\b/) {
             $db_file = $_;
             last;
         }
@@ -109,13 +109,13 @@ SKIP: {
 }
 
 # Now try to load well known XS modules
-my $extensions = $Config{'dynamic_ext'};
+my $extensions = %Config{'dynamic_ext'};
 $extensions =~ s|/|::|g;
 
 for my $module (sort keys %modules) {
     SKIP: {
         if ($extensions !~ m/\b$module\b/) {
-            delete($modules{$module});
+            delete(%modules{$module});
             skip "$module not available", 3;
         }
         eval "use $module";

@@ -9,13 +9,13 @@ require Config; Config->import;
 
 $TEST_COUNT = 11;
 
-if ($Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
+if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
     skip_all('IPC::SysV was not built');
 }
-elsif ($Config{'d_sem'} ne 'define') {
+elsif (%Config{'d_sem'} ne 'define') {
     skip_all('$Config{d_sem} undefined');
 }
-elsif ($Config{'d_msg'} ne 'define') {
+elsif (%Config{'d_msg'} ne 'define') {
     skip_all('$Config{d_msg} undefined');
 }
 else {
@@ -59,7 +59,7 @@ ok($sem->setall( (0) x 10),'set all');
 my @sem = $sem->getall;
 cmp_ok(join("",@sem),'eq',"0000000000",'get all');
 
-$sem[2] = 1;
+@sem[2] = 1;
 ok($sem->setall( @sem ),'set after change');
 
 @sem = $sem->getall;

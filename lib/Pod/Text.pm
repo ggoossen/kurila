@@ -85,33 +85,33 @@ sub new {
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
     my %opts = @_;
-    my @opts = map { ("opt_$_", $opts{$_}) } keys %opts;
+    my @opts = map { ("opt_$_", %opts{$_}) } keys %opts;
     %$self = (%$self, @opts);
 
     # Initialize various things from our parameters.
-    $$self{opt_alt}      = 0  unless defined $$self{opt_alt};
-    $$self{opt_indent}   = 4  unless defined $$self{opt_indent};
-    $$self{opt_margin}   = 0  unless defined $$self{opt_margin};
-    $$self{opt_loose}    = 0  unless defined $$self{opt_loose};
-    $$self{opt_sentence} = 0  unless defined $$self{opt_sentence};
-    $$self{opt_width}    = 76 unless defined $$self{opt_width};
+    %$self{opt_alt}      = 0  unless defined %$self{opt_alt};
+    %$self{opt_indent}   = 4  unless defined %$self{opt_indent};
+    %$self{opt_margin}   = 0  unless defined %$self{opt_margin};
+    %$self{opt_loose}    = 0  unless defined %$self{opt_loose};
+    %$self{opt_sentence} = 0  unless defined %$self{opt_sentence};
+    %$self{opt_width}    = 76 unless defined %$self{opt_width};
 
     # Figure out what quotes we'll be using for C<> text.
-    $$self{opt_quotes} ||= '"';
-    if ($$self{opt_quotes} eq 'none') {
-        $$self{LQUOTE} = $$self{RQUOTE} = '';
-    } elsif (length ($$self{opt_quotes}) == 1) {
-        $$self{LQUOTE} = $$self{RQUOTE} = $$self{opt_quotes};
-    } elsif ($$self{opt_quotes} =~ m/^(.)(.)$/
-             || $$self{opt_quotes} =~ m/^(..)(..)$/) {
-        $$self{LQUOTE} = $1;
-        $$self{RQUOTE} = $2;
+    %$self{opt_quotes} ||= '"';
+    if (%$self{opt_quotes} eq 'none') {
+        %$self{LQUOTE} = %$self{RQUOTE} = '';
+    } elsif (length (%$self{opt_quotes}) == 1) {
+        %$self{LQUOTE} = %$self{RQUOTE} = %$self{opt_quotes};
+    } elsif (%$self{opt_quotes} =~ m/^(.)(.)$/
+             || %$self{opt_quotes} =~ m/^(..)(..)$/) {
+        %$self{LQUOTE} = $1;
+        %$self{RQUOTE} = $2;
     } else {
-        die qq(Invalid quote specification "$$self{opt_quotes}");
+        die qq(Invalid quote specification "%$self{opt_quotes}");
     }
 
     # If requested, do something with the non-POD text.
-    $self->code_handler (\&handle_code) if $$self{opt_code};
+    $self->code_handler (\&handle_code) if %$self{opt_code};
 
     # Return the created object.
     return $self;
@@ -139,8 +139,8 @@ sub new {
 # according to the current formatting instructions as we do.
 sub _handle_text {
     my ($self, $text) = @_;
-    my $tag = $$self{PENDING}[-1];
-    $$tag[1] .= $text;
+    my $tag = %$self{PENDING}[-1];
+    @$tag[1] .= $text;
 }
 
 # Given an element name, get the corresponding method name.
@@ -163,7 +163,7 @@ sub _handle_element_start {
     # If we have a command handler, we need to accumulate the contents of the
     # tag before calling it.
     if ($self->can ("cmd_$method")) {
-        push (@{ $$self{PENDING} }, [ $attrs, '' ]);
+        push (@{ %$self{PENDING} }, [ $attrs, '' ]);
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
@@ -180,12 +180,12 @@ sub _handle_element_end {
     # If we have a command handler, pull off the pending text and pass it to
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
-        my $tag = pop @{ $$self{PENDING} };
+        my $tag = pop @{ %$self{PENDING} };
         my $method = 'cmd_' . $method;
         my $text = $self->?$method (@$tag);
         if (defined $text) {
-            if (@{ $$self{PENDING} } +> 1) {
-                $$self{PENDING}[-1][1] .= $text;
+            if (@{ %$self{PENDING} } +> 1) {
+                %$self{PENDING}[-1][1] .= $text;
             } else {
                 $self->output ($text);
             }
@@ -208,8 +208,8 @@ sub wrap {
     my $self = shift;
     local $_ = shift;
     my $output = '';
-    my $spaces = ' ' x $$self{MARGIN};
-    my $width = $$self{opt_width} - $$self{MARGIN};
+    my $spaces = ' ' x %$self{MARGIN};
+    my $width = %$self{opt_width} - %$self{MARGIN};
     while (length +> $width) {
         if (s/^([^\n]{0,$width})[ \t]+// || s/^([^\n]{$width})//) {
             $output .= $spaces . $1 . "\n";
@@ -230,7 +230,7 @@ sub reformat {
 
     # If we're trying to preserve two spaces after sentences, do some munging
     # to support that.  Otherwise, smash all repeated whitespace.
-    if ($$self{opt_sentence}) {
+    if (%$self{opt_sentence}) {
         s/ +$//mg;
         s/\.\n/. \n/g;
         s/\n/ /g;
@@ -246,13 +246,13 @@ sub output {
     my ($self, $text) = @_;
     $text =~ s/\x{a0}/ /g; # non-breaking space
     $text =~ s/\x{ad}//g; # soft hyphen
-    print { $$self{output_fh} } $text;
+    print { %$self{output_fh} } $text;
 }
 
 # Output a block of code (something that isn't part of the POD text).  Called
 # by preprocess_paragraph only if we were given the code option.  Exists here
 # only so that it can be overridden by subclasses.
-sub output_code { $_[0]->output ($_[1]) }
+sub output_code { @_[0]->output (@_[1]) }
 
 ##############################################################################
 # Document initialization
@@ -261,12 +261,12 @@ sub output_code { $_[0]->output ($_[1]) }
 # Set up various things that have to be initialized on a per-document basis.
 sub start_document {
     my $self = shift;
-    my $margin = $$self{opt_indent} + $$self{opt_margin};
+    my $margin = %$self{opt_indent} + %$self{opt_margin};
 
     # Initialize a few per-document variables.
-    $$self{INDENTS} = [];       # Stack of indentations.
-    $$self{MARGIN}  = $margin;  # Default left margin.
-    $$self{PENDING} = [[]];     # Pending output.
+    %$self{INDENTS} = [];       # Stack of indentations.
+    %$self{MARGIN}  = $margin;  # Default left margin.
+    %$self{PENDING} = [[]];     # Pending output.
 
     return '';
 }
@@ -284,27 +284,27 @@ sub start_document {
 # have to put it on a separate line.
 sub item {
     my ($self, $text) = @_;
-    my $tag = $$self{ITEM};
+    my $tag = %$self{ITEM};
     unless (defined $tag) {
         warn "Item called without tag";
         return;
     }
-    undef $$self{ITEM};
+    undef %$self{ITEM};
 
     # Calculate the indentation and margin.  $fits is set to true if the tag
     # will fit into the margin of the paragraph given our indentation level.
-    my $indent = $$self{INDENTS}[-1];
-    $indent = $$self{opt_indent} unless defined $indent;
-    my $margin = ' ' x $$self{opt_margin};
-    my $fits = ($$self{MARGIN} - $indent +>= length ($tag) + 1);
+    my $indent = %$self{INDENTS}[-1];
+    $indent = %$self{opt_indent} unless defined $indent;
+    my $margin = ' ' x %$self{opt_margin};
+    my $fits = (%$self{MARGIN} - $indent +>= length ($tag) + 1);
 
     # If the tag doesn't fit, or if we have no associated text, print out the
     # tag separately.  Otherwise, put the tag in the margin of the paragraph.
     if (!$text || $text =~ m/^\s+$/ || !$fits) {
-        my $realindent = $$self{MARGIN};
-        $$self{MARGIN} = $indent;
+        my $realindent = %$self{MARGIN};
+        %$self{MARGIN} = $indent;
         my $output = $self->reformat ($tag);
-        $output =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent +> 0);
+        $output =~ s/^$margin /$margin:/ if (%$self{opt_alt} && $indent +> 0);
         $output =~ s/\n*$/\n/;
 
         # If the text is just whitespace, we have an empty item paragraph;
@@ -314,13 +314,13 @@ sub item {
         $output .= "\n" if $text && $text =~ m/^\s*$/;
 
         $self->output ($output);
-        $$self{MARGIN} = $realindent;
+        %$self{MARGIN} = $realindent;
         $self->output ($self->reformat ($text)) if ($text && $text =~ m/\S/);
     } else {
         my $space = ' ' x $indent;
-        $space =~ s/^$margin /$margin:/ if $$self{opt_alt};
+        $space =~ s/^$margin /$margin:/ if %$self{opt_alt};
         $text = $self->reformat ($text);
-        $text =~ s/^$margin /$margin:/ if ($$self{opt_alt} && $indent +> 0);
+        $text =~ s/^$margin /$margin:/ if (%$self{opt_alt} && $indent +> 0);
         my $tagspace = ' ' x length $tag;
         $text =~ s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
         $self->output ($text);
@@ -332,7 +332,7 @@ sub item {
 sub cmd_para {
     my ($self, $attrs, $text) = @_;
     $text =~ s/\s+$/\n/;
-    if (defined $$self{ITEM}) {
+    if (defined %$self{ITEM}) {
         $self->item ($text . "\n");
     } else {
         $self->output ($self->reformat ($text . "\n"));
@@ -344,9 +344,9 @@ sub cmd_para {
 # our margin.
 sub cmd_verbatim {
     my ($self, $attrs, $text) = @_;
-    $self->item if defined $$self{ITEM};
+    $self->item if defined %$self{ITEM};
     return if $text =~ m/^\s*$/;
-    $text =~ s/^(\n*)(\s*\S+)/{$1 . (' ' x $$self{MARGIN}) . $2}/gm;
+    $text =~ s/^(\n*)(\s*\S+)/{$1 . (' ' x %$self{MARGIN}) . $2}/gm;
     $text =~ s/\s*$/\n\n/;
     $self->output ($text);
     return '';
@@ -370,15 +370,15 @@ sub cmd_data {
 # indentation, and the surrounding marker for the alt formatting method.
 sub heading {
     my ($self, $text, $indent, $marker) = @_;
-    $self->item ("\n\n") if defined $$self{ITEM};
+    $self->item ("\n\n") if defined %$self{ITEM};
     $text =~ s/\s+$//;
-    if ($$self{opt_alt}) {
+    if (%$self{opt_alt}) {
         my $closemark = reverse (split (m//, $marker));
-        my $margin = ' ' x $$self{opt_margin};
+        my $margin = ' ' x %$self{opt_margin};
         $self->output ("\n" . "$margin$marker $text $closemark" . "\n\n");
     } else {
-        $text .= "\n" if $$self{opt_loose};
-        my $margin = ' ' x ($$self{opt_margin} + $indent);
+        $text .= "\n" if %$self{opt_loose};
+        my $margin = ' ' x (%$self{opt_margin} + $indent);
         $self->output ($margin . $text . "\n");
     }
     return '';
@@ -393,19 +393,19 @@ sub cmd_head1 {
 # Second level heading.
 sub cmd_head2 {
     my ($self, $attrs, $text) = @_;
-    $self->heading ($text, $$self{opt_indent} / 2, '==  ');
+    $self->heading ($text, %$self{opt_indent} / 2, '==  ');
 }
 
 # Third level heading.
 sub cmd_head3 {
     my ($self, $attrs, $text) = @_;
-    $self->heading ($text, $$self{opt_indent} * 2 / 3 + 0.5, '=   ');
+    $self->heading ($text, %$self{opt_indent} * 2 / 3 + 0.5, '=   ');
 }
 
 # Fourth level heading.
 sub cmd_head4 {
     my ($self, $attrs, $text) = @_;
-    $self->heading ($text, $$self{opt_indent} * 3 / 4 + 0.5, '-   ');
+    $self->heading ($text, %$self{opt_indent} * 3 / 4 + 0.5, '-   ');
 }
 
 ##############################################################################
@@ -417,17 +417,17 @@ sub cmd_head4 {
 # the four different types of lists (bullet, number, text, and block).
 sub over_common_start {
     my ($self, $attrs) = @_;
-    $self->item ("\n\n") if defined $$self{ITEM};
+    $self->item ("\n\n") if defined %$self{ITEM};
 
     # Find the indentation level.
-    my $indent = $$attrs{indent};
+    my $indent = %$attrs{indent};
     unless (defined ($indent) && $indent =~ m/^\s*[-+]?\d{1,4}\s*$/) {
-        $indent = $$self{opt_indent};
+        $indent = %$self{opt_indent};
     }
 
     # Add this to our stack of indents and increase our current margin.
-    push (@{ $$self{INDENTS} }, $$self{MARGIN});
-    $$self{MARGIN} += ($indent + 0);
+    push (@{ %$self{INDENTS} }, %$self{MARGIN});
+    %$self{MARGIN} += ($indent + 0);
     return '';
 }
 
@@ -435,26 +435,26 @@ sub over_common_start {
 # any pending items and then pop one level of indentation.
 sub over_common_end {
     my ($self) = @_;
-    $self->item ("\n\n") if defined $$self{ITEM};
-    $$self{MARGIN} = pop @{ $$self{INDENTS} };
+    $self->item ("\n\n") if defined %$self{ITEM};
+    %$self{MARGIN} = pop @{ %$self{INDENTS} };
     return '';
 }
 
 # Dispatch the start and end calls as appropriate.
-sub start_over_bullet { $_[0]->over_common_start ($_[1]) }
-sub start_over_number { $_[0]->over_common_start ($_[1]) }
-sub start_over_text   { $_[0]->over_common_start ($_[1]) }
-sub start_over_block  { $_[0]->over_common_start ($_[1]) }
-sub end_over_bullet { $_[0]->over_common_end }
-sub end_over_number { $_[0]->over_common_end }
-sub end_over_text   { $_[0]->over_common_end }
-sub end_over_block  { $_[0]->over_common_end }
+sub start_over_bullet { @_[0]->over_common_start (@_[1]) }
+sub start_over_number { @_[0]->over_common_start (@_[1]) }
+sub start_over_text   { @_[0]->over_common_start (@_[1]) }
+sub start_over_block  { @_[0]->over_common_start (@_[1]) }
+sub end_over_bullet { @_[0]->over_common_end }
+sub end_over_number { @_[0]->over_common_end }
+sub end_over_text   { @_[0]->over_common_end }
+sub end_over_block  { @_[0]->over_common_end }
 
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.
 sub item_common {
     my ($self, $type, $attrs, $text) = @_;
-    $self->item if defined $$self{ITEM};
+    $self->item if defined %$self{ITEM};
 
     # Clean up the text.  We want to end up with two variables, one ($text)
     # which contains any body text after taking out the item portion, and
@@ -465,13 +465,13 @@ sub item_common {
     if ($type eq 'bullet') {
         $item = '*';
     } elsif ($type eq 'number') {
-        $item = $$attrs{'~orig_content'};
+        $item = %$attrs{'~orig_content'};
     } else {
         $item = $text;
         $item =~ s/\s*\n\s*/ /g;
         $text = '';
     }
-    $$self{ITEM} = $item;
+    %$self{ITEM} = $item;
 
     # If body text for this item was included, go ahead and output that now.
     if ($text) {
@@ -492,9 +492,9 @@ sub cmd_item_block  { my $self = shift; $self->item_common ('block',  @_) }
 ##############################################################################
 
 # The simple ones.
-sub cmd_b { return $_[0]{alt} ? "``$_[2]''" : $_[2] }
-sub cmd_f { return $_[0]{alt} ? "\"$_[2]\"" : $_[2] }
-sub cmd_i { return '*' . $_[2] . '*' }
+sub cmd_b { return @_[0]{alt} ? "``@_[2]''" : @_[2] }
+sub cmd_f { return @_[0]{alt} ? "\"@_[2]\"" : @_[2] }
+sub cmd_i { return '*' . @_[2] . '*' }
 sub cmd_x { return '' }
 
 # Apply a whole bunch of messy heuristics to not quote things that don't
@@ -525,16 +525,16 @@ sub cmd_c {
      }xo && return $text;
 
     # If we didn't return, go ahead and quote the text.
-    return $$self{opt_alt}
+    return %$self{opt_alt}
         ? "``$text''"
-        : "$$self{LQUOTE}$text$$self{RQUOTE}";
+        : "%$self{LQUOTE}$text%$self{RQUOTE}";
 }
 
 # Links reduce to the text that we're given, wrapped in angle brackets if it's
 # a URL.
 sub cmd_l {
     my ($self, $attrs, $text) = @_;
-    return $$attrs{type} eq 'url' ? "<$text>" : $text;
+    return %$attrs{type} eq 'url' ? "<$text>" : $text;
 }
 
 ##############################################################################
@@ -549,7 +549,7 @@ sub pod2text {
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
-    while ($_[0] =~ m/^-/) {
+    while (@_[0] =~ m/^-/) {
         my $flag = shift;
         if    ($flag eq '-a')       { push (@args, alt => 1)    }
         elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
@@ -566,16 +566,16 @@ sub pod2text {
     # handle.  That means we want to call parse_from_filehandle(), which means
     # we need to turn the first argument into a file handle.  Magic open will
     # handle the <&STDIN case automagically.
-    if (defined $_[1]) {
+    if (defined @_[1]) {
         my @fhs = @_;
         local *IN;
-        unless (open (IN, "<", $fhs[0])) {
-            die ("Can't open $fhs[0] for reading: $!\n");
+        unless (open (IN, "<", @fhs[0])) {
+            die ("Can't open @fhs[0] for reading: $!\n");
             return;
         }
-        $fhs[0] = \*IN;
-        $parser->output_fh ($fhs[1]);
-        my $retval = $parser->parse_file ($fhs[0]);
+        @fhs[0] = \*IN;
+        $parser->output_fh (@fhs[1]);
+        my $retval = $parser->parse_file (@fhs[0]);
         my $fh = $parser->output_fh ();
         close $fh;
         return $retval;
@@ -592,11 +592,11 @@ sub parse_from_file {
 
     # Fake the old cutting option to Pod::Parser.  This fiddings with internal
     # Pod::Simple state and is quite ugly; we need a better approach.
-    if (ref ($_[0]) eq 'HASH') {
+    if (ref (@_[0]) eq 'HASH') {
         my $opts = shift @_;
-        if (defined ($$opts{-cutting}) && !$$opts{-cutting}) {
-            $$self{in_pod} = 1;
-            $$self{last_was_blank} = 1;
+        if (defined (%$opts{-cutting}) && !%$opts{-cutting}) {
+            %$self{in_pod} = 1;
+            %$self{last_was_blank} = 1;
         }
     }
 

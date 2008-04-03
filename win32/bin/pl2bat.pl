@@ -12,10 +12,10 @@ Usage:  $0 [-h]
    or:  $0 [-w] [-u] [-n ntargs] [-o otherargs] [-s stripsuffix] [files]
         -n ntargs       arguments to invoke perl with in generated file
                             when run from Windows NT.  Defaults to
-                            '-x -S %0 %*'.
+                            '-x -S \%0 \%*'.
         -o otherargs    arguments to invoke perl with in generated file
                             other than when run from Windows NT.  Defaults
-                            to '-x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9'.
+                            to '-x -S "\%0" \%1 \%2 \%3 \%4 \%5 \%6 \%7 \%8 \%9'.
         -a argstring    arguments to invoke perl with in generated file
                             ignoring operating system (for compatibility
                             with previous pl2bat versions).
@@ -31,19 +31,19 @@ Usage:  $0 [-h]
 EOT
 
 my %OPT = ();
-warn($usage), exit(0) if !getopts('whun:o:a:s:',\%OPT) or $OPT{'h'};
+warn($usage), exit(0) if !getopts('whun:o:a:s:',\%OPT) or %OPT{'h'};
 # NOTE: %0 is already enclosed in doublequotes by cmd.exe, as appropriate
-$OPT{'n'} = '-x -S %0 %*' unless exists $OPT{'n'};
-$OPT{'o'} = '-x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9' unless exists $OPT{'o'};
-$OPT{'s'} = '/\.plx?/' unless exists $OPT{'s'};
-$OPT{'s'} = ($OPT{'s'} =~ m#^/([^/]*[^/\$]|)\$?/?$# ? $1 : "\Q$OPT{'s'}\E");
+%OPT{'n'} = '-x -S %0 %*' unless exists %OPT{'n'};
+%OPT{'o'} = '-x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9' unless exists %OPT{'o'};
+%OPT{'s'} = '/\.plx?/' unless exists %OPT{'s'};
+%OPT{'s'} = (%OPT{'s'} =~ m#^/([^/]*[^/\$]|)\$?/?$# ? $1 : "\Q%OPT{'s'}\E");
 
 my $head;
-if(  defined( $OPT{'a'} )  ) {
+if(  defined( %OPT{'a'} )  ) {
     $head = <<EOT;
 	\@rem = '--*-Perl-*--
 	\@echo off
-	perl $OPT{'a'}
+	perl %OPT{'a'}
 	goto endofperl
 	\@rem ';
 EOT
@@ -51,13 +51,13 @@ EOT
     $head = <<EOT;
 	\@rem = '--*-Perl-*--
 	\@echo off
-	if "%OS%" == "Windows_NT" goto WinNT
-	perl $OPT{'o'}
+	if "\%OS\%" == "Windows_NT" goto WinNT
+	perl %OPT{'o'}
 	goto endofperl
 	:WinNT
-	perl $OPT{'n'}
-	if NOT "%COMSPEC%" == "%SystemRoot%\\system32\\cmd.exe" goto endofperl
-	if %errorlevel% == 9009 echo You do not have Perl in your PATH.
+	perl %OPT{'n'}
+	if NOT "\%COMSPEC\%" == "\%SystemRoot\%\\system32\\cmd.exe" goto endofperl
+	if \%errorlevel\% == 9009 echo You do not have Perl in your PATH.
 	if errorlevel 1 goto script_failed_so_exit_with_non_zero_val 2>nul
 	goto endofperl
 	\@rem ';
@@ -81,21 +81,21 @@ sub process {
     my $linenum = 0;
     my $skiplines = 0;
     my $line;
-    my $start= $Config{startperl};
+    my $start= %Config{startperl};
     $start= "#!perl"   unless  $start =~ m/^#!.*perl/;
     open( FILE, "<", $file ) or die "$0: Can't open $file: $!";
     @file = ~< *FILE;
     foreach $line ( @file ) {
 	$linenum++;
 	if ( $line =~ m/^:endofperl\b/ ) {
-	    if(  ! exists $OPT{'u'}  ) {
+	    if(  ! exists %OPT{'u'}  ) {
 		warn "$0: $file has already been converted to a batch file!\n";
 		return;
 	    }
 	    $taildone++;
 	}
 	if ( not $linedone and $line =~ m/^#!.*perl/ ) {
-	    if(  exists $OPT{'u'}  ) {
+	    if(  exists %OPT{'u'}  ) {
 		$skiplines = $linenum - 1;
 		$line .= "#line ".(1+$headlines)."\n";
 	    } else {
@@ -108,13 +108,13 @@ sub process {
 	}
     }
     close( FILE );
-    $file =~ s/$OPT{'s'}$//oi;
+    $file =~ s/%OPT{'s'}$//oi;
     $file .= '.bat' unless $file =~ m/\.bat$/i or $file =~ m/^-$/;
     open( FILE, ">", "$file" ) or die "Can't open $file: $!";
     print FILE $myhead;
-    print FILE $start, ( $OPT{'w'} ? " -w" : "" ),
+    print FILE $start, ( %OPT{'w'} ? " -w" : "" ),
 	       "\n#line ", ($headlines+1), "\n" unless $linedone;
-    print FILE @file[$skiplines..$#file];
+    print FILE @file[[$skiplines..(@file-1)]];
     print FILE $tail unless $taildone;
     close( FILE );
 }

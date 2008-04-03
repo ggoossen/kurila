@@ -82,8 +82,8 @@ my @Prefs = (
             ### in list mode                
             {   diag( "Running list mode" ) if $Verbose;
                 my @list = run( command => $cmd );
-                ok( $list[0],   "Command ran successfully" );
-                ok( !$list[1],  "   No error code set" );
+                ok( @list[0],   "Command ran successfully" );
+                ok( !@list[1],  "   No error code set" );
 
                 my $list_length = $Class->can_capture_buffer ? 5 : 2;
                 is( scalar(@list), $list_length,
@@ -94,14 +94,14 @@ my @Prefs = (
                                 unless $Class->can_capture_buffer;
                     
                     ### the last 3 entries from the RV, are they array refs?
-                    isa_ok( $list[$_], 'ARRAY' ) for 2..4;
+                    isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
-                    like( "@{$list[2]}", $regex,
+                    like( "@{@list[2]}", $regex,
                                 "   Combined buffer holds output" );
 
-                    like( "@{$list[3]}", qr/$regex/,
+                    like( "@{@list[3]}", qr/$regex/,
                             "   Stdout buffer filled" );
-                    is( scalar( @{$list[4]} ), 0,
+                    is( scalar( @{@list[4]} ), 0,
                                     "   Stderr buffer empty" );
                 }
             }
@@ -157,8 +157,8 @@ my @Prefs = (
             ### in list mode
             {   diag( "Running stderr command in list mode" ) if $Verbose;
                 my @list = run( command => $cmd );
-                ok( $list[0],   "Ran stderr command successfully in list mode." );
-                ok( !$list[1],  "   No error code set" );
+                ok( @list[0],   "Ran stderr command successfully in list mode." );
+                ok( !@list[1],  "   No error code set" );
 
                 my $list_length = $Class->can_capture_buffer ? 5 : 2;
                 is( scalar(@list), $list_length,
@@ -170,14 +170,14 @@ my @Prefs = (
                                 unless $Class->can_capture_buffer;
 
                     ### the last 3 entries from the RV, are they array refs?
-                    isa_ok( $list[$_], 'ARRAY' ) for 2..4;
+                    isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
-                    like( "@{$list[2]}", $regex,
+                    like( "@{@list[2]}", $regex,
                                 "   Combined buffer holds output" );
 
-                    is( scalar( @{$list[3]} ), 0,
+                    is( scalar( @{@list[3]} ), 0,
                                     "   Stdout buffer empty" );
-                    like( "@{$list[4]}", qr/$regex/,
+                    like( "@{@list[4]}", qr/$regex/,
                             "   Stderr buffer filled" );
                 }
             }

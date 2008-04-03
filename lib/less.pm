@@ -20,12 +20,12 @@ sub of {
     # If no one wants the result, don't bother computing it.
     return unless defined wantarray;
 
-    my $hinthash = ( caller 0 )[10];
+    my $hinthash = ( caller 0 )[[10]];
     my %tags;
-    @tags{ _unpack_tags( $hinthash->{$class} ) } = ();
+    %tags{[_unpack_tags( $hinthash->{$class} ) ]} = ();
 
     if (@_) {
-        exists $tags{$_} and return !!1 for @_;
+        exists %tags{$_} and return !!1 for @_;
         return;
     }
     else {
@@ -38,9 +38,9 @@ sub import {
 
     @_ = 'please' if not @_;
     my %tags;
-    @tags{ _unpack_tags( @_, $^H{$class} ) } = ();
+    %tags{[_unpack_tags( @_, %^H{$class} ) ]} = ();
 
-    $^H{$class} = _pack_tags( keys %tags );
+    %^H{$class} = _pack_tags( keys %tags );
     return;
 }
 
@@ -49,19 +49,19 @@ sub unimport {
 
     if (@_) {
         my %tags;
-        @tags{ _unpack_tags( $^H{$class} ) } = ();
-        delete @tags{ _unpack_tags(@_) };
+        %tags{[_unpack_tags( %^H{$class} ) ]} = ();
+        delete %tags{[_unpack_tags(@_) ]};
         my $new = _pack_tags( keys %tags );
 
         if ( not length $new ) {
-            delete $^H{$class};
+            delete %^H{$class};
         }
         else {
-            $^H{$class} = $new;
+            %^H{$class} = $new;
         }
     }
     else {
-        delete $^H{$class};
+        delete %^H{$class};
     }
 
     return;

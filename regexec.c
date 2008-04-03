@@ -1070,10 +1070,10 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	register const bool do_utf8 = (prog->extflags & RXf_PMf_UTF8) != 0;
         RXi_GET_DECL(prog,progi);
 
-	PERL_ARGS_ASSERT_FIND_BYCLASS;
-        
 	GET_RE_DEBUG_FLAGS_DECL;
 
+	PERL_ARGS_ASSERT_FIND_BYCLASS;
+        
 	DEBUG_EXECUTE_r( {
             RE_PV_QUOTED_DECL(quoted, do_utf8, PERL_DEBUG_PAD_ZERO(0), 
                 s, strend -s + 1, 30);
@@ -4944,19 +4944,6 @@ S_reghop3(char *s, I32 off, char* lim)
     }
 }
 
-STATIC char*
-S_reghop3x(char *s, I32 off, char* lim)
-{
-    PERL_ARGS_ASSERT_REGHOP3X;
-
-    if (off >= 0) {
-	return s + off > lim ? lim : s + off;
-    }
-    else {
-	return s + off < lim ? lim : s + off;
-    }
-}
-
 STATIC char *
 S_reghop3c(char *s, I32 off, char* lim)
 {
@@ -4984,7 +4971,7 @@ S_reghop3c(char *s, I32 off, char* lim)
 }
 
 STATIC char *
-S_reghop4(char *s, I32 off, const char* llim, const char* rlim)
+S_reghop4(char *s, I32 off, char* llim, char* rlim)
 {
     PERL_ARGS_ASSERT_REGHOP4;
     return (off >= 0)

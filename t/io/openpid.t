@@ -22,8 +22,8 @@ plan tests => 10;
 
 use Config;
 $| = 1;
-$SIG{PIPE} = 'IGNORE';
-$SIG{HUP} = 'IGNORE' if $^O eq 'interix';
+%SIG{PIPE} = 'IGNORE';
+%SIG{HUP} = 'IGNORE' if $^O eq 'interix';
 
 my $perl = which_perl();
 $perl .= qq[ "-I../lib"];
@@ -54,7 +54,7 @@ ok( $pid4 = open(FH4, "|-", "$cmd4"), '    fourth' );
 print "# pids were $pid1, $pid2, $pid3, $pid4\n";
 
 my $killsig = 'HUP';
-$killsig = 1 unless $Config{sig_name} =~ m/\bHUP\b/;
+$killsig = 1 unless %Config{sig_name} =~ m/\bHUP\b/;
 
 # get message from first process and kill it
 chomp($from_pid1 = scalar( ~< *FH1));

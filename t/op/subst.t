@@ -157,7 +157,7 @@ ok( $_ eq 'aaaXXXXxb' );
 $_ = 'abc123xyz';
 s/(\d+)/{$1*2}/;              # yields 'abc246xyz'
 ok( $_ eq 'abc246xyz' );
-s/(\d+)/{sprintf("%5d",$1)}/; # yields 'abc  246xyz'
+s/(\d+)/{sprintf("\%5d",$1)}/; # yields 'abc  246xyz'
 ok( $_ eq 'abc  246xyz' );
 s/(\w)/{$1 x 2}/g;            # yields 'aabbcc  224466xxyyzz'
 ok( $_ eq 'aabbcc  224466xxyyzz' );
@@ -171,7 +171,7 @@ ok( y/c// == 1 );
 ok( y/c//d == 1 );
 ok( $_ eq "" );
 
-$_ = "Now is the %#*! time for all good men...";
+$_ = "Now is the \%#*! time for all good men...";
 ok( ($x=(y/a-zA-Z //cd)) == 7 );
 ok( y/ / /s == 8 );
 
@@ -181,7 +181,7 @@ tr/a-z/A-Z/;
 ok( $_ eq 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' );
 
 # same as tr/A-Z/a-z/;
-if (defined $Config{ebcdic} && $Config{ebcdic} eq 'define') {	# EBCDIC.
+if (defined %Config{ebcdic} && %Config{ebcdic} eq 'define') {	# EBCDIC.
     no utf8;
     y[\301-\351][\201-\251];
 } else {		# Ye Olde ASCII.  Or something like it.
@@ -219,8 +219,8 @@ my %MK = (
 );
 sub var { 
     my($var,$level) = @_;
-    return "\$($var)" unless exists $MK{$var};
-    return exp_vars($MK{$var}, $level+1); # can recurse
+    return "\$($var)" unless exists %MK{$var};
+    return exp_vars(%MK{$var}, $level+1); # can recurse
 }
 sub exp_vars { 
     my($str,$level) = @_;
@@ -531,7 +531,7 @@ is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
 # [perl #20682] @- not visible in replacement
 $_ = "123";
 m/(2)/;	# seed @- with something else
-s/(1)(2)(3)/$#- (@-)/;
+s/(1)(2)(3)/{@- -1} (@-)/;
 is($_, "3 (0 0 1 2)", '#20682 @- not visible in replacement');
 
 # [perl #20682] $^N not visible in replacement

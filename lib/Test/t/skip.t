@@ -28,7 +28,7 @@ chop @T;
 my @expect = split m/\n+/, join('', ~< *DATA);
 ok @T, 4;
 for (my $x=0; $x +< @T; $x++) {
-    ok $T[$x], $expect[$x];
+    ok @T[$x], @expect[$x];
 }
 
 END { close F; unlink "skips" }

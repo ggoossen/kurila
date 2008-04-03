@@ -12,8 +12,8 @@ if ($@ and $@->{description} =~ m/(The \w+ function is unimplemented)/) {
 our (%Config, $where);
 eval { require Config; Config->import; };
 my $reason;
-if ($Config{'i_grp'} ne 'define') {
-	$reason = '$Config{i_grp} not defined';
+if (%Config{'i_grp'} ne 'define') {
+	$reason = '%Config{i_grp} not defined';
 }
 elsif (not -f "/etc/group" ) { # Play safe.
 	$reason = 'no /etc/group file';
@@ -94,7 +94,7 @@ while ( ~< *GR) {
     my @s = split m/:/, $_, -1;
     my ($name_s,$passwd_s,$gid_s,$members_s) = @s;
     if (@s) {
-	push @{ $seen{$name_s} }, $.;
+	push @{ %seen{$name_s} }, $.;
     } else {
 	warn "# Your $where line $. is empty.\n";
 	next;
@@ -123,7 +123,7 @@ while ( ~< *GR) {
 	# NOTE: group names *CAN* contain whitespace.
 	$members =~ s/\s+/,/g;
 	# what about different orders of members?
-	$perfect{$name_s}++
+	%perfect{$name_s}++
 	    if $name    eq $name_s    and
 # Do not compare passwords: think shadow passwords.
 # Not that group passwords are used much but better not assume anything.

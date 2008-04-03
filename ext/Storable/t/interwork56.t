@@ -13,18 +13,18 @@
 # on Unix systems with IV as long long works.
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
-    unless ($Config{ivsize} and $Config{ivsize} +> $Config{longsize}) {
+    unless (%Config{ivsize} and %Config{ivsize} +> %Config{longsize}) {
         print "1..0 # Skip: Your IVs are no larger than your longs\n";
         exit 0;
     }
@@ -47,7 +47,7 @@ use vars qw(%tests);
         }
         next unless oct $1 == ord 'A'; # Skip ASCII on EBCDIC, and vice versa
         my $data = unpack 'u', $3;
-        $tests{$2} = $data;
+        %tests{$2} = $data;
     }
 }
 
@@ -56,7 +56,7 @@ my $test = freeze \'Hell';
 
 my $header = Storable::read_magic ($test);
 
-is ($header->{byteorder}, $Config{byteorder},
+is ($header->{byteorder}, %Config{byteorder},
     "header's byteorder and Config.pm's should agree");
 
 my $result = eval {thaw $test};

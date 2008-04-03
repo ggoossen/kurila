@@ -54,7 +54,7 @@ use_ok( 'Module::Load::Conditional' );
         @path;
     };
     
-    is( $INC{'Module/Load/Conditional.pm'},            
+    is( %INC{'Module/Load/Conditional.pm'},            
             File::Spec::Unix->catfile(@rv_path),
                             q[  Found proper file]
     );
@@ -150,13 +150,13 @@ use_ok( 'Module::Load::Conditional' );
 }
 
 {
-    delete $INC{'LoadIt.pm'};
-    delete $INC{'MustBe/Loaded.pm'};
+    delete %INC{'LoadIt.pm'};
+    delete %INC{'MustBe/Loaded.pm'};
 
     my $use_list = { 'LoadIt' => 1, 'MustBe::Loaded' => 1 };
     my $bool = can_load( modules => $use_list );
 
-    ok( !$INC{'LoadIt.pm'} && !$INC{'MustBe/Loaded.pm'},
+    ok( !%INC{'LoadIt.pm'} && !%INC{'MustBe/Loaded.pm'},
         q[Do not load if one prerequisite fails]
     );
 }
@@ -165,12 +165,12 @@ use_ok( 'Module::Load::Conditional' );
 ### test 'requires' ###
 SKIP:{
     skip "Depends on \$^X, which doesn't work well when testing the Perl core", 
-        1 if $ENV{PERL_CORE};
+        1 if %ENV{PERL_CORE};
 
     my %list = map { $_ => 1 } requires('Carp');
     
     my $flag;
-    $flag++ unless delete $list{'Exporter'};
+    $flag++ unless delete %list{'Exporter'};
 
     ok( !$flag, q[Detecting requirements] );
 }
@@ -181,7 +181,7 @@ SKIP:{
     
     {   package A::B::C::D; 
         $A::B::C::D::VERSION = $$; 
-        $INC{'A/B/C/D.pm'}   = $$.$$;
+        %INC{'A/B/C/D.pm'}   = $$.$$;
         
         ### XXX this is no longer needed with M::Load 0.11_01
         #$INC{'[.A.B.C]D.pm'} = $$.$$ if $^O eq 'VMS';

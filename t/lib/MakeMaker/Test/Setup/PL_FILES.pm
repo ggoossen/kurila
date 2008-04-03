@@ -49,7 +49,7 @@ die unless PL::Foo::bar() == 42;
 die "argv empty\n" unless @ARGV;
 die "too many in argv: @ARGV\n" unless @ARGV == 1;
 
-my $file = $ARGV[0];
+my $file = @ARGV[0];
 open OUT, ">", "$file" or die $!;
 
 print OUT "Testing\n";
@@ -74,7 +74,7 @@ eval { require PL::Foo; };
 die "argv empty\n" unless @ARGV;
 die "too many in argv: @ARGV\n" unless @ARGV == 1;
 
-my $file = $ARGV[0];
+my $file = @ARGV[0];
 open OUT, ">", "$file" or die $!;
 
 print OUT "Testing\n";

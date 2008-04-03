@@ -11,7 +11,7 @@ sub uuencode_it {
 
   my $uu = pack 'u', $frozen;
 
-  printf "begin %3o $name\n", ord 'A';
+  printf "begin \%3o $name\n", ord 'A';
   print $uu;
   print "\nend\n\n";
 }
@@ -73,7 +73,7 @@ uuencode_it (\$utf8, "Long 24 bit utf8 data");
 
 # Hash which has the utf8 bit set, but no longer has any utf8 keys
 my %uhash = ("\x{100}", "gone", "perl", "rules");
-delete $uhash{"\x{100}"};
+delete %uhash{"\x{100}"};
 
 # use Devel::Peek; Dump \%uhash;
 uuencode_it (\%uhash, "Hash with utf8 flag but no utf8 keys");
@@ -96,9 +96,9 @@ while (my ($key, $val) = each %uhash) {
   # to say "promote back to utf8"
   # Whereas scalars are stored as is.
   utf8::encode ($key) if ord $key +> 256;
-  $pre58{$key} = $val;
+  %pre58{$key} = $val;
   utf8::encode ($val) unless $val eq "ch\xe5teau";
-  $pre56{$key} = $val;
+  %pre56{$key} = $val;
 
 }
 uuencode_it (\%pre56, "Hash with utf8 keys for pre 5.6");

@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	if ($^O eq 'MacOS') {
 	    @INC = qw(: ::lib ::macos:lib);
@@ -14,7 +14,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -38,7 +38,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 my $path = join " ", map { qq["-I$_"] } @INC;
 $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
 my $redir = $Is_MacOS ? "" : "2>&1";
-my $is_thread = $Config{use5005threads} && $Config{use5005threads} eq 'define';
+my $is_thread = %Config{use5005threads} && %Config{use5005threads} eq 'define';
 
 if ($is_thread) {
     ok "# use5005threads: test skipped\n";
@@ -73,7 +73,7 @@ for $newlex ('', '-newlex') {
 
 SKIP: {
     skip "no perlio in this build", 5
-    unless $Config::Config{useperlio};
+    unless %Config::Config{useperlio};
 
     our $buf = 'arb startval';
     my $ak = B::Showlex::walk_output (\$buf);
@@ -109,7 +109,7 @@ SKIP: {
 	{ # inner block vars
 	    my (@fib)=(1,2);
 	    for (my $i=2; $i+<10; $i++) {
-		$fib[$i] = $fib[$i-2] + $fib[$i-1];
+		@fib[$i] = @fib[$i-2] + @fib[$i-1];
 	    }
 	    for my $i(0..10) {
 		$total += $i;

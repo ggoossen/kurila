@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bSys\/Hostname\b/) {
+    if (%Config{'extensions'} !~ m/\bSys\/Hostname\b/) {
       print "1..0 # Skip: Sys::Hostname was not built\n";
       exit 0;
     }

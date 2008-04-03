@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -105,12 +105,12 @@ threads->create(sub {
         print $@ && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_scalar\n";
         $test++;
-        eval { $unique_array[0] = 1 };
+        eval { @unique_array[0] = 1 };
         print $& && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_array\n";
         $test++;
         if ($^O ne 'MSWin32') {
-            eval { $unique_hash{abc} = 1 };
+            eval { %unique_hash{abc} = 1 };
             print $@ && $@->{description} =~ m/disallowed/
               ? '' : 'not ', "ok $test # TODO $TODO - unique_hash\n";
         } else {
@@ -158,7 +158,7 @@ my $child = threads->create(sub { return (scalar(keys(%h))); })->join;
 is($child, 2, "keys correct in child");
 
 lock_keys(%h);
-delete($h{1});
+delete(%h{1});
 
 is(keys(%h), 1, "keys correct in parent with restricted hash");
 

@@ -144,7 +144,7 @@ sub self_and_super_versions {
   no strict 'refs';
   map {
         $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ? ${*{Symbol::fetch_glob("$_\::VERSION")}} : undef)
-      } self_and_super_path($_[0])
+      } self_and_super_path(@_[0])
 }
 
 # Also consider magic like:
@@ -181,8 +181,8 @@ sub self_and_super_path {
 
   my @out = ();
 
-  my @in_stack = ($_[0]);
-  my %seen = ($_[0] => 1);
+  my @in_stack = (@_[0]);
+  my %seen = (@_[0] => 1);
 
   my $current;
   while(@in_stack) {
@@ -196,7 +196,7 @@ sub self_and_super_path {
           substr($c,0,2, "main::") if substr($c,0,2) eq '::';
            # Canonize the :: -> main::, ::foo -> main::foo thing.
            # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
-          $seen{$c}++ ? () : $c;
+          %seen{$c}++ ? () : $c;
         }
         @{*{Symbol::fetch_glob("$current\::ISA")}}
     ;

@@ -1,12 +1,12 @@
 #!./perl -w
 $|=1;
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     } 
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bOpcode\b/ && $Config{'osname'} ne 'VMS') {
+    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
     }
@@ -67,24 +67,24 @@ $glob = "ok 11\n";
 sub sayok { print "ok @_\n" }
 
 $cpt->share(qw($foo %bar @baz *glob sayok));
-$cpt->share('$"') unless $Config{use5005threads};
+$cpt->share('$"') unless %Config{use5005threads};
 
 $cpt->reval(q{
     package other;
     sub other_sayok { print "ok @_\n" }
     package main;
     print $foo ? $foo : "not ok 8\n";
-    print $bar{key} ? $bar{key} : "not ok 9\n";
+    print %bar{key} ? %bar{key} : "not ok 9\n";
     (@baz) ? print "@baz\n" : print "not ok 10\n";
     print $glob;
     other::other_sayok(12);
     $foo =~ s/8/14/;
-    $bar{new} = "ok 15\n";
+    %bar{new} = "ok 15\n";
     @glob = qw(ok 16);
 });
-print $@ ? "not ok 13\n#$@" : "ok 13\n";
+print $@ ? "not ok 13\n#{$@->message}" : "ok 13\n";
 $" = ' ';
-print $foo, $bar{new}, "@glob\n";
+print $foo, %bar{new}, "@glob\n";
 
 $Root::foo = "not ok 17";
 @{$cpt->varglob('bar')} = qw(not ok 18);
@@ -114,7 +114,7 @@ $cpt->mask(empty_opset);
 my $t_scalar = $cpt->reval('print wantarray ? "not ok 24\n" : "ok 24\n"');
 print $cpt->reval('@ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
 my @t_array  = $cpt->reval('print wantarray ? "ok 26\n" : "not ok 26\n"; (2,3,4)');
-print $t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
+print @t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
 
 my $t_scalar2 = $cpt->reval('die "foo bar"; 1');
 print defined $t_scalar2 ? "not ok 28\n" : "ok 28\n";
@@ -131,7 +131,7 @@ if ($@) {
     die "Eek! Attempting to open $nosuch failed, but \$! is still 0" unless $!;
     $! = 0;
     $cpt->rdo($nosuch);
-    print $! == $errno ? "ok $t\n" : sprintf "not ok $t # \"$!\" is %d (expected %d)\n", $!, $errno; $t++;
+    print $! == $errno ? "ok $t\n" : sprintf "not ok $t # \"$!\" is \%d (expected \%d)\n", $!, $errno; $t++;
 } else {
     die "Eek! Didn't expect $nosuch to be there.";
 }

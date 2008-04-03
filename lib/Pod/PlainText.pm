@@ -119,14 +119,14 @@ $VERSION = '2.02';
 sub initialize {
     my $self = shift;
 
-    $$self{alt}      = 0  unless defined $$self{alt};
-    $$self{indent}   = 4  unless defined $$self{indent};
-    $$self{loose}    = 0  unless defined $$self{loose};
-    $$self{sentence} = 0  unless defined $$self{sentence};
-    $$self{width}    = 76 unless defined $$self{width};
+    %$self{alt}      = 0  unless defined %$self{alt};
+    %$self{indent}   = 4  unless defined %$self{indent};
+    %$self{loose}    = 0  unless defined %$self{loose};
+    %$self{sentence} = 0  unless defined %$self{sentence};
+    %$self{width}    = 76 unless defined %$self{width};
 
-    $$self{INDENTS}  = [];              # Stack of indentations.
-    $$self{MARGIN}   = $$self{indent};  # Current left margin in spaces.
+    %$self{INDENTS}  = [];              # Stack of indentations.
+    %$self{MARGIN}   = %$self{indent};  # Current left margin in spaces.
 
     $self->SUPER::initialize;
 }
@@ -144,8 +144,8 @@ sub command {
     my $self = shift;
     my $command = shift;
     return if $command eq 'pod';
-    return if ($$self{EXCLUDE} && $command ne 'end');
-    $self->item ("\n") if defined $$self{ITEM};
+    return if (%$self{EXCLUDE} && $command ne 'end');
+    $self->item ("\n") if defined %$self{ITEM};
     $command = 'cmd_' . $command;
     $self->?$command (@_);
 }
@@ -155,11 +155,11 @@ sub command {
 # to spaces.
 sub verbatim {
     my $self = shift;
-    return if $$self{EXCLUDE};
-    $self->item if defined $$self{ITEM};
+    return if %$self{EXCLUDE};
+    $self->item if defined %$self{ITEM};
     local $_ = shift;
     return if m/^\s*$/;
-    s/^(\s*\S+)/{(' ' x $$self{MARGIN}) . $1}/gm;
+    s/^(\s*\S+)/{(' ' x %$self{MARGIN}) . $1}/gm;
     $self->output ($_);
 }
 
@@ -167,8 +167,8 @@ sub verbatim {
 # a Pod::Paragraph object.  Perform interpolation and output the results.
 sub textblock {
     my $self = shift;
-    return if $$self{EXCLUDE};
-    $self->output ($_[0]), return if $$self{VERBATIM};
+    return if %$self{EXCLUDE};
+    $self->output (@_[0]), return if %$self{VERBATIM};
     local $_ = shift;
     my $line = shift;
 
@@ -203,9 +203,9 @@ sub textblock {
         my $string = "the ";
         my $i;
         for ($i = 0; $i +< @items; $i++) {
-            $string .= $items[$i];
-            $string .= ", " if @items +> 2 && $i != $#items;
-            $string .= " and " if ($i == $#items - 1);
+            $string .= @items[$i];
+            $string .= ", " if @items +> 2 && $i != @items-1;
+            $string .= " and " if ($i == @items - 2);
         }
         $string .= " entries elsewhere in this document";
         $string;
@@ -215,7 +215,7 @@ sub textblock {
     # Now actually interpolate and output the paragraph.
     $_ = $self->interpolate ($_, $line);
     s/\s+$/\n/;
-    if (defined $$self{ITEM}) {
+    if (defined %$self{ITEM}) {
         $self->item ($_ . "\n");
     } else {
         $self->output ($self->reformat ($_ . "\n"));
@@ -234,7 +234,7 @@ sub interior_sequence {
 
     # Expand escapes into the actual character now, warning if invalid.
     if ($command eq 'E') {
-        return $ESCAPES{$_} if defined $ESCAPES{$_};
+        return %ESCAPES{$_} if defined %ESCAPES{$_};
         warn "Unknown escape: E<$_>";
         return "E<$_>";
     }
@@ -281,10 +281,10 @@ sub cmd_head1 {
     local $_ = shift;
     s/\s+$//;
     $_ = $self->interpolate ($_, shift);
-    if ($$self{alt}) {
+    if (%$self{alt}) {
         $self->output ("\n==== $_ ====\n\n");
     } else {
-        $_ .= "\n" if $$self{loose};
+        $_ .= "\n" if %$self{loose};
         $self->output ($_ . "\n");
     }
 }
@@ -295,10 +295,10 @@ sub cmd_head2 {
     local $_ = shift;
     s/\s+$//;
     $_ = $self->interpolate ($_, shift);
-    if ($$self{alt}) {
+    if (%$self{alt}) {
         $self->output ("\n==   $_   ==\n\n");
     } else {
-        $self->output (' ' x ($$self{indent} / 2) . $_ . "\n\n");
+        $self->output (' ' x (%$self{indent} / 2) . $_ . "\n\n");
     }
 }
 
@@ -308,10 +308,10 @@ sub cmd_head3 {
     local $_ = shift;
     s/\s+$//;
     $_ = $self->interpolate ($_, shift);
-    if ($$self{alt}) {
+    if (%$self{alt}) {
         $self->output ("\n= $_ =\n");
     } else {
-        $self->output (' ' x ($$self{indent}) . $_ . "\n");
+        $self->output (' ' x (%$self{indent}) . $_ . "\n");
     }
 }
 
@@ -323,28 +323,28 @@ sub cmd_head3 {
 sub cmd_over {
     my $self = shift;
     local $_ = shift;
-    unless (m/^[-+]?\d+\s+$/) { $_ = $$self{indent} }
-    push (@{ $$self{INDENTS} }, $$self{MARGIN});
-    $$self{MARGIN} += ($_ + 0);
+    unless (m/^[-+]?\d+\s+$/) { $_ = %$self{indent} }
+    push (@{ %$self{INDENTS} }, %$self{MARGIN});
+    %$self{MARGIN} += ($_ + 0);
 }
 
 # End a list.
 sub cmd_back {
     my $self = shift;
-    $$self{MARGIN} = pop @{ $$self{INDENTS} };
-    unless (defined $$self{MARGIN}) {
+    %$self{MARGIN} = pop @{ %$self{INDENTS} };
+    unless (defined %$self{MARGIN}) {
         warn "Unmatched =back";
-        $$self{MARGIN} = $$self{indent};
+        %$self{MARGIN} = %$self{indent};
     }
 }
 
 # An individual list item.
 sub cmd_item {
     my $self = shift;
-    if (defined $$self{ITEM}) { $self->item }
+    if (defined %$self{ITEM}) { $self->item }
     local $_ = shift;
     s/\s+$//;
-    $$self{ITEM} = $self->interpolate ($_);
+    %$self{ITEM} = $self->interpolate ($_);
 }
 
 # Begin a block for a particular translator.  Setting VERBATIM triggers
@@ -354,9 +354,9 @@ sub cmd_begin {
     local $_ = shift;
     my ($kind) = m/^(\S+)/ or return;
     if ($kind eq 'text') {
-        $$self{VERBATIM} = 1;
+        %$self{VERBATIM} = 1;
     } else {
-        $$self{EXCLUDE} = 1;
+        %$self{EXCLUDE} = 1;
     }
 }
 
@@ -364,8 +364,8 @@ sub cmd_begin {
 # pairs are properly closed.
 sub cmd_end {
     my $self = shift;
-    $$self{EXCLUDE} = 0;
-    $$self{VERBATIM} = 0;
+    %$self{EXCLUDE} = 0;
+    %$self{VERBATIM} = 0;
 }    
 
 # One paragraph for a particular translator.  Ignore it unless it's intended
@@ -385,10 +385,10 @@ sub cmd_for {
 
 # The simple formatting ones.  These are here mostly so that subclasses can
 # override them and do more complicated things.
-sub seq_b { return $_[0]{alt} ? "``$_[1]''" : $_[1] }
-sub seq_c { return $_[0]{alt} ? "``$_[1]''" : "`$_[1]'" }
-sub seq_f { return $_[0]{alt} ? "\"$_[1]\"" : $_[1] }
-sub seq_i { return '*' . $_[1] . '*' }
+sub seq_b { return @_[0]{alt} ? "``@_[1]''" : @_[1] }
+sub seq_c { return @_[0]{alt} ? "``@_[1]''" : "`@_[1]'" }
+sub seq_f { return @_[0]{alt} ? "\"@_[1]\"" : @_[1] }
+sub seq_i { return '*' . @_[1] . '*' }
 
 # The complicated one.  Handle links.  Since this is plain text, we can't
 # actually make any real links, so this is all to figure out what text we
@@ -455,27 +455,27 @@ sub seq_l {
 sub item {
     my $self = shift;
     local $_ = shift;
-    my $tag = $$self{ITEM};
+    my $tag = %$self{ITEM};
     unless (defined $tag) {
         warn "item called without tag";
         return;
     }
-    undef $$self{ITEM};
-    my $indent = $$self{INDENTS}[-1];
-    unless (defined $indent) { $indent = $$self{indent} }
+    undef %$self{ITEM};
+    my $indent = %$self{INDENTS}[-1];
+    unless (defined $indent) { $indent = %$self{indent} }
     my $space = ' ' x $indent;
-    $space =~ s/^ /:/ if $$self{alt};
-    if (!$_ || m/^\s+$/ || ($$self{MARGIN} - $indent +< length ($tag) + 1)) {
-        my $margin = $$self{MARGIN};
-        $$self{MARGIN} = $indent;
+    $space =~ s/^ /:/ if %$self{alt};
+    if (!$_ || m/^\s+$/ || (%$self{MARGIN} - $indent +< length ($tag) + 1)) {
+        my $margin = %$self{MARGIN};
+        %$self{MARGIN} = $indent;
         my $output = $self->reformat ($tag);
         $output =~ s/\n*$/\n/;
         $self->output ($output);
-        $$self{MARGIN} = $margin;
+        %$self{MARGIN} = $margin;
         $self->output ($self->reformat ($_)) if m/\S/;
     } else {
         $_ = $self->reformat ($_);
-        s/^ /:/ if ($$self{alt} && $indent +> 0);
+        s/^ /:/ if (%$self{alt} && $indent +> 0);
         my $tagspace = ' ' x length $tag;
         s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
         $self->output ($_);
@@ -495,8 +495,8 @@ sub wrap {
     my $self = shift;
     local $_ = shift;
     my $output = '';
-    my $spaces = ' ' x $$self{MARGIN};
-    my $width = $$self{width} - $$self{MARGIN};
+    my $spaces = ' ' x %$self{MARGIN};
+    my $width = %$self{width} - %$self{MARGIN};
     while (length +> $width) {
         if (s/^([^\n]{0,$width})\s+// || s/^([^\n]{$width})//) {
             $output .= $spaces . $1 . "\n";
@@ -517,7 +517,7 @@ sub reformat {
 
     # If we're trying to preserve two spaces after sentences, do some
     # munging to support that.  Otherwise, smash all repeated whitespace.
-    if ($$self{sentence}) {
+    if (%$self{sentence}) {
         s/ +$//mg;
         s/\.\n/. \n/g;
         s/\n/ /g;
@@ -529,7 +529,7 @@ sub reformat {
 }
 
 # Output text to the output device.
-sub output { $_[1] =~ tr/\01/ /; print { $_[0]->output_handle } $_[1] }
+sub output { @_[1] =~ tr/\01/ /; print { @_[0]->output_handle } @_[1] }
 
 
 ############################################################################
@@ -544,7 +544,7 @@ sub pod2text {
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
-    while ($_[0] =~ m/^-/) {
+    while (@_[0] =~ m/^-/) {
         my $flag = shift;
         if    ($flag eq '-a')       { push (@args, alt => 1)    }
         elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
@@ -561,13 +561,13 @@ sub pod2text {
     # handle.  That means we want to call parse_from_filehandle(), which
     # means we need to turn the first argument into a file handle.  Magic
     # open will handle the <&STDIN case automagically.
-    if (defined $_[1]) {
+    if (defined @_[1]) {
         local *IN;
-        unless (open (IN, "<", $_[0])) {
-            die ("Can't open $_[0] for reading: $!\n");
+        unless (open (IN, "<", @_[0])) {
+            die ("Can't open @_[0] for reading: $!\n");
             return;
         }
-        $_[0] = \*IN;
+        @_[0] = \*IN;
         return $parser->parse_from_filehandle (@_);
     } else {
         return $parser->parse_from_file (@_);

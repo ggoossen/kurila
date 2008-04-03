@@ -7,7 +7,7 @@
 # -- Daniel S. Lewart	since Sep 1997
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -58,9 +58,9 @@ while ( ~< *DATA) {
 		my $i;
 		for ($i = 0; $i +< @set; $i++) {
 			# complex number
-			$target = $set[$i];
+			$target = @set[$i];
 			# textual value as found in set definition
-			$zvalue = $val[$i];
+			$zvalue = @val[$i];
 			test($zvalue, $target, @args);
 		}
 	} else {
@@ -133,7 +133,7 @@ sub test_dbz {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
-	(\$bad) = (\$@->\{description\} =~ m/(.+)/);
+	(\$bad) = (\$\@->\{description\} =~ m/(.+)/);
 	print "# $test op = $op divbyzero? \$bad... \$\@->\{description\}\n";
 	print 'not ' unless (\$\@->\{description\} =~ m/Division by zero/);
 EOT
@@ -204,7 +204,7 @@ test_broot(qw(-3 -2.1 0 0.99));
 
 sub test_display_format {
     is(Math::Complex->display_format, 'cartesian');
-    my $j = (root(1,3))[1];
+    my $j = (root(1,3))[[1]];
 
     $j->display_format('polar');
     is($j->display_format, 'polar');
@@ -215,7 +215,7 @@ sub test_display_format {
 
     %display_format = $j->display_format;
 
-    is($display_format{style}, 'polar');
+    is(%display_format{style}, 'polar');
 
     is(keys %display_format, 2);
 
@@ -224,7 +224,7 @@ sub test_display_format {
     is("$j", "-0.50000+0.86603i");
 
     %display_format = $j->display_format;
-    is($display_format{format}, '%.5f');
+    is(%display_format{format}, '%.5f');
     is(keys %display_format, 3);
 
     $j->display_format('format' => undef);
@@ -393,7 +393,7 @@ test_atan2();
 test_decplx();
 
 print "1..$test\n";
-#print @script, "\n";
+print @script, "\n";
 eval join '', @script;
 die if $@;
 
@@ -410,25 +410,25 @@ sub test {
 	my $i;
 	$baop = 1 if ($op =~ s/;=$//);
 	for ($i = 0; $i +< @args; $i++) {
-		$val = value($args[$i]);
+		$val = value(@args[$i]);
 		push @script, "\$z$i = $val;\n";
 	}
 	if (defined $z) {
 		$args = "'$op'";		# Really the value
 		$try = "abs(\$z0 - \$z1) +<= $eps ? \$z1 : \$z0";
 		push @script, "\$res = $try; ";
-		push @script, "check($test, $args[0], \$res, \$z$#args, $args);\n";
+		push @script, "check($test, @args[0], \$res, \$z{@args-1}, $args);\n";
 	} else {
 		my ($try, $args);
 		if (@args == 2) {
 			$try = ($op =~ m/^\w/) ? "\$z0->$op" : "$op \$z0";
-			$args = "'$args[0]'";
+			$args = "'@args[0]'";
 		} else {
 			$try = ($op =~ m/^\w/) ? "$op(\$z0, \$z1)" : "\$z0 $op \$z1";
-			$args = "'$args[0]', '$args[1]'";
+			$args = "'@args[0]', '@args[1]'";
 		}
 		push @script, "\$res = $try; ";
-		push @script, "check($test, '$try', \$res, \$z$#args, $args);\n";
+		push @script, "check($test, '$try', \$res, \$z{@args-1}, $args);\n";
 		if (@args +> 2 and $baop) { # binary assignment ops
 			$test++;
 			# check the op= works
@@ -443,7 +443,7 @@ sub test {
 	\$za $op= \$zb;
 	my (\$zbr, \$zbi) = \@\{\$zb->_cartesian\};
 
-	check($test, '\$z0 $op= \$z1', \$za, \$z$#args, $args);
+	check($test, '\$z0 $op= \$z1', \$za, \$z{@args-1}, $args);
 EOB
 			$test++;
 			# check that the rhs has not changed
@@ -462,8 +462,8 @@ sub set {
 	my @res;
 	my $i;
 	for ($i = 0; $i +< @set; $i++) {
-		push(@{$valref}, $set[$i]);
-		my $val = value($set[$i]);
+		push(@{$valref}, @set[$i]);
+		my $val = value(@set[$i]);
 		push @script, "\$s$i = $val;\n";
 		push @{$setref}, "\$s$i";
 	}
@@ -511,7 +511,7 @@ sub check {
 		print "ok $test\n";
 	} else {
 		print "not ok $test\n";
-		my $args = (@z == 1) ? "z = $z[0]" : "z0 = $z[0], z1 = $z[1]";
+		my $args = (@z == 1) ? "z = @z[0]" : "z0 = @z[0], z1 = @z[1]";
 		print "# '$try' expected: '$expected' got: '$got' for $args\n";
 	}
 }

@@ -11,51 +11,51 @@ BEGIN {
     use Config;
     # Load threads::shared when threads are turned on.
     # 5.8.0's threads are so busted we no longer support them.
-    if( $Config{useithreads} && $INC{'threads.pm'}) {
+    if( %Config{useithreads} && %INC{'threads.pm'}) {
         require threads::shared;
 
         # Hack around YET ANOTHER threads::shared bug.  It would 
         # occassionally forget the contents of the variable when sharing it.
         # So we first copy the data, then share, then put our copy back.
         *share = sub (\[$@%]) {
-            my $type = ref $_[0];
+            my $type = ref @_[0];
             my $data;
 
             if( $type eq 'HASH' ) {
-                %$data = %{$_[0]};
+                %$data = %{@_[0]};
             }
             elsif( $type eq 'ARRAY' ) {
-                @$data = @{$_[0]};
+                @$data = @{@_[0]};
             }
             elsif( $type eq 'SCALAR' ) {
-                $$data = ${$_[0]};
+                $$data = ${@_[0]};
             }
             else {
                 die("Unknown type: ".$type);
             }
 
-            $_[0] = &threads::shared::share($_[0]);
+            @_[0] = &threads::shared::share(@_[0]);
 
             if( $type eq 'HASH' ) {
-                %{$_[0]} = %$data;
+                %{@_[0]} = %$data;
             }
             elsif( $type eq 'ARRAY' ) {
-                @{$_[0]} = @$data;
+                @{@_[0]} = @$data;
             }
             elsif( $type eq 'SCALAR' ) {
-                ${$_[0]} = $$data;
+                ${@_[0]} = $$data;
             }
             else {
                 die("Unknown type: ".$type);
             }
 
-            return $_[0];
+            return @_[0];
         };
     }
     # 5.8.0's threads::shared is busted when threads are off
     # and earlier Perls just don't have that module at all.
     else {
-        *share = sub { return $_[0] };
+        *share = sub { return @_[0] };
         *lock  = sub { 0 };
     }
 }
@@ -401,10 +401,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
-        @$result{ 'ok', 'actual_ok' } = ( ( $todo ? 1 : 0 ), 0 );
+        %$result{['ok', 'actual_ok' ]} = ( ( $todo ? 1 : 0 ), 0 );
     }
     else {
-        @$result{ 'ok', 'actual_ok' } = ( 1, $test );
+        %$result{['ok', 'actual_ok' ]} = ( 1, $test );
     }
 
     $out .= "ok";
@@ -436,7 +436,7 @@ ERR
 
     unless( $test ) {
         my $msg = $todo ? "Failed (TODO)" : "Failed";
-        $self->_print_diag("\n") if $ENV{HARNESS_ACTIVE};
+        $self->_print_diag("\n") if %ENV{HARNESS_ACTIVE};
 
     my(undef, $file, $line) = $self->caller;
         if( defined $name ) {
@@ -585,8 +585,8 @@ sub _is_diag {
 
     local $Level = $Level + 1;
     return $self->diag(sprintf <<DIAGNOSTIC, $got, $expect);
-         got: %s
-    expected: %s
+         got: \%s
+    expected: \%s
 DIAGNOSTIC
 
 }    
@@ -701,7 +701,7 @@ sub cmp_ok {
 
     # Treat overloaded objects as numbers if we're asked to do a
     # numeric comparison.
-    my $unoverload = $numeric_cmps{$type} ? '_unoverload_num'
+    my $unoverload = %numeric_cmps{$type} ? '_unoverload_num'
                                           : '_unoverload_str';
 
     $self->?$unoverload(\$got, \$expect);
@@ -742,9 +742,9 @@ sub _cmp_diag {
     
     local $Level = $Level + 1;
     return $self->diag(sprintf <<DIAGNOSTIC, $got, $type, $expect);
-    %s
-        %s
-    %s
+    \%s
+        \%s
+    \%s
 DIAGNOSTIC
 }
 
@@ -997,8 +997,8 @@ $code" . q{$test = $this =~ m/$usable_regex/ ? 1 : 0};
 
         local $Level = $Level + 1;
         $self->diag(sprintf <<DIAGNOSTIC, $this, $match, $regex);
-                  %s
-    %13s '%s'
+                  \%s
+    \%13s '\%s'
 DIAGNOSTIC
 
     }
@@ -1509,7 +1509,7 @@ sub current_test {
         }
         # If backward, wipe history.  Its their funeral.
         elsif( $num +< @$test_results ) {
-            $#{$test_results} = $num - 1;
+            splice @{$test_results}, $num;
         }
     }
     return $self->{Curr_Test};
@@ -1637,7 +1637,7 @@ sub caller {
     $height ||= 0;
 
     my @caller = CORE::caller($self->level + $height + 1);
-    return wantarray ? @caller : $caller[0];
+    return wantarray ? @caller : @caller[0];
 }
 
 =back
@@ -1702,7 +1702,7 @@ doesn't actually exit, that's your job.
 =cut
 
 sub _my_exit {
-    $? ||= $_[0];
+    $? ||= @_[0];
 
     return 1;
 }
@@ -1756,7 +1756,7 @@ sub _ending {
         }
 
         my $num_failed = grep !$_->{'ok'}, 
-                              @{$test_results}[0..$self->{Curr_Test}-1];
+                              @{$test_results}[[0..$self->{Curr_Test}-1]];
 
         my $num_extra = $self->{Curr_Test} - $self->{Expected_Tests};
 

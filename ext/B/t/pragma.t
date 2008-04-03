@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {    ## no critic strict
-    if ( $ENV{PERL_CORE} ) {
+    if ( %ENV{PERL_CORE} ) {
         chdir('t') if -d 't';
 	@INC = qw(../lib . lib);
     }
@@ -9,7 +9,7 @@ BEGIN {    ## no critic strict
         unshift @INC, 't';
     }
     require Config;
-    if ( ( $Config::Config{'extensions'} !~ m/\bB\b/ ) ) {
+    if ( ( %Config::Config{'extensions'} !~ m/\bB\b/ ) ) {
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }

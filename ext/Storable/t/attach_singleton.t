@@ -52,7 +52,7 @@ my $SINGLETON = undef;
 
 sub new {
 	$SINGLETON or
-	$SINGLETON = bless { value => 'Hello World!' }, $_[0];
+	$SINGLETON = bless { value => 'Hello World!' }, @_[0];
 }
 
 sub STORABLE_freeze {

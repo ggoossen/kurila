@@ -19,8 +19,8 @@ my %seen;
 my $maxl = 30; # make up a limit for a maximum filename length
 
 sub eight_dot_three {
-    return () if $seen{$_[0]}++;
-    my ($dir, $base, $ext) = ($_[0] =~ m{^(?:(.+)/)?([^/.]+)(?:\.([^/.]+))?$});
+    return () if %seen{@_[0]}++;
+    my ($dir, $base, $ext) = (@_[0] =~ m{^(?:(.+)/)?([^/.]+)(?:\.([^/.]+))?$});
     my $file = $base . ( defined $ext ? ".$ext" : "" );
     $base = substr($base, 0, 8);
     $ext  = substr($ext,  0, 3) if defined $ext;
@@ -28,7 +28,7 @@ sub eight_dot_three {
 	print "directory name contains '.': $dir\n";
     }
     if ($file =~ m/[^A-Za-z0-9\._-]/) {
-	print "filename contains non-portable characters: $_[0]\n";
+	print "filename contains non-portable characters: @_[0]\n";
     }
     if (length $file +> $maxl) {
 	print "filename longer than $maxl characters: $file\n";
@@ -62,7 +62,7 @@ if (open(MANIFEST, "<", "MANIFEST")) {
 	    my ($dir, $edt) = eight_dot_three($`);
 	    next unless defined $dir;
 	    ($dir, $edt) = map { lc } ($dir, $edt);
-	    push @{$dir{$dir}->{$edt}}, $_;
+	    push @{%dir{$dir}->{$edt}}, $_;
 	}
     }
 } else {
@@ -70,8 +70,8 @@ if (open(MANIFEST, "<", "MANIFEST")) {
 }
 
 for my $dir (sort keys %dir) {
-    for my $edt (keys %{$dir{$dir}}) {
-	my @files = @{$dir{$dir}{$edt}};
+    for my $edt (keys %{%dir{$dir}}) {
+	my @files = @{%dir{$dir}{$edt}};
 	if (@files +> 1) {
 	    print "conflict on filename $edt:\n", map "    $_\n", @files;
 	}

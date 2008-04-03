@@ -8,7 +8,7 @@
 # spaces.
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -16,7 +16,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }

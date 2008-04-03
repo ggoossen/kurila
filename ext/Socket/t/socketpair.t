@@ -8,10 +8,10 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    $can_fork = $Config{'d_fork'} || $Config{'d_pseudofork'};
+    $can_fork = %Config{'d_fork'} || %Config{'d_pseudofork'};
 
-    if ($^O eq "hpux" or $Config{'extensions'} !~ m/\bSocket\b/ &&
-        !(($^O eq 'VMS') && $Config{d_socket})) {
+    if ($^O eq "hpux" or %Config{'extensions'} !~ m/\bSocket\b/ &&
+        !(($^O eq 'VMS') && %Config{d_socket})) {
 	print "1..0\n";
 	exit 0;
     }
@@ -29,7 +29,7 @@ BEGIN {
       $child = fork;
       die "Fork failed" unless defined $child;
       if (!$child) {
-        $SIG{INT} = sub {exit 0}; # You have 60 seconds. Your time starts now.
+        %SIG{INT} = sub {exit 0}; # You have 60 seconds. Your time starts now.
         my $must_finish_by = time + 60;
         my $remaining;
         while (($remaining = $must_finish_by - time) +> 0) {
@@ -55,7 +55,7 @@ use Errno;
 
 my $skip_reason;
 
-if( !$Config{d_alarm} ) {
+if( !%Config{d_alarm} ) {
   plan skip_all => "alarm() not implemented on this platform";
 } elsif( !$can_fork ) {
   plan skip_all => "fork() not implemented on this platform";
@@ -76,7 +76,7 @@ if( !$Config{d_alarm} ) {
 }
 
 # But we'll install an alarm handler in case any of the races below fail.
-$SIG{ALRM} = sub {die "Unexpected alarm during testing"};
+%SIG{ALRM} = sub {die "Unexpected alarm during testing"};
 
 ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_STREAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_STREAM, PF_UNSPEC)")
@@ -115,7 +115,7 @@ ok (shutdown(LEFT, SHUT_WR), "shutdown left for writing");
 # Calls. Hence the child process minder.
 SKIP: {
   skip "SCO Unixware / OSR have a bug with shutdown",2 if $^O =~ m/^(?:svr|sco)/;
-  local $SIG{ALRM} = sub { warn "EOF on right took over 3 seconds" };
+  local %SIG{ALRM} = sub { warn "EOF on right took over 3 seconds" };
   local $TODO = "Known problems with unix sockets on $^O"
       if $^O eq 'hpux'   || $^O eq 'super-ux';
   alarm 3;
@@ -128,9 +128,9 @@ SKIP: {
 }
 
 my $err = $!;
-$SIG{PIPE} = 'IGNORE';
+%SIG{PIPE} = 'IGNORE';
 {
-  local $SIG{ALRM}
+  local %SIG{ALRM}
     = sub { warn "syswrite to left didn't fail within 3 seconds" };
   alarm 3;
   # Split the system call from the is() - is() does IO so
@@ -144,8 +144,8 @@ $SIG{PIPE} = 'IGNORE';
   # This may need skipping on some OSes - restoring value saved above
   # should help
   $! = $err;
-  ok (($!{EPIPE} or $!{ESHUTDOWN}), '$! should be EPIPE or ESHUTDOWN')
-    or printf "\$\!=%d(%s)\n", $err, $err;
+  ok ((%!{EPIPE} or %!{ESHUTDOWN}), '$! should be EPIPE or ESHUTDOWN')
+    or printf "\$\!=\%d(\%s)\n", $err, $err;
 }
 
 my @gripping = (chr 255, chr 127);
@@ -214,7 +214,7 @@ SKIP: {
   skip "$^O does length 0 udp reads", 2 if ($^O eq 'os390');
 
   my $alarmed = 0;
-  local $SIG{ALRM} = sub { $alarmed = 1; };
+  local %SIG{ALRM} = sub { $alarmed = 1; };
   print "# Approximate forever as 3 seconds. Wait 'forever'...\n";
   alarm 3;
   undef $buffer;

@@ -190,7 +190,7 @@ sub readline {
   my $self = shift;
   my ($in,$out,$str) = @$self;
   my $prompt = shift;
-  print $out $rl_term_set[0], $prompt, $rl_term_set[1], $rl_term_set[2]; 
+  print $out @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
   $self->register_Tk 
      if not $Term::ReadLine::registered and $Term::ReadLine::toloop
 	and defined &Tk::DoOneEvent;
@@ -200,7 +200,7 @@ sub readline {
   utf8::upgrade($str)
       if (${^UNICODE} ^&^ PERL_UNICODE_STDIN || defined ${^ENCODING}) &&
          utf8::valid($str);
-  print $out $rl_term_set[3]; 
+  print $out @rl_term_set[3]; 
   # bug in 5.000: chomping empty string creats length -1:
   chomp $str if defined $str;
   $str;
@@ -247,7 +247,7 @@ sub new {
   #local (*FIN, *FOUT);
   my ($FIN, $FOUT, $ret);
   if (@_==2) {
-    my($console, $consoleOUT) = $_[0]->findConsole;
+    my($console, $consoleOUT) = @_[0]->findConsole;
 
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
@@ -261,7 +261,7 @@ sub new {
     select($sel);
     $ret = bless [\*FIN, \*FOUT];
   } else {			# Filehandles supplied
-    $FIN = $_[2]; $FOUT = $_[3];
+    $FIN = @_[2]; $FOUT = @_[3];
     #OUT->autoflush(1);		# Conflicts with debugger?
     my $sel = select($FOUT);
     $| = 1;				# for DB::OUT
@@ -269,7 +269,7 @@ sub new {
     $ret = bless [$FIN, $FOUT];
   }
   if ($ret->Features->{ornaments} 
-      and not ($ENV{PERL_RL} and $ENV{PERL_RL} =~ m/\bo\w*=0/)) {
+      and not (%ENV{PERL_RL} and %ENV{PERL_RL} =~ m/\bo\w*=0/)) {
     local $Term::ReadLine::termcap_nowarn = 1;
     $ret->ornaments(1);
   }
@@ -304,7 +304,7 @@ package Term::ReadLine;		# So late to allow the above code be defined?
 
 our $VERSION = '1.03';
 
-my ($which) = exists $ENV{PERL_RL} ? split m/\s+/, $ENV{PERL_RL} : undef;
+my ($which) = exists %ENV{PERL_RL} ? split m/\s+/, %ENV{PERL_RL} : undef;
 if ($which) {
   if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";
@@ -390,7 +390,7 @@ sub register_Tk {
 }
 
 sub tkRunning {
-  $Term::ReadLine::toloop = $_[1] if @_ +> 1;
+  $Term::ReadLine::toloop = @_[1] if @_ +> 1;
   $Term::ReadLine::toloop;
 }
 

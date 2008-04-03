@@ -10,7 +10,7 @@ use FileHandle;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&testcmp);
-$MYPKG = eval { (caller)[0] };
+$MYPKG = eval { (caller)[[0]] };
 
 ##--------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ otherwise.
 ##--------------------------------------------------------------------------
 
 sub testcmp( $ $ ; $) {
-   my %opts = ref($_[0]) eq 'HASH' ? %{shift()} : ();
+   my %opts = ref(@_[0]) eq 'HASH' ? %{shift()} : ();
    my ($file1, $file2) = @_;
    my ($fh1, $fh2) = ($file1, $file2);
    unless (ref $fh1) {
@@ -55,7 +55,7 @@ sub testcmp( $ $ ; $) {
       $fh2 = FileHandle->new($file2, "r") or die "Can't open $file2: $!";
    }
   
-   my $cmplines = $opts{'-cmplines'} || undef;
+   my $cmplines = %opts{'-cmplines'} || undef;
    my ($f1text, $f2text) = ("", "");
    my ($line, $diffs)    = (0, 0);
   

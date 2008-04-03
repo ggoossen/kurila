@@ -69,9 +69,9 @@ my @output = ~< *INFH;
 
 ok(@output, @reference);
 
-for my $i (0..$#reference) {
-  next if $reference[$i] =~ m/^%%/; # skip timestamp comments
-  ok($output[$i], $reference[$i]);
+for my $i (0..(@reference-1)) {
+  next if @reference[$i] =~ m/^%%/; # skip timestamp comments
+  ok(@output[$i], @reference[$i]);
 }
 
 close(INFH) or die "Error closing INFH test.tex: $!\n";

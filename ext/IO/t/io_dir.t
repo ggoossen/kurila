@@ -6,7 +6,7 @@ BEGIN {
         @INC = '../lib';
     }
     require Config; Config->import;
-    if ($Config{'d_readdir'}) {
+    if (%Config{'d_readdir'}) {
 	print "1..0 # Skip: readdir() not available\n";
 	exit 0;
     }
@@ -21,7 +21,7 @@ my $tcount = 0;
 
 sub ok {
   $tcount++;
-  my $not = $_[0] ? '' : 'not ';
+  my $not = @_[0] ? '' : 'not ';
   print "${not}ok $tcount\n";
 }
 

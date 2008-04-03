@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -31,10 +31,10 @@ my $class = 'ExtUtils::MM_Unix';
 
 # only one of the following can be true
 # test should be removed if MM_Unix ever stops handling other OS than Unix
-my $os =  ($ExtUtils::MM_Unix::Is{OS2}   || 0)
-        + ($ExtUtils::MM_Unix::Is{Win32} || 0) 
-        + ($ExtUtils::MM_Unix::Is{Dos}   || 0)
-        + ($ExtUtils::MM_Unix::Is{VMS}   || 0); 
+my $os =  (%ExtUtils::MM_Unix::Is{OS2}   || 0)
+        + (%ExtUtils::MM_Unix::Is{Win32} || 0) 
+        + (%ExtUtils::MM_Unix::Is{Dos}   || 0)
+        + (%ExtUtils::MM_Unix::Is{VMS}   || 0); 
 ok ( $os +<= 1,  'There can be only one (or none)');
 
 cmp_ok ($ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least version 1.12606');
@@ -183,7 +183,7 @@ unlink "command";
 ###############################################################################
 # perl_script (on unix any ordinary, readable file)
 
-my $self_name = $ENV{PERL_CORE} ? '../lib/ExtUtils/t/MM_Unix.t' 
+my $self_name = %ENV{PERL_CORE} ? '../lib/ExtUtils/t/MM_Unix.t' 
                                  : 'MM_Unix.t';
 is ($t->perl_script($self_name),$self_name, 'we pass as a perl_script()');
 
