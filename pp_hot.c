@@ -1161,7 +1161,7 @@ PP(pp_match)
     const I32 oldsave = PL_savestack_ix;
     I32 update_minmatch = 1;
     I32 had_zerolen = 0;
-    void* gpos = NULL;
+    I32 gpos = 0;
 
     if (PL_op->op_flags & OPf_STACKED)
 	TARG = POPs;
@@ -1948,7 +1948,6 @@ PP(pp_subst)
     STRLEN len;
     int force_on_match = 0;
     const I32 oldsave = PL_savestack_ix;
-    STRLEN slen;
     I32 matched;
 #ifdef PERL_OLD_COPY_ON_WRITE
     bool is_cow;
