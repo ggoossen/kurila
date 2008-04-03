@@ -324,9 +324,9 @@ Perl_mg_length(pTHX_ SV *sv)
     {
 	/* You can't know whether it's UTF-8 until you get the string again...
 	 */
-        const U8 *s = (U8*)SvPV_const(sv, len);
+        const char *s = SvPV_const(sv, len);
 
-	if (DO_UTF8(sv)) {
+	if (IN_CODEPOINTS) {
 	    len = utf8_length(s, s + len);
 	}
     }

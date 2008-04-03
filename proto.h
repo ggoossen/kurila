@@ -521,8 +521,11 @@ PERL_CALLCONV void	Perl_deprecate_old(pTHX_ const char *const s)
 PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
-PERL_CALLCONV void	Perl_vdie(pTHX_ const char* pat, va_list* args);
+PERL_CALLCONV void	Perl_vdie(pTHX_ const char* pat, va_list* args)
+			__attribute__noreturn__;
+
 PERL_CALLCONV void	Perl_die_where(pTHX_ SV *msv)
+			__attribute__noreturn__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DIE_WHERE	\
 	assert(msv)
@@ -4984,11 +4987,6 @@ STATIC regnode*	S_reg_node(pTHX_ struct RExC_state_t *pRExC_state, U8 op)
 #define PERL_ARGS_ASSERT_REG_NODE	\
 	assert(pRExC_state)
 
-STATIC UV	S_reg_recode(pTHX_ const char value, SV **encp)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_REG_RECODE	\
-	assert(encp)
-
 STATIC regnode*	S_regpiece(pTHX_ struct RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -5227,14 +5225,7 @@ STATIC char*	S_reghop3c(char *s, I32 off, char *lim)
 #define PERL_ARGS_ASSERT_REGHOP3C	\
 	assert(s); assert(lim)
 
-STATIC char*	S_reghop3x(char *s, I32 off, char *lim)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(1)
-			__attribute__nonnull__(3);
-#define PERL_ARGS_ASSERT_REGHOP3X	\
-	assert(s); assert(lim)
-
-STATIC char*	S_reghop4(char *s, I32 off, const char *llim, const char *rlim)
+STATIC char*	S_reghop4(char *s, I32 off, char *llim, char *rlim)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1)
 			__attribute__nonnull__(3)

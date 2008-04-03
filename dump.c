@@ -961,7 +961,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",HUSH_VMSISH");
     }
     else if (PL_check[optype] != MEMBER_TO_FPTR(Perl_ck_ftst)) {
-	if (OP_IS_FILETEST_ACCESS(o) && o->op_private & OPpFT_ACCESS)
+	if (OP_IS_FILETEST_ACCESS(optype) && o->op_private & OPpFT_ACCESS)
 	    sv_catpv(tmpsv, ",FT_ACCESS");
 	if (o->op_private & OPpFT_STACKED)
 	    sv_catpv(tmpsv, ",FT_STACKED");

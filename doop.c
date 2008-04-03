@@ -280,10 +280,10 @@ S_do_trans_complex_utf8(pTHX_ SV * const sv)
     bool havefinal = FALSE;
     STRLEN len;
     char *dstart, *dend;
+    char *s = SvPV(sv, len);
 
     PERL_ARGS_ASSERT_DO_TRANS_COMPLEX_UTF8;
 
-    char *s = SvPV(sv, len);
     send = s + len;
     start = s;
 
