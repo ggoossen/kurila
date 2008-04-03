@@ -54,7 +54,7 @@ sub import {
     while (@args) {
 	my $type = shift(@args);
 	my $dscp;
-	if ($type =~ m/^:?(utf8|locale|encoding\(.+\))$/) {
+	if ($type =~ m/^:?(utf8|encoding\(.+\))$/) {
 	    $type = 'IO';
 	    $dscp = ":$1";
 	} elsif ($type eq ':std') {
@@ -66,23 +66,12 @@ sub import {
 	my @val;
 	foreach my $layer (split(m/\s+/,$dscp)) {
             $layer =~ s/^://;
-	    if ($layer eq 'locale') {
-		require Encode;
-		require encoding;
-		$locale_encoding = encoding::_get_locale_encoding()
-		    unless defined $locale_encoding;
-		(warnings::warnif("layer", "Cannot figure out an encoding to use"), last)
-		    unless defined $locale_encoding;
-                $layer = "encoding($locale_encoding)";
-		$std = 1;
-	    } else {
-		my $target = $layer;		# the layer name itself
-		$target =~ s/^(\w+)\(.+\)$/$1/;	# strip parameters
+            my $target = $layer;		# the layer name itself
+            $target =~ s/^(\w+)\(.+\)$/$1/;	# strip parameters
 
-		unless(PerlIO::Layer->find($target,1)) {
-		    warnings::warnif("layer", "Unknown PerlIO layer '$target'");
-		}
-	    }
+            unless(PerlIO::Layer->find($target,1)) {
+                warnings::warnif("layer", "Unknown PerlIO layer '$target'");
+            }
 	    push(@val,":$layer");
 	    if ($layer =~ m/^(crlf|raw)$/) {
 		%^H{"open_$type"} = $layer;
