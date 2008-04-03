@@ -30,10 +30,7 @@ toke.c	AOK
 	$a =/ 2 ;
 
      Multidimensional syntax %.*s not supported 
-	my $a = $a[1,2] ;
-
-     You need to quote \"%s\"" 
-	sub fred {} ; $SIG{TERM} = fred;
+	my $a = @a[1,2] ;
 
      Scalar value %.*s better written as $%.*s" 
 	@a[3] = 2;
@@ -181,30 +178,11 @@ No operator expected, but found '<', '<=' or '<=>' operator at - line 9.
 ########
 # toke.c
 use warnings 'syntax' ;
-my $a = $a[1,2] ;
+my $a = @a[1,2] ;
 no warnings 'syntax' ;
-my $a = $a[1,2] ;
+my $a = @a[1,2] ;
 EXPECT
-Multidimensional syntax $a[1,2] not supported at - line 3.
-########
-# toke.c
-use warnings 'syntax' ;
-sub fred {} ; $SIG{TERM} = fred;
-no warnings 'syntax' ;
-$SIG{TERM} = fred;
-EXPECT
-You need to quote "fred" at - line 3.
-########
-# toke.c
-use warnings 'syntax' ;
-@a[3] = 2;
-@a{3} = 2;
-no warnings 'syntax' ;
-@a[3] = 2;
-@a{3} = 2;
-EXPECT
-Scalar value @a[3] better written as $a[3] at - line 3.
-Scalar value @a{3} better written as $a{3} at - line 4.
+Multidimensional syntax @a[1,2] not supported at - line 3.
 ########
 # toke.c
 use warnings 'syntax' ;
@@ -217,19 +195,6 @@ EXPECT
 Can't use \1 to mean $1 in expression at - line 4.
 syntax error at - line 7, near "s/(ab)/{\1}/e"
 Execution of - aborted due to compilation errors. at - line 7.
-########
-# toke.c
-use warnings 'reserved' ;
-$a = abc;
-$a = { def
-
-=> 1 };
-no warnings 'reserved' ;
-$a = abc;
-EXPECT
-Bareword "abc" not allowed while "strict subs" in use
-Bareword "abc" not allowed while "strict subs" in use
-Execution of - aborted due to compilation errors. at - line 8.
 ########
 # toke.c
 use warnings 'qw' ;
@@ -292,21 +257,21 @@ EXPECT
 ########
 # toke.c
 use warnings 'ambiguous' ;
-$a = ${time[2]};
+$a = @{time[2]};
 no warnings 'ambiguous' ;
-$a = ${time[2]};
+$a = @{time[2]};
 EXPECT
-Ambiguous use of ${time[...]} resolved to $time[...] at - line 3.
+Ambiguous use of @{time[...]} resolved to @time[...] at - line 3.
 ########
 # toke.c
 use warnings 'ambiguous' ;
-$a = ${time{2}};
+$a = %{time{2}};
 EXPECT
-Ambiguous use of ${time{...}} resolved to $time{...} at - line 3.
+Ambiguous use of %{time{...}} resolved to %time{...} at - line 3.
 ########
 # toke.c
 no warnings 'ambiguous' ;
-$a = ${time{2}};
+$a = %{time{2}};
 EXPECT
 
 ########
@@ -636,10 +601,10 @@ Operator or semicolon missing before *foo at - line 8.
 Ambiguous use of * resolved as operator * at - line 8.
 Operator or semicolon missing before *foo at - line 10.
 Ambiguous use of * resolved as operator * at - line 10.
-Bareword "foo" not allowed while "strict subs" in use
-Bareword "foo" not allowed while "strict subs" in use
-Bareword "foo" not allowed while "strict subs" in use
-Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use at - line 3, at EOF
+Bareword "foo" not allowed while "strict subs" in use at - line 6, at EOF
+Bareword "foo" not allowed while "strict subs" in use at - line 8, at EOF
+Bareword "foo" not allowed while "strict subs" in use at - line 10, at EOF
 Execution of - aborted due to compilation errors. at - line 10.
 ########
 # toke.c

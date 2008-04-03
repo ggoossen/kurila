@@ -14,7 +14,7 @@
 # It also acts as a test for read_header
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
@@ -22,7 +22,7 @@ sub BEGIN {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -32,7 +32,7 @@ use strict;
 use vars qw($file_magic_str $other_magic $network_magic $byteorder
             $major $minor $minor_write $fancy);
 
-$byteorder = $Config{byteorder};
+$byteorder = %Config{byteorder};
 
 $file_magic_str = 'pst0';
 $other_magic = 7 + length $byteorder;
@@ -64,7 +64,7 @@ sub test_hash {
   my $clone = shift;
   is (ref $clone, "HASH", "Get hash back");
   is (scalar keys %$clone, 1, "with 1 key");
-  is ((keys %$clone)[0], "perl", "which is correct");
+  is ((keys %$clone)[[0]], "perl", "which is correct");
   is ($clone->{perl}, "rules");
 }
 
@@ -78,14 +78,14 @@ sub test_header {
     # Network order header has no sizes
   } else {
     is ($header->{byteorder}, $byteorder, "byte order");
-    is ($header->{intsize}, $Config{intsize}, "int size");
-    is ($header->{longsize}, $Config{longsize}, "long size");
+    is ($header->{intsize}, %Config{intsize}, "int size");
+    is ($header->{longsize}, %Config{longsize}, "long size");
  SKIP: {
 	skip ("No \$Config\{prtsize\} on this perl version ($^V)", 1)
-	    unless defined $Config{ptrsize};
-	is ($header->{ptrsize}, $Config{ptrsize}, "long size");
+	    unless defined %Config{ptrsize};
+	is ($header->{ptrsize}, %Config{ptrsize}, "long size");
     }
-    is ($header->{nvsize}, $Config{nvsize} || $Config{doublesize} || 8,
+    is ($header->{nvsize}, %Config{nvsize} || %Config{doublesize} || 8,
         "nv size"); # 5.00405 doesn't even have doublesize in config.
   }
 }
@@ -245,7 +245,7 @@ my $length = -s $file;
 die "Don't seem to have written file '$file' as I can't get its length: $!"
   unless defined $file;
 
-die "Expected file to be $expected bytes (sizeof long is $Config{longsize}) but it is $length"
+die "Expected file to be $expected bytes (sizeof long is %Config{longsize}) but it is $length"
   unless $length == $expected;
 
 # Read the contents into memory:
@@ -273,7 +273,7 @@ $length = -s $file;
 die "Don't seem to have written file '$file' as I can't get its length: $!"
   unless defined $file;
 
-die "Expected file to be $expected bytes (sizeof long is $Config{longsize}) but it is $length"
+die "Expected file to be $expected bytes (sizeof long is %Config{longsize}) but it is $length"
   unless $length == $expected;
 
 # Read the contents into memory:
@@ -295,7 +295,7 @@ test_things($stored, \&freeze_and_thaw, 'string', 1);
 {
     chop(my $a = chr(0xDF).chr(256));
     my %a = (chr(0xDF) => 1);
-    $a{$a}++;
+    %a{$a}++;
     freeze \%a;
     # If we were built with -DDEBUGGING, the assert() should have killed
     # us, which will probably alert the user that something went wrong.

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = ('../lib', 'lib');
     }
@@ -27,7 +27,7 @@ use MakeMaker::Test::Setup::BFD;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete @ENV{qw(PREFIX LIB MAKEFLAGS)};
+delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
 
 my $Perl = which_perl();
 my $Makefile = makefile_name();

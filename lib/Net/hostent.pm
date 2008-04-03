@@ -32,12 +32,12 @@ sub addr { shift->addr_list->[0] }
 sub populate (@) {
     return unless @_;
     my $hob = new();
-    $h_name 	 =    $hob->[0]     	     = $_[0];
-    @h_aliases	 = @{ $hob->[1] } = split ' ', $_[1];
-    $h_addrtype  =    $hob->[2] 	     = $_[2];
-    $h_length	 =    $hob->[3] 	     = $_[3];
-    $h_addr 	 =                             $_[4];
-    @h_addr_list = @{ $hob->[4] } =          @_[ (4 .. $#_) ];
+    $h_name 	 =    $hob->[0]     	     = @_[0];
+    @h_aliases	 = @{ $hob->[1] } = split ' ', @_[1];
+    $h_addrtype  =    $hob->[2] 	     = @_[2];
+    $h_length	 =    $hob->[3] 	     = @_[3];
+    $h_addr 	 =                             @_[4];
+    @h_addr_list = @{ $hob->[4] } =          @_[[ (4 .. (@_-1)) ]];
     return $hob;
 } 
 
@@ -52,7 +52,7 @@ sub gethostbyaddr ($;$) {
 } 
 
 sub gethost($) {
-    if ($_[0] =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
+    if (@_[0] =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
 	require Socket;
 	&gethostbyaddr(Socket::inet_aton(shift));
     } else {

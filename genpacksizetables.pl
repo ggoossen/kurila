@@ -33,14 +33,14 @@ sub make_tables {
 
         $size = "sizeof($size)" unless $size =~ s/^=//;
 
-        $arrays{$shriek ? 'shrieking' : 'normal'}{ord $chrmap->{$letter}} =
+        %arrays{$shriek ? 'shrieking' : 'normal'}{ord $chrmap->{$letter}} =
             make_text($chrmap, $letter,
                       $unpredictable, $nocsum, $size, $condition);
     }
 
     my $text = "STATIC const packprops_t packprops[512] = \{\n";
     foreach my $arrayname (qw(normal shrieking)) {
-        my $array = $arrays{$arrayname} ||
+        my $array = %arrays{$arrayname} ||
             die "No defined entries in $arrayname";
         $text .= "    /* $arrayname */\n";
         for my $ch (0..255) {

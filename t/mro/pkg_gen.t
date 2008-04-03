@@ -30,7 +30,7 @@ $new_f_gen = mro::get_pkg_gen('Foo');
 ok($new_f_gen +> $f_gen, 'Foo pkg_gen incs for @ISA');
 
 undef %Foo::;
-is(mro::get_pkg_gen('Foo'), 1, "pkg_gen 1 for undef %Pkg::");
+is(mro::get_pkg_gen('Foo'), 1, "pkg_gen 1 for undef \%Pkg::");
 
-delete $::{"Foo::"};
+delete %::{"Foo::"};
 is(mro::get_pkg_gen('Foo'), 0, 'pkg_gen 0 for delete $::{Pkg::}');

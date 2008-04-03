@@ -181,7 +181,7 @@ Tom Christiansen <F<tchrist@mox.perl.com>>, 25 June 1995.
 =cut
 
 use strict;
-$Carp::Internal{__PACKAGE__.""}++;
+%Carp::Internal{__PACKAGE__.""}++;
 
 our $VERSION = 1.17;
 our $DEBUG;
@@ -191,7 +191,7 @@ our $TRACEONLY = 0;
 our $WARNTRACE = 0;
 
 use Config;
-my($privlib, $archlib) = @Config{qw(privlibexp archlibexp)};
+my($privlib, $archlib) = %Config{[qw(privlibexp archlibexp)]};
 if ($^O eq 'VMS') {
     require VMS::Filespec;
     $privlib = VMS::Filespec::unixify($privlib);
@@ -199,15 +199,15 @@ if ($^O eq 'VMS') {
 }
 my @trypod = (
 	   "$archlib/pod/perldiag.pod",
-	   "$privlib/pod/perldiag-$Config{version}.pod",
+	   "$privlib/pod/perldiag-%Config{version}.pod",
 	   "$privlib/pod/perldiag.pod",
 	   "$archlib/pods/perldiag.pod",
-	   "$privlib/pods/perldiag-$Config{version}.pod",
+	   "$privlib/pods/perldiag-%Config{version}.pod",
 	   "$privlib/pods/perldiag.pod",
 	  );
 # handy for development testing of new warnings etc
 unshift @trypod, "./pod/perldiag.pod" if -e "pod/perldiag.pod";
-(my $PODFILE) = ((grep { -e } @trypod), $trypod[$#trypod])[0];
+(my $PODFILE) = ((grep { -e } @trypod), @trypod[-1])[[0]];
 
 if ($^O eq 'MacOS') {
     # just updir one from each lib dir, we'll find it ...
@@ -327,9 +327,9 @@ my %msg;
 
 	unescape();
 	if ($PRETTY) {
-	    sub noop   { return $_[0] }  # spensive for a noop
-	    sub bold   { my $str =$_[0];  $str =~ s/(.)/$1\b$1/g; return $str; } 
-	    sub italic { my $str = $_[0]; $str =~ s/(.)/_\b$1/g;  return $str; } 
+	    sub noop   { return @_[0] }  # spensive for a noop
+	    sub bold   { my $str =@_[0];  $str =~ s/(.)/$1\b$1/g; return $str; } 
+	    sub italic { my $str = @_[0]; $str =~ s/(.)/_\b$1/g;  return $str; } 
 	    s/C<<< (.*?) >>>|C<< (.*?) >>|[BC]<(.*?)>/{bold($+)}/gs;
 	    s/[LIF]<(.*?)>/{italic($1)}/gs;
 	} else {
@@ -346,7 +346,7 @@ my %msg;
 		    next;
 		}
 		s/^/    /gm;
-		$msg{$header} .= $_;
+		%msg{$header} .= $_;
 	 	undef $for_item;	
 	    }
 	    next;
@@ -354,7 +354,7 @@ my %msg;
 	unless ( s/=item (.*?)\s*\z//) {
 
 	    if ( s/=head1\sDESCRIPTION//) {
-		$msg{$header = 'DESCRIPTION'} = '';
+		%msg{$header = 'DESCRIPTION'} = '';
 		undef $for_item;
 	    }
 	    elsif( s/^=for\s+diagnostics\s*\n(.*?)\s*\z// ) {
@@ -375,41 +375,41 @@ my %msg;
 	# strip formatting directives from =item line
 	$header =~ s/[A-Z]<(.*?)>/$1/g;
 
-        my @toks = split( m/(%l?[dx]|%c|%(?:\.\d+)?s)/, $header );
+        my @toks = split( m/(\%l?[dx]|\%c|%(?:\.\d+)?s)/, $header );
 	if (@toks +> 1) {
             my $conlen = 0;
-            for my $i (0..$#toks){
+            for my $i (0..@toks-1){
                 if( $i % 2 ){
-                    if(      $toks[$i] eq '%c' ){
-                        $toks[$i] = '.';
-                    } elsif( $toks[$i] eq '%d' ){
-                        $toks[$i] = '\d+';
-                    } elsif( $toks[$i] eq '%s' ){
-                        $toks[$i] = $i == $#toks ? '.*' : '.*?';
-                    } elsif( $toks[$i] =~ '%.(\d+)s' ){
-                        $toks[$i] = ".\{$1\}";
-                     } elsif( $toks[$i] =~ '^%l*x$' ){
-                        $toks[$i] = '[\da-f]+';
+                    if(      @toks[$i] eq '%c' ){
+                        @toks[$i] = '.';
+                    } elsif( @toks[$i] eq '%d' ){
+                        @toks[$i] = '\d+';
+                    } elsif( @toks[$i] eq '%s' ){
+                        @toks[$i] = $i == @toks-1 ? '.*' : '.*?';
+                    } elsif( @toks[$i] =~ '%.(\d+)s' ){
+                        @toks[$i] = ".\{$1\}";
+                     } elsif( @toks[$i] =~ '^%l*x$' ){
+                        @toks[$i] = '[\da-f]+';
                    }
-                } elsif( length( $toks[$i] ) ){
-                    $toks[$i] = quotemeta $toks[$i];
-                    $conlen += length( $toks[$i] );
+                } elsif( length( @toks[$i] ) ){
+                    @toks[$i] = quotemeta @toks[$i];
+                    $conlen += length( @toks[$i] );
                 }
             }  
             my $lhs = join( '', @toks );
-	    $transfmt{$header}{pat} =
+	    %transfmt{$header}{pat} =
               "    s\{^$lhs\}\n     \{\Q$header\E\}s\n\t&& return 1;\n";
-            $transfmt{$header}{len} = $conlen;
+            %transfmt{$header}{len} = $conlen;
 	} else {
-            $transfmt{$header}{pat} =
+            %transfmt{$header}{pat} =
 	      "    m\{^\Q$header\E\} && return 1;\n";
-            $transfmt{$header}{len} = length( $header );
+            %transfmt{$header}{len} = length( $header );
 	} 
 
 	print STDERR "$WHOAMI: Duplicate entry: \"$header\"\n"
-	    if $msg{$header};
+	    if %msg{$header};
 
-	$msg{$header} = '';
+	%msg{$header} = '';
     } 
 
 
@@ -419,9 +419,9 @@ my %msg;
 
     # Apply patterns in order of decreasing sum of lengths of fixed parts
     # Seems the best way of hitting the right one.
-    for my $hdr ( sort { $transfmt{$b}{len} <+> $transfmt{$a}{len} }
+    for my $hdr ( sort { %transfmt{$b}{len} <+> %transfmt{$a}{len} }
                   keys %transfmt ){
-        $transmo .= $transfmt{$hdr}{pat};
+        $transmo .= %transfmt{$hdr}{pat};
     }
     $transmo .= "    return 0;\n\}\n";
     print STDERR $transmo if $DEBUG;
@@ -492,7 +492,7 @@ sub disable {
 } 
 
 sub warn_trap {
-    my $warning = $_[0];
+    my $warning = @_[0];
     if (caller eq $WHOAMI or !splainthis($warning)) {
 	if ($WARNTRACE) {
 	    print STDERR Carp::longmess($warning);
@@ -504,13 +504,13 @@ sub warn_trap {
 };
 
 sub death_trap {
-    my $exception = $_[0];
+    my $exception = @_[0];
 
     # See if we are coming from anywhere within an eval. If so we don't
     # want to explain the exception because it's going to get caught.
     my $in_eval = 0;
     my $i = 0;
-    while (my $caller = (caller($i++))[3]) {
+    while (my $caller = (caller($i++))[[3]]) {
       if ($caller eq '(eval)') {
 	$in_eval = 1;
 	last;
@@ -561,41 +561,41 @@ sub splainthis {
     my $real = 0;
     my @secs = split( m/ at / );
     return unless @secs;
-    $_ = $secs[0];
-    for my $i ( 1..$#secs ){
-        if( $secs[$i] =~ m/.+? (?:line|chunk) \d+/ ){
+    $_ = @secs[0];
+    for my $i ( 1..@secs-1 ){
+        if( @secs[$i] =~ m/.+? (?:line|chunk) \d+/ ){
             $real = 1;
             last;
         } else {
-            $_ .= ' at ' . $secs[$i];
+            $_ .= ' at ' . @secs[$i];
 	}
     }
     
     # remove parenthesis occurring at the end of some messages 
     s/^\((.*)\)$/$1/;
 
-    if ($exact_duplicate{$orig}++) {
+    if (%exact_duplicate{$orig}++) {
 	return &transmo;
     } else {
 	return 0 unless &transmo;
     }
 
     $orig = shorten($orig);
-    if ($old_diag{$_}) {
+    if (%old_diag{$_}) {
 	autodescribe();
-	print THITHER "$orig (#$old_diag{$_})\n";
+	print THITHER "$orig (#%old_diag{$_})\n";
 	$wantspace = 1;
     } else {
 	autodescribe();
-	$old_diag{$_} = ++$count;
+	%old_diag{$_} = ++$count;
 	print THITHER "\n" if $wantspace;
 	$wantspace = 0;
-	print THITHER "$orig (#$old_diag{$_})\n";
-	if ($msg{$_}) {
-	    print THITHER $msg{$_};
+	print THITHER "$orig (#%old_diag{$_})\n";
+	if (%msg{$_}) {
+	    print THITHER %msg{$_};
 	} else {
 	    if (0 and $standalone) { 
-		print THITHER "    **** Error #$old_diag{$_} ",
+		print THITHER "    **** Error #%old_diag{$_} ",
 			($real ? "is" : "appears to be"),
 			" an unknown diagnostic message.\n\n";
 	    }
@@ -608,7 +608,7 @@ sub splainthis {
 sub autodescribe {
     if ($VERBOSE and not $count) {
 	print THITHER &{$PRETTY ? \&bold : \&noop}("DESCRIPTION OF DIAGNOSTICS"),
-		"\n$msg{DESCRIPTION}\n";
+		"\n%msg{DESCRIPTION}\n";
     } 
 } 
 
@@ -619,8 +619,8 @@ sub unescape {
             >   
     } {{ 
          do {   
-             exists $HTML_Escapes{$1}
-                ? do { $HTML_Escapes{$1} }
+             exists %HTML_Escapes{$1}
+                ? do { %HTML_Escapes{$1} }
                 : do {
                     warn "Unknown escape: E<$1> in $_";
                     "E<$1>";
@@ -630,7 +630,7 @@ sub unescape {
 }
 
 sub shorten {
-    my $line = $_[0];
+    my $line = @_[0];
     if (length($line) +> 79 and index($line, "\n") == -1) {
 	my $space_place = rindex($line, ' ', 79);
 	if ($space_place != -1) {

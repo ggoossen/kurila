@@ -830,7 +830,7 @@ Perl_screaminstr(pTHX_ SV *bigstr, SV *littlestr, I32 start_shift, I32 end_shift
     stop_pos = SvCUR(bigstr) - end_shift - (SvCUR(littlestr) - 1 - previous);
     /* Always return the stop_pos if looking for last and tail (might be a false positive) */
     if (last && SvTAIL(littlestr))
-	return big + stop_pos;
+	return (char*)big + stop_pos;
     if (previous + start_shift > stop_pos) {
 /*
   stop_pos does not include SvTAIL in the count, so this check is incorrect
@@ -1323,7 +1323,6 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
     msv = vdie_croak_common(pat, args);
     die_where(msv);
     /* NOTREACHED */
-    return;
 }
 
 OP *
@@ -3422,9 +3421,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
 	break;
     case want_vtbl_isaelem:
 	result = &PL_vtbl_isaelem;
-	break;
-    case want_vtbl_arylen:
-	result = &PL_vtbl_arylen;
 	break;
     case want_vtbl_mglob:
 	result = &PL_vtbl_mglob;

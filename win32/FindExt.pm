@@ -17,7 +17,7 @@ sub getcwd {
     $_ = `cd`;
     chomp;
     s:\\:/:g ;
-    return $ENV{'PWD'} = $_;
+    return %ENV{'PWD'} = $_;
 }
 
 sub set_static_extensions {
@@ -27,13 +27,13 @@ sub set_static_extensions {
     # (with possible exclusions)
     %static = ();
     my @list = @_;
-    if ($_[0] eq '*') {
-	my %excl = map {$_=>1} map {m/^!(.*)$/} @_[1 .. $#_];
-	@list = grep {!exists $excl{$_}} keys %ext;
+    if (@_[0] eq '*') {
+	my %excl = map {$_=>1} map {m/^!(.*)$/} @_[[1 .. (@_-1)]];
+	@list = grep {!exists %excl{$_}} keys %ext;
     }
     for (@list) {
-        $static{$_} = 1;
-        $ext{$_} = 'static' if $ext{$_} && $ext{$_} eq 'dynamic';
+        %static{$_} = 1;
+        %ext{$_} = 'static' if %ext{$_} && %ext{$_} eq 'dynamic';
     }
 }
 
@@ -50,33 +50,33 @@ sub scan_ext
 
 sub dynamic_ext
 {
- return sort grep $ext{$_} eq 'dynamic',keys %ext;
+ return sort grep %ext{$_} eq 'dynamic',keys %ext;
 }
 
 sub static_ext
 {
- return sort grep $ext{$_} eq 'static',keys %ext;
+ return sort grep %ext{$_} eq 'static',keys %ext;
 }
 
 sub nonxs_ext
 {
- return sort grep $ext{$_} eq 'nonxs',keys %ext;
+ return sort grep %ext{$_} eq 'nonxs',keys %ext;
 }
 
 sub extensions
 {
- return sort grep $ext{$_} ne 'known',keys %ext;
+ return sort grep %ext{$_} ne 'known',keys %ext;
 }
 
 sub known_extensions
 {
  # faithfully copy Configure in not including nonxs extensions for the nonce
- return sort grep $ext{$_} ne 'nonxs',keys %ext;
+ return sort grep %ext{$_} ne 'nonxs',keys %ext;
 }
 
 sub is_static
 {
- return $ext{$_[0]} eq 'static'
+ return %ext{@_[0]} eq 'static'
 }
 
 # Function to recursively find available extensions, ignoring DynaLoader
@@ -89,17 +89,17 @@ sub find_ext
     for my $xxx (@items) {
         if ($xxx ne "DynaLoader") {
             if (-f "$xxx/$xxx.xs" || -f "$xxx/$xxx.c" ) {
-                $ext{"$_[0]$xxx"} = $static{"$_[0]$xxx"} ? 'static' : 'dynamic';
+                %ext{"@_[0]$xxx"} = %static{"@_[0]$xxx"} ? 'static' : 'dynamic';
             } elsif (-f "$xxx/Makefile.PL") {
-                $ext{"$_[0]$xxx"} = 'nonxs';
+                %ext{"@_[0]$xxx"} = 'nonxs';
             } else {
                 if (-d $xxx && @_ +< 10) {
                     chdir $xxx;
-                    find_ext("$_[0]$xxx/", @_);
+                    find_ext("@_[0]$xxx/", @_);
                     chdir "..";
                 }
             }
-            $ext{"$_[0]$xxx"} = 'known' if $ext{"$_[0]$xxx"} && $xxx =~ $no;
+            %ext{"@_[0]$xxx"} = 'known' if %ext{"@_[0]$xxx"} && $xxx =~ $no;
         }
     }
 
@@ -109,11 +109,11 @@ sub find_ext
 # recursive finding breaks SDBM_File/sdbm).
 # A.D. 20011025 (SDBM), ajgough 20071008 (FieldHash)
 
-    if (!$_[0] && -d "threads/shared") {
-        $ext{"threads/shared"} = 'dynamic';
+    if (!@_[0] && -d "threads/shared") {
+        %ext{"threads/shared"} = 'dynamic';
     }
-    if (!$_[0] && -d "Hash/Util/FieldHash") {
-        $ext{"Hash/Util/FieldHash"} = 'dynamic';
+    if (!@_[0] && -d "Hash/Util/FieldHash") {
+        %ext{"Hash/Util/FieldHash"} = 'dynamic';
     }
 }
 

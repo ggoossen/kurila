@@ -2,7 +2,7 @@
 
 BEGIN {
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
+    if (%Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
         print "1..0\n";
         exit 0;
     }
@@ -13,8 +13,8 @@ BEGIN {use_ok('File::Glob', ':glob')};
 use Cwd ();
 
 # look for the contents of the current directory
-$ENV{PATH} = "/bin";
-delete @ENV{qw(BASH_ENV CDPATH ENV IFS)};
+%ENV{PATH} = "/bin";
+delete %ENV{[qw(BASH_ENV CDPATH ENV IFS)]};
 my @correct = ();
 if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
    @correct = grep { !m/^\./ } sort readdir(D);
@@ -35,7 +35,7 @@ SKIP: {
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS'
 	|| $^O eq 'os2' || $^O eq 'beos';
     skip "Can't find user for $>: $@", 1 unless eval {
-	($name, $home) = (getpwuid($>))[0,7];
+	($name, $home) = (getpwuid($>))[[0,7]];
 	1;
     };
     skip "$> has no home directory", 1
@@ -73,7 +73,7 @@ SKIP: {
 SKIP: {
     skip $^O, 2 if $^O eq 'mpeix' or $^O eq 'MSWin32' or $^O eq 'NetWare'
 	or $^O eq 'os2' or $^O eq 'VMS' or $^O eq 'cygwin';
-    skip "AFS", 2 if Cwd::cwd() =~ m#^$Config{'afsroot'}#s;
+    skip "AFS", 2 if Cwd::cwd() =~ m#^%Config{'afsroot'}#s;
     skip "running as root", 2 if not $>;
 
     my $dir = "pteerslo";
@@ -105,11 +105,11 @@ print "# @a\n";
 is_deeply(\@a, [($^O eq 'VMS'? 'test.' : 'TEST'), 'a', 'b']);
 
 # "~" should expand to $ENV{HOME}
-$ENV{HOME} = "sweet home";
+%ENV{HOME} = "sweet home";
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
 SKIP: {
     skip $^O, 1 if $^O eq "MacOS";
-    is_deeply(\@a, [$ENV{HOME}]);
+    is_deeply(\@a, [%ENV{HOME}]);
 }
 
 # GLOB_ALPHASORT (default) should sort alphabetically regardless of case

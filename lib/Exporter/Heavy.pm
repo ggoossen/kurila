@@ -30,11 +30,11 @@ No user-serviceable parts inside.
 sub _rebuild_cache {
     my ($pkg, $exports, $cache) = @_;
     s/^&// foreach @$exports;
-    @{$cache}{@$exports} = (1) x @$exports;
+    %{$cache}{[@$exports]} = (1) x @$exports;
     my $ok = \@{*{Symbol::fetch_glob("${pkg}::EXPORT_OK")}};
     if (@$ok) {
 	s/^&// foreach @$ok;
-	@{$cache}{@$ok} = (1) x @$ok;
+	%{$cache}{[@$ok]} = (1) x @$ok;
     }
 }
 
@@ -43,7 +43,7 @@ sub heavy_export {
     my($pkg, $callpkg, @imports) = @_;
     my($type, $sym, $cache_is_current, $oops);
     my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("${pkg}::EXPORT")}},
-                                   $Exporter::Cache{$pkg} ||= {});
+                                   %Exporter::Cache{$pkg} ||= {});
 
     if (@imports) {
 	if (!%$export_cache) {
@@ -57,7 +57,7 @@ sub heavy_export {
 	    my %imports;
 	    my($remove, $spec, @names, @allexports);
 	    # negated first item implies starting with default set:
-	    unshift @imports, ':DEFAULT' if $imports[0] =~ m/^!/;
+	    unshift @imports, ':DEFAULT' if @imports[0] =~ m/^!/;
 	    foreach $spec (@imports){
 		$remove = $spec =~ s/^!//;
 
@@ -69,7 +69,7 @@ sub heavy_export {
 			@names = @$tagdata;
 		    }
 		    else {
-			warn qq["$spec" is not defined in %${pkg}::EXPORT_TAGS];
+			warn qq["$spec" is not defined in \%${pkg}::EXPORT_TAGS];
 			++$oops;
 			next;
 		    }
@@ -87,10 +87,10 @@ sub heavy_export {
 		    if $Exporter::Verbose;
 
 		if ($remove) {
-		   foreach $sym (@names) { delete $imports{$sym} } 
+		   foreach $sym (@names) { delete %imports{$sym} } 
 		}
 		else {
-		    @imports{@names} = (1) x @names;
+		    %imports{[@names]} = (1) x @names;
 		}
 	    }
 	    @imports = keys %imports;
@@ -109,7 +109,7 @@ sub heavy_export {
 		    }
 		    # We need a way to emulate 'use Foo ()' but still
 		    # allow an easy version check: "use Foo 1.23, ''";
-		    if (@imports == 2 and !$imports[1]) {
+		    if (@imports == 2 and !@imports[1]) {
 			@imports = ();
 			last;
 		    }
@@ -141,7 +141,7 @@ sub heavy_export {
     }
 
     my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("${pkg}::EXPORT_FAIL")}},
-                              $Exporter::FailCache{$pkg} ||= {});
+                              %Exporter::FailCache{$pkg} ||= {});
 
     if (@$fail) {
 	if (!%$fail_cache) {
@@ -150,7 +150,7 @@ sub heavy_export {
 	    # (Technique could be applied to $export_cache at cost of memory)
 	    my @expanded = map { m/^\w/ ? ($_, '&'.$_) : $_ } @$fail;
 	    warn "${pkg}::EXPORT_FAIL cached: @expanded" if $Exporter::Verbose;
-	    @{$fail_cache}{@expanded} = (1) x @expanded;
+	    %{$fail_cache}{[@expanded]} = (1) x @expanded;
 	}
 	my @failed;
 	foreach $sym (@imports) { push(@failed, $sym) if $fail_cache->{$sym} }
@@ -220,11 +220,11 @@ sub heavy_require_version {
 }
 
 sub heavy_export_tags {
-  _push_tags((caller)[0], "EXPORT",    \@_);
+  _push_tags((caller)[[0]], "EXPORT",    \@_);
 }
 
 sub heavy_export_ok_tags {
-  _push_tags((caller)[0], "EXPORT_OK", \@_);
+  _push_tags((caller)[[0]], "EXPORT_OK", \@_);
 }
 
 1;

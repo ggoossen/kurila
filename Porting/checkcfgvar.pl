@@ -67,7 +67,7 @@ my %MANIFEST;
 
 read_file("MANIFEST",
 	  sub {
-	      $MANIFEST{$1}++ if m/^(.+?)\t/;
+	      %MANIFEST{$1}++ if m/^(.+?)\t/;
 	  });
 
 my @MASTER_CFG = sort keys %MASTER_CFG;
@@ -80,7 +80,7 @@ sub check_cfg {
 }
 
 for my $cfg (@CFG) {
-    unless (exists $MANIFEST{$cfg}) {
+    unless (exists %MANIFEST{$cfg}) {
 	print "[skipping not-expected '$cfg']\n";
 	next;
     }
@@ -97,19 +97,19 @@ for my $cfg (@CFG) {
 		  # $foo='bar' # VOS 5.8.x specialty
 		  # $foo=bar   # VOS 5.8.x specialty
 		  if (m/^\$?(\w+)='(.*)'$/) {
-		      $cfg{$1}++;
+		      %cfg{$1}++;
 		  }
 		  elsif (m/^\$?(\w+)=(.*)$/) {
-		      $cfg{$1}++;
+		      %cfg{$1}++;
 		  }
 		  elsif (m/^\$\s+WC "(\w+)='(.*)'"$/) {
-		      $cfg{$1}++;
+		      %cfg{$1}++;
 		  } else {
 		      warn "$cfg:$.:$_";
 		  }
 	      });
     if ($cfg eq 'configure.com') {
-	$cfg{startperl}++; # Cheat.
+	%cfg{startperl}++; # Cheat.
     }
     check_cfg($cfg, \%cfg);
 }

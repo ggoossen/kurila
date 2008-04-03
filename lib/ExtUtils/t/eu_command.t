@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib/');
     }
@@ -31,7 +31,7 @@ BEGIN {
 BEGIN {
     # bad neighbor, but test_f() uses exit()
     *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
-    *CORE::GLOBAL::exit = sub (;$) { return $_[0] };
+    *CORE::GLOBAL::exit = sub (;$) { return @_[0] };
     use_ok( 'ExtUtils::Command' );
 }
 
@@ -70,29 +70,29 @@ BEGIN {
     is_deeply( \@ARGV, [$Testfile], 'test_f preserves @ARGV' );
 
     @ARGV = ( $Testfile );
-    ok( -e $ARGV[0], 'created!' );
+    ok( -e @ARGV[0], 'created!' );
 
     my ($now) = time;
-    utime ($now, $now, $ARGV[0]);
+    utime ($now, $now, @ARGV[0]);
     sleep 2;
 
     # Just checking modify time stamp, access time stamp is set
     # to the beginning of the day in Win95.
     # There's a small chance of a 1 second flutter here.
-    my $stamp = (stat($ARGV[0]))[9];
+    my $stamp = (stat(@ARGV[0]))[[9]];
     cmp_ok( abs($now - $stamp), '+<=', 1, 'checking modify time stamp' ) ||
       diag "mtime == $stamp, should be $now";
 
     @ARGV = qw(newfile);
     touch();
 
-    my $new_stamp = (stat('newfile'))[9];
+    my $new_stamp = (stat('newfile'))[[9]];
     cmp_ok( abs($new_stamp - $stamp), '+>=', 2,  'newer file created' );
 
     @ARGV = ('newfile', $Testfile);
     eqtime();
 
-    $stamp = (stat($Testfile))[9];
+    $stamp = (stat($Testfile))[[9]];
     cmp_ok( abs($new_stamp - $stamp), '+<=', 1, 'eqtime' );
 
     # eqtime use to clear the contents of the file being equalized!
@@ -116,21 +116,21 @@ BEGIN {
         @ARGV = ( '0100', $Testfile );
         ExtUtils::Command::chmod();
 
-        is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
+        is( ((stat($Testfile))[[2]] ^&^ 07777) ^&^ 0700,
             0100, 'change a file to execute-only' );
 
         # change a file to read-only
         @ARGV = ( '0400', $Testfile );
         ExtUtils::Command::chmod();
 
-        is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
+        is( ((stat($Testfile))[[2]] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0500 : 0400), 'change a file to read-only' );
 
         # change a file to write-only
         @ARGV = ( '0200', $Testfile );
         ExtUtils::Command::chmod();
 
-        is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
+        is( ((stat($Testfile))[[2]] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0700 : 0200), 'change a file to write-only' );
     }
 
@@ -140,7 +140,7 @@ BEGIN {
     ExtUtils::Command::chmod();
     is_deeply( \@ARGV, \@orig_argv, 'chmod preserves @ARGV' );
 
-    is( ((stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
+    is( ((stat($Testfile))[[2]] ^&^ 07777) ^&^ 0700,
         ($^O eq 'vos' ? 0700 : 0600), 'change a file to read-write' );
 
 
@@ -160,21 +160,21 @@ BEGIN {
         @ARGV = ( '0100', 'testdir' );
         ExtUtils::Command::chmod();
 
-        is( ((stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
+        is( ((stat('testdir'))[[2]] ^&^ 07777) ^&^ 0700,
             0100, 'change a dir to execute-only' );
 
         # change a dir to read-only
         @ARGV = ( '0400', 'testdir' );
         ExtUtils::Command::chmod();
 
-        is( ((stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
+        is( ((stat('testdir'))[[2]] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0500 : 0400), 'change a dir to read-only' );
 
         # change a dir to write-only
         @ARGV = ( '0200', 'testdir' );
         ExtUtils::Command::chmod();
 
-        is( ((stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
+        is( ((stat('testdir'))[[2]] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0700 : 0200), 'change a dir to write-only' );
 
         @ARGV = ('testdir');
@@ -186,12 +186,12 @@ BEGIN {
     # mkpath
     my $test_dir = File::Spec->join( 'ecmddir', 'temp2' );
     @ARGV = ( $test_dir );
-    ok( ! -e $ARGV[0], 'temp directory not there yet' );
+    ok( ! -e @ARGV[0], 'temp directory not there yet' );
     is( test_d(), 1, 'testing non-existent directory' );
 
     @ARGV = ( $test_dir );
     mkpath();
-    ok( -e $ARGV[0], 'temp directory created' );
+    ok( -e @ARGV[0], 'temp directory created' );
     is( test_d(), 0, 'testing existing dir' );
 
     @ARGV = ( $test_dir );
@@ -232,7 +232,7 @@ BEGIN {
 
         # % means 'match one character' on VMS.  Everything else is ?
         my $match_char = $^O eq 'VMS' ? '%' : '?';
-        ($ARGV[0] = $file) =~ s/.\z/$match_char/;
+        (@ARGV[0] = $file) =~ s/.\z/$match_char/;
 
         # this should find the file
         ExtUtils::Command::expand_wildcards();
@@ -240,7 +240,7 @@ BEGIN {
         is_deeply( \@ARGV, [$file], 'expanded wildcard ? successfully' );
 
         # try it with the asterisk now
-        ($ARGV[0] = $file) =~ s/.{3}\z/\*/;
+        (@ARGV[0] = $file) =~ s/.{3}\z/\*/;
         ExtUtils::Command::expand_wildcards();
 
         is_deeply( \@ARGV, [$file], 'expanded wildcard * successfully' );

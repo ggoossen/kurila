@@ -7,14 +7,14 @@
 #
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -142,10 +142,10 @@ tie $scalar, 'TIED_SCALAR';
 ### time it is reached. I have not investigated enough to tell whether it's
 ### a bug in my dump() routine or in the Perl tieing mechanism.
 $scalar = 'foo';
-$hash{'attribute'} = 'plain value';
-$array[0] = \$scalar;
-$array[1] = $c;
-$array[2] = \@array;
+%hash{'attribute'} = 'plain value';
+@array[0] = \$scalar;
+@array[1] = $c;
+@array[2] = \@array;
 
 @tied = (\$scalar, \@array, \%hash);
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
@@ -176,7 +176,7 @@ ok 6, length($f) == length($g);
 
 # Ensure the tied items in the retrieved image work
 @old = ($scalar_fetch, $array_fetch, $hash_fetch);
-@tied = ($tscalar, $tarray, $thash) = @{$root->[$#{$root}]};
+@tied = ($tscalar, $tarray, $thash) = @{$root->[@$root -1]};
 @type = qw(SCALAR  ARRAY  HASH);
 
 ok 7, tied $$tscalar;
@@ -188,10 +188,10 @@ ok 9, tied %{$thash};
 
 # Tests 10..15
 for ($i = 0; $i +< @new; $i++) {
-	print "not " unless $new[$i] == $old[$i] + 1;
-	printf "ok %d\n", 10 + 2*$i;	# Tests 10,12,14
-	print "not " unless ref $tied[$i] eq $type[$i];
-	printf "ok %d\n", 11 + 2*$i;	# Tests 11,13,15
+	print "not " unless @new[$i] == @old[$i] + 1;
+	printf "ok \%d\n", 10 + 2*$i;	# Tests 10,12,14
+	print "not " unless ref @tied[$i] eq @type[$i];
+	printf "ok \%d\n", 11 + 2*$i;	# Tests 11,13,15
 }
 
 # Check undef ties

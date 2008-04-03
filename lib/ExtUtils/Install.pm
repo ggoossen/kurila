@@ -106,7 +106,7 @@ my $Inc_uninstall_warn_handler;
 
 # install relative to here
 
-my $INSTALL_ROOT = $ENV{PERL_INSTALL_ROOT};
+my $INSTALL_ROOT = %ENV{PERL_INSTALL_ROOT};
 
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
@@ -119,7 +119,7 @@ sub _estr(@) {
 sub _warnonce(@) {
     my $first=shift;
     my $msg=_estr "WARNING: $first",@_;
-    warn $msg unless $warned{$msg}++;
+    warn $msg unless %warned{$msg}++;
 }}
 
 sub _choke(@) {
@@ -296,7 +296,7 @@ Handles loading the INSTALL.SKIP file. Returns an array of patterns to use.
 
 sub _get_install_skip {
     my ( $skip, $verbose )= @_;
-    if ($ENV{EU_INSTALL_IGNORE_SKIP}) {
+    if (%ENV{EU_INSTALL_IGNORE_SKIP}) {
         print "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
         return [];
@@ -304,7 +304,7 @@ sub _get_install_skip {
     if ( ! defined $skip ) {
         print "Looking for install skip list\n"
             if $verbose+>2;
-        for my $file ( 'INSTALL.SKIP', $ENV{EU_INSTALL_SITE_SKIPFILE} ) {
+        for my $file ( 'INSTALL.SKIP', %ENV{EU_INSTALL_SITE_SKIPFILE} ) {
             next unless $file;
             print "\tChecking for $file\n"
                 if $verbose+>2;
@@ -442,7 +442,7 @@ sub _mkpath {
     my ($dir,$show,$mode,$verbose,$dry_run)=@_;
     if ( $verbose && $verbose +> 1 && ! -d $dir) {
         $show= 1;
-        printf "mkpath(%s,%d,%#o)\n", $dir, $show, $mode;
+        printf "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
     }
     if (!$dry_run) {
         if ( ! eval { File::Path::mkpath($dir,$show,$mode); 1 } ) {
@@ -486,7 +486,7 @@ Dies if the copy fails.
 sub _copy {
     my ( $from, $to, $verbose, $dry_run)=@_;
     if ($verbose && $verbose+>1) {
-        printf "copy(%s,%s)\n", $from, $to;
+        printf "copy(\%s,\%s)\n", $from, $to;
     }
     if (!$dry_run) {
         File::Copy::copy($from,$to)
@@ -511,7 +511,7 @@ Dies if the copy fails.
 sub _symlink {
     my ( $old, $new, $verbose, $nonono)=@_;
     if ($verbose && $verbose+>1) {
-        printf "symlink(%s,%s)\n", $old, $new;
+        printf "symlink(\%s,\%s)\n", $old, $new;
     }
     if (!$nonono) {
         $old = File::Spec->rel2abs( $old );
@@ -667,14 +667,14 @@ sub install { #XXX OS-SPECIFIC
     my($from_to,$verbose,$dry_run,$uninstall_shadows,$skip,$always_copy,$result) = @_;
     if (@_==1 and eval { 1+@$from_to }) {
         my %opts        = @$from_to;
-        $from_to        = $opts{from_to} 
+        $from_to        = %opts{from_to} 
                             or Carp::confess("from_to is a mandatory parameter");
-        $verbose        = $opts{verbose};
-        $dry_run        = $opts{dry_run};
-        $uninstall_shadows  = $opts{uninstall_shadows};
-        $skip           = $opts{skip};
-        $always_copy    = $opts{always_copy};
-        $result         = $opts{result};
+        $verbose        = %opts{verbose};
+        $dry_run        = %opts{dry_run};
+        $uninstall_shadows  = %opts{uninstall_shadows};
+        $skip           = %opts{skip};
+        $always_copy    = %opts{always_copy};
+        $result         = %opts{result};
     }
     
     $result ||= {};
@@ -682,8 +682,8 @@ sub install { #XXX OS-SPECIFIC
     $dry_run  ||= 0;
 
     $skip= _get_install_skip($skip,$verbose);
-    $always_copy =  $ENV{EU_INSTALL_ALWAYS_COPY}
-                 || $ENV{EU_ALWAYS_COPY} 
+    $always_copy =  %ENV{EU_INSTALL_ALWAYS_COPY}
+                 || %ENV{EU_ALWAYS_COPY} 
                  || 0
         unless defined $always_copy;
 
@@ -693,10 +693,10 @@ sub install { #XXX OS-SPECIFIC
 
     local(*DIR);
     for (qw/read write/) {
-        $pack{$_}=$from_to{$_};
-        delete $from_to{$_};
+        %pack{$_}=%from_to{$_};
+        delete %from_to{$_};
     }
-    my $tmpfile = install_rooted_file($pack{"read"});
+    my $tmpfile = install_rooted_file(%pack{"read"});
     $packlist->read($tmpfile) if (-f $tmpfile);
     my $cwd = cwd();
     my @found_files;
@@ -713,15 +713,15 @@ sub install { #XXX OS-SPECIFIC
         #there are any files in arch. So we depend on having ./blib/arch
         #hardcoded here.
 
-        my $targetroot = install_rooted_dir($from_to{$source});
+        my $targetroot = install_rooted_dir(%from_to{$source});
 
         my $blib_lib  = File::Spec->catdir('blib', 'lib');
         my $blib_arch = File::Spec->catdir('blib', 'arch');
         if ($source eq $blib_lib and
-            exists $from_to{$blib_arch} and
+            exists %from_to{$blib_arch} and
             directory_not_empty($blib_arch)
         ){
-            $targetroot = install_rooted_dir($from_to{$blib_arch});
+            $targetroot = install_rooted_dir(%from_to{$blib_arch});
             print "Files found in $blib_arch: installing files in $blib_lib into architecture dependent library tree\n";
         }
 
@@ -732,7 +732,7 @@ sub install { #XXX OS-SPECIFIC
         # File::Find seems to always be Unixy except on MacPerl :(
         my $current_directory= $Is_MacPerl ? $Curdir : '.';
         find(sub {
-            my ($mode,$size,$atime,$mtime) = (stat)[2,7,8,9];
+            my ($mode,$size,$atime,$mtime) = (stat)[[2,7,8,9]];
 
             return if !-f _;
             my $origfile = $_;
@@ -762,7 +762,7 @@ sub install { #XXX OS-SPECIFIC
                 # we might not need to copy this file
                 $diff = compare($sourcefile, $targetfile);
             }
-            $check_dirs{$targetdir}++ 
+            %check_dirs{$targetdir}++ 
                 unless -w $targetfile;
             
             push @found_files,
@@ -827,11 +827,11 @@ sub install { #XXX OS-SPECIFIC
         $packlist->{$targetfile}++;
     }
 
-    if ($pack{'write'}) {
-        $dir = install_rooted_dir(dirname($pack{'write'}));
+    if (%pack{'write'}) {
+        $dir = install_rooted_dir(dirname(%pack{'write'}));
         _mkpath( $dir, 0, 0755, $verbose, $dry_run );
-        print "Writing $pack{'write'}\n";
-        $packlist->write(install_rooted_file($pack{'write'})) unless $dry_run;
+        print "Writing %pack{'write'}\n";
+        $packlist->write(install_rooted_file(%pack{'write'})) unless $dry_run;
     }
 
     _do_cleanup($verbose);
@@ -880,18 +880,18 @@ is defined.
 
 sub install_rooted_file {
     if (defined $INSTALL_ROOT) {
-        File::Spec->catfile($INSTALL_ROOT, $_[0]);
+        File::Spec->catfile($INSTALL_ROOT, @_[0]);
     } else {
-        $_[0];
+        @_[0];
     }
 }
 
 
 sub install_rooted_dir {
     if (defined $INSTALL_ROOT) {
-        File::Spec->catdir($INSTALL_ROOT, $_[0]);
+        File::Spec->catdir($INSTALL_ROOT, @_[0]);
     } else {
-        $_[0];
+        @_[0];
     }
 }
 
@@ -963,7 +963,7 @@ Consider its use discouraged.
 
 sub install_default {
   @_ +< 2 or Carp::croak("install_default should be called with 0 or 1 argument");
-  my $FULLEXT = @_ ? shift : $ARGV[0];
+  my $FULLEXT = @_ ? shift : @ARGV[0];
   defined $FULLEXT or die "Do not know to where to write install log";
   my $INST_LIB = File::Spec->catdir($Curdir,"blib","lib");
   my $INST_ARCHLIB = File::Spec->catdir($Curdir,"blib","arch");
@@ -972,16 +972,16 @@ sub install_default {
   my $INST_MAN1DIR = File::Spec->catdir($Curdir,'blib','man1');
   my $INST_MAN3DIR = File::Spec->catdir($Curdir,'blib','man3');
   install({
-           read => "$Config{sitearchexp}/auto/$FULLEXT/.packlist",
-           write => "$Config{installsitearch}/auto/$FULLEXT/.packlist",
+           read => "%Config{sitearchexp}/auto/$FULLEXT/.packlist",
+           write => "%Config{installsitearch}/auto/$FULLEXT/.packlist",
            $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ?
-                         $Config{installsitearch} :
-                         $Config{installsitelib},
-           $INST_ARCHLIB => $Config{installsitearch},
-           $INST_BIN => $Config{installbin} ,
-           $INST_SCRIPT => $Config{installscript},
-           $INST_MAN1DIR => $Config{installman1dir},
-           $INST_MAN3DIR => $Config{installman3dir},
+                         %Config{installsitearch} :
+                         %Config{installsitelib},
+           $INST_ARCHLIB => %Config{installsitearch},
+           $INST_BIN => %Config{installbin} ,
+           $INST_SCRIPT => %Config{installscript},
+           $INST_MAN1DIR => %Config{installman1dir},
+           $INST_MAN3DIR => %Config{installman3dir},
           },1,0,0);
 }
 
@@ -1044,25 +1044,25 @@ sub inc_uninstall {
     my($filepath,$libdir,$verbose,$dry_run,$ignore,$results) = @_;
     my($dir);
     $ignore||="";
-    my $file = (File::Spec->splitpath($filepath))[2];
+    my $file = (File::Spec->splitpath($filepath))[[2]];
     my %seen_dir = ();
     
-    my @PERL_ENV_LIB = split $Config{path_sep}, defined $ENV{'PERL5LIB'}
-      ? $ENV{'PERL5LIB'} : $ENV{'PERLLIB'} || '';
+    my @PERL_ENV_LIB = split %Config{path_sep}, defined %ENV{'PERL5LIB'}
+      ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '';
         
     my @dirs=( @PERL_ENV_LIB, 
                @INC, 
-               @Config{qw(archlibexp
+               %Config{[qw(archlibexp
                           privlibexp
                           sitearchexp
-                          sitelibexp)});        
+                          sitelibexp)]});        
     
     #warn join "\n","---",@dirs,"---";
     my $seen_ours;
     foreach $dir ( @dirs ) {
         my $canonpath = File::Spec->canonpath($dir);
         next if $canonpath eq $Curdir;
-        next if $seen_dir{$canonpath}++;
+        next if %seen_dir{$canonpath}++;
         my $targetfile = File::Spec->catfile($canonpath,$libdir,$file);
         next unless -f $targetfile;
 
@@ -1215,14 +1215,14 @@ sub DESTROY {
         foreach $file (sort keys %$self) {
             $plural = @{$self->{$file}} +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
-            for (0..$#{$self->{$file}}) {
+            for (0..@{$self->{$file}}-1) {
                 print "rm ", $self->{$file}[$_], "\n";
                 $i++;
             }
         }
         $plural = $i+>1 ? "all those files" : "this file";
         my $inst = (_invokant() eq 'ExtUtils::MakeMaker')
-                 ? ( $Config::Config{make} || 'make' ).' install UNINST=1'
+                 ? ( %Config::Config{make} || 'make' ).' install UNINST=1'
                  : './Build install uninst=1';
         print "## Running '$inst' will unlink $plural for you.\n";
     }
@@ -1243,13 +1243,13 @@ or by ExtUtils::MakeMaker.
 sub _invokant {
     my @stack;
     my $frame = 0;
-    while (my $file = (caller($frame++))[1]) {
-        push @stack, (File::Spec->splitpath($file))[2];
+    while (my $file = (caller($frame++))[[1]]) {
+        push @stack, (File::Spec->splitpath($file))[[2]];
     }
 
     my $builder;
     my $top = pop @stack;
-    if ($top =~ m/^Build/i || exists($INC{'Module/Build.pm'})) {
+    if ($top =~ m/^Build/i || exists(%INC{'Module/Build.pm'})) {
         $builder = 'Module::Build';
     } else {
         $builder = 'ExtUtils::MakeMaker';

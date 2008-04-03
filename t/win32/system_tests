@@ -92,12 +92,12 @@ for my $cmds (@commands) {
 	my @args = defined($args) ? (ref($args) ? @$args : $args) : ();
 	print "######## [@cmds]\n";
 	print "<", join('><',
-			$cmds[$#cmds],
+			@cmds[(@cmds-1)],
 			map { my $x = $_; $x =~ s/"//g; $x } @args),
 	      ">\n";
 	if (system(@cmds,@args) != 0) {
 	    print "Failed, status($?)\n";
-	    if ($Config{ccflags} =~ m/\bDDEBUGGING\b/) {
+	    if (%Config{ccflags} =~ m/\bDDEBUGGING\b/) {
 		print "Running again in debug mode\n";
 		$^D = 1; # -Dp
 		system(@cmds,@args);
@@ -109,7 +109,7 @@ for my $cmds (@commands) {
 	print "######## '$cmdstr'\n";
 	if (system($cmdstr) != 0) {
 	    print "Failed, status($?)\n";
-	    if ($Config{ccflags} =~ m/\bDDEBUGGING\b/) {
+	    if (%Config{ccflags} =~ m/\bDDEBUGGING\b/) {
 		print "Running again in debug mode\n";
 		$^D = 1; # -Dp
 		system($cmdstr);

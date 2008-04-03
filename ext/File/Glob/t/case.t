@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, '../lib'; 
     }
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
+    if (%Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
         print "1..0\n";
         exit 0;
     }

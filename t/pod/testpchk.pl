@@ -22,7 +22,7 @@ use Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&testpodchecker);
-$MYPKG = eval { (caller)[0] };
+$MYPKG = eval { (caller)[[0]] };
 
 sub stripname( $ ) {
    local $_ = shift;
@@ -43,9 +43,9 @@ sub msgcmp( $ $ ) {
 
 sub testpodcheck( @ ) {
    my %args = @_;
-   my $infile  = $args{'-In'}  || die "No input file given!";
-   my $outfile = $args{'-Out'} || die "No output file given!";
-   my $cmpfile = $args{'-Cmp'} || die "No compare-result file given!";
+   my $infile  = %args{'-In'}  || die "No input file given!";
+   my $outfile = %args{'-Out'} || die "No output file given!";
+   my $cmpfile = %args{'-Cmp'} || die "No compare-result file given!";
 
    my $different = '';
    my $testname = basename $cmpfile, '.t', '.xr';
@@ -74,7 +74,7 @@ sub testpodcheck( @ ) {
 }
 
 sub testpodchecker( @ ) {
-   my %opts = (ref $_[0] eq 'HASH') ? %{shift()} : ();
+   my %opts = (ref @_[0] eq 'HASH') ? %{shift()} : ();
    my @testpods = @_;
    my ($testname, $testdir) = ("", "");
    my ($podfile, $cmpfile) = ("", "");
@@ -83,7 +83,7 @@ sub testpodchecker( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar @testpods, "\n"  unless ($opts{'-xrgen'});
+   print "1..", scalar @testpods, "\n"  unless (%opts{'-xrgen'});
 
    for $podfile (@testpods) {
       ($testname, $_) = fileparse($podfile);
@@ -92,8 +92,8 @@ sub testpodchecker( @ ) {
       $cmpfile   =  $testdir . $testname . '.xr';
       $outfile   =  $testdir . $testname . '.OUT';
 
-      if ($opts{'-xrgen'}) {
-          if ($opts{'-force'} or ! -e $cmpfile) {
+      if (%opts{'-xrgen'}) {
+          if (%opts{'-force'} or ! -e $cmpfile) {
              ## Create the comparison file
              print "# Creating expected result for \"$testname\"" .
                    " podchecker test ...\n";

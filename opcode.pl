@@ -25,18 +25,18 @@ while ( ~< *DATA) {
     my ($key, $desc, $check, $flags, $args) = split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
-    warn qq[Description "$desc" duplicates $seen{$desc}\n] if $seen{$desc};
-    die qq[Opcode "$key" duplicates $seen{$key}\n] if $seen{$key};
-    $seen{$desc} = qq[description of opcode "$key"];
-    $seen{$key} = qq[opcode "$key"];
+    warn qq[Description "$desc" duplicates %seen{$desc}\n] if %seen{$desc};
+    die qq[Opcode "$key" duplicates %seen{$key}\n] if %seen{$key};
+    %seen{$desc} = qq[description of opcode "$key"];
+    %seen{$key} = qq[opcode "$key"];
 
     push(@ops, $key);
-    $opnum{$key} = $#ops;
-    $desc{$key} = $desc;
-    $check{$key} = $check;
-    $ckname{$check}++;
-    $flags{$key} = $flags;
-    $args{$key} = $args;
+    %opnum{$key} =( @ops-1);
+    %desc{$key} = $desc;
+    %check{$key} = $check;
+    %ckname{$check}++;
+    %flags{$key} = $flags;
+    %args{$key} = $args;
 }
 
 # Set up aliases
@@ -92,7 +92,7 @@ my @raw_alias = (
 		);
 
 while (my ($func, $names) = splice @raw_alias, 0, 2) {
-    $alias{$_} = $func for @$names;
+    %alias{$_} = $func for @$names;
 }
 
 # Emit defines.
@@ -190,7 +190,7 @@ EXTCONST char* const PL_op_desc[] = \{
 END
 
 for (@ops) {
-    my($safe_desc) = $desc{$_};
+    my($safe_desc) = %desc{$_};
 
     # Have to escape double quotes and escape characters.
     $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
@@ -240,7 +240,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 END
 
 for (@ops) {
-    if (my $name = $alias{$_}) {
+    if (my $name = %alias{$_}) {
 	print "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
     }
     else {
@@ -275,7 +275,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 END
 
 for (@ops) {
-    print "\t", &tab(3, "MEMBER_TO_FPTR(Perl_$check{$_}),"), "\t/* $_ */\n";
+    print "\t", &tab(3, "MEMBER_TO_FPTR(Perl_%check{$_}),"), "\t/* $_ */\n";
 }
 
 print <<END;
@@ -347,36 +347,36 @@ my $OASHIFT = 13;
 
 for my $op (@ops) {
     my $argsum = 0;
-    my $flags = $flags{$op};
+    my $flags = %flags{$op};
     for my $flag (keys %opflags) {
 	if ($flags =~ s/$flag//) {
-	    die "Flag collision for '$op' ($flags{$op}, $flag)"
-		if $argsum ^&^ $opflags{$flag};
-	    $argsum ^|^= $opflags{$flag};
+	    die "Flag collision for '$op' (%flags{$op}, $flag)"
+		if $argsum ^&^ %opflags{$flag};
+	    $argsum ^|^= %opflags{$flag};
 	}
     }
-    die qq[Opcode '$op' has no class indicator ($flags{$op} => $flags)\n]
-	unless exists $opclass{$flags};
-    $argsum ^|^= $opclass{$flags} << $OCSHIFT;
+    die qq[Opcode '$op' has no class indicator (%flags{$op} => $flags)\n]
+	unless exists %opclass{$flags};
+    $argsum ^|^= %opclass{$flags} << $OCSHIFT;
     my $argshift = $OASHIFT;
-    for my $arg (split(' ',$args{$op})) {
+    for my $arg (split(' ',%args{$op})) {
 	if ($arg =~ m/^F/) {
 	    # record opnums of these opnames
-	    $OP_IS_SOCKET{$op}   = $opnum{$op} if $arg =~ s/s//;
-	    $OP_IS_FILETEST{$op} = $opnum{$op} if $arg =~ s/-//;
-	    $OP_IS_FT_ACCESS{$op} = $opnum{$op} if $arg =~ s/\+//;
+	    %OP_IS_SOCKET{$op}   = %opnum{$op} if $arg =~ s/s//;
+	    %OP_IS_FILETEST{$op} = %opnum{$op} if $arg =~ s/-//;
+	    %OP_IS_FT_ACCESS{$op} = %opnum{$op} if $arg =~ s/\+//;
         }
 	my $argnum = ($arg =~ s/\?//) ? 8 : 0;
         die "op = $op, arg = $arg\n"
-	    unless exists $argnum{$arg};
-	$argnum += $argnum{$arg};
+	    unless exists %argnum{$arg};
+	$argnum += %argnum{$arg};
 	die "Argument overflow for '$op'\n"
 	    if $argshift +>= $ARGBITS ||
 	       $argnum +> ((1 << ($ARGBITS - $argshift)) - 1);
 	$argsum += $argnum << $argshift;
 	$argshift += 4;
     }
-    $argsum = sprintf("0x%08x", $argsum);
+    $argsum = sprintf("0x\%08x", $argsum);
     print "\t", &tab(3, "$argsum,"), "/* $op */\n";
 }
 
@@ -627,7 +627,6 @@ pushre		push regexp		ck_null		d/
 
 rv2gv		ref-to-glob cast	ck_rvconst	ds1	
 rv2sv		scalar dereference	ck_rvconst	ds1	
-av2arylen	array length		ck_null		is1	
 rv2cv		subroutine dereference	ck_rvconst	d1
 anoncode	anonymous subroutine	ck_anoncode	$	
 prototype	subroutine prototype	ck_null		s%	S

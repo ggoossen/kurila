@@ -14,13 +14,13 @@ use strict;
 use warnings;
 
 my $warn = "";
-${^WARN_HOOK} = sub { print $warn; $warn .= $_[0]->{description} . "\n" };
+${^WARN_HOOK} = sub { print $warn; $warn .= @_[0]->{description} . "\n" };
 
 sub uninitialized { $warn =~ s/Use of uninitialized value[^\n]+\n//s; }
-sub tiex { tie $_[0], 'main' }
+sub tiex { tie @_[0], 'main' }
 sub TIESCALAR { my $x; bless \$x }
-sub FETCH { ${$_[0]} }
-sub STORE { ${$_[0]} = $_[1] }
+sub FETCH { ${@_[0]} }
+sub STORE { ${@_[0]} = @_[1] }
 our $TODO;
 
 print "1..63\n";

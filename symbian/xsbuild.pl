@@ -13,18 +13,18 @@ my $CoreBuild = -d "ext" && -f "perl.h" && -d "symbian" && -f "perl.c";
 
 my $SymbianVersion;
 
-if (exists $ENV{EPOCROOT}) {
-    if ($ENV{EPOCROOT} =~ m!\\Symbian\\UIQ_21\\$!i) {
+if (exists %ENV{EPOCROOT}) {
+    if (%ENV{EPOCROOT} =~ m!\\Symbian\\UIQ_21\\$!i) {
 	$SymbianVersion = '7.0s'; # TODO: other UIQ versions
-    } elsif ($ENV{EPOCROOT} =~ m!\\Symbian\\(.+?)\\!i) {
+    } elsif (%ENV{EPOCROOT} =~ m!\\Symbian\\(.+?)\\!i) {
 	$SymbianVersion = $1;
     }
 }
 
-$SymbianVersion = $ENV{XSBUILD_SYMBIAN_VERSION}
-  if exists $ENV{XSBUILD_SYMBIAN_VERSION};
+$SymbianVersion = %ENV{XSBUILD_SYMBIAN_VERSION}
+  if exists %ENV{XSBUILD_SYMBIAN_VERSION};
 
-my $PerlVersion    = $ENV{XSBUILD_PERL_VERSION};
+my $PerlVersion    = %ENV{XSBUILD_PERL_VERSION};
 my $CSuffix        = '.c';
 my $CPlusPlus;
 my $Config;
@@ -58,7 +58,7 @@ if ( !defined $PerlVersion && $0 =~ m:\\symbian\\perl\\(.+)\\bin\\xsbuild.pl:i )
 }
 
 if ( !defined $SymbianVersion) {
-    ($SymbianVersion) = ($ENV{PATH} =~ m!\\Symbian\\(.+?)\\!i);
+    ($SymbianVersion) = (%ENV{PATH} =~ m!\\Symbian\\(.+?)\\!i);
 }
 
 my ($SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION);
@@ -68,8 +68,8 @@ if ($CoreBuild) {
     my %VERSION = %{ do "version.pl" or die $@ };
     ($SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION) =
       @{ do "sdk.pl" or die $@ };
-    $VERSION = "$VERSION{REVISION}$VERSION{VERSION}$VERSION{SUBVERSION}";
-    $R_V_SV  = "$VERSION{REVISION}.$VERSION{VERSION}.$VERSION{SUBVERSION}";
+    $VERSION = "%VERSION{REVISION}%VERSION{VERSION}%VERSION{SUBVERSION}";
+    $R_V_SV  = "%VERSION{REVISION}.%VERSION{VERSION}.%VERSION{SUBVERSION}";
     $BUILDROOT    = do "cwd.pl" or die $@;
     $PerlVersion    = $R_V_SV;
 }
@@ -80,7 +80,7 @@ usage()
   unless GetOptions(
     'symbian=s'     => \$SymbianVersion,
     'perl=s'        => \$PerlVersion,
-    'extversion=s'  => \$CONF{EXTVERSION},
+    'extversion=s'  => \%CONF{EXTVERSION},
     'csuffix=s'     => \$CSuffix,
     'cplusplus|cpp' => \$CPlusPlus,
     'win=s'         => \$WIN,
@@ -119,16 +119,16 @@ $VERSION = $PerlVersion unless defined $VERSION;
 
 $VERSION =~ tr/.//d if defined $VERSION;
 
-$ENV{SDK}   = $SYMBIAN_ROOT;    # For the Errno extension
-$ENV{CROSS} = 1;                # For the Encode extension (unbuilt now)
+%ENV{SDK}   = $SYMBIAN_ROOT;    # For the Errno extension
+%ENV{CROSS} = 1;                # For the Encode extension (unbuilt now)
 
 my $UARM = 'urel';
 my $UREL = "$SYMBIAN_ROOT\\epoc32\\release\\-ARM-\\$UARM";
 my $SRCDBG;
-if (exists $ENV{UREL}) {
-    $UREL = $ENV{UREL}; # from sdk.pl
+if (exists %ENV{UREL}) {
+    $UREL = %ENV{UREL}; # from sdk.pl
     $UREL =~ s/-ARM-/$ARM/;
-    $UARM = $ENV{UARM}; # from sdk.pl
+    $UARM = %ENV{UARM}; # from sdk.pl
     $SRCDBG = $UARM eq 'udeb' ? "SRCDBG" : "";
 }
 
@@ -163,7 +163,7 @@ sub run_PL {
         print "\t(Running $dir\\$PL)\n";
     }
     my $cmd;
-    $ENV{PERL_CORE} = 1 if $CoreBuild;
+    %ENV{PERL_CORE} = 1 if $CoreBuild;
     system_echo("perl -I$BUILDROOT\\lib -I$BUILDROOT\\xlib\\symbian -I$BUILDROOT\\t\\lib $PL") == 0
       or warn "$0: $PL failed.\n";
     if ( defined $file ) { -s $file or die "$0: No $file created.\n" }
@@ -177,11 +177,11 @@ sub read_old_multi {
 sub uniquefy_filenames {
     my $b = [];
     my %c = ();
-    for my $i (@{$_[0]}) {
+    for my $i (@{@_[0]}) {
         $i =~ s!/!\\!g;
         $i = lc $i if $i =~ m!\\!;
         $i =~ s!^c:!!;
-        push @$b, $i unless $c{$i}++;
+        push @$b, $i unless %c{$i}++;
     }
     return $b;
 }
@@ -212,81 +212,81 @@ sub write_mmp {
     my $extdash = $ext; $extdash =~ s!\\!-!g;
 
     print "\t$base.mmp\n";
-    $CONF{TARGET}        = "perl$VERSION-$extdash.dll";
-    $CONF{TARGETPATH}    = "\\System\\Libs\\Perl\\$R_V_SV";
-    $CONF{SOURCE}        = [@src];
-    $CONF{SOURCEPATH}    = [ $CWD, $BUILDROOT ];
-    $CONF{USERINCLUDE}   = [ $CWD, $BUILDROOT ];
-    $CONF{SYSTEMINCLUDE} = ["$PERLSDK\\include"] unless $CoreBuild;
-    $CONF{SYSTEMINCLUDE} = [ $BUILDROOT, "$BUILDROOT\\symbian" ] if $CoreBuild;
-    $CONF{LIBRARY}       = [];
-    $CONF{MACRO}         = [];
+    %CONF{TARGET}        = "perl$VERSION-$extdash.dll";
+    %CONF{TARGETPATH}    = "\\System\\Libs\\Perl\\$R_V_SV";
+    %CONF{SOURCE}        = [@src];
+    %CONF{SOURCEPATH}    = [ $CWD, $BUILDROOT ];
+    %CONF{USERINCLUDE}   = [ $CWD, $BUILDROOT ];
+    %CONF{SYSTEMINCLUDE} = ["$PERLSDK\\include"] unless $CoreBuild;
+    %CONF{SYSTEMINCLUDE} = [ $BUILDROOT, "$BUILDROOT\\symbian" ] if $CoreBuild;
+    %CONF{LIBRARY}       = [];
+    %CONF{MACRO}         = [];
     read_mmp( \%CONF, "_init.mmp" );
     read_mmp( \%CONF, "$base.mmp" );
 
     if ($base eq 'Zlib') {
-	push @{$CONF{USERINCLUDE}}, "$CWD\\zlib-src";
+	push @{%CONF{USERINCLUDE}}, "$CWD\\zlib-src";
     }
 
     for my $ui ( @{$userinclude} ) {
         $ui =~ s!/!\\!g;
         if ( $ui =~ m!^(?:[CD]:)?\\! ) {
-            push @{ $CONF{USERINCLUDE} }, $ui;
+            push @{ %CONF{USERINCLUDE} }, $ui;
         }
         else {
-            push @{ $CONF{USERINCLUDE} }, "$BUILDROOT\\$ui";
+            push @{ %CONF{USERINCLUDE} }, "$BUILDROOT\\$ui";
         }
     }
-    push @{ $CONF{SYSTEMINCLUDE} }, "\\epoc32\\include";
-    push @{ $CONF{SYSTEMINCLUDE} }, "\\epoc32\\include\\libc";
-    push @{ $CONF{LIBRARY} },       "euser.lib";
-    push @{ $CONF{LIBRARY} },       "estlib.lib";
-    push @{ $CONF{LIBRARY} },       "perl$VERSION.lib";
-    push @{ $CONF{MACRO} },         "SYMBIAN" unless $CoreBuild;
-    push @{ $CONF{MACRO} },         "PERL_EXT" if $CoreBuild;
-    push @{ $CONF{MACRO} },         "MULTIPLICITY";
-    push @{ $CONF{MACRO} },         "PERL_IMPLICIT_CONTEXT";
-    push @{ $CONF{MACRO} },         "PERL_GLOBAL_STRUCT";
-    push @{ $CONF{MACRO} },         "PERL_GLOBAL_STRUCT_PRIVATE";
+    push @{ %CONF{SYSTEMINCLUDE} }, "\\epoc32\\include";
+    push @{ %CONF{SYSTEMINCLUDE} }, "\\epoc32\\include\\libc";
+    push @{ %CONF{LIBRARY} },       "euser.lib";
+    push @{ %CONF{LIBRARY} },       "estlib.lib";
+    push @{ %CONF{LIBRARY} },       "perl$VERSION.lib";
+    push @{ %CONF{MACRO} },         "SYMBIAN" unless $CoreBuild;
+    push @{ %CONF{MACRO} },         "PERL_EXT" if $CoreBuild;
+    push @{ %CONF{MACRO} },         "MULTIPLICITY";
+    push @{ %CONF{MACRO} },         "PERL_IMPLICIT_CONTEXT";
+    push @{ %CONF{MACRO} },         "PERL_GLOBAL_STRUCT";
+    push @{ %CONF{MACRO} },         "PERL_GLOBAL_STRUCT_PRIVATE";
 
     if ($SDK_VARIANT eq 'S60') {
-      push @{ $CONF{MACRO} }, '__SERIES60__'
-	unless grep { $_ eq '__SERIES60__' } @{ $CONF{MACRO} };
+      push @{ %CONF{MACRO} }, '__SERIES60__'
+	unless grep { $_ eq '__SERIES60__' } @{ %CONF{MACRO} };
     }
     if ($SDK_VARIANT eq 'S80') {
-      push @{ $CONF{MACRO} }, '__SERIES80__'
-	unless grep { $_ eq '__SERIES80__' } @{ $CONF{MACRO} };
+      push @{ %CONF{MACRO} }, '__SERIES80__'
+	unless grep { $_ eq '__SERIES80__' } @{ %CONF{MACRO} };
     }
     if ($SDK_VARIANT eq 'S90') {
-      push @{ $CONF{MACRO} }, '__SERIES90__'
-	unless grep { $_ eq '__SERIES90__' } @{ $CONF{MACRO} };
+      push @{ %CONF{MACRO} }, '__SERIES90__'
+	unless grep { $_ eq '__SERIES90__' } @{ %CONF{MACRO} };
     }
     if ($SDK_VARIANT eq 'UIQ') {
-      push @{ $CONF{MACRO} }, '__UIQ__'
-	unless grep { $_ eq '__UIQ__' } @{ $CONF{MACRO} };
+      push @{ %CONF{MACRO} }, '__UIQ__'
+	unless grep { $_ eq '__UIQ__' } @{ %CONF{MACRO} };
     }
 
     for my $u (qw(SOURCE SOURCEPATH SYSTEMINCLUDE USERINCLUDE LIBRARY MACRO)) {
-        $CONF{$u} = uniquefy_filenames( $CONF{$u} );
+        %CONF{$u} = uniquefy_filenames( %CONF{$u} );
     }
     open( BASE_MMP, ">", "$base.mmp" ) or die "$0: $base.mmp: $!\n";
 
     print BASE_MMP <<__EOF__;
-TARGET		$CONF{TARGET}
+TARGET		%CONF{TARGET}
 TARGETTYPE	dll
-TARGETPATH	$CONF{TARGETPATH}
-SOURCE		@{$CONF{SOURCE}}
+TARGETPATH	%CONF{TARGETPATH}
+SOURCE		@{%CONF{SOURCE}}
 $SRCDBG
 __EOF__
     for my $u (qw(SOURCEPATH SYSTEMINCLUDE USERINCLUDE)) {
-        for my $v ( @{ $CONF{$u} } ) {
+        for my $v ( @{ %CONF{$u} } ) {
             print BASE_MMP "$u\t$v\n";
         }
     }
     # OPTION does not work in MMPs for pre-2.0 SDKs?
     print BASE_MMP <<__EOF__;
-LIBRARY		@{$CONF{LIBRARY}}
-MACRO		@{$CONF{MACRO}}
+LIBRARY		@{%CONF{LIBRARY}}
+MACRO		@{%CONF{MACRO}}
 // OPTION	MSVC /P // Uncomment for creating .i (cpp'ed .cpp)
 // OPTION	GCC -E  // Uncomment for creating .i (cpp'ed .cpp)
 __EOF__
@@ -418,7 +418,7 @@ sub patch_config {
     # make sure the patch script was not left from previous run
     unlink $config_restore_script;
     return unless $CoreBuild;
-    my $V = sprintf "%vd", $^V;
+    my $V = sprintf "\%vd", $^V;
     # create reverse patch script
     if (open(RSCRIPT, ">", "$config_restore_script")) {
         print RSCRIPT <<__EOF__;
@@ -474,17 +474,17 @@ sub xsconfig {
     write_bld_inf($base) if -f $basexs;
 
     my %src;
-    $src{$basec}++;
+    %src{$basec}++;
 
     $extdirdir = $extdirdir eq "." ? "" : "$extdirdir\\";
 
     my $extdash = $ext; $extdash =~ s!\\!-!g;
 
     my %lst;
-    $lst{"$UREL\\perl$VERSION-$extdash.dll"} =
+    %lst{"$UREL\\perl$VERSION-$extdash.dll"} =
       "$targetroot\\$ARM-symbian\\$base.dll"
       if -f $basexs;
-    $lst{"$dir\\$base.pm"} = "$targetroot\\$extdirdir$base.pm"
+    %lst{"$dir\\$base.pm"} = "$targetroot\\$extdirdir$base.pm"
       if -f $basepm && $base ne 'XSLoader';
 
     my %incdir;
@@ -498,21 +498,21 @@ sub xsconfig {
             my ($short) = ( $found =~ m/^lib.(.+)/ );
             $short =~ s!/!\\!g;
             $found =~ s!/!\\!g;
-            $lst{"$dir\\$found"} = "$targetroot\\$short";
+            %lst{"$dir\\$found"} = "$targetroot\\$short";
         }
     }
     if ( my @pm = glob("*.pm */*.pm") ) {
         for my $pm (@pm) {
             next if $pm =~ m:^t/:;
             $pm =~ s:/:\\:g;
-            $lst{"$dir\\$pm"} = "$targetroot\\$extdirdir$pm";
+            %lst{"$dir\\$pm"} = "$targetroot\\$extdirdir$pm";
         }
     }
     if ( my @c = glob("*.c *.cpp */*.c */*.cpp") ) {
 	map { s:^zlib-src/:: } @c if $ext eq 'ext\Compress\Raw\Zlib';
         for my $c (@c) {
             $c =~ s:/:\\:g;
-            $src{$c}++;
+            %src{$c}++;
         }
     }
     if ( my @h = glob("*.h */*.h") ) {
@@ -520,11 +520,11 @@ sub xsconfig {
         for my $h (@h) {
             $h =~ s:/:\\:g;
             $h = dirname($h);
-            $incdir{"$dir\\$h"}++ unless $h eq ".";
+            %incdir{"$dir\\$h"}++ unless $h eq ".";
         }
     }
-    if ( exists $EXTCFG{$ext} ) {
-        for my $cfg ( @{ $EXTCFG{$ext} } ) {
+    if ( exists %EXTCFG{$ext} ) {
+        for my $cfg ( @{ %EXTCFG{$ext} } ) {
             if ( $cfg =~ m/^([-+])?(.+\.(c|cpp|h))$/ ) {
                 my $o = defined $1 ? $1 : '+';
                 my $f = $2;
@@ -532,13 +532,13 @@ sub xsconfig {
                 for my $f ( glob($f) ) {
                     if ( $o eq '+' ) {
                         warn "$0: no source file $dir\\$f\n" unless -f $f;
-                        $src{$f}++ unless $cfg =~ m/\.h$/;
+                        %src{$f}++ unless $cfg =~ m/\.h$/;
                         if ( $f =~ m:^(.+)\\[^\\]+$: ) {
-                            $incdir{$1}++;
+                            %incdir{$1}++;
                         }
                     }
                     elsif ( $o eq '-' ) {
-                        delete $src{$f};
+                        delete %src{$f};
                     }
                 }
             }
@@ -549,10 +549,10 @@ sub xsconfig {
                 for my $f ( glob($f) ) {
                     if ( $o eq '+' ) {
                         warn "$0: no Perl file $dir\\$f\n" unless -f $f;
-                        $lst{"$dir\\$f"} = "$targetroot\\$extdir\\$f";
+                        %lst{"$dir\\$f"} = "$targetroot\\$extdir\\$f";
                     }
                     elsif ( $o eq '-' ) {
-                        delete $lst{"$dir\\$f"};
+                        delete %lst{"$dir\\$f"};
                     }
                 }
             }
@@ -566,11 +566,11 @@ sub xsconfig {
     }
     if ( $dir eq "ext\\Errno" ) {
         run_PL( "Errno_pm.PL", $dir, "Errno.pm" );
-        $lst{"$dir\\Errno.pm"} = "$targetroot\\Errno.pm";
+        %lst{"$dir\\Errno.pm"} = "$targetroot\\Errno.pm";
     }
     elsif ( $dir eq "ext\\DynaLoader" ) {
         run_PL( "XSLoader_pm.PL", $dir, "XSLoader.pm" );
-        $lst{"ext\\DynaLoader\\XSLoader.pm"} = "$targetroot\\XSLoader.pm";
+        %lst{"ext\\DynaLoader\\XSLoader.pm"} = "$targetroot\\XSLoader.pm";
     }
     elsif ( $dir eq "ext\\Encode" ) {
         system_echo("perl bin\\enc2xs -Q -O -o def_t.c -f def_t.fnm") == 0
@@ -591,7 +591,7 @@ sub xsconfig {
                 while ( ~< *MAKEFILE) {
                     for my $m (@MM) {
                         if (m!^$m = (.+)!) {
-                            $MM{$m} = $1;
+                            %MM{$m} = $1;
                             print "\t$m = $1\n";
                         }
                     }
@@ -607,20 +607,20 @@ sub xsconfig {
 
         unlink($basec);
         print "\t$basec\n";
-        if ( defined $CONF{EXTVERSION} ) {
-            my $EXTVERSION = $CONF{EXTVERSION};
+        if ( defined %CONF{EXTVERSION} ) {
+            my $EXTVERSION = %CONF{EXTVERSION};
             print "\tUsing $EXTVERSION for version...\n";
-            $MM{VERSION} = $MM{XS_VERSION} = $EXTVERSION;
+            %MM{VERSION} = %MM{XS_VERSION} = $EXTVERSION;
         }
         (&restore_config and die "$0: VERSION or XS_VERSION undefined\n")
-          unless defined $MM{VERSION} && defined $MM{XS_VERSION};
+          unless defined %MM{VERSION} && defined %MM{XS_VERSION};
         if ( open( BASE_C, ">", "$basec" ) ) {
             print BASE_C <<__EOF__;
 #ifndef VERSION
-#define VERSION "$MM{VERSION}"
+#define VERSION "%MM{VERSION}"
 #endif
 #ifndef XS_VERSION
-#define XS_VERSION "$MM{XS_VERSION}"
+#define XS_VERSION "%MM{XS_VERSION}"
 #endif
 __EOF__
             close(BASE_C);
@@ -713,7 +713,7 @@ __EOF__
     my $lstout =
       $CoreBuild ? "$BUILDROOT/symbian/$lstname.lst" : "$BUILDROOT/$lstname.lst";
     if ( open( my $lst, ">", "$lstout" ) ) {
-        for my $f (@lst) { print $lst qq["$f"-"!:$lst{$f}"\n] }
+        for my $f (@lst) { print $lst qq["$f"-"!:%lst{$f}"\n] }
         close($lst);
     }
     else {
@@ -772,7 +772,7 @@ for my $ext (@ARGV) {
         $dir = "ext\\DynaLoader";
     }
 
-    $EXTCFG{$ext} = [ split( m/,/, $cfg ) ] if defined $cfg;
+    %EXTCFG{$ext} = [ split( m/,/, $cfg ) ] if defined $cfg;
 
     die "$0: no lib\\Config.pm\n"
       if $CoreBuild && $Build && !-f "lib\\Config.pm";
@@ -787,7 +787,7 @@ for my $ext (@ARGV) {
             chomp;
             my $ext = $1;
             my @ext = split( ' ', $ext );
-            $EXTCFG{"ext\\$ext[0]"} = [@ext];
+            %EXTCFG{"ext\\@ext[0]"} = [@ext];
         }
         close($cfg);
     }
@@ -809,7 +809,7 @@ for my $ext (@ARGV) {
     my %CONF;
 
     my @ext   = split( m/\\/, $ext );
-    my $base  = $ext[-1];
+    my $base  = @ext[-1];
 
     if ( $Clean || $DistClean ) {
         print "Cleaning $ext...\n";
@@ -890,7 +890,7 @@ __EOF__
         while ( ~< $def) {
             next while 1 .. m/^EXPORTS/;
             if (m/^\s*(\w+) \@ (\d+) /) {
-                $symbol{$1} = $2;
+                %symbol{$1} = $2;
             }
         }
         close($def);
@@ -907,7 +907,7 @@ __EOF__
             for my $sym (@symbol) {
                 my $len = length($sym);
                 print _INIT_C <<__EOF__;
-        hv_store(h->symbols, "$sym", $len, newSViv($symbol{$sym}), 0);
+        hv_store(h->symbols, "$sym", $len, newSViv(%symbol{$sym}), 0);
 __EOF__
             }
         }

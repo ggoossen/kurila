@@ -10,7 +10,7 @@ my %page = (
 						 },
 	            last  => qq{Hamlet's soliloquy concludes...\n\n},
 			  },
-	footer => { other => sub{form "\n\{>\{70\}>\}", "../".($_[0]{page}{number}+1)},
+	footer => { other => sub{form "\n\{>\{70\}>\}", "../".(@_[0]{page}{number}+1)},
 			    last  => sub{form "\n\{||\{70\}||\}", "END OF TEXT"},
 			  },
 	length => 15,

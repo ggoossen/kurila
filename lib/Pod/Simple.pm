@@ -114,7 +114,7 @@ BEGIN {
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 sub version_report {
-  my $class = ref($_[0]) || $_[0];
+  my $class = ref(@_[0]) || @_[0];
   if($class eq __PACKAGE__) {
     return "$class $VERSION";
   } else {
@@ -138,17 +138,17 @@ sub output_string {
   return $this->{'output_string'} unless @_;  # GET.
   
   require Pod::Simple::TiedOutFH;
-  my $x = (defined($_[0]) and ref($_[0])) ? $_[0] : \( $_[0] );
+  my $x = (defined(@_[0]) and ref(@_[0])) ? @_[0] : \( @_[0] );
   $$x = '' unless defined $$x;
   DEBUG +> 4 and print "# Output string set to $x ($$x)\n";
-  $this->{'output_fh'} = Pod::Simple::TiedOutFH->handle_on($_[0]);
+  $this->{'output_fh'} = Pod::Simple::TiedOutFH->handle_on(@_[0]);
   return
-    $this->{'output_string'} = $_[0];
+    $this->{'output_string'} = @_[0];
     #${ ${ $this->{'output_fh'} } };
 }
 
-sub abandon_output_string { $_[0]->abandon_output_fh; delete $_[0]{'output_string'} }
-sub abandon_output_fh     { $_[0]->output_fh(undef) }
+sub abandon_output_string { @_[0]->abandon_output_fh; delete @_[0]{'output_string'} }
+sub abandon_output_fh     { @_[0]->output_fh(undef) }
 # These don't delete the string or close the FH -- they just delete our
 #  references to it/them.
 # TODO: document these
@@ -157,7 +157,7 @@ sub abandon_output_fh     { $_[0]->output_fh(undef) }
 
 sub new {
   # takes no parameters
-  my $class = ref($_[0]) || $_[0];
+  my $class = ref(@_[0]) || @_[0];
   #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
   #  . __PACKAGE__ );
   return bless {
@@ -203,7 +203,7 @@ sub _accept_directives {
     die "\"$d\" isn't a valid directive name"
      unless $d =~ m/^[a-zA-Z][a-zA-Z0-9]*$/s;
     die "\"$d\" is already a reserved Pod directive name"
-     if exists $Known_directives{$d};
+     if exists %Known_directives{$d};
     $this->{'accept_directives'}{$d} = $type;
     DEBUG +> 2 and print "Learning to accept \"=$d\" as directive of type $type\n";
   }
@@ -226,7 +226,7 @@ sub unaccept_directives {
     die "\"$d\" isn't a valid directive name"
      unless $d =~ m/^[a-zA-Z][a-zA-Z0-9]*$/s;
     die "But you must accept \"$d\" directives -- it's a builtin!"
-     if exists $Known_directives{$d};
+     if exists %Known_directives{$d};
     delete $this->{'accept_directives'}{$d};
     DEBUG +> 2 and print "OK, won't accept \"=$d\" as directive.\n";
   }
@@ -411,7 +411,7 @@ sub parse_file {
     for($i = MANY_LINES; $i--;) {  # read those many lines at a time
       local $/ = $NL;
       push @lines, scalar( ~< $source );  # readline
-      last unless defined $lines[-1];
+      last unless defined @lines[-1];
        # but pass thru the undef, which will set source_dead to true
     }
     $self->parse_lines(@lines);
@@ -465,7 +465,7 @@ sub whine {
   my $self = shift(@_);
   ++$self->{'errors_seen'};
   if($self->{'no_whining'}) {
-    DEBUG +> 9 and print "Discarding complaint (at line $_[0]) $_[1]\n because no_whining is on.\n";
+    DEBUG +> 9 and print "Discarding complaint (at line @_[0]) @_[1]\n because no_whining is on.\n";
     return;
   }
   return $self->_complain_warn(@_) if $self->{'complain_stderr'};
@@ -482,7 +482,7 @@ sub scream {    # like whine, but not suppressable
 
 sub _complain_warn {
   my($self,$line,$complaint) = @_;
-  return printf STDERR "%s around line %s: %s\n",
+  return printf STDERR "\%s around line \%s: \%s\n",
     $self->{'source_filename'} || 'Pod input', $line, $complaint;
 }
 
@@ -506,7 +506,7 @@ sub _get_initial_item_type {
   return $para->[1]{'~type'}  if $para->[1]{'~type'};
 
   return $para->[1]{'~type'} = 'text'
-   if join("\n", @{$para}[2 .. $#$para]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
+   if join("\n", @{$para}[[2 .. @$para-1]]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
   # Else fall thru to the general case:
   return $self->_get_item_type($para);
 }
@@ -520,7 +520,7 @@ sub _get_item_type {       # mutates the item!!
 
   # Otherwise we haven't yet been to this node.  Maybe alter it...
   
-  my $content = join "\n", @{$para}[2 .. $#$para];
+  my $content = join "\n", @{$para}[[2 .. @$para-1]];
 
   if($content =~ m/^\s*\*\s*$/s or $content =~ m/^\s*$/s) {
     # Like: "=item *", "=item   *   ", "=item"
@@ -533,7 +533,7 @@ sub _get_item_type {       # mutates the item!!
     # Like: "=item * Foo bar baz";
     $para->[1]{'~orig_content'}      = $content;
     $para->[1]{'~_freaky_para_hack'} = $1;
-    DEBUG +> 2 and print " Tolerating $$para[2] as =item *\\n\\n$1\n";
+    DEBUG +> 2 and print " Tolerating @$para[2] as =item *\\n\\n$1\n";
     splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
     return $para->[1]{'~type'} = 'bullet';
 
@@ -560,13 +560,13 @@ sub _make_treelet {
   my $treelet;
   if(!@_) {
     return [''];
-  } if(ref $_[0] and ref $_[0][0] and $_[0][0][0] eq '~Top') {
+  } if(ref @_[0] and ref @_[0][0] and @_[0][0][0] eq '~Top') {
     # Hack so we can pass in fake-o pre-cooked paragraphs:
     #  just have the first line be a reference to a ['~Top', {}, ...]
     # We use this feechure in gen_errata and stuff.
 
-    DEBUG and print "Applying precooked treelet hack to $_[0][0]\n";
-    $treelet = $_[0][0];
+    DEBUG and print "Applying precooked treelet hack to @_[0][0]\n";
+    $treelet = @_[0][0];
     splice @$treelet, 0, 2;  # lop the top off
     return $treelet;
   } else {
@@ -621,7 +621,7 @@ sub _wrap_up {
       ) {
         DEBUG +> 3 and print "   Merging ", $i-1,
          ":[$treelet->[$i-1]] and $i\:[$treelet->[$i]]\n";
-        $treelet->[$i-1] .= ( splice(@$treelet, $i, 1) )[0];
+        $treelet->[$i-1] .= ( splice(@$treelet, $i, 1) )[[0]];
         DEBUG +> 4 and print "    Now: ", $i-1, ":[$treelet->[$i-1]]\n";
         --$i;
         next; 
@@ -656,7 +656,7 @@ sub _wrap_up {
 sub _remap_sequences {
   my($self,@stack) = @_;
   
-  if(@stack == 1 and @{ $stack[0] } == 3 and !ref $stack[0][2]) {
+  if(@stack == 1 and @{ @stack[0] } == 3 and !ref @stack[0][2]) {
     # VERY common case: abort it.
     DEBUG and print "Skipping _remap_sequences: formatless treelet.\n";
     return 0;
@@ -664,9 +664,9 @@ sub _remap_sequences {
   
   my $map = ($self->{'accept_codes'} || die "NO accept_codes in $self?!?");
 
-  my $start_line = $stack[0][1]{'start_line'};
+  my $start_line = @stack[0][1]{'start_line'};
   DEBUG +> 2 and printf
-   "\nAbout to start _remap_sequences on treelet from line %s.\n",
+   "\nAbout to start _remap_sequences on treelet from line \%s.\n",
    $start_line || '[?]'
   ;
   DEBUG +> 3 and print " Map: ",
@@ -710,13 +710,13 @@ sub _remap_sequences {
       }
       if(ref $is) {
         my @dynasty = @$is;
-        DEBUG +> 4 and print "    Renaming $was node to $dynasty[-1]\n"; 
+        DEBUG +> 4 and print "    Renaming $was node to @dynasty[-1]\n"; 
         $treelet->[$i][0] = pop @dynasty;
         my $nugget;
         while(@dynasty) {
           DEBUG +> 4 and printf
-           "    Grafting a new %s node between %s and %s\n",
-           $dynasty[-1], $treelet->[0], $treelet->[$i][0], 
+           "    Grafting a new \%s node between \%s and \%s\n",
+           @dynasty[-1], $treelet->[0], $treelet->[$i][0], 
           ;
           
           #$nugget = ;
@@ -741,7 +741,7 @@ sub _remap_sequences {
   
   DEBUG +> 2 and print "End of _remap_sequences traversal.\n\n";
 
-  if(@_ == 2 and @{ $_[1] } == 3 and !ref $_[1][2]) {
+  if(@_ == 2 and @{ @_[1] } == 3 and !ref @_[1][2]) {
     DEBUG and print "Noting that the treelet is now formatless.\n";
     return 0;
   }
@@ -825,7 +825,7 @@ sub _ponder_extend {
     my @elements   = split ',', $elements_one, -1;
 
     foreach my $f (@fallbacks) {
-      next if exists $Known_formatting_codes{$f} or $f eq '0' or $f eq '1';
+      next if exists %Known_formatting_codes{$f} or $f eq '0' or $f eq '1';
       DEBUG +> 2 and print "  Can't fall back on unknown code $f\n";
       $self->whine(
         $para->[1]{'start_line'},
@@ -834,7 +834,7 @@ sub _ponder_extend {
       return;
     }
 
-    DEBUG +> 3 and printf "Extensor: Fallbacks <%s> Elements <%s>.\n",
+    DEBUG +> 3 and printf "Extensor: Fallbacks <\%s> Elements <\%s>.\n",
      @fallbacks, @elements;
 
     my $canonical_form;
@@ -857,7 +857,7 @@ sub _ponder_extend {
     } else {
       # We have to use the fallback(s), which might be '0', or '1'.
       $self->{'accept_codes'}{$new_letter}
-        = (@fallbacks == 1) ? $fallbacks[0] : \@fallbacks;
+        = (@fallbacks == 1) ? @fallbacks[0] : \@fallbacks;
       DEBUG +> 2 and print
        "Extensor maps $new_letter => fallbacks @fallbacks.\n";
     }
@@ -879,7 +879,7 @@ sub _treat_Zs {  # Nix Z<...>'s
   my($self,@stack) = @_;
 
   my($i, $treelet);
-  my $start_line = $stack[0][1]{'start_line'};
+  my $start_line = @stack[0][1]{'start_line'};
 
   # A recursive algorithm implemented iteratively!  Whee!
 
@@ -984,7 +984,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
   my($self,@stack) = @_;
 
   my($i, $treelet);
-  my $start_line = $stack[0][1]{'start_line'};
+  my $start_line = @stack[0][1]{'start_line'};
 
   # A recursive algorithm implemented iteratively!  Whee!
 
@@ -1024,7 +1024,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
         if( 3 == @{ $treelet->[$i] } ) {
           # But if it IS just one text node (most common case)
-          DEBUG +> 1 and printf qq{Catching "%s as " as ho-hum L<URL> link.\n},
+          DEBUG +> 1 and printf qq{Catching "\%s as " as ho-hum L<URL> link.\n},
             $treelet->[$i][2]
           ;
           $treelet->[$i][1]{'to'} = Pod::Simple::LinkSection->new(
@@ -1099,13 +1099,13 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       DEBUG +> 3 and
          print "  Peering at L content for a '|' ...\n";
       for(my $j = 0; $j +< @ell_content; ++$j) {
-        next if ref $ell_content[$j];
+        next if ref @ell_content[$j];
         DEBUG +> 3 and
-         print "    Peering at L-content text bit \"$ell_content[$j]\" for a '|'.\n";
+         print "    Peering at L-content text bit \"@ell_content[$j]\" for a '|'.\n";
 
-        if($ell_content[$j] =~ m/^([^\|]*)\|(.*)$/s) {
+        if(@ell_content[$j] =~ m/^([^\|]*)\|(.*)$/s) {
           my @link_text = ($1);   # might be 0-length
-          $ell_content[$j] = $2;  # might be 0-length
+          @ell_content[$j] = $2;  # might be 0-length
 
           DEBUG +> 3 and
            print "     FOUND a '|' in it.  Splitting into [$1] + [$2]\n";
@@ -1115,7 +1115,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
           @ell_content =  grep ref($_)||length($_), @ell_content ;
           $link_text   = [grep ref($_)||length($_), @link_text  ];
           DEBUG +> 3 and printf
-           "  So link text is %s\n  and remaining ell content is %s\n",
+           "  So link text is \%s\n  and remaining ell content is \%s\n",
             pretty($link_text), pretty(@ell_content);
           last;
         }
@@ -1128,13 +1128,13 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       my $section_name;  # set to arrayref if found
       DEBUG +> 3 and print "  Peering at L-content for a '/' ...\n";
       for(my $j = 0; $j +< @ell_content; ++$j) {
-        next if ref $ell_content[$j];
+        next if ref @ell_content[$j];
         DEBUG +> 3 and
-         print "    Peering at L-content text bit \"$ell_content[$j]\" for a '/'.\n";
+         print "    Peering at L-content text bit \"@ell_content[$j]\" for a '/'.\n";
 
-        if($ell_content[$j] =~ m/^([^\/]*)\/(.*)$/s) {
+        if(@ell_content[$j] =~ m/^([^\/]*)\/(.*)$/s) {
           my @section_name = ($2); # might be 0-length
-          $ell_content[$j] =  $1;  # might be 0-length
+          @ell_content[$j] =  $1;  # might be 0-length
 
           DEBUG +> 3 and
            print "     FOUND a '/' in it.",
@@ -1148,15 +1148,15 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
           # Turn L<.../"foo"> into L<.../foo>
           if(@section_name
-            and !ref($section_name[0]) and !ref($section_name[-1])
-            and $section_name[ 0] =~ m/^\"/s
-            and $section_name[-1] =~ m/\"$/s
+            and !ref(@section_name[0]) and !ref(@section_name[-1])
+            and @section_name[ 0] =~ m/^\"/s
+            and @section_name[-1] =~ m/\"$/s
             and !( # catch weird degenerate case of L<"> !
-              @section_name == 1 and $section_name[0] eq '"'
+              @section_name == 1 and @section_name[0] eq '"'
             )
           ) {
-            $section_name[ 0] =~ s/^\"//s;
-            $section_name[-1] =~ s/\"$//s;
+            @section_name[ 0] =~ s/^\"//s;
+            @section_name[-1] =~ s/\"$//s;
             DEBUG +> 3 and
              print "     Quotes removed: ", pretty(@section_name), "\n";
           } else {
@@ -1171,11 +1171,11 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
       # Turn L<"Foo Bar"> into L</Foo Bar>
       if(!$section_name and @ell_content
-         and !ref($ell_content[0]) and !ref($ell_content[-1])
-         and $ell_content[ 0] =~ m/^\"/s
-         and $ell_content[-1] =~ m/\"$/s
+         and !ref(@ell_content[0]) and !ref(@ell_content[-1])
+         and @ell_content[ 0] =~ m/^\"/s
+         and @ell_content[-1] =~ m/\"$/s
          and !( # catch weird degenerate case of L<"> !
-           @ell_content == 1 and $ell_content[0] eq '"'
+           @ell_content == 1 and @ell_content[0] eq '"'
          )
       ) {
         $section_name = [splice @ell_content];
@@ -1212,11 +1212,11 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
       # And the E resolver will have to deal with all our treeletty things:
 
-      if(@ell_content == 1 and !ref($ell_content[0])
-         and $ell_content[0] =~ m/^[-a-zA-Z0-9]+\([-a-zA-Z0-9]+\)$/s
+      if(@ell_content == 1 and !ref(@ell_content[0])
+         and @ell_content[0] =~ m/^[-a-zA-Z0-9]+\([-a-zA-Z0-9]+\)$/s
       ) {
         $ell->[1]{'type'}    = 'man';
-        DEBUG +> 3 and print "Considering this ($ell_content[0]) a man link.\n";
+        DEBUG +> 3 and print "Considering this (@ell_content[0]) a man link.\n";
       } else {
         $ell->[1]{'type'}    = 'pod';
         DEBUG +> 3 and print "Considering this a pod link (not man or url).\n";
@@ -1237,7 +1237,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       }
       
       # And update children to be the link-text:
-      @$ell = (@$ell[0,1], defined($link_text) ? splice(@$link_text) : '');
+      @$ell = (@$ell[[0,1]], defined($link_text) ? splice(@$link_text) : '');
       
       DEBUG +> 2 and print "End of L-parsing for this node $treelet->[$i]\n";
 
@@ -1254,7 +1254,7 @@ sub _treat_Es {
   my($self,@stack) = @_;
 
   my($i, $treelet, $content, $replacer, $charnum);
-  my $start_line = $stack[0][1]{'start_line'};
+  my $start_line = @stack[0][1]{'start_line'};
 
   # A recursive algorithm implemented iteratively!  Whee!
 
@@ -1391,9 +1391,9 @@ sub _accessorize {  # A simple-minded method-maker
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
       use strict;
       die "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
-        unless (@_ == 1 or @_ == 2) and ref $_[0];
-      (@_ == 1) ?  $_[0]->{$attrname}
-                : ($_[0]->{$attrname} = $_[1]);
+        unless (@_ == 1 or @_ == 2) and ref @_[0];
+      (@_ == 1) ?  @_[0]->{$attrname}
+                : (@_[0]->{$attrname} = @_[1]);
     };
   }
   # Ya know, they say accessories make the ensemble!
@@ -1429,10 +1429,10 @@ sub _out {
   
   my $class = shift(@_);
 
-  my $mutor = shift(@_) if @_ and ref($_[0] || '') eq 'CODE';
+  my $mutor = shift(@_) if @_ and ref(@_[0] || '') eq 'CODE';
 
   DEBUG and print "\n\n", '#' x 76,
-   "\nAbout to parse source: \{\{\n$_[0]\n\}\}\n\n";
+   "\nAbout to parse source: \{\{\n@_[0]\n\}\}\n\n";
   
   
   my $parser = $class->new;
@@ -1444,7 +1444,7 @@ sub _out {
   
   $mutor->($parser) if $mutor;
 
-  $parser->parse_string_document( $_[0] );
+  $parser->parse_string_document( @_[0] );
   # use Data::Dumper; print Dumper($parser), "\n";
   return $out;
 }
@@ -1460,7 +1460,7 @@ sub _duo {
   die "But $class->_duo is useful only in list context!"
    unless wantarray;
 
-  my $mutor = shift(@_) if @_ and ref($_[0] || '') eq 'CODE';
+  my $mutor = shift(@_) if @_ and ref(@_[0] || '') eq 'CODE';
 
   die "But $class->_duo takes two parameters, not: @_"
    unless @_ == 2;
@@ -1471,7 +1471,7 @@ sub _duo {
     my $parser = $class->new;
 
     push @out, '';
-    $parser->output_string( \( $out[-1] ) );
+    $parser->output_string( \( @out[-1] ) );
 
     DEBUG and print " _duo out to ", $parser->output_string(),
       " = $parser->{'output_string'}\n";

@@ -7,14 +7,14 @@ my @files;
 my %dirs;
 sub mk {
   my $r = shift;
-  return if exists $dirs{$r};
+  return if exists %dirs{$r};
   if ($r=~m/\//) {
     $r=~m/^(.*)\/[^\/]*?$/;
     mk($1);
   }
   print STDERR "..\\miniperl.exe -MCross comp.pl --do cemkdir [p]\\lib\\$r\n";
   system("..\\miniperl.exe -I..\\lib -MCross comp.pl --do cemkdir [p]\\lib\\$r");
-  $dirs{$r}++;
+  %dirs{$r}++;
 }
 for (@files) {
   if (m/\//) {

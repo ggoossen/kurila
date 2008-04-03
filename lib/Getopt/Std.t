@@ -23,8 +23,8 @@ is( $opt_f, 'foo',		q/option -f is 'foo'/ );
 getopt 'il', \%opt;
 
 is( "@ARGV", 'k -- -l m -n',	'options removed from @ARGV (2)' );
-ok( $opt{h} && $opt{i} eq 'j',	'option -h and -i correctly set' );
-ok( !defined $opt{l},		'option -l not set' );
+ok( %opt{h} && %opt{i} eq 'j',	'option -h and -i correctly set' );
+ok( !defined %opt{l},		'option -l not set' );
 ok( !defined $opt_i,		'$opt_i still undefined' );
 
 # Then we try the getopts
@@ -41,12 +41,12 @@ ok( !defined $opt_o,		'option -o not set' );
 
 ok( getopts('hi:kl', \%opt),	'getopts succeeded (2)' );
 is( "@ARGV", '-l m',		'options removed from @ARGV (4)' );
-ok( $opt{h} && $opt{k},		'options -h and -k set' );
-is( $opt{i}, 'j',		q/option -i is 'j'/ );
+ok( %opt{h} && %opt{k},		'options -h and -k set' );
+is( %opt{i}, 'j',		q/option -i is 'j'/ );
 ok( !defined $opt_i,		'$opt_i still undefined' );
 
 # Try illegal options, but avoid printing of the error message
-${^WARN_HOOK} = sub { $warning = $_[0] };
+${^WARN_HOOK} = sub { $warning = @_[0] };
 @ARGV = qw(-h help);
 
 ok( !getopts("xf:y"),		'getopts fails for an illegal option' );

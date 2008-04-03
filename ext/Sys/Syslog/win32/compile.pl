@@ -49,7 +49,7 @@ my $max = 0;
 
 while ( ~< $header) {
     if (m/^#define\s+(\w+)\s+(\d+)$/ || m/^#define\s+(\w+)\s+\(\(DWORD\)(\d+)L\)/) {
-        $vals{$1} = $2;
+        %vals{$1} = $2;
         if (substr($1, 0, 1) eq 'C') {
             $max = $2 if $max +< $2;
         }
@@ -60,14 +60,14 @@ close($header);
 
 my ($hash, $f2c, %fac);
 
-for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || $vals{$a} <+> $vals{$b} } keys %vals) {
-    $hash .= "    $name => $vals{$name},\n" ;
+for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || %vals{$a} <+> %vals{$b} } keys %vals) {
+    $hash .= "    $name => %vals{$name},\n" ;
     if ($name =~ m/^CAT_(\w+)$/) {
-        $fac{$1} = $vals{$name};
+        %fac{$1} = %vals{$name};
     }
 }
 
-for my $name (sort {$fac{$a} <+> $fac{$b}} keys %fac) {
+for my $name (sort {%fac{$a} <+> %fac{$b}} keys %fac) {
     $f2c .= "    Sys::Syslog::LOG_$name() => '$name',\n";
 }    
 
@@ -78,7 +78,7 @@ $template =~ s/__CONSTANT__/$hash/;
 $template =~ s/__F2C__/$f2c/;
 $template =~ s/__NAME_VER__/$name/;
 $template =~ s/__VER__/$version/;
-$max = sprintf "0x%08x", $max;
+$max = sprintf "0x\%08x", $max;
 $template =~ s/__MAX__/'$max'/g;
 $template =~ s/__TIME__/{localtime()}/g;
 print $out $template;

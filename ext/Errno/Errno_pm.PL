@@ -8,7 +8,7 @@ my %err = ();
 my %wsa = ();
 
 # Symbian cross-compiling environment.
-my $IsSymbian = exists $ENV{SDK} && -d "$ENV{SDK}\\epoc32";
+my $IsSymbian = exists %ENV{SDK} && -d "%ENV{SDK}\\epoc32";
 
 my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 
@@ -17,7 +17,7 @@ open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $!";
 select OUT;
 my $file;
 my @files = get_files();
-if ($Config{gccversion} ne '' && $^O eq 'MSWin32') {
+if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
     # all in .c file and process that instead.
@@ -44,7 +44,7 @@ sub process_file {
     my($file) = @_;
 
     # for win32 perl under cygwin, we need to get a windows pathname
-    if ($^O eq 'MSWin32' && $Config{cc} =~ m/\B-mno-cygwin\b/ &&
+    if ($^O eq 'MSWin32' && %Config{cc} =~ m/\B-mno-cygwin\b/ &&
         defined($file) && !-f $file) {
         chomp($file = `cygpath -w "$file"`);
     }
@@ -53,18 +53,18 @@ sub process_file {
 #    warn "Processing $file\n";
 
     local *FH;
-    if (($^O eq 'VMS') && ($Config{vms_cc_type} ne 'gnuc')) {
+    if (($^O eq 'VMS') && (%Config{vms_cc_type} ne 'gnuc')) {
 	unless(open(FH, "-|", "LIBRARY/EXTRACT=ERRNO/OUTPUT=SYS\$OUTPUT $file")) {
             warn "Cannot open '$file'";
             return;
 	}     
-    } elsif ($Config{gccversion} ne ''
+    } elsif (%Config{gccversion} ne ''
              # OpenSTEP has gcc 2.7.2.1 which recognizes but
 	     # doesn't implement the -dM flag.
 	     && $^O ne 'openstep' && $^O ne 'next' && $^O ne 'darwin'
 	     ) { 
 	# With the -dM option, gcc outputs every #define it finds
-	unless(open(FH,"-|","$Config{cc} -E -dM $Config{cppflags} $file")) {
+	unless(open(FH,"-|","%Config{cc} -E -dM %Config{cppflags} $file")) {
             warn "Cannot open '$file'";
             return;
 	}     
@@ -79,15 +79,15 @@ sub process_file {
     
     if ($^O eq 'MacOS') {
 	while( ~< *FH) {
-	    $err{$1} = $2
+	    %err{$1} = $2
 		if m/^\s*#\s*define\s+(E\w+)\s+(\d+)/;
 	}
     } else {
 	while( ~< *FH) {
-	    $err{$1} = 1
+	    %err{$1} = 1
 		if m/^\s*#\s*define\s+(E\w+)\s+/;
             if ($IsMSWin32) {
-	        $wsa{$1} = 1
+	        %wsa{$1} = 1
 	    	    if m/^\s*#\s*define\s+WSA(E\w+)\s+/;
             }
 	}
@@ -101,7 +101,7 @@ my $cppstdin;
 sub default_cpp {
     unless (defined $cppstdin) {
 	use File::Spec;
-	$cppstdin = $Config{cppstdin};
+	$cppstdin = %Config{cppstdin};
 	my $upup_cppstdin = File::Spec->catfile(File::Spec->updir,
 						File::Spec->updir,
 						"cppstdin");
@@ -111,61 +111,61 @@ sub default_cpp {
 		    and -x $upup_cppstdin);
 	$cppstdin = $upup_cppstdin if $cppstdin_is_wrapper;
     }
-    return "$cppstdin $Config{cppflags} $Config{cppminus}";
+    return "$cppstdin %Config{cppflags} %Config{cppminus}";
 }
 
 sub get_files {
     my %file = ();
     # VMS keeps its include files in system libraries (well, except for Gcc)
     if ($^O eq 'VMS') {
-	if ($Config{vms_cc_type} eq 'decc') {
-	    $file{'Sys$Library:DECC$RTLDEF.TLB'} = 1;
-	} elsif ($Config{vms_cc_type} eq 'vaxc') {
-	    $file{'Sys$Library:vaxcdef.tlb'} = 1;
-	} elsif ($Config{vms_cc_type} eq 'gcc') {
-	    $file{'gnu_cc_include:[000000]errno.h'} = 1;
+	if (%Config{vms_cc_type} eq 'decc') {
+	    %file{'Sys$Library:DECC$RTLDEF.TLB'} = 1;
+	} elsif (%Config{vms_cc_type} eq 'vaxc') {
+	    %file{'Sys$Library:vaxcdef.tlb'} = 1;
+	} elsif (%Config{vms_cc_type} eq 'gcc') {
+	    %file{'gnu_cc_include:[000000]errno.h'} = 1;
 	}
     } elsif ($^O eq 'os390') {
 	# OS/390 C compiler doesn't generate #file or #line directives
-	$file{'/usr/include/errno.h'} = 1;
+	%file{'/usr/include/errno.h'} = 1;
     } elsif ($^O eq 'vmesa') {
 	# OS/390 C compiler doesn't generate #file or #line directives
-	$file{'../../vmesa/errno.h'} = 1;
-    } elsif ($Config{archname} eq 'epoc') {
+	%file{'../../vmesa/errno.h'} = 1;
+    } elsif (%Config{archname} eq 'epoc') {
 	# Watch out for cross compiling for EPOC (usually done on linux)
-	$file{'/usr/local/epocemx/epocsdk/include/libc/sys/errno.h'} = 1;
-    } elsif ($Config{archname} eq 'arm-riscos') {
+	%file{'/usr/local/epocemx/epocsdk/include/libc/sys/errno.h'} = 1;
+    } elsif (%Config{archname} eq 'arm-riscos') {
 	# Watch out for cross compiling for RISC OS
 	my $dep = `echo "#include <errno.h>" | gcc -E -M -`;
 	if ($dep =~ m/(\S+errno\.h)/) {
-	     $file{$1} = 1;
+	     %file{$1} = 1;
 	}
     } elsif ($^O eq 'linux' &&
-	      $Config{gccversion} ne '' && 
-	      $Config{gccversion} !~ m/intel/i
+	      %Config{gccversion} ne '' && 
+	      %Config{gccversion} !~ m/intel/i
 	      # might be using, say, Intel's icc
 	     ) {
 	# Some Linuxes have weird errno.hs which generate
 	# no #file or #line directives
 	my $linux_errno_h = -e '/usr/include/errno.h' ?
 	    '/usr/include/errno.h' : '/usr/local/include/errno.h';
-	$file{$linux_errno_h} = 1;
+	%file{$linux_errno_h} = 1;
     } elsif ($^O eq 'MacOS') {
 	# note that we are only getting the GUSI errno's here ...
 	# we might miss out on compiler-specific ones
-	$file{"$ENV{GUSI}include:sys:errno.h"} = 1;
+	%file{"%ENV{GUSI}include:sys:errno.h"} = 1;
 
     } elsif ($^O eq 'beos') {
 	# hidden in a special place
-	$file{'/boot/develop/headers/posix/errno.h'} = 1;
+	%file{'/boot/develop/headers/posix/errno.h'} = 1;
 
     } elsif ($^O eq 'vos') {
 	# avoid problem where cpp returns non-POSIX pathnames
-	$file{'/system/include_library/errno.h'} = 1;
+	%file{'/system/include_library/errno.h'} = 1;
     } elsif ($IsSymbian) {
-        my $SDK = $ENV{SDK};
+        my $SDK = %ENV{SDK};
         $SDK =~ s!\\!/!g;
-	$file{"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
+	%file{"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
     } else {
 	open(CPPI, ">","errno.c") or
 	    die "Cannot open errno.c";
@@ -184,8 +184,8 @@ sub get_files {
 
 	# invoke CPP and read the output
 	if ($IsMSWin32 || $^O eq 'NetWare') {
-	    open(CPPO,"-|","$Config{cpprun} $Config{cppflags} errno.c") or
-		die "Cannot run '$Config{cpprun} $Config{cppflags} errno.c'";
+	    open(CPPO,"-|","%Config{cpprun} %Config{cppflags} errno.c") or
+		die "Cannot run '%Config{cpprun} %Config{cppflags} errno.c'";
 	} else {
 	    my $cpp = default_cpp();
 	    open(CPPO,"-|", "$cpp < errno.c") or
@@ -193,7 +193,7 @@ sub get_files {
 	}
 
 	my $pat;
-	if (($IsMSWin32 || $^O eq 'NetWare') and $Config{cc} =~ m/^bcc/i) {
+	if (($IsMSWin32 || $^O eq 'NetWare') and %Config{cc} =~ m/^bcc/i) {
 	    $pat = '^/\*\s+(.+)\s+\d+\s*:\s+\*/';
 	}
 	else {
@@ -204,11 +204,11 @@ sub get_files {
 		if (m/$pat/o) {
 		   my $f = $1;
 		   $f =~ s,\\\\,/,g;
-		   $file{$f} = 1;
+		   %file{$f} = 1;
 		}
 	    }
 	    else {
-		$file{$1} = 1 if m/$pat/o;
+		%file{$1} = 1 if m/$pat/o;
 	    }
 	}
 	close(CPPO);
@@ -240,7 +240,7 @@ sub write_errno_pm {
 	    print CPPI "#ifndef $err\n";
 	    print CPPI "#define $err WSA$err\n";
 	    print CPPI "#endif\n";
-	    $err{$err} = 1;
+	    %err{$err} = 1;
 	}
     }
  
@@ -254,15 +254,15 @@ sub write_errno_pm {
     # invoke CPP and read the output
 
 	if ($^O eq 'VMS') {
-	    my $cpp = "$Config{cppstdin} $Config{cppflags} $Config{cppminus}";
+	    my $cpp = "%Config{cppstdin} %Config{cppflags} %Config{cppminus}";
 	    $cpp =~ s/sys\$input//i;
 	    open(CPPO,"-|", "$cpp  errno.c") or
-		die "Cannot exec $Config{cppstdin}";
+		die "Cannot exec %Config{cppstdin}";
 	} elsif ($IsMSWin32 || $^O eq 'NetWare') {
-	    open(CPPO,"-|", "$Config{cpprun} $Config{cppflags} errno.c") or
-		die "Cannot run '$Config{cpprun} $Config{cppflags} errno.c'";
+	    open(CPPO,"-|", "%Config{cpprun} %Config{cppflags} errno.c") or
+		die "Cannot run '%Config{cpprun} %Config{cppflags} errno.c'";
 	} elsif ($IsSymbian) {
-            my $cpp = "gcc -E -I$ENV{SDK}\\epoc32\\include\\libc -";
+            my $cpp = "gcc -E -I%ENV{SDK}\\epoc32\\include\\libc -";
 	    open(CPPO,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
         } else {
@@ -281,12 +281,12 @@ sub write_errno_pm {
 	    $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g; # 2147483647L et alia
 	    next if $expr =~ m/^[a-zA-Z]+$/; # skip some Win32 functions
 	    if($expr =~ m/^0[xX]/) {
-		$err{$name} = hex $expr;
+		%err{$name} = hex $expr;
 	    }
 	    else {
-	    $err{$name} = eval $expr;
+	    %err{$name} = eval $expr;
 	}
-	    delete $err{$name} unless defined $err{$name};
+	    delete %err{$name} unless defined %err{$name};
 	}
 	close(CPPO);
     }
@@ -307,7 +307,7 @@ sub write_errno_pm {
 int main() \{
 EOF
             for (@allerrs) {
-		print C qq[printf("$_ %d\n", $_);]
+		print C qq[printf("$_ \%d\n", $_);]
 	    }
             print C "\}\n";
             close C;
@@ -315,7 +315,7 @@ EOF
             unlink("errno.c");
             if (open(C, "-|", "./errno")) {
 		while ( ~< *C) {
-		    if (m/^(\w+) (-?\d+)$/) { $err{$1} = $2 }
+		    if (m/^(\w+) (-?\d+)$/) { %err{$1} = $2 }
 		}
 		close(C);
 	    } else {
@@ -340,9 +340,9 @@ use Exporter ();
 use Config;
 use strict;
 
-"\$Config\{'archname'\}-\$Config\{'osvers'\}" eq
-"$Config{'archname'}-$Config{'osvers'}" or
-	die "Errno architecture ($Config{'archname'}-$Config{'osvers'}) does not match executable architecture (\$Config\{'archname'\}-\$Config\{'osvers'\})";
+"\%Config\{'archname'\}-\%Config\{'osvers'\}" eq
+"%Config{'archname'}-%Config{'osvers'}" or
+	die "Errno architecture (%Config{'archname'}-%Config{'osvers'}) does not match executable architecture (\%Config\{'archname'\}-\%Config\{'osvers'\})";
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;
@@ -351,7 +351,7 @@ use strict;
 EDQ
    
     my $len = 0;
-    my @err = sort { $err{$a} <+> $err{$b} } keys %err;
+    my @err = sort { %err{$a} <+> %err{$b} } keys %err;
     map { $len = length if length +> $len } @err;
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
@@ -363,7 +363,7 @@ print <<'ESQ';
     POSIX => [qw(
 ESQ
 
-    my $k = join(" ", grep { exists $err{$_} } 
+    my $k = join(" ", grep { exists %err{$_} } 
 	qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
 	EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
 	ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT
@@ -382,7 +382,7 @@ ESQ
     print "\t",$k,"\n    )]\n);\n\n";
 
     foreach $err (@err) {
-	printf "sub %s () \{ %d \}\n",,$err,$err{$err};
+	printf "sub \%s () \{ \%d \}\n",,$err,%err{$err};
     }
 
     print <<'ESQ';

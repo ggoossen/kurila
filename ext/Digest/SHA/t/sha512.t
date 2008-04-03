@@ -3,20 +3,20 @@ use strict;
 my $MODULE;
 
 BEGIN {
-	$MODULE = ($ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
+	$MODULE = (%ENV{PERL_CORE} || -e "SHA.pm") ? "Digest::SHA" : "Digest::SHA::PurePerl";
 	eval "require $MODULE" || die $@;
 	$MODULE->import(qw(sha512_hex));
 }
 
 BEGIN {
-	if ($ENV{PERL_CORE}) {
+	if (%ENV{PERL_CORE}) {
 		chdir 't' if -d 't';
 		@INC = '../lib';
 	}
 }
 
 my @vecs = map { eval } ~< *DATA;
-$#vecs -= 2 if $MODULE eq "Digest::SHA::PurePerl";
+splice @vecs, -2 if $MODULE eq "Digest::SHA::PurePerl";
 
 my $numtests = scalar(@vecs) / 2;
 print "1..$numtests\n";

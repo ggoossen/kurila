@@ -16,21 +16,21 @@ my $Config_inc_version_list;
 # Expand the variables only if explicitly requested because
 # otherwise relocating Perl becomes much harder.
 
-if ($ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $useConfig = '';
-    $Config_archname = qq('$Config{archname}');
-    $Config_version  = qq('$Config{version}');
+    $Config_archname = qq('%Config{archname}');
+    $Config_version  = qq('%Config{version}');
     my @Config_inc_version_list =
-	reverse split m/ /, $Config{inc_version_list};
+	reverse split m/ /, %Config{inc_version_list};
     $Config_inc_version_list =
 	@Config_inc_version_list ?
 	    qq(@Config_inc_version_list) : q(());
 } else {
     $useConfig = 'use Config;';
-    $Config_archname = q($Config{archname});
-    $Config_version  = q($Config{version});
+    $Config_archname = q(%Config{archname});
+    $Config_version  = q(%Config{version});
     $Config_inc_version_list =
-	      q(reverse split m/ /, $Config{inc_version_list});
+	      q(reverse split m/ /, %Config{inc_version_list});
 }
  
 open OUT,">", "$file" or die "Can't create $file: $!";
@@ -38,7 +38,7 @@ open OUT,">", "$file" or die "Can't create $file: $!";
 print "Extracting $file (with variable substitutions)\n";
  
 # In this section, perl variables will be expanded during extraction.
-# You can use $Config{...} to use Configure variables.
+# You can use %Config{...} to use Configure variables.
  
 print OUT <<"!GROK!THIS!";
 package lib;
@@ -102,7 +102,7 @@ sub import {
     }
 
     # remove trailing duplicates
-    @INC = grep { ++$names{$_} == 1 } @INC;
+    @INC = grep { ++%names{$_} == 1 } @INC;
     return;
 }
 
@@ -116,14 +116,14 @@ sub unimport {
 
 	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
 	    = _get_dirs($path);
-	++$names{$path};
-	++$names{$arch_dir}         if -d $arch_auto_dir;
-	++$names{$version_dir}      if -d $version_dir;
-	++$names{$version_arch_dir} if -d $version_arch_dir;
+	++%names{$path};
+	++%names{$arch_dir}         if -d $arch_auto_dir;
+	++%names{$version_dir}      if -d $version_dir;
+	++%names{$version_arch_dir} if -d $version_arch_dir;
     }
 
     # Remove ALL instances of each named directory.
-    @INC = grep { !exists $names{$_} } @INC;
+    @INC = grep { !exists %names{$_} } @INC;
     return;
 }
 

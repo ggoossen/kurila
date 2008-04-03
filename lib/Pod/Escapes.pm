@@ -39,7 +39,7 @@ $NOT_ASCII = 'A' ne chr(65) unless defined $NOT_ASCII;
 
 #--------------------------------------------------------------------------
 sub e2char {
-  my $in = $_[0];
+  my $in = @_[0];
   return undef unless defined $in and length $in;
   
   # Convert to decimal:
@@ -54,7 +54,7 @@ sub e2char {
     # Cope with US-ASCII codes, use fallbacks for Latin-1, or use FAR_CHAR.
     unless($in =~ m/^\d+$/s) {
       # It's a named character reference.  Get its numeric Unicode value.
-      $in = $Name2character{$in};
+      $in = %Name2character{$in};
       return undef unless defined $in;  # (if there's no such name)
       $in = ord $in; # (All ents must be one character long.)
         # ...So $in holds the char's US-ASCII numeric value, which we'll
@@ -62,8 +62,8 @@ sub e2char {
     }
 
     # It's numeric, whether by origin or by mutation from a known name
-    return $Code2USASCII{$in} # so "65" => "A" everywhere
-        || $Latin1Code_to_fallback{$in} # Fallback.
+    return %Code2USASCII{$in} # so "65" => "A" everywhere
+        || %Latin1Code_to_fallback{$in} # Fallback.
         || $FAR_CHAR; # Fall further back
   }
   
@@ -71,13 +71,13 @@ sub e2char {
   if($in =~ m/^\d+$/s) {
       return chr($in);
   } else {
-    return $Name2character{$in}; # returns undef if unknown
+    return %Name2character{$in}; # returns undef if unknown
   }
 }
 
 #--------------------------------------------------------------------------
 sub e2charnum {
-  my $in = $_[0];
+  my $in = @_[0];
   return undef unless defined $in and length $in;
   
   # Convert to decimal:
@@ -90,7 +90,7 @@ sub e2charnum {
   if($in =~ m/^\d+$/s) {
     return 0 + $in;
   } else {
-    return $Name2character_number{$in}; # returns undef if unknown
+    return %Name2character_number{$in}; # returns undef if unknown
   }
 }
 
@@ -374,17 +374,17 @@ sub e2charnum {
   %Name2character = ();
   my($name, $number);
   while( ($name, $number) = each %Name2character_number) {
-      $Name2character{$name} = chr $number;
+      %Name2character{$name} = chr $number;
       # normal case
   }
   # So they resolve 'right' even in EBCDIC-land
-  $Name2character{'lt'  }   = '<';
-  $Name2character{'gt'  }   = '>';
-  $Name2character{'quot'}   = '"';
-  $Name2character{'amp' }   = '&';
-  $Name2character{'apos'}   = "'";
-  $Name2character{'sol' }   = '/';
-  $Name2character{'verbar'} = '|';
+  %Name2character{'lt'  }   = '<';
+  %Name2character{'gt'  }   = '>';
+  %Name2character{'quot'}   = '"';
+  %Name2character{'amp' }   = '&';
+  %Name2character{'apos'}   = "'";
+  %Name2character{'sol' }   = '/';
+  %Name2character{'verbar'} = '|';
 }
 
 #--------------------------------------------------------------------------
@@ -492,7 +492,7 @@ sub e2charnum {
 #--------------------------------------------------------------------------
 
 %Latin1Code_to_fallback = ();
-@Latin1Code_to_fallback{0xA0 .. 0xFF} = (
+%Latin1Code_to_fallback{[0xA0 .. 0xFF]} = (
 # Copied from Text/Unidecode/x00.pm:
 
 ' ', qq{!}, qq{C/}, 'PS', qq{\$?}, qq{Y=}, qq{|}, 'SS', qq{"}, qq{(c)}, 'a', qq{<<}, qq{!}, "", qq{(r)}, qq{-},
@@ -509,7 +509,7 @@ sub e2charnum {
   %Latin1Char_to_fallback = ();
   my($k,$v);
   while( ($k,$v) = each %Latin1Code_to_fallback) {
-    $Latin1Char_to_fallback{chr $k} = $v;
+    %Latin1Char_to_fallback{chr $k} = $v;
     #print chr($k), ' => ', $v, "\n";
   }
 }

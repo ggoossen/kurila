@@ -135,14 +135,14 @@ use utf8;
 
 @ary = split(m/\x{FE}/, "\x{FF}\x{FE}\x{FD}"); # bug id 20010105.016
 ok(@ary == 2 &&
-   $ary[0] eq "\x{FF}"   && $ary[1] eq "\x{FD}" &&
-   $ary[0] eq "\x{FF}" && $ary[1] eq "\x{FD}");
+   @ary[0] eq "\x{FF}"   && @ary[1] eq "\x{FD}" &&
+   @ary[0] eq "\x{FF}" && @ary[1] eq "\x{FD}");
 
 @ary = split(m/(\x{FE}\x{FE})/, "\x{FF}\x{FF}\x{FE}\x{FE}\x{FD}\x{FD}"); # variant of 31
 ok(@ary == 3 &&
-   $ary[0] eq "\x{FF}\x{FF}" &&
-   $ary[1] eq "\x{FE}\x{FE}"     &&
-   $ary[2] eq "\x{FD}\x{FD}");
+   @ary[0] eq "\x{FF}\x{FF}" &&
+   @ary[1] eq "\x{FE}\x{FE}"     &&
+   @ary[2] eq "\x{FD}\x{FD}");
 
 {
     my @a = map ord, split(m//, join("", map chr, (1234, 123, 2345)));
@@ -166,7 +166,7 @@ ok(@ary == 3 &&
     my @charlist = split m//, $sushi;
     my $r = '';
     foreach my $ch (@charlist) {
-	$r = $r . " " . sprintf "U+%04X", ord($ch);
+	$r = $r . " " . sprintf "U+\%04X", ord($ch);
     }
 
     is($r, " U+B36C U+5A8C U+FF5B U+5079 U+505B");
@@ -214,7 +214,7 @@ ok(@ary == 3 &&
 
     is(scalar @b, 4);
 
-    ok(length($b[3]) == 1 && $b[3] eq "\x{263A}");
+    ok(length(@b[3]) == 1 && @b[3] eq "\x{263A}");
 
     $a =~ s/^A/Z/;
     ok(length($a) == 4 && $a eq "ZBC\x{263A}");
@@ -224,7 +224,7 @@ ok(@ary == 3 &&
     no utf8;
     my @a = split(m/\xFE/, "\x[FF]\x[FE]\x[FD]");
 
-    ok(@a == 2 && $a[0] eq "\x[FF]" && $a[1] eq "\x[FD]");
+    ok(@a == 2 && @a[0] eq "\x[FF]" && @a[1] eq "\x[FD]");
 }
 
 {
@@ -241,7 +241,7 @@ ok(@ary == 3 &&
 {
     # split /(A)|B/, "1B2" should return (1, undef, 2)
     my @x = split m/(A)|B/, "1B2";
-    ok($x[0] eq '1' and (not defined $x[1]) and $x[2] eq '2');
+    ok(@x[0] eq '1' and (not defined @x[1]) and @x[2] eq '2');
 }
 
 {
@@ -250,7 +250,7 @@ ok(@ary == 3 &&
     local ${^WARN_HOOK} = sub { $warn = join '', @_; chomp $warn };
     my $char = "\x{10f1ff}";
     my @a = split m/\r?\n/, "$char\n";
-    ok(@a == 1 && $a[0] eq $char && !defined($warn));
+    ok(@a == 1 && @a[0] eq $char && !defined($warn));
 }
 
 {
@@ -288,8 +288,8 @@ ok(@ary == 3 &&
 
     my $x;
     @a = split m/,/, ',,,,,';
-    $a[3]=1;
-    $x = \$a[2];
+    @a[3]=1;
+    $x = \@a[2];
     is (ref $x, 'SCALAR', '#28938 - garbage after extend');
 }
 {
@@ -324,7 +324,7 @@ ok(@ary == 3 &&
     );
     #diag "Have @{[0+@spaces]} to test\n";
     foreach my $cp (@spaces) {
-	my $msg = sprintf "Space: U+%04x", $cp;
+	my $msg = sprintf "Space: U+\%04x", $cp;
         my $space = chr($cp);
         my $str="A:$space:B";
 
@@ -346,8 +346,8 @@ ok(@ary == 3 &&
     my @s = split(" \0 ", $src);
     my @r = split(m/ \0 /, $src);
     is(scalar(@s), 3);
-    is($s[0], "ABC");
-    is($s[1], "FOO");
-    is($s[2]," XYZ");
+    is(@s[0], "ABC");
+    is(@s[1], "FOO");
+    is(@s[2]," XYZ");
     is(join(':',@s), join(':',@r));
 }

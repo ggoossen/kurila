@@ -61,7 +61,7 @@ EOM
 
                 title "Testing $CompressClass with $i streams to $fb";
 
-                my @buffs = @buffers[0..$i -1] ;
+                my @buffs = @buffers[[0..$i -1]] ;
 
                 if ($CompressClass eq 'IO::Compress::Gzip') {
                     %headers = (
@@ -157,7 +157,7 @@ EOM
 
                     for my $stream (1 .. $i)
                     {
-                        my $buff = $buffs[$stream-1];
+                        my $buff = @buffs[$stream-1];
                         my @lines = split("\n", $buff);
                         my $lines = @lines;
 

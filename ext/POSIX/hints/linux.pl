@@ -3,4 +3,4 @@
 # See Message-ID: <19971009002636.50729@tanglefoot>
 #  XXX A Configure test is needed.
 use vars '$self';
-$self->{CCFLAGS} = $Config{ccflags} . ' -DSTRUCT_TM_HASZONE -DHINT_SC_EXIST' ;
+$self->{CCFLAGS} = %Config{ccflags} . ' -DSTRUCT_TM_HASZONE -DHINT_SC_EXIST' ;

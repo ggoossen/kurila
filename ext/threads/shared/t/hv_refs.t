@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -23,7 +23,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -44,27 +44,27 @@ my $foo;
 share($foo);
 my %foo;
 share(%foo);
-$foo{"foo"} = \$foo;
-ok(2, !defined ${$foo{foo}}, "Check deref");
+%foo{"foo"} = \$foo;
+ok(2, !defined ${%foo{foo}}, "Check deref");
 $foo = "test";
-ok(3, ${$foo{foo}} eq "test", "Check deref after assign");
-threads->create(sub{${$foo{foo}} = "test2";})->join();
+ok(3, ${%foo{foo}} eq "test", "Check deref after assign");
+threads->create(sub{${%foo{foo}} = "test2";})->join();
 ok(4, $foo eq "test2", "Check after assign in another thread");
-my $bar = delete($foo{foo});
+my $bar = delete(%foo{foo});
 ok(5, $$bar eq "test2", "check delete");
 threads->create( sub {
    my $test;
    share($test);
    $test = "thread3";
-   $foo{test} = \$test;
+   %foo{test} = \$test;
    })->join();
-ok(6, ${$foo{test}} eq "thread3", "Check reference created in another thread");
-my $gg = $foo{test};
+ok(6, ${%foo{test}} eq "thread3", "Check reference created in another thread");
+my $gg = %foo{test};
 $$gg = "test";
-ok(7, ${$foo{test}} eq "test", "Check reference");
-my $gg2 = delete($foo{test});
+ok(7, ${%foo{test}} eq "test", "Check reference");
+my $gg2 = delete(%foo{test});
 ok(8, threads::shared::_id($$gg) == threads::shared::_id($$gg2),
-       sprintf("Check we get the same thing (%x vs %x)",
+       sprintf('Check we get the same thing (%x vs %x)',
        threads::shared::_id($$gg),threads::shared::_id($$gg2)));
 ok(9, $$gg eq $$gg2, "And check the values are the same");
 ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
@@ -72,13 +72,13 @@ ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
     my (%hash1, %hash2);
     share(%hash1);
     share(%hash2);
-    $hash1{hash} = \%hash2;
-    $hash2{"bar"} = "foo";
-    ok(11, $hash1{hash}->{bar} eq "foo", "Check hash references work");
-    threads->create(sub { $hash2{"bar2"} = "foo2"})->join();
-    ok(12, $hash1{hash}->{bar2} eq "foo2", "Check hash references work");
-    threads->create(sub { my (%hash3); share(%hash3); $hash2{hash} = \%hash3; $hash3{"thread"} = "yes"})->join();
-    ok(13, $hash1{hash}->{hash}->{thread} eq "yes", "Check hash created in another thread");
+    %hash1{hash} = \%hash2;
+    %hash2{"bar"} = "foo";
+    ok(11, %hash1{hash}->{bar} eq "foo", "Check hash references work");
+    threads->create(sub { %hash2{"bar2"} = "foo2"})->join();
+    ok(12, %hash1{hash}->{bar2} eq "foo2", "Check hash references work");
+    threads->create(sub { my (%hash3); share(%hash3); %hash2{hash} = \%hash3; %hash3{"thread"} = "yes"})->join();
+    ok(13, %hash1{hash}->{hash}->{thread} eq "yes", "Check hash created in another thread");
 }
 
 {
@@ -97,9 +97,9 @@ ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
                  })->join;
     ok(16, ref($object) eq 'test1', "blessing does work");
     my %test = (object => $object);
-    ok(17, ref($test{object}) eq 'test1', "and some more work");
+    ok(17, ref(%test{object}) eq 'test1', "and some more work");
     bless $object, 'test2';
-    ok(18, ref($test{object}) eq 'test2', "reblessing works!");
+    ok(18, ref(%test{object}) eq 'test2', "reblessing works!");
 }
 
 ok(19, is_shared($foo), "Check for sharing");

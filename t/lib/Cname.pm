@@ -17,6 +17,6 @@ sub translator {
 
 sub import {
     shift;
-    $^H{charnames} = \&translator;
+    %^H{charnames} = \&translator;
 }
 1;  

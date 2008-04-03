@@ -51,7 +51,7 @@ sub cflags {
     foreach (split m/\n/, $base) {
         m/^(\S*)\s*=\s*(\S*)$/ and $self->{$1} = $2;
     };
-    $self->{CCFLAGS} .= " -DUSEIMPORTLIB" if ($Config{useshrplib} eq 'true');
+    $self->{CCFLAGS} .= " -DUSEIMPORTLIB" if (%Config{useshrplib} eq 'true');
 
     return $self->{CFLAGS} = qq{
 CCFLAGS = $self->{CCFLAGS}
@@ -83,13 +83,13 @@ points to libperl.a
 sub init_linker {
     my $self = shift;
 
-    if ($Config{useshrplib} eq 'true') {
-        my $libperl = '$(PERL_INC)' .'/'. "$Config{libperl}";
+    if (%Config{useshrplib} eq 'true') {
+        my $libperl = '$(PERL_INC)' .'/'. "%Config{libperl}";
         $libperl =~ s/a$/dll.a/;
         $self->{PERL_ARCHIVE} = $libperl;
     } else {
         $self->{PERL_ARCHIVE} = 
-          '$(PERL_INC)' .'/'. ("$Config{libperl}" or "libperl.a");
+          '$(PERL_INC)' .'/'. ("%Config{libperl}" or "libperl.a");
     }
 
     $self->{PERL_ARCHIVE_AFTER} ||= '';

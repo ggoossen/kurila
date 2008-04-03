@@ -23,11 +23,11 @@ $VERSION = '0.35';
       next unless $name;
       ++$count;
       print "<$tag> <$name>\n" if $Debug;
-      $last_name = $Name{$tag} = $name;
-      $Is_Disrec{$tag} = 1 if $disrec;
+      $last_name = %Name{$tag} = $name;
+      %Is_Disrec{$tag} = 1 if $disrec;
     } elsif (m/[Ff]ormerly \"([-a-z0-9]+)\"/) {
-      $Name{$1} = "$last_name (old tag)" if $last_name;
-      $Is_Disrec{$1} = 1;
+      %Name{$1} = "$last_name (old tag)" if $last_name;
+      %Is_Disrec{$1} = 1;
     }
   }
   die "No tags read??" unless $count;
@@ -35,7 +35,7 @@ $VERSION = '0.35';
 #----------------------------------------------------------------------
 
 sub name {
-  my $tag = lc($_[0] || return);
+  my $tag = lc(@_[0] || return);
   $tag =~ s/^\s+//s;
   $tag =~ s/\s+$//s;
   
@@ -52,8 +52,8 @@ sub name {
   my $name = '';
   print "Input: \{$tag\}\n" if $Debug;
   while(length $tag) {
-    last if $name = $Name{$tag};
-    last if $name = $Name{$alt};
+    last if $name = %Name{$tag};
+    last if $name = %Name{$alt};
     if($tag =~ s/(-[a-z0-9]+)$//s) {
       print "Shaving off: $1 leaving $tag\n" if $Debug;
       $subform = "$1$subform";
@@ -78,7 +78,7 @@ sub name {
 #--------------------------------------------------------------------------
 
 sub is_decent {
-  my $tag = lc($_[0] || return 0);
+  my $tag = lc(@_[0] || return 0);
   #require I18N::LangTags;
 
   return 0 unless
@@ -95,18 +95,18 @@ sub is_decent {
   my @supers = ();
   foreach my $bit (split('-', $tag)) {
     push @supers, 
-      scalar(@supers) ? ($supers[-1] . '-' . $bit) : $bit;
+      scalar(@supers) ? (@supers[-1] . '-' . $bit) : $bit;
   }
   return 0 unless @supers;
-  shift @supers if $supers[0] =~ m<^(i|x|sgn)$>s;
+  shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s;
   return 0 unless @supers;
 
   foreach my $f ($tag, @supers) {
-    return 0 if $Is_Disrec{$f};
-    return 2 if $Name{$f};
+    return 0 if %Is_Disrec{$f};
+    return 2 if %Name{$f};
      # so that decent subforms of indecent tags are decent
   }
-  return 2 if $Name{$tag}; # not only is it decent, it's known!
+  return 2 if %Name{$tag}; # not only is it decent, it's known!
   return 1;
 }
 

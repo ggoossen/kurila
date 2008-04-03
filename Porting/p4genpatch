@@ -26,13 +26,13 @@ my @P4opt;
 our %OPT = ( "d" => "u", b => "//depot/perl/", "D" => "diff" );
 Getopt::Long::Configure("no_ignore_case");
 GetOptions(\%OPT, "b=s", "p=s", "d=s", "D=s", "h", "v", "V") or die Usage;
-print Usage and exit if $OPT{h};
-print "$VERSION\n" and exit if $OPT{V};
-die Usage unless @ARGV == 1 && $ARGV[0] =~ m/^\d+$/;
+print Usage and exit if %OPT{h};
+print "$VERSION\n" and exit if %OPT{V};
+die Usage unless @ARGV == 1 && @ARGV[0] =~ m/^\d+$/;
 my $CHANGE = shift;
 
 for my $p4opt (qw(p)) {
-  push @P4opt, "-$p4opt $OPT{$p4opt}" if $OPT{$p4opt};
+  push @P4opt, "-$p4opt %OPT{$p4opt}" if %OPT{$p4opt};
 }
 
 my $system = "p4 @P4opt describe -s $CHANGE |";
@@ -40,7 +40,7 @@ open my $p4, "<", $system or die "Could not run $system";
 my @action;
 while ( ~< $p4) {
   print;
-  next unless m|($OPT{b})|;
+  next unless m|(%OPT{b})|;
   my($prefix) = $1;
   $prefix =~ s|/$||;
   $prefix =~ s|/[^/]+$||; # up to the last "/" in the match is to be stripped
@@ -78,7 +78,7 @@ for my $a (@action) {
   } elsif ($action =~ m/^(edit|integrate)$/) {
     $d1 = File::Spec->catfile($path, "$basename-$prevchange");
     $t1 = File::Spec->catfile($tempdir, $d1);
-    warn "==> $d1 <==\n" if $OPT{v};
+    warn "==> $d1 <==\n" if %OPT{v};
     my $system = qq[p4 @P4opt print -o "$t1" "$prevfile"];
     my $status = `$system`;
     if ($?) {
@@ -102,7 +102,7 @@ for my $a (@action) {
   $d2 = File::Spec->catfile($path, $basename);
   $t2 = File::Spec->catfile($tempdir, $d2);
   push @unlink, $t2;
-  warn "==> $d2#$number <==\n" if $OPT{v};
+  warn "==> $d2#$number <==\n" if %OPT{v};
   my $system = qq[p4 @P4opt print -o "$t2" "$file"];
   # warn "system[$system]";
   my $type = `$system`;
@@ -126,7 +126,7 @@ for my $a (@action) {
     correctmtime($prevfile,$prev,$t1) unless $doadd;
     correctmtime($file,$number,$t2);
     chdir $tempdir or warn "Could not chdir '$tempdir': $!";
-    $system = qq[$OPT{D} -$OPT{d} "$d1" "$d2"];
+    $system = qq[%OPT{D} -%OPT{d} "$d1" "$d2"];
     system($system); # no return check because diff doesn't always return 0
     chdir $TOPDIR or warn "Could not chdir '$TOPDIR': $!";
   }
@@ -142,17 +142,17 @@ my($tz_offset);
 sub correctmtime ($$$) {
   my($depotfile,$nr,$localfile) = @_;
   my %fstat = map { m/^\.\.\. (\w+) (.*)$/ } `p4 @P4opt fstat -s "$depotfile"`;
-  return unless exists($fstat{headRev}) and $fstat{headRev} == $nr;
+  return unless exists(%fstat{headRev}) and %fstat{headRev} == $nr;
 
   if ($^O eq 'MacOS') {  # fix epoch ... still off by three hours (EDT->PDT)
     require Time::Local;
-    $tz_offset ||= sprintf "%+0.4d\n", (
+    $tz_offset ||= sprintf "\%+0.4d\n", (
       Time::Local::timelocal(localtime) - Time::Local::timelocal(gmtime)
     );
-    $fstat{headTime} += 2082844801 + $tz_offset;
+    %fstat{headTime} += 2082844801 + $tz_offset;
   }
 
-  utime $fstat{headTime}, $fstat{headTime}, $localfile;
+  utime %fstat{headTime}, %fstat{headTime}, $localfile;
 }
 
 sub Usage () {

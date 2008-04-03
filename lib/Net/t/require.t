@@ -13,16 +13,17 @@ BEGIN {
     }
 }
 
-print "1..9\n";
+print "1..1\n";
 my $i = 1;
-eval { require Net::Config; } || print "not "; print "ok ",$i++,"\n";
-eval { require Net::Domain; } || print "not "; print "ok ",$i++,"\n";
-eval { require Net::Cmd; }    || print "not "; print "ok ",$i++,"\n";
-eval { require Net::Netrc; }  || print "not "; print "ok ",$i++,"\n";
-eval { require Net::FTP; }    || print "not "; print "ok ",$i++,"\n";
-eval { require Net::SMTP; }   || print "not "; print "ok ",$i++,"\n";
-eval { require Net::NNTP; }   || print "not "; print "ok ",$i++,"\n";
-eval { require Net::POP3; }   || print "not "; print "ok ",$i++,"\n";
-eval { require Net::Time; }   || print "not "; print "ok ",$i++,"\n";
+require Net::Config;
+require Net::Domain;
+require Net::Cmd;
+require Net::Netrc;
+require Net::FTP;
+require Net::SMTP;
+require Net::NNTP;
+require Net::POP3;
+require Net::Time;
+print "ok 1\n";
 
 

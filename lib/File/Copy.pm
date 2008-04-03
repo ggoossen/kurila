@@ -66,8 +66,8 @@ sub _catname {
 # _eq($from, $to) tells whether $from and $to are identical
 # works for strings and references
 sub _eq {
-    return $_[0] == $_[1] if ref $_[0] && ref $_[1];
-    return $_[0] eq $_[1] if !ref $_[0] && !ref $_[1];
+    return @_[0] == @_[1] if ref @_[0] && ref @_[1];
+    return @_[0] eq @_[1] if !ref @_[0] && !ref @_[1];
     return "";
 }
 
@@ -96,12 +96,12 @@ sub copy {
         return 1;
     }
 
-    if ((($Config{d_symlink} && $Config{d_readlink}) || $Config{d_link}) &&
+    if (((%Config{d_symlink} && %Config{d_readlink}) || %Config{d_link}) &&
 	!($^O eq 'MSWin32' || $^O eq 'os2')) {
 	my @fs = stat($from);
 	if (@fs) {
 	    my @ts = stat($to);
-	    if (@ts && $fs[0] == $ts[0] && $fs[1] == $ts[1]) {
+	    if (@ts && @fs[0] == @ts[0] && @fs[1] == @ts[1]) {
 		carp("'$from' and '$to' are identical (not copied)");
                 return 0;
 	    }
@@ -229,7 +229,7 @@ sub move {
 	$to = _catname($from, $to);
     }
 
-    ($tosz1,$tomt1) = (stat($to))[7,9];
+    ($tosz1,$tomt1) = (stat($to))[[7,9]];
     $fromsz = -s $from;
     if ($^O eq 'os2' and defined $tosz1 and defined $fromsz) {
       # will not rename with overwrite
@@ -260,18 +260,18 @@ sub move {
     # Did rename return an error even though it succeeded, because $to
     # is on a remote NFS file system, and NFS lost the server's ack?
     return 1 if defined($fromsz) && !-e $from &&           # $from disappeared
-                (($tosz2,$tomt2) = (stat($to))[7,9]) &&    # $to's there
+                (($tosz2,$tomt2) = (stat($to))[[7,9]]) &&    # $to's there
                   ((!defined $tosz1) ||			   #  not before or
 		   ($tosz1 != $tosz2 or $tomt1 != $tomt2)) &&  #   was changed
                 $tosz2 == $fromsz;                         # it's all there
 
-    ($tosz1,$tomt1) = (stat($to))[7,9];  # just in case rename did something
+    ($tosz1,$tomt1) = (stat($to))[[7,9]];  # just in case rename did something
 
     {
         local $@;
         eval {
             copy($from,$to) or die;
-            my($atime, $mtime) = (stat($from))[8,9];
+            my($atime, $mtime) = (stat($from))[[8,9]];
             utime($atime, $mtime, $to);
             unlink($from)   or die;
         };
@@ -279,7 +279,7 @@ sub move {
     }
     ($sts,$ossts) = ($! + 0, $^E + 0);
 
-    ($tosz2,$tomt2) = ((stat($to))[7,9],0,0) if defined $tomt1;
+    ($tosz2,$tomt2) = ((stat($to))[[7,9]],0,0) if defined $tomt1;
     unlink($to) if !defined($tomt1) or $tomt1 != $tomt2 or $tosz1 != $tosz2;
     ($!,$^E) = ($sts,$ossts);
     return 0;
@@ -290,9 +290,9 @@ sub move {
 
 
 if ($^O eq 'MacOS') {
-    *_protect = sub { MacPerl::MakeFSSpec($_[0]) };
+    *_protect = sub { MacPerl::MakeFSSpec(@_[0]) };
 } else {
-    *_protect = sub { "./$_[0]" };
+    *_protect = sub { "./@_[0]" };
 }
 
 # &syscopy is an XSUB under OS/2
@@ -304,7 +304,7 @@ unless (defined &syscopy) {
 	    return 0 unless @_ == 2;
 	    # Use the MPE cp program in order to
 	    # preserve MPE file attributes.
-	    return system('/bin/cp', '-f', $_[0], $_[1]) == 0;
+	    return system('/bin/cp', '-f', @_[0], @_[1]) == 0;
 	};
     } elsif ($^O eq 'MSWin32' && defined &DynaLoader::boot_DynaLoader) {
 	# Win32::CopyFile() fill only work if we can load Win32.xs

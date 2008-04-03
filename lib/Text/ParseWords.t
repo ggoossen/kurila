@@ -11,9 +11,9 @@ use Text::ParseWords;
 use Test::More tests => 27;
 
 our @words = shellwords(qq(foo "bar quiz" zoo));
-is($words[0], 'foo');
-is($words[1], 'bar quiz');
-is($words[2], 'zoo');
+is(@words[0], 'foo');
+is(@words[1], 'bar quiz');
+is(@words[2], 'zoo');
 
 {
   # Gonna get some undefined things back
@@ -47,9 +47,9 @@ is($result, 'aaaabbbbb|cc cc|\\\"dddd eee\\\\\\"ffff|gg');
 # Make sure @nested_quotewords does the right thing
 our @lists = nested_quotewords('\s+', 0, 'a b c', '1 2 3', 'x y z');
 is (@lists, 3);
-is (@{$lists[0]}, 3);
-is (@{$lists[1]}, 3);
-is (@{$lists[2]}, 3);
+is (@{@lists[0]}, 3);
+is (@{@lists[1]}, 3);
+is (@{@lists[2]}, 3);
 
 # Now test error return
 $string = 'foo bar baz"bach blech boop';
@@ -119,7 +119,7 @@ is($result, "");
 $result = join('|', shellwords(" aa \\  \\ bb ", " \\  ", "cc dd ee\\ "));
 is($result, "aa| | bb| |cc|dd|ee ");
 
-$SIG{ALRM} = sub {die "Timeout!"};
+%SIG{ALRM} = sub {die "Timeout!"};
 alarm(3);
 @words = Text::ParseWords::old_shellwords("foo\\");
 is(@words, 1);

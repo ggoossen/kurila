@@ -12,14 +12,14 @@ use Carp::Heavy ();
 BEGIN {
     if ($^O ne 'VMS') {
 	for (keys %ENV) { # untaint ENV
-	    ($ENV{$_}) = $ENV{$_} =~ m/(.*)/;
+	    (%ENV{$_}) = %ENV{$_} =~ m/(.*)/;
 	}
     }
 
     # Remove insecure directories from PATH
     my @path;
-    my $sep = $Config{path_sep};
-    foreach my $dir (split(m/\Q$sep/,$ENV{'PATH'}))
+    my $sep = %Config{path_sep};
+    foreach my $dir (split(m/\Q$sep/,%ENV{'PATH'}))
     {
 	##
 	## Match the directory taint tests in mg.c::Perl_magic_setenv()
@@ -28,9 +28,9 @@ BEGIN {
 				 or
 				 substr($dir,0,1) ne "/"
 				 or
-				 (stat $dir)[2] ^&^ 002);
+				 (stat $dir)[[2]] ^&^ 002);
     }
-    $ENV{'PATH'} = join($sep,@path);
+    %ENV{'PATH'} = join($sep,@path);
 }
 
 use Test::More tests => 45;
@@ -88,11 +88,11 @@ END {
 }
 
 sub touch {
-    ok( open(my $T,'>',$_[0]), "Opened $_[0] successfully" );
+    ok( open(my $T,'>',@_[0]), "Opened @_[0] successfully" );
 }
 
 sub MkDir($$) {
-    ok( mkdir($_[0],$_[1]), "Created directory $_[0] successfully" );
+    ok( mkdir(@_[0],@_[1]), "Created directory @_[0] successfully" );
 }
 
 sub wanted_File_Dir {
@@ -100,13 +100,13 @@ sub wanted_File_Dir {
     print "# \$_ => '$_'\n";
     s#\.$## if ($^O eq 'VMS' && $_ ne '.');
     s/(.dir)?$//i if ($^O eq 'VMS' && -d _);
-	ok( $Expect_File{$_}, "Expected and found $File::Find::name" );
+	ok( %Expect_File{$_}, "Expected and found $File::Find::name" );
     if ( $FastFileTests_OK ) {
-        delete $Expect_File{ $_}
-          unless ( $Expect_Dir{$_} && ! -d _ );
+        delete %Expect_File{ $_}
+          unless ( %Expect_Dir{$_} && ! -d _ );
     } else {
-        delete $Expect_File{$_}
-          unless ( $Expect_Dir{$_} && ! -d $_ );
+        delete %Expect_File{$_}
+          unless ( %Expect_Dir{$_} && ! -d $_ );
     }
 }
 
@@ -265,14 +265,14 @@ print "# check untainting (no follow)\n";
                 1,file_path('fa_ord') => 1, file_path('fab') => 1,
                 file_path('fab_ord') => 1, file_path('faba') => 1,
                 file_path('faa') => 1, file_path('faa_ord') => 1);
-delete $Expect_File{ file_path('fsl') } unless $symlink_exists;
+delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
 %Expect_Name = ();
 
 %Expect_Dir = ( dir_path('fa') => 1, dir_path('faa') => 1,
                 dir_path('fab') => 1, dir_path('faba') => 1,
                 dir_path('fb') => 1, dir_path('fba') => 1);
 
-delete @Expect_Dir{ dir_path('fb'), dir_path('fba') } unless $symlink_exists;
+delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
 
 File::Find::find( {wanted => \&wanted_File_Dir_prune, untaint => 1,
 		   untaint_pattern => qr|^(.+)$|}, topdir('fa') );

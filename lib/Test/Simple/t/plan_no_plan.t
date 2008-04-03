@@ -1,5 +1,5 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -8,7 +8,7 @@ BEGIN {
 use Test::More;
 
 BEGIN {
-    if( !$ENV{HARNESS_ACTIVE} && $ENV{PERL_CORE} ) {
+    if( !%ENV{HARNESS_ACTIVE} && %ENV{PERL_CORE} ) {
         plan skip_all => "Won't work with t/TEST";
     }
 }
@@ -20,7 +20,7 @@ ok(1, 'Testing again');
 
 {
     my $warning = '';
-    local $SIG{__WARN__} = sub { $warning = join "", @_ };
+    local %SIG{__WARN__} = sub { $warning = join "", @_ };
     SKIP: {
         skip 'Just testing skip with no_plan';
         fail("So very failed");

@@ -1,20 +1,20 @@
 #!perl -w
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
         chdir('t') if -d 't';
         @INC = ('.', '../lib', '../ext/Storable/t');
     } else {
         unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
 
     use Config;
-    if ($Config{byteorder} ne "1234") {
+    if (%Config{byteorder} ne "1234") {
 	print "1..0 # Skip: Test only works for 32 bit little-ending machines\n";
 	exit 0;
     }

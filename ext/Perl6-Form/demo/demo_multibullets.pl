@@ -18,5 +18,5 @@ for my $category (keys %categories) {
 		 {bullet=>'*'},
 		 "** * \{<<<<<<<<<<<<<<<<<<<<<<<<<<<<\} **", $category,
 		 {bullet=>'-'},
-		 "     - \{[[[[[[[[[[[[[[[[[[[[[[[[[[\} - ", $categories{$category};
+		 "     - \{[[[[[[[[[[[[[[[[[[[[[[[[[[\} - ", %categories{$category};
 }

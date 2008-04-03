@@ -75,7 +75,7 @@ sub validate {
     $cwd = "";
     $Warnings = 0;
 
-    foreach my $check (split m/\n/, $_[0]) {
+    foreach my $check (split m/\n/, @_[0]) {
         my ($testlist, @testlist);
 
         # skip blanks/comments
@@ -155,7 +155,7 @@ sub validate {
                         $orig_sigwarn->(@_);
                     }
                     else {
-                        print STDERR $_[0]->message;
+                        print STDERR @_[0]->message;
                     }
                 };
 
@@ -218,7 +218,7 @@ sub valmess {
     if ($test =~ m/ ^ (!?) -(\w) \s* $ /x) {
         my ($neg, $ftype) = ($1, $2);
 
-        $ferror = "$file $Val_Message{$ftype}";
+        $ferror = "$file %Val_Message{$ftype}";
 
         if ($neg eq '!') {
             $ferror =~ s/ is not / should not be / ||

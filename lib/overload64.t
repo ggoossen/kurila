@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config;
-    if ($Config::Config{'uvsize'} != 8) {
+    if (%Config::Config{'uvsize'} != 8) {
         print "1..0 # Skip -- Perl configured with 32-bit ints\n";
         exit 0;
     }
@@ -19,7 +19,7 @@ my $ii = 36028797018963971;  # 2^55 + 3
 
 ### Tests with numerifying large positive int
 { package Oobj;
-    use overload '0+' => sub { ${$_[0]} += 1; $ii },
+    use overload '0+' => sub { ${@_[0]} += 1; $ii },
                  'fallback' => 1;
 }
 my $oo = bless(\do{my $x = 0}, 'Oobj');
@@ -86,7 +86,7 @@ is($$oo, $cnt++, 'overload called once');
 
 ### Tests with numerifying large negative int
 { package Oobj2;
-    use overload '0+' => sub { ${$_[0]} += 1; -$ii },
+    use overload '0+' => sub { ${@_[0]} += 1; -$ii },
                  'fallback' => 1;
 }
 $oo = bless(\do{my $x = 0}, 'Oobj2');
@@ -133,42 +133,42 @@ is($$oo, $cnt++, 'overload called once');
 ### Tests with overloading but no fallback
 { package Oobj3;
     use overload
-        'int' => sub { ${$_[0]} += 1; $ii },
-        'abs' => sub { ${$_[0]} += 1; $ii },
-        'neg' => sub { ${$_[0]} += 1; -$ii },
+        'int' => sub { ${@_[0]} += 1; $ii },
+        'abs' => sub { ${@_[0]} += 1; $ii },
+        'neg' => sub { ${@_[0]} += 1; -$ii },
         '+' => sub {
-            ${$_[0]} += 1;
-            my $res = (ref($_[0]) eq __PACKAGE__) ? $ii : $_[0];
-            $res   += (ref($_[1]) eq __PACKAGE__) ? $ii : $_[1];
+            ${@_[0]} += 1;
+            my $res = (ref(@_[0]) eq __PACKAGE__) ? $ii : @_[0];
+            $res   += (ref(@_[1]) eq __PACKAGE__) ? $ii : @_[1];
         },
         '-' => sub {
-            ${$_[0]} += 1;
-            my ($l, $r) = ($_[2]) ? (1, 0) : (0, 1);
-            my $res = (ref($_[$l]) eq __PACKAGE__) ? $ii : $_[$l];
-            $res   -= (ref($_[$r]) eq __PACKAGE__) ? $ii : $_[$r];
+            ${@_[0]} += 1;
+            my ($l, $r) = (@_[2]) ? (1, 0) : (0, 1);
+            my $res = (ref(@_[$l]) eq __PACKAGE__) ? $ii : @_[$l];
+            $res   -= (ref(@_[$r]) eq __PACKAGE__) ? $ii : @_[$r];
         },
         '*' => sub {
-            ${$_[0]} += 1;
-            my $res = (ref($_[0]) eq __PACKAGE__) ? $ii : $_[0];
-            $res   *= (ref($_[1]) eq __PACKAGE__) ? $ii : $_[1];
+            ${@_[0]} += 1;
+            my $res = (ref(@_[0]) eq __PACKAGE__) ? $ii : @_[0];
+            $res   *= (ref(@_[1]) eq __PACKAGE__) ? $ii : @_[1];
         },
         '/' => sub {
-            ${$_[0]} += 1;
-            my ($l, $r) = ($_[2]) ? (1, 0) : (0, 1);
-            my $res = (ref($_[$l]) eq __PACKAGE__) ? $ii+1 : $_[$l];
-            $res   /= (ref($_[$r]) eq __PACKAGE__) ? $ii+1 : $_[$r];
+            ${@_[0]} += 1;
+            my ($l, $r) = (@_[2]) ? (1, 0) : (0, 1);
+            my $res = (ref(@_[$l]) eq __PACKAGE__) ? $ii+1 : @_[$l];
+            $res   /= (ref(@_[$r]) eq __PACKAGE__) ? $ii+1 : @_[$r];
         },
         '%' => sub {
-            ${$_[0]} += 1;
-            my ($l, $r) = ($_[2]) ? (1, 0) : (0, 1);
-            my $res = (ref($_[$l]) eq __PACKAGE__) ? $ii : $_[$l];
-            $res   %= (ref($_[$r]) eq __PACKAGE__) ? $ii : $_[$r];
+            ${@_[0]} += 1;
+            my ($l, $r) = (@_[2]) ? (1, 0) : (0, 1);
+            my $res = (ref(@_[$l]) eq __PACKAGE__) ? $ii : @_[$l];
+            $res   %= (ref(@_[$r]) eq __PACKAGE__) ? $ii : @_[$r];
         },
         '**' => sub {
-            ${$_[0]} += 1;
-            my ($l, $r) = ($_[2]) ? (1, 0) : (0, 1);
-            my $res = (ref($_[$l]) eq __PACKAGE__) ? $ii : $_[$l];
-            $res  **= (ref($_[$r]) eq __PACKAGE__) ? $ii : $_[$r];
+            ${@_[0]} += 1;
+            my ($l, $r) = (@_[2]) ? (1, 0) : (0, 1);
+            my $res = (ref(@_[$l]) eq __PACKAGE__) ? $ii : @_[$l];
+            $res  **= (ref(@_[$r]) eq __PACKAGE__) ? $ii : @_[$r];
         },
 }
 $oo = bless(\do{my $x = 0}, 'Oobj3');

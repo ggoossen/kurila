@@ -1,7 +1,7 @@
 # See dl_aix.xs for details.
 use Config;
-if ($Config{libs} =~ m/-lC/ && -f '/lib/libC.a') {
-    $self->{CCFLAGS} = $Config{ccflags} . ' -DUSE_libC';
+if (%Config{libs} =~ m/-lC/ && -f '/lib/libC.a') {
+    $self->{CCFLAGS} = %Config{ccflags} . ' -DUSE_libC';
     if (-f '/usr/vacpp/include/load.h') {
 	$self->{CCFLAGS} .= ' -DUSE_vacpp_load_h';
     } elsif (-f '/usr/ibmcxx/include/load.h') {

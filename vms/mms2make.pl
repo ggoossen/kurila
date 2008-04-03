@@ -21,18 +21,18 @@
 #  2.2  29-Jan-1996  Charles Bailey  bailey@newman.upenn.edu
 #    - Fix output file name to work under Unix
 
-if ($#ARGV +> -1 && $ARGV[0] =~ m/^[\-\/]trim/i) {
+if ((@ARGV-1) +> -1 && @ARGV[0] =~ m/^[\-\/]trim/i) {
   $do_trim = 1;
   shift @ARGV;
 }
-$infile  = $#ARGV +> -1 ? shift(@ARGV) : "Descrip.MMS";
-$outfile = $#ARGV +> -1 ? shift(@ARGV) : "Makefile";
+$infile  = (@ARGV-1) +> -1 ? shift(@ARGV) : "Descrip.MMS";
+$outfile = (@ARGV-1) +> -1 ? shift(@ARGV) : "Makefile";
 
 # set any other args in %macros - set VAXC by default
-foreach (@ARGV) { $macros{"\U$_"}=1 }
+foreach (@ARGV) { %macros{"\U$_"}=1 }
 
 # consistency check
-$macros{"DECC"} = 1 if $macros{"__AXP__"};
+%macros{"DECC"} = 1 if %macros{"__AXP__"};
 
 # set conditions as if there was a .if 1  around whole file
 # [lazy - saves having to check for empty array - just test [0]==1]
@@ -58,7 +58,7 @@ while ( ~< *INFIL) {
   if (m/^\.ifdef\s*(.+)/i)
   {
      print OUTFIL "#> ",$_ unless $do_trim;
-     unshift @conditions, ($macros{"\U$1"} ? $conditions[0] : 0);
+     unshift @conditions, (%macros{"\U$1"} ? @conditions[0] : 0);
      next;
   }
 
@@ -66,7 +66,7 @@ while ( ~< *INFIL) {
   if (m/^\.else/i)
   {
       print OUTFIL "#> ",$_ unless $do_trim;
-      $conditions[0] = $conditions[1] && !$conditions[0];
+      @conditions[0] = @conditions[1] && !@conditions[0];
       next;
   }
 
@@ -78,7 +78,7 @@ while ( ~< *INFIL) {
      next;
   }
 
-  next if ($do_trim && !$conditions[0]);
+  next if ($do_trim && !@conditions[0]);
 
 # spot new rule and pick up first source file, since some versions of
 # Make don't provide a macro for this
@@ -97,7 +97,7 @@ while ( ~< *INFIL) {
       $macros =~ s/,/ /g;  # We're hosed if there're commas within a macro -
                            # someday, check for "" and skip contents
       last if $end;
-      print OUTFIL $conditions[0] ? "#> " : "",$_;
+      print OUTFIL @conditions[0] ? "#> " : "",$_;
       $_ = ~< *INFIL;
       m#(.*)(\$\(MACROEND\))?#;
     }
@@ -113,7 +113,7 @@ while ( ~< *INFIL) {
   s/\$\(mms\$target_name\)\$\(O\)/\$\@/i;
   s/\$\(mms\$target_name\)/\$\*/i;
   s/sys\$([^\(])/sys\$\$$1/gi;
-  print OUTFIL "#> " unless $conditions[0];
+  print OUTFIL "#> " unless @conditions[0];
   print OUTFIL $_;
 }
 

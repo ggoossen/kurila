@@ -5,9 +5,9 @@ my $test = 1;
 sub ok {
     my($ok, $name) = @_;
 
-    printf "%sok %d - %s\n", ($ok ? "" : "not "), $test, $name;
+    printf "\%sok \%d - \%s\n", ($ok ? "" : "not "), $test, $name;
 
-    printf "# Failed test at line %d\n", (caller)[2] unless $ok;
+    printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 
     $test++;
     return $ok;

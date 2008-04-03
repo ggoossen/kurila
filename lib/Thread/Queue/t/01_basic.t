@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir('t');
         unshift(@INC, '../lib');
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -86,7 +86,7 @@ sub reader2 {
         my @el = $q->dequeue($count);
         is(scalar(@el), $count, "Thread $id got @el");
         select(undef, undef, undef, rand(1));
-        return if ($el[0] == 0);
+        return if (@el[0] == 0);
     }
 }
 
@@ -110,11 +110,11 @@ is($q->pending(), scalar(@items), 'Queue count');
 threads->create(sub {
     is($q->pending(), scalar(@items), 'Queue count in thread');
     while (my @el = $q->dequeue_nb(2)) {
-        is($el[0], shift(@items), "Thread got $el[0]");
-        if ($el[0] eq 'exit') {
+        is(@el[0], shift(@items), "Thread got @el[0]");
+        if (@el[0] eq 'exit') {
             is(scalar(@el), 1, 'Thread to exit');
         } else {
-            is($el[1], shift(@items), "Thread got $el[1]");
+            is(@el[1], shift(@items), "Thread got @el[1]");
         }
     }
     is($q->pending(), 0, 'Empty queue');

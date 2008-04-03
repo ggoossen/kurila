@@ -82,9 +82,9 @@ sub import {
     $t->plan(@plan);
 
     my @imports = ();
-    foreach my $idx (0..$#plan) {
-        if( $plan[$idx] eq 'import' ) {
-            @imports = @{$plan[$idx+1]};
+    foreach my $idx (0..(@plan-1)) {
+        if( @plan[$idx] eq 'import' ) {
+            @imports = @{@plan[$idx+1]};
             last;
         }
     }
@@ -127,8 +127,8 @@ sub _start_testing
 {
     # even if we're running under Test::Harness pretend we're not
     # for now.  This needed so Test::Builder doesn't add extra spaces
-    $original_harness_env = $ENV{HARNESS_ACTIVE} || 0;
-    $ENV{HARNESS_ACTIVE} = 0;
+    $original_harness_env = %ENV{HARNESS_ACTIVE} || 0;
+    %ENV{HARNESS_ACTIVE} = 0;
 
     # remember what the handles were set to
     $original_output_handle  = $t->output();
@@ -331,9 +331,9 @@ sub test_test
    else
    {
      %args = @_;
-     $mess = $args{name} if exists($args{name});
-     $mess = $args{title} if exists($args{title});
-     $mess = $args{label} if exists($args{label});
+     $mess = %args{name} if exists(%args{name});
+     $mess = %args{title} if exists(%args{title});
+     $mess = %args{label} if exists(%args{label});
    }
 
     # er, are we testing?
@@ -350,11 +350,11 @@ sub test_test
     $testing = 0;
 
     # re-enable the original setting of the harness
-    $ENV{HARNESS_ACTIVE} = $original_harness_env;
+    %ENV{HARNESS_ACTIVE} = $original_harness_env;
 
     # check the output we've stashed
-    unless ($t->ok(    ($args{skip_out} || $out->check)
-                    && ($args{skip_err} || $err->check),
+    unless ($t->ok(    (%args{skip_out} || $out->check)
+                    && (%args{skip_err} || $err->check),
                    $mess))
     {
       # print out the diagnostic information about why this
@@ -363,10 +363,10 @@ sub test_test
       local $_;
 
       $t->diag(map {"$_\n"} $out->complaint)
-	unless $args{skip_out} || $out->check;
+	unless %args{skip_out} || $out->check;
 
       $t->diag(map {"$_\n"} $err->complaint)
-	unless $args{skip_err} || $err->check;
+	unless %args{skip_err} || $err->check;
     }
 }
 

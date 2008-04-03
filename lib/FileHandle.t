@@ -4,7 +4,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
+    if (%Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
 	print "1..0\n";
 	exit 0;
     }
@@ -77,7 +77,7 @@ if ($^O eq 'dos')
 ($rd,$wr) = FileHandle::pipe;
 
 if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O eq 'NetWare' ||
-    $Config{d_fork} ne 'define') {
+    %Config{d_fork} ne 'define') {
   $wr->autoflush;
   $wr->printf("ok %d\n",11);
   print $rd->getline;

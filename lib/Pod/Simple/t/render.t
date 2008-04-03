@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     } else {
@@ -25,11 +25,11 @@ BEGIN {
 $Pod::Simple::Text::FREAKYMODE = 1;
 use Pod::Simple::TiedOutFH ();
 
-chdir 't' unless $ENV{PERL_CORE};
+chdir 't' unless %ENV{PERL_CORE};
 
 sub source_path {
     my $file = shift;
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 'Simple', 't');
@@ -68,11 +68,11 @@ foreach my $file (
   foreach my $class ('Pod::Simple::TextContent', 'Pod::Simple::Text') {
     my $p = $class->new;
     push @out, '';
-    $p->output_string(\$out[-1]);
+    $p->output_string(\@out[-1]);
     my $t = mytime();
     $p->parse_file(source_path($file));
-    printf "# %s %s %sb, %.03fs\n",
-     ref($p), source_path($file), length($out[-1]), mytime() - $t ;
+    printf "# \%s \%s \%sb, \%.03fs\n",
+     ref($p), source_path($file), length(@out[-1]), mytime() - $t ;
     ok 1;
   }
 
@@ -83,7 +83,7 @@ foreach my $file (
     push @out, ~< *IN;
   }
   close(IN);
-  print "#   ", length($out[-1]), " bytes pulled in.\n";
+  print "#   ", length(@out[-1]), " bytes pulled in.\n";
   
   @out = map {
                join '', pack("U*", unpack("C*", $_)) # latin1 decode.
@@ -93,21 +93,21 @@ foreach my $file (
 
   my $faily = 0;
   print "#\n#Now comparing 1 and 2...\n";
-  $faily += compare2($out[0], $out[1]);
+  $faily += compare2(@out[0], @out[1]);
   print "#\n#Now comparing 2 and 3...\n";
-  $faily += compare2($out[1], $out[2]);
+  $faily += compare2(@out[1], @out[2]);
   print "#\n#Now comparing 1 and 3...\n";
-  $faily += compare2($out[0], $out[2]);
+  $faily += compare2(@out[0], @out[2]);
 
   if($faily) {
     ++$outfile;
     
     my @outnames = map $outfile . $_ , qw(0 1);
-    open(OUT2, ">", "$outnames[0].~out.txt") || die "Can't write-open $outnames[0].txt: $!";
+    open(OUT2, ">", "@outnames[0].~out.txt") || die "Can't write-open @outnames[0].txt: $!";
 
-    foreach my $out (@out) { push @outnames, $outnames[-1];  ++$outnames[-1] };
+    foreach my $out (@out) { push @outnames, @outnames[-1];  ++@outnames[-1] };
     pop @outnames;
-    printf "# Writing to %s.txt .. %s.txt\n", $outnames[0], $outnames[-1];
+    printf "# Writing to \%s.txt .. \%s.txt\n", @outnames[0], @outnames[-1];
     shift @outnames;
     
     binmode(OUT2);
@@ -131,12 +131,12 @@ exit;
 
 sub compare2 {
   my @out = @_;
-  if($out[0] eq $out[1]) {
+  if(@out[0] eq @out[1]) {
     ok 1;
     return 0;
   } elsif( do{
-    for ($out[0], $out[1]) { tr/ //d; };
-    $out[0] eq $out[1];
+    for (@out[0], @out[1]) { tr/ //d; };
+    @out[0] eq @out[1];
   }){
     print "# Differ only in whitespace.\n";
     ok 1;
@@ -144,7 +144,7 @@ sub compare2 {
   } else {
     #ok $out[0], $out[1];
     
-    my $x = $out[0] ^^^ $out[1];
+    my $x = @out[0] ^^^ @out[1];
     $x =~ m/^(\x00*)/s or die;
     my $at = length($1);
     print "# Difference at byte $at...\n";
@@ -152,15 +152,15 @@ sub compare2 {
       $at -= 5;
     }
     {
-      print "# ", substr($out[0],$at,20), "\n";
-      print "# ", substr($out[1],$at,20), "\n";
+      print "# ", substr(@out[0],$at,20), "\n";
+      print "# ", substr(@out[1],$at,20), "\n";
       print "#      ^...";
     }
     
     
     
     ok 0;
-    printf "# Unequal lengths %s and %s\n", length($out[0]), length($out[1]);
+    printf "# Unequal lengths \%s and \%s\n", length(@out[0]), length(@out[1]);
     return 1;
   }
 }

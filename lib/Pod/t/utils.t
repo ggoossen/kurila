@@ -35,8 +35,8 @@ my @results = (
 	      );
 
 for my $i( 0..@links ) {
-  my $link = Pod::Hyperlink->new( $links[$i]);
-  is($link->markup, $results[$i]);
+  my $link = Pod::Hyperlink->new( @links[$i]);
+  is($link->markup, @results[$i]);
 }
 
 # Now test lists
@@ -76,7 +76,7 @@ is($cache->find_page("Junk"), undef);
 # Make sure that the item we found is the same one as the
 # first in the list
 my @i = $cache->item;
-cmp_ok($i[0], '\==', $item);
+cmp_ok(@i[0], '\==', $item);
 
 # Check the contents
 is($item->page, "Pod::ParseUtils");

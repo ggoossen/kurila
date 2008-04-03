@@ -8,10 +8,10 @@
 
 sub BEGIN {
     chdir('t') if -d 't';
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	@INC = ('.', '../lib', '../ext/Storable/t');
         require Config;
-        if ($Config::Config{'extensions'} !~ m/\bStorable\b/) {
+        if (%Config::Config{'extensions'} !~ m/\bStorable\b/) {
             print "1..0 # Skip: Storable was not built\n";
             exit 0;
         }
@@ -39,20 +39,20 @@ my %hash = (question => '?', answer => 42, extra => 'junk', undef => undef);
 lock_hash %hash;
 unlock_value %hash, 'answer';
 unlock_value %hash, 'extra';
-delete $hash{'extra'};
+delete %hash{'extra'};
 
 my $test;
 
 package Restrict_Test;
 
 sub me_second {
-  return (undef, $_[0]);
+  return (undef, @_[0]);
 }
 
 package main;
 
 sub freeze_thaw {
-  my $temp = freeze $_[0];
+  my $temp = freeze @_[0];
   return thaw $temp;
 }
 
@@ -104,11 +104,11 @@ for $Storable::canonical (0, 1) {
     # bless {}, "Restrict_Test";
 
     my %hash2;
-    $hash2{"k$_"} = "v$_" for 0..16;
+    %hash2{"k$_"} = "v$_" for 0..16;
     lock_hash %hash2;
     for (0..16) {
       unlock_value %hash2, "k$_";
-      delete $hash2{"k$_"};
+      delete %hash2{"k$_"};
     }
     my $copy = &$cloner(\%hash2);
 

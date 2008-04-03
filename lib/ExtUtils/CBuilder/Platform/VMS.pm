@@ -30,7 +30,7 @@ sub arg_defines {
   return ('/define=(' 
           . join(',', 
 		 @config_defines,
-                 map "\"$_" . ( length($args{$_}) ? "=$args{$_}" : '') . "\"", 
+                 map "\"$_" . ( length(%args{$_}) ? "=%args{$_}" : '') . "\"", 
                      keys %args) 
           . ')');
 }
@@ -50,15 +50,15 @@ sub arg_include_dirs {
 sub _do_link {
   my ($self, $type, %args) = @_;
   
-  my $objects = delete $args{objects};
+  my $objects = delete %args{objects};
   $objects = [$objects] unless ref $objects;
   
-  if ($args{lddl}) {
+  if (%args{lddl}) {
 
     # prelink will call Mksymlists, which creates the extension-specific
     # linker options file and populates it with the boot symbol.
 
-    my @temp_files = $self->prelink(%args, dl_name => $args{module_name});
+    my @temp_files = $self->prelink(%args, dl_name => %args{module_name});
 
     # We now add the rest of what we need to the linker options file.  We
     # should replicate the functionality of C<ExtUtils::MM_VMS::dlsyms>,
@@ -68,9 +68,9 @@ sub _do_link {
     # own version of C<ExtUtils::Liblist::Kid::ext> so that any additional
     # libraries (including PERLSHR) can be added to the options file.
 
-    my @optlibs = $self->_liblist_ext( $args{'libs'} );
+    my @optlibs = $self->_liblist_ext( %args{'libs'} );
 
-    my $optfile = 'sys$disk:[]' . $temp_files[0];
+    my $optfile = 'sys$disk:[]' . @temp_files[0];
     open my $opt_fh, '>>', $optfile 
         or die "_do_link: Unable to open $optfile: $!";
     for my $lib (@optlibs) {print $opt_fh "$lib\n" if length $lib }
@@ -157,7 +157,7 @@ sub _liblist_ext {
 
   my(@dirs,@libs,$dir,$lib,%found,@fndlibs,$ldlib);
   my $cwd = cwd();
-  my($so,$lib_ext,$obj_ext) = @{$self->{'config'}}{'so','lib_ext','obj_ext'};
+  my($so,$lib_ext,$obj_ext) = %{$self->{'config'}}{['so','lib_ext','obj_ext']};
   # List of common Unix library names and their VMS equivalents
   # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
@@ -167,7 +167,7 @@ sub _liblist_ext {
                  'socket' => '', 'X11' => 'DECW$XLIBSHR',
                  'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
                  'Xmu' => 'DECW$XMULIBSHR');
-  if ($self->{'config'}{'vms_cc_type'} ne 'decc') { $libmap{'curses'} = 'VAXCCURSE'; }
+  if ($self->{'config'}{'vms_cc_type'} ne 'decc') { %libmap{'curses'} = 'VAXCCURSE'; }
 
   warn "Potential libraries are '$potential_libs'\n" if $verbose;
 
@@ -199,9 +199,9 @@ sub _liblist_ext {
   unshift(@dirs,''); # Check each $lib without additions first
 
   LIB: foreach $lib (@libs) {
-    if (exists $libmap{$lib}) {
-      next unless length $libmap{$lib};
-      $lib = $libmap{$lib};
+    if (exists %libmap{$lib}) {
+      next unless length %libmap{$lib};
+      $lib = %libmap{$lib};
     }
 
     my(@variants,$variant,$cand);
@@ -269,11 +269,11 @@ sub _liblist_ext {
       }
       if ($ctype) { 
         # This has to precede any other CRTLs, so just make it first
-        if ($cand eq 'VAXCCURSE') { unshift @{$found{$ctype}}, $cand; }  
-        else                      { push    @{$found{$ctype}}, $cand; }
+        if ($cand eq 'VAXCCURSE') { unshift @{%found{$ctype}}, $cand; }  
+        else                      { push    @{%found{$ctype}}, $cand; }
         warn "\tFound as $cand (really $fullname), type $ctype\n" 
           if $verbose +> 1;
-	push @flibs, $name unless $libs_seen{$fullname}++;
+	push @flibs, $name unless %libs_seen{$fullname}++;
         next LIB;
       }
     }
@@ -281,9 +281,9 @@ sub _liblist_ext {
 		 ."No library found for $lib\n";
   }
 
-  push @fndlibs, @{$found{OBJ}}                      if exists $found{OBJ};
-  push @fndlibs, map { "$_/Library" } @{$found{OLB}} if exists $found{OLB};
-  push @fndlibs, map { "$_/Share"   } @{$found{SHR}} if exists $found{SHR};
+  push @fndlibs, @{%found{OBJ}}                      if exists %found{OBJ};
+  push @fndlibs, map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
+  push @fndlibs, map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
   $lib = join(' ',@fndlibs);
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;

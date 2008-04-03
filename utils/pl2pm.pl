@@ -33,7 +33,7 @@ my %keyword = ();
 
 while ( ~< *DATA) {
     chomp;
-    $keyword{$_} = 1;
+    %keyword{$_} = 1;
 }
 
 local $/;
@@ -59,11 +59,11 @@ while ( ~< *ARGV) {
     else {
 	@export = m/sub\s+([A-Za-z]\w*)/g;
     }
-    my @export_ok = grep($keyword{$_}, @export);
-    @export = grep(!$keyword{$_}, @export);
+    my @export_ok = grep(%keyword{$_}, @export);
+    @export = grep(!%keyword{$_}, @export);
 
     my %export = ();
-    @export{@export} = (1) x @export;
+    %export{[@export]} = (1) x @export;
 
     s/(^\s*);#/$1#/g;
     s/(#.*)require ['"]$oldpack\.pl['"]/$1use $newpack/;

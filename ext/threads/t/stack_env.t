@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -23,7 +23,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -33,7 +33,7 @@ BEGIN {
     $| = 1;
     print("1..4\n");   ### Number of tests that will be run ###
 
-    $ENV{'PERL5_ITHREADS_STACK_SIZE'} = 128*4096;
+    %ENV{'PERL5_ITHREADS_STACK_SIZE'} = 128*4096;
 };
 
 use threads;
@@ -42,7 +42,7 @@ ok(1, 1, 'Loaded');
 ### Start of Testing ###
 
 ok(2, threads->get_stack_size() == 128*4096,
-        '$ENV{PERL5_ITHREADS_STACK_SIZE}');
+        '%ENV{PERL5_ITHREADS_STACK_SIZE}');
 ok(3, threads->set_stack_size(144*4096) == 128*4096,
         'Set returns previous value');
 ok(4, threads->get_stack_size() == 144*4096,

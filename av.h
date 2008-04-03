@@ -31,7 +31,6 @@ typedef struct {
 
 /* SV**	xav_alloc; */
 #define xav_alloc xiv_u.xivu_p1
-/* SV*	xav_arylen; */
 
 /* SVpav_REAL is set for all AVs whose xav_array contents are refcounted.
  * Some things like "@_" and the scratchpad list do not set this, to
@@ -75,7 +74,6 @@ Same as C<av_len()>.  Deprecated, use C<av_len()> instead.
 #define AvALLOC(av)	(*((SV***)&((XPVAV*)  SvANY(av))->xav_alloc))
 #define AvMAX(av)	((XPVAV*)  SvANY(av))->xav_max
 #define AvFILLp(av)	((XPVAV*)  SvANY(av))->xav_fill
-#define AvARYLEN(av)	(*Perl_av_arylen_p(aTHX_ (AV*)av))
 
 #define AvREAL(av)	(SvFLAGS(av) & SVpav_REAL)
 #define AvREAL_on(av)	(SvFLAGS(av) |= SVpav_REAL)

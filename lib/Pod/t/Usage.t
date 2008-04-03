@@ -102,7 +102,7 @@ is( $pod2usage, $pod2text, 'Verbose level >= 2 eq pod2text' );
 
 package CatchOut;
 sub TIEHANDLE { bless \( my $self ), shift }
-sub PRINT     { my $self = shift; $$self .= $_[0] }
+sub PRINT     { my $self = shift; $$self .= @_[0] }
 
 __END__
 

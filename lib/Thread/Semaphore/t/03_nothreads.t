@@ -1,14 +1,19 @@
 use strict;
 use warnings;
+use Test::More;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir('t');
         unshift(@INC, '../lib');
     }
+    require Config;
+    if (! %Config::Config{usethreads}) {
+        plan 'skip_all';
+    }
 }
 
-use Test::More 'tests' => 4;
+plan tests => 4;
 
 use Thread::Semaphore;
 

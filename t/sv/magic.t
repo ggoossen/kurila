@@ -13,11 +13,11 @@ sub ok {
     my($ok, $info, $todo) = @_;
 
     # You have to do it this way or VMS will get confused.
-    printf "%s $test%s\n", $ok ? "ok" : "not ok",
+    printf "\%s $test\%s\n", $ok ? "ok" : "not ok",
                            $todo ? " # TODO $todo" : '';
 
     unless( $ok ) {
-        printf "# Failed test at line %d\n", (caller)[2];
+        printf "# Failed test at line \%d\n", (caller)[[2]];
         print  "# $info\n" if defined $info;
     }
 
@@ -28,7 +28,7 @@ sub ok {
 sub skip {
     my($reason) = @_;
 
-    printf "ok $test # skipped%s\n", defined $reason ? ": $reason" : '';
+    printf "ok $test # skipped\%s\n", defined $reason ? ": $reason" : '';
 
     $test++;
     return 1;
@@ -45,16 +45,16 @@ my $Is_os2      = $^O eq 'os2';
 my $Is_Cygwin   = $^O eq 'cygwin';
 my $Is_MacOS    = $^O eq 'MacOS';
 my $Is_MPE      = $^O eq 'mpeix';		
-my $Is_miniperl = $ENV{PERL_CORE_MINITEST};
+my $Is_miniperl = %ENV{PERL_CORE_MINITEST};
 my $Is_BeOS     = $^O eq 'beos';
 
-my $PERL = $ENV{PERL}
+my $PERL = %ENV{PERL}
     || ($Is_NetWare           ? 'perl'   :
        ($Is_MacOS || $Is_VMS) ? $^X      :
        $Is_MSWin32            ? '.\perl' :
        './perl');
 
-eval '$ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
+eval '%ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
 if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }
@@ -83,9 +83,9 @@ else {
 
     $| = 1;		# command buffering
 
-    $SIG{"INT"} = \&ok3;     kill "INT",$$; sleep 1;
-    $SIG{"INT"} = "IGNORE";  kill "INT",$$; sleep 1; print "ok 4\n";
-    $SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
+    %SIG{"INT"} = \&ok3;     kill "INT",$$; sleep 1;
+    %SIG{"INT"} = "IGNORE";  kill "INT",$$; sleep 1; print "ok 4\n";
+    %SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
 
     sub ok3 {
 	if ((my $x = pop(@_)) eq "INT") {
@@ -113,13 +113,13 @@ END
 	return sub { $x };
     }
     $| = 1;		# command buffering
-    $SIG{"INT"} = \&ok5;
+    %SIG{"INT"} = \&ok5;
     {
-	local $SIG{"INT"}=x();
+	local %SIG{"INT"}=x();
 	print ""; # Needed to expose failure in 5.8.0 (why?)
     }
     sleep 1;
-    delete $SIG{"INT"};
+    delete %SIG{"INT"};
     kill "INT",$$; sleep 1;
     sub ok5 {
 	print "ok 5\n";
@@ -134,7 +134,7 @@ END
 }
 
 # can we slice ENV?
-my @val1 = @ENV{keys(%ENV)};
+my @val1 = %ENV{[keys(%ENV)]};
 my @val2 = values(%ENV);
 ok join(':',@val1) eq join(':',@val2);
 ok @val1 +> 1;
@@ -156,13 +156,13 @@ ok "@a" eq "foo bar baz", "@a";
 
 # $;
 my %h = ();
-$h{'foo', 'bar'} = 1;
-ok((keys %h)[0] eq "foo\034bar", (keys %h)[0]);
+%h{'foo', 'bar'} = 1;
+ok((keys %h)[[0]] eq "foo\034bar", (keys %h)[[0]]);
 {
     local $; = 'x';
     %h = ();
-    $h{'foo', 'bar'} = 1;
-    ok((keys %h)[0] eq 'fooxbar', (keys %h)[0]);
+    %h{'foo', 'bar'} = 1;
+    ok((keys %h)[[0]] eq 'fooxbar', (keys %h)[[0]]);
 }
 
 # $?, $@, $$
@@ -190,7 +190,7 @@ our ($wd, $script);
     if ($^O eq 'qnx') {
 	chomp($wd = `/usr/bin/fullpath -t`);
     }
-    elsif($Is_Cygwin || $Config{'d_procselfexe'}) {
+    elsif($Is_Cygwin || %Config{'d_procselfexe'}) {
        # Cygwin turns the symlink into the real file
        chomp($wd = `pwd`);
        $wd =~ s#/t$##;
@@ -288,23 +288,23 @@ ok($^O eq $orig_osname, 'Assigning $^I does not clobber $^O');
 $^O = $orig_osname;
 
 if ($Is_VMS || $Is_Dos || $Is_MacOS) {
-    skip("%ENV manipulations fail or aren't safe on $^O") for 1..4;
+    skip("\%ENV manipulations fail or aren't safe on $^O") for 1..4;
 }
 else {
-	if ($ENV{PERL_VALGRIND}) {
+	if (%ENV{PERL_VALGRIND}) {
 	    skip("clearing \%ENV is not safe when running under valgrind");
 	} else {
-	    my $PATH = $ENV{PATH};
-	    my $PDL = $ENV{PERL_DESTRUCT_LEVEL} || 0;
-	    $ENV{foo} = "bar";
+	    my $PATH = %ENV{PATH};
+	    my $PDL = %ENV{PERL_DESTRUCT_LEVEL} || 0;
+	    %ENV{foo} = "bar";
 	    %ENV = ();
-	    $ENV{PATH} = $PATH;
-	    $ENV{PERL_DESTRUCT_LEVEL} = $PDL || 0;
+	    %ENV{PATH} = $PATH;
+	    %ENV{PERL_DESTRUCT_LEVEL} = $PDL || 0;
 	    ok ($Is_MSWin32 ? (`set foo 2>NUL` eq "")
 			    : (`echo \$foo` eq "\n") );
 	}
 
-	$ENV{__NoNeSuCh} = "foo";
+	%ENV{__NoNeSuCh} = "foo";
 	$0 = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
@@ -313,7 +313,7 @@ else {
 	if ($^O =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, '<', "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
-	    my $me = (split m/\0/, $line)[0];
+	    my $me = (split m/\0/, $line)[[0]];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
 	    close CMDLINE;
             # perlbug #22811
@@ -322,10 +322,10 @@ else {
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
-              my $ps = (`ps -o command= -p $$`)[-1];
+              my $ps = (`ps -o command= -p $$`)[[-1]];
               return if $?;
               chomp $ps;
-              printf "# 0[%s]ps[%s]\n", $0, $ps;
+              printf "# 0[\%s]ps[\%s]\n", $0, $ps;
               $ps;
             };
             my $ps = $mydollarzero->("x");
@@ -359,11 +359,11 @@ else {
 # when perl is compiled with -DENV_IS_CASELESS)
 if ($Is_MSWin32 || $Is_NetWare) {
     %ENV = ();
-    $ENV{'Foo'} = 'bar';
-    $ENV{'fOo'} = 'baz';
+    %ENV{'Foo'} = 'bar';
+    %ENV{'fOo'} = 'baz';
     ok (scalar(keys(%ENV)) == 1);
-    ok exists($ENV{'FOo'});
-    ok (delete($ENV{'foO'}) eq 'baz');
+    ok exists(%ENV{'FOo'});
+    ok (delete(%ENV{'foO'}) eq 'baz');
     ok (scalar(keys(%ENV)) == 0);
 }
 else {
@@ -371,7 +371,7 @@ else {
 }
 
 if ($Is_miniperl) {
-    skip ("miniperl can't rely on loading %Errno") for 1..2;
+    skip ("miniperl can't rely on loading \%Errno") for 1..2;
 } else {
    no warnings 'void';
 
@@ -388,17 +388,17 @@ if ($Is_miniperl) {
 }
 
 if ($Is_miniperl) {
-    skip ("miniperl can't rely on loading %Errno");
+    skip ("miniperl can't rely on loading \%Errno");
 } else {
     # Make sure that Errno loading doesn't clobber $!
 
     undef %{Symbol::stash("Errno")};
-    delete $INC{"Errno.pm"};
+    delete %INC{"Errno.pm"};
 
     open(FOO, "<", "nonesuch"); # Generate ENOENT
     no strict 'refs';
     my %errs = %{*{Symbol::fetch_glob("!")}}; # Cause Errno.pm to be loaded at run-time
-    ok ${*{Symbol::fetch_glob("!")}}{ENOENT};
+    ok %{*{Symbol::fetch_glob("!")}}{ENOENT};
 }
 
 ok $^S == 0 && defined $^S;
@@ -461,7 +461,7 @@ if (!$Is_VMS) {
     eval { %ENV = (PATH => __PACKAGE__) };
     ok( $@ eq '', 'Assign a constant to a magic hash');
     $@ and print "# $@";
-    eval { my %h = qw(A B); %ENV = (PATH => (keys %h)[0]) };
+    eval { my %h = qw(A B); %ENV = (PATH => (keys %h)[[0]]) };
     ok( $@ eq '', 'Assign a shared key to a magic hash');
     $@ and print "# $@";
 }

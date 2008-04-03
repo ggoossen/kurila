@@ -33,14 +33,14 @@ sub hostname {
 
     # method 2 - no sockets ==> return DECnet node name
     eval { $host = (gethostbyname('me'))[0] };
-    if ($@) { return $host = $ENV{'SYS$NODE'}; }
+    if ($@) { return $host = %ENV{'SYS$NODE'}; }
 
     # method 3 - has someone else done the job already?  It's common for the
     #    TCP/IP stack to advertise the hostname via a logical name.  (Are
     #    there any other logicals which TCP/IP stacks use for the host name?)
-    $host = $ENV{'ARPANET_HOST_NAME'}  || $ENV{'INTERNET_HOST_NAME'} ||
-            $ENV{'MULTINET_HOST_NAME'} || $ENV{'UCX$INET_HOST'}      ||
-            $ENV{'TCPWARE_DOMAINNAME'} || $ENV{'NEWS_ADDRESS'};
+    $host = %ENV{'ARPANET_HOST_NAME'}  || %ENV{'INTERNET_HOST_NAME'} ||
+            %ENV{'MULTINET_HOST_NAME'} || %ENV{'UCX$INET_HOST'}      ||
+            %ENV{'TCPWARE_DOMAINNAME'} || %ENV{'NEWS_ADDRESS'};
     return $host if $host;
 
     # method 4 - does hostname happen to work?
@@ -65,7 +65,7 @@ sub hostname {
   else {  # Unix
     # is anyone going to make it here?
 
-    local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin'; # Paranoia.
+    local %ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin'; # Paranoia.
 
     # method 2 - syscall is preferred since it avoids tainting problems
     # XXX: is it such a good idea to return hostname untainted?
@@ -86,7 +86,7 @@ sub hostname {
 
     # method 3 - trusty old hostname command
     || eval {
-	local $SIG{CHLD};
+	local %SIG{CHLD};
 	$host = `(hostname) 2>/dev/null`; # bsdish
     }
 

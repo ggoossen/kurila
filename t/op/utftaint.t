@@ -15,7 +15,7 @@ sub tainted ($) {
 require './test.pl';
 plan(tests => 3*10 + 3*6 + 2*12 + 2);
 
-my $arg = $ENV{PATH}; # a tainted value
+my $arg = %ENV{PATH}; # a tainted value
 
 use utf8;
 use constant UTF8 => "\x{1234}";

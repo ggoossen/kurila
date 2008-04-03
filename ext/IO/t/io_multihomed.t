@@ -10,16 +10,16 @@ BEGIN {
 use Config;
 
 BEGIN {
-    my $can_fork = $Config{d_fork} ||
+    my $can_fork = %Config{d_fork} ||
 		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and
-		     $Config{useithreads} and 
-		     $Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
+		     %Config{useithreads} and 
+		     %Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
 		    );
     my $reason;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bSocket\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
 	$reason = 'Socket extension unavailable';
     }
-    elsif ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bIO\b/) {
+    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
 	$reason = 'IO extension unavailable';
     }
     elsif (!$can_fork) {
@@ -36,7 +36,7 @@ $| = 1;
 print "1..8\n";
 
 eval {
-    $SIG{ALRM} = sub { die; };
+    %SIG{ALRM} = sub { die; };
     alarm 60;
 };
 
@@ -66,7 +66,7 @@ sub connect
 {
     my $self = shift;
     if (@_ == 1) {
-	my($port, $addr) = unpack_sockaddr_in($_[0]);
+	my($port, $addr) = unpack_sockaddr_in(@_[0]);
 	$addr = inet_ntoa($addr);
 	#print "connect($self, $port, $addr)\n";
 	if($addr eq "10.250.230.10") {

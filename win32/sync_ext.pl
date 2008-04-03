@@ -46,19 +46,19 @@ sub xx {
   my %f = map {lc($_)=>$_} map {m/^(.*)\.$ext2$/i} @t;
   for (@f) {
     my $lc = lc($_);
-    if (exists $f{$lc} and $f{$lc} ne $_) {
-      print STDERR "$sp$f{$lc}.$ext2 <==> $_.$ext1\n" if $opts{verbose};
-      if ($opts{dummy}) {
-        print STDERR "ren $f{$lc}.$ext2 $_.$ext2\n";
+    if (exists %f{$lc} and %f{$lc} ne $_) {
+      print STDERR "$sp%f{$lc}.$ext2 <==> $_.$ext1\n" if %opts{verbose};
+      if (%opts{dummy}) {
+        print STDERR "ren %f{$lc}.$ext2 $_.$ext2\n";
       }
       else {
-        system "ren $f{$lc}.$ext2 $_.$ext2";
+        system "ren %f{$lc}.$ext2 $_.$ext2";
       }
     }
   }
-  if ($opts{recurse}) {
+  if (%opts{recurse}) {
     for (grep {-d&&!m/^\.\.?$/} @t) {
-      print STDERR "$sp\\$_\n" if $opts{'say-subdir'};
+      print STDERR "$sp\\$_\n" if %opts{'say-subdir'};
       $sp .= ' ';
       chdir $_ or die;
       xx();

@@ -61,9 +61,9 @@ X<subroutine, parameter> X<parameter>
 
 Any arguments passed in show up in the array C<@_>.  Therefore, if
 you called a function with two arguments, those would be stored in
-C<$_[0]> and C<$_[1]>.  The array C<@_> is a local array, but its
+C<@_[0]> and C<@_[1]>.  The array C<@_> is a local array, but its
 elements are aliases for the actual scalar parameters.  In particular,
-if an element C<$_[0]> is updated, the corresponding argument is
+if an element C<@_[0]> is updated, the corresponding argument is
 updated (or an error occurs if it is not updatable).  If an argument
 is an array or hash element which did not exist when the function
 was called, that element is created only when (and if) it is modified
@@ -795,7 +795,7 @@ whatever C<*> value was assigned to it.  Example:
 
 Scalars are already passed by reference, so you can modify
 scalar arguments without using this mechanism by referring explicitly
-to C<$_[0]> etc.  You can modify all the elements of an array by passing
+to C<@_[0]> etc.  You can modify all the elements of an array by passing
 all the elements as scalars, but you have to use the C<*> mechanism (or
 the equivalent reference mechanism) to C<push>, C<pop>, or change the size of
 an array.  It will certainly be faster to pass the typeglob (or reference).
@@ -1114,7 +1114,7 @@ X<&>
 	    &$catch;
 	}
     }
-    sub catch (&) { $_[0] }
+    sub catch (&) { @_[0] }
 
     try {
 	die "phooey";

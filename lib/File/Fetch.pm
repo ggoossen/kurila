@@ -159,7 +159,7 @@ result of $ff->output_file will be used.
         no strict 'refs';
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
-                        $self->{$method} = $_[0] if @_;
+                        $self->{$method} = @_[0] if @_;
                         return $self->{$method};
                     }
     }
@@ -174,12 +174,12 @@ result of $ff->output_file will be used.
     
         if( lc($args->scheme) ne 'file' and not $args->host ) {
             return File::Fetch->_error(loc(
-                "Hostname required when fetching from '%1'",$args->scheme));
+                "Hostname required when fetching from '\%1'",$args->scheme));
         }
         
         for (qw[path file]) {
             unless( $args->?$_ ) {
-                return File::Fetch->_error(loc("No '%1' specified",$_));
+                return File::Fetch->_error(loc("No '\%1' specified",$_));
             }
         }
         
@@ -340,16 +340,16 @@ sub _parse_uri {
         ### file://hostname/...
         ### file://hostname/...
         ### normalize file://localhost with file:///
-        $href->{host} = $parts[0] || '';
+        $href->{host} = @parts[0] || '';
 
         ### index in @parts where the path components begin;
         my $index = 1;  
 
         ### file:////hostname/sharename/blah.txt        
-        if ( HAS_SHARE and not length $parts[0] and not length $parts[1] ) {
+        if ( HAS_SHARE and not length @parts[0] and not length @parts[1] ) {
             
-            $href->{host}   = $parts[2] || '';  # avoid warnings
-            $href->{share}  = $parts[3] || '';  # avoid warnings        
+            $href->{host}   = @parts[2] || '';  # avoid warnings
+            $href->{share}  = @parts[3] || '';  # avoid warnings        
 
             $index          = 4         # index after the share
 
@@ -361,7 +361,7 @@ sub _parse_uri {
             ### this code comes from dmq's patch, but:
             ### XXX if volume is empty, wouldn't that be an error? --kane
             ### if so, our file://localhost test needs to be fixed as wel            
-            $href->{vol}    = $parts[1] || '';
+            $href->{vol}    = @parts[1] || '';
 
             ### correct D| style colume descriptors
             $href->{vol}    =~ s/\A([A-Z])\|\z/$1:/i if ON_WIN;
@@ -370,18 +370,18 @@ sub _parse_uri {
         } 
 
         ### rebuild the path from the leftover parts;
-        $href->{path} = join '/', '', splice( @parts, $index, $#parts );
+        $href->{path} = join '/', '', splice( @parts, $index, (@parts-1) );
 
     } else {
         ### using anything but qw() in hash slices may produce warnings 
         ### in older perls :-(
-        @{$href}{ qw(host path) } = $uri =~ m|([^/]*)(/.*)$|s;
+        %{$href}{[qw(host path) ]} = $uri =~ m|([^/]*)(/.*)$|s;
     }
 
     ### split the path into file + dir ###
     {   my @parts = File::Spec::Unix->splitpath( delete $href->{path} );
-        $href->{path} = $parts[1];
-        $href->{file} = $parts[2];
+        $href->{path} = @parts[1];
+        $href->{file} = @parts[2];
     }
 
     ### host will be empty if the target was 'localhost' and the 
@@ -417,11 +417,11 @@ sub fetch {
     unless( -d $to ) {
         eval { mkpath( $to ) };
 
-        return $self->_error(loc("Could not create path '%1'",$to)) if $@;
+        return $self->_error(loc("Could not create path '\%1'",$to)) if $@;
     }
 
     ### set passive ftp if required ###
-    local $ENV{FTP_PASSIVE} = $FTP_PASSIVE;
+    local %ENV{FTP_PASSIVE} = $FTP_PASSIVE;
 
     ### we dont use catfile on win32 because if we are using a cygwin tool
     ### under cmd.exe they wont understand windows style separators.
@@ -432,7 +432,7 @@ sub fetch {
         my $sub =  '_'.$method.'_fetch';
 
         unless( __PACKAGE__->can($sub) ) {
-            $self->_error(loc("Cannot call method for '%1' -- WEIRD!",
+            $self->_error(loc("Cannot call method for '\%1' -- WEIRD!",
                         $method));
             next;
         }
@@ -456,7 +456,7 @@ sub fetch {
         )){
 
             unless( -e $file && -s _ ) {
-                $self->_error(loc("'%1' said it fetched '%2', ".
+                $self->_error(loc("'\%1' said it fetched '\%2', ".
                      "but it was not created",$method,$file));
 
                 ### mark the failure ###
@@ -529,7 +529,7 @@ sub _lwp_fetch {
             return $to;
 
         } else {
-            return $self->_error(loc("Fetch failed! HTTP response: %1 %2 [%3]",
+            return $self->_error(loc("Fetch failed! HTTP response: \%1 \%2 [\%3]",
                         $res->code, HTTP::Status::status_message($res->code),
                         $res->status_line));
         }
@@ -561,12 +561,12 @@ sub _netftp_fetch {
         my @options = ($self->host);
         push(@options, Timeout => $TIMEOUT) if $TIMEOUT;
         unless( $ftp = Net::FTP->new( @options ) ) {
-            return $self->_error(loc("Ftp creation failed: %1",$@));
+            return $self->_error(loc("Ftp creation failed: \%1",$@));
         }
 
         ### login ###
         unless( $ftp->login( anonymous => $FROM_EMAIL ) ) {
-            return $self->_error(loc("Could not login to '%1'",$self->host));
+            return $self->_error(loc("Could not login to '\%1'",$self->host));
         }
 
         ### set binary mode, just in case ###
@@ -579,7 +579,7 @@ sub _netftp_fetch {
         ### fetch the file ###
         my $target;
         unless( $target = $ftp->get( $remote, $to ) ) {
-            return $self->_error(loc("Could not fetch '%1' from '%2'",
+            return $self->_error(loc("Could not fetch '\%1' from '\%2'",
                         $remote, $self->host));
         }
 
@@ -634,7 +634,7 @@ sub _wget_fetch {
             ### fails.. so unlink it in that case
             1 while unlink $to;
             
-            return $self->_error(loc( "Command failed: %1", $captured || '' ));
+            return $self->_error(loc( "Command failed: \%1", $captured || '' ));
         }
 
         return $to;
@@ -662,10 +662,10 @@ sub _ftp_fetch {
 
         my $fh = FileHandle->new;
 
-        local $SIG{CHLD} = 'IGNORE';
+        local %SIG{CHLD} = 'IGNORE';
 
         unless ($fh->open("|$ftp -n")) {
-            return $self->_error(loc("%1 creation failed: %2", $ftp, $!));
+            return $self->_error(loc("\%1 creation failed: \%2", $ftp, $!));
         }
 
         my @dialog = (
@@ -705,14 +705,14 @@ sub _lynx_fetch {
             $METHOD_FAIL->{'lynx'} = 1;
 
             return $self->_error(loc( 
-                "Can not capture buffers. Can not use '%1' to fetch files",
+                "Can not capture buffers. Can not use '\%1' to fetch files",
                 'lynx' ));
         }            
 
         ### write to the output file ourselves, since lynx ass_u_mes to much
         my $local = FileHandle->new(">$to")
                         or return $self->_error(loc(
-                            "Could not open '%1' for writing: %2",$to,$!));
+                            "Could not open '\%1' for writing: \%2",$to,$!));
 
         ### dump to stdout ###
         my $cmd = [
@@ -735,7 +735,7 @@ sub _lynx_fetch {
                     buffer  => \$captured,
                     verbose => $DEBUG )
         ) {
-            return $self->_error(loc("Command failed: %1", $captured || ''));
+            return $self->_error(loc("Command failed: \%1", $captured || ''));
         }
 
         ### print to local file ###
@@ -796,7 +796,7 @@ sub _ncftp_fetch {
                     buffer  => \$captured,
                     verbose => $DEBUG )
         ) {
-            return $self->_error(loc("Command failed: %1", $captured || ''));
+            return $self->_error(loc("Command failed: \%1", $captured || ''));
         }
 
         return $to;
@@ -846,7 +846,7 @@ sub _curl_fetch {
                     verbose => $DEBUG )
         ) {
 
-            return $self->_error(loc("Command failed: %1", $captured || ''));
+            return $self->_error(loc("Command failed: \%1", $captured || ''));
         }
 
         return $to;
@@ -896,7 +896,7 @@ sub _file_fetch {
     my $remote;
     if (!$share and $self->host) {
         return $self->_error(loc( 
-            "Currently %1 cannot handle hosts in %2 urls",
+            "Currently \%1 cannot handle hosts in \%2 urls",
             'File::Fetch', 'file://'
         ));            
     }
@@ -919,7 +919,7 @@ sub _file_fetch {
 
     ### something went wrong ###
     if( !$rv or $@ ) {
-        return $self->_error(loc("Could not copy '%1' to '%2': %3 %4",
+        return $self->_error(loc("Could not copy '\%1' to '\%2': \%3 \%4",
                              $remote, $to, $!, $@));
     }
 
@@ -957,7 +957,7 @@ sub _rsync_fetch {
                     verbose => $DEBUG )
         ) {
 
-            return $self->_error(loc("Command %1 failed: %2", 
+            return $self->_error(loc("Command \%1 failed: \%2", 
                 "@$cmd" || '', $captured || ''));
         }
 

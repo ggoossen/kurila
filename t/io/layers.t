@@ -16,21 +16,21 @@ BEGIN {
 	exit 0;
     }
     # Makes testing easier.
-    $ENV{PERLIO} = 'stdio' if exists $ENV{PERLIO} && $ENV{PERLIO} eq '';
-    if (exists $ENV{PERLIO} && $ENV{PERLIO} !~ m/^(stdio|perlio|mmap)$/) {
+    %ENV{PERLIO} = 'stdio' if exists %ENV{PERLIO} && %ENV{PERLIO} eq '';
+    if (exists %ENV{PERLIO} && %ENV{PERLIO} !~ m/^(stdio|perlio|mmap)$/) {
 	# We are not prepared for anything else.
-	print "1..0 # PERLIO='$ENV{PERLIO}' unknown\n";
+	print "1..0 # PERLIO='%ENV{PERLIO}' unknown\n";
 	exit 0;
     }
-    $PERLIO = exists $ENV{PERLIO} ? $ENV{PERLIO} : "(undef)";
+    $PERLIO = exists %ENV{PERLIO} ? %ENV{PERLIO} : "(undef)";
 }
 
 use Config;
 
 my $DOSISH    = $^O =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ? 1 : 0;
    $DOSISH    = 1 if !$DOSISH and $^O =~ m/^uwin/;
-my $NONSTDIO  = exists $ENV{PERLIO} && $ENV{PERLIO} ne 'stdio'     ? 1 : 0;
-my $FASTSTDIO = $Config{d_faststdio} && $Config{usefaststdio}      ? 1 : 0;
+my $NONSTDIO  = exists %ENV{PERLIO} && %ENV{PERLIO} ne 'stdio'     ? 1 : 0;
+my $FASTSTDIO = %Config{d_faststdio} && %Config{usefaststdio}      ? 1 : 0;
 my $UTF8_STDIN;
 if (${^UNICODE} ^&^ 1) {
     if (${^UNICODE} ^&^ 64) {
@@ -63,8 +63,8 @@ __EOH__
 SKIP: {
     # FIXME - more of these could be tested without Encode or full perl
     skip("This perl does not have Encode", $NTEST)
-	unless " $Config{extensions} " =~ m/ Encode /;
-    skip("miniperl does not have Encode", $NTEST) if $ENV{PERL_CORE_MINITEST};
+	unless " %Config{extensions} " =~ m/ Encode /;
+    skip("miniperl does not have Encode", $NTEST) if %ENV{PERL_CORE_MINITEST};
 
     sub check {
 	my ($result, $expected, $id) = @_;
@@ -86,9 +86,9 @@ SKIP: {
 	    shift @$result if $result->[0] eq "unix";
 	    # Change expectations.
 	    if ($FASTSTDIO) {
-		$expected->[0] = $ENV{PERLIO};
+		$expected->[0] = %ENV{PERLIO};
 	    } else {
-		$expected->[0] = $ENV{PERLIO} if $expected->[0] eq "stdio";
+		$expected->[0] = %ENV{PERLIO} if $expected->[0] eq "stdio";
 	    }
 	} elsif (!$FASTSTDIO && !$DOSISH) {
 	    splice(@$result, 0, 2, "stdio")
@@ -183,8 +183,8 @@ SKIP: {
 	splice(@results, 1, 2) if $NONSTDIO;
 
 	check([ @results ],
-	      [ "stdio",    undef,        sub { $_[0] +> 0 },
-		"encoding", "iso-8859-1", sub { $_[0] ^&^ PerlIO::F_UTF8() } ],
+	      [ "stdio",    undef,        sub { @_[0] +> 0 },
+		"encoding", "iso-8859-1", sub { @_[0] ^&^ PerlIO::F_UTF8() } ],
 	      ":raw:encoding(latin1)");
     }
 

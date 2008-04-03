@@ -5,7 +5,7 @@ use warnings;
 
 our $VERSION = '2.06';
 
-use threads::shared 0.96;
+use threads::shared v0.96;
 use Scalar::Util v1.10 qw(looks_like_number);
 
 # Predeclarations for internal functions
@@ -83,7 +83,7 @@ sub peek
     my $queue = shift;
     lock(@$queue);
     my $index = @_ ? $validate_index->(shift) : 0;
-    return $$queue[$index];
+    return @$queue[$index];
 }
 
 # Insert items anywhere into a queue
@@ -153,7 +153,7 @@ sub extract
     push(@$queue, @tmp);
 
     # Return single item
-    return $items[0] if ($count == 1);
+    return @items[0] if ($count == 1);
 
     # Return multiple items
     return @items;
@@ -232,11 +232,9 @@ $validate_index = sub {
     my $index = shift;
 
     if (! looks_like_number($index) || (int($index) != $index)) {
-        require Carp;
-        my ($method) = (caller(1))[3];
+        my ($method) = (caller(1))[[3]];
         $method =~ s/Thread::Queue:://;
-        $index = 'undef' if (! defined($index));
-        Carp::croak("Invalid 'index' argument ($index) to '$method' method");
+        die("Invalid 'index' argument ({dump::view($index)}) to '$method' method");
     }
 
     return $index;
@@ -247,7 +245,7 @@ $validate_count = sub {
     my $count = shift;
 
     if ((! looks_like_number($count)) || (int($count) != $count) || ($count +< 1)) {
-        my ($method) = (caller(1))[3];
+        my ($method) = (caller(1))[[3]];
         $method =~ s/Thread::Queue:://;
         $count = 'undef' if (! defined($count));
         die("Invalid 'count' argument ($count) to '$method' method");

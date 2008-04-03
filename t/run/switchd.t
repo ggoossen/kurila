@@ -21,11 +21,11 @@ SKIP: {
 	    or skip( "Can't write temp file $filename: $!" );
 	print $f <<'__SWDTEST__';
 package Bar;
-sub bar { $_[0] * $_[0] }
+sub bar { @_[0] * @_[0] }
 package Foo;
 sub foo {
   my $s;
-  $s += Bar::bar($_) for 1..$_[0];
+  $s += Bar::bar($_) for 1..@_[0];
 }
 package main;
 Foo::foo(3);

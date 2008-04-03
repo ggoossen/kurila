@@ -2,9 +2,9 @@
 
 BEGIN {
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bOpcode\b/
-	&& $Config{'extensions'} !~ m/\bPOSIX\b/
-	&& $Config{'osname'} ne 'VMS')
+    if (%Config{'extensions'} !~ m/\bOpcode\b/
+	&& %Config{'extensions'} !~ m/\bPOSIX\b/
+	&& %Config{'osname'} ne 'VMS')
     {
 	print "1..0\n";
 	exit 0;
@@ -22,7 +22,7 @@ $safe->deny('add');
 
 my $masksize = ceil( Opcode::opcodes / 8 );
 # Attempt to change the opmask from within the safe compartment
-$safe->reval( qq{\$_[1] = qq/\0/ x } . $masksize );
+$safe->reval( qq{\@_[1] = qq/\0/ x } . $masksize );
 
 # Check that it didn't work
 $safe->reval( q{$x + $y} );
@@ -34,7 +34,7 @@ $safe2->deny('add');
 
 open my $fh, ">", 'nasty.pl' or die "Can't write nasty.pl: $!\n";
 print $fh <<EOF;
-\$_[1] = "\0" x $masksize;
+\@_[1] = "\0" x $masksize;
 EOF
 close $fh;
 $safe2->rdo('nasty.pl');

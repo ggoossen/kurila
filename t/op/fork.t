@@ -5,11 +5,11 @@
 BEGIN {
     our %Config;
     require Config; Config->import;
-    unless ($Config{'d_fork'} or $Config{'d_pseudofork'}) {
+    unless (%Config{'d_fork'} or %Config{'d_pseudofork'}) {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }
-    $ENV{PERL5LIB} = "../lib";
+    %ENV{PERL5LIB} = "../lib";
 }
 
 if ($^O eq 'mpeix') {
@@ -101,7 +101,7 @@ if ($cid = fork) {
 else {
     # XXX On Windows the default signal handler kills the
     # XXX whole process, not just the thread (pseudo-process)
-    $SIG{INT} = sub { exit };
+    %SIG{INT} = sub { exit };
     print "ok 1\n";
     sleep 5;
     die;
@@ -229,8 +229,8 @@ use Config;
 $| = 1;
 $\ = "\n";
 fork()
- ? print($Config{osname} eq $^O)
- : print($Config{osname} eq $^O) ;
+ ? print(%Config{osname} eq $^O)
+ : print(%Config{osname} eq $^O) ;
 EXPECT
 1
 1
@@ -238,8 +238,8 @@ EXPECT
 $| = 1;
 $\ = "\n";
 fork()
- ? do { require Config; print($Config::Config{osname} eq $^O); }
- : do { require Config; print($Config::Config{osname} eq $^O); }
+ ? do { require Config; print(%Config::Config{osname} eq $^O); }
+ : do { require Config; print(%Config::Config{osname} eq $^O); }
 EXPECT
 1
 1
@@ -274,21 +274,21 @@ $| = 1;
 $\ = "\n";
 my $getenv;
 if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-    $getenv = qq[$^X -e "print \$ENV\{TST\}"];
+    $getenv = qq[$^X -e "print \%ENV\{TST\}"];
 }
 else {
-    $getenv = qq[$^X -e 'print \$ENV\{TST\}'];
+    $getenv = qq[$^X -e 'print \%ENV\{TST\}'];
 }
-$ENV{TST} = 'foo';
+%ENV{TST} = 'foo';
 if (fork) {
     sleep 1;
     print "parent before: " . `$getenv`;
-    $ENV{TST} = 'bar';
+    %ENV{TST} = 'bar';
     print "parent after: " . `$getenv`;
 }
 else {
     print "child before: " . `$getenv`;
-    $ENV{TST} = 'baz';
+    %ENV{TST} = 'baz';
     print "child after: " . `$getenv`;
 }
 EXPECT

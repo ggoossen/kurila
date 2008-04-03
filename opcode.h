@@ -49,7 +49,6 @@ EXTCONST char* const PL_op_name[] = {
 	"pushre",
 	"rv2gv",
 	"rv2sv",
-	"av2arylen",
 	"rv2cv",
 	"anoncode",
 	"prototype",
@@ -411,7 +410,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"push regexp",
 	"ref-to-glob cast",
 	"scalar dereference",
-	"array length",
 	"subroutine dereference",
 	"anonymous subroutine",
 	"subroutine prototype",
@@ -785,7 +783,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_pushre),
 	MEMBER_TO_FPTR(Perl_pp_rv2gv),
 	MEMBER_TO_FPTR(Perl_pp_rv2sv),
-	MEMBER_TO_FPTR(Perl_pp_av2arylen),
 	MEMBER_TO_FPTR(Perl_pp_rv2cv),
 	MEMBER_TO_FPTR(Perl_pp_anoncode),
 	MEMBER_TO_FPTR(Perl_pp_prototype),
@@ -1156,7 +1153,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushre */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2gv */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2sv */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* av2arylen */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2cv */
 	MEMBER_TO_FPTR(Perl_ck_anoncode),	/* anoncode */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* prototype */
@@ -1521,7 +1517,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000a40,	/* pushre */
 	0x00000244,	/* rv2gv */
 	0x00000244,	/* rv2sv */
-	0x00000214,	/* av2arylen */
 	0x00000240,	/* rv2cv */
 	0x00000c00,	/* anoncode */
 	0x00003604,	/* prototype */

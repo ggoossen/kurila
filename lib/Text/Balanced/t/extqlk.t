@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = qw(../lib);
     }
@@ -23,7 +23,7 @@ print "ok 1\n";
 my $count=2;
 use vars qw( $DEBUG );
 #$DEBUG=1;
-sub debug { print "\t>>>",@_ if $ENV{DEBUG} }
+sub debug { print "\t>>>",@_ if %ENV{DEBUG} }
 sub esc   { my $x = shift||'<undef>'; $x =~ s/\n/\\n/gs; $x }
 
 ######################### End of black magic.
@@ -49,7 +49,7 @@ while (defined($str = ~< *DATA))
 		debug "\t   on: [" . esc($setup_cmd) . "][" . esc($str) . "]\n";
 		my @res;
 		eval qq{\@res = $cmd; };
-		debug "\t  got:\n" . join "", map { "\t\t\t$_: [" . esc($res[$_]) . "]\n"} (0..$#res);
+		debug "\t  got:\n" . join "", map { "\t\t\t$_: [" . esc(@res[$_]) . "]\n"} (0..(@res-1));
 		debug "\t left: [" . esc($str) . "]\n";
 		debug "\t  pos: [" . esc(substr($str,pos($str))) . "...]\n";
 		print "not " if (substr($str,pos($str),1) eq ';')==$neg;
@@ -76,7 +76,7 @@ while (defined($str = ~< *DATA))
 # fails in Text::Balanced 1.95
 $_ = qq(s\{\}\{\});
 my @z = extract_quotelike();
-print "not " if $z[0] eq '';
+print "not " if @z[0] eq '';
 print "ok ", $count++;
 print "\n";
 

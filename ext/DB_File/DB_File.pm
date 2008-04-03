@@ -241,29 +241,29 @@ else
 sub tie_hash_or_array
 {
     my (@arg) = @_ ;
-    my $tieHASH = ( (caller(1))[3] =~ m/TIEHASH/ ) ;
+    my $tieHASH = ( (caller(1))[[3]] =~ m/TIEHASH/ ) ;
 
     use File::Spec;
-    $arg[1] = File::Spec->rel2abs($arg[1]) 
-        if defined $arg[1] ;
+    @arg[1] = File::Spec->rel2abs(@arg[1]) 
+        if defined @arg[1] ;
 
-    $arg[4] = tied %{ $arg[4] } 
-	if @arg +>= 5 && ref $arg[4] && (dump::view($arg[4]) =~ m/=HASH/) && tied %{ $arg[4] } ;
+    @arg[4] = tied %{ @arg[4] } 
+	if @arg +>= 5 && ref @arg[4] && (dump::view(@arg[4]) =~ m/=HASH/) && tied %{ @arg[4] } ;
 
-    $arg[2] = O_CREAT()^|^O_RDWR() if @arg +>=3 && ! defined $arg[2];
-    $arg[3] = 0666               if @arg +>=4 && ! defined $arg[3];
+    @arg[2] = O_CREAT()^|^O_RDWR() if @arg +>=3 && ! defined @arg[2];
+    @arg[3] = 0666               if @arg +>=4 && ! defined @arg[3];
 
     # make recno in Berkeley DB version 2 (or better) work like 
     # recno in version 1.
     if ($db_version +>= 4 and ! $tieHASH) {
-        $arg[2] ^|^= O_CREAT();
+        @arg[2] ^|^= O_CREAT();
     }
 
-    if ($db_version +> 1 and defined $arg[4] and (ref $arg[4]) =~ m/RECNO/ and 
-	$arg[1] and ! -e $arg[1]) {
-	open(FH, ">", "$arg[1]") or return undef ;
+    if ($db_version +> 1 and defined @arg[4] and (ref @arg[4]) =~ m/RECNO/ and 
+	@arg[1] and ! -e @arg[1]) {
+	open(FH, ">", "@arg[1]") or return undef ;
 	close FH ;
-	chmod $arg[3] ? $arg[3] : 0666 , $arg[1] ;
+	chmod @arg[3] ? @arg[3] : 0666 , @arg[1] ;
     }
 
     DoTie_($tieHASH, @arg) ;
@@ -324,6 +324,7 @@ sub SPLICE
 	$offset = 0;
     }
 
+    my $no_length = ! @_;
     my $length = @_ ? shift : 0;
     # Carping about definedness comes _after_ the OFFSET sanity check.
     # This is so we get the same error messages as Perl's splice().
@@ -357,7 +358,7 @@ sub SPLICE
     }
 
     # 'If LENGTH is omitted, removes everything from OFFSET onward.'
-    if (not defined $length) {
+    if ($no_length) {
 	$length = $size - $offset;
     }
 
@@ -540,7 +541,7 @@ sub get_dup
         # save the value or count number of matches
         if ($wantarray) {
 	    if ($flag)
-                { ++ $values{$value} }
+                { ++ %values{$value} }
 	    else
                 { push (@values, $value) }
 	}

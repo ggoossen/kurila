@@ -45,88 +45,88 @@ print "not " unless $x == $q && $x +> $f;
 print "ok 1\n";
 
 
-$x = sprintf("%lld", 12345678901);
+$x = sprintf("\%lld", 12345678901);
 print "not " unless $x eq $q && $x +> $f;
 print "ok 2\n";
 
 
-$x = sprintf("%lld", $q);
+$x = sprintf("\%lld", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 3\n";
 
-$x = sprintf("%Ld", $q);
+$x = sprintf("\%Ld", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 4\n";
 
-$x = sprintf("%qd", $q);
+$x = sprintf("\%qd", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 5\n";
 
 
-$x = sprintf("%llx", $q);
+$x = sprintf("\%llx", $q);
 print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) +> $f;
 print "ok 6\n";
 
-$x = sprintf("%Lx", $q);
+$x = sprintf("\%Lx", $q);
 print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) +> $f;
 print "ok 7\n";
 
-$x = sprintf("%qx", $q);
+$x = sprintf("\%qx", $q);
 print "not " unless hex($x) == 0x2dfdc1c35 && hex($x) +> $f;
 print "ok 8\n";
 
 
-$x = sprintf("%llo", $q);
+$x = sprintf("\%llo", $q);
 print "not " unless oct("0$x") == 0133767016065 && oct($x) +> $f;
 print "ok 9\n";
 
-$x = sprintf("%Lo", $q);
+$x = sprintf("\%Lo", $q);
 print "not " unless oct("0$x") == 0133767016065 && oct($x) +> $f;
 print "ok 10\n";
 
-$x = sprintf("%qo", $q);
+$x = sprintf("\%qo", $q);
 print "not " unless oct("0$x") == 0133767016065 && oct($x) +> $f;
 print "ok 11\n";
 
 
-$x = sprintf("%llb", $q);
+$x = sprintf("\%llb", $q);
 print "not " unless oct("0b$x") == 0b1011011111110111000001110000110101 &&
                     oct("0b$x") +> $f;
 print "ok 12\n";
 
-$x = sprintf("%Lb", $q);
+$x = sprintf("\%Lb", $q);
 print "not " unless oct("0b$x") == 0b1011011111110111000001110000110101 &&
                                    oct("0b$x") +> $f;
 print "ok 13\n";
 
-$x = sprintf("%qb", $q);
+$x = sprintf("\%qb", $q);
 print "not " unless oct("0b$x") == 0b1011011111110111000001110000110101 &&
                     oct("0b$x") +> $f;
 print "ok 14\n";
 
 
-$x = sprintf("%llu", $q);
+$x = sprintf("\%llu", $q);
 print "not " unless $x eq $q && $x +> $f;
 print "ok 15\n";
 
-$x = sprintf("%Lu", $q);
+$x = sprintf("\%Lu", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 16\n";
 
-$x = sprintf("%qu", $q);
+$x = sprintf("\%qu", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 17\n";
 
 
-$x = sprintf("%D", $q);
+$x = sprintf("\%D", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 18\n";
 
-$x = sprintf("%U", $q);
+$x = sprintf("\%U", $q);
 print "not " unless $x == $q && $x eq $q && $x +> $f;
 print "ok 19\n";
 
-$x = sprintf("%O", $q);
+$x = sprintf("\%O", $q);
 print "not " unless oct($x) == $q && oct($x) +> $f;
 print "ok 20\n";
 
@@ -264,7 +264,7 @@ print "ok 43\n";
 print "not " unless 1<<63 == 0x8000000000000000;
 print "ok 44\n";
 
-print "not " unless (sprintf "%#Vx", 1<<63) eq '0x8000000000000000';
+print "not " unless (sprintf "\%#Vx", 1<<63) eq '0x8000000000000000';
 print "ok 45\n";
 
 print "not " unless (0x8000000000000000 ^|^ 1) == 0x8000000000000001;
@@ -280,19 +280,19 @@ print "ok 48\n";
 
 
 print "not "
-    unless (sprintf "%b", ^~^0)   eq
+    unless (sprintf "\%b", ^~^0)   eq
            '1111111111111111111111111111111111111111111111111111111111111111';
 print "ok 49\n";
 
 print "not "
-    unless (sprintf "%64b", ^~^0) eq
+    unless (sprintf "\%64b", ^~^0) eq
            '1111111111111111111111111111111111111111111111111111111111111111';
 print "ok 50\n";
 
-print "not " unless (sprintf "%d", ^~^0>>1) eq '9223372036854775807';
+print "not " unless (sprintf "\%d", ^~^0>>1) eq '9223372036854775807';
 print "ok 51\n";
 
-print "not " unless (sprintf "%u", ^~^0)    eq '18446744073709551615';
+print "not " unless (sprintf "\%u", ^~^0)    eq '18446744073709551615';
 print "ok 52\n";
 
 # If the 53..55 fail you have problems in the parser's string->int conversion,
@@ -355,28 +355,28 @@ $q = 0xFFFFFFFFFFFFFFFF % 0x5555555555555555;
 if ($q == 0) {
   print "ok 60\n";
 } else {
-  print "not ok 60 # 0xFFFFFFFFFFFFFFFF % 0x5555555555555555 => $q\n";
+  print "not ok 60 # 0xFFFFFFFFFFFFFFFF \% 0x5555555555555555 => $q\n";
 }
 
 $q = 0xFFFFFFFFFFFFFFFF % 0xFFFFFFFFFFFFFFF0;
 if ($q == 0xF) {
   print "ok 61\n";
 } else {
-  print "not ok 61 # 0xFFFFFFFFFFFFFFFF % 0xFFFFFFFFFFFFFFF0 => $q\n";
+  print "not ok 61 # 0xFFFFFFFFFFFFFFFF \% 0xFFFFFFFFFFFFFFF0 => $q\n";
 }
 
 $q = 0x8000000000000000 % 9223372036854775807;
 if ($q == 1) {
   print "ok 62\n";
 } else {
-  print "not ok 62 # 0x8000000000000000 % 9223372036854775807 => $q\n";
+  print "not ok 62 # 0x8000000000000000 \% 9223372036854775807 => $q\n";
 }
 
 $q = 0x8000000000000000 % -9223372036854775807;
 if ($q == -9223372036854775806) {
   print "ok 63\n";
 } else {
-  print "not ok 63 # 0x8000000000000000 % -9223372036854775807 => $q\n";
+  print "not ok 63 # 0x8000000000000000 \% -9223372036854775807 => $q\n";
 }
 
 {
@@ -385,7 +385,7 @@ if ($q == -9223372036854775806) {
   if ($q == 0x123456789abcdef0 and $q != 0x123456789abcdef1) {
     print "ok 64\n";
   } else {
-    printf "not ok 64 # hex \"0x123456789abcdef0\" = $q (%X)\n", $q;
+    printf "not ok 64 # hex \"0x123456789abcdef0\" = $q (\%X)\n", $q;
     print "# Should not be floating point\n" if $q =~ tr/e.//;
   }
 
@@ -393,7 +393,7 @@ if ($q == -9223372036854775806) {
   if ($q == 0x123456789abcdef0 and $q != 0x123456789abcdef1) {
     print "ok 65\n";
   } else {
-    printf "not ok 65 # oct \"0x123456789abcdef0\" = $q (%X)\n", $q;
+    printf "not ok 65 # oct \"0x123456789abcdef0\" = $q (\%X)\n", $q;
     print "# Should not be floating point\n" if $q =~ tr/e.//;
   }
 
@@ -401,7 +401,7 @@ if ($q == -9223372036854775806) {
   if ($q == 0765432176543217654321 and $q != 0765432176543217654322) {
     print "ok 66\n";
   } else {
-    printf "not ok 66 # oct \"765432176543217654321\" = $q (%o)\n", $q;
+    printf "not ok 66 # oct \"765432176543217654321\" = $q (\%o)\n", $q;
     print "# Should not be floating point\n" if $q =~ tr/e.//;
   }
 
@@ -409,7 +409,7 @@ if ($q == -9223372036854775806) {
   if ($q == 0x5555555555555555 and $q != 0x5555555555555556) {
     print "ok 67\n";
   } else {
-    printf "not ok 67 # oct \"0b0101010101010101010101010101010101010101010101010101010101010101\" = $q (%b)\n", $q;
+    printf "not ok 67 # oct \"0b0101010101010101010101010101010101010101010101010101010101010101\" = $q (\%b)\n", $q;
     print "# Should not be floating point\n" if $q =~ tr/e.//;
   }
 }

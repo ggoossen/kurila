@@ -22,19 +22,19 @@ sub new {
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub _handle_element_start {
-  print {$_[0]{'output_fh'}} "\n"  unless $_[1] =~ m/^[A-Z]$/s;
+  print {@_[0]{'output_fh'}} "\n"  unless @_[1] =~ m/^[A-Z]$/s;
   return;
 }
 
 sub _handle_text {
-    $_[1] =~ tr/\x{AD}//d;
-    $_[1] =~ tr/\x{A0}/ /;
-    print {$_[0]{'output_fh'}} $_[1];
+    @_[1] =~ tr/\x{AD}//d;
+    @_[1] =~ tr/\x{A0}/ /;
+    print {@_[0]{'output_fh'}} @_[1];
     return;
 }
 
 sub _handle_element_end {
-  print {$_[0]{'output_fh'}} "\n"  unless $_[1] =~ m/^[A-Z]$/s;
+  print {@_[0]{'output_fh'}} "\n"  unless @_[1] =~ m/^[A-Z]$/s;
   return;
 }
 

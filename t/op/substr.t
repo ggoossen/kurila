@@ -9,14 +9,14 @@ our ($w, $FATAL_MSG, $x);
 
 $a = 'abcdefxyz';
 ${^WARN_HOOK} = sub {
-     if ($_[0]->{description} =~ m/^substr outside of string/) {
+     if (@_[0]->{description} =~ m/^substr outside of string/) {
           $w++;
-     } elsif ($_[0]->{description} =~ m/^Attempt to use reference as lvalue in substr/) {
+     } elsif (@_[0]->{description} =~ m/^Attempt to use reference as lvalue in substr/) {
           $w += 2;
-     } elsif ($_[0]->{description} =~ m/^Use of uninitialized value/) {
+     } elsif (@_[0]->{description} =~ m/^Use of uninitialized value/) {
           $w += 3;
      } else {
-          warn $_[0]->{description};
+          warn @_[0]->{description};
      }
 };
 
@@ -307,10 +307,10 @@ is($a, 'xxxxefgh');
 # replacement should work on magical values
 require Tie::Scalar;
 my %data;
-tie $data{'a'}, 'Tie::StdScalar';  # makes $data{'a'} magical
-$data{a} = "firstlast";
-is(substr($data{'a'}, 0, 5, ""), "first");
-is($data{'a'}, "last");
+tie %data{'a'}, 'Tie::StdScalar';  # makes $data{'a'} magical
+%data{a} = "firstlast";
+is(substr(%data{'a'}, 0, 5, ""), "first");
+is(%data{'a'}, "last");
 
 # And tests for already-UTF8 one
 
@@ -457,7 +457,7 @@ is($x, "\x{100}\x{200}ab");
 { 
     my $s = "ab";
     my @r; 
-    $r[$_] = \ substr $s, $_, 1 for (0, 1);
+    @r[$_] = \ substr $s, $_, 1 for (0, 1);
     is(join("", map { $$_ } @r), "ab");
 }
 

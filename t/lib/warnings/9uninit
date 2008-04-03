@@ -51,14 +51,14 @@ Use of uninitialized value $m1 in addition (+) at - line 8.
 use warnings 'uninitialized';
 my ($m1, @ma, $v);
 
-$v = $ma[5] + 45;
-$v = 56 + $ma[6];
-$v = $ma[7] + $m1;
-$v = $ma[8] + $ma[9];
-$v = $ma[-1] + $ma[-2];
+$v = @ma[5] + 45;
+$v = 56 + @ma[6];
+$v = @ma[7] + $m1;
+$v = @ma[8] + @ma[9];
+$v = @ma[-1] + @ma[-2];
 EXPECT
-Use of uninitialized value $ma[5] in addition (+) at - line 4.
-Use of uninitialized value $ma[6] in addition (+) at - line 5.
+Use of uninitialized value @ma[5] in addition (+) at - line 4.
+Use of uninitialized value @ma[6] in addition (+) at - line 5.
 Use of uninitialized value $m1 in addition (+) at - line 6.
 Use of uninitialized value in addition (+) at - line 6.
 Use of uninitialized value in addition (+) at - line 7.
@@ -71,43 +71,43 @@ my ($v);
 my @mau = (undef) x 258;
 my %mhu = ('foo', undef, 'bar', undef);
 
-$v = $mau[5] + 23;
-$v = $mau[-5] + 45;
-$v = 56 + $mau[6];
-$v = 78 + $mau[-6];
-$v = $mau[7] + $mau[8];
-$v = $mau[256] + $mau[257];
-$v = $mau[-1] + $mau[-2];
-$v = $mhu{foo} + $mhu{bar};
+$v = @mau[5] + 23;
+$v = @mau[-5] + 45;
+$v = 56 + @mau[6];
+$v = 78 + @mau[-6];
+$v = @mau[7] + @mau[8];
+$v = @mau[256] + @mau[257];
+$v = @mau[-1] + @mau[-2];
+$v = %mhu{foo} + %mhu{bar};
 EXPECT
-Use of uninitialized value $mau[5] in addition (+) at - line 6.
-Use of uninitialized value $mau[-5] in addition (+) at - line 7.
-Use of uninitialized value $mau[6] in addition (+) at - line 8.
-Use of uninitialized value $mau[-6] in addition (+) at - line 9.
-Use of uninitialized value $mau[8] in addition (+) at - line 10.
-Use of uninitialized value $mau[7] in addition (+) at - line 10.
-Use of uninitialized value $mau[257] in addition (+) at - line 11.
-Use of uninitialized value $mau[256] in addition (+) at - line 11.
-Use of uninitialized value $mau[-2] in addition (+) at - line 12.
-Use of uninitialized value $mau[-1] in addition (+) at - line 12.
-Use of uninitialized value $mhu{"bar"} in addition (+) at - line 13.
-Use of uninitialized value $mhu{"foo"} in addition (+) at - line 13.
+Use of uninitialized value @mau[5] in addition (+) at - line 6.
+Use of uninitialized value @mau[-5] in addition (+) at - line 7.
+Use of uninitialized value @mau[6] in addition (+) at - line 8.
+Use of uninitialized value @mau[-6] in addition (+) at - line 9.
+Use of uninitialized value @mau[8] in addition (+) at - line 10.
+Use of uninitialized value @mau[7] in addition (+) at - line 10.
+Use of uninitialized value @mau[257] in addition (+) at - line 11.
+Use of uninitialized value @mau[256] in addition (+) at - line 11.
+Use of uninitialized value @mau[-2] in addition (+) at - line 12.
+Use of uninitialized value @mau[-1] in addition (+) at - line 12.
+Use of uninitialized value %mhu{"bar"} in addition (+) at - line 13.
+Use of uninitialized value %mhu{"foo"} in addition (+) at - line 13.
 ########
 use warnings 'uninitialized';
 my ($v);
 our (@ga);
 
-$v = $ga[8] + 21;
-$v = $ga[-8] + 46;
-$v = 57 + $ga[9];
-$v = 58 + $ga[-9];
-$v = $ga[10] + $ga[11];
-$v = $ga[-10] + $ga[-11];
+$v = @ga[8] + 21;
+$v = @ga[-8] + 46;
+$v = 57 + @ga[9];
+$v = 58 + @ga[-9];
+$v = @ga[10] + @ga[11];
+$v = @ga[-10] + @ga[-11];
 EXPECT
-Use of uninitialized value $ga[8] in addition (+) at - line 5.
-Use of uninitialized value $ga[-8] in addition (+) at - line 6.
-Use of uninitialized value $ga[9] in addition (+) at - line 7.
-Use of uninitialized value $ga[-9] in addition (+) at - line 8.
+Use of uninitialized value @ga[8] in addition (+) at - line 5.
+Use of uninitialized value @ga[-8] in addition (+) at - line 6.
+Use of uninitialized value @ga[9] in addition (+) at - line 7.
+Use of uninitialized value @ga[-9] in addition (+) at - line 8.
 Use of uninitialized value in addition (+) at - line 9.
 Use of uninitialized value in addition (+) at - line 9.
 Use of uninitialized value in addition (+) at - line 10.
@@ -118,27 +118,27 @@ my ($v);
 our @gau = (undef) x 258;
 our %ghu = ('foo', undef, 'bar', undef);
 
-$v = $gau[8] + 46;
-$v = $gau[-8] + 47;
-$v = 57 + $gau[9];
-$v = 57 + $gau[-9];
-$v = $gau[10] + $gau[11];
-$v = $gau[256] + $gau[257];
-$v = $gau[-1] + $gau[-2];
-$v = $ghu{foo} + $ghu{bar};
+$v = @gau[8] + 46;
+$v = @gau[-8] + 47;
+$v = 57 + @gau[9];
+$v = 57 + @gau[-9];
+$v = @gau[10] + @gau[11];
+$v = @gau[256] + @gau[257];
+$v = @gau[-1] + @gau[-2];
+$v = %ghu{foo} + %ghu{bar};
 EXPECT
-Use of uninitialized value $gau[8] in addition (+) at - line 6.
-Use of uninitialized value $gau[-8] in addition (+) at - line 7.
-Use of uninitialized value $gau[9] in addition (+) at - line 8.
-Use of uninitialized value $gau[-9] in addition (+) at - line 9.
-Use of uninitialized value $gau[11] in addition (+) at - line 10.
-Use of uninitialized value $gau[10] in addition (+) at - line 10.
-Use of uninitialized value $gau[257] in addition (+) at - line 11.
-Use of uninitialized value $gau[256] in addition (+) at - line 11.
-Use of uninitialized value $gau[-2] in addition (+) at - line 12.
-Use of uninitialized value $gau[-1] in addition (+) at - line 12.
-Use of uninitialized value $ghu{"bar"} in addition (+) at - line 13.
-Use of uninitialized value $ghu{"foo"} in addition (+) at - line 13.
+Use of uninitialized value @gau[8] in addition (+) at - line 6.
+Use of uninitialized value @gau[-8] in addition (+) at - line 7.
+Use of uninitialized value @gau[9] in addition (+) at - line 8.
+Use of uninitialized value @gau[-9] in addition (+) at - line 9.
+Use of uninitialized value @gau[11] in addition (+) at - line 10.
+Use of uninitialized value @gau[10] in addition (+) at - line 10.
+Use of uninitialized value @gau[257] in addition (+) at - line 11.
+Use of uninitialized value @gau[256] in addition (+) at - line 11.
+Use of uninitialized value @gau[-2] in addition (+) at - line 12.
+Use of uninitialized value @gau[-1] in addition (+) at - line 12.
+Use of uninitialized value %ghu{"bar"} in addition (+) at - line 13.
+Use of uninitialized value %ghu{"foo"} in addition (+) at - line 13.
 ########
 use warnings 'uninitialized';
 my ($v);
@@ -153,43 +153,43 @@ my $i3 = 2000;
 my $k1 = 'foo';
 my $k2 = 'bar';
 my $k3 = 'baz';
-$v = $mau[$i1] + $mau[$i2];
-$v = $gau[$i1] + $gau[$i2];
-$v = $gau[$i1] + $gau[$i3];
-$v = $mhu{$k1} + $mhu{$k2};
-$v = $ghu{$k1} + $ghu{$k2};
-$v = $ghu{$k1} + $ghu{$k3};
+$v = @mau[$i1] + @mau[$i2];
+$v = @gau[$i1] + @gau[$i2];
+$v = @gau[$i1] + @gau[$i3];
+$v = %mhu{$k1} + %mhu{$k2};
+$v = %ghu{$k1} + %ghu{$k2};
+$v = %ghu{$k1} + %ghu{$k3};
 EXPECT
-Use of uninitialized value $mau[20] in addition (+) at - line 14.
-Use of uninitialized value $mau[10] in addition (+) at - line 14.
-Use of uninitialized value $gau[20] in addition (+) at - line 15.
-Use of uninitialized value $gau[10] in addition (+) at - line 15.
+Use of uninitialized value @mau[20] in addition (+) at - line 14.
+Use of uninitialized value @mau[10] in addition (+) at - line 14.
+Use of uninitialized value @gau[20] in addition (+) at - line 15.
+Use of uninitialized value @gau[10] in addition (+) at - line 15.
 Use of uninitialized value in addition (+) at - line 16.
-Use of uninitialized value $gau[10] in addition (+) at - line 16.
-Use of uninitialized value $mhu{"bar"} in addition (+) at - line 17.
-Use of uninitialized value $mhu{"foo"} in addition (+) at - line 17.
-Use of uninitialized value $ghu{"bar"} in addition (+) at - line 18.
-Use of uninitialized value $ghu{"foo"} in addition (+) at - line 18.
+Use of uninitialized value @gau[10] in addition (+) at - line 16.
+Use of uninitialized value %mhu{"bar"} in addition (+) at - line 17.
+Use of uninitialized value %mhu{"foo"} in addition (+) at - line 17.
+Use of uninitialized value %ghu{"bar"} in addition (+) at - line 18.
+Use of uninitialized value %ghu{"foo"} in addition (+) at - line 18.
 Use of uninitialized value in addition (+) at - line 19.
-Use of uninitialized value $ghu{"foo"} in addition (+) at - line 19.
+Use of uninitialized value %ghu{"foo"} in addition (+) at - line 19.
 ########
 use warnings 'uninitialized';
 my ($m1, $m2, @ma, %mh, $v);
 our ($g1, $g2, @ga, %gh);
 
-$v = $ma[$m1];
-$v = $ma[$g1];
-$v = $ga[$m2];
-$v = $ga[$g2];
+$v = @ma[$m1];
+$v = @ma[$g1];
+$v = @ga[$m2];
+$v = @ga[$g2];
 
-$v = $mh{$m1};
-$v = $mh{$g1};
-$v = $gh{$m2};
-$v = $gh{$g2};
+$v = %mh{$m1};
+$v = %mh{$g1};
+$v = %gh{$m2};
+$v = %gh{$g2};
 
 $v = $m1+($m2-$g1);
-$v = $ma[$ga[3]];
-$v = $ga[$ma[4]];
+$v = @ma[@ga[3]];
+$v = @ga[@ma[4]];
 EXPECT
 Use of uninitialized value $m1 in array element at - line 5.
 Use of uninitialized value $g1 in array element at - line 6.
@@ -202,27 +202,27 @@ Use of uninitialized value $g2 in hash element at - line 13.
 Use of uninitialized value $g1 in subtraction (-) at - line 15.
 Use of uninitialized value $m2 in subtraction (-) at - line 15.
 Use of uninitialized value $m1 in addition (+) at - line 15.
-Use of uninitialized value $ga[3] in array element at - line 16.
-Use of uninitialized value $ma[4] in array element at - line 17.
+Use of uninitialized value @ga[3] in array element at - line 16.
+Use of uninitialized value @ma[4] in array element at - line 17.
 ########
 use warnings 'uninitialized';
 my (@ma, %mh, $v);
 our (@ga, %gh);
 
-$v = sin $ga[1000];
-$v = sin $ma[1000];
-$v = sin $gh{foo};
-$v = sin $mh{bar};
+$v = sin @ga[1000];
+$v = sin @ma[1000];
+$v = sin %gh{foo};
+$v = sin %mh{bar};
 
-$v = sin $ga[$$];
-$v = sin $ma[$$];
-$v = sin $gh{$$};
-$v = sin $mh{$$};
+$v = sin @ga[$$];
+$v = sin @ma[$$];
+$v = sin %gh{$$};
+$v = sin %mh{$$};
 EXPECT
-Use of uninitialized value $ga[1000] in sin at - line 5.
-Use of uninitialized value $ma[1000] in sin at - line 6.
-Use of uninitialized value $gh{"foo"} in sin at - line 7.
-Use of uninitialized value $mh{"bar"} in sin at - line 8.
+Use of uninitialized value @ga[1000] in sin at - line 5.
+Use of uninitialized value @ma[1000] in sin at - line 6.
+Use of uninitialized value %gh{"foo"} in sin at - line 7.
+Use of uninitialized value %mh{"bar"} in sin at - line 8.
 Use of uninitialized value within @ga in sin at - line 10.
 Use of uninitialized value within @ma in sin at - line 11.
 Use of uninitialized value within %gh in sin at - line 12.
@@ -240,32 +240,32 @@ my $key2 = 'bkey';
 my $index1 = 33;
 my $index2 = 55;
 
-$v = sin $mat[0];
-$v = $mat[0] + $mat[1];
-$v = sin $mat[1000];
-$v = $mat[1000] + $mat[1001];
+$v = sin @mat[0];
+$v = @mat[0] + @mat[1];
+$v = sin @mat[1000];
+$v = @mat[1000] + @mat[1001];
 
-$v = sin $mat[$index1];
-$v = $mat[$index1] + $mat[$index2];
+$v = sin @mat[$index1];
+$v = @mat[$index1] + @mat[$index2];
 
-$v = sin $mht{foo};
-$v = $mht{foo} + $mht{bar};
+$v = sin %mht{foo};
+$v = %mht{foo} + %mht{bar};
 
-$v = sin $mht{$key1};
-$v = $mht{$key1} + $mht{$key2};
+$v = sin %mht{$key1};
+$v = %mht{$key1} + %mht{$key2};
 
 $v = $1+1;
 EXPECT
-Use of uninitialized value $mat[0] in sin at - line 13.
+Use of uninitialized value @mat[0] in sin at - line 13.
 Use of uninitialized value in addition (+) at - line 14.
 Use of uninitialized value in addition (+) at - line 14.
-Use of uninitialized value $mat[1000] in sin at - line 15.
+Use of uninitialized value @mat[1000] in sin at - line 15.
 Use of uninitialized value in addition (+) at - line 16.
 Use of uninitialized value in addition (+) at - line 16.
 Use of uninitialized value within @mat in sin at - line 18.
 Use of uninitialized value in addition (+) at - line 19.
 Use of uninitialized value in addition (+) at - line 19.
-Use of uninitialized value $mht{"foo"} in sin at - line 21.
+Use of uninitialized value %mht{"foo"} in sin at - line 21.
 Use of uninitialized value in addition (+) at - line 22.
 Use of uninitialized value in addition (+) at - line 22.
 Use of uninitialized value within %mht in sin at - line 24.
@@ -277,18 +277,18 @@ use warnings 'uninitialized';
 my ($m1);
 our ($g1, @ga);
 
-print $ga[1000];
-print STDERR $ga[1000];
-print STDERR $m1, $g1, $ga[1],$m2;
-print STDERR "", $ga[1],"";
+print @ga[1000];
+print STDERR @ga[1000];
+print STDERR $m1, $g1, @ga[1],$m2;
+print STDERR "", @ga[1],"";
 EXPECT
-Use of uninitialized value $ga[1000] in print at - line 5.
-Use of uninitialized value $ga[1000] in print at - line 6.
+Use of uninitialized value @ga[1000] in print at - line 5.
+Use of uninitialized value @ga[1000] in print at - line 6.
 Use of uninitialized value $m1 in print at - line 7.
 Use of uninitialized value $g1 in print at - line 7.
 Use of uninitialized value in print at - line 7.
 Use of uninitialized value $m2 in print at - line 7.
-Use of uninitialized value $ga[1] in print at - line 8.
+Use of uninitialized value @ga[1] in print at - line 8.
 ########
 use warnings 'uninitialized';
 my ($m1);
@@ -361,10 +361,10 @@ use warnings 'uninitialized';
 my ($m1, @ma, %mh);
 our ($g1);
 
-delete $ma[$m1];
-delete @ma[$m1, $g1];
-delete $mh{$m1};
-delete @mh{$m1, $g1};
+delete @ma[$m1];
+delete @ma[[$m1, $g1]];
+delete %mh{$m1};
+delete %mh{[$m1, $g1]};
 EXPECT
 Use of uninitialized value $m1 in delete at - line 5.
 Use of uninitialized value $m1 in delete at - line 6.
@@ -377,9 +377,9 @@ use warnings 'uninitialized';
 my ($m1, @ma, %mh);
 our ($g1);
 
-my @a = @ma[$m1, $g1];
-@a = (4,5)[$m1, $g1];
-@a = @mh{$m1, $g1};
+my @a = @ma[[$m1, $g1]];
+@a = (4,5)[[$m1, $g1]];
+@a = %mh{[$m1, $g1]};
 EXPECT
 Use of uninitialized value $m1 in array slice at - line 5.
 Use of uninitialized value $g1 in array slice at - line 5.
@@ -392,10 +392,10 @@ use warnings 'uninitialized';
 my ($m1, @ma, %mh, $v);
 our ($g1, @ga, %gh);
 
-$v = exists $ma[$m1];
-$v = exists $ga[$g1];
-$v = exists $mh{$m1};
-$v = exists $gh{$g1};
+$v = exists @ma[$m1];
+$v = exists @ga[$g1];
+$v = exists %mh{$m1};
+$v = exists %gh{$g1};
 EXPECT
 Use of uninitialized value $m1 in exists at - line 5.
 Use of uninitialized value $g1 in exists at - line 6.
@@ -918,33 +918,33 @@ our @foo1=(1,undef); chomp @foo1;
 my  @foo2=(1,undef); chomp @foo2;
 our @foo3=(1,undef); chop  @foo3;
 my  @foo4=(1,undef); chop  @foo4;
-our @foo5=(1,undef); $v = sprintf "%s%s",@foo5;
-my  @foo6=(1,undef); $v = sprintf "%s%s",@foo6;
-our %foo7=('foo'=>'bar','baz'=>undef); $v = sprintf "%s%s",%foo7;
-my  %foo8=('foo'=>'bar','baz'=>undef); $v = sprintf "%s%s",%foo8;
-our @foo9 =(1,undef); $v = sprintf "%s%s%s%s",$m1,@foo9, $ma[2];
-my  @foo10=(1,undef); $v = sprintf "%s%s%s%s",$m2,@foo10,$ma[2];
+our @foo5=(1,undef); $v = sprintf '%s%s',@foo5;
+my  @foo6=(1,undef); $v = sprintf '%s%s',@foo6;
+our %foo7=('foo'=>'bar','baz'=>undef); $v = sprintf '%s%s',%foo7;
+my  %foo8=('foo'=>'bar','baz'=>undef); $v = sprintf '%s%s',%foo8;
+our @foo9 =(1,undef); $v = sprintf '%s%s%s%s',$m1,@foo9, @ma[2];
+my  @foo10=(1,undef); $v = sprintf '%s%s%s%s',$m2,@foo10,@ma[2];
 our %foo11=('foo'=>'bar','baz'=>undef); $v = join '', %foo11;
 my  %foo12=('foo'=>'bar','baz'=>undef); $v = join '', %foo12;
 our %foo13=(1..2000,'foo'=>'bar','baz'=>undef); $v = join '', %foo13;
 my  %foo14=(1..2000,'foo'=>'bar','baz'=>undef); $v = join '', %foo14;
 EXPECT
-Use of uninitialized value $foo1[1] in chomp at - line 4.
-Use of uninitialized value $foo2[1] in chomp at - line 5.
-Use of uninitialized value $foo3[1] in chop at - line 6.
-Use of uninitialized value $foo4[1] in chop at - line 7.
-Use of uninitialized value $foo5[1] in sprintf at - line 8.
-Use of uninitialized value $foo6[1] in sprintf at - line 9.
-Use of uninitialized value $foo7{"baz"} in sprintf at - line 10.
-Use of uninitialized value $foo8{"baz"} in sprintf at - line 11.
+Use of uninitialized value @foo1[1] in chomp at - line 4.
+Use of uninitialized value @foo2[1] in chomp at - line 5.
+Use of uninitialized value @foo3[1] in chop at - line 6.
+Use of uninitialized value @foo4[1] in chop at - line 7.
+Use of uninitialized value @foo5[1] in sprintf at - line 8.
+Use of uninitialized value @foo6[1] in sprintf at - line 9.
+Use of uninitialized value %foo7{"baz"} in sprintf at - line 10.
+Use of uninitialized value %foo8{"baz"} in sprintf at - line 11.
 Use of uninitialized value $m1 in sprintf at - line 12.
-Use of uninitialized value $foo9[1] in sprintf at - line 12.
+Use of uninitialized value @foo9[1] in sprintf at - line 12.
 Use of uninitialized value in sprintf at - line 12.
 Use of uninitialized value $m2 in sprintf at - line 13.
-Use of uninitialized value $foo10[1] in sprintf at - line 13.
+Use of uninitialized value @foo10[1] in sprintf at - line 13.
 Use of uninitialized value in sprintf at - line 13.
-Use of uninitialized value $foo11{"baz"} in join or string at - line 14.
-Use of uninitialized value $foo12{"baz"} in join or string at - line 15.
+Use of uninitialized value %foo11{"baz"} in join or string at - line 14.
+Use of uninitialized value %foo12{"baz"} in join or string at - line 15.
 Use of uninitialized value within %foo13 in join or string at - line 16.
 Use of uninitialized value within %foo14 in join or string at - line 17.
 ########
@@ -968,7 +968,7 @@ my ($v);
 my %h = ("\0011\002\r\n\t\f\"\\abcdefghijklmnopqrstuvwxyz", undef);
 $v = join '', %h;
 EXPECT
-Use of uninitialized value $h{"\x[1]1\x[2]\r\n\t\f\"\\abcdefghi"...} in join or string at - line 6.
+Use of uninitialized value %h{"\x[1]1\x[2]\r\n\t\f\"\\abcdefghi"...} in join or string at - line 6.
 ########
 use warnings 'uninitialized';
 my ($m1, $v);
@@ -1050,11 +1050,11 @@ my ($m1);
 our ($g1, @ga);
 
 printf $m1;
-printf STDERR "%d%d%d%d\n", $m1, $m2, $g1, $g2;
-printf $ga[1000];
-printf STDERR "FOO1:%s\n", $ga[1000];
-printf STDERR "FOO2:%s%s%s%s\n", $m1, $g1, $ga[1],$m2;
-printf STDERR "FOO3:%s%s%s\n", "X", $ga[1],"Y";
+printf STDERR "\%d\%d\%d\%d\n", $m1, $m2, $g1, $g2;
+printf @ga[1000];
+printf STDERR "FOO1:\%s\n", @ga[1000];
+printf STDERR "FOO2:\%s\%s\%s\%s\n", $m1, $g1, @ga[1],$m2;
+printf STDERR "FOO3:\%s\%s\%s\n", "X", @ga[1],"Y";
 EXPECT
 Use of uninitialized value $m1 in printf at - line 5.
 Use of uninitialized value $m1 in printf at - line 6.
@@ -1062,15 +1062,15 @@ Use of uninitialized value $m2 in printf at - line 6.
 Use of uninitialized value $g1 in printf at - line 6.
 Use of uninitialized value $g2 in printf at - line 6.
 0000
-Use of uninitialized value $ga[1000] in printf at - line 7.
-Use of uninitialized value $ga[1000] in printf at - line 8.
+Use of uninitialized value @ga[1000] in printf at - line 7.
+Use of uninitialized value @ga[1000] in printf at - line 8.
 FOO1:
 Use of uninitialized value $m1 in printf at - line 9.
 Use of uninitialized value $g1 in printf at - line 9.
 Use of uninitialized value in printf at - line 9.
 Use of uninitialized value $m2 in printf at - line 9.
 FOO2:
-Use of uninitialized value $ga[1] in printf at - line 10.
+Use of uninitialized value @ga[1] in printf at - line 10.
 FOO3:XY
 ########
 use warnings 'uninitialized';
@@ -1101,9 +1101,9 @@ Use of uninitialized value $m1 in socketpair at - line 12.
 ########
 use Config; 
 BEGIN { 
-  if ( !$Config{d_flock} &&
-       !$Config{d_fcntl_can_lock} &&
-       !$Config{d_lockf} ) {
+  if ( !%Config{d_flock} &&
+       !%Config{d_fcntl_can_lock} &&
+       !%Config{d_lockf} ) {
     print <<EOM ;
 SKIPPED
 # flock not present

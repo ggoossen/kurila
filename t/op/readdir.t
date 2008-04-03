@@ -23,19 +23,19 @@ while (~< $man) {
 my ($min, $max) = ($expect - 10, $expect + 10);
 if (@D +> $min && @D +< $max) { print "ok 2\n"; }
 else {
-    printf "not ok 2 # counting op/*.t, expect $min < %d < $max files\n",
+    printf "not ok 2 # counting op/*.t, expect $min < \%d < $max files\n",
       scalar @D;
 }
 
 our @R = sort @D;
 our @G = sort glob("op/*.t");
 @G = sort glob(":op:*.t") if $^O eq 'MacOS';
-if ($G[0] =~ m#.*\](\w+\.t)#i) {
+if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
     @G = grep(s#.*\](\w+\.t).*#op/$1#i,glob("op/*.t"));
 }
-while (@R && @G && $G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').$R[0]) {
+while (@R && @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
 	shift(@R);
 	shift(@G);
 }
@@ -44,9 +44,9 @@ if (@R == 0 && @G == 0) { print "ok 3\n"; } else { print "not ok 3\n"; }
 our ($fh, @fh, %fh);
 if (opendir($fh, "op")) { print "ok 4\n"; } else { print "not ok 4\n"; }
 if (ref($fh) eq 'GLOB') { print "ok 5\n"; } else { print "not ok 5\n"; }
-if (opendir($fh[0], "op")) { print "ok 6\n"; } else { print "not ok 6\n"; }
-if (ref($fh[0]) eq 'GLOB') { print "ok 7\n"; } else { print "not ok 7\n"; }
-if (opendir($fh{abc}, "op")) { print "ok 8\n"; } else { print "not ok 8\n"; }
-if (ref($fh{abc}) eq 'GLOB') { print "ok 9\n"; } else { print "not ok 9\n"; }
-if (not $fh \== $fh[0]) { print "ok 10\n"; } else { print "not ok 10\n"; }
-if (not $fh \== $fh{abc}) { print "ok 11\n"; } else { print "not ok 11\n"; }
+if (opendir(@fh[0], "op")) { print "ok 6\n"; } else { print "not ok 6\n"; }
+if (ref(@fh[0]) eq 'GLOB') { print "ok 7\n"; } else { print "not ok 7\n"; }
+if (opendir(%fh{abc}, "op")) { print "ok 8\n"; } else { print "not ok 8\n"; }
+if (ref(%fh{abc}) eq 'GLOB') { print "ok 9\n"; } else { print "not ok 9\n"; }
+if (not $fh \== @fh[0]) { print "ok 10\n"; } else { print "not ok 10\n"; }
+if (not $fh \== %fh{abc}) { print "ok 11\n"; } else { print "not ok 11\n"; }

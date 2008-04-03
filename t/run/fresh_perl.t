@@ -26,7 +26,7 @@ while( ~< *DATA) {
         push @prgs, ['', $1];
     }
     else { 
-        $prgs[-1][0] .= $_;
+        @prgs[-1][0] .= $_;
     }
 }
 plan tests => scalar @prgs;
@@ -77,7 +77,7 @@ BEGIN
 	    "foo";
         }
 ########
-$array[128]=1
+@array[128]=1
 ########
 $x=0x0eabcd; print $x->ref;
 EXPECT
@@ -104,7 +104,7 @@ EXPECT
 12345
 ########
 $_="foo";
-printf(STDOUT "%s\n", $_);
+printf(STDOUT "\%s\n", $_);
 EXPECT
 foo
 ########
@@ -125,7 +125,7 @@ package FOO;sub new {bless {FOO => 'BAR'}};
 package main;
 use strict 'vars';   
 my $self = FOO->new();
-print $$self{FOO};
+print %$self{FOO};
 EXPECT
 BAR
 ########
@@ -140,14 +140,14 @@ EXPECT
 bar
 ########
 sub by_number { $a <+> $b; };# inline function for sort below
-$as_ary{0}="a0";
+%as_ary{0}="a0";
 @ordered_array=sort by_number keys(%as_ary);
 ########
 sub NewShell
 {
   local($Host) = @_;
-  my($m2) = $#Shells++;
-  $Shells[$m2]{HOST} = $Host;
+  my($m2) = 0+@Shells;
+  @Shells[$m2]{HOST} = $Host;
   return $m2;
 }
  
@@ -168,9 +168,9 @@ sub ShowShell
          die "bomb out\n" unless $count ++ ;
          bless ['foo'] 
        }
-       sub FETCH { print "fetch @_\n"; $_[0]->[$_[1]] }
-       sub STORE { print "store @_\n"; $_[0]->[$_[1]] = $_[2] }
-       sub DESTROY { print "DESTROY \n"; undef @{$_[0]}; }
+       sub FETCH { print "fetch @_\n"; @_[0]->[@_[1]] }
+       sub STORE { print "store @_\n"; @_[0]->[@_[1]] = @_[2] }
+       sub DESTROY { print "DESTROY \n"; undef @{@_[0]}; }
    }
    
 eval 'tie @h, "FAKEARRAY", "fred"' ;
@@ -236,7 +236,7 @@ BEGIN failed--compilation aborted
     $len = 10; $offset = 1;
     read(FOO, $buf, $len, $offset) == 100 or die "foo->READ failed";
     getc(FOO) eq "a" or die "foo->GETC failed";
-    printf "%s is number %d\n", "Perl", 1;
+    printf "\%s is number \%d\n", "Perl", 1;
 }
 EXPECT
 This is a reversed sentence.
@@ -246,7 +246,7 @@ Don't GETC, Get Perl
 Perl is number 1
 and destroyed as well
 ########
-my @a; $a[2] = 1; for (@a) { $_ = 2 } print "@a\n"
+my @a; @a[2] = 1; for (@a) { $_ = 2 } print "@a\n"
 EXPECT
 2 2 2
 ########
@@ -261,7 +261,7 @@ ok
 ########
 @a = ($a, $b, $c, $d) = (5, 6);
 print "ok\n"
-  if ($a[0] == 5 and $a[1] == 6 and !defined $a[2] and !defined $a[3]);
+  if (@a[0] == 5 and @a[1] == 6 and !defined @a[2] and !defined @a[3]);
 EXPECT
 ok
 ########
@@ -286,14 +286,14 @@ nowisthetime
 ########
 $ren = 'joy';
 $stimpy = 'happy';
-{ local $main::{ren} = *stimpy; print $ren, ' ' }
+{ local %main::{ren} = *stimpy; print $ren, ' ' }
 print $ren, "\n";
 EXPECT
 happy joy
 ########
 $stimpy = 'happy';
 no strict 'refs';
-{ local $main::{ren} = *stimpy; print ${'ren'}, ' ' }
+{ local %main::{ren} = *stimpy; print ${'ren'}, ' ' }
 print +(defined(${'ren'}) ? 'oops' : 'joy'), "\n";
 EXPECT
 Can't use string ("ren") as a SCALAR ref while "strict refs" in use at - line 3.
@@ -307,15 +307,15 @@ EXPECT
 really groovy
 ########
 @list = ([ 'one', 1 ], [ 'two', 2 ]);
-sub func { $num = shift; (grep $_->[1] == $num, @list)[0] }
+sub func { $num = shift; (grep $_->[1] == $num, @list)[[0]] }
 print scalar(map &func($_), 1 .. 3), " ",
       scalar(map scalar &func($_), 1 .. 3), "\n";
 EXPECT
 2 3
 ########
 ($k, $s)  = qw(x 0);
-@{$h{$k}} = qw(1 2 4);
-for (@{$h{$k}}) { $s += $_; delete $h{$k} if ($_ == 2) }
+@{%h{$k}} = qw(1 2 4);
+for (@{%h{$k}}) { $s += $_; delete %h{$k} if ($_ == 2) }
 print "bogus\n" unless $s == 7;
 ########
 my $a = 'outer';
@@ -366,7 +366,7 @@ argv <e>
 -l
 # fdopen from a system descriptor to a system descriptor used to close
 # the former.
-open STDERR, '>&=', 'STDOUT' or die $!;
+open STDERR, '>&=', \*STDOUT or die $!;
 select STDOUT; $| = 1; print fileno STDOUT or die $!;
 select STDERR; $| = 1; print fileno STDERR or die $!;
 EXPECT
@@ -429,7 +429,7 @@ destroyed
 BEGIN {
   $| = 1;
   ${^WARN_HOOK} = sub {
-    eval { print $_[0]->{description} };
+    eval { print @_[0]->{description} };
     die "bar";
   };
   warn "foo\n";
@@ -486,7 +486,7 @@ EXPECT
 foo
 ########
 sub C () { 1 }
-sub M { $_[0] = 2; }
+sub M { @_[0] = 2; }
 eval "C";
 M(C);
 EXPECT
@@ -499,7 +499,7 @@ aba\ba\\b
 ########
 # lexicals declared after the myeval() definition should not be visible
 # within it
-sub myeval { eval $_[0] }
+sub myeval { eval @_[0] }
 my $foo = "ok 2\n";
 myeval('sub foo { local $foo = "ok 1\n"; print $foo; }');
 die $@ if $@;
@@ -622,7 +622,7 @@ print $x;
 EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
-$eval = eval 'sub { eval "sub \{ %S \}" }';
+$eval = eval 'sub { eval "sub \{ \%S \}" }';
 $eval->({});
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';
@@ -683,7 +683,7 @@ EXPECT
 ./"TEST"
 ######## "Segfault using HTML::Entities", Richard Jolly <richardjolly@mac.com>, <A3C7D27E-C9F4-11D8-B294-003065AE00B6@mac.com> in perl-unicode@perl.org
 -lw
-# SKIP: use Config; $ENV{PERL_CORE_MINITEST} or " $Config::Config{'extensions'} " !~ m[ Encode ] # Perl configured without Encode module
+# SKIP: use Config; %ENV{PERL_CORE_MINITEST} or " %Config::Config{'extensions'} " !~ m[ Encode ] # Perl configured without Encode module
 BEGIN {
   eval 'require Encode';
   if ($@) { exit 0 } # running minitest?

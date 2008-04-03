@@ -1,5 +1,5 @@
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -22,7 +22,7 @@ sub e     ($$) { Pod::Simple::XMLOutStream->_duo(\&nowhine, @_) }
 
 sub nowhine {
 #  $_[0]->{'no_whining'} = 1;
-  $_[0]->accept_targets("*");
+  @_[0]->accept_targets("*");
 }
 
 &ok(e(

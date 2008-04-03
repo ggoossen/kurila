@@ -137,7 +137,7 @@ sub lock_ref_keys {
         my %original_keys = map { ($_ => 1) } keys %$hash;
         foreach my $k (keys %original_keys) {
             die "Hash has key '$k' which is not in the new key set"
-              unless $keys{$k};
+              unless %keys{$k};
         }
 
         foreach my $k (@keys) {
@@ -146,7 +146,7 @@ sub lock_ref_keys {
         Internals::SvREADONLY %$hash, 1;
 
         foreach my $k (@keys) {
-            delete $hash->{$k} unless $original_keys{$k};
+            delete $hash->{$k} unless %original_keys{$k};
         }
     }
     else {
@@ -192,7 +192,7 @@ sub lock_ref_keys_plus {
         }
     }
     Internals::SvREADONLY(%$hash,1);
-    delete @{$hash}{@delete};
+    delete %{$hash}{[@delete]};
     return $hash
 }
 

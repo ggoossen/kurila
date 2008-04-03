@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -14,7 +14,7 @@ use strict;
 
 require Test::Simple::Catch;
 my($out, $err) = Test::Simple::Catch::caught();
-local $ENV{HARNESS_ACTIVE} = 0;
+local %ENV{HARNESS_ACTIVE} = 0;
 
 
 # Can't use Test.pm, that's a 5.005 thing.
@@ -119,10 +119,10 @@ ERR
 # line 60
 like( "bug", '/(%)/',   'regex with % in it' );
 err_ok( <<ERR );
-#   Failed test 'regex with % in it'
+#   Failed test 'regex with \% in it'
 #   at $0 line 60.
 #                   'bug'
-#     doesn't match '/(%)/'
+#     doesn't match '/(\%)/'
 ERR
 
 #line 67
@@ -212,7 +212,7 @@ ERR
 
 {
     my $warnings;
-    local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
+    local ${^WARN_HOOK} = sub { $warnings .= @_[0]->message };
 
 # line 211
     cmp_ok( 42,    '==', "foo", '       == with strings' );
@@ -284,7 +284,7 @@ not ok - foo isnt foo?
 not ok - undef isnt undef?
 not ok - is foo like that
 not ok - is foo unlike foo
-not ok - regex with % in it
+not ok - regex with \% in it
 not ok - fail()
 not ok - Mooble::Hooble::Yooble->can(...)
 not ok - Mooble::Hooble::Yooble->can(...)

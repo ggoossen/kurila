@@ -34,15 +34,15 @@ _init_optags();
 sub ops_to_opset { opset @_ }	# alias for old name
 
 sub opset_to_hex ($) {
-    return "(invalid opset)" unless verify_opset($_[0]);
-    unpack("h*",$_[0]);
+    return "(invalid opset)" unless verify_opset(@_[0]);
+    unpack("h*",@_[0]);
 }
 
 sub opdump (;$) {
 	my $pat = shift;
     # handy utility: perl -MOpcode=opdump -e 'opdump File'
     foreach(opset_to_ops(full_opset)) {
-        my $op = sprintf "  %12s  %s\n", $_, opdesc($_);
+        my $op = sprintf "  \%12s  \%s\n", $_, opdesc($_);
 		next if defined $pat and $op !~ m/$pat/i;
 		print $op;
     }
@@ -52,7 +52,7 @@ sub opdump (;$) {
 
 sub _init_optags {
     my(%all, %seen);
-    @all{opset_to_ops(full_opset)} = (); # keys only
+    %all{[opset_to_ops(full_opset)]} = (); # keys only
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section
@@ -68,9 +68,9 @@ sub _init_optags {
 	my @ops   = map  { split ' ' } @lines; # get op words
 
 	foreach(@ops) {
-	    warn "$tag - $_ already tagged in $seen{$_}\n" if $seen{$_};
-	    $seen{$_} = $tag;
-	    delete $all{$_};
+	    warn "$tag - $_ already tagged in %seen{$_}\n" if %seen{$_};
+	    %seen{$_} = $tag;
+	    delete %all{$_};
 	}
 	# opset will croak on invalid names
 	define_optag($tag, opset(@ops));
@@ -307,7 +307,7 @@ invert_opset function.
 
     rv2sv sassign
 
-    rv2av aassign aelem aelemfast aslice av2arylen
+    rv2av aassign aelem aelemfast aslice
 
     rv2hv helem hslice each values keys exists delete
 

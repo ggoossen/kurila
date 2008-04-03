@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir('t');
         unshift(@INC, '../lib');
     }
@@ -15,11 +15,11 @@ use Test::More 'tests' => 12;
 my $err = qr/^Semaphore .* is not .* integer: /;
 
 eval { Thread::Semaphore->new(undef); };
-like($@->message, $err);
+like($@ && $@->message, $err);
 eval { Thread::Semaphore->new(0.5); };
-like($@->message, $err);
+like($@ && $@->message, $err);
 eval { Thread::Semaphore->new('foo'); };
-like($@->message, $err);
+like($@ && $@->message, $err);
 
 my $s = Thread::Semaphore->new();
 ok($s, 'New semaphore');

@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = ("../lib", "lib/compress");
     }
@@ -17,7 +17,7 @@ BEGIN
 { 
     plan skip_all => "Lengthy Tests Disabled\n" .
                      "set COMPRESS_ZLIB_RUN_ALL to run this test suite" 
-        unless defined $ENV{COMPRESS_ZLIB_RUN_ALL} ;
+        unless defined %ENV{COMPRESS_ZLIB_RUN_ALL} ;
 
     # use Test::NoWarnings, if available
     my $extra = 0 ;

@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -25,7 +25,7 @@ ok(1); # If we made it this far, we're ok.
 
 sub _pack_U { Unicode::Normalize::pack_U(@_) }
 sub hexU { _pack_U map hex, split ' ', shift }
-sub answer { defined $_[0] ? $_[0] ? "YES" : "NO" : "MAYBE" }
+sub answer { defined @_[0] ? @_[0] ? "YES" : "NO" : "MAYBE" }
 
 #########################
 

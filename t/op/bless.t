@@ -81,7 +81,7 @@ expected(bless({}, $1), "E", "HASH");
     {
 	{
 	    package F;
-	    sub test { main::is(${$_[0]}, $string) }
+	    sub test { main::is(${@_[0]}, $string) }
 	}
 	$! = 2;
 	$f1 = bless \$!, "F";
@@ -96,7 +96,7 @@ expected(bless({}, $1), "E", "HASH");
 # no class, or empty string (with a warning), or undef (with two)
 expected(bless([]), 'main', "ARRAY");
 {
-    local ${^WARN_HOOK} = sub { push @w, $_[0]->message };
+    local ${^WARN_HOOK} = sub { push @w, @_[0]->message };
     use warnings;
 
     my $m = bless [];

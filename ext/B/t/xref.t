@@ -1,14 +1,14 @@
 #!./perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     } else {
 	unshift @INC, 't';
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -48,61 +48,61 @@ while ( ~< *XREF) {
 	$curpack = $1;
     } elsif ($curpack eq '?' && m/^      (".*")  +(.*)/
 	    or m/^      (\S+)\s+(.*)/) {
-	$xreftable{$curfile}{$cursub}{$curpack}{$1} = $2;
+	%xreftable{$curfile}{$cursub}{$curpack}{$1} = $2;
     }
 }
 close XREF;
 my $thisfile = __FILE__;
 
 ok(
-    defined $xreftable{$thisfile}{'(main)'}{main}{'$compilesub'},
+    defined %xreftable{$thisfile}{'(main)'}{main}{'$compilesub'},
     '$compilesub present in main program'
 );
 like(
-    $xreftable{$thisfile}{'(main)'}{main}{'$compilesub'},
+    %xreftable{$thisfile}{'(main)'}{main}{'$compilesub'},
     qr/\bi100\b/,
     '$compilesub introduced at line 100'
 );
 like(
-    $xreftable{$thisfile}{'(main)'}{main}{'$compilesub'},
+    %xreftable{$thisfile}{'(main)'}{main}{'$compilesub'},
     qr/&102\b/,
     '$compilesub coderef called at line 102'
 );
 ok(
-    defined $xreftable{$thisfile}{'(main)'}{'(lexical)'}{'$curfile'},
+    defined %xreftable{$thisfile}{'(main)'}{'(lexical)'}{'$curfile'},
     '$curfile present in main program'
 );
 like(
-    $xreftable{$thisfile}{'(main)'}{'(lexical)'}{'$curfile'},
+    %xreftable{$thisfile}{'(main)'}{'(lexical)'}{'$curfile'},
     qr/\bi200\b/,
     '$curfile introduced at line 200'
 );
 ok(
-    defined $xreftable{$thisfile}{'(main)'}{main}{'%xreftable'},
+    defined %xreftable{$thisfile}{'(main)'}{main}{'%xreftable'},
     '$xreftable present in main program'
 );
 ok(
-    defined $xreftable{$thisfile}{'Testing::Xref::foo'}{main}{'%xreftable'},
+    defined %xreftable{$thisfile}{'Testing::Xref::foo'}{main}{'%xreftable'},
     '$xreftable used in subroutine bar'
 );
 is(
-    $xreftable{$thisfile}{'(main)'}{main}{'&use_ok'}, '&50',
+    %xreftable{$thisfile}{'(main)'}{main}{'&use_ok'}, '&50',
     'use_ok called at line 50'
 );
 is(
-    $xreftable{$thisfile}{'(definitions)'}{'Testing::Xref'}{'&foo'}, 's1001',
+    %xreftable{$thisfile}{'(definitions)'}{'Testing::Xref'}{'&foo'}, 's1001',
     'subroutine foo defined at line 1001'
 );
 is(
-    $xreftable{$thisfile}{'(definitions)'}{'Testing::Xref'}{'&bar'}, 's1002',
+    %xreftable{$thisfile}{'(definitions)'}{'Testing::Xref'}{'&bar'}, 's1002',
     'subroutine bar defined at line 1002'
 );
 is(
-    $xreftable{$thisfile}{'Testing::Xref::bar'}{'Testing::Xref'}{'&foo'},
+    %xreftable{$thisfile}{'Testing::Xref::bar'}{'Testing::Xref'}{'&foo'},
     '&1002', 'subroutine foo called at line 1002 by bar'
 );
 is(
-    $xreftable{$thisfile}{'Testing::Xref::foo'}{'Testing::Xref'}{'*FOO'},
+    %xreftable{$thisfile}{'Testing::Xref::foo'}{'Testing::Xref'}{'*FOO'},
     '1001', 'glob FOO used in subroutine foo'
 );
 

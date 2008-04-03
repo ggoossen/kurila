@@ -1,7 +1,7 @@
 #!./perl -T
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -10,7 +10,7 @@ BEGIN {
 use warnings;
 use vars qw{ @warnings $fagwoosh $putt $kloong};
 BEGIN {				# ...and save 'em for later
-    ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} }
+    ${^WARN_HOOK} = sub { push @warnings, @_[0]->{description} }
 }
 END { print STDERR @warnings }
 
@@ -26,7 +26,7 @@ use constant PI		=> 4 * atan2 1, 1;
 ok defined PI,                          'basic scalar constant';
 is substr(PI, 0, 7), '3.14159',         '    in substr()';
 
-sub deg2rad { PI * $_[0] / 180 }
+sub deg2rad { PI * @_[0] / 180 }
 
 my $ninety = deg2rad 90;
 
@@ -44,7 +44,7 @@ is UNDEF3, undef,       '    short way';
 # XXX Why is this way different than the other ones?
 my @undef = UNDEF1;
 is @undef, 1;
-is $undef[0], undef;
+is @undef[0], undef;
 
 @undef = UNDEF2;
 is @undef, 0;
@@ -55,14 +55,14 @@ is @undef, 0;
 
 use constant COUNTDOWN	=> scalar reverse 1, 2, 3, 4, 5;
 use constant COUNTLIST	=> reverse 1, 2, 3, 4, 5;
-use constant COUNTLAST	=> (COUNTLIST)[-1];
+use constant COUNTLAST	=> (COUNTLIST)[[-1]];
 
 is COUNTDOWN, '54321';
 my @cl = COUNTLIST;
 is @cl, 5;
 is COUNTDOWN, join '', @cl;
 is COUNTLAST, 1;
-is((COUNTLIST)[1], 4);
+is((COUNTLIST)[[1]], 4);
 
 use constant ABC	=> 'ABC';
 is "abc${\( ABC )}abc", "abcABCabc";
@@ -115,7 +115,7 @@ cmp_ok length(E2BIG), '+>', 6;
 is @warnings, 0 or diag join "\n", "unexpected warning", @warnings;
 @warnings = ();		# just in case
 undef &PI;
-ok @warnings && ($warnings[0] =~ m/Constant sub.* undefined/) or
+ok @warnings && (@warnings[0] =~ m/Constant sub.* undefined/) or
   diag join "\n", "unexpected warning", @warnings;
 shift @warnings;
 
@@ -125,7 +125,7 @@ my $curr_test = $TB->current_test;
 use constant CSCALAR	=> \"ok 37\n";
 use constant CHASH	=> { foo => "ok 38\n" };
 use constant CARRAY	=> [ undef, "ok 39\n" ];
-use constant CCODE	=> sub { "ok $_[0]\n" };
+use constant CCODE	=> sub { "ok @_[0]\n" };
 
 my $output = $TB->output ;
 print $output ${+CSCALAR};
@@ -157,26 +157,26 @@ sub declared ($) {
     $name =~ s/^::/main::/;
     my $pkg = caller;
     my $full_name = $name =~ m/::/ ? $name : "${pkg}::$name";
-    $constant::declared{$full_name};
+    %constant::declared{$full_name};
 }
 
 ok declared 'PI';
-ok $constant::declared{'main::PI'};
+ok %constant::declared{'main::PI'};
 
 ok !declared 'PIE';
-ok !$constant::declared{'main::PIE'};
+ok !%constant::declared{'main::PIE'};
 
 {
     package Other;
     use constant IN_OTHER_PACK => 42;
     ::ok ::declared 'IN_OTHER_PACK';
-    ::ok $constant::declared{'Other::IN_OTHER_PACK'};
+    ::ok %constant::declared{'Other::IN_OTHER_PACK'};
     ::ok ::declared 'main::PI';
-    ::ok $constant::declared{'main::PI'};
+    ::ok %constant::declared{'main::PI'};
 }
 
 ok declared 'Other::IN_OTHER_PACK';
-ok $constant::declared{'Other::IN_OTHER_PACK'};
+ok %constant::declared{'Other::IN_OTHER_PACK'};
 
 @warnings = ();
 eval q{
@@ -237,8 +237,8 @@ else {
 
 is @warnings, 0+@Expected_Warnings;
 
-for my $idx (0..$#warnings) {
-    like $warnings[$idx], $Expected_Warnings[$idx];
+for my $idx (0..(@warnings-1)) {
+    like @warnings[$idx], @Expected_Warnings[$idx];
 }
 
 @warnings = ();
@@ -285,14 +285,14 @@ sub zit;
 
 {
     my @warnings;
-    local ${^WARN_HOOK} = sub { push @warnings, $_[0]->{description} };
+    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->{description} };
     eval 'use constant zit => 4; 1' or die $@;
 
     # empty prototypes are reported differently in different versions
     my $no_proto = ": none";
 
     is(scalar @warnings, 1, "1 warning");
-    like ($warnings[0], qr/^Prototype mismatch: sub main::zit$no_proto vs \(\)/,
+    like (@warnings[0], qr/^Prototype mismatch: sub main::zit$no_proto vs \(\)/,
 	  "about the prototype mismatch");
 
     my $value = eval 'zit';

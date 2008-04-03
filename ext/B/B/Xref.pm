@@ -129,11 +129,11 @@ sub process {
     }
     $type =~ s/(.)\*$/$1/g;
     if ($raw) {
-	printf "%-16s %-12s %5d %-12s %4s %-16s %s\n",
+	printf '%-16s %-12s %5d %-12s %4s %-16s %s' . "\n",
 	    $file, $subname, $line, $pack, $type, $name, $event;
     } else {
 	# Wheee
-	push(@{$table{$file}->{$subname}->{$pack}->{$type.$name}->{$event}},
+	push(@{%table{$file}->{$subname}->{$pack}->{$type.$name}->{$event}},
 	    $line);
     }
 }
@@ -146,20 +146,20 @@ sub load_pad {
     ($namelistav,$vallistav) = $padlist->ARRAY;
     @namelist = $namelistav->ARRAY;
     for ($ix = 1; $ix +< @namelist; $ix++) {
-	my $namesv = $namelist[$ix];
+	my $namesv = @namelist[$ix];
 	next if class($namesv) eq "SPECIAL";
 	my ($type, $name) = $namesv->PV =~ m/^(.)([^\0]*)(\0.*)?$/;
-	$pad[$ix] = ["(lexical)", $type || '?', $name || '?'];
+	@pad[$ix] = ["(lexical)", $type || '?', $name || '?'];
     }
-    if ($Config{useithreads}) {
+    if (%Config{useithreads}) {
 	my (@vallist);
 	@vallist = $vallistav->ARRAY;
 	for ($ix = 1; $ix +< @vallist; $ix++) {
-	    my $valsv = $vallist[$ix];
+	    my $valsv = @vallist[$ix];
 	    next unless class($valsv) eq "GV";
 	    # these pad GVs don't have corresponding names, so same @pad
 	    # array can be used without collisions
-	    $pad[$ix] = [$valsv->STASH->NAME, "*", $valsv->NAME];
+	    @pad[$ix] = [$valsv->STASH->NAME, "*", $valsv->NAME];
 	}
     }
 }
@@ -168,8 +168,8 @@ sub xref {
     my $start = shift;
     my $op;
     for ($op = $start; $$op; $op = $op->next) {
-	last if $done{$$op}++;
-	warn sprintf("top = [%s, %s, %s]\n", @$top) if $debug_top;
+	last if %done{$$op}++;
+	warn sprintf('top = [%s, %s, %s]', @$top) if $debug_top;
 	warn peekop($op), "\n" if $debug_op;
 	my $opname = $op->name;
 	if ($opname =~ m/^(or|and|mapwhile|grepwhile|range|cond_expr)$/) {
@@ -226,7 +226,7 @@ sub pp_nextstate {
 
 sub pp_padsv {
     my $op = shift;
-    $top = $pad[$op->targ];
+    $top = @pad[$op->targ];
     process($top, $op->private ^&^ OPpLVAL_INTRO ? "intro" : "used");
 }
 
@@ -248,8 +248,8 @@ sub pp_rv2gv { deref(shift, $top, "*"); }
 sub pp_gvsv {
     my $op = shift;
     my $gv;
-    if ($Config{useithreads}) {
-	$top = $pad[$op->padix];
+    if (%Config{useithreads}) {
+	$top = @pad[$op->padix];
 	$top = UNKNOWN unless $top;
 	$top->[1] = '$';
     }
@@ -264,8 +264,8 @@ sub pp_gvsv {
 sub pp_gv {
     my $op = shift;
     my $gv;
-    if ($Config{useithreads}) {
-	$top = $pad[$op->padix];
+    if (%Config{useithreads}) {
+	$top = @pad[$op->padix];
 	$top = UNKNOWN unless $top;
 	$top->[1] = '*';
     }
@@ -286,7 +286,7 @@ sub pp_const {
 		? cstring($sv->PV) : "?"];
     }
     else {
-	$top = $pad[$op->targ];
+	$top = @pad[$op->targ];
 	$top = UNKNOWN unless $top;
     }
 }
@@ -329,10 +329,10 @@ sub xref_definitions {
     foreach $pack (qw(B O DynaLoader XSLoader Config DB VMS
 		      strict vars FileHandle Exporter Carp PerlIO::Layer
 		      attributes utf8 warnings)) {
-        $exclude{$pack."::"} = 1;
+        %exclude{$pack."::"} = 1;
     }
     no strict qw(vars refs);
-    walksymtable(\%{*{Symbol::fetch_glob("main::")}}, "xref", sub { !defined($exclude{$_[0]}) });
+    walksymtable(\%{*{Symbol::fetch_glob("main::")}}, "xref", sub { !defined(%exclude{@_[0]}) });
 }
 
 sub output {
@@ -340,7 +340,7 @@ sub output {
     my ($file, $subname, $pack, $name, $ev, $perfile, $persubname,
 	$perpack, $pername, $perev);
     foreach $file (sort(keys(%table))) {
-	$perfile = $table{$file};
+	$perfile = %table{$file};
 	print "File $file\n";
 	foreach $subname (sort(keys(%$perfile))) {
 	    $persubname = $perfile->{$subname};
@@ -354,11 +354,11 @@ sub output {
 		    foreach $ev (qw(intro formdef subdef meth subused used)) {
 			$perev = $pername->{$ev};
 			if (defined($perev) && @$perev) {
-			    my $code = $code{$ev};
+			    my $code = %code{$ev};
 			    push(@lines, map("$code$_", @$perev));
 			}
 		    }
-		    printf "      %-16s  %s\n", $name, join(", ", @lines);
+		    printf "      \%-16s  \%s\n", $name, join(", ", @lines);
 		}
 	    }
 	}

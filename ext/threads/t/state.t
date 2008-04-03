@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -50,7 +50,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -229,7 +229,7 @@ ok(threads->list(threads::joinable) == 0, 'thread joinable list');
     for (1..3) { threads->create($thr_routine); }
 
     foreach my $t (map {threads->create($thr_routine)} 1..2) {
-        threads->create(sub { thr_ready(); $_[0]->join; thr_done(); }, $t);
+        threads->create(sub { thr_ready(); @_[0]->join; thr_done(); }, $t);
     }
     threads->create(sub { thr_ready(); thr_done(); });
     {

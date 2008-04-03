@@ -1,5 +1,5 @@
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = ("../lib", "lib/compress");
     }
@@ -186,13 +186,13 @@ my $line = '';
 for my $i (0 .. @text -2)
 {
     ok $fil->gzreadline($line) +> 0;
-    is $line, $text[$i] ;
+    is $line, @text[$i] ;
     ok ! $fil->gzeof() ;
 }
 
 # now read the last line
 ok $fil->gzreadline($line) +> 0;
-is $line, $text[-1] ;
+is $line, @text[-1] ;
 ok $fil->gzeof() ;
 
 # read past the eof
@@ -217,12 +217,12 @@ ok ! $fil->gzeof() ;
 my $i = 0 ;
 my @got = ();
 while ($fil->gzreadline($line) +> 0) {
-    $got[$i] = $line ;    
+    @got[$i] = $line ;    
     ++ $i ;
 }
 is $i, 2 ;
-is $got[0], $line1 ;
-is $got[1], $line2 ;
+is @got[0], $line1 ;
+is @got[1], $line2 ;
 
 ok   $fil->gzeof() ;
 ok ! $fil->gzclose ;
@@ -244,12 +244,12 @@ ok ! $fil->gzclose ;
 ok $fil = gzopen($name, "rb") ;
 @got = () ; $i = 0 ;
 while ($fil->gzreadline($line) +> 0) {
-    $got[$i] = $line ;    
+    @got[$i] = $line ;    
     ++ $i ;
 }
 is $i, 2 ;
-is $got[0], $line1 ;
-is $got[1], $line2 ;
+is @got[0], $line1 ;
+is @got[1], $line2 ;
 
 ok   $fil->gzeof() ;
 ok ! $fil->gzclose ;

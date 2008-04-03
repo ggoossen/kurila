@@ -29,10 +29,10 @@ require ExtUtils::MM_Unix;
 our @ISA = qw( ExtUtils::MM_Unix );
 our $VERSION = '6.44';
 
-$ENV{EMXSHELL} = 'sh'; # to run `commands`
+%ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND = $Config{'cc'} =~ m/^bcc/i ? 1 : 0;
-my $GCC     = $Config{'cc'} =~ m/^gcc/i ? 1 : 0;
+my $BORLAND = %Config{'cc'} =~ m/^bcc/i ? 1 : 0;
+my $GCC     = %Config{'cc'} =~ m/^gcc/i ? 1 : 0;
 
 
 =head2 Overridden methods
@@ -46,10 +46,10 @@ my $GCC     = $Config{'cc'} =~ m/^gcc/i ? 1 : 0;
 sub dlsyms {
     my($self,%attribs) = @_;
 
-    my($funcs) = $attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = $attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist) = $attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my($imports)  = $attribs{IMPORTS} || $self->{IMPORTS} || {};
+    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
+    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || [];
+    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || [];
+    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || {};
     my(@m);
 
     if (not $self->{SKIPHASH}{'dynamic'}) {
@@ -98,8 +98,8 @@ used by default.
 
 sub maybe_command {
     my($self,$file) = @_;
-    my @e = exists($ENV{'PATHEXT'})
-          ? split(m/;/, $ENV{PATHEXT})
+    my @e = exists(%ENV{'PATHEXT'})
+          ? split(m/;/, %ENV{PATHEXT})
 	  : qw(.com .exe .bat .cmd);
     my $e = '';
     for (@e) { $e .= "\Q$_\E|" }
@@ -169,15 +169,15 @@ sub init_others {
       "\$(PERLRUN) $self->{PERL_SRC}/win32/bin/pl2bat.pl" : 
       'pl2bat.bat';
 
-    $self->{LD}     ||= $Config{ld} || 'link';
-    $self->{AR}     ||= $Config{ar} || 'lib';
+    $self->{LD}     ||= %Config{ld} || 'link';
+    $self->{AR}     ||= %Config{ar} || 'lib';
 
     $self->SUPER::init_others;
 
     # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
     delete $self->{SHELL};
 
-    $self->{LDLOADLIBS} ||= $Config{libs};
+    $self->{LDLOADLIBS} ||= %Config{libs};
     # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
     if ($BORLAND) {
         my $libs = $self->{LDLOADLIBS};
@@ -187,7 +187,7 @@ sub init_others {
             $libpath .= $1;
         }
         $self->{LDLOADLIBS} = $libs;
-        $self->{LDDLFLAGS} ||= $Config{lddlflags};
+        $self->{LDDLFLAGS} ||= %Config{lddlflags};
         $self->{LDDLFLAGS} .= " $libpath";
     }
 
@@ -296,8 +296,8 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = $attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
-    my($inst_dynamic_dep) = $attribs{INST_DYNAMIC_DEP} || "";
+    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
+    my($inst_dynamic_dep) = %attribs{INST_DYNAMIC_DEP} || "";
     my($ldfrom) = '$(LDFROM)';
     my(@m);
 
@@ -309,7 +309,7 @@ sub dynamic_lib {
 	my $dllname = $self->{BASEEXT} . "." . $self->{DLEXT};
 	$dllname =~ m/(....)(.{0,4})/;
 	my $baseaddr = unpack("n", $1 ^^^ $2);
-	$otherldflags .= sprintf("-Wl,--image-base,0x%x0000 ", $baseaddr);
+	$otherldflags .= sprintf("-Wl,--image-base,0x\%x0000 ", $baseaddr);
     }
 
     push(@m,'
@@ -341,7 +341,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
       .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
 
       # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
-      if ($Config{ivsize} == 4 && $Config{cc} eq 'cl' and $Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) 
+      if (%Config{ivsize} == 4 && %Config{cc} eq 'cl' and %Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) 
     {
         push(@m,
           q{
@@ -375,7 +375,7 @@ sub extra_clean_files {
 sub init_linker {
     my $self = shift;
 
-    $self->{PERL_ARCHIVE}       = "\$(PERL_INC)\\$Config{libperl}";
+    $self->{PERL_ARCHIVE}       = "\$(PERL_INC)\\%Config{libperl}";
     $self->{PERL_ARCHIVE_AFTER} = '';
     $self->{EXPORT_LIST}        = '$(BASEEXT).def';
 }

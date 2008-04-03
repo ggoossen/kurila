@@ -30,7 +30,7 @@ sub testing (&$) {
     print "not "
 	if((defined($p) && defined($c) && $p ne $c)
 	   || (defined($p) != defined($c)));
-    printf "ok %d\n",$i++;
+    printf "ok \%d\n",$i++;
 }
 
 @_ = qw(a b c d);
@@ -49,19 +49,19 @@ sub no_proto {
 }
 
 print "not " unless 0 == no_proto();
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 1 == no_proto(5);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == &no_proto;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 1 == no_proto +6;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == no_proto(@_);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 ##
 ##
@@ -76,23 +76,23 @@ sub no_args () {
 }
 
 print "not " unless 0 == no_args();
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 0 == no_args;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 5 == no_args +5;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == &no_args;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &no_args(1,2);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "no_args(1)";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 ##
 ##
@@ -106,29 +106,29 @@ sub one_args ($) {
 }
 
 print "not " unless 1 == one_args(1);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 1 == one_args +5;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == &one_args;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &one_args(1,2);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "one_args(1,2)";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "one_args()";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 sub one_a_args ($) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ == 1 && $_[0] == 4;
-    printf "ok %d\n",$i++;
+    print "not " unless @_ == 1 && @_[0] == 4;
+    printf "ok \%d\n",$i++;
 }
 
 one_a_args(@_);
@@ -145,31 +145,31 @@ sub over_one_args ($@) {
 }
 
 print "not " unless 1 == over_one_args(1);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == over_one_args(1,2);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 1 == over_one_args +5;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == &over_one_args;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &over_one_args(1,2);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 5 == &over_one_args(1,@_);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "over_one_args()";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 sub over_one_a_args ($@) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ +>= 1 && $_[0] == 4;
-    printf "ok %d\n",$i++;
+    print "not " unless @_ +>= 1 && @_[0] == 4;
+    printf "ok \%d\n",$i++;
 }
 
 over_one_a_args(@_);
@@ -189,31 +189,31 @@ sub scalar_and_hash ($%) {
 }
 
 print "not " unless 1 == scalar_and_hash(1);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 3 == scalar_and_hash(1,2,3);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 1 == scalar_and_hash +5;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == &scalar_and_hash;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &scalar_and_hash(1,2);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 5 == &scalar_and_hash(1,@_);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "scalar_and_hash()";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 sub scalar_and_hash_a ($@) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ +>= 1 && $_[0] == 4;
-    printf "ok %d\n",$i++;
+    print "not " unless @_ +>= 1 && @_[0] == 4;
+    printf "ok \%d\n",$i++;
 }
 
 scalar_and_hash_a(@_);
@@ -233,35 +233,35 @@ sub one_or_two ($;$) {
 }
 
 print "not " unless 1 == one_or_two(1);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == one_or_two(1,3);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 1 == one_or_two +5;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 4 == &one_or_two;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 3 == &one_or_two(1,2,3);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 5 == &one_or_two(1,@_);
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "one_or_two()";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 eval "one_or_two(1,2,3)";
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 sub one_or_two_a ($;$) {
     print "# \@_ = (",join(",",@_),")\n";
-    print "not " unless @_ +>= 1 && $_[0] == 4;
-    printf "ok %d\n",$i++;
+    print "not " unless @_ +>= 1 && @_[0] == 4;
+    printf "ok \%d\n",$i++;
 }
 
 one_or_two_a(@_);
@@ -276,18 +276,18 @@ testing \&a_sub, '&';
 
 sub a_sub (&) {
     print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
-    &{$_[0]};
+    &{@_[0]};
 }
 
-sub tmp_sub_1 { printf "ok %d\n",$i++ }
+sub tmp_sub_1 { printf "ok \%d\n",$i++ }
 
-a_sub { printf "ok %d\n",$i++ };
+a_sub { printf "ok \%d\n",$i++ };
 a_sub \&tmp_sub_1;
 
 @array = ( \&tmp_sub_1 );
 eval 'a_sub @array';
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 ##
 ##
@@ -297,16 +297,16 @@ testing \&a_subx, '\&';
 
 sub a_subx (\&) {
     print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
-    &{$_[0]};
+    &{@_[0]};
 }
 
-sub tmp_sub_2 { printf "ok %d\n",$i++ }
+sub tmp_sub_2 { printf "ok \%d\n",$i++ }
 a_subx &tmp_sub_2;
 
 @array = ( \&tmp_sub_2 );
 eval 'a_subx @array';
 print "not " unless $@;
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 ##
 ##
@@ -355,10 +355,10 @@ sub a_hash (%) {
 }
 
 print "not " unless 1 == a_hash 'a';
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 print "not " unless 2 == a_hash 'a','b';
-printf "ok %d\n",$i++;
+printf "ok \%d\n",$i++;
 
 ##
 ##
@@ -368,15 +368,15 @@ testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
     print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
-    print "not " unless ref($_[0]) && $_[0]->{'a'};
-    printf "ok %d\n",$i++;
-    $_[0]->{'b'} = 2;
+    print "not " unless ref(@_[0]) && @_[0]->{'a'};
+    printf "ok \%d\n",$i++;
+    @_[0]->{'b'} = 2;
 }
 
 %hash = ( a => 1);
 a_hash_ref %hash;
-print "not " unless $hash{'b'} == 2;
-printf "ok %d\n",$i++;
+print "not " unless %hash{'b'} == 2;
+printf "ok \%d\n",$i++;
 
 ##
 ##
@@ -386,9 +386,9 @@ testing \&array_ref_plus, '\@@';
 
 sub array_ref_plus (\@@) {
     print "# \@_ = (",join(",",map {dump::view($_)} @_),")\n";
-    print "not " unless @_ == 2 && ref($_[0]) && 1 == @{$_[0]} && $_[1] eq 'x';
-    printf "ok %d\n",$i++;
-    @{$_[0]} = (qw(ok)," ",$i++,"\n");
+    print "not " unless @_ == 2 && ref(@_[0]) && 1 == @{@_[0]} && @_[1] eq 'x';
+    printf "ok \%d\n",$i++;
+    @{@_[0]} = (qw(ok)," ",$i++,"\n");
 }
 
 @array = ('a');
@@ -436,112 +436,112 @@ print "ok ", $i++, "\n";
 
 # test if the (*) prototype allows barewords, constants, scalar expressions,
 # globs and globrefs (just as CORE::open() does), all under stricture
-sub star (*&) { &{$_[1]} }
-sub star2 (**&) { &{$_[2]} }
+sub star (*&) { &{@_[1]} }
+sub star2 (**&) { &{@_[2]} }
 sub BAR { "quux" }
 sub Bar::BAZ { "quuz" }
 my $star = 'FOO';
 star 'FOO', sub {
-    print "not " unless $_[0] eq 'FOO';
+    print "not " unless @_[0] eq 'FOO';
     print "ok $i - star FOO\n";
 }; $i++;
 star('FOO', sub {
-	print "not " unless $_[0] eq 'FOO';
+	print "not " unless @_[0] eq 'FOO';
 	print "ok $i - star(FOO)\n";
     }); $i++;
 star "FOO", sub {
-    print "not " unless $_[0] eq 'FOO';
+    print "not " unless @_[0] eq 'FOO';
     print qq/ok $i - star "FOO"\n/;
 }; $i++;
 star("FOO", sub {
-	print "not " unless $_[0] eq 'FOO';
+	print "not " unless @_[0] eq 'FOO';
 	print qq/ok $i - star("FOO")\n/;
     }); $i++;
 star $star, sub {
-    print "not " unless $_[0] eq 'FOO';
+    print "not " unless @_[0] eq 'FOO';
     print "ok $i - star \$star\n";
 }; $i++;
 star($star, sub {
-	print "not " unless $_[0] eq 'FOO';
+	print "not " unless @_[0] eq 'FOO';
 	print "ok $i - star(\$star)\n";
     }); $i++;
 star *FOO, sub {
-    print "not " unless $_[0] \== \*FOO;
+    print "not " unless @_[0] \== \*FOO;
     print "ok $i - star *FOO\n";
 }; $i++;
 star(*FOO, sub {
-	print "not " unless $_[0] \== \*FOO;
+	print "not " unless @_[0] \== \*FOO;
 	print "ok $i - star(*FOO)\n";
     }); $i++;
 star \*FOO, sub {
-    print "not " unless $_[0] \== \*FOO;
+    print "not " unless @_[0] \== \*FOO;
     print "ok $i - star \\*FOO\n";
 }; $i++;
 star(\*FOO, sub {
-	print "not " unless $_[0] \== \*FOO;
+	print "not " unless @_[0] \== \*FOO;
 	print "ok $i - star(\\*FOO)\n";
     }); $i++;
 star2 'FOO', BAR, sub {
-    print "not " unless $_[0] eq 'FOO' and $_[1] eq 'BAR';
+    print "not " unless @_[0] eq 'FOO' and @_[1] eq 'BAR';
     print "ok $i - star2 FOO, BAR\n";
 }; $i++;
 star2(Bar::BAZ, 'FOO', sub {
-	print "not " unless $_[0] eq 'Bar::BAZ' and $_[1] eq 'FOO';
+	print "not " unless @_[0] eq 'Bar::BAZ' and @_[1] eq 'FOO';
 	print "ok $i - star2(Bar::BAZ, FOO)\n"
     }); $i++;
 star2 BAR(), 'FOO', sub {
-    print "not " unless $_[0] eq 'quux' and $_[1] eq 'FOO';
+    print "not " unless @_[0] eq 'quux' and @_[1] eq 'FOO';
     print "ok $i - star2 BAR(), FOO\n"
 }; $i++;
 star2('FOO', BAR(), sub {
-	print "not " unless $_[0] eq 'FOO' and $_[1] eq 'quux';
+	print "not " unless @_[0] eq 'FOO' and @_[1] eq 'quux';
 	print "ok $i - star2(FOO, BAR())\n";
     }); $i++;
 star2 "FOO", "BAR", sub {
-    print "not " unless $_[0] eq 'FOO' and $_[1] eq 'BAR';
+    print "not " unless @_[0] eq 'FOO' and @_[1] eq 'BAR';
     print qq/ok $i - star2 "FOO", "BAR"\n/;
 }; $i++;
 star2("FOO", "BAR", sub {
-	print "not " unless $_[0] eq 'FOO' and $_[1] eq 'BAR';
+	print "not " unless @_[0] eq 'FOO' and @_[1] eq 'BAR';
 	print qq/ok $i - star2("FOO", "BAR")\n/;
     }); $i++;
 star2 $star, $star, sub {
-    print "not " unless $_[0] eq 'FOO' and $_[1] eq 'FOO';
+    print "not " unless @_[0] eq 'FOO' and @_[1] eq 'FOO';
     print "ok $i - star2 \$star, \$star\n";
 }; $i++;
 star2($star, $star, sub {
-	print "not " unless $_[0] eq 'FOO' and $_[1] eq 'FOO';
+	print "not " unless @_[0] eq 'FOO' and @_[1] eq 'FOO';
 	print "ok $i - star2(\$star, \$star)\n";
     }); $i++;
 star2 *FOO, *BAR, sub {
-    print "not " unless $_[0] \== \*FOO and $_[1] \== \*BAR;
+    print "not " unless @_[0] \== \*FOO and @_[1] \== \*BAR;
     print "ok $i - star2 *FOO, *BAR\n";
 }; $i++;
 star2(*FOO, *BAR, sub {
-	print "not " unless $_[0] \== \*FOO and $_[1] \== \*BAR;
+	print "not " unless @_[0] \== \*FOO and @_[1] \== \*BAR;
 	print "ok $i - star2(*FOO, *BAR)\n";
     }); $i++;
 star2 \*FOO, \*BAR, sub {
     no strict 'refs';
-    print "not " unless $_[0] \== \*{Symbol::fetch_glob('FOO')} and $_[1] \== \*{Symbol::fetch_glob('BAR')};
+    print "not " unless @_[0] \== \*{Symbol::fetch_glob('FOO')} and @_[1] \== \*{Symbol::fetch_glob('BAR')};
     print "ok $i - star2 \*FOO, \*BAR\n";
 }; $i++;
 star2(\*FOO, \*BAR, sub {
 	no strict 'refs';
-	print "not " unless $_[0] \== \*{Symbol::fetch_glob('FOO')} and $_[1] \== \*{Symbol::fetch_glob('BAR')};
+	print "not " unless @_[0] \== \*{Symbol::fetch_glob('FOO')} and @_[1] \== \*{Symbol::fetch_glob('BAR')};
 	print "ok $i - star2(\*FOO, \*BAR)\n";
     }); $i++;
 
 # test scalarref prototype
 sub sreftest (\$$) {
-    print "not " unless ref $_[0];
-    print "ok $_[1] - sreftest\n";
+    print "not " unless ref @_[0];
+    print "ok @_[1] - sreftest\n";
 }
 {
     no strict 'vars';
     sreftest my $sref, $i++;
-    sreftest($helem{$i}, $i++);
-    sreftest $aelem[0], $i++;
+    sreftest(%helem{$i}, $i++);
+    sreftest @aelem[0], $i++;
 }
 
 # test prototypes when they are evaled and there is a syntax error
@@ -571,7 +571,7 @@ print "ok ", $i++, "\n";
     sub mysub { print "not calling mysub I hope\n" }
     local *myglob;
 
-    sub myref (\[$@%&*]) { return dump::view($_[0]) }
+    sub myref (\[$@%&*]) { return dump::view(@_[0]) }
 
     print "not " unless myref($myvar)   =~ m/^SCALAR\(/;
     print "ok ", $i++, "\n";
@@ -611,7 +611,7 @@ print "ok ", $i++, "\n";
 {
   use warnings 'syntax';
   my $warn = "";
-  local ${^WARN_HOOK} = sub { $warn .= $_[0]->{description} . "\n" };
+  local ${^WARN_HOOK} = sub { $warn .= @_[0]->{description} . "\n" };
   
   eval 'sub badproto (@bar) { 1; }';
   print "not " unless $warn =~ m/Illegal character in prototype for main::badproto : \@bar/;

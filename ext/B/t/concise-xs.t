@@ -95,7 +95,7 @@ Looking at ../foo2, you'll see 34 occurrences of the following error:
 =cut
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib');
     } else {
@@ -103,11 +103,11 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    unless ($Config::Config{useperlio}) {
+    unless (%Config::Config{useperlio}) {
         print "1..0 # Skip -- Perl configured without perlio\n";
         exit 0;
     }
@@ -265,12 +265,12 @@ if (%opts) {
 my @argpkgs = @ARGV;
 my %report;
 
-if ($opts{r}) {
-    my $refpkgs = require "$opts{r}";
+if (%opts{r}) {
+    my $refpkgs = require "%opts{r}";
     $testpkgs->{$_} = $refpkgs->{$_} foreach keys %$refpkgs;
 }
 
-unless ($opts{a}) {
+unless (%opts{a}) {
     unless (@argpkgs) {
 	foreach my $pkg (sort keys %$testpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
@@ -299,27 +299,27 @@ sub test_pkg {
 
     for my $type (keys %matchers) {
 	foreach my $fn (@{$fntypes->{$type}}) {
-	    carp "$fn can only be one of $type, $stash{$fn}\n"
-		if $stash{$fn};
-	    $stash{$fn} = $type;
+	    carp "$fn can only be one of $type, %stash{$fn}\n"
+		if %stash{$fn};
+	    %stash{$fn} = $type;
 	}
     }
     # set default type for un-named functions
     my $dflt = $fntypes->{dflt} || 'perl';
     for my $k (keys %stash) {
-	$stash{$k} = $dflt unless $stash{$k};
+	%stash{$k} = $dflt unless %stash{$k};
     }
-    $stash{$_} = 'skip' foreach @{$fntypes->{skip}};
+    %stash{$_} = 'skip' foreach @{$fntypes->{skip}};
 
-    if ($opts{v}) {
+    if (%opts{v}) {
 	diag("fntypes: " => Dumper($fntypes));
 	diag("$pkg stash: " => Dumper(\%stash));
     }
     foreach my $fn (reverse sort keys %stash) {
-	next if $stash{$fn} eq 'skip';
-	my $res = checkXS("${pkg}::$fn", $stash{$fn});
+	next if %stash{$fn} eq 'skip';
+	my $res = checkXS("${pkg}::$fn", %stash{$fn});
 	if ($res ne '1') {
-	    push @{$report{$pkg}{$res}}, $fn;
+	    push @{%report{$pkg}{$res}}, $fn;
 	}
     }
 }
@@ -328,15 +328,15 @@ sub checkXS {
     my ($func_name, $want) = @_;
 
     croak "unknown type $want: $func_name\n"
-	unless defined $matchers{$want};
+	unless defined %matchers{$want};
 
     my ($buf, $err) = render($func_name);
-    my $res = like($buf, $matchers{$want}, "$want sub:\t $func_name");
+    my $res = like($buf, %matchers{$want}, "$want sub:\t $func_name");
 
     unless ($res) {
 	# test failed. return type that would give success
 	for my $m (keys %matchers) {
-	    return $m if $buf =~ $matchers{$m};
+	    return $m if $buf =~ %matchers{$m};
 	}
     }
     $res;
@@ -351,7 +351,7 @@ sub render {
     my $walker = B::Concise::compile($func_name);
     eval { $walker->() };
     diag("err: $@ $buf") if $@;
-    diag("verbose: $buf") if $opts{V};
+    diag("verbose: $buf") if %opts{V};
 
     return ($buf, $@);
 }
@@ -362,7 +362,7 @@ sub corecheck {
 	warn "Module::CoreList not available on $^V\n";
 	return;
     }
-    my $mods = $Module::CoreList::version{'5.009002'};
+    my $mods = %Module::CoreList::version{'5.009002'};
     $mods = [ sort keys %$mods ];
     print Dumper($mods);
 
@@ -372,14 +372,14 @@ sub corecheck {
 }
 
 END {
-    if ($opts{c}) {
+    if (%opts{c}) {
 	$Data::Dumper::Indent = 1;
 	print "Corrections: ", Dumper(\%report);
 
 	foreach my $pkg (sort keys %report) {
 	    for my $type (keys %matchers) {
-		print "$pkg: $type: @{$report{$pkg}{$type}}\n"
-		    if @{$report{$pkg}{$type}};
+		print "$pkg: $type: @{%report{$pkg}{$type}}\n"
+		    if @{%report{$pkg}{$type}};
 	    }
 	}
     }

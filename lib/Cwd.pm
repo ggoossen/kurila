@@ -279,8 +279,8 @@ my %METHOD_MAP =
    },
   );
 
-$METHOD_MAP{NT} = $METHOD_MAP{MSWin32};
-$METHOD_MAP{nto} = $METHOD_MAP{qnx};
+%METHOD_MAP{NT} = %METHOD_MAP{MSWin32};
+%METHOD_MAP{nto} = %METHOD_MAP{qnx};
 
 
 # Find the pwd command in the expected locations.  We assume these
@@ -312,8 +312,8 @@ sub _croak { require Carp; Carp::croak(@_) }
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
-    my @localize = grep exists $ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV);
-    local @ENV{@localize};
+    my @localize = grep exists %ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV);
+    local %ENV{[@localize]};
     
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".
@@ -326,15 +326,15 @@ sub _backtick_pwd {
 # Since some ports may predefine cwd internally (e.g., NT)
 # we take care not to override an existing definition for cwd().
 
-unless ($METHOD_MAP{$^O}{cwd} or defined &cwd) {
+unless (%METHOD_MAP{$^O}{cwd} or defined &cwd) {
     # The pwd command is not available in some chroot(2)'ed environments
-    my $sep = $Config::Config{path_sep} || ':';
+    my $sep = %Config::Config{path_sep} || ':';
     my $os = $^O;  # Protect $^O from tainting
 
 
     # Try again to find a pwd, this time searching the whole PATH.
-    if (defined $ENV{PATH} and $os ne 'MSWin32') {  # no pwd on Windows
-	my @candidates = split($sep, $ENV{PATH});
+    if (defined %ENV{PATH} and $os ne 'MSWin32') {  # no pwd on Windows
+	my @candidates = split($sep, %ENV{PATH});
 	while (!$found_pwd_cmd and @candidates) {
 	    my $candidate = shift @candidates;
 	    $found_pwd_cmd = 1 if -x "$candidate/pwd";
@@ -427,24 +427,24 @@ if (not defined &fastcwd) { *fastcwd = \&fastcwd_ }
 my $chdir_init = 0;
 
 sub chdir_init {
-    if ($ENV{'PWD'} and $^O ne 'os2' and $^O ne 'dos' and $^O ne 'MSWin32') {
+    if (%ENV{'PWD'} and $^O ne 'os2' and $^O ne 'dos' and $^O ne 'MSWin32') {
 	my($dd,$di) = stat('.');
-	my($pd,$pi) = stat($ENV{'PWD'});
+	my($pd,$pi) = stat(%ENV{'PWD'});
 	if (!defined $dd or !defined $pd or $di != $pi or $dd != $pd) {
-	    $ENV{'PWD'} = cwd();
+	    %ENV{'PWD'} = cwd();
 	}
     }
     else {
 	my $wd = cwd();
 	$wd = Win32::GetFullPathName($wd) if $^O eq 'MSWin32';
-	$ENV{'PWD'} = $wd;
+	%ENV{'PWD'} = $wd;
     }
     # Strip an automounter prefix (where /tmp_mnt/foo/bar == /foo/bar)
-    if ($^O ne 'MSWin32' and $ENV{'PWD'} =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
+    if ($^O ne 'MSWin32' and %ENV{'PWD'} =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
 	my($pd,$pi) = stat($2);
 	my($dd,$di) = stat($1);
 	if (defined $pd and defined $dd and $di == $pi and $dd == $pd) {
-	    $ENV{'PWD'}="$2$3";
+	    %ENV{'PWD'}="$2$3";
 	}
     }
     $chdir_init = 1;
@@ -463,22 +463,22 @@ sub chdir {
     return 0 unless CORE::chdir $newdir;
 
     if ($^O eq 'VMS') {
-	return $ENV{'PWD'} = $ENV{'DEFAULT'}
+	return %ENV{'PWD'} = %ENV{'DEFAULT'}
     }
     elsif ($^O eq 'MacOS') {
-	return $ENV{'PWD'} = cwd();
+	return %ENV{'PWD'} = cwd();
     }
     elsif ($^O eq 'MSWin32') {
-	$ENV{'PWD'} = $newpwd;
+	%ENV{'PWD'} = $newpwd;
 	return 1;
     }
 
     if (ref $newdir eq 'GLOB') { # in case a file/dir handle is passed in
-	$ENV{'PWD'} = cwd();
+	%ENV{'PWD'} = cwd();
     } elsif ($newdir =~ m#^/#s) {
-	$ENV{'PWD'} = $newdir;
+	%ENV{'PWD'} = $newdir;
     } else {
-	my @curdir = split(m#/#,$ENV{'PWD'});
+	my @curdir = split(m#/#,%ENV{'PWD'});
 	@curdir = ('') unless @curdir;
 	my $component;
 	foreach $component (split(m#/#, $newdir)) {
@@ -486,7 +486,7 @@ sub chdir {
 	    pop(@curdir),next if $component eq '..';
 	    push(@curdir,$component);
 	}
-	$ENV{'PWD'} = join('/',@curdir) || '/';
+	%ENV{'PWD'} = join('/',@curdir) || '/';
     }
     1;
 }
@@ -543,7 +543,7 @@ sub _perl_abs_path
 	    closedir(PARENT);
 	    return '';
 	}
-	if ($pst[0] == $cst[0] && $pst[1] == $cst[1])
+	if (@pst[0] == @cst[0] && @pst[1] == @cst[1])
 	{
 	    $dir = undef;
 	}
@@ -557,10 +557,10 @@ sub _perl_abs_path
 		    closedir(PARENT);
 		    return '';
 		}
-		$tst[0] = $pst[0]+1 unless (@tst = lstat("$dotdots/$dir"))
+		@tst[0] = @pst[0]+1 unless (@tst = lstat("$dotdots/$dir"))
 	    }
-	    while ($dir eq '.' || $dir eq '..' || $tst[0] != $pst[0] ||
-		   $tst[1] != $pst[1]);
+	    while ($dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
+		   @tst[1] != @pst[1]);
 	}
 	$cwd = (defined $dir ? "$dir" : "" ) . "/$cwd" ;
 	closedir(PARENT);
@@ -572,7 +572,7 @@ sub _perl_abs_path
 
 my $Curdir;
 sub fast_abs_path {
-    local $ENV{PWD} = $ENV{PWD} || ''; # Guard against clobberage
+    local %ENV{PWD} = %ENV{PWD} || ''; # Guard against clobberage
     my $cwd = getcwd();
     require File::Spec;
     my $path = @_ ? shift : ($Curdir ||= File::Spec->curdir);
@@ -633,11 +633,11 @@ sub fast_abs_path {
 #   the CRTL chdir() function persist only until Perl exits.
 
 sub _vms_cwd {
-    return $ENV{'DEFAULT'};
+    return %ENV{'DEFAULT'};
 }
 
 sub _vms_abs_path {
-    return $ENV{'DEFAULT'} unless @_;
+    return %ENV{'DEFAULT'} unless @_;
     my $path = shift;
 
     if (-l $path) {
@@ -648,7 +648,7 @@ sub _vms_abs_path {
     }
 
     if (defined &VMS::Filespec::vms_realpath) {
-        my $path = $_[0];
+        my $path = @_[0];
         if ($path =~ m#(?<=\^)/# ) {
             # Unix format
             return VMS::Filespec::vms_realpath($path);
@@ -674,49 +674,49 @@ sub _vms_abs_path {
 }
 
 sub _os2_cwd {
-    $ENV{'PWD'} = `cmd /c cd`;
-    chomp $ENV{'PWD'};
-    $ENV{'PWD'} =~ s:\\:/:g ;
-    return $ENV{'PWD'};
+    %ENV{'PWD'} = `cmd /c cd`;
+    chomp %ENV{'PWD'};
+    %ENV{'PWD'} =~ s:\\:/:g ;
+    return %ENV{'PWD'};
 }
 
 sub _win32_cwd {
     if (defined &DynaLoader::boot_DynaLoader) {
-	$ENV{'PWD'} = Win32::GetCwd();
+	%ENV{'PWD'} = Win32::GetCwd();
     }
     else { # miniperl
-	chomp($ENV{'PWD'} = `cd`);
+	chomp(%ENV{'PWD'} = `cd`);
     }
-    $ENV{'PWD'} =~ s:\\:/:g ;
-    return $ENV{'PWD'};
+    %ENV{'PWD'} =~ s:\\:/:g ;
+    return %ENV{'PWD'};
 }
 
 *_NT_cwd = defined &Win32::GetCwd ? \&_win32_cwd : \&_os2_cwd;
 
 sub _dos_cwd {
     if (!defined &Dos::GetCwd) {
-        $ENV{'PWD'} = `command /c cd`;
-        chomp $ENV{'PWD'};
-        $ENV{'PWD'} =~ s:\\:/:g ;
+        %ENV{'PWD'} = `command /c cd`;
+        chomp %ENV{'PWD'};
+        %ENV{'PWD'} =~ s:\\:/:g ;
     } else {
-        $ENV{'PWD'} = Dos::GetCwd();
+        %ENV{'PWD'} = Dos::GetCwd();
     }
-    return $ENV{'PWD'};
+    return %ENV{'PWD'};
 }
 
 sub _qnx_cwd {
-	local $ENV{PATH} = '';
-	local $ENV{CDPATH} = '';
-	local $ENV{ENV} = '';
-    $ENV{'PWD'} = `/usr/bin/fullpath -t`;
-    chomp $ENV{'PWD'};
-    return $ENV{'PWD'};
+	local %ENV{PATH} = '';
+	local %ENV{CDPATH} = '';
+	local %ENV{ENV} = '';
+    %ENV{'PWD'} = `/usr/bin/fullpath -t`;
+    chomp %ENV{'PWD'};
+    return %ENV{'PWD'};
 }
 
 sub _qnx_abs_path {
-	local $ENV{PATH} = '';
-	local $ENV{CDPATH} = '';
-	local $ENV{ENV} = '';
+	local %ENV{PATH} = '';
+	local %ENV{CDPATH} = '';
+	local %ENV{ENV} = '';
     my $path = @_ ? shift : '.';
     local *REALPATH;
 
@@ -729,16 +729,16 @@ sub _qnx_abs_path {
 }
 
 sub _epoc_cwd {
-    $ENV{'PWD'} = EPOC::getcwd();
-    return $ENV{'PWD'};
+    %ENV{'PWD'} = EPOC::getcwd();
+    return %ENV{'PWD'};
 }
 
 
 # Now that all the base-level functions are set up, alias the
 # user-level functions to the right places
 
-if (exists $METHOD_MAP{$^O}) {
-  my $map = $METHOD_MAP{$^O};
+if (exists %METHOD_MAP{$^O}) {
+  my $map = %METHOD_MAP{$^O};
   foreach my $name (keys %$map) {
     local $^W = 0;  # assignments trigger 'subroutine redefined' warning
     no strict 'refs';

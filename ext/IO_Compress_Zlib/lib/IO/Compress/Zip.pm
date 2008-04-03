@@ -33,10 +33,10 @@ $ZipError = '';
 @ISA = qw(IO::Compress::RawDeflate Exporter);
 @EXPORT_OK = qw( $ZipError zip ) ;
 %EXPORT_TAGS = %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ;
-push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
+push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
 
-$EXPORT_TAGS{zip_method} = [qw( ZIP_CM_STORE ZIP_CM_DEFLATE ZIP_CM_BZIP2 )];
-push @{ $EXPORT_TAGS{all} }, @{ $EXPORT_TAGS{zip_method} };
+%EXPORT_TAGS{zip_method} = [qw( ZIP_CM_STORE ZIP_CM_DEFLATE ZIP_CM_BZIP2 )];
+push @{ %EXPORT_TAGS{all} }, @{ %EXPORT_TAGS{zip_method} };
 
 Exporter::export_ok_tags('all');
 
@@ -114,7 +114,7 @@ if (*$self->{ZipData}{Method} == ZIP_CM_DEFLATE) {
 *$self->{ZipData}{CRC32} = *$self->{Compress}->crc32();
 }
 else {
-*$self->{ZipData}{CRC32} = crc32(${$_[0]}, *$self->{ZipData}{CRC32});
+*$self->{ZipData}{CRC32} = crc32(${@_[0]}, *$self->{ZipData}{CRC32});
 
 }
 }
@@ -192,7 +192,7 @@ if *$self->{ZipData}{Stream} ;
 
 my $method = *$self->{ZipData}{Method} ;
 
-my $version = $ZIP_CM_MIN_VERSIONS{$method};
+my $version = %ZIP_CM_MIN_VERSIONS{$method};
 $version = ZIP64_MIN_VERSION
 if ZIP64_MIN_VERSION +> $version && *$self->{ZipData}{Zip64};
 my $madeBy = ($param->value('OS_Code') << 8) + $version;
@@ -401,7 +401,7 @@ if  *$self->{ZipData}{Zip64} && ! *$self->{ZipData}{Stream} ;
 
 my $method = $got->value('Method');
 return $self->saveErrorString(undef, "Unknown Method '$method'")   
-if ! defined $ZIP_CM_MIN_VERSIONS{$method};
+if ! defined %ZIP_CM_MIN_VERSIONS{$method};
 
 return $self->saveErrorString(undef, "Bzip2 not available")
 if $method == ZIP_CM_BZIP2 and 
@@ -489,7 +489,7 @@ my $params = shift;
 my $filename = shift ;
 
 my ($mode, $uid, $gid, $atime, $mtime, $ctime) 
-        = (stat($filename))[2, 4,5, 8,9,10] ;
+        = (stat($filename))[[2, 4,5, 8,9,10]] ;
 
 $params->value('Name' => $filename)
 if ! $params->parsed('Name') ;

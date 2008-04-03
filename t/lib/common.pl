@@ -94,7 +94,7 @@ for (@prgs){
     if ($todo_reason && $todo_reason =~ s/^\?//) {
 	my $temp = eval $todo_reason;
 	if ($@) {
-	    die "# In TODO code reason:\n# $todo_reason\n$@";
+	    die "# In TODO code reason:\n# $todo_reason\n{$@->message}";
 	}
 	$todo_reason = $temp;
     }
@@ -102,7 +102,7 @@ for (@prgs){
         my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error: test $_ didn't split into pairs, got " .
-		scalar(@files) . "[" . join("%%%%", @files) ."]\n"
+		scalar(@files) . "[" . join("\%\%\%\%", @files) ."]\n"
 	    if @files % 2 ;
 	while (@files +> 2) {
 	    my $filename = shift @files ;

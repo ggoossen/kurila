@@ -23,7 +23,7 @@ $INSECURE_EXTRACT_MODE  = 0;
 
 BEGIN {
     use Config;
-    $HAS_PERLIO = $Config::Config{useperlio};
+    $HAS_PERLIO = %Config::Config{useperlio};
 
     ### try and load IO::String anyway, so you can dynamically
     ### switch between perlio and IO::String
@@ -98,7 +98,7 @@ for my $key ( keys %$tmpl ) {
     no strict 'refs';
     *{Symbol::fetch_glob(__PACKAGE__."::$key")} = sub {
         my $self = shift;
-        $self->{$key} = $_[0] if @_;
+        $self->{$key} = @_[0] if @_;
         return $self->{$key};
     }
 }
@@ -287,7 +287,7 @@ sub _read_tar {
         ### to set it ASAP
         my $entry;
         {   my %extra_args = ();
-            $extra_args{'name'} = $$real_name if defined $real_name;
+            %extra_args{'name'} = $$real_name if defined $real_name;
             
             unless( $entry = Archive::Tar::File->new(   chunk => $chunk, 
                                                         %extra_args ) 
@@ -919,7 +919,7 @@ sub remove {
     my @list = @_;
 
     my %seen = map { $_->full_path => $_ } @{$self->_data};
-    delete $seen{ $_ } for @list;
+    delete %seen{ $_ } for @list;
 
     $self->_data( [values %seen] );
 
@@ -1134,7 +1134,7 @@ sub _format_tar_entry {
     my $l = PREFIX_LENGTH; # is ambiguous otherwise...
     substr ($prefix, 0, -$l, "") if length $prefix +>= PREFIX_LENGTH;
 
-    my $f1 = "%06o"; my $f2  = "%11o";
+    my $f1 = "\%06o"; my $f2  = "\%11o";
 
     ### this might be optimizable with a 'changed' flag in the file objects ###
     my $tar = pack (
@@ -1157,7 +1157,7 @@ sub _format_tar_entry {
     );
 
     ### add the checksum ###
-    substr($tar,148,7, sprintf("%6o\0", unpack("%16C*",$tar)));
+    substr($tar,148,7, sprintf("\%6o\0", unpack("\%16C*",$tar)));
 
     return $tar;
 }

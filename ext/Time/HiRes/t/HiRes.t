@@ -1,11 +1,11 @@
 #!./perl -w
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
 	require Config; Config->import;
-	if (" $Config{'extensions'} " !~ m[ Time/HiRes ]) {
+	if (" %Config{'extensions'} " !~ m[ Time/HiRes ]) {
 	    print "1..0 # Skip -- Perl configured without Time::HiRes module\n";
 	    exit 0;
 	}
@@ -43,15 +43,15 @@ sub has_symbol {
     return $@ eq '';
 }
 
-printf "# have_gettimeofday    = %d\n", $have_gettimeofday;
-printf "# have_usleep          = %d\n", $have_usleep;
-printf "# have_nanosleep       = %d\n", $have_nanosleep;
-printf "# have_ualarm          = %d\n", $have_ualarm;
-printf "# have_clock_gettime   = %d\n", $have_clock_gettime;
-printf "# have_clock_getres    = %d\n", $have_clock_getres;
-printf "# have_clock_nanosleep = %d\n", $have_clock_nanosleep;
-printf "# have_clock           = %d\n", $have_clock;
-printf "# have_hires_stat      = %d\n", $have_hires_stat;
+printf "# have_gettimeofday    = \%d\n", $have_gettimeofday;
+printf "# have_usleep          = \%d\n", $have_usleep;
+printf "# have_nanosleep       = \%d\n", $have_nanosleep;
+printf "# have_ualarm          = \%d\n", $have_ualarm;
+printf "# have_clock_gettime   = \%d\n", $have_clock_gettime;
+printf "# have_clock_getres    = \%d\n", $have_clock_getres;
+printf "# have_clock_nanosleep = \%d\n", $have_clock_nanosleep;
+printf "# have_clock           = \%d\n", $have_clock;
+printf "# have_hires_stat      = \%d\n", $have_hires_stat;
 
 Time::HiRes->import('gettimeofday')	if $have_gettimeofday;
 Time::HiRes->import('usleep')		if $have_usleep;
@@ -66,8 +66,8 @@ use Config;
 
 use Time::HiRes qw(gettimeofday);
 
-my $have_alarm = $Config{d_alarm};
-my $have_fork  = $Config{d_fork};
+my $have_alarm = %Config{d_alarm};
+my $have_fork  = %Config{d_fork};
 my $waitfor = 180; # 30-45 seconds is normal (load affects this).
 my $timer_pid;
 my $TheEnd;
@@ -136,17 +136,17 @@ unless ($have_gettimeofday) {
 else {
     my @one = gettimeofday();
     ok 2, @one == 2, 'gettimeofday returned ', 0+@one, ' args';
-    ok 3, $one[0] +> 850_000_000, "@one too small";
+    ok 3, @one[0] +> 850_000_000, "@one too small";
 
     sleep 1;
 
     my @two = gettimeofday();
-    ok 4, ($two[0] +> $one[0] || ($two[0] == $one[0] && $two[1] +> $one[1])),
+    ok 4, (@two[0] +> @one[0] || (@two[0] == @one[0] && @two[1] +> @one[1])),
     	    "@two is not greater than @one";
 
     my $f = Time::HiRes::time();
     ok 5, $f +> 850_000_000, "$f too small";
-    ok 6, $f - $two[0] +< 2, "$f - $two[0] >= 2";
+    ok 6, $f - @two[0] +< 2, "$f - @two[0] >= 2";
 }
 
 unless ($have_usleep) {
@@ -203,7 +203,7 @@ unless ($have_ualarm && $have_alarm) {
 }
 else {
     my $tick = 0;
-    local $SIG{ ALRM } = sub { $tick++ };
+    local %SIG{ ALRM } = sub { $tick++ };
 
     my $one = time; $tick = 0; ualarm(10_000); while ($tick == 0) { }
     my $two = time; $tick = 0; ualarm(10_000); while ($tick == 0) { }
@@ -234,7 +234,7 @@ unless ($have_gettimeofday) {
  print "# s = $s, n = $n, s/n = ", abs($s)/$n, "\n";
 }
 
-my $has_ualarm = $Config{d_ualarm};
+my $has_ualarm = %Config{d_ualarm};
 
 $has_ualarm ||= $xdefine =~ m/-DHAS_UALARM/;
 
@@ -266,7 +266,7 @@ unless (   defined &Time::HiRes::gettimeofday
     my $oldaction;
     if ($use_sigaction) {
 	$oldaction = POSIX::SigAction->new();
-	printf "# sigaction tick, ALRM = %d\n", &POSIX::SIGALRM;
+	printf "# sigaction tick, ALRM = \%d\n", &POSIX::SIGALRM;
 
 	# Perl's deferred signals may be too wimpy to break through
 	# a restartable select(), so use POSIX::sigaction if available.
@@ -277,7 +277,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	    or die "Error setting SIGALRM handler with sigaction: $!\n";
     } else {
 	print "# SIG tick\n";
-	$SIG{ALRM} = "tick";
+	%SIG{ALRM} = "tick";
     }
 
     # On VMS timers can not interrupt select.
@@ -336,7 +336,7 @@ unless (   defined &Time::HiRes::gettimeofday
 unless (   defined &Time::HiRes::setitimer
 	&& defined &Time::HiRes::getitimer
 	&& has_symbol('ITIMER_VIRTUAL')
-	&& $Config{sig_name} =~ m/\bVTALRM\b/
+	&& %Config{sig_name} =~ m/\bVTALRM\b/
         && $^O !~ m/^(nto)$/) { # nto: QNX 6 has the API but no implementation
     for (18..19) {
 	print "ok $_ # Skip: no virtual interval timers\n";
@@ -347,7 +347,7 @@ unless (   defined &Time::HiRes::setitimer
     my $i = 3;
     my $r = [Time::HiRes::gettimeofday()];
 
-    $SIG{VTALRM} = sub {
+    %SIG{VTALRM} = sub {
 	$i ? $i-- : setitimer(&ITIMER_VIRTUAL, 0);
 	print "# Tick! $i ", Time::HiRes::tv_interval($r), "\n";
     };	
@@ -372,7 +372,7 @@ unless (   defined &Time::HiRes::setitimer
     print "not " unless defined $virt && $virt == 0;
     print "ok 19\n";
 
-    $SIG{VTALRM} = 'DEFAULT';
+    %SIG{VTALRM} = 'DEFAULT';
 }
 
 if ($have_gettimeofday &&
@@ -516,7 +516,7 @@ if ($have_ualarm) {
     my $A = 2; # Number of alarms we will handle before disarming.
                # (We may well get $A + 1 alarms.)
 
-    $SIG{ALRM} = sub {
+    %SIG{ALRM} = sub {
 	$a++;
 	print "# Alarm $a - ", time(), "\n";
 	alarm(0) if $a +>= $A; # Disarm the alarm.
@@ -559,7 +559,7 @@ if ($have_clock_gettime &&
 		print "# Error: t0 = $t0, t1 = $t1\n";
 	    }
 	    my $r = rand() + rand();
-	    printf "# Sleeping for %.6f seconds...\n", $r;
+	    printf "# Sleeping for \%.6f seconds...\n", $r;
 	    sleep($r);
 	}
     }
@@ -608,10 +608,10 @@ if ($have_clock) {
 	push @clock, clock();
 	print "# clock = @clock\n";
     }
-    if ($clock[0] +>= 0 &&
-	$clock[1] +> $clock[0] &&
-	$clock[2] +> $clock[1] &&
-	$clock[3] +> $clock[2]) {
+    if (@clock[0] +>= 0 &&
+	@clock[1] +> @clock[0] &&
+	@clock[2] +> @clock[1] &&
+	@clock[3] +> @clock[2]) {
 	print "ok 33\n";
     } else {
 	print "not ok 33\n";
@@ -630,7 +630,7 @@ if ($have_ualarm) {
 	       [37, 4_300_000]) {
 	my ($i, $n) = @$t;
 	my $alarmed = 0;
-	local $SIG{ ALRM } = sub { $alarmed++ };
+	local %SIG{ ALRM } = sub { $alarmed++ };
 	my $t0 = Time::HiRes::time();
 	print "# t0 = $t0\n";
 	print "# ualarm($n)\n";
@@ -663,13 +663,13 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 	print X $$;
 	close(X);
 	@stat = Time::HiRes::stat($$);
-	push @mtime, $stat[9];
+	push @mtime, @stat[9];
 	Time::HiRes::sleep(rand(0.1) + 0.1);
 	open(X, "<", "$$");
 	~< *X;
 	close(X);
 	@stat = Time::HiRes::stat($$);
-	push @atime, $stat[8];
+	push @atime, @stat[8];
     }
     1 while unlink $$;
     print "# mtime = @mtime\n";
@@ -678,18 +678,18 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
     my $mi = 0;
     my $ss = 0;
     for (my $i = 1; $i +< @atime; $i++) {
-	if ($atime[$i] +>= $atime[$i-1]) {
+	if (@atime[$i] +>= @atime[$i-1]) {
 	    $ai++;
 	}
-	if ($atime[$i] +> int($atime[$i])) {
+	if (@atime[$i] +> int(@atime[$i])) {
 	    $ss++;
 	}
     }
     for (my $i = 1; $i +< @mtime; $i++) {
-	if ($mtime[$i] +>= $mtime[$i-1]) {
+	if (@mtime[$i] +>= @mtime[$i-1]) {
 	    $mi++;
 	}
-	if ($mtime[$i] +> int($mtime[$i])) {
+	if (@mtime[$i] +> int(@mtime[$i])) {
 	    $ss++;
 	}
     }
@@ -713,9 +713,9 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 END {
     if ($timer_pid) { # Only in the main process.
 	my $left = $TheEnd - time();
-	printf "# I am the main process $$, terminating the timer process $timer_pid\n# before it terminates me in %d seconds (testing took %d seconds).\n", $left, $waitfor - $left;
+	printf "# I am the main process $$, terminating the timer process $timer_pid\n# before it terminates me in \%d seconds (testing took \%d seconds).\n", $left, $waitfor - $left;
 	my $kill = kill('TERM', $timer_pid); # We are done, the timer can go.
-	printf "# kill TERM $timer_pid = %d\n", $kill;
+	printf "# kill TERM $timer_pid = \%d\n", $kill;
 	unlink("ktrace.out"); # Used in BSD system call tracing.
 	print "# All done.\n";
     }

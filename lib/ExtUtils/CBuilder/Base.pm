@@ -25,7 +25,7 @@ sub new {
 sub find_perl_interpreter {
   my $perl;
   File::Spec->file_name_is_absolute($perl = $^X)
-    or -f ($perl = $Config::Config{perlpath})
+    or -f ($perl = %Config::Config{perlpath})
     or ($perl = $^X);
   return $perl;
 }
@@ -76,39 +76,39 @@ sub arg_exec_file {
 
 sub arg_defines {
   my ($self, %args) = @_;
-  return map "-D$_=$args{$_}", keys %args;
+  return map "-D$_=%args{$_}", keys %args;
 }
 
 sub compile {
   my ($self, %args) = @_;
-  die "Missing 'source' argument to compile()" unless defined $args{source};
+  die "Missing 'source' argument to compile()" unless defined %args{source};
   
   my $cf = $self->{config}; # For convenience
 
-  $args{object_file} ||= $self->object_file($args{source});
+  %args{object_file} ||= $self->object_file(%args{source});
   
   my @include_dirs = $self->arg_include_dirs
-    (@{$args{include_dirs} || []},
+    (@{%args{include_dirs} || []},
      $self->perl_inc());
   
-  my @defines = $self->arg_defines( %{$args{defines} || {}} );
+  my @defines = $self->arg_defines( %{%args{defines} || {}} );
   
-  my @extra_compiler_flags = $self->split_like_shell($args{extra_compiler_flags});
+  my @extra_compiler_flags = $self->split_like_shell(%args{extra_compiler_flags});
   my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
   my @ccflags = $self->split_like_shell($cf->{ccflags});
   my @optimize = $self->split_like_shell($cf->{optimize});
   my @flags = (@include_dirs, @defines, @cccdlflags, @extra_compiler_flags,
 	       $self->arg_nolink,
 	       @ccflags, @optimize,
-	       $self->arg_object_file($args{object_file}),
+	       $self->arg_object_file(%args{object_file}),
 	      );
   
   my @cc = $self->split_like_shell($cf->{cc});
   
-  $self->do_system(@cc, @flags, $args{source})
-    or die "error building $args{object_file} from '$args{source}'";
+  $self->do_system(@cc, @flags, %args{source})
+    or die "error building %args{object_file} from '%args{source}'";
 
-  return $args{object_file};
+  return %args{object_file};
 }
 
 sub have_compiler {
@@ -159,22 +159,22 @@ sub extra_link_args_after_prelink { return }
 sub prelink {
   my ($self, %args) = @_;
   
-  ($args{dl_file} = $args{dl_name}) =~ s/.*::// unless $args{dl_file};
+  (%args{dl_file} = %args{dl_name}) =~ s/.*::// unless %args{dl_file};
   
   require ExtUtils::Mksymlists;
   ExtUtils::Mksymlists::Mksymlists( # dl. abbrev for dynamic library
-    DL_VARS  => $args{dl_vars}      || [],
-    DL_FUNCS => $args{dl_funcs}     || {},
-    FUNCLIST => $args{dl_func_list} || [],
-    IMPORTS  => $args{dl_imports}   || {},
-    NAME     => $args{dl_name},		# Name of the Perl module
-    DLBASE   => $args{dl_base},		# Basename of DLL file
-    FILE     => $args{dl_file},		# Dir + Basename of symlist file
-    VERSION  => (defined $args{dl_version} ? $args{dl_version} : '0.0'),
+    DL_VARS  => %args{dl_vars}      || [],
+    DL_FUNCS => %args{dl_funcs}     || {},
+    FUNCLIST => %args{dl_func_list} || [],
+    IMPORTS  => %args{dl_imports}   || {},
+    NAME     => %args{dl_name},		# Name of the Perl module
+    DLBASE   => %args{dl_base},		# Basename of DLL file
+    FILE     => %args{dl_file},		# Dir + Basename of symlist file
+    VERSION  => (defined %args{dl_version} ? %args{dl_version} : '0.0'),
   );
   
   # Mksymlists will create one of these files
-  return grep -e, map "$args{dl_file}.$_", qw(ext def opt);
+  return grep -e, map "%args{dl_file}.$_", qw(ext def opt);
 }
 
 sub link {
@@ -192,20 +192,20 @@ sub _do_link {
 
   my $cf = $self->{config}; # For convenience
   
-  my $objects = delete $args{objects};
+  my $objects = delete %args{objects};
   $objects = [$objects] unless ref $objects;
-  my $out = $args{$type} || $self->?$type($objects->[0]);
+  my $out = %args{$type} || $self->?$type($objects->[0]);
   
   my @temp_files;
   @temp_files =
     $self->prelink(%args,
-		   dl_name => $args{module_name}) if $args{lddl} && $self->need_prelink;
+		   dl_name => %args{module_name}) if %args{lddl} && $self->need_prelink;
   
-  my @linker_flags = ($self->split_like_shell($args{extra_linker_flags}),
-		      $self->extra_link_args_after_prelink(%args, dl_name => $args{module_name},
+  my @linker_flags = ($self->split_like_shell(%args{extra_linker_flags}),
+		      $self->extra_link_args_after_prelink(%args, dl_name => %args{module_name},
 							   prelink_res => \@temp_files));
 
-  my @output = $args{lddl} ? $self->arg_share_object_file($out) : $self->arg_exec_file($out);
+  my @output = %args{lddl} ? $self->arg_share_object_file($out) : $self->arg_exec_file($out);
   my @shrp = $self->split_like_shell($cf->{shrpenv});
   my @ld = $self->split_like_shell($cf->{ld});
   
@@ -238,7 +238,7 @@ sub perl_src {
   # N.B. makemaker actually searches regardless of PERL_CORE, but
   # only squawks at not finding it if PERL_CORE is set
 
-  return unless $ENV{PERL_CORE};
+  return unless %ENV{PERL_CORE};
 
   my $Updir = File::Spec->updir;
   my $dir   = File::Spec->curdir;

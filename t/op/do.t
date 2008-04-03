@@ -4,14 +4,14 @@ our (@x, @y, $result, $x, $y, @t, $u);
 
 sub foo1
 {
-    ok($_[0]);
+    ok(@_[0]);
     'value';
 }
 
 sub foo2
 {
     shift;
-    ok($_[0]);
+    ok(@_[0]);
     $x = 'value';
     $x;
 }
@@ -21,11 +21,11 @@ sub ok {
     my($ok, $name) = @_;
 
     # You have to do it this way or VMS will get confused.
-    printf "%s %d%s\n", $ok ? "ok" : "not ok", 
+    printf "\%s \%d\%s\n", $ok ? "ok" : "not ok", 
                         $test,
                         defined $name ? " - $name" : '';
 
-    printf "# Failed test at line %d\n", (caller)[2] unless $ok;
+    printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 
     $test++;
     return $ok;
@@ -34,16 +34,16 @@ sub ok {
 print "1..22\n";
 
 # Test do &sub and proper @_ handling.
-$_[0] = 0;
+@_[0] = 0;
 $result = do foo1(1);
 
 ok( $result eq 'value',  ":$result: eq :value:" );
-ok( $_[0] == 0 );
+ok( @_[0] == 0 );
 
-$_[0] = 0;
+@_[0] = 0;
 $result = do foo2(0,1,0);
 ok( $result eq 'value', ":$result: eq :value:" );
-ok( $_[0] == 0 );
+ok( @_[0] == 0 );
 
 $result = do{ ok 1; 'value';};
 ok( $result eq 'value',  ":$result: eq :value:" );
@@ -92,7 +92,7 @@ ok( (!defined do 6) && $!, "'do 6' : $!" );
 
 # [perl #19545]
 push @t, ($u = (do {} . "This should be pushed."));
-ok( $#t == 0, "empty do result value" );
+ok( (@t-1) == 0, "empty do result value" );
 
 END {
     1 while unlink("$$.16", "$$.17", "$$.18");

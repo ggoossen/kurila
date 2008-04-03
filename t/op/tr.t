@@ -189,13 +189,13 @@ is($a, "\x{c4}\x{ac}\x{12d}\x{c4}\x{ac}\x{ac}");
 
 # Tricky cases (When Simon Cozens Attacks)
 ($a = "\x{c4}\x{ac}\x{c8}") =~ tr/\x{12c}/a/;
-is(sprintf("%vd", $a), '196.172.200');
+is(sprintf("\%vd", $a), '196.172.200');
 
 ($a = "\x{c4}\x{ac}\x{c8}") =~ tr/\x{12c}/\x{12c}/;
-is(sprintf("%vd", $a), '196.172.200');
+is(sprintf("\%vd", $a), '196.172.200');
 
 ($a = "\x{c4}\x{ac}\x{c8}") =~ tr/\x{12c}//d;
-is(sprintf("%vd", $a), '196.172.200');
+is(sprintf("\%vd", $a), '196.172.200');
 
 
 # UTF8 range tests from Inaba Hiroto
@@ -313,17 +313,17 @@ is($@, '',  '   no error');
 
 
 my @foo = ();
-eval '$foo[-1] =~ tr/N/N/';
+eval '@foo[-1] =~ tr/N/N/';
 is( $@, '',         'implicit count outside array bounds, index negative' );
 is( scalar @foo, 0, "    doesn't extend the array");
 
-eval '$foo[1] =~ tr/N/N/';
+eval '@foo[1] =~ tr/N/N/';
 is( $@, '',         'implicit count outside array bounds, index positive' );
 is( scalar @foo, 0, "    doesn't extend the array");
 
 
 my %foo = ();
-eval '$foo{bar} =~ tr/N/N/';
+eval '%foo{bar} =~ tr/N/N/';
 is( $@, '',         'implicit count outside hash bounds' );
 is( scalar keys %foo, 0,   "    doesn't extend the hash");
 

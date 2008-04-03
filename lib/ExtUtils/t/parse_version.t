@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -33,8 +33,8 @@ my %versions = (q[$VERSION = '1.00']        => '1.00',
                );
 
 if( $Has_Version ) {
-    $versions{q[use version; $VERSION = v1.2.3;]} = v1.2.3;
-    $versions{q[$VERSION = v1.2.3]}               = v1.2.3;
+    %versions{q[use version; $VERSION = v1.2.3;]} = v1.2.3;
+    %versions{q[$VERSION = v1.2.3]}               = v1.2.3;
 }
 
 plan tests => (2 * keys %versions) + 4;

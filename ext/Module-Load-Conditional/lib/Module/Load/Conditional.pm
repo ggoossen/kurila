@@ -175,7 +175,7 @@ sub check_install {
     ### check the inc hash if we're allowed to
     if( $CHECK_INC_HASH ) {
         $filename = $href->{'file'} = 
-            $INC{ $file_inc } if defined $INC{ $file_inc };
+            %INC{ $file_inc } if defined %INC{ $file_inc };
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
@@ -200,7 +200,7 @@ sub check_install {
                     ($fh) = $dir->($dir, $file);
     
                 } elsif (UNIVERSAL::isa($dir, 'ARRAY')) {
-                    ($fh) = $dir->[0]->($dir, $file, @{$dir}{1..$#{$dir}})
+                    ($fh) = $dir->[0]->($dir, $file, %{$dir}{[1..(@{$dir}-1)]})
     
                 } elsif (UNIVERSAL::can($dir, 'INC')) {
                     ($fh) = $dir->INC->($dir, $file);
@@ -212,7 +212,7 @@ sub check_install {
                     next;
                 }
     
-                $filename = $INC{$file_inc} || $file;
+                $filename = %INC{$file_inc} || $file;
     
             } else {
                 $filename = File::Spec->catfile($dir, $file);
@@ -517,7 +517,7 @@ sub requires {
     }
 
     my $lib = join " ", map { qq["-I$_"] } @INC;
-    my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(%INC)))"];
+    my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
 
     return  sort
                 grep { !m/^$who$/  }

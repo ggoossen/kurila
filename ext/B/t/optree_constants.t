@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -22,7 +22,7 @@ use Config;
 my $tests = 28;
 plan tests => $tests;
 SKIP: {
-skip "no perlio in this build", $tests unless $Config::Config{useperlio};
+skip "no perlio in this build", $tests unless %Config::Config{useperlio};
 
 #################################
 
@@ -67,7 +67,7 @@ use constant WEEKDAYS
     => qw ( Sunday Monday Tuesday Wednesday Thursday Friday Saturday );
 
 
-$::{napier} = \2.71828;	# counter-example (doesn't get optimized).
+%::{napier} = \2.71828;	# counter-example (doesn't get optimized).
 eval "sub napier () \{\}";
 
 
@@ -191,7 +191,7 @@ checkOptree ( name	=> 'constant sub returning list',
 
 
 sub printem {
-    printf "myint %d mystr %s myfl %f pi %f\n"
+    printf "myint \%d mystr \%s myfl \%f pi \%f\n"
 	, myint, mystr, myfl, pi;
 }
 

@@ -30,7 +30,7 @@ while( ~< *DATA ) {
                    "EXPECTED:\n", $expected, "GOT:\n", $returned;
        print "not ";
     }
-    printf "ok %d\n", ++$test; 
+    printf "ok \%d\n", ++$test; 
     close OUT;
     close IN;
 }

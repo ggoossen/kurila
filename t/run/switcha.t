@@ -5,7 +5,7 @@ BEGIN {
     *ARGV = *DATA;
     $i = 0;
 }
-print "$F[1] ",++$i,"\n";
+print "@F[1] ",++$i,"\n";
 
 __DATA__
 not ok

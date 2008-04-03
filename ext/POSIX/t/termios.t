@@ -1,7 +1,7 @@
 #!perl -T
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -9,7 +9,7 @@ BEGIN {
     use Config;
     use Test::More;
     plan skip_all => "POSIX is unavailable" 
-        if $Config{'extensions'} !~ m!\bPOSIX\b!;
+        if %Config{'extensions'} !~ m!\bPOSIX\b!;
 }
 use strict;
 use POSIX;

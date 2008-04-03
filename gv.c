@@ -914,13 +914,13 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
     if (!stash) {
 	if (add) {
 	    SV * const err = Perl_mess(aTHX_
-		 "Global symbol \"%s%s\" requires explicit package name\n",
+		 "Global symbol \"%s%s\" requires explicit package name",
 		 (sv_type == SVt_PV ? "$"
 		  : sv_type == SVt_PVAV ? "@"
 		  : sv_type == SVt_PVHV ? "%"
 		  : ""), name);
 	    GV *gv;
-	    qerror(err);
+	    yyerror(SvPVX_const(err));
 	    gv = gv_fetchpvn_flags("<none>::", 8, GV_ADDMULTI, SVt_PVHV);
 	    if(!gv) {
 		/* symbol table under destruction */

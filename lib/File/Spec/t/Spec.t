@@ -25,7 +25,7 @@ if ( $@ ) {
       sub File::Spec::VMS::unixify \{ die "$skip_exception" \}
       sub File::Spec::VMS::vmspath \{ die "$skip_exception" \}
    - ;
-   $INC{"VMS/Filespec.pm"} = 1 ;
+   %INC{"VMS/Filespec.pm"} = 1 ;
 }
 require File::Spec::VMS ;
 
@@ -718,8 +718,8 @@ plan tests => scalar @tests + 1;
 	    my $self = shift;
 	    local $^W;
 	    local *Cwd::getdcwd = sub {
-	      return 'D:\alpha\beta' if $_[0] eq 'D:';
-	      return 'C:\one\two'    if $_[0] eq 'C:';
+	      return 'D:\alpha\beta' if @_[0] eq 'D:';
+	      return 'C:\one\two'    if @_[0] eq 'C:';
 	      return;
 	    };
 	    *Cwd::getdcwd = *Cwd::getdcwd; # Avoid a 'used only once' warning

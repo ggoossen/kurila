@@ -3,7 +3,7 @@ use Config;
 
 @VMS = ($^O eq 'VMS') ? (MAN3PODS => {}) : ();
 
-my $arch = "$Config{'archname'}-$Config{'osvers'}";
+my $arch = "%Config{'archname'}-%Config{'osvers'}";
 my $got = "";
 if (-e 'arch.txt') {
     open my $in, "<", "arch.txt" or die "Can't read 'arch.txt': $!";

@@ -26,14 +26,14 @@ sub compr
 {
     my $self = shift ;
 
-    if (defined ${ $_[0] } && length ${ $_[0] }) {
-        $self->{CompSize} += length ${ $_[0] } ;
+    if (defined ${ @_[0] } && length ${ @_[0] }) {
+        $self->{CompSize} += length ${ @_[0] } ;
         $self->{UnCompSize} = $self->{CompSize} ;
 
-        if ( ref $_[1] ) 
-          { ${ $_[1] } .= ${ $_[0] } }
+        if ( ref @_[1] ) 
+          { ${ @_[1] } .= ${ @_[0] } }
         else
-          { $_[1] .= ${ $_[0] } }
+          { @_[1] .= ${ @_[0] } }
     }
 
     return STATUS_OK ;

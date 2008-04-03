@@ -7,7 +7,7 @@ BEGIN {
 
 use strict 'vars';
 eval 'use Errno';
-die $@ if $@ and !$ENV{PERL_CORE_MINITEST};
+die $@ if $@ and !%ENV{PERL_CORE_MINITEST};
 
 print "1..21\n";
 
@@ -23,13 +23,13 @@ print STDOUT "ok 5\n";
 open(foo, ">-") or die;
 print foo "ok 6\n";
 
-printf "ok %d\n",7;
-printf("ok %d\n",8);
+printf "ok \%d\n",7;
+printf("ok \%d\n",8);
 
-my @a = ("ok %d%c",9,ord("\n"));
+my @a = ("ok \%d\%c",9,ord("\n"));
 printf @a;
 
-$a[1] = 10;
+@a[1] = 10;
 printf STDOUT @a;
 
 $, = ' ';

@@ -19,29 +19,29 @@ BEGIN {
 
 BAIL_OUT("No errno's are exported") unless @Errno::EXPORT_OK;
 
-my $err = $Errno::EXPORT_OK[0];
+my $err = @Errno::EXPORT_OK[0];
 my $num = &{*{Symbol::fetch_glob("Errno::$err")}};
 
 is($num, &{*{Symbol::fetch_glob("Errno::$err")}});
 
 $! = $num;
-ok(exists $!{$err});
+ok(exists %!{$err});
 
 $! = 0;
-ok(! $!{$err});
+ok(! %!{$err});
 
 ok(join(",",sort keys(%!)) eq join(",",sort @Errno::EXPORT_OK));
 
-eval { exists $!{''} };
+eval { exists %!{''} };
 ok(! $@);
 
-eval {$!{$err} = "qunckkk" };
+eval {%!{$err} = "qunckkk" };
 like($@->{description}, qr/^ERRNO hash is read only!/);
 
-eval {delete $!{$err}};
+eval {delete %!{$err}};
 like($@->{description}, qr/^ERRNO hash is read only!/);
 
 # The following tests are in trouble if some OS picks errno values
 # through Acme::MetaSyntactic::batman
-is($!{EFLRBBB}, "");
-ok(! exists($!{EFLRBBB}));
+is(%!{EFLRBBB}, "");
+ok(! exists(%!{EFLRBBB}));

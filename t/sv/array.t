@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-plan (117);
+plan (87);
 
 my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
@@ -12,40 +12,40 @@ my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 @ary = (1,2,3,4,5);
 is(join('',@ary), '12345');
 
-$tmp = $ary[$#ary]; --$#ary;
+$tmp = @ary[(@ary-1)]; pop @ary;
 is($tmp, 5);
-is($#ary, 3);
+is((@ary-1), 3);
 is(join('',@ary), '1234');
 
 @foo = ();
-$r = join(',', $#foo, @foo);
+$r = join(',', (@foo-1), @foo);
 is($r, "-1");
-$foo[0] = '0';
-$r = join(',', $#foo, @foo);
+@foo[0] = '0';
+$r = join(',', (@foo-1), @foo);
 is($r, "0,0");
-$foo[2] = '2';
-$r = join(',', $#foo, @foo);
+@foo[2] = '2';
+$r = join(',', (@foo-1), @foo);
 is($r, "2,0,,2");
 @bar = ();
-$bar[0] = '0';
-$bar[1] = '1';
-$r = join(',', $#bar, @bar);
+@bar[0] = '0';
+@bar[1] = '1';
+$r = join(',', (@bar-1), @bar);
 is($r, "1,0,1");
 @bar = ();
-$r = join(',', $#bar, @bar);
+$r = join(',', (@bar-1), @bar);
 is($r, "-1");
-$bar[0] = '0';
-$r = join(',', $#bar, @bar);
+@bar[0] = '0';
+$r = join(',', (@bar-1), @bar);
 is($r, "0,0");
-$bar[2] = '2';
-$r = join(',', $#bar, @bar);
+@bar[2] = '2';
+$r = join(',', (@bar-1), @bar);
 is($r, "2,0,,2");
 @bar = ();
-$bar[0] = '0';
-$r = join(',', $#bar, @bar);
+@bar[0] = '0';
+$r = join(',', (@bar-1), @bar);
 is($r, "0,0");
-$bar[2] = '2';
-$r = join(',', $#bar, @bar);
+@bar[2] = '2';
+$r = join(',', (@bar-1), @bar);
 is($r, "2,0,,2");
 
 $foo = 'now is the time';
@@ -60,15 +60,15 @@ ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
 
 %foo = ('blurfl','dyick','foo','bar','etc.','etc.');
 %bar = %foo;
-is($bar{'foo'}, 'bar');
+is(%bar{'foo'}, 'bar');
 %bar = ();
-is($bar{'foo'}, undef);
+is(%bar{'foo'}, undef);
 (%bar,$a,$b) = (%foo,'how','now');
-is($bar{'foo'}, 'bar');
-is($bar{'how'}, 'now');
-@bar{keys %foo} = values %foo;
-is($bar{'foo'}, 'bar');
-is($bar{'how'}, 'now');
+is(%bar{'foo'}, 'bar');
+is(%bar{'how'}, 'now');
+%bar{[keys %foo]} = values %foo;
+is(%bar{'foo'}, 'bar');
+is(%bar{'how'}, 'now');
 
 @foo = grep(m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ',@foo), 'the time men come');
@@ -76,24 +76,24 @@ is(join(' ',@foo), 'the time men come');
 @foo = grep(!m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ',@foo), 'now is for all good to to');
 
-$foo = join('',('a','b','c','d','e','f')[0..5]);
+$foo = join('',('a','b','c','d','e','f')[[0..5]]);
 is($foo, 'abcdef');
 
-$foo = join('',('a','b','c','d','e','f')[0..1]);
+$foo = join('',('a','b','c','d','e','f')[[0..1]]);
 is($foo, 'ab');
 
-$foo = join('',('a','b','c','d','e','f')[6]);
+$foo = join('',('a','b','c','d','e','f')[[6]]);
 is($foo, '');
 
-@foo = ('a','b','c','d','e','f')[0,2,4];
-@bar = ('a','b','c','d','e','f')[1,3,5];
-$foo = join('',(@foo,@bar)[0..5]);
+@foo = ('a','b','c','d','e','f')[[0,2,4]];
+@bar = ('a','b','c','d','e','f')[[1,3,5]];
+$foo = join('',(@foo,@bar)[[0..5]]);
 is($foo, 'acebdf');
 
-$foo = ('a','b','c','d','e','f')[0,2,4];
+$foo = ('a','b','c','d','e','f')[[0,2,4]];
 is($foo, 'e');
 
-$foo = ('a','b','c','d','e','f')[1];
+$foo = ('a','b','c','d','e','f')[[1]];
 is($foo, 'b');
 
 @foo = ( 'foo', 'bar', 'burbl', 'blah');
@@ -101,7 +101,7 @@ is($foo, 'b');
     no strict 'vars';
     @foox = ( 'foo', 'bar', 'burbl');
     push(foox, 'blah');
-    is($#foox, 3);
+    is((@foox-1), 3);
 }
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
@@ -209,14 +209,14 @@ our @bim;
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify { $_[1] = $t++; print "@_\n"; }
+sub reify { @_[1] = $t++; print "@_\n"; }
 reify('ok');
 reify('ok');
 
 curr_test($t);
 
 # qw() is no longer a runtime split, it's compiletime.
-is (qw(foo bar snorfle)[2], 'snorfle');
+is (qw(foo bar snorfle)[[2]], 'snorfle');
 
 @ary = (12,23,34,45,56);
 
@@ -226,8 +226,8 @@ is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
 sub foo { "a" }
-my @foo=(foo())[0,0];
-is ($foo[1], "a");
+my @foo=(foo())[[0,0]];
+is (@foo[1], "a");
 
 # bugid #15439 - clearing an array calls destructors which may try
 # to modify the array - caused 'Attempt to free unreferenced scalar'
@@ -236,7 +236,7 @@ my $got = runperl (
 	prog => q{
                     our @a;
 		    sub X::DESTROY { @a = () }
-		    @a = (bless {}, \'X\');
+		    @a = (bless {}, "X");
 		    @a = ();
 		},
 	stderr => 1
@@ -250,89 +250,22 @@ is ($got, '');
 
 {
     my @a = 0..4;
-    is($a[-1], 4);
-    is($a[-2], 3);
-    is($a[-5], 0);
-    ok(!defined $a[-6]);
+    is(@a[-1], 4);
+    is(@a[-2], 3);
+    is(@a[-5], 0);
+    ok(!defined @a[-6]);
 
-    is($a[2.1]  , 2);
-    is($a[2.9]  , 2);
-    is($a[undef], 0);
-    is($a["3rd"], 3);
+    is(@a[2.1]  , 2);
+    is(@a[2.9]  , 2);
+    is(@a[undef], 0);
+    is(@a["3rd"], 3);
 }
 
 
 {
     my @a;
-    eval_dies_like( '$a[-1] = 0', 
+    eval_dies_like( '@a[-1] = 0', 
                     qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0");
-}
-
-sub test_arylen {
-    my $ref = shift;
-    local $^W = 1;
-    is ($$ref, undef, "\$# on freed array is undef");
-    my @warn;
-    local ${^WARN_HOOK} = sub {push @warn, $_[0]->message};
-    $$ref = 1000;
-    is (scalar @warn, 1);
-    like ($warn[0], qr/^Attempt to set length of freed array/);
-}
-
-{
-    my $a = \$#{[]};
-    # Need a new statement to make it go out of scope
-    test_arylen ($a);
-    test_arylen (do {my @a; \$#a});
-}
-
-{
-    use vars '@array';
-
-    my $outer = \$#array;
-    is ($$outer, -1);
-    is (scalar @array, 0);
-
-    $$outer = 3;
-    is ($$outer, 3);
-    is (scalar @array, 4);
-
-    my $ref = \@array;
-
-    my $inner;
-    {
-	local @array;
-	$inner = \$#array;
-
-	is ($$inner, -1);
-	is (scalar @array, 0);
-	$$outer = 6;
-
-	is (scalar @$ref, 7);
-
-	is ($$inner, -1);
-	is (scalar @array, 0);
-
-	$$inner = 42;
-    }
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-
-    is ($$inner, undef, "orphaned $#foo is always undef");
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-
-    $$inner = 1;
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
-
-    $$inner = 503; # Bang!
-
-    is (scalar @array, 7);
-    is ($$outer, 6);
 }
 
 {
@@ -342,40 +275,10 @@ sub test_arylen {
     for (1,2) {
 	{
 	    local @a;
-	    is ($#a, -1);
+	    is ((@a-1), -1);
 	    @a=(1..4)
 	}
     }
-}
-
-{
-    # Bug #37350
-    no strict 'refs';
-    my @array = (1..4);
-    $#{*{Symbol::fetch_glob(scalar @array)}} = 7;
-    is ($#{4}, 7);
-
-    my $x;
-    $#{$x} = 3;
-    is(scalar @$x, 4);
-
-    push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
-    is ($4[8], 23);
-}
-{
-    # Bug #37350 -- once more with a global
-    no strict 'refs';
-    use vars '@array';
-    @array = (1..4);
-    $#{*{Symbol::fetch_glob(scalar @array)}} = 7;
-    is ($#{4}, 7);
-
-    my $x;
-    $#{$x} = 3;
-    is(scalar @$x, 4);
-
-    push @{*{Symbol::fetch_glob(scalar @array)}}, 23;
-    is ($4[8], 23);
 }
 
 # more tests for AASSIGN_COMMON

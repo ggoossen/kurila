@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
         @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -180,7 +180,7 @@ my $sCtg = "\x{30DB}\x{309A}";
 ok(composeContiguous($sCtg), "\x{30DD}");
 ok($sCtg, "\x{30DB}\x{309A}");
 
-sub answer { defined $_[0] ? $_[0] ? "YES" : "NO" : "MAYBE" }
+sub answer { defined @_[0] ? @_[0] ? "YES" : "NO" : "MAYBE" }
 
 ok(answer(checkNFD("")),  "YES");
 ok(answer(checkNFC("")),  "YES");

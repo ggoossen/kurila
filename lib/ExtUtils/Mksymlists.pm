@@ -16,37 +16,37 @@ sub Mksymlists {
     my($osname) = $^O;
 
     croak("Insufficient information specified to Mksymlists")
-        unless ( $spec{NAME} or
-                 ($spec{FILE} and ($spec{DL_FUNCS} or $spec{FUNCLIST})) );
+        unless ( %spec{NAME} or
+                 (%spec{FILE} and (%spec{DL_FUNCS} or %spec{FUNCLIST})) );
 
-    $spec{DL_VARS} = [] unless $spec{DL_VARS};
-    ($spec{FILE} = $spec{NAME}) =~ s/.*::// unless $spec{FILE};
-    $spec{FUNCLIST} = [] unless $spec{FUNCLIST};
-    $spec{DL_FUNCS} = { $spec{NAME} => [] }
-        unless ( ($spec{DL_FUNCS} and keys %{$spec{DL_FUNCS}}) or
-                 @{$spec{FUNCLIST}});
-    if (defined $spec{DL_FUNCS}) {
-        foreach my $package (keys %{$spec{DL_FUNCS}}) {
+    %spec{DL_VARS} = [] unless %spec{DL_VARS};
+    (%spec{FILE} = %spec{NAME}) =~ s/.*::// unless %spec{FILE};
+    %spec{FUNCLIST} = [] unless %spec{FUNCLIST};
+    %spec{DL_FUNCS} = { %spec{NAME} => [] }
+        unless ( (%spec{DL_FUNCS} and keys %{%spec{DL_FUNCS}}) or
+                 @{%spec{FUNCLIST}});
+    if (defined %spec{DL_FUNCS}) {
+        foreach my $package (keys %{%spec{DL_FUNCS}}) {
             my($packprefix,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
-            foreach my $sym (@{$spec{DL_FUNCS}->{$package}}) {
+            foreach my $sym (@{%spec{DL_FUNCS}->{$package}}) {
                 if ($sym =~ m/^boot_/) {
-                    push(@{$spec{FUNCLIST}},$sym);
+                    push(@{%spec{FUNCLIST}},$sym);
                     $bootseen++;
                 }
                 else {
-                    push(@{$spec{FUNCLIST}},"XS_${packprefix}_$sym");
+                    push(@{%spec{FUNCLIST}},"XS_${packprefix}_$sym");
                 }
             }
-            push(@{$spec{FUNCLIST}},"boot_$packprefix") unless $bootseen;
+            push(@{%spec{FUNCLIST}},"boot_$packprefix") unless $bootseen;
         }
     }
 
 #    We'll need this if we ever add any OS which uses mod2fname
 #    not as pseudo-builtin.
 #    require DynaLoader;
-    if (defined &DynaLoader::mod2fname and not $spec{DLBASE}) {
-        $spec{DLBASE} = DynaLoader::mod2fname([ split(m/::/,$spec{NAME}) ]);
+    if (defined &DynaLoader::mod2fname and not %spec{DLBASE}) {
+        %spec{DLBASE} = DynaLoader::mod2fname([ split(m/::/,%spec{NAME}) ]);
     }
 
     if    ($osname eq 'aix') { _write_aix(\%spec); }
@@ -76,7 +76,7 @@ sub _write_aix {
 sub _write_os2 {
     my($data) = @_;
     require Config;
-    my $threaded = ($Config::Config{archname} =~ m/-thread/ ? " threaded" : "");
+    my $threaded = (%Config::Config{archname} =~ m/-thread/ ? " threaded" : "");
 
     if (not $data->{DLBASE}) {
         ($data->{DLBASE} = $data->{NAME}) =~ s/.*:://;
@@ -84,15 +84,15 @@ sub _write_os2 {
     }
     my $distname = $data->{DISTNAME} || $data->{NAME};
     $distname = "Distribution $distname";
-    my $patchlevel = " pl$Config{perl_patchlevel}" || '';
-    my $comment = sprintf "Perl (v%s%s%s) module %s", 
-      $Config::Config{version}, $threaded, $patchlevel, $data->{NAME};
+    my $patchlevel = " pl%Config{perl_patchlevel}" || '';
+    my $comment = sprintf "Perl (v\%s\%s\%s) module \%s", 
+      %Config::Config{version}, $threaded, $patchlevel, $data->{NAME};
     chomp $comment;
     if ($data->{INSTALLDIRS} and $data->{INSTALLDIRS} eq 'perl') {
         $distname = 'perl5-porters@perl.org';
         $comment = "Core $comment";
     }
-    $comment = "$comment (Perl-config: $Config{config_args})";
+    $comment = "$comment (Perl-config: %Config{config_args})";
     $comment = substr($comment, 0, 200) . "...)" if length $comment +> 203;
     rename "$data->{FILE}.def", "$data->{FILE}_def.old";
 
@@ -128,7 +128,7 @@ sub _write_win32 {
     open( my $def, ">", "$data->{FILE}.def" )
         or croak("Can't create $data->{FILE}.def: $!\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
-    if ($Config::Config{'cc'} !~ m/^gcc/i) {
+    if (%Config::Config{'cc'} !~ m/^gcc/i) {
         print $def "LIBRARY \"$data->{DLBASE}\"\n";
     }
     print $def "EXPORTS\n  ";
@@ -138,7 +138,7 @@ sub _write_win32 {
     # NOTE: DynaLoader itself only uses the names without underscores,
     # so this is only to cover the case when the extension DLL may be
     # linked to directly from C. GSAR 97-07-10
-    if ($Config::Config{'cc'} =~ m/^bcc/i) {
+    if (%Config::Config{'cc'} =~ m/^bcc/i) {
         for (@{$data->{DL_VARS}}, @{$data->{FUNCLIST}}) {
             push @syms, "_$_", "$_ = _$_";
         }
@@ -166,7 +166,7 @@ sub _write_vms {
     require Config; # a reminder for once we do $^O
     require ExtUtils::XSSymSet;
 
-    my($isvax) = $Config::Config{'archname'} =~ m/VAX/i;
+    my($isvax) = %Config::Config{'archname'} =~ m/VAX/i;
     my($set) = ExtUtils::XSSymSet->new;
 
     rename "$data->{FILE}.opt", "$data->{FILE}.opt_old";
@@ -182,7 +182,7 @@ sub _write_vms {
     # the GSMATCH criteria for a dynamic extension
 
     print $opt "case_sensitive=yes\n"
-        if $Config::Config{d_vms_case_sensitive_symbols};
+        if %Config::Config{d_vms_case_sensitive_symbols};
 
     foreach my $sym (@{$data->{FUNCLIST}}) {
         my $safe = $set->addsym($sym);

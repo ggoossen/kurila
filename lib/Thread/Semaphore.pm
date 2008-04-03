@@ -13,9 +13,7 @@ sub new {
     my $class = shift;
     my $val :shared = @_ ? shift : 1;
     if (! looks_like_number($val) || (int($val) != $val)) {
-        require Carp;
-        $val = 'undef' if (! defined($val));
-        Carp::croak("Semaphore initializer is not an integer: $val");
+        die("Semaphore initializer is not an integer: {dump::view($val)}");
     }
     return bless(\$val, $class);
 }

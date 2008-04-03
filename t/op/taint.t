@@ -20,15 +20,15 @@ use vars qw($ipcsysv); # did we manage to load IPC::SysV?
 
 my ($old_env_path, $old_env_dcl_path, $old_env_term);
 BEGIN {
-   $old_env_path = $ENV{'PATH'};
-   $old_env_dcl_path = $ENV{'DCL$PATH'};
-   $old_env_term = $ENV{'TERM'};
-  if ($^O eq 'VMS' && !defined($Config{d_setenv})) {
-      $ENV{PATH} = $ENV{PATH};
-      $ENV{TERM} = $ENV{TERM} ne ''? $ENV{TERM} : 'dummy';
+   $old_env_path = %ENV{'PATH'};
+   $old_env_dcl_path = %ENV{'DCL$PATH'};
+   $old_env_term = %ENV{'TERM'};
+  if ($^O eq 'VMS' && !defined(%Config{d_setenv})) {
+      %ENV{PATH} = %ENV{PATH};
+      %ENV{TERM} = %ENV{TERM} ne ''? %ENV{TERM} : 'dummy';
   }
-  if ($Config{'extensions'} =~ m/\bIPC\/SysV\b/
-      && ($Config{d_shm} || $Config{d_msg})) {
+  if (%Config{'extensions'} =~ m/\bIPC\/SysV\b/
+      && (%Config{d_shm} || %Config{d_msg})) {
       eval { require IPC::SysV };
       unless ($@) {
 	  $ipcsysv++;
@@ -54,7 +54,7 @@ my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 if ($Is_VMS) {
     my (%old, $x);
     for $x ('DCL$PATH', @MoreEnv) {
-	($old{$x}) = $ENV{$x} =~ m/^(.*)$/ if exists $ENV{$x};
+	(%old{$x}) = %ENV{$x} =~ m/^(.*)$/ if exists %ENV{$x};
     }
     # VMS note:  PATH and TERM are automatically created by the C
     # library in VMS on reference to the their keys in %ENV.
@@ -66,7 +66,7 @@ if ($Is_VMS) {
 	    warn "# Note: logical name 'PATH' may have been created\n";
 	    \$ENV\{'TERM'\} = \$old_env_term;
 	    warn "# Note: logical name 'TERM' may have been created\n";
-	    \@ENV\{keys %old\} = values %old;
+	    \@ENV\{keys \%old\} = values \%old;
 	    if (defined \$old_env_dcl_path) \{
 		\$ENV\{'DCL\$PATH'\} = \$old_env_dcl_path;
 	    \} else \{
@@ -97,7 +97,7 @@ sub any_tainted (@) {
     return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
-    my $tainted = not eval { $_[0], kill 0; 1};
+    my $tainted = not eval { @_[0], kill 0; 1};
     die if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
     return $tainted;
 }
@@ -116,7 +116,7 @@ sub test ($;$) {
 	print "ok $curr_test\n";
     } else {
 	print "not ok $curr_test\n";
-        printf "# Failed test at line %d\n", (caller)[2];
+        printf "# Failed test at line \%d\n", (caller)[[2]];
 	for (split m/^/m, $diag) {
 	    print "# $_";
 	}
@@ -144,11 +144,11 @@ my $TEST = catfile(curdir(), 'TEST');
 # environment variables. Maybe they aren't set yet, so we'll
 # taint them ourselves.
 {
-    $ENV{'DCL$PATH'} = '' if $Is_VMS;
+    %ENV{'DCL$PATH'} = '' if $Is_VMS;
 
-    if ($Is_MSWin32 && $Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
+    if ($Is_MSWin32 && %Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split m/$Config{path_sep}/, $ENV{PATH}) {
+	foreach my $dir (split m/%Config{path_sep}/, %ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -162,9 +162,9 @@ my $TEST = catfile(curdir(), 'TEST');
 	    };
 	}
     }
-    $ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
-    delete @ENV{@MoreEnv};
-    $ENV{TERM} = 'dumb';
+    %ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
+    delete %ENV{[@MoreEnv]};
+    %ENV{TERM} = 'dumb';
 
     test eval { `$echo 1` } eq "1\n";
 
@@ -173,8 +173,8 @@ my $TEST = catfile(curdir(), 'TEST');
           if $Is_MSWin32 || $Is_NetWare || $Is_VMS || $Is_Dos || $Is_MacOS;
 
 	my @vars = ('PATH', @MoreEnv);
-	while (my $v = $vars[0]) {
-	    local $ENV{$v} = $TAINT;
+	while (my $v = @vars[0]) {
+	    local %ENV{$v} = $TAINT;
 	    last if eval { `$echo 1` };
 	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
@@ -182,10 +182,10 @@ my $TEST = catfile(curdir(), 'TEST');
 	test !@vars, "@vars";
 
 	# tainted $TERM is unsafe only if it contains metachars
-	local $ENV{TERM};
-	$ENV{TERM} = 'e=mc2';
+	local %ENV{TERM};
+	%ENV{TERM} = 'e=mc2';
 	test eval { `$echo 1` } eq "1\n";
-	$ENV{TERM} = 'e=mc2' . $TAINT;
+	%ENV{TERM} = 'e=mc2' . $TAINT;
 	test !eval { `$echo 1` };
 	like( $@->{description}, qr/^Insecure \$ENV{TERM}/ );
     }
@@ -195,16 +195,16 @@ my $TEST = catfile(curdir(), 'TEST');
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and (stat '_')[2] ^&^ 2 }
+	$tmp = (grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
 		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
-		     @ENV{qw(TMP TEMP)})[0]
+		     %ENV{[qw(TMP TEMP)]})[[0]]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
     SKIP: {
         skip "all directories are writeable", 2 unless $tmp;
 
-	local $ENV{PATH} = $tmp;
+	local %ENV{PATH} = $tmp;
 	test !eval { `$echo 1` };
 	test $@->{description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     }
@@ -212,18 +212,18 @@ my $TEST = catfile(curdir(), 'TEST');
     SKIP: {
         skip "This is not VMS", 4 unless $Is_VMS;
 
-	$ENV{'DCL$PATH'} = $TAINT;
+	%ENV{'DCL$PATH'} = $TAINT;
 	test  eval { `$echo 1` } eq '';
 	test $@->{description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
-	    $ENV{'DCL$PATH'} = $tmp;
+	    %ENV{'DCL$PATH'} = $tmp;
 	    test eval { `$echo 1` } eq '';
 	    test $@->{description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	}
-	$ENV{'DCL$PATH'} = '';
+	%ENV{'DCL$PATH'} = '';
     }
 }
 
@@ -243,10 +243,10 @@ my $TEST = catfile(curdir(), 'TEST');
 
     my @list = 1..10;
     test not any_tainted @list;
-    taint_these @list[1,3,5,7,9];
+    taint_these @list[[1,3,5,7,9]];
     test any_tainted @list;
-    test all_tainted @list[1,3,5,7,9];
-    test not any_tainted @list[0,2,4,6,8];
+    test all_tainted @list[[1,3,5,7,9]];
+    test not any_tainted @list[[0,2,4,6,8]];
 
     ($foo) = $foo =~ m/(.+)/;
     test not tainted $foo;
@@ -276,7 +276,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     ($pi) = $pi =~ m/(\d+\.\d+)/;
     test not tainted $pi;
-    test sprintf("%.5f", $pi) eq '3.14159';
+    test sprintf("\%.5f", $pi) eq '3.14159';
 }
 
 # How about command-line arguments? The problem is that we don't
@@ -353,7 +353,7 @@ SKIP: {
 {
     dies_like( sub { chmod 0, $TAINT }, qr/^Insecure dependency/);
 
-    # There is no feature test in $Config{} for truncate,
+    # There is no feature test in %Config{} for truncate,
     #   so we allow for the possibility that it's missing.
     dies_like( sub { truncate 'NoSuChFiLe', $TAINT0 }, 
                qr/^(?:Insecure dependency|truncate not implemented)/);
@@ -368,21 +368,21 @@ SKIP: {
                qr/^Insecure dependency/);
 
     SKIP: {
-        skip "chown() is not available", 2 unless $Config{d_chown};
+        skip "chown() is not available", 2 unless %Config{d_chown};
 
 	dies_like( sub { chown -1, -1, $TAINT },
                    qr/^Insecure dependency/);
     }
 
     SKIP: {
-        skip "link() is not available", 2 unless $Config{d_link};
+        skip "link() is not available", 2 unless %Config{d_link};
 
 	dies_like( sub { link $TAINT, '' },
                    qr/^Insecure dependency/);
     }
 
     SKIP: {
-        skip "symlink() is not available", 2 unless $Config{d_symlink};
+        skip "symlink() is not available", 2 unless %Config{d_symlink};
 
 	dies_like( sub { symlink $TAINT, '' },
                    qr/^Insecure dependency/);
@@ -401,7 +401,7 @@ SKIP: {
                qr/^Insecure dependency/);
 
     SKIP: {
-        skip "chroot() is not available", 2 unless $Config{d_chroot};
+        skip "chroot() is not available", 2 unless %Config{d_chroot};
 
 	dies_like( sub { chroot $TAINT },
                    qr/^Insecure dependency/);
@@ -475,14 +475,14 @@ SKIP: {
                qr/^Insecure dependency/);
 
     SKIP: {
-        skip "setpgrp() is not available", 2 unless $Config{d_setpgrp};
+        skip "setpgrp() is not available", 2 unless %Config{d_setpgrp};
 
 	dies_like( sub { setpgrp 0, $TAINT0 },
                    qr/^Insecure dependency/);
     }
 
     SKIP: {
-        skip "setpriority() is not available", 2 unless $Config{d_setprior};
+        skip "setpriority() is not available", 2 unless %Config{d_setprior};
 
 	dies_like( sub { setpriority 0, $TAINT0, $TAINT0 },
                    qr/^Insecure dependency/);
@@ -492,7 +492,7 @@ SKIP: {
 # Some miscellaneous operations can't use tainted data.
 {
     SKIP: {
-        skip "syscall() is not available", 2 unless $Config{d_syscall};
+        skip "syscall() is not available", 2 unless %Config{d_syscall};
 
 	dies_like( sub { syscall $TAINT },
                    qr/^Insecure dependency/);
@@ -510,7 +510,7 @@ SKIP: {
                    qr/^Insecure dependency/);
 
         SKIP: {
-            skip "fcntl() is not available", 2 unless $Config{d_fcntl};
+            skip "fcntl() is not available", 2 unless %Config{d_fcntl};
 
 	    dies_like( sub { fcntl FOO, $TAINT0, $foo },
                        qr/^Insecure dependency/);
@@ -552,37 +552,37 @@ SKIP: {
 # Test assignment and return of lists
 {
     my @foo = ("A", "tainted" . $TAINT, "B");
-    test not tainted $foo[0];
-    test     tainted $foo[1];
-    test not tainted $foo[2];
+    test not tainted @foo[0];
+    test     tainted @foo[1];
+    test not tainted @foo[2];
     my @bar = @foo;
-    test not tainted $bar[0];
-    test     tainted $bar[1];
-    test not tainted $bar[2];
+    test not tainted @bar[0];
+    test     tainted @bar[1];
+    test not tainted @bar[2];
     my @baz = eval { "A", "tainted" . $TAINT, "B" };
-    test not tainted $baz[0];
-    test     tainted $baz[1];
-    test not tainted $baz[2];
+    test not tainted @baz[0];
+    test     tainted @baz[1];
+    test not tainted @baz[2];
     my @plugh = eval q[ "A", "tainted" . $TAINT, "B" ];
-    test not tainted $plugh[0];
-    test     tainted $plugh[1];
-    test not tainted $plugh[2];
+    test not tainted @plugh[0];
+    test     tainted @plugh[1];
+    test not tainted @plugh[2];
     my $nautilus = sub { "A", "tainted" . $TAINT, "B" };
-    test not tainted ((&$nautilus)[0]);
-    test     tainted ((&$nautilus)[1]);
-    test not tainted ((&$nautilus)[2]);
+    test not tainted ((&$nautilus)[[0]]);
+    test     tainted ((&$nautilus)[[1]]);
+    test not tainted ((&$nautilus)[[2]]);
     my @xyzzy = &$nautilus;
-    test not tainted $xyzzy[0];
-    test     tainted $xyzzy[1];
-    test not tainted $xyzzy[2];
+    test not tainted @xyzzy[0];
+    test     tainted @xyzzy[1];
+    test not tainted @xyzzy[2];
     my $red_october = sub { return "A", "tainted" . $TAINT, "B" };
-    test not tainted ((&$red_october)[0]);
-    test     tainted ((&$red_october)[1]);
-    test not tainted ((&$red_october)[2]);
+    test not tainted ((&$red_october)[[0]]);
+    test     tainted ((&$red_october)[[1]]);
+    test not tainted ((&$red_october)[[2]]);
     my @corge = &$red_october;
-    test not tainted $corge[0];
-    test     tainted $corge[1];
-    test not tainted $corge[2];
+    test not tainted @corge[0];
+    test     tainted @corge[1];
+    test not tainted @corge[2];
 }
 
 # Test for system/library calls returning string data of dubious origin.
@@ -595,21 +595,21 @@ SKIP: {
 	setpwent();
 	my @getpwent = getpwent();
 	die "getpwent: $!\n" unless (@getpwent);
-	test (    not tainted $getpwent[0]
-	          and     tainted $getpwent[1]
-	          and not tainted $getpwent[2]
-	          and not tainted $getpwent[3]
-	          and not tainted $getpwent[4]
-	          and not tainted $getpwent[5]
-	          and     tainted $getpwent[6]		# ge?cos
-	          and not tainted $getpwent[7]
-		  and     tainted $getpwent[8]);	# shell
+	test (    not tainted @getpwent[0]
+	          and     tainted @getpwent[1]
+	          and not tainted @getpwent[2]
+	          and not tainted @getpwent[3]
+	          and not tainted @getpwent[4]
+	          and not tainted @getpwent[5]
+	          and     tainted @getpwent[6]		# ge?cos
+	          and not tainted @getpwent[7]
+		  and     tainted @getpwent[8]);	# shell
 	endpwent();
     }
 
     SKIP: {
         # pretty hard to imagine not
-        skip "readdir() is not available", 1 unless $Config{d_readdir};
+        skip "readdir() is not available", 1 unless %Config{d_readdir};
 
 	local(*D);
 	opendir(D, "op") or die "opendir: $!\n";
@@ -620,13 +620,13 @@ SKIP: {
 
     SKIP: {
         skip "readlink() or symlink() is not available" unless 
-          $Config{d_readlink} && $Config{d_symlink};
+          %Config{d_readlink} && %Config{d_symlink};
 
 	my $symlink = "sl$$";
 	unlink($symlink);
 	my $sl = "/something/naughty";
 	# it has to be a real path on Mac OS
-	$sl = MacPerl::MakePath((MacPerl::Volumes())[0]) if $Is_MacOS;
+	$sl = MacPerl::MakePath((MacPerl::Volumes())[[0]]) if $Is_MacOS;
 	symlink($sl, $symlink) or die "symlink: $!\n";
 	my $readlink = readlink($symlink);
 	test tainted $readlink;
@@ -664,7 +664,7 @@ SKIP: {
 
     # test shmread
     SKIP: {
-        skip "shm*() not available", 1 unless $Config{d_shm};
+        skip "shm*() not available", 1 unless %Config{d_shm};
 
         no strict 'subs';
         my $sent = "foobar";
@@ -696,7 +696,7 @@ SKIP: {
 
     # test msgrcv
     SKIP: {
-        skip "msg*() not available", 1 unless $Config{d_msg};
+        skip "msg*() not available", 1 unless %Config{d_msg};
 
 	no strict 'subs';
 	my $id = msgget(IPC_PRIVATE, IPC_CREAT ^|^ S_IRWXU);
@@ -851,7 +851,7 @@ SKIP: {
 
     sub fmi {
 	my $divnum = shift()/1;
-	sprintf("%1.1f\n", $divnum);
+	sprintf("\%1.1f\n", $divnum);
     }
 
     fmi(21 . $TAINT);
@@ -876,7 +876,7 @@ SKIP: {
 
     sub Tie::FETCH {
         $i ++;
-        ${$_ [0]}
+        ${@_ [0]}
     }
 
  
@@ -929,7 +929,7 @@ SKIP: {
     skip "system \{\} has different semantics on Win32", 1 if $Is_MSWin32;
 
     # bug 20010221.005
-    local $ENV{PATH} .= $TAINT;
+    local %ENV{PATH} .= $TAINT;
     dies_like(sub { system { "echo" } "/arg0", "arg1" },
               qr/^Insecure \$ENV/);
 }
@@ -988,10 +988,10 @@ TODO: {
     our %nonmagicalenv = ( PATH => "util" );
     local *ENV = \%nonmagicalenv;
     dies_like(sub { system("lskdfj") },
-              qr/^%ENV is aliased to another variable while running with -T switch/);
+              qr/^\%ENV is aliased to another variable while running with -T switch/);
     local *ENV = *nonmagicalenv;
     dies_like( sub { system("lskdfj"); },
-               qr/^%ENV is aliased to %nonmagicalenv while running with -T switch/);
+               qr/^\%ENV is aliased to \%nonmagicalenv while running with -T switch/);
 }
 {
     # [perl #24248]
@@ -1127,9 +1127,9 @@ TERNARY_CONDITIONALS: {
 {
     my @a;
     local $::TODO = 1;
-    $a[0] = $^X;
+    @a[0] = $^X;
     my $i = 0;
-    while($a[0]=~ m/(.)/g ) {
+    while(@a[0]=~ m/(.)/g ) {
 	last if $i++ +> 10000;
     }
     cmp_ok $i, '+<', 10000, "infinite m//g";
@@ -1149,12 +1149,12 @@ SKIP:
 
 {
     SKIP: {
-	skip "fork() is not available", 3 unless $Config{'d_fork'};
+	skip "fork() is not available", 3 unless %Config{'d_fork'};
 	skip "opening |- is not stable on threaded OpenBSD with taint", 3
-            if $Config{useithreads} && $Is_OpenBSD;
+            if %Config{useithreads} && $Is_OpenBSD;
 
-	$ENV{'PATH'} = $TAINT;
-	local $SIG{'PIPE'} = 'IGNORE';
+	%ENV{'PATH'} = $TAINT;
+	local %SIG{'PIPE'} = 'IGNORE';
 	eval {
 	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {
@@ -1177,13 +1177,13 @@ SKIP:
 
 {
     # tests for tainted format in s?printf
-    dies_like( sub { printf($TAINT . "# %s\n", "foo") },
+    dies_like( sub { printf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in printf/, q/printf doesn't like tainted formats/);
-    eval { printf("# %s\n", $TAINT . "foo") };
+    eval { printf("# \%s\n", $TAINT . "foo") };
     ok(!$@, q/printf accepts other tainted args/);
-    dies_like( sub { sprintf($TAINT . "# %s\n", "foo") },
+    dies_like( sub { sprintf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in sprintf/, q/sprintf doesn't like tainted formats/);
-    eval { sprintf("# %s\n", $TAINT . "foo") };
+    eval { sprintf("# \%s\n", $TAINT . "foo") };
     ok(!$@, q/sprintf accepts other tainted args/);
 }
 
@@ -1230,14 +1230,14 @@ SKIP:
 {
     my $value = "foo bar";
     my @values = split(m/\s+/, $value, 2);
-    ok(!tainted($values[1]), "result of split is not tainted if input was not tainted");
+    ok(!tainted(@values[1]), "result of split is not tainted if input was not tainted");
     my @values = split(m/\s+/, $value . $TAINT, 2);
-    ok(tainted($values[1]), "result of split is tainted if input was tainted");
+    ok(tainted(@values[1]), "result of split is tainted if input was tainted");
 }
 
 # This may bomb out with the alarm signal so keep it last
 SKIP: {
-    skip "No alarm()"  unless $Config{d_alarm};
+    skip "No alarm()"  unless %Config{d_alarm};
     # Test from RT #41831]
     # [PATCH] Bug & fix: hang when using study + taint mode (perl 5.6.1, 5.8.x)
 

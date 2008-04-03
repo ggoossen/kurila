@@ -7,14 +7,14 @@
 #  
 
 sub BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -276,7 +276,7 @@ sub make {
 	return $self;
 }
 
-sub set_c2 { $_[0]->{c2} = $_[1] }
+sub set_c2 { @_[0]->{c2} = @_[1] }
 
 #
 # Is the reference count of the extra references returned from a
@@ -285,7 +285,7 @@ sub set_c2 { $_[0]->{c2} = $_[1] }
 package Foo2;
 
 sub new {
-	my $self = bless {}, $_[0];
+	my $self = bless {}, @_[0];
 	$self->{freezed} = dump::view($self);
 	return $self;
 }
@@ -298,7 +298,7 @@ sub DESTROY {
 package Foo3;
 
 sub new {
-	bless {}, $_[0];
+	bless {}, @_[0];
 }
 
 sub STORABLE_freeze {

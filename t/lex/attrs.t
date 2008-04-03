@@ -19,13 +19,13 @@ sub eval_ok ($;$) {
     is( $@, '', @_);
 }
 
-eval_ok 'sub t1 ($) : locked { $_[0]++ }';
-eval_ok 'sub t2 : locked { $_[0]++ }';
+eval_ok 'sub t1 ($) : locked { @_[0]++ }';
+eval_ok 'sub t2 : locked { @_[0]++ }';
 eval_ok 'sub t3 ($) : locked ;';
 eval_ok 'sub t4 : locked ;';
-eval_ok '$anon1 = sub ($) : locked:method { $_[0]++ }';
-eval_ok '$anon2 = sub : locked : method { $_[0]++ }';
-eval_ok '$anon3 = sub : method { $_[0]->[1] }';
+eval_ok '$anon1 = sub ($) : locked:method { @_[0]++ }';
+eval_ok '$anon2 = sub : locked : method { @_[0]++ }';
+eval_ok '$anon3 = sub : method { @_[0]->[1] }';
 
 eval 'sub e1 ($) : plugh ;';
 like $@->message, qr/^Invalid CODE attributes?: ["']?plugh["']? at/;
@@ -91,7 +91,7 @@ like $@->message, qr/^Expected variable after declarator at/;
 eval 'package Cat; my Cat @socks;';
 like $@->message, qr/^Expected variable after declarator at/;
 
-sub X::MODIFY_CODE_ATTRIBUTES { die "$_[0]" }
+sub X::MODIFY_CODE_ATTRIBUTES { die "@_[0]" }
 sub X::foo { 1 }
 *Y::bar = \&X::foo;
 *Y::bar = \&X::foo;	# second time for -w
@@ -119,13 +119,13 @@ eval 'package A; sub PS : locked';
 is "@attrs", "locked";
 
 # Test ability to modify existing sub's (or XSUB's) attributes.
-eval 'package A; sub X { $_[0] } sub X : locked';
+eval 'package A; sub X { @_[0] } sub X : locked';
 @attrs = eval 'attributes::get \&A::X';
 is "@attrs", "locked";
 
 # Above not with just 'pure' built-in attributes.
 sub Z::MODIFY_CODE_ATTRIBUTES { (); }
-eval 'package Z; sub L { $_[0] } sub L : Z locked';
+eval 'package Z; sub L { @_[0] } sub L : Z locked';
 @attrs = eval 'attributes::get \&Z::L';
 is "@attrs", "locked Z";
 
@@ -134,14 +134,14 @@ is "@attrs", "locked Z";
 {
     package Ttie;
     sub DESTROY {}
-    sub TIESCALAR { my $x = $_[1]; bless \$x, $_[0]; }
-    sub FETCH { ${$_[0]} }
+    sub TIESCALAR { my $x = @_[1]; bless \$x, @_[0]; }
+    sub FETCH { ${@_[0]} }
     sub STORE {
 	::pass;
-	${$_[0]} = $_[1]*2;
+	${@_[0]} = @_[1]*2;
     }
     package Tloop;
-    sub MODIFY_SCALAR_ATTRIBUTES { tie ${$_[1]}, 'Ttie', -1; (); }
+    sub MODIFY_SCALAR_ATTRIBUTES { tie ${@_[1]}, 'Ttie', -1; (); }
 }
 
 eval_ok '
@@ -162,9 +162,9 @@ like $@->message, qr/Can't declare scalar dereference in "my"/;
 my @code = qw(locked method);
 my @other = qw(shared unique);
 my %valid;
-$valid{CODE} = {map {$_ => 1} @code};
-$valid{SCALAR} = {map {$_ => 1} @other};
-$valid{ARRAY} = $valid{HASH} = $valid{SCALAR};
+%valid{CODE} = {map {$_ => 1} @code};
+%valid{SCALAR} = {map {$_ => 1} @other};
+%valid{ARRAY} = %valid{HASH} = %valid{SCALAR};
 
 our ($scalar, @array, %hash);
 foreach my $value (\&foo, \$scalar, \@array, \%hash) {
@@ -173,7 +173,7 @@ foreach my $value (\&foo, \$scalar, \@array, \%hash) {
 	foreach my $attr (@code, @other) {
 	    my $attribute = $negate . $attr;
 	    eval "use attributes __PACKAGE__, \$value, '$attribute'";
-	    if ($valid{$type}{$attr}) {
+	    if (%valid{$type}{$attr}) {
 		if ($attribute eq '-shared') {
 		    like $@->message, qr/^A variable may not be unshared/;
 		} else {

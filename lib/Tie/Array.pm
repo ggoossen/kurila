@@ -65,18 +65,18 @@ sub SPLICE {
         $obj->STORESIZE($sz-$d);
     }
     for (my $i=0; $i +< @_; $i++) {
-        $obj->STORE($off+$i,$_[$i]);
+        $obj->STORE($off+$i,@_[$i]);
     }
     return wantarray ? @result : pop @result;
 }
 
 sub EXISTS {
-    my $pkg = ref $_[0];
+    my $pkg = ref @_[0];
     die "$pkg doesn't define an EXISTS method";
 }
 
 sub DELETE {
-    my $pkg = ref $_[0];
+    my $pkg = ref @_[0];
     die "$pkg doesn't define a DELETE method";
 }
 
@@ -84,18 +84,18 @@ package Tie::StdArray;
 use vars qw(@ISA);
 @ISA = 'Tie::Array';
 
-sub TIEARRAY  { bless [], $_[0] }
-sub FETCHSIZE { scalar @{$_[0]} }
-sub STORESIZE { $#{$_[0]} = $_[1]-1 }
-sub STORE     { $_[0]->[$_[1]] = $_[2] }
-sub FETCH     { $_[0]->[$_[1]] }
-sub CLEAR     { @{$_[0]} = () }
-sub POP       { pop(@{$_[0]}) }
+sub TIEARRAY  { bless [], @_[0] }
+sub FETCHSIZE { scalar @{@_[0]} }
+sub STORESIZE { if (@_[1] +> @{@_[0]}) { @_[0][@_[1]-1] = @_[0][@_[1]-1]; } else { splice @{@_[0]}, @_[1] } }
+sub STORE     { @_[0]->[@_[1]] = @_[2] }
+sub FETCH     { @_[0]->[@_[1]] }
+sub CLEAR     { @{@_[0]} = () }
+sub POP       { pop(@{@_[0]}) }
 sub PUSH      { my $o = shift; push(@$o,@_) }
-sub SHIFT     { shift(@{$_[0]}) }
+sub SHIFT     { shift(@{@_[0]}) }
 sub UNSHIFT   { my $o = shift; unshift(@$o,@_) }
-sub EXISTS    { exists $_[0]->[$_[1]] }
-sub DELETE    { delete $_[0]->[$_[1]] }
+sub EXISTS    { exists @_[0]->[@_[1]] }
+sub DELETE    { delete @_[0]->[@_[1]] }
 
 sub SPLICE
 {

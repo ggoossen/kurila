@@ -41,10 +41,10 @@ sub pod2html {
   for($infile, $outfile) { $_ = undef unless defined and length }
   
   if($verbose) {
-    warn sprintf "%s version %s\n", __PACKAGE__, $VERSION;
+    warn sprintf "\%s version \%s\n", __PACKAGE__, $VERSION;
     warn "OK, processed args [@args] ...\n";
     warn sprintf
-      " Verbose: %s\n Index: %s\n Infile: %s\n Outfile: %s\n Title: %s\n",
+      " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n",
       map defined($_) ? $_ : "(nil)",
        $verbose,     $index,     $infile,     $outfile,     $title,
     ;

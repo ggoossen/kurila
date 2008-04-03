@@ -107,7 +107,7 @@ sub subtract_from {
 }
 
 sub copy {
-	Time::Seconds->new(${$_[0]});
+	Time::Seconds->new(${@_[0]});
 }
 
 sub seconds {

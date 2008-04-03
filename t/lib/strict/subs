@@ -8,14 +8,14 @@ my $fred ;
 $b = "fred" ;
 $a = $$b ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 6.
 ########
 
 use strict qw(refs vars);
 Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 
@@ -31,7 +31,7 @@ use strict 'subs' ;
 my @a = (1..2);
 my $b = xyz;
 EXPECT
-Bareword "xyz" not allowed while "strict subs" in use
+Bareword "xyz" not allowed while "strict subs" in use at - line 5, at EOF
 Execution of - aborted due to compilation errors. at - line 5.
 ########
 
@@ -39,7 +39,7 @@ Execution of - aborted due to compilation errors. at - line 5.
 use strict 'subs' ;
 Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 4, at EOF
 Execution of - aborted due to compilation errors. at - line 4.
 ########
 
@@ -47,8 +47,8 @@ Execution of - aborted due to compilation errors. at - line 4.
 use strict 'subs' ;
 my @a = (A..Z);
 EXPECT
-Bareword "Z" not allowed while "strict subs" in use
-Bareword "A" not allowed while "strict subs" in use
+Bareword "Z" not allowed while "strict subs" in use at - line 4, near ");"
+Bareword "A" not allowed while "strict subs" in use at - line 4, near ");"
 Execution of - aborted due to compilation errors. at - line 4.
 ########
 
@@ -56,8 +56,8 @@ Execution of - aborted due to compilation errors. at - line 4.
 use strict 'subs' ;
 my $a = (B..Y);
 EXPECT
-Bareword "Y" not allowed while "strict subs" in use
-Bareword "B" not allowed while "strict subs" in use
+Bareword "Y" not allowed while "strict subs" in use at - line 4, at EOF
+Bareword "B" not allowed while "strict subs" in use at - line 4, at EOF
 Execution of - aborted due to compilation errors. at - line 4.
 ########
 
@@ -65,7 +65,7 @@ Execution of - aborted due to compilation errors. at - line 4.
 use strict ;
 Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 4, at EOF
 Execution of - aborted due to compilation errors. at - line 4.
 ########
 
@@ -85,7 +85,7 @@ use strict 'subs' ;
 }
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 8, at EOF
 Execution of - aborted due to compilation errors. at - line 8.
 ########
 
@@ -97,7 +97,7 @@ no strict;
 }
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 6, at EOF
 Execution of - aborted due to compilation errors. at - line 8.
 ########
 
@@ -110,7 +110,7 @@ use strict 'vars' ;
 $joe = 1 ;
 EXPECT
 Variable "$joe" is not imported at - line 8.
-Global symbol "$joe" requires explicit package name
+Global symbol "$joe" requires explicit package name at - line 8, near "$joe "
 Execution of - aborted due to compilation errors. at - line 8.
 ########
 
@@ -122,7 +122,7 @@ no strict;
 }
 $joe = 1 ;
 EXPECT
-Global symbol "$joe" requires explicit package name
+Global symbol "$joe" requires explicit package name at - line 6, near "$joe "
 Execution of - aborted due to compilation errors. at - line 8.
 ########
 
@@ -169,7 +169,7 @@ Can't use string ("fred") as a SCALAR ref while "strict refs" in use at - line 8
 use strict 'subs' ;
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 
@@ -180,7 +180,7 @@ my $a = Fred ;
 no strict 'subs' ;
 require "./abc";
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at ./abc line 1, at EOF
 Compilation failed in require at - line 2.
 ########
 
@@ -204,7 +204,7 @@ no strict 'subs';
 Fred ;
 require "./abc";
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at ./abc line 2, at EOF
 Compilation failed in require at - line 3.
 ########
 
@@ -217,7 +217,7 @@ no strict 'subs';
 Fred ;
 use abc;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at abc.pm line 2, at EOF
 Compilation failed in require at - line 3.
 BEGIN failed--compilation aborted
 ########
@@ -242,7 +242,7 @@ eval {
 print STDERR $@;
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 6, at EOF
 Execution of - aborted due to compilation errors. at - line 9.
 ########
 
@@ -254,8 +254,8 @@ eval {
 print STDERR $@;
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 5, at EOF
+Bareword "Fred" not allowed while "strict subs" in use at - line 8, at EOF
 Execution of - aborted due to compilation errors. at - line 8.
 ########
 
@@ -268,7 +268,7 @@ eval {
 print STDERR $@;
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 9, at EOF
 Execution of - aborted due to compilation errors. at - line 9.
 ########
 
@@ -289,7 +289,7 @@ eval q[
     Fred ;
 ]; print STDERR $@->message;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at (eval 1) line 3, at EOF
  at - line 4.
 ########
 
@@ -299,7 +299,7 @@ eval '
     Fred ;
 '; print STDERR $@->message ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at (eval 1) line 2, at EOF
  at - line 4.
 ########
 
@@ -311,7 +311,8 @@ eval '
 '; print STDERR $@;
 my $a = Fred ;
 EXPECT
-Bareword "Fred" not allowed while "strict subs" in use
+Bareword "Fred" not allowed while "strict subs" in use at - line 8, at EOF
+  (Might be a runaway multi-line '' string starting on line 4)
 Execution of - aborted due to compilation errors. at - line 8.
 ########
 
@@ -334,7 +335,7 @@ Bareword "Foo::" refering to a package are not allowed at - line 9.
 use strict;
 "" =~ foo;
 EXPECT
-Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use at - line 4, near "foo;"
 Execution of - aborted due to compilation errors. at - line 4.
 ########
 
@@ -344,7 +345,7 @@ use warnings;
 my $abc = XYZ ? 1 : 0;
 print "$abc\n";
 EXPECT
-Bareword "XYZ" not allowed while "strict subs" in use
+Bareword "XYZ" not allowed while "strict subs" in use at - line 5, near "0;"
 Execution of - aborted due to compilation errors. at - line 6.
 ########
 
@@ -353,46 +354,46 @@ use strict;
 use warnings;
 print "" if BAREWORD;
 EXPECT
-Bareword "BAREWORD" not allowed while "strict subs" in use
+Bareword "BAREWORD" not allowed while "strict subs" in use at - line 5, near "BAREWORD;"
 Execution of - aborted due to compilation errors. at - line 5.
 ########
 # Ticket: 18927
 use strict 'subs';
 print 1..1, bad;
 EXPECT
-Bareword "bad" not allowed while "strict subs" in use
+Bareword "bad" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 eval q{ use strict; no strict refs; };
 print $@->message;
 EXPECT
-Bareword "refs" not allowed while "strict subs" in use
+Bareword "refs" not allowed while "strict subs" in use at (eval 1) line 1, near "refs;"
  at - line 1.
 ########
 # [perl #25147] 
 use strict;
 print "" if BAREWORD;
 EXPECT
-Bareword "BAREWORD" not allowed while "strict subs" in use
+Bareword "BAREWORD" not allowed while "strict subs" in use at - line 3, near "BAREWORD;"
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 # [perl #26910] hints not propagated into (?{...})
 use strict 'subs';
 qr/(?{my $x=foo})/;
 EXPECT
-Bareword "foo" not allowed while "strict subs" in use
+Bareword "foo" not allowed while "strict subs" in use at (re_eval 1) line 1, at EOF
 Compilation failed in regexp at - line 3.
 ########
 #  [perl #27628] strict 'subs' didn't warn on bareword array index
 use strict 'subs';
-my @a; my $x=$a[FOO];
+my @a; my $x=@a[FOO];
 EXPECT
-Bareword "FOO" not allowed while "strict subs" in use
+Bareword "FOO" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors. at - line 3.
 ########
 use strict 'subs';
-my @a;my $x=$a[FOO];
+my @a;my $x=@a[FOO];
 EXPECT
-Bareword "FOO" not allowed while "strict subs" in use
+Bareword "FOO" not allowed while "strict subs" in use at - line 2, at EOF
 Execution of - aborted due to compilation errors. at - line 2.
 ########

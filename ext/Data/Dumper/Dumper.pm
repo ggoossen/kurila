@@ -174,9 +174,9 @@ sub DESTROY {}
 
 sub Dump {
     return &Dumpxs
-	unless $Data::Dumper::Useperl || (ref($_[0]) && $_[0]->{useperl}) ||
-	       $Data::Dumper::Useqq   || (ref($_[0]) && $_[0]->{useqq}) ||
-	       $Data::Dumper::Deparse || (ref($_[0]) && $_[0]->{deparse});
+	unless $Data::Dumper::Useperl || (ref(@_[0]) && @_[0]->{useperl}) ||
+	       $Data::Dumper::Useqq   || (ref(@_[0]) && @_[0]->{useqq}) ||
+	       $Data::Dumper::Deparse || (ref(@_[0]) && @_[0]->{deparse});
     return &Dumpperl;
 }
 
@@ -386,7 +386,7 @@ sub _dump {
 	$sname = $mname . '[' . $i . ']';
 	$out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
 	$out .= $pad . $ipad . $s->_dump($v, $sname);
-	$out .= "," if $i++ +< $#$val;
+	$out .= "," if $i++ +< @$val -1;
       }
       $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
       $out .= ($name =~ m/^\@/) ? ')' : ']';
@@ -461,7 +461,7 @@ sub _dump {
   }
   else {                                 # simple scalar
 
-    my $ref = \$_[1];
+    my $ref = \@_[1];
     # first, catalog the scalar
     if ($name ne '') {
       $id = format_refaddr($ref);
@@ -497,9 +497,9 @@ sub _dump {
 
 	  # _dump can push into @post, so we hold our place using $postlen
 	  my $postlen = scalar @post;
-	  $post[$postlen] = "\*$sname = ";
-	  local ($s->{apad}) = " " x length($post[$postlen]) if $s->{indent} +>= 2;
-	  $post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
+	  @post[$postlen] = "\*$sname = ";
+	  local ($s->{apad}) = " " x length(@post[$postlen]) if $s->{indent} +>= 2;
+	  @post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
 	}
       }
       $out .= '*' . $sname;
@@ -668,16 +668,16 @@ sub qquote {
   local($_) = shift;
   s/([\\\"\@\$\{\}])/\\$1/g;
   my $bytes; { use bytes; $bytes = length }
-  s/([^\x[00]-\x[7f]])/{'\x'.sprintf("[%02x]",ord($1))}/g if $bytes +> length;
+  s/([^\x[00]-\x[7f]])/{'\x'.sprintf("[\%02x]",ord($1))}/g if $bytes +> length;
   return qq("$_") unless 
     m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
   my $high = shift || "";
-  s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
+  s/([\a\b\t\n\f\r\e])/%esc{$1}/g;
 
     # no need for 3 digits in escape for these
     s/([\0-\037])(?!\d)/{'\'.sprintf('%o',ord($1))}/g;
-    s/([\0-\037\177])/{'\'.sprintf('%03o',ord($1))}/g;
+    s/([\0-\037\177])/{'\'.sprintf('\%03o',ord($1))}/g;
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
     if ($high eq "iso8859") {
       s/([\200-\240])/{'\'.sprintf('%o',ord($1))}/g;
@@ -688,7 +688,7 @@ sub qquote {
         # leave it as it is
     } else {
         use utf8;
-        s/([^\040-\176])/{sprintf "\\x\{%04x\}", ord($1)}/g;
+        s/([^\040-\176])/{sprintf "\\x\{\%04x\}", ord($1)}/g;
     }
 
   return qq("$_");
@@ -696,7 +696,7 @@ sub qquote {
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { [ sort keys %{$_[0]} ] }
+sub _sortkeys { [ sort keys %{@_[0]} ] }
 
 1;
 __END__
@@ -1065,10 +1065,10 @@ distribution for more examples.)
     use Data::Dumper;
 
     package Foo;
-    sub new {bless {'a' => 1, 'b' => sub { return "foo" }}, $_[0]};
+    sub new {bless {'a' => 1, 'b' => sub { return "foo" }}, @_[0]};
 
     package Fuz;                       # a weird REF-REF-SCALAR object
-    sub new {bless \($_ = \ 'fu\'z'), $_[0]};
+    sub new {bless \($_ = \ 'fu\'z'), @_[0]};
 
     package main;
     $foo = Foo->new;

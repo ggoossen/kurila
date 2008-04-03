@@ -19,7 +19,7 @@ if [[ -z $FOO ]]; then echo 'not ok 1'; fi
 #!/some/path/that/leads/to/perl -l
 
 # These lines get executed
-my $test = $ARGV[0];
+my $test = @ARGV[0];
 if (-f 'switchx.t') {
     print("ok $test");
 }

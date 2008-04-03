@@ -200,12 +200,12 @@ sub catdir {
 
 	# take care of the first argument
 
-	if ($args[0] eq '')  { # absolute path, rootdir
+	if (@args[0] eq '')  { # absolute path, rootdir
 		shift @args;
 		$relative = 0;
 		$first_arg = $self->rootdir;
 
-	} elsif ($args[0] =~ m/^[^:]+:/) { # absolute path, volume name
+	} elsif (@args[0] =~ m/^[^:]+:/) { # absolute path, volume name
 		$relative = 0;
 		$first_arg = shift @args;
 		# add a trailing ':' if need be (may be it's a path like HD:dir)
@@ -213,10 +213,10 @@ sub catdir {
 
 	} else { # relative path
 		$relative = 1;
-		if ( $args[0] =~ m/^::+\Z(?!\n)/ ) {
+		if ( @args[0] =~ m/^::+\Z(?!\n)/ ) {
 			# updir colon path ('::', ':::' etc.), don't shift
 			$first_arg = ':';
-		} elsif ($args[0] eq ':') {
+		} elsif (@args[0] eq ':') {
 			$first_arg = shift @args;
 		} else {
 			# add a trailing ':' if need be
@@ -238,7 +238,7 @@ sub catdir {
 		unless (($arg eq '') || ($arg eq ':')) {
 			if ($arg =~ m/^::+\Z(?!\n)/ ) { # updir colon path like ':::'
 				my $updir_count = length($arg) - 1;
-				while ((@args) && ($args[0] =~ m/^::+\Z(?!\n)/) ) { # while updir colon path
+				while ((@args) && (@args[0] =~ m/^::+\Z(?!\n)/) ) { # while updir colon path
 					$arg = shift @args;
 					$updir_count += (length($arg) - 1);
 				}
@@ -373,7 +373,7 @@ directory on your startup volume.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = $_[0]->_tmpdir( $ENV{TMPDIR} );
+    $tmpdir = @_[0]->_tmpdir( %ENV{TMPDIR} );
 }
 
 =item updir
@@ -432,8 +432,8 @@ sub path {
 #  The concept is meaningless under the MacPerl application.
 #  Under MPW, it has a meaning.
 #
-    return unless exists $ENV{Commands};
-    return split(m/,/, $ENV{Commands});
+    return unless exists %ENV{Commands};
+    return split(m/,/, %ENV{Commands});
 }
 
 =item splitpath
@@ -685,7 +685,7 @@ sub abs2rel {
 	
     while ( @pathchunks &&
 	    @basechunks &&
-	    lc( $pathchunks[0] ) eq lc( $basechunks[0] ) ) {
+	    lc( @pathchunks[0] ) eq lc( @basechunks[0] ) ) {
         shift @pathchunks ;
         shift @basechunks ;
     }
@@ -740,7 +740,7 @@ sub rel2abs {
 	# Split up paths
 
 	# igonore $path's volume
-        my ( $path_dirs, $path_file ) = ($self->splitpath($path))[1,2] ;
+        my ( $path_dirs, $path_file ) = ($self->splitpath($path))[[1,2]] ;
 
         # ignore $base's file part
 	my ( $base_vol, $base_dirs ) = $self->splitpath($base) ;

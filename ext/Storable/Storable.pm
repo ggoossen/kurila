@@ -41,7 +41,7 @@ $VERSION = '2.18';
 #
 
 BEGIN {
-	if (eval { require Fcntl; 1 } && exists $Fcntl::EXPORT_TAGS{'flock'}) {
+	if (eval { require Fcntl; 1 } && exists %Fcntl::EXPORT_TAGS{'flock'}) {
 		Fcntl->import(':flock');
 	} else {
 		eval q{
@@ -87,9 +87,9 @@ sub CAN_FLOCK; my $CAN_FLOCK; sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
 	require Config; Config->import;
 	return $CAN_FLOCK =
-		$Config{'d_flock'} ||
-		$Config{'d_fcntl_can_lock'} ||
-		$Config{'d_lockf'};
+		%Config{'d_flock'} ||
+		%Config{'d_fcntl_can_lock'} ||
+		%Config{'d_lockf'};
 }
 
 sub show_file_magic {
@@ -100,7 +100,7 @@ sub show_file_magic {
 # usually either /usr/share/misc/magic or /etc/magic.
 #
 0	string	perl-store	perl Storable(v0.6) data
->4	byte	>0	(net-order %d)
+>4	byte	>0	(net-order \%d)
 >>4	byte	&01	(network-ordered)
 >>4	byte	=3	(major 1)
 >>4	byte	=2	(major 1)
@@ -110,7 +110,7 @@ sub show_file_magic {
 >>4	byte	&01	(network-ordered)
 >>4	byte	=5	(major 2)
 >>4	byte	=4	(major 2)
->>5	byte	>0	(minor %d)
+>>5	byte	>0	(minor \%d)
 EOM
 }
 
@@ -135,7 +135,7 @@ sub read_magic {
     my $magic;
     if ($buf =~ s/^(pst0|perl-store)//) {
 	$magic = $1;
-	$info{file} = $file || 1;
+	%info{file} = $file || 1;
     }
     else {
 	return undef if $file;
@@ -146,54 +146,54 @@ sub read_magic {
 
     my $net_order;
     if ($magic eq "perl-store" && ord(substr($buf, 0, 1)) +> 1) {
-	$info{version} = -1;
+	%info{version} = -1;
 	$net_order = 0;
     }
     else {
 	$net_order = ord(substr($buf, 0, 1, ""));
 	my $major = $net_order >> 1;
 	return undef if $major +> 4; # sanity (assuming we never go that high)
-	$info{major} = $major;
+	%info{major} = $major;
 	$net_order ^&^= 0x01;
 	if ($major +> 1) {
 	    return undef unless length($buf);
 	    my $minor = ord(substr($buf, 0, 1, ""));
-	    $info{minor} = $minor;
-	    $info{version} = "$major.$minor";
-	    $info{version_nv} = sprintf "%d.%03d", $major, $minor;
+	    %info{minor} = $minor;
+	    %info{version} = "$major.$minor";
+	    %info{version_nv} = sprintf "\%d.\%03d", $major, $minor;
 	}
 	else {
-	    $info{version} = $major;
+	    %info{version} = $major;
 	}
     }
-    $info{version_nv} ||= $info{version};
-    $info{netorder} = $net_order;
+    %info{version_nv} ||= %info{version};
+    %info{netorder} = $net_order;
 
     unless ($net_order) {
 	return undef unless length($buf);
 	my $len = ord(substr($buf, 0, 1, ""));
 	return undef unless length($buf) +>= $len;
 	return undef unless $len == 4 || $len == 8;  # sanity
-	$info{byteorder} = substr($buf, 0, $len, "");
-	$info{intsize} = ord(substr($buf, 0, 1, ""));
-	$info{longsize} = ord(substr($buf, 0, 1, ""));
-	$info{ptrsize} = ord(substr($buf, 0, 1, ""));
-	if ($info{version_nv} +>= 2.002) {
+	%info{byteorder} = substr($buf, 0, $len, "");
+	%info{intsize} = ord(substr($buf, 0, 1, ""));
+	%info{longsize} = ord(substr($buf, 0, 1, ""));
+	%info{ptrsize} = ord(substr($buf, 0, 1, ""));
+	if (%info{version_nv} +>= 2.002) {
 	    return undef unless length($buf);
-	    $info{nvsize} = ord(substr($buf, 0, 1, ""));
+	    %info{nvsize} = ord(substr($buf, 0, 1, ""));
 	}
     }
-    $info{hdrsize} = $buflen - length($buf);
+    %info{hdrsize} = $buflen - length($buf);
 
     return \%info;
 }
 
 sub BIN_VERSION_NV {
-    sprintf "%d.%03d", BIN_MAJOR(), BIN_MINOR();
+    sprintf "\%d.\%03d", BIN_MAJOR(), BIN_MINOR();
 }
 
 sub BIN_WRITE_VERSION_NV {
-    sprintf "%d.%03d", BIN_MAJOR(), BIN_WRITE_MINOR();
+    sprintf "\%d.\%03d", BIN_MAJOR(), BIN_WRITE_MINOR();
 }
 
 #
@@ -348,7 +348,7 @@ sub _freeze {
 # object of that tree.
 #
 sub retrieve {
-	_retrieve($_[0], 0);
+	_retrieve(@_[0], 0);
 }
 
 #
@@ -357,7 +357,7 @@ sub retrieve {
 # Same as retrieve, but with advisory locking.
 #
 sub lock_retrieve {
-	_retrieve($_[0], 1);
+	_retrieve(@_[0], 1);
 }
 
 # Internal retrieve routine

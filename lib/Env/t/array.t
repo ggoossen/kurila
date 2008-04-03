@@ -6,8 +6,8 @@ BEGIN {
 }
 
 BEGIN {
-	$ENV{FOO} = "foo";
-	$ENV{BAR} = "bar";
+	%ENV{FOO} = "foo";
+	%ENV{BAR} = "bar";
 }
 
 use Env qw(FOO $BAR);

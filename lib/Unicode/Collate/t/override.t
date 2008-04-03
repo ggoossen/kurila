@@ -4,7 +4,7 @@ BEGIN {
 	    "cannot stringify a Unicode code point\n";
 	exit 0;
     }
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -149,7 +149,7 @@ my $overCJK = Unicode::Collate->new(
 4E00 ; [.B1FC.0030.0004.4E00] # Ideograph; B1FC = FFFF - 4E03.
 ENTRIES
   overrideCJK => sub {
-    my $u = 0xFFFF - $_[0]; # reversed
+    my $u = 0xFFFF - @_[0]; # reversed
     [$u, 0x20, 0x2, $u];
   },
 );

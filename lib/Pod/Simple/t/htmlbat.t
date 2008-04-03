@@ -1,6 +1,6 @@
 # Testing HTMLBatch
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -43,7 +43,7 @@ ok 1;
 
 my $outdir;
 while(1) {
-  my $rand = sprintf "%05x", rand( 0x100000 );
+  my $rand = sprintf "\%05x", rand( 0x100000 );
   $outdir = File::Spec->catdir( $t_dir, "delme-$rand-out" );
   last unless -e $outdir;
 }
@@ -70,7 +70,7 @@ use File::Find;
 find( sub { push @files, $File::Find::name; return }, $outdir );
 
 {
-  my $long = ( grep m/zikzik\./i, @files )[0];
+  my $long = ( grep m/zikzik\./i, @files )[[0]];
   ok($long) or print "# How odd, no zikzik file in $outdir!?\n";
   if($long) {
     $long =~ s{zikzik\.html?$}{}s;

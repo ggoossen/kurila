@@ -7,42 +7,42 @@ my $SDK_VARIANT;
 my $SDK_VERSION;
 my $WIN;
 
-if ($ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
+if (%ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     $SYMBIAN_VERSION = $1;
     $SDK_NAME = $2;
     $WIN = ($SDK_NAME =~ m!_CW!i || $SDK_NAME eq '8.1a') ?
 	'winscw' : 'wins';
-    $ENV{WIN} = $WIN; 
+    %ENV{WIN} = $WIN; 
     if ($SDK_NAME =~ m!Series60_v20!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = $ENV{S60SDK} = '2.0';
+	$SDK_VERSION = %ENV{S60SDK} = '2.0';
     } elsif ($SDK_NAME =~ m!Series60_v21!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = $ENV{S60SDK} = '2.1';
+	$SDK_VERSION = %ENV{S60SDK} = '2.1';
     } elsif ($SDK_NAME =~ m!S60_2nd_FP2!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = $ENV{S60SDK} = '2.6';
+	$SDK_VERSION = %ENV{S60SDK} = '2.6';
     } elsif ($SDK_NAME =~ m!S60_2nd_FP3!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = $ENV{S60SDK} = '2.8';
+	$SDK_VERSION = %ENV{S60SDK} = '2.8';
     } elsif ($SDK_NAME =~ m!S80_DP2_0_SDK!) {
 	$SDK_VARIANT = 'S80';
-	$SDK_VERSION = $ENV{S80SDK} = '2.0';
+	$SDK_VERSION = %ENV{S80SDK} = '2.0';
     } elsif ($SDK_NAME =~ m!Nokia_7710_SDK!) {
 	$SDK_VARIANT = 'S90';
-	$SDK_VERSION = $ENV{S90SDK} = '1.1';
+	$SDK_VERSION = %ENV{S90SDK} = '1.1';
     }
-} elsif ($ENV{PATH} =~ m!\\Symbian\\UIQ_(\d)(\d)\\Epoc32\\gcc\\bin!i) {
+} elsif (%ENV{PATH} =~ m!\\Symbian\\UIQ_(\d)(\d)\\Epoc32\\gcc\\bin!i) {
     $SDK_NAME    = 'UIQ';
     $SDK_VARIANT = 'UIQ';
-    $SDK_VERSION = $ENV{UIQSDK} = "$1.$2";
+    $SDK_VERSION = %ENV{UIQSDK} = "$1.$2";
     if ($SDK_VERSION =~ m/^2\./) {
 	$SYMBIAN_VERSION = '7.0s';
     } else {
 	die "$0: Unknown UIQ version '$SDK_VERSION'\n";
     }
     $WIN = 'winscw'; # This is CodeWarrior, how about Borland?
-    $ENV{WIN} = $WIN; 
+    %ENV{WIN} = $WIN; 
 }
 
 if (open(GCC, "-|", "gcc -v 2>&1")) {
@@ -51,12 +51,12 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
      if (m/Reading specs from (.+?)\\Epoc32\\/i) {
        $SYMBIAN_ROOT = $1;
        # The S60SDK tells the Series 60 SDK version.
-       if ($ENV{S60SDK}) {
+       if (%ENV{S60SDK}) {
 	   if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Shared') { # Visual C. 
 	       $SYMBIAN_ROOT = 'C:\Symbian\6.1\Series60';
-	       $SDK_VERSION = $ENV{S60SDK} = '1.2';
+	       $SDK_VERSION = %ENV{S60SDK} = '1.2';
 	   } elsif ($SYMBIAN_ROOT eq 'C:\Symbian\Series60_1_2_CW') { # CodeWarrior.
-	       $SDK_VERSION = $ENV{S60SDK} = '1.2';
+	       $SDK_VERSION = %ENV{S60SDK} = '1.2';
 	   }
        }
        last;
@@ -69,13 +69,13 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
 
 die "$0: failed to locate the Symbian SDK\n" unless defined $SYMBIAN_ROOT;
 
-my $UARM = $ENV{UARM} ? $ENV{UARM} : "urel";
+my $UARM = %ENV{UARM} ? %ENV{UARM} : "urel";
 my $UREL = "$SYMBIAN_ROOT\\epoc32\\release\\-ARM-\\$UARM";
-if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Series60' && $ENV{WIN} eq 'winscw') {
+if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Series60' && %ENV{WIN} eq 'winscw') {
     $UREL = "C:\\Symbian\\Series60_1_2_CW\\epoc32\\release\\-ARM-\\urel";
 }
-$ENV{UREL} = $UREL;
-$ENV{UARM} = $UARM;
+%ENV{UREL} = $UREL;
+%ENV{UARM} = $UARM;
 
 [ $SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION ];
 

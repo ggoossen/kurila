@@ -422,8 +422,8 @@ PP(pp_warn)
 	LEAVE;
     }
     else {
-	EXTEND(SP, 1);
 	SV * const error = ERRSV;
+	EXTEND(SP, 1);
 	if (sv_isobject(error)) {
 	    tmpsv = error;
 	}

@@ -12,15 +12,15 @@ our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 is(join(':',1..5), '1:2:3:4:5');
 
 @foo = (1,2,3,4,5,6,7,8,9);
-@foo[2..4] = ('c','d','e');
+@foo[[2..4]] = ('c','d','e');
 
-is(join(':',@foo[$foo[0]..5]), '2:c:d:e:6');
+is(join(':',@foo[[@foo[0]..5]]), '2:c:d:e:6');
 
-@bar[2..4] = ('c','d','e');
-is(join(':',@bar[1..5]), ':c:d:e:');
+@bar[[2..4]] = ('c','d','e');
+is(join(':',@bar[[1..5]]), ':c:d:e:');
 
-($a,@bcd[0..2],$e) = ('a','b','c','d','e');
-is(join(':',$a,@bcd[0..2],$e), 'a:b:c:d:e');
+($a,@bcd[[0..2]],$e) = ('a','b','c','d','e');
+is(join(':',$a,@bcd[[0..2]],$e), 'a:b:c:d:e');
 
 $x = 0;
 for (1..100) {
@@ -41,7 +41,7 @@ is($x, 'abcdefghijklmnopqrstuvwxyz');
 is (scalar @x, 27 * 26);
 
 @x = '09' .. '08';  # should produce '09', '10',... '99' (strange but true)
-is(join(",", @x), join(",", map {sprintf "%02d",$_} 9..99));
+is(join(",", @x), join(",", map {sprintf "\%02d",$_} 9..99));
 
 # same test with foreach (which is a separate implementation)
 @y = ();
@@ -51,7 +51,7 @@ foreach ('09'..'08') {
 is(join(",", @y), join(",", @x));
 
 # check bounds
-if ($Config{ivsize} == 8) {
+if (%Config{ivsize} == 8) {
   @a = eval "0x7ffffffffffffffe..0x7fffffffffffffff";
   $a = "9223372036854775806 9223372036854775807";
   @b = eval "-0x7fffffffffffffff..-0x7ffffffffffffffe";
@@ -142,12 +142,12 @@ is(join(":", map "[$_]", @foo), '[]');
 # again with magic
 {
     my @a = (1..3);
-    @foo=(); push @foo, $_ for undef..$#a;
+    @foo=(); push @foo, $_ for undef..(@a-1);
     is(join(":", @foo), '0:1:2');
 }
 {
     my @a = ();
-    @foo=(); push @foo, $_ for $#a..undef;
+    @foo=(); push @foo, $_ for (@a-1)..undef;
     is(join(":", @foo), '-1:0');
 }
 {
@@ -261,7 +261,7 @@ foreach my $ii (^~^0, ^~^0+1, ^~^0+(^~^0>>4)) {
 # Test lower range limit
 my $MIN_INT = -1-$MAX_INT;
 
-if (! $Config{d_nv_preserves_uv}) {
+if (! %Config{d_nv_preserves_uv}) {
     # $MIN_INT needs adjustment when IV won't fit into an NV
     my $NV = $MIN_INT - 1;
     my $OFFSET = 1;

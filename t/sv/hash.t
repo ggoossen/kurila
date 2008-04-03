@@ -13,13 +13,13 @@ my %h;
 ok (!Internals::HvREHASH(%h), "hash doesn't start with rehash flag on");
 
 foreach (1..10) {
-  $h{"\0"x$_}++;
+  %h{"\0"x$_}++;
 }
 
 ok (!Internals::HvREHASH(%h), "10 entries doesn't trigger rehash");
 
 foreach (11..20) {
-  $h{"\0"x$_}++;
+  %h{"\0"x$_}++;
 }
 
 ok (Internals::HvREHASH(%h), "20 entries triggers rehash");
@@ -43,7 +43,7 @@ ok (!Internals::HvREHASH(%h2),
     "starting with pre-populated non-pathological hash (rehash flag if off)");
 
 my @keys = get_keys(\%h2);
-$h2{$_}++ for @keys;
+%h2{$_}++ for @keys;
 ok (Internals::HvREHASH(%h2), 
     scalar(@keys) . " colliding into the same bucket keys are triggering rehash");
 
@@ -75,7 +75,7 @@ sub get_keys {
         $hash = hash($s);
         next unless ($hash ^&^ $mask) == 0;
         $c++;
-        printf "# %2d: %5s, %10s\n", $c, $s, $hash;
+        printf "# \%2d: \%5s, \%10s\n", $c, $s, $hash;
         push @keys, $s;
     } continue {
         $s++;

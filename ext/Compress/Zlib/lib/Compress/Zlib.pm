@@ -76,7 +76,7 @@ sub _set_gzerr
         $Compress::Zlib::gzerrno = $! ;
     }
     else {
-        $Compress::Zlib::gzerrno = dualvar($value+0, $my_z_errmsg[2 - $value]);
+        $Compress::Zlib::gzerrno = dualvar($value+0, @my_z_errmsg[2 - $value]);
     }
 
     return $value ;
@@ -111,10 +111,10 @@ sub gzopen($$)
     $writing = ! ($mode =~ m/r/i) ;
     $writing = ($mode =~ m/[wa]/i) ;
 
-    $defOpts{Level}    = $1               if $mode =~ m/(\d)/;
-    $defOpts{Strategy} = Z_FILTERED()     if $mode =~ m/f/i;
-    $defOpts{Strategy} = Z_HUFFMAN_ONLY() if $mode =~ m/h/i;
-    $defOpts{Append}   = 1                if $mode =~ m/a/i;
+    %defOpts{Level}    = $1               if $mode =~ m/(\d)/;
+    %defOpts{Strategy} = Z_FILTERED()     if $mode =~ m/f/i;
+    %defOpts{Strategy} = Z_HUFFMAN_ONLY() if $mode =~ m/h/i;
+    %defOpts{Append}   = 1                if $mode =~ m/a/i;
 
     my $infDef = $writing ? 'deflate' : 'inflate';
     my @params = () ;
@@ -156,16 +156,16 @@ sub Compress::Zlib::gzFile::gzread
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'inflate';
 
-    my $len = defined $_[1] ? $_[1] : 4096 ; 
+    my $len = defined @_[1] ? @_[1] : 4096 ; 
 
     if ($self->gzeof() || $len == 0) {
         # Zap the output buffer to match ver 1 behaviour.
-        $_[0] = "" ;
+        @_[0] = "" ;
         return 0 ;
     }
 
     my $gz = $self->[0] ;
-    my $status = $gz->read($_[0], $len) ; 
+    my $status = $gz->read(@_[0], $len) ; 
     _save_gzerr($gz, 1);
     return $status ;
 }
@@ -179,10 +179,10 @@ sub Compress::Zlib::gzFile::gzreadline
         # Maintain backward compatibility with 1.x behaviour
         # It didn't support $/, so this can't either.
         local $/ = "\n" ;
-        $_[0] = $gz->getline() ; 
+        @_[0] = $gz->getline() ; 
     }
     _save_gzerr($gz, 1);
-    return defined $_[0] ? length $_[0] : 0 ;
+    return defined @_[0] ? length @_[0] : 0 ;
 }
 
 sub Compress::Zlib::gzFile::gzwrite
@@ -193,7 +193,7 @@ sub Compress::Zlib::gzFile::gzwrite
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
 
-    my $status = $gz->write($_[0]) ;
+    my $status = $gz->write(@_[0]) ;
     _save_gzerr($gz);
     return $status ;
 }
@@ -286,15 +286,15 @@ sub compress($;$)
 {
     my ($x, $output, $err, $in) =('', '', '', '') ;
 
-    if (ref $_[0] ) {
-        $in = $_[0] ;
+    if (ref @_[0] ) {
+        $in = @_[0] ;
         croak "not a scalar reference" unless ref $in eq 'SCALAR' ;
     }
     else {
-        $in = \$_[0] ;
+        $in = \@_[0] ;
     }
 
-    my $level = (@_ == 2 ? $_[1] : Z_DEFAULT_COMPRESSION() );
+    my $level = (@_ == 2 ? @_[1] : Z_DEFAULT_COMPRESSION() );
 
     $x = Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level)
             or return undef ;
@@ -313,12 +313,12 @@ sub uncompress($)
 {
     my ($x, $output, $err, $in) =('', '', '', '') ;
 
-    if (ref $_[0] ) {
-        $in = $_[0] ;
+    if (ref @_[0] ) {
+        $in = @_[0] ;
         croak "not a scalar reference" unless ref $in eq 'SCALAR' ;
     }
     else {
-        $in = \$_[0] ;
+        $in = \@_[0] ;
     }
 
     $x = Compress::Raw::Zlib::Inflate->new( -ConsumeInput => 0) or return undef ;
@@ -402,7 +402,7 @@ sub deflate
     my $self = shift ;
     my $output ;
 
-    my $status = $self->SUPER::deflate($_[0], $output) ;
+    my $status = $self->SUPER::deflate(@_[0], $output) ;
     wantarray ? ($output, $status) : $output ;
 }
 
@@ -425,7 +425,7 @@ sub inflate
 {
     my $self = shift ;
     my $output ;
-    my $status = $self->SUPER::inflate($_[0], $output) ;
+    my $status = $self->SUPER::inflate(@_[0], $output) ;
     wantarray ? ($output, $status) : $output ;
 }
 
@@ -438,7 +438,7 @@ sub memGzip($)
   my $out;
 
   # if the deflation buffer isn't a reference, make it one
-  my $string = (ref $_[0] ? $_[0] : \$_[0]) ;
+  my $string = (ref @_[0] ? @_[0] : \@_[0]) ;
 
   IO::Compress::Gzip::gzip($string, \$out, Minimal => 1)
       or return undef ;
@@ -509,7 +509,7 @@ sub _removeGzipHeader($)
 sub memGunzip($)
 {
     # if the buffer isn't a reference, make it one
-    my $string = (ref $_[0] ? $_[0] : \$_[0]);
+    my $string = (ref @_[0] ? @_[0] : \@_[0]);
  
     _removeGzipHeader($string) == Z_OK() 
         or return undef;

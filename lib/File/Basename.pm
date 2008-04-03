@@ -293,7 +293,7 @@ sub dirname {
     my($basename, $dirname) = fileparse($path);
 
     if ($type eq 'VMS') { 
-        $dirname ||= $ENV{DEFAULT};
+        $dirname ||= %ENV{DEFAULT};
     }
     elsif ($type eq 'MacOS') {
 	if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
@@ -331,13 +331,13 @@ sub _strip_trailing_sep  {
     my $type = $Fileparse_fstype;
 
     if ($type eq 'MacOS') {
-        $_[0] =~ s/([^:]):\z/$1/s;
+        @_[0] =~ s/([^:]):\z/$1/s;
     }
     elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
-        $_[0] =~ s/([^:])[\\\/]*\z/$1/;
+        @_[0] =~ s/([^:])[\\\/]*\z/$1/;
     }
     else {
-        $_[0] =~ s{(.)/*\z}{$1}s;
+        @_[0] =~ s{(.)/*\z}{$1}s;
     }
 }
 

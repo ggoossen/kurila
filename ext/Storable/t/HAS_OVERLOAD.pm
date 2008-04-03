@@ -1,7 +1,7 @@
 package HAS_OVERLOAD;
 
 use overload
-	'""'	=> sub { ${$_[0]} }, fallback => 1;
+	'""'	=> sub { ${@_[0]} }, fallback => 1;
 
 sub make {
   my $package = shift;

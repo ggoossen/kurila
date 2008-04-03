@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -9,11 +9,11 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    if (!$Config::Config{useperlio}) {
+    if (!%Config::Config{useperlio}) {
         print "1..0 # Skip -- need perlio to walk the optree\n";
         exit 0;
     }
@@ -273,13 +273,13 @@ EONT_EONT
 
 # chunk: # this sorts the %age hash by value instead of key
 # using an in-line function
-@eldest = sort { $age{$b} <=> $age{$a} } keys %age;
+@eldest = sort { %age{$b} <=> %age{$a} } keys %age;
 
 =cut
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@eldest = sort { $age{$b} <+> $age{$a} } keys %age; },
+	    code   => q{@eldest = sort { %age{$b} <+> %age{$a} } keys %age; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 592 (eval 28):1) v
 # 2  <0> pushmark s
@@ -313,7 +313,7 @@ EONT_EONT
 
 # chunk: # sort using explicit subroutine name
 sub byage {
-    $age{$a} <=> $age{$b};  # presuming numeric
+    %age{$a} <=> %age{$b};  # presuming numeric
 }
 @sortedclass = sort byage @class;
 
@@ -321,7 +321,7 @@ sub byage {
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sub byage { $age{$a} <+> $age{$b}; } @sortedclass = sort byage @class; },
+	    code   => q{sub byage { %age{$a} <+> %age{$b}; } @sortedclass = sort byage @class; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 597 (eval 30):1) v
 # 2  <0> pushmark s
@@ -577,7 +577,7 @@ EONT_EONT
 # chunk: # using a prototype allows you to use any comparison subroutine
 # as a sort subroutine (including other package's subroutines)
 package other;
-sub backwards ($$) { $_[1] cmp $_[0]; }     # $a and $b are not set here
+sub backwards ($$) { @_[1] cmp @_[0]; }     # $a and $b are not set here
 package main;
 @new = sort other::backwards @old;
 
@@ -585,7 +585,7 @@ package main;
 
 checkOptree(name   => q{sort other::sub LIST },
 	    bcopts => q{-exec},
-	    code   => q{package other; sub backwards ($$) { $_[1] cmp $_[0]; }
+	    code   => q{package other; sub backwards ($$) { @_[1] cmp @_[0]; }
 			package main; @new = sort other::backwards @old; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 614 (eval 36):2) v:{
@@ -619,14 +619,14 @@ EONT_EONT
 =for gentest
 
 # chunk: # repeat, condensed. $main::a and $b are unaffected
-sub other::backwards ($$) { $_[1] cmp $_[0]; }
+sub other::backwards ($$) { @_[1] cmp @_[0]; }
 @new = sort other::backwards @old;
 
 =cut
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{sub other::backwards ($$) { $_[1] cmp $_[0]; } @new = sort other::backwards @old; },
+	    code   => q{sub other::backwards ($$) { @_[1] cmp @_[0]; } @new = sort other::backwards @old; },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 619 (eval 38):1) v
 # 2  <0> pushmark s

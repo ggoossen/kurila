@@ -11,13 +11,13 @@ sub OVERLOAD {
   my %arg = @_;
   my ($sub, $fb);
   no strict 'refs';
-  $ {*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
+  % {*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
   *{Symbol::fetch_glob($package . "::()")} = \&nil; # Make it findable via fetchmethod.
   for (keys %arg) {
     if ($_ eq 'fallback') {
-      $fb = $arg{$_};
+      $fb = %arg{$_};
     } else {
-      $sub = $arg{$_};
+      $sub = %arg{$_};
       if (not ref $sub) {
           die "Overloading requires subref, got '$sub'";
       }
@@ -29,21 +29,21 @@ sub OVERLOAD {
 }
 
 sub import {
-  my $package = (caller())[0];
+  my $package = (caller())[[0]];
   # *{$package . "::OVERLOAD"} = \&OVERLOAD;
   shift;
   $package->overload::OVERLOAD(@_);
 }
 
 sub unimport {
-  my $package = (caller())[0];
-  ${*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Upgrade the table
+  my $package = (caller())[[0]];
+  %{*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Upgrade the table
   shift;
   for (@_) {
     if ($_ eq 'fallback') {
       undef $ {*{Symbol::fetch_glob($package . "::()")}};
     } else {
-      delete $ {*{Symbol::fetch_glob($package . "::")}}{"(" . $_};
+      delete % {*{Symbol::fetch_glob($package . "::")}}{"(" . $_};
     }
   }
 }
@@ -88,17 +88,17 @@ sub Method {
 }
 
 sub AddrRef {
-  my $package = ref $_[0];
-  return "$_[0]" unless $package;
+  my $package = ref @_[0];
+  return "@_[0]" unless $package;
 
   local $@;
   local $!;
   require Scalar::Util;
-  my $class = Scalar::Util::blessed($_[0]);
+  my $class = Scalar::Util::blessed(@_[0]);
   my $class_prefix = defined($class) ? "$class=" : "";
-  my $type = Scalar::Util::reftype($_[0]);
-  my $addr = Scalar::Util::refaddr($_[0]);
-  return sprintf("$class_prefix$type(0x%x)", $addr);
+  my $type = Scalar::Util::reftype(@_[0]);
+  my $addr = Scalar::Util::refaddr(@_[0]);
+  return sprintf("$class_prefix$type(0x\%x)", $addr);
 }
 
 *StrVal = *AddrRef;
@@ -123,8 +123,8 @@ sub mycan {				# Real can would leave stubs.
 	      'qr'	  => 0x10000, # HINT_NEW_RE
 	     );
 
-%ops = ( with_assign	  => "+ - * / % ** << >> x .",
-	 assign		  => "+= -= *= /= %= **= <<= >>= x= .=",
+%ops = ( with_assign	  => "+ - * / \% ** << >> x .",
+	 assign		  => "+= -= *= /= \%= **= <<= >>= x= .=",
 	 num_comparison	  => "+< +<= +>  +>= == !=",
 	 '3way_comparison'=> "<+> cmp",
 	 str_comparison	  => "eq ne",
@@ -145,20 +145,20 @@ sub constant {
         warnings::warnif ("Odd number of arguments for overload::constant");
         last;
     }
-    elsif (!exists $constants{$_[0]}) {
-        warnings::warnif ("`$_[0]' is not an overloadable type");
+    elsif (!exists %constants{@_[0]}) {
+        warnings::warnif ("`@_[0]' is not an overloadable type");
     }
-    elsif (ref $_[1] ne "CODE") {
+    elsif (ref @_[1] ne "CODE") {
         # Can't use C<ref $_[1] eq "CODE"> above as code references can be
         # blessed, and C<ref> would return the package the ref is blessed into.
         if (warnings::enabled) {
-            $_ [1] = "undef" unless defined $_ [1];
-            warnings::warn ("`$_[1]' is not a code reference");
+            @_ [1] = "undef" unless defined @_ [1];
+            warnings::warn ("`@_[1]' is not a code reference");
         }
     }
     else {
-        $^H{$_[0]} = $_[1];
-        $^H ^|^= $constants{$_[0]};
+        %^H{@_[0]} = @_[1];
+        $^H ^|^= %constants{@_[0]};
     }
     shift, shift;
   }
@@ -167,8 +167,8 @@ sub constant {
 sub remove_constant {
   # Arguments: what, sub
   while (@_) {
-    delete $^H{$_[0]};
-    $^H ^&^= ^~^ $constants{$_[0]};
+    delete %^H{@_[0]};
+    $^H ^&^= ^~^ %constants{@_[0]};
     shift, shift;
   }
 }

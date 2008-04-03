@@ -16,7 +16,7 @@ BEGIN {
 use Net::Domain qw(hostname domainname hostdomain hostfqdn);
 use Net::Config;
 
-unless($NetConfig{test_hosts}) {
+unless(%NetConfig{test_hosts}) {
     print "1..0\n";
     exit 0;
 }
@@ -38,13 +38,13 @@ my @copy = @domain;
 
 my @dummy = grep { defined hostname() and hostname() eq $_ } @domain;
 
-($domain[0] && $domain[0] eq $copy[0])
+(@domain[0] && @domain[0] eq @copy[0])
   ? print "ok 2\n"
   : print "not ok 2\n";
 
 @dummy = grep { defined hostdomain() and hostdomain() eq $_ } @domain;
 
-($domain[0] && $domain[0] eq $copy[0])
+(@domain[0] && @domain[0] eq @copy[0])
   ? print "ok 3\n"
   : print "not ok 3\n";
 

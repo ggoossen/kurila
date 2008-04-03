@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         unshift @INC, '../lib';
     }
@@ -35,7 +35,7 @@ sub add_file {
     1 while unlink $file;  # or else we'll get multiple versions on VMS
     open( T, ">", ''.$file) or return;
     print T $data;
-    ++$Files{$file};
+    ++%Files{$file};
     close T;
 }
 
@@ -48,8 +48,8 @@ sub read_manifest {
 
 sub catch_warning {
     my $warn = '';
-    local ${^WARN_HOOK} = sub { $warn .= $_[0]->{description} };
-    return join('', $_[0]->() ), $warn;
+    local ${^WARN_HOOK} = sub { $warn .= @_[0]->{description} };
+    return join('', @_[0]->() ), $warn;
 }
 
 sub remove_dir {
@@ -76,7 +76,7 @@ ok( add_file('foo'), 'add a temporary file' );
 # Some platforms don't have chmod or an executable bit, in which case
 # this call will do nothing or fail, but on the platforms where chmod()
 # works, we test the executable bit is copied
-chmod( 0744, 'foo') if $Config{'chmod'};
+chmod( 0744, 'foo') if %Config{'chmod'};
 
 # there shouldn't be a MANIFEST there
 my ($res, $warn) = catch_warning( \&mkmanifest );
@@ -188,7 +188,7 @@ like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
 
 	# add the new file to the list of files to be deleted
-	$Files{'albatross'}++;
+	%Files{'albatross'}++;
 }
 
 
@@ -250,7 +250,7 @@ is( $files->{foobar}, '',    '          preserved old entries' );
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' );
     my $extsep = $Is_VMS ? '_' : '.';
-    $Files{"$_.bak"}++ for ('MANIFEST', "MANIFEST${extsep}SKIP");
+    %Files{"$_.bak"}++ for ('MANIFEST', "MANIFEST${extsep}SKIP");
 }
 
 add_file('MANIFEST'   => 'Makefile.PL');

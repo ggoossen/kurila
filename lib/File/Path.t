@@ -71,7 +71,7 @@ SKIP: {
         
     @created = mkpath($dir2, {mask => 0700});
     is(scalar(@created), 1, "make directory with trailing parent segment");
-    is($created[0], $dir, "made parent");
+    is(@created[0], $dir, "made parent");
 };
 
 my $count = rmtree({error => \$error});
@@ -87,7 +87,7 @@ $dir = catdir($tmp_base,'C');
 $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
 @created = mkpath($tmp_base, $dir);
 is(scalar(@created), 1, "created directory (new style 1)");
-is($created[0], $dir, "created directory (new style 1) cross-check");
+is(@created[0], $dir, "created directory (new style 1) cross-check");
 
 @created = mkpath($tmp_base, 0, 0700);
 is(scalar(@created), 0, "skipped making existing directories (old style 2)")
@@ -98,7 +98,7 @@ $dir2 = catdir($tmp_base,'D');
 $dir2 = VMS::Filespec::unixify($dir2) if $Is_VMS;
 @created = mkpath($tmp_base, $dir, $dir2);
 is(scalar(@created), 1, "created directory (new style 2)");
-is($created[0], $dir2, "created directory (new style 2) cross-check");
+is(@created[0], $dir2, "created directory (new style 2) cross-check");
 
 $count = rmtree($dir, 0);
 is($count, 1, "removed directory unsafe mode");
@@ -144,17 +144,17 @@ $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
 
 @created = mkpath($dir, undef, 0770);
 is(scalar(@created), 1, "created directory (old style 2 verbose undef)");
-is($created[0], $dir, "created directory (old style 2 verbose undef) cross-check");
+is(@created[0], $dir, "created directory (old style 2 verbose undef) cross-check");
 is(rmtree($dir, undef, 0), 1, "removed directory 2 verbose undef");
 
 @created = mkpath($dir, undef);
 is(scalar(@created), 1, "created directory (old style 2a verbose undef)");
-is($created[0], $dir, "created directory (old style 2a verbose undef) cross-check");
+is(@created[0], $dir, "created directory (old style 2a verbose undef) cross-check");
 is(rmtree($dir, undef), 1, "removed directory 2a verbose undef");
 
 @created = mkpath($dir, 0, undef);
 is(scalar(@created), 1, "created directory (old style 3 mode undef)");
-is($created[0], $dir, "created directory (old style 3 mode undef) cross-check");
+is(@created[0], $dir, "created directory (old style 3 mode undef) cross-check");
 is(rmtree($dir, 0, undef), 1, "removed directory 3 verbose undef");
 
 $dir = catdir($tmp_base,'G');
@@ -162,7 +162,7 @@ $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
 
 @created = mkpath($dir, undef, 0200);
 is(scalar(@created), 1, "created write-only dir");
-is($created[0], $dir, "created write-only directory cross-check");
+is(@created[0], $dir, "created write-only directory cross-check");
 is(rmtree($dir), 1, "removed write-only dir");
 
 # borderline new-style heuristics

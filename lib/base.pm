@@ -19,13 +19,13 @@ my $Fattr = \%fields::attr;
 
 sub has_fields {
     my($base) = shift;
-    my $fglob = ${*{Symbol::fetch_glob("$base\::")}}{FIELDS};
+    my $fglob = %{*{Symbol::fetch_glob("$base\::")}}{FIELDS};
     return( ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0 );
 }
 
 sub has_version {
     my($base) = shift;
-    my $vglob = ${*{Symbol::fetch_glob($base.'::')}}{VERSION};
+    my $vglob = %{*{Symbol::fetch_glob($base.'::')}}{VERSION};
     return( ($vglob && *$vglob{SCALAR}) ? 1 : 0 );
 }
 
@@ -36,14 +36,14 @@ sub has_attr {
 }
 
 sub get_attr {
-    $Fattr->{$_[0]} = [1] unless $Fattr->{$_[0]};
-    return $Fattr->{$_[0]};
+    $Fattr->{@_[0]} = [1] unless $Fattr->{@_[0]};
+    return $Fattr->{@_[0]};
 }
 
 sub get_fields {
     # Shut up a possible typo warning.
-    () = \%{*{Symbol::fetch_glob($_[0].'::FIELDS')}};
-    return \%{*{Symbol::fetch_glob($_[0].'::FIELDS')}};
+    () = \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
+    return \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
 }
 
 sub import {
@@ -146,7 +146,7 @@ END
         }
     }
 
-    foreach my $idx (1..$#{$battr}) {
+    foreach my $idx (1..@$battr-1) {
         next if defined $dattr->[$idx];
         $dattr->[$idx] = $battr->[$idx] ^&^ INHERITED;
     }

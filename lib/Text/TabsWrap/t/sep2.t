@@ -108,7 +108,7 @@ use Text::Wrap;
 $Text::Wrap::separator2 = '=';
 
 use strict;
-my $rerun = $ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
 my $tn = 1;
 
@@ -154,7 +154,7 @@ while(@st) {
 	$in =~ s/^TEST(\d+)?\n//;
 
 	my @in = split("\n", $in, -1);
-	@in = ((map { "$_\n" } @in[0..$#in-1]), $in[-1]);
+	@in = ((map { "$_\n" } @in[[0..(@in-1)-1]]), @in[-1]);
 	
 	my $back = wrap('   ', ' ', @in);
 

@@ -4,13 +4,13 @@
     my $wide = "\x{100}";
     use bytes;
     my $ordwide = ord($wide);
-    printf "# under use bytes ord(v256) = 0x%02x\n", $ordwide;
+    printf "# under use bytes ord(v256) = 0x\%02x\n", $ordwide;
     if ($ordwide == 140) {
 	print "1..0 # Skip: UTF-EBCDIC (not UTF-8) used here\n";
 	exit 0;
     }
     elsif ($ordwide != 196) {
-	printf "# v256 starts with 0x%02x\n", $ordwide;
+	printf "# v256 starts with 0x\%02x\n", $ordwide;
     }
 }
 
@@ -135,8 +135,8 @@ __EOMK__
 
     my $x_warn;
     local ${^WARN_HOOK} = sub {
-	print "# $id: " . $_[0]->{description} . "\n";
-	$x_warn = $_[0]->{description};
+	print "# $id: " . @_[0]->{description} . "\n";
+	$x_warn = @_[0]->{description};
     };
 
     sub moan {
@@ -145,7 +145,7 @@ __EOMK__
 
     sub warn_unpack_U {
 	$x_warn = '';
-	my @null = unpack('U0U*', $_[0]);
+	my @null = unpack('U0U*', @_[0]);
 	return $x_warn;
     }
 

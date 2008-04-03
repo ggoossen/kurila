@@ -11,7 +11,7 @@ BEGIN {
     $hasne = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasne) { print "1..0 # Skip: no getnetbyname\n"; exit 0 }
     use Config;
-    $hasne = 0 unless $Config{'i_netdb'} eq 'define';
+    $hasne = 0 unless %Config{'i_netdb'} eq 'define';
     unless ($hasne) { print "1..0 # Skip: no netdb.h\n"; exit 0 }
 }
 
@@ -28,7 +28,7 @@ print "ok 1\n";
 
 my $netent = getnetbyname "loopback"; # This is the OO getnetbyname.
 
-print "not " unless $netent->name   eq $netent[0];
+print "not " unless $netent->name   eq @netent[0];
 print "ok 2\n";
 
 # Testing pretty much anything else is unportable;

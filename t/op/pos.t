@@ -15,7 +15,7 @@ is(pos($x), 2);
 $x=~m/.z/gc;
 is(pos($x), 2);
 
-sub f { my $p=$_[0]; return $p }
+sub f { my $p=@_[0]; return $p }
 
 $x=~m/.a/g;
 is(f(pos($x)), 4);

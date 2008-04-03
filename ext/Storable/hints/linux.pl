@@ -7,8 +7,8 @@
 # happen only for unthreaded builds, threaded builds work okay.
 use Config;
 use vars '$self';
-if ($Config{gccversion}) {
-    my $optimize = $Config{optimize};
+if (%Config{gccversion}) {
+    my $optimize = %Config{optimize};
     if ($optimize =~ s/(^| )-O[3-9]( |$)/$1-O2$2/) {
 	$self->{OPTIMIZE} = $optimize;
     }

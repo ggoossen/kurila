@@ -8,7 +8,7 @@ use private::MakeUtil;
 use ExtUtils::MakeMaker v5.16 ;
 
 UpDowngrade(getPerlFiles('MANIFEST')) 
-    unless $ENV{PERL_CORE};
+    unless %ENV{PERL_CORE};
 
 WriteMakefile( 
     NAME         => 'Compress::Zlib',
@@ -20,7 +20,7 @@ WriteMakefile(
                     },
 
     (
-      $ENV{SKIP_FOR_CORE}
+      %ENV{SKIP_FOR_CORE}
         ? (MAN3PODS    => {})
 	    : (PREREQ_PM   => { 'Compress::Raw::Zlib'           => $::VERSION,
 		                    'IO::Compress::Base'            => $::VERSION,

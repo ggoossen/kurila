@@ -115,7 +115,7 @@ for my $f ( @test_files ) {
 }
 
 ### _downgrade_to_plainfile
-{   my $aref        = $test_files[-1];
+{   my $aref        = @test_files[-1];
     my $unix_path   = $aref->[0];
     my $contents    = $aref->[1];
     my $attr        = $aref->[2];     

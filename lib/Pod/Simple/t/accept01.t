@@ -1,6 +1,6 @@
 # Testing accept_codes
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if(%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -20,7 +20,7 @@ print "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
 
 my $x = 'Pod::Simple::XMLOutStream';
-sub accept_N { $_[0]->accept_codes('N') }
+sub accept_N { @_[0]->accept_codes('N') }
 
 print "# Some sanity tests...\n";
 ok( $x->_out( "=pod\n\nI like pie.\n"), # without acceptor

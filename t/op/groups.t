@@ -1,9 +1,9 @@
 #!./perl
 
-$ENV{PATH} ="/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
-    exists $ENV{PATH} ? ":$ENV{PATH}" : "";
-$ENV{LC_ALL} = "C"; # so that external utilities speak English
-$ENV{LANGUAGE} = 'C'; # GNU locale extension
+%ENV{PATH} ="/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
+    exists %ENV{PATH} ? ":%ENV{PATH}" : "";
+%ENV{LC_ALL} = "C"; # so that external utilities speak English
+%ENV{LANGUAGE} = 'C'; # GNU locale extension
 
 BEGIN {
     require Config;
@@ -70,7 +70,7 @@ GROUPS: {
 	    print <<EOM;
 # These test results *may* be bogus, as you appear to have AFS,
 # and I can't find a working 'id' in your PATH (which I have set
-# to '$ENV{PATH}').
+# to '%ENV{PATH}').
 #
 # If these tests fail, report the particular incantation you use
 # on this platform to find *all* the groups that an arbitrary
@@ -117,13 +117,13 @@ print "1..2\n";
 
 $pwgid = $( + 0;
 ($pwgnam) = getgrgid($pwgid);
-$seen{$pwgid}++;
+%seen{$pwgid}++;
 
 print "# pwgid = $pwgid, pwgnam = $pwgnam\n";
 
 for (split(' ', $()) {
     ($group) = getgrgid($_);
-    next if (! defined $group or ! grep { $_ eq $group } @gr) and $seen{$_}++;
+    next if (! defined $group or ! grep { $_ eq $group } @gr) and %seen{$_}++;
     if (defined $group) {
 	push(@gr, $group);
     }
@@ -137,28 +137,28 @@ print "# gr = @gr\n";
 my %did;
 if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
 	# Or anybody else who can have spaces in group names.
-	$gr1 = join(' ', grep(!$did{$_}++, sort split(' ', join(' ', @gr))));
+	$gr1 = join(' ', grep(!%did{$_}++, sort split(' ', join(' ', @gr))));
 } else {
 	# Don't assume that there aren't duplicate groups
-	$gr1 = join(' ', sort grep defined $_ && !$did{$_}++, @gr);
+	$gr1 = join(' ', sort grep defined $_ && !%did{$_}++, @gr);
 }
 
-if ($Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
-    @basegroup{$pwgid,$pwgnam} = (0,0);
+if (%Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
+    %basegroup{[$pwgid,$pwgnam]} = (0,0);
 } else {
-    @basegroup{$pwgid,$pwgnam} = (1,1);
+    %basegroup{[$pwgid,$pwgnam]} = (1,1);
 }
-$gr2 = join(' ', grep(!$basegroup{$_}++, sort split(' ',$groups)));
+$gr2 = join(' ', grep(!%basegroup{$_}++, sort split(' ',$groups)));
 
 my $ok1 = 0;
 if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
     print "ok 1\n";
     $ok1++;
 }
-elsif ($Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
+elsif (%Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
     # Retry in default unix mode
     %basegroup = ( $pwgid => 1, $pwgnam => 1 );
-    $gr2 = join(' ', grep(!$basegroup{$_}++, sort split(' ',$groups)));
+    $gr2 = join(' ', grep(!%basegroup{$_}++, sort split(' ',$groups)));
     if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
 	print "ok 1 # This Cygwin behaves like Unix (Win2k?)\n";
 	$ok1++;
@@ -172,7 +172,7 @@ unless ($ok1) {
 
 # multiple 0's indicate GROUPSTYPE is currently long but should be short
 
-if ($pwgid == 0 || $seen{0} +< 2) {
+if ($pwgid == 0 || %seen{0} +< 2) {
     print "ok 2\n";
 }
 else {

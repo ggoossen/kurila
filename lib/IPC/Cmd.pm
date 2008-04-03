@@ -192,7 +192,7 @@ sub can_run {
 
     } else {
         for my $dir (
-            (split m/\Q$Config::Config{path_sep}\E/, $ENV{PATH}),
+            (split m/\Q%Config::Config{path_sep}\E/, %ENV{PATH}),
             File::Spec->curdir
         ) {           
             my $abs = File::Spec->catfile($dir, $command);
@@ -299,16 +299,16 @@ sub run {
         verbose => { default  => $VERBOSE,  store => \$verbose },
         buffer  => { default  => \$def_buf, store => \$buffer },
         command => { required => 1,         store => \$cmd,
-                     allow    => sub { !ref($_[0]) or ref($_[0]) eq 'ARRAY' } 
+                     allow    => sub { !ref(@_[0]) or ref(@_[0]) eq 'ARRAY' } 
         },
     };
 
     unless( check( $tmpl, \%hash, $VERBOSE ) ) {
-        Carp::carp(loc("Could not validate input: %1", Params::Check->last_error));
+        Carp::carp(loc("Could not validate input: \%1", Params::Check->last_error));
         return;
     };        
 
-    print loc("Running [%1]...\n", (ref $cmd ? "@$cmd" : $cmd)) if $verbose;
+    print loc("Running [\%1]...\n", (ref $cmd ? "@$cmd" : $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -456,7 +456,7 @@ sub _open3_run {
             ### see perldoc -f sysread: it returns undef on error,
             ### so bail out.
             if( not defined $len ) {
-                warn(loc("Error reading from process: %1", $!));
+                warn(loc("Error reading from process: \%1", $!));
                 last OUTER;
             }
             
@@ -596,14 +596,14 @@ sub _system_run {
         __PACKAGE__->_debug( "# Closing the following fds: @fds" ) if $DEBUG;
 
         for my $name ( @fds ) {
-            my($redir, $fh, $glob) = @{$Map{$name}} or (
-                Carp::carp(loc("No such FD: '%1'", $name)), next );
+            my($redir, $fh, $glob) = @{%Map{$name}} or (
+                Carp::carp(loc("No such FD: '\%1'", $name)), next );
             
             ### MUST use the 2-arg version of open for dup'ing for 
             ### 5.6.x compatibilty. 5.8.x can use 3-arg open
             ### see perldoc5.6.2 -f open for details            
             open $glob, $redir, fileno($fh) or (
-                        Carp::carp(loc("Could not dup '$name': %1", $!)),
+                        Carp::carp(loc("Could not dup '$name': \%1", $!)),
                         return
                     );        
                 
@@ -611,7 +611,7 @@ sub _system_run {
             ### just dup it
             if( $redir eq '>&' ) {
                 open( $fh, ">", '' . File::Spec->devnull ) or (
-                    Carp::carp(loc("Could not reopen '$name': %1", $!)),
+                    Carp::carp(loc("Could not reopen '$name': \%1", $!)),
                     return
                 );
             }
@@ -628,11 +628,11 @@ sub _system_run {
         __PACKAGE__->_debug( "# Reopening the following fds: @fds" ) if $DEBUG;
 
         for my $name ( @fds ) {
-            my($redir, $fh, $glob) = @{$Map{$name}} or (
-                Carp::carp(loc("No such FD: '%1'", $name)), next );
+            my($redir, $fh, $glob) = @{%Map{$name}} or (
+                Carp::carp(loc("No such FD: '\%1'", $name)), next );
 
             open( $fh, $redir, fileno($glob) ) or (
-                    Carp::carp(loc("Could not restore '$name': %1", $!)),
+                    Carp::carp(loc("Could not restore '$name': \%1", $!)),
                     return
                 ); 
            

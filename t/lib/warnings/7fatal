@@ -287,7 +287,7 @@ print STDERR "The End.\n" ;
 EXPECT
 Reversed += operator at - line 8.
 ########
-# TODO ? !$Config{usethreads} && $::UTF8 && ($ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
+# TODO ? !%Config{usethreads} && $::UTF8 && (%ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
 
 use warnings 'void' ;
 
@@ -306,7 +306,7 @@ EXPECT
 Useless use of time in void context at - line 4.
 Useless use of length in void context at - line 9.
 ########
-# TODO ? !$Config{usethreads} && $::UTF8 && ($ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
+# TODO ? !%Config{usethreads} && $::UTF8 && (%ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
 
 use warnings ;
 
@@ -412,7 +412,7 @@ EXPECT
 Useless use of length in void context at - line 4.
 The End.
 ########
-# TODO ? !$Config{usethreads} && $::UTF8 && ($ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
+# TODO ? !%Config{usethreads} && $::UTF8 && (%ENV{PERL_DESTRUCT_LEVEL} || 0) +> 1 ? "Parser leaks OPs, which leak shared hash keys" : ''
 
 use warnings NONFATAL => 'void', FATAL => 'void' ;
 $a = "abc";

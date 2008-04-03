@@ -32,13 +32,13 @@ use constant BUFFER         => 4096;
 use constant HEAD           => 512;
 use constant BLOCK          => 512;
 
-use constant BLOCK_SIZE     => sub { my $n = int($_[0]/BLOCK); $n++ if $_[0] % BLOCK; $n * BLOCK };
+use constant BLOCK_SIZE     => sub { my $n = int(@_[0]/BLOCK); $n++ if @_[0] % BLOCK; $n * BLOCK };
 use constant TAR_PAD        => sub { my $x = shift || return; return "\0" x (BLOCK - ($x % BLOCK) ) };
 use constant TAR_END        => "\0" x BLOCK;
 
 use constant READ_ONLY      => sub { shift() ? 'rb' : 'r' };
-use constant WRITE_ONLY     => sub { $_[0] ? 'wb' . shift : 'w' };
-use constant MODE_READ      => sub { $_[0] =~ m/^r/ ? 1 : 0 };
+use constant WRITE_ONLY     => sub { @_[0] ? 'wb' . shift : 'w' };
+use constant MODE_READ      => sub { @_[0] =~ m/^r/ ? 1 : 0 };
 
 # Pointless assignment to make -w shut up
 my $getpwuid; $getpwuid = 'unknown' unless eval { my $f = getpwuid (0); };
@@ -46,7 +46,7 @@ my $getgrgid; $getgrgid = 'unknown' unless eval { my $f = getgrgid (0); };
 use constant UNAME          => sub { $getpwuid || scalar getpwuid( shift() ) || '' };
 use constant GNAME          => sub { $getgrgid || scalar getgrgid( shift() ) || '' };
 use constant UID            => $>;
-use constant GID            => (split ' ', $) )[0];
+use constant GID            => (split ' ', $) )[[0]];
 
 use constant MODE           => do { 0666 ^&^ (0777 ^&^ ^~^umask) };
 use constant STRIP_MODE     => sub { shift() ^&^ 0777 };
@@ -64,9 +64,9 @@ use constant LONGLINK_NAME  => '././@LongLink';
 
                             ### allow ZLIB to be turned off using ENV
                             ### DEBUG only
-use constant ZLIB           => do { !$ENV{'PERL5_AT_NO_ZLIB'} and
+use constant ZLIB           => do { !%ENV{'PERL5_AT_NO_ZLIB'} and
                                         eval { require IO::Zlib };
-                                    $ENV{'PERL5_AT_NO_ZLIB'} || $@ ? 0 : 1 };
+                                    %ENV{'PERL5_AT_NO_ZLIB'} || $@ ? 0 : 1 };
                                     
 use constant GZIP_MAGIC_NUM => qr/^(?:\037\213|\037\235)/;
 

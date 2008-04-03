@@ -51,10 +51,10 @@ sub ok ($;$) {
     my($ok, $name) = @_;
     my $todo = $TODO ? " # TODO $TODO" : '';
 
-    printf "%sok %d - %s\n", ($ok ? "" : "not "), $test,
-        ($name||$Message)."$todo\tLine ".((caller)[2]);
+    printf "\%sok \%d - \%s\n", ($ok ? "" : "not "), $test,
+        ($name||$Message)."$todo\tLine ".((caller)[[2]]);
 
-    printf "# Failed test at line %d\n", (caller)[2] unless $ok;
+    printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 
     $test++;
     return $ok;
@@ -278,7 +278,7 @@ print "not " if "@out" ne 'bar2 barf';
 print "ok 65\n";
 
 # Tests which depend on REG_INFTY
-our $reg_infty = defined $Config{reg_infty} ? $Config{reg_infty} : 32767;
+our $reg_infty = defined %Config{reg_infty} ? %Config{reg_infty} : 32767;
 our $reg_infty_m = $reg_infty - 1;
 our $reg_infty_p = $reg_infty + 1;
 
@@ -346,12 +346,12 @@ my %ans = ( 'ax13876y25677lbc' => 1,
        );
 
 for ( keys %ans ) {
-  print "# const-len `$_' not =>  $ans{$_}\nnot "
-    if $ans{$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o;
+  print "# const-len `$_' not =>  %ans{$_}\nnot "
+    if %ans{$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o;
   print "ok $test\n";
   $test++;
-  print "# var-len   `$_' not =>  $ans{$_}\nnot "
-    if $ans{$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o;
+  print "# var-len   `$_' not =>  %ans{$_}\nnot "
+    if %ans{$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o;
   print "ok $test\n";
   $test++;
 }
@@ -476,7 +476,7 @@ print "ok $test\n";
 $test++;
 
 sub f {
-    my $p = $_[0];
+    my $p = @_[0];
     return $p;
 }
 
@@ -607,7 +607,7 @@ ok($c == 3, "# TODO lexical scope?");
 
 sub must_warn_pat {
     my $warn_pat = shift;
-    return sub { print "not  # warning: $_[0]->{description}" unless $_[0]->{description} =~ m/$warn_pat/ }
+    return sub { print "not  # warning: @_[0]->{description}" unless @_[0]->{description} =~ m/$warn_pat/ }
 }
 
 sub must_warn {
@@ -655,88 +655,88 @@ print "ok $test\n";
 $test++;
 
 m/a(?=.$)/;
-print "not " if $#+ != 0 or $#- != 0;
+print "not " if @+ != 1 or @- != 1;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[0] != 2 or $-[0] != 1;
+print "not " if @+[0] != 2 or @-[0] != 1;
 print "ok $test\n";
 $test++;
 
 print "not "
-   if defined $+[1] or defined $-[1] or defined $+[2] or defined $-[2];
+   if defined @+[1] or defined @-[1] or defined @+[2] or defined @-[2];
 print "ok $test\n";
 $test++;
 
 m/a(a)(a)/;
-print "not " if $#+ != 2 or $#- != 2;
+print "not " if @+ != 3 or @- != 3;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[0] != 3 or $-[0] != 0;
+print "not " if @+[0] != 3 or @-[0] != 0;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[1] != 2 or $-[1] != 1;
+print "not " if @+[1] != 2 or @-[1] != 1;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[2] != 3 or $-[2] != 2;
+print "not " if @+[2] != 3 or @-[2] != 2;
 print "ok $test\n";
 $test++;
 
 print "not "
-   if defined $+[3] or defined $-[3] or defined $+[4] or defined $-[4];
+   if defined @+[3] or defined @-[3] or defined @+[4] or defined @-[4];
 print "ok $test\n";
 $test++;
 
 m/.(a)(b)?(a)/;
-print "not " if $#+ != 3 or $#- != 3;
+print "not " if @+ != 4 or @- != 4;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[0] != 3 or $-[0] != 0;
+print "not " if @+[0] != 3 or @-[0] != 0;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[1] != 2 or $-[1] != 1;
+print "not " if @+[1] != 2 or @-[1] != 1;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[3] != 3 or $-[3] != 2;
+print "not " if @+[3] != 3 or @-[3] != 2;
 print "ok $test\n";
 $test++;
 
 print "not "
-   if defined $+[2] or defined $-[2] or defined $+[4] or defined $-[4];
+   if defined @+[2] or defined @-[2] or defined @+[4] or defined @-[4];
 print "ok $test\n";
 $test++;
 
 m/.(a)/;
-print "not " if $#+ != 1 or $#- != 1;
+print "not " if @+ != 2 or @- != 2;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[0] != 2 or $-[0] != 0;
+print "not " if @+[0] != 2 or @-[0] != 0;
 print "ok $test\n";
 $test++;
 
-print "not " if $+[1] != 2 or $-[1] != 1;
+print "not " if @+[1] != 2 or @-[1] != 1;
 print "ok $test\n";
 $test++;
 
 print "not "
-   if defined $+[2] or defined $-[2] or defined $+[3] or defined $-[3];
+   if defined @+[2] or defined @-[2] or defined @+[3] or defined @-[3];
 print "ok $test\n";
 $test++;
 
-eval { $+[0] = 13; };
+eval { @+[0] = 13; };
 print "not "
    if $@->{description} !~ m/^Modification of a read-only value attempted/;
 print "ok $test\n";
 $test++;
 
-eval { $-[0] = 13; };
+eval { @-[0] = 13; };
 print "not "
    if $@->{description} !~ m/^Modification of a read-only value attempted/;
 print "ok $test\n";
@@ -752,7 +752,7 @@ eval { @- = qw(foo bar); };
 ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
 
 m/.(a)(ba*)?/;
-print "#$#-..$#+\nnot " if $#+ != 2 or $#- != 1;
+print "#@-..@+\nnot " if @+ != 3 or @- != 2;
 print "ok $test\n";
 $test++;
 
@@ -1100,9 +1100,9 @@ my %space = ( spc   => " ",
 	      vt    => chr(11),
 	      false => "space" );
 
-my @space0 = sort grep { $space{$_} =~ m/\s/ }          keys %space;
-my @space1 = sort grep { $space{$_} =~ m/[[:space:]]/ } keys %space;
-my @space2 = sort grep { $space{$_} =~ m/[[:blank:]]/ } keys %space;
+my @space0 = sort grep { %space{$_} =~ m/\s/ }          keys %space;
+my @space1 = sort grep { %space{$_} =~ m/[[:space:]]/ } keys %space;
+my @space2 = sort grep { %space{$_} =~ m/[[:blank:]]/ } keys %space;
 
 print "not " unless "@space0" eq "cr ff lf spc tab";
 print "ok $test # @space0\n";
@@ -1239,9 +1239,9 @@ SKIP: {
 	     );
 	
     for my $char (map { s/^\S+ //; $_ }
-                    sort map { sprintf("%06x", ord($_))." $_" } keys %s) {
-	my $class = $s{$char};
-	my $code  = sprintf("%06x", ord($char));
+                    sort map { sprintf("\%06x", ord($_))." $_" } keys %s) {
+	my $class = %s{$char};
+	my $code  = sprintf("\%06x", ord($char));
 	printf "#\n# 0x$code  $char\n#\n";
 	print "# IsAlpha\n";
 	if ($class =~ m/^[LM]/) {
@@ -1672,7 +1672,7 @@ eval <<"EOT"; die if $@;
 EOT
 
 #test /o feature
-sub test_o { $_[0] =~m/$_[1]/o; return $1}
+sub test_o { @_[0] =~m/@_[1]/o; return $1}
 if(test_o('abc','(.)..') eq 'a') {
     print "ok 633\n";
 } else {
@@ -1812,7 +1812,7 @@ if (ord("A") == 65) {
     
     my @a = ($a =~ m/./gs);
     
-    print "not " unless $#a == 12;
+    print "not " unless @a == 13;
     print "ok 675\n";
 }
 
@@ -2476,7 +2476,7 @@ print "# some Unicode properties\n";
     my $i = 855; 
     for (keys %u) {
 	my $m1 = m/^\w*$/ ? 1 : 0;
-	my $m2 = $u{$_}=~m/^\w*$/ ? 1 : 0;
+	my $m2 = %u{$_}=~m/^\w*$/ ? 1 : 0;
 	print $m1 == $m2 ? "ok $i\n" : "not ok $i # $m1 $m2\n";
 	$i++;
     }
@@ -2650,7 +2650,7 @@ EOF
 print "d" =~ m/\p{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 print "e" =~ m/\P{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 
-if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
+if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
     for ([ 'byte', "\x{ff}" ], [ 'utf8', "\x{1ff}" ]) {
 	my($type, $char) = @$_;
@@ -2919,7 +2919,7 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
 {
     package Str;
-    use overload q/""/ => sub { ${$_[0]}; };
+    use overload q/""/ => sub { ${@_[0]}; };
     sub new { my ($c, $v) = @_; bless \$v, $c; }
 
     package main;
@@ -2943,8 +2943,8 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
 # bug #22354
 sub func ($) {
-    ok( "a\nb" !~ m/^b/, $_[0] );
-    ok( "a\nb" =~ m/^b/m, "$_[0] - with /m" );
+    ok( "a\nb" !~ m/^b/, @_[0] );
+    ok( "a\nb" =~ m/^b/m, "@_[0] - with /m" );
 }
 func "standalone";
 $_ = "x"; s/x/{func "in subst"}/;
@@ -3067,10 +3067,10 @@ ok(("abc" =~ m/^abc(\z)??/) && !defined($1),
     push @got,$1 while m/$re/g;
 
     my %count;
-    $count{$_}++ for @got;
+    %count{$_}++ for @got;
     my $ok=1;
     for (@nums) {
-        $ok=0 if --$count{$_}+<0;
+        $ok=0 if --%count{$_}+<0;
     }
     ok($ok,"Trie min count matches");
 }
@@ -3125,7 +3125,7 @@ ok(("foba  ba${s}pxySS$s$s" =~ qr/(b(?:a${s}t|a${s}f|a${s}p)[xy]+$s*)/i)
 
 
 print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
-if (!$ENV{PERL_SKIP_PSYCHO_TEST}){
+if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     my @normal=qw(these are some normal words);
     use utf8;
     my $psycho=join "|",@normal,map chr $_,255..20000;
@@ -3223,7 +3223,7 @@ if ($ordA == 193) {
 
     # create some random junk. Inefficient, but it works.
     for ($i = 0 ; $i +< $size ; $i++) {
-        $str .= $chars[int(rand(@chars))];
+        $str .= @chars[int(rand(@chars))];
     }
 
     $str .= ($delim x 4);
@@ -3351,17 +3351,17 @@ SKIP:{
         or skip("Won't test individual results as count isn't equal",
                 0+@expect);
     foreach my $idx (@expect) {
-        ok($expect[$idx] eq $stack[$idx], 
+        ok(@expect[$idx] eq @stack[$idx], 
             "Expecting '$expect' at stack pos #$idx");
     }
         
 }
 {
     my $s='123453456';
-    $s=~s/(?<digits>\d+)\k<digits>/$+{digits}/;
+    $s=~s/(?<digits>\d+)\k<digits>/%+{digits}/;
     ok($s eq '123456','Named capture (angle brackets) s///');
     $s='123453456';
-    $s=~s/(?'digits'\d+)\k'digits'/$+{digits}/;
+    $s=~s/(?'digits'\d+)\k'digits'/%+{digits}/;
     ok($s eq '123456','Named capture (single quotes) s///');    
 }
 
@@ -3380,9 +3380,9 @@ SKIP:{
 	my ($r1, $c1, $r2, $c2) = eval qq{
 	    use utf8;
 	    scalar("..foo foo.." =~ m/(?'${uni}'foo) \\k'${uni}'/),
-		\$+\{${uni}\},
+		\%+\{${uni}\},
 	    scalar("..bar bar.." =~ m/(?<${uni}>bar) \\k<${uni}>/),
-		\$+\{${uni}\};
+		\%+\{${uni}\};
 	};
 	ok($r1,                         "Named capture UTF (?'')");
 	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
@@ -3400,14 +3400,14 @@ sub iseq($$;$) {
         
     my $ok=  $got eq $expect;
         
-    printf "%sok %d - %s$todo\n", ($ok ? "" : "not "), $test,
-        ($name||$Message)."\tLine ".((caller)[2]);
+    printf "\%sok \%d - \%s$todo\n", ($ok ? "" : "not "), $test,
+        ($name||$Message)."\tLine ".((caller)[[2]]);
 
     no warnings 'utf8';
-    printf "# Failed test at line %d\n".
-           "# expected: %s\n". 
-           "#   result: %s\n", 
-           (caller)[2], $expect, $got
+    printf "# Failed test at line \%d\n".
+           "# expected: \%s\n". 
+           "#   result: \%s\n", 
+           (caller)[[2]], $expect, $got
         unless $ok;
 
     $test++;
@@ -3426,27 +3426,27 @@ sub iseq($$;$) {
         @v=sort values(%+);
         $res=1;
         push @fetch,
-            [ "$+{A}", "$1" ],
-            [ "$+{B}", "$2" ],
-            [ "$+{C}", "$3" ],
+            [ "%+{A}", "$1" ],
+            [ "%+{B}", "$2" ],
+            [ "%+{C}", "$3" ],
         ;
     } 
     foreach (0..2) {
-        if ($fetch[$_]) {
-            iseq($fetch[$_][0],$fetch[$_][1],$names[$_]);
+        if (@fetch[$_]) {
+            iseq(@fetch[$_][0],@fetch[$_][1],@names[$_]);
         } else {
-            ok(0, $names[$_]);
+            ok(0, @names[$_]);
         }
     }
     iseq($res,1,"$s~=/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/");
-    iseq($count,3,"Got 3 keys in %+ via each");
+    iseq($count,3,"Got 3 keys in \%+ via each");
     iseq(0+@k, 3, 'Got 3 keys in %+ via keys');
     iseq("@k","A B C", "Got expected keys");
     iseq("@v","bar baz foo", "Got expected values");
     eval'
-        print for $+{this_key_doesnt_exist};
+        print for %+{this_key_doesnt_exist};
     ';
-    ok(!$@,'lvalue $+{...} should not throw an exception');
+    ok(!$@,'lvalue %+{...} should not throw an exception');
 }
 {
     #
@@ -3455,7 +3455,7 @@ sub iseq($$;$) {
     my $s = 'foo bar baz';
     my (@k,@v,@fetch,$res);
     my $count = 0;
-    my @names = qw($+{A} $+{B} $+{C} $+{D});
+    my @names = qw(%+{A} %+{B} %+{C} %+{D});
     if ($s =~ m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/) {
 	while (my ($k,$v) = each(%+)) {
 	    $count++;
@@ -3464,46 +3464,46 @@ sub iseq($$;$) {
 	@v = sort values(%+);
 	$res = 1;
 	push @fetch,
-	    [ "$+{A}", "$2" ],
-	    [ "$+{B}", "$3" ],
-	    [ "$+{C}", "$4" ],
-	    [ "$+{D}", $1 ],
+	    [ "%+{A}", "$2" ],
+	    [ "%+{B}", "$3" ],
+	    [ "%+{C}", "$4" ],
+	    [ "%+{D}", $1 ],
 	;
     }
     foreach (0..3) {
-	if ($fetch[$_]) {
-	    iseq($fetch[$_][0],$fetch[$_][1],$names[$_]);
+	if (@fetch[$_]) {
+	    iseq(@fetch[$_][0],@fetch[$_][1],@names[$_]);
 	} else {
-	    ok(0, $names[$_]);
+	    ok(0, @names[$_]);
 	}
     }
     iseq($res,1,"$s~=m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/");
-    iseq($count,4,"Got 4 keys in %+ via each -- bug 50496");
+    iseq($count,4,"Got 4 keys in \%+ via each -- bug 50496");
     iseq(0+@k, 4, 'Got 4 keys in %+ via keys -- bug 50496');
     iseq("@k","A B C D", "Got expected keys -- bug 50496");
     iseq("@v","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
     eval'
-	print for $+{this_key_doesnt_exist};
+	print for %+{this_key_doesnt_exist};
     ';
-    ok(!$@,'lvalue $+{...} should not throw an exception');
+    ok(!$@,'lvalue %+{...} should not throw an exception');
 }
 {
     my $s='foo bar baz';
     my @res;
     if ('1234'=~m/(?<A>1)(?<B>2)(?<A>3)(?<B>4)/) {
         foreach my $name (sort keys(%-)) {
-            my $ary = $-{$name};
-            foreach my $idx (0..$#$ary) {
+            my $ary = %-{$name};
+            foreach my $idx (0..@$ary-1) {
                 push @res,"$name:$idx:$ary->[$idx]";
             }
         }
     }
     my @expect=qw(A:0:1 A:1:3 B:0:2 B:1:4);
-    iseq("@res","@expect","Check %-");
+    iseq("@res","@expect","Check \%-");
     eval'
-        print for $-{this_key_doesnt_exist};
+        print for %-{this_key_doesnt_exist};
     ';
-    ok(!$@,'lvalue $-{...} should not throw an exception');
+    ok(!$@,'lvalue %-{...} should not throw an exception');
 }
 # stress test CURLYX/WHILEM.
 #
@@ -3512,8 +3512,8 @@ sub iseq($$;$) {
 # CURLYX and WHILEM blocks, except those related to LONGJMP, the
 # super-linear cache and warnings. It executes about 0.5M regexes
 
-if ($ENV{PERL_SKIP_PSYCHO_TEST}){
-  printf "ok %d Skip: No psycho tests\n", $test++;
+if (%ENV{PERL_SKIP_PSYCHO_TEST}){
+  printf "ok \%d Skip: No psycho tests\n", $test++;
 } else {    
   print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
   my $r = qr/^
@@ -3631,7 +3631,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $count=0;
     my $mval=0;
     my $pval=0;
-    while ($str=~m/b/g) { $mval=$#-; $pval=$#+; $count++ }
+    while ($str=~m/b/g) { $mval=@- -1; $pval=@+ -1; $count++ }
     iseq($mval,0,"\@- should be empty [RT#36046]");
     iseq($pval,0,"\@+ should be empty [RT#36046]");
     iseq($count,1,"should have matched once only [RT#36046]");
@@ -3979,7 +3979,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
 }
 sub kt
 {
-    return '4' if $_[0] eq '09028623';
+    return '4' if @_[0] eq '09028623';
 }
 
 {
@@ -4046,14 +4046,14 @@ sub kt
     my $res="";
 
     if ('1' =~ m/(?|(?<digit>1)|(?<digit>2))/) {
-      $res = "@{$- {digit}}";
+      $res = "@{%- {digit}}";
     }
     iseq($res,"1",
         "Check that (?|...) doesnt cause dupe entries in the names array");
     #---
     $res="";
     if ('11' =~ m/(?|(?<digit>1)|(?<digit>2))(?&digit)/) {
-      $res = "@{$- {digit}}";
+      $res = "@{%- {digit}}";
     }
     iseq($res, "1",
         "Check that (?&..) to a buffer inside a (?|...) goes to the leftmost");
@@ -4110,10 +4110,10 @@ sub kt
     my @strs= ('ss','sS','Ss','SS',chr(0xDF));
     my @ss= @strs;
 
-    for my $ssi (0..$#ss) {
-        for my $dfi (0..$#df) {
-            my $pat= $df[$dfi];
-            my $str= $ss[$ssi];
+    for my $ssi (0..@ss-1) {
+        for my $dfi (0..@df-1) {
+            my $pat= @df[$dfi];
+            my $str= @ss[$ssi];
             (my $sstr=$str)=~s/\x{DF}/\\x\{DF\}/;
 
             my $ret= $str=~m/$pat/i;
@@ -4165,34 +4165,34 @@ sub kt
     iseq( length($'), 4, q[length $'] );
     iseq( length($&), 9, 'length $&' );
     iseq( length($1), 4, 'length $1' );
-    iseq( length($+{eek}), 4, 'length $+{eek} == length $1' );
+    iseq( length(%+{eek}), 4, 'length $+{eek} == length $1' );
 }
 
 {
     my $ok=-1;
 
-    $ok=exists($-{x}) ? 1 : 0
+    $ok=exists(%-{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
     iseq($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
     iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~m/(?<x>foo)|bar/');
     iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
-    $ok=exists($+{x}) ? 1 : 0
+    $ok=exists(%+{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
     iseq($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
     iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~m/(?<x>foo)|bar/');
     iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
-    $ok=exists($-{x}) ? 1 : 0
+    $ok=exists(%-{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
     iseq($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
     iseq(scalar(%+), 1, 'scalar %+ == 1 after "foo"=~m/(?<x>foo)|bar/');
     iseq(scalar(%-), 1, 'scalar %- == 1 after "foo"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
-    $ok=exists($+{x}) ? 1 : 0
+    $ok=exists(%+{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
     iseq($ok,1,'$+{x} exists after "foo"=~m/(?<x>foo)|bar/');
 }
@@ -4275,7 +4275,7 @@ sub kt
     foreach (@list) {
         m/ab(.+)cd/i; # the ignore-case seems to be important
         $y = $1; # use $1, which might not be from the last match!
-        $x = substr($list[0],$-[0],$+[0]-$-[0]);
+        $x = substr(@list[0],@-[0],@+[0]-@-[0]);
     }
     iseq($y,' ',
         'pattern in a loop, failure should not affect previous success');

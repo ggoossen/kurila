@@ -50,13 +50,13 @@ test "Assignment", sub {
 };
 
 test "Storing", sub {
-    $FOO[1] = 'b';
-    $BAR[1] = 'b';
+    @FOO[1] = 'b';
+    @BAR[1] = 'b';
 };
 
 test "Truncation", sub {
-    $#FOO = 0;
-    $#BAR = 0;
+    splice @FOO, 1;
+    splice @BAR, 1;
 };
 
 test "Push", sub {

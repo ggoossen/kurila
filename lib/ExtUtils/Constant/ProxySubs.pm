@@ -26,11 +26,11 @@ $VERSION = '0.06';
 
 %type_from_struct =
     (
-     IV => sub { $_[0] . '->value' },
-     NV => sub { $_[0] . '->value' },
-     UV => sub { $_[0] . '->value' },
-     PV => sub { $_[0] . '->value' },
-     PVN => sub { $_[0] . '->value', $_[0] . '->len' },
+     IV => sub { @_[0] . '->value' },
+     NV => sub { @_[0] . '->value' },
+     UV => sub { @_[0] . '->value' },
+     PV => sub { @_[0] . '->value' },
+     PVN => sub { @_[0] . '->value', @_[0] . '->len' },
      YES => sub {},
      NO => sub {},
      UNDEF => sub {},
@@ -39,16 +39,16 @@ $VERSION = '0.06';
 
 %type_to_sv = 
     (
-     IV => sub { "newSViv($_[0])" },
-     NV => sub { "newSVnv($_[0])" },
-     UV => sub { "newSVuv($_[0])" },
-     PV => sub { "newSVpv($_[0], 0)" },
-     PVN => sub { "newSVpvn($_[0], $_[1])" },
+     IV => sub { "newSViv(@_[0])" },
+     NV => sub { "newSVnv(@_[0])" },
+     UV => sub { "newSVuv(@_[0])" },
+     PV => sub { "newSVpv(@_[0], 0)" },
+     PVN => sub { "newSVpvn(@_[0], @_[1])" },
      YES => sub { '&PL_sv_yes' },
      NO => sub { '&PL_sv_no' },
      UNDEF => sub { '&PL_sv_undef' },
      '' => sub { '&PL_sv_yes' },
-     SV => sub {"SvREFCNT_inc($_[0])"},
+     SV => sub {"SvREFCNT_inc(@_[0])"},
      );
 
 %type_to_C_value = 
@@ -61,7 +61,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my ($self, $type) = @_;
-    return $type_to_C_value{$type} || sub {return map {ref $_ ? @$_ : $_} @_};
+    return %type_to_C_value{$type} || sub {return map {ref $_ ? @$_ : $_} @_};
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -79,13 +79,13 @@ sub type_to_C_value {
      PV => ['const char *'],
      PVN => ['const char *', 'STRLEN'],
      );
-$type_temporary{$_} = [$_] foreach qw(IV UV NV);
+%type_temporary{$_} = [$_] foreach qw(IV UV NV);
      
 while (my ($type, $value) = each %XS_TypeSet) {
-    $type_num_args{$type}
+    %type_num_args{$type}
 	= defined $value ? ref $value ? scalar @$value : 1 : 0;
 }
-$type_num_args{''} = 0;
+%type_num_args{''} = 0;
 
 sub partition_names {
     my ($self, $default_type, @items) = @_;
@@ -111,10 +111,10 @@ sub partition_names {
 	}
 
 	if ($item->{pre} or $item->{post} or $item->{not_constant}
-	    or $type_is_a_problem{$item->{type}}) {
+	    or %type_is_a_problem{$item->{type}}) {
 	    push @trouble, $item;
 	} else {
-	    push @{$found{$item->{type}}}, $item;
+	    push @{%found{$item->{type}}}, $item;
 	}
     }
     # use Data::Dumper; print Dumper \%found;
@@ -123,10 +123,10 @@ sub partition_names {
 
 sub boottime_iterator {
     my ($self, $type, $iterator, $hash, $subname) = @_;
-    my $extractor = $type_from_struct{$type};
+    my $extractor = %type_from_struct{$type};
     die "Can't find extractor code for type $type"
 	unless defined $extractor;
-    my $generator = $type_to_sv{$type};
+    my $generator = %type_to_sv{$type};
     die "Can't find generator code for type $type"
 	unless defined $generator;
 
@@ -135,7 +135,7 @@ sub boottime_iterator {
     return sprintf <<"EOBOOT", &$generator(&$extractor($iterator));
         while ($iterator->name) \{
 	    $subname($athx $hash, $iterator->name,
-				$iterator->namelen, %s);
+				$iterator->namelen, \%s);
 	    ++$iterator;
 	\}
 EOBOOT
@@ -164,7 +164,7 @@ sub WriteConstants {
     my $ARGS = {@_};
 
     my ($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-	= @{$ARGS}{qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)};
+	= %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{PROXYSUBS};
     $options = {} unless ref $options;
@@ -174,7 +174,7 @@ sub WriteConstants {
 
     # If anyone is insane enough to suggest a package name containing %
     my $package_sprintf_safe = $package;
-    $package_sprintf_safe =~ s/%/%%/g;
+    $package_sprintf_safe =~ s/%/\%\%/g;
 
     # All the types we see
     my $what = {};
@@ -211,7 +211,7 @@ Im_sorry_Dave(pTHX_ SV *sv, MAGIC *mg)
 \{
     PERL_UNUSED_ARG(mg);
     Perl_croak(aTHX_
-	       "Your vendor has not defined $package_sprintf_safe macro %"SVf
+	       "Your vendor has not defined $package_sprintf_safe macro \%"SVf
 	       " used", sv);
     NORETURN_FUNCTION_END;
 \}
@@ -292,9 +292,9 @@ EOBOOT
         = [map {{%$_, type=>'', invert_macro => 1}} @$notfound];
 
     foreach my $type (sort keys %$found) {
-	my $struct = $type_to_struct{$type};
+	my $struct = %type_to_struct{$type};
 	my $type_to_value = $self->type_to_C_value($type);
-	my $number_of_args = $type_num_args{$type};
+	my $number_of_args = %type_num_args{$type};
 	die "Can't find structure definition for type $type"
 	    unless defined $struct;
 
@@ -333,10 +333,10 @@ EOBOOT
     # Terminate the list with a NULL
 	print $xs_fh "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
 
-	$iterator{$type} = "value_for_" . ($type ? lc $type : 'notfound');
+	%iterator{$type} = "value_for_" . ($type ? lc $type : 'notfound');
 
 	print $xs_fh <<"EOBOOT";
-	const struct $struct_type *$iterator{$type} = $array_name;
+	const struct $struct_type *%iterator{$type} = $array_name;
 EOBOOT
     }
 
@@ -350,7 +350,7 @@ EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
     foreach my $type (sort keys %$found) {
-	print $xs_fh $self->boottime_iterator($type, $iterator{$type}, 
+	print $xs_fh $self->boottime_iterator($type, %iterator{$type}, 
 					      'symbol_table',
 					      $add_symbol_subname);
     }
@@ -382,7 +382,7 @@ EXPLODE
 			       value_for_notfound->namelen, TRUE);
 	    if (!sv) \{
 		Perl_croak($athx
-			   "Couldn't add key '%s' to %%$package_sprintf_safe\::",
+			   "Couldn't add key '\%s' to \%\%$package_sprintf_safe\::",
 			   value_for_notfound->name);
 	    \}
 	    if (!SvOK(*sv) && SvTYPE(*sv) != SVt_PVGV) \{
@@ -408,7 +408,7 @@ EXPLODE
 #ifndef SYMBIAN
 	    if (!hv_store(${c_subname}_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0))
-		Perl_croak($athx "Couldn't add key '%s' to missing_hash",
+		Perl_croak($athx "Couldn't add key '\%s' to missing_hash",
 			   value_for_notfound->name);
 #endif
 DONT
@@ -432,7 +432,7 @@ EOBOOT
 		 "        /* This is the default value: */\n" if $type;
 	    print $xs_fh "#else\n";
 	}
-	my $generator = $type_to_sv{$type};
+	my $generator = %type_to_sv{$type};
 	die "Can't find generator code for type $type"
 	    unless defined $generator;
 
@@ -441,21 +441,21 @@ EOBOOT
 	# items use C pre processor directives in their values, and in turn
 	# these don't fit nicely in the macro-ised generator functions
 	my $counter = 0;
-	printf $xs_fh "            %s temp%d;\n", $_, $counter++
-	    foreach @{$type_temporary{$type}};
+	printf $xs_fh "            \%s temp\%d;\n", $_, $counter++
+	    foreach @{%type_temporary{$type}};
 
 	print $xs_fh "            $item->{pre}\n" if $item->{pre};
 
 	# And because the code in pre might be both declarations and
 	# statements, we can't declare and assign to the temporaries in one.
 	$counter = 0;
-	printf $xs_fh "            temp%d = %s;\n", $counter++, $_
+	printf $xs_fh "            temp\%d = \%s;\n", $counter++, $_
 	    foreach &$type_to_value($value);
 
 	my @tempvarnames = map {sprintf 'temp%d', $_} 0 .. $counter - 1;
 	printf $xs_fh <<"EOBOOT", $name, &$generator(@tempvarnames);
-	    ${c_subname}_add_symbol($athx symbol_table, "%s",
-				    $namelen, %s);
+	    ${c_subname}_add_symbol($athx symbol_table, "\%s",
+				    $namelen, \%s);
 EOBOOT
 	print $xs_fh "        $item->{post}\n" if $item->{post};
 	print $xs_fh "        \}\n";
@@ -477,7 +477,7 @@ $xs_subname(sv)
     INPUT:
 	SV *		sv;
     PPCODE:
-	sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro %" SVf
+	sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro \%" SVf
 			  ", used", sv);
         PUSHs(sv_2mortal(sv));
 EXPLODE
@@ -491,14 +491,14 @@ $xs_subname(sv)
         const char *	s = SvPV(sv, len);
     PPCODE:
 #ifdef SYMBIAN
-	sv = newSVpvf("%"SVf" is not a valid $package_sprintf_safe macro", sv);
+	sv = newSVpvf("\%"SVf" is not a valid $package_sprintf_safe macro", sv);
 #else
 	HV *${c_subname}_missing = get_missing_hash(aTHX);
 	if (hv_exists(${c_subname}_missing, s, (I32)len)) \{
-	    sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro %" SVf
+	    sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro \%" SVf
 			  ", used", sv);
 	\} else \{
-	    sv = newSVpvf("%"SVf" is not a valid $package_sprintf_safe macro",
+	    sv = newSVpvf("\%"SVf" is not a valid $package_sprintf_safe macro",
 			  sv);
 	\}
 #endif

@@ -2,7 +2,7 @@
 use strict;
 
 BEGIN {
-    if ( $ENV{PERL_CORE} ) {
+    if ( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -19,7 +19,7 @@ package main;
 use Test::More tests => 15;
 
 BEGIN {
-    $ENV{PERL_RL} = 'Mock'; # test against our instrumented class
+    %ENV{PERL_RL} = 'Mock'; # test against our instrumented class
     use_ok('Term::ReadLine');
 }
 

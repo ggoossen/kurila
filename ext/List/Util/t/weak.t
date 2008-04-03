@@ -6,7 +6,7 @@ BEGIN {
 	@INC = '../lib';
 	require Config; Config->import;
 	keys %Config; # Silence warning
-	if ($Config{extensions} !~ m/\bList\/Util\b/) {
+	if (%Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
 	}
@@ -181,7 +181,7 @@ ok(!isweak($x->{Z}));
 
 SKIP: {
     # in a MAD build, constants have refcnt 2, not 1
-    skip("Test does not work with MAD", 5) if exists $Config{mad};
+    skip("Test does not work with MAD", 5) if exists %Config{mad};
 
     $a = eval '\"hello"';
     ok(ref($a)) or print "# didn't get a ref from eval\n";
@@ -199,5 +199,5 @@ package Dest;
 
 sub DESTROY {
 	print "# INCFLAG\n";
-	${$_[0]{Flag}} ++;
+	${@_[0]{Flag}} ++;
 }

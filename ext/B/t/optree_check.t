@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/B/t');
     } else {
@@ -9,7 +9,7 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
@@ -29,12 +29,12 @@ cmdline args in 'standard' way across all clients of OptreeCheck.
 
 =cut
 
-my $tests = 5 + 15 + 16 * $gOpts{selftest};	# pass()s + $#tests
+my $tests = 5 + 15 + 16 * %gOpts{selftest};	# pass()s + $#tests
 plan tests => $tests;
 
 SKIP: {
     skip "no perlio in this build", $tests
-    unless $Config::Config{useperlio};
+    unless %Config::Config{useperlio};
 
 
 pass("REGEX TEST HARNESS SELFTEST");

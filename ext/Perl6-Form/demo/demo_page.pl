@@ -1,7 +1,7 @@
 use Perl6::Form;
 
 print form { ws=>qr/\s/, page=>{header=>"Report",
-								footer=>{other=>sub{"../".($_[0]{page}{number}+1)},
+								footer=>{other=>sub{"../".(@_[0]{page}{number}+1)},
 										 last=>"THE\nEND"
 										},
 								feed=>{other=>sub{".\n.\n.\n"}, last=>""},

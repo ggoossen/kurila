@@ -28,13 +28,13 @@ sub new {
   }
   else {
     %arg  = @_;
-    $host = delete $arg{Host};
+    $host = delete %arg{Host};
   }
   my $obj;
 
-  $host ||= $ENV{NNTPSERVER} || $ENV{NEWSHOST};
+  $host ||= %ENV{NNTPSERVER} || %ENV{NEWSHOST};
 
-  my $hosts = defined $host ? [$host] : $NetConfig{nntp_hosts};
+  my $hosts = defined $host ? [$host] : %NetConfig{nntp_hosts};
 
   @{$hosts} = qw(news)
     unless @{$hosts};
@@ -43,10 +43,10 @@ sub new {
   foreach $h (@{$hosts}) {
     $obj = $type->SUPER::new(
       PeerAddr => ($host = $h),
-      PeerPort => $arg{Port} || 'nntp(119)',
+      PeerPort => %arg{Port} || 'nntp(119)',
       Proto => 'tcp',
-      Timeout => defined $arg{Timeout}
-      ? $arg{Timeout}
+      Timeout => defined %arg{Timeout}
+      ? %arg{Timeout}
       : 120
       )
       and last;
@@ -55,10 +55,10 @@ sub new {
   return undef
     unless defined $obj;
 
-  ${*$obj}{'net_nntp_host'} = $host;
+  %{*$obj}{'net_nntp_host'} = $host;
 
   $obj->autoflush(1);
-  $obj->debug(exists $arg{Debug} ? $arg{Debug} : undef);
+  $obj->debug(exists %arg{Debug} ? %arg{Debug} : undef);
 
   unless ($obj->response() == CMD_OK) {
     $obj->close;
@@ -68,7 +68,7 @@ sub new {
   my $c = $obj->code;
   my @m = $obj->message;
 
-  unless (exists $arg{Reader} && $arg{Reader} == 0) {
+  unless (exists %arg{Reader} && %arg{Reader} == 0) {
 
     # if server is INN and we have transfer rights the we are currently
     # talking to innd not nnrpd
@@ -84,7 +84,7 @@ sub new {
     }
   }
 
-  ${*$obj}{'net_nntp_post'} = $c == 200 ? 1 : 0;
+  %{*$obj}{'net_nntp_post'} = $c == 200 ? 1 : 0;
 
   $obj;
 }
@@ -92,7 +92,7 @@ sub new {
 
 sub host {
   my $me = shift;
-  ${*$me}{'net_nntp_host'};
+  %{*$me}{'net_nntp_host'};
 }
 
 
@@ -114,7 +114,7 @@ sub debug_text {
 sub postok {
   @_ == 1 or croak 'usage: $nntp->postok()';
   my $nntp = shift;
-  ${*$nntp}{'net_nntp_post'} || 0;
+  %{*$nntp}{'net_nntp_post'} || 0;
 }
 
 
@@ -123,7 +123,7 @@ sub article {
   my $nntp = shift;
   my @fh;
 
-  @fh = (pop) if @_ == 2 || (@_ && (ref($_[0]) || ref(\$_[0]) eq 'GLOB'));
+  @fh = (pop) if @_ == 2 || (@_ && (ref(@_[0]) || ref(\@_[0]) eq 'GLOB'));
 
   $nntp->_ARTICLE(@_)
     ? $nntp->read_until_dot(@fh)
@@ -163,7 +163,7 @@ sub body {
   my $nntp = shift;
   my @fh;
 
-  @fh = (pop) if @_ == 2 || (@_ && ref($_[0]) || ref(\$_[0]) eq 'GLOB');
+  @fh = (pop) if @_ == 2 || (@_ && ref(@_[0]) || ref(\@_[0]) eq 'GLOB');
 
   $nntp->_BODY(@_)
     ? $nntp->read_until_dot(@fh)
@@ -184,7 +184,7 @@ sub head {
   my $nntp = shift;
   my @fh;
 
-  @fh = (pop) if @_ == 2 || (@_ && ref($_[0]) || ref(\$_[0]) eq 'GLOB');
+  @fh = (pop) if @_ == 2 || (@_ && ref(@_[0]) || ref(\@_[0]) eq 'GLOB');
 
   $nntp->_HEAD(@_)
     ? $nntp->read_until_dot(@fh)
@@ -213,7 +213,7 @@ sub nntpstat {
 sub group {
   @_ == 1 || @_ == 2 or croak 'usage: $nntp->group( [ GROUP ] )';
   my $nntp = shift;
-  my $grp  = ${*$nntp}{'net_nntp_group'} || undef;
+  my $grp  = %{*$nntp}{'net_nntp_group'} || undef;
 
   return $grp
     unless (@_ || wantarray);
@@ -227,10 +227,10 @@ sub group {
   my ($count, $first, $last, $group) = ($1, $2, $3, $4);
 
   # group may be replied as '(current group)'
-  $group = ${*$nntp}{'net_nntp_group'}
+  $group = %{*$nntp}{'net_nntp_group'}
     if $group =~ m/\(/;
 
-  ${*$nntp}{'net_nntp_group'} = $group;
+  %{*$nntp}{'net_nntp_group'} = $group;
 
   wantarray
     ? ($count, $first, $last, $group)
@@ -515,7 +515,7 @@ sub xpath {
   ($m = $nntp->message) =~ s/^\d+\s+//o;
   my @p = split m/\s+/, $m;
 
-  wantarray ? @p : $p[0];
+  wantarray ? @p : @p[0];
 }
 
 
@@ -553,7 +553,7 @@ sub _msg_arg {
   if (@_) {
     carp "Depriciated passing of two message numbers, " . "pass a reference"
       if $^W;
-    $spec = [$spec, $_[0]];
+    $spec = [$spec, @_[0]];
   }
 
   if (defined $spec) {
@@ -578,9 +578,9 @@ sub _msg_arg {
 sub _timestr {
   my $time = shift;
   my @g    = reverse((gmtime($time))[0 .. 5]);
-  $g[1] += 1;
-  $g[0] %= 100;
-  sprintf "%02d%02d%02d %02d%02d%02d GMT", @g;
+  @g[1] += 1;
+  @g[0] %= 100;
+  sprintf '%02d%02d%02d %02d%02d%02d GMT', @g;
 }
 
 
@@ -594,7 +594,7 @@ sub _grouplist {
 
   foreach $ln (@$arr) {
     my @a = split(m/[\s\n]+/, $ln);
-    $hash->{$a[0]} = [@a[1, 2, 3]];
+    $hash->{@a[0]} = [@a[[1, 2, 3]]];
   }
 
   $hash;

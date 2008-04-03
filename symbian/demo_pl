@@ -16,7 +16,7 @@
 
 use strict;
 
-unless (@ARGV && $ARGV[0] =~ m/^(?:list|extract|cleanup)$/) {
+unless (@ARGV && @ARGV[0] =~ m/^(?:list|extract|cleanup)$/) {
    die "$0: Usage: $0 [list|extract|cleanup]\n";
 }
 

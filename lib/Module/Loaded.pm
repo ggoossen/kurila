@@ -57,7 +57,7 @@ sub mark_as_loaded (*) {
         carp "'$pm' already marked as loaded ('$where')";
     
     } else {
-        $INC{$file} = $who;
+        %INC{$file} = $who;
     }
     
     return 1;
@@ -81,7 +81,7 @@ sub mark_as_unloaded (*) {
         carp "'$pm' already marked as unloaded";
 
     } else {
-        delete $INC{ $file };
+        delete %INC{ $file };
     }
     
     return 1;
@@ -101,7 +101,7 @@ sub is_loaded (*) {
     my $pm      = shift;
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
 
-    return $INC{$file} if exists $INC{$file};
+    return %INC{$file} if exists %INC{$file};
     
     return;
 }

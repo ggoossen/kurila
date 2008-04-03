@@ -10,8 +10,8 @@ BEGIN {
     }
     eval { require Config; Config->import; };
     my $reason;
-    if ($Config{'i_pwd'} ne 'define') {
-	$reason = '$Config{i_pwd} undefined';
+    if (%Config{'i_pwd'} ne 'define') {
+	$reason = '%Config{i_pwd} undefined';
     }
     elsif (not -f "/etc/passwd" ) { # Play safe.
 	$reason = 'no /etc/passwd file';
@@ -89,15 +89,15 @@ while ( ~< *PW) {
     # LIMIT -1 so that users with empty shells don't fall off
     my @s = split m/:/, $_, -1;
     my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s);
-    (my $v) = $Config{osvers} =~ m/^(\d+)/;
+    (my $v) = %Config{osvers} =~ m/^(\d+)/;
     if ($^O eq 'darwin' && $v +< 9) {
-       ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s[0,1,2,3,7,8,9];
+       ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s[[0,1,2,3,7,8,9]];
     } else {
        ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = @s;
     }
     next if m/^\+/; # ignore NIS includes
     if (@s) {
-	push @{ $seen{$name_s} }, $.;
+	push @{ %seen{$name_s} }, $.;
     } else {
 	warn "# Your $where line $. is empty.\n";
 	next;
@@ -120,7 +120,7 @@ while ( ~< *PW) {
 	    ($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) = @n;
 	    next if $name_s ne $name;
 	}
-	$perfect{$name_s}++
+	%perfect{$name_s}++
 	    if $name    eq $name_s    and
                $uid     eq $uid_s     and
 # Do not compare passwords: think shadow passwords.

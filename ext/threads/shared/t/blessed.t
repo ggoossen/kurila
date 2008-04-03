@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -23,7 +23,7 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
@@ -55,13 +55,13 @@ threads->create(sub {
                 bless $sobj, 'baz';
 
                 # Add data to objects
-                $$aobj[0] = bless(&share({}), 'yin');
-                $$aobj[1] = bless(&share([]), 'yang');
-                $$aobj[2] = $sobj;
+                @$aobj[0] = bless(&share({}), 'yin');
+                @$aobj[1] = bless(&share([]), 'yang');
+                @$aobj[2] = $sobj;
 
-                $$hobj{'hash'}   = bless(&share({}), 'yin');
-                $$hobj{'array'}  = bless(&share([]), 'yang');
-                $$hobj{'scalar'} = $sobj;
+                %$hobj{'hash'}   = bless(&share({}), 'yin');
+                %$hobj{'array'}  = bless(&share([]), 'yang');
+                %$hobj{'scalar'} = $sobj;
 
                 $$sobj = 3;
 
@@ -71,15 +71,15 @@ threads->create(sub {
                 ok(4, ref($sobj) eq 'baz', "scalar blessing does work");
                 ok(5, $$sobj eq '3', "scalar contents okay");
 
-                ok(6, ref($$aobj[0]) eq 'yin', "blessed hash in array");
-                ok(7, ref($$aobj[1]) eq 'yang', "blessed array in array");
-                ok(8, ref($$aobj[2]) eq 'baz', "blessed scalar in array");
-                ok(9, ${$$aobj[2]} eq '3', "blessed scalar in array contents");
+                ok(6, ref(@$aobj[0]) eq 'yin', "blessed hash in array");
+                ok(7, ref(@$aobj[1]) eq 'yang', "blessed array in array");
+                ok(8, ref(@$aobj[2]) eq 'baz', "blessed scalar in array");
+                ok(9, ${@$aobj[2]} eq '3', "blessed scalar in array contents");
 
-                ok(10, ref($$hobj{'hash'}) eq 'yin', "blessed hash in hash");
-                ok(11, ref($$hobj{'array'}) eq 'yang', "blessed array in hash");
-                ok(12, ref($$hobj{'scalar'}) eq 'baz', "blessed scalar in hash");
-                ok(13, ${$$hobj{'scalar'}} eq '3', "blessed scalar in hash contents");
+                ok(10, ref(%$hobj{'hash'}) eq 'yin', "blessed hash in hash");
+                ok(11, ref(%$hobj{'array'}) eq 'yang', "blessed array in hash");
+                ok(12, ref(%$hobj{'scalar'}) eq 'baz', "blessed scalar in hash");
+                ok(13, ${%$hobj{'scalar'}} eq '3', "blessed scalar in hash contents");
 
              })->join;
 
@@ -89,15 +89,15 @@ ok(15, ref($aobj) eq 'bar', "array blessing does work");
 ok(16, ref($sobj) eq 'baz', "scalar blessing does work");
 ok(17, $$sobj eq '3', "scalar contents okay");
 
-ok(18, ref($$aobj[0]) eq 'yin', "blessed hash in array");
-ok(19, ref($$aobj[1]) eq 'yang', "blessed array in array");
-ok(20, ref($$aobj[2]) eq 'baz', "blessed scalar in array");
-ok(21, ${$$aobj[2]} eq '3', "blessed scalar in array contents");
+ok(18, ref(@$aobj[0]) eq 'yin', "blessed hash in array");
+ok(19, ref(@$aobj[1]) eq 'yang', "blessed array in array");
+ok(20, ref(@$aobj[2]) eq 'baz', "blessed scalar in array");
+ok(21, ${@$aobj[2]} eq '3', "blessed scalar in array contents");
 
-ok(22, ref($$hobj{'hash'}) eq 'yin', "blessed hash in hash");
-ok(23, ref($$hobj{'array'}) eq 'yang', "blessed array in hash");
-ok(24, ref($$hobj{'scalar'}) eq 'baz', "blessed scalar in hash");
-ok(25, ${$$hobj{'scalar'}} eq '3', "blessed scalar in hash contents");
+ok(22, ref(%$hobj{'hash'}) eq 'yin', "blessed hash in hash");
+ok(23, ref(%$hobj{'array'}) eq 'yang', "blessed array in hash");
+ok(24, ref(%$hobj{'scalar'}) eq 'baz', "blessed scalar in hash");
+ok(25, ${%$hobj{'scalar'}} eq '3', "blessed scalar in hash contents");
 
 threads->create(sub {
                     # Rebless objects
@@ -105,19 +105,19 @@ threads->create(sub {
                     bless $aobj, 'rab';
                     bless $sobj, 'zab';
 
-                    my $data = $$aobj[0];
+                    my $data = @$aobj[0];
                     bless $data, 'niy';
-                    $$aobj[0] = $data;
-                    $data = $$aobj[1];
+                    @$aobj[0] = $data;
+                    $data = @$aobj[1];
                     bless $data, 'gnay';
-                    $$aobj[1] = $data;
+                    @$aobj[1] = $data;
 
-                    $data = $$hobj{'hash'};
+                    $data = %$hobj{'hash'};
                     bless $data, 'niy';
-                    $$hobj{'hash'} = $data;
-                    $data = $$hobj{'array'};
+                    %$hobj{'hash'} = $data;
+                    $data = %$hobj{'array'};
                     bless $data, 'gnay';
-                    $$hobj{'array'} = $data;
+                    %$hobj{'array'} = $data;
 
                     $$sobj = 'test';
                 })->join();
@@ -128,14 +128,14 @@ ok(27, ref($aobj) eq 'rab', "array reblessing does work");
 ok(28, ref($sobj) eq 'zab', "scalar reblessing does work");
 ok(29, $$sobj eq 'test', "scalar contents okay");
 
-ok(30, ref($$aobj[0]) eq 'niy', "reblessed hash in array");
-ok(31, ref($$aobj[1]) eq 'gnay', "reblessed array in array");
-ok(32, ref($$aobj[2]) eq 'zab', "reblessed scalar in array");
-ok(33, ${$$aobj[2]} eq 'test', "reblessed scalar in array contents");
+ok(30, ref(@$aobj[0]) eq 'niy', "reblessed hash in array");
+ok(31, ref(@$aobj[1]) eq 'gnay', "reblessed array in array");
+ok(32, ref(@$aobj[2]) eq 'zab', "reblessed scalar in array");
+ok(33, ${@$aobj[2]} eq 'test', "reblessed scalar in array contents");
 
-ok(34, ref($$hobj{'hash'}) eq 'niy', "reblessed hash in hash");
-ok(35, ref($$hobj{'array'}) eq 'gnay', "reblessed array in hash");
-ok(36, ref($$hobj{'scalar'}) eq 'zab', "reblessed scalar in hash");
-ok(37, ${$$hobj{'scalar'}} eq 'test', "reblessed scalar in hash contents");
+ok(34, ref(%$hobj{'hash'}) eq 'niy', "reblessed hash in hash");
+ok(35, ref(%$hobj{'array'}) eq 'gnay', "reblessed array in hash");
+ok(36, ref(%$hobj{'scalar'}) eq 'zab', "reblessed scalar in hash");
+ok(37, ${%$hobj{'scalar'}} eq 'test', "reblessed scalar in hash contents");
 
 # EOF

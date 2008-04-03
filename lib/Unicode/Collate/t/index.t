@@ -5,7 +5,7 @@ BEGIN {
 	    "cannot stringify a Unicode code point\n";
 	exit 0;
     }
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
     }
@@ -250,7 +250,7 @@ ok($ret);
 ok($$ret eq "P\cBe\x{300}\cB");
 
 @ret = $Collator->match("P\cBe\x{300}\cBrl and PERL", "pe");
-ok($ret[0], "P\cBe\x{300}\cB");
+ok(@ret[0], "P\cBe\x{300}\cB");
 
 $str = $IsEBCDIC ? "mu\x{0059}" : "mu\x{00DF}";
 $sub = $IsEBCDIC ? "m\x{00DC}ss" : "m\x{00FC}ss";
@@ -338,7 +338,7 @@ ok($ret, 2);
 ok($str, "lr\cB\x{300}e\cBP and LREP.");
 
 $str = "Camel donkey zebra came\x{301}l CAMEL horse cAm\0E\0L...";
-$Collator->gsubst($str, "camel", sub { "<b>$_[0]</b>" });
+$Collator->gsubst($str, "camel", sub { "<b>@_[0]</b>" });
 ok($str, "<b>Camel</b> donkey zebra <b>came\x{301}l</b> "
 	. "<b>CAMEL</b> horse <b>cAm\0E\0L</b>...");
 

@@ -22,12 +22,12 @@ for my $time (keys %mjd) {
 
   # First check using GMT
   my $tp = gmtime( $time );
-  ok(sprintf("%.3f",$tp->mjd),$mjd{$time});
+  ok(sprintf("\%.3f",$tp->mjd),%mjd{$time});
 
   # Now localtime should give the same answer for MJD
   # since MJD is always referred to as UT
   $tp = localtime( $time );
-  ok(sprintf("%.3f",$tp->mjd),$mjd{$time});
+  ok(sprintf("\%.3f",$tp->mjd),%mjd{$time});
 
 }
 

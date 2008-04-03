@@ -966,7 +966,7 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 
 {
     our @a37725;
-    $a37725[3] = 1; # use package var
+    @a37725[3] = 1; # use package var
     our $i = 2;
     for my $x (reverse @a37725) {
 	$x = $i++;

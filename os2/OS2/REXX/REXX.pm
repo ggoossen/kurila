@@ -88,17 +88,17 @@ package OS2::REXX::_SCALAR;
 
 sub FETCH
 {
-	return OS2::REXX::_fetch(${$_[0]});
+	return OS2::REXX::_fetch(${@_[0]});
 }
 
 sub STORE
 {
-	return OS2::REXX::_set(${$_[0]}, $_[1]);
+	return OS2::REXX::_set(${@_[0]}, @_[1]);
 }
 
 sub DESTROY
 {
-	return OS2::REXX::_drop(${$_[0]});
+	return OS2::REXX::_drop(${@_[0]});
 }
 
 #############################################################################
@@ -106,14 +106,14 @@ package OS2::REXX::_ARRAY;
 
 sub FETCH
 {
-	$_[0]->[1] = $_[1] if $_[1] +> $_[0]->[1];
-	return OS2::REXX::_fetch($_[0]->[0].'.'.(0+$_[1]));
+	@_[0]->[1] = @_[1] if @_[1] +> @_[0]->[1];
+	return OS2::REXX::_fetch(@_[0]->[0].'.'.(0+@_[1]));
 }
 
 sub STORE
 {
-	$_[0]->[1] = $_[1] if $_[1] +> $_[0]->[1];
-	return OS2::REXX::_set($_[0]->[0].'.'.(0+$_[1]), $_[2]);
+	@_[0]->[1] = @_[1] if @_[1] +> @_[0]->[1];
+	return OS2::REXX::_set(@_[0]->[0].'.'.(0+@_[1]), @_[2]);
 }
 
 #############################################################################
@@ -143,27 +143,27 @@ sub FIRSTKEY
 
 sub NEXTKEY
 {
-	return pop @{$_[0]->{List}};
+	return pop @{@_[0]->{List}};
 }
 
 sub EXISTS
 {
-	return defined OS2::REXX::_fetch($_[0]->{Stem}.$_[1]);
+	return defined OS2::REXX::_fetch(@_[0]->{Stem}.@_[1]);
 }
 
 sub FETCH
 {
-	return OS2::REXX::_fetch($_[0]->{Stem}.$_[1]);
+	return OS2::REXX::_fetch(@_[0]->{Stem}.@_[1]);
 }
 
 sub STORE
 {
-	return OS2::REXX::_set($_[0]->{Stem}.$_[1], $_[2]);
+	return OS2::REXX::_set(@_[0]->{Stem}.@_[1], @_[2]);
 }
 
 sub DELETE
 {
-	OS2::REXX::_drop($_[0]->{Stem}.$_[1]);
+	OS2::REXX::_drop(@_[0]->{Stem}.@_[1]);
 }
 
 #############################################################################

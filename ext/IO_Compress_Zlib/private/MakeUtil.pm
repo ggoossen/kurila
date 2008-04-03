@@ -12,18 +12,18 @@ BEGIN
     eval { require File::Spec::Functions ; File::Spec::Functions->import() } ;
     if ($@)
     {
-        *catfile = sub { return "$_[0]/$_[1]" }
+        *catfile = sub { return "@_[0]/@_[1]" }
     }
 }
 
 require VMS::Filespec if $^O eq 'VMS';
 
 
-unless($ENV{PERL_CORE}) {
-    $ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
+unless(%ENV{PERL_CORE}) {
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
 }
 
-$ENV{SKIP_FOR_CORE} = 1 if $ENV{PERL_CORE} || $ENV{MY_PERL_CORE} ;
+%ENV{SKIP_FOR_CORE} = 1 if %ENV{PERL_CORE} || %ENV{MY_PERL_CORE} ;
 
 
 
@@ -43,7 +43,7 @@ sub MY::libscan
 sub MY::postamble 
 {
     return ''
-        if $ENV{PERL_CORE} ;
+        if %ENV{PERL_CORE} ;
 
     my @files = getPerlFiles('MANIFEST');
 
@@ -107,7 +107,7 @@ sub getPerlFiles
 
 sub UpDowngrade
 {
-    return if defined $ENV{TipTop};
+    return if defined %ENV{TipTop};
 
     my @files = @_ ;
 
@@ -125,7 +125,7 @@ sub UpDowngrade
     my $downgrade ;
     my $do_downgrade ;
 
-    my $caller = (caller(1))[3] || '';
+    my $caller = (caller(1))[[3]] || '';
 
     if ($caller =~ m/downgrade/)
     {
@@ -214,7 +214,7 @@ sub doUpDown
     my $our_sub = shift;
     my $warn_sub = shift;
 
-    return if -d $_[0];
+    return if -d @_[0];
 
     local ($^I) = ($^O eq 'VMS') ? "_bak" : ".bak";
     local (@ARGV) = shift;

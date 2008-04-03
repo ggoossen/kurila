@@ -23,12 +23,12 @@ ok (keys %comma == 1, 'keys on comma hash');
 ok (values %comma == 1, 'values on comma hash');
 # defeat any tokeniser or optimiser cunning
 my $key = 'ey';
-is ($comma{"k" . $key}, "value", 'is key present? (unoptimised)');
+is (%comma{"k" . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
-is ($comma{key}, "value", 'is key present? (maybe optimised)');
+is (%comma{key}, "value", 'is key present? (maybe optimised)');
 #tokeniser may treat => differently.
 my @temp = (key=>undef);
-is ($comma{$temp[0]}, "value", 'is key present? (using LHS of =>)');
+is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
 @temp = %comma;
 ok (eq_array (\@comma, \@temp), 'list from comma hash');
@@ -42,11 +42,11 @@ my %temp = %comma;
 
 ok (keys %temp == 1, 'keys on copy of comma hash');
 ok (values %temp == 1, 'values on copy of comma hash');
-is ($temp{'k' . $key}, "value", 'is key present? (unoptimised)');
+is (%temp{'k' . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
-is ($temp{key}, "value", 'is key present? (maybe optimised)');
+is (%temp{key}, "value", 'is key present? (maybe optimised)');
 @temp = (key=>undef);
-is ($comma{$temp[0]}, "value", 'is key present? (using LHS of =>)');
+is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
 @temp = %temp;
 ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
@@ -63,12 +63,12 @@ ok (keys %arrow == 1, 'keys on arrow hash');
 ok (values %arrow == 1, 'values on arrow hash');
 # defeat any tokeniser or optimiser cunning
 $key = 'ey';
-is ($arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
+is (%arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
-is ($arrow{Key}, "Value", 'is key present? (maybe optimised)');
+is (%arrow{Key}, "Value", 'is key present? (maybe optimised)');
 #tokeniser may treat => differently.
 @temp = ('Key', undef);
-is ($arrow{$temp[0]}, "Value", 'is key present? (using LHS of =>)');
+is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
 @temp = %arrow;
 ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
@@ -82,11 +82,11 @@ ok (eq_array ([], \@temp), 'last each from arrow hash');
 
 ok (keys %temp == 1, 'keys on copy of arrow hash');
 ok (values %temp == 1, 'values on copy of arrow hash');
-is ($temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
+is (%temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
-is ($temp{Key}, "Value", 'is key present? (maybe optimised)');
+is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
 @temp = ('Key', undef);
-is ($arrow{$temp[0]}, "Value", 'is key present? (using LHS of =>)');
+is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
 @temp = %temp;
 ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
@@ -98,14 +98,14 @@ ok (eq_array ([], \@temp), 'last each from copy of arrow hash');
 
 my %direct = ('Camel', 2, 'Dromedary', 1);
 my %slow;
-$slow{Dromedary} = 1;
-$slow{Camel} = 2;
+%slow{Dromedary} = 1;
+%slow{Camel} = 2;
 
 ok (eq_hash (\%slow, \%direct), "direct list assignment to hash");
 %direct = (Camel => 2, 'Dromedary' => 1);
 ok (eq_hash (\%slow, \%direct), "direct list assignment to hash using =>");
 
-$slow{Llama} = 0; # A llama is not a camel :-)
+%slow{Llama} = 0; # A llama is not a camel :-)
 ok (!eq_hash (\%direct, \%slow), "different hashes should not be equal!");
 
 my (%names, %names_copy);
@@ -172,7 +172,7 @@ ok (eq_hash (\%names, \%names_copy), "duplicates at the start of a list");
 # This should not
 %names_copy = ('*', 'Typeglob', %names);
 
-$names_copy2{'*'} = 'Typeglob';
+%names_copy2{'*'} = 'Typeglob';
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
 
 %names_copy = ('%', 'Associative Array', '*', 'Endangered species', %names,
@@ -194,12 +194,12 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   ok (keys %utf8c == 1, 'keys on utf8 comma hash');
   ok (values %utf8c == 1, 'values on utf8 comma hash');
   # defeat any tokeniser or optimiser cunning
-  is ($utf8c{"" . $key}, $value, 'is key present? (unoptimised)');
-  my $tempval = sprintf '$utf8c{"\x{%x}"}', $chr;
+  is (%utf8c{"" . $key}, $value, 'is key present? (unoptimised)');
+  my $tempval = sprintf '%%utf8c{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
-  is ($utf8c{$temp[0]}, $value, 'is key present? (using LHS of $tempval)');
+  is (%utf8c{@temp[0]}, $value, 'is key present? (using LHS of $tempval)');
 
   @temp = %utf8c;
   ok (eq_array (\@utf8c, \@temp), 'list from utf8 comma hash');
@@ -213,12 +213,12 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 
   ok (keys %temp == 1, 'keys on copy of utf8 comma hash');
   ok (values %temp == 1, 'values on copy of utf8 comma hash');
-  is ($temp{"" . $key}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '$temp{"\x{%x}"}', $chr;
+  is (%temp{"" . $key}, $value, 'is key present? (unoptimised)');
+  $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
-  is ($temp{$temp[0]}, $value, "is key present? (using LHS of $tempval)");
+  is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
   @temp = %temp;
   ok (eq_array (\@temp, \@temp), 'list from copy of utf8 comma hash');
@@ -236,12 +236,12 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   ok (keys %utf8a == 1, 'keys on utf8 arrow hash');
   ok (values %utf8a == 1, 'values on utf8 arrow hash');
   # defeat any tokeniser or optimiser cunning
-  is ($utf8a{$key . ""}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '$utf8a{"\x{%x}"}', $chr;
+  is (%utf8a{$key . ""}, $value, 'is key present? (unoptimised)');
+  $tempval = sprintf '%%utf8a{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
-  is ($utf8a{$temp[0]}, $value, "is key present? (using LHS of $tempval)");
+  is (%utf8a{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
   @temp = %utf8a;
   ok (eq_array (\@utf8a, \@temp), 'list from utf8 arrow hash');
@@ -255,12 +255,12 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 
   ok (keys %temp == 1, 'keys on copy of utf8 arrow hash');
   ok (values %temp == 1, 'values on copy of utf8 arrow hash');
-  is ($temp{'' . $key}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '$temp{"\x{%x}"}', $chr;
+  is (%temp{'' . $key}, $value, 'is key present? (unoptimised)');
+  $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
   $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
-  is ($temp{$temp[0]}, $value, "is key present? (using LHS of $tempval)");
+  is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
   @temp = %temp;
   ok (eq_array (\@temp, \@temp), 'list from copy of utf8 arrow hash');
@@ -283,10 +283,10 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
     is( scalar( ($x,%h) = (0,1,2,1,3,1,4,1,5) ), 3,
 	'scalar + hash assignment in scalar context' );
     $ar = [ %h = (1,2,1,3,1,4,1,5) ];
-    is( $#$ar, 1, 'hash assignment in list context' );
+    is( (@$ar-1), 1, 'hash assignment in list context' );
     is( "@$ar", "1 5", '...gets the last values' );
     $ar = [ ($x,%h) = (0,1,2,1,3,1,4,1,5) ];
-    is( $#$ar, 2, 'scalar + hash assignment in list context' );
+    is( (@$ar-1), 2, 'scalar + hash assignment in list context' );
     is( "@$ar", "0 1 5", '...gets the last values' );
 }
 
@@ -295,12 +295,12 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
     no warnings 'once';
     my @refs =    ( \ do { my $x }, [],   {},  sub {}, \ *x);
     for my $ref (@refs) {
-        dies_like( sub { $h{$ref} }, qr/reference as string/ );
+        dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
 
     bless $_ for @refs;
     %h = ();
     for my $ref (@refs) {
-        dies_like( sub { $h{$ref} }, qr/reference as string/ );
+        dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
 }

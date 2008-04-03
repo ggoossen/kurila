@@ -34,7 +34,7 @@ my $reps = 15000;	# How many times to try rand each time.
 sub bits ($) {
     # Takes a small integer and returns the number of one-bits in it.
     my $total;
-    my $bits = sprintf "%o", $_[0];
+    my $bits = sprintf '%o', @_[0];
     while (length $bits) {
 	$total += (0,1,1,2,1,2,2,3)[chop $bits];	# Oct to bits
     }
@@ -46,13 +46,13 @@ sub bits ($) {
     my($max, $min, $sum);	# Characteristics of rand
     my($off, $shouldbe);	# Problems with randbits
     my($dev, $bits);		# Number of one bits
-    my $randbits = $Config{randbits};
+    my $randbits = %Config{randbits};
     $max = $min = rand(1);
     for (1..$reps) {
 	my $n = rand(1);
 	if ($n +< 0.0 or $n +>= 1.0) {
 	    print <<EOM;
-# WHOA THERE!  \$Config\{drand01\} is set to '$Config{drand01}',
+# WHOA THERE!  \%Config\{drand01\} is set to '%Config{drand01}',
 # but that apparently produces values < 0.0 or >= 1.0.
 # Make sure \$Config\{drand01\} is a valid expression in the
 # C-language, and produces values in the range [0.0,1.0).
@@ -100,7 +100,7 @@ DIAG
     $off = log($max) / log(2);			# log2
     $off = int($off) + ($off +> 0);		# Next more positive int
     unless (is( $off, 0 )) {
-	$shouldbe = $Config{randbits} + $off;
+	$shouldbe = %Config{randbits} + $off;
 	print "# max=[$max] min=[$min]\n";
 	print "# This perl was compiled with randbits=$randbits on $^O.\n";
 	print "# Consider using randbits=$shouldbe instead.\n";

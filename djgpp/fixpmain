@@ -15,7 +15,7 @@ $makefile= ~< *MAKEFILE;
 $badname=join ("__",map {lc substr ($_,0,8)} split m/:+/); # dosify
 $perlmain =~ s/^.*boot_$badname.*$//gm if $badname; # delete bad lines
 
-@exts=('DynaLoader',split (" ",$Config{known_extensions}));
+@exts=('DynaLoader',split (" ",%Config{known_extensions}));
 for $realname (@exts)
 {
     $dosname=join ("__",map {lc substr ($_,0,8)} split m/\//,$realname);

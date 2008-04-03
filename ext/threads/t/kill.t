@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -27,7 +27,7 @@ BEGIN {
         exit(0);
     }
 
-    local $SIG{'HUP'} = sub {};
+    local %SIG{'HUP'} = sub {};
     my $thr = threads->create(sub {});
     eval { $thr->kill('HUP') };
     $thr->join();
@@ -61,7 +61,7 @@ sub ok($$)
             print("ok $id - $name\n");
         } else {
             print("not ok $id - $name\n");
-            printf("# Failed test at line %d\n", (caller)[2]);
+            printf("# Failed test at line \%d\n", (caller)[2]);
         }
     }
 }
@@ -74,13 +74,13 @@ ok(1, 'Loaded');
 
 # Set up to capture warning when thread terminates
 my @errs :shared;
-${^DIE_HOOK} = sub { push(@errs, $_[0]->{description}); };
+${^DIE_HOOK} = sub { push(@errs, @_[0]->{description}); };
 
 sub thr_func {
     my $q = shift;
 
     # Thread 'cancellation' signal handler
-    $SIG{'KILL'} = sub {
+    %SIG{'KILL'} = sub {
         $q->enqueue(1, 'Thread received signal');
         die("Thread killed\n");
     };
@@ -108,7 +108,7 @@ my $rc = $thr->join();
 ok(! $rc, 'No thread return value');
 
 # Check for thread termination message
-ok(@errs && $errs[0] =~ m/Thread killed/, 'Thread termination warning');
+ok(@errs && @errs[0] =~ m/Thread killed/, 'Thread termination warning');
 
 
 ### Thread suspend/resume ###
@@ -121,7 +121,7 @@ sub thr_func2
     $q->enqueue($sema, 'Thread received semaphore');
 
     # Set up the signal handler for suspension/resumption
-    $SIG{'STOP'} = sub {
+    %SIG{'STOP'} = sub {
         $q->enqueue(1, 'Thread suspending');
         $sema->down();
         $q->enqueue(1, 'Thread resuming');
@@ -130,7 +130,7 @@ sub thr_func2
 
     # Set up the signal handler for graceful termination
     my $term = 0;
-    $SIG{'TERM'} = sub {
+    %SIG{'TERM'} = sub {
         $q->enqueue(1, 'Thread caught termination signal');
         $term = 1;
     };

@@ -46,8 +46,8 @@ sub saveErrorString
 sub croakError
 {
     my $self   = shift ;
-    $self->saveErrorString(0, $_[0]);
-    croak $_[0];
+    $self->saveErrorString(0, @_[0]);
+    croak @_[0];
 }
 
 sub closeError
@@ -291,16 +291,16 @@ sub ckOutputParam
 {
     my $self = shift ;
     my $from = shift ;
-    my $outType = whatIsOutput($_[0]);
+    my $outType = whatIsOutput(@_[0]);
 
     $self->croakError("$from: output parameter not a filename, filehandle or scalar ref")
         if ! $outType ;
 
     $self->croakError("$from: output filename is undef or null string")
-        if $outType eq 'filename' && (! defined $_[0] || $_[0] eq '')  ;
+        if $outType eq 'filename' && (! defined @_[0] || @_[0] eq '')  ;
 
     $self->croakError("$from: output buffer is read-only")
-        if $outType eq 'buffer' && readonly(${ $_[0] });
+        if $outType eq 'buffer' && readonly(${ @_[0] });
     
     return 1;    
 }
@@ -310,8 +310,8 @@ sub _def
 {
     my $obj = shift ;
     
-    my $class= (caller)[0] ;
-    my $name = (caller(1))[3] ;
+    my $class= (caller)[[0]] ;
+    my $name = (caller(1))[[3]] ;
 
     $obj->croakError("$name: expected at least 1 parameters\n")
         unless @_ +>= 1 ;
@@ -532,7 +532,7 @@ sub getFileInfo
 
 sub TIEHANDLE
 {
-    return $_[0] if ref($_[0]);
+    return @_[0] if ref(@_[0]);
     die "OOPS\n" ;
 }
   
@@ -564,13 +564,13 @@ sub syswrite
     my $self = shift ;
 
     my $buffer ;
-    if (ref $_[0] ) {
+    if (ref @_[0] ) {
         $self->croakError( *$self->{ClassName} . "::write: not a scalar reference" )
-            unless ref $_[0] eq 'SCALAR' ;
-        $buffer = $_[0] ;
+            unless ref @_[0] eq 'SCALAR' ;
+        $buffer = @_[0] ;
     }
     else {
-        $buffer = \$_[0] ;
+        $buffer = \@_[0] ;
     }
 
 
@@ -578,10 +578,10 @@ sub syswrite
         my $slen = defined $$buffer ? length($$buffer) : 0;
         my $len = $slen;
         my $offset = 0;
-        $len = $_[1] if $_[1] +< $len;
+        $len = @_[1] if @_[1] +< $len;
 
         if (@_ +> 2) {
-            $offset = $_[2] || 0;
+            $offset = @_[2] || 0;
             $self->croakError(*$self->{ClassName} . "::write: offset outside string") 
                 if $offset +> $slen;
             if ($offset +< 0) {

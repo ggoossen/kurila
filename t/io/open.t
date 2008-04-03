@@ -59,8 +59,8 @@ my $Perl = which_perl();
     ok( open(my $f, '<', 'afile'),      "open(my \$f, '<', 'afile')" );
     my @rows = ~< $f;
     is( scalar @rows, 2,                '       readline, list context' );
-    is( $rows[0], "a row\n",            '       first line read' );
-    is( $rows[1], "a row\n",            '       second line' );
+    is( @rows[0], "a row\n",            '       first line read' );
+    is( @rows[1], "a row\n",            '       second line' );
     ok( close($f),                      '       close' );
 }
 
@@ -234,15 +234,15 @@ like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 }
 
 SKIP: {
-    skip "This perl uses perlio", 1 if $Config{useperlio};
-    skip "miniperl cannot be relied on to load %Errno"
-	if $ENV{PERL_CORE_MINITEST};
+    skip "This perl uses perlio", 1 if %Config{useperlio};
+    skip "miniperl cannot be relied on to load \%Errno"
+	if %ENV{PERL_CORE_MINITEST};
     # Force the reference to %! to be run time by writing ! as {"!"}
     skip "This system doesn't understand EINVAL", 1
-	unless exists ${"!"}{EINVAL};
+	unless exists %{"!"}{EINVAL};
 
     no warnings 'io';
-    ok(!open(F,'>',\my $s) && ${"!"}{EINVAL}, 'open(reference) raises EINVAL');
+    ok(!open(F,'>',\my $s) && %{"!"}{EINVAL}, 'open(reference) raises EINVAL');
 }
 
 {
@@ -260,27 +260,29 @@ SKIP: {
 	return $line;
     }
 
-    open($fh0[0], "<", "TEST");
-    gimme($fh0[0]);
-    like($@->message, qr/<\$fh0\[...\]> line 1/, "autoviv fh package aelem");
+    local $TODO = "fix variable name";
 
-    open($fh1{k}, "<", "TEST");
-    gimme($fh1{k});
-    like($@->message, qr/<\$fh1{...}> line 1/, "autoviv fh package helem");
+    open(@fh0[0], "<", "TEST");
+    gimme(@fh0[0]);
+    like($@->message, qr/<\@fh0\[...\]> line 1/, "autoviv fh package aelem");
+
+    open(%fh1{k}, "<", "TEST");
+    gimme(%fh1{k});
+    like($@->message, qr/<\%fh1{...}> line 1/, "autoviv fh package helem");
 
     my @fh2;
-    open($fh2[0], "<", "TEST");
-    gimme($fh2[0]);
-    like($@->message, qr/<\$fh2\[...\]> line 1/, "autoviv fh lexical aelem");
+    open(@fh2[0], "<", "TEST");
+    gimme(@fh2[0]);
+    like($@->message, qr/<\@fh2\[...\]> line 1/, "autoviv fh lexical aelem");
 
     my %fh3;
-    open($fh3{k}, "<", "TEST");
-    gimme($fh3{k});
-    like($@->message, qr/<\$fh3{...}> line 1/, "autoviv fh lexical helem");
+    open(%fh3{k}, "<", "TEST");
+    gimme(%fh3{k});
+    like($@->message, qr/<\%fh3{...}> line 1/, "autoviv fh lexical helem");
 }
     
 SKIP: {
-    skip("These tests use perlio", 5) unless $Config{useperlio};
+    skip("These tests use perlio", 5) unless %Config{useperlio};
     my $w;
     use warnings 'layer';
     local ${^WARN_HOOK} = sub { $w = shift->message };

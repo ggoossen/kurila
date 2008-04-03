@@ -17,7 +17,7 @@ for my $method (qw(new localtime gmtime)) {
 }
 
 {
-  my $piece = $class->strptime("2005-01-01", "%Y-%m-%d");
+  my $piece = $class->strptime("2005-01-01", "\%Y-\%m-\%d");
   isa_ok($piece, $class, "timepiece made via strptime");
 }
 
@@ -48,7 +48,7 @@ for my $method (qw(new localtime gmtime)) {
 
 {
   my $class = "Time::Piece::NumString";
-  my $piece = $class->strptime ("2006", "%Y");
+  my $piece = $class->strptime ("2006", "\%Y");
   is (2007 - $piece, 1,
       "subtract attempts stringify for unrecognized objects.");
 }
@@ -61,6 +61,6 @@ for my $method (qw(new localtime gmtime)) {
   sub _stringify
   {
     my $self = shift;
-    return $self->strftime ("%Y");
+    return $self->strftime ("\%Y");
   }
 }

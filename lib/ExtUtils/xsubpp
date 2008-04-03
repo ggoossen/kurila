@@ -27,14 +27,14 @@ GetOptions(\%args, qw(hiertype!
 		     ))
   or die $usage;
 
-if ($args{v}) {
+if (%args{v}) {
   print "xsubpp version $ExtUtils::ParseXS::VERSION\n";
   exit;
 }
 
 @ARGV == 1 or die $usage;
 
-$args{filename} = shift @ARGV;
+%args{filename} = shift @ARGV;
 
 process_file(%args);
 exit( ExtUtils::ParseXS::errors() ? 1 : 0 );

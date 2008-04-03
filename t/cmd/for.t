@@ -7,9 +7,9 @@ use strict;
 our ($i, @x, $y, $c, $foo, @ary, $loop_count, @array, $r, $TODO);
 
 for ($i = 0; $i +<= 10; $i++) {
-    $x[$i] = $i;
+    @x[$i] = $i;
 }
-$y = $x[10];
+$y = @x[10];
 print "#1	:$y: eq :10:\n";
 $y = join(' ', @x);
 print "#1	:$y: eq :0 1 2 3 4 5 6 7 8 9 10:\n";
@@ -37,7 +37,7 @@ for (@ary) {
     s/(.*)/ok $1\n/;
 }
 
-print $ary[1];
+print @ary[1];
 
 # test for internal scratch array generation
 # this also tests that $foo was restored to 3210 after test 3
@@ -52,7 +52,7 @@ foreach $foo (("ok 6\n","ok 7\n")) {
 
 sub foo {
     for $i (1..5) {
-	return $i if $_[0] == $i;
+	return $i if @_[0] == $i;
     }
 }
 
@@ -94,8 +94,8 @@ print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok",
     }
 
     my %h;
-    $h{foo} = bless [], 'X';
-    delete $h{foo} for $h{foo}, 1;
+    %h{foo} = bless [], 'X';
+    delete %h{foo} for %h{foo}, 1;
     print $x == 1 ? "ok" : "not ok", " 14 - double destroy, x=$x\n";
 }
 
@@ -666,7 +666,7 @@ TODO: {
     no warnings 'reserved';
     local $TODO = "RT #2166: foreach spuriously autovivifies";
     my %h;
-    foreach (@h{'a', 'b'}) {}
+    foreach (%h{['a', 'b']}) {}
     if(keys(%h)) {
         print "not ";
     }

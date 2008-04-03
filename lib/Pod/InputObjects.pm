@@ -166,8 +166,8 @@ contents of the given argument.
 =cut
 
 sub name {
-   (@_ +> 1)  and  $_[0]->{'-name'} = $_[1];
-   return $_[0]->{'-name'};
+   (@_ +> 1)  and  @_[0]->{'-name'} = @_[1];
+   return @_[0]->{'-name'};
 }
 
 ## allow 'filename' as an alias for 'name'
@@ -189,7 +189,7 @@ one used to contructed this input source object).
 =cut
 
 sub handle {
-   return $_[0]->{'-handle'};
+   return @_[0]->{'-handle'};
 }
 
 ##---------------------------------------------------------------------------
@@ -210,8 +210,8 @@ state is restored to this value.
 =cut
 
 sub was_cutting {
-   (@_ +> 1)  and  $_[0]->{-was_cutting} = $_[1];
-   return $_[0]->{-was_cutting};
+   (@_ +> 1)  and  @_[0]->{-was_cutting} = @_[1];
+   return @_[0]->{-was_cutting};
 }
 
 ##---------------------------------------------------------------------------
@@ -293,8 +293,8 @@ the name of the command (I<without> any leading C<=> prefix).
 =cut
 
 sub cmd_name {
-   (@_ +> 1)  and  $_[0]->{'-name'} = $_[1];
-   return $_[0]->{'-name'};
+   (@_ +> 1)  and  @_[0]->{'-name'} = @_[1];
+   return @_[0]->{'-name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -311,8 +311,8 @@ This method will return the corresponding text of the paragraph.
 =cut
 
 sub text {
-   (@_ +> 1)  and  $_[0]->{'-text'} = $_[1];
-   return $_[0]->{'-text'};
+   (@_ +> 1)  and  @_[0]->{'-text'} = @_[1];
+   return @_[0]->{'-text'};
 }       
 
 ##---------------------------------------------------------------------------
@@ -327,9 +327,9 @@ as it appeared in the input.
 =cut
 
 sub raw_text {
-   return $_[0]->{'-text'}  unless (defined $_[0]->{'-name'});
-   return $_[0]->{'-prefix'} . $_[0]->{'-name'} . 
-          $_[0]->{'-separator'} . $_[0]->{'-text'};
+   return @_[0]->{'-text'}  unless (defined @_[0]->{'-name'});
+   return @_[0]->{'-prefix'} . @_[0]->{'-name'} . 
+          @_[0]->{'-separator'} . @_[0]->{'-text'};
 }
 
 ##---------------------------------------------------------------------------
@@ -345,7 +345,7 @@ or "==").
 =cut
 
 sub cmd_prefix {
-   return $_[0]->{'-prefix'};
+   return @_[0]->{'-prefix'};
 }
 
 ##---------------------------------------------------------------------------
@@ -361,7 +361,7 @@ paragraph (if any).
 =cut
 
 sub cmd_separator {
-   return $_[0]->{'-separator'};
+   return @_[0]->{'-separator'};
 }
 
 ##---------------------------------------------------------------------------
@@ -377,8 +377,8 @@ This method will get/set the corresponding parse-tree of the paragraph's text.
 =cut
 
 sub parse_tree {
-   (@_ +> 1)  and  $_[0]->{'-ptree'} = $_[1];
-   return $_[0]->{'-ptree'};
+   (@_ +> 1)  and  @_[0]->{'-ptree'} = @_[1];
+   return @_[0]->{'-ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -400,8 +400,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = ($_[0]->{'-file'} || '<unknown-file>',
-              $_[0]->{'-line'} || 0);
+   my @loc = (@_[0]->{'-file'} || '<unknown-file>',
+              @_[0]->{'-line'} || 0);
    return (wantarray) ? @loc : join(':', @loc);
 }
 
@@ -456,7 +456,7 @@ sub new {
     my $class = ref($this) || $this;
 
     ## See if first argument has no keyword
-    if (((@_ +<= 2) or (@_ % 2)) and $_[0] !~ m/^-\w/) {
+    if (((@_ +<= 2) or (@_ % 2)) and @_[0] !~ m/^-\w/) {
        ## Yup - need an implicit '-name' before first parameter
        unshift @_, '-name';
     }
@@ -464,7 +464,7 @@ sub new {
     ## See if odd number of args
     if ((@_ % 2) != 0) {
        ## Yup - need an implicit '-ptree' before the last parameter
-       splice @_, $#_, 0, '-ptree';
+       splice @_, (@_-1), 0, '-ptree';
     }
 
     ## Any remaining arguments are treated as initial values for the
@@ -472,7 +472,7 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = {
-          -name       => (@_ == 1) ? $_[0] : undef,
+          -name       => (@_ == 1) ? @_[0] : undef,
           -file       => '<unknown-file>',
           -line       => 0,
           -ldelim     => '<',
@@ -505,8 +505,8 @@ The name of the interior sequence command.
 =cut
 
 sub cmd_name {
-   (@_ +> 1)  and  $_[0]->{'-name'} = $_[1];
-   return $_[0]->{'-name'};
+   (@_ +> 1)  and  @_[0]->{'-name'} = @_[1];
+   return @_[0]->{'-name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -632,8 +632,8 @@ sequence (should be "<").
 =cut
 
 sub left_delimiter {
-   (@_ +> 1)  and  $_[0]->{'-ldelim'} = $_[1];
-   return $_[0]->{'-ldelim'};
+   (@_ +> 1)  and  @_[0]->{'-ldelim'} = @_[1];
+   return @_[0]->{'-ldelim'};
 }
 
 ## let ldelim() be an alias for left_delimiter()
@@ -649,8 +649,8 @@ sequence (should be ">").
 =cut
 
 sub right_delimiter {
-   (@_ +> 1)  and  $_[0]->{'-rdelim'} = $_[1];
-   return $_[0]->{'-rdelim'};
+   (@_ +> 1)  and  @_[0]->{'-rdelim'} = @_[1];
+   return @_[0]->{'-rdelim'};
 }
 
 ## let rdelim() be an alias for right_delimiter()
@@ -670,8 +670,8 @@ sequence's text.
 =cut
 
 sub parse_tree {
-   (@_ +> 1)  and  $_[0]->{'-ptree'} = $_[1];
-   return $_[0]->{'-ptree'};
+   (@_ +> 1)  and  @_[0]->{'-ptree'} = @_[1];
+   return @_[0]->{'-ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -693,8 +693,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = ($_[0]->{'-file'}  || '<unknown-file>',
-              $_[0]->{'-line'}  || 0);
+   my @loc = (@_[0]->{'-file'}  || '<unknown-file>',
+              @_[0]->{'-line'}  || 0);
    return (wantarray) ? @loc : join(':', @loc);
 }
 
@@ -756,7 +756,7 @@ sub new {
     my $this = shift;
     my $class = ref($this) || $this;
 
-    my $self = (@_ == 1  and  ref $_[0]) ? $_[0] : [];
+    my $self = (@_ == 1  and  ref @_[0]) ? @_[0] : [];
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -783,7 +783,7 @@ children for the top node.
 sub top {
    my $self = shift;
    if (@_ +> 0) {
-      @{ $self } = (@_ == 1  and  ref $_[0]) ? ${ @_ } : @_;
+      @{ $self } = (@_ == 1  and  ref @_[0]) ? ${ @_ } : @_;
    }
    return $self;
 }
@@ -806,7 +806,7 @@ children for the top node.
 sub children {
    my $self = shift;
    if (@_ +> 0) {
-      @{ $self } = (@_ == 1  and  ref $_[0]) ? ${ @_ } : @_;
+      @{ $self } = (@_ == 1  and  ref @_[0]) ? ${ @_ } : @_;
    }
    return @{ $self };
 }
@@ -830,8 +830,8 @@ sub prepend {
    local *ptree = $self;
    for (@_) {
       next  unless length;
-      if (@ptree  and  !(ref $ptree[0])  and  !(ref $_)) {
-         $ptree[0] = $_ . $ptree[0];
+      if (@ptree  and  !(ref @ptree[0])  and  !(ref $_)) {
+         @ptree[0] = $_ . @ptree[0];
       }
       else {
          unshift @ptree, $_;
@@ -854,7 +854,7 @@ the current one.
 sub append {
    my $self = shift;
    local *ptree = $self;
-   my $can_append = @ptree && !(ref $ptree[-1]);
+   my $can_append = @ptree && !(ref @ptree[-1]);
    for (@_) {
       if (ref) {
          push @ptree, $_;
@@ -863,7 +863,7 @@ sub append {
          next;
       }
       elsif ($can_append) {
-         $ptree[-1] .= $_;
+         @ptree[-1] .= $_;
       }
       else {
          push @ptree, $_;

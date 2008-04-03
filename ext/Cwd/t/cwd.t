@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
         chdir 't';
         @INC = '../lib';
     }
@@ -21,13 +21,13 @@ require VMS::Filespec if $^O eq 'VMS';
 my $tests = 30;
 # _perl_abs_path() currently only works when the directory separator
 # is '/', so don't test it when it won't work.
-my $EXTRA_ABSPATH_TESTS = ($Config{prefix} =~ m/\//) && $^O ne 'cygwin';
+my $EXTRA_ABSPATH_TESTS = (%Config{prefix} =~ m/\//) && $^O ne 'cygwin';
 $tests += 4 if $EXTRA_ABSPATH_TESTS;
 plan tests => $tests;
 
 SKIP: {
-  skip "no need to check for blib/ in the core", 1 if $ENV{PERL_CORE};
-  like $INC{'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
+  skip "no need to check for blib/ in the core", 1 if %ENV{PERL_CORE};
+  like %INC{'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
 }
 
 my $IsVMS = $^O eq 'VMS';
@@ -41,10 +41,10 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 {
   my @fields = qw(PATH IFS CDPATH ENV BASH_ENV);
-  my $before = grep exists $ENV{$_}, @fields;
+  my $before = grep exists %ENV{$_}, @fields;
   cwd();
-  my $after = grep exists $ENV{$_}, @fields;
-  is($before, $after, "cwd() shouldn't create spurious entries in %ENV");
+  my $after = grep exists %ENV{$_}, @fields;
+  is($before, $after, "cwd() shouldn't create spurious entries in \%ENV");
 }
 
 # XXX force Cwd to bootsrap its XSUBs since we have set @INC = "../lib"
@@ -59,8 +59,8 @@ my $pwd_cmd =
         "cd" :
     ($IsMacOS) ?
         "pwd" :
-        (grep { -x && -f } map { "$_/$pwd$Config{exe_ext}" }
-	                   split m/$Config{path_sep}/, $ENV{PATH})[0];
+        (grep { -x && -f } map { "$_/$pwd%Config{exe_ext}" }
+	                   split m/%Config{path_sep}/, %ENV{PATH})[[0]];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {
@@ -74,7 +74,7 @@ SKIP: {
 
     print "# native pwd = '$pwd_cmd'\n";
 
-    local @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};
+    local %ENV{[qw(PATH IFS CDPATH ENV BASH_ENV)]};
     my ($pwd_cmd_untainted) = $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
@@ -99,7 +99,7 @@ SKIP: {
 	# Admittedly fixing this in the Cwd module would be better
 	# long-term solution but deleting $ENV{PWD} should not be
 	# done light-heartedly. --jhi
-	delete $ENV{PWD} if $^O eq 'darwin';
+	delete %ENV{PWD} if $^O eq 'darwin';
 
 	my $cwd        = cwd;
 	my $getcwd     = getcwd;
@@ -133,35 +133,35 @@ foreach my $func (qw(cwd getcwd fastcwd fastgetcwd)) {
 }
 
 # Cwd::chdir should also update $ENV{PWD}
-dir_ends_with( $ENV{PWD}, $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
+dir_ends_with( %ENV{PWD}, $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
 my $updir = File::Spec->updir;
 
 for (1..@test_dirs) {
   Cwd::chdir $updir;
-  print "#$ENV{PWD}\n";
+  print "#%ENV{PWD}\n";
 }
 
-rmtree($test_dirs[0], 0, 0);
+rmtree(@test_dirs[0], 0, 0);
 
 {
   my $check = ($IsVMS   ? qr|\b((?i)t)\]$| :
 	       $IsMacOS ? qr|\bt:$| :
 			  qr|\bt$| );
   
-  like($ENV{PWD}, $check);
+  like(%ENV{PWD}, $check);
 }
 
 {
   # Make sure abs_path() doesn't trample $ENV{PWD}
-  my $start_pwd = $ENV{PWD};
+  my $start_pwd = %ENV{PWD};
   mkpath([$Test_Dir], 0, 0777);
   Cwd::abs_path($Test_Dir);
-  is $ENV{PWD}, $start_pwd;
-  rmtree($test_dirs[0], 0, 0);
+  is %ENV{PWD}, $start_pwd;
+  rmtree(@test_dirs[0], 0, 0);
 }
 
 SKIP: {
-    skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless $Config{d_symlink};
+    skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless %Config{d_symlink};
 
     mkpath([$Test_Dir], 0, 0777);
     symlink $Test_Dir, "linktest";
@@ -170,7 +170,7 @@ SKIP: {
     my $fast_abs_path =  Cwd::fast_abs_path("linktest");
     my $want          =  quotemeta(
                              File::Spec->rel2abs(
-			         $ENV{PERL_CORE} ? $Test_Dir : File::Spec->catdir('t', $Test_Dir)
+			         %ENV{PERL_CORE} ? $Test_Dir : File::Spec->catdir('t', $Test_Dir)
                                                 )
                                   );
 
@@ -178,11 +178,11 @@ SKIP: {
     like($fast_abs_path, qr|$want$|i);
     like(Cwd::_perl_abs_path("linktest"), qr|$want$|i) if $EXTRA_ABSPATH_TESTS;
 
-    rmtree($test_dirs[0], 0, 0);
+    rmtree(@test_dirs[0], 0, 0);
     1 while unlink "linktest";
 }
 
-if ($ENV{PERL_CORE}) {
+if (%ENV{PERL_CORE}) {
     chdir '../ext/Cwd/t';
     unshift @INC, '../../../lib';
 }

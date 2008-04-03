@@ -172,7 +172,7 @@ sub run
                 use Config;
 
                 skip 'readonly + threads', 1
-                    if $Config{useithreads};
+                    if %Config{useithreads};
 
                 
                 eval { $a = $Func->(\$in, \$out, TrailingData => \"abc") ;} ;
@@ -301,9 +301,9 @@ sub run
                     my @output = ('first') ;
                     ok &$Func(\$buffer, \@output, Append => $append), '  Compressed ok' ;
 
-                    is $output[0], 'first', "  Array[0] unchanged";
+                    is @output[0], 'first', "  Array[0] unchanged";
                     is $keep, $buffer, "  Input buffer not changed" ;
-                    my $got = anyUncompress($output[1]);
+                    my $got = anyUncompress(@output[1]);
                     $got = undef if ! defined $buffer && $got eq '' ;
                     is $got, $buffer, "  Uncompressed matches original";
                 }
@@ -317,8 +317,8 @@ sub run
                     my @input = ($in_file);
                     ok &$Func(\@input, \@output, Append => $append), '  Compressed ok' ;
 
-                    is $output[0], 'first', "  Array[0] unchanged";
-                    my $got = anyUncompress($output[1]);
+                    is @output[0], 'first', "  Array[0] unchanged";
+                    my $got = anyUncompress(@output[1]);
                     $got = undef if ! defined $buffer && $got eq '' ;
                     is $got, $buffer, "  Uncompressed matches original";
                 }
@@ -530,7 +530,7 @@ sub run
             my @output = ('first') ;
             ok &$Func(\@input, \@output, AutoClose => 0), '  Compressed ok' ;
 
-            is $output[0], 'first', "  Array[0] unchanged";
+            is @output[0], 'first', "  Array[0] unchanged";
 
             is_deeply \@input, \@keep, "  Input array not changed" ;
             my @got = shift @output;
@@ -1007,9 +1007,9 @@ sub run
                 ok &$Func(\$comp, \@output, Append => $append, @opts), '  Uncompressed ok' ;
 
                 is $keep_comp, $comp, "  Input buffer not changed" ;
-                is $output[0], 'first', "  Uncompressed matches original";
-                is ${ $output[1] }, $buffer, "  Uncompressed matches original"
-                    or diag $output[1] ;
+                is @output[0], 'first', "  Uncompressed matches original";
+                is ${ @output[1] }, $buffer, "  Uncompressed matches original"
+                    or diag @output[1] ;
                 is @output, 2, "  only 2 elements in the array" ;
             }
 

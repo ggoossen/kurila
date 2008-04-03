@@ -1,14 +1,14 @@
 #!./perl
 
 BEGIN {
-        if ($ENV{PERL_CORE}){
+        if (%ENV{PERL_CORE}){
 	        chdir('t') if -d 't';
 	        @INC = ('.', '../lib');
         } else {
 	        unshift @INC, 't';
         }
 	require Config;
-	if (($Config::Config{'extensions'} !~ m/\bB\b/) ){
+	if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
 		print "1..0 # Skip -- Perl configured without B module\n";
 		exit 0;
 	}
@@ -52,10 +52,10 @@ foreach (@lines) {
 	s/^\s+//;
 	if (m/^([A-Z]+)\s+/) {
 		my $op = $1;
-		next unless exists $ops{$op};
-		like( $_, $ops{$op}, "$op " );
-		s/$ops{$op}//;
-		delete $ops{$op};
+		next unless exists %ops{$op};
+		like( $_, %ops{$op}, "$op " );
+		s/%ops{$op}//;
+		delete %ops{$op};
 		redo if $_;
 	}
 }
@@ -104,7 +104,7 @@ like( $items, qr/IV $hex \\42/, 'RV (but now stored in an IV)' );
 package TieOut;
 
 sub TIEHANDLE {
-	bless( \(my $out), $_[0] );
+	bless( \(my $out), @_[0] );
 }
 
 sub PRINT {

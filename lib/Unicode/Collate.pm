@@ -115,9 +115,9 @@ sub unpack_U {
 ######
 
 my (%VariableOK);
-@VariableOK{ qw/
+%VariableOK{[qw/
     blanked  non-ignorable  shifted  shift-trimmed
-  / } = (); # keys lowercased
+  / ]} = (); # keys lowercased
 
 our @ChangeOK = qw/
     alternate backwards level normalization rearrange
@@ -145,25 +145,25 @@ sub version {
 }
 
 my (%ChangeOK, %ChangeNG);
-@ChangeOK{ @ChangeOK } = ();
-@ChangeNG{ @ChangeNG } = ();
+%ChangeOK{[@ChangeOK ]} = ();
+%ChangeNG{[@ChangeNG ]} = ();
 
 sub change {
     my $self = shift;
     my %hash = @_;
     my %old;
-    if (exists $hash{variable} && exists $hash{alternate}) {
-	delete $hash{alternate};
+    if (exists %hash{variable} && exists %hash{alternate}) {
+	delete %hash{alternate};
     }
-    elsif (!exists $hash{variable} && exists $hash{alternate}) {
-	$hash{variable} = $hash{alternate};
+    elsif (!exists %hash{variable} && exists %hash{alternate}) {
+	%hash{variable} = %hash{alternate};
     }
     foreach my $k (keys %hash) {
-	if (exists $ChangeOK{$k}) {
-	    $old{$k} = $self->{$k};
-	    $self->{$k} = $hash{$k};
+	if (exists %ChangeOK{$k}) {
+	    %old{$k} = $self->{$k};
+	    $self->{$k} = %hash{$k};
 	}
-	elsif (exists $ChangeNG{$k}) {
+	elsif (exists %ChangeNG{$k}) {
 	    croak "change of $k via change() is not allowed!";
 	}
 	# else => ignored
@@ -176,10 +176,10 @@ sub _checkLevel {
     my $level = shift;
     my $key   = shift; # 'level' or 'backwards'
     MinLevel +<= $level or croak sprintf
-	"Illegal level %d (in value for key '%s') lower than %d.",
+	"Illegal level \%d (in value for key '\%s') lower than \%d.",
 	    $level, $key, MinLevel;
     $level +<= MaxLevel or croak sprintf
-	"Unsupported level %d (in value for key '%s') higher than %d.",
+	"Unsupported level \%d (in value for key '\%s') higher than \%d.",
 	    $level, $key, MaxLevel;
 }
 
@@ -194,13 +194,13 @@ sub checkCollator {
     my $self = shift;
     _checkLevel($self->{level}, "level");
 
-    $self->{derivCode} = $DerivCode{ $self->{UCA_Version} }
+    $self->{derivCode} = %DerivCode{ $self->{UCA_Version} }
 	or croak "Illegal UCA version (passed $self->{UCA_Version}).";
 
     $self->{variable} ||= $self->{alternate} || $self->{variableTable} ||
 				$self->{alternateTable} || 'shifted';
     $self->{variable} = $self->{alternate} = lc($self->{variable});
-    exists $VariableOK{ $self->{variable} }
+    exists %VariableOK{ $self->{variable} }
 	or croak "$PACKAGE unknown variable parameter name: $self->{variable}";
 
     if (! defined $self->{backwards}) {
@@ -215,7 +215,7 @@ sub checkCollator {
 	$self->{backwardsFlag} = 0;
 	for my $b (@{ $self->{backwards} }) {
 	    _checkLevel($b, "backwards");
-	    $level{$b} = 1;
+	    %level{$b} = 1;
 	}
 	for my $v (sort keys %level) {
 	    $self->{backwardsFlag} += 1 << $v;
@@ -230,7 +230,7 @@ sub checkCollator {
     $self->{rearrangeHash} = undef;
 
     if (@{ $self->{rearrange} }) {
-	@{ $self->{rearrangeHash} }{ @{ $self->{rearrange} } } = ();
+	%{ $self->{rearrangeHash} }{[@{ $self->{rearrange} } ]} = ();
     }
 
     $self->{normCode} = undef;
@@ -385,7 +385,7 @@ sub parseEntry
 	my @wt = _getHexArray($arr);
 	push @key, pack(VCE_TEMPLATE, $var, @wt);
 	$is_L3_ignorable = FALSE
-	    if $wt[0] || $wt[1] || $wt[2];
+	    if @wt[0] || @wt[1] || @wt[2];
 	# Conformance Test for 3.1.1 and 4.0.0 shows Level 3 ignorable
 	# is completely ignorable.
 	# For expansion, an entry $is_L3_ignorable
@@ -395,8 +395,8 @@ sub parseEntry
     $self->{mapping}{$entry} = $is_L3_ignorable ? [] : \@key;
 
     if (@uv +> 1) {
-	(!$self->{maxlength}{$uv[0]} || $self->{maxlength}{$uv[0]} +< @uv)
-	    and $self->{maxlength}{$uv[0]} = @uv;
+	(!$self->{maxlength}{@uv[0]} || $self->{maxlength}{@uv[0]} +< @uv)
+	    and $self->{maxlength}{@uv[0]} = @uv;
     }
 }
 
@@ -415,14 +415,14 @@ sub _varCE
 
     if ($var) {
 	return pack(VCE_TEMPLATE, $var, 0, 0, 0,
-		$vbl eq 'blanked' ? $wt[3] : $wt[0]);
+		$vbl eq 'blanked' ? @wt[3] : @wt[0]);
     }
     elsif ($vbl eq 'blanked') {
 	return $vce;
     }
     else {
-	return pack(VCE_TEMPLATE, $var, @wt[0..2],
-	    $vbl eq 'shifted' && $wt[0]+$wt[1]+$wt[2] ? Shift4Wt : 0);
+	return pack(VCE_TEMPLATE, $var, @wt[[0..2]],
+	    $vbl eq 'shifted' && @wt[0]+@wt[1]+@wt[2] ? Shift4Wt : 0);
     }
 }
 
@@ -435,7 +435,7 @@ sub viewSortKey
 sub visualizeSortKey
 {
     my $self = shift;
-    my $view = join " ", map sprintf("%04X", $_), unpack(KEY_TEMPLATE, shift);
+    my $view = join " ", map sprintf("\%04X", $_), unpack(KEY_TEMPLATE, shift);
 
     if ($self->{UCA_Version} +<= 8) {
 	$view =~ s/ ?0000 ?/|/g;
@@ -453,7 +453,7 @@ sub visualizeSortKey
 sub splitEnt
 {
     my $self = shift;
-    my $wLen = $_[1];
+    my $wLen = @_[1];
 
     my $code = $self->{preprocess};
     my $norm = $self->{normCode};
@@ -469,10 +469,10 @@ sub splitEnt
 			. "Don't use with index(), match(), etc.";
 	$norm and croak "Normalization breaks character positions. "
 			. "Don't use with index(), match(), etc.";
-	$str = $_[0];
+	$str = @_[0];
     }
     else {
-	$str = $_[0];
+	$str = @_[0];
 	$str = &$code($str) if ref $code;
 	$str = &$norm($str) if ref $norm;
     }
@@ -485,8 +485,8 @@ sub splitEnt
     # then neglected if $wLen is true.
     if ($reH && ! $wLen) {
 	for (my $i = 0; $i +< @src; $i++) {
-	    if (exists $reH->{ $src[$i] } && $i + 1 +< @src) {
-		($src[$i], $src[$i+1]) = ($src[$i+1], $src[$i]);
+	    if (exists $reH->{ @src[$i] } && $i + 1 +< @src) {
+		(@src[$i], @src[$i+1]) = (@src[$i+1], @src[$i]);
 		$i++;
 	    }
 	}
@@ -494,18 +494,18 @@ sub splitEnt
 
     # remove a code point marked as a completely ignorable.
     for (my $i = 0; $i +< @src; $i++) {
-	$src[$i] = undef
-	    if _isIllegal($src[$i]) || ($ver9 &&
-		$map->{ $src[$i] } && @{ $map->{ $src[$i] } } == 0);
+	@src[$i] = undef
+	    if _isIllegal(@src[$i]) || ($ver9 &&
+		$map->{ @src[$i] } && @{ $map->{ @src[$i] } } == 0);
     }
 
     for (my $i = 0; $i +< @src; $i++) {
-	my $jcps = $src[$i];
+	my $jcps = @src[$i];
 
 	# skip removed code point
 	if (! defined $jcps) {
 	    if ($wLen && @buf) {
-		$buf[-1][2] = $i + 1;
+		@buf[-1][2] = $i + 1;
 	    }
 	    next;
 	}
@@ -519,8 +519,8 @@ sub splitEnt
 	    my $maxLen = $max->{$jcps};
 
 	    for (my $p = $i + 1; $jcpsLen +< $maxLen && $p +< @src; $p++) {
-		next if ! defined $src[$p];
-		$temp_jcps .= CODE_SEP . $src[$p];
+		next if ! defined @src[$p];
+		$temp_jcps .= CODE_SEP . @src[$p];
 		$jcpsLen++;
 		if ($map->{$temp_jcps}) {
 		    $jcps = $temp_jcps;
@@ -542,13 +542,13 @@ sub splitEnt
 		my $curCC = 0;
 
 		for (my $p = $i + 1; $p +< @src; $p++) {
-		    next if ! defined $src[$p];
-		    $curCC = $CVgetCombinClass->($src[$p]);
+		    next if ! defined @src[$p];
+		    $curCC = $CVgetCombinClass->(@src[$p]);
 		    last unless $curCC;
-		    my $tail = CODE_SEP . $src[$p];
+		    my $tail = CODE_SEP . @src[$p];
 		    if ($preCC != $curCC && $map->{$jcps.$tail}) {
 			$jcps .= $tail;
-			$src[$p] = undef;
+			@src[$p] = undef;
 		    } else {
 			$preCC = $curCC;
 		    }
@@ -559,7 +559,7 @@ sub splitEnt
 	# skip completely ignorable
 	if ($map->{$jcps} && @{ $map->{$jcps} } == 0) {
 	    if ($wLen && @buf) {
-		$buf[-1][2] = $i + 1;
+		@buf[-1][2] = $i + 1;
 	    }
 	    next;
 	}
@@ -603,20 +603,20 @@ sub getWt
 		my $contract = join(CODE_SEP, @decH);
 		@decH = ($contract) if $map->{$contract};
 	    } else { # must be <@decH == 3>
-		if ($max->{$decH[0]}) {
+		if ($max->{@decH[0]}) {
 		    my $contract = join(CODE_SEP, @decH);
 		    if ($map->{$contract}) {
 			@decH = ($contract);
 		    } else {
-			$contract = join(CODE_SEP, @decH[0,1]);
-			$map->{$contract} and @decH = ($contract, $decH[2]);
+			$contract = join(CODE_SEP, @decH[[0,1]]);
+			$map->{$contract} and @decH = ($contract, @decH[2]);
 		    }
 		    # even if V's ignorable, LT contraction is not supported.
 		    # If such a situatution were required, NFD should be used.
 		}
-		if (@decH == 3 && $max->{$decH[1]}) {
-		    my $contract = join(CODE_SEP, @decH[1,2]);
-		    $map->{$contract} and @decH = ($decH[0], $contract);
+		if (@decH == 3 && $max->{@decH[1]}) {
+		    my $contract = join(CODE_SEP, @decH[[1,2]]);
+		    $map->{$contract} and @decH = (@decH[0], $contract);
 		}
 	    }
 
@@ -693,7 +693,7 @@ sub getSortKey
 	    if ($var) {
 		$last_is_variable = TRUE;
 	    }
-	    elsif (!$wt[0]) { # ignorable
+	    elsif (!@wt[0]) { # ignorable
 		next if $last_is_variable;
 	    }
 	    else {
@@ -701,13 +701,13 @@ sub getSortKey
 	    }
 	}
 	foreach my $v (0..$lev-1) {
-	    0 +< $wt[$v] and push @{ $ret[$v] }, $wt[$v];
+	    0 +< @wt[$v] and push @{ @ret[$v] }, @wt[$v];
 	}
     }
 
     # modification of tertiary weights
     if ($self->{upper_before_lower}) {
-	foreach my $w (@{ $ret[2] }) {
+	foreach my $w (@{ @ret[2] }) {
 	    if    (0x8 +<= $w && $w +<= 0xC) { $w -= 6 } # lower
 	    elsif (0x2 +<= $w && $w +<= 0x6) { $w += 6 } # upper
 	    elsif ($w == 0x1C)             { $w += 1 } # square upper
@@ -715,7 +715,7 @@ sub getSortKey
 	}
     }
     if ($self->{katakana_before_hiragana}) {
-	foreach my $w (@{ $ret[2] }) {
+	foreach my $w (@{ @ret[2] }) {
 	    if    (0x0F +<= $w && $w +<= 0x13) { $w -= 2 } # katakana
 	    elsif (0x0D +<= $w && $w +<= 0x0E) { $w += 5 } # hiragana
 	}
@@ -724,7 +724,7 @@ sub getSortKey
     if ($self->{backwardsFlag}) {
 	for (my $v = MinLevel; $v +<= MaxLevel; $v++) {
 	    if ($self->{backwardsFlag} ^&^ (1 << $v)) {
-		@{ $ret[$v-1] } = reverse @{ $ret[$v-1] };
+		@{ @ret[$v-1] } = reverse @{ @ret[$v-1] };
 	    }
 	}
     }
@@ -736,9 +736,9 @@ sub getSortKey
 ##
 ## int compare = cmp(string a, string b)
 ##
-sub cmp { $_[0]->getSortKey($_[1]) cmp $_[0]->getSortKey($_[2]) }
-sub eq  { $_[0]->getSortKey($_[1]) eq  $_[0]->getSortKey($_[2]) }
-sub ne  { $_[0]->getSortKey($_[1]) ne  $_[0]->getSortKey($_[2]) }
+sub cmp { @_[0]->getSortKey(@_[1]) cmp @_[0]->getSortKey(@_[2]) }
+sub eq  { @_[0]->getSortKey(@_[1]) eq  @_[0]->getSortKey(@_[2]) }
+sub ne  { @_[0]->getSortKey(@_[1]) ne  @_[0]->getSortKey(@_[2]) }
 
 ##
 ## list[strings] sorted = sort(list[strings] arg)
@@ -823,7 +823,7 @@ sub getWtHangulTerm {
 ##
 ## "hhhh hhhh hhhh" to (dddd, dddd, dddd)
 ##
-sub _getHexArray { map hex, $_[0] =~ m/([0-9a-fA-F]+)/g }
+sub _getHexArray { map hex, @_[0] =~ m/([0-9a-fA-F]+)/g }
 
 #
 # $code *must* be in Hangul syllable.
@@ -947,7 +947,7 @@ sub index
 	    if ($var) {
 		$last_is_variable = TRUE;
 	    }
-	    elsif (!$wt[0]) { # ignorable
+	    elsif (!@wt[0]) { # ignorable
 		$to_be_pushed = FALSE if $last_is_variable;
 	    }
 	    else {
@@ -955,8 +955,8 @@ sub index
 	    }
 	}
 
-	if (@subWt && !$var && !$wt[0]) {
-	    push @{ $subWt[-1] }, \@wt if $to_be_pushed;
+	if (@subWt && !$var && !@wt[0]) {
+	    push @{ @subWt[-1] }, \@wt if $to_be_pushed;
 	} else {
 	    push @subWt, [ \@wt ];
 	}
@@ -980,7 +980,7 @@ sub index
 		    if ($var) {
 			$last_is_variable = TRUE;
 		    }
-		    elsif (!$wt[0]) { # ignorable
+		    elsif (!@wt[0]) { # ignorable
 			$to_be_pushed = FALSE if $last_is_variable;
 		    }
 		    else {
@@ -988,13 +988,13 @@ sub index
 		    }
 		}
 
-		if (@strWt && !$var && !$wt[0]) {
-		    push @{ $strWt[-1] }, \@wt if $to_be_pushed;
-		    $finPos[-1] = $strE->[$i][2];
+		if (@strWt && !$var && !@wt[0]) {
+		    push @{ @strWt[-1] }, \@wt if $to_be_pushed;
+		    @finPos[-1] = $strE->[$i][2];
 		} elsif ($to_be_pushed) {
 		    push @strWt, [ \@wt ];
 		    push @iniPos, $found_base ? NOMATCHPOS : $strE->[$i][1];
-		    $finPos[-1] = NOMATCHPOS if $found_base;
+		    @finPos[-1] = NOMATCHPOS if $found_base;
 		    push @finPos, $strE->[$i][2];
 		    $found_base++;
 		}
@@ -1005,20 +1005,20 @@ sub index
 
 	# try to match
 	while ( @strWt +> @subWt || (@strWt == @subWt && $i +> $end) ) {
-	    if ($iniPos[0] != NOMATCHPOS &&
-		    $finPos[$#subWt] != NOMATCHPOS &&
+	    if (@iniPos[0] != NOMATCHPOS &&
+		    @finPos[(@subWt-1)] != NOMATCHPOS &&
 			_eqArray(\@strWt, \@subWt, $lev)) {
-		my $temp = $iniPos[0] + $pos;
+		my $temp = @iniPos[0] + $pos;
 
 		if ($grob) {
-		    push @g_ret, [$temp, $finPos[$#subWt] - $iniPos[0]];
-		    splice @strWt,  0, $#subWt;
-		    splice @iniPos, 0, $#subWt;
-		    splice @finPos, 0, $#subWt;
+		    push @g_ret, [$temp, @finPos[(@subWt-1)] - @iniPos[0]];
+		    splice @strWt,  0, (@subWt-1);
+		    splice @iniPos, 0, (@subWt-1);
+		    splice @finPos, 0, (@subWt-1);
 		}
 		else {
 		    return wantarray
-			? ($temp, $finPos[$#subWt] - $iniPos[0])
+			? ($temp, @finPos[(@subWt-1)] - @iniPos[0])
 			:  $temp;
 		}
 	    }
@@ -1039,8 +1039,8 @@ sub index
 sub match
 {
     my $self = shift;
-    if (my($pos,$len) = $self->index($_[0], $_[1])) {
-	my $temp = substr($_[0], $pos, $len);
+    if (my($pos,$len) = $self->index(@_[0], @_[1])) {
+	my $temp = substr(@_[0], $pos, $len);
 	return wantarray ? $temp : \$temp;
 	# An lvalue ref \substr should be avoided,
 	# since its value is affected by modification of its referent.
@@ -1068,14 +1068,14 @@ sub gmatch
 sub subst
 {
     my $self = shift;
-    my $code = ref $_[2] eq 'CODE' ? $_[2] : FALSE;
+    my $code = ref @_[2] eq 'CODE' ? @_[2] : FALSE;
 
-    if (my($pos,$len) = $self->index($_[0], $_[1])) {
+    if (my($pos,$len) = $self->index(@_[0], @_[1])) {
 	if ($code) {
-	    my $mat = substr($_[0], $pos, $len);
-	    substr($_[0], $pos, $len, $code->($mat));
+	    my $mat = substr(@_[0], $pos, $len);
+	    substr(@_[0], $pos, $len, $code->($mat));
 	} else {
-	    substr($_[0], $pos, $len, $_[2]);
+	    substr(@_[0], $pos, $len, @_[2]);
 	}
 	return TRUE;
     }
@@ -1090,16 +1090,16 @@ sub subst
 sub gsubst
 {
     my $self = shift;
-    my $code = ref $_[2] eq 'CODE' ? $_[2] : FALSE;
+    my $code = ref @_[2] eq 'CODE' ? @_[2] : FALSE;
     my $cnt = 0;
 
     # Replacement is carried out from the end, then use reverse.
-    for my $pos_len (reverse $self->index($_[0], $_[1], 0, 'g')) {
+    for my $pos_len (reverse $self->index(@_[0], @_[1], 0, 'g')) {
 	if ($code) {
-	    my $mat = substr($_[0], $pos_len->[0], $pos_len->[1]);
-	    substr($_[0], $pos_len->[0], $pos_len->[1], $code->($mat));
+	    my $mat = substr(@_[0], $pos_len->[0], $pos_len->[1]);
+	    substr(@_[0], $pos_len->[0], $pos_len->[1], $code->($mat));
 	} else {
-	    substr($_[0], $pos_len->[0], $pos_len->[1], $_[2]);
+	    substr(@_[0], $pos_len->[0], $pos_len->[1], @_[2]);
 	}
 	$cnt++;
     }

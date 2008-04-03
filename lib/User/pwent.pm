@@ -86,14 +86,14 @@ sub _feature_init {
                         $feep;
                     };
 
-        exists $Config{ "d_" . $feep }
+        exists %Config{ "d_" . $feep }
             || die("$IE Configure doesn't d_$feep");
-        $Groks{$short} = defined $Config{ "d_" . $feep };
+        %Groks{$short} = defined %Config{ "d_" . $feep };
     }
     # assume that any that are left are always there
     for my $feep (grep m/^\$pw_/s, @EXPORT_OK) {
         $feep =~ m/^\$pw_(.*)/;
-        $Groks{$1} = 1 unless defined $Groks{$1};
+        %Groks{$1} = 1 unless defined %Groks{$1};
     }
 }
 
@@ -115,13 +115,13 @@ sub pw_has {
                     ? \&die
                     : sub { die("$IE @_") };
     if (@_ == 0) {
-        my @valid = sort grep { $Groks{$_} } keys %Groks;
+        my @valid = sort grep { %Groks{$_} } keys %Groks;
         return wantarray ? @valid : "@valid";
     }
     for my $feep (map { split } @_) {
-        defined $Groks{$feep}
+        defined %Groks{$feep}
             || $sploder->("$feep is never a valid struct pwd field");
-        $cando &&= $Groks{$feep};
+        $cando &&= %Groks{$feep};
     }
     return $cando;
 }
@@ -135,34 +135,34 @@ sub _populate (@) {
     # since the underlying core call already took exception to your
     # impudence.
 
-    $pw_name    = $pwob->name   ( $_[0] );
-    $pw_passwd  = $pwob->passwd ( $_[1] )   if pw_has("passwd");
-    $pw_uid     = $pwob->uid    ( $_[2] );
-    $pw_gid     = $pwob->gid    ( $_[3] );
+    $pw_name    = $pwob->name   ( @_[0] );
+    $pw_passwd  = $pwob->passwd ( @_[1] )   if pw_has("passwd");
+    $pw_uid     = $pwob->uid    ( @_[2] );
+    $pw_gid     = $pwob->gid    ( @_[3] );
 
     if (pw_has("change")) {
-        $pw_change      = $pwob->change ( $_[4] );
+        $pw_change      = $pwob->change ( @_[4] );
     }
     elsif (pw_has("age")) {
-        $pw_age         = $pwob->age    ( $_[4] );
+        $pw_age         = $pwob->age    ( @_[4] );
     }
     elsif (pw_has("quota")) {
-        $pw_quota       = $pwob->quota  ( $_[4] );
+        $pw_quota       = $pwob->quota  ( @_[4] );
     }
 
     if (pw_has("class")) {
-        $pw_class       = $pwob->class  ( $_[5] );
+        $pw_class       = $pwob->class  ( @_[5] );
     }
     elsif (pw_has("comment")) {
-        $pw_comment     = $pwob->comment( $_[5] );
+        $pw_comment     = $pwob->comment( @_[5] );
     }
 
-    $pw_gecos   = $pwob->gecos  ( $_[6] ) if pw_has("gecos");
+    $pw_gecos   = $pwob->gecos  ( @_[6] ) if pw_has("gecos");
 
-    $pw_dir     = $pwob->dir    ( $_[7] );
-    $pw_shell   = $pwob->shell  ( $_[8] );
+    $pw_dir     = $pwob->dir    ( @_[7] );
+    $pw_shell   = $pwob->shell  ( @_[8] );
 
-    $pw_expire  = $pwob->expire ( $_[9] ) if pw_has("expire");
+    $pw_expire  = $pwob->expire ( @_[9] ) if pw_has("expire");
 
     return $pwob;
 }
@@ -170,7 +170,7 @@ sub _populate (@) {
 sub getpwent ( ) { _populate(CORE::getpwent()) }
 sub getpwnam ($) { _populate(CORE::getpwnam(shift)) }
 sub getpwuid ($) { _populate(CORE::getpwuid(shift)) }
-sub getpw    ($) { ($_[0] =~ m/^\d+\z/s) ? &getpwuid : &getpwnam }
+sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ? &getpwuid : &getpwnam }
 
 _feature_init();
 

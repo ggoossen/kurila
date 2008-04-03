@@ -45,8 +45,8 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
     is(dirname('arma:virumque.cano'), 'arma:');
 
     {
-        local $ENV{DEFAULT} = '' unless exists $ENV{DEFAULT};
-        is(dirname('virumque.cano'), $ENV{DEFAULT});
+        local %ENV{DEFAULT} = '' unless exists %ENV{DEFAULT};
+        is(dirname('virumque.cano'), %ENV{DEFAULT});
         is(dirname('arma/'), '.');
     }
 }

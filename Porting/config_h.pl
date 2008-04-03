@@ -21,9 +21,9 @@ open $ch, "<", "$cSH" or die "Cannot open $cSH: $!\n";
 sub ch_index ()
 {
     %ch = ();
-    foreach my $ch (0 .. $#ch) {
-	while ($ch[$ch] =~ m{^/\* ([A-Z]\w+)}gm) {
-	    $ch{$1} = $ch;
+    foreach my $ch (0 .. (@ch-1)) {
+	while (@ch[$ch] =~ m{^/\* ([A-Z]\w+)}gm) {
+	    %ch{$1} = $ch;
 	    }
 	}
     } # ch_index
@@ -44,11 +44,11 @@ do {
     $changed = 0;
     foreach my $sym (keys %dep) {
 	ch_index;
-	foreach my $dep (@{$dep{$sym}}) {
-	    print STDERR "Check if $sym\t($ch{$sym}) precedes $dep\t($ch{$dep})\n";
-	    $ch{$sym} +< $ch{$dep} and next;
-	    my $ch = splice @ch, $ch{$sym}, 1;
-	    splice @ch, $ch{$dep}, 0, $ch;
+	foreach my $dep (@{%dep{$sym}}) {
+	    print STDERR "Check if $sym\t(%ch{$sym}) precedes $dep\t(%ch{$dep})\n";
+	    %ch{$sym} +< %ch{$dep} and next;
+	    my $ch = splice @ch, %ch{$sym}, 1;
+	    splice @ch, %ch{$dep}, 0, $ch;
 	    $changed++;
 	    ch_index;
 	    }

@@ -1,10 +1,10 @@
 # Many AIX installations seem not to have the right PATH
 # for the C compiler.  Steal the logic from Perl's hints/aix.sh.
 use Config;
-unless ($Config{gccversion}) {
-    my $cc = $Config{cc};
+unless (%Config{gccversion}) {
+    my $cc = %Config{cc};
     if (! -x $cc && -x "/usr/vac/bin/$cc") {
-	unless (":$ENV{PATH}:" =~ m{:/usr/vac/bin:}) {
+	unless (":%ENV{PATH}:" =~ m{:/usr/vac/bin:}) {
 	    die <<__EOE__;
 ***
 *** You either implicitly or explicitly specified an IBM C compiler,

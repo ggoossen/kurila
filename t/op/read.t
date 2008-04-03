@@ -26,7 +26,7 @@ is ($buf, "");
 my $has_perlio = !eval {
     no warnings;
     require Config;
-    !$Config::Config{useperlio}
+    !%Config::Config{useperlio}
 };
 
 my $tmpfile = 'Op_read.tmp';

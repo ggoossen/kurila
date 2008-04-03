@@ -8,7 +8,7 @@ our %E = qw( < lt > gt );
  
 sub escape_ltgt {
     (undef, my $text) = @_;
-    $text =~ s/([<>])/E<$E{$1}>/g;
+    $text =~ s/([<>])/E<%E{$1}>/g;
     $text 
 } 
 

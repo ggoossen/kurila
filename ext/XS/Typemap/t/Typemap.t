@@ -2,7 +2,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
     require Config; Config->import;
-    if ($Config{'extensions'} !~ m/\bXS\/Typemap\b/) {
+    if (%Config{'extensions'} !~ m/\bXS\/Typemap\b/) {
         print "1..0 # Skip: XS::Typemap was not built\n";
         exit 0;
     }
@@ -128,7 +128,7 @@ ok( ! T_BOOL(undef) );
 print "# T_U_SHORT\n";
 
 is( T_U_SHORT(32000), 32000);
-if ($Config{shortsize} == 2) {
+if (%Config{shortsize} == 2) {
   ok( T_U_SHORT(65536) != 65536); # probably dont want to test edge cases
 } else {
   ok(1); # e.g. Crays have shortsize 4 (T3X) or 8 (CXX and SVX)
@@ -252,8 +252,8 @@ my @test = (5,6,7);
 $p = T_OPAQUEPTR_IN_struct(@test);
 my @result = T_OPAQUEPTR_OUT_struct($p);
 is(scalar(@result),scalar(@test));
-for (0..$#test) {
-  is($result[$_], $test[$_]);
+for (0..(@test-1)) {
+  is(@result[$_], @test[$_]);
 }
 
 # T_OPAQUE
@@ -271,8 +271,8 @@ my @opq = (2,4,8);
 my $packed = T_OPAQUE_array(@opq);
 my @uopq = unpack("i*",$packed);
 is(scalar(@uopq), scalar(@opq));
-for (0..$#opq) {
-  is( $uopq[$_], $opq[$_]);
+for (0..(@opq-1)) {
+  is( @uopq[$_], @opq[$_]);
 }
 
 # Skip T_PACKED
@@ -289,8 +289,8 @@ my @inarr = (1,2,3,4,5,6,7,8,9,10);
 my @outarr = T_ARRAY( 5, @inarr );
 is(scalar(@outarr), scalar(@inarr));
 
-for (0..$#inarr) {
-  is($outarr[$_], $inarr[$_]);
+for (0..(@inarr-1)) {
+  is(@outarr[$_], @inarr[$_]);
 }
 
 
@@ -309,21 +309,21 @@ if (defined $fh) {
   my @lines = ("NormalSTDIO\n", "PerlIO\n");
 
   # print to it using FILE* through XS
-  is( T_STDIO_print($fh, $lines[0]), length($lines[0]));
+  is( T_STDIO_print($fh, @lines[0]), length(@lines[0]));
 
   # print to it using normal perl
-  ok(print $fh "$lines[1]");
+  ok(print $fh "@lines[1]");
 
   # close it using XS if using perlio, using Perl otherwise
-  ok( $Config{useperlio} ? T_STDIO_close( $fh ) : close( $fh ) );
+  ok( %Config{useperlio} ? T_STDIO_close( $fh ) : close( $fh ) );
 
   # open from perl, and check contents
   open($fh, "<", "$testfile");
   ok($fh);
   my $line = ~< $fh;
-  is($line,$lines[0]);
+  is($line,@lines[0]);
   $line = ~< $fh;
-  is($line,$lines[1]);
+  is($line,@lines[1]);
 
   ok(close($fh));
   ok(unlink($testfile));

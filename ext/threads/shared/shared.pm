@@ -24,7 +24,7 @@ if ($threads::threads) {
     # Vivifying them conditionally this way saves on average about 4K
     # of memory per thread.
     eval <<'_MARKER_';
-        sub share          (\[$@%])         { return $_[0] }
+        sub share          (\[$@%])         { return @_[0] }
         sub is_shared      (\[$@%])         { undef }
         sub cond_wait      (\[$@%];\[$@%])  { undef }
         sub cond_timedwait (\[$@%]$;\[$@%]) { undef }
@@ -58,8 +58,7 @@ sub import
 
 sub threads::shared::tie::SPLICE
 {
-    require Carp;
-    Carp::croak('Splice not implemented for shared arrays');
+    die('Splice not implemented for shared arrays');
 }
 
 1;

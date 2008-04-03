@@ -6,9 +6,9 @@ sub import {
   my($value,$variable);
   
   if(@_ == 2) {
-    $value = $_[1];
+    $value = @_[1];
   } elsif(@_ == 3) {
-    ($variable, $value) = @_[1,2];
+    ($variable, $value) = @_[[1,2]];
     
     ($variable, $value) = ($value, $variable)
        if     defined $value    and ref($value)    eq 'SCALAR'

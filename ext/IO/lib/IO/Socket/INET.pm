@@ -26,9 +26,9 @@ my %socket_type = ( tcp  => SOCK_STREAM,
 		    icmp => SOCK_RAW
 		  );
 my %proto_number;
-$proto_number{tcp}  = Socket::IPPROTO_TCP()  if defined &Socket::IPPROTO_TCP;
-$proto_number{upd}  = Socket::IPPROTO_UDP()  if defined &Socket::IPPROTO_UDP;
-$proto_number{icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP;
+%proto_number{tcp}  = Socket::IPPROTO_TCP()  if defined &Socket::IPPROTO_TCP;
+%proto_number{upd}  = Socket::IPPROTO_UDP()  if defined &Socket::IPPROTO_UDP;
+%proto_number{icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP;
 my %proto_name = reverse %proto_number;
 
 sub new {
@@ -39,34 +39,34 @@ sub new {
 
 sub _cache_proto {
     my @proto = @_;
-    for (map lc($_), $proto[0], split(' ', $proto[1])) {
-	$proto_number{$_} = $proto[2];
+    for (map lc($_), @proto[0], split(' ', @proto[1])) {
+	%proto_number{$_} = @proto[2];
     }
-    $proto_name{$proto[2]} = $proto[0];
+    %proto_name{@proto[2]} = @proto[0];
 }
 
 sub _get_proto_number {
     my $name = lc(shift);
     return undef unless defined $name;
-    return $proto_number{$name} if exists $proto_number{$name};
+    return %proto_number{$name} if exists %proto_number{$name};
 
     my @proto = getprotobyname($name);
     return undef unless @proto;
     _cache_proto(@proto);
 
-    return $proto[2];
+    return @proto[2];
 }
 
 sub _get_proto_name {
     my $num = shift;
     return undef unless defined $num;
-    return $proto_name{$num} if exists $proto_name{$num};
+    return %proto_name{$num} if exists %proto_name{$num};
 
     my @proto = getprotobynumber($num);
     return undef unless @proto;
     _cache_proto(@proto);
 
-    return $proto[0];
+    return @proto[0];
 }
 
 sub _sock_info {
@@ -93,13 +93,13 @@ sub _sock_info {
     @serv = getservbyname($port, _get_proto_name($proto) || "")
 	if ($port =~ m,\D,);
 
-    $port = $serv[2] || $defport || $pnum;
+    $port = @serv[2] || $defport || $pnum;
     unless (defined $port) {
 	$@ = "Bad service '$origport'";
 	return;
     }
 
-    $proto = _get_proto_number($serv[3]) if @serv && !$proto;
+    $proto = _get_proto_number(@serv[3]) if @serv && !$proto;
   }
 
  return ($addr || undef,
@@ -114,7 +114,7 @@ sub _error {
     {
       local($!);
       my $title = ref($sock).": ";
-      $@ = join("", $_[0] =~ m/^$title/ ? "" : $title, @_);
+      $@ = join("", @_[0] =~ m/^$title/ ? "" : $title, @_);
       $sock->close()
 	if(defined fileno($sock));
     }
@@ -165,7 +165,7 @@ sub configure {
 
     $proto ||= _get_proto_number('tcp');
 
-    $type = $arg->{Type} || $socket_type{lc _get_proto_name($proto)};
+    $type = $arg->{Type} || %socket_type{lc _get_proto_name($proto)};
 
     my @raddr = ();
 

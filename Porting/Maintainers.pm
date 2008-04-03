@@ -25,7 +25,7 @@ my %MANIFEST;
 if (open(MANIFEST, "<", "MANIFEST")) {
     while ( ~< *MANIFEST) {
 	if (m/^(\S+)\t+(.+)$/) {
-	    $MANIFEST{$1}++;
+	    %MANIFEST{$1}++;
 	}
     }
     close MANIFEST;
@@ -35,7 +35,7 @@ if (open(MANIFEST, "<", "MANIFEST")) {
 
 sub get_module_pat {
     my $m = shift;
-    split ' ', $Modules{$m}{FILES};
+    split ' ', %Modules{$m}{FILES};
 }
 
 sub get_module_files {
@@ -50,7 +50,7 @@ sub get_module_files {
 		find(
 		     sub {
 			 push @files, $File::Find::name
-			     if -f $_ && exists $MANIFEST{$File::Find::name};
+			     if -f $_ && exists %MANIFEST{$File::Find::name};
 		     }, $_);
 		@files;
 	    }
@@ -61,7 +61,7 @@ sub get_module_files {
 sub get_maintainer_modules {
     my $m = shift;
     sort { lc $a cmp lc $b }
-    grep { $Modules{$_}{MAINTAINER} eq $m }
+    grep { %Modules{$_}{MAINTAINER} eq $m }
     keys %Modules;
 }
 
@@ -119,10 +119,10 @@ sub process_options {
     }
 
     warn "$0: Did you mean '$0 -mo $Maintainer'?\n"
-	if defined $Maintainer && exists $Modules{$Maintainer};
+	if defined $Maintainer && exists %Modules{$Maintainer};
 
     warn "$0: Did you mean '$0 -ma $Module'?\n"
-	if defined $Module     && exists $Maintainers{$Module};
+	if defined $Module     && exists %Maintainers{$Module};
 
     return ($Maintainer, $Module, $Files, @Files);
 }
@@ -132,7 +132,7 @@ sub show_results {
 
     if ($Maintainer) {
 	for my $m (sort keys %Maintainers) {
-	    if ($m =~ m/$Maintainer/io || $Maintainers{$m} =~ m/$Maintainer/io) {
+	    if ($m =~ m/$Maintainer/io || %Maintainers{$m} =~ m/$Maintainer/io) {
 		my @modules = get_maintainer_modules($m);
 		if ($Module) {
 		    @modules = grep { m/$Module/io } @modules;
@@ -142,12 +142,12 @@ sub show_results {
 		    for my $module (@modules) {
 			push @files, get_module_files($module);
 		    }
-		    printf "%-15s @files\n", $m;
+		    printf "\%-15s @files\n", $m;
 		} else {
 		    if ($Module) {
-			printf "%-15s @modules\n", $m;
+			printf "\%-15s @modules\n", $m;
 		    } else {
-			printf "%-15s $Maintainers{$m}\n", $m;
+			printf "\%-15s %Maintainers{$m}\n", $m;
 		    }
 		}
 	    }
@@ -157,9 +157,9 @@ sub show_results {
 	    if ($m =~ m/$Module/io) {
 		if ($Files) {
 		    my @files = get_module_files($m);
-		    printf "%-15s @files\n", $m;
+		    printf "\%-15s @files\n", $m;
 		} else {
-		    printf "%-15s $Modules{$m}{MAINTAINER}\n", $m;
+		    printf "\%-15s %Modules{$m}{MAINTAINER}\n", $m;
 		}
 	    }
 	}
@@ -175,35 +175,35 @@ sub show_results {
 
 	for (@Files) { s:^\./:: }
 
-	@ModuleByFile{@Files} = ();
+	%ModuleByFile{[@Files]} = ();
 
 	# First try fast match.
 
 	my %ModuleByPat;
 	for my $module (keys %Modules) {
 	    for my $pat (get_module_pat($module)) {
-		$ModuleByPat{$pat} = $module;
+		%ModuleByPat{$pat} = $module;
 	    }
 	}
 	# Expand any globs.
 	my %ExpModuleByPat;
 	for my $pat (keys %ModuleByPat) {
 	    if (-e $pat) {
-		$ExpModuleByPat{$pat} = $ModuleByPat{$pat};
+		%ExpModuleByPat{$pat} = %ModuleByPat{$pat};
 	    } else {
 		for my $exp (glob($pat)) {
-		    $ExpModuleByPat{$exp} = $ModuleByPat{$pat};
+		    %ExpModuleByPat{$exp} = %ModuleByPat{$pat};
 		}
 	    }
 	}
 	%ModuleByPat = %ExpModuleByPat;
 	for my $file (@Files) {
-	    $ModuleByFile{$file} = $ModuleByPat{$file}
-	        if exists $ModuleByPat{$file};
+	    %ModuleByFile{$file} = %ModuleByPat{$file}
+	        if exists %ModuleByPat{$file};
 	}
 
 	# If still unresolved files...
-	if (my @ToDo = grep { !defined $ModuleByFile{$_} } keys %ModuleByFile) {
+	if (my @ToDo = grep { !defined %ModuleByFile{$_} } keys %ModuleByFile) {
 
 	    # Cannot match what isn't there.
 	    @ToDo = grep { -e $_ } @ToDo;
@@ -215,7 +215,7 @@ sub show_results {
 		for (@ToDo) { s|/$|| }
 
 		my %ToDo;
-		@ToDo{@ToDo} = ();
+		%ToDo{[@ToDo]} = ();
 
 		for my $pat (keys %ModuleByPat) {
 		    last unless keys %ToDo;
@@ -223,23 +223,23 @@ sub show_results {
 			my @Done;
 			for my $file (keys %ToDo) {
 			    if ($file =~ m|^$pat|i) {
-				$ModuleByFile{$file} = $ModuleByPat{$pat};
+				%ModuleByFile{$file} = %ModuleByPat{$pat};
 				push @Done, $file;
 			    }
 			}
-			delete @ToDo{@Done};
+			delete %ToDo{[@Done]};
 		    }
 		}
 	    }
 	}
 
 	for my $file (@Files) {
-	    if (defined $ModuleByFile{$file}) {
-		my $module     = $ModuleByFile{$file};
-		my $maintainer = $Modules{$ModuleByFile{$file}}{MAINTAINER};
-		printf "%-15s $module $maintainer $Maintainers{$maintainer}\n", $file;
+	    if (defined %ModuleByFile{$file}) {
+		my $module     = %ModuleByFile{$file};
+		my $maintainer = %Modules{%ModuleByFile{$file}}{MAINTAINER};
+		printf "\%-15s $module $maintainer %Maintainers{$maintainer}\n", $file;
 	    } else {
-		printf "%-15s ?\n", $file;
+		printf "\%-15s ?\n", $file;
 	    }
 	}
     }
@@ -254,7 +254,7 @@ sub maintainers_files {
     %files = ();
     for my $k (keys %Modules) {
 	for my $f (get_module_files($k)) {
-	    ++$files{$f};
+	    ++%files{$f};
 	}
     }
 }
@@ -262,15 +262,15 @@ sub maintainers_files {
 sub duplicated_maintainers {
     maintainers_files();
     for my $f (keys %files) {
-	if ($files{$f} +> 1) {
-	    warn "File $f appears $files{$f} times in Maintainers.pl\n";
+	if (%files{$f} +> 1) {
+	    warn "File $f appears %files{$f} times in Maintainers.pl\n";
 	}
     }
 }
 
 sub warn_maintainer {
     my $name = shift;
-    warn "File $name has no maintainer\n" if not $files{$name};
+    warn "File $name has no maintainer\n" if not %files{$name};
 }
 
 sub missing_maintainers {

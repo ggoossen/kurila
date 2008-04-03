@@ -13,13 +13,13 @@
 __END__
 # mg.c
 use warnings 'signal' ;
-$SIG{FRED} = sub {};
+%SIG{FRED} = sub {};
 EXPECT
 No such signal: SIGFRED at - line 3.
 ########
 # mg.c
 no warnings 'signal' ;
-$SIG{FRED} = sub {};
+%SIG{FRED} = sub {};
 EXPECT
 
 ########
@@ -38,7 +38,7 @@ Use of uninitialized value $3 in oct at - line 3.
 ########
 # mg.c
 use warnings 'uninitialized';
-$ENV{FOO} = undef; # should not warn
+%ENV{FOO} = undef; # should not warn
 EXPECT
 
 ########

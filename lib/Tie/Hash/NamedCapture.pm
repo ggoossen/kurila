@@ -10,7 +10,7 @@ my ($one, $all) = Tie::Hash::NamedCapture::flags();
 
 sub TIEHASH {
     my ($pkg, %arg) = @_;
-    my $flag = $arg{all} ? $all : $one;
+    my $flag = %arg{all} ? $all : $one;
     bless \$flag => $pkg;
 }
 

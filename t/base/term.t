@@ -23,11 +23,11 @@ if ($x eq "hi there\n") {print "ok 2\n";} else {print "not ok 2\n";}
 # check $#array
 
 my @x;
-$x[0] = 'foo';
-$x[1] = 'foo';
-my $tmp = $#x;
+@x[0] = 'foo';
+@x[1] = 'foo';
+my $tmp = (@x-1);
 print "#3\t:$tmp: == :1:\n";
-if ($#x == '1') {print "ok 3\n";} else {print "not ok 3\n";}
+if ((@x-1) == '1') {print "ok 3\n";} else {print "not ok 3\n";}
 
 # check numeric literal
 

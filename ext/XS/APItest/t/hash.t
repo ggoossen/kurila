@@ -5,7 +5,7 @@ BEGIN {
   @INC = '../lib';
   push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
   require Config; Config->import;
-  if ($Config{'extensions'} !~ m/\bXS\/APItest\b/) {
+  if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
     # Look, I'm using this fully-qualified variable more than once!
     my $arch = $MacPerl::Architecture;
     print "1..0 # Skip: XS::APItest was not built\n";
@@ -47,7 +47,7 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
 
   is (XS::APItest::Hash::store(\%h, chr 258,  1), $result);
     
-  ok (exists $h{$utf8_for_258},
+  ok (exists %h{$utf8_for_258},
       "hv_store does insert a key with the raw utf8 on a tied hash");
 }
 
@@ -99,7 +99,7 @@ foreach my $in ("", "N", "a\0b") {
 	my %hash;
 	my %placebo = (a => 1, p => 2, i => 4, e => 8);
 	$setup->(\%hash);
-	$hash{a}++; @hash{qw(p i e)} = (2, 4, 8);
+	%hash{a}++; %hash{[qw(p i e)]} = (2, 4, 8);
 
 	test_U_hash(\%hash, \%placebo, [f => 9, g => 10, h => 11], $mapping,
 		    $name);
@@ -112,7 +112,7 @@ foreach my $in ("", "N", "a\0b") {
 			    ) {
 		foreach my $code (78, 240, 256, 1336) {
 		    my $key = chr $code;
-		    $hash{$key} = $placebo{$key} = $code;
+		    %hash{$key} = %placebo{$key} = $code;
 		}
 		my $name = 'bitflip ' . shift @$new;
 		my @new_kv;
@@ -277,8 +277,8 @@ sub perform_test {
   my (%hash, %tiehash);
   tie %tiehash, 'Tie::StdHash';
 
-  @hash{@$keys} = @$keys;
-  @tiehash{@$keys} = @$keys;
+  %hash{[@$keys]} = @$keys;
+  %tiehash{[@$keys]} = @$keys;
 
   &$test_sub (\%hash, $key, $printable, $message, @other);
   &$test_sub (\%tiehash, $key, $printable, "$message tie", @other);
@@ -393,11 +393,11 @@ sub brute_force_exists {
 
 sub rot13 {
     my @results = map {my $a = $_; $a =~ tr/A-Za-z/N-ZA-Mn-za-m/; $a} @_;
-    wantarray ? @results : $results[0];
+    wantarray ? @results : @results[0];
 }
 
 sub bitflip {
     use bytes;
     my @results = map {join '', map {chr(32 ^^^ ord $_)} split '', $_} @_;
-    wantarray ? @results : $results[0];
+    wantarray ? @results : @results[0];
 }

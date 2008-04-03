@@ -205,7 +205,7 @@ sub fred
 } 
 {
   local ${^WARN_HOOK} = sub {
-    if ($_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
+    if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print "ok\n";
         exit 0;
     }
@@ -223,7 +223,7 @@ sub fred
 } 
 {
   local ${^WARN_HOOK} = sub {
-    if ($_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
+    if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print "ok\n";
         exit 0;
     }

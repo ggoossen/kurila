@@ -7,13 +7,13 @@ BEGIN {
     require 'test.pl';
 }
 
-if ($Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
+if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
     skip_all('IPC::SysV was not built');
 }
-elsif ($Config{'d_sem'} ne 'define') {
+elsif (%Config{'d_sem'} ne 'define') {
     skip_all('$Config{d_sem} undefined');
 }
-elsif ($Config{'d_msg'} ne 'define') {
+elsif (%Config{'d_msg'} ne 'define') {
     skip_all('$Config{d_msg} undefined');
 }
 else {
@@ -30,7 +30,7 @@ my $msg;
 my $sem;
 
 # FreeBSD is known to throw this if there's no SysV IPC in the kernel.
-$SIG{SYS} = sub {
+%SIG{SYS} = sub {
     diag(<<EOM);
 SIGSYS caught.
 It may be that your kernel does not have SysV IPC configured.
@@ -57,10 +57,10 @@ my $perm = S_IRWXU;
 SKIP: {
 
 skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
-    $Config{'d_msgget'} eq 'define' &&
-    $Config{'d_msgctl'} eq 'define' &&
-    $Config{'d_msgsnd'} eq 'define' &&
-    $Config{'d_msgrcv'} eq 'define';
+    %Config{'d_msgget'} eq 'define' &&
+    %Config{'d_msgctl'} eq 'define' &&
+    %Config{'d_msgsnd'} eq 'define' &&
+    %Config{'d_msgrcv'} eq 'define';
 
     $msg = msgget(IPC_PRIVATE, $perm);
     # Very first time called after machine is booted value may be 0 
@@ -143,8 +143,8 @@ EOM
 SKIP: {
 
     skip('lacking d_semget d_semctl', 11) unless
-        $Config{'d_semget'} eq 'define' &&
-        $Config{'d_semctl'} eq 'define';
+        %Config{'d_semget'} eq 'define' &&
+        %Config{'d_semctl'} eq 'define';
 
     use IPC::SysV qw(IPC_CREAT GETALL SETALL);
 
@@ -186,7 +186,7 @@ SKIP: {
 
     my $poke = 2;
 
-    $data[$poke] = 1;
+    @data[$poke] = 1;
     ok(semctl($sem,0,SETALL,pack("s!*",@data)),'poke it');
     
     $data = "";

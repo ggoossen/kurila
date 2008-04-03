@@ -58,8 +58,8 @@ sub do_module($) {
 
         last if $cmd eq 'q';
 
-        if( $Module_Commands{$cmd} ) {
-            $Module_Commands{$cmd}->($reply, $module);
+        if( %Module_Commands{$cmd} ) {
+            %Module_Commands{$cmd}->($reply, $module);
         }
         elsif( $cmd eq 'q' ) {
             last MODULE_CMD;
@@ -74,7 +74,7 @@ sub do_module($) {
 sub list_installed {
     my($reply, $module) = @_;
 
-    my $class = (split(' ', $reply))[1];
+    my $class = (split(' ', $reply))[[1]];
     $class = 'all' unless $class;
 
     my @files;
@@ -91,7 +91,7 @@ sub list_installed {
 sub list_directories {
     my($reply, $module) = @_;
 
-    my $class = (split(' ', $reply))[1];
+    my $class = (split(' ', $reply))[[1]];
     $class = 'all' unless $class;
 
     my @dirs;
@@ -108,7 +108,7 @@ sub list_directories {
 sub create_archive {
     my($reply, $module) = @_;
 
-    my $file = (split(' ', $reply))[1];
+    my $file = (split(' ', $reply))[[1]];
 
     if( !(defined $file and length $file) ) {
         print "No tar file specified\n";
@@ -169,7 +169,7 @@ while (1)
          };
       $reply =~ m/^m\s+/ and do
          {
-         do_module((split(' ', $reply))[1]);
+         do_module((split(' ', $reply))[[1]]);
          last CASE;
          };
       $reply eq 'q' and do

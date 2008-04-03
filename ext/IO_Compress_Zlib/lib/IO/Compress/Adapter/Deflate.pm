@@ -40,7 +40,7 @@ sub compr
 
     my $def   = $self->{Def};
 
-    my $status = $def->deflate($_[0], $_[1]) ;
+    my $status = $def->deflate(@_[0], @_[1]) ;
     $self->{ErrorNo} = $status;
 
     if ($status != Z_OK)
@@ -58,8 +58,8 @@ sub flush
 
     my $def   = $self->{Def};
 
-    my $opt = $_[1] || Z_FINISH;
-    my $status = $def->flush($_[0], $opt);
+    my $opt = @_[1] || Z_FINISH;
+    my $status = $def->flush(@_[0], $opt);
     $self->{ErrorNo} = $status;
 
     if ($status != Z_OK)
@@ -78,7 +78,7 @@ sub close
 
     my $def   = $self->{Def};
 
-    $def->flush($_[0], Z_FINISH)
+    $def->flush(@_[0], Z_FINISH)
         if defined $def ;
 }
 

@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
+    if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
@@ -13,7 +13,7 @@ BEGIN {
     if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
         print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
     }
-    $INC{'Socket.pm'} = 1;
+    %INC{'Socket.pm'} = 1;
 }
 
 package Socket;
@@ -34,14 +34,14 @@ sub set_fail {
 
 sub inet_aton {
 	return if $fail;
-	my $num = unpack('N', pack('C*', split(m/\./, $_[0])));
-	$names{$num} = $_[0];
+	my $num = unpack('N', pack('C*', split(m/\./, @_[0])));
+	%names{$num} = @_[0];
 	return $num;
 }
 
 sub inet_ntoa {
 	return if $fail;
-	return $names{$_[0]};
+	return %names{@_[0]};
 }
 
 package main;
@@ -52,31 +52,31 @@ package main;
 use Test::More tests => 10;
 
 use Net::Config;
-ok( exists $INC{'Net/Config.pm'}, 'Net::Config should have been used' );
+ok( exists %INC{'Net/Config.pm'}, 'Net::Config should have been used' );
 ok( keys %NetConfig, '%NetConfig should be imported' );
 
 Socket::set_fail(1);
-undef $NetConfig{'ftp_firewall'};
+undef %NetConfig{'ftp_firewall'};
 is( Net::Config->requires_firewall(), 0, 
 	'requires_firewall() should return 0 without ftp_firewall defined' );
 
-$NetConfig{'ftp_firewall'} = 1;
+%NetConfig{'ftp_firewall'} = 1;
 is( Net::Config->requires_firewall('a.host.not.there'), -1,
 	'... should return -1 without a valid hostname' );
 
 Socket::set_fail(0);
-delete $NetConfig{'local_netmask'};
+delete %NetConfig{'local_netmask'};
 is( Net::Config->requires_firewall('127.0.0.1'), 0,
 	'... should return 0 without local_netmask defined' );
 
-$NetConfig{'local_netmask'} = '127.0.0.1/24';
+%NetConfig{'local_netmask'} = '127.0.0.1/24';
 is( Net::Config->requires_firewall('127.0.0.1'), 0,
 	'... should return false if host is within netmask' );
 is( Net::Config->requires_firewall('192.168.10.0'), 1,
 	'... should return true if host is outside netmask' );
 
 # now try more netmasks
-$NetConfig{'local_netmask'} = [ '127.0.0.1/24', '10.0.0.0/8' ];
+%NetConfig{'local_netmask'} = [ '127.0.0.1/24', '10.0.0.0/8' ];
 is( Net::Config->requires_firewall('10.10.255.254'), 0,
 	'... should find success with mutiple local netmasks' );
 is( Net::Config->requires_firewall('192.168.10.0'), 1,

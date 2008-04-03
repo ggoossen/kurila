@@ -8,7 +8,7 @@ sub work {
     unless @_ +>= 2;
   return unless shift;		# CONDITION
 
-  my $p = $_[0];		# PACKAGE
+  my $p = @_[0];		# PACKAGE
   (my $file = "$p.pm") =~ s!::!/!g;
   require $file;		# Works even if $_[0] is a keyword (like open)
   my $m = $p->can($method);

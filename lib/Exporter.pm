@@ -16,7 +16,7 @@ sub as_heavy {
   require Exporter::Heavy;
   # Unfortunately, this does not work if the caller is aliased as *name = \&foo
   # Thus the need to create a lot of identical subroutines
-  my $c = (caller(1))[3];
+  my $c = (caller(1))[[3]];
   $c =~ s/.*:://;
   \&{*{Symbol::fetch_glob("Exporter::Heavy::heavy_$c")}};
 }
@@ -29,7 +29,7 @@ sub import {
   my $pkg = shift;
   my $callpkg = caller($ExportLevel);
 
-  if ($pkg eq "Exporter" and @_ and $_[0] eq "import") {
+  if ($pkg eq "Exporter" and @_ and @_[0] eq "import") {
     *{Symbol::fetch_glob($callpkg."::import")} = \&import;
     return;
   }
@@ -39,7 +39,7 @@ sub import {
                          \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
   return export $pkg, $callpkg, @_
     if $Verbose or $Debug or @$fail +> 1;
-  my $export_cache = ($Cache{$pkg} ||= {});
+  my $export_cache = (%Cache{$pkg} ||= {});
   my $args = @_ or @_ = @$exports;
 
   local $_;

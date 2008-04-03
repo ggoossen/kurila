@@ -13,8 +13,8 @@ use utf8;
 {
   package Woozle;
   @ISA = ('Locale::Maketext');
-  sub dubbil   { return $_[1] * 2  .chr(2000)}
-  sub numerate { return $_[2] . 'en'  }
+  sub dubbil   { return @_[1] * 2  .chr(2000)}
+  sub numerate { return @_[2] . 'en'  }
 }
 {
   package Woozle::eu_mt;

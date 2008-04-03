@@ -1,7 +1,7 @@
 #!perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -32,7 +32,7 @@ BEGIN {
 package Overloaded;
 
 use overload
-  q{""} => sub { $_[0]->{string} };
+  q{""} => sub { @_[0]->{string} };
 
 sub new {
     my $class = shift;

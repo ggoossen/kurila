@@ -1,7 +1,7 @@
 package TieIn;
 
 sub TIEHANDLE {
-    bless( \(my $scalar), $_[0]);
+    bless( \(my $scalar), @_[0]);
 }
 
 sub write {

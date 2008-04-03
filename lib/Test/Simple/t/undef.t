@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't';
         @INC = ('../lib', 'lib');
     }
@@ -17,7 +17,7 @@ use TieOut;
 BEGIN { $^W = 1; }
 
 my $warnings = '';
-local ${^WARN_HOOK} = sub { $warnings .= $_[0]->message };
+local ${^WARN_HOOK} = sub { $warnings .= @_[0]->message };
 
 my $TB = Test::Builder->new;
 sub no_warnings {
@@ -26,12 +26,12 @@ sub no_warnings {
 }
 
 sub warnings_is {
-    $TB->is_eq($warnings, $_[0]);
+    $TB->is_eq($warnings, @_[0]);
     $warnings = '';
 }
 
 sub warnings_like {
-    $TB->like($warnings, "/$_[0]/");
+    $TB->like($warnings, "/@_[0]/");
     $warnings = '';
 }
 

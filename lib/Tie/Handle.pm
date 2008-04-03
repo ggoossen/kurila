@@ -164,7 +164,7 @@ sub PRINTF {
 }
 
 sub READLINE {
-    my $pkg = ref $_[0];
+    my $pkg = ref @_[0];
     croak "$pkg doesn't define a READLINE method";
 }
 
@@ -182,17 +182,17 @@ sub GETC {
 }
 
 sub READ {
-    my $pkg = ref $_[0];
+    my $pkg = ref @_[0];
     croak "$pkg doesn't define a READ method";
 }
 
 sub WRITE {
-    my $pkg = ref $_[0];
+    my $pkg = ref @_[0];
     croak "$pkg doesn't define a WRITE method";
 }
 
 sub CLOSE {
-    my $pkg = ref $_[0];
+    my $pkg = ref @_[0];
     croak "$pkg doesn't define a CLOSE method";
 }
 

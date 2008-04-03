@@ -7,14 +7,14 @@
 #
 
 BEGIN {
-    if ($ENV{PERL_CORE}){
+    if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = ('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
     require Config; Config->import;
-    if ($ENV{PERL_CORE} and $Config{'extensions'} !~ m/\bStorable\b/) {
+    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
     }
@@ -76,10 +76,10 @@ sub make {
 	return $self;
 };
 
-sub num { $_[0]->{num} }
-sub h   { $_[0]->{h} }
-sub ref { $_[0]->{ref} }
-sub obj { $_[0]->{obj} }
+sub num { @_[0]->{num} }
+sub h   { @_[0]->{h} }
+sub ref { @_[0]->{ref} }
+sub obj { @_[0]->{obj} }
 
 package main;
 

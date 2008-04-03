@@ -15,7 +15,7 @@ use Test::More ;
 sub title
 {
     #diag "" ; 
-    ok 1, $_[0] ;
+    ok 1, @_[0] ;
     #diag "" ;
 }
 
@@ -154,7 +154,7 @@ sub hexDump
     #while (read(STDIN, $data, 16)) {
     while (my $data = substr($d, 0, 16)) {
         substr($d, 0, 16, '') ;
-        printf "# %8.8lx    ", $offset;
+        printf "# \%8.8lx    ", $offset;
         $offset += 16;
 
         my @array = unpack('C*', $data);
@@ -229,7 +229,7 @@ sub uncompressBuffer
                 );
 
     my $out ;
-    my $obj = $mapping{$compWith}->new( \$buffer, -Append => 1);
+    my $obj = %mapping{$compWith}->new( \$buffer, -Append => 1);
     1 while $obj->read($out) +> 0 ;
     return $out ;
 
@@ -299,8 +299,8 @@ my %TopFuncMap = (  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip',
                     'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp',
                  );
 
-   %TopFuncMap = map { ($_              => $TopFuncMap{$_}, 
-                        $TopFuncMap{$_} => $TopFuncMap{$_}) } 
+   %TopFuncMap = map { ($_              => %TopFuncMap{$_}, 
+                        %TopFuncMap{$_} => %TopFuncMap{$_}) } 
                  keys %TopFuncMap ;
 
  #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) } 
@@ -325,34 +325,34 @@ my %inverse  = ( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gun
                  'IO::Compress::DummyComp'               => 'IO::Uncompress::DummyUncomp',
              );
 
-%inverse  = map { ($_ => $inverse{$_}, $inverse{$_} => $_) } keys %inverse;
+%inverse  = map { ($_ => %inverse{$_}, %inverse{$_} => $_) } keys %inverse;
 
 sub getInverse
 {
     my $class = shift ;
 
-    return $inverse{$class} ;
+    return %inverse{$class} ;
 }
 
 sub getErrorRef
 {
     my $class = shift ;
 
-    return $ErrorMap{$class} ;
+    return %ErrorMap{$class} ;
 }
 
 sub getTopFuncRef
 {
     my $class = shift ;
 
-    return \&{ $TopFuncMap{$class} } ;
+    return \&{ %TopFuncMap{$class} } ;
 }
 
 sub getTopFuncName
 {
     my $class = shift ;
 
-    return $TopFuncMap{$class}  ;
+    return %TopFuncMap{$class}  ;
 }
 
 sub compressBuffer
@@ -383,7 +383,7 @@ sub compressBuffer
                 );
 
     my $out ;
-    my $obj = $mapping{$compWith}->new( \$out);
+    my $obj = %mapping{$compWith}->new( \$out);
     $obj->write($buffer) ;
     $obj->close();
     return $out ;

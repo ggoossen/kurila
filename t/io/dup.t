@@ -75,7 +75,7 @@ open(F,">&=",1) or die "Cannot dup to numeric 1: $!";
 print F "ok 11\n";
 close(F);
 
-if ($Config{useperlio}) {
+if (%Config{useperlio}) {
     open(F,">&=",'1') or die "Cannot dup to string '1': $!";
     print F "ok 12\n";
     close(F);
@@ -91,7 +91,7 @@ open(F, ">&", \*DUPOUT) or die "Cannot dup stdout back: $!";
 curr_test(13);
 
 SKIP: {
-    skip("need perlio", 14) unless $Config{useperlio};
+    skip("need perlio", 14) unless %Config{useperlio};
     
     ok(open(F, ">&", 'STDOUT'));
     isnt(fileno(F), fileno(STDOUT));

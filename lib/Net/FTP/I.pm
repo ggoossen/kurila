@@ -15,23 +15,23 @@ $VERSION = "1.12";
 
 sub read {
   my $data = shift;
-  local *buf = \$_[0];
+  local *buf = \@_[0];
   shift;
   my $size = shift || croak 'read($buf,$size,[$timeout])';
   my $timeout = @_ ? shift: $data->timeout;
 
   my $n;
 
-  if ($size +> length ${*$data} and !${*$data}{'net_ftp_eof'}) {
+  if ($size +> length ${*$data} and !%{*$data}{'net_ftp_eof'}) {
     $data->can_read($timeout)
       or croak "Timeout";
 
-    my $blksize = ${*$data}{'net_ftp_blksize'};
+    my $blksize = %{*$data}{'net_ftp_blksize'};
     $blksize = $size if $size +> $blksize;
 
     unless ($n = sysread($data, ${*$data}, $blksize, length ${*$data})) {
       return undef unless defined $n;
-      ${*$data}{'net_ftp_eof'} = 1;
+      %{*$data}{'net_ftp_eof'} = 1;
     }
   }
 
@@ -41,7 +41,7 @@ sub read {
 
   substr(${*$data}, 0, $n, '');
 
-  ${*$data}{'net_ftp_bytesread'} += $n;
+  %{*$data}{'net_ftp_bytesread'} += $n;
 
   $n;
 }
@@ -49,7 +49,7 @@ sub read {
 
 sub write {
   my $data = shift;
-  local *buf = \$_[0];
+  local *buf = \@_[0];
   shift;
   my $size = shift || croak 'write($buf,$size,[$timeout])';
   my $timeout = @_ ? shift: $data->timeout;
@@ -57,13 +57,13 @@ sub write {
   # If the remote server has closed the connection we will be signal'd
   # when we write. This can happen if the disk on the remote server fills up
 
-  local $SIG{PIPE} = 'IGNORE'
-    unless ($SIG{PIPE} || '') eq 'IGNORE'
+  local %SIG{PIPE} = 'IGNORE'
+    unless (%SIG{PIPE} || '') eq 'IGNORE'
     or $^O eq 'MacOS';
   my $sent = $size;
   my $off  = 0;
 
-  my $blksize = ${*$data}{'net_ftp_blksize'};
+  my $blksize = %{*$data}{'net_ftp_blksize'};
   while ($sent +> 0) {
     $data->can_write($timeout)
       or croak "Timeout";

@@ -123,7 +123,6 @@ Apd	|SV**	|av_store	|NN AV *av|I32 key|NULLOK SV *val
 Apd	|void	|av_undef	|NN AV *av
 ApdoxM	|SV**	|av_create_and_unshift_one|NN AV **const avp|NN SV *const val
 Apd	|void	|av_unshift	|NN AV *av|I32 num
-Apo	|SV**	|av_arylen_p	|NN AV *av
 pR	|OP*	|bind_match	|I32 type|NN OP *left|NN OP *right
 pR	|OP*	|block_end	|I32 floor|NULLOK OP* seq
 ApR	|I32	|block_gimme
@@ -192,8 +191,8 @@ pM	|void	|delete_eval_scope
 p	|void	|deprecate	|NN const char *const s
 p	|void	|deprecate_old	|NN const char *const s
 Afp	|OP*	|die		|NULLOK const char* pat|...
-p	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
-p	|void	|die_where	|NN SV *msv
+pr	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
+pr	|void	|die_where	|NN SV *msv
 Ap	|void	|dounwind	|I32 cxix
 pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp
 p	|bool	|do_aexec5	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp|int fd|int do_report
@@ -433,7 +432,6 @@ p	|int	|magic_clearsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_existspack|NN SV* sv|NN const MAGIC* mg
 p	|int	|magic_freeovrld|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_get	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_getarylen|NN SV* sv|NN const MAGIC* mg
 p	|int	|magic_getdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getnkeys	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getpack	|NN SV* sv|NN MAGIC* mg
@@ -449,8 +447,6 @@ p	|int	|magic_regdatum_get|NN SV* sv|NN MAGIC* mg
 pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setamagic|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setarylen|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_freearylen_p|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdbline|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setenv	|NN SV* sv|NN MAGIC* mg
@@ -1374,7 +1370,6 @@ Es	|STRLEN	|reguni		|NN const struct RExC_state_t *pRExC_state \
 Es	|regnode*|regclass	|NN struct RExC_state_t *pRExC_state|U32 depth
 ERsn	|I32	|regcurly	|NN const char *s
 Es	|regnode*|reg_node	|NN struct RExC_state_t *pRExC_state|U8 op
-Es	|UV	|reg_recode	|const char value|NN SV **encp
 Es	|regnode*|regpiece	|NN struct RExC_state_t *pRExC_state \
 				|NN I32 *flagp|U32 depth
 Es	|regnode*|reg_namedseq	|NN struct RExC_state_t *pRExC_state \
@@ -1456,8 +1451,7 @@ Es	|CHECKPOINT|regcppush	|I32 parenfloor
 Es	|char*	|regcppop	|NN const regexp *rex
 ERsn	|char*	|reghop3	|NN char *s|I32 off|NN char *lim
 ERsn	|char*	|reghop3c	|NN char *s|I32 off|NN char *lim
-ERsn	|char*	|reghop3x	|NN char *s|I32 off|NN char *lim
-ERsn	|char*	|reghop4	|NN char *s|I32 off|NN const char *llim|NN const char *rlim
+ERsn	|char*	|reghop4	|NN char *s|I32 off|NN char *llim|NN char *rlim
 ERsn	|char*	|reghopmaybe3	|NN char *s|I32 off|NN const char *lim
 ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c|NN char *s|NN const char *strend|NULLOK regmatch_info *reginfo
 Es	|void	|swap_match_buff|NN regexp * prog

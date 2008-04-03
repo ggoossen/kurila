@@ -328,12 +328,12 @@ sub init_globals {
 #
 sub clean_data($){
     my( $dataref ) = @_;
-    for my $i ( 0..$#{$dataref} ) {
-	${$dataref}[$i] =~ s/\s+\Z//;
+    for my $i ( 0..@{$dataref}-1 ) {
+	@{$dataref}[$i] =~ s/\s+\Z//;
 
         # have a look for all-space lines
-      if( ${$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
-	    my @chunks = split( m/^\s+$/m, ${$dataref}[$i] );
+      if( @{$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
+	    my @chunks = split( m/^\s+$/m, @{$dataref}[$i] );
 	    splice( @$dataref, $i, 1, @chunks );
 	}
     }
@@ -361,12 +361,12 @@ sub pod2html {
 
     # set some variables to their default values if necessary
     local *POD;
-    unless (@ARGV && $ARGV[0]) {
+    unless (@ARGV && @ARGV[0]) {
 	$Podfile  = "-" unless $Podfile;	# stdin
 	open(POD, "<", "$Podfile")
 		|| die "$0: cannot open $Podfile file for input: $!\n";
     } else {
-	$Podfile = $ARGV[0];  # XXX: might be more filenames
+	$Podfile = @ARGV[0];  # XXX: might be more filenames
 	*POD = *ARGV;
     }
     $Htmlfile = "-" unless $Htmlfile;	# stdout
@@ -426,8 +426,8 @@ sub pod2html {
     if ($Title eq '') {
 	TITLE_SEARCH: {
  	    for (my $i = 0; $i +< @poddata; $i++) {
-		if ($poddata[$i] =~ m/^=head1\s*NAME\b/m) {
- 		    for my $para ( @poddata[$i, $i+1] ) {
+		if (@poddata[$i] =~ m/^=head1\s*NAME\b/m) {
+ 		    for my $para ( @poddata[[$i, $i+1]] ) {
 			last TITLE_SEARCH
 			    if ($Title) = $para =~ m/(\S+\s+-+.*\S)/s;
 		    }
@@ -439,7 +439,7 @@ sub pod2html {
     if (!$Title and $Podfile =~ m/\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
  	for (my $i = 0; $i +< @poddata; $i++) {
-	    last if ($Title) = $poddata[$i] =~ m/^=head[12]\s*(.*)/;
+	    last if ($Title) = @poddata[$i] =~ m/^=head[12]\s*(.*)/;
 	}
 	warn "adopted '$Title' as title for $Podfile\n"
 	    if $Verbose and $Title;
@@ -467,7 +467,7 @@ sub pod2html {
     }
 
       my $block = $Header ? <<END_OF_BLOCK : '';
-<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<table border="0" width="100\%" cellspacing="0" cellpadding="3">
 <tr><td class="block"$tdstyle valign="middle">
 <big><strong><span class="block">&nbsp;$Title</span></strong></big>
 </td></tr>
@@ -481,7 +481,7 @@ END_OF_BLOCK
 <head>
 <title>$Title</title>$csslink
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:$Config{perladmin}" />
+<link rev="made" href="mailto:%Config{perladmin}" />
 </head>
 
 <body$bodystyle>
@@ -521,8 +521,8 @@ END_OF_INDEX
     # now convert this file
     my $after_item;             # set to true after an =item
     warn "Converting input file $Podfile\n" if $Verbose;
-    foreach my $i (0..$#poddata){
-	$_ = $poddata[$i];
+    foreach my $i (0..@poddata-1){
+	$_ = @poddata[$i];
 	$Paragraph = $i+1;
 	if (m/^(=.*)/s) {	# is it a pod directive?
 	    $Ignore = 0;
@@ -537,7 +537,7 @@ END_OF_INDEX
 	    } elsif (m/^=pod/) {			# =pod
 		process_pod();
 	    } else {
-		next if @Begin_Stack && $Begin_Stack[-1] ne 'html';
+		next if @Begin_Stack && @Begin_Stack[-1] ne 'html';
 
 		if (m/^=(head[1-6])\s+(.*\S)/s) {	# =head[1-6] heading
 		    process_head( $1, $2, $Doindex && $index );
@@ -560,8 +560,8 @@ END_OF_INDEX
 	}
 	else {
 	    next if $Ignore;
-	    next if @Begin_Stack && $Begin_Stack[-1] ne 'html';
-	    print HTML and next if @Begin_Stack && $Begin_Stack[-1] eq 'html';
+	    next if @Begin_Stack && @Begin_Stack[-1] ne 'html';
+	    print HTML and next if @Begin_Stack && @Begin_Stack[-1] eq 'html';
 	    my $text = $_;
 
 	    # Open tag for definition list as we have something to put in it
@@ -677,7 +677,7 @@ sub parse_command_line {
 	$opt_netscape,$opt_outfile,$opt_podpath,$opt_podroot,$opt_quiet,
 	$opt_recurse,$opt_title,$opt_verbose,$opt_hiddendirs);
 
-    unshift @ARGV, split ' ', $Config{pod2html} if $Config{pod2html};
+    unshift @ARGV, split ' ', %Config{pod2html} if %Config{pod2html};
     my $result = GetOptions(
 			    'backlink=s' => \$opt_backlink,
 			    'cachedir=s' => \$opt_cachedir,
@@ -806,7 +806,7 @@ sub load_cache {
     warn "loading item cache\n" if $Verbose;
     while ( ~< *CACHE) {
 	m/(.*?) (.*)$/;
-	$Items{$1} = $2;
+	%Items{$1} = $2;
     }
     close(CACHE);
 
@@ -835,7 +835,7 @@ sub load_cache {
     warn "loading directory cache\n" if $Verbose;
     while ( ~< *CACHE) {
 	m/(.*?) (.*)$/;
-	$Pages{$1} = $2;
+	%Pages{$1} = $2;
     }
 
     close(CACHE);
@@ -870,12 +870,12 @@ sub scan_podpath {
     foreach $libpod (@Libpods) {
 	# if the page isn't defined then we won't know where to find it
 	# on the system.
-	next unless defined $Pages{$libpod} && $Pages{$libpod};
+	next unless defined %Pages{$libpod} && %Pages{$libpod};
 
 	# if there is a directory then use the .pod and .pm files within it.
 	# NOTE: Only finds the first so-named directory in the tree.
 #	if ($Pages{$libpod} =~ /([^:]*[^(\.pod|\.pm)]):/) {
-	if ($Pages{$libpod} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/) {
+	if (%Pages{$libpod} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/) {
 	    #  find all the .pod and .pm files within the directory
 	    $dirname = $1;
 	    opendir(DIR, $dirname) ||
@@ -900,8 +900,8 @@ sub scan_podpath {
 ###		$pod =~ /^(.*)(\.pod|\.pm)$/;
 ###		$Items{$1} = "$dirname/$1.html" if $1;
 ###	    }
-	} elsif ($Pages{$libpod} =~ m/([^:]*\.pod):/ ||
-		 $Pages{$libpod} =~ m/([^:]*\.pm):/) {
+	} elsif (%Pages{$libpod} =~ m/([^:]*\.pod):/ ||
+		 %Pages{$libpod} =~ m/([^:]*\.pm):/) {
 	    # scan the .pod or .pm file for =item directives
 	    $pod = $1;
 	    open(POD, "<", "$pod") ||
@@ -927,7 +927,7 @@ sub scan_podpath {
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Items) {
-	print CACHE "$key $Items{$key}\n";
+	print CACHE "$key %Items{$key}\n";
     }
 
     close(CACHE);
@@ -939,7 +939,7 @@ sub scan_podpath {
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Pages) {
-	print CACHE "$key $Pages{$key}\n";
+	print CACHE "$key %Pages{$key}\n";
     }
 
     close(CACHE);
@@ -965,22 +965,22 @@ sub scan_dir {
 	if (-d "$dir/$_" && $_ ne "." && $_ ne ".."
 	    && ($HiddenDirs || !m/^\./)
 	) {         # directory
-	    $Pages{$_}  = "" unless defined $Pages{$_};
-	    $Pages{$_} .= "$dir/$_:";
+	    %Pages{$_}  = "" unless defined %Pages{$_};
+	    %Pages{$_} .= "$dir/$_:";
 	    push(@subdirs, $_);
 	} elsif (m/\.pod\z/) {	    	    	    	    # .pod
 	    s/\.pod\z//;
-	    $Pages{$_}  = "" unless defined $Pages{$_};
-	    $Pages{$_} .= "$dir/$_.pod:";
+	    %Pages{$_}  = "" unless defined %Pages{$_};
+	    %Pages{$_} .= "$dir/$_.pod:";
 	    push(@pods, "$dir/$_.pod");
 	} elsif (m/\.html\z/) { 	    	    	    	    # .html
 	    s/\.html\z//;
-	    $Pages{$_}  = "" unless defined $Pages{$_};
-	    $Pages{$_} .= "$dir/$_.pod:";
+	    %Pages{$_}  = "" unless defined %Pages{$_};
+	    %Pages{$_} .= "$dir/$_.pod:";
 	} elsif (m/\.pm\z/) { 	    	    	    	    # .pm
 	    s/\.pm\z//;
-	    $Pages{$_}  = "" unless defined $Pages{$_};
-	    $Pages{$_} .= "$dir/$_.pm:";
+	    %Pages{$_}  = "" unless defined %Pages{$_};
+	    %Pages{$_} .= "$dir/$_.pm:";
 	    push(@pods, "$dir/$_.pm");
 	} elsif (-T "$dir/$_") {			    # script(?)
 	    local *F;
@@ -988,8 +988,8 @@ sub scan_dir {
 		my $line;
 		while (defined($line = ~< *F)) {
 		    if ($line =~ m/^=(?:pod|head1)/) {
-			$Pages{$_}  = "" unless defined $Pages{$_};
-			$Pages{$_} .= "$dir/$_.pod:";
+			%Pages{$_}  = "" unless defined %Pages{$_};
+			%Pages{$_} .= "$dir/$_.pod:";
 			last;
 		    }
 		}
@@ -1028,7 +1028,7 @@ sub scan_headings {
 
         my $title = depod( $otitle );
         my $name = anchorify( $title );
-        $$sections{$name} = 1;
+        %$sections{$name} = 1;
         $title = process_text( \$otitle );
 
 	    while ($which_head != $listdepth) {
@@ -1070,8 +1070,8 @@ sub scan_items {
     $pod =~ s/\.pod\z//;
     $pod .= ".html" if $pod;
 
-    foreach $i (0..$#poddata) {
-	my $txt = depod( $poddata[$i] );
+    foreach $i (0..@poddata-1) {
+	my $txt = depod( @poddata[$i] );
 
 	# figure out what kind of item it is.
 	# Build string for referencing this item.
@@ -1086,7 +1086,7 @@ sub scan_items {
 	    next;
 	}
 	my $fid = fragment_id( $item );
-	$$itemref{$fid} = "$pod" if $fid;
+	%$itemref{$fid} = "$pod" if $fid;
     }
 }
 
@@ -1132,7 +1132,7 @@ sub emit_item_tag($$$){
     ### print STDERR "emit_item_tag=$item ($text)\n";
 
     print HTML '<strong>';
-    if ($Items_Named{$item}++) {
+    if (%Items_Named{$item}++) {
 	print HTML process_text( \$otext );
     } else {
         my $name = $item;
@@ -1151,7 +1151,7 @@ sub new_listitem {
 	$ListNewTerm = 0;
     }
 
-    if( $Items_Seen[$Listlevel]++ == 0 ){
+    if( @Items_Seen[$Listlevel]++ == 0 ){
 	# start of new list
 	push( @Listtype, "$tag" );
 	print HTML "<$tag>\n";
@@ -1240,13 +1240,13 @@ sub process_back {
     # defined because an =item directive may have never appeared and thus
     # $Listtype[$Listlevel] may have never been initialized.
     $Listlevel--;
-    if( defined $Listtype[$Listlevel] ){
-        if ( $Listtype[$Listlevel] eq 'dl' ){
+    if( defined @Listtype[$Listlevel] ){
+        if ( @Listtype[$Listlevel] eq 'dl' ){
             print HTML "</dd>\n" unless $ListNewTerm;
         } else {
             print HTML "</li>\n";
         }
-        print HTML "</$Listtype[$Listlevel]>\n";
+        print HTML "</@Listtype[$Listlevel]>\n";
         pop( @Listtype );
         $ListNewTerm = 0;
     }
@@ -1308,7 +1308,7 @@ sub process_begin {
 sub process_end {
     my($whom, $text) = @_;
     $whom = lc($whom);
-    if (!defined $Begin_Stack[-1] or $Begin_Stack[-1] ne $whom ) {
+    if (!defined @Begin_Stack[-1] or @Begin_Stack[-1] ne $whom ) {
 	Carp::confess("Unmatched begin/end at chunk $Paragraph in pod $Podfile\n")
     }
     pop( @Begin_Stack );
@@ -1327,7 +1327,7 @@ sub process_pre {
     # insert spaces in place of tabs
     $rest =~ s#(.+)#{
 	    my $line = $1;
-            1 while $line =~ s/(\t+)/{' ' x ((length($1) * 8) - $-[0] % 8)}/;
+            1 while $line =~ s/(\t+)/{' ' x ((length($1) * 8) - @-[0] % 8)}/;
 	    $line;
 	}#g;
 
@@ -1339,10 +1339,10 @@ sub process_pre {
     $rest =~ s{
 	         (\s*)(perl\w+)
 	      }{{
-		 if ( defined $Pages{$2} ){	# is a link
-		     qq($1<a href="$Htmlroot/$Pages{$2}">$2</a>);
-		 } elsif (defined $Pages{dosify($2)}) {	# is a link
-		     qq($1<a href="$Htmlroot/$Pages{dosify($2)}">$2</a>);
+		 if ( defined %Pages{$2} ){	# is a link
+		     qq($1<a href="$Htmlroot/%Pages{$2}">$2</a>);
+		 } elsif (defined %Pages{dosify($2)}) {	# is a link
+		     qq($1<a href="$Htmlroot/%Pages{dosify($2)}">$2</a>);
 		 } else {
 		     "$1$2";
 		 }
@@ -1520,7 +1520,7 @@ sub process_puretext {
 #
 
 sub process_text1($$;$$);
-sub pattern ($) { $_[0] ? '\s+'.('>' x ($_[0] + 1)) : '>' }
+sub pattern ($) { @_[0] ? '\s+'.('>' x (@_[0] + 1)) : '>' }
 sub closing ($) { local($_) = shift; (defined && s/\s+\z//) ? length : 0 }
 
 sub process_text {
@@ -1754,7 +1754,7 @@ sub go_ahead($$$){
     my $res = '';
     my @closing = ($closing);
     while( $$rstr =~
-      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|@{[pattern $closing[0]]})//s ){
+      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|@{[pattern @closing[0]]})//s ){
 	$res .= $1;
 	unless( $3 ){
 	    shift @closing;
@@ -1799,7 +1799,7 @@ sub emit_C($;$$){
 # html_escape: make text safe for HTML
 #
 sub html_escape {
-    my $rest = $_[0];
+    my $rest = @_[0];
     $rest   =~ s/&/&amp;/g;
     $rest   =~ s/</&lt;/g;
     $rest   =~ s/>/&gt;/g;
@@ -1832,14 +1832,14 @@ sub page_sect($$) {
     my( $linktext, $page83, $link);	# work strings
 
     # check if we know that this is a section in this page
-    if (!defined $Pages{$page} && defined $Sections{$page}) {
+    if (!defined %Pages{$page} && defined %Sections{$page}) {
 	$section = $page;
 	$page = "";
         ### print STDERR "reset page='', section=$section\n";
     }
 
     $page83=dosify($page);
-    $page=$page83 if (defined $Pages{$page83});
+    $page=$page83 if (defined %Pages{$page83});
     if ($page eq "") {
         $link = "#" . anchorify( $section );
     } elsif ( $page =~ m/::/ ) {
@@ -1850,8 +1850,8 @@ sub page_sect($$) {
 	# an intermediate page that is an index to all such pages.
 	my $page_name = $page ;
 	$page_name =~ s,^.*/,,s ;
-	if ( defined( $Pages{ $page_name } ) &&
-	     $Pages{ $page_name } =~ m/([^:]*$page)\.(?:pod|pm):/
+	if ( defined( %Pages{ $page_name } ) &&
+	     %Pages{ $page_name } =~ m/([^:]*$page)\.(?:pod|pm):/
 	   ) {
 	    $page = $1 ;
 	}
@@ -1869,7 +1869,7 @@ sub page_sect($$) {
 	}
 	$link = "$Htmlroot/$page.html";
 	$link .= "#" . anchorify( $section ) if ($section);
-    } elsif (!defined $Pages{$page}) {
+    } elsif (!defined %Pages{$page}) {
 	$link = "";
     } else {
 	$section = anchorify( $section ) if $section ne "";
@@ -1878,7 +1878,7 @@ sub page_sect($$) {
 	# if there is a directory by the name of the page, then assume that an
 	# appropriate section will exist in the subdirectory
 #	if ($section ne "" && $Pages{$page} =~ /([^:]*[^(\.pod|\.pm)]):/) {
-	if ($section ne "" && $Pages{$page} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/) {
+	if ($section ne "" && %Pages{$page} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/) {
 	    $link = "$Htmlroot/$1/$section.html";
             ### print STDERR "...link=$link\n";
 
@@ -1891,7 +1891,7 @@ sub page_sect($$) {
 
 	    # check if there is a .pod with the page name.
 	    # for L<Foo>, Foo.(pod|pm) is preferred to A/Foo.(pod|pm)
-	    if ($Pages{$page} =~ m/([^:]*)\.(?:pod|pm):/) {
+	    if (%Pages{$page} =~ m/([^:]*)\.(?:pod|pm):/) {
 		$link = "$Htmlroot/$1.html$section";
 	    } else {
 		$link = "";
@@ -1971,7 +1971,7 @@ sub coderef($$){
         Carp::confess("Undefined fragment '$item' from fragment_id() in coderef() in $Podfile")
             if !defined $fid;    
 	# Do we take it? Item could be a section!
-	my $base = $Items{$fid} || "";
+	my $base = %Items{$fid} || "";
 	$base =~ s{[^/]*/}{};
 	if( $base ne "$page.html" ){
             ###   print STDERR "coderef( $page, $item ): items{$fid} = $Items{$fid} = $base => discard page!\n";
@@ -1981,10 +1981,10 @@ sub coderef($$){
     } else {
         # no page - local items precede cached items
 	if( defined( $fid ) ){
-	    if(  exists $Local_Items{$fid} ){
-		$page = $Local_Items{$fid};
+	    if(  exists %Local_Items{$fid} ){
+		$page = %Local_Items{$fid};
 	    } else {
-		$page = $Items{$fid};
+		$page = %Items{$fid};
 	    }
 	}
     }
@@ -1993,7 +1993,7 @@ sub coderef($$){
     # =item directive, then create a link to that page.
     if( defined $page ){
 	if( $page ){
-            if( exists $Pages{$page} and $Pages{$page} =~ m/([^:.]*)\.[^:]*:/){
+            if( exists %Pages{$page} and %Pages{$page} =~ m/([^:.]*)\.[^:]*:/){
 		$page = $1 . '.html';
 	    }
 	    my $link = "$Htmlroot/$page#" . anchorify($fid);
@@ -2074,21 +2074,21 @@ sub anchorify {
 # Note: can be called with copy or modify semantics
 #
 my %E2c;
-$E2c{lt}     = '<';
-$E2c{gt}     = '>';
-$E2c{sol}    = '/';
-$E2c{verbar} = '|';
-$E2c{amp}    = '&'; # in Tk's pods
+%E2c{lt}     = '<';
+%E2c{gt}     = '>';
+%E2c{sol}    = '/';
+%E2c{verbar} = '|';
+%E2c{amp}    = '&'; # in Tk's pods
 
 sub depod1($;$$);
 
 sub depod($){
     my $string;
-    if( ref( $_[0] ) ){
-	$string =  ${$_[0]};
-        ${$_[0]} = depod1( \$string );
+    if( ref( @_[0] ) ){
+	$string =  ${@_[0]};
+        ${@_[0]} = depod1( \$string );
     } else {
-	$string =  $_[0];
+	$string =  @_[0];
         depod1( \$string );
     }
 }
@@ -2107,7 +2107,7 @@ sub depod1($;$$){
   } elsif( $func eq 'E' ){
       # E<x> - convert to character
       $$rstr =~ s/^([^>]*)>//;
-      $res .= $E2c{$1} || "";
+      $res .= %E2c{$1} || "";
   } elsif( $func eq 'X' ){
       # X<> - ignore
       $$rstr =~ s/^[^>]*>//;
@@ -2155,12 +2155,12 @@ sub fragment_id_readable {
     }
 
     if ($generate) {
-        if ( exists $seen{$text} ) {
+        if ( exists %seen{$text} ) {
             # This already exists, make it unique
-            $seen{$text}++;
-            $text = $text . $seen{$text};
+            %seen{$text}++;
+            $text = $text . %seen{$text};
         } else {
-            $seen{$text} = 1;  # first time seen this fragment
+            %seen{$text} = 1;  # first time seen this fragment
         }
     }
 
@@ -2176,8 +2176,8 @@ sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
     $text =~ s/\s+/_/sg;
 
     $text =~ s{(\W)}{{
-        defined( $HC[ord($1)] ) ? $HC[ord($1)]
-        : ( $HC[ord($1)] = sprintf( "%%%02X", ord($1) ) ) }}gx;
+        defined( @HC[ord($1)] ) ? @HC[ord($1)]
+        : ( @HC[ord($1)] = sprintf( "\%\%\%02X", ord($1) ) ) }}gx;
     $text = substr( $text, 0, 50 );
 
     $text;

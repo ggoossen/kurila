@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if (%ENV{'PERL_CORE'}){
         chdir 't';
         unshift @INC, '../lib';
     }
     use Config;
-    if (! $Config{'useithreads'}) {
+    if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
@@ -50,14 +50,14 @@ sub ok {
         print("ok $id - $name\n");
     } else {
         print("not ok $id - $name\n");
-        printf("# Failed test at line %d\n", (caller)[2]);
+        printf("# Failed test at line \%d\n", (caller)[2]);
     }
 
     return ($ok);
 }
 
 sub skip {
-    ok(1, '# skip: ' . $_[0]);
+    ok(1, '# skip: ' . @_[0]);
 }
 
 
@@ -70,7 +70,7 @@ sub skip {
 {
     my ($thread) = threads->create(sub { return (1,2,3) });
     my @retval = $thread->join();
-    ok($retval[0] == 1 && $retval[1] == 2 && $retval[2] == 3,'');
+    ok(@retval[0] == 1 && @retval[1] == 2 && @retval[2] == 3,'');
 }
 {
     my $retval = threads->create(sub { return [1] })->join();
@@ -93,13 +93,13 @@ sub skip {
 }
 {
     my $test = "hi";
-    my $retval = threads->create(sub { return $_[0]}, \$test)->join();
+    my $retval = threads->create(sub { return @_[0]}, \$test)->join();
     ok($$retval eq 'hi','');
 }
 {
     my $test = "hi";
     share($test);
-    my $retval = threads->create(sub { return $_[0]}, \$test)->join();
+    my $retval = threads->create(sub { return @_[0]}, \$test)->join();
     ok($$retval eq 'hi','');
     $test = "foo";
     ok($$retval eq 'foo','');
@@ -111,7 +111,7 @@ sub skip {
         my $foo;
         share($foo);
         $foo = "thread1";
-        return $foo{bar} = \$foo;
+        return %foo{bar} = \$foo;
     })->join();
     ok(1,"");
 }
@@ -189,7 +189,7 @@ if ($^O eq 'linux') {
         cond_wait($go) until $go;
     }); 
 
-    my $joiner = threads->create(sub { $_[0]->join }, $t);
+    my $joiner = threads->create(sub { @_[0]->join }, $t);
 
     threads->yield();
     sleep 1;
@@ -217,7 +217,7 @@ if ($^O eq 'linux') {
     my $t = threads->create( sub {
         lock($go);  cond_wait($go) until $go;
     });
-    my $joiner = threads->create(sub { $_[0]->join; }, $t);
+    my $joiner = threads->create(sub { @_[0]->join; }, $t);
 
     threads->yield();
     sleep 1;

@@ -24,7 +24,7 @@ $d = Digest->new("Dummy");
 print "not " unless $d->digest eq "ooo";
 print "ok 1\n";
 
-$Digest::MMAP{"Dummy-24"} = [["NotThere"], "NotThereEither", ["Digest::Dummy", 24]];
+%Digest::MMAP{"Dummy-24"} = [["NotThere"], "NotThereEither", ["Digest::Dummy", 24]];
 $d = Digest->new("Dummy-24");
 print "not " unless $d->digest eq "24";
 print "ok 2\n";

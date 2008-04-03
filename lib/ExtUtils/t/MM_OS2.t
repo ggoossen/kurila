@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = '../lib';
     }
@@ -162,7 +162,7 @@ is( ExtUtils::MM_OS2->replace_manpage_separator($sep), '.a.b.c.de',
 	# in addition, we need them to be unique enough they do not trip
 	# an earlier file test in maybe_command().  Portability.
 
-	foreach my $path (split(m/:/, $ENV{PATH})) {
+	foreach my $path (split(m/:/, %ENV{PATH})) {
 		opendir(DIR, $path) or next;
 		while (defined(my $file = readdir(DIR))) {
 			next if $file eq $curdir or $file eq $updir;
