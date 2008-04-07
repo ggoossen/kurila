@@ -2183,7 +2183,7 @@ sub astnull {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d');
-    push @newkids, $self->madness(']');
+    push @newkids, $self->madness('slice_close ]');
     return P5AST::op_aslice->new(Kids => [@newkids]);
 }
 
@@ -2197,7 +2197,7 @@ sub ast {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d');
-    push @newkids, $self->madness(']');
+    push @newkids, $self->madness('slice_close ]');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -2275,7 +2275,7 @@ sub astnull {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d'); 
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('slice_close }');
     return P5AST::op_hslice->new(Kids => [@newkids]);
 }
 
@@ -2289,7 +2289,7 @@ sub ast {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d'); 
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('slice_close }');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
