@@ -1387,7 +1387,7 @@ sub process_pre {
     my $ltrs = '\w';
     my $gunk = '/#~:.?+=&%@!\-';
     my $punc = '.:!?\-;';
-    my $any  = "${ltrs}${gunk}${punc}";
+    my $any  = "{$ltrs}{$gunk}{$punc}";
 
     $rest =~ s{
 	\b			# start at word boundary

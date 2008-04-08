@@ -52,7 +52,7 @@ use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
   # an a circumflex, so we need to be explicit.
 
   my $a_circumflex = "\xe5"; # a byte.
-  %U_HASH = (map {$_, $_} 'castle', "ch${a_circumflex}teau", $utf8, chr 0x57CE);
+  %U_HASH = (map {$_, $_} 'castle', "ch{$a_circumflex}teau", $utf8, chr 0x57CE);
   plan tests => 162;
 }
 

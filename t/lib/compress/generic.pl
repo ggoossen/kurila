@@ -74,14 +74,14 @@ sub run
         }
 
         eval ' $gz->write({})' ;
-like $@->{description}, mkEvalErr("^${CompressClass}::write: not a scalar reference");
+like $@->{description}, mkEvalErr("^{$CompressClass}::write: not a scalar reference");
 #like $@, mkEvalErr("^${CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref");
 
 eval ' $gz->syswrite("abc", 1, 5)' ;
-like $@->{description}, mkEvalErr("^${CompressClass}::write: offset outside string");
+like $@->{description}, mkEvalErr("^{$CompressClass}::write: offset outside string");
 
 eval ' $gz->syswrite("abc", 1, -4)' ;
-like $@->{description}, mkEvalErr("^${CompressClass}::write: offset outside string");
+like $@->{description}, mkEvalErr("^{$CompressClass}::write: offset outside string");
 }
 
 
@@ -1100,10 +1100,10 @@ foreach my $file (0, 1)
 
     ok ! $a->error() ;
     eval { $a->seek(-1, 10) ; };
-    like $@->{description}, mkErr("^${CompressClass}::seek: unknown value, 10, for whence parameter");
+    like $@->{description}, mkErr("^{$CompressClass}::seek: unknown value, 10, for whence parameter");
 
     eval { $a->seek(-1, SEEK_END) ; };
-    like $@->{description}, mkErr("^${CompressClass}::seek: cannot seek backwards");
+    like $@->{description}, mkErr("^{$CompressClass}::seek: cannot seek backwards");
 
     $a->write("fred");
     $a->close ;
@@ -1112,13 +1112,13 @@ foreach my $file (0, 1)
     my $u = $UncompressClass-> new((\$b))  ;
 
     eval { $u->seek(-1, 10) ; };
-    like $@->{description}, mkErr("^${UncompressClass}::seek: unknown value, 10, for whence parameter");
+    like $@->{description}, mkErr("^{$UncompressClass}::seek: unknown value, 10, for whence parameter");
 
     eval { $u->seek(-1, SEEK_END) ; };
-    like $@->{description}, mkErr("^${UncompressClass}::seek: SEEK_END not allowed");
+    like $@->{description}, mkErr("^{$UncompressClass}::seek: SEEK_END not allowed");
 
     eval { $u->seek(-1, SEEK_CUR) ; };
-    like $@->{description}, mkErr("^${UncompressClass}::seek: cannot seek backwards");
+    like $@->{description}, mkErr("^{$UncompressClass}::seek: cannot seek backwards");
 }
 
 foreach my $fb (qw(filename buffer filehandle))
@@ -1369,12 +1369,12 @@ foreach my $file (0, 1)
     #ok ! -e $name1, "  File $name1 does not exist";
 
     my @data = (
-        [ '{ }',         "${CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
-        [ '[ { } ]',     "${CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
-        [ '[ [ { } ] ]', "${CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
-        [ '[ "" ]',      "${CompressClass}::write: input filename is undef or null string" ], 
-        [ '[ undef ]',   "${CompressClass}::write: input filename is undef or null string" ], 
-        [ '[ \$Answer ]',"${CompressClass}::write: input and output buffer are identical" ], 
+        [ '{ }',         "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
+        [ '[ { } ]',     "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
+        [ '[ [ { } ] ]', "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
+        [ '[ "" ]',      "{$CompressClass}::write: input filename is undef or null string" ], 
+        [ '[ undef ]',   "{$CompressClass}::write: input filename is undef or null string" ], 
+        [ '[ \$Answer ]',"{$CompressClass}::write: input and output buffer are identical" ], 
         #[ "not readable", 'xx' ], 
         # same filehandle twice, 'xx'
        ) ;
@@ -1382,7 +1382,7 @@ foreach my $file (0, 1)
     foreach my $data (@data)
     {
         my ($send, $get) = @$data ;
-        title "${CompressClass}::write( $send )";
+        title "{$CompressClass}::write( $send )";
         my($copy);
         eval "\$copy = $send";
         my $x = $CompressClass-> new((\$Answer));

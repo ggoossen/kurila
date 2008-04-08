@@ -158,7 +158,7 @@ sub checkParams
             *$self->{OneShot} ? $self->getOneShotParams() 
                               : (),
         }, 
-        @_) or $self->croakError("${class}: $got->{Error}")  ;
+        @_) or $self->croakError("{$class}: $got->{Error}")  ;
 
     return $got ;
 }
@@ -225,7 +225,7 @@ sub _create
     }
 
     $obj->ckParams($got)
-        or $obj->croakError("${class}: " . $obj->error());
+        or $obj->croakError("{$class}: " . $obj->error());
 
 
     $obj->saveStatus(STATUS_OK) ;

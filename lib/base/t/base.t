@@ -57,7 +57,7 @@ like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty
                                           '  still empty on 2nd load');
 {
     my $warning;
-    local ${^WARN_HOOK} = sub { $warning = shift };
+    local $^WARN_HOOK = sub { $warning = shift };
     eval q{package HomoGenous; use base 'HomoGenous';};
     like($warning->{description}, qr/^Class 'HomoGenous' tried to inherit from itself/,
                                           '  self-inheriting');

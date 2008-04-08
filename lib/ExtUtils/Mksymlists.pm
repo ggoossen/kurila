@@ -35,7 +35,7 @@ sub Mksymlists {
                     $bootseen++;
                 }
                 else {
-                    push(@{%spec{FUNCLIST}},"XS_${packprefix}_$sym");
+                    push(@{%spec{FUNCLIST}},"XS_{$packprefix}_$sym");
                 }
             }
             push(@{%spec{FUNCLIST}},"boot_$packprefix") unless $bootseen;
@@ -192,7 +192,7 @@ sub _write_vms {
 
     foreach my $sym (@{$data->{DL_VARS}}) {
         my $safe = $set->addsym($sym);
-        print $opt "PSECT_ATTR=${sym},PIC,OVR,RD,NOEXE,WRT,NOSHR\n";
+        print $opt "PSECT_ATTR={$sym},PIC,OVR,RD,NOEXE,WRT,NOSHR\n";
         if ($isvax) { print $opt "UNIVERSAL=$safe\n" }
         else        { print $opt "SYMBOL_VECTOR=($safe=DATA)\n"; }
     }

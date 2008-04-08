@@ -260,7 +260,7 @@ sub _parseInputGlob
     $out .= quotemeta $string ;
 
 
-    $self->{InputGlob} =~ s/${noPreBS}[\(\)]//g;
+    $self->{InputGlob} =~ s/$noPreBS[\(\)]//g;
     $self->{InputPattern} = $out ;
 
     #print "# INPUT '$self->{InputGlob}' => '$out'\n";
@@ -304,8 +304,8 @@ sub _parseOutputGlob
     #warn "noPreBS = '$noPreBS'\n";
 
     #$string =~ s/${noPreBS}\$(\d)/\${$1}/g;
-    $string =~ s/${noPreBS}#(\d)/\$\{$1\}/g;
-    $string =~ s#${noPreBS}\*#\$\{inFile\}#g;
+    $string =~ s/$noPreBS#(\d)/\$\{$1\}/g;
+    $string =~ s#$noPreBS\*#\$\{inFile\}#g;
     $string = '"' . $string . '"';
 
     #print "OUTPUT '$self->{OutputGlob}' => '$string'\n";

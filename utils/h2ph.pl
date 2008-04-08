@@ -118,14 +118,14 @@ while (defined (my $file = next_file())) {
 			$new =~ s/(['\\])/\\$1/g;   #']);
 			if ($opt_h) {
 			    print OUT $t,
-                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    ${args}eval q($new);\n$t\}' unless defined(\&$name);\n";
+                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    {$args}eval q($new);\n$t\}' unless defined(\&$name);\n";
                             $eval_index++;
 			} else {
 			    print OUT $t,
-                            "eval 'sub $name $proto\{\n$t    ${args}eval q($new);\n$t\}' unless defined(\&$name);\n";
+                            "eval 'sub $name $proto\{\n$t    {$args}eval q($new);\n$t\}' unless defined(\&$name);\n";
 			}
 		    } else {
-                      print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t${args}eval q($new);\n    \}\n\}\n";
+                      print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t{$args}eval q($new);\n    \}\n\}\n";
 		    }
 		    %curargs = ();
 		} else {
