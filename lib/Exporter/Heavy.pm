@@ -133,7 +133,7 @@ sub heavy_export {
 	    }
 	}
 	if ($oops) {
-	    die("@{carp}Can't continue after import errors");
+	    die("{@carp}Can't continue after import errors");
 	}
     }
     else {

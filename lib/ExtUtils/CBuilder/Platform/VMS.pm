@@ -212,7 +212,7 @@ sub _liblist_ext {
     # a like-named executable image (e.g. -lperl resolves to perlshr.exe
     # before perl.exe).
     if ($lib !~ m/\.[^:>\]]*$/) {
-      push(@variants,"${lib}shr","${lib}rtl","${lib}lib");
+      push(@variants,"{$lib}shr","{$lib}rtl","{$lib}lib");
       push(@variants,"lib$lib") if $lib !~ m/[:>\]]/;
     }
     push(@variants,$lib);

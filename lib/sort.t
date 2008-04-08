@@ -11,7 +11,7 @@ BEGIN {
     $BigWidth  = 6;				# Digits in $BigEnough-1
     $BigEnough = 10**$BigWidth;			# Largest array we'll attempt
     $RootWidth = int(($BigWidth+1)/2);		# Digits in sqrt($BigEnough-1)
-    $ItemFormat = "\%0${RootWidth}d\%0${BigWidth}d";	# Array item format
+    $ItemFormat = "\%0{$RootWidth}d\%0{$BigWidth}d";	# Array item format
     @TestSizes = (0, 1, 2);			# Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)

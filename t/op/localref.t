@@ -22,7 +22,7 @@ is($aa,1);
 @aa = qw/a b/;
 { local @aa;     @aa = qw/c d/; is("@aa","c d"); }
 is("@aa","a b");
-{ local @{aa};   @aa = qw/e f/; is("@aa","e f"); }
+{ local @aa;   @aa = qw/e f/; is("@aa","e f"); }
 is("@aa","a b");
 { no strict 'refs'; local @{*{Symbol::fetch_glob("aa")}}; @aa = qw/g h/; is("@aa","g h"); }
 is("@aa","a b");

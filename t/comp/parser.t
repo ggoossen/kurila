@@ -96,8 +96,8 @@ is( $@, '', 'PL_lex_brackstack' );
     $c =~ s/foo/{$a}\{/;
     is($c, 'A{', "interpolation, s//.../");
     is(<<"${a}{", "A\{ A[ B\{\n", "interpolation, here doc");
-{$a}\{ {$a}[ @{b}\{
-${a}{
+{$a}\{ {$a}[ {@b}\{
+{$a}{
 }
 
 eval q{ sub a(;; &) { } a { } };

@@ -125,7 +125,7 @@ sub _unix_os2_ext {
 			$mb cmp $ma;} @fullname)[[0]];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
 		 && ((%Config{'dlsrc'} ne "dl_dld.xs") || ($thislib eq "m"))){
-	    } elsif (-f ($fullname="$thispth/lib${thislib}_s$Config_libext")
+	    } elsif (-f ($fullname="$thispth/lib{$thislib}_s$Config_libext")
                  && (! %Config{'archname'} =~ m/RM\d\d\d-svr4/)
 		 && ($thislib .= "_s") ){ # we must explicitly use _s version
 	    } elsif (-f ($fullname="$thispth/lib$thislib$Config_libext")){
@@ -156,7 +156,7 @@ sub _unix_os2_ext {
 
 	    # what do we know about this library...
 	    my $is_dyna = ($fullname !~ m/\Q$Config_libext\E\z/);
-	    my $in_perl = ($libs =~ m/\B-l\Q${thislib}\E\b/s);
+	    my $in_perl = ($libs =~ m/\B-l\Q$thislib\E\b/s);
 
             # include the path to the lib once in the dynamic linker path
             # but only if it is a dynamic lib and not in Perl itself
@@ -463,7 +463,7 @@ sub _vms_ext {
     # a like-named executable image (e.g. -lperl resolves to perlshr.exe
     # before perl.exe).
     if ($lib !~ m/\.[^:>\]]*$/) {
-      push(@variants,"${lib}shr","${lib}rtl","${lib}lib");
+      push(@variants,"{$lib}shr","{$lib}rtl","{$lib}lib");
       push(@variants,"lib$lib") if $lib !~ m/[:>\]]/;
     }
     push(@variants,$lib);

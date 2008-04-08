@@ -48,7 +48,7 @@ sub read_manifest {
 
 sub catch_warning {
     my $warn = '';
-    local ${^WARN_HOOK} = sub { $warn .= @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warn .= @_[0]->{description} };
     return join('', @_[0]->() ), $warn;
 }
 
@@ -250,7 +250,7 @@ is( $files->{foobar}, '',    '          preserved old entries' );
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' );
     my $extsep = $Is_VMS ? '_' : '.';
-    %Files{"$_.bak"}++ for ('MANIFEST', "MANIFEST${extsep}SKIP");
+    %Files{"$_.bak"}++ for ('MANIFEST', "MANIFEST{$extsep}SKIP");
 }
 
 add_file('MANIFEST'   => 'Makefile.PL');

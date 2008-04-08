@@ -117,7 +117,7 @@ for my $exe (@EXES) {
         next if $sym =~ m/\s/;
         $sym =~ s/\@.*\z//;	# remove @@GLIBC_2.0 etc
         # warn "#### $sym\n";
-        if (exists %rfuncs{"${sym}_r"} && ! %syms{"$sym:$exe"}++) {
+        if (exists %rfuncs{"{$sym}_r"} && ! %syms{"$sym:$exe"}++) {
     	    push @syms, $sym;
         }
     }

@@ -23,7 +23,7 @@ is $@->{description}, sprintf "this at \%s line \%s.\n", $0, __LINE__ - 1;
 
 {
     my $warning = '';
-    local ${^WARN_HOOK} = sub {
+    local $^WARN_HOOK = sub {
         $warning .= @_[0]->{description};
     };
 

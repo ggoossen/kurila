@@ -312,7 +312,7 @@ undef $@;
 # Poke a couple more parse failures
 
 our $context = 'x' x 256;
-eval qq("${context}y" =~ m/(?<=$context)y/);
+eval qq("{$context}y" =~ m/(?<=$context)y/);
 print "not " if $@->{description} !~ m%^\QLookbehind longer than 255 not%;
 print "ok 71\n";
 
@@ -1083,7 +1083,7 @@ $test++;
 
 our $w = 0;
 {
-    local ${^WARN_HOOK} = sub { $w = 1 };
+    local $^WARN_HOOK = sub { $w = 1 };
     local $^W = 1;
 	$w = 1 if ("1\n" x 102) =~ m/^\s*\n/m;
 }
@@ -1577,7 +1577,7 @@ EOT
     # from japhy
     my $w;
     use warnings;    
-    local ${^WARN_HOOK} = sub { $w .= shift->{description} . "\n" };
+    local $^WARN_HOOK = sub { $w .= shift->{description} . "\n" };
 
     $w = "";
     eval 'qr/(?c)/';
@@ -2852,8 +2852,8 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     my $attr = 'Name-1' ;
 
     my $NormalChar          = qr/[\p{IsDigit}\p{IsLower}\p{IsUpper}]/;
-    my $NormalWord          = qr/${NormalChar}+?/;
-    my $PredNameHyphen      = qr/^${NormalWord}(\-${NormalWord})*?$/;
+    my $NormalWord          = qr/$NormalChar+?/;
+    my $PredNameHyphen      = qr/^$NormalWord(\-$NormalWord)*?$/;
 
     $attr =~ m/^$/;
     ok( $attr =~ $PredNameHyphen, "[perl #19767] original test" );
@@ -3116,8 +3116,8 @@ ok(("foba  ba$s" =~ qr/(foo|BaSS|bar)/i)
     &&  $1 eq "ba$s",
    "TRIEF + LATIN SMALL LETTER SHARP S =~ SS # TODO");
 
-ok(("foba  ba${s}pxySS$s$s" =~ qr/(b(?:a${s}t|a${s}f|a${s}p)[xy]+$s*)/i)
-    &&  $1 eq "ba${s}pxySS$s$s",
+ok(("foba  ba{$s}pxySS$s$s" =~ qr/(b(?:a$st|a$sf|a$sp)[xy]+$s*)/i)
+    &&  $1 eq "ba{$s}pxySS$s$s",
    "COMMON PREFIX TRIEF + LATIN SMALL LETTER SHARP S # TODO");
 
    
@@ -3229,7 +3229,7 @@ if ($ordA == 193) {
     $str .= ($delim x 4);
     my $res;
     my $matched;
-    if ($str =~ s/^(.*?)${delim}{4}//s) {
+    if ($str =~ s/^(.*?)$delim{4}//s) {
         $res = $1;
         $matched=1;
     } 
@@ -3258,10 +3258,10 @@ if ($ordA == 193) {
 
     local $" = ','; # non-whitespace and non-RE-specific
     ok('abc' =~ m/(.)(.)(.)/, 'the last successful match is bogus');
-    ok("A@+B"  =~ m/A@{+}B/,  'interpolation of @+ in /@{+}/');
-    ok("A@-B"  =~ m/A@{-}B/,  'interpolation of @- in /@{-}/');
-    ok("A@+B"  =~ m/A@{+}B/x, 'interpolation of @+ in /@{+}/x');
-    ok("A@-B"  =~ m/A@{-}B/x, 'interpolation of @- in /@{-}/x');
+    ok("A@+B"  =~ m/A@+B/,  'interpolation of @+ in /@{+}/');
+    ok("A@-B"  =~ m/A@-B/,  'interpolation of @- in /@{-}/');
+    ok("A@+B"  =~ m/A@+B/x, 'interpolation of @+ in /@{+}/x');
+    ok("A@-B"  =~ m/A@-B/x, 'interpolation of @- in /@{-}/x');
 }
 
 {
@@ -3274,7 +3274,7 @@ if ($ordA == 193) {
     {
         my $code;
         my $w="";
-        local ${^WARN_HOOK} = sub { $w.=shift->message };
+        local $^WARN_HOOK = sub { $w.=shift->message };
         eval($code=<<'EOFTEST') or die "$@\n$code\n";
         {
             use warnings;
@@ -3379,10 +3379,10 @@ SKIP:{
     for my $uni (@ary) {
 	my ($r1, $c1, $r2, $c2) = eval qq{
 	    use utf8;
-	    scalar("..foo foo.." =~ m/(?'${uni}'foo) \\k'${uni}'/),
-		\%+\{${uni}\},
-	    scalar("..bar bar.." =~ m/(?<${uni}>bar) \\k<${uni}>/),
-		\%+\{${uni}\};
+	    scalar("..foo foo.." =~ m/(?'{$uni}'foo) \\k'{$uni}'/),
+		\%+\{{$uni}\},
+	    scalar("..bar bar.." =~ m/(?<{$uni}>bar) \\k<{$uni}>/),
+		\%+\{{$uni}\};
 	};
 	ok($r1,                         "Named capture UTF (?'')");
 	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
@@ -3913,10 +3913,10 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     local $Message = "http://nntp.perl.org/group/perl.perl5.porters/118663";
     my $qr_barR1 = qr/(bar)\g-1/;
     ok("foobarbarxyz" =~ $qr_barR1);
-    ok("foobarbarxyz" =~ qr/foo${qr_barR1}xyz/);
-    ok("foobarbarxyz" =~ qr/(foo)${qr_barR1}xyz/);
+    ok("foobarbarxyz" =~ qr/foo$qr_barR1xyz/);
+    ok("foobarbarxyz" =~ qr/(foo)$qr_barR1xyz/);
     ok("foobarbarxyz" =~ qr/(foo)(bar)\g{-1}xyz/);
-    ok("foobarbarxyz" =~ qr/(foo${qr_barR1})xyz/);
+    ok("foobarbarxyz" =~ qr/(foo$qr_barR1)xyz/);
     ok("foobarbarxyz" =~ qr/(foo(bar)\g{-1})xyz/);
 } 
 {
@@ -4038,7 +4038,7 @@ sub kt
         no warnings 'utf8'; # oops
         my $c = chr $u;
         my $x = sprintf '%04X', $u;
-        ok( "A${c}B" =~ m/A[\0-\x{10000}]B/, "unicode range - $x");
+        ok( "A{$c}B" =~ m/A[\0-\x{10000}]B/, "unicode range - $x");
     }
 }
 
@@ -4063,9 +4063,9 @@ sub kt
     use warnings;
     local $Message = "ASCII pattern that really is utf8";
     my @w;
-    local ${^WARN_HOOK}=sub{push @w,"@_"};
+    local $^WARN_HOOK=sub{push @w,"@_"};
     my $c=qq(\x{DF}); 
-    ok($c=~m/${c}|\x{100}/);
+    ok($c=~m/$c|\x{100}/);
     ok(@w==0);
 }    
 {
@@ -4310,7 +4310,7 @@ ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
 # [perl #45337] utf8 + "[a]a{2}" + /$.../ = panic: sv_len_utf8 cache
 
 {
-    local ${^UTF8CACHE} = -1;
+    local $^UTF8CACHE = -1;
     use utf8;
     my $s="[a]a\{2\}";
     ok("aaa" =~ m/$s/, "#45337");

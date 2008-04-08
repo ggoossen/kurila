@@ -30,7 +30,7 @@ ok($deparse);
 
 # Tell B::Deparse about our ambient pragmas
 { my ($hint_bits, $warning_bits, $hinthash);
- BEGIN { ($hint_bits, $warning_bits, $hinthash) = ($^H, ${^WARNING_BITS}, \%^H); }
+ BEGIN { ($hint_bits, $warning_bits, $hinthash) = ($^H, $^WARNING_BITS, \%^H); }
  $deparse->ambient_pragmas (
      hint_bits    => $hint_bits,
      warning_bits => $warning_bits,
