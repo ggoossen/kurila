@@ -220,7 +220,7 @@ foreach my $test (@tests) {
     my $num_args = @$test;
 
     my $warning;
-    local ${^WARN_HOOK} = sub { $warning .= @_[0]->message; };
+    local $^WARN_HOOK = sub { $warning .= @_[0]->message; };
     ok !is_deeply(@$test);
 
     like \$warning, 

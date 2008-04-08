@@ -12,9 +12,9 @@ BEGIN { print "1..17\n"; }
 BEGIN {
     print "not " if exists %^H{foo};
     print "ok 1 - \$^H\{foo\} doesn't exist initially\n";
-    if (${^OPEN}) {
+    if ($^OPEN) {
 	print "not " unless $^H ^&^ 0x00020000;
-	print "ok 2 - \$^H contains HINT_LOCALIZE_HH initially with ${^OPEN}\n";
+	print "ok 2 - \$^H contains HINT_LOCALIZE_HH initially with {$^OPEN}\n";
     } else {
 	print "not " if $^H ^&^ 0x00020000;
 	print "ok 2 - \$^H doesn't contain HINT_LOCALIZE_HH initially\n";
@@ -45,9 +45,9 @@ BEGIN {
     CHECK {
 	print "not " if exists %^H{foo};
 	print "ok 9 - \$^H\{foo\} doesn't exist when compilation complete\n";
-	if (${^OPEN}) {
+	if ($^OPEN) {
 	    print "not " unless $^H ^&^ 0x00020000;
-	    print "ok 10 - \$^H contains HINT_LOCALIZE_HH when compilation complete with ${^OPEN}\n";
+	    print "ok 10 - \$^H contains HINT_LOCALIZE_HH when compilation complete with {$^OPEN}\n";
 	} else {
 	    print "not " if $^H ^&^ 0x00020000;
 	    print "ok 10 - \$^H doesn't contain HINT_LOCALIZE_HH when compilation complete\n";
@@ -55,9 +55,9 @@ BEGIN {
     }
     print "not " if exists %^H{foo};
     print "ok 11 - \$^H\{foo\} doesn't exist at runtime\n";
-    if (${^OPEN}) {
+    if ($^OPEN) {
 	print "not " unless $^H ^&^ 0x00020000;
-	print "ok 12 - \$^H contains HINT_LOCALIZE_HH at run-time with ${^OPEN}\n";
+	print "ok 12 - \$^H contains HINT_LOCALIZE_HH at run-time with {$^OPEN}\n";
     } else {
 	print "not " if $^H ^&^ 0x00020000;
 	print "ok 12 - \$^H doesn't contain HINT_LOCALIZE_HH at run-time\n";
@@ -74,9 +74,9 @@ BEGIN {
 BEGIN {
     print "not " if exists %^H{foo};
     print "ok 7 - \%^H\{foo\} doesn't exist while finishing compilation\n";
-    if (${^OPEN}) {
+    if ($^OPEN) {
 	print "not " unless $^H ^&^ 0x00020000;
-	print "ok 8 - \$^H contains HINT_LOCALIZE_HH while finishing compilation with ${^OPEN}\n";
+	print "ok 8 - \$^H contains HINT_LOCALIZE_HH while finishing compilation with {$^OPEN}\n";
     } else {
 	print "not " if $^H ^&^ 0x00020000;
 	print "ok 8 - \$^H doesn't contain HINT_LOCALIZE_HH while finishing compilation\n";

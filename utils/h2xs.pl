@@ -610,7 +610,7 @@ if( $opt_v ){
     my $beta_version = $temp_version =~ s/(\d)_(\d\d)/$1$2/;
     my $notnum;
     {
-        local ${^WARN_HOOK} = sub { $notnum = 1 };
+        local $^WARN_HOOK = sub { $notnum = 1 };
         use warnings 'numeric';
         $temp_version = 0+$temp_version;
     }
@@ -1249,7 +1249,7 @@ $exp_doc$meth_doc$revhist
 #
 #=head1 AUTHOR
 #
-#$author, E<lt>${email}E<gt>
+#$author, E<lt>$emailE<gt>
 #
 #=head1 COPYRIGHT AND LICENSE
 #
@@ -1293,7 +1293,7 @@ print XS <<"END" if $opt_g;
 
 /* Global Data */
 
-#define MY_CXT_KEY "${module}::_guts" XS_VERSION
+#define MY_CXT_KEY "$module::_guts" XS_VERSION
 
 typedef struct \{
     /* Put Global Data in here */
@@ -1510,7 +1510,7 @@ sub print_accessors {
   my $ptrname = normalize_type("$name *");
   print $fh <<"EOF";
 
-MODULE = $module		PACKAGE = ${name}		$prefix
+MODULE = $module		PACKAGE = $name		$prefix
 
 $name *
 _to_ptr(THIS)
@@ -1539,7 +1539,7 @@ new(CLASS)
     OUTPUT:
 	RETVAL
 
-MODULE = $module		PACKAGE = ${name}Ptr		$prefix
+MODULE = $module		PACKAGE = $namePtr		$prefix
 
 EOF
   my @items = @$struct;
@@ -1813,7 +1813,7 @@ EOC
   print PL <<END;
     LIBS              => ['$extralibs'], # e.g., '-lm'
     DEFINE            => '$opt_F', # e.g., '-DHAVE_SOMETHING'
-$Icomment    INC               => '$I', # e.g., '${Ihelp}-I/usr/include/other'
+$Icomment    INC               => '$I', # e.g., '$Ihelp-I/usr/include/other'
 END
 
   my $C = grep {$_ ne "$modfname.c"}
@@ -1824,7 +1824,7 @@ END
 EOC
 
   print PL <<END;
-$Ccomment    ${Cpre}OBJECT            => '\$(O_FILES)', # link all the C files too
+$Ccomment    $CpreOBJECT            => '\$(O_FILES)', # link all the C files too
 END
 } # ' # Grr
 print PL ");\n";

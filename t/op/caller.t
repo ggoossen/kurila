@@ -103,11 +103,11 @@ sub testwarn {
 	$registered = $default;
 	vec($registered, $warnings::LAST_BIT/2, 2) = 1;
     }
-    BEGIN { check_bits( ${^WARNING_BITS}, "\0" x 12, 'all bits off via "no warnings"' ) }
+    BEGIN { check_bits( $^WARNING_BITS, "\0" x 12, 'all bits off via "no warnings"' ) }
     testwarn("\0" x 12, 'no bits');
 
     use warnings;
-    BEGIN { check_bits( ${^WARNING_BITS}, $default,
+    BEGIN { check_bits( $^WARNING_BITS, $default,
 			'default bits on via "use warnings"' ); }
     BEGIN { testwarn($default, 'all'); }
     # run-time :
@@ -115,7 +115,7 @@ sub testwarn {
     testwarn($registered, 'ahead of w::r');
 
     use warnings::register;
-    BEGIN { check_bits( ${^WARNING_BITS}, $registered,
+    BEGIN { check_bits( $^WARNING_BITS, $registered,
 			'warning bits on via "use warnings::register"' ) }
     testwarn($registered, 'following w::r');
 }

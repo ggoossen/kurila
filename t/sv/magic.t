@@ -2,7 +2,7 @@
 
 BEGIN {
     $| = 1;
-    ${^WARN_HOOK} = sub { die "Dying on warning: ", @_ };
+    $^WARN_HOOK = sub { die "Dying on warning: ", @_ };
 }
 
 use warnings;
@@ -350,7 +350,7 @@ else {
 {
     my $ok = 1;
     my $warn = '';
-    local ${^WARN_HOOK} = sub { $ok = 0; $warn = join '', @_; };
+    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @_; };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }
@@ -406,9 +406,9 @@ eval { ok $^S == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
 ok $^S == 0 && defined $^S;
 
-ok ${^TAINT} == 0;
-eval { ${^TAINT} = 1 };
-ok ${^TAINT} == 0;
+ok $^TAINT == 0;
+eval { $^TAINT = 1 };
+ok $^TAINT == 0;
 
 # 5.6.1 had a bug: @+ and @- were not properly interpolated
 # into double-quoted strings

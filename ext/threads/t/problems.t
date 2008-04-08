@@ -87,7 +87,7 @@ sub is($$$)
     lock($test);
     threads->create( sub {1} )->join;
     my $not = eval { Config::myconfig() } ? '' : 'not ';
-    print "${not}ok $test - Are we able to call Config::myconfig after clone\n";
+    print "{$not}ok $test - Are we able to call Config::myconfig after clone\n";
     $test++;
 }
 

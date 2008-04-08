@@ -1,6 +1,6 @@
 package HasSigDie;
 
-${^DIE_HOOK} = sub { "Die, Bart, Die!" };
+$^DIE_HOOK = sub { "Die, Bart, Die!" };
 
 1;
 

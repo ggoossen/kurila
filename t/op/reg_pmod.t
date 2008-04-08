@@ -18,7 +18,7 @@ our @tests = (
 plan tests => 4 * @tests + 2;
 my $W = "";
 
-${^WARN_HOOK} = sub { $W.=join("",@_); };
+$^WARN_HOOK = sub { $W.=join("",@_); };
 sub _u($$) { "@_[0] is ".(defined @_[1] ? "'@_[1]'" : "undef") }
 
 $_ = '123-456-789';
@@ -38,10 +38,10 @@ foreach my $test (@tests) {
     SKIP: {
         skip "/$pat/$p failed to match", 3
             unless $ok;
-        is(${^PREMATCH},  $l,_u "$test_name: ^PREMATCH",$l);
-        is(${^MATCH},     $m,_u "$test_name: ^MATCH",$m );
-        is(${^POSTMATCH}, $r,_u "$test_name: ^POSTMATCH",$r );
+        is($^PREMATCH,  $l,_u "$test_name: ^PREMATCH",$l);
+        is($^MATCH,     $m,_u "$test_name: ^MATCH",$m );
+        is($^POSTMATCH, $r,_u "$test_name: ^POSTMATCH",$r );
     }
 }
 is($W,"","No warnings should be produced");
-ok(!defined ${^MATCH}, "No /p in scope so ^MATCH is undef");
+ok(!defined $^MATCH, "No /p in scope so ^MATCH is undef");

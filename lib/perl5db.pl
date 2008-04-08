@@ -1385,8 +1385,8 @@ sub safe_do {
     my $file = shift;
 
     # Just exactly what part of the word "CORE::" don't you understand?
-    local ${^WARN_HOOK};
-    local ${^DIE_HOOK};
+    local $^WARN_HOOK;
+    local $^DIE_HOOK;
 
     unless ( is_safe_file($file) ) {
         CORE::warn <<EO_GRIPE;
@@ -2297,8 +2297,8 @@ completely replacing it.
 
                     # Squelch signal handling; we want to keep control here
                     # if something goes loco during the alias eval.
-                    local ${^DIE_HOOK};
-                    local ${^WARN_HOOK};
+                    local $^DIE_HOOK;
+                    local $^WARN_HOOK;
 
                     # This is a command, so we eval it in the DEBUGGER's
                     # scope! Otherwise, we can't see the special debugger
@@ -2863,8 +2863,8 @@ mess us up.
                     if ( $inpat ne "" ) {
 
                         # Turn of warn and die procesing for a bit.
-                        local ${^DIE_HOOK};
-                        local ${^WARN_HOOK};
+                        local $^DIE_HOOK;
+                        local $^WARN_HOOK;
 
                         # Create the pattern.
                         eval '$inpat =~ m' . "\a$inpat\a";
@@ -2938,8 +2938,8 @@ Same as for C</>, except the loop runs backwards.
                     if ( $inpat ne "" ) {
 
                         # Turn off die & warn handlers.
-                        local ${^DIE_HOOK};
-                        local ${^WARN_HOOK};
+                        local $^DIE_HOOK;
+                        local $^WARN_HOOK;
                         eval '$inpat =~ m' . "\a$inpat\a";
 
                         if ( $@ ne "" ) {
@@ -3196,8 +3196,8 @@ Manipulates C<%alias> to add or list command aliases.
                         %alias{$k} = "s\a$k\a$v\a";
 
                         # Turn off standard warn and die behavior.
-                        local ${^DIE_HOOK};
-                        local ${^WARN_HOOK};
+                        local $^DIE_HOOK;
+                        local $^WARN_HOOK;
 
                         # Is it valid Perl?
                         unless ( eval "sub \{ s\a$k\a$v\a \}; 1" ) {
@@ -6635,7 +6635,7 @@ sub set_list {
     my $val;
 
     # VAR_n: how many we have. Scalar assignment gets the number of items.
-    %ENV{"${stem}_n"} = @list;
+    %ENV{"{$stem}_n"} = @list;
 
     # Grab each item in the list, escape the backslashes, encode the non-ASCII
     # as hex, and then save in the appropriate VAR_0, VAR_1, etc.
@@ -6643,7 +6643,7 @@ sub set_list {
         $val = @list[$i];
         $val =~ s/\\/\\\\/g;
         $val =~ s/([\0-\37\177\200-\377])/{"\\0x" . unpack('H2',$1)}/g;
-        %ENV{"${stem}_$i"} = $val;
+        %ENV{"{$stem}_$i"} = $val;
     } ## end for $i (0 .. @list)
 } ## end sub set_list
 
@@ -6657,10 +6657,10 @@ back, and then pull VAR_0, VAR_1. etc. back out.
 sub get_list {
     my $stem = shift;
     my @list;
-    my $n = delete %ENV{"${stem}_n"};
+    my $n = delete %ENV{"{$stem}_n"};
     my $val;
     for $i ( 0 .. $n - 1 ) {
-        $val = delete %ENV{"${stem}_$i"};
+        $val = delete %ENV{"{$stem}_$i"};
         $val =~ s/\\((\\)|0x(..))/{ $2 ? $2 : pack('H2', $3) }/g;
         push @list, $val;
     }
@@ -7606,8 +7606,8 @@ sub dbwarn {
 
     # Turn off warn and die handling to prevent recursive entries to this
     # routine.
-    local ${^WARN_HOOK} = '';
-    local ${^DIE_HOOK}  = '';
+    local $^WARN_HOOK = '';
+    local $^DIE_HOOK  = '';
 
     # Save the current values of $single and $trace, and then turn them off.
     my ( $mysingle, $mytrace ) = ( $single, $trace );
@@ -7638,13 +7638,13 @@ displaying the exception via its C<dbwarn()> routine.
 sub dbdie {
     local $frame         = 0;
     local $doret         = -2;
-    local ${^DIE_HOOK}  = '';
-    local ${^WARN_HOOK} = '';
+    local $^DIE_HOOK  = '';
+    local $^WARN_HOOK = '';
     my $i      = 0;
     my $ineval = 0;
     my $sub;
     if ( $dieLevel +> 2 ) {
-        local ${^WARN_HOOK} = \&dbwarn;
+        local $^WARN_HOOK = \&dbwarn;
         &warn(@_);    # Yell no matter what
         return;
     }
@@ -7676,13 +7676,13 @@ being debugged in place.
 
 sub warnLevel {
     if (@_) {
-        $prevwarn = ${^WARN_HOOK} unless $warnLevel;
+        $prevwarn = $^WARN_HOOK unless $warnLevel;
         $warnLevel = shift;
         if ($warnLevel) {
-            ${^WARN_HOOK} = \&DB::dbwarn;
+            $^WARN_HOOK = \&DB::dbwarn;
         }
         elsif ($prevwarn) {
-            ${^WARN_HOOK} = $prevwarn;
+            $^WARN_HOOK = $prevwarn;
         }
     } ## end if (@_)
     $warnLevel;
@@ -7699,12 +7699,12 @@ zero lets you use your own C<die()> handler.
 sub dieLevel {
     local $\ = '';
     if (@_) {
-        $prevdie = ${^DIE_HOOK} unless $dieLevel;
+        $prevdie = $^DIE_HOOK unless $dieLevel;
         $dieLevel = shift;
         if ($dieLevel) {
 
             # Always set it to dbdie() for non-zero values.
-            ${^DIE_HOOK} = \&DB::dbdie;    # if $dieLevel < 2;
+            $^DIE_HOOK = \&DB::dbdie;    # if $dieLevel < 2;
 
             # No longer exists, so don't try  to use it.
             #$SIG{__DIE__} = \&DB::diehard if $dieLevel >= 2;
@@ -7722,7 +7722,7 @@ sub dieLevel {
 
         # Put the old one back if there was one.
         elsif ($prevdie) {
-            ${^DIE_HOOK} = $prevdie;
+            $^DIE_HOOK = $prevdie;
             print $OUT "Default die handler restored.\n";
         }
     } ## end if (@_)
@@ -7875,10 +7875,10 @@ sub methods_via {
     for $name (
 
         # Keep if this is a defined subroutine in this class.
-        grep { defined &{ %{*{Symbol::fetch_glob("${class}::")}}{$_} } }
+        grep { defined &{ %{*{Symbol::fetch_glob("{$class}::")}}{$_} } }
 
         # Extract from all the symbols in this class.
-        sort keys %{*{Symbol::fetch_glob("${class}::")}}
+        sort keys %{*{Symbol::fetch_glob("{$class}::")}}
       )
     {
 
@@ -7896,7 +7896,7 @@ sub methods_via {
 
     # $crawl_upward true: keep going up the tree.
     # Find all the classes this one is a subclass of.
-    for $name ( @{*{Symbol::fetch_glob("${class}::ISA")}} ) {
+    for $name ( @{*{Symbol::fetch_glob("{$class}::ISA")}} ) {
 
         # Set up the new prefix.
         $prepend = $prefix ? $prefix . " -> $name" : $name;
@@ -8758,7 +8758,7 @@ sub restart {
     }
 
     # Turn on taint if it was on before.
-    push @flags, '-T' if ${^TAINT};
+    push @flags, '-T' if $^TAINT;
 
     # Arrange for setting the old INC:
     # Save the current @init_INC in the environment.

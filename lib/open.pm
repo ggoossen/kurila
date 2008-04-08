@@ -50,7 +50,7 @@ sub import {
     my ($class,@args) = @_;
     die("open: needs explicit list of PerlIO layers") unless @args;
     my $std;
-    my ($in,$out) = split(m/\0/,(${^OPEN} || "\0"), -1);
+    my ($in,$out) = split(m/\0/,($^OPEN || "\0"), -1);
     while (@args) {
 	my $type = shift(@args);
 	my $dscp;
@@ -94,7 +94,7 @@ sub import {
 	    die "Unknown PerlIO layer class '$type'";
 	}
     }
-    ${^OPEN} = join("\0", $in, $out);
+    $^OPEN = join("\0", $in, $out);
     if ($std) {
 	if ($in) {
 	    if ($in =~ m/:utf8\b/) {

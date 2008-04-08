@@ -206,7 +206,7 @@ foreach my $forbidden (~< *DATA) {
 
 {
     my @warnings;
-    local ${^WARN_HOOK} = sub { push @warnings, @_[0]->message };
+    local $^WARN_HOOK = sub { push @warnings, @_[0]->message };
 
     eval q{
 	use warnings;

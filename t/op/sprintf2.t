@@ -32,7 +32,7 @@ for my $i (1, 5, 10, 20, 50, 100) {
 for my $i (1, 3, 5, 10) {
     my $string = "\x{0410}"x($i+10);   # cyrillic capital A
     my $expect = "\x{0410}"x$i;        # cut down to exactly $i characters
-    my $format = "\%$i.${i}s";
+    my $format = "\%$i.{$i}s";
     is(sprintf($format, $string), $expect,
        "width & precision interplay with utf8 strings, length=$i");
 }
@@ -47,16 +47,16 @@ fresh_perl_is(
 
 # check overflows
 for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
-    dies_like( sub {sprintf "\%${_}d", 0},
+    dies_like( sub {sprintf "\%{$_}d", 0},
                qr/^Integer overflow in format string for sprintf/, "overflow in sprintf");
-    dies_like( sub {printf "\%${_}d\n", 0},
+    dies_like( sub {printf "\%{$_}d\n", 0},
                qr/^Integer overflow in format string for prtf/, "overflow in printf");
 }
 
 # check %NNN$ for range bounds
 {
     my ($warn, $bad) = (0,0);
-    local ${^WARN_HOOK} = sub {
+    local $^WARN_HOOK = sub {
 	if (@_[0]->{description} =~ m/uninitialized/) {
 	    $warn++
 	}
@@ -75,7 +75,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 {
     foreach my $ord (0 .. 255) {
 	my $bad = 0;
-	local ${^WARN_HOOK} = sub {
+	local $^WARN_HOOK = sub {
 	    if (@_[0]->{description} !~ m/^Invalid conversion in sprintf/) {
 		warn @_[0];
 		$bad++;
@@ -115,7 +115,7 @@ for my $num (0, -1, 1) {
 	    for my $f3 ('', @flags) { # '' for doubled flags
 		my $flag = $f1.$f2.$f3;
 		my $width = 4;
-		my $fmt   = '%'."${flag}${width}d";
+		my $fmt   = '%'."{$flag}{$width}d";
 		my $result = sprintf($fmt, $num);
 		my $expect = mysprintf_int_flags($fmt, $num);
 		is($result, $expect, qq/sprintf("$fmt",$num)/);
@@ -124,7 +124,7 @@ for my $num (0, -1, 1) {
 
 		for my $f4 (@flags) { # quadrupled flags
 		    my $flag = $f1.$f2.$f3.$f4;
-		    my $fmt   = '%'."${flag}${width}d";
+		    my $fmt   = '%'."{$flag}{$width}d";
 		    my $result = sprintf($fmt, $num);
 		    my $expect = mysprintf_int_flags($fmt, $num);
 		    is($result, $expect, qq/sprintf("$fmt",$num)/);

@@ -80,7 +80,7 @@ if ($have_fork) {
 	    my $ppid = getppid();
 	    print "# I am the timer process $$, sleeping for $waitfor seconds...\n";
 	    sleep($waitfor);
-	    warn "\n$0: overall time allowed for tests (${waitfor}s) exceeded!\n";
+	    warn "\n$0: overall time allowed for tests ({$waitfor}s) exceeded!\n";
 	    print "# Terminating main process $ppid...\n";
 	    kill('TERM', $ppid);
 	    print "# This is the timer process $$, over and out.\n";

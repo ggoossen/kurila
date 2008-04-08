@@ -27,7 +27,7 @@ sub import {
 
     my $svtype = uc reftype($svref);
     my $pkgmeth;
-    $pkgmeth = UNIVERSAL::can($home_stash, "MODIFY_${svtype}_ATTRIBUTES")
+    $pkgmeth = UNIVERSAL::can($home_stash, "MODIFY_{$svtype}_ATTRIBUTES")
 	if defined $home_stash && $home_stash ne '';
     my @badattrs;
     if ($pkgmeth) {
@@ -67,7 +67,7 @@ sub get ($) {
     my $stash = _guess_stash $svref;
     $stash = caller unless defined $stash;
     my $pkgmeth;
-    $pkgmeth = UNIVERSAL::can($stash, "FETCH_${svtype}_ATTRIBUTES")
+    $pkgmeth = UNIVERSAL::can($stash, "FETCH_{$svtype}_ATTRIBUTES")
 	if defined $stash && $stash ne '';
     return $pkgmeth ?
 		(_fetch_attrs($svref), $pkgmeth->($stash, $svref)) :

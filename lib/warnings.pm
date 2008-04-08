@@ -340,7 +340,7 @@ sub import
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    my $mask = ${^WARNING_BITS} ;
+    my $mask = $^WARNING_BITS ;
 
     if (vec($mask, %Offsets{'all'}, 1)) {
         $mask ^|^= %Bits{'all'} ;
@@ -367,7 +367,7 @@ sub import
           { die("Unknown warnings category '$word'")}
     }
 
-    ${^WARNING_BITS} = $mask ;
+    $^WARNING_BITS = $mask ;
 }
 
 sub unimport 
@@ -375,7 +375,7 @@ sub unimport
     shift;
 
     my $catmask ;
-    my $mask = ${^WARNING_BITS} ;
+    my $mask = $^WARNING_BITS ;
 
     if (vec($mask, %Offsets{'all'}, 1)) {
         $mask ^|^= %Bits{'all'} ;
@@ -395,7 +395,7 @@ sub unimport
           { die("Unknown warnings category '$word'")}
     }
 
-    ${^WARNING_BITS} = $mask ;
+    $^WARNING_BITS = $mask ;
 }
 
 my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
