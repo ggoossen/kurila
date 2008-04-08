@@ -504,7 +504,7 @@ foreach my $prefix (qw(ccflags ldflags)) {
     my $withlargefiles = fetch_string ({}, $prefix . "_uselargefiles");
     if (defined $withlargefiles) {
         $value =~ s/\Q$withlargefiles\E\b//;
-        $heavy_txt .= "${prefix}_nolargefiles='$value'\n";
+        $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
     }
 }
 
@@ -528,7 +528,7 @@ foreach my $prefix (qw(libs libswanted)) {
 	    $value = join(' ', @libswanted);
 	}
     }
-    $heavy_txt .= "${prefix}_nolargefiles='$value'\n";
+    $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
 }
 
 $heavy_txt .= "EOVIRTUAL\n";
@@ -624,7 +624,7 @@ sub config_vars {
 	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';
 	    $v = 'undef' unless defined $v;
-	    print "${prfx}'${v}'$lnend";
+	    print "{$prfx}'{$v}'$lnend";
 	}
     }
 }

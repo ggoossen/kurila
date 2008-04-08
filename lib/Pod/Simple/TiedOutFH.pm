@@ -10,7 +10,7 @@ sub handle_on { # some horrible frightening things are encapsulated in here
   my $class = shift;
   $class = ref($class) || $class;
   
-  Carp::croak "Usage: ${class}->handle_on(\$somescalar)" unless @_;
+  Carp::croak "Usage: {$class}->handle_on(\$somescalar)" unless @_;
   
   my $x = (defined(@_[0]) and ref(@_[0]))
     ? @_[0]

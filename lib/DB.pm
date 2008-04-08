@@ -115,7 +115,7 @@ sub DB {
     }
   }
   if ($DB::single || $DB::trace || $DB::signal) {
-    $DB::subname = ($DB::sub =~ m/\'|::/) ? $DB::sub : "${DB::package}::$DB::sub"; #';
+    $DB::subname = ($DB::sub =~ m/\'|::/) ? $DB::sub : "{$DB::package}::$DB::sub"; #';
     DB->loadfile($DB::filename, $DB::lineno);
   }
   $evalarg = $action, &eval if $action;
@@ -412,7 +412,7 @@ sub set_tbreak {
 sub _find_subline {
   my $name = shift;
   $name =~ s/\'/::/;
-  $name = "${DB::package}\:\:" . $name if $name !~ m/::/;
+  $name = "{$DB::package}\:\:" . $name if $name !~ m/::/;
   $name = "main" . $name if substr($name,0,2) eq "::";
   my($fname, $from, $to) = (%DB::sub{$name} =~ m/^(.*):(\d+)-(\d+)$/);
   if ($from) {

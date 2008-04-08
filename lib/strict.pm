@@ -3,9 +3,10 @@ package strict;
 $strict::VERSION = "1.04";
 
 # Verify that we're called correctly so that strictures will work.
-unless ( __FILE__ =~ m/(^|[\/\\])\Q${\__PACKAGE__}\E\.pmc?$/ ) {
+my $pkg = __PACKAGE__;
+unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
     my (undef, $f, $l) = caller;
-    die("Incorrect use of pragma '${\__PACKAGE__}' at $f line $l.\n");
+    die("Incorrect use of pragma '{__PACKAGE__}' at $f line $l.\n");
 }
 
 my %bitmask = (

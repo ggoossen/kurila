@@ -185,7 +185,7 @@ foreach my $argv (@ARGV) {
 	next if m/^--- [0-9,]+ ----$/ || m/^\*\*\* [0-9,]+ \*\*\*\*$/;
 	$prologue = 0;
 
-	print "Last: $prevline","This: ${_}Got:  $type\n\n" if $::opt_d;
+	print "Last: $prevline","This: {$_}Got:  $type\n\n" if $::opt_d;
 
 	# Some patches have Index lines but not diff headers
 	# Patch copes with this, so must we. It's also handy for

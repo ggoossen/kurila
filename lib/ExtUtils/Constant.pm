@@ -237,7 +237,7 @@ EOT
   foreach $type (sort keys %XS_Constant) {
     # '' marks utf8 flag needed.
     next if $type eq '';
-    $xs .= "\t/* Uncomment this if you need to return ${type}s\n"
+    $xs .= "\t/* Uncomment this if you need to return {$type}s\n"
       unless $what->{$type};
     $xs .= "        case PERL_constant_IS$type:\n";
     if (length %XS_Constant{$type}) {

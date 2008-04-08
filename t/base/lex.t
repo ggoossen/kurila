@@ -100,7 +100,7 @@ E1
 
 print "%foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
-print "${foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
+print "{$foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
 print "%{foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";

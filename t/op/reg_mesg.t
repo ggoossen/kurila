@@ -143,7 +143,7 @@ while (@death)
 
 
 our $warning;
-${^WARN_HOOK} = sub { $warning = shift };
+$^WARN_HOOK = sub { $warning = shift };
 
 while (@warning)
 {

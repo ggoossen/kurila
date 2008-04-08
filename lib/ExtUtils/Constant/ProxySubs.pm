@@ -198,7 +198,7 @@ sub WriteConstants {
 
     print $c_fh $self->header(), <<"EOADD";
 static void
-${c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
+{$c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
 	newCONSTSUB(hash, name, value);
 \}
 
@@ -282,7 +282,7 @@ BOOT:
 #endif
     HV *symbol_table = get_hv("$symbol_table", TRUE);
 #ifndef SYMBIAN
-    HV *${c_subname}_missing;
+    HV *{$c_subname}_missing;
 #endif
 EOBOOT
 
@@ -344,7 +344,7 @@ EOBOOT
 
     print $xs_fh <<"EOBOOT";
 #ifndef SYMBIAN
-	${c_subname}_missing = get_missing_hash(aTHX);
+	{$c_subname}_missing = get_missing_hash(aTHX);
 #endif
 EOBOOT
 
@@ -406,7 +406,7 @@ EXPLODE
 		CvXSUBANY(cv).any_ptr = NULL;
 	    \}
 #ifndef SYMBIAN
-	    if (!hv_store(${c_subname}_missing, value_for_notfound->name,
+	    if (!hv_store({$c_subname}_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0))
 		Perl_croak($athx "Couldn't add key '\%s' to missing_hash",
 			   value_for_notfound->name);
@@ -454,7 +454,7 @@ EOBOOT
 
 	my @tempvarnames = map {sprintf 'temp%d', $_} 0 .. $counter - 1;
 	printf $xs_fh <<"EOBOOT", $name, &$generator(@tempvarnames);
-	    ${c_subname}_add_symbol($athx symbol_table, "\%s",
+	    {$c_subname}_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT
 	print $xs_fh "        $item->{post}\n" if $item->{post};
@@ -493,8 +493,8 @@ $xs_subname(sv)
 #ifdef SYMBIAN
 	sv = newSVpvf("\%"SVf" is not a valid $package_sprintf_safe macro", sv);
 #else
-	HV *${c_subname}_missing = get_missing_hash(aTHX);
-	if (hv_exists(${c_subname}_missing, s, (I32)len)) \{
+	HV *{$c_subname}_missing = get_missing_hash(aTHX);
+	if (hv_exists({$c_subname}_missing, s, (I32)len)) \{
 	    sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro \%" SVf
 			  ", used", sv);
 	\} else \{

@@ -160,7 +160,7 @@ our $test;
 
 {
     sub add_an_x(@){
-        map {"${_}x"} @_;
+        map {"{$_}x"} @_;
     };
     cmp_ok( join("-",add_an_x(1,2,3,4)), 'eq', "1x-2x-3x-4x", 'add-an-x');
 }

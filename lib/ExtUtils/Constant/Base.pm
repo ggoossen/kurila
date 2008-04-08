@@ -864,12 +864,12 @@ sub C_constant {
         }
         $params = $self->params ($what);
         push @subs, $self->C_constant ({package=>$package,
-					subname=>"${subname}_$i",
+					subname=>"{$subname}_$i",
 					default_type => $default_type,
 					types => $what, indent => $indent,
 					breakout => [$i, $items]},
 				       @{@by_length[$i]});
-        $body .= "    return ${subname}_$i ("
+        $body .= "    return {$subname}_$i ("
 	  # Eg "aTHX_ "
 	  . $self->C_constant_prefix_param($params)
 	    # Probably "name"
