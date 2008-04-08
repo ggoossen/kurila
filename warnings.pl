@@ -427,9 +427,10 @@ our $VERSION = '1.06';
 
 # Verify that we're called correctly so that warnings will work.
 # see also strict.pm.
-unless ( __FILE__ =~ m/(^|[\/\\])\Q${\__PACKAGE__}\E\.pmc?$/ ) {
+my $pkg = __PACKAGE__;
+unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
     my (undef, $f, $l) = caller;
-    die("Incorrect use of pragma '${\__PACKAGE__}' at $f line $l.\n");
+    die("Incorrect use of pragma '{__PACKAGE__}' at $f line $l.\n");
 }
 
 =head1 NAME
@@ -599,7 +600,7 @@ sub import
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    my $mask = ${^WARNING_BITS} ;
+    my $mask = $^WARNING_BITS ;
 
     if (vec($mask, %Offsets{'all'}, 1)) {
         $mask ^|^= %Bits{'all'} ;
@@ -626,7 +627,7 @@ sub import
           { die("Unknown warnings category '$word'")}
     }
 
-    ${^WARNING_BITS} = $mask ;
+    $^WARNING_BITS = $mask ;
 }
 
 sub unimport 
@@ -634,7 +635,7 @@ sub unimport
     shift;
 
     my $catmask ;
-    my $mask = ${^WARNING_BITS} ;
+    my $mask = $^WARNING_BITS ;
 
     if (vec($mask, %Offsets{'all'}, 1)) {
         $mask ^|^= %Bits{'all'} ;
@@ -654,7 +655,7 @@ sub unimport
           { die("Unknown warnings category '$word'")}
     }
 
-    ${^WARNING_BITS} = $mask ;
+    $^WARNING_BITS = $mask ;
 }
 
 my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();

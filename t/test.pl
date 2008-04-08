@@ -521,7 +521,7 @@ sub runperl {
     my $runperl = &_create_runperl;
     my $result;
 
-    my $tainted = ${^TAINT};
+    my $tainted = $^TAINT;
     my %args = @_;
     exists %args{switches} && grep m/^-T$/, @{%args{switches}} and $tainted = $tainted + 1;
 

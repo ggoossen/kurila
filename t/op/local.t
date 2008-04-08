@@ -220,20 +220,20 @@ is(@a[0].@a[1], "Xb");
 eval { %SIG{TERM} = 'foo' };
 like $@->{description}, qr/signal handler should be glob or .../;
 %SIG{INT} = \&foo;
-${^WARN_HOOK} = %SIG{INT};
+$^WARN_HOOK = %SIG{INT};
 {
     local(%SIG{TERM}) = %SIG{TERM};
     local(%SIG{INT}) = %SIG{INT};
-    local(${^WARN_HOOK}) = ${^WARN_HOOK};
+    local($^WARN_HOOK) = $^WARN_HOOK;
     is(%SIG{TERM}, undef);
     cmp_ok(%SIG{INT}, '\==', \&foo);
-    cmp_ok(${^WARN_HOOK}, '\==', \&foo);
+    cmp_ok($^WARN_HOOK, '\==', \&foo);
     local(%SIG{INT});
-    ${^WARN_HOOK} = undef;
+    $^WARN_HOOK = undef;
 }
 is(%SIG{TERM}, undef);
 cmp_ok(%SIG{INT}, '\==', \&foo);
-cmp_ok(${^WARN_HOOK}, '\==', \&foo);
+cmp_ok($^WARN_HOOK, '\==', \&foo);
 {
     my $d = join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG);
     local %SIG = %SIG;

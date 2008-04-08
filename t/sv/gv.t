@@ -63,7 +63,7 @@ is (scalar %foo, 0);
 {
     # test warnings from assignment of undef to glob
     my $msg = '';
-    local ${^WARN_HOOK} = sub { $msg = @_[0]->message };
+    local $^WARN_HOOK = sub { $msg = @_[0]->message };
     use warnings;
     *foo = 'bar';
     is($msg, '');
@@ -110,7 +110,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
     ++$test;
 
     my $warn;
-    local ${^WARN_HOOK} = sub {
+    local $^WARN_HOOK = sub {
 	$warn .= @_[0]->message;
     };
     my $val = *x{FILEHANDLE};
@@ -185,7 +185,7 @@ is(@j[0], 1);
 
 {
     my $w = '';
-    local ${^WARN_HOOK} = sub { $w = @_[0]->message };
+    local $^WARN_HOOK = sub { $w = @_[0]->message };
     sub abc1 ();
     local *abc1 = sub { };
     is ($w, '');
@@ -210,7 +210,7 @@ is(@j[0], 1);
 {
     # test the assignment of a GLOB to an LVALUE
     my $e = '';
-    local ${^DIE_HOOK} = sub { $e = @_[0]->message };
+    local $^DIE_HOOK = sub { $e = @_[0]->message };
     my $v;
     sub f { @_[0] = 0; @_[0] = "a"; @_[0] = *DATA }
     f($v);
@@ -222,7 +222,7 @@ is(@j[0], 1);
 {
     $e = '';
     # GLOB assignment to tied element
-    local ${^DIE_HOOK} = sub { $e = @_[0]->message };
+    local $^DIE_HOOK = sub { $e = @_[0]->message };
     sub T::TIEARRAY  { bless [] => "T" }
     sub T::STORE     { @_[0]->[ @_[1] ] = @_[2] }
     sub T::FETCH     { @_[0]->[ @_[1] ] }
@@ -316,7 +316,7 @@ my $ref_oonk = ''; # Was 'SCALAR';
 # Check that assignment to an existing typeglob works
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
+  local $^WARN_HOOK = sub { $w = @_[0]->message };
   *{Symbol::fetch_glob("zwot")} = \&{Symbol::fetch_glob("oonk")};
   is($w, '', "Should be no warning");
 }
@@ -333,7 +333,7 @@ sub spritsits () {
 # Check that assignment to an existing subroutine works
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
+  local $^WARN_HOOK = sub { $w = @_[0]->message };
   *{Symbol::fetch_glob("spritsits")} = \&{Symbol::fetch_glob("oonk")};
   like($w, qr/^Constant subroutine main::spritsits redefined/,
        "Redefining a constant sub should warn");
@@ -347,7 +347,7 @@ my $result;
 # Check that assignment to an existing typeglob works
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
+  local $^WARN_HOOK = sub { $w = @_[0]->message };
   $result = *{Symbol::fetch_glob("plunk")} = \&{Symbol::fetch_glob("oonk")};
   is($w, '', "Should be no warning");
 }
@@ -363,7 +363,7 @@ my $gr = eval '\*plunk' or die;
 
 {
   my $w = '';
-  local ${^WARN_HOOK} = sub { $w = @_[0]->message };
+  local $^WARN_HOOK = sub { $w = @_[0]->message };
   $result = *{$gr} = \&{Symbol::fetch_glob("oonk")};
   is($w, '', "Redefining a constant sub to another constant sub with the same underlying value should not warn (It's just re-exporting, and that was always legal)");
 }

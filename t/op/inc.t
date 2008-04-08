@@ -204,7 +204,7 @@ sub check_some_code {
     my ($start, $warn, $action, $description) = @_;
     my $warn_line = ($warn ? 'use' : 'no') . " warnings 'imprecision';";
     my @warnings;
-    local ${^WARN_HOOK} = sub {push @warnings, @_[0]->message};
+    local $^WARN_HOOK = sub {push @warnings, @_[0]->message};
 
     print "# checking $action under $warn_line\n";
     my $code = <<"EOC";

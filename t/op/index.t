@@ -113,7 +113,7 @@ is(rindex("abc", "", 4), 3);
     my $t = $b.'pqrxyz';
     is(index($t, 'pqr'), 1, "0xfffffffd is a single character");
 
-    local ${^UTF8CACHE} = -1;
+    local $^UTF8CACHE = -1;
     is(index($t, 'xyz'), 4, "0xfffffffd and utf8cache");
 }
 

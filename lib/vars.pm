@@ -23,7 +23,7 @@ sub import {
 		    die("'$_' is not a valid variable name under strict vars");
 		}
 	    }
-	    $sym = "${callpack}::$sym" unless $sym =~ m/::/;
+	    $sym = "{$callpack}::$sym" unless $sym =~ m/::/;
 	    *{Symbol::fetch_glob($sym)} =
 		(  $ch eq "\$" ? \${*{Symbol::fetch_glob($sym)}}
 		 : $ch eq "\@" ? \@{*{Symbol::fetch_glob($sym)}}

@@ -81,7 +81,7 @@ sub _make_fatal {
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
-    $sub = "${pkg}::$sub" unless $sub =~ m/::/;
+    $sub = "{$pkg}::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     print "# _make_fatal: sub=$sub pkg=$pkg name=$name void=$void\n" if $Debug;

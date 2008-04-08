@@ -8,7 +8,7 @@ our ($aaa, $x, @aa, %aa, $aa);
 $aa = 1;
 { local $aa;     $aa = 2; is($aa,2); }
 is($aa,1);
-{ local ${aa};   $aa = 3; is($aa,3); }
+{ local $aa;   $aa = 3; is($aa,3); }
 is($aa,1);
 { no strict 'refs'; local ${*{Symbol::fetch_glob("aa")}}; $aa = 4; is($aa,4); }
 is($aa,1);

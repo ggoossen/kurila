@@ -139,7 +139,7 @@ foreach (@tests) {
                 $utf8;
                 $study;
                 pos(\$subject)=0;
-                \$match = ( \$subject =~ m${pat}g );
+                \$match = ( \$subject =~ m{$pat}g );
                 \$got = pos(\$subject);
 EOFCODE
         }
