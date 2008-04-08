@@ -698,7 +698,7 @@ END
 
     my @man_cmds;
     foreach my $section (qw(1 3)) {
-        my $pods = $self->{"MAN${section}PODS"};
+        my $pods = $self->{"MAN{$section}PODS"};
         push @man_cmds, $self->split_command(<<CMD, %$pods);
 	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
 CMD
@@ -1104,7 +1104,7 @@ sub init_INSTALL_from_PREFIX {
     foreach my $num (1, 3) {
         my $k = 'installsiteman'.$num.'dir';
 
-        $self->{uc $k} ||= uc "\$(installman${num}dir)"
+        $self->{uc $k} ||= uc "\$(installman{$num}dir)"
           unless %Config{$k};
     }
 
@@ -1113,7 +1113,7 @@ sub init_INSTALL_from_PREFIX {
 
         unless( %Config{$k} ) {
             $self->{uc $k}  ||= %Config{usevendorprefix}
-                              ? uc "\$(installman${num}dir)"
+                              ? uc "\$(installman{$num}dir)"
                               : '';
         }
     }

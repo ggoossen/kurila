@@ -340,18 +340,18 @@ EOF
   if ($Overload) # make it findable with fetchmethod
   {
     print Q(<<"EOF");
-#XS(XS_$Packid_nil); /* prototype to pass -Wmissing-prototypes */
-#XS(XS_$Packid_nil)
+#XS(XS_{$Packid}_nil); /* prototype to pass -Wmissing-prototypes */
+#XS(XS_{$Packid}_nil)
 #\{
 #   XSRETURN_EMPTY;
 #\}
 #
 EOF
     unshift(@InitFileCode, <<"MAKE_FETCHMETHOD_WORK");
-    /* Making a sub named "$Package::()" allows the package */
+    /* Making a sub named "{$Package}::()" allows the package */
     /* to be findable via fetchmethod(), and causes */
     /* overload::Overloaded("$Package") to return true. */
-    newXS("$Package::()", XS_$Packid_nil, file$proto);
+    newXS("{$Package}::()", XS_{$Packid}_nil, file$proto);
 MAKE_FETCHMETHOD_WORK
   }
 
@@ -1758,7 +1758,7 @@ sub generate_init {
     $subexpr =~ s/\$arg/ST(ix_$var)/g;
     $subexpr =~ s/\n\t/\n\t\t/g;
     $subexpr =~ s/is not of (.*\")/[arg \%d] is not of $1, ix_$var + 1/g;
-    $subexpr =~ s/\$var/$var[ix_$var - $argoff]/;
+    $subexpr =~ s/\$var/{$var}\[ix_$var - $argoff]/;
     $expr =~ s/DO_ARRAY_ELEM/$subexpr/;
   }
   if ($expr =~ m#/\*.*scope.*\*/#i) {  # "scope" in C comments
@@ -1825,7 +1825,7 @@ sub generate_output {
       $subexpr = %output_expr{%type_kind{$subtype}};
       $subexpr =~ s/ntype/subtype/g;
       $subexpr =~ s/\$arg/ST(ix_$var)/g;
-      $subexpr =~ s/\$var/$var[ix_$var]/g;
+      $subexpr =~ s/\$var/{$var}\[ix_$var]/g;
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
       eval "print qq\a$expr\a";
