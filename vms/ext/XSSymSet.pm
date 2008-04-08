@@ -84,8 +84,8 @@ sub addsym {
   if (exists $self->{$trimmed}) {
     my($i) = "00";
     $trimmed = $self->trimsym($sym,$maxlen-3,$silent);
-    while (exists $self->{"${trimmed}_$i"}) { $i++; }
-    warn "Warning: duplicate symbol $trimmed\n\tchanged to ${trimmed}_$i\n\t(original was $sym)\n\t"
+    while (exists $self->{"{$trimmed}_$i"}) { $i++; }
+    warn "Warning: duplicate symbol $trimmed\n\tchanged to {$trimmed}_$i\n\t(original was $sym)\n\t"
       unless $silent;
     $trimmed .= "_$i";
   }

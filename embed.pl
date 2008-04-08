@@ -374,7 +374,7 @@ sub hide ($$) {
 sub bincompat_var ($$) {
     my ($pfx, $sym) = @_;
     my $arg = ($pfx eq 'G' ? 'NULL' : 'aTHX');
-    undefine("PL_$sym") . hide("PL_$sym", "(*Perl_${pfx}${sym}_ptr($arg))");
+    undefine("PL_$sym") . hide("PL_$sym", "(*Perl_{$pfx}{$sym}_ptr($arg))");
 }
 
 sub multon ($$$) {

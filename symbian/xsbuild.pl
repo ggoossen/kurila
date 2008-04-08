@@ -303,9 +303,9 @@ sub write_makefile {
     print "\tMakefile\n";
 
     my $windef1 = "$SYMBIAN_ROOT\\Epoc32\\Build$CWD\\$base\\$WIN\\$base.def";
-    my $windef2 = "..\\BWINS\\${base}u.def";
+    my $windef2 = "..\\BWINS\\{$base}u.def";
     my $armdef1 = "$SYMBIAN_ROOT\\Epoc32\\Build$CWD\\$base\\$ARM\\$base.def";
-    my $armdef2 = "..\\BMARM\\${base}u.def";
+    my $armdef2 = "..\\BMARM\\{$base}u.def";
 
     my $wrap = $SYMBIAN_ROOT && defined $SDK_VARIANT eq 'S60' && $SDK_VERSION eq '1.2' && $SYMBIAN_ROOT !~ m/_CW$/;
     my $ABLD = $wrap ? 'perl b.pl' : 'abld';
@@ -874,7 +874,7 @@ __EOF__
 	my $def;
 	my $basef;
         for my $f ("$SYMBIAN_ROOT\\Epoc32\\Build$CWD\\$base\\WINS\\perl$VERSION-$extdash.def",
-		   "..\\BMARM\\perl$VERSION-${extdash}u.def") {
+		   "..\\BMARM\\perl$VERSION-{$extdash}u.def") {
 	    print "\t($f - ";
 	    if ( open( $def, "<", $f ) ) {
 		print "OK)\n";

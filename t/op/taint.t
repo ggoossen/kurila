@@ -847,7 +847,7 @@ SKIP: {
     use warnings;
 
     my $saw_warning = 0;
-    local ${^WARN_HOOK} = sub { $saw_warning = 1 };
+    local $^WARN_HOOK = sub { $saw_warning = 1 };
 
     sub fmi {
 	my $divnum = shift()/1;
@@ -905,10 +905,10 @@ SKIP: {
 }
 
 
-ok( ${^TAINT} == 1, '$^TAINT is on' );
+ok( $^TAINT == 1, '$^TAINT is on' );
 
-eval { ${^TAINT} = 0 };
-ok( ${^TAINT},  '$^TAINT is not assignable' );
+eval { $^TAINT = 0 };
+ok( $^TAINT,  '$^TAINT is not assignable' );
 ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
     'Assigning to ${^TAINT} fails' );
 

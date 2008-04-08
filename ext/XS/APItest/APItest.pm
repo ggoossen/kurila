@@ -27,7 +27,7 @@ our @EXPORT = qw( print_double print_int print_long
 our $VERSION = '0.14';
 
 use vars '$WARNINGS_ON_BOOTSTRAP';
-use vars map "\$${_}_called_PP", qw(BEGIN UNITCHECK CHECK INIT END);
+use vars map "\${$_}_called_PP", qw(BEGIN UNITCHECK CHECK INIT END);
 
 # Do these here to verify that XS code and Perl code get called at the same
 # times

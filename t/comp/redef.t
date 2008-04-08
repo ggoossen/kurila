@@ -5,7 +5,7 @@
 our $warn;
 BEGIN {
     $warn = "";
-    ${^WARN_HOOK} = sub { $warn .= @_[0]->message }
+    $^WARN_HOOK = sub { $warn .= @_[0]->message }
 }
 
 sub ok ($$) { 

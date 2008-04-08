@@ -149,8 +149,8 @@ sub UpDowngrade
         # From: use|no warnings "blah"
         # To:   local ($^W) = 1; # use|no warnings "blah"
         $warn_sub = sub {
-                            s/^(\s*)(no\s+warnings)/${1}local (\$^W) = 0; #$2/ ;
-                            s/^(\s*)(use\s+warnings)/${1}local (\$^W) = 1; #$2/ ;
+                            s/^(\s*)(no\s+warnings)/$1local (\$^W) = 0; #$2/ ;
+                            s/^(\s*)(use\s+warnings)/$1local (\$^W) = 1; #$2/ ;
                         };
     }
     elsif ($upgrade) {
@@ -166,7 +166,7 @@ sub UpDowngrade
 	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
                 my $vars = join ' ', split m/\s*,\s*/, $2;
-                $_ = "${indent}use vars qw($vars);\n";
+                $_ = "{$indent}use vars qw($vars);\n";
             }
 	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {
@@ -179,7 +179,7 @@ sub UpDowngrade
 	    if ( m/^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {
                 my $indent = $1;
                 my $vars = join ', ', split ' ', $2;
-                $_ = "${indent}our ($vars);\n";
+                $_ = "{$indent}our ($vars);\n";
             }
 	    elsif ( m/^(\s*)#\s*((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {

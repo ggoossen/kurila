@@ -444,7 +444,7 @@ sub import {
     shift;
     $^W = 1; # yup, clobbered the global variable; 
 	     # tough, if you want diags, you want diags.
-    return if defined ${^WARN_HOOK} && (${^WARN_HOOK} eq \&warn_trap);
+    return if defined $^WARN_HOOK && ($^WARN_HOOK eq \&warn_trap);
 
     for (@_) {
 
@@ -476,19 +476,19 @@ sub import {
 	warn "Unknown flag: $_";
     } 
 
-    $oldwarn = ${^WARN_HOOK};
-    $olddie = ${^DIE_HOOK};
-    ${^WARN_HOOK} = \&warn_trap;
-    ${^DIE_HOOK} = \&death_trap;
+    $oldwarn = $^WARN_HOOK;
+    $olddie = $^DIE_HOOK;
+    $^WARN_HOOK = \&warn_trap;
+    $^DIE_HOOK = \&death_trap;
 } 
 
 sub enable { &import }
 
 sub disable {
     shift;
-    return unless ${^WARN_HOOK} eq \&warn_trap;
-    ${^WARN_HOOK} = $oldwarn || '';
-    ${^DIE_HOOK} = $olddie || '';
+    return unless $^WARN_HOOK eq \&warn_trap;
+    $^WARN_HOOK = $oldwarn || '';
+    $^DIE_HOOK = $olddie || '';
 } 
 
 sub warn_trap {
@@ -528,7 +528,7 @@ sub death_trap {
 
     # Switch off our die/warn handlers so we don't wind up in our own
     # traps.
-    ${^DIE_HOOK} = ${^WARN_HOOK} = '';
+    $^DIE_HOOK = $^WARN_HOOK = '';
 
     # Have carp skip over death_trap() when showing the stack trace.
     local($Carp::CarpLevel) = 1;

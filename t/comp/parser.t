@@ -83,20 +83,20 @@ is( $@, '', 'PL_lex_brackstack' );
     undef $a;
     undef @b;
     my $a="A";
-    is("${a}\{", "A\{", "interpolation, qq//");
-    is("${a}[", "A[", "interpolation, qq//");
+    is("{$a}\{", "A\{", "interpolation, qq//");
+    is("{$a}[", "A[", "interpolation, qq//");
     my @b=("B");
-    is("@{b}\{", "B\{", "interpolation, qq//");
-    is(qr/${a}{/, '(?-uxism:A{)', "interpolation, qr//");
+    is("{@b}\{", "B\{", "interpolation, qq//");
+    is(qr/$a{/, '(?-uxism:A{)', "interpolation, qr//");
     my $c = "A\{";
-    $c =~ m/${a}{/;
+    $c =~ m/$a{/;
     is($&, 'A{', "interpolation, m//");
-    $c =~ s/${a}\{/foo/;
+    $c =~ s/$a\{/foo/;
     is($c, 'foo', "interpolation, s/...//");
-    $c =~ s/foo/${a}\{/;
+    $c =~ s/foo/$a\{/;
     is($c, 'A{', "interpolation, s//.../");
     is(<<"${a}{", "A\{ A[ B\{\n", "interpolation, here doc");
-${a}\{ ${a}[ @{b}\{
+$a\{ $a[ @b\{
 ${a}{
 }
 
@@ -134,7 +134,7 @@ EOF
 
 # Bug #24212
 {
-    local ${^WARN_HOOK} = sub { }; # silence mandatory warning
+    local $^WARN_HOOK = sub { }; # silence mandatory warning
     eval q{ my $x = -F 1; };
     like( $@->{description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
     is(

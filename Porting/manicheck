@@ -13,7 +13,7 @@
 #
 
 BEGIN {
-  ${^WARN_HOOK} = sub {
+  $^WARN_HOOK = sub {
     help() if @_[0] =~ m/"main::\w" used only once: possible typo at /;
   };
 }

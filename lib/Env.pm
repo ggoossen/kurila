@@ -86,12 +86,12 @@ sub import {
     foreach (@vars) {
 	my ($type, $name) = m/^([\$\@])(.*)$/;
 	if ($type eq '$') {
-	    tie ${*{Symbol::fetch_glob("${callpack}::$name")}}, 'Env', $name;
+	    tie ${*{Symbol::fetch_glob("{$callpack}::$name")}}, 'Env', $name;
 	} else {
 	    if ($^O eq 'VMS') {
-		tie @{*{Symbol::fetch_glob("${callpack}::$name")}}, 'Env::Array::VMS', $name;
+		tie @{*{Symbol::fetch_glob("{$callpack}::$name")}}, 'Env::Array::VMS', $name;
 	    } else {
-		tie @{*{Symbol::fetch_glob("${callpack}::$name")}}, 'Env::Array', $name;
+		tie @{*{Symbol::fetch_glob("{$callpack}::$name")}}, 'Env::Array', $name;
 	    }
 	}
     }

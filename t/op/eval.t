@@ -148,7 +148,7 @@ sub recurse {
   }
 }
 {
-  local ${^WARN_HOOK} = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
+  local $^WARN_HOOK = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
   recurse($x-5);
 }
 $x++;

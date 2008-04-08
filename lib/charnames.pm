@@ -58,7 +58,7 @@ sub alias_file ($)
     $file = $arg;
   }
   elsif ($arg =~ m/^\w+$/) {
-    $file = "unicore/${arg}_alias.pl";
+    $file = "unicore/{$arg}_alias.pl";
   }
   else {
     die "Charnames alias files can only have identifier characters";

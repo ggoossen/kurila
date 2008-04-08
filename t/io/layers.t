@@ -32,10 +32,10 @@ my $DOSISH    = $^O =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ? 1 : 0;
 my $NONSTDIO  = exists %ENV{PERLIO} && %ENV{PERLIO} ne 'stdio'     ? 1 : 0;
 my $FASTSTDIO = %Config{d_faststdio} && %Config{usefaststdio}      ? 1 : 0;
 my $UTF8_STDIN;
-if (${^UNICODE} ^&^ 1) {
-    if (${^UNICODE} ^&^ 64) {
+if ($^UNICODE ^&^ 1) {
+    if ($^UNICODE ^&^ 64) {
 	# Conditional on the locale
-	$UTF8_STDIN = ${^UTF8LOCALE};
+	$UTF8_STDIN = $^UTF8LOCALE;
     } else {
 	# Unconditional
 	$UTF8_STDIN = 1;
@@ -55,8 +55,8 @@ print <<__EOH__;
 # DOSISH        = $DOSISH
 # NONSTDIO      = $NONSTDIO
 # FASTSTDIO     = $FASTSTDIO
-# UNICODE       = ${^UNICODE}
-# UTF8LOCALE    = ${^UTF8LOCALE}
+# UNICODE       = $^UNICODE
+# UTF8LOCALE    = $^UTF8LOCALE
 # UTF8_STDIN = $UTF8_STDIN
 __EOH__
 
