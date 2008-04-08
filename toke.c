@@ -9838,6 +9838,10 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 	}
     }
     else {
+	/* allow initial ^ */
+	if (*s == '^') {
+	    *d++ = *s++;
+	}
 	for (;;) {
 	    if (d >= e)
 		Perl_croak(aTHX_ ident_too_long);
@@ -9879,17 +9883,17 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
 	return s;
     }
     if (*s == '{') {
-	bracket = s;
-	s++;
+	*d = '\0';
+	return s;
     }
     else if (ck_uni)
 	check_uni();
     if (s < send)
 	*d = *s++;
     d[1] = '\0';
-    if (*d == '^' && *s && isCONTROLVAR(*s)) {
-	*d = toCTRL(*s);
-	s++;
+    if (*d == '^') {/*  && *s  && isCONTROLVAR(*s)) { */
+	*d++ = *s++;/*  toCTRL(*s); */
+/* 	s++; */
     }
     if (bracket) {
 	if (isSPACE(s[-1])) {

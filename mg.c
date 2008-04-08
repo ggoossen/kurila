@@ -737,188 +737,212 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_GET;
 
     switch (*mg->mg_ptr) {
-    case '\003':		/* ^C, ^CHILD_ERROR_NATIVE */
-	if (nextchar == '\0') {
-	    sv_setiv(sv, (IV)PL_minus_c);
-	}
-	else if (strEQ(remaining, "HILD_ERROR_NATIVE")) {
-	    sv_setiv(sv, (IV)STATUS_NATIVE);
-        }
-	break;
-
-    case '\004':		/* ^D */
-	if (nextchar == '\0') {
-	    sv_setiv(sv, (IV)(PL_debug & DEBUG_MASK));
-	} else if (strEQ(remaining, "IE_HOOK")) { /* $^DIE_HOOK */
+    case '^':
+	switch (*remaining) {
+	case 'C':		/* ^C, ^CHILD_ERROR_NATIVE */
+	    if (remaining[1] == '\0') {
+		sv_setiv(sv, (IV)PL_minus_c);
+	    }
+	    else if (strEQ(remaining, "CHILD_ERROR_NATIVE")) {
+		sv_setiv(sv, (IV)STATUS_NATIVE);
+	    }
 	    break;
-	}
-	break;
-    case '\005':  /* ^E */
-	 if (nextchar == '\0') {
+	case 'D':		/* ^D */
+	    if (remaining[1] == '\0') {
+		sv_setiv(sv, (IV)(PL_debug & DEBUG_MASK));
+	    } else if (strEQ(remaining, "DIE_HOOK")) { /* $^DIE_HOOK */
+		break;
+	    }
+	    break;
+	case 'E':  /* ^E */
+	    if (remaining[1] == '\0') {
 #if defined(MACOS_TRADITIONAL)
-	     {
-		  char msg[256];
+		{
+		    char msg[256];
 
-		  sv_setnv(sv,(double)gMacPerl_OSErr);
-		  sv_setpv(sv, gMacPerl_OSErr ? GetSysErrText(gMacPerl_OSErr, msg) : "");
-	     }
+		    sv_setnv(sv,(double)gMacPerl_OSErr);
+		    sv_setpv(sv, gMacPerl_OSErr ? GetSysErrText(gMacPerl_OSErr, msg) : "");
+		}
 #elif defined(VMS)
-	     {
-#	          include <descrip.h>
-#	          include <starlet.h>
-		  char msg[255];
-		  $DESCRIPTOR(msgdsc,msg);
-		  sv_setnv(sv,(NV) vaxc$errno);
-		  if (sys$getmsg(vaxc$errno,&msgdsc.dsc$w_length,&msgdsc,0,0) & 1)
-		       sv_setpvn(sv,msgdsc.dsc$a_pointer,msgdsc.dsc$w_length);
-		  else
-		       sv_setpvn(sv,"",0);
-	     }
+		{
+#	            include <descrip.h>
+#	            include <starlet.h>
+		    char msg[255];
+		    $DESCRIPTOR(msgdsc,msg);
+		    sv_setnv(sv,(NV) vaxc$errno);
+		    if (sys$getmsg(vaxc$errno,&msgdsc.dsc$w_length,&msgdsc,0,0) & 1)
+			sv_setpvn(sv,msgdsc.dsc$a_pointer,msgdsc.dsc$w_length);
+		    else
+			sv_setpvn(sv,"",0);
+		}
 #elif defined(OS2)
-	     if (!(_emx_env & 0x200)) {	/* Under DOS */
-		  sv_setnv(sv, (NV)errno);
-		  sv_setpv(sv, errno ? Strerror(errno) : "");
-	     } else {
-		  if (errno != errno_isOS2) {
-		       const int tmp = _syserrno();
-		       if (tmp)	/* 2nd call to _syserrno() makes it 0 */
+		if (!(_emx_env & 0x200)) {	/* Under DOS */
+		    sv_setnv(sv, (NV)errno);
+		    sv_setpv(sv, errno ? Strerror(errno) : "");
+		} else {
+		    if (errno != errno_isOS2) {
+			const int tmp = _syserrno();
+			if (tmp)	/* 2nd call to _syserrno() makes it 0 */
 			    Perl_rc = tmp;
-		  }
-		  sv_setnv(sv, (NV)Perl_rc);
-		  sv_setpv(sv, os2error(Perl_rc));
-	     }
+		    }
+		    sv_setnv(sv, (NV)Perl_rc);
+		    sv_setpv(sv, os2error(Perl_rc));
+		}
 #elif defined(WIN32)
-	     {
-		  const DWORD dwErr = GetLastError();
-		  sv_setnv(sv, (NV)dwErr);
-		  if (dwErr) {
-		       PerlProc_GetOSError(sv, dwErr);
-		  }
-		  else
-		       sv_setpvn(sv, "", 0);
-		  SetLastError(dwErr);
-	     }
+		{
+		    const DWORD dwErr = GetLastError();
+		    sv_setnv(sv, (NV)dwErr);
+		    if (dwErr) {
+			PerlProc_GetOSError(sv, dwErr);
+		    }
+		    else
+			sv_setpvn(sv, "", 0);
+		    SetLastError(dwErr);
+		}
 #else
-	     {
-		 const int saveerrno = errno;
-		 sv_setnv(sv, (NV)errno);
-		 sv_setpv(sv, errno ? Strerror(errno) : "");
-		 errno = saveerrno;
-	     }
+		{
+		    const int saveerrno = errno;
+		    sv_setnv(sv, (NV)errno);
+		    sv_setpv(sv, errno ? Strerror(errno) : "");
+		    errno = saveerrno;
+		}
 #endif
-	     SvRTRIM(sv);
-	     SvNOK_on(sv);	/* what a wonderful hack! */
-	 }
-	 break;
-    case '\006':		/* ^F */
-	sv_setiv(sv, (IV)PL_maxsysfd);
-	break;
-    case '\010':		/* ^H */
-	sv_setiv(sv, (IV)PL_hints);
-	break;
-    case '\011':		/* ^I */ /* NOT \t in EBCDIC */
-	sv_setpv(sv, PL_inplace); /* Will undefine sv if PL_inplace is NULL */
-	break;
-    case '\017':		/* ^O & ^OPEN */
-	if (nextchar == '\0') {
-	    sv_setpv(sv, PL_osname);
-	    SvTAINTED_off(sv);
-	}
-	else if (strEQ(remaining, "PEN")) {
-	    Perl_emulate_cop_io(aTHX_ &PL_compiling, sv);
-	}
-	break;
-    case '\020':		
-	if (nextchar == '\0') {       /* ^P */
-	    sv_setiv(sv, (IV)PL_perldb);
-	} else if (strEQ(remaining, "REMATCH")) { /* $^PREMATCH */
-	    goto do_prematch_fetch;
-	} else if (strEQ(remaining, "OSTMATCH")) { /* $^POSTMATCH */
-	    goto do_postmatch_fetch;
-	}
-	break;
-    case '\023':		/* ^S */
-	if (nextchar == '\0') {
-	    if (PL_parser && PL_parser->lex_state != LEX_NOTPARSING)
-		SvOK_off(sv);
-	    else if (PL_in_eval)
- 		sv_setiv(sv, PL_in_eval & ~(EVAL_INREQUIRE));
+		SvRTRIM(sv);
+		SvNOK_on(sv);	/* what a wonderful hack! */
+	    }
+	    break;
+	case 'F':		/* ^F */
+	    sv_setiv(sv, (IV)PL_maxsysfd);
+	    break;
+	case 'H':		/* ^H */
+	    sv_setiv(sv, (IV)PL_hints);
+	    break;
+	case 'I':		/* ^I */
+	    sv_setpv(sv, PL_inplace); /* Will undefine sv if PL_inplace is NULL */
+	    break;
+	case 'O':		/* ^O & ^OPEN */
+	    if (remaining[1] == '\0') {
+		sv_setpv(sv, PL_osname);
+		SvTAINTED_off(sv);
+	    }
+	    else if (strEQ(remaining, "OPEN")) {
+		Perl_emulate_cop_io(aTHX_ &PL_compiling, sv);
+	    }
+	    break;
+	case 'P':		
+	    if (remaining[1] == '\0') {       /* ^P */
+		sv_setiv(sv, (IV)PL_perldb);
+	    } else if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
+		goto do_prematch_fetch;
+	    } else if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
+		goto do_postmatch_fetch;
+	    }
+	    break;
+	case 'S':		/* ^S */
+	    if (remaining[1] == '\0') {
+		if (PL_parser && PL_parser->lex_state != LEX_NOTPARSING)
+		    SvOK_off(sv);
+		else if (PL_in_eval)
+		    sv_setiv(sv, PL_in_eval & ~(EVAL_INREQUIRE));
 	    else
 		sv_setiv(sv, 0);
 	}
 	break;
-    case '\024':		/* ^T */
-	if (nextchar == '\0') {
+	case 'T':		/* ^T */
+	    if (remaining[1] == '\0') {
 #ifdef BIG_TIME
             sv_setnv(sv, PL_basetime);
 #else
             sv_setiv(sv, (IV)PL_basetime);
 #endif
         }
-	else if (strEQ(remaining, "AINT"))
+	else if (strEQ(remaining, "TAINT"))
             sv_setiv(sv, PL_tainting
 		    ? (PL_taint_warn || PL_unsafe ? -1 : 1)
 		    : 0);
         break;
-    case '\025':		/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
-	if (strEQ(remaining, "NICODE"))
-	    sv_setuv(sv, (UV) PL_unicode);
-	else if (strEQ(remaining, "TF8LOCALE"))
-	    sv_setuv(sv, (UV) PL_utf8locale);
-	else if (strEQ(remaining, "TF8CACHE"))
-	    sv_setiv(sv, (IV) PL_utf8cache);
-        break;
-    case '\027':		/* ^W  & $^WARNING_BITS */
-	if (nextchar == '\0')
-	    sv_setiv(sv, (IV)((PL_dowarn & G_WARN_ON) ? TRUE : FALSE));
-	else if (strEQ(remaining, "ARNING_BITS")) {
-	    if (PL_compiling.cop_warnings == pWARN_NONE) {
-	        sv_setpvn(sv, WARN_NONEstring, WARNsize) ;
-	    }
-	    else if (PL_compiling.cop_warnings == pWARN_STD) {
-		sv_setpvn(
-		    sv, 
-		    (PL_dowarn & G_WARN_ON) ? WARN_ALLstring : WARN_NONEstring,
-		    WARNsize
-		);
-	    }
-            else if (PL_compiling.cop_warnings == pWARN_ALL) {
-		/* Get the bit mask for $warnings::Bits{all}, because
-		 * it could have been extended by warnings::register */
-		HV * const bits=get_hv("warnings::Bits", FALSE);
-		if (bits) {
-		    SV ** const bits_all = hv_fetchs(bits, "all", FALSE);
-		    if (bits_all)
-			sv_setsv(sv, *bits_all);
+	case 'U':		/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
+	    if (strEQ(remaining, "UNICODE"))
+		sv_setuv(sv, (UV) PL_unicode);
+	    else if (strEQ(remaining, "UTF8LOCALE"))
+		sv_setuv(sv, (UV) PL_utf8locale);
+	    else if (strEQ(remaining, "UTF8CACHE"))
+		sv_setiv(sv, (IV) PL_utf8cache);
+	    break;
+	case 'W':		/* ^W  & $^WARNING_BITS */
+	    if (remaining[1] == '\0')
+		sv_setiv(sv, (IV)((PL_dowarn & G_WARN_ON) ? TRUE : FALSE));
+	    else if (strEQ(remaining, "WARNING_BITS")) {
+		if (PL_compiling.cop_warnings == pWARN_NONE) {
+		    sv_setpvn(sv, WARN_NONEstring, WARNsize) ;
 		}
-	        else {
-		    sv_setpvn(sv, WARN_ALLstring, WARNsize) ;
+		else if (PL_compiling.cop_warnings == pWARN_STD) {
+		    sv_setpvn(
+			sv, 
+			(PL_dowarn & G_WARN_ON) ? WARN_ALLstring : WARN_NONEstring,
+			WARNsize
+			);
 		}
+		else if (PL_compiling.cop_warnings == pWARN_ALL) {
+		    /* Get the bit mask for $warnings::Bits{all}, because
+		     * it could have been extended by warnings::register */
+		    HV * const bits=get_hv("warnings::Bits", FALSE);
+		    if (bits) {
+			SV ** const bits_all = hv_fetchs(bits, "all", FALSE);
+			if (bits_all)
+			    sv_setsv(sv, *bits_all);
+		    }
+		    else {
+			sv_setpvn(sv, WARN_ALLstring, WARNsize) ;
+		    }
+		}
+		else {
+		    sv_setpvn(sv, (char *) (PL_compiling.cop_warnings + 1),
+			      *PL_compiling.cop_warnings);
+		}
+		SvPOK_only(sv);
+	    } else if (strEQ(remaining, "WARN_HOOK")) { /* $^WARN_HOOK */
+		break;
 	    }
-            else {
-	        sv_setpvn(sv, (char *) (PL_compiling.cop_warnings + 1),
-			  *PL_compiling.cop_warnings);
+	    break;
+	case 'M': /* $^MATCH */
+	    if (strEQ(remaining, "MATCH")) {
+		if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+		    /*
+		     * Pre-threads, this was paren = atoi(GvENAME((GV*)mg->mg_obj));
+		     * XXX Does the new way break anything?
+		     */
+		    paren = atoi(mg->mg_ptr); /* $& is in [0] */
+		    CALLREG_NUMBUF_FETCH(rx,paren,sv);
+		    break;
+		}
+		sv_setsv(sv,&PL_sv_undef);
 	    }
-	    SvPOK_only(sv);
-	} else if (strEQ(remaining, "ARN_HOOK")) { /* $^WARN_HOOK */
+	    break;
+	case 'N':		/* ^N */
+	    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+		if (RX_LASTCLOSEPAREN(rx)) {
+		    CALLREG_NUMBUF_FETCH(rx,RX_LASTCLOSEPAREN(rx),sv);
+		    break;
+		}
+		
+	    }
+	    sv_setsv(sv,&PL_sv_undef);
 	    break;
 	}
 	break;
-    case '\015': /* $^MATCH */
-	if (strEQ(remaining, "ATCH")) {
     case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9': case '&':
-	    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-		/*
-		 * Pre-threads, this was paren = atoi(GvENAME((GV*)mg->mg_obj));
-		 * XXX Does the new way break anything?
-		 */
-		paren = atoi(mg->mg_ptr); /* $& is in [0] */
-		CALLREG_NUMBUF_FETCH(rx,paren,sv);
-		break;
-	    }
-	    sv_setsv(sv,&PL_sv_undef);
+	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+	    /*
+	     * Pre-threads, this was paren = atoi(GvENAME((GV*)mg->mg_obj));
+	     * XXX Does the new way break anything?
+	     */
+	    paren = atoi(mg->mg_ptr); /* $& is in [0] */
+	    CALLREG_NUMBUF_FETCH(rx,paren,sv);
+	    break;
 	}
+	sv_setsv(sv,&PL_sv_undef);
 	break;
     case '+':
 	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
@@ -926,16 +950,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	        CALLREG_NUMBUF_FETCH(rx,RX_LASTPAREN(rx),sv);
 	        break;
 	    }
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case '\016':		/* ^N */
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    if (RX_LASTCLOSEPAREN(rx)) {
-	        CALLREG_NUMBUF_FETCH(rx,RX_LASTCLOSEPAREN(rx),sv);
-	        break;
-	    }
-
 	}
 	sv_setsv(sv,&PL_sv_undef);
 	break;
@@ -2155,9 +2169,181 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_SET;
 
     switch (*mg->mg_ptr) {
-    case '\015': /* $^MATCH */
-      if (strEQ(remaining, "ATCH"))
-          goto do_match;
+    case '^':
+	switch (*remaining) {
+	case 'M': /* $^MATCH */
+	    if (strEQ(remaining, "MATCH"))
+		goto do_match;
+	case 'C':        /* ^C */
+	    PL_minus_c = (bool)SvIV(sv);
+	    break;
+	    
+	case 'D':        /* ^D */
+	    if (remaining[1] == '\0') {
+#ifdef DEBUGGING
+		s = SvPV_nolen_const(sv);
+		PL_debug = get_debug_opts(&s, 0) | DEBUG_TOP_FLAG;
+		DEBUG_x(dump_all());
+#else
+		PL_debug = (SvIV(sv)) | DEBUG_TOP_FLAG;
+#endif
+	    }
+	    else if (strEQ(remaining, "DIE_HOOK")) {
+		SvREFCNT_dec(PL_diehook);
+		PL_diehook = newSVsv(sv);
+	    }
+	    break;
+	case 'E':  /* ^E */
+	    if (remaining[1] == '\0') {
+#ifdef MACOS_TRADITIONAL
+		gMacPerl_OSErr = SvIV(sv);
+#else
+#  ifdef VMS
+		set_vaxc_errno(SvIV(sv));
+#  else
+#    ifdef WIN32
+		SetLastError( SvIV(sv) );
+#    else
+#      ifdef OS2
+		os2_setsyserrno(SvIV(sv));
+#      else
+		/* will anyone ever use this? */
+		SETERRNO(SvIV(sv), 4);
+#      endif
+#    endif
+#  endif
+#endif
+	    }
+	    break;
+	case 'F':        /* ^F */
+	    PL_maxsysfd = SvIV(sv);
+	    break;
+	case 'H':        /* ^H */
+	    PL_hints = SvIV(sv);
+	    break;
+	case 'I':        /* ^I */ /* NOT \t in EBCDIC */
+	    Safefree(PL_inplace);
+	    PL_inplace = SvOK(sv) ? savesvpv(sv) : NULL;
+	    break;
+	case 'O':        /* ^O */
+	    if (remaining[1] == '\0') {
+		Safefree(PL_osname);
+		PL_osname = NULL;
+		if (SvOK(sv)) {
+		    TAINT_PROPER("assigning to $^O");
+		    PL_osname = savesvpv(sv);
+		}
+	    }
+	    else if (strEQ(remaining, "OPEN")) {
+		STRLEN len;
+		const char *const start = SvPV(sv, len);
+		const char *out = (const char*)memchr(start, '\0', len);
+		SV *tmp;
+		HV* old_cop_hints_hash;
+
+
+		PL_compiling.cop_hints |= HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
+		PL_hints
+		    |= HINT_LOCALIZE_HH | HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
+
+		/* Opening for input is more common than opening for output, so
+		   ensure that hints for input are sooner on linked list.  */
+
+		old_cop_hints_hash = PL_compiling.cop_hints_hash;
+		PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
+		SvREFCNT_dec(old_cop_hints_hash);
+
+		tmp = out ? newSVpvn_flags(out + 1, start + len - out - 1, 0) : newSVpvs_flags("", 0);
+		(void)hv_store_ent(PL_compiling.cop_hints_hash, 
+				   newSVpvs_flags("open>", SVs_TEMP), tmp, 0);
+
+		tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, 0);
+		(void)hv_store_ent(PL_compiling.cop_hints_hash,
+				   newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
+	    }
+	    break;
+	case 'P':        /* ^P */
+	    if (remaining[1] == '\0') { /* ^P */
+		PL_perldb = SvIV(sv);
+		if (PL_perldb && !PL_DBsingle)
+		    init_debugger();
+		break;
+	    } else if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
+		goto do_prematch;
+	    } else if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
+		goto do_postmatch;
+	    }
+	case 'T':        /* ^T */
+#ifdef BIG_TIME
+	    PL_basetime = (Time_t)(SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv));
+#else
+	    PL_basetime = (Time_t)SvIV(sv);
+#endif
+	    break;
+	case 'U':        /* ^UTF8CACHE */
+	    if (strEQ(remaining, "UTF8CACHE")) {
+		PL_utf8cache = (signed char) sv_2iv(sv);
+	    }
+	    break;
+	case 'W':        /* ^W & $^WARNING_BITS */
+	    if (remaining[1] == '\0') {
+		if ( ! (PL_dowarn & G_WARN_ALL_MASK)) {
+		    i = SvIV(sv);
+		    PL_dowarn = (PL_dowarn & ~G_WARN_ON)
+			| (i ? G_WARN_ON : G_WARN_OFF) ;
+		}
+	    }
+	    else if (strEQ(remaining, "WARNING_BITS")) {
+		if ( ! (PL_dowarn & G_WARN_ALL_MASK)) {
+		    if (!SvPOK(sv) && PL_localizing) {
+			sv_setpvn(sv, WARN_NONEstring, WARNsize);
+			PL_compiling.cop_warnings = pWARN_NONE;
+			break;
+		    }
+		    {
+			STRLEN len, i;
+			int accumulate = 0 ;
+			int any_fatals = 0 ;
+			const char * const ptr = SvPV_const(sv, len) ;
+			for (i = 0 ; i < len ; ++i) {
+			    accumulate |= ptr[i] ;
+			    any_fatals |= (ptr[i] & 0xAA) ;
+			}
+			if (!accumulate) {
+			    if (!specialWARN(PL_compiling.cop_warnings))
+				PerlMemShared_free(PL_compiling.cop_warnings);
+			    PL_compiling.cop_warnings = pWARN_NONE;
+			}
+			/* Yuck. I can't see how to abstract this:  */
+			else if (isWARN_on(((STRLEN *)SvPV_nolen_const(sv)) - 1,
+					   WARN_ALL) && !any_fatals) {
+			    if (!specialWARN(PL_compiling.cop_warnings))
+				PerlMemShared_free(PL_compiling.cop_warnings);
+			    PL_compiling.cop_warnings = pWARN_ALL;
+			    PL_dowarn |= G_WARN_ONCE ;
+			}
+			else {
+			    STRLEN len;
+			    const char *const p = SvPV_const(sv, len);
+
+			    PL_compiling.cop_warnings
+				= Perl_new_warnings_bitfield(aTHX_ PL_compiling.cop_warnings,
+							     p, len);
+
+			    if (isWARN_on(PL_compiling.cop_warnings, WARN_ONCE))
+				PL_dowarn |= G_WARN_ONCE ;
+			}
+
+		    }
+		}
+	    }
+	    else if (strEQ(remaining, "WARN_HOOK")) { /* $^WARN_HOOK */
+		SvREFCNT_dec(PL_warnhook);
+		PL_warnhook = newSVsv(sv);
+	    }
+	    break;
+	}
+	break;
     case '`': /* ${^PREMATCH} caught below */
       do_prematch:
       paren = RX_BUFF_IDX_PREMATCH;
@@ -2185,174 +2371,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '\003':        /* ^C */
-        PL_minus_c = (bool)SvIV(sv);
-        break;
-
-    case '\004':        /* ^D */
-	if (*remaining == '\0') {
-#ifdef DEBUGGING
-	    s = SvPV_nolen_const(sv);
-	    PL_debug = get_debug_opts(&s, 0) | DEBUG_TOP_FLAG;
-	    DEBUG_x(dump_all());
-#else
-	    PL_debug = (SvIV(sv)) | DEBUG_TOP_FLAG;
-#endif
-	}
-	else if (strEQ(remaining, "IE_HOOK")) {
-	    SvREFCNT_dec(PL_diehook);
-	    PL_diehook = newSVsv(sv);
-	}
-        break;
-    case '\005':  /* ^E */
-        if (*(mg->mg_ptr+1) == '\0') {
-#ifdef MACOS_TRADITIONAL
-            gMacPerl_OSErr = SvIV(sv);
-#else
-#  ifdef VMS
-            set_vaxc_errno(SvIV(sv));
-#  else
-#    ifdef WIN32
-            SetLastError( SvIV(sv) );
-#    else
-#      ifdef OS2
-            os2_setsyserrno(SvIV(sv));
-#      else
-            /* will anyone ever use this? */
-            SETERRNO(SvIV(sv), 4);
-#      endif
-#    endif
-#  endif
-#endif
-        }
-        break;
-    case '\006':        /* ^F */
-        PL_maxsysfd = SvIV(sv);
-        break;
-    case '\010':        /* ^H */
-        PL_hints = SvIV(sv);
-        break;
-    case '\011':        /* ^I */ /* NOT \t in EBCDIC */
-        Safefree(PL_inplace);
-        PL_inplace = SvOK(sv) ? savesvpv(sv) : NULL;
-        break;
-    case '\017':        /* ^O */
-        if (*(mg->mg_ptr+1) == '\0') {
-            Safefree(PL_osname);
-            PL_osname = NULL;
-            if (SvOK(sv)) {
-                TAINT_PROPER("assigning to $^O");
-                PL_osname = savesvpv(sv);
-            }
-        }
-        else if (strEQ(mg->mg_ptr, "\017PEN")) {
-            STRLEN len;
-            const char *const start = SvPV(sv, len);
-            const char *out = (const char*)memchr(start, '\0', len);
-            SV *tmp;
-            HV* old_cop_hints_hash;
-
-
-	    PL_compiling.cop_hints |= HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
-	    PL_hints
-		|= HINT_LOCALIZE_HH | HINT_LEXICAL_IO_IN | HINT_LEXICAL_IO_OUT;
-
-            /* Opening for input is more common than opening for output, so
-               ensure that hints for input are sooner on linked list.  */
-
-            old_cop_hints_hash = PL_compiling.cop_hints_hash;
-            PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
-            SvREFCNT_dec(old_cop_hints_hash);
-
-            tmp = out ? newSVpvn_flags(out + 1, start + len - out - 1, 0) : newSVpvs_flags("", 0);
-            (void)hv_store_ent(PL_compiling.cop_hints_hash, 
-                               newSVpvs_flags("open>", SVs_TEMP), tmp, 0);
-
-            tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, 0);
-            (void)hv_store_ent(PL_compiling.cop_hints_hash,
-                               newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
-        }
-        break;
-    case '\020':        /* ^P */
-      if (*remaining == '\0') { /* ^P */
-          PL_perldb = SvIV(sv);
-          if (PL_perldb && !PL_DBsingle)
-              init_debugger();
-          break;
-      } else if (strEQ(remaining, "REMATCH")) { /* $^PREMATCH */
-          goto do_prematch;
-      } else if (strEQ(remaining, "OSTMATCH")) { /* $^POSTMATCH */
-          goto do_postmatch;
-      }
-    case '\024':        /* ^T */
-#ifdef BIG_TIME
-        PL_basetime = (Time_t)(SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv));
-#else
-        PL_basetime = (Time_t)SvIV(sv);
-#endif
-        break;
-    case '\025':        /* ^UTF8CACHE */
-         if (strEQ(mg->mg_ptr+1, "TF8CACHE")) {
-             PL_utf8cache = (signed char) sv_2iv(sv);
-         }
-         break;
-    case '\027':        /* ^W & $^WARNING_BITS */
-        if (*(mg->mg_ptr+1) == '\0') {
-            if ( ! (PL_dowarn & G_WARN_ALL_MASK)) {
-                i = SvIV(sv);
-                PL_dowarn = (PL_dowarn & ~G_WARN_ON)
-                                | (i ? G_WARN_ON : G_WARN_OFF) ;
-            }
-        }
-        else if (strEQ(mg->mg_ptr+1, "ARNING_BITS")) {
-            if ( ! (PL_dowarn & G_WARN_ALL_MASK)) {
-                if (!SvPOK(sv) && PL_localizing) {
-                    sv_setpvn(sv, WARN_NONEstring, WARNsize);
-                    PL_compiling.cop_warnings = pWARN_NONE;
-                    break;
-                }
-                {
-                    STRLEN len, i;
-                    int accumulate = 0 ;
-                    int any_fatals = 0 ;
-                    const char * const ptr = SvPV_const(sv, len) ;
-                    for (i = 0 ; i < len ; ++i) {
-                        accumulate |= ptr[i] ;
-                        any_fatals |= (ptr[i] & 0xAA) ;
-                    }
-                    if (!accumulate) {
-                        if (!specialWARN(PL_compiling.cop_warnings))
-                            PerlMemShared_free(PL_compiling.cop_warnings);
-                        PL_compiling.cop_warnings = pWARN_NONE;
-                    }
-                    /* Yuck. I can't see how to abstract this:  */
-                    else if (isWARN_on(((STRLEN *)SvPV_nolen_const(sv)) - 1,
-                                       WARN_ALL) && !any_fatals) {
-                        if (!specialWARN(PL_compiling.cop_warnings))
-                            PerlMemShared_free(PL_compiling.cop_warnings);
-                        PL_compiling.cop_warnings = pWARN_ALL;
-                        PL_dowarn |= G_WARN_ONCE ;
-                    }
-                    else {
-                        STRLEN len;
-                        const char *const p = SvPV_const(sv, len);
-
-                        PL_compiling.cop_warnings
-                            = Perl_new_warnings_bitfield(aTHX_ PL_compiling.cop_warnings,
-                                                         p, len);
-
-                        if (isWARN_on(PL_compiling.cop_warnings, WARN_ONCE))
-                            PL_dowarn |= G_WARN_ONCE ;
-                    }
-
-                }
-            }
-        }
-	else if (strEQ(remaining, "ARN_HOOK")) { /* $^WARN_HOOK */
-	    SvREFCNT_dec(PL_warnhook);
-	    PL_warnhook = newSVsv(sv);
-	}
-        break;
     case '.':
         if (PL_localizing) {
             if (PL_localizing == 1)
