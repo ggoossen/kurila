@@ -36,19 +36,19 @@ print "{$e}ok 5\n";
 # to avoid "used once" warnings
 eval <<'EOE';
 $e = ! %main::{p} && 'not ';
-print "${e}ok 6\n";
+print "{$e}ok 6\n";
 $e = ! *q{ARRAY} && 'not ';
-print "${e}ok 7\n";
+print "{$e}ok 7\n";
 $e = ! *r{HASH} && 'not ';
-print "${e}ok 8\n";
+print "{$e}ok 8\n";
 $e = ! %main::{s} && 'not ';
-print "${e}ok 9\n";
+print "{$e}ok 9\n";
 $e = ! *t{CODE} && 'not ';
-print "${e}ok 10\n";
+print "{$e}ok 10\n";
 $e = defined %X::{q} && 'not ';
-print "${e}ok 11\n";
+print "{$e}ok 11\n";
 $e = ! %X::{p} && 'not ';
-print "${e}ok 12\n";
+print "{$e}ok 12\n";
 EOE
 $e = $@ && 'not ';
 print "{$e}ok 13\n";

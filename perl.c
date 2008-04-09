@@ -1487,7 +1487,7 @@ S_procself_val(pTHX_ SV *sv, const char *arg0)
 STATIC void
 S_set_caret_X(pTHX) {
     dVAR;
-    GV* tmpgv = gv_fetchpvs("\030", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^X */
+    GV* tmpgv = gv_fetchpvs("^X", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^X */
     if (tmpgv) {
 #ifdef HAS_PROCSELFEXE
 	S_procself_val(aTHX_ GvSV(tmpgv), PL_origargv[0]);
@@ -3550,14 +3550,14 @@ S_init_main_stash(pTHX)
 					     SVt_PVAV)));
     SvREFCNT_inc_simple_void(PL_incgv); /* Don't allow it to be freed */
     GvMULTI_on(PL_incgv);
-    PL_hintgv = gv_fetchpvs("\010", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
+    PL_hintgv = gv_fetchpvs("^H", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
     GvMULTI_on(PL_hintgv);
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
     PL_errgv = gv_HVadd(gv_fetchpvs("@", GV_ADD|GV_NOTQUAL, SVt_PV));
     SvREFCNT_inc_simple_void(PL_errgv);
     GvMULTI_on(PL_errgv);
-    PL_replgv = gv_fetchpvs("\022", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
+    PL_replgv = gv_fetchpvs("^R", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
     GvMULTI_on(PL_replgv);
     (void)Perl_form(aTHX_ "%240s","");	/* Preallocate temp - for immediate signals. */
 #ifdef PERL_DONT_CREATE_GVSV

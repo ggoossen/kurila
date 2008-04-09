@@ -12,7 +12,7 @@ BEGIN {
     %ENV{PERL5LIB} = "../lib";
 
 # turn warnings into fatal errors
-    ${^WARN_HOOK} = sub { die "WARNING: @_" } ;
+    $^WARN_HOOK = sub { die "WARNING: @_" } ;
 
     foreach (qw(Fcntl XS::APItest)) {
 	eval "require $_"

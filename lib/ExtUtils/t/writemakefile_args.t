@@ -38,7 +38,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 {
     ok( my $stdout = tie *STDOUT, 'TieOut' );
     my $warnings = '';
-    local ${^WARN_HOOK} = sub {
+    local $^WARN_HOOK = sub {
         $warnings .= @_[0]->{description};
     };
 

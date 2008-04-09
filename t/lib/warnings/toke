@@ -54,15 +54,6 @@ toke.c	AOK
 	printf ("")
 	sort ("")
 
-     Ambiguous use of %c{%s%s} resolved to %c%s%s 
-	$a = ${time[2]}
-	$a = ${time{2}}
-
-
-     Ambiguous use of %c{%s} resolved to %c%s
-	$a = ${time}
-	sub fred {} $a = ${fred}
-
      Misplaced _ in number 
 	$a = 1_2;
 	$a = 1_2345_6;
@@ -254,43 +245,6 @@ no warnings 'syntax' ;
 sort ("")
 EXPECT
 
-########
-# toke.c
-use warnings 'ambiguous' ;
-$a = @{time[2]};
-no warnings 'ambiguous' ;
-$a = @{time[2]};
-EXPECT
-Ambiguous use of @{time[...]} resolved to @time[...] at - line 3.
-########
-# toke.c
-use warnings 'ambiguous' ;
-$a = %{time{2}};
-EXPECT
-Ambiguous use of %{time{...}} resolved to %time{...} at - line 3.
-########
-# toke.c
-no warnings 'ambiguous' ;
-$a = %{time{2}};
-EXPECT
-
-########
-# toke.c
-use warnings 'ambiguous' ;
-$a = ${time} ;
-no warnings 'ambiguous' ;
-$a = ${time} ;
-EXPECT
-Ambiguous use of ${time} resolved to $time at - line 3.
-########
-# toke.c
-use warnings 'ambiguous' ;
-sub fred {}
-$a = ${fred} ;
-no warnings 'ambiguous' ;
-$a = ${fred} ;
-EXPECT
-Ambiguous use of ${fred} resolved to $fred at - line 4.
 ########
 # toke.c
 use warnings 'syntax' ;

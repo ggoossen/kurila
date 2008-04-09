@@ -203,7 +203,7 @@ sub ldopts {
 	$sub = @ns[-1];
 	$root = File::Spec->catdir(@ns);
 	
-	print STDERR "searching for '$sub{$lib_ext}'\n" if $Verbose;
+	print STDERR "searching for '{$sub}{$lib_ext}'\n" if $Verbose;
 	foreach (@path) {
 	    next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
 	    push @archives, $archive;

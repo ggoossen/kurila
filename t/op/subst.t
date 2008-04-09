@@ -24,7 +24,7 @@ s/x/\$x $x/;
 ok( $_ eq '$x foo', ":$_: eq :\$x foo:" );
 
 $b = 'cd';
-($a = 'abcdef') =~ s<(b$be)>'\n$1';
+($a = 'abcdef') =~ s<(b$b(?:)e)>'\n$1';
 ok( $1 eq 'bcde' && $a eq "a\nbcdef" );
 
 $a = 'abacada';
@@ -536,7 +536,7 @@ is($_, "3 (0 0 1 2)", '#20682 @- not visible in replacement');
 
 # [perl #20682] $^N not visible in replacement
 $_ = "abc";
-m/(a)/; s/(b)|(c)/-$^N/g;
+m/(a)/; s/(b)|(c)/-{$^N}/g;
 is($_,'a-b-c','#20682 $^N not visible in replacement');
 
 # [perl #22351] perl bug with 'e' substitution modifier

@@ -146,7 +146,7 @@ use warnings ();
 # run/switchI 1 - missing -I switches entirely
 #    perl -Ifoo -e 'print @INC'
 # op/caller 2 - warning mask propagates backwards before warnings::register
-#    'use warnings; BEGIN {${^WARNING_BITS} eq "U"x12;} use warnings::register'
+#    'use warnings; BEGIN {$^WARNING_BITS eq "U"x12;} use warnings::register'
 # op/getpid 2 - can't assign to shared my() declaration (threads only)
 #    'my $x : shared = 5'
 # op/override 7 - parens on overriden require change v-string interpretation
@@ -1193,7 +1193,7 @@ Carp::confess() unless ref($gv) eq "B::GV";
 	$stash = $stash . "::";
     }
     if ($name =~ m/^(\^..|{)/) {
-        $name = "\{$name\}";       # ${^WARNING_BITS}, etc and ${
+        $name = "\{$name\}";       # $^WARNING_BITS, etc and ${
     }
     return $stash . $name;
 }
@@ -4629,12 +4629,12 @@ See L<perllexwarn> for more information about lexical warnings.
 =item warning_bits
 
 These two parameters are used to specify the ambient pragmas in
-the format used by the special variables $^H and ${^WARNING_BITS}.
+the format used by the special variables $^H and $^WARNING_BITS.
 
 They exist principally so that you can write code like:
 
     { my ($hint_bits, $warning_bits);
-    BEGIN {($hint_bits, $warning_bits) = ($^H, ${^WARNING_BITS})}
+    BEGIN {($hint_bits, $warning_bits) = ($^H, $^WARNING_BITS)}
     $deparser->ambient_pragmas (
 	hint_bits    => $hint_bits,
 	warning_bits => $warning_bits,

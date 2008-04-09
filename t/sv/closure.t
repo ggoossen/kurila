@@ -245,7 +245,7 @@ DEBUG_INFO
 
 	  $code .= <<"END_MARK_ONE";
 
-BEGIN \{ \$\{^WARN_HOOK\} = sub \{ 
+BEGIN \{ \$^WARN_HOOK = sub \{ 
     my \$msg = \@_[0]->message;
 END_MARK_ONE
 

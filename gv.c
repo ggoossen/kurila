@@ -971,7 +971,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
     /* set up magic where warranted */
     if (len > 1) {
 #ifndef EBCDIC
-	if (*name > 'V' ) {
+	if (*name >= 'a' ) {
 	    NOOP;
 	    /* Nothing else to do.
 	       The compiler will probably turn the switch statement into a

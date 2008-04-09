@@ -747,7 +747,7 @@ where possible $^X is now set by asking the operating system.
 
 =item *
 
-A new variable, C<${^TAINT}>, indicates whether taint mode is enabled.
+A new variable, C<$^TAINT>, indicates whether taint mode is enabled.
 
 =item *
 

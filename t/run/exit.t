@@ -32,7 +32,7 @@ my $exit, $exit_arg;
 $exit = run('exit');
 is( $exit >> 8, 0,              'Normal exit' );
 is( $exit, $?,                  'Normal exit $?' );
-is( $^CHILD_ERROR_NATIVE, $native_success,  'Normal exit ${^CHILD_ERROR_NATIVE}' );
+is( $^CHILD_ERROR_NATIVE, $native_success,  'Normal exit $^CHILD_ERROR_NATIVE' );
 
 if ($^O ne 'VMS') {
   my $posix_ok = eval { require POSIX; };
@@ -41,7 +41,7 @@ if ($^O ne 'VMS') {
   $exit = run('exit 42');
   is( $exit >> 8, 42,             'Non-zero exit' );
   is( $exit, $?,                  'Non-zero exit $?' );
-  isnt( !$^CHILD_ERROR_NATIVE, 0, 'Non-zero exit ${^CHILD_ERROR_NATIVE}' );
+  isnt( !$^CHILD_ERROR_NATIVE, 0, 'Non-zero exit $^CHILD_ERROR_NATIVE' );
   SKIP: {
     skip("No POSIX", 3) unless $posix_ok;
     skip("No POSIX wait macros", 3) unless $wait_macros_ok;
@@ -58,7 +58,7 @@ if ($^O ne 'VMS') {
     is( $exit ^&^ 127, 15,            'Term by signal' );
     ok( !($exit ^&^ 128),             'No core dump' );
     is( $? ^&^ 127, 15,               'Term by signal $?' );
-    isnt( $^CHILD_ERROR_NATIVE,  0, 'Term by signal ${^CHILD_ERROR_NATIVE}' );
+    isnt( $^CHILD_ERROR_NATIVE,  0, 'Term by signal $^CHILD_ERROR_NATIVE' );
     SKIP: {
       skip("No POSIX", 3) unless $posix_ok;
       skip("No POSIX wait macros", 3) unless $wait_macros_ok;
@@ -131,7 +131,7 @@ $exit = run("END \{ \$? = $exit_arg \}");
 # when Perl exits, it will set that status code.
 #
 # In this test on VMS, the child process exit with a SS$_ABORT, which
-# the parent stores in ${^CHILD_ERROR_NATIVE}.  The SS$_ABORT code is
+# the parent stores in $^CHILD_ERROR_NATIVE.  The SS$_ABORT code is
 # then translated to the UNIX code EINTR which has the value of 4 on VMS.
 #
 # This is complex because Perl translates internally generated UNIX

@@ -15,7 +15,7 @@ sub _drop_oldenc {
     # perlio layer stack an encoding identical to what we would like
     # to push via this open pragma, we will pop away the old encoding
     # (+utf8) so that we can push ourselves in place (this is easier
-    # than ignoring pushing ourselves because of the way how ${^OPEN}
+    # than ignoring pushing ourselves because of the way how $^OPEN
     # works).  So we are looking for something like
     #
     #   stdio encoding(xxx) utf8

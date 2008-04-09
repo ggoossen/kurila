@@ -613,7 +613,7 @@ sub must_warn_pat {
 sub must_warn {
     my ($warn_pat, $code) = @_;
     local %SIG;
-    eval 'BEGIN { use warnings; ${^WARN_HOOK} = $warn_pat };' . $code;
+    eval 'BEGIN { use warnings; $^WARN_HOOK = $warn_pat };' . $code;
     print "ok $test\n";
     $test++;
 }
@@ -3229,7 +3229,7 @@ if ($ordA == 193) {
     $str .= ($delim x 4);
     my $res;
     my $matched;
-    if ($str =~ s/^(.*?)$delim{4}//s) {
+    if ($str =~ s/^(.*?)(?:$delim){4}//s) {
         $res = $1;
         $matched=1;
     } 
@@ -3258,10 +3258,10 @@ if ($ordA == 193) {
 
     local $" = ','; # non-whitespace and non-RE-specific
     ok('abc' =~ m/(.)(.)(.)/, 'the last successful match is bogus');
-    ok("A@+B"  =~ m/A@+B/,  'interpolation of @+ in /@{+}/');
-    ok("A@-B"  =~ m/A@-B/,  'interpolation of @- in /@{-}/');
-    ok("A@+B"  =~ m/A@+B/x, 'interpolation of @+ in /@{+}/x');
-    ok("A@-B"  =~ m/A@-B/x, 'interpolation of @- in /@{-}/x');
+    ok("A@+B"  =~ m/A@{\@+}B/,  'interpolation of @+ in /@{+}/');
+    ok("A@-B"  =~ m/A@{\@-}B/,  'interpolation of @- in /@{-}/');
+    ok("A@+B"  =~ m/A@{\@+}B/x, 'interpolation of @+ in /@{+}/x');
+    ok("A@-B"  =~ m/A@{\@-}B/x, 'interpolation of @- in /@{-}/x');
 }
 
 {

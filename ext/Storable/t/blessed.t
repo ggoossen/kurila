@@ -70,11 +70,11 @@ die $@ if $@;
 ok 1, $@ eq '';
 
 eval <<EOC;
-package $name_WITH_HOOK;
+package {$name}_WITH_HOOK;
 
 \@ISA = ("SHORT_NAME_WITH_HOOK");
 EOC
-ok 2, $@ eq '';
+ok 2, ! $@ ;
 
 # Construct a pool of objects
 my @pool;

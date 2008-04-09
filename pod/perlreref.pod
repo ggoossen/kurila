@@ -29,7 +29,7 @@ applying the given options.
     i  case-Insensitive
     x  eXtended legibility - free whitespace and comments
     p  Preserve a copy of the matched string -
-       ${^PREMATCH}, ${^MATCH}, ${^POSTMATCH} will be defined.
+       $^PREMATCH, $^MATCH, $^POSTMATCH will be defined.
     o  compile pattern Once
     g  Global - all occurrences
     c  don't reset pos on failed matches when using /g
@@ -227,16 +227,16 @@ There is no quantifier {,n} -- that gets understood as a literal string.
    $&    Entire matched string
    $'    Everything after to matched string
 
-   ${^PREMATCH}   Everything prior to matched string
-   ${^MATCH}      Entire matched string
-   ${^POSTMATCH}  Everything after to matched string
+   $^PREMATCH   Everything prior to matched string
+   $^MATCH      Entire matched string
+   $^POSTMATCH  Everything after to matched string
 
 The use of C<$`>, C<$&> or C<$'> will slow down B<all> regex use
 within your program. Consult L<perlvar> for C<@->
 to see equivalent expressions that won't cause slow down.
 See also L<Devel::SawAmpersand>. Starting with Perl 5.10, you
-can also use the equivalent variables C<${^PREMATCH}>, C<${^MATCH}>
-and C<${^POSTMATCH}>, but for them to be defined, you have to
+can also use the equivalent variables C<$^PREMATCH>, C<$^MATCH>
+and C<$^POSTMATCH>, but for them to be defined, you have to
 specify the C</p> (preserve) modifier on your regular expression.
 
    $1, $2 ...  hold the Xth captured expr

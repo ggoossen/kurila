@@ -2344,11 +2344,11 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    break;
 	}
 	break;
-    case '`': /* ${^PREMATCH} caught below */
+    case '`': /* $^PREMATCH caught below */
       do_prematch:
       paren = RX_BUFF_IDX_PREMATCH;
       goto setparen;
-    case '\'': /* ${^POSTMATCH} caught below */
+    case '\'': /* $^POSTMATCH caught below */
       do_postmatch:
       paren = RX_BUFF_IDX_POSTMATCH;
       goto setparen;

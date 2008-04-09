@@ -114,7 +114,7 @@ sub guess_name {
     # extension into a working directory whose name doesn't reflect the
     # extension's name.  We'll use the name of a unique .pm file, or the
     # first .pm file with a matching .xs file.
-    if (not -e "${defpm}.pm") {
+    if (not -e "{$defpm}.pm") {
       @pm = glob('*.pm');
       s/.pm$// for @pm;
       if (@pm == 1) { ($defpm = @pm[0]) =~ s/.pm$//; }
@@ -127,20 +127,20 @@ sub guess_name {
         }
       }
     }
-    if (open(my $pm, '<', "${defpm}.pm")){
+    if (open(my $pm, '<', "{$defpm}.pm")){
         while (~< $pm) {
             if (m/^\s*package\s+([^;]+)/i) {
                 $defname = $1;
                 last;
             }
         }
-        print STDOUT "Warning (non-fatal): Couldn't find package name in ${defpm}.pm;\n\t",
+        print STDOUT "Warning (non-fatal): Couldn't find package name in {$defpm}.pm;\n\t",
                      "defaulting package name to $defname\n"
             if eof($pm);
         close $pm;
     }
     else {
-        print STDOUT "Warning (non-fatal): Couldn't find ${defpm}.pm;\n\t",
+        print STDOUT "Warning (non-fatal): Couldn't find {$defpm}.pm;\n\t",
                      "defaulting package name to $defname\n";
     }
     $defname =~ s#[\d.\-_]+$##;
@@ -707,7 +707,7 @@ sub cflags {
     if ($self->{DEFINE}) { $quals .= $self->{DEFINE}; }
     for my $type (qw(Def Undef)) {
 	my(@terms);
-	while ($quals =~ m:/${type}i?n?e?=([^/]+):ig) {
+	while ($quals =~ m:/${\$type}i?n?e?=([^/]+):ig) {
 		my $term = $1;
 		$term =~ s:^\((.+)\)$:$1:;
 		push @terms, $term;
@@ -716,8 +716,8 @@ sub cflags {
 	    push @terms, qw[ $(DEFINE_VERSION) $(XS_DEFINE_VERSION) ];
 	}
 	if (@terms) {
-	    $quals =~ s:/${type}i?n?e?=[^/]+::ig;
-	    $quals .= "/${type}ine=(" . join(',',@terms) . ')';
+	    $quals =~ s:/${\$type}i?n?e?=[^/]+::ig;
+	    $quals .= "/${\$type}ine=(" . join(',',@terms) . ')';
 	}
     }
 
@@ -1513,27 +1513,27 @@ MAP_LIBPERL = ",$self->fixpath($libperl,0),'
 ';
 
 
-    push @m,"\n${tmpdir}Makeaperl.Opt : \$(MAP_EXTRA)\n";
+    push @m,"\n{$tmpdir}Makeaperl.Opt : \$(MAP_EXTRA)\n";
     foreach (@optlibs) {
 	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,'}" >>$(MMS$TARGET)',"\n";
     }
-    push @m,"\n${tmpdir}PerlShr.Opt :\n\t";
+    push @m,"\n{$tmpdir}PerlShr.Opt :\n\t";
     push @m,'$(NOECHO) $(PERL) -e "print q{$(MAP_SHRTARGET)}" >$(MMS$TARGET)',"\n";
 
     push @m,'
-$(MAP_SHRTARGET) : $(MAP_LIBPERL) Makeaperl.Opt ',"${libperldir}Perlshr_Attr.Opt",'
-	$(MAP_LINKCMD)/Shareable=$(MMS$TARGET) $(MAP_LIBPERL), Makeaperl.Opt/Option ',"${libperldir}Perlshr_Attr.Opt/Option",'
-$(MAP_TARGET) : $(MAP_SHRTARGET) ',"${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}PerlShr.Opt",'
-	$(MAP_LINKCMD) ',"${tmpdir}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
+$(MAP_SHRTARGET) : $(MAP_LIBPERL) Makeaperl.Opt ',"{$libperldir}Perlshr_Attr.Opt",'
+	$(MAP_LINKCMD)/Shareable=$(MMS$TARGET) $(MAP_LIBPERL), Makeaperl.Opt/Option ',"{$libperldir}Perlshr_Attr.Opt/Option",'
+$(MAP_TARGET) : $(MAP_SHRTARGET) ',"{$tmpdir}perlmain\$(OBJ_EXT) {$tmpdir}PerlShr.Opt",'
+	$(MAP_LINKCMD) ',"{$tmpdir}perlmain\$(OBJ_EXT)",', PerlShr.Opt/Option
 	$(NOECHO) $(ECHO) "To install the new ""$(MAP_TARGET)"" binary, say"
 	$(NOECHO) $(ECHO) "    $(MAKE)$(USEMAKEFILE)$(FIRST_MAKEFILE) inst_perl $(USEMACROS)MAP_TARGET=$(MAP_TARGET)$(ENDMACRO)"
 	$(NOECHO) $(ECHO) "To remove the intermediate files, say
 	$(NOECHO) $(ECHO) "    $(MAKE)$(USEMAKEFILE)$(FIRST_MAKEFILE) map_clean"
 ';
-    push @m,"\n${tmpdir}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >${tmpdir}Writemain.tmp\n";
+    push @m,"\n{$tmpdir}perlmain.c : \$(FIRST_MAKEFILE)\n\t\$(NOECHO) \$(PERL) -e 1 >{$tmpdir}Writemain.tmp\n";
     push @m, "# More from the 255-char line length limit\n";
     foreach (@staticpkgs) {
-	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[\}" >>${tmpdir}Writemain.tmp\n];
+	push @m,'	$(NOECHO) $(PERL) -e "print q{',$_,qq[\}" >>{$tmpdir}Writemain.tmp\n];
     }
 
     push @m, sprintf <<'MAKE_FRAG', $tmpdir, $tmpdir;
@@ -1565,8 +1565,8 @@ clean :: map_clean
 	\$(NOECHO) \$(NOOP)
 
 map_clean :
-	\$(RM_F) ${tmpdir}perlmain\$(OBJ_EXT) ${tmpdir}perlmain.c \$(FIRST_MAKEFILE)
-	\$(RM_F) ${tmpdir}Makeaperl.Opt ${tmpdir}PerlShr.Opt \$(MAP_TARGET)
+	\$(RM_F) {$tmpdir}perlmain\$(OBJ_EXT) {$tmpdir}perlmain.c \$(FIRST_MAKEFILE)
+	\$(RM_F) {$tmpdir}Makeaperl.Opt {$tmpdir}PerlShr.Opt \$(MAP_TARGET)
 ";
 
     join '', @m;

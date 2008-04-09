@@ -770,7 +770,7 @@ sub explict_call_constant {
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
 \{
-  my (\$error, \$got) = ${package}::constant ('$string');\n;
+  my (\$error, \$got) = {$package}::constant ('$string');\n;
 EOT
 
   if (defined $expect) {

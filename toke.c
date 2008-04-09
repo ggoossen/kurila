@@ -134,15 +134,15 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 
 /* #define LEX_NOTPARSING		11 is done in perl.h. */
 
-#define LEX_NORMAL		 8 /* normal code (ie not within "...")     */
-#define LEX_INTERPNORMAL	 7 /* code within a string, eg "$foo[$x+1]" */
-#define LEX_INTERPCASEMOD	 6 /* expecting a \U, \Q or \E etc          */
-#define LEX_INTERPPUSH		 5 /* starting a new sublex parse level     */
-#define LEX_INTERPSTART		 4 /* expecting the start of a $var         */
+#define LEX_INTERPBLOCK          8 /* block inside { ... } */
+#define LEX_NORMAL		 7 /* normal code (ie not within "...")     */
+#define LEX_INTERPNORMAL	 6 /* code within a string, eg "$foo[$x+1]" */
+#define LEX_INTERPCASEMOD	 5 /* expecting a \U, \Q or \E etc          */
+#define LEX_INTERPPUSH		 4 /* starting a new sublex parse level     */
+#define LEX_INTERPSTART		 3 /* expecting the start of a $var         */
 
 				   /* at end of code, eg "$x" followed by:  */
-#define LEX_INTERPEND		 3 /* ... eg not one of [, { or ->          */
-#define LEX_INTERPENDMAYBE	 2 /* ... eg one of [, { or ->              */
+#define LEX_INTERPEND		 2 /* ... eg not one of [, { or ->          */
 
 #define LEX_INTERPCONCAT	 1 /* expecting anything, eg at start of
 				        string or after \E, $foo, etc       */
@@ -153,13 +153,13 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 static const char* const lex_state_names[] = {
     "KNOWNEXT",
     "INTERPCONCAT",
-    "INTERPENDMAYBE",
     "INTERPEND",
     "INTERPSTART",
     "INTERPPUSH",
     "INTERPCASEMOD",
     "INTERPNORMAL",
-    "NORMAL"
+    "NORMAL",
+    "INTERPBLOCK"
 };
 #endif
 
@@ -2908,7 +2908,7 @@ Perl_yylex(pTHX)
 	DEBUG_T({ PerlIO_printf(Perl_debug_log,
               "### Interpolated variable\n"); });
 	if (*PL_bufptr == '{') {
-	    PL_lex_state = LEX_INTERPNORMAL;
+	    PL_lex_state = LEX_INTERPBLOCK;
 	    PL_expect = XREF;
 
 	    start_force(PL_curforce);
@@ -2956,13 +2956,6 @@ Perl_yylex(pTHX)
 		Aop(OP_CONCAT);
 	}
 	return yylex();
-
-    case LEX_INTERPENDMAYBE:
-	if (intuit_more(PL_bufptr)) {
-	    PL_lex_state = LEX_INTERPNORMAL;	/* false alarm, more expr */
-	    break;
-	}
-	/* FALL THROUGH */
 
     case LEX_INTERPEND:
 	if (PL_lex_dojoin) {
@@ -3264,7 +3257,7 @@ Perl_yylex(pTHX)
 		     * at least, set argv[0] to the basename of the Perl
 		     * interpreter. So, having found "#!", we'll set it right.
 		     */
-		    SV * const x = GvSV(gv_fetchpvs("\030", GV_ADD|GV_NOTQUAL,
+		    SV * const x = GvSV(gv_fetchpvs("^X", GV_ADD|GV_NOTQUAL,
 						    SVt_PV)); /* $^X */
 		    assert(SvPOK(x) || SvGMAGICAL(x));
 		    if (sv_eq(x, CopFILESV(PL_curcop))) {
@@ -4128,6 +4121,18 @@ Perl_yylex(pTHX)
 	    Perl_croak(aTHX_ "Unmatched right curly bracket");
 	else
 	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets];
+	if (PL_lex_state == LEX_INTERPBLOCK) {
+	    if (PL_lex_brackets == 0) 
+		PL_lex_state = LEX_INTERPEND;
+	    if (PL_lex_brackets == 0) {
+		if (PL_expect & XFAKEBRACK) {
+		    PL_expect &= XENUMMASK;
+		    PL_lex_state = LEX_INTERPEND;
+		    PL_bufptr = s;
+		    return yylex();	/* ignore fake brackets */
+		}
+	    }
+	}
 	if (PL_lex_state == LEX_INTERPNORMAL) {
 	    if ( ! intuit_more(s))
 		PL_lex_state = LEX_INTERPEND;
@@ -9869,10 +9874,12 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
     d = dest;
     if (*d) {
 	if (PL_lex_state != LEX_NORMAL) {
-	    if (intuit_more(s)) {
-		PL_lex_state = LEX_INTERPNORMAL;
-	    } else {
-		PL_lex_state = LEX_INTERPEND;
+	    if (PL_lex_brackets == 0) {
+		if (intuit_more(s)) {
+		    PL_lex_state = LEX_INTERPNORMAL;
+		} else {
+		    PL_lex_state = LEX_INTERPEND;
+		}
 	    }
 	}
 	return s;

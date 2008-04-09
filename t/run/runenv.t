@@ -152,7 +152,7 @@ try({PERL5OPT => '-w -w'},
     '');
 
 try({PERL5OPT => '-t'},
-    ['-e', 'print ${^TAINT}'],
+    ['-e', 'print $^TAINT'],
     '-1',
     '');
 

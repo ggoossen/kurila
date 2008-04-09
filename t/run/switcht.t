@@ -14,7 +14,7 @@ my $warning;
 local $^WARN_HOOK = sub { $warning = @_[0]->message; };
 my $Tmsg = 'while running with -t switch';
 
-is( $^TAINT, -1, '${^TAINT} == -1' );
+is( $^TAINT, -1, '$^TAINT == -1' );
 
 my $out = `$Perl -le "print q(Hello)"`;
 is( $out, "Hello\n",                      '`` worked' );

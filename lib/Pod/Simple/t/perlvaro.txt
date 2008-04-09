@@ -312,7 +312,7 @@ See also $] for an older representation of the Perl version.
 $WARNING
 $^W
 The current value of the warning switch, initially true if -w was used, false otherwise, but directly modifiable. (Mnemonic: related to the -w switch.) See also warnings.
-${^WARNING_BITS}
+$^WARNING_BITS
 The current set of warning checks enabled by the use warnings pragma. See the documentation of warnings for more details.
 ${^WIDE_SYSTEM_CALLS}
 Global flag that enables system calls made by Perl to use wide character APIs native to the system, if available. This is currently only implemented on the Windows platform.
