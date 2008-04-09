@@ -106,17 +106,17 @@ sub check
 # #####
 
 title "gzcat - command line" ;
-check "$Perl ${examples}/gzcat $file1 $file2",  $hello1 . $hello2;
+check "$Perl {$examples}/gzcat $file1 $file2",  $hello1 . $hello2;
 
 title "gzcat - stdin" ;
-check "$Perl ${examples}/gzcat <$file1 ", $hello1;
+check "$Perl {$examples}/gzcat <$file1 ", $hello1;
 
 
 # gzgrep
 # ######
 
 title "gzgrep";
-check "$Perl  ${examples}/gzgrep the $file1 $file2",
+check "$Perl  {$examples}/gzgrep the $file1 $file2",
         join('', grep(m/the/, @hello1, @hello2));
 
 for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
@@ -129,10 +129,10 @@ for ($file1, $file2, $stderr) { 1 while unlink $_ } ;
 {
     title "gzstream" ;
     writeFile($file1, $hello1) ;
-    check "$Perl ${examples}/gzstream <$file1 >$file2";
+    check "$Perl {$examples}/gzstream <$file1 >$file2";
 
     title "gzcat" ;
-    check "$Perl ${examples}/gzcat $file2", $hello1 ;
+    check "$Perl {$examples}/gzcat $file2", $hello1 ;
 }
 
 END

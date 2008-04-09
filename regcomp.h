@@ -624,8 +624,8 @@ typedef struct _reg_ac_data reg_ac_data;
 #endif
 
 #define RE_TRIE_MAXBUF_INIT 65536
-#define RE_TRIE_MAXBUF_NAME "\022E_TRIE_MAXBUF"
-#define RE_DEBUG_FLAGS "\022E_DEBUG_FLAGS"
+#define RE_TRIE_MAXBUF_NAME "^RE_TRIE_MAXBUF"
+#define RE_DEBUG_FLAGS "^RE_DEBUG_FLAGS"
 
 /*
 

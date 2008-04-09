@@ -116,8 +116,7 @@ sub bits {
     my $on = shift;
     my $bits = 0;
     unless (@_) {
-	require Carp;
-	Carp::carp("Useless use of \"re\" pragma"); 
+	warn("Useless use of \"re\" pragma"); 
     }
     foreach my $idx (0..(@_-1)){
         my $s=@_[$idx];
@@ -132,8 +131,7 @@ sub bits {
                         $^RE_DEBUG_FLAGS ^&^= ^~^ %flags{@_[$idx]};
                     }
                 } else {
-                    require Carp;
-                    Carp::carp("Unknown \"re\" Debug flag '@_[$idx]', possible flags: ",
+                    warn("Unknown \"re\" Debug flag '@_[$idx]', possible flags: ",
                                join(", ",sort keys %flags ) );
                 }
             }
@@ -156,8 +154,7 @@ sub bits {
 	    require Exporter;
 	    re->export_to_level(2, 're', $s);
 	} else {
-	    require Carp;
-	    Carp::carp("Unknown \"re\" subpragma '$s' (known ones are: ",
+	    warn("Unknown \"re\" subpragma '$s' (known ones are: ",
                        join(', ', map {qq('$_')} 'debug', 'debugcolor', sort keys %bitmask),
                        ")");
 	}

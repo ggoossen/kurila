@@ -14,7 +14,7 @@ BEGIN {
 # (It may become useful if the test is moved to ./t subdirectory.)
 
 our $loaded;
-BEGIN { $| = 1; print "1..183\n"; }
+BEGIN { $| = 1; print "1..181\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Text::Balanced qw ( extract_variable );
 $loaded = 1;
@@ -120,7 +120,6 @@ $%;
 $=;
 $-;
 $~;
-$^;
 $:;
 $^L;
 $^A;
