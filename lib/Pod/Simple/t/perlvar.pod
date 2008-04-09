@@ -1213,7 +1213,7 @@ other names are also exempt:
 	ARGVOUT
 	SIG
 
-In particular, the new special C<${^_XYZ}> variables are always taken
+In particular, the new special C<$^_XYZ> variables are always taken
 to be in package C<main>, regardless of any C<package> declarations
 presently in scope.
 

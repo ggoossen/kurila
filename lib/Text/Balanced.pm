@@ -446,7 +446,7 @@ sub _match_variable($$)
 		return;
 	}
 	my $varpos = pos($$textref);
-        unless ($$textref =~ m{\G\$\s*(?!::)(\d+|[][&`'+*./|,";%=~:?!\@<>()-]|\^[a-z]?)}gci)
+        unless ($$textref =~ m{\G\$\s*\^?(?!::)(\d+|[][&`'+*./|,";%=~:?!\@<>()-])}gci)
 	{
 	    unless ($$textref =~ m/\G((\$#?|[*\@\%]|\\&)+)/gc)
 	    {
@@ -456,7 +456,7 @@ sub _match_variable($$)
 	    }
 	    my $deref = $1;
 
-	    unless ($$textref =~ m/\G\s*(?:::|')?(?:[_a-z]\w*(?:::|'))*[_a-z]\w*/gci
+	    unless ($$textref =~ m/\G\s*\^?(?:::|')?(?:[_a-z]\w*(?:::|'))*[_a-z]\w*/gci
 	    	or _match_codeblock($textref, "", '\{', '\}', '\{', '\}', 0)
 		or $deref eq '$#' or $deref eq '$$' )
 	    {
