@@ -31,7 +31,8 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_carp();
+t_no_sigil_change();
+#t_carp();
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
@@ -865,6 +866,64 @@ confess "foo";
 ----
 use Carp;
 die "foo";
+====
+END
+}
+
+sub t_no_sigil_change {
+    my $x = "abc";
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my @foo;
+$#foo;
+----
+my @foo;
+(@foo-1);
+====
+$#$foo
+----
+(@$foo-1)
+====
+my @foo;
+$foo[1];
+$foo[$a];
+sub x { $_[1]++; }
+----
+my @foo;
+@foo[1];
+@foo[$a];
+sub x { @_[1]++; }
+====
+my %foo;
+$foo{1};
+$foo{$a};
+exists $foo{$a};
+----
+my %foo;
+%foo{1};
+%foo{$a};
+exists %foo{$a};
+====
+@foo{@bar};
+my %mfoo;
+@mfoo{@bar};
+----
+%foo{[@bar]};
+my %mfoo;
+%mfoo{[@bar]};
+====
+@foo[1,2];
+(1,2,3)[0..2];
+----
+@foo[[1,2]];
+(1,2,3)[[0..2]];
+====
+"%"
+----
+"\%"
+====
+split m/$foo::baz{bar}/, $a;
+----
+split m/%foo::baz{bar}/, $a;
 ====
 END
 }

@@ -646,6 +646,7 @@ struct madtoken {
  * G       __END__ section
  * i       if/unless modifier
  * I       if/elsif/unless statement
+ * j       first ']' of an array or hash slice
  * k       local declarator
  * K       retired kid op
  * l       last index of array ($#foo)

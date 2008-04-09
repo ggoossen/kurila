@@ -814,8 +814,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
-			  TOKEN_GETMAD($5,$$,';');
-			  TOKEN_GETMAD($6,$$,'}');
+			  TOKEN_GETMAD($5,$$,'j');
+			  TOKEN_GETMAD($6,$$,';');
+			  TOKEN_GETMAD($7,$$,'}');
 			}
 	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
 			{ $$ = prepend_elem(OP_ASLICE,
@@ -825,7 +826,8 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 					ref(newAVREF($1), OP_ASLICE)));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,']');
+			  TOKEN_GETMAD($5,$$,'j');
+			  TOKEN_GETMAD($6,$$,']');
 			}
 	|	subscripted '[' expr ']'    /* $foo->[$bar]->[$baz] */
 			{ $$ = newBINOP(OP_AELEM, 0,
@@ -842,8 +844,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 					ref(newHVREF($1), OP_HSLICE)));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
-			  TOKEN_GETMAD($5,$$,'}');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,';');
+			  TOKEN_GETMAD($6,$$,'}');
 			}
 	|	subscripted ASLICE expr ']' ']'                     /* $foo->[[...]] */
 			{ $$ = prepend_elem(OP_ASLICE,
@@ -852,7 +855,8 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 					list($3),
 					ref(newAVREF($1), OP_ASLICE)));
 			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,']');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,']');
 			}
 	|	hsh HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
 			{ $$ = prepend_elem(OP_HSLICE,
@@ -862,8 +866,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 					ref($1, OP_HSLICE)));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
-			  TOKEN_GETMAD($5,$$,'}');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,';');
+			  TOKEN_GETMAD($6,$$,'}');
 			}
 	|	hsh '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
 			{ $$ = newBINOP(OP_HELEM, 0, oopsHV($1), jmaybe($3));
@@ -925,14 +930,16 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
 			  TOKEN_GETMAD($4,$$,'[');
-			  TOKEN_GETMAD($6,$$,']');
+			  TOKEN_GETMAD($6,$$,'j');
+			  TOKEN_GETMAD($7,$$,']');
 			}
 	|	'(' ')' ASLICE expr ']' ']'                 /* empty list slice! */
 			{ $$ = newSLICEOP(0, $4, (OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
 			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,']');
+			  TOKEN_GETMAD($6,$$,'j');
+			  TOKEN_GETMAD($6,$$,']');
 			}
 	|	'(' expr ')' '[' expr ']'            /* list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
@@ -1223,7 +1230,8 @@ term	:	termbinop
 					list($3),
 					ref($1, OP_ASLICE)));
 			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,']');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,']');
 			}
 	|	THING	%prec '('
 			{ $$ = $1; }

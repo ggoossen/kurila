@@ -2416,7 +2416,8 @@ Perl_do_pmop_xmldump(pTHX_ I32 level, PerlIO *file, const PMOP *pm)
     level++;
     if (PM_GETRE(pm)) {
 	REGEXP *const r = PM_GETRE(pm);
-	SV * const tmpsv = newSVsv((SV*)r);
+	SV * const tmpsv = newSVpvn("", 0);
+	sv_catxmlsv(tmpsv, (SV*)r);
 	Perl_xmldump_indent(aTHX_ level, file, "pre=\"%s\"\n",
 	     SvPVX(tmpsv));
 	SvREFCNT_dec(tmpsv);
@@ -2518,6 +2519,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 'h', "constsub_args" },
     { '>', "null_type" },
     { '<', "null_type_first" },
+    { 'j', "slice_close" },
     { 0,   NULL }
 };
 const char* slotname(char s) {

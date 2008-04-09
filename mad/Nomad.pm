@@ -1541,8 +1541,9 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $$self{Kids}[0]->madness('l');
+    push @newkids, $$self{Kids}[0]->madness('wrap_open l');
     push @newkids, $$self{Kids}[0]->ast();
+    push @newkids, $$self{Kids}[0]->madness('wrap_close');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -2020,6 +2021,8 @@ package PLXML::op_sge;
 package PLXML::op_seq;
 package PLXML::op_sne;
 package PLXML::op_scmp;
+package PLXML::op_ref_eq;
+package PLXML::op_ref_ne;
 package PLXML::op_bit_and;
 package PLXML::op_bit_xor;
 package PLXML::op_bit_or;
@@ -2180,7 +2183,7 @@ sub astnull {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d');
-    push @newkids, $self->madness(']');
+    push @newkids, $self->madness('slice_close ]');
     return P5AST::op_aslice->new(Kids => [@newkids]);
 }
 
@@ -2194,7 +2197,7 @@ sub ast {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d');
-    push @newkids, $self->madness(']');
+    push @newkids, $self->madness('slice_close ]');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -2272,7 +2275,7 @@ sub astnull {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d'); 
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('slice_close }');
     return P5AST::op_hslice->new(Kids => [@newkids]);
 }
 
@@ -2286,7 +2289,7 @@ sub ast {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d'); 
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('slice_close }');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
