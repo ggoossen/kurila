@@ -1140,7 +1140,6 @@
 
 ;;; Code:
 
-
 (if (fboundp 'eval-when-compile)
     (eval-when-compile
       (condition-case nil
@@ -1279,7 +1278,6 @@
   :prefix "kurila-"
   :group 'cperl)
 
-
 (defcustom kurila-extra-newline-before-brace nil
   "*Non-nil means that if, elsif, while, until, else, for, foreach
 and do constructs look like:
@@ -7541,7 +7539,7 @@ $~	The name of the current report format.
 \\0	Octal char, e.g. \\033.
 \\E	Case modification terminator.  See \\Q, \\L, and \\U.
 \\L	Lowercase until \\E .  See also \l, lc.
-\\U	Upcase until \\E .  See also \u, uc.
+\\U	Upcase until \\E .  See also \\u, uc.
 \\Q	Quote metacharacters until \\E .  See also quotemeta.
 \\a	Alarm character (octal 007).
 \\b	Backspace character (octal 010).
