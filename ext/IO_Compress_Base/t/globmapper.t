@@ -32,7 +32,7 @@ BEGIN
 
     for my $delim ( qw/ ( ) { } [ ] / )
     {
-        $gm = File::GlobMapper->new("${delim}abc", '*.X');
+        $gm = File::GlobMapper->new("{$delim}abc", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
             "  catch unmatched $delim";
@@ -40,7 +40,7 @@ BEGIN
 
     for my $delim ( qw/ ( ) [ ] / )
     {
-        $gm = File::GlobMapper->new("\{${delim}abc\}", '*.X');
+        $gm = File::GlobMapper->new("\{{$delim}abc\}", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
             "  catch unmatched $delim inside \{\}";

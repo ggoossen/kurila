@@ -29,7 +29,7 @@ foreach my $test (@tests) {
                   :                "/$pat/";
 
     #
-    # Cannot use if/else due to the scope invalidating ${^MATCH} and friends.
+    # Cannot use if/else due to the scope invalidating $^MATCH and friends.
     #
     my $ok = ok $p eq '/p'   ? m/$pat/p
               : $p eq '(?p)' ? m/(?p)$pat/

@@ -36,7 +36,7 @@ is("@aa","a b");
 %aa = qw/a b/;
 { local %aa;     %aa = qw/c d/; is(%aa{c},"d"); }
 is(%aa{a},"b");
-{ no strict 'refs'; local %{aa};   %aa = qw/e f/; is(%aa{e},"f"); }
+{ no strict 'refs'; local %aa;   %aa = qw/e f/; is(%aa{e},"f"); }
 is(%aa{a},"b");
 { no strict 'refs'; local %{*{Symbol::fetch_glob("aa")}}; %aa = qw/g h/; is(%aa{g},"h"); }
 is(%aa{a},"b");

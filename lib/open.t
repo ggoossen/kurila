@@ -24,7 +24,7 @@ like( $@->{description}, qr/needs explicit list of PerlIO layers/,
 
 # prevent it from loading I18N::Langinfo, so we can test encoding failures
 my $warn;
-local ${^WARN_HOOK} = sub {
+local $^WARN_HOOK = sub {
 	$warn .= shift->{description};
 };
 
@@ -56,7 +56,7 @@ like( $@->{description}, qr/Unknown PerlIO layer class/, 'should croak with unkn
 
 # but it handles them all so well together
 import( 'IO', ':raw :crlf' );
-is( ${^OPEN}, ":raw :crlf\0:raw :crlf",
+is( $^OPEN, ":raw :crlf\0:raw :crlf",
 	'should set multi types, multi layer' );
 is( %^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 

@@ -2037,7 +2037,7 @@ may then attempt to stat("foo.exe") (Cygwin)
 
 On Win32 stat() needs to open the file to determine the link count
 and update attributes that may have been changed through hard links.
-Setting ${^WIN32_SLOPPY_STAT} to a true value speeds up stat() by
+Setting $^WIN32_SLOPPY_STAT to a true value speeds up stat() by
 not performing this operation. (Win32)
 
 =item symlink

@@ -330,7 +330,7 @@ sub bootstrap {
 		$path = Mac::FileSpec::Unixish::nativize($path);
 	    }
 	    $path .= ":"  unless /:$/;
-	    my $dir = "${path}auto:$modpname";
+	    my $dir = "{$path}auto:$modpname";
 	<<|$^O-eq-MacOS>>
 	    my $dir = "$_/auto/$modpname";
 	<</$^O-eq-MacOS>>
@@ -399,7 +399,7 @@ sub bootstrap {
     push(@dl_modules, $module); # record loaded module
 
   boot:
-    my $xs = dl_install_xsub("${module}::bootstrap", $boot_symbol_ref, $file);
+    my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
 
     # See comment block above
 
@@ -973,11 +973,11 @@ calls dl_find_symbol() for "boot_$module"
 
 =item *
 
-calls dl_install_xsub() to install it as "${module}::bootstrap"
+calls dl_install_xsub() to install it as "{$module}::bootstrap"
 
 =item *
 
-calls &{"${module}::bootstrap"} to bootstrap the module (actually
+calls &{"{$module}::bootstrap"} to bootstrap the module (actually
 it uses the function reference returned by dl_install_xsub for speed)
 
 =back

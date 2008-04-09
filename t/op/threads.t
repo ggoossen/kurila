@@ -101,7 +101,7 @@ ok(1);
 fresh_perl_is(<<'EOI', 'ok', { }, 'cloning constant subs');
 use constant x=>1;
 use threads;
-${^WARN_HOOK} = sub{};
+$^WARN_HOOK = sub{};
 async sub {};
 print "ok";
 EOI

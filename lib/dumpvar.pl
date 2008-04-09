@@ -463,7 +463,7 @@ sub main::dumpvar {
     $package .= "::" unless $package =~ m/::$/;
     *stab = *{Symbol::fetch_glob("main::")};
     while ($package =~ m/(\w+?::)/g){
-      *stab = % {stab}{$1};
+      *stab = %stab{$1};
     }
     local $TotalStrings = 0;
     local $Strings = 0;
@@ -532,7 +532,7 @@ sub packageUsage {
   $package .= "::" unless $package =~ m/::$/;
   local *stab = *{Symbol::fetch_glob("main::")};
   while ($package =~ m/(\w+?::)/g){
-    *stab = % {stab}{$1};
+    *stab = %stab{$1};
   }
   local $TotalStrings = 0;
   local $CompleteTotal = 0;

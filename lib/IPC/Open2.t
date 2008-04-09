@@ -13,7 +13,7 @@ BEGIN {
 	exit 0;
     }
     # make warnings fatal
-    ${^WARN_HOOK} = sub { die @_ };
+    $^WARN_HOOK = sub { die @_ };
 }
 
 use strict;

@@ -377,7 +377,7 @@ sub jleft {
 		}
 		my ($fail, $str);
 		{
-			local ${^WARN_HOOK} = sub { $fail = 1 };
+			local $^WARN_HOOK = sub { $fail = 1 };
 			$str = sprintf('%*.*f',%val{width},$places,$orig);
 		}
 		if ($fail) {
@@ -501,7 +501,7 @@ sub segment ($\@\%$\%) {
 	my $args_req = int(@format/3);
 	my (@formatters,@starred,@vstarred);
 	for my $i (0..$args_req) {
-		my ($literal,$field,$userdef) = @format[3*$i..3*$i+2];
+		my ($literal,$field,$userdef) = @format[[3*$i..3*$i+2]];
 		$literal =~ s/\\\{/\{/g;
 		push @formatters, { %std_literal,
 							width => length($literal),

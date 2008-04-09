@@ -910,7 +910,7 @@ ok( $^TAINT == 1, '$^TAINT is on' );
 eval { $^TAINT = 0 };
 ok( $^TAINT,  '$^TAINT is not assignable' );
 ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
-    'Assigning to ${^TAINT} fails' );
+    'Assigning to $^TAINT fails' );
 
 {
     # bug 20011111.105

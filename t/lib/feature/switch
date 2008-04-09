@@ -135,20 +135,3 @@ EXPECT
 Bareword "when" not allowed while "strict subs" in use at - line 6, at EOF
 Execution of - aborted due to compilation errors. at - line 6.
 ########
-# Without the feature, no 'Unambiguous use of' warning:
-use warnings;
-@break = ($break = "break");
-print ${break}, @{break[0]};
-EXPECT
-breakbreak
-########
-# With the feature, we get an 'Unambiguous use of' warning:
-use warnings;
-use feature 'switch';
-@break = ($break = "break");
-print ${break}, @{break[0]};
-EXPECT
-Ambiguous use of ${break} resolved to $break at - line 5.
-Ambiguous use of @{break[...]} resolved to @break[...] at - line 5.
-breakbreak
-########
