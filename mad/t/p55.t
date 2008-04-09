@@ -15,6 +15,8 @@
 #     make && make test
 #     cd t && /usr/bin/prove ../mad/t/p55.t
 
+use 5.8.8;
+
 use strict;
 use warnings;
 
@@ -40,10 +42,10 @@ sub p55 {
     my $returncode = system("PERL_XMLDUMP='tmp.xml' ../perl -I ../lib tmp.in 2> tmp.err");
 
     if (-z "tmp.xml") {
-        ok 0, "MAD dump failed $msg" or $TODO or die;
+        ok 0, "MAD dump of '$input' failed: $msg" or $TODO or die;
         return;
     }
-    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
+    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.9" ) };
     diag($@) if $@;
     is($output, $input, $msg) or $TODO or die;
 }
@@ -78,7 +80,7 @@ sub p55_file {
         fail "MAD dump failure of '$file'";
         return;
     }
-    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml" ) };
+    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.9" ) };
     if ($@) {
         fail "convert xml to p5 failed file: '$file'";
         #$TODO or die;
@@ -141,15 +143,15 @@ tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
 sub ok($$) { }
 #BEGIN { ok(1, 2, ); }
 ########
-for (my $i=0; $i<3; $i++) { }
+for (my $i=0; $i+<3; $i++) { }
 ########
-for (; $a<3; $a++) { }
-########
-#
-s//$#foo/ge;
+for (; $a+<3; $a++) { }
 ########
 #
-s//m#.#/ge;
+s//{$#foo}/g;
+########
+#
+s//{m#.#}/g;
 ########
 # Reduced test case from t/io/layers.t
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
@@ -199,7 +201,7 @@ __END__
 DATA
 ########
 # split with PUSHRE
-@prgs = split "\n########\n", <DATA>;
+@prgs = split "\n########\n", ~< DATA;
 ########
 # unless(eval { })
 unless (eval { $a }) { $a = $b }
@@ -251,6 +253,3 @@ $a =~ s/$foo/$bar/;
 my $msg = "ce ºtii tu, bã ?\n";
 use utf8;
 my $msg = "ce ºtii tu, bã ?\n";
-########
-use encoding 'latin1';
-my @a = qw{bl� arg};
