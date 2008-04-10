@@ -732,7 +732,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     register I32 paren;
     register REGEXP *rx;
     const char * const remaining = mg->mg_ptr + 1;
-    const char nextchar = *remaining;
 
     PERL_ARGS_ASSERT_MAGIC_GET;
 

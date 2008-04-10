@@ -9826,12 +9826,13 @@ STATIC char *
 S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRLEN destlen, I32 ck_uni)
 {
     dVAR;
-    char *bracket = NULL;
-    char funny = *s++;
     register char *d = dest;
     register char * const e = d + destlen + 3;    /* two-character token, ending NUL */
 
     PERL_ARGS_ASSERT_SCAN_IDENT;
+
+    /* skip sigil */
+    s++;
 
     if (isSPACE(*s))
 	s = PEEKSPACE(s);
@@ -9898,94 +9899,10 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
     if (s < send)
 	*d = *s++;
     d[1] = '\0';
-    if (*d == '^') {/*  && *s  && isCONTROLVAR(*s)) { */
-	*d++ = *s++;/*  toCTRL(*s); */
-/* 	s++; */
+    if (*d == '^') {
+	*d++ = *s++;
     }
-    if (bracket) {
-	if (isSPACE(s[-1])) {
-	    while (s < send) {
-		const char ch = *s++;
-		if (!SPACE_OR_TAB(ch)) {
-		    *d = ch;
-		    break;
-		}
-	    }
-	}
-	if (isIDFIRST_lazy_if(d,UTF)) {
-	    d++;
-	    if (UTF) {
-		char *end = s;
-		while ((end < send && isALNUM_lazy_if(end,UTF)) || *end == ':') {
-		    end += UTF8SKIP(end);
-		    while (end < send && UTF8_IS_CONTINUED(*end) && is_utf8_mark(end))
-			end += UTF8SKIP(end);
-		}
-		Copy(s, d, end - s, char);
-		d += end - s;
-		s = end;
-	    }
-	    else {
-		while ((isALNUM(*s) || *s == ':') && d < e)
-		    *d++ = *s++;
-		if (d >= e)
-		    Perl_croak(aTHX_ ident_too_long);
-	    }
-	    *d = '\0';
-	    while (s < send && SPACE_OR_TAB(*s))
-		s++;
-	    if ((*s == '[' || (*s == '{' && strNE(dest, "sub")))) {
-		if (ckWARN(WARN_AMBIGUOUS) && keyword(dest, d - dest, 0)) {
-		    const char * const brack =
-			(const char *)
-			((*s == '[') ? "[...]" : "{...}");
-		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
-			"Ambiguous use of %c{%s%s} resolved to %c%s%s",
-			funny, dest, brack, funny, dest, brack);
-		}
-		bracket++;
-		PL_lex_brackstack[PL_lex_brackets++] = (char)(XOPERATOR | XFAKEBRACK);
-		return s;
-	    }
-	}
-	/* Handle extended ${^Foo} variables
-	 * 1999-02-27 mjd-perl-patch@plover.com */
-	else if (!isALNUM(*d) && !isPRINT(*d) /* isCTRL(d) */
-		 && isALNUM(*s))
-	{
-	    d++;
-	    while (isALNUM(*s) && d < e) {
-		*d++ = *s++;
-	    }
-	    if (d >= e)
-		Perl_croak(aTHX_ ident_too_long);
-	    *d = '\0';
-	}
-	if (*s == '}') {
-	    s++;
-	    if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets) {
-		PL_lex_state = LEX_INTERPEND;
-		PL_expect = XREF;
-	    }
-	    if (PL_lex_state == LEX_NORMAL) {
-		if (ckWARN(WARN_AMBIGUOUS) &&
-		    (keyword(dest, d - dest, 0)
-		     || get_cvn_flags(dest, d - dest, 0)))
-		{
-		    if (funny == '#')
-			funny = '@';
-		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
-			"Ambiguous use of %c{%s} resolved to %c%s",
-			funny, dest, funny, dest);
-		}
-	    }
-	}
-	else {
-	    s = bracket;		/* let the parser handle it */
-	    *dest = '\0';
-	}
-    }
-    else if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets && !intuit_more(s))
+    if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets && !intuit_more(s))
 	PL_lex_state = LEX_INTERPEND;
     return s;
 }
