@@ -131,8 +131,8 @@ sub bits {
                         $^RE_DEBUG_FLAGS ^&^= ^~^ %flags{@_[$idx]};
                     }
                 } else {
-                    warn("Unknown \"re\" Debug flag '@_[$idx]', possible flags: ",
-                               join(", ",sort keys %flags ) );
+                    warn("Unknown \"re\" Debug flag '@_[$idx]', possible flags: "
+                         . join(", ",sort keys %flags ) );
                 }
             }
             _load_unload($on ? 1 : $^RE_DEBUG_FLAGS);
@@ -154,9 +154,9 @@ sub bits {
 	    require Exporter;
 	    re->export_to_level(2, 're', $s);
 	} else {
-	    warn("Unknown \"re\" subpragma '$s' (known ones are: ",
-                       join(', ', map {qq('$_')} 'debug', 'debugcolor', sort keys %bitmask),
-                       ")");
+	    warn("Unknown \"re\" subpragma '$s' (known ones are: "
+                 . join(', ', map {qq('$_')} 'debug', 'debugcolor', sort keys %bitmask)
+                 . ")");
 	}
     }
     $bits;
