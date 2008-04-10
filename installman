@@ -202,8 +202,8 @@ sub pod2man {
 	else {
 	  $manpage =~ s#/#::#g;
 	}
-	$tmp = "${mandir}/${manpage}.tmp";
-	$manpage = "${mandir}/${manpage}.${manext}";
+	$tmp = "{$mandir}/{$manpage}.tmp";
+	$manpage = "{$mandir}/{$manpage}.{$manext}";
 	push @to_process, [$mod, $tmp, $manpage];
     }
 
