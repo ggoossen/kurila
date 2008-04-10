@@ -4369,29 +4369,27 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 	   "\\(\\)"		; To preserve count of pars :-( 6 + 1
 	   "\\)"
 	   "\\|"
-	   ;; 1+6 extra () before this:
-	   "^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$"
 	   (if kurila-use-syntax-table-text-property
 	       (concat
 		"\\|"
-		;; 1+6+2=9 extra () before this:
+		;; 1+6=7 extra () before this:
 		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
 		"\\|"
-		;; 1+6+2+1=10 extra () before this:
+		;; 1+6+1=8 extra () before this:
 		"\\([/]\\)"	; /blah/
 		"\\|"
-		;; 1+6+2+1+1=11 extra () before this:
+		;; 1+6+1+1=9 extra () before this:
 		"\\<sub\\>[ \t]*\\([a-zA-Z_:'0-9]+[ \t]*\\)?\\(([^()]*)\\)"
 		"\\|"
-		;; 1+6+2+1+1+2=13 extra () before this:
+		;; 1+6+1+1+2=11 extra () before this:
 		"\\$\\(['{]\\)"
 		"\\|"
-		;; 1+6+2+1+1+2+1=14 extra () before this:
+		;; 1+6+1+1+2+1=12 extra () before this:
 		"\\(\\<sub[ \t\n\f]+\\|[&*$@%]\\)[a-zA-Z0-9_]*'"
-		;; 1+6+2+1+1+2+1+1=15 extra () before this:
+		;; 1+6+1+1+2+1+1=13 extra () before this:
 		"\\|"
 		"__\\(END\\|DATA\\)__"
-		;; 1+6+2+1+1+2+1+1+1=16 extra () before this:
+		;; 1+6+1+1+2+1+1+1=14 extra () before this:
 		"\\|"
 		"\\\\\\(['`\"($]\\)")
 	     ""))))
@@ -4576,65 +4574,13 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		  (kurila-put-do-not-fontify b (match-end 0) t)
 		  (if (> e1 max)
 		      (setq tmpend tb))))
-	       ;; format
-	       ((match-beginning 8)
-		;; 1+6=7 extra () before this:
-		;;"^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$"
-		(setq b (point)
-		      name (if (match-beginning 8) ; 7 + 1
-			       (buffer-substring (match-beginning 8) ; 7 + 1
-						 (match-end 8)) ; 7 + 1
-			     "")
-		      tb (match-beginning 0))
-		(setq argument nil)
-		(put-text-property (save-excursion
-				     (beginning-of-line)
-				     (point))
-				   b 'first-format-line 't)
-		(if kurila-pod-here-fontify
-		    (while (and (eq (forward-line) 0)
-				(not (looking-at "^[.;]$")))
-		      (cond
-		       ((looking-at "^#")) ; Skip comments
-		       ((and argument	; Skip argument multi-lines
-			     (looking-at "^[ \t]*{"))
-			(forward-sexp 1)
-			(setq argument nil))
-		       (argument	; Skip argument lines
-			(setq argument nil))
-		       (t		; Format line
-			(setq b1 (point))
-			(setq argument (looking-at "^[^\n]*[@^]"))
-			(end-of-line)
-			;; Highlight the format line
-			(kurila-postpone-fontification b1 (point)
-						      'face font-lock-string-face)
-			(kurila-commentify b1 (point) nil)
-			(kurila-put-do-not-fontify b1 (point) t))))
-		  ;; We do not search to max, since we may be called from
-		  ;; some hook of fontification, and max is random
-		  (re-search-forward "^[.;]$" stop-point 'toend))
-		(beginning-of-line)
-		(if (looking-at "^\\.$") ; ";" is not supported yet
-		    (progn
-		      ;; Highlight the ending delimiter
-		      (kurila-postpone-fontification (point) (+ (point) 2)
-						    'face font-lock-string-face)
-		      (kurila-commentify (point) (+ (point) 2) nil)
-		      (kurila-put-do-not-fontify (point) (+ (point) 2) t))
-		  (message "End of format `%s' not found." name)
-		  (or (car err-l) (setcar err-l b)))
-		(forward-line)
-		(if (> (point) max)
-		    (setq tmpend tb))
-		(put-text-property b (point) 'syntax-type 'format))
 	       ;; Regexp:
-	       ((or (match-beginning 10) (match-beginning 11))
-		;; 1+6+2=9 extra () before this:
+	       ((or (match-beginning 8) (match-beginning 9))
+		;; 1+6=7 extra () before this:
 		;; "\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
 		;; "\\|"
 		;; "\\([/<]\\)"	; /blah/ or ?blah? or <file*glob>
-		(setq b1 (if (match-beginning 10) 10 11)
+		(setq b1 (if (match-beginning 8) 8 9)
 		      argument (buffer-substring
 				(match-beginning b1) (match-end b1))
 		      b (point)
@@ -4642,7 +4588,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		      c (char-after (match-beginning b1))
 		      bb (char-after (1- (match-beginning b1)))	; tmp holder
 		      ;; bb == "Not a stringy"
-		      bb (if (eq b1 10) ; user variables/whatever
+		      bb (if (eq b1 8) ; user variables/whatever
 			     (and (memq bb (append "$@%*#_:-&>" nil)) ; $#y)
 				  (cond ((eq bb ?-) (eq c ?s)) ; -s file test
 					((eq bb ?\:) ; $opt::s
@@ -4883,7 +4829,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 			     b1 (1+ b1) 'face font-lock-constant-face))))
 		  (if (> (point) max)
 		      (setq tmpend tb))))
-	       ((match-beginning 13)	; sub with prototypes
+	       ((match-beginning 11)	; sub with prototypes
 		(setq b (match-beginning 0))
 		(if (memq (char-after (1- b))
 			  '(?\$ ?\@ ?\% ?\& ?\*))
@@ -4894,11 +4840,11 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		  (if (or (nth 3 state) (nth 4 state))
 		      nil
 		    ;; Mark as string
-		    (kurila-commentify (match-beginning 13) (match-end 13) t))
+		    (kurila-commentify (match-beginning 11) (match-end 11) t))
 		  (goto-char (match-end 0))))
 	       ;; 1+6+2+1+1+2=13 extra () before this:
 	       ;;    "\\$\\(['{]\\)"
-	       ((and (match-beginning 14)
+	       ((and (match-beginning 12)
 		     (eq (preceding-char) ?\')) ; $'
 		(setq b (1- (point))
 		      state (parse-partial-sexp
@@ -4907,14 +4853,14 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		(if (nth 3 state)	; in string
 		    (kurila-modify-syntax-type (1- b) kurila-st-punct))
 		(goto-char (1+ b)))
-	       ;; 1+6+2+1+1+2=13 extra () before this:
+	       ;; 1+6+2+1+1=11 extra () before this:
 	       ;;    "\\$\\(['{]\\)"
-	       ((match-beginning 14)	; ${
+	       ((match-beginning 12)	; ${
 		(setq bb (match-beginning 0))
 		(kurila-modify-syntax-type bb kurila-st-punct))
-	       ;; 1+6+2+1+1+2+1=14 extra () before this:
+	       ;; 1+6+2+1+1+1=12 extra () before this:
 	       ;;    "\\(\\<sub[ \t\n\f]+\\|[&*$@%]\\)[a-zA-Z0-9_]*'")
-	       ((match-beginning 15)	; old $abc'efg syntax
+	       ((match-beginning 13)	; old $abc'efg syntax
 		(setq bb (match-end 0)
 		      b (match-beginning 0)
 		      state (parse-partial-sexp
@@ -4924,9 +4870,9 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		    nil
 		  (put-text-property (1- bb) bb 'syntax-table kurila-st-word))
 		(goto-char bb))
-	       ;; 1+6+2+1+1+2+1+1=15 extra () before this:
+	       ;; 1+6+2+1+1+1+1=13 extra () before this:
 	       ;; "__\\(END\\|DATA\\)__"
-	       ((match-beginning 16)	; __END__, __DATA__
+	       ((match-beginning 14)	; __END__, __DATA__
 		(setq bb (match-end 0)
 		      b (match-beginning 0)
 		      state (parse-partial-sexp
@@ -4938,7 +4884,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		  (kurila-commentify b bb nil)
 		  (setq end t))
 		(goto-char bb))
-	       ((match-beginning 17)	; "\\\\\\(['`\"($]\\)"
+	       ((match-beginning 15)	; "\\\\\\(['`\"($]\\)"
 		;; Trailing backslash ==> non-quoting outside string/comment
 		(setq bb (match-end 0)
 		      b (match-beginning 0))
