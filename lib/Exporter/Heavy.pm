@@ -5,8 +5,6 @@ no strict 'refs';
 
 # On one line so MakeMaker will see it.
 require Exporter;  our $VERSION = $Exporter::VERSION;
-# Carp does this now for us, so we can finally live w/o Carp
-#$Carp::Internal{"Exporter::Heavy"} = 1;
 
 =head1 NAME
 
@@ -133,7 +131,7 @@ sub heavy_export {
 	    }
 	}
 	if ($oops) {
-	    die("{@carp}Can't continue after import errors");
+	    die("{join ' ', @carp}Can't continue after import errors");
 	}
     }
     else {
@@ -157,13 +155,11 @@ sub heavy_export {
 	if (@failed) {
 	    @failed = $pkg->export_fail(@failed);
 	    foreach $sym (@failed) {
-                require Carp;
-		Carp::carp(qq["$sym" is not implemented by the $pkg module ],
-			"on this architecture");
+		warn(qq["$sym" is not implemented by the $pkg module ]
+			. "on this architecture");
 	    }
 	    if (@failed) {
-		require Carp;
-		Carp::croak("Can't continue after import errors");
+		die("Can't continue after import errors");
 	    }
 	}
     }
@@ -183,7 +179,7 @@ sub heavy_export {
 	    $type eq '@' ? \@{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
 	    $type eq '%' ? \%{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
 	    $type eq '*' ?  *{Symbol::fetch_glob("{$pkg}::$sym")} :
-	    do { require Carp; Carp::croak("Can't export symbol: $type$sym") };
+	    warn("Can't export symbol: $type$sym");
     }
 }
 
@@ -208,8 +204,7 @@ sub _push_tags {
 		(@$syms) ? @$syms : keys %$export_tags);
     if (@nontag and $^W) {
 	# This may change to a die one day
-	require Carp;
-	Carp::carp(join(", ", @nontag)." are not tags of $pkg");
+	warn(join(", ", @nontag)." are not tags of $pkg");
     }
 }
 
