@@ -266,7 +266,6 @@ BOOT:
 #define B_sv_undef()	&PL_sv_undef
 #define B_sv_yes()	&PL_sv_yes
 #define B_sv_no()	&PL_sv_no
-#define B_formfeed()	PL_formfeed
 #ifdef USE_ITHREADS
 #define B_regex_padav()	PL_regex_padav
 #endif
@@ -800,6 +799,14 @@ is_empty(gv)
         B::GV   gv
     CODE:
         RETVAL = GvGP(gv) == Null(GP*);
+    OUTPUT:
+        RETVAL
+
+bool
+isGV_with_GP(gv)
+        B::GV   gv
+    CODE:
+        RETVAL = isGV_with_GP(gv) ? TRUE : FALSE;
     OUTPUT:
         RETVAL
 
