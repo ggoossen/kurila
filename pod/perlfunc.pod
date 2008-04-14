@@ -1911,44 +1911,6 @@ if you exit, then the remote server (such as, say, a CGI script or a
 backgrounded job launched from a remote shell) won't think you're done.
 You should reopen those to F</dev/null> if it's any issue.
 
-=item format
-X<format>
-
-Declare a picture format for use by the C<write> function.  For
-example:
-
-    format Something =
-	Test: @<<<<<<<< @||||| @>>>>>
-	      $str,     $%,    '$' . int($num)
-    .
-
-    $str = "widget";
-    $num = $cost/$quantity;
-    $~ = 'Something';
-    write;
-
-See L<perlform> for many details and examples.
-
-=item formline PICTURE,LIST
-X<formline>
-
-This is an internal function used by C<format>s, though you may call it,
-too.  It formats (see L<perlform>) a list of values according to the
-contents of PICTURE, placing the output into the format output
-accumulator, C<$^A> (or C<$ACCUMULATOR> in English).
-Eventually, when a C<write> is done, the contents of
-C<$^A> are written to some filehandle.  You could also read C<$^A>
-and then set C<$^A> back to C<"">.  Note that a format typically
-does one C<formline> per line of form, but the C<formline> function itself
-doesn't care how many newlines are embedded in the PICTURE.  This means
-that the C<~> and C<~~> tokens will treat the entire PICTURE as a single line.
-You may therefore need to use multiple formlines to implement a single
-record format, just like the format compiler.
-
-Be careful if you put double quotes around the picture, because an C<@>
-character may be taken to mean the beginning of an array name.
-C<formline> always returns true.  See L<perlform> for other examples.
-
 =item getc FILEHANDLE
 X<getc> X<getchar> X<character> X<file, read>
 

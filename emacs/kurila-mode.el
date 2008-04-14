@@ -7382,8 +7382,6 @@ $ARGV	The name of the current file used with <> .
 $[	Deprecated: The index of the first element/char in an array/string.
 $\\	The output record separator for the print operator.
 $]	The perl version string as displayed with perl -v.
-$^	The name of the current top-of-page format.
-$^A     The current value of the write() accumulator for format() lines.
 $^D	The value of the perl debug (-D) flags.
 $^E     Information about the last system error other than that provided by $!.
 $^F	The highest system file descriptor, ordinarily 2.
@@ -7398,7 +7396,6 @@ $^W	True if warnings are requested (perl -w flag).
 $^X	The name under which perl was invoked (argv[0] in C-speech).
 $_	The default input and pattern-searching space.
 $|	Auto-flush after write/print on current output channel?  Default 0.
-$~	The name of the current report format.
 ... % ...	Modulo division.
 ... %= ...	Modulo division assignment.
 %ENV	Contains the current environment.

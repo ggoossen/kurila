@@ -89,12 +89,6 @@ sub import {
 	*LIST_SEPARATOR
 	*SUBSCRIPT_SEPARATOR
 	*SUBSEP
-	*FORMAT_LINES_PER_PAGE
-	*FORMAT_LINES_LEFT
-	*FORMAT_NAME
-	*FORMAT_TOP_NAME
-	*FORMAT_LINE_BREAK_CHARACTERS
-	*FORMAT_FORMFEED
 	*CHILD_ERROR
 	*OS_ERROR
 	*ERRNO
@@ -112,7 +106,6 @@ sub import {
 	*EGID
 	*PROGRAM_NAME
 	*PERL_VERSION
-	*ACCUMULATOR
 	*COMPILING
 	*DEBUGGING
 	*SYSTEM_FD_MAX
@@ -170,15 +163,6 @@ sub import {
 	*SUBSCRIPT_SEPARATOR			= *;	;
 	    *SUBSEP				= *;	;
 
-# Formats
-
-	*FORMAT_LINES_PER_PAGE			= *=	;
-	*FORMAT_LINES_LEFT			= *-	;
-	*FORMAT_NAME				= *~	;
-	*FORMAT_TOP_NAME			= *^	;
-	*FORMAT_LINE_BREAK_CHARACTERS		= *:	;
-	*FORMAT_FORMFEED			= *^L	;
-
 # Error status.
 
 	*CHILD_ERROR				= *?	;
@@ -206,7 +190,6 @@ sub import {
 # Internals.
 
 	*PERL_VERSION				= *^V	;
-	*ACCUMULATOR				= *^A	;
 	*COMPILING				= *^C	;
 	*DEBUGGING				= *^D	;
 	*SYSTEM_FD_MAX				= *^F	;

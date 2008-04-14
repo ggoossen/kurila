@@ -1089,7 +1089,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    }
 		    case 'S':	/* $^S */
 			goto ro_magicalize;
-		    case 'A':	/* $^A */
 		    case 'C':	/* $^C */
 		    case 'D':	/* $^D */
 		    case 'E':	/* $^E */
@@ -2027,7 +2026,6 @@ Perl_is_gv_magical(pTHX_ const char *name, STRLEN len, U32 flags)
 		}
 	    } else {
 		switch (name[1]) {
-		case 'A':   /* $^A */
 		case 'C':   /* $^C */
 		case 'D':   /* $^D */
 		case 'E':   /* $^E */
