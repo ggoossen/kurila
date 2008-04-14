@@ -939,7 +939,7 @@ XS(XS_error_message)
 	SV *res = sv_newmortal();
 	sv_setpvn(res, "", 0);
 	
-	if (sv_derived_from(ST(0), "error")) {
+	if (sv_isobject(ST(0))) {
 	    err = (HV*)SvRV(ST(0));
 	}
 	else
