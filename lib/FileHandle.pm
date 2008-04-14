@@ -208,13 +208,6 @@ supported C<FileHandle> methods:
     output_record_separator
     input_record_separator
     input_line_number
-    format_page_number
-    format_lines_per_page
-    format_lines_left
-    format_name
-    format_top_name
-    format_line_break_characters
-    format_formfeed
 
 Furthermore, for doing normal I/O you might need these:
 

@@ -132,8 +132,8 @@ equivalent:
     while (<>) {...}	# equivalent only in while!
     while (defined($_ = <>)) {...}
 
-    /^Subject:/
-    $_ =~ /^Subject:/
+    m/^Subject:/
+    $_ =~ m/^Subject:/
 
     tr/a-z/A-Z/
     $_ =~ tr/a-z/A-Z/
@@ -551,32 +551,6 @@ taken for something more important.)
 Consider using "real" multidimensional arrays as described
 in L<perllol>.
 
-=item HANDLE->format_page_number(EXPR)
-
-=item HANDLE->format_lines_per_page(EXPR)
-
-=item $FORMAT_LINES_PER_PAGE
-
-=item $=
-X<$=> X<$FORMAT_LINES_PER_PAGE>
-
-The current page length (printable lines) of the currently selected
-output channel.  Default is 60.  
-Used with formats.
-(Mnemonic: = has horizontal lines.)
-
-=item HANDLE->format_lines_left(EXPR)
-
-=item $FORMAT_LINES_LEFT
-
-=item $-
-X<$-> X<$FORMAT_LINES_LEFT>
-
-The number of lines left on the page of the currently selected output
-channel.  
-Used with formats.
-(Mnemonic: lines_on_page - lines_printed.)
-
 =item @LAST_MATCH_START
 
 =item @-
@@ -596,26 +570,26 @@ with C<@+>.
 
 This array holds the offsets of the beginnings of the last
 successful submatches in the currently active dynamic scope.
-C<$-[0]> is the offset into the string of the beginning of the
+C<@-[0]> is the offset into the string of the beginning of the
 entire match.  The I<n>th element of this array holds the offset
-of the I<n>th submatch, so C<$-[1]> is the offset where $1
-begins, C<$-[2]> the offset where $2 begins, and so on.
+of the I<n>th submatch, so C<@-[1]> is the offset where $1
+begins, C<@-[2]> the offset where $2 begins, and so on.
 
 After a match against some variable $var:
 
 =over 5
 
-=item C<$`> is the same as C<substr($var, 0, $-[0])>
+=item C<$`> is the same as C<substr($var, 0, @-[0])>
 
-=item C<$&> is the same as C<substr($var, $-[0], $+[0] - $-[0])>
+=item C<$&> is the same as C<substr($var, @-[0], @+[0] - @-[0])>
 
-=item C<$'> is the same as C<substr($var, $+[0])>
+=item C<$'> is the same as C<substr($var, @+[0])>
 
-=item C<$1> is the same as C<substr($var, $-[1], $+[1] - $-[1])>  
+=item C<$1> is the same as C<substr($var, @-[1], @+[1] - @-[1])>  
 
-=item C<$2> is the same as C<substr($var, $-[2], $+[2] - $-[2])>
+=item C<$2> is the same as C<substr($var, @-[2], @+[2] - @-[2])>
 
-=item C<$3> is the same as C<substr($var, $-[3], $+[3] - $-[3])>
+=item C<$3> is the same as C<substr($var, @-[3], @+[3] - @-[3])>
 
 =back
 
@@ -633,9 +607,9 @@ Here's an example:
 
     if ('1234' =~ /(?<A>1)(?<B>2)(?<A>3)(?<B>4)/) {
         foreach my $bufname (sort keys %-) {
-            my $ary = $-{$bufname};
-            foreach my $idx (0..$#$ary) {
-                print "\$-{$bufname}[$idx] : ",
+            my $ary = %-{$bufname};
+            foreach my $idx (0..@$ary-1) {
+                print "\%-{$bufname}[$idx] : ",
                       (defined($ary->[$idx]) ? "'$ary->[$idx]'" : "undef"),
                       "\n";
             }
@@ -644,10 +618,10 @@ Here's an example:
 
 would print out:
 
-    $-{A}[0] : '1'
-    $-{A}[1] : '3'
-    $-{B}[0] : '2'
-    $-{B}[1] : '4'
+    %-{A}[0] : '1'
+    %-{A}[1] : '3'
+    %-{B}[0] : '2'
+    %-{B}[1] : '4'
 
 The keys of the C<%-> hash correspond to all buffer names found in
 the regular expression.
@@ -660,61 +634,6 @@ associated with the last successful regular expression. Therefore mixing
 iterative access to them via C<each> may have unpredictable results.
 Likewise, if the last successful match changes, then the results may be
 surprising.
-
-=item HANDLE->format_name(EXPR)
-
-=item $FORMAT_NAME
-
-=item $~
-X<$~> X<$FORMAT_NAME>
-
-The name of the current report format for the currently selected output
-channel.  Default is the name of the filehandle.  (Mnemonic: brother to
-C<$^>.)
-
-=item HANDLE->format_top_name(EXPR)
-
-=item $FORMAT_TOP_NAME
-
-=item $^
-X<$^> X<$FORMAT_TOP_NAME>
-
-The name of the current top-of-page format for the currently selected
-output channel.  Default is the name of the filehandle with _TOP
-appended.  (Mnemonic: points to top of page.)
-
-=item IO::Handle->format_line_break_characters EXPR
-
-=item $FORMAT_LINE_BREAK_CHARACTERS
-
-=item $:
-X<$:> X<FORMAT_LINE_BREAK_CHARACTERS>
-
-The current set of characters after which a string may be broken to
-fill continuation fields (starting with ^) in a format.  Default is
-S<" \n-">, to break on whitespace or hyphens.  (Mnemonic: a "colon" in
-poetry is a part of a line.)
-
-=item IO::Handle->format_formfeed EXPR
-
-=item $FORMAT_FORMFEED
-
-=item $^L
-X<$^L> X<$FORMAT_FORMFEED>
-
-What formats output as a form feed.  Default is \f.
-
-=item $ACCUMULATOR
-
-=item $^A
-X<$^A> X<$ACCUMULATOR>
-
-The current value of the write() accumulator for format() lines.  A format
-contains formline() calls that put their result into C<$^A>.  After
-calling its format, write() prints out the contents of C<$^A> and empties.
-So you never really see the contents of C<$^A> unless you call
-formline() yourself and then look at it.  See L<perlform> and
-L<perlfunc/formline()>.
 
 =item $CHILD_ERROR
 
@@ -1318,6 +1237,29 @@ for a convenient way to fail if the running Perl interpreter is too old.
 
 See also C<$]> for an older representation of the Perl version.
 
+=item $^WARN_HOOK
+X<$^WARN_HOOK>
+
+The routine indicated by C<$^WARN_HOOK> is called when a warning message is
+about to be printed.  The warning message is passed as the first
+argument.  The default $^WARN_HOOK calls C<message> on the object and print it
+to C<STDERR>.
+You can use this to save warnings
+in a variable, or turn warnings into fatal errors, like this:
+
+    local $^WARN_HOOK = sub { die @_[0] };
+    eval $proggie;
+
+To save warnings:
+
+    local $^WARN_HOOK = sub { push @warn, @_[0] };
+
+=item $^DIE_HOOK
+
+The routine indicated by C<$^DIE_HOOK> is called when a fatal exception
+is about to be thrown.  The error message is passed as the first
+argument. The <$^DIE_HOOK> is disabled inside an eval().
+
 =item $WARNING
 
 =item $^W
@@ -1392,10 +1334,10 @@ this goal, and produce a pathname that can be invoked as a
 command or referenced as a file.
 
   use Config;
-  $secure_perl_path = $Config{perlpath};
+  $secure_perl_path = %Config{perlpath};
   if ($^O ne 'VMS')
-     {$secure_perl_path .= $Config{_exe}
-          unless $secure_perl_path =~ m/$Config{_exe}$/i;}
+     {$secure_perl_path .= %Config{_exe}
+          unless $secure_perl_path =~ m/%Config{_exe}$/i;}
 
 =item ARGV
 X<ARGV>
@@ -1505,11 +1447,11 @@ The hash C<%SIG> contains signal handlers for signals.  For example:
 	exit(0);
     }
 
-    $SIG{'INT'}  = \&handler;
-    $SIG{'QUIT'} = \&handler;
+    %SIG{'INT'}  = \&handler;
+    %SIG{'QUIT'} = \&handler;
     ...
-    $SIG{'INT'}  = 'DEFAULT';	# restore default action
-    $SIG{'QUIT'} = 'IGNORE';	# ignore SIGQUIT
+    %SIG{'INT'}  = 'DEFAULT';	# restore default action
+    %SIG{'QUIT'} = 'IGNORE';	# ignore SIGQUIT
 
 Using a value of C<'IGNORE'> usually has the effect of ignoring the
 signal, except for the C<CHLD> signal.  See L<perlipc> for more about
@@ -1517,13 +1459,9 @@ this special case.
 
 Here are some other examples:
 
-    $SIG{"PIPE"} = "Plumber";   # assumes main::Plumber (not recommended)
-    $SIG{"PIPE"} = \&Plumber;   # just fine; assume current Plumber
-    $SIG{"PIPE"} = *Plumber;    # somewhat esoteric
-    $SIG{"PIPE"} = Plumber();   # oops, what did Plumber() return??
-
-Be sure not to use a bareword as the name of a signal handler,
-lest you inadvertently call it. 
+    %SIG{"PIPE"} = \&Plumber;   # just fine; assume current Plumber
+    %SIG{"PIPE"} = *Plumber;    # somewhat esoteric
+    %SIG{"PIPE"} = Plumber();   # oops, what did Plumber() return??
 
 If your system has the sigaction() function then signal handlers are
 installed using it.  This means you get reliable signal handling.
@@ -1531,57 +1469,6 @@ installed using it.  This means you get reliable signal handling.
 The default delivery policy of signals changed in Perl 5.8.0 from 
 immediate (also known as "unsafe") to deferred, also known as 
 "safe signals".  See L<perlipc> for more information.
-
-Certain internal hooks can be also set using the %SIG hash.  The
-routine indicated by C<$SIG{__WARN__}> is called when a warning message is
-about to be printed.  The warning message is passed as the first
-argument.  The presence of a C<__WARN__> hook causes the ordinary printing
-of warnings to C<STDERR> to be suppressed.  You can use this to save warnings
-in a variable, or turn warnings into fatal errors, like this:
-
-    local $SIG{__WARN__} = sub { die $_[0] };
-    eval $proggie;
-
-As the C<'IGNORE'> hook is not supported by C<__WARN__>, you can
-disable warnings using the empty subroutine:
-
-    local $SIG{__WARN__} = sub {};
-
-The routine indicated by C<$SIG{__DIE__}> is called when a fatal exception
-is about to be thrown.  The error message is passed as the first
-argument.  When a C<__DIE__> hook routine returns, the exception
-processing continues as it would have in the absence of the hook,
-unless the hook routine itself exits via a C<goto>, a loop exit, or a C<die()>.
-The C<__DIE__> handler is explicitly disabled during the call, so that you
-can die from a C<__DIE__> handler.  Similarly for C<__WARN__>.
-
-Due to an implementation glitch, the C<$SIG{__DIE__}> hook is called
-even inside an eval().  Do not use this to rewrite a pending exception
-in C<$@>, or as a bizarre substitute for overriding C<CORE::GLOBAL::die()>.
-This strange action at a distance may be fixed in a future release
-so that C<$SIG{__DIE__}> is only called if your program is about
-to exit, as was the original intent.  Any other use is deprecated.
-
-C<__DIE__>/C<__WARN__> handlers are very special in one respect:
-they may be called to report (probable) errors found by the parser.
-In such a case the parser may be in inconsistent state, so any
-attempt to evaluate Perl code from such a handler will probably
-result in a segfault.  This means that warnings or errors that
-result from parsing Perl should be used with extreme caution, like
-this:
-
-    require Carp if defined $^S;
-    Carp::confess("Something wrong") if defined &Carp::confess;
-    die "Something wrong, but could not load Carp to give backtrace...
-         To see backtrace try starting Perl with -MCarp switch";
-
-Here the first line will load Carp I<unless> it is the parser who
-called the handler.  The second line will print backtrace and die if
-Carp was available.  The third line will be executed only if Carp was
-not available.
-
-See L<perlfunc/die>, L<perlfunc/warn>, L<perlfunc/eval>, and
-L<warnings> for additional information.
 
 =back
 
