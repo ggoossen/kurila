@@ -18,7 +18,7 @@ plan (3);
 
 # OA_HVREF
 {
-    # hash without '@'.
+    # hash without '%'.
     no strict 'vars';
     our %foox = ( foo => 'bar' );
     eval q| keys foox |;

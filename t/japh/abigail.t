@@ -220,11 +220,6 @@ plan tests => 99;
 }
 
 __END__
-#######  Funky loop 1.
-$_ = q ;4a75737420616e6f74686572205065726c204861636b65720as;;
-     for (s;s;s;s;s;s;s;s;s;s;s;s)
-         {s;(..)s?;qq qprint chr 0x$1 and \161 ssq;excess;}
-
 #######  Funky loop 4.
 $_ = q ?4a75737420616e6f74686572205065726c204861636b65720as?;??;
 for (??;(??)x??;??)
@@ -426,13 +421,13 @@ print 52,2,10,23,16,8,1,19,3,6,15,12,5,49,21,14,9,11,36,13,22,32,7,18,24;
 #######  $; fun
 $;                                   # A lone dollar?
 =$";                                 # Pod?
-$;                                   # The return of the lone dollar?
+%;                                   # The return of the lone dollar?
 {Just=>another=>Perl=>Hacker=>}      # Bare block?
 =$/;                                 # More pod?
 print%;                              # No right operand for %?
 
 #######  %; fun
-$;=$";$;{Just=>another=>Perl=>Hacker=>}=$/;print%;
+$;=$";%;{Just=>another=>Perl=>Hacker=>}=$/;print%;
 
 ####### &func;
 $_ = "\112\165\163\1648\141\156\157\164\150\145\1628\120\145"

@@ -1392,7 +1392,7 @@ sub init_VERSION {
     if ($self->{VERSION_FROM}){
         $self->{VERSION} = $self->parse_version($self->{VERSION_FROM});
         if( $self->{VERSION} eq 'undef' ) {
-            carp("WARNING: Setting VERSION via file ".
+            warn("WARNING: Setting VERSION via file ".
                  "'$self->{VERSION_FROM}' failed\n");
         }
     }
