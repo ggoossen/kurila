@@ -2713,7 +2713,7 @@ sub parse_version {
         |;
         local $^W = 0;
         $result = eval($eval);  ## no critic
-        warn "Could not eval '$eval' in $parsefile: $@" if $@;
+        warn "Could not eval '$eval' in $parsefile: {$@->message}" if $@;
         last;
     }
     close $fh;

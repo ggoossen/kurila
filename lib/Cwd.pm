@@ -391,9 +391,9 @@ sub fastcwd_ {
 	CORE::chdir('..') || return undef;
 	($cdev, $cino) = stat('.');
 	last if $odev == $cdev && $oino == $cino;
-	opendir(DIR, '.') || return undef;
+	opendir(my $dir, '.') || return undef;
 	for (;;) {
-	    $direntry = readdir(DIR);
+	    $direntry = readdir($dir);
 	    last unless defined $direntry;
 	    next if $direntry eq '.';
 	    next if $direntry eq '..';
@@ -401,7 +401,7 @@ sub fastcwd_ {
 	    ($tdev, $tino) = lstat($direntry);
 	    last unless $tdev != $odev || $tino != $oino;
 	}
-	closedir(DIR);
+	closedir($dir);
 	return undef unless defined $direntry; # should never happen
 	unshift(@path, $direntry);
     }
@@ -531,8 +531,8 @@ sub _perl_abs_path
     {
 	$dotdots .= '/..';
 	@pst = @cst;
-	local *PARENT;
-	unless (opendir(PARENT, $dotdots))
+        my $parent;
+	unless (opendir($parent, $dotdots))
 	{
 	    # probably a permissions issue.  Try the native command.
 	    return File::Spec->rel2abs( $start, _backtick_pwd() );
@@ -540,7 +540,7 @@ sub _perl_abs_path
 	unless (@cst = stat($dotdots))
 	{
 	    _carp("stat($dotdots): $!");
-	    closedir(PARENT);
+	    closedir($parent);
 	    return '';
 	}
 	if (@pst[0] == @cst[0] && @pst[1] == @cst[1])
@@ -551,10 +551,10 @@ sub _perl_abs_path
 	{
 	    do
 	    {
-		unless (defined ($dir = readdir(PARENT)))
+		unless (defined ($dir = readdir($parent)))
 	        {
 		    _carp("readdir($dotdots): $!");
-		    closedir(PARENT);
+		    closedir($parent);
 		    return '';
 		}
 		@tst[0] = @pst[0]+1 unless (@tst = lstat("$dotdots/$dir"))
@@ -563,7 +563,7 @@ sub _perl_abs_path
 		   @tst[1] != @pst[1]);
 	}
 	$cwd = (defined $dir ? "$dir" : "" ) . "/$cwd" ;
-	closedir(PARENT);
+	closedir($parent);
     } while (defined $dir);
     chop($cwd) unless $cwd eq '/'; # drop the trailing /
     $cwd;
@@ -714,16 +714,16 @@ sub _qnx_cwd {
 }
 
 sub _qnx_abs_path {
-	local %ENV{PATH} = '';
-	local %ENV{CDPATH} = '';
-	local %ENV{ENV} = '';
+    local %ENV{PATH} = '';
+    local %ENV{CDPATH} = '';
+    local %ENV{ENV} = '';
     my $path = @_ ? shift : '.';
-    local *REALPATH;
 
-    defined( open(REALPATH, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or
+    my $rpfh;
+    defined( open($rpfh, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or
       die "Can't open /usr/bin/fullpath: $!";
-    my $realpath = ~< *REALPATH;
-    close REALPATH;
+    my $realpath = ~< *$rpfh;
+    close $rpfh;
     chomp $realpath;
     return $realpath;
 }
