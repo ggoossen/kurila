@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 35;
+plan tests => 34;
 
 our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total, 
      %hash, @foo, %u, $A, %b);
@@ -106,11 +106,6 @@ keys(%hash) = $size + 100;
 isnt ($size, (split('/', scalar %hash))[[1]]);
 
 is (keys(%hash), 10, "keys (\%hash)");
-
-{
-no strict;
-is (keys(hash), 10, "keys (hash)");
-}
 
 $i = 0;
 %h = (a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');

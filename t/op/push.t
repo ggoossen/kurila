@@ -14,7 +14,7 @@ our @tests = split(m/\n/, <<EOF);
 -4,			4 5 6 7,	0 1 2 3
 EOF
 
-print "1..", 4 + @tests, "\n";
+print "1..", 2 + @tests, "\n";
 die "blech" unless @tests;
 
 our @x = (1,2,3);
@@ -23,15 +23,7 @@ if (join(':',@x) eq '1:2:3:1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
 push(@x,4);
 if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 2\n";} else {print "not ok 2\n";}
 
-# test for push/pop intuiting @ on array
-{ no strict 'vars';
-  push(x,3);
-  if (join(':',@x) eq '1:2:3:1:2:3:4:3') {print "ok 3\n";} else {print "not ok 3\n";}
-  pop(x);
-  if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 4\n";} else {print "not ok 4\n";}
-}
-
-our $test = 5;
+our $test = 3;
 foreach my $line (@tests) {
     my ($list,$get,$leave) = split(m/,\t*/,$line);
     my ($pos, $len, @list) = split(' ',$list);
