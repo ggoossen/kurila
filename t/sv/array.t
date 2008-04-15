@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-plan (87);
+plan (86);
 
 my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
@@ -97,12 +97,6 @@ $foo = ('a','b','c','d','e','f')[[1]];
 is($foo, 'b');
 
 @foo = ( 'foo', 'bar', 'burbl', 'blah');
-{
-    no strict 'vars';
-    @foox = ( 'foo', 'bar', 'burbl');
-    push(foox, 'blah');
-    is((@foox-1), 3);
-}
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
 

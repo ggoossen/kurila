@@ -9,6 +9,8 @@ use warnings;
 require './test.pl';
 plan( tests => 141 );
 
+our ($foo, $bar);
+
 # type coersion on assignment
 $foo = 'foo';
 $bar = *main::foo;

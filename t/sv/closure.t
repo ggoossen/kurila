@@ -506,7 +506,7 @@ END
 {
     no strict 'vars';
     # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
-    BEGIN { $vanishing_pad = sub { eval @_[0] } }
+    BEGIN { our $vanishing_pad = sub { eval @_[0] } }
     $some_var = 123;
     test { $vanishing_pad->( '$some_var' ) == 123 };
 }
