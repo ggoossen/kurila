@@ -10759,7 +10759,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     /* magical thingies */
     /* XXX time(&PL_basetime) when asked for? */
     PL_basetime		= proto_perl->Ibasetime;
-    PL_formfeed		= sv_dup(proto_perl->Iformfeed, param);
 
     PL_maxsysfd		= proto_perl->Imaxsysfd;
     PL_statusvalue	= proto_perl->Istatusvalue;

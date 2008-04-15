@@ -325,9 +325,6 @@ B_defstash()
 U8
 B_dowarn()
 
-B::SV
-B_formfeed()
-
 void
 B_warnhook()
     CODE:

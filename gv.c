@@ -1106,10 +1106,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			sv_setsv(sv, PL_patchlevel);
 			break;
 		    }
-		    case 'L':	/* $^L */
-			sv_setpvn(GvSVn(gv),"\f",1);
-			PL_formfeed = GvSVn(gv);
-			break;
 		    }
 		}
 	    case '1':
@@ -2032,7 +2028,6 @@ Perl_is_gv_magical(pTHX_ const char *name, STRLEN len, U32 flags)
 		case 'F':   /* $^F */
 		case 'H':   /* $^H */
 		case 'I':   /* $^I */
-		case 'L':   /* $^L */
 		case 'N':   /* $^N */
 		case 'O':   /* $^O */
 		case 'P':   /* $^P */
