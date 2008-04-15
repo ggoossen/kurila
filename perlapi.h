@@ -318,8 +318,6 @@ END_EXTERN_C
 #define PL_firstgv		(*Perl_Ifirstgv_ptr(aTHX))
 #undef  PL_forkprocess
 #define PL_forkprocess		(*Perl_Iforkprocess_ptr(aTHX))
-#undef  PL_formfeed
-#define PL_formfeed		(*Perl_Iformfeed_ptr(aTHX))
 #undef  PL_formtarget
 #define PL_formtarget		(*Perl_Iformtarget_ptr(aTHX))
 #undef  PL_generation

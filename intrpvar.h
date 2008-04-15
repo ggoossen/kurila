@@ -245,7 +245,6 @@ PERLVAR(Ie_script,	SV *)
 
 /* magical thingies */
 PERLVAR(Ibasetime,	Time_t)		/* $^T */
-PERLVAR(Iformfeed,	SV *)		/* $^L */
 
 
 PERLVARI(Imaxsysfd,	I32,	MAXSYSFD)

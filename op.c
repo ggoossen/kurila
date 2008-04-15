@@ -5476,7 +5476,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    GvCV(gv) = cv;
 	    if (PL_madskills) {
 		if (strEQ(name, "import")) {
-		    PL_formfeed = (SV*)cv;
 		    Perl_warner(aTHX_ packWARN(WARN_VOID), "%lx\n", (long)cv);
 		}
 	    }

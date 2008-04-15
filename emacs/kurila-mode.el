@@ -7387,7 +7387,6 @@ $^E     Information about the last system error other than that provided by $!.
 $^F	The highest system file descriptor, ordinarily 2.
 $^H     The current set of syntax checks enabled by `use strict'.
 $^I	The value of the in-place edit extension (perl -i option).
-$^L     What formats output to perform a formfeed.  Default is \f.
 $^M     A buffer for emergency memory allocation when running out of memory.
 $^O     The operating system name under which this copy of Perl was built.
 $^P	Internal debugging flag.
