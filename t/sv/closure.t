@@ -269,10 +269,9 @@ END_MARK_TWO
 \}
 
 # some of the variables which the closure will access
-no strict 'vars';
-\$global_scalar = 1000;
-\@global_array = (2000, 2100, 2200, 2300);
-\%global_hash = 3000..3009;
+our \$global_scalar = 1000;
+our \@global_array = (2000, 2100, 2200, 2300);
+our \%global_hash = 3000..3009;
 
 my \$fs_scalar = 4000;
 my \@fs_array = (5000, 5100, 5200, 5300);
@@ -292,7 +291,7 @@ END
     # }
 	  } elsif ($where_declared eq 'in_anon') {
 	    $code .= <<'END';
-$outer = sub {
+our $outer = sub {
   my $sub_scalar = 7000;
   my @sub_array = (8000, 8100, 8200, 8300);
   my %sub_hash = 9000..9009;
@@ -328,7 +327,7 @@ END
 	    if ($inner_type eq 'named') {
 	      $code .= "    sub named_$sub_test "
 	    } elsif ($inner_type eq 'anon') {
-	      $code .= "    \$anon_$sub_test = sub "
+	      $code .= "    our \$anon_$sub_test = sub "
 	    } else {
 	      die "What was $inner_type?"
 	    }
@@ -422,7 +421,7 @@ END
 
 	    # Here's the test:
 	    if ($inner_type eq 'anon') {
-	      $code .= "test \{ &\$anon_$test == $expected \};\n"
+	      $code .= "test \{ our \$anon_$test; &\$anon_$test == $expected \};\n"
 	    } else {
 	      $code .= "test \{ &named_$test == $expected \};\n"
 	    }
@@ -504,11 +503,11 @@ END
 }
 
 {
-    no strict 'vars';
     # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
+    our $some_var;
     BEGIN { our $vanishing_pad = sub { eval @_[0] } }
     $some_var = 123;
-    test { $vanishing_pad->( '$some_var' ) == 123 };
+    test { our $vanishing_pad->( '$some_var' ) == 123 };
 }
 
 our ($newvar, @a, $x);

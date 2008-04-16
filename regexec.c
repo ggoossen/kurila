@@ -1888,8 +1888,7 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
 
     reginfo->cutpoint=NULL;
 
-    DEBUG_EXECUTE_r(
-			PerlIO_printf(Perl_debug_log, "regtry") );
+    DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "regtry") );
     assert(*startpos <= PL_regeol);
 
     if ((prog->extflags & RXf_EVAL_SEEN) && !PL_reg_eval_set) {
