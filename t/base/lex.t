@@ -214,20 +214,21 @@ EOT
     T '^main:plink:53$', $test++;
     print "ok 44\nok 45\nok 46\n";
 }
+#line 218 "lex.t"
 
 # tests 47--51 start here
 # tests for new array interpolation semantics:
 # arrays now *always* interpolate into "..." strings.
 # 20000522 MJD (mjd@plover.com)
 {
-  no strict 'vars';
   my $test = 47;
+  our (@nosuch, @a, @example);
   eval(q(">@nosuch<" eq "><")) || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
 
   # Look at this!  This is going to be a common error in the future:
-  eval(q("fred@example.com" eq "fred.com")) || print "# $@", "not ";
+  eval(q("fred@example.com" eq "fred.com")) || print "# {$@->message}", "not ";
   print "ok $test\n";
   ++$test;
 
