@@ -31,7 +31,19 @@ Both can be installed at the same time.
 
 =item *
 
-error objects
+Sigil invariant of value
+
+=item *
+
+Renaming numeric comparison operators
+
+=item *
+
+Easier quoting rules
+
+=item *
+
+Error objects, with default backtrace
 
 =item * 
 
@@ -55,12 +67,8 @@ String dereference will always result in an error
 
 =item *
 
-Default 'C3' method resolution
-
-=item *
-
 Removal of a lot of deprecated syntax, keywords, operators.
-Including indirect object syntax, formats, <> as glob operator, 
+Including indirect object syntax, formats, <> as glob operator,
 ?PATTERN?, C<..> as flip-flop operator.
 
 =back
@@ -103,7 +111,25 @@ at git://dev.tty.nl/perl
 
 =over 4
 
-=item L<kurila01delta> too see what has changed compared to Perl 5.
+=item L<kurila110delta> What is new for Perl Kurila 1.10
+
+=item L<kurila19delta> What is new for Perl Kurila 1.9
+
+=item L<kurila18delta> What is new for Perl Kurila 1.8
+
+=item L<kurila17delta> What is new for Perl Kurila 1.7
+
+=item L<kurila16delta> What is new for Perl Kurila 1.6
+
+=item L<kurila15delta> What is new for Perl Kurila 1.5
+
+=item L<kurila14delta> What is new for Perl Kurila 1.4
+
+=item L<kurila13delta> What is new for Perl Kurila 1.3
+
+=item L<kurila02delta> What is new for Perl Kurila 0.2
+
+=item L<kurila01delta> What is new for Perl Kurila 0.1
 
 =back
 
