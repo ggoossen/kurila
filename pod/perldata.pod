@@ -21,14 +21,12 @@ structure it refers.  The rest of the name tells you the particular
 value to which it refers.  Usually this name is a single I<identifier>,
 that is, a string beginning with a letter or underscore, and
 containing letters, underscores, and digits.  In some cases, it may
-be a chain of identifiers, separated by C<::> (or by the slightly
-archaic C<'>); all but the last are interpreted as names of packages,
-to locate the namespace in which to look up the final identifier
-(see L<perlmod/Packages> for details).  It's possible to substitute
-for a simple identifier, an expression that produces a reference
-to the value at runtime.   This is described in more detail below
-and in L<perlref>.
-X<identifier>
+be a chain of identifiers, separated by C<::>; all but the last are
+interpreted as names of packages, to locate the namespace in which to
+look up the final identifier (see L<perlmod/Packages> for details).
+It's possible to substitute for a simple identifier, an expression
+that produces a reference to the value at runtime.  This is described
+in more detail below and in L<perlref>.  X<identifier>
 
 Perl also has its own built-in variables whose names don't follow
 these rules.  They have strange names so they don't accidentally
@@ -40,30 +38,25 @@ the inner working of Perl have names containing punctuation characters
 and control characters.  These are documented in L<perlvar>.
 X<variable, built-in>
 
-Scalar values are always named with '$', even when referring to a
-scalar that is part of an array or a hash.  The '$' symbol works
-semantically like the English word "the" in that it indicates a
-single value is expected.
+Scalar variables are always named with '$'. And they variables and do
+not change depending on the value being refered as is done in Perl 5:
 X<scalar>
 
-    $days		# the simple scalar value "days"
-    $days[28]		# the 29th element of array @days
-    $days{'Feb'}	# the 'Feb' value from hash %days
-    $#days		# the last index of array @days
+    $days		# the simple scalar variable "days"
 
-Entire arrays (and slices of arrays and hashes) are denoted by '@',
-which works much like the word "these" or "those" does in English,
-in that it indicates multiple values are expected.
+Arrays are denoted by '@':
 X<array>
 
-    @days		# ($days[0], $days[1],... $days[n])
-    @days[3,4,5]	# same as ($days[3],$days[4],$days[5])
-    @days{'a','c'}	# same as ($days{'a'},$days{'c'})
+    @days		# (@days[0], @days[1],... @days[n])
+    @days[28]		# the 29th element of array @days
+    @days[[3,4,5]]	# same as (@days[3],@days[4],@days[5])
 
-Entire hashes are denoted by '%':
+Hashes are denoted by '%':
 X<hash>
 
     %days		# (key1, val1, key2, val2 ...)
+    %days{'Feb'}	# the 'Feb' value from hash %days
+    %days{['Jan','Feb'}	# same as (%days{'Jan'},%days{'Feb'})
 
 In addition, subroutines are named with an initial '&', though this
 is optional when unambiguous, just as the word "do" is often redundant
@@ -75,9 +68,7 @@ non-variable identifiers.  This means that you can, without fear
 of conflict, use the same name for a scalar variable, an array, or
 a hash--or, for that matter, for a filehandle, a directory handle, a
 subroutine name, a format name, or a label.  This means that $foo
-and @foo are two different variables.  It also means that C<$foo[1]>
-is a part of @foo, not a part of $foo.  This may seem a bit weird,
-but that's okay, because it is weird.
+and @foo are two different variables.
 X<namespace>
 
 Because variable references always start with '$', '@', or '%', the
@@ -224,36 +215,13 @@ with a regular expression (as documented in L<perlre>).
     warn "not a C float"
 	unless /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/;
 
-The length of an array is a scalar value.  You may find the length
-of array @days by evaluating C<$#days>, as in B<csh>.  However, this
-isn't the length of the array; it's the subscript of the last element,
-which is a different value since there is ordinarily a 0th element.
-Assigning to C<$#days> actually changes the length of the array.
-Shortening an array this way destroys intervening values.  Lengthening
-an array that was previously shortened does not recover values
-that were in those elements.  (It used to do so in Perl 4, but we
-had to break this to make sure destructors were called when expected.)
-X<$#> X<array, length>
-
-You can also gain some minuscule measure of efficiency by pre-extending
-an array that is going to get big.  You can also extend an array
-by assigning to an element that is off the end of the array.  You
-can truncate an array down to nothing by assigning the null list
-() to it.  The following are equivalent:
-
-    @whatever = ();
-    $#whatever = -1;
-
 If you evaluate an array in scalar context, it returns the length
 of the array.  (Note that this is not true of lists, which return
 the last value, like the C comma operator, nor of built-in functions,
-which return whatever they feel like returning.)  The following is
-always true:
+which return whatever they feel like returning.) For examle:
 X<array, length>
 
-    scalar(@whatever) == $#whatever + 1;
-
-Kurila does not support the C<$[>.
+    $element_count = @whatever
 
 Some programmers choose to use an explicit conversion so as to 
 leave nothing to doubt:
@@ -321,7 +289,7 @@ your trailing quote, the error will not be reported until Perl finds
 another line containing the quote character, which may be much further
 on in the script.  Variable substitution inside strings is limited to
 scalar variables, arrays, and array or hash slices.  (In other words,
-names beginning with $ or @, followed by an optional bracketed
+names beginning with $, @ or %, followed by an optional bracketed
 expression as a subscript.)  The following code segment prints out "The
 price is $Z<>100."
 X<interpolation>
@@ -356,45 +324,17 @@ C<who>.
 
 In fact, an identifier within such curlies is forced to be a string,
 as is any simple identifier within a hash subscript.  Neither need
-quoting.  Our earlier example, C<$days{'Feb'}> can be written as
-C<$days{Feb}> and the quotes will be assumed automatically.  But
+quoting.  Our earlier example, C<%days{'Feb'}> can be written as
+C<%days{Feb}> and the quotes will be assumed automatically.  But
 anything more complicated in the subscript will be interpreted as an
-expression.  This means for example that C<$version{2.0}++> is
-equivalent to C<$version{2}++>, not to C<$version{'2.0'}++>.
+expression.  This means for example that C<%version{2.0}++> is
+equivalent to C<%version{2}++>, not to C<%version{'2.0'}++>.
 
-=head3 Version Strings
-X<version string> X<vstring> X<v-string>
+=head3 Version syntax
+X<version string> X<version syntax> X<vstring> X<v-string>
 
-B<Note:> Version Strings (v-strings) have been deprecated.  They will
-be removed in some future release after Perl 5.8.1.  The marginal
-benefits of v-strings were greatly outweighed by the potential for
-Surprise and Confusion.
-
-A literal of the form C<v1.20.300.4000> is parsed as a string composed
-of characters with the specified ordinals.  This form, known as
-v-strings, provides an alternative, more readable way to construct
-strings, rather than use the somewhat less readable interpolation form
-C<"\x{1}\x{14}\x{12c}\x{fa0}">.  This is useful for representing
-Unicode strings, and for comparing version "numbers" using the string
-comparison operators, C<cmp>, C<gt>, C<lt> etc.  If there are two or
-more dots in the literal, the leading C<v> may be omitted.
-
-    print v9786;              # prints SMILEY, "\x{263a}"
-    print v102.111.111;       # prints "foo"
-    print 102.111.111;        # same
-
-Such literals are accepted by both C<require> and C<use> for
-doing a version check.  Note that using the v-strings for IPv4
-addresses is not portable unless you also use the
-inet_aton()/inet_ntoa() routines of the Socket package.
-
-Note that since Perl 5.8.1 the single-number v-strings (like C<v65>)
-are not v-strings before the C<< => >> operator (which is usually used
-to separate a hash key from a hash value), instead they are interpreted
-as literal strings ('v65').  They were v-strings from Perl 5.6.0 to
-Perl 5.8.0, but that caused more confusion and breakage than good.
-Multi-number v-strings like C<v65.66> and C<65.66.67> continue to
-be v-strings always.
+A literal of the form C<v1.20.300.4000> creates a version object,
+as returned by C<version->new>.
 
 =head3 Special Literals
 X<special literal> X<__END__> X<__DATA__> X<END> X<DATA>
@@ -459,16 +399,6 @@ space by default.  The following are equivalent:
     system "echo $temp";
 
     system "echo @ARGV";
-
-Within search patterns (which also undergo double-quotish substitution)
-there is an unfortunate ambiguity:  Is C</$foo[bar]/> to be interpreted as
-C</${foo}[bar]/> (where C<[bar]> is a character class for the regular
-expression) or as C</${foo[bar]}/> (where C<[bar]> is the subscript to array
-@foo)?  If @foo doesn't otherwise exist, then it's obviously a
-character class.  If @foo exists, Perl takes a good guess about C<[bar]>,
-and is almost always right.  If it does guess wrong, or if you're just
-plain paranoid, you can force the correct interpretation with curly
-braces as above.
 
 If you're looking for the information on how to use here-documents,
 which used to be here, that's been moved to
@@ -566,7 +496,7 @@ is itself legal to assign to:
 
     ($a, $b, $c) = (1, 2, 3);
 
-    ($map{'red'}, $map{'blue'}, $map{'green'}) = (0x00f, 0x0f0, 0xf00);
+    (%map{'red'}, %map{'blue'}, %map{'green'}) = (0x00f, 0x0f0, 0xf00);
 
 An exception to this is that you may assign to C<undef> in a list.
 This is useful for throwing away some of the return values of a
@@ -589,7 +519,7 @@ performing an operation in list context and then counting the number of
 return values, by assigning to an empty list and then using that
 assignment in scalar context. For example, this code:
 
-    $count = () = $string =~ /\d+/g;
+    $count = () = $string =~ m/\d+/g;
 
 will place into $count the number of digit groups found in $string.
 This happens because the pattern match is in list context (since it
@@ -599,7 +529,7 @@ context will translate that into the number of elements (here, the
 number of times the pattern matched) and assign that to $count. Note
 that simply using
 
-    $count = $string =~ /\d+/g;
+    $count = $string =~ m/\d+/g;
 
 would not have worked, since a pattern match in scalar context will
 only return true or false, rather than a count of matches.
@@ -663,16 +593,15 @@ of how to arrange for an output ordering.
 
 =head2 Subscripts
 
-An array is subscripted by specifying a dollar sign (C<$>), then the
-name of the array (without the leading C<@>), then the subscript inside
-square brackets.  For example:
+An array is subscripted the name of the array (including leading
+C<@>b), then the subscript inside square brackets.  For example:
 
     @myarray = (5, 50, 500, 5000);
-    print "Element Number 2 is", $myarray[2], "\n";
+    print "Element Number 2 is", @myarray[2], "\n";
 
 The array indices start with 0. A negative subscript retrieves its 
-value from the end.  In our example, C<$myarray[-1]> would have been 
-5000, and C<$myarray[-2]> would have been 500.
+value from the end.  In our example, C<@myarray[-1]> would have been 
+5000, and C<@myarray[-2]> would have been 500.
 
 Hash subscripts are similar, only instead of square brackets curly brackets
 are used. For example:
@@ -685,7 +614,7 @@ are used. For example:
         "Feynman" => "Richard",
     );
 
-    print "Darwin's First Name is ", $scientists{"Darwin"}, "\n";
+    print "Darwin's First Name is ", %scientists{"Darwin"}, "\n";
 
 =head2 Slices
 X<slice> X<array, slice> X<hash, slice>
@@ -693,8 +622,8 @@ X<slice> X<array, slice> X<hash, slice>
 A common way to access an array or a hash is one scalar element at a
 time.  You can also subscript a list to get a single element from it.
 
-    $whoami = $ENV{"USER"};             # one element from the hash
-    $parent = $ISA[0];                  # one element from the array
+    $whoami = %ENV{"USER"};             # one element from the hash
+    $parent = @ISA[0];                  # one element from the array
     $dir    = (getpwnam("daemon"))[7];  # likewise, but with list
 
 A slice accesses several elements of a list, an array, or a hash
@@ -702,33 +631,33 @@ simultaneously using a list of subscripts.  It's more convenient
 than writing out the individual elements as a list of separate
 scalar values.
 
-    ($him, $her)   = @folks[0,-1];              # array slice
-    @them          = @folks[0 .. 3];            # array slice
-    ($who, $home)  = @ENV{"USER", "HOME"};      # hash slice
-    ($uid, $dir)   = (getpwnam("daemon"))[2,7]; # list slice
+    ($him, $her)   = @folks[[0,-1]];              # array slice
+    @them          = @folks[[0 .. 3]];            # array slice
+    ($who, $home)  = %ENV{["USER", "HOME"]};      # hash slice
+    ($uid, $dir)   = (getpwnam("daemon"))[[2,7]]; # list slice
 
 Since you can assign to a list of variables, you can also assign to
 an array or hash slice.
 
-    @days[3..5]    = qw/Wed Thu Fri/;
-    @colors{'red','blue','green'} 
+    @days[[3..5]]    = qw/Wed Thu Fri/;
+    %colors{['red','blue','green']} 
                    = (0xff0000, 0x0000ff, 0x00ff00);
-    @folks[0, -1]  = @folks[-1, 0];
+    @folks[[0, -1]]  = @folks[[-1, 0]];
 
 The previous assignments are exactly equivalent to
 
-    ($days[3], $days[4], $days[5]) = qw/Wed Thu Fri/;
-    ($colors{'red'}, $colors{'blue'}, $colors{'green'})
+    (@days[3], @days[4], @days[5]) = qw/Wed Thu Fri/;
+    (%colors{'red'}, %colors{'blue'}, %colors{'green'})
                    = (0xff0000, 0x0000ff, 0x00ff00);
-    ($folks[0], $folks[-1]) = ($folks[-1], $folks[0]);
+    (@folks[0], @folks[-1]) = (@folks[-1], @folks[0]);
 
 Since changing a slice changes the original array or hash that it's
 slicing, a C<foreach> construct will alter some--or even all--of the
 values of the array or hash.
 
-    foreach (@array[ 4 .. 10 ]) { s/peter/paul/ } 
+    foreach (@array[[ 4 .. 10 ]]) { s/peter/paul/ } 
 
-    foreach (@hash{qw[key1 key2]}) {
+    foreach (%hash{[qw[key1 key2]]}) {
         s/^\s+//;           # trim leading whitespace
         s/\s+$//;           # trim trailing whitespace
         s/(\w+)/\u\L$1/g;   # "titlecase" words
@@ -736,33 +665,26 @@ values of the array or hash.
 
 A slice of an empty list is still an empty list.  Thus:
 
-    @a = ()[1,0];           # @a has no elements
-    @b = (@a)[0,1];         # @b has no elements
-    @c = (0,1)[2,3];        # @c has no elements
+    @a = ()[[1,0]];           # @a has no elements
+    @b = (@a)[[0,1]];         # @b has no elements
+    @c = (0,1)[[2,3]];        # @c has no elements
 
 But:
 
-    @a = (1)[1,0];          # @a has two elements
-    @b = (1,undef)[1,0,2];  # @b has three elements
+    @a = (1)[[1,0]];          # @a has two elements
+    @b = (1,undef)[[1,0,2]];  # @b has three elements
 
 This makes it easy to write loops that terminate when a null list
 is returned:
 
-    while ( ($home, $user) = (getpwent)[7,0]) {
-        printf "%-8s %s\n", $user, $home;
+    while ( ($home, $user) = (getpwent)[[7,0]]) {
+        printf '%-8s %s'."\n", $user, $home;
     }
 
 As noted earlier in this document, the scalar sense of list assignment
 is the number of elements on the right-hand side of the assignment.
 The null list contains no elements, so when the password file is
 exhausted, the result is 0, not 2.
-
-If you're confused about why you use an '@' there on a hash slice
-instead of a '%', think of it like this.  The type of bracket (square
-or curly) governs whether it's an array or a hash being looked at.
-On the other hand, the leading symbol ('$' or '@') on the array or
-hash indicates whether you are getting back a singular value (a
-scalar) or a plural one (a list).
 
 =head2 Typeglobs and Filehandles
 X<typeglob> X<filehandle> X<*>
