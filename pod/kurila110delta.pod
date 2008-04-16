@@ -19,7 +19,7 @@ value. For example: @array[28] should be used instead of $array[28], and
 =item *
 
 Slices are taken using C<[[...]]> and C<{[....]}> instead of using the sigil to indicate a slice.
-i.e. C<@hash{["foo", "bar"]} instead of C<@hash{"foo", "bar"}>, and
+i.e. C<%hash{["foo", "bar"]} instead of C<@hash{"foo", "bar"}>, and
 C<@array[[1,2]]> instead of C<@array[1,2]>.
 
 =item *
@@ -44,7 +44,7 @@ value. For example: @array[28] should be used instead of $array[28], and
 =head2 Changed slice syntax
 
 Slices are taken using C<[[...]]> and C<{[....]}> instead of using the sigil to indicate a slice.
-i.e. @hash{["foo", "bar"]} instead of @hash{"foo", "bar"}, and
+i.e. %hash{["foo", "bar"]} instead of @hash{"foo", "bar"}, and
 @array[[1,2]] instead of @array[1,2].
 
 =head2 No curly braces allowed around variables
