@@ -97,13 +97,13 @@ EOE
 		($c = sysread(F, $b, 1)) == 1  &&
 		length($b)               == 1  &&
 		ord($b)                  == ord($_) &&
-		systell('F')               == ($a += bytes::length($b))
+		systell(*F)               == ($a += bytes::length($b))
 		) {
 	    print '# ord($_)           == ', ord($_), "\n";
 	    print '# ord($b)           == ', ord($b), "\n";
 	    print '# length($b)        == ', length($b), "\n";
 	    print '# bytes::length($b) == ', bytes::length($b), "\n";
-	    print '# systell(F)        == ', systell('F'), "\n";
+	    print '# systell(F)        == ', systell(*F), "\n";
 	    print '# $a                == ', $a, "\n";
 	    print '# $c                == ', $c, "\n";
 	    last;
@@ -146,7 +146,7 @@ EOE
 	for (@a) {
 	    unless (
 		    ($c = %actions{$key}($_)) == 1 &&
-		    systell('G')                == ($a += bytes::length($_))
+		    systell(*G)                == ($a += bytes::length($_))
 		   ) {
 		diagnostics();
 		last;
@@ -164,13 +164,13 @@ EOE
 		    ($c = sysread(G, $b, 1)) == 1 &&
 		    length($b)               == 1 &&
 		    ord($b)                  == ord($_) &&
-		    systell('G')               == ($a += bytes::length($_))
+		    systell(*G)               == ($a += bytes::length($_))
 		   ) {
 		print '# ord($_)           == ', ord($_), "\n";
 		print '# ord($b)           == ', ord($b), "\n";
 		print '# length($b)        == ', length($b), "\n";
 		print '# bytes::length($b) == ', bytes::length($b), "\n";
-		print '# systell(G)        == ', systell('G'), "\n";
+		print '# systell(G)        == ', systell(*G), "\n";
 		print '# $a                == ', $a, "\n";
 		print '# $c                == ', $c, "\n";
 		last;

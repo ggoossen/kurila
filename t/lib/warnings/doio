@@ -100,7 +100,7 @@ $a = seek(STDIN,1,1);
 $a = sysseek(STDIN,1,1);
 -x STDIN ;
 stat(STDIN) ;
-$a = "fred";
+$a = *fred;
 tell($a);
 seek($a,1,1);
 sysseek($a,1,1);
@@ -113,7 +113,7 @@ $a = seek(STDIN,1,1);
 $a = sysseek(STDIN,1,1);
 -x STDIN ;
 stat(STDIN) ;
-$a = "fred";
+$a = *fred;
 tell($a);
 seek($a,1,1);
 sysseek($a,1,1);
@@ -125,9 +125,11 @@ seek() on closed filehandle STDIN at - line 5.
 sysseek() on closed filehandle STDIN at - line 6.
 -x on closed filehandle STDIN at - line 7.
 stat() on closed filehandle STDIN at - line 8.
-tell() on unopened filehandle at - line 10.
-seek() on unopened filehandle at - line 11.
-sysseek() on unopened filehandle at - line 12.
+tell() on unopened filehandle fred at - line 10.
+seek() on unopened filehandle fred at - line 11.
+sysseek() on unopened filehandle fred at - line 12.
+-x on unopened filehandle fred at - line 13.
+stat() on unopened filehandle fred at - line 14.
 ########
 # doio.c [Perl_do_print]
 use warnings 'uninitialized' ;
