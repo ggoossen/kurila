@@ -1,0 +1,84 @@
+=head1 NAME
+
+kurila110delta - what is new for Perl Kurila 1.10
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.9 and Perl Kurila 1.10
+
+=head1 Highlights In Perl Kurila 1.10
+
+=over 4
+
+=item *
+
+The sigil refers the the data type of the variable, instead of the data type of the
+value. For example: @array[28] should be used instead of $array[28], and
+%hash{'key'} instead of $hash{'key'}.
+
+=item *
+
+Slices are taken using C<[[...]]> and C<{[....]}> instead of using the sigil to indicate a slice.
+i.e. C<@hash{["foo", "bar"]} instead of C<@hash{"foo", "bar"}>, and
+C<@array[[1,2]]> instead of C<@array[1,2]>.
+
+=item *
+
+Curly braces are not allowed around variable names, i.e. $varname should be used instead
+of ${varname}
+
+=item *
+
+An error is raised for C<$#array>
+
+=back
+
+=head1 Core Enhancements
+
+=head2 Sigil refering to the variable type.
+
+The sigil refers the the data type of the variable, instead of the data type of the
+value. For example: @array[28] should be used instead of $array[28], and
+%hash{'key'} instead of $hash{'key'}.
+
+=head2 Changed slice syntax
+
+Slices are taken using C<[[...]]> and C<{[....]}> instead of using the sigil to indicate a slice.
+i.e. @hash{["foo", "bar"]} instead of @hash{"foo", "bar"}, and
+@array[[1,2]] instead of @array[1,2].
+
+=head2 No curly braces allowed around variables
+
+Curly braces are not allowed around variable names, i.e. $varname
+should be used instead of ${varname}. Also names are allowed to start
+with an C<^>, which refer to special variables, for example $^TAINT
+instead of ${^TAINT}.
+
+=head2 Error on C<$#array>
+
+An error is raised for C<$#array>. To get the length of an array
+C<scalar @array> should be used.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
