@@ -1084,9 +1084,6 @@ PERL_CALLCONV bool	Perl_io_close(pTHX_ IO* io, bool not_implicit)
 PERL_CALLCONV OP*	Perl_invert(pTHX_ OP* cmd)
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV I32	Perl_is_lvalue_sub(pTHX)
-			__attribute__warn_unused_result__;
-
 PERL_CALLCONV U32	Perl_to_uni_upper_lc(pTHX_ U32 c)
 			__attribute__warn_unused_result__
 			__attribute__pure__;

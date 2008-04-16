@@ -306,7 +306,6 @@
 #define io_close		Perl_io_close
 #define invert			Perl_invert
 #endif
-#define is_lvalue_sub		Perl_is_lvalue_sub
 #define to_uni_upper_lc		Perl_to_uni_upper_lc
 #define to_uni_title_lc		Perl_to_uni_title_lc
 #define to_uni_lower_lc		Perl_to_uni_lower_lc
@@ -2563,7 +2562,6 @@
 #define io_close(a,b)		Perl_io_close(aTHX_ a,b)
 #define invert(a)		Perl_invert(aTHX_ a)
 #endif
-#define is_lvalue_sub()		Perl_is_lvalue_sub(aTHX)
 #define to_uni_upper_lc(a)	Perl_to_uni_upper_lc(aTHX_ a)
 #define to_uni_title_lc(a)	Perl_to_uni_title_lc(aTHX_ a)
 #define to_uni_lower_lc(a)	Perl_to_uni_lower_lc(aTHX_ a)
