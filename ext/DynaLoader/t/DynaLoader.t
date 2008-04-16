@@ -119,7 +119,7 @@ for my $module (sort keys %modules) {
             skip "$module not available", 3;
         }
         eval "use $module";
-        is( $@, '', "loading $module" );
+        is( $@ && $@->message, '', "loading $module" );
     }
 }
 
