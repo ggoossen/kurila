@@ -1201,12 +1201,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
             break;
 	}
-	case '*':
-	case '#':
-	    if (sv_type == SVt_PV && ckWARN2_d(WARN_DEPRECATED, WARN_SYNTAX))
-		Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
-			    "$%c is no longer supported", *name);
-	    break;
 	case '|':
 	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 	    goto magicalize;
@@ -1248,6 +1242,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    break;
 	case ']':
 	    Perl_croak(aTHX_ "$] is obsolete. Use $^V or $kurila::VERSION");
+	case '*':
+	case '#':
 	case '(':
 	case ')':
 	    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
