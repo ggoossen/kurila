@@ -934,6 +934,8 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    SvOK_off(sv);
 		else if (PL_in_eval)
 		    sv_setiv(sv, PL_in_eval & ~(EVAL_INREQUIRE));
+		else
+		    sv_setiv(sv, 0);
 		break;
 	    case 'T':		/* $^T */
 #ifdef BIG_TIME
