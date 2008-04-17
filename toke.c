@@ -4336,7 +4336,6 @@ Perl_yylex(pTHX)
 		if (*s == '[') {
 		    Perl_croak(aTHX_ "array element should be @%s[...] instead of $%s[...]",
 			       &PL_tokenbuf[1], &PL_tokenbuf[1]);
-		    PL_tokenbuf[0] = '@';
 		}
 		else if (*s == '{') {
 		    Perl_croak(aTHX_ "hash element should be %%%s{...} instead of $%s{...}",
@@ -6203,9 +6202,6 @@ S_pending_ident(pTHX)
           "### Pending identifier '%s'\n", PL_tokenbuf); });
 
     /* if we're in a my(), we can't allow dynamics here.
-       $foo'bar has already been turned into $foo::bar, so
-       just check for colons.
-
        if it's a legal name, the OP is a PADANY.
     */
     if (PL_in_my) {
