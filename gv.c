@@ -1060,6 +1060,11 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    case 'P':        /* $^PREMATCH  $^POSTMATCH */
 			if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH"))
 			    goto magicalize;  
+			break;
+		    case 'R':        /* $^RE_TRIE_MAXBUF */
+			if (strEQ(name2, "RE_TRIE_MAXBUF") || strEQ(name2, "RE_DEBUG_FLAGS"))
+			    goto no_magicalize;
+			break;
 		    case 'T':	/* $^TAINT */
 			if (strEQ(name2, "TAINT"))
 			    goto ro_magicalize;
@@ -1079,6 +1084,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			    goto magicalize;
 			break;
 		    }
+		    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
 		} else {
 		    switch (*name2) {
 		    case 'H':	/* $^H */
@@ -1100,13 +1106,18 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    case 'T':	/* $^T */
 		    case 'W':	/* $^W */
 			goto magicalize;
+		    case 'M':   /* $^M */
+		    case 'R':   /* $^R */
+		    case 'X':   /* $^X */
+			goto no_magicalize;
 		    case 'V':	/* $^V */
 		    {
 			SV * const sv = GvSVn(gv);
 			sv_setsv(sv, PL_patchlevel);
-			break;
+			goto no_magicalize;
 		    }
 		    }
+		    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
 		}
 	    case '1':
 	    case '2':
@@ -1217,6 +1228,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '/':
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
+	no_magicalize:
 	    break;
 
 	case ';':
