@@ -1046,8 +1046,14 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			if (strEQ(name2, "DIE_HOOK"))
 			    goto magicalize;
 			break;
-		    case 'E':	/* $^ENCODING */
+		    case 'E':	/* $^ENCODING  $^EGID */
 			if (strEQ(name2, "ENCODING"))
+			    goto magicalize;
+			if (strEQ(name2, "EGID"))
+			    goto magicalize;
+			break;
+		    case 'G':   /* $^GID */
+			if (strEQ(name2, "GID"))
 			    goto magicalize;
 			break;
 		    case 'M':        /* $^MATCH */
@@ -1219,8 +1225,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '9':
 	case '[':
 	case '.':
-	case '(':
-	case ')':
 	case '<':
 	case '>':
 	case ',':
@@ -1228,6 +1232,14 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '/':
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
+
+	case '$':
+	case '@':
+	case '"':
+	case '0':
+	case '_':
+	case 'a':
+	case 'b':
 	no_magicalize:
 	    break;
 
@@ -1235,10 +1247,10 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    sv_setpvn(GvSVn(gv),"\034",1);
 	    break;
 	case ']':
-	{
 	    Perl_croak(aTHX_ "$] is obsolete. Use $^V or $kurila::VERSION");
-	}
-	break;
+	case '(':
+	case ')':
+	    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
 	}
     }
     return gv;
