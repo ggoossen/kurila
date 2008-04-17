@@ -556,16 +556,16 @@ in L<perllol>.
 =item @-
 X<@-> X<@LAST_MATCH_START>
 
-$-[0] is the offset of the start of the last successful match.
-C<$-[>I<n>C<]> is the offset of the start of the substring matched by
+@-[0] is the offset of the start of the last successful match.
+C<@-[>I<n>C<]> is the offset of the start of the substring matched by
 I<n>-th subpattern, or undef if the subpattern did not match.
 
 Thus after a match against $_, $& coincides with C<substr $_, $-[0],
 $+[0] - $-[0]>.  Similarly, $I<n> coincides with C<substr $_, $-[n],
 $+[n] - $-[n]> if C<$-[n]> is defined, and $+ coincides with
-C<substr $_, $-[$#-], $+[$#-] - $-[$#-]>.  One can use C<$#-> to find the last
+C<substr $_, @-[@- -1], @+[@- -1] - @-[@- -1]>.  One can use C<@- -1> to find the last
 matched subgroup in the last successful match.  Contrast with
-C<$#+>, the number of subgroups in the regular expression.  Compare
+C<@+ -1>, the number of subgroups in the regular expression.  Compare
 with C<@+>.
 
 This array holds the offsets of the beginnings of the last
@@ -839,10 +839,9 @@ supporting setreuid().
 
 =item $REAL_GROUP_ID
 
-=item $GID
+=item $^GID
 
-=item $(
-X<$(> X<$GID> X<$REAL_GROUP_ID>
+X<$^GID> X<$REAL_GROUP_ID>
 
 The real gid of this process.  If you are on a machine that supports
 membership in multiple groups simultaneously, gives a space separated
@@ -850,14 +849,14 @@ list of groups you are in.  The first number is the one returned by
 getgid(), and the subsequent ones by getgroups(), one of which may be
 the same as the first number.
 
-However, a value assigned to C<$(> must be a single number used to
-set the real gid.  So the value given by C<$(> should I<not> be assigned
-back to C<$(> without being forced numeric, such as by adding zero. Note
-that this is different to the effective gid (C<$)>) which does take a
+However, a value assigned to C<$^GID> must be a single number used to
+set the real gid.  So the value given by C<$^GID> should I<not> be assigned
+back to C<$^GID> without being forced numeric, such as by adding zero. Note
+that this is different to the effective gid (C<$^EGID>) which does take a
 list.
 
 You can change both the real gid and the effective gid at the same
-time by using POSIX::setgid().  Changes to $( require a check to $!
+time by using POSIX::setgid().  Changes to $^GID require a check to $!
 to detect any possible errors after an attempted change.
 
 (Mnemonic: parentheses are used to I<group> things.  The real gid is the
@@ -865,10 +864,9 @@ group you I<left>, if you're running setgid.)
 
 =item $EFFECTIVE_GROUP_ID
 
-=item $EGID
+=item $^EGID
 
-=item $)
-X<$)> X<$EGID> X<$EFFECTIVE_GROUP_ID>
+X<$^EGID> X<$EFFECTIVE_GROUP_ID>
 
 The effective gid of this process.  If you are on a machine that
 supports membership in multiple groups simultaneously, gives a space
@@ -876,12 +874,12 @@ separated list of groups you are in.  The first number is the one
 returned by getegid(), and the subsequent ones by getgroups(), one of
 which may be the same as the first number.
 
-Similarly, a value assigned to C<$)> must also be a space-separated
+Similarly, a value assigned to C<$^EGID> must also be a space-separated
 list of numbers.  The first number sets the effective gid, and
 the rest (if any) are passed to setgroups().  To get the effect of an
 empty list for setgroups(), just repeat the new effective gid; that is,
 to force an effective gid of 5 and an effectively empty setgroups()
-list, say C< $) = "5 5" >.
+list, say C< $^EGID = "5 5" >.
 
 You can change both the effective gid and the real gid at the same
 time by using POSIX::setgid() (use only a single numeric argument).
@@ -891,9 +889,9 @@ after an attempted change.
 (Mnemonic: parentheses are used to I<group> things.  The effective gid
 is the group that's I<right> for you, if you're running setgid.)
 
-C<< $< >>, C<< $> >>, C<$(> and C<$)> can be set only on
-machines that support the corresponding I<set[re][ug]id()> routine.  C<$(>
-and C<$)> can be swapped only on machines supporting setregid().
+C<< $< >>, C<< $> >>, C<$^GID> and C<$^EGID> can be set only on
+machines that support the corresponding I<set[re][ug]id()> routine.  C<$^GID>
+and C<$^EGID> can be swapped only on machines supporting setregid().
 
 =item $PROGRAM_NAME
 
@@ -930,23 +928,6 @@ thread may modify its copy of the C<$0> and the change becomes visible
 to ps(1) (assuming the operating system plays along).  Note that
 the view of C<$0> the other threads have will not change since they
 have their own copies of it.
-
-=item $]
-X<$]>
-
-The version + patchlevel / 1000 of the Perl interpreter.  This variable
-can be used to determine whether the Perl interpreter executing a
-script is in the right range of versions.  (Mnemonic: Is this version
-of perl in the right bracket?)  Example:
-
-    warn "No checksumming!\n" if $] < 3.019;
-
-See also the documentation of C<use VERSION> and C<require VERSION>
-for a convenient way to fail if the running Perl interpreter is too old.
-
-The floating point representation can sometimes lead to inaccurate
-numeric comparisons.  See C<$^V> for a more modern representation of
-the Perl version that allows accurate string comparisons.
 
 =item $COMPILING
 
@@ -1426,7 +1407,7 @@ specific info.
 
 =item %ENV
 
-=item $ENV{expr}
+=item %ENV{expr}
 X<%ENV>
 
 The hash %ENV contains your current environment.  Setting a
@@ -1435,7 +1416,7 @@ you subsequently fork() off.
 
 =item %SIG
 
-=item $SIG{expr}
+=item %SIG{expr}
 X<%SIG>
 
 The hash C<%SIG> contains signal handlers for signals.  For example:
@@ -1530,19 +1511,14 @@ Variable names in Perl can have several formats.  Usually, they
 must begin with a letter or underscore, in which case they can be
 arbitrarily long (up to an internal limit of 251 characters) and
 may contain letters, digits, underscores, or the special sequence
-C<::> or C<'>.  In this case, the part before the last C<::> or
-C<'> is taken to be a I<package qualifier>; see L<perlmod>.
+C<::>.  In this case, the part before the last C<::>  is taken
+to be a I<package qualifier>; see L<perlmod>.
 
 Perl variable names may also be a sequence of digits or a single
-punctuation or control character.  These names are all reserved for
+punctuation or a name starting with C<^>.  These names are all reserved for
 special uses by Perl; for example, the all-digits names are used
 to hold data captured by backreferences after a regular expression
-match.  Perl has a special syntax for the single-control-character
-names: It understands C<^X> (caret C<X>) to mean the control-C<X>
-character.  For example, the notation C<$^W> (dollar-sign caret
-C<W>) is the scalar variable whose name is the single character
-control-C<W>.  This is better than typing a literal control-C<W>
-into your program.
+match.
 
 Perl variable names may be alphanumeric
 strings that begin with a caret.
@@ -1582,6 +1558,6 @@ for more information. Writing C<use English '-no_match_vars';>
 avoids the performance penalty.
 
 Having to even think about the C<$^S> variable in your exception
-handlers is simply wrong.  C<$SIG{__DIE__}> as currently implemented
+handlers is simply wrong.  C<$DIE_HOOK> as currently implemented
 invites grievous and difficult to track down errors.  Avoid it
 and use an C<END{}> or CORE::GLOBAL::die override instead.
