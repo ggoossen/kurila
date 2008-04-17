@@ -432,9 +432,9 @@ EOT
 	if (%ENV{PERL_VALGRIND}) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
-		if (open(V, "<", $valgrind_log)) {
-		    @valgrind = ~< *V;
-		    close V;
+		if (open(my $v, "<", $valgrind_log)) {
+		    @valgrind = ~< $v;
+		    close $v;
 		} else {
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
