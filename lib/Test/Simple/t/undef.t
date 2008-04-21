@@ -52,19 +52,19 @@ isnt( undef, 0,             'undef isnt zero' );
 like( undef, '/.*/',        'undef is like anything' );
 warnings_like("Use of uninitialized value.* at $Filename line 45\\.\n");
 
-eq_array( [undef, undef], [undef, 23] );
+eq_array( \@(undef, undef), \@(undef, 23) );
 no_warnings;
 
-eq_hash ( { foo => undef, bar => undef },
-          { foo => undef, bar => 23 } );
+eq_hash ( \%( foo => undef, bar => undef ),
+          \%( foo => undef, bar => 23 ) );
 no_warnings;
 
-eq_set  ( [undef, undef, 12], [29, undef, undef] );
+eq_set  ( \@(undef, undef, 12), \@(29, undef, undef) );
 no_warnings;
 
 
-eq_hash ( { foo => undef, bar => { baz => undef, moo => 23 } },
-          { foo => undef, bar => { baz => undef, moo => 23 } } );
+eq_hash ( \%( foo => undef, bar => \%( baz => undef, moo => 23 ) ),
+          \%( foo => undef, bar => \%( baz => undef, moo => 23 ) ) );
 no_warnings;
 
 

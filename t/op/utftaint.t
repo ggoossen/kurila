@@ -20,7 +20,7 @@ my $arg = %ENV{PATH}; # a tainted value
 use utf8;
 use constant UTF8 => "\x{1234}";
 
-for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"], [utf8 => "\x{100}"]) {
+for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}")) {
     my $encode = $ary->[0];
     my $string = $ary->[1];
 
@@ -54,7 +54,7 @@ for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"], [utf8 => "\x{100}"]) {
 }
 
 
-for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"], [utf8 => "\x{100}"]) {
+for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}")) {
     my $encode = $ary->[0];
 
     my $utf8 = pack('U*') . $ary->[1];
@@ -80,7 +80,7 @@ for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"], [utf8 => "\x{100}"]) {
 }
 
 
-for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"]) {
+for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]")) {
     my $encode = $ary->[0];
 
     my $up   = pack('U*') . $ary->[1];
@@ -123,10 +123,10 @@ for my $ary ([ascii => 'perl'], [latin1 => "\x[B6]"]) {
 
 {
     fresh_perl_is('use utf8; $a = substr $^X, 0, 0; m/\x{100}/i; m/$a\x{100}/i || print q,ok,',
-		  'ok', {switches => ["-T", "-l"]},
+		  'ok', \%(switches => \@("-T", "-l")),
 		  "matching a regexp is taint agnostic");
 
     fresh_perl_is('use utf8; $a = substr $^X, 0, 0; m/$a\x{100}/i || print q,ok,',
-		  'ok', {switches => ["-T", "-l"]},
+		  'ok', \%(switches => \@("-T", "-l")),
 		  "therefore swash_init should be taint agnostic");
 }

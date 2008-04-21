@@ -24,6 +24,6 @@
 
 %hash = map  ( lc($_), 1 ), @array;  # evaluates to (1, @array)
 
-@hashes = map +{ lc($_), 1 }, @array # EXPR, so needs , at end
+@hashes = map +\%( lc($_), 1 ), @array # EXPR, so needs , at end
 
 

@@ -7,10 +7,10 @@ EOSOL
 my $advert = join "", ~< *DATA;
 
 print form
-	{page=>{width=>70}, layout=>'across' },
-   	 '{[[[[[[[[[[[[{*}]]]]]]]]]]]]}', {height=>2}, $text,
+	\%(page=>\%(width=>70), layout=>'across' ),
+   	 '{[[[[[[[[[[[[{*}]]]]]]]]]]]]}', \%(height=>2), $text,
    	 '{V{*}V}   {="{*}"=}   {V{*}V}', $advert,
-   	 '{VVVVVVVVVVVV{*}VVVVVVVVVVVV}', {height=>undef};
+   	 '{VVVVVVVVVVVV{*}VVVVVVVVVVVV}', \%(height=>undef);
 
 __DATA__
 

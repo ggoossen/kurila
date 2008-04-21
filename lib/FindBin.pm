@@ -100,7 +100,7 @@ use File::Basename;
 use File::Spec;
 
 @EXPORT_OK = qw($Bin $Script $RealBin $RealScript $Dir $RealDir);
-%EXPORT_TAGS = (ALL => [qw($Bin $Script $RealBin $RealScript $Dir $RealDir)]);
+%EXPORT_TAGS = (ALL => \@(qw($Bin $Script $RealBin $RealScript $Dir $RealDir)));
 @ISA = qw(Exporter);
 
 $VERSION = "1.49";

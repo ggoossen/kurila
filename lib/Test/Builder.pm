@@ -134,7 +134,7 @@ this method.  Also, the method name may change in the future.
 sub create {
     my $class = shift;
 
-    my $self = bless {}, $class;
+    my $self = bless \%(), $class;
     $self->reset;
 
     return $self;
@@ -165,7 +165,7 @@ sub reset {
 
     share($self->{Curr_Test});
     $self->{Curr_Test}    = 0;
-    $self->{Test_Results} = &share([]);
+    $self->{Test_Results} = &share(\@());
 
     $self->{Exported_To}    = undef;
     $self->{Expected_Tests} = 0;
@@ -397,7 +397,7 @@ ERR
     $self->_unoverload_str(\$todo);
 
     my $out;
-    my $result = &share({});
+    my $result = &share(\%());
 
     unless( $test ) {
         $out .= "not ";
@@ -816,13 +816,13 @@ sub skip {
     lock($self->{Curr_Test});
     $self->{Curr_Test}++;
 
-    $self->{Test_Results}[$self->{Curr_Test}-1] = &share({
+    $self->{Test_Results}[$self->{Curr_Test}-1] = &share(\%(
         'ok'      => 1,
         actual_ok => 1,
         name      => '',
         type      => 'skip',
         reason    => $why,
-    });
+    ));
 
     my $out = "ok";
     $out   .= " $self->{Curr_Test}" if $self->use_numbers;
@@ -857,13 +857,13 @@ sub todo_skip {
     lock($self->{Curr_Test});
     $self->{Curr_Test}++;
 
-    $self->{Test_Results}[$self->{Curr_Test}-1] = &share({
+    $self->{Test_Results}[$self->{Curr_Test}-1] = &share(\%(
         'ok'      => 1,
         actual_ok => 0,
         name      => '',
         type      => 'todo_skip',
         reason    => $why,
-    });
+    ));
 
     my $out = "not ok";
     $out   .= " $self->{Curr_Test}" if $self->use_numbers;
@@ -1498,13 +1498,13 @@ sub current_test {
         if( $num +> @$test_results ) {
             my $start = @$test_results ? @$test_results : 0;
             for ($start..$num-1) {
-                $test_results->[$_] = &share({
+                $test_results->[$_] = &share(\%(
                     'ok'      => 1, 
                     actual_ok => undef, 
                     reason    => 'incrementing test number', 
                     type      => 'unknown', 
                     name      => undef 
-                });
+                ));
             }
         }
         # If backward, wipe history.  Its their funeral.
@@ -1749,7 +1749,7 @@ sub _ending {
         # Auto-extended arrays and elements which aren't explicitly
         # filled in with a shared reference will puke under 5.8.0
         # ithreads.  So we have to fill them in by hand. :(
-        my $empty_result = &share({});
+        my $empty_result = &share(\%());
         for my $idx ( 0..$self->{Expected_Tests}-1 ) {
             $test_results->[$idx] = $empty_result
               unless defined $test_results->[$idx];

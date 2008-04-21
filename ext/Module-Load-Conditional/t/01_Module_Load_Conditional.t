@@ -129,21 +129,21 @@ use_ok( 'Module::Load::Conditional' );
 ### test 'can_load' ###
 
 {
-    my $use_list = { 'LoadIt' => 1 };
+    my $use_list = \%( 'LoadIt' => 1 );
     my $bool = can_load( modules => $use_list );
 
     ok( $bool, q[Load simple module] );
 }
 
 {
-    my $use_list = { 'Commented' => 2 };
+    my $use_list = \%( 'Commented' => 2 );
     my $bool = can_load( modules => $use_list );
 
     ok( $bool, q[Load module with a second, commented-out $VERSION] );
 }
 
 {
-    my $use_list = { 'MustBe::Loaded' => 1 };
+    my $use_list = \%( 'MustBe::Loaded' => 1 );
     my $bool = can_load( modules => $use_list );
 
     ok( !$bool, q[Detect out of date module] );
@@ -153,7 +153,7 @@ use_ok( 'Module::Load::Conditional' );
     delete %INC{'LoadIt.pm'};
     delete %INC{'MustBe/Loaded.pm'};
 
-    my $use_list = { 'LoadIt' => 1, 'MustBe::Loaded' => 1 };
+    my $use_list = \%( 'LoadIt' => 1, 'MustBe::Loaded' => 1 );
     my $bool = can_load( modules => $use_list );
 
     ok( !%INC{'LoadIt.pm'} && !%INC{'MustBe/Loaded.pm'},
@@ -193,7 +193,7 @@ SKIP:{
     is( $href->{'file'}, $$.$$, '   Found correct file' );
     is( $href->{'version'}, $$, '   Found correct version' );
     ok( $href->{'uptodate'},    '   Marked as uptodate' );
-    ok( can_load( modules => { 'A::B::C::D' => 0 } ),
+    ok( can_load( modules => \%( 'A::B::C::D' => 0 ) ),
                                 '   can_load successful' );
 }
 

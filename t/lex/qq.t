@@ -90,7 +90,7 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
   # couldn't find a better place
 
   my @x = qw|aap noot|;
-  my $dx = [@x];
+  my $dx = \@(@x);
 
   is("@x", "aap noot");
   is("@$dx", "aap noot");

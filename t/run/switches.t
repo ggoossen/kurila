@@ -25,7 +25,7 @@ my @tmpfiles = ();
 END { unlink @tmpfiles }
 
 $r = runperl(
-    switches	=> [],
+    switches	=> \@(),
     stdin	=> 'foo\nbar\nbaz\n',
     prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
@@ -34,49 +34,49 @@ is( $r, "<foo\n><bar\n><baz\n>", "no switches" );
 # Tests for -0
 
 $r = runperl(
-    switches	=> [ '-0', ],
+    switches	=> \@( '-0', ),
     stdin	=> 'foo\0bar\0baz\0',
     prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
 is( $r, "<foo\0><bar\0><baz\0>", "-0" );
 
 $r = runperl(
-    switches	=> [ '-l', '-0', '-p' ],
+    switches	=> \@( '-l', '-0', '-p' ),
     stdin	=> 'foo\0bar\0baz\0',
     prog	=> '1',
 );
 is( $r, "foo\nbar\nbaz\n", "-0 after a -l" );
 
 $r = runperl(
-    switches	=> [ '-0', '-l', '-p' ],
+    switches	=> \@( '-0', '-l', '-p' ),
     stdin	=> 'foo\0bar\0baz\0',
     prog	=> '1',
 );
 is( $r, "foo\0bar\0baz\0", "-0 before a -l" );
 
 $r = runperl(
-    switches	=> [ sprintf('-0%o', ord 'x') ],
+    switches	=> \@( sprintf('-0%o', ord 'x') ),
     stdin	=> 'fooxbarxbazx',
     prog	=> 'print qq(<$_>) while ~< *ARGV',
 );
 is( $r, "<foox><barx><bazx>", "-0 with octal number" );
 
 $r = runperl(
-    switches	=> [ '-00', '-p' ],
+    switches	=> \@( '-00', '-p' ),
     stdin	=> 'abc\ndef\n\nghi\njkl\nmno\n\npq\n',
     prog	=> 's/\n/-/g;$_.=q(/)',
 );
 is( $r, 'abc-def--/ghi-jkl-mno--/pq-/', '-00 (paragraph mode)' );
 
 $r = runperl(
-    switches	=> [ '-0777', '-p' ],
+    switches	=> \@( '-0777', '-p' ),
     stdin	=> 'abc\ndef\n\nghi\njkl\nmno\n\npq\n',
     prog	=> 's/\n/-/g;$_.=q(/)',
 );
 is( $r, 'abc-def--ghi-jkl-mno--pq-/', '-0777 (slurp mode)' );
 
 $r = runperl(
-    switches	=> [ '-066' ],
+    switches	=> \@( '-066' ),
     prog	=> 'BEGIN { print qq{($/)} } print qq{[$/]}',
 );
 is( $r, "(\066)[\066]", '$/ set at compile-time' );
@@ -97,7 +97,7 @@ END   { print "block 5\n"; }
 SWTEST
     close $f or die "Could not close: $!";
     $r = runperl(
-	switches	=> [ '-c' ],
+	switches	=> \@( '-c' ),
 	progfile	=> $filename,
 	stderr		=> 1,
     );
@@ -118,7 +118,7 @@ SWTEST
 # Tests for -l
 
 $r = runperl(
-    switches	=> [ sprintf('-l%o', ord 'x') ],
+    switches	=> \@( sprintf('-l%o', ord 'x') ),
     prog	=> 'print for qw/foo bar/'
 );
 is( $r, 'fooxbarx', '-l with octal number' );
@@ -126,9 +126,9 @@ is( $r, 'fooxbarx', '-l with octal number' );
 # Tests for -s
 
 $r = runperl(
-    switches	=> [ '-s' ],
+    switches	=> \@( '-s' ),
     prog	=> 'for (qw/abc def ghi/) {print defined ${*{Symbol::fetch_glob($_)}} ? ${*{Symbol::fetch_glob($_)}} : q(-)}',
-    args	=> [ '--', '-abc=2', '-def', ],
+    args	=> \@( '--', '-abc=2', '-def', ),
 );
 is( $r, '21-', '-s switch parsing' );
 
@@ -142,7 +142,7 @@ SWTEST
     close $f or die "Could not close: $!";
     $r = runperl(
 	progfile    => $filename,
-	args	    => [ '-x=foo -y' ],
+	args	    => \@( '-x=foo -y' ),
     );
     is( $r, 'foo1', '-s on the shebang line' );
     push @tmpfiles, $filename;
@@ -159,7 +159,7 @@ SWTEST
     close $f or die "Could not close: $!";
     $r = runperl(
 	progfile    => $filename,
-	args	    => [ '-x=foo' ],
+	args	    => \@( '-x=foo' ),
     );
     is( $r, 'foo', '-sn on the shebang line' );
     push @tmpfiles, $filename;
@@ -177,17 +177,17 @@ sub import { print map "<$_>", @_ }
 SWTESTPM
     close $f or die "Could not close: $!";
     $r = runperl(
-	switches    => [ '-Mswtest' ],
+	switches    => \@( '-Mswtest' ),
 	prog	    => '1',
     );
     is( $r, '<swtest>', '-M' );
     $r = runperl(
-	switches    => [ '-Mswtest=foo' ],
+	switches    => \@( '-Mswtest=foo' ),
 	prog	    => '1',
     );
     is( $r, '<swtest><foo>', '-M with import parameter' );
     $r = runperl(
-	switches    => [ '-mswtest' ],
+	switches    => \@( '-mswtest' ),
 	prog	    => '1',
     );
 
@@ -196,36 +196,36 @@ SWTESTPM
         is( $r, '', '-m' );
     }
     $r = runperl(
-	switches    => [ '-mswtest=foo,bar' ],
+	switches    => \@( '-mswtest=foo,bar' ),
 	prog	    => '1',
     );
     is( $r, '<swtest><foo><bar>', '-m with import parameters' );
     push @tmpfiles, $filename;
 
-    is( runperl( switches => [ '-MTie::Hash' ], stderr => 1, prog => 1 ),
+    is( runperl( switches => \@( '-MTie::Hash' ), stderr => 1, prog => 1 ),
 	  '', "-MFoo::Bar allowed" );
 
-    like( runperl( switches => [ '-M:swtest' ], stderr => 1,
+    like( runperl( switches => \@( '-M:swtest' ), stderr => 1,
 		   prog => 'die "oops"' ),
 	  qr/Invalid module name [\w:]+ with -M option\b/,
           "-M:Foo not allowed" );
 
-    like( runperl( switches => [ '-mA:B:C' ], stderr => 1,
+    like( runperl( switches => \@( '-mA:B:C' ), stderr => 1,
 		   prog => 'die "oops"' ),
 	  qr/Invalid module name [\w:]+ with -m option\b/,
           "-mFoo:Bar not allowed" );
 
-    like( runperl( switches => [ '-m-A:B:C' ], stderr => 1,
+    like( runperl( switches => \@( '-m-A:B:C' ), stderr => 1,
 		   prog => 'die "oops"' ),
 	  qr/Invalid module name [\w:]+ with -m option\b/,
           "-m-Foo:Bar not allowed" );
 
-    like( runperl( switches => [ '-m-' ], stderr => 1,
+    like( runperl( switches => \@( '-m-' ), stderr => 1,
 		   prog => 'die "oops"' ),
 	  qr/Module name required with -m option\b/,
   	  "-m- not allowed" );
 
-    like( runperl( switches => [ '-M-=' ], stderr => 1,
+    like( runperl( switches => \@( '-M-=' ), stderr => 1,
 		   prog => 'die "oops"' ),
 	  qr/Module name required with -M option\b/,
   	  "-M- not allowed" );
@@ -238,26 +238,26 @@ SWTESTPM
 
     # basic perl -V should generate significant output.
     # we don't test actual format too much since it could change
-    like( runperl( switches => ['-V'] ), qr/(\n.*){20}/,
+    like( runperl( switches => \@('-V') ), qr/(\n.*){20}/,
           '-V generates 20+ lines' );
 
-    like( runperl( switches => ['-V'] ),
+    like( runperl( switches => \@('-V') ),
 	  qr/\ASummary of my kurila .*configuration:/,
           '-V looks okay' );
 
     # lookup a known config var
-    chomp( $r=runperl( switches => ['-V:osname'] ) );
+    chomp( $r=runperl( switches => \@('-V:osname') ) );
     is( $r, "osname='$^O';", 'perl -V:osname');
 
     # lookup a nonexistent var
-    chomp( $r=runperl( switches => ['-V:this_var_makes_switches_test_fail'] ) );
+    chomp( $r=runperl( switches => \@('-V:this_var_makes_switches_test_fail') ) );
     is( $r, "this_var_makes_switches_test_fail='UNKNOWN';",
         'perl -V:unknown var');
 
     # regexp lookup
     # platforms that don't like this quoting can either skip this test
     # or fix test.pl _quote_args
-    $r = runperl( switches => ['"-V:i\D+size"'] );
+    $r = runperl( switches => \@('"-V:i\D+size"') );
     # should be unlike( $r, qr/^$|not found|UNKNOWN/ );
     like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
 
@@ -271,7 +271,7 @@ SWTESTPM
     local $TODO = '';   # these ones should work on VMS
 
     my (undef, $v) = split m/-/, $^V;
-    like( runperl( switches => ['-v'] ),
+    like( runperl( switches => \@('-v') ),
 	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q%Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
           '-v looks okay' );
 
@@ -282,7 +282,7 @@ SWTESTPM
 {
     local $TODO = '';   # these ones should work on VMS
 
-    like( runperl( switches => ['-h'] ),
+    like( runperl( switches => \@('-h') ),
 	  qr/Usage: .+(?i:perl(?:%Config{_exe})?).+switches.+programfile.+arguments/,
           '-h looks okay' );
 
@@ -294,7 +294,7 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 
-    like( runperl( switches => ["-$switch"], stderr => 1,
+    like( runperl( switches => \@("-$switch"), stderr => 1,
 		   prog => 'die "oops"' ),
 	  qr/\QUnrecognized switch: -$switch  (-h will show valid options)/,
           "-$switch correctly unknown" );
@@ -318,7 +318,7 @@ __EOF__
 
     END { do_i_unlink() }
 
-    runperl( switches => ['-pi.bak'], prog => 's/foo/bar/', args => ['file'] );
+    runperl( switches => \@('-pi.bak'), prog => 's/foo/bar/', args => \@('file') );
 
     open(FILE, "<", "file") or die "$0: Failed to open 'file': $!";
     chomp(my @file = ~< *FILE);
@@ -339,11 +339,11 @@ __EOF__
 # Tests for -E
 
 $r = runperl(
-    switches	=> [ '-E', '"undef ~~ undef and print qq(Hello, world!\n)"']
+    switches	=> \@( '-E', '"undef ~~ undef and print qq(Hello, world!\n)"')
 );
 is( $r, "Hello, world!\n", "-E ~~" );
 
 $r = runperl(
-    switches	=> [ '-E', '"given(undef) {when(undef) { print qq(Hello, world!\n)"}}']
+    switches	=> \@( '-E', '"given(undef) {when(undef) { print qq(Hello, world!\n)"}}')
 );
 is( $r, "Hello, world!\n", "-E given" );

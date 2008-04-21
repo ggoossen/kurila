@@ -101,30 +101,30 @@ use fields qw(b1);
 package main;
 
 my %EXPECT = (
-              B1 => [qw(b1 b2 b3)],
-              D1 => [qw(b1 b2 b3 d1 d2 d3)],
-              D2 => [qw(b1 b2 b3 _d1 _d2 d1 d2)],
+              B1 => \@(qw(b1 b2 b3)),
+              D1 => \@(qw(b1 b2 b3 d1 d2 d3)),
+              D2 => \@(qw(b1 b2 b3 _d1 _d2 d1 d2)),
 
-              M  => [qw()],
-              B2 => [qw(_b1 b1 _b2 b2)],
-              D3 => [(undef,undef,undef,
-                                qw(b2 b1 d1 _b1 _d1))],     # b1 is hidden
-              D4 => [(undef,undef,undef,
-                                qw(b2 b1 d1),undef,undef,qw(_d3 d3))],
+              M  => \@(qw()),
+              B2 => \@(qw(_b1 b1 _b2 b2)),
+              D3 => \@((undef,undef,undef,
+                                qw(b2 b1 d1 _b1 _d1))),     # b1 is hidden
+              D4 => \@((undef,undef,undef,
+                                qw(b2 b1 d1),undef,undef,qw(_d3 d3))),
 
-              D5 => [undef, 'b1', undef, 'b2'],
+              D5 => \@(undef, 'b1', undef, 'b2'),
 
-              B3 => [qw(b4 _b5 b6 _b7)],
+              B3 => \@(qw(b4 _b5 b6 _b7)),
 
-              B7 => [qw(_b1)],
-              D7 => [undef, 'b1'],
+              B7 => \@(qw(_b1)),
+              D7 => \@(undef, 'b1'),
 
-              B8  => [qw(_b1)],
-              D8  => [undef],
-              D8A => [undef, 'b1'],
+              B8  => \@(qw(_b1)),
+              D8  => \@(undef),
+              D8A => \@(undef, 'b1'),
 
-              'Foo::Bar'        => [qw(b1 b2 b3)],
-              'Foo::Bar::Baz'   => [qw(b1 b2 b3 foo bar baz)],
+              'Foo::Bar'        => \@(qw(b1 b2 b3)),
+              'Foo::Bar::Baz'   => \@(qw(b1 b2 b3 foo bar baz)),
              );
 
 while(my($class, $efields) = each %EXPECT) {

@@ -37,11 +37,11 @@ print "1..$tests\n";
 
 package SHORT_NAME;
 
-sub make { bless [], shift }
+sub make { bless \@(), shift }
 
 package SHORT_NAME_WITH_HOOK;
 
-sub make { bless [], shift }
+sub make { bless \@(), shift }
 
 sub STORABLE_freeze {
 	my $self = shift;
@@ -108,7 +108,7 @@ for (my $i = 0; $i +< 10; $i++) {
 ok 10, $good;
 
 {
-	my $blessed_ref = bless \\[1,2,3], 'Foobar';
+	my $blessed_ref = bless \\\@(1,2,3), 'Foobar';
 	my $x = freeze $blessed_ref;
 	my $y = thaw $x;
 	ok 11, ref $y eq 'Foobar';
@@ -117,7 +117,7 @@ ok 10, $good;
 
 package RETURNS_IMMORTALS;
 
-sub make { my $self = shift; bless [@_], $self }
+sub make { my $self = shift; bless \@(@_), $self }
 
 sub STORABLE_freeze {
   # Some reference some number of times.
@@ -167,7 +167,7 @@ $loaded_count = 0;
 $thawed_count = 0;
 
 sub make {
-  bless [];
+  bless \@();
 }
 
 sub STORABLE_freeze {

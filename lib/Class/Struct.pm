@@ -24,7 +24,7 @@ sub printem {
 
     sub TIEARRAY {
         my $class = shift;
-        return bless [], $class;
+        return bless \@(), $class;
     }
 
     sub STORE {

@@ -113,7 +113,7 @@ is( Net::Netrc->lookup('abadname')->{login}, 'baz',
 	'lookup() should use default for unknown machine name' );
 
 # now test these accessors
-my $instance = bless({}, 'Net::Netrc');
+my $instance = bless(\%(), 'Net::Netrc');
 for my $accessor (qw( login account password )) {
 	is( $instance->?$accessor(), undef, 
 		"$accessor() should return undef if $accessor is not set" );
@@ -137,7 +137,7 @@ sub new {
 
 sub TIEHANDLE {
 	my ($class, $file, $mode) = @_[[0,2,3]];
-	bless({ file => $file, mode => $mode }, $class);
+	bless(\%( file => $file, mode => $mode ), $class);
 }
 
 my @lines;

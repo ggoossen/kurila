@@ -135,7 +135,7 @@ sub case_tolerant () {
   my $osFsType = "\0"x256;
   my $osVolName = "\0"x256;
   my $ouFsFlags = 0;
-  Win32API::File::GetVolumeInformation($drive, $osVolName, 256, [], [], $ouFsFlags, $osFsType, 256 );
+  Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 );
   if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
   else { return 1; }
 }

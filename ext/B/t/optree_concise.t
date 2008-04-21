@@ -132,7 +132,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> '-base4',
-	      bcopts	=> [qw/ -basic -base4 /],
+	      bcopts	=> \@(qw/ -basic -base4 /),
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 13 <1> leavesub[1 ref] K/REFC,1 ->(end)
@@ -159,7 +159,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> "restore -base36 default",
-	      bcopts	=> [qw/ -basic -base36 /],
+	      bcopts	=> \@(qw/ -basic -base36 /),
 	      code	=> sub{$a},
 	      crossfail	=> 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -177,7 +177,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> "terse basic",
-	      bcopts	=> [qw/ -basic -terse /],
+	      bcopts	=> \@(qw/ -basic -terse /),
 	      code	=> sub{$a},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 UNOP (0x82b0918) leavesub [1] 
@@ -194,7 +194,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> "sticky-terse exec",
-	      bcopts	=> [qw/ -exec /],
+	      bcopts	=> \@(qw/ -exec /),
 	      code	=> sub{$a},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 COP (0x82b0d70) nextstate 
@@ -210,9 +210,9 @@ pass("OPTIONS IN CMDLINE MODE");
 
 checkOptree ( name => 'cmdline invoke -basic works',
 	      prog => 'sort @a',
-	      errs => [ 'Useless use of sort in void context at -e line 1.',
+	      errs => \@( 'Useless use of sort in void context at -e line 1.',
 			'Name "main::a" used only once: possible typo at -e line 1.',
-			],
+			),
 	      #bcopts	=> '-basic', # default
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 7  <@> leave[1 ref] vKP/REFC ->(end)
@@ -234,9 +234,9 @@ EONT_EONT
 
 checkOptree ( name => 'cmdline invoke -exec works',
 	      prog => 'sort @a',
-	      errs => [ 'Useless use of sort in void context at -e line 1.',
+	      errs => \@( 'Useless use of sort in void context at -e line 1.',
 			'Name "main::a" used only once: possible typo at -e line 1.',
-			],
+			),
 	      bcopts => '-exec',
 	      expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 1  <0> enter 
@@ -261,7 +261,7 @@ EONT_EONT
 checkOptree
     ( name	=> 'cmdline self-strict compile err using prog',
       prog	=> 'use strict; sort @a',
-      bcopts	=> [qw/ -basic -concise -exec /],
+      bcopts	=> \@(qw/ -basic -concise -exec /),
       errs	=> 'Global symbol "@a" requires explicit package name at -e line 1.',
       expect	=> 'nextstate',
       expect_nt	=> 'nextstate',
@@ -271,7 +271,7 @@ checkOptree
 checkOptree
     ( name	=> 'cmdline self-strict compile err using code',
       code	=> 'use strict; sort @a',
-      bcopts	=> [qw/ -basic -concise -exec /],
+      bcopts	=> \@(qw/ -basic -concise -exec /),
       errs	=> 'Global symbol "@a" requires explicit package name at .*? line 1.',
       note	=> 'this test relys on a kludge which copies $@ to rendering when empty',
       expect	=> 'Global symbol',
@@ -282,8 +282,8 @@ checkOptree
 checkOptree
     ( name	=> 'cmdline -basic -concise -exec works',
       prog	=> 'our @a; sort @a',
-      bcopts	=> [qw/ -basic -concise -exec /],
-      errs	=> ['Useless use of sort in void context at -e line 1.'],
+      bcopts	=> \@(qw/ -basic -concise -exec /),
+      errs	=> \@('Useless use of sort in void context at -e line 1.'),
       strip_open_hints => 1,
       expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <0> enter 
@@ -362,7 +362,7 @@ set_up_relative_test();
 pass("set_up_relative_test, new callback installed");
 
 checkOptree ( name	=> 'callback used, independent of style',
-	      bcopts	=> [qw/ -concise -exec /],
+	      bcopts	=> \@(qw/ -concise -exec /),
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 1  <;> nextstate(main 76 optree_concise.t:337) v:&,{
@@ -383,7 +383,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> "new 'relative' style, -exec mode",
-	      bcopts	=> [qw/ -basic -relative /],
+	      bcopts	=> \@(qw/ -basic -relative /),
 	      code	=> sub{$a=$b+42},
 	      crossfail	=> 1,
 	      #retry	=> 1,
@@ -412,7 +412,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> "both -exec -relative",
-	      bcopts	=> [qw/ -exec -relative /],
+	      bcopts	=> \@(qw/ -exec -relative /),
 	      code	=> sub{$a=$b+42},
 	      crossfail	=> 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -445,7 +445,7 @@ add_style
 	 );
 
 checkOptree ( name	=> "both -exec -scope",
-	      bcopts	=> [qw/ -exec -scope /],
+	      bcopts	=> \@(qw/ -exec -scope /),
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 1  <;> nextstate(main 50 optree_concise.t:337) v 
@@ -457,7 +457,7 @@ EONT_EONT
 
 
 checkOptree ( name	=> "both -basic -scope",
-	      bcopts	=> [qw/ -basic -scope /],
+	      bcopts	=> \@(qw/ -basic -scope /),
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 7  <1> leavesub[1 ref] K/REFC,1 ->(end) 

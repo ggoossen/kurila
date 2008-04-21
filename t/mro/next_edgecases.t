@@ -12,7 +12,7 @@ require q(./test.pl); plan(tests => 12);
         use strict;
         use warnings;
         use mro 'c3';
-        sub new { bless {}, @_[0] }
+        sub new { bless \%(), @_[0] }
         sub bar { 'Foo::bar' }
     }
 

@@ -30,10 +30,10 @@ our @EXPORT_OK = qw(
     splitOnLastStarter
 );
 our %EXPORT_TAGS = (
-    all       => [ @EXPORT, @EXPORT_OK ],
-    normalize => [ @EXPORT, qw/normalize decompose reorder compose/ ],
-    check     => [ qw/checkNFD checkNFKD checkNFC checkNFKC check/ ],
-    fast      => [ qw/FCD checkFCD FCC checkFCC composeContiguous/ ],
+    all       => \@( @EXPORT, @EXPORT_OK ),
+    normalize => \@( @EXPORT, qw/normalize decompose reorder compose/ ),
+    check     => \@( qw/checkNFD checkNFKD checkNFC checkNFKC check/ ),
+    fast      => \@( qw/FCD checkFCD FCC checkFCC composeContiguous/ ),
 );
 
 ######

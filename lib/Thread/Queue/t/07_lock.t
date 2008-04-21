@@ -37,14 +37,14 @@ threads->create(sub {
         threads::yield();
         select(undef, undef, undef, 0.1);
         my @x = $q->extract(5,2);
-        is_deeply(\@x, [6,7], 'Thread dequeues under lock');
+        is_deeply(\@x, \@(6,7), 'Thread dequeues under lock');
     }
 })->detach();
 
 $sm->down();
 $st->up();
 my @x = $q->dequeue_nb(100);
-is_deeply(\@x, [1..5,8..10], 'Main dequeues');
+is_deeply(\@x, \@(1..5,8..10), 'Main dequeues');
 threads::yield();
 
 # EOF

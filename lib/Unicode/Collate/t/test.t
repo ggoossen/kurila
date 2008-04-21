@@ -254,7 +254,7 @@ is($Collator->cmp("the pen", "a pencil"), 1);
 my $backLevel1 = Unicode::Collate->new(
   table => undef,
   normalization => undef,
-  backwards => [ 1 ],
+  backwards => \@( 1 ),
 );
 
 # all strings are reversed at level 1.

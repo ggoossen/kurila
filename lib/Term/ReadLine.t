@@ -12,7 +12,7 @@ package Term::ReadLine::Mock;
 our @ISA = 'Term::ReadLine::Stub';
 sub ReadLine {'Term::ReadLine::Mock'};
 sub readline { "a line" }
-sub new      { bless {} }
+sub new      { bless \%() }
 
 package main;
 

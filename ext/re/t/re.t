@@ -68,7 +68,7 @@ ok( $ok, 'No segv!' );
 package Term::Cap;
 
 sub Tgetent {
-	bless({}, @_[0]);
+	bless(\%(), @_[0]);
 }
 
 sub Tputs {

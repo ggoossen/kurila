@@ -73,7 +73,7 @@ is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff');
 my $a = 0;
 is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 
-use constant cr => ['hello'];
+use constant cr => \@('hello');
 my $string = "sub " . $deparse->coderef2text(\&cr);
 my $val = (eval $string)->() or diag $string;
 is(ref($val), 'ARRAY');

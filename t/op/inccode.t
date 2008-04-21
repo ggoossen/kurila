@@ -85,7 +85,7 @@ sub fooinc2 {
     }
 }
 
-my $arrayref = [ \&fooinc2, 'Bar' ];
+my $arrayref = \@( \&fooinc2, 'Bar' );
 push @INC, $arrayref;
 
 $evalret = eval { require Foo; 1; };
@@ -123,7 +123,7 @@ sub FooLoader::INC {
     }
 }
 
-my $href = bless( {}, 'FooLoader' );
+my $href = bless( \%(), 'FooLoader' );
 push @INC, $href;
 
 $evalret = eval { require Quux; 1 };
@@ -136,7 +136,7 @@ cmp_ok( %INC{'Quux.pm'}, '\==', $href,        '  val Quux.pm is correct in %INC'
 
 pop @INC;
 
-my $aref = bless( [], 'FooLoader' );
+my $aref = bless( \@(), 'FooLoader' );
 push @INC, $aref;
 
 $evalret = eval { require Quux1; 1 };

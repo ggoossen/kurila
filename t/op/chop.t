@@ -138,7 +138,7 @@ is (chop(%stuff{[1, 3]}), '4');
 }
 
 # chomp should not stringify references unless it decides to modify them
-$_ = [];
+$_ = \@();
 $/ = "\n";
 dies_like( sub { $got = chomp(); }, qr/reference as string/, "chomp ref" );
 is (ref($_), "ARRAY", "chomp ref (no modify)");

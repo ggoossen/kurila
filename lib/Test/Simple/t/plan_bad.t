@@ -16,7 +16,7 @@ $tb->level(0);
 ok !eval { $tb->plan( tests => 'no_plan' ); };
 is $@->{description}, sprintf "Number of tests must be a positive integer.  You gave it 'no_plan' at \%s line \%d.\n", $0, __LINE__ - 1;
 
-my $foo = [];
+my $foo = \@();
 my @foo = ($foo, 2, 3);
 ok !eval { $tb->plan( tests => @foo ) };
 like $@->{description}, qr/reference as string/;

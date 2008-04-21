@@ -22,13 +22,13 @@ require q(./test.pl); plan(tests => 28);
 
 ok(eq_array(
     mro::get_linear_isa('MRO_F'),
-    [qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/]
+    \@(qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/)
 ));
 
 my @isarev = sort { $a cmp $b } @{mro::get_isarev('MRO_B')};
 ok(eq_array(
     \@isarev,
-    [qw/MRO_D MRO_E MRO_F/]
+    \@(qw/MRO_D MRO_E MRO_F/)
 ));
 
 ok(!mro::is_universal('MRO_B'));
@@ -44,7 +44,7 @@ ok(mro::is_universal('MRO_B'));
 ok(!mro::is_universal('Does_Not_Exist'));
 ok(eq_array(
     mro::get_linear_isa('Does_Not_Exist_Three'),
-    [qw/Does_Not_Exist_Three/]
+    \@(qw/Does_Not_Exist_Three/)
 ));
 
 # Assigning @ISA via globref
@@ -69,7 +69,7 @@ is(eval { MRO_N->testfunc() }, 123);
 
     {
         package DESTROY_MRO_Baseline;
-        sub new { bless {} => shift }
+        sub new { bless \%() => shift }
         sub DESTROY { $x++ }
 
         package DESTROY_MRO_Baseline_Child;
@@ -92,7 +92,7 @@ is(eval { MRO_N->testfunc() }, 123);
 
     {
         package DESTROY_MRO_Dynamic;
-        sub new { bless {} => shift }
+        sub new { bless \%() => shift }
 
         package DESTROY_MRO_Dynamic_Child;
         our @ISA = qw/DESTROY_MRO_Dynamic/;
@@ -128,16 +128,16 @@ is(eval { MRO_N->testfunc() }, 123);
         our @ISA = qw/XX YY ZZ/;
     }
     # baseline
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX YY ZZ/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\@(qw/ISACLEAR XX YY ZZ/)));
 
     # this looks dumb, but it preserves existing behavior for compatibility
     #  (undefined @ISA elements treated as "main")
     @ISACLEAR::ISA[1] = undef;
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR XX main/, undef, qw/ZZ/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\@(qw/ISACLEAR XX main/, undef, qw/ZZ/)));
 
     # undef the array itself
     undef @ISACLEAR::ISA;
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),[qw/ISACLEAR/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\@(qw/ISACLEAR/)));
 
     # Now, clear more than one package's @ISA at once
     {
@@ -148,12 +148,12 @@ is(eval { MRO_N->testfunc() }, 123);
         our @ISA = qw/YY ZZ/;
     }
     # baseline
-    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),[qw/ISACLEAR1 WW XX/]));
-    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),[qw/ISACLEAR2 YY ZZ/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\@(qw/ISACLEAR1 WW XX/)));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\@(qw/ISACLEAR2 YY ZZ/)));
     (@ISACLEAR1::ISA, @ISACLEAR2::ISA) = ();
 
-    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),[qw/ISACLEAR1/]));
-    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),[qw/ISACLEAR2/]));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\@(qw/ISACLEAR1/)));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\@(qw/ISACLEAR2/)));
 }
 
 # Check that recursion bails out "cleanly" in a variety of cases
@@ -175,7 +175,7 @@ is(eval { MRO_N->testfunc() }, 123);
 {
     {
         package SUPERTEST;
-        sub new { bless {} => shift }
+        sub new { bless \%() => shift }
         sub foo { @_[1]+1 }
 
         package SUPERTEST::MID;

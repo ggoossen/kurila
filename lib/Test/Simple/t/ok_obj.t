@@ -14,7 +14,7 @@ use Test::More tests => 4;
 
 package Foo;
 my $destroyed = 0;
-sub new { bless {}, shift }
+sub new { bless \%(), shift }
 
 sub DESTROY {
     $destroyed++;

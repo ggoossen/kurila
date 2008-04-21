@@ -442,7 +442,7 @@ sub new {
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object.
     my %params = @_;
-    my $self = { %params };
+    my $self = \%( %params );
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
     $self->initialize();
@@ -910,7 +910,7 @@ dynamic lookup; Hence subclasses may I<not> override it!
 sub parse_paragraph {
     my ($self, $text, $line_num) = @_;
     local *myData = $self;  ## alias to avoid deref-ing overhead
-    local *myOpts = (%myData{_PARSEOPTS} ||= {});  ## get parse-options
+    local *myOpts = (%myData{_PARSEOPTS} ||= \%());  ## get parse-options
     local $_;
 
     ## See if we want to preprocess nonPOD paragraphs as well as POD ones.
@@ -1037,7 +1037,7 @@ sub parse_from_filehandle {
     my ($in_fh, $out_fh) = @_;
     $in_fh = \*STDIN  unless ($in_fh);
     local *myData = $self;  ## alias to avoid deref-ing overhead
-    local *myOpts = (%myData{_PARSEOPTS} ||= {});  ## get parse-options
+    local *myOpts = (%myData{_PARSEOPTS} ||= \%());  ## get parse-options
     local $_;
 
     ## Put this stream at the top of the stack and do beginning-of-input
@@ -1344,14 +1344,14 @@ parse-option currently recognized.
 
 sub parseopts {
    local *myData = shift;
-   local *myOpts = (%myData{_PARSEOPTS} ||= {});
+   local *myOpts = (%myData{_PARSEOPTS} ||= \%());
    return %myOpts  if (@_ == 0);
    if (@_ == 1) {
       local $_ = shift;
       return  ref($_)  ?  %myData{_PARSEOPTS} = $_  :  %myOpts{$_};
    }
    my @newOpts = (%myOpts, @_);
-   %myData{_PARSEOPTS} = { @newOpts };
+   %myData{_PARSEOPTS} = \%( @newOpts );
 }
 
 ##---------------------------------------------------------------------------
@@ -1525,7 +1525,7 @@ sub _push_input_stream {
     unless (defined  %myData{_TOP_STREAM}) {
         $out_fh  = \*STDOUT  unless (defined $out_fh);
         %myData{_CUTTING}       = 1;   ## current "cutting" state
-        %myData{_INPUT_STREAMS} = [];  ## stack of all input streams
+        %myData{_INPUT_STREAMS} = \@();  ## stack of all input streams
     }
 
     ## Initialize input indicators

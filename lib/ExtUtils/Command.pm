@@ -104,7 +104,7 @@ Removes files and directories - recursively (even if readonly)
 sub rm_rf
 {
  expand_wildcards();
- rmtree([grep -e $_,@ARGV],0,0);
+ rmtree(\@(grep -e $_,@ARGV),0,0);
 }
 
 =item rm_f
@@ -254,7 +254,7 @@ Creates directories, including any parent directories.
 sub mkpath
 {
  expand_wildcards();
- File::Path::mkpath([@ARGV],0,0777);
+ File::Path::mkpath(\@(@ARGV),0,0777);
 }
 
 =item test_f

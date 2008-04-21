@@ -29,11 +29,11 @@ sub BEGIN {
 use Storable ();
 use Test::More tests => 9;
 
-my $ddd = bless { }, 'Foo';
-my $eee = bless { Bar => $ddd }, 'Bar';
+my $ddd = bless \%( ), 'Foo';
+my $eee = bless \%( Bar => $ddd ), 'Bar';
 $ddd->{Foo} = $eee;
 
-my $array = [ $ddd ];
+my $array = \@( $ddd );
 
 my $string = Storable::freeze( $array );
 my $thawed = Storable::thaw( $string );
@@ -50,7 +50,7 @@ isa_ok( $thawed->[0]->{Foo}->{Bar}, 'Foo' );
 is( $thawed->[0], $thawed->[0]->{Foo}->{Bar}, 'Circular is... well... circular' );
 
 # Make sure the thawing went the way we expected
-is_deeply( \@Foo::order, [ 'Bar', 'Foo' ], 'thaw order is correct (depth first)' );
+is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first)' );
 
 
 

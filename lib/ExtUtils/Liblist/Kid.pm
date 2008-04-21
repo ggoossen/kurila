@@ -32,7 +32,7 @@ sub _unix_os2_ext {
 	$potential_libs .= " " if $potential_libs;
 	$potential_libs .= %Config{perllibs};
     }
-    return ("", "", "", "", ($give_libs ? [] : ())) unless $potential_libs;
+    return ("", "", "", "", ($give_libs ? \@() : ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
     my($so)   = %Config{so};
@@ -222,7 +222,7 @@ sub _win32_ext {
 
     # If user did not supply a list, we punt.
     # (caller should probably use the list in $Config{libs})
-    return ("", "", "", "", ($give_libs ? [] : ())) unless $potential_libs;
+    return ("", "", "", "", ($give_libs ? \@() : ())) unless $potential_libs;
 
     my $cc		= %Config{cc};
     my $VC		= $cc =~ m/^cl/i;
@@ -399,7 +399,7 @@ sub _vms_ext {
 
   unless ($potential_libs) {
     warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose;
-    return ('', '', $crtlstr, '', ($give_libs ? [] : ()));
+    return ('', '', $crtlstr, '', ($give_libs ? \@() : ()));
   }
 
   my(%found,@fndlibs,$ldlib);

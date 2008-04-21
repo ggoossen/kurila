@@ -9,7 +9,7 @@ use Test::More tests => 14;
     package J;
     my $c = 0;
     sub reset { $c = 0 }
-    sub TIESCALAR { bless [] }
+    sub TIESCALAR { bless \@() }
     sub FETCH { $c++ ? "next" : "first" }
 }
 

@@ -4,7 +4,7 @@ use strict;
 use Archive::Tar;
 use Getopt::Std;
 
-my $opts = {};
+my $opts = \%();
 getopts('h:', $opts) or die usage();
 
 die usages() if $opts->{h};
@@ -23,10 +23,10 @@ foreach my $file ( $tar->get_files ) {
     my $name = $file->name;
     
     diff(   \($file->get_content), $name, 
-            {   FILENAME_A  => $name,
+            \%(   FILENAME_A  => $name,
                 MTIME_A     => $file->mtime,
                 OUTPUT      => \*STDOUT
-            } 
+            ) 
     );
 }
 

@@ -44,10 +44,10 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
     my $mm = WriteMakefile(
                            NAME            => 'Big::Dummy',
                            VERSION_FROM    => 'lib/Big/Dummy.pm',
-                           postamble       => {
+                           postamble       => \%(
                                                FOO => 1,
                                                BAR => "fugawazads"
-                                              }
+                                              )
                           );
     is( $warnings, '', 'postamble argument not warned about' );
 }
@@ -55,7 +55,7 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
 sub MY::postamble {
     my($self, %extra) = @_;
 
-    is_deeply( \%extra, { FOO => 1, BAR => 'fugawazads' }, 
+    is_deeply( \%extra, \%( FOO => 1, BAR => 'fugawazads' ), 
                'postamble args passed' );
 
     return <<OUT;

@@ -2,12 +2,12 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME		=> "Data::Dumper",
 	VERSION_FROM	=> 'Dumper.pm',
-	'dist'		=> {
+	'dist'		=> \%(
 			     COMPRESS	=> 'gzip -9f',
 	      		     SUFFIX	=> 'gz',
 	      		     DIST_DEFAULT => 'all tardist',
-			   },
-	MAN3PODS	=> {},
+			   ),
+	MAN3PODS	=> \%(),
         (
             (grep { $_ eq 'PERL_CORE=1' } @ARGV)
                 ? ()

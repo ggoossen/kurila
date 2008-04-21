@@ -479,7 +479,7 @@ sub init_others {
     $self->{EQUALIZE_TIMESTAMP} ||= '$(ABSPERLRUN) -we "open F,qq{>>$ARGV[1]};close F;utime(0,(stat($ARGV[0]))[9]+1,$ARGV[1])"';
 
     $self->{MOD_INSTALL} ||= 
-      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
+      $self->oneliner(<<'CODE', \@('-MExtUtils::Install'));
 install({split(' ',<STDIN>)}, '$(VERBINST)', 0, '$(UNINST)');
 CODE
 
@@ -923,9 +923,9 @@ sub dlsyms {
 
     return '' unless $self->needs_linking();
 
-    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = %attribs{DL_VARS}  || $self->{DL_VARS}  || [];
-    my($funclist)  = %attribs{FUNCLIST}  || $self->{FUNCLIST}  || [];
+    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || \%();
+    my($vars)  = %attribs{DL_VARS}  || $self->{DL_VARS}  || \@();
+    my($funclist)  = %attribs{FUNCLIST}  || $self->{FUNCLIST}  || \@();
     my(@m);
 
     unless ($self->{SKIPHASH}{'dynamic'}) {
@@ -1040,7 +1040,7 @@ sub static_lib {
     return '
 $(INST_STATIC) :
 	$(NOECHO) $(NOOP)
-' unless ($self->{OBJECT} or @{$self->{C} || []} or $self->{MYEXTLIB});
+' unless ($self->{OBJECT} or @{$self->{C} || \@()} or $self->{MYEXTLIB});
 
     my(@m);
     push @m,'
@@ -1417,13 +1417,13 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	}
 
 	%olbs{%ENV{DEFAULT}} = $_;
-    }, grep( -d $_, @{$searchdirs || []}));
+    }, grep( -d $_, @{$searchdirs || \@()}));
 
     # We trust that what has been handed in as argument will be buildable
-    $static = [] unless $static;
+    $static = \@() unless $static;
     %olbs{[@{$static}]} = (1) x @{$static};
  
-    $extra = [] unless $extra && ref $extra eq 'ARRAY';
+    $extra = \@() unless $extra && ref $extra eq 'ARRAY';
     # Sort the object libraries in inverse order of
     # filespec length to try to insure that dependent extensions
     # will appear before their parents, so the linker will
@@ -1719,7 +1719,7 @@ MAKE_FRAG
 
 sub oneliner {
     my($self, $cmd, $switches) = @_;
-    $switches = [] unless defined $switches;
+    $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
     $cmd =~ s{^\n+}{};
@@ -1828,7 +1828,7 @@ File::Spec::VMS is deprecated.
 sub eliminate_macros {
     my($self,$path) = @_;
     return '' unless $path;
-    $self = {} unless ref $self;
+    $self = \%() unless ref $self;
 
     if ($path =~ m/\s/) {
       return join ' ', map { $self->eliminate_macros($_) } split m/\s+/, $path;
@@ -1889,7 +1889,7 @@ File::Spec::VMS is deprecated.
 sub fixpath {
     my($self,$path,$force_path) = @_;
     return '' unless $path;
-    $self = bless {}, $self unless ref $self;
+    $self = bless \%(), $self unless ref $self;
     my($fixedpath,$prefix,$name);
 
     if ($path =~ m/[ \t]/) {

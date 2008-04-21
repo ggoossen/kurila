@@ -24,9 +24,9 @@ $IPC::Cmd::VERBOSE  = $IPC::Cmd::VERBOSE = $Verbose;
 
 ### run tests in various configurations, based on what modules we have
 my @Prefs = ( 
-    [ $Have_IPC_Run, $Have_IPC_Open3 ], 
-    [ 0,             $Have_IPC_Open3 ], 
-    [ 0,             0 ] 
+    \@( $Have_IPC_Run, $Have_IPC_Open3 ), 
+    \@( 0,             $Have_IPC_Open3 ), 
+    \@( 0,             0 ) 
 );
 
 ### can_run tests
@@ -37,13 +37,13 @@ my @Prefs = (
 
 ### run tests that print only to stdout
 {   ### list of commands and regexes matching output ###
-    my $map = [
+    my $map = \@(
         # command                                    # output regex
-        [ "$^X -v",                                  qr/gerard\s+goossen/i, ],
-        [ [$^X, '-v'],                               qr/gerard\s+goossen/i, ],
-        [ "$^X -eprint+42 | $^X -neprint",           qr/42/,            ],
-        [ [$^X,qw[-eprint+42 |], $^X, qw|-neprint|], qr/42/,            ],
-    ];
+        \@( "$^X -v",                                  qr/gerard\s+goossen/i, ),
+        \@( \@($^X, '-v'),                               qr/gerard\s+goossen/i, ),
+        \@( "$^X -eprint+42 | $^X -neprint",           qr/42/,            ),
+        \@( \@($^X,qw[-eprint+42 |], $^X, qw|-neprint|), qr/42/,            ),
+    );
 
     diag( "Running tests that print only to stdout" ) if $Verbose;
     ### for each configuarion
@@ -113,11 +113,11 @@ my @Prefs = (
 ### XXX lots of duplication from stdout tests, only difference
 ### is buffer inspection
 {   ### list of commands and regexes matching output ###
-    my $map = [
+    my $map = \@(
         # command                                    # output regex
-        [ "$^X -ewarn+42",                          qr/^42 /, ],
-        [ [$^X, '-ewarn+42'],                       qr/^42 /, ],
-    ];
+        \@( "$^X -ewarn+42",                          qr/^42 /, ),
+        \@( \@($^X, '-ewarn+42'),                       qr/^42 /, ),
+    );
 
     diag( "Running tests that print only to stderr" ) if $Verbose;
     ### for each configuarion

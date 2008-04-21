@@ -30,7 +30,7 @@ use Storable qw(freeze nfreeze thaw);
 package TIED_HASH;
 
 sub TIEHASH {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	return $self;
 }
 
@@ -50,7 +50,7 @@ sub STORE {
 package SIMPLE;
 
 sub make {
-	my $self = bless [], shift;
+	my $self = bless \@(), shift;
 	my ($x) = @_;
 	$self->[0] = $x;
 	return $self;
@@ -59,7 +59,7 @@ sub make {
 package ROOT;
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	my $h = tie %hash, 'TIED_HASH';
 	$self->{h} = $h;
 	$self->{ref} = \%hash;
@@ -70,7 +70,7 @@ sub make {
 	$self->{obj} = \@pool;
 	my @a = ('string', $h, $self);
 	$self->{a} = \@a;
-	$self->{num} = [1, 0, -3, -3.14159, 456, 4.5];
+	$self->{num} = \@(1, 0, -3, -3.14159, 456, 4.5);
 	$h->{key1} = 'val1';
 	$h->{key2} = 'val2';
 	return $self;

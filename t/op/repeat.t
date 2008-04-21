@@ -132,7 +132,7 @@ is(77, scalar ((1,7)x2),    'stack truncation');
 
 # perlbug 20011113.110 works in 5.6.1, broken in 5.7.2
 {
-    my $x= [("foo") x 2];
+    my $x= \@(("foo") x 2);
     is( join('', @$x), 'foofoo', 'list repeat in anon array ref broken [ID 20011113.110]' );
 }
 

@@ -19,7 +19,7 @@ $VERSION = eval $VERSION;
 
     use Class::Struct qw(struct);
 
-    struct 'IPC::Msg::stat' => [
+    struct 'IPC::Msg::stat' => \@(
 	uid	=> '$',
 	gid	=> '$',
 	cuid	=> '$',
@@ -32,7 +32,7 @@ $VERSION = eval $VERSION;
 	stime	=> '$',
 	rtime	=> '$',
 	ctime	=> '$',
-    ];
+    );
 }
 
 sub new {

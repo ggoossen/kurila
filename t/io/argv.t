@@ -19,7 +19,7 @@ close TRY or die "Could not close: $!";
 
 $x = runperl(
     prog	=> 'while (~< *ARGV) { print $., $_; }',
-    args	=> [ 'Io_argv1.tmp', 'Io_argv1.tmp' ],
+    args	=> \@( 'Io_argv1.tmp', 'Io_argv1.tmp' ),
 );
 is($x, "1a line\n2a line\n", '~< *ARGV from two files');
 
@@ -27,7 +27,7 @@ is($x, "1a line\n2a line\n", '~< *ARGV from two files');
     $x = runperl(
 	prog	=> 'while (~< *ARGV) { print $_; }',
 	stdin	=> "foo\n",
-	args	=> [ 'Io_argv1.tmp', '-' ],
+	args	=> \@( 'Io_argv1.tmp', '-' ),
     );
     is($x, "a line\nfoo\n", '   from a file and STDIN');
 
@@ -122,7 +122,7 @@ ok( eof(),      'eof() true after closing ARGV' );
 }
 
 # This used to dump core
-fresh_perl_is( <<'**PROG**', "foobar", {}, "ARGV aliasing and eof()" ); 
+fresh_perl_is( <<'**PROG**', "foobar", \%(), "ARGV aliasing and eof()" ); 
 open OUT, ">", "Io_argv3.tmp" or die "Can't open temp file: $!";
 print OUT "foo";
 close OUT;

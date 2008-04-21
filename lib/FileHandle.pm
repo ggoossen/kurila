@@ -40,12 +40,12 @@ IO::Handle->import(grep { !defined(&$_) } @EXPORT, @EXPORT_OK);
 
     my %import = (
 	'IO::Handle' =>
-	    [qw(new_from_fd fdopen close fileno getc ungetc gets
-		eof flush error clearerr setbuf setvbuf _open_mode_string)],
+	    \@(qw(new_from_fd fdopen close fileno getc ungetc gets
+		eof flush error clearerr setbuf setvbuf _open_mode_string)),
 	'IO::Seekable' =>
-	    [qw(seek tell getpos setpos)],
+	    \@(qw(seek tell getpos setpos)),
 	'IO::File' =>
-	    [qw(new new_tmpfile open)]
+	    \@(qw(new new_tmpfile open))
     );
     for my $pkg (keys %import) {
 	for my $func (@{%import{$pkg}}) {

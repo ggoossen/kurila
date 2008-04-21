@@ -46,8 +46,8 @@ while ( ~< *DATA) {
 
     $evalData = eval $data;
     die if $@;
-    $evalData = ref $evalData ? $evalData : [$evalData];
-    push @tests, [$template, $evalData, $result, $comment, $data];
+    $evalData = ref $evalData ? $evalData : \@($evalData);
+    push @tests, \@($template, $evalData, $result, $comment, $data);
 }
 
 print '1..', scalar @tests, "\n";

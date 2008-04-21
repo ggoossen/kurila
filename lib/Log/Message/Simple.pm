@@ -201,7 +201,7 @@ BEGIN {
     %EXPORT_TAGS    = (
         STD     => \@EXPORT,
         CARP    => \@EXPORT_OK,
-        ALL     => [ @EXPORT, @EXPORT_OK ],
+        ALL     => \@( @EXPORT, @EXPORT_OK ),
     );        
 
     my $log         = Log::Message->new();
@@ -216,13 +216,13 @@ BEGIN {
                                 message => $msg,
                                 tag     => uc $func,
                                 level   => $func,
-                                extra   => [@_]
+                                extra   => \@(@_)
                         );
                 };
     }
 
     sub flush {
-        return @{[ reverse $log->flush ]};
+        return @{\@( reverse $log->flush )};
     }
 
     sub stack {

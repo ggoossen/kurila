@@ -57,7 +57,7 @@ others
 		UV    => '*iv_return = (IV)',
 		NV    => '*nv_return = ',
 		PV    => '*pv_return = ',
-		PVN   => ['*pv_return = ', '*iv_return = (IV)'],
+		PVN   => \@('*pv_return = ', '*iv_return = (IV)'),
 		SV    => '*sv_return = ',
 		YES   => undef,
 		NO    => undef,
@@ -145,7 +145,7 @@ sub params {
   foreach (sort keys %$what) {
     warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{$_};
   }
-  my $params = {};
+  my $params = \%();
   $params->{''} = 1 if $what->{''};
   $params->{IV} = 1 if $what->{IV} || $what->{UV} || $what->{PVN};
   $params->{NV} = 1 if $what->{NV};
@@ -206,8 +206,8 @@ sub dogfood {
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 EOT
-  $result .= $self->dump_names ({default_type=>$default_type, what=>$what,
-				 indent=>0, declare_types=>1},
+  $result .= $self->dump_names (\%(default_type=>$default_type, what=>$what,
+				 indent=>0, declare_types=>1),
 				@items);
   $result .= <<'EOT';
 

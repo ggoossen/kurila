@@ -160,11 +160,11 @@ sub new {
   my $class = ref(@_[0]) || @_[0];
   #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
   #  . __PACKAGE__ );
-  return bless {
-    'accept_codes'      => { map( ($_=>$_), @Known_formatting_codes ) },
-    'accept_directives' => { %Known_directives },
-    'accept_targets'    => {},
-  }, $class;
+  return bless \%(
+    'accept_codes'      => \%( map( ($_=>$_), @Known_formatting_codes ) ),
+    'accept_directives' => \%( %Known_directives ),
+    'accept_targets'    => \%(),
+  ), $class;
 }
 
 
@@ -559,7 +559,7 @@ sub _make_treelet {
   my $self = shift;  # and ($para, $start_line)
   my $treelet;
   if(!@_) {
-    return [''];
+    return \@('');
   } if(ref @_[0] and ref @_[0][0] and @_[0][0][0] eq '~Top') {
     # Hack so we can pass in fake-o pre-cooked paragraphs:
     #  just have the first line be a reference to a ['~Top', {}, ...]
@@ -720,7 +720,7 @@ sub _remap_sequences {
           ;
           
           #$nugget = ;
-          splice @$treelet, $i, 1, [pop(@dynasty), {}, $treelet->[$i]];
+          splice @$treelet, $i, 1, \@(pop(@dynasty), \%(), $treelet->[$i]);
             # relace node with a new parent
         }
       } elsif($is eq '0') {
@@ -1113,7 +1113,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
           unshift @link_text, splice @ell_content, 0, $j;
             # leaving only things at J and after
           @ell_content =  grep ref($_)||length($_), @ell_content ;
-          $link_text   = [grep ref($_)||length($_), @link_text  ];
+          $link_text   = \@(grep ref($_)||length($_), @link_text  );
           DEBUG +> 3 and printf
            "  So link text is \%s\n  and remaining ell content is \%s\n",
             pretty($link_text), pretty(@ell_content);
@@ -1178,7 +1178,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
            @ell_content == 1 and @ell_content[0] eq '"'
          )
       ) {
-        $section_name = [splice @ell_content];
+        $section_name = \@(splice @ell_content);
         $section_name->[ 0] =~ s/^\"//s;
         $section_name->[-1] =~ s/\"$//s;
       }
@@ -1187,7 +1187,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       if(!$section_name and !$link_text and @ell_content
          and grep !ref($_) && m/ /s, @ell_content
       ) {
-        $section_name = [splice @ell_content];
+        $section_name = \@(splice @ell_content);
         # That's support for the now-deprecated syntax.
         # (Maybe generate a warning eventually?)
         # Note that it deliberately won't work on L<...|Foo Bar>
@@ -1200,7 +1200,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       # L<Foo/Bar> -> L<"Bar" in Foo/Foo>
       unless($link_text) {
         $ell->[1]{'content-implicit'} = 'yes';
-        $link_text = [];
+        $link_text = \@();
         push @$link_text, '"', @$section_name, '"' if $section_name;
 
         if(@ell_content) {
@@ -1224,14 +1224,14 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
       if( defined $section_name ) {
         $ell->[1]{'section'} = Pod::Simple::LinkSection->new(
-          ['', {}, @$section_name]
+          \@('', \%(), @$section_name)
         );
         DEBUG +> 3 and print "L-section content: ", pretty($ell->[1]{'section'}), "\n";
       }
 
       if( @ell_content ) {
         $ell->[1]{'to'} = Pod::Simple::LinkSection->new(
-          ['', {}, @ell_content]
+          \@('', \%(), @ell_content)
         );
         DEBUG +> 3 and print "L-to content: ", pretty($ell->[1]{'to'}), "\n";
       }

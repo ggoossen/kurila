@@ -415,7 +415,7 @@ is($s, "AxBC", "utf8, DELETE");
     is($c, "\x20\x30\x40\x50\x60", "tr/\\x00-\\x1f//d");
 }
 
-($s) = keys %{{pie => 3}};
+($s) = keys %{\%(pie => 3)};
 my $wasro = Internals::SvREADONLY($s);
 {
     $wasro or local $TODO = "didn't have a COW";

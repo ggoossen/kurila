@@ -18,7 +18,7 @@ my $sel = IO::Select->new(\*STDIN);
 $sel->add(4, 5) == 2 or print "not ";
 print "ok 1\n";
 
-$sel->add([\*STDOUT, 'foo']) == 1 or print "not ";
+$sel->add(\@(\*STDOUT, 'foo')) == 1 or print "not ";
 print "ok 2\n";
 
 @handles = $sel->handles;
@@ -45,7 +45,7 @@ $sel = IO::Select->new();
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 8\n";
 
-$sel->remove([\*STDOUT, 5]);
+$sel->remove(\@(\*STDOUT, 5));
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 9\n";
 
@@ -62,7 +62,7 @@ print "not " unless @a == 0;
 print "ok 10\n";
 
 # we assume that we can write to STDOUT :-)
-$sel->add([\*STDOUT, "ok 12\n"]);
+$sel->add(\@(\*STDOUT, "ok 12\n"));
 
 @a = $sel->can_write;
 print "not " unless @a == 1;
@@ -90,7 +90,7 @@ POST_SOCKET:
 $sel->exists(\*STDIN) and print "not ";
 print "ok 16\n";
 
-($sel->exists(0) || $sel->exists([\*STDERR])) and print "not ";
+($sel->exists(0) || $sel->exists(\@(\*STDERR))) and print "not ";
 print "ok 17\n";
 
 $fd = $sel->exists(\*STDOUT);
@@ -100,7 +100,7 @@ if ($fd) {
     print "not ok 18\n";
 }
 
-$fd = $sel->exists([1, 'foo']);
+$fd = $sel->exists(\@(1, 'foo'));
 if ($fd) {
     print $fd "ok 19\n";
 } else {

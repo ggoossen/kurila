@@ -18,15 +18,15 @@ require 'regen_lib.pl';
 # safer_unlink ("warnings.h", "lib/warnings.pm");
 
 my %gen = (
-	   'autodoc.pl'  => [qw[pod/perlapi.pod pod/perlintern.pod]],
-	   'embed.pl'    => [qw[proto.h embed.h embedvar.h global.sym
-				perlapi.h perlapi.c]],
-	   'keywords.pl' => [qw[keywords.h]],
-	   'opcode.pl'   => [qw[opcode.h opnames.h pp_proto.h pp.sym]],
-	   'regcomp.pl'  => [qw[regnodes.h]],
-	   'warnings.pl' => [qw[warnings.h lib/warnings.pm]],
-	   'reentr.pl'   => [qw[reentr.c reentr.h]],
-	   'overload.pl' => [qw[overload.h]],
+	   'autodoc.pl'  => \@(qw[pod/perlapi.pod pod/perlintern.pod]),
+	   'embed.pl'    => \@(qw[proto.h embed.h embedvar.h global.sym
+				perlapi.h perlapi.c]),
+	   'keywords.pl' => \@(qw[keywords.h]),
+	   'opcode.pl'   => \@(qw[opcode.h opnames.h pp_proto.h pp.sym]),
+	   'regcomp.pl'  => \@(qw[regnodes.h]),
+	   'warnings.pl' => \@(qw[warnings.h lib/warnings.pm]),
+	   'reentr.pl'   => \@(qw[reentr.c reentr.h]),
+	   'overload.pl' => \@(qw[overload.h]),
 	   );
 
 sub do_cksum {

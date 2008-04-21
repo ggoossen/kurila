@@ -399,7 +399,7 @@ package main;
     use overload ('""' => \&stringify, '0+' => \&numify, fallback => 1);
 
     sub new {
-	bless [@_[1], @_[2]], @_[0];
+	bless \@(@_[1], @_[2]), @_[0];
     }
 
     sub stringify { @_[0]->[0] }
@@ -745,7 +745,7 @@ main::cmp_ok($answer,'eq','good','sort subr called from other package');
 
 $answer = "good";
 my @list = sort { A::min(@$a) <+> A::min(@$b) }
-  [3, 1, 5], [2, 4], [0];
+  \@(3, 1, 5), \@(2, 4), \@(0);
 
 main::cmp_ok($answer,'eq','good','bug 36430');
 

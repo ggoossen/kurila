@@ -61,7 +61,7 @@ sub new {
     my $this = shift;
     my $class = ref($this) || $this;
     my %params = @_;
-    my $self = {%params};
+    my $self = \%(%params);
     bless $self, $class;
     $self->initialize();
     return $self;
@@ -72,7 +72,7 @@ sub initialize {
     $self->{-file} ||= 'unknown';
     $self->{-start} ||= 'unknown';
     $self->{-indent} ||= 4; # perlpod: "should be the default"
-    $self->{_items} = [];
+    $self->{_items} = \@();
     $self->{-type} ||= '';
 }
 
@@ -236,7 +236,7 @@ failure, the error message is stored in C<$@>.
 sub new {
     my $this = shift;
     my $class = ref($this) || $this;
-    my $self = +{};
+    my $self = +\%();
     bless $self, $class;
     $self->initialize();
     if(defined @_[0]) {
@@ -261,7 +261,7 @@ sub initialize {
     $self->{-node} ||= '';
     $self->{-alttext} ||= '';
     $self->{-type} ||= 'undef';
-    $self->{_warnings} = [];
+    $self->{_warnings} = \@();
 }
 
 =item $link-E<gt>parse($string)
@@ -281,7 +281,7 @@ sub parse {
     # syntax check the link and extract destination
     my ($alttext,$page,$node,$type,$quoted) = (undef,'','','',0);
 
-    $self->{_warnings} = [];
+    $self->{_warnings} = \@();
 
     # collapse newlines with whitespace
     s/\s*\n+\s*/ /g;
@@ -640,7 +640,7 @@ POD documents of class Pod::Cache::Item.
 sub new {
     my $this = shift;
     my $class = ref($this) || $this;
-    my $self = [];
+    my $self = \@();
     bless $self, $class;
     return $self;
 }
@@ -706,7 +706,7 @@ sub new {
     my $this = shift;
     my $class = ref($this) || $this;
     my %params = @_;
-    my $self = {%params};
+    my $self = \%(%params);
     bless $self, $class;
     $self->initialize();
     return $self;
@@ -714,7 +714,7 @@ sub new {
 
 sub initialize {
     my $self = shift;
-    $self->{-nodes} = [] unless(defined $self->{-nodes});
+    $self->{-nodes} = \@() unless(defined $self->{-nodes});
 }
 
 =item $cacheitem-E<gt>page()

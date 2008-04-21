@@ -25,9 +25,9 @@ print ");\n";
 EOT
 
 my @tests = (
-    [
+    \@(
         "perl-store\x[04]1234\4\4\4\x[D4]\x[C2]\32\b\3\13\0\0\0v\b\x[C5]\32\b...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.1.le32",
           hdrsize    => 18,
@@ -37,11 +37,11 @@ my @tests = (
           ptrsize    => 4,
           version    => -1,
           version_nv => -1,
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "perl-store\0\x[04]1234\4\4\4\x[8C]o\34\b\3\13\0\0\0v\x[94]v\34...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.4_07.le32",
           hdrsize    => 19,
@@ -52,22 +52,22 @@ my @tests = (
           ptrsize    => 4,
           version    => 0,
           version_nv => 0,
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "perl-store\1\x8Co\34\b\3\0\0\0\13v\x94v\34\b\1\0\0\4\0\0\0...",
-        {
+        \%(
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.4_07.neutral",
           hdrsize    => 11,
           major      => 0,
           netorder   => 1,
           version    => 0,
           version_nv => 0,
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\2\x041234\4\4\4\3\13\0\0\0\1\0\4\0\0\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.604.le32",
           hdrsize    => 13,
@@ -78,22 +78,22 @@ my @tests = (
           ptrsize    => 4,
           version    => 1,
           version_nv => 1,
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\3\3\0\0\0\13\1\0\0\4\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.604.neutral",
           hdrsize    => 5,
           major      => 1,
           netorder   => 1,
           version    => 1,
           version_nv => 1,
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\0\x041234\4\4\4\3\13\0\0\0\1\0\4\0\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.700.le32",
           hdrsize    => 14,
@@ -105,11 +105,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.0",
           version_nv => "2.000",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\0\3\0\0\0\13\1\0\0\4\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-0.700.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -117,11 +117,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.0",
           version_nv => "2.000",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\4\x041234\4\4\4\x08\3\13\0\0\0\1\0\4\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.006001_i686-linux-thread-multi_Storable-1.012.le32",
           hdrsize    => 15,
@@ -134,11 +134,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.4",
           version_nv => "2.004",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\3\x044321\4\4\4\x08\3\0\0\0\13\1\0\0\4\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           byteorder  => 4321,
           file       => "data_perl-5.006001_IA64.ARCHREV_0-thread-multi_Storable-1.006.be32",
           hdrsize    => 15,
@@ -151,11 +151,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.3",
           version_nv => "2.003",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\3\3\0\0\0\13\1\0\0\4\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           file       => "data_perl-5.006001_IA64.ARCHREV_0-thread-multi_Storable-1.006.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -163,11 +163,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.3",
           version_nv => "2.003",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\4\x044321\4\4\4\x08\3\0\0\0\13\1\0\0\4\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           byteorder  => 4321,
           file       => "data_perl-5.006001_IA64.ARCHREV_0-thread-multi_Storable-1.012.be32",
           hdrsize    => 15,
@@ -180,11 +180,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.4",
           version_nv => "2.004",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\4\3\0\0\0\13\1\0\0\4\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0...",
-        {
+        \%(
           file       => "data_perl-5.006001_IA64.ARCHREV_0-thread-multi_Storable-1.012.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -192,11 +192,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.4",
           version_nv => "2.004",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\6\x044321\4\4\4\x08\3\0\0\0\13\n\n4294967296...",
-        {
+        \%(
           byteorder  => 4321,
           file       => "data_perl-5.008001_darwin-thread-multi-2level_Storable-2.08.be32",
           hdrsize    => 15,
@@ -209,11 +209,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\6\3\0\0\0\13\n\n4294967296\0\0\0\bfour_...",
-        {
+        \%(
           file       => "data_perl-5.008001_darwin-thread-multi-2level_Storable-2.08.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -221,11 +221,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\6\x044321\4\4\4\x08\3\0\0\0\13\4\3\0\0\0\0\0\0\0\nem...",
-        {
+        \%(
           byteorder  => 4321,
           file       => "data_perl-5.008003_PA-RISC1.1-thread-multi_Storable-2.09.be32",
           hdrsize    => 15,
@@ -238,11 +238,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\6\3\0\0\0\13\4\3\0\0\0\0\0\0\0\nempty_hash\n...",
-        {
+        \%(
           file       => "data_perl-5.008003_PA-RISC1.1-thread-multi_Storable-2.09.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -250,11 +250,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\6\x0812345678\4\4\4\x08\3\13\0\0\0\4\3\0\0\0\0\n\0...",
-        {
+        \%(
           byteorder  => 12_345_678,
           file       => "data_perl-5.008004_i86pc-solaris-64int_Storable-2.12.le64",
           hdrsize    => 19,
@@ -267,11 +267,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\6\x041234\4\4\4\x08\3\13\0\0\0\4\3\0\0\0\0\n\0\0\0em...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.008006_i686-linux-thread-multi_Storable-2.13.le32",
           hdrsize    => 15,
@@ -284,11 +284,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\6\x0887654321\4\x08\x08\x08\3\0\0\0\13\4\3\0\0\0\0\0\0...",
-        {
+        \%(
           byteorder  => 87_654_321,
           file       => "data_perl-5.008007_IA64.ARCHREV_0-thread-multi-LP64_Storable-2.13.be64",
           hdrsize    => 19,
@@ -301,11 +301,11 @@ my @tests = (
           ptrsize    => 8,
           version    => "2.6",
           version_nv => "2.006",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\x07\x0812345678\4\x08\x08\x08\3\13\0\0\0\4\3\0\0\0\0\n\0...",
-        {
+        \%(
           byteorder  => 12_345_678,
           file       => "data_perl-5.008007_x86-solaris-thread-multi-64_Storable-2.15.le64",
           hdrsize    => 19,
@@ -318,11 +318,11 @@ my @tests = (
           ptrsize    => 8,
           version    => "2.7",
           version_nv => "2.007",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\x07\3\0\0\0\13\4\3\0\0\0\0\0\0\0\nempty_hash\n...",
-        {
+        \%(
           file       => "data_perl-5.008007_x86-solaris-thread-multi-64_Storable-2.15.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -330,11 +330,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.7",
           version_nv => "2.007",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\5\x041234\4\4\4\x08\3\13\0\0\0\4\3\0\0\0\0\n\0\0\0em...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.008_i686-linux-thread-multi_Storable-2.04.le32",
           hdrsize    => 15,
@@ -347,11 +347,11 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.5",
           version_nv => "2.005",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\5\5\3\0\0\0\13\4\3\0\0\0\0\0\0\0\nempty_hash\n...",
-        {
+        \%(
           file       => "data_perl-5.008_i686-linux-thread-multi_Storable-2.04.neutral",
           hdrsize    => 6,
           major      => 2,
@@ -359,11 +359,11 @@ my @tests = (
           netorder   => 1,
           version    => "2.5",
           version_nv => "2.005",
-        },
-    ],
-    [
+        ),
+    ),
+    \@(
         "pst0\4\x07\x041234\4\4\4\x08\3\13\0\0\0\4\3\0\0\0\0\n\0\0\0em...",
-        {
+        \%(
           byteorder  => 1234,
           file       => "data_perl-5.009003_i686-linux_Storable-2.15.le32",
           hdrsize    => 15,
@@ -376,8 +376,8 @@ my @tests = (
           ptrsize    => 4,
           version    => "2.7",
           version_nv => "2.007",
-        },
-    ],
+        ),
+    ),
 );
 
 plan tests => 31 + 2 * @tests;
@@ -388,7 +388,7 @@ is(eval { Storable::file_magic($file) }, undef, "empty file give undef");
 like($@->{description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
 is(Storable::file_magic(__FILE__), undef, "not an image");
 
-store({}, $file);
+store(\%(), $file);
 {
     my $info = Storable::file_magic($file);
     unlink($file);
@@ -413,7 +413,7 @@ store({}, $file);
     }
 }
 
-nstore({}, $file);
+nstore(\%(), $file);
 {
     my $info = Storable::file_magic($file);
     unlink($file);

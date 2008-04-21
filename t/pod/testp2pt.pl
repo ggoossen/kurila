@@ -90,7 +90,7 @@ sub command {
     my $incfile  = $self->findinclude(shift @incargs)  or  return;
     my $incbase  = basename $incfile;
     print $out_fh "###### begin =include $incbase #####\n"  if ($incdebug);
-    $self->parse_from_file( {-cutting => 1}, $incfile );
+    $self->parse_from_file( \%(-cutting => 1), $incfile );
     print $out_fh "###### end =include $incbase #####\n"    if ($incdebug);
 }
 

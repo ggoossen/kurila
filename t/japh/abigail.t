@@ -108,19 +108,19 @@ plan tests => 99;
     my $expected  =  $JaPH;
        $expected  =~ s/ /\n/g;
        $expected .= "\n";
-    is (runperl (switches => [qw /'-weprint<<EOT;' -eJust -eanother
-                                   -ePerl -eHacker -eEOT/],
+    is (runperl (switches => \@(qw /'-weprint<<EOT;' -eJust -eanother
+                                   -ePerl -eHacker -eEOT/),
                  verbose  => 0),
         $expected, "Multiple -e switches");
 
-    is (runperl (switches => [q  !'-wle$_=<<EOT;y/\n/ /;print;'!,
-                              qw ! -eJust -eanother -ePerl -eHacker -eEOT!],
+    is (runperl (switches => \@(q  !'-wle$_=<<EOT;y/\n/ /;print;'!,
+                              qw ! -eJust -eanother -ePerl -eHacker -eEOT!),
                  verbose  => 0),
         $JaPH . " \n", "Multiple -e switches");
 
-    is (runperl (switches => [qw !-wl!],
-                 progs    => [qw !print qq-@{[ qw+ Just
-                                  another Perl Hacker +]}-!],
+    is (runperl (switches => \@(qw !-wl!),
+                 progs    => \@(qw !print qq-@{[ qw+ Just
+                                  another Perl Hacker +]}-!),
                  verbose  => 0),
         $JaPH_n, "Multiple -e switches");
 }
@@ -132,8 +132,8 @@ plan tests => 99;
             skip "Your platform quotes differently.", 1;
             last;
     }
-    is (runperl (switches => [qw /-sweprint --/,
-                              "-_='Just another Perl Hacker'"],
+    is (runperl (switches => \@(qw /-sweprint --/,
+                              "-_='Just another Perl Hacker'"),
                  nolib    => 1,
                  verbose  => 0),
         $JaPH, 'setting $_ via -s');
@@ -161,11 +161,11 @@ plan tests => 99;
         last if m/^__END__$/;
 
         if (m/^#{7}(?:\s+(.*))?/) {
-            push @progs => {COMMENT  => $1 || '',
+            push @progs => \%(COMMENT  => $1 || '',
                             CODE     => '',
-                            SKIP_OS  => [],
-                            ARGS     => [],
-                            SWITCHES => [],};
+                            SKIP_OS  => \@(),
+                            ARGS     => \@(),
+                            SWITCHES => \@(),);
             $key = 'CODE';
             next;
         }
@@ -212,9 +212,9 @@ plan tests => 99;
                                      @{$program -> {ARGS}});
         fresh_perl_is ($program -> {CODE},
                        $program -> {EXPECT},
-                      {switches => $program -> {SWITCHES},
+                      \%(switches => $program -> {SWITCHES},
                        args     => $program -> {ARGS},
-                       verbose  =>  0},
+                       verbose  =>  0),
                        $program -> {COMMENT});
     }
 }

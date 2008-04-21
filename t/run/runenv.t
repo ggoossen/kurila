@@ -94,28 +94,28 @@ sub try {
 #                    -T, tainting will be enabled, and any
 #                    subsequent options ignored.
 
-try({PERL5OPT => '-w'}, ['-e', 'print $::x'],
+try(\%(PERL5OPT => '-w'), \@('-e', 'print $::x'),
     "", 
     qq{Name "main::x" used only once: possible typo at -e line 1.
 Use of uninitialized value \$x in print at -e line 1.
 });
 
-try({PERL5OPT => '-Mstrict'}, ['-e', 'print $::x'],
+try(\%(PERL5OPT => '-Mstrict'), \@('-e', 'print $::x'),
     "", "");
 
-try({PERL5OPT => '-Mstrict'}, ['-e', 'print $x'],
+try(\%(PERL5OPT => '-Mstrict'), \@('-e', 'print $x'),
     "", 
     qq{Global symbol "\$x" requires explicit package name at -e line 1, at end of line
 Execution of -e aborted due to compilation errors. at -e line 1.\n});
 
 # Fails in 5.6.0
-try({PERL5OPT => '-Mstrict -w'}, ['-e', 'print $x'],
+try(\%(PERL5OPT => '-Mstrict -w'), \@('-e', 'print $x'),
     "", 
     qq{Global symbol "\$x" requires explicit package name at -e line 1, at end of line
 Execution of -e aborted due to compilation errors. at -e line 1.\n});
 
 # Fails in 5.6.0
-try({PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
+try(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $::x'),
     "", 
     <<ERROR
 Name "main::x" used only once: possible typo at -e line 1.
@@ -124,7 +124,7 @@ ERROR
     );
 
 # Fails in 5.6.0
-try({PERL5OPT => '-w -Mstrict'}, ['-e', 'print $::x'],
+try(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $::x'),
     "", 
     <<ERROR
 Name "main::x" used only once: possible typo at -e line 1.
@@ -132,59 +132,59 @@ Use of uninitialized value \$x in print at -e line 1.
 ERROR
     );
 
-try({PERL5OPT => '-MExporter'}, ['-e0'],
+try(\%(PERL5OPT => '-MExporter'), \@('-e0'),
     "", 
     "");
 
 # Fails in 5.6.0
-try({PERL5OPT => '-MExporter -MExporter'}, ['-e0'],
+try(\%(PERL5OPT => '-MExporter -MExporter'), \@('-e0'),
     "", 
     "");
 
-try({PERL5OPT => '-Mstrict -Mwarnings'}, 
-    ['-e', 'print "ok" if %INC{"strict.pm"} and %INC{"warnings.pm"}'],
+try(\%(PERL5OPT => '-Mstrict -Mwarnings'), 
+    \@('-e', 'print "ok" if %INC{"strict.pm"} and %INC{"warnings.pm"}'),
     "ok",
     "");
 
-try({PERL5OPT => '-w -w'},
-    ['-e', 'print %ENV{PERL5OPT}'],
+try(\%(PERL5OPT => '-w -w'),
+    \@('-e', 'print %ENV{PERL5OPT}'),
     '-w -w',
     '');
 
-try({PERL5OPT => '-t'},
-    ['-e', 'print $^TAINT'],
+try(\%(PERL5OPT => '-t'),
+    \@('-e', 'print $^TAINT'),
     '-1',
     '');
 
-try({PERLLIB => "foobar%Config{path_sep}42"},
-    ['-e', 'print grep { $_ eq "foobar" } @INC'],
+try(\%(PERLLIB => "foobar%Config{path_sep}42"),
+    \@('-e', 'print grep { $_ eq "foobar" } @INC'),
     'foobar',
     '');
 
-try({PERLLIB => "foobar%Config{path_sep}42"},
-    ['-e', 'print grep { $_ eq "42" } @INC'],
+try(\%(PERLLIB => "foobar%Config{path_sep}42"),
+    \@('-e', 'print grep { $_ eq "42" } @INC'),
     '42',
     '');
 
-try({PERL5LIB => "foobar%Config{path_sep}42"},
-    ['-e', 'print grep { $_ eq "foobar" } @INC'],
+try(\%(PERL5LIB => "foobar%Config{path_sep}42"),
+    \@('-e', 'print grep { $_ eq "foobar" } @INC'),
     'foobar',
     '');
 
-try({PERL5LIB => "foobar%Config{path_sep}42"},
-    ['-e', 'print grep { $_ eq "42" } @INC'],
+try(\%(PERL5LIB => "foobar%Config{path_sep}42"),
+    \@('-e', 'print grep { $_ eq "42" } @INC'),
     '42',
     '');
 
-try({PERL5LIB => "foo",
-     PERLLIB => "bar"},
-    ['-e', 'print grep { $_ eq "foo" } @INC'],
+try(\%(PERL5LIB => "foo",
+     PERLLIB => "bar"),
+    \@('-e', 'print grep { $_ eq "foo" } @INC'),
     'foo',
     '');
 
-try({PERL5LIB => "foo",
-     PERLLIB => "bar"},
-    ['-e', 'print grep { $_ eq "bar" } @INC'],
+try(\%(PERL5LIB => "foo",
+     PERLLIB => "bar"),
+    \@('-e', 'print grep { $_ eq "bar" } @INC'),
     '',
     '');
 

@@ -39,7 +39,7 @@ sub import {
                          \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
   return export $pkg, $callpkg, @_
     if $Verbose or $Debug or @$fail +> 1;
-  my $export_cache = (%Cache{$pkg} ||= {});
+  my $export_cache = (%Cache{$pkg} ||= \%());
   my $args = @_ or @_ = @$exports;
 
   local $_;

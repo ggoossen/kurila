@@ -27,6 +27,6 @@ pos $disclaimer = 0;
 print "\n\nThe best Shakespearean roles are:\n\n";
 
 print form
-	 {bullet=>'*'},
+	 \%(bullet=>'*'),
      "   * \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}   |\{[[[[[[[[]]]]]]]]\}|",
 		   \@character,                            $disclaimer;

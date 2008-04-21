@@ -13,7 +13,7 @@ my $rx2 = \$x;
 
 is( \$x \== \$x, 1, "\== true");
 is( \$x \== \$y, '', "\== false");
-is( [] \== [], '', "\== using anonymous refs");
+is( \@() \== \@(), '', "\== using anonymous refs");
 
 is( $rx1 \== $rx2, 1, "ref are vars");
 # is( $rx1 \==\ $rx2, 1, "ref are vars");
@@ -37,7 +37,7 @@ dies_like( sub { $x \== $y }, qr/Not a reference/ );
 
 is( \$x \!= \$x, '', "\!= true");
 is( \$x \!= \$y, 1, "\!= false");
-is( [] \!= [], 1, "\!= using anonymous refs");
+is( \@() \!= \@(), 1, "\!= using anonymous refs");
 
 is( $rx1 \!= $rx2, '', "ref are vars");
 # is( $rx1 \==\ $rx2, 1, "ref are vars");

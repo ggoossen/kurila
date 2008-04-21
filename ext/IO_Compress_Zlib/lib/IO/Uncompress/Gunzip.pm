@@ -47,7 +47,7 @@ sub gunzip
 sub getExtraParams
 {
     use IO::Compress::Base::Common  v2.006 qw(:Parse);
-    return ( 'ParseExtra' => [1, 1, Parse_boolean,  0] ) ;
+    return ( 'ParseExtra' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
 sub ckParams
@@ -235,7 +235,7 @@ sub _readGzipHeader($)
 
     *$self->{Type} = 'rfc1952';
 
-    return {
+    return \%(
         'Type'          => 'rfc1952',
         'FingerprintLength'  => 2,
         'HeaderLength'  => length $keep,
@@ -260,13 +260,13 @@ sub _readGzipHeader($)
         'Flags'         => $flag,
         'ExtraFlags'    => $xfl,
         'ExtraFieldRaw' => $EXTRA,
-        'ExtraField'    => [ @EXTRA ],
+        'ExtraField'    => \@( @EXTRA ),
 
 
         #'CompSize'=> $compsize,
         #'CRC32'=> $CRC32,
         #'OrigSize'=> $ISIZE,
-      }
+      )
 }
 
 

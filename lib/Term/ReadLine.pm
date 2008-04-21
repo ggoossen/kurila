@@ -259,14 +259,14 @@ sub new {
     my $sel = select(FOUT);
     $| = 1;				# for DB::OUT
     select($sel);
-    $ret = bless [\*FIN, \*FOUT];
+    $ret = bless \@(\*FIN, \*FOUT);
   } else {			# Filehandles supplied
     $FIN = @_[2]; $FOUT = @_[3];
     #OUT->autoflush(1);		# Conflicts with debugger?
     my $sel = select($FOUT);
     $| = 1;				# for DB::OUT
     select($sel);
-    $ret = bless [$FIN, $FOUT];
+    $ret = bless \@($FIN, $FOUT);
   }
   if ($ret->Features->{ornaments} 
       and not (%ENV{PERL_RL} and %ENV{PERL_RL} =~ m/\bo\w*=0/)) {
@@ -288,7 +288,7 @@ sub newTTY {
 sub IN { shift->[0] }
 sub OUT { shift->[1] }
 sub MinLine { undef }
-sub Attribs { {} }
+sub Attribs { \%() }
 
 my %features = (tkRunning => 1, ornaments => 1, 'newTTY' => 1);
 sub Features { \%features }
@@ -347,7 +347,7 @@ sub LoadTermCap {
   return if defined $terminal;
   
   require Term::Cap;
-  $terminal = Term::Cap->Tgetent({OSPEED => 9600}); # Avoid warning.
+  $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
 }
 
 sub ornaments {

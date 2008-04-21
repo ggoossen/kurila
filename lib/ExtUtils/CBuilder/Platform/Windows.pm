@@ -60,7 +60,7 @@ sub compile {
 
   $srcdir ||= File::Spec->curdir();
 
-  my @defines = $self->arg_defines( %{ %args{defines} || {} } );
+  my @defines = $self->arg_defines( %{ %args{defines} || \%() } );
 
   my %spec = (
     srcdir      => $srcdir,
@@ -69,18 +69,18 @@ sub compile {
     source      => %args{source},
     output      => File::Spec->catfile($srcdir, $basename) . $cf->{obj_ext},
     cc          => $cf->{cc},
-    cflags      => [
+    cflags      => \@(
                      $self->split_like_shell($cf->{ccflags}),
                      $self->split_like_shell($cf->{cccdlflags}),
                      $self->split_like_shell(%args{extra_compiler_flags}),
-                   ],
-    optimize    => [ $self->split_like_shell($cf->{optimize})    ],
+                   ),
+    optimize    => \@( $self->split_like_shell($cf->{optimize})    ),
     defines     => \@defines,
-    includes    => [ @{%args{include_dirs} || []} ],
-    perlinc     => [
+    includes    => \@( @{%args{include_dirs} || \@()} ),
+    perlinc     => \@(
                      $self->perl_inc(),
                      $self->split_like_shell($cf->{incpath}),
-                   ],
+                   ),
     use_scripts => 1, # XXX provide user option to change this???
   );
 
@@ -123,16 +123,16 @@ sub link {
   my %spec = (
     srcdir        => $to,
     builddir      => $to,
-    startup       => [ ],
+    startup       => \@( ),
     objects       => \@objects,
-    libs          => [ ],
+    libs          => \@( ),
     output        => $output,
     ld            => $cf->{ld},
     libperl       => $cf->{libperl},
-    perllibs      => [ $self->split_like_shell($cf->{perllibs})  ],
-    libpath       => [ $self->split_like_shell($cf->{libpth})    ],
-    lddlflags     => [ $self->split_like_shell($lddlflags) ],
-    other_ldflags => [ $self->split_like_shell(%args{extra_linker_flags} || '') ],
+    perllibs      => \@( $self->split_like_shell($cf->{perllibs})  ),
+    libpath       => \@( $self->split_like_shell($cf->{libpth})    ),
+    lddlflags     => \@( $self->split_like_shell($lddlflags) ),
+    other_ldflags => \@( $self->split_like_shell(%args{extra_linker_flags} || '') ),
     use_scripts   => 1, # XXX provide user option to change this???
   );
 
@@ -166,7 +166,7 @@ sub link {
 
   $self->add_to_cleanup(
     grep defined,
-    @{[ %spec{[qw(manifest implib explib dbg_file def_file base_file map_file)]} ]}
+    @{\@( %spec{[qw(manifest implib explib dbg_file def_file base_file map_file)]} )}
   );
 
   foreach my $opt ( qw(output manifest implib explib dbg_file def_file map_file base_file) ) {
@@ -253,15 +253,15 @@ package ExtUtils::CBuilder::Platform::Windows::MSVC;
 sub format_compiler_cmd {
   my ($self, %spec) = @_;
 
-  foreach my $path ( @{ %spec{includes} || [] },
-                     @{ %spec{perlinc}  || [] } ) {
+  foreach my $path ( @{ %spec{includes} || \@() },
+                     @{ %spec{perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
   %spec = $self->write_compiler_script(%spec)
     if %spec{use_scripts};
 
-  return [ grep {defined && length} (
+  return \@( grep {defined && length} (
     %spec{cc},'-nologo','-c',
     @{%spec{includes}}      ,
     @{%spec{cflags}}        ,
@@ -270,7 +270,7 @@ sub format_compiler_cmd {
     @{%spec{perlinc}}       ,
     "-Fo%spec{output}"      ,
     %spec{source}           ,
-  ) ];
+  ) );
 }
 
 sub write_compiler_script {
@@ -320,7 +320,7 @@ sub format_linker_cmd {
 
   my @cmds; # Stores the series of commands needed to build the module.
 
-  push @cmds, [ grep {defined && length} (
+  push @cmds, \@( grep {defined && length} (
     %spec{ld}               ,
     @{%spec{lddlflags}}     ,
     @{%spec{libpath}}       ,
@@ -333,13 +333,13 @@ sub format_linker_cmd {
     %spec{def_file}         ,
     %spec{implib}           ,
     %spec{output}           ,
-  ) ];
+  ) );
 
   # Embed the manifest file for VC 2005 (aka VC 8) or higher, but not for the 64-bit Platform SDK compiler
   if ($cf->{ivsize} == 4 && $cf->{cc} eq 'cl' and $cf->{ccversion} =~ m/^(\d+)/ and $1 +>= 14) {
-    push @cmds, [
+    push @cmds, \@(
       'mt', '-nologo', %spec{manifest}, '-outputresource:' . "$output;2"
-    ];
+    );
   }
 
   return @cmds;
@@ -382,15 +382,15 @@ package ExtUtils::CBuilder::Platform::Windows::BCC;
 sub format_compiler_cmd {
   my ($self, %spec) = @_;
 
-  foreach my $path ( @{ %spec{includes} || [] },
-                     @{ %spec{perlinc}  || [] } ) {
+  foreach my $path ( @{ %spec{includes} || \@() },
+                     @{ %spec{perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
   %spec = $self->write_compiler_script(%spec)
     if %spec{use_scripts};
 
-  return [ grep {defined && length} (
+  return \@( grep {defined && length} (
     %spec{cc}, '-c'         ,
     @{%spec{includes}}      ,
     @{%spec{cflags}}        ,
@@ -399,7 +399,7 @@ sub format_compiler_cmd {
     @{%spec{perlinc}}       ,
     "-o%spec{output}"       ,
     %spec{source}           ,
-  ) ];
+  ) );
 }
 
 sub write_compiler_script {
@@ -447,7 +447,7 @@ sub format_linker_cmd {
   %spec = $self->write_linker_script(%spec)
     if %spec{use_scripts};
 
-  return [ grep {defined && length} (
+  return \@( grep {defined && length} (
     %spec{ld}               ,
     @{%spec{lddlflags}}     ,
     @{%spec{libpath}}       ,
@@ -459,7 +459,7 @@ sub format_linker_cmd {
     %spec{libperl}          ,
     @{%spec{perllibs}}      , ',',
     %spec{def_file}
-  ) ];
+  ) );
 }
 
 sub write_linker_script {
@@ -496,7 +496,7 @@ sub write_linker_script {
 
   print LD_LIBS join( " +\n",
      (delete %spec{libperl}  || ''),
-    @{delete %spec{perllibs} || []},
+    @{delete %spec{perllibs} || \@()},
   );
 
   close LD_LIBS;
@@ -515,15 +515,15 @@ package ExtUtils::CBuilder::Platform::Windows::GCC;
 sub format_compiler_cmd {
   my ($self, %spec) = @_;
 
-  foreach my $path ( @{ %spec{includes} || [] },
-                     @{ %spec{perlinc}  || [] } ) {
+  foreach my $path ( @{ %spec{includes} || \@() },
+                     @{ %spec{perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
   # split off any -arguments included in cc
   my @cc = split m/ (?=-)/, %spec{cc};
 
-  return [ grep {defined && length} (
+  return \@( grep {defined && length} (
     @cc, '-c'               ,
     @{%spec{includes}}      ,
     @{%spec{cflags}}        ,
@@ -532,7 +532,7 @@ sub format_compiler_cmd {
     @{%spec{perlinc}}       ,
     '-o', %spec{output}     ,
     %spec{source}           ,
-  ) ];
+  ) );
 }
 
 sub format_linker_cmd {
@@ -564,15 +564,15 @@ sub format_linker_cmd {
 
   my @cmds; # Stores the series of commands needed to build the module.
 
-  push @cmds, [
+  push @cmds, \@(
     'dlltool', '--def'        , %spec{def_file},
                '--output-exp' , %spec{explib}
-  ];
+  );
 
   # split off any -arguments included in ld
   my @ld = split m/ (?=-)/, %spec{ld};
 
-  push @cmds, [ grep {defined && length} (
+  push @cmds, \@( grep {defined && length} (
     @ld                       ,
     '-o', %spec{output}       ,
     "-Wl,--base-file,%spec{base_file}"   ,
@@ -586,15 +586,15 @@ sub format_linker_cmd {
     @{%spec{perllibs}}        ,
     %spec{explib}             ,
     %spec{map_file} ? ('-Map', %spec{map_file}) : ''
-  ) ];
+  ) );
 
-  push @cmds, [
+  push @cmds, \@(
     'dlltool', '--def'        , %spec{def_file},
                '--output-exp' , %spec{explib},
                '--base-file'  , %spec{base_file}
-  ];
+  );
 
-  push @cmds, [ grep {defined && length} (
+  push @cmds, \@( grep {defined && length} (
     @ld                       ,
     '-o', %spec{output}       ,
     "-Wl,--image-base,%spec{image_base}" ,
@@ -607,7 +607,7 @@ sub format_linker_cmd {
     @{%spec{perllibs}}        ,
     %spec{explib}             ,
     %spec{map_file} ? ('-Map', %spec{map_file}) : ''
-  ) ];
+  ) );
 
   return @cmds;
 }
@@ -626,7 +626,7 @@ sub write_linker_script {
     or die( "Could not create script '$script': $!" );
 
   print( SCRIPT 'SEARCH_DIR(' . $_ . ")\n" )
-    for @{delete %spec{libpath} || []};
+    for @{delete %spec{libpath} || \@()};
 
   # gcc takes only one startup file, so the first object in startup is
   # specified as the startup file and any others are shifted into the
@@ -634,16 +634,16 @@ sub write_linker_script {
   if ( %spec{startup} && @{%spec{startup}} ) {
     print SCRIPT 'STARTUP(' . shift( @{%spec{startup}} ) . ")\n";
     unshift @{%spec{objects}},
-      @{delete %spec{startup} || []};
+      @{delete %spec{startup} || \@()};
   }
 
   print SCRIPT 'INPUT(' . join( ',',
-    @{delete %spec{objects}  || []}
+    @{delete %spec{objects}  || \@()}
   ) . ")\n";
 
   print SCRIPT 'INPUT(' . join( ' ',
      (delete %spec{libperl}  || ''),
-    @{delete %spec{perllibs} || []},
+    @{delete %spec{perllibs} || \@()},
   ) . ")\n";
 
   close SCRIPT;

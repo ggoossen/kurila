@@ -47,7 +47,7 @@ my $stdout = tie *STDOUT, 'TieOut' or die;
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => {},
+    PREREQ_PM     => \%(),
     PERL_CORE     => %ENV{PERL_CORE},
 );
 like( $stdout->read, qr{

@@ -16,7 +16,7 @@ BEGIN {
 		       $st_atime   $st_mtime  $st_ctime 
 		       $st_blksize $st_blocks
 		    );
-    %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
 }
 use vars @EXPORT_OK;
 
@@ -24,12 +24,12 @@ use vars @EXPORT_OK;
 sub import { goto &Exporter::import }
 
 use Class::Struct qw(struct);
-struct 'File::stat' => [
+struct 'File::stat' => \@(
      map { $_ => '$' } qw{
 	 dev ino mode nlink uid gid rdev size
 	 atime mtime ctime blksize blocks
      }
-];
+);
 
 sub populate (@) {
     return unless @_;

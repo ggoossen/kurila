@@ -136,7 +136,7 @@ for (@prgs){
     print TEST "\n#line 1\n";  # So the line numbers don't get messed up.
     print TEST $prog,"\n";
     close TEST or die "Cannot close $tmpfile: $!";
-    my $results = runperl( switches => [$switch], stderr => 1, progfile => $tmpfile );
+    my $results = runperl( switches => \@($switch), stderr => 1, progfile => $tmpfile );
     my $status = $?;
     $results =~ s/\n+$//;
     # allow expected output to be written as if $prog is on STDIN

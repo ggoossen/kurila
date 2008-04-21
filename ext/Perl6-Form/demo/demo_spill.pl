@@ -7,7 +7,7 @@ $tax = 12.6125;
 
 $desc = "3.5 in. closed length. Translucent ruby handle. Features, large & small blades, corkscrew, can opener with small screwdriver, bottle opener with large screwdriver, Perl interpreter, wire stripper, reamer, key ring, tweezers, toothpick, plus 12 other features.";
 
-print form {fill=>'*', interleave=>1}, <<'.',
+print form \%(fill=>'*', interleave=>1), <<'.',
 =================[ Quote for item: {<<<<<<<<<<} ]=================
 
       Retail: {$>>>>>.<}        Desc: {<<<<<<<<<<<<<<<<<<<<<<<<<}
@@ -15,8 +15,8 @@ print form {fill=>'*', interleave=>1}, <<'.',
          Tax: {>>>>.<<%}              {VVVVVVVVVVVVVVVVVVVVVVVVV}
                                       {VVVVVVVVVVVVVVVVVVVVVVVVV}
 .
-      {fill=>' '}, $ID,
+      \%(fill=>' '), $ID,
 	  $retail,
-	  {fill=>' '}, $desc,
+	  \%(fill=>' '), $desc,
 	  $disc,
 	  $tax;

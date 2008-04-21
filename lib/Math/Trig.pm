@@ -51,9 +51,9 @@ my @pi = qw(pi pi2 pi4 pip2 pip4);
 # http://www.movable-type.co.uk/scripts/LatLong.html
 # http://williams.best.vwh.net/avform.htm
 
-%EXPORT_TAGS = ('radial' => [ @rdlcnv ],
-	        'great_circle' => [ @greatcircle ],
-	        'pi'     => [ @pi ]);
+%EXPORT_TAGS = ('radial' => \@( @rdlcnv ),
+	        'great_circle' => \@( @greatcircle ),
+	        'pi'     => \@( @pi ));
 
 sub _DR  () { pi2/360 }
 sub _RD  () { 360/pi2 }

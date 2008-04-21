@@ -15,7 +15,7 @@ END { unlink_all('.a','.b','.c', 'bak.a', 'bak.b', 'bak.c'); }
 
 for my $file (@tfiles) {
     runperl( prog => 'print qq(foo\n);', 
-             args => ['>', $file] );
+             args => \@('>', $file) );
 }
 
 @ARGV = @tfiles;

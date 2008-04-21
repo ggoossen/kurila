@@ -10,7 +10,7 @@ open F, ">", "mix";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 
-plan tests => 4, todo => [2,3];
+plan tests => 4, todo => \@(2,3);
 
 # line 15
 ok(sub { 

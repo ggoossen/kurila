@@ -78,9 +78,9 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
     }
 
     sub get_list1 {
-	return [curr_test] unless @_[0];
+	return \@(curr_test) unless @_[0];
 	my $u = get_first1(0);
-	[$u];
+	\@($u);
     }
     my $x = get_first1(1);
     ok($x, "premature FREETMPS (change 5699)");
@@ -92,9 +92,9 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
     }
 
     sub get_list2 {
-	return [curr_test] unless @_[0];
+	return \@(curr_test) unless @_[0];
 	my $u = get_first2(0);
-	return [$u];
+	return \@($u);
     }
     my $x = get_first2(1);
     ok($x, "premature FREETMPS (change 5699)");

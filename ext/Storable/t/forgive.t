@@ -38,7 +38,7 @@ print "1..8\n";
 
 my $test = 1;
 *GLOB = *GLOB; # peacify -w
-my $bad = ['foo', \*GLOB,  'bar'];
+my $bad = \@('foo', \*GLOB,  'bar');
 my $result;
 
 eval {$result = store ($bad , 'store')};

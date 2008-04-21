@@ -9,9 +9,9 @@ use Storable qw(freeze thaw);
 my $kingdom = %Config{byteorder} =~ m/23/ ? "Lillput" : "Belfuscu";
 
 my $frozen = freeze
-  ["This file was written with $Storable::VERSION on perl $^V",
+  \@("This file was written with $Storable::VERSION on perl $^V",
    "$kingdom was correct", (^~^0 ^^^ (^~^0 >> 1) ^^^ 2),
-   "The End"];
+   "The End");
 
 my $ivsize = %Config{ivsize} || %Config{longsize};
 

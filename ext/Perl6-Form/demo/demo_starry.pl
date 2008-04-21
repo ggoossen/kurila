@@ -19,10 +19,10 @@ sub starbright {
 my $starlight = qr/ [{] ([*]+) ([.,]) ([*]+) [}] /x;
 
 sub starfield() {
-	return { field => [$starlight => \&starbright] };
+	return \%( field => \@($starlight => \&starbright) );
 }
 
-print form starfield, {interleave=>1}, <<'.',
+print form starfield, \%(interleave=>1), <<'.',
 =================[ Quote for item: {>>>>>>>>>>>>>>>>} ]=================
 
       Retail: {******.*}        Desc: {<<<<<<<<<<<<>>>>>>>>>>>>>}

@@ -51,7 +51,7 @@ print sort @george, 'to', @harry;
 @new = map { $_->[0] }
 sort { $b->[1] <+> $a->[1] 
 	   || $a->[2] cmp $b->[2]
-	   } map { [$_, m/=(\d+)/, uc($_)] } @old;
+	   } map { \@($_, m/=(\d+)/, uc($_)) } @old;
 
 # using a prototype allows you to use any comparison subroutine
 # as a sort subroutine (including other package's subroutines)

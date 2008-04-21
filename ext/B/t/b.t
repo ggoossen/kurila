@@ -138,12 +138,12 @@ my $cv_ret = $cv_ref->object_2svref();
 is(ref $cv_ret, "REF", "Test object_2svref() return is REF");
 is($$cv_ret, $cv, "Test object_2svref()");
 
-my $av = [];
+my $av = \@();
 my $av_ref = B::svref_2object(\$av);
 is(ref $av_ref, "$RV_class",
    "Test $RV_class return from svref_2object - array");
 
-my $hv = [];
+my $hv = \@();
 my $hv_ref = B::svref_2object(\$hv);
 is(ref $hv_ref, "$RV_class",
    "Test $RV_class return from svref_2object - hash");
@@ -170,7 +170,7 @@ is(B::cstring("wibble"), '"wibble"', "Testing B::cstring()");
 is(B::perlstring("wibble"), '"wibble"', "Testing B::perlstring()");
 is(B::perlstring("\n"), '"\n"', "Testing B::perlstring()");
 is(B::perlstring("\""), '"\""', "Testing B::perlstring()");
-is(B::class(bless {}, "Wibble::Bibble"), "Bibble", "Testing B::class()");
+is(B::class(bless \%(), "Wibble::Bibble"), "Bibble", "Testing B::class()");
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()");
 is(B::opnumber("chop"), 37, "Testing opnumber with opname (chop)");
 

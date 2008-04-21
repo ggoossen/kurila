@@ -213,17 +213,17 @@ $VERSION = eval $VERSION;
 my %METHOD_MAP =
   (
    VMS =>
-   {
+   \%(
     cwd			=> '_vms_cwd',
     getcwd		=> '_vms_cwd',
     fastcwd		=> '_vms_cwd',
     fastgetcwd		=> '_vms_cwd',
     abs_path		=> '_vms_abs_path',
     fast_abs_path	=> '_vms_abs_path',
-   },
+   ),
 
    MSWin32 =>
-   {
+   \%(
     # We assume that &_NT_cwd is defined as an XSUB or in the core.
     cwd			=> '_NT_cwd',
     getcwd		=> '_NT_cwd',
@@ -231,52 +231,52 @@ my %METHOD_MAP =
     fastgetcwd		=> '_NT_cwd',
     abs_path		=> 'fast_abs_path',
     realpath		=> 'fast_abs_path',
-   },
+   ),
 
    dos => 
-   {
+   \%(
     cwd			=> '_dos_cwd',
     getcwd		=> '_dos_cwd',
     fastgetcwd		=> '_dos_cwd',
     fastcwd		=> '_dos_cwd',
     abs_path		=> 'fast_abs_path',
-   },
+   ),
 
    qnx =>
-   {
+   \%(
     cwd			=> '_qnx_cwd',
     getcwd		=> '_qnx_cwd',
     fastgetcwd		=> '_qnx_cwd',
     fastcwd		=> '_qnx_cwd',
     abs_path		=> '_qnx_abs_path',
     fast_abs_path	=> '_qnx_abs_path',
-   },
+   ),
 
    cygwin =>
-   {
+   \%(
     getcwd		=> 'cwd',
     fastgetcwd		=> 'cwd',
     fastcwd		=> 'cwd',
     abs_path		=> 'fast_abs_path',
     realpath		=> 'fast_abs_path',
-   },
+   ),
 
    epoc =>
-   {
+   \%(
     cwd			=> '_epoc_cwd',
     getcwd	        => '_epoc_cwd',
     fastgetcwd		=> '_epoc_cwd',
     fastcwd		=> '_epoc_cwd',
     abs_path		=> 'fast_abs_path',
-   },
+   ),
 
    MacOS =>
-   {
+   \%(
     getcwd		=> 'cwd',
     fastgetcwd		=> 'cwd',
     fastcwd		=> 'cwd',
     abs_path		=> 'fast_abs_path',
-   },
+   ),
   );
 
 %METHOD_MAP{NT} = %METHOD_MAP{MSWin32};

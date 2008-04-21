@@ -18,7 +18,7 @@ my $Cache_set = 0;
 
 sub new {
   my($pkg,$type) = @_;
-  bless { TYPE => $type }, $pkg;
+  bless \%( TYPE => $type ), $pkg;
 }
 
 sub DESTROY { }

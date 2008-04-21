@@ -16,7 +16,7 @@ sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'pod' }
 
-sub new { return bless {}, ref(@_[0]) || @_[0] }
+sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
 sub parse_from_file {
   my( $self, $in, $outfh ) = @_;

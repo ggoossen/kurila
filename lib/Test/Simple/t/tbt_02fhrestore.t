@@ -48,7 +48,7 @@ sub PRINT  {
 
 sub TIEHANDLE {
     my $class = shift;
-    my $self = [shift()];
+    my $self = \@(shift());
     return bless $self, $class;
 }
 

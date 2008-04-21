@@ -258,10 +258,10 @@ for my $n (47..113) {
     }
 
     foreach my $warn (0, 1) {
-	foreach (['++$i', 'pre-inc'], ['$i++', 'post-inc']) {
+	foreach (\@('++$i', 'pre-inc'), \@('$i++', 'post-inc')) {
 	    check_some_code($start_p, $warn, @$_);
 	}
-	foreach (['--$i', 'pre-dec'], ['$i--', 'post-dec']) {
+	foreach (\@('--$i', 'pre-dec'), \@('$i--', 'post-dec')) {
 	    check_some_code($start_n, $warn, @$_);
 	}
     }

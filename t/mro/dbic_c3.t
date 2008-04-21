@@ -92,7 +92,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
 
 ok(eq_array(
     mro::get_linear_isa('xx::DBIx::Class::Core'),
-    [qw/
+    \@(qw/
         xx::DBIx::Class::Core
         xx::DBIx::Class::Serialize::Storable
         xx::DBIx::Class::InflateColumn
@@ -115,5 +115,5 @@ ok(eq_array(
         xx::DBIx::Class
         xx::DBIx::Class::Componentised
         xx::Class::Data::Accessor
-    /]
+    /)
 ), '... got the right C3 merge order for xx::DBIx::Class::Core');

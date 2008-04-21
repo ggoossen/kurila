@@ -78,7 +78,7 @@ sub lexical
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
 	my $real_stdout = select($fh) ;
-	return bless [$fh, $real_stdout ] ;
+	return bless \@($fh, $real_stdout ) ;
 
     }
     sub DESTROY
@@ -581,9 +581,9 @@ sub ArrayCompare
     1 ;
 }
  
-ok(84, ArrayCompare (\@srt_1, [keys %h]) );
-ok(85, ArrayCompare (\@srt_2, [keys %g]) );
-ok(86, ArrayCompare (\@srt_3, [keys %k]) );
+ok(84, ArrayCompare (\@srt_1, \@(keys %h)) );
+ok(85, ArrayCompare (\@srt_2, \@(keys %g)) );
+ok(86, ArrayCompare (\@srt_3, \@(keys %k)) );
 
 untie %h ;
 untie %g ;

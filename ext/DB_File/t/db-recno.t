@@ -28,7 +28,7 @@ our ($dbh, $Dfile, $bad_ones, $FA);
 # Double check to see if it is available.
 
 {
-    sub try::TIEARRAY { bless [], "try" }
+    sub try::TIEARRAY { bless \@(), "try" }
     sub try::FETCHSIZE { $FA = 1 }
     $FA = 0 ;
     my @a ; 
@@ -59,7 +59,7 @@ sub ok
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
 	my $real_stdout = select($fh) ;
-	return bless [$fh, $real_stdout ] ;
+	return bless \@($fh, $real_stdout ) ;
 
     }
     sub DESTROY
@@ -1272,52 +1272,52 @@ exit unless $FA ;
 # The expected result is not needed because we get that by running
 # Perl's built-in splice().
 # 
-my @tests = ([ [ 'falsely', 'dinosaur', 'remedy', 'commotion',
-		 'rarely', 'paleness' ],
+my @tests = (\@( \@( 'falsely', 'dinosaur', 'remedy', 'commotion',
+		 'rarely', 'paleness' ),
 	       -4, -2,
-	       [ 'redoubled', 'Taylorize', 'Zoe', 'halogen' ],
-	       'void' ],
+	       \@( 'redoubled', 'Taylorize', 'Zoe', 'halogen' ),
+	       'void' ),
 
-	     [ [ 'a' ], -2, 1, [ 'B' ], 'void' ],
+	     \@( \@( 'a' ), -2, 1, \@( 'B' ), 'void' ),
 
-	     [ [ 'Hartley', 'Islandia', 'assents', 'wishful' ],
+	     \@( \@( 'Hartley', 'Islandia', 'assents', 'wishful' ),
 	       0, -4,
-	       [ 'maids' ],
-	       'void' ],
+	       \@( 'maids' ),
+	       'void' ),
 
-	     [ [ 'visibility', 'pocketful', 'rectangles' ],
+	     \@( \@( 'visibility', 'pocketful', 'rectangles' ),
 	       -10, 0,
-	       [ 'garbages' ],
-	       'void' ],
+	       \@( 'garbages' ),
+	       'void' ),
 
-	     [ [ 'sleeplessly' ],
+	     \@( \@( 'sleeplessly' ),
 	       8, -4,
-	       [ 'Margery', 'clearing', 'repercussion', 'clubs',
-		 'arise' ],
-	       'void' ],
+	       \@( 'Margery', 'clearing', 'repercussion', 'clubs',
+		 'arise' ),
+	       'void' ),
 
-	     [ [ 'chastises', 'recalculates' ],
+	     \@( \@( 'chastises', 'recalculates' ),
 	       0, 0,
-	       [ 'momentariness', 'mediates', 'accents', 'toils',
-		 'regaled' ],
-	       'void' ],
+	       \@( 'momentariness', 'mediates', 'accents', 'toils',
+		 'regaled' ),
+	       'void' ),
 
-	     [ [ 'b', '' ],
+	     \@( \@( 'b', '' ),
 	       9, 8,
-	       [ 'otrb', 'stje', 'ixrpw', 'vxfx', 'lhhf' ],
-	       'scalar' ],
+	       \@( 'otrb', 'stje', 'ixrpw', 'vxfx', 'lhhf' ),
+	       'scalar' ),
 
-	     [ [ 'b', '' ],
+	     \@( \@( 'b', '' ),
 	       undef, undef,
-	       [ 'otrb', 'stje', 'ixrpw', 'vxfx', 'lhhf' ],
-	       'scalar' ],
+	       \@( 'otrb', 'stje', 'ixrpw', 'vxfx', 'lhhf' ),
+	       'scalar' ),
 	     
-	     [ [ 'riheb' ], -8, undef, [], 'void' ],
+	     \@( \@( 'riheb' ), -8, undef, \@(), 'void' ),
 
-	     [ [ 'uft', 'qnxs', '' ],
+	     \@( \@( 'uft', 'qnxs', '' ),
 	       6, -2,
-	       [ 'znp', 'mhnkh', 'bn' ],
-	       'void' ],
+	       \@( 'znp', 'mhnkh', 'bn' ),
+	       'void' ),
 	    );
 
 my $testnum = 194;
@@ -1420,7 +1420,7 @@ sub test_splice {
 	    $r = splice @array, $offset, $length, @list;
 	};
 	$s_error = $@ && $@->{description};
-	$s_r = [ $r ];
+	$s_r = \@( $r );
     }
     elsif ($context eq 'void') {
 	eval {
@@ -1428,7 +1428,7 @@ sub test_splice {
 	    splice @array, $offset, $length, @list;
 	};
 	$s_error = $@ && $@->{description};
-	$s_r = [];
+	$s_r = \@();
     }
     else {
 	die "bad context $context";
@@ -1460,7 +1460,7 @@ sub test_splice {
 	    $r = splice @h, $offset, $length, @list;
 	};
 	$ms_error = $@ && $@->{description};
-	$ms_r = [ $r ];
+	$ms_r = \@( $r );
     }
     elsif ($context eq 'void') {
 	eval {
@@ -1468,7 +1468,7 @@ sub test_splice {
 	    splice @h, $offset, $length, @list;
 	};
 	$ms_error = $@ && $@->{description};
-	$ms_r = [];
+	$ms_r = \@();
     }
     else {
 	die "bad context $context";
@@ -1571,11 +1571,11 @@ sub rand_test {
     die 'usage: rand_test()' if @_;
     my @contexts = qw<list scalar void>;
     my $context = @contexts[int(rand @contexts)];
-    return [ rand_list(),
+    return \@( rand_list(),
 	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
 	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
 	     rand_list(),
-	     $context ];
+	     $context );
 }
 
 

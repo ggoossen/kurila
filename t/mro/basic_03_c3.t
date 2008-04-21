@@ -88,7 +88,7 @@ Level 0                0 | A |
 
 ok(eq_array(
     mro::get_linear_isa('Test::A'),
-    [ qw(Test::A Test::B Test::E Test::C Test::D Test::F Test::O) ]
+    \@( qw(Test::A Test::B Test::E Test::C Test::D Test::F Test::O) )
 ), '... got the right MRO for Test::A');      
     
 is('Test::A'->O_or_D, 'Test::D', '... got the right method dispatch');    

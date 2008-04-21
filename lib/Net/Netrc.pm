@@ -82,8 +82,8 @@ sub _readrc {
       while (@tok) {
         if (@tok[0] eq "default") {
           shift(@tok);
-          $mach = bless {};
-          %netrc{default} = [$mach];
+          $mach = bless \%();
+          %netrc{default} = \@($mach);
 
           next TOKEN;
         }
@@ -95,9 +95,9 @@ sub _readrc {
 
         if ($tok eq "machine") {
           my $host = shift @tok;
-          $mach = bless {machine => $host};
+          $mach = bless \%(machine => $host);
 
-          %netrc{$host} = []
+          %netrc{$host} = \@()
             unless exists(%netrc{$host});
           push(@{%netrc{$host}}, $mach);
         }
@@ -112,9 +112,9 @@ sub _readrc {
         elsif ($tok eq "macdef") {
           next TOKEN unless $mach;
           my $value = shift @tok;
-          $mach->{macdef} = {}
+          $mach->{macdef} = \%()
             unless exists $mach->{macdef};
-          $macdef = $mach->{machdef}{$value} = [];
+          $macdef = $mach->{machdef}{$value} = \@();
         }
       }
     }

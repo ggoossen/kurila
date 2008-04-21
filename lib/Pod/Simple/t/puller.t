@@ -162,7 +162,7 @@ ok 1;
 print "# Testing pullparsing from an arrayref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-$p->set_source( ['','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut'] );
+$p->set_source( \@('','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') );
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {
@@ -190,8 +190,8 @@ ok @t[4]->tagname, 'Document';
 print "# Testing pullparsing from an arrayref with terminal newlines\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-$p->set_source( [ map "$_\n",
-  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut'] );
+$p->set_source( \@( map "$_\n",
+  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') );
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {

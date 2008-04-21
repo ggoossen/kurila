@@ -11,7 +11,7 @@ BEGIN {
 			$h_addrtype 	$h_length
 			@h_addr_list 	$h_addr
 		   );
-    %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
 }
 use vars      @EXPORT_OK;
 
@@ -19,13 +19,13 @@ use vars      @EXPORT_OK;
 sub import { goto &Exporter::import }
 
 use Class::Struct qw(struct);
-struct 'Net::hostent' => [
+struct 'Net::hostent' => \@(
    name		=> '$',
    aliases	=> '@',
    addrtype	=> '$',
    'length'	=> '$',
    addr_list	=> '@',
-];
+);
 
 sub addr { shift->addr_list->[0] }
 

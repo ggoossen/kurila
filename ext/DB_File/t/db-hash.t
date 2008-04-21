@@ -42,7 +42,7 @@ sub ok
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
 	my $real_stdout = select($fh) ;
-	return bless [$fh, $real_stdout ] ;
+	return bless \@($fh, $real_stdout ) ;
 
     }
     sub DESTROY
