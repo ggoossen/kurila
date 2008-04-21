@@ -25,7 +25,7 @@ require q(./test.pl); plan(tests => 7);
     use overload '""' => sub { ref(shift) . " stringified" },
                  fallback => 1;
     
-    sub new { bless {} => shift }    
+    sub new { bless \%() => shift }    
     
     package InheritingFromOverloadedTest;
     use strict;

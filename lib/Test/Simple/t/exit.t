@@ -33,20 +33,20 @@ print "# Ahh!  I see you're running VMS.\n" if $IsVMS;
 
 my %Tests = (
              #                      Everyone Else   VMS
-             'success.plx'              => [0,      0],
-             'one_fail.plx'             => [1,      4],
-             'two_fail.plx'             => [2,      4],
-             'five_fail.plx'            => [5,      4],
-             'extras.plx'               => [2,      4],
-             'too_few.plx'              => [255,    4],
-             'too_few_fail.plx'         => [2,      4],
-             'death.plx'                => [255,    4],
-             'last_minute_death.plx'    => [255,    4],
-             'pre_plan_death.plx'       => ['not zero',    'not zero'],
-             'death_in_eval.plx'        => [0,      0],
-             'require.plx'              => [0,      0],
-             'death_with_handler.plx'   => [255,    4],
-             'exit.plx'                 => [1,      4],
+             'success.plx'              => \@(0,      0),
+             'one_fail.plx'             => \@(1,      4),
+             'two_fail.plx'             => \@(2,      4),
+             'five_fail.plx'            => \@(5,      4),
+             'extras.plx'               => \@(2,      4),
+             'too_few.plx'              => \@(255,    4),
+             'too_few_fail.plx'         => \@(2,      4),
+             'death.plx'                => \@(255,    4),
+             'last_minute_death.plx'    => \@(255,    4),
+             'pre_plan_death.plx'       => \@('not zero',    'not zero'),
+             'death_in_eval.plx'        => \@(0,      0),
+             'require.plx'              => \@(0,      0),
+             'death_with_handler.plx'   => \@(255,    4),
+             'exit.plx'                 => \@(1,      4),
             );
 
 $TB->plan( tests => scalar keys(%Tests) );

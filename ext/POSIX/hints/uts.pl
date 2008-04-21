@@ -6,4 +6,4 @@
 #         /usr/ccs/lib/libm.a(acos.o)
 #               ...
 
-$self->{LIBS} = [''];
+$self->{LIBS} = \@('');

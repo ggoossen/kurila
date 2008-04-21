@@ -76,7 +76,7 @@ is( Net::Config->requires_firewall('192.168.10.0'), 1,
 	'... should return true if host is outside netmask' );
 
 # now try more netmasks
-%NetConfig{'local_netmask'} = [ '127.0.0.1/24', '10.0.0.0/8' ];
+%NetConfig{'local_netmask'} = \@( '127.0.0.1/24', '10.0.0.0/8' );
 is( Net::Config->requires_firewall('10.10.255.254'), 0,
 	'... should find success with mutiple local netmasks' );
 is( Net::Config->requires_firewall('192.168.10.0'), 1,

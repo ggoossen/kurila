@@ -59,118 +59,118 @@ $Archive::Extract::VERBOSE  = $Archive::Extract::VERBOSE = $Debug;
 $Archive::Extract::WARN     = $Archive::Extract::WARN    = $Debug ? 1 : 0;
 
 
-my $tmpl = {
+my $tmpl = \%(
     ### plain files
-    'x.bz2' => {    programs    => [qw[bunzip2]],
-                    modules     => [qw[IO::Uncompress::Bunzip2]],
+    'x.bz2' => \%(    programs    => \@(qw[bunzip2]),
+                    modules     => \@(qw[IO::Uncompress::Bunzip2]),
                     method      => 'is_bz2',
                     outfile     => 'a',
-                },
-    'x.tgz' => {    programs    => [qw[gzip tar]],
-                    modules     => [qw[Archive::Tar IO::Zlib]],
+                ),
+    'x.tgz' => \%(    programs    => \@(qw[gzip tar]),
+                    modules     => \@(qw[Archive::Tar IO::Zlib]),
                     method      => 'is_tgz',
                     outfile     => 'a',
-                },
-    'x.tar.gz' => { programs    => [qw[gzip tar]],
-                    modules     => [qw[Archive::Tar IO::Zlib]],
+                ),
+    'x.tar.gz' => \%( programs    => \@(qw[gzip tar]),
+                    modules     => \@(qw[Archive::Tar IO::Zlib]),
                     method      => 'is_tgz',
                     outfile     => 'a',
-                },
-    'x.tar' => {    programs    => [qw[tar]],
-                    modules     => [qw[Archive::Tar]],
+                ),
+    'x.tar' => \%(    programs    => \@(qw[tar]),
+                    modules     => \@(qw[Archive::Tar]),
                     method      => 'is_tar',
                     outfile     => 'a',
-                },
-    'x.gz'  => {    programs    => [qw[gzip]],
-                    modules     => [qw[Compress::Zlib]],
+                ),
+    'x.gz'  => \%(    programs    => \@(qw[gzip]),
+                    modules     => \@(qw[Compress::Zlib]),
                     method      => 'is_gz',
                     outfile     => 'a',
-                },
-    'x.Z'   => {    programs    => [qw[uncompress]],
-                    modules     => [qw[Compress::Zlib]],
+                ),
+    'x.Z'   => \%(    programs    => \@(qw[uncompress]),
+                    modules     => \@(qw[Compress::Zlib]),
                     method      => 'is_Z',
                     outfile     => 'a',
-                },
-    'x.zip' => {    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+                ),
+    'x.zip' => \%(    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'a',
-                },
-    'x.jar' => {    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+                ),
+    'x.jar' => \%(    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'a',
-                },                
-    'x.par' => {    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+                ),                
+    'x.par' => \%(    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'a',
-                },                
-    'x.lzma' => {   programs    => [qw[unlzma]],
-                    modules     => [qw[Compress::unLZMA]],
+                ),                
+    'x.lzma' => \%(   programs    => \@(qw[unlzma]),
+                    modules     => \@(qw[Compress::unLZMA]),
                     method      => 'is_lzma',
                     outfile     => 'a',
-                },
+                ),
     ### with a directory
-    'y.tbz'     => {    programs    => [qw[bunzip2 tar]],
-                        modules     => [qw[Archive::Tar 
-                                           IO::Uncompress::Bunzip2]],
+    'y.tbz'     => \%(    programs    => \@(qw[bunzip2 tar]),
+                        modules     => \@(qw[Archive::Tar 
+                                           IO::Uncompress::Bunzip2]),
                         method      => 'is_tbz',
                         outfile     => 'z',
                         outdir      => 'y',
-                    },
-    'y.tar.bz2' => {    programs    => [qw[bunzip2 tar]],
-                        modules     => [qw[Archive::Tar 
-                                           IO::Uncompress::Bunzip2]],
+                    ),
+    'y.tar.bz2' => \%(    programs    => \@(qw[bunzip2 tar]),
+                        modules     => \@(qw[Archive::Tar 
+                                           IO::Uncompress::Bunzip2]),
                         method      => 'is_tbz',
                         outfile     => 'z',
                         outdir      => 'y'
-                    },    
-    'y.tgz'     => {    programs    => [qw[gzip tar]],
-                        modules     => [qw[Archive::Tar IO::Zlib]],
+                    ),    
+    'y.tgz'     => \%(    programs    => \@(qw[gzip tar]),
+                        modules     => \@(qw[Archive::Tar IO::Zlib]),
                         method      => 'is_tgz',
                         outfile     => 'z',
                         outdir      => 'y'
-                    },
-    'y.tar.gz' => {     programs    => [qw[gzip tar]],
-                        modules     => [qw[Archive::Tar IO::Zlib]],
+                    ),
+    'y.tar.gz' => \%(     programs    => \@(qw[gzip tar]),
+                        modules     => \@(qw[Archive::Tar IO::Zlib]),
                         method      => 'is_tgz',
                         outfile     => 'z',
                         outdir      => 'y'
-                    },
-    'y.tar' => {    programs    => [qw[tar]],
-                    modules     => [qw[Archive::Tar]],
+                    ),
+    'y.tar' => \%(    programs    => \@(qw[tar]),
+                    modules     => \@(qw[Archive::Tar]),
                     method      => 'is_tar',
                     outfile     => 'z',
                     outdir      => 'y'
-                },
-    'y.zip' => {    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+                ),
+    'y.zip' => \%(    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'z',
                     outdir      => 'y'
-                },
-    'y.par' => {    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+                ),
+    'y.par' => \%(    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'z',
                     outdir      => 'y'
-                },
-    'y.jar' => {    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+                ),
+    'y.jar' => \%(    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'z',
                     outdir      => 'y'
-                },
+                ),
     ### with non-same top dir
-    'double_dir.zip' => {
-                    programs    => [qw[unzip]],
-                    modules     => [qw[Archive::Zip]],
+    'double_dir.zip' => \%(
+                    programs    => \@(qw[unzip]),
+                    modules     => \@(qw[Archive::Zip]),
                     method      => 'is_zip',
                     outfile     => 'w',
                     outdir      => 'x'
-                },
-};
+                ),
+);
 
 ### XXX special case: on older solaris boxes (8),
 ### bunzip2 is version 0.9.x. Older versions (pre 1),
@@ -215,7 +215,7 @@ SKIP: {   my $meth = '__get_extract_dir';
 
     ### get the right separator -- File::Spec does clean ups for
     ### paths, so we need to join ourselves.
-    my $sep  = [ split '', File::Spec->catfile( 'a', 'b' ) ]->[1];
+    my $sep  = \@( split '', File::Spec->catfile( 'a', 'b' ) )->[1];
     
     ### bug #23999: Attempt to generate Makefile.PL gone awry
     ### showed that dirs in the style of './dir/' were reported
@@ -233,7 +233,7 @@ SKIP: {   my $meth = '__get_extract_dir';
         my @files = map { length $prefix 
                                 ? join $sep, $prefix, $_
                                 : $_
-                      } $dir, File::Spec->catfile( $dir, [keys %$tmpl]->[0] );
+                      } $dir, File::Spec->catfile( $dir, \@(keys %$tmpl)->[0] );
         
         my $res = $Class->?$meth( \@files );
         $res = &Win32::GetShortPathName( $res ) if IS_WIN32;
@@ -353,7 +353,7 @@ for my $switch (0,1) {
                     ### might be 1 or 2, depending wether we extracted 
                     ### a dir too
                     my $file_cnt = grep { defined } $file, $dir;
-                    is( scalar @{ $ae->files || []}, $file_cnt,
+                    is( scalar @{ $ae->files || \@()}, $file_cnt,
                                     "Found correct number of output files" );
                     is( $ae->files->[-1], $nix_path,
                                     "Found correct output file '$nix_path'" );

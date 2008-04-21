@@ -97,14 +97,14 @@ DOC:
 	    $docs = "\n$docs" if $docs and $docs !~ m/^\n/;
 	    if ($flags =~ m/m/) {
 		if ($flags =~ m/A/) {
-		    %apidocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
+		    %apidocs{$curheader}{$name} = \@($flags, $docs, $ret, $file, @args);
 		}
 		else {
-		    %gutsdocs{$curheader}{$name} = [$flags, $docs, $ret, $file, @args];
+		    %gutsdocs{$curheader}{$name} = \@($flags, $docs, $ret, $file, @args);
 		}
 	    }
 	    else {
-		%docfuncs{$name} = [$flags, $docs, $ret, $file, $curheader, @args];
+		%docfuncs{$name} = \@($flags, $docs, $ret, $file, $curheader, @args);
 	    }
 	    if (defined $doc) {
 		if ($doc =~ m/^=(?:for|head)/) {
@@ -196,11 +196,11 @@ walk_table {	# load documented functions into appropriate hash
 	    if ($flags =~ m/A/) {
 		$docref->[0].="x" if $flags =~ m/M/;
 		%apidocs{$docref->[4]}{$func} =
-		    [$docref->[0] . 'A', $docref->[1], $retval, $docref->[3],
-			@args];
+		    \@($docref->[0] . 'A', $docref->[1], $retval, $docref->[3],
+			@args);
 	    } else {
 		%gutsdocs{$docref->[4]}{$func} =
-		    [$docref->[0], $docref->[1], $retval, $docref->[3], @args];
+		    \@($docref->[0], $docref->[1], $retval, $docref->[3], @args);
 	    }
 	}
 	else {

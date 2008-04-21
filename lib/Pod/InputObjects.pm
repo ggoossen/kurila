@@ -137,10 +137,10 @@ sub new {
     ## hash that is used to represent this object. Note that we default
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
-    my $self = { -name        => '(unknown)',
+    my $self = \%( -name        => '(unknown)',
                  -handle      => undef,
                  -was_cutting => 0,
-                 @_ };
+                 @_ );
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -265,16 +265,16 @@ sub new {
     ## hash that is used to represent this object. Note that we default
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
-    my $self = {
+    my $self = \%(
           -name       => undef,
           -text       => (@_ == 1) ? shift : undef,
           -file       => '<unknown-file>',
           -line       => 0,
           -prefix     => '=',
           -separator  => ' ',
-          -ptree => [],
+          -ptree => \@(),
           @_
-    };
+    );
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -471,21 +471,21 @@ sub new {
     ## hash that is used to represent this object. Note that we default
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
-    my $self = {
+    my $self = \%(
           -name       => (@_ == 1) ? @_[0] : undef,
           -file       => '<unknown-file>',
           -line       => 0,
           -ldelim     => '<',
           -rdelim     => '>',
           @_
-    };
+    );
 
     ## Initialize contents if they havent been already
     my $ptree = $self->{'-ptree'} || Pod::ParseTree->new();
     if ( (ref $ptree) =~ m/^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
-        $ptree = Pod::ParseTree->new($1 ? [$ptree] : $ptree);
+        $ptree = Pod::ParseTree->new($1 ? \@($ptree) : $ptree);
     }
     $self->{'-ptree'} = $ptree;
 
@@ -756,7 +756,7 @@ sub new {
     my $this = shift;
     my $class = ref($this) || $this;
 
-    my $self = (@_ == 1  and  ref @_[0]) ? @_[0] : [];
+    my $self = (@_ == 1  and  ref @_[0]) ? @_[0] : \@();
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;

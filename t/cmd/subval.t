@@ -178,7 +178,7 @@ sub iseof {
 
 sub autov { @_[0] = 23 };
 
-my $href = {};
+my $href = \%();
 print keys %$href ? 'not ' : '', "ok 35\n";
 autov($href->{b});
 print join(':', %$href) eq 'b:23' ? '' : 'not ', "ok 36\n";

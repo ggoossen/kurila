@@ -647,36 +647,36 @@ sub alternate_language_tags {
    #  here, I'll just go crazy.
 
    # Scandinavian lgs.  All based on opinion and hearsay.
-   'sv' => [qw(nb no da nn)],
-   'da' => [qw(nb no sv nn)], # I guess
-   [qw(no nn nb)], [qw(no nn nb sv da)],
-   'is' => [qw(da sv no nb nn)],
-   'fo' => [qw(da is no nb nn sv)], # I guess
+   'sv' => \@(qw(nb no da nn)),
+   'da' => \@(qw(nb no sv nn)), # I guess
+   \@(qw(no nn nb)), \@(qw(no nn nb sv da)),
+   'is' => \@(qw(da sv no nb nn)),
+   'fo' => \@(qw(da is no nb nn sv)), # I guess
    
    # I think this is about the extent of tolerable intelligibility
    #  among large modern Romance languages.
-   'pt' => [qw(es ca it fr)], # Portuguese, Spanish, Catalan, Italian, French
-   'ca' => [qw(es pt it fr)],
-   'es' => [qw(ca it fr pt)],
-   'it' => [qw(es fr ca pt)],
-   'fr' => [qw(es it ca pt)],
+   'pt' => \@(qw(es ca it fr)), # Portuguese, Spanish, Catalan, Italian, French
+   'ca' => \@(qw(es pt it fr)),
+   'es' => \@(qw(ca it fr pt)),
+   'it' => \@(qw(es fr ca pt)),
+   'fr' => \@(qw(es it ca pt)),
    
    # Also assume that speakers of the main Indian languages prefer
    #  to read/hear Hindi over English
-   [qw(
+   \@(qw(
      as bn gu kn ks kok ml mni mr ne or pa sa sd te ta ur
-   )] => 'hi',
+   )) => 'hi',
     # Assamese, Bengali, Gujarati, [Hindi,] Kannada (Kanarese), Kashmiri,
     # Konkani, Malayalam, Meithei (Manipuri), Marathi, Nepali, Oriya,
     # Punjabi, Sanskrit, Sindhi, Telugu, Tamil, and Urdu.
-   'hi' => [qw(bn pa as or)],
+   'hi' => \@(qw(bn pa as or)),
    # I welcome finer data for the other Indian languages.
    #  E.g., what should Oriya's list be, besides just Hindi?
    
    # And the panic languages for English is, of course, nil!
 
    # My guesses at Slavic intelligibility:
-   ([qw(ru be uk)]) x 2,  # Russian, Belarusian, Ukranian
+   (\@(qw(ru be uk))) x 2,  # Russian, Belarusian, Ukranian
    'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
    'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
 
@@ -692,7 +692,7 @@ sub alternate_language_tags {
     ($k,$v) = splice(@panic,0,2);
     foreach my $k (ref($k) ? @$k : $k) {
       foreach my $v (ref($v) ? @$v : $v) {
-        push @{%Panic{$k} ||= []}, $v unless $k eq $v;
+        push @{%Panic{$k} ||= \@()}, $v unless $k eq $v;
       }
     }
   }

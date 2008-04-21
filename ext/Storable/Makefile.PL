@@ -11,12 +11,12 @@ use Config;
 WriteMakefile(
     NAME                => 'Storable',
     DISTNAME            => "Storable",
-    MAN3PODS            => {},
+    MAN3PODS            => \%(),
 # We now ship this in t/
 #    PREREQ_PM           => { 'Test::More' => '0.41' },
     INSTALLDIRS		=> 'perl',
     VERSION_FROM        => 'Storable.pm',
-    dist                => { SUFFIX => 'gz', COMPRESS => 'gzip -f' },
+    dist                => \%( SUFFIX => 'gz', COMPRESS => 'gzip -f' ),
 );
 
 my $ivtype = %Config{ivtype};

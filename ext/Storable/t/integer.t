@@ -46,11 +46,11 @@ my $lots_of_9C = do {
 my $max_iv = ^~^0 >> 1;
 my $min_iv = do {use integer; -$max_iv-1}; # 2s complement assumption
 
-my @processes = (["dclone", \&do_clone],
-                 ["freeze/thaw", \&freeze_and_thaw],
-                 ["nfreeze/thaw", \&nfreeze_and_thaw],
-                 ["store/retrieve", \&store_and_retrieve],
-                 ["nstore/retrieve", \&nstore_and_retrieve],
+my @processes = (\@("dclone", \&do_clone),
+                 \@("freeze/thaw", \&freeze_and_thaw),
+                 \@("nfreeze/thaw", \&nfreeze_and_thaw),
+                 \@("store/retrieve", \&store_and_retrieve),
+                 \@("nstore/retrieve", \&nstore_and_retrieve),
                 );
 my @numbers =
   (# IV bounds of 8 bits

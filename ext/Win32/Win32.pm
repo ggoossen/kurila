@@ -176,19 +176,19 @@ sub GetOSName {
 	    # Magic numbers from MSDN documentation of OSVERSIONINFO
 	    # Most version names can be parsed from just the id and minor
 	    # version
-	    $os = {
-		1 => {
+	    $os = \%(
+		1 => \%(
 		    0  => "95",
 		    10 => "98",
 		    90 => "Me"
-		},
-		2 => {
+		),
+		2 => \%(
 		    0  => "NT4",
 		    1  => "XP/.Net",
 		    2  => "2003",
 		    51 => "NT3.51"
-		}
-	    }->{$id}->{$minor};
+		)
+	    )->{$id}->{$minor};
 	}
 
         # This _really_ shouldnt happen.  At least not for quite a while
@@ -202,7 +202,7 @@ sub GetOSName {
 
         # But distinguising W2k and Vista from NT4 requires looking at the major version
         if ($os eq "NT4") {
-	    $os = {5 => "2000", 6 => "Vista"}->{$major} || "NT4";
+	    $os = \%(5 => "2000", 6 => "Vista")->{$major} || "NT4";
         }
 
         # For the rest we take a look at the build numbers and try to deduce

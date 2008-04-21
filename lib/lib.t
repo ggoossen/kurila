@@ -27,7 +27,7 @@ BEGIN {
     $Auto_Dir = File::Spec->catdir(@lib_dir, %Config{archname},'auto');
     $Module   = File::Spec->catfile(@lib_dir, 'Yup.pm');
 
-    mkpath [$Auto_Dir];
+    mkpath \@($Auto_Dir);
 
     open(MOD, ">", "$Module") || $!-> DIE();
     print MOD <<'MODULE';
@@ -41,7 +41,7 @@ MODULE
 
 END {
     # cleanup the auto/ directory we created.
-    rmtree([@lib_dir[0]]);
+    rmtree(\@(@lib_dir[0]));
 }
 
 

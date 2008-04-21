@@ -31,8 +31,8 @@ use Archive::Tar::Constant;
 ### set up the environment ###
 my @EXPECT_NORMAL = (
     ### dirs        filename    contents
-    [   [],         'c',        qr/^iiiiiiiiiiii\s*$/ ],
-    [   [],         'd',        qr/^uuuuuuuu\s*$/ ],
+    \@(   \@(),         'c',        qr/^iiiiiiiiiiii\s*$/ ),
+    \@(   \@(),         'd',        qr/^uuuuuuuu\s*$/ ),
 );
 
 use bytes;
@@ -44,11 +44,11 @@ my $ALL_CHARS = join '', "\r\n", map( chr, 1..255 ), "zzz\n\r";
 ### order and that the contents and order match exactly when extracted
 my @EXPECTBIN = (
     ###  dirs   filename      contents       ###
-    [    [],    'bIn11',      $ALL_CHARS x 11 ],
-    [    [],    'bIn3',       $ALL_CHARS x  3 ],
-    [    [],    'bIn4',       $ALL_CHARS x  4 ],
-    [    [],    'bIn1',       $ALL_CHARS      ],
-    [    [],    'bIn2',       $ALL_CHARS x  2 ],
+    \@(    \@(),    'bIn11',      $ALL_CHARS x 11 ),
+    \@(    \@(),    'bIn3',       $ALL_CHARS x  3 ),
+    \@(    \@(),    'bIn4',       $ALL_CHARS x  4 ),
+    \@(    \@(),    'bIn1',       $ALL_CHARS      ),
+    \@(    \@(),    'bIn2',       $ALL_CHARS x  2 ),
 );
 
 ### @EXPECTX is used to ensure that $tarx is written in the right
@@ -56,8 +56,8 @@ my @EXPECTBIN = (
 ### the 'x/x' extraction used to fail before A::T 1.08
 my @EXPECTX = (
     ###  dirs       filename    contents
-    [    [ 'x' ],   'k',        '',     ],
-    [    [ 'x' ],   'x',        'j',    ],   # failed before A::T 1.08
+    \@(    \@( 'x' ),   'k',        '',     ),
+    \@(    \@( 'x' ),   'x',        'j',    ),   # failed before A::T 1.08
 );
 
 my $LONG_FILE = qq[directory/really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-really-long-directory-name/myfile];
@@ -70,7 +70,7 @@ my $TOO_LONG    =   ($^O eq 'MSWin32' or $^O eq 'cygwin' or $^O eq 'VMS')
 if ($TOO_LONG) {
     diag("No long filename support - long filename extraction disabled") if ! %ENV{PERL_CORE};
 } else {
-    push @EXPECT_NORMAL, [ [], $LONG_FILE, qr/^hello\s*$/];
+    push @EXPECT_NORMAL, \@( \@(), $LONG_FILE, qr/^hello\s*$/);
 }
 
 my @ROOT        = grep { length }   'src', $TOO_LONG ? 'short' : 'long';
@@ -231,8 +231,8 @@ chmod 0644, $COMPRESS_FILE;
 }
 
 ### add files tests ###
-{   my @add     = map { File::Spec->catfile( @ROOT, @$_ ) } ['b'];
-    my @addunix = map { File::Spec::Unix->catfile( @ROOT, @$_ ) } ['b'];
+{   my @add     = map { File::Spec->catfile( @ROOT, @$_ ) } \@('b');
+    my @addunix = map { File::Spec::Unix->catfile( @ROOT, @$_ ) } \@('b');
     my $tar     = Archive::Tar->new;
 
     ### check we got the object
@@ -306,8 +306,8 @@ chmod 0644, $COMPRESS_FILE;
     {   ### binary data +
         ### dir/file structure -- x/y always went ok, x/x used to extract
         ### in the wrong way -- this test catches that
-        for my $list (  [$TARBIN,   \@EXPECTBIN],
-                        [$TARX,     \@EXPECTX],
+        for my $list (  \@($TARBIN,   \@EXPECTBIN),
+                        \@($TARX,     \@EXPECTX),
         ) {
             ### XXX GLOBAL! changes may affect other tests!
             my($tar,$struct) = @$list;
@@ -386,9 +386,9 @@ SKIP: {
     my $new = Archive::Tar->new;
     ok( $tar->read( $TAR_FILE ),    "Read in '$TAR_FILE'" );
 
-    for my $aref (  [$tar,    \@EXPECT_NORMAL],
-                    [$TARBIN, \@EXPECTBIN],
-                    [$TARX,   \@EXPECTX]
+    for my $aref (  \@($tar,    \@EXPECT_NORMAL),
+                    \@($TARBIN, \@EXPECTBIN),
+                    \@($TARX,   \@EXPECTX)
     ) {
         my($obj,$struct) = @$aref;
 
@@ -490,7 +490,7 @@ SKIP: {
 
 ### limited read + extract tests ###
 {   my $tar     = Archive::Tar->new;
-    my @files   = $tar->read( $TAR_FILE, 0, { limit => 1 } );
+    my @files   = $tar->read( $TAR_FILE, 0, \%( limit => 1 ) );
     my $obj     = @files[0];
 
     is( scalar @files, 1,           "Limited read" );
@@ -746,7 +746,7 @@ sub check_tar_extract {
     }
 
     ### now check if list_files is returning the same info as get_files
-    is_deeply( [$tar->list_files], [ map { $_->full_path } $tar->get_files],
+    is_deeply( \@($tar->list_files), \@( map { $_->full_path } $tar->get_files),
                                     "   Verified via list_files as well" );
 
     #do { rmtree $_->full_path if -d $_->full_path && not $NO_UNLINK }
@@ -791,13 +791,13 @@ sub get_expect_name_and_contents {
         } grep {
             $_->[0] eq $find
         } map {
-            [   ### full path ###
+            \@(   ### full path ###
                 File::Spec::Unix->catfile(
                     grep { length } @{$_->[0]}, $_->[1]
                 ),
                 ### regex
                 $_->[2],
-            ]
+            )
         } @$struct;
 
     ### not a qr// yet?

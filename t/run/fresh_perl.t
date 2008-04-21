@@ -23,7 +23,7 @@ $|=1;
 my @prgs = ();
 while( ~< *DATA) { 
     if(m/^#{8,}\s*(.*)/) { 
-        push @prgs, ['', $1];
+        push @prgs, \@('', $1);
     }
     else { 
         @prgs[-1][0] .= $_;
@@ -52,7 +52,7 @@ foreach my $prog (@prgs) {
 
     $expected =~ s/\n+$//;
 
-    fresh_perl_is($prog, $expected, { switches => [$switch || ''] }, $name);
+    fresh_perl_is($prog, $expected, \%( switches => \@($switch || '') ), $name);
 }
 
 __END__

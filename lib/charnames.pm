@@ -47,7 +47,7 @@ my $txt;
 sub alias (@)
 {
   @_ or return %alias3;
-  my $alias = ref @_[0] ? @_[0] : { @_ };
+  my $alias = ref @_[0] ? @_[0] : \%( @_ );
   %alias3{[keys %$alias]} = values %$alias;
 } # alias
 
@@ -224,7 +224,7 @@ sub import
 
   %^H{charnames_full} = delete %h{':full'};
   %^H{charnames_short} = delete %h{':short'};
-  %^H{charnames_scripts} = [map uc, keys %h];
+  %^H{charnames_scripts} = \@(map uc, keys %h);
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,

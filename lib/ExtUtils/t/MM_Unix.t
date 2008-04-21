@@ -135,7 +135,7 @@ ok ( join (' ', $class->dist_basics()), 'distclean :: realclean distcheck');
 ###############################################################################
 # has_link_code tests
 
-my $t = bless { NAME => "Foo" }, $class;
+my $t = bless \%( NAME => "Foo" ), $class;
 $t->{HAS_LINK_CODE} = 1; 
 is ($t->has_link_code(),1,'has_link_code'); is ($t->{HAS_LINK_CODE},1);
 
@@ -151,7 +151,7 @@ is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT}; $t->{MYEXTLIB} = 1;
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
-delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{C} = [ 'Gloin' ];
+delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{C} = \@( 'Gloin' );
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
 ###############################################################################

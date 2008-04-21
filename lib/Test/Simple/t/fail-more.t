@@ -136,7 +136,7 @@ ERR
 can_ok('Mooble::Hooble::Yooble', qw(this that));
 can_ok('Mooble::Hooble::Yooble', ());
 can_ok(undef, undef);
-can_ok([], "foo");
+can_ok(\@(), "foo");
 err_ok( <<ERR );
 #   Failed test 'Mooble::Hooble::Yooble->can(...)'
 #   at $0 line 52.
@@ -154,10 +154,10 @@ err_ok( <<ERR );
 ERR
 
 #line 55
-isa_ok(bless([], "Foo"), "Wibble");
+isa_ok(bless(\@(), "Foo"), "Wibble");
 isa_ok(42,    "Wibble", "My Wibble");
 isa_ok(undef, "Wibble", "Another Wibble");
-isa_ok([],    "HASH");
+isa_ok(\@(),    "HASH");
 err_ok( <<ERR );
 #   Failed test 'The object isa Wibble'
 #   at $0 line 55.

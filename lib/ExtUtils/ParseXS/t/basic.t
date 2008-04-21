@@ -74,6 +74,6 @@ if ($b->have_compiler) {
 
 #####################################################################
 
-sub Foo::TIEHANDLE { bless {}, 'Foo' }
+sub Foo::TIEHANDLE { bless \%(), 'Foo' }
 sub Foo::PRINT { shift->{buf} .= join '', @_ }
 sub Foo::content { shift->{buf} }

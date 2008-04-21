@@ -107,8 +107,8 @@ else {
 
 plan tests => $TMAX;
 
-is Data::Dumper->Dump(['{'], [qw(a)]), '#$a = "\{";' . "\n";
-is Data::Dumper->Dumpxs(['{'], [qw(a)]), '#$a = "\{";' . "\n" if $XS;
+is Data::Dumper->Dump(\@('{'), \@(qw(a))), '#$a = "\{";' . "\n";
+is Data::Dumper->Dumpxs(\@('{'), \@(qw(a))), '#$a = "\{";' . "\n" if $XS;
 
 #XXXif (0) {
 #############
@@ -116,8 +116,8 @@ is Data::Dumper->Dumpxs(['{'], [qw(a)]), '#$a = "\{";' . "\n" if $XS;
 
 @c = ("c");
 $c = \@c;
-$b = {};
-$a = [1, $b, $c];
+$b = \%();
+$a = \@(1, $b, $c);
 $b->{a} = $a;
 $b->{b} = $a->[1];
 $b->{c} = $a->[2];
@@ -308,9 +308,9 @@ $WANT = <<'EOT';
 #};
 EOT
 
-$foo = { "abc\000\'\efg" => "mno\000",
+$foo = \%( "abc\000\'\efg" => "mno\000",
          "reftest" => \\1,
-       };
+       );
 {
   local $Data::Dumper::Useqq = 1;
   TEST q(Dumper($foo));
@@ -638,7 +638,7 @@ EOT
 {
 
 sub z { print "foo\n" }
-$c = [ \&z ];
+$c = \@( \&z );
 
 ############# 121
 ##
@@ -682,7 +682,7 @@ TEST q(Data::Dumper->new([\&z,$c],['*a','*c'])->Seen({'*b' => \&z})->Dumpxs;)
 }
 
 {
-  $a = [];
+  $a = \@();
   $a->[1] = \$a->[0];
 
 ############# 139
@@ -717,8 +717,8 @@ TEST q(Data::Dumper->new([$a,$b],['a','b'])->Purity(1)->Dumpxs;)
 }
 
 {
-  $a = [{ a => \$b }, { b => undef }];
-  $b = [{ c => \$b }, { d => \$a }];
+  $a = \@(\%( a => \$b ), \%( b => undef ));
+  $b = \@(\%( c => \$b ), \%( d => \$a ));
 
 ############# 151
 ##
@@ -749,7 +749,7 @@ TEST q(Data::Dumper->new([$a,$b],['a','b'])->Purity(1)->Dumpxs;)
 }
 
 {
-  $a = [[[[\\\\\'foo']]]];
+  $a = \@(\@(\@(\@(\\\\\'foo'))));
   $b = $a->[0][0];
   $c = $${$b->[0][0]};
 
@@ -776,11 +776,11 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Purity(1)->Dumpxs;)
 
 {
     $f = "pearl";
-    $e = [        $f ];
-    $d = { 'e' => $e };
-    $c = [        $d ];
-    $b = { 'c' => $c };
-    $a = { 'b' => $b };
+    $e = \@(        $f );
+    $d = \%( 'e' => $e );
+    $c = \@(        $d );
+    $b = \%( 'c' => $c );
+    $a = \%( 'b' => $b );
 
 ############# 163
 ##
@@ -821,7 +821,7 @@ TEST q(Data::Dumper->new([$a,$b,$c],['a','b','c'])->Maxdepth(1)->Dumpxs;)
 
 {
     $a = \$a;
-    $b = [$a];
+    $b = \@($a);
 
 ############# 175
 ##
@@ -865,7 +865,7 @@ EOT
 
 {
   $i = 0;
-  $a = { map { ("$_$_$_", ++$i) } 'I'..'Q' };
+  $a = \%( map { ("$_$_$_", ++$i) } 'I'..'Q' );
 
 ############# 193
 ##
@@ -890,11 +890,11 @@ TEST q(Data::Dumper->new([$a])->Dumpxs;)
 
 {
   $i = 5;
-  $c = { map { (++$i, "$_$_$_") } 'I'..'Q' };
+  $c = \%( map { (++$i, "$_$_$_") } 'I'..'Q' );
   local $Data::Dumper::Sortkeys = \&sort199;
   sub sort199 {
     my $hash = shift;
-    return [ sort { $b <+> $a } keys %$hash ];
+    return \@( sort { $b <+> $a } keys %$hash );
   }
 
 ############# 199
@@ -923,15 +923,15 @@ TEST q(Data::Dumper->new([$c])->Dumpxs;)
 
 {
   $i = 5;
-  $c = { map { (++$i, "$_$_$_") } 'I'..'Q' };
-  $d = { reverse %$c };
+  $c = \%( map { (++$i, "$_$_$_") } 'I'..'Q' );
+  $d = \%( reverse %$c );
   local $Data::Dumper::Sortkeys = \&sort205;
   sub sort205 {
     my $hash = shift;
-    return [ 
+    return \@( 
       $hash \== $c ? (sort { $a <+> $b } keys %$hash)
 		   : (reverse sort keys %$hash)
-    ];
+    );
   }
 
 ############# 205

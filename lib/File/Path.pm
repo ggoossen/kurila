@@ -545,7 +545,7 @@ sub _error {
 
     if ($arg->{error}) {
         $object = '' unless defined $object;
-        push @{${$arg->{error}}}, {$object => "$message: $!"};
+        push @{${$arg->{error}}}, \%($object => "$message: $!");
     }
     else {
         _carp(defined($object) ? "$message for $object: $!" : "$message: $!");
@@ -568,7 +568,7 @@ sub mkpath {
     if ($old_style) {
         my ($verbose, $mode);
         ($paths, $verbose, $mode) = @_;
-        $paths = [$paths] unless UNIVERSAL::isa($paths,'ARRAY');
+        $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY');
         $arg->{verbose} = defined $verbose ? $verbose : 0;
         $arg->{mode}    = defined $mode    ? $mode    : 0777;
     }
@@ -577,12 +577,12 @@ sub mkpath {
             $arg = pop @_;
             exists $arg->{mask} and $arg->{mode} = delete $arg->{mask};
             $arg->{mode} = 0777 unless exists $arg->{mode};
-            ${$arg->{error}} = [] if exists $arg->{error};
+            ${$arg->{error}} = \@() if exists $arg->{error};
         }
         else {
             %{$arg}{[qw(verbose mode)]} = (0, 0777);
         }
-        $paths = [@_];
+        $paths = \@(@_);
     }
     return _mkpath($arg, $paths);
 }
@@ -604,7 +604,7 @@ sub _mkpath {
 	next if -d $path;
 	my $parent = File::Basename::dirname($path);
 	unless (-d $parent or $path eq $parent) {
-            push(@created,_mkpath($arg, [$parent]));
+            push(@created,_mkpath($arg, \@($parent)));
         }
         print "mkdir $path\n" if $arg->{verbose};
         if (mkdir($path,$arg->{mode})) {
@@ -618,7 +618,7 @@ sub _mkpath {
             if (!-d $path) {
                 $! = $save_bang;
                 if ($arg->{error}) {
-                    push @{${$arg->{error}}}, {$path => $e};
+                    push @{${$arg->{error}}}, \%($path => $e);
                 }
                 else {
                     _croak("mkdir $path: $e");
@@ -642,7 +642,7 @@ sub rmtree {
         $arg->{safe}    = defined $safe    ? $safe    : 0;
 
         if (defined($paths)) {
-            $paths = [$paths] unless UNIVERSAL::isa($paths,'ARRAY');
+            $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY');
         }
         else {
             die ("No root path(s) specified\n");
@@ -652,13 +652,13 @@ sub rmtree {
     else {
         if (@_ +> 0 and UNIVERSAL::isa(@_[-1],'HASH')) {
             $arg = pop @_;
-            ${$arg->{error}}  = [] if exists $arg->{error};
-            ${$arg->{result}} = [] if exists $arg->{result};
+            ${$arg->{error}}  = \@() if exists $arg->{error};
+            ${$arg->{result}} = \@() if exists $arg->{result};
         }
         else {
             %{$arg}{[qw(verbose safe)]} = (0, 0);
     }
-        $paths = [@_];
+        $paths = \@(@_);
     }
 
     $arg->{prefix} = '';
@@ -777,7 +777,7 @@ sub _rmtree {
 
             if (@files) {
                 # remove the contained files before the directory itself
-                my $narg = {%$arg};
+                my $narg = \%(%$arg);
                 %{$narg}{[qw(device inode cwd prefix depth)]}
                     = ($device, $inode, $updir, $canon, $arg->{depth}+1);
                 $count += _rmtree($narg, \@files);

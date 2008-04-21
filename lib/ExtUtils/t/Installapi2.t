@@ -41,7 +41,7 @@ local %ENV{EU_ALWAYS_COPY};
 chdir 'Big-Dummy';
 
 my $stdout = tie *STDOUT, 'TieOut';
-pm_to_blib( { 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' },
+pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
 END { rmtree 'blib' }
@@ -51,7 +51,7 @@ ok( -r 'blib/lib/Big/Dummy.pm', '  copied .pm file' );
 ok( -r 'blib/lib/auto',         '  created autosplit dir' );
 is( $stdout->read, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
 
-pm_to_blib( { 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' },
+pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
 ok( -d 'blib/lib',              'second run, blib dir still there' );
@@ -59,21 +59,21 @@ ok( -r 'blib/lib/Big/Dummy.pm', '  .pm file still there' );
 ok( -r 'blib/lib/auto',         '  autosplit still there' );
 is( $stdout->read, "Skip blib/lib/Big/Dummy.pm (unchanged)\n" );
 
-install( [
-    from_to=>{ 'blib/lib' => 'install-test/lib/perl',
+install( \@(
+    from_to=>\%( 'blib/lib' => 'install-test/lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
-    dry_run=>1]);
+         ),
+    dry_run=>1));
 ok( ! -d 'install-test/lib/perl',        'install made dir (dry run)');
 ok( ! -r 'install-test/lib/perl/Big/Dummy.pm',
                                          '  .pm file installed (dry run)');
 ok( ! -r 'install-test/packlist',        '  packlist exists (dry run)');
 
-install([ from_to=> { 'blib/lib' => 'install-test/lib/perl',
+install(\@( from_to=> \%( 'blib/lib' => 'install-test/lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         } ]);
+         ) ));
 ok( -d 'install-test/lib/perl',                 'install made dir' );
 ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
 ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
@@ -91,10 +91,10 @@ is( lc((keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
 
 
 # Test UNINST=1 preserving same versions in other dirs.
-install([from_to=> { 'blib/lib' => 'install-test/other_lib/perl',
+install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },uninstall_shadows=>1]);
+         ),uninstall_shadows=>1));
 ok( -d 'install-test/other_lib/perl',        'install made other dir' );
 ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
 ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -113,10 +113,10 @@ close DUMMY;
 
   local @INC = ('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
-  install([from_to=> { 'blib/lib' => 'install-test/other_lib/perl',
+  install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         }]);
+         )));
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -134,11 +134,11 @@ close DUMMY;
   my @warn;
   local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
   my $ok=eval {
-    install([from_to=> { 'blib/lib' => 'install-test/other_lib/perl',
+    install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
-       uninstall_shadows=>1]);
+         ),
+       uninstall_shadows=>1));
     1
   };
   ok($ok,'  we didnt die');
@@ -160,10 +160,10 @@ close DUMMY;
   my @warn;
   local %SIG{__WARN__}=sub { push @warn,@_; return };
   my $ok=eval {
-    install([from_to=> { 'blib/lib' => 'install-test/other_lib/perl',
+    install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },uninstall_shadows=>1]);
+         ),uninstall_shadows=>1));
     1
   };
   ok(!$ok,'  we did die');
@@ -179,10 +179,10 @@ close DUMMY;
   local @INC = ('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
   ok( -r 'install-test/lib/perl/Big/Dummy.pm','different install exists' );
-  install([from_to=>{ 'blib/lib' => 'install-test/other_lib/perl',
+  install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },uninstall_shadows=>1]);
+         ),uninstall_shadows=>1));
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -201,10 +201,10 @@ close DUMMY;
   ok(-r $sfile,"source file already exists");
   utime time-600, time-600, $sfile or die "utime '$sfile' failed:$!";   
   ok( (stat $tfile)[[9]]!=(stat $sfile)[[9]],'  Times are different');
-  install([from_to=>{ 'blib/lib' => 'install-test/other_lib/perl',
+  install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },result=>\my %result]);
+         ),result=>\my %result));
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -222,10 +222,10 @@ close DUMMY;
   ok(-r $sfile,"source file already exists");
   utime time-1200, time-1200, $sfile or die "utime '$sfile' failed:$!";   
   ok( (stat $tfile)[[9]]!=(stat $sfile)[[9]],'  Times are different');
-  install([from_to=>{ 'blib/lib' => 'install-test/other_lib/perl',
+  install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },result=>\my %result]);
+         ),result=>\my %result));
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );

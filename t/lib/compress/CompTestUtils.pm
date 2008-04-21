@@ -41,7 +41,7 @@ sub like_eval
         }
         chmod 0777, @_;
         for (@_) { 1 while unlink $_ } ;
-        bless [ @_ ], $self ;
+        bless \@( @_ ), $self ;
     }
 
     sub DESTROY
@@ -61,7 +61,7 @@ sub like_eval
     {
         my $self = shift ;
         foreach (@_) { rmtree $_ }
-        bless [ @_ ], $self ;
+        bless \@( @_ ), $self ;
     }
 
     sub DESTROY
@@ -529,7 +529,7 @@ sub mkComplete
         %params = (
             Name       => "My name",
             Comment    => "a comment",
-            ExtraField => ['ab' => "extra"],
+            ExtraField => \@('ab' => "extra"),
             HeaderCRC  => 1);
     }
     elsif ($class eq 'IO::Compress::Zip'){
@@ -537,9 +537,9 @@ sub mkComplete
             Name              => "My name",
             Comment           => "a comment",
             ZipComment        => "last comment",
-            exTime            => [100, 200, 300],
-            ExtraFieldLocal   => ["ab" => "extra1"],
-            ExtraFieldCentral => ["cd" => "extra2"],
+            exTime            => \@(100, 200, 300),
+            ExtraFieldLocal   => \@("ab" => "extra1"),
+            ExtraFieldCentral => \@("cd" => "extra2"),
         );
     }
 

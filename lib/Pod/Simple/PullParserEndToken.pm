@@ -6,7 +6,7 @@ use strict;
 
 sub new {  # Class->new(tagname);
   my $class = shift;
-  return bless ['end', @_], ref($class) || $class;
+  return bless \@('end', @_), ref($class) || $class;
 }
 
 # Purely accessors:

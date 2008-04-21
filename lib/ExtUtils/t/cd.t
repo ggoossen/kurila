@@ -24,7 +24,7 @@ my @cd_args = ("some/dir", "command1", "command2");
     use ExtUtils::MM_Win32;
     @ISA = qw(ExtUtils::MM_Win32);
 
-    my $mm = bless {}, 'Test::MM_Win32';
+    my $mm = bless \%(), 'Test::MM_Win32';
 
     {
         local *make = sub { "nmake" };

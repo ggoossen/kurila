@@ -34,7 +34,7 @@ use XSLoader ();
 );
 
 %EXPORT_TAGS = (
-    'glob' => [ qw(
+    'glob' => \@( qw(
         GLOB_ABEND
 	GLOB_ALPHASORT
         GLOB_ALTDIRFUNC
@@ -53,7 +53,7 @@ use XSLoader ();
         GLOB_TILDE
         glob
         bsd_glob
-    ) ],
+    ) ),
 );
 
 $VERSION = '1.06';
@@ -144,10 +144,10 @@ sub csh_glob {
     # if we're just beginning, do it all first
     if (%iter{$cxix} == 0) {
 	if (@pat) {
-	    %entries{$cxix} = [ map { doglob($_, $DEFAULT_FLAGS) } @pat ];
+	    %entries{$cxix} = \@( map { doglob($_, $DEFAULT_FLAGS) } @pat );
 	}
 	else {
-	    %entries{$cxix} = [ doglob($pat, $DEFAULT_FLAGS) ];
+	    %entries{$cxix} = \@( doglob($pat, $DEFAULT_FLAGS) );
 	}
     }
 

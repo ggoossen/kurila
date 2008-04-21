@@ -1369,12 +1369,12 @@ foreach my $file (0, 1)
     #ok ! -e $name1, "  File $name1 does not exist";
 
     my @data = (
-        [ '{ }',         "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
-        [ '[ { } ]',     "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
-        [ '[ [ { } ] ]', "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ], 
-        [ '[ "" ]',      "{$CompressClass}::write: input filename is undef or null string" ], 
-        [ '[ undef ]',   "{$CompressClass}::write: input filename is undef or null string" ], 
-        [ '[ \$Answer ]',"{$CompressClass}::write: input and output buffer are identical" ], 
+        \@( '{ }',         "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ), 
+        \@( '[ { } ]',     "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ), 
+        \@( '[ [ { } ] ]', "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ), 
+        \@( '[ "" ]',      "{$CompressClass}::write: input filename is undef or null string" ), 
+        \@( '[ undef ]',   "{$CompressClass}::write: input filename is undef or null string" ), 
+        \@( '[ \$Answer ]',"{$CompressClass}::write: input and output buffer are identical" ), 
         #[ "not readable", 'xx' ], 
         # same filehandle twice, 'xx'
        ) ;

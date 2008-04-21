@@ -132,7 +132,7 @@ sub output
 
 sub getOneShotParams
 {
-    return ( 'MultiStream' => [1, 1, Parse_boolean,   1],
+    return ( 'MultiStream' => \@(1, 1, Parse_boolean,   1),
            );
 }
 
@@ -144,20 +144,20 @@ sub checkParams
     my $got = shift || IO::Compress::Base::Parameters::new();
 
     $got->parse(
-        {
+        \%(
             # Generic Parameters
-            'AutoClose' => [1, 1, Parse_boolean,   0],
+            'AutoClose' => \@(1, 1, Parse_boolean,   0),
             #'Encode'    => [1, 1, Parse_any,       undef],
-            'Strict'    => [0, 1, Parse_boolean,   1],
-            'Append'    => [1, 1, Parse_boolean,   0],
-            'BinModeIn' => [1, 1, Parse_boolean,   0],
+            'Strict'    => \@(0, 1, Parse_boolean,   1),
+            'Append'    => \@(1, 1, Parse_boolean,   0),
+            'BinModeIn' => \@(1, 1, Parse_boolean,   0),
 
-            'FilterEnvelope' => [1, 1, Parse_any,   undef],
+            'FilterEnvelope' => \@(1, 1, Parse_any,   undef),
 
             $self->getExtraParams(),
             *$self->{OneShot} ? $self->getOneShotParams() 
                               : (),
-        }, 
+        ), 
         @_) or $self->croakError("{$class}: $got->{Error}")  ;
 
     return $got ;

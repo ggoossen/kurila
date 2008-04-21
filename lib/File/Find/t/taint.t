@@ -44,14 +44,14 @@ use Cwd;
 cleanup();
 
 my $found;
-find({wanted => sub { $found = 1 if ($_ eq 'commonsense.t') },
-		untaint => 1, untaint_pattern => qr|^(.+)$|}, File::Spec->curdir);
+find(\%(wanted => sub { $found = 1 if ($_ eq 'commonsense.t') },
+		untaint => 1, untaint_pattern => qr|^(.+)$|), File::Spec->curdir);
 
 ok($found, 'commonsense.t found');
 $found = 0;
 
-finddepth({wanted => sub { $found = 1 if $_ eq 'commonsense.t'; },
-           untaint => 1, untaint_pattern => qr|^(.+)$|}, File::Spec->curdir);
+finddepth(\%(wanted => sub { $found = 1 if $_ eq 'commonsense.t'; },
+           untaint => 1, untaint_pattern => qr|^(.+)$|), File::Spec->curdir);
 
 ok($found, 'commonsense.t found again');
 
@@ -274,8 +274,8 @@ delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
 
 delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
 
-File::Find::find( {wanted => \&wanted_File_Dir_prune, untaint => 1,
-		   untaint_pattern => qr|^(.+)$|}, topdir('fa') );
+File::Find::find( \%(wanted => \&wanted_File_Dir_prune, untaint => 1,
+		   untaint_pattern => qr|^(.+)$|), topdir('fa') );
 
 is(scalar keys %Expect_File, 0, 'Found all expected files');
 
@@ -285,7 +285,7 @@ is(scalar keys %Expect_File, 0, 'Found all expected files');
 %Expect_Name = ();
 %Expect_Dir  = ();
 undef $@;
-eval {File::Find::find( {wanted => \&simple_wanted}, topdir('fa') );};
+eval {File::Find::find( \%(wanted => \&simple_wanted), topdir('fa') );};
 like( $@->{description}, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
 chdir($cwd_untainted);
 
@@ -293,8 +293,8 @@ chdir($cwd_untainted);
 # untaint pattern doesn't match, should die
 undef $@;
 
-eval {File::Find::find( {wanted => \&simple_wanted, untaint => 1,
-                         untaint_pattern => qr|^(NO_MATCH)$|},
+eval {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
+                         untaint_pattern => qr|^(NO_MATCH)$|),
                          topdir('fa') );};
 
 like( $@->{description}, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
@@ -305,9 +305,9 @@ chdir($cwd_untainted);
 print "# check untaint_skip (No follow)\n";
 undef $@;
 
-eval {File::Find::find( {wanted => \&simple_wanted, untaint => 1,
+eval {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_skip => 1, untaint_pattern =>
-                         qr|^(NO_MATCH)$|}, topdir('fa') );};
+                         qr|^(NO_MATCH)$|), topdir('fa') );};
 
 print "# $@->{description}\n" if $@;
 #$^D = 8;
@@ -348,9 +348,9 @@ SKIP: {
 		   dir_path('fb') => 1,
 		   dir_path('fb', 'fba') => 1);
 
-    File::Find::find( {wanted => \&wanted_File_Dir, follow_fast => 1,
+    File::Find::find( \%(wanted => \&wanted_File_Dir, follow_fast => 1,
                        no_chdir => 1, untaint => 1, untaint_pattern =>
-                       qr|^(.+)$| }, topdir('fa') );
+                       qr|^(.+)$| ), topdir('fa') );
 
     is( scalar(keys %Expect_File), 0, 'Found all files in symlink test' );
 
@@ -358,7 +358,7 @@ SKIP: {
     # don't untaint at all, should die
     undef $@;
 
-    eval {File::Find::find( {wanted => \&simple_wanted, follow => 1},
+    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
 			    topdir('fa') );};
 
     like( $@->{description}, qr|Insecure dependency|, 'Not untainting causes death (good)' );
@@ -367,9 +367,9 @@ SKIP: {
     # untaint pattern doesn't match, should die
     undef $@;
 
-    eval {File::Find::find( {wanted => \&simple_wanted, follow => 1,
+    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                              untaint => 1, untaint_pattern =>
-                             qr|^(NO_MATCH)$|}, topdir('fa') );};
+                             qr|^(NO_MATCH)$|), topdir('fa') );};
 
     like( $@->{description}, qr|is still tainted|, 'Bat untaint pattern causes death (good)' );
     chdir($cwd_untainted);
@@ -378,9 +378,9 @@ SKIP: {
     print "# check untaint_skip (Follow)\n";
     undef $@;
 
-    eval {File::Find::find( {wanted => \&simple_wanted, untaint => 1,
+    eval {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                              untaint_skip => 1, untaint_pattern =>
-                             qr|^(NO_MATCH)$|}, topdir('fa') );};
+                             qr|^(NO_MATCH)$|), topdir('fa') );};
     like( $@->{description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
 
     chdir($cwd_untainted);

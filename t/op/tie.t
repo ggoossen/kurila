@@ -27,7 +27,7 @@ for (@prgs){
     $TODO = $testname =~ s/^TODO //;
     $expected =~ s/\n+$//;
 
-    fresh_perl_is($prog, $expected, {}, $testname);
+    fresh_perl_is($prog, $expected, \%(), $testname);
 }
 
 __END__

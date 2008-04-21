@@ -59,12 +59,12 @@ my @commands = (
   ".\\$cmdbx",
   "$cwd/$cmdx",
   "$cwdb\\$cmdbx",
-  [$^X, $batx],
-  [$^X, $batbx],
-  [$^X, "./$batx"],
-  [$^X, ".\\$batbx"],
-  [$^X, "$cwd/$batx"],
-  [$^X, "$cwdb\\$batbx"],
+  \@($^X, $batx),
+  \@($^X, $batbx),
+  \@($^X, "./$batx"),
+  \@($^X, ".\\$batbx"),
+  \@($^X, "$cwd/$batx"),
+  \@($^X, "$cwdb\\$batbx"),
 );
 
 my @av = (
@@ -77,11 +77,11 @@ my @av = (
   "abc\t",
   " abc\t",
   "\ta b c ",
-  ["\ta b c ", ""],
-  ["\ta b c ", " "],
-  ["", "\ta b c ", "abc"],
-  [" ", "\ta b c ", "abc"],
-  ['" "', 'a" "b" "c', "abc"],
+  \@("\ta b c ", ""),
+  \@("\ta b c ", " "),
+  \@("", "\ta b c ", "abc"),
+  \@(" ", "\ta b c ", "abc"),
+  \@('" "', 'a" "b" "c', "abc"),
 );
 
 print "1.." . (@commands * @av * 2) . "\n";

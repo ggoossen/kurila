@@ -275,7 +275,7 @@ sub _init_headings {
 
     ## Initialize current section heading titles if necessary
     unless (defined %myData{_SECTION_HEADINGS}) {
-        local *section_headings = %myData{_SECTION_HEADINGS} = [];
+        local *section_headings = %myData{_SECTION_HEADINGS} = \@();
         for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
             @section_headings[$i] = '';
         }
@@ -360,7 +360,7 @@ sub select {
         delete %myData{_SELECTED_SECTIONS}  unless ($add);
         return;
     }
-    %myData{_SELECTED_SECTIONS} = []
+    %myData{_SELECTED_SECTIONS} = \@()
         unless ($add  &&  exists %myData{_SELECTED_SECTIONS});
     local *selected_sections = %myData{_SELECTED_SECTIONS};
 
@@ -699,7 +699,7 @@ sub _compile_section_spec {
             $_ = '!' . $_  if ($negated);
         }
     }
-    return  (! $bad_regexs) ? [ @regexs ] : undef;
+    return  (! $bad_regexs) ? \@( @regexs ) : undef;
 }
 
 ##---------------------------------------------------------------------------

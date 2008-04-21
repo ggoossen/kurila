@@ -78,7 +78,7 @@ is( $f2->(), 2, 'generator 2 once more' );
 {
     package countfetches;
     our $fetchcount = 0;
-    sub TIESCALAR {bless {}};
+    sub TIESCALAR {bless \%()};
     sub FETCH { ++$fetchcount; 18 };
     tie my $y, "countfetches";
     sub foo { state $x //= $y; $x++ }
@@ -93,11 +93,11 @@ is( $f2->(), 2, 'generator 2 once more' );
 sub gen_cashier {
     my $amount = shift;
     state $cash_in_store;
-    return {
+    return \%(
 	add => sub { $cash_in_store += $amount },
 	del => sub { $cash_in_store -= $amount },
 	bal => sub { $cash_in_store },
-    };
+    );
 }
 
 gen_cashier(59)->{add}->();

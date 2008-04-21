@@ -175,7 +175,7 @@ else {
 
 # Two-arg tv_interval() is always available.
 {
-    my $f = tv_interval [5, 100_000], [10, 500_000];
+    my $f = tv_interval \@(5, 100_000), \@(10, 500_000);
     ok 9, abs($f - 5.4) +< 0.001, $f;
 }
 
@@ -183,7 +183,7 @@ unless ($have_gettimeofday) {
     skip 10;
 }
 else {
-    my $r = [gettimeofday()];
+    my $r = \@(gettimeofday());
     my $f = tv_interval $r;
     ok 10, $f +< 2, $f;
 }
@@ -192,7 +192,7 @@ unless ($have_usleep && $have_gettimeofday) {
     skip 11;
 }
 else {
-    my $r = [ gettimeofday() ];
+    my $r = \@( gettimeofday() );
     Time::HiRes::sleep( 0.5 );
     my $f = tv_interval $r;
     ok 11, $f +> 0.4 && $f +< 0.9, "slept $f instead of 0.5 secs.";
@@ -257,11 +257,11 @@ unless (   defined &Time::HiRes::gettimeofday
     print "# time...$f\n";
     print "ok 15\n";
 
-    $r = [Time::HiRes::gettimeofday()];
+    $r = \@(Time::HiRes::gettimeofday());
     sleep (0.5);
     print "# sleep...", Time::HiRes::tv_interval($r), "\nok 16\n";
 
-    $r = [Time::HiRes::gettimeofday()];
+    $r = \@(Time::HiRes::gettimeofday());
     $i = 5;
     my $oldaction;
     if ($use_sigaction) {
@@ -345,7 +345,7 @@ unless (   defined &Time::HiRes::setitimer
     use Time::HiRes qw(setitimer getitimer ITIMER_VIRTUAL);
 
     my $i = 3;
-    my $r = [Time::HiRes::gettimeofday()];
+    my $r = \@(Time::HiRes::gettimeofday());
 
     %SIG{VTALRM} = sub {
 	$i ? $i-- : setitimer(&ITIMER_VIRTUAL, 0);
@@ -624,10 +624,10 @@ if ($have_ualarm) {
     # 1_100_000 sligthly over 1_000_000,
     # 2_200_000 slightly over 2**31/1000,
     # 4_300_000 slightly over 2**32/1000.
-    for my $t ([34, 100_000],
-	       [35, 1_100_000],
-	       [36, 2_200_000],
-	       [37, 4_300_000]) {
+    for my $t (\@(34, 100_000),
+	       \@(35, 1_100_000),
+	       \@(36, 2_200_000),
+	       \@(37, 4_300_000)) {
 	my ($i, $n) = @$t;
 	my $alarmed = 0;
 	local %SIG{ ALRM } = sub { $alarmed++ };

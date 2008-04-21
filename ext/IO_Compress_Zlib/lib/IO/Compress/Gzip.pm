@@ -67,15 +67,15 @@ sub getExtraParams
             $self->getZlibParams(),
 
             # Gzip header fields
-            'Minimal'   => [0, 1, Parse_boolean,   0],
-            'Comment'   => [0, 1, Parse_any,       undef],
-            'Name'      => [0, 1, Parse_any,       undef],
-            'Time'      => [0, 1, Parse_any,       undef],
-            'TextFlag'  => [0, 1, Parse_boolean,   0],
-            'HeaderCRC' => [0, 1, Parse_boolean,   0],
-            'OS_Code'   => [0, 1, Parse_unsigned,  $Compress::Raw::Zlib::gzip_os_code],
-            'ExtraField'=> [0, 1, Parse_any,       undef],
-            'ExtraFlags'=> [0, 1, Parse_any,       undef],
+            'Minimal'   => \@(0, 1, Parse_boolean,   0),
+            'Comment'   => \@(0, 1, Parse_any,       undef),
+            'Name'      => \@(0, 1, Parse_any,       undef),
+            'Time'      => \@(0, 1, Parse_any,       undef),
+            'TextFlag'  => \@(0, 1, Parse_boolean,   0),
+            'HeaderCRC' => \@(0, 1, Parse_boolean,   0),
+            'OS_Code'   => \@(0, 1, Parse_unsigned,  $Compress::Raw::Zlib::gzip_os_code),
+            'ExtraField'=> \@(0, 1, Parse_any,       undef),
+            'ExtraFlags'=> \@(0, 1, Parse_any,       undef),
 
         );
 }

@@ -83,11 +83,11 @@ sub new {
 
     my %args = @_;
 
-    my $self = {};
+    my $self = \%();
 
     if (%args{config_override}) {
         eval {
-            $self->{':private:'}{Config} = { %{%args{config_override}} };
+            $self->{':private:'}{Config} = \%( %{%args{config_override}} );
         } or Carp::croak(
             "The 'config_override' parameter must be a hash reference."
         );
@@ -96,13 +96,13 @@ sub new {
         $self->{':private:'}{Config} = \%Config;
     }
     
-    for my $tuple ([inc_override => INC => [ @INC ] ],
-                   [ extra_libs => EXTRA => [] ]) 
+    for my $tuple (\@(inc_override => INC => \@( @INC ) ),
+                   \@( extra_libs => EXTRA => \@() )) 
     {
         my ($arg,$key,$val)=@$tuple;
         if ( %args{$arg} ) {
             eval {
-                $self->{':private:'}{$key} = [ @{%args{$arg}} ];
+                $self->{':private:'}{$key} = \@( @{%args{$arg}} );
             } or Carp::croak(
                 "The '$arg' parameter must be an array reference."
             );

@@ -33,7 +33,7 @@ print form
 print "\n\n";
 
 
-print form {rfill=>0},
+print form \%(rfill=>0),
 	"\{]],]],]]].[\x{20A8}\}",
 	\@amounts;
 
@@ -52,7 +52,7 @@ print form
 
 print "\n\n";
 
-print form {rfill=>0},
+print form \%(rfill=>0),
 	'{$]]].[¢}',
 	\@amounts;
 

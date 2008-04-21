@@ -26,9 +26,9 @@ sub expected {
 
 # test blessing simple types
 
-$a1 = bless {}, "A";
+$a1 = bless \%(), "A";
 expected($a1, "A", "HASH");
-$b1 = bless [], "B";
+$b1 = bless \@(), "B";
 expected($b1, "B", "ARRAY");
 $c1 = bless \(map "$_", "test"), "C";
 expected($c1, "C", "SCALAR");
@@ -36,7 +36,7 @@ our $test = "foo"; $d1 = bless \*test, "D";
 expected($d1, "D", "GLOB");
 $e1 = bless sub { 1 }, "E";
 expected($e1, "E", "CODE");
-$f1 = bless \[], "F";
+$f1 = bless \\@(), "F";
 expected($f1, "F", "REF");
 $g1 = bless \vec("test", 1, 2), "G";
 expected($g1, "G", "LVALUE");
@@ -54,7 +54,7 @@ expected($a1, "A2", "HASH");
 # local and my
 {
     local $a1 = bless $a1, "A3";	# should rebless outer $a1
-    local $b1 = bless [], "B3";
+    local $b1 = bless \@(), "B3";
     my $c1 = bless $c1, "C3";		# should rebless outer $c1
     our $test2 = ""; my $d1 = bless \*test2, "D3";
     expected($a1, "A3", "HASH");
@@ -69,13 +69,13 @@ expected($d1, "D", "GLOB");
 
 # class is magic
 "E" =~ m/(.)/;
-expected(bless({}, $1), "E", "HASH");
+expected(bless(\%(), $1), "E", "HASH");
 {
     local $! = 1;
     my $string = "$!";
     $! = 2;	# attempt to avoid cached string
     $! = 1;
-    expected(bless({}, $!), $string, "HASH");
+    expected(bless(\%(), $!), $string, "HASH");
 
 # ref is ref to magic
     {
@@ -94,29 +94,29 @@ expected(bless({}, $1), "E", "HASH");
 ### example of magic variable that is a reference??
 
 # no class, or empty string (with a warning), or undef (with two)
-expected(bless([]), 'main', "ARRAY");
+expected(bless(\@()), 'main', "ARRAY");
 {
     local $^WARN_HOOK = sub { push @w, @_[0]->message };
     use warnings;
 
-    my $m = bless [];
+    my $m = bless \@();
     expected($m, 'main', "ARRAY");
     is (scalar @w, 0);
 
     @w = ();
-    $m = bless [], '';
+    $m = bless \@(), '';
     expected($m, 'main', "ARRAY");
     is (scalar @w, 1);
 
     @w = ();
-    $m = bless [], undef;
+    $m = bless \@(), undef;
     expected($m, 'main', "ARRAY");
     is (scalar @w, 2);
 }
 
 # class is a ref
-$a1 = bless {}, "A4";
-$b1 = eval { bless {}, $a1 };
+$a1 = bless \%(), "A4";
+$b1 = eval { bless \%(), $a1 };
 like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
 
 # class is an overloaded ref
@@ -124,7 +124,7 @@ like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
     package H4;
     use overload '""' => sub { "C4" };
 }
-my $h1 = bless {}, "H4";
+my $h1 = bless \%(), "H4";
 my $c4 = eval { bless \$test, $h1 };
 is ($@, '', "class is an overloaded ref");
 expected($c4, 'C4', "SCALAR");

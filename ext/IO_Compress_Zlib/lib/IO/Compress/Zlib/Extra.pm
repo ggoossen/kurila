@@ -83,11 +83,11 @@ sub parseRawExtra
         return ExtraFieldError("Truncated in FEXTRA Body Section")
             if $offset + $subLen +> $XLEN ;
 
-        my $bad = validateExtraFieldPair( [$id, 
-                                           substr($data, $offset, $subLen)], 
+        my $bad = validateExtraFieldPair( \@($id, 
+                                           substr($data, $offset, $subLen)), 
                                            $strict, $gzipMode );
         return $bad if $bad ;
-        push @$extraRef, [$id => substr($data, $offset, $subLen)]
+        push @$extraRef, \@($id => substr($data, $offset, $subLen))
             if defined $extraRef;;
 
         $offset += $subLen ;
@@ -163,8 +163,8 @@ sub parseExtraField
                 unless @$data % 2  == 0;
 
             for (my $ix = 0; $ix +<= length(@$data) -1 ; $ix += 2) {
-                my $bad = validateExtraFieldPair([$data->[$ix],
-                                                  $data->[$ix+1]], 
+                my $bad = validateExtraFieldPair(\@($data->[$ix],
+                                                  $data->[$ix+1]), 
                                                  $strict, $gzipMode) ;
                 return $bad if $bad ;
 
@@ -174,7 +174,7 @@ sub parseExtraField
     }   
     elsif (ref $data eq 'HASH') {    
         while (my ($id, $info) = each %$data) {
-            my $bad = validateExtraFieldPair([$id, $info], $strict, $gzipMode);
+            my $bad = validateExtraFieldPair(\@($id, $info), $strict, $gzipMode);
             return $bad if $bad ;
 
             $out .= mkSubField($id, $info);

@@ -28,7 +28,7 @@ print "1..12\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, 'CLASS';
+$c = bless \%(), 'CLASS';
 $c->{attribute} = 'attrval';
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
@@ -49,7 +49,7 @@ print "ok 4\n";
 package FOO; @ISA = qw(Storable);
 
 sub make {
-	my $self = bless {};
+	my $self = bless \%();
 	$self->{key} = \%main::a;
 	return $self;
 };
@@ -95,8 +95,8 @@ print ref $clone eq ref $empty_string_obj &&
 # Do not fail if Tie::Hash and/or Tie::StdHash is not available
 if (eval { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     tie my %tie, "Tie::StdHash" or die $!;
-    %tie{array} = [1,2,3,4];
-    %tie{hash} = {1,2,3,4};
+    %tie{array} = \@(1,2,3,4);
+    %tie{hash} = \%(1,2,3,4);
     my $clone_array = dclone %tie{array};
     print "not " unless "@$clone_array" eq "@{%tie{array}}";
     print "ok 11\n";

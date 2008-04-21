@@ -68,7 +68,7 @@ sub is($$$)
         is(threads->tid(), $self->{tid}, "In destroy[$self->{tid}] it should be correct too" );
     }
 
-    my $foo = bless {tid => 0}, 'Foo';
+    my $foo = bless \%(tid => 0), 'Foo';
     my $bar = threads->create(sub {
         is(threads->tid(), 1, "And tid be 1 here");
         $foo->{tid} = 1;

@@ -67,15 +67,15 @@ sub make_fail {
 
 package IO::Socket::INET;
 
-%fail{'IO::Socket::INET'} = {
+%fail{'IO::Socket::INET'} = \%(
 	new		=> 0,
 	'send'	=> 0,
-};
+);
 
 sub new {
 	my $class = shift;
 	return if %fail{$class}{new} and %fail{$class}{new}--;
-	bless( { @_ }, $class );
+	bless( \%( @_ ), $class );
 }
 
 sub send {
@@ -115,7 +115,7 @@ package IO::Select;
 sub new {
 	my $class = shift;
 	return if defined %fail{$class}{new} and %fail{$class}{new}--;
-	bless({sock => shift}, $class);
+	bless(\%(sock => shift), $class);
 }
 
 sub can_read {

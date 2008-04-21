@@ -452,7 +452,7 @@ sub _create_runperl { # Create the string to qx in runperl().
     if (defined %args{prog}) {
 	die "test.pl:runperl(): both 'prog' and 'progs' cannot be used " . _where()
 	    if defined %args{progs};
-        %args{progs} = [%args{prog}]
+        %args{progs} = \@(%args{prog})
     }
     if (defined %args{progs}) {
 	die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
@@ -641,7 +641,7 @@ END { unlink_all $tmpfile }
 sub _fresh_perl {
     my($prog, $resolve, $runperl_args, $name) = @_;
 
-    $runperl_args ||= {};
+    $runperl_args ||= \%();
     $runperl_args->{progfile} = $tmpfile;
     $runperl_args->{stderr} = 1;
 

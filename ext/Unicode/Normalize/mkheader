@@ -120,7 +120,7 @@ while ($Combin =~ m/(.+)/g) {
 while ($Decomp =~ m/(.+)/g) {
     my @tab = split m/\t/, $1;
     my $compat = @tab[2] =~ s/<[^>]+>//;
-    my $dec = [ _getHexArray(@tab[2]) ]; # decomposition
+    my $dec = \@( _getHexArray(@tab[2]) ); # decomposition
     my $ini = hex(@tab[0]); # initial decomposable character
 
     my $listname =
@@ -199,12 +199,12 @@ sub getCompatList {
 
 # exhaustive decomposition
 foreach my $key (keys %Canon) {
-    %Canon{$key}  = [ getCanonList($key) ];
+    %Canon{$key}  = \@( getCanonList($key) );
 }
 
 # exhaustive decomposition
 foreach my $key (keys %Compat) {
-    %Compat{$key} = [ getCompatList($key) ];
+    %Compat{$key} = \@( getCompatList($key) );
 }
 
 sub _pack_U {
@@ -236,26 +236,26 @@ foreach my $hash (\%Canon, \%Compat) {
 ########## writing header files ##########
 
 my @boolfunc = (
-    {
+    \%(
 	name => "Exclusion",
 	type => "bool",
 	hash => \%Exclus,
-    },
-    {
+    ),
+    \%(
 	name => "Singleton",
 	type => "bool",
 	hash => \%Single,
-    },
-    {
+    ),
+    \%(
 	name => "NonStDecomp",
 	type => "bool",
 	hash => \%NonStD,
-    },
-    {
+    ),
+    \%(
 	name => "Comp2nd",
 	type => "bool",
 	hash => \%Comp2nd,
-    },
+    ),
 );
 
 my $file = "unfexc.h";
@@ -308,35 +308,35 @@ foreach my $i (sort keys %CompList) {
 }
 
 my @tripletable = (
-    {
+    \%(
 	file => "unfcmb",
 	name => "combin",
 	type => "STDCHAR",
 	hash => \%Combin,
 	null =>  0,
-    },
-    {
+    ),
+    \%(
 	file => "unfcan",
 	name => "canon",
 	type => "char*",
 	hash => \%Canon,
 	null => "NULL",
-    },
-    {
+    ),
+    \%(
 	file => "unfcpt",
 	name => "compat",
 	type => "char*",
 	hash => \%Compat,
 	null => "NULL",
-    },
-    {
+    ),
+    \%(
 	file => "unfcmp",
 	name => "compos",
 	type => "$structname *",
 	hash => \%Comp1st,
 	null => "NULL",
 	init => $compinit,
-    },
+    ),
 );
 
 foreach my $tbl (@tripletable) {

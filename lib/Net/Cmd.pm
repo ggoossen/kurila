@@ -175,7 +175,7 @@ sub set_status {
   my $cmd = shift;
   my ($code, $resp) = @_;
 
-  $resp = [$resp]
+  $resp = \@($resp)
     unless ref($resp);
 
   (%{*$cmd}{'net_cmd_code'}, %{*$cmd}{'net_cmd_resp'}) = ($code, $resp);
@@ -219,7 +219,7 @@ sub command {
     $cmd->debug_print(1, $str)
       if ($cmd->debug);
 
-    %{*$cmd}{'net_cmd_resp'} = [];       # the response
+    %{*$cmd}{'net_cmd_resp'} = \@();       # the response
     %{*$cmd}{'net_cmd_code'} = "000";    # Made this one up :-)
   }
 
@@ -238,7 +238,7 @@ sub ok {
 sub unsupported {
   my $cmd = shift;
 
-  %{*$cmd}{'net_cmd_resp'} = ['Unsupported command'];
+  %{*$cmd}{'net_cmd_resp'} = \@('Unsupported command');
   %{*$cmd}{'net_cmd_code'} = 580;
   0;
 }
@@ -247,7 +247,7 @@ sub unsupported {
 sub getline {
   my $cmd = shift;
 
-  %{*$cmd}{'net_cmd_lines'} ||= [];
+  %{*$cmd}{'net_cmd_lines'} ||= \@();
 
   return shift @{%{*$cmd}{'net_cmd_lines'}}
     if scalar(@{%{*$cmd}{'net_cmd_lines'}});
@@ -307,7 +307,7 @@ sub getline {
 sub ungetline {
   my ($cmd, $str) = @_;
 
-  %{*$cmd}{'net_cmd_lines'} ||= [];
+  %{*$cmd}{'net_cmd_lines'} ||= \@();
   unshift(@{%{*$cmd}{'net_cmd_lines'}}, $str);
 }
 
@@ -323,7 +323,7 @@ sub response {
   my $cmd = shift;
   my ($code, $more) = (undef) x 2;
 
-  %{*$cmd}{'net_cmd_resp'} ||= [];
+  %{*$cmd}{'net_cmd_resp'} ||= \@();
 
   while (1) {
     my $str = $cmd->getline();
@@ -354,7 +354,7 @@ sub response {
 sub read_until_dot {
   my $cmd = shift;
   my $fh  = shift;
-  my $arr = [];
+  my $arr = \@();
 
   while (1) {
     my $str = $cmd->getline() or return undef;

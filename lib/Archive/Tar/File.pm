@@ -13,7 +13,7 @@ use vars qw[@ISA $VERSION];
 $VERSION    = '0.02';
 
 ### set value to 1 to oct() it during the unpack ###
-my $tmpl = [
+my $tmpl = \@(
         name        => 0,   # string
         mode        => 1,   # octal
         uid         => 1,   # octal
@@ -35,7 +35,7 @@ my $tmpl = [
         raw         => 0,   # the raw data chunk
         data        => 0,   # the data associated with the file --
                             # This  might be very memory intensive
-];
+);
 
 ### install get/set accessors for this object.
 for ( my $i=0; $i+<scalar @$tmpl ; $i+=2 ) {
@@ -195,7 +195,7 @@ sub new {
 ### copies the data, creates a clone ###
 sub clone {
     my $self = shift;
-    return bless { %$self }, ref $self;
+    return bless \%( %$self ), ref $self;
 }
 
 sub _new_from_chunk {
@@ -214,7 +214,7 @@ sub _new_from_chunk {
         $tmpl->[++$i] => $tmpl->[++$i] ? oct $_ : $_
     } map { m/^([^\0]*)/ } unpack( UNPACK, $chunk );
 
-    my $obj = bless { %entry, %args }, $class;
+    my $obj = bless \%( %entry, %args ), $class;
 
 	### magic is a filetype string.. it should have something like 'ustar' or
 	### something similar... if the chunk is garbage, skip it
@@ -278,7 +278,7 @@ sub _new_from_file {
 
     ### probably requires some file path munging here ... ###
     ### name and prefix are set later
-    my $obj = {
+    my $obj = \%(
         %hash,
         name        => '',
         chksum      => CHECK_SUM,
@@ -294,7 +294,7 @@ sub _new_from_file {
         devminor    => 0,   # not handled
         prefix      => '',
         data        => $data,
-    };
+    );
 
     bless $obj, $class;
 
@@ -312,7 +312,7 @@ sub _new_from_data {
     my $data    = shift;    return unless defined $data;
     my $opt     = shift;
 
-    my $obj = {
+    my $obj = \%(
         data        => $data,
         name        => '',
         mode        => MODE,
@@ -330,7 +330,7 @@ sub _new_from_data {
         devminor    => 0,
         devmajor    => 0,
         prefix      => '',
-    };
+    );
 
     ### overwrite with user options, if provided ###
     if( $opt and ref $opt eq 'HASH' ) {

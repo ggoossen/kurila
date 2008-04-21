@@ -34,7 +34,7 @@ use overload
 
 package main;
 
-$a = bless [77], 'OVERLOADED';
+$a = bless \@(77), 'OVERLOADED';
 
 $b = thaw freeze $a;
 ok 1, ref $b eq 'OVERLOADED';
@@ -45,7 +45,7 @@ ok 3, ref $c eq 'REF';
 ok 4, ref $$c eq 'OVERLOADED';
 ok 5, "$$c" eq "77";
 
-$d = thaw freeze [$a, $a];
+$d = thaw freeze \@($a, $a);
 ok 6, "$d->[0]" eq "77";
 $d->[0][0]++;
 ok 7, "$d->[1]" eq "78";
@@ -53,7 +53,7 @@ ok 7, "$d->[1]" eq "78";
 package REF_TO_OVER;
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	my ($over) = @_;
 	$self->{over} = $over;
 	return $self;
@@ -70,7 +70,7 @@ sub plus {
 }
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	my $ref = REF_TO_OVER->make($self);
 	$self->{ref} = $ref;
 	return $self;

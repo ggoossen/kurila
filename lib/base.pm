@@ -36,7 +36,7 @@ sub has_attr {
 }
 
 sub get_attr {
-    $Fattr->{@_[0]} = [1] unless $Fattr->{@_[0]};
+    $Fattr->{@_[0]} = \@(1) unless $Fattr->{@_[0]};
     return $Fattr->{@_[0]};
 }
 

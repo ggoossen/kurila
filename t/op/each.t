@@ -123,7 +123,7 @@ our @tests = (&next_test, &next_test, &next_test);
     package Obj;
     sub DESTROY { print "ok @::tests[1] # DESTROY called\n"; }
     {
-	my $h = { A => bless [], __PACKAGE__ };
+	my $h = \%( A => bless \@(), __PACKAGE__ );
         while (my($k,$v) = each %$h) {
 	    print "ok @::tests[0]\n" if $k eq 'A' and ref($v) eq 'Obj';
 	}

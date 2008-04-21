@@ -2,10 +2,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	NAME		=> "Text::Soundex",
 	VERSION_FROM	=> 'Soundex.pm',
-	'dist'		=> {
+	'dist'		=> \%(
 			     COMPRESS	=> 'gzip -9f',
 	      		     SUFFIX	=> 'gz',
 	      		     DIST_DEFAULT => 'all tardist',
-			   },
-	MAN3PODS	=> {},
+			   ),
+	MAN3PODS	=> \%(),
 );

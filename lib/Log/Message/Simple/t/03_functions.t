@@ -51,7 +51,7 @@ for my $name (@Carp, @Msg) {
     ok( $ref,                   "Found function for '$name'" );
 
     ### start with an empty stack?
-    cmp_ok( scalar @{[$Class->stack]}, '==', 0,
+    cmp_ok( scalar @{\@($Class->stack)}, '==', 0,
                                 "   Starting with empty stack" );
     ok(!$Class->stack_as_string,"   Stringified stack empty" );                                
     
@@ -70,7 +70,7 @@ for my $name (@Carp, @Msg) {
 
     ### empty stack again ###    
     ok( $Class->flush,          "   Stack flushed" );
-    cmp_ok( scalar @{[$Class->stack]}, '==', 0,
+    cmp_ok( scalar @{\@($Class->stack)}, '==', 0,
                                 "   Starting with empty stack" );
     ok(!$Class->stack_as_string,"   Stringified stack empty" );                                
 }

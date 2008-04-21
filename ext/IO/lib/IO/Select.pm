@@ -24,7 +24,7 @@ sub new
  my $self = shift;
  my $type = ref($self) || $self;
 
- my $vec = bless [undef,0], $type;
+ my $vec = bless \@(undef,0), $type;
 
  $vec->add(@_)
     if @_;

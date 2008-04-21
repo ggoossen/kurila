@@ -13,8 +13,8 @@ use Tie::Hash;
 # about feature issues such as scoping etc.
 
 # Predeclare vars used in the tests:
-my $deep1 = []; push @$deep1, \$deep1;
-my $deep2 = []; push @$deep2, \$deep2;
+my $deep1 = \@(); push @$deep1, \$deep1;
+my $deep2 = \@(); push @$deep2, \$deep2;
 
 {my $const = "a constant"; sub a_const () {$const}}
 
@@ -27,7 +27,7 @@ tie my %tied_hash, 'Tie::StdHash';
 %tied_hash = %hash;
 
 # Load and run the tests
-my @tests = map [chomp and split m/\t+/, $_, 3], grep !m/^#/ && m/\S/, ~< *DATA;
+my @tests = map \@(chomp and split m/\t+/, $_, 3), grep !m/^#/ && m/\S/, ~< *DATA;
 plan tests => 2 * @tests;
 
 for my $test (@tests) {

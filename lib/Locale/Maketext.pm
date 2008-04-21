@@ -127,7 +127,7 @@ sub failure_handler_auto {
   #  $handle->fail_with('failure_handler_auto')
 
   my($handle, $phrase, @params) = @_;
-  $handle->{'failure_lex'} ||= {};
+  $handle->{'failure_lex'} ||= \%();
   my $lex = $handle->{'failure_lex'};
 
   my $value;
@@ -158,7 +158,7 @@ sub failure_handler_auto {
 sub new {
   # Nothing fancy!
   my $class = ref(@_[0]) || @_[0];
-  my $handle = bless {}, $class;
+  my $handle = bless \%(), $class;
   $handle->init;
   return $handle;
 }
@@ -413,7 +413,7 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   return %isa_scan{$class} if exists %isa_scan{$class};  # memoization!
 
   my @lex_refs;
-  my $seen_r = ref(@_[1]) ? @_[1] : {};
+  my $seen_r = ref(@_[1]) ? @_[1] : \%();
 
   if( defined( *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'} )) {
     push @lex_refs, *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'};

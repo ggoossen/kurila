@@ -96,7 +96,7 @@ use B qw(peekop class comppadlist main_start svref_2object walksymtable
          OPpLVAL_INTRO SVf_POK OPpOUR_INTRO cstring
         );
 
-sub UNKNOWN { ["?", "?", "?"] }
+sub UNKNOWN { \@("?", "?", "?") }
 
 my @pad;			# lexicals in current pad
 				# as ["(lexical)", type, name]
@@ -149,7 +149,7 @@ sub load_pad {
 	my $namesv = @namelist[$ix];
 	next if class($namesv) eq "SPECIAL";
 	my ($type, $name) = $namesv->PV =~ m/^(.)([^\0]*)(\0.*)?$/;
-	@pad[$ix] = ["(lexical)", $type || '?', $name || '?'];
+	@pad[$ix] = \@("(lexical)", $type || '?', $name || '?');
     }
     if (%Config{useithreads}) {
 	my (@vallist);
@@ -159,7 +159,7 @@ sub load_pad {
 	    next unless class($valsv) eq "GV";
 	    # these pad GVs don't have corresponding names, so same @pad
 	    # array can be used without collisions
-	    @pad[$ix] = [$valsv->STASH->NAME, "*", $valsv->NAME];
+	    @pad[$ix] = \@($valsv->STASH->NAME, "*", $valsv->NAME);
 	}
     }
 }
@@ -255,7 +255,7 @@ sub pp_gvsv {
     }
     else {
 	$gv = $op->gv;
-	$top = [$gv->STASH->NAME, '$', $gv->SAFENAME];
+	$top = \@($gv->STASH->NAME, '$', $gv->SAFENAME);
     }
     process($top, $op->private ^&^ OPpLVAL_INTRO ||
                   $op->private ^&^ OPpOUR_INTRO   ? "intro" : "used");
@@ -271,7 +271,7 @@ sub pp_gv {
     }
     else {
 	$gv = $op->gv;
-	$top = [$gv->STASH->NAME, "*", $gv->SAFENAME];
+	$top = \@($gv->STASH->NAME, "*", $gv->SAFENAME);
     }
     process($top, $op->private ^&^ OPpLVAL_INTRO ? "intro" : "used");
 }
@@ -281,9 +281,9 @@ sub pp_const {
     my $sv = $op->sv;
     # constant could be in the pad (under useithreads)
     if ($$sv) {
-	$top = ["?", "",
+	$top = \@("?", "",
 		(class($sv) ne "SPECIAL" && $sv->FLAGS ^&^ SVf_POK)
-		? cstring($sv->PV) : "?"];
+		? cstring($sv->PV) : "?");
     }
     else {
 	$top = @pad[$op->targ];
@@ -293,7 +293,7 @@ sub pp_const {
 
 sub pp_method {
     my $op = shift;
-    $top = ["(method)", "->".$top->[1], $top->[2]];
+    $top = \@("(method)", "->".$top->[1], $top->[2]);
 }
 
 sub pp_entersub {
@@ -317,7 +317,7 @@ sub B::GV::xref {
 	#return if $done{$$cv}++;
 	$file = $gv->FILE;
 	$line = $gv->LINE;
-	process([$gv->STASH->NAME, "&", $gv->NAME], "subdef");
+	process(\@($gv->STASH->NAME, "&", $gv->NAME), "subdef");
 	push(@todo, $cv);
     }
 }

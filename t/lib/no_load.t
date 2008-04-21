@@ -17,7 +17,7 @@ require "test.pl";
 # Format: [Module-that-should-not-be-loaded => modules to test]
 #
 my @TESTS = (
-    [Carp  => qw [warnings Exporter]],
+    \@(Carp  => qw [warnings Exporter]),
 );
 
 my $count = 0;

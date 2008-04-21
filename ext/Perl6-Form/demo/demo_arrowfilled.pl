@@ -8,7 +8,7 @@ sub hashes {
 }
 
 print form
-	{field=>[qr/(#+)/=>\&hashes]},
+	\%(field=>\@(qr/(#+)/=>\&hashes)),
 	"[###|###############################]",
-	[1,2,3], [qw[First Second Last]];
+	\@(1,2,3), \@(qw[First Second Last]);
 

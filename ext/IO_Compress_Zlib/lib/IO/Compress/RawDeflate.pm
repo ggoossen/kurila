@@ -22,27 +22,27 @@ $RawDeflateError = '';
 @ISA = qw(IO::Compress::Base Exporter);
 @EXPORT_OK = qw( $RawDeflateError rawdeflate ) ;
 
-%EXPORT_TAGS = ( flush     => [qw{  
+%EXPORT_TAGS = ( flush     => \@(qw{  
                                     Z_NO_FLUSH
                                     Z_PARTIAL_FLUSH
                                     Z_SYNC_FLUSH
                                     Z_FULL_FLUSH
                                     Z_FINISH
                                     Z_BLOCK
-                              }],
-                 level     => [qw{  
+                              }),
+                 level     => \@(qw{  
                                     Z_NO_COMPRESSION
                                     Z_BEST_SPEED
                                     Z_BEST_COMPRESSION
                                     Z_DEFAULT_COMPRESSION
-                              }],
-                 strategy  => [qw{  
+                              }),
+                 strategy  => \@(qw{  
                                     Z_FILTERED
                                     Z_HUFFMAN_ONLY
                                     Z_RLE
                                     Z_FIXED
                                     Z_DEFAULT_STRATEGY
-                              }],
+                              }),
 
               );
 
@@ -151,12 +151,12 @@ sub getZlibParams
         
             # zlib behaviour
             #'Method'   => [0, 1, Parse_unsigned,  Z_DEFLATED],
-            'Level'     => [0, 1, Parse_signed,    Z_DEFAULT_COMPRESSION],
-            'Strategy'  => [0, 1, Parse_signed,    Z_DEFAULT_STRATEGY],
+            'Level'     => \@(0, 1, Parse_signed,    Z_DEFAULT_COMPRESSION),
+            'Strategy'  => \@(0, 1, Parse_signed,    Z_DEFAULT_STRATEGY),
 
-            'CRC32'     => [0, 1, Parse_boolean,   0],
-            'ADLER32'   => [0, 1, Parse_boolean,   0],
-            'Merge'     => [1, 1, Parse_boolean,   0],
+            'CRC32'     => \@(0, 1, Parse_boolean,   0),
+            'ADLER32'   => \@(0, 1, Parse_boolean,   0),
+            'Merge'     => \@(1, 1, Parse_boolean,   0),
         );
     
     

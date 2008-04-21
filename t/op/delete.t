@@ -134,7 +134,7 @@ cmp_ok( scalar(@{@refary[0]}),'==',1,'one down');
     sub X::DESTROY { $x++ }
     {
 	my @a;
-	@a[0] = bless [], 'X';
+	@a[0] = bless \@(), 'X';
 	my $y = delete @a[0];
     }
     cmp_ok($x,'==',1,q([perl #30733] array delete didn't free returned element));

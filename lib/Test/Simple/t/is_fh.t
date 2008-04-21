@@ -45,4 +45,4 @@ sub isa {
     return 1 if $parent eq 'IO::Handle';
 }
 
-::ok( Test::Builder->is_fh(bless {}, "Lying::isa"));
+::ok( Test::Builder->is_fh(bless \%(), "Lying::isa"));

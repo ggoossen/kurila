@@ -414,7 +414,7 @@ sub TIEHANDLE
     my $class = shift;
     my @args = @_;
 
-    my $self = bless {}, $class;
+    my $self = bless \%(), $class;
 
     return @args ? $self->OPEN(@args) : $self;
 }

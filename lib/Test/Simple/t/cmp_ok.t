@@ -50,12 +50,12 @@ use Test::More;
 Test::More->builder->no_ending(1);
 
 my @Tests = (
-    [1, '==', 1],
-    [1, '==', 2],
-    ["a", "eq", "b"],
-    ["a", "eq", "a"],
-    [1, "+", 1],
-    [1, "-", 1],
+    \@(1, '==', 1),
+    \@(1, '==', 2),
+    \@("a", "eq", "b"),
+    \@("a", "eq", "a"),
+    \@(1, "+", 1),
+    \@(1, "-", 1),
 );
 
 # These don't work yet.
@@ -67,10 +67,10 @@ if( 0 ) {
     my $ify = Overloaded::Ify->new("bar", 23);
     
     push @Tests, (
-        [$cmp, '==', 42],
-        [$cmp, 'eq', "foo"],
-        [$ify, 'eq', "bar"],
-        [$ify, "==", 23],
+        \@($cmp, '==', 42),
+        \@($cmp, 'eq', "foo"),
+        \@($ify, 'eq', "bar"),
+        \@($ify, "==", 23),
     );
 }
 

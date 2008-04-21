@@ -35,7 +35,7 @@ $ZipError = '';
 %EXPORT_TAGS = %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ;
 push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
 
-%EXPORT_TAGS{zip_method} = [qw( ZIP_CM_STORE ZIP_CM_DEFLATE ZIP_CM_BZIP2 )];
+%EXPORT_TAGS{zip_method} = \@(qw( ZIP_CM_STORE ZIP_CM_DEFLATE ZIP_CM_BZIP2 ));
 push @{ %EXPORT_TAGS{all} }, @{ %EXPORT_TAGS{zip_method} };
 
 Exporter::export_ok_tags('all');
@@ -453,24 +453,24 @@ return (
     # zlib behaviour
     $self->getZlibParams(),
 
-    'Stream'    => [1, 1, Parse_boolean,   1],
+    'Stream'    => \@(1, 1, Parse_boolean,   1),
    #'Store'     => [0, 1, Parse_boolean,   0],
-    'Method'    => [0, 1, Parse_unsigned,  ZIP_CM_DEFLATE],
+    'Method'    => \@(0, 1, Parse_unsigned,  ZIP_CM_DEFLATE),
 
 #            # Zip header fields
-    'Minimal'   => [0, 1, Parse_boolean,   0],
-    'Zip64'     => [0, 1, Parse_boolean,   0],
-    'Comment'   => [0, 1, Parse_any,       ''],
-    'ZipComment'=> [0, 1, Parse_any,       ''],
-    'Name'      => [0, 1, Parse_any,       ''],
-    'Time'      => [0, 1, Parse_any,       undef],
-    'exTime'    => [0, 1, Parse_any,       undef],
-    'ExtAttr'   => [0, 1, Parse_any,       0],
-    'OS_Code'   => [0, 1, Parse_unsigned,  $Compress::Raw::Zlib::gzip_os_code],
+    'Minimal'   => \@(0, 1, Parse_boolean,   0),
+    'Zip64'     => \@(0, 1, Parse_boolean,   0),
+    'Comment'   => \@(0, 1, Parse_any,       ''),
+    'ZipComment'=> \@(0, 1, Parse_any,       ''),
+    'Name'      => \@(0, 1, Parse_any,       ''),
+    'Time'      => \@(0, 1, Parse_any,       undef),
+    'exTime'    => \@(0, 1, Parse_any,       undef),
+    'ExtAttr'   => \@(0, 1, Parse_any,       0),
+    'OS_Code'   => \@(0, 1, Parse_unsigned,  $Compress::Raw::Zlib::gzip_os_code),
 
-   'TextFlag'  => [0, 1, Parse_boolean,   0],
-   'ExtraFieldLocal'  => [0, 1, Parse_any,    undef],
-   'ExtraFieldCentral'=> [0, 1, Parse_any,    undef],
+   'TextFlag'  => \@(0, 1, Parse_boolean,   0),
+   'ExtraFieldLocal'  => \@(0, 1, Parse_any,    undef),
+   'ExtraFieldCentral'=> \@(0, 1, Parse_any,    undef),
 
     @Bzip2,
 );

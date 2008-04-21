@@ -926,13 +926,13 @@ cmp_ok($ok,'==',1,'dynamically scoped');
     my $n=10; my $late_free = 0;
     sub X::DESTROY { $late_free++ if $n +< 0 };
     {
-	($n-- && bless {}, 'X') && redo;
+	($n-- && bless \%(), 'X') && redo;
     }
     cmp_ok($late_free,'==',0,"bug 27206: redo memory leak");
 
     $n = 10; $late_free = 0;
     {
-	($n-- && bless {}, 'X') && redo;
+	($n-- && bless \%(), 'X') && redo;
     }
     continue { }
     cmp_ok($late_free,'==',0,"bug 27206: redo with continue memory leak");

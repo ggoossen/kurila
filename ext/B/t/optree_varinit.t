@@ -115,7 +115,7 @@ EONT_EONT
 
 checkOptree ( name	=> 'local $a',
 	      prog	=> 'local $a',
-	      errs      => ['Name "main::a" used only once: possible typo at -e line 1.'],
+	      errs      => \@('Name "main::a" used only once: possible typo at -e line 1.'),
 	      bcopts	=> '-basic',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -245,7 +245,7 @@ EONT_EONT
 
 checkOptree ( name	=> 'local $a=undef',
 	      prog	=> 'local $a=undef',
-	      errs      => ['Name "main::a" used only once: possible typo at -e line 1.'],
+	      errs      => \@('Name "main::a" used only once: possible typo at -e line 1.'),
 	      note	=> 'locals are rare, probly not worth doing',
 	      bcopts	=> '-basic',
 	      strip_open_hints => 1,
@@ -366,7 +366,7 @@ EONT_EONT
 
 checkOptree ( name	=> 'local $a=()',
 	      prog	=> 'local $a=()',
-	      errs      => ['Name "main::a" used only once: possible typo at -e line 1.'],
+	      errs      => \@('Name "main::a" used only once: possible typo at -e line 1.'),
               #todo	=> 'probly not worth doing',
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,

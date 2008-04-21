@@ -49,7 +49,7 @@ seek EXE, $offset+4+20+68, 0;
 if (@ARGV == 1) {
     read EXE, $record, 2;
     my ($subsys) = unpack "S", $record;
-    $subsys = {reverse %subsys}->{$subsys} || "UNKNOWN($subsys)";
+    $subsys = \%(reverse %subsys)->{$subsys} || "UNKNOWN($subsys)";
     print "@ARGV[0] uses the $subsys subsystem.\n";
 }
 else {

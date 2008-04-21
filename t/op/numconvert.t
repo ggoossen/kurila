@@ -115,7 +115,7 @@ my @opnames = split m//, "-+UINPuinp";
 my $test = 1;
 my $nok;
 for my $num_chain (1..$max_chain) {
-  my @ops = map [split m//], grep m/[4-9]/,
+  my @ops = map \@(split m//), grep m/[4-9]/,
     map { sprintf "\%0{$num_chain}d", $_ }  0 .. 10**$num_chain - 1;
 
   #@ops = ([]) unless $num_chain;

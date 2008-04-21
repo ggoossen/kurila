@@ -32,7 +32,7 @@ print "1..23\n";
 package TIED_HASH;
 
 sub TIEHASH {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	return $self;
 }
 
@@ -63,7 +63,7 @@ sub NEXTKEY {
 package TIED_ARRAY;
 
 sub TIEARRAY {
-	my $self = bless [], shift;
+	my $self = bless \@(), shift;
 	return $self;
 }
 
@@ -111,7 +111,7 @@ $fault = 0;
 
 sub TIESCALAR {
 	my $pkg = shift;
-	return bless [@_], $pkg;
+	return bless \@(@_), $pkg;
 }
 
 sub FETCH {
@@ -195,7 +195,7 @@ for ($i = 0; $i +< @new; $i++) {
 }
 
 # Check undef ties
-my $h = {};
+my $h = \%();
 tie $h->{'x'}, 'FAULT', $h, 'x';
 my $hf = freeze($h);
 ok 16, defined $hf;

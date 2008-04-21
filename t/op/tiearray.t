@@ -136,7 +136,7 @@ sub EXISTS {
 
 package NegFetchsize;
 
-sub TIEARRAY  { bless [] }
+sub TIEARRAY  { bless \@() }
 sub FETCH     { }
 sub FETCHSIZE { -1 }
 
@@ -269,7 +269,7 @@ untie @ary;
 {
   my @a;
   
-  sub X::TIEARRAY { bless {}, 'X' }
+  sub X::TIEARRAY { bless \%(), 'X' }
 
   sub X::SPLICE {
     do '/dev/null';

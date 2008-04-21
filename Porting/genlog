@@ -97,8 +97,8 @@ else {
 			    not exists %branch_include{$branch}) {
 			    $skip++;
 			}
-			%files{$branch} = {} unless exists %files{$branch};
-			%files{$branch}{$type} = [] unless exists %files{$branch}{$type};
+			%files{$branch} = \%() unless exists %files{$branch};
+			%files{$branch}{$type} = \@() unless exists %files{$branch}{$type};
 			push @{%files{$branch}{$type}}, $file;
 		    }
 		    else {
@@ -130,7 +130,7 @@ EOT
 	        warn("### $kind ###\n"), next unless exists %editkind{$kind};
 		my $files = %files{$branch}{$kind};
 		# don't show large branches and integrations
-		$files = ["($kind " . scalar(@$files) . ' files)']
+		$files = \@("($kind " . scalar(@$files) . ' files)')
 		    if (@$files +> 25 && ($kind eq 'integrate'
 		    			 || $kind eq 'branch'))
 		       || @$files +> 100;

@@ -10,7 +10,7 @@ BEGIN {
 			$n_name	    	@n_aliases
 			$n_addrtype 	$n_net
 		   );
-    %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
 }
 use vars      @EXPORT_OK;
 
@@ -18,12 +18,12 @@ use vars      @EXPORT_OK;
 sub import { goto &Exporter::import }
 
 use Class::Struct qw(struct);
-struct 'Net::netent' => [
+struct 'Net::netent' => \@(
    name		=> '$',
    aliases	=> '@',
    addrtype	=> '$',
    net		=> '$',
-];
+);
 
 sub populate (@) {
     return unless @_;

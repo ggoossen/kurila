@@ -344,7 +344,7 @@ eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
 # [perl #9728] used to dump core
 {
    $eval = eval 'sub { eval "sub { %S }" }';
-   $eval->({});
+   $eval->(\%());
    print "ok $test\n";
    $test++;
 }
@@ -461,10 +461,10 @@ print "ok $test - eval and last\n"; $test++;
     my $ok  = 0;
     package Eval1;
     sub STORE { eval '('; $ok = 1 }
-    sub TIESCALAR { bless [] }
+    sub TIESCALAR { bless \@() }
 
     my $x;
-    tie $x, bless [];
+    tie $x, bless \@();
     $x = 1;
     print "not " unless $ok;
     print "ok $test # eval docatch \n"; $test++;

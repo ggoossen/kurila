@@ -77,10 +77,10 @@ print <<"EOC";
 typedef U8 packprops_t;
 #if 'J'-'I' == 1
 /* ASCII */
-@{[make_tables (\%asciimap, @lines)]}
+@{\@(make_tables (\%asciimap, @lines))}
 #else
 /* EBCDIC (or bust) */
-@{[make_tables (\%ebcdicmap, @lines)]}
+@{\@(make_tables (\%ebcdicmap, @lines))}
 #endif
 EOC
 

@@ -176,7 +176,7 @@ $make_shared = sub {
         # Copy an array ref
         if ($ref_type eq 'ARRAY') {
             # Make empty shared array ref
-            $copy = &share([]);
+            $copy = &share(\@());
             # Recursively copy and add contents
             push(@$copy, map { $make_shared->($_) } @$item);
         }
@@ -184,7 +184,7 @@ $make_shared = sub {
         # Copy a hash ref
         elsif ($ref_type eq 'HASH') {
             # Make empty shared hash ref
-            $copy = &share({});
+            $copy = &share(\%());
             # Recursively copy and add contents
             foreach my $key (keys(%{$item})) {
                 $copy->{$key} = $make_shared->($item->{$key});

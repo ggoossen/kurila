@@ -9,7 +9,7 @@ sub new {
   my($pkg,$maxlen,$silent) = @_;
   $maxlen ||= 31;
   $silent ||= 0;
-  my($obj) = { '__M@xLen' => $maxlen, '__S!lent' => $silent };
+  my($obj) = \%( '__M@xLen' => $maxlen, '__S!lent' => $silent );
   bless $obj, $pkg;
 }
 

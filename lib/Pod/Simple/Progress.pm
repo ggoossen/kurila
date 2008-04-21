@@ -17,7 +17,7 @@ use strict;
 
 sub new {
   my($class,$delay) = @_;
-  my $self = bless {'quiet_until' => 1},  ref($class) || $class;
+  my $self = bless \%('quiet_until' => 1),  ref($class) || $class;
   $self->to(*STDOUT{IO});
   $self->delay(defined($delay) ? $delay : 5);
   return $self;
@@ -25,7 +25,7 @@ sub new {
 
 sub copy { 
   my $orig = shift;
-  bless {%$orig, 'quiet_until' => 1}, ref($orig);
+  bless \%(%$orig, 'quiet_until' => 1), ref($orig);
 }
 #--------------------------------------------------------------------------
 

@@ -297,16 +297,16 @@ sub _open3 {
 	}
 	require IO::Pipe;
 	$kidpid = eval {
-	    spawn_with_handles( [ { mode => 'r',
+	    spawn_with_handles( \@( \%( mode => 'r',
 				    open_as => $kid_rdr,
-				    handle => \*STDIN },
-				  { mode => 'w',
+				    handle => \*STDIN ),
+				  \%( mode => 'w',
 				    open_as => $kid_wtr,
-				    handle => \*STDOUT },
-				  { mode => 'w',
+				    handle => \*STDOUT ),
+				  \%( mode => 'w',
 				    open_as => $kid_err,
-				    handle => \*STDERR },
-				], \@close, @cmd);
+				    handle => \*STDERR ),
+				), \@close, @cmd);
 	};
 	die "$Me: $@" if $@;
     }

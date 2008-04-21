@@ -33,7 +33,7 @@ use Storable qw(freeze thaw);
 
 @x = ('a', 1);
 
-sub make { bless [], shift }
+sub make { bless \@(), shift }
 
 sub STORABLE_freeze {
 	my $self = shift;
@@ -59,7 +59,7 @@ package OBJ_SYNC;
 
 @x = ('a', 1);
 
-sub make { bless {}, shift }
+sub make { bless \%(), shift }
 
 sub STORABLE_freeze {
 	my $self = shift;
@@ -81,7 +81,7 @@ package OBJ_SYNC2;
 use Storable qw(dclone);
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	my ($ext) = @_;
 	$self->{sync} = OBJ_SYNC->make;
 	$self->{ext} = $ext;
@@ -93,7 +93,7 @@ sub STORABLE_freeze {
 	my %copy = %$self;
 	my $r = \%copy;
 	my $t = dclone($r->{sync});
-	return ("", [$t, $self->{ext}], $r, $self, $r->{ext});
+	return ("", \@($t, $self->{ext}), $r, $self, $r->{ext});
 }
 
 sub STORABLE_thaw {
@@ -115,7 +115,7 @@ $MAX = 20;
 $recursed = 0;
 $hook_called = 0;
 
-sub make { bless [], shift }
+sub make { bless \@(), shift }
 
 sub STORABLE_freeze {
 	my $self = shift;
@@ -152,9 +152,9 @@ $y = thaw $x;
 ok 6, 1;
 ok 7, $y->{ok} == $y;
 
-my $ext = [1, 2];
+my $ext = \@(1, 2);
 $sync = OBJ_SYNC2->make($ext);
-$x = freeze [$sync, $ext];
+$x = freeze \@($sync, $ext);
 ok 8, 1;
 
 my $z = thaw $x;
@@ -193,19 +193,19 @@ package Foo;
 sub new {
 	my $class = shift;
 	my $dat = shift;
-	return bless {dat => $dat}, $class;
+	return bless \%(dat => $dat), $class;
 }
 
 package Bar;
 sub new {
 	my $class = shift;
-	return bless {
+	return bless \%(
 		a => 'dummy',
-		b => [ 
+		b => \@( 
 			Foo->new(1),
 			Foo->new(2), # Second instance of a Foo 
-		]
-	}, $class;
+		)
+	), $class;
 }
 
 sub STORABLE_freeze {
@@ -238,14 +238,14 @@ ok 28, ref($bar2->{b}[1]) eq 'Foo';
 package CLASS_1;
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	return $self;
 }
 
 package CLASS_2;
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	my ($o) = @_;
 	$self->{c1} = CLASS_1->make();
 	$self->{o} = $o;
@@ -272,7 +272,7 @@ sub STORABLE_thaw {
 package CLASS_OTHER;
 
 sub make {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	return $self;
 }
 
@@ -285,7 +285,7 @@ sub set_c2 { @_[0]->{c2} = @_[1] }
 package Foo2;
 
 sub new {
-	my $self = bless {}, @_[0];
+	my $self = bless \%(), @_[0];
 	$self->{freezed} = dump::view($self);
 	return $self;
 }
@@ -298,7 +298,7 @@ sub DESTROY {
 package Foo3;
 
 sub new {
-	bless {}, @_[0];
+	bless \%(), @_[0];
 }
 
 sub STORABLE_freeze {
