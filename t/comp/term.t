@@ -2,7 +2,7 @@
 
 # tests that aren't important enough for base.term
 
-print "1..23\n";
+print "1..14\n";
 
 our $x = "\\n";
 print "#1\t:$x: eq " . ':\n:' . "\n";
@@ -31,42 +31,3 @@ if ("@foo[1]b" eq "2b") { print "ok 12\n";} else {print "not ok 12\n";}
 if ("@foo[[0..1]]b" eq "1 2b") { print "ok 13\n";} else {print "not ok 13\n";}
 $" = '::';
 if ("@foo[[0..1]]b" eq "1::2b") { print "ok 14\n";} else {print "not ok 14\n";}
-
-# test if C<eval "{...}"> distinguishes between blocks and hashrefs
-
-$a = "\{ q|'| , 'foo' \}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 15\n";} else {print "not ok 15\n";}
-
-$a = "\{ q|\\\\\\'abc| => 'foo' \}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 16\n";} else {print "not ok 16\n";}
-
-$a = "\{q|a\\\n\\'b|,'foo'\}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 17\n";} else {print "not ok 17\n";}
-
-$a = "\{q|'\\\\'\\\\|=>'foo'\}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 18\n";} else {print "not ok 18\n";}
-
-$a = "\{q,a'b,,'foo'\}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 19\n";} else {print "not ok 19\n";}
-
-$a = "\{q[[']]=>'foo'\}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 20\n";} else {print "not ok 20\n";}
-
-# needs disambiguation if first term is a variable
-$a = "+\{ \$a , 'foo'\}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 21\n";} else {print "not ok 21\n";}
-
-$a = "+\{ \$a=>'foo'\}";
-$a = eval $a;
-if (ref($a) eq 'HASH') {print "ok 22\n";} else {print "not ok 22\n";}
-
-$a = "\{ 0x01 => 'foo'\}->\{0x01\}";
-$a = eval $a;
-if ($a eq 'foo') {print "ok 23\n";} else {print "not ok 23\n";}

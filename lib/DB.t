@@ -164,7 +164,7 @@ sub three { two(@_) }
         is( $subs, 2, '... same song, different key' );
         my @subs = DB->subs( 'foo', 'boo', 'bar' );
         is( scalar @subs, 2, '... should report only for requested subs' );
-        my @expected = ( [ 'foo', 23, 45 ], [ 'ba:r', 7, 890 ] );
+        my @expected = ( \@( 'foo', 23, 45 ), \@( 'ba:r', 7, 890 ) );
         ok( eq_array( \@subs, \@expected ), '... find file, start, end for subs' );
 }
 
@@ -246,7 +246,7 @@ SKIP: {
                 4 => "\0abc",
         );
 
-        *DB::dbline = [ $dualfalse, $dualtrue, $dualfalse, $dualfalse, $dualtrue ];
+        *DB::dbline = \@( $dualfalse, $dualtrue, $dualfalse, $dualfalse, $dualtrue );
 
         local %DB::sub = (
                 'main::foo'     => 'foo:1-4',
@@ -281,7 +281,7 @@ SKIP: {
 # test DB::set_tbreak()
 {
         local ($DB::lineno, *DB::dbline, $DB::package);
-        *DB::dbline = [ $dualfalse, $dualtrue, $dualfalse, $dualfalse, $dualtrue ];
+        *DB::dbline = \@( $dualfalse, $dualtrue, $dualfalse, $dualfalse, $dualtrue );
 
         DB->set_tbreak(1);
         is( %DB::dbline{1}, ';9', 'DB::set_tbreak() should set tbreak condition' );
@@ -351,7 +351,7 @@ SKIP: {
         is( %DB::dbline{3}, "\0\0\0abc", '... should remove break, leaving action');
         is( %DB::dbline{4}, "\0\0\0abc", '... should not remove set actions' );
 
-        local *{Symbol::fetch_glob( "::_<foo") } = [ 0, 0, 0, 1 ];
+        local *{Symbol::fetch_glob( "::_<foo") } = \@( 0, 0, 0, 1 );
 
         local $DB::package;
         local %DB::sub = (
@@ -391,7 +391,7 @@ SKIP: {
                 2 => "\0abc",
         );
 
-        *DB::dbline = [ $dualfalse, $dualfalse, $dualtrue, $dualtrue ];
+        *DB::dbline = \@( $dualfalse, $dualfalse, $dualtrue, $dualtrue );
 
         DB->set_action(2, 'def');
         is( %DB::dbline{2}, "\0def", 
@@ -420,7 +420,7 @@ SKIP: {
         );
 
         %DB::dbline = %lines;
-        *DB::dbline = [ ($dualtrue) x 4 ];
+        *DB::dbline = \@( ($dualtrue) x 4 );
 
         DB->clr_actions(1 .. 4);
 
@@ -429,7 +429,7 @@ SKIP: {
         is( %DB::dbline{3}, "123", '... should remove action, leaving break');
         is( %DB::dbline{4}, "abc\0", '... should not remove set breaks' );
 
-        local *{Symbol::fetch_glob( "::_<foo") } = [ 0, 0, 0, 1 ];
+        local *{Symbol::fetch_glob( "::_<foo") } = \@( 0, 0, 0, 1 );
 
         local $DB::package;
         local %DB::sub = (
@@ -500,7 +500,7 @@ package FakeDB;
 use vars qw( $output );
 
 sub new {
-        bless({}, @_[0]);
+        bless(\%(), @_[0]);
 }
 
 sub set_tbreak {

@@ -1494,15 +1494,15 @@ sub run
         title "Array Input Error tests" ;
 
         my @data = (
-                   \@( '[]',    "empty array reference"),
-                   \@( '[[]]',    "unknown input parameter"),
-                   \@( '[[[]]]',   "unknown input parameter"),
-                   \@( '[[\"ab"], [\"cd"]]', "unknown input parameter"),
-                   \@( '[\""]',     "not a filename"),
-                   \@( '[\undef]',  "not a filename"),
-                   \@( '[\"abcd"]', "not a filename"),
-                   \@( '[\&xx]',      "unknown input parameter"),
-                   \@( '[$fh2]',      "not a filename"),
+                   \@( '\@()',    "empty array reference"),
+                   \@( '\@(\@())',    "unknown input parameter"),
+                   \@( '\@(\@(\@()))',   "unknown input parameter"),
+                   \@( '\@(\@(\"ab"), \@(\"cd"))', "unknown input parameter"),
+                   \@( '\@(\"")',     "not a filename"),
+                   \@( '\@(\undef)',  "not a filename"),
+                   \@( '\@(\"abcd")', "not a filename"),
+                   \@( '\@(\&xx)',      "unknown input parameter"),
+                   \@( '\@($fh2)',      "not a filename"),
                 ) ;
 
 
@@ -1527,8 +1527,8 @@ sub run
         }
 
         @data = (
-                   '[""]', 
-                   '[undef]', 
+                   '\@("")', 
+                   '\@(undef)', 
                 ) ;
 
 

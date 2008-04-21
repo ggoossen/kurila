@@ -68,15 +68,15 @@ sub go {
 
 
 sub new {
-  my $new = bless {}, ref(@_[0]) || @_[0];
+  my $new = bless \%(), ref(@_[0]) || @_[0];
   $new->html_render_class($HTML_RENDER_CLASS);
   $new->verbose(1 + DEBUG);
-  $new->_contents([]);
+  $new->_contents(\@());
   
   $new->index(1);
 
-  $new->       _css_wad([]);         $new->css_flurry(1);
-  $new->_javascript_wad([]);  $new->javascript_flurry(1);
+  $new->       _css_wad(\@());         $new->css_flurry(1);
+  $new->_javascript_wad(\@());  $new->javascript_flurry(1);
   
   $new->contents_file(
     'index' . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION)
@@ -130,7 +130,7 @@ sub batch_convert {
     #  or, under MSWin, like "c:/thing;d:/also;c:/whatever/perl" (";"-delim!)
     require Config;
     my $ps = quotemeta( %Config::Config{'path_sep'} || ":" );
-    $dirs = [ grep length($_), split qr/$ps/, $dirs ];
+    $dirs = \@( grep length($_), split qr/$ps/, $dirs );
   }
 
   $outdir = $self->filespecsys->curdir
@@ -291,7 +291,7 @@ sub note_for_contents_file {
   if( $self->contents_file ) {
     my $c = $self->_contents();
     push @$c,
-     [ join("::", @$namelets), $infile, $outfile, $namelets ]
+     \@( join("::", @$namelets), $infile, $outfile, $namelets )
      #            0               1         2         3
     ;
     DEBUG +> 3 and print "Noting @$c[[-1]]\n";
@@ -587,7 +587,7 @@ sub add_css {
   $media        ||= 'all';
   $content_type ||= 'text/css';
   
-  my $bunch = [$url, $name, $content_type, $media, $_code];
+  my $bunch = \@($url, $name, $content_type, $media, $_code);
   if($is_default) { unshift @{ $self->_css_wad }, $bunch }
   else            { push    @{ $self->_css_wad }, $bunch }
   return;
@@ -755,9 +755,9 @@ sub _color_negate {
 sub add_javascript {
   my($self, $url, $content_type, $_code) = @_;
   return unless $url;
-  push  @{ $self->_javascript_wad }, [
+  push  @{ $self->_javascript_wad }, \@(
     $url, $content_type || 'text/javascript', $_code
-  ];
+  );
   return;
 }
 

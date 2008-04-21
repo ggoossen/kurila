@@ -87,7 +87,7 @@ is ($$$refref, 'Good');
 
 # Test nested anonymous lists.
 
-$ref = [[],2,[3,4,5,]];
+$ref = \@(\@(),2,\@(3,4,5,));
 is (scalar @$ref, 3);
 is (@$ref[1], 2);
 is (@{@$ref[2]}[2], 5);
@@ -137,18 +137,18 @@ is (ref $refref, 'HASH');
 
 # Test anonymous hash syntax.
 
-$anonhash = {};
+$anonhash = \%();
 is (ref $anonhash, 'HASH');
-$anonhash2 = {FOO => 'BAR', ABC => 'XYZ',};
+$anonhash2 = \%(FOO => 'BAR', ABC => 'XYZ',);
 is (join('', sort values %$anonhash2), 'BARXYZ');
 
 # Test ->[$@%&*] derefence syntax
 {
     my $z = \66;
     is($z->$, 66);
-    my $y = [1,2,3,4];
+    my $y = \@(1,2,3,4);
     is(join(':', $y->@), "1:2:3:4");
-    my $x = { aap => 'noot', mies => "teun" };
+    my $x = \%( aap => 'noot', mies => "teun" );
     is("".$x->%, "".%$x);
     my $w = \*foo428;
     is(Symbol::glob_name($w->*), "main::foo428");
@@ -164,7 +164,7 @@ $object = bless $main::anonhash2;
 main::is (ref $object, 'MYHASH');
 main::is ($object->{ABC}, 'XYZ');
 
-$object2 = bless {};
+$object2 = bless \%();
 main::is (ref $object2,	'MYHASH');
 
 # Test ordinary call on object method.
@@ -201,7 +201,7 @@ package OBJ;
 
 our @ISA = ('BASEOBJ');
 
-$main::object = bless {FOO => 'foo', BAR => 'bar'};
+$main::object = bless \%(FOO => 'foo', BAR => 'bar');
 
 package main;
 
@@ -277,10 +277,10 @@ is ($$_, 'glob 4');
 $test = curr_test();
 {
     package A;
-    sub new { bless {}, shift }
+    sub new { bless \%(), shift }
     DESTROY { print "# destroying 'A'\nok ", $test + 1, "\n" }
     package _B;
-    sub new { bless {}, shift }
+    sub new { bless \%(), shift }
     DESTROY { print "# destroying '_B'\nok $test\n"; bless shift, 'A' }
     package main;
     my $b = _B->new;
@@ -301,7 +301,7 @@ curr_test($test + 2);
 	like ($m->{description}, qr/^Modification of a read-only/);
     };
     package C;
-    sub new { bless {}, shift }
+    sub new { bless \%(), shift }
     DESTROY { @_[0] = 'foo' }
     {
 	print "# should generate an error...\n";
@@ -323,7 +323,7 @@ curr_test($test + 2);
 }
 
 # This test is the reason for postponed destruction in sv_unref
-$a = [1,2,3];
+$a = \@(1,2,3);
 $a = $a->[1];
 is ($a, 2);
 
@@ -335,7 +335,7 @@ is ($a, 2);
 
 foreach my $lexical ('', 'my $a; ') {
   my $expect = "pass\n";
-  my $result = runperl (switches => ['-wl'], stderr => 1,
+  my $result = runperl (switches => \@('-wl'), stderr => 1,
     prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print $a');
 
   is ($?, 0);
@@ -344,22 +344,22 @@ foreach my $lexical ('', 'my $a; ') {
 
 $test = curr_test();
 sub x::DESTROY {print "ok ", $test + shift->[0], "\n"}
-{ my $a1 = bless [3],"x";
-  my $a2 = bless [2],"x";
-  { my $a3 = bless [1],"x";
-    my $a4 = bless [0],"x";
+{ my $a1 = bless \@(3),"x";
+  my $a2 = bless \@(2),"x";
+  { my $a3 = bless \@(1),"x";
+    my $a4 = bless \@(0),"x";
     567;
   }
 }
 curr_test($test+4);
 
-is (runperl (switches=>['-l'],
+is (runperl (switches=> \@('-l'),
 	     prog=> 'print 1; print qq-*$\*-;print 1;'),
     "1\n*\n*\n1\n");
 
 # bug #22719
 
-runperl(prog => 'sub f { my $x = shift; *z = $x; } f({}); f();');
+runperl(prog => 'sub f { my $x = shift; *z = $x; } f(\%()); f();');
 is ($?, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 
 # bug #27268: freeing self-referential typeglobs could trigger
@@ -375,7 +375,7 @@ is (runperl(
 # object is required to trigger the early freeing of GV refs to to STDOUT
 
 like (runperl(
-    prog => 'our $x=bless[]; sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
+    prog => 'our $x=bless \@(); sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
     stderr => 1
       ), qr/^(ok)+$/, 'STDOUT destructor');
 
@@ -460,10 +460,10 @@ TODO: {
 
 # test derefs after list slice
 
-is ( ({foo => "bar"})[[0]]{foo}, "bar", 'hash deref from list slice w/o ->' );
-is ( ({foo => "bar"})[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
-is ( ([qw/foo bar/])[[0]][1], "bar", 'array deref from list slice w/o ->' );
-is ( ([qw/foo bar/])[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
+is ( (\%(foo => "bar"))[[0]]{foo}, "bar", 'hash deref from list slice w/o ->' );
+is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
+is ( (\@(qw/foo bar/))[[0]][1], "bar", 'array deref from list slice w/o ->' );
+is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
 is ( (sub {"bar"})[[0]](), "bar", 'code deref from list slice w/o ->' );
 is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 
@@ -509,9 +509,9 @@ package FINALE;
 our ($ref3, $ref1);
 
 {
-    $ref3 = bless ["ok $test2\n"];	# package destruction
-    my $ref2 = bless ["ok $test1\n"];	# lexical destruction
-    local $ref1 = bless ["ok $test\n"];	# dynamic destruction
+    $ref3 = bless \@("ok $test2\n");	# package destruction
+    my $ref2 = bless \@("ok $test1\n");	# lexical destruction
+    local $ref1 = bless \@("ok $test\n");	# dynamic destruction
     1;					# flush any temp values on stack
 }
 

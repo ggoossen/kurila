@@ -30,7 +30,7 @@ sub new {
     %arg  = @_;
     $host = delete %arg{Host};
   }
-  my $hosts = defined $host ? [$host] : %NetConfig{pop3_hosts};
+  my $hosts = defined $host ? \@($host) : %NetConfig{pop3_hosts};
   my $obj;
   my @localport = exists %arg{ResvPort} ? (LocalPort => %arg{ResvPort}) : ();
 
@@ -257,7 +257,7 @@ sub uidl {
     my $ref = $me->read_until_dot
       or return undef;
     my $ln;
-    $uidl = {};
+    $uidl = \%();
     foreach $ln (@$ref) {
       my ($msg, $uid) = $ln =~ m/^\s*(\d+)\s+([\041-\176]+)/;
       $uidl->{$msg} = $uid;
@@ -369,7 +369,7 @@ sub response {
     $str =~ s/^-ERR\s*//io;
   }
 
-  %{*$cmd}{'net_cmd_resp'} = [$str];
+  %{*$cmd}{'net_cmd_resp'} = \@($str);
   %{*$cmd}{'net_cmd_code'} = $code;
 
   substr($code, 0, 1);
@@ -414,7 +414,7 @@ sub auth {
   eval {
     require MIME::Base64;
     require Authen::SASL;
-  } or $self->set_status(500, ["Need MIME::Base64 and Authen::SASL todo auth"]), return 0;
+  } or $self->set_status(500, \@("Need MIME::Base64 and Authen::SASL todo auth")), return 0;
 
   my $capa       = $self->capa;
   my $mechanisms = $capa->{SASL} || 'CRAM-MD5';
@@ -435,11 +435,11 @@ sub auth {
     unless (@mech) {
       $self->set_status(
         500,
-        [ 'Client SASL mechanisms (',
+        \@( 'Client SASL mechanisms (',
           join(', ', @user_mech),
           ') do not match the SASL mechnism the server announces (',
           join(', ', @server_mech), ')',
-        ]
+        )
       );
       return 0;
     }
@@ -450,11 +450,11 @@ sub auth {
     die "auth(username, password)" if not length $username;
     $sasl = Authen::SASL->new(
       mechanism => $mechanisms,
-      callback  => {
+      callback  => \%(
         user     => $username,
         pass     => $password,
         authname => $username,
-      }
+      )
     );
   }
 
@@ -467,10 +467,10 @@ sub auth {
     my $mech = $sasl->mechanism;
     $self->set_status(
       500,
-      [ " Authen::SASL failure: $@",
+      \@( " Authen::SASL failure: $@",
         '(please check if your local Authen::SASL installation',
         "supports mechanism '$mech'"
-      ]
+      )
     );
     return 0;
   }
@@ -480,10 +480,10 @@ sub auth {
     my $mech = $client->mechanism;
     $self->set_status(
       500,
-      [ ' Authen::SASL failure:  $client->client_start ',
+      \@( ' Authen::SASL failure:  $client->client_start ',
         "mechanism '$mech' hostname #$hostname#",
         $client->error
-      ]
+      )
     );
     return 0;
     };
@@ -503,10 +503,10 @@ sub auth {
     my ($token) = $client->client_step(MIME::Base64::decode_base64(($self->message)[0])) or do {
       $self->set_status(
         500,
-        [ ' Authen::SASL failure:  $client->client_step ',
-          "mechanism '", $client->mechanism, " hostname #$hostname#, ",
-          $client->error
-        ]
+        \@( ' Authen::SASL failure:  $client->client_step ',
+            "mechanism '", $client->mechanism, " hostname #$hostname#, ",
+            $client->error
+          )
       );
       return 0;
     };

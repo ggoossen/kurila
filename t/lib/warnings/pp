@@ -54,17 +54,17 @@ Can't use an undefined value as a SCALAR reference at - line 3.
 ########
 # pp.c
 use warnings 'misc' ;
-my $a = { 1,2,3};
+my $a = \%( 1,2,3);
 no warnings 'misc' ;
-my $b = { 1,2,3};
+my $b = \%( 1,2,3);
 EXPECT
 Odd number of elements in anonymous hash at - line 3.
 ########
 # pp.c
 use warnings 'misc' ;
-bless \[], "" ;
+bless \\@(), "" ;
 no warnings 'misc' ;
-bless \[], "" ;
+bless \\@(), "" ;
 EXPECT
 Explicit blessing to '' (assuming package main) at - line 3.
 ########

@@ -130,12 +130,12 @@ sub hash {
   my ($h, $b) = @_;
   unless ($h) {
     delete %{*$ftp}{'net_ftp_hash'};
-    return [\*STDERR, 0];
+    return \@(\*STDERR, 0);
   }
   ($h, $b) = (ref($h) ? $h : \*STDERR, $b || 1024);
   select((select($h), $| = 1)[0]);
   $b = 512 if $b +< 512;
-  %{*$ftp}{'net_ftp_hash'} = [$h, $b];
+  %{*$ftp}{'net_ftp_hash'} = \@($h, $b);
 }
 
 
@@ -846,7 +846,7 @@ sub supported {
   @_ == 2 or croak 'usage: $ftp->supported( CMD )';
   my $ftp  = shift;
   my $cmd  = uc shift;
-  my $hash = %{*$ftp}{'net_ftp_supported'} ||= {};
+  my $hash = %{*$ftp}{'net_ftp_supported'} ||= \%();
 
   return $hash->{$cmd}
     if exists $hash->{$cmd};
@@ -972,7 +972,7 @@ sub _list_cmd {
     $buf .= $databuf;
   }
 
-  my $list = [split(m/\n/, $buf)];
+  my $list = \@(split(m/\n/, $buf));
 
   $data->close();
 

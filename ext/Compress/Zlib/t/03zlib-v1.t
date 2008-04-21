@@ -55,11 +55,11 @@ my $fil;
 # compress/uncompress tests
 # =========================
 
-eval { compress([1]); };
+eval { compress(\@(1)); };
 ok $@->{description} =~ m#not a scalar reference#
     or print "# $@\n" ;;
 
-eval { uncompress([1]); };
+eval { uncompress(\@(1)); };
 ok $@->{description} =~ m#not a scalar reference#
     or print "# $@\n" ;;
 
@@ -136,7 +136,7 @@ $hello = "I am a HAL 9000 computer" ;
 my @hello = split('', $hello) ;
 my ($err, $X, $status);
  
-ok  (($x, $err) = deflateInit( {-Bufsize => 1} ) ) ;
+ok  (($x, $err) = deflateInit( \%(-Bufsize => 1) ) ) ;
 ok $x ;
 ok $err == Z_OK ;
  
@@ -158,7 +158,7 @@ $Answer .= $X ;
 my @Answer = split('', $Answer) ;
  
 my $k;
-ok (($k, $err) = inflateInit( {-Bufsize => 1}) ) ;
+ok (($k, $err) = inflateInit( \%(-Bufsize => 1)) ) ;
 ok $k ;
 ok $err == Z_OK ;
  
@@ -181,7 +181,7 @@ title 'deflate/inflate - small buffer with a number';
 
 $hello = 6529 ;
  
-ok (($x, $err) = deflateInit( {-Bufsize => 1} ) ) ;
+ok (($x, $err) = deflateInit( \%(-Bufsize => 1) ) ) ;
 ok $x ;
 ok $err == Z_OK ;
  
@@ -207,7 +207,7 @@ ok $x->total_out() == length $Answer ;
  
 @Answer = split('', $Answer) ;
  
-ok (($k, $err) = inflateInit( {-Bufsize => 1}) ) ;
+ok (($k, $err) = inflateInit( \%(-Bufsize => 1)) ) ;
 ok $k ;
 ok $err == Z_OK ;
 
@@ -260,8 +260,8 @@ title 'deflate/inflate - preset dictionary';
 # ===================================
 
 my $dictionary = "hello" ;
-ok $x = deflateInit({-Level => Z_BEST_COMPRESSION,
-			 -Dictionary => $dictionary}) ;
+ok $x = deflateInit(\%(-Level => Z_BEST_COMPRESSION,
+			 -Dictionary => $dictionary)) ;
  
 my $dictID = $x->dict_adler() ;
 
@@ -791,7 +791,7 @@ EOM
     eval { inflateInit(-Bufsize => "xxx") };
     ok $@->{description} =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
-    eval { gzopen([], 0) ; }  ;
+    eval { gzopen(\@(), 0) ; }  ;
     ok $@->{description} =~ m/^gzopen: file parameter is not a filehandle or filename at/
 	or print "# $@\n" ;
 

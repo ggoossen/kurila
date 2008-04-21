@@ -96,7 +96,7 @@ sub new {
   $new->nbsp_for_S(1);
   $new->accept_targets( 'rtf', 'RTF' );
 
-  $new->{'Tagmap'} = {%Tagmap};
+  $new->{'Tagmap'} = \%(%Tagmap);
 
   $new->accept_codes(@_to_accept);
   $new->accept_codes('VerbatimFormatted');
@@ -482,13 +482,13 @@ sub rtf_esc {
   my $x; # scratch
   if(!defined wantarray) { # void context: alter in-place!
     for(@_) {
-      s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
-      s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
+      s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
+      s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
     }
     return;
   } elsif(wantarray) {  # return an array
     return map {; ($x = $_) =~
-      s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
+      s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
       $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
       $x;
     } @_;

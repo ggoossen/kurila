@@ -60,10 +60,10 @@ BEGIN
 
     my $map = $gm->getFileMap() ;
     is @{ $map }, 0, "  returned 0 maps";
-    is_deeply $map, [], " zero maps" ;
+    is_deeply $map, \@(), " zero maps" ;
 
     my $hash = $gm->getHash() ;
-    is_deeply $hash, {}, "  zero maps" ;
+    is_deeply $hash, \%(), "  zero maps" ;
 }
 
 {
@@ -81,17 +81,17 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 3, "  returned 3 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX)],
-          [map { "$tmpDir/$_" } qw(abc2.tmp abc2.tmpX)],
-          [map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmpX)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX)),
+          \@(map { "$tmpDir/$_" } qw(abc2.tmp abc2.tmpX)),
+          \@(map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmpX)),
+        ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-        { map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX
+        \%( map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX
                                   abc2.tmp abc2.tmpX
                                   abc3.tmp abc3.tmpX),
-        }, "  got mapping";
+        ), "  got mapping";
 }
 
 {
@@ -109,13 +109,13 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 1, "  returned 1 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_.tmp" } qw(abc2 abc2)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_.tmp" } qw(abc2 abc2)),
+        ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-        { map { "$tmpDir/$_.tmp" } qw(abc2 abc2),
-        }, "  got mapping";
+        \%( map { "$tmpDir/$_.tmp" } qw(abc2 abc2),
+        ), "  got mapping";
 }
 
 {
@@ -134,9 +134,9 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 2, "  returned 2 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmp.X)],
-          [map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmp.X)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmp.X)),
+          \@(map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmp.X)),
+        ), "  got mapping";
 
     $gm = File::GlobMapper->new("$tmpDir/abc\{1,3\}.tmp", "$tmpDir/X.#1.X")
         or diag $File::GlobMapper::Error ;
@@ -146,9 +146,9 @@ BEGIN
     $map = $gm->getFileMap() ;
     is @{ $map }, 2, "  returned 2 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc1.tmp X.1.X)],
-          [map { "$tmpDir/$_" } qw(abc3.tmp X.3.X)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X.1.X)),
+          \@(map { "$tmpDir/$_" } qw(abc3.tmp X.3.X)),
+        ), "  got mapping";
 
 }
 
@@ -169,10 +169,10 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 3, "  returned 3 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)],
-          [map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)],
-          [map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
+          \@(map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
+          \@(map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
+        ), "  got mapping";
 }
 
 {
@@ -190,10 +190,10 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 3, "  returned 3 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)],
-          [map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)],
-          [map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
+          \@(map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
+          \@(map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
+        ), "  got mapping";
 }
 
 {
@@ -212,10 +212,10 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 3, "  returned 3 maps";
     is_deeply $map,
-        [ [map { "./$tmpDir/$_" } qw(abc1.tmp X-1-c-a-X)],
-          [map { "./$tmpDir/$_" } qw(abc2.tmp X-2-c-a-X)],
-          [map { "./$tmpDir/$_" } qw(abc3.tmp X-3-c-a-X)],
-        ], "  got mapping";
+        \@( \@(map { "./$tmpDir/$_" } qw(abc1.tmp X-1-c-a-X)),
+          \@(map { "./$tmpDir/$_" } qw(abc2.tmp X-2-c-a-X)),
+          \@(map { "./$tmpDir/$_" } qw(abc3.tmp X-3-c-a-X)),
+        ), "  got mapping";
 }
 
 {
@@ -233,11 +233,11 @@ BEGIN
     my $map = $gm->getFileMap() ;
     is @{ $map }, 1, "  returned 1 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X)], ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X)), ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-        { map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X) }, "  got mapping";
+        \%( map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X) ), "  got mapping";
 
 }
 
@@ -258,7 +258,7 @@ BEGIN
     #my $map = $gm->getFileMap() ;
     #is @{ $map }, 1, "  returned 1 maps";
     #is_deeply $map,
-    #[ [map { "$tmpDir/$_" } qw(abc1 abc.X)], ], "  got mapping";
+    #\@( \@(map { "$tmpDir/$_" } qw(abc1 abc.X)), ), "  got mapping";
 }
 
 {
@@ -276,10 +276,10 @@ BEGIN
 
     is @{ $map }, 3, "  returned 3 maps";
     is_deeply $map,
-        [ [map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)],
-          [map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)],
-          [map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)],
-        ], "  got mapping";
+        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
+          \@(map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
+          \@(map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
+        ), "  got mapping";
 }
 
 # TODO

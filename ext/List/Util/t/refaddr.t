@@ -28,7 +28,7 @@ foreach $v (undef, 10, 'string') {
   is(refaddr($v), undef, "not " . (defined($v) ? "'$v'" : "undef"));
 }
 
-foreach $r ({}, \$t, [], \*F, sub {}) {
+foreach $r (\%(), \$t, \@(), \*F, sub {}) {
   my $n = dump::view($r);
   $n =~ m/0x(\w+)/;
   my $addr = do { local $^W; hex $1 };
@@ -48,7 +48,7 @@ use overload  '0+' => sub { 10 },
 
 package MyTie;
 
-sub TIEHANDLE { bless {} }
+sub TIEHANDLE { bless \%() }
 sub DESTROY {}
 
 package Hash3;
@@ -58,7 +58,7 @@ use Scalar::Util qw(refaddr);
 sub TIEHASH
 {
 	my $pkg = shift;
-	return bless [ @_ ], $pkg;
+	return bless \@( @_ ), $pkg;
 }
 sub FETCH
 {

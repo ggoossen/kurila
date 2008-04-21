@@ -49,7 +49,7 @@ EOI
 # Scalars leaked: 3
 fresh_perl_is(<<'EOI', 'ok', \%( ), 'weaken ref #2 under threads');
 package Foo;
-sub new { bless {},shift }
+sub new { bless \%(),shift }
 package main;
 use threads;
 use Scalar::Util qw(weaken);

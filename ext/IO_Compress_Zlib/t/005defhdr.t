@@ -131,25 +131,25 @@ some text
 EOM
 
     my @tests = (
-        [ {-Level => 0}, { FLEVEL => ZLIB_FLG_LEVEL_FASTEST} ],
-        [ {-Level => 1}, { FLEVEL => ZLIB_FLG_LEVEL_FASTEST} ],
-        [ {-Level => 2}, { FLEVEL => ZLIB_FLG_LEVEL_FAST   } ],
-        [ {-Level => 3}, { FLEVEL => ZLIB_FLG_LEVEL_FAST   } ],
-        [ {-Level => 4}, { FLEVEL => ZLIB_FLG_LEVEL_FAST   } ],
-        [ {-Level => 5}, { FLEVEL => ZLIB_FLG_LEVEL_FAST   } ],
-        [ {-Level => 6}, { FLEVEL => ZLIB_FLG_LEVEL_DEFAULT} ],
-        [ {-Level => 7}, { FLEVEL => ZLIB_FLG_LEVEL_SLOWEST} ],
-        [ {-Level => 8}, { FLEVEL => ZLIB_FLG_LEVEL_SLOWEST} ],
-        [ {-Level => 9}, { FLEVEL => ZLIB_FLG_LEVEL_SLOWEST} ],
+        \@( \%(-Level => 0), \%( FLEVEL => ZLIB_FLG_LEVEL_FASTEST) ),
+        \@( \%(-Level => 1), \%( FLEVEL => ZLIB_FLG_LEVEL_FASTEST) ),
+        \@( \%(-Level => 2), \%( FLEVEL => ZLIB_FLG_LEVEL_FAST   ) ),
+        \@( \%(-Level => 3), \%( FLEVEL => ZLIB_FLG_LEVEL_FAST   ) ),
+        \@( \%(-Level => 4), \%( FLEVEL => ZLIB_FLG_LEVEL_FAST   ) ),
+        \@( \%(-Level => 5), \%( FLEVEL => ZLIB_FLG_LEVEL_FAST   ) ),
+        \@( \%(-Level => 6), \%( FLEVEL => ZLIB_FLG_LEVEL_DEFAULT) ),
+        \@( \%(-Level => 7), \%( FLEVEL => ZLIB_FLG_LEVEL_SLOWEST) ),
+        \@( \%(-Level => 8), \%( FLEVEL => ZLIB_FLG_LEVEL_SLOWEST) ),
+        \@( \%(-Level => 9), \%( FLEVEL => ZLIB_FLG_LEVEL_SLOWEST) ),
 
-        [ {-Level => Z_NO_COMPRESSION  }, { FLEVEL => ZLIB_FLG_LEVEL_FASTEST} ],
-        [ {-Level => Z_BEST_SPEED      }, { FLEVEL => ZLIB_FLG_LEVEL_FASTEST} ],
-        [ {-Level => Z_BEST_COMPRESSION}, { FLEVEL => ZLIB_FLG_LEVEL_SLOWEST} ],
-        [ {-Level => Z_DEFAULT_COMPRESSION}, { FLEVEL => ZLIB_FLG_LEVEL_DEFAULT} ],
+        \@( \%(-Level => Z_NO_COMPRESSION  ), \%( FLEVEL => ZLIB_FLG_LEVEL_FASTEST) ),
+        \@( \%(-Level => Z_BEST_SPEED      ), \%( FLEVEL => ZLIB_FLG_LEVEL_FASTEST) ),
+        \@( \%(-Level => Z_BEST_COMPRESSION), \%( FLEVEL => ZLIB_FLG_LEVEL_SLOWEST) ),
+        \@( \%(-Level => Z_DEFAULT_COMPRESSION), \%( FLEVEL => ZLIB_FLG_LEVEL_DEFAULT) ),
 
-        [ {-Strategy => Z_HUFFMAN_ONLY}, { FLEVEL => ZLIB_FLG_LEVEL_FASTEST} ],
-        [ {-Strategy => Z_HUFFMAN_ONLY,
-           -Level    => 3             }, { FLEVEL => ZLIB_FLG_LEVEL_FASTEST} ],
+        \@( \%(-Strategy => Z_HUFFMAN_ONLY), \%( FLEVEL => ZLIB_FLG_LEVEL_FASTEST) ),
+        \@( \%(-Strategy => Z_HUFFMAN_ONLY,
+           -Level    => 3             ), \%( FLEVEL => ZLIB_FLG_LEVEL_FASTEST) ),
     );
 
     foreach my $test (@tests)

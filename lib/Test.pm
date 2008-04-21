@@ -199,7 +199,7 @@ sub _read_program {
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
   open(SOURCEFILE, "<", "$file") || return;
-  %Program_Lines{$file} = [ ~< *SOURCEFILE];
+  %Program_Lines{$file} = \@( ~< *SOURCEFILE);
   close(SOURCEFILE);
 
   foreach my $x (@{%Program_Lines{$file}})
@@ -413,13 +413,13 @@ sub ok ($;$$) {
         }
 
         $ok or _complain($result, $expected,
-        {
-          'repetition' => $repetition, 'package' => $pkg,
-          'result' => $result, 'todo' => $todo,
-          'file' => $file, 'line' => $line,
-          'context' => $context, 'compare' => $compare,
-          @_ ? ('diagnostic' =>  _to_value(shift)) : (),
-        });
+        \%(
+           'repetition' => $repetition, 'package' => $pkg,
+           'result' => $result, 'todo' => $todo,
+           'file' => $file, 'line' => $line,
+           'context' => $context, 'compare' => $compare,
+           @_ ? ('diagnostic' =>  _to_value(shift)) : (),
+        ));
 
     }
     ++ $ntest;
@@ -587,18 +587,18 @@ sub _diff_complain_algdiff {
         my $kind = shift;
         &$diff_flush() if $diff_kind && $diff_kind ne $kind;
         $diff_kind = $kind;
-        push(@diff_lines, [@_]);
+        push(@diff_lines, \@(@_));
     };
 
 
     Algorithm::Diff::traverse_balanced(
         \@got, \@exp,
-        {
+        \%(
             DISCARD_A => sub { &$diff_collect("GOT", @_) },
             DISCARD_B => sub { &$diff_collect("EXP", @_) },
             CHANGE    => sub { &$diff_collect("CH",  @_) },
             MATCH     => sub { &$diff_flush() },
-        },
+        ),
     );
     &$diff_flush();
 

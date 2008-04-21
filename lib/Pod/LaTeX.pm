@@ -393,7 +393,7 @@ sub initialize {
   # print Dumper($self);
 
   # Internals
-  $self->{_Lists} = [];             # For nested lists
+  $self->{_Lists} = \@();             # For nested lists
   $self->{_suppress_all_para}  = 0; # For =begin blocks
   $self->{_dont_modify_any_para}=0; # For =begin blocks
   $self->{_CURRENT_HEAD1}   = '';   # Name of current HEAD1 section

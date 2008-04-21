@@ -359,7 +359,7 @@ ok ! $fil->gzclose ;
 
 }
 
-foreach my $stdio ( ['-', '-'], [\*STDIN, \*STDOUT])
+foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 {
     my $stdin = $stdio->[0];
     my $stdout = $stdio->[1];

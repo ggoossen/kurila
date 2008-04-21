@@ -36,7 +36,7 @@ sub new {
   my $obj;
 
   my $h;
-  foreach $h (@{ref($hosts) ? $hosts : [$hosts]}) {
+  foreach $h (@{ref($hosts) ? $hosts : \@($hosts)}) {
     $obj = $type->SUPER::new(
       PeerAddr => ($host = $h),
       PeerPort => %arg{Port} || 'smtp(25)',
@@ -103,7 +103,7 @@ sub domain {
 
 sub etrn {
   my $self = shift;
-  defined($self->supports('ETRN', 500, ["Command unknown: 'ETRN'"]))
+  defined($self->supports('ETRN', 500, \@("Command unknown: 'ETRN'")))
     && $self->_ETRN(@_);
 }
 
@@ -114,9 +114,9 @@ sub auth {
   eval {
     require MIME::Base64;
     require Authen::SASL;
-  } or $self->set_status(500, ["Need MIME::Base64 and Authen::SASL todo auth"]), return 0;
+  } or $self->set_status(500, \@("Need MIME::Base64 and Authen::SASL todo auth")), return 0;
 
-  my $mechanisms = $self->supports('AUTH', 500, ["Command unknown: 'AUTH'"]);
+  my $mechanisms = $self->supports('AUTH', 500, \@("Command unknown: 'AUTH'"));
   return unless defined $mechanisms;
 
   my $sasl;
@@ -129,11 +129,11 @@ sub auth {
     die "auth(username, password)" if not length $username;
     $sasl = Authen::SASL->new(
       mechanism => $mechanisms,
-      callback  => {
+      callback  => \%(
         user     => $username,
         pass     => $password,
         authname => $username,
-      }
+      )
     );
   }
 
@@ -171,7 +171,7 @@ sub hello {
   my @msg    = $me->message;
 
   if ($ok) {
-    my $h = %{*$me}{'net_smtp_esmtp'} = {};
+    my $h = %{*$me}{'net_smtp_esmtp'} = \%();
     my $ln;
     foreach $ln (@msg) {
       $h->{uc $1} = $2

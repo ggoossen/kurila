@@ -74,10 +74,10 @@ is($y, "c 20");
 eval 'local($$e)';
 like($@->{description}, qr/Can't localize through a reference/);
 
-eval '$e = []; local(@$e)';
+eval '$e = \@(); local(@$e)';
 like($@->{description}, qr/Can't localize through a reference/);
 
-eval '$e = {}; local(%$e)';
+eval '$e = \%(); local(%$e)';
 like($@->{description}, qr/Can't localize through a reference/);
 
 # Array and hash elements

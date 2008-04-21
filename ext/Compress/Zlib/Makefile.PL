@@ -15,9 +15,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Compress/Zlib.pm',
 
 
-      %ENV{SKIP_FOR_CORE}
-        ? (MAN3PODS    => \%())
-	    : (PREREQ_PM   => \%( 'Compress::Raw::Zlib'           => $::VERSION,
+    PREREQ_PM   => \%( 'Compress::Raw::Zlib'           => $::VERSION,
 		                    'IO::Compress::Base'            => $::VERSION,
 		                    'IO::Compress::Base::Common'    => $::VERSION,
 		                    'IO::Uncompress::Base'          => $::VERSION,
@@ -25,9 +23,7 @@ WriteMakefile(
 		                    'IO::Compress::Gzip::Constants' => $::VERSION,
 		                    'IO::Uncompress::Gunzip'        => $::VERSION,
 		                    'Scalar::Util'                  => 0,
-                          )
-	      )
-    ),
+                          ),
        
     ABSTRACT_FROM => 'lib/Compress/Zlib.pm',
     AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',

@@ -29,7 +29,7 @@ sub _socket {
 
   my $port = (getservbyname($pname, $proto))[2] || $pnum;
 
-  my $hosts = defined $host ? [$host] : %NetConfig{$pname . '_hosts'};
+  my $hosts = defined $host ? \@($host) : %NetConfig{$pname . '_hosts'};
 
   my $me;
 

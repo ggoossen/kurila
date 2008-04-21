@@ -348,9 +348,9 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 			SV *postentry;
 			
 			if (realtype == SVt_PVHV)
-			    sv_catpvn(retval, "{}", 2);
+			    sv_catpvn(retval, "\\%()", 4);
 			else if (realtype == SVt_PVAV)
-			    sv_catpvn(retval, "[]", 2);
+			    sv_catpvn(retval, "\\@()", 4);
 			else
 			    sv_catpvn(retval, "do{my $o}", 9);
 			postentry = newSVpvn(name, namelen);
@@ -531,7 +531,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		iname[0] = '$';
 	    }
 	    else {
-		sv_catpvn(retval, "[", 1);
+		sv_catpvn(retval, "\\@(", 3);
 		/* omit "->" in $foo{bar}->[0], but not in ${$foo}->[0] */
 		/*if (namelen > 0
 		    && name[namelen-1] != ']' && name[namelen-1] != '}'
@@ -591,10 +591,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		sv_catsv(retval, opad);
 		SvREFCNT_dec(opad);
 	    }
-	    if (name[0] == '@')
-		sv_catpvn(retval, ")", 1);
-	    else
-		sv_catpvn(retval, "]", 1);
+            sv_catpvn(retval, ")", 1);
 	    SvREFCNT_dec(ixsv);
 	    SvREFCNT_dec(totpad);
 	    Safefree(iname);
@@ -614,7 +611,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		(SvPVX(iname))[0] = '$';
 	    }
 	    else {
-		sv_catpvn(retval, "{", 1);
+		sv_catpvn(retval, "\\%(", 3);
 		/* omit "->" in $foo[0]->{bar}, but not in ${$foo}->{bar} */
 		if ((namelen > 0
 		     && name[namelen-1] != ']' && name[namelen-1] != '}')
@@ -778,10 +775,7 @@ DD_dump(pTHX_ SV *val, const char *name, STRLEN namelen, SV *retval, HV *seenhv,
 		sv_catsv(retval, opad);
 		SvREFCNT_dec(opad);
 	    }
-	    if (name[0] == '%')
-		sv_catpvn(retval, ")", 1);
-	    else
-		sv_catpvn(retval, "}", 1);
+            sv_catpvn(retval, ")", 1);
 	    SvREFCNT_dec(iname);
 	    SvREFCNT_dec(totpad);
 	}

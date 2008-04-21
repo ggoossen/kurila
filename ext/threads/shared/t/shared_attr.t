@@ -66,7 +66,7 @@ for(1..10) {
     ok($test_count++, @foo[-1] eq "baz");
 }
 
-my $shared :shared = &share({});
+my $shared :shared = &share(\%());
 %$shared{'foo'} = 'bar';
 
 for(1..10) {

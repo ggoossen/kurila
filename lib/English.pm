@@ -181,10 +181,8 @@ sub import {
 	    *UID				= *<	;
 	*EFFECTIVE_USER_ID			= *>	;
 	    *EUID				= *>	;
-	*REAL_GROUP_ID				= *(	;
-	    *GID				= *(	;
-	*EFFECTIVE_GROUP_ID			= *)	;
-	    *EGID				= *)	;
+	*REAL_GROUP_ID				= *^GID	;
+	*EFFECTIVE_GROUP_ID			= *^EGID	;
 	*PROGRAM_NAME				= *0	;
 
 # Internals.

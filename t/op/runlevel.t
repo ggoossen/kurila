@@ -155,7 +155,7 @@ sub str {
  
 package main;
  
-our $bar = bless {}, 'TEST';
+our $bar = bless \%(), 'TEST';
 print "$bar\n";
 print "OK\n";
 EXPECT
@@ -326,7 +326,7 @@ Nothing
 package TEST;
  
 sub TIEARRAY {
-  return bless [qw(foo fee fie foe)], @_[0];
+  return bless \@(qw(foo fee fie foe)), @_[0];
 }
 sub FETCH {
   my ($s,$i) = @_;
@@ -344,7 +344,7 @@ EXPECT
 foo|fee|fie|foe
 ########
 package TH;
-sub TIEHASH { bless {}, 'TH' }
+sub TIEHASH { bless \%(), 'TH' }
 sub STORE { eval { print "@_[[1,2]]\n" }; die "bar\n" }
 tie our %h, 'TH';
 eval { %h{A} = 1; print "never\n"; };
@@ -372,7 +372,7 @@ sub d {
 EXPECT
 0
 ########
-sub TIEHANDLE { bless {} }
+sub TIEHANDLE { bless \%() }
 sub PRINT { next }
 
 tie *STDERR, '';
@@ -381,7 +381,7 @@ tie *STDERR, '';
 EXPECT
 recursive die
 ########
-sub TIEHANDLE { bless {} }
+sub TIEHANDLE { bless \%() }
 sub PRINT { print "[TIE] @_[1]" }
 
 tie *STDERR, '';
@@ -390,7 +390,7 @@ die "DIE";
 EXPECT
 [TIE] DIE at - line 5.
 ########
-sub TIEHANDLE { bless {} }
+sub TIEHANDLE { bless \%() }
 sub PRINT { 
     (split(m/./, 'x'x10000))[0];
     eval('die("test\n")');

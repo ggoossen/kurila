@@ -204,7 +204,7 @@ sub Tgetent
     my $class = shift;
     my ($self) = @_;
 
-    $self = {} unless defined $self;
+    $self = \%() unless defined $self;
     bless $self, $class;
 
     my ( $term, $cap, $search, $field, $max, $tmp_term, $TERMCAP );

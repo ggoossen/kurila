@@ -17,7 +17,7 @@ BEGIN {
 plan(tests => 1);
 
 my $result = runperl( prog	=> 'print "foo"',
-		       args	=> [ '-Dx' ],
+		       args	=> \@( '-Dx' ),
 		       stderr	=> 1,
 		       );
 

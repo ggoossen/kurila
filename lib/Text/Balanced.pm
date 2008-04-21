@@ -11,7 +11,7 @@ use vars qw { $VERSION @ISA %EXPORT_TAGS };
 use version; $VERSION = qv('2.0.0');
 @ISA		= qw ( Exporter );
 		     
-%EXPORT_TAGS	= ( ALL => [ qw(
+%EXPORT_TAGS	= ( ALL => \@( qw(
 				&extract_delimited
 				&extract_bracketed
 				&extract_quotelike
@@ -24,7 +24,7 @@ use version; $VERSION = qv('2.0.0');
 				&gen_extract_tagged
 
 				&delimited_pat
-			       ) ] );
+			       ) ) );
 
 Exporter::export_ok_tags('ALL');
 
@@ -39,7 +39,7 @@ sub _match_quotelike($$$$);
 
 sub _failmsg {
 	my ($message, $pos) = @_;
-	$@ = bless { error=>$message, pos=>$pos }, "Text::Balanced::ErrorMsg";
+	$@ = bless \%( error=>$message, pos=>$pos ), "Text::Balanced::ErrorMsg";
 }
 
 sub _fail
@@ -860,11 +860,11 @@ sub _match_quotelike($$$$)	# ($textref, $prepat, $allow_raw_match)
 }
 
 my $def_func = 
-[
+\@(
 	sub { extract_variable(@_[0], '') },
 	sub { extract_quotelike(@_[0],'') },
 	sub { extract_codeblock(@_[0],'{}','') },
-];
+);
 
 sub extract_multiple (;$$$$)	# ($text, $functions_ref, $max_fields, $ignoreunknown)
 {

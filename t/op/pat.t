@@ -917,7 +917,7 @@ $_='123x123';
 ok( ('123||x|123|' eq join '|', @res) );
 
 # see if matching against temporaries (created via pp_helem()) is safe
-{ foo => "ok $test\n".$^X }->{foo} =~ m/^(.*)\n/g;
+\%( foo => "ok $test\n".$^X )->{foo} =~ m/^(.*)\n/g;
 print "$1\n";
 $test++;
 
@@ -1058,14 +1058,14 @@ ok("\n\n" =~ m/\n* $ \n/x);
 
 ok("\n\n" =~ m/\n+ $ \n/x);
 
-eval { [] =~ m/^ARRAY/ };
+eval { \@() =~ m/^ARRAY/ };
 ok($@ && $@->{description} =~ qr/Tried to stringify a reference/, " # TODO ");
 
 eval << 'EOE';
 \{
  package S;
  use overload '""' => sub \{ 'Object S' \};
- sub new \{ bless [] \}
+ sub new \{ bless \@() \}
 \}
 $a = 'S'->new;
 EOE
@@ -2652,13 +2652,13 @@ print "e" =~ m/\P{InConsonant}/ ? "ok $test\n" : "not ok $test\n"; $test++;
 
 if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
-    for ([ 'byte', "\x{ff}" ], [ 'utf8', "\x{1ff}" ]) {
+    for (\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" )) {
 	my($type, $char) = @$_;
 	for my $len (32000, 32768, 33000) {
 	    my $s = $char . "f" x $len;
 	    my $r = $s =~ m/$char([f]*)/gc;
             ok($r, " # TODO <$type x $len>");
-	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos @{[ pos($s) ]}");
+	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos @{\@( pos($s) )}");
 	}
     }
 } else {
@@ -2872,7 +2872,7 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 	    $p++ if m/(??{ $p })/
     }
     iseq ($p, 5, '[perl #20683] (??{ }) returns stale values');
-    { package P; $a=1; sub TIESCALAR { bless[] } sub FETCH { $a++ } }
+    { package P; $a=1; sub TIESCALAR { bless \@() } sub FETCH { $a++ } }
     tie $p, 'P';
     foreach (1,2,3,4) {
 	    m/(??{ $p })/
@@ -3152,7 +3152,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     }
     package main;
     
-    my $aeek = bless {}, 'wooosh';
+    my $aeek = bless \%(), 'wooosh';
     eval {$aeek->gloople() =~ m/(.)/g;};
     ok($@ eq "", "//g match against return value of sub") or print "# $@\n";
 }
@@ -3426,9 +3426,9 @@ sub iseq($$;$) {
         @v=sort values(%+);
         $res=1;
         push @fetch,
-            [ "%+{A}", "$1" ],
-            [ "%+{B}", "$2" ],
-            [ "%+{C}", "$3" ],
+            \@( "%+{A}", "$1" ),
+            \@( "%+{B}", "$2" ),
+            \@( "%+{C}", "$3" ),
         ;
     } 
     foreach (0..2) {
@@ -3464,10 +3464,10 @@ sub iseq($$;$) {
 	@v = sort values(%+);
 	$res = 1;
 	push @fetch,
-	    [ "%+{A}", "$2" ],
-	    [ "%+{B}", "$3" ],
-	    [ "%+{C}", "$4" ],
-	    [ "%+{D}", $1 ],
+	    \@( "%+{A}", "$2" ),
+	    \@( "%+{B}", "$3" ),
+	    \@( "%+{C}", "$4" ),
+	    \@( "%+{D}", $1 ),
 	;
     }
     foreach (0..3) {
@@ -3987,14 +3987,14 @@ sub kt
 
     # ANYOF tests
 
-    for ([qw|\w aA #@!|],
-         [qw|[abc] abc def|],
-         [qw|[^abc] def abc|],
-         [qw|[[:word:]] abc #@!|],
-         [qw|[[:^word:]] #@! abc|],
+    for (\@(qw|\w aA #@!|),
+         \@(qw|[abc] abc def|),
+         \@(qw|[^abc] def abc|),
+         \@(qw|[[:word:]] abc #@!|),
+         \@(qw|[[:^word:]] #@! abc|),
         ) {
         my $m = shift @$_;
-        my ($s, $f) = map { [split m/ */] } @$_;
+        my ($s, $f) = map { \@(split m/ */) } @$_;
         ok(m/$m/, " $m basic match") for @$s;
         ok(not m/$m/) for @$f;
         ok(m/^$m$/) for @$s;
@@ -4091,7 +4091,7 @@ sub kt
     local $Message = "Various whitespace special patterns";
     my @lb=( "\x{0D}\x{0A}",
              map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
-    foreach my $t ([\@lb,qr/\R/,qr/\R+/],){
+    foreach my $t (\@(\@lb,qr/\R/,qr/\R+/),){
         my $ary=shift @$t;
         foreach my $pat (@$t) {
             foreach my $str (@$ary) {

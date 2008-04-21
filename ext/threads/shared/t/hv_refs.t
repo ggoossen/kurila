@@ -82,7 +82,7 @@ ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
 }
 
 {
-    my $h = {a=>14};
+    my $h = \%(a=>14);
     my $r = \$h->{a};
     share($r);
         eval { lock($r); };
@@ -91,7 +91,7 @@ ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
         ok(15, !$@, "lock on helems: $@");
 }
 {
-    my $object : shared = &share({});
+    my $object : shared = &share(\%());
     threads->create(sub {
                      bless $object, 'test1';
                  })->join;

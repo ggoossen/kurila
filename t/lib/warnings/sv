@@ -211,7 +211,7 @@ Use of uninitialized value $a in concatenation (.) or string at - line 6.
 ########
 # sv.c 
 use warnings 'numeric' ;
-sub TIESCALAR{bless[]} ; 
+sub TIESCALAR{bless \@()} ; 
 sub FETCH {"def"} ; 
 tie $a,"main" ; 
 my $b = 1 + $a;

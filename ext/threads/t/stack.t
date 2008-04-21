@@ -65,7 +65,7 @@ ok(10, threads->get_stack_size() == 128*4096,
         'Default thread sized changed in thread');
 
 threads->create(
-    { 'stack' => 160*4096 },
+    \%( 'stack' => 160*4096 ),
     sub {
         ok(11, threads->get_stack_size() == 128*4096,
                 'Get stack size in thread');
@@ -74,7 +74,7 @@ threads->create(
     }
 )->join();
 
-my $thr = threads->create( { 'stack' => 160*4096 }, sub { } );
+my $thr = threads->create( \%( 'stack' => 160*4096 ), sub { } );
 
 $thr->create(
     sub {
@@ -86,7 +86,7 @@ $thr->create(
 )->join();
 
 $thr->create(
-    { 'stack' => 144*4096 },
+    \%( 'stack' => 144*4096 ),
     sub {
         ok(15, threads->get_stack_size() == 128*4096,
                 'Get stack size in thread');
