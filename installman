@@ -122,7 +122,7 @@ while (~< *UTILS) {
 	    $xold =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
 	    my $xnew = $new;
 	    $xnew =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
-	    $packlist->{$xnew} = { from => $xold, type => 'link' };
+	    $packlist->{$xnew} = \%( from => $xold, type => 'link' );
 	}
     }
 }
@@ -154,15 +154,15 @@ sub pod2man {
 	%modpods = (map {+"$poddir/$_", $_} @script);
     }
     else {
-	File::Find::find({no_chdir=>1,
-                          wanted => sub {
-                              # $_ is $File::Find::name when using no_chdir
-                              if (-f $_ and m/\.p(?:m|od)$/) {
-                                  my $fullname = $_;
-                                  s!^\Q$poddir\E/!!;
-                                  %modpods{$fullname} = $_;
-                              }
-                          }},
+	File::Find::find(\%(no_chdir=>1,
+                            wanted => sub {
+                                # $_ is $File::Find::name when using no_chdir
+                                if (-f $_ and m/\.p(?:m|od)$/) {
+                                    my $fullname = $_;
+                                    s!^\Q$poddir\E/!!;
+                                    %modpods{$fullname} = $_;
+                                }
+                            }),
                          $poddir);
     }
     my @to_process;
@@ -204,7 +204,7 @@ sub pod2man {
 	}
 	$tmp = "{$mandir}/{$manpage}.tmp";
 	$manpage = "{$mandir}/{$manpage}.{$manext}";
-	push @to_process, [$mod, $tmp, $manpage];
+	push @to_process, \@($mod, $tmp, $manpage);
     }
 
     foreach my $page (@to_process) {
@@ -220,7 +220,7 @@ sub pod2man {
 	if (!%opts{notify} && $parser->parse_from_file($pod, $tmp)) {
             if (-s $tmp) {
                 if (rename($tmp, $manpage)) {
-                    $packlist->{$xmanpage} = { type => 'file' };
+                    $packlist->{$xmanpage} = \%( type => 'file' );
                     next;
                 }
             }
