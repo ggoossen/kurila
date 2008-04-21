@@ -1,9 +1,6 @@
 use ExtUtils::MakeMaker;
 
 my @makefileopts;
-if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
-    push @makefileopts, MAN3PODS => \%();
-}
 push @makefileopts, INSTALLDIRS => 'perl';
 
 WriteMakefile(

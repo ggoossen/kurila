@@ -78,17 +78,17 @@ ok 18
 # previous line intentionally left blank.
 
 print <<E1 eq "foo\n\n" ? "ok 19\n" : "not ok 19\n";
-@{[ <<E2 ]}
+@{\@( <<E2 )}
 foo
 E2
 E1
 
 print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
-@{[
+@{\@(
   <<E2
 foo
 E2
-]}
+)}
 E1
 
 {

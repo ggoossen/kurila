@@ -3,9 +3,8 @@ use ExtUtils::Constant v0.11 'WriteConstants';
 WriteMakefile(
     NAME		=> 'File::Glob',
     VERSION_FROM	=> 'Glob.pm',
-    MAN3PODS		=> \%(),     # Pods will be built by installman.
     OBJECT		=> 'bsd_glob$(OBJ_EXT) Glob$(OBJ_EXT)',
-    realclean => \%(FILES=> 'const-c.inc const-xs.inc'),
+    realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
 
 ## uncomment for glob debugging (will cause make test to fail)
 #   DEFINE		=> '-DGLOB_DEBUG',

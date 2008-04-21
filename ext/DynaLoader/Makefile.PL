@@ -9,12 +9,12 @@ WriteMakefile(
     XSPROTOARG => '-noprototypes', 		# XXX remove later?
     VERSION_FROM => 'DynaLoader_pm.PL',
     PL_FILES	=> \%('DynaLoader_pm.PL'=>'DynaLoader.pm',
-		    'XSLoader_pm.PL'=>'XSLoader.pm'),
+                      'XSLoader_pm.PL'=>'XSLoader.pm'),
     PM		=> \%('DynaLoader.pm' => '$(INST_LIBDIR)/DynaLoader.pm',
-		    'XSLoader.pm' => '$(INST_LIBDIR)/XSLoader.pm'),
+                      'XSLoader.pm' => '$(INST_LIBDIR)/XSLoader.pm'),
     depend      => \%('DynaLoader$(OBJ_EXT)' => 'dlutils.c'),
     clean	=> \%(FILES => 'DynaLoader.c DynaLoader.xs DynaLoader.pm ' .
-			     'XSLoader.pm'),
+                               'XSLoader.pm'),
 );
 
 sub MY::postamble {

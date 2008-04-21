@@ -53,7 +53,7 @@ ExtUtils::Manifest - utilities to write and check a MANIFEST file
 
     manicopy($read,$target);
 
-    maniadd({$file => $comment, ...});
+    maniadd(\%($file => $comment, ...));
 
 
 =head1 DESCRIPTION
@@ -90,7 +90,7 @@ sub _sort {
 sub mkmanifest {
     my $manimiss = 0;
     my $read = (-r 'MANIFEST' && maniread()) or $manimiss++;
-    $read = {} if $manimiss;
+    $read = \%() if $manimiss;
     local *M;
     my $bakbase = $MANIFEST;
     $bakbase =~ s/\./_/g if $Is_VMS; # avoid double dots
@@ -142,8 +142,8 @@ below the current directory.
 =cut
 
 sub manifind {
-    my $p = shift || {};
-    my $found = {};
+    my $p = shift || \%();
+    my $found = \%();
 
     my $wanted = sub {
 	my $name = clean_up_filename($File::Find::name);
@@ -161,7 +161,7 @@ sub manifind {
     # $File::Find::name is unavailable.
     # Also, it's okay to use / here, because MANIFEST files use Unix-style 
     # paths.
-    find({wanted => $wanted},
+    find(\%(wanted => $wanted),
 	 $Is_MacOS ? ":" : ".");
 
     return $found;
@@ -214,7 +214,7 @@ refs.
 =cut
 
 sub fullcheck {
-    return [_check_files()], [_check_manifest()];
+    return \@(_check_files()), \@(_check_manifest());
 }
 
 
@@ -248,7 +248,7 @@ sub skipcheck {
 sub _check_files {
     my $p = shift;
     my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0);
-    my $read = maniread() || {};
+    my $read = maniread() || \%();
     my $found = manifind($p);
 
     my(@missfile) = ();
@@ -271,7 +271,7 @@ sub _check_files {
 
 sub _check_manifest {
     my($p) = @_;
-    my $read = maniread() || {};
+    my $read = maniread() || \%();
     my $found = manifind($p);
     my $skip  = _maniskip();
 
@@ -305,7 +305,7 @@ start with C<#> in the C<MANIFEST> file are discarded.
 sub maniread {
     my ($mfile) = @_;
     $mfile ||= $MANIFEST;
-    my $read = {};
+    my $read = \%();
     my $m;
     unless (open $m, "<", $mfile){
         warn "Problem opening $mfile: $!";
@@ -468,7 +468,7 @@ sub manicopy {
     require File::Basename;
 
     $target = VMS::Filespec::unixify($target) if $Is_VMS;
-    File::Path::mkpath([ $target ],! $Quiet,$Is_VMS ? undef : 0755);
+    File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ? undef : 0755);
     foreach my $file (keys %$read){
     	if ($Is_MacOS) {
 	    if ($file =~ m!:!) { 
@@ -482,7 +482,7 @@ sub manicopy {
 	    if ($file =~ m!/!) { # Ilya, that hurts, I fear, or maybe not?
 		my $dir = File::Basename::dirname($file);
 		$dir = VMS::Filespec::unixify($dir) if $Is_VMS;
-		File::Path::mkpath(["$target/$dir"],! $Quiet,$Is_VMS ? undef : 0755);
+		File::Path::mkpath(\@("$target/$dir"),! $Quiet,$Is_VMS ? undef : 0755);
 	    }
 	    cp_if_diff($file, "$target/$file", $how);
 	}
@@ -602,7 +602,7 @@ sub _unmacify {
 
 =item maniadd
 
-  maniadd({ $file => $comment, ...});
+  maniadd(\%( $file => $comment, ...));
 
 Adds an entry to an existing F<MANIFEST> unless its already there.
 

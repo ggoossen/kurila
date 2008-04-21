@@ -206,8 +206,8 @@ sub WriteIfChanged($\@)
 ## each range).
 ##
 ## For example, a range ASCII LETTERS would be represented as:
-##   [ [ 0x41 => 0x5A, 'UPPER' ],
-##     [ 0x61 => 0x7A, 'LOWER, ] ]
+##   \@( \@( 0x41 => 0x5A, 'UPPER' ),
+##     \@( 0x61 => 0x7A, 'LOWER, ) )
 ##
 sub RANGE_START() { 0 } ## index into range element
 sub RANGE_END()   { 1 } ## index into range element
@@ -291,8 +291,8 @@ sub Build_Aliases()
 	my ($prop, @data) = split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
-	    %PropValueAlias{$prop}{@data[1]} = [ @data[[0,2]] ];
-	    %PVA_reverse{$prop}{@data[2]} = [ @data[[0,1]] ];
+	    %PropValueAlias{$prop}{@data[1]} = \@( @data[[0,2]] );
+	    %PVA_reverse{$prop}{@data[2]} = \@( @data[[0,1]] );
 	}
 	else {
             next if @data[0] eq "n/a";
@@ -375,7 +375,7 @@ sub Table::New
     my $class = shift;
     my %Args = @_;
 
-    my $Table = bless [], $class;
+    my $Table = bless \@(), $class;
 
     my $Fuzzy = delete %Args{Fuzzy};
     my $Desc  = delete %Args{Desc};
@@ -464,9 +464,9 @@ sub Table::RawAppendRange
     my $name  = shift;
     $name = "" if not defined $name; ## warning: $name can be "0"
 
-    push @$Table, [ $start,    # RANGE_START
-                    $end,      # RANGE_END
-                    $name   ]; # RANGE_NAME
+    push @$Table, \@( $start,    # RANGE_START
+                      $end,      # RANGE_END
+                      $name   ); # RANGE_NAME
 }
 
 ##
@@ -565,7 +565,7 @@ sub Table::Merge
             push @Records, @$Arg;
         } else {
             ## arg is a codepoint, make a range
-            push @Records, [ $Arg, $Arg ]
+            push @Records, \@( $Arg, $Arg )
         }
     }
 
@@ -754,9 +754,9 @@ sub simple_dumper {
     foreach $item (@_) {
 	if (ref $item) {
 	    if (ref $item eq 'ARRAY') {
-		push @lines, "[\n", simple_dumper (@$item), "],\n";
+		push @lines, '\@('."\n", simple_dumper (@$item), "),\n";
 	    } elsif (ref $item eq 'HASH') {
-		push @lines, "\{\n", simple_dumper (%$item), "\},\n";
+		push @lines, '\%('."\n", simple_dumper (%$item), "),\n";
 	    } else {
 		die "Can't cope with $item";
 	    }
@@ -1125,7 +1125,7 @@ sub UnicodeData_Txt()
     # $Bidi->Write("Bidirectional.pl");
     for (keys %Bidi) {
 	%Bidi{$_}->Write(
-	    ["lib","bc","$_.pl"],
+	    \@("lib","bc","$_.pl"),
 	    "BidiClass category '%PropValueAlias{bc}{$_}'"
 	);
     }
@@ -1135,7 +1135,7 @@ sub UnicodeData_Txt()
 	my ($code, $name) = @{ %PropValueAlias{ccc}{$_} };
 	(my $c = Table->New())->Append($code);
 	$c->Write(
-	    ["lib","ccc","$_.pl"],
+	    \@("lib","ccc","$_.pl"),
 	    "CombiningClass category '$name'"
 	);
     }
@@ -1143,7 +1143,7 @@ sub UnicodeData_Txt()
     $Deco->Write("Decomposition.pl");
     for (keys %DC) {
 	%DC{$_}->Write(
-	    ["lib","dt","$_.pl"],
+	    \@("lib","dt","$_.pl"),
 	    "DecompositionType category '%PropValueAlias{dt}{$_}'"
 	);
     }
@@ -1151,7 +1151,7 @@ sub UnicodeData_Txt()
     # $Number->Write("Number.pl");
     for (keys %Number) {
 	%Number{$_}->Write(
-	    ["lib","nt","$_.pl"],
+	    \@("lib","nt","$_.pl"),
 	    "NumericType category '%PropValueAlias{nt}{$_}'"
 	);
     }
@@ -1159,7 +1159,7 @@ sub UnicodeData_Txt()
     # $General->Write("Category.pl");
 
     for my $to (sort keys %To) {
-        %To{$to}->Write(["To","$to.pl"]);
+        %To{$to}->Write(\@("To","$to.pl"));
     }
 
     for (keys %{ %PropValueAlias{gc} }) {
@@ -1202,7 +1202,7 @@ sub LineBreak_Txt()
 
     for (keys %Lbrk) {
 	%Lbrk{$_}->Write(
-	    ["lib","lb","$_.pl"],
+	    \@("lib","lb","$_.pl"),
 	    "Linebreak category '%PropValueAlias{lb}{$_}'"
 	);
     }
@@ -1243,7 +1243,7 @@ sub ArabicShaping_txt()
 
     for (keys %JoinType) {
 	%JoinType{$_}->Write(
-	    ["lib","jt","$_.pl"],
+	    \@("lib","jt","$_.pl"),
 	    "JoiningType category '%PropValueAlias{jt}{$_}'"
 	);
     }
@@ -1280,7 +1280,7 @@ sub EastAsianWidth_txt()
 
     for (keys %EAW) {
 	%EAW{$_}->Write(
-	    ["lib","ea","$_.pl"],
+	    \@("lib","ea","$_.pl"),
 	    "EastAsianWidth category '%PropValueAlias{ea}{$_}'"
 	);
     }
@@ -1311,7 +1311,7 @@ sub HangulSyllableType_txt()
 
     for (keys %HST) {
 	%HST{$_}->Write(
-	    ["lib","hst","$_.pl"],
+	    \@("lib","hst","$_.pl"),
 	    "HangulSyllableType category '%PropValueAlias{hst}{$_}'"
 	);
     }
@@ -1353,7 +1353,7 @@ sub Scripts_txt()
 
         # Wait until all the scripts have been read since
         # they are not listed in numeric order.
-        push @ScriptInfo, [ hex($1), hex($2||""), $3 ];
+        push @ScriptInfo, \@( hex($1), hex($2||""), $3 );
     }
     close IN;
 
@@ -1463,7 +1463,7 @@ sub PropList_txt()
 
 	# Wait until all the extended properties have been read since
 	# they are not listed in numeric order.
-	push @PropInfo, [ hex($1), hex($2||""), $3 ];
+	push @PropInfo, \@( hex($1), hex($2||""), $3 );
     }
     close IN;
 
@@ -1492,7 +1492,7 @@ sub PropList_txt()
 	# XXX I'm assuming that the names from %Prop don't suffer 8.3 clashes.
 	%BaseNames{lc $file}++;
 	%Prop{$_}->Write(
-	    ["lib","gc_sc","$file.pl"],
+	    \@("lib","gc_sc","$file.pl"),
 	    "Binary property '$_'"
 	);
     }
@@ -1852,7 +1852,7 @@ sub WriteAllMappings()
             ##
             ## Okay, write the file...
             ##
-            $Table->Write(["lib","gc_sc","$filename.pl"], $Comment);
+            $Table->Write(\@("lib","gc_sc","$filename.pl"), $Comment);
 
             ## and register it
             %RawNameToFile{$Name} = $filename;
@@ -1992,11 +1992,11 @@ sub SpecialCasing_txt()
         # Wait until all the special cases have been read since
         # they are not listed in numeric order.
         my $ix = hex($code);
-        push @{%CaseInfo{Lower}}, [ $ix, $code, $lower ]
+        push @{%CaseInfo{Lower}}, \@( $ix, $code, $lower )
 	    unless $code eq $lower;
-        push @{%CaseInfo{Title}}, [ $ix, $code, $title ]
+        push @{%CaseInfo{Title}}, \@( $ix, $code, $title )
 	    unless $code eq $title;
-        push @{%CaseInfo{Upper}}, [ $ix, $code, $upper ]
+        push @{%CaseInfo{Upper}}, \@( $ix, $code, $upper )
 	    unless $code eq $upper;
     }
     close IN;
@@ -2031,7 +2031,7 @@ sub SpecialCasing_txt()
                     $NormalCase,
                     "END\n"
                     );
-        WriteIfChanged(["To","$case.pl"], @OUT);
+        WriteIfChanged(\@("To","$case.pl"), @OUT);
     }
 }
 
@@ -2089,7 +2089,7 @@ sub CaseFolding_txt()
                 "END\n",
                );
 
-    WriteIfChanged(["To","Fold.pl"], @OUT);
+    WriteIfChanged(\@("To","Fold.pl"), @OUT);
 }
 
 ## Do it....
@@ -2122,7 +2122,7 @@ if ( $FileList and $MakeList ) {
 #
 # mktables.lst -- File list for mktables.
 #
-#   Autogenerated on @{[scalar localtime]}
+#   Autogenerated on {scalar localtime}
 #
 # - First section is input files
 #   (mktables itself is automatically included)
@@ -2146,7 +2146,7 @@ EOFHEADER
     
     require File::Find;
     my $count=0;
-    File::Find::find({
+    File::Find::find(\%(
         no_chdir=>1,
         wanted=>sub {
           if (m/\.pl$/) {
@@ -2155,7 +2155,7 @@ EOFHEADER
             $count++;
           }
         },
-    },"."); 
+    ),"."); 
     
     print $ofh "\n# ",scalar(@input)," input files\n",
                "# ",scalar($count+1)," output files\n\n",

@@ -796,8 +796,8 @@ distdir.
 sub distmeta_target {
     my $self = shift;
 
-    my $add_meta = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
-eval { maniadd({q{META.yml} => q{Module meta-data (added by MakeMaker)}}) } 
+    my $add_meta = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
+eval { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) } 
     or print "Could not add META.yml to MANIFEST: $${'@'}\n"
 CODE
 
@@ -935,8 +935,8 @@ distdir.
 sub distsignature_target {
     my $self = shift;
 
-    my $add_sign = $self->oneliner(<<'CODE', ['-MExtUtils::Manifest=maniadd']);
-eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } 
+    my $add_sign = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
+eval { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) } 
     or print "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
 CODE
 
@@ -1181,82 +1181,82 @@ sub init_INSTALL_from_PREFIX {
 
     my %bin_layouts = 
     (
-        bin         => { s => $iprefix,
+        bin         => \%( s => $iprefix,
                          t => 'perl',
-                         d => 'bin' },
-        vendorbin   => { s => $vprefix,
+                         d => 'bin' ),
+        vendorbin   => \%( s => $vprefix,
                          t => 'vendor',
-                         d => 'bin' },
-        sitebin     => { s => $sprefix,
+                         d => 'bin' ),
+        sitebin     => \%( s => $sprefix,
                          t => 'site',
-                         d => 'bin' },
-        script      => { s => $iprefix,
+                         d => 'bin' ),
+        script      => \%( s => $iprefix,
                          t => 'perl',
-                         d => 'bin' },
-        vendorscript=> { s => $vprefix,
+                         d => 'bin' ),
+        vendorscript=> \%( s => $vprefix,
                          t => 'vendor',
-                         d => 'bin' },
-        sitescript  => { s => $sprefix,
+                         d => 'bin' ),
+        sitescript  => \%( s => $sprefix,
                          t => 'site',
-                         d => 'bin' },
+                         d => 'bin' ),
     );
     
     my %man_layouts =
     (
-        man1dir         => { s => $iprefix,
+        man1dir         => \%( s => $iprefix,
                              t => 'perl',
                              d => 'man/man1',
-                             style => $manstyle, },
-        siteman1dir     => { s => $sprefix,
+                             style => $manstyle, ),
+        siteman1dir     => \%( s => $sprefix,
                              t => 'site',
                              d => 'man/man1',
-                             style => $manstyle, },
-        vendorman1dir   => { s => $vprefix,
+                             style => $manstyle, ),
+        vendorman1dir   => \%( s => $vprefix,
                              t => 'vendor',
                              d => 'man/man1',
-                             style => $manstyle, },
+                             style => $manstyle, ),
 
-        man3dir         => { s => $iprefix,
+        man3dir         => \%( s => $iprefix,
                              t => 'perl',
                              d => 'man/man3',
-                             style => $manstyle, },
-        siteman3dir     => { s => $sprefix,
+                             style => $manstyle, ),
+        siteman3dir     => \%( s => $sprefix,
                              t => 'site',
                              d => 'man/man3',
-                             style => $manstyle, },
-        vendorman3dir   => { s => $vprefix,
+                             style => $manstyle, ),
+        vendorman3dir   => \%( s => $vprefix,
                              t => 'vendor',
                              d => 'man/man3',
-                             style => $manstyle, },
+                             style => $manstyle, ),
     );
 
     my %lib_layouts =
     (
-        privlib     => { s => $iprefix,
+        privlib     => \%( s => $iprefix,
                          t => 'perl',
                          d => '',
-                         style => $libstyle, },
-        vendorlib   => { s => $vprefix,
+                         style => $libstyle, ),
+        vendorlib   => \%( s => $vprefix,
                          t => 'vendor',
                          d => '',
-                         style => $libstyle, },
-        sitelib     => { s => $sprefix,
+                         style => $libstyle, ),
+        sitelib     => \%( s => $sprefix,
                          t => 'site',
                          d => 'site_perl',
-                         style => $libstyle, },
+                         style => $libstyle, ),
         
-        archlib     => { s => $iprefix,
+        archlib     => \%( s => $iprefix,
                          t => 'perl',
                          d => "$version/$arch",
-                         style => $libstyle },
-        vendorarch  => { s => $vprefix,
+                         style => $libstyle ),
+        vendorarch  => \%( s => $vprefix,
                          t => 'vendor',
                          d => "$version/$arch",
-                         style => $libstyle },
-        sitearch    => { s => $sprefix,
+                         style => $libstyle ),
+        sitearch    => \%( s => $sprefix,
                          t => 'site',
                          d => "site_perl/$version/$arch",
-                         style => $libstyle },
+                         style => $libstyle ),
     );
 
 
@@ -1313,11 +1313,11 @@ sub init_INSTALL_from_PREFIX {
 =cut
 
 my %map = (
-           lib      => [qw(lib perl5)],
-           arch     => [('lib', 'perl5', %Config{archname})],
-           bin      => [qw(bin)],
-           man1dir  => [qw(man man1)],
-           man3dir  => [qw(man man3)]
+           lib      => \@(qw(lib perl5)),
+           arch     => \@('lib', 'perl5', %Config{archname}),
+           bin      => \@(qw(bin)),
+           man1dir  => \@(qw(man man1)),
+           man3dir  => \@(qw(man man3)),
           );
 %map{script} = %map{bin};
 

@@ -1899,9 +1899,9 @@ sub TIEHANDLE {
   $SECTION_END_MARKER = qq{#line --- "$cfile"};
   
   return bless \%(buffer => '',
-		fh => $fh,
-		line_no => 1,
-	       ), $class;
+                  fh => $fh,
+                  line_no => 1,
+                 ), $class;
 }
 
 sub PRINT {

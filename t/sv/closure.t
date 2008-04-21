@@ -541,7 +541,7 @@ sub {
     my $x;
     $x = eval 'sub { $outer }';
     $x->();
-    $a = [ 99 ];
+    $a = \@( 99 );
     $x->();
 }->();
 test {1};
@@ -581,7 +581,7 @@ fake();
 
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
-sub Watch::new { bless [ @_[1], @_[2] ], @_[0] }
+sub Watch::new { bless \@( @_[1], @_[2] ), @_[0] }
 sub Watch::DESTROY { ${@_[0][0]} .= @_[0][1] }
 
 
@@ -683,7 +683,7 @@ __EOF__
 	my $x;
 	BEGIN {$x = \&newsub }
 	sub newsub {};
-	$x = bless {}, 'X';
+	$x = bless \%(), 'X';
     }
     test { $flag == 1 };
 }
