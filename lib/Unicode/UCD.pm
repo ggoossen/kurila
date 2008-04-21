@@ -179,25 +179,25 @@ my @CharinfoRanges = (
 # block name
 # [ first, last, coderef to name, coderef to decompose ],
 # CJK Ideographs Extension A
-  [ 0x3400,   0x4DB5,   \&han_charname,   undef  ],
+  \@( 0x3400,   0x4DB5,   \&han_charname,   undef  ),
 # CJK Ideographs
-  [ 0x4E00,   0x9FA5,   \&han_charname,   undef  ],
+  \@( 0x4E00,   0x9FA5,   \&han_charname,   undef  ),
 # Hangul Syllables
-  [ 0xAC00,   0xD7A3,   $hasHangulUtil ? \&getHangulName : \&hangul_charname,  \&hangul_decomp ],
+  \@( 0xAC00,   0xD7A3,   $hasHangulUtil ? \&getHangulName : \&hangul_charname,  \&hangul_decomp ),
 # Non-Private Use High Surrogates
-  [ 0xD800,   0xDB7F,   undef,   undef  ],
+  \@( 0xD800,   0xDB7F,   undef,   undef  ),
 # Private Use High Surrogates
-  [ 0xDB80,   0xDBFF,   undef,   undef  ],
+  \@( 0xDB80,   0xDBFF,   undef,   undef  ),
 # Low Surrogates
-  [ 0xDC00,   0xDFFF,   undef,   undef  ],
+  \@( 0xDC00,   0xDFFF,   undef,   undef  ),
 # The Private Use Area
-  [ 0xE000,   0xF8FF,   undef,   undef  ],
+  \@( 0xE000,   0xF8FF,   undef,   undef  ),
 # CJK Ideographs Extension B
-  [ 0x20000,  0x2A6D6,  \&han_charname,   undef  ],
+  \@( 0x20000,  0x2A6D6,  \&han_charname,   undef  ),
 # Plane 15 Private Use Area
-  [ 0xF0000,  0xFFFFD,  undef,   undef  ],
+  \@( 0xF0000,  0xFFFFD,  undef,   undef  ),
 # Plane 16 Private Use Area
-  [ 0x100000, 0x10FFFD, undef,   undef  ],
+  \@( 0x100000, 0x10FFFD, undef,   undef  ),
 );
 
 sub charinfo {
@@ -221,7 +221,7 @@ sub charinfo {
     openunicode(\$UNICODEFH, "UnicodeData.txt");
     if (defined $UNICODEFH) {
 	use Search::Dict v1.02;
-	if (look($UNICODEFH, "$hexk;", { xfrm => sub { @_[0] =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } } ) +>= 0) {
+	if (look($UNICODEFH, "$hexk;", \%( xfrm => sub { @_[0] =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } ) ) +>= 0) {
 	    my $line = ~< $UNICODEFH;
 	    return unless defined $line;
 	    chomp $line;
@@ -314,7 +314,7 @@ sub _charblocks {
 	    while ( ~< $BLOCKSFH) {
 		if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
 		    my ($lo, $hi) = (hex($1), hex($2));
-		    my $subrange = [ $lo, $hi, $3 ];
+		    my $subrange = \@( $lo, $hi, $3 );
 		    push @BLOCKS, $subrange;
 		    push @{%BLOCKS{$3}}, $subrange;
 		}
@@ -378,7 +378,7 @@ sub _charscripts {
 		    my ($lo, $hi) = (hex($1), $2 ? hex($2) : hex($1));
 		    my $script = lc($3);
 		    $script =~ s/\b(\w)/{uc($1)}/g;
-		    my $subrange = [ $lo, $hi, $script ];
+		    my $subrange = \@( $lo, $hi, $script );
 		    push @SCRIPTS, $subrange;
 		    push @{%SCRIPTS{$script}}, $subrange;
 		}
@@ -695,9 +695,9 @@ sub _casefold {
 	    while ( ~< $CASEFOLDFH) {
 		if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
 		    my $code = hex($1);
-		    %CASEFOLD{$code} = { code    => $1,
-					 status  => $2,
-					 mapping => $3 };
+		    %CASEFOLD{$code} = \%( code    => $1,
+                                           status  => $2,
+                                           mapping => $3 );
 		}
 	    }
 	    close($CASEFOLDFH);
@@ -793,28 +793,28 @@ sub _casespec {
 				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
 				delete %CASESPEC{$code};
 				%CASESPEC{$code}->{$oldlocale} =
-				{ code      => $hexcode,
-				  lower     => $oldlower,
-				  title     => $oldtitle,
-				  upper     => $oldupper,
-				  condition => $oldcondition };
+				\%( code      => $hexcode,
+                                    lower     => $oldlower,
+                                    title     => $oldtitle,
+                                    upper     => $oldupper,
+                                    condition => $oldcondition );
 			    }
 			}
 			my ($locale) =
 			    ($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
 			%CASESPEC{$code}->{$locale} =
-			{ code      => $hexcode,
-			  lower     => $lower,
-			  title     => $title,
-			  upper     => $upper,
-			  condition => $condition };
+			\%( code      => $hexcode,
+                            lower     => $lower,
+                            title     => $title,
+                            upper     => $upper,
+                            condition => $condition );
 		    } else {
 			%CASESPEC{$code} =
-			{ code      => $hexcode,
-			  lower     => $lower,
-			  title     => $title,
-			  upper     => $upper,
-			  condition => $condition };
+			\%( code      => $hexcode,
+                            lower     => $lower,
+                            title     => $title,
+                            upper     => $upper,
+                            condition => $condition );
 		    }
 		}
 	    }

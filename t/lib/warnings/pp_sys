@@ -95,7 +95,7 @@
 __END__
 # pp_sys.c [pp_untie]
 use warnings 'untie' ;
-sub TIESCALAR { bless [] } ; 
+sub TIESCALAR { bless \@() } ; 
 $b = tie $a, 'main'; 
 untie $a ;
 no warnings 'untie' ;

@@ -216,7 +216,7 @@ if ($^O eq 'MacOS') {
 
 
 $DEBUG ||= 0;
-my $WHOAMI = ref bless [];  # nobody's business, prolly not even mine
+my $WHOAMI = ref bless \@();  # nobody's business, prolly not even mine
 
 local $| = 1;
 my $_;

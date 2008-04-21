@@ -1140,7 +1140,7 @@ use warnings::register ;
 sub new
 {
     my $class = shift ;
-    bless [], $class ;
+    bless \@(), $class ;
 }
 
 sub check 
@@ -1183,7 +1183,7 @@ use def ;
 sub new
 {
     my $class = shift ;
-    bless [], $class ;
+    bless \@(), $class ;
 }
 
 1;

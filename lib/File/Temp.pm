@@ -189,9 +189,9 @@ use base qw/Exporter/;
 # Groups of functions for export
 
 %EXPORT_TAGS = (
-		'POSIX' => [qw/ tmpnam tmpfile /],
-		'mktemp' => [qw/ mktemp mkstemp mkstemps mkdtemp/],
-		'seekable' => [qw/ SEEK_SET SEEK_CUR SEEK_END /],
+		'POSIX' => \@(qw/ tmpnam tmpfile /),
+		'mktemp' => \@(qw/ mktemp mkstemp mkstemps mkdtemp/),
+		'seekable' => \@(qw/ SEEK_SET SEEK_CUR SEEK_END /),
 	       );
 
 # add contents of these tags to @EXPORT
@@ -928,7 +928,7 @@ sub _can_do_level {
 	# Directory exists so store it
 	# first on VMS turn []foo into [.foo] for rmtree
 	$fname = VMS::Filespec::vmspath($fname) if $^O eq 'VMS';
-	%dirs_to_unlink{$$} = [] 
+	%dirs_to_unlink{$$} = \@() 
 	  unless exists %dirs_to_unlink{$$};
 	push (@{ %dirs_to_unlink{$$} }, $fname);
 
@@ -941,9 +941,9 @@ sub _can_do_level {
       if (-f $fname) {
 
 	# file exists so store handle and name for later removal
-	%files_to_unlink{$$} = []
+	%files_to_unlink{$$} = \@()
 	  unless exists %files_to_unlink{$$};
-	push(@{ %files_to_unlink{$$} }, [$fh, $fname]);
+	push(@{ %files_to_unlink{$$} }, \@($fh, $fname));
 
       } else {
 	carp "Request to remove file $fname could not be completed since it is not there!\n" if $^W;
@@ -1073,10 +1073,10 @@ sub newdir {
   } else {
     $tempdir = tempdir( %options );
   }
-  return bless { DIRNAME => $tempdir,
-		 CLEANUP => $cleanup,
-		 LAUNCHPID => $$,
-	       }, "File::Temp::Dir";
+  return bless \%( DIRNAME => $tempdir,
+                   CLEANUP => $cleanup,
+                   LAUNCHPID => $$,
+                 ), "File::Temp::Dir";
 }
 
 =item B<filename>

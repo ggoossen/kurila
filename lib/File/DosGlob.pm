@@ -378,9 +378,9 @@ sub glob {
 		@pat = _preprocess_pattern(@pat);
 		# expand volume names
 		@pat = _expand_volume(@pat);
-		%entries{$cxix} = (@pat) ? [_un_escape( doglob_Mac(1,@pat) )] : [()];
+		%entries{$cxix} = (@pat) ? \@(_un_escape( doglob_Mac(1,@pat) )) : \@();
 	} else {
-		%entries{$cxix} = [doglob(1,@pat)];
+		%entries{$cxix} = \@(doglob(1,@pat));
     }
 	}
 

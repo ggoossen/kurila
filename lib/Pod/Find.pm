@@ -364,7 +364,7 @@ sub pod_where {
   my %options = (
          '-inc' => 0,
          '-verbose' => 0,
-         '-dirs' => [ File::Spec->curdir ],
+         '-dirs' => \@( File::Spec->curdir ),
         );
 
   # Check for an options hash as first argument

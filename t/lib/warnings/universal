@@ -9,7 +9,7 @@ __END__
 print("SKIPPED\n# todo fix: overloading triggers spurious warnings\n"),exit;
 use warnings 'misc' ;
 @ISA = qw(Joe) ;
-my $a = bless [] ;
+my $a = bless \@() ;
 UNIVERSAL::isa $a, 'Jim' ;
 EXPECT
 Can't locate package Joe for @main::ISA at - line 5.

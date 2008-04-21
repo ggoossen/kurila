@@ -37,7 +37,7 @@ $VERSION = "0.07";
 sub new {
     my $class = shift;
 
-    my $self = bless [{},{},{}], $class;
+    my $self = bless \@(\%(),\%(),\%()), $class;
 
     $self;
 }
@@ -73,7 +73,7 @@ sub mask {
 sub poll {
     my($self,$timeout) = @_;
 
-    $self->[1] = {};
+    $self->[1] = \%();
 
     my($fd,$mask,$iom);
     my @poll = ();

@@ -562,7 +562,7 @@ sub new {
     my $this = shift;
     my $class = ref($this) || $this;
     my %params = @_;
-    my $self = {%params};
+    my $self = \%(%params);
     bless $self, $class;
     if ($self->can('initialize')) {
         $self->initialize();

@@ -749,19 +749,19 @@ SKIP: {
     open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
     my $a = ~< *IN;
 
-    my $c = { a => 42,
-	      b => $a };
+    my $c = \%( a => 42,
+                b => $a );
 
     ok !tainted($c->{a}) && tainted($c->{b});
 
 
-    my $d = { a => $a,
-	      b => 42 };
+    my $d = \%( a => $a,
+                b => 42 );
     ok tainted($d->{a}) && !tainted($d->{b});
 
 
-    my $e = { a => 42,
-	      b => { c => $a, d => 42 } };
+    my $e = \%( a => 42,
+                b => \%( c => $a, d => 42 ) );
     ok !tainted($e->{a}) &&
        !tainted($e->{b}) &&
 	tainted($e->{b}->{c}) &&

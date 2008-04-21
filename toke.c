@@ -3747,6 +3747,9 @@ Perl_yylex(pTHX)
 	    TOKEN(ASLICE);
 	    /* NOT REACHED */
 	}
+	if (PL_expect != XOPERATOR) {
+	    yyerror("'[...]' should be '\\@(...)'");
+	}
 	PL_lex_brackets++;
 	OPERATOR('[');
     case ',':
@@ -4016,7 +4019,7 @@ Perl_yylex(pTHX)
 			yyerror("syntax error");
 			break;
 		    }
-		    OPERATOR(HASHBRACK);
+		    yyerror("'{' should be '\%(' expected");
 		}
 		/* This hack serves to disambiguate a pair of curlies
 		 * as being a block or an anon hash.  Normally, expectation
@@ -4060,7 +4063,7 @@ Perl_yylex(pTHX)
 			    t++;
 			/* check for q => */
 			if (t+1 < PL_bufend && t[0] == '=' && t[1] == '>') {
-			    OPERATOR(HASHBRACK);
+			    yyerror("'{' should be '\%(' expected");
 			}
 			term = *t;
 			open = term;
@@ -4102,7 +4105,7 @@ Perl_yylex(pTHX)
 		/* XXX it could be a comma expression with loop modifiers */
 		if (t < PL_bufend && ((*t == ',' && (*s == 'q' || !isLOWER(*s)))
 				   || (*t == '=' && t[1] == '>')))
-		    OPERATOR(HASHBRACK);
+		    yyerror("'{' should be '\%(' expected");
 		if (PL_expect == XREF)
 		    PL_expect = XTERM;
 		else {

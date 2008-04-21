@@ -48,7 +48,7 @@
       (in cleanup) foo bar
 	package Foo;
 	DESTROY { die "foo bar" }
-	{ bless [], 'Foo' for 1..10 }
+	{ bless \@(), 'Foo' for 1..10 }
 
 __END__
 # pp_ctl.c
@@ -277,8 +277,8 @@ EXPECT
 use warnings 'misc' ;
 package Foo;
 DESTROY { die "@{@_[0]} foo bar" }
-{ bless ['A'], 'Foo' for 1..10 }
-{ bless ['B'], 'Foo' for 1..10 }
+{ bless \@('A'), 'Foo' for 1..10 }
+{ bless \@('B'), 'Foo' for 1..10 }
 EXPECT
 A foo bar at - line 4.
     Foo::DESTROY called at - line 5.
@@ -345,8 +345,8 @@ B foo bar at - line 4.
 no warnings 'misc' ;
 package Foo;
 DESTROY { die "@{@_[0]} foo bar" }
-{ bless ['A'], 'Foo' for 1..10 }
-{ bless ['B'], 'Foo' for 1..10 }
+{ bless \@('A'), 'Foo' for 1..10 }
+{ bless \@('B'), 'Foo' for 1..10 }
 EXPECT
 A foo bar at - line 4.
     Foo::DESTROY called at - line 5.

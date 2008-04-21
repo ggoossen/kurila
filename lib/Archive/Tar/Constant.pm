@@ -46,7 +46,7 @@ my $getgrgid; $getgrgid = 'unknown' unless eval { my $f = getgrgid (0); };
 use constant UNAME          => sub { $getpwuid || scalar getpwuid( shift() ) || '' };
 use constant GNAME          => sub { $getgrgid || scalar getgrgid( shift() ) || '' };
 use constant UID            => $>;
-use constant GID            => (split ' ', $) )[[0]];
+use constant GID            => (split ' ', $^GID )[[0]];
 
 use constant MODE           => do { 0666 ^&^ (0777 ^&^ ^~^umask) };
 use constant STRIP_MODE     => sub { shift() ^&^ 0777 };

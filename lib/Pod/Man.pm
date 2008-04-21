@@ -141,12 +141,12 @@ sub init_fonts {
 
     # Set up a table of font escapes.  First number is fixed-width, second is
     # bold, third is italic.
-    %$self{FONTS} = { '000' => '\fR', '001' => '\fI',
-                      '010' => '\fB', '011' => '\f(BI',
-                      '100' => toescape (%$self{fixed}),
-                      '101' => toescape (%$self{fixeditalic}),
-                      '110' => toescape (%$self{fixedbold}),
-                      '111' => toescape (%$self{fixedbolditalic}) };
+    %$self{FONTS} = \%( '000' => '\fR', '001' => '\fI',
+                        '010' => '\fB', '011' => '\f(BI',
+                        '100' => toescape (%$self{fixed}),
+                        '101' => toescape (%$self{fixeditalic}),
+                        '110' => toescape (%$self{fixedbold}),
+                        '111' => toescape (%$self{fixedbolditalic}) );
 }
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
@@ -258,7 +258,7 @@ sub _handle_element_start {
         # on, so this can be strictly inherited.
         my $formatting = %$self{PENDING}[-1][1];
         $formatting = $self->formatting ($formatting, $element);
-        push (@{ %$self{PENDING} }, [ $attrs, $formatting, '' ]);
+        push (@{ %$self{PENDING} }, \@( $attrs, $formatting, '' ));
         DEBUG +> 4 and print "Pending: [", pretty (%$self{PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
@@ -686,18 +686,18 @@ sub outindex {
     return unless ($section || @entries);
 
     # We're about to output all pending entries, so clear our pending queue.
-    %$self{INDEX} = [];
+    %$self{INDEX} = \@();
 
     # Build the output.  Regular index entries are marked Xref, and headings
     # pass in their own section.  Undo some *roff formatting on headings.
     my @output;
     if (@entries) {
-        push @output, [ 'Xref', join (' ', @entries) ];
+        push @output, \@( 'Xref', join (' ', @entries) );
     }
     if ($section) {
         $index =~ s/\\-/-/g;
         $index =~ s/\\(?:s-?\d|.\(..|.)//g;
-        push @output, [ $section, $index ];
+        push @output, \@( $section, $index );
     }
 
     # Print out the .IX commands.
@@ -742,14 +742,14 @@ sub start_document {
 
     # Initialize a few per-document variables.
     %$self{INDENT}    = 0;      # Current indentation level.
-    %$self{INDENTS}   = [];     # Stack of indentations.
-    %$self{INDEX}     = [];     # Index keys waiting to be printed.
+    %$self{INDENTS}   = \@();     # Stack of indentations.
+    %$self{INDEX}     = \@();     # Index keys waiting to be printed.
     %$self{IN_NAME}   = 0;      # Whether processing the NAME section.
     %$self{ITEMS}     = 0;      # The number of consecutive =items.
-    %$self{ITEMTYPES} = [];     # Stack of =item types, one per list.
+    %$self{ITEMTYPES} = \@();     # Stack of =item types, one per list.
     %$self{SHIFTWAIT} = 0;      # Whether there is a shift waiting.
-    %$self{SHIFTS}    = [];     # Stack of .RS shifts.
-    %$self{PENDING}   = [[]];   # Pending output.
+    %$self{SHIFTS}    = \@();     # Stack of .RS shifts.
+    %$self{PENDING}   = \@(\@());   # Pending output.
 }
 
 # Handle the end of the document.  This does nothing but print out a final

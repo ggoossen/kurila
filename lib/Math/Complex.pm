@@ -50,7 +50,7 @@ BEGIN {
 	    'INFINITY',
 	    '1e99999',
 	    ) {
-	    local %SIG{FPE} = { };
+	    local %SIG{FPE} = sub { };
 	    local $^W = 0;
 	    my $i = eval "$t+1.0";
 	    if (defined $i && $i +> $BIGGER_THAN_THIS) {
@@ -104,8 +104,8 @@ my @pi = qw(pi pi2 pi4 pip2 pip4 Inf);
 @EXPORT_OK = @pi;
 
 %EXPORT_TAGS = (
-    'trig' => [@trig],
-    'pi' => [@pi],
+    'trig' => \@(@trig),
+    'pi' => \@(@pi),
 );
 
 use overload
@@ -148,7 +148,7 @@ my $eps            = 1e-14;		# Epsilon
 # Die on bad *make() arguments.
 
 sub _cannot_make {
-    die "@{[(caller(1))[[3]]]}: Cannot take @_[0] of '@_[1]'.\n";
+    die "@{\@((caller(1))[[3]])}: Cannot take @_[0] of '@_[1]'.\n";
 }
 
 sub _make {
@@ -203,7 +203,7 @@ sub _emake {
 # Create a new complex number (cartesian form)
 #
 sub make {
-    my $self = bless {}, shift;
+    my $self = bless \%(), shift;
     my ($re, $im);
     if (@_ == 0) {
 	($re, $im) = (0, 0);
@@ -219,7 +219,7 @@ sub make {
     }
     $im ||= 0;
     _cannot_make("imaginary part", $im) unless $im =~ m/^$gre$/;
-    $self->_set_cartesian([$re, $im ]);
+    $self->_set_cartesian(\@($re, $im ));
     $self->display_format('cartesian');
 
     return $self;
@@ -231,7 +231,7 @@ sub make {
 # Create a new complex number (exponential form)
 #
 sub emake {
-    my $self = bless {}, shift;
+    my $self = bless \%(), shift;
     my ($rho, $theta);
     if (@_ == 0) {
 	($rho, $theta) = (0, 0);
@@ -253,7 +253,7 @@ sub emake {
     }
     $theta ||= 0;
     _cannot_make("theta", $theta) unless $theta =~ m/^$gre$/;
-    $self->_set_polar([$rho, $theta]);
+    $self->_set_polar(\@($rho, $theta));
     $self->display_format('polar');
 
     return $self;
@@ -330,9 +330,9 @@ sub _uplog10 () { 1 / CORE::log(10) }
 #
 sub i () {
         return $i if ($i);
-	$i = bless {};
-	$i->{'cartesian'} = [0, 1];
-	$i->{'polar'}     = [1, pip2];
+	$i = bless \%();
+	$i->{'cartesian'} = \@(0, 1);
+	$i->{'polar'}     = \@(1, pip2);
 	$i->{c_dirty} = 0;
 	$i->{p_dirty} = 0;
 	return $i;
@@ -368,7 +368,7 @@ sub _update_cartesian {
 	my $self = shift;
 	my ($r, $t) = @{$self->{'polar'}};
 	$self->{c_dirty} = 0;
-	return $self->{'cartesian'} = [$r * CORE::cos($t), $r * CORE::sin($t)];
+	return $self->{'cartesian'} = \@($r * CORE::cos($t), $r * CORE::sin($t));
 }
 
 #
@@ -381,9 +381,9 @@ sub _update_polar {
 	my $self = shift;
 	my ($x, $y) = @{$self->{'cartesian'}};
 	$self->{p_dirty} = 0;
-	return $self->{'polar'} = [0, 0] if $x == 0 && $y == 0;
-	return $self->{'polar'} = [CORE::sqrt($x*$x + $y*$y),
-				   CORE::atan2($y, $x)];
+	return $self->{'polar'} = \@(0, 0) if $x == 0 && $y == 0;
+	return $self->{'polar'} = \@(CORE::sqrt($x*$x + $y*$y),
+				   CORE::atan2($y, $x));
 }
 
 #
@@ -397,7 +397,7 @@ sub _plus {
 	$z2 = cplx($z2) unless ref $z2;
 	my ($re2, $im2) = ref $z2 ? @{$z2->_cartesian} : ($z2, 0);
 	unless (defined $regular) {
-		$z1->_set_cartesian([$re1 + $re2, $im1 + $im2]);
+		$z1->_set_cartesian(\@($re1 + $re2, $im1 + $im2));
 		return $z1;
 	}
 	return (ref $z1)->make($re1 + $re2, $im1 + $im2);
@@ -414,7 +414,7 @@ sub _minus {
 	$z2 = cplx($z2) unless ref $z2;
 	my ($re2, $im2) = @{$z2->_cartesian};
 	unless (defined $inverted) {
-		$z1->_set_cartesian([$re1 - $re2, $im1 - $im2]);
+		$z1->_set_cartesian(\@($re1 - $re2, $im1 - $im2));
 		return $z1;
 	}
 	return $inverted ?
@@ -438,7 +438,7 @@ sub _multiply {
 	    if    ($t +>   pi()) { $t -= pi2 }
 	    elsif ($t +<= -pi()) { $t += pi2 }
 	    unless (defined $regular) {
-		$z1->_set_polar([$r1 * $r2, $t]);
+		$z1->_set_polar(\@($r1 * $r2, $t));
 		return $z1;
 	    }
 	    return (ref $z1)->emake($r1 * $r2, $t);
@@ -619,7 +619,7 @@ sub abs {
 	    }
 	}
 	if (defined $rho) {
-	    $z->{'polar'} = [ $rho, @{$z->_polar}[1] ];
+	    $z->{'polar'} = \@( $rho, @{$z->_polar}[1] );
 	    $z->{p_dirty} = 0;
 	    $z->{c_dirty} = 1;
 	    return $rho;
@@ -645,7 +645,7 @@ sub arg {
 	return $z unless ref $z;
 	if (defined $theta) {
 	    _theta(\$theta);
-	    $z->{'polar'} = [ @{$z->_polar}[0], $theta ];
+	    $z->{'polar'} = \@( @{$z->_polar}[0], $theta );
 	    $z->{p_dirty} = 0;
 	    $z->{c_dirty} = 1;
 	} else {
@@ -755,7 +755,7 @@ sub Re {
 	my ($z, $Re) = @_;
 	return $z unless ref $z;
 	if (defined $Re) {
-	    $z->{'cartesian'} = [ $Re, @{$z->_cartesian}[1] ];
+	    $z->{'cartesian'} = \@( $Re, @{$z->_cartesian}[1] );
 	    $z->{c_dirty} = 0;
 	    $z->{p_dirty} = 1;
 	} else {
@@ -772,7 +772,7 @@ sub Im {
 	my ($z, $Im) = @_;
 	return 0 unless ref $z;
 	if (defined $Im) {
-	    $z->{'cartesian'} = [ @{$z->_cartesian}[0], $Im ];
+	    $z->{'cartesian'} = \@( @{$z->_cartesian}[0], $Im );
 	    $z->{c_dirty} = 0;
 	    $z->{p_dirty} = 1;
 	} else {
@@ -1377,7 +1377,7 @@ sub display_format {
 	}
 
 	if (ref $self) { # Called as an object method
-	    $self->{display_format} = { %display_format };
+	    $self->{display_format} = \%( %display_format );
 	    return
 		wantarray ?
 		    %{$self->{display_format}} :
@@ -1603,7 +1603,7 @@ Since there is a bijection between a point in the 2D plane and a complex
 number (i.e. the mapping is unique and reciprocal), a complex number
 can also be uniquely identified with polar coordinates:
 
-	[rho, theta]
+	\@(rho, theta)
 
 where C<rho> is the distance to the origin, and C<theta> the angle between
 the vector and the I<x> axis. There is a notation for this using the
@@ -1651,13 +1651,13 @@ It can also be extended to be an application from B<C> to B<C>,
 whilst its restriction to B<R> behaves as defined above by using
 the following definition:
 
-	sqrt(z = [r,t]) = sqrt(r) * exp(i * t/2)
+	sqrt(z = \@(r,t)) = sqrt(r) * exp(i * t/2)
 
-Indeed, a negative real number can be noted C<[x,pi]> (the modulus
-I<x> is always non-negative, so C<[x,pi]> is really C<-x>, a negative
+Indeed, a negative real number can be noted C<\@(x,pi)> (the modulus
+I<x> is always non-negative, so C<\@(x,pi)> is really C<-x>, a negative
 number) and the above definition states that
 
-	sqrt([x,pi]) = sqrt(x) * exp(i*pi/2) = [sqrt(x),pi/2] = sqrt(x)*i
+	sqrt(\@(x,pi)) = sqrt(x) * exp(i*pi/2) = \@(sqrt(x),pi/2) = sqrt(x)*i
 
 which is exactly what we had defined for negative real numbers above.
 The C<sqrt> returns only one of the solutions: if you want the both,
@@ -1790,7 +1790,7 @@ is a simple matter of writing:
 
 	$j = ((root(1, 3))[1];
 
-The I<k>th root for C<z = [r,t]> is given by:
+The I<k>th root for C<z = \@(r,t)> is given by:
 
 	(root(z, n))[k] = r**(1/n) * exp(i * (t + 2*k*pi)/n)
 
@@ -1827,7 +1827,7 @@ It is possible to write:
 
 	$x = cplxe(-3, pi/4);
 
-but that will be silently converted into C<[3,-3pi/4]>, since the
+but that will be silently converted into C<\@(3,-3pi/4)>, since the
 modulus must be non-negative (it represents the distance to the origin
 in the complex plane).
 
@@ -1843,9 +1843,9 @@ understand a single (string) argument of the forms
 
     	2-3i
     	-3i
-	[2,3]
-	[2,-3pi/4]
-	[2]
+	[2,3)
+	\@(2,-3pi/4)
+	\@(2)
 
 in which case the appropriate cartesian and exponential components
 will be parsed from the string and used to create new complex numbers.
@@ -1858,7 +1858,7 @@ understand the case of no arguments: this means plain zero or (0, 0).
 
 When printed, a complex number is usually shown under its cartesian
 style I<a+bi>, but there are legitimate cases where the polar style
-I<[r,t]> is more appropriate.  The process of converting the complex
+I<\@(r,t)> is more appropriate.  The process of converting the complex
 number into a string that can be displayed is known as I<stringification>.
 
 By calling the class method C<Math::Complex::display_format> and
@@ -1877,12 +1877,12 @@ For instance:
 
 	Math::Complex::display_format('polar');
 	$j = (root(1, 3))[1];
-	print "j = $j\n";		# Prints "j = [1,2pi/3]"
+	print "j = $j\n";		# Prints "j = \@(1,2pi/3)"
 	$j->display_format('cartesian');
 	print "j = $j\n";		# Prints "j = -0.5+0.866025403784439i"
 
 The polar style attempts to emphasize arguments like I<k*pi/n>
-(where I<n> is a positive integer and I<k> an integer within [-9, +9]),
+(where I<n> is a positive integer and I<k> an integer within \@(-9, +9)),
 this is called I<polar pretty-printing>.
 
 For the reverse of stringifying, see the C<make> and C<emake>.

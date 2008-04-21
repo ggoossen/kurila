@@ -138,7 +138,7 @@ thaw $frozen;			# used to segfault here
 ok 19, 1;
 
     eval '
-        $a = [undef, undef];
+        $a = \@(undef, undef);
         $b = thaw freeze $a;
         @a = map { exists $a->[$_] } 0 .. @$a-1;
         @b = map { exists $b->[$_] } 0 .. @$b-1;

@@ -121,7 +121,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     my @Answer = split('', $Answer) ;
      
     my $k;
-    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( {-Bufsize => 1}) );
+    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( \%(-Bufsize => 1)) );
     ok $k, "Compress::Raw::Zlib::Inflate ok" ;
     cmp_ok $err, '==', Z_OK, "status is Z_OK" ;
  
@@ -168,7 +168,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     my @Answer = split('', $Answer) ;
      
     my $k;
-    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( {-Bufsize => 1, -AppendOutput =>1}) );
+    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( \%(-Bufsize => 1, -AppendOutput =>1)) );
     ok $k ;
     cmp_ok $err, '==', Z_OK ;
      
@@ -197,7 +197,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     my $hello = "I am a HAL 9000 computer" ;
     my @hello = split('', $hello) ;
      
-    ok  my ($x, $err) = Compress::Raw::Zlib::Deflate->new( {-Bufsize => 1, -AppendOutput =>1}) ;
+    ok  my ($x, $err) = Compress::Raw::Zlib::Deflate->new( \%(-Bufsize => 1, -AppendOutput =>1)) ;
     ok $x ;
     cmp_ok $err, '==', Z_OK ;
      
@@ -217,7 +217,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     my @Answer = split('', $X) ;
      
     my $k;
-    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( {-Bufsize => 1, -AppendOutput =>1}));
+    ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( \%(-Bufsize => 1, -AppendOutput =>1)));
     ok $k ;
     cmp_ok $err, '==', Z_OK ;
      
@@ -302,8 +302,8 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION,
     # ===================================
 
     my $dictionary = "hello" ;
-    ok my $x = Compress::Raw::Zlib::Deflate->new({-Level => Z_BEST_COMPRESSION,
-			     -Dictionary => $dictionary}) ;
+    ok my $x = Compress::Raw::Zlib::Deflate->new((-Level => Z_BEST_COMPRESSION,
+			     -Dictionary => $dictionary)) ;
  
     my $dictID = $x->dict_adler() ;
 
@@ -396,9 +396,9 @@ for my $consume ( 0 .. 1)
      
     my $k;
     ok(($k, $err) = Compress::Raw::Zlib::Inflate->new( 
-			{-Bufsize => 1, 
+			\%(-Bufsize => 1, 
 			-AppendOutput =>1,
-			-WindowBits => -MAX_WBITS()})) ;
+			-WindowBits => -MAX_WBITS()))) ;
     ok $k ;
     cmp_ok $err, '==', Z_OK ;
      

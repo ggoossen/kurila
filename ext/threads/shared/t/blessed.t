@@ -42,8 +42,8 @@ ok(1, 1, 'Loaded');
 
 my ($hobj, $aobj, $sobj) : shared;
 
-$hobj = &share({});
-$aobj = &share([]);
+$hobj = &share(\%());
+$aobj = &share(\@());
 my $sref = \do{ my $x };
 share($sref);
 $sobj = $sref;
@@ -55,12 +55,12 @@ threads->create(sub {
                 bless $sobj, 'baz';
 
                 # Add data to objects
-                @$aobj[0] = bless(&share({}), 'yin');
-                @$aobj[1] = bless(&share([]), 'yang');
+                @$aobj[0] = bless(&share(\%()), 'yin');
+                @$aobj[1] = bless(&share(\@()), 'yang');
                 @$aobj[2] = $sobj;
 
-                %$hobj{'hash'}   = bless(&share({}), 'yin');
-                %$hobj{'array'}  = bless(&share([]), 'yang');
+                %$hobj{'hash'}   = bless(&share(\%()), 'yin');
+                %$hobj{'array'}  = bless(&share(\@()), 'yang');
                 %$hobj{'scalar'} = $sobj;
 
                 $$sobj = 3;

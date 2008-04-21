@@ -1,11 +1,5 @@
   gv.c AOK
 
-     $# is no longer supported
-     $* is no longer supported
-
-	$a = ${"#"} ;
- 	$a = ${"*"} ;
-
   Mandatory Warnings ALL TODO
   ------------------
 
@@ -18,17 +12,4 @@ no warnings 'syntax' ;
 @ISA = qw(Fred); joe()
 EXPECT
 Undefined subroutine &main::joe called at - line 3.
-########
-# gv.c
-use warnings 'deprecated' ;
-eval ' $a = $#; ';
-eval ' $a = $*; ';
-no warnings 'deprecated' ;
-eval ' $a = $#; ';
-eval ' $a = $*; ';
-EXPECT
-$# is no longer supported at (eval 1) line 1.
-    (eval) called at - line 3.
-$* is no longer supported at (eval 2) line 1.
-    (eval) called at - line 4.
 ########

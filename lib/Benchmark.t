@@ -528,7 +528,7 @@ is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
 
     my %cmpthese = ('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
                      'not result' => 'cmpthese(42)',
-                     'array ref'  => 'cmpthese( 42, [ foo => sub { 1 } ] )',
+                     'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
                     );
     while( my($name, $code) = each %cmpthese ) {
         eval $code;
@@ -537,7 +537,7 @@ is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
 
     my %timethese = ('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
                        'no code'    => 'timethese(42)',
-                       'array ref'  => 'timethese( 42, [ foo => sub { 1 } ] )',
+                       'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
                       );
 
     while( my($name, $code) = each %timethese ) {

@@ -247,8 +247,8 @@ sub dump_names {
     }
   }
   if ($declare_types) {
-    $result = $indent . 'my $types = {map {($_, 1)} qw('
-      . join (" ", sort keys %$what) . ")\};\n";
+    $result = $indent . 'my $types = \%(map {($_, 1)} qw('
+      . join (" ", sort keys %$what) . "));\n";
   }
   local $Text::Wrap::huge = 'overflow';
   local $Text::Wrap::columns = 80;

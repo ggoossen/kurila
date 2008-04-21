@@ -966,7 +966,7 @@ sub neatvalue {
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }
-    return "\{ ".join(', ',@m)." \}";
+    return '\%( '.join(', ',@m)." )";
 }
 
 sub selfdocument {
@@ -2091,11 +2091,11 @@ Bool.  If this parameter is true, the prerequisites will be printed to
 stdout and MakeMaker will exit.  The output format is an evalable hash
 ref.
 
-$PREREQ_PM = {
+$PREREQ_PM = \%(
                'A::B' => Vers1,
                'C::D' => Vers2,
                ...
-             };
+             );
 
 =item PRINT_PREREQ
 

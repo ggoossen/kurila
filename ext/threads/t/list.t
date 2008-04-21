@@ -39,16 +39,16 @@ ok(1, 1, 'Loaded');
 
 ### Start of Testing ###
 
-ok(2, scalar @{[threads->list()]} == 0, 'No threads yet');
+ok(2, scalar @{\@(threads->list())} == 0, 'No threads yet');
 
 threads->create(sub {})->join();
-ok(3, scalar @{[threads->list()]} == 0, 'Empty thread list after join');
+ok(3, scalar @{\@(threads->list())} == 0, 'Empty thread list after join');
 
 my $thread = threads->create(sub {});
 ok(4, scalar(threads->list()) == 1, 'Non-empty thread list');
 ok(5, threads->list() == 1,             'Non-empty thread list');
 $thread->join();
-ok(6, scalar @{[threads->list()]} == 0, 'Thread list empty again');
+ok(6, scalar @{\@(threads->list())} == 0, 'Thread list empty again');
 ok(7, threads->list() == 0,             'Thread list empty again');
 
 $thread = threads->create(sub {
@@ -66,7 +66,7 @@ ok(12, $cnt == 1,                        'Thread count 1');
 my ($thr_x) = threads->list();
 ok(13, $thread == $thr_x,                'Thread in list');
 $thread->join();
-ok(14, scalar @{[threads->list()]} == 0, 'Thread list empty');
+ok(14, scalar @{\@(threads->list())} == 0, 'Thread list empty');
 ok(15, threads->list() == 0,             'Thread list empty');
 
 # EOF

@@ -68,7 +68,7 @@ sub new
                 GlobFlags   => $flags,
                 Braces      => 0,
                 WildCount   => 0,
-                Pairs       => [],
+                Pairs       => \@(),
                 Sigil       => '#',
             );
 
@@ -338,7 +338,7 @@ sub _getFiles
                 return undef ;
             }
             %outInMapping{$outFile} = $inFile;
-            push @{ $self->{Pairs} }, [$inFile, $outFile];
+            push @{ $self->{Pairs} }, \@($inFile, $outFile);
         }
     }
 
@@ -356,7 +356,7 @@ sub getHash
 {
     my $self = shift ;
 
-    return { map { $_->[0] => $_->[1] } @{ $self->{Pairs} } } ;
+    return \%( map { $_->[0] => $_->[1] } @{ $self->{Pairs} } ) ;
 }
 
 1;

@@ -53,6 +53,6 @@ ok($var eq 'ok',	'Tied str');
 
 package Tied;
 
-sub TIESCALAR { bless {} }
+sub TIESCALAR { bless \%() }
 sub FETCH { 7.5 }
 

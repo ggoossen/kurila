@@ -9,7 +9,7 @@ BEGIN {
 }
 
 BEGIN { require "./test.pl"; }
-plan( tests => 102 );
+plan( tests => 86 );
 
 eval '%@x=0;';
 like( $@->{description}, qr/^Can't modify hash dereference in repeat \(x\)/, '%@x=0' );
@@ -87,7 +87,7 @@ is( $@, '', 'PL_lex_brackstack' );
     is("{$a}[", "A[", "interpolation, qq//");
     my @b=("B");
     is("{join ' ', @b}\{", "B\{", "interpolation, qq//");
-    is(''.qr/$a(?:){/, '(?-uxism:A(?:){)', "interpolation, qr//");
+    is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
     $c =~ m/$a(?:){/;
     is($&, 'A{', "interpolation, m//");
@@ -111,26 +111,6 @@ print "#";
 print(
 %data{foo});
 pass();
-
-# Bug #21875
-# { q.* => ... } should be interpreted as hash, not block
-
-foreach my $line (split m/\n/, <<'EOF')
-1 { foo => 'bar' }
-1 { qoo => 'bar' }
-1 { q   => 'bar' }
-1 { qq  => 'bar' }
-0 { q,'bar', }
-0 { q=bar= }
-0 { qq=bar= }
-1 { q=bar= => 'bar' }
-EOF
-{
-    my ($expect, $eval) = split m/ /, $line, 2;
-    my $result = eval $eval;
-    ok($@ eq  '', "eval $eval");
-    is(ref $result, $expect ? 'HASH' : '', $eval);
-}
 
 # Bug #24212
 {

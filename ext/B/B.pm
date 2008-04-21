@@ -243,7 +243,7 @@ sub walksymtable {
     sub new {
 	my ($class, $section, $symtable, $default) = @_;
 	$output_fh ||= FileHandle->new_tmpfile;
-	my $obj = bless [-1, $section, $symtable, $default], $class;
+	my $obj = bless \@(-1, $section, $symtable, $default), $class;
 	%sections{$section} = $obj;
 	return $obj;
     }
@@ -284,7 +284,7 @@ sub walksymtable {
     sub output {
 	my ($section, $fh, $format) = @_;
 	my $name = $section->name;
-	my $sym = $section->symtable || {};
+	my $sym = $section->symtable || \%();
 	my $default = $section->default;
 
 	seek($output_fh, 0, 0);
