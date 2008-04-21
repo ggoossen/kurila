@@ -53,11 +53,7 @@ NOTICE
 }
 
 # detect when being built in Perl core
-if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
-    push @extra_params, 
-        MAN3PODS    => \%();      # Pods will be built by installman.
-}
-else {
+if (not grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     push @extra_params, 
         DEFINE      => '-DUSE_PPPORT_H';
 }

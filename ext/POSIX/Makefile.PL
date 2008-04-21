@@ -17,7 +17,6 @@ if ($^O ne 'MSWin32') {
 WriteMakefile(
     NAME	=> 'POSIX',
     @libs,
-    MAN3PODS	=> \%(),	# Pods will be built by installman.
     XSPROTOARG	=> '-noprototypes',	# XXX remove later?
     VERSION_FROM => 'POSIX.pm',
     realclean	=> \%(FILES=> 'const-c.inc const-xs.inc'),
@@ -100,7 +99,7 @@ push @names, \%(name=>$_, type=>"NV")
 	      FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX LDBL_DIG LDBL_MANT_DIG
 	      LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN_10_EXP LDBL_MIN_EXP));
 
-push @names, \%(name=>$_, type=>"IV", default=>\@("IV", "0"))
+push @names, \%(name=>$_, type=>"IV", default=> \@("IV", "0"))
   foreach (qw(_POSIX_ARG_MAX _POSIX_CHILD_MAX _POSIX_CHOWN_RESTRICTED
               _POSIX_LINK_MAX _POSIX_MAX_CANON _POSIX_MAX_INPUT _POSIX_NAME_MAX
               _POSIX_NGROUPS_MAX _POSIX_NO_TRUNC _POSIX_OPEN_MAX

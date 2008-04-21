@@ -11,11 +11,6 @@ UpDowngrade(getPerlFiles('MANIFEST'))
 WriteMakefile( 
     NAME         => 'IO::Compress::Base',
     VERSION_FROM => 'lib/IO/Compress/Base.pm',
-    'dist'       => \%( COMPRESS     => 'gzip', 
-                      TARFLAGS     => '-chvf',
-                      SUFFIX       => 'gz',
-                      DIST_DEFAULT => 'MyTrebleCheck tardist',
-                    ),
 
     (
       %ENV{SKIP_FOR_CORE}

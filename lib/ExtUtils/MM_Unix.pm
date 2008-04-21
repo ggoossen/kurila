@@ -1432,7 +1432,7 @@ sub init_PM {
 
     # The attribute PMLIBDIRS holds an array reference which lists
     # subdirectories which we should search for library files to
-    # install. PMLIBDIRS defaults to [ 'lib', $self->{BASEEXT} ].  We
+    # install. PMLIBDIRS defaults to [ 'lib', $self->{BASEEXT} ).  We
     # recursively search through the named directories (skipping any
     # which don't exist or contain Makefile.PL files).
 
@@ -1814,7 +1814,7 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{VERBINST}   ||= 0;
     $self->{MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', \@('-MExtUtils::Install'));
-install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
+install(\%(@ARGV), '$(VERBINST)', 0, '$(UNINST)');
 CODE
     $self->{DOC_INSTALL}        ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
@@ -2893,7 +2893,7 @@ pm_to_blib : $(TO_INST_PM)
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, \@('-MExtUtils::Install'));
-pm_to_blib(\{\@ARGV\}, '$autodir', '\$(PM_FILTER)')
+pm_to_blib(\\\%(\@ARGV), '$autodir', '\$(PM_FILTER)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});

@@ -28,7 +28,6 @@ WriteMakefile(
 	'PREREQ_PM'	=> \%(),
 	'AUTHOR'	=> 'Mark Shelor <mshelor@cpan.org>',
 	'LIBS'		=> \@(''),
-        MAN3PODS        => \%(),      # Pods will be built by installman.
 	'DEFINE'	=> $define,
 	'INC'		=> '-I.',
 	'NO_META'	=> 1,

@@ -19,13 +19,12 @@ if ($^O eq 'VMS') {
 }
 
 push(@extra, 'INSTALLDIRS'  => 'perl');
-push(@extra, 'MAN3PODS' => \%()) if $PERL_CORE; # Pods built by installman.
 
 WriteMakefile(
     'NAME'	   => 'Digest::MD5',
     'VERSION_FROM' => 'MD5.pm',
     'PREREQ_PM'    => \%( 'File::Spec' => 0,
-			'Digest::base' => '1.00',
+                          'Digest::base' => '1.00',
 		      ),
     @extra,
     'dist'         => \%( COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),

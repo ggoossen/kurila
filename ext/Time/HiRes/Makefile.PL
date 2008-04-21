@@ -762,18 +762,9 @@ sub doMakefile {
 	  # Solaris will avenge.
 	'INC'	=> '',     # e.g., '-I/usr/include/other'
 	'INSTALLDIRS' => 'perl',
-	'dist'      => \%(
-	    'CI'       => 'ci -l',
-	    'COMPRESS' => 'gzip -9f',
-	    'SUFFIX'   => 'gz',
-	),
         clean => \%( FILES => "xdefine" ),
         realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
     );
-
-    if (%ENV{PERL_CORE}) {
-	push @makefileopts, MAN3PODS => \%();
-    }
 
     WriteMakefile(@makefileopts);
 }

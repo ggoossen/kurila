@@ -157,7 +157,7 @@ sub new {
     my %atts = @_;
 
     # Register the callers package.
-    my $self = { caller_pkg => (caller)[[0]] };
+    my $self = \%( caller_pkg => (caller)[[0]] );
 
     bless ($self, $class);
 
@@ -272,7 +272,7 @@ sub GetOptions(@) {
 sub GetOptionsFromString($@) {
     my ($string) = shift;
     require Text::ParseWords;
-    my $args = [ Text::ParseWords::shellwords($string) ];
+    my $args = \@( Text::ParseWords::shellwords($string) );
     $caller ||= (caller)[[0]];	# current context
     my $ret = GetOptionsFromArray($args, @_);
     return ( $ret, $args ) if wantarray;
@@ -470,14 +470,14 @@ sub GetOptionsFromArray($@) {
     # Supply --version and --help support, if needed and allowed.
     if ( defined($auto_version) ? $auto_version : ($requested_version +>= 2.3203) ) {
 	if ( !defined(%opctl{version}) ) {
-	    %opctl{version} = ['','version',0,CTL_DEST_CODE,undef];
+	    %opctl{version} = \@('','version',0,CTL_DEST_CODE,undef);
 	    %linkage{version} = \&VersionMessage;
 	}
 	$auto_version = 1;
     }
     if ( defined($auto_help) ? $auto_help : ($requested_version +>= 2.3203) ) {
 	if ( !defined(%opctl{help}) && !defined(%opctl{'?'}) ) {
-	    %opctl{help} = %opctl{'?'} = ['','help',0,CTL_DEST_CODE,undef];
+	    %opctl{help} = %opctl{'?'} = \@('','help',0,CTL_DEST_CODE,undef);
 	    %linkage{help} = \&HelpMessage;
 	}
 	$auto_help = 1;
@@ -551,7 +551,7 @@ sub GetOptionsFromArray($@) {
 					  " to ARRAY\n")
 			      if $debug;
 			    my $t = %linkage{$opt};
-			    $$t = %linkage{$opt} = [];
+			    $$t = %linkage{$opt} = \@();
 			    print STDERR ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
 			      if $debug;
 			    push (@{%linkage{$opt}}, $arg);
@@ -561,7 +561,7 @@ sub GetOptionsFromArray($@) {
 					  " to HASH\n")
 			      if $debug;
 			    my $t = %linkage{$opt};
-			    $$t = %linkage{$opt} = {};
+			    $$t = %linkage{$opt} = \%();
 			    print STDERR ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			      if $debug;
 			    %linkage{$opt}->{$key} = $arg;
@@ -631,7 +631,7 @@ sub GetOptionsFromArray($@) {
 		    else {
 			print STDERR ("=>\$L\{$opt\} = [\"$arg\"]\n")
 			    if $debug;
-			$userlinkage->{$opt} = [$arg];
+			$userlinkage->{$opt} = \@($arg);
 		    }
 		}
 		elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
@@ -643,7 +643,7 @@ sub GetOptionsFromArray($@) {
 		    else {
 			print STDERR ("=>\$L\{$opt\} = \{$key => \"$arg\"\}\n")
 			    if $debug;
-			$userlinkage->{$opt} = {$key => $arg};
+			$userlinkage->{$opt} = \%($key => $arg);
 		    }
 		}
 		else {
@@ -817,7 +817,7 @@ sub ParseOptionSpec ($$) {
     my $entry;
     if ( $spec eq '' || $spec eq '+' || $spec eq '!' ) {
 	# Fields are hard-wired here.
-	$entry = [$spec,$orig,undef,CTL_DEST_SCALAR,0,0];
+	$entry = \@($spec,$orig,undef,CTL_DEST_SCALAR,0,0);
     }
     elsif ( $spec =~ m/^:(-?\d+|\+)([@%])?$/ ) {
 	my $def = $1;
@@ -827,8 +827,8 @@ sub ParseOptionSpec ($$) {
 	$dest = $dest eq '@' ? CTL_DEST_ARRAY
 	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
 	# Fields are hard-wired here.
-	$entry = [$type,$orig,$def eq '+' ? undef : $def,
-		  $dest,0,1];
+	$entry = \@($type,$orig,$def eq '+' ? undef : $def,
+                    $dest,0,1);
     }
     else {
 	my ($mand, $type, $dest) =
@@ -855,7 +855,7 @@ sub ParseOptionSpec ($$) {
 	  if defined($ma) && $ma +< $mi;
 
 	# Fields are hard-wired here.
-	$entry = [$type,$orig,undef,$dest,$mi,$ma||-1];
+	$entry = \@($type,$orig,undef,$dest,$mi,$ma||-1);
     }
 
     # Process all names. First is canonical, the rest are aliases.
@@ -872,7 +872,7 @@ sub ParseOptionSpec ($$) {
 	if ( $spec eq '!' ) {
 	    $opctl->{"no$_"} = $entry;
 	    $opctl->{"no-$_"} = $entry;
-	    $opctl->{$_} = [@$entry];
+	    $opctl->{$_} = \@(@$entry);
 	    $opctl->{$_}->[CTL_TYPE] = '';
 	}
 	else {
@@ -1262,10 +1262,10 @@ sub Configure (@) {
     my (@options) = @_;
 
     my $prevconfig =
-      [ $error, $debug, $major_version, $minor_version,
-	$autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
-	$gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-	$longprefix ];
+      \@( $error, $debug, $major_version, $minor_version,
+          $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
+          $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
+          $longprefix );
 
     if ( ref(@options[0]) eq 'ARRAY' ) {
 	( $error, $debug, $major_version, $minor_version,
@@ -1433,10 +1433,10 @@ sub setup_pa_args($@) {
 
     my $pa;
     if ( @_ +> 1 ) {
-	$pa = { @_ };
+	$pa = \%( @_ );
     }
     else {
-	$pa = shift || {};
+	$pa = shift || \%();
     }
 
     # At this point, $pa can be a number (exit value), string
@@ -1448,10 +1448,10 @@ sub setup_pa_args($@) {
 	delete($pa->{-msg});
     }
     elsif ( $pa =~ m/^-?\d+$/ ) {
-	$pa = { -exitval => $pa };
+	$pa = \%( -exitval => $pa );
     }
     else {
-	$pa = { -message => $pa };
+	$pa = \%( -message => $pa );
     }
 
     # These are _our_ defaults.
@@ -1470,7 +1470,7 @@ package Getopt::Long::CallBack;
 
 sub new {
     my ($pkg, %atts) = @_;
-    bless { %atts }, $pkg;
+    bless \%( %atts ), $pkg;
 }
 
 sub name {

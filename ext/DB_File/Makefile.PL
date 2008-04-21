@@ -15,7 +15,6 @@ $LIB = "-llibdb" if $^O eq 'MSWin32' ;
 WriteMakefile(
 	NAME 		=> 'DB_File',
 	LIBS 		=> \@("-L/usr/local/lib $LIB"),
-        MAN3PODS        => \%(),         # Pods will be built by installman.
 	#INC		=> '-I/usr/local/include',
 	VERSION_FROM	=> 'DB_File.pm',
 	OBJECT		=> 'version$(OBJ_EXT) DB_File$(OBJ_EXT)',

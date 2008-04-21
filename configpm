@@ -703,8 +703,8 @@ for my $name (@heavy_subs) {
 }
 
 # tie returns the object, so the value returned to require will be true.
-tie %%Config, 'Config', {
-%s};
+tie %%Config, 'Config', \%%(
+%s);
 ENDOFTIE
 
 

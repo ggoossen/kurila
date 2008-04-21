@@ -13,13 +13,8 @@ UpDowngrade(getPerlFiles('MANIFEST'))
 WriteMakefile( 
     NAME         => 'Compress::Zlib',
     VERSION_FROM => 'lib/Compress/Zlib.pm',
-    'dist'       => \%( COMPRESS     => 'gzip', 
-                      TARFLAGS     => '-chvf',
-                      SUFFIX       => 'gz',
-                      DIST_DEFAULT => 'MyTrebleCheck tardist',
-                    ),
 
-    (
+
       %ENV{SKIP_FOR_CORE}
         ? (MAN3PODS    => \%())
 	    : (PREREQ_PM   => \%( 'Compress::Raw::Zlib'           => $::VERSION,

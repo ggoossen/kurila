@@ -297,6 +297,7 @@ static struct debug_tokens {
     { ANDAND,		TOKENTYPE_NONE,		"ANDAND" },
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
     { ANONSUB,		TOKENTYPE_IVAL,		"ANONSUB" },
+    { ANONARY,		TOKENTYPE_IVAL,		"ANONARY" },
     { ARROW,		TOKENTYPE_NONE,		"ARROW" },
     { ASSIGNOP,		TOKENTYPE_OPNUM,	"ASSIGNOP" },
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
@@ -3953,7 +3954,7 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
 	    else
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
-	    OPERATOR(HASHBRACK);
+	    yyerror("'{' should be '\%(' expected");
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
@@ -4391,6 +4392,7 @@ Perl_yylex(pTHX)
     case '@':
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
+
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
 	if (!PL_tokenbuf[1]) {
@@ -4481,6 +4483,7 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR) {
 	    no_op("String",s);
 	}
+	
 	if (!s)
 	    missingterminator(NULL);
 	DEBUG_T( { printbuf("### Saw string before %s\n", s); } );
@@ -4518,6 +4521,18 @@ Perl_yylex(pTHX)
 	TERM(sublex_start(pl_yylval.ival, PL_lex_op));
 
     case '\\':
+	if (PL_expect != XOPERATOR) {
+	    if (s[1] == '@' && s[2] == '(') {
+		/* anon array constructor */
+		s += 3;
+		OPERATOR(ANONARY);
+	    }
+	    if (s[1] == '%' && s[2] == '(') {
+		/* anon hash constructor */
+		s += 3;
+		OPERATOR(ANONHSH);
+	    }
+	}
 	s++;
 	if (PL_lex_inwhat && isDIGIT(*s) && ckWARN(WARN_SYNTAX))
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),"Can't use \\%c to mean $%c in expression",

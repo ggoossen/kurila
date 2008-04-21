@@ -69,18 +69,6 @@ WriteMakefile(
     XS           => \%( 'Zlib.xs' => 'Zlib.c'),
     'depend'     => \%( 'Makefile'   => 'config.in' ),
     'clean'      => \%( FILES        => '*.c constants.h constants.xs' ),
-    'dist'       => \%( COMPRESS     => 'gzip', 
-                      TARFLAGS     => '-chvf',
-                      SUFFIX       => 'gz',
-                      DIST_DEFAULT => 'MyTrebleCheck tardist',
-                    ),
-
-    (
-      %ENV{SKIP_FOR_CORE}
-        ? (MAN3PODS    => \%())
-        : ()
-    ),
-       
 
     (
       $BUILD_ZLIB
@@ -88,10 +76,8 @@ WriteMakefile(
         : (LIBS => \@( "-L$ZLIB_LIB -lz " ))
     ),
       
-    (
-     (ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
-      AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
-    ),
+    ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
+    AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
     INSTALLDIRS => ('perl'),
     LICENSE  => 'perl',
@@ -164,7 +150,7 @@ require ExtUtils::Constant;
             "\t$missing\n" ;
     }
     
-    push @names, \%(name => 'ZLIB_VERSION', type => 'PV' );
+    push @names, \%( name => 'ZLIB_VERSION', type => 'PV' );
 
     ExtUtils::Constant::WriteConstants(
                                        NAME => 'Compress::Raw::Zlib',

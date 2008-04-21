@@ -76,6 +76,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO HASHBRACK NOAMP HSLICE ASLICE
+%token <i_tkval> ANONARY ANONHSH
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -126,7 +127,7 @@
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
-%left '[' '{'
+%left '[' '{' ANONARY ANONHSH
 
 %token <i_tkval> PEG
 
@@ -1095,27 +1096,25 @@ termunop : '-' term %prec UMINUS                       /* -$x */
     ;
 
 /* Constructors for anonymous data */
-anonymous:	'[' expr ']'
+anonymous:	ANONARY expr ')'  /* @( ... ) */
 			{ $$ = newANONLIST($2);
 			  TOKEN_GETMAD($1,$$,'[');
 			  TOKEN_GETMAD($3,$$,']');
 			}
-	|	'[' ']'
+        |	ANONARY ')'  /* @( ... ) */
 			{ $$ = newANONLIST((OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'[');
 			  TOKEN_GETMAD($2,$$,']');
 			}
-	|	HASHBRACK expr ';' '}'	%prec '(' /* { foo => "Bar" } */
+	|	ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
 			{ $$ = newANONHASH($2);
 			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($3,$$,';');
-			  TOKEN_GETMAD($4,$$,'}');
+			  TOKEN_GETMAD($3,$$,'}');
 			}
-	|	HASHBRACK ';' '}'	%prec '(' /* { } (';' by tokener) */
+	|	ANONHSH ')'	%prec '(' /* %( ... ) */
 			{ $$ = newANONHASH((OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($2,$$,';');
-			  TOKEN_GETMAD($3,$$,'}');
+			  TOKEN_GETMAD($2,$$,'}');
 			}
 	|	ANONSUB startanonsub proto subattrlist block	%prec '('
 			{ SvREFCNT_inc_simple_void(PL_compcv);
