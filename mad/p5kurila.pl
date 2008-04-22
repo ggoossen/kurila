@@ -206,6 +206,16 @@ sub make_glob_sub {
     }
 }
 
+sub is_in_string {
+    my $op = shift;
+
+    return 1 if $op->tag eq "op_stringify" or
+      ($op->tag eq "op_null" and ($op->att('was') || '') eq "stringify");
+    return 1 if $op->tag eq "op_concat";
+
+    return $op->parent && is_in_string($op->parent);
+}
+
 sub is_string_op {
     my $op = shift;
 
@@ -214,7 +224,8 @@ sub is_string_op {
     # core functions returning a string
     return 1 if $op->tag =~ m/^op_(sprintf|join)$/;
     # stringify
-    return 1 if $op->tag eq "op_null" and ($op->att('was') || '') eq "stringify";
+    return 1 if $op->tag eq "op_stringify" or
+      ($op->tag eq "op_null" and ($op->att('was') || '') eq "stringify");
 
     if ($op->tag eq "op_padsv") {
         # lookup last change to variable and if string assignment
@@ -769,6 +780,36 @@ sub no_sigil_change {
     }
 }
 
+sub no_bracket_names {
+    my $xml = shift;
+    for my $prop (qw|variable ary|) {
+        for my $var ($xml->findnodes("//madprops/mad_$prop")) {
+            my $op = $var->parent->parent;
+            if (get_madprop($op, $prop) =~ m/^(\$|\@)\{/) {
+                my $v = get_madprop($op, $prop);
+                if (is_in_string($op)) {
+                    $v =~ s/(\$|\@)\{(.*)\}/\{$1$2\}/;
+                } else {
+                    $v =~ s/(\$|\@)\{(.*)\}/$1$2/;
+                }
+                set_madprop($op, $prop, $v);
+            }
+        }
+    }
+}
+
+sub anon_aryhsh {
+    my $xml = shift;
+    for my $op ($xml->findnodes("//op_anonlist")) {
+        set_madprop($op, 'square_open', '\@(');
+        set_madprop($op, 'square_close', ')');
+    }
+    for my $op ($xml->findnodes("//op_anonhash")) {
+        set_madprop($op, 'curly_open', '\%(');
+        set_madprop($op, 'curly_close', ')');
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -836,7 +877,10 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.10') {
     remove_dolsharp($twig);
     qq_escape($twig, ['%']);
     no_sigil_change($twig);
+    no_bracket_names($twig);
 }
+
+anon_aryhsh($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
