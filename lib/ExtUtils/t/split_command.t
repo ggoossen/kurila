@@ -21,12 +21,12 @@ my $Is_Win32 = $^O eq 'MSWin32';
 use Test::More tests => 7;
 
 my $perl = which_perl;
-my $mm = bless { NAME => "Foo" }, "MM";
+my $mm = bless \%( NAME => "Foo" ), "MM";
 
 # I don't expect anything to have a length shorter than 256 chars.
 cmp_ok( $mm->max_exec_len, '+>=', 256,   'max_exec_len' );
 
-my $echo = $mm->oneliner(q{print @ARGV}, ['-l']);
+my $echo = $mm->oneliner(q{print @ARGV}, \@('-l'));
 
 # Force a short command length to make testing split_command easier.
 $mm->{_MAX_EXEC_LEN} = length($echo) + 15;

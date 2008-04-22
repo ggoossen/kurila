@@ -94,7 +94,7 @@ print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok",
     }
 
     my %h;
-    %h{foo} = bless [], 'X';
+    %h{foo} = bless \@(), 'X';
     delete %h{foo} for %h{foo}, 1;
     print $x == 1 ? "ok" : "not ok", " 14 - double destroy, x=$x\n";
 }

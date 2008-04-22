@@ -40,11 +40,11 @@ sub mkUncompObject
     return (undef, "Could not create Inflation object: $status", $status) 
         if $status != Z_OK ;
 
-    return bless {'Inf'        => $inflate,
+    return bless \%('Inf'        => $inflate,
                   'CompSize'   => 0,
                   'UnCompSize' => 0,
                   'Error'      => '',
-                 } ;     
+                 ) ;     
     
 }
 
@@ -147,11 +147,11 @@ sub createDeflateStream
 {
     my $self = shift ;
     my $deflate = $self->{Inf}->createDeflateStream(@_);
-    return bless {'Def'        => $deflate,
+    return bless \%('Def'        => $deflate,
                   'CompSize'   => 0,
                   'UnCompSize' => 0,
                   'Error'      => '',
-                 }, 'IO::Compress::Adapter::Deflate';
+                 ), 'IO::Compress::Adapter::Deflate';
 }
 
 1;

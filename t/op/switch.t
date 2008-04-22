@@ -369,7 +369,7 @@ sub bar {"bar"}
 
 {
     my $ok = 0;
-    my $obj = bless [];
+    my $obj = bless \@();
     given("foo") {
 	when($obj->bar()) {$ok = 1}
     }
@@ -510,7 +510,7 @@ TODO: {
     package FetchCounter;
     sub TIESCALAR {
 	my ($class) = @_;
-	bless {value => undef, count => 0}, $class;
+	bless \%( value => undef, count => 0 ), $class;
     }
     sub STORE {
         my ($self, $val) = @_;
@@ -746,10 +746,10 @@ sub contains_x {
     
     sub new {
 	my ($pkg, $retval) = @_;
-	bless {
+	bless \%(
 	    called => 0,
 	    retval => $retval,
-	}, $pkg;
+	), $pkg;
     }
 }
 

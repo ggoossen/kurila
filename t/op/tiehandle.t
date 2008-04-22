@@ -164,7 +164,7 @@ is($r, 1);
     # Test for change #11536
     package Foo;
     use strict;
-    sub TIEHANDLE { bless {} }
+    sub TIEHANDLE { bless \%() }
     my $cnt = 'a';
     sub READ {
 	@_[1] = $cnt++;
@@ -206,9 +206,9 @@ is($r, 1);
 
     package Blah;
 
-    sub TIEHANDLE {bless {}}
-    sub TIEHASH   {bless {}}
-    sub TIEARRAY  {bless {}}
+    sub TIEHANDLE {bless \%()}
+    sub TIEHASH   {bless \%()}
+    sub TIEARRAY  {bless \%()}
 }
 
 {
@@ -238,7 +238,7 @@ is($r, 1);
     is($data, 'foobar', '[ID 20020713.001]');
 
     package CHOMP;
-    sub TIEHANDLE { bless {}, @_[0] }
+    sub TIEHANDLE { bless \%(), @_[0] }
     sub READLINE { "foobar\n" }
 }
 

@@ -75,7 +75,7 @@ like ($@->message, qr/use VERSION is not valid in Perl Kurila/);
 our $testimport;
 our $version_check;
 %INC{'testuse.pm'} = 1;
-*testuse::import = sub { $testimport = [@_] };
+*testuse::import = sub { $testimport = \@(@_) };
 *testuse::VERSION = sub { $version_check = @_[1] };
 
 # test calling of 'VERSION' and 'import' with correct arguments

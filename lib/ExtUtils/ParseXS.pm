@@ -84,7 +84,7 @@ sub process_file {
 	   prototypes => 0,
 	   inout => 1,
 	   argtypes => 1,
-	   typemap => [],
+	   typemap => \@(),
 	   output => \*STDOUT,
 	   csuffix => '.c',
 	   %args,
@@ -98,7 +98,7 @@ sub process_file {
     require ExtUtils::XSSymSet;
     $SymSet = ExtUtils::XSSymSet->new( 28);
   }
-  @XSStack = ({type => 'none'});
+  @XSStack = (\%(type => 'none'));
   ($XSS_work_idx, $cpp_next_tmp) = (0, "XSubPPtmpAAAA");
   @InitFileCode = ();
   $FH = Symbol::gensym();
@@ -250,7 +250,7 @@ sub process_file {
 	 ( (??{ $size }) )?	# Possible sizeof set-from
 	 \) \s* ; \s* $
 	]x);
-    %targetable{$key} = [$t, $with_size, $arg, $sarg] if $t;
+    %targetable{$key} = \@($t, $with_size, $arg, $sarg) if $t;
   }
 
   # Match an XS keyword
@@ -460,7 +460,7 @@ sub process_para {
       my $statement = $+;
       if ($statement eq 'if') {
 	$XSS_work_idx = @XSStack;
-	push(@XSStack, {type => 'if'});
+	push(@XSStack, \%(type => 'if'));
       } else {
 	death ("Error: `$statement' with no matching `if'")
 	  if @XSStack[-1]{type} ne 'if';
@@ -473,7 +473,7 @@ sub process_para {
 	if ($statement ne 'endif') {
 	  # Hide the functions defined in other #if branches, and reset.
 	  %{@XSStack[-1]{other_functions}}{[@fns]} = (1) x @fns;
-	  %{@XSStack[-1]}{[qw(varname functions)]} = ('', {});
+	  %{@XSStack[-1]}{[qw(varname functions)]} = ('', \%());
 	} else {
 	  my($tmp) = pop(@XSStack);
 	  0 while (--$XSS_work_idx
@@ -1475,7 +1475,7 @@ sub INCLUDE_handler ()
     ++ %IncludedFiles{$_} unless m/\|\s*$/ ;
 
     # Save the current file context.
-    push(@XSStack, {
+    push(@XSStack, \%(
 		    type		=> 'file',
 		    LastLine        => $lastline,
 		    LastLineNo      => $lastline_no,
@@ -1484,7 +1484,7 @@ sub INCLUDE_handler ()
 		    Filename        => $filename,
 		    Filepathname    => $filepathname,
 		    Handle          => $FH,
-		   }) ;
+		   )) ;
 
     $FH = Symbol::gensym();
 
@@ -1898,10 +1898,10 @@ sub TIEHANDLE {
   $cfile =~ s/\\/\\\\/g;
   $SECTION_END_MARKER = qq{#line --- "$cfile"};
   
-  return bless {buffer => '',
-		fh => $fh,
-		line_no => 1,
-	       }, $class;
+  return bless \%(buffer => '',
+                  fh => $fh,
+                  line_no => 1,
+                 ), $class;
 }
 
 sub PRINT {

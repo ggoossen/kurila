@@ -47,7 +47,7 @@ This tests the classic diamond inheritence pattern.
 
 ok(eq_array(
     mro::get_linear_isa('Diamond_D'),
-    [ qw(Diamond_D Diamond_B Diamond_C Diamond_A) ]
+    \@( qw(Diamond_D Diamond_B Diamond_C Diamond_A) )
 ), '... got the right MRO for Diamond_D');
 
 is(Diamond_D->hello, 'Diamond_C::hello => Diamond_A::hello', '... method resolved itself as expected');

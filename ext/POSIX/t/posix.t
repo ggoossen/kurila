@@ -271,8 +271,8 @@ ok(!POSIX::isxdigit('g'), 'isxdigit' );
 ok( POSIX::isalnum(''),   'isalnum empty string' );
 ok( POSIX::isalnum(undef),'isalnum undef' );
 # those functions should stringify their arguments
-dies_like( sub { POSIX::isalpha([]) }, qr/reference as string/,   'isalpha []' );
-dies_like( sub { POSIX::isprint([]) }, qr/reference as string/,   'isalpha []' );
+dies_like( sub { POSIX::isalpha(\@()) }, qr/reference as string/,   'isalpha []' );
+dies_like( sub { POSIX::isprint(\@()) }, qr/reference as string/,   'isalpha []' );
 
 eval { use strict; POSIX->import("S_ISBLK"); my $x = S_ISBLK };
 unlike( $@, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" );

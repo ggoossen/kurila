@@ -69,8 +69,8 @@ if ($threads::shared::VERSION && ! exists(%ENV{'PERL_CORE'})) {
     diag('Testing threads::shared ' . $threads::shared::VERSION);
 }
 
-array(24, [], 'Thing');
-hash(24, [], 'Thing');
+array(24, \@(), 'Thing');
+hash(24, \@(), 'Thing');
 
 threads::shared->import();
 

@@ -7,9 +7,9 @@ EOSOL
 
 print "\nAcross:\n";
 print form
-	{page=>{width=>72, length=>5, footer=>"====================\n"},
+	\%(page=>\%(width=>72, length=>5, footer=>"====================\n"),
       layout=>'across',
-	},
+	),
    	 "\{:[\{*\}]\}   \{:[\{*\}]\}   \{:[\{*\}]\}",
 	  $text,     $text,     $text,
 	 "\{II\{*\}II\}",
@@ -20,7 +20,7 @@ pos $text = 0;
                
 print "\nBalanced (default):\n";
 print form
-	{page=>{width=>72, length=>5, footer=>"====================\n"}},
+	\%(page=>\%(width=>72, length=>5, footer=>"====================\n")),
    	 "\{:[\{*\}]\}   \{:[\{*\}]\}   \{:[\{*\}]\}",
 	  $text,      $text,      $text,
 	 "\{II\{*\}II\}",
@@ -31,9 +31,9 @@ pos $text = 0;
 
 print "\nDown:\n";
 print form
-	{page=>{width=>72, length=>5, footer=>"====================\n"},
+	\%(page=>\%(width=>72, length=>5, footer=>"====================\n"),
       layout=>'down',
-	 },
+	 ),
    	 "\{:[\{*\}]\}   \{:[\{*\}]\}   \{:[\{*\}]\}",
 	  $text,      $text,      $text,
 	 "\{II\{*\}II\}",

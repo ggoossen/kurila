@@ -18,7 +18,7 @@ use Perl6::Form;
 	"Casa d'Otello,  Venezia",
 );
 
-print form {interleave=>1},
+print form \%(interleave=>1),
 	<<'EOFORMAT',
 Name:    {[[[[[[[[[[[[[[[}   Role: {[[[[[[[[[[}
 Address: {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}

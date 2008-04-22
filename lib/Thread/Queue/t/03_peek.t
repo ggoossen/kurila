@@ -23,7 +23,7 @@ plan('tests' => 19);
 my $q = Thread::Queue->new(1..10);
 ok($q, 'New queue');
 
-$q->enqueue([ qw/foo bar/ ]);
+$q->enqueue(\@( qw/foo bar/ ));
 
 sub q_check
 {
@@ -36,7 +36,7 @@ sub q_check
     ok(! defined($nada), 'Big negative peek');
 
     my $ary = $q->peek(-1);
-    is_deeply($ary, [ qw/foo bar/ ], 'Peek array');
+    is_deeply($ary, \@( qw/foo bar/ ), 'Peek array');
 
     is($q->pending(), 11, 'Queue count in thread');
 }

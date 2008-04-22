@@ -44,18 +44,18 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => {
+        PREREQ_PM       => \%(
             strict  => 0
-        }
+        )
     );
     is $warnings, '';
 
     $warnings = '';
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => {
+        PREREQ_PM       => \%(
             strict  => 99999
-        }
+        )
     );
     is $warnings, 
     sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n",
@@ -64,23 +64,23 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     $warnings = '';
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => {
+        PREREQ_PM       => \%(
             "I::Do::Not::Exist" => 0,
-        }
+        )
     );
     is $warnings, 
-    "Warning: prerequisite I::Do::Not::Exist 0 not found.\n";
+    "Warning: prerequisite I::Do::Not::Exist 0 not found.";
 
     $warnings = '';
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => {
+        PREREQ_PM       => \%(
             "I::Do::Not::Exist" => 0,
             "strict"            => 99999,
-        }
+        )
     );
     is $warnings, 
-    "Warning: prerequisite I::Do::Not::Exist 0 not found.\n".
+    "Warning: prerequisite I::Do::Not::Exist 0 not found.".
     sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n",
             strict->VERSION);
     
@@ -88,11 +88,11 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     eval {
         WriteMakefile(
             NAME            => 'Big::Dummy',
-            PREREQ_PM       => {
+            PREREQ_PM       => \%(
                 "I::Do::Not::Exist" => 0,
                 "Nor::Do::I"        => 0,
                 "strict"            => 99999,
-            },
+            ),
             PREREQ_FATAL    => 1,
         );
     };
@@ -112,9 +112,9 @@ END
     eval {
         WriteMakefile(
             NAME            => 'Big::Dummy',
-            PREREQ_PM       => {
+            PREREQ_PM       => \%(
                 "I::Do::Not::Exist" => 0,
-            },
+            ),
             CONFIGURE => sub {
                 require I::Do::Not::Exist;
             },

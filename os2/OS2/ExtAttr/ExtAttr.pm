@@ -23,7 +23,7 @@ sub TIEHASH {
     $name = $file;
     _read($ea, $name, 0, 0);
   }
-  bless [$ea, $name, $handle, 0, 0, 0], $class;
+  bless \@($ea, $name, $handle, 0, 0, 0), $class;
 }
 
 sub DESTROY {

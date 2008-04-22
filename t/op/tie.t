@@ -27,7 +27,7 @@ for (@prgs){
     $TODO = $testname =~ s/^TODO //;
     $expected =~ s/\n+$//;
 
-    fresh_perl_is($prog, $expected, {}, $testname);
+    fresh_perl_is($prog, $expected, \%(), $testname);
 }
 
 __END__
@@ -288,7 +288,7 @@ EXPECT
 ########
 #
 # FETCH freeing tie'd SV
-sub TIESCALAR { bless [] }
+sub TIESCALAR { bless \@() }
 sub FETCH { *a = \1; 1 }
 tie $a, 'main';
 print $a;
@@ -297,24 +297,24 @@ EXPECT
 
 #  [20020716.007] - nested FETCHES
 
-sub F1::TIEARRAY { bless [], 'F1' }
+sub F1::TIEARRAY { bless \@(), 'F1' }
 sub F1::FETCH { 1 }
 my @f1;
 tie @f1, 'F1';
 
-sub F2::TIEARRAY { bless [2], 'F2' }
+sub F2::TIEARRAY { bless \@(2), 'F2' }
 sub F2::FETCH { my $self = shift; my $x = @f1[3]; $self }
 my @f2;
 tie @f2, 'F2';
 
 print @f2[4][0],"\n";
 
-sub F3::TIEHASH { bless [], 'F3' }
+sub F3::TIEHASH { bless \@(), 'F3' }
 sub F3::FETCH { 1 }
 my %f3;
 tie %f3, 'F3';
 
-sub F4::TIEHASH { bless [3], 'F4' }
+sub F4::TIEHASH { bless \@(3), 'F4' }
 sub F4::FETCH { my $self = shift; my $x = %f3{3}; $self }
 my %f4;
 tie %f4, 'F4';
@@ -327,7 +327,7 @@ EXPECT
 ########
 # test untie() from within FETCH
 package Foo;
-sub TIESCALAR { my $pkg = shift; return bless [@_], $pkg; }
+sub TIESCALAR { my $pkg = shift; return bless \@(@_), $pkg; }
 sub FETCH {
   my $self = shift;
   my ($obj, $field) = @$self;
@@ -345,8 +345,8 @@ ok
 # the tmps returned by FETCH should appear to be SCALAR
 # (even though they are now implemented using PVLVs.)
 package X;
-sub TIEHASH { bless {} }
-sub TIEARRAY { bless {} }
+sub TIEHASH { bless \%() }
+sub TIEARRAY { bless \%() }
 sub FETCH {1}
 my (%h, @a);
 tie %h, 'X';
@@ -430,7 +430,7 @@ sub TIESCALAR
 {
         my $pkg = shift;
         my ($ref, $val) = @_;
-        return bless [ $ref, $val ], $pkg;
+        return bless \@( $ref, $val ), $pkg;
 }
 
 sub FETCH
@@ -482,7 +482,7 @@ package TieScalar;
 
 sub TIEHASH {
     my $pkg = shift;
-    bless { } => $pkg;
+    bless \%() => $pkg;
 }
 
 sub STORE {
@@ -522,7 +522,7 @@ package TieScalar;
 
 sub TIEHASH {
     my $pkg = shift;
-    bless { } => $pkg;
+    bless \%() => $pkg;
 }
 sub STORE {
     @_[0]->{@_[1]} = @_[2];
@@ -571,14 +571,14 @@ not empty
 FIRSTKEY
 empty
 ########
-sub TIESCALAR { bless {} }
+sub TIESCALAR { bless \%() }
 sub FETCH { my $x = 3.3; 1 if 0+$x; $x }
 tie $h, "main";
 print $h,"\n";
 EXPECT
 3.3
 ########
-sub TIESCALAR { bless {} }
+sub TIESCALAR { bless \%() }
 sub FETCH { shift()->{i} ++ }
 tie $h, "main";
 print $h.$h;
@@ -594,7 +594,7 @@ EXPECT
 10
 ########
 # Bug 36267
-sub TIEHASH  { bless {}, @_[0] }
+sub TIEHASH  { bless \%(), @_[0] }
 sub STORE    { @_[0]->{@_[1]} = @_[2] }
 sub FIRSTKEY { my $a = scalar keys %{@_[0]}; each %{@_[0]} }
 sub NEXTKEY  { each %{@_[0]} }
@@ -613,7 +613,7 @@ EXPECT
 0
 ########
 # Bug 37731
-sub foo::TIESCALAR { bless {value => @_[1]}, @_[0] }
+sub foo::TIESCALAR { bless \%(value => @_[1]), @_[0] }
 sub foo::FETCH { @_[0]->{value} }
 tie my $VAR, 'foo', '42';
 foreach my $var ($VAR) {
@@ -622,7 +622,7 @@ foreach my $var ($VAR) {
 EXPECT
 yes
 ########
-sub TIEARRAY { bless [], 'main' }
+sub TIEARRAY { bless \@(), 'main' }
 {
     local @a;
     tie @a, 'main';
@@ -630,7 +630,7 @@ sub TIEARRAY { bless [], 'main' }
 print "tied\n" if tied @a;
 EXPECT
 ########
-sub TIEHASH { bless [], 'main' }
+sub TIEHASH { bless \@(), 'main' }
 {
     local %h;
     tie %h, 'main';

@@ -433,7 +433,7 @@ sub rel2abs {
 sub eliminate_macros {
     my($self,$path) = @_;
     return '' unless (defined $path) && ($path ne '');
-    $self = {} unless ref $self;
+    $self = \%() unless ref $self;
 
     if ($path =~ m/\s/) {
       return join ' ', map { $self->eliminate_macros($_) } split m/\s+/, $path;
@@ -470,7 +470,7 @@ sub eliminate_macros {
 sub fixpath {
     my($self,$path,$force_path) = @_;
     return '' unless $path;
-    $self = bless {} unless ref $self;
+    $self = bless \%() unless ref $self;
     my($fixedpath,$prefix,$name);
 
     if ($path =~ m/\s/) {

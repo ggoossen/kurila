@@ -179,30 +179,30 @@ sub find_version {
 
 # perforce branches and patch levels
 %patchlevel = (
-    5.005    => [perl => 1647],
-    5.00503  => ['maint-5.005' => 3198],
-    5.00405  => ['maint-5.004' => 3296],
-    5.006    => [perl => 5899],
-    5.006001 => ['maint-5.6' => 9654],
-    5.006002 => ['maint-5.6' => 21727],
-    5.007003 => [perl => 15039],
-    5.008    => [perl => 17637],
-    5.008001 => ['maint-5.8' => 21377],
-    5.008002 => ['maint-5.8' => 21670],
-    5.009    => [perl => 21539],
-    5.008003 => ['maint-5.8' => 22151],
-    5.00504  => ['maint-5.005' => 22270],
-    5.009001 => [perl => 22506],
-    5.008004 => ['maint-5.8' => 22729],
-    5.008005 => ['maint-5.8' => 23139],
-    5.008006 => ['maint-5.8' => 23552],
-    5.009002 => [perl => 24131],
-    5.008007 => ['maint-5.8' => 24641],
-    5.009003 => [perl => 26975],
-    5.008008 => ['maint-5.8' => 27040],
-    5.009004 => [perl => 28727],
-    5.009005 => [perl => 31562],
-    5.010000 => [perl => 32642],
+    5.005    => \@(perl => 1647),
+    5.00503  => \@('maint-5.005' => 3198),
+    5.00405  => \@('maint-5.004' => 3296),
+    5.006    => \@(perl => 5899),
+    5.006001 => \@('maint-5.6' => 9654),
+    5.006002 => \@('maint-5.6' => 21727),
+    5.007003 => \@(perl => 15039),
+    5.008    => \@(perl => 17637),
+    5.008001 => \@('maint-5.8' => 21377),
+    5.008002 => \@('maint-5.8' => 21670),
+    5.009    => \@(perl => 21539),
+    5.008003 => \@('maint-5.8' => 22151),
+    5.00504  => \@('maint-5.005' => 22270),
+    5.009001 => \@(perl => 22506),
+    5.008004 => \@('maint-5.8' => 22729),
+    5.008005 => \@('maint-5.8' => 23139),
+    5.008006 => \@('maint-5.8' => 23552),
+    5.009002 => \@(perl => 24131),
+    5.008007 => \@('maint-5.8' => 24641),
+    5.009003 => \@(perl => 26975),
+    5.008008 => \@('maint-5.8' => 27040),
+    5.009004 => \@(perl => 28727),
+    5.009005 => \@(perl => 31562),
+    5.010000 => \@(perl => 32642),
 );
 
 for my $version ( sort { $a <+> $b } keys %released ) {
@@ -212,7 +212,7 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 
 
 %version = (
-    5.000 => {
+    5.000 => \%(
         'AnyDBM_File'           => undef,  # lib/AnyDBM_File.pm
         'AutoLoader'            => undef,  # lib/AutoLoader.pm
         'AutoSplit'             => undef,  # lib/AutoSplit.pm
@@ -263,9 +263,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'sigtrap'               => undef,  # lib/sigtrap.pm
         'strict'                => undef,  # lib/strict.pm
         'subs'                  => undef,  # lib/subs.pm
-    },
+    ),
 
-    5.001 => {
+    5.001 => \%(
         'AnyDBM_File'           => undef,  # lib/AnyDBM_File.pm
         'AutoLoader'            => undef,  # lib/AutoLoader.pm
         'AutoSplit'             => undef,  # lib/AutoSplit.pm
@@ -322,9 +322,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'sigtrap'               => undef,  # lib/sigtrap.pm
         'strict'                => undef,  # lib/strict.pm
         'subs'                  => undef,  # lib/subs.pm
-    },
+    ),
 
-    5.002 => {
+    5.002 => \%(
         'AnyDBM_File'           => undef,  # lib/AnyDBM_File.pm
         'AutoLoader'            => undef,  # lib/AutoLoader.pm
         'AutoSplit'             => undef,  # lib/AutoSplit.pm
@@ -402,9 +402,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'strict'                => undef,  # lib/strict.pm
         'subs'                  => undef,  # lib/subs.pm
         'vars'                  => undef,  # lib/vars.pm
-    },
+    ),
 
-    5.00307 => {
+    5.00307 => \%(
         'AnyDBM_File'           => undef, #./lib/AnyDBM_File.pm
         'AutoLoader'            => undef, #./lib/AutoLoader.pm
         'AutoSplit'             => undef, #./lib/AutoSplit.pm
@@ -503,9 +503,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'vars'                  => undef, #./lib/vars.pm
         'VMS::Filespec'         => undef, #./vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.0', #./vms/ext/Stdio/Stdio.pm
-    },
+    ),
 
-    5.004   => {
+    5.004   => \%(
         'AnyDBM_File'           => undef, #./lib/AnyDBM_File.pm
         'AutoLoader'            => undef, #./lib/AutoLoader.pm
         'AutoSplit'             => undef, #./lib/AutoSplit.pm
@@ -637,9 +637,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::Filespec'         => undef, #./vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.02', #./vms/ext/Stdio/Stdio.pm
         'vmsish'                => undef, #./vms/ext/vmsish.pm
-    },
+    ),
 
-    5.005   => {
+    5.005   => \%(
         'AnyDBM_File'           => undef, #./lib/AnyDBM_File.pm
         'attrs'                 => '1.0', #./ext/attrs/attrs.pm
         'AutoLoader'            => undef, #./lib/AutoLoader.pm
@@ -813,9 +813,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::Filespec'         => undef, #./vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.1', #./vms/ext/Stdio/Stdio.pm
         'vmsish'                => undef, #./vms/ext/vmsish.pm
-    },
+    ),
 
-    5.00503   => {
+    5.00503   => \%(
         'AnyDBM_File'           => undef,
         'attrs'                 => '1.0',
         'AutoLoader'            => undef,
@@ -990,9 +990,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::Filespec'         => undef,
         'VMS::Stdio'            => 2.1,
         'vmsish'                => undef,
-    },
+    ),
 
-    5.00405   => {
+    5.00405   => \%(
         'AnyDBM_File'           => undef, #./lib/AnyDBM_File.pm
         'attrs'                 => '0.1', #./lib/attrs.pm
         'AutoLoader'            => '5.56', #./lib/AutoLoader.pm
@@ -1137,9 +1137,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::Filespec'         => undef, #./vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.02', #./vms/ext/Stdio/Stdio.pm
         'vmsish'                => undef, #./vms/ext/vmsish.pm
-    },
+    ),
 
-    5.00504 => {
+    5.00504 => \%(
         'AnyDBM_File'           => undef,  #lib/AnyDBM_File.pm
         'attrs'                 => '1.0',  #lib/attrs.pm
         'AutoLoader'            => undef,  #lib/AutoLoader.pm
@@ -1317,9 +1317,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::Filespec'         => undef,  #vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.1',  #vms/ext/Stdio/Stdio.pm
         'vmsish'                => undef,  #vms/ext/vmsish.pm
-    },
+    ),
 
-    5.006   => {
+    5.006   => \%(
         'AnyDBM_File'           => undef, #./lib/AnyDBM_File.pm
         'AutoLoader'            => '5.57', #./lib/AutoLoader.pm
         'AutoSplit'             => '1.0305', #./lib/AutoSplit.pm
@@ -1535,9 +1535,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'vmsish'                => undef, #./vms/ext/vmsish.pm
         'warnings'              => undef, #./lib/warnings.pm
         'warnings::register'    => undef, #./lib/warnings/register.pm
-    },
+    ),
 
-    5.006001   => {
+    5.006001   => \%(
         'AnyDBM_File'           => undef,
         'attributes'            => 0.03,
         'attrs'                 => '1.0',
@@ -1759,9 +1759,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'warnings'              => undef,
         'warnings::register'    => undef,
         'XSLoader'              => '0.01',
-    },
+    ),
 
-    5.006002 => {
+    5.006002 => \%(
         'AnyDBM_File'           => undef,  #lib/AnyDBM_File.pm
         'attributes'            => '0.03',  #lib/attributes.pm
         'attrs'                 => '1.0',  #lib/attrs.pm
@@ -2007,9 +2007,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'warnings'              => undef, #lib/warnings.pm
         'warnings::register'    => undef, #lib/warnings/register.pm
         'XSLoader'              => '0.01', #lib/XSLoader.pm
-   },
+   ),
 
-    5.007003   => {
+    5.007003   => \%(
         'AnyDBM_File'           => '1.00',
         'Attribute::Handlers'   => '0.76',
         'attributes'            => '0.04_01',
@@ -2326,9 +2326,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'warnings::register'    => '1.00',
         'XS::Typemap'           => '0.01',
         'XSLoader'              => '0.01',
-    },
+    ),
 
-    5.008   => {
+    5.008   => \%(
         'AnyDBM_File'           => '1.00', #./lib/AnyDBM_File.pm
         'Attribute::Handlers'   => '0.77', #./lib/Attribute/Handlers.pm
         'attributes'            => '0.05', #./lib/attributes.pm
@@ -2663,9 +2663,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest'           => '0.01', #./ext/XS/APItest/APItest.pm
         'XS::Typemap'           => '0.01', #./ext/XS/Typemap/Typemap.pm
         'XSLoader'              => '0.01',
-    },
+    ),
 
-    5.008001 => {
+    5.008001 => \%(
         'AnyDBM_File'           => '1.00', #./lib/AnyDBM_File.pm
         'Attribute::Handlers'   => '0.78', #./lib/Attribute/Handlers.pm
         'attributes'            => '0.06', #./lib/attributes.pm
@@ -3020,9 +3020,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest'           => '0.02', #./lib/XS/APItest.pm
         'XS::Typemap'           => '0.01', #./lib/XS/Typemap.pm
         'XSLoader'              => '0.02', #./lib/XSLoader.pm
-    },
+    ),
 
-    5.008002 => {
+    5.008002 => \%(
         'AnyDBM_File' => '1.00',  #AnyDBM_File.pm
         'Attribute::Handlers' => 0.78, #Attribute\Handlers.pm
         'attributes' => 0.06,   #attributes.pm
@@ -3376,9 +3376,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest' => 0.02,  #XS\APItest.pm
         'XS::Typemap' => 0.01,  #XS\Typemap.pm
         'XSLoader' => 0.02,     #XSLoader.pm
-    },
+    ),
 
-    5.008003 => {
+    5.008003 => \%(
         'AnyDBM_File'           => '1.00',  #lib/AnyDBM_File.pm
         'Attribute::Handlers'   => '0.78',  #lib/Attribute/Handlers.pm
         'attributes'            => '0.06',  #lib/attributes.pm
@@ -3734,9 +3734,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest'           => '0.03',  #lib/XS/APItest.pm
         'XSLoader'              => '0.02',  #lib/XSLoader.pm
         'XS::Typemap'           => '0.01',  #lib/XS/Typemap.pm
-    },
+    ),
 
-    5.009 => {
+    5.009 => \%(
         'AnyDBM_File'           => '1.00',  #lib/AnyDBM_File.pm
         'assertions'            => '0.01',  #lib/assertions.pm
         'assertions::activate'  => '0.01',  #lib/assertions/activate.pm
@@ -4094,9 +4094,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest'           => '0.02',  #lib/XS/APItest.pm
         'XS::Typemap'           => '0.01',  #lib/XS/Typemap.pm
         'XSLoader'              => '0.03',  #lib/XSLoader.pm
-    },
+    ),
 
-    5.009001 => {
+    5.009001 => \%(
         'AnyDBM_File'           => '1.00',  #lib/AnyDBM_File.pm
         'assertions'            => '0.01',  #lib/assertions.pm
         'assertions::activate'  => '0.01',  #lib/assertions/activate.pm
@@ -4461,8 +4461,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest'           => '0.03',  #lib/XS/APItest.pm
         'XSLoader'              => '0.03',  #lib/XSLoader.pm
         'XS::Typemap'           => '0.01',  #lib/XS/Typemap.pm
-    },
-    5.008004 => {
+    ),
+    5.008004 => \%(
         'AnyDBM_File'           => '1.00',  #lib/AnyDBM_File.pm
         'attributes'            => '0.06',  #lib/attributes.pm
         'AutoLoader'            => '5.60',  #lib/AutoLoader.pm
@@ -4824,9 +4824,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::DCLsym'           => '1.02',  #vms/ext/DCLsym/DCLsym.pm
         'VMS::Filespec'         => '1.11',  #vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.3',  #vms/ext/Stdio/Stdio.pm
-    },
+    ),
 
-    5.008005 => {
+    5.008005 => \%(
         'AnyDBM_File'           => '1.00',  #lib/AnyDBM_File.pm
         'attributes'            => '0.06',  #lib/attributes.pm
         'AutoLoader'            => '5.60',  #lib/AutoLoader.pm
@@ -5189,9 +5189,9 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'VMS::DCLsym'           => '1.02',  #vms/ext/DCLsym/DCLsym.pm
         'VMS::Filespec'         => '1.11',  #vms/ext/Filespec.pm
         'VMS::Stdio'            => '2.3',  #vms/ext/Stdio/Stdio.pm
-    },
+    ),
 
-    5.008006 => {
+    5.008006 => \%(
         'AnyDBM_File'           => '1.00',  #lib/AnyDBM_File.pm
         'Attribute::Handlers'   => '0.78_01',  #lib/Attribute/Handlers.pm
         'attributes'            => '0.06',  #lib/attributes.pm
@@ -5554,8 +5554,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
         'XS::APItest'           => '0.05',  #lib/XS/APItest.pm
         'XSLoader'              => '0.02',  #lib/XSLoader.pm
         'XS::Typemap'           => '0.01',  #lib/XS/Typemap.pm
-    },
-    5.009002 => {
+    ),
+    5.009002 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Attribute::Handlers'   => '0.78_01',
 	'AutoLoader'            => '5.60',
@@ -5918,8 +5918,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.01',
 	'warnings'              => '1.04',
 	'warnings::register'    => '1.00',
-    },
-    5.008007 => {
+    ),
+    5.008007 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Attribute::Handlers'   => '0.78_01',
 	'AutoLoader'            => '5.60',
@@ -6277,8 +6277,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.01',
 	'warnings'              => '1.03',
 	'warnings::register'    => '1.00',
-    },
-    5.009003 => {
+    ),
+    5.009003 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Archive::Tar'          => '1.26_01',
 	'Archive::Tar::Constant'=> '0.02',
@@ -6726,8 +6726,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.02',
 	'warnings'              => '1.05',
 	'warnings::register'    => '1.01',
-    },
-    5.008008 => {
+    ),
+    5.008008 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Attribute::Handlers'   => '0.78_02',
 	'AutoLoader'            => '5.60',
@@ -7093,8 +7093,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.02',
 	'warnings'              => '1.05',
 	'warnings::register'    => '1.01',
-    },
-    5.009004 => {
+    ),
+    5.009004 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Archive::Tar'          => '1.30_01',
 	'Archive::Tar::Constant'=> '0.02',
@@ -7575,8 +7575,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.02',
 	'warnings'              => '1.05',
 	'warnings::register'    => '1.01',
-    },
-    5.009005 => {
+    ),
+    5.009005 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Archive::Extract'      => '0.22_01',
 	'Archive::Tar'          => '1.32',
@@ -8109,8 +8109,8 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.02',
 	'warnings'              => '1.06',
 	'warnings::register'    => '1.01',
-    },
-    5.010000 => {
+    ),
+    5.010000 => \%(
 	'AnyDBM_File'           => '1.00',
 	'Archive::Extract'      => '0.24',
 	'Archive::Tar'          => '1.38',
@@ -8648,7 +8648,7 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 	'vmsish'                => '1.02',
 	'warnings'              => '1.06',
 	'warnings::register'    => '1.01',
-    },
+    ),
 );
 
 1;

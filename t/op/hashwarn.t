@@ -30,22 +30,22 @@ my $fail_not_hr   = 'Not a HASH reference at ';
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg');
 
     @warnings = ();
-    dies_like( sub { %hash = { 1..3 }; }, qr/reference as string/ );
+    dies_like( sub { %hash = \%( 1..3 ); }, qr/reference as string/ );
 
     @warnings = ();
-    dies_like( sub { %hash = [ 1..3 ]; }, qr/reference as string/ );
+    dies_like( sub { %hash = \@( 1..3 ); }, qr/reference as string/ );
 
     @warnings = ();
     dies_like( sub { %hash = sub { print "fenice" }; }, qr/reference as string/ );
 
     @warnings = ();
-    $_ = { 1..10 };
+    $_ = \%( 1..10 );
     cmp_ok(scalar(@warnings),'==',0,'hashref assign');
 
     # Old pseudo-hash syntax, now removed.
 
     @warnings = ();
-    my $avhv = [{x=>1,y=>2}];
+    my $avhv = \@(\%(x=>1,y=>2));
     eval {
         %$avhv = (x=>13,'y');
     };

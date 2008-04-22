@@ -8,9 +8,9 @@ package DB;
 
 my ($running, $ready, $deep, $usrctxt, $evalarg, 
     @stack, @saved, @skippkg, @clients);
-my $preeval = {};
-my $posteval = {};
-my $ineval = {};
+my $preeval = \%();
+my $posteval = \%();
+my $ineval = \%();
 
 ####
 #
@@ -298,7 +298,7 @@ sub subs {
     my(@ret) = ();
     while (@_) {
       my $name = shift;
-      push @ret, [%DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/] 
+      push @ret, \@(%DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/) 
 	if exists %DB::sub{$name};
     }
     return @ret;
@@ -370,7 +370,7 @@ sub lineevents {
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
   for ($i = 1; $i +<=( @DB::dbline-1); $i++) {
-    %ret{$i} = [@DB::dbline[$i], split(m/\0/, %DB::dbline{$i})] 
+    %ret{$i} = \@(@DB::dbline[$i], split(m/\0/, %DB::dbline{$i})) 
       if defined %DB::dbline{$i};
   }
   return %ret;

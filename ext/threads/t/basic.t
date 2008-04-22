@@ -54,7 +54,7 @@ threads->create(\&test1, 'bar')->join();
 sub test2 {
     ok(4,'bar' eq @_[0]->[0]->{'foo'}, "Test that passing arguments as references work");
 }
-threads->create(\&test2, [{'foo' => 'bar'}])->join();
+threads->create(\&test2, \@(\%('foo' => 'bar')))->join();
 
 sub test3 {
     ok(5, shift() == 1, "Test a normal sub");
@@ -123,7 +123,7 @@ ok(15, 0 == threads->tid(), "Check so that tid for threads work for main thread"
     my $foo;
     threads->create(sub {
         ok(18, threads->tid() == 10, "And tid be 10 here");
-        $foo = bless {}, 'Foo';
+        $foo = bless \%(), 'Foo';
         return undef;
     })->join();
 }

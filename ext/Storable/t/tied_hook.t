@@ -32,7 +32,7 @@ print "1..25\n";
 package TIED_HASH;
 
 sub TIEHASH {
-	my $self = bless {}, shift;
+	my $self = bless \%(), shift;
 	return $self;
 }
 
@@ -80,7 +80,7 @@ sub STORABLE_thaw {
 package TIED_ARRAY;
 
 sub TIEARRAY {
-	my $self = bless [], shift;
+	my $self = bless \@(), shift;
 	return $self;
 }
 

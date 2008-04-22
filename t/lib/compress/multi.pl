@@ -67,7 +67,7 @@ EOM
                     %headers = (
                                   Strict     => 1,
                                   Comment    => "this is a comment",
-                                  ExtraField => ["so" => "me extra"],
+                                  ExtraField => \@("so" => "me extra"),
                                   HeaderCRC  => 1); 
 
                 }

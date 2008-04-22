@@ -23,16 +23,16 @@ use Symbol qw(gensym);
 tie *F, 'MyTie';
 
 @test = (
- [ undef, 1,		'number'	],
- [ undef, 'A',		'string'	],
- [ HASH   => {},	'HASH ref'	],
- [ ARRAY  => [],	'ARRAY ref'	],
- [ SCALAR => \$t,	'SCALAR ref'	],
- [ REF    => \(\$t),	'REF ref'	],
- [ GLOB   => \*F,	'tied GLOB ref'	],
- [ GLOB   => gensym,	'GLOB ref'	],
- [ CODE   => sub {},	'CODE ref'	],
-# [ IO => *STDIN{IO} ] the internal sv_reftype returns UNKNOWN
+ \@( undef, 1,		'number'	),
+ \@( undef, 'A',		'string'	),
+ \@( HASH   => \%(),	'HASH ref'	),
+ \@( ARRAY  => \@(),	'ARRAY ref'	),
+ \@( SCALAR => \$t,	'SCALAR ref'	),
+ \@( REF    => \(\$t),	'REF ref'	),
+ \@( GLOB   => \*F,	'tied GLOB ref'	),
+ \@( GLOB   => gensym,	'GLOB ref'	),
+ \@( CODE   => sub {},	'CODE ref'	),
+# \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
 );
 
 foreach $test (@test) {
@@ -50,6 +50,6 @@ foreach $test (@test) {
 
 package MyTie;
 
-sub TIEHANDLE { bless {} }
+sub TIEHANDLE { bless \%() }
 sub DESTROY {}
 

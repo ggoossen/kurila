@@ -31,16 +31,16 @@ sub TIEHASH
 {
     my $pkg = shift ;
 
-    bless { VALID => { 
+    bless \%( VALID => \%( 
 		       	bsize	  => 1,
 			ffactor	  => 1,
 			nelem	  => 1,
 			cachesize => 1,
 			hash	  => 2,
 			lorder	  => 1,
-		     }, 
-	    GOT   => {}
-          }, $pkg ;
+		     ), 
+	    GOT   => \%()
+          ), $pkg ;
 }
 
 
@@ -122,11 +122,11 @@ sub TIEHASH
 {
     my $pkg = shift ;
 
-    bless { VALID => { map {$_, 1} 
+    bless \%( VALID => \%( map {$_, 1} 
 		       qw( bval cachesize psize flags lorder reclen bfname )
-		     },
-	    GOT   => {},
-          }, $pkg ;
+		     ),
+	    GOT   => \%(),
+          ), $pkg ;
 }
 
 package DB_File::BTREEINFO ;
@@ -140,7 +140,7 @@ sub TIEHASH
 {
     my $pkg = shift ;
 
-    bless { VALID => { 
+    bless \%( VALID => \%( 
 		      	flags	   => 1,
 			cachesize  => 1,
 			maxkeypage => 1,
@@ -149,9 +149,9 @@ sub TIEHASH
 			compare	   => 2,
 			prefix	   => 2,
 			lorder	   => 1,
-	    	     },
-	    GOT   => {},
-          }, $pkg ;
+	    	     ),
+	    GOT   => \%(),
+          ), $pkg ;
 }
 
 

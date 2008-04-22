@@ -51,9 +51,9 @@ foreach my $meth (@::Exporter_Methods) {
 }
 
 %EXPORT_TAGS = (
-                This => [qw(stuff %left)],
-                That => [qw(Above the @wailing)],
-                tray => [qw(Fasten $seatbelt)],
+                This => \@(qw(stuff %left)),
+                That => \@(qw(Above the @wailing)),
+                tray => \@(qw(Fasten $seatbelt)),
                );
 @EXPORT    = qw(lifejacket is);
 @EXPORT_OK = qw(under &your $seat);

@@ -163,7 +163,7 @@ sub _handle_element_start {
     # If we have a command handler, we need to accumulate the contents of the
     # tag before calling it.
     if ($self->can ("cmd_$method")) {
-        push (@{ %$self{PENDING} }, [ $attrs, '' ]);
+        push (@{ %$self{PENDING} }, \@( $attrs, '' ));
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
@@ -264,9 +264,9 @@ sub start_document {
     my $margin = %$self{opt_indent} + %$self{opt_margin};
 
     # Initialize a few per-document variables.
-    %$self{INDENTS} = [];       # Stack of indentations.
+    %$self{INDENTS} = \@();       # Stack of indentations.
     %$self{MARGIN}  = $margin;  # Default left margin.
-    %$self{PENDING} = [[]];     # Pending output.
+    %$self{PENDING} = \@(\@());     # Pending output.
 
     return '';
 }

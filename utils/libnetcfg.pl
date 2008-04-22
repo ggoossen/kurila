@@ -265,7 +265,7 @@ MASK:
 
   }
 
- [ keys %list ];
+ \@( keys %list );
 }
 
 ##
@@ -431,7 +431,7 @@ EDQ
 $msg = 'Enter a list of available NNTP hosts :';
 
 $def = %oldcfg{'nntp_hosts'} ||
-	[ default_hostname(%ENV{NNTPSERVER},%ENV{NEWSHOST},'news') ];
+	\@( default_hostname(%ENV{NNTPSERVER},%ENV{NEWSHOST},'news') );
 
 %cfg{'nntp_hosts'} = get_host_list($msg,$def);
 
@@ -440,7 +440,7 @@ $def = %oldcfg{'nntp_hosts'} ||
 $msg = 'Enter a list of available SMTP hosts :';
 
 $def = %oldcfg{'smtp_hosts'} ||
-	[ default_hostname(split(m/:/,%ENV{SMTPHOSTS} || ""), 'mailhost') ];
+	\@( default_hostname(split(m/:/,%ENV{SMTPHOSTS} || ""), 'mailhost') );
 
 %cfg{'smtp_hosts'} = get_host_list($msg,$def);
 
@@ -448,7 +448,7 @@ $def = %oldcfg{'smtp_hosts'} ||
 
 $msg = 'Enter a list of available POP3 hosts :';
 
-$def = %oldcfg{'pop3_hosts'} || [];
+$def = %oldcfg{'pop3_hosts'} || \@();
 
 %cfg{'pop3_hosts'} = get_host_list($msg,$def);
 
@@ -456,7 +456,7 @@ $def = %oldcfg{'pop3_hosts'} || [];
 
 $msg = 'Enter a list of available SNPP hosts :';
 
-$def = %oldcfg{'snpp_hosts'} || [];
+$def = %oldcfg{'snpp_hosts'} || \@();
 
 %cfg{'snpp_hosts'} = get_host_list($msg,$def);
 
@@ -465,7 +465,7 @@ $def = %oldcfg{'snpp_hosts'} || [];
 $msg = 'Enter a list of available PH Hosts   :'  ;
 
 $def = %oldcfg{'ph_hosts'} ||
-	[ default_hostname('dirserv') ];
+	\@( default_hostname('dirserv') );
 
 %cfg{'ph_hosts'}   =  get_host_list($msg,$def);
 
@@ -473,7 +473,7 @@ $def = %oldcfg{'ph_hosts'} ||
 
 $msg = 'Enter a list of available TIME Hosts   :'  ;
 
-$def = %oldcfg{'time_hosts'} || [];
+$def = %oldcfg{'time_hosts'} || \@();
 
 %cfg{'time_hosts'} = get_host_list($msg,$def);
 
@@ -569,7 +569,7 @@ describe your internal network. Each netmask should be entered in the
 form x.x.x.x/y, for example 127.0.0.0/8 or 214.8.16.32/24
 
 EDQ
-$def = [];
+$def = \@();
 if(ref(%oldcfg{'local_netmask'}))
  {
   $def = %oldcfg{'local_netmask'};

@@ -358,8 +358,8 @@ use XSLoader ();
 	       TCP_STDURG);
 
 %EXPORT_TAGS = (
-    crlf    => [qw(CR LF CRLF $CR $LF $CRLF)],
-    all     => [@EXPORT, @EXPORT_OK],
+    crlf    => \@(qw(CR LF CRLF $CR $LF $CRLF)),
+    all     => \@(@EXPORT, @EXPORT_OK),
 );
 
 BEGIN {

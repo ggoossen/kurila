@@ -20,10 +20,10 @@ our @EXPORT_OK = qw( set_style set_style_standard add_callback
 		     concise_subref concise_cv concise_main
 		     add_style walk_output compile reset_sequence );
 our %EXPORT_TAGS =
-    ( io	=> [qw( walk_output compile reset_sequence )],
-      style	=> [qw( add_style set_style_standard )],
-      cb	=> [qw( add_callback )],
-      mech	=> [qw( concise_subref concise_cv concise_main )],  );
+    ( io	=> \@(qw( walk_output compile reset_sequence )),
+      style	=> \@(qw( add_style set_style_standard )),
+      cb	=> \@(qw( add_callback )),
+      mech	=> \@(qw( concise_subref concise_cv concise_main )),  );
 
 # use #6
 use B qw(class ppname main_start main_root main_cv cstring svref_2object
@@ -32,29 +32,29 @@ use B qw(class ppname main_start main_root main_cv cstring svref_2object
 
 my %style =
   ("terse" =>
-   ["(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
+   \@("(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
     . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n",
     "(*(    )*)goto #class (#addr)\n",
-    "#class pp_#name"],
+    "#class pp_#name"),
    "concise" =>
-   ["#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
+   \@("#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
     . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
     , "  (*(    )*)     goto #seq\n",
-    "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"],
+    "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"),
    "linenoise" =>
-   ["(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)",
+   \@("(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)",
     "gt_#seq ",
-    "(?(#seq)?)#noise#arg(?([#targarg])?)"],
+    "(?(#seq)?)#noise#arg(?([#targarg])?)"),
    "debug" =>
-   ["#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
+   \@("#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
     . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
     . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
     . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
     . "(?(\top_sv\t\t#svaddr\n)?)",
     "    GOTO #addr\n",
-    "#addr"],
-   "env" => [%ENV{B_CONCISE_FORMAT}, %ENV{B_CONCISE_GOTO_FORMAT},
-	     %ENV{B_CONCISE_TREE_FORMAT}],
+    "#addr"),
+   "env" => \@(%ENV{B_CONCISE_FORMAT}, %ENV{B_CONCISE_GOTO_FORMAT},
+	     %ENV{B_CONCISE_TREE_FORMAT}),
   );
 
 # Renderings, ie how Concise prints, is controlled by these vars
@@ -94,7 +94,7 @@ sub add_style {
     die "style '$newstyle' already exists, choose a new name\n"
 	if exists %style{$newstyle};
     die "expecting 3 style-format args\n" unless @args == 3;
-    %style{$newstyle} = [@args];
+    %style{$newstyle} = \@(@args);
     $stylename = $newstyle; # update rendering state
 }
 
@@ -231,10 +231,10 @@ my $start_sym = "\e(0"; # "\cN" sometimes also works
 my $end_sym   = "\e(B"; # "\cO" respectively
 
 my @tree_decorations =
-  (["  ", "--", "+-", "|-", "| ", "`-", "-", 1],
-   [" ", "-", "+", "+", "|", "`", "", 0],
-   ["  ", map("$start_sym$_$end_sym", "qq", "wq", "tq", "x ", "mq", "q"), 1],
-   [" ", map("$start_sym$_$end_sym", "q", "w", "t", "x", "m"), "", 0],
+  (\@("  ", "--", "+-", "|-", "| ", "`-", "-", 1),
+   \@(" ", "-", "+", "+", "|", "`", "", 0),
+   \@("  ", map("$start_sym$_$end_sym", "qq", "wq", "tq", "x ", "mq", "q"), 1),
+   \@(" ", map("$start_sym$_$end_sym", "q", "w", "t", "x", "m"), "", 0),
   );
 
 my @render_packs; # collect -stash=<packages>
@@ -468,20 +468,20 @@ sub walk_exec {
     my($top, $level) = @_;
     my %opsseen;
     my @lines;
-    my @todo = ([$top, \@lines]);
+    my @todo = (\@($top, \@lines));
     while (@todo and my($op, $targ) = @{shift @todo}) {
 	for (; $$op; $op = $op->next) {
 	    last if %opsseen{$$op}++;
 	    push @$targ, $op;
 	    my $name = $op->name;
 	    if (class($op) eq "LOGOP") {
-		my $ar = [];
+		my $ar = \@();
 		push @$targ, $ar;
-		push @todo, [$op->other, $ar];
+		push @todo, \@($op->other, $ar);
 	    } elsif ($name eq "subst" and $ {$op->pmreplstart}) {
-		my $ar = [];
+		my $ar = \@();
 		push @$targ, $ar;
-		push @todo, [$op->pmreplstart, $ar];
+		push @todo, \@($op->pmreplstart, $ar);
 	    } elsif ($name =~ m/^enter(loop|iter)$/) {
                 %labels{${$op->nextop}} = "NEXT";
                 %labels{${$op->lastop}} = "LAST";
@@ -691,7 +691,7 @@ sub concise_sv {
             $sv = $sv->RV;
         }
 	if (class($sv) eq "SPECIAL") {
-	    $hr->{svval} .= ["Null", "sv_undef", "sv_yes", "sv_no"]->[$$sv];
+	    $hr->{svval} .= \@("Null", "sv_undef", "sv_yes", "sv_no")->[$$sv];
 	} elsif ($preferpv && $sv->FLAGS ^&^ SVf_POK) {
 	    $hr->{svval} .= cstring($sv->PV);
 	} elsif ($sv->FLAGS ^&^ SVf_NOK) {
@@ -715,7 +715,7 @@ my %srclines;
 sub fill_srclines {
     my $fullnm = shift;
     if ($fullnm eq '-e') {
-	%srclines{$fullnm} = [ $fullnm, "-src not supported for -e" ];
+	%srclines{$fullnm} = \@( $fullnm, "-src not supported for -e" );
 	return;
     }
     open (my $fh, '<', $fullnm)
@@ -872,10 +872,10 @@ sub B::OP::concise {
     my($op, $level) = @_;
     if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
 	# insert a 'goto' line
-	my $synth = {"seq" => seq($lastnext), "class" => class($lastnext),
+	my $synth = \%("seq" => seq($lastnext), "class" => class($lastnext),
 		     "addr" => sprintf("\%#x", $$lastnext),
 		     "goto" => seq($lastnext), # simplify goto '-' removal
-	     };
+	     );
 	print $walkHandle fmt_line($synth, $op, $gotofmt, $level+1);
     }
     $lastnext = $op->next;
@@ -899,8 +899,8 @@ sub b_terse {
 
     if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
 	# insert a 'goto'
-	my $h = {"seq" => seq($lastnext), "class" => class($lastnext),
-		 "addr" => sprintf("\%#x", $$lastnext)};
+	my $h = \%("seq" => seq($lastnext), "class" => class($lastnext),
+		 "addr" => sprintf("\%#x", $$lastnext));
 	print # $walkHandle
 	    fmt_line($h, $op, %style{"terse"}[1], $level+1);
     }
@@ -1497,7 +1497,6 @@ string if this is not a COP. Here are the symbols used:
     i integers
     l locale
     b bytes
-    [ arybase
     { block scope
     % localise %^H
     < open in

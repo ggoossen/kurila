@@ -61,7 +61,7 @@ BEGIN {
                                 message => $msg,
                                 tag     => uc $func,
                                 level   => $func,
-                                extra   => [@_]
+                                extra   => \@(@_)
                         );
                 };
     }

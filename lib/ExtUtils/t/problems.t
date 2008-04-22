@@ -17,7 +17,7 @@ use ExtUtils::MM;
 use MakeMaker::Test::Setup::Problem;
 use TieOut;
 
-my $MM = bless { DIR => ['subdir'] }, 'MM';
+my $MM = bless \%( DIR => \@('subdir') ), 'MM';
 
 ok( setup_recurs(), 'setup' );
 END {

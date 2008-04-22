@@ -64,7 +64,7 @@ eval { local @{$x}; };    test_err_localref;
 eval { local @$y; };      test_err_localref;
 eval { local @{$y}; };    test_err_localref;
 eval { local @{\@aa}; };  test_err_localref;
-eval { local @{[]}; };    test_err_localref;
+eval { local @{\@()}; };    test_err_localref;
 $x = \%aa;
 $y = \%aa;
 eval { local %$x; };      test_err_localref;
@@ -72,7 +72,7 @@ eval { local %{$x}; };    test_err_localref;
 eval { local %$y; };      test_err_localref;
 eval { local %{$y}; };    test_err_localref;
 eval { local %{\%aa}; };  test_err_localref;
-eval { local %{{a=>1}}; };test_err_localref;
+eval { local %{\%(a=>1)}; };test_err_localref;
 
 
 {
@@ -82,7 +82,7 @@ eval { local %{{a=>1}}; };test_err_localref;
     $x = 0;
     sub X::DESTROY { $ok = !ref($x); }
     {
-	local $x = \ bless {}, 'X';
+	local $x = \ bless \%(), 'X';
 	1;
     }
 ok($ok,'old value not visible during restore');

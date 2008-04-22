@@ -33,12 +33,12 @@ ok( grep( 'ExtUtils::MM_OS2',  @MM::ISA),
 	'ExtUtils::MM_OS2 should be parent of MM' );
 
 # dlsyms
-my $mm = bless({ 
-	SKIPHASH => { 
+my $mm = bless(\%( 
+	SKIPHASH => \%( 
 		dynamic => 1 
-	}, 
+	), 
 	NAME => 'foo:bar::',
-}, 'ExtUtils::MM_OS2');
+), 'ExtUtils::MM_OS2');
 
 is( $mm->dlsyms(), '', 
 	'dlsyms() should return nothing with dynamic flag set' );
@@ -67,7 +67,7 @@ my $can_write;
 SKIP: {
 	skip("Cannot write test files: $!", 7) unless $can_write;
 
-	$mm->{IMPORTS} = { foo => 'bar' };
+	$mm->{IMPORTS} = \%( foo => 'bar' );
 
 	local $@->{description};
 	eval { $mm->dlsyms() };
@@ -78,7 +78,7 @@ SKIP: {
 	eval { $mm->dlsyms() };
 	like( $@->{description}, qr/Malformed IMPORT/, 'should die from malformed import symbols');
 
-	$mm->{IMPORTS} = { foo => 'bar.baz' };
+	$mm->{IMPORTS} = \%( foo => 'bar.baz' );
 
 	my @sysfail = ( 1, 0, 1 );
 	my ($sysargs, $unlinked);
@@ -122,7 +122,7 @@ SKIP: {
 		return "\n\ncalled static_lib\n\nline2\nline3\n\nline4";
 	};
 
-	my $args = bless({ IMPORTS => {}, }, 'MM');
+	my $args = bless(\%( IMPORTS => \%(), ), 'MM');
 
 	# without IMPORTS as a populated hash, there will be no extra data
 	my $ret = ExtUtils::MM_OS2::static_lib( $args );
@@ -130,7 +130,7 @@ SKIP: {
 	like( $ret, qr/^called static_lib/m,
 		'... should return parent data unless IMPORTS exists' );
 
-	$args->{IMPORTS} = { foo => 1};
+	$args->{IMPORTS} = \%( foo => 1);
 	$ret = ExtUtils::MM_OS2::static_lib( $args );
 	is( $called, 2, '... should call parent method if extra imports passed' );
 	like( $ret, qr/^called static_lib\n\t\$\(AR\) \$\(AR_STATIC_ARGS\)/m, 

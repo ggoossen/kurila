@@ -24,9 +24,9 @@ ok( defined &ExtUtils::Liblist::ext,
 
 {
     my @warn;
-    local $^WARN_HOOK = sub {push @warn, [@_[0]->{description}]};
+    local $^WARN_HOOK = sub {push @warn, \@(@_[0]->{description})};
 
-    my $ll = bless {}, 'ExtUtils::Liblist';
+    my $ll = bless \%(), 'ExtUtils::Liblist';
     my @out = $ll->ext('-ln0tt43r3_perl');
     is( @out, 4, 'enough output' );
     unlike( @out[2], qr/-ln0tt43r3_perl/, 'bogus library not added' );

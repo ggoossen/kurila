@@ -35,31 +35,31 @@ EOM
 
 sub My::testParseParameters()
 {
-    eval { ParseParameters(1, {}, 1) ; };
+    eval { ParseParameters(1, \%(), 1) ; };
     like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
-    eval { ParseParameters(1, {}, undef) ; };
+    eval { ParseParameters(1, \%(), undef) ; };
     like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
-    eval { ParseParameters(1, {}, []) ; };
+    eval { ParseParameters(1, \%(), \@()) ; };
     like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
-    eval { ParseParameters(1, {'Fred' => [1, 1, Parse_boolean, 0]}, Fred => 'joe') ; };
+    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_boolean, 0)), Fred => 'joe') ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be an int, got 'joe'"), 
             "wanted unsigned, got undef";
 
-    eval { ParseParameters(1, {'Fred' => [1, 1, Parse_unsigned, 0]}, Fred => undef) ; };
+    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_unsigned, 0)), Fred => undef) ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be an unsigned int, got 'undef'"), 
             "wanted unsigned, got undef";
 
-    eval { ParseParameters(1, {'Fred' => [1, 1, Parse_signed, 0]}, Fred => undef) ; };
+    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => undef) ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be a signed int, got 'undef'"), 
             "wanted signed, got undef";
 
-    eval { ParseParameters(1, {'Fred' => [1, 1, Parse_signed, 0]}, Fred => 'abc') ; };
+    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => 'abc') ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be a signed int, got 'abc'"), 
             "wanted signed, got 'abc'";
 
@@ -71,49 +71,49 @@ sub My::testParseParameters()
         skip 'readonly + threads', 1
             if %Config{useithreads};
 
-        eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => 'abc') ; };
+        eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
         like $@->{description}, mkErr("Parameter 'Fred' not writable"), 
                 "wanted writable, got readonly";
     }
 
     my @xx;
-    eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => \@xx) ; };
+    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \@xx) ; };
     like $@->{description}, mkErr("Parameter 'Fred' not a scalar reference"), 
             "wanted scalar reference";
 
     local *ABC;
-    eval { ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, 0]}, Fred => *ABC) ; };
+    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => *ABC) ; };
     like $@->{description}, mkErr("Parameter 'Fred' not a scalar"), 
             "wanted scalar";
 
-    #eval { ParseParameters(1, {'Fred' => [1, 1, Parse_any|Parse_multiple, 0]}, Fred => 1, Fred => 2) ; };
+    #eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_any|Parse_multiple, 0)), Fred => 1, Fred => 2) ; };
     #like $@, mkErr("Muliple instances of 'Fred' found"),
         #"wanted scalar";
 
     ok 1;
 
-    my $got = ParseParameters(1, {'Fred' => [1, 1, 0x1000000, 0]}, Fred => 'abc') ;
+    my $got = ParseParameters(1, \%('Fred' => \@(1, 1, 0x1000000, 0)), Fred => 'abc') ;
     is $got->value('Fred'), "abc", "other" ;
 
-    $got = ParseParameters(1, {'Fred' => [0, 1, Parse_any, undef]}, Fred =>
+    $got = ParseParameters(1, \%('Fred' => \@(0, 1, Parse_any, undef)), Fred =>
 undef) ;
     ok $got->parsed('Fred'), "undef" ;
     ok ! defined $got->value('Fred'), "undef" ;
 
-    $got = ParseParameters(1, {'Fred' => [0, 1, Parse_string, undef]}, Fred =>
+    $got = ParseParameters(1, \%('Fred' => \@(0, 1, Parse_string, undef)), Fred =>
 undef) ;
     ok $got->parsed('Fred'), "undef" ;
     is $got->value('Fred'), "", "empty string" ;
 
     my $xx;
-    $got = ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, undef]}, Fred => $xx) ;
+    $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, undef)), Fred => $xx) ;
 
     ok $got->parsed('Fred'), "parsed" ;
     my $xx_ref = $got->value('Fred');
     $$xx_ref = 77 ;
     is $xx, 77;
 
-    $got = ParseParameters(1, {'Fred' => [1, 1, Parse_writable_scalar, undef]}, Fred => \$xx) ;
+    $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, undef)), Fred => \$xx) ;
 
     ok $got->parsed('Fred'), "parsed" ;
     $xx_ref = $got->value('Fred');
@@ -130,7 +130,7 @@ My::testParseParameters();
     ok   isaFilename("abc"), "'abc' isaFilename";
 
     ok ! isaFilename(undef), "undef ! isaFilename";
-    ok ! isaFilename([]),    "[] ! isaFilename";
+    ok ! isaFilename(\@()),    "[] ! isaFilename";
     $main::X = 1; $main::X = $main::X ;
     ok ! isaFilename(*X),    "glob ! isaFilename";
 }

@@ -146,7 +146,7 @@ sub gzopen($$)
     return undef
         if ! defined $gz ;
 
-    bless [$gz, $infDef], 'Compress::Zlib::gzFile';
+    bless \@($gz, $infDef), 'Compress::Zlib::gzFile';
 }
 
 sub Compress::Zlib::gzFile::gzread
@@ -334,15 +334,15 @@ sub uncompress($)
 sub deflateInit(@)
 {
     my ($got) = ParseParameters(0,
-                {
-                'Bufsize'       => [1, 1, Parse_unsigned, 4096],
-                'Level'         => [1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()],
-                'Method'        => [1, 1, Parse_unsigned, Z_DEFLATED()],
-                'WindowBits'    => [1, 1, Parse_signed,   MAX_WBITS()],
-                'MemLevel'      => [1, 1, Parse_unsigned, MAX_MEM_LEVEL()],
-                'Strategy'      => [1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()],
-                'Dictionary'    => [1, 1, Parse_any,      ""],
-                }, @_ ) ;
+                \%(
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
+                'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
+                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
+                'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
+                'Dictionary'    => \@(1, 1, Parse_any,      ""),
+                ), @_ ) ;
 
     croak "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
@@ -368,11 +368,11 @@ sub deflateInit(@)
 sub inflateInit(@)
 {
     my ($got) = ParseParameters(0,
-                {
-                'Bufsize'       => [1, 1, Parse_unsigned, 4096],
-                'WindowBits'    => [1, 1, Parse_signed,   MAX_WBITS()],
-                'Dictionary'    => [1, 1, Parse_any,      ""],
-                }, @_) ;
+                \%(
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                'Dictionary'    => \@(1, 1, Parse_any,      ""),
+                ), @_) ;
 
 
     croak "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
@@ -515,8 +515,8 @@ sub memGunzip($)
         or return undef;
      
     my $bufsize = length $$string +> 4096 ? length $$string : 4096 ;
-    my $x = Compress::Raw::Zlib::Inflate->new({-WindowBits => - MAX_WBITS(),
-                         -Bufsize => $bufsize}) 
+    my $x = Compress::Raw::Zlib::Inflate->new(\%(-WindowBits => - MAX_WBITS(),
+                         -Bufsize => $bufsize)) 
 
               or return undef;
 

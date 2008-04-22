@@ -104,7 +104,7 @@ sub can_use_ipc_run     {
 
     ### if we dont have ipc::run, we obviously can't use it.
     return unless can_load(
-                        modules => { 'IPC::Run' => '0.55' },        
+                        modules => \%( 'IPC::Run' => '0.55' ),        
                         verbose => ($WARN && $verbose),
                     );
                     
@@ -132,7 +132,7 @@ sub can_use_ipc_open3   {
     ### ipc::open3 works on every platform, but it can't capture buffers
     ### on win32 :(
     return unless can_load(
-        modules => { map {$_ => '0.0'} qw|IPC::Open3 IO::Select Symbol| },
+        modules => \%( map {$_ => '0.0'} qw|IPC::Open3 IO::Select Symbol| ),
         verbose => ($WARN && $verbose),
     );
     
@@ -295,13 +295,13 @@ sub run {
     my $def_buf = '';
     
     my($verbose,$cmd,$buffer);
-    my $tmpl = {
-        verbose => { default  => $VERBOSE,  store => \$verbose },
-        buffer  => { default  => \$def_buf, store => \$buffer },
-        command => { required => 1,         store => \$cmd,
+    my $tmpl = \%(
+        verbose => \%( default  => $VERBOSE,  store => \$verbose ),
+        buffer  => \%( default  => \$def_buf, store => \$buffer ),
+        command => \%( required => 1,         store => \$cmd,
                      allow    => sub { !ref(@_[0]) or ref(@_[0]) eq 'ARRAY' } 
-        },
-    };
+        ),
+    );
 
     unless( check( $tmpl, \%hash, $VERBOSE ) ) {
         Carp::carp(loc("Could not validate input: \%1", Params::Check->last_error));
@@ -513,11 +513,11 @@ sub _ipc_run {
     
     my @command; my $special_chars;
     if( ref $cmd ) {
-        my $aref = [];
+        my $aref = \@();
         for my $item (@$cmd) {
             if( $item =~ m/([<>|&])/ ) {
                 push @command, $aref, $item;
-                $aref = [];
+                $aref = \@();
                 $special_chars .= $1;
             } else {
                 push @$aref, $item;
@@ -528,7 +528,7 @@ sub _ipc_run {
         @command = map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
-                            [ split m/ +/ ]
+                            \@( split m/ +/ )
                          }
                     } split( m/\s*([<>|&])\s*/, $cmd );
     }
@@ -583,9 +583,9 @@ sub _system_run {
     use Symbol;
 
     my %Map = (
-        STDOUT => [qw|>&|, \*STDOUT, Symbol::gensym() ],
-        STDERR => [qw|>&|, \*STDERR, Symbol::gensym() ],
-        STDIN  => [qw|<&|, \*STDIN,  Symbol::gensym() ],
+        STDOUT => \@(qw|>&|, \*STDOUT, Symbol::gensym() ),
+        STDERR => \@(qw|>&|, \*STDERR, Symbol::gensym() ),
+        STDIN  => \@(qw|<&|, \*STDIN,  Symbol::gensym() ),
     );
 
     ### dups FDs and stores them in a cache

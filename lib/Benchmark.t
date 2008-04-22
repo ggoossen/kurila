@@ -202,14 +202,14 @@ like ($got, $Nop_Pattern, 'specify format as nop');
 
 $foo = $bar = $baz = 0;
 select(OUT);
-$got = timethese($iterations, { Foo => sub {++$foo}, Bar => '++$bar',
-                                Baz => sub {++$baz} });
+$got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$bar',
+                                Baz => sub {++$baz} ));
 select(STDOUT);
 is(ref ($got), 'HASH', "timethese should return a hashref");
 isa_ok($got->{Foo}, 'Benchmark', "Foo value");
 isa_ok($got->{Bar}, 'Benchmark', "Bar value");
 isa_ok($got->{Baz}, 'Benchmark', "Baz value");
-eq_set([keys %$got], [qw(Foo Bar Baz)], 'should be exactly three objects');
+eq_set(\@(keys %$got), \@(qw(Foo Bar Baz)), 'should be exactly three objects');
 is ($foo, $iterations, "Foo code was run $iterations times");
 is ($bar, $iterations, "Bar code was run $iterations times");
 is ($baz, $iterations, "Baz code was run $iterations times");
@@ -226,8 +226,8 @@ like ($got, qr/\bBar\b.*\bBaz\b.*\bFoo\b/s, 'check output is in sorted order');
 like ($got, $Default_Pattern, 'should find default format somewhere');
 
 
-my $code_to_test =  { Foo => sub {$foo+=fib($ballast-2)},
-                      Bar => sub {$bar+=fib($ballast)}};
+my $code_to_test =  \%( Foo => sub {$foo+=fib($ballast-2)},
+                      Bar => sub {$bar+=fib($ballast)});
 # Keep these for later.
 my $results;
 {
@@ -241,7 +241,7 @@ my $results;
     is(ref ($results), 'HASH', "timethese should return a hashref");
     isa_ok($results->{Foo}, 'Benchmark', "Foo value");
     isa_ok($results->{Bar}, 'Benchmark', "Bar value");
-    eq_set([keys %$results], [qw(Foo Bar)], 'should be exactly two objects');
+    eq_set(\@(keys %$results), \@(qw(Foo Bar)), 'should be exactly two objects');
     ok ($foo +> 0, "Foo code was run");
     ok ($bar +> 0, "Bar code was run");
 
@@ -332,9 +332,9 @@ sub check_graph_vs_output {
                                  $slowr, $slowratet, $slowslow, $slowfastt,
                                  $fastr, $fastratet, $fastslowt, $fastfast);
     $all_passed
-      ^&^= is_deeply ($chart, [['', $ratetext, $slowc, $fastc],
-                             [$slowr, $slowratet, $slowslow, $slowfastt],
-                             [$fastr, $fastratet, $fastslowt, $fastfast]],
+      ^&^= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
+                             \@($slowr, $slowratet, $slowslow, $slowfastt),
+                             \@($fastr, $fastratet, $fastslowt, $fastfast)),
                     "check the chart layout matches the formatted output");
     unless ($all_passed) {
       print STDERR "# Something went wrong there. I got this chart:\n";
@@ -354,7 +354,7 @@ sub check_graph {
 {
     select(OUT);
     my $start = times;
-    my $chart = cmpthese( -0.1, { a => "++\$i", b => "\$i = sqrt(\$i++)" }, "auto" ) ;
+    my $chart = cmpthese( -0.1, \%( a => "++\$i", b => "\$i = sqrt(\$i++)" ), "auto" ) ;
     my $end = times;
     select(STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
@@ -376,7 +376,7 @@ sub check_graph {
 {
     select(OUT);
     my $start = times;
-    my $chart = cmpthese( -0.1, { a => "++\$i", b => "\$i = sqrt(\$i++)" } ) ;
+    my $chart = cmpthese( -0.1, \%( a => "++\$i", b => "\$i = sqrt(\$i++)" ) ) ;
     my $end = times;
     select(STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
@@ -508,15 +508,15 @@ my @after5_keys = keys %Benchmark::Cache;
 $bar = 0;
 isa_ok(timeit(10, '++$bar'), 'Benchmark', "timeit eval");
 is ($bar, 10, "benchmarked code was run 10 times");
-ok (!eq_array ([keys %Benchmark::Cache], \@after5_keys), "10 differs from 5");
+ok (!eq_array (\@(keys %Benchmark::Cache), \@after5_keys), "10 differs from 5");
 
 clearcache(10);
 # Hash key order will be the same if there are the same keys.
-is_deeply ([keys %Benchmark::Cache], \@after5_keys,
+is_deeply (\@(keys %Benchmark::Cache), \@after5_keys,
            "cleared 10, only cached results for 5 should remain");
 
 clearallcache();
-is_deeply ([keys %Benchmark::Cache], \@before_keys,
+is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
            "back to square 1 when we clear the cache again?");
 
 
@@ -528,7 +528,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
 
     my %cmpthese = ('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
                      'not result' => 'cmpthese(42)',
-                     'array ref'  => 'cmpthese( 42, [ foo => sub { 1 } ] )',
+                     'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
                     );
     while( my($name, $code) = each %cmpthese ) {
         eval $code;
@@ -537,7 +537,7 @@ is_deeply ([keys %Benchmark::Cache], \@before_keys,
 
     my %timethese = ('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
                        'no code'    => 'timethese(42)',
-                       'array ref'  => 'timethese( 42, [ foo => sub { 1 } ] )',
+                       'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
                       );
 
     while( my($name, $code) = each %timethese ) {

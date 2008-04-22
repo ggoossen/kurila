@@ -71,7 +71,7 @@ my %Special_Sigs = (
  H                  => 'ARRAY',
  IMPORTS            => 'HASH',
  INCLUDE_EXT        => 'ARRAY',
- LIBS               => ['ARRAY',''],
+ LIBS               => \@('ARRAY',''),
  MAN1PODS           => 'HASH',
  MAN3PODS           => 'HASH',
  PL_FILES           => 'HASH',
@@ -82,7 +82,7 @@ my %Special_Sigs = (
  SKIP               => 'ARRAY',
  TYPEMAPS           => 'ARRAY',
  XS                 => 'HASH',
- VERSION            => ['version',''],
+ VERSION            => \@('version',''),
  _KEEP_AFTER_FLUSH  => '',
 
  clean      => 'HASH',
@@ -364,7 +364,7 @@ sub new {
 
     if ("@ARGV" =~ m/\bPREREQ_PRINT\b/) {
         require Data::Dumper;
-        print Data::Dumper->Dump([$self->{PREREQ_PM}], [qw(PREREQ_PM)]);
+        print Data::Dumper->Dump(\@($self->{PREREQ_PM}), \@(qw(PREREQ_PM)));
         exit 0;
     }
 
@@ -380,7 +380,7 @@ sub new {
         check_manifest();
     }
 
-    $self = {} unless (defined $self);
+    $self = \%() unless (defined $self);
 
     check_hints($self);
 
@@ -401,7 +401,7 @@ sub new {
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
         if ($@) {
-            warn sprintf "Warning: prerequisite \%s \%s not found.\n", 
+            warn sprintf 'Warning: prerequisite %s %s not found.', 
               $prereq, $self->{PREREQ_PM}{$prereq} 
                    unless $self->{PREREQ_FATAL};
             %unsatisfied{$prereq} = 'not installed';
@@ -429,7 +429,7 @@ END
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
             %configure_att = %{&{$self->{CONFIGURE}}};
-            $self = { %$self, %configure_att };
+            $self = \%( %$self, %configure_att );
         } else {
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
         }
@@ -588,7 +588,7 @@ END
     }
 
     # turn the SKIP array into a SKIPHASH hash
-    for my $skip (@{$self->{SKIP} || []}) {
+    for my $skip (@{$self->{SKIP} || \@()}) {
         $self->{SKIPHASH}{$skip} = 1;
     }
     delete $self->{SKIP}; # free memory
@@ -615,7 +615,7 @@ END
         if ($skipit){
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
         } else {
-            my(%a) = %{$self->{$section} || {}};
+            my(%a) = %{$self->{$section} || \%()};
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
             push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
             push @{$self->{RESULT}}, $self->maketext_filter(
@@ -703,7 +703,7 @@ sub parse_args{
         } else {
             print STDOUT "$msg deleted.\n";
         }
-        $self->{LIBS} = [$self->{potential_libs}];
+        $self->{LIBS} = \@($self->{potential_libs});
         delete $self->{potential_libs};
     }
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
@@ -711,8 +711,8 @@ sub parse_args{
         my($armaybe) = $self->{ARMAYBE};
         print STDOUT "ARMAYBE => '$armaybe' should be changed to:\n",
                         "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
-        my(%dl) = %{$self->{dynamic_lib} || {}};
-        $self->{dynamic_lib} = { %dl, ARMAYBE => $armaybe};
+        my(%dl) = %{$self->{dynamic_lib} || \%()};
+        $self->{dynamic_lib} = \%( %dl, ARMAYBE => $armaybe);
         delete $self->{ARMAYBE};
     }
     if (defined $self->{LDTARGET}){
@@ -725,15 +725,15 @@ sub parse_args{
         # So they can choose from the command line, which extensions they want
         # the grep enables them to have some colons too much in case they
         # have to build a list with the shell
-        $self->{DIR} = [grep $_, split ":", $self->{DIR}];
+        $self->{DIR} = \@(grep $_, split ":", $self->{DIR});
     }
     # Turn a INCLUDE_EXT argument on the command line into an array
     if (defined $self->{INCLUDE_EXT} && ref \$self->{INCLUDE_EXT} eq 'SCALAR') {
-        $self->{INCLUDE_EXT} = [grep $_, split '\s+', $self->{INCLUDE_EXT}];
+        $self->{INCLUDE_EXT} = \@(grep $_, split '\s+', $self->{INCLUDE_EXT});
     }
     # Turn a EXCLUDE_EXT argument on the command line into an array
     if (defined $self->{EXCLUDE_EXT} && ref \$self->{EXCLUDE_EXT} eq 'SCALAR') {
-        $self->{EXCLUDE_EXT} = [grep $_, split '\s+', $self->{EXCLUDE_EXT}];
+        $self->{EXCLUDE_EXT} = \@(grep $_, split '\s+', $self->{EXCLUDE_EXT});
     }
 
     foreach my $mmkey (sort keys %$self){
@@ -966,7 +966,7 @@ sub neatvalue {
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }
-    return "\{ ".join(', ',@m)." \}";
+    return '\%( '.join(', ',@m)." )";
 }
 
 sub selfdocument {
@@ -2091,11 +2091,11 @@ Bool.  If this parameter is true, the prerequisites will be printed to
 stdout and MakeMaker will exit.  The output format is an evalable hash
 ref.
 
-$PREREQ_PM = {
+$PREREQ_PM = \%(
                'A::B' => Vers1,
                'C::D' => Vers2,
                ...
-             };
+             );
 
 =item PRINT_PREREQ
 

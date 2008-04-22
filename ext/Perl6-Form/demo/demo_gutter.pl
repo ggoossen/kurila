@@ -4,18 +4,18 @@ my @text = ~< *DATA;
 my $gutter = " "x5;
 
 my %page = (
-	header => {even=>"The Soliloquy from 'Hamlet'\n\n",
-	            odd=>$gutter."The Soliloquy from 'Hamlet'\n\n" },
-	body   => {even=>'{""{*}""}',
-	            odd=>$gutter.'{""{*}""}', },
+	header => \%(even=>"The Soliloquy from 'Hamlet'\n\n",
+	            odd=>$gutter."The Soliloquy from 'Hamlet'\n\n" ),
+	body   => \%(even=>'{""{*}""}',
+	            odd=>$gutter.'{""{*}""}', ),
 	length => 15,
 	width  => 72,
 	feed   => ('_'x72)."\n",
 );
 
-print form {page=>\%page},
+print form \%(page=>\%page),
 	 '{]]]]]}  {"{*}"}  {[[[[[}',
-	 [1..@text], \@text,  [1..@text];
+	 \@(1..@text), \@text,  \@(1..@text);
 
 __DATA__
 To be, or not to be -- that is the question:

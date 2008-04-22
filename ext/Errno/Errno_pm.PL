@@ -360,7 +360,7 @@ EDQ
 
 print <<'ESQ';
 %EXPORT_TAGS = (
-    POSIX => [qw(
+    POSIX => \@(qw(
 ESQ
 
     my $k = join(" ", grep { exists %err{$_} } 
@@ -379,7 +379,7 @@ ESQ
 	EUSERS EWOULDBLOCK EXDEV));
 
     $k =~ s/(.{50,70})\s/$1\n\t/g;
-    print "\t",$k,"\n    )]\n);\n\n";
+    print "\t",$k,"\n    ))\n);\n\n";
 
     foreach $err (@err) {
 	printf "sub \%s () \{ \%d \}\n",,$err,%err{$err};
@@ -387,7 +387,7 @@ ESQ
 
     print <<'ESQ';
 
-sub TIEHASH { bless [] }
+sub TIEHASH { bless \@() }
 
 sub FETCH {
     my ($self, $errname) = @_;

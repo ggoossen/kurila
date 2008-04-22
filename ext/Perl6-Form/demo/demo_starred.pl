@@ -5,7 +5,7 @@ Now is the winter of our discontent / Made glorious summer by this sun of York; 
 EOSOL
 
 print form
-	 {under=>'*'},
+	 \%(under=>'*'),
 	 '{:[{20}]]} | {:I{*}II}', $line, $line;
 
 $lines = <<EOSOL;
@@ -24,4 +24,4 @@ He capers nimbly in a lady's chamber.
 EOSOL
 
 print form
-	 {under=>'*'}, '| {:"{*}""} | {:"{*}""} |', $lines, $lines;
+	 \%(under=>'*'), '| {:"{*}""} | {:"{*}""} |', $lines, $lines;

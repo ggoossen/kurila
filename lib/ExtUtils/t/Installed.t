@@ -28,7 +28,7 @@ BEGIN { use_ok( 'ExtUtils::Installed' ) }
 my $mandirs =  !!%Config{man1direxp} + !!%Config{man3direxp};
 
 # saves having to qualify package name for class methods
-my $ei = bless( {}, 'ExtUtils::Installed' );
+my $ei = bless( \%(), 'ExtUtils::Installed' );
 
 # Make sure meta info is available
 $ei->{':private:'}{Config} = \%Config;
@@ -156,7 +156,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 # Do the same thing as the last block, but with overrides for
 # %Config and @INC.
 {
-    my $config_override = { %Config::Config };
+    my $config_override = \%( %Config::Config );
     $config_override->{archlibexp} = cwd();
     $config_override->{sitearchexp} = $fake_mod_dir;
     $config_override->{version} = 'fake_test_version';
@@ -181,7 +181,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 # Check if extra_libs works.
 {
     my $realei = ExtUtils::Installed->new(
-        'extra_libs' => [ cwd() ],
+        'extra_libs' => \@( cwd() ),
     );
     isa_ok( $realei, 'ExtUtils::Installed' );
     isa_ok( $realei->{Perl}{packlist}, 'ExtUtils::Packlist' );
@@ -205,8 +205,8 @@ is( join(' ', $ei->modules()), 'abc def ghi',
 is( $ei->modules, 3,    'modules() in scalar context' );
 
 # files
-$ei->{goodmod} = {
-        packlist => {
+$ei->{goodmod} = \%(
+        packlist => \%(
                 (%Config{man1direxp} ?
                     (File::Spec->catdir(%Config{man1direxp}, 'foo') => 1) :
                         ()),
@@ -215,8 +215,8 @@ $ei->{goodmod} = {
                         ()),
                 File::Spec->catdir($prefix, 'foobar') => 1,
                 foobaz  => 1,
-        },
-};
+        ),
+);
 
 eval { $ei->files('badmod') };
 like( $@->{description}, qr/badmod is not installed/,'files() should croak given bad modname');
@@ -276,10 +276,10 @@ SKIP: {
 
 my $fakepak = Fakepak->new(102);
 
-$ei->{yesmod} = {
+$ei->{yesmod} = \%(
         version         => 101,
         packlist        => $fakepak,
-};
+);
 
 # these should all croak
 foreach my $sub (qw( validate packlist version )) {

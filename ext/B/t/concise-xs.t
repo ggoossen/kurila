@@ -127,23 +127,23 @@ my %matchers =
       noSTART	=> qr/coderef .* has no START/,
 );
 
-my $testpkgs = {
+my $testpkgs = \%(
     # packages to test, with expected types for named funcs
 
-    'Digest::MD5' => { perl => [qw/ import /],
-		     dflt => 'XS' },
+    'Digest::MD5' => \%( perl => \@(qw/ import /),
+		     dflt => 'XS' ),
 
-    'Data::Dumper' => { XS => [qw/ bootstrap Dumpxs /],
-		      dflt => 'perl' },
-    B => { 
+    'Data::Dumper' => \%( XS => \@(qw/ bootstrap Dumpxs /),
+		      dflt => 'perl' ),
+    B => \%( 
 	dflt => 'constant',		# all but 47/297
-	skip => [ 'regex_padav' ],	# threaded only
-	perl => [qw(
+	skip => \@( 'regex_padav' ),	# threaded only
+	perl => \@(qw(
 		    walksymtable walkoptree_slow walkoptree_exec
 		    timing_info savesym peekop parents objsym debug
 		    compile_stats clearsym class
-		    )],
-	XS => [qw(
+		    )),
+	XS => \@(qw(
 		  warnhook walkoptree_debug walkoptree 
 		  svref_2object sv_yes sv_undef sv_no save_BEGINs
 		  regex_padav ppname perlstring opnumber minus_c
@@ -151,15 +151,15 @@ my $testpkgs = {
 		  end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  begin_av amagic_generation sub_generation address
-                  set_main_start set_main_root fudge unitcheck_av)],
-    },
+                  set_main_start set_main_root fudge unitcheck_av)),
+    ),
 
-    'B::Deparse' => { dflt => 'perl',	# 235 functions
+    'B::Deparse' => \%( dflt => 'perl',	# 235 functions
 
-	XS => [qw( svref_2object perlstring opnumber main_start
-		   main_root main_cv )],
+	XS => \@(qw( svref_2object perlstring opnumber main_start
+		   main_root main_cv )),
 
-	constant => [qw/ ASSIGN CVf_LOCKED
+	constant => \@(qw/ ASSIGN CVf_LOCKED
 		     CVf_METHOD LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
 		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
 		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
@@ -173,12 +173,12 @@ my $testpkgs = {
 		     PMf_MULTILINE PMf_SINGLELINE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
 		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN OPpPAD_STATE
-		     /, 'RXf_SKIPWHITE'],
-		 },
+		     /, 'RXf_SKIPWHITE'),
+		 ),
 
-    POSIX => { dflt => 'constant',			# all but 252/589
-	       skip => [qw/ _POSIX_JOB_CONTROL /],	# platform varying
-	       perl => [qw/ import load_imports
+    POSIX => \%( dflt => 'constant',			# all but 252/589
+	       skip => \@(qw/ _POSIX_JOB_CONTROL /),	# platform varying
+	       perl => \@(qw/ import load_imports
                             usage redef unimpl assert tolower toupper closedir
                             opendir readdir rewinddir errno creat fcntl getgrgid
                             getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
@@ -199,9 +199,9 @@ my $testpkgs = {
 
                             S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                             WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG
-                            /],
+                            /),
 
-	       XS => [qw/ write wctomb wcstombs uname tzset tzname
+	       XS => \@(qw/ write wctomb wcstombs uname tzset tzname
 		      ttyname tmpnam times tcsetpgrp tcsendbreak
 		      tcgetpgrp tcflush tcflow tcdrain tanh tan
 		      sysconf strxfrm strtoul strtol strtod
@@ -217,26 +217,26 @@ my $testpkgs = {
 		      ctermid cosh constant close clock ceil
 		      bootstrap atan asin asctime acos access abort
 		      _exit
-		      /],
-	       },
+		      /),
+	       ),
 
-    'IO::Socket' => { dflt => 'constant',		# 157/190
+    'IO::Socket' => \%( dflt => 'constant',		# 157/190
 
-		    perl => [qw/ timeout socktype sockopt sockname
+		    perl => \@(qw/ timeout socktype sockopt sockname
 			     socketpair socket sockdomain sockaddr_un
 			     sockaddr_in shutdown setsockopt send
 			     register_domain recv protocol peername
 			     new listen import getsockopt croak
 			     connected connect configure confess close
 			     carp bind atmark accept blocking
-                             /],
+                             /),
 
-		    XS => [qw/ unpack_sockaddr_un unpack_sockaddr_in
+		    XS => \@(qw/ unpack_sockaddr_un unpack_sockaddr_in
 			   sockatmark sockaddr_family pack_sockaddr_un
 			   pack_sockaddr_in inet_ntoa inet_aton
-			   /],
-		},
-};
+			   /),
+		),
+);
 
 ############
 
@@ -363,7 +363,7 @@ sub corecheck {
 	return;
     }
     my $mods = %Module::CoreList::version{'5.009002'};
-    $mods = [ sort keys %$mods ];
+    $mods = \@( sort keys %$mods );
     print Dumper($mods);
 
     foreach my $pkgnm (@$mods) {

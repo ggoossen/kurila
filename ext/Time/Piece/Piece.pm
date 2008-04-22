@@ -102,14 +102,14 @@ sub _mktime {
            : $class;
     if (ref($time)) {
         $time->[c_epoch] = undef;
-        return wantarray ? @$time : bless [@$time, $islocal], $class;
+        return wantarray ? @$time : bless \@(@$time, $islocal), $class;
     }
     _tzset();
     my @time = $islocal ?
             CORE::localtime($time)
                 :
             CORE::gmtime($time);
-    wantarray ? @time : bless [@time, $time, $islocal], $class;
+    wantarray ? @time : bless \@(@time, $time, $islocal), $class;
 }
 
 my %_special_exports = (

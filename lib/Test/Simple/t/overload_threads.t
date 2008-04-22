@@ -36,7 +36,7 @@ use overload
 
 sub new {
     my $class = shift;
-    bless { string => shift }, $class;
+    bless \%( string => shift ), $class;
 }
 
 

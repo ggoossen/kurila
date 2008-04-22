@@ -14,6 +14,6 @@ use Perl6::Form;
 $data = "You can play no part but Pyramus;\n"
 	  . "for Pyramus is a sweet-faced man;  ";
 
-print form {break=>\&break_width}, "|\{[[[[[\}|", $data;
+print form \%(break=>\&break_width), "|\{[[[[[\}|", $data;
 
 

@@ -134,7 +134,7 @@ for (qw(system qx popen)) {
 }
 
 my $cmd = _create_runperl(
-			  switches => ['-l'],
+			  switches => \@('-l'),
 			  prog =>
 			  sprintf('print qq[ok $_] for (%d..%d)', $t, $t+2));
 print "# cmd = '$cmd'\n";

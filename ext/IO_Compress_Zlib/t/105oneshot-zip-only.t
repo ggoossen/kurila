@@ -204,8 +204,8 @@ for my $stream (0, 1)
                             $file2 => $content2,
                           );
 
-            ok zip([$file1, $file2] => $zipfile , Method => $method, 
-                                                  Zip64  => $zip64,
+            ok zip(\@($file1, $file2) => $zipfile , Method => $method, 
+                                                    Zip64  => $zip64,
                                                   Stream => $stream), " zip ok" 
                 or diag $ZipError ;
 

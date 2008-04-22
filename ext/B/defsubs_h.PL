@@ -56,7 +56,7 @@ foreach my $const (qw(
 
 doconst('CVf_ISXSUB');
 
-foreach my $tuple (['op.h'],['cop.h'],['regexp.h','RXf_'])
+foreach my $tuple (\@('op.h'),\@('cop.h'),\@('regexp.h','RXf_'))
  {
   my $file = $tuple->[0];
   my $pfx = $tuple->[1] || '';

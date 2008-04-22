@@ -229,7 +229,7 @@ for (0,1) {
 $w = 0 ;
 # coercion of references
 {
-  my $s = [];
+  my $s = \@();
   dies_like( sub { substr($s, 0, 1, 'Foo'); }, qr/reference as string/ );
 }
 

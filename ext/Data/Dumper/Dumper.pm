@@ -63,9 +63,9 @@ sub new {
 
   die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
     unless (defined($v) && (ref($v) eq 'ARRAY'));
-  $n = [] unless (defined($n) && (ref($v) eq 'ARRAY'));
+  $n = \@() unless (defined($n) && (ref($v) eq 'ARRAY'));
 
-  my($s) = { 
+  my($s) = \%( 
              level      => 0,           # current recursive depth
 	     indent     => $Indent,     # various styles of indenting
 	     pad	=> $Pad,        # all lines prefixed by this string
@@ -73,7 +73,7 @@ sub new {
 	     apad       => "",          # added padding for hash keys n such
 	     sep        => "",          # list separator
 	     pair	=> $Pair,	# hash key/value separator: defaults to ' => '
-	     seen       => {},          # local (nested) refs (id => [name, val])
+	     seen       => \%(),        # local (nested) refs (id => [name, val])
 	     todump     => $v,          # values to dump []
 	     names      => $n,          # optional names for values []
 	     varname    => $Varname,    # prefix to use for tagging nameless ones
@@ -90,7 +90,7 @@ sub new {
 	     useperl    => $Useperl,    # use the pure Perl implementation
 	     sortkeys   => $Sortkeys,   # flag or filter for sorting hash keys
 	     deparse	=> $Deparse,	# use B::Deparse for coderefs
-	   };
+	   );
 
   if ($Indent +> 0) {
     $s->{xpad} = "  ";
@@ -129,7 +129,7 @@ sub Seen {
 	elsif ($k !~ m/^\$/) {
 	  $k = "\$" . $k;
 	}
-	$s->{seen}{$id} = [$k, $v];
+	$s->{seen}{$id} = \@($k, $v);
       }
       else {
 	warn "Only refs supported, ignoring non-ref item \$$k";
@@ -148,7 +148,7 @@ sub Seen {
 sub Values {
   my($s, $v) = @_;
   if (defined($v) && (ref($v) eq 'ARRAY'))  {
-    $s->{todump} = [@$v];        # make a copy
+    $s->{todump} = \@(@$v);        # make a copy
     return $s;
   }
   else {
@@ -162,7 +162,7 @@ sub Values {
 sub Names {
   my($s, $n) = @_;
   if (defined($n) && (ref($n) eq 'ARRAY'))  {
-    $s->{names} = [@$n];         # make a copy
+    $s->{names} = \@(@$n);         # make a copy
     return $s;
   }
   else {
@@ -283,8 +283,8 @@ sub _dump {
       if (exists $s->{seen}{$id}) {
 #	if ($s->{expdepth} < $s->{level}) {
 	  if ($s->{purity} and $s->{level} +> 0) {
-	    $out = ($realtype eq 'HASH')  ? '{}' :
-	      ($realtype eq 'ARRAY') ? '[]' :
+	    $out = ($realtype eq 'HASH')  ? '\%()' :
+	      ($realtype eq 'ARRAY') ? '\@()' :
 		'do{my $o}' ;
 	    push @post, $name . " = " . $s->{seen}{$id}[0];
 	  }
@@ -305,11 +305,11 @@ sub _dump {
       }
       else {
         # store our name
-        $s->{seen}{$id} = [ (($name =~ m/^[@%]/)     ? ('\' . $name ) :
+        $s->{seen}{$id} = \@( (($name =~ m/^[@%]/)     ? ('\' . $name ) :
 			     ($realtype eq 'CODE' and
 			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
 			     $name          ),
-			    $val ];
+			    $val );
       }
     }
     my $no_bless = 0; 
@@ -375,7 +375,7 @@ sub _dump {
     elsif ($realtype eq 'ARRAY') {
       my($v, $pad, $mname);
       my($i) = 0;
-      $out .= ($name =~ m/^\@/) ? '(' : '[';
+      $out .= ($name =~ m/^\@/) ? '(' : '\@(';
       $pad = $s->{sep} . $s->{pad} . $s->{apad};
       ($name =~ m/^\@(.*)$/) ? ($mname = "\$" . $1) : 
 	# omit -> if $foo->[0]->{bar}, but not ${$foo->[0]}->{bar}
@@ -389,11 +389,11 @@ sub _dump {
 	$out .= "," if $i++ +< @$val -1;
       }
       $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
-      $out .= ($name =~ m/^\@/) ? ')' : ']';
+      $out .= ')';
     }
     elsif ($realtype eq 'HASH') {
       my($k, $v, $pad, $lpad, $mname, $pair);
-      $out .= ($name =~ m/^\%/) ? '(' : '{';
+      $out .= ($name =~ m/^\%/) ? '(' : '\%(';
       $pad = $s->{sep} . $s->{pad} . $s->{apad};
       $lpad = $s->{apad};
       $pair = $s->{pair};
@@ -408,11 +408,11 @@ sub _dump {
 	  $keys = $s->{sortkeys}($val);
 	  unless (ref($keys) eq 'ARRAY') {
 	    warn "Sortkeys subroutine did not return ARRAYREF";
-	    $keys = [];
+	    $keys = \@();
 	  }
 	}
 	else {
-	  $keys = [ sort keys %$val ];
+	  $keys = \@( sort keys %$val );
 	}
       }
       while (($k, $v) = ! $sortkeys ? (each %$val) :
@@ -433,7 +433,7 @@ sub _dump {
 	chop $out;
 	$out .= $pad . ($s->{xpad} x ($s->{level} - 1));
       }
-      $out .= ($name =~ m/^\%/) ? ')' : '}';
+      $out .= ')';
     }
     elsif ($realtype eq 'CODE') {
       if ($s->{deparse}) {
@@ -474,7 +474,7 @@ sub _dump {
       }
       else {
 	#warn "[>\\$name]\n";
-	$s->{seen}{$id} = ["\\$name", $ref];
+	$s->{seen}{$id} = \@("\\$name", $ref);
       }
     }
     if (ref($ref) eq 'GLOB') {  # glob
@@ -537,12 +537,12 @@ sub _dump {
 # non-OO style of earlier version
 #
 sub Dumper {
-  return Data::Dumper->Dump([@_]);
+  return Data::Dumper->Dump(\@(@_));
 }
 
 # compat stub
 sub DumperX {
-  return Data::Dumper->Dumpxs([@_], []);
+  return Data::Dumper->Dumpxs(\@(@_), \@());
 }
 
 sub Dumpf { return Data::Dumper->Dump(@_) }
@@ -554,7 +554,7 @@ sub Dumpp { print Data::Dumper->Dump(@_) }
 #
 sub Reset {
   my($s) = shift;
-  $s->{seen} = {};
+  $s->{seen} = \%();
   return $s;
 }
 
@@ -696,7 +696,7 @@ sub qquote {
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { [ sort keys %{@_[0]} ] }
+sub _sortkeys { \@( sort keys %{@_[0]} ) }
 
 1;
 __END__
@@ -1108,7 +1108,7 @@ distribution for more examples.)
 
     @c = ('c');
     $c = \@c;
-    $b = {};
+    $b = \%();
     $a = [1, $b, $c];
     $b->{a} = $a;
     $b->{b} = $a->[1];

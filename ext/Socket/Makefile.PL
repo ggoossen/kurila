@@ -4,10 +4,9 @@ use Config;
 WriteMakefile(
     NAME	 => 'Socket',
     VERSION_FROM => 'Socket.pm',
-   (%Config{libs} =~ m/(-lsocks\S*)/ ? (LIBS => [ "$1" ] ) : ()),
-    MAN3PODS  	 => {}, 	# Pods will be built by installman.
+   (%Config{libs} =~ m/(-lsocks\S*)/ ? (LIBS => \@( "$1" ) ) : ()),
     XSPROTOARG   => '-noprototypes', 		# XXX remove later?
-    realclean => {FILES=> 'const-c.inc const-xs.inc'},
+    realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
 );
 my @names = (qw(AF_802 AF_AAL AF_APPLETALK AF_CCITT AF_CHAOS AF_CTF
 		AF_DATAKIT AF_DECnet AF_DLI AF_ECMA AF_GOSIP AF_HYLINK
@@ -46,27 +45,27 @@ my @names = (qw(AF_802 AF_AAL AF_APPLETALK AF_CCITT AF_CHAOS AF_CTF
 		TCP_KEEPALIVE TCP_MAXRT TCP_MAXSEG TCP_NODELAY TCP_STDURG
 		UIO_MAXIOV
 		),
-            {name=>"IPPROTO_IP", type=>"IV", default=>["IV", 0]},
-            {name=>"IPPROTO_IPV6", type=>"IV", default=>["IV", 41]},
-            {name=>"IPPROTO_RAW", type=>"IV", default=>["IV", 255]},
-            {name=>"IPPROTO_ICMP", type=>"IV", default=>["IV", 1]},
-            {name=>"IPPROTO_TCP",  type=>"IV", default=>["IV", 6]},
-            {name=>"IPPROTO_UDP",  type=>"IV", default=>["IV", 17]},
-            {name=>"SHUT_RD", type=>"IV", default=>["IV", "0"]},
-            {name=>"SHUT_WR", type=>"IV", default=>["IV", "1"]},
-            {name=>"SHUT_RDWR", type=>"IV", default=>["IV", "2"]},
+            \%(name=>"IPPROTO_IP", type=>"IV", default=>\@("IV", 0)),
+            \%(name=>"IPPROTO_IPV6", type=>"IV", default=>\@("IV", 41)),
+            \%(name=>"IPPROTO_RAW", type=>"IV", default=>\@("IV", 255)),
+            \%(name=>"IPPROTO_ICMP", type=>"IV", default=>\@("IV", 1)),
+            \%(name=>"IPPROTO_TCP",  type=>"IV", default=>\@("IV", 6)),
+            \%(name=>"IPPROTO_UDP",  type=>"IV", default=>\@("IV", 17)),
+            \%(name=>"SHUT_RD", type=>"IV", default=>\@("IV", "0")),
+            \%(name=>"SHUT_WR", type=>"IV", default=>\@("IV", "1")),
+            \%(name=>"SHUT_RDWR", type=>"IV", default=>\@("IV", "2")),
 );
 
 push @names,
-  {name=>$_, type=>"IV",
-   macro=>["#if defined($_) || defined(HAS_$_) /* might be an enum */\n",
-           "#endif\n"]}
+  \%(name=>$_, type=>"IV",
+   macro=>\@("#if defined($_) || defined(HAS_$_) /* might be an enum */\n",
+           "#endif\n"))
 foreach qw (MSG_CTRUNC MSG_DONTROUTE MSG_OOB MSG_PEEK MSG_PROXY SCM_RIGHTS);
 
 push @names, 
-{name => $_, type => "SV",
+\%(name => $_, type => "SV",
  pre=>"struct in_addr ip_address; ip_address.s_addr = htonl($_);",
- value => "sv_2mortal(newSVpvn((char *)&ip_address,sizeof ip_address ))",}
+ value => "sv_2mortal(newSVpvn((char *)&ip_address,sizeof ip_address ))",)
          foreach qw(INADDR_ANY INADDR_LOOPBACK INADDR_NONE INADDR_BROADCAST);
 
 WriteConstants(

@@ -636,6 +636,6 @@ print "not " if $@;
 print "ok ", $i++, "\n";
 
 # Ought to fail, doesn't in 5.8.1.
-eval 'sub bug (\[%@]) {  } my $array = [0 .. 1]; bug %$array;';
+eval 'sub bug (\[%@]) {  } my $array = \@(0 .. 1); bug %$array;';
 print "not " unless $@->message =~ m/Not a HASH reference/;
 print "ok ", $i++, "\n";

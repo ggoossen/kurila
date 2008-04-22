@@ -20,7 +20,7 @@ $VERSION = eval $VERSION;
 
     use Class::Struct qw(struct);
 
-    struct 'IPC::Semaphore::stat' => [
+    struct 'IPC::Semaphore::stat' => \@(
 	uid	=> '$',
 	gid	=> '$',
 	cuid	=> '$',
@@ -29,7 +29,7 @@ $VERSION = eval $VERSION;
 	ctime	=> '$',
 	otime	=> '$',
 	nsems	=> '$',
-    ];
+    );
 }
 
 sub new {

@@ -70,9 +70,9 @@ eval 'NO SUCH FUNCTION';
 like( $EVAL_ERROR->{description}, qr/syntax error/, '$EVAL_ERROR' );
 
 is( $UID, $<, '$UID' );
-is( $GID, $(, '$GID' );
+is( $REAL_GROUP_ID, $^GID, '$GID' );
 is( $EUID, $>, '$EUID' );
-is( $EGID, $), '$EGID' );
+is( $EFFECTIVE_GROUP_ID, $^EGID, '$EGID' );
 
 is( $PROGRAM_NAME, $0, '$PROGRAM_NAME' );
 is( $BASETIME, $^T, '$BASETIME' );

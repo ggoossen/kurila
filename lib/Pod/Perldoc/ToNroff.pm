@@ -23,7 +23,7 @@ sub quotes          { shift->_perldoc_elem('quotes'         , @_) }
 sub release         { shift->_perldoc_elem('release'        , @_) }
 sub section         { shift->_perldoc_elem('section'        , @_) }
 
-sub new { return bless {}, ref(@_[0]) || @_[0] }
+sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
 sub parse_from_file {
   my $self = shift;

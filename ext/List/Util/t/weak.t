@@ -96,7 +96,7 @@ print "# EXITBLOCK\n";
 
 $flag = 0;
 {
-	my $y = bless {}, 'Dest';
+	my $y = bless \%(), 'Dest';
 	Dump($y);
 	print "# 1: {dump::view($y)}\n";
 	$y->{Self} = $y;
@@ -126,8 +126,8 @@ print "# FLAGU\n";
 
 $flag = 0;
 {
-	my $y = bless {}, 'Dest';
-	my $x = bless {}, 'Dest';
+	my $y = bless \%(), 'Dest';
+	my $x = bless \%(), 'Dest';
 	$x->{Ref} = $y;
 	$y->{Ref} = $x;
 	$x->{Flag} = \$flag;
@@ -170,7 +170,7 @@ ok(isweak($b));
 $b = \$a;
 ok(!isweak($b));
 
-$x = {};
+$x = \%();
 weaken($x->{Y} = \$a);
 ok(isweak($x->{Y}));
 ok(!isweak($x->{Z}));

@@ -116,7 +116,7 @@ SKIP: {
 my @test_dirs = qw{_ptrslt_ _path_ _to_ _a_ _dir_};
 my $Test_Dir     = File::Spec->catdir(@test_dirs);
 
-mkpath([$Test_Dir], 0, 0777);
+mkpath(\@($Test_Dir), 0, 0777);
 Cwd::chdir $Test_Dir;
 
 foreach my $func (qw(cwd getcwd fastcwd fastgetcwd)) {
@@ -154,7 +154,7 @@ rmtree(@test_dirs[0], 0, 0);
 {
   # Make sure abs_path() doesn't trample $ENV{PWD}
   my $start_pwd = %ENV{PWD};
-  mkpath([$Test_Dir], 0, 0777);
+  mkpath(\@($Test_Dir), 0, 0777);
   Cwd::abs_path($Test_Dir);
   is %ENV{PWD}, $start_pwd;
   rmtree(@test_dirs[0], 0, 0);
@@ -163,7 +163,7 @@ rmtree(@test_dirs[0], 0, 0);
 SKIP: {
     skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless %Config{d_symlink};
 
-    mkpath([$Test_Dir], 0, 0777);
+    mkpath(\@($Test_Dir), 0, 0777);
     symlink $Test_Dir, "linktest";
 
     my $abs_path      =  Cwd::abs_path("linktest");

@@ -151,7 +151,7 @@ find( sub { push @copies, $_ if -f }, 'copy' );
 @copies = map { s/\.$//; $_ } @copies if $Is_VMS;  # VMS likes to put dots on
                                                    # the end of files.
 # Have to compare insensitively for non-case preserving VMS
-is_deeply( [sort map { lc } @copies], [sort map { lc } keys %$files] );
+is_deeply( \@(sort map { lc } @copies), \@(sort map { lc } keys %$files) );
 
 # cp would leave files readonly, so check permissions.
 foreach my $orig (@copies) {
@@ -211,8 +211,8 @@ is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
 $files = maniread;
 ok( !$files->{wibble},     'MANIFEST in good state' );
-maniadd({ wibble => undef });
-maniadd({ yarrow => "hock" });
+maniadd(\%( wibble => undef ));
+maniadd(\%( yarrow => "hock" ));
 $files = maniread;
 is( $files->{wibble}, '',    'maniadd() with undef comment' );
 is( $files->{yarrow}, 'hock','          with comment' );
@@ -220,8 +220,8 @@ is( $files->{foobar}, '',    '          preserved old entries' );
 
 # test including an external manifest.skip file in MANIFEST.SKIP
 {
-    maniadd({ foo => undef , albatross => undef,
-              'mymanifest.skip' => undef, 'mydefault.skip' => undef});
+    maniadd(\%( foo => undef , albatross => undef,
+              'mymanifest.skip' => undef, 'mydefault.skip' => undef));
     add_file('mymanifest.skip' => "^foo\n");
     add_file('mydefault.skip'  => "^my\n");
     $ExtUtils::Manifest::DEFAULT_MSKIP =
@@ -254,7 +254,7 @@ is( $files->{foobar}, '',    '          preserved old entries' );
 }
 
 add_file('MANIFEST'   => 'Makefile.PL');
-maniadd({ foo  => 'bar' });
+maniadd(\%( foo  => 'bar' ));
 $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
 %$files = map { (lc $_ => $files->{$_}) } keys %$files;
@@ -264,19 +264,19 @@ my %expect = ( 'makefile.pl' => '',
 is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline');
 
 #add_file('MANIFEST'   => 'Makefile.PL');
-#maniadd({ foo => 'bar' });
+#maniadd(\%( foo => 'bar' ));
 
 SKIP: {
     chmod( 0400, 'MANIFEST' );
     skip "Can't make MANIFEST read-only", 2 if -w 'MANIFEST';
 
     eval {
-        maniadd({ 'foo' => 'bar' });
+        maniadd(\%( 'foo' => 'bar' ));
     };
     is( $@, '',  "maniadd() won't open MANIFEST if it doesn't need to" );
 
     eval {
-        maniadd({ 'grrrwoof' => 'yippie' });
+        maniadd(\%( 'grrrwoof' => 'yippie' ));
     };
     like( $@->{description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
                  "maniadd() dies if it can't open the MANIFEST" );

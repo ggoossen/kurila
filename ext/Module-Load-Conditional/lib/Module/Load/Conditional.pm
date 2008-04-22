@@ -146,11 +146,11 @@ true, since C<check_install> had no way to verify clearly.
 sub check_install {
     my %hash = @_;
 
-    my $tmpl = {
-            version => { default    => '0.0'    },
-            module  => { required   => 1        },
-            verbose => { default    => $VERBOSE },
-    };
+    my $tmpl = \%(
+            version => \%( default    => '0.0'    ),
+            module  => \%( required   => 1        ),
+            verbose => \%( default    => $VERBOSE ),
+    );
 
     my $args;
     unless( $args = check( $tmpl, \%hash, $VERBOSE ) ) {
@@ -164,11 +164,11 @@ sub check_install {
                     ) . '.pm';
 
     ### where we store the return value ###
-    my $href = {
+    my $href = \%(
             file        => undef,
             version     => undef,
             uptodate    => undef,
-    };
+    );
     
     my $filename;
 
@@ -385,11 +385,11 @@ cache, but you can override that by setting C<nocache> to true.
 sub can_load {
     my %hash = @_;
 
-    my $tmpl = {
-        modules     => { default => {}, strict_type => 1 },
-        verbose     => { default => $VERBOSE },
-        nocache     => { default => 0 },
-    };
+    my $tmpl = \%(
+        modules     => \%( default => \%(), strict_type => 1 ),
+        verbose     => \%( default => $VERBOSE ),
+        nocache     => \%( default => 0 ),
+    );
 
     my $args;
 
@@ -408,7 +408,7 @@ sub can_load {
     ###     },
     ### };
 
-    $CACHE ||= {}; # in case it was undef'd
+    $CACHE ||= \%(); # in case it was undef'd
 
     my $error;
     BLOCK: {

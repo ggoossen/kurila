@@ -145,7 +145,7 @@ while (~< *SCRIPTS) {
     chomp;
     if (m/(\S*)\s*#\s*link\s*=\s*(\S*)/) {
 	push @scripts, $1;
-	push @tolink, [$1, $2];
+	push @tolink, \@($1, $2);
     } else {
 	push @scripts, $_;
     }
@@ -300,7 +300,7 @@ if (($Is_W32 and ! $Is_NetWare) or $Is_Cygwin) {
     safe_unlink("$installbin/$perldll");
     copy("$perldll", "$installbin/$perldll");
     chmod(0755, "$installbin/$perldll");
-    $packlist->{"$installbin/$perldll"} = { type => 'file' };
+    $packlist->{"$installbin/$perldll"} = \%( type => 'file' );
 } # if (($Is_W32 and ! $Is_NetWare) or $Is_Cygwin)
 
 # First we install the version-numbered executables.
@@ -707,7 +707,7 @@ sub link {
 	      ? die "AFS"  # okay inside eval {}
 	      : die "Couldn't link $from to $to: $!\n"
 	  unless $nonono;
-	$packlist->{$xto} = { from => $xfrom, type => 'link' };
+	$packlist->{$xto} = \%( from => $xfrom, type => 'link' );
     };
     if ($@) {
 	warn "Replacing link() with File::Copy::copy(): {$@->message}";
@@ -720,7 +720,7 @@ sub link {
 		unless -f $to and (chmod(0666, $to), unlink $to)
 			and File::Copy::copy($from, $to) and ++$success;
 	}
-	$packlist->{$xto} = { type => 'file' };
+	$packlist->{$xto} = \%( type => 'file' );
     }
     $success;
 }
@@ -748,7 +748,7 @@ sub copy {
 	    unless -f $to and (chmod(0666, $to), unlink $to)
 		   and File::Copy::copy($from, $to);
     }
-    $packlist->{$xto} = { type => 'file' };
+    $packlist->{$xto} = \%( type => 'file' );
 }
 
 sub samepath {
@@ -839,7 +839,7 @@ sub installlib {
 	}
 	my $xname = "$installlib/$name";
 	$xname =~ s/^\Q$destdir\E// if $destdir;
-	$packlist->{$xname} = { type => 'file' };
+	$packlist->{$xname} = \%( type => 'file' );
 	if ($force || compare($_, "$installlib/$name") || $nonono) {
 	    unlink("$installlib/$name");
 	    mkpath("$installlib/$dir", $verbose, 0777);
@@ -898,7 +898,7 @@ sub copy_if_diff {
 	$perlpodbadsymlink = 1;
     }
     -f $from || $perlpodbadsymlink || warn "$0: $from not found";
-    $packlist->{$xto} = { type => 'file' };
+    $packlist->{$xto} = \%( type => 'file' );
     if ($force || compare($from, $to) || $nonono) {
 	safe_unlink($to);   # In case we don't have write permissions.
 	if ($nonono) {

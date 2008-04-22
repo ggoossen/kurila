@@ -22,14 +22,14 @@ sub new {
                     grep m/^config|default$/i, keys %hash;
 
     ### allow provided arguments to override the values from the config ###
-    my $tmpl = {
-        private => { default => undef,  },
-        verbose => { default => 1       },
-        tag     => { default => 'NONE', },
-        level   => { default => 'log',  },
-        remove  => { default => 0       },
-        chrono  => { default => 1       },
-    };
+    my $tmpl = \%(
+        private => \%( default => undef,  ),
+        verbose => \%( default => 1       ),
+        tag     => \%( default => 'NONE', ),
+        level   => \%( default => 'log',  ),
+        remove  => \%( default => 0       ),
+        chrono  => \%( default => 1       ),
+    );
 
     my %lc_hash = map { lc, %hash{$_} } keys %hash;
 
@@ -39,7 +39,7 @@ sub new {
                         or ( warn( loc(q[Could not parse config file!]) ), return );
     }
 
-    my $def_conf = \%{ %special{default} || {} };
+    my $def_conf = \%{ %special{default} || \%() };
 
     ### make sure to only include keys that are actually defined --
     ### the checker will assign even 'undef' if you have provided that
@@ -50,12 +50,12 @@ sub new {
     ### 3: any default config passed
     my %to_check =  map     { @$_ }
                     grep    { defined $_->[1] }
-                    map     {   [ $_ =>
+                    map     {   \@( $_ =>
                                     defined %lc_hash{$_}        ? %lc_hash{$_}      :
                                     defined $file_conf->{$_}    ? $file_conf->{$_}  :
                                     defined $def_conf->{$_}     ? $def_conf->{$_}   :
                                     undef
-                                ]
+                                )
                             } keys %$tmpl;
 
     my $rv = check( $tmpl, \%to_check, 1 )
@@ -67,11 +67,11 @@ sub new {
 sub _read_config_file {
     my $file = shift or return;
 
-    my $conf = {};
+    my $conf = \%();
     my $FH = FileHandle->new();
     $FH->open("$file") or (
                         warn(loc(q[Could not open config file '%1': %2],$file,$!)),
-                        return {}
+                        return \%()
                     );
 
     while( ~< $FH) {

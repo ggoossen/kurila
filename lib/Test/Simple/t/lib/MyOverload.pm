@@ -2,7 +2,7 @@ package Overloaded;
 
 sub new {
     my $class = shift;
-    bless { string => shift, num => shift }, $class;
+    bless \%( string => shift, num => shift ), $class;
 }
 
 

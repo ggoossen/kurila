@@ -25,10 +25,9 @@ my $define = join(' ', @defines);
 WriteMakefile(
 	'NAME'		=> 'Digest::SHA',
 	'VERSION_FROM'	=> 'SHA.pm',
-	'PREREQ_PM'	=> {},
+	'PREREQ_PM'	=> \%(),
 	'AUTHOR'	=> 'Mark Shelor <mshelor@cpan.org>',
-	'LIBS'		=> [''],
-        MAN3PODS        => {},      # Pods will be built by installman.
+	'LIBS'		=> \@(''),
 	'DEFINE'	=> $define,
 	'INC'		=> '-I.',
 	'NO_META'	=> 1,

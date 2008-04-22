@@ -175,7 +175,7 @@ sub read_old_multi {
 }
 
 sub uniquefy_filenames {
-    my $b = [];
+    my $b = \@();
     my %c = ();
     for my $i (@{@_[0]}) {
         $i =~ s!/!\\!g;
@@ -214,13 +214,13 @@ sub write_mmp {
     print "\t$base.mmp\n";
     %CONF{TARGET}        = "perl$VERSION-$extdash.dll";
     %CONF{TARGETPATH}    = "\\System\\Libs\\Perl\\$R_V_SV";
-    %CONF{SOURCE}        = [@src];
-    %CONF{SOURCEPATH}    = [ $CWD, $BUILDROOT ];
-    %CONF{USERINCLUDE}   = [ $CWD, $BUILDROOT ];
-    %CONF{SYSTEMINCLUDE} = ["$PERLSDK\\include"] unless $CoreBuild;
-    %CONF{SYSTEMINCLUDE} = [ $BUILDROOT, "$BUILDROOT\\symbian" ] if $CoreBuild;
-    %CONF{LIBRARY}       = [];
-    %CONF{MACRO}         = [];
+    %CONF{SOURCE}        = \@(@src);
+    %CONF{SOURCEPATH}    = \@( $CWD, $BUILDROOT );
+    %CONF{USERINCLUDE}   = \@( $CWD, $BUILDROOT );
+    %CONF{SYSTEMINCLUDE} = \@("$PERLSDK\\include") unless $CoreBuild;
+    %CONF{SYSTEMINCLUDE} = \@( $BUILDROOT, "$BUILDROOT\\symbian" ) if $CoreBuild;
+    %CONF{LIBRARY}       = \@();
+    %CONF{MACRO}         = \@();
     read_mmp( \%CONF, "_init.mmp" );
     read_mmp( \%CONF, "$base.mmp" );
 
@@ -673,7 +673,7 @@ __EOF__
                         unlink($submf);
                         my $subbase = $d;
                         $subbase =~ s!/!::!g;
-                        write_mmp( $ext, $subbase, ["..\\Encode"], "$subbase.c",
+                        write_mmp( $ext, $subbase, \@("..\\Encode"), "$subbase.c",
                             @subsrc );
                         write_makefile( $subbase, $build );
                         write_bld_inf($subbase);
@@ -701,7 +701,7 @@ __EOF__
             print "Configuring Encode...\n";
         }
 
-        write_mmp( $ext, $base, [ keys %incdir ], @src );
+        write_mmp( $ext, $base, \@( keys %incdir ), @src );
         write_makefile( $base, $build );
     }
     &restore_config;
@@ -772,7 +772,7 @@ for my $ext (@ARGV) {
         $dir = "ext\\DynaLoader";
     }
 
-    %EXTCFG{$ext} = [ split( m/,/, $cfg ) ] if defined $cfg;
+    %EXTCFG{$ext} = \@( split( m/,/, $cfg ) ) if defined $cfg;
 
     die "$0: no lib\\Config.pm\n"
       if $CoreBuild && $Build && !-f "lib\\Config.pm";
@@ -787,7 +787,7 @@ for my $ext (@ARGV) {
             chomp;
             my $ext = $1;
             my @ext = split( ' ', $ext );
-            %EXTCFG{"ext\\@ext[0]"} = [@ext];
+            %EXTCFG{"ext\\@ext[0]"} = \@(@ext);
         }
         close($cfg);
     }

@@ -53,11 +53,7 @@ NOTICE
 }
 
 # detect when being built in Perl core
-if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
-    push @extra_params, 
-        MAN3PODS    => {};      # Pods will be built by installman.
-}
-else {
+if (not grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     push @extra_params, 
         DEFINE      => '-DUSE_PPPORT_H';
 }
@@ -70,14 +66,14 @@ WriteMakefile(
     INSTALLDIRS     => 'perl',
     XSPROTOARG      => '-noprototypes',
     PM              => \%virtual_path, 
-    PREREQ_PM       => {
+    PREREQ_PM       => \%(
         'Test::More' => 0,
         'XSLoader'   => 0,
         @extra_prereqs,
-    },
-    dist            => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean           => { FILES => 'Sys-Syslog-*' }, 
-    realclean       => { FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' },
+    ),
+    dist            => \%( COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
+    clean           => \%( FILES => 'Sys-Syslog-*' ), 
+    realclean       => \%( FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
     @extra_params
 );
 
@@ -126,18 +122,18 @@ if(eval {require ExtUtils::Constant; 1}) {
             LOG_SYSLOG LOG_USER LOG_UUCP
         ),
         # Mac OS X specific facilities
-        { name => "LOG_INSTALL",    type => "IV", default => [ "IV", "LOG_USER"  ] },
-        { name => "LOG_LAUNCHD",    type => "IV", default => [ "IV", "LOG_DAEMON"] },
-        { name => "LOG_NETINFO",    type => "IV", default => [ "IV", "LOG_DAEMON"] },
-        { name => "LOG_RAS",        type => "IV", default => [ "IV", "LOG_AUTH"  ] },
-        { name => "LOG_REMOTEAUTH", type => "IV", default => [ "IV", "LOG_AUTH"  ] },
+        \%( name => "LOG_INSTALL",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
+        \%( name => "LOG_LAUNCHD",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
+        \%( name => "LOG_NETINFO",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
+        \%( name => "LOG_RAS",        type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
+        \%( name => "LOG_REMOTEAUTH", type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
         # modern BSD specific facilities
-        { name => "LOG_CONSOLE",    type => "IV", default => [ "IV", "LOG_USER"  ] },
-        { name => "LOG_NTP",        type => "IV", default => [ "IV", "LOG_DAEMON"] },
-        { name => "LOG_SECURITY",   type => "IV", default => [ "IV", "LOG_AUTH"  ] },
+        \%( name => "LOG_CONSOLE",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
+        \%( name => "LOG_NTP",        type => "IV", default => \@( "IV", "LOG_DAEMON") ),
+        \%( name => "LOG_SECURITY",   type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
         # IRIX specific facilities
-        { name => "LOG_AUDIT",      type => "IV", default => [ "IV", "LOG_AUTH"  ] },
-        { name => "LOG_LFMT",       type => "IV", default => [ "IV", "LOG_USER"  ] },
+        \%( name => "LOG_AUDIT",      type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
+        \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
     );
 
     my @options = qw(
@@ -146,15 +142,15 @@ if(eval {require ExtUtils::Constant; 1}) {
 
     my @others_macros = (
         qw(LOG_FACMASK),
-        { name => "_PATH_LOG", type => "PV", default => [ "PV", qq("$_PATH_LOG") ] },
-        { name => "LOG_PRIMASK",     type => "IV", default => [ "IV", 7] },
-        { name => "LOG_NFACILITIES", type => "IV", default => [ "IV", scalar @facilities] },
+        \%( name => "_PATH_LOG", type => "PV", default => \@( "PV", qq("$_PATH_LOG") ) ),
+        \%( name => "LOG_PRIMASK",     type => "IV", default => \@( "IV", 7) ),
+        \%( name => "LOG_NFACILITIES", type => "IV", default => \@( "IV", scalar @facilities) ),
     );
 
     ExtUtils::Constant::WriteConstants(
         PROXYSUBS => 1,
         NAME => 'Sys::Syslog',
-        NAMES => [ @levels, @facilities, @options, @others_macros ],
+        NAMES => \@( @levels, @facilities, @options, @others_macros ),
     );
 
     my @names = map { ref $_ ? $_->{name} : $_ } @levels, @facilities, @options;

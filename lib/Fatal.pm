@@ -27,14 +27,14 @@ sub fill_protos {
   my ($n, $isref, @out, @out1, $seen_semi) = -1;
   while ($proto =~ m/\S/) {
     $n++;
-    push(@out1,[$n,@out]) if $seen_semi;
+    push(@out1,\@($n,@out)) if $seen_semi;
     push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
     push(@out, "\@_[[$n..\@_-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
     $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
-  push(@out1,[$n+1,@out]);
+  push(@out1,\@($n+1,@out));
   @out1;
 }
 

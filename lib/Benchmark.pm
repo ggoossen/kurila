@@ -437,7 +437,7 @@ our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 @EXPORT=qw(timeit timethis timethese timediff timestr);
 @EXPORT_OK=qw(timesum cmpthese countit
 	      clearcache clearallcache disablecache enablecache);
-%EXPORT_TAGS=( all => [ @EXPORT, @EXPORT_OK ] ) ;
+%EXPORT_TAGS=( all => \@( @EXPORT, @EXPORT_OK ) ) ;
 
 $VERSION = 1.10;
 
@@ -793,7 +793,7 @@ sub countit {
 	$n = $nmin if $n +< $nmin;
     }
 
-    return bless [ $rtot, $utot, $stot, $cutot, $cstot, $ntot ];
+    return bless \@( $rtot, $utot, $stot, $cutot, $cstot, $ntot );
 }
 
 # --- Functions implementing high-level time-then-print utilities
@@ -905,7 +905,7 @@ sub cmpthese{
     $style = "" unless defined $style;
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = map{ [ $_, @{$results->{$_}} ] } keys %$results;
+    my @vals = map{ \@( $_, @{$results->{$_}} ) } keys %$results;
 
     for (@vals) {
 	# The epsilon fudge here is to prevent div by 0.  Since clock

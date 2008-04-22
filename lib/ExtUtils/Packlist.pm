@@ -61,7 +61,7 @@ return(bless(\%self, $class));
 sub TIEHASH
 {
 my ($class, $packfile) = @_;
-my $self = { packfile => $packfile };
+my $self = \%( packfile => $packfile );
 bless($self, $class);
 $self->read($packfile) if (defined($packfile) && -f $packfile);
 return($self);
@@ -117,7 +117,7 @@ else { $packfile = $self->{packfile}; }
 die("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
 open($fh, "<", "$packfile") || die("Can't open file $packfile: $!");
-$self->{data} = {};
+$self->{data} = \%();
 my ($line);
 while (defined($line = ~< $fh))
    {
@@ -126,7 +126,7 @@ while (defined($line = ~< $fh))
    if ($key =~ m/^(.*?)( \w+=.*)$/)
       {
       $key = $1;
-      $data = { map { split('=', $_) } split(' ', $2)};
+      $data = \%( map { split('=', $_) } split(' ', $2));
 
       if (%Config{userelocatableinc} && $data->{relocate_as})
       {
@@ -172,7 +172,7 @@ foreach my $key (sort(keys(%{$self->{data}})))
 		       = File::Spec->abs2rel($key, $packfile_prefix);
 
 		   if (!ref $data) {
-		       $data = {};
+		       $data = \%();
 		   }
 		   $data->{relocate_as} = $relocate_as;
 	       }
@@ -232,8 +232,8 @@ ExtUtils::Packlist - manage .packlist files
 
    $pl->{'/some/file/name'}++;
       or
-   $pl->{'/some/other/file/name'} = { type => 'file',
-                                      from => '/some/file' };
+   $pl->{'/some/other/file/name'} = \%( type => 'file',
+                                        from => '/some/file' );
 
 =head1 DESCRIPTION
 

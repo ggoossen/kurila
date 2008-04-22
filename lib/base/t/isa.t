@@ -26,5 +26,5 @@ use Test::More tests => 1;
     base->import(qw(Middle Parent));
 }
 
-is_deeply [@Child::ISA], [qw(Middle)],
+is_deeply \@(@Child::ISA), \@(qw(Middle)),
           'base.pm will not add to @ISA if you already are-a';

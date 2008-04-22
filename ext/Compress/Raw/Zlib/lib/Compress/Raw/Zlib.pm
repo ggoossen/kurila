@@ -112,9 +112,9 @@ sub Compress::Raw::Zlib::Parameters::new
 {
     my $class = shift ;
 
-    my $obj = { Error => '',
-                Got   => {},
-              } ;
+    my $obj = \%( Error => '',
+                Got   => \%(),
+              ) ;
 
     #return bless $obj, ref($class) || $class || __PACKAGE__ ;
     return bless $obj, 'Compress::Raw::Zlib::Parameters' ;
@@ -188,7 +188,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         $key = lc $key;
 
         if ($firstTime || ! $sticky) {
-            $got->{$key} = [0, $type, $value, $x, $first_only, $sticky] ;
+            $got->{$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
         $got->{$key}[OFF_PARSED] = 0 ;
@@ -213,7 +213,7 @@ sub Compress::Raw::Zlib::Parameters::parse
                 or return undef ;
             #$value = $$value unless $type & Parse_store_ref ;
             $value = $$value ;
-            $got->{$canonkey} = [1, $type, $value, $s] ;
+            $got->{$canonkey} = \@(1, $type, $value, $s) ;
         }
         else
           { push (@Bad, $key) }
@@ -321,19 +321,19 @@ sub Compress::Raw::Zlib::Deflate::new
 {
     my $pkg = shift ;
     my ($got) = ParseParameters(0,
-            {
-                'AppendOutput'  => [1, 1, Parse_boolean,  0],
-                'CRC32'         => [1, 1, Parse_boolean,  0],
-                'ADLER32'       => [1, 1, Parse_boolean,  0],
-                'Bufsize'       => [1, 1, Parse_unsigned, 4096],
+            \%(
+                'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+                'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
  
-                'Level'         => [1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()],
-                'Method'        => [1, 1, Parse_unsigned, Z_DEFLATED()],
-                'WindowBits'    => [1, 1, Parse_signed,   MAX_WBITS()],
-                'MemLevel'      => [1, 1, Parse_unsigned, MAX_MEM_LEVEL()],
-                'Strategy'      => [1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()],
-                'Dictionary'    => [1, 1, Parse_any,      ""],
-            }, @_) ;
+                'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
+                'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
+                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
+                'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
+                'Dictionary'    => \@(1, 1, Parse_any,      ""),
+            ), @_) ;
 
 
     croak "Compress::Raw::Zlib::Deflate::new: Bufsize must be >= 1, you specified " . 
@@ -360,16 +360,16 @@ sub Compress::Raw::Zlib::Inflate::new
 {
     my $pkg = shift ;
     my ($got) = ParseParameters(0,
-                    {
-                        'AppendOutput'  => [1, 1, Parse_boolean,  0],
-                        'CRC32'         => [1, 1, Parse_boolean,  0],
-                        'ADLER32'       => [1, 1, Parse_boolean,  0],
-                        'ConsumeInput'  => [1, 1, Parse_boolean,  1],
-                        'Bufsize'       => [1, 1, Parse_unsigned, 4096],
+                    \%(
+                        'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+                        'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                        'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                        'ConsumeInput'  => \@(1, 1, Parse_boolean,  1),
+                        'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                  
-                        'WindowBits'    => [1, 1, Parse_signed,   MAX_WBITS()],
-                        'Dictionary'    => [1, 1, Parse_any,      ""],
-            }, @_) ;
+                        'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                        'Dictionary'    => \@(1, 1, Parse_any,      ""),
+            ), @_) ;
 
 
     croak "Compress::Raw::Zlib::Inflate::new: Bufsize must be >= 1, you specified " . 
@@ -390,14 +390,14 @@ sub Compress::Raw::Zlib::InflateScan::new
 {
     my $pkg = shift ;
     my ($got) = ParseParameters(0,
-                    {
-                        'CRC32'         => [1, 1, Parse_boolean,  0],
-                        'ADLER32'       => [1, 1, Parse_boolean,  0],
-                        'Bufsize'       => [1, 1, Parse_unsigned, 4096],
+                    \%(
+                        'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                        'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                        'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                  
-                        'WindowBits'    => [1, 1, Parse_signed,   -MAX_WBITS()],
-                        'Dictionary'    => [1, 1, Parse_any,      ""],
-            }, @_) ;
+                        'WindowBits'    => \@(1, 1, Parse_signed,   -MAX_WBITS()),
+                        'Dictionary'    => \@(1, 1, Parse_any,      ""),
+            ), @_) ;
 
 
     croak "Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified " . 
@@ -418,18 +418,18 @@ sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
 {
     my $pkg = shift ;
     my ($got) = ParseParameters(0,
-            {
-                'AppendOutput'  => [1, 1, Parse_boolean,  0],
-                'CRC32'         => [1, 1, Parse_boolean,  0],
-                'ADLER32'       => [1, 1, Parse_boolean,  0],
-                'Bufsize'       => [1, 1, Parse_unsigned, 4096],
+            \%(
+                'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+                'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
  
-                'Level'         => [1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()],
-                'Method'        => [1, 1, Parse_unsigned, Z_DEFLATED()],
-                'WindowBits'    => [1, 1, Parse_signed,   - MAX_WBITS()],
-                'MemLevel'      => [1, 1, Parse_unsigned, MAX_MEM_LEVEL()],
-                'Strategy'      => [1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()],
-            }, @_) ;
+                'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
+                'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
+                'WindowBits'    => \@(1, 1, Parse_signed,   - MAX_WBITS()),
+                'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
+                'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
+            ), @_) ;
 
     croak "Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
@@ -471,11 +471,11 @@ sub Compress::Raw::Zlib::inflateScanStream::inflate
 sub Compress::Raw::Zlib::deflateStream::deflateParams
 {
     my $self = shift ;
-    my ($got) = ParseParameters(0, {
-                'Level'      => [1, 1, Parse_signed,   undef],
-                'Strategy'   => [1, 1, Parse_unsigned, undef],
-                'Bufsize'    => [1, 1, Parse_unsigned, undef],
-                }, 
+    my ($got) = ParseParameters(0, \%(
+                'Level'      => \@(1, 1, Parse_signed,   undef),
+                'Strategy'   => \@(1, 1, Parse_unsigned, undef),
+                'Bufsize'    => \@(1, 1, Parse_unsigned, undef),
+                ), 
                 @_) ;
 
     croak "Compress::Raw::Zlib::deflateParams needs Level and/or Strategy"

@@ -7,7 +7,7 @@ BEGIN {
     use Exporter   ();
     @EXPORT      = qw(getprotobyname getprotobynumber getprotoent getproto);
     @EXPORT_OK   = qw( $p_name @p_aliases $p_proto );
-    %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
 }
 use vars      @EXPORT_OK;
 
@@ -15,11 +15,11 @@ use vars      @EXPORT_OK;
 sub import { goto &Exporter::import }
 
 use Class::Struct qw(struct);
-struct 'Net::protoent' => [
+struct 'Net::protoent' => \@(
    name		=> '$',
    aliases	=> '@',
    proto	=> '$',
-];
+);
 
 sub populate (@) {
     return unless @_;

@@ -35,7 +35,7 @@ BEGIN {
     '==' => \&overload_equiv;
 
     sub new {
-        return bless {}, shift;
+        return bless \%(), shift;
     }
 
     sub overload_equiv {
@@ -51,6 +51,6 @@ BEGIN {
 my $obj1 = Foo->new();
 my $obj2 = Foo->new();
 
-eval { is_deeply([$obj1, $obj2], [$obj1, $obj2]); };
+eval { is_deeply(\@($obj1, $obj2), \@($obj1, $obj2)); };
 is $@, '';
 

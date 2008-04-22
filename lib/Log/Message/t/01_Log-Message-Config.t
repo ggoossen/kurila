@@ -18,14 +18,14 @@ use_ok( 'Log::Message::Config'    ) or diag "Config.pm not found.  Dying", die;
 use_ok( 'Log::Message'            ) or diag "Module.pm not found.  Dying", die;
 
 {
-    my $default = {
+    my $default = \%(
         private => undef,
         verbose => 1,
         tag     => 'NONE',
         level   => 'log',
         remove  => 0,
         chrono  => 1,
-    };
+    );
 
     my $log = Log::Message->new();
 
@@ -33,14 +33,14 @@ use_ok( 'Log::Message'            ) or diag "Module.pm not found.  Dying", die;
 }
 
 {
-    my $config = {
+    my $config = \%(
         private => 1,
         verbose => 1,
         tag     => 'TAG',
         level   => 'carp',
         remove  => 0,
         chrono  => 1,
-    };
+    );
 
     my $log = Log::Message->new( %$config );
 
@@ -48,14 +48,14 @@ use_ok( 'Log::Message'            ) or diag "Module.pm not found.  Dying", die;
 }
 
 {
-    my $file = {
+    my $file = \%(
         private => 1,
         verbose => 0,
         tag     => 'SOME TAG',
         level   => 'carp',
         remove  => 1,
         chrono  => 0,
-    };
+    );
 
     my $log = Log::Message->new(
                     config  => File::Spec->catfile( qw|conf config_file| )
@@ -66,14 +66,14 @@ use_ok( 'Log::Message'            ) or diag "Module.pm not found.  Dying", die;
 
 {
 
-    my $mixed = {
+    my $mixed = \%(
         private => 1,
         verbose => 0,
         remove  => 1,
         chrono  => 0,
         tag     => 'MIXED',
         level   => 'die',
-    };
+    );
     my $log = Log::Message->new(
                     config  => File::Spec->catfile( qw|conf config_file| ),
                     tag     => 'MIXED',

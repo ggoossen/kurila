@@ -493,19 +493,19 @@ EOUU
 # test the ascii template types (A, a, Z)
 
 foreach (
-['p', 'A*',  "foo\0bar\0 ", "foo\0bar\0 "],
-['p', 'A11', "foo\0bar\0 ", "foo\0bar\0   "],
-['u', 'A*',  "foo\0bar \0", "foo\0bar"],
-['u', 'A8',  "foo\0bar \0", "foo\0bar"],
-['p', 'a*',  "foo\0bar\0 ", "foo\0bar\0 "],
-['p', 'a11', "foo\0bar\0 ", "foo\0bar\0 \0\0"],
-['u', 'a*',  "foo\0bar \0", "foo\0bar \0"],
-['u', 'a8',  "foo\0bar \0", "foo\0bar "],
-['p', 'Z*',  "foo\0bar\0 ", "foo\0bar\0 \0"],
-['p', 'Z11', "foo\0bar\0 ", "foo\0bar\0 \0\0"],
-['p', 'Z3',  "foo",         "fo\0"],
-['u', 'Z*',  "foo\0bar \0", "foo"],
-['u', 'Z8',  "foo\0bar \0", "foo"],
+\@('p', 'A*',  "foo\0bar\0 ", "foo\0bar\0 "),
+\@('p', 'A11', "foo\0bar\0 ", "foo\0bar\0   "),
+\@('u', 'A*',  "foo\0bar \0", "foo\0bar"),
+\@('u', 'A8',  "foo\0bar \0", "foo\0bar"),
+\@('p', 'a*',  "foo\0bar\0 ", "foo\0bar\0 "),
+\@('p', 'a11', "foo\0bar\0 ", "foo\0bar\0 \0\0"),
+\@('u', 'a*',  "foo\0bar \0", "foo\0bar \0"),
+\@('u', 'a8',  "foo\0bar \0", "foo\0bar "),
+\@('p', 'Z*',  "foo\0bar\0 ", "foo\0bar\0 \0"),
+\@('p', 'Z11', "foo\0bar\0 ", "foo\0bar\0 \0\0"),
+\@('p', 'Z3',  "foo",         "fo\0"),
+\@('u', 'Z*',  "foo\0bar \0", "foo"),
+\@('u', 'Z8',  "foo\0bar \0", "foo"),
 )
 {
     my ($what, $template, $in, $out) = @$_;
@@ -857,9 +857,9 @@ SKIP: {
   is($x, $expect);
 
   foreach (
-           ['a/a*/a*', '212ab345678901234567','ab3456789012'],
-           ['a/a*/a*', '3012ab345678901234567', 'ab3456789012'],
-           ['a/a*/b*', '212ab', $Is_EBCDIC ? '100000010100' : '100001100100'],
+           \@('a/a*/a*', '212ab345678901234567','ab3456789012'),
+           \@('a/a*/a*', '3012ab345678901234567', 'ab3456789012'),
+           \@('a/a*/b*', '212ab', $Is_EBCDIC ? '100000010100' : '100001100100'),
   )
   {
     my ($pat, $in, $expect) = @$_;
@@ -930,10 +930,10 @@ is(pack('U', 0x300), "\x{300}");
 is((unpack('U', "\x{300}"))[[0]], 0x300);
 
 # is unpack U the reverse of pack U for Unicode string?
-is("@{[unpack('U*', pack('U*', 100, 200, 300))]}", "100 200 300");
+is("@{\@(unpack('U*', pack('U*', 100, 200, 300)))}", "100 200 300");
 
 # is unpack U the reverse of pack U for byte string?
-is("@{[unpack('U*', pack('U*', 100, 200))]}", "100 200");
+is("@{\@(unpack('U*', pack('U*', 100, 200)))}", "100 200");
 }
 
 SKIP: {
@@ -941,10 +941,10 @@ SKIP: {
 
     use utf8;
     # does pack U0C create Unicode?
-    is("@{[pack('U0C*', 100, 195, 136)]}", "\x{64}"."\x{c8}");
+    is("@{\@(pack('U0C*', 100, 195, 136))}", "\x{64}"."\x{c8}");
 
     # does pack C0U create characters?
-    is("@{[pack('C0U*', 100, 200)]}", pack("C*", 100, 195, 136));
+    is("@{\@(pack('C0U*', 100, 200))}", pack("C*", 100, 195, 136));
 
     # does unpack U0U on byte data warn?
     {
@@ -999,14 +999,14 @@ EOPOEMSNIPPET
 
 # pack x X @
 foreach (
-         ['x', "N", "\0"],
-         ['x4', "N", "\0"x4],
-         ['xX', "N", ""],
-         ['xXa*', "Nick", "Nick"],
-         ['a5Xa5', "cameL", "llama", "camellama"],
-         ['@4', 'N', "\0"x4],
-         ['a*@8a*', 'Camel', 'Dromedary', "Camel\0\0\0Dromedary"],
-         ['a*@4a', 'Perl rules', '!', 'Perl!'],
+         \@('x', "N", "\0"),
+         \@('x4', "N", "\0"x4),
+         \@('xX', "N", ""),
+         \@('xXa*', "Nick", "Nick"),
+         \@('a5Xa5', "cameL", "llama", "camellama"),
+         \@('@4', 'N', "\0"x4),
+         \@('a*@8a*', 'Camel', 'Dromedary', "Camel\0\0\0Dromedary"),
+         \@('a*@4a', 'Perl rules', '!', 'Perl!'),
 )
 {
   my ($template, @in) = @$_;
@@ -1020,13 +1020,13 @@ foreach (
 
 # unpack x X @
 foreach (
-         ['x', "N"],
-         ['xX', "N"],
-         ['xXa*', "Nick", "Nick"],
-         ['a5Xa5', "camellama", "camel", "llama"],
-         ['@3', "ice"],
-         ['@2a2', "water", "te"],
-         ['a*@1a3', "steam", "steam", "tea"],
+         \@('x', "N"),
+         \@('xX', "N"),
+         \@('xXa*', "Nick", "Nick"),
+         \@('a5Xa5', "camellama", "camel", "llama"),
+         \@('@3', "ice"),
+         \@('@2a2', "water", "te"),
+         \@('a*@1a3', "steam", "steam", "tea"),
 )
 {
   my ($template, $in, @out) = @$_;
@@ -1100,16 +1100,16 @@ SKIP: {
   }
 
   my %templates = (
-    's<'                  => [-42],
-    's<c2x![S]S<'         => [-42, -11, 12, 4711],
-    '(i<j<[s]l<)3'        => [-11, -22, -33, 1000000, 1100, 2201, 3302,
-                              -1000000, 32767, -32768, 1, -123456789 ],
-    '(I!<4(J<2L<)3)5'     => [1 .. 65],
-    'q<Q<'                => [-50000000005, 60000000006],
-    'f<F<d<'              => [3.14159, 111.11, 2222.22],
-    'D<cCD<'              => [1e42, -128, 255, 1e-42],
-    'n/a*'                => ['/usr/bin/perl'],
-    'C/a*S</A*L</Z*I</a*' => [qw(Just another Perl hacker)],
+    's<'                  => \@(-42),
+    's<c2x![S]S<'         => \@(-42, -11, 12, 4711),
+    '(i<j<[s]l<)3'        => \@(-11, -22, -33, 1000000, 1100, 2201, 3302,
+                              -1000000, 32767, -32768, 1, -123456789 ),
+    '(I!<4(J<2L<)3)5'     => \@(1 .. 65),
+    'q<Q<'                => \@(-50000000005, 60000000006),
+    'f<F<d<'              => \@(3.14159, 111.11, 2222.22),
+    'D<cCD<'              => \@(1e42, -128, 255, 1e-42),
+    'n/a*'                => \@('/usr/bin/perl'),
+    'C/a*S</A*L</Z*I</a*' => \@(qw(Just another Perl hacker)),
   );
 
   for my $tle (sort keys %templates) {
@@ -1459,10 +1459,10 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
     my @unpack4s = scalar unpack "{$template}4", $packed;
     my @unpacks = scalar unpack "{$template}*", $packed;
 
-    my @tests = ( ["{$template}4 vs {$template}*", \@unpack4, \@unpack],
-                  ["scalar {$template} {$template}", \@unpack1s, \@unpack1],
-                  ["scalar {$template}4 vs {$template}", \@unpack4s, \@unpack1],
-                  ["scalar {$template}* vs {$template}", \@unpacks, \@unpack1],
+    my @tests = ( \@("{$template}4 vs {$template}*", \@unpack4, \@unpack),
+                  \@("scalar {$template} {$template}", \@unpack1s, \@unpack1),
+                  \@("scalar {$template}4 vs {$template}", \@unpack4s, \@unpack1),
+                  \@("scalar {$template}* vs {$template}", \@unpacks, \@unpack1),
                 );
 
     unless (%cant_checksum{$template}) {
@@ -1474,10 +1474,10 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
       my @unpacks_c = scalar unpack "\%{$template}*", $packed;
 
       push @tests,
-        ( ["\% {$template}4 vs {$template}*", \@unpack4_c, \@unpack_c],
-          ["\% scalar {$template} {$template}", \@unpack1s_c, \@unpack1_c],
-          ["\% scalar {$template}4 vs {$template}*", \@unpack4s_c, \@unpack_c],
-          ["\% scalar {$template}* vs {$template}*", \@unpacks_c, \@unpack_c],
+        ( \@("\% {$template}4 vs {$template}*", \@unpack4_c, \@unpack_c),
+          \@("\% scalar {$template} {$template}", \@unpack1s_c, \@unpack1_c),
+          \@("\% scalar {$template}4 vs {$template}*", \@unpack4s_c, \@unpack_c),
+          \@("\% scalar {$template}* vs {$template}*", \@unpacks_c, \@unpack_c),
         );
     }
     foreach my $test (@tests) {
@@ -1564,30 +1564,30 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
         # [expected result,
         #  how many chars it should progress,
         #  (optional) expected result of pack]
-        (a5 => ["\x[f8f9fafbfc]", 5],
-         A5 => ["\x[f8f9fafbfc]", 5],
-         Z5 => ["\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]"],
-         b21 => ["000111111001111101011", 3, "\x[f8f91afb]"],
-         B21 => ["111110001111100111111", 3, "\x[f8f9f8fb]"],
-         H5 => ["f8f9f", 3, "\x[f8f9f0fb]"],
-         h5 => ["8f9fa", 3, "\x[f8f90afb]"],
-         "s<"  => [-1544, 2],
-         "s>"  => [-1799, 2],
-         "S<"  => [0xf9f8, 2],
-         "S>"  => [0xf8f9, 2],
-         "l<"  => [-67438088, 4],
-         "l>"  => [-117835013, 4],
-         "L>"  => [0xf8f9fafb, 4],
-         "L<"  => [0xfbfaf9f8, 4],
-         n     => [0xf8f9, 2],
-         N     => [0xf8f9fafb, 4],
-         v     => [63992, 2],
-         V     => [0xfbfaf9f8, 4],
-         c     => [-8, 1],
-         # (invalid unicode) U0U   => [0xf8, 1],
-         w     => ["8715569050387726213", 9],
-         q     => ["-283686952306184", 8],
-         Q     => ["18446460386757245432", 8],
+        (a5 => \@("\x[f8f9fafbfc]", 5),
+         A5 => \@("\x[f8f9fafbfc]", 5),
+         Z5 => \@("\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]"),
+         b21 => \@("000111111001111101011", 3, "\x[f8f91afb]"),
+         B21 => \@("111110001111100111111", 3, "\x[f8f9f8fb]"),
+         H5 => \@("f8f9f", 3, "\x[f8f9f0fb]"),
+         h5 => \@("8f9fa", 3, "\x[f8f90afb]"),
+         "s<"  => \@(-1544, 2),
+         "s>"  => \@(-1799, 2),
+         "S<"  => \@(0xf9f8, 2),
+         "S>"  => \@(0xf8f9, 2),
+         "l<"  => \@(-67438088, 4),
+         "l>"  => \@(-117835013, 4),
+         "L>"  => \@(0xf8f9fafb, 4),
+         "L<"  => \@(0xfbfaf9f8, 4),
+         n     => \@(0xf8f9, 2),
+         N     => \@(0xf8f9fafb, 4),
+         v     => \@(63992, 2),
+         V     => \@(0xfbfaf9f8, 4),
+         c     => \@(-8, 1),
+         # (invalid unicode) U0U   => \@(0xf8, 1),
+         w     => \@("8715569050387726213", 9),
+         q     => \@("-283686952306184", 8),
+         Q     => \@("18446460386757245432", 8),
          );
 
     for my $string ($down, $up) {
@@ -1621,11 +1621,11 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 
 {
     # use utf8 neutrality, numbers
-    for ( ( map { [$_, -2.68] } qw(s S i I l L j J f d F D q Q
+    for ( ( map { \@($_, -2.68) } qw(s S i I l L j J f d F D q Q
                                    s! S! i! I! l! L! n! N! v! V!)),
-          ['C', 253], ['u', "\x[f8f9fafbfcfdfeff0506]"],
-          ['U', 0x300], ['a3', "abc"], ['a0', ''],
-          ['A3', "abc"], ['Z3', "ghi"]
+          \@('C', 253), \@('u', "\x[f8f9fafbfcfdfeff0506]"),
+          \@('U', 0x300), \@('a3', "abc"), \@('a0', ''),
+          \@('A3', "abc"), \@('Z3', "ghi")
         ) {
       SKIP: {
           my ($format, $val) = @$_;

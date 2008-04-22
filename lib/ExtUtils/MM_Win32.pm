@@ -46,10 +46,10 @@ my $GCC     = %Config{'cc'} =~ m/^gcc/i ? 1 : 0;
 sub dlsyms {
     my($self,%attribs) = @_;
 
-    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || {};
+    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || \%();
+    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || \@();
+    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || \@();
+    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || \%();
     my(@m);
 
     if (not $self->{SKIPHASH}{'dynamic'}) {
@@ -152,7 +152,7 @@ sub init_others {
     my ($self) = @_;
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', ['-l']);
+    $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', \@('-l'));
     $self->{ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
 
     $self->{TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch';
@@ -430,7 +430,7 @@ for other Windows shells, I don't know.
 
 sub oneliner {
     my($self, $cmd, $switches) = @_;
-    $switches = [] unless defined $switches;
+    $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
     $cmd =~ s{^\n+}{};

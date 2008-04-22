@@ -28,11 +28,11 @@ BEGIN{ %ENV{LINES}=25; %ENV{COLUMNS}=80; }
 my $term = Term::ReadLine->new('test')
                 or diag "Could not create a new term. Dying", die;
 
-my $tmpl = {
+my $tmpl = \%(
         prompt  => "What is your favourite colour?",
-        choices => [qw|blue red green|],
+        choices => \@(qw|blue red green|),
         default => 'blue',
-    };
+    );
 
 {
     my $args = \%{ $tmpl };
@@ -48,19 +48,19 @@ my $tmpl = {
 }
 
 {
-    my $args = {
+    my $args = \%(
         prompt  => 'Do you like cookies?',
         default => 'y',
-    };
+    );
 
     is( $term->ask_yn( %$args ), 1, q[Asking yes/no with 'yes' as default] );
 }
 
 {
-    my $args = {
+    my $args = \%(
         prompt  => 'Do you like Python?',
         default => 'n',
-    };
+    );
 
     is( $term->ask_yn( %$args ), 0, q[Asking yes/no with 'no' as default] );
 }
@@ -68,9 +68,9 @@ my $tmpl = {
 
 # used to print: Use of uninitialized value in length at Term/UI.pm line 141.
 # [#13412]
-{   my $args = {
+{   my $args = \%(
         prompt  => 'Uninit warning on empty default',
-    };
+    );
     
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= @_[0]->message };
@@ -86,10 +86,10 @@ my $tmpl = {
  
 # used to print: Use of uninitialized value in string at Params/Check.pm
 # [#13412]
-{   my $args = {
+{   my $args = \%(
         prompt  => 'Undef warning on failing allow',
         allow   => sub { 0 },
-    };
+    );
     
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= "@_" };
@@ -109,7 +109,7 @@ my $tmpl = {
                 q[--option="some'thing" -one-dash -single=blah' foo bar-zot];
 
     my $munged = 'command foo bar-zot';
-    my $expected = {
+    my $expected = \%(
             foo         => 0,
             baz         => 1,
             bar         => 0,
@@ -117,7 +117,7 @@ my $tmpl = {
             option      => q[some'thing],
             'one-dash'  => 1,
             single      => q[blah'],
-    };
+    );
 
     my ($href,$rest) = $term->parse_options( $str );
 

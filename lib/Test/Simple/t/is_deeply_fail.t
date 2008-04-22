@@ -55,7 +55,7 @@ sub like ($$;$) {
 
 
 require Test::More;
-Test::More->import(tests => 11, import => ['is_deeply']);
+Test::More->import(tests => 11, import => \@('is_deeply'));
 
 my $Filename = quotemeta $0;
 
@@ -71,7 +71,7 @@ ERR
 
 
 #line 78
-ok !is_deeply({}, [], 'different types');
+ok !is_deeply(\%(), \@(), 'different types');
 is( $out, "not ok 2 - different types\n",   'different types' );
 like( $err, <<ERR,                          '   right diagnostic' );
 #   Failed test 'different types'
@@ -82,7 +82,7 @@ like( $err, <<ERR,                          '   right diagnostic' );
 ERR
 
 #line 88
-ok !is_deeply({ this => 42 }, { this => 43 }, 'hashes with different values');
+ok !is_deeply(\%( this => 42 ), \%( this => 43 ), 'hashes with different values');
 is( $out, "not ok 3 - hashes with different values\n", 
                                         'hashes with different values' );
 is( $err, <<ERR,                        '   right diagnostic' );
@@ -94,7 +94,7 @@ is( $err, <<ERR,                        '   right diagnostic' );
 ERR
 
 #line 99
-ok !is_deeply({ that => 42 }, { this => 42 }, 'hashes with different keys');
+ok !is_deeply(\%( that => 42 ), \%( this => 42 ), 'hashes with different keys');
 is( $out, "not ok 4 - hashes with different keys\n",
                                         'hashes with different keys' );
 is( $err, <<ERR,                        '    right diagnostic' );
@@ -106,7 +106,7 @@ is( $err, <<ERR,                        '    right diagnostic' );
 ERR
 
 #line 110
-ok !is_deeply([1..9], [1..10],    'arrays of different length');
+ok !is_deeply(\@(1..9), \@(1..10),    'arrays of different length');
 is( $out, "not ok 5 - arrays of different length\n",
                                         'arrays of different length' );
 is( $err, <<ERR,                        '    right diagnostic' );
@@ -118,7 +118,7 @@ is( $err, <<ERR,                        '    right diagnostic' );
 ERR
 
 #line 121
-ok !is_deeply([undef, undef], [undef], 'arrays of undefs' );
+ok !is_deeply(\@(undef, undef), \@(undef), 'arrays of undefs' );
 is( $out, "not ok 6 - arrays of undefs\n",  'arrays of undefs' );
 is( $err, <<ERR,                            '    right diagnostic' );
 #   Failed test 'arrays of undefs'
@@ -129,7 +129,7 @@ is( $err, <<ERR,                            '    right diagnostic' );
 ERR
 
 #line 131
-ok !is_deeply({ foo => undef }, {},    'hashes of undefs' );
+ok !is_deeply(\%( foo => undef ), \%(),    'hashes of undefs' );
 is( $out, "not ok 7 - hashes of undefs\n",  'hashes of undefs' );
 is( $err, <<ERR,                            '    right diagnostic' );
 #   Failed test 'hashes of undefs'
@@ -151,7 +151,7 @@ is( $err, <<ERR,                        '    right diagnostic' );
 ERR
 
 #line 151
-ok !is_deeply([], \23,    'mixed scalar and array refs');
+ok !is_deeply(\@(), \23,    'mixed scalar and array refs');
 is( $out, "not ok 9 - mixed scalar and array refs\n",
                                         'mixed scalar and array refs' );
 like( $err, <<ERR,                      '    right diagnostic' );
@@ -187,15 +187,15 @@ ERR
 # $b2 = { foo => \$b3 };
 # is_deeply([$a1], [$b1], 'deep mixed scalar refs');
 
-my $foo = {
-           this => [1..10],
-           that => { up => "down", left => "right" },
-          };
+my $foo = \%(
+           this => \@(1..10),
+           that => \%( up => "down", left => "right" ),
+          );
 
-my $bar = {
-           this => [1..10],
-           that => { up => "down", left => "right", foo => 42 },
-          };
+my $bar = \%(
+           this => \@(1..10),
+           that => \%( up => "down", left => "right", foo => 42 ),
+          );
 
 #line 198
 ok !is_deeply( $foo, $bar, 'deep structures' );
@@ -211,9 +211,9 @@ ERR
 
 
 #line 221
-my @tests = ([],
-             [qw(42)],
-             [qw(42 23), qw(42 23)]
+my @tests = (\@(),
+             \@(qw(42)),
+             \@(qw(42 23), qw(42 23))
             );
 
 foreach my $test (@tests) {
@@ -230,26 +230,26 @@ foreach my $test (@tests) {
 
 #line 240
 # [rt.cpan.org 6837]
-ok !is_deeply([{Foo => undef}],[{Foo => ""}]), 'undef != ""';
+ok !is_deeply(\@(\%(Foo => undef)),\@(\%(Foo => ""))), 'undef != ""';
 ok( @Test::More::Data_Stack == 0, '@Data_Stack not holding onto things' );
 
 
 #line 258
 # [rt.cpan.org 7031]
-my $a = [];
+my $a = \@();
 ok !is_deeply($a, dump::view($a).''),       "don't compare refs like strings";
-ok !is_deeply([$a], [dump::view($a).'']),   "  even deep inside";
+ok !is_deeply(\@($a), \@(dump::view($a).'')),   "  even deep inside";
 
 
 #line 265
 # [rt.cpan.org 7030]
-ok !is_deeply( {}, {key => []} ),  '[] could match non-existent values';
-ok !is_deeply( [], [[]] );
+ok !is_deeply( \%(), \%(key => \@()) ),  '[] could match non-existent values';
+ok !is_deeply( \@(), \@(\@()) );
 
 
 #line 273
 $$err = $$out = '';
-ok !is_deeply( [\'a', 'b'], [\'a', 'c'] );
+ok !is_deeply( \@(\'a', 'b'), \@(\'a', 'c') );
 is( $out, "not ok 20\n",  'scalar refs in an array' );
 is( $err, <<ERR,        '    right diagnostic' );
 #   Failed test at $0 line 274.
@@ -281,7 +281,7 @@ is( $err, <<ERR,        '  right diagnostic');
 ERR
 
 #line 306
-ok !is_deeply( undef, [] );
+ok !is_deeply( undef, \@() );
 is( $out, "not ok 23\n", 'is_deeply and undef [RT 9441]' );
 like( $err, <<ERR,	 '  right diagnostic' );
 #   Failed test at $Filename line 306\\.
@@ -293,8 +293,8 @@ ERR
 
 # rt.cpan.org 8865
 {
-    my $array = [];
-    my $hash  = {};
+    my $array = \@();
+    my $hash  = \%();
 
 #line 321
     ok !is_deeply( $array, $hash );
@@ -307,7 +307,7 @@ ERR
 ERR
 
 #line 332
-    ok !is_deeply( [$array], [$hash] );
+    ok !is_deeply( \@($array), \@($hash) );
     is( $out, "not ok 25\n", 'nested different ref types' );
     is( $err, <<ERR,	     '  right diagnostic' );
 #   Failed test at $0 line 332.
@@ -318,8 +318,8 @@ ERR
 
 
     if( eval { require overload } ) {
-	my $foo = bless [], "Foo";
-	my $bar = bless {}, "Bar";
+	my $foo = bless \@(), "Foo";
+	my $bar = bless \%(), "Bar";
 
 	{
 	    package Bar;
@@ -327,7 +327,7 @@ ERR
 	}
 
 #line 353
-	ok !is_deeply( [$foo], [$bar] );
+	ok !is_deeply( \@($foo), \@($bar) );
 	is( $out, "not ok 26\n", 'string overloaded refs respected in diag' );
 	is( $err, <<ERR,	     '  right diagnostic' );
 #   Failed test at $0 line 353.

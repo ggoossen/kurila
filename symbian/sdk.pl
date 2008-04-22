@@ -77,7 +77,7 @@ if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Series60' && %ENV{WIN} eq 'winscw') {
 %ENV{UREL} = $UREL;
 %ENV{UARM} = $UARM;
 
-[ $SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION ];
+\@( $SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION );
 
 # The following is a cheat sheet for the right S60/S80 SDK settings.
 #

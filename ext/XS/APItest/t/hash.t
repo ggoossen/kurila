@@ -80,9 +80,9 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
 }
 
 {
-    is_deeply([&XS::APItest::Hash::test_hv_free_ent], [2,2,1,1],
+    is_deeply(\@(&XS::APItest::Hash::test_hv_free_ent), \@(2,2,1,1),
 	      "hv_free_ent frees the value immediately");
-    is_deeply([&XS::APItest::Hash::test_hv_delayfree_ent], [2,2,2,1],
+    is_deeply(\@(&XS::APItest::Hash::test_hv_delayfree_ent), \@(2,2,2,1),
 	      "hv_delayfree_ent keeps the value around until FREETMPS");
 }
 
@@ -92,8 +92,8 @@ foreach my $in ("", "N", "a\0b") {
 }
 
 {
-    foreach ([\&XS::APItest::Hash::rot13_hash, \&rot13, "rot 13"],
-	     [\&XS::APItest::Hash::bitflip_hash, \&bitflip, "bitflip"],
+    foreach (\@(\&XS::APItest::Hash::rot13_hash, \&rot13, "rot 13"),
+	     \@(\&XS::APItest::Hash::bitflip_hash, \&bitflip, "bitflip"),
 	    ) {
 	my ($setup, $mapping, $name) = @$_;
 	my %hash;
@@ -101,14 +101,14 @@ foreach my $in ("", "N", "a\0b") {
 	$setup->(\%hash);
 	%hash{a}++; %hash{[qw(p i e)]} = (2, 4, 8);
 
-	test_U_hash(\%hash, \%placebo, [f => 9, g => 10, h => 11], $mapping,
+	test_U_hash(\%hash, \%placebo, \@(f => 9, g => 10, h => 11), $mapping,
 		    $name);
     }
 	    my (%hash, %placebo);
 	    XS::APItest::Hash::bitflip_hash(\%hash);
-	    foreach my $new (["7", 65, 67, 80],
-			     ["8", 163, 171, 215],
-			     ["U", 2603, 2604, 2604],
+	    foreach my $new (\@("7", 65, 67, 80),
+			     \@("8", 163, 171, 215),
+			     \@("U", 2603, 2604, 2604),
 			    ) {
 		foreach my $code (78, 240, 256, 1336) {
 		    my $key = chr $code;
@@ -218,21 +218,21 @@ sub test_U_hash {
     ok (!XS::APItest::Hash::exists($hash, $mapping->($victim)),
 	"exists (missing)");
 
-    is (XS::APItest::Hash::common({hv => $hash, keysv => $victim}),
+    is (XS::APItest::Hash::common(\%(hv => $hash, keysv => $victim)),
 	$placebo->{$victim}, "common (fetch)");
-    is (XS::APItest::Hash::common({hv => $hash, keypv => $victim}),
+    is (XS::APItest::Hash::common(\%(hv => $hash, keypv => $victim)),
 	$placebo->{$victim}, "common (fetch pv)");
-    is (XS::APItest::Hash::common({hv => $hash, keysv => $victim,
-				   action => XS::APItest::HV_DISABLE_UVAR_XKEY}),
+    is (XS::APItest::Hash::common(\%(hv => $hash, keysv => $victim,
+				   action => XS::APItest::HV_DISABLE_UVAR_XKEY)),
 	undef, "common (fetch) missing");
-    is (XS::APItest::Hash::common({hv => $hash, keypv => $victim,
-				   action => XS::APItest::HV_DISABLE_UVAR_XKEY}),
+    is (XS::APItest::Hash::common(\%(hv => $hash, keypv => $victim,
+				   action => XS::APItest::HV_DISABLE_UVAR_XKEY)),
 	undef, "common (fetch pv) missing");
-    is (XS::APItest::Hash::common({hv => $hash, keysv => $mapping->($victim),
-				   action => XS::APItest::HV_DISABLE_UVAR_XKEY}),
+    is (XS::APItest::Hash::common(\%(hv => $hash, keysv => $mapping->($victim),
+				   action => XS::APItest::HV_DISABLE_UVAR_XKEY)),
 	$placebo->{$victim}, "common (fetch) missing mapped");
-    is (XS::APItest::Hash::common({hv => $hash, keypv => $mapping->($victim),
-				   action => XS::APItest::HV_DISABLE_UVAR_XKEY}),
+    is (XS::APItest::Hash::common(\%(hv => $hash, keypv => $mapping->($victim),
+				   action => XS::APItest::HV_DISABLE_UVAR_XKEY)),
 	$placebo->{$victim}, "common (fetch pv) missing mapped");
 }
 
@@ -246,7 +246,7 @@ sub main_tests {
     main_test_inner ($key, $lckey, $unikey, $keys, $description);
 
     main_test_inner ($key, $lckey, $unikey, $keys,
-		     $description . ' [key utf8 on]');
+		     $description . ' \@(key utf8 on)');
   }
 }
 
@@ -256,8 +256,8 @@ sub main_test_inner {
   perform_test (\&test_fetch_present, $key, $keys, $description);
   perform_test (\&test_delete_present, $key, $keys, $description);
 
-  perform_test (\&test_store, $key, $keys, $description, [a=>'cheat']);
-  perform_test (\&test_store, $key, $keys, $description, []);
+  perform_test (\&test_store, $key, $keys, $description, \@(a=>'cheat'));
+  perform_test (\&test_store, $key, $keys, $description, \@());
 
   perform_test (\&test_absent, $lckey, $keys, $description);
   perform_test (\&test_fetch_absent, $lckey, $keys, $description);
@@ -304,18 +304,18 @@ sub test_absent {
 sub test_delete_present {
   my ($hash, $key, $printable, $message) = @_;
 
-  my $copy = {};
+  my $copy = \%();
   my $class = tied %$hash;
   if (defined $class) {
     tie %$copy, ref $class;
   }
-  $copy = {%$hash};
+  $copy = \%(%$hash);
   ok (brute_force_exists ($copy, $key),
       "hv_delete_ent present$message $printable");
   is (delete $copy->{$key}, $key, "hv_delete_ent present$message $printable");
   ok (!brute_force_exists ($copy, $key),
       "hv_delete_ent present$message $printable");
-  $copy = {%$hash};
+  $copy = \%(%$hash);
   ok (brute_force_exists ($copy, $key),
       "hv_delete present$message $printable");
   is (XS::APItest::Hash::delete ($copy, $key), $key,
@@ -327,14 +327,14 @@ sub test_delete_present {
 sub test_delete_absent {
   my ($hash, $key, $printable, $message) = @_;
 
-  my $copy = {};
+  my $copy = \%();
   my $class = tied %$hash;
   if (defined $class) {
     tie %$copy, ref $class;
   }
-  $copy = {%$hash};
+  $copy = \%(%$hash);
   is (delete $copy->{$key}, undef, "hv_delete_ent absent$message $printable");
-  $copy = {%$hash};
+  $copy = \%(%$hash);
   is (XS::APItest::Hash::delete ($copy, $key), undef,
       "hv_delete absent$message $printable");
 }
@@ -351,8 +351,8 @@ sub test_store {
   # It's important to do this with nice new hashes created each time round
   # the loop, rather than hashes in the pad, which get recycled, and may have
   # xhv_array non-NULL
-  my $h1 = {@$defaults};
-  my $h2 = {@$defaults};
+  my $h1 = \%(@$defaults);
+  my $h2 = \%(@$defaults);
   if (defined $class) {
     tie %$h1, ref $class;
     tie %$h2, ref $class;

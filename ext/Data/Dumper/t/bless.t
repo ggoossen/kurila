@@ -17,10 +17,10 @@ foreach $Data::Dumper::Useperl (0, 1) {
 #diag("\$Data::Dumper::Useperl = $Data::Dumper::Useperl");
 
 {
-my $t = bless( {}, q{a'b} );
+my $t = bless( \%(), q{a'b} );
 my $dt = Dumper($t);
 my $o = <<'PERL';
-$VAR1 = bless( {}, "a'b" );
+$VAR1 = bless( \%(), "a'b" );
 PERL
 
 is($dt, $o, "package name in bless is escaped if needed (useperl=$Data::Dumper::Useperl)");
@@ -28,10 +28,10 @@ is_deeply(scalar eval($dt), $t, "eval reverts dump");
 }
 
 {
-my $t = bless( {}, q{a\} );
+my $t = bless( \%(), q{a\} );
 my $dt = Dumper($t);
 my $o = <<'PERL';
-$VAR1 = bless( {}, "a\\" );
+$VAR1 = bless( \%(), "a\\" );
 PERL
 
 is($dt, $o, "package name in bless is escaped if needed");

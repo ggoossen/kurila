@@ -66,32 +66,18 @@ WriteMakefile(
     VERSION_FROM => 'lib/Compress/Raw/Zlib.pm',
     INC          => "-I$ZLIB_INCLUDE" ,
     DEFINE       => "$OLD_ZLIB $WALL -DGZIP_OS_CODE=$GZIP_OS_CODE $USE_PPPORT_H" ,
-    XS           => { 'Zlib.xs' => 'Zlib.c'},
-    'depend'     => { 'Makefile'   => 'config.in' },
-    'clean'      => { FILES        => '*.c constants.h constants.xs' },
-    'dist'       => { COMPRESS     => 'gzip', 
-                      TARFLAGS     => '-chvf',
-                      SUFFIX       => 'gz',
-                      DIST_DEFAULT => 'MyTrebleCheck tardist',
-                    },
-
-    (
-      %ENV{SKIP_FOR_CORE}
-        ? (MAN3PODS    => {})
-        : ()
-    ),
-       
+    XS           => \%( 'Zlib.xs' => 'Zlib.c'),
+    'depend'     => \%( 'Makefile'   => 'config.in' ),
+    'clean'      => \%( FILES        => '*.c constants.h constants.xs' ),
 
     (
       $BUILD_ZLIB
         ? zlib_files($ZLIB_LIB)
-        : (LIBS => [ "-L$ZLIB_LIB -lz " ])
+        : (LIBS => \@( "-L$ZLIB_LIB -lz " ))
     ),
       
-    (
-     (ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
-      AUTHOR       => 'Paul Marquess <pmqs@cpan.org>')
-    ),
+    ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
+    AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
     INSTALLDIRS => ('perl'),
     LICENSE  => 'perl',
@@ -164,7 +150,7 @@ require ExtUtils::Constant;
             "\t$missing\n" ;
     }
     
-    push @names, {name => 'ZLIB_VERSION', type => 'PV' };
+    push @names, \%( name => 'ZLIB_VERSION', type => 'PV' );
 
     ExtUtils::Constant::WriteConstants(
                                        NAME => 'Compress::Raw::Zlib',
@@ -320,7 +306,7 @@ sub zlib_files
     
     return (
         #'H'         =>  [ @h_files ],
-    	'C'         =>  [ @c_files ] ,
+    	'C'         =>  \@( @c_files ) ,
         #'OBJECT'    => qq[ @o_files ],
         'OBJECT'    => q[ $(O_FILES) ],
         
@@ -335,26 +321,26 @@ use vars qw ( @GZIP_OS_Names  %OSnames) ;
 BEGIN
 {
   @GZIP_OS_Names = (
-    [ ''        => 0,    'MS-DOS'                       ],
-    [ 'amigaos' => 1,    'Amiga'                        ],
-    [ 'VMS'     => 2,    'VMS'                          ],
-    [ ''        => 3,    'Unix/Default'                 ],
-    [ ''        => 4,    'VM/CMS'                       ],
-    [ ''        => 5,    'Atari TOS'                    ],
-    [ 'os2'     => 6,    'HPFS (OS/2, NT)'              ],
-    [ 'MacOS'   => 7,    'Macintosh'                    ],
-    [ ''        => 8,    'Z-System'                     ],
-    [ ''        => 9,    'CP/M'                         ],
-    [ ''        => 10,   'TOPS-20'                      ],
-    [ ''        => 11,   'NTFS (NT)'                    ],
-    [ ''        => 12,   'SMS QDOS'                     ],
-    [ ''        => 13,   'Acorn RISCOS'                 ],
-    [ 'MSWin32' => 14,   'VFAT file system (Win95, NT)' ],
-    [ ''        => 15,   'MVS'                          ],
-    [ 'beos'    => 16,   'BeOS'                         ],
-    [ ''        => 17,   'Tandem/NSK'                   ],
-    [ ''        => 18,   'THEOS'                        ],
-    [ ''        => 255,  'Unknown OS'                   ],
+    \@( ''        => 0,    'MS-DOS'                       ),
+    \@( 'amigaos' => 1,    'Amiga'                        ),
+    \@( 'VMS'     => 2,    'VMS'                          ),
+    \@( ''        => 3,    'Unix/Default'                 ),
+    \@( ''        => 4,    'VM/CMS'                       ),
+    \@( ''        => 5,    'Atari TOS'                    ),
+    \@( 'os2'     => 6,    'HPFS (OS/2, NT)'              ),
+    \@( 'MacOS'   => 7,    'Macintosh'                    ),
+    \@( ''        => 8,    'Z-System'                     ),
+    \@( ''        => 9,    'CP/M'                         ),
+    \@( ''        => 10,   'TOPS-20'                      ),
+    \@( ''        => 11,   'NTFS (NT)'                    ),
+    \@( ''        => 12,   'SMS QDOS'                     ),
+    \@( ''        => 13,   'Acorn RISCOS'                 ),
+    \@( 'MSWin32' => 14,   'VFAT file system (Win95, NT)' ),
+    \@( ''        => 15,   'MVS'                          ),
+    \@( 'beos'    => 16,   'BeOS'                         ),
+    \@( ''        => 17,   'Tandem/NSK'                   ),
+    \@( ''        => 18,   'THEOS'                        ),
+    \@( ''        => 255,  'Unknown OS'                   ),
   );
 
   %OSnames = map { @$_[1] => @$_[2] }  

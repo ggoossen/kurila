@@ -63,7 +63,7 @@ print "ok $ord\n";
 
 {				# Check calling STORE
   my $sc = 0;
-  sub B::TIESCALAR {bless [11], 'B'}
+  sub B::TIESCALAR {bless \@(11), 'B'}
   sub B::FETCH { -(shift->[0]) }
   sub B::STORE { $sc++; my $o = shift; $o->[0] = 17 + shift }
 

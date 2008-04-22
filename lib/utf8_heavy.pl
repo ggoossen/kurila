@@ -216,7 +216,7 @@ sub SWASHNEW_real {
 	$list = join '',
 	    map  { $_->[1] }
 	    sort { $a->[0] <+> $b->[0] }
-	    map  { m/^([0-9a-fA-F]+)/; [ CORE::hex($1), $_ ] }
+	    map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) }
 	    grep { m/^([0-9a-fA-F]+)/ and not %seen{$1}++ } @tmp; # XXX doesn't do ranges right
     }
 
@@ -268,14 +268,14 @@ sub SWASHNEW_real {
 
     print STDERR "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG;
 
-    my $SWASH = bless {
+    my $SWASH = bless \%(
 	TYPE => $type,
 	BITS => $bits,
 	EXTRAS => $extras,
 	LIST => $list,
 	NONE => $none,
 	@extras,
-    } => $class;
+    ) => $class;
 
     if ($file) {
         %Cache{$class, $file} = $SWASH;

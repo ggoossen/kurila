@@ -84,7 +84,7 @@ sub new {
   my $self = $class->SUPER::new(@_);
   die "Couldn't construct for $class" unless $self;
 
-  $self->{'token_buffer'} ||= [];
+  $self->{'token_buffer'} ||= \@();
   $self->{'start_token_class'} ||= 'Pod::Simple::PullParserStartToken';
   $self->{'text_token_class'}  ||= 'Pod::Simple::PullParserTextToken';
   $self->{'end_token_class'}   ||= 'Pod::Simple::PullParserEndToken';

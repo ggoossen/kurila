@@ -22,11 +22,11 @@ EOD
 
 (my $data2 = $data) =~ s/\n/\n\n/g;
 
-my $t1 = { data => $data,  write_c => [1,2,length $data],  read_c => [1,2,3,length $data]};
-my $t2 = { data => $data2, write_c => [1,2,length $data2], read_c => [1,2,3,length $data2]};
+my $t1 = \%( data => $data,  write_c => \@(1,2,length $data),  read_c => \@(1,2,3,length $data));
+my $t2 = \%( data => $data2, write_c => \@(1,2,length $data2), read_c => \@(1,2,3,length $data2));
 
-$_->{write_c} = [1..length($_->{data})],
-  $_->{read_c} = [1..length($_->{data})+1, 0xe000]  # Need <0xffff for REx
+$_->{write_c} = \@(1..length($_->{data})),
+  $_->{read_c} = \@(1..length($_->{data})+1, 0xe000)  # Need <0xffff for REx
     for (); # $t1, $t2;
 
 my $c;	# len write tests, for each: one _all test, and 3 each len+2

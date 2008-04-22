@@ -32,7 +32,7 @@ ExtUtils::Install - install files from here to there
 
   uninstall($packlist);
 
-  pm_to_blib({ 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' });
+  pm_to_blib(\%( 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' ));
     
 =head1 VERSION
 
@@ -266,7 +266,7 @@ sub _unlink_or_rename { #XXX OS-SPECIFIC
         # IOW, if we cant delete the renamed file at reboot its
         # not the end of the world. The other cases are more serious
         # and need to be fatal.
-        _move_file_at_boot( $tmp, [], $installing );
+        _move_file_at_boot( $tmp, \@(), $installing );
         return $file;
     } elsif ( $installing ) {
         _warnonce("Rename failed: $!. Scheduling '$tmp'\nfor".
@@ -299,7 +299,7 @@ sub _get_install_skip {
     if (%ENV{EU_INSTALL_IGNORE_SKIP}) {
         print "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
-        return [];
+        return \@();
     }
     if ( ! defined $skip ) {
         print "Looking for install skip list\n"
@@ -328,7 +328,7 @@ sub _get_install_skip {
             $skip= \@patterns;
         } else {
             warn "Can't read skip file:'$skip':$!\n";
-            $skip=[];
+            $skip=\@();
         }
     } elsif ( UNIVERSAL::isa($skip,'ARRAY') ) {
         print "Using array for skip list\n"
@@ -336,9 +336,9 @@ sub _get_install_skip {
     } elsif ($verbose) {
         print "No skip list found.\n"
             if $verbose+>1;
-        $skip= [];
+        $skip= \@();
     }
-    warn "Got @{[0+@$skip]} skip patterns.\n"
+    warn "Got @{\@(0+@$skip)} skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
@@ -677,7 +677,7 @@ sub install { #XXX OS-SPECIFIC
         $result         = %opts{result};
     }
     
-    $result ||= {};
+    $result ||= \%();
     $verbose ||= 0;
     $dry_run  ||= 0;
 
@@ -766,11 +766,11 @@ sub install { #XXX OS-SPECIFIC
                 unless -w $targetfile;
             
             push @found_files,
-                [ $diff, $File::Find::dir, $origfile,
+                \@( $diff, $File::Find::dir, $origfile,
                   $mode, $size, $atime, $mtime,
                   $targetdir, $targetfile, $sourcedir, $sourcefile,
                   
-                ];  
+                );  
             #restore the original directory we were in when File::Find
             #called us so that it doesnt get horribly confused.
             _chdir($save_cwd);                
@@ -971,7 +971,7 @@ sub install_default {
   my $INST_SCRIPT = File::Spec->catdir($Curdir,'blib','script');
   my $INST_MAN1DIR = File::Spec->catdir($Curdir,'blib','man1');
   my $INST_MAN3DIR = File::Spec->catdir($Curdir,'blib','man3');
-  install({
+  install(\%(
            read => "%Config{sitearchexp}/auto/$FULLEXT/.packlist",
            write => "%Config{installsitearch}/auto/$FULLEXT/.packlist",
            $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ?
@@ -982,7 +982,7 @@ sub install_default {
            $INST_SCRIPT => %Config{installscript},
            $INST_MAN1DIR => %Config{installman1dir},
            $INST_MAN3DIR => %Config{installman3dir},
-          },1,0,0);
+          ),1,0,0);
 }
 
 
@@ -1201,7 +1201,7 @@ sub pm_to_blib {
 
 package ExtUtils::Install::Warn;
 
-sub new { bless {}, shift }
+sub new { bless \%(), shift }
 
 sub add {
     my($self,$file,$targetfile) = @_;

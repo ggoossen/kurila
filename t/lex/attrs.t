@@ -162,8 +162,8 @@ like $@->message, qr/Can't declare scalar dereference in "my"/;
 my @code = qw(locked method);
 my @other = qw(shared unique);
 my %valid;
-%valid{CODE} = {map {$_ => 1} @code};
-%valid{SCALAR} = {map {$_ => 1} @other};
+%valid{CODE} = \%(map {$_ => 1} @code);
+%valid{SCALAR} = \%(map {$_ => 1} @other);
 %valid{ARRAY} = %valid{HASH} = %valid{SCALAR};
 
 our ($scalar, @array, %hash);

@@ -167,7 +167,7 @@ foreach my $argv (@ARGV) {
 	next;
     }
     print "Reading $in...\n" if $::opt_v and @ARGV +> 1;
-    $ls = %ls{$in} ||= { is_in => 1, in => $in };
+    $ls = %ls{$in} ||= \%( is_in => 1, in => $in );
     my $type;
     while ( ~< *F) {
 	unless (m/^([-+*]{3}) / || m/^(Index):/) {
@@ -231,15 +231,15 @@ foreach my $argv (@ARGV) {
 	}
 	if (open CHIP, "<","$dir/from") {
 	    chop($chip = ~< *CHIP);
-	    $ls->{From} = { $chip => 1 };
+	    $ls->{From} = \%( $chip => 1 );
 	    $is_chip = 1;
 	}
 	if (open CHIP, "<","$dir/tag") {
 	    chop($chip = ~< *CHIP);
-	    $ls->{Title} = { $chip => 1 };
+	    $ls->{Title} = \%( $chip => 1 );
 	    $is_chip = 1;
 	}
-	$ls->{From} = { "Chip Salzenberg" => 1 } if $is_chip && !$ls->{From};
+	$ls->{From} = \%( "Chip Salzenberg" => 1 ) if $is_chip && !$ls->{From};
     }
 
     # if we don't have a title for -m then use the file name
@@ -247,7 +247,7 @@ foreach my $argv (@ARGV) {
 	and !$ls->{Title} and $ls->{out};
 
     $ls->{category} = $::opt_c
-	? categorize_files([keys %{ $ls->{out} }], $::opt_v) : '';
+	? categorize_files(\@(keys %{ $ls->{out} }), $::opt_v) : '';
 }
 print scalar(@ARGV)." files read.\n" if $::opt_v and @ARGV +> 1;
 
@@ -385,11 +385,11 @@ sub add_patched_file {
     warn "$out patched but not present\n" if $::opt_e && !-f $out;
 
     # do the -i inverse as well, even if we're not doing -i
-    my $i = %ls{$out} ||= {
+    my $i = %ls{$out} ||= \%(
 	is_out   => 1,
 	in       => $out,
-	category => $::opt_c ? categorize_files([ $out ], $::opt_v) : '',
-    };
+	category => $::opt_c ? categorize_files(\@( $out ), $::opt_v) : '',
+    );
     $i->{out}->{$in} = 1;
 }
 

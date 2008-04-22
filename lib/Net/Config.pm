@@ -18,13 +18,13 @@ $VERSION = "1.11";
 eval { require Net::LocalCfg };
 
 %NetConfig = (
-  nntp_hosts      => [],
-  snpp_hosts      => [],
-  pop3_hosts      => [],
-  smtp_hosts      => [],
-  ph_hosts        => [],
-  daytime_hosts   => [],
-  time_hosts      => [],
+  nntp_hosts      => \@(),
+  snpp_hosts      => \@(),
+  pop3_hosts      => \@(),
+  smtp_hosts      => \@(),
+  ph_hosts        => \@(),
+  daytime_hosts   => \@(),
+  time_hosts      => \@(),
   inet_domain     => undef,
   ftp_firewall    => undef,
   ftp_ext_passive => 1,
@@ -79,7 +79,7 @@ if ($< == $> and !$CONFIGURE) {
 }
 my ($k, $v);
 while (($k, $v) = each %NetConfig) {
-  %NetConfig{$k} = [$v]
+  %NetConfig{$k} = \@($v)
     if ($k =~ m/_hosts$/ and $k ne "test_hosts" and defined($v) and !ref($v));
 }
 
@@ -98,7 +98,7 @@ sub requires_firewall {
   if (exists %NetConfig{'local_netmask'}) {
     my $quad = unpack("N", pack("C*", split(m/\./, $host)));
     my $list = %NetConfig{'local_netmask'};
-    $list = [$list] unless ref($list);
+    $list = \@($list) unless ref($list);
     foreach (@$list) {
       my ($net, $bits) = (m#^(\d+\.\d+\.\d+\.\d+)/(\d+)$#) or next;
       my $mask = ^~^0 << (32 - $bits);

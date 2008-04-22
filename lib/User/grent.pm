@@ -7,7 +7,7 @@ BEGIN {
     use Exporter   ();
     @EXPORT      = qw(getgrent getgrgid getgrnam getgr);
     @EXPORT_OK   = qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members);
-    %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
 }
 use vars      @EXPORT_OK;
 
@@ -15,12 +15,12 @@ use vars      @EXPORT_OK;
 sub import { goto &Exporter::import }
 
 use Class::Struct qw(struct);
-struct 'User::grent' => [
+struct 'User::grent' => \@(
     name    => '$',
     passwd  => '$',
     gid	    => '$',
     members => '@',
-];
+);
 
 sub populate (@) {
     return unless @_;

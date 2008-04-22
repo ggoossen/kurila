@@ -74,10 +74,10 @@ is($y, "c 20");
 eval 'local($$e)';
 like($@->{description}, qr/Can't localize through a reference/);
 
-eval '$e = []; local(@$e)';
+eval '$e = \@(); local(@$e)';
 like($@->{description}, qr/Can't localize through a reference/);
 
-eval '$e = {}; local(%$e)';
+eval '$e = \%(); local(%$e)';
 like($@->{description}, qr/Can't localize through a reference/);
 
 # Array and hash elements
@@ -142,7 +142,7 @@ is($m, 5);
 # see if localization works on tied arrays
 {
     package TA;
-    sub TIEARRAY { bless [], @_[0] }
+    sub TIEARRAY { bless \@(), @_[0] }
     sub STORE { print "# STORE [{dump::view(\@_)}]\n"; @_[0]->[@_[1]] = @_[2] }
     sub FETCH { my $v = @_[0]->[@_[1]]; print "# FETCH [{dump::view(\@_)}=$v]\n"; $v }
     sub CLEAR { print "# CLEAR [{dump::view(\@_)}]\n"; @{@_[0]} = (); }
@@ -171,7 +171,7 @@ ok(!defined @a[0]);
 
 {
     package TH;
-    sub TIEHASH { bless {}, @_[0] }
+    sub TIEHASH { bless \%(), @_[0] }
     sub STORE { print "# STORE [{dump::view(\@_)}]\n"; @_[0]->{@_[1]} = @_[2] }
     sub FETCH { my $v = @_[0]->{@_[1]}; print "# FETCH [{dump::view(\@_)}=$v]\n"; $v }
     sub EXISTS { print "# EXISTS [{dump::view(\@_)}]\n"; exists @_[0]->{@_[1]}; }
@@ -413,7 +413,7 @@ is($@, "");
 
 {
     my $x;
-    my $y = bless [], 'X39012';
+    my $y = bless \@(), 'X39012';
     sub X39012::DESTROY { $x++ }
     sub { local @_[0]; shift }->($y);
     ok(!$x,  '[perl #39012]');

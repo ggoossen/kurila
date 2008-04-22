@@ -230,8 +230,8 @@ Use of uninitialized value within %mh in sin at - line 13.
 ########
 use warnings 'uninitialized';
 my (@mat, %mht, $v);
-sub X::TIEARRAY { bless [], 'X' }
-sub X::TIEHASH { bless [], 'X' }
+sub X::TIEARRAY { bless \@(), 'X' }
+sub X::TIEHASH { bless \@(), 'X' }
 sub X::FETCH { undef }
 tie @mat, 'X';
 tie %mht, 'X';
@@ -582,7 +582,7 @@ our ($g1);
 
 $v = *global1{$m1};
 $v = prototype $g1;
-$v = bless [], $g1;
+$v = bless \@(), $g1;
 $v = `$m1`;
 
 $v = $m1 . $g1;
@@ -978,7 +978,7 @@ my @a;
 @a = splice @a, $m1, $g1;
 $v = 1 + splice @a, $m1, $g1;
 
-my $x = bless [], 'Z';
+my $x = bless \@(), 'Z';
 eval { $x->?$m1() };
 
 eval { &$m1() };

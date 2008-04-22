@@ -4,8 +4,8 @@ use Perl6::Form;
 @proc = (1..3);
 
 print form
-	 {tfill=>'[done]', bfill=>'[unallocated]'},
+	 \%(tfill=>'[done]', bfill=>'[unallocated]'),
 	 'Task                Processor',
-	 {under=>'='},
+	 \%(under=>'='),
 	 '{[[[[[[[[[[[[[[}  {=IIIIIIIII=}',
 	 \@task,               \@proc;

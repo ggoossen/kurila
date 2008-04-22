@@ -62,5 +62,5 @@ example taken from: L<http://gauss.gwydiondylan.org/books/drm/drm_50.html>
 
 ok(eq_array(
     mro::get_linear_isa('Vulcan'),
-    [ qw(Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object) ]
+    \@( qw(Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object) )
 ), '... got the right MRO for the Vulcan Dylan Example');  

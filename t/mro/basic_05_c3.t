@@ -47,7 +47,7 @@ while building DBIx::Class. Thanks Matt!!!!
 
 ok(eq_array(
     mro::get_linear_isa('Diamond_D'),
-    [ qw(Diamond_D Diamond_C Diamond_B Diamond_A) ]
+    \@( qw(Diamond_D Diamond_C Diamond_B Diamond_A) )
 ), '... got the right MRO for Diamond_D');
 
 is(Diamond_D->foo, 

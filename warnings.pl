@@ -12,62 +12,62 @@ use strict ;
 sub DEFAULT_ON  () { 1 }
 sub DEFAULT_OFF () { 2 }
 
-my $tree = {
+my $tree = \%(
 
-'all' => [ 5.008, {
-	'io'		=> [ 5.008, { 	
-				'pipe' 		=> [ 5.008, DEFAULT_OFF],
-       				'unopened'	=> [ 5.008, DEFAULT_OFF],
-       				'closed'	=> [ 5.008, DEFAULT_OFF],
-       				'newline'	=> [ 5.008, DEFAULT_OFF],
-       				'exec'		=> [ 5.008, DEFAULT_OFF],
-       				'layer'		=> [ 5.008, DEFAULT_OFF],
-			   }],
-     	'syntax'	=> [ 5.008, { 	
-				'ambiguous'	=> [ 5.008, DEFAULT_OFF],
-			     	'semicolon'	=> [ 5.008, DEFAULT_OFF],
-			     	'precedence'	=> [ 5.008, DEFAULT_OFF],
-			     	'bareword'	=> [ 5.008, DEFAULT_OFF],
-			     	'reserved'	=> [ 5.008, DEFAULT_OFF],
-				'digit'		=> [ 5.008, DEFAULT_OFF],
-			     	'parenthesis'	=> [ 5.008, DEFAULT_OFF],
-       	 			'printf'	=> [ 5.008, DEFAULT_OFF],
-       	 			'prototype'	=> [ 5.008, DEFAULT_OFF],
-       	 			'qw'		=> [ 5.008, DEFAULT_OFF],
-			   }],
-       	'severe'	=> [ 5.008, { 	
-				'inplace'	=> [ 5.008, DEFAULT_ON],
-	 			'internal'	=> [ 5.008, DEFAULT_ON],
-         			'debugging'	=> [ 5.008, DEFAULT_ON],
-         			'malloc'	=> [ 5.008, DEFAULT_ON],
-	 		   }],
-        'deprecated'	=> [ 5.008, DEFAULT_OFF],
-       	'void'		=> [ 5.008, DEFAULT_OFF],
-       	'recursion'	=> [ 5.008, DEFAULT_OFF],
-       	'redefine'	=> [ 5.008, DEFAULT_OFF],
-       	'numeric'	=> [ 5.008, DEFAULT_OFF],
-        'uninitialized'	=> [ 5.008, DEFAULT_OFF],
-       	'once'		=> [ 5.008, DEFAULT_OFF],
-       	'misc'		=> [ 5.008, DEFAULT_OFF],
-       	'regexp'	=> [ 5.008, DEFAULT_OFF],
-       	'glob'		=> [ 5.008, DEFAULT_OFF],
-       	'untie'		=> [ 5.008, DEFAULT_OFF],
-	'substr'	=> [ 5.008, DEFAULT_OFF],
-	'taint'		=> [ 5.008, DEFAULT_OFF],
-	'signal'	=> [ 5.008, DEFAULT_OFF],
-	'closure'	=> [ 5.008, DEFAULT_OFF],
-	'overflow'	=> [ 5.008, DEFAULT_OFF],
-	'portable'	=> [ 5.008, DEFAULT_OFF],
-	'utf8'		=> [ 5.008, DEFAULT_OFF],
-       	'exiting'	=> [ 5.008, DEFAULT_OFF],
-       	'pack'		=> [ 5.008, DEFAULT_OFF],
-       	'unpack'	=> [ 5.008, DEFAULT_OFF],
-       	'threads'	=> [ 5.008, DEFAULT_OFF],
-       	'imprecision'	=> [ 5.011, DEFAULT_OFF],
+'all' => \@( 5.008, \%(
+	'io'		=> \@( 5.008, \%( 	
+				'pipe' 		=> \@( 5.008, DEFAULT_OFF),
+       				'unopened'	=> \@( 5.008, DEFAULT_OFF),
+       				'closed'	=> \@( 5.008, DEFAULT_OFF),
+       				'newline'	=> \@( 5.008, DEFAULT_OFF),
+       				'exec'		=> \@( 5.008, DEFAULT_OFF),
+       				'layer'		=> \@( 5.008, DEFAULT_OFF),
+			   )),
+     	'syntax'	=> \@( 5.008, \%( 	
+				'ambiguous'	=> \@( 5.008, DEFAULT_OFF),
+			     	'semicolon'	=> \@( 5.008, DEFAULT_OFF),
+			     	'precedence'	=> \@( 5.008, DEFAULT_OFF),
+			     	'bareword'	=> \@( 5.008, DEFAULT_OFF),
+			     	'reserved'	=> \@( 5.008, DEFAULT_OFF),
+				'digit'		=> \@( 5.008, DEFAULT_OFF),
+			     	'parenthesis'	=> \@( 5.008, DEFAULT_OFF),
+       	 			'printf'	=> \@( 5.008, DEFAULT_OFF),
+       	 			'prototype'	=> \@( 5.008, DEFAULT_OFF),
+       	 			'qw'		=> \@( 5.008, DEFAULT_OFF),
+			   )),
+       	'severe'	=> \@( 5.008, \%( 	
+				'inplace'	=> \@( 5.008, DEFAULT_ON),
+	 			'internal'	=> \@( 5.008, DEFAULT_ON),
+         			'debugging'	=> \@( 5.008, DEFAULT_ON),
+         			'malloc'	=> \@( 5.008, DEFAULT_ON),
+	 		   )),
+        'deprecated'	=> \@( 5.008, DEFAULT_OFF),
+       	'void'		=> \@( 5.008, DEFAULT_OFF),
+       	'recursion'	=> \@( 5.008, DEFAULT_OFF),
+       	'redefine'	=> \@( 5.008, DEFAULT_OFF),
+       	'numeric'	=> \@( 5.008, DEFAULT_OFF),
+        'uninitialized'	=> \@( 5.008, DEFAULT_OFF),
+       	'once'		=> \@( 5.008, DEFAULT_OFF),
+       	'misc'		=> \@( 5.008, DEFAULT_OFF),
+       	'regexp'	=> \@( 5.008, DEFAULT_OFF),
+       	'glob'		=> \@( 5.008, DEFAULT_OFF),
+       	'untie'		=> \@( 5.008, DEFAULT_OFF),
+	'substr'	=> \@( 5.008, DEFAULT_OFF),
+	'taint'		=> \@( 5.008, DEFAULT_OFF),
+	'signal'	=> \@( 5.008, DEFAULT_OFF),
+	'closure'	=> \@( 5.008, DEFAULT_OFF),
+	'overflow'	=> \@( 5.008, DEFAULT_OFF),
+	'portable'	=> \@( 5.008, DEFAULT_OFF),
+	'utf8'		=> \@( 5.008, DEFAULT_OFF),
+       	'exiting'	=> \@( 5.008, DEFAULT_OFF),
+       	'pack'		=> \@( 5.008, DEFAULT_OFF),
+       	'unpack'	=> \@( 5.008, DEFAULT_OFF),
+       	'threads'	=> \@( 5.008, DEFAULT_OFF),
+       	'imprecision'	=> \@( 5.011, DEFAULT_OFF),
 
        	 #'default'	=> [ 5.008, DEFAULT_ON ],
-  	}],
-} ;
+  	)),
+) ;
 
 ###########################################################################
 sub tab {
@@ -113,7 +113,7 @@ sub orderValues
     my $index = 0;
     foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
         foreach my $name (@{ %v_list{$ver} } ) {
-	    %ValueToName{ $index } = [ uc $name, $ver ] ;
+	    %ValueToName{ $index } = \@( uc $name, $ver ) ;
 	    %NameToValue{ uc $name } = $index ++ ;
         }
     }

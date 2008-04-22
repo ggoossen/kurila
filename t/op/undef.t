@@ -89,8 +89,8 @@ print $@->{description} =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n
 
 $test = 29;
 %hash = (
-    key1 => bless({}, 'X'),
-    key2 => bless({}, 'X'),
+    key1 => bless(\%(), 'X'),
+    key2 => bless(\%(), 'X'),
 );
 undef %hash;
 sub X::DESTROY {

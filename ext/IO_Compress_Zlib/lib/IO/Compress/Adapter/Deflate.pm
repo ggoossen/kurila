@@ -29,9 +29,9 @@ sub mkCompObject
     return (undef, "Cannot create Deflate object: $status", $status) 
         if $status != Z_OK;    
 
-    return bless {'Def'        => $def,
+    return bless \%('Def'        => $def,
                   'Error'      => '',
-                 } ;     
+                 ) ;     
 }
 
 sub compr

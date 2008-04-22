@@ -44,12 +44,12 @@ my %std_one = (
 
 sub one_char {
 	my ($newval, undef, $opts ) = @_;
-	$newval = [ $newval ] unless ref $newval eq 'ARRAY';
+	$newval = \@( $newval ) unless ref $newval eq 'ARRAY';
 	for (@$newval) {
 		die "Value for 'single' option must be single character (not '$_')"
 			if length() != 1;
 		$opts->{field} =
-			user_def([qr/\Q$_\E/, %std_one{$_}||'{[{1}[}'], 'single', $opts);
+			user_def(\@(qr/\Q$_\E/, %std_one{$_}||'{[{1}[}'), 'single', $opts);
 	}
 	return;
 }
@@ -70,8 +70,8 @@ sub pos_integer {
 sub strings_or_undef {
 	my ($val, $name) = @_;
 	my $type = ref $val;
-	if (!defined $val) { $val = [] }
-	elsif (!$type)     { $val = [ "$val" ] }
+	if (!defined $val) { $val = \@() }
+	elsif (!$type)     { $val = \@( "$val" ) }
 	die "Value for '$name' option must be string, array of strings, or undef (not $type)"
 			unless ref $val eq 'ARRAY';
 	return $val;
@@ -82,10 +82,10 @@ my $unlimited = ^~^0>>1;			# Ersatz infinity
 sub height_vals {
 	my ($vals) = @_;
 	my $type = ref $vals;
-	if (!defined $vals)      { $vals = {min=>0,     max=>$unlimited} }
+	if (!defined $vals)      { $vals = \%(min=>0,     max=>$unlimited) }
 	elsif (!$type && $vals eq 'minimal')
-						     { $vals = {min=>0, max=>$unlimited, minimal=>1} }
-	elsif (!$type) 		     { $vals = {min=>$vals, max=>$vals}     }
+						     { $vals = \%(min=>0, max=>$unlimited, minimal=>1) }
+	elsif (!$type) 		     { $vals = \%(min=>$vals, max=>$vals)     }
 	elsif ($type eq 'HASH')  { $vals->{min}||=0;
 							   defined $vals->{max} or $vals->{max}=$unlimited;
 							 }
@@ -118,7 +118,7 @@ sub form_body {
 	$format = '{[{*}[}' unless defined $format;
 	return sub {
 		my ($rows, $fill, $opt) = @_;
-		my %form_opts = ( page=>{width => $opt->{page}{width}} );
+		my %form_opts = ( page=> \%( width => $opt->{page}{width} ) );
 		%form_opts{height}->{[qw(min max)]} = (@$rows+@$fill) x 2
 			unless $opt->{page}{length} == $unlimited;
 		return form(\%form_opts, $format, $rows);
@@ -128,13 +128,13 @@ sub form_body {
 sub hashify {
 	my ($what, $val, $default_undef, $default_val) = @_;
 	if (!defined $val) {
-		return { other => $default_undef};
+		return \%( other => $default_undef );
 	}
 	if (!ref $val) {
-		return { other => $default_val->($val) };
+		return \%( other => $default_val->($val) );
 	}
 	if (ref $val eq 'CODE') {
-		return { other => $val };
+		return \%( other => $val );
 	}
 	if (ref $val eq 'HASH') {
 		die "Invalid key for $what: '$_'" 
@@ -160,7 +160,7 @@ sub page_hash {
 	my ($h, undef, $opts) = @_;
 	die "Value for 'page' option must be hash reference (not $_)"
 		for grep $_ ne 'HASH', ref $h;
-	$h = { %{$opts->{page}}, %$h };
+	$h = \%( %{$opts->{page}}, %$h );
 	die "Unknown page sub-option ('$_')"
 		for grep {!exists %def_page{$_}} keys %$h;
 	die "Page $_ must be greater than zero"
@@ -190,40 +190,40 @@ sub user_def {
 			if @$spec % 2;
 	}
 	else {
-		$spec = [%$spec];
+		$spec = \@(%$spec);
 	}
-	my @from = @{$opts->{field}{from}||=[]};
-	my @to   = @{$opts->{field}{to}||=[]};
+	my @from = @{$opts->{field}{from}||=\@()};
+	my @to   = @{$opts->{field}{to}||=\@()};
 	my $count = @from;
 	for (my $i=0; $i+<@$spec; $i+=2, $count++) {
 		my ($pat, $fld) = @{$spec}[$i,$i+1];
 		push @from, "$pat(?\{$count\})";
 		push @to,   (ref $fld eq 'CODE' ? $fld : sub{$fld});
 	}
-	return {from=>\@from, to=>\@to};
+	return \%(from=>\@from, to=>\@to);
 }
 
 my %std_opt = (
-	out  	=> { set => \&filehandle,		def => \*STDOUT,			},
-	ws    	=> { set => \&pattern,			def => undef,				},
-	fill 	=> { set => \&defined_or_space,	def => " ",					},
-	lfill 	=> { set => \&defined_or_space,	def => undef,				},
-	rfill 	=> { set => \&defined_or_space,	def => undef,				},
-	hfill 	=> { set => \&defined_or_space,	def => undef,				},
-	tfill 	=> { set => \&defined_or_space,	def => undef,				},
-	bfill 	=> { set => \&defined_or_space,	def => undef,				},
-	vfill 	=> { set => \&defined_or_space,	def => undef,				},
-	single	=> { set => \&one_char,         def => undef,				},
-	field 	=> { set => \&user_def,	        def => {from=>[],to=>[]}	},
-	bullet 	=> { set => \&strings_or_undef, def => []					},
-	height	=> { set => \&height_vals,		def => {min=>0, max=>$unlimited} },
-	layout	=> { set => \&layout_word,		def => 'balanced',			},
-	break 	=> { set => \&code,				def => break_at('-'),		},
-	page	=> { set => \&page_hash,		def => {%def_page},			},
-	under	=> { set => sub {"@_[0]"},		def => undef				},
-	interleave	=> { set => \&boolean,		def => 0					},
-	untrimmed  	=> { set => \&boolean,		def => 0,					},
-	locale  	=> { set => \&boolean,		def => 0,					},
+	out  	=> \%( set => \&filehandle,		def => \*STDOUT,			),
+	ws    	=> \%( set => \&pattern,			def => undef,				),
+	fill 	=> \%( set => \&defined_or_space,	def => " ",					),
+	lfill 	=> \%( set => \&defined_or_space,	def => undef,				),
+	rfill 	=> \%( set => \&defined_or_space,	def => undef,				),
+	hfill 	=> \%( set => \&defined_or_space,	def => undef,				),
+	tfill 	=> \%( set => \&defined_or_space,	def => undef,				),
+	bfill 	=> \%( set => \&defined_or_space,	def => undef,				),
+	vfill 	=> \%( set => \&defined_or_space,	def => undef,				),
+	single	=> \%( set => \&one_char,         def => undef,				),
+	field 	=> \%( set => \&user_def,	        def => \%(from=>\@(),to=>\@())	),
+	bullet 	=> \%( set => \&strings_or_undef, def => \@()					),
+	height	=> \%( set => \&height_vals,		def => \%(min=>0, max=>$unlimited) ),
+	layout	=> \%( set => \&layout_word,		def => 'balanced',			),
+	break 	=> \%( set => \&code,				def => break_at('-'),		),
+	page	=> \%( set => \&page_hash,		def => \%(%def_page),			),
+	under	=> \%( set => sub { "@_[0]" },		def => undef				),
+	interleave	=> \%( set => \&boolean,		def => 0					),
+	untrimmed  	=> \%( set => \&boolean,		def => 0,					),
+	locale  	=> \%( set => \&boolean,		def => 0,					),
 );
 
 my %def_opts = map {$_=>%std_opt{$_}{def}}  keys %std_opt;
@@ -233,7 +233,7 @@ sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
     $lconv = POSIX::localeconv();
     @_[0] = exists $lconv->{decimal_point} ? $lconv->{decimal_point} : "?";
     @_[1] = exists $lconv->{thousands_sep} ? $lconv->{thousands_sep} : "";
-    @_[2] = exists $lconv->{grouping} ? [unpack "c*", $lconv->{grouping}] : [0];
+    @_[2] = exists $lconv->{grouping} ? \@(unpack "c*", $lconv->{grouping}) : \@(0);
 }
 
 my %std_literal = (
@@ -341,8 +341,8 @@ sub jleft {
 	my $comma = $whole =~ m/([,.' ])/ ? $1 : '';
 	my $grouping;
 	if ($comma) {
-		$grouping = $whole =~ m/,(?:\]{2},\]{3}|>{2},>{3})\z/ ? [3,2] # Subcont
-				  : $whole =~ m/[,.' ](\]+|>+)\z/             ? [length($1)]
+		$grouping = $whole =~ m/,(?:\]{2},\]{3}|>{2},>{3})\z/ ? \@(3,2) # Subcont
+				  : $whole =~ m/[,.' ](\]+|>+)\z/             ? \@(length($1))
 				  : 										   undef;
 	}
 	if (defined $setplaces) {
@@ -462,7 +462,7 @@ sub perl6_match {
 		bless \@vals, 'Perl6::Form::Rule::Okay';
 	}
 	else {
-		bless [], 'Perl6::Form::Rule::Fail';
+		bless \@(), 'Perl6::Form::Rule::Fail';
 	}
 }
 
@@ -503,10 +503,10 @@ sub segment ($\@\%$\%) {
 	for my $i (0..$args_req) {
 		my ($literal,$field,$userdef) = @format[[3*$i..3*$i+2]];
 		$literal =~ s/\\\{/\{/g;
-		push @formatters, { %std_literal,
+		push @formatters, \%( %std_literal,
 							width => length($literal),
 							src	  => \$literal,
-						  };
+						  );
 		$width -= length($literal);
 		if (defined $field) {
 			my %form;
@@ -530,7 +530,7 @@ sub segment ($\@\%$\%) {
 				%form{vjust} = \&jtop;
 				%form{hjust} = \&jbullet;
 				%form{break} = \&break_bullet;
-				%form{src}   = [];
+				%form{src}   = \@();
 				(%form{bullethole} = $field) =~ s/./ /gs;
 			}
 			else {
@@ -574,7 +574,7 @@ sub segment ($\@\%$\%) {
 					$setplaces = $1 || 0;
 				}
 
-				for ([$checkwidth, $checkplaces], [$setwidth, $setplaces]) {
+				for (\@($checkwidth, $checkplaces), \@($setwidth, $setplaces)) {
 					die "Can't fit $_->[1] decimal place",($_->[1]!=1?'s':''),
 						  " in a $_->[0]-character field" 
 							  if defined($_->[0]) && defined($_->[1])
@@ -752,7 +752,7 @@ sub layout_groups {
 				next FORMATTER;
 			}
 		}
-		push @groups, [$f];
+		push @groups, \@($f);
 	}
 	return @groups;
 }
@@ -765,7 +765,7 @@ sub make_col {
 	my @col;
 	my ($more, $text) = (1,"");
 	my $bullet = $f->{hasbullet};
-	$bullet->{bullets} = [] if $bullet;
+	$bullet->{bullets} = \@() if $bullet;
 	my $bulleted = 1;
 	until ($f->{done}) {
 		my $skipped = 0;
@@ -876,11 +876,11 @@ sub resolve_overflows {
 						if $prev->{overflow} && $prev->{src} == $fld->{src};
 					next;
 				}
-				my %newfld = ( %$prev, opts=>{}, overflow=>1 );
+				my %newfld = ( %$prev, opts=>\%(), overflow=>1 );
 				my @keep = qw( width pos complete done line );
 				%newfld{[@keep]} = $fld->{[@keep]};
 				update %{%newfld{opts}}, %{$fld->{opts}};
-				%newfld{opts}{height} = {min=>0, max=>undef, minimal=>1};
+				%newfld{opts}{height} = \%(min=>0, max=>undef, minimal=>1);
 				$fld = \%newfld;
 				$prev->{notlastoverflow} = 1 if $prev->{overflow};
 				$overflowed = 1;
@@ -906,13 +906,13 @@ sub make_cols($$\@\%$) {
 		for my $g (@maxgroups) {
 			balance_cols($g,$opts, $maxheight);
 		}
-		$maxheight = max map 0+@{$_->{formcol}||[]}, @$formatters
+		$maxheight = max map 0+@{$_->{formcol}||\@()}, @$formatters
 			if grep {!$_->{literal} && !$_->{opts}{height}{minimal}} @$formatters; 
 		for my $g (@mingroups) {
 			balance_cols($g, $opts, $maxheight);
 		}
 		for my $f (@$formatters) {
-			push @$parts, $f->{formcol}||$f->{bullets}||[];
+			push @$parts, $f->{formcol}||$f->{bullets}||\@();
 		}
 	}
 	elsif ($opts->{layout} eq 'down') { # column-by-column
@@ -932,7 +932,7 @@ sub make_cols($$\@\%$) {
 		for my $col (0..@$formatters-1) {
 			my $f = $formatters->[$col];
 			next unless $f->{isbullet};
-			$parts->[$col] = $f->{bullets}||[];
+			$parts->[$col] = $f->{bullets}||\@();
 		}
 	}
 	elsif ($opts->{layout} eq 'across') { # across row-by-row
@@ -940,7 +940,7 @@ sub make_cols($$\@\%$) {
 		for (my $row=0;$row+<$maxheight && grep {$_} values %incomplete;$row++) {
 			%incomplete = ();
 			for my $col (0..@$formatters-1) {
-				$parts->[$col] ||= [];
+				$parts->[$col] ||= \@();
 			}
 			for my $col (0..@$formatters-1) {
 				my $f = $formatters->[$col];
@@ -979,7 +979,7 @@ sub make_cols($$\@\%$) {
 	}
 	else { # tabular layout: down to the first \n, then across, then fill
 		my $finished = 0;
-		for my $col (0..@$formatters-1) { $parts->[$col] = []; }
+		for my $col (0..@$formatters-1) { $parts->[$col] = \@(); }
 		while (!$finished) {
 			$finished = 1;
 			for my $col (0..@$formatters-1) {
@@ -1003,7 +1003,7 @@ sub make_cols($$\@\%$) {
 			for my $col (0..@$formatters-2) {
 				my $f = $formatters->[$col];
 				if ($f->{isbullet}) {
-					push @{$parts->[$col]}, @{$f->{bullets}||[]};
+					push @{$parts->[$col]}, @{$f->{bullets}||\@()};
 					push @{$parts->[$col]},
 						 ($f->{bullethole})x($minimaxheight-@{$parts->[$col]});
 				}
@@ -1050,7 +1050,7 @@ sub make_underline {
 	$nextline =~ s{\0}{ }g;
 	$nextline =~ s{(\cA+)}{{my $len=length($1); substr($under x $len,0,$len)}}g;
 	$nextline .= $trail;
-	return [{ %std_literal, width => length($nextline), src => \$nextline }];
+	return \@(\%( %std_literal, width => length($nextline), src => \$nextline ));
 }
 
 sub linecount($) {
@@ -1064,15 +1064,15 @@ sub form {
 	
 	# Handle formatting calls...
 	my ($package, $file, $line) = caller;
-    my $caller_opts = %caller_opts{$package,$file} ||= {};
+    my $caller_opts = %caller_opts{$package,$file} ||= \%();
     if (keys %$caller_opts) {
         $line = first { $_ +< $line } sort {$b<+>$a} keys %$caller_opts;
-        $caller_opts = $caller_opts->{$line} || {}
+        $caller_opts = $caller_opts->{$line} || \%()
                 if defined $line;
     }
     my %opts = (%def_opts, %$caller_opts);
 	my $fldcnt = 0;
-	my @section = {opts=>{%opts}, text=>[]};
+	my @section = \%(opts=>\%(%opts), text=>\@());
 	my $formats = \@_;
 	my $first = 1;
 	my %argcache;
@@ -1082,12 +1082,12 @@ sub form {
 		if (ref $format eq 'HASH') {
 			update %opts, %$format;
 			%opts{page}{number} = undef unless defined $format->{page}{number};
-			push @section, {opts=>{%opts}};
+			push @section, \%(opts=>\%(%opts));
 			redo;
 		}
 		if ($first) { 	# Change format lists if data first or last
 			if (%opts{interleave}) {
-				$formats = [$format =~ m/.*(?:\n|\z)/g];
+				$formats = \@($format =~ m/.*(?:\n|\z)/g);
 				$format = shift @$formats;
 			}
 			$first = 0;
@@ -1160,8 +1160,8 @@ sub form {
 						if $page->{body}{last};
 				}
 			}
-			my $fill = $pagelen +< $unlimited ? [("\n") x ($bodylen-@$pagetext)]
-											 : [];
+			my $fill = $pagelen +< $unlimited ? \@(("\n") x ($bodylen-@$pagetext))
+											 : \@();
 
 			my $body = $bodyfn->($pagetext, $fill, \%opts);
 
@@ -1225,7 +1225,7 @@ sub make_page {
 
 sub section {
     my ($structure, @index) = @_;
-    $structure = [ values %$structure ] if ref $structure eq 'HASH';
+    $structure = \@( values %$structure ) if ref $structure eq 'HASH';
     my @section;
     for my $row ( @$structure ) {
 		local $,=",";
@@ -1257,7 +1257,7 @@ sub drill (\[@%];@) {
     my ($structure, @indices) = @_;
 	return $structure unless @indices;
 	my $index = shift @indices;
-	my @section = [ @$index ? slice($structure,@$index) : vals($structure) ];
+	my @section = \@( @$index ? slice($structure,@$index) : vals($structure) );
 	return @section unless @indices;
 	for my $index (@indices) {
 		@section = map {section $_, @$index} @section;

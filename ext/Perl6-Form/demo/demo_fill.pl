@@ -1,21 +1,21 @@
 use Perl6::Form;
 use Perl6::Form 'drill';
 
-@data = map [split m/[\t\n]+/], ~< *DATA;
-($name, $payment) = drill @data, [], [0..1];
+@data = map \@(split m/[\t\n]+/), ~< *DATA;
+($name, $payment) = drill @data, \@(), \@(0..1);
 
 print form
   'Name              Payment (per unit)',
-  {under=>"=-\n"},
+  \%(under=>"=-\n"),
   '{[[[[[[[[[[[}        {]],]]].[[[}',
-  $name,                {lfill=>'*', rfill=>'0'},
+  $name,                \%(lfill=>'*', rfill=>'0'),
 				        $payment;
 
 print "\n\n";
 
 print form
   'Name              Payment (per unit)',
-  {under=>"=-\n"},
+  \%(under=>"=-\n"),
   '{[[[[[[[[[[[}        {*],]]].[[0}',
    $name,               $payment; 
 

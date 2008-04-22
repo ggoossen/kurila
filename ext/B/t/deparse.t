@@ -22,7 +22,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 58;
+use Test::More tests => 60;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -55,6 +55,7 @@ while ( ~< *DATA) {
 
     if ($@ and $@->{description}) {
 	diag("$num deparsed: {$@->message}");
+        diag("input: '$input'");
 	ok(0, $testname);
     }
     else {
@@ -73,9 +74,11 @@ is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff');
 my $a = 0;
 is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 
-use constant cr => ['hello'];
+use constant cr => \@('hello');
 my $string = "sub " . $deparse->coderef2text(\&cr);
-my $val = (eval $string)->() or diag $string;
+my $subref = eval $string;
+die "Failed eval '$string': {$@->message}" if $@;
+my $val = $subref->() or diag $string;
 is(ref($val), 'ARRAY');
 is($val->[0], 'hello');
 
@@ -310,7 +313,7 @@ do { my $x = 1; $x };
 ####
 # 37 <20061012113037.GJ25805@c4.convolution.nl>
 my $f = sub {
-    +{[]};
+    \%(\@());
 } ;
 ####
 # 38 (bug #43010)
@@ -363,10 +366,10 @@ $a = sub {
 }
 ####
 # 51 Anonymous arrays and hashes, and references to them
-my $a = {};
-my $b = \{};
-my $c = [];
-my $d = \[];
+my $a = \%();
+my $b = \\%();
+my $c = \@();
+my $d = \\@();
 ####
 # 52 implicit smartmatch in given/when
 given ('foo') {
@@ -374,3 +377,11 @@ given ('foo') {
     when ($_ ~~ 'quux') { continue; }
     default { 0; }
 }
+####
+# array slice
+my @array;
+@array[[1, 2]];
+####
+# hash slice
+my %hash;
+%hash{['foo', 'bar']};

@@ -25,7 +25,7 @@ use ExtUtils::MM;
 
 my $Is_Dosish = $^O =~ m/^(dos|MSWin32)$/;
 
-my $mm = bless {}, 'MM';
+my $mm = bless \%(), 'MM';
 
 my $default = File::Spec->catdir(qw(this that));
 

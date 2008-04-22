@@ -46,16 +46,16 @@ sub tester {
   &$testersub ($clone, $what);
 }
 
-my $r = {};
-my $s1 = [$r, $r];
+my $r = \%();
+my $s1 = \@($r, $r);
 weaken $s1->[1];
 ok (isweak($s1->[1]), "element 1 is a weak reference");
 
-my $s0 = [$r, $r];
+my $s0 = \@($r, $r);
 weaken $s0->[0];
 ok (isweak($s0->[0]), "element 0 is a weak reference");
 
-my $w = [$r];
+my $w = \@($r);
 weaken $w->[0];
 ok (isweak($w->[0]), "element 0 is a weak reference");
 
@@ -66,14 +66,14 @@ use overload
 
 package main;
 
-$a = bless [77], 'OVERLOADED';
+$a = bless \@(77), 'OVERLOADED';
 
-my $o = [$a, $a];
+my $o = \@($a, $a);
 weaken $o->[0];
 ok (isweak($o->[0]), "element 0 is a weak reference");
 
 my @tests = (
-[$s1,
+\@($s1,
  sub  {
   my ($clone, $what) = @_;
   isa_ok($clone,'ARRAY');
@@ -82,10 +82,10 @@ my @tests = (
   ok(!isweak $clone->[0], "Element 0 isn't weak");
   ok(isweak $clone->[1], "Element 1 is weak");
 }
-],
+),
 # The weak reference needs to hang around long enough for other stuff to
 # be able to make references to it. So try it second.
-[$s0,
+\@($s0,
  sub  {
   my ($clone, $what) = @_;
   isa_ok($clone,'ARRAY');
@@ -94,8 +94,8 @@ my @tests = (
   ok(isweak $clone->[0], "Element 0 is weak");
   ok(!isweak $clone->[1], "Element 1 isn't weak");
 }
-],
-[$w,
+),
+\@($w,
  sub  {
   my ($clone, $what) = @_;
   isa_ok($clone,'ARRAY');
@@ -107,8 +107,8 @@ my @tests = (
     is($clone->[0],undef);
   }
 }
-],
-[$o,
+),
+\@($o,
 sub {
   my ($clone, $what) = @_;
   isa_ok($clone,'ARRAY');
@@ -119,7 +119,7 @@ sub {
   is ("$clone->[0]", 77, "Element 0 stringifies to 77");
   is ("$clone->[1]", 77, "Element 1 stringifies to 77");
 }
-],
+),
 );
 
 foreach (@tests) {

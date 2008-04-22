@@ -696,7 +696,7 @@ depends on $(DIST_DEFAULT).
 sub dist_target {
     my($self) = shift;
 
-    my $date_check = $self->oneliner(<<'CODE', ['-l']);
+    my $date_check = $self->oneliner(<<'CODE', \@('-l'));
 print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
     if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
@@ -1229,7 +1229,7 @@ needs_linking() does.
 sub has_link_code {
     my($self) = shift;
     return $self->{HAS_LINK_CODE} if defined $self->{HAS_LINK_CODE};
-    if ($self->{OBJECT} or @{$self->{C} || []} or $self->{MYEXTLIB}){
+    if ($self->{OBJECT} or @{$self->{C} || \@()} or $self->{MYEXTLIB}){
 	$self->{HAS_LINK_CODE} = 1;
 	return 1;
     }
@@ -1293,14 +1293,14 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     }
 
     $self->{PL_FILES}   ||= \%pl_files;
-    $self->{DIR}        ||= [sort keys %dir];
+    $self->{DIR}        ||= \@(sort keys %dir);
     $self->{XS}         ||= \%xs;
-    $self->{C}          ||= [sort keys %c];
-    $self->{H}          ||= [sort keys %h];
+    $self->{C}          ||= \@(sort keys %c);
+    $self->{H}          ||= \@(sort keys %h);
     $self->{PM}         ||= \%pm;
 
     my @o_files = @{$self->{C}};
-    $self->{O_FILES} = [grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files];
+    $self->{O_FILES} = \@(grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files);
 }
 
 
@@ -1319,7 +1319,7 @@ sub init_MANPODS {
 	if ( $self->{"{$man}PODS"}
              or $self->{"INSTALL{$man}DIR"} =~ m/^(none|\s*)$/
         ) {
-            $self->{"{$man}PODS"} ||= {};
+            $self->{"{$man}PODS"} ||= \%();
         }
         else {
             my $init_method = "init_{$man}PODS";
@@ -1432,7 +1432,7 @@ sub init_PM {
 
     # The attribute PMLIBDIRS holds an array reference which lists
     # subdirectories which we should search for library files to
-    # install. PMLIBDIRS defaults to [ 'lib', $self->{BASEEXT} ].  We
+    # install. PMLIBDIRS defaults to [ 'lib', $self->{BASEEXT} ).  We
     # recursively search through the named directories (skipping any
     # which don't exist or contain Makefile.PL files).
 
@@ -1456,10 +1456,10 @@ sub init_PM {
     unless( $self->{PMLIBDIRS} ) {
         if( %Is{VMS} ) {
             # Avoid logical name vs directory collisions
-            $self->{PMLIBDIRS} = ['./lib', "./$self->{BASEEXT}"];
+            $self->{PMLIBDIRS} = \@('./lib', "./$self->{BASEEXT}");
         }
         else {
-            $self->{PMLIBDIRS} = ['lib', $self->{BASEEXT}];
+            $self->{PMLIBDIRS} = \@('lib', $self->{BASEEXT});
         }
     }
 
@@ -1686,7 +1686,7 @@ EOP
     # Get some stuff out of %Config if we haven't yet done so
     print STDOUT "CONFIG must be an array ref\n"
         if ($self->{CONFIG} and ref $self->{CONFIG} ne 'ARRAY');
-    $self->{CONFIG} = [] unless (ref $self->{CONFIG});
+    $self->{CONFIG} = \@() unless (ref $self->{CONFIG});
     push(@{$self->{CONFIG}}, @ExtUtils::MakeMaker::Get_from_Config);
     push(@{$self->{CONFIG}}, 'shellflags') if %Config{shellflags};
     my(%once_only);
@@ -1741,9 +1741,9 @@ sub init_others {	# --- Initialize Other Attributes
     # undefined. In any case we turn it into an anon array:
 
     # May check $Config{libs} too, thus not empty.
-    $self->{LIBS} = [$self->{LIBS}] unless ref $self->{LIBS};
+    $self->{LIBS} = \@($self->{LIBS}) unless ref $self->{LIBS};
 
-    $self->{LIBS} = [''] unless @{$self->{LIBS}} && defined $self->{LIBS}[0];
+    $self->{LIBS} = \@('') unless @{$self->{LIBS}} && defined $self->{LIBS}[0];
     $self->{LD_RUN_PATH} = "";
 
     foreach my $libs ( @{$self->{LIBS}} ){
@@ -1762,7 +1762,7 @@ sub init_others {	# --- Initialize Other Attributes
     } else {
 	# init_dirscan should have found out, if we have C files
 	$self->{OBJECT} = "";
-	$self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}||[]};
+	$self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}||\@()};
     }
     $self->{OBJECT} =~ s/\n+/ \\\n\t/g;
     $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ? "$self->{BASEEXT}_BS" : "";
@@ -1813,8 +1813,8 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{UNINST}     ||= 0;
     $self->{VERBINST}   ||= 0;
     $self->{MOD_INSTALL} ||= 
-      $self->oneliner(<<'CODE', ['-MExtUtils::Install']);
-install({@ARGV}, '$(VERBINST)', 0, '$(UNINST)');
+      $self->oneliner(<<'CODE', \@('-MExtUtils::Install'));
+install(\%(@ARGV), '$(VERBINST)', 0, '$(UNINST)');
 CODE
     $self->{DOC_INSTALL}        ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
@@ -1865,9 +1865,9 @@ sub init_lib2arch {
     # architecture. If not we take it as a sign that it should be the
     # same as the requested installation directory. Otherwise we take
     # the found one.
-    for my $libpair ({l=>"privlib",   a=>"archlib"}, 
-                     {l=>"sitelib",   a=>"sitearch"},
-                     {l=>"vendorlib", a=>"vendorarch"},
+    for my $libpair (\%(l=>"privlib",   a=>"archlib"), 
+                     \%(l=>"sitelib",   a=>"sitearch"),
+                     \%(l=>"vendorlib", a=>"vendorarch"),
                     )
     {
         my $lib = "install$libpair->{l}";
@@ -2430,20 +2430,20 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
 	use Cwd 'cwd';
 	%static{cwd() . "/" . $_}++;
-    }, grep( -d $_, @{$searchdirs || []}) );
+    }, grep( -d $_, @{$searchdirs || \@()}) );
 
     # We trust that what has been handed in as argument, will be buildable
-    $static = [] unless $static;
+    $static = \@() unless $static;
     %static{[@{$static}]} = (1) x @{$static};
 
-    $extra = [] unless $extra && ref $extra eq 'ARRAY';
+    $extra = \@() unless $extra && ref $extra eq 'ARRAY';
     for (sort keys %static) {
 	next unless m/\Q$self->{LIB_EXT}\E\z/;
 	$_ = dirname($_) . "/extralibs.ld";
 	push @$extra, $_;
     }
 
-    s/^(.*)/"-I$1"/ for @{$perlinc || []}; 
+    s/^(.*)/"-I$1"/ for @{$perlinc || \@()}; 
 
     $target ||= "perl";
     $tmp    ||= ".";
@@ -2453,7 +2453,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 # extralibs.all are computed correctly
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = @{$perlinc || []}
+MAP_PERLINC   = @{$perlinc || \@()}
 MAP_STATIC    = ",
 join(" \\\n\t", reverse sort keys %static), "
 
@@ -2892,8 +2892,8 @@ sub pm_to_blib {
 pm_to_blib : $(TO_INST_PM)
 };
 
-    my $pm_to_blib = $self->oneliner(<<CODE, ['-MExtUtils::Install']);
-pm_to_blib(\{\@ARGV\}, '$autodir', '\$(PM_FILTER)')
+    my $pm_to_blib = $self->oneliner(<<CODE, \@('-MExtUtils::Install'));
+pm_to_blib(\\\%(\@ARGV), '$autodir', '\$(PM_FILTER)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, %{$self->{PM}});
@@ -3085,7 +3085,7 @@ sub processPL {
     foreach my $plfile (sort keys %$pl_files) {
         my $list = ref($pl_files->{$plfile})
                      ?  $pl_files->{$plfile}
-		     : [$pl_files->{$plfile}];
+		     : \@($pl_files->{$plfile});
 
 	foreach my $target (@$list) {
             if( %Is{VMS} ) {
@@ -3177,7 +3177,7 @@ sub cd {
 
 sub oneliner {
     my($self, $cmd, $switches) = @_;
-    $switches = [] unless defined $switches;
+    $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
     $cmd =~ s{^\n+}{};
@@ -3638,7 +3638,7 @@ config :: $(FIRST_MAKEFILE) blibdirs
 
     push @m, '
 $(O_FILES): $(H_FILES)
-' if @{$self->{O_FILES} || []} && @{$self->{H} || []};
+' if @{$self->{O_FILES} || \@()} && @{$self->{H} || \@()};
 
     push @m, q{
 help :

@@ -170,7 +170,7 @@ sub _readDeflateHeader
 
     *$self->{Type} = 'rfc1950';
 
-    return {
+    return \%(
         'Type'          => 'rfc1950',
         'FingerprintLength'  => ZLIB_HEADER_SIZE,
         'HeaderLength'  => ZLIB_HEADER_SIZE,
@@ -186,7 +186,7 @@ sub _readDeflateHeader
         FLEVEL  => bits($FLG, ZLIB_FLG_LEVEL_OFFSET,  ZLIB_FLG_LEVEL_BITS ),
         DICTID  =>      $DICTID                                            ,
 
-    };
+    );
 }
 
 

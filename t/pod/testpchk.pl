@@ -64,7 +64,7 @@ sub testpodcheck( @ ) {
       }
    }
    podchecker($infile, $outfile);
-   if ( testcmp({'-cmplines' => \&msgcmp}, $outfile, $cmpfile) ) {
+   if ( testcmp(\%('-cmplines' => \&msgcmp), $outfile, $cmpfile) ) {
        $different = "$outfile is different from $cmpfile";
    }
    else {

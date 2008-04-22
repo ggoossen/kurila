@@ -24,7 +24,7 @@ sub printem {
 
     sub TIEARRAY {
         my $class = shift;
-        return bless [], $class;
+        return bless \@(), $class;
     }
 
     sub STORE {
@@ -118,11 +118,11 @@ sub struct {
     my( $cmt, $name, $type, $elem );
 
     if( $base_type eq 'HASH' ){
-        $out .= "    my(\$r) = \{\};\n";
+        $out .= '    my($r) = \%();'."\n";
         $cmt = '';
     }
     elsif( $base_type eq 'ARRAY' ){
-        $out .= "    my(\$r) = [];\n";
+        $out .= '    my($r) = \@();'."\n";
     }
     while( $idx +< @decls ){
         $name = @decls[$idx];
@@ -144,13 +144,13 @@ sub struct {
         if( $type eq '@' ){
             $out .= "    die 'Initializer for $name must be array reference'\n"; 
             $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n";
-            $out .= "    \$r->$elem = $init [];$cmt\n"; 
+            $out .= "    \$r->$elem = $init \\\@();$cmt\n";
             %arrays{$name}++;
         }
         elsif( $type eq '%' ){
             $out .= "    die 'Initializer for $name must be hash reference'\n";
             $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n";
-            $out .= "    \$r->$elem = $init \{\};$cmt\n";
+            $out .= "    \$r->$elem = $init \\\%();$cmt\n";
             %hashes{$name}++;
         }
         elsif ( $type eq '$') {

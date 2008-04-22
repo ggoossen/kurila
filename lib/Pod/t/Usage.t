@@ -19,13 +19,13 @@ Usage:
 
 EOMSG
 my $fake_out = tie *FAKEOUT, 'CatchOut';
-pod2usage({ -verbose => 0, -exit => 'noexit', -output => \*FAKEOUT });
+pod2usage(\%( -verbose => 0, -exit => 'noexit', -output => \*FAKEOUT ));
 is( $$fake_out, $vbl_0, 'Verbose level 0' );
 
 my $msg = "Prefix message for pod2usage()";
 $$fake_out = '';
-pod2usage({ -verbose => 0, -exit => 'noexit', -output => \*FAKEOUT,
-            -message => $msg });
+pod2usage(\%( -verbose => 0, -exit => 'noexit', -output => \*FAKEOUT,
+            -message => $msg ));
 is( $$fake_out, "$msg\n$vbl_0", '-message parameter' );
 
 SKIP: {
@@ -33,16 +33,16 @@ SKIP: {
     skip( 'File in current directory', 2 ) if -e $file; 
     $$fake_out = '';
     eval {
-        pod2usage({ -verbose => 0, -exit => 'noexit', 
-                    -output => \*FAKEOUT, -input => $file });
+        pod2usage(\%( -verbose => 0, -exit => 'noexit', 
+                    -output => \*FAKEOUT, -input => $file ));
     };
     like( $@->message, qr/^Can't open $file/, 
           'File not found without -pathlist' );
 
     eval {
-        pod2usage({ -verbose => 0, -exit => 'noexit',
+        pod2usage(\%( -verbose => 0, -exit => 'noexit',
                     -output => \*FAKEOUT, -input => $file, 
-                    -pathlist => $path });
+                    -pathlist => $path ));
     };
     is( $$fake_out, $vbl_0, '-pathlist parameter' );
 }
@@ -62,7 +62,7 @@ SKIP: { # Test exit status from pod2usage()
                || $^O eq 'VMS') ? '"'
               : "");
     my @params = ( "{$cq}-I../lib$cq",  "{$cq}-MPod::Usage$cq", '-e' );
-    my $prg = qq[{$cq}pod2usage(\{ $args \})$cq];
+    my $prg = qq[{$cq}pod2usage(\\\%( $args ))$cq];
     my @cmd = ( $^X, @params, $prg );
 
     print "# cmd = @cmd\n";
@@ -83,7 +83,7 @@ Arguments:
 
 EOMSG
 $$fake_out = '';
-pod2usage( { -verbose => 1, -exit => 'noexit', -output => \*FAKEOUT } );
+pod2usage( \%( -verbose => 1, -exit => 'noexit', -output => \*FAKEOUT ) );
 is( $$fake_out, $vbl_1, 'Verbose level 1' );
 
 # Test verbose level 2
@@ -94,7 +94,7 @@ require Pod::Text; # Pod::Usage->isa( 'Pod::Text' )
 my $pod2text = $$fake_out;
 
 $$fake_out = '';
-pod2usage( { -verbose => 2, -exit => 'noexit', -output => \*FAKEOUT } );
+pod2usage( \%( -verbose => 2, -exit => 'noexit', -output => \*FAKEOUT ) );
 my $pod2usage = $$fake_out;
 
 is( $pod2usage, $pod2text, 'Verbose level >= 2 eq pod2text' );

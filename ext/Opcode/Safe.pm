@@ -42,7 +42,7 @@ my $default_root  = 0;
 # share *_ and functions defined in universal.c
 # Don't share stuff like *UNIVERSAL:: otherwise code from the
 # compartment can 0wn functions in UNIVERSAL
-my $default_share = [qw[
+my $default_share = \@(qw[
     *_
     &PerlIO::get_layers
     &UNIVERSAL::isa
@@ -95,11 +95,11 @@ my $default_share = [qw[
     &error::message
     &error::write_to_stderr
     &Symbol::fetch_glob
-]];
+]);
 
 sub new {
     my($class, $root, $mask) = @_;
-    my $obj = {};
+    my $obj = \%();
     bless $obj, $class;
 
     if (defined($root)) {
@@ -258,17 +258,17 @@ sub share_record {
     my $obj = shift;
     my $pkg = shift;
     my $vars = shift;
-    my $shares = \%{$obj->{Shares} ||= {}};
+    my $shares = \%{$obj->{Shares} ||= \%()};
     # Record shares using keys of $obj->{Shares}. See reinit.
     %{$shares}{[@$vars]} = ($pkg) x @$vars if @$vars;
 }
 sub share_redo {
     my $obj = shift;
-    my $shares = \%{$obj->{Shares} ||= {}};
+    my $shares = \%{$obj->{Shares} ||= \%()};
     my($var, $pkg);
     while(($var, $pkg) = each %$shares) {
 	# warn "share_redo $pkg\:: $var";
-	$obj->share_from($pkg,  [ $var ], 1);
+	$obj->share_from($pkg,  \@( $var ), 1);
     }
 }
 sub share_forget {

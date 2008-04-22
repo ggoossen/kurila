@@ -11,8 +11,8 @@ my %feature = (
 # NB. the latest bundle must be loaded by the -E switch (see toke.c)
 
 my %feature_bundle = (
-    "5.10" => [qw(switch state)],
-    "5.11" => [qw(switch state)],
+    "5.10" => \@(qw(switch state)),
+    "5.11" => \@(qw(switch state)),
 );
 
 # special case

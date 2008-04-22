@@ -12,14 +12,14 @@
 #	A. Dougherty  Tue Oct 30 10:20:07 EST 2001
 #
 if (%Config{'archname'} =~ m/[34]4[0-9][0-9]-svr4/) {
-    $self->{LIBS} = ['-lm -posix -lcposix -lmw'];
+    $self->{LIBS} = \@('-lm -posix -lcposix -lmw');
 }
 # A better NCR MP-RAS test, thanks to W. Geoffrey Rommel, is to
 # look for /etc/issue and /etc/.relid.  A. Dougherty, September 16, 2003
 elsif( -e '/etc/issue' && -e '/etc/.relid') {
-    $self->{LIBS} = ['-lm -posix -lcposix -lmw'];
+    $self->{LIBS} = \@('-lm -posix -lcposix -lmw');
 }
 # Not sure what OS this one is.
 elsif (%Config{archname} =~ m/RM\d\d\d-svr4/) {
-    $self->{LIBS} = ['-lm -lc -lposix -lcposix'];
+    $self->{LIBS} = \@('-lm -lc -lposix -lcposix');
 }

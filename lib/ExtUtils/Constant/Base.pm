@@ -219,7 +219,7 @@ sub dump_names {
       $type = $_->{type} || $default_type;
       die "No more utf8 flag" if ($_->{utf8});
     } else {
-      $_ = {name=>$_};
+      $_ = \%(name=>$_);
       $type = $default_type;
     }
     %used_types{$type}++;
@@ -247,8 +247,8 @@ sub dump_names {
     }
   }
   if ($declare_types) {
-    $result = $indent . 'my $types = {map {($_, 1)} qw('
-      . join (" ", sort keys %$what) . ")\};\n";
+    $result = $indent . 'my $types = \%(map {($_, 1)} qw('
+      . join (" ", sort keys %$what) . "));\n";
   }
   local $Text::Wrap::huge = 'overflow';
   local $Text::Wrap::columns = 80;
@@ -317,7 +317,7 @@ sub assign {
     unless $self->valid_type($type);
 
   $clause .= join '', map {"$indent$_\n"}
-    $self->assignment_clause_for_type({type=>$type,item=>$item}, @_);
+    $self->assignment_clause_for_type(\%(type=>$type,item=>$item), @_);
   chomp $post;
   if (length $post) {
     $clause .= "$post";
@@ -365,8 +365,8 @@ sub return_clause {
   #      *iv_return = thingy;
   #      return PERL_constant_ISIV;
   $clause
-    .= $self->assign ({indent=>$indent, type=>$type, pre=>$pre, post=>$post,
-		       item=>$item}, ref $value ? @$value : $value);
+    .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre, post=>$post,
+		       item=>$item), ref $value ? @$value : $value);
 
   if (defined $macro && $macro ne "" && $macro ne "1") {
     ##else
@@ -379,8 +379,8 @@ sub return_clause {
     } else {
       my @default = ref $default ? @$default : $default;
       $type = shift @default;
-      $clause .= $self->assign ({indent=>$indent, type=>$type, pre=>$pre,
-				 post=>$post, item=>$item}, @default);
+      $clause .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre,
+				 post=>$post, item=>$item), @default);
     }
   }
   ##endif
@@ -403,8 +403,8 @@ sub match_clause {
     $inner_indent = $indent;
   }
 
-  $body .= $self->memEQ_clause ({name => $name, checked_at => $offset,
-				 indent => length $indent});
+  $body .= $self->memEQ_clause (\%(name => $name, checked_at => $offset,
+				 indent => length $indent));
   # If we've been presented with an arrayref for $item, then the user string
   # contains in the range 128-255, and we need to check whether it was utf8
   # (or not).
@@ -413,10 +413,10 @@ sub match_clause {
   # encoded in (say) ISO-8859-1.
   # In this case, $yes and $no both have item hashrefs.
   if ($either) {
-    $body .= $self->return_clause ({indent=>4 + length $indent}, $either);
+    $body .= $self->return_clause (\%(indent=>4 + length $indent), $either);
     $body .= $indent . "  \}\n";
   } else {
-    $body .= $self->return_clause ({indent=>2 + length $indent}, $item);
+    $body .= $self->return_clause (\%(indent=>2 + length $indent), $item);
   }
   $body .= $indent . "\}\n";
 }
@@ -524,8 +524,8 @@ sub switch_clause {
     foreach my $thisone (sort {
 	# Deal with the case of an item actually being an array ref to 1 or 2
 	# hashrefs. Don't assign to $a or $b, as they're aliases to the orignal
-	my $l = ref $a eq 'ARRAY' ? ($a->[0] || $-+>[1]) : $a;
-	my $r = ref $b eq 'ARRAY' ? ($b->[0] || $-+>[1]) : $b;
+	my $l = ref $a eq 'ARRAY' ? ($a->[0] || $-+>\@(1)) : $a;
+	my $r = ref $b eq 'ARRAY' ? ($b->[0] || $-+>\@(1)) : $b;
 	# Sort by weight first
 	($r->{weight} || 0) <+> ($l->{weight} || 0)
 	    # Sort equal weights by name
@@ -535,11 +535,11 @@ sub switch_clause {
 			 %{$items}{[@{$best->{$char}}]}) {
       # warn "You are here";
       if ($do_front_chop) {
-        $body .= $self->match_clause ({indent => 2 + length $indent,
-				       checked_at => \$char}, $thisone);
+        $body .= $self->match_clause (\%(indent => 2 + length $indent,
+				       checked_at => \$char), $thisone);
       } else {
-        $body .= $self->match_clause ({indent => 2 + length $indent,
-				       checked_at => $offset}, $thisone);
+        $body .= $self->match_clause (\%(indent => 2 + length $indent,
+				       checked_at => $offset), $thisone);
       }
     }
     $body .= $indent . "  break;\n";
@@ -634,7 +634,7 @@ sub normalise_items
             my ($type, $macro, $value) = %$orig{[qw (type macro value)]};
             $type ||= $default_type;
             $what->{$type} = 1;
-            $item = {name=>$name, type=>$type};
+            $item = \%(name=>$name, type=>$type);
             $item->{macro} = $macro if defined $macro and (ref $macro or $macro ne $name);
             $item->{value} = $value if defined $value and (ref $value or $value ne $name);
             foreach my $key (qw(default pre post def_pre def_post weight
@@ -645,7 +645,7 @@ sub normalise_items
             }
         } else {
             $name = $orig;
-            $item = {name=>$name, type=>$default_type};
+            $item = \%(name=>$name, type=>$default_type);
             $what->{$default_type} = 1;
         }
         warn +(ref ($self) || $self)
@@ -788,16 +788,16 @@ sub C_constant {
     # be a hashref, and pinch %$items from our parent to save recalculation.
     ($namelen, $items) = @$breakout;
   } else {
-    $items = {};
+    $items = \%();
     $breakout ||= 3;
     $default_type ||= $self->default_type();
     if (!ref $what) {
       # Convert line of the form IV,UV,NV to hash
-      $what = {map {$_ => 1} split m/,\s*/, ($what || '')};
+      $what = \%(map {$_ => 1} split m/,\s*/, ($what || ''));
       # Figure out what types we're dealing with, and assign all unknowns to the
       # default type
     }
-    @items = $self->normalise_items ({}, $default_type, $what, $items, @items);
+    @items = $self->normalise_items (\%(), $default_type, $what, $items, @items);
     # use Data::Dumper; print Dumper @items;
   }
   my $params = $self->params ($what);
@@ -820,14 +820,14 @@ sub C_constant {
     my $comment = 'When generated this function returned values for the list'
       . ' of names given here.  However, subsequent manual editing may have'
         . ' added or removed some.';
-    $body .= $self->switch_clause ({indent=>2, comment=>$comment},
+    $body .= $self->switch_clause (\%(indent=>2, comment=>$comment),
 				   $namelen, $items, @items);
   } else {
     # We are the top level.
     $body .= "  /* Initially switch on the length of the name.  */\n";
-    $body .= $self->dogfood ({package => $package, subname => $subname,
+    $body .= $self->dogfood (\%(package => $package, subname => $subname,
 			      default_type => $default_type, what => $what,
-			      indent => $indent, breakout => $breakout},
+			      indent => $indent, breakout => $breakout),
 			     @items);
     $body .= '  switch ('.$self->namelen_param().") \{\n";
     # Need to group names of the same length
@@ -843,31 +843,31 @@ sub C_constant {
         if ($only_thing->{utf8}) {
           if ($only_thing->{utf8} eq 'yes') {
             # With utf8 on flag item is passed in element 0
-            $body .= $self->match_clause (undef, [$only_thing]);
+            $body .= $self->match_clause (undef, \@($only_thing));
           } else {
             # With utf8 off flag item is passed in element 1
-            $body .= $self->match_clause (undef, [undef, $only_thing]);
+            $body .= $self->match_clause (undef, \@(undef, $only_thing));
           }
         } else {
           $body .= $self->match_clause (undef, $only_thing);
         }
       } elsif (@{@by_length[$i]} +< $breakout) {
-        $body .= $self->switch_clause ({indent=>4},
+        $body .= $self->switch_clause (\%(indent=>4),
 				       $i, $items, @{@by_length[$i]});
       } else {
         # Only use the minimal set of parameters actually needed by the types
         # of the names of this length.
-        my $what = {};
+        my $what = \%();
         foreach (@{@by_length[$i]}) {
           $what->{$_->{type}} = 1;
           $what->{''} = 1 if $_->{utf8};
         }
         $params = $self->params ($what);
-        push @subs, $self->C_constant ({package=>$package,
+        push @subs, $self->C_constant (\%(package=>$package,
 					subname=>"{$subname}_$i",
 					default_type => $default_type,
 					types => $what, indent => $indent,
-					breakout => [$i, $items]},
+					breakout => \@($i, $items)),
 				       @{@by_length[$i]});
         $body .= "    return {$subname}_$i ("
 	  # Eg "aTHX_ "

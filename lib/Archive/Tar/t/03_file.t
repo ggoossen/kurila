@@ -19,29 +19,29 @@ my ($rename_dir, $rename_file)  = dir_and_file( $rename_path );
 
 my @test_files = (
     ###  pathname         contents          optional hash of attributes ###
-    [    'x/bIn1',        $all_chars                                      ],
-    [    'bIn2',          $all_chars x 2                                  ],
-    [    'bIn0',          ''                                              ],
+    \@(    'x/bIn1',        $all_chars                                      ),
+    \@(    'bIn2',          $all_chars x 2                                  ),
+    \@(    'bIn0',          ''                                              ),
 
     ### we didnt handle 'false' filenames very well across A::T as of version
     ### 1.32, as reported in #28687. Test for the handling of such files here.
-    [    0,               '',                                             ],
+    \@(    0,               '',                                             ),
     
     ### keep this one as the last entry
-    [    'x/yy/z',        '',               { type  => DIR,
+    \@(    'x/yy/z',        '',               \%( type  => DIR,
                                               mode  => 0777,
                                               uid   => 42,
                                               gid   => 43,
                                               uname => 'Ford',
                                               gname => 'Prefect',
-                                              mtime => $start_time }      ],
+                                              mtime => $start_time )      ),
 );
 
 ### new( data => ... ) tests ###
 for my $f ( @test_files ) {
     my $unix_path     = $f->[0];
     my $contents      = $f->[1];
-    my $attr          = $f->[2] || {};
+    my $attr          = $f->[2] || \%();
     my ($dir, $file)  = dir_and_file( $unix_path );
 
     my $obj = Archive::Tar::File->new( data => $unix_path, $contents, $attr );
