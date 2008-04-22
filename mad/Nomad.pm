@@ -2141,7 +2141,7 @@ package PLXML::op_aelemfast;
 
 sub ast {
     my $self = shift;
-    return $self->madness('$');
+    return $self->madness('$ @'); # '$' for perl5, '@' for perl kurila
 }
 
 package PLXML::op_aelem;
@@ -2372,7 +2372,7 @@ sub ast {
 
     my $slice = $$self{Kids}[0];
     push @newkids, $slice->ast($self, @_);
-    push @newkids, $self->madness(']');
+    push @newkids, $self->madness('slice_close ]');
 
     return $self->newtype->new(Kids => [@newkids]);
 }

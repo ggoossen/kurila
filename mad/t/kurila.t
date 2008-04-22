@@ -31,13 +31,16 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_anon_aryhsh();
+die;
+t_strict_vars();
+t_no_bracket_names();
 t_no_sigil_change();
 #t_carp();
 #t_parenthesis();
 #t_change_deref();
 #t_anon_hash();
 t_error_str();
-die;
 t_open_args3();
 t_qstring();
 t_subst_eval();
@@ -921,9 +924,56 @@ my %mfoo;
 ----
 "\%"
 ====
+# TODO
 split m/$foo::baz{bar}/, $a;
 ----
 split m/%foo::baz{bar}/, $a;
+====
+END
+}
+
+sub t_no_bracket_names {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+${bar};
+${^WARN_HOOK};
+"${bar}";
+"@{baz}";
+<<"EOH"
+${bar}
+EOH
+----
+$bar;
+$^WARN_HOOK;
+"{$bar}";
+"{@baz}";
+<<"EOH"
+{$bar}
+EOH
+====
+END
+}
+
+sub t_anon_aryhsh {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+[ 1, 2 ];
+{ foo => 'bar' };
+----
+@( 1, 2 );
+%( foo => 'bar' );
+====
+END
+}
+
+sub t_strict_vars {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+@foo;
+use strict;
+our @bar;
+@bar;
+----
+our @foo;
+our @bar;
+@bar;
 ====
 END
 }
