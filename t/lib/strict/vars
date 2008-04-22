@@ -367,7 +367,7 @@ EXPECT
 use strict 'vars';
 use warnings;
 our $foo;
-${foo} = 10;
+$foo = 10;
 package Foo;
 our $foo = 20;
 print $foo, "\n";
@@ -379,7 +379,7 @@ EXPECT
 use strict 'vars';
 use warnings;
 our $foo;
-${foo} = 10;
+$foo = 10;
 our $foo;
 EXPECT
 "our" variable $foo redeclared at - line 7.

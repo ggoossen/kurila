@@ -12,9 +12,9 @@ our @EXPORT = qw( checkOptree plan skip skip_all pass is like unlike
 		  require_ok runperl);
 
 
-# The hints flags will differ if ${^OPEN} is set.
+# The hints flags will differ if $^OPEN is set.
 # The approach taken is to put the hints-with-open in the golden results, and
-# flag that they need to be taken out if ${^OPEN} is set.
+# flag that they need to be taken out if $^OPEN is set.
 
 if (((caller 0)[[10]]||{})->{'open<'}) {
     $using_open = 1;
@@ -292,7 +292,7 @@ use Carp;
 use B::Concise qw(walk_output);
 
 BEGIN {
-    %^{WARN_HOOK} = sub {
+    $^WARN_HOOK = sub {
 	my $err = shift->{description};
 	$err =~ m/Subroutine re::(un)?install redefined/ and return;
     };

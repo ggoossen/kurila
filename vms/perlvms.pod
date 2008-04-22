@@ -1139,8 +1139,8 @@ _POSIX_EXIT values was run and set a status.
 
 How can you tell the difference between a non-zero status that is
 the result of a VMS native error status or an encoded UNIX status?
-You can not unless you look at the ${^CHILD_ERROR_NATIVE} value.
-The ${^CHILD_ERROR_NATIVE} value returns the actual VMS status value
+You can not unless you look at the $^CHILD_ERROR_NATIVE value.
+The $^CHILD_ERROR_NATIVE value returns the actual VMS status value
 and check the severity bits. If the severity bits are equal to 1,
 then if the numeric value for C<$?> is between 2 and 255 or 0, then
 C<$?> accurately reflects a value passed back from a UNIX application.

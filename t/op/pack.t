@@ -39,7 +39,7 @@ if ($no_signedness) {
 }
 
 for my $size ( 16, 32, 64 ) {
-  if (defined %Config{"u${size}size"} and (%Config{"u${size}size"}||0) != ($size >> 3)) {
+  if (defined %Config{"u{$size}size"} and (%Config{"u{$size}size"}||0) != ($size >> 3)) {
     push @valid_errors, qr/^Perl_my_$maybe_not_avail$size\(\) not available/;
   }
 }
@@ -280,10 +280,10 @@ sub list_eq ($$) {
     }
 
     for my $mod (qw( <> >< !<> !>< <!> >!< <>! ><! )) {
-      dies_like(sub { $x = pack "sI${mod}s", 42, 47, 11 },
+      dies_like(sub { $x = pack "sI{$mod}s", 42, 47, 11 },
                 qr/^Can't use both '<' and '>' after type 'I' in pack/);
 
-      dies_like(sub { $x = unpack "sI${mod}s", 'x'x16 },
+      dies_like(sub { $x = unpack "sI{$mod}s", 'x'x16 },
                 qr/^Can't use both '<' and '>' after type 'I' in unpack/);
     }
   }
@@ -368,7 +368,7 @@ sub foo { my $a = "a"; return $a . $a++ . $a++ }
   use warnings qw(NONFATAL all);;
   my $warning;
   {
-      local ${^WARN_HOOK} = sub {
+      local $^WARN_HOOK = sub {
           $warning = @_[0]->message;
       };
       my $junk = pack("p", &foo);
@@ -512,7 +512,7 @@ foreach (
     my $got = $what eq 'u' ? (unpack $template, $in) : (pack $template, $in);
     unless (is($got, $out)) {
         my $un = $what eq 'u' ? 'un' : '';
-        print "# ${un}pack ('$template', "._qq($in).') gave '._qq($out).
+        print "# {$un}pack ('$template', "._qq($in).') gave '._qq($out).
             ' not '._qq($got)."\n";
     }
 }
@@ -951,7 +951,7 @@ SKIP: {
 	use warnings qw(NONFATAL all);;
 
         my $bad = pack("U0C", 255);
-        local ${^WARN_HOOK} = sub { $@ = @_[0]; };
+        local $^WARN_HOOK = sub { $@ = @_[0]; };
         my @null = unpack('U0U', $bad);
         like($@->{description}, qr/^Malformed UTF-8 character /);
     }
@@ -1240,7 +1240,7 @@ SKIP: {
 { # syntax checks (W.Laun)
   use warnings qw(NONFATAL all);;
   my @warning;
-  local ${^WARN_HOOK} = sub {
+  local $^WARN_HOOK = sub {
       push( @warning, @_[0]->{description} );
   };
   eval { my $s = pack( 'Ax![4c]A', 1..5 ); };
@@ -1412,7 +1412,7 @@ is(scalar unpack('A /A /A Z20', '3004bcde'), 'bcde');
 
   use warnings qw(NONFATAL all);;
   my $warning;
-  local ${^WARN_HOOK} = sub {
+  local $^WARN_HOOK = sub {
       $warning = @_[0];
   };
   @b = unpack "x[C] x[$t] X[$t] X[C] $t", "$p\0";
@@ -1446,38 +1446,38 @@ my %cant_checksum = map {$_=> 1} qw(A Z u w);
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: {
-    my $packed = eval {pack "${template}4", 1, 4, 9, 16};
+    my $packed = eval {pack "{$template}4", 1, 4, 9, 16};
     if ($@) {
       die unless $@->{description} =~ m/Invalid type '$template'/;
       skip ("$template not supported on this perl",
             %cant_checksum{$template} ? 4 : 8);
     }
-    my @unpack4 = unpack "${template}4", $packed;
-    my @unpack = unpack "${template}*", $packed;
-    my @unpack1 = unpack "${template}", $packed;
-    my @unpack1s = scalar unpack "${template}", $packed;
-    my @unpack4s = scalar unpack "${template}4", $packed;
-    my @unpacks = scalar unpack "${template}*", $packed;
+    my @unpack4 = unpack "{$template}4", $packed;
+    my @unpack = unpack "{$template}*", $packed;
+    my @unpack1 = unpack "{$template}", $packed;
+    my @unpack1s = scalar unpack "{$template}", $packed;
+    my @unpack4s = scalar unpack "{$template}4", $packed;
+    my @unpacks = scalar unpack "{$template}*", $packed;
 
-    my @tests = ( ["${template}4 vs ${template}*", \@unpack4, \@unpack],
-                  ["scalar ${template} ${template}", \@unpack1s, \@unpack1],
-                  ["scalar ${template}4 vs ${template}", \@unpack4s, \@unpack1],
-                  ["scalar ${template}* vs ${template}", \@unpacks, \@unpack1],
+    my @tests = ( ["{$template}4 vs {$template}*", \@unpack4, \@unpack],
+                  ["scalar {$template} {$template}", \@unpack1s, \@unpack1],
+                  ["scalar {$template}4 vs {$template}", \@unpack4s, \@unpack1],
+                  ["scalar {$template}* vs {$template}", \@unpacks, \@unpack1],
                 );
 
     unless (%cant_checksum{$template}) {
-      my @unpack4_c = unpack "\%${template}4", $packed;
-      my @unpack_c = unpack "\%${template}*", $packed;
-      my @unpack1_c = unpack "\%${template}", $packed;
-      my @unpack1s_c = scalar unpack "\%${template}", $packed;
-      my @unpack4s_c = scalar unpack "\%${template}4", $packed;
-      my @unpacks_c = scalar unpack "\%${template}*", $packed;
+      my @unpack4_c = unpack "\%{$template}4", $packed;
+      my @unpack_c = unpack "\%{$template}*", $packed;
+      my @unpack1_c = unpack "\%{$template}", $packed;
+      my @unpack1s_c = scalar unpack "\%{$template}", $packed;
+      my @unpack4s_c = scalar unpack "\%{$template}4", $packed;
+      my @unpacks_c = scalar unpack "\%{$template}*", $packed;
 
       push @tests,
-        ( ["\% ${template}4 vs ${template}*", \@unpack4_c, \@unpack_c],
-          ["\% scalar ${template} ${template}", \@unpack1s_c, \@unpack1_c],
-          ["\% scalar ${template}4 vs ${template}*", \@unpack4s_c, \@unpack_c],
-          ["\% scalar ${template}* vs ${template}*", \@unpacks_c, \@unpack_c],
+        ( ["\% {$template}4 vs {$template}*", \@unpack4_c, \@unpack_c],
+          ["\% scalar {$template} {$template}", \@unpack1s_c, \@unpack1_c],
+          ["\% scalar {$template}4 vs {$template}*", \@unpack4s_c, \@unpack_c],
+          ["\% scalar {$template}* vs {$template}*", \@unpacks_c, \@unpack_c],
         );
     }
     foreach my $test (@tests) {
@@ -1504,7 +1504,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 {
     use warnings qw(NONFATAL all);;
     my $warning;
-    local ${^WARN_HOOK} = sub {
+    local $^WARN_HOOK = sub {
         $warning = @_[0]->message;
     };
     my $out = pack("u99", "foo" x 99);

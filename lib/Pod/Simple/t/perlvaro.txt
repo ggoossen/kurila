@@ -312,9 +312,9 @@ See also $] for an older representation of the Perl version.
 $WARNING
 $^W
 The current value of the warning switch, initially true if -w was used, false otherwise, but directly modifiable. (Mnemonic: related to the -w switch.) See also warnings.
-${^WARNING_BITS}
+$^WARNING_BITS
 The current set of warning checks enabled by the use warnings pragma. See the documentation of warnings for more details.
-${^WIDE_SYSTEM_CALLS}
+$^WIDE_SYSTEM_CALLS
 Global flag that enables system calls made by Perl to use wide character APIs native to the system, if available. This is currently only implemented on the Windows platform.
 This can also be enabled from the command line using the -C switch.
 The initial value is typically 0 for compatibility with Perl versions earlier than 5.6, but may be automatically set to 1 by Perl if the system provides a user-settable default (e.g., $ENV{LC_CTYPE}).
@@ -393,14 +393,14 @@ For more details, see the individual descriptions at $@, $!, $^E, and $?.
 Technical Note on the Syntax of Variable Names
 Variable names in Perl can have several formats. Usually, they must begin with a letter or underscore, in which case they can be arbitrarily long (up to an internal limit of 251 characters) and may contain letters, digits, underscores, or the special sequence :: or '. In this case, the part before the last :: or ' is taken to be a package qualifier; see perlmod.
 Perl variable names may also be a sequence of digits or a single punctuation or control character. These names are all reserved for special uses by Perl; for example, the all-digits names are used to hold data captured by backreferences after a regular expression match. Perl has a special syntax for the single-control-character names: It understands ^X (caret X) to mean the control-X character. For example, the notation $^W (dollar-sign caret W) is the scalar variable whose name is the single character control-W. This is better than typing a literal control-W into your program.
-Finally, new in Perl 5.6, Perl variable names may be alphanumeric strings that begin with control characters (or better yet, a caret). These variables must be written in the form ${^Foo}; the braces are not optional. ${^Foo} denotes the scalar variable whose name is a control-F followed by two o's. These variables are reserved for future special uses by Perl, except for the ones that begin with ^_ (control-underscore or caret-underscore). No control-character name that begins with ^_ will acquire a special meaning in any future version of Perl; such names may therefore be used safely in programs. $^_ itself, however, is reserved.
+Finally, new in Perl 5.6, Perl variable names may be alphanumeric strings that begin with control characters (or better yet, a caret). These variables must be written in the form $^Foo; the braces are not optional. $^Foo denotes the scalar variable whose name is a control-F followed by two o's. These variables are reserved for future special uses by Perl, except for the ones that begin with ^_ (control-underscore or caret-underscore). No control-character name that begins with ^_ will acquire a special meaning in any future version of Perl; such names may therefore be used safely in programs. $^_ itself, however, is reserved.
 Perl identifiers that begin with digits, control characters, or punctuation characters are exempt from the effects of the package declaration and are always forced to be in package main. A few other names are also exempt:
         ENV             STDIN
         INC             STDOUT
         ARGV            STDERR
         ARGVOUT
         SIG
-In particular, the new special ${^_XYZ} variables are always taken to be in package main, regardless of any package declarations presently in scope.
+In particular, the new special $^_XYZ variables are always taken to be in package main, regardless of any package declarations presently in scope.
 BUGS
 Due to an unfortunate accident of Perl's implementation, use English imposes a considerable performance penalty on all regular expression matches in a program, regardless of whether they occur in the scope of use English. For that reason, saying use English in libraries is strongly discouraged. See the Devel::SawAmpersand module documentation from CPAN (http://www.perl.com/CPAN/modules/by-module/Devel/) for more information.
 Having to even think about the $^S variable in your exception handlers is simply wrong. $SIG{__DIE__} as currently implemented invites grievous and difficult to track down errors. Avoid it and use an END{} or CORE::GLOBAL::die override instead.

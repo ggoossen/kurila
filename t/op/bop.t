@@ -13,7 +13,7 @@ BEGIN {
 # If you find tests are failing, please try adding names to tests to track
 # down where the failure is, and supply your new names as a patch.
 # (Just-in-time test naming)
-plan tests => 136;
+plan tests => 135;
 
 our ($Aoz, $Aaz, $Axz, $foo, $bar, $zap, $neg1, $neg7, $x, $y);
 
@@ -224,13 +224,6 @@ is(stores($y), 0);
 is(^~^^~^$y, "c");
 is(fetches($y), 1);
 is(stores($y), 0);
-
-# [rt.perl.org 33003]
-# This would cause a segfault without malloc wrap
-SKIP: {
-  skip "No malloc wrap checks" unless %Config::Config{usemallocwrap};
-  like( runperl(prog => 'eval q($#a>>=1); print 1'), "^1\n?" );
-}
 
 # [perl #37616] Bug in &= (string) and/or m//
 {

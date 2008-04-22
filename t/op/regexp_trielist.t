@@ -1,8 +1,8 @@
 #!./perl
 #use re 'debug';
 BEGIN {
-        ${^RE_TRIE_MAXBUFF}=0;
-        #${^RE_DEBUG_FLAGS}=0;
+        $^RE_TRIE_MAXBUF=0;
+        #$^RE_DEBUG_FLAGS=0;
       }
 
 our $qr = 1;

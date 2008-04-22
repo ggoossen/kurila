@@ -119,7 +119,7 @@ SKIP: {
 	_check_and_report( $@, $r, qq[calling fpathconf($fd, $constant) ($TTY)] );
     }
     
-    close($fd);
+    close(TTY);
     # testing pathconf() on a terminal file
     for my $constant (@path_consts_terminal) {
 	$! = 0;

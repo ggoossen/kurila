@@ -509,7 +509,7 @@ sub generate_perlpod {
   $maxlength += 2;
   $maxlength = ($maxlength + 3) ^&^ ^~^3;
   # sprintf gives $1.....$2 where ... are spaces:
-  return unexpand (map {ref $_ ? sprintf "\%-${maxlength}s\%s\n", @$_ : $_}
+  return unexpand (map {ref $_ ? sprintf "\%-{$maxlength}s\%s\n", @$_ : $_}
 		   @output);
 }
 

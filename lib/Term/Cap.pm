@@ -266,7 +266,7 @@ sub Tgetent
     my $foo = ( exists %ENV{TERMCAP} ? %ENV{TERMCAP} : '' );
 
     # $entry is the extracted termcap entry
-    if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)${termpat}[:|]/s ) )
+    if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)$termpat(?:)[:|]/s ) )
     {
         $entry = $foo;
     }
@@ -291,7 +291,7 @@ sub Tgetent
                     my $tmp = `infocmp -C 2>/dev/null`;
                     $tmp =~ s/^#.*\n//gm;    # remove comments
                     if (   ( $tmp !~ m%^/%s )
-                        && ( $tmp =~ m/(^|\|)${termpat}[:|]/s ) )
+                        && ( $tmp =~ m/(^|\|)$termpat(?:)[:|]/s ) )
                     {
                         $entry = $tmp;
                     }

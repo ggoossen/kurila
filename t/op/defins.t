@@ -7,7 +7,7 @@
 our $warns;
 
 BEGIN {
-    ${^WARN_HOOK} = sub { $warns++; warn @_[0] };
+    $^WARN_HOOK = sub { $warns++; warn @_[0] };
 }
 require './test.pl';
 plan( tests => 19 );

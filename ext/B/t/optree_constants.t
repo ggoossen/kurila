@@ -106,7 +106,7 @@ for $func (sort keys %$want) {
 3  <1> leavesub[2 refs] K/REFC,1 ->(end)
 -     <\@> lineseq KP ->3
 1        <;> dbstate(main 833 (eval 44):1) v ->2
-2        <\$> const[$want->{$func}[0] $want->{$func}[1]] s ->3
+2        <\$> const\[$want->{$func}[0] $want->{$func}[1]\] s ->3
 EOT_EOT
 3  <1> leavesub[2 refs] K/REFC,1 ->(end)
 -     <\@> lineseq KP ->3

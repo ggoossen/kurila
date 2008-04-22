@@ -632,7 +632,7 @@ sub error_str {
         set_madprop($op, "variable", '$@->{description}');
     }
 
-    # replae $SIG{__DIE__} with ${^DIE_HOOK}
+    # replae $SIG{__DIE__} with $^DIE_HOOK
     for my $op_const ($xml->findnodes('//op_const')) {
         for my $name (qw|DIE WARN|) {
             next unless ($op_const->att('PV') || '') eq "__${name}__";
@@ -640,7 +640,7 @@ sub error_str {
             my $rv2hv = $op_const->parent->child(1);
             next unless $rv2hv->tag eq "op_rv2hv";
             next unless get_madprop($rv2hv, "variable") eq '$SIG';
-            set_madprop($rv2hv, "variable", '${^' . $name . '_HOOK}');
+            set_madprop($rv2hv, "variable", '$^' . $name . '_HOOK');
             set_madprop($op_const->parent, "curly_open", '');
             set_madprop($op_const->parent, "curly_close", '');
             set_madprop($op_const, $_, '') for qw|value quote_open quote_close assign|;

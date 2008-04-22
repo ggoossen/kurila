@@ -22,15 +22,11 @@ BEGIN {
         print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
         exit 0;
     }
-    eval 'use threads; use threads::shared';
-    plan tests => 3;
-    if ($@) {
-	fail("unable to load thread modules");
-    }
-    else {
-	pass("thread modules loaded");
-    }
 }
+use threads;
+use threads::shared;
+
+plan tests => 2;
 
 my ($pid, $ppid) = ($$, getppid());
 my $pid2 : shared = 0;

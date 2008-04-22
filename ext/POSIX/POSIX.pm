@@ -646,7 +646,7 @@ sub fork {
 
 sub getegid {
     usage "getegid()" if @_ != 0;
-    $) + 0;
+    $^EGID + 0;
 }
 
 sub geteuid {
@@ -656,13 +656,13 @@ sub geteuid {
 
 sub getgid {
     usage "getgid()" if @_ != 0;
-    $( + 0;
+    $^GID + 0;
 }
 
 sub getgroups {
     usage "getgroups()" if @_ != 0;
     my %seen;
-    grep(!%seen{$_}++, split(' ', $) ));
+    grep(!%seen{$_}++, split(' ', $^EGID ));
 }
 
 sub getlogin {

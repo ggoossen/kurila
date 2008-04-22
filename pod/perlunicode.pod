@@ -1474,6 +1474,6 @@ it. Functions to modify the flag have been removed or give an error.
 =head1 SEE ALSO
 
 L<perlunitut>, L<perluniintro>, L<Encode>, L<open>, L<utf8>, L<bytes>,
-L<perlretut>, L<perlvar/"${^UNICODE}">
+L<perlretut>, L<perlvar/"$^UNICODE">
 
 =cut

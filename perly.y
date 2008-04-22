@@ -767,7 +767,8 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             TOKEN_GETMAD($2,$$,'a');
                             if (IVAL($2) == OP_JOIN) {
                                 /* creates a join when ending list */
-                                OP* list = newSVOP(OP_CONST, 0, newSVpvs(" ")); /* TODO: change to $" */
+                                OP *list
+                                    = newSVREF(newGVOP(OP_GV, 0, gv_fetchpvs("\"", GV_ADD|GV_NOTQUAL, SVt_PV)));
                                 append_elem(OP_LIST, list, $$);
                                 $$ = convert(OP_JOIN, 0, list);
                             }

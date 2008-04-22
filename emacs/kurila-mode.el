@@ -1099,7 +1099,6 @@
 ;;;				Likewise for \$.
 ;;;				Remove `here-doc-group' text property at start
 ;;;				(makes this property reliable).
-;;;				Text property `first-format-line' ==> t.
 ;;;				Do not recognize $opt_s and $opt::s as s///.
 ;;;  (`kurila-perldoc'):		Use case-sensitive search (contributed).
 ;;;  (`kurila-fix-line-spacing'): Allow "_" in $vars of foreach etc. when
@@ -1140,7 +1139,6 @@
 
 ;;; Code:
 
-
 (if (fboundp 'eval-when-compile)
     (eval-when-compile
       (condition-case nil
@@ -1279,7 +1277,6 @@
   :prefix "kurila-"
   :group 'cperl)
 
-
 (defcustom kurila-extra-newline-before-brace nil
   "*Non-nil means that if, elsif, while, until, else, for, foreach
 and do constructs look like:
@@ -3676,8 +3673,7 @@ and closing parentheses and brackets."
 				   (progn
 				     (forward-sexp -1)
 				     (skip-chars-backward " \t")
-				     (looking-at "[ \t]*[a-zA-Z_][a-zA-Z_0-9]*[ \t]*:")))
-			      (get-text-property (point) 'first-format-line))
+				     (looking-at "[ \t]*[a-zA-Z_][a-zA-Z_0-9]*[ \t]*:"))))
 			  (progn
 			    (if (and parse-data
 				     (not (eq char-after ?\C-j)))
@@ -3755,8 +3751,7 @@ and closing parentheses and brackets."
 				    (append (if is-block " ;{" " ,;{") '(nil)))
 			      (and (eq (preceding-char) ?\})
 				   (kurila-after-block-and-statement-beg
-				    containing-sexp))
-			      (get-text-property (point) 'first-format-line)))
+				    containing-sexp))))
 		     ;; This line is continuation of preceding line's statement;
 		     ;; indent  `kurila-continued-statement-offset'  more than the
 		     ;; previous line of the statement.
@@ -4265,9 +4260,6 @@ Returns true if comment is found."
 ;;		Start-to-end is marked `here-doc-group' ==> t
 ;;		The body is marked `syntax-type' ==> `here-doc'
 ;;		The delimiter is marked `syntax-type' ==> `here-doc-delim'
-;;	c) FORMATs:
-;;		First line (to =) marked `first-format-line' ==> t
-;;		After-this--to-end is marked `syntax-type' ==> `format'
 ;;	d) 'Q'uoted string:
 ;;		part between markers inclusive is marked `syntax-type' ==> `string'
 ;;		part between `q' and the first marker is marked `syntax-type' ==> `prestring'
@@ -4370,9 +4362,8 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 	   ;; "\\([^= \t0-9$@%&]\\|[ \t]+[^ \t\n0-9$@%&]\\)" ; 6 + 1
 	   "\\(\\)"		; To preserve count of pars :-( 6 + 1
 	   "\\)"
-	   "\\|"
 	   ;; 1+6 extra () before this:
-	   "^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$"
+           "\\(\\)\\(\\)" ; To preserve count of pars
 	   (if kurila-use-syntax-table-text-property
 	       (concat
 		"\\|"
@@ -4413,7 +4404,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 						  syntax-subtype t
 						  rear-nonsticky t
 						  here-doc-group t
-						  first-format-line t
 						  indentable t))
 	    ;; Need to remove face as well...
 	    (goto-char min)
@@ -4460,7 +4450,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					      syntax-subtype t
 					      here-doc-group t
 					      rear-nonsticky t
-					      first-format-line t
 					      indentable t))
 			 (setq tmpend tb)))
 		  (put-text-property b e 'in-pod t)
@@ -4578,58 +4567,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		  (kurila-put-do-not-fontify b (match-end 0) t)
 		  (if (> e1 max)
 		      (setq tmpend tb))))
-	       ;; format
-	       ((match-beginning 8)
-		;; 1+6=7 extra () before this:
-		;;"^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$"
-		(setq b (point)
-		      name (if (match-beginning 8) ; 7 + 1
-			       (buffer-substring (match-beginning 8) ; 7 + 1
-						 (match-end 8)) ; 7 + 1
-			     "")
-		      tb (match-beginning 0))
-		(setq argument nil)
-		(put-text-property (save-excursion
-				     (beginning-of-line)
-				     (point))
-				   b 'first-format-line 't)
-		(if kurila-pod-here-fontify
-		    (while (and (eq (forward-line) 0)
-				(not (looking-at "^[.;]$")))
-		      (cond
-		       ((looking-at "^#")) ; Skip comments
-		       ((and argument	; Skip argument multi-lines
-			     (looking-at "^[ \t]*{"))
-			(forward-sexp 1)
-			(setq argument nil))
-		       (argument	; Skip argument lines
-			(setq argument nil))
-		       (t		; Format line
-			(setq b1 (point))
-			(setq argument (looking-at "^[^\n]*[@^]"))
-			(end-of-line)
-			;; Highlight the format line
-			(kurila-postpone-fontification b1 (point)
-						      'face font-lock-string-face)
-			(kurila-commentify b1 (point) nil)
-			(kurila-put-do-not-fontify b1 (point) t))))
-		  ;; We do not search to max, since we may be called from
-		  ;; some hook of fontification, and max is random
-		  (re-search-forward "^[.;]$" stop-point 'toend))
-		(beginning-of-line)
-		(if (looking-at "^\\.$") ; ";" is not supported yet
-		    (progn
-		      ;; Highlight the ending delimiter
-		      (kurila-postpone-fontification (point) (+ (point) 2)
-						    'face font-lock-string-face)
-		      (kurila-commentify (point) (+ (point) 2) nil)
-		      (kurila-put-do-not-fontify (point) (+ (point) 2) t))
-		  (message "End of format `%s' not found." name)
-		  (or (car err-l) (setcar err-l b)))
-		(forward-line)
-		(if (> (point) max)
-		    (setq tmpend tb))
-		(put-text-property b (point) 'syntax-type 'format))
 	       ;; Regexp:
 	       ((or (match-beginning 10) (match-beginning 11))
 		;; 1+6+2=9 extra () before this:
@@ -5062,10 +4999,7 @@ CHARS is a string that contains good characters to have before us (however,
 	    (if test (eval test)
 	      (or (memq (preceding-char) (append (or chars "{;") nil))
 		  (and (eq (preceding-char) ?\})
-		       (kurila-after-block-p lim))
-		  (and (eq (following-char) ?.)	; in format: see comment above
-		       (eq (get-text-property (point) 'syntax-type)
-			   'format)))))))))
+		       (kurila-after-block-p lim)))))))))
 
 (defun kurila-backward-to-start-of-continued-exp (lim)
   (if (memq (preceding-char) (append ")]}\"'`" nil))
@@ -7448,14 +7382,11 @@ $ARGV	The name of the current file used with <> .
 $[	Deprecated: The index of the first element/char in an array/string.
 $\\	The output record separator for the print operator.
 $]	The perl version string as displayed with perl -v.
-$^	The name of the current top-of-page format.
-$^A     The current value of the write() accumulator for format() lines.
 $^D	The value of the perl debug (-D) flags.
 $^E     Information about the last system error other than that provided by $!.
 $^F	The highest system file descriptor, ordinarily 2.
 $^H     The current set of syntax checks enabled by `use strict'.
 $^I	The value of the in-place edit extension (perl -i option).
-$^L     What formats output to perform a formfeed.  Default is \f.
 $^M     A buffer for emergency memory allocation when running out of memory.
 $^O     The operating system name under which this copy of Perl was built.
 $^P	Internal debugging flag.
@@ -7464,7 +7395,6 @@ $^W	True if warnings are requested (perl -w flag).
 $^X	The name under which perl was invoked (argv[0] in C-speech).
 $_	The default input and pattern-searching space.
 $|	Auto-flush after write/print on current output channel?  Default 0.
-$~	The name of the current report format.
 ... % ...	Modulo division.
 ... %= ...	Modulo division assignment.
 %ENV	Contains the current environment.
@@ -7541,7 +7471,7 @@ $~	The name of the current report format.
 \\0	Octal char, e.g. \\033.
 \\E	Case modification terminator.  See \\Q, \\L, and \\U.
 \\L	Lowercase until \\E .  See also \l, lc.
-\\U	Upcase until \\E .  See also \u, uc.
+\\U	Upcase until \\E .  See also \\u, uc.
 \\Q	Quote metacharacters until \\E .  See also quotemeta.
 \\a	Alarm character (octal 007).
 \\b	Backspace character (octal 010).

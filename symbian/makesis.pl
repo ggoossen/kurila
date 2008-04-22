@@ -31,15 +31,15 @@ my @target = @ARGV
   ? @ARGV
   : (
     "miniperl",          "perl",
-    "perl${VERSION}dll", "perl${VERSION}lib",
-    "perl${VERSION}ext"
+    "perl{$VERSION}dll", "perl{$VERSION}lib",
+    "perl{$VERSION}ext"
   );
 
 my %suffix;
 %suffix{["miniperl", "perl", "perl$VERSION" ]} = ( "exe", "exe", "dll", );
 
 for my $target (@target) {
-    $target = "perl${VERSION}" if $target eq "perl${VERSION}dll";
+    $target = "perl{$VERSION}" if $target eq "perl{$VERSION}dll";
 
     my %copy;
     my $pkg = "$target.pkg";
@@ -50,11 +50,11 @@ for my $target (@target) {
 
     my $srctarget = "$UREL\\$target.$suffix";
 
-    if ( $target =~ m/^(miniperl|perl|perl${VERSION}(?:dll)?)$/ ) {
+    if ( $target =~ m/^(miniperl|perl|perl$VERSION(?:dll)?)$/ ) {
         %copy{$srctarget} = "$dst\\$target.$suffix";
         print "\t$target.$suffix\n";
     }
-    if ( $target eq "perl${VERSION}lib" ) {
+    if ( $target eq "perl{$VERSION}lib" ) {
         print "Libraries...\n";
 
         print "\tConfig.pm\n";
@@ -89,7 +89,7 @@ for my $target (@target) {
         close($cfg);
     }
 
-    if ( $target eq "perl${VERSION}ext" ) {
+    if ( $target eq "perl{$VERSION}ext" ) {
         my @lst = glob("symbian/*.lst");
         print "Extensions...\n";
         print "\t(none found)\n" unless @lst;
@@ -126,10 +126,10 @@ for my $target (@target) {
     my %UID = (
         "miniperl"          => 0,
         "perl"              => 0,
-        "perl${VERSION}"    => $UID + 0,
-        "perl${VERSION}dll" => $UID + 0,
-        "perl${VERSION}ext" => $UID + 1,
-        "perl${VERSION}lib" => $UID + 2,
+        "perl{$VERSION}"    => $UID + 0,
+        "perl{$VERSION}dll" => $UID + 0,
+        "perl{$VERSION}ext" => $UID + 1,
+        "perl{$VERSION}lib" => $UID + 2,
         "perlapp"           => $UID + 3,
         "perlrecog"         => $UID + 4,
         "perlappmin"        => $UID + 5,

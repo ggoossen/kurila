@@ -949,12 +949,12 @@ The current value of the warning switch, initially true if B<-w>
 was used, false otherwise, but directly modifiable.  (Mnemonic:
 related to the B<-w> switch.)  See also L<warnings>.
 
-=item ${^WARNING_BITS}
+=item $^WARNING_BITS
 
 The current set of warning checks enabled by the C<use warnings> pragma.
 See the documentation of C<warnings> for more details.
 
-=item ${^WIDE_SYSTEM_CALLS}
+=item $^WIDE_SYSTEM_CALLS
 
 Global flag that enables system calls made by Perl to use wide character
 APIs native to the system, if available.  This is currently only implemented
@@ -1193,8 +1193,8 @@ into your program.
 
 Finally, new in Perl 5.6, Perl variable names may be alphanumeric
 strings that begin with control characters (or better yet, a caret).
-These variables must be written in the form C<${^Foo}>; the braces
-are not optional.  C<${^Foo}> denotes the scalar variable whose
+These variables must be written in the form C<$^Foo>; the braces
+are not optional.  C<$^Foo> denotes the scalar variable whose
 name is a control-C<F> followed by two C<o>'s.  These variables are
 reserved for future special uses by Perl, except for the ones that
 begin with C<^_> (control-underscore or caret-underscore).  No
@@ -1213,7 +1213,7 @@ other names are also exempt:
 	ARGVOUT
 	SIG
 
-In particular, the new special C<${^_XYZ}> variables are always taken
+In particular, the new special C<$^_XYZ> variables are always taken
 to be in package C<main>, regardless of any C<package> declarations
 presently in scope.
 

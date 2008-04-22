@@ -14,7 +14,7 @@ krunch.pm krunch.pmc whap.pm whap.pmc);
 
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
-my $Is_UTF8   = (${^OPEN} || "") =~ m/:utf8/;
+my $Is_UTF8   = ($^OPEN || "") =~ m/:utf8/;
 my $total_tests = 38;
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
@@ -220,7 +220,7 @@ EOT
     $err .= "\n" unless $err =~ m/\n$/;
     unless ($err =~ m/Global symbol "\$nosuchvar" requires /) {
 	$err =~ s/^/# /mg;
-	print "${err}not ";
+	print "{$err}not ";
     }
     print "ok ", ++$i, " [perl #49472]\n";
 }
@@ -237,7 +237,7 @@ if ($Is_EBCDIC || $Is_UTF8) { exit; }
 require utf8;
 my $utf8 = utf8::chr(0xFEFF);
 
-$i++; do_require(qq(${utf8}print "ok $i\n"; 1;\n));
+$i++; do_require(qq({$utf8}print "ok $i\n"; 1;\n));
 
 END {
     foreach my $file (@fjles_to_delete) {

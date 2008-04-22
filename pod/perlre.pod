@@ -62,8 +62,8 @@ Extend your pattern's legibility by permitting whitespace and comments.
 =item p
 X</p> X<regex, preserve> X<regexp, preserve>
 
-Preserve the string matched such that ${^PREMATCH}, {$^MATCH}, and
-${^POSTMATCH} are available for use after matching.
+Preserve the string matched such that $^PREMATCH, $^MATCH, and
+$^POSTMATCH are available for use after matching.
 
 =item g and c
 X</g> X</c>
@@ -610,8 +610,8 @@ already paid the price.  As of 5.005, C<$&> is not so costly as the
 other two.
 X<$&> X<$`> X<$'>
 
-As a workaround for this problem, Perl 5.10.0 introduces C<${^PREMATCH}>,
-C<${^MATCH}> and C<${^POSTMATCH}>, which are equivalent to C<$`>, C<$&>
+As a workaround for this problem, Perl 5.10.0 introduces C<$^PREMATCH>,
+C<$^MATCH> and C<$^POSTMATCH>, which are equivalent to C<$`>, C<$&>
 and C<$'>, B<except> that they are only guaranteed to be defined after a
 successful match that was executed with the C</p> (preserve) modifier.
 The use of these variables incurs no global performance penalty, unlike

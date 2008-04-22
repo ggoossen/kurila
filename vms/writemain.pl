@@ -12,10 +12,10 @@ if (-f 'miniperlmain.c') { $dir = ''; }
 elsif (-f '../miniperlmain.c') { $dir = '../'; }
 else { die "$0: Can't find miniperlmain.c\n"; }
 
-open (IN,"${dir}miniperlmain.c")
-  || die "$0: Can't open ${dir}miniperlmain.c: $!\n";
-open (OUT, ">","${dir}perlmain.c")
-  || die "$0: Can't open ${dir}perlmain.c: $!\n";
+open (IN,"{$dir}miniperlmain.c")
+  || die "$0: Can't open {$dir}miniperlmain.c: $!\n";
+open (OUT, ">","{$dir}perlmain.c")
+  || die "$0: Can't open {$dir}perlmain.c: $!\n";
 
 while ( ~< *IN) {
   print OUT;
@@ -26,8 +26,8 @@ close IN;
 
 if (!$ok) {
   close OUT;
-  unlink "${dir}perlmain.c";
-  die "$0: Can't find marker line in ${dir}miniperlmain.c - aborting\n";
+  unlink "{$dir}perlmain.c";
+  die "$0: Can't find marker line in {$dir}miniperlmain.c - aborting\n";
 }
 
 
@@ -50,7 +50,7 @@ if (@exts) {
   foreach $ext (@exts) {
     my($subname) = $ext;
     $subname =~ s/::/__/g;
-    print OUT "extern void	boot_${subname} (pTHX_ CV* cv);\n"
+    print OUT "extern void	boot_{$subname} (pTHX_ CV* cv);\n"
   }
   # May not actually be a declaration, so put after other declarations
   print OUT "  dXSUB_SYS;\n";
@@ -61,10 +61,10 @@ if (@exts) {
     if ($ext eq 'DynaLoader') {
       # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
       # boot_DynaLoader is called directly in DynaLoader.pm
-      print OUT "    newXS(\"${ext}::boot_${ext}\", boot_${subname}, file);\n"
+      print OUT "    newXS(\"{$ext}::boot_{$ext}\", boot_{$subname}, file);\n"
     }
     else {
-      print OUT "    newXS(\"${ext}::bootstrap\", boot_${subname}, file);\n"
+      print OUT "    newXS(\"{$ext}::bootstrap\", boot_{$subname}, file);\n"
     }
   }
 }

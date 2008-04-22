@@ -106,7 +106,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local ${^WARN_HOOK} = sub { $warn++ };
+    local $^WARN_HOOK = sub { $warn++ };
     open my $fh, '>', \my $scalar;
     print $fh "foo";
     close $fh;
@@ -116,7 +116,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local ${^WARN_HOOK} = sub { $warn++ };
+    local $^WARN_HOOK = sub { $warn++ };
     for (1..2) {
         open my $fh, '>', \my $scalar;
         close $fh;
@@ -127,7 +127,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local ${^WARN_HOOK} = sub { $warn++ };
+    local $^WARN_HOOK = sub { $warn++ };
 
     my $fetch = 0;
     {
@@ -146,7 +146,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
 {
     use warnings;
     my $warn = 0;
-    local ${^WARN_HOOK} = sub { $warn++ };
+    local $^WARN_HOOK = sub { $warn++ };
     my $scalar = 3;
     undef $scalar;
     open my $fh, '<', \$scalar;

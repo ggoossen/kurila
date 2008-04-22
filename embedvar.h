@@ -74,7 +74,6 @@
 #define PL_bitcount		(vTHX->Ibitcount)
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
-#define PL_bodytarget		(vTHX->Ibodytarget)
 #define PL_checkav		(vTHX->Icheckav)
 #define PL_checkav_save		(vTHX->Icheckav_save)
 #define PL_chopset		(vTHX->Ichopset)
@@ -141,8 +140,6 @@
 #define PL_filemode		(vTHX->Ifilemode)
 #define PL_firstgv		(vTHX->Ifirstgv)
 #define PL_forkprocess		(vTHX->Iforkprocess)
-#define PL_formfeed		(vTHX->Iformfeed)
-#define PL_formtarget		(vTHX->Iformtarget)
 #define PL_generation		(vTHX->Igeneration)
 #define PL_gensym		(vTHX->Igensym)
 #define PL_gid			(vTHX->Igid)
@@ -307,7 +304,6 @@
 #define PL_tmps_max		(vTHX->Itmps_max)
 #define PL_tmps_stack		(vTHX->Itmps_stack)
 #define PL_top_env		(vTHX->Itop_env)
-#define PL_toptarget		(vTHX->Itoptarget)
 #define PL_uid			(vTHX->Iuid)
 #define PL_unicode		(vTHX->Iunicode)
 #define PL_unitcheckav		(vTHX->Iunitcheckav)
@@ -379,7 +375,6 @@
 #define PL_Ibitcount		PL_bitcount
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
-#define PL_Ibodytarget		PL_bodytarget
 #define PL_Icheckav		PL_checkav
 #define PL_Icheckav_save	PL_checkav_save
 #define PL_Ichopset		PL_chopset
@@ -446,8 +441,6 @@
 #define PL_Ifilemode		PL_filemode
 #define PL_Ifirstgv		PL_firstgv
 #define PL_Iforkprocess		PL_forkprocess
-#define PL_Iformfeed		PL_formfeed
-#define PL_Iformtarget		PL_formtarget
 #define PL_Igeneration		PL_generation
 #define PL_Igensym		PL_gensym
 #define PL_Igid			PL_gid
@@ -612,7 +605,6 @@
 #define PL_Itmps_max		PL_tmps_max
 #define PL_Itmps_stack		PL_tmps_stack
 #define PL_Itop_env		PL_top_env
-#define PL_Itoptarget		PL_toptarget
 #define PL_Iuid			PL_uid
 #define PL_Iunicode		PL_unicode
 #define PL_Iunitcheckav		PL_unitcheckav

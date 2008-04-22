@@ -116,28 +116,26 @@ sub bits {
     my $on = shift;
     my $bits = 0;
     unless (@_) {
-	require Carp;
-	Carp::carp("Useless use of \"re\" pragma"); 
+	warn("Useless use of \"re\" pragma"); 
     }
     foreach my $idx (0..(@_-1)){
         my $s=@_[$idx];
         if ($s eq 'Debug' or $s eq 'Debugcolor') {
             setcolor() if $s =~m/color/i;
-            ${^RE_DEBUG_FLAGS} = 0 unless defined ${^RE_DEBUG_FLAGS};
+            $^RE_DEBUG_FLAGS = 0 unless defined $^RE_DEBUG_FLAGS;
             for my $idx ($idx+1..(@_-1)) {
                 if (%flags{@_[$idx]}) {
                     if ($on) {
-                        ${^RE_DEBUG_FLAGS} ^|^= %flags{@_[$idx]};
+                        $^RE_DEBUG_FLAGS ^|^= %flags{@_[$idx]};
                     } else {
-                        ${^RE_DEBUG_FLAGS} ^&^= ^~^ %flags{@_[$idx]};
+                        $^RE_DEBUG_FLAGS ^&^= ^~^ %flags{@_[$idx]};
                     }
                 } else {
-                    require Carp;
-                    Carp::carp("Unknown \"re\" Debug flag '@_[$idx]', possible flags: ",
-                               join(", ",sort keys %flags ) );
+                    warn("Unknown \"re\" Debug flag '@_[$idx]', possible flags: "
+                         . join(", ",sort keys %flags ) );
                 }
             }
-            _load_unload($on ? 1 : ${^RE_DEBUG_FLAGS});
+            _load_unload($on ? 1 : $^RE_DEBUG_FLAGS);
             last;
         } elsif ($s eq 'debug' or $s eq 'debugcolor') {
 	    setcolor() if $s =~m/color/i;
@@ -156,10 +154,9 @@ sub bits {
 	    require Exporter;
 	    re->export_to_level(2, 're', $s);
 	} else {
-	    require Carp;
-	    Carp::carp("Unknown \"re\" subpragma '$s' (known ones are: ",
-                       join(', ', map {qq('$_')} 'debug', 'debugcolor', sort keys %bitmask),
-                       ")");
+	    warn("Unknown \"re\" subpragma '$s' (known ones are: "
+                 . join(', ', map {qq('$_')} 'debug', 'debugcolor', sort keys %bitmask)
+                 . ")");
 	}
     }
     $bits;

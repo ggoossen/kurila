@@ -428,7 +428,7 @@ destroyed
 ########
 BEGIN {
   $| = 1;
-  ${^WARN_HOOK} = sub {
+  $^WARN_HOOK = sub {
     eval { print @_[0]->{description} };
     die "bar";
   };
@@ -690,7 +690,7 @@ BEGIN {
 }
 # Test case cut down by jhi
 use Carp;
-${^WARN_HOOK} = sub { $@ = shift };
+$^WARN_HOOK = sub { $@ = shift };
 use Encode;
 use utf8;
 my $t = "\x[E9]";

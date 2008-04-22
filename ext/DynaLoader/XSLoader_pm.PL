@@ -107,27 +107,22 @@ print OUT <<'EOT';
     # in this perl code simply because this was the last perl code
     # it executed.
 
-    my $libref = dl_load_file($file, 0) or do { 
-        require Carp;
-        Carp::croak("Can't load '$file' for module $module: " . dl_error());
-    };
+    my $libref = dl_load_file($file, 0) or
+          die("Can't load '$file' for module $module: " . dl_error());
     push(@DynaLoader::dl_librefs,$libref);  # record loaded object
 
     my @unresolved = dl_undef_symbols();
     if (@unresolved) {
-        require Carp;
-        Carp::carp("Undefined symbols present after loading $file: @unresolved\n");
+        warn("Undefined symbols present after loading $file: @unresolved\n");
     }
 
-    $boot_symbol_ref = dl_find_symbol($libref, $bootname) or do {
-        require Carp;
-        Carp::croak("Can't find '$bootname' symbol in $file\n");
-    };
+    $boot_symbol_ref = dl_find_symbol($libref, $bootname) or 
+        die("Can't find '$bootname' symbol in $file\n");
 
     push(@DynaLoader::dl_modules, $module); # record loaded module
 
   boot:
-    my $xs = dl_install_xsub("${module}::bootstrap", $boot_symbol_ref, $file);
+    my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
 
     # See comment block above
     push(@DynaLoader::dl_shared_objects, $file); # record files loaded

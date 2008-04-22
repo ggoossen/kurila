@@ -786,7 +786,7 @@ like($@->{description}, qr/foo/);
 ====
 $SIG{__DIE__} = 1;
 ----
-${^DIE_HOOK} = 1;
+$^DIE_HOOK = 1;
 ====
 like($@->{description}, qr/foo/);
 ----
@@ -794,7 +794,7 @@ like($@->{description}, qr/foo/);
 ====
 $SIG{'__WARN__'} = 1;
 ----
-${^WARN_HOOK} = 1;
+$^WARN_HOOK = 1;
 END
 }
 

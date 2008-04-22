@@ -162,7 +162,7 @@ foreach my $pain ($first, @virtual) {
 my ($path, $ver, @orig_inc)
   = split m/\n/,
     runperl (nolib=>1,
-	     prog=>'print qq{$^X\n$^V\n}; print qq{$_\n} while $_ = shift INC');
+	     prog=>'print qq{$^X\n$^V\n}; print qq{$_\n} while $_ = shift @INC');
 
 die "This perl is $^V at $^X; other perl is $ver (at $path) "
   . '- failed to find this perl' unless $^V eq $ver;

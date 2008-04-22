@@ -115,9 +115,6 @@ PERLVAR(Ilast_in_gv,	GV *)		/* GV used in last <FH> */
 PERLVAR(Iofs_sv,	SV *)		/* output field separator $, */
 PERLVAR(Idefoutgv,	GV *)		/* default FH for output */
 PERLVARI(Ichopset,	const char *, " \n-")	/* $: */
-PERLVAR(Iformtarget,	SV *)
-PERLVAR(Ibodytarget,	SV *)
-PERLVAR(Itoptarget,	SV *)
 
 /* Stashes */
 PERLVAR(Idefstash,	HV *)		/* main symbol table */
@@ -245,7 +242,6 @@ PERLVAR(Ie_script,	SV *)
 
 /* magical thingies */
 PERLVAR(Ibasetime,	Time_t)		/* $^T */
-PERLVAR(Iformfeed,	SV *)		/* $^L */
 
 
 PERLVARI(Imaxsysfd,	I32,	MAXSYSFD)

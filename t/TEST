@@ -75,8 +75,8 @@ my $updir  = File::Spec->updir;
 
 sub _find_tests {
     my($dir) = @_;
-    opendir DIR, $dir or die "Trouble opening $dir: $!";
-    foreach my $f (sort { $a cmp $b } readdir DIR) {
+    opendir my $dirh, $dir or die "Trouble opening $dir: $!";
+    foreach my $f (sort { $a cmp $b } readdir $dirh) {
 	next if $f eq $curdir or $f eq $updir or
 	    $f =~ m/^(?:CVS|RCS|SCCS|\.svn)$/;
 
@@ -127,8 +127,8 @@ unless (@ARGV) {
     my %skip;
     if (-f $configsh) {
 	my (%extensions, %known_extensions);
-	open FH, "<", $configsh or die "Can't open $configsh: $!";
-	while ( ~< *FH) {
+	open my $fh, "<", $configsh or die "Can't open $configsh: $!";
+	while ( ~< *$fh) {
 	    if (m/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
 		# $1 resetting bugs.
@@ -151,9 +151,9 @@ unless (@ARGV) {
 	}
     }
     my $mani = File::Spec->catfile($updir, "MANIFEST");
-    if (open(MANI, "<", $mani)) {
+    if (open(my $mani, "<", $mani)) {
 	my $ext_pat = $^O eq 'MSWin32' ? '(?:win32/)?ext' : 'ext';
-	while ( ~< *MANI) { # similar code in t/harness
+	while ( ~< *$mani) { # similar code in t/harness
 	    if (m!^($ext_pat/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
 		my $t = $1;
 		my $extension = $2;
@@ -170,7 +170,7 @@ unless (@ARGV) {
 		}
 	    }
 	}
-	close MANI;
+	close $mani;
     } else {
 	warn "$0: cannot open $mani: $!\n";
     }
@@ -193,15 +193,15 @@ elsif ($::with_utf16) {
 		my $f = $e ? "v" : "n";
 		push @UARGV, $u;
 		unlink($u);
-		if (open(A, "<", $a)) {
-		    if (open(U, ">", "$u")) {
-			print U pack("$f", 0xFEFF) if $b;
-			while ( ~< *A) {
-			    print U pack("$f*", unpack("C*", $_));
+		if (open(my $afh, "<", $a)) {
+		    if (open(my $ufh, ">", "$u")) {
+			print $ufh pack("$f", 0xFEFF) if $b;
+			while ( ~< *$afh) {
+			    print $ufh pack("$f*", unpack("C*", $_));
 			}
-			close(U);
+			close($ufh);
 		    }
-		    close(A);
+		    close($afh);
 		}
 	    }
 	    _testprogs('perl', '', @UARGV);
@@ -283,9 +283,9 @@ EOT
 	# XXX DAPM %OVER not defined anywhere
 	# $test = %OVER{$test} if exists %OVER{$test};
 
-	open(SCRIPT,"<",$test) or die "Can't run $test.\n";
-	$_ = ~< *SCRIPT;
-	close(SCRIPT) unless ($type eq 'deparse');
+	open(my $script,"<",$test) or die "Can't run $test.\n";
+	$_ = ~< *$script;
+	close($script) unless ($type eq 'deparse');
 	if ($::with_utf16) {
 	    $_ =~ tr/\0//d;
 	}
@@ -306,11 +306,11 @@ EOT
 	my $file_opts = "";
 	if ($type eq 'deparse') {
 	    # Look for #line directives which change the filename
-	    while ( ~< *SCRIPT) {
+	    while ( ~< *$script) {
 		$file_opts .= ",-f$3$4"
 			if m/^#\s*line\s+(\d+)\s+((\w+)|"([^"]+)")/;
 	    }
-	    close(SCRIPT);
+	    close($script);
 	}
 
 	my $utf8 = $::with_utf8 ? '-I../lib -Mutf8' : '';
@@ -432,9 +432,9 @@ EOT
 	if (%ENV{PERL_VALGRIND}) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
-		if (open(V, "<", $valgrind_log)) {
-		    @valgrind = ~< *V;
-		    close V;
+		if (open(my $v, "<", $valgrind_log)) {
+		    @valgrind = ~< $v;
+		    close $v;
 		} else {
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
@@ -499,7 +499,7 @@ EOT
 	}
 
 	if (defined $failure) {
-	    print "${te}$failure\n";
+	    print "{$te}$failure\n";
 	    $::bad_files++;
 	    if ($test =~ m/^base/) {
 		die "Failed a basic test ($test) -- cannot continue.\n";
@@ -516,11 +516,11 @@ EOT
 		else {
 		    $elapsed = "";
 		}
-		print "${te}ok$elapsed\n";
+		print "{$te}ok$elapsed\n";
 		$good_files++;
 	    }
 	    else {
-		print "${te}skipped\n";
+		print "{$te}skipped\n";
 		$tested_files -= 1;
 	    }
 	}

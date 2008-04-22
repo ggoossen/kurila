@@ -86,7 +86,7 @@ sub readFile
     else
     {
         open (F, "<", "$f") 
-            or croak "Cannot open $f: $!\n" ;
+            or die "Cannot open $f: $!\n" ;
         binmode F;
         @strings = ~< *F ;	
         close F ;

@@ -51,7 +51,7 @@ our %Comp2nd;	# $codepoint => 1          : may be composed with a prev char.
 our %CompList;	# $listname,$2nd  => $codepoint : composite
 
 our $prefix = "UNF_";
-our $structname = "${prefix}complist";
+our $structname = "{$prefix}complist";
 
 ########## definition of Hangul constants ##########
 use constant SBase  => 0xAC00;
@@ -124,7 +124,7 @@ while ($Decomp =~ m/(.+)/g) {
     my $ini = hex(@tab[0]); # initial decomposable character
 
     my $listname =
-	@$dec == 2 ? sprintf("${structname}_\%06x", $dec->[0]) : 'USELESS';
+	@$dec == 2 ? sprintf("{$structname}_\%06x", $dec->[0]) : 'USELESS';
 		# %04x is bad since it'd place _3046 after _1d157.
 
     if (@tab[1] eq '') {
@@ -341,7 +341,7 @@ my @tripletable = (
 
 foreach my $tbl (@tripletable) {
     my $file = "$tbl->{file}.h";
-    my $head = "${prefix}$tbl->{name}";
+    my $head = "{$prefix}$tbl->{name}";
     my $type = $tbl->{type};
     my $hash = $tbl->{hash};
     my $null = $tbl->{null};
@@ -371,7 +371,7 @@ EOF
 	next if ! %val{ $p };
 	for (my $r = 0; $r +< 256; $r++) {
 	    next if ! %val{ $p }{ $r };
-	    printf "static $type ${head}_\%02x_\%02x [256] = \{\n", $p, $r;
+	    printf "static $type {$head}_\%02x_\%02x [256] = \{\n", $p, $r;
 	    for (my $c = 0; $c +< 256; $c++) {
 		print "\t", defined %val{$p}{$r}{$c}
 		    ? "($type)".%val{$p}{$r}{$c}
@@ -384,10 +384,10 @@ EOF
     }
     foreach my $p (sort { $a <+> $b } keys %val) {
 	next if ! %val{ $p };
-	printf "static $type* ${head}_\%02x [256] = \{\n", $p;
+	printf "static $type* {$head}_\%02x [256] = \{\n", $p;
 	for (my $r = 0; $r +< 256; $r++) {
 	    print %val{ $p }{ $r }
-		? sprintf("${head}_\%02x_\%02x", $p, $r)
+		? sprintf("{$head}_\%02x_\%02x", $p, $r)
 		: "NULL";
 	    print ','  if $r != 255;
 	    print "\n" if %val{ $p }{ $r } || ($r+1) % 8 == 0;
@@ -396,7 +396,7 @@ EOF
     }
     print "static $type** $head [] = \{\n";
     for (my $p = 0; $p +<= 0x10; $p++) {
-	print %val{ $p } ? sprintf("${head}_\%02x", $p) : "NULL";
+	print %val{ $p } ? sprintf("{$head}_\%02x", $p) : "NULL";
 	print ','  if $p != 0x10;
 	print "\n";
     }

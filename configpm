@@ -157,8 +157,8 @@ sub import {
     no strict 'refs';
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
-	die sprintf qq{"%%s" is not exported by the %%s module\n},
-	    $func, __PACKAGE__ unless %%Export_Cache{$func};
+	die qq{"$func" is not exported by the {__PACKAGE__} module\n}
+             unless %%Export_Cache{$func};
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{$func};
     }
 
@@ -181,7 +181,7 @@ my %Data     = ();
 my %seen_quotes;
 {
   my ($name, $val);
-  open(CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $!";
+  open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $!";
   while ( ~< *CONFIG_SH) {
     next if m:^#!/bin/sh:;
 
@@ -225,7 +225,7 @@ my %seen_quotes;
     push(@v_others, $line);
     %seen_quotes{$quote}++;
   }
-  close CONFIG_SH;
+  close *CONFIG_SH;
 }
 
 # This is somewhat grim, but I want the code for parsing config.sh here and
@@ -446,10 +446,10 @@ $heavy_txt .= join('', @non_v) . "\n";
 
 # copy config summary format from the myconfig.SH script
 $heavy_txt .= "our \$summary = <<'!END!';\n";
-open(MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $!";
+open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $!";
 1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/;
 do { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
-close(MYCONFIG);
+close(*MYCONFIG);
 
 $heavy_txt .= "\n!END!\n" . <<'EOT';
 my $summary_expanded;
@@ -504,7 +504,7 @@ foreach my $prefix (qw(ccflags ldflags)) {
     my $withlargefiles = fetch_string ({}, $prefix . "_uselargefiles");
     if (defined $withlargefiles) {
         $value =~ s/\Q$withlargefiles\E\b//;
-        $heavy_txt .= "${prefix}_nolargefiles='$value'\n";
+        $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
     }
 }
 
@@ -528,7 +528,7 @@ foreach my $prefix (qw(libs libswanted)) {
 	    $value = join(' ', @libswanted);
 	}
     }
-    $heavy_txt .= "${prefix}_nolargefiles='$value'\n";
+    $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
 }
 
 $heavy_txt .= "EOVIRTUAL\n";
@@ -624,7 +624,7 @@ sub config_vars {
 	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';
 	    $v = 'undef' unless defined $v;
-	    print "${prfx}'${v}'$lnend";
+	    print "{$prfx}'{$v}'$lnend";
 	}
     }
 }
@@ -708,7 +708,7 @@ tie %%Config, 'Config', {
 ENDOFTIE
 
 
-open(CONFIG_POD, ">", "$Config_POD") or die "Can't open $Config_POD: $!";
+open(*CONFIG_POD, ">", "$Config_POD") or die "Can't open $Config_POD: $!";
 print CONFIG_POD <<'ENDOFTAIL';
 =head1 NAME
 
@@ -830,7 +830,7 @@ in such cases.
 ENDOFTAIL
 
 if (%Opts{glossary}) {
-  open(GLOS, "<", "$Glossary") or die "Can't open $Glossary: $!";
+  open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $!";
 }
 my %seen = ();
 my $text = 0;
@@ -912,8 +912,8 @@ outside of it.
 
 ENDOFTAIL
 
-close(GLOS) if %Opts{glossary};
-close(CONFIG_POD);
+close(*GLOS) if %Opts{glossary};
+close(*CONFIG_POD);
 print "written $Config_POD\n";
 
 my $orig_config_txt = "";
@@ -926,12 +926,12 @@ my $orig_heavy_txt = "";
 }
 
 if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
-    open CONFIG, ">", $Config_PM or die "Can't open $Config_PM: $!\n";
-    open CONFIG_HEAVY, ">", $Config_heavy or die "Can't open $Config_heavy: $!\n";
+    open *CONFIG, ">", $Config_PM or die "Can't open $Config_PM: $!\n";
+    open *CONFIG_HEAVY, ">", $Config_heavy or die "Can't open $Config_heavy: $!\n";
     print CONFIG $config_txt;
     print CONFIG_HEAVY $heavy_txt;
-    close(CONFIG_HEAVY);
-    close(CONFIG);
+    close(*CONFIG_HEAVY);
+    close(*CONFIG);
     print "updated $Config_PM\n";
     print "updated $Config_heavy\n";
 }
@@ -939,7 +939,7 @@ if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
 
 # Now create Cross.pm if needed
 if (%Opts{cross}) {
-  open CROSS, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $!";
+  open *CROSS, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $!";
   my $cross = <<'EOS';
 # typical invocation:
 #   perl -MCross Makefile.PL
@@ -961,7 +961,7 @@ sub import {
 EOS
   $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{cross}/g;
   print CROSS $cross;
-  close CROSS;
+  close *CROSS;
   print "written lib/Cross.pm\n";
   unshift(@INC,"xlib/%Opts{cross}");
 }

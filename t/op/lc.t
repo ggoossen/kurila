@@ -41,8 +41,8 @@ my ($x100, $x101);
     $x101 = "\x{101}";
 }
 
-$a = "${x100}${x101}Aa";
-$b = "${x101}${x100}aA";
+$a = "{$x100}{$x101}Aa";
+$b = "{$x101}{$x100}aA";
 {
     use utf8;
 
@@ -73,21 +73,21 @@ $b = "${x101}${x100}aA";
 
     local $TODO="no utf8 lc";
 
-    is("\Q$a\E."      , "${x100}${x101}Aa.", '\Q\E ${x100}${x101}Aa');
+    is("\Q$a\E."      , "{$x100}{$x101}Aa.", '\Q\E ${x100}${x101}Aa');
 
-    is(quotemeta($a)  , "${x100}${x101}Aa",  'quotemeta');
-    is(ucfirst($a)    , "${x100}${x101}Aa",  'ucfirst');
-    is(lcfirst($a)    , "${x100}${x101}Aa",  'lcfirst');
-    is(uc($a)         , "${x100}${x101}AA",  'uc');
-    is(lc($a)         , "${x100}${x101}aa",  'lc');
+    is(quotemeta($a)  , "{$x100}{$x101}Aa",  'quotemeta');
+    is(ucfirst($a)    , "{$x100}{$x101}Aa",  'ucfirst');
+    is(lcfirst($a)    , "{$x100}{$x101}Aa",  'lcfirst');
+    is(uc($a)         , "{$x100}{$x101}AA",  'uc');
+    is(lc($a)         , "{$x100}{$x101}aa",  'lc');
 
-    is("\Q$b\E."      , "${x101}${x100}aA.", '\Q\E ${x101}${x100}aA');
+    is("\Q$b\E."      , "{$x101}{$x100}aA.", '\Q\E ${x101}${x100}aA');
 
-    is(quotemeta($b)  , "${x101}${x100}aA",  'quotemeta');
-    is(ucfirst($b)    , "${x101}${x100}aA",  'ucfirst');
-    is(lcfirst($b)    , "${x101}${x100}aA",  'lcfirst');
-    is(uc($b)         , "${x101}${x100}AA",  'uc');
-    is(lc($b)         , "${x101}${x100}aa",  'lc');
+    is(quotemeta($b)  , "{$x101}{$x100}aA",  'quotemeta');
+    is(ucfirst($b)    , "{$x101}{$x100}aA",  'ucfirst');
+    is(lcfirst($b)    , "{$x101}{$x100}aA",  'lcfirst');
+    is(uc($b)         , "{$x101}{$x100}AA",  'uc');
+    is(lc($b)         , "{$x101}{$x100}aa",  'lc');
 }
 
 # \x{DF} is LATIN SMALL LETTER SHARP S, its uppercase is SS or \x{53}\x{53};

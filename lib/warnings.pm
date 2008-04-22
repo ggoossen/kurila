@@ -10,9 +10,10 @@ our $VERSION = '1.06';
 
 # Verify that we're called correctly so that warnings will work.
 # see also strict.pm.
-unless ( __FILE__ =~ m/(^|[\/\\])\Q${\__PACKAGE__}\E\.pmc?$/ ) {
+my $pkg = __PACKAGE__;
+unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
     my (undef, $f, $l) = caller;
-    die("Incorrect use of pragma '${\__PACKAGE__}' at $f line $l.\n");
+    die("Incorrect use of pragma '{__PACKAGE__}' at $f line $l.\n");
 }
 
 =head1 NAME
@@ -340,7 +341,7 @@ sub import
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    my $mask = ${^WARNING_BITS} ;
+    my $mask = $^WARNING_BITS ;
 
     if (vec($mask, %Offsets{'all'}, 1)) {
         $mask ^|^= %Bits{'all'} ;
@@ -367,7 +368,7 @@ sub import
           { die("Unknown warnings category '$word'")}
     }
 
-    ${^WARNING_BITS} = $mask ;
+    $^WARNING_BITS = $mask ;
 }
 
 sub unimport 
@@ -375,7 +376,7 @@ sub unimport
     shift;
 
     my $catmask ;
-    my $mask = ${^WARNING_BITS} ;
+    my $mask = $^WARNING_BITS ;
 
     if (vec($mask, %Offsets{'all'}, 1)) {
         $mask ^|^= %Bits{'all'} ;
@@ -395,7 +396,7 @@ sub unimport
           { die("Unknown warnings category '$word'")}
     }
 
-    ${^WARNING_BITS} = $mask ;
+    $^WARNING_BITS = $mask ;
 }
 
 my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
@@ -420,18 +421,18 @@ sub __chk
 	    unless defined $offset;
     }
     else {
-        $category = (caller(1))[[0]] ;
+        $category = (caller(1))[0] ;
         $offset = %Offsets{$category};
         die("package '$category' not registered for warnings")
 	    unless defined $offset ;
     }
 
-    my $this_pkg = (caller(1))[[0]] ;
+    my $this_pkg = (caller(1))[0] ;
     my $i = 2 ;
     my $pkg ;
 
     if ($isobj) {
-        while (do { { package DB; $pkg = (caller($i++))[[0]] } } ) {
+        while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;
@@ -440,7 +441,7 @@ sub __chk
         $i = 2;
     }
 
-    my $callers_bitmask = (caller($i))[[9]] ;
+    my $callers_bitmask = (caller($i))[9] ;
     return ($callers_bitmask, $offset, $i) ;
 }
 

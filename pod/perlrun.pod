@@ -299,7 +299,7 @@ are as follows; listing the letters is equal to summing the numbers.
               variables (the LC_ALL, LC_TYPE, and LANG, in the order
               of decreasing precedence) -- if the variables indicate
               UTF-8, then the selected "IOEioA" are in effect
-    a   256   Set ${^UTF8CACHE} to -1, to run the UTF-8 caching code in
+    a   256   Set $^UTF8CACHE to -1, to run the UTF-8 caching code in
               debugging mode.
 
 =for documenting_the_underdocumented
@@ -330,7 +330,7 @@ the I<implicit> (and problematic) UTF-8 behaviour of Perl 5.8.0.
 You can use C<-C0> (or C<"0"> for C<PERL_UNICODE>) to explicitly
 disable all the above Unicode features.
 
-The read-only magic variable C<${^UNICODE}> reflects the numeric value
+The read-only magic variable C<$^UNICODE> reflects the numeric value
 of this setting.  This is variable is set during Perl startup and is
 thereafter read-only.  If you want runtime effects, use the three-arg
 open() (see L<perlfunc/open>), the two-arg binmode() (see L<perlfunc/binmode>),

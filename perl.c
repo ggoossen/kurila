@@ -1207,36 +1207,6 @@ perl_destruct(pTHXx)
     if (PL_sv_count != 0 && ckWARN_d(WARN_INTERNAL))
 	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count);
 
-#ifdef DEBUG_LEAKING_SCALARS
-    if (PL_sv_count != 0) {
-	SV* sva;
-	SV* sv;
-	register SV* svend;
-
-	for (sva = PL_sv_arenaroot; sva; sva = (SV*)SvANY(sva)) {
-	    svend = &sva[SvREFCNT(sva)];
-	    for (sv = sva + 1; sv < svend; ++sv) {
-		if (SvTYPE(sv) != SVTYPEMASK) {
-		    PerlIO_printf(Perl_debug_log, "leaked: sv=0x%p"
-			" flags=0x%"UVxf
-			" refcnt=%"UVuf pTHX__FORMAT "\n"
-			"\tallocated at %s:%d %s %s%s\n",
-			(void*)sv, (UV)sv->sv_flags, (UV)sv->sv_refcnt
-			pTHX__VALUE,
-			sv->sv_debug_file ? sv->sv_debug_file : "(unknown)",
-			sv->sv_debug_line,
-			sv->sv_debug_inpad ? "for" : "by",
-			sv->sv_debug_optype ?
-			    PL_op_name[sv->sv_debug_optype]: "(none)",
-			sv->sv_debug_cloned ? " (cloned)" : ""
-		    );
-#ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-		    Perl_dump_sv_child(aTHX_ sv);
-#endif
-		}
-	    }
-	}
-    }
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
     {
 	int status;
@@ -1254,7 +1224,6 @@ perl_destruct(pTHXx)
 	waitpid(child, &status, WNOHANG);
 	close(sock);
     }
-#endif
 #endif
 #ifdef DEBUG_LEAKING_SCALARS_ABORT
     if (PL_sv_count)
@@ -1297,7 +1266,6 @@ perl_destruct(pTHXx)
     PL_bitcount = NULL;
     Safefree(PL_psig_pend);
     PL_psig_pend = (int*)NULL;
-    PL_formfeed = NULL;
     nuke_stacks();
     PL_tainting = FALSE;
     PL_taint_warn = FALSE;
@@ -1487,7 +1455,7 @@ S_procself_val(pTHX_ SV *sv, const char *arg0)
 STATIC void
 S_set_caret_X(pTHX) {
     dVAR;
-    GV* tmpgv = gv_fetchpvs("\030", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^X */
+    GV* tmpgv = gv_fetchpvs("^X", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^X */
     if (tmpgv) {
 #ifdef HAS_PROCSELFEXE
 	S_procself_val(aTHX_ GvSV(tmpgv), PL_origargv[0]);
@@ -3550,14 +3518,14 @@ S_init_main_stash(pTHX)
 					     SVt_PVAV)));
     SvREFCNT_inc_simple_void(PL_incgv); /* Don't allow it to be freed */
     GvMULTI_on(PL_incgv);
-    PL_hintgv = gv_fetchpvs("\010", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
+    PL_hintgv = gv_fetchpvs("^H", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
     GvMULTI_on(PL_hintgv);
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
     PL_errgv = gv_HVadd(gv_fetchpvs("@", GV_ADD|GV_NOTQUAL, SVt_PV));
     SvREFCNT_inc_simple_void(PL_errgv);
     GvMULTI_on(PL_errgv);
-    PL_replgv = gv_fetchpvs("\022", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
+    PL_replgv = gv_fetchpvs("^R", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
     GvMULTI_on(PL_replgv);
     (void)Perl_form(aTHX_ "%240s","");	/* Preallocate temp - for immediate signals. */
 #ifdef PERL_DONT_CREATE_GVSV

@@ -229,7 +229,7 @@ SKIP: {
         '__FILE__ set correctly' );
     {
         my $warning;
-        local ${^WARN_HOOK} = sub { $warning = shift };
+        local $^WARN_HOOK = sub { $warning = shift };
         Publius::Vergilius::Maro::complain();
         like( $warning->message, qr{barf at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
     }

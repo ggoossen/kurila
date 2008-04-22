@@ -48,7 +48,7 @@ SKIP: {
 		if ($^O =~ m/os2|win32|macos|cygwin/i);
 	
 	my $warn;
-	local ${^WARN_HOOK} = sub {
+	local $^WARN_HOOK = sub {
 		$warn = shift;
 	};
 

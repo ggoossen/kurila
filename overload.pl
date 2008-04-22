@@ -54,7 +54,7 @@ print <<'EOF';
 enum {
 EOF
 
-print "    ${_}_amg,\n", foreach @enums;
+print "    {$_}_amg,\n", foreach @enums;
 
 print <<'EOF';
     max_amg_code

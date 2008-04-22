@@ -64,14 +64,14 @@ sub ok {
 
 ### Start of Testing ###
 
-${^WARN_HOOK} = sub { ok(0, "Warning: @_[0]"); };
+$^WARN_HOOK = sub { ok(0, "Warning: @_[0]"); };
 
 sub foo { lock($COUNT); $COUNT++; }
 sub baz { 42 }
 
 my $bthr;
 BEGIN {
-    ${^WARN_HOOK} = sub { ok(0, "BEGIN: @_[0]"); };
+    $^WARN_HOOK = sub { ok(0, "BEGIN: @_[0]"); };
 
     $TOTAL++;
     threads->create(\&foo)->join();

@@ -146,7 +146,7 @@ use warnings ();
 # run/switchI 1 - missing -I switches entirely
 #    perl -Ifoo -e 'print @INC'
 # op/caller 2 - warning mask propagates backwards before warnings::register
-#    'use warnings; BEGIN {${^WARNING_BITS} eq "U"x12;} use warnings::register'
+#    'use warnings; BEGIN {$^WARNING_BITS eq "U"x12;} use warnings::register'
 # op/getpid 2 - can't assign to shared my() declaration (threads only)
 #    'my $x : shared = 5'
 # op/override 7 - parens on overriden require change v-string interpretation
@@ -348,7 +348,7 @@ sub next_todo {
 	    }
 	    $name =~ s/^\Q$stash\E::(?!\z|.*::)//;
 	}
-        return "${p}${l}sub $name " . $self->deparse_sub($cv);
+        return "{$p}{$l}sub $name " . $self->deparse_sub($cv);
     }
 }
 
@@ -614,7 +614,7 @@ sub compile {
 	    $self->todo($block, 0);
 	}
 	$self->stash_subs();
-	local(${^DIE_HOOK}) =
+	local($^DIE_HOOK) =
 	  sub {
 	      if ($self->{'curcop'}) {
 		  my $cop = $self->{'curcop'};
@@ -691,10 +691,10 @@ sub ambient_pragmas {
 	    || $name eq 'utf8') {
 	    require "$name.pm";
 	    if ($val) {
-		$hint_bits ^|^= ${%::{"${name}::"}{"hint_bits"}};
+		$hint_bits ^|^= ${%::{"{$name}::"}{"hint_bits"}};
 	    }
 	    else {
-		$hint_bits ^&^= ^~^${%::{"${name}::"}{"hint_bits"}};
+		$hint_bits ^&^= ^~^${%::{"{$name}::"}{"hint_bits"}};
 	    }
 	}
 
@@ -1193,7 +1193,7 @@ Carp::confess() unless ref($gv) eq "B::GV";
 	$stash = $stash . "::";
     }
     if ($name =~ m/^(\^..|{)/) {
-        $name = "\{$name\}";       # ${^WARNING_BITS}, etc and ${
+        $name = "\{$name\}";       # $^WARNING_BITS, etc and ${
     }
     return $stash . $name;
 }
@@ -3595,7 +3595,7 @@ sub const {
 	my $str = "$nv";
 	if ($str != $nv) {
 	    # failing that, try using more precision
-	    $str = sprintf("\%.${max_prec}g", $nv);
+	    $str = sprintf("\%.{$max_prec}g", $nv);
 #	    if (pack("F", $str) ne pack("F", $nv)) {
 	    if ($str != $nv) {
 		# not representable in decimal with whatever sprintf()
@@ -3687,9 +3687,9 @@ sub dq {
 
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]", "$foo\::bar"
 	($last =~ m/^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}\{^\}/)  # "${^}W" etc
+	    $first =~ s/([\$@])\^$/$1\{^\}/)  # "${^}W" etc
 	    || ($last =~ m/^[:'{\[\w_]/ && #'
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}\{$2\}/);
+		$first =~ s/([\$@])([A-Za-z_]\w*)$/$1\{$2\}/);
 
 	return $first . $last;
     } elsif ($type eq "uc") {
@@ -3994,9 +3994,9 @@ sub re_dq {
 
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]"
 	($last =~ m/^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}\{^\}/)  # "${^}W" etc
+	    $first =~ s/([\$@])\^$/$1\{^\}/)  # "${^}W" etc
 	    || ($last =~ m/^[{\[\w_]/ &&
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}\{$2\}/);
+		$first =~ s/([\$@])([A-Za-z_]\w*)$/$1\{$2\}/);
 
 	return $first . $last;
     } elsif ($type eq "uc") {
@@ -4629,12 +4629,12 @@ See L<perllexwarn> for more information about lexical warnings.
 =item warning_bits
 
 These two parameters are used to specify the ambient pragmas in
-the format used by the special variables $^H and ${^WARNING_BITS}.
+the format used by the special variables $^H and $^WARNING_BITS.
 
 They exist principally so that you can write code like:
 
     { my ($hint_bits, $warning_bits);
-    BEGIN {($hint_bits, $warning_bits) = ($^H, ${^WARNING_BITS})}
+    BEGIN {($hint_bits, $warning_bits) = ($^H, $^WARNING_BITS)}
     $deparser->ambient_pragmas (
 	hint_bits    => $hint_bits,
 	warning_bits => $warning_bits,
