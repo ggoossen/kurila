@@ -10,6 +10,7 @@ package Nomad;
 use strict;
 use warnings;
 use Carp;
+use version;
 
 use P5AST;
 use P5re;
@@ -25,7 +26,7 @@ sub xml_to_p5 {
 
     $::curenc = 0;		# start in utf8.
     $options{'version'} =~ m/(\w+)[-]([\d.]+)$/ or die "invalid version: '$options{version}'";
-    $::version = { branch => $1, 'v' => $2};
+    $::version = { branch => $1, 'v' => qv($2)};
 
     # parse file
     use XML::Parser;
@@ -852,7 +853,7 @@ sub innerpmop {
 	    }
 	    $really = $$really{Kids}[0];
 	}
-        if ( $::version->{branch} eq 'kurila' and $::version->{'v'} > 1.6 ) {
+        if ( $::version->{branch} eq 'kurila' and $::version->{'v'} > v1.6 ) {
             if ((ref $really) =~ m/PLXML::op_(scope|leave)/) {
                 # remove whitespace in front of the '{'
                 if (ref $really eq 'PLXML::op_scope' and

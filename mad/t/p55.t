@@ -45,7 +45,7 @@ sub p55 {
         ok 0, "MAD dump of '$input' failed: $msg" or $TODO or die;
         return;
     }
-    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.9" ) };
+    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.10" ) };
     diag($@) if $@;
     is($output, $input, $msg) or $TODO or die;
 }
@@ -148,9 +148,6 @@ for (my $i=0; $i+<3; $i++) { }
 for (; $a+<3; $a++) { }
 ########
 #
-s//{$#foo}/g;
-########
-#
 s//{m#.#}/g;
 ########
 # Reduced test case from t/io/layers.t
@@ -241,7 +238,7 @@ state $x = 4;
 my $x;
 "$x->@"
 ########
-$a =~ regex;
+$a =~ regex();
 ########
 $a !~ tr/a-z//;
 ########
@@ -249,6 +246,8 @@ s/foo/$bar/;
 s/$foo/$bar/;
 ########
 $a =~ s/$foo/$bar/;
+########
+$a =~ s|(abc)|{uc($1)}|;
 ########
 my $msg = "ce ºtii tu, bã ?\n";
 use utf8;

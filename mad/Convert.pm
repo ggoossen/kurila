@@ -12,6 +12,8 @@ sub convert {
     my ($input, $convert, %options) = @_;
 
     my $file = "tmp";
+    my $from_version = $options{from} or die;
+    my $to_version = $options{to} or die;
 
     # perl5 to xml
     open my $infile, "> $file.in" or die;
@@ -31,7 +33,7 @@ sub convert {
     }
 
     # sanity Perl 5 to Perl 5 works.
-    my $p5 = Nomad::xml_to_p5( input => "$file.xml", version => $options{from} );
+    my $p5 = Nomad::xml_to_p5( input => "$file.xml", version => $from_version );
     if ($p5 ne $input) {
         use Text::Diff;
         warn diff(\$input, \$p5);
@@ -46,7 +48,7 @@ sub convert {
     }
 
     # XML back to Perl 5
-    return Nomad::xml_to_p5( input => "$file.xml", version => $options{to} );
+    return Nomad::xml_to_p5( input => "$file.xml", version => $to_version );
 }
 
 1;
