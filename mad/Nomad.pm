@@ -2154,20 +2154,20 @@ sub astnull {
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
-    splice @newkids, -1, 0, $self->madness('a [');
-    push @newkids, $self->madness(']');
+    splice @newkids, -1, 0, $self->madness('( a [');
+    push @newkids, $self->madness('] )');
     return P5AST::op_aelem->new(Kids => [@newkids]);
 }
 
 sub ast {
     my $self = shift;
 
-    my @before = $self->madness('dx d');
+    my @before = $self->madness('dx d (');
     my @newkids;
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast(@_);
     }
-    splice @newkids, -1, 0, $self->madness('a [');
+    splice @newkids, -1, 0, $self->madness(') a [');
     push @newkids, $self->madness(']');
 
     return $self->newtype->new(Kids => [@before, @newkids]);
