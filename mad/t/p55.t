@@ -252,3 +252,5 @@ $a =~ s|(abc)|{uc($1)}|;
 my $msg = "ce ºtii tu, bã ?\n";
 use utf8;
 my $msg = "ce ºtii tu, bã ?\n";
+########
+(stat "abc")[2];
