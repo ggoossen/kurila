@@ -115,13 +115,13 @@ if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
 
 print "1..2\n";
 
-$pwgid = $( + 0;
+$pwgid = $^GID + 0;
 ($pwgnam) = getgrgid($pwgid);
 %seen{$pwgid}++;
 
 print "# pwgid = $pwgid, pwgnam = $pwgnam\n";
 
-for (split(' ', $()) {
+for (split(' ', $^GID)) {
     ($group) = getgrgid($_);
     next if (! defined $group or ! grep { $_ eq $group } @gr) and %seen{$_}++;
     if (defined $group) {

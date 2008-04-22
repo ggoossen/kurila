@@ -120,34 +120,34 @@ T_PTRREF
 	else
 	    Perl_croak(aTHX_ \"$var is not a reference\")
 T_REF_IV_REF
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"{$ntype}\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type *, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ \"$var is not of type ${ntype}\")
+	    Perl_croak(aTHX_ \"$var is not of type {$ntype}\")
 T_REF_IV_PTR
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"{$ntype}\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	}
 	else
-	    Perl_croak(aTHX_ \"$var is not of type ${ntype}\")
+	    Perl_croak(aTHX_ \"$var is not of type {$ntype}\")
 T_PTROBJ
-	if (sv_derived_from($arg, \"${ntype}\")) {
+	if (sv_derived_from($arg, \"{$ntype}\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
 	}
 	else
-	    Perl_croak(aTHX_ \"$var is not of type ${ntype}\")
+	    Perl_croak(aTHX_ \"$var is not of type {$ntype}\")
 T_PTRDESC
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"{$ntype}\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
-	    ${type}_desc = (\U${type}_DESC\E*) tmp;
-	    $var = ${type}_desc->ptr;
+	    {$type}_desc = (\U{$type}_DESC\E*) tmp;
+	    $var = {$type}_desc->ptr;
 	}
 	else
-	    Perl_croak(aTHX_ \"$var is not of type ${ntype}\")
+	    Perl_croak(aTHX_ \"$var is not of type {$ntype}\")
 T_REFREF
 	if (SvROK($arg)) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
@@ -156,12 +156,12 @@ T_REFREF
 	else
 	    Perl_croak(aTHX_ \"$var is not a reference\")
 T_REFOBJ
-	if (sv_isa($arg, \"${ntype}\")) {
+	if (sv_isa($arg, \"{$ntype}\")) {
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type,tmp);
 	}
 	else
-	    Perl_croak(aTHX_ \"$var is not of type ${ntype}\")
+	    Perl_croak(aTHX_ \"$var is not of type {$ntype}\")
 T_OPAQUE
 	$var = *($type *)SvPV_nolen($arg)
 T_OPAQUEPTR
@@ -245,13 +245,13 @@ T_PTR
 T_PTRREF
 	sv_setref_pv($arg, Nullch, (void*)$var);
 T_REF_IV_REF
-	sv_setref_pv($arg, \"${ntype}\", (void*)new $ntype($var));
+	sv_setref_pv($arg, \"{$ntype}\", (void*)new $ntype($var));
 T_REF_IV_PTR
-	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+	sv_setref_pv($arg, \"{$ntype}\", (void*)$var);
 T_PTROBJ
-	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+	sv_setref_pv($arg, \"{$ntype}\", (void*)$var);
 T_PTRDESC
-	sv_setref_pv($arg, \"${ntype}\", (void*)new\U${type}_DESC\E($var));
+	sv_setref_pv($arg, \"{$ntype}\", (void*)new\U{$type}_DESC\E($var));
 T_REFREF
 	NOT_IMPLEMENTED
 T_REFOBJ

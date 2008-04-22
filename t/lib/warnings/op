@@ -54,18 +54,6 @@
      Constant subroutine %s redefined 
         sub fred() {1;} sub fred() {1;}
  
-     Format FRED redefined at /tmp/x line 5.
-       format FRED =
-       .
-       format FRED =
-       .
- 
-     Array @%s missing the @ in argument %d of %s() 
-	push fred ;
- 
-     Hash %%%s missing the %% in argument %d of %s() 
-	keys joe ;
- 
      Statement unlikely to be reached
      	(Maybe you meant system() when you said exec()?
  	exec "true" ; my $a
@@ -727,22 +715,6 @@ sub fred () { 1 }
 *fred = sub () { 2 };
 EXPECT
 Constant subroutine main::fred redefined at - line 4.
-########
-# op.c
-use warnings 'deprecated' ;
-push FRED;
-no warnings 'deprecated' ;
-push FRED;
-EXPECT
-Array @FRED missing the @ in argument 1 of push() at - line 3.
-########
-# op.c
-use warnings 'deprecated' ;
-@a = keys FRED ;
-no warnings 'deprecated' ;
-@a = keys FRED ;
-EXPECT
-Hash %FRED missing the % in argument 1 of keys() at - line 3.
 ########
 # op.c
 BEGIN {

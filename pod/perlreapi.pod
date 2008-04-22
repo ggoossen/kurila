@@ -226,7 +226,7 @@ perl will handle releasing anything else contained in the regexp structure.
 =head2 Numbered capture callbacks
 
 Called to get/set the value of C<$`>, C<$'>, C<$&> and their named
-equivalents, ${^PREMATCH}, ${^POSTMATCH} and $^{MATCH}, as well as the
+equivalents, $^PREMATCH, $^POSTMATCH and $^MATCH, as well as the
 numbered capture buffers (C<$1>, C<$2>, ...).
 
 The C<paren> parameter will be C<-2> for C<$`>, C<-1> for C<$'>, C<0>

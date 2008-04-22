@@ -885,7 +885,7 @@ program exited non-zero, C<$!> will be set to C<0>.)  Closing a pipe
 also waits for the process executing on the pipe to complete, in case you
 want to look at the output of the pipe afterwards, and
 implicitly puts the exit status value of that command into C<$?> and
-C<${^CHILD_ERROR_NATIVE}>.
+C<$^CHILD_ERROR_NATIVE>.
 
 Prematurely closing the read end of a pipe (i.e. before the process
 writing to it at the other end has closed it) will result in a
@@ -1910,44 +1910,6 @@ STDIN and STDOUT that are actually connected by a pipe or socket, even
 if you exit, then the remote server (such as, say, a CGI script or a
 backgrounded job launched from a remote shell) won't think you're done.
 You should reopen those to F</dev/null> if it's any issue.
-
-=item format
-X<format>
-
-Declare a picture format for use by the C<write> function.  For
-example:
-
-    format Something =
-	Test: @<<<<<<<< @||||| @>>>>>
-	      $str,     $%,    '$' . int($num)
-    .
-
-    $str = "widget";
-    $num = $cost/$quantity;
-    $~ = 'Something';
-    write;
-
-See L<perlform> for many details and examples.
-
-=item formline PICTURE,LIST
-X<formline>
-
-This is an internal function used by C<format>s, though you may call it,
-too.  It formats (see L<perlform>) a list of values according to the
-contents of PICTURE, placing the output into the format output
-accumulator, C<$^A> (or C<$ACCUMULATOR> in English).
-Eventually, when a C<write> is done, the contents of
-C<$^A> are written to some filehandle.  You could also read C<$^A>
-and then set C<$^A> back to C<"">.  Note that a format typically
-does one C<formline> per line of form, but the C<formline> function itself
-doesn't care how many newlines are embedded in the PICTURE.  This means
-that the C<~> and C<~~> tokens will treat the entire PICTURE as a single line.
-You may therefore need to use multiple formlines to implement a single
-record format, just like the format compiler.
-
-Be careful if you put double quotes around the picture, because an C<@>
-character may be taken to mean the beginning of an array name.
-C<formline> always returns true.  See L<perlform> for other examples.
 
 =item getc FILEHANDLE
 X<getc> X<getchar> X<character> X<file, read>
@@ -3064,7 +3026,7 @@ L<PerlIO> for more details). For example
 
 will open the UTF-8 encoded file containing Unicode characters,
 see L<perluniintro>. Note that if layers are specified in the
-three-arg form then default layers stored in ${^OPEN} (see L<perlvar>;
+three-arg form then default layers stored in $^OPEN (see L<perlvar>;
 usually set by the B<open> pragma or the switch B<-CioD>) are ignored.
 
 Open returns nonzero upon success, the undefined value otherwise.  If
@@ -3260,7 +3222,7 @@ of $^F.  See L<perlvar/$^F>.
 
 Closing any piped filehandle causes the parent process to wait for the
 child to finish, and returns the status value in C<$?> and
-C<${^CHILD_ERROR_NATIVE}>.
+C<$^CHILD_ERROR_NATIVE>.
 
 If you want a "real" C C<open> (see L<open(2)> on your system), then you
 should use the C<sysopen> function, which involves no such magic (but
@@ -6243,7 +6205,7 @@ C<$?> like this:
 	printf "child exited with value %d\n", $? >> 8;
     }
 
-Alternatively you might inspect the value of C<${^CHILD_ERROR_NATIVE}>
+Alternatively you might inspect the value of C<$^CHILD_ERROR_NATIVE>
 with the W*() calls of the POSIX extension.
 
 When the arguments get executed via the system shell, results

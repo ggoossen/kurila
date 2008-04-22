@@ -101,7 +101,7 @@ ok(1);
 fresh_perl_is(<<'EOI', 'ok', { }, 'cloning constant subs');
 use constant x=>1;
 use threads;
-${^WARN_HOOK} = sub{};
+$^WARN_HOOK = sub{};
 async sub {};
 print "ok";
 EOI
@@ -146,7 +146,7 @@ EOI
 # run-time usage of newCONSTSUB (as done by the IO boot code) wasn't
 # thread-safe - got occasional coredumps or malloc corruption
 {
-    local ${^WARN_HOOK} = sub {};   # Ignore any thread creation failure warnings
+    local $^WARN_HOOK = sub {};   # Ignore any thread creation failure warnings
     my @t;
     for (1..100) {
         my $thr = threads->create( sub { require IO });

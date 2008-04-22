@@ -56,7 +56,7 @@ like($@->{description}, qr/Invalid version object/,
     "Bad subclass vcmp");
 
 # dummy up a redundant call to satify David Wheeler
-local ${^WARN_HOOK} = sub { die @_[0] };
+local $^WARN_HOOK = sub { die @_[0] };
 eval 'use version;';
 unlike ($@, qr/^Subroutine main::qv redefined/,
     "Only export qv once per package (to prevent redefined warnings)."); 
@@ -107,7 +107,7 @@ sub BaseTests {
     
     # for this first test, just upgrade the warn() to die()
     eval {
-	local ${^WARN_HOOK} = sub { die @_[0]->{description} };
+	local $^WARN_HOOK = sub { die @_[0]->{description} };
 	$version = $CLASS->new("1.2b3");
     };
     my $warnregex = "Version string '.+' contains invalid data; ".
@@ -119,7 +119,7 @@ sub BaseTests {
     # from here on out capture the warning and test independently
     {
     my $warning;
-    local ${^WARN_HOOK} = sub { $warning = @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warning = @_[0]->{description} };
     $version = $CLASS->new("99 and 44/100 pure");
 
     like($warning, qr/$warnregex/,
@@ -480,7 +480,7 @@ EOF
 SKIP: {
 	# test locale handling
 	my $warning;
-	local ${^WARN_HOOK} = sub { $warning = @_[0] };
+	local $^WARN_HOOK = sub { $warning = @_[0] };
 	my $ver = 1.23;  # has to be floating point number
 	my $loc;
 	while ( ~< *DATA) {
@@ -506,7 +506,7 @@ SKIP: {
 
     {
 	my $warning;
-	local ${^WARN_HOOK} = sub { $warning = @_[0] };
+	local $^WARN_HOOK = sub { $warning = @_[0] };
 	eval { my $v = $CLASS->new(^~^0); };
 	unlike($@, qr/Integer overflow in version/, "Too large version");
 	like($warning->{description}, qr/Integer overflow in version/, "Too large version");

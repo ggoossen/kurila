@@ -340,18 +340,18 @@ EOF
   if ($Overload) # make it findable with fetchmethod
   {
     print Q(<<"EOF");
-#XS(XS_${Packid}_nil); /* prototype to pass -Wmissing-prototypes */
-#XS(XS_${Packid}_nil)
+#XS(XS_{$Packid}_nil); /* prototype to pass -Wmissing-prototypes */
+#XS(XS_{$Packid}_nil)
 #\{
 #   XSRETURN_EMPTY;
 #\}
 #
 EOF
     unshift(@InitFileCode, <<"MAKE_FETCHMETHOD_WORK");
-    /* Making a sub named "${Package}::()" allows the package */
+    /* Making a sub named "{$Package}::()" allows the package */
     /* to be findable via fetchmethod(), and causes */
-    /* overload::Overloaded("${Package}") to return true. */
-    newXS("${Package}::()", XS_${Packid}_nil, file$proto);
+    /* overload::Overloaded("$Package") to return true. */
+    newXS("{$Package}::()", XS_{$Packid}_nil, file$proto);
 MAKE_FETCHMETHOD_WORK
   }
 
@@ -408,7 +408,7 @@ EOF
 #    /* mentioned above, and looks in the SV* slot of it for */
 #    /* the "fallback" status. */
 #    sv_setsv(
-#        get_sv( "${Package}::()", TRUE ),
+#        get_sv( "$Package::()", TRUE ),
 #        $Fallback
 #    );
 EOF
@@ -528,7 +528,7 @@ sub process_para {
     $_ = shift(@line);
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
       no strict 'refs';
-      &{*{Symbol::fetch_glob("${kwd}_handler")}}() ;
+      &{*{Symbol::fetch_glob("{$kwd}_handler")}}() ;
       next PARAGRAPH unless @line ;
       $_ = shift(@line);
     }
@@ -566,7 +566,7 @@ sub process_para {
     $class = "$4 $class" if $4;
     ($pname = $func_name) =~ s/^($Prefix)?/$Packprefix/;
     (my $clean_func_name = $func_name) =~ s/^$Prefix//;
-    $Full_func_name = "${Packid}_$clean_func_name";
+    $Full_func_name = "{$Packid}_$clean_func_name";
     if ($Is_VMS) {
       $Full_func_name = $SymSet->addsym($Full_func_name);
     }
@@ -704,8 +704,8 @@ sub process_para {
     # print function header
     print Q(<<"EOF");
 #$externC
-#XS(XS_${Full_func_name}); /* prototype to pass -Wmissing-prototypes */
-#XS(XS_${Full_func_name})
+#XS(XS_$Full_func_name); /* prototype to pass -Wmissing-prototypes */
+#XS(XS_$Full_func_name)
 #[[
 ##ifdef dVAR
 #    dVAR; dXSARGS;
@@ -848,7 +848,7 @@ EOF
 	    if ($func_name eq 'new') {
 	      $func_name = "$class";
 	    } else {
-	      print "${class}::";
+	      print "{$class}::";
 	    }
 	  } elsif (defined($class)) {
 	    if ($func_name eq 'new') {
@@ -1028,7 +1028,7 @@ EOF
     }
     else {
       push(@InitFileCode,
-	   "        ${newXS}(\"$pname\", XS_$Full_func_name, file$proto);\n");
+	   "        {$newXS}(\"$pname\", XS_$Full_func_name, file$proto);\n");
     }
 }
 
@@ -1112,7 +1112,7 @@ sub process_keyword($)
     my($pattern) = @_ ;
     my $kwd ;
 
-    &{*{Symbol::fetch_glob("${kwd}_handler")}}()
+    &{*{Symbol::fetch_glob("{$kwd}_handler")}}()
       while $kwd = check_keyword($pattern) ;
   }
 
@@ -1758,7 +1758,7 @@ sub generate_init {
     $subexpr =~ s/\$arg/ST(ix_$var)/g;
     $subexpr =~ s/\n\t/\n\t\t/g;
     $subexpr =~ s/is not of (.*\")/[arg \%d] is not of $1, ix_$var + 1/g;
-    $subexpr =~ s/\$var/${var}[ix_$var - $argoff]/;
+    $subexpr =~ s/\$var/{$var}\[ix_$var - $argoff]/;
     $expr =~ s/DO_ARRAY_ELEM/$subexpr/;
   }
   if ($expr =~ m#/\*.*scope.*\*/#i) {  # "scope" in C comments
@@ -1825,7 +1825,7 @@ sub generate_output {
       $subexpr = %output_expr{%type_kind{$subtype}};
       $subexpr =~ s/ntype/subtype/g;
       $subexpr =~ s/\$arg/ST(ix_$var)/g;
-      $subexpr =~ s/\$var/${var}[ix_$var]/g;
+      $subexpr =~ s/\$var/{$var}\[ix_$var]/g;
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
       eval "print qq\a$expr\a";

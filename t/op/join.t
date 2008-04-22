@@ -36,7 +36,7 @@ if ($f eq 'baeak') {print "ok 6\n";} else {print "# '$f'\nnot ok 6\n";}
 
 # 9,10 and for multiple read of undef
 { my $s = 5;
-  local ($^W, ${^WARN_HOOK}) = ( 1, sub { $s+=4 } );
+  local ($^W, $^WARN_HOOK) = ( 1, sub { $s+=4 } );
   my $r = join ':', 'a', undef, $s, 'b', undef, $s, 'c';
   print "# expected 'a::9:b::13:c' got '$r'\nnot " if $r ne 'a::9:b::13:c';
   print "ok 9\n";

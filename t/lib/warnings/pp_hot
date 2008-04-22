@@ -204,7 +204,7 @@ sub fred
     fred() if $a++ +< 200
 } 
 {
-  local ${^WARN_HOOK} = sub {
+  local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print "ok\n";
         exit 0;
@@ -222,7 +222,7 @@ sub fred
     fred() if $a++ +< 200
 } 
 {
-  local ${^WARN_HOOK} = sub {
+  local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print "ok\n";
         exit 0;

@@ -2141,6 +2141,7 @@ pod/buildtoc			Update files based on pod.lst
 pod/checkpods.PL		Tool to check for common errors in pods
 pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurila02delta.pod	What is new for Perl Kurila 0.2
+pod/kurila110delta.pod	What is new for Perl Kurila 1.10
 pod/kurila13delta.pod	What is new for Perl Kurila 1.3
 pod/kurila14delta.pod	What is new for Perl Kurila 1.4
 pod/kurila15delta.pod	What is new for Perl Kurila 1.5
@@ -2210,7 +2211,6 @@ pod/perlfaq9.pod		Networking
 pod/perlfaq.pod			Perl frequently asked questions
 pod/perlfilter.pod		Perl source filters
 pod/perlfork.pod		Perl fork() information
-pod/perlform.pod		Perl formats
 pod/perlfunc.pod		Perl built-in functions
 pod/perlglossary.pod		Perl Glossary
 pod/perlgpl.pod			GNU General Public License
@@ -2668,6 +2668,7 @@ t/op/exists_sub.t		See if exists(&sub) works
 t/op/exp.t			See if math functions work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
+t/op/fun.t			See if op.c:Perl_ck_fun works
 t/op/getpid.t			See if $$ and getppid work with threads
 t/op/getppid.t			See if getppid works
 t/op/glob.t			See if <*> works

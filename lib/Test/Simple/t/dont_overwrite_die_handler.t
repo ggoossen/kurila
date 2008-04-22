@@ -11,9 +11,9 @@ BEGIN {
 my $handler;
 BEGIN {
     $handler = sub { die "ARR"; };
-    ${^DIE_HOOK} = $handler;
+    $^DIE_HOOK = $handler;
 }
 
 use Test::More tests => 1;
 
-is ${^DIE_HOOK}, $handler, 'existing DIE handler not overridden';
+is $^DIE_HOOK, $handler, 'existing DIE handler not overridden';

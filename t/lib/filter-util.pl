@@ -39,7 +39,7 @@ sub ok
     }
 
     print "not " if !$result ;
-    print "ok ${number}${note}\n";
+    print "ok {$number}{$note}\n";
 }
 
 $Inc = '' ;

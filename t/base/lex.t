@@ -7,7 +7,7 @@ my $x = 'x';
 print "#1	:$x: eq :x:\n";
 if ($x eq 'x') {print "ok 1\n";} else {print "not ok 1\n";}
 
-$x = @#[0];
+$x = '';
 
 if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
@@ -100,8 +100,8 @@ E1
 
 print "%foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
-print "${foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
-print "%{foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
+print "{$foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
+print "{%foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
@@ -126,33 +126,33 @@ print $foo;
 # MJD 19990227
 
 { no strict 'refs';
-  my $CX = "\cX";
-  my $CXY  ="\cXY";
-  $ {*{Symbol::fetch_glob($CX)}} = 17;
-  $ {*{Symbol::fetch_glob($CXY)}} = 23;
-  if ($ {^XY} != 23) { print "not "  }
+  my $CX = "^X";
+  my $CXY  ="^RE_TRIE_MAXBUF";
+  ${*{Symbol::fetch_glob($CX)}} = 17;
+  ${*{Symbol::fetch_glob($CXY)}} = 23;
+  if ($^RE_TRIE_MAXBUF != 23) { print "not "  }
   print "ok 31\n";
  
-# Does the syntax where we use the literal control character still work?
-  if (eval "\$ \{\cX\}" != 17 or $@) { print "not "  }
+# the literal control character does not work anymore.
+  if (eval "\$\cX" == 17) { print "not "  }
   print "ok 32\n";
 
-  eval "\$\cQ = 24";                 # Literal control character
-  if ($@ or ${*{Symbol::fetch_glob("\cQ")}} != 24) {  print "not "  }
+  eval "\$\cR = 24";                 # Literal control character
+  if ($@ or ${*{Symbol::fetch_glob("\cR")}} != 24) {  print "not "  }
   print "ok 33\n";
-  if ($^Q != 24) {  print "not "  }  # Control character escape sequence
+  if ($^R == 24) {  print "not "  }  # Control character is NOT escape sequence
   print "ok 34\n";
 
 # Does the old UNBRACED syntax still do what it used to?
-  if ("$^XY" ne "17Y") { print "not " }
+  if ("$^RE_TRIE_MAXBUF" ne "23") { print "not " }
   print "ok 35\n";
 
   sub XX () { 6 }
-  $ {*{Symbol::fetch_glob("\cQ\cXX")}} = 119; 
-  $^Q = 5; #  This should be an unused ^Var.
+  $ {*{Symbol::fetch_glob("\cR\cXX")}} = 119; 
+  $^R = 5; #  This should be an unused ^Var.
   $N = 5;
   # The second caret here should be interpreted as an xor
-  if (($^Q^^^XX) != 3) { print "not " } 
+  if (($^R^^^XX) != 3) { print "not " } 
   print "ok 36\n";
 #  if (($N  ^  XX()) != 3) { print "not " } 
 #  print "ok 32\n";
@@ -166,22 +166,22 @@ print $foo;
   print "ok 37\n";
 #  print "($@)\n" if $@;
 
-  eval 'my $ {^XYZ};';
+  eval 'my $^XYZ;';
   print "not " unless index ($@->{description}, q|Can't use global $^XYZ in "my"|) +> -1;
   print "ok 38\n";
 #  print "($@)\n" if $@;
 
 # Now let's make sure that caret variables are all forced into the main package.
   package Someother;
-  $^Q = 'Someother';
-  $ {^Quixote} = 'Someother 2';
-  $ {^M} = 'Someother 3';
+  $^R = 'Someother';
+  $^RE_TRIE_MAXBUF = 'Someother 2';
+  $^M = 'Someother 3';
   package main;
-  print "not " unless $^Q eq 'Someother';
+  print "not " unless $^R eq 'Someother';
   print "ok 39\n";
-  print "not " unless $ {^Quixote} eq 'Someother 2';
+  print "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
   print "ok 40\n";
-  print "not " unless $ {^M} eq 'Someother 3';
+  print "not " unless $^M eq 'Someother 3';
   print "ok 41\n";
 
   
@@ -214,20 +214,21 @@ EOT
     T '^main:plink:53$', $test++;
     print "ok 44\nok 45\nok 46\n";
 }
+#line 218 "lex.t"
 
 # tests 47--51 start here
 # tests for new array interpolation semantics:
 # arrays now *always* interpolate into "..." strings.
 # 20000522 MJD (mjd@plover.com)
 {
-  no strict 'vars';
   my $test = 47;
+  our (@nosuch, @a, @example);
   eval(q(">@nosuch<" eq "><")) || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
 
   # Look at this!  This is going to be a common error in the future:
-  eval(q("fred@example.com" eq "fred.com")) || print "# $@", "not ";
+  eval(q("fred@example.com" eq "fred.com")) || print "# {$@->message}", "not ";
   print "ok $test\n";
   ++$test;
 

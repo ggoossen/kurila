@@ -184,8 +184,6 @@ END_EXTERN_C
 #define PL_body_arenas		(*Perl_Ibody_arenas_ptr(aTHX))
 #undef  PL_body_roots
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
-#undef  PL_bodytarget
-#define PL_bodytarget		(*Perl_Ibodytarget_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
 #undef  PL_checkav_save
@@ -318,10 +316,6 @@ END_EXTERN_C
 #define PL_firstgv		(*Perl_Ifirstgv_ptr(aTHX))
 #undef  PL_forkprocess
 #define PL_forkprocess		(*Perl_Iforkprocess_ptr(aTHX))
-#undef  PL_formfeed
-#define PL_formfeed		(*Perl_Iformfeed_ptr(aTHX))
-#undef  PL_formtarget
-#define PL_formtarget		(*Perl_Iformtarget_ptr(aTHX))
 #undef  PL_generation
 #define PL_generation		(*Perl_Igeneration_ptr(aTHX))
 #undef  PL_gensym
@@ -650,8 +644,6 @@ END_EXTERN_C
 #define PL_tmps_stack		(*Perl_Itmps_stack_ptr(aTHX))
 #undef  PL_top_env
 #define PL_top_env		(*Perl_Itop_env_ptr(aTHX))
-#undef  PL_toptarget
-#define PL_toptarget		(*Perl_Itoptarget_ptr(aTHX))
 #undef  PL_uid
 #define PL_uid			(*Perl_Iuid_ptr(aTHX))
 #undef  PL_unicode

@@ -29,8 +29,8 @@ sub Mkbootstrap {
     rename "$baseext.bs", "$baseext.bso"
       if -s "$baseext.bs";
 
-    if (-f "${baseext}_BS"){
-	$_ = "${baseext}_BS";
+    if (-f "{$baseext}_BS"){
+	$_ = "{$baseext}_BS";
 	package DynaLoader; # execute code as if in DynaLoader
 	local our ($osname, $dlsrc) = (); # avoid warnings
 	($osname, $dlsrc) = %Config::Config{[qw(osname dlsrc)]};

@@ -971,7 +971,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
     /* set up magic where warranted */
     if (len > 1) {
 #ifndef EBCDIC
-	if (*name > 'V' ) {
+	if (*name >= 'a' ) {
 	    NOOP;
 	    /* Nothing else to do.
 	       The compiler will probably turn the switch statement into a
@@ -1035,46 +1035,96 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (strEQ(name2, "ERSION"))
 		    GvMULTI_on(gv);
 		break;
-            case '\003':        /* $^CHILD_ERROR_NATIVE */
-		if (strEQ(name2, "HILD_ERROR_NATIVE"))
-		    goto magicalize;
-		break;
-	    case '\004':        /* $^DIE_HOOK */
-		if (strEQ(name2, "IE_HOOK"))
-		    goto magicalize;
-		break;
-	    case '\005':	/* $^ENCODING */
-		if (strEQ(name2, "NCODING"))
-		    goto magicalize;
-		break;
-            case '\015':        /* $^MATCH */
-                if (strEQ(name2, "ATCH"))
-		    goto magicalize;
-	    case '\017':	/* $^OPEN */
-		if (strEQ(name2, "PEN"))
-		    goto magicalize;
-		break;
-	    case '\020':        /* $^PREMATCH  $^POSTMATCH */
-	        if (strEQ(name2, "REMATCH") || strEQ(name2, "OSTMATCH"))
-		    goto magicalize;  
-	    case '\024':	/* ${^TAINT} */
-		if (strEQ(name2, "AINT"))
-		    goto ro_magicalize;
-		break;
-	    case '\025':	/* ${^UNICODE}, ${^UTF8LOCALE} */
-		if (strEQ(name2, "NICODE"))
-		    goto ro_magicalize;
-		if (strEQ(name2, "TF8LOCALE"))
-		    goto ro_magicalize;
-		if (strEQ(name2, "TF8CACHE"))
-		    goto magicalize;
-		break;
-	    case '\027':	/* $^WARNING_BITS, $^WARN_HOOK */
-		if (strEQ(name2, "ARN_HOOK"))
-		    goto magicalize;
-		if (strEQ(name2, "ARNING_BITS"))
-		    goto magicalize;
-		break;
+	    case '^':
+		if (len > 2) {
+		    switch (*name2) {
+		    case 'C':        /* $^CHILD_ERROR_NATIVE */
+			if (strEQ(name2, "CHILD_ERROR_NATIVE"))
+			    goto magicalize;
+			break;
+		    case 'D':        /* $^DIE_HOOK */
+			if (strEQ(name2, "DIE_HOOK"))
+			    goto magicalize;
+			break;
+		    case 'E':	/* $^ENCODING  $^EGID */
+			if (strEQ(name2, "ENCODING"))
+			    goto magicalize;
+			if (strEQ(name2, "EGID"))
+			    goto magicalize;
+			break;
+		    case 'G':   /* $^GID */
+			if (strEQ(name2, "GID"))
+			    goto magicalize;
+			break;
+		    case 'M':        /* $^MATCH */
+			if (strEQ(name2, "MATCH"))
+			    goto magicalize;
+		    case 'O':	/* $^OPEN */
+			if (strEQ(name2, "OPEN"))
+			    goto magicalize;
+			break;
+		    case 'P':        /* $^PREMATCH  $^POSTMATCH */
+			if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH"))
+			    goto magicalize;  
+			break;
+		    case 'R':        /* $^RE_TRIE_MAXBUF */
+			if (strEQ(name2, "RE_TRIE_MAXBUF") || strEQ(name2, "RE_DEBUG_FLAGS"))
+			    goto no_magicalize;
+			break;
+		    case 'T':	/* $^TAINT */
+			if (strEQ(name2, "TAINT"))
+			    goto ro_magicalize;
+			break;
+		    case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
+			if (strEQ(name2, "UNICODE"))
+			    goto ro_magicalize;
+			if (strEQ(name2, "UTF8LOCALE"))
+			    goto ro_magicalize;
+			if (strEQ(name2, "UTF8CACHE"))
+			    goto magicalize;
+			break;
+		    case 'W':	/* $^WARNING_BITS, $^WARN_HOOK */
+			if (strEQ(name2, "WARN_HOOK"))
+			    goto magicalize;
+			if (strEQ(name2, "WARNING_BITS"))
+			    goto magicalize;
+			break;
+		    }
+		    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
+		} else {
+		    switch (*name2) {
+		    case 'H':	/* $^H */
+		    {
+			HV *const hv = GvHVn(gv);
+			hv_magic(hv, NULL, PERL_MAGIC_hints);
+			goto magicalize;
+		    }
+		    case 'S':	/* $^S */
+			goto ro_magicalize;
+		    case 'C':	/* $^C */
+		    case 'D':	/* $^D */
+		    case 'E':	/* $^E */
+		    case 'F':	/* $^F */
+		    case 'I':	/* $^I */
+		    case 'N':	/* $^N */
+		    case 'O':	/* $^O */
+		    case 'P':	/* $^P */
+		    case 'T':	/* $^T */
+		    case 'W':	/* $^W */
+			goto magicalize;
+		    case 'M':   /* $^M */
+		    case 'R':   /* $^R */
+		    case 'X':   /* $^X */
+			goto no_magicalize;
+		    case 'V':	/* $^V */
+		    {
+			SV * const sv = GvSVn(gv);
+			sv_setsv(sv, PL_patchlevel);
+			goto no_magicalize;
+		    }
+		    }
+		    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
+		}
 	    case '1':
 	    case '2':
 	    case '3':
@@ -1151,23 +1201,10 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
             break;
 	}
-	case '*':
-	case '#':
-	    if (sv_type == SVt_PV && ckWARN2_d(WARN_DEPRECATED, WARN_SYNTAX))
-		Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
-			    "$%c is no longer supported", *name);
-	    break;
 	case '|':
 	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 	    goto magicalize;
 
-	case '\010':	/* $^H */
-	    {
-		HV *const hv = GvHVn(gv);
-		hv_magic(hv, NULL, PERL_MAGIC_hints);
-	    }
-	    goto magicalize;
-	case '\023':	/* $^S */
 	ro_magicalize:
 	    SvREADONLY_on(GvSVn(gv));
 	    /* FALL THROUGH */
@@ -1182,46 +1219,34 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '9':
 	case '[':
 	case '.':
-	case '(':
-	case ')':
 	case '<':
 	case '>':
 	case ',':
 	case '\\':
 	case '/':
-	case '\001':	/* $^A */
-	case '\003':	/* $^C */
-	case '\004':	/* $^D */
-	case '\005':	/* $^E */
-	case '\006':	/* $^F */
-	case '\011':	/* $^I, NOT \t in EBCDIC */
-	case '\016':	/* $^N */
-	case '\017':	/* $^O */
-	case '\020':	/* $^P */
-	case '\024':	/* $^T */
-	case '\027':	/* $^W */
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
+
+	case '$':
+	case '@':
+	case '"':
+	case '0':
+	case '_':
+	case 'a':
+	case 'b':
+	no_magicalize:
 	    break;
 
-	case '\014':	/* $^L */
-	    sv_setpvn(GvSVn(gv),"\f",1);
-	    PL_formfeed = GvSVn(gv);
-	    break;
 	case ';':
 	    sv_setpvn(GvSVn(gv),"\034",1);
 	    break;
 	case ']':
-	{
 	    Perl_croak(aTHX_ "$] is obsolete. Use $^V or $kurila::VERSION");
-	}
-	break;
-	case '\026':	/* $^V */
-	{
-	    SV * const sv = GvSVn(gv);
-	    sv_setsv(sv, PL_patchlevel);
-	}
-	break;
+	case '*':
+	case '#':
+	case '(':
+	case ')':
+	    Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
 	}
     }
     return gv;
@@ -1923,172 +1948,6 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
       return res;
     }
   }
-}
-
-/*
-=for apidoc is_gv_magical_sv
-
-Returns C<TRUE> if given the name of a magical GV. Calls is_gv_magical.
-
-=cut
-*/
-
-bool
-Perl_is_gv_magical_sv(pTHX_ SV *name, U32 flags)
-{
-    STRLEN len;
-    const char * const temp = SvPV_const(name, len);
-
-    PERL_ARGS_ASSERT_IS_GV_MAGICAL_SV;
-
-    return is_gv_magical(temp, len, flags);
-}
-
-/*
-=for apidoc is_gv_magical
-
-Returns C<TRUE> if given the name of a magical GV.
-
-Currently only useful internally when determining if a GV should be
-created even in rvalue contexts.
-
-C<flags> is not used at present but available for future extension to
-allow selecting particular classes of magical variable.
-
-Currently assumes that C<name> is NUL terminated (as well as len being valid).
-This assumption is met by all callers within the perl core, which all pass
-pointers returned by SvPV.
-
-=cut
-*/
-bool
-Perl_is_gv_magical(pTHX_ const char *name, STRLEN len, U32 flags)
-{
-    PERL_UNUSED_CONTEXT;
-    PERL_UNUSED_ARG(flags);
-
-    PERL_ARGS_ASSERT_IS_GV_MAGICAL;
-
-    if (len > 1) {
-	const char * const name1 = name + 1;
-	switch (*name) {
-	case 'I':
-	    if (len == 3 && name1[1] == 'S' && name[2] == 'A')
-		goto yes;
-	    break;
-	case 'O':
-	    if (len == 8 && strEQ(name1, "VERLOAD"))
-		goto yes;
-	    break;
-	case 'S':
-	    if (len == 3 && name[1] == 'I' && name[2] == 'G')
-		goto yes;
-	    break;
-	    /* Using ${^...} variables is likely to be sufficiently rare that
-	       it seems sensible to avoid the space hit of also checking the
-	       length.  */
-	case '\004':    /* ${^DIE_HOOK} */
-	    if (strEQ(name1, "IE_HOOK"))
-		goto yes;
-	    break;
-	case '\017':   /* ${^OPEN} */
-	    if (strEQ(name1, "PEN"))
-		goto yes;
-	    break;
-	case '\024':   /* ${^TAINT} */
-	    if (strEQ(name1, "AINT"))
-		goto yes;
-	    break;
-	case '\025':	/* ${^UNICODE} */
-	    if (strEQ(name1, "NICODE"))
-		goto yes;
-	    if (strEQ(name1, "TF8LOCALE"))
-		goto yes;
-	    break;
-	case '\027':   /* ${^WARNING_BITS} */
-	    if (strEQ(name1, "ARNING_BITS"))
-		goto yes;
-	    if (strEQ(name1, "ARN_HOOK"))
-		goto yes;
-	    break;
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-	{
-	    const char *end = name + len;
-	    while (--end > name) {
-		if (!isDIGIT(*end))
-		    return FALSE;
-	    }
-	    goto yes;
-	}
-	}
-    } else {
-	/* Because we're already assuming that name is NUL terminated
-	   below, we can treat an empty name as "\0"  */
-	switch (*name) {
-	case '&':
-	case '`':
-	case '\'':
-	case ':':
-	case '?':
-	case '!':
-	case '-':
-	case '#':
-	case '[':
-	case '^':
-	case '~':
-	case '=':
-	case '%':
-	case '.':
-	case '(':
-	case ')':
-	case '<':
-	case '>':
-	case ',':
-	case '\\':
-	case '/':
-	case '|':
-	case '+':
-	case ';':
-	case ']':
-	case '\001':   /* $^A */
-	case '\003':   /* $^C */
-	case '\004':   /* $^D */
-	case '\005':   /* $^E */
-	case '\006':   /* $^F */
-	case '\010':   /* $^H */
-	case '\011':   /* $^I, NOT \t in EBCDIC */
-	case '\014':   /* $^L */
-	case '\016':   /* $^N */
-	case '\017':   /* $^O */
-	case '\020':   /* $^P */
-	case '\023':   /* $^S */
-	case '\024':   /* $^T */
-	case '\026':   /* $^V */
-	case '\027':   /* $^W */
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-	yes:
-	    return TRUE;
-	default:
-	    break;
-	}
-    }
-    return FALSE;
 }
 
 void

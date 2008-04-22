@@ -51,7 +51,7 @@ while ( ~< *ARGV) {
     my @export = ();
 
     s/\bstd(in|out|err)\b/\U$&/g;
-    s/(sub\s+)(\w+)(\s*\{[ \t]*\n)\s*package\s+$oldpack\s*;[ \t]*\n+/${1}main'$2$3/ig;
+    s/(sub\s+)(\w+)(\s*\{[ \t]*\n)\s*package\s+$oldpack\s*;[ \t]*\n+/{$1}main'$2$3/ig;
     if (m/sub\s+\w+'/) {
 	@export = m/sub\s+\w+'(\w+)/g;
 	s/(sub\s+)main'(\w+)/$1$2/g;
@@ -113,21 +113,21 @@ sub xlate {
 
     my $xlated ;
     if ($prefix eq '' && $ident =~ m/^(t|s|m|d|ing|ll|ed|ve|re)$/) {
-	$xlated = "${pack}'$ident";
+	$xlated = "{$pack}'$ident";
     }
     elsif ($pack eq '' || $pack eq 'main') {
 	if ($export->{$ident}) {
 	    $xlated = "$prefix$ident";
 	}
 	else {
-	    $xlated = "$prefix${pack}::$ident";
+	    $xlated = "$prefix{$pack}::$ident";
 	}
     }
     elsif ($pack eq $oldpack) {
-	$xlated = "$prefix${newpack}::$ident";
+	$xlated = "$prefix{$newpack}::$ident";
     }
     else {
-	$xlated = "$prefix${pack}::$ident";
+	$xlated = "$prefix{$pack}::$ident";
     }
 
     return $xlated;

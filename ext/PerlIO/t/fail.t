@@ -11,7 +11,7 @@ BEGIN {
 use warnings 'layer';
 my $warn;
 my $file = "fail$$";
-${^WARN_HOOK} = sub { $warn = shift->{description} };
+$^WARN_HOOK = sub { $warn = shift->{description} };
 
 END { 1 while unlink($file) }
 

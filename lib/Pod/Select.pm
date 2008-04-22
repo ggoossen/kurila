@@ -466,8 +466,8 @@ sub match_section {
         for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
-            $match  ^&^= ($negated ? (@headings[$i] !~ m/${regex}/)
-                                 : (@headings[$i] =~ m/${regex}/));
+            $match  ^&^= ($negated ? (@headings[$i] !~ m/$regex/)
+                                 : (@headings[$i] =~ m/$regex/));
             last unless ($match);
         }
         return  1  if ($match);

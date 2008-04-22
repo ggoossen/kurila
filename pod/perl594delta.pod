@@ -237,7 +237,7 @@ matching to find the start point. (Yves Orton)
 
 On Windows, perl's stat() function normally opens the file to determine
 the link count and update attributes that may have been changed through
-hard links. Setting ${^WIN32_SLOPPY_STAT} to a true value speeds up
+hard links. Setting $^WIN32_SLOPPY_STAT to a true value speeds up
 stat() by not performing this operation. (Jan Dubois)
 
 =head1 Installation and Configuration Improvements

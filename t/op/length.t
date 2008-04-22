@@ -136,7 +136,7 @@ $^W = 1;
 
 my $warnings = 0;
 
-${^WARN_HOOK} = sub {
+$^WARN_HOOK = sub {
     $warnings++;
     warn @_;
 };

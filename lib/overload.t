@@ -250,7 +250,7 @@ eval q[package Oscalar;
 
 $a= Oscalar->new( "xx");
 
-is("b${a}c", "_._.b.__.xx._.__.c._");
+is("b{$a}c", "_._.b.__.xx._.__.c._");
 
 # Check inheritance of overloading;
 {
@@ -262,18 +262,18 @@ $aI = OscalarI->new( "$a");
 is(ref $aI, "OscalarI");
 is("$aI", "xx");
 is($aI, "xx");
-is("b${aI}c", "_._.b.__.xx._.__.c._");
+is("b{$aI}c", "_._.b.__.xx._.__.c._");
 
 # Here we test blessing to a package updates hash
 
 eval "package Oscalar; no overload '.'";
 
-is("b${a}", "_.b.__.xx._");
+is("b{$a}", "_.b.__.xx._");
 $x="1";
 bless \$x, 'Oscalar';
-is("b${a}c", "bxxc");
+is("b{$a}c", "bxxc");
  Oscalar->new( 1);
-is("b${a}c", "bxxc");
+is("b{$a}c", "bxxc");
 
 # Negative overloading:
 
@@ -660,10 +660,10 @@ else {
   my $iter = iterator->new(5);
   my $acc = '';
   my $out;
-  $acc .= " $out" while $out = glob("${iter}");
+  $acc .= " $out" while $out = glob("{$iter}");
   is($acc, ' 5 4 3 2 1 0');
   $iter = iterator->new(5);
-  is(scalar glob("${iter}"), '5');
+  is(scalar glob("{$iter}"), '5');
   $acc = '';
   $acc .= " $out" while $out = ~< $iter;
   is($acc, ' 4 3 2 1 0');
@@ -876,7 +876,7 @@ unless ($aaa) {
 {
     # check the Odd number of arguments for overload::constant warning
     my $a = "" ;
-    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
+    local $^WARN_HOOK = sub {$a = @_[0]} ;
     $x = eval ' overload::constant "integer" ; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -887,7 +887,7 @@ unless ($aaa) {
 {
     # check the `@_[0]' is not an overloadable type warning
     my $a = "" ;
-    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
+    local $^WARN_HOOK = sub {$a = @_[0]} ;
     $x = eval ' overload::constant "fred" => sub {} ; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -898,7 +898,7 @@ unless ($aaa) {
 {
     # check the `@_[1]' is not a code reference warning
     my $a = "" ;
-    local ${^WARN_HOOK} = sub {$a = @_[0]} ;
+    local $^WARN_HOOK = sub {$a = @_[0]} ;
     $x = eval ' overload::constant "integer" => 1; ' ;
     is($a, "");
     use warnings 'overload' ;
@@ -1030,7 +1030,7 @@ like ($@->{description}, qr/zap/);
 
    my $warn;
    {  
-     local ${^WARN_HOOK} = sub { $warn++ };
+     local $^WARN_HOOK = sub { $warn++ };
       my $x = t229->new;
       my $y = $x;
       eval { $y++ };
@@ -1252,7 +1252,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 
     package main;
     local $^W = 1;
-    local ${^WARN_HOOK} = sub { $warning = @_[0] };
+    local $^WARN_HOOK = sub { $warning = @_[0] };
 
     my $f = bless [], 'nomethod_false';
     ($warning, $method) = ("", "");

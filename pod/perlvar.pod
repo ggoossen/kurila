@@ -132,8 +132,8 @@ equivalent:
     while (<>) {...}	# equivalent only in while!
     while (defined($_ = <>)) {...}
 
-    /^Subject:/
-    $_ =~ /^Subject:/
+    m/^Subject:/
+    $_ =~ m/^Subject:/
 
     tr/a-z/A-Z/
     $_ =~ tr/a-z/A-Z/
@@ -238,8 +238,8 @@ performance penalty on all regular expression matches.  See L</BUGS>.
 
 See L</@-> for a replacement.
 
-=item ${^MATCH}
-X<${^MATCH}>
+=item $^MATCH
+X<$^MATCH>
 
 This is similar to C<$&> (C<$POSTMATCH>) except that it does not incur the
 performance penalty associated with that variable, and is only guaranteed
@@ -261,8 +261,8 @@ performance penalty on all regular expression matches.  See L</BUGS>.
 
 See L</@-> for a replacement.
 
-=item ${^PREMATCH}
-X<${^PREMATCH}>
+=item $^PREMATCH
+X<$^PREMATCH>
 
 This is similar to C<$`> ($PREMATCH) except that it does not incur the
 performance penalty associated with that variable, and is only guaranteed
@@ -290,8 +290,8 @@ performance penalty on all regular expression matches.  See L</BUGS>.
 
 See L</@-> for a replacement.
 
-=item ${^POSTMATCH}
-X<${^POSTMATCH}>
+=item $^POSTMATCH
+X<$^POSTMATCH>
 
 This is similar to C<$'> (C<$POSTMATCH>) except that it does not incur the
 performance penalty associated with that variable, and is only guaranteed
@@ -551,71 +551,45 @@ taken for something more important.)
 Consider using "real" multidimensional arrays as described
 in L<perllol>.
 
-=item HANDLE->format_page_number(EXPR)
-
-=item HANDLE->format_lines_per_page(EXPR)
-
-=item $FORMAT_LINES_PER_PAGE
-
-=item $=
-X<$=> X<$FORMAT_LINES_PER_PAGE>
-
-The current page length (printable lines) of the currently selected
-output channel.  Default is 60.  
-Used with formats.
-(Mnemonic: = has horizontal lines.)
-
-=item HANDLE->format_lines_left(EXPR)
-
-=item $FORMAT_LINES_LEFT
-
-=item $-
-X<$-> X<$FORMAT_LINES_LEFT>
-
-The number of lines left on the page of the currently selected output
-channel.  
-Used with formats.
-(Mnemonic: lines_on_page - lines_printed.)
-
 =item @LAST_MATCH_START
 
 =item @-
 X<@-> X<@LAST_MATCH_START>
 
-$-[0] is the offset of the start of the last successful match.
-C<$-[>I<n>C<]> is the offset of the start of the substring matched by
+@-[0] is the offset of the start of the last successful match.
+C<@-[>I<n>C<]> is the offset of the start of the substring matched by
 I<n>-th subpattern, or undef if the subpattern did not match.
 
 Thus after a match against $_, $& coincides with C<substr $_, $-[0],
 $+[0] - $-[0]>.  Similarly, $I<n> coincides with C<substr $_, $-[n],
 $+[n] - $-[n]> if C<$-[n]> is defined, and $+ coincides with
-C<substr $_, $-[$#-], $+[$#-] - $-[$#-]>.  One can use C<$#-> to find the last
+C<substr $_, @-[@- -1], @+[@- -1] - @-[@- -1]>.  One can use C<@- -1> to find the last
 matched subgroup in the last successful match.  Contrast with
-C<$#+>, the number of subgroups in the regular expression.  Compare
+C<@+ -1>, the number of subgroups in the regular expression.  Compare
 with C<@+>.
 
 This array holds the offsets of the beginnings of the last
 successful submatches in the currently active dynamic scope.
-C<$-[0]> is the offset into the string of the beginning of the
+C<@-[0]> is the offset into the string of the beginning of the
 entire match.  The I<n>th element of this array holds the offset
-of the I<n>th submatch, so C<$-[1]> is the offset where $1
-begins, C<$-[2]> the offset where $2 begins, and so on.
+of the I<n>th submatch, so C<@-[1]> is the offset where $1
+begins, C<@-[2]> the offset where $2 begins, and so on.
 
 After a match against some variable $var:
 
 =over 5
 
-=item C<$`> is the same as C<substr($var, 0, $-[0])>
+=item C<$`> is the same as C<substr($var, 0, @-[0])>
 
-=item C<$&> is the same as C<substr($var, $-[0], $+[0] - $-[0])>
+=item C<$&> is the same as C<substr($var, @-[0], @+[0] - @-[0])>
 
-=item C<$'> is the same as C<substr($var, $+[0])>
+=item C<$'> is the same as C<substr($var, @+[0])>
 
-=item C<$1> is the same as C<substr($var, $-[1], $+[1] - $-[1])>  
+=item C<$1> is the same as C<substr($var, @-[1], @+[1] - @-[1])>  
 
-=item C<$2> is the same as C<substr($var, $-[2], $+[2] - $-[2])>
+=item C<$2> is the same as C<substr($var, @-[2], @+[2] - @-[2])>
 
-=item C<$3> is the same as C<substr($var, $-[3], $+[3] - $-[3])>
+=item C<$3> is the same as C<substr($var, @-[3], @+[3] - @-[3])>
 
 =back
 
@@ -633,9 +607,9 @@ Here's an example:
 
     if ('1234' =~ /(?<A>1)(?<B>2)(?<A>3)(?<B>4)/) {
         foreach my $bufname (sort keys %-) {
-            my $ary = $-{$bufname};
-            foreach my $idx (0..$#$ary) {
-                print "\$-{$bufname}[$idx] : ",
+            my $ary = %-{$bufname};
+            foreach my $idx (0..@$ary-1) {
+                print "\%-{$bufname}[$idx] : ",
                       (defined($ary->[$idx]) ? "'$ary->[$idx]'" : "undef"),
                       "\n";
             }
@@ -644,10 +618,10 @@ Here's an example:
 
 would print out:
 
-    $-{A}[0] : '1'
-    $-{A}[1] : '3'
-    $-{B}[0] : '2'
-    $-{B}[1] : '4'
+    %-{A}[0] : '1'
+    %-{A}[1] : '3'
+    %-{B}[0] : '2'
+    %-{B}[1] : '4'
 
 The keys of the C<%-> hash correspond to all buffer names found in
 the regular expression.
@@ -660,61 +634,6 @@ associated with the last successful regular expression. Therefore mixing
 iterative access to them via C<each> may have unpredictable results.
 Likewise, if the last successful match changes, then the results may be
 surprising.
-
-=item HANDLE->format_name(EXPR)
-
-=item $FORMAT_NAME
-
-=item $~
-X<$~> X<$FORMAT_NAME>
-
-The name of the current report format for the currently selected output
-channel.  Default is the name of the filehandle.  (Mnemonic: brother to
-C<$^>.)
-
-=item HANDLE->format_top_name(EXPR)
-
-=item $FORMAT_TOP_NAME
-
-=item $^
-X<$^> X<$FORMAT_TOP_NAME>
-
-The name of the current top-of-page format for the currently selected
-output channel.  Default is the name of the filehandle with _TOP
-appended.  (Mnemonic: points to top of page.)
-
-=item IO::Handle->format_line_break_characters EXPR
-
-=item $FORMAT_LINE_BREAK_CHARACTERS
-
-=item $:
-X<$:> X<FORMAT_LINE_BREAK_CHARACTERS>
-
-The current set of characters after which a string may be broken to
-fill continuation fields (starting with ^) in a format.  Default is
-S<" \n-">, to break on whitespace or hyphens.  (Mnemonic: a "colon" in
-poetry is a part of a line.)
-
-=item IO::Handle->format_formfeed EXPR
-
-=item $FORMAT_FORMFEED
-
-=item $^L
-X<$^L> X<$FORMAT_FORMFEED>
-
-What formats output as a form feed.  Default is \f.
-
-=item $ACCUMULATOR
-
-=item $^A
-X<$^A> X<$ACCUMULATOR>
-
-The current value of the write() accumulator for format() lines.  A format
-contains formline() calls that put their result into C<$^A>.  After
-calling its format, write() prints out the contents of C<$^A> and empties.
-So you never really see the contents of C<$^A> unless you call
-formline() yourself and then look at it.  See L<perlform> and
-L<perlfunc/formline()>.
 
 =item $CHILD_ERROR
 
@@ -750,7 +669,7 @@ status; see L<perlvms/$?> for details.
 
 Also see L<Error Indicators>.
 
-=item ${^CHILD_ERROR_NATIVE}
+=item $^CHILD_ERROR_NATIVE
 X<$^CHILD_ERROR_NATIVE>
 
 The native status returned by the last pipe close, backtick (C<``>)
@@ -762,7 +681,7 @@ and WIFCONTINUED functions provided by the L<POSIX> module.
 Under VMS this reflects the actual VMS exit status; i.e. it is the same
 as $? when the pragma C<use vmsish 'status'> is in effect.
 
-=item ${^ENCODING}
+=item $^ENCODING
 X<$^ENCODING>
 
 The I<object reference> to the Encode object that is used to convert
@@ -920,10 +839,9 @@ supporting setreuid().
 
 =item $REAL_GROUP_ID
 
-=item $GID
+=item $^GID
 
-=item $(
-X<$(> X<$GID> X<$REAL_GROUP_ID>
+X<$^GID> X<$REAL_GROUP_ID>
 
 The real gid of this process.  If you are on a machine that supports
 membership in multiple groups simultaneously, gives a space separated
@@ -931,14 +849,14 @@ list of groups you are in.  The first number is the one returned by
 getgid(), and the subsequent ones by getgroups(), one of which may be
 the same as the first number.
 
-However, a value assigned to C<$(> must be a single number used to
-set the real gid.  So the value given by C<$(> should I<not> be assigned
-back to C<$(> without being forced numeric, such as by adding zero. Note
-that this is different to the effective gid (C<$)>) which does take a
+However, a value assigned to C<$^GID> must be a single number used to
+set the real gid.  So the value given by C<$^GID> should I<not> be assigned
+back to C<$^GID> without being forced numeric, such as by adding zero. Note
+that this is different to the effective gid (C<$^EGID>) which does take a
 list.
 
 You can change both the real gid and the effective gid at the same
-time by using POSIX::setgid().  Changes to $( require a check to $!
+time by using POSIX::setgid().  Changes to $^GID require a check to $!
 to detect any possible errors after an attempted change.
 
 (Mnemonic: parentheses are used to I<group> things.  The real gid is the
@@ -946,10 +864,9 @@ group you I<left>, if you're running setgid.)
 
 =item $EFFECTIVE_GROUP_ID
 
-=item $EGID
+=item $^EGID
 
-=item $)
-X<$)> X<$EGID> X<$EFFECTIVE_GROUP_ID>
+X<$^EGID> X<$EFFECTIVE_GROUP_ID>
 
 The effective gid of this process.  If you are on a machine that
 supports membership in multiple groups simultaneously, gives a space
@@ -957,12 +874,12 @@ separated list of groups you are in.  The first number is the one
 returned by getegid(), and the subsequent ones by getgroups(), one of
 which may be the same as the first number.
 
-Similarly, a value assigned to C<$)> must also be a space-separated
+Similarly, a value assigned to C<$^EGID> must also be a space-separated
 list of numbers.  The first number sets the effective gid, and
 the rest (if any) are passed to setgroups().  To get the effect of an
 empty list for setgroups(), just repeat the new effective gid; that is,
 to force an effective gid of 5 and an effectively empty setgroups()
-list, say C< $) = "5 5" >.
+list, say C< $^EGID = "5 5" >.
 
 You can change both the effective gid and the real gid at the same
 time by using POSIX::setgid() (use only a single numeric argument).
@@ -972,9 +889,9 @@ after an attempted change.
 (Mnemonic: parentheses are used to I<group> things.  The effective gid
 is the group that's I<right> for you, if you're running setgid.)
 
-C<< $< >>, C<< $> >>, C<$(> and C<$)> can be set only on
-machines that support the corresponding I<set[re][ug]id()> routine.  C<$(>
-and C<$)> can be swapped only on machines supporting setregid().
+C<< $< >>, C<< $> >>, C<$^GID> and C<$^EGID> can be set only on
+machines that support the corresponding I<set[re][ug]id()> routine.  C<$^GID>
+and C<$^EGID> can be swapped only on machines supporting setregid().
 
 =item $PROGRAM_NAME
 
@@ -1012,23 +929,6 @@ to ps(1) (assuming the operating system plays along).  Note that
 the view of C<$0> the other threads have will not change since they
 have their own copies of it.
 
-=item $]
-X<$]>
-
-The version + patchlevel / 1000 of the Perl interpreter.  This variable
-can be used to determine whether the Perl interpreter executing a
-script is in the right range of versions.  (Mnemonic: Is this version
-of perl in the right bracket?)  Example:
-
-    warn "No checksumming!\n" if $] < 3.019;
-
-See also the documentation of C<use VERSION> and C<require VERSION>
-for a convenient way to fail if the running Perl interpreter is too old.
-
-The floating point representation can sometimes lead to inaccurate
-numeric comparisons.  See C<$^V> for a more modern representation of
-the Perl version that allows accurate string comparisons.
-
 =item $COMPILING
 
 =item $^C
@@ -1049,12 +949,12 @@ The current value of the debugging flags.  (Mnemonic: value of B<-D>
 switch.) May be read or set. Like its command-line equivalent, you can use
 numeric or symbolic values, eg C<$^D = 10> or C<$^D = "st">.
 
-=item ${^RE_DEBUG_FLAGS}
+=item $^RE_DEBUG_FLAGS
 
 The current value of the regex debugging flags. Set to 0 for no debug output
 even when the re 'debug' module is loaded. See L<re> for details.
 
-=item ${^RE_TRIE_MAXBUF}
+=item $^RE_TRIE_MAXBUF
 
 Controls how certain regex optimisations are applied and how much memory they
 utilize. This value by default is 65536 which corresponds to a 512kB temporary
@@ -1167,7 +1067,7 @@ C<MSWin32>, it doesn't tell the difference between
 Win32::GetOSVersion() (see L<Win32> and L<perlport>) to distinguish
 between the variants.
 
-=item ${^OPEN}
+=item $^OPEN
 
 An internal variable used by PerlIO.  A string in two parts, separated
 by a C<\0> byte, the first part describes the input layers, the second
@@ -1265,26 +1165,26 @@ The time at which the program began running, in seconds since the
 epoch (beginning of 1970).  The values returned by the B<-M>, B<-A>,
 and B<-C> filetests are based on this value.
 
-=item ${^TAINT}
+=item $^TAINT
 
 Reflects if taint mode is on or off.  1 for on (the program was run with
 B<-T>), 0 for off, -1 when only taint warnings are enabled (i.e. with
 B<-t> or B<-TU>).  This variable is read-only.
 
-=item ${^UNICODE}
+=item $^UNICODE
 
 Reflects certain Unicode settings of Perl.  See L<perlrun>
 documentation for the C<-C> switch for more information about
 the possible values. This variable is set during Perl startup
 and is thereafter read-only.
 
-=item ${^UTF8CACHE}
+=item $^UTF8CACHE
 
 This variable controls the state of the internal UTF-8 offset caching code.
 1 for on (the default), 0 for off, -1 to debug the caching code by checking
 all its results against linear scans, and panicking on any discrepancy.
 
-=item ${^UTF8LOCALE}
+=item $^UTF8LOCALE
 
 This variable indicates whether an UTF-8 locale was detected by perl at
 startup. This information is used by perl when it's in
@@ -1318,6 +1218,29 @@ for a convenient way to fail if the running Perl interpreter is too old.
 
 See also C<$]> for an older representation of the Perl version.
 
+=item $^WARN_HOOK
+X<$^WARN_HOOK>
+
+The routine indicated by C<$^WARN_HOOK> is called when a warning message is
+about to be printed.  The warning message is passed as the first
+argument.  The default $^WARN_HOOK calls C<message> on the object and print it
+to C<STDERR>.
+You can use this to save warnings
+in a variable, or turn warnings into fatal errors, like this:
+
+    local $^WARN_HOOK = sub { die @_[0] };
+    eval $proggie;
+
+To save warnings:
+
+    local $^WARN_HOOK = sub { push @warn, @_[0] };
+
+=item $^DIE_HOOK
+
+The routine indicated by C<$^DIE_HOOK> is called when a fatal exception
+is about to be thrown.  The error message is passed as the first
+argument. The <$^DIE_HOOK> is disabled inside an eval().
+
 =item $WARNING
 
 =item $^W
@@ -1327,12 +1250,12 @@ The current value of the warning switch, initially true if B<-w>
 was used, false otherwise, but directly modifiable.  (Mnemonic:
 related to the B<-w> switch.)  See also L<warnings>.
 
-=item ${^WARNING_BITS}
+=item $^WARNING_BITS
 
 The current set of warning checks enabled by the C<use warnings> pragma.
 See the documentation of C<warnings> for more details.
 
-=item ${^WIN32_SLOPPY_STAT}
+=item $^WIN32_SLOPPY_STAT
 
 If this variable is set to a true value, then stat() on Windows will
 not try to open the file. This means that the link count cannot be
@@ -1392,10 +1315,10 @@ this goal, and produce a pathname that can be invoked as a
 command or referenced as a file.
 
   use Config;
-  $secure_perl_path = $Config{perlpath};
+  $secure_perl_path = %Config{perlpath};
   if ($^O ne 'VMS')
-     {$secure_perl_path .= $Config{_exe}
-          unless $secure_perl_path =~ m/$Config{_exe}$/i;}
+     {$secure_perl_path .= %Config{_exe}
+          unless $secure_perl_path =~ m/%Config{_exe}$/i;}
 
 =item ARGV
 X<ARGV>
@@ -1484,7 +1407,7 @@ specific info.
 
 =item %ENV
 
-=item $ENV{expr}
+=item %ENV{expr}
 X<%ENV>
 
 The hash %ENV contains your current environment.  Setting a
@@ -1493,7 +1416,7 @@ you subsequently fork() off.
 
 =item %SIG
 
-=item $SIG{expr}
+=item %SIG{expr}
 X<%SIG>
 
 The hash C<%SIG> contains signal handlers for signals.  For example:
@@ -1505,11 +1428,11 @@ The hash C<%SIG> contains signal handlers for signals.  For example:
 	exit(0);
     }
 
-    $SIG{'INT'}  = \&handler;
-    $SIG{'QUIT'} = \&handler;
+    %SIG{'INT'}  = \&handler;
+    %SIG{'QUIT'} = \&handler;
     ...
-    $SIG{'INT'}  = 'DEFAULT';	# restore default action
-    $SIG{'QUIT'} = 'IGNORE';	# ignore SIGQUIT
+    %SIG{'INT'}  = 'DEFAULT';	# restore default action
+    %SIG{'QUIT'} = 'IGNORE';	# ignore SIGQUIT
 
 Using a value of C<'IGNORE'> usually has the effect of ignoring the
 signal, except for the C<CHLD> signal.  See L<perlipc> for more about
@@ -1517,13 +1440,9 @@ this special case.
 
 Here are some other examples:
 
-    $SIG{"PIPE"} = "Plumber";   # assumes main::Plumber (not recommended)
-    $SIG{"PIPE"} = \&Plumber;   # just fine; assume current Plumber
-    $SIG{"PIPE"} = *Plumber;    # somewhat esoteric
-    $SIG{"PIPE"} = Plumber();   # oops, what did Plumber() return??
-
-Be sure not to use a bareword as the name of a signal handler,
-lest you inadvertently call it. 
+    %SIG{"PIPE"} = \&Plumber;   # just fine; assume current Plumber
+    %SIG{"PIPE"} = *Plumber;    # somewhat esoteric
+    %SIG{"PIPE"} = Plumber();   # oops, what did Plumber() return??
 
 If your system has the sigaction() function then signal handlers are
 installed using it.  This means you get reliable signal handling.
@@ -1531,57 +1450,6 @@ installed using it.  This means you get reliable signal handling.
 The default delivery policy of signals changed in Perl 5.8.0 from 
 immediate (also known as "unsafe") to deferred, also known as 
 "safe signals".  See L<perlipc> for more information.
-
-Certain internal hooks can be also set using the %SIG hash.  The
-routine indicated by C<$SIG{__WARN__}> is called when a warning message is
-about to be printed.  The warning message is passed as the first
-argument.  The presence of a C<__WARN__> hook causes the ordinary printing
-of warnings to C<STDERR> to be suppressed.  You can use this to save warnings
-in a variable, or turn warnings into fatal errors, like this:
-
-    local $SIG{__WARN__} = sub { die $_[0] };
-    eval $proggie;
-
-As the C<'IGNORE'> hook is not supported by C<__WARN__>, you can
-disable warnings using the empty subroutine:
-
-    local $SIG{__WARN__} = sub {};
-
-The routine indicated by C<$SIG{__DIE__}> is called when a fatal exception
-is about to be thrown.  The error message is passed as the first
-argument.  When a C<__DIE__> hook routine returns, the exception
-processing continues as it would have in the absence of the hook,
-unless the hook routine itself exits via a C<goto>, a loop exit, or a C<die()>.
-The C<__DIE__> handler is explicitly disabled during the call, so that you
-can die from a C<__DIE__> handler.  Similarly for C<__WARN__>.
-
-Due to an implementation glitch, the C<$SIG{__DIE__}> hook is called
-even inside an eval().  Do not use this to rewrite a pending exception
-in C<$@>, or as a bizarre substitute for overriding C<CORE::GLOBAL::die()>.
-This strange action at a distance may be fixed in a future release
-so that C<$SIG{__DIE__}> is only called if your program is about
-to exit, as was the original intent.  Any other use is deprecated.
-
-C<__DIE__>/C<__WARN__> handlers are very special in one respect:
-they may be called to report (probable) errors found by the parser.
-In such a case the parser may be in inconsistent state, so any
-attempt to evaluate Perl code from such a handler will probably
-result in a segfault.  This means that warnings or errors that
-result from parsing Perl should be used with extreme caution, like
-this:
-
-    require Carp if defined $^S;
-    Carp::confess("Something wrong") if defined &Carp::confess;
-    die "Something wrong, but could not load Carp to give backtrace...
-         To see backtrace try starting Perl with -MCarp switch";
-
-Here the first line will load Carp I<unless> it is the parser who
-called the handler.  The second line will print backtrace and die if
-Carp was available.  The third line will be executed only if Carp was
-not available.
-
-See L<perlfunc/die>, L<perlfunc/warn>, L<perlfunc/eval>, and
-L<warnings> for additional information.
 
 =back
 
@@ -1643,25 +1511,18 @@ Variable names in Perl can have several formats.  Usually, they
 must begin with a letter or underscore, in which case they can be
 arbitrarily long (up to an internal limit of 251 characters) and
 may contain letters, digits, underscores, or the special sequence
-C<::> or C<'>.  In this case, the part before the last C<::> or
-C<'> is taken to be a I<package qualifier>; see L<perlmod>.
+C<::>.  In this case, the part before the last C<::>  is taken
+to be a I<package qualifier>; see L<perlmod>.
 
 Perl variable names may also be a sequence of digits or a single
-punctuation or control character.  These names are all reserved for
+punctuation or a name starting with C<^>.  These names are all reserved for
 special uses by Perl; for example, the all-digits names are used
 to hold data captured by backreferences after a regular expression
-match.  Perl has a special syntax for the single-control-character
-names: It understands C<^X> (caret C<X>) to mean the control-C<X>
-character.  For example, the notation C<$^W> (dollar-sign caret
-C<W>) is the scalar variable whose name is the single character
-control-C<W>.  This is better than typing a literal control-C<W>
-into your program.
+match.
 
-Finally, new in Perl 5.6, Perl variable names may be alphanumeric
-strings that begin with control characters (or better yet, a caret).
-These variables must be written in the form C<${^Foo}>; the braces
-are not optional.  C<${^Foo}> denotes the scalar variable whose
-name is a control-C<F> followed by two C<o>'s.  These variables are
+Perl variable names may be alphanumeric
+strings that begin with a caret.
+These variables are
 reserved for future special uses by Perl, except for the ones that
 begin with C<^_> (control-underscore or caret-underscore).  No
 control-character name that begins with C<^_> will acquire a special
@@ -1680,7 +1541,7 @@ exempt in these ways:
 	ARGVOUT		_
 	SIG
 
-In particular, the new special C<${^_XYZ}> variables are always taken
+In particular, the new special C<$^_XYZ> variables are always taken
 to be in package C<main>, regardless of any C<package> declarations
 presently in scope.  
 
@@ -1697,6 +1558,6 @@ for more information. Writing C<use English '-no_match_vars';>
 avoids the performance penalty.
 
 Having to even think about the C<$^S> variable in your exception
-handlers is simply wrong.  C<$SIG{__DIE__}> as currently implemented
+handlers is simply wrong.  C<$DIE_HOOK> as currently implemented
 invites grievous and difficult to track down errors.  Avoid it
 and use an C<END{}> or CORE::GLOBAL::die override instead.

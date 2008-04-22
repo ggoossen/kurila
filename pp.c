@@ -170,20 +170,7 @@ PP(pp_rv2gv)
 		}
 		DIE(aTHX_ PL_no_usym, "a symbol");
 	    }
-	    if ((PL_op->op_flags & OPf_SPECIAL) &&
-		!(PL_op->op_flags & OPf_MOD))
-	    {
-		SV * const temp = (SV*)gv_fetchsv(sv, 0, SVt_PVGV);
-		if (!temp
-		    && (!is_gv_magical_sv(sv,0)
-			|| !(sv = (SV*)gv_fetchsv(sv, GV_ADD, SVt_PVGV)))) {
-		    RETSETUNDEF;
-		}
-		sv = temp;
-	    }
-	    else {
-		DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
-	    }
+	    DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
 	}
     }
     if (PL_op->op_private & OPpLVAL_INTRO)

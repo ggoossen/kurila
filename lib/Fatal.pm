@@ -50,7 +50,7 @@ sub write_invocation {
     while (@argvs) {
       @argv = @{shift @argvs};
       $n = shift @argv;
-      push @out, "$ {else}if (\@_ == $n) \{\n";
+      push @out, "{$else}if (\@_ == $n) \{\n";
       $else = "\t\} els";
       push @out, 
           "\t\treturn " . one_invocation($core, $call, $name, $void, @argv) . ";\n";
@@ -81,7 +81,7 @@ sub _make_fatal {
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
-    $sub = "${pkg}::$sub" unless $sub =~ m/::/;
+    $sub = "{$pkg}::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     print "# _make_fatal: sub=$sub pkg=$pkg name=$name void=$void\n" if $Debug;

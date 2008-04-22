@@ -369,10 +369,10 @@ read() on unopened filehandle NONEXISTENT at - line 20.
 # pp_sys.c [pp_binmode]
 use warnings 'unopened' ;
 binmode(BLARG);
-$a = "BLERG";binmode($a);
+$a = *BLERG;binmode($a);
 EXPECT
 binmode() on unopened filehandle BLARG at - line 3.
-binmode() on unopened filehandle at - line 4.
+binmode() on unopened filehandle BLERG at - line 4.
 ########
 # pp_sys.c [pp_lstat]
 use warnings 'io';

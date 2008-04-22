@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 # walkoptree_slow comes from B.pm (you are there),
 # walkoptree comes from B.xs
 our @EXPORT_OK = qw(minus_c ppname save_BEGINs
-		class peekop cast_I32 cstring cchar hash threadsv_names
+		class peekop cast_I32 cstring cchar hash
 		main_root main_start main_cv svref_2object opnumber
 		sub_generation amagic_generation perlstring
 		walkoptree_slow walkoptree walkoptree_exec walksymtable
@@ -789,8 +789,6 @@ If you're working with globs at runtime, and need to disambiguate
 =item SV
 
 =item IO
-
-=item FORM
 
 =item AV
 

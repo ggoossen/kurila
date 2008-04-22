@@ -49,7 +49,7 @@ sub getopts {
       shift @$args;
       last;
     }
-    my $method = "opt_${first}_with";
+    my $method = "opt_{$first}_with";
     if( $target->can($method) ) {  # it's argumental
       if($rest eq '') {   # like -f bar
         shift @$args;

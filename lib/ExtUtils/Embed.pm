@@ -97,7 +97,7 @@ sub xsi_protos {
         my($mname, $cname);
         ($mname = $pname) =~ s!/!::!g;
         ($cname = $pname) =~ s!/!__!g;
-	my($ccode) = "EXTERN_C void boot_${cname} ($boot_proto);\n";
+	my($ccode) = "EXTERN_C void boot_{$cname} ($boot_proto);\n";
 	next if %seen{$ccode}++;
         push(@retval, $ccode);
     }
@@ -120,10 +120,10 @@ sub xsi_body {
         if ($pname eq $dl){
             # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
             # boot_DynaLoader is called directly in DynaLoader.pm
-            $ccode = "\t/* DynaLoader is a special case */\n\tnewXS(\"${mname}::boot_${cname}\", boot_${cname}, file);\n";
+            $ccode = "\t/* DynaLoader is a special case */\n\tnewXS(\"{$mname}::boot_{$cname}\", boot_{$cname}, file);\n";
             push(@retval, $ccode) unless %seen{$ccode}++;
         } else {
-            $ccode = "\tnewXS(\"${mname}::bootstrap\", boot_${cname}, file);\n";
+            $ccode = "\tnewXS(\"{$mname}::bootstrap\", boot_{$cname}, file);\n";
             push(@retval, $ccode) unless %seen{$ccode}++;
         }
     }
@@ -203,7 +203,7 @@ sub ldopts {
 	$sub = @ns[-1];
 	$root = File::Spec->catdir(@ns);
 	
-	print STDERR "searching for '$sub${lib_ext}'\n" if $Verbose;
+	print STDERR "searching for '{$sub}{$lib_ext}'\n" if $Verbose;
 	foreach (@path) {
 	    next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
 	    push @archives, $archive;

@@ -305,9 +305,7 @@
 #ifdef PERL_CORE
 #define io_close		Perl_io_close
 #define invert			Perl_invert
-#define is_gv_magical		Perl_is_gv_magical
 #endif
-#define is_lvalue_sub		Perl_is_lvalue_sub
 #define to_uni_upper_lc		Perl_to_uni_upper_lc
 #define to_uni_title_lc		Perl_to_uni_title_lc
 #define to_uni_lower_lc		Perl_to_uni_lower_lc
@@ -1787,9 +1785,6 @@
 #endif
 #define gv_fetchpvn_flags	Perl_gv_fetchpvn_flags
 #define gv_fetchsv		Perl_gv_fetchsv
-#ifdef PERL_CORE
-#define is_gv_magical_sv	Perl_is_gv_magical_sv
-#endif
 #define stashpv_hvname_match	Perl_stashpv_hvname_match
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
 #ifdef PERL_CORE
@@ -2566,9 +2561,7 @@
 #ifdef PERL_CORE
 #define io_close(a,b)		Perl_io_close(aTHX_ a,b)
 #define invert(a)		Perl_invert(aTHX_ a)
-#define is_gv_magical(a,b,c)	Perl_is_gv_magical(aTHX_ a,b,c)
 #endif
-#define is_lvalue_sub()		Perl_is_lvalue_sub(aTHX)
 #define to_uni_upper_lc(a)	Perl_to_uni_upper_lc(aTHX_ a)
 #define to_uni_title_lc(a)	Perl_to_uni_title_lc(aTHX_ a)
 #define to_uni_lower_lc(a)	Perl_to_uni_lower_lc(aTHX_ a)
@@ -4054,9 +4047,6 @@
 #endif
 #define gv_fetchpvn_flags(a,b,c,d)	Perl_gv_fetchpvn_flags(aTHX_ a,b,c,d)
 #define gv_fetchsv(a,b,c)	Perl_gv_fetchsv(aTHX_ a,b,c)
-#ifdef PERL_CORE
-#define is_gv_magical_sv(a,b)	Perl_is_gv_magical_sv(aTHX_ a,b)
-#endif
 #define stashpv_hvname_match(a,b)	Perl_stashpv_hvname_match(aTHX_ a,b)
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
 #ifdef PERL_CORE

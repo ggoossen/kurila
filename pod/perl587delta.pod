@@ -333,7 +333,7 @@ make it tidier and more maintainable. The resulting object code and the
 C<perl> binary may well be smaller than 5.8.6, and hopefully faster in some
 cases, but apart from this there should be no user-detectable changes.
 
-C<${^UTF8LOCALE}> has been added to give perl space access to C<PL_utf8locale>.
+C<$^UTF8LOCALE> has been added to give perl space access to C<PL_utf8locale>.
 
 The size of the arenas used to allocate SV heads and most SV bodies can now
 be changed at compile time. The old size was 1008 bytes, the new default size

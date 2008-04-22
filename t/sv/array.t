@@ -1,8 +1,8 @@
 #!./perl
 
-require './test.pl';
+BEGIN { require './test.pl'; }
 
-plan (87);
+plan (86);
 
 my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
@@ -97,12 +97,6 @@ $foo = ('a','b','c','d','e','f')[[1]];
 is($foo, 'b');
 
 @foo = ( 'foo', 'bar', 'burbl', 'blah');
-{
-    no strict 'vars';
-    @foox = ( 'foo', 'bar', 'burbl');
-    push(foox, 'blah');
-    is((@foox-1), 3);
-}
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
 
@@ -264,8 +258,9 @@ is ($got, '');
 
 {
     my @a;
-    eval_dies_like( '@a[-1] = 0', 
-                    qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0");
+    eval '@a[-1] = 0';
+    like $@->message,
+      qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0";
 }
 
 {
@@ -274,7 +269,7 @@ is ($got, '');
     use vars '@array';
     for (1,2) {
 	{
-	    local @a;
+	    local our @a;
 	    is ((@a-1), -1);
 	    @a=(1..4)
 	}

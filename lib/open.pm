@@ -15,7 +15,7 @@ sub _drop_oldenc {
     # perlio layer stack an encoding identical to what we would like
     # to push via this open pragma, we will pop away the old encoding
     # (+utf8) so that we can push ourselves in place (this is easier
-    # than ignoring pushing ourselves because of the way how ${^OPEN}
+    # than ignoring pushing ourselves because of the way how $^OPEN
     # works).  So we are looking for something like
     #
     #   stdio encoding(xxx) utf8
@@ -50,7 +50,7 @@ sub import {
     my ($class,@args) = @_;
     die("open: needs explicit list of PerlIO layers") unless @args;
     my $std;
-    my ($in,$out) = split(m/\0/,(${^OPEN} || "\0"), -1);
+    my ($in,$out) = split(m/\0/,($^OPEN || "\0"), -1);
     while (@args) {
 	my $type = shift(@args);
 	my $dscp;
@@ -94,7 +94,7 @@ sub import {
 	    die "Unknown PerlIO layer class '$type'";
 	}
     }
-    ${^OPEN} = join("\0", $in, $out);
+    $^OPEN = join("\0", $in, $out);
     if ($std) {
 	if ($in) {
 	    if ($in =~ m/:utf8\b/) {

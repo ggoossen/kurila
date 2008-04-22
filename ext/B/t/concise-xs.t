@@ -148,7 +148,7 @@ my $testpkgs = {
 		  svref_2object sv_yes sv_undef sv_no save_BEGINs
 		  regex_padav ppname perlstring opnumber minus_c
 		  main_start main_root main_cv init_av inc_gv hash
-		  formfeed end_av dowarn diehook defstash curstash
+		  end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  begin_av amagic_generation sub_generation address
                   set_main_start set_main_root fudge unitcheck_av)],
@@ -317,7 +317,7 @@ sub test_pkg {
     }
     foreach my $fn (reverse sort keys %stash) {
 	next if %stash{$fn} eq 'skip';
-	my $res = checkXS("${pkg}::$fn", %stash{$fn});
+	my $res = checkXS("{$pkg}::$fn", %stash{$fn});
 	if ($res ne '1') {
 	    push @{%report{$pkg}{$res}}, $fn;
 	}

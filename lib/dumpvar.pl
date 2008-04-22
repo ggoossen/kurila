@@ -177,7 +177,7 @@ sub unwrap {
       if (!$dumpReused && defined $address) { 
 	%address{$address}++ ;
 	if ( %address{$address} +> 1 ) { 
-	  print "${sp}-> REUSED_ADDRESS\n" ; 
+	  print "{$sp}-> REUSED_ADDRESS\n" ; 
 	  return ; 
 	} 
       }
@@ -186,7 +186,7 @@ sub unwrap {
       $address = "$v" . "";	# To avoid a bug with globs
       %address{$address}++ ;
       if ( %address{$address} +> 1 ) { 
-	print "${sp}*DUMPED_GLOB*\n" ; 
+	print "{$sp}*DUMPED_GLOB*\n" ; 
 	return ; 
       } 
     }
@@ -463,7 +463,7 @@ sub main::dumpvar {
     $package .= "::" unless $package =~ m/::$/;
     *stab = *{Symbol::fetch_glob("main::")};
     while ($package =~ m/(\w+?::)/g){
-      *stab = % {stab}{$1};
+      *stab = %stab{$1};
     }
     local $TotalStrings = 0;
     local $Strings = 0;
@@ -532,7 +532,7 @@ sub packageUsage {
   $package .= "::" unless $package =~ m/::$/;
   local *stab = *{Symbol::fetch_glob("main::")};
   while ($package =~ m/(\w+?::)/g){
-    *stab = % {stab}{$1};
+    *stab = %stab{$1};
   }
   local $TotalStrings = 0;
   local $CompleteTotal = 0;

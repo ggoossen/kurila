@@ -61,8 +61,8 @@ SKIP: { # Test exit status from pod2usage()
                || $^O eq 'NetWare'
                || $^O eq 'VMS') ? '"'
               : "");
-    my @params = ( "${cq}-I../lib$cq",  "${cq}-MPod::Usage$cq", '-e' );
-    my $prg = qq[${cq}pod2usage(\{ $args \})$cq];
+    my @params = ( "{$cq}-I../lib$cq",  "{$cq}-MPod::Usage$cq", '-e' );
+    my $prg = qq[{$cq}pod2usage(\{ $args \})$cq];
     my @cmd = ( $^X, @params, $prg );
 
     print "# cmd = @cmd\n";

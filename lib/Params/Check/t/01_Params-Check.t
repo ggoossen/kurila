@@ -263,7 +263,7 @@ use constant TRUE   => sub { 1 };
 
 ### store => \$foo tests
 {   ### quell warnings
-    local ${^WARN_HOOK} = sub {};
+    local $^WARN_HOOK = sub {};
     
     my $tmpl = { foo => { store => '' } };
     check( $tmpl, {} );
