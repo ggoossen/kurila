@@ -73,20 +73,20 @@ __DATA__
 # USING: gen_extract_tagged('\{','\}');
 	{ a test };
 
-# USING: gen_extract_tagged(qr/<[A-Z]+>/,undef, undef, {ignore=>["<BR>"]});
+# USING: gen_extract_tagged(qr/<[A-Z]+>/,undef, undef, \%(ignore=>\@("<BR>")));
 	<A>aaa<B>bbb<BR>ccc</B>ddd</A>;
 
 # USING: gen_extract_tagged("BEGIN","END");
 	BEGIN at the BEGIN keyword and END at the END;
 	BEGIN at the beginning and end at the END;
 
-# USING: gen_extract_tagged(undef,undef,undef,{ignore=>["<[^>]*/>"]});
+# USING: gen_extract_tagged(undef,undef,undef,\%(ignore=>\@("<[^>]*/>")));
 	<A>aaa<B>bbb<BR/>ccc</B>ddd</A>;
 
-# USING: gen_extract_tagged(";","-",undef,{reject=>[";"],fail=>"MAX"});
+# USING: gen_extract_tagged(";","-",undef,\%(reject=>\@(";"),fail=>"MAX"));
 	; at the ;-) keyword
 
-# USING: gen_extract_tagged("<[A-Z]+>",undef, undef, {ignore=>["<BR>"]});
+# USING: gen_extract_tagged("<[A-Z]+>",undef, undef, \%(ignore=>\@("<BR>")));
 	<A>aaa<B>bbb<BR>ccc</B>ddd</A>;
 
 # THESE SHOULD FAIL
@@ -94,11 +94,11 @@ __DATA__
 	BEGIN at the BEGIN keyword and END at the end;
 
 # TEST EXTRACTION OF TAGGED STRINGS
-# USING: gen_extract_tagged("BEGIN","END",undef,{reject=>["BEGIN","END"]});
+# USING: gen_extract_tagged("BEGIN","END",undef,\%(reject=>\@("BEGIN","END")));
 # THESE SHOULD FAIL
 	BEGIN at the BEGIN keyword and END at the end;
 
-# USING: gen_extract_tagged(";","-",undef,{reject=>[";"],fail=>"PARA"});
+# USING: gen_extract_tagged(";","-",undef,\%(reject=>\@(";"),fail=>"PARA"));
 	; at the ;-) keyword
 
 

@@ -26,18 +26,18 @@ skip "no perlio in this build", $tests unless %Config::Config{useperlio};
 
 #################################
 
-use constant {		# see also t/op/gv.t line 282
-    myaref	=> [ 1,2,3 ],
+use constant \%(		# see also t/op/gv.t line 282
+    myaref	=> \@( 1,2,3 ),
     myfl	=> 1.414213,
     myglob	=> \*STDIN,
-    myhref	=> { a	=> 1 },
+    myhref	=> \%( a	=> 1 ),
     myint	=> 42,
     myrex	=> qr/foo/,
     mystr	=> 'hithere',
     mysub	=> \&ok,
     myundef	=> undef,
     myunsub	=> \&nosuch,
-};
+);
 
 sub myyes() { 1==1 }
 sub myno () { return 1!=1 }
@@ -45,23 +45,23 @@ sub pi () { 3.14159 };
 
 my $RV_class = 'IV';
 
-my $want = {	# expected types, how value renders in-line, todos (maybe)
-    mystr	=> [ 'PVIV', '"'.mystr.'"' ],
-    myhref	=> [ 'IV', ''],
-    pi		=> [ 'NV', pi ],
-    myglob	=> [ 'IV', '' ],
-    mysub	=> [ 'IV', '' ],
-    myunsub	=> [ 'IV', '' ],
+my $want = \%(	# expected types, how value renders in-line, todos (maybe)
+    mystr	=> \@( 'PVIV', '"'.mystr.'"' ),
+    myhref	=> \@( 'IV', ''),
+    pi		=> \@( 'NV', pi ),
+    myglob	=> \@( 'IV', '' ),
+    mysub	=> \@( 'IV', '' ),
+    myunsub	=> \@( 'IV', '' ),
     # these are not inlined, at least not per BC::Concise
     #myyes	=> [ 'RV', ],
     #myno	=> [ 'RV', ],
-    myrex	=> [ $RV_class, '\\\\"\\(?-xism:Foo\\)"' ],
-    myundef	=> [ 'NULL', ],
-    myfl	=> [ 'PVNV', myfl ],
-    myint	=> [ 'PVIV', myint ],
-    myrex	=> [ 'PVNV', '' ],
-    myundef	=> [ 'PVIV', ],
-};
+    myrex	=> \@( $RV_class, '\\\\"\\(?-xism:Foo\\)"' ),
+    myundef	=> \@( 'NULL', ),
+    myfl	=> \@( 'PVNV', myfl ),
+    myint	=> \@( 'PVIV', myint ),
+    myrex	=> \@( 'PVNV', '' ),
+    myundef	=> \@( 'PVIV', ),
+);
 
 use constant WEEKDAYS
     => qw ( Sunday Monday Tuesday Wednesday Thursday Friday Saturday );

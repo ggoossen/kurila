@@ -75,11 +75,11 @@ sub type_to_C_value {
 
 %type_temporary =
     (
-     SV => ['SV *'],
-     PV => ['const char *'],
-     PVN => ['const char *', 'STRLEN'],
+     SV => \@('SV *'),
+     PV => \@('const char *'),
+     PVN => \@('const char *', 'STRLEN'),
      );
-%type_temporary{$_} = [$_] foreach qw(IV UV NV);
+%type_temporary{$_} = \@($_) foreach qw(IV UV NV);
      
 while (my ($type, $value) = each %XS_TypeSet) {
     %type_num_args{$type}
@@ -96,7 +96,7 @@ sub partition_names {
 	if ($default) {
 	    # If we find a default value, convert it into a regular item and
 	    # append it to the queue of items to process
-	    my $default_item = {%$item};
+	    my $default_item = \%(%$item);
 	    $default_item->{invert_macro} = 1;
 	    $default_item->{pre} = delete $item->{def_pre};
 	    $default_item->{post} = delete $item->{def_post};
@@ -161,13 +161,13 @@ sub name_len_value_macro {
 
 sub WriteConstants {
     my $self = shift;
-    my $ARGS = {@_};
+    my $ARGS = \%(@_);
 
     my ($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
 	= %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{PROXYSUBS};
-    $options = {} unless ref $options;
+    $options = \%() unless ref $options;
     my $explosives = $options->{croak_on_read};
 
     $xs_subname ||= 'constant';
@@ -177,11 +177,11 @@ sub WriteConstants {
     $package_sprintf_safe =~ s/%/\%\%/g;
 
     # All the types we see
-    my $what = {};
+    my $what = \%();
     # A hash to lookup items with.
-    my $items = {};
+    my $items = \%();
 
-    my @items = $self->normalise_items ({disable_utf8_duplication => 1},
+    my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
 					$default_type, $what, $items,
 					@{$ARGS->{NAMES}});
 
@@ -289,7 +289,7 @@ EOBOOT
     my %iterator;
 
     $found->{''}
-        = [map {{%$_, type=>'', invert_macro => 1}} @$notfound];
+        = \@(map {\%(%$_, type=>'', invert_macro => 1)} @$notfound);
 
     foreach my $type (sort keys %$found) {
 	my $struct = %type_to_struct{$type};

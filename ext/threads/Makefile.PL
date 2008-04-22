@@ -47,8 +47,7 @@ sub have_cc
 my @conditional_params;
 if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     # Core
-    push(@conditional_params, 'MAN3PODS' => {},
-                              'NORECURS' => 1);
+    push(@conditional_params, 'NORECURS' => 1);
 } else {
     # CPAN
 
@@ -58,7 +57,7 @@ if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     }
 
     push(@conditional_params, 'DEFINE' => '-DHAS_PPPORT_H',
-                              'PREREQ_PM'         => {
+                              'PREREQ_PM'         => \%(
                                     'strict'            => 0,
                                     'warnings'          => 0,
                                     'overload'          => 0,
@@ -70,7 +69,7 @@ if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
                                     'ExtUtils::testlib' => 0,
                                     'Hash::Util'        => 0,
                                     'IO::File'          => 0,
-                              });
+                              ));
 }
 
 
@@ -80,9 +79,9 @@ WriteMakefile(
     'AUTHOR'            => 'Artur Bergman, Jerry D. Hedden <jdhedden AT cpan DOT org>',
     'VERSION_FROM'      => 'threads.pm',
     'ABSTRACT_FROM'     => 'threads.pm',
-    'PM' => {
+    'PM' => \%(
         'threads.pm'    => '$(INST_LIBDIR)/threads.pm',
-    },
+    ),
     'INSTALLDIRS'       => 'perl',
     'LICENSE'  => 'perl',
 

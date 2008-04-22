@@ -58,7 +58,7 @@ To recreate it use the following command:
 
      $me -p $file $outfile
 
-Created at @{[scalar localtime]}
+Created at @{\@(scalar localtime)}
 #########################################################################
 __UU__
 EOFBLURB
@@ -195,7 +195,7 @@ sub vms_check_name {
     return $file;
 }
 
-my $opts = {};
+my $opts = \%();
 GetOptions($opts,'u','p','c', 'D', 'm:s','s','d=s','v','h');
 
 die "Can't pack and unpack at the same time!\n", usage()

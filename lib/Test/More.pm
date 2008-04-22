@@ -751,7 +751,7 @@ along these lines.
 =cut
 
 use vars qw(@Data_Stack %Refs_Seen);
-my $DNE = bless [], 'Does::Not::Exist';
+my $DNE = bless \@(), 'Does::Not::Exist';
 
 sub _dne {
     ref @_[0] eq ref $DNE;
@@ -784,7 +784,7 @@ WARNING
     }
     elsif( !ref $got xor !ref $expected ) {  	# one's a reference, one isn't
         $ok = $tb->ok(0, $name);
-	$tb->diag( _format_stack({ vals => [ $got, $expected ] }) );
+	$tb->diag( _format_stack(\%( vals => \@( $got, $expected ) )) );
     }
     else {			       		# both references
         local @Data_Stack = ();
@@ -1162,7 +1162,7 @@ sub _eq_array  {
         my $e1 = $_ +> @$a1-1 ? $DNE : $a1->[$_];
         my $e2 = $_ +> @$a2-1 ? $DNE : $a2->[$_];
 
-        push @Data_Stack, { type => 'ARRAY', idx => $_, vals => [$e1, $e2] };
+        push @Data_Stack, \%( type => 'ARRAY', idx => $_, vals => \@($e1, $e2) );
         $ok = _deep_check($e1,$e2);
         pop @Data_Stack if $ok;
 
@@ -1206,7 +1206,7 @@ sub _deep_check {
             $ok = 1;
         }
 	elsif ( $not_ref ) {
-	    push @Data_Stack, { type => '', vals => [$e1, $e2] };
+	    push @Data_Stack, \%( type => '', vals => \@($e1, $e2) );
 	    $ok = 0;
 	}
         else {
@@ -1219,7 +1219,7 @@ sub _deep_check {
             $type = 'DIFFERENT' unless _type($e2) eq $type;
 
             if( $type eq 'DIFFERENT' ) {
-                push @Data_Stack, { type => $type, vals => [$e1, $e2] };
+                push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
                 $ok = 0;
             }
             elsif( $type eq 'ARRAY' ) {
@@ -1229,17 +1229,17 @@ sub _deep_check {
                 $ok = _eq_hash($e1, $e2);
             }
             elsif( $type eq 'REF' ) {
-                push @Data_Stack, { type => $type, vals => [$e1, $e2] };
+                push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
                 $ok = _deep_check($$e1, $$e2);
                 pop @Data_Stack if $ok;
             }
             elsif( $type eq 'SCALAR' ) {
-                push @Data_Stack, { type => 'REF', vals => [$e1, $e2] };
+                push @Data_Stack, \%( type => 'REF', vals => \@($e1, $e2) );
                 $ok = _deep_check($$e1, $$e2);
                 pop @Data_Stack if $ok;
             }
             elsif( $type ) {
-                push @Data_Stack, { type => $type, vals => [$e1, $e2] };
+                push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
                 $ok = 0;
             }
 	    else {
@@ -1293,7 +1293,7 @@ sub _eq_hash {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
 
-        push @Data_Stack, { type => 'HASH', idx => $k, vals => [$e1, $e2] };
+        push @Data_Stack, \%( type => 'HASH', idx => $k, vals => \@($e1, $e2) );
         $ok = _deep_check($e1, $e2);
         pop @Data_Stack if $ok;
 
@@ -1348,8 +1348,8 @@ sub eq_set  {
     # I don't know how references would be sorted so we just don't sort
     # them.  This means eq_set doesn't really work with refs.
     return eq_array(
-           [grep(ref, @$a1), sort( grep(!ref, @$a1) )],
-           [grep(ref, @$a2), sort( grep(!ref, @$a2) )],
+           \@(grep(ref, @$a1), sort( grep(!ref, @$a1) )),
+           \@(grep(ref, @$a2), sort( grep(!ref, @$a2) )),
     );
 }
 

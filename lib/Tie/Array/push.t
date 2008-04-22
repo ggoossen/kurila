@@ -11,7 +11,7 @@ BEGIN {
  use Tie::Array;
  @ISA = qw(Tie::Array);
 
- sub TIEARRAY  { return bless [], shift }
+ sub TIEARRAY  { return bless \@(), shift }
  sub FETCH     { @_[0]->[@_[1]] }
  sub STORE     { @_[0]->[@_[1]] = @_[2] }
  sub FETCHSIZE { scalar(@{@_[0]}) }

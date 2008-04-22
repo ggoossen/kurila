@@ -536,7 +536,7 @@ sub run
             my @got = shift @output;
             foreach (@output) { push @got, anyUncompress($_) }
 
-            is_deeply \@got, ['first', @expected], "  Got Expected uncompressed data";
+            is_deeply \@got, \@('first', @expected), "  Got Expected uncompressed data";
 
         }
 
@@ -552,7 +552,7 @@ sub run
                 ok &$Func(\@input, \$output, MultiStream => $ms, AutoClose => 0), '  Compressed ok' 
                     or diag $$Error;
 
-                my $got = anyUncompress([ \$output, MultiStream => $ms ]);
+                my $got = anyUncompress(\@( \$output, MultiStream => $ms ));
 
                 is $got, join('', @uexpected), "  Got Expected uncompressed data";
                 my @headers = getHeaders(\$output);
@@ -570,7 +570,7 @@ sub run
                 my $output  ;
                 ok &$Func(\@input, $file3, MultiStream => $ms, AutoClose => 0), '  Compressed ok' ;
 
-                my $got = anyUncompress([ $file3, MultiStream => $ms ]);
+                my $got = anyUncompress(\@( $file3, MultiStream => $ms ));
 
                 is $got, join('', @uexpected), "  Got Expected uncompressed data";
                 my @headers = getHeaders($file3);
@@ -592,7 +592,7 @@ sub run
 
                 $fh3->close();
 
-                my $got = anyUncompress([ $file3, MultiStream => $ms ]);
+                my $got = anyUncompress(\@( $file3, MultiStream => $ms ));
 
                 is $got, join('', @uexpected), "  Got Expected uncompressed data";
                 my @headers = getHeaders($file3);
@@ -847,7 +847,7 @@ sub run
         my $Func = getTopFuncRef($bit);
         my $TopType = getTopFuncName($bit);
 
-        for my $files ( [qw(a1)], [qw(a1 a2 a3)] )
+        for my $files ( \@(qw(a1)), \@(qw(a1 a2 a3)) )
         {
 
             my $tmpDir1 = 'tmpdir1';
@@ -911,7 +911,7 @@ sub run
 
                     #hexDump(\$buffer);
 
-                    my $got = anyUncompress([ \$buffer, MultiStream => $ms ]);
+                    my $got = anyUncompress(\@( \$buffer, MultiStream => $ms ));
 
                     is $got, join("", @expected), "  got expected" ;
                     my @headers = getHeaders(\$buffer);
@@ -930,7 +930,7 @@ sub run
 
                     #hexDump(\$buffer);
 
-                    my $got = anyUncompress([$filename, MultiStream => $ms]);
+                    my $got = anyUncompress(\@($filename, MultiStream => $ms));
 
                     is $got, join("", @expected), "  got expected" ;
                     my @headers = getHeaders($filename);
@@ -950,7 +950,7 @@ sub run
 
                     #hexDump(\$buffer);
 
-                    my $got = anyUncompress([$filename, MultiStream => $ms]);
+                    my $got = anyUncompress(\@($filename, MultiStream => $ms));
 
                     is $got, join("", @expected), "  got expected" ;
                     my @headers = getHeaders($filename);
@@ -1342,8 +1342,8 @@ sub run
             ok &$Func(\@input, \@output, AutoClose => 0, @opts), '  UnCompressed ok' ;
 
             is_deeply \@input, \@keep, "  Input array not changed" ;
-            is_deeply [map { defined $$_ ? $$_ : "" } @output], 
-                      ['first', @expected], 
+            is_deeply \@(map { defined $$_ ? $$_ : "" } @output), 
+                      \@('first', @expected), 
                       "  Got Expected uncompressed data";
 
         }
@@ -1494,15 +1494,15 @@ sub run
         title "Array Input Error tests" ;
 
         my @data = (
-                   [ '[]',    "empty array reference"],
-                   [ '[[]]',    "unknown input parameter"],
-                   [ '[[[]]]',   "unknown input parameter"],
-                   [ '[[\"ab"], [\"cd"]]', "unknown input parameter"],
-                   [ '[\""]',     "not a filename"],
-                   [ '[\undef]',  "not a filename"],
-                   [ '[\"abcd"]', "not a filename"],
-                   [ '[\&xx]',      "unknown input parameter"],
-                   [ '[$fh2]',      "not a filename"],
+                   \@( '\@()',    "empty array reference"),
+                   \@( '\@(\@())',    "unknown input parameter"),
+                   \@( '\@(\@(\@()))',   "unknown input parameter"),
+                   \@( '\@(\@(\"ab"), \@(\"cd"))', "unknown input parameter"),
+                   \@( '\@(\"")',     "not a filename"),
+                   \@( '\@(\undef)',  "not a filename"),
+                   \@( '\@(\"abcd")', "not a filename"),
+                   \@( '\@(\&xx)',      "unknown input parameter"),
+                   \@( '\@($fh2)',      "not a filename"),
                 ) ;
 
 
@@ -1527,8 +1527,8 @@ sub run
         }
 
         @data = (
-                   '[""]', 
-                   '[undef]', 
+                   '\@("")', 
+                   '\@(undef)', 
                 ) ;
 
 

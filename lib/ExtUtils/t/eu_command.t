@@ -67,7 +67,7 @@ BEGIN {
 
     @ARGV = ( $Testfile );
     is( test_f(), 0, 'testing touch() and test_f()' );
-    is_deeply( \@ARGV, [$Testfile], 'test_f preserves @ARGV' );
+    is_deeply( \@ARGV, \@($Testfile), 'test_f preserves @ARGV' );
 
     @ARGV = ( $Testfile );
     ok( -e @ARGV[0], 'created!' );
@@ -237,13 +237,13 @@ BEGIN {
         # this should find the file
         ExtUtils::Command::expand_wildcards();
 
-        is_deeply( \@ARGV, [$file], 'expanded wildcard ? successfully' );
+        is_deeply( \@ARGV, \@($file), 'expanded wildcard ? successfully' );
 
         # try it with the asterisk now
         (@ARGV[0] = $file) =~ s/.{3}\z/\*/;
         ExtUtils::Command::expand_wildcards();
 
-        is_deeply( \@ARGV, [$file], 'expanded wildcard * successfully' );
+        is_deeply( \@ARGV, \@($file), 'expanded wildcard * successfully' );
 
         chdir File::Spec->updir;
     }

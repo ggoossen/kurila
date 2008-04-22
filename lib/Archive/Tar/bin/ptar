@@ -5,7 +5,7 @@ use Getopt::Std;
 use Archive::Tar;
 use File::Find;
 
-my $opts = {};
+my $opts = \%();
 getopts('dcvzthxf:I', $opts) or die usage();
 
 ### show the help message ###

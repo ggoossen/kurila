@@ -37,7 +37,7 @@ my %old_rearrange = $Collator->change(rearrange => undef);
 is($Collator->cmp("\x{0E41}A", "\x{0E40}B"), 1);
 is($Collator->cmp("A\x{0E41}A", "A\x{0E40}B"), 1);
 
-$Collator->change(rearrange => [ 0x61 ]);
+$Collator->change(rearrange => \@( 0x61 ));
  # U+0061, 'a': This is a Unicode value, never a native value.
 
 is($Collator->cmp("ab", "AB"), 1); # as 'ba' > 'AB'
@@ -70,7 +70,7 @@ is($all_undef_8->cmp("A\x{0E41}A", "A\x{0E40}B"), -1);
 my $no_rearrange = Unicode::Collate->new(
   table => undef,
   normalization => undef,
-  rearrange => [],
+  rearrange => \@(),
   UCA_Version => 9,
 );
 

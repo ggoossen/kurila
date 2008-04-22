@@ -14,7 +14,7 @@ BEGIN {
 
     $VERSION    =   0.01;
 
-    $STACK      =   [];
+    $STACK      =   \@();
 }
 
 
@@ -305,13 +305,13 @@ sub _new_stack {
     my $class = shift;
     my %hash  = @_;
 
-    my $tmpl = {
-        stack   => { default        => [] },
-        config  => { default        => bless( {}, 'Log::Message::Config'),
+    my $tmpl = \%(
+        stack   => \%( default        => \@() ),
+        config  => \%( default        => bless( \%(), 'Log::Message::Config'),
                      required       => 1,
                      strict_type    => 1
-                },
-    };
+                ),
+    );
 
     my $args = check( $tmpl, \%hash, $CONFIG->verbose ) or (
         warn(loc(q[Could not create a new stack object: %1], 
@@ -380,16 +380,16 @@ sub store {
     my $self = shift;
     my %hash = ();
 
-    my $tmpl = {
-        message => {
+    my $tmpl = \%(
+        message => \%(
                 default     => '',
                 strict_type => 1,
                 required    => 1,
-            },
-        tag     => { default => $self->_get_conf('tag')     },
-        level   => { default => $self->_get_conf('level'),  },
-        extra   => { default => [], strict_type => 1 },
-    };
+            ),
+        tag     => \%( default => $self->_get_conf('tag')     ),
+        level   => \%( default => $self->_get_conf('level'),  ),
+        extra   => \%( default => \@(), strict_type => 1 ),
+    );
 
     ### single arg means just the message
     ### otherwise, they are named
@@ -470,14 +470,14 @@ sub retrieve {
     my $self = shift;
     my %hash = ();
 
-    my $tmpl = {
-        tag     => { default => qr/.*/ },
-        level   => { default => qr/.*/ },
-        message => { default => qr/.*/ },
-        amount  => { default => '' },
-        remove  => { default => $self->_get_conf('remove')  },
-        chrono  => { default => $self->_get_conf('chrono')  },
-    };
+    my $tmpl = \%(
+        tag     => \%( default => qr/.*/ ),
+        level   => \%( default => qr/.*/ ),
+        message => \%( default => qr/.*/ ),
+        amount  => \%( default => '' ),
+        remove  => \%( default => $self->_get_conf('remove')  ),
+        chrono  => \%( default => $self->_get_conf('chrono')  ),
+    );
 
     ### single arg means just the amount
     ### otherwise, they are named

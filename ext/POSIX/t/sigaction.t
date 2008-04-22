@@ -111,7 +111,7 @@ eval {
 ok(!$@, "zero for new action");
 
 eval {
-	sigaction(SIGHUP, bless({},'Class'), $oldaction);
+	sigaction(SIGHUP, bless(\%(),'Class'), $oldaction);
 };
 ok($@, "any object not good as new action");
 

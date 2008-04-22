@@ -14,12 +14,12 @@ sub mkCompObject
     my $level    = shift ;
     my $strategy = shift ;
 
-    return bless {
+    return bless \%(
                   'CompSize'   => 0,
                   'UnCompSize' => 0,
                   'Error'      => '',
                   'ErrorNo'    => 0,
-                 } ;     
+                 ) ;     
 }
 
 sub compr

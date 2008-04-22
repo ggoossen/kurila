@@ -46,7 +46,7 @@ while ( ~< $p4) {
   $prefix =~ s|/[^/]+$||; # up to the last "/" in the match is to be stripped
   if (my($file,$action) = m|^\.\.\. (//depot.*)\s(\w+)$|) {
     next if $action eq "delete";
-    push @action, [$action, $file, $prefix];
+    push @action, \@($action, $file, $prefix);
   }
 }
 close $p4;

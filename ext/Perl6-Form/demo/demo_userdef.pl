@@ -14,7 +14,7 @@ sub stars {
 }
 
 print form
-	{field=>[qr/(\*+)/=>\&stars], interleave=>1},
+	\%(field=>\@(qr/(\*+)/=>\&stars), interleave=>1),
     <<'.',
 =================[ Quote for item: {>>>>>>>>>>>>>>>>} ]=================
 

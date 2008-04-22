@@ -23,7 +23,7 @@ $|=1;
 my @prgs = ();
 while( ~< *DATA) { 
     if(m/^#{8,}\s*(.*)/) { 
-        push @prgs, ['', $1];
+        push @prgs, \@('', $1);
     }
     else { 
         @prgs[-1][0] .= $_;
@@ -52,7 +52,7 @@ foreach my $prog (@prgs) {
 
     $expected =~ s/\n+$//;
 
-    fresh_perl_is($prog, $expected, { switches => [$switch || ''] }, $name);
+    fresh_perl_is($prog, $expected, \%( switches => \@($switch || '') ), $name);
 }
 
 __END__
@@ -121,7 +121,7 @@ $_ x 4;}
 EXPECT
 Modification of a read-only value attempted at - line 3.
 ########
-package FOO;sub new {bless {FOO => 'BAR'}};
+package FOO;sub new {bless \%(FOO => 'BAR')};
 package main;
 use strict 'vars';   
 my $self = FOO->new();
@@ -166,7 +166,7 @@ sub ShowShell
        sub TIEARRAY
        { print "TIEARRAY @_\n"; 
          die "bomb out\n" unless $count ++ ;
-         bless ['foo'] 
+         bless \@('foo') 
        }
        sub FETCH { print "fetch @_\n"; @_[0]->[@_[1]] }
        sub STORE { print "store @_\n"; @_[0]->[@_[1]] = @_[2] }
@@ -207,7 +207,7 @@ BEGIN failed--compilation aborted
         print sprintf($fmt, @_)."\n";
     }
     sub TIEHANDLE {
-        bless {}, shift;
+        bless \%(), shift;
     }
     sub READLINE {
 	"Out of inspiration";
@@ -306,7 +306,7 @@ print p::func()->groovy(), "\n"
 EXPECT
 really groovy
 ########
-@list = ([ 'one', 1 ], [ 'two', 2 ]);
+@list = (\@( 'one', 1 ), \@( 'two', 2 ));
 sub func { $num = shift; (grep $_->[1] == $num, @list)[[0]] }
 print scalar(map &func($_), 1 .. 3), " ",
       scalar(map scalar &func($_), 1 .. 3), "\n";
@@ -387,7 +387,7 @@ EXPECT
 destroyed
 ########
 package X;
-sub anarray { bless [] }
+sub anarray { bless \@() }
 sub DESTROY { print "destroyed\n" };
 package main;
 *a = X->anarray();
@@ -395,7 +395,7 @@ EXPECT
 destroyed
 ########
 package X;
-sub ahash { bless {} }
+sub ahash { bless \%() }
 sub DESTROY { print "destroyed\n" };
 package main;
 *h = X->ahash();
@@ -412,7 +412,7 @@ destroyed
 ########
 no strict "refs";
 package X;
-sub any { bless {} }
+sub any { bless \%() }
 my $f = "FH000"; # just to thwart any future optimisations
 sub afh { select select *{Symbol::fetch_glob(++$f)};
           my $r = *{Symbol::fetch_glob($f)}{IO}; delete Symbol::stash('X')->{$f}; bless $r }
@@ -622,8 +622,8 @@ print $x;
 EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
-$eval = eval 'sub { eval "sub \{ \%S \}" }';
-$eval->({});
+$eval = eval 'sub { eval q|sub { %S }| }';
+$eval->(\%());
 ######## [perl #20667] unicode regex vs non-unicode regex
 $toto = 'Hello';
 $toto =~ m/\w/; # this line provokes the problem!

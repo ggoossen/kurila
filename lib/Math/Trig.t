@@ -312,7 +312,7 @@ print "# Infinity\n";
 my $BigDouble = 1e40;
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
-local %SIG{FPE} = { };
+local %SIG{FPE} = \%( );
 
 ok(Inf() +> $BigDouble);  # This passes in netbsd-alpha.
 ok(Inf() + $BigDouble +> $BigDouble); # This coredumps in netbsd-alpha.

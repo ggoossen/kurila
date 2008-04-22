@@ -10,7 +10,6 @@ use strict;
 use vars qw(@ISA $VERSION $debug);
 use IO::Socket;
 use Net::Cmd;
-use Carp;
 use Time::Local;
 use Net::Config;
 
@@ -34,7 +33,7 @@ sub new {
 
   $host ||= %ENV{NNTPSERVER} || %ENV{NEWSHOST};
 
-  my $hosts = defined $host ? [$host] : %NetConfig{nntp_hosts};
+  my $hosts = defined $host ? \@($host) : %NetConfig{nntp_hosts};
 
   @{$hosts} = qw(news)
     unless @{$hosts};
@@ -112,14 +111,14 @@ sub debug_text {
 
 
 sub postok {
-  @_ == 1 or croak 'usage: $nntp->postok()';
+  @_ == 1 or die 'usage: $nntp->postok()';
   my $nntp = shift;
   %{*$nntp}{'net_nntp_post'} || 0;
 }
 
 
 sub article {
-  @_ +>= 1 && @_ +<= 3 or croak 'usage: $nntp->article( [ MSGID ], [ FH ] )';
+  @_ +>= 1 && @_ +<= 3 or die 'usage: $nntp->article( [ MSGID ], [ FH ] )';
   my $nntp = shift;
   my @fh;
 
@@ -132,7 +131,7 @@ sub article {
 
 
 sub articlefh {
-  @_ +>= 1 && @_ +<= 2 or croak 'usage: $nntp->articlefh( [ MSGID ] )';
+  @_ +>= 1 && @_ +<= 2 or die 'usage: $nntp->articlefh( [ MSGID ] )';
   my $nntp = shift;
 
   return unless $nntp->_ARTICLE(@_);
@@ -141,7 +140,7 @@ sub articlefh {
 
 
 sub authinfo {
-  @_ == 3 or croak 'usage: $nntp->authinfo( USER, PASS )';
+  @_ == 3 or die 'usage: $nntp->authinfo( USER, PASS )';
   my ($nntp, $user, $pass) = @_;
 
   $nntp->_AUTHINFO("USER",      $user) == CMD_MORE
@@ -150,7 +149,7 @@ sub authinfo {
 
 
 sub authinfo_simple {
-  @_ == 3 or croak 'usage: $nntp->authinfo( USER, PASS )';
+  @_ == 3 or die 'usage: $nntp->authinfo( USER, PASS )';
   my ($nntp, $user, $pass) = @_;
 
   $nntp->_AUTHINFO('SIMPLE') == CMD_MORE
@@ -159,7 +158,7 @@ sub authinfo_simple {
 
 
 sub body {
-  @_ +>= 1 && @_ +<= 3 or croak 'usage: $nntp->body( [ MSGID ], [ FH ] )';
+  @_ +>= 1 && @_ +<= 3 or die 'usage: $nntp->body( [ MSGID ], [ FH ] )';
   my $nntp = shift;
   my @fh;
 
@@ -172,7 +171,7 @@ sub body {
 
 
 sub bodyfh {
-  @_ +>= 1 && @_ +<= 2 or croak 'usage: $nntp->bodyfh( [ MSGID ] )';
+  @_ +>= 1 && @_ +<= 2 or die 'usage: $nntp->bodyfh( [ MSGID ] )';
   my $nntp = shift;
   return unless $nntp->_BODY(@_);
   return $nntp->tied_fh;
@@ -180,7 +179,7 @@ sub bodyfh {
 
 
 sub head {
-  @_ +>= 1 && @_ +<= 3 or croak 'usage: $nntp->head( [ MSGID ], [ FH ] )';
+  @_ +>= 1 && @_ +<= 3 or die 'usage: $nntp->head( [ MSGID ], [ FH ] )';
   my $nntp = shift;
   my @fh;
 
@@ -193,7 +192,7 @@ sub head {
 
 
 sub headfh {
-  @_ +>= 1 && @_ +<= 2 or croak 'usage: $nntp->headfh( [ MSGID ] )';
+  @_ +>= 1 && @_ +<= 2 or die 'usage: $nntp->headfh( [ MSGID ] )';
   my $nntp = shift;
   return unless $nntp->_HEAD(@_);
   return $nntp->tied_fh;
@@ -201,7 +200,7 @@ sub headfh {
 
 
 sub nntpstat {
-  @_ == 1 || @_ == 2 or croak 'usage: $nntp->nntpstat( [ MSGID ] )';
+  @_ == 1 || @_ == 2 or die 'usage: $nntp->nntpstat( [ MSGID ] )';
   my $nntp = shift;
 
   $nntp->_STAT(@_) && $nntp->message =~ m/(<[^>]+>)/o
@@ -211,7 +210,7 @@ sub nntpstat {
 
 
 sub group {
-  @_ == 1 || @_ == 2 or croak 'usage: $nntp->group( [ GROUP ] )';
+  @_ == 1 || @_ == 2 or die 'usage: $nntp->group( [ GROUP ] )';
   my $nntp = shift;
   my $grp  = %{*$nntp}{'net_nntp_group'} || undef;
 
@@ -239,7 +238,7 @@ sub group {
 
 
 sub help {
-  @_ == 1 or croak 'usage: $nntp->help()';
+  @_ == 1 or die 'usage: $nntp->help()';
   my $nntp = shift;
 
   $nntp->_HELP
@@ -249,7 +248,7 @@ sub help {
 
 
 sub ihave {
-  @_ +>= 2 or croak 'usage: $nntp->ihave( MESSAGE-ID [, MESSAGE ])';
+  @_ +>= 2 or die 'usage: $nntp->ihave( MESSAGE-ID [, MESSAGE ])';
   my $nntp = shift;
   my $mid  = shift;
 
@@ -260,7 +259,7 @@ sub ihave {
 
 
 sub last {
-  @_ == 1 or croak 'usage: $nntp->last()';
+  @_ == 1 or die 'usage: $nntp->last()';
   my $nntp = shift;
 
   $nntp->_LAST && $nntp->message =~ m/(<[^>]+>)/o
@@ -270,7 +269,7 @@ sub last {
 
 
 sub list {
-  @_ == 1 or croak 'usage: $nntp->list()';
+  @_ == 1 or die 'usage: $nntp->list()';
   my $nntp = shift;
 
   $nntp->_LIST
@@ -280,7 +279,7 @@ sub list {
 
 
 sub newgroups {
-  @_ +>= 2 or croak 'usage: $nntp->newgroups( SINCE [, DISTRIBUTIONS ])';
+  @_ +>= 2 or die 'usage: $nntp->newgroups( SINCE [, DISTRIBUTIONS ])';
   my $nntp = shift;
   my $time = _timestr(shift);
   my $dist = shift || "";
@@ -296,7 +295,7 @@ sub newgroups {
 
 sub newnews {
   @_ +>= 2 && @_ +<= 4
-    or croak 'usage: $nntp->newnews( SINCE [, GROUPS [, DISTRIBUTIONS ]])';
+    or die 'usage: $nntp->newnews( SINCE [, GROUPS [, DISTRIBUTIONS ]])';
   my $nntp = shift;
   my $time = _timestr(shift);
   my $grp  = @_ ? shift: $nntp->group;
@@ -316,7 +315,7 @@ sub newnews {
 
 
 sub next {
-  @_ == 1 or croak 'usage: $nntp->next()';
+  @_ == 1 or die 'usage: $nntp->next()';
   my $nntp = shift;
 
   $nntp->_NEXT && $nntp->message =~ m/(<[^>]+>)/o
@@ -326,7 +325,7 @@ sub next {
 
 
 sub post {
-  @_ +>= 1 or croak 'usage: $nntp->post( [ MESSAGE ] )';
+  @_ +>= 1 or die 'usage: $nntp->post( [ MESSAGE ] )';
   my $nntp = shift;
 
   $nntp->_POST() && $nntp->datasend(@_)
@@ -343,7 +342,7 @@ sub postfh {
 
 
 sub quit {
-  @_ == 1 or croak 'usage: $nntp->quit()';
+  @_ == 1 or die 'usage: $nntp->quit()';
   my $nntp = shift;
 
   $nntp->_QUIT;
@@ -352,7 +351,7 @@ sub quit {
 
 
 sub slave {
-  @_ == 1 or croak 'usage: $nntp->slave()';
+  @_ == 1 or die 'usage: $nntp->slave()';
   my $nntp = shift;
 
   $nntp->_SLAVE;
@@ -364,7 +363,7 @@ sub slave {
 
 
 sub active {
-  @_ == 1 || @_ == 2 or croak 'usage: $nntp->active( [ PATTERN ] )';
+  @_ == 1 || @_ == 2 or die 'usage: $nntp->active( [ PATTERN ] )';
   my $nntp = shift;
 
   $nntp->_LIST('ACTIVE', @_)
@@ -374,7 +373,7 @@ sub active {
 
 
 sub active_times {
-  @_ == 1 or croak 'usage: $nntp->active_times()';
+  @_ == 1 or die 'usage: $nntp->active_times()';
   my $nntp = shift;
 
   $nntp->_LIST('ACTIVE.TIMES')
@@ -384,7 +383,7 @@ sub active_times {
 
 
 sub distributions {
-  @_ == 1 or croak 'usage: $nntp->distributions()';
+  @_ == 1 or die 'usage: $nntp->distributions()';
   my $nntp = shift;
 
   $nntp->_LIST('DISTRIBUTIONS')
@@ -394,7 +393,7 @@ sub distributions {
 
 
 sub distribution_patterns {
-  @_ == 1 or croak 'usage: $nntp->distributions()';
+  @_ == 1 or die 'usage: $nntp->distributions()';
   my $nntp = shift;
 
   my $arr;
@@ -402,13 +401,13 @@ sub distribution_patterns {
 
   $nntp->_LIST('DISTRIB.PATS')
     && ($arr = $nntp->read_until_dot)
-    ? [grep { m/^\d/ && (chomp, $_ = [split m/:/]) } @$arr]
+    ? \@(grep { m/^\d/ && (chomp, $_ = \@(split m/:/)) } @$arr)
     : undef;
 }
 
 
 sub newsgroups {
-  @_ == 1 || @_ == 2 or croak 'usage: $nntp->newsgroups( [ PATTERN ] )';
+  @_ == 1 || @_ == 2 or die 'usage: $nntp->newsgroups( [ PATTERN ] )';
   my $nntp = shift;
 
   $nntp->_LIST('NEWSGROUPS', @_)
@@ -418,7 +417,7 @@ sub newsgroups {
 
 
 sub overview_fmt {
-  @_ == 1 or croak 'usage: $nntp->overview_fmt()';
+  @_ == 1 or die 'usage: $nntp->overview_fmt()';
   my $nntp = shift;
 
   $nntp->_LIST('OVERVIEW.FMT')
@@ -428,7 +427,7 @@ sub overview_fmt {
 
 
 sub subscriptions {
-  @_ == 1 or croak 'usage: $nntp->subscriptions()';
+  @_ == 1 or die 'usage: $nntp->subscriptions()';
   my $nntp = shift;
 
   $nntp->_LIST('SUBSCRIPTIONS')
@@ -438,7 +437,7 @@ sub subscriptions {
 
 
 sub listgroup {
-  @_ == 1 || @_ == 2 or croak 'usage: $nntp->listgroup( [ GROUP ] )';
+  @_ == 1 || @_ == 2 or die 'usage: $nntp->listgroup( [ GROUP ] )';
   my $nntp = shift;
 
   $nntp->_LISTGROUP(@_)
@@ -448,7 +447,7 @@ sub listgroup {
 
 
 sub reader {
-  @_ == 1 or croak 'usage: $nntp->reader()';
+  @_ == 1 or die 'usage: $nntp->reader()';
   my $nntp = shift;
 
   $nntp->_MODE('READER');
@@ -456,7 +455,7 @@ sub reader {
 
 
 sub xgtitle {
-  @_ == 1 || @_ == 2 or croak 'usage: $nntp->xgtitle( [ PATTERN ] )';
+  @_ == 1 || @_ == 2 or die 'usage: $nntp->xgtitle( [ PATTERN ] )';
   my $nntp = shift;
 
   $nntp->_XGTITLE(@_)
@@ -466,7 +465,7 @@ sub xgtitle {
 
 
 sub xhdr {
-  @_ +>= 2 && @_ +<= 4 or croak 'usage: $nntp->xhdr( HEADER, [ MESSAGE-SPEC ] )';
+  @_ +>= 2 && @_ +<= 4 or die 'usage: $nntp->xhdr( HEADER, [ MESSAGE-SPEC ] )';
   my $nntp = shift;
   my $hdr  = shift;
   my $arg  = _msg_arg(@_);
@@ -478,7 +477,7 @@ sub xhdr {
 
 
 sub xover {
-  @_ == 2 || @_ == 3 or croak 'usage: $nntp->xover( MESSAGE-SPEC )';
+  @_ == 2 || @_ == 3 or die 'usage: $nntp->xover( MESSAGE-SPEC )';
   my $nntp = shift;
   my $arg  = _msg_arg(@_);
 
@@ -489,7 +488,7 @@ sub xover {
 
 
 sub xpat {
-  @_ == 4 || @_ == 5 or croak '$nntp->xpat( HEADER, PATTERN, MESSAGE-SPEC )';
+  @_ == 4 || @_ == 5 or die '$nntp->xpat( HEADER, PATTERN, MESSAGE-SPEC )';
   my $nntp = shift;
   my $hdr  = shift;
   my $pat  = shift;
@@ -505,7 +504,7 @@ sub xpat {
 
 
 sub xpath {
-  @_ == 2 or croak 'usage: $nntp->xpath( MESSAGE-ID )';
+  @_ == 2 or die 'usage: $nntp->xpath( MESSAGE-ID )';
   my ($nntp, $mid) = @_;
 
   return undef
@@ -520,7 +519,7 @@ sub xpath {
 
 
 sub xrover {
-  @_ == 2 || @_ == 3 or croak 'usage: $nntp->xrover( MESSAGE-SPEC )';
+  @_ == 2 || @_ == 3 or die 'usage: $nntp->xrover( MESSAGE-SPEC )';
   my $nntp = shift;
   my $arg  = _msg_arg(@_);
 
@@ -531,7 +530,7 @@ sub xrover {
 
 
 sub date {
-  @_ == 1 or croak 'usage: $nntp->date()';
+  @_ == 1 or die 'usage: $nntp->date()';
   my $nntp = shift;
 
   $nntp->_DATE
@@ -551,9 +550,9 @@ sub _msg_arg {
   my $arg  = "";
 
   if (@_) {
-    carp "Depriciated passing of two message numbers, " . "pass a reference"
+    warn "Depriciated passing of two message numbers, " . "pass a reference"
       if $^W;
-    $spec = [$spec, @_[0]];
+    $spec = \@($spec, @_[0]);
   }
 
   if (defined $spec) {
@@ -589,12 +588,12 @@ sub _grouplist {
   my $arr  = $nntp->read_until_dot
     or return undef;
 
-  my $hash = {};
+  my $hash = \%();
   my $ln;
 
   foreach $ln (@$arr) {
     my @a = split(m/[\s\n]+/, $ln);
-    $hash->{@a[0]} = [@a[[1, 2, 3]]];
+    $hash->{@a[0]} = \@(@a[[1, 2, 3]]);
   }
 
   $hash;
@@ -606,13 +605,13 @@ sub _fieldlist {
   my $arr  = $nntp->read_until_dot
     or return undef;
 
-  my $hash = {};
+  my $hash = \%();
   my $ln;
 
   foreach $ln (@$arr) {
     my @a = split(m/[\t\n]/, $ln);
     my $m = shift @a;
-    $hash->{$m} = [@a];
+    $hash->{$m} = \@(@a);
   }
 
   $hash;
@@ -635,7 +634,7 @@ sub _description {
   my $arr  = $nntp->read_until_dot
     or return undef;
 
-  my $hash = {};
+  my $hash = \%();
   my $ln;
 
   foreach $ln (@$arr) {

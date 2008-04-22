@@ -46,9 +46,9 @@ EONT_EONT
 
 checkOptree ( name => 'sort @a',
 	      prog => 'sort @a',
-	      errs => [ 'Useless use of sort in void context at -e line 1.',
+	      errs => \@( 'Useless use of sort in void context at -e line 1.',
 			'Name "main::a" used only once: possible typo at -e line 1.',
-			],
+			),
 	      bcopts => '-exec',
 	      strip_open_hints => 1,
 	      expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -157,7 +157,7 @@ EONT_EONT
 
 checkOptree ( name	=> '@a = sort @a; reverse @a',
 	      prog	=> '@a = sort @a; reverse @a',
-	      errs      => ['Useless use of reverse in void context at -e line 1.'],
+	      errs      => \@('Useless use of reverse in void context at -e line 1.'),
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');

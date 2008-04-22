@@ -1,16 +1,16 @@
 use Perl6::Form qw(form drill);
 
 @data = (
-	{item => 'food', cost => 100.23 },
-	{item => 'wine, MOTASes, and song', cost => 32158 },
-	{item => 'cars', cost => 0.2 },
+	\%(item => 'food', cost => 100.23 ),
+	\%(item => 'wine, MOTASes, and song', cost => 32158 ),
+	\%(item => 'cars', cost => 0.2 ),
 );
 
-my ($item, $cost) = drill(@data, [], [qw{item cost}]);
+my ($item, $cost) = drill(@data, \@(), \@(qw{item cost}));
 
 print form
 	 "Item                         Cost",
-	 {under=>"_"},
+	 \%(under=>"_"),
 	 '{]]]]]]]]]]]]]]]]]]]]]]]}    {$] ]]].[}',
-	 $item,						   {rfill=>0},
+	 $item,						   \%(rfill=>0),
 								   $cost;

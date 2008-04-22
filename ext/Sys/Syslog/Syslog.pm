@@ -13,9 +13,9 @@ require Exporter;
     @ISA = qw(Exporter);
 
     %EXPORT_TAGS = (
-        standard => [qw(openlog syslog closelog setlogmask)],
-        extended => [qw(setlogsock)],
-        macros => [
+        standard => \@(qw(openlog syslog closelog setlogmask)),
+        extended => \@(qw(setlogsock)),
+        macros => \@(
             # levels
             qw(
                 LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
@@ -46,7 +46,7 @@ require Exporter;
                 LOG_FACMASK LOG_NFACILITIES LOG_PRIMASK 
                 LOG_MASK LOG_UPTO
             ), 
-        ],
+        ),
     );
 
     @EXPORT = (

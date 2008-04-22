@@ -12,15 +12,14 @@ if (%Config{sig_name} =~ m/\bRTMIN\b/ && %Config{sig_name} =~ m/\bRTMAX\b/) {
 
 my @libs;
 if ($^O ne 'MSWin32') {
-    @libs = ('LIBS' => ["-lm -lposix -lcposix"]);
+    @libs = ('LIBS' => \@("-lm -lposix -lcposix"));
 }
 WriteMakefile(
     NAME	=> 'POSIX',
     @libs,
-    MAN3PODS	=> {},	# Pods will be built by installman.
     XSPROTOARG	=> '-noprototypes',	# XXX remove later?
     VERSION_FROM => 'POSIX.pm',
-    realclean	=> {FILES=> 'const-c.inc const-xs.inc'},
+    realclean	=> \%(FILES=> 'const-c.inc const-xs.inc'),
 );
 
 my @names =
@@ -60,21 +59,21 @@ my @names =
       _SC_ARG_MAX _SC_CHILD_MAX _SC_CLK_TCK _SC_JOB_CONTROL _SC_NGROUPS_MAX
       _SC_OPEN_MAX _SC_PAGESIZE _SC_SAVED_IDS _SC_STREAM_MAX _SC_TZNAME_MAX
       _SC_VERSION),
-   {name=>"CLK_TCK", not_constant=>1},
-   {name=>"MB_CUR_MAX", not_constant=>1},
-   {name=>"EXIT_FAILURE", default=>["IV", "1"]},
-   {name=>"EXIT_SUCCESS", default=>["IV", "0"]},
-   {name=>"SIG_DFL", value=>"PTR2IV(SIG_DFL)", not_constant=>1},
-   {name=>"SIG_ERR", value=>"PTR2IV(SIG_ERR)", not_constant=>1},
-   {name=>"SIG_IGN", value=>"PTR2IV(SIG_IGN)", not_constant=>1},
+   \%(name=>"CLK_TCK", not_constant=>1),
+   \%(name=>"MB_CUR_MAX", not_constant=>1),
+   \%(name=>"EXIT_FAILURE", default=>\@("IV", "1")),
+   \%(name=>"EXIT_SUCCESS", default=>\@("IV", "0")),
+   \%(name=>"SIG_DFL", value=>"PTR2IV(SIG_DFL)", not_constant=>1),
+   \%(name=>"SIG_ERR", value=>"PTR2IV(SIG_ERR)", not_constant=>1),
+   \%(name=>"SIG_IGN", value=>"PTR2IV(SIG_IGN)", not_constant=>1),
    # L_tmpnam[e] was a typo--retained for compatibility
-   {name=>"L_tmpname", value=>"L_tmpnam"},
-   {name=>"NULL", value=>"0"},
-   {name=>"_POSIX_JOB_CONTROL", type=>"YES", default=>["IV", "0"]},
-   {name=>"_POSIX_SAVED_IDS", type=>"YES", default=>["IV", "0"]},
-   {name=>'FLT_ROUNDS', type=>"NV", not_constant=>1},
-   {name=>"HUGE_VAL", type=>"NV", not_constant=>1,
-    macro=>[<<'END', "#endif\n"],
+   \%(name=>"L_tmpname", value=>"L_tmpnam"),
+   \%(name=>"NULL", value=>"0"),
+   \%(name=>"_POSIX_JOB_CONTROL", type=>"YES", default=>\@("IV", "0")),
+   \%(name=>"_POSIX_SAVED_IDS", type=>"YES", default=>\@("IV", "0")),
+   \%(name=>'FLT_ROUNDS', type=>"NV", not_constant=>1),
+   \%(name=>"HUGE_VAL", type=>"NV", not_constant=>1,
+    macro=>\@(<<'END', "#endif\n"),
 #if (defined(USE_LONG_DOUBLE) && defined(HUGE_VALL)) || defined(HUGE_VAL)
 	/* HUGE_VALL is admittedly non-POSIX but if we are using long doubles
 	 * we might as well use long doubles. --jhi */
@@ -85,22 +84,22 @@ END
 #else
                    HUGE_VAL
 #endif
-                           '});
+                           '));
 
-push @names, {name=>$_, type=>"UV"}
+push @names, \%(name=>$_, type=>"UV")
   foreach (qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK SA_RESETHAND
              SA_RESTART SA_SIGINFO UCHAR_MAX UINT_MAX ULONG_MAX USHRT_MAX));
-push @names, {name=>$_, type=>"NV", not_constant=>1}
+push @names, \%(name=>$_, type=>"NV", not_constant=>1)
   foreach (qw(DBL_MAX FLT_MAX LDBL_MAX LDBL_MIN LDBL_EPSILON
 	       DBL_EPSILON DBL_MIN FLT_EPSILON FLT_MIN));
 
-push @names, {name=>$_, type=>"NV"}
+push @names, \%(name=>$_, type=>"NV")
   foreach (qw(DBL_DIG DBL_MANT_DIG DBL_MAX_10_EXP DBL_MAX_EXP DBL_MIN_10_EXP
 	      DBL_MIN_EXP FLT_DIG FLT_MANT_DIG FLT_MAX_10_EXP FLT_MAX_EXP
 	      FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX LDBL_DIG LDBL_MANT_DIG
 	      LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN_10_EXP LDBL_MIN_EXP));
 
-push @names, {name=>$_, type=>"IV", default=>["IV", "0"]}
+push @names, \%(name=>$_, type=>"IV", default=> \@("IV", "0"))
   foreach (qw(_POSIX_ARG_MAX _POSIX_CHILD_MAX _POSIX_CHOWN_RESTRICTED
               _POSIX_LINK_MAX _POSIX_MAX_CANON _POSIX_MAX_INPUT _POSIX_NAME_MAX
               _POSIX_NGROUPS_MAX _POSIX_NO_TRUNC _POSIX_OPEN_MAX
@@ -109,13 +108,13 @@ push @names, {name=>$_, type=>"IV", default=>["IV", "0"]}
              ));
 
 if ($rt_signals) {
-    push @names, {name=>"SIGRTMAX", not_constant=>1},
-    {name=>"SIGRTMIN", not_constant=>1},
+    push @names, \%(name=>"SIGRTMAX", not_constant=>1),
+    \%(name=>"SIGRTMIN", not_constant=>1),
 } else {
     # Well, it seems that your vendor has defined them, but not in a way that
     # would actually compile.
-    push @names, {name=>"SIGRTMAX", macro=>0},
-    {name=>"SIGRTMIN", macro=>0},
+    push @names, \%(name=>"SIGRTMAX", macro=>0),
+    \%(name=>"SIGRTMIN", macro=>0),
 }
 
 WriteConstants(

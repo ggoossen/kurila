@@ -41,9 +41,9 @@ Attempt to pack pointer to temporary value at - line 4.
 ########
 # pp.c
 use warnings 'misc' ;
-bless \[], "" ;
+bless \\@(), "" ;
 no warnings 'misc' ;
-bless \[], "" ;
+bless \\@(), "" ;
 EXPECT
 Explicit blessing to '' (assuming package main) at - line 3.
 ########

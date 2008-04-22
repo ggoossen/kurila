@@ -30,7 +30,7 @@ e1
 		);
 my $expect = ":" . join(":", @expect);
 
-fresh_perl_is(<<'SCRIPT', $expect,{switches => [''], stdin => '', stderr => 1 },'Order of execution of special blocks');
+fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'Order of execution of special blocks');
 BEGIN {print ":b1"}
 END {print ":e1"}
 BEGIN {print ":b2"}
@@ -66,7 +66,7 @@ qw( main bar myfoo foo ),
 qw(foo myfoo bar main  ));
 
 $expect = ":" . join(":", @expect);
-fresh_perl_is(<<'SCRIPT2', $expect,{switches => [''], stdin => '', stderr => 1 },'blocks interact with packages/scopes');
+fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes');
 no strict 'vars';
 BEGIN {$f = 'main'; print ":$f"}
 UNITCHECK {print ":$f"}
@@ -97,7 +97,7 @@ SCRIPT2
 
 @expect = qw(begin unitcheck check init end);
 $expect = ":" . join(":", @expect);
-fresh_perl_is(<<'SCRIPT3', $expect,{switches => [''], stdin => '', stderr => 1 },'can name blocks as sub FOO');
+fresh_perl_is(<<'SCRIPT3', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'can name blocks as sub FOO');
 sub BEGIN {print ":begin"}
 sub UNITCHECK {print ":unitcheck"}
 sub CHECK {print ":check"}

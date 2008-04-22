@@ -50,7 +50,7 @@ my $stdout = tie *STDOUT, 'TieOut' or die;
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => {},
+    PREREQ_PM     => \%(),
     PERL_CORE     => %ENV{PERL_CORE},
 );
 
@@ -78,7 +78,7 @@ my $PREFIX = File::Spec->catdir('foo', 'bar');
 $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => {},
+    PREREQ_PM     => \%(),
     PERL_CORE     => %ENV{PERL_CORE},
     PREFIX        => $PREFIX,
 );
@@ -115,9 +115,9 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 # Every INSTALL* variable must start with some PREFIX.
 my %Install_Vars = (
- PERL   => [qw(archlib    privlib   bin       man1dir       man3dir   script)],
- SITE   => [qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)],
- VENDOR => [qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)]
+ PERL   => \@(qw(archlib    privlib   bin       man1dir       man3dir   script)),
+ SITE   => \@(qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)),
+ VENDOR => \@(qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir))
 );
 
 while( my($type, $vars) = each %Install_Vars) {
@@ -157,7 +157,7 @@ while( my($type, $vars) = each %Install_Vars) {
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
-                           PREREQ_PM     => {},
+                           PREREQ_PM     => \%(),
                            PERL_CORE     => %ENV{PERL_CORE},
                            PREFIX        => $PREFIX,
                            INSTALLMAN1DIR=> $wibble,
@@ -179,7 +179,7 @@ while( my($type, $vars) = each %Install_Vars) {
     my $mm = WriteMakefile(
                    NAME          => 'Big::Dummy',
                    VERSION_FROM  => 'lib/Big/Dummy.pm',
-                   PREREQ_PM     => {},
+                   PREREQ_PM     => \%(),
                    PERL_CORE     => %ENV{PERL_CORE},
 
                    # In case the local installation doesn't have man pages.

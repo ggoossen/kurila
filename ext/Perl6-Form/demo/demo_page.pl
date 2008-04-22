@@ -1,24 +1,24 @@
 use Perl6::Form;
 
-print form { ws=>qr/\s/, page=>{header=>"Report",
-								footer=>{other=>sub{"../".(@_[0]{page}{number}+1)},
+print form \%( ws=>qr/\s/, page=>\%(header=>"Report",
+								footer=>\%(other=>sub{"../".(@_[0]{page}{number}+1)},
 										 last=>"THE\nEND"
-										},
-								feed=>{other=>sub{".\n.\n.\n"}, last=>""},
+										),
+								feed=>\%(other=>sub{".\n.\n.\n"}, last=>""),
 								body=>'{=I{*}I=}',
 								length=>5,
-							   }
-		   },
+							   )
+		   ),
            "= [\{[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]\}]",
-		   [ ~< *DATA],
+		   \@( ~< *DATA),
            "= [\{[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]\}]",
-		   [1..100],
-		   {page=>{length => 12, number=>100}},
+		   \@(1..100),
+		   \%(page=>\%(length => 12, number=>100)),
            "= [\{[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]\}]",
-		   [101..200],
-		   {page=>{}},
+		   \@(101..200),
+		   \%(page=>\%()),
            "= [\{[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]\}]",
-		   [201..280],
+		   \@(201..280),
 
 
 __DATA__

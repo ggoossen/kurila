@@ -25,8 +25,8 @@ no warnings qw(once);
 
 require_ok 'Data::Dumper';
 
-my $HASH = { alpha => 'beta', gamma => 'vlissides' };
-my $WANT = q({"alpha" => "beta","gamma" => "vlissides"});
+my $HASH = \%( alpha => 'beta', gamma => 'vlissides' );
+my $WANT = q(\%("alpha" => "beta","gamma" => "vlissides"));
 
 $Data::Dumper::Useperl = 1;
 $Data::Dumper::Indent = 0;
@@ -45,7 +45,7 @@ SKIP: {
 	'XS: Default hash key/value separator: " => "');
     local $Data::Dumper::Pair = ' : ';
     is (Data::Dumper::DumperX($HASH), $want_colon, 'XS: $Data::Dumper::Pair = " : "');
-    my $dd = Data::Dumper->new([ $HASH ])->Pair(',');
+    my $dd = Data::Dumper->new(\@( $HASH ))->Pair(',');
     is ($dd->Dumpxs(), $want_comma, 
 	'XS: Data::Dumper->new([ $HASH ])->Pair(",")->Dumpxs()');
 };
@@ -58,7 +58,7 @@ SKIP: {
 	'Perl: Default hash key/value separator: " => "');
     local $Data::Dumper::Pair = ' : ';
     is (Data::Dumper::Dumper($HASH), $want_colon, 'Perl: $Data::Dumper::Pair = " : "');
-    my $dd = Data::Dumper->new([ $HASH ])->Pair(',');
+    my $dd = Data::Dumper->new(\@( $HASH ))->Pair(',');
     is ($dd->Pair(), ',', 
 	'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Pair() eq ","');
     is ($dd->Dump(), $want_comma, 'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Dump()');

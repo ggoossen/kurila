@@ -8,7 +8,7 @@ plan( tests => 12 );
 fresh_perl_is(
     '%:: = ""',
     'recursive die',
-    { switches => [ '-w' ] },
+    \%( switches => \@( '-w' ) ),
     'delete error::message and print a warning',
 );
 
@@ -16,7 +16,7 @@ fresh_perl_is(
 fresh_perl_is(
     'BEGIN { %::{"X::"} = 2 }',
     '',
-    { switches => [ '-w' ] },
+    \%( switches => \@( '-w' ) ),
     q(Insert a non-GV in a stash, under warnings 'once'),
 );
 

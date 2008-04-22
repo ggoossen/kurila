@@ -15,7 +15,7 @@ my $output = shift @ARGV ;
 my $gz = IO::Compress::Gzip->new( $output, Merge => 1)
      or die "Cannot open $output: $GzipError\n" ;
 
-$gz->write( [@ARGV] )
+$gz->write( \@(@ARGV) )
      or die "Cannot open $output: $GzipError\n" ;
 
 $gz->close;

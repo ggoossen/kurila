@@ -50,7 +50,7 @@ $_ = join(':', split(m/:/,'1:2:3:4:5:6:::', 999));
 is($_ , '1:2:3:4:5:6:::');
 
 # Does assignment to a list imply split to one more field than that?
-$foo = runperl( switches => ['-Dt'], stderr => 1, prog => '($a,$b)=split;' );
+$foo = runperl( switches => \@('-Dt'), stderr => 1, prog => '($a,$b)=split;' );
 ok($foo =~ m/DEBUGGING/ || $foo =~ m/const\n?\Q(IV(3))\E/);
 
 # Can we say how many fields to split to when assigning to a list?

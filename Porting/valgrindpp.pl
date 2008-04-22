@@ -73,7 +73,7 @@ if (exists %opt{'output-file'}) {
 my(%error, %leak);
 
 # Collect summary data
-find({wanted => \&filter, no_chdir => 1}, %opt{dir});
+find(\%(wanted => \&filter, no_chdir => 1), %opt{dir});
 
 # Format the output nicely
 $Text::Wrap::columns = 80;

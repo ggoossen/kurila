@@ -23,7 +23,7 @@ use threads;
 
 # test that we don't get:
 # Attempt to free unreferenced scalar: SV 0x40173f3c
-fresh_perl_is(<<'EOI', 'ok', { }, 'delete() under threads');
+fresh_perl_is(<<'EOI', 'ok', \%( ), 'delete() under threads');
 use threads;
 threads->create(sub { my %h=(1,2); delete %h{1}})->join for 1..2;
 print "ok";
@@ -32,7 +32,7 @@ EOI
 #PR24660
 # test that we don't get:
 # Attempt to free unreferenced scalar: SV 0x814e0dc.
-fresh_perl_is(<<'EOI', 'ok', { }, 'weaken ref under threads');
+fresh_perl_is(<<'EOI', 'ok', \%( ), 'weaken ref under threads');
 use threads;
 use Scalar::Util;
 my $data = "a";
@@ -47,9 +47,9 @@ EOI
 # test that we don't get:
 # panic: magic_killbackrefs.
 # Scalars leaked: 3
-fresh_perl_is(<<'EOI', 'ok', { }, 'weaken ref #2 under threads');
+fresh_perl_is(<<'EOI', 'ok', \%( ), 'weaken ref #2 under threads');
 package Foo;
-sub new { bless {},shift }
+sub new { bless \%(),shift }
 package main;
 use threads;
 use Scalar::Util qw(weaken);
@@ -98,7 +98,7 @@ ok(1);
 
 # Change 24643 made the mistake of assuming that CvCONST can only be true on
 # XSUBs. Somehow it can also end up on perl subs.
-fresh_perl_is(<<'EOI', 'ok', { }, 'cloning constant subs');
+fresh_perl_is(<<'EOI', 'ok', \%( ), 'cloning constant subs');
 use constant x=>1;
 use threads;
 $^WARN_HOOK = sub{};
@@ -108,7 +108,7 @@ EOI
 
 # From a test case by Tim Bunce in
 # http://www.nntp.perl.org/group/perl.perl5.porters/63123
-fresh_perl_is(<<'EOI', 'ok', { }, 'Ensure PL_linestr can be cloned');
+fresh_perl_is(<<'EOI', 'ok', \%( ), 'Ensure PL_linestr can be cloned');
 use threads;
 print do 'op/threads_create.pl' || die $@;
 EOI
@@ -120,7 +120,7 @@ TODO: {
 
 # Scalars leaked: 1
 foreach my $BLOCK (qw(CHECK INIT)) {
-    fresh_perl_is(<<EOI, 'ok', { }, "threads in $BLOCK block");
+    fresh_perl_is(<<EOI, 'ok', \%( ), "threads in $BLOCK block");
         use threads;
         $BLOCK \{ threads->create(sub \{\})->join; \}
         print 'ok';
@@ -128,7 +128,7 @@ EOI
     }
 
 # Scalars leaked: 1
-fresh_perl_is(<<'EOI', 'ok', { }, 'Bug #41138');
+fresh_perl_is(<<'EOI', 'ok', \%( ), 'Bug #41138');
     use threads;
     leak($x);
     sub leak

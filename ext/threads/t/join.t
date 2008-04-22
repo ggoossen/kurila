@@ -73,11 +73,11 @@ sub skip {
     ok(@retval[0] == 1 && @retval[1] == 2 && @retval[2] == 3,'');
 }
 {
-    my $retval = threads->create(sub { return [1] })->join();
+    my $retval = threads->create(sub { return \@(1) })->join();
     ok($retval->[0] == 1,"Check that a array ref works",);
 }
 {
-    my $retval = threads->create(sub { return { foo => "bar" }})->join();
+    my $retval = threads->create(sub { return \%( foo => "bar" )})->join();
     ok($retval->{foo} eq 'bar',"Check that hash refs work");
 }
 {

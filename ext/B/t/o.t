@@ -65,7 +65,7 @@ like( @lines[1], qr/fail at .eval/,
 	'O.pm should die if backend compile() does not return a subref' );
 
 sub get_lines {
-	split(m/[\r\n]+/, runperl( args => [ @_ ], stderr => 1 ));
+	split(m/[\r\n]+/, runperl( args => \@( @_ ), stderr => 1 ));
 }
 
 END {

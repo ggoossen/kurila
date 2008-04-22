@@ -49,7 +49,7 @@ sub anyinflate
 sub getExtraParams
 {
     use IO::Compress::Base::Common  v2.006 qw(:Parse);
-    return ( 'RawInflate' => [1, 1, Parse_boolean,  0] ) ;
+    return ( 'RawInflate' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
 sub ckParams

@@ -64,7 +64,7 @@ sub getExtraParams
     
     return (
 #            # Zip header fields
-            'Name'      => [1, 1, Parse_any,       undef],
+            'Name'      => \@(1, 1, Parse_any,       undef),
 
 #            'Streaming' => [1, 1, Parse_boolean,   1],
         );    
@@ -616,7 +616,7 @@ sub _readZipHeader($)
         return $self->HeaderError("Unsupported Compression format $compressedMethod");
     }
 
-    return {
+    return \%(
         'Type'               => 'zip',
         'FingerprintLength'  => 4,
         #'HeaderLength'       => $compressedMethod == 8 ? length $keep : 0,
@@ -653,10 +653,10 @@ sub _readZipHeader($)
 #        'Flags'         => $flag,
 #        'ExtraFlags'    => $xfl,
         'ExtraFieldRaw' => $extraField,
-        'ExtraField'    => [ @EXTRA ],
+        'ExtraField'    => \@( @EXTRA ),
 
 
-      }
+      )
 }
 
 sub filterUncompressed

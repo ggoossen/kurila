@@ -30,7 +30,7 @@ __PACKAGE__->_accessorize(  # Make my dumb accessor methods
 
 sub new {
   my $class = shift;
-  my $self = bless {}, ref($class) || $class;
+  my $self = bless \%(), ref($class) || $class;
   $self->init;
   return $self;
 }
@@ -52,9 +52,9 @@ sub survey {
 
 
   $self->{'_scan_count'} = 0;
-  $self->{'_dirs_visited'} = {};
-  $self->path2name( {} );
-  $self->name2path( {} );
+  $self->{'_dirs_visited'} = \%();
+  $self->path2name( \%() );
+  $self->name2path( \%() );
   $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{'limit_glob'};
   my $cwd = cwd();
   my $verbose  = $self->verbose;
@@ -75,7 +75,7 @@ sub survey {
         $try,
         grep length($_), split '[\/:]+', $self->{'dir_prefix'}
       );
-      $modname_prefix = [grep length($_), split m{[:/\\]}, $self->{'dir_prefix'}];
+      $modname_prefix = \@(grep length($_), split m{[:/\\]}, $self->{'dir_prefix'});
       $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",
         "giving $start_in (= @$modname_prefix)\n";
     } else {
@@ -106,7 +106,7 @@ sub survey {
       # A excursion consisting of just one file!
       $_ = basename($start_in);
       $verbose and print "Pondering $start_in ($_)\n";
-      $closure->($start_in, $_, 0, []);
+      $closure->($start_in, $_, 0, \@());
         
     } else {
       $verbose and print "Skipping mysterious $start_in\n";
@@ -292,7 +292,7 @@ sub _recurse_dir {
 
   my $here_string = File::Spec->curdir;
   my $up_string   = File::Spec->updir;
-  $modname_bits ||= [];
+  $modname_bits ||= \@();
 
   my $recursor;
   $recursor = sub {

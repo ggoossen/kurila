@@ -20,7 +20,7 @@ my $TB = Test::More->builder;
 
 BEGIN { use_ok('ExtUtils::MM') }
 
-my $mm = bless { NAME => "Foo" }, 'MM';
+my $mm = bless \%( NAME => "Foo" ), 'MM';
 isa_ok($mm, 'ExtUtils::MakeMaker');
 isa_ok($mm, 'ExtUtils::MM_Any');
 
@@ -38,13 +38,13 @@ sub try_oneliner {
 }
 
 # Lets see how it deals with quotes.
-try_oneliner(q{print "foo'o", ' bar"ar'}, [],  q{foo'o bar"ar},  'quotes');
+try_oneliner(q{print "foo'o", ' bar"ar'}, \@(),  q{foo'o bar"ar},  'quotes');
 
 # How about dollar signs?
-try_oneliner(q{$PATH = 'foo'; print $PATH},[], q{foo},   'dollar signs' );
+try_oneliner(q{$PATH = 'foo'; print $PATH},\@(), q{foo},   'dollar signs' );
 
 # switches?
-try_oneliner(q{print 'foo'}, ['-l'],           "foo\n",       'switches' );
+try_oneliner(q{print 'foo'}, \@('-l'),           "foo\n",       'switches' );
 
 # XXX gotta rethink the newline test.  The Makefile does newline
 # escaping, then the shell.

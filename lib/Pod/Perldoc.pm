@@ -199,7 +199,7 @@ sub run {  # to be called by the "perldoc" executable
 
 sub new {  # yeah, nothing fancy
   my $class = shift;
-  my $new = bless {@_}, (ref($class) || $class);
+  my $new = bless \%(@_), (ref($class) || $class);
   DEBUG +> 1 and print "New $class object $new\n";
   $new->init();
   $new;
@@ -325,31 +325,31 @@ sub init {
   eval { umask(0077) };   # doubtless someone has no mask
 
   $self->{'args'}              ||= \@ARGV;
-  $self->{'found'}             ||= [];
-  $self->{'temp_file_list'}    ||= [];
+  $self->{'found'}             ||= \@();
+  $self->{'temp_file_list'}    ||= \@();
   
   
   $self->{'target'} = undef;
 
   $self->init_formatter_class_list;
 
-  $self->{'pagers' } = [@Pagers] unless exists $self->{'pagers'};
+  $self->{'pagers' } = \@(@Pagers) unless exists $self->{'pagers'};
   $self->{'bindir' } = $Bindir   unless exists $self->{'bindir'};
   $self->{'pod2man'} = $Pod2man  unless exists $self->{'pod2man'};
 
-  push @{ $self->{'formatter_switches'} = [] }, (
+  push @{ $self->{'formatter_switches'} = \@() }, (
    # Yeah, we could use a hashref, but maybe there's some class where options
    # have to be ordered; so we'll use an arrayref.
 
-     [ '__bindir'  => $self->{'bindir' } ],
-     [ '__pod2man' => $self->{'pod2man'} ],
+     \@( '__bindir'  => $self->{'bindir' } ),
+     \@( '__pod2man' => $self->{'pod2man'} ),
   );
 
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
    join ' ', map "[@$_]", @{ $self->{'formatter_switches'} };
 
-  $self->{'translators'} = [];
-  $self->{'extra_search_dirs'} = [];
+  $self->{'translators'} = \@();
+  $self->{'extra_search_dirs'} = \@();
 
   return;
 }
@@ -358,7 +358,7 @@ sub init {
 
 sub init_formatter_class_list {
   my $self = shift;
-  $self->{'formatter_classes'} ||= [];
+  $self->{'formatter_classes'} ||= \@();
 
   # Remember, no switches have been read yet, when
   # we've started this routine.
@@ -449,7 +449,7 @@ sub process {
 my( %class_seen, %class_loaded );
 sub find_good_formatter_class {
   my $self = @_[0];
-  my @class_list = @{ $self->{'formatter_classes'} || [] };
+  my @class_list = @{ $self->{'formatter_classes'} || \@() };
   die "WHAT?  Nothing in the formatter class list!?" unless @class_list;
   
   my $good_class_found;
@@ -804,7 +804,7 @@ sub maybe_generate_dynamic_pod {
 
 sub add_formatter_option { # $self->add_formatter_option('key' => 'value');
   my $self = shift;
-  push @{ $self->{'formatter_switches'} }, [ @_ ] if @_;
+  push @{ $self->{'formatter_switches'} }, \@( @_ ) if @_;
 
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
    join ' ', map "[@$_]", @{ $self->{'formatter_switches'} };
@@ -980,7 +980,7 @@ sub render_findings {
 
   # Set formatter options:
   if( ref $formatter ) {
-    foreach my $f (@{ $self->{'formatter_switches'} || [] }) {
+    foreach my $f (@{ $self->{'formatter_switches'} || \@() }) {
       my($switch, $value, $silent_fail) = @$f;
       if( $formatter->can($switch) ) {
         eval { $formatter->?$switch( defined($value) ? $value : () ) };

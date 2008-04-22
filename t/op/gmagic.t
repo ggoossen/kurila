@@ -53,11 +53,11 @@ package Tie::Monitor;
 
 sub TIESCALAR {
     my($class, $value) = @_;
-    bless {
+    bless \%(
 	read => 0,
 	write => 0,
-	values => [ 0 ],
-    };
+	values => \@( 0 ),
+    );
 }
 
 sub FETCH {
@@ -76,6 +76,6 @@ sub init {
     my $self = shift;
     my @results = ($self->{read}, $self->{write});
     $self->{read} = $self->{write} = 0;
-    $self->{values} = [ 0 ];
+    $self->{values} = \@( 0 );
     @results;
 }

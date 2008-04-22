@@ -49,7 +49,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
    print "#  About to parse lines: ",
      join(' ', map defined($_) ? "[$_]" : "EOF", @_), "\n";
 
-  my $paras = ($self->{'paras'} ||= []);
+  my $paras = ($self->{'paras'} ||= \@());
    # paragraph buffer.  Because we need to defer processing of =over
    # directives and verbatim paragraphs.  We call _ponder_paragraph_buffer
    # to process this.
@@ -66,7 +66,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
     unless( defined $source_line ) {
       DEBUG +> 4 and print "# Undef-line seen.\n";
 
-      push @$paras, ['~end', {'start_line' => $self->{'line_count'}}];
+      push @$paras, \@('~end', \%('start_line' => $self->{'line_count'}));
       push @$paras, $paras->[-1], $paras->[-1];
        # So that it definitely fills the buffer.
       $self->{'source_dead'} = 1;
@@ -204,7 +204,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       
       if($line =~ m/^(=[a-zA-Z][a-zA-Z0-9]*)(?:\s+|$)(.*)/s) {
         # THIS IS THE ONE PLACE WHERE WE CONSTRUCT NEW DIRECTIVE OBJECTS
-        my $new = [$1, {'start_line' => $self->{'line_count'}}, $2];
+        my $new = \@($1, \%('start_line' => $self->{'line_count'}), $2);
          # Note that in "=head1 foo", the WS is lost.
          # Example: ['=head1', {'start_line' => 123}, ' foo']
         
@@ -226,13 +226,13 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
           $self->_ponder_paragraph_buffer();
            # by now it's safe to consider the previous paragraph as done.
           DEBUG +> 1 and print "Starting verbatim para at line %{$self}{'line_count'}\n";
-          push @$paras, ['~Verbatim', {'start_line' => $self->{'line_count'}}, $line];
+          push @$paras, \@('~Verbatim', \%('start_line' => $self->{'line_count'}), $line);
         }
       } else {
         ++$self->{'pod_para_count'};
         $self->_ponder_paragraph_buffer();
          # by now it's safe to consider the previous paragraph as done.
-        push @$paras, ['~Para',  {'start_line' => $self->{'line_count'}}, $line];
+        push @$paras, \@('~Para',  \%('start_line' => $self->{'line_count'}), $line);
         DEBUG +> 1 and print "Starting plain para at line %{$self}{'line_count'}\n";
       }
       $self->{'last_was_blank'} = $self->{'start_of_pod_block'} = 0;
@@ -385,12 +385,12 @@ sub _gen_errata {
   
   foreach my $line (sort {$a <+> $b} keys %{$self->{'errata'}}) {
     push @out,
-      ['=item', {'start_line' => $m}, "Around line $line:"],
-      map( ['~Para', {'start_line' => $m, '~cooked' => 1},
+      \@('=item', \%('start_line' => $m), "Around line $line:"),
+      map( \@('~Para', \%('start_line' => $m, '~cooked' => 1),
         #['~Top', {'start_line' => $m},
         $_
         #]
-        ],
+        ),
         @{$self->{'errata'}{$line}}
       )
     ;
@@ -399,18 +399,18 @@ sub _gen_errata {
   # TODO: report of unknown entities? unrenderable characters?
 
   unshift @out,
-    ['=head1', {'start_line' => $m, 'errata' => 1}, 'POD ERRORS'],
-    ['~Para', {'start_line' => $m, '~cooked' => 1, 'errata' => 1},
+    \@('=head1', \%('start_line' => $m, 'errata' => 1), 'POD ERRORS'),
+    \@('~Para', \%('start_line' => $m, '~cooked' => 1, 'errata' => 1),
      "Hey! ",
-     ['B', {},
+     \@('B', \%(),
       'The above document had some coding errors, which are explained below:'
-     ]
-    ],
-    ['=over',  {'start_line' => $m, 'errata' => 1}, ''],
+     )
+    ),
+    \@('=over',  \%('start_line' => $m, 'errata' => 1), ''),
   ;
 
   push @out, 
-    ['=back',  {'start_line' => $m, 'errata' => 1}, ''],
+    \@('=back',  \%('start_line' => $m, 'errata' => 1), ''),
   ;
 
   DEBUG and print "\n<<\n", pretty(\@out), "\n>>\n\n";
@@ -455,7 +455,7 @@ sub _ponder_paragraph_buffer {
   my $self = @_[0];
   my $paras;
   return unless @{$paras = $self->{'paras'}};
-  my $curr_open = ($self->{'curr_open'} ||= []);
+  my $curr_open = ($self->{'curr_open'} ||= \@());
 
   my $scratch;
 
@@ -480,10 +480,10 @@ sub _ponder_paragraph_buffer {
     
     $self->_handle_element_start(
       ($scratch = 'Document'),
-      {
+      \%(
         'start_line' => $paras->[0][1]{'start_line'},
         $starting_contentless ? ( 'contentless' => 1 ) : (),
-      },
+      ),
     );
   }
 
@@ -564,7 +564,7 @@ sub _ponder_paragraph_buffer {
           $para->[1]{'start_line'},
           "You forgot a '=back' before '$para_type'"
         );
-        unshift @$paras, ['=back', {}, ''], $para;   # close the =over
+        unshift @$paras, \@('=back', \%(), ''), $para;   # close the =over
         next;
       }
 
@@ -578,7 +578,7 @@ sub _ponder_paragraph_buffer {
             "'=item' outside of any '=over'"
           );
           unshift @$paras,
-            ['=over', {'start_line' => $para->[1]{'start_line'}}, ''],
+            \@('=over', \%('start_line' => $para->[1]{'start_line'}), ''),
             $para
           ;
           next;
@@ -865,15 +865,15 @@ sub _ponder_for {
   $para->[0] = 'Data';
   
   unshift @$paras,
-    ['=begin',
-      {'start_line' => $para->[1]{'start_line'}, '~really' => '=for'},
+    \@('=begin',
+      \%('start_line' => $para->[1]{'start_line'}, '~really' => '=for'),
       $target,
-    ],
+    ),
     $para,
-    ['=end',
-      {'start_line' => $para->[1]{'start_line'}, '~really' => '=for'},
+    \@('=end',
+      \%('start_line' => $para->[1]{'start_line'}, '~really' => '=for'),
       $target,
-    ],
+    ),
   ;
   
   return 1;
@@ -1178,7 +1178,7 @@ sub _ponder_item {
       "'=item' outside of any '=over'"
     );
     unshift @$paras,
-      ['=over', {'start_line' => $para->[1]{'start_line'}}, ''],
+      \@('=over', \%('start_line' => $para->[1]{'start_line'}), ''),
       $para
     ;
     return 1;
@@ -1432,7 +1432,7 @@ sub _closers_for_all_curr_open {
   my @closers;
   foreach my $still_open (@{  $self->{'curr_open'} || return  }) {
     my @copy = @$still_open;
-    @copy[1] = {%{ @copy[1] }};
+    @copy[1] = \%(%{ @copy[1] });
     #$copy[1]{'start_line'} = -1;
     if(@copy[0] eq '=for') {
       @copy[0] = '=end';
@@ -1537,14 +1537,14 @@ sub _verbatim_format {
           substr($p->[$i-1], pos($formatting)-length($1), length($1));
       } else {
         #print "SNARING $+\n";
-        push @new_line, [
+        push @new_line, \@(
           (
             $3 ? 'VerbatimB'  :
             $4 ? 'VerbatimI'  :
             $5 ? 'VerbatimBI' : die("Should never get called")
-          ), {},
+          ), \%(),
           substr($p->[$i-1], pos($formatting)-length($1), length($1))
-        ];
+        );
         #print "Formatting <$new_line[-1][-1]> as $new_line[-1][0]\n";
       }
     }
@@ -1601,7 +1601,7 @@ sub _treelet_from_formatting_codes {
   
   my($self, $para, $start_line, $preserve_space) = @_;
   
-  my $treelet = ['~Top', {'start_line' => $start_line},];
+  my $treelet = \@('~Top', \%('start_line' => $start_line),);
   
   unless ($preserve_space || $self->{'preserve_whitespace'}) {
     use utf8;
@@ -1683,7 +1683,7 @@ sub _treelet_from_formatting_codes {
         DEBUG +> 3 and print "Found simple start-text code \"$1\"\n";
         push @stack, 0;  # signal that we're looking for simple
       }
-      push @lineage, [ substr($1,0,1), {}, ];  # new node object
+      push @lineage, \@( substr($1,0,1), \%(), );  # new node object
       push @{ @lineage[-2] }, @lineage[-1];
       
     } elsif(defined $4) {

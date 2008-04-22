@@ -1754,7 +1754,7 @@ sub go_ahead($$$){
     my $res = '';
     my @closing = ($closing);
     while( $$rstr =~
-      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|@{[pattern @closing[0]]})//s ){
+      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|@{\@(pattern @closing[0])})//s ){
 	$res .= $1;
 	unless( $3 ){
 	    shift @closing;

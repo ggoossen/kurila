@@ -9,11 +9,10 @@ my $defines = '-DPERL_EXT_RE_BUILD -DPERL_EXT_RE_DEBUG -DPERL_EXT';
 WriteMakefile(
     NAME		=> 're',
     VERSION_FROM	=> 're.pm',
-    MAN3PODS		=> {}, 	# Pods will be built by installman.
     XSPROTOARG		=> '-noprototypes',
     OBJECT		=> $object,
     DEFINE             => $defines,
-    clean		=> { FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' },
+    clean		=> \%( FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' ),
 );
 
 package MY;

@@ -191,10 +191,10 @@ sub test_things {
     test_corrupt ($copy, $sub, "/^Byte order is not compatible/",
                   "byte order");
     $where = $file_magic + 3 + length $header->{byteorder};
-    foreach (['intsize', "Integer"],
-             ['longsize', "Long integer"],
-             ['ptrsize', "Pointer"],
-             ['nvsize', "Double"]) {
+    foreach (\@('intsize', "Integer"),
+             \@('longsize', "Long integer"),
+             \@('ptrsize', "Pointer"),
+             \@('nvsize', "Double")) {
       my ($key, $name) = @$_;
       $copy = $contents;
       substr ($copy, $where++, 1, chr 0);

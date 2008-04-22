@@ -52,6 +52,6 @@ $_->join() for threads->list();
 ok 1;
 
 sub sub1 {
-    nfreeze {};
+    nfreeze \%();
     ok 1;
 }

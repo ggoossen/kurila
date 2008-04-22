@@ -82,20 +82,20 @@ __DATA__
 # USING: extract_tagged($str);
 	<A-1 HREF="#section2">some text</A-1>;
 
-# USING: extract_tagged($str,qr/<[A-Z]+>/,undef, undef, {ignore=>["<BR>"]});
+# USING: extract_tagged($str,qr/<[A-Z]+>/,undef, undef, \%(ignore=>\@("<BR>")));
 	<A>aaa<B>bbb<BR>ccc</B>ddd</A>;
 
 # USING: extract_tagged($str,"BEGIN","END");
 	BEGIN at the BEGIN keyword and END at the END;
 	BEGIN at the beginning and end at the END;
 
-# USING: extract_tagged($str,undef,undef,undef,{ignore=>["<[^>]*/>"]});
+# USING: extract_tagged($str,undef,undef,undef,\%(ignore=>\@("<[^>]*/>")));
 	<A>aaa<B>bbb<BR/>ccc</B>ddd</A>;
 
-# USING: extract_tagged($str,";","-",undef,{reject=>[";"],fail=>"MAX"});
+# USING: extract_tagged($str,";","-",undef,\%(reject=>\@(";"),fail=>"MAX"));
 	; at the ;-) keyword
 
-# USING: extract_tagged($str,"<[A-Z]+>",undef, undef, {ignore=>["<BR>"]});
+# USING: extract_tagged($str,"<[A-Z]+>",undef, undef, \%(ignore=>\@("<BR>")));
 	<A>aaa<B>bbb<BR>ccc</B>ddd</A>;
 
 # THESE SHOULD FAIL
@@ -103,11 +103,11 @@ __DATA__
 	BEGIN at the BEGIN keyword and END at the end;
 
 # TEST EXTRACTION OF TAGGED STRINGS
-# USING: extract_tagged($str,"BEGIN","END",undef,{reject=>["BEGIN","END"]});
+# USING: extract_tagged($str,"BEGIN","END",undef,\%(reject=>\@("BEGIN","END")));
 # THESE SHOULD FAIL
 	BEGIN at the BEGIN keyword and END at the end;
 
-# USING: extract_tagged($str,";","-",undef,{reject=>[";"],fail=>"PARA"});
+# USING: extract_tagged($str,";","-",undef,\%(reject=>\@(";"),fail=>"PARA"));
 	; at the ;-) keyword
 
 

@@ -43,7 +43,7 @@ foreach my $func (qw(cond_wait cond_signal cond_broadcast)) {
 {
     my @array = qw(1 2 3 4);
     is_deeply( share(@array), \@array );
-    is( ref &share({}), 'HASH' );
+    is( ref &share(\%()), 'HASH' );
     is( "@array", "1 2 3 4" );
 }
 

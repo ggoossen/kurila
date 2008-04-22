@@ -21,7 +21,7 @@ foreach my $file (glob("*/*.pod */*/*.pod */*/*/*.pod README README.* INSTALL"))
         if (m{(?:http|ftp)://(?:(?!\w<)[-\w~?@=.])+} && !exists %dummy{$&}) {
             my $url = $&;
             $url =~ s/\.$//;
-            %urls {$url} ||= { };
+            %urls {$url} ||= \%( );
             %urls {$url} {$file} = 1;
         }
     }
@@ -60,7 +60,7 @@ while (@urls) {
     todo();
 
     for ($i = 0; $i +< $MAXFORK; $i++) {
-	@list[$i] = [ splice @urls, 0, $MAXURL ];
+	@list[$i] = \@( splice @urls, 0, $MAXURL );
 	$pid = fork;
 	die "Failed to fork: $!\n" unless defined $pid;
 	last unless $pid; # Child.

@@ -16,7 +16,7 @@ our @EXPORT = qw( checkOptree plan skip skip_all pass is like unlike
 # The approach taken is to put the hints-with-open in the golden results, and
 # flag that they need to be taken out if $^OPEN is set.
 
-if (((caller 0)[[10]]||{})->{'open<'}) {
+if (((caller 0)[[10]]||\%())->{'open<'}) {
     $using_open = 1;
 }
 
@@ -322,16 +322,16 @@ our %gOpts = 	# values are replaced at runtime !!
 
      # array values are one-of selections, with 1st value as default
      #  array: 2nd value is used as help-str, 1st val (still) default
-     help	=> [0, 'provides help and exits', 0],
-     testmode	=> [qw/ native cross both /],
+     help	=> \@(0, 'provides help and exits', 0),
+     testmode	=> \@(qw/ native cross both /),
 
      # reporting mode for rendering errs
-     report	=> [qw/ diag fail print /],
-     errcont	=> [1, 'if 1, tests match even if report is fail', 0],
+     report	=> \@(qw/ diag fail print /),
+     errcont	=> \@(1, 'if 1, tests match even if report is fail', 0),
 
      # fixup for VMS, cygwin, which dont have stderr b4 stdout
-     rxnoorder	=> [1, 'if 1, dont req match on -e lines, and -banner',0],
-     strip	=> [1, 'if 1, catch errs and remove from renderings',0],
+     rxnoorder	=> \@(1, 'if 1, dont req match on -e lines, and -banner',0),
+     strip	=> \@(1, 'if 1, catch errs and remove from renderings',0),
      stripv	=> 'if strip&&1, be verbose about it',
      errs	=> 'expected compile errs, array if several',
     );
@@ -356,11 +356,11 @@ our $platform = ($threaded) ? "threaded" : "plain";
 our $thrstat = ($threaded)  ? "threaded" : "nonthreaded";
 
 our %modes = (
-	      both	=> [ 'expect', 'expect_nt'],
-	      native	=> [ ($threaded) ? 'expect' : 'expect_nt'],
-	      cross	=> [ !($threaded) ? 'expect' : 'expect_nt'],
-	      expect	=> [ 'expect' ],
-	      expect_nt	=> [ 'expect_nt' ],
+	      both	=> \@( 'expect', 'expect_nt'),
+	      native	=> \@( ($threaded) ? 'expect' : 'expect_nt'),
+	      cross	=> \@( !($threaded) ? 'expect' : 'expect_nt'),
+	      expect	=> \@( 'expect' ),
+	      expect_nt	=> \@( 'expect_nt' ),
 	      );
 
 our %msgs # announce cross-testing.
@@ -455,7 +455,7 @@ sub checkOptree {
 
 sub newTestCases {
     # make test objects (currently 1) from args (passed to checkOptree)
-    my $tc = bless { @_ }, __PACKAGE__
+    my $tc = bless \%(@_), __PACKAGE__
 	or die "test cases are hashes";
 
     $tc->label();
@@ -469,7 +469,7 @@ sub newTestCases {
     # transform errs to self-hash for efficient set-math
     if ($tc->{errs}) {
 	if (not ref $tc->{errs}) {
-	    $tc->{errs} = { $tc->{errs} => 1};
+	    $tc->{errs} = \%( $tc->{errs} => 1);
 	}
 	elsif (ref $tc->{errs} eq 'ARRAY') {
 	    my %errs;
@@ -510,12 +510,12 @@ sub getRendering {
     my @errs;		# collect errs via 
 
     if ($tc->{Dx}) {
-	$rendering = runperl( switches => ['-w',join(',',"-Dx",@opts)],
+	$rendering = runperl( switches => \@('-w',join(',',"-Dx",@opts)),
 			      prog => $tc->{Dx}, stderr => 1,
 			      ); # verbose => 1);
     }
     elsif ($tc->{prog}) {
-	$rendering = runperl( switches => ['-w',join(',',"-MO=Concise",@opts)],
+	$rendering = runperl( switches => \@('-w',join(',',"-MO=Concise",@opts)),
 			      prog => $tc->{prog}, stderr => 1,
 			      ); # verbose => 1);
     } 
@@ -583,7 +583,7 @@ sub checkErrs {
 
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
-    $tc->{goterrs} ||= [];
+    $tc->{goterrs} ||= \@();
     %goterrs{[@{$tc->{goterrs}}]} = (1) x scalar @{$tc->{goterrs}};
     
     foreach my $k (keys %{$tc->{errs}}) {
@@ -972,7 +972,7 @@ EONT_EONT
 
 sub OptreeCheck::gentest {
     my ($code,$opts) = @_;
-    my $rendering = getRendering({code => $code});
+    my $rendering = getRendering(\%(code => $code));
     my $testcode = OptreeCheck::wrap($code);
     return unless $testcode;
 

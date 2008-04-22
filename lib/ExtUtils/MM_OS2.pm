@@ -50,10 +50,10 @@ MAKE_TEXT
 sub dlsyms {
     my($self,%attribs) = @_;
 
-    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || {};
-    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || [];
-    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || [];
-    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || {};
+    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || \%();
+    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || \@();
+    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || \@();
+    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || \%();
     my(@m);
     (my $boot = $self->{NAME}) =~ s/:/_/g;
 

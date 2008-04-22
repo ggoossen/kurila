@@ -36,7 +36,7 @@ ok (eq_array (\@comma, \@temp), 'list from comma hash');
 @temp = each %comma;
 ok (eq_array (\@comma, \@temp), 'first each from comma hash');
 @temp = each %comma;
-ok (eq_array ([], \@temp), 'last each from comma hash');
+ok (eq_array (\@(), \@temp), 'last each from comma hash');
 
 my %temp = %comma;
 
@@ -54,7 +54,7 @@ ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
 @temp = each %temp;
 ok (eq_array (\@temp, \@temp), 'first each from copy of comma hash');
 @temp = each %temp;
-ok (eq_array ([], \@temp), 'last each from copy of comma hash');
+ok (eq_array (\@(), \@temp), 'last each from copy of comma hash');
 
 my @arrow = (Key =>"Value");
 
@@ -76,7 +76,7 @@ ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
 @temp = each %arrow;
 ok (eq_array (\@arrow, \@temp), 'first each from arrow hash');
 @temp = each %arrow;
-ok (eq_array ([], \@temp), 'last each from arrow hash');
+ok (eq_array (\@(), \@temp), 'last each from arrow hash');
 
 %temp = %arrow;
 
@@ -94,7 +94,7 @@ ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
 @temp = each %temp;
 ok (eq_array (\@temp, \@temp), 'first each from copy of arrow hash');
 @temp = each %temp;
-ok (eq_array ([], \@temp), 'last each from copy of arrow hash');
+ok (eq_array (\@(), \@temp), 'last each from copy of arrow hash');
 
 my %direct = ('Camel', 2, 'Dromedary', 1);
 my %slow;
@@ -207,7 +207,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   @temp = each %utf8c;
   ok (eq_array (\@utf8c, \@temp), 'first each from utf8 comma hash');
   @temp = each %utf8c;
-  ok (eq_array ([], \@temp), 'last each from utf8 comma hash');
+  ok (eq_array (\@(), \@temp), 'last each from utf8 comma hash');
 
   %temp = %utf8c;
 
@@ -226,7 +226,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   @temp = each %temp;
   ok (eq_array (\@temp, \@temp), 'first each from copy of utf8 comma hash');
   @temp = each %temp;
-  ok (eq_array ([], \@temp), 'last each from copy of utf8 comma hash');
+  ok (eq_array (\@(), \@temp), 'last each from copy of utf8 comma hash');
 
   my $assign = sprintf '("\x{%x}" => "%d")', $chr, $chr;
   print "# $assign\n";
@@ -249,7 +249,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   @temp = each %utf8a;
   ok (eq_array (\@utf8a, \@temp), 'first each from utf8 arrow hash');
   @temp = each %utf8a;
-  ok (eq_array ([], \@temp), 'last each from utf8 arrow hash');
+  ok (eq_array (\@(), \@temp), 'last each from utf8 arrow hash');
 
   %temp = %utf8a;
 
@@ -268,7 +268,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   @temp = each %temp;
   ok (eq_array (\@temp, \@temp), 'first each from copy of utf8 arrow hash');
   @temp = each %temp;
-  ok (eq_array ([], \@temp), 'last each from copy of utf8 arrow hash');
+  ok (eq_array (\@(), \@temp), 'last each from copy of utf8 arrow hash');
 
 }
 
@@ -282,10 +282,10 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 	'hash assignment in scalar context' );
     is( scalar( ($x,%h) = (0,1,2,1,3,1,4,1,5) ), 3,
 	'scalar + hash assignment in scalar context' );
-    $ar = [ %h = (1,2,1,3,1,4,1,5) ];
+    $ar = \@( %h = (1,2,1,3,1,4,1,5) );
     is( (@$ar-1), 1, 'hash assignment in list context' );
     is( "@$ar", "1 5", '...gets the last values' );
-    $ar = [ ($x,%h) = (0,1,2,1,3,1,4,1,5) ];
+    $ar = \@( ($x,%h) = (0,1,2,1,3,1,4,1,5) );
     is( (@$ar-1), 2, 'scalar + hash assignment in list context' );
     is( "@$ar", "0 1 5", '...gets the last values' );
 }
@@ -293,7 +293,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 # test stringification of keys
 {
     no warnings 'once';
-    my @refs =    ( \ do { my $x }, [],   {},  sub {}, \ *x);
+    my @refs =    ( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
     for my $ref (@refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }

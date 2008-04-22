@@ -45,11 +45,7 @@ sub have_cc
 
 # Build options for different environments
 my @conditional_params;
-if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
-    # Core
-    push(@conditional_params, 'MAN3PODS' => {});
-
-} else {
+if (not grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     # CPAN
 
     # Verify that a 'C' compiler is available
@@ -58,7 +54,7 @@ if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     }
 
     push(@conditional_params, 'DEFINE' => '-DHAS_PPPORT_H',
-                              'PREREQ_PM' => {
+                              'PREREQ_PM' => \%(
                                     'strict'            => 0,
                                     'warnings'          => 0,
                                     'Config'            => 0,
@@ -68,7 +64,7 @@ if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
                                     'Test'              => 0,
                                     'Test::More'        => 0,
                                     'ExtUtils::testlib' => 0,
-                              });
+                              ));
 }
 
 
@@ -78,9 +74,9 @@ WriteMakefile(
     'AUTHOR'            => 'Artur Bergman, Jerry D. Hedden <jdhedden AT cpan DOT org>',
     'VERSION_FROM'      => 'shared.pm',
     'ABSTRACT_FROM'     => 'shared.pm',
-    'PM' => {
+    'PM' => \%(
         'shared.pm'     => '$(INST_LIBDIR)/shared.pm',
-    },
+    ),
     'INSTALLDIRS'       => 'perl',
 
     'LICENSE'  => 'perl',

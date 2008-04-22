@@ -2,9 +2,9 @@
 my $r = `/usr/bin/uname -r`;
 chomp($r);
 if (substr($r, 2) +<= 6) {
-    $self->{LIBS} = ['-lposix4'];
+    $self->{LIBS} = \@('-lposix4');
 } else {
-    $self->{LIBS} = ['-lrt'];
+    $self->{LIBS} = \@('-lrt');
 }
 
 

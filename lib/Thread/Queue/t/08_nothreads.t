@@ -14,22 +14,22 @@ use Thread::Queue;
 
 # Regular array
 my @ary1 = qw/foo bar baz/;
-push(@ary1, [ 1..3 ], { 'qux' => 99 });
+push(@ary1, \@( 1..3 ), \%( 'qux' => 99 ));
 
 # Shared array
 my @ary2 :shared = (99, 21, 86);
 
 # Regular hash-based object
-my $obj1 = {
+my $obj1 = \%(
     'foo' => 'bar',
     'qux' => 99,
-    'biff' => [ qw/fee fi fo/ ],
-    'boff' => { 'bork' => 'true' },
-};
+    'biff' => \@( qw/fee fi fo/ ),
+    'boff' => \%( 'bork' => 'true' ),
+);
 bless($obj1, 'Foo');
 
 # Shared hash-based object
-my $obj2 = &threads::shared::share({});
+my $obj2 = &threads::shared::share(\%());
 %$obj2{'bar'} = 86;
 %$obj2{'key'} = 'foo';
 bless($obj2, 'Bar');
@@ -43,7 +43,7 @@ threads::shared::share($sref2);
 bless($sref2, 'Baz');
 
 # Ref of ref
-my $foo = [ 5, 'bork', { 'now' => 123 } ];
+my $foo = \@( 5, 'bork', \%( 'now' => 123 ) );
 my $bar = \$foo;
 my $baz = \$bar;
 my $qux = \$baz;

@@ -4,7 +4,7 @@ our $VERSION = 0.08;
 
 our @EXPORT_OK = qw(get reftype);
 our @EXPORT = ();
-our %EXPORT_TAGS = (ALL => [@EXPORT, @EXPORT_OK]);
+our %EXPORT_TAGS = (ALL => \@(@EXPORT, @EXPORT_OK));
 
 use strict;
 

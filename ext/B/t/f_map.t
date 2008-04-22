@@ -391,7 +391,7 @@ EONT_EONT
 
 checkOptree(note   => q{},
 	    bcopts => q{-exec},
-	    code   => q{@hashes = map +{ lc($_), 1 }, @array },
+	    code   => q{@hashes = map \%( lc($_), 1 ), @array },
 	    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 475 (eval 10):1) v
 # 2  <0> pushmark s

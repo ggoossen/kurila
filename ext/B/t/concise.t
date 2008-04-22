@@ -24,7 +24,7 @@ require_ok("B::Concise");
 
 our ($out, $op_base, $op_base_p1, $cop_base);
 
-$out = runperl(switches => ["-MO=Concise"], prog => '$a', stderr => 1);
+$out = runperl(switches => \@("-MO=Concise"), prog => '$a', stderr => 1);
 
 # If either of the next two tests fail, it probably means you need to
 # fix the section labeled 'fragile kludge' in Concise.pm
@@ -43,7 +43,7 @@ is($cop_base, 1, "Smallest COP sequence number");
 # test that with -exec B::Concise navigates past logops (bug #18175)
 
 $out = runperl(
-    switches => ["-MO=Concise,-exec"],
+    switches => \@("-MO=Concise,-exec"),
     prog => q{$a=$b && print q/foo/},
     stderr => 1,
 );
@@ -59,7 +59,7 @@ B::Concise->import(qw( set_style set_style_standard add_callback
 ## walk_output argument checking
 
 # test that walk_output rejects non-HANDLE args
-foreach my $foo ("string", [], {}) {
+foreach my $foo ("string", \@(), \%()) {
     eval {  walk_output($foo) };
     isnt ($@ && $@->message, '', "walk_output() rejects arg {dump::view($foo)}");
     $@=''; # clear the fail for next test
@@ -72,7 +72,7 @@ foreach my $foo (undef, 0) {
 
 {   # any object that can print should be ok for walk_output
     package Hugo;
-    sub new { my $foo = bless {} };
+    sub new { my $foo = bless \%() };
     sub print { CORE::print @_ }
 }
 my $foo = Hugo->new();	# suggested this API fix
@@ -178,7 +178,7 @@ SKIP: {
     if (0) {
 	# pending STASH splaying
 	
-	foreach my $ref ([], {}) {
+	foreach my $ref (\@(), \%()) {
 	    my $typ = ref $ref;
 	    walk_output(\my $out);
 	    eval { B::Concise::compile('-basic', $ref)->() };
@@ -373,7 +373,7 @@ SKIP: {
 # test -stash and -src rendering
 # todo: stderr=1 puts '-e syntax OK' into $out,
 # conceivably fouling one of the lines that are tested
-$out = runperl ( switches => ["-MO=Concise,-stash=B::Concise,-src"],
+$out = runperl ( switches => \@("-MO=Concise,-stash=B::Concise,-src"),
 		 prog => '-e 1', stderr => 1 );
 
 like($out, qr/FUNC: \*B::Concise::concise_cv_obj/,
@@ -391,7 +391,7 @@ like($out, qr/PAD_FAKELEX_MULTI is a constant sub, optimized to a IV/,
 like($out, qr/\# 4\d\d: \s+ \$l->concise\(\$level\);/,
      "src-line rendering works");
 
-$out = runperl ( switches => ["-MO=Concise,-stash=Data::Dumper,-src,-exec"],
+$out = runperl ( switches => \@("-MO=Concise,-stash=Data::Dumper,-src,-exec"),
 		 prog => '-e 1', stderr => 1 );
 
 like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
@@ -400,7 +400,7 @@ like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
 my $prog = q{package FOO; sub bar { print "bar" } package main; FOO::bar(); };
 
 # this would fail if %INC used for -stash test
-$out = runperl ( switches => ["-MO=Concise,-src,-stash=FOO,-main"],
+$out = runperl ( switches => \@("-MO=Concise,-src,-stash=FOO,-main"),
 		 prog => $prog, stderr => 1 );
 
 like($out, qr/FUNC: \*FOO::bar/,

@@ -31,29 +31,29 @@ print "# a bit of meta-testing...\n";
 &ok(!deq( undef, 1     ));
 &ok(!deq( 1,     undef ));
 
-&ok( deq( [ ],   [ ]    ));
-&ok(!deq( [ ],   1      ));
-&ok(!deq( 1,     [ ]    ));
+&ok( deq( \@( ),   \@( )    ));
+&ok(!deq( \@( ),   1      ));
+&ok(!deq( 1,     \@( )    ));
 
-&ok( deq( [1],   [1]    ));
-&ok(!deq( [1],   1      ));
-&ok(!deq( 1,     [1]    ));
-&ok(!deq( [1],   [ ]    ));
-&ok(!deq( [ ],   [1]    ));
-&ok(!deq( [1],   [2]    ));
-&ok(!deq( [2],   [1]    ));
+&ok( deq( \@(1),   \@(1)    ));
+&ok(!deq( \@(1),   1      ));
+&ok(!deq( 1,     \@(1)    ));
+&ok(!deq( \@(1),   \@( )    ));
+&ok(!deq( \@( ),   \@(1)    ));
+&ok(!deq( \@(1),   \@(2)    ));
+&ok(!deq( \@(2),   \@(1)    ));
 
-&ok( deq( [ ],   [ ]    ));
-&ok(!deq( [ ],   1      ));
-&ok(!deq( 1,     [ ]    ));
+&ok( deq( \@( ),   \@( )    ));
+&ok(!deq( \@( ),   1      ));
+&ok(!deq( 1,     \@( )    ));
 
-&ok( deq( {},    {}     ));
-&ok(!deq( {},    1      ));
-&ok(!deq( 1,     {}     ));
-&ok(!deq( {1,2}, {}     ));
-&ok(!deq( {},    {1,2}  ));
-&ok( deq( {1,2}, {1,2}  ));
-&ok(!deq( {2,1}, {1,2}  ));
+&ok( deq( \%(),    \%()     ));
+&ok(!deq( \%(),    1      ));
+&ok(!deq( 1,     \%()     ));
+&ok(!deq( \%(1,2), \%()     ));
+&ok(!deq( \%(),    \%(1,2)  ));
+&ok( deq( \%(1,2), \%(1,2)  ));
+&ok(!deq( \%(2,1), \%(1,2)  ));
 
 
 
@@ -65,53 +65,53 @@ ok x( "=pod\n\nI like pie.\n" );
 
 print "# Some real tests...\n";
 &ok( deq( x( "=pod\n\nI like pie.\n"),
-  [ "Document", {"start_line"=>1},
-    [ "Para",   {"start_line"=>3},
+  \@( "Document", \%("start_line"=>1),
+    \@( "Para",   \%("start_line"=>3),
       "I like pie."
-    ]
-  ]
+    )
+  )
 ));
 
 $hashes_dont_matter = 1;
 
 &ok( deq( x("=pod\n\nB<foo\t>\n"),
-  [ "Document", {},
-    [ "Para",   {},
-      ["B",     {},
+  \@( "Document", \%(),
+    \@( "Para",   \%(),
+      \@("B",     \%(),
         "foo "
-      ]
-    ]
-  ]
+      )
+    )
+  )
 ));
 
 
 &ok( deq( x("=pod\n\nB<pieF<zorch>X<foo>I<pling>>\n"),
-  [ "Document", {},
-    [ "Para",   {},
-      ["B",     {},
+  \@( "Document", \%(),
+    \@( "Para",   \%(),
+      \@("B",     \%(),
         "pie",
-        ['F',{}, 'zorch'],
-        ['X',{}, 'foo'  ],
-        ['I',{}, 'pling'],
-      ]
-    ]
-  ]
+        \@('F',\%(), 'zorch'),
+        \@('X',\%(), 'foo'  ),
+        \@('I',\%(), 'pling'),
+      )
+    )
+  )
 ));
 
 &ok( deq( x("=over\n\n=item B<pieF<zorch>X<foo>I<pling>>!\n\n=back"),
-  [ "Document", {},
-    [ "over-text", {},
-      [ "item-text", {},
-        ["B",     {},
+  \@( "Document", \%(),
+    \@( "over-text", \%(),
+      \@( "item-text", \%(),
+        \@("B",     \%(),
           "pie",
-          ['F',{}, 'zorch'],
-          ['X',{}, 'foo'  ],
-          ['I',{}, 'pling'],
-        ],
+          \@('F',\%(), 'zorch'),
+          \@('X',\%(), 'foo'  ),
+          \@('I',\%(), 'pling'),
+        ),
         '!'
-      ]
-    ]
-  ]
+      )
+    )
+  )
 ));
 
 print "# Wrapping up... one for the road...\n";

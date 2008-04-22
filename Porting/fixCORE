@@ -15,8 +15,8 @@ while ($work)
          && -f $2 )
      {
       my ($var,$file,$line) = ($1,$2,$3);
-      %fix{$file} = [] unless exists %fix{$file}; 
-      push(@{%fix{$file}},[$line => $var]) unless ($var =~ m/^PL_/ || $file =~ m/\.h$/);
+      %fix{$file} = \@() unless exists %fix{$file}; 
+      push(@{%fix{$file}},\@($line => $var)) unless ($var =~ m/^PL_/ || $file =~ m/\.h$/);
      }
     print;
    }
@@ -45,7 +45,7 @@ while ($work)
          }
         else
          {
-          push(@miss,[$line,$var,$_]);
+          push(@miss,\@($line,$var,$_));
          }
        }
       print;

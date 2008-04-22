@@ -160,7 +160,7 @@ is($u, undef);
     use overload '""' => sub {return undef;};
 }
 
-my $uo = bless [], 'U';
+my $uo = bless \@(), 'U';
 
 is(length($uo), undef, "Length of overloaded reference");
 

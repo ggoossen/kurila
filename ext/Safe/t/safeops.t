@@ -36,7 +36,7 @@ while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
     my ($op, $opname) = split m/\t+/;
-    push @op, [$op, $opname, %code{$op}];
+    push @op, \@($op, $opname, %code{$op});
 }
 close $fh;
 
@@ -205,8 +205,8 @@ split		split m/foo/
 join		join $a, @b
 list		@x = (1,2)
 lslice		SKIP @x[[1,2]]
-anonlist	[1,2]
-anonhash	{ a => 1 }
+anonlist	\@(1,2)
+anonhash	\%( a => 1 )
 splice		splice @x, 1, 2, 3
 push		push @x, $x
 pop		pop @x

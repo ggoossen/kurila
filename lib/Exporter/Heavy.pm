@@ -41,7 +41,7 @@ sub heavy_export {
     my($pkg, $callpkg, @imports) = @_;
     my($type, $sym, $cache_is_current, $oops);
     my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("{$pkg}::EXPORT")}},
-                                   %Exporter::Cache{$pkg} ||= {});
+                                   %Exporter::Cache{$pkg} ||= \%());
 
     if (@imports) {
 	if (!%$export_cache) {
@@ -139,7 +139,7 @@ sub heavy_export {
     }
 
     my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("{$pkg}::EXPORT_FAIL")}},
-                              %Exporter::FailCache{$pkg} ||= {});
+                              %Exporter::FailCache{$pkg} ||= \%());
 
     if (@$fail) {
 	if (!%$fail_cache) {

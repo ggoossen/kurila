@@ -99,10 +99,10 @@ use ExtUtils::Constant::XS qw(%XS_Constant %XS_TypeSet);
 
 @ISA = 'Exporter';
 
-%EXPORT_TAGS = ( 'all' => [ qw(
+%EXPORT_TAGS = ( 'all' => \@( qw(
 	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
-) ] );
+) ) );
 
 @EXPORT_OK = ( @{ %EXPORT_TAGS{'all'} } );
 
@@ -120,10 +120,10 @@ sub constant_types {
 sub C_constant {
   my ($package, $subname, $default_type, $what, $indent, $breakout, @items)
     = @_;
-  ExtUtils::Constant::XS->C_constant({package => $package, subname => $subname,
-				      default_type => $default_type,
-				      types => $what, indent => $indent,
-				      breakout => $breakout}, @items);
+  ExtUtils::Constant::XS->C_constant(\%(package => $package, subname => $subname,
+                                        default_type => $default_type,
+                                        types => $what, indent => $indent,
+                                        breakout => $breakout), @items);
 }
 
 =item XS_constant PACKAGE, TYPES, SUBNAME, C_SUBNAME
@@ -156,7 +156,7 @@ sub XS_constant {
 
   if (!ref $what) {
     # Convert line of the form IV,UV,NV to hash
-    $what = {map {$_ => 1} split m/,\s*/, ($what)};
+    $what = \%( map {$_ => 1} split m/,\s*/, ($what) );
   }
   my $params = ExtUtils::Constant::XS->params ($what);
   my $type;
@@ -303,8 +303,8 @@ EOT
 EOT
 
   $result =~ s/^/{' 'x$indent}/gm;
-  return ExtUtils::Constant::XS->dump_names({default_type=>%args{DEFAULT_TYPE},
-					     indent=>$indent,},
+  return ExtUtils::Constant::XS->dump_names(\%(default_type=>%args{DEFAULT_TYPE},
+                                               indent=>$indent,),
 					    @{%args{NAMES}})
     . $result;
 }

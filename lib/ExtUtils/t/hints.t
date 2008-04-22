@@ -33,7 +33,7 @@ use TieOut;
 use ExtUtils::MakeMaker;
 
 my $out = tie *STDERR, 'TieOut';
-my $mm = bless {}, 'ExtUtils::MakeMaker';
+my $mm = bless \%(), 'ExtUtils::MakeMaker';
 $mm->check_hints;
 is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
 is( $out->read, "Processing hints file $hint_file\n" );

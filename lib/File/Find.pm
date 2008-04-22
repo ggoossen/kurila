@@ -784,7 +784,7 @@ sub _find_dir($$$) {
     my @Stack;
     my @filenames;
     my ($subcount,$sub_nlink);
-    my $SE= [];
+    my $SE= \@();
     my $dir_name= $p_dir;
     my $dir_pref;
     my $dir_rel = $File::Find::current_dir;
@@ -832,7 +832,7 @@ sub _find_dir($$$) {
     }
 
     # push the starting directory
-    push @Stack,[$CdLvl,$p_dir,$dir_rel,-1]  if  $bydepth;
+    push @Stack,\@($CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth;
 
     if ($Is_MacOS) {
 	$p_dir = $dir_pref;  # ensure trailing ':'
@@ -894,7 +894,7 @@ sub _find_dir($$$) {
 	@filenames = readdir DIR;
 	closedir(DIR);
 	@filenames = $pre_process->(@filenames) if $pre_process;
-	push @Stack,[$CdLvl,$dir_name,"",-2]   if $post_process;
+	push @Stack,\@($CdLvl,$dir_name,"",-2)   if $post_process;
 
 	# default: use whatever was specifid
         # (if $nlink >= 2, and $avoid_nlink == 0, this will switch back)
@@ -944,7 +944,7 @@ sub _find_dir($$$) {
 			# HACK: replace push to preserve dir traversal order
 			#push @Stack,[$CdLvl,$dir_name,$FN,$sub_nlink];
 			splice @Stack, $stack_top, 0,
-			         [$CdLvl,$dir_name,$FN,$sub_nlink];
+			         \@($CdLvl,$dir_name,$FN,$sub_nlink);
 		    }
 		    else {
 			$name = $dir_pref . $FN; # $File::Find::name
@@ -1033,7 +1033,7 @@ sub _find_dir($$$) {
 		{ $wanted_callback->() }; # protect against wild "next"
 	     }
 	     else {
-		push @Stack,[$CdLvl,$p_dir,$dir_rel,-1]  if  $bydepth;
+		push @Stack,\@($CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth;
 		last;
 	    }
 	}
@@ -1054,7 +1054,7 @@ sub _find_dir_symlnk($$$) {
     my @filenames;
     my $new_loc;
     my $updir_loc = $dir_loc; # untainted parent directory
-    my $SE = [];
+    my $SE = \@();
     my $dir_name = $p_dir;
     my $dir_pref;
     my $loc_pref;
@@ -1096,7 +1096,7 @@ sub _find_dir_symlnk($$$) {
 	}
     }
 
-    push @Stack,[$dir_loc,$updir_loc,$p_dir,$dir_rel,-1]  if  $bydepth;
+    push @Stack,\@($dir_loc,$updir_loc,$p_dir,$dir_rel,-1)  if  $bydepth;
 
     if ($Is_MacOS) {
 	$p_dir = $dir_pref; # ensure trailing ':'
@@ -1196,7 +1196,7 @@ sub _find_dir_symlnk($$$) {
 		    $new_loc =~ s/\.dir\z//i;
 		    $new_loc =~ s#\.$## if ($new_loc ne '.');
 		}
-		push @Stack,[$new_loc,$updir_loc,$dir_name,$FN,1];
+		push @Stack,\@($new_loc,$updir_loc,$dir_name,$FN,1);
 	    }
 	    else {
 		$fullname = $new_loc; # $File::Find::fullname
@@ -1254,7 +1254,7 @@ sub _find_dir_symlnk($$$) {
 		{ $wanted_callback->() }; # protect against wild "next"
 	    }
 	    else {
-		push @Stack,[$dir_loc, $updir_loc, $p_dir, $dir_rel,-1]  if  $bydepth;
+		push @Stack,\@($dir_loc, $updir_loc, $p_dir, $dir_rel,-1)  if  $bydepth;
 		last;
 	    }
 	}
@@ -1276,7 +1276,7 @@ sub wrap_wanted {
 	return $wanted;
     }
     else {
-	return { wanted => $wanted };
+	return \%( wanted => $wanted );
     }
 }
 

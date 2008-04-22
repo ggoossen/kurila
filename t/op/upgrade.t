@@ -19,7 +19,7 @@ my %types = (
     null => $null,
     iv => 3,
     nv => .5,
-    rv => [],
+    rv => \@(),
     pv => "Perl rules",
     pviv => 3,
     pvnv => 1==1,
@@ -38,7 +38,7 @@ plan tests => @keys * @keys;
 foreach my $source_type (@keys) {
     foreach my $dest_type (@keys) {
 	# Pads re-using variables might contaminate this
-	my $vars = {};
+	my $vars = \%();
 	$vars->{dest} = %types{$dest_type};
 	$vars->{source} = %types{$source_type};
 	# The assignment can potentially trigger assertion failures, so it's

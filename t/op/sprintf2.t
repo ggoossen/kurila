@@ -41,7 +41,7 @@ for my $i (1, 3, 5, 10) {
 fresh_perl_is(
     'print sprintf "xxx\%n\n"; print undef',
     'Modification of a read-only value attempted at - line 1.',
-    { switches => [ '-w' ] },
+    \%( switches => \@( '-w' ) ),
     q(%n should not be able to modify read-only constants),
 );
 

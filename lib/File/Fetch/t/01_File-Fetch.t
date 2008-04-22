@@ -48,70 +48,70 @@ if( $File::Fetch::DEBUG ) {
 ### _parse_uri tests
 ### these go on all platforms
 my @map = (
-    {   uri     => 'ftp://cpan.org/pub/mirror/index.txt',
+    \%(   uri     => 'ftp://cpan.org/pub/mirror/index.txt',
         scheme  => 'ftp',
         host    => 'cpan.org',
         path    => '/pub/mirror/',
         file    => 'index.txt'
-    },
-    {	uri	    => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM',
+    ),
+    \%(	uri	    => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM',
         scheme	=> 'rsync',
         host	=> 'cpan.pair.com',
         path	=> '/CPAN/',
         file	=> 'MIRRORING.FROM',
-    },
-    {   uri     => 'http://localhost/tmp/index.txt',
+    ),
+    \%(   uri     => 'http://localhost/tmp/index.txt',
         scheme  => 'http',
         host    => 'localhost',          # host is empty only on 'file://' 
         path    => '/tmp/',
         file    => 'index.txt',
-    },  
+    ),  
     
     ### only test host part, the rest is OS dependant
-    {   uri     => 'file://localhost/tmp/index.txt',
+    \%(   uri     => 'file://localhost/tmp/index.txt',
         host    => '',                  # host should be empty on 'file://'
-    },        
+    ),        
 );
 
 ### these only if we're not on win32/vms
 push @map, (
-    {   uri     => 'file:///usr/local/tmp/foo.txt',
+    \%(   uri     => 'file:///usr/local/tmp/foo.txt',
         scheme  => 'file',
         host    => '',
         path    => '/usr/local/tmp/',
         file    => 'foo.txt',
-    },
-    {   uri     => 'file://hostname/tmp/foo.txt',
+    ),
+    \%(   uri     => 'file://hostname/tmp/foo.txt',
         scheme  => 'file',
         host    => 'hostname',
         path    => '/tmp/',
         file    => 'foo.txt',
-    },    
+    ),    
 ) if not &File::Fetch::ON_WIN and not &File::Fetch::ON_VMS;
 
 ### these only on win32
 push @map, (
-    {   uri     => 'file:////hostname/share/tmp/foo.txt',
+    \%(   uri     => 'file:////hostname/share/tmp/foo.txt',
         scheme  => 'file',
         host    => 'hostname',
         share   => 'share',
         path    => '/tmp/',
         file    => 'foo.txt',
-    },
-    {   uri     => 'file:///D:/tmp/foo.txt',
+    ),
+    \%(   uri     => 'file:///D:/tmp/foo.txt',
         scheme  => 'file',
         host    => '',
         vol     => 'D:',
         path    => '/tmp/',
         file    => 'foo.txt',
-    },    
-    {   uri     => 'file:///D|/tmp/foo.txt',
+    ),    
+    \%(   uri     => 'file:///D|/tmp/foo.txt',
         scheme  => 'file',
         host    => '',
         vol     => 'D:',
         path    => '/tmp/',
         file    => 'foo.txt',
-    },    
+    ),    
 ) if &File::Fetch::ON_WIN;
 
 
@@ -194,7 +194,7 @@ sub _fetch_uri {
     
         ### stupid warnings ###
         $File::Fetch::METHODS =
-        $File::Fetch::METHODS = { $type => [$method] };
+        $File::Fetch::METHODS = \%( $type => \@($method) );
     
         my $ff  = File::Fetch->new( uri => $uri );
     

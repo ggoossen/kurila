@@ -376,21 +376,21 @@ is($b, "_<oups1
   use overload nomethod => \&wrap, '""' => \&str, '0+' => \&num,
       '=' => \&cpy, '++' => \&inc, '--' => \&dec;
 
-  sub new { shift; bless ['n', @_] }
+  sub new { shift; bless \@('n', @_) }
   sub cpy {
     my $self = shift;
-    bless [@$self], ref $self;
+    bless \@(@$self), ref $self;
   }
-  sub inc { @_[0] = bless ['++', @_[0], 1]; }
-  sub dec { @_[0] = bless ['--', @_[0], 1]; }
+  sub inc { @_[0] = bless \@('++', @_[0], 1); }
+  sub dec { @_[0] = bless \@('--', @_[0], 1); }
   sub wrap {
     my ($obj, $other, $inv, $meth) = @_;
     if ($meth eq '++' or $meth eq '--') {
-      @$obj = ($meth, (bless [@$obj]), 1); # Avoid circular reference
+      @$obj = ($meth, (bless \@(@$obj)), 1); # Avoid circular reference
       return $obj;
     }
     ($obj, $other) = ($other, $obj) if $inv;
-    bless [$meth, $obj, $other];
+    bless \@($meth, $obj, $other);
   }
   sub str {
     my ($meth, $a, $b) = @{+shift};
@@ -499,19 +499,19 @@ is($b, "_<oups1
   # Mutator inc/dec
   use overload nomethod => \&wrap, '""' => \&str, '0+' => \&num, '=' => \&cpy;
 
-  sub new { shift; bless ['n', @_] }
+  sub new { shift; bless \@('n', @_) }
   sub cpy {
     my $self = shift;
-    bless [@$self], ref $self;
+    bless \@(@$self), ref $self;
   }
   sub wrap {
     my ($obj, $other, $inv, $meth) = @_;
     if ($meth eq '++' or $meth eq '--') {
-      @$obj = ($meth, (bless [@$obj]), 1); # Avoid circular reference
+      @$obj = ($meth, (bless \@(@$obj)), 1); # Avoid circular reference
       return $obj;
     }
     ($obj, $other) = ($other, $obj) if $inv;
-    bless [$meth, $obj, $other];
+    bless \@($meth, $obj, $other);
   }
   sub str {
     my ($meth, $a, $b) = @{+shift};
@@ -618,7 +618,7 @@ is($b, "_<oups1
 {
   package two_face;		# Scalars with separate string and
                                 # numeric values.
-  sub new { my $p = shift; bless [@_], $p }
+  sub new { my $p = shift; bless \@(@_), $p }
   use overload '""' => \&str, '0+' => \&num, fallback => 1;
   sub num {shift->[1]}
   sub str {shift->[0]}
@@ -688,12 +688,12 @@ else {
   sub sderef {shift->deref('s')}
 }
 {
-  my $deref = bless { h => { foo => 5 , fake => 23 },
-		      c => sub {return shift() + 34},
-		      's' => \123,
-		      a => [11..13],
-		      g => \*srt,
-		    }, 'deref';
+  my $deref = bless \%( h => \%( foo => 5 , fake => 23 ),
+                        c => sub {return shift() + 34},
+                        's' => \123,
+                        a => \@(11..13),
+                        g => \*srt,
+                      ), 'deref';
   # Hash:
   my @cont = sort %$deref;
   if ("\t" eq "\011") { # ASCII
@@ -720,8 +720,8 @@ else {
   is(&$deref(6), 40);
   sub xxx_goto { goto &$deref }
   is(xxx_goto(7), 41);
-  my $srt = bless { c => sub {$b <+> $a}
-		  }, 'deref';
+  my $srt = bless \%( c => sub {$b <+> $a}
+                    ), 'deref';
   *srt = \&$srt;
   my @sorted = sort srt 11, 2, 5, 1, 22;
   is("@sorted", '22 11 5 2 1');
@@ -741,8 +741,8 @@ else {
   $l = 1;
   is($deref->[$l], '12');
   # Repeated dereference
-  my $double = bless { h => $deref,
-		     }, 'deref';
+  my $double = bless \%( h => $deref,
+                       ), 'deref';
   is($double->{foo}, 5);
 }
 
@@ -751,7 +751,7 @@ else {
   use overload '%{}' => \&gethash, '@{}' => sub { ${shift()} };
   sub new { 
     my $p = shift; 
-    bless \ [@_], $p;
+    bless \\@(@_), $p;
   }
   sub gethash {
     my %h;
@@ -801,10 +801,10 @@ is($bar->[3], 13);
                '@{}' => sub { ${shift()}->[0] };
   sub new { 
     my $p = shift; 
-    my $a = [@_];
+    my $a = \@(@_);
     my %h;
     tie %h, $p, $a;
-    bless \ [$a, \%h], $p;
+    bless \\@($a, \%h), $p;
   }
   sub gethash {
     my %h;
@@ -868,7 +868,7 @@ unless ($aaa) {
 { my $c = 0;
   package Join;
   use overload '""' => sub { $c++ };
-  my $x = join '', bless([]), 'pq', bless([]);
+  my $x = join '', bless(\@()), 'pq', bless(\@());
   main::is $x, '0pq1';
 };
 
@@ -912,18 +912,18 @@ unless ($aaa) {
   use overload '""'    => sub { 3+shift->[0] },
                '0+'    => sub { 10+shift->[0] },
                'int'   => sub { 100+shift->[0] };
-  sub new {my $p = shift; bless [shift], $p}
+  sub new {my $p = shift; bless \@(shift), $p}
 
   package ov_int2;
   use overload '""'    => sub { 5+shift->[0] },
                '0+'    => sub { 30+shift->[0] },
                'int'   => sub { 'ov_int1'->new(1000+shift->[0]) };
-  sub new {my $p = shift; bless [shift], $p}
+  sub new {my $p = shift; bless \@(shift), $p}
 
   package noov_int;
   use overload '""'    => sub { 2+shift->[0] },
                '0+'    => sub { 9+shift->[0] };
-  sub new {my $p = shift; bless [shift], $p}
+  sub new {my $p = shift; bless \@(shift), $p}
 
   package main;
 
@@ -946,7 +946,7 @@ unless ($aaa) {
                '0+'    => sub { shift },
                'bool'  => sub { shift },
                fallback => 1;
-  my $x = bless([]);
+  my $x = bless(\@());
   # For some reason beyond me these have to be oks rather than likes.
   eval { "$x" };
   main::like($@->message, qr/reference as string/);
@@ -970,7 +970,7 @@ sub is_zero
 sub new
   {
   my $class = shift;
-  my $self =  {};
+  my $self =  \%();
   $self->{var} = shift;
   bless $self,$class;
   }
@@ -993,7 +993,7 @@ use overload
 sub new
   {
     my $class = shift;
-    my $self =  {};
+    my $self =  \%();
     $self->{var} = shift;
     bless $self,$class;
   }
@@ -1012,7 +1012,7 @@ package Hderef;
 use overload '%{}' => sub { (caller(0))[0] eq 'Foo' ? @_[0] : die "zap" };
 package Foo;
 @Foo::ISA = 'Hderef';
-sub new { bless {}, shift }
+sub new { bless \%(), shift }
 sub xet { @_ == 2 ? @_[0]->{@_[1]} :
 	  @_ == 3 ? (@_[0]->{@_[1]} = @_[2]) : undef }
 package main;
@@ -1068,12 +1068,12 @@ like ($@->{description}, qr/zap/);
     package perl31793_fb;
     use overload cmp => sub { 0 }, fallback => 1;
     package main;
-    my $o  = bless [], 'perl31793';
-    my $of = bless [], 'perl31793_fb';
-    my $no = bless [], 'no_overload';
+    my $o  = bless \@(), 'perl31793';
+    my $of = bless \@(), 'perl31793_fb';
+    my $no = bless \@(), 'no_overload';
     like(overload::StrVal(\"scalar"), qr/^SCALAR\(0x[0-9a-f]+\)$/);
-    like(overload::StrVal([]),        qr/^ARRAY\(0x[0-9a-f]+\)$/);
-    like(overload::StrVal({}),        qr/^HASH\(0x[0-9a-f]+\)$/);
+    like(overload::StrVal(\@()),        qr/^ARRAY\(0x[0-9a-f]+\)$/);
+    like(overload::StrVal(\%()),        qr/^HASH\(0x[0-9a-f]+\)$/);
     like(overload::StrVal(sub{1}),    qr/^CODE\(0x[0-9a-f]+\)$/);
     like(overload::StrVal(\*GLOB),    qr/^GLOB\(0x[0-9a-f]+\)$/);
     like(overload::StrVal(\$o),       qr/^REF\(0x[0-9a-f]+\)$/);
@@ -1110,15 +1110,15 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
 	use overload
 	    '""' => sub { "^@_[0][0]\$" },
 	    '.'  => sub { 
-		    bless [
+		    bless \@(
 			     @_[2]
 			    ? (ref @_[1] ? @_[1][0] : @_[1]) . ':' .@_[0][0] 
 			    : @_[0][0] . ':' . (ref @_[1] ? @_[1][0] : @_[1])
-		    ], 'Foo493'
+		    ), 'Foo493'
 			};
     }
 
-    my $a = bless [ "a" ], 'Foo493';
+    my $a = bless \@( "a" ), 'Foo493';
     like('a', qr/$a/);
     like('x:a', qr/x$a/);
     like('x:a:=', qr/x$a=$/);
@@ -1162,15 +1162,15 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     package main;
 
     my $obj;
-    $obj = bless {name => 'cool'}, 'Sklorsh';
+    $obj = bless \%(name => 'cool'), 'Sklorsh';
     $obj->delete;
     ok(eval {if ($obj) {1}; 1}, $@ || 'reblessed into nonexistent namespace');
 
-    $obj = bless {name => 'cool'}, 'Sklorsh';
+    $obj = bless \%(name => 'cool'), 'Sklorsh';
     $obj->delete_with_self;
     ok (eval {if ($obj) {1}; 1}, $@);
     
-    my $a = $b = {name => 'hot'};
+    my $a = $b = \%(name => 'hot');
     bless $b, 'Sklorsh';
     is(ref $a, 'Sklorsh');
     is(ref $b, 'Sklorsh');
@@ -1254,12 +1254,12 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     local $^W = 1;
     local $^WARN_HOOK = sub { $warning = @_[0] };
 
-    my $f = bless [], 'nomethod_false';
+    my $f = bless \@(), 'nomethod_false';
     ($warning, $method) = ("", "");
     is($f eq 'whatever', 0, 'nomethod makes eq return 0');
     is($method, 'nomethod');
 
-    my $t = bless [], 'nomethod_true';
+    my $t = bless \@(), 'nomethod_true';
     ($warning, $method) = ("", "");
     is($t eq 'whatever', 'true', 'nomethod makes eq return "true"');
     is($method, 'nomethod');
@@ -1269,7 +1269,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
         package nomethod_false;
         use overload cmp => sub { $method = 'cmp'; 0 };
     };
-    $f = bless [], 'nomethod_false';
+    $f = bless \@(), 'nomethod_false';
     ($warning, $method) = ("", "");
     ok($f eq 'whatever', 'eq falls back to cmp (nomethod not called)');
     is($method, 'cmp');
@@ -1278,7 +1278,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
         package nomethod_true;
         use overload cmp => sub { $method = 'cmp'; 'true' };
     };
-    $t = bless [], 'nomethod_true';
+    $t = bless \@(), 'nomethod_true';
     ($warning, $method) = ("", "");
     ok($t eq 'whatever', 'eq falls back to cmp (nomethod not called)');
     is($method, 'cmp');
@@ -1334,22 +1334,22 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     package numify_self;
     use overload "0+" => sub { @_[0][0]++; @_[0] };
     package numify_other;
-    use overload "0+" => sub { @_[0][0]++; @_[0][1] = bless [], 'numify_int' };
+    use overload "0+" => sub { @_[0][0]++; @_[0][1] = bless \@(), 'numify_int' };
     package numify_by_fallback;
     use overload fallback => 1;
 
     package main;
-    my $o = bless [], 'numify_int';
+    my $o = bless \@(), 'numify_int';
     is(int($o), 42, 'numifies to integer');
     is($o->[0], 1, 'int() numifies only once');
 
-    my $aref = [];
+    my $aref = \@();
     my $num_val = int($aref);
     my $r = bless $aref, 'numify_self';
     is(int($r), $num_val, 'numifies to self');
     is($r->[0], 1, 'int() numifies once when returning self');
 
-    my $s = bless [], 'numify_other';
+    my $s = bless \@(), 'numify_other';
     is(int($s), 42, 'numifies to numification of other object');
     is($s->[0], 1, 'int() numifies once when returning other object');
     is($s->[1][0], 1, 'returned object numifies too');

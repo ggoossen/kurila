@@ -282,8 +282,8 @@ $::LINE = __LINE__ + 1;
   package Foo;
   sub DESTROY	{ my $s = shift; ::is($s->[0], $i, "destroy $i"); }
   sub show	{ ::is(+@_, 5, "show $i",); }
-  sub start	{ push @_, 1, "foo", {}; goto &show; }
-  for (1..3)	{ $i = $_; start(bless([$_]), 'bar'); }
+  sub start	{ push @_, 1, "foo", \%(); goto &show; }
+  for (1..3)	{ $i = $_; start(bless(\@($_)), 'bar'); }
 }
 
 {

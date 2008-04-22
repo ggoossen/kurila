@@ -76,10 +76,10 @@ can_ok( 'ExtUtils::Packlist', 'DESTROY' );
 
 
 # write is a little more complicated
-eval { ExtUtils::Packlist::write({}) };
+eval { ExtUtils::Packlist::write(\%()) };
 like( $@->{description}, qr/No packlist filename/, 'write() should croak without packfile' );
 
-eval { ExtUtils::Packlist::write({}, 'eplist') };
+eval { ExtUtils::Packlist::write(\%(), 'eplist') };
 my $file_is_ready = $@ ? 0 : 1;
 ok( $file_is_ready, 'write() can write a file' );
 
@@ -94,7 +94,7 @@ SKIP: {
 	SKIP: {
 	    skip("cannot write readonly files", 1) if -w 'eplist';
 
-	    eval { ExtUtils::Packlist::write({}, 'eplist') };
+	    eval { ExtUtils::Packlist::write(\%(), 'eplist') };
 	    like( $@->{description}, qr/Can't open file/, 'write() should croak on open failure' );
 	}
 
@@ -102,14 +102,14 @@ SKIP: {
 	chmod 0777, 'eplist';
 
 	# and some test data to be read
-	$pl->{data} = {
+	$pl->{data} = \%(
 		single => 1,
-		hash => {
+		hash => \%(
 			foo => 'bar',
 			baz => 'bup',
-		},
+		),
 		'/./abc' => '',
-	};
+	);
 	eval { ExtUtils::Packlist::write($pl, 'eplist') };
 	is( $@, '', 'write() should normally succeed' );
 	is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
@@ -118,11 +118,11 @@ SKIP: {
 }
 
 
-eval { ExtUtils::Packlist::read({}) };
+eval { ExtUtils::Packlist::read(\%()) };
 like( $@->{description}, qr/^No packlist filename/, 'read() should croak without packfile' );
 
 
-eval { ExtUtils::Packlist::read({}, 'abadfilename') };
+eval { ExtUtils::Packlist::read(\%(), 'abadfilename') };
 like( $@->{description}, qr/^Can't open file/, 'read() should croak with bad packfile name' );
 #'open packfile for reading
 
@@ -147,10 +147,10 @@ SKIP: {
 	ok( exists $pl->{data}{'/abc'}, 'read() should resolve /./ to / in keys' );
 
 	# give validate a valid and an invalid file to find
-	$pl->{data} = {
+	$pl->{data} = \%(
 		eplist => 1,
 		fake => undef,
-	};
+	);
 
 	is( ExtUtils::Packlist::validate($pl), 1,
 		'validate() should find missing files' );
@@ -164,7 +164,7 @@ SKIP: {
 
 
 # packlist_file, $pl should be set from write test
-is( ExtUtils::Packlist::packlist_file({ packfile => 'pl' }), 'pl',
+is( ExtUtils::Packlist::packlist_file(\%( packfile => 'pl' )), 'pl',
 	'packlist_file() should fetch packlist from passed hash' );
 is( ExtUtils::Packlist::packlist_file($pl), 'eplist',
 	'packlist_file() should fetch packlist from ExtUtils::Packlist object' );

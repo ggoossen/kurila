@@ -17,13 +17,13 @@ EOSOL
 
                
 print form
-	 {single=>'='},
+	 \%(single=>'='),
    	 '=   {=""""{*}""""=}   =',
 	 'TOP SECRET', "$text", 'EYES ONLY';
 
 print "\n\n\n";
 
 print form
-	 {single=>'='},
+	 \%(single=>'='),
    	 '=   {=[[[[{*}[[[[[[=}   =',
 	 'TOP SECRET', "$text", 'EYES ONLY';

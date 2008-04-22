@@ -26,7 +26,7 @@ for (@data) {
 	my ($pid, $cmd, $time, $cpu) = split;
 	$cmd =~ s/_/ /g;
 	print form
-		 {single=>'%'},
+		 \%(single=>'%'),
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu, '%';
 }

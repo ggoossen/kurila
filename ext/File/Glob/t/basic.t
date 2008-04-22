@@ -46,7 +46,7 @@ SKIP: {
     if (GLOB_ERROR) {
 	fail(GLOB_ERROR);
     } else {
-	is_deeply (\@a, [$home]);
+	is_deeply (\@a, \@($home));
     }
 }
 
@@ -56,7 +56,7 @@ SKIP: {
 if (GLOB_ERROR) {
     fail(GLOB_ERROR);
 } else {
-    is_deeply(\@a, ['TEST']);
+    is_deeply(\@a, \@('TEST'));
 }
 
 # check nonexistent checks
@@ -65,7 +65,7 @@ if (GLOB_ERROR) {
 @a = bsd_glob("asdfasdf", 0);
 SKIP: {
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare';
-    is_deeply(\@a, []);
+    is_deeply(\@a, \@());
 }
 
 # check bad protections
@@ -83,12 +83,12 @@ SKIP: {
     local $TODO = 'hit VOS bug posix-956' if $^O eq 'vos';
 
     isnt(GLOB_ERROR, 0);
-    is_deeply(\@a, []);
+    is_deeply(\@a, \@());
 }
 
 # check for csh style globbing
 @a = bsd_glob('{a,b}', GLOB_BRACE ^|^ GLOB_NOMAGIC);
-is_deeply(\@a, ['a', 'b']);
+is_deeply(\@a, \@('a', 'b'));
 
 @a = bsd_glob(
     '{TES?,doesntexist*,a,b}',
@@ -102,14 +102,14 @@ is_deeply(\@a, ['a', 'b']);
 
 print "# @a\n";
 
-is_deeply(\@a, [($^O eq 'VMS'? 'test.' : 'TEST'), 'a', 'b']);
+is_deeply(\@a, \@(($^O eq 'VMS'? 'test.' : 'TEST'), 'a', 'b'));
 
 # "~" should expand to $ENV{HOME}
 %ENV{HOME} = "sweet home";
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
 SKIP: {
     skip $^O, 1 if $^O eq "MacOS";
-    is_deeply(\@a, [%ENV{HOME}]);
+    is_deeply(\@a, \@(%ENV{HOME}));
 }
 
 # GLOB_ALPHASORT (default) should sort alphabetically regardless of case
@@ -164,7 +164,7 @@ pass("Don't panic");
 	or die "Could not chdir to $dir: $!";
     my(@glob_files) = glob('a*{d[e]}j');
     local $TODO = "home-made glob doesn't do regexes" if $^O eq 'VMS';
-    is_deeply(\@glob_files, ['a_dej']);
+    is_deeply(\@glob_files, \@('a_dej'));
     chdir $cwd
 	or die "Could not chdir back to $cwd: $!";
 }

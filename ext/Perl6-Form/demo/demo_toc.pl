@@ -7,10 +7,10 @@ for ( ~< *DATA) {
 }
 
 print form
-	 {page=>{width=>51},hfill=>'=-'},
+	 \%(page=>\%(width=>51),hfill=>'=-'),
 	 "\{||||\{*\}|||||\}\n\n",
 	 "[ Table of Contents ]",
-	 {hfill=>' .'},
+	 \%(hfill=>' .'),
 	 "   \{[[[[[\{*\}[[[[[\}\{]]]\}   ",
 	     \@contents,    \@page;
 

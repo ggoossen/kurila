@@ -14,17 +14,17 @@ my @name = (
 
 
 print form
-	 {layout=>'down', bullet=>'.'},
+	 \%(layout=>'down', bullet=>'.'),
 	 "Index  Character     Appears in",
-	 {under=>"_"},
+	 \%(under=>"_"),
 	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
-      [1..@name], \@name,       \@play;
+      \@(1..@name), \@name,       \@play;
 
 print "\n\n=================\n\n";
 
 print form
-	 {layout=>'tabular', bullet=>'.'},
+	 \%(layout=>'tabular', bullet=>'.'),
 	 "Index  Character     Appears in",
-	 {under=>"_"},
+	 \%(under=>"_"),
 	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
-      [1..@name], \@name,       \@play;
+      \@(1..@name), \@name,       \@play;

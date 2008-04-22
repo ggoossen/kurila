@@ -31,11 +31,11 @@ $VERSION = '2.006';
               STATUS_ERROR
           );  
 
-%EXPORT_TAGS = ( Status => [qw( STATUS_OK
+%EXPORT_TAGS = ( Status => \@(qw( STATUS_OK
                                  STATUS_ENDSTREAM
                                  STATUS_EOF
                                  STATUS_ERROR
-                           )]);
+                           )));
 
                        
 use constant STATUS_OK        => 0;
@@ -284,7 +284,7 @@ sub Validator::new
         {
             $obj->validateInputFilenames(@inputs)
                 or return undef;
-            @_[0] = [ @inputs ] ;
+            @_[0] = \@( @inputs ) ;
             %data{inType} = 'filenames' ;
         }
     }
@@ -449,12 +449,12 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-%EXPORT_TAGS{Parse} = [qw( ParseParameters 
+%EXPORT_TAGS{Parse} = \@(qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar
                          )
-                      ];              
+                      );              
 
 push @EXPORT, @{ %EXPORT_TAGS{Parse} } ;
 
@@ -502,9 +502,9 @@ sub IO::Compress::Base::Parameters::new
 {
     my $class = shift ;
 
-    my $obj = { Error => '',
-                Got   => {},
-              } ;
+    my $obj = \%( Error => '',
+                Got   => \%(),
+              ) ;
 
     #return bless $obj, ref($class) || $class || __PACKAGE__ ;
     return bless $obj, 'IO::Compress::Base::Parameters' ;
@@ -578,10 +578,10 @@ sub IO::Compress::Base::Parameters::parse
         $key = lc $key;
 
         if ($firstTime || ! $sticky) {
-            $x = [ $x ]
+            $x = \@( $x )
                 if $type ^&^ Parse_multiple;
 
-            $got->{$key} = [0, $type, $value, $x, $first_only, $sticky] ;
+            $got->{$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
         $got->{$key}[OFF_PARSED] = 0 ;
@@ -618,7 +618,7 @@ sub IO::Compress::Base::Parameters::parse
                 push @{ $got->{$canonkey}[OFF_FIXED] }, $s ;
             }
             else {
-                $got->{$canonkey} = [1, $type, $value, $s] ;
+                $got->{$canonkey} = \@(1, $type, $value, $s) ;
             }
         }
         else
@@ -771,11 +771,11 @@ sub IO::Compress::Base::Parameters::wantValue
 sub IO::Compress::Base::Parameters::clone
 {
     my $self = shift ;
-    my $obj = { };
+    my $obj = \%( );
     my %got ;
 
     while (my ($k, $v) = each %{ $self->{Got} }) {
-        %got{$k} = [ @$v ];
+        %got{$k} = \@( @$v );
     }
 
     $obj->{Error} = $self->{Error};
@@ -805,7 +805,7 @@ sub new
         $low  = shift ;
     }
 
-    bless [$low, $high], $class;
+    bless \@($low, $high), $class;
 }
 
 sub newUnpack_V64
@@ -813,7 +813,7 @@ sub newUnpack_V64
     my $string = shift;
 
     my ($low, $hi) = unpack "V V", $string ;
-    bless [ $low, $hi ], "U64";
+    bless \@( $low, $hi ), "U64";
 }
 
 sub newUnpack_V32
@@ -821,7 +821,7 @@ sub newUnpack_V32
     my $string = shift;
 
     my $low = unpack "V", $string ;
-    bless [ $low, 0 ], "U64";
+    bless \@( $low, 0 ), "U64";
 }
 
 sub reset
@@ -833,7 +833,7 @@ sub reset
 sub clone
 {
     my $self = shift;
-    bless [ @$self ], ref $self ;
+    bless \@( @$self ), ref $self ;
 }
 
 sub getHigh

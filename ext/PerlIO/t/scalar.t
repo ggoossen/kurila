@@ -99,7 +99,7 @@ open $fh, '<', \42;
 is( ~< $fh, "42", "reading from non-string scalars");
 close $fh;
 
-{ package P; sub TIESCALAR {bless{}} sub FETCH { "shazam" } }
+{ package P; sub TIESCALAR {bless \%()} sub FETCH { "shazam" } }
 tie $p, 'P'; open $fh, '<', \$p;
 is( ~< $fh, "shazam", "reading from magic scalars");
 
@@ -132,7 +132,7 @@ is( ~< $fh, "shazam", "reading from magic scalars");
     my $fetch = 0;
     {
         package MgUndef;
-        sub TIESCALAR { bless [] }
+        sub TIESCALAR { bless \@() }
         sub FETCH { $fetch++; return undef }
     }
     tie my $scalar, 'MgUndef';

@@ -121,56 +121,56 @@ SKIP: {
 	}
     }
 
-    check([ PerlIO::get_layers('STDIN') ],
-	  $UTF8_STDIN ? [ "stdio", "utf8" ] : [ "stdio" ],
+    check(\@( PerlIO::get_layers('STDIN') ),
+	  $UTF8_STDIN ? \@( "stdio", "utf8" ) : \@( "stdio" ),
 	  "STDIN");
 
     open(F, ">:crlf", "afile");
 
-    check([ PerlIO::get_layers('F') ],
-	  [ qw(stdio crlf) ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( qw(stdio crlf) ),
 	  "open :crlf");
 
     binmode(F, ":encoding(cp1047)"); 
 
-    check([ PerlIO::get_layers('F') ],
-	  [ qw[stdio crlf encoding(cp1047) utf8] ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( qw[stdio crlf encoding(cp1047) utf8] ),
 	  ":encoding(cp1047)");
     
     binmode(F, ":pop");
 
-    check([ PerlIO::get_layers('F') ],
-	  [ qw(stdio crlf) ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( qw(stdio crlf) ),
 	  ":pop");
 
     binmode(F, ":raw");
 
-    check([ PerlIO::get_layers('F') ],
-	  [ "stdio" ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( "stdio" ),
 	  ":raw");
 
     binmode(F, ":utf8");
 
-    check([ PerlIO::get_layers('F') ],
-	  [ qw(stdio utf8) ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( qw(stdio utf8) ),
 	  ":utf8");
 
     binmode(F, ":bytes");
 
-    check([ PerlIO::get_layers('F') ],
-	  [ "stdio" ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( "stdio" ),
 	  ":bytes");
 
     binmode(F, ":encoding(utf8)");
 
-    check([ PerlIO::get_layers('F') ],
-	    [ qw[stdio encoding(utf8) utf8] ],
+    check(\@( PerlIO::get_layers('F') ),
+	    \@( qw[stdio encoding(utf8) utf8] ),
 	    ":encoding(utf8)");
 
     binmode(F, ":raw :crlf");
 
-    check([ PerlIO::get_layers('F') ],
-	  [ qw(stdio crlf) ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( qw(stdio crlf) ),
 	  ":raw:crlf");
 
     binmode(F, ":raw :encoding(latin1)"); # "latin1" will be canonized
@@ -182,16 +182,16 @@ SKIP: {
 	# Get rid of the args and the flags.
 	splice(@results, 1, 2) if $NONSTDIO;
 
-	check([ @results ],
-	      [ "stdio",    undef,        sub { @_[0] +> 0 },
-		"encoding", "iso-8859-1", sub { @_[0] ^&^ PerlIO::F_UTF8() } ],
+	check(\@( @results ),
+	      \@( "stdio",    undef,        sub { @_[0] +> 0 },
+		"encoding", "iso-8859-1", sub { @_[0] ^&^ PerlIO::F_UTF8() } ),
 	      ":raw:encoding(latin1)");
     }
 
     binmode(F);
 
-    check([ PerlIO::get_layers('F') ],
-	  [ "stdio" ],
+    check(\@( PerlIO::get_layers('F') ),
+	  \@( "stdio" ),
 	  "binmode");
 
     close F;
@@ -202,12 +202,12 @@ SKIP: {
 	open F, "<", "afile";
 	open G, ">", "afile";
 
-	check([ PerlIO::get_layers('F', input  => 1) ],
-	      [ qw(stdio crlf) ],
+	check(\@( PerlIO::get_layers('F', input  => 1) ),
+	      \@( qw(stdio crlf) ),
 	      "use open IN");
 	
-	check([ PerlIO::get_layers('G', output => 1) ],
-	      [ qw[stdio encoding(cp1252) utf8] ],
+	check(\@( PerlIO::get_layers('G', output => 1) ),
+	      \@( qw[stdio encoding(cp1252) utf8] ),
 	      "use open OUT");
 
 	close F;

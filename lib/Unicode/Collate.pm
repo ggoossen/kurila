@@ -96,7 +96,7 @@ use constant CJK_ExtBFin   => 0x2A6D6;
 use constant BMP_Max       => 0xFFFF;
 
 # Logical_Order_Exception in PropList.txt
-my $DefaultRearrange = [ 0x0E40..0x0E44, 0x0EC0..0x0EC4 ];
+my $DefaultRearrange = \@( 0x0E40..0x0E44, 0x0EC0..0x0EC4 );
 
 sub UCA_Version { "14" }
 
@@ -222,7 +222,7 @@ sub checkCollator {
 	}
     }
 
-    defined $self->{rearrange} or $self->{rearrange} = [];
+    defined $self->{rearrange} or $self->{rearrange} = \@();
     ref $self->{rearrange}
 	or croak "$PACKAGE: list for rearrangement must be store in ARRAYREF";
 
@@ -259,7 +259,7 @@ sub checkCollator {
 sub new
 {
     my $class = shift;
-    my $self = bless { @_ }, $class;
+    my $self = bless \%( @_ ), $class;
 
     # If undef is passed explicitly, no file is read.
     $self->{table} = $KeyFile if ! exists $self->{table};
@@ -281,7 +281,7 @@ sub new
     $self->{normalization} = 'NFD'
 	if ! exists $self->{normalization};
     $self->{rearrange} = $self->{rearrangeTable} ||
-	($self->{UCA_Version} +<= 11 ? $DefaultRearrange : [])
+	($self->{UCA_Version} +<= 11 ? $DefaultRearrange : \@())
 	if ! exists $self->{rearrange};
     $self->{backwards} = $self->{backwardsTable}
 	if ! exists $self->{backwards};
@@ -392,7 +392,7 @@ sub parseEntry
 	# if and only if "all" CEs are [.0000.0000.0000].
     }
 
-    $self->{mapping}{$entry} = $is_L3_ignorable ? [] : \@key;
+    $self->{mapping}{$entry} = $is_L3_ignorable ? \@() : \@key;
 
     if (@uv +> 1) {
 	(!$self->{maxlength}{@uv[0]} || $self->{maxlength}{@uv[0]} +< @uv)
@@ -564,7 +564,7 @@ sub splitEnt
 	    next;
 	}
 
-	push @buf, $wLen ? [$jcps, $i_orig, $i + 1] : $jcps;
+	push @buf, $wLen ? \@($jcps, $i_orig, $i + 1) : $jcps;
     }
     return \@buf;
 }
@@ -682,7 +682,7 @@ sub getSortKey
     }
 
     # make sort key
-    my @ret = ([],[],[],[]);
+    my @ret = (\@(),\@(),\@(),\@());
     my $last_is_variable;
 
     foreach my $vwt (@buf) {
@@ -748,7 +748,7 @@ sub sort {
     return
 	map { $_->[1] }
 	    sort{ $a->[0] cmp $b->[0] }
-		map [ $obj->getSortKey($_), $_ ], @_;
+		map \@( $obj->getSortKey($_), $_ ), @_;
 }
 
 
@@ -926,7 +926,7 @@ sub index
     if (! @$subE) {
 	my $temp = $pos +<= 0 ? 0 : $len +<= $pos ? $len : $pos;
 	return $grob
-	    ? map([$_, 0], $temp..$len)
+	    ? map(\@($_, 0), $temp..$len)
 	    : wantarray ? ($temp,0) : $temp;
     }
     $len +< $pos
@@ -958,7 +958,7 @@ sub index
 	if (@subWt && !$var && !@wt[0]) {
 	    push @{ @subWt[-1] }, \@wt if $to_be_pushed;
 	} else {
-	    push @subWt, [ \@wt ];
+	    push @subWt, \@( \@wt );
 	}
     }
 
@@ -992,7 +992,7 @@ sub index
 		    push @{ @strWt[-1] }, \@wt if $to_be_pushed;
 		    @finPos[-1] = $strE->[$i][2];
 		} elsif ($to_be_pushed) {
-		    push @strWt, [ \@wt ];
+		    push @strWt, \@( \@wt );
 		    push @iniPos, $found_base ? NOMATCHPOS : $strE->[$i][1];
 		    @finPos[-1] = NOMATCHPOS if $found_base;
 		    push @finPos, $strE->[$i][2];
@@ -1011,7 +1011,7 @@ sub index
 		my $temp = @iniPos[0] + $pos;
 
 		if ($grob) {
-		    push @g_ret, [$temp, @finPos[(@subWt-1)] - @iniPos[0]];
+		    push @g_ret, \@($temp, @finPos[(@subWt-1)] - @iniPos[0]);
 		    splice @strWt,  0, (@subWt-1);
 		    splice @iniPos, 0, (@subWt-1);
 		    splice @finPos, 0, (@subWt-1);

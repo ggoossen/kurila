@@ -88,10 +88,10 @@ for any reason, C<new()> returns undef.
 
 =cut
 
-my $tmpl = {
-    _data   => [ ],
+my $tmpl = \%(
+    _data   => \@( ),
     _file   => 'Unknown',
-};
+);
 
 ### install get/set accessors for this object.
 for my $key ( keys %$tmpl ) {
@@ -109,7 +109,7 @@ sub new {
 
     ### copying $tmpl here since a shallow copy makes it use the
     ### same aref, causing for files to remain in memory always.
-    my $obj = bless { _data => [ ], _file => 'Unknown' }, $class;
+    my $obj = bless \%( _data => \@( ), _file => 'Unknown' ), $class;
 
     if (@_) {
         unless ( $obj->read( @_ ) ) {
@@ -173,7 +173,7 @@ sub read {
     my $self = shift;
     my $file = shift;
     my $gzip = shift || 0;
-    my $opts = shift || {};
+    my $opts = shift || \%();
 
     unless( defined $file ) {
         $self->_error( qq[No file to read from!] );
@@ -233,7 +233,7 @@ sub _get_handle {
 sub _read_tar {
     my $self    = shift;
     my $handle  = shift or return;
-    my $opts    = shift || {};
+    my $opts    = shift || \%();
 
     my $count   = $opts->{limit}    || 0;
     my $extract = $opts->{extract}  || 0;
@@ -242,7 +242,7 @@ sub _read_tar {
     my $limit   = 0;
     $limit = 1 if $count +> 0;
 
-    my $tarfile = [ ];
+    my $tarfile = \@( );
     my $chunk;
     my $read = 0;
     my $real_name;  # to set the name of a file when
@@ -790,7 +790,7 @@ arguments.
 
 sub list_files {
     my $self = shift;
-    my $aref = shift || [ ];
+    my $aref = shift || \@( );
 
     unless( $self->_data ) {
         $self->read() or return;
@@ -809,7 +809,7 @@ sub list_files {
         ### this does the same as the above.. just needs a +{ }
         ### to make sure perl doesn't confuse it for a block
         return map {    my $o=$_;
-                        +{ map { $_ => $o->?$_() } @$aref }
+                        +\%( map { $_ => $o->?$_() } @$aref )
                     } @{$self->_data};
     }
 }
@@ -921,7 +921,7 @@ sub remove {
     my %seen = map { $_->full_path => $_ } @{$self->_data};
     delete %seen{ $_ } for @list;
 
-    $self->_data( [values %seen] );
+    $self->_data( \@(values %seen) );
 
     return values %seen;
 }
@@ -937,7 +937,7 @@ only has effect on the object, not the underlying tarfile.
 sub clear {
     my $self = shift or return;
 
-    $self->_data( [] );
+    $self->_data( \@() );
     $self->_file( '' );
 
     return 1;
@@ -1037,7 +1037,7 @@ sub write {
             my $longlink = Archive::Tar::File->new(
                             data => LONGLINK_NAME,
                             $clone->full_path,
-                            { type => LONGLINK }
+                            \%( type => LONGLINK )
                         );
 
             unless( $longlink ) {
@@ -1482,7 +1482,7 @@ sub extract_archive {
 
     my $tar = $class->new( ) or return;
 
-    return $tar->read( $file, $gzip, { extract => 1 } );
+    return $tar->read( $file, $gzip, \%( extract => 1 ) );
 }
 
 =head2 Archive::Tar->can_handle_compressed_files

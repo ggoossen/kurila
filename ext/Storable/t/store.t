@@ -14,7 +14,7 @@ plan tests => 19;
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, 'CLASS';
+$c = bless \%(), 'CLASS';
 $c->{attribute} = 'attrval';
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
@@ -32,7 +32,7 @@ is_deeply($root, \@a);
 package FOO; @ISA = qw(Storable);
 
 sub make {
-	my $self = bless {};
+	my $self = bless \%();
 	$self->{key} = \%main::a;
 	return $self;
 };

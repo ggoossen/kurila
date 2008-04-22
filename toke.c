@@ -297,6 +297,7 @@ static struct debug_tokens {
     { ANDAND,		TOKENTYPE_NONE,		"ANDAND" },
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
     { ANONSUB,		TOKENTYPE_IVAL,		"ANONSUB" },
+    { ANONARY,		TOKENTYPE_IVAL,		"ANONARY" },
     { ARROW,		TOKENTYPE_NONE,		"ARROW" },
     { ASSIGNOP,		TOKENTYPE_OPNUM,	"ASSIGNOP" },
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
@@ -3746,6 +3747,9 @@ Perl_yylex(pTHX)
 	    TOKEN(ASLICE);
 	    /* NOT REACHED */
 	}
+	if (PL_expect != XOPERATOR) {
+	    yyerror("'[...]' should be '\\@(...)'");
+	}
 	PL_lex_brackets++;
 	OPERATOR('[');
     case ',':
@@ -3953,7 +3957,7 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
 	    else
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
-	    OPERATOR(HASHBRACK);
+	    yyerror("'{' should be '\%(' expected");
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
@@ -4015,7 +4019,7 @@ Perl_yylex(pTHX)
 			yyerror("syntax error");
 			break;
 		    }
-		    OPERATOR(HASHBRACK);
+		    yyerror("'{' should be '\%(' expected");
 		}
 		/* This hack serves to disambiguate a pair of curlies
 		 * as being a block or an anon hash.  Normally, expectation
@@ -4059,7 +4063,7 @@ Perl_yylex(pTHX)
 			    t++;
 			/* check for q => */
 			if (t+1 < PL_bufend && t[0] == '=' && t[1] == '>') {
-			    OPERATOR(HASHBRACK);
+			    yyerror("'{' should be '\%(' expected");
 			}
 			term = *t;
 			open = term;
@@ -4101,7 +4105,7 @@ Perl_yylex(pTHX)
 		/* XXX it could be a comma expression with loop modifiers */
 		if (t < PL_bufend && ((*t == ',' && (*s == 'q' || !isLOWER(*s)))
 				   || (*t == '=' && t[1] == '>')))
-		    OPERATOR(HASHBRACK);
+		    yyerror("'{' should be '\%(' expected");
 		if (PL_expect == XREF)
 		    PL_expect = XTERM;
 		else {
@@ -4391,6 +4395,7 @@ Perl_yylex(pTHX)
     case '@':
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
+
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
 	if (!PL_tokenbuf[1]) {
@@ -4481,6 +4486,7 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR) {
 	    no_op("String",s);
 	}
+	
 	if (!s)
 	    missingterminator(NULL);
 	DEBUG_T( { printbuf("### Saw string before %s\n", s); } );
@@ -4518,6 +4524,18 @@ Perl_yylex(pTHX)
 	TERM(sublex_start(pl_yylval.ival, PL_lex_op));
 
     case '\\':
+	if (PL_expect != XOPERATOR) {
+	    if (s[1] == '@' && s[2] == '(') {
+		/* anon array constructor */
+		s += 3;
+		OPERATOR(ANONARY);
+	    }
+	    if (s[1] == '%' && s[2] == '(') {
+		/* anon hash constructor */
+		s += 3;
+		OPERATOR(ANONHSH);
+	    }
+	}
 	s++;
 	if (PL_lex_inwhat && isDIGIT(*s) && ckWARN(WARN_SYNTAX))
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),"Can't use \\%c to mean $%c in expression",

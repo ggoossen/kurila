@@ -9,7 +9,7 @@ $foo = 3;
 
 package xyz;
 
-sub new {bless [];}
+sub new {bless \@();}
 
 $bar = 4;
 

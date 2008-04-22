@@ -63,10 +63,10 @@ SKIP: {
 }
 
 # make a Term::Cap "object"
-my $t = {
+my $t = \%(
 	PADDING => 1,
 	_pc => 'pc',
-};
+);
 bless($t, 'Term::Cap' );
 
 # see if Tpad() works
@@ -97,7 +97,7 @@ local $^WARN_HOOK = sub {
 
 # test the first few features by forcing Tgetent() to croak (line 156)
 undef %ENV{TERM};
-my $vals = {};
+my $vals = \%();
 eval { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
 like( $@->{description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
 like( $warn, qr/OSPEED was not set/, 'Tgetent() should set default OSPEED' );

@@ -388,31 +388,31 @@ EXPECT
 :alias cannot use existing pragma :full \(reversed order\?\) at
 ########
 # alias with hashref but no :full
-use charnames ":alias" => { e_ACUTE => "LATIN SMALL LETTER E WITH ACUTE" };
+use charnames ":alias" => \%( e_ACUTE => "LATIN SMALL LETTER E WITH ACUTE" );
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 Unknown charname 'LATIN SMALL LETTER E WITH ACUTE' at
 ########
 # alias with hashref but with :short
-use charnames ":short", ":alias" => { e_ACUTE => "LATIN SMALL LETTER E WITH ACUTE" };
+use charnames ":short", ":alias" => \%( e_ACUTE => "LATIN SMALL LETTER E WITH ACUTE" );
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 Unknown charname 'LATIN SMALL LETTER E WITH ACUTE' at
 ########
 # alias with hashref to :full OK
-use charnames ":full", ":alias" => { e_ACUTE => "LATIN SMALL LETTER E WITH ACUTE" };
+use charnames ":full", ":alias" => \%( e_ACUTE => "LATIN SMALL LETTER E WITH ACUTE" );
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 $
 ########
 # alias with hashref to :short but using :full
-use charnames ":full", ":alias" => { e_ACUTE => "LATIN:e WITH ACUTE" };
+use charnames ":full", ":alias" => \%( e_ACUTE => "LATIN:e WITH ACUTE" );
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 Unknown charname 'LATIN:e WITH ACUTE' at
 ########
 # alias with hashref to :short OK
-use charnames ":short", ":alias" => { e_ACUTE => "LATIN:e WITH ACUTE" };
+use charnames ":short", ":alias" => \%( e_ACUTE => "LATIN:e WITH ACUTE" );
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 $
@@ -424,58 +424,58 @@ EXPECT
 unicore/e_ACUTE_alias.pl cannot be used as alias file for charnames at
 ########
 # alias with arrayref
-use charnames ":short", ":alias" => [ e_ACUTE => "LATIN:e WITH ACUTE" ];
+use charnames ":short", ":alias" => \@( e_ACUTE => "LATIN:e WITH ACUTE" );
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 Only HASH reference supported as argument to :alias at
 ########
 # alias with bad hashref
-use charnames ":short", ":alias" => { e_ACUTE => "LATIN:e WITH ACUTE", "a_ACUTE" };
+use charnames ":short", ":alias" => \%( e_ACUTE => "LATIN:e WITH ACUTE", "a_ACUTE" );
 "Here: \N{e_ACUTE}\N{a_ACUTE}!\n";
 EXPECT
 Use of uninitialized value
 ########
 # alias with hashref two aliases
-use charnames ":short", ":alias" => {
+use charnames ":short", ":alias" => \%(
     e_ACUTE => "LATIN:e WITH ACUTE",
     a_ACUTE => "",
-    };
+    );
 "Here: \N{e_ACUTE}\N{a_ACUTE}!\n";
 EXPECT
 Unknown charname '' at
 ########
 # alias with hashref two aliases
-use charnames ":short", ":alias" => {
+use charnames ":short", ":alias" => \%(
     e_ACUTE => "LATIN:e WITH ACUTE",
     a_ACUTE => "LATIN:a WITH ACUTE",
-    };
+    );
 "Here: \N{e_ACUTE}\N{a_ACUTE}!\n";
 EXPECT
 $
 ########
 # alias with hashref using mixed aliasses
-use charnames ":short", ":alias" => {
+use charnames ":short", ":alias" => \%(
     e_ACUTE => "LATIN:e WITH ACUTE",
     a_ACUTE => "LATIN SMALL LETTER A WITH ACUT",
-    };
+    );
 "Here: \N{e_ACUTE}\N{a_ACUTE}!\n";
 EXPECT
 Unknown charname 'LATIN SMALL LETTER A WITH ACUT' at
 ########
 # alias with hashref using mixed aliasses
-use charnames ":short", ":alias" => {
+use charnames ":short", ":alias" => \%(
     e_ACUTE => "LATIN:e WITH ACUTE",
     a_ACUTE => "LATIN SMALL LETTER A WITH ACUTE",
-    };
+    );
 "Here: \N{e_ACUTE}\N{a_ACUTE}!\n";
 EXPECT
 Unknown charname 'LATIN SMALL LETTER A WITH ACUTE' at
 ########
 # alias with hashref using mixed aliasses
-use charnames ":full", ":alias" => {
+use charnames ":full", ":alias" => \%(
     e_ACUTE => "LATIN:e WITH ACUTE",
     a_ACUTE => "LATIN SMALL LETTER A WITH ACUTE",
-    };
+    );
 "Here: \N{e_ACUTE}\N{a_ACUTE}!\n";
 EXPECT
 Unknown charname 'LATIN:e WITH ACUTE' at

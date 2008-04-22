@@ -30,8 +30,8 @@ $v = first { 0 };
 is($v, undef, 'no args');
 
 $v = first { ($_->[1] cmp "e") +<= 0 and ("e" cmp $_->[2]) +<= 0 }
-		[qw(a b c)], [qw(d e f)], [qw(g h i)];
-is_deeply($v, [qw(d e f)], 'reference args');
+		\@(qw(a b c)), \@(qw(d e f)), \@(qw(g h i));
+is_deeply($v, \@(qw(d e f)), 'reference args');
 
 # Check that eval{} inside the block works correctly
 my $i = 0;

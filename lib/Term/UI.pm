@@ -118,14 +118,14 @@ sub get_reply {
     my $term = shift;
     my %hash = @_;
 
-    my $tmpl = {
-        default     => { default => undef,  strict_type => 1 },
-        prompt      => { default => '',     strict_type => 1, required => 1 },
-        choices     => { default => [],     strict_type => 1 },
-        multi       => { default => 0,      allow => [0, 1] },
-        allow       => { default => qr/.*/ },
-        print_me    => { default => '',     strict_type => 1 },
-    };
+    my $tmpl = \%(
+        default     => \%( default => undef,  strict_type => 1 ),
+        prompt      => \%( default => '',     strict_type => 1, required => 1 ),
+        choices     => \%( default => \@(),     strict_type => 1 ),
+        multi       => \%( default => 0,      allow => \@(0, 1) ),
+        allow       => \%( default => qr/.*/ ),
+        print_me    => \%( default => '',     strict_type => 1 ),
+    );
 
     my $args = check( $tmpl, \%hash, $VERBOSE )
                 or ( carp( loc(q[Could not parse arguments]) ), return );
@@ -194,17 +194,17 @@ sub ask_yn {
     my $term = shift;
     my %hash = @_;
 
-    my $tmpl = {
-        default     => { default => undef, allow => [qw|0 1 y n|],
-                                                            strict_type => 1 },
-        prompt      => { default => '', required => 1,      strict_type => 1 },
-        print_me    => { default => '',                     strict_type => 1 },        
-        multi       => { default => 0,                      no_override => 1 },
-        choices     => { default => [qw|y n|],              no_override => 1 },
-        allow       => { default => [qr/^y(?:es)?$/i, qr/^n(?:o)?$/i],
+    my $tmpl = \%(
+        default     => \%( default => undef, allow => \@(qw|0 1 y n|),
+                                                            strict_type => 1 ),
+        prompt      => \%( default => '', required => 1,      strict_type => 1 ),
+        print_me    => \%( default => '',                     strict_type => 1 ),        
+        multi       => \%( default => 0,                      no_override => 1 ),
+        choices     => \%( default => \@(qw|y n|),              no_override => 1 ),
+        allow       => \%( default => \@(qr/^y(?:es)?$/i, qr/^n(?:o)?$/i),
                          no_override => 1
-                       },
-    };
+                       ),
+    );
 
     my $args = check( $tmpl, \%hash, $VERBOSE ) or return undef;
     
@@ -217,7 +217,7 @@ sub ask_yn {
             ### if you supplied the default as a boolean, rather than y/n
             ### transform it to a y/n now
             $args->{default} = $args->{default} =~ m/\d/ 
-                                ? { 0 => 'n', 1 => 'y' }->{ $args->{default} }
+                                ? \%( 0 => 'n', 1 => 'y' )->{ $args->{default} }
                                 : $args->{default};
         
             @list = map { lc $args->{default} eq lc $_
@@ -245,18 +245,18 @@ sub _tt_readline {
 
 
     my ($default, $prompt, $choices, $multi, $allow, $prompt_add, $print_me);
-    my $tmpl = {
-        default     => { default => undef,  strict_type => 1, 
-                            store => \$default },
-        prompt      => { default => '',     strict_type => 1, required => 1,
-                            store => \$prompt },
-        choices     => { default => [],     strict_type => 1, 
-                            store => \$choices },
-        multi       => { default => 0,      allow => [0, 1], store => \$multi },
-        allow       => { default => qr/.*/, store => \$allow, },
-        prompt_add  => { default => '',     store => \$prompt_add },
-        print_me    => { default => '',     store => \$print_me },
-    };
+    my $tmpl = \%(
+        default     => \%( default => undef,  strict_type => 1, 
+                            store => \$default ),
+        prompt      => \%( default => '',     strict_type => 1, required => 1,
+                            store => \$prompt ),
+        choices     => \%( default => \@(),     strict_type => 1, 
+                            store => \$choices ),
+        multi       => \%( default => 0,      allow => \@(0, 1), store => \$multi ),
+        allow       => \%( default => qr/.*/, store => \$allow, ),
+        prompt_add  => \%( default => '',     store => \$prompt_add ),
+        print_me    => \%( default => '',     store => \$print_me ),
+    );
 
     check( $tmpl, \%hash, $VERBOSE ) or return;
 
@@ -400,7 +400,7 @@ sub parse_options {
     my $term    = shift;
     my $input   = shift;
 
-    my $return = {};
+    my $return = \%();
 
     ### there's probably a more elegant way to do this... ###
     while ( $input =~ s/(?:\s+)--?([-\w]+=("|').+?\2)(?=\Z|\s+)//  or

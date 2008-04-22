@@ -279,25 +279,25 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
     title 'Check ExtraField';
 
     my @tests = (
-        [1, ['AB' => '']                   => [['AB'=>'']] ],
-        [1, {'AB' => ''}                   => [['AB'=>'']] ],
-        [1, ['AB' => 'Fred']               => [['AB'=>'Fred']] ],
-        [1, {'AB' => 'Fred'}               => [['AB'=>'Fred']] ],
-        [1, ['Xx' => '','AB' => 'Fred']    => [['Xx' => ''],['AB'=>'Fred']] ],
-        [1, ['Xx' => '','Xx' => 'Fred']    => [['Xx' => ''],['Xx'=>'Fred']] ],
-        [1, ['Xx' => '',
+        \@(1, \@('AB' => '')                   => \@(\@('AB'=>'')) ),
+        \@(1, \%('AB' => '')                   => \@(\@('AB'=>'')) ),
+        \@(1, \@('AB' => 'Fred')               => \@(\@('AB'=>'Fred')) ),
+        \@(1, \%('AB' => 'Fred')               => \@(\@('AB'=>'Fred')) ),
+        \@(1, \@('Xx' => '','AB' => 'Fred')    => \@(\@('Xx' => ''),\@('AB'=>'Fred')) ),
+        \@(1, \@('Xx' => '','Xx' => 'Fred')    => \@(\@('Xx' => ''),\@('Xx'=>'Fred')) ),
+        \@(1, \@('Xx' => '',
              'Xx' => 'Fred', 
-             'Xx' => 'Fred']               => [['Xx' => ''],['Xx'=>'Fred'],
-                                               ['Xx'=>'Fred']] ],
-        [1, [ ['Xx' => 'a'],
-              ['AB' => 'Fred'] ]           => [['Xx' => 'a'],['AB'=>'Fred']] ],
-        [0, {'AB' => 'Fred', 
+             'Xx' => 'Fred')               => \@(\@('Xx' => ''),\@('Xx'=>'Fred'),
+                                               \@('Xx'=>'Fred')) ),
+        \@(1, \@( \@('Xx' => 'a'),
+              \@('AB' => 'Fred') )           => \@(\@('Xx' => 'a'),\@('AB'=>'Fred')) ),
+        \@(0, \%('AB' => 'Fred', 
              'Pq' => 'r', 
-             "\x01\x02" => "\x03"}         => [['AB'=>'Fred'],
-                                               ['Pq'=>'r'], 
-                                               ["\x01\x02"=>"\x03"]] ],
-        [1, ['AB' => 'z' x GZIP_FEXTRA_SUBFIELD_MAX_SIZE] => 
-                            [['AB'=>'z' x GZIP_FEXTRA_SUBFIELD_MAX_SIZE]] ],
+             "\x01\x02" => "\x03")         => \@(\@('AB'=>'Fred'),
+                                               \@('Pq'=>'r'), 
+                                               \@("\x01\x02"=>"\x03")) ),
+        \@(1, \@('AB' => 'z' x GZIP_FEXTRA_SUBFIELD_MAX_SIZE) => 
+                            \@(\@('AB'=>'z' x GZIP_FEXTRA_SUBFIELD_MAX_SIZE)) ),
                 );
 
     foreach my $test (@tests) {
@@ -342,21 +342,21 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
 
     my $prefix = 'Error with ExtraField Parameter: ';
     my @tests = (
-            [ sub{ "abc" }        => "Not a scalar, array ref or hash ref"],
-            [ [ "a" ]             => "Not even number of elements"],
-            [ [ "a" => "fred" ]   => 'SubField ID not two chars long'],
-            [ [ "a\x00" => "fred" ]   => 'SubField ID 2nd byte is 0x00'],
-            [ [ [ {}, "abc" ]]    => "SubField ID is a reference"],
-            [ [ [ "ab", \1 ]]     => "SubField Data is a reference"],
-            [ [ {"a" => "fred"} ] => "Not list of lists"],
-            [ [ ['ab'=>'x'],{"a" => "fred"} ] => "Not list of lists"],
-            [ [ ["aa"] ]          => "SubField must have two parts"],
-            [ [ ["aa", "b", "c"] ] => "SubField must have two parts"],
-            [ [ ["ab" => 'x' x (GZIP_FEXTRA_SUBFIELD_MAX_SIZE + 1) ] ] 
-                                   => "SubField Data too long"],
+            \@( sub{ "abc" }        => "Not a scalar, array ref or hash ref"),
+            \@( \@( "a" )             => "Not even number of elements"),
+            \@( \@( "a" => "fred" )   => 'SubField ID not two chars long'),
+            \@( \@( "a\x00" => "fred" )   => 'SubField ID 2nd byte is 0x00'),
+            \@( \@( \@( \%(), "abc" ))    => "SubField ID is a reference"),
+            \@( \@( \@( "ab", \1 ))     => "SubField Data is a reference"),
+            \@( \@( \%("a" => "fred") ) => "Not list of lists"),
+            \@( \@( \@('ab'=>'x'),\%("a" => "fred") ) => "Not list of lists"),
+            \@( \@( \@("aa") )          => "SubField must have two parts"),
+            \@( \@( \@("aa", "b", "c") ) => "SubField must have two parts"),
+            \@( \@( \@("ab" => 'x' x (GZIP_FEXTRA_SUBFIELD_MAX_SIZE + 1) ) ) 
+                                   => "SubField Data too long"),
 
-            [ { 'abc', 1 }        => "SubField ID not two chars long"],
-            [ { "ab", \1 }     => "SubField Data is a reference"],
+            \@( \%( 'abc', 1 )        => "SubField ID not two chars long"),
+            \@( \%( "ab", \1 )     => "SubField Data is a reference"),
         );
 
     
@@ -378,22 +378,22 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
     # Corrupt ExtraField
 
     my @tests = (
-        ["Sub-field truncated",           
+        \@("Sub-field truncated",           
             "Error with ExtraField Parameter: Truncated in FEXTRA Body Section",
             "Header Error: Truncated in FEXTRA Body Section",
-            ['a', undef, undef]              ],
-        ["Length of field incorrect",     
+            \@('a', undef, undef)              ),
+        \@("Length of field incorrect",     
             "Error with ExtraField Parameter: Truncated in FEXTRA Body Section",
             "Header Error: Truncated in FEXTRA Body Section",
-            ["ab", 255, "abc"]               ],
-        ["Length of 2nd field incorrect", 
+            \@("ab", 255, "abc")               ),
+        \@("Length of 2nd field incorrect", 
             "Error with ExtraField Parameter: Truncated in FEXTRA Body Section",
             "Header Error: Truncated in FEXTRA Body Section",
-            ["ab", 3, "abc"], ["de", 7, "x"] ],
-        ["Length of 2nd field incorrect", 
+            \@("ab", 3, "abc"), \@("de", 7, "x") ),
+        \@("Length of 2nd field incorrect", 
             "Error with ExtraField Parameter: SubField ID 2nd byte is 0x00",
             "Header Error: SubField ID 2nd byte is 0x00",
-            ["a\x00", 3, "abc"], ["de", 7, "x"] ],
+            \@("a\x00", 3, "abc"), \@("de", 7, "x") ),
         );
 
     foreach my $test (@tests)

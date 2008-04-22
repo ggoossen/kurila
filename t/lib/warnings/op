@@ -119,19 +119,19 @@ my (@foo, %foo);
 %foo->{"bar"};
 @main::foo->[23];
 @foo->[23];
-$main::foo = {}; %$main::foo->{"bar"};
-$foo = {}; %$foo->{"bar"};
-$main::foo = []; @$main::foo->[34];
-$foo = []; @$foo->[34];
+$main::foo = \%(); %$main::foo->{"bar"};
+$foo = \%(); %$foo->{"bar"};
+$main::foo = \@(); @$main::foo->[34];
+$foo = \@(); @$foo->[34];
 no warnings 'deprecated';
 %main::foo->{"bar"};
 %foo->{"bar"};
 @main::foo->[23];
 @foo->[23];
-$main::foo = {}; %$main::foo->{"bar"};
-$foo = {}; %$foo->{"bar"};
-$main::foo = []; @$main::foo->[34];
-$foo = []; @$foo->[34];
+$main::foo = \%(); %$main::foo->{"bar"};
+$foo = \%(); %$foo->{"bar"};
+$main::foo = \@(); @$main::foo->[34];
+$foo = \@(); @$foo->[34];
 EXPECT
 Using a hash as a reference is deprecated at - line 4.
 Using a hash as a reference is deprecated at - line 5.
@@ -306,9 +306,9 @@ EXPECT
 ########
 # op.c
 use warnings 'void' ;
-for (@{[0]}) { "$_" }		# check warning isn't duplicated
+for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 no warnings 'void' ;
-for (@{[0]}) { "$_" }		# check warning isn't duplicated
+for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 EXPECT
 Useless use of string in void context at - line 3.
 ########

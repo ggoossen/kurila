@@ -28,10 +28,10 @@ print "1..20\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless {}, 'CLASS';
+$c = bless \%(), 'CLASS';
 $c->{attribute} = $b;
-$d = {};
-$e = [];
+$d = \%();
+$e = \@();
 $d->{'a'} = $e;
 $e->[0] = $d;
 %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
@@ -57,7 +57,7 @@ print "ok 5\n";
 package FOO; @ISA = qw(Storable);
 
 sub make {
-	my $self = bless {};
+	my $self = bless \%();
 	$self->{key} = \%main::a;
 	return $self;
 };
@@ -93,13 +93,13 @@ $root2 = thaw($other);
 print "not " unless &dump($root2) eq &dump($root);
 print "ok 13\n";
 
-$VAR1 = [
+$VAR1 = \@(
 	'method',
 	1,
 	'prepare',
 	q|SELECT table_name, table_owner, num_rows FROM iitables
                   where table_owner != '$ingres' and table_owner != 'DBA'|
-];
+);
 
 $x = nfreeze($VAR1);
 $VAR2 = thaw($x);
@@ -108,7 +108,7 @@ print "ok 14\n";
 
 # Test the workaround for LVALUE bug in perl 5.004_04 -- from Gisle Aas
 sub foo { @_[0] = 1 }
-$foo = [];
+$foo = \@();
 foo($foo->[1]);
 eval { freeze($foo) };
 print "not " if $@;
@@ -129,16 +129,16 @@ eval {
 };
 ok 17, !$@;
 
-freeze {};
+freeze \%();
 eval { thaw $thaw_me };
-eval { $frozen = freeze { foo => {} } };
+eval { $frozen = freeze \%( foo => \%() ) };
 ok 18, !$@;
 
 thaw $frozen;			# used to segfault here
 ok 19, 1;
 
     eval '
-        $a = [undef, undef];
+        $a = \@(undef, undef);
         $b = thaw freeze $a;
         @a = map { exists $a->[$_] } 0 .. @$a-1;
         @b = map { exists $b->[$_] } 0 .. @$b-1;

@@ -174,11 +174,11 @@ run_perl(prog => 'use threads v1.67;' .
                  'sub a{threads->create(shift)} $t = a sub{};' .
                  '$t->tid; $t->join; $t->tid',
          nolib => (%ENV{PERL_CORE}) ? 0 : 1,
-         switches => (%ENV{PERL_CORE}) ? [] : [ '-Mblib' ]);
+         switches => (%ENV{PERL_CORE}) ? \@() : \@( '-Mblib' ));
 is($?, 0, 'coredump in global destruction');
 
 # Attempt to free unreferenced scalar...
-fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via scalar');
+fresh_perl_is(<<'EOI', 'ok', \%(), 'thread sub via scalar');
     use threads;
     my $test = sub {};
     threads->create($test)->join();
@@ -186,7 +186,7 @@ fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via scalar');
 EOI
 
 # Attempt to free unreferenced scalar...
-fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via @_[0]');
+fresh_perl_is(<<'EOI', 'ok', \%(), 'thread sub via @_[0]');
     use threads;
     sub thr { threads->new(@_[0]); }
     thr(sub { })->join;
@@ -194,7 +194,7 @@ fresh_perl_is(<<'EOI', 'ok', { }, 'thread sub via @_[0]');
 EOI
 
 # [perl #45053]  Memory corruption from eval return in void context
-fresh_perl_is(<<'EOI', 'ok', { }, 'void eval return');
+fresh_perl_is(<<'EOI', 'ok', \%(), 'void eval return');
     use threads;
     threads->create(sub { eval '1' });
     $_->join() for threads->list;
@@ -262,7 +262,7 @@ SKIP: {
     {
         my @objs;
         for my $class (qw(A A1 A2 B B1 B2 C C1 C2 D D1)) {
-            push @objs, bless [], $class;
+            push @objs, bless \@(), $class;
         }
 
         sub f {
@@ -279,7 +279,7 @@ SKIP: {
 
     curr_test(curr_test()+2);
     ok(eq_hash(\%c,
-        {
+        \%(
             qw(
                 A-A     2
                 A1-A1   2
@@ -291,10 +291,10 @@ SKIP: {
                 C1-C1   2
                 C1-C2   2
             )
-        }),
+        )),
         "counts of calls to CLONE_SKIP");
     ok(eq_hash(\%d,
-        {
+       \%( 
             qw(
                 A-A     1
                 A1-A1   1
@@ -308,7 +308,7 @@ SKIP: {
                 D-D     3
                 D-D1    3
             )
-        }),
+        )),
         "counts of calls to DESTROY");
 }
 

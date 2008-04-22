@@ -563,11 +563,11 @@ sub initialize {
     # set the error handling subroutine
     $self->errorsub($self->{-quiet} ? sub { 1; } : 'poderror');
     $self->{_commands} = 0; # total number of POD commands encountered
-    $self->{_list_stack} = []; # stack for nested lists
+    $self->{_list_stack} = \@(); # stack for nested lists
     $self->{_have_begin} = ''; # stores =begin
-    $self->{_links} = []; # stack for internal hyperlinks
-    $self->{_nodes} = []; # stack for =head/=item nodes
-    $self->{_index} = []; # text in X<>
+    $self->{_links} = \@(); # stack for internal hyperlinks
+    $self->{_nodes} = \@(); # stack for =head/=item nodes
+    $self->{_index} = \@(); # text in X<>
     # print warnings?
     $self->{-warnings} = 1 unless(defined $self->{-warnings});
     $self->{_current_head1} = ''; # the current =head1 block
@@ -751,9 +751,9 @@ sub end_pod {
         my $list;
         while(($list = $self->_close_list('EOF',$infile)) &&
           $list->indent() ne 'auto') {
-            $self->poderror({ -line => 'EOF', -file => $infile,
+            $self->poderror(\%( -line => 'EOF', -file => $infile,
                 -severity => 'ERROR', -msg => "=over on line " .
-                $list->start() . " without closing =back" }); #"
+                $list->start() . " without closing =back" )); #"
         }
     }
 
@@ -779,9 +779,9 @@ sub end_pod {
             my $node = $self->_check_ptree($self->parse_text($link->node(),
                 $line), $line, $infile, 'L');
             if($node && !%nodes{$node}) {
-                $self->poderror({ -line => $line || '', -file => $infile,
+                $self->poderror(\%( -line => $line || '', -file => $infile,
                     -severity => 'ERROR',
-                    -msg => "unresolved internal link '$node'"});
+                    -msg => "unresolved internal link '$node'"));
             }
         }
     }
@@ -791,9 +791,9 @@ sub end_pod {
     if($self->{-warnings} && $self->{-warnings}+>1) {
       foreach(grep($self->{_unique_nodes}->{$_} +> 1,
         keys %{$self->{_unique_nodes}})) {
-          $self->poderror({ -line => '-', -file => $infile,
+          $self->poderror(\%( -line => '-', -file => $infile,
             -severity => 'WARNING',
-            -msg => "multiple occurrence of link target '$_'"});
+            -msg => "multiple occurrence of link target '$_'"));
       }
     }
 
@@ -808,8 +808,8 @@ sub command {
     ## Check the command syntax
     my $arg; # this will hold the command argument
     if (! %VALID_COMMANDS{$cmd}) {
-       $self->poderror({ -line => $line, -file => $file, -severity => 'ERROR',
-                         -msg => "Unknown command '$cmd'" });
+       $self->poderror(\%( -line => $line, -file => $file, -severity => 'ERROR',
+                         -msg => "Unknown command '$cmd'" ));
     }
     else { # found a valid command
         $self->{_commands}++; # delete this line if below is enabled again
@@ -835,9 +835,9 @@ sub command {
         elsif($cmd eq 'item') {
             # are we in a list?
             unless(@{$self->{_list_stack}}) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
-                     -msg => "=item without previous =over" });
+                     -msg => "=item without previous =over" ));
                 # auto-open in case we encounter many more
                 $self->_open_list('auto',$line,$file);
             }
@@ -845,14 +845,14 @@ sub command {
             # check whether the previous item had some contents
             if(defined $self->{_list_item_contents} &&
               $self->{_list_item_contents} == 0) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
-                     -msg => "previous =item has no contents" });
+                     -msg => "previous =item has no contents" ));
             }
             if($list->{_has_par}) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
-                     -msg => "preceding non-item paragraph(s)" });
+                     -msg => "preceding non-item paragraph(s)" ));
                 delete $list->{_has_par};
             }
             # check for argument
@@ -876,18 +876,18 @@ sub command {
                 }
                 my $first = $list->type();
                 if($first && $first ne $type) {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                        -severity => 'WARNING', 
-                       -msg => "=item type mismatch ('$first' vs. '$type')"});
+                       -msg => "=item type mismatch ('$first' vs. '$type')"));
                 }
                 else { # first item
                     $list->type($type);
                 }
             }
             else {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
-                     -msg => "No argument for =item" });
+                     -msg => "No argument for =item" ));
 		$arg = ' '; # empty
                 $self->{_list_item_contents} = 0;
             }
@@ -899,26 +899,26 @@ sub command {
         elsif($cmd eq 'back') {
             # check if we have an open list
             unless(@{$self->{_list_stack}}) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'ERROR', 
-                         -msg => "=back without previous =over" });
+                         -msg => "=back without previous =over" ));
             }
             else {
                 # check for spurious characters
                 $arg = $self->interpolate_and_check($paragraph, $line,$file);
                 if($arg && $arg =~ m/\S/) {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'ERROR', 
-                         -msg => "Spurious character(s) after =back" });
+                         -msg => "Spurious character(s) after =back" ));
                 }
                 # close list
                 my $list = $self->_close_list($line,$file);
                 # check for empty lists
                 if(!$list->item() && $self->{-warnings}) {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'WARNING', 
                          -msg => "No items in =over (at line " .
-                         $list->start() . ") / =back list"}); #"
+                         $list->start() . ") / =back list")); #"
                 }
             }
         }
@@ -926,18 +926,18 @@ sub command {
             my $hnum = $1;
             $self->{"_have_head_$hnum"}++; # count head types
             if($hnum +> 1 && !$self->{"_have_head_".($hnum -1)}) {
-              $self->poderror({ -line => $line, -file => $file,
+              $self->poderror(\%( -line => $line, -file => $file,
                    -severity => 'WARNING', 
-                   -msg => "=head$hnum without preceding higher level"});
+                   -msg => "=head$hnum without preceding higher level"));
             }
             # check whether the previous =head section had some contents
             if(defined $self->{_commands_in_head} &&
               $self->{_commands_in_head} == 0 &&
               defined $self->{_last_head} &&
               $self->{_last_head} +>= $hnum) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
-                     -msg => "empty section in previous paragraph"});
+                     -msg => "empty section in previous paragraph"));
             }
             $self->{_commands_in_head} = -1;
             $self->{_last_head} = $hnum;
@@ -946,10 +946,10 @@ sub command {
                 my $list;
                 while(($list = $self->_close_list($line,$file)) &&
                   $list->indent() ne 'auto') {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'ERROR', 
                          -msg => "=over on line ". $list->start() .
-                         " without closing =back (at $cmd)" });
+                         " without closing =back (at $cmd)" ));
                 }
             }
             # remember this node
@@ -957,9 +957,9 @@ sub command {
             $arg =~ s/[\s\n]+$//s;
             $self->node($arg);
             unless(length($arg)) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
-                     -msg => "empty =$cmd"});
+                     -msg => "empty =$cmd"));
             }
             if($cmd eq 'head1') {
                 $self->{_current_head1} = $arg;
@@ -970,18 +970,18 @@ sub command {
         elsif($cmd eq 'begin') {
             if($self->{_have_begin}) {
                 # already have a begin
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
                      -msg => "Nested =begin's (first at line " .
-                     $self->{_have_begin} . ")"});
+                     $self->{_have_begin} . ")"));
             }
             else {
                 # check for argument
                 $arg = $self->interpolate_and_check($paragraph, $line,$file);
                 unless($arg && $arg =~ m/(\S+)/) {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'ERROR', 
-                         -msg => "No argument for =begin"});
+                         -msg => "No argument for =begin"));
                 }
                 # remember the =begin
                 $self->{_have_begin} = "$line:$1";
@@ -1002,16 +1002,16 @@ sub command {
             }
             else {
                 # don't have a matching =begin
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
-                     -msg => "=end without =begin" });
+                     -msg => "=end without =begin" ));
             }
         }
         elsif($cmd eq 'for') {
             unless($paragraph =~ m/\s*(\S+)\s*/) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
-                     -msg => "=for without formatter specification" });
+                     -msg => "=for without formatter specification" ));
             }
             $arg = ''; # do not expand paragraph below
         }
@@ -1019,9 +1019,9 @@ sub command {
             # check for argument
             $arg = $self->interpolate_and_check($paragraph, $line,$file);
             if($arg && $arg =~ m/(\S+)/) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                       -severity => 'ERROR', 
-                      -msg => "Spurious text after =$cmd"});
+                      -msg => "Spurious text after =$cmd"));
             }
         }
     $self->{_commands_in_head}++;
@@ -1049,9 +1049,9 @@ sub _close_list
     my $list = shift(@{$self->{_list_stack}});
     if(defined $self->{_list_item_contents} &&
       $self->{_list_item_contents} == 0) {
-        $self->poderror({ -line => $line, -file => $file,
+        $self->poderror(\%( -line => $line, -file => $file,
             -severity => 'WARNING', 
-            -msg => "previous =item has no contents" });
+            -msg => "previous =item has no contents" ));
     }
     undef $self->{_list_item_contents};
     $list;
@@ -1079,9 +1079,9 @@ sub _check_ptree {
             if($self->{-warnings} && $self->{-warnings}+>1) {
               my $count;
               if($count = tr/<>/<>/) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
-                     -msg => "$count unescaped <> in paragraph" });
+                     -msg => "$count unescaped <> in paragraph" ));
                 }
             }
             $text .= $_;
@@ -1093,26 +1093,26 @@ sub _check_ptree {
         ($file,$line) = $_->file_line();
         # check for valid tag
         if (! %VALID_SEQUENCES{$cmd}) {
-            $self->poderror({ -line => $line, -file => $file,
+            $self->poderror(\%( -line => $line, -file => $file,
                  -severity => 'ERROR', 
-                 -msg => qq(Unknown interior-sequence '$cmd')});
+                 -msg => qq(Unknown interior-sequence '$cmd')));
             # expand it anyway
             $text .= $self->_check_ptree($contents, $line, $file, "$nestlist$cmd");
             next;
         }
         if($nestlist =~ m/$cmd/) {
-            $self->poderror({ -line => $line, -file => $file,
+            $self->poderror(\%( -line => $line, -file => $file,
                  -severity => 'WARNING', 
-                 -msg => "nested commands $cmd<...$cmd<...>...>"});
+                 -msg => "nested commands $cmd<...$cmd<...>...>"));
             # _TODO_ should we add the contents anyway?
             # expand it anyway, see below
         }
         if($cmd eq 'E') {
             # preserve entities
             if(@$contents +> 1 || ref @$contents[0] || @$contents[0] !~ m/^\w+$/) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
-                    -msg => "garbled entity " . $_->raw_text()});
+                    -msg => "garbled entity " . $_->raw_text()));
                 next;
             }
             my $ent = @$contents[0];
@@ -1134,9 +1134,9 @@ sub _check_ptree {
                     $text .= chr($val);
                 }
                 else {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                         -severity => 'ERROR', 
-                        -msg => "Entity number out of range " . $_->raw_text()});
+                        -msg => "Entity number out of range " . $_->raw_text()));
                 }
             }
             elsif(%ENTITIES{$ent}) {
@@ -1144,9 +1144,9 @@ sub _check_ptree {
                 $text .= %ENTITIES{$ent};
             }
             else {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'WARNING', 
-                    -msg => "Unknown entity " . $_->raw_text()});
+                    -msg => "Unknown entity " . $_->raw_text()));
                 $text .= "E<$ent>";
             }
         }
@@ -1154,24 +1154,24 @@ sub _check_ptree {
             # try to parse the hyperlink
             my $link = Pod::Hyperlink->new($contents->raw_text());
             unless(defined $link) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
-                    -msg => "malformed link " . $_->raw_text() ." : $@"});
+                    -msg => "malformed link " . $_->raw_text() ." : $@"));
                 next;
             }
             $link->line($line); # remember line
             if($self->{-warnings}) {
                 foreach my $w ($link->warning()) {
-                    $self->poderror({ -line => $line, -file => $file,
+                    $self->poderror(\%( -line => $line, -file => $file,
                         -severity => 'WARNING', 
-                        -msg => $w });
+                        -msg => $w ));
                 }
             }
             # check the link text
             $text .= $self->_check_ptree($self->parse_text($link->text(),
                 $line), $line, $file, "$nestlist$cmd");
             # remember link
-            $self->hyperlink([$line,$link]);
+            $self->hyperlink(\@($line,$link));
         }
         elsif($cmd =~ m/[BCFIS]/) {
             # add the guts
@@ -1179,17 +1179,17 @@ sub _check_ptree {
         }
         elsif($cmd eq 'Z') {
             if(length($contents->raw_text())) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
-                    -msg => "Nonempty Z<>"});
+                    -msg => "Nonempty Z<>"));
             }
         }
         elsif($cmd eq 'X') {
             my $idx = $self->_check_ptree($contents, $line, $file, "$nestlist$cmd");
             if($idx =~ m/^\s*$/s) {
-                $self->poderror({ -line => $line, -file => $file,
+                $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
-                    -msg => "Empty X<>"});
+                    -msg => "Empty X<>"));
             }
             else {
                 # remember this node
@@ -1213,9 +1213,9 @@ sub verbatim {
 
     if($self->{_current_head1} eq 'NAME') {
         my ($file, $line) = $pod_para->file_line;
-        $self->poderror({ -line => $line, -file => $file,
+        $self->poderror(\%( -line => $line, -file => $file,
             -severity => 'WARNING',
-            -msg => 'Verbatim paragraph in NAME section' });
+            -msg => 'Verbatim paragraph in NAME section' ));
     }
 }
 

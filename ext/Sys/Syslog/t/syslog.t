@@ -120,7 +120,7 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
             if $sock_type eq 'stream' and grep {m/pipe|unix/} @passed;
 
         # setlogsock() called with an arrayref
-        $r = eval { setlogsock([$sock_type]) } || 0;
+        $r = eval { setlogsock(\@($sock_type)) } || 0;
         skip "can't use '$sock_type' socket", 20 unless $r;
         is( $@, '', "[$sock_type] setlogsock() called with ['$sock_type']" );
         ok( $r, "[$sock_type] setlogsock() should return true: '$r'" );

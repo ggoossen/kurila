@@ -196,10 +196,10 @@ close F;
 is($failed, undef);
 
 {
-    my @a = ( [ 0x007F, "bytes" ],
-	      [ 0x0080, "bytes" ],
-	      [ 0x0080, "utf8"  ],
-	      [ 0x0100, "utf8"  ] );
+    my @a = ( \@( 0x007F, "bytes" ),
+	      \@( 0x0080, "bytes" ),
+	      \@( 0x0080, "utf8"  ),
+	      \@( 0x0100, "utf8"  ) );
     my $t = 34;
     for my $u (@a) {
 	for my $v (@a) {

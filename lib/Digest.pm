@@ -6,16 +6,16 @@ use vars qw($VERSION %MMAP $AUTOLOAD);
 $VERSION = "1.15";
 
 %MMAP = (
-  "SHA-1"      => ["Digest::SHA1", ["Digest::SHA", 1], ["Digest::SHA2", 1]],
-  "SHA-224"    => [["Digest::SHA", 224]],
-  "SHA-256"    => [["Digest::SHA", 256], ["Digest::SHA2", 256]],
-  "SHA-384"    => [["Digest::SHA", 384], ["Digest::SHA2", 384]],
-  "SHA-512"    => [["Digest::SHA", 512], ["Digest::SHA2", 512]],
+  "SHA-1"      => \@("Digest::SHA1", \@("Digest::SHA", 1), \@("Digest::SHA2", 1)),
+  "SHA-224"    => \@(\@("Digest::SHA", 224)),
+  "SHA-256"    => \@(\@("Digest::SHA", 256), \@("Digest::SHA2", 256)),
+  "SHA-384"    => \@(\@("Digest::SHA", 384), \@("Digest::SHA2", 384)),
+  "SHA-512"    => \@(\@("Digest::SHA", 512), \@("Digest::SHA2", 512)),
   "HMAC-MD5"   => "Digest::HMAC_MD5",
   "HMAC-SHA-1" => "Digest::HMAC_SHA1",
-  "CRC-16"     => [["Digest::CRC", type => "crc16"]],
-  "CRC-32"     => [["Digest::CRC", type => "crc32"]],
-  "CRC-CCITT"  => [["Digest::CRC", type => "crcccitt"]],
+  "CRC-16"     => \@(\@("Digest::CRC", type => "crc16")),
+  "CRC-32"     => \@(\@("Digest::CRC", type => "crc32")),
+  "CRC-CCITT"  => \@(\@("Digest::CRC", type => "crcccitt")),
 );
 
 sub new
@@ -26,7 +26,7 @@ sub new
 	$algorithm =~ s/\W+//;
 	"Digest::$algorithm";
     };
-    $impl = [$impl] unless ref($impl);
+    $impl = \@($impl) unless ref($impl);
     my $err;
     for  (@$impl) {
 	my $class = $_;

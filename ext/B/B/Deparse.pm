@@ -308,7 +308,7 @@ sub todo {
     } else {
 	$seq = 0;
     }
-    push @{$self->{'subs_todo'}}, [$seq, $cv, $is_form];
+    push @{$self->{'subs_todo'}}, \@($seq, $cv, $is_form);
     unless ($is_form || class($cv->STASH) eq 'SPECIAL') {
 	$self->{'subs_deparsed'}{$cv->STASH->NAME."::".$cv->GV->NAME} = 1;
     }
@@ -517,17 +517,17 @@ sub style_opts {
 
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self = bless \%(), $class;
     $self->{'cuddle'} = "\n";
     $self->{'curcop'} = undef;
     $self->{'curstash'} = "main";
     $self->{'ex_const'} = "'???'";
     $self->{'expand'} = 0;
-    $self->{'files'} = {};
+    $self->{'files'} = \%();
     $self->{'indent_size'} = 4;
     $self->{'linenums'} = 0;
     $self->{'parens'} = 0;
-    $self->{'subs_todo'} = [];
+    $self->{'subs_todo'} = \@();
     $self->{'unquote'} = 0;
     $self->{'use_dumper'} = 0;
     $self->{'use_tabs'} = 0;
@@ -1252,7 +1252,7 @@ sub populate_curcvlex {
 		    ? (0, 999999)
 		    : (@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
-	    push @{$self->{'curcvlex'}{$name}}, [$seq_st, $seq_en];
+	    push @{$self->{'curcvlex'}{$name}}, \@($seq_st, $seq_en);
 	}
     }
 }
@@ -1360,7 +1360,7 @@ sub pp_nextstate {
     }
 
     # hack to check that the hint hash hasn't changed
-    if ("@{[sort %{$self->{'hinthash'} || {}}]}" ne "@{[sort %{$op->hints_hash || {}}]}") {
+    if ("@{\@(sort %{$self->{'hinthash'} || \%()})}" ne "@{\@(sort %{$op->hints_hash || \%()})}") {
 	push @text, declare_hinthash($self->{'hinthash'}, $op->hints_hash, $self->{indent_size});
 	$self->{'hinthash'} = $op->hints_hash;
     }
@@ -1751,8 +1751,8 @@ sub anon_hash_or_list {
     my $self = shift;
     my($op, $cx) = @_;
 
-    my($pre, $post) = @{{"anonlist" => ["[","]"],
-			 "anonhash" => ["\{","\}"]}->{$op->name}};
+    my($pre, $post) = @{\%("anonlist" => \@('\@(',')'),
+                           "anonhash" => \@('\%(',')'))->{$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
     for (; !null($op); $op = $op->sibling) {
@@ -1786,7 +1786,7 @@ sub pp_refgen {
 	$kid = $kid->first;
 	if (!null($kid->sibling) and
 		 $kid->sibling->name eq "anoncode") {
-            return $self->e_anoncode({ code => $self->padval($kid->sibling->targ) });
+            return $self->e_anoncode(\%( code => $self->padval($kid->sibling->targ) ));
 	} elsif ($kid->name eq "pushmark") {
             my $sib_name = $kid->sibling->name;
             if ($sib_name =~ m/^(pad|rv2)[ah]v$/
@@ -2606,7 +2606,7 @@ sub loop_common {
 	$head = "foreach $var ($ary) ";
     } elsif ($kid->name eq "null") { # while/until
 	$kid = $kid->first;
-	my $name = {"and" => "while", "or" => "until"}->{$kid->name};
+	my $name = \%("and" => "while", "or" => "until")->{$kid->name};
 	$cond = $self->deparse($kid->first, 1);
 	$head = "$name ($cond) ";
 	$body = $kid->first->sibling;
@@ -3020,8 +3020,8 @@ sub slice {
     return ($regname eq "rv2av" ? '@' : '%') . $array . $left . $list . $right;
 }
 
-sub pp_aslice { maybe_local(@_, slice(@_, "[", "]", "rv2av", "padav")) }
-sub pp_hslice { maybe_local(@_, slice(@_, "\{", "\}", "rv2hv", "padhv")) }
+sub pp_aslice { maybe_local(@_, slice(@_, "[[", "]]", "rv2av", "padav")) }
+sub pp_hslice { maybe_local(@_, slice(@_, "\{[", "]\}", "rv2hv", "padhv")) }
 
 sub pp_lslice {
     my $self = shift;
@@ -3089,8 +3089,8 @@ sub _method {
 	}
     }
 
-    return { method => $meth, variable_method => ref($meth),
-             object => $obj, args => \@exprs  };
+    return \%( method => $meth, variable_method => ref($meth),
+               object => $obj, args => \@exprs  );
 }
 
 # compat function only
@@ -3469,7 +3469,7 @@ sub balanced_delim {
     my($str) = @_;
     my @str = split m//, $str;
     my($ar, $open, $close, $fail, $c, $cnt, $last_bs);
-    for $ar (['[',']'], ['(',')'], ['<','>'], ['{','}']) {
+    for $ar (\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}')) {
 	($open, $close) = @$ar;
 	$fail = 0; $cnt = 0; $last_bs = 0;
 	for $c (@str) {
@@ -3609,14 +3609,14 @@ sub const {
     } elsif ($sv->FLAGS ^&^ SVf_ROK && $sv->can("RV")) {
 	my $ref = $sv->RV;
 	if (class($ref) eq "AV") {
-	    return "[" . $self->list_const(2, $ref->ARRAY) . "]";
+	    return '\@(' . $self->list_const(2, $ref->ARRAY) . ")";
 	} elsif (class($ref) eq "HV") {
 	    my %hash = $ref->ARRAY;
 	    my @elts;
 	    for my $k (sort keys %hash) {
 		push @elts, "$k => " . $self->const(%hash{$k}, 6);
 	    }
-	    return "\{" . join(", ", @elts) . "\}";
+	    return '\%(' . join(", ", @elts) . ")";
 	} elsif (class($ref) eq "CV") {
 	    return "sub " . $self->deparse_sub($ref);
 	}
@@ -3646,7 +3646,7 @@ sub const_dumper {
     my $self = shift;
     my($sv, $cx) = @_;
     my $ref = $sv->object_2svref();
-    my $dumper = Data::Dumper->new([$$ref], ['$v']);
+    my $dumper = Data::Dumper->new(\@($$ref), \@('$v'));
     $dumper->Purity(1)->Terse(1)->Deparse(1)->Indent(0)->Useqq(1)->Sortkeys(1);
     my $str = $dumper->Dump();
     if ($str =~ m/^\$v/) {
@@ -3884,10 +3884,10 @@ sub tr_decode_utf8 {
 	}
 	$result = hex $result;
 	if ($result == $extra) {
-	    push @delfrom, [$min, $max];
+	    push @delfrom, \@($min, $max);
 	} else {
-	    push @from, [$min, $max];
-	    push @to, [$result, $result + $max - $min];
+	    push @from, \@($min, $max);
+	    push @to, \@($result, $result + $max - $min);
 	}
     }
     for my $i (0 ..( @from-1)) {
@@ -3914,14 +3914,14 @@ sub tr_decode_utf8 {
 	}
     }
     if (defined $final and @to[(@to-1)][1] != $final) {
-	push @to, [$final, $final];
+	push @to, \@($final, $final);
     }
     push @from, @delfrom;
     if ($flags ^&^ OPpTRANS_COMPLEMENT) {
 	my @newfrom;
 	my $next = 0;
 	for my $i (0 ..( @from-1)) {
-	    push @newfrom, [$next, @from[$i][0] - 1];
+	    push @newfrom, \@($next, @from[$i][0] - 1);
 	    $next = @from[$i][1] + 1;
 	}
 	@from = ();

@@ -41,7 +41,7 @@ END {
 chdir 'Big-Dummy';
 
 my $stdout = tie *STDOUT, 'TieOut';
-pm_to_blib( { 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' },
+pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
 END { rmtree 'blib' }
@@ -51,7 +51,7 @@ ok( -r 'blib/lib/Big/Dummy.pm', '  copied .pm file' );
 ok( -r 'blib/lib/auto',         '  created autosplit dir' );
 is( $stdout->read, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
 
-pm_to_blib( { 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' },
+pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
 ok( -d 'blib/lib',              'second run, blib dir still there' );
@@ -59,20 +59,20 @@ ok( -r 'blib/lib/Big/Dummy.pm', '  .pm file still there' );
 ok( -r 'blib/lib/auto',         '  autosplit still there' );
 is( $stdout->read, "Skip blib/lib/Big/Dummy.pm (unchanged)\n" );
 
-install( { 'blib/lib' => 'install-test/lib/perl',
+install( \%( 'blib/lib' => 'install-test/lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
+         ),
        0, 1);
 ok( ! -d 'install-test/lib/perl',        'install made dir (dry run)');
 ok( ! -r 'install-test/lib/perl/Big/Dummy.pm',
                                          '  .pm file installed (dry run)');
 ok( ! -r 'install-test/packlist',        '  packlist exists (dry run)');
 
-install( { 'blib/lib' => 'install-test/lib/perl',
+install( \%( 'blib/lib' => 'install-test/lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         } );
+         ) );
 ok( -d 'install-test/lib/perl',                 'install made dir' );
 ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
 ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
@@ -90,10 +90,10 @@ is( lc((keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
 
 
 # Test UNINST=1 preserving same versions in other dirs.
-install( { 'blib/lib' => 'install-test/other_lib/perl',
+install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
+         ),
        0, 0, 1);
 ok( -d 'install-test/other_lib/perl',        'install made other dir' );
 ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
@@ -113,10 +113,10 @@ close DUMMY;
 
   local @INC = ('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
-  install( { 'blib/lib' => 'install-test/other_lib/perl',
+  install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
+         ),
        0, 0, 0);
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
@@ -135,10 +135,10 @@ close DUMMY;
   my @warn;
   local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
   my $ok=eval {
-    install( { 'blib/lib' => 'install-test/other_lib/perl',
+    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
+         ),
        0, 0, 1);
     1
   };
@@ -161,10 +161,10 @@ close DUMMY;
   my @warn;
   local $^WARN_HOOK=sub { push @warn,@_[0]->message; return };
   my $ok=eval {
-    install( { 'blib/lib' => 'install-test/other_lib/perl',
+    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
+         ),
        0, 0, 1);
     1
   };
@@ -180,10 +180,10 @@ close DUMMY;
 {
   local @INC = ('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
-  install( { 'blib/lib' => 'install-test/other_lib/perl',
+  install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
-         },
+         ),
        0, 0, 1);
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );

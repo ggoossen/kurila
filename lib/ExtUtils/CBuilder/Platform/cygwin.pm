@@ -19,10 +19,10 @@ sub link_executable {
 sub link {
   my ($self, %args) = @_;
 
-  %args{extra_linker_flags} = [
+  %args{extra_linker_flags} = \@(
     File::Spec->catdir($self->perl_inc(), 'libperl.dll.a'),
     $self->split_like_shell(%args{extra_linker_flags})
-  ];
+  );
 
   return $self->SUPER::link(%args);
 }

@@ -68,7 +68,7 @@ use constant ABC	=> 'ABC';
 is "abc${\( ABC )}abc", "abcABCabc";
 
 use constant DEF	=> 'D', 'E', chr ord 'F';
-is "d e f @{[ DEF ]} d e f", "d e f D E F d e f";
+is "d e f @{\@( DEF )} d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';
@@ -123,8 +123,8 @@ is @warnings, 0, "unexpected warning";
 
 my $curr_test = $TB->current_test;
 use constant CSCALAR	=> \"ok 37\n";
-use constant CHASH	=> { foo => "ok 38\n" };
-use constant CARRAY	=> [ undef, "ok 39\n" ];
+use constant CHASH	=> \%( foo => "ok 38\n" );
+use constant CARRAY	=> \@( undef, "ok 39\n" );
 use constant CCODE	=> sub { "ok @_[0]\n" };
 
 my $output = $TB->output ;
@@ -244,13 +244,13 @@ for my $idx (0..(@warnings-1)) {
 @warnings = ();
 
 
-use constant {
+use constant \%(
 	THREE  => 3,
-	FAMILY => [ qw( John Jane Sally ) ],
-	AGES   => { John => 33, Jane => 28, Sally => 3 },
-	RFAM   => [ [ qw( John Jane Sally ) ] ],
+	FAMILY => \@( qw( John Jane Sally ) ),
+	AGES   => \%( John => 33, Jane => 28, Sally => 3 ),
+	RFAM   => \@( \@( qw( John Jane Sally ) ) ),
 	SPIT   => sub { shift },
-};
+);
 
 is @{+FAMILY}, THREE;
 is @{+FAMILY}, @{RFAM->[0]};
@@ -317,7 +317,7 @@ $kloong = 'schlozhauer';
 
     my @value = eval 'fagwoosh';
     is ($@, '');
-    is_deeply (\@value, [5]);
+    is_deeply (\@value, \@(5));
 
     eval 'use constant putt => 6, 7; 1' or die $@;
 
@@ -325,7 +325,7 @@ $kloong = 'schlozhauer';
 
     @value = eval 'putt';
     is ($@, '');
-    is_deeply (\@value, [6, 7]);
+    is_deeply (\@value, \@(6, 7));
 
     eval 'use constant "klong"; 1' or die $@;
 
@@ -337,5 +337,5 @@ $kloong = 'schlozhauer';
 
     @value = eval 'klong';
     is ($@, '');
-    is_deeply (\@value, []);
+    is_deeply (\@value, \@());
 }

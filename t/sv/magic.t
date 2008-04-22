@@ -109,7 +109,7 @@ END
 	}
     }
     sub x {
-	my $x=bless [], 'X';
+	my $x=bless \@(), 'X';
 	return sub { $x };
     }
     $| = 1;		# command buffering
@@ -384,7 +384,7 @@ if ($Is_miniperl) {
    ok scalar eval q{
       %!;
       defined %Errno::;
-   }, $@;
+   }, $@ && $@->message;
 }
 
 if ($Is_miniperl) {

@@ -305,8 +305,8 @@ die if $@;
 # This is somewhat grim, but I need to run fetch_string here.
 $Config_SH_expanded = join "\n", '', @v_others;
 
-my $t = fetch_string ({}, 'ivtype');
-my $s = fetch_string ({}, 'ivsize');
+my $t = fetch_string (\%(), 'ivtype');
+my $s = fetch_string (\%(), 'ivsize');
 
 # byteorder does exist on its own but we overlay a virtual
 # dynamically recomputed value.
@@ -332,7 +332,7 @@ EOT
 
 my @need_relocation;
 
-if (fetch_string({},'userelocatableinc')) {
+if (fetch_string(\%(),'userelocatableinc')) {
     foreach my $what (qw(prefixexp
 
 			 archlibexp
@@ -389,7 +389,7 @@ if (fetch_string({},'userelocatableinc')) {
 			 installvendorman3dir
 			 installvendorscript
 			 )) {
-	push @need_relocation, $what if fetch_string({}, $what) =~ m!^\.\.\./!;
+	push @need_relocation, $what if fetch_string(\%(), $what) =~ m!^\.\.\./!;
     }
 }
 
@@ -397,7 +397,7 @@ my %need_relocation;
 %need_relocation{[@need_relocation]} = @need_relocation;
 
 # This can have .../ anywhere:
-if (fetch_string({}, 'otherlibdirs') =~ m!\.\.\./!) {
+if (fetch_string(\%(), 'otherlibdirs') =~ m!\.\.\./!) {
     %need_relocation{otherlibdirs} = 'otherlibdirs';
 }
 
@@ -500,8 +500,8 @@ our $Config_SH_expanded = "\n$_" . << 'EOVIRTUAL';
 EOT
 
 foreach my $prefix (qw(ccflags ldflags)) {
-    my $value = fetch_string ({}, $prefix);
-    my $withlargefiles = fetch_string ({}, $prefix . "_uselargefiles");
+    my $value = fetch_string (\%(), $prefix);
+    my $withlargefiles = fetch_string (\%(), $prefix . "_uselargefiles");
     if (defined $withlargefiles) {
         $value =~ s/\Q$withlargefiles\E\b//;
         $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
@@ -509,22 +509,22 @@ foreach my $prefix (qw(ccflags ldflags)) {
 }
 
 foreach my $prefix (qw(libs libswanted)) {
-    my $value = fetch_string ({}, $prefix);
-    my $withlf = fetch_string ({}, 'libswanted_uselargefiles');
+    my $value = fetch_string (\%(), $prefix);
+    my $withlf = fetch_string (\%(), 'libswanted_uselargefiles');
     next unless defined $withlf;
     my @lflibswanted
-       = split(' ', fetch_string ({}, 'libswanted_uselargefiles'));
+       = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'));
     if (@lflibswanted) {
 	my %lflibswanted;
 	%lflibswanted{[@lflibswanted]} = ();
 	if ($prefix eq 'libs') {
 	    my @libs = grep { m/^-l(.+)/ &&
                             not exists %lflibswanted{$1} }
-		                    split(' ', fetch_string ({}, 'libs'));
+		                    split(' ', fetch_string (\%(), 'libs'));
 	    $value = join(' ', @libs);
 	} else {
 	    my @libswanted = grep { not exists %lflibswanted{$_} }
-	                          split(' ', fetch_string ({}, 'libswanted'));
+	                          split(' ', fetch_string (\%(), 'libswanted'));
 	    $value = join(' ', @libswanted);
 	}
     }
@@ -665,7 +665,7 @@ ENDOFSET
 }
 
 foreach my $key (keys %Common) {
-    my $value = fetch_string ({}, $key);
+    my $value = fetch_string (\%(), $key);
     # Is it safe on the LHS of => ?
     my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ? $key : "'$key'";
     if (defined $value) {
@@ -703,8 +703,8 @@ for my $name (@heavy_subs) {
 }
 
 # tie returns the object, so the value returned to require will be true.
-tie %%Config, 'Config', {
-%s};
+tie %%Config, 'Config', \%%(
+%s);
 ENDOFTIE
 
 

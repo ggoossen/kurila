@@ -9,11 +9,11 @@ BEGIN {
 # A couple of simple classes to use as struct elements.
 #
 package aClass;
-sub new { bless {}, shift }
+sub new { bless \%(), shift }
 sub meth { 42 }
 
 package RecClass;
-sub new { bless {}, shift }
+sub new { bless \%(), shift }
 
 #
 # The first of our Class::Struct based objects.
@@ -21,7 +21,7 @@ sub new { bless {}, shift }
 package MyObj;
 use Class::Struct;
 use Class::Struct 'struct'; # test out both forms
-use Class::Struct SomeClass => { SomeElem => '$' };
+use Class::Struct SomeClass => \%( SomeElem => '$' );
 
 struct( s => '$', a => '@', h => '%', c => 'aClass' );
 
@@ -49,14 +49,14 @@ isa_ok $obj->a, 'ARRAY';
 $obj->a(2, 'secundus');
 is $obj->a(2), 'secundus';
 
-$obj->a([4,5,6]);
+$obj->a(\@(4,5,6));
 is $obj->a(1), 5;
 
 isa_ok $obj->h, 'HASH';
 $obj->h('x', 10);
 is $obj->h('x'), 10;
 
-$obj->h({h=>7,r=>8,f=>9});
+$obj->h(\%(h=>7,r=>8,f=>9));
 is $obj->h('r'), 8;
 
 is $obj->c, undef;
@@ -76,14 +76,14 @@ isa_ok $obj->a, 'ARRAY';
 $obj->a(2, 'secundus');
 is $obj->a(2), 'secundus';
 
-$obj->a([4,5,6]);
+$obj->a(\@(4,5,6));
 is $obj->a(1), 5;
 
 isa_ok $obj->h, 'HASH';
 $obj->h('x', 10);
 is $obj->h('x'), 10;
 
-$obj->h({h=>7,r=>8,f=>9});
+$obj->h(\%(h=>7,r=>8,f=>9));
 is $obj->h('r'), 8;
 
 is $obj->c, undef;

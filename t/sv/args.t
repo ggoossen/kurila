@@ -92,7 +92,7 @@ for (1..3) {
 	ok(!$flag, 'delete $_[0] : in f');
     }
     {
-	my $x = bless [], 'X';
+	my $x = bless \@(), 'X';
 	f($x);
 	ok(!$flag, 'delete $_[0] : after f');
     }

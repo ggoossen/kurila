@@ -51,7 +51,7 @@ sub _do_link {
   my ($self, $type, %args) = @_;
   
   my $objects = delete %args{objects};
-  $objects = [$objects] unless ref $objects;
+  $objects = \@($objects) unless ref $objects;
   
   if (%args{lddl}) {
 
@@ -113,7 +113,7 @@ sub lib_file {
   # Need to create with the same name as DynaLoader will load with.
   if (defined &DynaLoader::mod2fname) {
     my ($dev,$dir,$file) = File::Spec->splitpath($dl_file);
-    $file = DynaLoader::mod2fname([$file]);
+    $file = DynaLoader::mod2fname(\@($file));
     $dl_file = File::Spec->catpath($dev,$dir,$file);
   }
   return $dl_file;
@@ -152,7 +152,7 @@ sub _liblist_ext {
 
   unless ($potential_libs) {
     warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose;
-    return ('', '', $crtlstr, '', ($give_libs ? [] : ()));
+    return ('', '', $crtlstr, '', ($give_libs ? \@() : ()));
   }
 
   my(@dirs,@libs,$dir,$lib,%found,@fndlibs,$ldlib);

@@ -84,7 +84,7 @@ package Tie::StdArray;
 use vars qw(@ISA);
 @ISA = 'Tie::Array';
 
-sub TIEARRAY  { bless [], @_[0] }
+sub TIEARRAY  { bless \@(), @_[0] }
 sub FETCHSIZE { scalar @{@_[0]} }
 sub STORESIZE { if (@_[1] +> @{@_[0]}) { @_[0][@_[1]-1] = @_[0][@_[1]-1]; } else { splice @{@_[0]}, @_[1] } }
 sub STORE     { @_[0]->[@_[1]] = @_[2] }

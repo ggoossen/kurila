@@ -150,7 +150,7 @@ my $overCJK = Unicode::Collate->new(
 ENTRIES
   overrideCJK => sub {
     my $u = 0xFFFF - @_[0]; # reversed
-    [$u, 0x20, 0x2, $u];
+    \@($u, 0x20, 0x2, $u);
   },
 );
 

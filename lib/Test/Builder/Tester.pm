@@ -594,7 +594,7 @@ sub reset
     %$self = (
               type   => $self->{type},
               got    => '',
-              wanted => [],
+              wanted => \@(),
              );
 }
 
@@ -629,9 +629,9 @@ sub PRINT  {
 sub TIEHANDLE {
     my($class, $type) = @_;
 
-    my $self = bless {
+    my $self = bless \%(
                    type => $type
-               }, $class;
+               ), $class;
 
     $self->reset;
 

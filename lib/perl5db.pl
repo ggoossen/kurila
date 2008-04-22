@@ -1207,9 +1207,9 @@ $rl          = 1     unless defined $rl;
 $warnLevel   = 1     unless defined $warnLevel;
 $dieLevel    = 1     unless defined $dieLevel;
 $signalLevel = 1     unless defined $signalLevel;
-$pre         = []    unless defined $pre;
-$post        = []    unless defined $post;
-$pretype     = []    unless defined $pretype;
+$pre         = \@()    unless defined $pre;
+$post        = \@()    unless defined $post;
+$pretype     = \@()    unless defined $pretype;
 $CreateTTY   = 3     unless defined $CreateTTY;
 $CommandSet  = '580' unless defined $CommandSet;
 
@@ -1543,9 +1543,9 @@ if ( exists %ENV{PERLDB_RESTART} ) {
     @ini_INC = @INC;
 
     # return pre/postprompt actions and typeahead buffer
-    $pretype   = [ get_list("PERLDB_PRETYPE") ];
-    $pre       = [ get_list("PERLDB_PRE") ];
-    $post      = [ get_list("PERLDB_POST") ];
+    $pretype   = \@( get_list("PERLDB_PRETYPE") );
+    $pre       = \@( get_list("PERLDB_PRE") );
+    $post      = \@( get_list("PERLDB_POST") );
     @typeahead = get_list( "PERLDB_TYPEAHEAD", @typeahead );
 } ## end if (exists $ENV{PERLDB_RESTART...
 
@@ -3800,7 +3800,7 @@ Note that trying to set the CommandSet to C<foobar> simply results in the
 ### The API section
 
 my %set = (    #
-    'pre580' => {
+    'pre580' => \%(
         'a' => 'pre580_a',
         'A' => 'pre580_null',
         'b' => 'pre580_b',
@@ -3814,15 +3814,15 @@ my %set = (    #
         'v' => 'M',
         'w' => 'v',
         'W' => 'pre580_W',
-    },
-    'pre590' => {
+    ),
+    'pre590' => \%(
         '<'  => 'pre590_prepost',
         '<<' => 'pre590_prepost',
         '>'  => 'pre590_prepost',
         '>>' => 'pre590_prepost',
         '{'  => 'pre590_prepost',
         '{{' => 'pre590_prepost',
-    },
+    ),
 );
 
 =head2 C<cmd_wrapper()> (API)
@@ -5768,7 +5768,7 @@ sub dump_trace {
 
         # if the sub has args ($h true), make an anonymous array of the
         # dumped args.
-        $args = $h ? [@a] : undef;
+        $args = $h ? \@(@a) : undef;
 
         # remove trailing newline-whitespace-semicolon-end of line sequence
         # from the eval text, if any.
@@ -5796,13 +5796,13 @@ sub dump_trace {
         # Stick the collected information into @sub as an anonymous hash.
         push(
             @sub,
-            {
+            \%(
                 context => $context,
                 sub     => $sub,
                 args    => $args,
                 file    => $file,
                 line    => $line
-            }
+            )
         );
 
         # Stop processing frames if the user hit control-C.
@@ -6149,7 +6149,7 @@ a new window.
 
 my @script_versions=
 
-    ([237, <<'__LEOPARD__'],
+    (\@(237, <<'__LEOPARD__'),
 tell application "Terminal"
     do script "clear;exec sleep 100000"
     tell first tab of first window
@@ -6164,7 +6164,7 @@ end tell
 thetty
 __LEOPARD__
 
-     [100, <<'__JAGUAR_TIGER__'],
+     \@(100, <<'__JAGUAR_TIGER__'),
 tell application "Terminal"
     do script "clear;exec sleep 100000"
     tell first window
@@ -8859,7 +8859,7 @@ variable via C<DB::set_list>.
         my ( $quoted, $sub, %subs, $line ) = quotemeta $_;
         for $sub ( keys %sub ) {
             next unless %sub{$sub} =~ m/^$quoted:(\d+)-(\d+)$/;
-            %subs{$sub} = [ $1, $2 ];
+            %subs{$sub} = \@( $1, $2 );
         }
         unless (%subs) {
             print $OUT
@@ -9299,7 +9299,7 @@ sub cmd_prepost {
     # Make sure we have some array or another to address later.
     # This means that if ssome reason the tests fail, we won't be
     # trying to stash actions or delete them from the wrong place.
-    my $aref = [];
+    my $aref = \@();
 
     # < - Perl code to run before prompt.
     if ( $cmd =~ m/^\</o ) {

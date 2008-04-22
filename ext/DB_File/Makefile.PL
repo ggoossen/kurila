@@ -14,8 +14,7 @@ $LIB = "-llibdb" if $^O eq 'MSWin32' ;
 
 WriteMakefile(
 	NAME 		=> 'DB_File',
-	LIBS 		=> ["-L/usr/local/lib $LIB"],
-        MAN3PODS        => {},         # Pods will be built by installman.
+	LIBS 		=> \@("-L/usr/local/lib $LIB"),
 	#INC		=> '-I/usr/local/include',
 	VERSION_FROM	=> 'DB_File.pm',
 	OBJECT		=> 'version$(OBJ_EXT) DB_File$(OBJ_EXT)',
@@ -27,8 +26,8 @@ WriteMakefile(
         ABSTRACT_FROM => 'DB_File.pm',
         AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
-	'depend'	=> {'version$(OBJ_EXT)' => 'version.c'},
-	'clean'		=> {FILES => 'constants.h constants.xs'},
+	'depend'	=> \%('version$(OBJ_EXT)' => 'version.c'),
+	'clean'		=> \%(FILES => 'constants.h constants.xs'),
 	);
 
 my @names = qw(

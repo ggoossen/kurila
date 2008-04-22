@@ -95,13 +95,13 @@ sub readHeader
     my $self = shift;
     my $magic = shift ;
 
-    return {
+    return \%(
         'Type'          => 'rfc1951',
         'FingerprintLength'  => 0,
         'HeaderLength'  => 0,
         'TrailerLength' => 0,
         'Header'        => ''
-        };
+        );
 }
 
 sub chkTrailer
@@ -168,12 +168,12 @@ sub _isRawx
 
     $self->saveStatus(STATUS_OK);
 
-    return {
+    return \%(
         'Type'          => 'rfc1951',
         'HeaderLength'  => 0,
         'TrailerLength' => 0,
         'Header'        => ''
-        };
+        );
 }
 
 

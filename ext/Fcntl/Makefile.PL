@@ -24,14 +24,14 @@ my @names = (qw(
 	       S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU S_ISGID
 	       S_ISTXT S_ISUID S_ISVTX S_IWGRP S_IWOTH S_IWRITE
 	       S_IWUSR S_IXGRP S_IXOTH S_IXUSR),
-            {name=>"LOCK_SH", default=>["IV", "1"]},
-            {name=>"LOCK_EX", default=>["IV", "2"]},
-            {name=>"LOCK_NB", default=>["IV", "4"]},
-            {name=>"LOCK_UN", default=>["IV", "8"]},
-            {name=>"SEEK_SET", default=>["IV", "0"]},
-            {name=>"SEEK_CUR", default=>["IV", "1"]},
-            {name=>"SEEK_END", default=>["IV", "2"]},
-            {name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"});
+            \%(name=>"LOCK_SH", default=>\@("IV", "1")),
+            \%(name=>"LOCK_EX", default=>\@("IV", "2")),
+            \%(name=>"LOCK_NB", default=>\@("IV", "4")),
+            \%(name=>"LOCK_UN", default=>\@("IV", "8")),
+            \%(name=>"SEEK_SET", default=>\@("IV", "0")),
+            \%(name=>"SEEK_CUR", default=>\@("IV", "1")),
+            \%(name=>"SEEK_END", default=>\@("IV", "2")),
+            \%(name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"));
 WriteConstants(
     PROXYSUBS => 1,
     NAME => 'Fcntl',
@@ -40,8 +40,7 @@ WriteConstants(
 
 WriteMakefile(
     NAME 	=> 'Fcntl',
-    MAN3PODS 	=> {}, 	# Pods will be built by installman.
     XSPROTOARG => '-noprototypes', 		# XXX remove later?
     VERSION_FROM => 'Fcntl.pm',
-    realclean => {FILES=> 'const-c.inc const-xs.inc'},
+    realclean => \%( FILES=> 'const-c.inc const-xs.inc'),
 );

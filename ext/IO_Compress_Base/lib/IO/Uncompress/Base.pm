@@ -290,17 +290,17 @@ sub checkParams
 
     my $got = shift || IO::Compress::Base::Parameters::new();
     
-    my $Valid = {
-                    'BlockSize'     => [1, 1, Parse_unsigned, 16 * 1024],
-                    'AutoClose'     => [1, 1, Parse_boolean,  0],
-                    'Strict'        => [1, 1, Parse_boolean,  0],
-                    'Append'        => [1, 1, Parse_boolean,  0],
-                    'Prime'         => [1, 1, Parse_any,      undef],
-                    'MultiStream'   => [1, 1, Parse_boolean,  0],
-                    'Transparent'   => [1, 1, Parse_any,      1],
-                    'Scan'          => [1, 1, Parse_boolean,  0],
-                    'InputLength'   => [1, 1, Parse_unsigned, undef],
-                    'BinModeOut'    => [1, 1, Parse_boolean,  0],
+    my $Valid = \%(
+                    'BlockSize'     => \@(1, 1, Parse_unsigned, 16 * 1024),
+                    'AutoClose'     => \@(1, 1, Parse_boolean,  0),
+                    'Strict'        => \@(1, 1, Parse_boolean,  0),
+                    'Append'        => \@(1, 1, Parse_boolean,  0),
+                    'Prime'         => \@(1, 1, Parse_any,      undef),
+                    'MultiStream'   => \@(1, 1, Parse_boolean,  0),
+                    'Transparent'   => \@(1, 1, Parse_any,      1),
+                    'Scan'          => \@(1, 1, Parse_boolean,  0),
+                    'InputLength'   => \@(1, 1, Parse_unsigned, undef),
+                    'BinModeOut'    => \@(1, 1, Parse_boolean,  0),
                     #'Encode'        => [1, 1, Parse_any,       undef],
 
                    #'ConsumeInput'  => [1, 1, Parse_boolean,  0],
@@ -309,9 +309,9 @@ sub checkParams
 
                     #'Todo - Revert to ordinary file on end Z_STREAM_END'=> 0,
                     # ContinueAfterEof
-                } ;
+                ) ;
 
-    $Valid->{TrailingData} = [1, 1, Parse_writable_scalar, undef]
+    $Valid->{TrailingData} = \@(1, 1, Parse_writable_scalar, undef)
         if  *$self->{OneShot} ;
         
     $got->parse($Valid, @_ ) 

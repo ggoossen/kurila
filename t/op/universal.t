@@ -10,7 +10,7 @@ BEGIN {
 
 plan tests => 110;
 
-$a = {};
+$a = \%();
 bless $a, "Bob";
 ok $a->isa("Bob");
 
@@ -24,7 +24,7 @@ package Alice;
 our @ISA=qw(Bob Female);
 sub sing;
 sub drink { return "drinking " . @_[1]  }
-sub new { bless {} }
+sub new { bless \%() }
 
 $Alice::VERSION = 2.718;
 
@@ -95,7 +95,7 @@ ok (!Cedric->isa('Programmer'));
 
 my $b = 'abc';
 my @refs = qw(SCALAR SCALAR     LVALUE      GLOB ARRAY HASH CODE);
-my @vals = (  \$b,   \3.14, \vec($b,1,1), \*b,  [],  {}, sub {} );
+my @vals = (  \$b,   \3.14, \vec($b,1,1), \*b,  \@(),  \%(), sub {} );
 for (my $p=0; $p +< @refs; $p++) {
     for (my $q=0; $q +< @vals; $q++) {
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1);
@@ -124,9 +124,9 @@ is $subs, "DOES VERSION can import isa";
 
 ok $a->isa("UNIVERSAL");
 
-ok ! UNIVERSAL::isa([], "UNIVERSAL");
+ok ! UNIVERSAL::isa(\@(), "UNIVERSAL");
 
-ok ! UNIVERSAL::can({}, "can");
+ok ! UNIVERSAL::can(\%(), "can");
 
 ok UNIVERSAL::isa(Alice => "UNIVERSAL");
 
@@ -165,7 +165,7 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
     ok $1->isa("Human");
     ok $1->can("eat");
     package HumanTie;
-    sub TIESCALAR { bless {} }
+    sub TIESCALAR { bless \%() }
     sub FETCH { "Human" }
     tie my($x), "HumanTie";
     ::ok $x->isa("Human");
@@ -176,7 +176,7 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching
 
 @X::ISA=();
-my $x = {}; bless $x, 'X';
+my $x = \%(); bless $x, 'X';
 ok $x->isa('UNIVERSAL');
 ok $x->isa('UNIVERSAL');
 
@@ -211,10 +211,10 @@ package Pig;
 package Bodine;
 Bodine->isa('Pig');
 *isa = \&UNIVERSAL::isa;
-eval { isa({}, 'HASH') };
+eval { isa(\%(), 'HASH') };
 ::is($@, '', "*isa correctly found");
 
 package main;
-::dies_like( sub { UNIVERSAL::DOES([], "foo") },
+::dies_like( sub { UNIVERSAL::DOES(\@(), "foo") },
              qr/Can't call method "DOES" on unblessed reference/,
              'DOES call error message says DOES, not isa' );

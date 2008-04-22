@@ -62,7 +62,7 @@ sub padrep {
 
 for $newlex ('', '-newlex') {
 
-    $out = runperl ( switches => ["-MO=Showlex,$newlex"],
+    $out = runperl ( switches => \@("-MO=Showlex,$newlex"),
 		     prog => 'my ($a,$b)', stderr => 1 );
     $na = padrep('$a',$newlex);
     $nb = padrep('$b',$newlex);

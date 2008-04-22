@@ -78,14 +78,14 @@ SKIP: {
 }
 
 fresh_perl_is('BEGIN{~< *ARGV}', '',
-              { switches => ['-w'], stdin => '', stderr => 1 },
+              \%( switches => \@('-w'), stdin => '', stderr => 1 ),
               'No ARGVOUT used only once warning');
 
 fresh_perl_is('print readline', 'foo',
-              { switches => ['-w'], stdin => 'foo', stderr => 1 },
+              \%( switches => \@('-w'), stdin => 'foo', stderr => 1 ),
               'readline() defaults to *ARGV');
 
-my $obj = bless [];
+my $obj = bless \@();
 dies_like( sub { $obj .= ~< *DATA; }, qr/reference as string/, 'rcatline and refs');
 
 # bug #38631

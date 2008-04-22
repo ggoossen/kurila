@@ -314,11 +314,9 @@ Can't use string ("Fred") as a SCALAR ref while "strict refs" in use at - line 8
 ########
 # [perl #26910] hints not propagated into (?{...})
 use strict 'refs';
-/(?{${"foo"}++})/;
+m/(?{${"foo"}++})/;
 EXPECT
-/pat/ should be m/pat/ at - line 3, at end of line
-syntax error at - line 3, near "/"
-Execution of - aborted due to compilation errors. at - line 3.
+Can't use string ("foo") as a SCALAR ref while "strict refs" in use at (re_eval 1) line 1.
 ########
 # [perl #37886] strict 'refs' doesn't apply inside defined
 use strict 'refs';

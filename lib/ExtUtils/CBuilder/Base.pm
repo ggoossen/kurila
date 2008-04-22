@@ -11,7 +11,7 @@ $VERSION = '0.22';
 
 sub new {
   my $class = shift;
-  my $self = bless {@_}, $class;
+  my $self = bless \%(@_), $class;
 
   $self->{properties}{perl} = $class->find_perl_interpreter
     or warn "Warning: Can't locate your perl binary";
@@ -88,10 +88,10 @@ sub compile {
   %args{object_file} ||= $self->object_file(%args{source});
   
   my @include_dirs = $self->arg_include_dirs
-    (@{%args{include_dirs} || []},
+    (@{%args{include_dirs} || \@()},
      $self->perl_inc());
   
-  my @defines = $self->arg_defines( %{%args{defines} || {}} );
+  my @defines = $self->arg_defines( %{%args{defines} || \%()} );
   
   my @extra_compiler_flags = $self->split_like_shell(%args{extra_compiler_flags});
   my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
@@ -163,10 +163,10 @@ sub prelink {
   
   require ExtUtils::Mksymlists;
   ExtUtils::Mksymlists::Mksymlists( # dl. abbrev for dynamic library
-    DL_VARS  => %args{dl_vars}      || [],
-    DL_FUNCS => %args{dl_funcs}     || {},
-    FUNCLIST => %args{dl_func_list} || [],
-    IMPORTS  => %args{dl_imports}   || {},
+    DL_VARS  => %args{dl_vars}      || \@(),
+    DL_FUNCS => %args{dl_funcs}     || \%(),
+    FUNCLIST => %args{dl_func_list} || \@(),
+    IMPORTS  => %args{dl_imports}   || \%(),
     NAME     => %args{dl_name},		# Name of the Perl module
     DLBASE   => %args{dl_base},		# Basename of DLL file
     FILE     => %args{dl_file},		# Dir + Basename of symlist file
@@ -193,7 +193,7 @@ sub _do_link {
   my $cf = $self->{config}; # For convenience
   
   my $objects = delete %args{objects};
-  $objects = [$objects] unless ref $objects;
+  $objects = \@($objects) unless ref $objects;
   my $out = %args{$type} || $self->?$type($objects->[0]);
   
   my @temp_files;

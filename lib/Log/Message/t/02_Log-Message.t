@@ -113,7 +113,7 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
 
         is( $item, $i,              q[Item handler check] );
         is_deeply( $item, $i,       q[  Item handler deep check] );
-        is_deeply( \@a, [1,2,3],    q[  Item extra argument check] );
+        is_deeply( \@a, \@(1,2,3),    q[  Item extra argument check] );
     }
 
     {

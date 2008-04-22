@@ -19,13 +19,13 @@ use Pod::Simple::LinkSection;
 use Pod::Simple::BlackBox; # for its pretty()
 
 my $bare_treelet =
-  ['B', {'pie' => 'no'},
+  \@('B', \%('pie' => 'no'),
    'a',
-   ['C', {'bzrok' => 'plip'},
+   \@('C', \%('bzrok' => 'plip'),
     'b'
-   ],
+   ),
    'c'
-  ]
+  )
 ;
 my $treelet = Pod::Simple::LinkSection->new($bare_treelet);
 

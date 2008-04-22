@@ -7,7 +7,7 @@ require Tie::Array;
 
 package Tie::BasicArray;
 our @ISA = 'Tie::Array';
-sub TIEARRAY  { bless [], @_[0] }
+sub TIEARRAY  { bless \@(), @_[0] }
 sub STORE     { @_[0]->[@_[1]] = @_[2] }
 sub FETCH     { @_[0]->[@_[1]] }
 sub FETCHSIZE { scalar(@{@_[0]})} 
@@ -32,14 +32,14 @@ sub no_op { $foo++ }
 
 our ($sch, @keys, @values, @fake, %fake, $v, @x, %hv);
 
-$sch = {
+$sch = \%(
     'abc' => 1,
     'def' => 2,
     'jkl' => 3,
-};
+);
 
 # basic normal array
-$a = [];
+$a = \@();
 $a->[0] = $sch;
 
 eval {
@@ -130,7 +130,7 @@ not_hash($@);
 
 
 # evaluation in scalar context
-my $avhv = [{}];
+my $avhv = \@(\%());
 
 eval {
     () = %$avhv;
@@ -143,11 +143,11 @@ eval {
 };
 not_hash($@);
 
-$avhv = [];
+$avhv = \@();
 eval { $a = %$avhv };
 not_hash($@);
 
-$avhv = [{foo=>1, bar=>2}];
+$avhv = \@(\%(foo=>1, bar=>2));
 eval {
     %$avhv =~ m,^\d+/\d+,;
 };
@@ -159,14 +159,14 @@ sub f {
     @_[0] = 'b';
     print "ok 11\n";
 }
-$a = [{key => 1}, 'a'];
+$a = \@(\%(key => 1), 'a');
 eval {
     f($a->{key});
 };
 not_hash($@);
 
 # check if exists() is behaving properly
-$avhv = [{foo=>1,bar=>2,pants=>3}];
+$avhv = \@(\%(foo=>1,bar=>2,pants=>3));
 eval {
     no_op if exists $avhv->{bar};
 };
@@ -273,7 +273,7 @@ eval {
 not_hash($@);
 
 # Check hash slices (BUG ID 20010423.002)
-$avhv = [{foo=>1, bar=>2}];
+$avhv = \@(\%(foo=>1, bar=>2));
 eval {
     %$avhv{["foo", "bar"]} = (42, 53);
 };
