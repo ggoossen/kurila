@@ -997,7 +997,7 @@ case 2:
   case 116:
 #line 947 "perly.y"
     { (yyval.opval) = newBINOP(OP_AELEM, 0,
-					oopsAV(newAVREF(convert(OP_ANONLIST, OPf_SPECIAL, (ps[(2) - (6)].val.opval)))),
+					oopsAV(convert(OP_ANONLIST, 0, (ps[(2) - (6)].val.opval))),
 					scalar((ps[(5) - (6)].val.opval)));
 			  TOKEN_GETMAD((ps[(1) - (6)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(3) - (6)].val.i_tkval),(yyval.opval),')');
@@ -1009,7 +1009,7 @@ case 2:
   case 117:
 #line 956 "perly.y"
     { (yyval.opval) = newBINOP(OP_AELEM, 0,
-					oopsAV(newAVREF(convert(OP_ANONLIST, OPf_SPECIAL, (OP*)NULL))),
+					oopsAV(convert(OP_ANONLIST, 0, (OP*)NULL)),
 					scalar((ps[(4) - (5)].val.opval)));
 			  TOKEN_GETMAD((ps[(1) - (5)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(2) - (5)].val.i_tkval),(yyval.opval),')');
@@ -1666,7 +1666,7 @@ case 2:
 
   case 203:
 #line 1419 "perly.y"
-    { (yyval.opval) = newAVREF(newANONLIST((ps[(2) - (3)].val.opval)));
+    { (yyval.opval) = newANONLIST((ps[(2) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'[');
 			  TOKEN_GETMAD((ps[(3) - (3)].val.i_tkval),(yyval.opval),']');
 			;}
@@ -1674,7 +1674,7 @@ case 2:
 
   case 204:
 #line 1424 "perly.y"
-    { (yyval.opval) = newAVREF(newANONLIST((OP*)NULL));
+    { (yyval.opval) = newANONLIST((OP*)NULL);
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'[');
 			  TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),']');
 			;}
@@ -1689,7 +1689,7 @@ case 2:
 
   case 206:
 #line 1435 "perly.y"
-    { (yyval.opval) = newHVREF(newANONHASH((ps[(2) - (3)].val.opval)));
+    { (yyval.opval) = newANONHASH((ps[(2) - (3)].val.opval));
 			  TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'{');
 			  TOKEN_GETMAD((ps[(3) - (3)].val.i_tkval),(yyval.opval),'}');
 			;}
@@ -1697,7 +1697,7 @@ case 2:
 
   case 207:
 #line 1440 "perly.y"
-    { (yyval.opval) = newHVREF(newANONHASH((OP*)NULL));
+    { (yyval.opval) = newANONHASH((OP*)NULL);
 			  TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'{');
 			  TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'}');
 			;}

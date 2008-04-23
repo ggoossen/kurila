@@ -945,7 +945,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	'(' expr ')' '[' expr ']'            /* list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
-					oopsAV(newAVREF(convert(OP_ANONLIST, OPf_SPECIAL, $2))),
+					oopsAV(convert(OP_ANONLIST, 0, $2)),
 					scalar($5));
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
@@ -954,7 +954,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	'(' ')' '[' expr ']'            /* empty list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
-					oopsAV(newAVREF(convert(OP_ANONLIST, OPf_SPECIAL, (OP*)NULL))),
+					oopsAV(convert(OP_ANONLIST, 0, (OP*)NULL)),
 					scalar($4));
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
@@ -1416,12 +1416,12 @@ ary	:	'@' indirob
 			  TOKEN_GETMAD($1,$$,'@');
 			}
         |       ANONARY expr ')'  /* @( ... ) */
-			{ $$ = newAVREF(newANONLIST($2));
+			{ $$ = newANONLIST($2);
 			  TOKEN_GETMAD($1,$$,'[');
 			  TOKEN_GETMAD($3,$$,']');
 			}
         |	ANONARY ')'  /* @() */
-			{ $$ = newAVREF(newANONLIST((OP*)NULL));
+			{ $$ = newANONLIST((OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'[');
 			  TOKEN_GETMAD($2,$$,']');
 			}
@@ -1432,12 +1432,12 @@ hsh	:	'%' indirob
 			  TOKEN_GETMAD($1,$$,'%');
 			}
 	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
-			{ $$ = newHVREF(newANONHASH($2));
+			{ $$ = newANONHASH($2);
 			  TOKEN_GETMAD($1,$$,'{');
 			  TOKEN_GETMAD($3,$$,'}');
 			}
 	|	ANONHSH ')'	%prec '(' /* %() */
-			{ $$ = newHVREF(newANONHASH((OP*)NULL));
+			{ $$ = newANONHASH((OP*)NULL);
 			  TOKEN_GETMAD($1,$$,'{');
 			  TOKEN_GETMAD($2,$$,'}');
 			}

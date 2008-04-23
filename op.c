@@ -922,8 +922,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_PACK:
     case OP_JOIN:
     case OP_LSLICE:
-    case OP_ANONLIST:
-    case OP_ANONHASH:
     case OP_SORT:
     case OP_REVERSE:
     case OP_RANGE:
@@ -966,6 +964,11 @@ Perl_scalarvoid(pTHX_ OP *o)
 	if (!(o->op_private & (OPpLVAL_INTRO|OPpOUR_INTRO)))
 	    /* Otherwise it's "Useless use of grep iterator" */
 	    useless = OP_DESC(o);
+	break;
+
+    case OP_ANONLIST:
+    case OP_ANONHASH:
+	useless = OP_DESC(o);
 	break;
 
     case OP_NOT:
@@ -1698,6 +1701,8 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 
     case OP_PADAV:
     case OP_PADHV:
+    case OP_ANONLIST:
+    case OP_ANONHASH:
 	if (set_op_ref)
 	    o->op_flags |= OPf_REF;
 	break;
@@ -5844,13 +5849,13 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 OP *
 Perl_newANONLIST(pTHX_ OP *o)
 {
-    return convert(OP_ANONLIST, OPf_SPECIAL, o);
+    return convert(OP_ANONLIST, 0, o);
 }
 
 OP *
 Perl_newANONHASH(pTHX_ OP *o)
 {
-    return convert(OP_ANONHASH, OPf_SPECIAL, o);
+    return convert(OP_ANONHASH, 0, o);
 }
 
 OP *
@@ -5906,6 +5911,9 @@ Perl_oopsHV(pTHX_ OP *o)
     case OP_RV2HV:
 	ref(o, OP_RV2HV);
 	break;
+
+    case OP_ANONHASH:
+	return ref(o, OP_RV2AV);
 
     default:
 	Perl_croak(aTHX_ "oops: oopsHV");

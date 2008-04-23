@@ -1054,7 +1054,7 @@ Perl_do_kv(pTHX)
     HV *keys;
     register HE *entry;
     const I32 gimme = GIMME_V;
-    const I32 dokv =     (PL_op->op_type == OP_RV2HV || PL_op->op_type == OP_PADHV);
+    const I32 dokv =     (PL_op->op_type == OP_RV2HV || PL_op->op_type == OP_PADHV || PL_op->op_type == OP_ANONHASH);
     const I32 dokeys =   dokv || (PL_op->op_type == OP_KEYS);
     const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES);
 
