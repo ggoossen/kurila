@@ -86,7 +86,7 @@ our $test;
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'linefeed grep is');
 
     @res = grep
-        (\%(a=>$_)->{a},
+        (%(a=>$_){a},
         ("chobb"));
     cmp_ok( scalar(@res), '==', 1, 'deref grep nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'deref grep is');
@@ -100,12 +100,12 @@ our $test;
     cmp_ok( scalar(@res), '==', 1, 'no paren linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'no paren linefeed grep is');
 
-    @res = grep \%(a=>$_)->{a}, ("chobb");
+    @res = grep %(a=>$_){a}, ("chobb");
     cmp_ok( scalar(@res), '==', 1, 'no paren deref grep nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'no paren deref grep is');
 
     @res = grep
-         \%(a=>$_)->{a}, ("chobb");
+         %(a=>$_){a}, ("chobb");
     cmp_ok( scalar(@res), '==', 1, 'no paren deref linefeed  nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'no paren deref linefeed  is');
 

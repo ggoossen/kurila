@@ -400,17 +400,20 @@ checkOptree(note   => q{},
 # 5  <1> rv2av[t6] lKM/1
 # 6  <@> mapstart lK
 # 7  <|> mapwhile(other->8)[t7] lK
-# 8      <0> pushmark s
-# 9      <#> gvsv[*_] s
-# a      <1> lc[t4] sK/1
-# b      <$> const[IV 1] s
-# c      <@> anonhash sK*/1
+# 8      <0> pushmark sRM
+# 9      <0> pushmark s
+# a      <#> gvsv[*_] s
+# b      <1> lc[t4] sK/1
+# c      <$> const[IV 1] s
+# d      <@> anonhash sK*/1
+# e      <1> rv2hv[t5] lKRM/1
+# f      <1> refgen lK/1
 #            goto 7
-# d  <0> pushmark s
-# e  <#> gv[*hashes] s
-# f  <1> rv2av[t2] lKRM*/1
-# g  <2> aassign[t8] KS/COMMON
-# h  <1> leavesub[1 ref] K/REFC,1
+# g  <0> pushmark s
+# h  <#> gv[*hashes] s
+# i  <1> rv2av[t2] lKRM*/1
+# j  <2> aassign[t9] KS/COMMON
+# k  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 601 (eval 32):1) v
 # 2  <0> pushmark s

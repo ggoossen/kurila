@@ -917,7 +917,7 @@ $_='123x123';
 ok( ('123||x|123|' eq join '|', @res) );
 
 # see if matching against temporaries (created via pp_helem()) is safe
-\%( foo => "ok $test\n".$^X )->{foo} =~ m/^(.*)\n/g;
+%( foo => "ok $test\n".$^X ){foo} =~ m/^(.*)\n/g;
 print "$1\n";
 $test++;
 

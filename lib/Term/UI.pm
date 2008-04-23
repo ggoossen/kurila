@@ -217,7 +217,7 @@ sub ask_yn {
             ### if you supplied the default as a boolean, rather than y/n
             ### transform it to a y/n now
             $args->{default} = $args->{default} =~ m/\d/ 
-                                ? \%( 0 => 'n', 1 => 'y' )->{ $args->{default} }
+                                ? %( 0 => 'n', 1 => 'y' ){ $args->{default} }
                                 : $args->{default};
         
             @list = map { lc $args->{default} eq lc $_
