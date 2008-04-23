@@ -92,7 +92,7 @@ Perl_dump_all(pTHX)
     PerlIO_setlinebuf(Perl_debug_log);
     if (PL_main_root)
 	op_dump(PL_main_root);
-    dump_packsubs(PL_defstash);
+/*     dump_packsubs(PL_defstash); */
 }
 
 void

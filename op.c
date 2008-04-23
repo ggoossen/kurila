@@ -3938,6 +3938,9 @@ S_is_list_assignment(pTHX_ register const OP *o)
     if (type == OP_PADAV || type == OP_PADHV)
 	return TRUE;
 
+    if (type == OP_ANONLIST)
+	return TRUE;
+
     if (type == OP_RV2SV)
 	return FALSE;
 
@@ -5880,11 +5883,10 @@ Perl_oopsAV(pTHX_ OP *o)
 	break;
 
     case OP_ANONLIST:
-	return ref(newAVREF(o), OP_RV2AV);
+	return ref(o, OP_RV2AV);
 
     default:
-	if (ckWARN_d(WARN_INTERNAL))
-	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL), "oops: oopsAV");
+	Perl_croak(aTHX_ "oops: oopsAV");
 	break;
     }
     return o;
@@ -5906,8 +5908,7 @@ Perl_oopsHV(pTHX_ OP *o)
 	break;
 
     default:
-	if (ckWARN_d(WARN_INTERNAL))
-	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL), "oops: oopsHV");
+	Perl_croak(aTHX_ "oops: oopsHV");
 	break;
     }
     return o;
@@ -5925,10 +5926,8 @@ Perl_newAVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADAV];
 	return o;
     }
-    else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV)
-		&& ckWARN(WARN_DEPRECATED)) {
-	Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
-		"Using an array as a reference is deprecated");
+    else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV)) {
+	Perl_croak(aTHX_ "Array may not be used as a reference");
     }
     return newUNOP(OP_RV2AV, 0, scalar(o));
 }
@@ -5953,10 +5952,8 @@ Perl_newHVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADHV];
 	return o;
     }
-    else if ((o->op_type == OP_RV2HV || o->op_type == OP_PADHV)
-		&& ckWARN(WARN_DEPRECATED)) {
-	Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
-		"Using a hash as a reference is deprecated");
+    else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV) {
+	Perl_croak(aTHX_ "Hash may not be used as a reference");
     }
     return newUNOP(OP_RV2HV, 0, scalar(o));
 }

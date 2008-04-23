@@ -3700,6 +3700,13 @@ Perl_yylex(pTHX)
 	    ++s;
 	    Mop(OP_MODULO);
 	}
+
+	if (s[1] == '(') {
+	    /* anonymous hash constructor */
+	    s += 2;
+	    OPERATOR(ANONHSH);
+	}
+
 	PL_tokenbuf[0] = '%';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1,
 		sizeof PL_tokenbuf - 1, FALSE);
@@ -3931,7 +3938,7 @@ Perl_yylex(pTHX)
 	{
 	    const char tmp = *s++;
 	    s = SKIPSPACE1(s);
-	    if (*s == '{')
+	    if (*s == '{' && PL_expect != XOPERATOR)
 		PREBLOCK(tmp);
 	    TERM(tmp);
 	}
@@ -4396,6 +4403,12 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
 
+	if (s[1] == '(') {
+	    /* array constructor */
+	    s += 2;
+	    OPERATOR(ANONARY);
+	}
+
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
 	if (!PL_tokenbuf[1]) {
@@ -4524,18 +4537,6 @@ Perl_yylex(pTHX)
 	TERM(sublex_start(pl_yylval.ival, PL_lex_op));
 
     case '\\':
-	if (PL_expect != XOPERATOR) {
-	    if (s[1] == '@' && s[2] == '(') {
-		/* anon array constructor */
-		s += 3;
-		OPERATOR(ANONARY);
-	    }
-	    if (s[1] == '%' && s[2] == '(') {
-		/* anon hash constructor */
-		s += 3;
-		OPERATOR(ANONHSH);
-	    }
-	}
 	s++;
 	if (PL_lex_inwhat && isDIGIT(*s) && ckWARN(WARN_SYNTAX))
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),"Can't use \\%c to mean $%c in expression",
