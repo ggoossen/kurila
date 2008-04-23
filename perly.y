@@ -1096,27 +1096,8 @@ termunop : '-' term %prec UMINUS                       /* -$x */
     ;
 
 /* Constructors for anonymous data */
-anonymous:	ANONARY expr ')'  /* @( ... ) */
-			{ $$ = newANONLIST($2);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($3,$$,']');
-			}
-        |	ANONARY ')'  /* @( ... ) */
-			{ $$ = newANONLIST((OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($2,$$,']');
-			}
-	|	ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
-			{ $$ = newANONHASH($2);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($3,$$,'}');
-			}
-	|	ANONHSH ')'	%prec '(' /* %( ... ) */
-			{ $$ = newANONHASH((OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($2,$$,'}');
-			}
-	|	ANONSUB startanonsub proto subattrlist block	%prec '('
+anonymous:
+	ANONSUB startanonsub proto subattrlist block	%prec '('
 			{ SvREFCNT_inc_simple_void(PL_compcv);
 			  $$ = newANONATTRSUB($2, $3, $4, $5);
 			  TOKEN_GETMAD($1,$$,'o');
@@ -1434,11 +1415,31 @@ ary	:	'@' indirob
 			{ $$ = newAVREF($2);
 			  TOKEN_GETMAD($1,$$,'@');
 			}
+        |       ANONARY expr ')'  /* @( ... ) */
+			{ $$ = newAVREF(newANONLIST($2));
+			  TOKEN_GETMAD($1,$$,'[');
+			  TOKEN_GETMAD($3,$$,']');
+			}
+        |	ANONARY ')'  /* @() */
+			{ $$ = newAVREF(newANONLIST((OP*)NULL));
+			  TOKEN_GETMAD($1,$$,'[');
+			  TOKEN_GETMAD($2,$$,']');
+			}
 	;
 
 hsh	:	'%' indirob
 			{ $$ = newHVREF($2);
 			  TOKEN_GETMAD($1,$$,'%');
+			}
+	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
+			{ $$ = newHVREF(newANONHASH($2));
+			  TOKEN_GETMAD($1,$$,'{');
+			  TOKEN_GETMAD($3,$$,'}');
+			}
+	|	ANONHSH ')'	%prec '(' /* %() */
+			{ $$ = newHVREF(newANONHASH((OP*)NULL));
+			  TOKEN_GETMAD($1,$$,'{');
+			  TOKEN_GETMAD($2,$$,'}');
 			}
 	;
 
