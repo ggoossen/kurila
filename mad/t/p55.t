@@ -254,3 +254,5 @@ use utf8;
 my $msg = "ce ºtii tu, bã ?\n";
 ########
 (stat "abc")[2];
+########
+$x->foobar(1, 3) = ();

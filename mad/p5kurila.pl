@@ -801,10 +801,12 @@ sub no_bracket_names {
 sub anon_aryhsh {
     my $xml = shift;
     for my $op ($xml->findnodes("//op_anonlist")) {
+        next unless get_madprop($op, 'square_open');
         set_madprop($op, 'square_open', '\@(');
         set_madprop($op, 'square_close', ')');
     }
     for my $op ($xml->findnodes("//op_anonhash")) {
+        next unless get_madprop($op, 'curly_open');
         set_madprop($op, 'curly_open', '\%(');
         set_madprop($op, 'curly_close', ')');
     }
