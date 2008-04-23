@@ -3795,18 +3795,33 @@ PP(pp_lslice)
 
 PP(pp_anonlist)
 {
-    dVAR; dSP; dMARK; dORIGMARK;
+    dVAR; dSP; dMARK;
+    const I32 gimme = GIMME_V;
     const I32 items = SP - MARK;
-    SV * const av = (SV *) av_make(items, MARK+1);
-    SP = ORIGMARK;		/* av_make() might realloc stack_sp */
-    mXPUSHs((PL_op->op_flags & OPf_SPECIAL)
-	    ? newRV_noinc(av) : av);
+
+    if (PL_op->op_flags & OPf_REF) {
+	dORIGMARK;
+	SV * const av = (SV *) av_make(items, MARK+1);
+	SP = ORIGMARK;		/* av_make() might realloc stack_sp */
+
+	PUSHs(av);
+	RETURN;
+    }
+
+    if (gimme == G_ARRAY) {
+	/* Nothing: items are already on the stack */
+    } else if (gimme == G_SCALAR) {
+	SP = MARK;
+	mXPUSHi(items);
+    } else {
+    }
     RETURN;
 }
 
 PP(pp_anonhash)
 {
     dVAR; dSP; dMARK; dORIGMARK;
+    const I32 gimme = GIMME_V;
     HV* const hv = newHV();
 
     while (MARK < SP) {
@@ -3819,8 +3834,22 @@ PP(pp_anonhash)
 	(void)hv_store_ent(hv,key,val,0);
     }
     SP = ORIGMARK;
-    mXPUSHs((PL_op->op_flags & OPf_SPECIAL)
-	    ? newRV_noinc((SV*) hv) : (SV*) hv);
+
+    if (PL_op->op_flags & OPf_REF) {
+	PUSHs((SV*)hv);
+	RETURN;
+    }
+
+    if (gimme == G_ARRAY) { /* array wanted */
+	PUTBACK;
+	EXTEND(PL_stack_sp, 1);
+	*++PL_stack_sp = (SV*)hv;
+	return do_kv();
+    }
+    else if (gimme == G_SCALAR) {
+	PUTBACK;
+	XPUSHs( Perl_hv_scalar(aTHX_ hv) );
+    }
     RETURN;
 }
 
