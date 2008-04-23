@@ -2445,6 +2445,7 @@ Perl_gen_constant_list(pTHX_ register OP *o)
     PL_op = curop;
     assert (!(curop->op_flags & OPf_SPECIAL));
     assert(curop->op_type == OP_RANGE);
+    PL_op->op_flags |= OPf_REF;
     pp_anonlist();
     PL_tmps_floor = oldtmps_floor;
 
@@ -3943,7 +3944,7 @@ S_is_list_assignment(pTHX_ register const OP *o)
     if (type == OP_PADAV || type == OP_PADHV)
 	return TRUE;
 
-    if (type == OP_ANONLIST)
+    if (type == OP_ANONLIST || type == OP_ANONHASH)
 	return TRUE;
 
     if (type == OP_RV2SV)
