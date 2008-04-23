@@ -3912,6 +3912,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     }
 
     /* Useful during FAIL. */
+#ifdef RE_TRACK_PATTERN_OFFSETS
     Newxz(ri->u.offsets, 2*RExC_size+1, U32); /* MJD 20001228 */
     if (ri->u.offsets) {
 	ri->u.offsets[0] = RExC_size;
@@ -3920,6 +3921,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
                           "%s %"UVuf" bytes for offset annotations.\n",
                           ri->u.offsets ? "Got" : "Couldn't get",
                           (UV)((2*RExC_size+1) * sizeof(U32))));
+#endif  /* RE_TRACK_PATTERN_OFFSETS */
     SetProgLen(ri,RExC_size);
     RExC_rx_sv = rx;
     RExC_rx = r;
@@ -8180,6 +8182,7 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 
     while (src > opnd) {
 	StructCopy(--src, --dst, regnode);
+#ifdef RE_TRACK_PATTERN_OFFSETS
         if (RExC_offsets) {     /* MJD 20010112 */
 	    MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s copy %"UVuf" -> %"UVuf" (max %"UVuf").\n",
                   "reg_insert",
@@ -8193,10 +8196,12 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	    Set_Node_Offset_To_R(dst-RExC_emit_start, Node_Offset(src));
 	    Set_Node_Length_To_R(dst-RExC_emit_start, Node_Length(src));
         }
+#endif /* RE_TRACK_PATTERN_OFFSETS */
     }
     
 
     place = opnd;		/* Op node, where operand used to be. */
+#ifdef RE_TRACK_PATTERN_OFFSETS
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s %"UVuf" <- %"UVuf" (max %"UVuf").\n", 
               "reginsert",
@@ -8210,6 +8215,7 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	Set_Node_Offset(place, RExC_parse);
 	Set_Node_Length(place, 1);
     }
+#endif /* RE_TRACK_PATTERN_OFFSETS */
     src = NEXTOPER(place);
     FILL_ADVANCE_NODE(place, op);
     Zero(src, offset, regnode);

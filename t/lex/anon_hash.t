@@ -1,5 +1,5 @@
 #!./perl
-__END__
+
 BEGIN { require "./test.pl"; }
 plan( tests => 6 );
 
