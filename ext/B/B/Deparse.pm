@@ -1751,8 +1751,8 @@ sub anon_hash_or_list {
     my $self = shift;
     my($op, $cx) = @_;
 
-    my($pre, $post) = @{\%("anonlist" => \@('\@(',')'),
-                           "anonhash" => \@('\%(',')'))->{$op->name}};
+    my($pre, $post) = @{%("anonlist" => \@('@(',')'),
+                          "anonhash" => \@('%(',')')){$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
     for (; !null($op); $op = $op->sibling) {
@@ -2606,7 +2606,7 @@ sub loop_common {
 	$head = "foreach $var ($ary) ";
     } elsif ($kid->name eq "null") { # while/until
 	$kid = $kid->first;
-	my $name = \%("and" => "while", "or" => "until")->{$kid->name};
+	my $name = %("and" => "while", "or" => "until"){$kid->name};
 	$cond = $self->deparse($kid->first, 1);
 	$head = "$name ($cond) ";
 	$body = $kid->first->sibling;

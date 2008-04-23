@@ -215,7 +215,7 @@ SKIP: {   my $meth = '__get_extract_dir';
 
     ### get the right separator -- File::Spec does clean ups for
     ### paths, so we need to join ourselves.
-    my $sep  = \@( split '', File::Spec->catfile( 'a', 'b' ) )->[1];
+    my $sep  = ( split '', File::Spec->catfile( 'a', 'b' ) )[1];
     
     ### bug #23999: Attempt to generate Makefile.PL gone awry
     ### showed that dirs in the style of './dir/' were reported
@@ -233,7 +233,7 @@ SKIP: {   my $meth = '__get_extract_dir';
         my @files = map { length $prefix 
                                 ? join $sep, $prefix, $_
                                 : $_
-                      } $dir, File::Spec->catfile( $dir, \@(keys %$tmpl)->[0] );
+                      } $dir, File::Spec->catfile( $dir, (keys %$tmpl)[0] );
         
         my $res = $Class->?$meth( \@files );
         $res = &Win32::GetShortPathName( $res ) if IS_WIN32;

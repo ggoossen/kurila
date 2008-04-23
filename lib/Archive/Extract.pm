@@ -1037,8 +1037,8 @@ sub __get_extract_dir {
     ### dirs are different.. do they share the base dir?
     ### if so, use that, if not, fall back to '.'
     } else {
-        my $base1 = \@( File::Spec->splitdir( $dir1 ) )->[0];
-        my $base2 = \@( File::Spec->splitdir( $dir2 ) )->[0];
+        my $base1 = ( File::Spec->splitdir( $dir1 ) )[0];
+        my $base2 = ( File::Spec->splitdir( $dir2 ) )[0];
         
         $dir = File::Spec->rel2abs( $base1 eq $base2 ? $base1 : '.' ); 
     }        

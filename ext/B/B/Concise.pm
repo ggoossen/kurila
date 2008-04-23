@@ -691,7 +691,7 @@ sub concise_sv {
             $sv = $sv->RV;
         }
 	if (class($sv) eq "SPECIAL") {
-	    $hr->{svval} .= \@("Null", "sv_undef", "sv_yes", "sv_no")->[$$sv];
+	    $hr->{svval} .= ("Null", "sv_undef", "sv_yes", "sv_no")[$$sv];
 	} elsif ($preferpv && $sv->FLAGS ^&^ SVf_POK) {
 	    $hr->{svval} .= cstring($sv->PV);
 	} elsif ($sv->FLAGS ^&^ SVf_NOK) {
