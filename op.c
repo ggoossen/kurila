@@ -5935,7 +5935,7 @@ Perl_newAVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADAV];
 	return o;
     }
-    else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV)) {
+    else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV || o->op_type == OP_ANONLIST )) {
 	Perl_croak(aTHX_ "Array may not be used as a reference");
     }
     return newUNOP(OP_RV2AV, 0, scalar(o));
@@ -5961,7 +5961,7 @@ Perl_newHVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADHV];
 	return o;
     }
-    else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV) {
+    else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV || o->op_type == OP_ANONHASH) {
 	Perl_croak(aTHX_ "Hash may not be used as a reference");
     }
     return newUNOP(OP_RV2HV, 0, scalar(o));

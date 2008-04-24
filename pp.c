@@ -3836,7 +3836,7 @@ PP(pp_anonhash)
     SP = ORIGMARK;
 
     if (PL_op->op_flags & OPf_REF) {
-	PUSHs((SV*)hv);
+	mPUSHs((SV*)hv);
 	RETURN;
     }
 
