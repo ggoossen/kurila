@@ -452,8 +452,7 @@ Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flag
 	goto malformed;
     }
 
-    if (UTF8_IS_START(uv) && curlen > 1 && !UTF8_IS_CONTINUATION(s[1]) &&
-	!(flags & UTF8_ALLOW_NON_CONTINUATION)) {
+    if (UTF8_IS_START(uv) && curlen > 1 && !UTF8_IS_CONTINUATION(s[1])) {
 	warning = UTF8_WARN_NON_CONTINUATION;
 	goto malformed;
     }
@@ -497,14 +496,13 @@ Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flag
     ouv = uv;
 
     while (len--) {
-	if (!UTF8_IS_CONTINUATION(*s) &&
-	    !(flags & UTF8_ALLOW_NON_CONTINUATION)) {
+	if (!UTF8_IS_CONTINUATION(*s)) {
+	    expectlen = expectlen - len;
 	    s--;
 	    warning = UTF8_WARN_NON_CONTINUATION;
 	    goto malformed;
 	}
-	else
-	    uv = UTF8_ACCUMULATE(uv, (U8)*s);
+	uv = UTF8_ACCUMULATE(uv, (U8)*s);
 	if (!(uv > ouv)) {
 	    /* These cannot be allowed. */
 	    if (uv == ouv) {

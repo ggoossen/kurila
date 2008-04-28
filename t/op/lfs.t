@@ -128,7 +128,7 @@ print "# we seem to have sparse files...\n";
 %ENV{LC_ALL} = "C";
 
 my $r = system '../perl', '-e', <<'EOF';
-open(BIG, ">big");
+open(BIG, ">", "big");
 seek(BIG, 5_000_000_000, 0);
 print BIG "big";
 exit 0;
