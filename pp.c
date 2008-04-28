@@ -3804,7 +3804,7 @@ PP(pp_anonlist)
 	SV * const av = (SV *) av_make(items, MARK+1);
 	SP = ORIGMARK;		/* av_make() might realloc stack_sp */
 
-	PUSHs(av);
+	mXPUSHs(av);
 	RETURN;
     }
 
@@ -3836,7 +3836,7 @@ PP(pp_anonhash)
     SP = ORIGMARK;
 
     if (PL_op->op_flags & OPf_REF) {
-	mPUSHs((SV*)hv);
+	mXPUSHs((SV*)hv);
 	RETURN;
     }
 

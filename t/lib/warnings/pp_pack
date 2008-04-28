@@ -47,13 +47,6 @@ bless \\@(), "" ;
 EXPECT
 Explicit blessing to '' (assuming package main) at - line 3.
 ########
-# pp.c
-use utf8 ;
-$_ = "\x[80]  \x[ff]" ;
-reverse ;
-EXPECT
-
-########
 # pp_pack.c
 use warnings 'pack' ;
 print unpack("C", pack("C",   -1)), "\n",

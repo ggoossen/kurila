@@ -813,14 +813,19 @@ sub dies_like(&$;$) {
 
 sub eval_dies_like($$;$) {
     my ($e, $qr, $name) = @_;
-    eval "$e";
-    my $err = $@;
-    if (not $err) {
-        local $Level = 2;
-        diag "didn't die";
-        return ok(0, $name);
+  TODO:
+    {
+        todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{PERL_VALGRIND};
+        
+        eval "$e";
+        my $err = $@;
+        if (not $err) {
+            local $Level = 2;
+            diag "didn't die";
+            return ok(0, $name);
+        }
+        return like_yn(0, $err->{description}, $qr );
     }
-    return like_yn(0, $err->{description}, $qr );
 }
 
 1;
