@@ -75,7 +75,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO HASHBRACK NOAMP HSLICE ASLICE
+%token <i_tkval> DO NOAMP HSLICE ASLICE
 %token <i_tkval> ANONARY ANONHSH
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
