@@ -93,5 +93,5 @@ use utf8 ;
 $_ = "\x[80]  \x[ff]" ;
 reverse ;
 EXPECT
-Malformed UTF-8 character (overflow at 0x2ca62800, byte 0x00, after start byte 0xff) in reverse at - line 4.
+Malformed UTF-8 character (unexpected non-continuation byte 0x20, immediately after start byte 0x80) in reverse at - line 4.
 ########
