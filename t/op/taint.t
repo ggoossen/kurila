@@ -60,7 +60,7 @@ if ($Is_VMS) {
     # library in VMS on reference to the their keys in %ENV.
     # There is currently no way to determine if they did not exist
     # before this test was run.
-    eval <<EndOfCleanup;
+    eval <<EndOfCleanup; die if $@;
 	END \{
 	    \$ENV\{PATH\} = \$old_env_path;
 	    warn "# Note: logical name 'PATH' may have been created\n";
@@ -159,7 +159,7 @@ my $TEST = catfile(curdir(), 'TEST');
 		die "$0: failed to copy cc3250mt.dll: $!\n";
 	    eval q{
 		END { unlink "cc3250mt.dll" }
-	    };
+	    }; die if $@;
 	}
     }
     %ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
@@ -278,7 +278,6 @@ my $TEST = catfile(curdir(), 'TEST');
     test not tainted $pi;
     test sprintf("\%.5f", $pi) eq '3.14159';
 }
-
 # How about command-line arguments? The problem is that we don't
 # always get some, so we'll run another process with some.
 SKIP: {
@@ -425,7 +424,7 @@ SKIP: {
     # Try first new style but allow also old style.
     # We do not want the whole taint.t to fail
     # just because Errno possibly failing.
-    test eval('$!{ENOENT}') ||
+    test eval('%!{ENOENT}') ||
 	$! == 2 || # File not found
 	($Is_Dos && $! == 22) ||
 	($^O eq 'mint' && $! == 33);
@@ -1202,17 +1201,17 @@ SKIP:
 {
     my $val = 0;
     my $tainted = '1' . $TAINT;
-    eval '$val = eval $tainted;';
+    eval_dies_like('$val = eval $tainted;',
+                   qr/^Insecure dependency in eval/);
     is ($val, 0, "eval doesn't like tainted strings");
-    like ($@->{description}, qr/^Insecure dependency in eval/);
 
     # Rather nice code to get a tainted undef by from Rick Delaney
     open FH, "<", "test.pl" or die $!;
     seek FH, 0, 2 or die $!;
     $tainted = ~< *FH;
 
-    eval 'eval $tainted';
-    like ($@->{description}, qr/^Insecure dependency in eval/);
+    eval_dies_like('eval $tainted',
+                   qr/^Insecure dependency in eval/);
 }
 
 {
