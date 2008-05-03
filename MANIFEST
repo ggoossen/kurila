@@ -2511,8 +2511,8 @@ t/lex/qq.t			See if qq works
 t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
-t/lex/anon_array.t		See if @( ... ) work
-t/lex/anon_hash.t		See if %( ... ) work
+t/op/anon_array.t		See if @( ... ) work
+t/op/anon_hash.t		See if %( ... ) work
 t/lib/1_compile.t		See if the various libraries and extensions compile
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
