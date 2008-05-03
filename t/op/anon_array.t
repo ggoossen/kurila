@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require "./test.pl"; }
-plan( tests => 6 );
+plan( tests => 7 );
 
 my $x = \ @(qw|foo bar baz|);
 is $x->[0], 'foo', "anon array ref construction";
