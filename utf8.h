@@ -194,7 +194,6 @@ static __inline__ bool UTF8_IS_CONTINUED(const char c) {
 
 #define UTF8_ALLOW_EMPTY		0x0001
 #define UTF8_ALLOW_CONTINUATION		0x0002
-#define UTF8_ALLOW_NON_CONTINUATION	0x0004
 #define UTF8_ALLOW_FE_FF		0x0008 /* Allow above 0x7fffFFFF */
 #define UTF8_ALLOW_SHORT		0x0010
 #define UTF8_ALLOW_SURROGATE		0x0020
