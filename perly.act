@@ -755,9 +755,9 @@ case 2:
                             TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                             if (IVAL((ps[(2) - (2)].val.i_tkval)) == OP_JOIN) {
                                 /* creates a join when ending list */
-                                OP *list
+                                OP *gvop
                                     = newSVREF(newGVOP(OP_GV, 0, gv_fetchpvs("\"", GV_ADD|GV_NOTQUAL, SVt_PV)));
-                                append_elem(OP_LIST, list, (yyval.opval));
+                                OP* list = append_elem(OP_LIST, gvop, (yyval.opval));
                                 (yyval.opval) = convert(OP_JOIN, 0, list);
                             }
                         ;}
