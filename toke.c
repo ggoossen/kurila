@@ -9738,7 +9738,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     }
     cvp = hv_fetch(table, key, keylen, FALSE);
     if (!cvp || !SvOK(*cvp)) {
-	why1 = "$^H{";
+	why1 = "%^H{";
 	why2 = key;
 	why3 = "} is not defined";
 	goto report;
@@ -9786,7 +9786,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     POPSTACK;
 
     if (!SvOK(res)) {
- 	why1 = "Call to &{$^H{";
+ 	why1 = "Call to &{%^H{";
  	why2 = key;
  	why3 = "}} did not return a defined value";
  	sv = res;
