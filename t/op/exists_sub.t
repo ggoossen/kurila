@@ -1,6 +1,8 @@
 #!./perl
 
-print "1..9\n";
+BEGIN { require "./test.pl" }
+
+plan 9;
 
 sub t1;
 sub t2 : locked;
@@ -14,28 +16,17 @@ sub t5 {1;}
     our @ISA = 'P1';
 }
 
-print "not " unless exists &t1 && not defined &t1;
-print "ok 1\n";
-print "not " unless exists &t2 && not defined &t2;
-print "ok 2\n";
-print "not " unless exists &t3 && not defined &t3;
-print "ok 3\n";
-print "not " unless exists &t4 && not defined &t4;
-print "ok 4\n";
-print "not " unless exists &t5 && defined &t5;
-print "ok 5\n";
+ok( exists &t1 && not defined &t1 );
+ok( exists &t2 && not defined &t2 );
+ok( exists &t3 && not defined &t3 );
+ok( exists &t4 && not defined &t4 );
+ok( exists &t5 && defined &t5 );
 'P2'->tmc;
-print "not " unless not exists &P2::tmc && not defined &P2::tmc;
-print "ok 6\n";
+ok( not exists &P2::tmc && not defined &P2::tmc );
 my $ref;
 $ref->{A}[0] = \&t4;
-print "not " unless exists &{$ref->{A}[0]} && not defined &{$ref->{A}[0]};
-print "ok 7\n";
+ok( exists &{$ref->{A}[0]} && not defined &{$ref->{A}[0]} );
 undef &P1::tmc;
-print "not " unless exists &P1::tmc && not defined &P1::tmc;
-print "ok 8\n";
-eval 'exists &t5()';
-print "not " unless $@;
-print "ok 9\n";
-
-exit 0;
+ok( exists &P1::tmc && not defined &P1::tmc );
+eval_dies_like('exists &t5()',
+               qr/exists argument is not a subroutine name/); 
