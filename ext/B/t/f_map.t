@@ -415,22 +415,24 @@ checkOptree(note   => q{},
 # j  <2> aassign[t9] KS/COMMON
 # k  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 601 (eval 32):1) v
+# 1  <;> nextstate(main 768 (eval 24):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
 # 4  <$> gv(*array) s
 # 5  <1> rv2av[t3] lKM/1
 # 6  <@> mapstart lK
 # 7  <|> mapwhile(other->8)[t4] lK
-# 8      <0> pushmark s
-# 9      <$> gvsv(*_) s
-# a      <1> lc[t2] sK/1
-# b      <$> const(IV 1) s
-# c      <@> anonhash sK*/1
+# 8      <0> pushmark sRM
+# 9      <0> pushmark s
+# a      <$> gvsv(*_) s
+# b      <1> lc[t2] sK/1
+# c      <$> const(IV 1) s
+# d      <@> anonhash lKRM/1
+# e      <1> refgen lK/1
 #            goto 7
-# d  <0> pushmark s
-# e  <$> gv(*hashes) s
-# f  <1> rv2av[t1] lKRM*/1
-# g  <2> aassign[t5] KS/COMMON
-# h  <1> leavesub[1 ref] K/REFC,1
+# f  <0> pushmark s
+# g  <$> gv(*hashes) s
+# h  <1> rv2av[t1] lKRM*/1
+# i  <2> aassign[t5] KS/COMMON
+# j  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT

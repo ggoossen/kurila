@@ -373,5 +373,4 @@ Guessed: match at offset 26
 #Guessed: match at offset 0
 #%MATCHED%
 #Freeing REx: "[q]"
-Got 100 bytes for offset annotations.
 %MATCHED%        

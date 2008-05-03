@@ -36,7 +36,7 @@ my $testno;
 for my $dump (@dumps) {
     $testno++;
 
-    open(FH, ">$file") || die "Can't create $file: $!";
+    open(FH, ">", "$file") || die "Can't create $file: $!";
     binmode(FH);
     print FH $dump;
     close(FH) || die "Can't write $file: $!";

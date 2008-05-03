@@ -1759,21 +1759,13 @@ sub anon_hash_or_list {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
     }
-    if ($pre eq "\{" and $cx +< 1) {
-	# Disambiguate that it's not a block
-	$pre = "+\{";
-    }
     return $pre . join(", ", @exprs) . $post;
 }
 
 sub pp_anonlist {
     my $self = shift;
     my ($op, $cx) = @_;
-    if ($op->flags ^&^ OPf_SPECIAL) {
-	return $self->anon_hash_or_list($op, $cx);
-    }
-    warn "Unexpected op pp_" . $op->name() . " without OPf_SPECIAL";
-    return 'XXX';
+    return $self->anon_hash_or_list($op, $cx);
 }
 
 *pp_anonhash = \&pp_anonlist;
