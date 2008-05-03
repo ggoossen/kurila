@@ -48,7 +48,7 @@ BEGIN {
   *iseq = *is;
 }
 
-plan 1770;
+plan 1774;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);
@@ -261,28 +261,26 @@ our $reg_infty_p = $reg_infty + 1;
 # default value for $reg_infty from Config.pm, but have not.
 
 undef $@;
-ok( not eval q(('aaa' =~ m/(a{1,$reg_infty_m})/)[0] ne 'aaa') || $@ );
+ok( eval q(('aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $@;
 
 undef $@;
-ok( not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) || $@ );
+ok( not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) ); die if $@;
 
 undef $@;
-ok( not eval q(('a' x ($reg_infty_m - 1)) =~ m/a{$reg_infty_m}/) || $@ );
+ok( not eval q(('a' x ($reg_infty_m - 1)) =~ m/a{$reg_infty_m}/) ); die if $@;
 
-undef $@;
-eval "'aaa' =~ m/a\{1,$reg_infty\}/";
-ok( $@->{description} =~ m%^\QQuantifier in {,} bigger than% );
+eval_dies_like( "'aaa' =~ m/a\{1,$reg_infty\}/",
+                qr%^\QQuantifier in {,} bigger than% );
 
-undef $@;
-eval "'aaa' =~ m/a\{1,$reg_infty_p\}/";
-ok( $@->{description} =~ m%^\QQuantifier in {,} bigger than% );
+eval_dies_like( "'aaa' =~ m/a\{1,$reg_infty_p\}/",
+                qr%^\QQuantifier in {,} bigger than% );
 
 # Poke a couple more parse failures
 
 undef $@;
 our $context = 'x' x 256;
-eval qq("{$context}y" =~ m/(?<=$context)y/);
-ok( $@->{description} =~ m%^\QLookbehind longer than 255 not% );
+eval_dies_like( qq("{$context}y" =~ m/(?<=$context)y/),
+                qr%^\QLookbehind longer than 255 not% );
 
 # removed test
 ok(1);
@@ -379,26 +377,30 @@ ok( "@ans" eq 'a/ b' );
 
 my $code = '{$blah = 45}';
 my $blah = 12;
-eval { m/(?$code)/ };
-ok( $@ and $@->{description} =~ m/not allowed at runtime/ and $blah == 12 );
+dies_like( sub { m/(?$code)/ },
+           qr/not allowed at runtime/);
+ok( $blah == 12 , "blah not changed by the eval" );
 
 for $code ('{$blah = 45}','=xx') {
   $blah = 12;
-  $res = eval { "xx" =~ m/(?$code)/o };
   if ($code eq '=xx') {
-    ok( not $@ and $res );
+      $res = eval { "xx" =~ m/(?$code)/o }; die if $@;
+      ok( not $@ );
+      ok( $res );
   } else {
-    ok( $@ and $@->{description} =~ m/not allowed at runtime/ and $blah == 12 );
+      $res = dies_like( sub { "xx" =~ m/(?$code)/o },
+                        qr/not allowed at runtime/ );
+      ok( $blah == 12, "blah not chagned by not allowed eval" );
   }
 }
 
 $code = '{$blah = 45}';
 $blah = 12;
-eval "m/(?$code)/";			
+eval "m/(?$code)/"; die if $@;
 ok($blah == 45);
 
 $blah = 12;
-m/(?{$blah = 45})/;			
+m/(?{$blah = 45})/;
 ok($blah == 45);
 
 $x = 'banana';
@@ -488,10 +490,9 @@ our $lex_a;
 
 
   no re "eval";
-  my $match = eval { m/$a$c$a/ };
-  # FIXME - split this one. That would require removing a lot of hard coded
-  # test numbers.
-  ok($b eq '14' and $@->{description} =~ m/Eval-group not allowed/ and not $match);
+  dies_like( sub { m/$a$c$a/ },
+             qr/Eval-group not allowed/ );
+  ok($b eq '14');
 }
 
 {
@@ -517,8 +518,8 @@ our $lex_a;
   ok($c == 3, "lexical scope?");
 }
 
-eval('q(a:[b]:) =~ m/[x[:foo:]]/');
-ok( $@->message =~ qr/POSIX class \[:foo:\] unknown in regex/);
+eval_dies_like('q(a:[b]:) =~ m/[x[:foo:]]/',
+               qr/POSIX class \[:foo:\] unknown in regex/);
 
 #&$for_future('q(a=[b]=) =~ m/[x[=foo=]]/');
 ok( 1 ); # now a fatal croak
@@ -578,17 +579,17 @@ ok( not (@+[1] != 2 or @-[1] != 1 ));
 
 ok( not ( defined @+[2] or defined @-[2] or defined @+[3] or defined @-[3] ));
 
-eval { @+[0] = 13; };
-ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
+dies_like( sub { @+[0] = 13; },
+           qr/^Modification of a read-only value attempted/ );
 
-eval { @-[0] = 13; };
-ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
+dies_like( sub { @-[0] = 13; },
+           qr/^Modification of a read-only value attempted/ );
 
-eval { @+ = (7, 6, 5); };
-ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
+dies_like( sub { @+ = (7, 6, 5); },
+           qr/^Modification of a read-only value attempted/ );
 
-eval { @- = qw(foo bar); };
-ok( $@->{description} =~ m/^Modification of a read-only value attempted/ );
+dies_like( sub { @- = qw(foo bar); },
+           qr/^Modification of a read-only value attempted/ );
 
 m/.(a)(ba*)?/;
 ok( @+ == 3 and @- == 2 );
@@ -821,16 +822,16 @@ ok("\n\n" =~ m/\n+ $ \n/x);
              qr/Tried to stringify a reference/);
 }
 
-eval << 'EOE';
-\{
+eval << 'EOE'; die if $@;
+{
  package S;
- use overload '""' => sub \{ 'Object S' \};
- sub new \{ bless \@() \}
-\}
+ use overload '""' => sub { 'Object S' };
+ sub new { bless \@() }
+}
 $a = 'S'->new;
 EOE
 
-ok($a and $a =~ m/^Object\sS/, '$a');
+ok(($a and $a =~ m/^Object\sS/), '$a');
 
 # test result of match used as match (!)
 ok( 'a1b' =~ ('xyz' =~ m/y/) and $` eq 'a' );
@@ -878,8 +879,8 @@ ok( undef =~ m/^([^\/]*)(.*)$/ );
     ok($x =~ m/^.$/u, "wide is extactly one .");
     my $y = qr/^.$/u;
     ok("$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified.");
-    eval q|no utf8; $x =~ m/\x{65e5}/|;
-    ok( $@->{description} , "\\x\{...\} gives error in non-unicode regex");
+    eval_dies_like( q|no utf8; $x =~ m/\x{65e5}/|,
+                    qr/\\x\{\} not allowed outside Unicode match/);
 }
 
 use utf8;
@@ -1127,8 +1128,9 @@ SKIP: {
 
 	$i = 0;
 	$input = "a\{b\}c\{d\}";
-        eval <<EOT;
+        eval <<EOT; die if $@;
 	while (eval \$input =~ $rx) \{
+            die if \$\@;
 	    print "# \\\$1 = '\$1' \\\$2 = '\$2'\n";
 	    ++\$i;
 	\}
@@ -1200,45 +1202,45 @@ EOT
     local $^WARN_HOOK = sub { $w .= shift->{description} . "\n" };
 
     $w = "";
-    eval 'qr/(?c)/';
+    eval 'qr/(?c)/'; die if $@;
     ok( $w =~ m/^Useless \(\?c\)/ );
 
     $w = "";
-    eval 'qr/(?-c)/';
+    eval 'qr/(?-c)/'; die if $@;
     ok( $w =~ m/^Useless \(\?-c\)/ );
 
     $w = "";
-    eval 'qr/(?g)/';
+    eval 'qr/(?g)/'; die if $@;
     ok( $w =~ m/^Useless \(\?g\)/ );
 
     $w = "";
-    eval 'qr/(?-g)/';
+    eval 'qr/(?-g)/'; die if $@;
     ok( $w =~ m/^Useless \(\?-g\)/ );
 
     $w = "";
-    eval 'qr/(?o)/';
+    eval 'qr/(?o)/'; die if $@;
     ok( $w =~ m/^Useless \(\?o\)/ );
 
     $w = "";
-    eval 'qr/(?-o)/';
+    eval 'qr/(?-o)/'; die if $@;
     ok( $w =~ m/^Useless \(\?-o\)/ );
 
     # now test multi-error regexes
 
     $w = "";
-    eval 'qr/(?g-o)/';
+    eval 'qr/(?g-o)/'; die if $@;
     ok( $w =~ m/^Useless \(\?g\).*\nUseless \(\?-o\)/ );
 
     $w = "";
-    eval 'qr/(?g-c)/';
+    eval 'qr/(?g-c)/'; die if $@;
     ok( $w =~ m/^Useless \(\?g\).*\nUseless \(\?-c\)/ );
 
     $w = "";
-    eval 'qr/(?o-cg)/';  # (?c) means (?g) error won't be thrown
+    eval 'qr/(?o-cg)/'; die if $@;  # (?c) means (?g) error won't be thrown
     ok( $w =~ m/^Useless \(\?o\).*\nUseless \(\?-c\)/ );
 
     $w = "";
-    eval 'qr/(?ogc)/';
+    eval 'qr/(?ogc)/'; die if $@;
     ok( $w =~ m/^Useless \(\?o\).*\nUseless \(\?g\).*\nUseless \(\?c\)/ );
 }
 
@@ -1952,16 +1954,16 @@ print "# some Unicode properties\n";
 
     my $R = qr/ A B C # D E/x;
 
-    ok( eval {"ABCDE" =~ $R} );
-    ok( eval {"ABCDE" =~ m/$R/} );
-    ok( eval {"ABCDE" =~ m/($R)/} );
+    ok( eval {"ABCDE" =~ $R} ); die if $@;
+    ok( eval {"ABCDE" =~ m/$R/} ); die if $@;
+    ok( eval {"ABCDE" =~ m/($R)/} ); die if $@;
 }
 
 {
     print "# illegal Unicode properties\n";
 
-    ok( not eval qq* "a" =~ m/\pq / *      );
-    ok( not eval qq* "a" =~ m/\p\{qrst\} / * );
+    ok( not eval qq* "a" =~ m/\pq / *      ); die if $@;
+    ok( not eval qq* "a" =~ m/\p\{qrst\} / * ); die if $@;
 }
 
 print "# user-defined character properties\n";
@@ -2375,7 +2377,7 @@ for (120 .. 130) {
 	ok(
 	    eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
 	    '\x{...} misparsed in regexp near 127 char EXACT limit'
-	);
+	); die if $@;
     }
 }
 
@@ -2383,7 +2385,7 @@ for (120 .. 130) {
 ok("a-bc" eq eval {
 	my($x, $y) = "bca" =~ m/^(?=.*(a)).*(bc)/;
 	"$x-$y";
-}, 'captures can move backwards in string');
+}, 'captures can move backwards in string'); die if $@;
 
 # perl #27940: \cA not recognized in character classes
 ok("a\cAb" =~ m/\cA/, '\cA in pattern');
@@ -2509,7 +2511,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     package main;
     
     my $aeek = bless \%(), 'wooosh';
-    eval {$aeek->gloople() =~ m/(.)/g;};
+    eval {$aeek->gloople() =~ m/(.)/g;}; die if $@;
     ok($@ eq "", "//g match against return value of sub") or print "# $@\n";
 }
 
@@ -2517,7 +2519,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     sub gloople {
       "!";
     }
-    eval {gloople() =~ m/(.)/g;};
+    eval {gloople() =~ m/(.)/g;}; die if $@;
     ok($@ eq "", "# 26410 didn't affect sub calls for some reason")
 	or print "# $@\n";
 }
@@ -2527,7 +2529,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     no warnings 'utf8';
     $_ = pack('U0C2', 0xa2, 0xf8); # ill-formed UTF-8
     my $ret = 0;
-    eval { $ret = s/[\0]+//g };
+    eval { $ret = s/[\0]+//g }; die if $@;
     ok($ret == 0, "ill-formed UTF-8 doesn't match NUL in class");
 }
 
@@ -2750,7 +2752,7 @@ SKIP:{
 		\%+\{{$uni}\},
 	    scalar("..bar bar.." =~ m/(?<{$uni}>bar) \\k<{$uni}>/),
 		\%+\{{$uni}\};
-	};
+	}; die if $@;
 	ok($r1,                         "Named capture UTF (?'')");
 	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
 	ok($r2,                         "Named capture UTF (?<>)");
@@ -2790,7 +2792,7 @@ SKIP:{
     iseq("@v","bar baz foo", "Got expected values");
     eval'
         print for %+{this_key_doesnt_exist};
-    ';
+    '; die if $@;
     ok(!$@,'lvalue %+{...} should not throw an exception');
 }
 {
@@ -2829,7 +2831,7 @@ SKIP:{
     iseq("@v","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
     eval'
 	print for %+{this_key_doesnt_exist};
-    ';
+    '; die if $@;
     ok(!$@,'lvalue %+{...} should not throw an exception');
 }
 {
@@ -2847,7 +2849,7 @@ SKIP:{
     iseq("@res","@expect","Check \%-");
     eval'
         print for %-{this_key_doesnt_exist};
-    ';
+    '; die if $@;
     ok(!$@,'lvalue %-{...} should not throw an exception');
 }
 # stress test CURLYX/WHILEM.
@@ -3243,7 +3245,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $dow_name= "nada";
     my $parser = "use utf8; (\$dow_name) = \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;";
     my $time_string = "D\x{e9} C\x{e9}adaoin";
-    eval $parser;
+    eval $parser; die if $@;
     ok(!$@,"Test Eval worked");
     iseq($dow_name,$time_string,"UTF8 trie common prefix extraction");
 }
@@ -3637,8 +3639,8 @@ ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/,
         "Regexp /^(??\{'(.)'x 100\})/ crashes older perls")
     or print "# Unexpected outcome: should pass or crash perl\n";
 
-eval 'm/\k/';
-ok($@->{description}=~m/\QSequence \k... not terminated in regex;\E/);
+eval_dies_like( 'm/\k/',
+                qr/\QSequence \k... not terminated in regex;\E/);
 
 {
     use bytes;
