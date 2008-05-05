@@ -1,0 +1,55 @@
+=head1 NAME
+
+kurila111delta - what is new for Perl Kurila 1.11
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.10 and Perl Kurila 1.11
+
+=head1 Highlights In Perl Kurila 1.11
+
+New anonymous array and hash constructors: C<@(...)> and
+C<%(...)>. The anonymous array/hash ref constructors C<[...]> and
+C<{...}> have been removed. Thus C<{...}> is never interpreted as a
+anonymous hash, but will always create a closure/block.
+
+=head1 Core Enhancements
+
+=head2 New anonymous array and hash constructors: C<@(...)> and
+C<%(...)>
+
+There are two new operators @(...) and %(...) for creating anonymous
+arrays and hashes, replacing the old anonymous array and hash ref
+constructors C<[...]> and C<{...}>.  @(...) creates an anonymous
+array, and %(...) creates an anonymous hash.
+
+=head2 Removal C<[...]> and C<{...}>
+
+The anonymous array and hash ref constructors C<[...]> and C<{...}>
+have been removed.  They can be replaced with the new array/hash
+constructors: C<[...]> becomes C<\ @(...)> and {...} becomes C<\
+%(...)>
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
