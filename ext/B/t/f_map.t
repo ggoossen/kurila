@@ -405,15 +405,14 @@ checkOptree(note   => q{},
 # a      <#> gvsv[*_] s
 # b      <1> lc[t4] sK/1
 # c      <$> const[IV 1] s
-# d      <@> anonhash sK*/1
-# e      <1> rv2hv[t5] lKRM/1
-# f      <1> refgen lK/1
+# d      <@> anonhash lKRM/1
+# e      <1> refgen lK/1
 #            goto 7
-# g  <0> pushmark s
-# h  <#> gv[*hashes] s
-# i  <1> rv2av[t2] lKRM*/1
-# j  <2> aassign[t9] KS/COMMON
-# k  <1> leavesub[1 ref] K/REFC,1
+# f  <0> pushmark s
+# g  <#> gv[*hashes] s
+# h  <1> rv2av[t2] lKRM*/1
+# i  <2> aassign[t8] KS/COMMON
+# j  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 768 (eval 24):1) v
 # 2  <0> pushmark s
