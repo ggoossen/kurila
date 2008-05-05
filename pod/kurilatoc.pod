@@ -91,7 +91,14 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila01delta> too see what has changed compared to Perl 5
+L<kurila111delta> What is new for Perl Kurila 1.11, L<kurila110delta> What
+is new for Perl Kurila 1.10, L<kurila19delta> What is new for Perl Kurila
+1.9, L<kurila18delta> What is new for Perl Kurila 1.8, L<kurila17delta>
+What is new for Perl Kurila 1.7, L<kurila16delta> What is new for Perl
+Kurila 1.6, L<kurila15delta> What is new for Perl Kurila 1.5,
+L<kurila14delta> What is new for Perl Kurila 1.4, L<kurila13delta> What is
+new for Perl Kurila 1.3, L<kurila02delta> What is new for Perl Kurila 0.2,
+L<kurila01delta> What is new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -2246,19 +2253,18 @@ LIST, exists EXPR X<exists> X<autovivification>, exit EXPR X<exit>
 X<terminate> X<abort>, exit, exp EXPR X<exp> X<exponential> X<antilog>
 X<antilogarithm> X<e>, exp, fcntl FILEHANDLE,FUNCTION,SCALAR X<fcntl>,
 fileno FILEHANDLE X<fileno>, flock FILEHANDLE,OPERATION X<flock> X<lock>
-X<locking>, fork X<fork> X<child> X<parent>, format X<format>, formline
-PICTURE,LIST X<formline>, getc FILEHANDLE X<getc> X<getchar> X<character>
-X<file, read>, getc, getlogin X<getlogin> X<login>, getpeername SOCKET
-X<getpeername> X<peer>, getpgrp PID X<getpgrp> X<group>, getppid X<getppid>
-X<parent> X<pid>, getpriority WHICH,WHO X<getpriority> X<priority> X<nice>,
-getpwnam NAME X<getpwnam> X<getgrnam> X<gethostbyname> X<getnetbyname>
-X<getprotobyname> X<getpwuid> X<getgrgid> X<getservbyname> X<gethostbyaddr>
-X<getnetbyaddr> X<getprotobynumber> X<getservbyport> X<getpwent>
-X<getgrent> X<gethostent> X<getnetent> X<getprotoent> X<getservent>
-X<setpwent> X<setgrent> X<sethostent> X<setnetent> X<setprotoent>
-X<setservent> X<endpwent> X<endgrent> X<endhostent> X<endnetent>
-X<endprotoent> X<endservent>, getgrnam NAME, gethostbyname NAME,
-getnetbyname NAME, getprotobyname NAME, getpwuid UID, getgrgid GID,
+X<locking>, fork X<fork> X<child> X<parent>, getc FILEHANDLE X<getc>
+X<getchar> X<character> X<file, read>, getc, getlogin X<getlogin> X<login>,
+getpeername SOCKET X<getpeername> X<peer>, getpgrp PID X<getpgrp> X<group>,
+getppid X<getppid> X<parent> X<pid>, getpriority WHICH,WHO X<getpriority>
+X<priority> X<nice>, getpwnam NAME X<getpwnam> X<getgrnam> X<gethostbyname>
+X<getnetbyname> X<getprotobyname> X<getpwuid> X<getgrgid> X<getservbyname>
+X<gethostbyaddr> X<getnetbyaddr> X<getprotobynumber> X<getservbyport>
+X<getpwent> X<getgrent> X<gethostent> X<getnetent> X<getprotoent>
+X<getservent> X<setpwent> X<setgrent> X<sethostent> X<setnetent>
+X<setprotoent> X<setservent> X<endpwent> X<endgrent> X<endhostent>
+X<endnetent> X<endprotoent> X<endservent>, getgrnam NAME, gethostbyname
+NAME, getnetbyname NAME, getprotobyname NAME, getpwuid UID, getgrgid GID,
 getservbyname NAME,PROTO, gethostbyaddr ADDR,ADDRTYPE, getnetbyaddr
 ADDR,ADDRTYPE, getprotobynumber NUMBER, getservbyport PORT,PROTO, getpwent,
 getgrent, gethostent, getnetent, getprotoent, getservent, setpwent,
@@ -2836,9 +2842,9 @@ X<memory usage>
 =item Predefined Names
 
 $ARG, $_ X<$_> X<$ARG>, $a, $b X<$a> X<$b>, $<I<digits>> X<$1> X<$2> X<$3>,
-$MATCH, $& X<$&> X<$MATCH>, ${^MATCH} X<${^MATCH}>, $PREMATCH, $` X<$`>
-X<$PREMATCH>, ${^PREMATCH} X<${^PREMATCH}>, $POSTMATCH, $' X<$'>
-X<$POSTMATCH>, ${^POSTMATCH} X<${^POSTMATCH}>, $LAST_PAREN_MATCH, $+ X<$+>
+$MATCH, $& X<$&> X<$MATCH>, $^MATCH X<$^MATCH>, $PREMATCH, $` X<$`>
+X<$PREMATCH>, $^PREMATCH X<$^PREMATCH>, $POSTMATCH, $' X<$'> X<$POSTMATCH>,
+$^POSTMATCH X<$^POSTMATCH>, $LAST_PAREN_MATCH, $+ X<$+>
 X<$LAST_PAREN_MATCH>, $LAST_SUBMATCH_RESULT, $^N X<$^N>, @LAST_MATCH_END,
 @+ X<@+> X<@LAST_MATCH_END>, %+ X<%+>, HANDLE->input_line_number(EXPR),
 $INPUT_LINE_NUMBER, $NR, $. X<$.> X<$NR> X<$INPUT_LINE_NUMBER> X<line
@@ -2850,45 +2856,33 @@ X<$,> X<$OFS> X<$OUTPUT_FIELD_SEPARATOR>,
 IO::Handle->output_record_separator EXPR, $OUTPUT_RECORD_SEPARATOR, $ORS,
 $\ X<$\> X<$ORS> X<$OUTPUT_RECORD_SEPARATOR>, $LIST_SEPARATOR, $" X<$">
 X<$LIST_SEPARATOR>, $SUBSCRIPT_SEPARATOR, $SUBSEP, $; X<$;> X<$SUBSEP>
-X<SUBSCRIPT_SEPARATOR>, HANDLE->format_page_number(EXPR),
-HANDLE->format_lines_per_page(EXPR), $FORMAT_LINES_PER_PAGE, $= X<$=>
-X<$FORMAT_LINES_PER_PAGE>, HANDLE->format_lines_left(EXPR),
-$FORMAT_LINES_LEFT, $- X<$-> X<$FORMAT_LINES_LEFT>, @LAST_MATCH_START, @-
-X<@-> X<@LAST_MATCH_START>, C<$`> is the same as C<substr($var, 0, $-[0])>,
-C<$&> is the same as C<substr($var, $-[0], $+[0] - $-[0])>, C<$'> is the
-same as C<substr($var, $+[0])>, C<$1> is the same as C<substr($var, $-[1],
-$+[1] - $-[1])>, C<$2> is the same as C<substr($var, $-[2], $+[2] -
-$-[2])>, C<$3> is the same as C<substr($var, $-[3], $+[3] - $-[3])>, %-
-X<%->, HANDLE->format_name(EXPR), $FORMAT_NAME, $~ X<$~> X<$FORMAT_NAME>,
-HANDLE->format_top_name(EXPR), $FORMAT_TOP_NAME, $^ X<$^>
-X<$FORMAT_TOP_NAME>, IO::Handle->format_line_break_characters EXPR,
-$FORMAT_LINE_BREAK_CHARACTERS, $: X<$:> X<FORMAT_LINE_BREAK_CHARACTERS>,
-IO::Handle->format_formfeed EXPR, $FORMAT_FORMFEED, $^L X<$^L>
-X<$FORMAT_FORMFEED>, $ACCUMULATOR, $^A X<$^A> X<$ACCUMULATOR>,
-$CHILD_ERROR, $? X<$?> X<$CHILD_ERROR>, ${^CHILD_ERROR_NATIVE}
-X<$^CHILD_ERROR_NATIVE>, ${^ENCODING} X<$^ENCODING>, $OS_ERROR, $ERRNO, $!
-X<$!> X<$ERRNO> X<$OS_ERROR>, %OS_ERROR, %ERRNO, %! X<%!>,
-$EXTENDED_OS_ERROR, $^E X<$^E> X<$EXTENDED_OS_ERROR>, $EVAL_ERROR, $@ X<$@>
-X<$EVAL_ERROR>, $PROCESS_ID, $PID, $$ X<$$> X<$PID> X<$PROCESS_ID>,
-$REAL_USER_ID, $UID, $< X<< $< >> X<$UID> X<$REAL_USER_ID>,
-$EFFECTIVE_USER_ID, $EUID, $> X<< $> >> X<$EUID> X<$EFFECTIVE_USER_ID>,
-$REAL_GROUP_ID, $GID, $( X<$(> X<$GID> X<$REAL_GROUP_ID>,
-$EFFECTIVE_GROUP_ID, $EGID, $) X<$)> X<$EGID> X<$EFFECTIVE_GROUP_ID>,
-$PROGRAM_NAME, $0 X<$0> X<$PROGRAM_NAME>, $] X<$]>, $COMPILING, $^C X<$^C>
-X<$COMPILING>, $DEBUGGING, $^D X<$^D> X<$DEBUGGING>, ${^RE_DEBUG_FLAGS},
-${^RE_TRIE_MAXBUF}, $SYSTEM_FD_MAX, $^F X<$^F> X<$SYSTEM_FD_MAX>, $^H, %^H,
+X<SUBSCRIPT_SEPARATOR>, @LAST_MATCH_START, @- X<@-> X<@LAST_MATCH_START>,
+C<$`> is the same as C<substr($var, 0, @-[0])>, C<$&> is the same as
+C<substr($var, @-[0], @+[0] - @-[0])>, C<$'> is the same as C<substr($var,
+@+[0])>, C<$1> is the same as C<substr($var, @-[1], @+[1] - @-[1])>, C<$2>
+is the same as C<substr($var, @-[2], @+[2] - @-[2])>, C<$3> is the same as
+C<substr($var, @-[3], @+[3] - @-[3])>, %- X<%->, $CHILD_ERROR, $? X<$?>
+X<$CHILD_ERROR>, $^CHILD_ERROR_NATIVE X<$^CHILD_ERROR_NATIVE>, $^ENCODING
+X<$^ENCODING>, $OS_ERROR, $ERRNO, $! X<$!> X<$ERRNO> X<$OS_ERROR>,
+%OS_ERROR, %ERRNO, %! X<%!>, $EXTENDED_OS_ERROR, $^E X<$^E>
+X<$EXTENDED_OS_ERROR>, $EVAL_ERROR, $@ X<$@> X<$EVAL_ERROR>, $PROCESS_ID,
+$PID, $$ X<$$> X<$PID> X<$PROCESS_ID>, $REAL_USER_ID, $UID, $< X<< $< >>
+X<$UID> X<$REAL_USER_ID>, $EFFECTIVE_USER_ID, $EUID, $> X<< $> >> X<$EUID>
+X<$EFFECTIVE_USER_ID>, $REAL_GROUP_ID, $^GID, $EFFECTIVE_GROUP_ID, $^EGID,
+$PROGRAM_NAME, $0 X<$0> X<$PROGRAM_NAME>, $COMPILING, $^C X<$^C>
+X<$COMPILING>, $DEBUGGING, $^D X<$^D> X<$DEBUGGING>, $^RE_DEBUG_FLAGS,
+$^RE_TRIE_MAXBUF, $SYSTEM_FD_MAX, $^F X<$^F> X<$SYSTEM_FD_MAX>, $^H, %^H,
 $INPLACE_EDIT, $^I X<$^I> X<$INPLACE_EDIT>, $^M X<$^M>, $OSNAME, $^O X<$^O>
-X<$OSNAME>, ${^OPEN}, $PERLDB, $^P X<$^P> X<$PERLDB>, 0x01, 0x02, 0x04,
-0x08, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400,
-$LAST_REGEXP_CODE_RESULT, $^R X<$^R> X<$LAST_REGEXP_CODE_RESULT>,
-$EXCEPTIONS_BEING_CAUGHT, $^S X<$^S> X<$EXCEPTIONS_BEING_CAUGHT>,
-$BASETIME, $^T X<$^T> X<$BASETIME>, ${^TAINT}, ${^UNICODE}, ${^UTF8CACHE},
-${^UTF8LOCALE}, $PERL_VERSION, $^V X<$^V> X<$PERL_VERSION>, $WARNING, $^W
-X<$^W> X<$WARNING>, ${^WARNING_BITS}, ${^WIN32_SLOPPY_STAT},
-$EXECUTABLE_NAME, $^X X<$^X> X<$EXECUTABLE_NAME>, ARGV X<ARGV>, $ARGV
-X<$ARGV>, @ARGV X<@ARGV>, ARGVOUT X<ARGVOUT>, @F X<@F>, @INC X<@INC>, @ARG,
-@_ X<@_> X<@ARG>, %INC X<%INC>, %ENV, $ENV{expr} X<%ENV>, %SIG, $SIG{expr}
-X<%SIG>
+X<$OSNAME>, $^OPEN, $PERLDB, $^P X<$^P> X<$PERLDB>, 0x01, 0x02, 0x04, 0x08,
+0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, $LAST_REGEXP_CODE_RESULT, $^R
+X<$^R> X<$LAST_REGEXP_CODE_RESULT>, $EXCEPTIONS_BEING_CAUGHT, $^S X<$^S>
+X<$EXCEPTIONS_BEING_CAUGHT>, $BASETIME, $^T X<$^T> X<$BASETIME>, $^TAINT,
+$^UNICODE, $^UTF8CACHE, $^UTF8LOCALE, $PERL_VERSION, $^V X<$^V>
+X<$PERL_VERSION>, $^WARN_HOOK X<$^WARN_HOOK>, $^DIE_HOOK, $WARNING, $^W
+X<$^W> X<$WARNING>, $^WARNING_BITS, $^WIN32_SLOPPY_STAT, $EXECUTABLE_NAME,
+$^X X<$^X> X<$EXECUTABLE_NAME>, ARGV X<ARGV>, $ARGV X<$ARGV>, @ARGV
+X<@ARGV>, ARGVOUT X<ARGVOUT>, @F X<@F>, @INC X<@INC>, @ARG, @_ X<@_>
+X<@ARG>, %INC X<%INC>, %ENV, %ENV{expr} X<%ENV>, %SIG, %SIG{expr} X<%SIG>
 
 =item Error Indicators
 X<error> X<exception>
@@ -3096,13 +3090,10 @@ cntrl, graph, print, punct
 =item Making References
 X<reference, creation> X<referencing>
 
-1. X<\> X<backslash>, 2. X<array, anonymous> X<[> X<[]> X<square bracket>
-X<bracket, square> X<arrayref> X<array reference> X<reference, array>, 3.
-X<hash, anonymous> X<{> X<{}> X<curly bracket> X<bracket, curly> X<brace>
-X<hashref> X<hash reference> X<reference, hash>, 4. X<subroutine,
-anonymous> X<subroutine, reference> X<reference, subroutine> X<scope,
-lexical> X<closure> X<lexical> X<lexical scope>, 5. X<constructor> X<new>,
-6. X<autovivification>, 7. X<*foo{THING}> X<*>
+1. X<\> X<backslash>, 2. X<subroutine, anonymous> X<subroutine, reference>
+X<reference, subroutine> X<scope, lexical> X<closure> X<lexical> X<lexical
+scope>, 3. X<constructor> X<new>, 4. X<autovivification>, 5. X<*foo{THING}>
+X<*>
 
 =item Using References
 X<reference, use> X<dereferencing> X<dereference>
@@ -3124,63 +3115,6 @@ X<subroutine, nested> X<sub, nested> X<subroutine, local> X<sub, local>
 X<reference, string context> X<reference, use as hash key>
 
 =item SEE ALSO
-
-=back
-
-=head2 perlform - Perl formats
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Text Fields
-X<format, text field>
-
-=item Numeric Fields
-X<#> X<format, numeric field>
-
-=item The Field @* for Variable Width Multi-Line Text
-X<@*>
-
-=item The Field ^* for Variable Width One-line-at-a-time Text
-X<^*>
-
-=item Specifying Values
-X<format, specifying values>
-
-=item Using Fill Mode
-X<format, fill mode>
-
-=item Suppressing Lines Where All Fields Are Void
-X<format, suppressing lines>
-
-=item Repeating Format Lines
-X<format, repeating lines>
-
-=item Top of Form Processing
-X<format, top of form> X<top> X<header>
-
-=item Format Variables
-X<format variables>
-X<format, variables>
-
-=back
-
-=item NOTES
-
-=over 4
-
-=item Footers
-X<format, footer> X<footer>
-
-=item Accessing Formatting Internals
-X<format, internals>
-
-=back
-
-=item WARNINGS
 
 =back
 
@@ -4322,39 +4256,38 @@ warnings::register
 
 =item Standard Modules
 
-Archive::Extract, Archive::Tar, Archive::Tar::File, B, B-OP, B::Concise,
-B::Debug, B::Deparse, B::Showlex, B::Terse, B::Xref, Benchmark, CORE, CPAN,
-CPAN::API::HOWTO, CPAN::FirstTime, CPAN::Kwalify, CPAN::Nox, CPAN::Version,
-Carp, Carp::Heavy, Class::ISA, Class::Struct, Compress::Raw::Zlib,
-Compress::Zlib, Config, Cwd, DB, DB_File, Data::Dumper, Digest,
-Digest::MD5, Digest::SHA, Digest::base, Digest::file, DynaLoader, English,
-Env, Errno, Exporter, Exporter::Heavy, ExtUtils::CBuilder,
-ExtUtils::CBuilder::Platform::Windows, ExtUtils::Command,
-ExtUtils::Command::MM, ExtUtils::Constant, ExtUtils::Constant::Base,
-ExtUtils::Constant::Utils, ExtUtils::Constant::XS, ExtUtils::Embed,
-ExtUtils::Install, ExtUtils::Installed, ExtUtils::Liblist, ExtUtils::MM,
-ExtUtils::MM_AIX, ExtUtils::MM_Any, ExtUtils::MM_BeOS, ExtUtils::MM_Cygwin,
-ExtUtils::MM_DOS, ExtUtils::MM_Darwin, ExtUtils::MM_MacOS,
-ExtUtils::MM_NW5, ExtUtils::MM_OS2, ExtUtils::MM_QNX, ExtUtils::MM_UWIN,
-ExtUtils::MM_Unix, ExtUtils::MM_VMS, ExtUtils::MM_VOS, ExtUtils::MM_Win32,
-ExtUtils::MM_Win95, ExtUtils::MY, ExtUtils::MakeMaker,
-ExtUtils::MakeMaker::Config, ExtUtils::MakeMaker::FAQ,
-ExtUtils::MakeMaker::Tutorial, ExtUtils::MakeMaker::bytes,
-ExtUtils::MakeMaker::vmsish, ExtUtils::Manifest, ExtUtils::Mkbootstrap,
-ExtUtils::Mksymlists, ExtUtils::Packlist, ExtUtils::ParseXS,
-ExtUtils::testlib, Fatal, Fcntl, File::Basename, File::CheckTree,
-File::Compare, File::Copy, File::DosGlob, File::Fetch, File::Find,
-File::Glob, File::GlobMapper, File::Path, File::Spec, File::Spec::Cygwin,
-File::Spec::Epoc, File::Spec::Functions, File::Spec::Mac, File::Spec::OS2,
-File::Spec::Unix, File::Spec::VMS, File::Spec::Win32, File::Temp,
-File::stat, FileHandle, FindBin, Getopt::Long, Getopt::Std, Hash::Util,
-I18N::Collate, I18N::LangTags, I18N::LangTags::Detect,
-I18N::LangTags::List, I18N::Langinfo, IO, IO::Compress::Base,
-IO::Compress::Deflate, IO::Compress::Gzip, IO::Compress::RawDeflate,
-IO::Compress::Zip, IO::Dir, IO::File, IO::Handle, IO::Pipe, IO::Poll,
-IO::Seekable, IO::Select, IO::Socket, IO::Socket::INET, IO::Socket::UNIX,
-IO::Uncompress::AnyInflate, IO::Uncompress::AnyUncompress,
-IO::Uncompress::Base, IO::Uncompress::Gunzip, IO::Uncompress::Inflate,
+B, B-OP, B::Concise, B::Debug, B::Deparse, B::Showlex, B::Terse, B::Xref,
+Benchmark, CORE, Carp, Carp::Heavy, Class::ISA, Class::Struct,
+Compress::Raw::Zlib, Compress::Zlib, Config, Cwd, DB, DB_File,
+Data::Dumper, Digest, Digest::MD5, Digest::SHA, Digest::base, Digest::file,
+DynaLoader, English, Env, Errno, Exporter, Exporter::Heavy,
+ExtUtils::CBuilder, ExtUtils::CBuilder::Platform::Windows,
+ExtUtils::Command, ExtUtils::Command::MM, ExtUtils::Constant,
+ExtUtils::Constant::Base, ExtUtils::Constant::Utils,
+ExtUtils::Constant::XS, ExtUtils::Embed, ExtUtils::Install,
+ExtUtils::Installed, ExtUtils::Liblist, ExtUtils::MM, ExtUtils::MM_AIX,
+ExtUtils::MM_Any, ExtUtils::MM_BeOS, ExtUtils::MM_Cygwin, ExtUtils::MM_DOS,
+ExtUtils::MM_Darwin, ExtUtils::MM_MacOS, ExtUtils::MM_NW5,
+ExtUtils::MM_OS2, ExtUtils::MM_QNX, ExtUtils::MM_UWIN, ExtUtils::MM_Unix,
+ExtUtils::MM_VMS, ExtUtils::MM_VOS, ExtUtils::MM_Win32, ExtUtils::MM_Win95,
+ExtUtils::MY, ExtUtils::MakeMaker, ExtUtils::MakeMaker::Config,
+ExtUtils::MakeMaker::FAQ, ExtUtils::MakeMaker::Tutorial,
+ExtUtils::MakeMaker::bytes, ExtUtils::MakeMaker::vmsish,
+ExtUtils::Manifest, ExtUtils::Mkbootstrap, ExtUtils::Mksymlists,
+ExtUtils::Packlist, ExtUtils::ParseXS, ExtUtils::testlib, Fatal, Fcntl,
+File::Basename, File::CheckTree, File::Compare, File::Copy, File::DosGlob,
+File::Fetch, File::Find, File::Glob, File::GlobMapper, File::Path,
+File::Spec, File::Spec::Cygwin, File::Spec::Epoc, File::Spec::Functions,
+File::Spec::Mac, File::Spec::OS2, File::Spec::Unix, File::Spec::VMS,
+File::Spec::Win32, File::Temp, File::stat, FileHandle, FindBin,
+Getopt::Long, Getopt::Std, Hash::Util, I18N::Collate, I18N::LangTags,
+I18N::LangTags::Detect, I18N::LangTags::List, I18N::Langinfo, IO,
+IO::Compress::Base, IO::Compress::Deflate, IO::Compress::Gzip,
+IO::Compress::RawDeflate, IO::Compress::Zip, IO::Dir, IO::File, IO::Handle,
+IO::Pipe, IO::Poll, IO::Seekable, IO::Select, IO::Socket, IO::Socket::INET,
+IO::Socket::UNIX, IO::Uncompress::AnyInflate,
+IO::Uncompress::AnyUncompress, IO::Uncompress::Base,
+IO::Uncompress::Gunzip, IO::Uncompress::Inflate,
 IO::Uncompress::RawInflate, IO::Uncompress::Unzip, IO::Zlib, IPC::Cmd,
 IPC::Open2, IPC::Open3, IPC::SysV, IPC::SysV::Msg, IPC::SysV::Semaphore,
 List::Util, Locale::Constants, Locale::Country, Locale::Currency,
@@ -4392,8 +4325,8 @@ Thread::Queue, Thread::Semaphore, Tie::Array, Tie::Handle, Tie::Hash,
 Tie::Hash::NamedCapture, Tie::Scalar, Tie::SubstrHash, Time::HiRes,
 Time::Local, Time::Piece, Time::Piece::Seconds, Time::gmtime,
 Time::localtime, Time::tm, UNIVERSAL, Unicode::Collate, Unicode::Normalize,
-Unicode::UCD, User::grent, User::pwent, Win32, Win32API::File, Win32CORE,
-XS::APItest, XS::Typemap, XSLoader
+Unicode::UCD, User::grent, User::pwent, Win32, Win32CORE, XS::APItest,
+XS::Typemap, XSLoader
 
 =item Extension Modules
 
@@ -4669,7 +4602,7 @@ L<enc2xs>, L<xsubpp>, L<dprofpp|dprofpp>, L<prove>, L<corelist>
 
 =item General tools
 
-L<piconv>, L<ptar>, L<ptardiff>, L<shasum>
+L<piconv>, L<shasum>
 
 =item Installation
 
@@ -12924,438 +12857,6 @@ warnings::warnif($object, $message)
 
 =head1 MODULE DOCUMENTATION
 
-=head2 Archive::Extract - A generic archive extracting mechanism
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=over 4
-
-=item METHODS
-
-=over 4
-
-=item $ae = Archive::Extract->new(archive => '/path/to/archive',[type =>
-TYPE])
-
-tar, tgz, gz, Z, zip, bz2, tbz, lzma
-
-=back
-
-=back
-
-=over 4
-
-=item $ae->extract( [to => '/output/path'] )
-
-$ae->extract_path, $ae->files
-
-=back
-
-=over 4
-
-=item ACCESSORS
-
-=over 4
-
-=item $ae->error([BOOL])
-
-=item $ae->extract_path
-
-=item $ae->files
-
-=item $ae->archive
-
-=item $ae->type
-
-=item $ae->types
-
-=back
-
-=back
-
-=over 4
-
-=item $ae->is_tgz
-
-=item $ae->is_tar
-
-=item $ae->is_gz
-
-=item $ae->is_Z
-
-=item $ae->is_zip
-
-=item $ae->is_lzma
-
-=back
-
-=over 4
-
-=item $ae->bin_tar
-
-=item $ae->bin_gzip
-
-=item $ae->bin_unzip
-
-=item $ae->bin_unlzma
-
-=back
-
-=over 4
-
-=item $bool = $ae->have_old_bunzip2
-
-=back
-
-=over 4
-
-=item HOW IT WORKS
-
-=item CAVEATS
-
-=over 4
-
-=item File Extensions
-
-=item Supporting Very Large Files
-
-=item Bunzip2 support of arbitrary extensions.
-
-=back
-
-=item GLOBAL VARIABLES
-
-=over 4
-
-=item $Archive::Extract::DEBUG
-
-=item $Archive::Extract::WARN
-
-=item $Archive::Extract::PREFER_BIN
-
-=back
-
-=item TODO
-
-Mime magic support
-
-=item BUG REPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Archive::Tar - module for manipulations of tar archives
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item Object Methods
-
-=over 4
-
-=item Archive::Tar->new( [$file, $compressed] )
-
-=back
-
-=back
-
-=over 4
-
-=item $tar->read ( $filename|$handle, $compressed, {opt => 'val'} )
-
-limit, extract
-
-=back
-
-=over 4
-
-=item $tar->contains_file( $filename )
-
-=back
-
-=over 4
-
-=item $tar->extract( [@filenames] )
-
-=back
-
-=over 4
-
-=item $tar->extract_file( $file, [$extract_path] )
-
-=back
-
-=over 4
-
-=item $tar->list_files( [\@properties] )
-
-=back
-
-=over 4
-
-=item $tar->get_files( [@filenames] )
-
-=back
-
-=over 4
-
-=item $tar->get_content( $file )
-
-=back
-
-=over 4
-
-=item $tar->replace_content( $file, $content )
-
-=back
-
-=over 4
-
-=item $tar->rename( $file, $new_name )
-
-=back
-
-=over 4
-
-=item $tar->remove (@filenamelist)
-
-=back
-
-=over 4
-
-=item $tar->clear
-
-=back
-
-=over 4
-
-=item $tar->write ( [$file, $compressed, $prefix] )
-
-=back
-
-=over 4
-
-=item $tar->add_files( @filenamelist )
-
-=back
-
-=over 4
-
-=item $tar->add_data ( $filename, $data, [$opthashref] )
-
-FILE, HARDLINK, SYMLINK, CHARDEV, BLOCKDEV, DIR, FIFO, SOCKET
-
-=back
-
-=over 4
-
-=item $tar->error( [$BOOL] )
-
-=back
-
-=over 4
-
-=item $tar->setcwd( $cwd );
-
-=back
-
-=over 4
-
-=item $bool = $tar->has_io_string
-
-=back
-
-=over 4
-
-=item $bool = $tar->has_perlio
-
-=back
-
-=over 4
-
-=item Class Methods
-
-=over 4
-
-=item Archive::Tar->create_archive($file, $compression, @filelist)
-
-=back
-
-=back
-
-=over 4
-
-=item Archive::Tar->list_archive ($file, $compressed, [\@properties])
-
-=back
-
-=over 4
-
-=item Archive::Tar->extract_archive ($file, $gzip)
-
-=back
-
-=over 4
-
-=item Archive::Tar->can_handle_compressed_files
-
-=back
-
-=over 4
-
-=item GLOBAL VARIABLES
-
-=over 4
-
-=item $Archive::Tar::FOLLOW_SYMLINK
-
-=item $Archive::Tar::CHOWN
-
-=item $Archive::Tar::CHMOD
-
-=item $Archive::Tar::DO_NOT_USE_PREFIX
-
-=item $Archive::Tar::DEBUG
-
-=item $Archive::Tar::WARN
-
-=item $Archive::Tar::error
-
-=item $Archive::Tar::INSECURE_EXTRACT_MODE
-
-=item $Archive::Tar::HAS_PERLIO
-
-=item $Archive::Tar::HAS_IO_STRING
-
-=back
-
-=item FAQ
-
-What's the minimum perl version required to run Archive::Tar?, Isn't
-Archive::Tar slow?, Isn't Archive::Tar heavier on memory than /bin/tar?,
-Can't you lazy-load data instead?, How much memory will an X kb tar file
-need?, What do you do with unsupported filetypes in an archive?, I'm using
-WinZip, or some other non-POSIX client, and files are not being extracted
-properly!, How do I extract only files that have property X from an
-archive?, How do I access .tar.Z files?, How do I handle Unicode strings?
-
-=item TODO
-
-Check if passed in handles are open for read/write, Allow archives to be
-passed in as string, Facilitate processing an opened filehandle of a
-compressed archive
-
-=item SEE ALSO
-
-The GNU tar specification, The PAX format specication, A comparison of GNU
-and POSIX tar standards;
-C<http://www.delorie.com/gnu/docs/tar/tar_114.html>, GNU tar intends to
-switch to POSIX compatibility, A Comparison between various tar
-implementations
-
-=item AUTHOR
-
-=item ACKNOWLEDGEMENTS
-
-=item COPYRIGHT
-
-=back
-
-=head2 Archive::Tar::File - a subclass for in-memory extracted file from
-Archive::Tar
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Accessors
-
-name, mode, uid, gid, size, mtime, chksum, type, linkname, magic, version,
-uname, gname, devmajor, devminor, prefix, raw
-
-=back
-
-=item Methods
-
-=over 4
-
-=item new( file => $path )
-
-=item new( data => $path, $data, $opt )
-
-=item new( chunk => $chunk )
-
-=back
-
-=back
-
-=over 4
-
-=item full_path
-
-=back
-
-=over 4
-
-=item validate
-
-=back
-
-=over 4
-
-=item has_content
-
-=back
-
-=over 4
-
-=item get_content
-
-=back
-
-=over 4
-
-=item get_content_by_ref
-
-=back
-
-=over 4
-
-=item replace_content( $content )
-
-=back
-
-=over 4
-
-=item rename( $new_name )
-
-=back
-
-=over 4
-
-=item Convenience methods
-
-is_file, is_dir, is_hardlink, is_symlink, is_chardev, is_blockdev, is_fifo,
-is_socket, is_longlink, is_label, is_unknown
-
-=back
-
 =head2 B - The Perl Compiler
 
 =over 4
@@ -13439,8 +12940,8 @@ USEFUL, PREVIOUS, RARE, TABLE
 
 =item B::GV Methods
 
-is_empty, NAME, SAFENAME, STASH, SV, IO, FORM, AV, HV, EGV, CV, CVGEN,
-LINE, FILE, FILEGV, GvREFCNT, FLAGS
+is_empty, NAME, SAFENAME, STASH, SV, IO, AV, HV, EGV, CV, CVGEN, LINE,
+FILE, FILEGV, GvREFCNT, FLAGS
 
 =item B::IO Methods
 
@@ -13926,316 +13427,6 @@ disablecache ( ), enablecache ( ), timesum ( T1, T2 )
 =item AUTHOR
 
 =item SEE ALSO
-
-=back
-
-=head2 CPAN - query, download and build perl modules from CPAN sites
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item CPAN::shell([$prompt, $command]) Starting Interactive Mode
-
-Searching for authors, bundles, distribution files and modules, C<get>,
-C<make>, C<test>, C<install>, C<clean> modules or distributions, C<readme>,
-C<perldoc>, C<look> module or distribution, C<ls> author, C<ls>
-globbing_expression, C<failed>, Persistence between sessions, The C<force>
-and the C<fforce> pragma, Lockfile, Signals
-
-=item CPAN::Shell
-
-=item autobundle
-
-=item hosts
-
-=item mkmyconfig
-
-=item recent ***EXPERIMENTAL COMMAND***
-
-=item recompile
-
-=item report Bundle|Distribution|Module
-
-=item smoke ***EXPERIMENTAL COMMAND***
-
-=item upgrade [Module|/Regex/]...
-
-=item The four C<CPAN::*> Classes: Author, Bundle, Module, Distribution
-
-=item Integrating local directories
-
-=back
-
-=item CONFIGURATION
-
-completion support, displaying some help: o conf help, displaying current
-values: o conf [KEY], changing of scalar values: o conf KEY VALUE, changing
-of list values: o conf KEY SHIFT|UNSHIFT|PUSH|POP|SPLICE|LIST, reverting to
-saved: o conf defaults, saving the config: o conf commit
-
-=over 4
-
-=item Config Variables
-
-C<o conf E<lt>scalar optionE<gt>>, C<o conf E<lt>scalar optionE<gt>
-E<lt>valueE<gt>>, C<o conf E<lt>list optionE<gt>>, C<o conf E<lt>list
-optionE<gt> [shift|pop]>, C<o conf E<lt>list optionE<gt>
-[unshift|push|splice] E<lt>listE<gt>>, interactive editing: o conf init
-[MATCH|LIST]
-
-=item CPAN::anycwd($path): Note on config variable getcwd
-
-cwd, getcwd, fastcwd, backtickcwd
-
-=item Note on the format of the urllist parameter
-
-=item The urllist parameter has CD-ROM support
-
-=item Maintaining the urllist parameter
-
-=item The C<requires> and C<build_requires> dependency declarations
-
-=item Configuration for individual distributions (I<Distroprefs>)
-
-=item Filenames
-
-=item Fallback Data::Dumper and Storable
-
-=item Blueprint
-
-=item Language Specs
-
-comment [scalar], cpanconfig [hash], depends [hash] *** EXPERIMENTAL
-FEATURE ***, disabled [boolean], goto [string], install [hash], make
-[hash], match [hash], patches [array], pl [hash], test [hash]
-
-=item Processing Instructions
-
-args [array], commandline, eexpect [hash], env [hash], expect [array]
-
-=item Schema verification with C<Kwalify>
-
-=item Example Distroprefs Files
-
-=back
-
-=item PROGRAMMER'S INTERFACE
-
-expand($type,@things), expandany(@things), Programming Examples
-
-=over 4
-
-=item Methods in the other Classes
-
-CPAN::Author::as_glimpse(), CPAN::Author::as_string(),
-CPAN::Author::email(), CPAN::Author::fullname(), CPAN::Author::name(),
-CPAN::Bundle::as_glimpse(), CPAN::Bundle::as_string(),
-CPAN::Bundle::clean(), CPAN::Bundle::contains(),
-CPAN::Bundle::force($method,@args), CPAN::Bundle::get(),
-CPAN::Bundle::inst_file(), CPAN::Bundle::inst_version(),
-CPAN::Bundle::uptodate(), CPAN::Bundle::install(), CPAN::Bundle::make(),
-CPAN::Bundle::readme(), CPAN::Bundle::test(),
-CPAN::Distribution::as_glimpse(), CPAN::Distribution::as_string(),
-CPAN::Distribution::author, CPAN::Distribution::pretty_id(),
-CPAN::Distribution::base_id(), CPAN::Distribution::clean(),
-CPAN::Distribution::containsmods(), CPAN::Distribution::cvs_import(),
-CPAN::Distribution::dir(), CPAN::Distribution::force($method,@args),
-CPAN::Distribution::get(), CPAN::Distribution::install(),
-CPAN::Distribution::install_tested(), CPAN::Distribution::isa_perl(),
-CPAN::Distribution::is_tested(), CPAN::Distribution::look(),
-CPAN::Distribution::make(), CPAN::Distribution::perldoc(),
-CPAN::Distribution::prefs(), CPAN::Distribution::prereq_pm(),
-CPAN::Distribution::readme(), CPAN::Distribution::reports(),
-CPAN::Distribution::read_yaml(), CPAN::Distribution::test(),
-CPAN::Distribution::uptodate(), CPAN::Index::force_reload(),
-CPAN::Index::reload(), CPAN::InfoObj::dump(), CPAN::Module::as_glimpse(),
-CPAN::Module::as_string(), CPAN::Module::clean(),
-CPAN::Module::cpan_file(), CPAN::Module::cpan_version(),
-CPAN::Module::cvs_import(), CPAN::Module::description(),
-CPAN::Module::distribution(), CPAN::Module::dslip_status(),
-CPAN::Module::force($method,@args), CPAN::Module::get(),
-CPAN::Module::inst_file(), CPAN::Module::available_file(),
-CPAN::Module::inst_version(), CPAN::Module::available_version(),
-CPAN::Module::install(), CPAN::Module::look(), CPAN::Module::make(),
-CPAN::Module::manpage_headline(), CPAN::Module::perldoc(),
-CPAN::Module::readme(), CPAN::Module::reports(), CPAN::Module::test(),
-CPAN::Module::uptodate(), CPAN::Module::userid()
-
-=item Cache Manager
-
-=item Bundles
-
-=back
-
-=item PREREQUISITES
-
-=item UTILITIES
-
-=over 4
-
-=item Finding packages and VERSION
-
-=item Debugging
-
-o debug package.., o debug -package.., o debug all, o debug number
-
-=item Floppy, Zip, Offline Mode
-
-=item Basic Utilities for Programmers
-
-has_inst($module), has_usable($module), instance($module)
-
-=back
-
-=item SECURITY
-
-=over 4
-
-=item Cryptographically signed modules
-
-=back
-
-=item EXPORT
-
-=item ENVIRONMENT
-
-=item POPULATE AN INSTALLATION WITH LOTS OF MODULES
-
-=item WORKING WITH CPAN.pm BEHIND FIREWALLS
-
-=over 4
-
-=item Three basic types of firewalls
-
-http firewall, ftp firewall, One way visibility, SOCKS, IP Masquerade
-
-=item Configuring lynx or ncftp for going through a firewall
-
-=back
-
-=item FAQ
-
-1), 2), 3), 4), 5), 6), 7), 8), 9), 10), 11), 12), 13), 14), 15), 16)
-
-=item COMPATIBILITY
-
-=over 4
-
-=item OLD PERL VERSIONS
-
-=item CPANPLUS
-
-=back
-
-=item SECURITY ADVICE
-
-=item BUGS
-
-=item AUTHOR
-
-=item LICENSE
-
-=item TRANSLATIONS
-
-=item SEE ALSO
-
-=back
-
-=head2 CPAN::API::HOWTO - a recipe book for programming with CPAN.pm
-
-=over 4
-
-=item RECIPES
-
-=over 4
-
-=item What distribution contains a particular module?
-
-=item What modules does a particular distribution contain?
-
-=back
-
-=item SEE ALSO
-
-=item LICENSE
-
-=item AUTHOR
-
-=back
-
-=head2 CPAN::FirstTime - Utility for CPAN::Config file Initialization
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-auto_commit, build_cache, build_dir, build_dir_reuse,
-build_requires_install_policy, cache_metadata, check_sigs, colorize_output,
-colorize_print, colorize_warn, colorize_debug, commandnumber_in_prompt,
-ftp_passive, getcwd, histfile, histsize, inactivity_timeout, index_expire,
-inhibit_startup_message, keep_source_where, load_module_verbosity,
-makepl_arg, make_arg, make_install_arg, make_install_make_command,
-mbuildpl_arg, mbuild_arg, mbuild_install_arg, mbuild_install_build_command,
-pager, prefer_installer, prefs_dir, prerequisites_policy,
-randomize_urllist, scan_cache, shell, show_unparsable_versions,
-show_upload_date, show_zero_versions, tar_verbosity, term_is_latin,
-term_ornaments, test_report, use_sqlite, yaml_load_code, yaml_module
-
-=over 4
-
-=item LICENSE
-
-=back
-
-=head2 CPAN::Kwalify - Interface between CPAN.pm and Kwalify.pm
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-_validate($schema_name, $data, $file, $doc), yaml($schema_name)
-
-=item AUTHOR
-
-=item LICENSE
-
-=back
-
-=head2 CPAN::Version - utility functions to compare CPAN versions
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item LICENSE
-
-=back
-
-=head2 CPANox, CPAN::Nox - Wrapper around CPAN.pm without using any XS
-module
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item LICENSE
-
-=item  SEE ALSO
 
 =back
 
@@ -27476,142 +26667,6 @@ Win32::SetLastError(ERROR), Win32::Sleep(TIME), Win32::Spawn(COMMAND, ARGS,
 PID), Win32::UnregisterServer(LIBRARYNAME)
 
 =back
-
-=back
-
-=head2 Win32API::File - Low-level access to Win32 system API calls for
-files/dirs.
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Object Oriented/Tied Handle Interface
-
-=item Exports
-
-C<":Func">, attrLetsToBits, C<$uBits= attrLetsToBits( $sAttributeLetters
-)>, C<"a">, C<"c">, C<"h">, C<"o">, C<"r">, C<"s">, C<"t">, createFile,
-C<$hObject= createFile( $sPath )>, C<$hObject= createFile( $sPath,
-$rvhvOptions )>, C<$hObject= createFile( $sPath, $svAccess )>, C<$hObject=
-createFile( $sPath, $svAccess, $rvhvOptions )>, C<$hObject= createFile(
-$sPath, $svAccess, $svShare )>, C<$hObject= createFile( $sPath, $svAccess,
-$svShare, $rvhvOptions )>, C<"q">, C<"r">, C<"w">, C<"k">, C<"t">, C<"n">,
-C<"c">, C<"e">, C<"kc">, C<"ke">, C<"tc">, C<"te">, C<"nc">, C<"ne">, Flags
-=> $uFlags, Attributes => $sAttributes, Security => $pSecurityAttributes,
-Model => $hModelFile, Access => $sAccess, Access => $uAccess, Create =>
-$sCreate, Create => $uCreate, Share => $sShare, Share => $uShare,
-getLogicalDrives, C<@roots= getLogicalDrives()>, CloseHandle,
-C<CloseHandle( $hObject )>, CopyFile, C<CopyFile( $sOldFileName,
-$sNewFileName, $bFailIfExists )>, CreateFile, C<$hObject= CreateFile(
-$sPath, $uAccess, $uShare, $pSecAttr, $uCreate, $uFlags, $hModel )>,
-C<"//./PhysicalDrive0">, C<"//./C:">, C<"//./A:">, C<"//./PIPE/PipeName">,
-DefineDosDevice, C<DefineDosDevice( $uFlags, $sDosDeviceName, $sTargetPath
-)>, C<DDD_RAW_TARGET_PATH>, C<DDD_REMOVE_DEFINITION>,
-C<DDD_EXACT_MATCH_ON_REMOVE>, DeleteFile, C<DeleteFile( $sFileName )>,
-DeviceIoControl, C<DeviceIoControl( $hDevice, $uIoControlCode, $pInBuf,
-$lInBuf, $opOutBuf, $lOutBuf, $olRetBytes, $pOverlapped )>, FdGetOsFHandle,
-C<$hNativeHandle= FdGetOsFHandle( $ivFd )>, fileConstant, C<$value=
-fileConstant( $sConstantName )>, fileLastError, C<$svError=
-fileLastError();>, C<fileLastError( $uError );>, GetDriveType,
-C<$uDriveType= GetDriveType( $sRootPath )>, C<DRIVE_UNKNOWN>,
-C<DRIVE_NO_ROOT_DIR>, C<DRIVE_REMOVABLE>, C<DRIVE_FIXED>, C<DRIVE_REMOTE>,
-C<DRIVE_CDROM>, C<DRIVE_RAMDISK>, GetFileAttributes, C<$uAttrs =
-GetFileAttributes( $sPath )>, C<FILE_ATTRIBUTE_ARCHIVE>,
-C<FILE_ATTRIBUTE_COMPRESSED>, C<FILE_ATTRIBUTE_DEVICE>,
-C<FILE_ATTRIBUTE_DIRECTORY>, C<FILE_ATTRIBUTE_ENCRYPTED>,
-C<FILE_ATTRIBUTE_HIDDEN>, C<FILE_ATTRIBUTE_NORMAL>,
-C<FILE_ATTRIBUTE_NOT_CONTENT_INDEXED>, C<FILE_ATTRIBUTE_OFFLINE>,
-C<FILE_ATTRIBUTE_READONLY>, C<FILE_ATTRIBUTE_REPARSE_POINT>,
-C<FILE_ATTRIBUTE_SPARSE_FILE>, C<FILE_ATTRIBUTE_SYSTEM>,
-C<FILE_ATTRIBUTE_TEMPORARY>, GetFileType, C<$uFileType= GetFileType( $hFile
-)>, C<FILE_TYPE_UNKNOWN>, C<FILE_TYPE_DISK>, C<FILE_TYPE_CHAR>,
-C<FILE_TYPE_PIPE>, getFileSize, C<$size= getFileSize( $hFile )>,
-GetFileSize, C<$iSizeLow= GetFileSize($win32Handle, $iSizeHigh)>,
-GetOverlappedResult, C<$bRetval= GetOverlappedResult( $win32Handle,
-$pOverlapped,  $numBytesTransferred, $bWait )>, GetLogicalDrives,
-C<$uDriveBits= GetLogicalDrives()>, GetLogicalDriveStrings, C<$olOutLength=
-GetLogicalDriveStrings( $lBufSize, $osBuffer )>, GetHandleInformation,
-C<GetHandleInformation( $hObject, $ouFlags )>, GetOsFHandle,
-C<$hNativeHandle= GetOsFHandle( FILE )>, GetVolumeInformation,
-C<GetVolumeInformation( $sRootPath, $osVolName, $lVolName, $ouSerialNum,
-$ouMaxNameLen, $ouFsFlags, $osFsType, $lFsType )>, C<FS_CASE_IS_PRESERVED>,
-C<FS_CASE_SENSITIVE>, C<FS_UNICODE_STORED_ON_DISK>, C<FS_PERSISTENT_ACLS>,
-C<FS_FILE_COMPRESSION>, C<FS_VOL_IS_COMPRESSED>, IsRecognizedPartition,
-C<IsRecognizedPartition( $ivPartitionType )>, IsContainerPartition,
-C<IsContainerPartition( $ivPartitionType )>, MoveFile, C<MoveFile(
-$sOldName, $sNewName )>, MoveFileEx, C<MoveFileEx( $sOldName, $sNewName,
-$uFlags )>, C<MOVEFILE_REPLACE_EXISTING>, C<MOVEFILE_COPY_ALLOWED>,
-C<MOVEFILE_DELAY_UNTIL_REBOOT>, C<MOVEFILE_WRITE_THROUGH>, OsFHandleOpen,
-C<OsFHandleOpen( FILE, $hNativeHandle, $sMode )>, OsFHandleOpenFd, C<$ivFD=
-OsFHandleOpenFd( $hNativeHandle, $uMode )>, QueryDosDevice, C<$olTargetLen=
-QueryDosDevice( $sDosDeviceName, $osTargetPath, $lTargetBuf )>, ReadFile,
-C<ReadFile( $hFile, $opBuffer, $lBytes, $olBytesRead, $pOverlapped )>,
-SetErrorMode, C<$uOldMode= SetErrorMode( $uNewMode )>,
-C<SEM_FAILCRITICALERRORS>, C<SEM_NOALIGNMENTFAULTEXCEPT>,
-C<SEM_NOGPFAULTERRORBOX>, C<SEM_NOOPENFILEERRORBOX>, setFilePointer,
-C<$uNewPos = setFilePointer( $hFile, $ivOffset, $uFromWhere )>,
-SetFilePointer, C<$uNewPos = SetFilePointer( $hFile, $ivOffset,
-$ioivOffsetHigh, $uFromWhere )>, SetHandleInformation,
-C<SetHandleInformation( $hObject, $uMask, $uFlags )>, WriteFile,
-C<WriteFile( $hFile, $pBuffer, $lBytes, $ouBytesWritten, $pOverlapped )>,
-C<":FuncA">, C<":FuncW">, CopyFileW, C<CopyFileW( $swOldFileName,
-$swNewFileName, $bFailIfExists )>, CreateFileW, C<$hObject= CreateFileW(
-$swPath, $uAccess, $uShare, $pSecAttr, $uCreate, $uFlags, $hModel )>,
-DefineDosDeviceW, C<DefineDosDeviceW( $uFlags, $swDosDeviceName,
-$swTargetPath )>, DeleteFileW, C<DeleteFileW( $swFileName )>,
-GetDriveTypeW, C<$uDriveType= GetDriveTypeW( $swRootPath )>,
-GetFileAttributesW, C<$uAttrs= GetFileAttributesW( $swPath )>,
-GetLogicalDriveStringsW, C<$olwOutLength= GetLogicalDriveStringsW(
-$lwBufSize, $oswBuffer )>, GetVolumeInformationW, C<GetVolumeInformationW(
-$swRootPath, $oswVolName, $lwVolName, $ouSerialNum, $ouMaxNameLen,
-$ouFsFlags, $oswFsType, $lwFsType )>, MoveFileW, C<MoveFileW( $swOldName,
-$swNewName )>, MoveFileExW, C<MoveFileExW( $swOldName, $swNewName, $uFlags
-)>, QueryDosDeviceW, C<$olwTargetLen= QueryDosDeviceW( $swDeviceName,
-$oswTargetPath, $lwTargetBuf )>, C<":Misc">, C<":DDD_">, C<":DRIVE_">,
-C<":FILE_">, C<":FILE_ATTRIBUTE_">, C<":FILE_FLAG_">, C<":FILE_SHARE_">,
-C<":FILE_TYPE_">, C<":FS_">, C<":HANDLE_FLAG_">, HANDLE_FLAG_INHERIT,
-HANDLE_FLAG_PROTECT_FROM_CLOSE, C<":IOCTL_STORAGE_">,
-C<IOCTL_STORAGE_CHECK_VERIFY>, C<IOCTL_STORAGE_MEDIA_REMOVAL>,
-C<IOCTL_STORAGE_EJECT_MEDIA>, C<IOCTL_STORAGE_LOAD_MEDIA>,
-C<IOCTL_STORAGE_RESERVE>, C<IOCTL_STORAGE_RELEASE>,
-C<IOCTL_STORAGE_FIND_NEW_DEVICES>, C<IOCTL_STORAGE_GET_MEDIA_TYPES>,
-C<$ucCylsLow[$i]>, C<$ivcCylsHigh[$i]>, C<$uMediaType[$i]>,
-C<$uTracksPerCyl[$i]>, C<$uSectsPerTrack[$i]>, C<$uBytesPerSect[$i]>,
-C<":IOCTL_DISK_">, C<IOCTL_DISK_GET_DRIVE_GEOMETRY>, C<$ucCylsLow>,
-C<$ivcCylsHigh>, C<$uMediaType>, C<$uTracksPerCyl>, C<$uSectsPerTrack>,
-C<$uBytesPerSect>, C<IOCTL_DISK_GET_PARTITION_INFO>, C<$uStartLow> and
-C<$ivStartHigh>, C<$ucHiddenSects>, C<$uPartitionSeqNumber>,
-C<$uPartitionType>, C<$bActive>, C<$bRecognized>, C<$bToRewrite>,
-C<IOCTL_DISK_SET_PARTITION_INFO>, C<IOCTL_DISK_GET_DRIVE_LAYOUT>,
-C<$cPartitions>, C<$uDiskSignature>, C<IOCTL_DISK_GET_MEDIA_TYPES>,
-C<IOCTL_DISK_SET_DRIVE_LAYOUT>, C<IOCTL_DISK_VERIFY>, C<$uStartOffsetLow>
-and C<$ivStartOffsetHigh>, C<$uLength>, C<IOCTL_DISK_FORMAT_TRACKS>,
-C<IOCTL_DISK_REASSIGN_BLOCKS>, C<IOCTL_DISK_PERFORMANCE>,
-C<IOCTL_DISK_IS_WRITABLE>, C<IOCTL_DISK_LOGGING>, DISK_LOGGING_START,
-DISK_LOGGING_STOP, DISK_LOGGING_DUMP, DISK_LOGGING_BINNING,
-C<IOCTL_DISK_FORMAT_TRACKS_EX>, C<IOCTL_DISK_HISTOGRAM_STRUCTURE>,
-C<IOCTL_DISK_HISTOGRAM_DATA>, C<IOCTL_DISK_HISTOGRAM_RESET>,
-C<IOCTL_DISK_REQUEST_STRUCTURE>, C<IOCTL_DISK_REQUEST_DATA>, C<":FSCTL_">,
-C<FSCTL_SET_REPARSE_POINT>, C<FSCTL_GET_REPARSE_POINT>,
-C<FSCTL_DELETE_REPARSE_POINT>, C<":GENERIC_">, C<":MEDIA_TYPE">,
-C<Unknown>, C<F5_1Pt2_512>, C<F3_1Pt44_512>, C<F3_2Pt88_512>,
-C<F3_20Pt8_512>, C<F3_720_512>, C<F5_360_512>, C<F5_320_512>,
-C<F5_320_1024>, C<F5_180_512>, C<F5_160_512>, C<RemovableMedia>,
-C<FixedMedia>, C<F3_120M_512>, C<":MOVEFILE_">, C<":SECURITY_">,
-C<":SEM_">, C<":PARTITION_">, C<":ALL">
-
-=back
-
-=item BUGS
-
-=item AUTHOR
-
-=item SEE ALSO
 
 =back
 
