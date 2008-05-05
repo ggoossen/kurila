@@ -2031,8 +2031,6 @@ make install will install the following:
 	podselect	Prints sections of POD documentation
 	prove		A command-line tool for running tests
 	psed		A Perl implementation of sed
-	ptar		A Perl implementation of tar
-	ptardiff	A diff for tar archives
 	s2p		sed-to-perl translator
 	shasum		A tool to print or check SHA checksums
 	splain		Describe Perl warnings and errors

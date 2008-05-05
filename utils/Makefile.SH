@@ -45,7 +45,7 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 
 plextract = perlbug perlivp
 plfixlocal = h2xs h2ph perldoc pl2pm libnetcfg
-plfix = corelist instmodsh ptar ptardiff shasum splain xsubpp
+plfix = corelist instmodsh shasum splain xsubpp
 
 all: $(plextract) $(plfixlocal) $(plfix)
 
@@ -73,14 +73,6 @@ perlbug:	perlbug.PL ../config.sh ../patchlevel.h
 perldoc:	perldoc.pl ../config.sh
 
 perlivp:	perlivp.PL ../config.sh
-
-ptar: ../lib/Archive/Tar/bin/$@ ../config.sh
-	$(CPS) ../lib/Archive/Tar/bin/$@ $@
-	$(RUN) $(PERL) $(FIXIN) $@
-
-ptardiff: ../lib/Archive/Tar/bin/$@ ../config.sh
-	$(CPS) ../lib/Archive/Tar/bin/$@ $@
-	$(RUN) $(PERL) $(FIXIN) $@
 
 pl2pm:		pl2pm.pl ../config.sh
 
