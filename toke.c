@@ -4010,114 +4010,17 @@ Perl_yylex(pTHX)
 	    yyerror("panic: Unknown PL_expect");
 	    break;
 	case XSTATE:
-	case XREF: {
-		const char *t;
-		if (PL_oldoldbufptr == PL_last_lop)
-		    PL_lex_brackstack[PL_lex_brackets++] = XTERM;
-		else
-		    PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
-		s = SKIPSPACE1(s);
-		if (*s == '}') {
-		    if (PL_expect == XREF && PL_lex_state == LEX_INTERPNORMAL) {
-			PL_expect = XTERM;
-			/* This hack is to get the ${} in the message. */
-			PL_bufptr = s+1;
-			yyerror("syntax error");
-			break;
-		    }
-		    yyerror("'{' should be '\%(' expected");
-		}
-		/* This hack serves to disambiguate a pair of curlies
-		 * as being a block or an anon hash.  Normally, expectation
-		 * determines that, but in cases where we're not in a
-		 * position to expect anything in particular (like inside
-		 * eval"") we have to resolve the ambiguity.  This code
-		 * covers the case where the first term in the curlies is a
-		 * quoted string.  Most other cases need to be explicitly
-		 * disambiguated by prepending a "+" before the opening
-		 * curly in order to force resolution as an anon hash.
-		 *
-		 * XXX should probably propagate the outer expectation
-		 * into eval"" to rely less on this hack, but that could
-		 * potentially break current behavior of eval"".
-		 * GSAR 97-07-21
-		 */
-
-/* 		yyerror("{ ... } unknown hash or block"); */
-/* 		break; */
-
-		t = s;
-		if (*s == '\'' || *s == '"' || *s == '`') {
-		    /* common case: get past first string, handling escapes */
-		    for (t++; t < PL_bufend && *t != *s;)
-			if (*t++ == '\\' && (*t == '\\' || *t == *s))
-			    t++;
-		    t++;
-		}
-		else if (*s == 'q') {
-		    if (++t < PL_bufend
-			&& (!isALNUM(*t)
-			    || ((*t == 'q' || *t == 'x') && ++t < PL_bufend
-				&& !isALNUM(*t))))
-		    {
-			/* skip q//-like construct */
-			const char *tmps;
-			char open, close, term;
-			I32 brackets = 1;
-
-			while (t < PL_bufend && isSPACE(*t))
-			    t++;
-			/* check for q => */
-			if (t+1 < PL_bufend && t[0] == '=' && t[1] == '>') {
-			    yyerror("'{' should be '\%(' expected");
-			}
-			term = *t;
-			open = term;
-			if (term && (tmps = strchr("([{< )]}> )]}>",term)))
-			    term = tmps[5];
-			close = term;
-			if (open == close)
-			    for (t++; t < PL_bufend; t++) {
-				if (*t == '\\' && t+1 < PL_bufend && open != '\\')
-				    t++;
-				else if (*t == open)
-				    break;
-			    }
-			else {
-			    for (t++; t < PL_bufend; t++) {
-				if (*t == '\\' && t+1 < PL_bufend)
-				    t++;
-				else if (*t == close && --brackets <= 0)
-				    break;
-				else if (*t == open)
-				    brackets++;
-			    }
-			}
-			t++;
-		    }
-		    else
-			/* skip plain q word */
-			while (t < PL_bufend && isALNUM_lazy_if(t,UTF))
-			     t += UTF8SKIP(t);
-		}
-		else if (isALNUM_lazy_if(t,UTF)) {
-		    t += UTF8SKIP(t);
-		    while (t < PL_bufend && isALNUM_lazy_if(t,UTF))
-			 t += UTF8SKIP(t);
-		}
-		while (t < PL_bufend && isSPACE(*t))
-		    t++;
-		/* if comma follows first term, call it an anon hash */
-		/* XXX it could be a comma expression with loop modifiers */
-		if (t < PL_bufend && ((*t == ',' && (*s == 'q' || !isLOWER(*s)))
-				   || (*t == '=' && t[1] == '>')))
-		    yyerror("'{' should be '\%(' expected");
-		if (PL_expect == XREF)
-		    PL_expect = XTERM;
-		else {
-		    PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
-		    PL_expect = XSTATE;
-		}
+	case XREF:
+	    if (PL_oldoldbufptr == PL_last_lop)
+		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+	    else
+		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+	    s = SKIPSPACE1(s);
+	    if (PL_expect == XREF)
+		PL_expect = XTERM;
+	    else {
+		PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
+		PL_expect = XSTATE;
 	    }
 	    break;
 	}
