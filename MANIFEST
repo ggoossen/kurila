@@ -998,21 +998,6 @@ lib/Archive/Extract/t/src/y.tar.packed	Archive::Extract tests
 lib/Archive/Extract/t/src/y.tbz.packed	Archive::Extract tests
 lib/Archive/Extract/t/src/y.tgz.packed	Archive::Extract tests
 lib/Archive/Extract/t/src/y.zip.packed	Archive::Extract tests
-lib/Archive/Tar/bin/ptar	the ptar utility
-lib/Archive/Tar/bin/ptardiff	the ptardiff utility
-lib/Archive/Tar/Constant.pm	Archive::Tar
-lib/Archive/Tar/File.pm		Archive::Tar
-lib/Archive/Tar.pm		Archive::Tar
-lib/Archive/Tar/t/01_use.t	Archive::Tar tests
-lib/Archive/Tar/t/02_methods.t	Archive::Tar tests
-lib/Archive/Tar/t/03_file.t	Archive::Tar tests
-lib/Archive/Tar/t/04_resolved_issues.t	Archive::Tar tests
-lib/Archive/Tar/t/src/long/b	Archive::Tar tests
-lib/Archive/Tar/t/src/long/bar.tar.packed	Archive::Tar tests
-lib/Archive/Tar/t/src/long/foo.tgz.packed	Archive::Tar tests
-lib/Archive/Tar/t/src/short/b	Archive::Tar tests
-lib/Archive/Tar/t/src/short/bar.tar.packed	Archive::Tar tests
-lib/Archive/Tar/t/src/short/foo.tgz.packed	Archive::Tar tests
 lib/attributes.pm		For "sub foo : attrlist"
 lib/autouse.pm			Load and call a function only when it's used
 lib/autouse.t			See if autouse works

@@ -789,7 +789,7 @@ sub installlib {
     # the corelist script from lib/Module/CoreList/bin and ptar* in
     # lib/Archive/Tar/bin, the config_data script in lib/Module/Build/scripts
     # (they're installed later with other utils)
-    return if $name =~ m/^(?:cpan|instmodsh|prove|corelist|ptar|cpan2dist|ptardiff|config_data)\z/;
+    return if $name =~ m/^(?:cpan|instmodsh|prove|corelist|cpan2dist|config_data)\z/;
     # ignore the Makefiles
     return if $name =~ m/^makefile$/i;
     # ignore the test extensions
