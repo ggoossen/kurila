@@ -1201,8 +1201,8 @@ SKIP:
 {
     my $val = 0;
     my $tainted = '1' . $TAINT;
-    eval_dies_like('$val = eval $tainted;',
-                   qr/^Insecure dependency in eval/);
+    dies_like( sub { $val = eval $tainted; },
+               qr/^Insecure dependency in eval/);
     is ($val, 0, "eval doesn't like tainted strings");
 
     # Rather nice code to get a tainted undef by from Rick Delaney
@@ -1210,8 +1210,8 @@ SKIP:
     seek FH, 0, 2 or die $!;
     $tainted = ~< *FH;
 
-    eval_dies_like('eval $tainted',
-                   qr/^Insecure dependency in eval/);
+    dies_like( sub { eval $tainted },
+               qr/^Insecure dependency in eval/);
 }
 
 {
