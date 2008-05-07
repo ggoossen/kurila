@@ -437,7 +437,7 @@ print "ok ",$test++," - #20798 (used to dump core)\n";
 
 $got = runperl (
     prog => 
-    'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie @a, A; warn qq(ok\n)',
+    'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie @a, q(A); warn qq(ok\n)',
 stderr => 1);
 
 print "not " unless $got =~ qr/^ok\n/;
