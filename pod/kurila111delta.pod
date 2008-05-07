@@ -18,17 +18,17 @@ anonymous hash, but will always create a closure/block.
 =head2 New anonymous array and hash constructors: C<@(...)> and
 C<%(...)>
 
-There are two new operators @(...) and %(...) for creating anonymous
+There are two new operators C<@(...)> and C<%(...)> for creating anonymous
 arrays and hashes, replacing the old anonymous array and hash ref
-constructors C<[...]> and C<{...}>.  @(...) creates an anonymous
-array, and %(...) creates an anonymous hash.
+constructors C<[...]> and C<{...}>. C<@(...)> creates an anonymous
+array, and C<%(...)> creates an anonymous hash.
 
 =head2 Removal C<[...]> and C<{...}>
 
 The anonymous array and hash ref constructors C<[...]> and C<{...}>
 have been removed.  They can be replaced with the new array/hash
-constructors: C<[...]> becomes C<\ @(...)> and {...} becomes C<\
-%(...)>
+constructors: C<[...]> becomes C<\ @(...)> and C<{...}> becomes
+C<\ %(...)>
 
 =head1 KNOWN BUGS
 
