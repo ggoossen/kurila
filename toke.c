@@ -4748,20 +4748,34 @@ Perl_yylex(pTHX)
 		    PL_nextwhite = nextPL_nextwhite;	/* assume no & deception */
 #endif
 
+		    /* Special case of "_" following a filetest operator: it's a bareword */
+		    if (PL_tokenbuf[0] == '_' && PL_tokenbuf[1] == '\0'
+			&& ((PL_opargs[PL_last_lop_op] & OA_CLASS_MASK) == OA_FILESTATOP)) {
+			TOKEN(WORD);
+		    }
+
 		    /* If not a declared subroutine, it's an indirect object. */
 		    /* (But it's an indir obj regardless for sort.) */
-		    /* Also, if "_" follows a filetest operator, it's a bareword */
 
 		    if (
 			( !immediate_paren && (PL_last_lop_op == OP_SORT ||
                          ((!gv || !cv) &&
                         (PL_last_lop_op != OP_MAPSTART &&
 			 PL_last_lop_op != OP_GREPSTART))))
-		       || (PL_tokenbuf[0] == '_' && PL_tokenbuf[1] == '\0'
-			    && ((PL_opargs[PL_last_lop_op] & OA_CLASS_MASK) == OA_FILESTATOP))
 		       )
 		    {
 			PL_expect = (PL_last_lop == PL_oldoldbufptr) ? XTERM : XOPERATOR;
+
+			if (lastchar != '-') {
+			    if (ckWARN(WARN_RESERVED)) {
+				d = PL_tokenbuf;
+				while (isLOWER(*d))
+				    d++;
+				if (!*d && !gv_stashpv(PL_tokenbuf, 0))
+				    Perl_warner(aTHX_ packWARN(WARN_RESERVED), PL_warn_reserved,
+						PL_tokenbuf);
+			    }
+			}
 			goto bareword;
 		    }
 		}
@@ -4892,21 +4906,9 @@ Perl_yylex(pTHX)
 
 		/* Call it a bare word */
 
-		if (PL_hints & HINT_STRICT_SUBS)
-		    pl_yylval.opval->op_private |= OPpCONST_STRICT;
-		else {
-		bareword:
-		    if (lastchar != '-') {
-			if (ckWARN(WARN_RESERVED)) {
-			    d = PL_tokenbuf;
-			    while (isLOWER(*d))
-				d++;
-			    if (!*d && !gv_stashpv(PL_tokenbuf, 0))
-				Perl_warner(aTHX_ packWARN(WARN_RESERVED), PL_warn_reserved,
-				       PL_tokenbuf);
-			}
-		    }
-		}
+		pl_yylval.opval->op_private |= OPpCONST_STRICT;
+		
+	    bareword:
 
 		if ((lastchar == '*' || lastchar == '%' || lastchar == '&')
 		    && ckWARN_d(WARN_AMBIGUOUS)) {
