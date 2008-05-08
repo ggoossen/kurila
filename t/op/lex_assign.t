@@ -224,7 +224,7 @@ substr $posstr, 2, 2		# substr
 vec("abc",2,8)			# vec
 index $posstr, 2		# index
 rindex $posstr, 2		# rindex
-sprintf "%i%i", $n, $n		# sprintf
+sprintf '%i%i', $n, $n		# sprintf
 ord $n				# ord
 chr $n				# chr
 crypt $n, $n			# crypt

@@ -230,7 +230,7 @@ my %def_opts = map {$_=>%std_opt{$_}{def}}  keys %std_opt;
 
 sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
     use POSIX;
-    $lconv = POSIX::localeconv();
+    my $lconv = POSIX::localeconv();
     @_[0] = exists $lconv->{decimal_point} ? $lconv->{decimal_point} : "?";
     @_[1] = exists $lconv->{thousands_sep} ? $lconv->{thousands_sep} : "";
     @_[2] = exists $lconv->{grouping} ? \@(unpack "c*", $lconv->{grouping}) : \@(0);
@@ -478,7 +478,8 @@ sub fldvals {
 	return ($fld, $udnum);
 }
 
-our $nestedbraces = qr/ \{ (?: (?> ((?!\{|\}).)+ ) | (??{ $nestedbraces }) )* \} /sx;
+our $nestedbraces;
+$nestedbraces = qr/ \{ (?: (?> ((?!\{|\}).)+ ) | (??{ $nestedbraces }) )* \} /sx;
 
 sub segment ($\@\%$\%) {
 	my ($format, $args, $opts, $fldcnt, $argcache) = @_;
@@ -546,7 +547,7 @@ sub segment ($\@\%$\%) {
 							 ;
 
 				$DB::single=1;
-                ($checkwidth, $extras) = $fld =~ m/\(\s*(\d+[.,]?\d*)\s*\)/g;
+                my ($checkwidth, $extras) = $fld =~ m/\(\s*(\d+[.,]?\d*)\s*\)/g;
 				die "Too many width specifications in $field" if $extras;
 				if ($checkwidth) {
 					$checkplaces = $checkwidth =~ s/[.,](\d+)// && $1;
@@ -779,10 +780,10 @@ sub make_col {
 				last if $tabular && $bulleted && @col;
 			}
 		}
-		($text,$more,$eol) = $f->{break}->($str_ref,$width,$f->{opts}{ws});
+		my ($text,$more,$eol) = $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
 			$text =~ s{($f->{opts}{ws})}
-					  {{ @caps = grep { defined $$_ } 2..(@+ -1);
+					  {{ my @caps = grep { defined $$_ } 2..(@+ -1);
 						@caps = length($1) ? " " : "" unless @caps;
 						join "", @caps;
 					  

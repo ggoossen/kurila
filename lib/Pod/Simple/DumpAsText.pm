@@ -1,8 +1,8 @@
 
 package Pod::Simple::DumpAsText;
-$VERSION = '2.02';
+our $VERSION = '2.02';
 use Pod::Simple ();
-BEGIN {@ISA = ('Pod::Simple')}
+BEGIN {our @ISA = ('Pod::Simple')}
 
 use strict;
 

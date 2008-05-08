@@ -294,6 +294,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 {
     no warnings 'once';
     my @refs =    ( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
+    our %h;
     for my $ref (@refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }

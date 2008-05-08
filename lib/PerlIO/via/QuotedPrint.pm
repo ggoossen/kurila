@@ -3,7 +3,7 @@ package PerlIO::via::QuotedPrint;
 # Set the version info
 # Make sure we do things by the book from now on
 
-$VERSION = '0.06';
+our $VERSION = '0.06';
 use strict;
 
 # Make sure the encoding/decoding stuff is available

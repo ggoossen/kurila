@@ -211,7 +211,7 @@ is ($object->doit("BAR"), 'bar');
 
 # Test not working indirect-object-style method invocation.
 
-eval_dies_like(q{$foo = doit $object "FOO";},
+eval_dies_like(q{my $object; my $foo = doit $object "FOO";},
                qr/syntax error at/);
 
 sub BASEOBJ::doit {
@@ -239,7 +239,7 @@ is (scalar grep(ref($_), @baa), 3);
 is (scalar (@bzz), 3);
 
 # also, it can't be an lvalue
-eval_dies_like('\($x, $y) = (1, 2);',
+eval_dies_like('our ($x, $y); \($x, $y) = (1, 2);',
                qr/Can\'t modify.*ref.*in.*assignment/);
 
 # test for proper destruction of lexical objects

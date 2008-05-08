@@ -24,7 +24,7 @@ unless(defined(%NetConfig{ftp_testhost}) && %NetConfig{test_hosts}) {
 my $t = 1;
 print "1..7\n";
 
-$ftp = Net::FTP->new(%NetConfig{ftp_testhost})
+my $ftp = Net::FTP->new(%NetConfig{ftp_testhost})
 	or (print("not ok 1\n"), exit);
 
 printf "ok \%d\n",$t++;
@@ -44,13 +44,13 @@ $ftp->cwd('/pub') or do {
   print "not ";
 };
 
-if ($data = $ftp->stor('libnet.tst')) {
+if (my $data = $ftp->stor('libnet.tst')) {
   my $text = "abc\ndef\nqwe\n";
   printf "ok \%d\n",$t++;
   $data->write($text,length $text);
   $data->close;
   $data = $ftp->retr('libnet.tst');
-  $data->read($buf,length $text);
+  $data->read(my $buf,length $text);
   $data->close;
   print "not " unless $text eq $buf;
   printf "ok \%d\n",$t++;

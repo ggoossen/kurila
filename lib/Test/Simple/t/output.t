@@ -53,7 +53,7 @@ ok($line eq 'hi!');
 
 open(FOO, ">>", "$tmpfile") or die $!;
 $out = $Test->output(\*FOO);
-$old = select *$out;
+my $old = select *$out;
 print "Hello!\n";
 close *$out;
 undef $out;

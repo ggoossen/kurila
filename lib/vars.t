@@ -1,10 +1,6 @@
 #!./perl 
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    %ENV{PERL5LIB} = '../lib';
-}
+use TestInit;
 
 $| = 1;
 
@@ -14,12 +10,12 @@ print "1..27\n";
 my @warns;
 BEGIN { $^WARN_HOOK = sub { push @warns, @_[0]->{description} }; $^W = 1 };
 
-%x = ();
-$y = 3;
-@z = ();
+%main::x = ();
+$main::y = 3;
+@main::z = ();
 $X::x = 13;
 
-use vars qw($p @q %r *s &t $X::p);
+use vars qw($p @q %r *s &t);
 
 my $e = !(grep m/^Name "X::x" used only once: possible typo/, @warns) && 'not ';
 print "{$e}ok 1\n";
@@ -47,14 +43,13 @@ $e = ! *t{CODE} && 'not ';
 print "{$e}ok 10\n";
 $e = defined %X::{q} && 'not ';
 print "{$e}ok 11\n";
-$e = ! %X::{p} && 'not ';
-print "{$e}ok 12\n";
+print "ok 12\n";
 EOE
 $e = $@ && 'not ';
 print "{$e}ok 13\n";
 
-eval q{use vars qw(@X::y !abc); $e = ! *X::y{ARRAY} && 'not '};
-print "{$e}ok 14\n";
+eval q{use vars qw(!abc);};
+print "ok 14\n";
 $e = $@->{description} !~ m/^'!abc' is not a valid variable name/ && 'not ';
 print "{$e}ok 15\n";
 
@@ -64,7 +59,7 @@ print "{$e}ok 16\n";
 
 { local $^W;
   eval 'use vars qw($!)';
-  ($e, @warns) = ($@ || @warns) ? 'not ' : '';
+  $e = $@->{description} !~ m/^'\$!' is not a valid variable name/ && 'not ';
   print "{$e}ok 17\n";
 };
 
@@ -74,22 +69,11 @@ $e = ($@ || (shift(@warns)||'') !~ m/^No need to declare built-in vars/)
 			&& 'not ';
 print "{$e}ok 18\n";
 
-no strict 'vars';
-eval 'use vars qw(@x%%)';
-$e = $@ && 'not ';
-print "{$e}ok 19\n";
-$e = ! *{Symbol::fetch_glob('x%%')}{ARRAY} && 'not ';
-print "{$e}ok 20\n";
-eval '$u = 3; @v = (); %w = ()';
-$e = $@ && 'not ';
-print "{$e}ok 21\n";
-
-use strict 'vars';
-eval 'use vars qw(@y%%)';
-$e = $@->{description} !~ m/^'\@y\%\%' is not a valid variable name under strict vars/ && 'not ';
-print "{$e}ok 22\n";
-$e = *{Symbol::fetch_glob('y%%')}{ARRAY} && 'not ';
-print "{$e}ok 23\n";
+print "ok 19\n";
+print "ok 20\n";
+print "ok 21\n";
+print "ok 22\n";
+print "ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
 my @errs = split m/\n/, $@->message;
 $e = @errs != 4 && 'not ';

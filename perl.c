@@ -4565,10 +4565,10 @@ Perl_init_argv_symbols(pTHX_ register int argc, register char **argv)
 	    if ((s = strchr(argv[0], '='))) {
 		const char *const start_name = argv[0] + 1;
 		sv_setpv(GvSV(gv_fetchpvn_flags(start_name, s - start_name,
-						TRUE, SVt_PV)), s + 1);
+						GV_ADD | GV_NOTQUAL, SVt_PV)), s + 1);
 	    }
 	    else
-		sv_setiv(GvSV(gv_fetchpv(argv[0]+1, GV_ADD, SVt_PV)),1);
+		sv_setiv(GvSV(gv_fetchpv(argv[0]+1, GV_ADD | GV_NOTQUAL, SVt_PV)),1);
 	}
     }
     if ((PL_argvgv = gv_fetchpvs("ARGV", GV_ADD|GV_NOTQUAL, SVt_PVAV))) {

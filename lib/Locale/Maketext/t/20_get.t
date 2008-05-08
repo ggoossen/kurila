@@ -10,14 +10,14 @@ print "# --- Making sure that get_handle works ---\n";
 # declare some classes...
 {
   package Woozle;
-  @ISA = ('Locale::Maketext');
+  our @ISA = ('Locale::Maketext');
   sub dubbil   { return @_[1] * 2 }
   sub numerate { return @_[2] . 'en' }
 }
 {
   package Woozle::eu_mt;
-  @ISA = ('Woozle');
-  %Lexicon = (
+  our @ISA = ('Woozle');
+  our %Lexicon = (
    'd2' => 'hum [dubbil,_1]',
    'd3' => 'hoo [quant,_1,zaz]',
    'd4' => 'hoo [*,_1,zaz]',

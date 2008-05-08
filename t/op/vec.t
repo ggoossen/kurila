@@ -3,6 +3,7 @@
 BEGIN { require "./test.pl"; }
 plan( tests => 25 );
 
+our ($foo, $Vec, $bar, $baz);
 is(vec($foo,0,1), 0);
 is(length($foo), undef);
 vec($foo,0,1) = 1;
@@ -44,7 +45,7 @@ ok(! vec('abcd', 7, 8));
 
 # vec is independent of 'use utf8'
 use utf8;
-$x = "\x{263a}";  # == \xE2\x98\xBA
+our $x = "\x{263a}";  # == \xE2\x98\xBA
 is(vec($x, 0, 8), 0xE2);
 no utf8;
 

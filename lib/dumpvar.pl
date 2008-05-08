@@ -11,6 +11,13 @@ package dumpvar;
 
 # Won't dump symbol tables and contents of debugged files by default
 
+our ($printUndef, $tick, $unctrl, $subdump, $dumpReused, $bareStringify,
+     $winsize, %address, $v, $noticks, $quoteHighBit, $arrayDepth, $short,
+     $compactDump, $veryCompact, $tArrayDepth, $shortmore, $sp, %v, @v,
+     $s, $m, $value, $key, @sortKeys, $address, $more, $tHashDepth, $start_part,
+     $item_type, $hashDepth, $num, $globPrint, $fileno, $entry,
+    $dumpDBFiles, $entry, @entry, %entry, $dumpPackages);
+
 $winsize = 80 unless defined $winsize;
 
 

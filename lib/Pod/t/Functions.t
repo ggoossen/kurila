@@ -9,10 +9,9 @@ use File::Basename;
 use File::Spec;
 
 use Test::More;
-plan tests => 9;
+plan tests => 8;
 
-
-use_ok( 'Pod::Functions' );
+use Pod::Functions;
 
 # How do you test exported vars?
 my( $pkg_ref, $exp_ref ) = ( \%Pod::Functions::Kinds, \%Kinds );

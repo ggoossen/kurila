@@ -25,7 +25,7 @@ print "1..3\n";
 
 my $i = 1;
 
-$smtp = Net::SMTP->new(Debug => 0)
+my $smtp = Net::SMTP->new(Debug => 0)
 	or (print("not ok 1\n"), exit);
 
 print "ok 1\n";

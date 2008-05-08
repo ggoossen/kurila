@@ -115,7 +115,7 @@ SKIP: {
 		ok($j->($result->[$i]), "$id - $i is ok");
 	    } else {
 		is($result->[$i], $j,
-		   sprintf("$id - $i is %s",
+		   sprintf("$id - $i is \%s",
 			   defined $j ? $j : "undef"));
 	    }
 	}

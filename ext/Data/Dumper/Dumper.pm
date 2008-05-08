@@ -9,7 +9,7 @@
 
 package Data::Dumper;
 
-$VERSION = '2.121_16';
+our $VERSION = '2.121_16';
 
 #$| = 1;
 
@@ -17,10 +17,12 @@ $VERSION = '2.121_16';
 require Exporter;
 require overload;
 
+our $Useperl;
+
 BEGIN {
-    @ISA = qw(Exporter);
-    @EXPORT = qw(Dumper);
-    @EXPORT_OK = qw(DumperX);
+    our @ISA = qw(Exporter);
+    our @EXPORT = qw(Dumper);
+    our @EXPORT_OK = qw(DumperX);
 
     # if run under miniperl, or otherwise lacking dynamic loading,
     # XSLoader should be attempted to load, or the pure perl flag
@@ -34,23 +36,23 @@ BEGIN {
 XSLoader::load( 'Data::Dumper' ) unless $Useperl;
 
 # module vars and their defaults
-$Indent     = 2         unless defined $Indent;
-$Purity     = 0         unless defined $Purity;
-$Pad        = ""        unless defined $Pad;
-$Varname    = "VAR"     unless defined $Varname;
-$Useqq      = 0         unless defined $Useqq;
-$Terse      = 0         unless defined $Terse;
-$Freezer    = ""        unless defined $Freezer;
-$Toaster    = ""        unless defined $Toaster;
-$Deepcopy   = 0         unless defined $Deepcopy;
-$Quotekeys  = 1         unless defined $Quotekeys;
-$Bless      = "bless"   unless defined $Bless;
+our $Indent     //= 2;
+our $Purity     //= 0;
+our $Pad        //= "";
+our $Varname    //= "VAR";
+our $Useqq      //= 0;
+our $Terse      //= 0;
+our $Freezer    //= "";
+our $Toaster    //= "";
+our $Deepcopy   //= 0;
+our $Quotekeys  //= 1;
+our $Bless      //= "bless";
 #$Expdepth   = 0         unless defined $Expdepth;
-$Maxdepth   = 0         unless defined $Maxdepth;
-$Pair       = ' => '    unless defined $Pair;
-$Useperl    = 0         unless defined $Useperl;
-$Sortkeys   = 0         unless defined $Sortkeys;
-$Deparse    = 0         unless defined $Deparse;
+our $Maxdepth   //= 0;
+our $Pair       //= ' => ';
+our $Useperl    //= 0;
+our $Sortkeys   //= 0;
+our $Deparse    //= 0;
 
 #
 # expects an arrayref of values to be dumped.
@@ -184,6 +186,7 @@ sub Dump {
 # dump the refs in the current dumper object.
 # expects same args as new() if called via package name.
 #
+our @post;
 sub Dumpperl {
   my($s) = shift;
   my(@out, $val, $name);
@@ -439,7 +442,7 @@ sub _dump {
       if ($s->{deparse}) {
 	require B::Deparse;
 	my $sub =  'sub ' . (B::Deparse->new)->coderef2text($val);
-	$pad    =  $s->{sep} . $s->{pad} . $s->{apad} . $s->{xpad} x ($s->{level} - 1);
+	my $pad    =  $s->{sep} . $s->{pad} . $s->{apad} . $s->{xpad} x ($s->{level} - 1);
 	$sub    =~ s/\n/{$pad}/gs;
 	$out   .=  $sub;
       } else {

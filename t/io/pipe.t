@@ -22,9 +22,9 @@ $| = 1;
 
 open(PIPE, "|-", "-") || exec $Perl, '-pe', 'tr/YX/ko/';
 
-printf PIPE "Xk %d - open |- || exec\n", curr_test();
+printf PIPE "Xk \%d - open |- || exec\n", curr_test();
 next_test();
-printf PIPE "oY %d -    again\n", curr_test();
+printf PIPE "oY \%d -    again\n", curr_test();
 next_test();
 close PIPE;
 
@@ -41,7 +41,7 @@ SKIP: {
 	close PIPE;        # avoid zombies
     }
     else {
-	printf STDOUT "not ok %d - open -|\n", curr_test();
+	printf STDOUT "not ok \%d - open -|\n", curr_test();
         next_test();
         my $tnum = curr_test;
         next_test();
@@ -66,7 +66,7 @@ SKIP: {
 	close PIPE;        # avoid zombies
     }
     else {
-	printf STDOUT "not ok %d - $raw", curr_test();
+	printf STDOUT "not ok \%d - $raw", curr_test();
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -74,7 +74,7 @@ SKIP: {
     next_test();
 
     if (open(PIPE, "|-", "-")) {
-	printf PIPE "not ok %d - $raw", curr_test();
+	printf PIPE "not ok \%d - $raw", curr_test();
 	close PIPE;        # avoid zombies
     }
     else {
@@ -99,7 +99,7 @@ SKIP: {
 
         pipe(READER,'WRITER') || die "Can't open pipe";
 
-        if ($pid = fork) {
+        if (my $pid = fork) {
             close WRITER;
             while( ~< *READER) {
                 s/^not //;
@@ -111,7 +111,7 @@ SKIP: {
         else {
             die "Couldn't fork" unless defined $pid;
             close READER;
-            printf WRITER "not ok %d - pipe & fork\n", curr_test;
+            printf WRITER "not ok \%d - pipe & fork\n", curr_test;
             next_test;
 
             open(STDOUT, ">&",\*WRITER) || die "Can't dup WRITER to STDOUT";
@@ -135,10 +135,10 @@ close READER;
 
 sub broken_pipe {
     %SIG{'PIPE'} = 'IGNORE';       # loop preventer
-    printf "ok %d - SIGPIPE\n", curr_test;
+    printf "ok \%d - SIGPIPE\n", curr_test;
 }
 
-printf WRITER "not ok %d - SIGPIPE\n", curr_test;
+printf WRITER "not ok \%d - SIGPIPE\n", curr_test;
 close WRITER;
 sleep 1;
 next_test;
@@ -190,7 +190,6 @@ SKIP: {
             # check that status for the correct process is collected
             my $zombie;
             unless( $zombie = fork ) {
-                $NO_ENDING=1;
                 exit 37;
             }
             my $pipe = open *FH, "-|", "sleep 2;exit 13" or die "Open: $!\n";
