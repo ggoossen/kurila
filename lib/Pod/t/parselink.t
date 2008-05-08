@@ -13,7 +13,7 @@
 # increment the test count in the BEGIN block below.  We don't use any of the
 # fancy test modules intentionally for backward compatibility to older
 # versions of Perl.
-@TESTS = (
+our @TESTS = (
     \@( 'foo',
       undef, 'foo', 'foo', undef, 'pod' ),
 
@@ -91,19 +91,13 @@
       'news:yld72axzc8.fsf@windlord.stanford.edu', undef, 'url' )
 );
 
+use TestInit;
+
 BEGIN {
-    chdir 't' if -d 't';
-    unshift (@INC, '../blib/lib');
-    $| = 1;
     print "1..25\n";
 }
 
-END {
-    print "not ok 1\n" unless $loaded;
-}
-
 use Pod::ParseLink;
-$loaded = 1;
 print "ok 1\n";
 
 # Used for reporting test failures.

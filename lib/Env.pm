@@ -122,7 +122,7 @@ package Env::Array;
 use Config;
 use Tie::Array;
 
-@ISA = qw(Tie::Array);
+our @ISA = qw(Tie::Array);
 
 my $sep = %Config::Config{path_sep};
 
@@ -142,7 +142,7 @@ sub STORESIZE {
     if (@temp +> $size) {
         splice @temp, $size;
     } else {
-        @temp[$size-1] = @tem[$size-1];
+        @temp[$size-1] = @temp[$size-1];
     }
     %ENV{$$self} = join($sep, @temp);
 }

@@ -58,6 +58,6 @@ is($c, 2,       '   $tied = $var');
 $c = $a || $b;
 
 {
-    local $TODO = 'Double FETCH';
+    local our $TODO = 'Double FETCH';
     is($c, 1,   '   $tied || $var');
 }

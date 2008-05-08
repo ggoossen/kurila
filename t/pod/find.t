@@ -33,6 +33,7 @@ my $VERBOSE = %ENV{PERL_CORE} ? 0 : (%ENV{TEST_VERBOSE} || 0);
 my $lib_dir = %ENV{PERL_CORE} ? 
   'File::Spec'->catdir('pod', 'testpods', 'lib')
   : 'File::Spec'->catdir($THISDIR,'lib');
+our $Qlib_dir;
 if ($^O eq 'VMS') {
     $lib_dir = %ENV{PERL_CORE} ?
       VMS::Filespec::unixify('File::Spec'->catdir('pod', 'testpods', 'lib'))

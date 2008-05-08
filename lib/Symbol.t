@@ -12,10 +12,10 @@ ok( $_ eq 'foo', 'check $_ clobbering' );
 
 
 # First test gensym()
-$sym1 = gensym;
+our $sym1 = gensym;
 ok( ref($sym1) eq 'GLOB', 'gensym() returns a GLOB' );
 
-$sym2 = gensym;
+our $sym2 = gensym;
 
 ok( $sym1 \!= $sym2, 'gensym() returns a different GLOB' );
 
@@ -30,7 +30,7 @@ use Symbol qw(geniosym);
 $sym1 = geniosym;
 is( (ref $sym1), 'IO::Handle', 'got an IO ref' );
 
-$FOO = 'Eymascalar';
+our $FOO = 'Eymascalar';
 *FOO = $sym1;
 
 cmp_ok( $sym1, '\==', *FOO{IO}, 'assigns into glob OK' );

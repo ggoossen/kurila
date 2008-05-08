@@ -18,11 +18,11 @@ sub ok
     print "not ok $no\n" unless $ok ;
 }
 
-$name="test.gz";
+my $name="test.gz";
 
 print "1..23\n";
 
-@text = (<<EOM, <<EOM, <<EOM, <<EOM) ;
+my @text = (<<EOM, <<EOM, <<EOM, <<EOM) ;
 this is line 1
 EOM
 the second line
@@ -32,9 +32,9 @@ EOM
 the final line
 EOM
 
-$text = join("", @text) ;
+my $text = join("", @text) ;
 
-ok(1, $file = IO::Zlib->new($name, "wb"));
+ok(1, my $file = IO::Zlib->new($name, "wb"));
 ok(2, $file->print($text));
 ok(3, $file->close());
 
@@ -52,7 +52,7 @@ ok(13, $file = IO::Zlib->new($name, "rb"));
 ok(14, !$file->eof());
 eval '$file->getlines';
 ok(15, $@->{description} =~ m/^IO::Zlib::getlines: must be called in list context /);
-ok(16, @lines = $file->getlines());
+ok(16, my @lines = $file->getlines());
 ok(17, @lines == @text);
 ok(18, @lines[0] eq @text[0]);
 ok(19, @lines[1] eq @text[1]);

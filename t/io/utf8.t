@@ -44,8 +44,8 @@ seek(F,0,0);
 binmode(F,":utf8");
 is( scalar( ~< *F), "\x{100}\x[c2]\x[a3]\n" );
 seek(F,0,0);
-$buf = chr(0x200);
-$count = read(F,$buf,2,1);
+my $buf = chr(0x200);
+my $count = read(F,$buf,2,1);
 cmp_ok( $count, '==', 2 );
 is( $buf, "\x{200}\x{100}\x[c2]\x[a3]" );
 close(F);
@@ -59,7 +59,7 @@ close(F);
     close F;
 
     open F, "<:utf8", 'a' or die $!;
-    $x = ~< *F;
+    my $x = ~< *F;
     chomp($x);
     is( $x, chr(300) );
 
@@ -127,7 +127,7 @@ close F;
 
 open F, "<", "a" or die $!;
 binmode(F, ":bytes");
-$x = ~< *F; chomp $x;
+my $x = ~< *F; chomp $x;
 $chr = chr(130);
 is( $x, $a . $chr );
 
@@ -143,11 +143,7 @@ close F;
 open F, "<", "a" or die $!;
 binmode(F, ":bytes");
 $x = ~< *F; chomp $x;
-SKIP: {
-    skip("Defaulting to UTF-8 output means that we can't generate a mangled file")
-	if $UTF8_OUTPUT;
-    is( $x, $a . bytes::chr(130) );
-}
+is( $x, $a . bytes::chr(130) );
 
 # Now we have a deformed file.
 
@@ -165,7 +161,7 @@ close F;
 unlink('a');
 
 open F, ">:utf8", "a";
-@a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
+my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
 unshift @a, chr(0); # ... and a null byte in front just for fun
 print F @a;
 close F;

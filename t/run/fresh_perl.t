@@ -61,14 +61,14 @@ $a = ":="; split m/($a)/o, "a:=b:=c"; print "@_"
 EXPECT
 a := b := c
 ########
-$cusp = ^~^0 ^^^ (^~^0 >> 1);
+our $cusp = ^~^0 ^^^ (^~^0 >> 1);
 use integer;
 $, = " ";
 print +($cusp - 1) % 8, $cusp % 8, -$cusp % 8, 8 ^|^ (($cusp + 1) % 8 + 7), "!\n";
 EXPECT
 7 0 0 8 !
 ########
-$foo=undef; $foo->go;
+our $foo=undef; $foo->go;
 EXPECT
 Can't call method "go" on an undefined value at - line 1.
 ########
@@ -77,14 +77,17 @@ BEGIN
 	    "foo";
         }
 ########
+our @array;
 @array[128]=1
 ########
-$x=0x0eabcd; print $x->ref;
+our $x=0x0eabcd; print $x->ref;
 EXPECT
 Can't call method "ref" without a package or object reference at - line 1.
 ########
+our $str;
 chop ($str .= ~< *DATA);
 ########
+our ($x, $y);
 $x=2;$y=3;$x+<$y ? $x : $y += 23;print $x;
 EXPECT
 25
@@ -93,11 +96,12 @@ eval 'sub bar {print "In bar"}';
 ########
 system './perl -ne "print if eof" /dev/null' unless $^O eq 'MacOS'
 ########
+our $file;
 chop($file = ~< *DATA);
 ########
 package N;
 sub new {my ($obj,$n)=@_; bless \$n}  
-$aa=N->new(1);
+our $aa=N->new(1);
 $aa=12345;
 print $aa;
 EXPECT
@@ -108,6 +112,7 @@ printf(STDOUT "\%s\n", $_);
 EXPECT
 foo
 ########
+our @a;
 push(@a, 1, 2, 3,)
 ########
 quotemeta ""
@@ -140,26 +145,11 @@ EXPECT
 bar
 ########
 sub by_number { $a <+> $b; };# inline function for sort below
+our %as_ary;
 %as_ary{0}="a0";
-@ordered_array=sort by_number keys(%as_ary);
+our @ordered_array=sort by_number keys(%as_ary);
 ########
-sub NewShell
-{
-  local($Host) = @_;
-  my($m2) = 0+@Shells;
-  @Shells[$m2]{HOST} = $Host;
-  return $m2;
-}
- 
-sub ShowShell
-{
-  local($i) = @_;
-}
- 
-&ShowShell(&NewShell("beach","Work","+0+0"));
-&ShowShell(&NewShell("beach","Work","+0+0"));
-&ShowShell(&NewShell("beach","Work","+0+0"));
-########
+our $count;
    {
        package FAKEARRAY;
    
@@ -173,6 +163,7 @@ sub ShowShell
        sub DESTROY { print "DESTROY \n"; undef @{@_[0]}; }
    }
    
+our @h;
 eval 'tie @h, "FAKEARRAY", "fred"' ;
 tie @h, "FAKEARRAY", "fred" ;
 EXPECT
@@ -185,7 +176,7 @@ EXPECT
 phooey at - line 1.
 BEGIN failed--compilation aborted
 ########
-BEGIN { 1/$zero }
+BEGIN { 1/0 }
 EXPECT
 Illegal division by zero at - line 1.
 BEGIN failed--compilation aborted
@@ -259,16 +250,6 @@ print "ok\n";
 EXPECT
 ok
 ########
-@a = ($a, $b, $c, $d) = (5, 6);
-print "ok\n"
-  if (@a[0] == 5 and @a[1] == 6 and !defined @a[2] and !defined @a[3]);
-EXPECT
-ok
-########
-print "ok\n" if (1E2<<1 == 200 and 3E4<<3 == 240000);
-EXPECT
-ok
-########
 print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
@@ -284,8 +265,8 @@ print thing(), "\n";
 EXPECT
 nowisthetime
 ########
-$ren = 'joy';
-$stimpy = 'happy';
+our $ren = 'joy';
+our $stimpy = 'happy';
 { local %main::{ren} = *stimpy; print $ren, ' ' }
 print $ren, "\n";
 EXPECT
@@ -305,18 +286,6 @@ package main;
 print p::func()->groovy(), "\n"
 EXPECT
 really groovy
-########
-@list = (\@( 'one', 1 ), \@( 'two', 2 ));
-sub func { $num = shift; (grep $_->[1] == $num, @list)[[0]] }
-print scalar(map &func($_), 1 .. 3), " ",
-      scalar(map scalar &func($_), 1 .. 3), "\n";
-EXPECT
-2 3
-########
-($k, $s)  = qw(x 0);
-@{%h{$k}} = qw(1 2 4);
-for (@{%h{$k}}) { $s += $_; delete %h{$k} if ($_ == 2) }
-print "bogus\n" unless $s == 7;
 ########
 my $a = 'outer';
 eval q[ my $a = 'inner'; eval q[ print "$a " ] ];
@@ -624,18 +593,6 @@ ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 $eval = eval 'sub { eval q|sub { %S }| }';
 $eval->(\%());
-######## [perl #20667] unicode regex vs non-unicode regex
-$toto = 'Hello';
-$toto =~ m/\w/; # this line provokes the problem!
-$name = 'A B';
-# utf8::upgrade($name) if @ARGV;
-if ($name =~ m/(\p{IsUpper}) (\p{IsUpper})/u){
-    print "It's good! >$1< >$2<\n";
-} else {
-    print "It's not good...\n";
-}
-EXPECT
-It's good! >A< >B<
 ######## glob() bug Mon, 01 Sep 2003 02:25:41 -0700 <200309010925.h819Pf0X011457@smtp3.ActiveState.com>
 -lw
 BEGIN {

@@ -12,14 +12,14 @@ use utf8;
 # declare some classes...
 {
   package Woozle;
-  @ISA = ('Locale::Maketext');
+  our @ISA = ('Locale::Maketext');
   sub dubbil   { return @_[1] * 2  .chr(2000)}
   sub numerate { return @_[2] . 'en'  }
 }
 {
   package Woozle::eu_mt;
-  @ISA = ('Woozle');
-  %Lexicon = (
+  our @ISA = ('Woozle');
+  our %Lexicon = (
    'd2' => chr(1000) . 'hum [dubbil,_1]',
    'd3' => chr(1000) . 'hoo [quant,_1,zaz]',
    'd4' => chr(1000) . 'hoo [*,_1,zaz]',

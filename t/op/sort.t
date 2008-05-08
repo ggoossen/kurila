@@ -690,7 +690,7 @@ main::dies_like( sub { @output = sort {goto label} 1,2; },
 
 sub goto_label {goto label}
 label: eval { @output = sort goto_label 1,2; };
-$fail_msg = q(Can't "goto" out of a pseudo block);
+my $fail_msg = q(Can't "goto" out of a pseudo block);
 main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'goto out of a pseudo block 2');
 
 

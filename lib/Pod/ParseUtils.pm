@@ -584,8 +584,6 @@ sub link {
     my $link = $self->page() || '';
     if($self->node()) {
         my $node = $self->node();
-        $text =~ s/\|/E<verbar>/g;
-        $text =~ s:/:E<sol>:g;
         if($self->type() eq 'section') {
             $link .= ($link ? '/' : '') . '"' . $node . '"';
         }

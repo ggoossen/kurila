@@ -20,7 +20,7 @@ if (!eof && m/vt100/) {print "ok 1\n";} else {print "not ok 1 $_\n";}
 
 # test "next" command
 
-$bad = '';
+my $bad = '';
 open(fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
 while ( ~< *fh) {
     next if m/vt100/;
@@ -46,7 +46,7 @@ if (!eof || $bad) {print "not ok 3\n";} else {print "ok 3\n";}
 
 # test "last" command
 
-$badcont = '';
+my $badcont = '';
 open(fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
 line: while ( ~< *fh) {
     if (m/vt100/) {last line;}
@@ -102,7 +102,7 @@ unlink 'Cmd_while.tmp' || `/bin/rm Cmd_While.tmp`;
 #
 #if ($x < 10) {print "ok 10\n";} else {print "not ok 10\n";}
 
-$i = 9;
+my $i = 9;
 {
     $i++;
 }
@@ -140,6 +140,7 @@ print "ok $i\n";
     }
 }
 
+our $l;
 {
     local $l = 18;
     {

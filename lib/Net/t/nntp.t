@@ -26,10 +26,12 @@ print "1..4\n";
 
 my $i = 1;
 
-$nntp = Net::NNTP->new(Debug => 0)
+my $nntp = Net::NNTP->new(Debug => 0)
 	or (print("not ok 1\n"), exit);
 
 print "ok 1\n";
+
+our @grp;
 
 my $grp;
 foreach $grp (qw(test alt.test control news.announce.newusers)) {

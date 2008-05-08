@@ -18,6 +18,8 @@ SKIP: {
 
     no utf8;
 
+    our $Orig_Bits;
+
     BEGIN { $Orig_Bits = $^H }
 
     # make sure that all those 'use vmsish' calls didn't do anything.
@@ -51,7 +53,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
 {
   use vmsish qw(status);
 
-  $msg = do_a_perl('-e "exit 1"');
+  my $msg = do_a_perl('-e "exit 1"');
     $msg =~ s/\n/\\n/g; # keep output on one line
   like($msg,'ABORT', "POSIX ERR exit, DCL error message check");
   is($?^&^1,0,"vmsish status check, POSIX ERR exit");
@@ -110,7 +112,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
      $utcval,  $vmaval, $offset);
   # Make sure apparent local time isn't GMT
   if (not %ENV{'SYS$TIMEZONE_DIFFERENTIAL'}) {
-    $oldtz = %ENV{'SYS$TIMEZONE_DIFFERENTIAL'};
+    my $oldtz = %ENV{'SYS$TIMEZONE_DIFFERENTIAL'};
     %ENV{'SYS$TIMEZONE_DIFFERENTIAL'} = 3600;
     eval "END \{ \$ENV\{'SYS\$TIMEZONE_DIFFERENTIAL'\} = $oldtz; \}";
     gmtime(0); # Force reset of tz offset
@@ -152,7 +154,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
 
   $utcval = @utclocal[5] * 31536000 + @utclocal[7] * 86400 +
             @utclocal[2] * 3600     + @utclocal[1] * 60 + @utclocal[0];
-  $vmsval = @vmslocal[5] * 31536000 + @vmslocal[7] * 86400 +
+  my $vmsval = @vmslocal[5] * 31536000 + @vmslocal[7] * 86400 +
             @vmslocal[2] * 3600     + @vmslocal[1] * 60 + @vmslocal[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(localtime) UTC: $utcval  VMS: $vmsval");
   print "# UTC: @utclocal\n# VMS: @vmslocal\n";

@@ -15,6 +15,7 @@ sub two {
     print "ok 2\n";
 }
 
+our $x;
 if ($x eq $x) {
     sub three {
 	print "ok 3\n";
