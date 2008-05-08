@@ -1,9 +1,9 @@
 #!./perl
 
+use TestInit;
+use Config;
+
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; Config->import;
     if (%Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
 	print "1..0\n";
 	exit 0;
@@ -19,24 +19,24 @@ use strict 'subs';
 
 STDOUT->autoflush( 1);
 
-$mystdout = FileHandle->new_from_fd( 1,"w");
+my $mystdout = FileHandle->new_from_fd( 1,"w");
 $| = 1;
  $mystdout->autoflush();
 print "1..12\n";
 
 print $mystdout "ok ".fileno($mystdout)."\n";
 
-$fh = (FileHandle->new( "./TEST", O_RDONLY)
+my $fh = (FileHandle->new( "./TEST", O_RDONLY)
        or FileHandle->new( "TEST", O_RDONLY))
   and print "ok 2\n";
 
 
-$buffer = ~< $fh;
+my $buffer = ~< $fh;
 print $buffer eq "#!./perl\n" ? "ok 3\n" : "not ok 3\n";
  $fh->
 
 ungetc( ord 'A');
-CORE::read($fh, $buf,1);
+CORE::read($fh, my $buf,1);
 print $buf eq 'A' ? "ok 4\n" : "not ok 4\n";
 
 close $fh;
@@ -51,7 +51,7 @@ print "#possible mixed CRLF/LF in t/TEST\nnot " unless ( ~< $fh eq $buffer);
 print "ok 6\n";
 
 $fh->seek(0,2);
-$line = ~< $fh;
+my $line = ~< $fh;
 print "not " if (defined($line) || !$fh->eof);
 print "ok 7\n";
 
@@ -70,16 +70,16 @@ print "ok 10\n";
 
 if ($^O eq 'dos')
 {
-    printf("ok %d\n",11);
+    printf("ok \%d\n",11);
     exit(0);
 }
 
-($rd,$wr) = FileHandle::pipe;
+my ($rd,$wr) = FileHandle::pipe;
 
 if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O eq 'NetWare' ||
     %Config{d_fork} ne 'define') {
   $wr->autoflush;
-  $wr->printf("ok %d\n",11);
+  $wr->printf("ok \%d\n",11);
   print $rd->getline;
 }
 else {
@@ -89,7 +89,7 @@ else {
   }
   else {
    $rd->close;
-   $wr->printf("ok %d\n",11);
+   $wr->printf("ok \%d\n",11);
    exit(0);
   }
 }

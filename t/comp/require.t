@@ -122,6 +122,7 @@ print $x;
 # Test that scalar context is forced for require
 
 write_file('bleah.pm', <<'**BLEAH**'
+our $i;
 print "not " if !defined wantarray || wantarray ne '';
 print "ok $i - require() context\n";
 1;

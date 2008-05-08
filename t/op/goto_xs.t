@@ -21,6 +21,8 @@ BEGIN {
 }
 print "1..11\n";
 
+our ($VALID, $value, $ret, $FNAME1, $FNAME2, $FREF);
+
 # We don't know what symbols are defined in platform X's system headers.
 # We don't even want to guess, because some platform out there will
 # likely do the unthinkable.  However, Fcntl::constant("LOCK_SH",0)

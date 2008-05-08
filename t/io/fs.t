@@ -115,8 +115,8 @@ SKIP: {
 #      if ($^O eq 'cygwin') { # new files on cygwin get rwx instead of rw-
 #          is($mode & 0777, 0777, "mode of triply-linked file");
 #      } else {
-            is(sprintf("0%o", $mode ^&^ 0777), 
-               sprintf("0%o", $a_mode ^&^ 0777), 
+            is(sprintf('0%o', $mode ^&^ 0777), 
+               sprintf('0%o', $a_mode ^&^ 0777), 
                "mode of triply-linked file");
 #      }
     }

@@ -175,10 +175,10 @@ sub simple_wanted {
 sub noop_wanted {}
 
 sub my_preprocess {
-    @files = @_;
+    my @files = @_;
     print "# --preprocess--\n";
     print "#   \$File::Find::dir => '$File::Find::dir' \n";
-    foreach $file (@files) {
+    foreach my $file (@files) {
         $file =~ s/\.(dir)?$// if $^O eq 'VMS';
         print "#   $file \n";
         delete %Expect_Dir{ $File::Find::dir }->{$file};

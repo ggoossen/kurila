@@ -71,7 +71,7 @@ $b = "{$x101}{$x100}aA";
 
     no utf8;
 
-    local $TODO="no utf8 lc";
+    local our $TODO="no utf8 lc";
 
     is("\Q$a\E."      , "{$x100}{$x101}Aa.", '\Q\E ${x100}${x101}Aa');
 
@@ -98,7 +98,7 @@ $b = "{$x101}{$x100}aA";
 # and it's uppercase is \x{178}, LATIN CAPITAL LETTER Y WITH DIAERESIS.
 
 {
-    local $TODO="multibyte uppercase";
+    local our $TODO="multibyte uppercase";
     use utf8;
     is(uc("\x{DF}aB\x{149}cD") , "SSAB\x{2BC}NCD",
        "multicharacter uppercase");
@@ -128,7 +128,7 @@ $a = "\x{587}";
 
 is(lc("\x{587}") , "\x{587}",        "ligature lowercase");
 {
-    local $TODO="ligature special case";
+    local our $TODO="ligature special case";
     is(ucfirst("\x{587}") , "\x{535}\x{582}", "ligature titlecase");
     is(uc("\x{587}") , "\x{535}\x{552}", "ligature uppercase");
 }
@@ -180,7 +180,7 @@ for my $a (0,1) {
 
 {
     foreach (0, 1) {
-        local $TODO = "fix lc";
+        local our $TODO = "fix lc";
 	$a = "\x{a}"."\x{101}";
 	chop $a;
 	$a =~ s/^(\s*)(\w*)/{"$1".ucfirst($2)}/;
@@ -224,7 +224,7 @@ for (map { $_ } "A\x{100}", "ABC\x{100}", "\x{100}") {
 }
 
 for (1, 4, 9, 16, 25) {
-    local $TODO="growth";
+    local our $TODO="growth";
     is(uc "\x{03B0}" x $_, "\x{3a5}\x{308}\x{301}" x $_,
        'uc U+03B0 grows threefold');
 

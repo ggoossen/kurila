@@ -4,13 +4,13 @@
 #
 # $PERL5OPT, $PERL5LIB, etc.
 
+use TestInit;
+use Config;
+
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; Config->import;
     unless (%Config{'d_fork'}) {
         print "1..0 # Skip: no fork\n";
-	    exit 0;
+        exit 0;
     }
 }
 

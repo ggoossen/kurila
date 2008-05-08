@@ -1,5 +1,6 @@
 #!./perl -w
 
+our @OrigINC;
 BEGIN {
     chdir 't';
     @INC = '../lib';
@@ -32,7 +33,7 @@ BEGIN {
     open(MOD, ">", "$Module") || $!-> DIE();
     print MOD <<'MODULE';
 package Yup;
-$Plan = 9;
+our $Plan = 9;
 return '42';
 MODULE
 

@@ -237,20 +237,20 @@ is($a, "X");
 # from Karsten Sperling.
 
 {
-use bytes;
-$c = ($a = "\x[89]\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]\x[91]") =~ tr/\x[89]-\x[91]/X/;
-is($c, 8);
-is($a, "XXXXXXXX");
+    use bytes;
+    my  $c = ($a = "\x[89]\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]\x[91]") =~ tr/\x[89]-\x[91]/X/;
+    is($c, 8);
+    is($a, "XXXXXXXX");
 
-$c = ($a = "\x[c9]\x[ca]\x[cb]\x[cc]\x[cd]\x[cf]\x[d0]\x[d1]") =~ tr/\x[c9]-\x[d1]/X/;
-is($c, 8);
-is($a, "XXXXXXXX");
+    $c = ($a = "\x[c9]\x[ca]\x[cb]\x[cc]\x[cd]\x[cf]\x[d0]\x[d1]") =~ tr/\x[c9]-\x[d1]/X/;
+    is($c, 8);
+    is($a, "XXXXXXXX");
 }
 
 SKIP: {
     skip "not EBCDIC", 4 unless $Is_EBCDIC;
 
-    $c = ($a = "\x[89]\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]\x[91]") =~ tr/i-j/X/;
+    my $c = ($a = "\x[89]\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]\x[91]") =~ tr/i-j/X/;
     is($c, 2);
     is($a, "X\x[8a]\x[8b]\x[8c]\x[8d]\x[8f]\x[90]X");
    
@@ -262,7 +262,7 @@ SKIP: {
 my $x = "\x{100}";
 use bytes;
 {
-    local $TODO = "byte range";
+    local our $TODO = "byte range";
     ($a = $x) =~ tr/\x[00]-\x[ff]/X/c;
     is(ord($a), ord("X"), "byte tr///");
 
@@ -286,7 +286,7 @@ is($a, "\x{1ff}\x{1fe}");
 is(hex($a), 1);
 
 # From Inaba Hiroto
-@a = (1,2); map { y/1/./ for $_ } @a;
+our @a = (1,2); map { y/1/./ for $_ } @a;
 is("@a", ". 2");
 
 @a = (1,2); map { y/1/./ for $_.'' } @a;
@@ -299,7 +299,7 @@ is($a, "XZY");
 
 
 # Used to fail with "Modification of a read-only value attempted"
-%a = (N=>1);
+our %a = (N=>1);
 foreach (keys %a) {
   eval 'tr/N/n/';
   is($_, 'n',   'pp_trans needs to unshare shared hash keys');
@@ -339,12 +339,12 @@ fresh_perl_is(q[$_ = "foo"; y/A-Z/a-z/], '');
 { # [perl #38293] chr(65535) should be allowed in regexes
 no warnings 'utf8'; # to allow non-characters
 
-$s = "\x{d800}\x{ffff}";
+my $s = "\x{d800}\x{ffff}";
 $s =~ tr/\0/A/;
 is($s, "\x{d800}\x{ffff}", "do_trans_simple");
 
 $s = "\x{d800}\x{ffff}";
-$i = $s =~ tr/\0//;
+my $i = $s =~ tr/\0//;
 is($i, 0, "do_trans_count");
 
 $s = "\x{d800}\x{ffff}";
@@ -415,10 +415,10 @@ is($s, "AxBC", "utf8, DELETE");
     is($c, "\x20\x30\x40\x50\x60", "tr/\\x00-\\x1f//d");
 }
 
-($s) = keys %{\%(pie => 3)};
+my ($s) = keys %{\%(pie => 3)};
 my $wasro = Internals::SvREADONLY($s);
 {
-    $wasro or local $TODO = "didn't have a COW";
+    $wasro or local our $TODO = "didn't have a COW";
     $s =~ tr/i//;
     ok( Internals::SvREADONLY($s), "count-only tr doesn't deCOW COWs" );
 }

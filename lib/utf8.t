@@ -88,7 +88,7 @@ plan tests => 36;
 
 
 {
-    local $TODO = "use utf8; passed to eval";
+    local our $TODO = "use utf8; passed to eval";
     use utf8;
     my $w = 0;
     local $^WARN_HOOK = sub { print "#(@_[0])\n"; $w++ };
