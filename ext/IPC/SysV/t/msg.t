@@ -1,15 +1,9 @@
+use Config;
+
 BEGIN {
-    chdir 't' if -d 't';
-
-    @INC = '../lib';
-
-    require Config; Config->import;
-
     my $reason;
 
-    if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
-      $reason = 'IPC::SysV was not built';
-    } elsif (%Config{'d_sem'} ne 'define') {
+    if (%Config{'d_sem'} ne 'define') {
       $reason = '%Config{d_sem} undefined';
     } elsif (%Config{'d_msg'} ne 'define') {
       $reason = '%Config{d_msg} undefined';
@@ -34,20 +28,20 @@ my $msq =
 print "ok 1\n";
 
 #Putting a message on the queue
-$msgtype = 1;
-$msg = "hello";
+my $msgtype = 1;
+my $msg = "hello";
 print $msq->snd($msgtype,$msg,IPC_NOWAIT) ? "ok 2\n" : "not ok 2 # $!\n";
 
 #Check if there are messages on the queue
-$ds = $msq->stat() or print "not ";
+my $ds = $msq->stat() or print "not ";
 print "ok 3\n";
 
 print "not " unless $ds && $ds->qnum() == 1;
 print "ok 4\n";
 
 #Retreiving a message from the queue
-$rmsgtype = 0; # Give me any type
-$rmsgtype = $msq->rcv($rmsg,256,$rmsgtype,IPC_NOWAIT) || print "not ";
+my $rmsgtype = 0; # Give me any type
+$rmsgtype = $msq->rcv(my $rmsg,256,$rmsgtype,IPC_NOWAIT) || print "not ";
 print "ok 5\n";
 
 print "not " unless $rmsgtype == $msgtype && $rmsg eq $msg;

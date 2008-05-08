@@ -1,22 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    if ($^O eq 'MacOS') { 
-	@INC = qw(: ::lib ::macos:lib); 
-    } else { 
-	@INC = '.'; 
-	push @INC, '../lib'; 
-    }
-    require Config; Config->import;
-    if (%Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
-        print "1..0\n";
-        exit 0;
-    }
     print "1..10\n";
-}
-END {
-    print "not ok 1\n" unless $loaded;
 }
 
 BEGIN {
@@ -33,7 +18,6 @@ EOMessage
 }
 
 use File::Glob ':globally';
-$loaded = 1;
 print "ok 1\n";
 
 $_ = $^O eq "MacOS" ? ":op:*.t" : "op/*.t";

@@ -1,18 +1,5 @@
 #!/usr/bin/perl -Tw
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
-	keys %Config; # Silence warning
-	if (%Config{extensions} !~ m/\bHash\/Util\b/) {
-	    print "1..0 # Skip: Hash::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use strict;
 use Test::More;
 my @Exported_Funcs;

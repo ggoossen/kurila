@@ -20,12 +20,12 @@ END { unlink "./__taint__$$" }
 
 print "1..3\n";
 use IO::File;
-$x = IO::File->new( "./__taint__$$", ">") || die("Cannot open ./__taint__$$\n");
+my $x = IO::File->new( "./__taint__$$", ">") || die("Cannot open ./__taint__$$\n");
 print $x "$$\n";
 $x->close;
 
 $x = IO::File->new( "./__taint__$$", "<") || die("Cannot open ./__taint__$$\n");
-chop($unsafe = ~< $x);
+chop(my $unsafe = ~< $x);
 eval { kill 0 * $unsafe };
 print "not " if ((($^O ne 'MSWin32') && ($^O ne 'NetWare')) and ($@->{description} !~ m/^Insecure/o));
 print "ok 1\n";

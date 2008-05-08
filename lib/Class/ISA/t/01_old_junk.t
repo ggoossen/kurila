@@ -6,9 +6,7 @@ BEGIN {
 # Time-stamp: "2004-12-29 19:59:33 AST"
 
 BEGIN { $| = 1; print "1..2\n"; }
-END {print "not ok 1\n" unless $loaded;}
 use Class::ISA;
-$loaded = 1;
 print "ok 1\n";
 
   @Food::Fishstick::ISA = qw(Food::Fish  Life::Fungus  Chemicals);

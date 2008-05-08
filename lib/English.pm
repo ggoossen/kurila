@@ -3,7 +3,7 @@ package English;
 our $VERSION = '1.04';
 
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 =head1 NAME
 
@@ -48,33 +48,7 @@ no warnings;
 
 my $globbed_match ;
 
-# Grandfather $NAME import
-sub import {
-    my $this = shift;
-    my @list = grep { ! m/^-no_match_vars$/ } @_ ;
-    local $Exporter::ExportLevel = 1;
-    if ( @_ == @list ) {
-        *EXPORT = \@COMPLETE_EXPORT ;
-        $globbed_match ||= (
-	    eval q{
-		*MATCH				= *&	;
-		*PREMATCH			= *`	;
-		*POSTMATCH			= *'	;
-		1 ;
-	       }
-	    || do {
-		require Carp ;
-		Carp::croak("Can't create English for match leftovers: $@") ;
-	    }
-	) ;
-    }
-    else {
-        *EXPORT = \@MINIMAL_EXPORT ;
-    }
-    Exporter::import($this,grep {s/^\$/*/} @list);
-}
-
-@MINIMAL_EXPORT = qw(
+our @MINIMAL_EXPORT = qw(
 	*ARG
 	*LAST_PAREN_MATCH
 	*INPUT_LINE_NUMBER
@@ -123,13 +97,39 @@ sub import {
 );
 
 
-@MATCH_EXPORT = qw(
+our @MATCH_EXPORT = qw(
 	*MATCH
 	*PREMATCH
 	*POSTMATCH
 );
 
-@COMPLETE_EXPORT = ( @MINIMAL_EXPORT, @MATCH_EXPORT ) ;
+our @COMPLETE_EXPORT = ( @MINIMAL_EXPORT, @MATCH_EXPORT ) ;
+
+# Grandfather $NAME import
+sub import {
+    my $this = shift;
+    my @list = grep { ! m/^-no_match_vars$/ } @_ ;
+    local $Exporter::ExportLevel = 1;
+    if ( @_ == @list ) {
+        *EXPORT = \@COMPLETE_EXPORT ;
+        $globbed_match ||= (
+	    eval q{
+		*MATCH				= *&	;
+		*PREMATCH			= *`	;
+		*POSTMATCH			= *'	;
+		1 ;
+	       }
+	    || do {
+		require Carp ;
+		Carp::croak("Can't create English for match leftovers: $@") ;
+	    }
+	) ;
+    }
+    else {
+        *EXPORT = \@MINIMAL_EXPORT ;
+    }
+    Exporter::import($this,grep {s/^\$/*/} @list);
+}
 
 # The ground of all being. @ARG is deprecated (5.005 makes @_ lexical)
 

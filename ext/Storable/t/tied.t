@@ -6,6 +6,8 @@
 #  in the README file that comes with the distribution.
 #
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -13,7 +15,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -27,7 +28,7 @@ use Storable qw(freeze thaw);
 
 print "1..23\n";
 
-($scalar_fetch, $array_fetch, $hash_fetch) = (0, 0, 0);
+our ($scalar_fetch, $array_fetch, $hash_fetch) = (0, 0, 0);
 
 package TIED_HASH;
 
@@ -107,7 +108,7 @@ sub STORE {
 
 package FAULT;
 
-$fault = 0;
+our $fault = 0;
 
 sub TIESCALAR {
 	my $pkg = shift;
@@ -127,9 +128,9 @@ package main;
 $a = 'toto';
 $b = \$a;
 
-$c = tie %hash, 'TIED_HASH';
-$d = tie @array, 'TIED_ARRAY';
-tie $scalar, 'TIED_SCALAR';
+our $c = tie our %hash, 'TIED_HASH';
+our $d = tie our @array, 'TIED_ARRAY';
+tie our $scalar, 'TIED_SCALAR';
 
 #$scalar = 'foo';
 #$hash{'attribute'} = \$d;
@@ -147,20 +148,20 @@ $scalar = 'foo';
 @array[1] = $c;
 @array[2] = \@array;
 
-@tied = (\$scalar, \@array, \%hash);
-%a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
-@a = ('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
+our @tied = (\$scalar, \@array, \%hash);
+our %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
+our @a = ('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
 	$b, \$a, $a, $c, \$c, \%a, \@array, \%hash, \@tied);
 
-ok 1, defined($f = freeze(\@a));
+ok 1, defined(our $f = freeze(\@a));
 
-$dumped = &dump(\@a);
+our $dumped = &dump(\@a);
 ok 2, 1;
 
-$root = thaw($f);
+our $root = thaw($f);
 ok 3, defined $root;
 
-$got = &dump($root);
+our $got = &dump($root);
 ok 4, 1;
 
 ### Used to see the manifestation of the bug documented above.
@@ -171,23 +172,23 @@ ok 4, 1;
 
 ok 5, $got eq $dumped; 
 
-$g = freeze($root);
+our $g = freeze($root);
 ok 6, length($f) == length($g);
 
 # Ensure the tied items in the retrieved image work
-@old = ($scalar_fetch, $array_fetch, $hash_fetch);
-@tied = ($tscalar, $tarray, $thash) = @{$root->[@$root -1]};
-@type = qw(SCALAR  ARRAY  HASH);
+our @old = ($scalar_fetch, $array_fetch, $hash_fetch);
+@tied = our ($tscalar, $tarray, $thash) = @{$root->[@$root -1]};
+our @type = qw(SCALAR  ARRAY  HASH);
 
 ok 7, tied $$tscalar;
 ok 8, tied @{$tarray};
 ok 9, tied %{$thash};
 
-@new = ($$tscalar, $tarray->[0], $thash->{'attribute'});
+our @new = ($$tscalar, $tarray->[0], $thash->{'attribute'});
 @new = ($scalar_fetch, $array_fetch, $hash_fetch);
 
 # Tests 10..15
-for ($i = 0; $i +< @new; $i++) {
+for (my $i = 0; $i +< @new; $i++) {
 	print "not " unless @new[$i] == @old[$i] + 1;
 	printf "ok \%d\n", 10 + 2*$i;	# Tests 10,12,14
 	print "not " unless ref @tied[$i] eq @type[$i];

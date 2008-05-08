@@ -1,11 +1,9 @@
 #!./perl
 
+use Config;
+
 BEGIN {
     unless (-d 'blib') {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
-	keys %Config; # Silence warning
 	if (%Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
@@ -22,7 +20,7 @@ use Symbol qw(gensym);
 # Ensure we do not trigger and tied methods
 tie *F, 'MyTie';
 
-@test = (
+my @test = (
  \@( undef, 1,		'number'	),
  \@( undef, 'A',		'string'	),
  \@( HASH   => \%(),	'HASH ref'	),
@@ -35,7 +33,7 @@ tie *F, 'MyTie';
 # \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
 );
 
-foreach $test (@test) {
+foreach my $test (@test) {
   my($type,$what, $n) = @$test;
 
   is( reftype($what), $type, $n);

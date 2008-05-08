@@ -50,7 +50,7 @@ our $Bless      //= "bless";
 #$Expdepth   = 0         unless defined $Expdepth;
 our $Maxdepth   //= 0;
 our $Pair       //= ' => ';
-our $Useperl    //= 0;
+$Useperl    //= 0;
 our $Sortkeys   //= 0;
 our $Deparse    //= 0;
 

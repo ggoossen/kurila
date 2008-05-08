@@ -23,7 +23,7 @@ BEGIN {
 
 use Text::Soundex;
 
-$test = 0;
+my $test = 0;
 print "1..13\n";
 
 while ( ~< *DATA)
@@ -33,10 +33,11 @@ while ( ~< *DATA)
   next if m/^\s*$/;
 
   ++$test;
-  $bad = 0;
+  my $bad = 0;
 
   if (m/^eval\s+/)
   {
+    my $try;
     ($try = $_) =~ s/^eval\s+//;
 
     eval ($try);
@@ -49,9 +50,10 @@ while ( ~< *DATA)
   }
   elsif (m/^\(/)
   {
-    ($in, $out) = split (':');
+    my ($in, $out) = split (':');
 
-    $try = "\@expect = $out; \@got = &soundex $in;";
+    our (@expect, @got);
+    my $try = "\@expect = $out; \@got = &soundex $in;";
     eval ($try);
 
     if (@expect != @got)
@@ -66,8 +68,8 @@ while ( ~< *DATA)
     {
       while (@got)
       {
-	$expect = shift @expect;
-	$got = shift @got;
+	my $expect = shift @expect;
+	my $got = shift @got;
 
 	if ($expect ne $got)
 	{
@@ -80,9 +82,10 @@ while ( ~< *DATA)
   }
   else
   {
-    ($in, $out) = split (':');
+    my ($in, $out) = split (':');
 
-    $try = "\$expect = $out; \$got = &soundex ($in);";
+    my ($expect, $got);
+    my $try = "\$expect = $out; \$got = &soundex ($in);";
     eval ($try);
 
     if ($expect ne $got)

@@ -2,10 +2,9 @@
 # stdio: open(), tell(), seek(), print(), read() is tested in t/op/lfs.t.
 # If you modify/add tests here, remember to update also t/op/lfs.t.
 
+use Config;
+
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
 	# Don't bother if there are no quad offsets.
 	if (%Config{lseeksize} +< 8) {
 		print "1..0 # Skip: no 64-bit file offsets\n";

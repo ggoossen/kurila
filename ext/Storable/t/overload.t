@@ -6,6 +6,8 @@
 #  in the README file that comes with the distribution.
 #  
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -13,7 +15,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -40,12 +41,12 @@ $b = thaw freeze $a;
 ok 1, ref $b eq 'OVERLOADED';
 ok 2, "$b" eq "77";
 
-$c = thaw freeze \$a;
+my $c = thaw freeze \$a;
 ok 3, ref $c eq 'REF';
 ok 4, ref $$c eq 'OVERLOADED';
 ok 5, "$$c" eq "77";
 
-$d = thaw freeze \@($a, $a);
+my $d = thaw freeze \@($a, $a);
 ok 6, "$d->[0]" eq "77";
 $d->[0][0]++;
 ok 7, "$d->[1]" eq "78";
@@ -97,8 +98,7 @@ if (ord ('A') == 193) { # EBCDIC.
 
 # see note at the end of do_retrieve in Storable.xs about why this test has to
 # use a reference to an overloaded reference, rather than just a reference.
-my $t = eval {thaw $f};
-print "# $@" if $@;
+my $t = eval {thaw $f}; die if $@;
 ok 13, $@ eq "";
 ok 14, ref ($t) eq 'REF';
 ok 15, ref ($$t) eq 'HAS_OVERLOAD';

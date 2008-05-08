@@ -47,15 +47,15 @@ print "1..10\n";
 if ($is_win32) {
     print "ok $_ # skipped: $is_win32\n" for 1..4;
 } else {
-    $pipe = IO::Pipe->new()->reader($perl, '-e', 'print qq(not ok 1\n)');
+    my $pipe = IO::Pipe->new()->reader($perl, '-e', 'print qq(not ok 1\n)');
     while ( ~< $pipe) {
       s/^not //;
       print;
     }
     $pipe->close or print "# \$!=$!\nnot ";
     print "ok 2\n";
-    $cmd = 'BEGIN{%SIG{ALRM} = sub {print qq(not ok 4\n); exit}; alarm 10} s/not //';
-    $pipe = IO::Pipe->new()->writer($perl, '-pe', $cmd);
+    my $cmd = 'BEGIN{%SIG{ALRM} = sub {print qq(not ok 4\n); exit}; alarm 10} s/not //';
+    my $pipe = IO::Pipe->new()->writer($perl, '-pe', $cmd);
     print $pipe "not ok 3\n" ;
     $pipe->close or print "# \$!=$!\nnot ";
     print "ok 4\n";
@@ -68,9 +68,9 @@ if ($^O eq 'os2' and
     exit 0;
 }
 
-$pipe = IO::Pipe->new();
+my $pipe = IO::Pipe->new();
 
-$pid = fork();
+my $pid = fork();
 
 if($pid)
  {
@@ -83,7 +83,7 @@ if($pid)
 elsif(defined $pid)
  {
   $pipe->reader;
-  $stdin = bless \*STDIN, "IO::Handle";
+  my $stdin = bless \*STDIN, "IO::Handle";
   $stdin->fdopen($pipe,"r");
   exec $^X, '-pne', 'tr/YX/ko/';
  }
@@ -112,7 +112,7 @@ if ($is_win32) {
  {
   $pipe->writer;
 
-  $stdout = bless \*STDOUT, "IO::Handle";
+  my $stdout = bless \*STDOUT, "IO::Handle";
   $stdout->fdopen($pipe,"w");
   print STDOUT "not ok 7\n";
   exec 'echo', 'not ok 8';
