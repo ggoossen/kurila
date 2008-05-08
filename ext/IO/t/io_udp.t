@@ -55,13 +55,13 @@ print "1..7\n";
 use Socket;
 use IO::Socket qw(AF_INET SOCK_DGRAM INADDR_ANY);
 
-$udpa = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
+my $udpa = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
      || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
     or die "$! (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
 print "ok 1\n";
 
-$udpb = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
+my $udpb = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
      || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
     or die "$! (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
@@ -73,7 +73,7 @@ print "not "
   unless compare_addr($udpa->peername,$udpb->sockname, 'peername', 'sockname');
 print "ok 3\n";
 
-my $where = $udpb->recv($buf="",5);
+my $where = $udpb->recv(my $buf="",5);
 print $buf;
 
 my @xtra = ();

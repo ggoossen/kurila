@@ -1,7 +1,9 @@
 #!./perl
 
+use Config;
+
+our $has_alarm;
 BEGIN {
-    require Config; Config->import;
     if (%Config{'extensions'} !~ m/\bSocket\b/ && 
         !(($^O eq 'VMS') && %Config{d_socket})) {
 	print "1..0\n";
@@ -14,8 +16,8 @@ use Socket qw(:all);
 
 print "1..17\n";
 
-$has_echo = $^O ne 'MSWin32';
-$alarmed = 0;
+my $has_echo = $^O ne 'MSWin32';
+my $alarmed = 0;
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
 %SIG{ALRM} = \&alarmed                    if $has_alarm;
@@ -41,7 +43,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 	arm(0);
 
 	arm(5);
-	$read = sysread(T,$buff,10);	# Connection may be granted, then closed!
+	my $read = sysread(T,my $buff,10);	# Connection may be granted, then closed!
 	arm(0);
 
 	while ($read +> 0 && length($buff) +< 5) {
@@ -85,7 +87,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 	arm(0);
 
 	arm(5);
-	$read = sysread(S,$buff,10);	# Connection may be granted, then closed!
+	my $read = sysread(S,my $buff,10);	# Connection may be granted, then closed!
 	arm(0);
 
 	while ($read +> 0 && length($buff) +< 5) {
@@ -111,6 +113,7 @@ else {
 }
 
 # warnings
+our $w;
 $^WARN_HOOK = sub {
     ++ $w if @_[0]->{description} =~ m/^6-ARG sockaddr_in call is deprecated/ ;
 } ;

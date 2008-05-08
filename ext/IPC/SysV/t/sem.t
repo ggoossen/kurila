@@ -5,14 +5,11 @@ BEGIN {
     require 'test.pl';
 }
 
-require Config; Config->import;
+use Config;
 
-$TEST_COUNT = 11;
+my $TEST_COUNT = 11;
 
-if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
-    skip_all('IPC::SysV was not built');
-}
-elsif (%Config{'d_sem'} ne 'define') {
+if (%Config{'d_sem'} ne 'define') {
     skip_all('$Config{d_sem} undefined');
 }
 elsif (%Config{'d_msg'} ne 'define') {

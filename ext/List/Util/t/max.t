@@ -1,18 +1,5 @@
 #!./perl
 
-BEGIN {
-    unless (-d 'blib') {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
-	keys %Config; # Silence warning
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use strict;
 use Test::More tests => 5;
 use List::Util qw(max);

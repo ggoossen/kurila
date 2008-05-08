@@ -1,12 +1,9 @@
 #!./perl
 
+use Config;
+
 BEGIN {
-    unless(grep m/blib/, @INC) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    require Config; Config->import;
-    if (%Config{'d_readdir'}) {
+    if (not %Config{'d_readdir'}) {
 	print "1..0 # Skip: readdir() not available\n";
 	exit 0;
     }
@@ -22,53 +19,54 @@ my $tcount = 0;
 sub ok {
   $tcount++;
   my $not = @_[0] ? '' : 'not ';
-  print "${not}ok $tcount\n";
+  print "{$not}ok $tcount\n";
 }
 
 print "1..10\n";
 
 my $DIR = $^O eq 'MacOS' ? ":" : ".";
 
-$dot = IO::Dir->new( $DIR);
+my $dot = IO::Dir->new( $DIR);
 ok(defined($dot));
 
-@a = sort glob("*");
+my @a = sort glob("*");
+my $first;
 do { $first = $dot->read } while defined($first) && $first =~ m/^\./;
 ok(+(grep { $_ eq $first } @a));
 
-@b = sort($first, (grep {m/^[^.]/} $dot->read));
+my @b = sort($first, (grep {m/^[^.]/} $dot->read));
 ok(+(join("\0", @a) eq join("\0", @b)));
 
 $dot->rewind;
-@c = sort grep {m/^[^.]/} $dot->read;
+my @c = sort grep {m/^[^.]/} $dot->read;
 ok(+(join("\0", @b) eq join("\0", @c)));
 
 $dot->close;
 $dot->rewind;
 ok(!defined($dot->read));
 
-open(FH,'>X') || die "Can't create x";
+open(FH,'>', 'X') || die "Can't create x";
 print FH "X";
 close(FH) or die "Can't close: $!";
 
-tie %dir, 'IO::Dir', $DIR;
+tie my %dir, 'IO::Dir', $DIR;
 my @files = keys %dir;
 
 # I hope we do not have an empty dir :-)
 ok(scalar @files);
 
-my $stat = $dir{'X'};
+my $stat = %dir{'X'};
 ok(defined($stat) && UNIVERSAL::isa($stat,'File::stat') && $stat->size == 1);
 
-delete $dir{'X'};
+delete %dir{'X'};
 
 ok(-f 'X');
 
-tie %dirx, 'IO::Dir', $DIR, DIR_UNLINK;
+tie my %dirx, 'IO::Dir', $DIR, DIR_UNLINK;
 
-my $statx = $dirx{'X'};
+my $statx = %dirx{'X'};
 ok(defined($statx) && UNIVERSAL::isa($statx,'File::stat') && $statx->size == 1);
 
-delete $dirx{'X'};
+delete %dirx{'X'};
 
 ok(!(-f 'X'));

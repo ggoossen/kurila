@@ -24,9 +24,13 @@ foo(1);
 
 "abc" =~ m/b/;
 
+{
+our ($PREMATCH, $MATCH, $POSTMATCH);
+
 ok( !$PREMATCH, '$PREMATCH undefined' );
 ok( !$MATCH, '$MATCH undefined' );
 ok( !$POSTMATCH, '$POSTMATCH undefined' );
+}
 
 $OFS = " ";
 $ORS = "\n";
@@ -58,8 +62,9 @@ $ORS = "\n";
 
 undef $OUTPUT_FIELD_SEPARATOR;
 
+our $threads;
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
-@foo = (8, 9);
+my @foo = (8, 9);
 @foo = split(m/\n/, "@foo");
 is( @foo[0], 8, '$"' );
 is( @foo[1], 9, '$LIST_SEPARATOR' );
@@ -145,9 +150,12 @@ use English qw( -no_match_vars ) ;
 
 "abc" =~ m/b/;
 
-main::ok( !$PREMATCH, '$PREMATCH disabled' );
-main::ok( !$MATCH, '$MATCH disabled' );
-main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
+{
+  our ($PREMATCH, $MATCH, $POSTMATCH);
+  main::ok( !$PREMATCH, '$PREMATCH disabled' );
+  main::ok( !$MATCH, '$MATCH disabled' );
+  main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
+}
 
 __END__
 This is a line.

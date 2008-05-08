@@ -4,10 +4,9 @@ my $child;
 my $can_fork;
 my $has_perlio;
 
+use Config;
+
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; Config->import;
     $can_fork = %Config{'d_fork'} || %Config{'d_pseudofork'};
 
     if ($^O eq "hpux" or %Config{'extensions'} !~ m/\bSocket\b/ &&

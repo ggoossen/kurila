@@ -37,13 +37,15 @@ sub num_equal {
 package dump;
 use Carp;
 
-%dump = (
+my %dump = (
 	'SCALAR'	=> 'dump_scalar',
 	'LVALUE'	=> 'dump_scalar',
 	'ARRAY'		=> 'dump_array',
 	'HASH'		=> 'dump_hash',
 	'REF'		=> 'dump_ref',
 );
+
+our (%dumped, %object, $count, $dumped);
 
 # Given an object, dump its transitive data closure
 sub main::dump {
@@ -127,7 +129,7 @@ sub dump_array {
 	my ($aref) = @_;
 	my $items = 0 + @{$aref};
 	$dumped .= "ARRAY items=$items\n";
-	foreach $item (@{$aref}) {
+	foreach my $item (@{$aref}) {
 		unless (defined $item) {
 			$dumped .= 'ITEM_UNDEF' . "\n";
 			next;
@@ -142,7 +144,7 @@ sub dump_hash {
 	my ($href) = @_;
 	my $items = scalar(keys %{$href});
 	$dumped .= "HASH items=$items\n";
-	foreach $key (sort keys %{$href}) {
+	foreach my $key (sort keys %{$href}) {
 		$dumped .= 'KEY ';
 		&recursive_dump(\$key, undef);
 		unless (defined $href->{$key}) {

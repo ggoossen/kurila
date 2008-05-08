@@ -10,6 +10,8 @@
 # Tests ref to items in tied hash/array structures.
 #
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -17,7 +19,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -32,27 +33,27 @@ print "1..8\n";
 
 use Storable qw(dclone);
 
-$h_fetches = 0;
+my $h_fetches = 0;
 
 sub H::TIEHASH { bless \(my $x), "H" }
 sub H::FETCH { $h_fetches++; @_[1] - 70 }
 
-tie %h, "H";
+tie my %h, "H";
 
-$ref = \%h{77};
-$ref2 = dclone $ref;
+my $ref = \%h{77};
+my $ref2 = dclone $ref;
 
 ok 1, $h_fetches == 0;
 ok 2, $$ref2 eq $$ref;
 ok 3, $$ref2 == 7;
 ok 4, $h_fetches == 2;
 
-$a_fetches = 0;
+my $a_fetches = 0;
 
 sub A::TIEARRAY { bless \(my $x), "A" }
 sub A::FETCH { $a_fetches++; @_[1] - 70 }
 
-tie @a, "A";
+tie my @a, "A";
 
 $ref = \@a[78];
 $ref2 = dclone $ref;

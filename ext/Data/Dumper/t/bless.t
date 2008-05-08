@@ -16,6 +16,7 @@ foreach $Data::Dumper::Useperl (0, 1) {
 
 #diag("\$Data::Dumper::Useperl = $Data::Dumper::Useperl");
 
+our $VAR1;
 {
 my $t = bless( \%(), q{a'b} );
 my $dt = Dumper($t);

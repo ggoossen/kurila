@@ -1,18 +1,5 @@
 #!./perl
 
-BEGIN {
-    unless (-d 'blib') {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
-	keys %Config; # Silence warning
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use Scalar::Util ();
 use Test::More  (grep { m/dualvar/ } @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'dualvar requires XS version')
@@ -20,12 +7,12 @@ use Test::More  (grep { m/dualvar/ } @Scalar::Util::EXPORT_FAIL)
 
 Scalar::Util->import('dualvar');
 
-$var = dualvar( 2.2,"string");
+my $var = dualvar( 2.2,"string");
 
 ok( $var == 2.2,	'Numeric value');
 ok( $var eq "string",	'String value');
 
-$var2 = $var;
+my $var2 = $var;
 
 ok( $var2 == 2.2,	'copy Numeric value');
 ok( $var2 eq "string",	'copy String value');

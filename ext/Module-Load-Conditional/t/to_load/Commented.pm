@@ -1,4 +1,4 @@
 # $VERSION = 1;
-$VERSION = 2;
+our $VERSION = 2;
 
 1;

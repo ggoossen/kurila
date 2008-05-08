@@ -25,6 +25,7 @@ my $hint_file = File::Spec->catfile('hints', "$os.pl");
 
 open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $!";
 print HINT <<'CLOO';
+our $self;
 $self->{CCFLAGS} = 'basset hounds got long ears';
 CLOO
 close HINT;
