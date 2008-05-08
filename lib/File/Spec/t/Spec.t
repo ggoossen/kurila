@@ -45,7 +45,7 @@ if ($^O eq 'MacOS') {
 # maintenance easy, and should be OK since perl should be pretty functional
 # before these tests are run.
 
-@tests = (
+my @tests = (
 # [ Function          ,            Expected          ,         Platform ]
 
 \@( "Unix->case_tolerant()",         '0'  ),

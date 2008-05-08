@@ -2,6 +2,8 @@
 
 # Testing of v-string syntax
 
+our $DOWARN;
+
 BEGIN {
     $^WARN_HOOK = sub { warn @_[0] if $DOWARN };
 }
@@ -18,7 +20,7 @@ is(ref v111.107.32, 'version','ASCII printing characters');
 
 # poetry optimization should also
 sub v77 { "ok" }
-$x = v77;
+my $x = v77;
 is('ok',$x,'poetry optimization');
 
 # but not when dots are involved
@@ -41,11 +43,11 @@ ok(v200 eq eval("+v200"), 'v200 eq eval("+v200")' );
 
 # Tests for magic v-strings 
 
-$v = v1.2_3;
+my $v = v1.2_3;
 is( ref($v), 'version', 'v-string objects with v' );
 
 # [perl #16010]
-%h = (v65 => 42);
+my %h = (v65 => 42);
 ok( exists %h{v65}, "v-stringness is not engaged for vX" );
 %h = (v65.66 => 42);
 ok( exists %h{'v65.66'}, "v-stringness is engaged for vX.Y" );

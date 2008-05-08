@@ -7,7 +7,7 @@ BEGIN {
 }
 
 use Tie::Array;
-tie @foo,'Tie::StdArray';
-tie @ary,'Tie::StdArray';
-tie @bar,'Tie::StdArray';
+tie our @foo,'Tie::StdArray';
+tie our @ary,'Tie::StdArray';
+tie our @bar,'Tie::StdArray';
 require "sv/array.t"

@@ -56,7 +56,7 @@ is( $r, join($dirsep, "Foo", "Bar.pm") );
 our $fh;
 
 {
-    local $TODO = "overrie readline";
+    local our $TODO = "overrie readline";
     $r = 11;
     BEGIN { *CORE::GLOBAL::readline = sub (;*) { ++$r }; }
     is( (~< *FH)	, 12 );

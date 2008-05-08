@@ -58,7 +58,7 @@ is(ref $a, "Oscalar");
 is($a, $a);
 is($a, "087");
 
-$c = $a + 7;
+my $c = $a + 7;
 
 is(ref $c, "Oscalar");
 isnt($c, $a);
@@ -105,6 +105,7 @@ is($b, "88");
 is(ref $a, "Oscalar");
 
 package Oscalar;
+our $dummy;
 $dummy=bless \$dummy;		# Now cache of method should be reloaded
 package main;
 
@@ -155,7 +156,7 @@ ok($b? 1:0);
 
 eval q[ package Oscalar; use overload ('=' => sub {$main::copies++; 
 						   package Oscalar;
-						   local $new=$ {@_[0]};
+						   local our $new=$ {@_[0]};
 						   bless \$new } ) ];
 
 $b= Oscalar->new( "$a");
@@ -171,6 +172,7 @@ is(ref $b, "Oscalar");
 is($a, "087");
 is($b, "89");
 is(ref $a, "Oscalar");
+our $copies;
 is($copies, undef);
 
 $b+=1;
@@ -255,10 +257,10 @@ is("b{$a}c", "_._.b.__.xx._.__.c._");
 # Check inheritance of overloading;
 {
   package OscalarI;
-  @ISA = 'Oscalar';
+  our @ISA = 'Oscalar';
 }
 
-$aI = OscalarI->new( "$a");
+my $aI = OscalarI->new( "$a");
 is(ref $aI, "OscalarI");
 is("$aI", "xx");
 is($aI, "xx");
@@ -269,7 +271,7 @@ is("b{$aI}c", "_._.b.__.xx._.__.c._");
 eval "package Oscalar; no overload '.'";
 
 is("b{$a}", "_.b.__.xx._");
-$x="1";
+my $x="1";
 bless \$x, 'Oscalar';
 is("b{$a}c", "bxxc");
  Oscalar->new( 1);
@@ -277,7 +279,7 @@ is("b{$a}c", "bxxc");
 
 # Negative overloading:
 
-$na = eval { ^~^$a };
+my $na = eval { ^~^$a };
 like($@->{description}, qr/no method found/);
 
 eval "package Oscalar; sub numify \{ return '_!_' . shift() . '_!_' \} use overload '0+' => \\&numify";
@@ -313,6 +315,7 @@ like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
     cmp_ok(overload::StrVal(\$aI), '\==', \$aI);
 }
 
+our ($int, $out);
 {
   BEGIN { $int = 7; overload::constant 'integer' => sub {$int++; shift}; }
   $out = 2**10;
@@ -320,8 +323,9 @@ like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
 is($int, 9);
 is($out, 1024);
 
-$foo = 'foo';
-$foo1 = q|f'o\\o|;
+our $foo = 'foo';
+our $foo1 = q|f'o\\o|;
+our ($q, $qr, @q, @qr, $out1, $out2, @q1, @qr1);
 {
   BEGIN { $q = $qr = 7; 
 	  overload::constant 'q' => sub {$q++; push @q, shift, (@_[1] || 'none'); shift},
@@ -342,6 +346,7 @@ is($q, 11);
 is("@qr", "b\\b qq .\\. qq");
 is($qr, 9);
 
+our $res;
 {
   $_ = '!<b>!foo!<-.>!';
   BEGIN { overload::constant 'q' => sub {push @q1, shift, (@_[1] || 'none'); "_<" . (shift) . ">_"},
@@ -361,7 +366,7 @@ EOF
   s/yet another/tail here/;
   tr/A-Z/a-z/;
 }
- is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
+is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
  q second part s tail here s A-Z tr a-z tr");
 is("@qr1", "b\\b qq .\\. qq try it qq first part qq yet another qq");
@@ -786,7 +791,7 @@ is($bar->[3], 13);
 
 {
   package two_refs_o;
-  @ISA = ('two_refs');
+  our @ISA = ('two_refs');
 }
 
 $bar = two_refs_o->new( 3,4,5,6);
@@ -839,7 +844,7 @@ is($bar->[3], 13);
 
 {
   package two_refs1_o;
-  @ISA = ('two_refs1');
+  our @ISA = ('two_refs1');
 }
 
 $bar = two_refs1_o->new( 3,4,5,6);

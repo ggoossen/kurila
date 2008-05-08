@@ -6,83 +6,60 @@ BEGIN {
 
 plan (tests => 28);
 
-print "not " unless length("")    == 0;
-print "ok 1\n";
+ok(length("")    == 0);
 
-print "not " unless length("abc") == 3;
-print "ok 2\n";
+ok(length("abc") == 3);
 
 $_ = "foobar";
-print "not " unless length()      == 6;
-print "ok 3\n";
+ok(length()      == 6);
 
 # Okay, so that wasn't very challenging.  Let's go Unicode.
 
 {
     my $a = "\x{41}";
 
-    print "not " unless length($a) == 1;
-    print "ok 4\n";
-    $test++;
+    ok(length($a) == 1);
 
     use bytes;
-    print "not " unless $a eq "\x[41]" && length($a) == 1;
-    print "ok 5\n";
-    $test++;
+    ok($a eq "\x[41]" && length($a) == 1);
 }
 
 {
     my $a = pack("U", 0xFF);
 
     use utf8;
-    print "not " unless length($a) == 1;
-    print "ok 6\n";
-    $test++;
+    ok(length($a) == 1);
 
     no utf8;
-    print "not " unless $a eq "\x[c3bf]" && length($a) == 2;
-    print "ok 7\n";
-    $test++;
+    ok($a eq "\x[c3bf]" && length($a) == 2);
 }
 
 {
     use utf8;
     my $a = "\x{100}";
-    print "not " unless length($a) == 1;
-    print "ok 8\n";
-    $test++;
+    ok(length($a) == 1);
 
     use bytes;
-    print "not " unless $a eq "\x[c480]" && length($a) == 2;
-    print "ok 9\n";
-    $test++;
+    ok( $a eq "\x[c480]" && length($a) == 2 );
 }
 
 {
     use utf8;
     my $a = "\x{100}\x{80}";
 
-    print "not " unless length($a) == 2;
-    print "ok 10\n";
-    $test++;
+    ok(length($a) == 2);
 
     use bytes;
-    print "not " unless $a eq "\x[c480c280]" && length($a) == 4;
-    print "ok 11\n";
-    $test++;
+    ok( $a eq "\x[c480c280]" && length($a) == 4);
 }
 
 {
     use utf8;
     my $a = "\x{80}\x{100}";
-    print "not " unless length($a) == 2;
-    print "ok 12\n";
-    $test++;
+    ok(length($a) == 2);
 
     use bytes;
-    print "not " unless $a eq "\x[c280c480]" && length($a) == 4;
-    print "ok 13\n";
-    $test++;
+    ok( $a eq "\x[c280c480]" && length($a) == 4 );
 }
 
 # Now for Unicode with magical vtbls
@@ -95,14 +72,10 @@ print "ok 3\n";
     use utf8;
     $a = "\x{263A}";
 
-    print "not " unless length($a) == 1;
-    print "ok 14\n";
-    $test++;
+    ok(length($a) == 1);
 
     use bytes;
-    print "not " unless length($a) == 3;
-    print "ok 15\n";
-    $test++;
+    ok(length($a) == 3);
 }
 
 {
@@ -110,22 +83,22 @@ print "ok 3\n";
     # give a little workout to the UTF-8 length cache.
     use utf8;
     my $a = chr(256) x 100;
-    print length $a == 100 ? "ok 16\n" : "not ok 16\n";
+    ok(length $a == 100);
     chop $a;
-    print length $a ==  99 ? "ok 17\n" : "not ok 17\n";
+    ok(length $a ==  99);
     $a .= $a;
-    print length $a == 198 ? "ok 18\n" : "not ok 18\n";
+    ok(length $a == 198);
     $a = chr(256) x 999;
-    print length $a == 999 ? "ok 19\n" : "not ok 19\n";
+    ok(length $a == 999);
     substr($a, 0, 1, '');
-    print length $a == 998 ? "ok 20\n" : "not ok 20\n";
+    ok(length $a == 998);
 }
 
 curr_test(21);
 
 require Tie::Scalar;
 
-$u = "ASCII";
+my $u = "ASCII";
 
 tie $u, 'Tie::StdScalar', chr 256;
 

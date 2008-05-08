@@ -343,7 +343,7 @@ eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
 
 # [perl #9728] used to dump core
 {
-   $eval = eval 'sub { eval "sub { %S }" }';
+   my $eval = eval 'sub { eval q|sub { %S }| }';
    $eval->(\%());
    print "ok $test\n";
    $test++;

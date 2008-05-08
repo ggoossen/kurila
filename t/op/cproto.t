@@ -6,7 +6,7 @@ plan tests => 228;
 
 while ( ~< *DATA) {
     chomp;
-    (my $keyword, my $proto, local $TODO) = split " ", $_, 3;
+    (my $keyword, my $proto, local our $TODO) = split " ", $_, 3;
     if ($proto eq 'undef') {
 	ok( !defined prototype "CORE::".$keyword, $keyword );
     }

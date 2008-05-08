@@ -91,7 +91,7 @@ my @death =
 ##
 ## Key-value pairs of code/error of code that should have non-fatal warnings.
 ##
-@warning = (
+my @warning = (
     'm/\b*/' => '\b* matches null string many times in regex; marked by {#} in m/\b*{#}/',
 
     'm/[:blank:]/' => 'POSIX syntax [: :] belongs inside character classes in regex; marked by {#} in m/[:blank:]{#}/',

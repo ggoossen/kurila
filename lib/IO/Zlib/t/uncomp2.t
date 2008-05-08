@@ -20,12 +20,12 @@ sub ok
 
 print "1..10\n";
 
-$hello = <<EOM ;
+my $hello = <<EOM ;
 hello world
 this is a test
 EOM
 
-$name = "test$$";
+my $name = "test$$";
 
 if (open(FH, ">", "$name")) {
     binmode FH;
@@ -35,10 +35,10 @@ if (open(FH, ">", "$name")) {
     die "$name: $!";
 }
 
-ok(1, $file = IO::Zlib->new());
+ok(1, my $file = IO::Zlib->new());
 ok(2, $file->open($name, "rb"));
 ok(3, !$file->eof());
-ok(4, $file->read($uncomp, 1024) == length($hello));
+ok(4, $file->read(my $uncomp, 1024) == length($hello));
 ok(5, $file->eof());
 ok(6, $file->opened());
 ok(7, $file->close());

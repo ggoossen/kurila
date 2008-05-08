@@ -74,9 +74,9 @@ for (@prgs){
 
 __END__
 $| = 1;
-if ($cid = fork) {
+if (my $cid = fork) {
     sleep 1;
-    if ($result = (kill 9, $cid)) {
+    if (my $result = (kill 9, $cid)) {
 	print "ok 2\n";
     }
     else {
@@ -93,7 +93,7 @@ ok 1
 ok 2
 ########
 $| = 1;
-if ($cid = fork) {
+if (my $cid = fork) {
     sleep 1;
     print "not " unless kill 'INT', $cid;
     print "ok 2\n";
@@ -111,6 +111,7 @@ ok 1
 ok 2
 ########
 $| = 1;
+our $i;
 sub forkit {
     print "iteration $i start\n";
     my $x = fork;
@@ -167,7 +168,7 @@ parent
 child
 ########
 $| = 1;
-@a = (1..3);
+my @a = (1..3);
 for (@a) {
     if (fork) {
 	print "parent $_\n";
@@ -299,7 +300,7 @@ parent after: bar
 ########
 $| = 1;
 $\ = "\n";
-if ($pid = fork) {
+if (my $pid = fork) {
     waitpid($pid,0);
     print "parent got $?"
 }
@@ -312,7 +313,7 @@ parent got 10752
 $| = 1;
 $\ = "\n";
 my $echo = 'echo';
-if ($pid = fork) {
+if (my $pid = fork) {
     waitpid($pid,0);
     print "parent got $?"
 }
@@ -333,7 +334,7 @@ EXPECT
 parent died at - line 2.
 child died at - line 5.
 ########
-if ($pid = fork) {
+if (my $pid = fork) {
     eval { die "parent died" };
     print $@->message;
 }
@@ -347,6 +348,7 @@ parent died at - line 2.
 child died at - line 6.
     (eval) called at - line 2.
 ########
+my $pid;
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
     print $@->message;
@@ -357,9 +359,9 @@ else {
 }
 EXPECT
 parent died at (eval 2) line 1.
-    (eval) called at - line 2.
+    (eval) called at - line 3.
 child died at (eval 2) line 1.
-    (eval) called at - line 6.
+    (eval) called at - line 7.
 ########
 BEGIN {
     $| = 1;
@@ -426,7 +428,7 @@ pipe_from_fork
 pipe_to_fork
 ########
 $|=1;
-if ($pid = fork()) {
+if (my $pid = fork()) {
     print "forked first kid\n";
     print "waitpid() returned ok\n" if waitpid($pid,0) == $pid;
 }
@@ -434,7 +436,7 @@ else {
     print "first child\n";
     exit(0);
 }
-if ($pid = fork()) {
+if (my $pid = fork()) {
     print "forked second kid\n";
     print "wait() returned ok\n" if wait() == $pid;
 }

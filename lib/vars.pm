@@ -4,8 +4,6 @@ package vars;
 our $VERSION = '1.01';
 
 use warnings::register;
-use strict;
-no strict 'refs';
 
 sub import {
     my $callpack = caller;
@@ -19,8 +17,8 @@ sub import {
 		    die("Can't declare individual elements of hash or array");
 		} elsif (warnings::enabled() and length($sym) == 1 and $sym !~ tr/a-zA-Z//) {
 		    warnings::warn("No need to declare built-in vars");
-		} elsif  (($^H ^&^= strict::bits('vars'))) {
-		    die("'$_' is not a valid variable name under strict vars");
+		} else {
+		    die("'$_' is not a valid variable name");
 		}
 	    }
 	    $sym = "{$callpack}::$sym" unless $sym =~ m/::/;

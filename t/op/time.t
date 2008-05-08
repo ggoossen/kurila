@@ -20,7 +20,7 @@ ok($now +> $beg && $now - $beg +< 10,             'very basic time test');
 our $i;
 for ($i = 0; $i +< 1_000_000; $i++) {
     for my $j (1..100) {}; # burn some user cycles
-    ($nowuser, $nowsys) = times;
+    my ($nowuser, $nowsys) = times;
     $i = 2_000_000 if $nowuser +> $beguser && ( $nowsys +>= $begsys ||
                                             (!$nowsys && !$begsys));
     last if time - $beg +> 20;
@@ -52,7 +52,7 @@ SKIP: {
 %ENV{TZ} = "GMT-5";
 ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
 %ENV{TZ} = "GMT+5";
-($sec,$min,$hour2,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
+my ($sec,$min,$hour2,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
 ok($hour != $hour2,                             'changes to $ENV{TZ} respected');
 }
 

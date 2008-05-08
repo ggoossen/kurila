@@ -99,11 +99,13 @@ use Config;
 use File::Basename;
 use File::Spec;
 
-@EXPORT_OK = qw($Bin $Script $RealBin $RealScript $Dir $RealDir);
-%EXPORT_TAGS = (ALL => \@(qw($Bin $Script $RealBin $RealScript $Dir $RealDir)));
-@ISA = qw(Exporter);
 
-$VERSION = "1.49";
+our ($Bin, $Script, $RealBin, $RealScript, $Dir, $RealDir);
+our @EXPORT_OK = qw($Bin $Script $RealBin $RealScript $Dir $RealDir);
+our %EXPORT_TAGS = (ALL => \@(qw($Bin $Script $RealBin $RealScript $Dir $RealDir)));
+our @ISA = qw(Exporter);
+
+our $VERSION = "1.49";
 
 
 # needed for VMS-specific filename translation

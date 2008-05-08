@@ -18,7 +18,7 @@ BEGIN {
 
   use IO::File;
   use Net::Cmd;
-  @ISA = qw(Net::Cmd IO::File);
+  our @ISA = qw(Net::Cmd IO::File);
 
   sub timeout { 0 }
 

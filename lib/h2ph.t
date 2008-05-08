@@ -19,13 +19,14 @@ print "1..2\n";
 
 # quickly compare two text files
 sub txt_compare {
+    our ($A, $B);
     local ($/, $A, $B);
     for (($A,$B) = @_) { open(_, "<","$_") ? $_ = ~< *_ : die "$_ : $!"; close _ }
     $A cmp $B;
 }
 
 # does it run?
-$ok = system("$^X \"-I../lib\" $extracted_program -d. \"-Q\" lib/h2ph.h");
+my $ok = system("$^X \"-I../lib\" $extracted_program -d. \"-Q\" lib/h2ph.h");
 print(($ok == 0 ? "" : "not "), "ok 1\n");
     
 # does it work? well, does it do what we expect? :-)

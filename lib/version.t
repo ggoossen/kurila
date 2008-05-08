@@ -13,13 +13,15 @@ BEGIN {
     use_ok("version", 0.50); # If we made it this far, we are ok.
 }
 
+our $Verbose;
+
 BaseTests("version");
 
 diag "Tests with empty derived class" unless %ENV{PERL_CORE};
 
 package version::Empty;
 use base 'version';
-$VERSION = 0.01;
+our $VERSION = 0.01;
 no warnings 'redefine';
 *::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
@@ -70,7 +72,7 @@ sub BaseTests {
     
     # Test bare number processing
     diag "tests with bare numbers" if $Verbose;
-    $version = $CLASS->new(5.005_03);
+    my $version = $CLASS->new(5.005_03);
     is ( "$version" , "5.00503" , '5.005_03 eq 5.00503' );
     $version = $CLASS->new(1.23);
     is ( "$version" , "1.23" , '1.23 eq "1.23"' );
@@ -150,7 +152,7 @@ sub BaseTests {
     # Test Numeric Comparison operators
     # test first with non-object
     $version = $CLASS->new("5.006.001");
-    $new_version = "5.8.0";
+    my $new_version = "5.8.0";
     diag "numeric tests with non-objects" if $Verbose;
     ok ( $version == $version, '$version == $version' );
     ok ( $version +< $new_version, '$version < $new_version' );
@@ -347,7 +349,7 @@ SKIP: {
 
     { # dummy up some variously broken modules for testing
 	open F, ">", "zzz.pm" or die "Cannot open zzz.pm: $!\n";
-	print F "package zzz;\n\@VERSION = ();\n1;\n";
+	print F "package zzz;\nour \@VERSION = ();\n1;\n";
 	close F;
 	eval "use lib '.'; use zzz v3;";
 	like ($@->{description}, qr/$error_regex/,
@@ -418,7 +420,7 @@ SKIP: {
 	open F, ">", "www.pm" or die "Cannot open www.pm: $!\n";
 	print F <<"EOF";
 package www;
-use version; \$VERSION = qv('0.0.4');
+use version; our \$VERSION = qv('0.0.4');
 1;
 EOF
 	close F;
@@ -464,7 +466,7 @@ SKIP: {
 	open F, ">", "uuu.pm" or die "Cannot open uuu.pm: $!\n";
 	print F <<"EOF";
 package uuu;
-\$VERSION = 1.0;
+our \$VERSION = 1.0;
 1;
 EOF
 	close F;

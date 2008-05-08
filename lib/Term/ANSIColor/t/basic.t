@@ -8,10 +8,8 @@
 ##############################################################################
 
 BEGIN { $| = 1; print "1..16\n" }
-END   { print "not ok 1\n" unless $loaded }
 delete %ENV{ANSI_COLORS_DISABLED};
 use Term::ANSIColor qw(:constants color colored uncolor);
-$loaded = 1;
 print "ok 1\n";
 
 ##############################################################################

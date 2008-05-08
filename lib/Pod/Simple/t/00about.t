@@ -39,12 +39,8 @@ ok 1;
 foreach my $m (@modules) {
   print "# Loading $m ...\n";
   eval "require $m;";
-  unless($@) { ok 1; next }
-  my $e = $@;
-  $e =~ s/\s+$//s;
-  $e =~ s/[\n\r]+/\n# > /;
-  print "# Error while trying to load $m --\n# > $e\n";
-  ok 0;
+  die if $@;
+  ok 1;
 }
 
 {
