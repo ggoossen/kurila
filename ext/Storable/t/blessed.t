@@ -13,11 +13,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
     require 'st-dump.pl';
 }
 
@@ -64,7 +59,7 @@ my $name = "LONG_NAME_" . 'xxxxxxxxxxxxx::' x 14 . "final";
 eval <<EOC;
 package $name;
 
-\@ISA = ("SHORT_NAME");
+our \@ISA = ("SHORT_NAME");
 EOC
 die $@ if $@;
 ok 1, $@ eq '';
@@ -72,7 +67,7 @@ ok 1, $@ eq '';
 eval <<EOC;
 package {$name}_WITH_HOOK;
 
-\@ISA = ("SHORT_NAME_WITH_HOOK");
+our \@ISA = ("SHORT_NAME_WITH_HOOK");
 EOC
 ok 2, ! $@ ;
 
@@ -163,8 +158,8 @@ foreach $count (1..3) {
 
 package HAS_HOOK;
 
-$loaded_count = 0;
-$thawed_count = 0;
+our $loaded_count = 0;
+our $thawed_count = 0;
 
 sub make {
   bless \@();

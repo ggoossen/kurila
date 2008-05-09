@@ -13,11 +13,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
     require 'st-dump.pl';
 }
 
@@ -28,25 +23,25 @@ print "1..12\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless \%(), 'CLASS';
+our $c = bless \%(), 'CLASS';
 $c->{attribute} = 'attrval';
-%a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
-@a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
+our %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
+our @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
 
-print "not " unless defined ($aref = dclone(\@a));
+print "not " unless defined (our $aref = dclone(\@a));
 print "ok 1\n";
 
-$dumped = &dump(\@a);
+our $dumped = &dump(\@a);
 print "ok 2\n";
 
-$got = &dump($aref);
+our $got = &dump($aref);
 print "ok 3\n";
 
 print "not " unless $got eq $dumped; 
 print "ok 4\n";
 
-package FOO; @ISA = qw(Storable);
+package FOO; our @ISA = qw(Storable);
 
 sub make {
 	my $self = bless \%();
@@ -56,8 +51,8 @@ sub make {
 
 package main;
 
-$foo = FOO->make;
-print "not " unless defined($r = $foo->dclone);
+our $foo = FOO->make;
+print "not " unless defined(our $r = $foo->dclone);
 print "ok 5\n";
 
 print "not " unless &dump($foo) eq &dump($r);
