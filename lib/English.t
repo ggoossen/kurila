@@ -6,7 +6,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test::More tests => 47;
+use Test::More tests => 43;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -127,22 +127,6 @@ ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );
 eval { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
 is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
 ok( %OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
-
-package B;
-
-use English;
-
-"abc" =~ m/b/;
-
-main::is( $PREMATCH, 'a', '$PREMATCH defined' );
-main::is( $MATCH, 'b', '$MATCH defined' );
-main::is( $POSTMATCH, 'c', '$POSTMATCH defined' );
-
-{
-    my $s = "xyz";
-    $s =~ s/y/t$MATCH/;
-    main::is( $s, "xtyz", '$MATCH defined in right side of s///' );
-}
 
 package C;
 

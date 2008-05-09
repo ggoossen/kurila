@@ -1226,8 +1226,8 @@ PP(pp_match)
        /g matches against large strings.  So far a solution to this problem
        appears to be quite tricky.
        Test for the unsafe vars are TODO for now. */
-    if ((  !global && RX_NPARENS(rx)) 
-	    || SvTEMP(TARG) || PL_sawampersand ||
+    if (( /* !global  && */ RX_NPARENS(rx)) 
+	    || SvTEMP(TARG) ||
 	    (RX_EXTFLAGS(rx) & (RXf_EVAL_SEEN|RXf_PMf_KEEPCOPY)))
 	r_flags |= REXEC_COPY_STR;
     if (SvSCREAM(TARG))
@@ -1249,7 +1249,6 @@ play_it_again:
 	if (!s)
 	    goto nope;
 	if ( (RX_EXTFLAGS(rx) & RXf_CHECK_ALL)
-	     && !PL_sawampersand
 	     && !(RX_EXTFLAGS(rx) & RXf_PMf_KEEPCOPY)
 	     && ((RX_EXTFLAGS(rx) & RXf_NOSCAN)
 		 || !((RX_EXTFLAGS(rx) & RXf_INTUIT_TAIL)
@@ -1366,7 +1365,7 @@ yup:					/* Confirmed by INTUIT */
 	RX_SUBLEN(rx) = strend - truebase;
 	goto gotcha;
     }
-    if (PL_sawampersand || RX_EXTFLAGS(rx) & RXf_PMf_KEEPCOPY) {
+    if (RX_EXTFLAGS(rx) & RXf_PMf_KEEPCOPY) {
 	I32 off;
 #ifdef PERL_OLD_COPY_ON_WRITE
 	if (SvIsCOW(TARG) || (SvFLAGS(TARG) & CAN_COW_MASK) == CAN_COW_FLAGS) {
@@ -2005,7 +2004,7 @@ PP(pp_subst)
 	pm = PL_curpm;
 	rx = PM_GETRE(pm);
     }
-    r_flags = (RX_NPARENS(rx) || SvTEMP(TARG) || PL_sawampersand
+    r_flags = (RX_NPARENS(rx) || SvTEMP(TARG)
 	    || (RX_EXTFLAGS(rx) & (RXf_EVAL_SEEN|RXf_PMf_KEEPCOPY)) )
 	       ? REXEC_COPY_STR : 0;
     if (SvSCREAM(TARG))
@@ -2020,7 +2019,6 @@ PP(pp_subst)
 	    goto nope;
 	/* How to do it in subst? */
 /*	if ( (RX_EXTFLAGS(rx) & RXf_CHECK_ALL)
-	     && !PL_sawampersand
 	     && !(RX_EXTFLAGS(rx) & RXf_KEEPCOPY)
 	     && ((RX_EXTFLAGS(rx) & RXf_NOSCAN)
 		 || !((RX_EXTFLAGS(rx) & RXf_INTUIT_TAIL)

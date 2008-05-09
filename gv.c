@@ -1152,18 +1152,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	/* Names of length 1.  (Or 0. But name is NUL terminated, so that will
 	   be case '\0' in this switch statement (ie a default case)  */
 	switch (*name) {
-	case '&':
-	case '`':
-	case '\'':
-	    if (
-		sv_type == SVt_PVAV ||
-		sv_type == SVt_PVHV ||
-		sv_type == SVt_PVCV ||
-		sv_type == SVt_PVIO
-		) { break; }
-	    PL_sawampersand = TRUE;
-	    goto magicalize;
-
 	case ':':
 	    sv_setpv(GvSVn(gv),PL_chopset);
 	    goto magicalize;
@@ -1248,6 +1236,9 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '(':
 	case ')':
 	case '[':
+	case '&':
+	case '`':
+	case '\'':
 	    Perl_croak(aTHX_ "Unknown magic variable '%c%s'",
 		       sv_type == SVt_PVAV ? '@' : sv_type == SVt_PVHV ? '%' : '$',
 		       name);

@@ -536,8 +536,6 @@ END_EXTERN_C
 #define PL_savestack_ix		(*Perl_Isavestack_ix_ptr(aTHX))
 #undef  PL_savestack_max
 #define PL_savestack_max	(*Perl_Isavestack_max_ptr(aTHX))
-#undef  PL_sawampersand
-#define PL_sawampersand		(*Perl_Isawampersand_ptr(aTHX))
 #undef  PL_scopestack
 #define PL_scopestack		(*Perl_Iscopestack_ptr(aTHX))
 #undef  PL_scopestack_ix

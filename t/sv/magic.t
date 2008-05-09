@@ -34,7 +34,7 @@ sub skip {
     return 1;
 }
 
-print "1..57\n";
+print "1..54\n";
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -141,9 +141,6 @@ ok @val1 +> 1;
 
 # regex vars
 'foobarbaz' =~ m/b(a)r/;
-ok $` eq 'foo', $`;
-ok $& eq 'bar', $&;
-ok $' eq 'baz', $';
 ok $+ eq 'a', $+;
 
 # $"

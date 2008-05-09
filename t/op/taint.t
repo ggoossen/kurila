@@ -12,7 +12,7 @@ use Config;
 use File::Spec::Functions;
 
 BEGIN { require './test.pl'; }
-plan tests => 232;
+plan tests => 231;
 
 $| = 1;
 
@@ -336,7 +336,6 @@ SKIP: {
     test tainted $foo;
 
     $foo =~ m/def/;
-    test not any_tainted $`, $&, $';
 
     $foo =~ m/(...)(...)(...)/;
     test not any_tainted $1, $2, $3, $+;

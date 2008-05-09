@@ -114,7 +114,7 @@ sub walk_table (&@) {
 }
 
 sub munge_c_files () {
-    my $functions = {};
+    my $functions = \%();
     unless (@ARGV) {
 	warn "\@ARGV empty, nothing to do\n";
 	return;

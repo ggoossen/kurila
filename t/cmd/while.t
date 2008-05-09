@@ -109,14 +109,14 @@ my $i = 9;
 print "ok $i\n";
 
 # Check curpm is reset when jumping out of a scope
-'abc' =~ m/b/;
+'abc' =~ m/b/p;
 WHILE:
 while (1) {
   $i++;
-  print "#$`,$&,$',\nnot " unless $` . $& . $' eq "abc";
+  print "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
   print "ok $i\n";
   {                             # Localize changes to $` and friends
-    'end' =~ m/end/;
+    'end' =~ m/end/p;
     redo WHILE if $i == 11;
     next WHILE if $i == 12;
     # 13 do a normal loop
@@ -124,7 +124,7 @@ while (1) {
   }
 }
 $i++;
-print "not " unless $` . $& . $' eq "abc";
+print "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
 print "ok $i\n";
 
 # check that scope cleanup happens right when there's a continue block
