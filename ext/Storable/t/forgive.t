@@ -9,20 +9,6 @@
 # (C) Copyright 1997, Universitat Dortmund, all rights reserved.
 #
 
-sub BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
-
 use Storable qw(store retrieve);
 
 # problems with 5.00404 when in an BEGIN block, so this is defined here

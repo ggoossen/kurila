@@ -6,20 +6,6 @@
 #  in the README file that comes with the distribution.
 #  
 
-sub BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
-
 
 use Storable qw(freeze thaw dclone);
 use vars qw($debugging $verbose);
@@ -37,28 +23,31 @@ sub ok {
 # (you may want to reduce the size of the hashes too)
 # $debugging = 1;
 
-$hashsize = 100;
-$maxhash2size = 100;
-$maxarraysize = 100;
+our $gotdd;
+
+our $hashsize = 100;
+our $maxhash2size = 100;
+our $maxarraysize = 100;
 
 # Use MD5 if its available to make random string keys
 
 eval { require "MD5.pm" };
-$gotmd5 = !$@;
+our $gotmd5 = !$@;
 
 # Use Data::Dumper if debugging and it is available to create an ASCII dump
 
 if ($debugging) {
     eval { require "Data/Dumper.pm" };
-    $gotdd  = !$@;
+    our $gotdd  = !$@;
 }
 
-@fixed_strings = ("January", "February", "March", "April", "May", "June",
+our @fixed_strings = ("January", "February", "March", "April", "May", "June",
 		  "July", "August", "September", "October", "November", "December" );
 
 # Build some arbitrarily complex data structure starting with a top level hash
 # (deeper levels contain scalars, references to hashes or references to arrays);
 
+our (%a1, %a2);
 for (my $i = 0; $i +< $hashsize; $i++) {
 	my($k) = int(rand(1_000_000));
 	$k = MD5->hexhash($k) if $gotmd5 and int(rand(2));
@@ -94,22 +83,22 @@ print STDERR Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
 
 # Copy the hash, element by element in order of the keys
 
-foreach $k (sort keys %a1) {
+foreach my $k (sort keys %a1) {
     %a2{$k} = \%( key => "$k", "value" => %a1{$k}->{value} );
 }
 
 # Deep clone the hash
 
-$a3 = dclone(\%a1);
+my $a3 = dclone(\%a1);
 
 # In canonical mode the frozen representation of each of the hashes
 # should be identical
 
 $Storable::canonical = 1;
 
-$x1 = freeze(\%a1);
-$x2 = freeze(\%a2);
-$x3 = freeze($a3);
+my $x1 = freeze(\%a1);
+my $x2 = freeze(\%a2);
+my $x3 = freeze($a3);
 
 ok 1, (length($x1) +> $hashsize);	# sanity check
 ok 2, length($x1) == length($x2);	# idem

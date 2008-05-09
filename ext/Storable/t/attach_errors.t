@@ -201,7 +201,7 @@ use Storable ();
 	package My::GoodAttach::Subclass;
 
 	BEGIN {
-		@ISA = 'My::GoodAttach';
+		our @ISA = 'My::GoodAttach';
 	}
 }
 

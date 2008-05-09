@@ -13,11 +13,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
     require 'st-dump.pl';
     sub ok;
 }
@@ -28,33 +23,33 @@ print "1..20\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless \%(), 'CLASS';
+our $c = bless \%(), 'CLASS';
 $c->{attribute} = $b;
-$d = \%();
-$e = \@();
+our $d = \%();
+our $e = \@();
 $d->{'a'} = $e;
 $e->[0] = $d;
-%a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
-@a = ('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
+our %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
+our @a = ('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
 	$b, \$a, $a, $c, \$c, \%a);
 
-print "not " unless defined ($f1 = freeze(\@a));
+print "not " unless defined (our $f1 = freeze(\@a));
 print "ok 1\n";
 
-$dumped = &dump(\@a);
+our $dumped = &dump(\@a);
 print "ok 2\n";
 
-$root = thaw($f1);
+our $root = thaw($f1);
 print "not " unless defined $root;
 print "ok 3\n";
 
-$got = &dump($root);
+our $got = &dump($root);
 print "ok 4\n";
 
 print "not " unless $got eq $dumped; 
 print "ok 5\n";
 
-package FOO; @ISA = qw(Storable);
+package FOO; our @ISA = qw(Storable);
 
 sub make {
 	my $self = bless \%();
@@ -64,14 +59,14 @@ sub make {
 
 package main;
 
-$foo = FOO->make;
-print "not " unless $f2 = $foo->freeze;
+our $foo = FOO->make;
+print "not " unless our $f2 = $foo->freeze;
 print "ok 6\n";
 
-print "not " unless $f3 = $foo->nfreeze;
+print "not " unless our $f3 = $foo->nfreeze;
 print "ok 7\n";
 
-$root3 = thaw($f3);
+our $root3 = thaw($f3);
 print "not " unless defined $root3;
 print "ok 8\n";
 
@@ -85,15 +80,15 @@ print "ok 10\n";
 print "not " unless &dump($root3) eq &dump($root);
 print "ok 11\n";
 
-$other = freeze($root);
+our $other = freeze($root);
 print "not " unless length($other) == length($f2);
 print "ok 12\n";
 
-$root2 = thaw($other);
+our $root2 = thaw($other);
 print "not " unless &dump($root2) eq &dump($root);
 print "ok 13\n";
 
-$VAR1 = \@(
+our $VAR1 = \@(
 	'method',
 	1,
 	'prepare',
@@ -101,8 +96,8 @@ $VAR1 = \@(
                   where table_owner != '$ingres' and table_owner != 'DBA'|
 );
 
-$x = nfreeze($VAR1);
-$VAR2 = thaw($x);
+our $x = nfreeze($VAR1);
+our $VAR2 = thaw($x);
 print "not " unless $VAR2->[3] eq $VAR1->[3];
 print "ok 14\n";
 
@@ -141,6 +136,6 @@ ok 19, 1;
         $a = \@(undef, undef);
         $b = thaw freeze $a;
         @a = map { exists $a->[$_] } 0 .. @$a-1;
-        @b = map { exists $b->[$_] } 0 .. @$b-1;
+        our @b = map { exists $b->[$_] } 0 .. @$b-1;
         ok 20, "@a" eq "@b";
     ';
