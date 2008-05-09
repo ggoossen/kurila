@@ -30,18 +30,6 @@ $INPUT_RECORD_SEPARATOR if you are using the English module.
 
 See L<perlvar> for a complete list of these.
 
-=head1 PERFORMANCE
-
-This module can provoke sizeable inefficiencies for regular expressions,
-due to unfortunate implementation details.  If performance matters in
-your application and you don't need $PREMATCH, $MATCH, or $POSTMATCH,
-try doing
-
-   use English qw( -no_match_vars ) ;
-
-.  B<It is especially important to do this in modules to avoid penalizing
-all applications which use them.>
-
 =cut
 
 no warnings;
@@ -96,38 +84,12 @@ our @MINIMAL_EXPORT = qw(
 	@LAST_MATCH_END
 );
 
-
-our @MATCH_EXPORT = qw(
-	*MATCH
-	*PREMATCH
-	*POSTMATCH
-);
-
-our @COMPLETE_EXPORT = ( @MINIMAL_EXPORT, @MATCH_EXPORT ) ;
-
 # Grandfather $NAME import
 sub import {
     my $this = shift;
     my @list = grep { ! m/^-no_match_vars$/ } @_ ;
     local $Exporter::ExportLevel = 1;
-    if ( @_ == @list ) {
-        *EXPORT = \@COMPLETE_EXPORT ;
-        $globbed_match ||= (
-	    eval q{
-		*MATCH				= *&	;
-		*PREMATCH			= *`	;
-		*POSTMATCH			= *'	;
-		1 ;
-	       }
-	    || do {
-		require Carp ;
-		Carp::croak("Can't create English for match leftovers: $@") ;
-	    }
-	) ;
-    }
-    else {
-        *EXPORT = \@MINIMAL_EXPORT ;
-    }
+    *EXPORT = \@MINIMAL_EXPORT ;
     Exporter::import($this,grep {s/^\$/*/} @list);
 }
 

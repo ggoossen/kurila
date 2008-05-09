@@ -10748,7 +10748,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_doswitches	= proto_perl->Idoswitches;
     PL_dowarn		= proto_perl->Idowarn;
     PL_doextract	= proto_perl->Idoextract;
-    PL_sawampersand	= proto_perl->Isawampersand;
     PL_unsafe		= proto_perl->Iunsafe;
     PL_inplace		= SAVEPV(proto_perl->Iinplace);
     PL_e_script		= sv_dup_inc(proto_perl->Ie_script, param);

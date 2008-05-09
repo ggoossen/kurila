@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 135 );
+plan( tests => 134 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -568,14 +568,3 @@ is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
     s/(((((((((x)))))))))(r)/fooba${*{Symbol::fetch_glob(10)}}/;
     is($_,"foobar","RT#6006: \$_ eq '$_'");
 }
-{
-    my $want=("\n" x 11).("B\n" x 11)."B";
-    $_="B";
-    our $i;
-    for $i(1..11){
-	s/^.*$/$&/gm;
-	$_="\n$_\n$&";
-    }
-    is($want,$_,"RT#17542");
-}
-

@@ -274,7 +274,7 @@ Use of uninitialized value in addition (+) at - line 25.
 Use of uninitialized value $1 in addition (+) at - line 27.
 ########
 use warnings 'uninitialized';
-my ($m1);
+my ($m1, $m2);
 our ($g1, @ga);
 
 print @ga[1000];
@@ -300,8 +300,8 @@ EXPECT
 Can't use an undefined value as a symbol reference at - line 5.
 ########
 use warnings 'uninitialized';
-my ($m1, $v);
-our ($g1);
+my ($m1, $m2, $v);
+our ($g1, $g2);
 
 $v = $m1 ^|^ $m2;
 $v = $m1 ^&^ $m2;
@@ -478,7 +478,7 @@ Use of uninitialized value $g2 in abs at - line 6.
 ########
 use warnings 'uninitialized';
 my ($m1, $m2, $v);
-our ($g1);
+our ($g1, $g2);
 
 $v = pack $m1;
 $v = pack "i*", $m2, $g1, $g2;
@@ -724,7 +724,7 @@ use warnings 'uninitialized';
 my ($m1);
 our ($g1);
 
-$v = pos($m1) + 1;
+my $v = pos($m1) + 1;
 $v = pos($g1) + 1;
 $m1 = 0;
 $g1 = "";

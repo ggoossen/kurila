@@ -933,7 +933,6 @@ perl_destruct(pTHXx)
     PL_doswitches   = FALSE;
     PL_dowarn       = G_WARN_OFF;
     PL_doextract    = FALSE;
-    PL_sawampersand = FALSE;	/* must save all match strings */
     PL_unsafe       = FALSE;
 
     Safefree(PL_inplace);
@@ -1895,7 +1894,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			     "@env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
+			     "our @env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
 			     "sort grep {m/^PERL/} keys %ENV; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
@@ -2321,8 +2320,6 @@ STATIC void
 S_run_body(pTHX_ I32 oldscope)
 {
     dVAR;
-    DEBUG_r(PerlIO_printf(Perl_debug_log, "%s $` $& $' support.\n",
-                    PL_sawampersand ? "Enabling" : "Omitting"));
 
     if (!PL_restartop) {
 #ifdef PERL_MAD

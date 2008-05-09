@@ -457,8 +457,8 @@ my $postcurrpat = qr/([[<0]) ([^]0>[<]+)     (\}$)     /x;
 sub perl6_match {
 	my ($str, $pat) = @_;
 	use re 'eval';
-	if (my @vals = $str =~ m/$pat/) {
-		unshift @vals, $&;
+	if (my @vals = $str =~ m/($pat)/) {
+		unshift @vals, $1;
 		bless \@vals, 'Perl6::Form::Rule::Okay';
 	}
 	else {

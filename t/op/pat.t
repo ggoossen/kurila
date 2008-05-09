@@ -111,28 +111,28 @@ for (25..27) {
 }
 
 'cde' =~ m/[^ab]*/;
-'xyz' =~ m//;
-ok($& eq 'xyz');
+'xyz' =~ m//p;
+ok($^MATCH eq 'xyz');
 
 $foo = '[^ab]*';
 'cde' =~ m/$foo/;
-'xyz' =~ m//;
-ok($& eq 'xyz');
+'xyz' =~ m//p;
+ok($^MATCH eq 'xyz');
 
 $foo = '[^ab]*';
 'cde' =~ m/$foo/;
-'xyz' =~ m/$null/;
-ok($& eq 'xyz');
+'xyz' =~ m/$null/p;
+ok($^MATCH eq 'xyz');
 
 $_ = 'abcdefghi';
-m/def/;		# optimized up to cmd
-ok("$`:$&:$'" eq 'abc:def:ghi');
+m/def/p;		# optimized up to cmd
+ok("$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'abc:def:ghi');
 
-m/cde/ + 0;	# optimized only to spat
-ok("$`:$&:$'" eq 'ab:cde:fghi');
+m/cde/p + 0;	# optimized only to spat
+ok("$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'ab:cde:fghi');
 
-m/[d][e][f]/;	# not optimized
-ok("$`:$&:$'" eq 'abc:def:ghi');
+m/[d][e][f]/p;	# not optimized
+ok("$^PREMATCH:$^MATCH:$^POSTMATCH" eq 'abc:def:ghi');
 
 $_ = 'now is the {time for all} good men to come to.';
 m/ {([^}]*)}/;
@@ -154,15 +154,15 @@ $_ = "now is the time for all good men to come to.";
 ok( join(':',@words) eq "now:is:the:time:for:all:good:men:to:come:to" );
 
 @words = ();
-while (m/\w+/g) {
-    push(@words, $&);
+while (m/\w+/gp) {
+    push(@words, $^MATCH);
 }
 ok( join(':',@words) eq "now:is:the:time:for:all:good:men:to:come:to" );
 
 @words = ();
 pos = 0;
-while (m/to/g) {
-    push(@words, $&);
+while (m/to/gp) {
+    push(@words, $^MATCH);
 }
 ok( join(':',@words) eq "to:to" );
 
@@ -204,30 +204,30 @@ ok( "abc" =~ m/^abc$|$xyz/ );
 
 # perl 4.009 says "unmatched ()"
 our $result;
-eval '"abc" =~ m/a(bc$)|$xyz/; $result = "$&:$1"';
+eval '"abc" =~ m/a(bc$)|$xyz/p; $result = "$^MATCH:$1"';
 ok( $@ eq "" );
 ok( $result eq "abc:bc" );
 
 
 $_="abcfooabcbar";
-$x=m/abc/g;
-ok( $x and $` eq "" );
-$x=m/abc/g;
-ok( $x and $` eq "abcfoo" );
-$x=m/abc/g;
+$x=m/abc/gp;
+ok( $x and $^PREMATCH eq "" );
+$x=m/abc/gp;
+ok( $x and $^PREMATCH eq "abcfoo" );
+$x=m/abc/gp;
 ok( $x == 0 );
 pos = 0;
-$x=m/ABC/gi;
-ok( $x and $` eq "" );
-$x=m/ABC/gi;
-ok( $x and $` eq "abcfoo" );
+$x=m/ABC/gip;
+ok( $x and $^PREMATCH eq "" );
+$x=m/ABC/gip;
+ok( $x and $^PREMATCH eq "abcfoo" );
 $x=m/ABC/gi;
 ok( $x == 0 );
 pos = 0;
-$x=m/abc/g;
-ok( $x and $' eq "fooabcbar" );
-$x=m/abc/g;
-ok( $x and $' eq "bar" );
+$x=m/abc/gp;
+ok( $x and $^POSTMATCH eq "fooabcbar" );
+$x=m/abc/gp;
+ok( $x and $^POSTMATCH eq "bar" );
 $_ .= '';
 @x=m/abc/g;
 ok( scalar @x == 2 );
@@ -362,7 +362,7 @@ my $matched;
 $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/;
 
 @ans = @ans1 = ();
-push(@ans, $res), push(@ans1, $&) while $res = m/$matched/g;
+push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp;
 
 ok( "@ans" eq "1 1 1" );
 
@@ -446,8 +446,8 @@ foreach my $ans ('', 'c') {
 
 $_ = 'a';
 foreach my $ans ('', 'a', '') {
-  m/^|a|$/g;
-  ok( $& eq $ans );
+  m/^|a|$/gp;
+  ok( $^MATCH eq $ans );
 }
 
 sub prefixify {
@@ -612,10 +612,10 @@ ok( not ( $str =~ m/^...\G/ ));
 
 {
     local $TODO = $::running_as_thread;
-    ok($str =~ m/.\G./ and $& eq 'bc');
+    ok($str =~ m/.\G./p and $^MATCH eq 'bc');
 }
 
-ok( $str =~ m/\G../ and $& eq 'cd' );
+ok( $str =~ m/\G../p and $^MATCH eq 'cd' );
 
 our ($foo, $bar);
 undef $foo; undef $bar;
@@ -656,7 +656,7 @@ $res = "@res";
 ok(  "@res" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
 
 @res = ();
-@dummy = m/([ace]).(?{push @res, $`,$&,$'})([ce])(?{push @res, $`,$&,$'})/g;
+@dummy = m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp;
 @res = map {defined $_ ? "'$_'" : 'undef'} @res;
 $res = "@res";
 ok(  "@res" eq
@@ -834,9 +834,9 @@ EOE
 ok(($a and $a =~ m/^Object\sS/), '$a');
 
 # test result of match used as match (!)
-ok( 'a1b' =~ ('xyz' =~ m/y/) and $` eq 'a' );
+ok( 'a1b' =~ ('xyz' =~ m/y/) );
 
-ok( 'a1b' =~ ('xyz' =~ m/t/) and $` eq 'a' );
+ok( 'a1b' =~ ('xyz' =~ m/t/) );
 
 our $w = 0;
 {
@@ -1093,11 +1093,11 @@ SKIP: {
 {
     $_ = "abc\x{100}\x{200}\x{300}\x{380}\x{400}defg";
 
-    if (m/(.\x{300})./) {
+    if (m/(.\x{300})./p) {
 	ok(1);
-	ok( $` eq "abc\x{100}" && length($`) == 4 );
-	ok( $& eq "\x{200}\x{300}\x{380}" && length($&) == 3 );
-	ok( $' eq "\x{400}defg" && length($') == 5 );
+	ok( $^PREMATCH eq "abc\x{100}" && length($^PREMATCH) == 4 );
+	ok( $^MATCH eq "\x{200}\x{300}\x{380}" && length($^MATCH) == 3 );
+	ok( $^POSTMATCH eq "\x{400}defg" && length($^POSTMATCH) == 5 );
 	ok( $1 eq "\x{200}\x{300}" && length($1) == 2 );
     } else {
 	for (576..580) { ok(0); }
@@ -1699,55 +1699,55 @@ print "# some Unicode properties\n";
     use charnames ':full';
 
     ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-	  m/fran.ais/ &&
-	$& eq "francais" );
+	  m/fran.ais/p &&
+	$^MATCH eq "francais" );
 
     ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-	  m/fran.ais/ &&
-	$& eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
+	  m/fran.ais/p &&
+	$^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
 
     ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-	   m/fran\Cais/ &&
-        $& eq "francais" );
+	   m/fran\Cais/p &&
+        $^MATCH eq "francais" );
 
     ok( "franc\N{COMBINING CEDILLA}ais" =~
 	  m/franc\C\Cais/ ); # COMBINING CEDILLA is two bytes when encoded
 
     ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-	  m/fran\Xais/ &&
-	$& eq "francais" );
+	  m/fran\Xais/p &&
+	$^MATCH eq "francais" );
 
     ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-	  m/fran\Xais/  &&
-        $& eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
+	  m/fran\Xais/p  &&
+        $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
 
     ok( "franc\N{COMBINING CEDILLA}ais" =~
-	  m/fran\Xais/ &&
-         $& eq "franc\N{COMBINING CEDILLA}ais" );
+	  m/fran\Xais/p &&
+         $^MATCH eq "franc\N{COMBINING CEDILLA}ais" );
 
     ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-	  m/fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais/  &&
-        $& eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
+	  m/fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais/p  &&
+        $^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
 
     ok( "franc\N{COMBINING CEDILLA}ais" =~
-	  m/franc\N{COMBINING CEDILLA}ais/  &&
-        $& eq "franc\N{COMBINING CEDILLA}ais" );
+	  m/franc\N{COMBINING CEDILLA}ais/p  &&
+        $^MATCH eq "franc\N{COMBINING CEDILLA}ais" );
 
     ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/ &&
-	$& eq "francais" );
+	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+	$^MATCH eq "francais" );
 
     ok( "fran\N{LATIN SMALL LETTER C}ais" =~
-	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/ &&
-	$& eq "francais" );
+	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+	$^MATCH eq "francais" );
 
     ok( "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" =~
-	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/ &&
-	$& eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
+	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+	$^MATCH eq "fran\N{LATIN SMALL LETTER C WITH CEDILLA}ais" );
 
     ok( "franc\N{COMBINING CEDILLA}ais" =~
-	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/ &&
-	$& eq "franc\N{COMBINING CEDILLA}ais" );
+	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
+	$^MATCH eq "franc\N{COMBINING CEDILLA}ais" );
 }
 
 {
@@ -2289,7 +2289,7 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     $_ = "code:   'x' \{ '...' \}\n"; study;
 
     $_ = "code:   'x' \{ '...' \}\n"; study;
-    my @x; push @x, $& while m/'[^\']*'/gx;
+    my @x; push @x, $^MATCH while m/'[^\']*'/gxp;
     ok(join(":", @x) eq "'x':'...'",
        "[perl #17757] Parse::RecDescent triggers infinite loop");
 }
@@ -2312,8 +2312,8 @@ $_ = "x"; s/x/{func "in multiline subst"}/m;
 
 # bug RT#19049
 $_="abcdef\n";
-@x = m/./g;
-ok("abcde" eq "$`", 'RT#19049 - global match not setting $`');
+@x = m/./gp;
+ok("abcde" eq "$^PREMATCH", 'RT#19049 - global match not setting $^PREMATCH');
 
 ok("123\x{100}" =~ m/^.*1.*23\x{100}$/, 'uft8 + multiple floating substr');
 
@@ -3133,8 +3133,8 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $parens=qr/(\((?:[^()]++|(?-1))*+\))/;
     local $_='foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))';
     my ($all,$one,$two)=('','','');
-    if (m/foo $parens \s* \+ \s* bar $parens/x) {
-       $all=$&;
+    if (m/foo $parens \s* \+ \s* bar $parens/xp) {
+       $all=$^MATCH;
        $one=$1;
        $two=$2;
     }
@@ -3218,9 +3218,9 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my @words = ('word1', 'word3', 'word5');
     my $count;
     foreach my $word (@words){
-        $text =~ s/$word\s//gi; # Leave a space to seperate words in the resultant str.
+        $text =~ s/$word\s//gip; # Leave a space to seperate words in the resultant str.
         # The following block is not working.
-        if($&){
+        if($^MATCH){
             $count++;
         }
         # End bad block
@@ -3507,11 +3507,11 @@ sub kt
 # length() on captures, the numbered ones end up in Perl_magic_len
 {
     my $_ = "aoeu \x{e6}var ook";
-    m/^ \w+ \s (?<eek>\S+)/x;
+    m/^ \w+ \s (?<eek>\S+)/xp;
 
-    iseq( length($`), 0, 'length $`' );
-    iseq( length($'), 4, q[length $'] );
-    iseq( length($&), 9, 'length $&' );
+    iseq( length($^PREMATCH), 0, 'length $`' );
+    iseq( length($^POSTMATCH), 4, q[length $'] );
+    iseq( length($^MATCH), 9, 'length $&' );
     iseq( length($1), 4, 'length $1' );
     iseq( length(%+{eek}), 4, 'length $+{eek} == length $1' );
 }

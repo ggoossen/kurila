@@ -1,5 +1,7 @@
 #!./perl -na
 
+our $i;
+
 BEGIN {
     print "1..2\n";
     *ARGV = *DATA;
