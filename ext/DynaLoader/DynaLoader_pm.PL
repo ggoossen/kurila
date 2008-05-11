@@ -32,7 +32,7 @@ sub to_string {
 #
 sub _expansion {
     my ($op, $os, $expr) = @_;
-    if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg in $&"};
+    if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my ($if,$el) = ($1,$2);
         if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
