@@ -1762,24 +1762,24 @@ and if we can.
             # read/write on in, or just read, or read on STDIN.
             open( IN,      "+<", "$i" )
               || open( IN, "<", "$i" )
-              || open( IN, "<", "&STDIN" );
+              || open( IN, "<&", \*STDIN );
 
             # read/write/create/clobber out, or write/create/clobber out,
             # or merge with STDERR, or merge with STDOUT.
                  open( OUT, "+>", "$o" )
               || open( OUT, ">", "$o" )
-              || open( OUT, ">", "&STDERR" )
-              || open( OUT, ">", "&STDOUT" );    # so we don't dongle stdout
+              || open( OUT, ">&", \*STDERR )
+              || open( OUT, ">&", \*STDOUT );    # so we don't dongle stdout
 
         } ## end if ($console)
         elsif ( not defined $console ) {
 
             # No console. Open STDIN.
-            open( IN, "<", "&STDIN" );
+            open( IN, "<&", \*STDIN );
 
             # merge with STDERR, or with STDOUT.
-            open( OUT, ">",      "&STDERR" )
-              || open( OUT, ">", "&STDOUT" );    # so we don't dongle stdout
+            open( OUT, ">&",      \*STDERR )
+              || open( OUT, ">&", \*STDOUT );    # so we don't dongle stdout
             $console = 'STDIN/OUT';
         } ## end elsif (not defined $console)
 
@@ -3374,9 +3374,9 @@ reading another.
                     if ( $pager =~ m/^\|/ ) {
 
                         # Default pager is into a pipe. Redirect I/O.
-                        open( SAVEOUT, ">", "&STDOUT" )
+                        open( SAVEOUT, ">&", \*STDOUT )
                           || &warn("Can't save STDOUT");
-                        open( STDOUT, ">", "&OUT" )
+                        open( STDOUT, ">&", \*OUT )
                           || &warn("Can't redirect STDOUT");
                     } ## end if ($pager =~ /^\|/)
                     else {
@@ -3395,9 +3395,9 @@ reading another.
                         if ( $pager =~ m/^\|/ ) {
 
                             # Redirect I/O back again.
-                            open( OUT, ">", "&STDOUT" )    # XXX: lost message
+                            open( OUT, ">&", \*STDOUT )    # XXX: lost message
                               || &warn("Can't restore DB::OUT");
-                            open( STDOUT, ">", "&SAVEOUT" )
+                            open( STDOUT, ">&", \*SAVEOUT )
                               || &warn("Can't restore STDOUT");
                             close(SAVEOUT);
                         } ## end if ($pager =~ /^\|/)
