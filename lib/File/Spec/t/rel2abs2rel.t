@@ -40,11 +40,11 @@ sub safe_rel {
 # `$perl -le "print 'ok'"`. And, for portability, we can't use fork().
 sub sayok{
     my $perl = shift;
-    open(STDOUTDUP, ">", '&STDOUT');
+    open(STDOUTDUP, ">&", \*STDOUT);
     open(STDOUT, ">", "rel2abs2rel$$.tmp")
         or die "Can't open scratch file rel2abs2rel$$.tmp -- $!\n";
     system($perl, "rel2abs2rel$$.pl");
-    open(STDOUT, ">", '&STDOUTDUP');
+    open(STDOUT, ">&", \*STDOUTDUP);
     close(STDOUTDUP);
 
     local *F;
