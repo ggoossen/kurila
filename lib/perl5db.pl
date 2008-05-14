@@ -3404,7 +3404,7 @@ reading another.
                         else {
 
                             # Redirect I/O. STDOUT already safe.
-                            open( OUT, ">", "&STDOUT" )    # XXX: lost message
+                            open( OUT, ">&", \*STDOUT )    # XXX: lost message
                               || &warn("Can't restore DB::OUT");
                         }
                         next CMD;
@@ -3511,8 +3511,8 @@ our standard filehandles for input and output.
 
                     # Reopen filehandle for our output (if we can) and
                     # restore STDOUT (if we can).
-                    open( OUT, ">", "&STDOUT" ) || &warn("Can't restore DB::OUT");
-                    open( STDOUT, ">", "&SAVEOUT" )
+                    open( OUT, ">&", \*STDOUT ) || &warn("Can't restore DB::OUT");
+                    open( STDOUT, ">&", \*SAVEOUT )
                       || &warn("Can't restore STDOUT");
 
                     # Turn off pipe exception handler if necessary.
@@ -5888,15 +5888,15 @@ sub system {
 
     # We save, change, then restore STDIN and STDOUT to avoid fork() since
     # some non-Unix systems can do system() but have problems with fork().
-    open( SAVEIN, "<",  "&STDIN" )  || &warn("Can't save STDIN");
-    open( SAVEOUT, ">", "&STDOUT" ) || &warn("Can't save STDOUT");
-    open( STDIN, "<",   "&IN" )     || &warn("Can't redirect STDIN");
-    open( STDOUT, ">",  "&OUT" )    || &warn("Can't redirect STDOUT");
+    open( SAVEIN, "<&",  \*STDIN )  || &warn("Can't save STDIN");
+    open( SAVEOUT, ">&", \*STDOUT ) || &warn("Can't save STDOUT");
+    open( STDIN, "<&",   \*IN )     || &warn("Can't redirect STDIN");
+    open( STDOUT, ">&",  \*OUT )    || &warn("Can't redirect STDOUT");
 
     # XXX: using csh or tcsh destroys sigint retvals!
     system(@_);
-    open( STDIN, "<",  "&SAVEIN" )  || &warn("Can't restore STDIN");
-    open( STDOUT, ">", "&SAVEOUT" ) || &warn("Can't restore STDOUT");
+    open( STDIN, "<&",  \*SAVEIN )  || &warn("Can't restore STDIN");
+    open( STDOUT, ">&", \*SAVEOUT ) || &warn("Can't restore STDOUT");
     close(SAVEIN);
     close(SAVEOUT);
 
