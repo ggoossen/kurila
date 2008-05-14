@@ -121,6 +121,7 @@ foreach (@tests) {
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
     $pat =~ s/\$\{(\w+)\}/{eval '$'.$1}/g;
     $pat =~ s/\\n/\n/g;
+    my $keep = ($repl =~ m/\$\^MATCH/) ? 'p' : '';
     $subject = eval qq("$subject"); die "error in '$subject': $@" if $@;
     $expect  = eval qq("$expect"); die "error in '$expect': $@" if $@;
     my $todo = $qr_embed_thr && ($result =~ s/t//);
@@ -139,7 +140,7 @@ foreach (@tests) {
                 $utf8;
                 $study;
                 pos(\$subject)=0;
-                \$match = ( \$subject =~ m{$pat}g );
+                \$match = ( \$subject =~ m{$pat}{$keep}g );
                 \$got = pos(\$subject);
 EOFCODE
         }
@@ -148,7 +149,7 @@ EOFCODE
                 $utf8;
                 my \$RE = qr$pat;
                 $study;
-                \$match = (\$subject =~ m/(?:)\$RE(?:)/) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/{$keep}) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
@@ -158,7 +159,7 @@ EOFCODE
 	 	# clone the pattern the other way.
                 my \$RE = threads->new(sub \{qr$pat\})->join();
                 $study;
-                \$match = (\$subject =~ m/(?:)\$RE(?:)/) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/{$keep}) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
@@ -166,7 +167,7 @@ EOFCODE
             $code= <<EOFCODE;
                 $utf8;
                 $study;
-                \$match = (\$subject =~ $OP$pat) while \$c--;
+                \$match = (\$subject =~ $OP$pat$keep) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
