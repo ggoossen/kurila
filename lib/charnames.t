@@ -24,6 +24,8 @@ use charnames ':full';
 print "not " unless "Here\N{EXCLAMATION MARK}?" eq "Here!?";
 print "ok 1\n";
 
+our ($res, $encoded_be, $encoded_alpha, $encoded_bet, $encoded_deseng);
+
 {
   use bytes;			# TEST -utf8 can switch utf8 on
 
@@ -298,8 +300,7 @@ for (@prgs) {
 	print $ali $fil;
 	close $ali or die "Could not close $alifile: $!";
 	}
-    my $res = runperl( switches => $switch, 
-                       progfile => $tmpfile,
+    my $res = runperl( progfile => $tmpfile,
                        stderr => 1 );
     my $status = $?;
     $res =~ s/[\r\n]+$//;
@@ -314,9 +315,9 @@ for (@prgs) {
     my $pfx = ($res =~ s/^PREFIX\n//);
     my $rexp = qr{^$exp};
     if ($res =~ s/^SKIPPED\n//) {
-	print "$results\n";
+	print "$res\n";
 	}
-    elsif (($pfx and $res !~ m/^\Q$expected/) or
+    elsif (($pfx and $res !~ m/^\Q$exp/) or
 	  (!$pfx and $res !~ $rexp)) {
         print STDERR
 	    "PROG:\n$prog\n",

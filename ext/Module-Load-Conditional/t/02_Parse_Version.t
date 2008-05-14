@@ -54,26 +54,26 @@ use_ok( $Class );
 
 sub _succeed {
     return grep { m/\S/ } map { s/^\s*//; $_ } split "\n", q[
-        $VERSION = 1;
+        our $VERSION = 1;
         *VERSION = \'1.01';
-        use version; $VERSION = qv('0.0.2');
-        use version; $VERSION = qv('3.0.14');
-        ($VERSION) = '$Revision: 2.03 $' =~ m/\s(\d+\.\d+)\s/; 
-        ( $VERSION ) = sprintf '%d.%02d', q$Revision: 1.23 $ =~ m/ (\d+) \. (\d+) /gx;
+        use version; our $VERSION = qv('0.0.2');
+        use version; our $VERSION = qv('3.0.14');
+        (our $VERSION) = '$Revision: 2.03 $' =~ m/\s(\d+\.\d+)\s/; 
+        ( our $VERSION ) = sprintf '%d.%02d', q$Revision: 1.23 $ =~ m/ (\d+) \. (\d+) /gx;
         ($GD::Graph::area::VERSION) = '$Revision: 1.16.2.3 $' =~ m/\s([\d.]+)/;
         ($GD::Graph::axestype::VERSION) = '$Revision: 1.44.2.14 $' =~ m/\s([\d.]+)/;
         ($GD::Graph::colour::VERSION) = '$Revision: 1.10 $' =~ m/\s([\d.]+)/;
         ($GD::Graph::pie::VERSION) = '$Revision: 1.20.2.4 $' =~ m/\s([\d.]+)/;
         ($GD::Text::Align::VERSION) = '$Revision: 1.18 $' =~ m/\s([\d.]+)/;
-        $VERSION = qv('0.0.1');
-        use version; $VERSION = qv('0.0.3');
-        $VERSION = do { my @r = ( ( $v = q<Version value="0.20.1"> ) =~ m/\d+/g ); sprintf '%d.%02d', @r[0], int( @r[1] / 10 ) };
-        ($VERSION) = sprintf '%i.%03i', split(m/\./,('$Revision: 2.0 $' =~ m/Revision: (\S+)\s/)[0]); # $Date: 2005/11/16 02:16:00 $
-        ( $VERSION = q($Id: Tidy.pm,v 1.56 2006/07/19 23:13:33 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
-        ($VERSION) = q $Revision: 2.120 $ =~ m/([\d.]+)/;
-        ($VERSION) = q$Revision: 1.00 $ =~ m/([\d.]+)/;
-        $VERSION = "3.0.8";
-        $VERSION = '1.0.5';
+        our $VERSION = qv('0.0.1');
+        use version; our $VERSION = qv('0.0.3');
+        our $VERSION = do { my @r = ( ( my $v = q<Version value="0.20.1"> ) =~ m/\d+/g ); sprintf '%d.%02d', @r[0], int( @r[1] / 10 ) };
+        (our $VERSION) = sprintf '%i.%03i', split(m/\./,('$Revision: 2.0 $' =~ m/Revision: (\S+)\s/)[0]); # $Date: 2005/11/16 02:16:00 $
+        (our  $VERSION = q($Id: Tidy.pm,v 1.56 2006/07/19 23:13:33 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
+        (our $VERSION) = q $Revision: 2.120 $ =~ m/([\d.]+)/;
+        (our $VERSION) = q$Revision: 1.00 $ =~ m/([\d.]+)/;
+        our $VERSION = "3.0.8";
+        our $VERSION = '1.0.5';
     ];
 }
 

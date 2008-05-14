@@ -18,6 +18,9 @@ our ($printUndef, $tick, $unctrl, $subdump, $dumpReused, $bareStringify,
      $item_type, $hashDepth, $num, $globPrint, $fileno, $entry,
     $dumpDBFiles, $entry, @entry, %entry, $dumpPackages);
 
+our ($package, $skipCvGV, %subs, $val, $TotalStrings, $Strings,
+     $CompleteTotal, $usageOnly, $total, $name, @name, %stab, %name);
+
 $winsize = 80 unless defined $winsize;
 
 
@@ -467,6 +470,7 @@ sub findsubs {
 sub main::dumpvar {
     my ($package,$m,@vars) = @_;
     local(%address,$key,$val,$^W);
+    our (%stab);
     $package .= "::" unless $package =~ m/::$/;
     *stab = *{Symbol::fetch_glob("main::")};
     while ($package =~ m/(\w+?::)/g){

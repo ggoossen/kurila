@@ -39,10 +39,12 @@ isa_ok ($t0, 'Benchmark', "Ensure we can create a benchmark object");
 isa_ok(timeit(5, sub {++$foo}), 'Benchmark', "timeit CODEREF");
 is ($foo, 5, "benchmarked code was run 5 times");
 
-isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+our $bar;
+isa_ok(timeit(5, '++ our $bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
 
 # is coderef called with spurious arguments?
+my $foo;
 timeit( 1, sub { $foo = @_ });
 is ($foo, 0, "benchmarked code called without arguments");
 
@@ -354,7 +356,7 @@ sub check_graph {
 {
     select(OUT);
     my $start = times;
-    my $chart = cmpthese( -0.1, \%( a => "++\$i", b => "\$i = sqrt(\$i++)" ), "auto" ) ;
+    my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i = sqrt( our \$i++)" ), "auto" ) ;
     my $end = times;
     select(STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
@@ -376,7 +378,7 @@ sub check_graph {
 {
     select(OUT);
     my $start = times;
-    my $chart = cmpthese( -0.1, \%( a => "++\$i", b => "\$i = sqrt(\$i++)" ) ) ;
+    my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i = sqrt(our \$i++)" ) ) ;
     my $end = times;
     select(STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");

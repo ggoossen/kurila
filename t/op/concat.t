@@ -102,8 +102,7 @@ print q(1..22
     eval {"\x{1234}$2"};
     ok(!$@, "bug id 20001020.006, right");
 
-    no strict 'vars';
-
+    our $pi;
     *pi = \undef;
     # This bug existed earlier than the $2 bug, but is fixed with the same
     # patch. Without the fix this 5.7.0 would also croak:

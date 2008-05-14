@@ -2443,7 +2443,6 @@ t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
 t/op/anon_array.t		See if @( ... ) work
 t/op/anon_hash.t		See if %( ... ) work
-t/lib/1_compile.t		See if the various libraries and extensions compile
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs

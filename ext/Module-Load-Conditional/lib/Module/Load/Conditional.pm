@@ -319,6 +319,7 @@ sub _parse_version {
             package Module::Load::Conditional::_version;
             no strict;
 
+            our \$VERSION;
             local $1$2;
             \$$2=undef; do \{
                 $str
