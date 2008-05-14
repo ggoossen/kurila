@@ -2704,6 +2704,7 @@ sub parse_version {
                 "version"->import;
             \} \}
 
+            our \$VERSION;
             local $1$2;
             \$$2=undef;
             do \{

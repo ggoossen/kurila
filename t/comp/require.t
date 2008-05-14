@@ -111,8 +111,7 @@ print "ok ",$i++,"\n";
 # do FILE shouldn't see any outside lexicals
 my $x = "ok $i\n";
 write_file("bleah.do", <<EOT);
-no strict 'vars';
-\$x = "not ok $i\\n";
+our \$x = "not ok $i\\n";
 EOT
 do "bleah.do" or die $@;
 dofile();

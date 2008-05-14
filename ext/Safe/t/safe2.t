@@ -46,6 +46,7 @@ if ($@ && $@->{description} =~ m/^'?system'? trapped by operation mask/) {
 }
 
 $cpt->reval(q{
+    our ($foo, $bar);
     print $foo eq 'visible'		? "ok 2\n" : "not ok 2\n";
     print $main::foo  eq 'visible'	? "ok 3\n" : "not ok 3\n";
     print defined($bar)			? "not ok 4\n" : "ok 4\n";
@@ -109,7 +110,7 @@ print $cpt->reval("2 + 2") == 4 ? "ok 23\n" : "not ok 23\n";
 
 $cpt->mask(empty_opset);
 my $t_scalar = $cpt->reval('print wantarray ? "not ok 24\n" : "ok 24\n"');
-print $cpt->reval('@ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
+print $cpt->reval('our @ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
 my @t_array  = $cpt->reval('print wantarray ? "ok 26\n" : "not ok 26\n"; (2,3,4)');
 print @t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
 

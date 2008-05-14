@@ -3,8 +3,6 @@
 require "./test.pl";
 plan( tests => 7 );
 
-no strict 'vars';
-
 sub foo {
     $a='abcd';
     $a=~m/(.)/g;
@@ -12,11 +10,12 @@ sub foo {
 }
 
 $a=foo;
-@a=foo;
+our @a=foo;
 foo;
 foo(foo);
 
 my $before = curr_test();
+our %h;
 %h{foo} = foo;
 my $after = curr_test();
 

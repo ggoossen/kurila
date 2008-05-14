@@ -8,11 +8,11 @@ use POSIX qw(strftime setlocale LC_TIME);
 use Socket ':all';
 require Exporter;
 
-{   no strict 'vars';
-    $VERSION = '0.24';
-    @ISA = qw(Exporter);
+{
+    our $VERSION = '0.24';
+    our @ISA = qw(Exporter);
 
-    %EXPORT_TAGS = (
+    our %EXPORT_TAGS = (
         standard => \@(qw(openlog syslog closelog setlogmask)),
         extended => \@(qw(setlogsock)),
         macros => \@(
@@ -49,11 +49,11 @@ require Exporter;
         ),
     );
 
-    @EXPORT = (
+    our @EXPORT = (
         @{%EXPORT_TAGS{standard}}, 
     );
 
-    @EXPORT_OK = (
+    our @EXPORT_OK = (
         @{%EXPORT_TAGS{extended}}, 
         @{%EXPORT_TAGS{macros}}, 
     );
