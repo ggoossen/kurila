@@ -4574,8 +4574,6 @@ enum {		/* pass one of these to get_vtbl */
 				/* currently defined by vms/vmsish.h */
 
 #define HINT_BLOCK_SCOPE	0x00000100
-#define HINT_STRICT_SUBS	0x00000200 /* strict pragma */
-#define HINT_STRICT_VARS	0x00000400 /* strict pragma */
 
 /* The HINT_NEW_* constants are used by the overload pragma */
 #define HINT_NEW_INTEGER	0x00001000
@@ -4600,7 +4598,7 @@ enum {		/* pass one of these to get_vtbl */
 #define HINT_SORT_MERGESORT	0x00000002
 #define HINT_SORT_STABLE	0x00000100 /* sort styles (currently one) */
 
-#define DEFAULT_HINTS ( HINT_STRICT_SUBS | HINT_STRICT_VARS ) /* ( HINT_STRICT_REFS | HINT_STRICT_SUBS ) */
+#define DEFAULT_HINTS 0 /* ( HINT_STRICT_REFS | HINT_STRICT_SUBS ) */
 
 /* Various states of the input record separator SV (rs) */
 #define RsSNARF(sv)   (! SvOK(sv))
