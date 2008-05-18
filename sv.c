@@ -11140,59 +11140,6 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
     return SvPOKp(sv) ? SvPVX(sv) : NULL;
 }
 
-/*
-=for apidoc sv_cat_decode
-
-The encoding is assumed to be an Encode object, the PV of the ssv is
-assumed to be octets in that encoding and decoding the input starts
-from the position which (PV + *offset) pointed to.  The dsv will be
-concatenated the decoded UTF-8 string from ssv.  Decoding will terminate
-when the string tstr appears in decoding output or the input ends on
-the PV of the ssv. The value which the offset points will be modified
-to the last input position on the ssv.
-
-Returns TRUE if the terminator was found, else returns FALSE.
-
-=cut */
-
-bool
-Perl_sv_cat_decode(pTHX_ SV *dsv, SV *encoding,
-		   SV *ssv, int *offset, char *tstr, int tlen)
-{
-    dVAR;
-    bool ret = FALSE;
-
-    PERL_ARGS_ASSERT_SV_CAT_DECODE;
-
-    if (SvPOK(ssv) && SvPOK(dsv) && SvROK(encoding) && offset) {
-	SV *offsv;
-	dSP;
-	ENTER;
-	SAVETMPS;
-	save_re_context();
-	PUSHMARK(sp);
-	EXTEND(SP, 6);
-	XPUSHs(encoding);
-	XPUSHs(dsv);
-	XPUSHs(ssv);
-	offsv = newSViv(*offset);
-	mXPUSHs(offsv);
-	mXPUSHp(tstr, tlen);
-	PUTBACK;
-	call_method("cat_decode", G_SCALAR);
-	SPAGAIN;
-	ret = SvTRUE(TOPs);
-	*offset = SvIV(offsv);
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-    }
-    else
-        Perl_croak(aTHX_ "Invalid argument to sv_cat_decode");
-    return ret;
-
-}
-
 /* ---------------------------------------------------------------------
  *
  * support functions for report_uninit()
