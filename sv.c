@@ -2146,11 +2146,8 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
     dVAR;
     if (!sv)
 	return 0;
-    if (SvGMAGICAL(sv) || (SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
-	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
-	   cache IVs just in case. In practice it seems that they never
-	   actually anywhere accessible by user Perl code, let alone get used
-	   in anything other than a string context.  */
+    assert( ! (SvTYPE(sv) >= SVt_PVMG && SvVALID(sv)) ); /* FBMs are never used as ivs */
+    if (SvGMAGICAL(sv)) {
 	if (flags & SV_GMAGIC)
 	    mg_get(sv);
 	if (SvIOKp(sv))
@@ -2194,7 +2191,7 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
 		    return SvIV(tmpstr);
 		}
 	    }
-	    return PTR2IV(SvRV(sv));
+	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
 	if (SvIsCOW(sv)) {
 	    sv_force_normal_flags(sv, 0);
@@ -6199,12 +6196,9 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 		Perl_croak(aTHX_ PL_no_modify);
 	}
 	if (SvROK(sv)) {
-	    IV i;
 	    if (SvAMAGIC(sv) && AMG_CALLun(sv,inc))
 		return;
-	    i = PTR2IV(SvRV(sv));
-	    sv_unref(sv);
-	    sv_setiv(sv, i);
+	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
     flags = SvFLAGS(sv);
@@ -6362,12 +6356,9 @@ Perl_sv_dec(pTHX_ register SV *const sv)
 		Perl_croak(aTHX_ PL_no_modify);
 	}
 	if (SvROK(sv)) {
-	    IV i;
 	    if (SvAMAGIC(sv) && AMG_CALLun(sv,dec))
 		return;
-	    i = PTR2IV(SvRV(sv));
-	    sv_unref(sv);
-	    sv_setiv(sv, i);
+	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
     /* Unlike sv_inc we don't have to worry about string-never-numbers
