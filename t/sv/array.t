@@ -1,14 +1,25 @@
 #!./perl
 
-BEGIN { require './test.pl'; }
+#BEGIN { require './test.pl'; }
 
-plan (86);
+#plan (86);
 
 my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 #
 # @foo, @bar, and @ary are also used from tie-stdarray after tie-ing them
 #
 
+@ary = @(1,2,3,4,5);
+is(@ary[0], 1);
+is(@ary[4], 5);
+
+(@ary) = @(6,7,8);
+is(@ary[0], 6);
+
+(@ary) = @(6,7,8), @(9, 10);
+is(@ary[0], 9);
+
+__END__
 @ary = (1,2,3,4,5);
 is(join('',@ary), '12345');
 
@@ -265,8 +276,6 @@ is ($got, '');
 
 {
     # Bug #36211
-    no strict 'vars';
-    use vars '@array';
     for (1,2) {
 	{
 	    local our @a;

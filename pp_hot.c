@@ -940,63 +940,63 @@ PP(pp_aassign)
 	TAINT_NOT;		/* Each item stands on its own, taintwise. */
 	sv = *lelem++;
 	switch (SvTYPE(sv)) {
-	case SVt_PVAV:
-	    ary = (AV*)sv;
-	    magic = SvMAGICAL(ary) != 0;
-	    av_clear(ary);
-	    av_extend(ary, lastrelem - relem);
-	    i = 0;
-	    while (relem <= lastrelem) {	/* gobble up all the rest */
-		SV **didstore;
-		assert(*relem);
-		sv = newSVsv(*relem);
-		*(relem++) = sv;
-		didstore = av_store(ary,i++,sv);
-		if (magic) {
-		    if (SvSMAGICAL(sv))
-			mg_set(sv);
-		    if (!didstore)
-			sv_2mortal(sv);
-		}
-		TAINT_NOT;
-	    }
-	    if (PL_delaymagic & DM_ARRAY)
-		SvSETMAGIC((SV*)ary);
-	    break;
-	case SVt_PVHV: {				/* normal hash */
-		SV *tmpstr;
+/* 	case SVt_PVAV: */
+/* 	    ary = (AV*)sv; */
+/* 	    magic = SvMAGICAL(ary) != 0; */
+/* 	    av_clear(ary); */
+/* 	    av_extend(ary, lastrelem - relem); */
+/* 	    i = 0; */
+/* 	    while (relem <= lastrelem) {	/\* gobble up all the rest *\/ */
+/* 		SV **didstore; */
+/* 		assert(*relem); */
+/* 		sv = newSVsv(*relem); */
+/* 		*(relem++) = sv; */
+/* 		didstore = av_store(ary,i++,sv); */
+/* 		if (magic) { */
+/* 		    if (SvSMAGICAL(sv)) */
+/* 			mg_set(sv); */
+/* 		    if (!didstore) */
+/* 			sv_2mortal(sv); */
+/* 		} */
+/* 		TAINT_NOT; */
+/* 	    } */
+/* 	    if (PL_delaymagic & DM_ARRAY) */
+/* 		SvSETMAGIC((SV*)ary); */
+/* 	    break; */
+/* 	case SVt_PVHV: {				/\* normal hash *\/ */
+/* 		SV *tmpstr; */
 
-		hash = (HV*)sv;
-		magic = SvMAGICAL(hash) != 0;
-		hv_clear(hash);
-		firsthashrelem = relem;
+/* 		hash = (HV*)sv; */
+/* 		magic = SvMAGICAL(hash) != 0; */
+/* 		hv_clear(hash); */
+/* 		firsthashrelem = relem; */
 
-		while (relem < lastrelem) {	/* gobble up all the rest */
-		    HE *didstore;
-		    sv = *relem ? *relem : &PL_sv_no;
-		    relem++;
-		    tmpstr = newSV(0);
-		    if (*relem)
-			sv_setsv(tmpstr,*relem);	/* value */
-		    *(relem++) = tmpstr;
-		    if (gimme != G_VOID && hv_exists_ent(hash, sv, 0))
-			/* key overwrites an existing entry */
-			duplicates += 2;
-		    didstore = hv_store_ent(hash,sv,tmpstr,0);
-		    if (magic) {
-			if (SvSMAGICAL(tmpstr))
-			    mg_set(tmpstr);
-			if (!didstore)
-			    sv_2mortal(tmpstr);
-		    }
-		    TAINT_NOT;
-		}
-		if (relem == lastrelem) {
-		    do_oddball(hash, relem, firstrelem);
-		    relem++;
-		}
-	    }
-	    break;
+/* 		while (relem < lastrelem) {	/\* gobble up all the rest *\/ */
+/* 		    HE *didstore; */
+/* 		    sv = *relem ? *relem : &PL_sv_no; */
+/* 		    relem++; */
+/* 		    tmpstr = newSV(0); */
+/* 		    if (*relem) */
+/* 			sv_setsv(tmpstr,*relem);	/\* value *\/ */
+/* 		    *(relem++) = tmpstr; */
+/* 		    if (gimme != G_VOID && hv_exists_ent(hash, sv, 0)) */
+/* 			/\* key overwrites an existing entry *\/ */
+/* 			duplicates += 2; */
+/* 		    didstore = hv_store_ent(hash,sv,tmpstr,0); */
+/* 		    if (magic) { */
+/* 			if (SvSMAGICAL(tmpstr)) */
+/* 			    mg_set(tmpstr); */
+/* 			if (!didstore) */
+/* 			    sv_2mortal(tmpstr); */
+/* 		    } */
+/* 		    TAINT_NOT; */
+/* 		} */
+/* 		if (relem == lastrelem) { */
+/* 		    do_oddball(hash, relem, firstrelem); */
+/* 		    relem++; */
+/* 		} */
+/* 	    } */
+/* 	    break; */
 	default:
 	    if (SvIMMORTAL(sv)) {
 		if (relem <= lastrelem)
