@@ -4321,11 +4321,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_dbline:
 	vtable = &PL_vtbl_dbline;
 	break;
-#ifdef USE_LOCALE_COLLATE
-    case PERL_MAGIC_collxfrm:
-        vtable = &PL_vtbl_collxfrm;
-        break;
-#endif /* USE_LOCALE_COLLATE */
     case PERL_MAGIC_tied:
 	vtable = &PL_vtbl_pack;
 	break;
@@ -5796,7 +5791,7 @@ Perl_sv_eq(pTHX_ register SV *sv1, register SV *sv2)
 Compares the strings in two SVs.  Returns -1, 0, or 1 indicating whether the
 string in C<sv1> is less than, equal to, or greater than the string in
 C<sv2>. Is UTF-8 and 'use bytes' aware, handles get magic, and will
-coerce its args to strings if necessary.  See also C<sv_cmp_locale>.
+coerce its args to strings if necessary.
 
 =cut
 */
@@ -5847,130 +5842,6 @@ Perl_sv_cmp(pTHX_ register SV *const sv1, register SV *const sv2)
 
     return cmp;
 }
-
-/*
-=for apidoc sv_cmp_locale
-
-Compares the strings in two SVs in a locale-aware manner. Is UTF-8 and
-'use bytes' aware, handles get magic, and will coerce its args to strings
-if necessary.  See also C<sv_cmp>.
-
-=cut
-*/
-
-I32
-Perl_sv_cmp_locale(pTHX_ register SV *const sv1, register SV *const sv2)
-{
-    dVAR;
-#ifdef USE_LOCALE_COLLATE
-
-    char *pv1, *pv2;
-    STRLEN len1, len2;
-    I32 retval;
-
-    if (PL_collation_standard)
-	goto raw_compare;
-
-    len1 = 0;
-    pv1 = sv1 ? sv_collxfrm(sv1, &len1) : (char *) NULL;
-    len2 = 0;
-    pv2 = sv2 ? sv_collxfrm(sv2, &len2) : (char *) NULL;
-
-    if (!pv1 || !len1) {
-	if (pv2 && len2)
-	    return -1;
-	else
-	    goto raw_compare;
-    }
-    else {
-	if (!pv2 || !len2)
-	    return 1;
-    }
-
-    retval = memcmp((void*)pv1, (void*)pv2, len1 < len2 ? len1 : len2);
-
-    if (retval)
-	return retval < 0 ? -1 : 1;
-
-    /*
-     * When the result of collation is equality, that doesn't mean
-     * that there are no differences -- some locales exclude some
-     * characters from consideration.  So to avoid false equalities,
-     * we use the raw string as a tiebreaker.
-     */
-
-  raw_compare:
-    /*FALLTHROUGH*/
-
-#endif /* USE_LOCALE_COLLATE */
-
-    return sv_cmp(sv1, sv2);
-}
-
-
-#ifdef USE_LOCALE_COLLATE
-
-/*
-=for apidoc sv_collxfrm
-
-Add Collate Transform magic to an SV if it doesn't already have it.
-
-Any scalar variable may carry PERL_MAGIC_collxfrm magic that contains the
-scalar data of the variable, but transformed to such a format that a normal
-memory comparison can be used to compare the data according to the locale
-settings.
-
-=cut
-*/
-
-char *
-Perl_sv_collxfrm(pTHX_ SV *const sv, STRLEN *const nxp)
-{
-    dVAR;
-    MAGIC *mg;
-
-    PERL_ARGS_ASSERT_SV_COLLXFRM;
-
-    mg = SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_collxfrm) : (MAGIC *) NULL;
-    if (!mg || !mg->mg_ptr || *(U32*)mg->mg_ptr != PL_collation_ix) {
-	const char *s;
-	char *xf;
-	STRLEN len, xlen;
-
-	if (mg)
-	    Safefree(mg->mg_ptr);
-	s = SvPV_const(sv, len);
-	if ((xf = mem_collxfrm(s, len, &xlen))) {
-	    if (! mg) {
-#ifdef PERL_OLD_COPY_ON_WRITE
-		if (SvIsCOW(sv))
-		    sv_force_normal_flags(sv, 0);
-#endif
-		mg = sv_magicext(sv, 0, PERL_MAGIC_collxfrm, &PL_vtbl_collxfrm,
-				 0, 0);
-		assert(mg);
-	    }
-	    mg->mg_ptr = xf;
-	    mg->mg_len = xlen;
-	}
-	else {
-	    if (mg) {
-		mg->mg_ptr = NULL;
-		mg->mg_len = -1;
-	    }
-	}
-    }
-    if (mg && mg->mg_ptr) {
-	*nxp = mg->mg_len;
-	return mg->mg_ptr + sizeof(PL_collation_ix);
-    }
-    else {
-	*nxp = 0;
-	return NULL;
-    }
-}
-
-#endif /* USE_LOCALE_COLLATE */
 
 /*
 =for apidoc sv_gets
@@ -10940,14 +10811,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_hints		= proto_perl->Ihints;
 
     PL_amagic_generation	= proto_perl->Iamagic_generation;
-
-#ifdef USE_LOCALE_COLLATE
-    PL_collation_ix	= proto_perl->Icollation_ix;
-    PL_collation_name	= SAVEPV(proto_perl->Icollation_name);
-    PL_collation_standard	= proto_perl->Icollation_standard;
-    PL_collxfrm_base	= proto_perl->Icollxfrm_base;
-    PL_collxfrm_mult	= proto_perl->Icollxfrm_mult;
-#endif /* USE_LOCALE_COLLATE */
 
 #ifdef USE_LOCALE_NUMERIC
     PL_numeric_name	= SAVEPV(proto_perl->Inumeric_name);

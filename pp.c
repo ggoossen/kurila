@@ -2930,9 +2930,6 @@ PP(pp_substr)
 	tmps += pos;
 
 	sv_setpvn(TARG, tmps, rem);
-#ifdef USE_LOCALE_COLLATE
-	sv_unmagic(TARG, PERL_MAGIC_collxfrm);
-#endif
 	if (repl) {
 	    SV* repl_sv_copy = NULL;
 

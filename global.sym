@@ -370,7 +370,6 @@ Perl_get_hv
 Perl_get_cv
 Perl_get_cvn_flags
 Perl_init_i18nl10n
-Perl_new_collate
 Perl_new_ctype
 Perl_new_numeric
 Perl_set_numeric_local
@@ -496,8 +495,6 @@ Perl_sv_catsv
 Perl_sv_chop
 Perl_sv_clear
 Perl_sv_cmp
-Perl_sv_cmp_locale
-Perl_sv_collxfrm
 Perl_sv_compile_2op
 Perl_getcwd_sv
 Perl_sv_dec

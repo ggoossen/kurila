@@ -34,7 +34,6 @@
 #endif
 
 #define sv_cmp_static Perl_sv_cmp
-#define sv_cmp_locale_static Perl_sv_cmp_locale
 
 #ifndef SMALLSORT
 #define	SMALLSORT (200)

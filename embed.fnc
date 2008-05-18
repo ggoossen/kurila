@@ -468,10 +468,6 @@ p	|U32	|magic_sizepack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_wipepack	|NN SV* sv|NN MAGIC* mg
 p	|void	|magicname	|NN const char* sym|NULLOK const char* name|I32 namlen
 Ap	|void	|markstack_grow
-#if defined(USE_LOCALE_COLLATE)
-p	|int	|magic_setcollxfrm|NN SV* sv|NN MAGIC* mg
-p	|char*	|mem_collxfrm	|NN const char* s|STRLEN len|NN STRLEN* xlen
-#endif
 Afp	|SV*	|mess		|NN const char* pat|...
 Ap	|SV*	|vmess		|NN const char* pat|NULLOK va_list* args
 EXp	|void	|qerror		|NN SV* err
@@ -649,7 +645,6 @@ Apd	|HV*	|get_hv		|NN const char* name|I32 create
 Apd	|CV*	|get_cv		|NN const char* name|I32 flags
 Apd	|CV*	|get_cvn_flags	|NN const char* name|STRLEN len|I32 flags
 Ap	|int	|init_i18nl10n	|int printwarn
-Ap	|void	|new_collate	|NULLOK const char* newcoll
 Ap	|void	|new_ctype	|NN const char* newctype
 Ap	|void	|new_numeric	|NULLOK const char* newcoll
 Ap	|void	|set_numeric_local
@@ -831,10 +826,6 @@ pd	|I32	|sv_clean_all
 pd	|void	|sv_clean_objs
 Apd	|void	|sv_clear	|NN SV *const sv
 Apd	|I32	|sv_cmp		|NULLOK SV *const sv1|NULLOK SV *const sv2
-Apd	|I32	|sv_cmp_locale	|NULLOK SV *const sv1|NULLOK SV *const sv2
-#if defined(USE_LOCALE_COLLATE)
-Apd	|char*	|sv_collxfrm	|NN SV *const sv|NN STRLEN *const nxp
-#endif
 Ap	|OP*	|sv_compile_2op	|NN SV *sv|NN OP **startop \
 				|NN const char *code|NN PAD **padp
 Apd	|int	|getcwd_sv	|NN SV* sv

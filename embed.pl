@@ -132,7 +132,7 @@ sub munge_c_files () {
 	    my $f = $2;
 	    if (exists $functions->{$f}) {
 		$repl .= "aTHX_ ";
-		warn("$ARGV:$.:$`#$repl#$'");
+		die("$ARGV:#$repl");
 	    }
 	    $repl;
 	 

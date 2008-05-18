@@ -446,12 +446,6 @@
 #define magicname		Perl_magicname
 #endif
 #define markstack_grow		Perl_markstack_grow
-#if defined(USE_LOCALE_COLLATE)
-#ifdef PERL_CORE
-#define magic_setcollxfrm	Perl_magic_setcollxfrm
-#define mem_collxfrm		Perl_mem_collxfrm
-#endif
-#endif
 #define mess			Perl_mess
 #define vmess			Perl_vmess
 #if defined(PERL_CORE) || defined(PERL_EXT)
@@ -643,7 +637,6 @@
 #define get_cv			Perl_get_cv
 #define get_cvn_flags		Perl_get_cvn_flags
 #define init_i18nl10n		Perl_init_i18nl10n
-#define new_collate		Perl_new_collate
 #define new_ctype		Perl_new_ctype
 #define new_numeric		Perl_new_numeric
 #define set_numeric_local	Perl_set_numeric_local
@@ -851,10 +844,6 @@
 #endif
 #define sv_clear		Perl_sv_clear
 #define sv_cmp			Perl_sv_cmp
-#define sv_cmp_locale		Perl_sv_cmp_locale
-#if defined(USE_LOCALE_COLLATE)
-#define sv_collxfrm		Perl_sv_collxfrm
-#endif
 #define sv_compile_2op		Perl_sv_compile_2op
 #define getcwd_sv		Perl_getcwd_sv
 #define sv_dec			Perl_sv_dec
@@ -2701,12 +2690,6 @@
 #define magicname(a,b,c)	Perl_magicname(aTHX_ a,b,c)
 #endif
 #define markstack_grow()	Perl_markstack_grow(aTHX)
-#if defined(USE_LOCALE_COLLATE)
-#ifdef PERL_CORE
-#define magic_setcollxfrm(a,b)	Perl_magic_setcollxfrm(aTHX_ a,b)
-#define mem_collxfrm(a,b,c)	Perl_mem_collxfrm(aTHX_ a,b,c)
-#endif
-#endif
 #define vmess(a,b)		Perl_vmess(aTHX_ a,b)
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define qerror(a)		Perl_qerror(aTHX_ a)
@@ -2895,7 +2878,6 @@
 #define get_cv(a,b)		Perl_get_cv(aTHX_ a,b)
 #define get_cvn_flags(a,b,c)	Perl_get_cvn_flags(aTHX_ a,b,c)
 #define init_i18nl10n(a)	Perl_init_i18nl10n(aTHX_ a)
-#define new_collate(a)		Perl_new_collate(aTHX_ a)
 #define new_ctype(a)		Perl_new_ctype(aTHX_ a)
 #define new_numeric(a)		Perl_new_numeric(aTHX_ a)
 #define set_numeric_local()	Perl_set_numeric_local(aTHX)
@@ -3102,10 +3084,6 @@
 #endif
 #define sv_clear(a)		Perl_sv_clear(aTHX_ a)
 #define sv_cmp(a,b)		Perl_sv_cmp(aTHX_ a,b)
-#define sv_cmp_locale(a,b)	Perl_sv_cmp_locale(aTHX_ a,b)
-#if defined(USE_LOCALE_COLLATE)
-#define sv_collxfrm(a,b)	Perl_sv_collxfrm(aTHX_ a,b)
-#endif
 #define sv_compile_2op(a,b,c,d)	Perl_sv_compile_2op(aTHX_ a,b,c,d)
 #define getcwd_sv(a)		Perl_getcwd_sv(aTHX_ a)
 #define sv_dec(a)		Perl_sv_dec(aTHX_ a)
