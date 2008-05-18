@@ -11286,18 +11286,7 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
 	buffer[0] = gvtype;
 	buffer[1] = 0;
 
-	/* as gv_fullname4(), but add literal '^' for $^FOO names  */
-
 	gv_fullname4(name, gv, buffer, 0);
-
-	if ((unsigned int)SvPVX(name)[1] <= 26) {
-	    buffer[0] = '^';
-	    buffer[1] = SvPVX(name)[1] + 'A' - 1;
-
-	    /* Swap the 1 unprintable control character for the 2 byte pretty
-	       version - ie substr($name, 1, 1) = $buffer; */
-	    sv_insert(name, 1, 1, buffer, 2);
-	}
     }
     else {
 	CV * const cv = find_runcv(NULL);
