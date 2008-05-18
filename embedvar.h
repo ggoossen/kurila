@@ -78,11 +78,6 @@
 #define PL_checkav_save		(vTHX->Icheckav_save)
 #define PL_chopset		(vTHX->Ichopset)
 #define PL_clocktick		(vTHX->Iclocktick)
-#define PL_collation_ix		(vTHX->Icollation_ix)
-#define PL_collation_name	(vTHX->Icollation_name)
-#define PL_collation_standard	(vTHX->Icollation_standard)
-#define PL_collxfrm_base	(vTHX->Icollxfrm_base)
-#define PL_collxfrm_mult	(vTHX->Icollxfrm_mult)
 #define PL_colors		(vTHX->Icolors)
 #define PL_colorset		(vTHX->Icolorset)
 #define PL_compcv		(vTHX->Icompcv)
@@ -378,11 +373,6 @@
 #define PL_Icheckav_save	PL_checkav_save
 #define PL_Ichopset		PL_chopset
 #define PL_Iclocktick		PL_clocktick
-#define PL_Icollation_ix	PL_collation_ix
-#define PL_Icollation_name	PL_collation_name
-#define PL_Icollation_standard	PL_collation_standard
-#define PL_Icollxfrm_base	PL_collxfrm_base
-#define PL_Icollxfrm_mult	PL_collxfrm_mult
 #define PL_Icolors		PL_colors
 #define PL_Icolorset		PL_colorset
 #define PL_Icompcv		PL_compcv

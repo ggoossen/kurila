@@ -3455,11 +3455,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_regdatum:
 	result = &PL_vtbl_regdatum;
 	break;
-#ifdef USE_LOCALE_COLLATE
-    case want_vtbl_collxfrm:
-	result = &PL_vtbl_collxfrm;
-	break;
-#endif
     case want_vtbl_amagic:
 	result = &PL_vtbl_amagic;
 	break;

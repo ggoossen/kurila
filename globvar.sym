@@ -39,7 +39,6 @@ vtbl_amagic
 vtbl_amagicelem
 vtbl_backref
 vtbl_bm
-vtbl_collxfrm
 vtbl_dbline
 vtbl_defelem
 vtbl_env

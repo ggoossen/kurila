@@ -1033,11 +1033,6 @@ perl_destruct(pTHXx)
 #endif
 
     /* free locale stuff */
-#ifdef USE_LOCALE_COLLATE
-    Safefree(PL_collation_name);
-    PL_collation_name = NULL;
-#endif
-
 #ifdef USE_LOCALE_NUMERIC
     Safefree(PL_numeric_name);
     PL_numeric_name = NULL;

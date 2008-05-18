@@ -458,15 +458,6 @@ PERLVAR(Idebug,		VOL U32)	/* flags given to -D switch */
 
 PERLVARI(Iamagic_generation,	long,	0)
 
-#ifdef USE_LOCALE_COLLATE
-PERLVAR(Icollation_name,char *)		/* Name of current collation */
-PERLVAR(Icollxfrm_base,	Size_t)		/* Basic overhead in *xfrm() */
-PERLVARI(Icollxfrm_mult,Size_t,	2)	/* Expansion factor in *xfrm() */
-PERLVARI(Icollation_ix,	U32,	0)	/* Collation generation index */
-PERLVARI(Icollation_standard, bool,	TRUE)
-					/* Assume simple collation */
-#endif /* USE_LOCALE_COLLATE */
-
 
 #if defined (PERL_UTF8_CACHE_ASSERT) || defined (DEBUGGING)
 #  define PERL___I -1
