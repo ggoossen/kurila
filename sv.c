@@ -2974,6 +2974,17 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	if (dtype < SVt_PVNV)
 	    sv_upgrade(dstr, SVt_PVNV);
 	break;
+    case SVt_PVAV:
+	if (dtype != SVt_PVAV) {
+	    sv_upgrade(dstr, SVt_PVAV);
+	}
+	break;
+    case SVt_PVHV:
+	if (dtype != SVt_PVHV) {
+	    sv_upgrade(dstr, SVt_PVHV);
+	}
+	break;
+
     default:
 	{
 	const char * const type = sv_reftype(sstr,0);
@@ -3012,6 +3023,12 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     }
  end_of_first_switch:
 
+    if( dtype == SVt_PVAV ) {
+	if (stype != SVt_PVAV) {
+	    av_undef( (AV*)dstr );
+	}
+    }
+
     /* dstr may have been upgraded.  */
     dtype = SvTYPE(dstr);
     sflags = SvFLAGS(sstr);
@@ -3029,12 +3046,31 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	} else {
 	    SvOK_off(dstr);
 	}
-    } else if (dtype == SVt_PVAV || dtype == SVt_PVHV) {
-	const char * const type = sv_reftype(dstr,0);
-	if (PL_op)
-	    Perl_croak(aTHX_ "Cannot copy to %s in %s", type, OP_NAME(PL_op));
-	else
-	    Perl_croak(aTHX_ "Cannot copy to %s", type);
+    } else if (dtype == SVt_PVAV) {
+	int i;
+	int len = av_len( (AV*)sstr);
+	av_fill( (AV*)dstr, len );
+	for (i=0; i<=len; i++) {
+	    SV** val = av_fetch( (AV*)sstr, i, 0);
+	    assert(*val);
+	    SvREFCNT_inc(*val);
+	    if ( ! av_store( (AV*)dstr, i, *val) )
+		SvREFCNT_dec(*val);
+	}
+	
+    } else if (dtype == SVt_PVHV) {
+	HE* ent;
+	hv_undef( (HV*)dstr );
+	if (hv_iterinit( (HV*)sstr)) {
+
+/* 	    while ((ent = hv_iternext( (HV*) sstr))) { */
+/* 		STRLEN len; */
+/* 		char* key = HePV(ent, len); */
+/* 		SvREFCNT_inc(HeVAL(ent)); */
+/* 		if( ! hv_store( (HV*)dstr, key, len, HeVAL(ent), HeHASH(ent) ) ) */
+/* 		    SvREFCNT_dec(HeVAL(ent)); */
+/* 	    } */
+	}
     } else if (sflags & SVf_ROK) {
 	if (isGV_with_GP(dstr) && dtype == SVt_PVGV
 	    && SvTYPE(SvRV(sstr)) == SVt_PVGV) {

@@ -1403,8 +1403,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	}
 	/* FALL THROUGH */
     case OP_RV2GV:
-	if (scalar_mod_type(o, type))
-	    goto nomod;
+/* 	if (scalar_mod_type(o, type)) */
+/* 	    goto nomod; */
 	ref(cUNOPo->op_first, o->op_type);
 	/* FALL THROUGH */
     case OP_ASLICE:
@@ -1441,8 +1441,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
        PL_modcount = RETURN_UNLIMITED_NUMBER;
 	if (type == OP_REFGEN && o->op_flags & OPf_PARENS)
 	    return o;		/* Treat \(@foo) like ordinary list. */
-	if (scalar_mod_type(o, type))
-	    goto nomod;
+/* 	if (scalar_mod_type(o, type)) */
+/* 	    goto nomod; */
 	if (type == OP_LEAVESUBLV)
 	    o->op_private |= OPpMAYBE_LVSUB;
 	/* FALL THROUGH */
@@ -3588,12 +3588,12 @@ S_is_list_assignment(pTHX_ register const OP *o)
 	return FALSE;
 
     if (type == OP_LIST || flags & OPf_PARENS ||
-	type == OP_RV2AV || type == OP_RV2HV ||
+/* 	type == OP_RV2AV || type == OP_RV2HV || */
 	type == OP_ASLICE || type == OP_HSLICE)
 	return TRUE;
 
-    if (type == OP_PADAV || type == OP_PADHV)
-	return TRUE;
+/*     if (type == OP_PADAV || type == OP_PADHV) */
+/* 	return TRUE; */
 
     if (type == OP_ANONLIST || type == OP_ANONHASH)
 	return TRUE;
@@ -5501,7 +5501,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 OP *
 Perl_newANONLIST(pTHX_ OP *o)
 {
-    return convert(OP_ANONLIST, 0, o);
+    return convert(OP_ANONLIST, OPf_REF, o);
 }
 
 OP *
@@ -5589,7 +5589,7 @@ Perl_newAVREF(pTHX_ OP *o)
     else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV || o->op_type == OP_ANONLIST )) {
 	yyerror(Perl_form(aTHX_ "Array may not be used as a reference"));
     }
-    return newUNOP(OP_RV2AV, 0, scalar(o));
+    return newUNOP(OP_RV2AV, OPf_REF, scalar(o));
 }
 
 OP *
