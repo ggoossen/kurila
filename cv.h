@@ -21,7 +21,7 @@ typedef U16 cv_flags_t;
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     GV *	xcv_gv;								\
-    char *	xcv_file;							\
+    const char *	xcv_file;							\
     AV *	xcv_padlist;							\
     CV *	xcv_outside;							\
     U32		xcv_outside_seq; /* the COP sequence (at the point of our	\

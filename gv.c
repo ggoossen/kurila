@@ -192,7 +192,7 @@ Perl_newGP(pTHX_ GV *const gv)
     PERL_ARGS_ASSERT_NEWGP;
 
     if (temp_sv) {
-	file = SvPVX(temp_sv);
+	file = SvPVX_const(temp_sv);
 	len = SvCUR(temp_sv);
     } else {
 	file = "";

@@ -969,7 +969,7 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 		    ? len : (leftlen > rightlen ? leftlen : rightlen);
 	Newxz(dc, needlen + 1, char);
 	sv_usepvn_flags(sv, dc, needlen, SV_HAS_TRAILING_NUL);
-	dc = SvPVX(sv);		/* sv_usepvn() calls Renew() */
+	dc = SvPVX_mutable(sv);		/* sv_usepvn() calls Renew() */
     }
 #ifdef LIBERAL
     if (len >= sizeof(long)*4 &&

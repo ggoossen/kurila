@@ -3102,7 +3102,7 @@ PERL_CALLCONV SV*	Perl_sv_newmortal(pTHX)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV SV*	Perl_sv_newref(pTHX_ SV *const sv);
-PERL_CALLCONV char*	Perl_sv_peek(pTHX_ SV* sv);
+PERL_CALLCONV const char*	Perl_sv_peek(pTHX_ SV* sv);
 PERL_CALLCONV void	Perl_sv_pos_u2b(pTHX_ SV *const sv, I32 *const offsetp, I32 *const lenp)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SV_POS_U2B	\
@@ -3699,19 +3699,19 @@ PERL_CALLCONV void	Perl_sv_setsv_mg(pTHX_ SV *const dstr, SV *const sstr)
 PERL_CALLCONV MGVTBL*	Perl_get_vtbl(pTHX_ int vtbl_id)
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV char*	Perl_pv_display(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRLEN pvlim)
+PERL_CALLCONV const char*	Perl_pv_display(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRLEN pvlim)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_PV_DISPLAY	\
 	assert(dsv); assert(pv)
 
-PERL_CALLCONV char*	Perl_pv_escape(pTHX_ SV *dsv, char const * const str, const STRLEN count, const STRLEN max, STRLEN * const escaped, const U32 flags)
+PERL_CALLCONV const char*	Perl_pv_escape(pTHX_ SV *dsv, char const * const str, const STRLEN count, const STRLEN max, STRLEN * const escaped, const U32 flags)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_PV_ESCAPE	\
 	assert(dsv); assert(str)
 
-PERL_CALLCONV char*	Perl_pv_pretty(pTHX_ SV *dsv, char const * const str, const STRLEN count, const STRLEN max, char const * const start_color, char const * const end_color, const U32 flags)
+PERL_CALLCONV const char*	Perl_pv_pretty(pTHX_ SV *dsv, char const * const str, const STRLEN count, const STRLEN max, char const * const start_color, char const * const end_color, const U32 flags)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_PV_PRETTY	\
@@ -6176,19 +6176,19 @@ PERL_CALLCONV void	Perl_xmldump_form(pTHX_ const GV* gv)
 	assert(gv)
 
 PERL_CALLCONV void	Perl_xmldump_eval(pTHX);
-PERL_CALLCONV char*	Perl_sv_catxmlsv(pTHX_ SV *dsv, SV *ssv)
+PERL_CALLCONV const char*	Perl_sv_catxmlsv(pTHX_ SV *dsv, SV *ssv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SV_CATXMLSV	\
 	assert(dsv); assert(ssv)
 
-PERL_CALLCONV char*	Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
+PERL_CALLCONV const char*	Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SV_CATXMLPVN	\
 	assert(dsv); assert(pv)
 
-PERL_CALLCONV char*	Perl_sv_xmlpeek(pTHX_ SV* sv)
+PERL_CALLCONV const char*	Perl_sv_xmlpeek(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_XMLPEEK	\
 	assert(sv)

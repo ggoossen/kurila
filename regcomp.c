@@ -1439,7 +1439,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                         }
                         state = newstate;
                     } else {
-                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %"IVdf, uvc );
+                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %d", uvc );
 		    }
 		}
 	    }
@@ -1614,7 +1614,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                         }
                         state = trie->trans[ state + charid ].next;
                     } else {
-                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %"IVdf, uvc );
+                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %d", uvc );
                     }
                     /* charid is now 0 if we dont know the char read, or nonzero if we do */
                 }
@@ -4151,7 +4151,7 @@ reStudy:
             &data, -1, NULL, NULL,
             SCF_DO_SUBSTR | SCF_WHILEM_VISITED_POS | stclass_flag,0);
 
-	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %d\n", minlen));
+	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %"IVdf"\n", minlen));
 	
         CHECK_RESTUDY_GOTO;
 
@@ -7387,7 +7387,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
 	if (UTF)
 	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
-	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
+	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %"IVdf" - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
 	ANYOF_BITMAP_ZERO(ret);
 	listsv = newSVpvs("# comment\n");
     }
