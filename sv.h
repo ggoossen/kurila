@@ -1114,12 +1114,12 @@ the scalar's value cannot change unless written to.
 		(((XPV*)  SvANY(sv))->xpv_len = (val)); } STMT_END
 #define SvEND_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) >= SVt_PV); \
-		(SvCUR(sv) = (val) - SvPVX(sv)); } STMT_END
+		(SvCUR(sv) = (val) - SvPVX_const(sv)); } STMT_END
 
 #define SvPV_renew(sv,n) \
 	STMT_START { SvLEN_set(sv, n); \
 		SvPV_set((sv), (MEM_WRAP_CHECK_(n,char)			\
-				(char*)saferealloc((Malloc_t)SvPVX(sv), \
+				(char*)saferealloc((Malloc_t)SvPVX_mutable(sv), \
 						   (MEM_SIZE)((n)))));  \
 		 } STMT_END
 
