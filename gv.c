@@ -41,8 +41,7 @@ Perl_gv_SVadd(pTHX_ GV *gv)
 {
     PERL_ARGS_ASSERT_GV_SVADD;
 
-    if (!gv || SvTYPE((SV*)gv) != SVt_PVGV)
-	Perl_croak(aTHX_ "Bad symbol for scalar");
+    assert( SvTYPE((SV*)gv) == SVt_PVGV );
     if (!GvSV(gv))
 	GvSV(gv) = newSV(0);
     return gv;
@@ -54,8 +53,7 @@ Perl_gv_AVadd(pTHX_ register GV *gv)
 {
     PERL_ARGS_ASSERT_GV_AVADD;
 
-    if (!gv || SvTYPE((SV*)gv) != SVt_PVGV)
-	Perl_croak(aTHX_ "Bad symbol for array");
+    assert( SvTYPE((SV*)gv) == SVt_PVGV );
     if (!GvAV(gv))
 	GvAV(gv) = newAV();
     return gv;
@@ -66,8 +64,7 @@ Perl_gv_HVadd(pTHX_ register GV *gv)
 {
     PERL_ARGS_ASSERT_GV_HVADD;
 
-    if (!gv || SvTYPE((SV*)gv) != SVt_PVGV)
-	Perl_croak(aTHX_ "Bad symbol for hash");
+    assert( SvTYPE((SV*)gv) == SVt_PVGV );
     if (!GvHV(gv))
 	GvHV(gv) = newHV();
     return gv;
@@ -152,27 +149,6 @@ Perl_gv_fetchfile_flags(pTHX_ const char *const name, const STRLEN namelen,
     if (tmpbuf != smallbuf)
 	Safefree(tmpbuf);
     return gv;
-}
-
-/*
-=for apidoc gv_const_sv
-
-If C<gv> is a typeglob whose subroutine entry is a constant sub eligible for
-inlining, or C<gv> is a placeholder reference that would be promoted to such
-a typeglob, then returns the value returned by the sub.  Otherwise, returns
-NULL.
-
-=cut
-*/
-
-SV *
-Perl_gv_const_sv(pTHX_ GV *gv)
-{
-    PERL_ARGS_ASSERT_GV_CONST_SV;
-
-    if (SvTYPE(gv) == SVt_PVGV)
-	return cv_const_sv(GvCVu(gv));
-    return SvROK(gv) ? SvRV(gv) : NULL;
 }
 
 GP *
@@ -563,16 +539,13 @@ Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
 	stash = NULL;
 
     for (nend = name; *nend; nend++) {
-	if (*nend == '\'')
-	    nsplit = nend;
-	else if (*nend == ':' && *(nend + 1) == ':')
+	if (*nend == ':' && *(nend + 1) == ':')
 	    nsplit = ++nend;
     }
     if (nsplit) {
 	const char * const origname = name;
 	name = nsplit + 1;
-	if (*nsplit == ':')
-	    --nsplit;
+	--nsplit;
 	if ((nsplit - origname) == 5 && strnEQ(origname, "SUPER", 5)) {
 	    /* ->SUPER::method should really be looked up in original stash */
 	    SV * const tmpstr = sv_2mortal(Perl_newSVpvf(aTHX_ "%s::SUPER",
@@ -777,8 +750,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
     for (name_cursor = name; name_cursor < name_end; name_cursor++) {
 	if ((*name_cursor == ':' && name_cursor < name_em1
-	     && name_cursor[1] == ':')
-	    || (*name_cursor == '\'' && name_cursor[1]))
+	     && name_cursor[1] == ':'))
 	{
 	    if (!stash)
 		stash = PL_defstash;
@@ -817,9 +789,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    hv_name_set(stash, nambeg, name_cursor - nambeg, 0);
 	    }
 
-	    if (*name_cursor == ':')
-		name_cursor++;
-	    name_cursor++;
+	    name_cursor+=2;
 	    name = name_cursor;
 	    if (name == name_end)
 		return gv ? gv : (GV*)*hv_fetchs(PL_defstash, "main::", TRUE);
