@@ -4803,7 +4803,7 @@ Perl_yylex(pTHX)
 			d = s + 1;
 			while (SPACE_OR_TAB(*d))
 			    d++;
-			if (*d == ')' && (sv = gv_const_sv(gv))) {
+			if (*d == ')' && (sv = cv_const_sv(cv))) {
 #ifdef PERL_MAD
 			    if (PL_madskills) {
 				curmad('X', PL_thistoken);
@@ -4844,7 +4844,7 @@ Perl_yylex(pTHX)
 				"Ambiguous use of -%s resolved as -&%s()",
 				PL_tokenbuf, PL_tokenbuf);
 		    /* Check for a constant sub */
-		    if ((sv = gv_const_sv(gv))) {
+		    if ((sv = cv_const_sv(cv))) {
 		  its_constant:
 			SvREFCNT_dec(((SVOP*)pl_yylval.opval)->op_sv);
 			((SVOP*)pl_yylval.opval)->op_sv = SvREFCNT_inc_simple(sv);
