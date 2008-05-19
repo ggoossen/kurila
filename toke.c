@@ -1730,6 +1730,7 @@ const char *
 Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 {
     U32 uv;
+    PERL_ARGS_ASSERT_PARSE_ESCAPE;
 
     switch (*s) {
 

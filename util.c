@@ -1230,6 +1230,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     SV **const hook = warn ? &PL_warnhook : &PL_diehook;
     /* sv_2cv might call Perl_croak() or Perl_warner() */
     SV * const oldhook = *hook;
+    PERL_ARGS_ASSERT_VDIE_COMMON;
 
     if ( *hook == NULL ) {
 	const char *msg;
@@ -1341,6 +1342,7 @@ void
 Perl_die_nocontext(const char* pat, ...)
 {
     dTHX;
+    PERL_ARGS_ASSERT_DIE_NOCONTEXT;
     va_list args;
     va_start(args, pat);
     vdie(pat, &args);
@@ -1354,6 +1356,7 @@ void
 Perl_croak_nocontext(const char *pat, ...)
 {
     dTHX;
+    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
     va_list args;
     va_start(args, pat);
     vdie(pat, &args);

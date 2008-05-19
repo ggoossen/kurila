@@ -6061,7 +6061,7 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
     AV* unicode_alternate  = NULL;
 
     GET_RE_DEBUG_FLAGS_DECL;
-    PERL_ARGS_ASSERT_REG_NAMEDSEQ;
+    PERL_ARGS_ASSERT_REGCLASSFOLD_VALUE;
 
     /* Assume we are going to generate an ANYOF node. */
     ret = reganode(pRExC_state, (UTF ? ANYOFU : ANYOF), 0);
@@ -6217,6 +6217,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
     STRLEN len; /* this has various purposes throughout the code */
     bool cached = 0; /* if this is true then we shouldn't refcount dev sv_str */
     regnode *ret = NULL;
+    PERL_ARGS_ASSERT_REG_NAMEDSEQ;
     
     if (*RExC_parse != '{') {
         vFAIL("Missing braces on \\N{}");
@@ -7829,6 +7830,7 @@ S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     STRLEN numlen;
 
     GET_RE_DEBUG_FLAGS_DECL;
+    PERL_ARGS_ASSERT_REGCLASSFOLD;
 
     DEBUG_PARSE("clasfold");
 
@@ -7907,6 +7909,9 @@ S_anyof_get_swash(pTHX_ RExC_state_t *pRExC_state, regnode* ret, SV* listsv, AV*
 	AV * const av = newAV();
 	SV *rv;
 	SV *sw  = NULL;
+
+	PERL_ARGS_ASSERT_ANYOF_GET_SWASH;
+
 	/* The 0th element stores the character class description
 	 * in its textual form: used later (regexec.c:Perl_regclass_swash())
 	 * to initialize the appropriate swash (which gets stored in

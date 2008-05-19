@@ -772,6 +772,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 STATIC SV* S_dump_op_flags(pTHX_ const OP* o)
 {
     SV * const tmpsv = sv_2mortal(newSVpvs(""));
+    PERL_ARGS_ASSERT_DUMP_OP_FLAGS;
     switch (o->op_flags & OPf_WANT) {
     case OPf_WANT_VOID:
 	sv_catpv(tmpsv, ",VOID");
@@ -812,6 +813,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 {
     const OPCODE optype = o->op_type;
     SV * const tmpsv = sv_2mortal(newSVpvs(""));
+    PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE;
 
     if (PL_opargs[optype] & OA_TARGLEX) {
 	if (o->op_private & OPpTARGET_MY)
@@ -974,6 +976,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 
 static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
 {
+    PERL_ARGS_ASSERT_DUMP_OP_MAD;
 #ifndef PERL_MAD
     PERL_UNUSED_ARG(level);
     PERL_UNUSED_ARG(file);
@@ -1021,6 +1024,7 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
 static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 {
     const OPCODE optype = o->op_type;
+    PERL_ARGS_ASSERT_DUMP_OP_REST;
 
     switch (optype) {
     case OP_AELEMFAST:
