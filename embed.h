@@ -231,7 +231,6 @@
 #if defined(DUMP_FDS)
 #define dump_fds		Perl_dump_fds
 #endif
-#define dump_form		Perl_dump_form
 #define gv_dump			Perl_gv_dump
 #define op_dump			Perl_op_dump
 #define pmop_dump		Perl_pmop_dump
@@ -261,7 +260,6 @@
 #define gv_HVadd		Perl_gv_HVadd
 #define gv_IOadd		Perl_gv_IOadd
 #define gv_check		Perl_gv_check
-#define gv_efullname		Perl_gv_efullname
 #define gv_efullname4		Perl_gv_efullname4
 #define gv_fetchfile		Perl_gv_fetchfile
 #define gv_fetchfile_flags	Perl_gv_fetchfile_flags
@@ -826,7 +824,6 @@
 #define sv_nv			Perl_sv_nv
 #define sv_pvn			Perl_sv_pvn
 #define sv_pvutf8n		Perl_sv_pvutf8n
-#define sv_pvbyten		Perl_sv_pvbyten
 #define sv_true			Perl_sv_true
 #ifdef PERL_CORE
 #define sv_add_arena		Perl_sv_add_arena
@@ -871,7 +868,6 @@
 #define sv_pos_u2b		Perl_sv_pos_u2b
 #define sv_pos_b2u		Perl_sv_pos_b2u
 #define sv_pvutf8n_force	Perl_sv_pvutf8n_force
-#define sv_pvbyten_force	Perl_sv_pvbyten_force
 #define sv_recode_to_utf8	Perl_sv_recode_to_utf8
 #define sv_reftype		Perl_sv_reftype
 #define sv_replace		Perl_sv_replace
@@ -1142,7 +1138,6 @@
 #define ck_glob			Perl_ck_glob
 #define ck_grep			Perl_ck_grep
 #define ck_index		Perl_ck_index
-#define ck_join			Perl_ck_join
 #define ck_lfun			Perl_ck_lfun
 #define ck_listiob		Perl_ck_listiob
 #define ck_match		Perl_ck_match
@@ -1813,7 +1808,6 @@
 #define xmldump_all		Perl_xmldump_all
 #define xmldump_packsubs	Perl_xmldump_packsubs
 #define xmldump_sub		Perl_xmldump_sub
-#define xmldump_form		Perl_xmldump_form
 #define xmldump_eval		Perl_xmldump_eval
 #define sv_catxmlsv		Perl_sv_catxmlsv
 #define sv_catxmlpvn		Perl_sv_catxmlpvn
@@ -2469,7 +2463,6 @@
 #if defined(DUMP_FDS)
 #define dump_fds(a)		Perl_dump_fds(aTHX_ a)
 #endif
-#define dump_form(a)		Perl_dump_form(aTHX_ a)
 #define gv_dump(a)		Perl_gv_dump(aTHX_ a)
 #define op_dump(a)		Perl_op_dump(aTHX_ a)
 #define pmop_dump(a)		Perl_pmop_dump(aTHX_ a)
@@ -2500,7 +2493,6 @@
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
 #define gv_check(a)		Perl_gv_check(aTHX_ a)
-#define gv_efullname(a,b)	Perl_gv_efullname(aTHX_ a,b)
 #define gv_efullname4(a,b,c,d)	Perl_gv_efullname4(aTHX_ a,b,c,d)
 #define gv_fetchfile(a)		Perl_gv_fetchfile(aTHX_ a)
 #define gv_fetchfile_flags(a,b,c)	Perl_gv_fetchfile_flags(aTHX_ a,b,c)
@@ -3065,7 +3057,6 @@
 #define sv_nv(a)		Perl_sv_nv(aTHX_ a)
 #define sv_pvn(a,b)		Perl_sv_pvn(aTHX_ a,b)
 #define sv_pvutf8n(a,b)		Perl_sv_pvutf8n(aTHX_ a,b)
-#define sv_pvbyten(a,b)		Perl_sv_pvbyten(aTHX_ a,b)
 #define sv_true(a)		Perl_sv_true(aTHX_ a)
 #ifdef PERL_CORE
 #define sv_add_arena(a,b,c)	Perl_sv_add_arena(aTHX_ a,b,c)
@@ -3109,7 +3100,6 @@
 #define sv_pos_u2b(a,b,c)	Perl_sv_pos_u2b(aTHX_ a,b,c)
 #define sv_pos_b2u(a,b)		Perl_sv_pos_b2u(aTHX_ a,b)
 #define sv_pvutf8n_force(a,b)	Perl_sv_pvutf8n_force(aTHX_ a,b)
-#define sv_pvbyten_force(a,b)	Perl_sv_pvbyten_force(aTHX_ a,b)
 #define sv_recode_to_utf8(a,b)	Perl_sv_recode_to_utf8(aTHX_ a,b)
 #define sv_reftype(a,b)		Perl_sv_reftype(aTHX_ a,b)
 #define sv_replace(a,b)		Perl_sv_replace(aTHX_ a,b)
@@ -3376,7 +3366,6 @@
 #define ck_glob(a)		Perl_ck_glob(aTHX_ a)
 #define ck_grep(a)		Perl_ck_grep(aTHX_ a)
 #define ck_index(a)		Perl_ck_index(aTHX_ a)
-#define ck_join(a)		Perl_ck_join(aTHX_ a)
 #define ck_lfun(a)		Perl_ck_lfun(aTHX_ a)
 #define ck_listiob(a)		Perl_ck_listiob(aTHX_ a)
 #define ck_match(a)		Perl_ck_match(aTHX_ a)
@@ -4062,7 +4051,6 @@
 #define xmldump_all()		Perl_xmldump_all(aTHX)
 #define xmldump_packsubs(a)	Perl_xmldump_packsubs(aTHX_ a)
 #define xmldump_sub(a)		Perl_xmldump_sub(aTHX_ a)
-#define xmldump_form(a)		Perl_xmldump_form(aTHX_ a)
 #define xmldump_eval()		Perl_xmldump_eval(aTHX)
 #define sv_catxmlsv(a,b)	Perl_sv_catxmlsv(aTHX_ a,b)
 #define sv_catxmlpvn(a,b,c)	Perl_sv_catxmlpvn(aTHX_ a,b,c)

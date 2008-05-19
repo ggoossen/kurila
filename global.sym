@@ -110,7 +110,6 @@ Perl_dowantarray
 Perl_dump_all
 Perl_dump_eval
 Perl_dump_fds
-Perl_dump_form
 Perl_gv_dump
 Perl_op_dump
 Perl_pmop_dump
@@ -127,7 +126,6 @@ Perl_gv_AVadd
 Perl_gv_HVadd
 Perl_gv_IOadd
 Perl_gv_check
-Perl_gv_efullname
 Perl_gv_efullname3
 Perl_gv_efullname4
 Perl_gv_fetchfile
@@ -482,7 +480,6 @@ Perl_sv_uv
 Perl_sv_nv
 Perl_sv_pvn
 Perl_sv_pvutf8n
-Perl_sv_pvbyten
 Perl_sv_true
 Perl_sv_backoff
 Perl_sv_bless
@@ -521,7 +518,6 @@ Perl_sv_pos_u2b
 Perl_sv_pos_b2u
 Perl_sv_pvn_force
 Perl_sv_pvutf8n_force
-Perl_sv_pvbyten_force
 Perl_sv_recode_to_utf8
 Perl_sv_reftype
 Perl_sv_replace
@@ -637,7 +633,6 @@ Perl_sv_2pvutf8_nolen
 Perl_sv_2pvbyte_nolen
 Perl_sv_pv
 Perl_sv_pvutf8
-Perl_sv_pvbyte
 Perl_sv_utf8_encode
 Perl_sv_utf8_decode
 Perl_sv_force_normal

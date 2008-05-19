@@ -2763,6 +2763,7 @@ Perl_append_madprops(pTHX_ MADPROP* tm, OP* o, char slot)
 void
 Perl_append_madprops_pv(pTHX_ const char* v, OP* o, char slot)
 {
+    PERL_ARGS_ASSERT_APPEND_MADPROPS_PV;
     append_madprops(newMADsv(slot, newSVpv(v, 0)), o, slot);
 }
 

@@ -877,6 +877,7 @@ void
 Perl_die_where(pTHX_ SV *msv)
 {
     dVAR;
+    PERL_ARGS_ASSERT_DIE_WHERE;
     const char* message;
     STRLEN msglen;
 

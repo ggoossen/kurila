@@ -254,7 +254,6 @@ Ap	|void	|dump_eval
 #if defined(DUMP_FDS)
 Ap	|void	|dump_fds	|NN char* s
 #endif
-Ap	|void	|dump_form	|NN const GV* gv
 Ap	|void	|gv_dump	|NN GV* gv
 Ap	|void	|op_dump	|NN const OP *o
 Ap	|void	|pmop_dump	|NULLOK PMOP* pm
@@ -281,7 +280,6 @@ Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
-Ap	|void	|gv_efullname	|NN SV* sv|NN const GV* gv
 Apmb	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 Ap	|void	|gv_efullname4	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix|bool keepmain
 Ap	|GV*	|gv_fetchfile	|NN const char* name
@@ -809,7 +807,6 @@ Apd	|UV	|sv_uv		|NN SV* sv
 Apd	|NV	|sv_nv		|NN SV* sv
 Apd	|char*	|sv_pvn		|NN SV *sv|NN STRLEN *lp
 Apd	|char*	|sv_pvutf8n	|NN SV *sv|NN STRLEN *lp
-Apd	|char*	|sv_pvbyten	|NN SV *sv|NN STRLEN *lp
 Apd	|I32	|sv_true	|NULLOK SV *const sv
 pd	|void	|sv_add_arena	|NN char *const ptr|const U32 size|const U32 flags
 Apd	|int	|sv_backoff	|NN SV *const sv
@@ -858,7 +855,6 @@ Apd	|void	|sv_pos_u2b	|NULLOK SV *const sv|NN I32 *const offsetp|NULLOK I32 *con
 Apd	|void	|sv_pos_b2u	|NULLOK SV *const sv|NN I32 *const offsetp
 Amdb	|char*	|sv_pvn_force	|NN SV* sv|NULLOK STRLEN* lp
 Apd	|char*	|sv_pvutf8n_force|NN SV *const sv|NULLOK STRLEN *const lp
-Apd	|char*	|sv_pvbyten_force|NN SV *const sv|NULLOK STRLEN *const lp
 Apd	|char*	|sv_recode_to_utf8	|NN SV* sv|NN SV *encoding
 ApdR	|const char*	|sv_reftype	|NN const SV *const sv|const int ob
 Apd	|void	|sv_replace	|NN SV *const sv|NN SV *const nsv
@@ -1037,7 +1033,6 @@ ApdRmb	|char*	|sv_2pvutf8_nolen|NN SV* sv
 ApdRmb	|char*	|sv_2pvbyte_nolen|NN SV* sv
 AmdbR	|char*	|sv_pv		|NN SV *sv
 AmdbR	|char*	|sv_pvutf8	|NN SV *sv
-AmdbR	|char*	|sv_pvbyte	|NN SV *sv
 Apd	|void	|sv_utf8_encode |NN SV *const sv
 ApdM	|bool	|sv_utf8_decode |NN SV *const sv
 Apdmb	|void	|sv_force_normal|NN SV *sv
@@ -1165,7 +1160,6 @@ pR	|OP*	|ck_fun		|NN OP *o
 pR	|OP*	|ck_glob	|NN OP *o
 pR	|OP*	|ck_grep	|NN OP *o
 pR	|OP*	|ck_index	|NN OP *o
-pR	|OP*	|ck_join	|NN OP *o
 pR	|OP*	|ck_lfun	|NN OP *o
 pR	|OP*	|ck_listiob	|NN OP *o
 pR	|OP*	|ck_match	|NN OP *o
@@ -1340,9 +1334,9 @@ s	|SV *	|space_join_names_mortal|NN char *const *array
 #endif
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
-Es	|regnode*|regclassfold	|NN struct RExC_state_t *state|U32 depth
-Es	|regnode*|regclassfold_value	|NN struct RExC_state_t *state|UV value
-Es	|void   |anyof_get_swash	|NN struct RExC_state_t *state|NN regnode *ret|NN SV *listsv|NULLOK AV* unicode_alternate
+Es	|regnode*|regclassfold	|NN struct RExC_state_t *pRExC_state|U32 depth
+Es	|regnode*|regclassfold_value	|NN struct RExC_state_t *pRExC_state|UV value
+Es	|void   |anyof_get_swash	|NN struct RExC_state_t *pRExC_state|NN regnode *ret|NN SV *listsv|NULLOK AV* unicode_alternate
 Es	|regnode*|reg		|NN struct RExC_state_t *pRExC_state \
 				|I32 paren|NN I32 *flagp|U32 depth
 Es	|regnode*|reganode	|NN struct RExC_state_t *pRExC_state|U8 op \
@@ -1583,7 +1577,7 @@ s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
 sr	|char *	|write_no_mem
 #endif
 
-p	|bool	|vdie_common	|NN SV *msg|bool warn
+p	|bool	|vdie_common	|NN SV *msv|bool warn
 
 #if defined(PERL_IN_NUMERIC_C) || defined(PERL_DECL_PROT)
 sn	|NV|mulexp10	|NV value|I32 exponent
@@ -1838,7 +1832,6 @@ Mp	|void	|xmldump_vindent|I32 level|NN PerlIO *file|NN const char* pat \
 Mp	|void	|xmldump_all
 Mp	|void	|xmldump_packsubs	|NN const HV* stash
 Mp	|void	|xmldump_sub	|NN const GV* gv
-Mp	|void	|xmldump_form	|NN const GV* gv
 Mp	|void	|xmldump_eval
 Mp	|const char*	|sv_catxmlsv	|NN SV *dsv|NN SV *ssv
 Mp	|const char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len

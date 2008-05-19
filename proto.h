@@ -738,11 +738,6 @@ PERL_CALLCONV void	Perl_dump_fds(pTHX_ char* s)
 	assert(s)
 
 #endif
-PERL_CALLCONV void	Perl_dump_form(pTHX_ const GV* gv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DUMP_FORM	\
-	assert(gv)
-
 PERL_CALLCONV void	Perl_gv_dump(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_DUMP	\
@@ -835,12 +830,6 @@ PERL_CALLCONV void	Perl_gv_check(pTHX_ const HV* stash)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_CHECK	\
 	assert(stash)
-
-PERL_CALLCONV void	Perl_gv_efullname(pTHX_ SV* sv, const GV* gv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_GV_EFULLNAME	\
-	assert(sv); assert(gv)
 
 /* PERL_CALLCONV void	Perl_gv_efullname3(pTHX_ SV* sv, const GV* gv, const char* prefix)
 			__attribute__nonnull__(pTHX_1)
@@ -2946,12 +2935,6 @@ PERL_CALLCONV char*	Perl_sv_pvutf8n(pTHX_ SV *sv, STRLEN *lp)
 #define PERL_ARGS_ASSERT_SV_PVUTF8N	\
 	assert(sv); assert(lp)
 
-PERL_CALLCONV char*	Perl_sv_pvbyten(pTHX_ SV *sv, STRLEN *lp)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_SV_PVBYTEN	\
-	assert(sv); assert(lp)
-
 PERL_CALLCONV I32	Perl_sv_true(pTHX_ SV *const sv);
 PERL_CALLCONV void	Perl_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 			__attribute__nonnull__(pTHX_1);
@@ -3115,11 +3098,6 @@ PERL_CALLCONV void	Perl_sv_pos_b2u(pTHX_ SV *const sv, I32 *const offsetp)
 PERL_CALLCONV char*	Perl_sv_pvutf8n_force(pTHX_ SV *const sv, STRLEN *const lp)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_PVUTF8N_FORCE	\
-	assert(sv)
-
-PERL_CALLCONV char*	Perl_sv_pvbyten_force(pTHX_ SV *const sv, STRLEN *const lp)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SV_PVBYTEN_FORCE	\
 	assert(sv)
 
 PERL_CALLCONV char*	Perl_sv_recode_to_utf8(pTHX_ SV* sv, SV *encoding)
@@ -3795,12 +3773,6 @@ PERL_CALLCONV void	Perl_reginitcolors(pTHX);
 #define PERL_ARGS_ASSERT_SV_PVUTF8	\
 	assert(sv)
 
-/* PERL_CALLCONV char*	Perl_sv_pvbyte(pTHX_ SV *sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1); */
-#define PERL_ARGS_ASSERT_SV_PVBYTE	\
-	assert(sv)
-
 PERL_CALLCONV void	Perl_sv_utf8_encode(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_UTF8_ENCODE	\
@@ -4242,12 +4214,6 @@ PERL_CALLCONV OP*	Perl_ck_index(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CK_INDEX	\
-	assert(o)
-
-PERL_CALLCONV OP*	Perl_ck_join(pTHX_ OP *o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CK_JOIN	\
 	assert(o)
 
 PERL_CALLCONV OP*	Perl_ck_lfun(pTHX_ OP *o)
@@ -4877,22 +4843,22 @@ STATIC SV *	S_space_join_names_mortal(pTHX_ char *const *array)
 #endif
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
-STATIC regnode*	S_regclassfold(pTHX_ struct RExC_state_t *state, U32 depth)
+STATIC regnode*	S_regclassfold(pTHX_ struct RExC_state_t *pRExC_state, U32 depth)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_REGCLASSFOLD	\
-	assert(state)
+	assert(pRExC_state)
 
-STATIC regnode*	S_regclassfold_value(pTHX_ struct RExC_state_t *state, UV value)
+STATIC regnode*	S_regclassfold_value(pTHX_ struct RExC_state_t *pRExC_state, UV value)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_REGCLASSFOLD_VALUE	\
-	assert(state)
+	assert(pRExC_state)
 
-STATIC void	S_anyof_get_swash(pTHX_ struct RExC_state_t *state, regnode *ret, SV *listsv, AV* unicode_alternate)
+STATIC void	S_anyof_get_swash(pTHX_ struct RExC_state_t *pRExC_state, regnode *ret, SV *listsv, AV* unicode_alternate)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_ANYOF_GET_SWASH	\
-	assert(state); assert(ret); assert(listsv)
+	assert(pRExC_state); assert(ret); assert(listsv)
 
 STATIC regnode*	S_reg(pTHX_ struct RExC_state_t *pRExC_state, I32 paren, I32 *flagp, U32 depth)
 			__attribute__nonnull__(pTHX_1)
@@ -5619,10 +5585,10 @@ STATIC char *	S_write_no_mem(pTHX)
 
 #endif
 
-PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msg, bool warn)
+PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msv, bool warn)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_VDIE_COMMON	\
-	assert(msg)
+	assert(msv)
 
 
 #if defined(PERL_IN_NUMERIC_C) || defined(PERL_DECL_PROT)
@@ -6162,11 +6128,6 @@ PERL_CALLCONV void	Perl_xmldump_packsubs(pTHX_ const HV* stash)
 PERL_CALLCONV void	Perl_xmldump_sub(pTHX_ const GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_XMLDUMP_SUB	\
-	assert(gv)
-
-PERL_CALLCONV void	Perl_xmldump_form(pTHX_ const GV* gv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_XMLDUMP_FORM	\
 	assert(gv)
 
 PERL_CALLCONV void	Perl_xmldump_eval(pTHX);

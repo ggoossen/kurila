@@ -812,6 +812,7 @@ NV
 Perl_my_atof(pTHX_ const char* s)
 {
     NV x = 0.0;
+    PERL_ARGS_ASSERT_MY_ATOF;
     Perl_atof2(s, x);
     return x;
 }
