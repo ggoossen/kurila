@@ -94,7 +94,7 @@ num_q(register const char *s, register STRLEN slen)
 
     while (slen > 0) {
 	if (*s == '\"' || *s == '\\' || *s == '@' ||
-            *s == '$' || *s == '{' || *s == '}')
+            *s == '$' || *s == '{' || *s == '}' || *s == '%')
 	    ++ret;
 	++s;
 	--slen;
@@ -114,6 +114,7 @@ esc_q(register char *d, register const char *s, register STRLEN slen)
     while (slen > 0) {
 	switch (*s) {
 	case '\"':
+	case '%':
 	case '@':
 	case '$':
 	case '{':
@@ -169,7 +170,7 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
             backslashes++;
         } else if (k == '\'') {
             single_quotes++;
-        } else if (k == '"' || k == '$' || k == '@' || k == '{' || k == '}') {
+        } else if (k == '"' || k == '$' || k == '@' || k == '{' || k == '}' || k == '%') {
             qq_escapables++;
         } else {
             normal++;
@@ -192,7 +193,7 @@ esc_q_utf8(pTHX_ SV* sv, register const char *src, register STRLEN slen)
                 r = r + my_sprintf(r, "\\x[%02x]", (U8)*s);
                 charlen = 1;
                 continue;
-            } else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}') {
+            } else if (k == '"' || k == '\\' || k == '$' || k == '@' || k == '{' || k == '}' || k == '%') {
                 *r++ = '\\';
                 *r++ = (char)k;
             }
