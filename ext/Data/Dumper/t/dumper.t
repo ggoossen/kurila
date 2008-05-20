@@ -107,8 +107,8 @@ else {
 
 plan tests => $TMAX;
 
-is Data::Dumper->Dump(\@('{'), \@(qw(a))), '#$a = "\{";' . "\n";
-is Data::Dumper->Dumpxs(\@('{'), \@(qw(a))), '#$a = "\{";' . "\n" if $XS;
+is Data::Dumper->Dump(\@('123xyz{$@%'), \@(qw(a))), '#$a = "123xyz\{\$\@\%";' . "\n";
+is Data::Dumper->Dumpxs(\@('123xyz{$@%'), \@(qw(a))), '#$a = "123xyz\{\$\@\%";' . "\n" if $XS;
 
 #XXXif (0) {
 #############
