@@ -2009,7 +2009,6 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
 	} else if (flags & SVf_NOK) {
             NV nv;
 
-            SvIV_please(sv);
 	    if (SvIOK_notUV(sv)) {
                 iv = SvIV(sv);
                 goto integer;		/* Share code above */

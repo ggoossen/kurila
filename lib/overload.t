@@ -1,14 +1,6 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
-	print "1..0 # Skip -- Perl configured without List::Util module\n";
-	exit 0;
-    }
-}
+use TestInit;
 
 package Oscalar;
 use overload ( 
@@ -46,7 +38,7 @@ sub numify { 0 + "${@_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 548;
+use Test::More tests => 545;
 
 
 $a = Oscalar->new( "087");
@@ -956,7 +948,8 @@ unless ($aaa) {
   eval { "$x" };
   main::like($@->message, qr/reference as string/);
   main::ok($x);
-  main::ok($x+0 =~ qr/Recurse=ARRAY/);
+  eval { $x + 0 };
+  main::like($@->message, qr/Reference can't be used as a number/ );
 }
 
 # BugID 20010422.003
@@ -1349,9 +1342,10 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     is($o->[0], 1, 'int() numifies only once');
 
     my $aref = \@();
-    my $num_val = int($aref);
+    my $num_val = undef;
     my $r = bless $aref, 'numify_self';
-    is(int($r), $num_val, 'numifies to self');
+    eval { int($r) };
+    like($@->message, qr/Reference can't be used as a number/);
     is($r->[0], 1, 'int() numifies once when returning self');
 
     my $s = bless \@(), 'numify_other';
@@ -1360,28 +1354,19 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     is($s->[1][0], 1, 'returned object numifies too');
 
     my $m = bless $aref, 'numify_by_fallback';
-    is(int($m), $num_val, 'numifies to usual reference value');
-    is(abs($m), $num_val, 'numifies to usual reference value');
-    is(-$m, -$num_val, 'numifies to usual reference value');
-    is(0+$m, $num_val, 'numifies to usual reference value');
-    is($m+0, $num_val, 'numifies to usual reference value');
-    is($m+$m, 2*$num_val, 'numifies to usual reference value');
-    is(0-$m, -$num_val, 'numifies to usual reference value');
-    is(1*$m, $num_val, 'numifies to usual reference value');
-    is($m/1, $num_val, 'numifies to usual reference value');
-    is($m%100, $num_val%100, 'numifies to usual reference value');
-    is($m**1, $num_val, 'numifies to usual reference value');
+    for (sub { int($m) }, sub { -$m }, sub { 0+$m }, sub { $m+$m },
+         sub { 0-$m }, sub { 1*$m }, sub { $m/1 }, sub { $m%100 },
+         sub { $m**1 }) {
+        eval { $_->() };
+        like($@->message, qr/Reference can't be used as a number/);
+    }
 
-    is(abs($aref), $num_val, 'abs() of ref');
-    is(-$aref, -$num_val, 'negative of ref');
-    is(0+$aref, $num_val, 'ref addition');
-    is($aref+0, $num_val, 'ref addition');
-    is($aref+$aref, 2*$num_val, 'ref addition');
-    is(0-$aref, -$num_val, 'subtraction of ref');
-    is(1*$aref, $num_val, 'multiplicaton of ref');
-    is($aref/1, $num_val, 'division of ref');
-    is($aref%100, $num_val%100, 'modulo of ref');
-    is($aref**1, $num_val, 'exponentiation of ref');
+    for (sub { int($aref) }, sub { -$aref }, sub { 0+$aref }, sub { $aref+$aref },
+         sub { 0-$aref }, sub { 1*$aref }, sub { $aref/1 }, sub { $aref%100 },
+         sub { $aref**1 }) {
+        eval { $_->() };
+        like($@->message, qr/Reference can't be used as a number/);
+    }
 }
 
 # EOF

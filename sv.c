@@ -2203,8 +2203,40 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
 	}
     }
     if (!SvIOKp(sv)) {
-	if (S_sv_2iuv_common(aTHX_ sv))
-	    return 0;
+
+	if (SvNOKp(sv)) {
+	    return I_V(SvNVX(sv));
+	}
+	if (SvPOKp(sv) && SvLEN(sv)) {
+	    UV value;
+	    const int numtype
+		= grok_number(SvPVX_const(sv), SvCUR(sv), &value);
+
+	    if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT))
+		== IS_NUMBER_IN_UV) {
+		/* It's definitely an integer */
+		if (numtype & IS_NUMBER_NEG) {
+		    if (value < (UV)IV_MIN)
+			return -(IV)value;
+		} else {
+		    if (value < (UV)IV_MAX)
+			return (IV)value;
+		}
+	    }
+	    if (!numtype) {
+		if (ckWARN(WARN_NUMERIC))
+		    not_a_number(sv);
+	    }
+	    return I_V(Atof(SvPVX_const(sv)));
+	}
+	if (isGV_with_GP(sv))
+	    Perl_croak(aTHX_ "Tried to use glob as number");
+
+	if (!(SvFLAGS(sv) & SVs_PADTMP)) {
+	    if (!PL_localizing && ckWARN(WARN_UNINITIALIZED))
+		report_uninit(sv);
+	}
+	return 0;
     }
     DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2iv(%"IVdf")\n",
 	PTR2UV(sv),SvIVX(sv)));
@@ -2521,14 +2553,15 @@ Perl_sv_2num(pTHX_ register SV *const sv)
 {
     PERL_ARGS_ASSERT_SV_2NUM;
 
-    if (!SvROK(sv))
-	return sv;
-    if (SvAMAGIC(sv)) {
-	SV * const tmpsv = AMG_CALLun(sv,numer);
-	if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
-	    return sv_2num(tmpsv);
+    if (SvROK(sv)) {
+	if (SvAMAGIC(sv)) {
+	    SV * const tmpsv = AMG_CALLun(sv,numer);
+	    if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
+		return sv_2num(tmpsv);
+	}
+	Perl_croak(aTHX_ "Reference can't be used as a number");
     }
-    return sv_2mortal(newSVuv(PTR2UV(SvRV(sv))));
+    return sv;
 }
 
 /* uiv_2buf(): private routine for use by sv_2pv_flags(): print an IV or
