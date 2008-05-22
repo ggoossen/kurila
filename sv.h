@@ -1054,12 +1054,6 @@ the scalar's value cannot change unless written to.
 #define SvENDx(sv) ((PL_Sv = (sv)), SvEND(PL_Sv))
 
 
-/* Ask a scalar nicely to try to become an IV, if possible.
-   Not guaranteed to stay returning void */
-/* Macro won't actually call sv_2iv if already IOK */
-#define SvIV_please(sv) \
-	STMT_START {if (!SvIOKp(sv) && (SvNOK(sv) || SvPOK(sv))) \
-		(void) SvIV(sv); } STMT_END
 #define SvIV_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) == SVt_IV || SvTYPE(sv) >= SVt_PVIV); \
 		assert(SvTYPE(sv) != SVt_PVAV);		\
