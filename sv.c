@@ -2017,41 +2017,31 @@ Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
 	       we aren't going to call atof() below. If NVs don't preserve UVs
 	       then the value returned may have more precision than atof() will
 	       return, even though value isn't perfectly accurate.  */
-	    if ((numtype & (IS_NUMBER_IN_UV
-#ifdef NV_PRESERVES_UV
-			    | IS_NUMBER_NOT_INT
-#endif
+	    if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT
 		     )) == IS_NUMBER_IN_UV) {
-               /* This won't turn off the public IOK flag if it was set above  */
-               (void)SvIOKp_on(sv);
-
-               if (!(numtype & IS_NUMBER_NEG)) {
-		   return value;
-	       } else {
-		   /* 2s complement assumption  */
-		   if (value <= (UV)IV_MIN) {
-		       IV x = -(IV)value;
-		       return (UV)x;
-		   } else {
-		       return (UV)IV_MIN;
-		   }
-	       }
+		if (!(numtype & IS_NUMBER_NEG)) {
+		    return value;
+		} else {
+		    /* 2s complement assumption  */
+		    if (value <= (UV)IV_MIN) {
+			IV x = -(IV)value;
+			return (UV)x;
+		    } else {
+			return (UV)IV_MIN;
+		    }
+		}
 	    }
-  	    /* For !NV_PRESERVES_UV and IS_NUMBER_IN_UV and IS_NUMBER_NOT_INT we
-	       will be in the previous block to set the IV slot, and the next
-	       block to set the NV slot.  So no else here.  */
-	
   	    if (numtype) {
 		/* It wasn't an (integer that doesn't overflow the UV). */
 		NV nv = Atof(SvPVX_const(sv));
 
-		if (SvNVX(sv) < (NV)IV_MAX + 0.5) {
-		    return (UV)I_V(SvNVX(sv));
+		if (nv < (NV)IV_MAX + 0.5) {
+		    return (UV)I_V(nv);
 		} else {
-		    if (SvNVX(sv) > (NV)UV_MAX) {
+		    if (nv > (NV)UV_MAX) {
 			return UV_MAX;
 		    } else {
-			return U_V(SvNVX(sv));
+			return U_V(nv);
 		    }
 		}
 	    }
