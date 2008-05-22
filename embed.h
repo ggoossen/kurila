@@ -1421,17 +1421,6 @@
 #define del_sv			S_del_sv
 #endif
 #  endif
-#  if !defined(NV_PRESERVES_UV)
-#    ifdef DEBUGGING
-#ifdef PERL_CORE
-#define sv_2iuv_non_preserve	S_sv_2iuv_non_preserve
-#endif
-#    else
-#ifdef PERL_CORE
-#define sv_2iuv_non_preserve	S_sv_2iuv_non_preserve
-#endif
-#    endif
-#  endif
 #ifdef PERL_CORE
 #define expect_number		S_expect_number
 #endif
@@ -1451,7 +1440,6 @@
 #ifdef PERL_CORE
 #define more_sv			S_more_sv
 #define more_bodies		S_more_bodies
-#define sv_2iuv_common		S_sv_2iuv_common
 #define glob_assign_glob	S_glob_assign_glob
 #define glob_assign_ref		S_glob_assign_ref
 #define ptr_table_find		S_ptr_table_find
@@ -3662,17 +3650,6 @@
 #define del_sv(a)		S_del_sv(aTHX_ a)
 #endif
 #  endif
-#  if !defined(NV_PRESERVES_UV)
-#    ifdef DEBUGGING
-#ifdef PERL_CORE
-#define sv_2iuv_non_preserve(a,b)	S_sv_2iuv_non_preserve(aTHX_ a,b)
-#endif
-#    else
-#ifdef PERL_CORE
-#define sv_2iuv_non_preserve(a)	S_sv_2iuv_non_preserve(aTHX_ a)
-#endif
-#    endif
-#  endif
 #ifdef PERL_CORE
 #define expect_number(a)	S_expect_number(aTHX_ a)
 #endif
@@ -3692,7 +3669,6 @@
 #ifdef PERL_CORE
 #define more_sv()		S_more_sv(aTHX)
 #define more_bodies(a)		S_more_bodies(aTHX_ a)
-#define sv_2iuv_common(a)	S_sv_2iuv_common(aTHX_ a)
 #define glob_assign_glob(a,b,c)	S_glob_assign_glob(aTHX_ a,b,c)
 #define glob_assign_ref(a,b)	S_glob_assign_ref(aTHX_ a,b)
 #define ptr_table_find		S_ptr_table_find
