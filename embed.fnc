@@ -1476,13 +1476,6 @@ sR	|SV *	|varname	|NULLOK GV *gv|const char gvtype|PADOFFSET targ \
 #  ifdef DEBUGGING
 s	|void	|del_sv	|NN SV *p
 #  endif
-#  if !defined(NV_PRESERVES_UV)
-#    ifdef DEBUGGING
-s	|int	|sv_2iuv_non_preserve	|NN SV *const sv|I32 numtype
-#    else
-s	|int	|sv_2iuv_non_preserve	|NN SV *const sv
-#    endif
-#  endif
 sR	|I32	|expect_number	|NN char **const pattern
 #
 sn	|STRLEN	|sv_pos_u2b_forwards|NN const char *const start \
@@ -1502,7 +1495,6 @@ sM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
 #  endif
 s	|SV *	|more_sv
 s	|void *	|more_bodies	|const svtype sv_type
-s	|bool	|sv_2iuv_common	|NN SV *const sv
 s	|void	|glob_assign_glob|NN SV *const dstr|NN SV *const sstr \
 		|const int dtype
 s	|void	|glob_assign_ref|NN SV *const dstr|NN SV *const sstr
