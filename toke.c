@@ -5995,7 +5995,7 @@ Perl_yylex(pTHX)
 	    LOP(OP_SYSWRITE,XTERM);
 
 	case KEY_tr:
-	    Perl_croak(aTHX_ "y translation operator is removed");
+	    Perl_croak(aTHX_ "tr transliteration operator is removed");
 
 	case KEY_tell:
 	    UNI(OP_TELL);
@@ -6098,7 +6098,7 @@ Perl_yylex(pTHX)
 	    OPERATOR(OROP);
 
 	case KEY_y:
-	    Perl_croak(aTHX_ "y translation operator is removed");
+	    Perl_croak(aTHX_ "y transliteration operator is removed");
 	}
     }}
 }
