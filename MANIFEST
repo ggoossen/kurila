@@ -2697,7 +2697,6 @@ t/op/tiearray.t			See if tie for arrays works
 t/op/tiehandle.t		See if tie for handles works
 t/op/tie.t			See if tie/untie functions work
 t/op/time.t			See if time functions work
-t/op/tr.t			See if tr works
 t/op/undef.t			See if undef works
 t/op/universal.t		See if UNIVERSAL class works
 t/op/unshift.t			See if unshift works
@@ -2786,7 +2785,6 @@ t/uni/fold.t			See if Unicode folding works
 t/uni/lower.t			See if Unicode casing works
 t/uni/sprintf.t			See if Unicode sprintf works
 t/uni/title.t			See if Unicode casing works
-t/uni/tr_utf8.t			See if Unicode tr/// in utf8 works
 t/uni/upper.t			See if Unicode casing works
 t/win32/system.t		See if system works in Win*
 t/win32/system_tests		Test runner for system.t

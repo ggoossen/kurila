@@ -15,7 +15,7 @@ sub import {
 		# time for a more-detailed check-up
 		if ($sym =~ m/^\w+[[{].*[]}]$/) {
 		    die("Can't declare individual elements of hash or array");
-		} elsif (warnings::enabled() and length($sym) == 1 and $sym !~ tr/a-zA-Z//) {
+		} elsif (warnings::enabled() and length($sym) == 1 and $sym !~ m/[a-zA-Z]/) {
 		    warnings::warn("No need to declare built-in vars");
 		} else {
 		    die("'$_' is not a valid variable name");

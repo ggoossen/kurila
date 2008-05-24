@@ -246,7 +246,7 @@ sub interior_sequence {
     # When we output the text, we'll map this back.
     if ($command eq 'S') {
         s/\s{2,}/ /g;
-        tr/ /\01/;
+        s/ /\01/g;
         return $_;
     }
 
@@ -529,7 +529,7 @@ sub reformat {
 }
 
 # Output text to the output device.
-sub output { @_[1] =~ tr/\01/ /; print { @_[0]->output_handle } @_[1] }
+sub output { @_[1] =~ s/\01/ /g; print { @_[0]->output_handle } @_[1] }
 
 
 ############################################################################

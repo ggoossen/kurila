@@ -24,7 +24,7 @@ sub num_equal {
           print "# Expected $right\n";
           if (!defined $left) {
             print "# Got undef\n";
-          } elsif ($left !~ tr/0-9//c) {
+          } elsif ($left !~ m/[^0-9]/) {
             print "# Got $left\n";
           } else {
             $left =~ s/([^-a-zA-Z0-9_+])/{sprintf "\\\%03o", ord $1}/g;

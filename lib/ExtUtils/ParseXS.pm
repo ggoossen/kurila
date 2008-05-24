@@ -1622,7 +1622,7 @@ sub fetch_para {
     $Prefix  = defined($3) ? $3 : ''; # keep -w happy
     $Prefix = quotemeta $Prefix ;
     ($Module_cname = $Module) =~ s/\W/_/g;
-    ($Packid = $Package) =~ tr/:/_/;
+    ($Packid = $Package) =~ s/:/_/g;
     $Packprefix = $Package;
     $Packprefix .= "::" if $Packprefix ne "";
     $lastline = "";
@@ -1743,7 +1743,7 @@ sub generate_init {
       if defined %defaults{$var};
     return;
   }
-  $type =~ tr/:/_/ unless $hiertype;
+  $type =~ s/:/_/g unless $hiertype;
   blurt("Error: No INPUT definition for type '$type', typekind '%type_kind{$type}' found"), return
     unless defined %input_expr{$tk} ;
   $expr = %input_expr{$tk};
@@ -1874,7 +1874,7 @@ sub map_type {
   my($type, $varname) = @_;
   
   # C++ has :: in types too so skip this
-  $type =~ tr/:/_/ unless $hiertype;
+  $type =~ s/:/_/g unless $hiertype;
   $type =~ s/^array\(([^,]*),(.*)\).*/$1 */s;
   if ($varname) {
     if ($varname && $type =~ m/ \( \s* \* (?= \s* \) ) /xg) {

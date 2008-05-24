@@ -273,7 +273,7 @@ sub auto_path {
 
     # Try absolute path name.
     if ($^O eq 'MacOS') {
-	(my $malldir = $calldir) =~ tr#/#:#;
+	(my $malldir = $calldir) =~ s!/!:!g;
 	$path =~ s#^(.*)$malldir\.pm\z#$1auto:$malldir:#s;
     } else {
 	$path =~ s#^(.*)$calldir\.pm\z#$1auto/$calldir/#;

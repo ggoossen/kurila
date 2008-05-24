@@ -347,7 +347,7 @@ print "ok 74\n";
 my $names = do "unicore/Name.pl";
 print defined $names ? "ok 75\n" : "not ok 75\n";
 if (ord('A') == 65) { # as on ASCII or UTF-8 machines
-  my $non_ascii = $names =~ tr/\0-\177//c;
+  my $non_ascii = $names =~ s/[^\0-\177]//g;
   print $non_ascii ? "not ok 76 # $non_ascii\n" : "ok 76\n";
 } else {
   print "ok 76\n";

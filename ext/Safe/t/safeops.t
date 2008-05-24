@@ -98,7 +98,6 @@ match		m/foo/
 qr		qr/foo/
 subst		s/foo/bar/
 substcont	SKIP (set by optimizer)
-trans		y:z:t:
 sassign		$x = $y
 aassign		@x = @y
 chop		chop @foo

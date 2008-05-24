@@ -51,7 +51,7 @@ $i = 0;		# stop -w complaints
 while (($key,$value) = each(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i]
         && (($key cmp $value) +> 0)) {
-	$key =~ y/a-z/A-Z/;
+	$key =~ s/([a-z])/{uc($1)}/g;
 	$i++ if $key eq $value;
     }
 }

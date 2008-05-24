@@ -57,7 +57,7 @@ if ($max_uv1 ne $max_uv2 or $big_iv +> $max_uv1 or $max_uv1 == $max_uv_less3) {
   print "\n";
   exit 0;
 }
-if ($max_uv_less3 =~ tr/0-9//c) {
+if ($max_uv_less3 =~ s/[^0-9]//g) {
   print "1..0 # skipped: this perl stringifies large unsigned integers using E notation\n";
   exit 0;
 }

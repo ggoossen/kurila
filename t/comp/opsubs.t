@@ -15,7 +15,7 @@ This test verifies this behavior for nine different operators.
 #use Test::More tests => 36;
 BEGIN { require "./test.pl" }
 
-plan tests => 36;
+plan tests => 28;
 
 sub m  { return "m-".shift }
 sub q  { return "q-".shift }
@@ -24,8 +24,6 @@ sub qr { return "qr-".shift }
 sub qw { return "qw-".shift }
 sub qx { return "qx-".shift }
 sub s  { return "s-".shift }
-sub tr { return "tr-".shift }
-sub y  { return "y-".shift }
 
 # m operator
 can_ok( 'main', "m" );
@@ -80,20 +78,6 @@ eval "s('unqualified')";
 like( $@->{description}, qr/^Substitution replacement not terminated/, "s('unqualified') doesn't work" );
 is( main::s('main'), "s-main", "main::s() is func" );
 is( &s('amper'), "s-amper", "&s() is func" );
-
-# tr operator
-can_ok( 'main', "tr" );
-eval "tr('unqualified')";
-like( $@->{description}, qr/^Transliteration replacement not terminated/, "tr('unqualified') doesn't work" );
-is( main::tr('main'), "tr-main", "main::tr() is func" );
-is( &tr('amper'), "tr-amper", "&tr() is func" );
-
-# y operator
-can_ok( 'main', "y" );
-eval "y('unqualified')";
-like( $@->{description}, qr/^Transliteration replacement not terminated/, "y('unqualified') doesn't work" );
-is( main::y('main'), "y-main", "main::y() is func" );
-is( &y('amper'), "y-amper", "&y() is func" );
 
 =pod
 

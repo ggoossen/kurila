@@ -203,7 +203,7 @@ sub _read_program {
   close(SOURCEFILE);
 
   foreach my $x (@{%Program_Lines{$file}})
-   { $x =~ tr/\cm\cj\n\r//d }
+   { $x =~ s/[\cm\cj\n\r]//g }
 
   unshift @{%Program_Lines{$file}}, '';
   return 1;
@@ -456,7 +456,7 @@ sub _complain {
            $diag ? " ($diag)" : (), "\n";
 
         _diff_complain( $result, $expected, $detail, $prefix )
-          if defined($expected) and 2 +< ($expected =~ tr/\n//);
+          if defined($expected) and 2 +< ($expected =~ m/(\n)/g);
     }
 
     if(defined %Program_Lines{ %$detail{file} }[ %$detail{line} ]) {

@@ -775,7 +775,7 @@ sub make_col {
 			if ($skipped||=0) {
 				$bulleted = ($skipped =~ m/\n/);
 				$skipped=~s/\r\Z//;
-				$skipped = ($skipped=~tr/\r//);
+				$skipped = ($skipped=~s/(\r)//g);
 				push @col, ("") x $skipped;
 				last if $tabular && $bulleted && @col;
 			}
@@ -1055,7 +1055,7 @@ sub make_underline {
 }
 
 sub linecount($) {
-	return tr/\n// + (m/[^\n]\z/?1:0) for @_;
+	return @(m/(\n)/g) + (m/[^\n]\z/?1:0) for @_;
 }
 
 use warnings::register;

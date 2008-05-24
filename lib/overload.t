@@ -356,11 +356,10 @@ EOF
   m'try it';
   s'first part'second part';
   s/yet another/tail here/;
-  tr/A-Z/a-z/;
 }
 is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
- q second part s tail here s A-Z tr a-z tr");
+ q second part s tail here s");
 is("@qr1", "b\\b qq .\\. qq try it qq first part qq yet another qq");
 is($res, 1);
 is($a, "_<oups

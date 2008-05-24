@@ -20,7 +20,7 @@ my $Perl = which_perl();
 
 $| = 1;
 
-open(PIPE, "|-", "-") || exec $Perl, '-pe', 'tr/YX/ko/';
+open(PIPE, "|-", "-") || exec $Perl, '-pe', 's/Y/k/g; s/X/o/g';
 
 printf PIPE "Xk \%d - open |- || exec\n", curr_test();
 next_test();
@@ -103,7 +103,7 @@ SKIP: {
             close WRITER;
             while( ~< *READER) {
                 s/^not //;
-                y/A-Z/a-z/;
+                s/([A-Z])/{lc($1)}/g;
                 print;
             }
             close READER;     # avoid zombies
