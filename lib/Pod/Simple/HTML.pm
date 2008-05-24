@@ -636,8 +636,8 @@ sub section_escape {
 
 sub section_name_tidy {
   my($self, $section) = @_;
-  $section =~ tr/ /_/;
-  $section =~ tr/\x[00]-\x[1F]\x[80]-\x[9F]//d; # drop crazy characters
+  $section =~ s/ /_/g;
+  $section =~ s/\x[00]-\x[1F]\x[80]-\x[9F]//g; # drop crazy characters
   $section = $self->unicode_escape_url($section);
   $section = '_' unless length $section;
   return $section;

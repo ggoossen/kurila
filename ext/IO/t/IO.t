@@ -94,7 +94,7 @@ if ( -d $fakedir or mkpath( $fakedir ))
 {
 	if (open( OUT, ">", "$fakemod"))
 	{
-		(my $package = <<'		END_HERE') =~ tr/\t//d;
+		(my $package = <<'		END_HERE') =~ s/\t//g;
 		package IO::fakemod;
 
 		sub import { die "Do not import!\n" }

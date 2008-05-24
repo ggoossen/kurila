@@ -4596,7 +4596,7 @@ enum {		/* pass one of these to get_vtbl */
 #define HINT_SORT_MERGESORT	0x00000002
 #define HINT_SORT_STABLE	0x00000100 /* sort styles (currently one) */
 
-#define DEFAULT_HINTS 0 /* ( HINT_STRICT_REFS | HINT_STRICT_SUBS ) */
+#define DEFAULT_HINTS 0
 
 /* Various states of the input record separator SV (rs) */
 #define RsSNARF(sv)   (! SvOK(sv))

@@ -85,7 +85,7 @@ elsif(defined $pid)
   $pipe->reader;
   my $stdin = bless \*STDIN, "IO::Handle";
   $stdin->fdopen($pipe,"r");
-  exec $^X, '-pne', 'tr/YX/ko/';
+  exec $^X, '-pne', 's/Y/k/g; s/X/o/g';
  }
 else
  {

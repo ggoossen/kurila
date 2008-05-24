@@ -252,7 +252,7 @@ my $results;
     $got = $out->read();
     # Remove any warnings about having too few iterations.
     $got =~ s/\(warning:[^\)]+\)//gs;
-    is ($got =~ tr/ \t\n//c, 0, "format 'none' should suppress output");
+    ok ($got !~ m/[^ \t\n]/, "format 'none' should suppress output");
 }
 my $graph_dissassembly =
     qr!^[ \t]+(\S+)[ \t]+(\w+)[ \t]+(\w+)[ \t]*		# Title line

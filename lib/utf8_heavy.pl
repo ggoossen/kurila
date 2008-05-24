@@ -98,8 +98,8 @@ sub SWASHNEW_real {
 	    require "unicore/PVA.pl";
 	    if ($type =~ m/^([\w\s]+)[:=]\s*(.*)/) {
 		my ($enum, $val) = (lc $1, lc $2);
-		$enum =~ tr/ _-//d;
-		$val =~ tr/ _-//d;
+		$enum =~ s/[ _-]//g;
+		$val =~ s/[ _-]//g;
 
 		my $pa = %PropertyAlias{$enum} ? $enum : %PA_reverse{$enum};
 		my $f = %PropValueAlias{$pa}{$val} ? $val : %PVA_reverse{$pa}{lc $val};
@@ -112,7 +112,7 @@ sub SWASHNEW_real {
 	    }
 	    else {
 		my $t = lc $type;
-		$t =~ tr/ _-//d;
+		$t =~ s/[ _-]//g;
 
 		if (%PropValueAlias{gc}{$t} or %PropValueAlias{sc}{$t}) {
 		    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}{$t}.pl";

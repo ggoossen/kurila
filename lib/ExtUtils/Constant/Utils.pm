@@ -40,7 +40,7 @@ sub C_stringify {
   return unless defined $_;
   # grr 5.6.1
   die "Wide character in '$_' intended as a C identifier"
-    if tr/\0-\377// != length;
+    if m/[^\0-\377]/;
   s/\\/\\\\/g;
   s/([\"\'])/\\$1/g;	# Grr. fix perl mode.
   s/\n/\\n/g;		# Ensure newlines don't end up in octal

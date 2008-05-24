@@ -97,7 +97,7 @@ sub compile {
       or die "error building $cf->{dlext} file from '%args{source}'";
   }
 
-  (my $out = %spec{output}) =~ tr/'"//d;
+  (my $out = %spec{output}) =~ s/'|"//g;
   return $out;
 }
 
@@ -177,7 +177,7 @@ sub link {
     $self->normalize_filespecs( %spec{$opt} );
   }
 
-  (my $def_base = %spec{def_file}) =~ tr/'"//d;
+  (my $def_base = %spec{def_file}) =~ s/'|"//g;
   $def_base =~ s/\.def$//;
   $self->prelink( dl_name => %args{module_name},
                   dl_file => $def_base,
@@ -188,7 +188,7 @@ sub link {
     $self->do_system( @$cmd );
   }
 
-  %spec{output} =~ tr/'"//d;
+  %spec{output} =~ s/'|"//g;
   return wantarray
     ? grep defined, %spec{[qw[output manifest implib explib dbg_file def_file map_file base_file]]}
     : %spec{output};
@@ -201,7 +201,7 @@ sub normalize_filespecs {
     if ( ref $spec eq 'ARRAY') {
       $self->normalize_filespecs( map {\$_} grep defined, @$spec )
     } elsif ( ref $spec eq 'SCALAR' ) {
-      $$spec =~ tr/"//d if $$spec;
+      $$spec =~ s/"//g if $$spec;
       next unless $$spec;
       $$spec = '"' . File::Spec->canonpath($$spec) . '"';
     } elsif ( ref $spec eq '' ) {

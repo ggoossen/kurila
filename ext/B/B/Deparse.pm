@@ -3157,7 +3157,7 @@ sub check_proto {
 		      return "&";
 		  }
 	    } elsif (substr($chr, 0, 1) eq "\\") {
-		$chr =~ tr/\\[]//d;
+		$chr =~ s/[\\\[\]]//g;
 		if ($arg->name =~ m/^s?refgen$/ and
 		    !null($real = $arg->first) and
 		    ($chr =~ m/\$/ && is_scalar($real->first)
@@ -3435,7 +3435,7 @@ sub escape_extended_re {
     my($str) = @_;
     $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1}/g;
     $str =~ s/([[:^print:]])/{
-	($1 =~ y! \t\n!!) ? $1 : sprintf("\\\%03o", ord($1))}/g;
+	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1))}/g;
     $str =~ s/\n/\n\f/g;
     return $str;
 }

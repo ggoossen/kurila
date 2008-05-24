@@ -389,7 +389,7 @@ sub _canon_cat(@)				# @path -> path
 	       : "";
     my $path   = join "\\", $first, @_;
 
-    $path =~ tr#\\/#\\\\#s;		# xx/yy --> xx\yy & xx\\yy --> xx\yy
+    $path =~ s#[\\/]+#\\#g;		# xx/yy --> xx\yy & xx\\yy --> xx\yy
 
     					# xx/././yy --> xx/yy
     $path =~ s{(?:

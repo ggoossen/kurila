@@ -226,7 +226,7 @@ sub dump_names {
     if ($type eq $default_type
         # grr 5.6.1
         and length $_->{name}
-        and length $_->{name} == ($_->{name} =~ tr/A-Za-z0-9_//)
+        and length $_->{name} == @($_->{name} =~ m/([A-Za-z0-9_])/g)
         and !defined ($_->{macro}) and !defined ($_->{value})
         and !defined ($_->{default}) and !defined ($_->{pre})
         and !defined ($_->{post}) and !defined ($_->{def_pre})
@@ -455,9 +455,7 @@ sub switch_clause {
   foreach (@safe_names) {
     die sprintf "Name '$_' is length \%d, not $namelen", length
       unless length == $namelen;
-    # Argh. 5.6.1
-    # next unless tr/A-Za-z0-9_//c;
-    next if tr/A-Za-z0-9_// == length;
+    next unless m/[^A-Za-z0-9_]/;
     $_ = '"' . perl_stringify ($_) . '"';
     # Ensure that the enclosing C comment doesn't end
     # by turning */  into *" . "/

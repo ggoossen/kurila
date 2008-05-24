@@ -112,7 +112,7 @@ sub hostname {
     || croak "Cannot get host name of local machine";  
 
     # remove garbage 
-    $host =~ tr/\0\r\n//d;
+    $host =~ s/[\0\r\n]//g;
     $host;
   }
 }

@@ -135,7 +135,7 @@ sub compare2 {
     ok 1;
     return 0;
   } elsif( do{
-    for (@out[0], @out[1]) { tr/ //d; };
+    for (@out[0], @out[1]) { s/[ ]//g; };
     @out[0] eq @out[1];
   }){
     print "# Differ only in whitespace.\n";

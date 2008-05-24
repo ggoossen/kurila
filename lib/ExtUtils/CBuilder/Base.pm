@@ -140,7 +140,7 @@ sub have_compiler {
 sub lib_file {
   my ($self, $dl_file) = @_;
   $dl_file =~ s/\.[^.]+$//;
-  $dl_file =~ tr/"//d;
+  $dl_file =~ s/"//g;
   return "$dl_file.$self->{config}{dlext}";
 }
 
@@ -148,7 +148,7 @@ sub lib_file {
 sub exe_file {
   my ($self, $dl_file) = @_;
   $dl_file =~ s/\.[^.]+$//;
-  $dl_file =~ tr/"//d;
+  $dl_file =~ s/"//g;
   return "$dl_file$self->{config}{_exe}";
 }
 

@@ -85,7 +85,7 @@ my $line = ~< *INHERIT;
 close INHERIT or die qq{close $fd: $!};
 print $line
 CHILD_PROG
-$Child_prog =~ tr/\n//d;
+$Child_prog =~ s/\n//g;
 
 plan(tests => 22);
 
@@ -104,7 +104,7 @@ sub test_not_inherited {
     # at least not on Tru64.
     # cmp_ok( $rc, '!=', 0,
     #     "child return code=$rc (non-zero means cannot inherit fd=$expected_fd)" );
-    cmp_ok( $out =~ tr/\n//, '==', 1,
+    cmp_ok( $out =~ m/(\n)/g, '==', 1,
         "child stdout: has 1 newline (rc=$rc, should be non-zero)" );
     is( $out, "childfd=$expected_fd\n", 'child stdout: fd' );
 }
@@ -118,7 +118,7 @@ sub test_inherited {
     cmp_ok( $rc, '==', 0,
         "child return code=$rc (zero means inherited fd=$expected_fd ok)" );
     my @lines = split(m/^/, $out);
-    cmp_ok( $out =~ tr/\n//, '==', 2, 'child stdout: has 2 newlines' );
+    cmp_ok( $out =~ m/(\n)/g, '==', 2, 'child stdout: has 2 newlines' );
     cmp_ok( scalar(@lines),  '==', 2, 'child stdout: split into 2 lines' );
     is( @lines[0], "childfd=$expected_fd\n", 'child stdout: fd' );
     is( @lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );

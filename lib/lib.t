@@ -54,7 +54,7 @@ BEGIN { use_ok('Yup') }
 BEGIN {
     if ($^O eq 'MacOS') {
 	for ($Lib_Dir, $Arch_Dir) {
-	    tr|/|:|;
+	    s|/|:|g;
 	    $_ .= ":" unless m/:$/;
 	    $_ = ":$_" unless m/^:/; # we know this path is relative
 	}
