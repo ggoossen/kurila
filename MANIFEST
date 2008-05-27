@@ -712,12 +712,6 @@ ext/Sys/Syslog/win32/PerlLog_dll.uu	Sys::Syslog extension Win32 related file
 ext/Sys/Syslog/win32/PerlLog.mc	Sys::Syslog extension Win32 related file
 ext/Sys/Syslog/win32/PerlLog_RES.uu	Sys::Syslog extension Win32 related file
 ext/Sys/Syslog/win32/Win32.pm	Sys::Syslog extension Win32 related file
-ext/Text/Soundex/Changes	Changelog for Text::Soundex
-ext/Text/Soundex/Makefile.PL	Text::Soundex extension makefile writer
-ext/Text/Soundex/README		README for Text::Soundex
-ext/Text/Soundex/Soundex.pm	Text::Soundex extension Perl module
-ext/Text/Soundex/Soundex.xs	Text::Soundex extension external subroutines
-ext/Text/Soundex/t/Soundex.t	test for Text::Soundex
 ext/threads/hints/hpux.pl	Hint file for HPUX
 ext/threads/hints/linux.pl	Hint file for Linux
 ext/threads/Makefile.PL		ithreads
