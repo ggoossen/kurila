@@ -45,14 +45,6 @@ Use of uninitialized value in ref-to-glob cast at - line 3.
 Can't use string ("") as a symbol ref while "strict refs" in use at - line 3.
 ########
 # pp.c
-use warnings 'uninitialized';
-$x = undef; $y = $$x;
-no warnings 'uninitialized' ;
-$u = undef; $v = $$u;
-EXPECT
-Can't use an undefined value as a SCALAR reference at - line 3.
-########
-# pp.c
 use warnings 'misc' ;
 my $a = \%( 1,2,3);
 no warnings 'misc' ;
@@ -79,6 +71,7 @@ EXPECT
 Constant subroutine foo undefined at - line 4.
 ########
 # pp.c
+our ($foo, $bar);
 use warnings 'misc';
 $foo = sub () { 3 };
 undef &$foo;
@@ -86,7 +79,7 @@ no warnings 'misc';
 $bar = sub () { 4 };
 undef &$bar;
 EXPECT
-Constant subroutine (anonymous) undefined at - line 4.
+Constant subroutine (anonymous) undefined at - line 5.
 ########
 # pp.c
 use utf8 ;

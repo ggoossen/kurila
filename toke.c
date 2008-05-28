@@ -6205,28 +6205,6 @@ S_pending_ident(pTHX)
         }
     }
 
-    /*
-       Whine if they've said @foo in a doublequoted string,
-       and @foo isn't a variable we can find in the symbol
-       table.
-    */
-    if (pit == '@' && PL_lex_state != LEX_NORMAL && !PL_lex_brackets) {
-        GV *const gv = gv_fetchpvn_flags(PL_tokenbuf + 1, tokenbuf_len - 1, 0,
-					 SVt_PVAV);
-        if ((!gv || ((PL_tokenbuf[0] == '@') ? !GvAV(gv) : !GvHV(gv)))
-		&& ckWARN(WARN_AMBIGUOUS)
-		/* DO NOT warn for @- and @+ */
-		&& !( PL_tokenbuf[2] == '\0' &&
-		    ( PL_tokenbuf[1] == '-' || PL_tokenbuf[1] == '+' ))
-	   )
-        {
-            /* Downgraded from fatal to warning 20000522 mjd */
-            Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
-                        "Possible unintended interpolation of %s in string",
-                         PL_tokenbuf);
-        }
-    }
-
     /* build ops for a bareword */
     pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, newSVpvn(PL_tokenbuf + 1,
 						      tokenbuf_len - 1));

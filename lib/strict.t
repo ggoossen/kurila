@@ -1,7 +1,10 @@
 #!./perl
 
-our $pragma_name = "strict";
-require "../t/lib/common.pl";
+BEGIN { require './test.pl' };
+plan tests => 1;
+use strict;
+
+ok 1;
 
 # eval qq(use strict 'garbage');
 # like($@->{description}, qr/^Unknown 'strict' tag\(s\) 'garbage'/);

@@ -109,9 +109,9 @@ Octal number > 037777777777 non-portable at - line 5.
 ########
 # util.c
 use warnings;
-$x = 1;
+my $x = 1;
 if ($x) {
-    print $y;
+    print $main::y;
 }
 EXPECT
 Name "main::y" used only once: possible typo at - line 5.
@@ -119,10 +119,10 @@ Use of uninitialized value $y in print at - line 4.
 ########
 # util.c
 use warnings;
-$x = 1;
+my $x = 1;
 if ($x) {
     $x++;
-    print $y;
+    print $main::y;
 }
 EXPECT
 Name "main::y" used only once: possible typo at - line 6.
@@ -130,11 +130,11 @@ Use of uninitialized value $y in print at - line 6.
 ########
 # util.c
 use warnings;
-$x = 0;
+my $x = 0;
 if ($x) {
     print "1\n";
 } elsif (!$x) {
-    print $y;
+    print $main::y;
 } else {
     print "0\n";
 }
@@ -144,12 +144,12 @@ Use of uninitialized value $y in print at - line 4.
 ########
 # util.c
 use warnings;
-$x = 0;
+my $x = 0;
 if ($x) {
     print "1\n";
 } elsif (!$x) {
     $x++;
-    print $y;
+    print $main::y;
 } else {
     print "0\n";
 }

@@ -56,7 +56,7 @@ checkOptree ( name => 'sort our @a',
 2  <;> nextstate(main 1 -e:1) v:{
 3  <0> pushmark s
 4  <#> gv[*a] s
-5  <1> rv2av[t2] lK/1
+5  <1> rv2av[t2] lK/OURINTR,1
 6  <@> sort vK
 7  <@> leave[1 ref] vKP/REFC
 EOT_EOT
@@ -69,8 +69,8 @@ EOT_EOT
 # 7  <@> leave[1 ref] vKP/REFC
 EONT_EONT
 
-checkOptree ( name	=> 'sub {@a = sort @a}',
-	      code	=> sub {@a = sort @a},
+checkOptree ( name	=> 'sub {our @a = sort @a}',
+	      code	=> sub {our @a = sort @a},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -82,7 +82,7 @@ checkOptree ( name	=> 'sub {@a = sort @a}',
 6  <@> sort lK
 7  <0> pushmark s
 8  <#> gv[*a] s
-9  <1> rv2av[t2] lKRM*/1
+9  <1> rv2av[t2] lKRM*/OURINTR,1
 a  <2> aassign[t5] KS/COMMON
 b  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
@@ -94,7 +94,7 @@ EOT_EOT
 # 6  <@> sort lK
 # 7  <0> pushmark s
 # 8  <$> gv(*a) s
-# 9  <1> rv2av[t1] lKRM*/1
+# 9  <1> rv2av[t1] lKRM*/OURINTR,1
 # a  <2> aassign[t3] KS/COMMON
 # b  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT

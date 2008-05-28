@@ -44,7 +44,7 @@ EXPECT
 (?=a)* matches null string many times in regex; marked by <-- HERE in m/(?=a)* <-- HERE / at - line 4.
 ########
 # regcomp.c [S_regatom]
-$x = '\m' ;
+my $x = '\m' ;
 use warnings 'regexp' ;
 $a =~ m/a$x/ ;
 no warnings 'regexp' ;
