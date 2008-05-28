@@ -11,6 +11,16 @@ package dumpvar;
 
 # Won't dump symbol tables and contents of debugged files by default
 
+our ($printUndef, $tick, $unctrl, $subdump, $dumpReused, $bareStringify,
+     $winsize, %address, $v, $noticks, $quoteHighBit, $arrayDepth, $short,
+     $compactDump, $veryCompact, $tArrayDepth, $shortmore, $sp, %v, @v,
+     $s, $m, $value, $key, @sortKeys, $address, $more, $tHashDepth, $start_part,
+     $item_type, $hashDepth, $num, $globPrint, $fileno, $entry,
+    $dumpDBFiles, $entry, @entry, %entry, $dumpPackages);
+
+our ($package, $skipCvGV, %subs, $val, $TotalStrings, $Strings,
+     $CompleteTotal, $usageOnly, $total, $name, @name, %stab, %name);
+
 $winsize = 80 unless defined $winsize;
 
 
@@ -250,7 +260,7 @@ sub unwrap {
 	  if (@$v) {
 	    $short = $sp . "0..@{$v}-1  " . 
 	      join(" ", 
-		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} ($[..$tArrayDepth)
+		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} (0..$tArrayDepth)
 		  ) . "$shortmore";
 	  } else {
 	    $short = $sp . "empty array";
@@ -261,7 +271,7 @@ sub unwrap {
 	#  print "$short\n";
 	#  return;
 	#}
-	for $num ($[ .. $tArrayDepth) {
+	for $num (0 .. $tArrayDepth) {
 	    return if $DB::signal;
 	    print "$sp$num  ";
 	    if (exists $v->[$num]) {
@@ -460,6 +470,7 @@ sub findsubs {
 sub main::dumpvar {
     my ($package,$m,@vars) = @_;
     local(%address,$key,$val,$^W);
+    our (%stab);
     $package .= "::" unless $package =~ m/::$/;
     *stab = *{Symbol::fetch_glob("main::")};
     while ($package =~ m/(\w+?::)/g){

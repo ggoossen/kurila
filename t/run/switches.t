@@ -18,7 +18,7 @@ use Config;
 # due to a bug in VMS's piping which makes it impossible for runperl()
 # to emulate echo -n (ie. stdin always winds up with a newline), these 
 # tests almost totally fail.
-$TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
+our $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
 
 my $r;
 my @tmpfiles = ();
@@ -137,6 +137,7 @@ SKIP: {
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -s
+our ($x, $y);
 BEGIN { print $x,$y; exit }
 SWTEST
     close $f or die "Could not close: $!";
@@ -154,6 +155,7 @@ SKIP: {
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
     print $f <<'SWTEST';
 #!perl -sn
+our $x;
 BEGIN { print $x; exit }
 SWTEST
     close $f or die "Could not close: $!";

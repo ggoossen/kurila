@@ -8,27 +8,17 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
+use TestInit;
+
 BEGIN {
-    chdir 't' if -d 't';
-    if (%ENV{PERL_CORE}) {
-        @INC = '../lib';
-    } else {
-        unshift (@INC, '../blib/lib');
-    }
-    unshift (@INC, '../blib/lib');
     $| = 1;
     print "1..43\n";
-}
-
-END {
-    print "not ok 1\n" unless $loaded;
 }
 
 use Pod::Man;
 use charnames ':full';
 use utf8;
 
-$loaded = 1;
 print "ok 1\n";
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";

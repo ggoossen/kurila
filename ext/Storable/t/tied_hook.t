@@ -6,6 +6,8 @@
 #  in the README file that comes with the distribution.
 #
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -13,7 +15,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -27,7 +28,7 @@ use Storable qw(freeze thaw);
 
 print "1..25\n";
 
-($scalar_fetch, $array_fetch, $hash_fetch) = (0, 0, 0);
+our ($scalar_fetch, $array_fetch, $hash_fetch) = (0, 0, 0);
 
 package TIED_HASH;
 
@@ -151,9 +152,9 @@ package main;
 $a = 'toto';
 $b = \$a;
 
-$c = tie %hash, 'TIED_HASH';
-$d = tie @array, 'TIED_ARRAY';
-tie $scalar, 'TIED_SCALAR';
+my $c = tie my %hash, 'TIED_HASH';
+my $d = tie my @array, 'TIED_ARRAY';
+tie my $scalar, 'TIED_SCALAR';
 
 $scalar = 'foo';
 %hash{'attribute'} = 'plain value';
@@ -162,41 +163,42 @@ $scalar = 'foo';
 @array[2] = dump::view(\@array);
 @array[3] = "plaine scalaire";
 
-@tied = (\$scalar, \@array, \%hash);
-%a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
-@a = ('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
-	$b, \$a, $a, $c, \$c, \%a, \@array, \%hash, \@tied);
+my @tied = (\$scalar, \@array, \%hash);
+my %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
+my @a = ('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
+         $b, \$a, $a, $c, \$c, \%a, \@array, \%hash, \@tied);
 
+my $f;
 ok 1, defined($f = freeze(\@a));
 
-$dumped = &dump(\@a);
+my $dumped = &dump(\@a);
 ok 2, 1;
 
-$root = thaw($f);
+my $root = thaw($f);
 ok 3, defined $root;
 
-$got = &dump($root);
+my $got = &dump($root);
 ok 4, 1;
 
 ok 5, $got eq $dumped;
 
-$g = freeze($root);
+my $g = freeze($root);
 ok 6, length($f) == length($g);
 
 # Ensure the tied items in the retrieved image work
-@old = ($scalar_fetch, $array_fetch, $hash_fetch);
-@tied = ($tscalar, $tarray, $thash) = @{$root->[@$root-1]};
-@type = qw(SCALAR  ARRAY  HASH);
+my @old = ($scalar_fetch, $array_fetch, $hash_fetch);
+@tied = our ($tscalar, $tarray, $thash) = @{$root->[@$root-1]};
+my @type = qw(SCALAR  ARRAY  HASH);
 
 ok 7, tied $$tscalar;
 ok 8, tied @{$tarray};
 ok 9, tied %{$thash};
 
-@new = ($$tscalar, $tarray->[0], $thash->{'attribute'});
+our @new = ($$tscalar, $tarray->[0], $thash->{'attribute'});
 @new = ($scalar_fetch, $array_fetch, $hash_fetch);
 
 # Tests 10..15
-for ($i = 0; $i +< @new; $i++) {
+for (my $i = 0; $i +< @new; $i++) {
 	ok 10 + 2*$i, @new[$i] == @old[$i] + 1;		# Tests 10,12,14
 	ok 11 + 2*$i, ref @tied[$i] eq @type[$i];	# Tests 11,13,15
 }
@@ -206,6 +208,7 @@ ok 17, $tarray->[3] eq 'plaine scalaire';
 ok 18, $thash->{'attribute'} eq 'plain value';
 
 # Ensure hooks were called
+our ($scalar_hook1, $scalar_hook2, $array_hook1, $array_hook2, $hash_hook1, $hash_hook2);
 ok 19, ($scalar_hook1 && $scalar_hook2);
 ok 20, ($array_hook1 && $array_hook2);
 ok 21, ($hash_hook1 && $hash_hook2);

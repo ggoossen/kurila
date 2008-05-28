@@ -287,7 +287,7 @@ EOT
 	$_ = ~< *$script;
 	close($script) unless ($type eq 'deparse');
 	if ($::with_utf16) {
-	    $_ =~ tr/\0//d;
+	    $_ =~ s/\0//g;
 	}
 	my $switch;
 	if (m/#!.*\bperl.*\s-\w*([tT])/) {

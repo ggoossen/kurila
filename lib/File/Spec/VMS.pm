@@ -45,7 +45,8 @@ sub canonpath {
       else          { return vmsify($path);  }
     }
     else {
-	$path =~ tr/<>/[]/;			# < and >       ==> [ and ]
+	$path =~ s/</[/g;
+        $path =~ s/>/]/g;			# < and >       ==> [ and ]
 	$path =~ s/\]\[\./\.\]\[/g;		# ][.		==> .][
 	$path =~ s/\[000000\.\]\[/\[/g;		# [000000.][	==> [
 	$path =~ s/\[000000\./\[/g;		# [000000.	==> [
@@ -264,7 +265,8 @@ sub splitdir {
     my($self,$dirspec) = @_;
     my @dirs = ();
     return @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
-    $dirspec =~ tr/<>/[]/;			# < and >	==> [ and ]
+    $dirspec =~ s/</[/g;
+    $dirspec =~ s/>/]/g;			# < and >	==> [ and ]
     $dirspec =~ s/\]\[\./\.\]\[/g;		# ][.		==> .][
     $dirspec =~ s/\[000000\.\]\[/\[/g;		# [000000.][	==> [
     $dirspec =~ s/\[000000\./\[/g;		# [000000.	==> [

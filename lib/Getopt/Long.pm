@@ -672,7 +672,7 @@ sub GetOptionsFromArray($@) {
 		    if ( @$argv ) {
 			if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
 			    $arg = shift(@$argv);
-			    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
+			    $arg =~ s/_//g if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
 			    ($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
 			      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 			    next;
@@ -689,7 +689,7 @@ sub GetOptionsFromArray($@) {
 		# Any more args?
 		if ( @$argv && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
 		    $arg = shift(@$argv);
-		    $arg =~ tr/_//d if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
+		    $arg =~ s/_//g if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
 		    ($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
 		      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 		    next;
@@ -1141,7 +1141,7 @@ sub FindOption ($$$$$) {
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
 	elsif ( $arg =~ m/^$o_valid$/si ) {
-	    $arg =~ tr/_//d;
+	    $arg =~ s/_//g;
 	    $arg = ($type eq 'o' && $arg =~ m/^0/) ? oct($arg) : 0+$arg;
 	}
 	else {
@@ -1182,13 +1182,13 @@ sub FindOption ($$$$$) {
 	my $o_valid = PAT_FLOAT;
 	if ( $bundling && defined $rest &&
 	     $rest =~ m/^($key_valid)($o_valid)(.*)$/s ) {
-	    $arg =~ tr/_//d;
+	    $arg =~ s/_//g;
 	    ($key, $arg, $rest) = ($1, $2, $+);
 	    chop($key) if $key;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
 	elsif ( $arg =~ m/^$o_valid$/ ) {
-	    $arg =~ tr/_//d;
+	    $arg =~ s/_//g;
 	}
 	else {
 	    if ( defined $optarg || $mand ) {

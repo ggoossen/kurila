@@ -12,19 +12,6 @@
 # This file tests several known-error cases relating to STORABLE_attach, in
 # which Storable should (correctly) throw errors.
 
-sub BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
 
 use Storable ();
 use Test::More tests => 9;
@@ -58,7 +45,7 @@ is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first
 
 package Foo;
 
-@order = ();
+our @order = ();
 
 sub STORABLE_freeze {
 	my ($self, $clone) = @_;
@@ -85,7 +72,7 @@ sub STORABLE_thaw {
 package Bar;
 
 BEGIN {
-@ISA = 'Foo';
+our @ISA = 'Foo';
 }
 
 1;

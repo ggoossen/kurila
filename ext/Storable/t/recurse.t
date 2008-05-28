@@ -6,6 +6,8 @@
 #  in the README file that comes with the distribution.
 #  
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -13,7 +15,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -31,7 +32,7 @@ package OBJ_REAL;
 
 use Storable qw(freeze thaw);
 
-@x = ('a', 1);
+my @x = ('a', 1);
 
 sub make { bless \@(), shift }
 
@@ -111,9 +112,9 @@ package OBJ_REAL2;
 
 use Storable qw(freeze thaw);
 
-$MAX = 20;
-$recursed = 0;
-$hook_called = 0;
+my $MAX = 20;
+my $recursed = 0;
+my $hook_called = 0;
 
 sub make { bless \@(), shift }
 

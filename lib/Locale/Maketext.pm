@@ -73,7 +73,7 @@ sub numf {
    #  backtrack so it un-eats the rightmost three, and then we
    #  insert the comma there.
 
-  $num =~ tr<.,><,.> if ref($handle) and $handle->{'numf_comma'};
+  $num =~ s<(.,)><{$1 eq ',' ? '.' : ','}>g if ref($handle) and $handle->{'numf_comma'};
    # This is just a lame hack instead of using Number::Format
   return $num;
 }
@@ -93,7 +93,7 @@ sub language_tag {
   my $it = ref(@_[0]) || @_[0];
   return undef unless $it =~ m/([^':]+)(?:::)?$/s;
   $it = lc($1);
-  $it =~ tr<_><->;
+  $it =~ s<_><->g;
   return $it;
 }
 
@@ -307,8 +307,9 @@ sub _langtag_munging {
     @languages =  # final bit of processing to turn them into classname things
       map {
         my $it = $_;  # copy
-        $it =~ tr<-A-Z><_a-z>; # lc, and turn - to _
-        $it =~ tr<_a-z0-9><>cd;  # remove all but a-z0-9_
+        $it = lc($it);
+        $it =~ s<-><_>g; # lc, and turn - to _
+        $it =~ s<[^_a-z0-9]><>g;  # remove all but a-z0-9_
         $it;
       } @languages
     ;

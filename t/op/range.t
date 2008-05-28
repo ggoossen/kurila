@@ -240,7 +240,6 @@ foreach my $ii (-3 .. 3) {
             if (! defined($first)) {
                 $first = $_;
             }
-            $last = $_;
             last if ($lim++ +> 100);
         }
     };
@@ -321,7 +320,6 @@ foreach my $ii (-3 .. 3) {
             if (! defined($first)) {
                 $first = $_;
             }
-            $last = $_;
             last if ($lim++ +> 100);
         }
     };

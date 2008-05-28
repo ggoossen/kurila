@@ -310,12 +310,10 @@ PP(pp_eq)
     }
 #endif
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
 	/* Unless the left argument is integer in range we are going
 	   to have to use NV maths. Hence only attempt to coerce the
 	   right argument if we know the left is integer.  */
-      SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    const bool auvok = SvUOK(TOPm1s);
 	    const bool buvok = SvUOK(TOPs);
@@ -512,7 +510,6 @@ PP(pp_add)
        unsigned code below is actually shorter than the old code. :-)
     */
 
-    SvIV_please(svr);
     if (SvIOK(svr)) {
 	/* Unless the left argument is integer in range we are going to have to
 	   use NV maths. Hence only attempt to coerce the right argument if
@@ -529,7 +526,6 @@ PP(pp_add)
 	       lots of code to speed up what is probably a rarish case.  */
 	} else {
 	    /* Left operand is defined, so is it IV? */
-	    SvIV_please(svl);
 	    if (SvIOK(svl)) {
 		if ((auvok = SvUOK(svl)))
 		    auv = SvUVX(svl);
@@ -828,42 +824,42 @@ PP(pp_rv2av)
 	/* The guts of pp_rv2av, with no intenting change to preserve history
 	   (until such time as we get tools that can do blame annotation across
 	   whitespace changes.  */
-    if (gimme == G_ARRAY) {
-	const I32 maxarg = AvFILL(av) + 1;
-	(void)POPs;			/* XXXX May be optimized away? */
-	EXTEND(SP, maxarg);
-	if (SvRMAGICAL(av)) {
-	    U32 i;
-	    for (i=0; i < (U32)maxarg; i++) {
-		SV ** const svp = av_fetch(av, i, FALSE);
-		/* See note in pp_helem, and bug id #27839 */
-		SP[i+1] = svp
-		    ? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
-		    : &PL_sv_undef;
+	if (gimme == G_ARRAY) {
+	    const I32 maxarg = AvFILL(av) + 1;
+	    (void)POPs;			/* XXXX May be optimized away? */
+	    EXTEND(SP, maxarg);
+	    if (SvRMAGICAL(av)) {
+		U32 i;
+		for (i=0; i < (U32)maxarg; i++) {
+		    SV ** const svp = av_fetch(av, i, FALSE);
+		    /* See note in pp_helem, and bug id #27839 */
+		    SP[i+1] = svp
+			? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
+			: &PL_sv_undef;
+		}
 	    }
+	    else {
+		Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	    }
+	    SP += maxarg;
 	}
-	else {
-	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	else if (gimme == G_SCALAR) {
+	    dTARGET;
+	    const I32 maxarg = AvFILL(av) + 1;
+	    SETi(maxarg);
 	}
-	SP += maxarg;
-    }
-    else if (gimme == G_SCALAR) {
-	dTARGET;
-	const I32 maxarg = AvFILL(av) + 1;
-	SETi(maxarg);
-    }
     } else {
 	/* The guts of pp_rv2hv  */
-    if (gimme == G_ARRAY) { /* array wanted */
-	*PL_stack_sp = sv;
-	return do_kv();
-    }
-    else if (gimme == G_SCALAR) {
-	dTARGET;
-    TARG = Perl_hv_scalar(aTHX_ (HV*)sv);
-	SPAGAIN;
-	SETTARG;
-    }
+	if (gimme == G_ARRAY) { /* array wanted */
+	    *PL_stack_sp = sv;
+	    return do_kv();
+	}
+	else if (gimme == G_SCALAR) {
+	    dTARGET;
+	    TARG = Perl_hv_scalar(aTHX_ (HV*)sv);
+	    SPAGAIN;
+	    SETTARG;
+	}
     }
     RETURN;
 }
@@ -1226,8 +1222,8 @@ PP(pp_match)
        /g matches against large strings.  So far a solution to this problem
        appears to be quite tricky.
        Test for the unsafe vars are TODO for now. */
-    if ((  !global && RX_NPARENS(rx)) 
-	    || SvTEMP(TARG) || PL_sawampersand ||
+    if (( /* !global  && */ RX_NPARENS(rx)) 
+	    || SvTEMP(TARG) ||
 	    (RX_EXTFLAGS(rx) & (RXf_EVAL_SEEN|RXf_PMf_KEEPCOPY)))
 	r_flags |= REXEC_COPY_STR;
     if (SvSCREAM(TARG))
@@ -1249,7 +1245,6 @@ play_it_again:
 	if (!s)
 	    goto nope;
 	if ( (RX_EXTFLAGS(rx) & RXf_CHECK_ALL)
-	     && !PL_sawampersand
 	     && !(RX_EXTFLAGS(rx) & RXf_PMf_KEEPCOPY)
 	     && ((RX_EXTFLAGS(rx) & RXf_NOSCAN)
 		 || !((RX_EXTFLAGS(rx) & RXf_INTUIT_TAIL)
@@ -1366,7 +1361,7 @@ yup:					/* Confirmed by INTUIT */
 	RX_SUBLEN(rx) = strend - truebase;
 	goto gotcha;
     }
-    if (PL_sawampersand || RX_EXTFLAGS(rx) & RXf_PMf_KEEPCOPY) {
+    if (RX_EXTFLAGS(rx) & RXf_PMf_KEEPCOPY) {
 	I32 off;
 #ifdef PERL_OLD_COPY_ON_WRITE
 	if (SvIsCOW(TARG) || (SvFLAGS(TARG) & CAN_COW_MASK) == CAN_COW_FLAGS) {
@@ -2005,7 +2000,7 @@ PP(pp_subst)
 	pm = PL_curpm;
 	rx = PM_GETRE(pm);
     }
-    r_flags = (RX_NPARENS(rx) || SvTEMP(TARG) || PL_sawampersand
+    r_flags = (RX_NPARENS(rx) || SvTEMP(TARG)
 	    || (RX_EXTFLAGS(rx) & (RXf_EVAL_SEEN|RXf_PMf_KEEPCOPY)) )
 	       ? REXEC_COPY_STR : 0;
     if (SvSCREAM(TARG))
@@ -2020,7 +2015,6 @@ PP(pp_subst)
 	    goto nope;
 	/* How to do it in subst? */
 /*	if ( (RX_EXTFLAGS(rx) & RXf_CHECK_ALL)
-	     && !PL_sawampersand
 	     && !(RX_EXTFLAGS(rx) & RXf_KEEPCOPY)
 	     && ((RX_EXTFLAGS(rx) & RXf_NOSCAN)
 		 || !((RX_EXTFLAGS(rx) & RXf_INTUIT_TAIL)

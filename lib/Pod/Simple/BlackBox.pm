@@ -76,7 +76,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
 
     if( $self->{'line_count'}++ ) {
-      ($line = $source_line) =~ tr/\n\r//d;
+      ($line = $source_line) =~ s/[\n\r]//g;
        # If we don't have two vars, we'll end up with that there
        # tr/// modding the (potentially read-only) original source line!
     
@@ -86,7 +86,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       if( ($line = $source_line) =~ s/^\xEF\xBB\xBF//s ) {
         DEBUG and print "UTF-8 BOM seen.  Faking a '=encoding utf8'.\n";
         $self->_handle_encoding_line( "=encoding utf8" );
-        $line =~ tr/\n\r//d;
+        $line =~ s/[\n\r]//g;
         
       } elsif( $line =~ s/^\xFE\xFF//s ) {
         DEBUG and print "Big-endian UTF-16 BOM seen.  Aborting parsing.\n";
@@ -115,7 +115,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       } else {
         DEBUG +> 2 and print "First line is BOM-less.  Faking a '=encoding latin1'.\n";
         $self->_handle_encoding_line( "=encoding latin1" );
-        ($line = $source_line) =~ tr/\n\r//d;
+        ($line = $source_line) =~ s/[\n\r]//g;
       }
     }
 
@@ -309,11 +309,11 @@ sub _handle_encoding_line {
 
     # Look for a near match:
     my $norm = lc($e);
-    $norm =~ tr[-_][]d;
+    $norm =~ s/[-_]//g;
     my $n;
     foreach my $enc (@supported) {
       $n = lc($enc);
-      $n =~ tr[-_][]d;
+      $n =~ s/[-_]//g;
       next unless $n eq $norm;
       $suggestion = "  (Maybe \"$e\" should be \"$enc\"?)";
       last;

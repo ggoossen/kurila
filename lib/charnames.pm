@@ -297,9 +297,9 @@ sub vianame
   $txt = do "unicore/Name.pl" unless $txt;
 
   my $pos = index $txt, "\t\t$arg\n";
-  if ($[ +<= $pos) {
+  if ($pos +>= 0) {
     my $posLF = rindex $txt, "\n", $pos;
-    (my $code = substr $txt, $posLF + 1, 6) =~ tr/\t//d;
+    (my $code = substr $txt, $posLF + 1, 6) =~ s/\t//g;
     return %vianame{$arg} = CORE::hex $code;
 
     # If $pos is at the 1st line, $posLF must be $[ - 1 (not found);

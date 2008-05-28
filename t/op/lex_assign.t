@@ -1,5 +1,7 @@
 #!./perl
 
+BEGIN { require "./test.pl" }
+
 our ($xref, $runme, @a, %h, $aref, $chopit, @chopar, $posstr,
      $cstr, $nn, $n, @INPUT, @simple_input, $ord, $href, $zzz1,
     $zzz2, $op, $commentt, $expectop, $skip, $integer,
@@ -26,17 +28,15 @@ sub subb {"in s"}
 
 @INPUT = ~< *DATA;
 @simple_input = grep m/^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
-print "1..", (11 + @INPUT + @simple_input), "\n";
-$ord = 0;
+
+plan 11 + @INPUT + @simple_input;
 
 sub wrn {"@_"}
 
 # Check correct optimization of ucfirst etc
-$ord++;
 my $a = "AB";
 my $b = ucfirst(lc("$a"));
-print "not " unless $b eq 'Ab';
-print "ok $ord\n";
+ok $b eq 'Ab';
 
 # Check correct destruction of objects:
 my $dc = 0;
@@ -45,21 +45,15 @@ $a=8;
 my $b;
 { my $c = 6; $b = bless \$c, "A"}
 
-$ord++;
-print "not " unless $dc == 0;
-print "ok $ord\n";
+ok $dc == 0;
 
 $b = $a+5;
 
-$ord++;
-print "not " unless $dc == 1;
-print "ok $ord\n";
+ok $dc == 1;
 
-$ord++;
 my $xxx = 'b';
 $xxx = 'c' . ($xxx || 'e');
-print "not " unless $xxx eq 'cb';
-print "ok $ord\n";
+ok $xxx eq 'cb';
 
 {				# Check calling STORE
   my $sc = 0;
@@ -71,30 +65,18 @@ print "ok $ord\n";
   tie $m, 'B';
   $m = 100;
 
-  $ord++;
-  print "not " unless $sc == 1;
-  print "ok $ord\n";
+  ok $sc == 1;
 
   my $t = 11;
   $m = $t + 89;
   
-  $ord++;
-  print "not " unless $sc == 2;
-  print "ok $ord\n";
-
-  $ord++;
-  print "# $m\nnot " unless $m == -117;
-  print "ok $ord\n";
+  ok $sc == 2;
+  ok $m == -117;
 
   $m += $t;
 
-  $ord++;
-  print "not " unless $sc == 3;
-  print "ok $ord\n";
-
-  $ord++;
-  print "# $m\nnot " unless $m == 89;
-  print "ok $ord\n";
+  ok $sc == 3;
+  ok $m == 89;
 
 }
 
@@ -104,50 +86,44 @@ my ($l1, $l2, $l3, $l4);
 my $zzzz = 12;
 $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 1 + $zzzz;
 
-$ord++;
-print "# $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13\nnot "
-  unless $zzz1 == 13 and $zzz2 == 13 and $l1 == 13
-  and $l2 == 13 and $l3 == 13 and $l4 == 13;
-print "ok $ord\n";
+ok( $zzz1 == 13 and $zzz2 == 13 and $l1 == 13,
+    "$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13" );
 
 for (@INPUT) {
-  $ord++;
-  ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
-  $comment = $op unless defined $comment;
-  chomp;
-  $op = "$op==$op" unless $op =~ m/==/;
-  ($op, $expectop) = $op =~ m/(.*)==(.*)/;
+ SKIP: {
+    ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
+    $comment = $op unless defined $comment;
+    chomp;
+    $op = "$op==$op" unless $op =~ m/==/;
+    ($op, $expectop) = $op =~ m/(.*)==(.*)/;
   
-  $skip = ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^O\E.*\)/i)
-	  ? "skip" : "# '$_'\nnot";
-  $integer = ($comment =~ m/^i_/) ? "use integer" : '' ;
-  (print "#skipping $comment:\nok $ord\n"), next if $skip eq 'skip';
+    if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^O\E.*\)/i) {
+      skip("$comment", 1);
+    }
+    $integer = ($comment =~ m/^i_/) ? "use integer" : '' ;
   
-  eval <<EOE . <<'EOE';
-  local \$^WARN_HOOK = \\&wrn;
-  my \$a = 'fake';
-  $integer;
-  \$a = $op;
-  \$b = $expectop;
+    eval <<EOE . <<'EOE';
+    local \$^WARN_HOOK = \\&wrn;
+    my \$a = 'fake';
+    $integer;
+    \$a = $op;
+    \$b = $expectop;
 EOE
-  if (ref $a ? (not $a \== $b) : $a ne $b) {
-    print "# $comment: got `$a', expected `$b'\n";
-    print "$skip " if $a ne $b or $skip eq 'skip';
-  }
-  print "ok $ord\n";
+    is($a, $b, $comment);
 EOE
-  if ($@) {
-    if ($@->{description} =~ m/is unimplemented/) {
-      print "# skipping $comment: unimplemented:\nok $ord\n";
-    } else {
-      print "# error: {$@->message}";
-      print "# '$_'\nnot ok $ord\n";
+    if ($@) {
+      if ($@->{description} =~ m/is unimplemented/) {
+        skip("$comment: unimplemented", 1);
+      } else {
+        fail("error: {$@->message}");
+      }
     }
   }
 }
 
 for (@simple_input) {
-  $ord++;
+ SKIP:
+ {
   ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
   chomp;
@@ -158,23 +134,21 @@ for (@simple_input) {
   \$$variable = $operator \$$variable;
   \$toself = \$$variable;
   \$direct = $operator "Ac# Ca\\nxxx";
-  print "# \\\$$variable = $operator \\\$$variable\\nnot "
-    unless \$toself eq \$direct;
-  print "ok \$ord\\n";
+  ok( \$toself eq \$direct,
+     "\\\$$variable = $operator \\\$$variable");
 EOE
   if ($@) {
     if ($@->{description} =~ m/is unimplemented/) {
-      print "# skipping $comment: unimplemented:\nok $ord\n";
+      skip("skipping $comment: unimplemented", 1);
     } elsif ($@->{description} =~ m/Can't (modify|take log of 0)/) {
-      print "# skipping $comment: syntax not good for selfassign:\nok $ord\n";
+      skip("skipping $comment: syntax not good for selfassign", 1);
     } else {
-      warn $@;
-      print "# '$_'\nnot ok $ord\n";
+      fail("error: {$@->message}");
     }
   }
+ }
 }
 
-$ord++;
 eval {
     sub PVBM () { 'foo' }
     index 'foo', PVBM;
@@ -186,11 +160,8 @@ eval {
 
     1;
 };
-if ($@) {
-    warn "# $@";
-    print 'not ';
-}
-print "ok $ord\n";
+die if $@;
+ok 1;
 
 __END__
 ref $xref			# ref
@@ -253,7 +224,7 @@ substr $posstr, 2, 2		# substr
 vec("abc",2,8)			# vec
 index $posstr, 2		# index
 rindex $posstr, 2		# rindex
-sprintf "%i%i", $n, $n		# sprintf
+sprintf '%i%i', $n, $n		# sprintf
 ord $n				# ord
 chr $n				# chr
 crypt $n, $n			# crypt

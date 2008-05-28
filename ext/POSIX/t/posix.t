@@ -1,9 +1,8 @@
 #!./perl
 
+use Config;
+
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config; Config->import;
     if ($^O ne 'VMS' and %Config{'extensions'} !~ m/\bPOSIX\b/) {
 	print "1..0\n";
 	exit 0;
@@ -19,23 +18,24 @@ use strict 'subs';
 
 $| = 1;
 
-$Is_W32     = $^O eq 'MSWin32';
-$Is_Dos     = $^O eq 'dos';
-$Is_MPE     = $^O eq 'mpeix';
-$Is_MacOS   = $^O eq 'MacOS';
-$Is_VMS     = $^O eq 'VMS';
-$Is_OS2     = $^O eq 'os2';
-$Is_UWin    = $^O eq 'uwin';
-$Is_OS390   = $^O eq 'os390';
+my $Is_W32     = $^O eq 'MSWin32';
+my $Is_Dos     = $^O eq 'dos';
+my $Is_MPE     = $^O eq 'mpeix';
+my $Is_MacOS   = $^O eq 'MacOS';
+my $Is_VMS     = $^O eq 'VMS';
+my $Is_OS2     = $^O eq 'os2';
+my $Is_UWin    = $^O eq 'uwin';
+my $Is_OS390   = $^O eq 'os390';
 
-ok( $testfd = open("TEST", O_RDONLY, 0),        'O_RDONLY with open' );
-read($testfd, $buffer, 4) if $testfd +> 2;
+ok( my $testfd = open("TEST", O_RDONLY, 0),        'O_RDONLY with open' );
+read($testfd, my $buffer, 4) if $testfd +> 2;
 is( $buffer, "#!./",                      '    with read' );
 
 TODO:
 {
-    local $TODO = "read to array element not working";
+    local our $TODO = "read to array element not working";
 
+    our @buffer;
     read($testfd, @buffer[1], 5) if $testfd +> 2;
     is( @buffer[1], "perl\n",	               '    read to array element' );
 }
@@ -46,11 +46,11 @@ next_test();
 SKIP: {
     skip("no pipe() support on DOS", 2) if $Is_Dos;
 
-    @fds = POSIX::pipe();
+    our @fds = POSIX::pipe();
     ok( @fds[0] +> $testfd,      'POSIX::pipe' );
 
-    CORE::open($reader = \*READER, "<&=", @fds[0]);
-    CORE::open($writer = \*WRITER, ">&=", @fds[1]);
+    CORE::open(my $reader = \*READER, "<&=", @fds[0]);
+    CORE::open(my $writer = \*WRITER, ">&=", @fds[1]);
     print $writer "ok 6\n";
     close $writer;
     print ~< $reader;
@@ -118,7 +118,7 @@ SKIP: {
 
 SKIP: {
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE;
-    skip("_POSIX_OPEN_MAX undefined (@fds[1])",  1) unless &_POSIX_OPEN_MAX;
+    skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless &_POSIX_OPEN_MAX;
 
     ok( &_POSIX_OPEN_MAX +>= 16, "The minimum allowed values according to susv2" );
 
@@ -141,10 +141,10 @@ like( getcwd(), qr/$pat/, 'getcwd' );
 SKIP: { 
     skip("strtod() not present", 1) unless %Config{d_strtod};
 
-    $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC, 'C') if %Config{d_setlocale};
+    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC, 'C') if %Config{d_setlocale};
 
     # we're just checking that strtod works, not how accurate it is
-    ($n, $x) = &POSIX::strtod('3.14159_OR_SO');
+    my ($n, $x) = &POSIX::strtod('3.14159_OR_SO');
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
     &POSIX::setlocale(&POSIX::LC_NUMERIC, $lc) if %Config{d_setlocale};
@@ -153,7 +153,7 @@ SKIP: {
 SKIP: {
     skip("strtol() not present", 2) unless %Config{d_strtol};
 
-    ($n, $x) = &POSIX::strtol('21_PENGUINS');
+    my ($n, $x) = &POSIX::strtol('21_PENGUINS');
     is($n, 21, 'strtol() number');
     is($x, 9,  '         unparsed chars');
 }
@@ -161,7 +161,7 @@ SKIP: {
 SKIP: {
     skip("strtoul() not present", 2) unless %Config{d_strtoul};
 
-    ($n, $x) = &POSIX::strtoul('88_TEARS');
+    my ($n, $x) = &POSIX::strtoul('88_TEARS');
     is($n, 88, 'strtoul() number');
     is($x, 6,  '          unparsed chars');
 }
@@ -184,7 +184,7 @@ sub try_strftime {
     is($got, $expect, "validating mini_mktime() and strftime(): $expect");
 }
 
-$lc = &POSIX::setlocale(&POSIX::LC_TIME, 'C') if %Config{d_setlocale};
+my $lc = &POSIX::setlocale(&POSIX::LC_TIME, 'C') if %Config{d_setlocale};
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)

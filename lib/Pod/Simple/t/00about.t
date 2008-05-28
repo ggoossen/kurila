@@ -39,12 +39,8 @@ ok 1;
 foreach my $m (@modules) {
   print "# Loading $m ...\n";
   eval "require $m;";
-  unless($@) { ok 1; next }
-  my $e = $@;
-  $e =~ s/\s+$//s;
-  $e =~ s/[\n\r]+/\n# > /;
-  print "# Error while trying to load $m --\n# > $e\n";
-  ok 0;
+  die if $@;
+  ok 1;
 }
 
 {
@@ -95,7 +91,7 @@ foreach my $m (@modules) {
   push @out, " Modules in memory:\n";
   delete %v{['', '[none]']};
   foreach my $p (sort {lc($a) cmp lc($b)} keys %v) {
-    my $indent = ' ' x (2 + ($p =~ tr/:/:/));
+    my $indent = ' ' x (2 + @($p =~ m/(:)/g));
     push @out,  '  ', $indent, $p, defined(%v{$p}) ? " v%v{$p};\n" : ";\n";
   }
   push @out, sprintf "[at \%s (local) / \%s (GMT)]\n",

@@ -50,7 +50,7 @@ this and tell you from where the C<PACKAGE> has been loaded already.
 sub mark_as_loaded (*) {
     my $pm      = shift;
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
-    my $who     = \@(caller)->[1];
+    my $who     = (caller)[1];
     
     my $where   = is_loaded( $pm );
     if ( defined $where ) {

@@ -933,7 +933,6 @@ perl_destruct(pTHXx)
     PL_doswitches   = FALSE;
     PL_dowarn       = G_WARN_OFF;
     PL_doextract    = FALSE;
-    PL_sawampersand = FALSE;	/* must save all match strings */
     PL_unsafe       = FALSE;
 
     Safefree(PL_inplace);
@@ -1034,11 +1033,6 @@ perl_destruct(pTHXx)
 #endif
 
     /* free locale stuff */
-#ifdef USE_LOCALE_COLLATE
-    Safefree(PL_collation_name);
-    PL_collation_name = NULL;
-#endif
-
 #ifdef USE_LOCALE_NUMERIC
     Safefree(PL_numeric_name);
     PL_numeric_name = NULL;
@@ -1895,7 +1889,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			     "@env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
+			     "our @env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
 			     "sort grep {m/^PERL/} keys %ENV; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
@@ -2321,8 +2315,6 @@ STATIC void
 S_run_body(pTHX_ I32 oldscope)
 {
     dVAR;
-    DEBUG_r(PerlIO_printf(Perl_debug_log, "%s $` $& $' support.\n",
-                    PL_sawampersand ? "Enabling" : "Omitting"));
 
     if (!PL_restartop) {
 #ifdef PERL_MAD
@@ -4565,10 +4557,10 @@ Perl_init_argv_symbols(pTHX_ register int argc, register char **argv)
 	    if ((s = strchr(argv[0], '='))) {
 		const char *const start_name = argv[0] + 1;
 		sv_setpv(GvSV(gv_fetchpvn_flags(start_name, s - start_name,
-						TRUE, SVt_PV)), s + 1);
+						GV_ADD | GV_NOTQUAL, SVt_PV)), s + 1);
 	    }
 	    else
-		sv_setiv(GvSV(gv_fetchpv(argv[0]+1, GV_ADD, SVt_PV)),1);
+		sv_setiv(GvSV(gv_fetchpv(argv[0]+1, GV_ADD | GV_NOTQUAL, SVt_PV)),1);
 	}
     }
     if ((PL_argvgv = gv_fetchpvs("ARGV", GV_ADD|GV_NOTQUAL, SVt_PVAV))) {

@@ -167,7 +167,7 @@ $x++;
 
 # does lexical search terminate correctly at subroutine boundary?
 $main::r = "ok $x\n";
-sub terminal { eval 'no strict; print $r' }
+sub terminal { eval 'our $r; print $r' }
 {
    my $r = "not ok $x\n";
    eval 'terminal($r)';
@@ -343,7 +343,7 @@ eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
 
 # [perl #9728] used to dump core
 {
-   $eval = eval 'sub { eval "sub { %S }" }';
+   my $eval = eval 'sub { eval q|sub { %S }| }';
    $eval->(\%());
    print "ok $test\n";
    $test++;
@@ -437,7 +437,7 @@ print "ok ",$test++," - #20798 (used to dump core)\n";
 
 $got = runperl (
     prog => 
-    'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie @a, A; warn qq(ok\n)',
+    'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie my @a, q(A); warn qq(ok\n)',
 stderr => 1);
 
 print "not " unless $got =~ qr/^ok\n/;

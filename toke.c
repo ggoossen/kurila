@@ -318,7 +318,6 @@ static struct debug_tokens {
     { FUNC0SUB,		TOKENTYPE_OPVAL,	"FUNC0SUB" },
     { FUNC1,		TOKENTYPE_OPNUM,	"FUNC1" },
     { GIVEN,		TOKENTYPE_IVAL,		"GIVEN" },
-    { HASHBRACK,	TOKENTYPE_NONE,		"HASHBRACK" },
     { IF,		TOKENTYPE_IVAL,		"IF" },
     { LABEL,		TOKENTYPE_PVAL,		"LABEL" },
     { LOCAL,		TOKENTYPE_IVAL,		"LOCAL" },
@@ -1731,6 +1730,7 @@ const char *
 Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 {
     U32 uv;
+    PERL_ARGS_ASSERT_PARSE_ESCAPE;
 
     switch (*s) {
 
@@ -3700,6 +3700,13 @@ Perl_yylex(pTHX)
 	    ++s;
 	    Mop(OP_MODULO);
 	}
+
+	if (s[1] == '(') {
+	    /* anonymous hash constructor */
+	    s += 2;
+	    OPERATOR(ANONHSH);
+	}
+
 	PL_tokenbuf[0] = '%';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1,
 		sizeof PL_tokenbuf - 1, FALSE);
@@ -3931,7 +3938,7 @@ Perl_yylex(pTHX)
 	{
 	    const char tmp = *s++;
 	    s = SKIPSPACE1(s);
-	    if (*s == '{')
+	    if (*s == '{' && PL_expect != XOPERATOR)
 		PREBLOCK(tmp);
 	    TERM(tmp);
 	}
@@ -4004,114 +4011,17 @@ Perl_yylex(pTHX)
 	    yyerror("panic: Unknown PL_expect");
 	    break;
 	case XSTATE:
-	case XREF: {
-		const char *t;
-		if (PL_oldoldbufptr == PL_last_lop)
-		    PL_lex_brackstack[PL_lex_brackets++] = XTERM;
-		else
-		    PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
-		s = SKIPSPACE1(s);
-		if (*s == '}') {
-		    if (PL_expect == XREF && PL_lex_state == LEX_INTERPNORMAL) {
-			PL_expect = XTERM;
-			/* This hack is to get the ${} in the message. */
-			PL_bufptr = s+1;
-			yyerror("syntax error");
-			break;
-		    }
-		    yyerror("'{' should be '\%(' expected");
-		}
-		/* This hack serves to disambiguate a pair of curlies
-		 * as being a block or an anon hash.  Normally, expectation
-		 * determines that, but in cases where we're not in a
-		 * position to expect anything in particular (like inside
-		 * eval"") we have to resolve the ambiguity.  This code
-		 * covers the case where the first term in the curlies is a
-		 * quoted string.  Most other cases need to be explicitly
-		 * disambiguated by prepending a "+" before the opening
-		 * curly in order to force resolution as an anon hash.
-		 *
-		 * XXX should probably propagate the outer expectation
-		 * into eval"" to rely less on this hack, but that could
-		 * potentially break current behavior of eval"".
-		 * GSAR 97-07-21
-		 */
-
-/* 		yyerror("{ ... } unknown hash or block"); */
-/* 		break; */
-
-		t = s;
-		if (*s == '\'' || *s == '"' || *s == '`') {
-		    /* common case: get past first string, handling escapes */
-		    for (t++; t < PL_bufend && *t != *s;)
-			if (*t++ == '\\' && (*t == '\\' || *t == *s))
-			    t++;
-		    t++;
-		}
-		else if (*s == 'q') {
-		    if (++t < PL_bufend
-			&& (!isALNUM(*t)
-			    || ((*t == 'q' || *t == 'x') && ++t < PL_bufend
-				&& !isALNUM(*t))))
-		    {
-			/* skip q//-like construct */
-			const char *tmps;
-			char open, close, term;
-			I32 brackets = 1;
-
-			while (t < PL_bufend && isSPACE(*t))
-			    t++;
-			/* check for q => */
-			if (t+1 < PL_bufend && t[0] == '=' && t[1] == '>') {
-			    yyerror("'{' should be '\%(' expected");
-			}
-			term = *t;
-			open = term;
-			if (term && (tmps = strchr("([{< )]}> )]}>",term)))
-			    term = tmps[5];
-			close = term;
-			if (open == close)
-			    for (t++; t < PL_bufend; t++) {
-				if (*t == '\\' && t+1 < PL_bufend && open != '\\')
-				    t++;
-				else if (*t == open)
-				    break;
-			    }
-			else {
-			    for (t++; t < PL_bufend; t++) {
-				if (*t == '\\' && t+1 < PL_bufend)
-				    t++;
-				else if (*t == close && --brackets <= 0)
-				    break;
-				else if (*t == open)
-				    brackets++;
-			    }
-			}
-			t++;
-		    }
-		    else
-			/* skip plain q word */
-			while (t < PL_bufend && isALNUM_lazy_if(t,UTF))
-			     t += UTF8SKIP(t);
-		}
-		else if (isALNUM_lazy_if(t,UTF)) {
-		    t += UTF8SKIP(t);
-		    while (t < PL_bufend && isALNUM_lazy_if(t,UTF))
-			 t += UTF8SKIP(t);
-		}
-		while (t < PL_bufend && isSPACE(*t))
-		    t++;
-		/* if comma follows first term, call it an anon hash */
-		/* XXX it could be a comma expression with loop modifiers */
-		if (t < PL_bufend && ((*t == ',' && (*s == 'q' || !isLOWER(*s)))
-				   || (*t == '=' && t[1] == '>')))
-		    yyerror("'{' should be '\%(' expected");
-		if (PL_expect == XREF)
-		    PL_expect = XTERM;
-		else {
-		    PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
-		    PL_expect = XSTATE;
-		}
+	case XREF:
+	    if (PL_oldoldbufptr == PL_last_lop)
+		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+	    else
+		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+	    s = SKIPSPACE1(s);
+	    if (PL_expect == XREF)
+		PL_expect = XTERM;
+	    else {
+		PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
+		PL_expect = XSTATE;
 	    }
 	    break;
 	}
@@ -4396,6 +4306,12 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
 
+	if (s[1] == '(') {
+	    /* array constructor */
+	    s += 2;
+	    OPERATOR(ANONARY);
+	}
+
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
 	if (!PL_tokenbuf[1]) {
@@ -4524,18 +4440,6 @@ Perl_yylex(pTHX)
 	TERM(sublex_start(pl_yylval.ival, PL_lex_op));
 
     case '\\':
-	if (PL_expect != XOPERATOR) {
-	    if (s[1] == '@' && s[2] == '(') {
-		/* anon array constructor */
-		s += 3;
-		OPERATOR(ANONARY);
-	    }
-	    if (s[1] == '%' && s[2] == '(') {
-		/* anon hash constructor */
-		s += 3;
-		OPERATOR(ANONHSH);
-	    }
-	}
 	s++;
 	if (PL_lex_inwhat && isDIGIT(*s) && ckWARN(WARN_SYNTAX))
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),"Can't use \\%c to mean $%c in expression",
@@ -4845,20 +4749,34 @@ Perl_yylex(pTHX)
 		    PL_nextwhite = nextPL_nextwhite;	/* assume no & deception */
 #endif
 
+		    /* Special case of "_" following a filetest operator: it's a bareword */
+		    if (PL_tokenbuf[0] == '_' && PL_tokenbuf[1] == '\0'
+			&& ((PL_opargs[PL_last_lop_op] & OA_CLASS_MASK) == OA_FILESTATOP)) {
+			TOKEN(WORD);
+		    }
+
 		    /* If not a declared subroutine, it's an indirect object. */
 		    /* (But it's an indir obj regardless for sort.) */
-		    /* Also, if "_" follows a filetest operator, it's a bareword */
 
 		    if (
 			( !immediate_paren && (PL_last_lop_op == OP_SORT ||
                          ((!gv || !cv) &&
                         (PL_last_lop_op != OP_MAPSTART &&
 			 PL_last_lop_op != OP_GREPSTART))))
-		       || (PL_tokenbuf[0] == '_' && PL_tokenbuf[1] == '\0'
-			    && ((PL_opargs[PL_last_lop_op] & OA_CLASS_MASK) == OA_FILESTATOP))
 		       )
 		    {
 			PL_expect = (PL_last_lop == PL_oldoldbufptr) ? XTERM : XOPERATOR;
+
+			if (lastchar != '-') {
+			    if (ckWARN(WARN_RESERVED)) {
+				d = PL_tokenbuf;
+				while (isLOWER(*d))
+				    d++;
+				if (!*d && !gv_stashpv(PL_tokenbuf, 0))
+				    Perl_warner(aTHX_ packWARN(WARN_RESERVED), PL_warn_reserved,
+						PL_tokenbuf);
+			    }
+			}
 			goto bareword;
 		    }
 		}
@@ -4886,7 +4804,7 @@ Perl_yylex(pTHX)
 			d = s + 1;
 			while (SPACE_OR_TAB(*d))
 			    d++;
-			if (*d == ')' && (sv = gv_const_sv(gv))) {
+			if (*d == ')' && (sv = cv_const_sv(cv))) {
 #ifdef PERL_MAD
 			    if (PL_madskills) {
 				curmad('X', PL_thistoken);
@@ -4927,7 +4845,7 @@ Perl_yylex(pTHX)
 				"Ambiguous use of -%s resolved as -&%s()",
 				PL_tokenbuf, PL_tokenbuf);
 		    /* Check for a constant sub */
-		    if ((sv = gv_const_sv(gv))) {
+		    if ((sv = cv_const_sv(cv))) {
 		  its_constant:
 			SvREFCNT_dec(((SVOP*)pl_yylval.opval)->op_sv);
 			((SVOP*)pl_yylval.opval)->op_sv = SvREFCNT_inc_simple(sv);
@@ -4989,21 +4907,9 @@ Perl_yylex(pTHX)
 
 		/* Call it a bare word */
 
-		if (PL_hints & HINT_STRICT_SUBS)
-		    pl_yylval.opval->op_private |= OPpCONST_STRICT;
-		else {
-		bareword:
-		    if (lastchar != '-') {
-			if (ckWARN(WARN_RESERVED)) {
-			    d = PL_tokenbuf;
-			    while (isLOWER(*d))
-				d++;
-			    if (!*d && !gv_stashpv(PL_tokenbuf, 0))
-				Perl_warner(aTHX_ packWARN(WARN_RESERVED), PL_warn_reserved,
-				       PL_tokenbuf);
-			}
-		    }
-		}
+		pl_yylval.opval->op_private |= OPpCONST_STRICT;
+		
+	    bareword:
 
 		if ((lastchar == '*' || lastchar == '%' || lastchar == '&')
 		    && ckWARN_d(WARN_AMBIGUOUS)) {
@@ -6089,8 +5995,7 @@ Perl_yylex(pTHX)
 	    LOP(OP_SYSWRITE,XTERM);
 
 	case KEY_tr:
-	    s = scan_trans(s);
-	    TERM(sublex_start(pl_yylval.ival, PL_lex_op));
+	    Perl_croak(aTHX_ "tr transliteration operator is removed");
 
 	case KEY_tell:
 	    UNI(OP_TELL);
@@ -6193,8 +6098,7 @@ Perl_yylex(pTHX)
 	    OPERATOR(OROP);
 
 	case KEY_y:
-	    s = scan_trans(s);
-	    TERM(sublex_start(pl_yylval.ival, PL_lex_op));
+	    Perl_croak(aTHX_ "y transliteration operator is removed");
 	}
     }}
 }
@@ -6298,28 +6202,6 @@ S_pending_ident(pTHX)
             pl_yylval.opval = newOP(OP_PADANY, 0);
             pl_yylval.opval->op_targ = tmp;
             return PRIVATEREF;
-        }
-    }
-
-    /*
-       Whine if they've said @foo in a doublequoted string,
-       and @foo isn't a variable we can find in the symbol
-       table.
-    */
-    if (pit == '@' && PL_lex_state != LEX_NORMAL && !PL_lex_brackets) {
-        GV *const gv = gv_fetchpvn_flags(PL_tokenbuf + 1, tokenbuf_len - 1, 0,
-					 SVt_PVAV);
-        if ((!gv || ((PL_tokenbuf[0] == '@') ? !GvAV(gv) : !GvHV(gv)))
-		&& ckWARN(WARN_AMBIGUOUS)
-		/* DO NOT warn for @- and @+ */
-		&& !( PL_tokenbuf[2] == '\0' &&
-		    ( PL_tokenbuf[1] == '-' || PL_tokenbuf[1] == '+' ))
-	   )
-        {
-            /* Downgraded from fatal to warning 20000522 mjd */
-            Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
-                        "Possible unintended interpolation of %s in string",
-                         PL_tokenbuf);
         }
     }
 
@@ -9737,7 +9619,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     }
     cvp = hv_fetch(table, key, keylen, FALSE);
     if (!cvp || !SvOK(*cvp)) {
-	why1 = "$^H{";
+	why1 = "%^H{";
 	why2 = key;
 	why3 = "} is not defined";
 	goto report;
@@ -9785,7 +9667,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     POPSTACK;
 
     if (!SvOK(res)) {
- 	why1 = "Call to &{$^H{";
+ 	why1 = "Call to &{%^H{";
  	why2 = key;
  	why3 = "}} did not return a defined value";
  	sv = res;

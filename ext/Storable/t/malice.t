@@ -13,6 +13,8 @@
 # error traps in Storable as possible
 # It also acts as a test for read_header
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -21,7 +23,6 @@ sub BEGIN {
 	# This lets us distribute Test::More in t/
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;

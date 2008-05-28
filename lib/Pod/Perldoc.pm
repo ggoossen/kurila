@@ -76,7 +76,7 @@ sub opt_w_with { # Specify an option for the formatter subclass
   if($value =~ m/^([-_a-zA-Z][-_a-zA-Z0-9]*)(?:[=\:](.*?))?$/s) {
     my $option = $1;
     my $option_value = defined($2) ? $2 : "TRUE";
-    $option =~ tr/\-/_/s;  # tolerate "foo-bar" for "foo_bar"
+    $option =~ s/[-]+/_/g;  # tolerate "foo-bar" for "foo_bar"
     $self->add_formatter_option( $option, $option_value );
   } else {
     warn "\"$value\" isn't a good formatter option name.  I'm ignoring it!\n";

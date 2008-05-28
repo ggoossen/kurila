@@ -17,7 +17,7 @@ open(TRY, ">", 'Io_argv1.tmp') || (die "Can't open temp file: $!");
 print TRY "a line\n";
 close TRY or die "Could not close: $!";
 
-$x = runperl(
+my $x = runperl(
     prog	=> 'while (~< *ARGV) { print $., $_; }',
     args	=> \@( 'Io_argv1.tmp', 'Io_argv1.tmp' ),
 );
@@ -46,6 +46,7 @@ is($x, "1a line\n2a line\n", '~< *ARGV from two files');
 }
 
 @ARGV = ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
+our $y;
 while ( ~< *ARGV) {
     $y .= $. . $_;
     if (eof()) {

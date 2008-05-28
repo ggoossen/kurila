@@ -107,7 +107,7 @@ sub clear {
 
 # remove the bell character
 sub scrub {
-	${ @_[0] } =~ tr/\a//d;
+	${ @_[0] } =~ s/\a//g;
 }
 
 # must shift off self

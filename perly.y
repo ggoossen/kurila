@@ -75,7 +75,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO HASHBRACK NOAMP HSLICE ASLICE
+%token <i_tkval> DO NOAMP HSLICE ASLICE
 %token <i_tkval> ANONARY ANONHSH
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
@@ -768,9 +768,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             TOKEN_GETMAD($2,$$,'a');
                             if (IVAL($2) == OP_JOIN) {
                                 /* creates a join when ending list */
-                                OP *list
+                                OP *gvop
                                     = newSVREF(newGVOP(OP_GV, 0, gv_fetchpvs("\"", GV_ADD|GV_NOTQUAL, SVt_PV)));
-                                append_elem(OP_LIST, list, $$);
+                                OP* list = append_elem(OP_LIST, gvop, $$);
                                 $$ = convert(OP_JOIN, 0, list);
                             }
                         }
@@ -945,7 +945,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	'(' expr ')' '[' expr ']'            /* list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
-					oopsAV(convert(OP_ANONLIST, OPf_SPECIAL, $2)),
+					oopsAV(convert(OP_ANONLIST, 0, $2)),
 					scalar($5));
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
@@ -954,7 +954,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	'(' ')' '[' expr ']'            /* empty list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
-					oopsAV(convert(OP_ANONLIST, OPf_SPECIAL, (OP*)NULL)),
+					oopsAV(convert(OP_ANONLIST, 0, (OP*)NULL)),
 					scalar($4));
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
@@ -1096,27 +1096,8 @@ termunop : '-' term %prec UMINUS                       /* -$x */
     ;
 
 /* Constructors for anonymous data */
-anonymous:	ANONARY expr ')'  /* @( ... ) */
-			{ $$ = newANONLIST($2);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($3,$$,']');
-			}
-        |	ANONARY ')'  /* @( ... ) */
-			{ $$ = newANONLIST((OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($2,$$,']');
-			}
-	|	ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
-			{ $$ = newANONHASH($2);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($3,$$,'}');
-			}
-	|	ANONHSH ')'	%prec '(' /* %( ... ) */
-			{ $$ = newANONHASH((OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($2,$$,'}');
-			}
-	|	ANONSUB startanonsub proto subattrlist block	%prec '('
+anonymous:
+	ANONSUB startanonsub proto subattrlist block	%prec '('
 			{ SvREFCNT_inc_simple_void(PL_compcv);
 			  $$ = newANONATTRSUB($2, $3, $4, $5);
 			  TOKEN_GETMAD($1,$$,'o');
@@ -1434,11 +1415,31 @@ ary	:	'@' indirob
 			{ $$ = newAVREF($2);
 			  TOKEN_GETMAD($1,$$,'@');
 			}
+        |       ANONARY expr ')'  /* @( ... ) */
+			{ $$ = newANONLIST($2);
+			  TOKEN_GETMAD($1,$$,'[');
+			  TOKEN_GETMAD($3,$$,']');
+			}
+        |	ANONARY ')'  /* @() */
+			{ $$ = newANONLIST((OP*)NULL);
+			  TOKEN_GETMAD($1,$$,'[');
+			  TOKEN_GETMAD($2,$$,']');
+			}
 	;
 
 hsh	:	'%' indirob
 			{ $$ = newHVREF($2);
 			  TOKEN_GETMAD($1,$$,'%');
+			}
+	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
+			{ $$ = newANONHASH($2);
+			  TOKEN_GETMAD($1,$$,'{');
+			  TOKEN_GETMAD($3,$$,'}');
+			}
+	|	ANONHSH ')'	%prec '(' /* %() */
+			{ $$ = newANONHASH((OP*)NULL);
+			  TOKEN_GETMAD($1,$$,'{');
+			  TOKEN_GETMAD($2,$$,'}');
 			}
 	;
 

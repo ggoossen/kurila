@@ -10,6 +10,8 @@ die("Getopt::Long version $want_version required--this is only version ".
 
 print "1..9\n";
 
+our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
+
 @ARGV = qw(-Foo -baR --foo bar);
 undef $opt_baR;
 undef $opt_bar;

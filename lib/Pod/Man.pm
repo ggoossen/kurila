@@ -229,9 +229,9 @@ sub _handle_text {
 # Given an element name, get the corresponding method name.
 sub method_for_element {
     my ($self, $element) = @_;
-    $element =~ tr/-/_/;
-    $element =~ tr/A-Z/a-z/;
-    $element =~ tr/_a-z0-9//cd;
+    $element =~ s/-/_/g;
+    $element =~ s/([A-Z])/{lc($1)}/g;
+    $element =~ s/[^_a-z0-9]//g;
     return $element;
 }
 

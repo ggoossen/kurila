@@ -327,7 +327,7 @@ sub maniread {
             require File::Basename;
             my($base,$dir) = File::Basename::fileparse($file);
             # Resolve illegal file specifications in the same way as tar
-            $dir =~ tr/./_/;
+            $dir =~ s/./_/g;
             my(@pieces) = split(m/\./,$base);
             if (@pieces +> 2) { $base = shift(@pieces) . '.' . join('_',@pieces); }
             my $okfile = "$dir$base";
@@ -594,7 +594,7 @@ sub _unmacify {
 
     $file =~ s|^:||;
     $file =~ s|([/ \n])|{sprintf("\\\%03o", unpack("c", $1))}|g;
-    $file =~ y|:|/|;
+    $file =~ s|:|/|g;
 
     $file;
 }

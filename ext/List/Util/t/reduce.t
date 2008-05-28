@@ -1,11 +1,9 @@
 #!./perl
 
+use Config;
+
 BEGIN {
     unless (-d 'blib') {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
-	keys %Config; # Silence warning
 	if (%Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
 	    exit 0;
@@ -28,7 +26,7 @@ is( $v,	9,	'4-arg divide');
 $v = reduce { $a / $b } 6;
 is( $v,	6,	'one arg');
 
-@a = map { rand } 0 .. 20;
+my @a = map { rand } 0 .. 20;
 $v = reduce { $a +< $b ? $a : $b } @a;
 is( $v,	min(@a),	'min');
 

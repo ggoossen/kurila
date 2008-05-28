@@ -538,7 +538,7 @@ sub sreftest (\$$) {
     print "ok @_[1] - sreftest\n";
 }
 {
-    no strict 'vars';
+    our (%helem, @aelem);
     sreftest my $sref, $i++;
     sreftest(%helem{$i}, $i++);
     sreftest @aelem[0], $i++;

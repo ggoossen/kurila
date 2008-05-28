@@ -1,8 +1,6 @@
+use TestInit;
+use Config;
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-    require Config; Config->import;
     if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
         print "1..0 # Skip: XS::APItest was not built\n";
         exit 0;

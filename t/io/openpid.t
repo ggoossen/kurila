@@ -42,6 +42,9 @@ my $cmd4 = qq/$perl -e "print scalar ~< *ARGV;"/;
 
 #warn "#$cmd1\n#$cmd2\n#$cmd3\n#$cmd4\n";
 
+our ($pid3, $pid4);
+our ($from_pid1, $from_pid2, $kill_cnt);
+
 # start the processes
 ok( my $pid1 = open(FH1, "-|", "$cmd1"), 'first process started');
 ok( my $pid2 = open(FH2, "-|", "$cmd2"), '    second' );
@@ -76,9 +79,9 @@ is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
 # send one expected line of text to child process and then wait for it
 select(FH4); $| = 1; select(STDOUT);
 
-printf FH4 "ok %d - text sent to fourth process\n", curr_test();
+printf FH4 "ok \%d - text sent to fourth process\n", curr_test();
 next_test();
 print "# waiting for process $pid4 to exit\n";
-$reap_pid = waitpid $pid4, 0;
+my $reap_pid = waitpid $pid4, 0;
 is( $reap_pid, $pid4, 'fourth process reaped' );
 

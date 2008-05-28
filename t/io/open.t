@@ -260,12 +260,14 @@ SKIP: {
 	return $line;
     }
 
-    local $TODO = "fix variable name";
+    local our $TODO = "fix variable name";
 
+    our @fh0;
     open(@fh0[0], "<", "TEST");
     gimme(@fh0[0]);
     like($@->message, qr/<\@fh0\[...\]> line 1/, "autoviv fh package aelem");
 
+    our %fh1;
     open(%fh1{k}, "<", "TEST");
     gimme(%fh1{k});
     like($@->message, qr/<\%fh1{...}> line 1/, "autoviv fh package helem");

@@ -82,8 +82,8 @@ for (@prgs){
     my $switch = "";
     my @temps = () ;
     my @temp_path = () ;
-    if (s/^\s*-\w+//){
-        $switch = $&;
+    if (s/^(\s*-\w+)//){
+        $switch = $1;
     }
     my($prog,$expected) = split(m/\nEXPECT(?:\n|$)/, $_, 2);
 

@@ -10,7 +10,8 @@ $VERSION = '2.02';
 # as little an additional performance hit as possible.
 
 sub _handle_element_start {
-  @_[1] =~ tr/-:./__/;
+  @_[1] =~ s/-|:/_/g;
+  @_[1] =~ s/\.//g;
   ( @_[0]->can( 'start_' . @_[1] )
     || return
   )->(
@@ -27,7 +28,8 @@ sub _handle_text {
 }
 
 sub _handle_element_end {
-  @_[1] =~ tr/-:./__/;
+  @_[1] =~ s/-|:/_/g;
+  @_[1] =~ s/\.//g;
   ( @_[0]->can( 'end_' . @_[1] )
     || return
   )->(

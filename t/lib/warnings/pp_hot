@@ -47,7 +47,7 @@
 __END__
 # pp_hot.c [pp_print]
 use warnings 'unopened' ;
-$f = $a = "abc" ; 
+our $f = $a = "abc" ; 
 print $f $a;
 no warnings 'unopened' ;
 print $f $a;
@@ -121,7 +121,7 @@ package foo;
 use warnings 'closed';
 open my $fh1, "<", "nonexistent";
 print $fh1 42;
-open $fh2, "<", "nonexistent";
+open my $fh2, "<", "nonexistent";
 print $fh2 42;
 open $bar::fh3, "<", "nonexistent";
 print $bar::fh3 42;

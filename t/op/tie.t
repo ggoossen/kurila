@@ -24,7 +24,7 @@ for (@prgs){
         unless defined $expected;
     my ($testname) = $prog =~ m/^# (.*)\n/m;
     $testname ||= '';
-    $TODO = $testname =~ s/^TODO //;
+    local our $TODO = $testname =~ s/^TODO //;
     $expected =~ s/\n+$//;
 
     fresh_perl_is($prog, $expected, \%(), $testname);
@@ -34,6 +34,7 @@ __END__
 
 # standard behaviour, without any extra references
 use Tie::Hash ;
+our %h;
 tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
@@ -127,7 +128,7 @@ EXPECT
 # strict behaviour, with extra 1 references via tied which are destroyed
 use warnings 'untie';
 use Tie::Hash ;
-tie %h, 'Tie::StdHash';
+tie our %h, 'Tie::StdHash';
 $a = tied %h;
 $a = 0 ;
 untie %h;
@@ -137,7 +138,7 @@ EXPECT
 # strict error behaviour, with 2 extra references
 use warnings 'untie';
 use Tie::Hash ;
-$a = tie %h, 'Tie::StdHash';
+$a = tie our %h, 'Tie::StdHash';
 $b = tied %h ;
 untie %h;
 EXPECT
@@ -147,7 +148,9 @@ untie attempted while 2 inner references still exist at - line 7.
 # strict behaviour, check scope of strictness.
 no warnings 'untie';
 use Tie::Hash ;
-$A = tie %H, 'Tie::StdHash';
+our ($A, $B, $C);
+our %H;
+$A = tie our %h, 'Tie::StdHash';
 $C = $B = tied %H ;
 {
     use warnings 'untie';
@@ -200,6 +203,7 @@ EXPECT
 
 # Allowed IO self-ties
 my $destroyed = 0;
+my $printed = 0;
 sub Self3::TIEHANDLE { bless @_[1], @_[0] }
 sub Self3::DESTROY   { $destroyed = 1; }
 sub Self3::PRINT     { $printed = 1; }
@@ -216,6 +220,7 @@ EXPECT
 
 # TODO IO "self-tie" via TEMP glob
 my $destroyed = 0;
+my $printed = 0;
 sub Self3::TIEHANDLE { bless @_[1], @_[0] }
 sub Self3::DESTROY   { $destroyed = 1; }
 sub Self3::PRINT     { $printed = 1; }
@@ -245,7 +250,8 @@ EXPECT
 
 # correct unlocalisation of tied hashes (patch #16431)
 use Tie::Hash ;
-tie %tied, 'Tie::StdHash';
+tie our %tied, 'Tie::StdHash';
+our %hash;
 { local %hash{'foo'} } warn "plain hash bad unlocalize" if exists %hash{'foo'};
 { local %tied{'foo'} } warn "tied hash bad unlocalize" if exists %tied{'foo'};
 { local %ENV{'foo'}  } warn "\%ENV bad unlocalize" if exists %ENV{'foo'};
@@ -573,14 +579,14 @@ empty
 ########
 sub TIESCALAR { bless \%() }
 sub FETCH { my $x = 3.3; 1 if 0+$x; $x }
-tie $h, "main";
+tie our $h, "main";
 print $h,"\n";
 EXPECT
 3.3
 ########
 sub TIESCALAR { bless \%() }
 sub FETCH { shift()->{i} ++ }
-tie $h, "main";
+tie our $h, "main";
 print $h.$h;
 EXPECT
 01
@@ -600,6 +606,8 @@ sub FIRSTKEY { my $a = scalar keys %{@_[0]}; each %{@_[0]} }
 sub NEXTKEY  { each %{@_[0]} }
 sub DELETE   { delete @_[0]->{@_[1]} }
 sub CLEAR    { %{@_[0]} = () }
+our %h;
+our %i;
 %h{b}=1;
 delete %h{b};
 print scalar keys %h, "\n";
@@ -622,6 +630,7 @@ foreach my $var ($VAR) {
 EXPECT
 yes
 ########
+our @a;
 sub TIEARRAY { bless \@(), 'main' }
 {
     local @a;
@@ -630,6 +639,7 @@ sub TIEARRAY { bless \@(), 'main' }
 print "tied\n" if tied @a;
 EXPECT
 ########
+our %h;
 sub TIEHASH { bless \@(), 'main' }
 {
     local %h;

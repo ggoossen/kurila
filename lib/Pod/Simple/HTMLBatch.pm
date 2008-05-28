@@ -719,7 +719,7 @@ sub _gen_css_wad {
        { $this_css =~ s/#000\b/#666/gi } # white -> light grey
 
     my $name = $outname;    
-    $name =~ tr/-_/  /;
+    $name =~ s/-|_/ /g;
     $self->add_css( "_$outname.css", 0, $name, 0, 0, \$this_css);
   }
 
@@ -736,7 +736,7 @@ sub _gen_css_wad {
       "\n",
     ;
     my $name = $outname;    
-    $name =~ tr/-_/  /;
+    $name =~ s/-|_/ /g;
     $self->add_css( "_$outname.css", 0, $name, 0, 0, \$this_css);
   }
 
@@ -745,8 +745,8 @@ sub _gen_css_wad {
 
 sub _color_negate {
   my $x = lc @_[0];
-  $x =~ tr[0123456789abcdef]
-          [fedcba9876543210];
+  $x =~ s/([0123456789abcdef])/{ 
+     %( qw| 0 f 1 e 2 d 3 c 4 b 5 a 6 9 7 8 8 7 9 6 a 5 b 4 c 3 d 2 e 1 f 0 | ){$1} }/g;
   return $x;
 }
 

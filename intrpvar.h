@@ -230,7 +230,6 @@ The C variable which corresponds to Perl's $^W warning variable.
 
 PERLVAR(Idowarn,	U8)
 PERLVAR(Idoextract,	bool)
-PERLVAR(Isawampersand,	bool)		/* must save all match strings */
 PERLVAR(Iunsafe,	bool)
 PERLVAR(Iexit_flags,	U8)		/* was exit() unexpected, etc. */
 PERLVAR(Isrand_called,	bool)
@@ -458,15 +457,6 @@ PERLVAR(Ihints,		U32)		/* pragma-tic compile-time flags */
 PERLVAR(Idebug,		VOL U32)	/* flags given to -D switch */
 
 PERLVARI(Iamagic_generation,	long,	0)
-
-#ifdef USE_LOCALE_COLLATE
-PERLVAR(Icollation_name,char *)		/* Name of current collation */
-PERLVAR(Icollxfrm_base,	Size_t)		/* Basic overhead in *xfrm() */
-PERLVARI(Icollxfrm_mult,Size_t,	2)	/* Expansion factor in *xfrm() */
-PERLVARI(Icollation_ix,	U32,	0)	/* Collation generation index */
-PERLVARI(Icollation_standard, bool,	TRUE)
-					/* Assume simple collation */
-#endif /* USE_LOCALE_COLLATE */
 
 
 #if defined (PERL_UTF8_CACHE_ASSERT) || defined (DEBUGGING)

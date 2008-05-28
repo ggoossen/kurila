@@ -99,7 +99,7 @@ sub TIESCALAR { bless \@() } ;
 $b = tie $a, 'main'; 
 untie $a ;
 no warnings 'untie' ;
-$c = tie $d, 'main'; 
+our $c = tie our $d, 'main'; 
 untie $d ;
 EXPECT
 untie attempted while 1 inner references still exist at - line 5.
@@ -395,7 +395,7 @@ getc FOO;
 close STDIN;
 getc STDIN;
 # Create an empty file
-$file = 'getcwarn.tmp';
+my $file = 'getcwarn.tmp';
 open FH1, ">", "$file" or die "# $!"; close FH1;
 open FH2, "<", $file    or die "# $!";
 getc FH2; # Should not warn at EOF
@@ -413,7 +413,7 @@ getc() on closed filehandle FH2 at - line 12.
 ########
 # pp_sys.c [pp_sselect]
 use warnings 'misc';
-$x = 1;
+my $x = 1;
 select $x, undef, undef, 1;
 no warnings 'misc';
 select $x, undef, undef, 1;
@@ -432,8 +432,8 @@ EOM
 }
 opendir FOO, '.'; closedir FOO;
 open BAR, "<", '.'; close BAR;
-opendir $dh, '.'; closedir $dh;
-open $fh, "<", '.'; close $fh;
+opendir my $dh, '.'; closedir $dh;
+open my $fh, "<", '.'; close $fh;
 chdir FOO;
 chdir BAR;
 chdir $dh;

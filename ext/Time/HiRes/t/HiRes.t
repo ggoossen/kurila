@@ -1,10 +1,10 @@
 #!./perl -w
 
+use TestInit;
+use Config;
+
 BEGIN {
     if (%ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
 	if (" %Config{'extensions'} " !~ m[ Time/HiRes ]) {
 	    print "1..0 # Skip -- Perl configured without Time::HiRes module\n";
 	    exit 0;
@@ -14,12 +14,8 @@ BEGIN {
 
 BEGIN { $| = 1; print "1..38\n"; }
 
-END { print "not ok 1\n" unless $loaded }
-
 use Time::HiRes v1.9704; # Remember to bump this once in a while.
 use Time::HiRes qw(tv_interval);
-
-$loaded = 1;
 
 print "ok 1\n";
 

@@ -815,6 +815,7 @@ STATIC const COP*
 S_closest_cop(pTHX_ const COP *cop, const OP *o)
 {
     dVAR;
+    PERL_ARGS_ASSERT_CLOSEST_COP;
     /* Look for PL_op starting from o.  cop is the last COP we've seen. */
 
     if (!o || o == PL_op)

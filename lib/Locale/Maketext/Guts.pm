@@ -106,10 +106,10 @@ sub _compile {
           # A bit of a hack -- we've turned "~,"'s into DELs, so turn
           #  'em into real commas here.
           if (ord('A') == 65) { # ASCII, etc
-            foreach($m, @params) { tr/\x7F/,/ } 
+            foreach($m, @params) { s/\x7F/,/g } 
           } else {              # EBCDIC (1047, 0037, POSIX-BC)
             # Thanks to Peter Prymmer for the EBCDIC handling
-            foreach($m, @params) { tr/\x07/,/ } 
+            foreach($m, @params) { s/\x07/,/g } 
           }
           
           # Special-case handling of some method names:
@@ -271,7 +271,7 @@ sub _die_pointing {
     } else {
       # tabs screw everything up!
       $pointy = substr(@_[0],0,$pos);
-      $pointy =~ tr/\t //cd;
+      $pointy =~ s/[^\t ]//g;
        # make everything into whitespace, but preseving tabs
       $pointy .= "^=== near there\n";
     }

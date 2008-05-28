@@ -561,7 +561,7 @@ END
 
         my($v) = neatvalue(%initial_att{$key});
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-        $v =~ tr/\n/ /s;
+        $v =~ s/\n+/ /g;
         push @{$self->{RESULT}}, "#     $key => $v";
     }
     undef %initial_att;        # free memory
@@ -576,7 +576,7 @@ END
                next if $key eq 'ARGS';
                my($v) = neatvalue(%configure_att{$key});
                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-               $v =~ tr/\n/ /s;
+               $v =~ s/\n+/ /g;
                push @{$self->{RESULT}}, "#     $key => $v";
             }
         }
@@ -978,7 +978,7 @@ sub selfdocument {
             next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/;
             my($v) = neatvalue($self->{$key});
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-            $v =~ tr/\n/ /s;
+            $v =~ s/\n+/ /g;
             push @m, "# $key => $v";
         }
     }

@@ -153,9 +153,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_fm:
     case PERL_MAGIC_regex_global:
     case PERL_MAGIC_nkeys:
-#ifdef USE_LOCALE_COLLATE
-    case PERL_MAGIC_collxfrm:
-#endif
     case PERL_MAGIC_qr:
     case PERL_MAGIC_taint:
     case PERL_MAGIC_vec:
@@ -2129,27 +2126,6 @@ Perl_magic_setregexp(pTHX_ SV *sv, MAGIC *mg)
     }
     return sv_unmagic(sv, type);
 }
-
-#ifdef USE_LOCALE_COLLATE
-int
-Perl_magic_setcollxfrm(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_ARGS_ASSERT_MAGIC_SETCOLLXFRM;
-
-    /*
-     * RenE<eacute> Descartes said "I think not."
-     * and vanished with a faint plop.
-     */
-    PERL_UNUSED_CONTEXT;
-    PERL_UNUSED_ARG(sv);
-    if (mg->mg_ptr) {
-        Safefree(mg->mg_ptr);
-        mg->mg_ptr = NULL;
-        mg->mg_len = -1;
-    }
-    return 0;
-}
-#endif /* USE_LOCALE_COLLATE */
 
 /* Just clear the UTF-8 cache data. */
 int

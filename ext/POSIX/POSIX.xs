@@ -1147,7 +1147,6 @@ setlocale(category, locale = 0)
 		else
 #endif
 		    newcoll = RETVAL;
-		new_collate(newcoll);
 	    }
 #endif /* USE_LOCALE_COLLATE */
 #ifdef USE_LOCALE_NUMERIC

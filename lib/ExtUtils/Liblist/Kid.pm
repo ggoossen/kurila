@@ -115,9 +115,9 @@ sub _unix_os2_ext {
 		$fullname = "$thispth/" .
 		(sort { my($ma) = $a;
 			my($mb) = $b;
-			$ma =~ tr/A-Za-z/0/s;
+			$ma =~ s/[A-Za-z]+/0/g;
 			$ma =~ s/\b(\d)\b/0$1/g;
-			$mb =~ tr/A-Za-z/0/s;
+			$mb =~ s/[A-Za-z]+/0/g;
 			$mb =~ s/\b(\d)\b/0$1/g;
 			while (length($ma) +< length($mb)) { $ma .= ".00"; }
 			while (length($mb) +< length($ma)) { $mb .= ".00"; }

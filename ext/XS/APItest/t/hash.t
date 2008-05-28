@@ -1,10 +1,8 @@
 #!perl -w
 
+use TestInit;
+use Config;
 BEGIN {
-  chdir 't' if -d 't';
-  @INC = '../lib';
-  push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-  require Config; Config->import;
   if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
     # Look, I'm using this fully-qualified variable more than once!
     my $arch = $MacPerl::Architecture;
@@ -392,7 +390,9 @@ sub brute_force_exists {
 }
 
 sub rot13 {
-    my @results = map {my $a = $_; $a =~ tr/A-Za-z/N-ZA-Mn-za-m/; $a} @_;
+    my @results = map {my $a = $_; $a =~ s/([A-Z])/{ chr((ord($1) + 13 - ord('A')) % 26 + ord('A')) }/g;
+                       $a =~ s/([a-z])/{ chr((ord($1) + 13 - ord('a')) % 26 + ord('a')) }/g;
+                       $a} @_;
     wantarray ? @results : @results[0];
 }
 

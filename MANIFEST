@@ -712,12 +712,6 @@ ext/Sys/Syslog/win32/PerlLog_dll.uu	Sys::Syslog extension Win32 related file
 ext/Sys/Syslog/win32/PerlLog.mc	Sys::Syslog extension Win32 related file
 ext/Sys/Syslog/win32/PerlLog_RES.uu	Sys::Syslog extension Win32 related file
 ext/Sys/Syslog/win32/Win32.pm	Sys::Syslog extension Win32 related file
-ext/Text/Soundex/Changes	Changelog for Text::Soundex
-ext/Text/Soundex/Makefile.PL	Text::Soundex extension makefile writer
-ext/Text/Soundex/README		README for Text::Soundex
-ext/Text/Soundex/Soundex.pm	Text::Soundex extension Perl module
-ext/Text/Soundex/Soundex.xs	Text::Soundex extension external subroutines
-ext/Text/Soundex/t/Soundex.t	test for Text::Soundex
 ext/threads/hints/hpux.pl	Hint file for HPUX
 ext/threads/hints/linux.pl	Hint file for Linux
 ext/threads/Makefile.PL		ithreads
@@ -779,19 +773,6 @@ ext/Time/HiRes/HiRes.xs		Time::HiRes extension
 ext/Time/HiRes/Makefile.PL	Time::HiRes extension
 ext/Time/HiRes/t/HiRes.t	Test for Time::HiRes
 ext/Time/HiRes/typemap		Time::HiRes extension
-ext/Time/Piece/Changes		Time::Piece extension
-ext/Time/Piece/Makefile.PL	Time::Piece extension
-ext/Time/Piece/Piece.pm		Time::Piece extension
-ext/Time/Piece/Piece.xs		Time::Piece extension
-ext/Time/Piece/README		Time::Piece extension
-ext/Time/Piece/Seconds.pm	Time::Piece extension
-ext/Time/Piece/t/01base.t	Test for Time::Piece
-ext/Time/Piece/t/02core.t	Test for Time::Piece
-ext/Time/Piece/t/03compare.t	Test for Time::Piece
-ext/Time/Piece/t/04mjd.t	Test for Time::Piece
-ext/Time/Piece/t/05overload.t	Test for Time::Piece
-ext/Time/Piece/t/06subclass.t	Test for Time::Piece
-ext/Time/Piece/t/07arith.t	Test for Time::Piece
 ext/Unicode/Normalize/Changes	Unicode::Normalize
 ext/Unicode/Normalize/Makefile.PL	Unicode::Normalize
 ext/Unicode/Normalize/mkheader	Unicode::Normalize
@@ -977,42 +958,6 @@ intrpvar.h			Variables held in each interpreter instance
 iperlsys.h			Perl's interface to the system
 keywords.h			The keyword numbers
 keywords.pl			Program to write keywords.h
-lib/Archive/Extract.pm	Archive::Extract
-lib/Archive/Extract/t/01_Archive-Extract.t	Archive::Extract tests
-lib/Archive/Extract/t/src/double_dir.zip.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.bz2.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.gz.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.jar.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.lzma.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.par.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.tar.gz.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.tar.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.tgz.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.zip.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/x.Z.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.jar.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.par.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.tar.bz2.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.tar.gz.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.tar.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.tbz.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.tgz.packed	Archive::Extract tests
-lib/Archive/Extract/t/src/y.zip.packed	Archive::Extract tests
-lib/Archive/Tar/bin/ptar	the ptar utility
-lib/Archive/Tar/bin/ptardiff	the ptardiff utility
-lib/Archive/Tar/Constant.pm	Archive::Tar
-lib/Archive/Tar/File.pm		Archive::Tar
-lib/Archive/Tar.pm		Archive::Tar
-lib/Archive/Tar/t/01_use.t	Archive::Tar tests
-lib/Archive/Tar/t/02_methods.t	Archive::Tar tests
-lib/Archive/Tar/t/03_file.t	Archive::Tar tests
-lib/Archive/Tar/t/04_resolved_issues.t	Archive::Tar tests
-lib/Archive/Tar/t/src/long/b	Archive::Tar tests
-lib/Archive/Tar/t/src/long/bar.tar.packed	Archive::Tar tests
-lib/Archive/Tar/t/src/long/foo.tgz.packed	Archive::Tar tests
-lib/Archive/Tar/t/src/short/b	Archive::Tar tests
-lib/Archive/Tar/t/src/short/bar.tar.packed	Archive::Tar tests
-lib/Archive/Tar/t/src/short/foo.tgz.packed	Archive::Tar tests
 lib/attributes.pm		For "sub foo : attrlist"
 lib/autouse.pm			Load and call a function only when it's used
 lib/autouse.t			See if autouse works
@@ -1377,49 +1322,14 @@ lib/Module/Load/t/to_load/Must/Be/Loaded.pm	Module::Load tests
 lib/Module/Load/t/to_load/TestModule.pm	Module::Load tests
 lib/Module/Load/t/to_load/ToBeLoaded	Module::Load tests
 lib/mro.pm			mro extension
-lib/Net/Changes			libnet
-lib/Net/Cmd.pm			libnet
-lib/Net/Config.eg		libnet
-lib/Net/Config.pm		libnet
-lib/Net/demos/ftp		libnet
-lib/Net/demos/inetd		libnet
-lib/Net/demos/nntp		libnet
-lib/Net/demos/nntp.mirror	libnet
-lib/Net/demos/pop3		libnet
-lib/Net/demos/smtp.self		libnet
-lib/Net/demos/time		libnet
-lib/Net/Domain.pm		libnet
-lib/Net/FTP/A.pm		libnet
-lib/Net/FTP/dataconn.pm		libnet
-lib/Net/FTP/E.pm		libnet
-lib/Net/FTP/I.pm		libnet
-lib/Net/FTP/L.pm		libnet
-lib/Net/FTP.pm			libnet
 lib/Net/hostent.pm		By-name interface to Perl's builtin gethost*
 lib/Net/hostent.t		See if Net::hostent works
-lib/Net/Hostname.pm.eg		libnet
-lib/Net/libnetFAQ.pod		libnet
 lib/Net/netent.pm		By-name interface to Perl's builtin getnet*
 lib/Net/netent.t		See if Net::netent works
-lib/Net/Netrc.pm		libnet
-lib/Net/NNTP.pm			libnet
-lib/Net/POP3.pm			libnet
 lib/Net/protoent.pm		By-name interface to Perl's builtin getproto*
 lib/Net/protoent.t		See if Net::protoent works
-lib/Net/README			libnet
 lib/Net/servent.pm		By-name interface to Perl's builtin getserv*
 lib/Net/servent.t		See if Net::servtent works
-lib/Net/SMTP.pm			libnet
-lib/Net/t/config.t		libnet
-lib/Net/t/datasend.t		libnet
-lib/Net/t/ftp.t			libnet
-lib/Net/t/hostname.t		libnet
-lib/Net/Time.pm			libnet
-lib/Net/t/netrc.t		libnet
-lib/Net/t/nntp.t		libnet
-lib/Net/t/require.t		libnet
-lib/Net/t/smtp.t		libnet
-lib/Net/t/time.t		libnet
 lib/open.pm			Pragma to specify default I/O layers
 lib/open.t			See if the open pragma works
 lib/overload64.t		See if operator overloading works with 64-bit ints
@@ -1796,18 +1706,6 @@ lib/Test/t/todo.t		See if Test works
 lib/Test/Tutorial.pod		A tutorial on writing tests
 lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
-lib/Text/Balanced/Changes	Text::Balanced
-lib/Text/Balanced.pm		Text::Balanced
-lib/Text/Balanced/README	Text::Balanced
-lib/Text/Balanced/t/00-load.t	See if Text::Balanced works
-lib/Text/Balanced/t/extbrk.t	See if Text::Balanced works
-lib/Text/Balanced/t/extcbk.t	See if Text::Balanced works
-lib/Text/Balanced/t/extdel.t	See if Text::Balanced works
-lib/Text/Balanced/t/extmul.t	See if Text::Balanced works
-lib/Text/Balanced/t/extqlk.t	See if Text::Balanced works
-lib/Text/Balanced/t/exttag.t	See if Text::Balanced works
-lib/Text/Balanced/t/extvar.t	See if Text::Balanced works
-lib/Text/Balanced/t/gentag.t	See if Text::Balanced works
 lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
 lib/Text/ParseWords.t		See if Text::ParseWords works
 lib/Text/ParseWords/taint.t	See if Text::ParseWords works with tainting
@@ -2141,6 +2039,7 @@ pod/buildtoc			Update files based on pod.lst
 pod/checkpods.PL		Tool to check for common errors in pods
 pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurila02delta.pod	What is new for Perl Kurila 0.2
+pod/kurila111delta.pod	What is new for Perl Kurila 1.11
 pod/kurila110delta.pod	What is new for Perl Kurila 1.10
 pod/kurila13delta.pod	What is new for Perl Kurila 1.3
 pod/kurila14delta.pod	What is new for Perl Kurila 1.4
@@ -2511,7 +2410,8 @@ t/lex/qq.t			See if qq works
 t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
-t/lib/1_compile.t		See if the various libraries and extensions compile
+t/op/anon_array.t		See if @( ... ) work
+t/op/anon_hash.t		See if %( ... ) work
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
@@ -2559,9 +2459,6 @@ t/lib/NoExporter.pm			Part of Test-Simple
 t/lib/no_load.t			Test that some modules don't load others
 t/lib/proxy_constant_subs.t	Test that Proxy Constant Subs behave correctly
 t/lib/Sans_mypragma.pm			Test module for t/lib/mypragma.t
-t/lib/strict/refs		Tests of "use strict 'refs'" for strict.t
-t/lib/strict/subs		Tests of "use strict 'subs'" for strict.t
-t/lib/strict/vars		Tests of "use strict 'vars'" for strict.t
 t/lib/Test/Simple/Catch.pm	Utility module for testing Test::Simple
 t/lib/Test/Simple/sample_tests/death_in_eval.plx	for exit.t
 t/lib/Test/Simple/sample_tests/death.plx		for exit.t
@@ -2766,12 +2663,10 @@ t/op/state.t			See if state variables work
 t/op/stat.t			See if stat works
 t/op/study.t			See if study works
 t/op/studytied.t		See if study works with tied scalars
-t/op/subst_amp.t		See if $&-related substitution works
 t/op/substr.t			See if substr works
 t/op/substr_thr.t		See if substr works in another thread
 t/op/subst.t			See if substitution works
 t/op/substT.t			See if substitution works with -T
-t/op/subst_wamp.t		See if substitution works with $& present
 t/op/sub.t			See if subroutines work
 t/op/switch.t			See if switches (given/when) work
 t/op/symbolcache.t		See if undef/delete works on stashes with functions
@@ -2783,7 +2678,6 @@ t/op/tiearray.t			See if tie for arrays works
 t/op/tiehandle.t		See if tie for handles works
 t/op/tie.t			See if tie/untie functions work
 t/op/time.t			See if time functions work
-t/op/tr.t			See if tr works
 t/op/undef.t			See if undef works
 t/op/universal.t		See if UNIVERSAL class works
 t/op/unshift.t			See if unshift works
@@ -2872,7 +2766,6 @@ t/uni/fold.t			See if Unicode folding works
 t/uni/lower.t			See if Unicode casing works
 t/uni/sprintf.t			See if Unicode sprintf works
 t/uni/title.t			See if Unicode casing works
-t/uni/tr_utf8.t			See if Unicode tr/// in utf8 works
 t/uni/upper.t			See if Unicode casing works
 t/win32/system.t		See if system works in Win*
 t/win32/system_tests		Test runner for system.t
@@ -2888,7 +2781,6 @@ util.h				Dummy header
 utils/h2ph.pl			A thing to turn C .h files into perl .ph files
 utils/h2xs.pl			Program to make .xs files from C header files
 utils/instmodsh.PL		Give information about installed extensions
-utils/libnetcfg.pl		libnet
 utils.lst			Lists utilities bundled with Perl
 utils/Makefile			Pregenerated from utils/Makefile.SH
 utils/Makefile.SH		Extract the utility scripts

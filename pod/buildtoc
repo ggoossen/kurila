@@ -94,7 +94,7 @@ foreach ( ~< *MASTER) {
     %flags{toc_omit} = 1 if $flags =~ tr/o//d;
     %flags{aux} = 1 if $flags =~ tr/a//d;
     die "$0: Unknown flag found in heading line: $_" if length $flags;
-    push @Master, [\%flags, $2];
+    push @Master, \@(\%flags, $2);
 
   } elsif (m/^(\S*)\s+(\S+)\s+(.*)/) {
     # it's a section
@@ -125,7 +125,7 @@ foreach ( ~< *MASTER) {
       %Pods{$filename} = $desc;
     }
     die "$0: Unknown flag found in section line: $_" if length $flags;
-    push @Master, [\%flags, $filename, $desc];
+    push @Master, \@(\%flags, $filename, $desc);
   } elsif (m/^$/) {
     push @Master, undef;
   } else {
@@ -497,7 +497,7 @@ sub generate_perlpod {
       # Section
       my $start = " " x (4 + $flags->{indent}) . $_->[1];
       $maxlength = length $start if length ($start) +> $maxlength;
-      push @output, [$start, $_->[2]];
+      push @output, \@($start, $_->[2]);
     } elsif (@$_ == 0) {
       # blank line
       push @output, "\n";
@@ -522,11 +522,11 @@ sub generate_manifest {
   map {s/ \t/\t\t/g; $_} @temp;
 }
 sub generate_manifest_pod {
-  generate_manifest map {["pod/$_.pod", %Pods{$_}]}
+  generate_manifest map {\@("pod/$_.pod", %Pods{$_})}
     grep {!%Copies{"$_.pod"}} sort keys %Pods;
 }
 sub generate_manifest_readme {
-  generate_manifest map {["README.$_", %Readmes{$_}]} sort keys %Readmes;
+  generate_manifest map {\@("README.$_", %Readmes{$_})} sort keys %Readmes;
 }
 
 sub generate_roffitall {
@@ -594,7 +594,7 @@ sub do_manifest {
   # Dictionary order - fold and handle non-word chars as nothing
   map  { $_->[0] }
   sort { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] }
-  map  { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; [ $_, $f ] }
+  map  { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@( $_, $f ) }
     @manifest,
       &generate_manifest_pod(),
 	&generate_manifest_readme();

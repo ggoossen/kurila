@@ -75,7 +75,6 @@ Perl_sv_setpvf_mg_nocontext
 Perl_fprintf_nocontext
 Perl_printf_nocontext
 Perl_cv_ckproto
-Perl_gv_const_sv
 Perl_cv_const_sv
 Perl_cv_undef
 Perl_cx_dump
@@ -111,7 +110,6 @@ Perl_dowantarray
 Perl_dump_all
 Perl_dump_eval
 Perl_dump_fds
-Perl_dump_form
 Perl_gv_dump
 Perl_op_dump
 Perl_pmop_dump
@@ -128,7 +126,6 @@ Perl_gv_AVadd
 Perl_gv_HVadd
 Perl_gv_IOadd
 Perl_gv_check
-Perl_gv_efullname
 Perl_gv_efullname3
 Perl_gv_efullname4
 Perl_gv_fetchfile
@@ -370,7 +367,6 @@ Perl_get_hv
 Perl_get_cv
 Perl_get_cvn_flags
 Perl_init_i18nl10n
-Perl_new_collate
 Perl_new_ctype
 Perl_new_numeric
 Perl_set_numeric_local
@@ -484,7 +480,6 @@ Perl_sv_uv
 Perl_sv_nv
 Perl_sv_pvn
 Perl_sv_pvutf8n
-Perl_sv_pvbyten
 Perl_sv_true
 Perl_sv_backoff
 Perl_sv_bless
@@ -496,8 +491,6 @@ Perl_sv_catsv
 Perl_sv_chop
 Perl_sv_clear
 Perl_sv_cmp
-Perl_sv_cmp_locale
-Perl_sv_collxfrm
 Perl_sv_compile_2op
 Perl_getcwd_sv
 Perl_sv_dec
@@ -525,9 +518,7 @@ Perl_sv_pos_u2b
 Perl_sv_pos_b2u
 Perl_sv_pvn_force
 Perl_sv_pvutf8n_force
-Perl_sv_pvbyten_force
 Perl_sv_recode_to_utf8
-Perl_sv_cat_decode
 Perl_sv_reftype
 Perl_sv_replace
 Perl_sv_report_used
@@ -642,7 +633,6 @@ Perl_sv_2pvutf8_nolen
 Perl_sv_2pvbyte_nolen
 Perl_sv_pv
 Perl_sv_pvutf8
-Perl_sv_pvbyte
 Perl_sv_utf8_encode
 Perl_sv_utf8_decode
 Perl_sv_force_normal

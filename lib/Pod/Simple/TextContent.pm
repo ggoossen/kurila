@@ -27,8 +27,8 @@ sub _handle_element_start {
 }
 
 sub _handle_text {
-    @_[1] =~ tr/\x{AD}//d;
-    @_[1] =~ tr/\x{A0}/ /;
+    @_[1] =~ s/\x{AD}//g;
+    @_[1] =~ s/\x{A0}/ /g;
     print {@_[0]{'output_fh'}} @_[1];
     return;
 }

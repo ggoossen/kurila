@@ -194,52 +194,6 @@ Perl_new_ctype(pTHX_ const char *newctype)
 }
 
 /*
- * Set up for a new collation locale.
- */
-void
-Perl_new_collate(pTHX_ const char *newcoll)
-{
-#ifdef USE_LOCALE_COLLATE
-    dVAR;
-
-    if (! newcoll) {
-	if (PL_collation_name) {
-	    ++PL_collation_ix;
-	    Safefree(PL_collation_name);
-	    PL_collation_name = NULL;
-	}
-	PL_collation_standard = TRUE;
-	PL_collxfrm_base = 0;
-	PL_collxfrm_mult = 2;
-	return;
-    }
-
-    if (! PL_collation_name || strNE(PL_collation_name, newcoll)) {
-	++PL_collation_ix;
-	Safefree(PL_collation_name);
-	PL_collation_name = stdize_locale(savepv(newcoll));
-	PL_collation_standard = ((*newcoll == 'C' && newcoll[1] == '\0')
-				 || strEQ(newcoll, "POSIX"));
-
-	{
-	  /*  2: at most so many chars ('a', 'b'). */
-	  /* 50: surely no system expands a char more. */
-#define XFRMBUFSIZE  (2 * 50)
-	  char xbuf[XFRMBUFSIZE];
-	  const Size_t fa = strxfrm(xbuf, "a",  XFRMBUFSIZE);
-	  const Size_t fb = strxfrm(xbuf, "ab", XFRMBUFSIZE);
-	  const SSize_t mult = fb - fa;
-	  if (mult < 1)
-	      Perl_croak(aTHX_ "strxfrm() gets absurd");
-	  PL_collxfrm_base = (fa > (Size_t)mult) ? (fa - mult) : 0;
-	  PL_collxfrm_mult = mult;
-	}
-    }
-
-#endif /* USE_LOCALE_COLLATE */
-}
-
-/*
  * Initialize locale awareness.
  */
 int
@@ -484,10 +438,6 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
     new_ctype(curctype);
 #endif /* USE_LOCALE_CTYPE */
 
-#ifdef USE_LOCALE_COLLATE
-    new_collate(curcoll);
-#endif /* USE_LOCALE_COLLATE */
-
 #ifdef USE_LOCALE_NUMERIC
     new_numeric(curnum);
 #endif /* USE_LOCALE_NUMERIC */
@@ -564,69 +514,6 @@ Perl_init_i18nl10n(pTHX_ int printwarn)
 #endif /* USE_LOCALE_NUMERIC */
     return ok;
 }
-
-#ifdef USE_LOCALE_COLLATE
-
-/*
- * mem_collxfrm() is a bit like strxfrm() but with two important
- * differences. First, it handles embedded NULs. Second, it allocates
- * a bit more memory than needed for the transformed data itself.
- * The real transformed data begins at offset sizeof(collationix).
- * Please see sv_collxfrm() to see how this is used.
- */
-
-char *
-Perl_mem_collxfrm(pTHX_ const char *s, STRLEN len, STRLEN *xlen)
-{
-    dVAR;
-    char *xbuf;
-    STRLEN xAlloc, xin, xout; /* xalloc is a reserved word in VC */
-
-    PERL_ARGS_ASSERT_MEM_COLLXFRM;
-
-    /* the first sizeof(collationix) bytes are used by sv_collxfrm(). */
-    /* the +1 is for the terminating NUL. */
-
-    xAlloc = sizeof(PL_collation_ix) + PL_collxfrm_base + (PL_collxfrm_mult * len) + 1;
-    Newx(xbuf, xAlloc, char);
-    if (! xbuf)
-	goto bad;
-
-    *(U32*)xbuf = PL_collation_ix;
-    xout = sizeof(PL_collation_ix);
-    for (xin = 0; xin < len; ) {
-	Size_t xused;
-
-	for (;;) {
-	    xused = strxfrm(xbuf + xout, s + xin, xAlloc - xout);
-	    if (xused >= PERL_INT_MAX)
-		goto bad;
-	    if ((STRLEN)xused < xAlloc - xout)
-		break;
-	    xAlloc = (2 * xAlloc) + 1;
-	    Renew(xbuf, xAlloc, char);
-	    if (! xbuf)
-		goto bad;
-	}
-
-	xin += strlen(s + xin) + 1;
-	xout += xused;
-
-	/* Embedded NULs are understood but silently skipped
-	 * because they make no sense in locale collation. */
-    }
-
-    xbuf[xout] = '\0';
-    *xlen = xout - sizeof(PL_collation_ix);
-    return xbuf;
-
-  bad:
-    Safefree(xbuf);
-    *xlen = 0;
-    return NULL;
-}
-
-#endif /* USE_LOCALE_COLLATE */
 
 /*
  * Local variables:

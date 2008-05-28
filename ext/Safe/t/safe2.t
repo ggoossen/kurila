@@ -1,11 +1,7 @@
 #!./perl -w
 $|=1;
+use Config;
 BEGIN {
-    if(%ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    } 
-    require Config; Config->import;
     if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
@@ -50,6 +46,7 @@ if ($@ && $@->{description} =~ m/^'?system'? trapped by operation mask/) {
 }
 
 $cpt->reval(q{
+    our ($foo, $bar);
     print $foo eq 'visible'		? "ok 2\n" : "not ok 2\n";
     print $main::foo  eq 'visible'	? "ok 3\n" : "not ok 3\n";
     print defined($bar)			? "not ok 4\n" : "ok 4\n";
@@ -58,11 +55,11 @@ $cpt->reval(q{
 });
 print $@ ? "not ok 7\n#$@" : "ok 7\n";
 
-$foo = "ok 8\n";
-%bar = (key => "ok 9\n");
-@baz = (); push(@baz, "o", "10"); $" = 'k ';
-$glob = "ok 11\n";
-@glob = qw(not ok 16);
+our $foo = "ok 8\n";
+our %bar = (key => "ok 9\n");
+our @baz = (); push(@baz, "o", "10"); $" = 'k ';
+our $glob = "ok 11\n";
+our @glob = qw(not ok 16);
 
 sub sayok { print "ok @_\n" }
 
@@ -73,6 +70,7 @@ $cpt->reval(q{
     package other;
     sub other_sayok { print "ok @_\n" }
     package main;
+    our ($foo, %bar, @baz, $glob, @glob);
     print $foo ? $foo : "not ok 8\n";
     print %bar{key} ? %bar{key} : "not ok 9\n";
     (@baz) ? print "@baz\n" : print "not ok 10\n";
@@ -112,7 +110,7 @@ print $cpt->reval("2 + 2") == 4 ? "ok 23\n" : "not ok 23\n";
 
 $cpt->mask(empty_opset);
 my $t_scalar = $cpt->reval('print wantarray ? "not ok 24\n" : "ok 24\n"');
-print $cpt->reval('@ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
+print $cpt->reval('our @ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
 my @t_array  = $cpt->reval('print wantarray ? "ok 26\n" : "not ok 26\n"; (2,3,4)');
 print @t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
 

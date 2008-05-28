@@ -91,9 +91,9 @@ sub emit_par {
   my $indent = ' ' x ( 2 * $self->{'Indent'} + ($tweak_indent||0) );
    # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
 
-  $self->{'Thispara'} =~ tr{\x{AD}}{}d if Pod::Simple::ASCII;
+  $self->{'Thispara'} =~ s/\x{AD}//g if Pod::Simple::ASCII;
   my $out = Text::Wrap::wrap($indent, $indent, $self->{'Thispara'} .= "\n");
-  $out =~ tr{\x{A0}}{ } if Pod::Simple::ASCII;
+  $out =~ s/\x{A0}/ /g if Pod::Simple::ASCII;
   print {$self->{'output_fh'}} $out,
     #"\n"
   ;
@@ -108,8 +108,8 @@ sub end_Verbatim  {
   return unless @_[0]{'Errata_seen'};
   my $self = shift;
   if(Pod::Simple::ASCII) {
-    $self->{'Thispara'} =~ tr{\x{A0}}{ };
-    $self->{'Thispara'} =~ tr{\x{AD}}{}d;
+    $self->{'Thispara'} =~ s/\x{A0}/ /g;
+    $self->{'Thispara'} =~ s/\x{AD}//g;
   }
 
   my $i = ' ' x ( 2 * $self->{'Indent'} + 4);

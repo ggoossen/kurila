@@ -9,7 +9,7 @@ my $minitest   = %ENV{PERL_CORE_MINITEST};
 my $has_perlio = %Config{useperlio};
 
 if (!$minitest) {
-    if (%Config{d_fork} && eval 'require POSIX; 1') {
+    if (%Config{d_fork} && eval { require POSIX; 1 } ) {
 	$can_fork = 1;
     }
 }
@@ -101,7 +101,7 @@ ok( exists %INC{'Bar.pm'},        '  %INC sees Bar.pm' );
 is( ref %INC{'Bar.pm'}, 'ARRAY',  '  val Bar.pm is an arrayref in %INC' );
 cmp_ok( %INC{'Bar.pm'}, '\==', $arrayref,    '  val Bar.pm is correct in %INC' );
 
-ok( eval "use Bar1; 1;",          'use Bar1' );
+ok( eval "use Bar1; 1;",          'use Bar1' ); die if $@;
 ok( exists %INC{'Bar1.pm'},       '  %INC sees Bar1.pm' );
 is( ref %INC{'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in %INC' );
 cmp_ok( %INC{'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in %INC' );

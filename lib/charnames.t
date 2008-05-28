@@ -24,6 +24,8 @@ use charnames ':full';
 print "not " unless "Here\N{EXCLAMATION MARK}?" eq "Here!?";
 print "ok 1\n";
 
+our ($res, $encoded_be, $encoded_alpha, $encoded_bet, $encoded_deseng);
+
 {
   use bytes;			# TEST -utf8 can switch utf8 on
 
@@ -298,8 +300,7 @@ for (@prgs) {
 	print $ali $fil;
 	close $ali or die "Could not close $alifile: $!";
 	}
-    my $res = runperl( switches => $switch, 
-                       progfile => $tmpfile,
+    my $res = runperl( progfile => $tmpfile,
                        stderr => 1 );
     my $status = $?;
     $res =~ s/[\r\n]+$//;
@@ -314,9 +315,9 @@ for (@prgs) {
     my $pfx = ($res =~ s/^PREFIX\n//);
     my $rexp = qr{^$exp};
     if ($res =~ s/^SKIPPED\n//) {
-	print "$results\n";
+	print "$res\n";
 	}
-    elsif (($pfx and $res !~ m/^\Q$expected/) or
+    elsif (($pfx and $res !~ m/^\Q$exp/) or
 	  (!$pfx and $res !~ $rexp)) {
         print STDERR
 	    "PROG:\n$prog\n",
@@ -346,7 +347,7 @@ print "ok 74\n";
 my $names = do "unicore/Name.pl";
 print defined $names ? "ok 75\n" : "not ok 75\n";
 if (ord('A') == 65) { # as on ASCII or UTF-8 machines
-  my $non_ascii = $names =~ tr/\0-\177//c;
+  my $non_ascii = $names =~ s/[^\0-\177]//g;
   print $non_ascii ? "not ok 76 # $non_ascii\n" : "ok 76\n";
 } else {
   print "ok 76\n";

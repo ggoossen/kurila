@@ -15,7 +15,7 @@ print "1..33\n";
 
 @ARGV = qw(-Foo -baR --foo bar);
 Getopt::Long::Configure ("no_ignore_case");
-%lnk = ();
+our %lnk = ();
 print "ok 1\n" if GetOptions (\%lnk, "foo", "Foo=s");
 print ((defined %lnk{foo})   ? "" : "not ", "ok 2\n");
 print ((%lnk{foo} == 1)      ? "" : "not ", "ok 3\n");

@@ -45,7 +45,7 @@ sub catdir {
     my $self = shift;
     my @args = @_;
     foreach (@args) {
-	tr[\\][/];
+	s[\\][/]g;
         # append a backslash to each argument unless it has one there
         $_ .= "/" unless m{/$};
     }

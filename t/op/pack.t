@@ -131,7 +131,7 @@ sub list_eq ($$) {
 
     $sum = unpack("\%32b*", $foo);
     my $longway = unpack("b*", $foo);
-    is( $sum, $longway =~ tr/1/1/ );
+    is( $sum, @($longway =~ m/(1)/g) );
 }
 
 {
@@ -463,7 +463,7 @@ MM+6VM[BYNKN\O;Z_P,'"P\3%QL?(R<K+S,W.S]#1TM/4U=;7V-G:V]S=WM_@
 EOUU
 
     $_ = $uu;
-    tr/ /`/;
+    s/ /`/g;
 
     is(pack('u', $in), $_);
 
@@ -621,7 +621,7 @@ sub numbers_with_total {
             pass ("unpack '\%$_$format' gave $sum");
         } else {
             my $delta = 1.000001;
-            if ($format =~ tr /dDfF//
+            if ($format =~ s/[dDfF]//g
                 && ($calc_sum +<= $sum * $delta && $calc_sum +>= $sum / $delta)) {
                 pass ("unpack '\%$_$format' gave $sum, expected $calc_sum");
             } else {
@@ -1115,7 +1115,7 @@ SKIP: {
   for my $tle (sort keys %templates) {
     my @d = @{%templates{$tle}};
     my $tbe = $tle;
-    $tbe =~ y/</>/;
+    $tbe =~ s/</>/g;
     for my $t ($tbe, $tle) {
       my $c = compress_template($t);
       print "# '$t' -> '$c'\n";

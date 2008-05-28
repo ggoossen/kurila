@@ -165,7 +165,6 @@ bp	|void	|cv_ckproto	|NN const CV* cv|NULLOK const GV* gv\
 p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
 				|NULLOK const char* p|const STRLEN len
 pd	|CV*	|cv_clone	|NN CV* proto
-ApdR	|SV*	|gv_const_sv	|NN GV* gv
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
@@ -255,7 +254,6 @@ Ap	|void	|dump_eval
 #if defined(DUMP_FDS)
 Ap	|void	|dump_fds	|NN char* s
 #endif
-Ap	|void	|dump_form	|NN const GV* gv
 Ap	|void	|gv_dump	|NN GV* gv
 Ap	|void	|op_dump	|NN const OP *o
 Ap	|void	|pmop_dump	|NULLOK PMOP* pm
@@ -282,7 +280,6 @@ Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
-Ap	|void	|gv_efullname	|NN SV* sv|NN const GV* gv
 Apmb	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 Ap	|void	|gv_efullname4	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix|bool keepmain
 Ap	|GV*	|gv_fetchfile	|NN const char* name
@@ -468,10 +465,6 @@ p	|U32	|magic_sizepack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_wipepack	|NN SV* sv|NN MAGIC* mg
 p	|void	|magicname	|NN const char* sym|NULLOK const char* name|I32 namlen
 Ap	|void	|markstack_grow
-#if defined(USE_LOCALE_COLLATE)
-p	|int	|magic_setcollxfrm|NN SV* sv|NN MAGIC* mg
-p	|char*	|mem_collxfrm	|NN const char* s|STRLEN len|NN STRLEN* xlen
-#endif
 Afp	|SV*	|mess		|NN const char* pat|...
 Ap	|SV*	|vmess		|NN const char* pat|NULLOK va_list* args
 EXp	|void	|qerror		|NN SV* err
@@ -649,7 +642,6 @@ Apd	|HV*	|get_hv		|NN const char* name|I32 create
 Apd	|CV*	|get_cv		|NN const char* name|I32 flags
 Apd	|CV*	|get_cvn_flags	|NN const char* name|STRLEN len|I32 flags
 Ap	|int	|init_i18nl10n	|int printwarn
-Ap	|void	|new_collate	|NULLOK const char* newcoll
 Ap	|void	|new_ctype	|NN const char* newctype
 Ap	|void	|new_numeric	|NULLOK const char* newcoll
 Ap	|void	|set_numeric_local
@@ -815,7 +807,6 @@ Apd	|UV	|sv_uv		|NN SV* sv
 Apd	|NV	|sv_nv		|NN SV* sv
 Apd	|char*	|sv_pvn		|NN SV *sv|NN STRLEN *lp
 Apd	|char*	|sv_pvutf8n	|NN SV *sv|NN STRLEN *lp
-Apd	|char*	|sv_pvbyten	|NN SV *sv|NN STRLEN *lp
 Apd	|I32	|sv_true	|NULLOK SV *const sv
 pd	|void	|sv_add_arena	|NN char *const ptr|const U32 size|const U32 flags
 Apd	|int	|sv_backoff	|NN SV *const sv
@@ -831,10 +822,6 @@ pd	|I32	|sv_clean_all
 pd	|void	|sv_clean_objs
 Apd	|void	|sv_clear	|NN SV *const sv
 Apd	|I32	|sv_cmp		|NULLOK SV *const sv1|NULLOK SV *const sv2
-Apd	|I32	|sv_cmp_locale	|NULLOK SV *const sv1|NULLOK SV *const sv2
-#if defined(USE_LOCALE_COLLATE)
-Apd	|char*	|sv_collxfrm	|NN SV *const sv|NN STRLEN *const nxp
-#endif
 Ap	|OP*	|sv_compile_2op	|NN SV *sv|NN OP **startop \
 				|NN const char *code|NN PAD **padp
 Apd	|int	|getcwd_sv	|NN SV* sv
@@ -863,15 +850,12 @@ Apd	|MAGIC *|sv_magicext	|NN SV *const sv|NULLOK SV *const obj|const int how \
 ApdaR	|SV*	|sv_mortalcopy	|NULLOK SV *const oldsv
 ApdR	|SV*	|sv_newmortal
 Apd	|SV*	|sv_newref	|NULLOK SV *const sv
-Ap	|char*	|sv_peek	|NULLOK SV* sv
+Ap	|const char*	|sv_peek	|NULLOK SV* sv
 Apd	|void	|sv_pos_u2b	|NULLOK SV *const sv|NN I32 *const offsetp|NULLOK I32 *const lenp
 Apd	|void	|sv_pos_b2u	|NULLOK SV *const sv|NN I32 *const offsetp
 Amdb	|char*	|sv_pvn_force	|NN SV* sv|NULLOK STRLEN* lp
 Apd	|char*	|sv_pvutf8n_force|NN SV *const sv|NULLOK STRLEN *const lp
-Apd	|char*	|sv_pvbyten_force|NN SV *const sv|NULLOK STRLEN *const lp
 Apd	|char*	|sv_recode_to_utf8	|NN SV* sv|NN SV *encoding
-Apd	|bool	|sv_cat_decode	|NN SV* dsv|NN SV *encoding|NN SV *ssv|NN int *offset \
-				|NN char* tstr|int tlen
 ApdR	|const char*	|sv_reftype	|NN const SV *const sv|const int ob
 Apd	|void	|sv_replace	|NN SV *const sv|NN SV *const nsv
 Apd	|void	|sv_report_used
@@ -1016,13 +1000,13 @@ Apd	|void	|sv_setpvn_mg	|NN SV *const sv|NN const char *const ptr|const STRLEN l
 Apd	|void	|sv_setsv_mg	|NN SV *const dstr|NULLOK SV *const sstr
 Apdbm	|void	|sv_usepvn_mg	|NN SV *sv|NULLOK char *ptr|STRLEN len
 ApR	|MGVTBL*|get_vtbl	|int vtbl_id
-Apd	|char*	|pv_display	|NN SV *dsv|NN const char *pv|STRLEN cur|STRLEN len \
+Apd	|const char*	|pv_display	|NN SV *dsv|NN const char *pv|STRLEN cur|STRLEN len \
 				|STRLEN pvlim
-Apd	|char*	|pv_escape	|NN SV *dsv|NN char const * const str\
+Apd	|const char*	|pv_escape	|NN SV *dsv|NN char const * const str\
                                 |const STRLEN count|const STRLEN max\
                                 |NULLOK STRLEN * const escaped\
                                 |const U32 flags				
-Apd     |char*  |pv_pretty      |NN SV *dsv|NN char const * const str\
+Apd     |const char*  |pv_pretty      |NN SV *dsv|NN char const * const str\
                                 |const STRLEN count|const STRLEN max\
                                 |NULLOK char const * const start_color\
                                 |NULLOK char const * const end_color\
@@ -1049,7 +1033,6 @@ ApdRmb	|char*	|sv_2pvutf8_nolen|NN SV* sv
 ApdRmb	|char*	|sv_2pvbyte_nolen|NN SV* sv
 AmdbR	|char*	|sv_pv		|NN SV *sv
 AmdbR	|char*	|sv_pvutf8	|NN SV *sv
-AmdbR	|char*	|sv_pvbyte	|NN SV *sv
 Apd	|void	|sv_utf8_encode |NN SV *const sv
 ApdM	|bool	|sv_utf8_decode |NN SV *const sv
 Apdmb	|void	|sv_force_normal|NN SV *sv
@@ -1177,7 +1160,6 @@ pR	|OP*	|ck_fun		|NN OP *o
 pR	|OP*	|ck_glob	|NN OP *o
 pR	|OP*	|ck_grep	|NN OP *o
 pR	|OP*	|ck_index	|NN OP *o
-pR	|OP*	|ck_join	|NN OP *o
 pR	|OP*	|ck_lfun	|NN OP *o
 pR	|OP*	|ck_listiob	|NN OP *o
 pR	|OP*	|ck_match	|NN OP *o
@@ -1352,9 +1334,9 @@ s	|SV *	|space_join_names_mortal|NN char *const *array
 #endif
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
-Es	|regnode*|regclassfold	|NN struct RExC_state_t *state|U32 depth
-Es	|regnode*|regclassfold_value	|NN struct RExC_state_t *state|UV value
-Es	|void   |anyof_get_swash	|NN struct RExC_state_t *state|NN regnode *ret|NN SV *listsv|NULLOK AV* unicode_alternate
+Es	|regnode*|regclassfold	|NN struct RExC_state_t *pRExC_state|U32 depth
+Es	|regnode*|regclassfold_value	|NN struct RExC_state_t *pRExC_state|UV value
+Es	|void   |anyof_get_swash	|NN struct RExC_state_t *pRExC_state|NN regnode *ret|NN SV *listsv|NULLOK AV* unicode_alternate
 Es	|regnode*|reg		|NN struct RExC_state_t *pRExC_state \
 				|I32 paren|NN I32 *flagp|U32 depth
 Es	|regnode*|reganode	|NN struct RExC_state_t *pRExC_state|U8 op \
@@ -1494,13 +1476,6 @@ sR	|SV *	|varname	|NULLOK GV *gv|const char gvtype|PADOFFSET targ \
 #  ifdef DEBUGGING
 s	|void	|del_sv	|NN SV *p
 #  endif
-#  if !defined(NV_PRESERVES_UV)
-#    ifdef DEBUGGING
-s	|int	|sv_2iuv_non_preserve	|NN SV *const sv|I32 numtype
-#    else
-s	|int	|sv_2iuv_non_preserve	|NN SV *const sv
-#    endif
-#  endif
 sR	|I32	|expect_number	|NN char **const pattern
 #
 sn	|STRLEN	|sv_pos_u2b_forwards|NN const char *const start \
@@ -1520,7 +1495,6 @@ sM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
 #  endif
 s	|SV *	|more_sv
 s	|void *	|more_bodies	|const svtype sv_type
-s	|bool	|sv_2iuv_common	|NN SV *const sv
 s	|void	|glob_assign_glob|NN SV *const dstr|NN SV *const sstr \
 		|const int dtype
 s	|void	|glob_assign_ref|NN SV *const dstr|NN SV *const sstr
@@ -1595,7 +1569,7 @@ s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
 sr	|char *	|write_no_mem
 #endif
 
-p	|bool	|vdie_common	|NN SV *msg|bool warn
+p	|bool	|vdie_common	|NN SV *msv|bool warn
 
 #if defined(PERL_IN_NUMERIC_C) || defined(PERL_DECL_PROT)
 sn	|NV|mulexp10	|NV value|I32 exponent
@@ -1850,11 +1824,10 @@ Mp	|void	|xmldump_vindent|I32 level|NN PerlIO *file|NN const char* pat \
 Mp	|void	|xmldump_all
 Mp	|void	|xmldump_packsubs	|NN const HV* stash
 Mp	|void	|xmldump_sub	|NN const GV* gv
-Mp	|void	|xmldump_form	|NN const GV* gv
 Mp	|void	|xmldump_eval
-Mp	|char*	|sv_catxmlsv	|NN SV *dsv|NN SV *ssv
-Mp	|char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len
-Mp	|char*	|sv_xmlpeek	|NN SV* sv
+Mp	|const char*	|sv_catxmlsv	|NN SV *dsv|NN SV *ssv
+Mp	|const char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len
+Mp	|const char*	|sv_xmlpeek	|NN SV* sv
 Mp	|void	|do_pmop_xmldump|I32 level|NN PerlIO *file \
 				|NULLOK const PMOP *pm
 Mp	|void	|pmop_xmldump	|NULLOK const PMOP* pm

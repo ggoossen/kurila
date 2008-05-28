@@ -404,9 +404,6 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 #  define VTBL_regexp		&PL_vtbl_regexp
 #  define VTBL_regdata		&PL_vtbl_regdata
 #  define VTBL_regdatum		&PL_vtbl_regdatum
-#  ifdef USE_LOCALE_COLLATE
-#    define VTBL_collxfrm	&PL_vtbl_collxfrm
-#  endif
 #  define VTBL_amagic		&PL_vtbl_amagic
 #  define VTBL_amagicelem	&PL_vtbl_amagicelem
 #endif

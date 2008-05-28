@@ -6,6 +6,8 @@
 #  in the README file that comes with the distribution.
 #
 
+use Config;
+
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
@@ -13,7 +15,6 @@ sub BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -28,10 +29,10 @@ print "1..14\n";
 
 $a = 'toto';
 $b = \$a;
-$c = bless \%(), 'CLASS';
+my $c = bless \%(), 'CLASS';
 $c->{attribute} = 'attrval';
-%a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
-@a = ('first', '', undef, 3, -4, -3.14159, 456, 4.5,
+my %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
+my @a = ('first', '', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
 
 print "not " unless defined store(\@a, 'store');
@@ -45,21 +46,21 @@ print "ok 4\n";
 print "not " unless Storable::last_op_in_netorder();
 print "ok 5\n";
 
-$root = retrieve('store');
+my $root = retrieve('store');
 print "not " unless defined $root;
 print "ok 6\n";
 print "not " if Storable::last_op_in_netorder();
 print "ok 7\n";
 
-$nroot = retrieve('nstore');
+my $nroot = retrieve('nstore');
 print "not " unless defined $nroot;
 print "ok 8\n";
 print "not " unless Storable::last_op_in_netorder();
 print "ok 9\n";
 
-$d1 = &dump($root);
+my $d1 = &dump($root);
 print "ok 10\n";
-$d2 = &dump($nroot);
+my $d2 = &dump($nroot);
 print "ok 11\n";
 
 print "not " unless $d1 eq $d2; 

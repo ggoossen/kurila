@@ -6,7 +6,7 @@ BEGIN {
     @INC = '../lib';
 }
 
-use Test::More tests => 47;
+use Test::More tests => 43;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -24,9 +24,13 @@ foo(1);
 
 "abc" =~ m/b/;
 
+{
+our ($PREMATCH, $MATCH, $POSTMATCH);
+
 ok( !$PREMATCH, '$PREMATCH undefined' );
 ok( !$MATCH, '$MATCH undefined' );
 ok( !$POSTMATCH, '$POSTMATCH undefined' );
+}
 
 $OFS = " ";
 $ORS = "\n";
@@ -58,8 +62,9 @@ $ORS = "\n";
 
 undef $OUTPUT_FIELD_SEPARATOR;
 
+our $threads;
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
-@foo = (8, 9);
+my @foo = (8, 9);
 @foo = split(m/\n/, "@foo");
 is( @foo[0], 8, '$"' );
 is( @foo[1], 9, '$LIST_SEPARATOR' );
@@ -123,31 +128,18 @@ eval { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
 is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
 ok( %OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
 
-package B;
-
-use English;
-
-"abc" =~ m/b/;
-
-main::is( $PREMATCH, 'a', '$PREMATCH defined' );
-main::is( $MATCH, 'b', '$MATCH defined' );
-main::is( $POSTMATCH, 'c', '$POSTMATCH defined' );
-
-{
-    my $s = "xyz";
-    $s =~ s/y/t$MATCH/;
-    main::is( $s, "xtyz", '$MATCH defined in right side of s///' );
-}
-
 package C;
 
 use English qw( -no_match_vars ) ;
 
 "abc" =~ m/b/;
 
-main::ok( !$PREMATCH, '$PREMATCH disabled' );
-main::ok( !$MATCH, '$MATCH disabled' );
-main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
+{
+  our ($PREMATCH, $MATCH, $POSTMATCH);
+  main::ok( !$PREMATCH, '$PREMATCH disabled' );
+  main::ok( !$MATCH, '$MATCH disabled' );
+  main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
+}
 
 __END__
 This is a line.

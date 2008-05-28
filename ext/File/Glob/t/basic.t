@@ -1,12 +1,7 @@
 #!./perl
 
-BEGIN {
-    require Config; Config->import;
-    if (%Config{'extensions'} !~ m/\bFile\/Glob\b/i) {
-        print "1..0\n";
-        exit 0;
-    }
-}
+use Config;
+
 use strict;
 use Test::More tests => 14;
 BEGIN {use_ok('File::Glob', ':glob')};

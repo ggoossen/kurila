@@ -1801,334 +1801,7 @@ Perl_looks_like_number(pTHX_ SV *const sv)
 #  define IS_NUMBER_IV_AND_UV    2
 #  define IS_NUMBER_OVERFLOW_IV  4
 #  define IS_NUMBER_OVERFLOW_UV  5
-
-/* sv_2iuv_non_preserve(): private routine for use by sv_2iv() and sv_2uv() */
-
-/* For sv_2nv these three cases are "SvNOK and don't bother casting"  */
-STATIC int
-S_sv_2iuv_non_preserve(pTHX_ register SV *const sv
-#  ifdef DEBUGGING
-		       , I32 numtype
-#  endif
-		       )
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_SV_2IUV_NON_PRESERVE;
-
-    DEBUG_c(PerlIO_printf(Perl_debug_log,"sv_2iuv_non '%s', IV=0x%"UVxf" NV=%"NVgf" inttype=%"UVXf"\n", SvPVX_const(sv), SvIVX(sv), SvNVX(sv), (UV)numtype));
-    if (SvNVX(sv) < (NV)IV_MIN) {
-	(void)SvIOKp_on(sv);
-	(void)SvNOK_on(sv);
-	SvIV_set(sv, IV_MIN);
-	return IS_NUMBER_UNDERFLOW_IV;
-    }
-    if (SvNVX(sv) > (NV)UV_MAX) {
-	(void)SvIOKp_on(sv);
-	(void)SvNOK_on(sv);
-	SvIsUV_on(sv);
-	SvUV_set(sv, UV_MAX);
-	return IS_NUMBER_OVERFLOW_UV;
-    }
-    (void)SvIOKp_on(sv);
-    (void)SvNOK_on(sv);
-    /* Can't use strtol etc to convert this string.  (See truth table in
-       sv_2iv  */
-    if (SvNVX(sv) <= (UV)IV_MAX) {
-        SvIV_set(sv, I_V(SvNVX(sv)));
-        if ((NV)(SvIVX(sv)) == SvNVX(sv)) {
-            SvIOK_on(sv); /* Integer is precise. NOK, IOK */
-        } else {
-            /* Integer is imprecise. NOK, IOKp */
-        }
-        return SvNVX(sv) < 0 ? IS_NUMBER_UNDERFLOW_UV : IS_NUMBER_IV_AND_UV;
-    }
-    SvIsUV_on(sv);
-    SvUV_set(sv, U_V(SvNVX(sv)));
-    if ((NV)(SvUVX(sv)) == SvNVX(sv)) {
-        if (SvUVX(sv) == UV_MAX) {
-            /* As we know that NVs don't preserve UVs, UV_MAX cannot
-               possibly be preserved by NV. Hence, it must be overflow.
-               NOK, IOKp */
-            return IS_NUMBER_OVERFLOW_UV;
-        }
-        SvIOK_on(sv); /* Integer is precise. NOK, UOK */
-    } else {
-        /* Integer is imprecise. NOK, IOKp */
-    }
-    return IS_NUMBER_OVERFLOW_IV;
-}
-#endif /* !NV_PRESERVES_UV*/
-
-STATIC bool
-S_sv_2iuv_common(pTHX_ SV *const sv)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_SV_2IUV_COMMON;
-
-    if (SvNOKp(sv)) {
-	/* erm. not sure. *should* never get NOKp (without NOK) from sv_2nv
-	 * without also getting a cached IV/UV from it at the same time
-	 * (ie PV->NV conversion should detect loss of accuracy and cache
-	 * IV or UV at same time to avoid this. */
-	/* IV-over-UV optimisation - choose to cache IV if possible */
-
-	if (SvTYPE(sv) == SVt_NV)
-	    sv_upgrade(sv, SVt_PVNV);
-
-	(void)SvIOKp_on(sv);	/* Must do this first, to clear any SvOOK */
-	/* < not <= as for NV doesn't preserve UV, ((NV)IV_MAX+1) will almost
-	   certainly cast into the IV range at IV_MAX, whereas the correct
-	   answer is the UV IV_MAX +1. Hence < ensures that dodgy boundary
-	   cases go to UV */
-#if defined(NAN_COMPARE_BROKEN) && defined(Perl_isnan)
-	if (Perl_isnan(SvNVX(sv))) {
-	    SvUV_set(sv, 0);
-	    SvIsUV_on(sv);
-	    return FALSE;
-	}
-#endif
-	if (SvNVX(sv) < (NV)IV_MAX + 0.5) {
-	    SvIV_set(sv, I_V(SvNVX(sv)));
-	    if (SvNVX(sv) == (NV) SvIVX(sv)
-#ifndef NV_PRESERVES_UV
-		&& (((UV)1 << NV_PRESERVES_UV_BITS) >
-		    (UV)(SvIVX(sv) > 0 ? SvIVX(sv) : -SvIVX(sv)))
-		/* Don't flag it as "accurately an integer" if the number
-		   came from a (by definition imprecise) NV operation, and
-		   we're outside the range of NV integer precision */
-#endif
-		) {
-		if (SvNOK(sv))
-		    SvIOK_on(sv);  /* Can this go wrong with rounding? NWC */
-		else {
-		    /* scalar has trailing garbage, eg "42a" */
-		}
-		DEBUG_c(PerlIO_printf(Perl_debug_log,
-				      "0x%"UVxf" iv(%"NVgf" => %"IVdf") (precise)\n",
-				      PTR2UV(sv),
-				      SvNVX(sv),
-				      SvIVX(sv)));
-
-	    } else {
-		/* IV not precise.  No need to convert from PV, as NV
-		   conversion would already have cached IV if it detected
-		   that PV->IV would be better than PV->NV->IV
-		   flags already correct - don't set public IOK.  */
-		DEBUG_c(PerlIO_printf(Perl_debug_log,
-				      "0x%"UVxf" iv(%"NVgf" => %"IVdf") (imprecise)\n",
-				      PTR2UV(sv),
-				      SvNVX(sv),
-				      SvIVX(sv)));
-	    }
-	    /* Can the above go wrong if SvIVX == IV_MIN and SvNVX < IV_MIN,
-	       but the cast (NV)IV_MIN rounds to a the value less (more
-	       negative) than IV_MIN which happens to be equal to SvNVX ??
-	       Analogous to 0xFFFFFFFFFFFFFFFF rounding up to NV (2**64) and
-	       NV rounding back to 0xFFFFFFFFFFFFFFFF, so UVX == UV(NVX) and
-	       (NV)UVX == NVX are both true, but the values differ. :-(
-	       Hopefully for 2s complement IV_MIN is something like
-	       0x8000000000000000 which will be exact. NWC */
-	}
-	else {
-	    SvUV_set(sv, U_V(SvNVX(sv)));
-	    if (
-		(SvNVX(sv) == (NV) SvUVX(sv))
-#ifndef  NV_PRESERVES_UV
-		/* Make sure it's not 0xFFFFFFFFFFFFFFFF */
-		/*&& (SvUVX(sv) != UV_MAX) irrelevant with code below */
-		&& (((UV)1 << NV_PRESERVES_UV_BITS) > SvUVX(sv))
-		/* Don't flag it as "accurately an integer" if the number
-		   came from a (by definition imprecise) NV operation, and
-		   we're outside the range of NV integer precision */
-#endif
-		&& SvNOK(sv)
-		)
-		SvIOK_on(sv);
-	    SvIsUV_on(sv);
-	    DEBUG_c(PerlIO_printf(Perl_debug_log,
-				  "0x%"UVxf" 2iv(%"UVuf" => %"IVdf") (as unsigned)\n",
-				  PTR2UV(sv),
-				  SvUVX(sv),
-				  SvUVX(sv)));
-	}
-    }
-    else if (SvPOKp(sv) && SvLEN(sv)) {
-	UV value;
-	const int numtype = grok_number(SvPVX_const(sv), SvCUR(sv), &value);
-	/* We want to avoid a possible problem when we cache an IV/ a UV which
-	   may be later translated to an NV, and the resulting NV is not
-	   the same as the direct translation of the initial string
-	   (eg 123.456 can shortcut to the IV 123 with atol(), but we must
-	   be careful to ensure that the value with the .456 is around if the
-	   NV value is requested in the future).
-	
-	   This means that if we cache such an IV/a UV, we need to cache the
-	   NV as well.  Moreover, we trade speed for space, and do not
-	   cache the NV if we are sure it's not needed.
-	 */
-
-	/* SVt_PVNV is one higher than SVt_PVIV, hence this order  */
-	if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT))
-	     == IS_NUMBER_IN_UV) {
-	    /* It's definitely an integer, only upgrade to PVIV */
-	    if (SvTYPE(sv) < SVt_PVIV)
-		sv_upgrade(sv, SVt_PVIV);
-	    (void)SvIOK_on(sv);
-	} else if (SvTYPE(sv) < SVt_PVNV)
-	    sv_upgrade(sv, SVt_PVNV);
-
-	/* If NVs preserve UVs then we only use the UV value if we know that
-	   we aren't going to call atof() below. If NVs don't preserve UVs
-	   then the value returned may have more precision than atof() will
-	   return, even though value isn't perfectly accurate.  */
-	if ((numtype & (IS_NUMBER_IN_UV
-#ifdef NV_PRESERVES_UV
-			| IS_NUMBER_NOT_INT
-#endif
-	    )) == IS_NUMBER_IN_UV) {
-	    /* This won't turn off the public IOK flag if it was set above  */
-	    (void)SvIOKp_on(sv);
-
-	    if (!(numtype & IS_NUMBER_NEG)) {
-		/* positive */;
-		if (value <= (UV)IV_MAX) {
-		    SvIV_set(sv, (IV)value);
-		} else {
-		    /* it didn't overflow, and it was positive. */
-		    SvUV_set(sv, value);
-		    SvIsUV_on(sv);
-		}
-	    } else {
-		/* 2s complement assumption  */
-		if (value <= (UV)IV_MIN) {
-		    SvIV_set(sv, -(IV)value);
-		} else {
-		    /* Too negative for an IV.  This is a double upgrade, but
-		       I'm assuming it will be rare.  */
-		    if (SvTYPE(sv) < SVt_PVNV)
-			sv_upgrade(sv, SVt_PVNV);
-		    SvNOK_on(sv);
-		    SvIOK_off(sv);
-		    SvIOKp_on(sv);
-		    SvNV_set(sv, -(NV)value);
-		    SvIV_set(sv, IV_MIN);
-		}
-	    }
-	}
-	/* For !NV_PRESERVES_UV and IS_NUMBER_IN_UV and IS_NUMBER_NOT_INT we
-           will be in the previous block to set the IV slot, and the next
-           block to set the NV slot.  So no else here.  */
-	
-	if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT))
-	    != IS_NUMBER_IN_UV) {
-	    /* It wasn't an (integer that doesn't overflow the UV). */
-	    SvNV_set(sv, Atof(SvPVX_const(sv)));
-
-	    if (! numtype && ckWARN(WARN_NUMERIC))
-		not_a_number(sv);
-
-#if defined(USE_LONG_DOUBLE)
-	    DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2iv(%" PERL_PRIgldbl ")\n",
-				  PTR2UV(sv), SvNVX(sv)));
-#else
-	    DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2iv(%"NVgf")\n",
-				  PTR2UV(sv), SvNVX(sv)));
-#endif
-
-#ifdef NV_PRESERVES_UV
-            (void)SvIOKp_on(sv);
-            (void)SvNOK_on(sv);
-            if (SvNVX(sv) < (NV)IV_MAX + 0.5) {
-                SvIV_set(sv, I_V(SvNVX(sv)));
-                if ((NV)(SvIVX(sv)) == SvNVX(sv)) {
-                    SvIOK_on(sv);
-                } else {
-		    NOOP;  /* Integer is imprecise. NOK, IOKp */
-                }
-                /* UV will not work better than IV */
-            } else {
-                if (SvNVX(sv) > (NV)UV_MAX) {
-                    SvIsUV_on(sv);
-                    /* Integer is inaccurate. NOK, IOKp, is UV */
-                    SvUV_set(sv, UV_MAX);
-                } else {
-                    SvUV_set(sv, U_V(SvNVX(sv)));
-                    /* 0xFFFFFFFFFFFFFFFF not an issue in here, NVs
-                       NV preservse UV so can do correct comparison.  */
-                    if ((NV)(SvUVX(sv)) == SvNVX(sv)) {
-                        SvIOK_on(sv);
-                    } else {
-			NOOP;   /* Integer is imprecise. NOK, IOKp, is UV */
-                    }
-                }
-		SvIsUV_on(sv);
-            }
-#else /* NV_PRESERVES_UV */
-            if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT))
-                == (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT)) {
-                /* The IV/UV slot will have been set from value returned by
-                   grok_number above.  The NV slot has just been set using
-                   Atof.  */
-	        SvNOK_on(sv);
-                assert (SvIOKp(sv));
-            } else {
-                if (((UV)1 << NV_PRESERVES_UV_BITS) >
-                    U_V(SvNVX(sv) > 0 ? SvNVX(sv) : -SvNVX(sv))) {
-                    /* Small enough to preserve all bits. */
-                    (void)SvIOKp_on(sv);
-                    SvNOK_on(sv);
-                    SvIV_set(sv, I_V(SvNVX(sv)));
-                    if ((NV)(SvIVX(sv)) == SvNVX(sv))
-                        SvIOK_on(sv);
-                    /* Assumption: first non-preserved integer is < IV_MAX,
-                       this NV is in the preserved range, therefore: */
-                    if (!(U_V(SvNVX(sv) > 0 ? SvNVX(sv) : -SvNVX(sv))
-                          < (UV)IV_MAX)) {
-                        Perl_croak(aTHX_ "sv_2iv assumed (U_V(fabs((double)SvNVX(sv))) < (UV)IV_MAX) but SvNVX(sv)=%"NVgf" U_V is 0x%"UVxf", IV_MAX is 0x%"UVxf"\n", SvNVX(sv), U_V(SvNVX(sv)), (UV)IV_MAX);
-                    }
-                } else {
-                    /* IN_UV NOT_INT
-                         0      0	already failed to read UV.
-                         0      1       already failed to read UV.
-                         1      0       you won't get here in this case. IV/UV
-                         	        slot set, public IOK, Atof() unneeded.
-                         1      1       already read UV.
-                       so there's no point in sv_2iuv_non_preserve() attempting
-                       to use atol, strtol, strtoul etc.  */
-#  ifdef DEBUGGING
-                    sv_2iuv_non_preserve (sv, numtype);
-#  else
-                    sv_2iuv_non_preserve (sv);
-#  endif
-                }
-            }
 #endif /* NV_PRESERVES_UV */
-	/* It might be more code efficient to go through the entire logic above
-	   and conditionally set with SvIOKp_on() rather than SvIOK(), but it
-	   gets complex and potentially buggy, so more programmer efficient
-	   to do it this way, by turning off the public flags:  */
-	if (!numtype)
-	    SvFLAGS(sv) &= ~(SVf_IOK|SVf_NOK);
-	}
-    }
-    else  {
-	if (isGV_with_GP(sv))
-	    Perl_croak(aTHX_ "Tried to use glob as number");
-
-	if (!(SvFLAGS(sv) & SVs_PADTMP)) {
-	    if (!PL_localizing && ckWARN(WARN_UNINITIALIZED))
-		report_uninit(sv);
-	}
-	if (SvTYPE(sv) < SVt_IV)
-	    /* Typically the caller expects that sv_any is not NULL now.  */
-	    sv_upgrade(sv, SVt_IV);
-	/* Return 0 from the caller.  */
-	return TRUE;
-    }
-    return FALSE;
-}
 
 /*
 =for apidoc sv_2iv_flags
@@ -2146,11 +1819,8 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
     dVAR;
     if (!sv)
 	return 0;
-    if (SvGMAGICAL(sv) || (SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
-	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
-	   cache IVs just in case. In practice it seems that they never
-	   actually anywhere accessible by user Perl code, let alone get used
-	   in anything other than a string context.  */
+    assert( ! (SvTYPE(sv) >= SVt_PVMG && SvVALID(sv)) ); /* FBMs are never used as ivs */
+    if (SvGMAGICAL(sv)) {
 	if (flags & SV_GMAGIC)
 	    mg_get(sv);
 	if (SvIOKp(sv))
@@ -2194,7 +1864,7 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
 		    return SvIV(tmpstr);
 		}
 	    }
-	    return PTR2IV(SvRV(sv));
+	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
 	if (SvIsCOW(sv)) {
 	    sv_force_normal_flags(sv, 0);
@@ -2206,8 +1876,40 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
 	}
     }
     if (!SvIOKp(sv)) {
-	if (S_sv_2iuv_common(aTHX_ sv))
-	    return 0;
+
+	if (SvNOKp(sv)) {
+	    return I_V(SvNVX(sv));
+	}
+	if (SvPOKp(sv) && SvLEN(sv)) {
+	    UV value;
+	    const int numtype
+		= grok_number(SvPVX_const(sv), SvCUR(sv), &value);
+
+	    if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT))
+		== IS_NUMBER_IN_UV) {
+		/* It's definitely an integer */
+		if (numtype & IS_NUMBER_NEG) {
+		    if (value < (UV)IV_MIN)
+			return -(IV)value;
+		} else {
+		    if (value < (UV)IV_MAX)
+			return (IV)value;
+		}
+	    }
+	    if (!numtype) {
+		if (ckWARN(WARN_NUMERIC))
+		    not_a_number(sv);
+	    }
+	    return I_V(Atof(SvPVX_const(sv)));
+	}
+	if (isGV_with_GP(sv))
+	    Perl_croak(aTHX_ "Tried to use glob as number");
+
+	if (!(SvFLAGS(sv) & SVs_PADTMP)) {
+	    if (!PL_localizing && ckWARN(WARN_UNINITIALIZED))
+		report_uninit(sv);
+	}
+	return 0;
     }
     DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2iv(%"IVdf")\n",
 	PTR2UV(sv),SvIVX(sv)));
@@ -2282,8 +1984,81 @@ Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
 	}
     }
     if (!SvIOKp(sv)) {
-	if (S_sv_2iuv_common(aTHX_ sv))
-	    return 0;
+
+	if (SvNOKp(sv)) {
+#if defined(NAN_COMPARE_BROKEN) && defined(Perl_isnan)
+	    if (Perl_isnan(SvNVX(sv))) {
+		return 0;
+	    }
+#endif
+	    if (SvNVX(sv) < (NV)IV_MAX + 0.5) {
+		return (UV)I_V(SvNVX(sv));
+	    }
+	    else {
+		return U_V(SvNVX(sv));
+	    }
+	}
+	if (SvPOKp(sv) && SvLEN(sv)) {
+	    UV value;
+	    const int numtype = grok_number(SvPVX_const(sv), SvCUR(sv), &value);
+	    /* We want to avoid a possible problem when we cache an IV/ a UV which
+	       may be later translated to an NV, and the resulting NV is not
+	       the same as the direct translation of the initial string
+	       (eg 123.456 can shortcut to the IV 123 with atol(), but we must
+	       be careful to ensure that the value with the .456 is around if the
+	       NV value is requested in the future).
+	
+	       This means that if we cache such an IV/a UV, we need to cache the
+	       NV as well.  Moreover, we trade speed for space, and do not
+	       cache the NV if we are sure it's not needed.
+	    */
+
+	    /* If NVs preserve UVs then we only use the UV value if we know that
+	       we aren't going to call atof() below. If NVs don't preserve UVs
+	       then the value returned may have more precision than atof() will
+	       return, even though value isn't perfectly accurate.  */
+	    if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT
+		     )) == IS_NUMBER_IN_UV) {
+		if (!(numtype & IS_NUMBER_NEG)) {
+		    return value;
+		} else {
+		    /* 2s complement assumption  */
+		    if (value <= (UV)IV_MIN) {
+			IV x = -(IV)value;
+			return (UV)x;
+		    } else {
+			return (UV)IV_MIN;
+		    }
+		}
+	    }
+  	    if (numtype) {
+		/* It wasn't an (integer that doesn't overflow the UV). */
+		NV nv = Atof(SvPVX_const(sv));
+
+		if (nv < (NV)IV_MAX + 0.5) {
+		    return (UV)I_V(nv);
+		} else {
+		    if (nv > (NV)UV_MAX) {
+			return UV_MAX;
+		    } else {
+			return U_V(nv);
+		    }
+		}
+	    }
+
+		 assert(!numtype);
+		 if (ckWARN(WARN_NUMERIC))
+		     not_a_number(sv);
+		 return 0;
+	}
+        if (isGV_with_GP(sv))
+	    Perl_croak(aTHX_ "Tried to use glob as number");
+
+	if (!(SvFLAGS(sv) & SVs_PADTMP)) {
+	    if (!PL_localizing && ckWARN(WARN_UNINITIALIZED))
+		report_uninit(sv);
+	}
+	return 0;
     }
 
     DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2uv(%"UVuf")\n",
@@ -2524,14 +2299,15 @@ Perl_sv_2num(pTHX_ register SV *const sv)
 {
     PERL_ARGS_ASSERT_SV_2NUM;
 
-    if (!SvROK(sv))
-	return sv;
-    if (SvAMAGIC(sv)) {
-	SV * const tmpsv = AMG_CALLun(sv,numer);
-	if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
-	    return sv_2num(tmpsv);
+    if (SvROK(sv)) {
+	if (SvAMAGIC(sv)) {
+	    SV * const tmpsv = AMG_CALLun(sv,numer);
+	    if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
+		return sv_2num(tmpsv);
+	}
+	Perl_croak(aTHX_ "Reference can't be used as a number");
     }
-    return sv_2mortal(newSVuv(PTR2UV(SvRV(sv))));
+    return sv;
 }
 
 /* uiv_2buf(): private routine for use by sv_2pv_flags(): print an IV or
@@ -4321,11 +4097,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_dbline:
 	vtable = &PL_vtbl_dbline;
 	break;
-#ifdef USE_LOCALE_COLLATE
-    case PERL_MAGIC_collxfrm:
-        vtable = &PL_vtbl_collxfrm;
-        break;
-#endif /* USE_LOCALE_COLLATE */
     case PERL_MAGIC_tied:
 	vtable = &PL_vtbl_pack;
 	break;
@@ -5796,7 +5567,7 @@ Perl_sv_eq(pTHX_ register SV *sv1, register SV *sv2)
 Compares the strings in two SVs.  Returns -1, 0, or 1 indicating whether the
 string in C<sv1> is less than, equal to, or greater than the string in
 C<sv2>. Is UTF-8 and 'use bytes' aware, handles get magic, and will
-coerce its args to strings if necessary.  See also C<sv_cmp_locale>.
+coerce its args to strings if necessary.
 
 =cut
 */
@@ -5847,130 +5618,6 @@ Perl_sv_cmp(pTHX_ register SV *const sv1, register SV *const sv2)
 
     return cmp;
 }
-
-/*
-=for apidoc sv_cmp_locale
-
-Compares the strings in two SVs in a locale-aware manner. Is UTF-8 and
-'use bytes' aware, handles get magic, and will coerce its args to strings
-if necessary.  See also C<sv_cmp>.
-
-=cut
-*/
-
-I32
-Perl_sv_cmp_locale(pTHX_ register SV *const sv1, register SV *const sv2)
-{
-    dVAR;
-#ifdef USE_LOCALE_COLLATE
-
-    char *pv1, *pv2;
-    STRLEN len1, len2;
-    I32 retval;
-
-    if (PL_collation_standard)
-	goto raw_compare;
-
-    len1 = 0;
-    pv1 = sv1 ? sv_collxfrm(sv1, &len1) : (char *) NULL;
-    len2 = 0;
-    pv2 = sv2 ? sv_collxfrm(sv2, &len2) : (char *) NULL;
-
-    if (!pv1 || !len1) {
-	if (pv2 && len2)
-	    return -1;
-	else
-	    goto raw_compare;
-    }
-    else {
-	if (!pv2 || !len2)
-	    return 1;
-    }
-
-    retval = memcmp((void*)pv1, (void*)pv2, len1 < len2 ? len1 : len2);
-
-    if (retval)
-	return retval < 0 ? -1 : 1;
-
-    /*
-     * When the result of collation is equality, that doesn't mean
-     * that there are no differences -- some locales exclude some
-     * characters from consideration.  So to avoid false equalities,
-     * we use the raw string as a tiebreaker.
-     */
-
-  raw_compare:
-    /*FALLTHROUGH*/
-
-#endif /* USE_LOCALE_COLLATE */
-
-    return sv_cmp(sv1, sv2);
-}
-
-
-#ifdef USE_LOCALE_COLLATE
-
-/*
-=for apidoc sv_collxfrm
-
-Add Collate Transform magic to an SV if it doesn't already have it.
-
-Any scalar variable may carry PERL_MAGIC_collxfrm magic that contains the
-scalar data of the variable, but transformed to such a format that a normal
-memory comparison can be used to compare the data according to the locale
-settings.
-
-=cut
-*/
-
-char *
-Perl_sv_collxfrm(pTHX_ SV *const sv, STRLEN *const nxp)
-{
-    dVAR;
-    MAGIC *mg;
-
-    PERL_ARGS_ASSERT_SV_COLLXFRM;
-
-    mg = SvMAGICAL(sv) ? mg_find(sv, PERL_MAGIC_collxfrm) : (MAGIC *) NULL;
-    if (!mg || !mg->mg_ptr || *(U32*)mg->mg_ptr != PL_collation_ix) {
-	const char *s;
-	char *xf;
-	STRLEN len, xlen;
-
-	if (mg)
-	    Safefree(mg->mg_ptr);
-	s = SvPV_const(sv, len);
-	if ((xf = mem_collxfrm(s, len, &xlen))) {
-	    if (! mg) {
-#ifdef PERL_OLD_COPY_ON_WRITE
-		if (SvIsCOW(sv))
-		    sv_force_normal_flags(sv, 0);
-#endif
-		mg = sv_magicext(sv, 0, PERL_MAGIC_collxfrm, &PL_vtbl_collxfrm,
-				 0, 0);
-		assert(mg);
-	    }
-	    mg->mg_ptr = xf;
-	    mg->mg_len = xlen;
-	}
-	else {
-	    if (mg) {
-		mg->mg_ptr = NULL;
-		mg->mg_len = -1;
-	    }
-	}
-    }
-    if (mg && mg->mg_ptr) {
-	*nxp = mg->mg_len;
-	return mg->mg_ptr + sizeof(PL_collation_ix);
-    }
-    else {
-	*nxp = 0;
-	return NULL;
-    }
-}
-
-#endif /* USE_LOCALE_COLLATE */
 
 /*
 =for apidoc sv_gets
@@ -6328,12 +5975,9 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 		Perl_croak(aTHX_ PL_no_modify);
 	}
 	if (SvROK(sv)) {
-	    IV i;
 	    if (SvAMAGIC(sv) && AMG_CALLun(sv,inc))
 		return;
-	    i = PTR2IV(SvRV(sv));
-	    sv_unref(sv);
-	    sv_setiv(sv, i);
+	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
     flags = SvFLAGS(sv);
@@ -6491,12 +6135,9 @@ Perl_sv_dec(pTHX_ register SV *const sv)
 		Perl_croak(aTHX_ PL_no_modify);
 	}
 	if (SvROK(sv)) {
-	    IV i;
 	    if (SvAMAGIC(sv) && AMG_CALLun(sv,dec))
 		return;
-	    i = PTR2IV(SvRV(sv));
-	    sv_unref(sv);
-	    sv_setiv(sv, i);
+	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
     /* Unlike sv_inc we don't have to worry about string-never-numbers
@@ -10748,7 +10389,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_doswitches	= proto_perl->Idoswitches;
     PL_dowarn		= proto_perl->Idowarn;
     PL_doextract	= proto_perl->Idoextract;
-    PL_sawampersand	= proto_perl->Isawampersand;
     PL_unsafe		= proto_perl->Iunsafe;
     PL_inplace		= SAVEPV(proto_perl->Iinplace);
     PL_e_script		= sv_dup_inc(proto_perl->Ie_script, param);
@@ -10941,14 +10581,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_hints		= proto_perl->Ihints;
 
     PL_amagic_generation	= proto_perl->Iamagic_generation;
-
-#ifdef USE_LOCALE_COLLATE
-    PL_collation_ix	= proto_perl->Icollation_ix;
-    PL_collation_name	= SAVEPV(proto_perl->Icollation_name);
-    PL_collation_standard	= proto_perl->Icollation_standard;
-    PL_collxfrm_base	= proto_perl->Icollxfrm_base;
-    PL_collxfrm_mult	= proto_perl->Icollxfrm_mult;
-#endif /* USE_LOCALE_COLLATE */
 
 #ifdef USE_LOCALE_NUMERIC
     PL_numeric_name	= SAVEPV(proto_perl->Inumeric_name);
@@ -11278,59 +10910,6 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
     return SvPOKp(sv) ? SvPVX(sv) : NULL;
 }
 
-/*
-=for apidoc sv_cat_decode
-
-The encoding is assumed to be an Encode object, the PV of the ssv is
-assumed to be octets in that encoding and decoding the input starts
-from the position which (PV + *offset) pointed to.  The dsv will be
-concatenated the decoded UTF-8 string from ssv.  Decoding will terminate
-when the string tstr appears in decoding output or the input ends on
-the PV of the ssv. The value which the offset points will be modified
-to the last input position on the ssv.
-
-Returns TRUE if the terminator was found, else returns FALSE.
-
-=cut */
-
-bool
-Perl_sv_cat_decode(pTHX_ SV *dsv, SV *encoding,
-		   SV *ssv, int *offset, char *tstr, int tlen)
-{
-    dVAR;
-    bool ret = FALSE;
-
-    PERL_ARGS_ASSERT_SV_CAT_DECODE;
-
-    if (SvPOK(ssv) && SvPOK(dsv) && SvROK(encoding) && offset) {
-	SV *offsv;
-	dSP;
-	ENTER;
-	SAVETMPS;
-	save_re_context();
-	PUSHMARK(sp);
-	EXTEND(SP, 6);
-	XPUSHs(encoding);
-	XPUSHs(dsv);
-	XPUSHs(ssv);
-	offsv = newSViv(*offset);
-	mXPUSHs(offsv);
-	mXPUSHp(tstr, tlen);
-	PUTBACK;
-	call_method("cat_decode", G_SCALAR);
-	SPAGAIN;
-	ret = SvTRUE(TOPs);
-	*offset = SvIV(offsv);
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-    }
-    else
-        Perl_croak(aTHX_ "Invalid argument to sv_cat_decode");
-    return ret;
-
-}
-
 /* ---------------------------------------------------------------------
  *
  * support functions for report_uninit()
@@ -11424,18 +11003,7 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
 	buffer[0] = gvtype;
 	buffer[1] = 0;
 
-	/* as gv_fullname4(), but add literal '^' for $^FOO names  */
-
 	gv_fullname4(name, gv, buffer, 0);
-
-	if ((unsigned int)SvPVX(name)[1] <= 26) {
-	    buffer[0] = '^';
-	    buffer[1] = SvPVX(name)[1] + 'A' - 1;
-
-	    /* Swap the 1 unprintable control character for the 2 byte pretty
-	       version - ie substr($name, 1, 1) = $buffer; */
-	    sv_insert(name, 1, 1, buffer, 2);
-	}
     }
     else {
 	CV * const cv = find_runcv(NULL);

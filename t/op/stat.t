@@ -337,7 +337,7 @@ SKIP: {
     ok(! -t *TTY,    '!-t on closed TTY filehandle');
 
     {
-        local $TODO = 'STDIN not a tty when output is to pipe' if $Is_VMS;
+        local our $TODO = 'STDIN not a tty when output is to pipe' if $Is_VMS;
         ok(-t,          '-t on STDIN');
     }
 }

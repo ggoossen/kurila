@@ -12,7 +12,7 @@ use Locale::Script;
 # otherwise "ok N". If the eval dies, then the OK_TO_DIE flag is checked.
 # If it is true (1), the test is treated as passing, otherwise it failed.
 #-----------------------------------------------------------------------
-@TESTS =
+our @TESTS =
 (
 	#================================================
 	# TESTS FOR code2script
@@ -85,8 +85,8 @@ use Locale::Script;
 
 print "1..", int(@TESTS), "\n";
 
-$testid = 1;
-foreach $test (@TESTS)
+my $testid = 1;
+foreach my $test (@TESTS)
 {
     eval "print (($test->[0]) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
     if ($@)

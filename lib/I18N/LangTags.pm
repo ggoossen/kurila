@@ -401,7 +401,7 @@ sub locale2language_tag {
 
   return $lang if &is_language_tag($lang); # like "en"
 
-  $lang =~ tr<_><->;  # "en_US" -> en-US
+  $lang =~ s<_><->g;  # "en_US" -> en-US
   $lang =~ s<(?:[\.\@][-_a-zA-Z0-9]+)+$><>s;  # "en_US.ISO8859-1" -> en-US
    # it_IT.utf8@euro => it-IT
 

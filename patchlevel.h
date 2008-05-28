@@ -15,7 +15,7 @@
 
 #define KURILA_REVISION "kurila"
 #define KURILA_VERSION 1
-#define KURILA_SUBVERSION 10
+#define KURILA_SUBVERSION 11
 
 /* Fake Perl version 5.10.0 */
 #define PERL_REVISION	5		/* age */

@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..70\n";
+print "1..68\n";
 
 my $test = 0;
 sub ok ($$) {
@@ -21,8 +21,6 @@ ok( $_ eq 'glabol', 's/// on global $_' );
     ok( $_ eq 'lacol', 's/// on my $_' );
     m/(..)/;
     ok( $1 eq 'la', '// on my $_' );
-    ok( tr/c/d/ == 1, 'tr/// on my $_ counts correctly' );
-    ok( $_ eq 'ladol', 'tr/// on my $_' );
     {
 	my $_ = 'nested';
 	ok( $_ eq 'nested', 'my $_ nested' );
@@ -33,7 +31,7 @@ ok( $_ eq 'glabol', 's/// on global $_' );
 	our $_;
 	ok( $_ eq 'glabol', 'gains access to our global $_' );
     }
-    ok( $_ eq 'ladol', 'my $_ restored' );
+    ok( $_ eq 'lacol', 'my $_ restored' );
 }
 ok( $_ eq 'glabol', 'global $_ restored' );
 s/abo/oba/;

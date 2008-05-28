@@ -26,6 +26,8 @@ sub array_equal
     return 1;
 }
 
+our $check;
+our $i;
 sub test
 {
     my ($desc, $code) = @_;

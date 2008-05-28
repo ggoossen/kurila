@@ -1,14 +1,6 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
-	print "1..0 # Skip -- Perl configured without List::Util module\n";
-	exit 0;
-    }
-}
+use TestInit;
 
 package Oscalar;
 use overload ( 
@@ -46,7 +38,7 @@ sub numify { 0 + "${@_[0]}" }	# Not needed, additional overhead
 package main;
 
 $| = 1;
-use Test::More tests => 548;
+use Test::More tests => 545;
 
 
 $a = Oscalar->new( "087");
@@ -58,7 +50,7 @@ is(ref $a, "Oscalar");
 is($a, $a);
 is($a, "087");
 
-$c = $a + 7;
+my $c = $a + 7;
 
 is(ref $c, "Oscalar");
 isnt($c, $a);
@@ -105,6 +97,7 @@ is($b, "88");
 is(ref $a, "Oscalar");
 
 package Oscalar;
+our $dummy;
 $dummy=bless \$dummy;		# Now cache of method should be reloaded
 package main;
 
@@ -155,7 +148,7 @@ ok($b? 1:0);
 
 eval q[ package Oscalar; use overload ('=' => sub {$main::copies++; 
 						   package Oscalar;
-						   local $new=$ {@_[0]};
+						   local our $new=$ {@_[0]};
 						   bless \$new } ) ];
 
 $b= Oscalar->new( "$a");
@@ -171,6 +164,7 @@ is(ref $b, "Oscalar");
 is($a, "087");
 is($b, "89");
 is(ref $a, "Oscalar");
+our $copies;
 is($copies, undef);
 
 $b+=1;
@@ -255,10 +249,10 @@ is("b{$a}c", "_._.b.__.xx._.__.c._");
 # Check inheritance of overloading;
 {
   package OscalarI;
-  @ISA = 'Oscalar';
+  our @ISA = 'Oscalar';
 }
 
-$aI = OscalarI->new( "$a");
+my $aI = OscalarI->new( "$a");
 is(ref $aI, "OscalarI");
 is("$aI", "xx");
 is($aI, "xx");
@@ -269,7 +263,7 @@ is("b{$aI}c", "_._.b.__.xx._.__.c._");
 eval "package Oscalar; no overload '.'";
 
 is("b{$a}", "_.b.__.xx._");
-$x="1";
+my $x="1";
 bless \$x, 'Oscalar';
 is("b{$a}c", "bxxc");
  Oscalar->new( 1);
@@ -277,7 +271,7 @@ is("b{$a}c", "bxxc");
 
 # Negative overloading:
 
-$na = eval { ^~^$a };
+my $na = eval { ^~^$a };
 like($@->{description}, qr/no method found/);
 
 eval "package Oscalar; sub numify \{ return '_!_' . shift() . '_!_' \} use overload '0+' => \\&numify";
@@ -313,6 +307,7 @@ like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
     cmp_ok(overload::StrVal(\$aI), '\==', \$aI);
 }
 
+our ($int, $out);
 {
   BEGIN { $int = 7; overload::constant 'integer' => sub {$int++; shift}; }
   $out = 2**10;
@@ -320,8 +315,9 @@ like (overload::StrVal($aI), qr/^OscalarI=SCALAR\(0x[\da-fA-F]+\)$/);
 is($int, 9);
 is($out, 1024);
 
-$foo = 'foo';
-$foo1 = q|f'o\\o|;
+our $foo = 'foo';
+our $foo1 = q|f'o\\o|;
+our ($q, $qr, @q, @qr, $out1, $out2, @q1, @qr1);
 {
   BEGIN { $q = $qr = 7; 
 	  overload::constant 'q' => sub {$q++; push @q, shift, (@_[1] || 'none'); shift},
@@ -342,6 +338,7 @@ is($q, 11);
 is("@qr", "b\\b qq .\\. qq");
 is($qr, 9);
 
+our $res;
 {
   $_ = '!<b>!foo!<-.>!';
   BEGIN { overload::constant 'q' => sub {push @q1, shift, (@_[1] || 'none'); "_<" . (shift) . ">_"},
@@ -359,11 +356,10 @@ EOF
   m'try it';
   s'first part'second part';
   s/yet another/tail here/;
-  tr/A-Z/a-z/;
 }
- is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
+is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
- q second part s tail here s A-Z tr a-z tr");
+ q second part s tail here s");
 is("@qr1", "b\\b qq .\\. qq try it qq first part qq yet another qq");
 is($res, 1);
 is($a, "_<oups
@@ -786,7 +782,7 @@ is($bar->[3], 13);
 
 {
   package two_refs_o;
-  @ISA = ('two_refs');
+  our @ISA = ('two_refs');
 }
 
 $bar = two_refs_o->new( 3,4,5,6);
@@ -839,7 +835,7 @@ is($bar->[3], 13);
 
 {
   package two_refs1_o;
-  @ISA = ('two_refs1');
+  our @ISA = ('two_refs1');
 }
 
 $bar = two_refs1_o->new( 3,4,5,6);
@@ -951,7 +947,8 @@ unless ($aaa) {
   eval { "$x" };
   main::like($@->message, qr/reference as string/);
   main::ok($x);
-  main::ok($x+0 =~ qr/Recurse=ARRAY/);
+  eval { $x + 0 };
+  main::like($@->message, qr/Reference can't be used as a number/ );
 }
 
 # BugID 20010422.003
@@ -1344,9 +1341,10 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     is($o->[0], 1, 'int() numifies only once');
 
     my $aref = \@();
-    my $num_val = int($aref);
+    my $num_val = undef;
     my $r = bless $aref, 'numify_self';
-    is(int($r), $num_val, 'numifies to self');
+    eval { int($r) };
+    like($@->message, qr/Reference can't be used as a number/);
     is($r->[0], 1, 'int() numifies once when returning self');
 
     my $s = bless \@(), 'numify_other';
@@ -1355,28 +1353,19 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     is($s->[1][0], 1, 'returned object numifies too');
 
     my $m = bless $aref, 'numify_by_fallback';
-    is(int($m), $num_val, 'numifies to usual reference value');
-    is(abs($m), $num_val, 'numifies to usual reference value');
-    is(-$m, -$num_val, 'numifies to usual reference value');
-    is(0+$m, $num_val, 'numifies to usual reference value');
-    is($m+0, $num_val, 'numifies to usual reference value');
-    is($m+$m, 2*$num_val, 'numifies to usual reference value');
-    is(0-$m, -$num_val, 'numifies to usual reference value');
-    is(1*$m, $num_val, 'numifies to usual reference value');
-    is($m/1, $num_val, 'numifies to usual reference value');
-    is($m%100, $num_val%100, 'numifies to usual reference value');
-    is($m**1, $num_val, 'numifies to usual reference value');
+    for (sub { int($m) }, sub { -$m }, sub { 0+$m }, sub { $m+$m },
+         sub { 0-$m }, sub { 1*$m }, sub { $m/1 }, sub { $m%100 },
+         sub { $m**1 }) {
+        eval { $_->() };
+        like($@->message, qr/Reference can't be used as a number/);
+    }
 
-    is(abs($aref), $num_val, 'abs() of ref');
-    is(-$aref, -$num_val, 'negative of ref');
-    is(0+$aref, $num_val, 'ref addition');
-    is($aref+0, $num_val, 'ref addition');
-    is($aref+$aref, 2*$num_val, 'ref addition');
-    is(0-$aref, -$num_val, 'subtraction of ref');
-    is(1*$aref, $num_val, 'multiplicaton of ref');
-    is($aref/1, $num_val, 'division of ref');
-    is($aref%100, $num_val%100, 'modulo of ref');
-    is($aref**1, $num_val, 'exponentiation of ref');
+    for (sub { int($aref) }, sub { -$aref }, sub { 0+$aref }, sub { $aref+$aref },
+         sub { 0-$aref }, sub { 1*$aref }, sub { $aref/1 }, sub { $aref%100 },
+         sub { $aref**1 }) {
+        eval { $_->() };
+        like($@->message, qr/Reference can't be used as a number/);
+    }
 }
 
 # EOF

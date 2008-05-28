@@ -20,7 +20,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
          CVf_METHOD CVf_LOCKED
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
-$VERSION = 0.86;
+our $VERSION = 0.86;
 use strict;
 use warnings ();
 
@@ -320,10 +320,7 @@ sub next_todo {
     my $cv = $ent->[1];
     my $gv = $cv->GV;
     my $name = $self->gv_name($gv);
-    if ($ent->[2]) {
-	return "format $name =\n"
-	    . $self->deparse_format($ent->[1]). "\n";
-    } else {
+    {
 	$self->{'subs_declared'}{$name} = 1;
 	if ($name eq "BEGIN") {
 	    my $use_dec = $self->begin_is_use($cv);
@@ -461,7 +458,6 @@ sub stash_subs {
     }
     else {
 	$pack =~ s/(::)?$//;
-	no strict 'refs';
 	$stash = \%{Symbol::stash($pack)};
     }
     my %stash = svref_2object($stash)->ARRAY;
@@ -531,6 +527,7 @@ sub new {
     $self->{'unquote'} = 0;
     $self->{'use_dumper'} = 0;
     $self->{'use_tabs'} = 0;
+    $self->{'global_variables'} = \%();
 
     $self->{'ambient_warnings'} = undef; # Assume no lexical warnings
     $self->{'ambient_hints'} = 0;
@@ -636,7 +633,6 @@ sub compile {
 	print $self->indent(join("", @text)), "\n" if @text;
 
 	# Print __DATA__ section, if necessary
-	no strict 'refs';
 	my $laststash = defined $self->{'curcop'}
 	    ? $self->{'curcop'}->stash->NAME : $self->{'curstash'};
 	if (defined *{Symbol::fetch_glob($laststash."::DATA")}{IO}) {
@@ -848,36 +844,10 @@ Carp::confess("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
 	    return "$proto;\n";
 	}
     }
-    return $proto ."\{\n\t$body\n\b\}" ."\n";
-}
-
-sub deparse_format {
-    my $self = shift;
-    my $form = shift;
-    my @text;
-    local($self->{'curcv'}) = $form;
-    local($self->{'curcvlex'});
-    local($self->{'in_format'}) = 1;
-    local(%$self{[qw'curstash warnings hints hinthash']})
-		= %$self{[qw'curstash warnings hints hinthash']};
-    my $op = $form->ROOT;
-    my $kid;
-    return "\f." if $op->first->name eq 'stub'
-                || $op->first->name eq 'nextstate';
-    $op = $op->first->first; # skip leavewrite, lineseq
-    while (not null $op) {
-	$op = $op->sibling; # skip nextstate
-	my @exprs;
-	$kid = $op->first->sibling; # skip pushmark
-	push @text, "\f".$self->const_sv($kid)->PV;
-	$kid = $kid->sibling;
-	for (; not null $kid; $kid = $kid->sibling) {
-	    push @exprs, $self->deparse($kid, 0);
-	}
-	push @text, "\f".join(", ", @exprs)."\n" if @exprs;
-	$op = $op->sibling;
+    if (keys %{$self->{'global_variables'}}) {
+        $body = "our (" . (join ", ", keys %{$self->{'global_variables'}}) . ");\n" . $body;
     }
-    return join("", @text) . "\f.";
+    return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
 
 sub is_scope {
@@ -1212,7 +1182,8 @@ sub stash_variable {
     }
 
     my $v = ($prefix eq '$#' ? '@' : $prefix) . $name;
-    return $prefix .$self->{'curstash'}.'::'. $name if $self->lex_in_scope($v);
+    return "$prefix$name" if $name =~ m/^\W/; # no stash for magic variables.
+    return $prefix .$self->{'curstash'}.'::'. $name if 1; # $self->lex_in_scope($v);
     return "$prefix$name";
 }
 
@@ -1751,17 +1722,13 @@ sub anon_hash_or_list {
     my $self = shift;
     my($op, $cx) = @_;
 
-    my($pre, $post) = @{\%("anonlist" => \@('\@(',')'),
-                           "anonhash" => \@('\%(',')'))->{$op->name}};
+    my($pre, $post) = @{%("anonlist" => \@('@(',')'),
+                          "anonhash" => \@('%(',')')){$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
     for (; !null($op); $op = $op->sibling) {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
-    }
-    if ($pre eq "\{" and $cx +< 1) {
-	# Disambiguate that it's not a block
-	$pre = "+\{";
     }
     return $pre . join(", ", @exprs) . $post;
 }
@@ -1769,11 +1736,7 @@ sub anon_hash_or_list {
 sub pp_anonlist {
     my $self = shift;
     my ($op, $cx) = @_;
-    if ($op->flags ^&^ OPf_SPECIAL) {
-	return $self->anon_hash_or_list($op, $cx);
-    }
-    warn "Unexpected op pp_" . $op->name() . " without OPf_SPECIAL";
-    return 'XXX';
+    return $self->anon_hash_or_list($op, $cx);
 }
 
 *pp_anonhash = \&pp_anonlist;
@@ -2606,7 +2569,7 @@ sub loop_common {
 	$head = "foreach $var ($ary) ";
     } elsif ($kid->name eq "null") { # while/until
 	$kid = $kid->first;
-	my $name = \%("and" => "while", "or" => "until")->{$kid->name};
+	my $name = %("and" => "while", "or" => "until"){$kid->name};
 	$cond = $self->deparse($kid->first, 1);
 	$head = "$name ($cond) ";
 	$body = $kid->first->sibling;
@@ -3165,7 +3128,7 @@ sub check_proto {
 		      return "&";
 		  }
 	    } elsif (substr($chr, 0, 1) eq "\\") {
-		$chr =~ tr/\\[]//d;
+		$chr =~ s/[\\\[\]]//g;
 		if ($arg->name =~ m/^s?refgen$/ and
 		    !null($real = $arg->first) and
 		    ($chr =~ m/\$/ && is_scalar($real->first)
@@ -3443,7 +3406,7 @@ sub escape_extended_re {
     my($str) = @_;
     $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1}/g;
     $str =~ s/([[:^print:]])/{
-	($1 =~ y! \t\n!!) ? $1 : sprintf("\\\%03o", ord($1))}/g;
+	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1))}/g;
     $str =~ s/\n/\n\f/g;
     return $str;
 }
