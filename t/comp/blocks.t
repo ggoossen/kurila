@@ -67,19 +67,21 @@ qw(foo myfoo bar main  ));
 
 $expect = ":" . join(":", @expect);
 fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes');
-no strict 'vars';
+our $f;
 BEGIN {$f = 'main'; print ":$f"}
 UNITCHECK {print ":$f"}
 CHECK {print ":$f"}
 INIT {print ":$f"}
 END {print ":$f"}
 package bar;
+our $f;
 BEGIN {$f = 'bar';print ":$f"}
 UNITCHECK {print ":$f"}
 CHECK {print ":$f"}
 INIT {print ":$f"}
 END {print ":$f"}
 package foo;
+our $f;
 {
     my $f;
     BEGIN {$f = 'myfoo'; print ":$f"}

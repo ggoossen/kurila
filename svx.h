@@ -45,4 +45,11 @@ static __inline__ bool iiSvTRUE(pTHX_ SV *sv) {
 /* static __inline__ bool SvTRUEx(pTHX_ SV *sv) {return SvTRUE(sv); } */
 #define SvTRUEx SvTRUE
 
+static __inline__ void iiSvIOKp_on(pTHX_ SV *sv) {
+    assert_not_glob(sv)
+    SvRELEASE_IVX_(sv)
+    SvFLAGS(sv) |= SVp_IOK;
+    assert((SvTYPE(sv) == SVt_IV) || (SvTYPE(sv) >= SVt_PVIV));
+}
+#define SvIOKp_on(sv) iiSvIOKp_on(aTHX_ sv)
 

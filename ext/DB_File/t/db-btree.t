@@ -266,7 +266,7 @@ ok(25, (@keys-1) == 29 && (@values-1) == 29) ;
 $i = 0 ;
 while (($key,$value) = each(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
-	$key =~ y/a-z/A-Z/;
+	$key = uc($key);
 	$i++ if $key eq $value;
     }
 }

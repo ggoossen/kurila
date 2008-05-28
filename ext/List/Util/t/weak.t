@@ -1,10 +1,9 @@
 #!./perl
 
+use Config;
+
 BEGIN {
     unless (-d 'blib') {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	require Config; Config->import;
 	keys %Config; # Silence warning
 	if (%Config{extensions} !~ m/\bList\/Util\b/) {
 	    print "1..0 # Skip: List::Util was not built\n";
@@ -94,7 +93,7 @@ print "# EXITBLOCK\n";
 # Case 3: a circular structure
 #
 
-$flag = 0;
+my $flag = 0;
 {
 	my $y = bless \%(), 'Dest';
 	Dump($y);
@@ -140,6 +139,7 @@ ok( $flag == 2 );
 # Case 5: deleting a weakref before the other one
 #
 
+our ($y, $z);
 {
 	my $x = "foo";
 	$y = \$x;
@@ -170,7 +170,7 @@ ok(isweak($b));
 $b = \$a;
 ok(!isweak($b));
 
-$x = \%();
+our $x = \%();
 weaken($x->{Y} = \$a);
 ok(isweak($x->{Y}));
 ok(!isweak($x->{Z}));

@@ -9,6 +9,7 @@ sub make {
   bless \$value, $package;
 }
 
+our $loaded_count;
 ++$loaded_count;
 
 1;

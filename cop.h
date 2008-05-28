@@ -217,7 +217,7 @@ struct cop {
 #    define CopFILEAVx(c)	(GvAV(CopFILEGV(c)))
 # endif
 #  define CopFILE(c)		(CopFILEGV(c) && GvSV(CopFILEGV(c)) \
-				    ? SvPVX(GvSV(CopFILEGV(c))) : NULL)
+				    ? SvPVX_const(GvSV(CopFILEGV(c))) : NULL)
 #  define CopSTASH(c)		((c)->cop_stash)
 #  define CopLABEL(c)		((c)->cop_label)
 #  define CopSTASH_set(c,hv)	((c)->cop_stash = (hv))

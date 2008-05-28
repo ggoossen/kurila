@@ -63,7 +63,7 @@ foreach my $file (
       ok 1;
       next;
     } elsif( do{
-      for ($outstring, $compstring) { tr/ //d; };
+      for ($outstring, $compstring) { s/[ ]//g; };
       $outstring eq $compstring;
     }){
       print "# Differ only in whitespace.\n";

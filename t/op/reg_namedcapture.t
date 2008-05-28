@@ -5,6 +5,9 @@
 
 print "1..2\n";
 
+my $test = 0;
+our %Y;
+
 # This tests whether glob assignment fails to load the tie.
 *X = *-;
 'X'=~m/(?<X>X)/;

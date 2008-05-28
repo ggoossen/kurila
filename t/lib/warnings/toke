@@ -168,7 +168,7 @@ syntax error at - line 8, near "=."
 No operator expected, but found '<', '<=' or '<=>' operator at - line 9.
 ########
 # toke.c
-use warnings 'syntax' ;
+use warnings 'syntax' ; our @a;
 my $a = @a[1,2] ;
 no warnings 'syntax' ;
 my $a = @a[1,2] ;
@@ -189,7 +189,7 @@ Execution of - aborted due to compilation errors. at - line 7.
 ########
 # toke.c
 use warnings 'qw' ;
-@a = qw(a, b, c) ;
+our @a = qw(a, b, c) ;
 no warnings 'qw' ;
 @a = qw(a, b, c) ;
 EXPECT
@@ -197,14 +197,14 @@ Possible attempt to separate words with commas at - line 3.
 ########
 # toke.c
 use warnings 'qw' ;
-@a = qw(a b #) ;
+our @a = qw(a b #) ;
 no warnings 'qw' ;
 @a = qw(a b #) ;
 EXPECT
 Possible attempt to put comments in qw() list at - line 3.
 ########
 # toke.c
-use warnings 'syntax' ;
+use warnings 'syntax' ; our $x;
 print ("");
 print ("") and $x = 1;
 print ("") or die;
@@ -647,14 +647,6 @@ EXPECT
 no warning for overriden dump
 ########
 # toke.c
-use warnings 'ambiguous';
-"@mjd_previously_unused_array";        
-no warnings 'ambiguous';
-"@mjd_previously_unused_array";        
-EXPECT
-Possible unintended interpolation of @mjd_previously_unused_array in string at - line 3.
-########
-# toke.c
 # 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
 use warnings 'regexp';
 "foo" =~ m/foo/c;
@@ -677,35 +669,6 @@ s/ab/ab/cg;
 EXPECT
 Use of /c modifier is meaningless in s/// at - line 5.
 Use of /c modifier is meaningless in s/// at - line 6.
-########
--wa
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com # -a flag should suppress these warnings
-print "@F\n";
-EXPECT
-
-########
--w
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com # -a flag should suppress these warnings
-print "@F\n";
-EXPECT
-Possible unintended interpolation of @F in string at - line 4.
-Name "main::F" used only once: possible typo at - line 4.
-########
--wa
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com
-EXPECT
-
-########
-# toke.c
-# 20020414 mjd-perl-patch+@plover.com
-# In 5.7.3, this emitted "Possible unintended interpolation" warnings
-use warnings 'ambiguous';
-$s = "(@-)(@+)";
-EXPECT
-
 ########
 # toke.c
 # mandatory warning

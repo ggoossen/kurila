@@ -834,9 +834,7 @@ PP(pp_pow)
        we're sure it is safe; otherwise we call pow() and try to convert to
        integer afterwards. */
     {
-	SvIV_please(svr);
 	if (SvIOK(svr)) {
-	    SvIV_please(svl);
 	    if (SvIOK(svl)) {
 		UV power;
 		bool baseuok;
@@ -892,7 +890,6 @@ PP(pp_pow)
 		    }
                     SP--;
                     SETn( result );
-                    SvIV_please(svr);
                     RETURN;
 		} else {
 		    register unsigned int highbit = 8 * sizeof(UV);
@@ -985,10 +982,6 @@ PP(pp_pow)
 	SETn( Perl_pow( left, right) );
 #endif  /* HAS_AIX_POWL_NEG_BASE_BUG */
 
-#ifdef PERL_PRESERVE_IVUV
-	if (is_int)
-	    SvIV_please(svr);
-#endif
 	RETURN;
     }
 }
@@ -1000,13 +993,11 @@ PP(pp_multiply)
     svl = sv_2num(TOPm1s);
     svr = sv_2num(TOPs);
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(svr);
     if (SvIOK(svr)) {
 	/* Unless the left argument is integer in range we are going to have to
 	   use NV maths. Hence only attempt to coerce the right argument if
 	   we know the left is integer.  */
 	/* Left operand is defined, so is it IV? */
-	SvIV_please(svl);
 	if (SvIOK(svl)) {
 	    bool auvok = SvUOK(svl);
 	    bool buvok = SvUOK(svr);
@@ -1145,9 +1136,7 @@ PP(pp_divide)
 #endif
 
 #ifdef PERL_TRY_UV_DIVIDE
-    SvIV_please(svr);
     if (SvIOK(svr)) {
-        SvIV_please(svl);
         if (SvIOK(svl)) {
             bool left_non_neg = SvUOK(svl);
             bool right_non_neg = SvUOK(svr);
@@ -1255,7 +1244,6 @@ PP(pp_modulo)
 	NV dleft  = 0.0;
         SV * svl;
         SV * const svr = sv_2num(TOPs);
-        SvIV_please(svr);
         if (SvIOK(svr)) {
             right_neg = !SvUOK(svr);
             if (!right_neg) {
@@ -1288,7 +1276,6 @@ PP(pp_modulo)
            a UV.  In range NV has been rounded down to nearest UV and
            use_double false.  */
         svl = sv_2num(TOPs);
-        SvIV_please(svl);
 	if (!use_double && SvIOK(svl)) {
             if (SvIOK(svl)) {
                 left_neg = !SvUOK(svl);
@@ -1505,7 +1492,6 @@ PP(pp_subtract)
 #ifdef PERL_PRESERVE_IVUV
     /* See comments in pp_add (in pp_hot.c) about Overflow, and how
        "bad things" happen if you rely on signed integers wrapping.  */
-    SvIV_please(svr);
     if (SvIOK(svr)) {
 	/* Unless the left argument is integer in range we are going to have to
 	   use NV maths. Hence only attempt to coerce the right argument if
@@ -1520,7 +1506,6 @@ PP(pp_subtract)
 	    /* left operand is undef, treat as zero.  */
 	} else {
 	    /* Left operand is defined, so is it IV? */
-	    SvIV_please(svl);
 	    if (SvIOK(svl)) {
 		if ((auvok = SvUOK(svl)))
 		    auv = SvUVX(svl);
@@ -1654,9 +1639,7 @@ PP(pp_lt)
 {
     dVAR; dSP; tryAMAGICbinSET(lt,0);
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
-	SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    bool auvok = SvUOK(TOPm1s);
 	    bool buvok = SvUOK(TOPs);
@@ -1736,9 +1719,7 @@ PP(pp_gt)
 {
     dVAR; dSP; tryAMAGICbinSET(gt,0);
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
-	SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    bool auvok = SvUOK(TOPm1s);
 	    bool buvok = SvUOK(TOPs);
@@ -1819,9 +1800,7 @@ PP(pp_le)
 {
     dVAR; dSP; tryAMAGICbinSET(le,0);
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
-	SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    bool auvok = SvUOK(TOPm1s);
 	    bool buvok = SvUOK(TOPs);
@@ -1902,9 +1881,7 @@ PP(pp_ge)
 {
     dVAR; dSP; tryAMAGICbinSET(ge,0);
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
-	SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    bool auvok = SvUOK(TOPm1s);
 	    bool buvok = SvUOK(TOPs);
@@ -1992,9 +1969,7 @@ PP(pp_ne)
     }
 #endif
 #ifdef PERL_PRESERVE_IVUV
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
-	SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    const bool auvok = SvUOK(TOPm1s);
 	    const bool buvok = SvUOK(TOPs);
@@ -2070,9 +2045,7 @@ PP(pp_ncmp)
 #endif
 #ifdef PERL_PRESERVE_IVUV
     /* Fortunately it seems NaN isn't IOK */
-    SvIV_please(TOPs);
     if (SvIOK(TOPs)) {
-	SvIV_please(TOPm1s);
 	if (SvIOK(TOPm1s)) {
 	    const bool leftuvok = SvUOK(TOPm1s);
 	    const bool rightuvok = SvUOK(TOPs);
@@ -2295,7 +2268,6 @@ PP(pp_negate)
 		*SvPV_force(TARG, len) = *s == '-' ? '+' : '-';
 	    }
 	    else if (DO_UTF8(sv)) {
-		SvIV_please(sv);
 		if (SvIOK(sv))
 		    goto oops_its_an_int;
 		if (SvNOK(sv))
@@ -2306,7 +2278,6 @@ PP(pp_negate)
 		}
 	    }
 	    else {
-		SvIV_please(sv);
 		if (SvIOK(sv))
 		  goto oops_its_an_int;
 		sv_setnv(TARG, -SvNV(sv));
@@ -2930,9 +2901,6 @@ PP(pp_substr)
 	tmps += pos;
 
 	sv_setpvn(TARG, tmps, rem);
-#ifdef USE_LOCALE_COLLATE
-	sv_unmagic(TARG, PERL_MAGIC_collxfrm);
-#endif
 	if (repl) {
 	    SV* repl_sv_copy = NULL;
 
@@ -3795,18 +3763,33 @@ PP(pp_lslice)
 
 PP(pp_anonlist)
 {
-    dVAR; dSP; dMARK; dORIGMARK;
+    dVAR; dSP; dMARK;
+    const I32 gimme = GIMME_V;
     const I32 items = SP - MARK;
-    SV * const av = (SV *) av_make(items, MARK+1);
-    SP = ORIGMARK;		/* av_make() might realloc stack_sp */
-    mXPUSHs((PL_op->op_flags & OPf_SPECIAL)
-	    ? newRV_noinc(av) : av);
+
+    if (PL_op->op_flags & OPf_REF) {
+	dORIGMARK;
+	SV * const av = (SV *) av_make(items, MARK+1);
+	SP = ORIGMARK;		/* av_make() might realloc stack_sp */
+
+	mXPUSHs(av);
+	RETURN;
+    }
+
+    if (gimme == G_ARRAY) {
+	/* Nothing: items are already on the stack */
+    } else if (gimme == G_SCALAR) {
+	SP = MARK;
+	mXPUSHi(items);
+    } else {
+    }
     RETURN;
 }
 
 PP(pp_anonhash)
 {
     dVAR; dSP; dMARK; dORIGMARK;
+    const I32 gimme = GIMME_V;
     HV* const hv = newHV();
 
     while (MARK < SP) {
@@ -3819,8 +3802,22 @@ PP(pp_anonhash)
 	(void)hv_store_ent(hv,key,val,0);
     }
     SP = ORIGMARK;
-    mXPUSHs((PL_op->op_flags & OPf_SPECIAL)
-	    ? newRV_noinc((SV*) hv) : (SV*) hv);
+
+    if (PL_op->op_flags & OPf_REF) {
+	mXPUSHs((SV*)hv);
+	RETURN;
+    }
+
+    if (gimme == G_ARRAY) { /* array wanted */
+	PUTBACK;
+	EXTEND(PL_stack_sp, 1);
+	*++PL_stack_sp = (SV*)hv;
+	return do_kv();
+    }
+    else if (gimme == G_SCALAR) {
+	PUTBACK;
+	XPUSHs( Perl_hv_scalar(aTHX_ hv) );
+    }
     RETURN;
 }
 

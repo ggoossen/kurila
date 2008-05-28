@@ -64,7 +64,7 @@ ok my_system($exe_file), 11;
 
 # Clean up
 for ($source_file, $object_file, $exe_file) {
-  tr/"'//d;
+  s/"|'//g;
   1 while unlink;
 }
 

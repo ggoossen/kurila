@@ -17,6 +17,8 @@ die("Getopt::Long version $want_version required--this is only version ".
 
 print "1..14\n";
 
+our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
+
 my $args = "-Foo -baR --foo";
 @ARGV = qw(foo bar);
 undef $opt_baR;

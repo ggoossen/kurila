@@ -49,7 +49,7 @@ if ($b->have_compiler) {
   ok $lib_file;
   ok -e $lib_file, 1, "Make sure $lib_file exists";
 
-  eval {require XSTest};
+  eval {require XSTest}; die if $@;
   ok $@, '';
   ok  XSTest::is_even(8);
   ok !XSTest::is_even(9);

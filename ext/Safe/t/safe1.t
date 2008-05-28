@@ -1,11 +1,7 @@
 #!./perl -w
 $|=1;
+use Config;
 BEGIN {
-    if(%ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-    require Config; Config->import;
     if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
         print "1..0\n";
         exit 0;
@@ -38,7 +34,7 @@ $cpt = Safe->new() or die;
 $cpt = Safe->new( "Root") or die;
 
 foreach(1..3) {
-	$foo = 42;
+	our $foo = 42;
 
 	$cpt->share(qw($foo));
 

@@ -36,7 +36,7 @@ if (open(CF, "<", $CF)) {
 	$i++;
 	my $a = pack("U0U*", hex $code);
 	my $b = pack("U0U*", map { hex } split " ", $mapping);
-        $todo = (utf8::length($b) +> 1 ? "TODO" : "");
+        my $todo = (utf8::length($b) +> 1 ? "TODO" : "");
 	my $t0 = ":$a:" =~ m/:$a:/    ? 1 : 0;
 	my $t1 = ":$a:" =~ m/:$a:/i   ? 1 : 0;
 	my $t2 = ":$a:" =~ m/:[$a]:/  ? 1 : 0;

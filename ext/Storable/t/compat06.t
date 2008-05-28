@@ -13,11 +13,6 @@ BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
     require 'st-dump.pl';
 }
 
@@ -60,7 +55,7 @@ package ROOT;
 
 sub make {
 	my $self = bless \%(), shift;
-	my $h = tie %hash, 'TIED_HASH';
+	my $h = tie our %hash, 'TIED_HASH';
 	$self->{h} = $h;
 	$self->{ref} = \%hash;
 	my @pool;
@@ -119,7 +114,7 @@ ok 4, nfreeze($y) eq nfreeze($r);
 
 ok 5, $y->ref->{key1} eq 'val1';
 ok 6, $y->ref->{key2} eq 'val2';
-ok 7, $hash_fetch == 2;
+ok 7, our $hash_fetch == 2;
 
 my $num = $r->num;
 my $ok = 1;

@@ -36,7 +36,7 @@ BEGIN {
     }
 }
 
-$PATH = "sock-$$";
+my $PATH = "sock-$$";
 
 if ($^O eq 'os2') {	# Can't create sockets with relative path...
   require Cwd;
@@ -59,7 +59,7 @@ print "1..5\n";
 
 use IO::Socket;
 
-$listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0);
+my $listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0);
 
 # Sometimes UNIX filesystems are mounted for security reasons
 # with "nodev" option which spells out "no" for creating UNIX
@@ -81,9 +81,9 @@ unless (defined $listen) {
 }
 print "ok 1\n";
 
-if($pid = fork()) {
+if(my $pid = fork()) {
 
-    $sock = $listen->accept();
+    my $sock = $listen->accept();
 
     if (defined $sock) {
 	print "ok 2\n";
@@ -106,7 +106,7 @@ if($pid = fork()) {
     }
 } elsif(defined $pid) {
 
-    $sock = IO::Socket::UNIX->new(Peer => $PATH) or die "$!";
+    my $sock = IO::Socket::UNIX->new(Peer => $PATH) or die "$!";
 
     print $sock "ok 3\n";
 

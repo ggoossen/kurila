@@ -23,8 +23,8 @@ END {  if ($tmpfile) { 1 while unlink $tmpfile} }
 for (@prgs){
     my $switch = "";
     my @temps = () ;
-    if (s/^\s*-\w+//){
-        $switch = $&;
+    if (s/^(\s*-\w+)//){
+        $switch = $1;
     }
     my($prog,$expected) = split(m/\nEXPECT\n/, $_);
     if ( $prog =~ m/--FILE--/) {

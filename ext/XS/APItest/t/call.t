@@ -3,11 +3,10 @@
 # test the various call-into-perl-from-C functions
 # DAPM Aug 2004
 
+use TestInit;
+use Config;
+
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-    require Config; Config->import;
     if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
 	# Look, I'm using this fully-qualified variable more than once!
 	my $arch = $MacPerl::Architecture;

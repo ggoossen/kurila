@@ -102,11 +102,13 @@ typedef OP OP_4tree;			/* Will be redefined later. */
  typedef struct regexp_internal {
         int name_list_idx;	/* Optional data index of an array of paren names */
         union {
+#ifdef RE_TRACK_PATTERN_OFFSETS
 	    U32 *offsets;           /* offset annotations 20001228 MJD
                                        data about mapping the program to the
                                        string -
                                        offsets[0] is proglen when this is used
                                        */
+#endif /* RE_TRACK_PATTERN_OFFSETS */
             U32 proglen;
         } u;
 

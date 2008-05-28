@@ -52,3 +52,152 @@
    Memcheck:Cond
    obj:/lib/ld-2.*.so
 }
+
+## pwent leaks.
+{
+   gpwent
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getspnam_r
+   fun:Perl_pp_gpwent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getpwuid_r
+   fun:Perl_pp_gpwent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getspnam_r
+   fun:Perl_pp_gpwent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getpwuid_r
+   fun:Perl_pp_gpwent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/libc-2.7.so
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getpwuid_r
+   fun:Perl_pp_gpwent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/libc-2.7.so
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getspnam_r
+   fun:Perl_pp_gpwent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getgrgid_r
+   fun:Perl_pp_ggrent
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   fun:getgrgid_r
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/libc-2.7.so
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   fun:getgrgid_r
+   fun:Perl_pp_ggrent
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   obj:*
+   fun:setpwent
+   fun:Perl_pp_spwent
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:tsearch
+   fun:__nss_lookup_function
+   obj:*
+   obj:*
+   obj:*
+   fun:setpwent
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/libc-2.7.so
+   fun:__nss_database_lookup
+   obj:*
+   obj:*
+   obj:*
+   fun:setpwent
+   fun:Perl_pp_spwent
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/lib/libc-2.7.so
+   obj:*
+   obj:*
+   obj:*
+   fun:setpwent
+   fun:Perl_pp_spwent
+}

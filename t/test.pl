@@ -232,7 +232,7 @@ sub cmp_ok ($$$@) {
         # This will also show numbers for some uneeded cases, but will
         # definately be helpful for things such as == and <= that fail
         if (not ref $got and not ref $expected
-            and $got eq $expected and $type !~ tr/a-z//) {
+            and $got eq $expected and $type !~ m/[a-z]/) {
             unshift @mess, "# $got - $expected = " . ($got - $expected) . "\n";
         }
         unshift(@mess, "#      got "._q($got)."\n",
@@ -252,7 +252,7 @@ sub within ($$$@) {
     my $pass;
     if (!defined $got or !defined $expected or !defined $range) {
         # This is a fail, but doesn't need extra diagnostics
-    } elsif ($got !~ tr/0-9// or $expected !~ tr/0-9// or $range !~ tr/0-9//) {
+    } elsif ($got !~ m/[0-9]/ or $expected !~ m/[0-9]/ or $range !~ m/[0-9]/) {
         # This is a fail
         unshift @mess, "# got, expected and range must be numeric\n";
     } elsif ($range +< 0) {
@@ -813,14 +813,19 @@ sub dies_like(&$;$) {
 
 sub eval_dies_like($$;$) {
     my ($e, $qr, $name) = @_;
-    eval "$e";
-    my $err = $@;
-    if (not $err) {
-        local $Level = 2;
-        diag "didn't die";
-        return ok(0, $name);
+  TODO:
+    {
+        todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{PERL_VALGRIND};
+        
+        eval "$e";
+        my $err = $@;
+        if (not $err) {
+            local $Level = 2;
+            diag "didn't die";
+            return ok(0, $name);
+        }
+        return like_yn(0, $err->{description}, $qr );
     }
-    return like_yn(0, $err->{description}, $qr );
 }
 
 1;

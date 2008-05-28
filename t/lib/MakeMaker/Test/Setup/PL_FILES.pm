@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::PL_FILES;
 
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 require Exporter;
-@EXPORT = qw(setup teardown);
+our @EXPORT = qw(setup teardown);
 
 use strict;
 use File::Path;

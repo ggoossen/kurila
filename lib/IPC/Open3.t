@@ -36,7 +36,7 @@ sub ok {
 sub cmd_line {
 	if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
 		my $cmd = shift;
-		$cmd =~ tr/\r\n//d;
+		$cmd =~ s/[\r\n]//g;
 		$cmd =~ s/"/\\"/g;
 		return qq/"$cmd"/;
 	}

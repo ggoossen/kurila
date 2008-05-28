@@ -12,19 +12,7 @@
 # This test checks downgrade behaviour on pre-5.8 perls when new 5.8 features
 # are encountered.
 
-sub BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-    }
-    require Config; Config->import;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
+use Config;
 
 use Test::More;
 use Storable qw (dclone store retrieve freeze thaw nstore nfreeze);

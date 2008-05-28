@@ -20,8 +20,6 @@ utils/perlivp
 utils/piconv
 utils/pl2pm
 utils/prove
-utils/ptar
-utils/ptardiff
 utils/shasum
 utils/splain
 utils/xsubpp

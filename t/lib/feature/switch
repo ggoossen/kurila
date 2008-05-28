@@ -38,7 +38,7 @@ Execution of - aborted due to compilation errors. at - line 2.
 ########
 # Use switch; so given is a keyword
 use feature 'switch';
-given("okay\n") { print }
+given("okay\n") { +print }
 EXPECT
 okay
 ########
@@ -99,7 +99,7 @@ Execution of - aborted due to compilation errors. at - line 6.
 # switch out of scope; break should be a bareword.
 use warnings;
 { use feature 'switch';
-  given (1) { break }  
+  given (1) { +break }  
 }
 print STDOUT break;
 EXPECT

@@ -9,14 +9,10 @@ BEGIN {
 }
 
 BEGIN { require "./test.pl"; }
-plan( tests => 86 );
+plan( tests => 85 );
 
 eval '%@x=0;';
 like( $@->{description}, qr/^Can't modify hash dereference in repeat \(x\)/, '%@x=0' );
-
-# Bug 20010422.005
-eval q{{s//${}/; m//}};
-like( $@->{description}, qr/syntax error/, 'syntax error, used to dump core' );
 
 # Bug 20010528.007
 eval q/"\x{"/;
@@ -89,8 +85,8 @@ is( $@, '', 'PL_lex_brackstack' );
     is("{join ' ', @b}\{", "B\{", "interpolation, qq//");
     is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
-    $c =~ m/$a(?:){/;
-    is($&, 'A{', "interpolation, m//");
+    $c =~ m/$a(?:){/p;
+    is($^MATCH, 'A{', "interpolation, m//");
     $c =~ s/$a\{/foo/;
     is($c, 'foo', "interpolation, s/...//");
     $c =~ s/foo/{$a}\{/;

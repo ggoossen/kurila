@@ -783,7 +783,7 @@ sub parse_text {
             my $ldelim_orig;
             ($cmd, $ldelim_orig) = ($1, $2);
             ($ldelim = $ldelim_orig) =~ s/\s+$//;
-            ($rdelim = $ldelim) =~ tr/</>/;
+            ($rdelim = $ldelim) =~ s/</>/g;
             $seq = Pod::InteriorSequence->new(
                        -name   => $cmd,
                        -ldelim => $ldelim_orig,  -rdelim => $rdelim,
@@ -846,7 +846,7 @@ sub parse_text {
     while (@seq_stack +> 1) {
        ($cmd, $file, $line) = ($seq->name, $seq->file_line);
        $ldelim  = $seq->ldelim;
-       ($rdelim = $ldelim) =~ tr/</>/;
+       ($rdelim = $ldelim) =~ s/</>/g;
        $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
        pop @seq_stack;
        my $errmsg = "*** ERROR: unterminated {$cmd}{$ldelim}...{$rdelim}".

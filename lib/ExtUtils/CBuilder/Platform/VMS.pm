@@ -107,7 +107,7 @@ sub arg_share_object_file {
 sub lib_file {
   my ($self, $dl_file) = @_;
   $dl_file =~ s/\.[^.]+$//;
-  $dl_file =~ tr/"//d;
+  $dl_file =~ s/"//g;
   $dl_file = $dl_file .= '.' . $self->{config}{dlext};
 
   # Need to create with the same name as DynaLoader will load with.

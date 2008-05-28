@@ -29,7 +29,7 @@ like( $warning, qr/^Insecure .* $Tmsg/, '    taint warn' );
 }
 
 # Get ourselves a tainted variable.
-$file = $0;
+my $file = $0;
 $file =~ s/.*/some.tmp/;
 ok( open(FILE, ">", "$file"),   'open >' ) or DIE $!;
 print FILE "Stuff\n";

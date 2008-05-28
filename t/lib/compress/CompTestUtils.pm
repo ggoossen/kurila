@@ -163,7 +163,7 @@ sub hexDump
         }
         print "   " x (16 - @array)
             if @array +< 16 ;
-        $data =~ tr/\0-\37\177-\377/./;
+        $data =~ s/[\0-\37\177-\377]/./g;
         print "  $data\n";
     }
 

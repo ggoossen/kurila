@@ -1219,6 +1219,8 @@ Perl_hv_delete(pTHX_ HV *hv, const char *key, I32 klen_i32, I32 flags)
 int
 Perl_magic_setglob(pTHX_ SV *sv, MAGIC *mg)
 {
+    PERL_ARGS_ASSERT_MAGIC_SETGLOB;
+
     PERL_UNUSED_ARG(mg);
     PERL_UNUSED_ARG(sv);
 

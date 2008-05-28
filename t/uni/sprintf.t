@@ -12,7 +12,7 @@ use utf8;
 
 $a = "B\x{fc}f";
 $b = "G\x{100}r";
-$c = 0x200;
+my $c = 0x200;
 
 {
     my $s = sprintf "\%s", $a;

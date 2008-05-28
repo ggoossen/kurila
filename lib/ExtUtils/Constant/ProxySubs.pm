@@ -148,11 +148,6 @@ sub name_len_value_macro {
     $value = $item->{name} unless defined $value;
 
     my $namelen = length $name;
-    if ($name =~ tr/\0-\377// != $namelen) {
-	# the hash API signals UTF-8 by passing the length negated.
-	utf8::encode($name);
-	$namelen = -length $name;
-    }
     $name = C_stringify($name);
 
     my $macro = $self->macro_from_item($item);

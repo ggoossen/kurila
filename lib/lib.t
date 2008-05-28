@@ -1,5 +1,6 @@
 #!./perl -w
 
+our @OrigINC;
 BEGIN {
     chdir 't';
     @INC = '../lib';
@@ -32,7 +33,7 @@ BEGIN {
     open(MOD, ">", "$Module") || $!-> DIE();
     print MOD <<'MODULE';
 package Yup;
-$Plan = 9;
+our $Plan = 9;
 return '42';
 MODULE
 
@@ -53,7 +54,7 @@ BEGIN { use_ok('Yup') }
 BEGIN {
     if ($^O eq 'MacOS') {
 	for ($Lib_Dir, $Arch_Dir) {
-	    tr|/|:|;
+	    s|/|:|g;
 	    $_ .= ":" unless m/:$/;
 	    $_ = ":$_" unless m/^:/; # we know this path is relative
 	}

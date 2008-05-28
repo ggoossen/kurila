@@ -1078,7 +1078,7 @@ sub _check_ptree {
             # complain only when warning level is greater than 1
             if($self->{-warnings} && $self->{-warnings}+>1) {
               my $count;
-              if($count = tr/<>/<>/) {
+              if($count = m/([<>])/g) {
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
                      -msg => "$count unescaped <> in paragraph" ));

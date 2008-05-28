@@ -708,8 +708,6 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 
 #define SvOKp(sv)		(SvFLAGS(sv) & (SVp_IOK|SVp_NOK|SVp_POK))
 #define SvIOKp(sv)		(SvFLAGS(sv) & SVp_IOK)
-#define SvIOKp_on(sv)		(assert_not_glob(sv) SvRELEASE_IVX_(sv)	\
-				    SvFLAGS(sv) |= SVp_IOK)
 #define SvNOKp(sv)		(SvFLAGS(sv) & SVp_NOK)
 #define SvNOKp_on(sv)		(assert_not_glob(sv) SvFLAGS(sv) |= SVp_NOK)
 #define SvPOKp(sv)		(SvFLAGS(sv) & SVp_POK)
@@ -1054,12 +1052,6 @@ the scalar's value cannot change unless written to.
 #define SvENDx(sv) ((PL_Sv = (sv)), SvEND(PL_Sv))
 
 
-/* Ask a scalar nicely to try to become an IV, if possible.
-   Not guaranteed to stay returning void */
-/* Macro won't actually call sv_2iv if already IOK */
-#define SvIV_please(sv) \
-	STMT_START {if (!SvIOKp(sv) && (SvNOK(sv) || SvPOK(sv))) \
-		(void) SvIV(sv); } STMT_END
 #define SvIV_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) == SVt_IV || SvTYPE(sv) >= SVt_PVIV); \
 		assert(SvTYPE(sv) != SVt_PVAV);		\
@@ -1114,12 +1106,12 @@ the scalar's value cannot change unless written to.
 		(((XPV*)  SvANY(sv))->xpv_len = (val)); } STMT_END
 #define SvEND_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) >= SVt_PV); \
-		(SvCUR(sv) = (val) - SvPVX(sv)); } STMT_END
+		(SvCUR(sv) = (val) - SvPVX_const(sv)); } STMT_END
 
 #define SvPV_renew(sv,n) \
 	STMT_START { SvLEN_set(sv, n); \
 		SvPV_set((sv), (MEM_WRAP_CHECK_(n,char)			\
-				(char*)saferealloc((Malloc_t)SvPVX(sv), \
+				(char*)saferealloc((Malloc_t)SvPVX_mutable(sv), \
 						   (MEM_SIZE)((n)))));  \
 		 } STMT_END
 

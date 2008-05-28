@@ -9,6 +9,8 @@ die("Getopt::Long version $want_version required--this is only version ".
   unless $Getopt::Long::VERSION +>= $want_version;
 print "1..9\n";
 
+our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
+
 @ARGV = qw(-Foo -baR --foo bar);
 my $p = Getopt::Long::Parser->new(config => \@("no_ignore_case"));
 undef $opt_baR;

@@ -15,6 +15,7 @@ sub run {
     return system($^X, "-e", $code);
 }
 
+our $numtests;
 BEGIN {
     # MacOS system() doesn't have good return value
     $numtests = ($^O eq 'VMS') ? 16 : ($^O eq 'MacOS') ? 0 : 17;
@@ -27,7 +28,7 @@ my $native_success = 0;
    $native_success = 1 if $^O eq 'VMS';
 
 if ($^O ne 'MacOS') {
-my $exit, $exit_arg;
+my ($exit, $exit_arg);
 
 $exit = run('exit');
 is( $exit >> 8, 0,              'Normal exit' );

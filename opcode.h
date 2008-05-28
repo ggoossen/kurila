@@ -534,8 +534,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"join or string",
 	"list",
 	"list slice",
-	"anonymous list ([])",
-	"anonymous hash ({})",
+	"anonymous list (%())",
+	"anonymous hash (@())",
 	"splice",
 	"push",
 	"pop",
@@ -1641,8 +1641,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x0004280d,	/* join */
 	0x00004801,	/* list */
 	0x00448400,	/* lslice */
-	0x00004805,	/* anonlist */
-	0x00004805,	/* anonhash */
+	0x00004801,	/* anonlist */
+	0x00004801,	/* anonhash */
 	0x05326801,	/* splice */
 	0x0004691d,	/* push */
 	0x00017604,	/* pop */

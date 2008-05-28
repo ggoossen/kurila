@@ -186,12 +186,14 @@ is($r, 1);
 
 {
     # test for change 11639: Can't localize *FH, then tie it
+    our %foo;
     {
 	local *foo;
 	tie %foo, 'Blah';
     }
     ok(!tied %foo);
 
+    our @bar;
     {
 	local *bar;
 	tie @bar, 'Blah';

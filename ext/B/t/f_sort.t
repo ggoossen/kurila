@@ -510,32 +510,34 @@ checkOptree(name   => q{Compound sort/map Expression },
 # 8  <@> mapstart lK*
 # 9  <|> mapwhile(other->a)[t20] lK
 # a      <0> enter l
-# b      <;> nextstate(main 608 (eval 34):2) v:{
-# c      <0> pushmark s
-# d      <#> gvsv[*_] s
-# e      </> match(/"=(\\d+)"/) l/RTIME
-# f      <#> gvsv[*_] s
-# g      <1> uc[t17] sK/1
-# h      <@> anonlist sK*/1
-# i      <@> leave lKP
+# b      <;> nextstate(main 789 (eval 30):2) v:{
+# c      <0> pushmark sRM
+# d      <0> pushmark s
+# e      <#> gvsv[*_] s
+# f      </> match(/"=(\\d+)"/) l/RTIME
+# g      <#> gvsv[*_] s
+# h      <1> uc[t17] sK/1
+# i      <@> anonlist lKRM/1
+# j      <1> refgen lK/1
+# k      <@> leave lKP
 #            goto 9
-# j  <@> sort lKMS*
-# k  <@> mapstart lK*
-# l  <|> mapwhile(other->m)[t26] lK
-# m      <#> gv[*_] s
-# n      <1> rv2sv sKM/DREFAV,1
-# o      <1> rv2av[t4] sKR/1
-# p      <$> const[IV 0] s
-# q      <2> aelem sK/2
+# l  <@> sort lKMS*
+# m  <@> mapstart lK*
+# n  <|> mapwhile(other->o)[t26] lK
+# o      <#> gv[*_] s
+# p      <1> rv2sv sKM/DREFAV,1
+# q      <1> rv2av[t4] sKR/1
+# r      <$> const[IV 0] s
+# s      <2> aelem sK/2
 # -      <@> scope lK
-#            goto l
-# r  <0> pushmark s
-# s  <#> gv[*new] s
-# t  <1> rv2av[t2] lKRM*/1
-# u  <2> aassign[t27] KS/COMMON
-# v  <1> leavesub[1 ref] K/REFC,1
+#            goto n
+# t  <0> pushmark s
+# u  <#> gv[*new] s
+# v  <1> rv2av[t2] lKRM*/1
+# w  <2> aassign[t27] KS/COMMON
+# x  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 609 (eval 34):3) v:{
+# 1  <;> nextstate(main 790 (eval 30):3) v:{
 # 2  <0> pushmark s
 # 3  <0> pushmark s
 # 4  <0> pushmark s
@@ -545,30 +547,32 @@ EOT_EOT
 # 8  <@> mapstart lK*
 # 9  <|> mapwhile(other->a)[t11] lK
 # a      <0> enter l
-# b      <;> nextstate(main 608 (eval 34):2) v:{
-# c      <0> pushmark s
-# d      <$> gvsv(*_) s
-# e      </> match(/"=(\\d+)"/) l/RTIME
-# f      <$> gvsv(*_) s
-# g      <1> uc[t9] sK/1
-# h      <@> anonlist sK*/1
-# i      <@> leave lKP
+# b      <;> nextstate(main 789 (eval 30):2) v:{
+# c      <0> pushmark sRM
+# d      <0> pushmark s
+# e      <$> gvsv(*_) s
+# f      </> match(/"=(\\d+)"/) l/RTIME
+# g      <$> gvsv(*_) s
+# h      <1> uc[t9] sK/1
+# i      <@> anonlist lKRM/1
+# j      <1> refgen lK/1
+# k      <@> leave lKP
 #            goto 9
-# j  <@> sort lKMS*
-# k  <@> mapstart lK*
-# l  <|> mapwhile(other->m)[t12] lK
-# m      <$> gv(*_) s
-# n      <1> rv2sv sKM/DREFAV,1
-# o      <1> rv2av[t2] sKR/1
-# p      <$> const(IV 0) s
-# q      <2> aelem sK/2
+# l  <@> sort lKMS*
+# m  <@> mapstart lK*
+# n  <|> mapwhile(other->o)[t12] lK
+# o      <$> gv(*_) s
+# p      <1> rv2sv sKM/DREFAV,1
+# q      <1> rv2av[t2] sKR/1
+# r      <$> const(IV 0) s
+# s      <2> aelem sK/2
 # -      <@> scope lK
-#            goto l
-# r  <0> pushmark s
-# s  <$> gv(*new) s
-# t  <1> rv2av[t1] lKRM*/1
-# u  <2> aassign[t13] KS/COMMON
-# v  <1> leavesub[1 ref] K/REFC,1
+#            goto n
+# t  <0> pushmark s
+# u  <$> gv(*new) s
+# v  <1> rv2av[t1] lKRM*/1
+# w  <2> aassign[t13] KS/COMMON
+# x  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
     
 

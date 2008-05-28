@@ -12,7 +12,7 @@ sub context {
 
 context('V',1);
 $a = context('S',2);
-@a = context('A',3);
+our @a = context('A',3);
 scalar context('S',4);
 $a = scalar context('S',5);
 ($a) = context('A',6);
@@ -31,6 +31,7 @@ $a = scalar context('S',5);
   print +($c == 2) ? "ok 9\n" : "not ok 9\t# <$c>\n";
 }
 
+our $q;
 my $qcontext = q{
   $q = (defined wantarray) ? ( wantarray ? 'A' : 'S' ) : 'V';
 };

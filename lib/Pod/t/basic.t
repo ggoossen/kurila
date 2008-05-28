@@ -8,20 +8,11 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
+use TestInit;
+
 BEGIN {
-    chdir 't' if -d 't';
-    if (%ENV{PERL_CORE}) {
-        @INC = '../lib';
-    } else {
-        unshift (@INC, '../blib/lib');
-    }
-    unshift (@INC, '../blib/lib');
     $| = 1;
     print "1..11\n";
-}
-
-END {
-    print "not ok 1\n" unless $loaded;
 }
 
 use bytes;
@@ -45,7 +36,6 @@ sub source_path {
     }
 }
 
-$loaded = 1;
 print "ok 1\n";
 
 # Hard-code a few values to try to get reproducible results.
@@ -62,7 +52,7 @@ my %translators = ('Pod::Man'              => 'man',
                    'Pod::Text::Termcap'    => 'cap');
 
 # Set default options to match those of pod2man and pod2text.
-%options = (sentence => 0);
+our %options = (sentence => 0);
 
 my $n = 2;
 for (sort keys %translators) {
@@ -115,7 +105,7 @@ for (sort keys %translators) {
         # OS/390 is EBCDIC, which uses a different character for ESC
         # apparently.  Try to convert so that the test still works.
         if ($^O eq 'os390' && $_ eq 'Pod::Text::Termcap') {
-            $output =~ tr/\033/\047/;
+            $output =~ s/\033/\047/g;
         }
 
         if ($master eq $output) {

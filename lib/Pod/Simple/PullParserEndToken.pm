@@ -1,7 +1,7 @@
 
 package Pod::Simple::PullParserEndToken;
 use Pod::Simple::PullParserToken ();
-@ISA = ('Pod::Simple::PullParserToken');
+our @ISA = ('Pod::Simple::PullParserToken');
 use strict;
 
 sub new {  # Class->new(tagname);

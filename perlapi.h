@@ -192,16 +192,6 @@ END_EXTERN_C
 #define PL_chopset		(*Perl_Ichopset_ptr(aTHX))
 #undef  PL_clocktick
 #define PL_clocktick		(*Perl_Iclocktick_ptr(aTHX))
-#undef  PL_collation_ix
-#define PL_collation_ix		(*Perl_Icollation_ix_ptr(aTHX))
-#undef  PL_collation_name
-#define PL_collation_name	(*Perl_Icollation_name_ptr(aTHX))
-#undef  PL_collation_standard
-#define PL_collation_standard	(*Perl_Icollation_standard_ptr(aTHX))
-#undef  PL_collxfrm_base
-#define PL_collxfrm_base	(*Perl_Icollxfrm_base_ptr(aTHX))
-#undef  PL_collxfrm_mult
-#define PL_collxfrm_mult	(*Perl_Icollxfrm_mult_ptr(aTHX))
 #undef  PL_colors
 #define PL_colors		(*Perl_Icolors_ptr(aTHX))
 #undef  PL_colorset
@@ -536,8 +526,6 @@ END_EXTERN_C
 #define PL_savestack_ix		(*Perl_Isavestack_ix_ptr(aTHX))
 #undef  PL_savestack_max
 #define PL_savestack_max	(*Perl_Isavestack_max_ptr(aTHX))
-#undef  PL_sawampersand
-#define PL_sawampersand		(*Perl_Isawampersand_ptr(aTHX))
 #undef  PL_scopestack
 #define PL_scopestack		(*Perl_Iscopestack_ptr(aTHX))
 #undef  PL_scopestack_ix

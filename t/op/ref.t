@@ -211,8 +211,8 @@ is ($object->doit("BAR"), 'bar');
 
 # Test not working indirect-object-style method invocation.
 
-eval q{$foo = doit $object "FOO";};
-main::like($@->message, qr/syntax error at/);
+eval_dies_like(q{my $object; my $foo = doit $object "FOO";},
+               qr/syntax error at/);
 
 sub BASEOBJ::doit {
     local $ref = shift;
@@ -239,8 +239,8 @@ is (scalar grep(ref($_), @baa), 3);
 is (scalar (@bzz), 3);
 
 # also, it can't be an lvalue
-eval '\($x, $y) = (1, 2);';
-like ($@->{description}, qr/Can\'t modify.*ref.*in.*assignment/);
+eval_dies_like('our ($x, $y); \($x, $y) = (1, 2);',
+               qr/Can\'t modify.*ref.*in.*assignment/);
 
 # test for proper destruction of lexical objects
 $test = curr_test();
@@ -479,18 +479,18 @@ is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 {
     my $ref;
     foreach $ref (*STDOUT{IO}) {
-	eval q/ $$ref /;
+	eval { $$ref };
 	like($@->{description}, qr/Not a SCALAR reference/, "Scalar dereference");
-	eval q/ @$ref /;
+	eval { @$ref };
 	like($@->{description}, qr/Not an ARRAY reference/, "Array dereference");
-	eval q/ %$ref /;
+	eval { %$ref };
 	like($@->{description}, qr/Not a HASH reference/, "Hash dereference");
-	eval q/ &$ref /;
+	eval { &$ref };
 	like($@->{description}, qr/Not a CODE reference/, "Code dereference");
     }
 
     $ref = *STDOUT{IO};
-    eval q/ *$ref /;
+    eval { *$ref };
     is($@, '', "Glob dereference of PVIO is acceptable");
 
     cmp_ok($ref, '\==', *{$ref}{IO}, "IO slot of the temporary glob is set correctly");

@@ -1439,7 +1439,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                         }
                         state = newstate;
                     } else {
-                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %"IVdf, uvc );
+                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %d", uvc );
 		    }
 		}
 	    }
@@ -1614,7 +1614,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                         }
                         state = trie->trans[ state + charid ].next;
                     } else {
-                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %"IVdf, uvc );
+                        Perl_croak( aTHX_ "panic! In trie construction, no char mapping for %d", uvc );
                     }
                     /* charid is now 0 if we dont know the char read, or nonzero if we do */
                 }
@@ -3912,6 +3912,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     }
 
     /* Useful during FAIL. */
+#ifdef RE_TRACK_PATTERN_OFFSETS
     Newxz(ri->u.offsets, 2*RExC_size+1, U32); /* MJD 20001228 */
     if (ri->u.offsets) {
 	ri->u.offsets[0] = RExC_size;
@@ -3920,6 +3921,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
                           "%s %"UVuf" bytes for offset annotations.\n",
                           ri->u.offsets ? "Got" : "Couldn't get",
                           (UV)((2*RExC_size+1) * sizeof(U32))));
+#endif  /* RE_TRACK_PATTERN_OFFSETS */
     SetProgLen(ri,RExC_size);
     RExC_rx_sv = rx;
     RExC_rx = r;
@@ -4149,7 +4151,7 @@ reStudy:
             &data, -1, NULL, NULL,
             SCF_DO_SUBSTR | SCF_WHILEM_VISITED_POS | stclass_flag,0);
 
-	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %d\n", minlen));
+	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %"IVdf"\n", minlen));
 	
         CHECK_RESTUDY_GOTO;
 
@@ -6059,7 +6061,7 @@ S_regclassfold_value(pTHX_ RExC_state_t *pRExC_state, UV value)
     AV* unicode_alternate  = NULL;
 
     GET_RE_DEBUG_FLAGS_DECL;
-    PERL_ARGS_ASSERT_REG_NAMEDSEQ;
+    PERL_ARGS_ASSERT_REGCLASSFOLD_VALUE;
 
     /* Assume we are going to generate an ANYOF node. */
     ret = reganode(pRExC_state, (UTF ? ANYOFU : ANYOF), 0);
@@ -6215,6 +6217,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
     STRLEN len; /* this has various purposes throughout the code */
     bool cached = 0; /* if this is true then we shouldn't refcount dev sv_str */
     regnode *ret = NULL;
+    PERL_ARGS_ASSERT_REG_NAMEDSEQ;
     
     if (*RExC_parse != '{') {
         vFAIL("Missing braces on \\N{}");
@@ -7385,7 +7388,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
 	if (UTF)
 	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
-	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
+	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %"IVdf" - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
 	ANYOF_BITMAP_ZERO(ret);
 	listsv = newSVpvs("# comment\n");
     }
@@ -7827,6 +7830,7 @@ S_regclassfold(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     STRLEN numlen;
 
     GET_RE_DEBUG_FLAGS_DECL;
+    PERL_ARGS_ASSERT_REGCLASSFOLD;
 
     DEBUG_PARSE("clasfold");
 
@@ -7905,6 +7909,9 @@ S_anyof_get_swash(pTHX_ RExC_state_t *pRExC_state, regnode* ret, SV* listsv, AV*
 	AV * const av = newAV();
 	SV *rv;
 	SV *sw  = NULL;
+
+	PERL_ARGS_ASSERT_ANYOF_GET_SWASH;
+
 	/* The 0th element stores the character class description
 	 * in its textual form: used later (regexec.c:Perl_regclass_swash())
 	 * to initialize the appropriate swash (which gets stored in
@@ -8180,6 +8187,7 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 
     while (src > opnd) {
 	StructCopy(--src, --dst, regnode);
+#ifdef RE_TRACK_PATTERN_OFFSETS
         if (RExC_offsets) {     /* MJD 20010112 */
 	    MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s copy %"UVuf" -> %"UVuf" (max %"UVuf").\n",
                   "reg_insert",
@@ -8193,10 +8201,12 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	    Set_Node_Offset_To_R(dst-RExC_emit_start, Node_Offset(src));
 	    Set_Node_Length_To_R(dst-RExC_emit_start, Node_Length(src));
         }
+#endif /* RE_TRACK_PATTERN_OFFSETS */
     }
     
 
     place = opnd;		/* Op node, where operand used to be. */
+#ifdef RE_TRACK_PATTERN_OFFSETS
     if (RExC_offsets) {         /* MJD */
 	MJD_OFFSET_DEBUG(("%s(%d): (op %s) %s %"UVuf" <- %"UVuf" (max %"UVuf").\n", 
               "reginsert",
@@ -8210,6 +8220,7 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 	Set_Node_Offset(place, RExC_parse);
 	Set_Node_Length(place, 1);
     }
+#endif /* RE_TRACK_PATTERN_OFFSETS */
     src = NEXTOPER(place);
     FILL_ADVANCE_NODE(place, op);
     Zero(src, offset, regnode);

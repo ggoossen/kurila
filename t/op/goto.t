@@ -237,7 +237,7 @@ ok($ok, 'skipped to returned_label');
 
 $r = runperl(
     prog =>
-	'sub f { return if $d; $d=1; my $a=sub {goto &f}; &$a; f() } f(); print qq(ok\n)',
+	'our $d; sub f { return if $d; $d=1; my $a=sub {goto &f}; &$a; f() } f(); print qq(ok\n)',
     stderr => 1
     );
 is($r, "ok\n", 'avoid pad without an @_');

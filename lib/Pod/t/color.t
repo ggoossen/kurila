@@ -8,20 +8,11 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
+use TestInit;
+
 BEGIN {
-    chdir 't' if -d 't';
-    if (%ENV{PERL_CORE}) {
-        @INC = '../lib';
-    } else {
-        unshift (@INC, '../blib/lib');
-    }
-    unshift (@INC, '../blib/lib');
     $| = 1;
     print "1..2\n";
-}
-
-END {
-    print "not ok 1\n" unless $loaded;
 }
 
 eval { require Term::ANSIColor };
@@ -29,12 +20,10 @@ if ($@) {
     for (1..2) {
         print "ok $_ # skip\n";
     }
-    $loaded = 1;
     exit;
 }
 require Pod::Text::Color;
 
-$loaded = 1;
 print "ok 1\n";
 
 my $parser = Pod::Text::Color->new or die "Cannot create parser\n";

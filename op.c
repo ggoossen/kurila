@@ -922,8 +922,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_PACK:
     case OP_JOIN:
     case OP_LSLICE:
-    case OP_ANONLIST:
-    case OP_ANONHASH:
     case OP_SORT:
     case OP_REVERSE:
     case OP_RANGE:
@@ -966,6 +964,11 @@ Perl_scalarvoid(pTHX_ OP *o)
 	if (!(o->op_private & (OPpLVAL_INTRO|OPpOUR_INTRO)))
 	    /* Otherwise it's "Useless use of grep iterator" */
 	    useless = OP_DESC(o);
+	break;
+
+    case OP_ANONLIST:
+    case OP_ANONHASH:
+	useless = OP_DESC(o);
 	break;
 
     case OP_NOT:
@@ -1698,6 +1701,8 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 
     case OP_PADAV:
     case OP_PADHV:
+    case OP_ANONLIST:
+    case OP_ANONHASH:
 	if (set_op_ref)
 	    o->op_flags |= OPf_REF;
 	break;
@@ -2440,6 +2445,7 @@ Perl_gen_constant_list(pTHX_ register OP *o)
     PL_op = curop;
     assert (!(curop->op_flags & OPf_SPECIAL));
     assert(curop->op_type == OP_RANGE);
+    PL_op->op_flags |= OPf_REF;
     pp_anonlist();
     PL_tmps_floor = oldtmps_floor;
 
@@ -2757,6 +2763,7 @@ Perl_append_madprops(pTHX_ MADPROP* tm, OP* o, char slot)
 void
 Perl_append_madprops_pv(pTHX_ const char* v, OP* o, char slot)
 {
+    PERL_ARGS_ASSERT_APPEND_MADPROPS_PV;
     append_madprops(newMADsv(slot, newSVpv(v, 0)), o, slot);
 }
 
@@ -3936,6 +3943,9 @@ S_is_list_assignment(pTHX_ register const OP *o)
 	return TRUE;
 
     if (type == OP_PADAV || type == OP_PADHV)
+	return TRUE;
+
+    if (type == OP_ANONLIST || type == OP_ANONHASH)
 	return TRUE;
 
     if (type == OP_RV2SV)
@@ -5841,13 +5851,13 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 OP *
 Perl_newANONLIST(pTHX_ OP *o)
 {
-    return convert(OP_ANONLIST, OPf_SPECIAL, o);
+    return convert(OP_ANONLIST, 0, o);
 }
 
 OP *
 Perl_newANONHASH(pTHX_ OP *o)
 {
-    return convert(OP_ANONHASH, OPf_SPECIAL, o);
+    return convert(OP_ANONHASH, 0, o);
 }
 
 OP *
@@ -5880,11 +5890,10 @@ Perl_oopsAV(pTHX_ OP *o)
 	break;
 
     case OP_ANONLIST:
-	return ref(newAVREF(o), OP_RV2AV);
+	return ref(o, OP_RV2AV);
 
     default:
-	if (ckWARN_d(WARN_INTERNAL))
-	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL), "oops: oopsAV");
+	Perl_croak(aTHX_ "oops: oopsAV");
 	break;
     }
     return o;
@@ -5905,9 +5914,11 @@ Perl_oopsHV(pTHX_ OP *o)
 	ref(o, OP_RV2HV);
 	break;
 
+    case OP_ANONHASH:
+	return ref(o, OP_RV2AV);
+
     default:
-	if (ckWARN_d(WARN_INTERNAL))
-	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL), "oops: oopsHV");
+	Perl_croak(aTHX_ "oops: oopsHV");
 	break;
     }
     return o;
@@ -5925,10 +5936,8 @@ Perl_newAVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADAV];
 	return o;
     }
-    else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV)
-		&& ckWARN(WARN_DEPRECATED)) {
-	Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
-		"Using an array as a reference is deprecated");
+    else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV || o->op_type == OP_ANONLIST )) {
+	Perl_croak(aTHX_ "Array may not be used as a reference");
     }
     return newUNOP(OP_RV2AV, 0, scalar(o));
 }
@@ -5953,10 +5962,8 @@ Perl_newHVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADHV];
 	return o;
     }
-    else if ((o->op_type == OP_RV2HV || o->op_type == OP_PADHV)
-		&& ckWARN(WARN_DEPRECATED)) {
-	Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
-		"Using a hash as a reference is deprecated");
+    else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV || o->op_type == OP_ANONHASH) {
+	Perl_croak(aTHX_ "Hash may not be used as a reference");
     }
     return newUNOP(OP_RV2HV, 0, scalar(o));
 }

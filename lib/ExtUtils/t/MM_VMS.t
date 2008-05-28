@@ -1,16 +1,8 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
-chdir 't';
+use TestInit;
 
+our @Methods;
 BEGIN {
     @Methods = (qw(wraplist
                    rootdir

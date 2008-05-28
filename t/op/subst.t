@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 135 );
+plan( tests => 119 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -162,53 +162,6 @@ ok( $_ eq 'abc  246xyz' );
 s/(\w)/{$1 x 2}/g;            # yields 'aabbcc  224466xxyyzz'
 ok( $_ eq 'aabbcc  224466xxyyzz' );
 
-$_ = "aaaaa";
-ok( y/a/b/ == 5 );
-ok( y/a/b/ == 0 );
-ok( y/b// == 5 );
-ok( y/b/c/s == 5 );
-ok( y/c// == 1 );
-ok( y/c//d == 1 );
-ok( $_ eq "" );
-
-$_ = "Now is the \%#*! time for all good men...";
-ok( ($x=(y/a-zA-Z //cd)) == 7 );
-ok( y/ / /s == 8 );
-
-$_ = 'abcdefghijklmnopqrstuvwxyz0123456789';
-tr/a-z/A-Z/;
-
-ok( $_ eq 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' );
-
-# same as tr/A-Z/a-z/;
-if (defined %Config{ebcdic} && %Config{ebcdic} eq 'define') {	# EBCDIC.
-    no utf8;
-    y[\301-\351][\201-\251];
-} else {		# Ye Olde ASCII.  Or something like it.
-    y[\101-\132][\141-\172];
-}
-
-ok( $_ eq 'abcdefghijklmnopqrstuvwxyz0123456789' );
-
-SKIP: {
-    skip("not ASCII",1) unless (ord("+") == ord(",") - 1
-			     && ord(",") == ord("-") - 1
-			     && ord("a") == ord("b") - 1
-			     && ord("b") == ord("c") - 1);
-    $_ = '+,-';
-    tr/+--/a-c/;
-    ok( $_ eq 'abc' );
-}
-
-$_ = '+,-';
-tr/+\--/a\/c/;
-ok( $_ eq 'a,/' );
-
-$_ = '+,-';
-tr/-+,/ab\-/;
-ok( $_ eq 'b-a' );
-
-
 # test recursive substitutions
 # code based on the recursive expansion of makefile variables
 
@@ -264,11 +217,6 @@ ok( $_ eq "foobarfoobbar" && $snum == 1 );
 eval 's{foo} # this is a comment, not a delimiter
        {bar};';
 ok( ! @?, 'parsing of split subst with comment' );
-
-$_="baacbaa";
-$snum = tr/a/b/s;
-ok( $_ eq "bbcbb" && $snum == 4,
-    'check if squashing works at the end of string' );
 
 $_ = "ab";
 ok( s/a/b/ == 1 );
@@ -568,14 +516,3 @@ is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
     s/(((((((((x)))))))))(r)/fooba${*{Symbol::fetch_glob(10)}}/;
     is($_,"foobar","RT#6006: \$_ eq '$_'");
 }
-{
-    my $want=("\n" x 11).("B\n" x 11)."B";
-    $_="B";
-    our $i;
-    for $i(1..11){
-	s/^.*$/$&/gm;
-	$_="\n$_\n$&";
-    }
-    is($want,$_,"RT#17542");
-}
-

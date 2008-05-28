@@ -281,14 +281,14 @@ if (($Is_W32 and ! $Is_NetWare) or $Is_Cygwin) {
     if ($Is_Cygwin) {
       $perldll = $libperl;
       my $v_e_r_s = $ver;
-      $v_e_r_s =~ tr/./_/;
+      $v_e_r_s =~ s/[.]/_/g;
       $v_e_r_s =~ s/(\d_\d)_\d$/$1/;   # remove optional _SUBVERSION suffix
       $v_e_r_s .= "d" if %Config{'ccflags'} =~ m/-DDEBUGGING\b/;
       $perldll =~ s/(\..*)?$/$v_e_r_s.$dlext/;
       $perldll =~ s/^lib/cyg/;
     } else {
       my $v_e_r_s = $ver;
-      $v_e_r_s =~ tr/.//;
+      $v_e_r_s =~ s/[.]//g;
       $perldll = 'perlkurila' . $v_e_r_s . "." . $dlext;
     }
 
@@ -393,7 +393,7 @@ mkpath("$installarchlib/CORE", $verbose, 0777);
 my @corefiles;
 if ($Is_VMS) {  # We did core file selection during build
     my $coredir = "lib/%Config{archname}/$ver/CORE";
-    $coredir =~ tr/./_/;
+    $coredir =~ s/[.]/_/g;
     map { s|^$coredir/||i; } @corefiles = glob("$coredir/*.*");
 }
 else {
@@ -789,7 +789,7 @@ sub installlib {
     # the corelist script from lib/Module/CoreList/bin and ptar* in
     # lib/Archive/Tar/bin, the config_data script in lib/Module/Build/scripts
     # (they're installed later with other utils)
-    return if $name =~ m/^(?:cpan|instmodsh|prove|corelist|ptar|cpan2dist|ptardiff|config_data)\z/;
+    return if $name =~ m/^(?:cpan|instmodsh|prove|corelist|cpan2dist|config_data)\z/;
     # ignore the Makefiles
     return if $name =~ m/^makefile$/i;
     # ignore the test extensions

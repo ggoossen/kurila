@@ -106,7 +106,7 @@ threads->create(sub {
           ? '' : 'not ', "ok $test # TODO $TODO - unique_scalar\n";
         $test++;
         eval { @unique_array[0] = 1 };
-        print $& && $@->{description} =~ m/read-only/
+        print $@ && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_array\n";
         $test++;
         if ($^O ne 'MSWin32') {

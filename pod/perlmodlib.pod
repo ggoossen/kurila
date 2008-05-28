@@ -201,18 +201,6 @@ don't have the gdbm library.
 
 =over 12
 
-=item Archive::Extract
-
-A generic archive extracting mechanism
-
-=item Archive::Tar
-
-Module for manipulations of tar archives
-
-=item Archive::Tar::File
-
-A subclass for in-memory extracted file from Archive::Tar
-
 =item B
 
 The Perl Compiler
@@ -252,30 +240,6 @@ Benchmark running times of Perl code
 =item CORE
 
 Pseudo-namespace for Perl's core routines
-
-=item CPAN
-
-Query, download and build perl modules from CPAN sites
-
-=item CPAN::API::HOWTO
-
-A recipe book for programming with CPAN.pm
-
-=item CPAN::FirstTime
-
-Utility for CPAN::Config file Initialization
-
-=item CPAN::Kwalify
-
-Interface between CPAN.pm and Kwalify.pm
-
-=item CPAN::Nox
-
-Wrapper around CPAN.pm without using any XS module
-
-=item CPAN::Version
-
-Utility functions to compare CPAN versions
 
 =item Carp
 
@@ -1360,10 +1324,6 @@ By-name interface to Perl's built-in getpw*() functions
 =item Win32
 
 Interfaces to some Win32 API Functions
-
-=item Win32API::File
-
-Low-level access to Win32 system API calls for files/dirs.
 
 =item Win32CORE
 

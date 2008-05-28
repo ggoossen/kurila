@@ -169,7 +169,8 @@ sub do_middle {      # the main work
       DEBUG +> 1 and print "  $type " , $token->text, "\n";
       
       $scratch = $token->text;
-      $scratch =~ tr/\t\cb\cc/ /d;
+      $scratch =~ s/\t/ /g;
+      $scratch =~ s/[\cb\cc]//g;
       
       $self->{'no_proofing_exemptions'} or $scratch =~
        s/(?:
@@ -489,14 +490,14 @@ sub rtf_esc {
   } elsif(wantarray) {  # return an array
     return map {; ($x = $_) =~
       s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
-      $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
+      $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
       $x;
     } @_;
   } else { # return a single scalar
     ($x = ((@_ == 1) ? @_[0] : join '', @_)
     ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
              # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
+    $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
     return $x;
   }
 }

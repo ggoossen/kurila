@@ -18,13 +18,13 @@ sub ok
     print "not ok $no\n" unless $ok ;
 }
 
-$name="test.gz";
+my $name="test.gz";
 
 print "1..10\n";
 
-$text = "abcd";
+my $text = "abcd";
 
-ok(1, $file = IO::Zlib->new($name, "wb"));
+ok(1, my $file = IO::Zlib->new($name, "wb"));
 ok(2, $file->print($text));
 ok(3, $file->close());
 

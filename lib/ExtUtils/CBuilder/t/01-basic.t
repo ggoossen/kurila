@@ -44,11 +44,11 @@ ok 1;
 
 my ($lib, @temps) = $b->link(objects => $object_file,
                              module_name => 'compilet');
-$lib =~ tr/"'//d;
+$lib =~ s/"|'//g;
 ok $lib_file, $lib;
 
 for ($source_file, $object_file, $lib_file) {
-  tr/"'//d;
+  s/"|'//g;
   1 while unlink;
 }
 

@@ -132,8 +132,8 @@ ok( exists %Config{d_fork}, "still d_fork");
 # Signal-related variables
 # (this is actually a regression test for Configure.)
 
-is(%Config{sig_num_init}  =~ tr/,/,/, %Config{sig_size}, "sig_num_init size");
-is(%Config{sig_name_init} =~ tr/,/,/, %Config{sig_size}, "sig_name_init size");
+is(@(%Config{sig_num_init}  =~ m/,/g), %Config{sig_size}, "sig_num_init size");
+is(@(%Config{sig_name_init} =~ m/,/g), %Config{sig_size}, "sig_name_init size");
 
 # Test the troublesome virtual stuff
 my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles

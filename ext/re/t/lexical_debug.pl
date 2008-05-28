@@ -2,6 +2,8 @@ use re 'debug';
 
 $_ = 'foo bar baz bop fip fop';
 
+our $count;
+
 m/foo/ and $count++;
 
 {
