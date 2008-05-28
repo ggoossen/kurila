@@ -833,18 +833,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpASSIGN_BACKWARDS)
 	    sv_catpv(tmpsv, ",BACKWARDS");
     }
-    else if (optype == OP_TRANS) {
-	if (o->op_private & OPpTRANS_SQUASH)
-	    sv_catpv(tmpsv, ",SQUASH");
-	if (o->op_private & OPpTRANS_DELETE)
-	    sv_catpv(tmpsv, ",DELETE");
-	if (o->op_private & OPpTRANS_COMPLEMENT)
-	    sv_catpv(tmpsv, ",COMPLEMENT");
-	if (o->op_private & OPpTRANS_IDENTICAL)
-	    sv_catpv(tmpsv, ",IDENTICAL");
-	if (o->op_private & OPpTRANS_GROWS)
-	    sv_catpv(tmpsv, ",GROWS");
-    }
     else if (optype == OP_REPEAT) {
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    sv_catpv(tmpsv, ",DOLIST");

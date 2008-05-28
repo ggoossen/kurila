@@ -324,17 +324,6 @@ cc_opclass(pTHX_ const OP *o)
     case OA_PADOP:
 	return OPc_PADOP;
 
-    case OA_PVOP_OR_SVOP:
-        /*
-         * Character translations (tr///) are usually a PVOP, keeping a 
-         * pointer to a table of shorts used to look up translations.
-         * Under utf8, however, a simple table isn't practical; instead,
-         * the OP is an SVOP, and the SV is a reference to a swash
-         * (i.e., an RV pointing to an HV).
-         */
-	return (o->op_private & (OPpTRANS_UTF8))
-		? OPc_SVOP : OPc_PVOP;
-
     case OA_LOOP:
 	return OPc_LOOP;
 
@@ -1454,23 +1443,7 @@ void
 PVOP_pv(o)
 	B::PVOP	o
     CODE:
-	/*
-	 * OP_TRANS uses op_pv to point to a table of 256 or >=258 shorts
-	 * whereas other PVOPs point to a null terminated string.
-	 */
-	if (o->op_type == OP_TRANS &&
-		(o->op_private & OPpTRANS_COMPLEMENT) &&
-		!(o->op_private & OPpTRANS_DELETE))
-	{
-	    const short* const tbl = (short*)o->op_pv;
-	    const short entries = 257 + tbl[256];
-	    ST(0) = sv_2mortal(newSVpv(o->op_pv, entries * sizeof(short)));
-	}
-	else if (o->op_type == OP_TRANS) {
-	    ST(0) = sv_2mortal(newSVpv(o->op_pv, 256 * sizeof(short)));
-	}
-	else
-	    ST(0) = sv_2mortal(newSVpv(o->op_pv, 0));
+        ST(0) = sv_2mortal(newSVpv(o->op_pv, 0));
 
 #define LOOP_redoop(o)	o->op_redoop
 #define LOOP_nextop(o)	o->op_nextop
