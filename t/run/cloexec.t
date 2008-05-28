@@ -118,7 +118,7 @@ sub test_inherited {
     cmp_ok( $rc, '==', 0,
         "child return code=$rc (zero means inherited fd=$expected_fd ok)" );
     my @lines = split(m/^/, $out);
-    cmp_ok( $out =~ m/(\n)/g, '==', 2, 'child stdout: has 2 newlines' );
+    cmp_ok( @($out =~ m/(\n)/g), '==', 2, 'child stdout: has 2 newlines' );
     cmp_ok( scalar(@lines),  '==', 2, 'child stdout: split into 2 lines' );
     is( @lines[0], "childfd=$expected_fd\n", 'child stdout: fd' );
     is( @lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );

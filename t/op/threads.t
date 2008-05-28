@@ -116,7 +116,7 @@ EOI
 
 TODO: {
     no strict 'vars';   # Accessing $TODO from test.pl
-    local $TODO = 'refcount issues with threads';
+    local our $TODO = 'refcount issues with threads';
 
 # Scalars leaked: 1
 foreach my $BLOCK (qw(CHECK INIT)) {

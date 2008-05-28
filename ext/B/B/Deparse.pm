@@ -320,10 +320,7 @@ sub next_todo {
     my $cv = $ent->[1];
     my $gv = $cv->GV;
     my $name = $self->gv_name($gv);
-    if ($ent->[2]) {
-	return "format $name =\n"
-	    . $self->deparse_format($ent->[1]). "\n";
-    } else {
+    {
 	$self->{'subs_declared'}{$name} = 1;
 	if ($name eq "BEGIN") {
 	    my $use_dec = $self->begin_is_use($cv);
@@ -461,7 +458,6 @@ sub stash_subs {
     }
     else {
 	$pack =~ s/(::)?$//;
-	no strict 'refs';
 	$stash = \%{Symbol::stash($pack)};
     }
     my %stash = svref_2object($stash)->ARRAY;
@@ -531,6 +527,7 @@ sub new {
     $self->{'unquote'} = 0;
     $self->{'use_dumper'} = 0;
     $self->{'use_tabs'} = 0;
+    $self->{'global_variables'} = \%();
 
     $self->{'ambient_warnings'} = undef; # Assume no lexical warnings
     $self->{'ambient_hints'} = 0;
@@ -636,7 +633,6 @@ sub compile {
 	print $self->indent(join("", @text)), "\n" if @text;
 
 	# Print __DATA__ section, if necessary
-	no strict 'refs';
 	my $laststash = defined $self->{'curcop'}
 	    ? $self->{'curcop'}->stash->NAME : $self->{'curstash'};
 	if (defined *{Symbol::fetch_glob($laststash."::DATA")}{IO}) {
@@ -848,36 +844,10 @@ Carp::confess("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
 	    return "$proto;\n";
 	}
     }
-    return $proto ."\{\n\t$body\n\b\}" ."\n";
-}
-
-sub deparse_format {
-    my $self = shift;
-    my $form = shift;
-    my @text;
-    local($self->{'curcv'}) = $form;
-    local($self->{'curcvlex'});
-    local($self->{'in_format'}) = 1;
-    local(%$self{[qw'curstash warnings hints hinthash']})
-		= %$self{[qw'curstash warnings hints hinthash']};
-    my $op = $form->ROOT;
-    my $kid;
-    return "\f." if $op->first->name eq 'stub'
-                || $op->first->name eq 'nextstate';
-    $op = $op->first->first; # skip leavewrite, lineseq
-    while (not null $op) {
-	$op = $op->sibling; # skip nextstate
-	my @exprs;
-	$kid = $op->first->sibling; # skip pushmark
-	push @text, "\f".$self->const_sv($kid)->PV;
-	$kid = $kid->sibling;
-	for (; not null $kid; $kid = $kid->sibling) {
-	    push @exprs, $self->deparse($kid, 0);
-	}
-	push @text, "\f".join(", ", @exprs)."\n" if @exprs;
-	$op = $op->sibling;
+    if (keys %{$self->{'global_variables'}}) {
+        $body = "our (" . (join ", ", keys %{$self->{'global_variables'}}) . ");\n" . $body;
     }
-    return join("", @text) . "\f.";
+    return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
 
 sub is_scope {
@@ -1194,6 +1164,9 @@ Carp::confess() unless ref($gv) eq "B::GV";
     }
     if ($name =~ m/^(\^..|{)/) {
         $name = "\{$name\}";       # $^WARNING_BITS, etc and ${
+    }
+    if ( ! $stash ) {
+        $self->{'global_variables'}{$name}++;
     }
     return $stash . $name;
 }

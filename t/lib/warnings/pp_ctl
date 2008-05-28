@@ -54,7 +54,7 @@ __END__
 # pp_ctl.c
 use warnings 'exiting' ;
 $_ = "abc" ;
- 
+our $i;
 while ($i ++ == 0)
 {
     s/ab/{last}/ ;
@@ -93,8 +93,8 @@ Exiting eval via last at (eval 1) line 1.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
-@a = (1,2) ;
-@b = sort { last } @a ;
+our @a = (1,2) ;
+our @b = sort { last } @a ;
 no warnings 'exiting' ;
 @b = sort { last } @a ;
 EXPECT
@@ -103,7 +103,7 @@ Can't "last" outside a loop block at - line 4.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
-$_ = "abc" ;
+$_ = "abc" ; our $i;
 fred: 
 while ($i ++ == 0)
 {
@@ -141,8 +141,8 @@ Exiting eval via last at (eval 1) line 1.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
-@a = (1,2) ;
-fred: @b = sort { last fred } @a ;
+our @a = (1,2) ;
+fred: our @b = sort { last fred } @a ;
 no warnings 'exiting' ;
 Fred: @b = sort { last Fred } @a ;
 EXPECT
@@ -411,10 +411,11 @@ B foo bar at - line 4.
 ########
 # pp_ctl.c
 use warnings;
+our $foo;
 eval 'print $foo';
 EXPECT
 Use of uninitialized value $foo in print at (eval 1) line 1.
-    (eval) called at - line 3.
+    (eval) called at - line 4.
 ########
 # pp_ctl.c
 use warnings;
