@@ -1165,9 +1165,6 @@ Carp::confess() unless ref($gv) eq "B::GV";
     if ($name =~ m/^(\^..|{)/) {
         $name = "\{$name\}";       # $^WARNING_BITS, etc and ${
     }
-    if ( ! $stash ) {
-        $self->{'global_variables'}{$name}++;
-    }
     return $stash . $name;
 }
 
@@ -1185,7 +1182,8 @@ sub stash_variable {
     }
 
     my $v = ($prefix eq '$#' ? '@' : $prefix) . $name;
-    return $prefix .$self->{'curstash'}.'::'. $name if $self->lex_in_scope($v);
+    return "$prefix$name" if $name =~ m/^\W/; # no stash for magic variables.
+    return $prefix .$self->{'curstash'}.'::'. $name if 1; # $self->lex_in_scope($v);
     return "$prefix$name";
 }
 
