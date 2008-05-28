@@ -219,7 +219,6 @@
 #ifdef PERL_CORE
 #define do_sysseek		Perl_do_sysseek
 #define do_tell			Perl_do_tell
-#define do_trans		Perl_do_trans
 #define do_vecget		Perl_do_vecget
 #define do_vecset		Perl_do_vecset
 #define do_vop			Perl_do_vop
@@ -1079,16 +1078,6 @@
 #define sv_nounlocking		Perl_sv_nounlocking
 #endif
 #define nothreadhook		Perl_nothreadhook
-#if defined(PERL_IN_DOOP_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define do_trans_simple		S_do_trans_simple
-#define do_trans_count		S_do_trans_count
-#define do_trans_complex	S_do_trans_complex
-#define do_trans_simple_utf8	S_do_trans_simple_utf8
-#define do_trans_count_utf8	S_do_trans_count_utf8
-#define do_trans_complex_utf8	S_do_trans_complex_utf8
-#endif
-#endif
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define gv_init_sv		S_gv_init_sv
@@ -1459,7 +1448,6 @@
 #define scan_pat		S_scan_pat
 #define scan_str		S_scan_str
 #define scan_subst		S_scan_subst
-#define scan_trans		S_scan_trans
 #define scan_word		S_scan_word
 #define update_debugger_info	S_update_debugger_info
 #define skipspace		S_skipspace
@@ -2242,7 +2230,6 @@
 #define pp_tied			Perl_pp_tied
 #define pp_time			Perl_pp_time
 #define pp_tms			Perl_pp_tms
-#define pp_trans		Perl_pp_trans
 #define pp_truncate		Perl_pp_truncate
 #define pp_uc			Perl_pp_uc
 #define pp_ucfirst		Perl_pp_ucfirst
@@ -2439,7 +2426,6 @@
 #ifdef PERL_CORE
 #define do_sysseek(a,b,c)	Perl_do_sysseek(aTHX_ a,b,c)
 #define do_tell(a)		Perl_do_tell(aTHX_ a)
-#define do_trans(a)		Perl_do_trans(aTHX_ a)
 #define do_vecget(a,b,c)	Perl_do_vecget(aTHX_ a,b,c)
 #define do_vecset(a)		Perl_do_vecset(aTHX_ a)
 #define do_vop(a,b,c,d)		Perl_do_vop(aTHX_ a,b,c,d)
@@ -3293,16 +3279,6 @@
 #define sv_nounlocking(a)	Perl_sv_nounlocking(aTHX_ a)
 #endif
 #define nothreadhook()		Perl_nothreadhook(aTHX)
-#if defined(PERL_IN_DOOP_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define do_trans_simple(a)	S_do_trans_simple(aTHX_ a)
-#define do_trans_count(a)	S_do_trans_count(aTHX_ a)
-#define do_trans_complex(a)	S_do_trans_complex(aTHX_ a)
-#define do_trans_simple_utf8(a)	S_do_trans_simple_utf8(aTHX_ a)
-#define do_trans_count_utf8(a)	S_do_trans_count_utf8(aTHX_ a)
-#define do_trans_complex_utf8(a)	S_do_trans_complex_utf8(aTHX_ a)
-#endif
-#endif
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define gv_init_sv(a,b)		S_gv_init_sv(aTHX_ a,b)
@@ -3688,7 +3664,6 @@
 #define scan_pat(a,b)		S_scan_pat(aTHX_ a,b)
 #define scan_str(a,b,c,d)	S_scan_str(aTHX_ a,b,c,d)
 #define scan_subst(a)		S_scan_subst(aTHX_ a)
-#define scan_trans(a)		S_scan_trans(aTHX_ a)
 #define scan_word(a,b,c,d,e)	S_scan_word(aTHX_ a,b,c,d,e)
 #define update_debugger_info(a,b,c)	S_update_debugger_info(aTHX_ a,b,c)
 #define skipspace(a)		S_skipspace(aTHX_ a)
@@ -4475,7 +4450,6 @@
 #define pp_tied()		Perl_pp_tied(aTHX)
 #define pp_time()		Perl_pp_time(aTHX)
 #define pp_tms()		Perl_pp_tms(aTHX)
-#define pp_trans()		Perl_pp_trans(aTHX)
 #define pp_truncate()		Perl_pp_truncate(aTHX)
 #define pp_uc()			Perl_pp_uc(aTHX)
 #define pp_ucfirst()		Perl_pp_ucfirst(aTHX)

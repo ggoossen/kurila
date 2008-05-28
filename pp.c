@@ -632,24 +632,6 @@ PP(pp_study)
     RETPUSHYES;
 }
 
-PP(pp_trans)
-{
-    dVAR; dSP; dTARG;
-    SV *sv;
-
-    if (PL_op->op_flags & OPf_STACKED)
-	sv = POPs;
-    else if (PL_op->op_private & OPpTARGET_MY)
-	sv = GETTARGET;
-    else {
-	sv = DEFSV;
-	EXTEND(SP,1);
-    }
-    TARG = sv_newmortal();
-    PUSHi(do_trans(sv));
-    RETURN;
-}
-
 /* Lvalue operators. */
 
 PP(pp_schop)

@@ -1671,8 +1671,8 @@ S_sublex_done(pTHX)
 	return yylex();
     }
 
-    /* Is there a right-hand side to take care of? (s//RHS/ or tr//RHS/) */
-    if (PL_lex_repl.str_sv && (PL_lex_inwhat == OP_SUBST || PL_lex_inwhat == OP_TRANS)) {
+    /* Is there a right-hand side to take care of? (s//RHS/) */
+    if (PL_lex_repl.str_sv && (PL_lex_inwhat == OP_SUBST)) {
 	PL_linestr = PL_lex_repl.str_sv;
 	PL_lex_stuff.flags = PL_lex_repl.flags;
 	PL_lex_repl.flags = 0;
@@ -2011,82 +2011,15 @@ S_scan_const(pTHX_ char *start)
     SV *sv = newSV(send - start);		/* sv for the constant */
     register char *s = start;			/* start of the constant */
     register char *d = SvPVX(sv);		/* destination for copies */
-    bool dorange = FALSE;			/* are we in a translit range? */
-    bool didrange = FALSE;		        /* did we just finish a range? */
     I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
-    bool in_codepoints = (IN_CODEPOINTS != 0);  /* PL_curtoken can be changed ?! */
     bool in_pat = ((PL_lex_flags & LEXf_INPAT) != 0);
 
     PERL_ARGS_ASSERT_SCAN_CONST;
 
-    while (s < send || dorange) {
-        /* get transliterations out of the way (they're most literal) */
-	if (PL_lex_inwhat == OP_TRANS) {
-	    /* expand a range A-Z to the full set of characters.  AIE! */
-	    if (dorange) {
-		I32 i;				/* current expanded character */
-		I32 min;			/* first character in range */
-		I32 max;			/* last character in range */
-
-
-		if ( in_codepoints ) {
-		    char * const c = (char*)utf8_hop(d, -1);
-		    char *e = d++;
-		    while (e-- > c)
-			*(e + 1) = *e;
-		    *c = (char)UTF_TO_NATIVE(0xff);
-		    /* mark the range as done, and continue */
-		    dorange = FALSE;
-		    didrange = TRUE;
-		    continue;
-		}
-
-		i = d - SvPVX_const(sv);		/* remember current offset */
-		SvGROW(sv, SvLEN(sv) + 256);	/* never more than 256 chars in a range */
-		d = SvPVX(sv) + i;		/* refresh d after realloc */
-
-		d -= 2;		/* eat the first char and the - */
-		min = (U8)*d;	/* first char in range */
-		max = (U8)d[1];	/* last char in range  */
-
-                if (min > max) {
-		    Perl_croak(aTHX_
-			       "Invalid range \"%c-%c\" in transliteration operator",
-			       (char)min, (char)max);
-                }
-
-		for (i = min; i <= max; i++)
-		    *d++ = (char)i;
- 
-		/* mark the range as done, and continue */
-		dorange = FALSE;
-		didrange = TRUE;
-		continue;
-	    }
-
-	    /* range begins (ignore - as first or last char) */
-	    else if (*s == '-' && s+1 < send  && s != start) {
-		if (didrange) {
-		    Perl_croak(aTHX_ "Ambiguous range in transliteration operator");
-		}
-		if (in_codepoints) {
-		    *d++ = (char)UTF_TO_NATIVE(0xff);	/* use illegal utf8 byte--see pmtrans */
-		    s++;
-		    continue;
-		}
-		dorange = TRUE;
-		s++;
-	    }
-	    else {
-		didrange = FALSE;
-	    }
-	}
-
-	/* if we get here, we're not doing a transliteration */
-
+    while (s < send) {
 	/* skip for regexp comments /(?#comment)/ and code /(?{code})/,
 	   except for the last char, which will be done separately. */
-	else if (*s == '(' && in_pat && s[1] == '?') {
+	if (*s == '(' && in_pat && s[1] == '?') {
 	    if (s[2] == '#') {
 		while (s+1 < send && *s != ')')
 		    *d++ = NATIVE_TO_UNI(*s++);
@@ -2175,7 +2108,7 @@ S_scan_const(pTHX_ char *start)
 /* 	    if (PL_lex_inwhat != OP_TRANS && *s && strchr("LUlu", *s)) { */
 /* 		Perl_warner(packWARN(WARN_SYNTAX), "case modifiers have een removed"); */
 /* 	    } */
-	    if (PL_lex_inwhat != OP_TRANS && *s && strchr("lLuUEQ", *s)) {
+	    if (strchr("lLuUEQ", *s)) {
 		--s;
 		break;
 	    }
@@ -2183,12 +2116,6 @@ S_scan_const(pTHX_ char *start)
 	    else if (in_pat) {
 		*d++ = NATIVE_TO_UNI('\\');
 		goto default_action;
-	    }
-
-	    /* quoted - in transliterations */
-	    if ((*s == '-') && (PL_lex_inwhat == OP_TRANS)) {
-		*d++ = *s++;
-		continue;
 	    }
 
 	    /* if we get here, it's either a quoted -, or a digit */
@@ -2235,10 +2162,7 @@ S_scan_const(pTHX_ char *start)
 	    const char *type;
 	    STRLEN typelen;
 
-	    if (PL_lex_inwhat == OP_TRANS) {
-		type = "tr";
-		typelen = 2;
-	    } else if (PL_lex_inwhat == OP_SUBST && !in_pat) {
+	    if (PL_lex_inwhat == OP_SUBST && !in_pat) {
 		type = "s";
 		typelen = 1;
 	    } else  {
@@ -6112,8 +6036,6 @@ S_pending_ident(pTHX)
     dVAR;
     register char *d;
     PADOFFSET tmp = 0;
-    /* pit holds the identifier we read and pending_ident is reset */
-    char pit = PL_pending_ident;
     const STRLEN tokenbuf_len = strlen(PL_tokenbuf);
     /* All routes through this function want to know if there is a colon.  */
     const char *const has_colon = (const char*) memchr (PL_tokenbuf, ':', tokenbuf_len);
@@ -9956,98 +9878,6 @@ S_scan_subst(pTHX_ char *start)
 }
 
 STATIC char *
-S_scan_trans(pTHX_ char *start)
-{
-    dVAR;
-    register char* s;
-    OP *o;
-    short *tbl;
-    U8 squash;
-    U8 del;
-    U8 complement;
-#ifdef PERL_MAD
-    char *modstart;
-#endif
-
-    PERL_ARGS_ASSERT_SCAN_TRANS;
-
-    pl_yylval.ival = OP_NULL;
-
-    PL_lex_stuff.flags = LEXf_INPAT;
-    s = scan_str(start,TRUE,FALSE, &PL_lex_stuff);
-    if (!s)
-	Perl_croak(aTHX_ "Transliteration pattern not terminated");
-
-    if (s[-1] == PL_multi_open)
-	s--;
-#ifdef PERL_MAD
-    if (PL_madskills) {
-	CURMAD('q', PL_thisopen);
-	CURMAD('_', PL_thiswhite);
-	CURMAD('Q', PL_thisclose);
-	PL_realtokenstart = s - SvPVX(PL_linestr);
-    }
-#endif
-
-    PL_lex_stuff.flags = LEXf_REPL;
-    s = scan_str(s,TRUE,FALSE, &PL_lex_repl);
-    if (!s) {
-	if (PL_lex_stuff.str_sv) {
-	    SvREFCNT_dec(PL_lex_stuff.str_sv);
-	    PL_lex_stuff.str_sv = NULL;
-	}
-	Perl_croak(aTHX_ "Transliteration replacement not terminated");
-    }
-    if (PL_madskills) {
-	CURMAD('z', PL_thisopen);
-	CURMAD('R', PL_thisstuff);
-	CURMAD('Z', PL_thisclose);
-    }
-
-    complement = del = squash = 0;
-#ifdef PERL_MAD
-    modstart = s;
-#endif
-    while (1) {
-	switch (*s) {
-	case 'c':
-	    complement = OPpTRANS_COMPLEMENT;
-	    break;
-	case 'd':
-	    del = OPpTRANS_DELETE;
-	    break;
-	case 's':
-	    squash = OPpTRANS_SQUASH;
-	    break;
-	default:
-	    goto no_more;
-	}
-	s++;
-    }
-  no_more:
-
-    tbl = (short *)PerlMemShared_calloc(complement&&!del?258:256, sizeof(short));
-    o = newPVOP(OP_TRANS, 0, (char*)tbl);
-    o->op_private &= ~OPpTRANS_ALL;
-    o->op_private |= del|squash|complement|
-      (IN_CODEPOINTS? OPpTRANS_UTF8 : 0);
-
-    PL_lex_op = o;
-    pl_yylval.ival = OP_TRANS;
-
-#ifdef PERL_MAD
-    if (PL_madskills) {
-	if (modstart != s)
-	    curmad('m', newSVpvn(modstart, s - modstart));
-	append_madprops(PL_thismad, o, 0);
-	PL_thismad = 0;
-    }
-#endif
-
-    return s;
-}
-
-STATIC char *
 S_scan_heredoc(pTHX_ register char *s)
 {
     dVAR;
@@ -10294,16 +10124,13 @@ S_scan_heredoc(pTHX_ register char *s)
 	qw		quote words		@EXPORT_OK = qw( func() $spam )
 	m//		regexp match		m/this/
 	s///		regexp substitute	s/this/that/
-	tr///		string transliterate	tr/this/that/
-	y///		string transliterate	y/this/that/
 	($*@)		sub prototypes		sub foo ($)
 	(stuff)		sub attr parameters	sub foo : attr(stuff)
 	
    In most of these cases (all but <>, patterns and transliterate)
    yylex() calls scan_str().  m// makes yylex() call scan_pat() which
    calls scan_str().  s/// makes yylex() call scan_subst() which calls
-   scan_str().  tr/// and y/// make yylex() call scan_trans() which
-   calls scan_str().
+   scan_str().
 
    It skips whitespace before the string starts, and treats the first
    character as the delimiter.  If the delimiter is one of ([{< then
