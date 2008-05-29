@@ -812,6 +812,13 @@ sub anon_aryhsh {
     }
 }
 
+sub eval_to_try {
+    my $xml = shift;
+    for my $op ($xml->findnodes("//op_leavetry")) {
+        set_madprop($op, 'operator', 'try');
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -882,7 +889,11 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.10') {
     no_bracket_names($twig);
 }
 
-anon_aryhsh($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.11') {
+    anon_aryhsh($twig);
+}
+
+eval_to_try($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
