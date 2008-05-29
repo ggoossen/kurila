@@ -319,7 +319,6 @@ my %opclass = (
     '/',  5,		# pmop
     '$',  6,		# svop_or_padop
     '#',  7,		# padop
-    '"',  8,		# pvop_or_svop
     '{',  9,		# loop
     ';',  10,		# cop
     '%',  11,		# baseop_or_unop
@@ -523,7 +522,6 @@ sub tab {
 # pp.c	pos substr each not OK (RETPUSHUNDEF)
 #	substr vec also not OK due to LV to target (are they???)
 #	ref not OK (RETPUSHNO)
-#	trans not OK (dTARG; TARG = sv_newmortal();)
 #	ucfirst etc not OK: TMP arg processed inplace
 #	quotemeta not OK (unsafe when TARG == arg)
 #	each repeat not OK too due to list context
@@ -652,7 +650,6 @@ match		pattern match (m//)	ck_match	d/
 qr		pattern quote (qr//)	ck_match	s/
 subst		substitution (s///)	ck_match	dis/	S
 substcont	substitution iterator	ck_null		dis|	
-trans		transliteration (tr///)	ck_match	is"	S
 
 # Lvalue operators.
 # sassign is special-cased for op class

@@ -583,23 +583,8 @@ Perl_op_clear(pTHX_ OP *o)
     case OP_REDO:
 	if (o->op_flags & (OPf_SPECIAL|OPf_STACKED|OPf_KIDS))
 	    break;
-	/* FALL THROUGH */
-    case OP_TRANS:
-	if (o->op_private & OPpTRANS_UTF8) {
-#ifdef USE_ITHREADS
-	    if (cPADOPo->op_padix > 0) {
-		pad_swipe(cPADOPo->op_padix, TRUE);
-		cPADOPo->op_padix = 0;
-	    }
-#else
-	    SvREFCNT_dec(cSVOPo->op_sv);
-	    cSVOPo->op_sv = NULL;
-#endif
-	}
-	else {
-	    PerlMemShared_free(cPVOPo->op_pv);
-	    cPVOPo->op_pv = NULL;
-	}
+	PerlMemShared_free(cPVOPo->op_pv);
+	cPVOPo->op_pv = NULL;
 	break;
     case OP_SUBST:
 	op_free(cPMOPo->op_pmreplrootu.op_pmreplroot);
@@ -973,9 +958,8 @@ Perl_scalarvoid(pTHX_ OP *o)
 
     case OP_NOT:
        kid = cUNOPo->op_first;
-       if (kid->op_type != OP_MATCH && kid->op_type != OP_SUBST &&
-           kid->op_type != OP_TRANS) {
-	        goto func_ops;
+       if (kid->op_type != OP_MATCH && kid->op_type != OP_SUBST) {
+	   goto func_ops;
        }
        useless = "negative pattern binding (!~)";
        break;
@@ -1597,7 +1581,6 @@ S_scalar_mod_type(const OP *o, I32 type)
     case OP_BIT_OR:
     case OP_CONCAT:
     case OP_SUBST:
-    case OP_TRANS:
     case OP_READ:
     case OP_SYSREAD:
     case OP_RECV:
@@ -2047,7 +2030,7 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 	  || ltype == OP_PADHV) && ckWARN(WARN_MISC))
     {
       const char * const desc
-	  = PL_op_desc[(rtype == OP_SUBST || rtype == OP_TRANS)
+	  = PL_op_desc[(rtype == OP_SUBST)
 		       ? (int)rtype : OP_MATCH];
       const char * const sample = ((ltype == OP_RV2AV || ltype == OP_PADAV)
 	     ? "@array" : "%hash");
@@ -2064,8 +2047,7 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
     }
 
     ismatchop = rtype == OP_MATCH ||
-		rtype == OP_SUBST ||
-		rtype == OP_TRANS;
+         	rtype == OP_SUBST;
     if (ismatchop && right->op_private & OPpTARGET_MY) {
 	right->op_targ = 0;
 	right->op_private &= ~OPpTARGET_MY;
@@ -2074,16 +2056,11 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 	OP *newleft;
 
 	right->op_flags |= OPf_STACKED;
-	if (rtype != OP_MATCH &&
-            ! (rtype == OP_TRANS &&
-               right->op_private & OPpTRANS_IDENTICAL))
+	if (rtype != OP_MATCH)
 	    newleft = mod(left, rtype);
 	else
 	    newleft = left;
-	if (right->op_type == OP_TRANS)
-	    o = newBINOP(OP_NULL, OPf_STACKED, scalar(newleft), right);
-	else
-	    o = prepend_elem(rtype, scalar(newleft), right);
+	o = prepend_elem(rtype, scalar(newleft), right);
 	if (type == OP_NOT)
 	    return newUNOP(OP_NOT, 0, scalar(o));
 	return o;
@@ -2964,342 +2941,6 @@ Perl_newBINOP(pTHX_ I32 type, I32 flags, OP *first, OP *last)
     return fold_constants((OP *)binop);
 }
 
-static int uvcompare(const void *a, const void *b)
-    __attribute__nonnull__(1)
-    __attribute__nonnull__(2)
-    __attribute__pure__;
-static int uvcompare(const void *a, const void *b)
-{
-    if (*((const UV *)a) < (*(const UV *)b))
-	return -1;
-    if (*((const UV *)a) > (*(const UV *)b))
-	return 1;
-    if (*((const UV *)a+1) < (*(const UV *)b+1))
-	return -1;
-    if (*((const UV *)a+1) > (*(const UV *)b+1))
-	return 1;
-    return 0;
-}
-
-OP *
-Perl_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
-{
-    dVAR;
-    SV * const tstr = ((SVOP*)expr)->op_sv;
-    SV * const rstr =
-#ifdef PERL_MAD
-			(repl->op_type == OP_NULL)
-			    ? ((SVOP*)((LISTOP*)repl)->op_first)->op_sv :
-#endif
-			      ((SVOP*)repl)->op_sv;
-    STRLEN tlen;
-    STRLEN rlen;
-    const char *t = SvPV_const(tstr, tlen);
-    const char *r = SvPV_const(rstr, rlen);
-    register I32 i;
-    register I32 j;
-    I32 grows = 0;
-    register short *tbl;
-
-    const I32 complement = o->op_private & OPpTRANS_COMPLEMENT;
-    const I32 squash     = o->op_private & OPpTRANS_SQUASH;
-    I32 del              = o->op_private & OPpTRANS_DELETE;
-    SV* swash;
-
-    PERL_ARGS_ASSERT_PMTRANS;
-
-    PL_hints |= HINT_BLOCK_SCOPE;
-
-    if (IN_CODEPOINTS)
-        o->op_private |= OPpTRANS_UTF8;
-
-    if (o->op_private & OPpTRANS_UTF8) {
-	SV* const listsv = newSVpvs("# comment\n");
-	SV* transv = NULL;
-	const char* tend = t + tlen;
-	const char* rend = r + rlen;
-	STRLEN ulen;
-	UV tfirst = 1;
-	UV tlast = 0;
-	IV tdiff;
-	UV rfirst = 1;
-	UV rlast = 0;
-	IV rdiff;
-	IV diff;
-	I32 none = 0;
-	U32 max = 0;
-	I32 bits;
-	I32 havefinal = 0;
-	U32 final = 0;
-	char* tsave = NULL;
-	char* rsave = NULL;
-	const U32 flags = UTF8_ALLOW_DEFAULT;
-
-/* There are several snags with this code on EBCDIC:
-   1. 0xFF is a legal UTF-EBCDIC byte (there are no illegal bytes).
-   2. scan_const() in toke.c has encoded chars in native encoding which makes
-      ranges at least in EBCDIC 0..255 range the bottom odd.
-*/
-
-	if (complement) {
-	    char tmpbuf[UTF8_MAXBYTES+1];
-	    UV *cp;
-	    UV nextmin = 0;
-	    Newx(cp, 2*tlen, UV);
-	    i = 0;
-	    transv = newSVpvs("");
-	    while (t < tend) {
-		cp[2*i] = utf8n_to_uvuni(t, tend-t, &ulen, flags);
-		t += ulen;
-		if (t < tend && (U8)NATIVE_TO_UTF(*t) == 0xff) {
-		    t++;
-		    cp[2*i+1] = utf8n_to_uvuni(t, tend-t, &ulen, flags);
-		    t += ulen;
-		}
-		else {
-		 cp[2*i+1] = cp[2*i];
-		}
-		i++;
-	    }
-	    qsort(cp, i, 2*sizeof(UV), uvcompare);
-	    for (j = 0; j < i; j++) {
-		UV  val = cp[2*j];
-		diff = val - nextmin;
-		if (diff > 0) {
-		    t = uvuni_to_utf8(tmpbuf,nextmin);
-		    sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
-		    if (diff > 1) {
-			char range_mark = UTF_TO_NATIVE((char)0xff);
-			t = uvuni_to_utf8(tmpbuf, val - 1);
-			sv_catpvn(transv, (char *)&range_mark, 1);
-			sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
-		    }
-	        }
-		val = cp[2*j+1];
-		if (val >= nextmin)
-		    nextmin = val + 1;
-	    }
-	    t = uvuni_to_utf8(tmpbuf,nextmin);
-	    sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
-	    {
-		char range_mark = UTF_TO_NATIVE((char)0xff);
-		sv_catpvn(transv, (char *)&range_mark, 1);
-	    }
-	    t = uvuni_to_utf8_flags(tmpbuf, 0x7fffffff,
-				    UNICODE_ALLOW_SUPER);
-	    sv_catpvn(transv, (char*)tmpbuf, t - tmpbuf);
-	    t = SvPVX_const(transv);
-	    tlen = SvCUR(transv);
-	    tend = t + tlen;
-	    Safefree(cp);
-	}
-	else if (!rlen && !del) {
-	    r = t; rlen = tlen; rend = tend;
-	}
-	if (!squash) {
-		if ((!rlen && !del) || t == r ||
-		    (tlen == rlen && memEQ((char *)t, (char *)r, tlen)))
-		{
-		    o->op_private |= OPpTRANS_IDENTICAL;
-		}
-	}
-
-	while (t < tend || tfirst <= tlast) {
-	    /* see if we need more "t" chars */
-	    if (tfirst > tlast) {
-		tfirst = (I32)utf8n_to_uvuni(t, tend - t, &ulen, flags);
-		t += ulen;
-		if (t < tend && (U8)NATIVE_TO_UTF(*t) == 0xff) {	/* illegal utf8 val indicates range */
-		    t++;
-		    tlast = (I32)utf8n_to_uvuni(t, tend - t, &ulen, flags);
-		    t += ulen;
-		}
-		else
-		    tlast = tfirst;
-	    }
-
-	    /* now see if we need more "r" chars */
-	    if (rfirst > rlast) {
-		if (r < rend) {
-		    rfirst = (I32)utf8n_to_uvuni(r, rend - r, &ulen, flags);
-		    r += ulen;
-		    if (r < rend && (U8)NATIVE_TO_UTF(*r) == 0xff) {	/* illegal utf8 val indicates range */
-			r++;
-			rlast = (I32)utf8n_to_uvuni(r, rend - r, &ulen, flags);
-			r += ulen;
-		    }
-		    else
-			rlast = rfirst;
-		}
-		else {
-		    if (!havefinal++)
-			final = rlast;
-		    rfirst = rlast = 0xffffffff;
-		}
-	    }
-
-	    /* now see which range will peter our first, if either. */
-	    tdiff = tlast - tfirst;
-	    rdiff = rlast - rfirst;
-
-	    if (tdiff <= rdiff)
-		diff = tdiff;
-	    else
-		diff = rdiff;
-
-	    if (rfirst == 0xffffffff) {
-		diff = tdiff;	/* oops, pretend rdiff is infinite */
-		if (diff > 0)
-		    Perl_sv_catpvf(aTHX_ listsv, "%04lx\t%04lx\tXXXX\n",
-				   (long)tfirst, (long)tlast);
-		else
-		    Perl_sv_catpvf(aTHX_ listsv, "%04lx\t\tXXXX\n", (long)tfirst);
-	    }
-	    else {
-		if (diff > 0)
-		    Perl_sv_catpvf(aTHX_ listsv, "%04lx\t%04lx\t%04lx\n",
-				   (long)tfirst, (long)(tfirst + diff),
-				   (long)rfirst);
-		else
-		    Perl_sv_catpvf(aTHX_ listsv, "%04lx\t\t%04lx\n",
-				   (long)tfirst, (long)rfirst);
-
-		if (rfirst + diff > max)
-		    max = rfirst + diff;
-		if (!grows)
-		    grows = (tfirst < rfirst &&
-			     UNISKIP(tfirst) < UNISKIP(rfirst + diff));
-		rfirst += diff + 1;
-	    }
-	    tfirst += diff + 1;
-	}
-
-	none = ++max;
-	if (del)
-	    del = ++max;
-
-	if (max > 0xffff)
-	    bits = 32;
-	else if (max > 0xff)
-	    bits = 16;
-	else
-	    bits = 8;
-
-	PerlMemShared_free(cPVOPo->op_pv);
-	cPVOPo->op_pv = NULL;
-
-	swash = (SV*)swash_init("utf8", "", listsv, bits, none);
-#ifdef USE_ITHREADS
-	cPADOPo->op_padix = pad_alloc(OP_TRANS, SVs_PADTMP);
-	SvREFCNT_dec(PAD_SVl(cPADOPo->op_padix));
-	PAD_SETSV(cPADOPo->op_padix, swash);
-	SvPADTMP_on(swash);
-#else
-	cSVOPo->op_sv = swash;
-#endif
-	SvREFCNT_dec(listsv);
-	SvREFCNT_dec(transv);
-
-	if (!del && havefinal && rlen)
-	    (void)hv_store((HV*)SvRV(swash), "FINAL", 5,
-			   newSVuv((UV)final), 0);
-
-	if (grows)
-	    o->op_private |= OPpTRANS_GROWS;
-
-	Safefree(tsave);
-	Safefree(rsave);
-
-#ifdef PERL_MAD
-	op_getmad(expr,o,'e');
-	op_getmad(repl,o,'r');
-#else
-	op_free(expr);
-	op_free(repl);
-#endif
-	return o;
-    }
-
-    tbl = (short*)cPVOPo->op_pv;
-    if (complement) {
-	Zero(tbl, 256, short);
-	for (i = 0; i < (I32)tlen; i++)
-	    tbl[(U8)t[i]] = -1;
-	for (i = 0, j = 0; i < 256; i++) {
-	    if (!tbl[i]) {
-		if (j >= (I32)rlen) {
-		    if (del)
-			tbl[i] = -2;
-		    else if (rlen)
-			tbl[i] = (U8)r[j-1];
-		    else
-			tbl[i] = (short)i;
-		}
-		else {
-		    if (i < 128 && (U8)r[j] >= 128)
-			grows = 1;
-		    tbl[i] = (U8)r[j++];
-		}
-	    }
-	}
-	if (!del) {
-	    if (!rlen) {
-		j = rlen;
-		if (!squash)
-		    o->op_private |= OPpTRANS_IDENTICAL;
-	    }
-	    else if (j >= (I32)rlen)
-		j = rlen - 1;
-	    else {
-		tbl = 
-		    (short *)
-		    PerlMemShared_realloc(tbl,
-					  (0x101+rlen-j) * sizeof(short));
-		cPVOPo->op_pv = (char*)tbl;
-	    }
-	    tbl[0x100] = (short)(rlen - j);
-	    for (i=0; i < (I32)rlen - j; i++)
-		tbl[0x101+i] = (U8)r[j+i];
-	}
-    }
-    else {
-	if (!rlen && !del) {
-	    r = t; rlen = tlen;
-	    if (!squash)
-		o->op_private |= OPpTRANS_IDENTICAL;
-	}
-	else if (!squash && rlen == tlen && memEQ((char*)t, (char*)r, tlen)) {
-	    o->op_private |= OPpTRANS_IDENTICAL;
-	}
-	for (i = 0; i < 256; i++)
-	    tbl[i] = -1;
-	for (i = 0, j = 0; i < (I32)tlen; i++,j++) {
-	    if (j >= (I32)rlen) {
-		if (del) {
-		    if (tbl[(U8)t[i]] == -1)
-			tbl[(U8)t[i]] = -2;
-		    continue;
-		}
-		--j;
-	    }
-	    if (tbl[(U8)t[i]] == -1) {
-		tbl[(U8)t[i]] = (U8)r[j];
-	    }
-	}
-    }
-    if (grows)
-	o->op_private |= OPpTRANS_GROWS;
-#ifdef PERL_MAD
-    op_getmad(expr,o,'e');
-    op_getmad(repl,o,'r');
-#else
-    op_free(expr);
-    op_free(repl);
-#endif
-
-    return o;
-}
-
 OP *
 Perl_newPMOP(pTHX_ I32 type, I32 flags)
 {
@@ -3365,7 +3006,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 
     PERL_ARGS_ASSERT_PMRUNTIME;
 
-    if (o->op_type == OP_SUBST || o->op_type == OP_TRANS) {
+    if (o->op_type == OP_SUBST) {
 	/* last element in list is the replacement; pop it */
 	OP* kid;
 	repl = cLISTOPx(expr)->op_last;
@@ -3385,10 +3026,6 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	cLISTOPx(oe)->op_first->op_sibling = NULL;
 	cLISTOPx(oe)->op_last = NULL;
 	op_free(oe);
-    }
-
-    if (o->op_type == OP_TRANS) {
-	return pmtrans(o, expr, repl);
     }
 
     reglist = isreg && expr->op_type == OP_LIST;

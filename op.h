@@ -168,16 +168,6 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for OP_MATCH and OP_SUBST{,CONST} */
 #define OPpRUNTIME		64	/* Pattern coming in on the stack */
 
-/* Private for OP_TRANS */
-#define OPpTRANS_UTF8	1
-#define OPpTRANS_IDENTICAL	4	/* right side is same as left */
-#define OPpTRANS_SQUASH		8
-    /* 16 is used for OPpTARGET_MY */
-#define OPpTRANS_COMPLEMENT	32
-#define OPpTRANS_GROWS		64
-#define OPpTRANS_DELETE		128
-#define OPpTRANS_ALL	(OPpTRANS_UTF8|OPpTRANS_IDENTICAL|OPpTRANS_SQUASH|OPpTRANS_COMPLEMENT|OPpTRANS_GROWS|OPpTRANS_DELETE)
-
 /* Private for OP_REPEAT */
 #define OPpREPEAT_DOLIST	64	/* List replication. */
 
@@ -494,7 +484,6 @@ struct loop {
 #define OA_PMOP (5 << OCSHIFT)
 #define OA_SVOP (6 << OCSHIFT)
 #define OA_PADOP (7 << OCSHIFT)
-#define OA_PVOP_OR_SVOP (8 << OCSHIFT)
 #define OA_LOOP (9 << OCSHIFT)
 #define OA_COP (10 << OCSHIFT)
 #define OA_BASEOP_OR_UNOP (11 << OCSHIFT)

@@ -11267,7 +11267,6 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	goto do_op;
 
     /* ops where $_ may be an implicit arg */
-    case OP_TRANS:
     case OP_SUBST:
     case OP_MATCH:
 	if ( !(obase->op_flags & OPf_STACKED)) {
