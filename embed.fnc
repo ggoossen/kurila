@@ -243,7 +243,6 @@ p	|bool	|do_seek	|NULLOK GV* gv|Off_t pos|int whence
 Ap	|void	|do_sprintf	|NN SV* sv|I32 len|NN SV** sarg
 p	|Off_t	|do_sysseek	|NN GV* gv|Off_t pos|int whence
 pR	|Off_t	|do_tell	|NN GV* gv
-p	|I32	|do_trans	|NN SV* sv
 p	|UV	|do_vecget	|NN SV* sv|I32 offset|I32 size
 p	|void	|do_vecset	|NN SV* sv
 p	|void	|do_vop		|I32 optype|NN SV* sv|NN SV* left|NN SV* right
@@ -1097,15 +1096,6 @@ Adp	|int	|nothreadhook
 
 END_EXTERN_C
 
-#if defined(PERL_IN_DOOP_C) || defined(PERL_DECL_PROT)
-sR	|I32	|do_trans_simple	|NN SV * const sv
-sR	|I32	|do_trans_count		|NN SV * const sv
-sR	|I32	|do_trans_complex	|NN SV * const sv
-sR	|I32	|do_trans_simple_utf8	|NN SV * const sv
-sR	|I32	|do_trans_count_utf8	|NN SV * const sv
-sR	|I32	|do_trans_complex_utf8	|NN SV * const sv
-#endif
-
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 s	|void	|gv_init_sv	|NN GV *gv|const svtype sv_type
 s	|HV*	|gv_get_super_pkg|NN const char* name|I32 namelen
@@ -1516,7 +1506,6 @@ s	|char*	|scan_ident	|NN char *s|NN const char *send|NN char *dest \
 sR	|char*	|scan_pat	|NN char *start|I32 type
 sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims|NN yy_str_info *str_info
 sR	|char*	|scan_subst	|NN char *start
-sR	|char*	|scan_trans	|NN char *start
 s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 				|int allow_package|NN STRLEN *slp
 s	|void	|update_debugger_info|NULLOK SV *orig_sv \

@@ -699,11 +699,6 @@ PERL_CALLCONV Off_t	Perl_do_tell(pTHX_ GV* gv)
 #define PERL_ARGS_ASSERT_DO_TELL	\
 	assert(gv)
 
-PERL_CALLCONV I32	Perl_do_trans(pTHX_ SV* sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS	\
-	assert(sv)
-
 PERL_CALLCONV UV	Perl_do_vecget(pTHX_ SV* sv, I32 offset, I32 size)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DO_VECGET	\
@@ -3969,45 +3964,6 @@ PERL_CALLCONV int	Perl_nothreadhook(pTHX);
 
 END_EXTERN_C
 
-#if defined(PERL_IN_DOOP_C) || defined(PERL_DECL_PROT)
-STATIC I32	S_do_trans_simple(pTHX_ SV * const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS_SIMPLE	\
-	assert(sv)
-
-STATIC I32	S_do_trans_count(pTHX_ SV * const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS_COUNT	\
-	assert(sv)
-
-STATIC I32	S_do_trans_complex(pTHX_ SV * const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS_COMPLEX	\
-	assert(sv)
-
-STATIC I32	S_do_trans_simple_utf8(pTHX_ SV * const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS_SIMPLE_UTF8	\
-	assert(sv)
-
-STATIC I32	S_do_trans_count_utf8(pTHX_ SV * const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS_COUNT_UTF8	\
-	assert(sv)
-
-STATIC I32	S_do_trans_complex_utf8(pTHX_ SV * const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_TRANS_COMPLEX_UTF8	\
-	assert(sv)
-
-#endif
-
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 STATIC void	S_gv_init_sv(pTHX_ GV *gv, const svtype sv_type)
 			__attribute__nonnull__(pTHX_1);
@@ -5414,12 +5370,6 @@ STATIC char*	S_scan_subst(pTHX_ char *start)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SCAN_SUBST	\
-	assert(start)
-
-STATIC char*	S_scan_trans(pTHX_ char *start)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SCAN_TRANS	\
 	assert(start)
 
 STATIC char*	S_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_package, STRLEN *slp)
