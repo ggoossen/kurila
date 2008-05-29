@@ -8931,7 +8931,7 @@ Perl_parser_dup(pTHX_ const yy_parser *const proto, CLONE_PARAMS *const param)
     parser->thistoken	= proto->thistoken;
     parser->thiswhite	= proto->thiswhite;
 
-    Copy(proto->nexttoke, parser->nexttoke, 5, NEXTTOKE);
+    Copy(proto->nexttoke, parser->nexttoke, 5, NEXTMADTOKE);
     parser->curforce	= proto->curforce;
 #else
     Copy(proto->nextval, parser->nextval, 5, YYSTYPE);
