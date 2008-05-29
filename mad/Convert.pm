@@ -6,8 +6,6 @@ use warnings;
 use Nomad;
 use Encode;
 
-$ENV{madpath} or die "No madpath specified";
-
 sub convert {
     my ($input, $convert, %options) = @_;
 

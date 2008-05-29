@@ -7,6 +7,10 @@ BEGIN {
     push @INC, "../mad";
 }
 
+BEGIN {
+    $ENV{madpath} or die "No madpath specified";
+}
+
 use IO::Handle;
 
 use Test::More qw|no_plan|;
@@ -15,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.7';
-my $to = 'kurila-1.8';
+my $from = 'kurila-1.11';
+my $to = 'kurila-1.12';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -32,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_anon_aryhsh();
+t_eval_to_try();
 die;
+t_anon_aryhsh();
 t_strict_vars();
 t_no_bracket_names();
 t_no_sigil_change();
@@ -965,6 +970,17 @@ sub t_anon_aryhsh {
 (stat "foo")[2];
 ----
 (stat "foo")[2];
+====
+END
+}
+
+sub t_eval_to_try {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+eval { 1 };
+eval "1";
+----
+try { 1 };
+eval "1";
 ====
 END
 }
