@@ -940,7 +940,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($1,$$,'(');
 			  TOKEN_GETMAD($2,$$,')');
 			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($6,$$,'j');
+			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,']');
 			}
 	|	'(' expr ')' '[' expr ']'            /* list element */

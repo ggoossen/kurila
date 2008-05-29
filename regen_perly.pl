@@ -137,6 +137,7 @@ sub extract {
     my $actlines;
 
     $clines =~ m@
+       (
 	(?:
 	    ^/* YYFINAL[^\n]+\n		#optional comment
 	)?
@@ -145,9 +146,10 @@ sub extract {
 	yystos\[\]\s*=			# start of last table
 	.*?
 	}\s*;				# end of last table
+       )
     @xms
 	or die "Can't extract tables from $tmpc_file\n";
-    $tablines = $&;
+    $tablines = $1;
 
 
     $clines =~ m@

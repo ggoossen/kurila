@@ -42,7 +42,8 @@ sub p55 {
     my $returncode = system("PERL_XMLDUMP='tmp.xml' ../perl -I ../lib tmp.in 2> tmp.err");
 
     if (-z "tmp.xml") {
-        ok 0, "MAD dump of '$input' failed: $msg" or $TODO or die;
+        diag("failed dumping: '$input'");
+        ok 0, "$msg" or $TODO or die;
         return;
     }
     my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.10" ) };
@@ -114,6 +115,7 @@ our %failing = map { $_, 1 } qw|
 
 ../t/op/exec.t
 
+../t/arch/64bitint.t
 |;
 
 my @files;
@@ -136,10 +138,6 @@ my $x = pi;
 ########
 -OS_Code => $a
 ########
-# TODO
-use encoding 'euc-jp';
-tr/¤¡-¤ó¥¡-¥ó/¥¡-¥ó¤¡-¤ó/;
-########
 sub ok($$) { }
 #BEGIN { ok(1, 2, ); }
 ########
@@ -153,12 +151,6 @@ s//{m#.#}/g;
 # Reduced test case from t/io/layers.t
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
 BEGIN { PerlIO::Layer->find("encoding",1);}
-########
-# from ../t/op/array.t
-$[ = 1
-########
-# from t/comp/parser.t
-$x = 1 for ($[) = 0;
 ########
 # from t/op/getppid.t
 pipe my ($r, $w)
@@ -188,17 +180,17 @@ BEGIN {
 use foobar;
 ########
 # operator with modify TARGET_MY
-my $nc_attempt;
+my ($nc_attempt, $within);
 $nc_attempt = 0+ ($within eq 'other_sub') ;
 ########
 # __END__ section
-$foo
+my $foo
 
 __END__
 DATA
 ########
 # split with PUSHRE
-@prgs = split "\n########\n", ~< DATA;
+my @prgs = split "\n########\n", ~< DATA;
 ########
 # unless(eval { })
 unless (eval { $a }) { $a = $b }
@@ -218,6 +210,7 @@ ok my $x = "foobar";
 CHECK { die; }
 ########
 # new named method call syntax
+my $bar;
 Foo->?$bar();
 ########
 # pod with invalid UTF-8
@@ -240,11 +233,11 @@ my $x;
 ########
 $a =~ regex();
 ########
-$a !~ tr/a-z//;
-########
+my ($foo, $bar);
 s/foo/$bar/;
 s/$foo/$bar/;
 ########
+my ($foo, $bar);
 $a =~ s/$foo/$bar/;
 ########
 $a =~ s|(abc)|{uc($1)}|;
@@ -255,4 +248,5 @@ my $msg = "ce ºtii tu, bã ?\n";
 ########
 (stat "abc")[2];
 ########
+my $x;
 $x->foobar(1, 3) = ();
