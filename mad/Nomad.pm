@@ -2571,7 +2571,7 @@ sub astmethod {
 	push @newkids, $kid->ast($self, @_);
     }
     my $dest = pop(@newkids);
-    if (ref $dest eq 'PLXML::op_rv2cv' and $$self{flags} =~ /\bMOD\b/) {
+    if ((ref $dest) =~ m/op_rv2cv$/ and $$self{flags} =~ /\bMOD\b/) {
 	$dest = pop(@newkids);
     }
     my $x = "";

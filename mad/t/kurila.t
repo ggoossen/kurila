@@ -27,7 +27,8 @@ sub p5convert {
     my $output = Convert::convert($input,
                                   "/usr/bin/env perl ../mad/p5kurila.pl --from $from",
                                   from => $from, to => $to,
-                                  dumpcommand => "$ENV{madpath}/perl");
+                                  dumpcommand => "$ENV{madpath}/perl",
+                                 );
     is($output, $expected) or $TODO or die;
 }
 
@@ -958,8 +959,12 @@ sub t_anon_aryhsh {
 [ 1, 2 ];
 { foo => 'bar' };
 ----
-@( 1, 2 );
-%( foo => 'bar' );
+\@( 1, 2 );
+\%( foo => 'bar' );
+====
+(stat "foo")[2];
+----
+(stat "foo")[2];
 ====
 END
 }
