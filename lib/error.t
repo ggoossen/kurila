@@ -32,7 +32,7 @@ MSG
 # creating the error object using 'die' inside an 'eval'
 {
     my ($line1, $line2);
-    eval { $line1 = __LINE__;
+    try { $line1 = __LINE__;
            $line2 = __LINE__; die "foobar";
        };
     is defined $@, 1, '$@ is set';
@@ -48,8 +48,8 @@ MSG
 {
     my $err;
     my ($line1, $line2);
-    eval { $line2 = __LINE__;
-        eval { die "my die"; }; $line1 = __LINE__;
+    try { $line2 = __LINE__;
+        try { die "my die"; }; $line1 = __LINE__;
         $err = $@;
     };
     is defined $err, 1, '$@ is set';
@@ -64,8 +64,8 @@ MSG
 # die without arguments, reuses $@
 {
     my ($line1, $line2);
-    eval { $line2 = __LINE__;
-        eval { die "reuse die"; }; $line1 = __LINE__;
+    try { $line2 = __LINE__;
+        try { die "reuse die"; }; $line1 = __LINE__;
         die;
     };
     is ref $@, "error", '$@ is an error object';
@@ -79,7 +79,7 @@ MSG
 # Internal Perl_croak routines also make error objects
 {
     my $line1;
-    eval { my $foo = "xx"; $$foo; }; $line1 = __LINE__;
+    try { my $foo = "xx"; $$foo; }; $line1 = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is an error object';
     is $@->message, <<MSG;

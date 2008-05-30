@@ -121,14 +121,14 @@ cmp_ok("@b",'eq','1 2 3 4','reverse then sort');
 
 
 sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface }
-eval { @b = sort twoface 4,1,3,2 };
+try { @b = sort twoface 4,1,3,2 };
 cmp_ok("@b",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
 
-eval { no warnings 'redefine'; *twoface = sub { &Backwards } };
+try { no warnings 'redefine'; *twoface = sub { &Backwards } };
 ok(!$@,"redefining sort subs outside the sort \$@=[$@]");
 
-eval { @b = sort twoface 4,1,3,2 };
+try { @b = sort twoface 4,1,3,2 };
 cmp_ok("@b",'eq','4 3 2 1','twoface redefinition');
 
 {
@@ -136,7 +136,7 @@ cmp_ok("@b",'eq','4 3 2 1','twoface redefinition');
   *twoface = sub { *twoface = *Backwards_other; $a <+> $b };
 }
 
-eval { @b = sort twoface 4,1,9,5 };
+try { @b = sort twoface 4,1,9,5 };
 ok(($@ eq "" && "@b" eq "1 4 5 9"),'redefinition should not take effect during the sort');
 
 {
@@ -689,7 +689,7 @@ main::dies_like( sub { @output = sort {goto label} 1,2; },
 
 
 sub goto_label {goto label}
-label: eval { @output = sort goto_label 1,2; };
+label: try { @output = sort goto_label 1,2; };
 my $fail_msg = q(Can't "goto" out of a pseudo block);
 main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'goto out of a pseudo block 2');
 
@@ -760,7 +760,7 @@ sub min {
 
 # Bug 7567 - an array shouldn't be modifiable while it's being
 # sorted in-place.
-eval { @a=(1..8); @a = sort { @a = (0) } @a; },
+try { @a=(1..8); @a = sort { @a = (0) } @a; },
 main::like($@->{description}, qr(^Modification of a read-only value attempted), 'bug 7567');
 
 
@@ -774,7 +774,7 @@ $fail_msg = q(Modification of a read-only value attempted);
 # Sorting a read-only array in-place shouldn't be allowed
 my @readonly = (1..10);
 Internals::SvREADONLY(@readonly, 1);
-eval { @readonly = sort @readonly; };
+try { @readonly = sort @readonly; };
 main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'in-place sort of read-only array');
 
 

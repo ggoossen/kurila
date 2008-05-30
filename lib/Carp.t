@@ -42,14 +42,14 @@ sub_4;
 { local $^DIE_HOOK = sub {
     like @_[0]->message, qr/^(\d+) at.+\b(?i:carp\.t) line \d+\n\teval \Q{...}\E called at.+\b(?i:carp\.t) line \d+$/, 'croak 5' };
 
-  eval { croak 5 };
+  try { croak 5 };
 }
 
 sub sub_6 {
     local $^DIE_HOOK = sub {
 	like @_[0]->message, qr/^(\d+) at.+\b(?i:carp\.t) line \d+\n\teval \Q{...}\E called at.+\b(?i:carp\.t) line \d+\n\tmain::sub_6\(\) called at.+\b(?i:carp\.t) line \d+$/, 'confess 6' };
 
-    eval { confess 6 };
+    try { confess 6 };
 }
 
 sub_6;

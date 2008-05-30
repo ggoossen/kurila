@@ -131,7 +131,7 @@ sub case_tolerant () {
   if ($mntopts and ($mntopts =~ m/,managed/)) {
     return 0;
   }
-  eval { require Win32API::File; } or return 1;
+  try { require Win32API::File; } or return 1;
   my $osFsType = "\0"x256;
   my $osVolName = "\0"x256;
   my $ouFsFlags = 0;

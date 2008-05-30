@@ -30,13 +30,13 @@ sub shortmess { goto &shortmess_jmp }
 # these two are replaced when Carp::Heavy is loaded
 sub longmess_jmp  {
     local($@, $!);
-    eval { require Carp::Heavy };
+    try { require Carp::Heavy };
     die if $@;
     goto &longmess_real;
 }
 sub shortmess_jmp  {
     local($@, $!);
-    eval { require Carp::Heavy };
+    try { require Carp::Heavy };
     die if $@;
     goto &longmess_real;
 }

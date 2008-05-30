@@ -200,7 +200,7 @@ sub getoptions {
     my $ret = 0;
     $Getopt::Long::caller = $self->{caller_pkg};
 
-    eval {
+    try {
 	# Locally set exception handler to default, otherwise it will
 	# be called implicitly here, and again explicitly when we try
 	# to deliver the messages.
@@ -589,7 +589,7 @@ sub GetOptionsFromArray($@) {
 			    if $debug;
 			my $eval_error = do {
 			    local $@;
-			    eval {
+			    try {
 				&{%linkage{$opt}}
 				  (Getopt::Long::CallBack->new
 				   (name    => $opt,
@@ -706,7 +706,7 @@ sub GetOptionsFromArray($@) {
 		  if $debug;
 		my $eval_error = do {
 		    local $@;
-		    eval { &$cb ($tryopt) };
+		    try { &$cb ($tryopt) };
 		    $@;
 		};
 		print STDERR ("=> die($eval_error)\n")
@@ -1340,7 +1340,7 @@ sub Configure (@) {
 	    $genprefix = $1;
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
-	    eval { '' =~ m/$genprefix/; };
+	    try { '' =~ m/$genprefix/; };
 	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
 	}
 	elsif ( $try =~ m/^prefix_pattern=(.+)$/ && $action ) {
@@ -1348,7 +1348,7 @@ sub Configure (@) {
 	    # Parenthesize if needed.
 	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ m/^\(.*\)$/;
-	    eval { '' =~ m"$genprefix"; };
+	    try { '' =~ m"$genprefix"; };
 	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
 	}
 	elsif ( $try =~ m/^long_prefix_pattern=(.+)$/ && $action ) {
@@ -1356,7 +1356,7 @@ sub Configure (@) {
 	    # Parenthesize if needed.
 	    $longprefix = "(" . $longprefix . ")"
 	      unless $longprefix =~ m/^\(.*\)$/;
-	    eval { '' =~ m"$longprefix"; };
+	    try { '' =~ m"$longprefix"; };
 	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
 	}
 	elsif ( $try eq 'debug' ) {
@@ -1411,7 +1411,7 @@ sub VersionMessage(@) {
 #  - a hash with options. See Pod::Usage for details.
 #
 sub HelpMessage(@) {
-    eval {
+    try {
 	require Pod::Usage;
 	Pod::Usage->import;
 	1;

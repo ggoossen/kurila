@@ -178,7 +178,7 @@ require Tie::Hash;
 require Exporter;
 BEGIN {
     $use_XSLoader = 1 ;
-    { eval { require XSLoader } ; }
+    { try { require XSLoader } ; }
 
     if ($@) {
         $use_XSLoader = 0 ;
@@ -222,7 +222,7 @@ push @ISA, qw(Tie::Hash Exporter);
 
 );
 
-eval {
+try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
     my @O = grep m/^O_/, @Fcntl::EXPORT;

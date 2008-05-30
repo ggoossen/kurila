@@ -19,7 +19,7 @@ ok( !-d 'TEST' );
 ok( -r 'TEST' );
 
 # make sure TEST is r-x
-eval { chmod 0555, 'TEST' or die "chmod 0555, 'TEST' failed: $!" };
+try { chmod 0555, 'TEST' or die "chmod 0555, 'TEST' failed: $!" };
 chomp ($bad_chmod = $@);
 
 $oldeuid = $>;		# root can read and write anything

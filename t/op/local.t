@@ -131,7 +131,7 @@ is($a, 'outer');
 
 # see if localization works when scope unwinds
 local $m = 5;
-eval {
+try {
     for $m (6) {
 	local $m = 7;
 	die "bye";
@@ -217,7 +217,7 @@ is(@a[0].@a[1], "Xb");
 
 # now try the same for %SIG
 
-eval { %SIG{TERM} = 'foo' };
+try { %SIG{TERM} = 'foo' };
 like $@->{description}, qr/signal handler should be glob or .../;
 %SIG{INT} = \&foo;
 $^WARN_HOOK = %SIG{INT};
@@ -300,7 +300,7 @@ while (m/(o.+?),/gc) {
 	"for local"   => sub { for("#ok?\n"){ print } },	1,
     );
     while ( my ($name, $code, $ok) = splice(@tests, 0, 3) ) {
-	eval { &$code };
+	try { &$code };
         main::ok(($ok xor $@), "Underscore '$name'");
     }
     untie $_;
@@ -319,18 +319,18 @@ while (m/(o.+?),/gc) {
 
 # local() and readonly magic variables
 
-eval { local $1 = 1 };
+try { local $1 = 1 };
 like($@->{description}, qr/Modification of a read-only value attempted/);
 
-eval { for ($1) { local $_ = 1 } };
+try { for ($1) { local $_ = 1 } };
 like($@->{description}, qr/Modification of a read-only value attempted/);
 
 # make sure $1 is still read-only
-eval { for ($1) { local $_ = 1 } };
+try { for ($1) { local $_ = 1 } };
 like($@->{description}, qr/Modification of a read-only value attempted/);
 
 # The s/// adds 'g' magic to $_, but it should remain non-readonly
-eval { for("a") { for $x (1,2) { local $_="b"; s/(.*)/+$1/ } } };
+try { for("a") { for $x (1,2) { local $_="b"; s/(.*)/+$1/ } } };
 is($@, "");
 
 # sub localisation
@@ -450,7 +450,7 @@ is($@, "");
 {
     local *@;
     pass("Localised *@");
-    eval {1};
+    try {1};
     pass("Can eval with *@ localised");
 }
 

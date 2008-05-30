@@ -118,7 +118,7 @@ FORL2: for($y=1; 1;) {
 # Does goto work correctly within a try block?
 #  (BUG ID 20000313.004) - [perl #2359]
 $ok = 0;
-eval {
+try {
   my $variable = 1;
   goto LABEL20;
   LABEL20: $ok = 1 if $variable;
@@ -224,7 +224,7 @@ sub i_return_a_label {
     $count++;
     return "returned_label";
 }
-eval { goto +i_return_a_label; };
+try { goto +i_return_a_label; };
 $ok = 0;
 
 returned_label:
@@ -272,7 +272,7 @@ $::LINE = __LINE__ + 1;
 
 {
     my $wherever = 'NOWHERE';
-    eval { goto $wherever };
+    try { goto $wherever };
     like($@->{description}, qr/Can't find label NOWHERE/, 'goto NOWHERE sets $@');
 }
 
@@ -296,7 +296,7 @@ moretests:
 # test goto duplicated labels.
 {
     my $z = 0;
-    eval {
+    try {
 	$z = 0;
 	for (0..1) {
 	  L4: # not outer scope
@@ -423,7 +423,7 @@ a32039();
 sub null { 1 };
 eval 'goto &null';
 like($@->{description}, qr/Can't goto subroutine from an eval-string/, 'eval string');
-eval { goto &null };
+try { goto &null };
 like($@->{description}, qr/Can't goto subroutine from an eval-block/, 'eval block');
 
 # [perl #36521] goto &foo in warn handler could defeat recursion avoider

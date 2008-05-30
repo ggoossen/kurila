@@ -23,7 +23,7 @@ is ($buf, "");
 
 # This is true if Config is not built, or if PerlIO is enabled
 # ie assume that PerlIO is present, unless we know for sure otherwise.
-my $has_perlio = !eval {
+my $has_perlio = !try {
     no warnings;
     require Config;
     !%Config::Config{useperlio}

@@ -21,7 +21,7 @@ sub quit {
     exit 0;
 }
 
-unless (eval { getgrgid(0); 1 }) {
+unless (try { getgrgid(0); 1 }) {
     print "1..0 # Skip: getgrgid() not implemented\n";
     exit 0;
 }

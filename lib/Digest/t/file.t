@@ -48,5 +48,5 @@ if (ord('A') == 193) { # EBCDIC.
 
 unlink($file) || warn "Can't unlink '$file': $!";
 
-ok(eval { digest_file("not-there.txt", "Foo") }, undef);
+ok(try { digest_file("not-there.txt", "Foo") }, undef);
 ok($@);

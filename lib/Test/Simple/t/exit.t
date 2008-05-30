@@ -10,7 +10,7 @@ BEGIN {
     }
 }
 
-unless( eval { require File::Spec } ) {
+unless( try { require File::Spec } ) {
     print "1..0 # Skip Need File::Spec to run this test\n";
     exit 0;
 }
@@ -51,7 +51,7 @@ my %Tests = (
 
 $TB->plan( tests => scalar keys(%Tests) );
 
-eval { require POSIX; &POSIX::WEXITSTATUS(0) };
+try { require POSIX; &POSIX::WEXITSTATUS(0) };
 if( $@ ) {
     *exitstatus = sub { @_[0] >> 8 };
 }

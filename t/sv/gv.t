@@ -25,7 +25,7 @@ is(ref(\$foo), 'GLOB');
 
 is(Symbol::glob_name($foo), 'main::bar');
 is(ref(\$foo), 'GLOB');
-eval { my $x = "$foo" };
+try { my $x = "$foo" };
 like($@->{description}, qr/Tried to use glob as string/);
 
 # returning glob values
@@ -78,15 +78,15 @@ is (scalar %foo, 0);
     foreach ($copy, *SKREEE) {
 	$msg = '';
         our $victim;
-	eval { $victim = sprintf "\%d", $_ };
+	try { $victim = sprintf "\%d", $_ };
         like($@->{description}, qr/Tried to use glob as number/);
 
-	eval { $victim = sprintf "\%u", $_ };
+	try { $victim = sprintf "\%u", $_ };
         like($@->{description}, qr/Tried to use glob as number/);
-	eval { $victim = sprintf "\%e", $_ };
+	try { $victim = sprintf "\%e", $_ };
         like($@->{description}, qr/Tried to use glob as number/);
 
-	eval { $victim = sprintf "\%s", $_ };
+	try { $victim = sprintf "\%s", $_ };
         like($@->{description}, qr/Tried to use glob as string/);
     }
 }
@@ -399,11 +399,11 @@ is (ref \%::{plunk}, 'GLOB', "Symbol table has full typeglob");
 {
     no warnings qw(once uninitialized);
     my $g = \*clatter;
-    my $r = eval {no strict; ${*{$g}{SCALAR}}};
+    my $r = try {no strict; ${*{$g}{SCALAR}}};
     is ($@, '', "PERL_DONT_CREATE_GVSV shouldn't affect thingy syntax");
 
     $g = \*vowm;
-    $r = eval {use strict; ${*{$g}{SCALAR}}};
+    $r = try {use strict; ${*{$g}{SCALAR}}};
     is ($@, '',
 	"PERL_DONT_CREATE_GVSV shouldn't affect thingy syntax under strict");
 }
@@ -422,7 +422,7 @@ is (ref \%::{plunk}, 'GLOB', "Symbol table has full typeglob");
 	    $s->SUPER::rip;
 	}
     }
-    eval {slosh->rip;};
+    try {slosh->rip;};
     like ($@->{description}, qr/^Can't locate object method "rip"/, "Even with SUPER");
 
     is(slosh->isa('swoosh'), '');

@@ -583,7 +583,7 @@ sub is_tainted_pp {
     my $arg = shift;
     my $nada = substr($arg, 0, 0); # zero-length
     local $@;
-    eval { eval "# $nada" };
+    try { eval "# $nada" };
     return length($@) != 0;
 }
 
@@ -1330,7 +1330,7 @@ unless ($File::Find::dont_use_nlink) {
 # fallback is_tainted_pp()
 {
     local $@;
-    eval { require Scalar::Util };
+    try { require Scalar::Util };
     *is_tainted = $@ ? \&is_tainted_pp : \&Scalar::Util::tainted;
 }
 

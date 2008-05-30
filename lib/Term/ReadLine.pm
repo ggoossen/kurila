@@ -357,7 +357,7 @@ sub ornaments {
   $rl_term_set ||= ',,,';
   $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
   my @ts = split m/,/, $rl_term_set, 4;
-  eval { LoadTermCap };
+  try { LoadTermCap };
   unless (defined $terminal) {
     warn("Cannot find termcap: $@\n") unless $Term::ReadLine::termcap_nowarn;
     $rl_term_set = ',,,';

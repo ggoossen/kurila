@@ -6,7 +6,7 @@ BEGIN { plan tests => 1 }
 
 use Pod::Parser;
 
-eval {require IO::String;};
+try {require IO::String;};
 skip($@ ? 'no IO::String' : '', sub {
   {
     my $pod_string = 'some I<silly> text';

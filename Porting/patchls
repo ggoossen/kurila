@@ -484,7 +484,7 @@ sub list_files_by_patch {
 
 
 sub my_wrap {
-	my $txt = eval { expand(wrap(@_)) };	# die's on long lines!
+	my $txt = try { expand(wrap(@_)) };	# die's on long lines!
     return $txt unless $@;
 	return expand("@_");
 }

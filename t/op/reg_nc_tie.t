@@ -30,15 +30,15 @@ is(%-{a}[0], "h", "FETCH");
 is(%-{a}[1], "a", "FETCH");
 
 # STORE
-eval { %+{a} = "yon" };
+try { %+{a} = "yon" };
 ok(index($@->{description}, "read-only") != -1, "STORE");
 
 # DELETE
-eval { delete %+{a} };
+try { delete %+{a} };
 ok(index($@->{description}, "read-only") != -1, "DELETE");
 
 # CLEAR
-eval { %+ = () };
+try { %+ = () };
 ok(index($@->{description}, "read-only") != -1, "CLEAR");
 
 # EXISTS

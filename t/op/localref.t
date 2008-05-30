@@ -52,27 +52,27 @@ sub test_err_localref () {
 }
 $x = \$aa;
 my $y = \$aa;
-eval { local $$x; };      test_err_localref;
-eval { local ${$x}; };    test_err_localref;
-eval { local $$y; };      test_err_localref;
-eval { local ${$y}; };    test_err_localref;
-eval { local ${\$aa}; };  test_err_localref;
+try { local $$x; };      test_err_localref;
+try { local ${$x}; };    test_err_localref;
+try { local $$y; };      test_err_localref;
+try { local ${$y}; };    test_err_localref;
+try { local ${\$aa}; };  test_err_localref;
 $x = \@aa;
 $y = \@aa;
-eval { local @$x; };      test_err_localref;
-eval { local @{$x}; };    test_err_localref;
-eval { local @$y; };      test_err_localref;
-eval { local @{$y}; };    test_err_localref;
-eval { local @{\@aa}; };  test_err_localref;
-eval { local @{\@()}; };    test_err_localref;
+try { local @$x; };      test_err_localref;
+try { local @{$x}; };    test_err_localref;
+try { local @$y; };      test_err_localref;
+try { local @{$y}; };    test_err_localref;
+try { local @{\@aa}; };  test_err_localref;
+try { local @{\@()}; };    test_err_localref;
 $x = \%aa;
 $y = \%aa;
-eval { local %$x; };      test_err_localref;
-eval { local %{$x}; };    test_err_localref;
-eval { local %$y; };      test_err_localref;
-eval { local %{$y}; };    test_err_localref;
-eval { local %{\%aa}; };  test_err_localref;
-eval { local %{\%(a=>1)}; };test_err_localref;
+try { local %$x; };      test_err_localref;
+try { local %{$x}; };    test_err_localref;
+try { local %$y; };      test_err_localref;
+try { local %{$y}; };    test_err_localref;
+try { local %{\%aa}; };  test_err_localref;
+try { local %{\%(a=>1)}; };test_err_localref;
 
 
 {

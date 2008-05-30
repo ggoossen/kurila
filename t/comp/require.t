@@ -22,7 +22,7 @@ print "1..$total_tests\n";
 sub do_require {
     %INC = ();
     write_file('bleah.pm',@_);
-    eval { require "bleah.pm" };
+    try { require "bleah.pm" };
     my @a; # magic guard for scope violations (must be first lexical in file)
 }
 
@@ -74,7 +74,7 @@ for my $expected_compile (1,0) {
     print "not " unless -e $flag_file;
     print "ok ",$i++,"\n";
     write_file('bleah.pm', "unlink '$flag_file' or die; \$a=0; \$b=1/\$a; 1;\n");
-    print "# $@\nnot " if eval { require 'bleah.pm' };
+    print "# $@\nnot " if try { require 'bleah.pm' };
     print "ok ",$i++,"\n";
     print "not " unless -e $flag_file xor $expected_compile;
     print "ok ",$i++,"\n";
@@ -94,7 +94,7 @@ print "not " unless exists %INC{'bleah.pm'};
 print "ok ",$i++,"\n";
 write_file($flag_file, 1);
 write_file('bleah.pm', "unlink '$flag_file'; 1");
-print "# $@\nnot " if eval { require 'bleah.pm' };
+print "# $@\nnot " if try { require 'bleah.pm' };
 print "ok ",$i++,"\n";
 print "# $@\nnot " unless $@->message =~ m/Compilation failed/i;
 print "ok ",$i++,"\n";
@@ -133,13 +133,13 @@ $foo = eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
 @foo = eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
        eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
        eval q{$_=$_+2;require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-$foo = eval  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-@foo = eval  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-       eval  {require bleah};
+$foo = try  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
+@foo = try  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
+       try  {require bleah};
 
 # Test for fix of RT #24404 : "require $scalar" may load a directory
 my $r = "threads";
-eval { require $r };
+try { require $r };
 $i++;
 if($@->message =~ m/Can't locate threads in \@INC/) {
     print "ok $i\n";
@@ -149,7 +149,7 @@ if($@->message =~ m/Can't locate threads in \@INC/) {
 
 write_file('bleah.pm', qq(die "This is an expected error";\n));
 delete %INC{"bleah.pm"}; ++$::i;
-eval { CORE::require bleah; };
+try { CORE::require bleah; };
 if ($@->message =~ m/^This is an expected error/) {
     print "ok $i\n";
 } else {
@@ -202,7 +202,7 @@ EOT
     }
     require urkkk;
     require krunch;
-    eval {CORE::require whap; 1} and die;
+    try {CORE::require whap; 1} and die;
 
     if ($@->message =~ m/^This is an expected error/) {
 	print "ok $pmc_dies\n";

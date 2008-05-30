@@ -173,11 +173,11 @@ else {
     ok $? != 0, $?;
 }
 
-eval { die "foo\n" };
+try { die "foo\n" };
 ok $@->{description} eq "foo\n", $@;
 
 ok $$ +> 0, $$;
-eval { $$++ };
+try { $$++ };
 ok $@->{description} =~ m/^Modification of a read-only value attempted/;
 
 our ($wd, $script);
@@ -399,12 +399,12 @@ if ($Is_miniperl) {
 }
 
 ok $^S == 0 && defined $^S;
-eval { ok $^S == 1 };
+try { ok $^S == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
 ok $^S == 0 && defined $^S;
 
 ok $^TAINT == 0;
-eval { $^TAINT = 1 };
+try { $^TAINT = 1 };
 ok $^TAINT == 0;
 
 # 5.6.1 had a bug: @+ and @- were not properly interpolated
@@ -452,13 +452,13 @@ if (!$Is_VMS) {
     # This used to be __PACKAGE__, but that causes recursive
     #  inheritance, which is detected earlier now and broke
     #  this test
-    eval { push @ISA, __FILE__ };
+    try { push @ISA, __FILE__ };
     ok( $@ eq '', 'Push a constant on a magic array');
     $@ and print "# $@";
-    eval { %ENV = (PATH => __PACKAGE__) };
+    try { %ENV = (PATH => __PACKAGE__) };
     ok( $@ eq '', 'Assign a constant to a magic hash');
     $@ and print "# $@";
-    eval { my %h = qw(A B); %ENV = (PATH => (keys %h)[[0]]) };
+    try { my %h = qw(A B); %ENV = (PATH => (keys %h)[[0]]) };
     ok( $@ eq '', 'Assign a shared key to a magic hash');
     $@ and print "# $@";
 }

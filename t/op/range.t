@@ -192,7 +192,7 @@ my $MAX_INT = ^~^0>>1;
 
 foreach my $ii (-3 .. 3) {
     my ($first, $last);
-    eval {
+    try {
         my $lim=0;
         for ($MAX_INT-10 .. $MAX_INT+$ii) {
             if (! defined($first)) {
@@ -213,7 +213,7 @@ foreach my $ii (-3 .. 3) {
 
 foreach my $ii (-3 .. 3) {
     my ($first, $last);
-    eval {
+    try {
         my $lim=0;
         for ($MAX_INT+$ii .. $MAX_INT) {
             if (! defined($first)) {
@@ -234,7 +234,7 @@ foreach my $ii (-3 .. 3) {
 
 {
     my $first;
-    eval {
+    try {
         my $lim=0;
         for ($MAX_INT .. $MAX_INT-1) {
             if (! defined($first)) {
@@ -248,7 +248,7 @@ foreach my $ii (-3 .. 3) {
 }
 
 foreach my $ii (^~^0, ^~^0+1, ^~^0+(^~^0>>4)) {
-    eval {
+    try {
         my $lim=0;
         for ($MAX_INT-10 .. $ii) {
             last if ($lim++ +> 100);
@@ -272,7 +272,7 @@ if (! %Config{d_nv_preserves_uv}) {
 
 foreach my $ii (-3 .. 3) {
     my ($first, $last);
-    eval {
+    try {
         my $lim=0;
         for ($MIN_INT+$ii .. $MIN_INT+10) {
             if (! defined($first)) {
@@ -293,7 +293,7 @@ foreach my $ii (-3 .. 3) {
 
 foreach my $ii (-3 .. 3) {
     my ($first, $last);
-    eval {
+    try {
         my $lim=0;
         for ($MIN_INT .. $MIN_INT+$ii) {
             if (! defined($first)) {
@@ -314,7 +314,7 @@ foreach my $ii (-3 .. 3) {
 
 {
     my $first;
-    eval {
+    try {
         my $lim=0;
         for ($MIN_INT+1 .. $MIN_INT) {
             if (! defined($first)) {
@@ -328,7 +328,7 @@ foreach my $ii (-3 .. 3) {
 }
 
 foreach my $ii (^~^0, ^~^0+1, ^~^0+(^~^0>>4)) {
-    eval {
+    try {
         my $lim=0;
         for (-$ii .. $MIN_INT+10) {
             last if ($lim++ +> 100);

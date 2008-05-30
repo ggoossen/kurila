@@ -5,14 +5,14 @@ print "1..3\n";
 my ($err, $x);
 
 $err = "#[\000]\nok 1\n";
-eval {
+try {
     die $err;
 };
 
 print "not " unless $@->{description} eq $err;
 print "ok 1\n";
 
-eval {
+try {
     local $^DIE_HOOK = sub { print "ok ", @_[0]->{description}, "\n" } ;
 
     die 2;

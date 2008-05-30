@@ -15,7 +15,7 @@ print "# Tests with caller(0)\n";
 @c = caller(0);
 ok( (!@c), "caller(0) in main program" );
 
-eval { @c = caller(0) };
+try { @c = caller(0) };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
 ok( !@c[4], "hasargs false in an eval \{\}" );
 
@@ -45,7 +45,7 @@ ok( @c[4], "hasargs true with callf()" );
 &callf;
 ok( !@c[4], "hasargs false with &callf" );
 
-eval { f() };
+try { f() };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
 ok( !@c[4], "hasargs false in an eval \{\}" );
 

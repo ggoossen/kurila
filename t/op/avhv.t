@@ -42,32 +42,32 @@ $sch = \%(
 $a = \@();
 $a->[0] = $sch;
 
-eval {
+try {
     $a->{'abc'} = 'ABC';
 };
 not_hash($@);
 
-eval {
+try {
     $a->{'def'} = 'DEF';
 };
 not_hash($@);
 
-eval {
+try {
     $a->{'jkl'} = 'JKL';
 };
 not_hash($@);
 
-eval {
+try {
     @keys = keys %$a;
 };
 not_hash($@);
 
-eval {
+try {
     @values = values %$a;
 };
 not_hash($@);
 
-eval {
+try {
     while( my($k,$v) = each %$a ) {
         no_op;
     }
@@ -80,12 +80,12 @@ tie @fake, 'Tie::StdArray';
 $a = \@fake;
 $a->[0] = $sch;
 
-eval {
+try {
     $a->{'abc'} = 'ABC';
 };
 not_hash($@);
 
-eval {
+try {
     if ($a->{'abc'} eq 'ABC') { no_op(23) } else { no_op(42) }
 };
 not_hash($@);
@@ -95,12 +95,12 @@ tie @fake, 'Tie::BasicArray';
 $a = \@fake;
 $a->[0] = $sch;
 
-eval {
+try {
     $a->{'abc'} = 'ABC';
 };
 not_hash($@);
 
-eval {
+try {
     if ($a->{'abc'} eq 'ABC') { no_op(23) } else { no_op(42) }
 };
 not_hash($@);
@@ -111,19 +111,19 @@ tie %fake, 'Tie::StdHash';
 %fake = %$sch;
 $a->[0] = \%fake;
 
-eval {
+try {
     $a->{'abc'} = 'ABC';
 };
 not_hash($@);
 
-eval {
+try {
     if ($a->{'abc'} eq 'ABC') { no_op(23) } else { no_op(42) }
 };
 not_hash($@);
 
 
 # hash slice
-eval {
+try {
     my $slice = join('', 'x',%$a{['abc','def']},'x');
 };
 not_hash($@);
@@ -132,23 +132,23 @@ not_hash($@);
 # evaluation in scalar context
 my $avhv = \@(\%());
 
-eval {
+try {
     () = %$avhv;
 };
 not_hash($@);
 
 push @$avhv, "a";
-eval {
+try {
     () = %$avhv;
 };
 not_hash($@);
 
 $avhv = \@();
-eval { $a = %$avhv };
+try { $a = %$avhv };
 not_hash($@);
 
 $avhv = \@(\%(foo=>1, bar=>2));
-eval {
+try {
     %$avhv =~ m,^\d+/\d+,;
 };
 not_hash($@);
@@ -160,121 +160,121 @@ sub f {
     print "ok 11\n";
 }
 $a = \@(\%(key => 1), 'a');
-eval {
+try {
     f($a->{key});
 };
 not_hash($@);
 
 # check if exists() is behaving properly
 $avhv = \@(\%(foo=>1,bar=>2,pants=>3));
-eval {
+try {
     no_op if exists $avhv->{bar};
 };
 not_hash($@);
 
-eval {
+try {
     $avhv->{pants} = undef;
 };
 not_hash($@);
 
-eval {
+try {
     no_op if exists $avhv->{pants};
 };
 not_hash($@);
 
-eval {
+try {
     no_op if exists $avhv->{bar};
 };
 not_hash($@);
 
-eval {
+try {
     $avhv->{bar} = 10;
 };
 not_hash($@);
 
-eval {
+try {
     no_op unless exists $avhv->{bar} and $avhv->{bar} == 10;
 };
 not_hash($@);
 
-eval {
+try {
     $v = delete $avhv->{bar};
 };
 not_hash($@);
 
-eval {
+try {
     no_op if exists $avhv->{bar};
 };
 not_hash($@);
 
-eval {
+try {
     $avhv->{foo} = 'xxx';
 };
 not_hash($@);
-eval {
+try {
     $avhv->{bar} = 'yyy';
 };
 not_hash($@);
-eval {
+try {
     $avhv->{pants} = 'zzz';
 };
 not_hash($@);
-eval {
+try {
     @x = delete %{$avhv}{['foo','pants']};
 };
 not_hash($@);
-eval {
+try {
     no_op unless "$avhv->{bar}" eq "yyy";
 };
 not_hash($@);
 
 # hash assignment
-eval {
+try {
     %$avhv = ();
 };
 not_hash($@);
 
-eval {
+try {
     %hv = %$avhv;
 };
 not_hash($@);
 
-eval {
+try {
     %$avhv = (foo => 29, pants => 2, bar => 0);
 };
 not_hash($@);
 
 my $extra;
 my @extra;
-eval {
+try {
     ($extra, %$avhv) = ("moo", foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
-eval {
+try {
     %$avhv = ();
     (%$avhv, $extra) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
-eval {
+try {
     @extra = qw(whatever and stuff);
     %$avhv = ();
 };
 not_hash($@);
-eval {
+try {
     (%$avhv, @extra) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
-eval {
+try {
     (@extra, %$avhv) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
 # Check hash slices (BUG ID 20010423.002)
 $avhv = \@(\%(foo=>1, bar=>2));
-eval {
+try {
     %$avhv{["foo", "bar"]} = (42, 53);
 };
 not_hash($@);

@@ -15,7 +15,7 @@ BEGIN {
     print "1..2\n";
 }
 
-eval { require Term::ANSIColor };
+try { require Term::ANSIColor };
 if ($@) {
     for (1..2) {
         print "ok $_ # skip\n";

@@ -115,7 +115,7 @@ for ($i = 1; @tests; $i++) {
 	elsif ($result =~ m/[-+]\d{3}$/ &&
 		   # Suppress tests with modulo of exponent >= 100 on platforms
 		   # which can't handle such magnitudes (or where we can't tell).
-		   ((!eval {require POSIX}) || # Costly: only do this if we must!
+		   ((!try {require POSIX}) || # Costly: only do this if we must!
 			(length(&POSIX::DBL_MAX) - rindex(&POSIX::DBL_MAX, '+')) == 3))
 	{
 		print("ok $i # >$template< >$data< >$result<",

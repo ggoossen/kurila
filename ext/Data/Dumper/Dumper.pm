@@ -27,7 +27,7 @@ BEGIN {
     # if run under miniperl, or otherwise lacking dynamic loading,
     # XSLoader should be attempted to load, or the pure perl flag
     # toggled on load failure.
-    eval {
+    try {
 	require XSLoader;
     };
     $Useperl = 1 if $@;
@@ -270,7 +270,7 @@ sub _dump {
     # implementation.
     my $freezer = $s->{freezer};
     if ($freezer and UNIVERSAL::can($val, $freezer)) {
-      eval { $val->?$freezer() };
+      try { $val->?$freezer() };
       warn "WARNING(Freezer method call failed): {$@->message}" if $@;
     }
 

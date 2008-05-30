@@ -129,9 +129,9 @@ sub load_loc {
     my $pkg = join('::', grep { defined and length } %args{Class}, %args{Subclass});
     return %Loc{$pkg} if exists %Loc{$pkg};
 
-    eval { require Locale::Maketext::Lexicon; 1 }   or return;
+    try { require Locale::Maketext::Lexicon; 1 }   or return;
     $Locale::Maketext::Lexicon::VERSION +> 0.20	    or return;
-    eval { require File::Spec; 1 }		    or return;
+    try { require File::Spec; 1 }		    or return;
 
     my $path = %args{Path} || $class->auto_path(%args{Class}) or return;
     my $pattern = File::Spec->catfile($path, '*.[pm]o');
@@ -158,7 +158,7 @@ sub load_loc {
 	1;
     " or die $@;
     
-    my $lh = eval { $pkg->get_handle } or return;
+    my $lh = try { $pkg->get_handle } or return;
     my $style = lc(%args{Style});
     if ($style eq 'maketext') {
 	%Loc{$pkg} = sub {

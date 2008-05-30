@@ -21,7 +21,7 @@ $reopen = ($^O eq 'VMS' ||
 $x = 'abc';
 
 # should not be able to do negative lengths
-eval { sysread(I, $x, -1) };
+try { sysread(I, $x, -1) };
 print 'not ' unless ($@->{description} =~ m/^Negative length/);
 print "ok 1\n";
 
@@ -30,7 +30,7 @@ print 'not ' unless ($x eq 'abc');
 print "ok 2\n";
 
 # should not be able to read before the buffer
-eval { sysread(I, $x, 1, -4) };
+try { sysread(I, $x, 1, -4) };
 print 'not ' unless ($x eq 'abc');
 print "ok 3\n";
 
@@ -71,7 +71,7 @@ open(O, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 select(O); $|=1; select(STDOUT);
 
 # cannot write negative lengths
-eval { syswrite(O, $x, -1) };
+try { syswrite(O, $x, -1) };
 print 'not ' unless ($@->{description} =~ m/^Negative length/);
 print "ok 11\n";
 
@@ -84,7 +84,7 @@ print 'not ' if (-s $outfile);
 print "ok 13\n";
 
 # should not be able to write from after the buffer
-eval { syswrite(O, $x, 1, 3) };
+try { syswrite(O, $x, 1, 3) };
 print 'not ' unless ($@->{description} =~ m/^Offset outside string/);
 print "ok 14\n";
 
@@ -101,7 +101,7 @@ print "ok 16\n";
 
 # should not be able to write from before the buffer
 
-eval { syswrite(O, $x, 1, -4) };
+try { syswrite(O, $x, 1, -4) };
 print 'not ' unless ($@->{description} =~ m/^Offset outside string/);
 print "ok 17\n";
 
@@ -221,7 +221,7 @@ unlink $outfile;
 # Check that utf8 IO doesn't upgrade the scalar
 open(I, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
 # Will skip harmlessly on stdioperl
-eval {binmode STDOUT, ":utf8"};
+try {binmode STDOUT, ":utf8"};
 die $@ if $@ and $@->{description} !~ m/^IO layers \(like ':utf8'\) unavailable/;
 
 $a = "\x[FF]";
@@ -234,7 +234,7 @@ syswrite I, $a;
 print $a ne "\x[FF]" ? "not ok 41\n" : "ok 41\n";
 
 # This should work
-eval {syswrite I, 2;};
+try {syswrite I, 2;};
 print $@ eq "" ? "ok 42\n" : "not ok 42 # $@";
 
 close(I);

@@ -105,10 +105,10 @@ for my $full (keys %fonts) {
 
 sub opta { my @a=() }
 sub opth { my %h=() }
-eval { my $x = opta };
+try { my $x = opta };
 print "not " if $@;
 print "ok 32\n";
-eval { my $x = opth };
+try { my $x = opth };
 print "not " if $@;
 print "ok 33\n";
 
@@ -118,7 +118,7 @@ sub foo3 {
     print "not " if defined $x->{bar};
     ++$x->{bar};
 }
-eval { foo3(); foo3(); };
+try { foo3(); foo3(); };
 print "not " if $@;
 print "ok 34\n";
 

@@ -672,7 +672,7 @@ sub eval {
     # that it will be stored in.
     our @saved;
     local @saved[0];    # Preserve the old value of $@
-    eval { &DB::save };
+    try { &DB::save };
 
     # Now see whether we need to report an error back to the user.
     if ($at) {
@@ -1265,7 +1265,7 @@ pager(
     ? %ENV{PAGER}
 
       # If not, see if Config.pm defines it.
-    : eval { require Config }
+    : try { require Config }
       && defined %Config::Config{pager}
     ? %Config::Config{pager}
 
@@ -1873,7 +1873,7 @@ sub DB {
 	lock($DBGR);
 	my $tid;
 	if (%ENV{PERL5DB_THREADED}) {
-		$tid = eval { "[".threads->tid."]" };
+		$tid = try { "[".threads->tid."]" };
 	}
 
     # Check for whether we should be running continuously or not.
@@ -2441,7 +2441,7 @@ Uses C<dumpvar.pl> to dump out the current values for selected variables.
 
                         # must detect sigpipe failures  - not catching
                         # then will cause the debugger to die.
-                        eval {
+                        try {
                             &main::dumpvar(
                                 $packname,
                                 defined %option{dumpDepth}
@@ -2621,7 +2621,7 @@ above the current one and then displays then using C<dumpvar.pl>.
                 $cmd =~ m/^y(?:\s+(\d*)\s*(.*))?$/ && do {
 
                     # See if we've got the necessary support.
-                    eval { require PadWalker; PadWalker->VERSION(0.08) }
+                    try { require PadWalker; PadWalker->VERSION(0.08) }
                       or &warn(
                         $@->{description} =~ m/locate/
                         ? "PadWalker module not found - please install\n"
@@ -2639,7 +2639,7 @@ above the current one and then displays then using C<dumpvar.pl>.
                     my @vars = split( ' ', $2 || '' );
 
                     # Find the pad.
-                    my $h = eval { PadWalker::peek_my( ( $1 || 0 ) + 1 ) };
+                    my $h = try { PadWalker::peek_my( ( $1 || 0 ) + 1 ) };
 
                     # Oops. Can't find it.
                     $@ and $@ =~ s/ at .*//, &warn($@), next CMD;
@@ -3337,7 +3337,7 @@ Return to any given position in the B<true>-history list
                     # connections" on p5p.
 
                     my $max_fd = 1024; # default if POSIX can't be loaded
-                    if (eval { require POSIX }) {
+                    if (try { require POSIX }) {
                         $max_fd = POSIX::sysconf(POSIX::_SC_OPEN_MAX());
                     }
 
@@ -3460,7 +3460,7 @@ any variables we might want to address in the C<DB> package.
                 $onetimedumpDepth = undef;
             }
             elsif ( $term_pid == $$ ) {
-		eval {		# May run under miniperl, when not available...
+		try {		# May run under miniperl, when not available...
                     STDOUT->flush();
                     STDERR->flush();
 		};
@@ -3935,13 +3935,13 @@ sub cmd_A {
     # if delete_action blows up for some reason, in which case
     # we print $@ and get out.
     if ( $line eq '*' ) {
-        eval { &delete_action(); 1 } or print $OUT $@ and return;
+        try { &delete_action(); 1 } or print $OUT $@ and return;
     }
 
     # There's a real line  number. Pass it to delete_action.
     # Error trapping is as above.
     elsif ( $line =~ m/^(\S.*)/ ) {
-        eval { &delete_action($1); 1 } or print $OUT $@ and return;
+        try { &delete_action($1); 1 } or print $OUT $@ and return;
     }
 
     # Swing and a miss. Bad syntax.
@@ -4332,7 +4332,7 @@ doesn't work.
 =cut 
 
 sub cmd_b_line {
-    eval { break_on_line(@_); 1 } or do {
+    try { break_on_line(@_); 1 } or do {
         local $\ = '';
         print $OUT $@ and return;
     };
@@ -4474,7 +4474,7 @@ sub cmd_b_sub {
     } ## end unless (ref $subname eq 'CODE')
 
     # Try to set the breakpoint.
-    eval { break_subroutine( $subname, $cond ); 1 } or do {
+    try { break_subroutine( $subname, $cond ); 1 } or do {
         local $\ = '';
         print $OUT $@ and return;
       }
@@ -4504,12 +4504,12 @@ sub cmd_B {
 
     # If it's * we're deleting all the breakpoints.
     if ( $line eq '*' ) {
-        eval { &delete_breakpoint(); 1 } or print $OUT $@ and return;
+        try { &delete_breakpoint(); 1 } or print $OUT $@ and return;
     }
 
     # If there is a line spec, delete the breakpoint on that line.
     elsif ( $line =~ m/^(\S.*)/ ) {
-        eval { &delete_breakpoint( $line || $dbline ); 1 } or do {
+        try { &delete_breakpoint( $line || $dbline ); 1 } or do {
             local $\ = '';
             print $OUT $@ and return;
         };
@@ -4758,7 +4758,7 @@ Display the (nested) parentage of the module or object given.
 sub cmd_i {
     my $cmd  = shift;
     my $line = shift;
-    eval { require Class::ISA };
+    try { require Class::ISA };
     if ($@) {
         &warn( $@->{description} =~ m/locate/
             ? "Class::ISA module not found - please install\n"
@@ -5942,7 +5942,7 @@ sub setterm {
     # Load Term::Readline, but quietly; don't debug it and don't trace it.
     local $frame = 0;
     local $doret = -2;
-    eval { require Term::ReadLine } or die $@;
+    try { require Term::ReadLine } or die $@;
 
     # If noTTY is set, but we have a TTY name, go ahead and hook up to it.
     if ($notty) {
@@ -6029,8 +6029,8 @@ sub load_hist {
 
 sub save_hist {
     return unless defined $histfile;
-    eval { require File::Path } or return;
-    eval { require File::Basename } or return;
+    try { require File::Path } or return;
+    try { require File::Basename } or return;
     File::Path::mkpath(File::Basename::dirname($histfile));
     open my $fh, ">", $histfile or die "Could not open '$histfile': $!";
     $histsize //= option_val("HistSize",100);
@@ -6108,7 +6108,7 @@ sub os2_get_fork_TTY { # A simplification of the following (and works without):
     my %opt = (	title => "Daughter Perl debugger $pids $name",
 		($rl ? (read_by_key => 1) : ()) );
     require OS2::Process;
-    my ($in, $out, $pid) = eval { OS2::Process::io_term(related => 0, %opt) }
+    my ($in, $out, $pid) = try { OS2::Process::io_term(related => 0, %opt) }
       or return;
     $pidprompt = '';    # Shown anyway in titlebar
     reset_IN_OUT($in, $out);
@@ -6760,7 +6760,7 @@ sub TTY {
     # switch to this terminal.  There may be a better place to make
     # sure that $term is defined on VMS
     if ( @_ and ($^O eq 'VMS') and !defined($term) ) {
-	eval { require Term::ReadLine } or die $@;
+	try { require Term::ReadLine } or die $@;
         if ( !$rl ) {
 	    $term = Term::ReadLine::Stub->new( 'perldb', $IN, $OUT);
 	}
@@ -6954,7 +6954,7 @@ sub ornaments {
 
         # No ornaments if the terminal doesn't support them.
         return '' unless $term->Features->{ornaments};
-        eval { $term->ornaments(@_) } || '';
+        try { $term->ornaments(@_) } || '';
     }
 
     # Use what was passed in if we can't determine it ourselves.
@@ -7615,7 +7615,7 @@ sub CvGV_name_or_bust {
     return if $skipCvGV;    # Backdoor to avoid problems if XS broken...
     return unless ref $in;
     $in = \&$in;            # Hard reference...
-    eval { require Devel::Peek; 1 } or return;
+    try { require Devel::Peek; 1 } or return;
     my $gv = Devel::Peek::CvGV($in) or return;
     *$gv{PACKAGE} . '::' . *$gv{NAME};
 } ## end sub CvGV_name_or_bust

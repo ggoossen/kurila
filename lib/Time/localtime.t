@@ -7,7 +7,7 @@ BEGIN {
 
 BEGIN {
     our $haslocal;
-    eval { my $n = localtime 0 };
+    try { my $n = localtime 0 };
     $haslocal = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($haslocal) { print "1..0 # Skip: no localtime\n"; exit 0 }
 }

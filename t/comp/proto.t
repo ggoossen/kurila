@@ -408,7 +408,7 @@ print "# CORE::open => ($p)\nnot " if ($p = prototype('CORE::open')) ne '*;$@';
 print "ok ", $i++, "\n";
 
 print "# CORE:Foo => ($p), \$@ => `$@'\nnot " 
-    if defined ($p = eval { prototype('CORE::Foo') or 1 }) or $@->message !~ m/^Can't find an opnumber/;
+    if defined ($p = try { prototype('CORE::Foo') or 1 }) or $@->message !~ m/^Can't find an opnumber/;
 print "ok ", $i++, "\n";
 
 # correctly note too-short parameter lists that don't end with '$',
@@ -426,7 +426,7 @@ print "ok ", $i++, "\n";
 
 sub X::foo3;
 *X::foo3 = sub {'ok'};
-print "# $@not " unless eval {X->foo3} eq 'ok';
+print "# $@not " unless try {X->foo3} eq 'ok';
 print "ok ", $i++, "\n";
 
 sub X::foo4 ($);

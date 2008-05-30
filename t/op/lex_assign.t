@@ -149,7 +149,7 @@ EOE
  }
 }
 
-eval {
+try {
     sub PVBM () { 'foo' }
     index 'foo', PVBM;
     my $x = PVBM;

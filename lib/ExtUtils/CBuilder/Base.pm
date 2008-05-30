@@ -124,7 +124,7 @@ sub have_compiler {
   }
 
   my ($obj_file, @lib_files);
-  eval {
+  try {
     $obj_file = $self->compile(source => $tmpfile);
     @lib_files = $self->link(objects => $obj_file, module_name => 'compilet');
   };

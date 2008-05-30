@@ -9,7 +9,7 @@ my $minitest   = %ENV{PERL_CORE_MINITEST};
 my $has_perlio = %Config{useperlio};
 
 if (!$minitest) {
-    if (%Config{d_fork} && eval { require POSIX; 1 } ) {
+    if (%Config{d_fork} && try { require POSIX; 1 } ) {
 	$can_fork = 1;
     }
 }
@@ -48,10 +48,10 @@ sub fooinc {
 
 push @INC, \&fooinc;
 
-my $evalret = eval { require Bar; 1 };
+my $evalret = try { require Bar; 1 };
 ok( !$evalret,      'Trying non-magic package' );
 
-$evalret = eval { require Foo; 1 };
+$evalret = try { require Foo; 1 };
 die $@ if $@;
 ok( $evalret,                      'require Foo; magic via code ref'  );
 ok( exists %INC{'Foo.pm'},         '  %INC sees Foo.pm' );
@@ -65,7 +65,7 @@ ok( exists %INC{'Foo1.pm'},        '  %INC sees Foo1.pm' );
 is( ref %INC{'Foo1.pm'}, 'CODE',   '  val Foo1.pm is a coderef in %INC' );
 cmp_ok( %INC{'Foo1.pm'}, '\==', \&fooinc,     '  val Foo1.pm is correct in %INC' );
 
-$evalret = eval { do 'Foo2.pl'; 1 };
+$evalret = try { do 'Foo2.pl'; 1 };
 die $@ if $@;
 ok( $evalret,                      'do "Foo2.pl"' );
 ok( exists %INC{'Foo2.pl'},        '  %INC sees Foo2.pl' );
@@ -88,13 +88,13 @@ sub fooinc2 {
 my $arrayref = \@( \&fooinc2, 'Bar' );
 push @INC, $arrayref;
 
-$evalret = eval { require Foo; 1; };
+$evalret = try { require Foo; 1; };
 die $@ if $@;
 ok( $evalret,                     'Originally loaded packages preserved' );
-$evalret = eval { require Foo3; 1; };
+$evalret = try { require Foo3; 1; };
 ok( !$evalret,                    'Original magic INC purged' );
 
-$evalret = eval { require Bar; 1 };
+$evalret = try { require Bar; 1 };
 die $@ if $@;
 ok( $evalret,                     'require Bar; magic via array ref' );
 ok( exists %INC{'Bar.pm'},        '  %INC sees Bar.pm' );
@@ -106,7 +106,7 @@ ok( exists %INC{'Bar1.pm'},       '  %INC sees Bar1.pm' );
 is( ref %INC{'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in %INC' );
 cmp_ok( %INC{'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in %INC' );
 
-ok( eval { do 'Bar2.pl'; 1 },     'do "Bar2.pl"' );
+ok( try { do 'Bar2.pl'; 1 },     'do "Bar2.pl"' );
 ok( exists %INC{'Bar2.pl'},       '  %INC sees Bar2.pl' );
 is( ref %INC{'Bar2.pl'}, 'ARRAY', '  val Bar2.pl is an arrayref in %INC' );
 cmp_ok( %INC{'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in %INC' );
@@ -126,7 +126,7 @@ sub FooLoader::INC {
 my $href = bless( \%(), 'FooLoader' );
 push @INC, $href;
 
-$evalret = eval { require Quux; 1 };
+$evalret = try { require Quux; 1 };
 die $@ if $@;
 ok( $evalret,                      'require Quux; magic via hash object' );
 ok( exists %INC{'Quux.pm'},        '  %INC sees Quux.pm' );
@@ -139,7 +139,7 @@ pop @INC;
 my $aref = bless( \@(), 'FooLoader' );
 push @INC, $aref;
 
-$evalret = eval { require Quux1; 1 };
+$evalret = try { require Quux1; 1 };
 die $@ if $@;
 ok( $evalret,                      'require Quux1; magic via array object' );
 ok( exists %INC{'Quux1.pm'},       '  %INC sees Quux1.pm' );
@@ -152,7 +152,7 @@ pop @INC;
 my $sref = bless( \(my $x = 1), 'FooLoader' );
 push @INC, $sref;
 
-$evalret = eval { require Quux2; 1 };
+$evalret = try { require Quux2; 1 };
 die $@ if $@;
 ok( $evalret,                      'require Quux2; magic via scalar object' );
 ok( exists %INC{'Quux2.pm'},       '  %INC sees Quux2.pm' );
@@ -173,7 +173,7 @@ push @INC, sub {
     }
 };
 
-$evalret = eval { require Toto; 1 };
+$evalret = try { require Toto; 1 };
 die $@ if $@;
 ok( $evalret,                      'require Toto; magic via anonymous code ref'  );
 ok( exists %INC{'Toto.pm'},        '  %INC sees Toto.pm' );
@@ -201,7 +201,7 @@ is( $ret, 'abc', 'do "abc.pl" sees return value' );
     #local @INC; # local fails on tied @INC
     my @old_INC = @INC; # because local doesn't work on tied arrays
     @INC = sub { $filename = 'seen'; return undef; };
-    eval { require $filename; };
+    try { require $filename; };
     is( $filename, 'seen', 'the coderef sees fully-qualified pathnames' );
     @INC = @old_INC;
 }

@@ -8,7 +8,7 @@ BEGIN {
 
 use Config;
 BEGIN {
-    eval {require Errno; Errno->import;};
+    try {require Errno; Errno->import;};
 }
 plan(tests => 9);
 
