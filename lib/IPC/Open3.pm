@@ -191,7 +191,7 @@ sub _open3 {
     # it's too ugly to use @_ throughout to make perl do it for us
     # tchrist 5-Mar-00
 
-    unless (eval  {
+    unless (try  {
 	$dad_wtr = @_[1] = gensym unless defined $dad_wtr;
 	$dad_rdr = @_[2] = gensym unless defined $dad_rdr;
 	1; }) 
@@ -265,7 +265,7 @@ sub _open3 {
 	local($")=(" ");
 	exec @cmd or do {
 	    carp "$Me: exec of @cmd failed";
-	    eval { require POSIX; POSIX::_exit(255); };
+	    try { require POSIX; POSIX::_exit(255); };
 	    exit 255;
 	};
     } elsif ($do_spawn) {
@@ -296,7 +296,7 @@ sub _open3 {
 	  $kid_err = $kid_wtr;
 	}
 	require IO::Pipe;
-	$kidpid = eval {
+	$kidpid = try {
 	    spawn_with_handles( \@( \%( mode => 'r',
 				    open_as => $kid_rdr,
 				    handle => \*STDIN ),
@@ -342,7 +342,7 @@ sub spawn_with_handles {
     }
     foreach $fd (@$fds) {
 	bless $fd->{handle}, 'IO::Handle'
-	    unless eval { $fd->{handle}->isa('IO::Handle') } ;
+	    unless try { $fd->{handle}->isa('IO::Handle') } ;
 	# If some of handles to redirect-to coincide with handles to
 	# redirect, we need to use saved variants:
 	$fd->{handle}->fdopen(%saved{fileno $fd->{open_as}} || $fd->{open_as},
@@ -357,7 +357,7 @@ sub spawn_with_handles {
     }
 
     unless (@errs) {
-	$pid = eval { system 1, @_ }; # 1 == P_NOWAIT
+	$pid = try { system 1, @_ }; # 1 == P_NOWAIT
 	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid +< 0;
     }
 

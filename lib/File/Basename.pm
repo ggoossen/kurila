@@ -41,7 +41,7 @@ package File::Basename;
 # File::Basename is used during the Perl build, when the re extension may
 # not be available.
 BEGIN {
-  unless (eval { require re; })
+  unless (try { require re; })
     { eval ' sub re::import { $^H ^|^= 0x00100000; } ' } # HINT_RE_TAINT
   re->import('taint');
 }

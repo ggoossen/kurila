@@ -7,7 +7,7 @@ print "1..1\n";
 $huge='overflow';
 $Text::Wrap::columns=9;
 $break="(?<=[,.])";
-eval {
+try {
 $a=wrap('','',
 "mmmm,n,ooo,ppp.qqqq.rrrrr.adsljasdf\nlasjdflajsdflajsdfljasdfl\nlasjdflasjdflasf,sssssssssssss,ttttttttt,uu,vvv wwwwwwwww####\n");
 };

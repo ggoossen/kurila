@@ -201,14 +201,14 @@ SKIP: {
 SKIP: {
     skip "has fchmod", 1 if (%Config{d_fchmod} || "") eq "define";
     open(my $fh, "<", "a");
-    eval { chmod(0777, $fh); };
+    try { chmod(0777, $fh); };
     like($@->{description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
 }
 
 SKIP: {
     skip "has fchown", 1 if (%Config{d_fchown} || "") eq "define";
     open(my $fh, "<", "a");
-    eval { chown(0, 0, $fh); };
+    try { chown(0, 0, $fh); };
     like($@->{description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
 }
 
@@ -298,7 +298,7 @@ sub check_utime_result {
 SKIP: {
     skip "has futimes", 1 if (%Config{d_futimes} || "") eq "define";
     open(my $fh, "<", "b") || die;
-    eval { utime(undef, undef, $fh); };
+    try { utime(undef, undef, $fh); };
     like($@->{description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
 }
 
@@ -342,7 +342,7 @@ close(IOFSCOM);
 
 SKIP: {
 # Check truncating a closed file.
-    eval { truncate "Iofs.tmp", 5; };
+    try { truncate "Iofs.tmp", 5; };
 
     skip("no truncate - $@", 8) if $@;
 

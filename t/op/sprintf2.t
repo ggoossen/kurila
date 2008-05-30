@@ -81,7 +81,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 		$bad++;
 	    }
 	};
-	my $r = eval {sprintf '%v' . chr $ord};
+	my $r = try {sprintf '%v' . chr $ord};
 	is ($bad, 0, "pattern '\%v' . chr $ord");
     }
 }

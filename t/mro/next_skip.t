@@ -65,7 +65,7 @@ is(Diamond_D->foo, 'Diamond_D::foo => Diamond_C::foo', '... skipped B and went t
 is(Diamond_D->bar, 'Diamond_D::bar => Diamond_A::bar', '... skipped B & C and went to A correctly');
 is(Diamond_D->baz, 'Diamond_B::baz => Diamond_A::baz', '... called B method, skipped C and went to A correctly');
 is(Diamond_D->buz, 'Diamond_D::buz => Diamond_B::baz => Diamond_A::baz', '... called D method dispatched to , different method correctly');
-eval { Diamond_D->fuz };
+try { Diamond_D->fuz };
 like($@->{description}, qr/^No next::method 'fuz' found for Diamond_D/, '... cannot re-dispatch to a method which is not there');
 
 is(Diamond_D->woz, 'Diamond_D::woz can => 1', '... can re-dispatch figured out correctly');

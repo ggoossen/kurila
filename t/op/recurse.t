@@ -113,7 +113,7 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 # check ok for recursion depth > 65536
 {
     my $r;
-    eval { 
+    try { 
 	$r = runperl(
 		     nolib => 1,
 		     stderr => 1,

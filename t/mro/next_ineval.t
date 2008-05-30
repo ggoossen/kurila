@@ -27,7 +27,7 @@ This tests the use of an eval{} block to wrap a next::method call.
     use mro 'c3'; 
     
     sub foo {
-      eval {
+      try {
         return 'B::foo => ' . (shift)->next::method();
       };
 

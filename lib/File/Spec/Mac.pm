@@ -10,7 +10,7 @@ $VERSION = '3.2701';
 
 my $macfiles;
 if ($^O eq 'MacOS') {
-	$macfiles = eval { require Mac::Files };
+	$macfiles = try { require Mac::Files };
 }
 
 sub case_tolerant { 1 }

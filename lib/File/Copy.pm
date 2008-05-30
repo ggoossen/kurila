@@ -43,7 +43,7 @@ sub carp {
 
 my $macfiles;
 if ($^O eq 'MacOS') {
-	$macfiles = eval { require Mac::MoreFiles };
+	$macfiles = try { require Mac::MoreFiles };
 	warn 'Mac::MoreFiles could not be loaded; using non-native syscopy'
 		if $@ && $^W;
 }
@@ -269,7 +269,7 @@ sub move {
 
     {
         local $@;
-        eval {
+        try {
             copy($from,$to) or die;
             my($atime, $mtime) = (stat($from))[[8,9]];
             utime($atime, $mtime, $to);

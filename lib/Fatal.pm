@@ -94,7 +94,7 @@ sub _make_fatal {
 	# Stray user subroutine
 	die "$sub is not a Perl subroutine" 
     } else {			# CORE subroutine
-        $proto = eval { prototype "CORE::$name" };
+        $proto = try { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
 	  if $@;
 	die "Cannot make the non-overridable builtin $name fatal"

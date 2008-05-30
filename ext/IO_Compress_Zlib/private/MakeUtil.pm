@@ -9,7 +9,7 @@ use File::Copy;
 
 BEGIN
 {
-    eval { require File::Spec::Functions ; File::Spec::Functions->import() } ;
+    try { require File::Spec::Functions ; File::Spec::Functions->import() } ;
     if ($@)
     {
         *catfile = sub { return "@_[0]/@_[1]" }

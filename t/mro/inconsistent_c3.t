@@ -40,5 +40,5 @@ except TypeError:
     our @ISA = ('Y', 'X');
 }
 
-eval { @Z::ISA = ('XY', 'YX') };
+try { @Z::ISA = ('XY', 'YX') };
 like($@->{description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');

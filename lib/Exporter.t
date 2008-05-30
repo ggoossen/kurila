@@ -63,7 +63,7 @@ our @EXPORT_OK = qw(under &your $seat);
 our $VERSION = '1.05';
 
 ::ok( Testing->require_version(1.05),   'require_version()' );
-eval { Testing->require_version(1.11); 1 };
+try { Testing->require_version(1.11); 1 };
 ::ok( $@,                               'require_version() fail' );
 ::ok( Testing->require_version(0),      'require_version(0)' );
 
@@ -100,7 +100,7 @@ Testing->import;
 
 ::ok( defined &lifejacket,      'simple import' );
 
-my $got = eval {&lifejacket};
+my $got = try {&lifejacket};
 ::ok ( $@ eq "", 'check we can call the imported subroutine')
   or print STDERR "# \$\@ is $@\n";
 ::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
@@ -163,7 +163,7 @@ Testing->import('!/e/');
   package More::Testing;
   our @ISA = qw(Exporter);
   our $VERSION = 0;
-  eval { More::Testing->require_version(0); 1 };
+  try { More::Testing->require_version(0); 1 };
   ::ok(!$@,       'require_version(0) and $VERSION = 0');
 }
 
@@ -171,7 +171,7 @@ Testing->import('!/e/');
   package Yet::More::Testing;
   our @ISA = qw(Exporter);
   our $VERSION = 0;
-  eval { Yet::More::Testing->require_version(10); 1 };
+  try { Yet::More::Testing->require_version(10); 1 };
   ::ok($@->{description} !~ m/\(undef\)/,       'require_version(10) and $VERSION = 0');
 
   my $warnings;
@@ -221,6 +221,6 @@ package Use::The::Import;
 
 The::Import->import;
 
-my $val = eval { wibble() };
+my $val = try { wibble() };
 ::ok($val eq "wobble", "exported importer worked");
 

@@ -31,7 +31,7 @@ sub alarm_ok (&) {
     local %SIG{ALRM} = sub { die "timeout\n" };
     
     my $match;
-    eval { 
+    try { 
         alarm(2) if $have_alarm;
         $match = $test->();
         alarm(0) if $have_alarm;

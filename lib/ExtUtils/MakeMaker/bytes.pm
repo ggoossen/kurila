@@ -4,7 +4,7 @@ use strict;
 
 our $VERSION = 6.44;
 
-my $Have_Bytes = eval { require bytes; 1; };
+my $Have_Bytes = try { require bytes; 1; };
 
 sub import {
     return unless $Have_Bytes;

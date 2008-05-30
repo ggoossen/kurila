@@ -181,7 +181,7 @@ sub is ($$@) {
     }
     else {
         local $@;
-        $pass = eval { $got eq $expected };
+        $pass = try { $got eq $expected };
     }
 
     unless ($pass) {
@@ -740,7 +740,7 @@ sub can_ok ($@) {
     foreach my $method (@methods) {
         local($!, $@);  # don't interfere with caller's $@
                         # eval sometimes resets $!
-        eval { $proto->can($method) } || push @nok, $method;
+        try { $proto->can($method) } || push @nok, $method;
     }
 
     my $name;
@@ -765,7 +765,7 @@ sub isa_ok ($$;$) {
     else {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
         local($@, $!);  # eval sometimes resets $!
-        my $rslt = eval { $object->isa($class) };
+        my $rslt = try { $object->isa($class) };
         if( $@ ) {
             if( $@->{description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 if( !UNIVERSAL::isa($object, $class) ) {
@@ -793,7 +793,7 @@ WHOA
 sub dies_not(&;$) {
     my ($e, $qr, $name) = @_;
     local $Level = 2;
-    if (eval { $e->(); 1; }) {
+    if (try { $e->(); 1; }) {
         return ok(1, $name);
     }
     diag $@->message;
@@ -802,7 +802,7 @@ sub dies_not(&;$) {
 
 sub dies_like(&$;$) {
     my ($e, $qr, $name) = @_;
-    if (eval { $e->(); 1; }) {
+    if (try { $e->(); 1; }) {
         local $Level = 2;
         diag "didn't die";
         return ok(0, $name);

@@ -470,7 +470,7 @@ is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 # deref on empty list shouldn't autovivify
 {
     local $@->{description};
-    eval { ()[[0]]{foo} };
+    try { ()[[0]]{foo} };
     like ( "$@->{description}", "Can't use an undefined value as a HASH reference",
            "deref of undef from list slice fails" );
 }
@@ -479,18 +479,18 @@ is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 {
     my $ref;
     foreach $ref (*STDOUT{IO}) {
-	eval { $$ref };
+	try { $$ref };
 	like($@->{description}, qr/Not a SCALAR reference/, "Scalar dereference");
-	eval { @$ref };
+	try { @$ref };
 	like($@->{description}, qr/Not an ARRAY reference/, "Array dereference");
-	eval { %$ref };
+	try { %$ref };
 	like($@->{description}, qr/Not a HASH reference/, "Hash dereference");
-	eval { &$ref };
+	try { &$ref };
 	like($@->{description}, qr/Not a CODE reference/, "Code dereference");
     }
 
     $ref = *STDOUT{IO};
-    eval { *$ref };
+    try { *$ref };
     is($@, '', "Glob dereference of PVIO is acceptable");
 
     cmp_ok($ref, '\==', *{$ref}{IO}, "IO slot of the temporary glob is set correctly");

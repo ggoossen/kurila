@@ -26,7 +26,7 @@ require DynaLoader;
 
 *addfile = \&Addfile;
 
-eval {
+try {
 	require MIME::Base64;
 	require Digest::base;
 	push(@ISA, 'Digest::base');

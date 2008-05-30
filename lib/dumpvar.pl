@@ -308,14 +308,14 @@ sub unwrap {
       if ($globPrint) {
 	$s += 3;
        dumpglob($s, "\{$$v\}", $$v, 1, $m-1);
-      } elsif (defined ($fileno = eval {fileno($v)})) {
+      } elsif (defined ($fileno = try {fileno($v)})) {
 	print( (' ' x ($s+3)) .  "FileHandle(\{$$v\}) => fileno($fileno)\n" );
       }
     } elsif (ref \$v eq 'GLOB') {
       # Raw glob (again?)
       if ($globPrint) {
        dumpglob($s, "\{$v\}", $v, 1, $m-1) if $globPrint;
-      } elsif (defined ($fileno = eval {fileno(\$v)})) {
+      } elsif (defined ($fileno = try {fileno(\$v)})) {
 	print( (' ' x $s) .  "FileHandle(\{$v\}) => fileno($fileno)\n" );
       }
     }
@@ -325,13 +325,13 @@ sub matchlex {
   (my $var = @_[0]) =~ s/.//;
   $var eq @_[1] or 
     (@_[1] =~ m/^([!~])(.)([\x[00]-\x[ff]]*)/) and 
-      ($1 eq '!') ^^^ (eval { $var =~ m/$2$3/ });
+      ($1 eq '!') ^^^ (try { $var =~ m/$2$3/ });
 }
 
 sub matchvar {
   @_[0] eq @_[1] or 
     (@_[1] =~ m/^([!~])(.)([\x[00]-\x[ff]]*)/) and 
-      ($1 eq '!') ^^^ (eval {(@_[2] . "::" . @_[0]) =~ m/$2$3/});
+      ($1 eq '!') ^^^ (try {(@_[2] . "::" . @_[0]) =~ m/$2$3/});
 }
 
 sub compactDump {
@@ -394,7 +394,7 @@ sub dumpglob {
       unwrap(\%entry,3+$off,$m) ;
       print( (' ' x $off) .  ")\n" );
     }
-    if (defined ($fileno = eval{fileno(*entry)})) {
+    if (defined ($fileno = try{fileno(*entry)})) {
       print( (' ' x $off) .  "FileHandle($key) => fileno($fileno)\n" );
     }
     if ($all) {
@@ -438,7 +438,7 @@ sub CvGV_name_or_bust {
   my $in = shift;
   return if $skipCvGV;		# Backdoor to avoid problems if XS broken...
   $in = \&$in;			# Hard reference...
-  eval {require Devel::Peek; 1} or return;
+  try {require Devel::Peek; 1} or return;
   my $gv = Devel::Peek::CvGV($in) or return;
   *$gv{PACKAGE} . '::' . *$gv{NAME};
 }

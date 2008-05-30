@@ -48,7 +48,7 @@ for (1..3) {
     eval 'print "ok ", $i++, "\n"';
 }
 
-eval {
+try {
     print "ok 14\n";
     die "ok 16\n";
     1;
@@ -183,8 +183,8 @@ $x++;
 
 # return from eval {} should clear $@ correctly
 {
-    my $status = eval {
-	eval { die };
+    my $status = try {
+	try { die };
 	print "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
@@ -210,8 +210,8 @@ print "ok 40\n";
 # Check that eval catches bad goto calls
 #   (BUG ID 20010305.003)
 {
-    eval {
-	eval { goto foo; };
+    try {
+	try { goto foo; };
 	print ($@ ? "ok 41\n" : "not ok 41\n");
 	last;
 	foreach my $i (1) {

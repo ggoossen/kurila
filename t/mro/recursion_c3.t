@@ -74,7 +74,7 @@ my @loopies = (
 );
 
 foreach my $loopy (@loopies) {
-    eval {
+    try {
         local %SIG{ALRM} = sub { die "ALRMTimeout" };
         alarm(3);
         $loopy->();

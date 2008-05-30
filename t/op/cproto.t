@@ -11,7 +11,7 @@ while ( ~< *DATA) {
 	ok( !defined prototype "CORE::".$keyword, $keyword );
     }
     elsif ($proto eq 'unknown') {
-	eval { prototype "CORE::".$keyword };
+	try { prototype "CORE::".$keyword };
 	like( $@->{description}, qr/Can't find an opnumber for/, $keyword );
     }
     else {

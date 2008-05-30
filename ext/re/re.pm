@@ -33,7 +33,7 @@ my %bitmask = (
 # *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 
 sub setcolor {
- eval {				# Ignore errors
+ try {				# Ignore errors
   require Term::Cap;
 
   my $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
@@ -85,7 +85,7 @@ my $installed_error;
 sub _do_install {
     if ( ! defined($installed) ) {
         require XSLoader;
-        $installed = eval { XSLoader::load('re', $VERSION) } || 0;
+        $installed = try { XSLoader::load('re', $VERSION) } || 0;
         $installed_error = $@;
     }
 }

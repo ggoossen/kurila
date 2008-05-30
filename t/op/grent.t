@@ -4,13 +4,13 @@ BEGIN {
     require './test.pl';
 }
 
-eval {my @n = getgrgid 0};
+try {my @n = getgrgid 0};
 if ($@ and $@->{description} =~ m/(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
 
 our (%Config, $where);
-eval { require Config; Config->import; };
+try { require Config; Config->import; };
 my $reason;
 if (%Config{'i_grp'} ne 'define') {
 	$reason = '%Config{i_grp} not defined';

@@ -9,7 +9,7 @@ require File::Spec::Unix ;
 require File::Spec::Win32 ;
 require Cwd;
 
-eval {
+try {
    require VMS::Filespec ;
 } ;
 

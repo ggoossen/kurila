@@ -71,7 +71,7 @@ print "ok 8\n";
 # tests if this doesn't seem to work
 
 my @donetests;
-eval {
+try {
   require File::Spec; File::Spec->import();
   require File::Path; File::Path->import();
   require File::Temp; File::Temp->import( qw/ :mktemp unlink0 /);

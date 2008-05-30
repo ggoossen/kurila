@@ -49,7 +49,7 @@ is(A->d, "D::d");		# Update hash table;
     local @A::ISA = qw(C);	# Update hash table with split() assignment
     is(A->d, "C::d");
     @A::ISA = 0;
-    is(eval { A->d } || "fail", "fail");
+    is(try { A->d } || "fail", "fail");
 }
 is(A->d, "D::d");
 
@@ -58,7 +58,7 @@ is(A->d, "D::d");
     eval 'sub B::d {"B::d1"}';	# Import now.
     is(A->d, "B::d1");	# Update hash table;
     undef &B::d;
-    is((eval { A->d }, ($@->{description} =~ m/Undefined subroutine/)), 1);
+    is((try { A->d }, ($@->{description} =~ m/Undefined subroutine/)), 1);
 }
 
 is(A->d, "D::d");		# Back to previous state
@@ -89,13 +89,13 @@ is(A->d, "C::d");
 
 {
     local *C::d;
-    is(eval { A->d } || "nope", "nope");
+    is(try { A->d } || "nope", "nope");
 }
 is(A->d, "C::d");
 
 *A::x = *A::d;			# See if cache incorrectly follows synonyms
 A->d;
-is(eval { A->x } || "nope", "nope");
+is(try { A->x } || "nope", "nope");
 
 {
     # this test added due to bug discovery

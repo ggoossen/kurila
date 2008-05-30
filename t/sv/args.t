@@ -50,7 +50,7 @@ sub method {
 }
 
 sub try {
-    eval { method('foo', 'bar'); };
+    try { method('foo', 'bar'); };
     print "# $@->{description}" if $@;
 }
 

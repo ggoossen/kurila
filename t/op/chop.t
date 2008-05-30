@@ -153,7 +153,7 @@ $/ = "\n";
 
 foreach (keys %chomp) {
   my $key = $_;
-  eval {chomp $_};
+  try {chomp $_};
   if ($@) {
     my $err = $@;
     $err =~ s/\n$//s;
@@ -165,7 +165,7 @@ foreach (keys %chomp) {
 
 foreach (keys %chop) {
   my $key = $_;
-  eval {chop $_};
+  try {chop $_};
   if ($@) {
     my $err = $@;
     $err =~ s/\n$//s;

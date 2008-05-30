@@ -70,7 +70,7 @@ ok ! $a->can("sleep");
 ok my $ref = $a->can("drink");        # returns a coderef
 is $a->?$ref("tea"), "drinking tea"; # ... which works
 ok $ref = $a->can("sing");
-eval { $a->?$ref() };
+try { $a->?$ref() };
 ok $@;                                # ... but not if no actual subroutine
 
 ok (!Cedric->isa('Programmer'));
@@ -109,12 +109,12 @@ ok $a->can("VERSION");
 ok $a->can("can");
 ok ! $a->can("export_tags");	# a method in Exporter
 
-cmp_ok eval { $a->VERSION }, '==', 2.718;
+cmp_ok try { $a->VERSION }, '==', 2.718;
 
 dies_like( sub { $a->VERSION(2.719) }, 
            qr/^Alice version 2.719 required--this is only version 2.718/ );
 
-ok (eval { $a->VERSION(2.718) });
+ok (try { $a->VERSION(2.718) });
 is $@, '';
 
 my $subs = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} } keys %UNIVERSAL::;
@@ -183,7 +183,7 @@ ok $x->isa('UNIVERSAL');
 
 # Check that the "historical accident" of UNIVERSAL having an import()
 # method doesn't effect anyone else.
-eval { 'Some::Package'->import("bar") };
+try { 'Some::Package'->import("bar") };
 is $@, '';
 
 
@@ -211,7 +211,7 @@ package Pig;
 package Bodine;
 Bodine->isa('Pig');
 *isa = \&UNIVERSAL::isa;
-eval { isa(\%(), 'HASH') };
+try { isa(\%(), 'HASH') };
 ::is($@, '', "*isa correctly found");
 
 package main;

@@ -11,7 +11,7 @@ print "1..2\n";
 
 require MIME::Base64;
 
-eval {
+try {
     my $tmp = MIME::Base64::encode("\x{12c}");
     print "# enc: $tmp\n";
 };
@@ -20,7 +20,7 @@ print "ok 1\n";
 
 require MIME::QuotedPrint;
 
-eval {
+try {
     my $tmp = MIME::QuotedPrint::encode("\x{12c}");
     print "# enc: $tmp\n";
 };

@@ -10,7 +10,7 @@ use strict;
 use Fatal qw(open close :void opendir sin);
 
 my $i = 1;
-eval { open *FOO, '<', 'lkjqweriuapofukndajsdlfjnvcvn' };
+try { open *FOO, '<', 'lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " unless $@->{description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
@@ -27,15 +27,15 @@ for ("*$foo", "\\*$foo") {
     print "ok $i\n"; ++$i;
 }
 
-eval { opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
+try { opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " unless $@->{description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
-eval { my $a = opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
+try { my $a = opendir *FOO, 'lkjqweriuapofukndajsdlfjnvcvn' };
 print "not " if $@ && $@->{description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
-eval { Fatal->import(qw(print)) };
+try { Fatal->import(qw(print)) };
 if ($@->message !~ m{Cannot make the non-overridable builtin print fatal}) {
     print "not ";
 }

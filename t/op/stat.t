@@ -77,7 +77,7 @@ sleep 2;
 
 SKIP: {
     unlink $tmpfile_link;
-    my $lnk_result = eval { link $tmpfile, $tmpfile_link };
+    my $lnk_result = try { link $tmpfile, $tmpfile_link };
     skip "link() unimplemented", 6 if $@ and $@->{description} =~ m/unimplemented/;
 
     is( $@, '',         'link() implemented' );
@@ -156,7 +156,7 @@ SKIP: {
     SKIP: {
         # Going to try to switch away from root.  Might not work.
         my $olduid = $>;
-        eval { $> = 1; };
+        try { $> = 1; };
         skip "Can't test -r or -w meaningfully if you're superuser", 2
           if $> == 0;
 
@@ -168,7 +168,7 @@ SKIP: {
         ok(!-w $tmpfile,    "   -w");
 
         # switch uid back (may not be implemented)
-        eval { $> = $olduid; };
+        try { $> = $olduid; };
     }
 
     ok(! -x $tmpfile,   '   -x');
@@ -197,7 +197,7 @@ ok(! -f $Curdir,          '!-f cwd' );
 
 SKIP: {
     unlink($tmpfile_link);
-    my $symlink_rslt = eval { symlink $tmpfile, $tmpfile_link };
+    my $symlink_rslt = try { symlink $tmpfile, $tmpfile_link };
     skip "symlink not implemented", 3 if $@ and $@->{description} =~ m/unimplemented/;
 
     is( $@, '',     'symlink() implemented' );
@@ -367,7 +367,7 @@ ok(! -T $Perl,    '!-T');
 
 open(FOO, "<",$statfile);
 SKIP: {
-    eval { -T *FOO; };
+    try { -T *FOO; };
     skip "-T/B on filehandle not implemented", 15 if $@ and $@->{description} =~ m/not implemented/;
 
     is( $@, '',     '-T on filehandle causes no errors' );
@@ -428,9 +428,9 @@ dies_like( sub { -l _ },
            '-l _ croaks after stat' );
 
 lstat $0;
-eval { lstat _ };
+try { lstat _ };
 is( "$@", "", "lstat _ ok after lstat" );
-eval { -l _ };
+try { -l _ };
 is( "$@", "", "-l _ ok after lstat" );
   
 SKIP: {

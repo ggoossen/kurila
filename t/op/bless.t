@@ -116,7 +116,7 @@ expected(bless(\@()), 'main', "ARRAY");
 
 # class is a ref
 $a1 = bless \%(), "A4";
-$b1 = eval { bless \%(), $a1 };
+$b1 = try { bless \%(), $a1 };
 like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
 
 # class is an overloaded ref
@@ -125,7 +125,7 @@ like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
     use overload '""' => sub { "C4" };
 }
 my $h1 = bless \%(), "H4";
-my $c4 = eval { bless \$test, $h1 };
+my $c4 = try { bless \$test, $h1 };
 is ($@, '', "class is an overloaded ref");
 expected($c4, 'C4', "SCALAR");
 

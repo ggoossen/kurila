@@ -56,7 +56,7 @@ ok(eq_array(
     package MRO_M; our @ISA = qw/MRO_TestBase/;
 }
 *MRO_N::ISA = *MRO_M::ISA;
-is(eval { MRO_N->testfunc() }, 123);
+is(try { MRO_N->testfunc() }, 123);
 
 # XXX TODO (when there's a way to backtrack through a glob's aliases)
 # push(@MRO_M::ISA, 'MRO_TestOtherBase');

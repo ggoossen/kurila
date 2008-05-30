@@ -95,11 +95,11 @@ print q(1..22
 
     # Without the fix this 5.7.0 would croak:
     # Modification of a read-only value attempted at ...
-    eval {"$2\x{1234}"};
+    try {"$2\x{1234}"};
     ok(!$@, "bug id 20001020.006, left");
 
     # For symmetry with the above.
-    eval {"\x{1234}$2"};
+    try {"\x{1234}$2"};
     ok(!$@, "bug id 20001020.006, right");
 
     our $pi;
@@ -107,11 +107,11 @@ print q(1..22
     # This bug existed earlier than the $2 bug, but is fixed with the same
     # patch. Without the fix this 5.7.0 would also croak:
     # Modification of a read-only value attempted at ...
-    eval{"$pi\x{1234}"};
+    try{"$pi\x{1234}"};
     ok(!$@, "bug id 20001020.006, constant left");
 
     # For symmetry with the above.
-    eval{"\x{1234}$pi"};
+    try{"\x{1234}$pi"};
     ok(!$@, "bug id 20001020.006, constant right");
 }
 

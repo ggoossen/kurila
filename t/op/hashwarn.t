@@ -46,14 +46,14 @@ my $fail_not_hr   = 'Not a HASH reference at ';
 
     @warnings = ();
     my $avhv = \@(\%(x=>1,y=>2));
-    eval {
+    try {
         %$avhv = (x=>13,'y');
     };
     cmp_ok(scalar(@warnings),'==',0,'pseudo-hash 1 count');
     cmp_ok(substr($@->message,0,length($fail_not_hr)),'eq',$fail_not_hr,'pseudo-hash 1 msg');
 
     @warnings = ();
-    eval {
+    try {
         %$avhv = 'x';
     };
     cmp_ok(scalar(@warnings),'==',0,'pseudo-hash 2 count');

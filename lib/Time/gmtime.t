@@ -7,7 +7,7 @@ BEGIN {
 
 BEGIN {
     our $hasgm;
-    eval { my $n = gmtime 0 };
+    try { my $n = gmtime 0 };
     $hasgm = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($hasgm) { print "1..0 # Skip: no gmtime\n"; exit 0 }
 }

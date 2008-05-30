@@ -277,7 +277,7 @@ untie @ary;
   }
 
   tie @a, 'X';
-  eval { splice(@a) };
+  try { splice(@a) };
   # If we survived this far.
   print "ok ", $test++, "\n";
 }
@@ -331,7 +331,7 @@ untie @ary;
 
 {
     tie my @dummy, "NegFetchsize";
-    eval { "@dummy"; };
+    try { "@dummy"; };
     print "# $@->{description}\n" if $@;
     print "not " unless $@->{description} =~ m/^FETCHSIZE returned a negative value/;
     print "ok ", $test++, " - croak on negative FETCHSIZE\n";

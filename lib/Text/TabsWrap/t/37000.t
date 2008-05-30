@@ -13,17 +13,17 @@ my $toprint;
 print "1..6\n";
 
 local($Text::Wrap::break) = '\s';
-eval { $toPrint = wrap("","",$toPrint); };
+try { $toPrint = wrap("","",$toPrint); };
 print $@ ? "not ok 1\n" : "ok 1\n";
 print $toPrint eq $good ? "ok 2\n" : "not ok 2\n";
 
 local($Text::Wrap::break) = '\d';
-eval { $toPrint = wrap("","",$toPrint); };
+try { $toPrint = wrap("","",$toPrint); };
 print $@ ? "not ok 3\n" : "ok 3\n";
 print $toPrint eq $good ? "ok 4\n" : "not ok 4\n";
 
 local($Text::Wrap::break) = 'a';
-eval { $toPrint = wrap("","",$toPrint); };
+try { $toPrint = wrap("","",$toPrint); };
 print $@ ? "not ok 5\n" : "ok 5\n";
 print $toPrint eq $good ? "ok 6\n" : "not ok 6\n";
 

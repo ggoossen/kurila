@@ -69,7 +69,7 @@ sub import {
     # If the Fcntl extension is available,
     #  export its constants.
     #
-    eval {
+    try {
 	require Fcntl;
 	Exporter::export('Fcntl', $callpkg);
     };

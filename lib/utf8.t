@@ -201,7 +201,7 @@ SKIP: {
 
 {
     use utf8;
-    eval {utf8::encode("£")};
+    try {utf8::encode("£")};
     is($@, '', "utf8::encode is a NO-OP");
 }
 

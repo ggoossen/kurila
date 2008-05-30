@@ -125,7 +125,7 @@ my %down = (1=>0, ab => -1);
 foreach (keys %inc) {
   my $ans = %up{$_};
   my $up;
-  eval {$up = ++$_};
+  try {$up = ++$_};
   ok ((defined $up and $up eq $ans), $up, $@);
 }
 
@@ -134,7 +134,7 @@ check_same (\%orig, \%inc);
 foreach (keys %dec) {
   my $ans = %down{$_};
   my $down;
-  eval {$down = --$_};
+  try {$down = --$_};
   ok ((defined $down and $down eq $ans), $down, $@);
 }
 
@@ -143,7 +143,7 @@ check_same (\%orig, \%dec);
 foreach (keys %postinc) {
   my $ans = %postinc{$_};
   my $up;
-  eval {$up = $_++};
+  try {$up = $_++};
   ok ((defined $up and $up eq $ans), $up, $@);
 }
 
@@ -152,7 +152,7 @@ check_same (\%orig, \%postinc);
 foreach (keys %postdec) {
   my $ans = %postdec{$_};
   my $down;
-  eval {$down = $_--};
+  try {$down = $_--};
   ok ((defined $down and $down eq $ans), $down, $@);
 }
 
@@ -161,7 +161,7 @@ check_same (\%orig, \%postdec);
 {
     no warnings 'uninitialized';
     my ($x, $y);
-    eval {
+    try {
 	$y ="$x\n";
 	++$x;
     };
@@ -169,7 +169,7 @@ check_same (\%orig, \%postdec);
     ok($@ eq '', $@);
 
     my ($p, $q);
-    eval {
+    try {
 	$q ="$p\n";
 	--$p;
     };

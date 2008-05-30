@@ -287,7 +287,7 @@ sub Tgetent
         {
             if ( grep { -x "$_/infocmp" } split m/:/, %ENV{PATH} )
             {
-                eval {
+                try {
                     my $tmp = `infocmp -C 2>/dev/null`;
                     $tmp =~ s/^#.*\n//gm;    # remove comments
                     if (   ( $tmp !~ m%^/%s )

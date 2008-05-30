@@ -201,7 +201,7 @@ if ($^O eq 'os2') {
 }
 
 # If loading the XS stuff doesn't work, we can fall back to pure perl
-eval {
+try {
     require XSLoader;
     XSLoader::load( __PACKAGE__, $VERSION );
 };

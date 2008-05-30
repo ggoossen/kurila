@@ -56,7 +56,7 @@ SKIP: {
        ok(chdir($dh), "fchdir back");
     }
     else {
-       eval { chdir($dh); };
+       try { chdir($dh); };
        like($@->{description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
@@ -71,7 +71,7 @@ SKIP: {
        ok(chdir *DH, "fchdir back bareword");
     }
     else {
-       eval { chdir(*DH); };
+       try { chdir(*DH); };
        like($@->{description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
@@ -89,7 +89,7 @@ SKIP: {
 	chdir ".." or die $!;
     }
     else {
-	eval { chdir(*H); };
+	try { chdir(*H); };
 	like($@->{description}, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
 	SKIP: {
@@ -105,7 +105,7 @@ SKIP: {
 SKIP: {
     skip("has fchdir", 1) if $has_fchdir;
     opendir(my $dh, "op");
-    eval { chdir($dh); };
+    try { chdir($dh); };
     like($@->{description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
 }
 

@@ -88,7 +88,7 @@ Default: 1
 =cut
 
 sub case_tolerant () {
-  eval { require Win32API::File; } or return 1;
+  try { require Win32API::File; } or return 1;
   my $drive = shift || "C:";
   my $osFsType = "\0"x256;
   my $osVolName = "\0"x256;
