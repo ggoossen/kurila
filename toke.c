@@ -4104,8 +4104,6 @@ Perl_yylex(pTHX)
 	OPERATOR('!');
     case '<':
 	if (PL_expect != XOPERATOR) {
-	    if (s[1] != '<' && !strchr(s,'>'))
-		check_uni();
 	    if (s[1] == '<') {
 		I32 op_type;
 		s = scan_heredoc(s);
@@ -4124,7 +4122,7 @@ Perl_yylex(pTHX)
 		}
 		TERM(sublex_start(op_type, NULL));
 	    }
-	    Perl_croak(aTHX_ "No operator expected, but found '<', '<=' or '<=>' operator");
+/* 	    Perl_croak(aTHX_ "No operator expected, but found '<', '<=' or '<=>' operator"); */
 	}
 	s++;
 	{
@@ -4136,7 +4134,11 @@ Perl_yylex(pTHX)
 		s++;
 		Eop(OP_NCMP);
 	    }
-	    Perl_croak(aTHX_ "'<' is reserved for hashes");
+
+	    if (tmp == '=')
+		Perl_croak(aTHX_ "'<=' operator is reserved");
+
+	    OPERATOR('<');
 	}
     case '>':
 	s++;

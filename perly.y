@@ -64,7 +64,7 @@
 #endif
 }
 
-%token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
+%token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';' '<'
 
 %token <opval> WORD METHOD THING PMFUNC PRIVATEREF
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
@@ -127,7 +127,7 @@
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
-%left '[' '{' ANONARY ANONHSH
+%left '[' '{' ANONARY ANONHSH '<'
 
 %token <i_tkval> PEG
 
@@ -1188,6 +1188,10 @@ term	:	termbinop
                               APPEND_MADPROPS_PV("amper", $$, '>');
 			  })
 			}
+        |       '<' term
+			{ $$ = newUNOP(OP_RV2AV, 0, scalar($2));
+			  TOKEN_GETMAD($1,$$,'o');
+                        }
 	|	NOAMP WORD listexpr                  /* foo(@args) */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 			    append_elem(OP_LIST, $3, scalar($2)));
