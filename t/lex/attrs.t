@@ -141,16 +141,8 @@ is "@attrs", "locked Z";
 	${@_[0]} = @_[1]*2;
     }
     package Tloop;
-    sub MODIFY_SCALAR_ATTRIBUTES { tie ${@_[1]}, 'Ttie', -1; (); }
+    sub MODIFY_SCALAR_ATTRIBUTES { tie ${@_[1]}, 'Ttie', -1; return; }
 }
-
-eval_ok '
-    package Tloop;
-    for my $i (0..2) {
-	my $x : TieLoop = $i;
-	$x != $i*2 and ::is $x, $i*2;
-    }
-';
 
 # bug #15898
 eval 'our ${""} : foo = 1';

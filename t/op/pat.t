@@ -2172,8 +2172,8 @@ ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash");
     chop $_; $\="\n";
     ok(m/[^\s]+/, "m/[^\s]/ utf8");
     ok(m/[^\d]+/, "m/[^\d]/ utf8");
-    ok(($a = $_, $_ =~ s/[^\s]+/./g), "s/[^\s]/ utf8");
-    ok(($a = $_, $a =~ s/[^\d]+/./g), "s/[^\s]/ utf8");
+    ok(do {$a = $_; $_ =~ s/[^\s]+/./g}, "s/[^\s]/ utf8");
+    ok(do {$a = $_; $a =~ s/[^\d]+/./g}, "s/[^\s]/ utf8");
 }
 
 ok("\x{100}" =~ m/\x{100}/, "[perl #15397]");
@@ -2970,6 +2970,7 @@ ok("x\c\_y"   =~ m/x\c\_y/,    "\_ in a pattern");
 for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $targ = "a\034$c";
     my $reg  = "a\\c\\$c";
+    local $TODO = $c eq "\0" && '\c\0';
     ok(eval("qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern");
 }
 

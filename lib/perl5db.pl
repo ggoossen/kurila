@@ -2248,10 +2248,10 @@ the new command. This is faster, but perhaps a bit more convoluted.
         while (
 
             # We have a terminal, or can get one ...
-            ( $term || &setterm ),
+            ( $term || &setterm ) and
 
             # ... and it belogs to this PID or we get one for this PID ...
-            ( $term_pid == $$ or resetterm(1) ),
+            ( $term_pid == $$ or resetterm(1) ) and
 
             # ... and we got a line of command input ...
             defined(

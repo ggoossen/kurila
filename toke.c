@@ -4249,24 +4249,6 @@ Perl_yylex(pTHX)
 			   PL_tokenbuf+1, PL_tokenbuf+1);
 		PL_tokenbuf[0] = '%';
 	    }
-
-	    /* Warn about @...[...] where they meant @...[[...]]. */
-	    if (*s == '[') {
-		if (ckWARN(WARN_SYNTAX)) {
-		    char *t = s+1;
-
-		    while (isSPACE(*t) || isALNUM_lazy_if(t,UTF) || *t == '$')
-			t++;
-		    if (*t++ == ',') {
-			PL_bufptr = PEEKSPACE(PL_bufptr); /* XXX can realloc */
-			while (t < PL_bufend && *t != ']')
-			    t++;
-			Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-				    "Multidimensional syntax %.*s not supported",
-				    (int)((t - PL_bufptr) + 1), PL_bufptr);
-		    }
-		}
-	    }
 	}
 	PL_pending_ident = '@';
 	TERM('@');

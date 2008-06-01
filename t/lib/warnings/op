@@ -578,6 +578,7 @@ local $c, $d = (1,2);
 EXPECT
 Parentheses missing around "local" list at - line 4.
 Parentheses missing around "local" list at - line 5.
+list may not be used in scalar context at - line 4.
 ########
 # op.c
 use warnings 'bareword' ;

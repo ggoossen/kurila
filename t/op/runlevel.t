@@ -202,7 +202,7 @@ sortfn 4, 5, 6
 ---- 1, 2, 3
 ########
 our @a = (3, 2, 1);
-@a = sort { eval('die("no way")') ,  $a <+> $b} @a;
+@a = sort { eval('die("no way")') ;  $a <+> $b} @a;
 print join(", ", @a)."\n";
 EXPECT
 1, 2, 3

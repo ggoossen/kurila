@@ -86,7 +86,7 @@ my ($l1, $l2, $l3, $l4);
 my $zzzz = 12;
 $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 1 + $zzzz;
 
-ok( $zzz1 == 13 and $zzz2 == 13 and $l1 == 13,
+ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
     "$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13" );
 
 for (@INPUT) {
