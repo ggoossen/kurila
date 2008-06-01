@@ -172,7 +172,7 @@ is(B::perlstring("\n"), '"\n"', "Testing B::perlstring()");
 is(B::perlstring("\""), '"\""', "Testing B::perlstring()");
 is(B::class(bless \%(), "Wibble::Bibble"), "Bibble", "Testing B::class()");
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()");
-is(B::opnumber("chop"), 37, "Testing opnumber with opname (chop)");
+is(B::opnumber("chop"), 36, "Testing opnumber with opname (chop)");
 
 {
     no warnings 'once';

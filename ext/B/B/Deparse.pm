@@ -13,7 +13,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
 	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD OPpPAD_STATE
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
-	 OPpTRANS_SQUASH OPpTRANS_DELETE OPpTRANS_COMPLEMENT OPpTARGET_MY
+	 OPpTARGET_MY
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
 	 OPpSORT_REVERSE OPpSORT_INPLACE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
@@ -159,7 +159,6 @@ use warnings ();
 # op/subst 90 - inconsistent handling of utf8 under "use utf8"
 # op/taint 29 - "use re 'taint'" deparsed in the wrong place wrt. block open
 # op/tiehandle compile - "use strict" deparsed in the wrong place
-# uni/tr_ several
 # ext/B/t/xref 11 - line numbers when we add newlines to one-line subs
 # ext/Data/Dumper/t/dumper compile
 # ext/DB_file/several
@@ -1182,8 +1181,8 @@ sub stash_variable {
     }
 
     my $v = ($prefix eq '$#' ? '@' : $prefix) . $name;
-    return "$prefix$name" if $name =~ m/^\W/; # no stash for magic variables.
-    return $prefix .$self->{'curstash'}.'::'. $name if 1; # $self->lex_in_scope($v);
+    return "$prefix$name" if $name =~ m/^(\W|_$)/; # no stash for magic variables.
+    return $prefix .$self->{'curstash'}.'::'. $name if 1; # if $self->lex_in_scope($v);
     return "$prefix$name";
 }
 
@@ -2660,12 +2659,6 @@ sub pp_null {
 	return $self->maybe_parens($self->deparse($op->first, 7) . " = "
 				   . $self->deparse($op->first->sibling, 7),
 				   $cx, 7);
-    } elsif (!null($op->first->sibling) and
-	     $op->first->sibling->name eq "trans" and
-	     $op->first->sibling->flags ^&^ OPf_STACKED) {
-	return $self->maybe_parens($self->deparse($op->first, 20) . " =~ "
-				   . $self->deparse($op->first->sibling, 20),
-				   $cx, 20);
     } elsif ($op->flags ^&^ OPf_SPECIAL && $cx +< 1 && !$op->targ) {
 	return "do \{\n\t". $self->deparse($op->first, $cx) ."\n\b\};";
     } elsif (!null($op->first->sibling) and
@@ -3238,14 +3231,6 @@ sub pp_entersub {
 	    return $prefix . $amper. $kid;
 	}
     } else {
-	# glob() invocations can be translated into calls of
-	# CORE::GLOBAL::glob with a second parameter, a number.
-	# Reverse this.
-	if ($kid eq "CORE::GLOBAL::glob") {
-	    $kid = "glob";
-	    $args =~ s/\s*,[^,]+$//;
-	}
-
 	# It's a syntax error to call CORE::GLOBAL::foo without a prefix,
 	# so it must have been translated from a keyword call. Translate
 	# it back.
@@ -3768,176 +3753,6 @@ sub collapse {
 	}
     }
     return $str;
-}
-
-sub tr_decode_byte {
-    my($table, $flags) = @_;
-    my(@table) = unpack("s*", $table);
-    splice @table, 0x100, 1;   # Number of subsequent elements
-    my($c, $tr, @from, @to, @delfrom, $delhyphen);
-    if (@table[ord "-"] != -1 and
-	@table[ord("-") - 1] == -1 || @table[ord("-") + 1] == -1)
-    {
-	$tr = @table[ord "-"];
-	@table[ord "-"] = -1;
-	if ($tr +>= 0) {
-	    @from = ord("-");
-	    @to = $tr;
-	} else { # -2 ==> delete
-	    $delhyphen = 1;
-	}
-    }
-    for ($c = 0; $c +< @table; $c++) {
-	$tr = @table[$c];
-	if ($tr +>= 0) {
-	    push @from, $c; push @to, $tr;
-	} elsif ($tr == -2) {
-	    push @delfrom, $c;
-	}
-    }
-    @from = (@from, @delfrom);
-    if ($flags ^&^ OPpTRANS_COMPLEMENT) {
-	my @newfrom = ();
-	my %from;
-	%from{[@from]} = (1) x @from;
-	for ($c = 0; $c +< 256; $c++) {
-	    push @newfrom, $c unless %from{$c};
-	}
-	@from = @newfrom;
-    }
-    unless ($flags ^&^ OPpTRANS_DELETE || !@to) {
-	pop @to while( @to-1) and @to[(@to-1)] == @to[(@to-1) -1];
-    }
-    my($from, $to);
-    $from = collapse(@from);
-    $to = collapse(@to);
-    $from .= "-" if $delhyphen;
-    return ($from, $to);
-}
-
-sub tr_chr {
-    my $x = shift;
-    if ($x == ord "-") {
-	return "\\-";
-    } elsif ($x == ord "\\") {
-	return "\\\\";
-    } else {
-	return chr $x;
-    }
-}
-
-# XXX This doesn't yet handle all cases correctly either
-
-sub tr_decode_utf8 {
-    my($swash_hv, $flags) = @_;
-    my %swash = $swash_hv->ARRAY;
-    my $final = undef;
-    $final = %swash{'FINAL'}->IV if exists %swash{'FINAL'};
-    my $none = %swash{"NONE"}->IV;
-    my $extra = $none + 1;
-    my(@from, @delfrom, @to);
-    my $line;
-    foreach $line (split m/\n/, %swash{'LIST'}->PV) {
-	my($min, $max, $result) = split(m/\t/, $line);
-	$min = hex $min;
-	if (length $max) {
-	    $max = hex $max;
-	} else {
-	    $max = $min;
-	}
-	$result = hex $result;
-	if ($result == $extra) {
-	    push @delfrom, \@($min, $max);
-	} else {
-	    push @from, \@($min, $max);
-	    push @to, \@($result, $result + $max - $min);
-	}
-    }
-    for my $i (0 ..( @from-1)) {
-	if (@from[$i][0] == ord '-') {
-	    unshift @from, splice(@from, $i, 1);
-	    unshift @to, splice(@to, $i, 1);
-	    last;
-	} elsif (@from[$i][1] == ord '-') {
-	    @from[$i][1]--;
-	    @to[$i][1]--;
-	    unshift @from, ord '-';
-	    unshift @to, ord '-';
-	    last;
-	}
-    }
-    for my $i (0 ..( @delfrom-1)) {
-	if (@delfrom[$i][0] == ord '-') {
-	    push @delfrom, splice(@delfrom, $i, 1);
-	    last;
-	} elsif (@delfrom[$i][1] == ord '-') {
-	    @delfrom[$i][1]--;
-	    push @delfrom, ord '-';
-	    last;
-	}
-    }
-    if (defined $final and @to[(@to-1)][1] != $final) {
-	push @to, \@($final, $final);
-    }
-    push @from, @delfrom;
-    if ($flags ^&^ OPpTRANS_COMPLEMENT) {
-	my @newfrom;
-	my $next = 0;
-	for my $i (0 ..( @from-1)) {
-	    push @newfrom, \@($next, @from[$i][0] - 1);
-	    $next = @from[$i][1] + 1;
-	}
-	@from = ();
-	for my $range (@newfrom) {
-	    if ($range->[0] +<= $range->[1]) {
-		push @from, $range;
-	    }
-	}
-    }
-    my($from, $to, $diff);
-    for my $chunk (@from) {
-	$diff = $chunk->[1] - $chunk->[0];
-	if ($diff +> 1) {
-	    $from .= tr_chr($chunk->[0]) . "-" . tr_chr($chunk->[1]);
-	} elsif ($diff == 1) {
-	    $from .= tr_chr($chunk->[0]) . tr_chr($chunk->[1]);
-	} else {
-	    $from .= tr_chr($chunk->[0]);
-	}
-    }
-    for my $chunk (@to) {
-	$diff = $chunk->[1] - $chunk->[0];
-	if ($diff +> 1) {
-	    $to .= tr_chr($chunk->[0]) . "-" . tr_chr($chunk->[1]);
-	} elsif ($diff == 1) {
-	    $to .= tr_chr($chunk->[0]) . tr_chr($chunk->[1]);
-	} else {
-	    $to .= tr_chr($chunk->[0]);
-	}
-    }
-    #$final = sprintf("%04x", $final) if defined $final;
-    #$none = sprintf("%04x", $none) if defined $none;
-    #$extra = sprintf("%04x", $extra) if defined $extra;
-    #print STDERR "final: $final\n none: $none\nextra: $extra\n";
-    #print STDERR $swash{'LIST'}->PV;
-    return (escape_str($from), escape_str($to));
-}
-
-sub pp_trans {
-    my $self = shift;
-    my($op, $cx) = @_;
-    my($from, $to);
-    if (class($op) eq "PVOP") {
-	($from, $to) = tr_decode_byte($op->pv, $op->private);
-    } else { # class($op) eq "SVOP"
-	($from, $to) = tr_decode_utf8($op->sv->RV, $op->private);
-    }
-    my $flags = "";
-    $flags .= "c" if $op->private ^&^ OPpTRANS_COMPLEMENT;
-    $flags .= "d" if $op->private ^&^ OPpTRANS_DELETE;
-    $to = "" if $from eq $to and $flags eq "";
-    $flags .= "s" if $op->private ^&^ OPpTRANS_SQUASH;
-    return "tr" . double_delim($from, $to) . $flags;
 }
 
 # Like dq(), but different
