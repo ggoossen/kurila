@@ -58,7 +58,8 @@ is(A->d, "D::d");
     eval 'sub B::d {"B::d1"}';	# Import now.
     is(A->d, "B::d1");	# Update hash table;
     undef &B::d;
-    is((try { A->d }, ($@->{description} =~ m/Undefined subroutine/)), 1);
+    dies_like( sub { A->d },
+               m/Undefined subroutine/ );
 }
 
 is(A->d, "D::d");		# Back to previous state

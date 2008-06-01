@@ -227,7 +227,7 @@ is($foo, 1, "utime");
 check_utime_result();
 
 utime undef, undef, 'b';
-($atime,$mtime) = (stat 'b')[8,9];
+($atime,$mtime) = (stat 'b')[[8,9]];
 print "# utime undef, undef --> $atime, $mtime\n";
 isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');

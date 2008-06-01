@@ -84,7 +84,8 @@ sub ary1 {
     (1,2,3);
 }
 
-print &ary1 eq 3 ? "ok 23\n" : "not ok 23\n";
+eval { &ary1 eq 3 };
+print $@->{description} =~ m/list may not be used in scalar context/ ? "ok 23\n" : "not ok 23\n";
 
 print join(':',&ary1) eq '1:2:3' ? "ok 24\n" : "not ok 24\n";
 

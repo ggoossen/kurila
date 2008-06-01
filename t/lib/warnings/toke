@@ -29,9 +29,6 @@ toke.c	AOK
 	$a =< 2 ;
 	$a =/ 2 ;
 
-     Multidimensional syntax %.*s not supported 
-	my $a = @a[1,2] ;
-
      Scalar value %.*s better written as $%.*s" 
 	@a[3] = 2;
 	@a{3} = 2;
@@ -166,14 +163,6 @@ $a =/ 2 ;
 EXPECT
 syntax error at - line 8, near "=."
 No operator expected, but found '<', '<=' or '<=>' operator at - line 9.
-########
-# toke.c
-use warnings 'syntax' ; our @a;
-my $a = @a[1,2] ;
-no warnings 'syntax' ;
-my $a = @a[1,2] ;
-EXPECT
-Multidimensional syntax @a[1,2] not supported at - line 3.
 ########
 # toke.c
 use warnings 'syntax' ;
