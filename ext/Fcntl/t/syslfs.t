@@ -122,7 +122,7 @@ print "# we seem to have sparse files...\n";
 
 my $r = system '../perl', '-I../lib', '-e', <<'EOF';
 use Fcntl qw(/^O_/ /^SEEK_/);
-sysopen(BIG, "big", O_WRONLY|O_CREAT|O_TRUNC) or die $!;
+sysopen(BIG, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or die $!;
 my $sysseek = sysseek(BIG, 5_000_000_000, SEEK_SET);
 my $syswrite = syswrite(BIG, "big");
 exit 0;
