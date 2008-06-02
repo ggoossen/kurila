@@ -5802,32 +5802,6 @@ Perl_ck_eval(pTHX_ OP *o)
 	    o->op_flags &= ~OPf_KIDS;
 	    op_null(o);
 	}
-	else if (kid->op_type == OP_LINESEQ || kid->op_type == OP_STUB) {
-	    LOGOP *enter;
-#ifdef PERL_MAD
-	    OP* const oldo = o;
-#endif
-
-	    cUNOPo->op_first = 0;
-#ifndef PERL_MAD
-	    op_free(o);
-#endif
-
-	    NewOp(1101, enter, 1, LOGOP);
-	    enter->op_type = OP_ENTERTRY;
-	    enter->op_ppaddr = PL_ppaddr[OP_ENTERTRY];
-	    enter->op_private = 0;
-
-	    /* establish postfix order */
-	    enter->op_next = (OP*)enter;
-
-	    o = prepend_elem(OP_LINESEQ, (OP*)enter, (OP*)kid);
-	    o->op_type = OP_LEAVETRY;
-	    o->op_ppaddr = PL_ppaddr[OP_LEAVETRY];
-	    enter->op_other = o;
-	    op_getmad(oldo,o,'O');
-	    return o;
-	}
 	else {
 	    scalar((OP*)kid);
 	    PL_cv_has_eval = 1;
