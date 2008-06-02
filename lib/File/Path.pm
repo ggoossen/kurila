@@ -189,7 +189,7 @@ If a system error prevents a directory from being created, then the
 C<mkpath> function throws a fatal error with C<Carp::croak>. This error
 can be trapped with an C<eval> block:
 
-  eval { mkpath($dir) };
+  try { mkpath($dir) };
   if ($@) {
     print "Couldn't create $dir: $@";
   }

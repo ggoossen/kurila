@@ -218,9 +218,9 @@ $ei->{goodmod} = \%(
         ),
 );
 
-eval { $ei->files('badmod') };
+try { $ei->files('badmod') };
 like( $@->{description}, qr/badmod is not installed/,'files() should croak given bad modname');
-eval { $ei->files('goodmod', 'badtype' ) };
+try { $ei->files('goodmod', 'badtype' ) };
 like( $@->{description}, qr/type must be/,'files() should croak given bad type' );
 
 my @files;
@@ -283,7 +283,7 @@ $ei->{yesmod} = \%(
 
 # these should all croak
 foreach my $sub (qw( validate packlist version )) {
-    eval { $ei->?$sub('nomod') };
+    try { $ei->?$sub('nomod') };
     like( $@->{description}, qr/nomod is not installed/,
 	  "$sub() should croak when asked about uninstalled module" );
 }

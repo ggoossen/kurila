@@ -15,12 +15,12 @@ BEGIN { plan tests => 9; }
 
 BEGIN {
     require autouse;
-    eval {
+    try {
         "autouse"->import('List::Util' => 'List::Util::first(&@)');
     };
     ok( !$@ );
 
-    eval {
+    try {
         "autouse"->import('List::Util' => 'Foo::min');
     };
     ok( $@->{description}, qr/^autouse into different package attempted/ );
@@ -45,7 +45,7 @@ ok( EPERM ); # test if non-zero
 ok( exists %INC{$mod_file} );
 
 use autouse Env => "something";
-eval { something() };
+try { something() };
 ok( $@->{description}, qr/^\Qautoused module Env has unique import() method/ );
 
 # Check that UNIVERSAL.pm doesn't interfere with modules that don't use

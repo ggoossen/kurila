@@ -256,11 +256,11 @@ sub link {
     my($success) = 0;
 
     print "  ln $from $to\n" if %opts{verbose};
-    eval {
+    try {
         CORE::link($from, $to)
             ? $success++
             : ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
-              ? die "AFS"  # okay inside eval {}
+              ? die "AFS"  # okay inside try {}
               : warn "Couldn't link $from to $to: $!\n"
           unless %opts{notify};
     };

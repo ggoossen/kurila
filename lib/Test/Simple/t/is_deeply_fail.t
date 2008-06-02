@@ -317,7 +317,7 @@ ERR
 ERR
 
 
-    if( eval { require overload } ) {
+    if( try { require overload } ) {
 	my $foo = bless \@(), "Foo";
 	my $bar = bless \%(), "Bar";
 

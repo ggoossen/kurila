@@ -15,10 +15,10 @@ my $tb = Test::Builder->create;
 sub foo { $tb->croak("foo") }
 sub bar { $tb->carp("bar")  }
 
-eval { foo() };
+try { foo() };
 is $@->{description}, sprintf "foo at \%s line \%s.\n", $0, __LINE__ - 1;
 
-eval { $tb->croak("this") };
+try { $tb->croak("this") };
 is $@->{description}, sprintf "this at \%s line \%s.\n", $0, __LINE__ - 1;
 
 {

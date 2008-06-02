@@ -139,7 +139,7 @@ print ((inet_ntoa("\x{a}\x{14}\x{1e}\x{28}") eq "10.20.30.40") ? "ok 11\n" : "no
     print ((inet_ntoa($addr) eq "10.10.10.10") ? "ok 13\n" : "not ok 13\n");
 }
 				     
-eval { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") };
+try { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") };
 print (($@->{description} =~ m/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/) ? "ok 14\n" : "not ok 14\n");
 
 if (sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))) == AF_INET) {
@@ -148,7 +148,7 @@ if (sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))) == AF_INET
     print "not ok 15\n";
 }
 
-eval { sockaddr_family("") };
+try { sockaddr_family("") };
 print (($@->{description} =~ m/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/) ? "ok 16\n" : "not ok 16\n");
 
 if ($^O eq 'linux') {

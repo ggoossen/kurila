@@ -17,7 +17,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
+        if try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 165 + $extra ;
 
@@ -43,10 +43,10 @@ sub run
     {
         title "Misc error cases";
 
-        eval { 'Compress::Raw::Zlib::InflateScan'->new( Bufsize => 0)} ;
+        try { 'Compress::Raw::Zlib::InflateScan'->new( Bufsize => 0)} ;
         like $@->{description}, qr/^Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified 0/, "  catch bufsize == 0";
 
-        eval { Compress::Raw::Zlib::inflateScanStream::createDeflateStream(undef, Bufsize => 0) } ;
+        try { Compress::Raw::Zlib::inflateScanStream::createDeflateStream(undef, Bufsize => 0) } ;
         like $@->{description}, qr/^Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified 0/, "  catch bufsize == 0";
 
     }
@@ -85,7 +85,7 @@ sub run
                 else
                   { $dest = 'IO::File'->new( "$out_file", "<")  }
 
-                my $gz = eval { $CompressClass->new($dest, Merge => 1) };
+                my $gz = try { $CompressClass->new($dest, Merge => 1) };
                 
                 ok ! $gz, "  Did not create $CompressClass object";
 
@@ -135,7 +135,7 @@ sub run
                   { $buffer = $out_file }
             }
 
-            ok ! eval { $CompressClass->new($buffer, Merge => 1) }, "  constructor fails";
+            ok ! try { $CompressClass->new($buffer, Merge => 1) }, "  constructor fails";
             {
                 local $TODO = 1;
                 like $$Error, '/Cannot create InflateScan object: (Header Error|unexpected end of file)/', "  got Bad Magic" ;

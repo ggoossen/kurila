@@ -28,13 +28,13 @@ my $TAINT = substr($^X, 0, 0);
 
 my $file = 'TEST';
 
-eval { mkfifo($TAINT. $file, 0) };
+try { mkfifo($TAINT. $file, 0) };
 like($@->{description}, qr/^Insecure dependency/,              'mkfifo with tainted data');
 
-eval { $testfd = open($TAINT. $file, O_WRONLY, 0) };
+try { $testfd = open($TAINT. $file, O_WRONLY, 0) };
 like($@->{description}, qr/^Insecure dependency/,              'open with tainted data');
 
-eval { $testfd = open($file, O_RDONLY, 0) };
+try { $testfd = open($file, O_RDONLY, 0) };
 is($@, "",                                  'open with untainted data');
 
 read($testfd, $buffer, 2) if $testfd +> 2;

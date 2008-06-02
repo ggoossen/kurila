@@ -457,7 +457,7 @@ sub can_load {
 
             if ( $CACHE->{$mod}->{uptodate} ) {
 
-                eval { load $mod };
+                try { load $mod };
 
                 ### in case anything goes wrong, log the error, the fact
                 ### we tried to use this module and return 0;

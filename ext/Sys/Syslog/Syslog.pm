@@ -58,7 +58,7 @@ require Exporter;
         @{%EXPORT_TAGS{macros}}, 
     );
 
-    eval {
+    try {
         require XSLoader;
         XSLoader::load('Sys::Syslog', $VERSION);
         1
@@ -436,8 +436,8 @@ sub xlate {
     $name = uc $name;
     $name = "LOG_$name" unless $name =~ m/^LOG_/;
     $name = "Sys::Syslog::$name";
-    # Can't have just eval { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = eval { no strict 'refs'; &{*{Symbol::fetch_glob($name)}} };
+    # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
+    my $value = try { no strict 'refs'; &{*{Symbol::fetch_glob($name)}} };
     defined $value ? $value : -1;
 }
 
@@ -512,7 +512,7 @@ sub connect_tcp {
     }
 
     setsockopt(SYSLOG, SOL_SOCKET, SO_KEEPALIVE, 1);
-    if (eval { IPPROTO_TCP() }) {
+    if (try { IPPROTO_TCP() }) {
         # These constants don't exist in 5.005. They were added in 1999
         setsockopt(SYSLOG, IPPROTO_TCP(), TCP_NODELAY(), 1);
     }
@@ -662,7 +662,7 @@ sub connect_native {
         $logopt += xlate($opt) if %options{$opt}
     }
 
-    eval { openlog_xs($ident, $logopt, xlate($facility)) };
+    try { openlog_xs($ident, $logopt, xlate($facility)) };
     if ($@) {
         push @$errs, $@;
         return 0;

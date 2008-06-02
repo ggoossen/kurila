@@ -57,7 +57,7 @@ use base qw(M B2);
 
 # Test that multiple inheritance fails.
 package D6;
-eval { 'base'->import(qw(B2 M B3)); };
+try { 'base'->import(qw(B2 M B3)); };
 ::like($@->{description}, qr/can't multiply inherit fields/i, 
     'No multiple field inheritance');
 
@@ -169,7 +169,7 @@ use fields qw(yo this _lah meep 42);
 package E2;
 use fields qw(_yo ahhh this);
 
-eval {
+try {
     package Broken;
 
     # The error must occur at run time for the eval to catch it.

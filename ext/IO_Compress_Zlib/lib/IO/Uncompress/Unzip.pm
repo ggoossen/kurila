@@ -17,7 +17,7 @@ use Compress::Raw::Zlib  v2.006 qw(crc32) ;
 
 BEGIN
 {
-    eval { require IO::Uncompress::Adapter::Bunzip2 ;
+    try { require IO::Uncompress::Adapter::Bunzip2 ;
            IO::Uncompress::Adapter::Bunzip2->import() } ;
 }
 
@@ -690,7 +690,7 @@ sub _dosToUnixTime
 
 	# catch errors
 	my $time_t =
-	  eval { timelocal( $sec, $min, $hour, $mday, $mon, $year ); };
+	  try { timelocal( $sec, $min, $hour, $mday, $mon, $year ); };
 	return 0 
         if $@;
 	return $time_t;

@@ -311,7 +311,7 @@ sub have_compiler {
     tie *STDOUT, 'TieOut';
     tie *STDERR, 'TieOut';
 
-    eval {
+    try {
 	require ExtUtils::CBuilder;
 	my $cb = 'ExtUtils::CBuilder'->new;
 

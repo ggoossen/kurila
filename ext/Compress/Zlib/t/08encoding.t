@@ -15,7 +15,7 @@ use CompTestUtils;
 
 BEGIN
 {
-    eval { require Encode; Encode->import(); };
+    try { require Encode; Encode->import(); };
 
     plan skip_all => "Encode is not available"
         if $@ ;
@@ -23,7 +23,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 16 + $extra ;
 

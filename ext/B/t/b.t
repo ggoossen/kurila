@@ -68,7 +68,7 @@ ok( B::svref_2object(\$.)->MAGIC->TYPE eq "\0", '$. has \0 magic' );
 {
     my $e = '';
     # Used to dump core, bug #16828
-    eval { B::svref_2object(\$.)->MAGIC->MOREMAGIC->TYPE; };
+    try { B::svref_2object(\$.)->MAGIC->MOREMAGIC->TYPE; };
     like( $@->{description}, qr/Can't call method "TYPE" on an undefined value/, 
 	'$. has no more magic' );
 }
@@ -102,7 +102,7 @@ my $pv_ret = $pv_ref->object_2svref();
 is(ref $pv_ret, "SCALAR", "Test object_2svref() return is SCALAR");
 is($$pv_ret, $pv, "Test object_2svref()");
 is($pv_ref->PV(), $pv, "Test PV()");
-eval { is($pv_ref->RV(), $pv, "Test RV()"); };
+try { is($pv_ref->RV(), $pv, "Test RV()"); };
 ok($@, "Test RV()");
 is($pv_ref->PVX(), $pv, "Test PVX()");
 

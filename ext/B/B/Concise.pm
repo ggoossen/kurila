@@ -151,7 +151,7 @@ sub concise_stashref {
 	print "FUNC: *", Symbol::glob_name(*s), "\n";
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
-	eval { concise_cv_obj($order, $codeobj, $k) };
+	try { concise_cv_obj($order, $codeobj, $k) };
 	warn "err {$@->message} on $codeobj" if $@;
     }
 }

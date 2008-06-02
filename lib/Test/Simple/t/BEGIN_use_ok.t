@@ -18,7 +18,7 @@ use Test::More;
 
 my $result;
 BEGIN {
-    eval {
+    try {
         use_ok("Wibble");
     };
     $result = $@;

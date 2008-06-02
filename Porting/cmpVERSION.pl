@@ -42,8 +42,8 @@ find(
 		    } else {
 			return if compare($_, $file2) == 0;
 		    }
-		    my $version1 = eval {MM->parse_version($_)};
-		    my $version2 = eval {MM->parse_version($file2)};
+		    my $version1 = try {MM->parse_version($_)};
+		    my $version2 = try {MM->parse_version($file2)};
 		    push @wanted, $File::Find::name
 			if defined $version1 &&
 			   defined $version2 &&

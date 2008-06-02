@@ -14,7 +14,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
 
-    my $st = eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1; };
+    my $st = try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1; };
     $extra = 1
         if $st ;
 
@@ -57,11 +57,11 @@ sub run
             
         my($out, $gz);
         $out = "" ;
-        eval { $a = $CompressClass->new( $out ) };
+        try { $a = $CompressClass->new( $out ) };
         like $@->{description}, mkEvalErr("^$CompressClass: output filename is undef or null string");
             
         $out = undef ;
-        eval { $a = $CompressClass->new($out) };
+        try { $a = $CompressClass->new($out) };
         like $@->{description}, mkEvalErr("^$CompressClass: output filename is undef or null string");
             
         my $x ;
@@ -775,7 +775,7 @@ EOT
         my $io = $UncompressClass->new($name);
 
 
-        eval { $io->read(1) } ;
+        try { $io->read(1) } ;
         like $@->{description}, mkErr("buffer parameter is read-only");
 
         is $io->read($buf, 0), 0, "Requested 0 bytes" ;
@@ -1099,10 +1099,10 @@ foreach my $file (0, 1)
     my $a = $CompressClass-> new((\$b))  ;
 
     ok ! $a->error() ;
-    eval { $a->seek(-1, 10) ; };
+    try { $a->seek(-1, 10) ; };
     like $@->{description}, mkErr("^{$CompressClass}::seek: unknown value, 10, for whence parameter");
 
-    eval { $a->seek(-1, SEEK_END) ; };
+    try { $a->seek(-1, SEEK_END) ; };
     like $@->{description}, mkErr("^{$CompressClass}::seek: cannot seek backwards");
 
     $a->write("fred");
@@ -1111,13 +1111,13 @@ foreach my $file (0, 1)
 
     my $u = $UncompressClass-> new((\$b))  ;
 
-    eval { $u->seek(-1, 10) ; };
+    try { $u->seek(-1, 10) ; };
     like $@->{description}, mkErr("^{$UncompressClass}::seek: unknown value, 10, for whence parameter");
 
-    eval { $u->seek(-1, SEEK_END) ; };
+    try { $u->seek(-1, SEEK_END) ; };
     like $@->{description}, mkErr("^{$UncompressClass}::seek: SEEK_END not allowed");
 
-    eval { $u->seek(-1, SEEK_CUR) ; };
+    try { $u->seek(-1, SEEK_CUR) ; };
     like $@->{description}, mkErr("^{$UncompressClass}::seek: cannot seek backwards");
 }
 
@@ -1387,7 +1387,7 @@ foreach my $file (0, 1)
         eval "\$copy = $send";
         my $x = $CompressClass-> new((\$Answer));
         ok $x, "  Created $CompressClass object";
-        eval { $x->write($copy) } ;
+        try { $x->write($copy) } ;
         #like $@, "/^$get/", "  error - $get";
         like $@->{description}, "/not a scalar reference /", "  error - not a scalar reference";
     }

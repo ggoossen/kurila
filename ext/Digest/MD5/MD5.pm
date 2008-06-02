@@ -9,7 +9,7 @@ require Exporter;
 *import = \&Exporter::import;
 @EXPORT_OK = qw(md5 md5_hex md5_base64);
 
-eval {
+try {
     require Digest::base;
     push(@ISA, 'Digest::base');
 };
@@ -19,13 +19,13 @@ if ($@) {
 }
 
 
-eval {
+try {
     require XSLoader;
     XSLoader::load('Digest::MD5', $VERSION);
 };
 if ($@) {
     my $olderr = $@;
-    eval {
+    try {
 	# Try to load the pure perl version
 	require Digest::Perl::MD5;
 

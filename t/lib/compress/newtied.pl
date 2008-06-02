@@ -15,7 +15,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
+        if try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => $tests + $extra ;
 
@@ -222,10 +222,10 @@ EOT
 
                 ok $io, "opened ok" ;
             
-                #eval { read($io, $buf, -1); } ;
+                #try { read($io, $buf, -1); } ;
                 #like $@, mkErr("length parameter is negative"), "xxx $io $UncompressClass $RawInflateError" ;
 
-                #eval { read($io, 1) } ;
+                #try { read($io, 1) } ;
                 #like $@, mkErr("buffer parameter is read-only");
 
                 is read($io, $buf, 0), 0, "Requested 0 bytes" ;
@@ -292,10 +292,10 @@ EOT
             my $a = $CompressClass-> new((\$b))  ;
 
             ok ! $a->error() ;
-            eval { seek($a, -1, 10) ; };
+            try { seek($a, -1, 10) ; };
             like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
-            eval { seek($a, -1, SEEK_END) ; };
+            try { seek($a, -1, SEEK_END) ; };
             like $@->{description}, mkErr("cannot seek backwards");
 
             print $a "fred";
@@ -304,13 +304,13 @@ EOT
 
             my $u = $UncompressClass-> new((\$b))  ;
 
-            eval { seek($u, -1, 10) ; };
+            try { seek($u, -1, 10) ; };
             like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
-            eval { seek($u, -1, SEEK_END) ; };
+            try { seek($u, -1, SEEK_END) ; };
             like $@->{description}, mkErr("seek: SEEK_END not allowed");
 
-            eval { seek($u, -1, SEEK_CUR) ; };
+            try { seek($u, -1, SEEK_CUR) ; };
             like $@->{description}, mkErr("cannot seek backwards");
         }
 

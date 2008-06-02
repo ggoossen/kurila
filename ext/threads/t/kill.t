@@ -18,7 +18,7 @@ use ExtUtils::testlib;
 use threads;
 
 BEGIN {
-    eval {
+    try {
         require threads::shared;
         threads::shared->import();
     };
@@ -29,7 +29,7 @@ BEGIN {
 
     local %SIG{'HUP'} = sub {};
     my $thr = threads->create(sub {});
-    eval { $thr->kill('HUP') };
+    try { $thr->kill('HUP') };
     $thr->join();
     if ($@ && $@->{description} =~ m/safe signals/) {
         print("1..0 # Skip: Not using safe signals\n");

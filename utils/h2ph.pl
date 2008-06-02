@@ -157,7 +157,7 @@ while (defined (my $file = next_file())) {
                     ($opt_e && exists(%bad_file{$incl}))) {
                     $incl =~ s/\.h$/.ph/;
 		print OUT ($t,
-			   "eval \{\n");
+			   "try \{\n");
                 $tab += 4;
                 $t = "\t" x ($tab / 8) . ' ' x ($tab % 8);
                     print OUT ($t, "my(\@REM);\n");

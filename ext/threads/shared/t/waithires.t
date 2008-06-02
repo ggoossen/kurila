@@ -11,7 +11,7 @@ BEGIN {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
         exit(0);
     }
-    eval {
+    try {
         require Time::HiRes;
         Time::HiRes->import('time');
     };

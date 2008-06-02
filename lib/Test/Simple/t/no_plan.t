@@ -16,13 +16,13 @@ my $tb = Test::Builder->create;
 $tb->level(0);
 
 #line 19
-ok !eval { $tb->plan(tests => undef) };
+ok !try { $tb->plan(tests => undef) };
 is($@->{description}, "Got an undefined number of tests at $0 line 19.\n");
 
 #line 23
-ok !eval { $tb->plan(tests => 0) };
+ok !try { $tb->plan(tests => 0) };
 is($@->{description}, "You said to run 0 tests at $0 line 23.\n");
 
 #line 27
-ok !eval { $tb->ok(1) };
+ok !try { $tb->ok(1) };
 is( $@->{description}, "You tried to run a test without a plan at $0 line 27.\n");

@@ -128,7 +128,7 @@ Use of uninitialized value $a in scalar chop at - line 3.
 
 # Check scope of pragma with eval
 no warnings ;
-eval {
+try {
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
 }; print STDERR "-- {$@->message}" ;
@@ -142,7 +142,7 @@ The End.
 
 # Check scope of pragma with eval
 use warnings FATAL => 'uninitialized' ;
-eval {
+try {
     my $b ; chop $b ;
 }; print STDERR "-- {$@->message}" ;
 my $b ; chop $b ;
@@ -155,7 +155,7 @@ Use of uninitialized value $b in scalar chop at - line 7.
 
 # Check scope of pragma with eval
 use warnings FATAL => 'uninitialized' ;
-eval {
+try {
     no warnings ;
     my $b ; chop $b ;
 }; print STDERR $@;
@@ -167,7 +167,7 @@ Use of uninitialized value $b in scalar chop at - line 8.
 
 # Check scope of pragma with eval
 no warnings ;
-eval {
+try {
     use warnings FATAL => 'syntax' ;
     $a =+ 1 ;
 }; print STDERR "-- {$@->message}" ;
@@ -179,7 +179,7 @@ Reversed += operator at - line 6.
 
 # Check scope of pragma with eval
 use warnings FATAL => 'syntax' ;
-eval {
+try {
     $a =+ 1 ;
 }; print STDERR "-- {$@->message}" ;
 $a =+ 1 ;
@@ -190,7 +190,7 @@ Reversed += operator at - line 5.
 
 # Check scope of pragma with eval
 use warnings FATAL => 'syntax' ;
-eval {
+try {
     no warnings ;
     $a =+ 1 ;
 }; print STDERR $@;
@@ -202,7 +202,7 @@ Reversed += operator at - line 8.
 
 # Check scope of pragma with eval
 no warnings ;
-eval {
+try {
     use warnings FATAL => 'syntax' ;
 }; print STDERR $@;
 $a =+ 1 ;

@@ -315,10 +315,10 @@ foobar
         print "$p|$f|$l|$s\n";
     }
 };
-eval { die };
+try { die };
 &{sub { eval 'die' }}();
-sub foo { eval { die } } foo();
-{package rmb; sub{ eval{die} } ->() };	# check __ANON__ knows package	
+sub foo { try { die } } foo();
+{package rmb; sub{ try{die} } ->() };	# check __ANON__ knows package	
 print "Nothing\n";
 EXPECT
 Nothing
@@ -345,11 +345,11 @@ foo|fee|fie|foe
 ########
 package TH;
 sub TIEHASH { bless \%(), 'TH' }
-sub STORE { eval { print "@_[[1,2]]\n" }; die "bar\n" }
+sub STORE { try { print "@_[[1,2]]\n" }; die "bar\n" }
 tie our %h, 'TH';
-eval { %h{A} = 1; print "never\n"; };
+try { %h{A} = 1; print "never\n"; };
 print $@->{description};
-eval { %h{B} = 2; };
+try { %h{B} = 2; };
 print $@->{description};
 EXPECT
 A 1

@@ -13,7 +13,7 @@ BEGIN {
 use Sys::Hostname;
 
 my $host;
-eval {
+try {
     $host = hostname;
 };
 

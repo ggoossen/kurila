@@ -18,7 +18,7 @@ sub import {
 ok( require 'open.pm', 'requiring open' );
 
 # this should fail
-eval { import() };
+try { import() };
 like( $@->{description}, qr/needs explicit list of PerlIO layers/,
 	'import should fail without args' );
 
@@ -51,7 +51,7 @@ import( 'IN', ':raw' );
 is( %^H{'open_IN'}, 'raw', 'should have reset to raw layer' );
 
 # it dies if you don't set IN, OUT, or IO
-eval { import( 'sideways', ':raw' ) };
+try { import( 'sideways', ':raw' ) };
 like( $@->{description}, qr/Unknown PerlIO layer class/, 'should croak with unknown class' );
 
 # but it handles them all so well together
@@ -187,7 +187,7 @@ EOE
 SKIP: {
     skip("no perlio", 1) unless (PerlIO::Layer->find( 'perlio'));
     use open IN => ':non-existent';
-    eval {
+    try {
 	require Symbol; # Anything that exists but we havn't loaded
     };
     like($@->{description}, qr/Can't locate Symbol|Recursive call/i,
@@ -204,7 +204,7 @@ END {
 
 __DATA__
 $ENV{LC_ALL} = 'nonexistent.euc';
-eval { open::_get_locale_encoding() };
+try { open::_get_locale_encoding() };
 like( $@, qr/too ambiguous/, 'should die with ambiguous locale encoding' );
 %%%
 # the special :locale layer

@@ -35,9 +35,9 @@ $fact = 'local($foo)=$foo; $foo +<= 1 ? 1 : $foo-- * (eval $fact);';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 9\n";} else {print "not ok 9 $ans\n";}
 
-open(try, ">",'Op.eval');
-print try 'print "ok 10\n"; unlink "Op.eval";',"\n";
-close try;
+open(TRY, ">",'Op.eval');
+print TRY 'print "ok 10\n"; unlink "Op.eval";',"\n";
+close TRY;
 
 do './Op.eval'; print $@;
 
@@ -181,7 +181,7 @@ $x++;
     $x++;
 }
 
-# return from eval {} should clear $@ correctly
+# return from try {} should clear $@ correctly
 {
     my $status = try {
 	try { die };
@@ -414,7 +414,7 @@ $test++;
   }
 }
 
-sub Foo {} print Foo(eval {});
+sub Foo {} print Foo(try {});
 print "ok ",$test++," - #20798 (used to dump core)\n";
 
 # check for context in string eval
@@ -437,7 +437,7 @@ print "ok ",$test++," - #20798 (used to dump core)\n";
 
 $got = runperl (
     prog => 
-    'no strict; sub A::TIEARRAY { L: { eval { last L } } } tie my @a, q(A); warn qq(ok\n)',
+    'no strict; sub A::TIEARRAY { L: { try { last L } } } tie my @a, q(A); warn qq(ok\n)',
 stderr => 1);
 
 print "not " unless $got =~ qr/^ok\n/;

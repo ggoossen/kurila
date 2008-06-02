@@ -32,14 +32,14 @@ SKIP: {
     my( $file, $path ) = fileparse( $0 );
     skip( 'File in current directory', 2 ) if -e $file; 
     $$fake_out = '';
-    eval {
+    try {
         pod2usage(\%( -verbose => 0, -exit => 'noexit', 
                     -output => \*FAKEOUT, -input => $file ));
     };
     like( $@->message, qr/^Can't open $file/, 
           'File not found without -pathlist' );
 
-    eval {
+    try {
         pod2usage(\%( -verbose => 0, -exit => 'noexit',
                     -output => \*FAKEOUT, -input => $file, 
                     -pathlist => $path ));

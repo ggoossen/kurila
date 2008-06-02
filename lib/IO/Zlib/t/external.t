@@ -30,7 +30,7 @@ sub ok
 my $hasCompressZlib;
 
 BEGIN {
-    eval { require Compress::Zlib };
+    try { require Compress::Zlib };
     $hasCompressZlib = $@ ? 0 : 1;
 }
 

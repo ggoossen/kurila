@@ -104,7 +104,7 @@ my $m2 = $cpt->mask;
 my @masked = opset_to_ops($m1);
 print $m2 eq opset("negate", @masked) ? "ok 21\n" : "not ok 21\n";
 
-print eval { $cpt->mask("a bad mask") } ? "not ok 22\n" : "ok 22\n";
+print try { $cpt->mask("a bad mask") } ? "not ok 22\n" : "ok 22\n";
 
 print $cpt->reval("2 + 2") == 4 ? "ok 23\n" : "not ok 23\n";
 

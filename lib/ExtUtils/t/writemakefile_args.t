@@ -44,7 +44,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 
     my $mm;
 
-    eval {
+    try {
         $mm = WriteMakefile(
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -58,7 +58,7 @@ WARNING: MAN3PODS takes a HASH reference not a string/number.
 VERIFY
 
     $warnings = '';
-    eval {
+    try {
         $mm = WriteMakefile(
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -96,7 +96,7 @@ VERIFY
     is_deeply( $mm->{LIBS}, \@('-lwibble', '-lwobble') );
 
     $warnings = '';
-    eval {
+    try {
         $mm = WriteMakefile(
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -124,7 +124,7 @@ VERIFY
 
     # Test VERSION
     $warnings = '';
-    eval {
+    try {
         $mm = WriteMakefile(
         NAME       => 'Big::Dummy',
         VERSION    => \@(1,2,3),
@@ -133,7 +133,7 @@ VERIFY
     like( $warnings, qr{^WARNING: VERSION takes a version object or string/number} );
 
     $warnings = '';
-    eval {
+    try {
         $mm = WriteMakefile(
         NAME       => 'Big::Dummy',
         VERSION    => 1.002_003,
@@ -143,7 +143,7 @@ VERIFY
     is( $mm->{VERSION}, '1.002003' );
 
     $warnings = '';
-    eval {
+    try {
         $mm = WriteMakefile(
         NAME       => 'Big::Dummy',
         VERSION    => '1.002_003',
@@ -154,7 +154,7 @@ VERIFY
 
 
     $warnings = '';
-    eval {
+    try {
         $mm = WriteMakefile(
         NAME       => 'Big::Dummy',
         VERSION    => bless \%(), "Some::Class",
@@ -164,12 +164,12 @@ VERIFY
 
 
     SKIP: {
-        skip("Can't test version objects",6) unless eval { require version };
+        skip("Can't test version objects",6) unless try { require version };
         version->import;
 
         my $version = version->new("1.2.3");
         $warnings = '';
-        eval {
+        try {
             $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => $version,
@@ -181,7 +181,7 @@ VERIFY
 
         $warnings = '';
         $version = qv('1.2.3');
-        eval {
+        try {
             $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => $version,

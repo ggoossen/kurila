@@ -51,7 +51,7 @@ package main;
 
 # now tests in eval
 
-ok( !try  { scalar %{Symbol::stash("achtfaden")} },   'works in eval{}' );
+ok( !try  { scalar %{Symbol::stash("achtfaden")} },   'works in try{}' );
 ok( !eval q{ defined %schoenmaker:: }, 'works in eval("")' );
 
 # now tests with strictures

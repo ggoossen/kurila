@@ -35,7 +35,7 @@ BEGIN {
 
 use Test::More tests => 45;
 
-my $symlink_exists = eval { symlink("",""); 1 };
+my $symlink_exists = try { symlink("",""); 1 };
 
 use File::Find;
 use File::Spec;
@@ -285,7 +285,7 @@ is(scalar keys %Expect_File, 0, 'Found all expected files');
 %Expect_Name = ();
 %Expect_Dir  = ();
 undef $@;
-eval {File::Find::find( \%(wanted => \&simple_wanted), topdir('fa') );};
+try {File::Find::find( \%(wanted => \&simple_wanted), topdir('fa') );};
 like( $@->{description}, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
 chdir($cwd_untainted);
 
@@ -293,7 +293,7 @@ chdir($cwd_untainted);
 # untaint pattern doesn't match, should die
 undef $@;
 
-eval {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
+try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_pattern => qr|^(NO_MATCH)$|),
                          topdir('fa') );};
 
@@ -305,7 +305,7 @@ chdir($cwd_untainted);
 print "# check untaint_skip (No follow)\n";
 undef $@;
 
-eval {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
+try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_skip => 1, untaint_pattern =>
                          qr|^(NO_MATCH)$|), topdir('fa') );};
 
@@ -358,7 +358,7 @@ SKIP: {
     # don't untaint at all, should die
     undef $@;
 
-    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
+    try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
 			    topdir('fa') );};
 
     like( $@->{description}, qr|Insecure dependency|, 'Not untainting causes death (good)' );
@@ -367,7 +367,7 @@ SKIP: {
     # untaint pattern doesn't match, should die
     undef $@;
 
-    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
+    try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                              untaint => 1, untaint_pattern =>
                              qr|^(NO_MATCH)$|), topdir('fa') );};
 
@@ -378,7 +378,7 @@ SKIP: {
     print "# check untaint_skip (Follow)\n";
     undef $@;
 
-    eval {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
+    try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                              untaint_skip => 1, untaint_pattern =>
                              qr|^(NO_MATCH)$|), topdir('fa') );};
     like( $@->{description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );

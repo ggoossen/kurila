@@ -85,7 +85,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
             strict->VERSION);
     
     $warnings = '';
-    eval {
+    try {
         WriteMakefile(
             NAME            => 'Big::Dummy',
             PREREQ_PM       => \%(
@@ -109,7 +109,7 @@ END
 
 
     $warnings = '';
-    eval {
+    try {
         WriteMakefile(
             NAME            => 'Big::Dummy',
             PREREQ_PM       => \%(

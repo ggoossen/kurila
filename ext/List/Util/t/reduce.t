@@ -42,11 +42,11 @@ sub add {
 $v = reduce { my $t="$a $b\n"; 0+add($a, $b) } 3, 2, 1;
 is( $v,	6,	'call sub');
 
-# Check that eval{} inside the block works correctly
-$v = reduce { eval { die }; $a + $b } 0,1,2,3,4;
+# Check that try{} inside the block works correctly
+$v = reduce { try { die }; $a + $b } 0,1,2,3,4;
 is( $v,	10,	'use eval{}');
 
-$v = !defined eval { reduce { die if $b +> 2; $a + $b } 0,1,2,3,4 };
+$v = !defined try { reduce { die if $b +> 2; $a + $b } 0,1,2,3,4 };
 ok($v, 'die');
 
 sub foobar { reduce { (defined(wantarray) && !wantarray) ? $a+1 : 0 } 0,1,2,3 }
@@ -86,7 +86,7 @@ is($v, 12, 'return from loop');
 
 # Can we undefine a reduce sub while it's running?
 sub self_immolate {undef &self_immolate; 1}
-eval { $v = reduce \&self_immolate, 1,2; };
+try { $v = reduce \&self_immolate, 1,2; };
 like($@->{description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
@@ -94,7 +94,7 @@ like($@->{description}, qr/^Can't undef active subroutine/, "undef active sub");
 # running the Perl or XS implementation.
 
 sub self_updating { local $^W; *self_updating = sub{1} ;1 }
-eval { $v = reduce \&self_updating, 1,2; };
+try { $v = reduce \&self_updating, 1,2; };
 is($@, '', 'redefine self');
 
 { my $failed = 0;
@@ -130,11 +130,11 @@ if (!$::PERL_ONLY) { SKIP: {
       if !$List::Util::REAL_MULTICALL;
 
     # Can we goto a label from the reduction sub?
-    eval {()=reduce{goto foo} 1,2; foo: 1};
+    try {()=reduce{goto foo} 1,2; foo: 1};
     like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
-    eval {()=reduce{goto sub{}} 1,2;};
+    try {()=reduce{goto sub{}} 1,2;};
     like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 } }

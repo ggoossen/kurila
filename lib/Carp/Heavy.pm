@@ -141,7 +141,7 @@ sub get_subname {
     }
   }
 
-  return ($info->{sub} eq '(eval)') ? 'eval {...}' : $info->{sub};
+  return ($info->{sub} eq '(eval)') ? 'try {...}' : $info->{sub};
 }
 
 # Figures out what call (from the point of view of the caller)

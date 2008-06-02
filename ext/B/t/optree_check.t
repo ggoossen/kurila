@@ -86,7 +86,7 @@ if (1) {
     # calling fail isnt good enough by itself.
 
     $@='';
-    eval {
+    try {
 	checkOptree ( name	=> 'test against empty expectations',
 		      bcopts	=> '-exec',
 		      code	=> sub {print 1},
@@ -96,7 +96,7 @@ if (1) {
     like($@->{description}, m/no '\w+' golden-sample found/, "empty expectations prevented");
     
     $@='';
-    eval {
+    try {
 	checkOptree ( name	=> 'prevent whitespace only expectations',
 		      bcopts	=> '-exec',
 		      code	=> sub {my $a},

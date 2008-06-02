@@ -489,8 +489,8 @@ if (%Config{installusrbinperl} && %Config{installusrbinperl} eq 'define' &&
     if (! $mainperl_is_instperl) {
 	unlink($usrbinperl);
 	( %Config{'d_link'} eq 'define' &&
-	  eval { CORE::link $instperl, $usrbinperl } )	||
-	eval { symlink $expinstperl, $usrbinperl }	||
+	  try { CORE::link $instperl, $usrbinperl } )	||
+	try { symlink $expinstperl, $usrbinperl }	||
 	copy($instperl, $usrbinperl);
 
 	$mainperl_is_instperl = 1;
@@ -700,11 +700,11 @@ sub link {
     my $xto = $to;
     $xto =~ s/^\Q$destdir\E// if $destdir;
     print $verbose ? "  ln $xfrom $xto\n" : "  $xto\n" unless $silent;
-    eval {
+    try {
 	CORE::link($from, $to)
 	    ? $success++
 	    : ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
-	      ? die "AFS"  # okay inside eval {}
+	      ? die "AFS"  # okay inside try {}
 	      : die "Couldn't link $from to $to: $!\n"
 	  unless $nonono;
 	$packlist->{$xto} = \%( from => $xfrom, type => 'link' );

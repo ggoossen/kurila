@@ -22,7 +22,7 @@ eval q{
 like( $@->{description}, qr/^Not enough arguments for ExtUtils::MakeMaker::prompt/,
                                             'no args' );
 
-eval {
+try {
     prompt(undef);
 };
 like( $@->{description}, qr/^prompt function called without an argument/, 

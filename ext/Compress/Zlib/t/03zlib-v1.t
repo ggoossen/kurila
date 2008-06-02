@@ -19,7 +19,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     my $count = 401 ;
 
@@ -55,11 +55,11 @@ my $fil;
 # compress/uncompress tests
 # =========================
 
-eval { compress(\@(1)); };
+try { compress(\@(1)); };
 ok $@->{description} =~ m#not a scalar reference#
     or print "# $@\n" ;;
 
-eval { uncompress(\@(1)); };
+try { uncompress(\@(1)); };
 ok $@->{description} =~ m#not a scalar reference#
     or print "# $@\n" ;;
 
@@ -691,11 +691,11 @@ EOM
     $input .= $hello;
     
     # error cases
-    eval { $x->deflateParams() };
+    try { $x->deflateParams() };
     #like $@, mkErr("^Compress::Raw::Zlib::deflateParams needs Level and/or Strategy");
     like $@->{description}, "/^Compress::Raw::Zlib::deflateParams needs Level and/or Strategy/";
 
-    eval { $x->deflateParams(-Joe => 3) };
+    try { $x->deflateParams(-Joe => 3) };
     like $@->{description}, "/^Compress::Raw::Zlib::deflateStream::deflateParams: unknown key value/";
     #like $@, mkErr("^Compress::Raw::Zlib::deflateStream::deflateParams: unknown key value(s) Joe");
     #ok $@ =~ /^Compress::Zlib::deflateStream::deflateParams: unknown key value\(s\) Joe at/
@@ -760,43 +760,43 @@ EOM
 {
     # error cases
 
-    eval { deflateInit(-Level) };
+    try { deflateInit(-Level) };
     like $@->{description}, '/^Compress::Zlib::deflateInit: Expected even number of parameters, got 1/';
 
-    eval { inflateInit(-Level) };
+    try { inflateInit(-Level) };
     like $@->{description}, '/^Compress::Zlib::inflateInit: Expected even number of parameters, got 1/';
 
-    eval { deflateInit(-Joe => 1) };
+    try { deflateInit(-Joe => 1) };
     ok $@->{description} =~ m/^Compress::Zlib::deflateInit: unknown key value\(s\) Joe at/;
 
-    eval { inflateInit(-Joe => 1) };
+    try { inflateInit(-Joe => 1) };
     ok $@->{description} =~ m/^Compress::Zlib::inflateInit: unknown key value\(s\) Joe at/;
 
-    eval { deflateInit(-Bufsize => 0) };
+    try { deflateInit(-Bufsize => 0) };
     ok $@->{description} =~ m/^.*?: Bufsize must be >= 1, you specified 0 at/;
 
-    eval { inflateInit(-Bufsize => 0) };
+    try { inflateInit(-Bufsize => 0) };
     ok $@->{description} =~ m/^.*?: Bufsize must be >= 1, you specified 0 at/;
 
-    eval { deflateInit(-Bufsize => -1) };
+    try { deflateInit(-Bufsize => -1) };
     #ok $@ =~ /^.*?: Bufsize must be >= 1, you specified -1 at/;
     ok $@->{description} =~ m/^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
 
-    eval { inflateInit(-Bufsize => -1) };
+    try { inflateInit(-Bufsize => -1) };
     ok $@->{description} =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
 
-    eval { deflateInit(-Bufsize => "xxx") };
+    try { deflateInit(-Bufsize => "xxx") };
     ok $@->{description} =~ m/^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
-    eval { inflateInit(-Bufsize => "xxx") };
+    try { inflateInit(-Bufsize => "xxx") };
     ok $@->{description} =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
-    eval { gzopen(\@(), 0) ; }  ;
+    try { gzopen(\@(), 0) ; }  ;
     ok $@->{description} =~ m/^gzopen: file parameter is not a filehandle or filename at/
 	or print "# $@\n" ;
 
 #    my $x = Symbol::gensym() ;
-#    eval { gzopen($x, 0) ; }  ;
+#    try { gzopen($x, 0) ; }  ;
 #    ok $@ =~ /^gzopen: file parameter is not a filehandle or filename at/
 #	or print "# $@\n" ;
 

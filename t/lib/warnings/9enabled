@@ -195,7 +195,7 @@ sub check {
 --FILE-- 
 use warnings 'syntax' ;
 use abc ;
-eval { 
+try { 
   abc::check() ; 
 };
 print $@ ;
@@ -216,7 +216,7 @@ sub check {
 --FILE-- 
 use warnings 'syntax' ;
 use abc ;
-eval { 
+try { 
   abc::check() ; 
   } ;
 print $@ ;
@@ -237,7 +237,7 @@ sub check {
 --FILE-- 
 use warnings 'syntax' ;
 require "abc" ;
-eval { 
+try { 
   abc::check() ; 
   } ;
 print $@ ;
@@ -258,7 +258,7 @@ sub check {
 --FILE-- 
 use warnings 'syntax' ;
 require "abc" ;
-eval { 
+try { 
   use warnings 'io' ; 
   abc::check() ; 
 };
@@ -332,11 +332,11 @@ ok4
 
 # check warnings::warn
 use warnings ;
-eval { 
+try { 
     warnings::warn() 
   } ;
 print $@->message;
-eval { 
+try { 
   warnings::warn("fred", "joe") 
   } ;
 print $@->message;
@@ -352,11 +352,11 @@ Unknown warnings category 'fred' at .../warnings.pm line xxx.
 
 # check warnings::warnif
 use warnings ;
-eval { 
+try { 
   warnings::warnif() 
 } ;
 print $@->message;
-eval { 
+try { 
   warnings::warnif("fred", "joe") 
 } ;
 print $@->message;
@@ -408,7 +408,7 @@ sub check { warnings::warn("io", "hello") }
 --FILE--
 use warnings qw( FATAL deprecated ) ;
 use abc;
-eval { 
+try { 
     abc::check() ; 
   } ;
 print "[[$@]]\n";
@@ -428,7 +428,7 @@ sub check { warnings::warn("io", "hello") }
 --FILE--
 use warnings qw( FATAL io ) ;
 use abc;
-eval { 
+try { 
   abc::check() ; 
 } ;
 print "[[{$@->message}]]\n";
@@ -576,7 +576,7 @@ sub check {
 use warnings 'syntax' ;
 use abc ;
 use warnings 'abc' ;
-eval { abc::check() ; };
+try { abc::check() ; };
 print $@ ;
 EXPECT
 ok1
@@ -596,7 +596,7 @@ sub check {
 --FILE-- 
 use warnings 'syntax' ;
 use abc ;
-eval { abc::check() ; } ;
+try { abc::check() ; } ;
 print $@ ;
 EXPECT
 ok1
@@ -705,7 +705,7 @@ sub check { warnings::warn("hello") }
 --FILE--
 use abc;
 use warnings qw( FATAL deprecated ) ;
-eval {
+try {
     abc::check() ; 
   } ;
 print "[[$@]]\n";
@@ -725,7 +725,7 @@ sub check { warnings::warn("hello") }
 --FILE--
 use abc;
 use warnings qw( FATAL abc ) ;
-eval { 
+try { 
   abc::check() ; 
   } ;
 print "[[{$@->message}]]\n";
@@ -1261,7 +1261,7 @@ sub call_warner {
 
 package main;
 my $warn_line = __LINE__ + 3; # this line should be in the error message
-eval {
+try {
     use warnings FATAL => $warn_cat; # we want to know if this works
     ClientModule::call_warner();
 };

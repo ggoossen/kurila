@@ -70,12 +70,12 @@ SKIP: {
 	$mm->{IMPORTS} = \%( foo => 'bar' );
 
 	local $@->{description};
-	eval { $mm->dlsyms() };
+	try { $mm->dlsyms() };
 	like( $@->{description}, qr/Can.t mkdir tmp_imp/, 
 		'... should die if directory cannot be made' );
 
 	unlink('tmp_imp') or skip("Cannot remove test file: $!", 9);
-	eval { $mm->dlsyms() };
+	try { $mm->dlsyms() };
 	like( $@->{description}, qr/Malformed IMPORT/, 'should die from malformed import symbols');
 
 	$mm->{IMPORTS} = \%( foo => 'bar.baz' );
@@ -92,14 +92,14 @@ SKIP: {
 		$unlinked++;
 	};
 
-	eval { $mm->dlsyms() };
+	try { $mm->dlsyms() };
 
 	like( $sysargs, qr/^emximp/, '... should try to call system() though' );
 	like( $@->{description}, qr/Cannot make import library/, 
 		'... should die if emximp syscall fails' );
 
 	# sysfail is 0 now, call emximp call should succeed
-	eval { $mm->dlsyms() };
+	try { $mm->dlsyms() };
 	is( $unlinked, 1, '... should attempt to unlink temp files' );
 	like( $@->{description}, qr/Cannot extract import/, 
 		'... should die if other syscall fails' );
@@ -107,7 +107,7 @@ SKIP: {
 	# make both syscalls succeed
 	@sysfail = (0, 0);
 	local $@->{description};
-	eval { $mm->dlsyms() };
+	try { $mm->dlsyms() };
 	is( $@, '', '... should not die if both syscalls succeed' );
 }
 

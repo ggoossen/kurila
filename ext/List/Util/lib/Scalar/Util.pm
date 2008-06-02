@@ -64,7 +64,7 @@ sub UNIVERSAL::a_sub_not_likely_to_be_here { ref(@_[0]) }
 sub blessed ($) {
   local($@, $^WARN_HOOK);
   length(ref(@_[0]))
-    ? eval { @_[0]->a_sub_not_likely_to_be_here }
+    ? try { @_[0]->a_sub_not_likely_to_be_here }
     : undef
 }
 
@@ -91,9 +91,9 @@ sub reftype ($) {
   length($t = ref($r)) or return undef;
 
   # This eval will fail if the reference is not blessed
-  eval { $r->a_sub_not_likely_to_be_here; 1 }
+  try { $r->a_sub_not_likely_to_be_here; 1 }
     ? do {
-      $t = eval {
+      $t = try {
 	  # we have a GLOB or an IO. Stringify a GLOB gives it's name
 	  my $q = *$r;
 	  Symbol::glob_name($q) ? "GLOB" : "IO";
@@ -115,7 +115,7 @@ sub reftype ($) {
 sub tainted {
   local($@, $^WARN_HOOK);
   local $^W = 0;
-  eval { kill 0 * @_[0] };
+  try { kill 0 * @_[0] };
   $@ =~ /^Insecure/;
 }
 
@@ -125,7 +125,7 @@ sub readonly {
   local($@, $^WARN_HOOK);
   my $tmp = @_[0];
 
-  !eval { @_[0] = $tmp; 1 };
+  !try { @_[0] = $tmp; 1 };
 }
 
 sub looks_like_number {

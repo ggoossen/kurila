@@ -7,7 +7,7 @@ BEGIN {
 
 BEGIN {
     our $hasse;
-    eval { my @n = getservbyname "echo", "tcp" };
+    try { my @n = getservbyname "echo", "tcp" };
     $hasse = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasse) { print "1..0 # Skip: no getservbyname\n"; exit 0 }
     use Config;

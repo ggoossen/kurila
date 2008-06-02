@@ -17,7 +17,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
 
     plan tests => 907 + $extra ;
@@ -250,14 +250,14 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
     for my $code ( -1, undef, '', 'fred' )
     {
         my $code_name = defined $code ? "'$code'" : "'undef'";
-        eval { IO::Compress::Gzip->new( $name, -OS_Code => $code) } ;
+        try { IO::Compress::Gzip->new( $name, -OS_Code => $code) } ;
         like $@->{description}, mkErr("^IO::Compress::Gzip: Parameter 'OS_Code' must be an unsigned int, got $code_name"),
             " Trap OS Code $code_name";
     }
 
     for my $code ( qw( 256 ) )
     {
-        eval { ok ! IO::Compress::Gzip->new($name, OS_Code => $code) };
+        try { ok ! IO::Compress::Gzip->new($name, OS_Code => $code) };
         like $@->{description}, mkErr("OS_Code must be between 0 and 255, got '$code'"),
             " Trap OS Code $code";
         like $GzipError, "/OS_Code must be between 0 and 255, got '$code'/",
@@ -365,7 +365,7 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
         my ($input, $string) = @$test ;
         my $buffer ;
         my $x ;
-        eval { $x = IO::Compress::Gzip->new( \$buffer, -ExtraField  => $input); };
+        try { $x = IO::Compress::Gzip->new( \$buffer, -ExtraField  => $input); };
         like $@->{description}, mkErr("$prefix$string");  
         like $GzipError, "/$prefix$string/";  
         ok ! $x ;
@@ -418,7 +418,7 @@ for my $value ( "0D", "0A", "0A0D", "0D0A", "0A0A", "0D0D")
 
         my $buffer ;
         my $x ;
-        eval {$x = IO::Compress::Gzip->new( \$buffer, -ExtraField  => $input, Strict => 1); };
+        try {$x = IO::Compress::Gzip->new( \$buffer, -ExtraField  => $input, Strict => 1); };
         like $@->{description}, mkErr("$gzip_error"), "  $name";  
         like $GzipError, "/$gzip_error/", "  $name";  
 
@@ -597,7 +597,7 @@ EOM
 {
     title "Header Corruption - ExtraField too big";
     my $x;
-    eval { IO::Compress::Gzip->new(\$x, -ExtraField => "x" x (GZIP_FEXTRA_MAX_SIZE + 1)) ;};
+    try { IO::Compress::Gzip->new(\$x, -ExtraField => "x" x (GZIP_FEXTRA_MAX_SIZE + 1)) ;};
     like $@->{description}, mkErr('Error with ExtraField Parameter: Too Large');
     like $GzipError, '/Error with ExtraField Parameter: Too Large/';
 }
@@ -606,7 +606,7 @@ EOM
     title "Header Corruption - Create Name with Illegal Chars";
 
     my $x;
-    eval { IO::Compress::Gzip->new( \$x, -Name => "fred\x[02]") };
+    try { IO::Compress::Gzip->new( \$x, -Name => "fred\x[02]") };
     like $@->{description}, mkErr('Non ISO 8859-1 Character found in Name');
     like $GzipError, '/Non ISO 8859-1 Character found in Name/';
 
@@ -632,11 +632,11 @@ EOM
 {
     title "Header Corruption - Null Chars in Name";
     my $x;
-    eval { IO::Compress::Gzip->new( \$x, -Name => "\x00") };
+    try { IO::Compress::Gzip->new( \$x, -Name => "\x00") };
     like $@->{description}, mkErr('Null Character found in Name');
     like $GzipError, '/Null Character found in Name/';
 
-    eval { IO::Compress::Gzip->new( \$x, -Name => "abc\x00") };
+    try { IO::Compress::Gzip->new( \$x, -Name => "abc\x00") };
     like $@->{description}, mkErr('Null Character found in Name');
     like $GzipError, '/Null Character found in Name/';
 
@@ -657,7 +657,7 @@ EOM
     title "Header Corruption - Create Comment with Illegal Chars";
 
     my $x;
-    eval { IO::Compress::Gzip->new( \$x, -Comment => "fred\x02") };
+    try { IO::Compress::Gzip->new( \$x, -Comment => "fred\x02") };
     like $@->{description}, mkErr('Non ISO 8859-1 Character found in Comment');
     like $GzipError, '/Non ISO 8859-1 Character found in Comment/';
 
@@ -681,11 +681,11 @@ EOM
 {
     title "Header Corruption - Null Char in Comment";
     my $x;
-    eval { IO::Compress::Gzip->new( \$x, -Comment => "\x00") };
+    try { IO::Compress::Gzip->new( \$x, -Comment => "\x00") };
     like $@->{description}, mkErr('Null Character found in Comment');
     like $GzipError, '/Null Character found in Comment/';
 
-    eval { IO::Compress::Gzip->new( \$x, -Comment => "abc\x00") } ;
+    try { IO::Compress::Gzip->new( \$x, -Comment => "abc\x00") } ;
     like $@->{description}, mkErr('Null Character found in Comment');
     like $GzipError, '/Null Character found in Comment/';
 

@@ -15,7 +15,7 @@ plan tests => 5;
 my $Perl = which_perl();
 
 my $start_time = time;
-eval {
+try {
     local %SIG{ALRM} = sub { die "ALARM!\n" };
     alarm 3;
 
@@ -31,7 +31,7 @@ ok( abs($diff - 3) +<= 1,   "   right time" );
 
 
 my $start_time = time;
-eval {
+try {
     local %SIG{ALRM} = sub { die "ALARM!\n" };
     alarm 3;
     system(qq{$Perl -e "sleep 6"});
@@ -51,7 +51,7 @@ is( $@->{description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs system()' 
 
 {
     local %SIG{"ALRM"} = sub { die };
-    eval { alarm(1); my $x = qx($Perl -e "sleep 3") };
+    try { alarm(1); my $x = qx($Perl -e "sleep 3") };
     chomp (my $foo = "foo\n");
     ok($foo eq "foo", '[perl #33928] chomp() fails after alarm(), `sleep`');
 }

@@ -135,7 +135,7 @@ sub failure_handler_auto {
 
   # Dumbly copied from sub maketext:
   {
-    eval { $value = &$value($handle, @_) };
+    try { $value = &$value($handle, @_) };
   }
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:
@@ -224,7 +224,7 @@ sub maketext {
   return $value unless ref($value) eq 'CODE';
   
   {
-    eval { $value = &$value($handle, @_) };
+    try { $value = &$value($handle, @_) };
   }
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:

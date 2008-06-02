@@ -134,7 +134,7 @@ close DUMMY;
   ok( -r $tfile, 'different install exists' );
   my @warn;
   local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
-  my $ok=eval {
+  my $ok=try {
     install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
@@ -160,7 +160,7 @@ close DUMMY;
   ok( -r $tfile, 'different install exists' );
   my @warn;
   local $^WARN_HOOK=sub { push @warn,@_[0]->message; return };
-  my $ok=eval {
+  my $ok=try {
     install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'

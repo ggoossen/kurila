@@ -10,7 +10,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
+        if try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     plan tests => 970 + $extra ;
 
@@ -43,22 +43,22 @@ sub run
         my $a;
         my $x ;
 
-        eval { $a = $Func->(\$a => \$x, Fred => 1) ;} ;
+        try { $a = $Func->(\$a => \$x, Fred => 1) ;} ;
         like $@->{description}, qr/^$TopType: unknown key value\(s\) Fred/, '  Illegal Parameters';
 
-        eval { $a = $Func->() ;} ;
+        try { $a = $Func->() ;} ;
         like $@->{description}, qr/^$TopType: expected at least 1 parameters/, '  No Parameters';
 
-        eval { $a = $Func->(\$x, \1) ;} ;
+        try { $a = $Func->(\$x, \1) ;} ;
         like $$Error, "/^$TopType: output buffer is read-only/", '  Output is read-only' ;
 
         my $in ;
-        eval { $a = $Func->($in, \$x) ;} ;
+        try { $a = $Func->($in, \$x) ;} ;
         like $@->{description}, mkErr("^$TopType: input filename is undef or null string"), 
             '  Input filename undef' ;
 
         $in = '';    
-        eval { $a = $Func->($in, \$x) ;} ;
+        try { $a = $Func->($in, \$x) ;} ;
         like $@->{description}, mkErr("^$TopType: input filename is undef or null string"), 
             '  Input filename empty' ;
 
@@ -66,7 +66,7 @@ sub run
             my $lex1 = LexFile->new( my $in) ;
             writeFile($in, "abc");
             my $out = $in ;
-            eval { $a = $Func->($in, $out) ;} ;
+            try { $a = $Func->($in, $out) ;} ;
             like $@->{description}, mkErr("^$TopType: input and output filename are identical"),
                 '  Input and Output filename are the same';
         }
@@ -87,7 +87,7 @@ sub run
                 '  Output filename is a directory';
         }
 
-        eval { $a = $Func->(\$in, \$in) ;} ;
+        try { $a = $Func->(\$in, \$in) ;} ;
         like $@->{description}, mkErr("^$TopType: input and output buffer are identical"),
             '  Input and Output buffer are the same';
             
@@ -97,7 +97,7 @@ sub run
 
             my $lex = LexFile->new( my $out_file) ;
             open OUT, ">", "$out_file" ;
-            eval { $a = $Func->(\*OUT, \*OUT) ;} ;
+            try { $a = $Func->(\*OUT, \*OUT) ;} ;
             like $@->{description}, mkErr("^$TopType: input and output handle are identical"),
                 '  Input and Output handle are the same';
                 
@@ -110,23 +110,23 @@ sub run
             my $object = bless \%x, "someClass" ;
 
             # Buffer not a scalar reference
-            #eval { $a = $Func->(\$x, \%x) ;} ;
-            eval { $a = $Func->(\$x, $object) ;} ;
+            #try { $a = $Func->(\$x, \%x) ;} ;
+            try { $a = $Func->(\$x, $object) ;} ;
             like $@->{description}, mkErr("^$TopType: illegal output parameter"),
                 '  Bad Output Param';
                 
             # Buffer not a scalar reference
-            eval { $a = $Func->(\$x, \%x) ;} ;
+            try { $a = $Func->(\$x, \%x) ;} ;
             like $@->{description}, mkErr("^$TopType: illegal output parameter"),
                 '  Bad Output Param';
                 
 
-            eval { $a = $Func->(\%x, \$x) ;} ;
+            try { $a = $Func->(\%x, \$x) ;} ;
             like $@->{description}, mkErr("^$TopType: illegal input parameter"),
                 '  Bad Input Param';
 
-            #eval { $a = $Func->(\%x, \$x) ;} ;
-            eval { $a = $Func->($object, \$x) ;} ;
+            #try { $a = $Func->(\%x, \$x) ;} ;
+            try { $a = $Func->($object, \$x) ;} ;
             like $@->{description}, mkErr("^$TopType: illegal input parameter"),
                 '  Bad Input Param';
         }
@@ -143,7 +143,7 @@ sub run
         is $a, undef, "  $TopType returned undef";
         like $$Error, ("/^(cannot open file '$filename'|input file '$filename' does not exist):/"), "  output File '$filename' does not exist";
             
-        eval { $a = $Func->(\$x, '<abc>') } ;
+        try { $a = $Func->(\$x, '<abc>') } ;
         like $$Error, "/Need input fileglob for outout fileglob/",
                 '  Output fileglob with no input fileglob';
         is $a, undef, "  $TopType returned undef";
@@ -175,12 +175,12 @@ sub run
                     if %Config{useithreads};
 
                 
-                eval { $a = $Func->(\$in, \$out, TrailingData => \"abc") ;} ;
+                try { $a = $Func->(\$in, \$out, TrailingData => \"abc") ;} ;
                 like $@->{description}, mkErr("^$TopType: Parameter 'TrailingData' not writable"),
                     '  TrailingData output not writable';
             }
 
-            eval { $a = $Func->(\$in, \$out, TrailingData => \@x) ;} ;
+            try { $a = $Func->(\$in, \$out, TrailingData => \@x) ;} ;
             like $@->{description}, mkErr("^$TopType: Parameter 'TrailingData' not a scalar reference"),
                 '  TrailingData output not scaral reference';
         }
@@ -1519,7 +1519,7 @@ sub run
             eval "\$copy = $send";
             my $Answer ;
             my $a ;
-            eval { $a = &$Func($copy, \$Answer) };
+            try { $a = &$Func($copy, \$Answer) };
             ok ! $a, "  $Name fails";
 
             is $$Error, $get, "  got error message";
@@ -1538,7 +1538,7 @@ sub run
             my($copy);
             eval "\$copy = $send";
             my $Answer ;
-            eval { &$Func($copy, \$Answer) } ;
+            try { &$Func($copy, \$Answer) } ;
             like $@->{description}, mkErr("^$TopFuncName: input filename is undef or null string"), 
                 "  got error message";
 

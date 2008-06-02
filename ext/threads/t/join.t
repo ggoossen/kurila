@@ -18,7 +18,7 @@ use ExtUtils::testlib;
 use threads;
 
 BEGIN {
-    eval {
+    try {
         require threads::shared;
         threads::shared->import();
     };
@@ -156,9 +156,9 @@ if ($^O eq 'linux') {
     my $t = threads->create(sub {});
     $t->join();
     threads->create(sub {})->join();
-    eval { $t->join(); };
+    try { $t->join(); };
     ok(($@->{description} =~ m/Thread already joined/), "Double join works");
-    eval { $t->detach(); };
+    try { $t->detach(); };
     ok(($@->{description} =~ m/Cannot detach a joined thread/), "Detach joined thread");
 }
 
@@ -166,9 +166,9 @@ if ($^O eq 'linux') {
     my $t = threads->create(sub {});
     $t->detach();
     threads->create(sub {})->join();
-    eval { $t->detach(); };
+    try { $t->detach(); };
     ok(($@->{description} =~ m/Thread already detached/), "Double detach works");
-    eval { $t->join(); };
+    try { $t->join(); };
     ok(($@->{description} =~ m/Cannot join a detached thread/), "Join detached thread");
 }
 
@@ -193,7 +193,7 @@ if ($^O eq 'linux') {
 
     threads->yield();
     sleep 1;
-    eval { $t->join; };
+    try { $t->join; };
     ok(($@->{description} =~ m/^Thread already joined/)?1:0, "Join pending join");
 
     { lock($go); $go = 1; cond_signal($go); }
@@ -203,7 +203,7 @@ if ($^O eq 'linux') {
 {
     my $go : shared = 0;
     my $t = threads->create( sub {
-        eval { threads->self->join; };
+        try { threads->self->join; };
         ok(($@->{description} =~ m/^Cannot join self/), "Join self");
         lock($go); $go = 1; cond_signal($go);
     });
@@ -221,7 +221,7 @@ if ($^O eq 'linux') {
 
     threads->yield();
     sleep 1;
-    eval { $t->detach };
+    try { $t->detach };
     ok(($@->{description} =~ m/^Cannot detach a joined thread/)?1:0, "Detach pending join");
 
     { lock($go); $go = 1; cond_signal($go); }

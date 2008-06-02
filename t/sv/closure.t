@@ -668,7 +668,7 @@ __EOF__
     # savestack, due to the early freeing of the anon closure
 
     my $got = runperl(stderr => 1, prog => 
-'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; eval{$f->()}; print qq(ok\n)'
+'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print qq(ok\n)'
     );
     test { $got eq "ok\n" };
 }

@@ -10,14 +10,14 @@ my $md5 = Digest::MD5->new;
 if ($Digest::base::VERSION) {
     $md5->add_bits("01111111");
     ok($md5->hexdigest, "83acb6e67e50e31db6ed341dd2de1595");
-    eval {
+    try {
 	$md5->add_bits("0111");
     };
     ok($@->{description} =~ m/must be multiple of 8/);
 }
 else {
     print "# No Digest::base\n";
-    eval {
+    try {
 	$md5->add_bits("foo");
     };
     ok($@->{description} =~ m/^Can\'t locate Digest\/base\.pm in \@INC/);

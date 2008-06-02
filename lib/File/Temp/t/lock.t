@@ -7,7 +7,7 @@ use Fcntl;
 
 BEGIN {
 # see if we have O_EXLOCK
-  eval { &Fcntl::O_EXLOCK; };
+  try { &Fcntl::O_EXLOCK; };
   if ($@) {
     plan skip_all => 'Do not seem to have O_EXLOCK';
   } else {
@@ -28,7 +28,7 @@ my $flags = O_CREAT | O_RDWR | O_EXLOCK;
 
 my $timeout = 5;
 my $status;
-eval {
+try {
    local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
    alarm $timeout;
    my $newfh;
@@ -45,7 +45,7 @@ ok( !$status, "File $fh is locked" );
 # Now get a tempfile with locking disabled
 $fh = new File::Temp( EXLOCK => 0 );
 
-eval {
+try {
    local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
    alarm $timeout;
    my $newfh;

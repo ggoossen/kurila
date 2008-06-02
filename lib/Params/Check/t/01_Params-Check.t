@@ -254,7 +254,7 @@ use constant TRUE   => sub { 1 };
 
     local $Params::Check::WARNINGS_FATAL = 1;
 
-    eval { check( $tmpl, \%( foo => 1 ) ) };      
+    try { check( $tmpl, \%( foo => 1 ) ) };      
 
     ok( $@,             "Call dies with fatal toggled" );
     like( $@->{description},           qr/invalid type/,

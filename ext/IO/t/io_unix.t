@@ -20,7 +20,7 @@ BEGIN {
     elsif ($^O eq 'os2') {
 	require IO::Socket;
 
-	eval {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
+	try {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
 	  or $@->{description} !~ m/not implemented/ or
 	    $reason = 'compiled without TCP/IP stack v4';
     }
@@ -66,7 +66,7 @@ my $listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0);
 # local sockets.  Therefore we will retry with a File::Temp
 # generated filename from a temp directory.
 unless (defined $listen) {
-    eval { require File::Temp };
+    try { require File::Temp };
     unless ($@) {
 	File::Temp->import( 'mktemp');
 	for my $TMPDIR (%ENV{TMPDIR}, "/tmp") {

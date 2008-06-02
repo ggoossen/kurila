@@ -18,7 +18,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 250 + $extra ;
 
@@ -420,7 +420,7 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
         '  gzopen with missing mode fails' ;
 
     # unknown parameters
-    $fil = eval { gzopen($name, "xy") };
+    $fil = try { gzopen($name, "xy") };
     ok ! defined $fil, '  gzopen with unknown mode fails' ;
 
     $fil = gzopen($name, "ab") ;
@@ -475,7 +475,7 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 
         ok ! -w $name, "  input file not writable";
 
-        my $fil = eval { gzopen($name, "wb") };
+        my $fil = try { gzopen($name, "wb") };
         ok !$fil, "  gzopen returns undef" ;
         ok $gzerrno, "  gzerrno ok" or 
             diag " gzerrno $gzerrno\n";
@@ -497,7 +497,7 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 
         ok ! -r $name, "  input file not readable";
         $gzerrno = 0;
-        $fil = eval { gzopen($name, "rb") };
+        $fil = try { gzopen($name, "rb") };
         ok !$fil, "  gzopen returns undef" ;
         ok $gzerrno, "  gzerrno ok";
         chmod 0777, $name ;
@@ -559,10 +559,10 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 
     ok ! $a->gzerror() 
         or print "# gzerrno is $Compress::Zlib::gzerrno \n" ;
-    eval { $a->gzseek(-1, 10) ; };
+    try { $a->gzseek(-1, 10) ; };
     like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
-    eval { $a->gzseek(-1, SEEK_END) ; };
+    try { $a->gzseek(-1, SEEK_END) ; };
     like $@->{description}, mkErr("seek: cannot seek backwards");
 
     $a->gzwrite("fred");
@@ -571,13 +571,13 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 
     my $u = gzopen($name, "r");
 
-    eval { $u->gzseek(-1, 10) ; };
+    try { $u->gzseek(-1, 10) ; };
     like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
 
-    eval { $u->gzseek(-1, SEEK_END) ; };
+    try { $u->gzseek(-1, SEEK_END) ; };
     like $@->{description}, mkErr("seek: SEEK_END not allowed");
 
-    eval { $u->gzseek(-1, SEEK_CUR) ; };
+    try { $u->gzseek(-1, SEEK_CUR) ; };
     like $@->{description}, mkErr("seek: cannot seek backwards");
 }
 

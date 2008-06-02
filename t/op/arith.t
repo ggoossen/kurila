@@ -2,7 +2,7 @@
 
 print "1..145\n";
 
-sub try ($$) {
+sub tryok ($$) {
    print +(@_[1] ? "ok" : "not ok"), " @_[0]\n";
 }
 sub tryeq ($$$) {
@@ -50,10 +50,10 @@ my $limit = 1e6;
 # seem to be rather sloppy in Cray.
 $limit = 1e8 if $^O eq 'unicos';
 
-try $T++, abs( 13e21 %  4e21 -  1e21) +< $limit;
-try $T++, abs(-13e21 %  4e21 -  3e21) +< $limit;
-try $T++, abs( 13e21 % -4e21 - -3e21) +< $limit;
-try $T++, abs(-13e21 % -4e21 - -1e21) +< $limit;
+tryok $T++, abs( 13e21 %  4e21 -  1e21) +< $limit;
+tryok $T++, abs(-13e21 %  4e21 -  3e21) +< $limit;
+tryok $T++, abs( 13e21 % -4e21 - -3e21) +< $limit;
+tryok $T++, abs(-13e21 % -4e21 - -1e21) +< $limit;
 
 # UVs should behave properly
 
@@ -281,7 +281,7 @@ tryeq_sloppy $T++, 18446744073709551616/9223372036854775808, 2;
 
   my $t = time;
   my $t1000 = time() * 1000;
-  try $T++, abs($t1000 -1000 * $t) +<= 2000;
+  tryok $T++, abs($t1000 -1000 * $t) +<= 2000;
 }
 
 my $vms_no_ieee;

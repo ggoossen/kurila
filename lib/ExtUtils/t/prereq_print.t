@@ -15,7 +15,7 @@ use Config;
 
 use Test::More;
 
-unless( eval { require Data::Dumper } ) {
+unless( try { require Data::Dumper } ) {
     plan skip_all => 'Data::Dumper not available';
 }
 

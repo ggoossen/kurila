@@ -22,7 +22,7 @@ use Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&testpodchecker);
-$MYPKG = eval { (caller)[[0]] };
+$MYPKG = try { (caller)[[0]] };
 
 sub stripname( $ ) {
    local $_ = shift;

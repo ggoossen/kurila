@@ -18,7 +18,7 @@ use base;
     local $^DIE_HOOK = sub { 
         ::fail('sigdie not caught, this test should not run') 
     };
-    eval {
+    try {
       'base'->import(qw(Huh::Boo));
     };
 

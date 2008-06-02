@@ -46,10 +46,10 @@ eval 'UNITCHECK {print ":u3"; UNITCHECK {print ":u4"}}';
 "a" =~ m/(?{UNITCHECK {print ":u5"};
 	   CHECK {print ":c2"};
 	   BEGIN {print ":b6"}})/x;
-eval {BEGIN {print ":b7"}};
-eval {UNITCHECK {print ":u6"}};
-eval {INIT {print ":i2"}};
-eval {CHECK {print ":c3"}};
+try {BEGIN {print ":b7"}};
+try {UNITCHECK {print ":u6"}};
+try {INIT {print ":i2"}};
+try {CHECK {print ":c3"}};
 END {print ":e2"}
 SCRIPT
 

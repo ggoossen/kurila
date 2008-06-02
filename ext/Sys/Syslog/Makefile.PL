@@ -107,7 +107,7 @@ else {
 
 # if possible, generate the code that handles the constants with 
 # ExtUtils::Constant, otherwise use cached copy in fallback/
-if(eval {require ExtUtils::Constant; 1}) {
+if(try {require ExtUtils::Constant; 1}) {
     my @levels = qw(
         LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
         LOG_INFO LOG_NOTICE LOG_WARNING

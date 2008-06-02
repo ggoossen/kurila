@@ -7,7 +7,7 @@ BEGIN {
 
 BEGIN {
     our $hasne;
-    eval { my @n = getnetbyname "loopback" };
+    try { my @n = getnetbyname "loopback" };
     $hasne = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasne) { print "1..0 # Skip: no getnetbyname\n"; exit 0 }
     use Config;

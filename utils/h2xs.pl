@@ -661,7 +661,7 @@ $tmask = qr{$opt_o} if defined $opt_o;
 my $tmask_all = $tmask && $opt_o eq '.';
 
 if ($opt_x) {
-  eval {require C::Scan; 1}
+  try {require C::Scan; 1}
     or die <<EOD;
 C::Scan required if you use -x option.
 To install C::Scan, execute
@@ -944,7 +944,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
       unless ($tmask_all) {
 	warn "Scanning $filename for typedefs...\n";
 	my $td = $c->get('typedef_hash');
-	# eval {require 'dumpvar.pl'; ::dumpValue($td)} or warn $@ if $opt_d;
+	# try {require 'dumpvar.pl'; ::dumpValue($td)} or warn $@ if $opt_d;
 	my @f_good_td = grep $td->{$_}[1] eq '', keys %$td;
 	push @good_td, @f_good_td;
 	%typedefs_pre{[@f_good_td]}  = map $_->[0], %$td{[@f_good_td]};
@@ -982,7 +982,7 @@ if( ! $opt_X ){  # use XS, unless it was disabled
     for my $k (qw(char double float int long short unsigned signed void)) {
       %td{"$_$k"} = "$_$k" for ('', 'signed ', 'unsigned ');
     }
-    # eval {require 'dumpvar.pl'; ::dumpValue( [\@td, \%td] ); 1} or warn $@;
+    # try {require 'dumpvar.pl'; ::dumpValue( [\@td, \%td] ); 1} or warn $@;
     my $n = 0;
     my %bad_macs;
     while (keys %td +> $n) {
@@ -1127,7 +1127,7 @@ END
 
 my ($email,$author,$licence);
 
-eval {
+try {
        my $username;
        ($username,$author) = (getpwuid($>))[[0,6]];
        if (defined $username && defined $author) {
@@ -2073,7 +2073,7 @@ warn "Writing $ext$modpname/MANIFEST\n";
 open(MANI, ">",'MANIFEST') or die "Can't create MANIFEST: $!";
 my @files = grep { -f } (glob("*"), glob("t/*"), glob("$fallbackdirname/*"), glob("$modpmdir/*"));
 if (!@files) {
-  eval {opendir(D,'.');};
+  try {opendir(D,'.');};
   unless ($@) { @files = readdir(D); closedir(D); }
 }
 if (!@files) { @files = map {chomp && $_} `ls`; }

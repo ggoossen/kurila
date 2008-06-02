@@ -98,7 +98,7 @@ my $CanMoveAtBoot = ($Is_Win32 || $Is_cygwin);
 # *note* CanMoveAtBoot is only incidentally the same condition as below
 # this needs not hold true in the future.
 my $Has_Win32API_File = ($Is_Win32 || $Is_cygwin)
-    ? (eval {require Win32API::File; 1} || 0)
+    ? (try {require Win32API::File; 1} || 0)
     : 0;
 
 
@@ -445,7 +445,7 @@ sub _mkpath {
         printf "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
     }
     if (!$dry_run) {
-        if ( ! eval { File::Path::mkpath($dir,$show,$mode); 1 } ) {
+        if ( ! try { File::Path::mkpath($dir,$show,$mode); 1 } ) {
             _choke("Can't create '$dir'","$@");
         }
 
@@ -665,7 +665,7 @@ provided then the returned hashref will be the passed in hashref.
 
 sub install { #XXX OS-SPECIFIC
     my($from_to,$verbose,$dry_run,$uninstall_shadows,$skip,$always_copy,$result) = @_;
-    if (@_==1 and eval { 1+@$from_to }) {
+    if (@_==1 and try { 1+@$from_to }) {
         my %opts        = @$from_to;
         $from_to        = %opts{from_to} 
                             or Carp::confess("from_to is a mandatory parameter");
@@ -786,7 +786,7 @@ sub install { #XXX OS-SPECIFIC
         
         my $realtarget= $targetfile;
         if ($diff) {
-            eval {
+            try {
                 if (-f $targetfile) {
                     print "_unlink_or_rename($targetfile)\n" if $verbose+>1;
                     $targetfile= _unlink_or_rename( $targetfile, 'tryhard', 'install' )
@@ -1095,7 +1095,7 @@ sub inc_uninstall {
             # if not verbose, we just say nothing
         } else {
             print "Unlinking $targetfile (shadowing?)\n" if $verbose;
-            eval {
+            try {
                 die "Fake die for testing" 
                     if $ExtUtils::Install::Testing and
                        File::Spec->canonpath($ExtUtils::Install::Testing) eq $targetfile;

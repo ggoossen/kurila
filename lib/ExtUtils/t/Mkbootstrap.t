@@ -83,13 +83,13 @@ SKIP: {
 	SKIP: {
 	    skip("cannot write readonly files", 1) if -w 'dasboot.bs'; 
 
-	    eval{ Mkbootstrap('dasboot', 1) };
+	    try{ Mkbootstrap('dasboot', 1) };
 	    like( $@->{description}, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
 	}
 
 	# now put it back like it was
 	chmod 0777, 'dasboot.bs';
-	eval{ Mkbootstrap('dasboot', 'myarg') };
+	try{ Mkbootstrap('dasboot', 'myarg') };
 	is( $@, '', 'should not die, given good filename' );
 
 	# red and reed (a visual pun makes tests worth reading)
@@ -129,7 +129,7 @@ SKIP: {
 	$ExtUtils::Mkbootstrap::Verbose = 0;
 	
 	# if arguments contain '-l' or '-L' or '-R' print dl_findfile message
-	eval{ Mkbootstrap('dasboot', '-Larry') };
+	try{ Mkbootstrap('dasboot', '-Larry') };
 	is( $@, '', 'should be able to open a file again');
 
 	$file_is_ready = open(IN, "<", 'dasboot.bs');

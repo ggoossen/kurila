@@ -38,7 +38,7 @@ my $has_perlio = PerlIO::Layer->find( 'perlio');
 $| = 1;
 print "1..26\n";
 
-eval {
+try {
     %SIG{ALRM} = sub { die; };
     alarm 120;
 };

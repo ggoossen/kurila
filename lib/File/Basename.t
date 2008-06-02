@@ -160,7 +160,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 
     # How to identify taint when you see it
     sub any_tainted (@) {
-        return ! eval { eval("#" . substr(join("", @_), 0, 0)); 1 };
+        return ! try { eval("#" . substr(join("", @_), 0, 0)); 1 };
     }
 
     sub tainted ($) {

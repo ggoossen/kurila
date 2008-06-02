@@ -24,7 +24,7 @@ use Tk;
 die join '', __PACKAGE__, " doesn't work nice with Tk.pm verison $Tk::VERSION"
  if $Tk::VERSION eq '800.003';
 
-BEGIN { eval { require Tk::FcyEntry; }; };
+BEGIN { try { require Tk::FcyEntry; }; };
 use Tk::Pod;
 
 # The following was adapted from "tkpod" in the Tk-Pod dist.

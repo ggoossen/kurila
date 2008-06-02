@@ -188,7 +188,7 @@ ok( exp_vars('$(DIR)',0)             eq '$(UNDEFINEDNAME)/xxx' );
 ok( exp_vars('foo $(DIR)/yyy bar',0) eq 'foo $(UNDEFINEDNAME)/xxx/yyy bar' );
 
 $_ = "abcd";
-s/(..)/{$x = $1, m#.#
+s/(..)/{$x = $1; m#.#
 }/g;
 ok( $x eq "cd", 'a match nested in the RHS of a substitution' );
 

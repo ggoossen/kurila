@@ -97,7 +97,7 @@ BEGIN {
     # use secure tempfiles wherever possible
     eval "require File::Temp;";
     $::HaveTemp = ($@ eq "");
-    eval { require Module::CoreList; };
+    try { require Module::CoreList; };
     $::HaveCoreList = ($@ eq "");
 };
 
@@ -364,7 +364,7 @@ EOF
     $me = $Is_MSWin32 ? $ENV{'USERNAME'}
 	    : $^O eq 'os2' ? $ENV{'USER'} || $ENV{'LOGNAME'}
 	    : $Is_MacOS ? $ENV{'USER'}
-	    : eval { getpwuid($<) };	# May be missing
+	    : try { getpwuid($<) };	# May be missing
 
     $from = $::Config{'cf_email'}
        if !$from && $::Config{'cf_email'} && $::Config{'cf_by'} && $me &&

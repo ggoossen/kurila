@@ -214,7 +214,7 @@ SKIP: {
     ($file, $message) = each %{$error->[0]};
     is( $entry, $file, "and the message is: $message");
 
-    eval {@created = mkpath($entry, 0, 0700)};
+    try {@created = mkpath($entry, 0, 0700)};
     $error = $@;
     chomp $error; # just to remove silly # in TAP output
     cmp_ok( $error, 'ne', "", "no directory created (old-style) err=$error" )
@@ -241,21 +241,21 @@ SKIP: {
     $dir = catdir('EXTRA', '3', 'S');
     rmtree($dir, \%(error => \$error));
     is( scalar(@$error), 1, 'one error for an unreadable dir' );
-    eval { ($file, $message) = each %{$error->[0]}};
+    try { ($file, $message) = each %{$error->[0]}};
     is( $file, $dir, 'unreadable dir reported in error' )
         or diag($message);
 
     $dir = catdir('EXTRA', '3', 'T');
     rmtree($dir, \%(error => \$error));
     is( scalar(@$error), 1, 'one error for an unreadable dir T' );
-    eval { ($file, $message) = each %{$error->[0]}};
+    try { ($file, $message) = each %{$error->[0]}};
     is( $file, $dir, 'unreadable dir reported in error T' );
 
     $dir = catdir( 'EXTRA', '4' );
     rmtree($dir,  \%(result => \$list, error => \$err) );
     is( scalar(@$list), 0, q{don't follow a symlinked dir} );
     is( scalar(@$err),  2, q{two errors when removing a symlink in r/o dir} );
-    eval { ($file, $message) = each %{$err->[0]} };
+    try { ($file, $message) = each %{$err->[0]} };
     is( $file, $dir, 'symlink reported in error' );
 
     $dir  = catdir('EXTRA', '3', 'U');
@@ -263,7 +263,7 @@ SKIP: {
     rmtree($dir, $dir2, \%(verbose => 0, error => \$err, result => \$list));
     is( scalar(@$list),  1, q{deleted 1 out of 2 directories} );
     is( scalar(@$error), 1, q{left behind 1 out of 2 directories} );
-    eval { ($file, $message) = each %{$err->[0]} };
+    try { ($file, $message) = each %{$err->[0]} };
     is( $file, $dir, 'first dir reported in error' );
 }
 

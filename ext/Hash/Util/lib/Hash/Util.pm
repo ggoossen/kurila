@@ -482,7 +482,7 @@ and additionally are not prototyped.
 Note that the trapping of the restricted operations is not atomic:
 for example
 
-    eval { %hash = (illegal_key => 1) }
+    try { %hash = (illegal_key => 1) }
 
 leaves the C<%hash> empty rather than with its original contents.
 

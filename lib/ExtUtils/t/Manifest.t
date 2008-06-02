@@ -170,7 +170,7 @@ is( ExtUtils::Manifest::maniread()->{none}, '#none',
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 $files = maniread();
-eval { (undef, $warn) = catch_warning( sub {
+try { (undef, $warn) = catch_warning( sub {
  		manicopy( $files, 'copy', 'cp' ) })
 };
 like( $@->{description}, qr/^Can't read none: /, 'croaked about none' );
@@ -270,12 +270,12 @@ SKIP: {
     chmod( 0400, 'MANIFEST' );
     skip "Can't make MANIFEST read-only", 2 if -w 'MANIFEST';
 
-    eval {
+    try {
         maniadd(\%( 'foo' => 'bar' ));
     };
     is( $@, '',  "maniadd() won't open MANIFEST if it doesn't need to" );
 
-    eval {
+    try {
         maniadd(\%( 'grrrwoof' => 'yippie' ));
     };
     like( $@->{description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  

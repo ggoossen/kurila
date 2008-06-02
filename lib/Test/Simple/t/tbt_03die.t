@@ -3,7 +3,7 @@
 use Test::Builder::Tester tests => 1;
 use Test::More;
 
-eval {
+try {
     test_test("foo");
 };
 like($@->{description},

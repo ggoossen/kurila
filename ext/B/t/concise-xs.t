@@ -349,7 +349,7 @@ sub render {
     B::Concise::walk_output(\my $buf);
 
     my $walker = B::Concise::compile($func_name);
-    eval { $walker->() };
+    try { $walker->() };
     diag("err: $@ $buf") if $@;
     diag("verbose: $buf") if %opts{V};
 
@@ -357,7 +357,7 @@ sub render {
 }
 
 sub corecheck {
-    eval { require Module::CoreList };
+    try { require Module::CoreList };
     if ($@) {
 	warn "Module::CoreList not available on $^V\n";
 	return;

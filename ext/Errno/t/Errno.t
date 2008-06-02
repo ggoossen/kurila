@@ -32,13 +32,13 @@ ok(! %!{$err});
 
 ok(join(",",sort keys(%!)) eq join(",",sort @Errno::EXPORT_OK));
 
-eval { exists %!{''} };
+try { exists %!{''} };
 ok(! $@);
 
-eval {%!{$err} = "qunckkk" };
+try {%!{$err} = "qunckkk" };
 like($@->{description}, qr/^ERRNO hash is read only!/);
 
-eval {delete %!{$err}};
+try {delete %!{$err}};
 like($@->{description}, qr/^ERRNO hash is read only!/);
 
 # The following tests are in trouble if some OS picks errno values

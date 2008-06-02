@@ -13,10 +13,10 @@ use Test::More tests => 106;
 use feature 'switch';
 no warnings "numeric";
 
-eval { continue };
+try { continue };
 like($@->{description}, qr/^Can't "continue" outside/, "continue outside");
 
-eval { break };
+try { break };
 like($@->{description}, qr/^Can't "break" outside/, "break outside");
 
 # Scoping rules
@@ -598,7 +598,7 @@ my $f = tie my $v, "FetchCounter";
     for (1, "two") {
 	when ("two") {
 	    is($first, 0, "Loop: second");
-	    eval {break};
+	    try {break};
 	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
@@ -615,7 +615,7 @@ my $f = tie my $v, "FetchCounter";
     for $_ (1, "two") {
 	when ("two") {
 	    is($first, 0, "Explicit \$_: second");
-	    eval {break};
+	    try {break};
 	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
@@ -633,7 +633,7 @@ my $f = tie my $v, "FetchCounter";
     for (1, "two") {
 	when ("two") {
 	    is($first, 0, "Implicitly lexical loop: second");
-	    eval {break};
+	    try {break};
 	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
@@ -651,7 +651,7 @@ my $f = tie my $v, "FetchCounter";
     for $_ (1, "two") {
 	when ("two") {
 	    is($first, 0, "Implicitly lexical, explicit \$_: second");
-	    eval {break};
+	    try {break};
 	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}
@@ -668,7 +668,7 @@ my $f = tie my $v, "FetchCounter";
     for my $_ (1, "two") {
 	when ("two") {
 	    is($first, 0, "Lexical loop: second");
-	    eval {break};
+	    try {break};
 	    like($@->{description}, qr/^Can't "break" in a loop topicalizer/,
 	    	q{Can't "break" in a loop topicalizer});
 	}

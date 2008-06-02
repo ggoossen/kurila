@@ -86,7 +86,7 @@ SKIP: {
 
     for my $constant (@path_consts) {
 	    $! = 0;
-            $r = eval { fpathconf( $fd, eval "$constant()" ) };
+            $r = try { fpathconf( $fd, eval "$constant()" ) };
             _check_and_report( $@, $r, "calling fpathconf($fd, $constant) " );
     }
     
@@ -96,7 +96,7 @@ SKIP: {
 # testing pathconf() on a non-terminal file
 for my $constant (@path_consts) {
 	$! = 0;
-        $r = eval { pathconf( $testdir, eval "$constant()" ) };
+        $r = try { pathconf( $testdir, eval "$constant()" ) };
         _check_and_report( $@, $r, qq[calling pathconf("$testdir", $constant)] );
 }
 
@@ -115,7 +115,7 @@ SKIP: {
     # testing fpathconf() on a terminal file
     for my $constant (@path_consts_terminal) {
 	$! = 0;
-	$r = eval { fpathconf( $fd, eval "$constant()" ) };
+	$r = try { fpathconf( $fd, eval "$constant()" ) };
 	_check_and_report( $@, $r, qq[calling fpathconf($fd, $constant) ($TTY)] );
     }
     
@@ -123,7 +123,7 @@ SKIP: {
     # testing pathconf() on a terminal file
     for my $constant (@path_consts_terminal) {
 	$! = 0;
-	$r = eval { pathconf( $TTY, eval "$constant()" ) };
+	$r = try { pathconf( $TTY, eval "$constant()" ) };
 	_check_and_report( $@, $r, qq[calling pathconf($TTY, $constant)] );
     }
 }
@@ -131,7 +131,7 @@ SKIP: {
 my $fifo = "fifo$$";
 
 SKIP: {
-    eval { mkfifo($fifo, 0666) }
+    try { mkfifo($fifo, 0666) }
 	or skip("could not create fifo $fifo ($!)", 2 * 3 * @path_consts_fifo);
 
   SKIP: {
@@ -140,7 +140,7 @@ SKIP: {
 
       for my $constant (@path_consts_fifo) {
 	  $! = 0;
-	  $r = eval { fpathconf( $fd, eval "$constant()" ) };
+	  $r = try { fpathconf( $fd, eval "$constant()" ) };
 	  _check_and_report( $@, $r, "calling fpathconf($fd, $constant) ($fifo)" );
       }
     
@@ -150,7 +150,7 @@ SKIP: {
   # testing pathconf() on a fifo file
   for my $constant (@path_consts_fifo) {
       $! = 0;
-      $r = eval { pathconf( $fifo, eval "$constant()" ) };
+      $r = try { pathconf( $fifo, eval "$constant()" ) };
       _check_and_report( $@, $r, qq[calling pathconf($fifo, $constant)] );
   }
 }
@@ -169,7 +169,7 @@ SKIP: {
 # testing sysconf()
 for my $constant (@sys_consts) {
 	$! = 0;
-	$r = eval { sysconf( eval "$constant()" ) };
+	$r = try { sysconf( eval "$constant()" ) };
 	_check_and_report( $@, $r, "calling sysconf($constant)" );
 }
 

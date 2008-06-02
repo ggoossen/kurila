@@ -131,7 +131,7 @@ EXPECT
 Use of uninitialized value $b in scalar chop at - line 4.
 ########
 
-eval {$^W = 1;} ;
+try {$^W = 1;} ;
 print $@ ;
 my $b ; chop $b ;
 EXPECT

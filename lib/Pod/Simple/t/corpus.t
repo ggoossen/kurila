@@ -100,7 +100,7 @@ foreach my $f (@testfiles) {
   }
 
   my $outstring;
-  eval {
+  try {
     my $p = Pod::Simple::DumpAsXML->new;
     $p->output_string( \$outstring );
     $p->parse_file( $f );

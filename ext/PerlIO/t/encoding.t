@@ -10,7 +10,7 @@ BEGIN {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }
-    unless (eval { require Encode } ) {
+    unless (try { require Encode } ) {
 	print "1..0 # Skip: not Encode\n";
 	exit 0;
     }

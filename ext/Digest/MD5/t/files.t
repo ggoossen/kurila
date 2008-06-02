@@ -52,7 +52,7 @@ if (!(-f "README") && -f "../README") {
 my $testno = 0;
 
 my $B64 = 1;
-eval { require MIME::Base64; };
+try { require MIME::Base64; };
 if ($@) {
     print "# $@: Will not test base64 methods\n";
     $B64 = 0;

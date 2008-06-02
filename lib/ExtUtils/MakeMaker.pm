@@ -112,7 +112,7 @@ sub _verify_att {
 
         my @sigs   = ref $sig ? @$sig : $sig;
         my $given  = ref $val;
-        unless( grep { $given eq $_ || ($_ && eval{$val->isa($_)}) } @sigs ) {
+        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } @sigs ) {
             my $takes = join " or ", map { _format_att($_) } @sigs;
 
             my $has = _format_att($given);
@@ -169,12 +169,12 @@ sub eval_in_subdirs {
     use Cwd qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
-    local @INC = map eval {abs_path($_) if -e} || $_, @INC;
+    local @INC = map try {abs_path($_) if -e} || $_, @INC;
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir (@{$self->{DIR}}){
         my($abs) = $self->catdir($pwd,$dir);
-        eval { $self->eval_in_x($abs); };
+        try { $self->eval_in_x($abs); };
         last if $@;
     }
     chdir $pwd;
@@ -393,7 +393,7 @@ sub new {
         # extra statement is a workaround.
         my $file = "$prereq.pm";
         $file =~ s{::}{/}g;
-        eval { require $file };
+        try { require $file };
 
         my $pr_version = $prereq->VERSION || 0;
 

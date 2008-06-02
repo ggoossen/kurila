@@ -67,7 +67,7 @@ sub _gen_pm_files {
 #!/usr/bin/perl -w
 
 # Ensure we do NOT have blib in @INC when building a module
-eval { require PL::Foo; };
+try { require PL::Foo; };
 #die $@ unless $@ =~ m{^Can't locate PL/Foo.pm in \@INC };
 
 # Had a bug where PL_FILES weren't sent the file to generate

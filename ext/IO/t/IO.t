@@ -83,7 +83,7 @@ foreach my $default (@default)
 	ok( exists %INC{ $default }, "... import should default load $default" );
 }
 
-eval { IO->import( 'nothere' ) };
+try { IO->import( 'nothere' ) };
 like( $@->{description}, qr/Can.t locate IO.nothere\.pm/, '... croaking on any error' );
 
 my $fakedir = File::Spec->catdir( 'lib', 'IO' );
@@ -117,7 +117,7 @@ if ( -d $fakedir or mkpath( $fakedir ))
 SKIP:
 {
 	skip("Could not write to disk", 2 ) unless $flag;
-	eval { IO->import( 'fakemod' ) };
+	try { IO->import( 'fakemod' ) };
 	ok( IO::fakemod::exists(), 'import() should import IO:: modules by name' );
 	is( $@, '', '... and should not call import() on imported modules' );
 }

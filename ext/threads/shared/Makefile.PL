@@ -27,9 +27,9 @@ sub check_cc
 
 sub have_cc
 {
-    eval { require Config_m; };     # ExtUtils::FakeConfig (+ ActivePerl)
+    try { require Config_m; };     # ExtUtils::FakeConfig (+ ActivePerl)
     if ($@) {
-        eval { require Config; };   # Everyone else
+        try { require Config; };   # Everyone else
     }
     my @chunks = split(m/ /, %Config::Config{cc});
     # $Config{cc} may contain args; try to find out the program part

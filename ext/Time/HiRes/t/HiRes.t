@@ -243,7 +243,7 @@ unless (   defined &Time::HiRes::gettimeofday
     }
 } else {
     use Time::HiRes qw(time alarm sleep);
-    eval { require POSIX };
+    try { require POSIX };
     my $use_sigaction =
 	!$@ && defined &POSIX::sigaction && &POSIX::SIGALRM +> 0;
 
@@ -435,20 +435,20 @@ else {
     }
 }
 
-eval { sleep(-1) };
+try { sleep(-1) };
 print $@->{description} =~ m/::sleep\(-1\): negative time not invented yet/ ?
     "ok 24\n" : "not ok 24\n";
 
-eval { usleep(-2) };
+try { usleep(-2) };
 print $@->{description} =~ m/::usleep\(-2\): negative time not invented yet/ ?
     "ok 25\n" : "not ok 25\n";
 
 if ($have_ualarm) {
-    eval { alarm(-3) };
+    try { alarm(-3) };
     print $@->{description} =~ m/::alarm\(-3, 0\): negative time not invented yet/ ?
 	"ok 26\n" : "not ok 26\n";
 
-    eval { ualarm(-4) };
+    try { ualarm(-4) };
     print $@->{description} =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ?
     "ok 27\n" : "not ok 27\n";
 } else {
@@ -457,7 +457,7 @@ if ($have_ualarm) {
 }
 
 if ($have_nanosleep) {
-    eval { nanosleep(-5) };
+    try { nanosleep(-5) };
     print $@->{description} =~ m/::nanosleep\(-5\): negative time not invented yet/ ?
 	"ok 28\n" : "not ok 28\n";
 } else {

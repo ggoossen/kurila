@@ -186,7 +186,7 @@ SKIP: {
     $a = eval '\"hello"';
     ok(ref($a)) or print "# didn't get a ref from eval\n";
     $b = $a;
-    eval{weaken($b)};
+    try{weaken($b)};
     # we didn't die
     ok($@ eq "") or print "# died with $@\n";
     ok(isweak($b));

@@ -45,6 +45,7 @@ PERL_CKDEF(Perl_ck_subr)
 PERL_CKDEF(Perl_ck_substr)
 PERL_CKDEF(Perl_ck_svconst)
 PERL_CKDEF(Perl_ck_trunc)
+PERL_CKDEF(Perl_ck_try)
 PERL_CKDEF(Perl_ck_unpack)
 
 

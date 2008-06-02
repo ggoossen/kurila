@@ -79,14 +79,14 @@ sub testit {
   ok ++$test, !Internals::SvREADONLY($copy->{answer}),
     "key 'answer' not locked in copy?";
 
-  eval { $copy->{extra} = 15 } ;
+  try { $copy->{extra} = 15 } ;
   unless (ok ++$test, !$@, "Can assign to reserved key 'extra'?") {
     my $diag = $@;
     $diag =~ s/\n.*\z//s;
     print "# \$\@: $diag\n";
   }
 
-  eval { $copy->{nono} = 7 } ;
+  try { $copy->{nono} = 7 } ;
   ok ++$test, $@, "Can not assign to invalid key 'nono'?";
 
   ok ++$test, exists $copy->{undef},
@@ -114,7 +114,7 @@ for $Storable::canonical (0, 1) {
 
     for (0..16) {
       my $k = "k$_";
-      eval { $copy->{$k} = undef } ;
+      try { $copy->{$k} = undef } ;
       unless (ok ++$test, !$@, "Can assign to reserved key '$k'?") {
 	my $diag = $@;
 	$diag =~ s/\n.*\z//s;
