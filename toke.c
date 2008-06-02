@@ -5113,8 +5113,7 @@ Perl_yylex(pTHX)
 	    UNI(OP_EXIT);
 
 	case KEY_eval:
-	    s = SKIPSPACE1(s);
-	    PL_expect = (*s == '{') ? XTERMBLOCK : XTERM;
+	    PL_expect = XTERM;
 	    UNIBRACK(OP_ENTEREVAL);
 
 	case KEY_eof:
@@ -5942,6 +5941,10 @@ Perl_yylex(pTHX)
 	case KEY_truncate:
 	    LOP(OP_TRUNCATE,XTERM);
 
+	case KEY_try:
+	    PL_expect = XTERMBLOCK;
+	    UNIBRACK(OP_ENTERTRY);
+
 	case KEY_uc:
 	    UNI(OP_UC);
 
@@ -6566,6 +6569,11 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
           {                                       /* tie        */
             return KEY_tie;
           }
+	  if (name[1] == 'r' &&
+	      name[2] == 'y')
+	  {
+	      return KEY_try;                      /* try       */
+	  }
 
           goto unknown;
 
