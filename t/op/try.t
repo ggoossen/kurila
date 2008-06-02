@@ -1,6 +1,8 @@
 #!./perl
 
-print "1..94\n";
+print "1..6\n";
+
+require './test.pl';
 
 try {
     print "ok 1\n";
@@ -8,9 +10,9 @@ try {
     1;
 } || print "ok 2\n$@->{description}";
 
-my $t = 4;
+my $test = 4;
 
-# return from eval {} should clear $@ correctly
+# return from try {} should clear $@ correctly
 {
     my $status = try {
 	try { die };
@@ -18,8 +20,8 @@ my $t = 4;
 	return; # removing this changes behavior
     };
     print "not " if $@;
-    print "ok $t\n";
-    $t++;
+    print "ok $test\n";
+    $test++;
 }
 
 # Check that eval catches bad goto calls
@@ -27,23 +29,24 @@ my $t = 4;
 {
     try {
 	try { goto foo; };
-	print ($@ ? "ok $t\n" : "not ok $t\n");
+	print ($@ ? "ok $test\n" : "not ok $test\n");
 	last;
 	foreach my $i (1) {
-	    foo: print "not ok $t\n";
+	    foo: print "not ok $test\n";
 	    print "# jumped into foreach\n";
 	}
     };
-    print "not ok $t\n" if $@;
-    $t++;
+    print "not ok $test\n" if $@;
+    $test++;
 }
 
 # [perl #34682] escaping an eval with last could coredump or dup output
 
-$got = runperl (
+my $got = runperl (
     prog => 
     'no strict; sub A::TIEARRAY { L: { try { last L } } } tie my @a, q(A); warn qq(ok\n)',
-stderr => 1);
+                   stderr => 1);
+$test++;
 
 print "not " unless $got =~ qr/^ok\n/;
 print "ok $test - eval and last\n"; $test++;

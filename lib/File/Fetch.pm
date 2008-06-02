@@ -415,7 +415,7 @@ sub fetch {
 
     ### create the path if it doesn't exist yet ###
     unless( -d $to ) {
-        eval { mkpath( $to ) };
+        try { mkpath( $to ) };
 
         return $self->_error(loc("Could not create path '\%1'",$to)) if $@;
     }
@@ -915,7 +915,7 @@ sub _file_fetch {
     }
 
     ### File::Copy is littered with 'die' statements :( ###
-    my $rv = eval { File::Copy::copy( $remote, $to ) };
+    my $rv = try { File::Copy::copy( $remote, $to ) };
 
     ### something went wrong ###
     if( !$rv or $@ ) {

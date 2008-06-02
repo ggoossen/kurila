@@ -32,7 +32,7 @@ use Storable ();
 {
 	my $goodfreeze = bless \%(), 'My::GoodFreeze';
 	my $frozen = undef;
-	eval {
+	try {
 		$frozen = Storable::freeze( $goodfreeze );
 	};
 	ok( ! $@, 'Storable does not die when STORABLE_freeze does not return references' );
@@ -58,7 +58,7 @@ use Storable ();
 # Error Case - should die on freeze
 {
 	my $badfreeze = bless \%(), 'My::BadFreeze';
-	eval {
+	try {
 		Storable::freeze( $badfreeze );
 	};
 	ok( $@, 'Storable dies correctly when STORABLE_freeze returns a referece' );
@@ -96,11 +96,11 @@ use Storable ();
 {
 	my $goodthaw = bless \%(), 'My::GoodThaw';
 	my $frozen = undef;
-	eval {
+	try {
 		$frozen = Storable::freeze( $goodthaw );
 	};
 	ok( $frozen, 'Storable freezes to a string as expected' );
-	my $thawed = eval {
+	my $thawed = try {
 		Storable::thaw( $frozen );
 	};
 	isa_ok( $thawed, 'My::GoodThaw' );
@@ -127,7 +127,7 @@ use Storable ();
 	# Create the frozen string normally
 	my $badthaw = bless \%( ), 'My::BadThaw';
 	my $frozen = undef;
-	eval {
+	try {
 		$frozen = Storable::freeze( $badthaw );
 	};
 	ok( $frozen, 'BadThaw was frozen with references correctly' );
@@ -140,7 +140,7 @@ use Storable ();
 
 	# Trigger the error condition
 	my $thawed = undef;
-	eval {
+	try {
 		$thawed = Storable::thaw( $frozen );
 	};
 	ok( $@, 'My::BadThaw object dies when thawing as expected' );
@@ -178,7 +178,7 @@ use Storable ();
 	my $goodattach = bless \%( ), 'My::GoodAttach';
 	my $frozen = Storable::freeze( $goodattach );
 	ok( $frozen, 'My::GoodAttach return as expected' );
-	my $thawed = eval {
+	my $thawed = try {
 		Storable::thaw( $frozen );
 	};
 	isa_ok( $thawed, 'My::GoodAttach' );
@@ -231,7 +231,7 @@ use Storable ();
 		$returnvalue = $_;
 
 		my $thawed = undef;
-		eval {
+		try {
 			$thawed = Storable::thaw( $frozen );
 		};
 		ok( $@, 'BadAttach dies on thaw' );

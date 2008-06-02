@@ -136,7 +136,7 @@ Use of uninitialized value $a in scalar chop at - line 3.
 use warnings;
 {
     no warnings ;
-    eval {
+    try {
         my $b ; chop $b ;
     }; print STDERR $@ ;
     my $b ; chop $b ;
@@ -149,7 +149,7 @@ EXPECT
 use warnings;
 {
     no warnings ;
-    eval {
+    try {
         use warnings 'uninitialized' ;
         my $b ; chop $b ;
     }; print STDERR $@ ;
@@ -164,7 +164,7 @@ Use of uninitialized value $b in scalar chop at - line 8.
 no warnings;
 {
     use warnings 'uninitialized' ;
-    eval {
+    try {
         my $b ; chop $b ;
     }; print STDERR $@ ;
     my $b ; chop $b ;
@@ -179,7 +179,7 @@ Use of uninitialized value $b in scalar chop at - line 9.
 no warnings;
 {
     use warnings 'uninitialized' ;
-    eval {
+    try {
         no warnings ;
         my $b ; chop $b ;
     }; print STDERR $@ ;
@@ -193,7 +193,7 @@ Use of uninitialized value $b in scalar chop at - line 10.
 use warnings;
 {
     no warnings ;
-    eval {
+    try {
         my $a =+ 1 ;
     }; print STDERR $@ ;
     my $a =+ 1 ;
@@ -206,7 +206,7 @@ EXPECT
 use warnings;
 {
     no warnings ;
-    eval {
+    try {
         use warnings 'syntax' ;
         my $a =+ 1 ;
     }; print STDERR $@ ;
@@ -220,7 +220,7 @@ Reversed += operator at - line 8.
 no warnings;
 {
     use warnings 'syntax' ;
-    eval {
+    try {
         my $a =+ 1 ;
     }; print STDERR $@ ;
     my $a =+ 1 ;
@@ -234,7 +234,7 @@ Reversed += operator at - line 9.
 no warnings;
 {
     use warnings 'syntax' ;
-    eval {
+    try {
         no warnings ;
         my $a =+ 1 ;
     }; print STDERR $@ ;

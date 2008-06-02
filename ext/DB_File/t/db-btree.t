@@ -622,7 +622,7 @@ unlink $Dfile1 ;
 
     my $filename = "xyz" ;
     my @x ;
-    eval { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ; } ;
+    try { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ; } ;
     ok(90, $@->{description} =~ m/^DB_File can only tie an associative array to a DB_BTREE database/) ;
     unlink $filename ;
 }
@@ -1383,10 +1383,10 @@ EOM
     # now an error to pass 'compare' a non-code reference
     my $dbh = DB_File::BTREEINFO->new() ;
 
-    eval { $dbh->{compare} = 2 };
+    try { $dbh->{compare} = 2 };
     ok(162, $@->{description} =~ m/^Key 'compare' not associated with a code reference at/);
 
-    eval { $dbh->{prefix} = 2 };
+    try { $dbh->{prefix} = 2 };
     ok(163, $@->{description} =~ m/^Key 'prefix' not associated with a code reference at/);
 
 }
@@ -1403,7 +1403,7 @@ EOM
 #    my (%h);
 #    ok(164, tie(%hash, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh ) );
 #
-#    eval {	$hash{1} = 2;
+#    try {	$hash{1} = 2;
 #    		$hash{4} = 5;
 #	 };
 #
@@ -1472,7 +1472,7 @@ ok(165,1);
    %h{"fred"} = "joe" ;
    ok(173, %h{"fred"} eq "joe");
 
-   eval { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= grep { %h{$_} } (1, 2, 3) };
    ok (174, ! $@);
 
 
@@ -1488,7 +1488,7 @@ ok(165,1);
 
    ok(176, $db->FIRSTKEY() eq "fred") ;
    
-   eval { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= grep { %h{$_} } (1, 2, 3) };
    ok (177, ! $@);
 
    undef $db ;

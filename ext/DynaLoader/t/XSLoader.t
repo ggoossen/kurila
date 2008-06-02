@@ -39,7 +39,7 @@ can_ok( 'XSLoader' => 'load' );
 can_ok( 'XSLoader' => 'bootstrap_inherit' );
 
 # Check error messages
-eval { XSLoader::load() };
+try { XSLoader::load() };
 like( $@->{description}, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|,
         "calling XSLoader::load() with no argument" );
 

@@ -41,7 +41,7 @@ $VERSION = '2.18';
 #
 
 BEGIN {
-	if (eval { require Fcntl; 1 } && exists %Fcntl::EXPORT_TAGS{'flock'}) {
+	if (try { require Fcntl; 1 } && exists %Fcntl::EXPORT_TAGS{'flock'}) {
 		Fcntl->import(':flock');
 	} else {
 		eval q{
@@ -260,7 +260,7 @@ sub _store {
 	my $da = $@;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine nstore or pstore, depending on network order
-	eval { $ret = &$xsptr(*FILE, $self) };
+	try { $ret = &$xsptr(*FILE, $self) };
 	close(FILE) or $ret = undef;
 	unlink($file) or warn "Can't unlink $file: $!\n" if $@ || !defined $ret;
 	logcroak $@ if $@;
@@ -300,7 +300,7 @@ sub _store_fd {
 	my $da = $@;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine nstore or pstore, depending on network order
-	eval { $ret = &$xsptr($file, $self) };
+	try { $ret = &$xsptr($file, $self) };
 	logcroak $@ if $@;
 	local $\; $file->print('');	# Autoflush the file if wanted
 	$@ = $da;
@@ -335,7 +335,7 @@ sub _freeze {
 	my $da = $@;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine mstore or net_mstore, depending on network order
-	eval { $ret = &$xsptr($self) };
+	try { $ret = &$xsptr($self) };
 	logcroak $@ if $@;
 	$@ = $da;
 	return $ret ? $ret : undef;
@@ -376,7 +376,7 @@ sub _retrieve {
 		flock(FILE, LOCK_SH) || logcroak "can't get shared lock on $file: $!";
 		# Unlocking will happen when FILE is closed
 	}
-	eval { $self = pretrieve(*FILE) };		# Call C routine
+	try { $self = pretrieve(*FILE) };		# Call C routine
 	close(FILE);
 	logcroak $@ if $@;
 	$@ = $da;
@@ -394,7 +394,7 @@ sub fd_retrieve {
 	logcroak "not a valid file descriptor" unless defined $fd;
 	my $self;
 	my $da = $@;							# Could be from exception handler
-	eval { $self = pretrieve($file) };		# Call C routine
+	try { $self = pretrieve($file) };		# Call C routine
 	logcroak $@ if $@;
 	$@ = $da;
 	return $self;
@@ -411,7 +411,7 @@ sub thaw {
 	return undef unless defined $frozen;
 	my $self;
 	my $da = $@;							# Could be from exception handler
-	eval { $self = mretrieve($frozen) };	# Call C routine
+	try { $self = mretrieve($frozen) };	# Call C routine
 	logcroak $@ if $@;
 	$@ = $da;
 	return $self;

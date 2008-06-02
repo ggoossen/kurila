@@ -797,7 +797,7 @@ sub distmeta_target {
     my $self = shift;
 
     my $add_meta = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
-eval { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) } 
+try { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) } 
     or print "Could not add META.yml to MANIFEST: $${'@'}\n"
 CODE
 
@@ -936,7 +936,7 @@ sub distsignature_target {
     my $self = shift;
 
     my $add_sign = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
-eval { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) } 
+try { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) } 
     or print "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
 CODE
 

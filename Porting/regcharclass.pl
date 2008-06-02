@@ -132,7 +132,7 @@ sub __uni_latin1 {
         $l= [@cp] if $max && $max < 256;
 
         my $copy= $str;    # must copy string, FB_CROAK makes encode destructive
-        $u= eval { Encode::encode( "utf8", $copy, Encode::FB_CROAK ) };
+        $u= try { Encode::encode( "utf8", $copy, Encode::FB_CROAK ) };
         # $u is utf8 but with the utf8 flag OFF
         # therefore "C*" gets us the values of the bytes involved.
         $u= [ unpack "C*", $u ] if defined $u;

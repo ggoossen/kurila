@@ -335,11 +335,11 @@ parent died at - line 2.
 child died at - line 5.
 ########
 if (my $pid = fork) {
-    eval { die "parent died" };
+    try { die "parent died" };
     print $@->message;
 }
 else {
-    sleep 1; eval { die "child died" };
+    sleep 1; try { die "child died" };
     print $@->message;
 }
 EXPECT

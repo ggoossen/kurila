@@ -131,10 +131,6 @@ print;
 EXPECT
 oo
 ########
-print scalar ("foo","bar")
-EXPECT
-bar
-########
 sub by_number { $a <+> $b; };# inline function for sort below
 our %as_ary;
 %as_ary{0}="a0";
@@ -273,7 +269,7 @@ really groovy
 ########
 my $a = 'outer';
 eval q[ my $a = 'inner'; eval q[ print "$a " ] ];
-eval { my $x = 'peace'; eval q[ print "$x\n" ] }
+try { my $x = 'peace'; eval q[ print "$x\n" ] }
 EXPECT
 inner peace
 ########
@@ -382,7 +378,7 @@ destroyed
 BEGIN {
   $| = 1;
   $^WARN_HOOK = sub {
-    eval { print @_[0]->{description} };
+    try { print @_[0]->{description} };
     die "bar";
   };
   warn "foo\n";
@@ -425,7 +421,7 @@ Use of uninitialized value $x in numeric eq (==) at - line 4.
 ########
 our $x = sub {};
 foo();
-sub foo { eval { return }; }
+sub foo { try { return }; }
 print "ok\n";
 EXPECT
 ok

@@ -232,13 +232,13 @@ is ($result, undef, "we should now have POSIX::kill");
 like ($@->{description}, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
 
 # Check unimplemented.
-$result = eval {POSIX::offsetof};
+$result = try {POSIX::offsetof};
 is ($result, undef, "offsetof should fail");
 like ($@->{description}, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
       "check its unimplemented message");
 
 # Check reimplemented.
-$result = eval {POSIX::fgets};
+$result = try {POSIX::fgets};
 is ($result, undef, "fgets should fail");
 like ($@->{description}, qr/^Use method IO::Handle::gets\(\) instead/,
       "check its redef message");
@@ -274,7 +274,7 @@ ok( POSIX::isalnum(undef),'isalnum undef' );
 dies_like( sub { POSIX::isalpha(\@()) }, qr/reference as string/,   'isalpha []' );
 dies_like( sub { POSIX::isprint(\@()) }, qr/reference as string/,   'isalpha []' );
 
-eval { use strict; POSIX->import("S_ISBLK"); my $x = S_ISBLK };
+try { use strict; POSIX->import("S_ISBLK"); my $x = S_ISBLK };
 unlike( $@, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" );
  
 # Check that output is not flushed by _exit. This test should be last

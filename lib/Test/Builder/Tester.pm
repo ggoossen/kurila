@@ -548,7 +548,7 @@ sub complaint
     if (Test::Builder::Tester::color)
     {
       # get color
-      eval { require Term::ANSIColor };
+      try { require Term::ANSIColor };
       unless ($@)
       {
         # colours

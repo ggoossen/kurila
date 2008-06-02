@@ -139,7 +139,7 @@ waitpid $pid, 0;
 # for understanding of Config{'sh'} test see exec description in camel book
 my $cmd = 'print(scalar(~< *STDIN))';
 $cmd = %Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
-eval{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
+try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($@) {
 	print "error $@\n";
 	print "not ok 22\n";

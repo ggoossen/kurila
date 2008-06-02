@@ -40,12 +40,12 @@ if (($x ^|^ 1) == 101) {print "ok 5\n";} else {print "not ok 5\n";}
 # check <> pseudoliteral
 
 if ($^O eq 'MacOS') {
-	open(try, "<", "Dev:Null") || (die "Can't open /dev/null.");
+	open(TRY, "<", "Dev:Null") || (die "Can't open /dev/null.");
 } else {
-	open(try, "<", "/dev/null") || open(try,"<", "nla0:") || (die "Can't open /dev/null.");
+	open(TRY, "<", "/dev/null") || open(TRY,"<", "nla0:") || (die "Can't open /dev/null.");
 }
 
-if ( ~< *try eq '') {
+if ( ~< *TRY eq '') {
     print "ok 6\n";
 }
 else {
@@ -53,5 +53,5 @@ else {
     die "/dev/null IS NOT A CHARACTER SPECIAL FILE!!!!\n" unless -c '/dev/null';
 }
 
-open(try, "<", "TEST") || (die "Can't open TEST.");
-if ( ~< *try ne '') {print "ok 7\n";} else {print "not ok 7\n";}
+open(TRY, "<", "TEST") || (die "Can't open TEST.");
+if ( ~< *TRY ne '') {print "ok 7\n";} else {print "not ok 7\n";}

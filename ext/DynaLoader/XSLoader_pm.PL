@@ -223,7 +223,7 @@ boilerplate.
 
     @ISA = qw( OnePackage OtherPackage );
     $VERSION = '0.01';
-    eval {
+    try {
        require XSLoader;
        XSLoader::load('YourPackage', $VERSION);
        1;

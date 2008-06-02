@@ -4,7 +4,7 @@ use kurila;
 use strict;
 
 our $VERSION = '0.78_01';
-$VERSION = eval { $VERSION }; # make the alpha version come out as a number
+$VERSION = try { $VERSION }; # make the alpha version come out as a number
 
 # Make Test::Builder thread-safe for ithreads.
 BEGIN {
@@ -1030,7 +1030,7 @@ sub _try {
     
     local $!;               # eval can mess up $!
     local $@;               # don't set $@ in the test
-    my $return = eval { $code->() };
+    my $return = try { $code->() };
     
     return wantarray ? ($return, $@ && $@->{description}) : $return;
 }
@@ -1054,9 +1054,9 @@ sub is_fh {
     return 1 if ref $maybe_fh  eq 'GLOB'; # its a glob ref
     return 1 if ref \$maybe_fh eq 'GLOB'; # its a glob
 
-    return eval { $maybe_fh->isa("IO::Handle") } ||
+    return try { $maybe_fh->isa("IO::Handle") } ||
            # 5.5.4's tied() and can() doesn't like getting undef
-           eval { (tied($maybe_fh) || '')->can('TIEHANDLE') };
+           try { (tied($maybe_fh) || '')->can('TIEHANDLE') };
 }
 
 

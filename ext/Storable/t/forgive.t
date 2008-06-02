@@ -12,7 +12,7 @@
 use Storable qw(store retrieve);
 
 # problems with 5.00404 when in an BEGIN block, so this is defined here
-if (!eval { require File::Spec; 1 } || $File::Spec::VERSION +< 0.8) {
+if (!try { require File::Spec; 1 } || $File::Spec::VERSION +< 0.8) {
     print "1..0 # Skip: File::Spec 0.8 needed\n";
     exit 0;
     # Mention $File::Spec::VERSION again, as 5.00503's harness seems to have
@@ -27,7 +27,7 @@ my $test = 1;
 my $bad = \@('foo', \*GLOB,  'bar');
 my $result;
 
-eval {$result = store ($bad , 'store')};
+try {$result = store ($bad , 'store')};
 print ((!defined $result)?"ok $test\n":"not ok $test\n"); $test++;
 print ($@?"ok $test\n":"not ok $test\n"); $test++;
 
@@ -39,7 +39,7 @@ open(SAVEERR, ">&", \*STDERR);
 open(STDERR, ">", "$devnull") or 
   ( print SAVEERR "Unable to redirect STDERR: $!\n" and exit(1) );
 
-eval {$result = store ($bad , 'store')};
+try {$result = store ($bad , 'store')};
 
 open(STDERR, ">&", \*SAVEERR);
 

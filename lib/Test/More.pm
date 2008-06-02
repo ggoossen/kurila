@@ -933,7 +933,7 @@ there are, $why and under what $condition to skip them.  An example is
 the easiest way to illustrate:
 
     SKIP: {
-        eval { require HTML::Lint };
+        try { require HTML::Lint };
 
         skip "HTML::Lint not installed", 2 if $@;
 

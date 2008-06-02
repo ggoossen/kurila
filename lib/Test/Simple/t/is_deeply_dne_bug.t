@@ -51,6 +51,6 @@ BEGIN {
 my $obj1 = Foo->new();
 my $obj2 = Foo->new();
 
-eval { is_deeply(\@($obj1, $obj2), \@($obj1, $obj2)); };
+try { is_deeply(\@($obj1, $obj2), \@($obj1, $obj2)); };
 is $@, '';
 

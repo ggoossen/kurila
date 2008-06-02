@@ -56,7 +56,7 @@ sub my_updir {
 }
 
 BEGIN {
-    eval { require File::Spec };
+    try { require File::Spec };
     if ($@) {
 	*File::Spec::catdir  = \&my_catdir;
 	*File::Spec::updir   = \&my_updir;
@@ -770,7 +770,7 @@ sub doMakefile {
 }
 
 sub doConstants {
-    if (eval {require ExtUtils::Constant; 1}) {
+    if (try {require ExtUtils::Constant; 1}) {
 	my @names = qw(CLOCK_HIGHRES CLOCK_MONOTONIC
 		       CLOCK_PROCESS_CPUTIME_ID
 		       CLOCK_REALTIME

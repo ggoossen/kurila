@@ -22,7 +22,7 @@ use_ok('I18N::Langinfo', 'langinfo', @constants);
 
 for my $constant (@constants) {
     SKIP: {
-        my $string = eval { langinfo(eval "$constant()") };
+        my $string = try { langinfo(eval "$constant()") };
         is( $@ && $@->message, '', "calling langinfo() with $constant" );
         skip "returned string was empty, skipping next two tests", 2 unless $string;
         ok( defined $string, "checking if the returned string is defined" );
@@ -67,7 +67,7 @@ print "1..", scalar @want, "\n";
     
 for my $i (1..@want) {
     my $try = @want[$i-1];
-    eval { I18N::Langinfo->import($try) };
+    try { I18N::Langinfo->import($try) };
     unless ($@) {
 	my $got = langinfo(&$try);
 	if (ref %want{$try} && $got =~ %want{$try} || $got eq %want{$try}) {

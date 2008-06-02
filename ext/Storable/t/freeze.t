@@ -105,28 +105,28 @@ print "ok 14\n";
 sub foo { @_[0] = 1 }
 $foo = \@();
 foo($foo->[1]);
-eval { freeze($foo) };
+try { freeze($foo) };
 print "not " if $@;
 print "ok 15\n";
 
 # Test cleanup bug found by Claudio Garcia -- RAM, 08/06/2001
 my $thaw_me = 'asdasdasdasd';
 
-eval {
+try {
 	my $thawed = thaw $thaw_me;
 };
 ok 16, $@;
 
 my %to_be_frozen = (foo => 'bar');
 my $frozen;
-eval {
+try {
 	$frozen = freeze \%to_be_frozen;
 };
 ok 17, !$@;
 
 freeze \%();
-eval { thaw $thaw_me };
-eval { $frozen = freeze \%( foo => \%() ) };
+try { thaw $thaw_me };
+try { $frozen = freeze \%( foo => \%() ) };
 ok 18, !$@;
 
 thaw $frozen;			# used to segfault here

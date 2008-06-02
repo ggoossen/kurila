@@ -49,12 +49,12 @@ sub method {
     &methimpl;
 }
 
-sub try {
+sub trymethod {
     try { method('foo', 'bar'); };
     print "# $@->{description}" if $@;
 }
 
-for (1..5) { try() }
+for (1..5) { trymethod() }
 pass();
 
 # bug #21542 local @_[0] causes reify problems and coredumps

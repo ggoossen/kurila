@@ -137,7 +137,7 @@ our $do_expand = <<$^O-eq-VMS>>1<<|$^O-eq-VMS>>0<</$^O-eq-VMS>>;
 
 <<$^O-eq-MacOS>>
 my $Mac_FS;
-$Mac_FS = eval { require Mac::FileSpec::Unixish };
+$Mac_FS = try { require Mac::FileSpec::Unixish };
 <</$^O-eq-MacOS>>
 
 our @dl_require_symbols = ();       # names of symbols we need
@@ -364,7 +364,7 @@ sub bootstrap {
     $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
     if (-s $bs) { # only read file if it's not empty
         print STDERR "BS: $bs ($^O, $dlsrc)\n" if $dl_debug;
-        eval { do $bs; };
+        try { do $bs; };
         warn "$bs: $@\n" if $@;
     }
 

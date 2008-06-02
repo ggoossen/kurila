@@ -140,7 +140,7 @@ END_OF_USAGE
 my ($alg, $binary, $check, $text, $status, $warn, $help, $version);
 my ($portable);
 
-eval { Getopt::Long::Configure ("bundling") };
+try { Getopt::Long::Configure ("bundling") };
 GetOptions(
 	'b|binary' => \$binary, 'c|check' => \$check,
 	't|text' => \$text, 'a|algorithm=i' => \$alg,
@@ -199,7 +199,7 @@ sub sumfile {
 	my $file = shift;
 
 	my $mode = $portable ? 'p' : ($binary ? 'b' : '');
-	my $digest = eval { $module->new($alg)->addfile($file, $mode) };
+	my $digest = try { $module->new($alg)->addfile($file, $mode) };
 	if ($@) {
 		warn "shasum: $file: $!\n";
 		return;

@@ -27,12 +27,12 @@ sub store_and_retrieve {
   print FH $data or die "Can't print to '$file': $!";
   close FH or die "Can't close '$file': $!";
 
-  return  eval {retrieve $file};
+  return  try {retrieve $file};
 }
 
 sub freeze_and_thaw {
   my $data = shift;
-  return eval {thaw $data};
+  return try {thaw $data};
 }
 
 $file;

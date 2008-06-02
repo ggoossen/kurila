@@ -60,12 +60,12 @@ if( !%Config{d_alarm} ) {
   plan skip_all => "fork() not implemented on this platform";
 } else {
   # This should fail but not die if there is real socketpair
-  eval {socketpair LEFT, 'RIGHT', -1, -1, -1};
+  try {socketpair LEFT, 'RIGHT', -1, -1, -1};
   if ($@ && $@->{description} =~ m/^Unsupported socket function "socketpair" called/ ||
       $! =~ m/^The operation requested is not supported./) { # Stratus VOS
     plan skip_all => 'No socketpair (real or emulated)';
   } else {
-    eval {AF_UNIX};
+    try {AF_UNIX};
     if ($@ && $@->{description} =~ m/^Your vendor has not defined Socket macro AF_UNIX/) {
       plan skip_all => 'No AF_UNIX';
     } else {

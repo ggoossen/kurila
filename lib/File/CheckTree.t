@@ -41,7 +41,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     my @warnings;
     local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
 
-    eval {
+    try {
         $num_warnings = validate qq{
             lib  -d
 # comment, followed "blank" line (w/ whitespace):
@@ -70,7 +70,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 
     local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
 
-    eval {
+    try {
         $num_warnings = validate qq{
             lib    -f
             README -f
@@ -99,7 +99,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 
     local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
 
-    eval {
+    try {
         $num_warnings = validate q{
             lib     -effd
             README -f || die
@@ -132,7 +132,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 
     local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
 
-    eval {
+    try {
         $num_warnings = validate qq{
             lib                -d || die
             '$path_to_libFile' cd
@@ -164,7 +164,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 {
     my $num_warnings;
 
-    eval {
+    try {
         $num_warnings = validate q{
             lib       -ef || die
             README    -d
@@ -187,7 +187,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 {
     my $num_warnings;
 
-    eval {
+    try {
         $num_warnings = validate q{
             lib       -ef || die "yadda $file yadda...\n"
             README    -d
@@ -207,7 +207,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 #### TEST 7 -- Quoted file names ####
 {
     my $num_warnings;
-    eval {
+    try {
         $num_warnings = validate q{
             "a file with whitespace" !-ef
             'a file with whitespace' !-ef
@@ -226,7 +226,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 #### TEST 8 -- Malformed query ####
 {
     my $num_warnings;
-    eval {
+    try {
         $num_warnings = validate q{
             a file with whitespace !-ef
         };

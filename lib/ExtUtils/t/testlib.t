@@ -33,5 +33,5 @@ is( @blib_paths, 2, 'ExtUtils::testlib added two @INC dirs!' );
 ok( !(grep !File::Spec->file_name_is_absolute($_), @blib_paths),
                     '  and theyre absolute');
 
-eval { eval "# @INC"; };
+try { eval "# @INC"; };
 is( $@, '',     '@INC is not tainted' );

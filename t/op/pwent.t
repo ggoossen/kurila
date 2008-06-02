@@ -3,12 +3,12 @@
 our (%Config, $where);
 
 BEGIN {
-    eval {my @n = getpwuid 0; setpwent()};
+    try {my @n = getpwuid 0; setpwent()};
     if ($@ && $@->{description} =~ m/(The \w+ function is unimplemented)/) {
 	print "1..0 # Skip: $1\n";
 	exit 0;
     }
-    eval { require Config; Config->import; };
+    try { require Config; Config->import; };
     my $reason;
     if (%Config{'i_pwd'} ne 'define') {
 	$reason = '%Config{i_pwd} undefined';

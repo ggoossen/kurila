@@ -18,7 +18,7 @@ use ExtUtils::testlib;
 use threads;
 
 BEGIN {
-    eval {
+    try {
         require threads::shared;
         threads::shared->import();
     };
@@ -86,7 +86,7 @@ sub is($$$)
 {
     lock($test);
     threads->create( sub {1} )->join;
-    my $not = eval { Config::myconfig() } ? '' : 'not ';
+    my $not = try { Config::myconfig() } ? '' : 'not ';
     print "{$not}ok $test - Are we able to call Config::myconfig after clone\n";
     $test++;
 }
@@ -101,16 +101,16 @@ our %unique_hash : unique;
 threads->create(sub {
         lock($test);
         my $TODO = ":unique needs to be re-implemented in a non-broken way";
-        eval { $unique_scalar = 1 };
+        try { $unique_scalar = 1 };
         print $@ && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_scalar\n";
         $test++;
-        eval { @unique_array[0] = 1 };
+        try { @unique_array[0] = 1 };
         print $@ && $@->{description} =~ m/read-only/
           ? '' : 'not ', "ok $test # TODO $TODO - unique_array\n";
         $test++;
         if ($^O ne 'MSWin32') {
-            eval { %unique_hash{abc} = 1 };
+            try { %unique_hash{abc} = 1 };
             print $@ && $@->{description} =~ m/disallowed/
               ? '' : 'not ', "ok $test # TODO $TODO - unique_hash\n";
         } else {

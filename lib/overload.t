@@ -271,7 +271,7 @@ is("b{$a}c", "bxxc");
 
 # Negative overloading:
 
-my $na = eval { ^~^$a };
+my $na = try { ^~^$a };
 like($@->{description}, qr/no method found/);
 
 eval "package Oscalar; sub numify \{ return '_!_' . shift() . '_!_' \} use overload '0+' => \\&numify";
@@ -279,14 +279,14 @@ is $@, '';
 eval "package Oscalar; sub rshft \{ return '_!_' . shift() . '_!_' \} use overload '>>' => \\&rshft";
 is $@, '';
 
-$na = eval { $aI >> 1 };       # Hash was not updated
+$na = try { $aI >> 1 };       # Hash was not updated
 like($@->{description}, qr/no method found/);
 
 bless \$x, 'OscalarI';
 
 $na = 0;
 
-$na = eval { $aI >> 1 };
+$na = try { $aI >> 1 };
 print $@;
 
 ok(!$@);
@@ -944,10 +944,10 @@ unless ($aaa) {
                fallback => 1;
   my $x = bless(\@());
   # For some reason beyond me these have to be oks rather than likes.
-  eval { "$x" };
+  try { "$x" };
   main::like($@->message, qr/reference as string/);
   main::ok($x);
-  eval { $x + 0 };
+  try { $x + 0 };
   main::like($@->message, qr/Reference can't be used as a number/ );
 }
 
@@ -1016,7 +1016,7 @@ package main;
 my $a = Foo->new;
 $a->xet('b', 42);
 is ($a->xet('b'), 42);
-ok (!defined eval { $a->{b} });
+ok (!defined try { $a->{b} });
 like ($@->{description}, qr/zap/);
 
 {
@@ -1030,7 +1030,7 @@ like ($@->{description}, qr/zap/);
      local $^WARN_HOOK = sub { $warn++ };
       my $x = t229->new;
       my $y = $x;
-      eval { $y++ };
+      try { $y++ };
    }
    main::ok (!$warn);
 }
@@ -1161,11 +1161,11 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     my $obj;
     $obj = bless \%(name => 'cool'), 'Sklorsh';
     $obj->delete;
-    ok(eval {if ($obj) {1}; 1}, $@ || 'reblessed into nonexistent namespace');
+    ok(try {if ($obj) {1}; 1}, $@ || 'reblessed into nonexistent namespace');
 
     $obj = bless \%(name => 'cool'), 'Sklorsh';
     $obj->delete_with_self;
-    ok (eval {if ($obj) {1}; 1}, $@);
+    ok (try {if ($obj) {1}; 1}, $@);
     
     my $a = $b = \%(name => 'hot');
     bless $b, 'Sklorsh';
@@ -1343,7 +1343,7 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     my $aref = \@();
     my $num_val = undef;
     my $r = bless $aref, 'numify_self';
-    eval { int($r) };
+    try { int($r) };
     like($@->message, qr/Reference can't be used as a number/);
     is($r->[0], 1, 'int() numifies once when returning self');
 
@@ -1356,14 +1356,14 @@ foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     for (sub { int($m) }, sub { -$m }, sub { 0+$m }, sub { $m+$m },
          sub { 0-$m }, sub { 1*$m }, sub { $m/1 }, sub { $m%100 },
          sub { $m**1 }) {
-        eval { $_->() };
+        try { $_->() };
         like($@->message, qr/Reference can't be used as a number/);
     }
 
     for (sub { int($aref) }, sub { -$aref }, sub { 0+$aref }, sub { $aref+$aref },
          sub { 0-$aref }, sub { 1*$aref }, sub { $aref/1 }, sub { $aref%100 },
          sub { $aref**1 }) {
-        eval { $_->() };
+        try { $_->() };
         like($@->message, qr/Reference can't be used as a number/);
     }
 }

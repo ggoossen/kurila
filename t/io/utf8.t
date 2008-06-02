@@ -152,7 +152,7 @@ SKIP: {
 	open F, "<:utf8", "a" or die $!;
 	$x = ~< *F; chomp $x;
 	local $^WARN_HOOK = sub { push @warnings, @_[0]->message; };
-	eval { sprintf "\%vd\n", $x };
+	try { sprintf "\%vd\n", $x };
 	is (scalar @warnings, 1);
 	like (@warnings[0], qr/Malformed UTF-8 character \(unexpected continuation byte 0x82, with no preceding start byte/);
 }

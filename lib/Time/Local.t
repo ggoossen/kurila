@@ -121,7 +121,7 @@ for (@bad_time) {
     $year -= 1900;
     $mon--;
 
-    eval { timegm($sec,$min,$hour,$mday,$mon,$year) };
+    try { timegm($sec,$min,$hour,$mday,$mon,$year) };
 
     like($@ && $@->{description}, qr/.*out of range.*/, 'invalid time caused an error');
 }
@@ -163,24 +163,24 @@ SKIP:
     skip 'this platform does not support negative epochs.', 6
         unless $neg_epoch_ok;
 
-    eval { timegm(0,0,0,29,1,1900) };
+    try { timegm(0,0,0,29,1,1900) };
     like($@ && $@->{description}, qr/Day '29' out of range 1\.\.28/,
          'does not accept leap day in 1900');
 
-    eval { timegm(0,0,0,29,1,200) };
+    try { timegm(0,0,0,29,1,200) };
     like($@ && $@->{description}, qr/Day '29' out of range 1\.\.28/,
          'does not accept leap day in 2100 (year passed as 200)');
 
-    eval { timegm(0,0,0,29,1,0) };
+    try { timegm(0,0,0,29,1,0) };
     is($@, '', 'no error with leap day of 2000 (year passed as 0)');
 
-    eval { timegm(0,0,0,29,1,1904) };
+    try { timegm(0,0,0,29,1,1904) };
     is($@, '', 'no error with leap day of 1904');
 
-    eval { timegm(0,0,0,29,1,4) };
+    try { timegm(0,0,0,29,1,4) };
     is($@, '', 'no error with leap day of 2004 (year passed as 4)');
 
-    eval { timegm(0,0,0,29,1,96) };
+    try { timegm(0,0,0,29,1,96) };
     is($@, '', 'no error with leap day of 1996 (year passed as 96)');
 }
 

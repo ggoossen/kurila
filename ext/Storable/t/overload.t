@@ -98,7 +98,7 @@ if (ord ('A') == 193) { # EBCDIC.
 
 # see note at the end of do_retrieve in Storable.xs about why this test has to
 # use a reference to an overloaded reference, rather than just a reference.
-my $t = eval {thaw $f}; die if $@;
+my $t = try {thaw $f}; die if $@;
 ok 13, $@ eq "";
 ok 14, ref ($t) eq 'REF';
 ok 15, ref ($$t) eq 'HAS_OVERLOAD';

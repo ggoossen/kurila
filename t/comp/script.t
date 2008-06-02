@@ -14,9 +14,9 @@ our $x = `$Perl -le "print 'ok';"`;
 
 if ($x eq "ok\n") {print "ok 1\n";} else {print "not ok 1\n";}
 
-open(try, ">","Comp.script") || (die "Can't open temp file.");
-print try 'print "ok\n";'; print try "\n";
-close try or die "Could not close: $!";
+open(TRY, ">","Comp.script") || (die "Can't open temp file.");
+print TRY 'print "ok\n";'; print TRY "\n";
+close TRY or die "Could not close: $!";
 
 $x = `$Perl Comp.script`;
 

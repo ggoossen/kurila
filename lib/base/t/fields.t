@@ -53,7 +53,7 @@ foreach (Foo->new) {
         return if @_[0] =~ m/^Pseudo-hashes are deprecated/ 
     };
     my $phash;
-    eval { $phash = fields::phash(name => "Joe", rank => "Captain") };
+    try { $phash = fields::phash(name => "Joe", rank => "Captain") };
     like $@->{description}, qr/^Pseudo-hashes have been removed from Perl/;
 }
 

@@ -232,7 +232,7 @@ SKIP: {
   close NIL;
 
   my $child = 0;
-  eval {
+  try {
     local %SIG{ALRM} = sub { die; };
     alarm 2;
     $child = wait;

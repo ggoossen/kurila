@@ -157,10 +157,10 @@ readlink 1;		# OP_READLINK
 time ;			# OP_TIME
 localtime ;		# OP_LOCALTIME
 gmtime ;		# OP_GMTIME
-eval { getgrnam 1 };	# OP_GGRNAM
-eval { getgrgid 1 };	# OP_GGRGID
-eval { getpwnam 1 };	# OP_GPWNAM
-eval { getpwuid 1 };	# OP_GPWUID
+try { getgrnam 1 };	# OP_GGRNAM
+try { getgrgid 1 };	# OP_GGRGID
+try { getpwnam 1 };	# OP_GPWNAM
+try { getpwuid 1 };	# OP_GPWUID
 prototype "foo";	# OP_PROTOTYPE
 $a ~~ $b;		# OP_SMARTMATCH
 $a <+> $b;		# OP_NCMP
@@ -262,10 +262,10 @@ readlink 1;		# OP_READLINK
 time ;			# OP_TIME
 localtime ;		# OP_LOCALTIME
 gmtime ;		# OP_GMTIME
-eval { getgrnam 1 };	# OP_GGRNAM
-eval { getgrgid 1 };	# OP_GGRGID
-eval { getpwnam 1 };	# OP_GPWNAM
-eval { getpwuid 1 };	# OP_GPWUID
+try { getgrnam 1 };	# OP_GGRNAM
+try { getgrgid 1 };	# OP_GGRGID
+try { getpwnam 1 };	# OP_GPWNAM
+try { getpwuid 1 };	# OP_GPWUID
 prototype "foo";	# OP_PROTOTYPE
 EXPECT
 

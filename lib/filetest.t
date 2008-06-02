@@ -17,7 +17,7 @@ my $error = "filetest: the only implemented subpragma is 'access'.\n";
 ok( require filetest, 'required pragma successfully' );
 
 # and here's one culprit, right here
-eval { filetest->import('bad subpragma') };
+try { filetest->import('bad subpragma') };
 is( $@->{description}, $error, 'filetest dies with bad subpragma on import' );
 
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set without pragma in place' );
@@ -35,7 +35,7 @@ ok( $^H ^&^ $hint_bits, 'hint bits set with pragma loaded' );
 filetest->unimport('access');
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set with pragma unimported' );
 
-eval { filetest->unimport() };
+try { filetest->unimport() };
 is( $@->{description}, $error, 'filetest dies without subpragma on unimport' );
 
 # there'll be a compilation aborted failure here, with the eval string
@@ -62,7 +62,7 @@ SKIP: {
 	                                            ||
 			      (!%Config{d_setregid} && !%Config{d_setresgid});
 
-    eval {
+    try {
 	if (!-e $tstfile) {
 	    open(T, ">", "$tstfile") or die "Can't create $tstfile: $!";
 	    close T;

@@ -1,7 +1,7 @@
 #./perl
 
 BEGIN {
-	eval { my $q = pack "q", 0 };
+	try { my $q = pack "q", 0 };
 	if ($@) {
 		print "1..0 # Skip: no 64-bit types\n";
 		exit(0);

@@ -76,10 +76,10 @@ can_ok( 'ExtUtils::Packlist', 'DESTROY' );
 
 
 # write is a little more complicated
-eval { ExtUtils::Packlist::write(\%()) };
+try { ExtUtils::Packlist::write(\%()) };
 like( $@->{description}, qr/No packlist filename/, 'write() should croak without packfile' );
 
-eval { ExtUtils::Packlist::write(\%(), 'eplist') };
+try { ExtUtils::Packlist::write(\%(), 'eplist') };
 my $file_is_ready = $@ ? 0 : 1;
 ok( $file_is_ready, 'write() can write a file' );
 
@@ -94,7 +94,7 @@ SKIP: {
 	SKIP: {
 	    skip("cannot write readonly files", 1) if -w 'eplist';
 
-	    eval { ExtUtils::Packlist::write(\%(), 'eplist') };
+	    try { ExtUtils::Packlist::write(\%(), 'eplist') };
 	    like( $@->{description}, qr/Can't open file/, 'write() should croak on open failure' );
 	}
 
@@ -110,7 +110,7 @@ SKIP: {
 		),
 		'/./abc' => '',
 	);
-	eval { ExtUtils::Packlist::write($pl, 'eplist') };
+	try { ExtUtils::Packlist::write($pl, 'eplist') };
 	is( $@, '', 'write() should normally succeed' );
 	is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
 
@@ -118,11 +118,11 @@ SKIP: {
 }
 
 
-eval { ExtUtils::Packlist::read(\%()) };
+try { ExtUtils::Packlist::read(\%()) };
 like( $@->{description}, qr/^No packlist filename/, 'read() should croak without packfile' );
 
 
-eval { ExtUtils::Packlist::read(\%(), 'abadfilename') };
+try { ExtUtils::Packlist::read(\%(), 'abadfilename') };
 like( $@->{description}, qr/^Can't open file/, 'read() should croak with bad packfile name' );
 #'open packfile for reading
 
@@ -138,7 +138,7 @@ SKIP: {
 	like( $file, qr/hash.+foo=bar/, 'second embedded hash value should appear');
 	close IN;
 
-	eval{ ExtUtils::Packlist::read($pl, 'eplist') };
+	try{ ExtUtils::Packlist::read($pl, 'eplist') };
 	is( $@, '', 'read() should normally succeed' );
 	is( $pl->{data}{single}, undef, 'single keys should have undef value' );
 	is( ref($pl->{data}{hash}), 'HASH', 'multivalue keys should become hashes');

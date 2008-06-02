@@ -57,7 +57,7 @@ for my $name (@Carp, @Msg) {
     
     ### call the func... no output should appear
     ### eval this -- the croak/confess functions die
-    eval { $ref->( $Text ); };
+    try { $ref->( $Text ); };
     
     my @stack = $Class->stack;
     cmp_ok( scalar(@stack), '==', 1,

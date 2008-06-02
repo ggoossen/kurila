@@ -7,7 +7,7 @@ BEGIN {
 
 BEGIN {
     our $haspw;
-    eval { my @n = getpwuid 0 };
+    try { my @n = getpwuid 0 };
     $haspw = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($haspw) { print "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config;

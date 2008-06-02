@@ -18,7 +18,7 @@ use Test::More tests => 13;
     my $mod = 'Must::Be::Loaded';
     my $file = Module::Load::_to_file($mod,1);
 
-    eval { load $mod };
+    try { load $mod };
 
     is( $@, '', qq[Loading module '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
@@ -28,7 +28,7 @@ use Test::More tests => 13;
     my $mod = 'LoadMe.pl';
     my $file = Module::Load::_to_file($mod);
 
-    eval { load $mod };
+    try { load $mod };
 
     is( $@, '', qq[Loading File '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
@@ -38,7 +38,7 @@ use Test::More tests => 13;
     my $mod = 'LoadIt';
     my $file = Module::Load::_to_file($mod,1);
 
-    eval { load $mod };
+    try { load $mod };
 
     is( $@, '', qq[Loading Ambigious Module '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
@@ -48,7 +48,7 @@ use Test::More tests => 13;
     my $mod = 'ToBeLoaded';
     my $file = Module::Load::_to_file($mod);
 
-    eval { load $mod };
+    try { load $mod };
 
     is( $@ && $@->message, '', qq[Loading Ambigious File '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
@@ -58,7 +58,7 @@ use Test::More tests => 13;
 {   my $mod     = 'TestModule';
     my @funcs   = qw[func1 func2];
     
-    eval { load $mod, @funcs };
+    try { load $mod, @funcs };
     is( $@, '', qq[Loaded exporter module '$mod'] );
     
     for my $func (@funcs) {

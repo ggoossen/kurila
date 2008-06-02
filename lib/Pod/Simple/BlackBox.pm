@@ -291,7 +291,7 @@ sub _handle_encoding_line {
 
     require Pod::Simple::Transcode;
     $self->{'_transcoder'} = Pod::Simple::Transcode->make_transcoder($e);
-    eval {
+    try {
       my @x = ('', "abc", "123");
       $self->{'_transcoder'}->(@x);
     };

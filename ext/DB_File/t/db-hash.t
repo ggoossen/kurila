@@ -396,7 +396,7 @@ untie %h ;
 
     my $filename = "xyz" ;
     my @x ;
-    eval { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_HASH ; } ;
+    try { tie @x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_HASH ; } ;
     ok(52, $@->{description} =~ m/^DB_File can only tie an associative array to a DB_HASH database/) ;
     unlink $filename ;
 }
@@ -848,7 +848,7 @@ EOM
     # now an error to pass 'hash' a non-code reference
     my $dbh = DB_File::HASHINFO->new() ;
 
-    eval { $dbh->{hash} = 2 };
+    try { $dbh->{hash} = 2 };
     ok(126, $@->{description} =~ m/^Key 'hash' not associated with a code reference at/);
 
 }
@@ -865,7 +865,7 @@ EOM
 # 
 #    ok(127, tie(%hash, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh ) );
 #
-#    eval {	$hash{1} = 2;
+#    try {	$hash{1} = 2;
 #    		$hash{4} = 5;
 #	 };
 #
@@ -963,7 +963,7 @@ EOM
    %h{"fred"} = "joe" ;
    ok(137, %h{"fred"} eq "joe");
 
-   eval { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= grep { %h{$_} } (1, 2, 3) };
    ok (138, ! $@);
 
 
@@ -979,7 +979,7 @@ EOM
 
    ok(140, $db->FIRSTKEY() eq "fred") ;
    
-   eval { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= grep { %h{$_} } (1, 2, 3) };
    ok (141, ! $@);
 
    undef $db ;

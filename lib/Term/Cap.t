@@ -84,9 +84,9 @@ $t->Tputs('pc', 1, *OUT);
 is( $t->{pc}, 'pc', 'Tputs() should cache pc value when asked' );
 is( $out->read(), 'pc', 'Tputs() should write to filehandle when passed' );
 
-eval { $t->Trequire( 'pc' ) };
+try { $t->Trequire( 'pc' ) };
 is( $@, '', 'Trequire() should finds existing cap' );
-eval { $t->Trequire( 'nonsense' ) };
+try { $t->Trequire( 'nonsense' ) };
 like( $@->{description}, qr/support: \(nonsense\)/, 
 	'Trequire() should croak with unsupported cap' );
 
@@ -98,20 +98,20 @@ local $^WARN_HOOK = sub {
 # test the first few features by forcing Tgetent() to croak (line 156)
 undef %ENV{TERM};
 my $vals = \%();
-eval { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
+try { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
 like( $@->{description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
 like( $warn, qr/OSPEED was not set/, 'Tgetent() should set default OSPEED' );
 
 is( $vals->{PADDING}, 10000/9600, 'Default OSPEED implies default PADDING' );
 
 $warn = 'xxxx';
-eval { local $^W = 0; $t = Term::Cap->Tgetent($vals) };
+try { local $^W = 0; $t = Term::Cap->Tgetent($vals) };
 is($warn,'xxxx',"Tgetent() doesn't carp() without warnings on");
 
 # check values for very slow speeds
 $vals->{OSPEED} = 1;
 $warn = '';
-eval { $t = Term::Cap->Tgetent($vals) };
+try { $t = Term::Cap->Tgetent($vals) };
 is( $warn, '', 'Tgetent() should not work if OSPEED is provided' );
 is( $vals->{PADDING}, 200, 'Tgetent() should set slow PADDING when needed' );
 
@@ -123,7 +123,7 @@ SKIP: {
         %ENV{TERM} = 'foo';
         %ENV{TERMPATH} = '!';
         %ENV{TERMCAP} = '';
-        eval { $t = Term::Cap->Tgetent($vals) };
+        try { $t = Term::Cap->Tgetent($vals) };
         isnt( $@, '', 'Tgetent() should catch bad termcap file' );
 }
 
@@ -133,14 +133,14 @@ SKIP: {
 	# it won't find the termtype in this fake file, so it should croak
 	$vals->{TERM} = 'quux';
 	%ENV{TERMPATH} = 'tcout';
-	eval { $t = Term::Cap->Tgetent($vals) };
+	try { $t = Term::Cap->Tgetent($vals) };
 	like( $@->{description}, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
 
 	# it shouldn't try to read one file more than 32(!) times
 	# see __END__ for a really awful termcap example
 	%ENV{TERMPATH} = join(' ', ('tcout') x 33);
 	$vals->{TERM} = 'bar';
-	eval { $t = Term::Cap->Tgetent($vals) };
+	try { $t = Term::Cap->Tgetent($vals) };
 	like( $@->{description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
 
 	# now let it read a fake termcap file, and see if it sets properties 

@@ -60,7 +60,7 @@ my @Tests = (
 
 # These don't work yet.
 if( 0 ) {
-#if( eval { require overload } ) {
+#if( try { require overload } ) {
     require MyOverload;
     
     my $cmp = Overloaded::Compare->new("foo", 42);

@@ -20,7 +20,7 @@ use Exporter;
 #use Cwd qw(abs_path);
 
 use vars qw($MYPKG @EXPORT @ISA);
-$MYPKG = eval { (caller)[[0]] };
+$MYPKG = try { (caller)[[0]] };
 @EXPORT = qw(&testpodplaintext);
 BEGIN {
     require Pod::PlainText;

@@ -78,7 +78,7 @@ sub list_installed {
     $class = 'all' unless $class;
 
     my @files;
-    if (eval { @files = $Inst->files($module, $class); }) {
+    if (try { @files = $Inst->files($module, $class); }) {
         print("$class files in $module are:\n   ",
               join("\n   ", @files), "\n");
     }
@@ -95,7 +95,7 @@ sub list_directories {
     $class = 'all' unless $class;
 
     my @dirs;
-    if (eval { @dirs = $Inst->directories($module, $class); }) {
+    if (try { @dirs = $Inst->directories($module, $class); }) {
         print("$class directories in $module are:\n   ",
               join("\n   ", @dirs), "\n");
     }
@@ -113,7 +113,7 @@ sub create_archive {
     if( !(defined $file and length $file) ) {
         print "No tar file specified\n";
     }
-    elsif( eval { require Archive::Tar } ) {
+    elsif( try { require Archive::Tar } ) {
         Archive::Tar->create_archive($file, 0, $Inst->files($module));
     }
     else {

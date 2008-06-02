@@ -8,7 +8,7 @@ BEGIN {
 	exit 0;
     }
     # Can we load the version module ?
-    eval { require version; 1 } or do {
+    try { require version; 1 } or do {
 	print "1..0 # no version.pm\n";
 	exit 0;
     };

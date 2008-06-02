@@ -125,7 +125,7 @@ ok(37, !defined delete(@foo[0]), "Check that delete works from a thread");
     ok(42,@foo[0] eq "hej", "Check slice assign");
 }
 {
-    eval {
+    try {
         my @t1 = splice(@foo,0,2,"hop", "hej");
     };
     ok(43, my $temp1 = $@->{description} =~ m/Splice not implemented for shared arrays/, "Check that the warning message is correct for non splice");

@@ -4,7 +4,7 @@
 my %Expect_File = (); # what we expect for $_ 
 my %Expect_Name = (); # what we expect for $File::Find::name/fullname
 my %Expect_Dir  = (); # what we expect for $File::Find::dir
-my $symlink_exists = eval { symlink("",""); 1 };
+my $symlink_exists = try { symlink("",""); 1 };
 my $warn_msg;
 
 use Carp::Heavy (); # make sure Carp::Heavy is already loaded, because @INC is relative
@@ -698,7 +698,7 @@ if ( $symlink_exists ) {
         CheckDie( symlink('../faa','fa/faa/faa_sl') );
     }
     undef $@;
-    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
+    try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                              no_chdir => 1), topdir('fa') ); };
     Check( $@->{description} =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link|i );  
     unlink file_path('fa', 'faa', 'faa_sl'); 
@@ -712,7 +712,7 @@ if ( $symlink_exists ) {
     }
     undef $@;
 
-    eval {File::Find::finddepth( \%(wanted => \&simple_wanted,
+    try {File::Find::finddepth( \%(wanted => \&simple_wanted,
                                   follow => 1,
                                   follow_skip => 0, no_chdir => 1),
                                   topdir('fa') );};
@@ -762,7 +762,7 @@ if ( $symlink_exists ) {
     }
     undef $@;
 
-    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
+    try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                             follow_skip => 0, no_chdir => 1),
                             topdir('fa') );};
 
@@ -771,7 +771,7 @@ if ( $symlink_exists ) {
   
     undef $@;
 
-    eval {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
+    try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                             follow_skip => 1, no_chdir => 1),
                             topdir('fa') );};
 

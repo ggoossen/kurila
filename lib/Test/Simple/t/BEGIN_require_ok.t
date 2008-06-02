@@ -14,7 +14,7 @@ use Test::More;
 
 my $result;
 BEGIN {
-    eval {
+    try {
         require_ok("Wibble");
     };
     $result = $@;

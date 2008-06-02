@@ -51,7 +51,7 @@ sub new {
 
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
     # available (such as on VMS).
-    eval { $termios = POSIX::Termios->new };
+    try { $termios = POSIX::Termios->new };
     if ($@) {
         $ospeed = 9600;
     } else {
@@ -60,7 +60,7 @@ sub new {
     }
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
-    eval { $term = Term::Cap->Tgetent( \%( TERM => undef, OSPEED => $ospeed )) };
+    try { $term = Term::Cap->Tgetent( \%( TERM => undef, OSPEED => $ospeed )) };
     %$self{BOLD} = %$term{_md} || "\e[1m";
     %$self{UNDL} = %$term{_us} || "\e[4m";
     %$self{NORM} = %$term{_me} || "\e[m";

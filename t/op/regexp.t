@@ -202,7 +202,7 @@ EOFCODE
 	}
 	else {
 	    if (!$match || $got ne $expect) {
-	        eval { require Data::Dumper };
+	        try { require Data::Dumper };
 		if ($@) {
 		    print "not ok $test ($study) $input => `$got', match=$match\n$code\n";
 		}

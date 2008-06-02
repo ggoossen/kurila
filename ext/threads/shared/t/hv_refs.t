@@ -85,9 +85,9 @@ ok(10, keys %foo == 0, "And make sure we realy have deleted the values");
     my $h = \%(a=>14);
     my $r = \$h->{a};
     share($r);
-        eval { lock($r); };
+        try { lock($r); };
         ok(14, !$@, "lock on helems ref: $@");
-        eval { lock($h->{a}); };
+        try { lock($h->{a}); };
         ok(15, !$@, "lock on helems: $@");
 }
 {

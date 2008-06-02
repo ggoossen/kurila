@@ -10,7 +10,7 @@ use FileHandle;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&testcmp);
-$MYPKG = eval { (caller)[[0]] };
+$MYPKG = try { (caller)[[0]] };
 
 ##--------------------------------------------------------------------------
 

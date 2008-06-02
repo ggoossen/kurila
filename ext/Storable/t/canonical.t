@@ -31,13 +31,13 @@ our $maxarraysize = 100;
 
 # Use MD5 if its available to make random string keys
 
-eval { require "MD5.pm" };
+try { require "MD5.pm" };
 our $gotmd5 = !$@;
 
 # Use Data::Dumper if debugging and it is available to create an ASCII dump
 
 if ($debugging) {
-    eval { require "Data/Dumper.pm" };
+    try { require "Data/Dumper.pm" };
     our $gotdd  = !$@;
 }
 

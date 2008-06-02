@@ -322,7 +322,7 @@ sub init {
   my $self = shift;
 
   # Make sure creat()s are neither too much nor too little
-  eval { umask(0077) };   # doubtless someone has no mask
+  try { umask(0077) };   # doubtless someone has no mask
 
   $self->{'args'}              ||= \@ARGV;
   $self->{'found'}             ||= \@();
@@ -915,7 +915,7 @@ sub search_perlfaqs {
     my %found_in;
     my $search_key = $self->opt_q;
     
-    my $rx = eval { qr/$search_key/ }
+    my $rx = try { qr/$search_key/ }
      or die <<EOD;
 Invalid regular expression '$search_key' given as -q pattern:
 $@
@@ -983,7 +983,7 @@ sub render_findings {
     foreach my $f (@{ $self->{'formatter_switches'} || \@() }) {
       my($switch, $value, $silent_fail) = @$f;
       if( $formatter->can($switch) ) {
-        eval { $formatter->?$switch( defined($value) ? $value : () ) };
+        try { $formatter->?$switch( defined($value) ? $value : () ) };
         warn "Got an error when setting $formatter_class\->$switch:\n$@\n"
          if $@;
       } else {
@@ -1016,7 +1016,7 @@ sub render_findings {
       #  $^W-suppressable warnings from the formatting!
     }
           
-    eval {  $formatter->parse_from_file( $file, $out_fh )  };
+    try {  $formatter->parse_from_file( $file, $out_fh )  };
   }
   
   warn "Error while formatting with $formatter_class:\n $@\n" if $@;
@@ -1658,7 +1658,7 @@ sub is_tainted { # just a function
     my $arg  = shift;
     my $nada = substr($arg, 0, 0);  # zero-length!
     local $@;  # preserve the caller's version of $@
-    eval { eval "# $nada" };
+    try { eval "# $nada" };
     return length($@) != 0;
 }
 
@@ -1674,8 +1674,8 @@ sub drop_privs_maybe {
         && ($> == 0 || $< == 0)
         && !$self->am_taint_checking()
     ) {
-        my $id = eval { getpwnam("nobody") };
-        $id = eval { getpwnam("nouser") } unless defined $id;
+        my $id = try { getpwnam("nobody") };
+        $id = try { getpwnam("nouser") } unless defined $id;
         $id = -2 unless defined $id;
             #
             # According to Stevens' APUE and various
@@ -1695,7 +1695,7 @@ sub drop_privs_maybe {
             # in HP-UX to change saved uid is to call setuid()
             # when the effective uid is zero).
             #
-        eval {
+        try {
             $< = $id; # real uid
             $> = $id; # effective uid
             $< = $id; # real uid

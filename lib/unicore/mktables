@@ -2187,7 +2187,7 @@ sub Expect($$$)
 
     $Tests++;
     my $RegObj;
-    my $result = eval {
+    my $result = try {
         $RegObj = qr/$Regex/;
         $String =~ $RegObj ? 1 : 0
     };
@@ -2205,7 +2205,7 @@ sub Error($)
 {
     my $Regex  = shift;
     $Tests++;
-    if (eval { 'x' =~ qr/$Regex/; 1 }) {
+    if (try { 'x' =~ qr/$Regex/; 1 }) {
         $Fails++;
         my $Line = (caller)[2];
         print "expected error for /$Regex/ on $0 line $Line: $@\n";

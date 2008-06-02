@@ -606,7 +606,7 @@ sub link {
 sub _invalid_link {
     my ($msg) = @_;
     # this sets @_
-    #eval { die "$msg\n" };
+    #try { die "$msg\n" };
     #chomp $@;
     $@ = $msg; # this seems to work, too!
     undef;

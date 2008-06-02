@@ -423,9 +423,9 @@ use integer;
 $v = $m1 + $g1;
 $v = $m1 - $g1;
 $v = $m1 * $g1;
-eval {$v = $m1 / $g1};
+try {$v = $m1 / $g1};
 $v = $m2 / 2;
-eval {$v = $m1 % $g1};
+try {$v = $m1 % $g1};
 $v = $m2 % 2;
 $v = $m1 +< $g1;
 $v = $m1 +> $g1;
@@ -524,9 +524,9 @@ use warnings 'uninitialized';
 my ($m1, $m2, $v);
 our ($g1);
 
-eval { $v = $m1 / $g1 };
+try { $v = $m1 / $g1 };
 $v = $m2 / 2;
-eval { $v = $m1 % $g1 };
+try { $v = $m1 % $g1 };
 $v = $m2 % 2;
 $v = $m1 == $g1;
 $v = $m1 +>= $g1;
@@ -770,7 +770,7 @@ $v = cos $m1;
 $v = rand $m1;
 $v = srand $m1;
 $v = exp $m1;
-$v = eval {log $m1};
+$v = try {log $m1};
 $v = sqrt $m1;
 $v = hex $m1;
 $v = oct $m1;
@@ -801,8 +801,8 @@ $v = substr $m1, $g1, $m2, $g2;	undef $m1;
 
 
 
-$v = eval {vec ($m1, $g1, $m2)};
-eval {vec ($m1, $g1, $m2) = $g2};	undef $m1; # ditto
+$v = try {vec ($m1, $g1, $m2)};
+try {vec ($m1, $g1, $m2) = $g2};	undef $m1; # ditto
 
 $v = index  $m1, $m2;
 $v = index  $m1, $m2, $g1;
@@ -968,18 +968,18 @@ use warnings 'uninitialized';
 my ($m1, $v);
 our ($g1);
 
-$v = eval { \&$m1 };
-$v = eval { \&$g1 };
+$v = try { \&$m1 };
+$v = try { \&$g1 };
 
 my @a;
 @a = splice @a, $m1, $g1;
 $v = 1 + splice @a, $m1, $g1;
 
 my $x = bless \@(), 'Z';
-eval { $x->?$m1() };
+try { $x->?$m1() };
 
-eval { &$m1() };
-eval { &$g1() };
+try { &$m1() };
+try { &$g1() };
 EXPECT
 Use of uninitialized value $m1 in subroutine dereference at - line 5.
     (eval) called at - line 5.
@@ -1009,7 +1009,7 @@ open FOO;		# accesses $FOO
 open my $x;		# accesses ${*$x}
 my $y;
 open $y, $m1;
-eval { open $y, $m1, $g1 };
+try { open $y, $m1, $g1 };
 open $y, '<', $g1;
 
 sysopen $y, $m1, $m2;
@@ -1042,7 +1042,7 @@ use warnings 'uninitialized';
 my ($m1);
 our ($g1);
 
-eval { my $x; tie $x, $m1 };
+try { my $x; tie $x, $m1 };
 EXPECT
 Use of uninitialized value $m1 in tie at - line 5.
     (eval) called at - line 5.
@@ -1081,14 +1081,14 @@ use warnings 'uninitialized';
 my ($m1, $m2);
 our ($g1);
 
-eval { my $x; seek    $x,$m1, $g1 };
-eval { my $x; sysseek $x,$m1, $g1 };
-eval { syswrite $m1, $g1 }; # logic changed - now won't try $g1 if $m1 is bad
-# eval { syswrite STDERR, $m1 };        # XXX under utf8, can give
-# eval { syswrite STDERR, $m1, $g1 };   # XXX different warnings
-# eval { syswrite STDERR, $m1, $g1, $m2 };
-eval { my $x; socket $x, $m1, $g1, $m2 };
-eval { my ($x,$y); socketpair $x, $y, $m1, $g1, $m2 };
+try { my $x; seek    $x,$m1, $g1 };
+try { my $x; sysseek $x,$m1, $g1 };
+try { syswrite $m1, $g1 }; # logic changed - now won't try $g1 if $m1 is bad
+# try { syswrite STDERR, $m1 };        # XXX under utf8, can give
+# try { syswrite STDERR, $m1, $g1 };   # XXX different warnings
+# try { syswrite STDERR, $m1, $g1, $m2 };
+try { my $x; socket $x, $m1, $g1, $m2 };
+try { my ($x,$y); socketpair $x, $y, $m1, $g1, $m2 };
 EXPECT
 Use of uninitialized value $m2 in socket at - line 11.
     (eval) called at - line 11.

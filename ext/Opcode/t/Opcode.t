@@ -52,9 +52,9 @@ print $s1 eq $s3 ? "ok $t\n" : "not ok $t\n"; ++$t;
 
 # --- define_optag
 
-print eval { opset(':_tst_') } ? "not ok $t\n" : "ok $t\n"; ++$t;
+print try { opset(':_tst_') } ? "not ok $t\n" : "ok $t\n"; ++$t;
 define_optag(":_tst_", opset(qw(padsv padav padhv)));
-print eval { opset(':_tst_') } ? "ok $t\n" : "not ok $t\n"; ++$t;
+print try { opset(':_tst_') } ? "ok $t\n" : "not ok $t\n"; ++$t;
 
 # --- opdesc and opcodes
 

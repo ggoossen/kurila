@@ -65,7 +65,7 @@ END { while (-f $file) {unlink $file or die "Can't unlink '$file': $!" }}
 
 sub do_clone {
   my $data = shift;
-  my $copy = eval {dclone $data};
+  my $copy = try {dclone $data};
   is ($@, '', 'Should be no error dcloning');
   ok (1, "dlcone is only 1 process, not 2");
   return $copy;
@@ -73,36 +73,36 @@ sub do_clone {
 
 sub freeze_and_thaw {
   my $data = shift;
-  my $frozen = eval {freeze $data};
+  my $frozen = try {freeze $data};
   is ($@, '', 'Should be no error freezing');
-  my $copy = eval {thaw $frozen};
+  my $copy = try {thaw $frozen};
   is ($@, '', 'Should be no error thawing');
   return $copy;
 }
 
 sub nfreeze_and_thaw {
   my $data = shift;
-  my $frozen = eval {nfreeze $data};
+  my $frozen = try {nfreeze $data};
   is ($@, '', 'Should be no error nfreezing');
-  my $copy = eval {thaw $frozen};
+  my $copy = try {thaw $frozen};
   is ($@, '', 'Should be no error thawing');
   return $copy;
 }
 
 sub store_and_retrieve {
   my $data = shift;
-  my $frozen = eval {store $data, $file};
+  my $frozen = try {store $data, $file};
   is ($@, '', 'Should be no error storing');
-  my $copy = eval {retrieve $file};
+  my $copy = try {retrieve $file};
   is ($@, '', 'Should be no error retrieving');
   return $copy;
 }
 
 sub nstore_and_retrieve {
   my $data = shift;
-  my $frozen = eval {nstore $data, $file};
+  my $frozen = try {nstore $data, $file};
   is ($@, '', 'Should be no error storing');
-  my $copy = eval {retrieve $file};
+  my $copy = try {retrieve $file};
   is ($@, '', 'Should be no error retrieving');
   return $copy;
 }

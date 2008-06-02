@@ -141,7 +141,7 @@ sub normalise
 BEGIN 
 { 
     { 
-        eval { require Data::Dumper ; Data::Dumper->import() } ; 
+        try { require Data::Dumper ; Data::Dumper->import() } ; 
     }
  
     if ($@) {
@@ -403,7 +403,7 @@ unlink $Dfile;
 
     my $filename = "xyz" ;
     my %x ;
-    eval { tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ; } ;
+    try { tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ; } ;
     ok(71, $@->{description} =~ m/^DB_File can only tie an array to a DB_RECNO database/) ;
     unlink $filename ;
 }
@@ -993,7 +993,7 @@ EOM
    @h[0] = "joe" ;
    ok(155, @h[0] eq "joe");
 
-   eval { my @r= grep { @h[$_] } (1, 2, 3) };
+   try { my @r= grep { @h[$_] } (1, 2, 3) };
    ok (156, ! $@);
 
 
@@ -1007,7 +1007,7 @@ EOM
 
    ok(157, @h[1] eq "joe");
 
-   eval { my @r= grep { @h[$_] } (1, 2, 3) };
+   try { my @r= grep { @h[$_] } (1, 2, 3) };
    ok (158, ! $@);
 
    undef $db ;
@@ -1406,7 +1406,7 @@ sub test_splice {
     my $gather_warning = sub { push @s_warnings, @_[0]->{description} };
     if ($context eq 'list') {
 	my @r;
-	eval {
+	try {
 	    local $^WARN_HOOK = $gather_warning;
 	    @r = splice @array, $offset, $length, @list;
 	};
@@ -1415,7 +1415,7 @@ sub test_splice {
     }
     elsif ($context eq 'scalar') {
 	my $r;
-	eval {
+	try {
 	    local $^WARN_HOOK = $gather_warning;
 	    $r = splice @array, $offset, $length, @list;
 	};
@@ -1423,7 +1423,7 @@ sub test_splice {
 	$s_r = \@( $r );
     }
     elsif ($context eq 'void') {
-	eval {
+	try {
 	    local $^WARN_HOOK = $gather_warning;
 	    splice @array, $offset, $length, @list;
 	};
@@ -1446,7 +1446,7 @@ sub test_splice {
     $gather_warning = sub { push @ms_warnings, @_[0]->{description} };
     if ($context eq 'list') {
 	my @r;
-	eval {
+	try {
 	    local $^WARN_HOOK = $gather_warning;
 	    @r = splice @h, $offset, $length, @list;
 	};
@@ -1455,7 +1455,7 @@ sub test_splice {
     }
     elsif ($context eq 'scalar') {
 	my $r;
-	eval {
+	try {
 	    local $^WARN_HOOK = $gather_warning;
 	    $r = splice @h, $offset, $length, @list;
 	};
@@ -1463,7 +1463,7 @@ sub test_splice {
 	$ms_r = \@( $r );
     }
     elsif ($context eq 'void') {
-	eval {
+	try {
 	    local $^WARN_HOOK = $gather_warning;
 	    splice @h, $offset, $length, @list;
 	};

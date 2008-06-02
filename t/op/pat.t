@@ -384,7 +384,7 @@ ok( $blah == 12 , "blah not changed by the eval" );
 for $code ('{$blah = 45}','=xx') {
   $blah = 12;
   if ($code eq '=xx') {
-      $res = eval { "xx" =~ m/(?$code)/o }; die if $@;
+      $res = try { "xx" =~ m/(?$code)/o }; die if $@;
       ok( not $@ );
       ok( $res );
   } else {
@@ -1954,9 +1954,9 @@ print "# some Unicode properties\n";
 
     my $R = qr/ A B C # D E/x;
 
-    ok( eval {"ABCDE" =~ $R} ); die if $@;
-    ok( eval {"ABCDE" =~ m/$R/} ); die if $@;
-    ok( eval {"ABCDE" =~ m/($R)/} ); die if $@;
+    ok( try {"ABCDE" =~ $R} ); die if $@;
+    ok( try {"ABCDE" =~ m/$R/} ); die if $@;
+    ok( try {"ABCDE" =~ m/($R)/} ); die if $@;
 }
 
 {
@@ -2382,7 +2382,7 @@ for (120 .. 130) {
 }
 
 # perl #25269: panic: pp_match start/end pointers
-ok("a-bc" eq eval {
+ok("a-bc" eq try {
 	my($x, $y) = "bca" =~ m/^(?=.*(a)).*(bc)/;
 	"$x-$y";
 }, 'captures can move backwards in string'); die if $@;
@@ -2511,7 +2511,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     package main;
     
     my $aeek = bless \%(), 'wooosh';
-    eval {$aeek->gloople() =~ m/(.)/g;}; die if $@;
+    try {$aeek->gloople() =~ m/(.)/g;}; die if $@;
     ok($@ eq "", "//g match against return value of sub") or print "# $@\n";
 }
 
@@ -2519,7 +2519,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     sub gloople {
       "!";
     }
-    eval {gloople() =~ m/(.)/g;}; die if $@;
+    try {gloople() =~ m/(.)/g;}; die if $@;
     ok($@ eq "", "# 26410 didn't affect sub calls for some reason")
 	or print "# $@\n";
 }
@@ -2529,7 +2529,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     no warnings 'utf8';
     $_ = pack('U0C2', 0xa2, 0xf8); # ill-formed UTF-8
     my $ret = 0;
-    eval { $ret = s/[\0]+//g }; die if $@;
+    try { $ret = s/[\0]+//g }; die if $@;
     ok($ret == 0, "ill-formed UTF-8 doesn't match NUL in class");
 }
 

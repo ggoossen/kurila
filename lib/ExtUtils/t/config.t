@@ -17,7 +17,7 @@ BEGIN { use_ok 'ExtUtils::MakeMaker::Config'; }
 
 is %Config{path_sep}, %Config::Config{path_sep};
 
-eval {
+try {
     %Config{wibble} = 42;
 };
 is %Config{wibble}, 42;

@@ -37,7 +37,7 @@ for my $dump (@dumps) {
     print FH $dump;
     close(FH) || die "Can't write $file: $!";
 
-    eval {
+    try {
 	my $data = retrieve($file);
 	if (ref($data) eq "HASH" && $data->{one} eq "1") {
 	    print "ok $testno\n";

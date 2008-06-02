@@ -63,7 +63,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 my $Mac_FS;
 if ($Is_MacOS) {
 	require File::Spec;
-	$Mac_FS = eval { require Mac::FileSpec::Unixish };
+	$Mac_FS = try { require Mac::FileSpec::Unixish };
 }
 
 sub import {

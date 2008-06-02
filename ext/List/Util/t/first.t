@@ -20,12 +20,12 @@ $v = first { ($_->[1] cmp "e") +<= 0 and ("e" cmp $_->[2]) +<= 0 }
 		\@(qw(a b c)), \@(qw(d e f)), \@(qw(g h i));
 is_deeply($v, \@(qw(d e f)), 'reference args');
 
-# Check that eval{} inside the block works correctly
+# Check that try{} inside the block works correctly
 my $i = 0;
-$v = first { eval { die }; ($i == 5, $i = $_)[0] } 0,1,2,3,4,5,5;
+$v = first { try { die }; ($i == 5, $i = $_)[0] } 0,1,2,3,4,5,5;
 is($v, 5, 'use of eval');
 
-$v = eval { first { die if $_ } 0,0,1 };
+$v = try { first { die if $_ } 0,0,1 };
 is($v, undef, 'use of die');
 
 sub foobar {  first { !defined(wantarray) || wantarray } "not ","not ","not " }
@@ -48,7 +48,7 @@ is($v, 12, 'return from loop');
 
 # Can we undefine a first sub while it's running?
 sub self_immolate {undef &self_immolate; 1}
-eval { $v = first \&self_immolate, 1,2; };
+try { $v = first \&self_immolate, 1,2; };
 like($@->{description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
@@ -56,7 +56,7 @@ like($@->{description}, qr/^Can't undef active subroutine/, "undef active sub");
 # running the Perl or XS implementation.
 
 sub self_updating { local $^W; *self_updating = sub{1} ;1}
-eval { $v = first \&self_updating, 1,2; };
+try { $v = first \&self_updating, 1,2; };
 is($@, '', 'redefine self');
 
 { my $failed = 0;
@@ -92,11 +92,11 @@ if (!$::PERL_ONLY) { SKIP: {
       if !$List::Util::REAL_MULTICALL;
 
     # Can we goto a label from the 'first' sub?
-    eval {()=first{goto foo} 1,2; foo: 1};
+    try {()=first{goto foo} 1,2; foo: 1};
     like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
-    eval {()=first{goto sub{}} 1,2;};
+    try {()=first{goto sub{}} 1,2;};
     like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 } }

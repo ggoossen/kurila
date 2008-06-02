@@ -205,7 +205,7 @@ BEGIN {
 
     # cp should croak if destination isn't directory (not a great warning)
     @ARGV = ( $Testfile ) x 3;
-    eval { cp() };
+    try { cp() };
 
     like( $@->{description}, qr/Too many arguments/, 'cp croaks on error' );
 
@@ -221,7 +221,7 @@ BEGIN {
     # mv should also croak with the same wacky warning
     @ARGV = ( $Testfile ) x 3;
 
-    eval { mv() };
+    try { mv() };
     like( $@->{description}, qr/Too many arguments/, 'mv croaks on error' );
 
     # Test expand_wildcards()

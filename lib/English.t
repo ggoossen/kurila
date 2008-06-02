@@ -121,10 +121,10 @@ my @keys = sort keys %hash;
 is( @keys[0], 'a,b,c', '$SUBSCRIPT_SEPARATOR' );
 is( @keys[1], 'd|e|f', '$SUBSCRIPT_SEPARATOR' );
 
-eval { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
+try { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
 ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );
 
-eval { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
+try { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
 is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
 ok( %OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
 

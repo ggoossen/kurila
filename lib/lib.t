@@ -72,8 +72,8 @@ BEGIN {
     }
     is( %INC{'Yup.pm'}, $path,    '%INC set properly' );
 
-    is( eval { do 'Yup.pm'  }, 42,  'do() works' );
-    ok( eval { require Yup; },      '   require()' );
+    is( try { do 'Yup.pm'  }, 42,  'do() works' );
+    ok( try { require Yup; },      '   require()' );
     ok( eval "use Yup; 1;",         '   use()' );
     is( $@, '' );
 

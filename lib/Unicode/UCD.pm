@@ -152,7 +152,7 @@ sub _getcode {
 # Lingua::KO::Hangul::Util not part of the standard distribution
 # but it will be used if available.
 
-eval { require Lingua::KO::Hangul::Util };
+try { require Lingua::KO::Hangul::Util };
 my $hasHangulUtil = ! $@;
 if ($hasHangulUtil) {
     Lingua::KO::Hangul::Util->import();

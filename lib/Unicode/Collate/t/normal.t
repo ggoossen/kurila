@@ -11,7 +11,7 @@ BEGIN {
 }
 
 BEGIN {
-    eval { require Unicode::Normalize; };
+    try { require Unicode::Normalize; };
     if ($@) {
 	print "1..0 # skipped: Unicode::Normalize needed for this test\n";
 	print $@;

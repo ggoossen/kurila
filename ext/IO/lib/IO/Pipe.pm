@@ -70,7 +70,7 @@ sub _doit {
 	$fh->close;
 
         if ($do_spawn) {
-          $pid = eval { system 1, @_ }; # 1 == P_NOWAIT
+          $pid = try { system 1, @_ }; # 1 == P_NOWAIT
           my $err = $!;
     
           $io->fdopen($save, $mode);

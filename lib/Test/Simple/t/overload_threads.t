@@ -14,7 +14,7 @@ chdir 't';
 BEGIN {
     # There was a bug with overloaded objects and threads.
     # See rt.cpan.org 4218
-    eval { require threads; 'threads'->import; 1; };
+    try { require threads; 'threads'->import; 1; };
 }
 
 use Test::More;

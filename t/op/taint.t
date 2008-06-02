@@ -29,7 +29,7 @@ BEGIN {
   }
   if (%Config{'extensions'} =~ m/\bIPC\/SysV\b/
       && (%Config{d_shm} || %Config{d_msg})) {
-      eval { require IPC::SysV };
+      try { require IPC::SysV };
       unless ($@) {
 	  $ipcsysv++;
 	  'IPC::SysV'->import(qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU IPC_NOWAIT));
@@ -97,7 +97,7 @@ sub any_tainted (@) {
     return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
-    my $tainted = not eval { @_[0], kill 0; 1};
+    my $tainted = not try { @_[0], kill 0; 1};
     die if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
     return $tainted;
 }
@@ -166,7 +166,7 @@ my $TEST = catfile(curdir(), 'TEST');
     delete %ENV{[@MoreEnv]};
     %ENV{TERM} = 'dumb';
 
-    test eval { `$echo 1` } eq "1\n";
+    test try { `$echo 1` } eq "1\n";
 
     SKIP: {
         skip "Environment tainting tests skipped", 4
@@ -175,7 +175,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	my @vars = ('PATH', @MoreEnv);
 	while (my $v = @vars[0]) {
 	    local %ENV{$v} = $TAINT;
-	    last if eval { `$echo 1` };
+	    last if try { `$echo 1` };
 	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
@@ -184,9 +184,9 @@ my $TEST = catfile(curdir(), 'TEST');
 	# tainted $TERM is unsafe only if it contains metachars
 	local %ENV{TERM};
 	%ENV{TERM} = 'e=mc2';
-	test eval { `$echo 1` } eq "1\n";
+	test try { `$echo 1` } eq "1\n";
 	%ENV{TERM} = 'e=mc2' . $TAINT;
-	test !eval { `$echo 1` };
+	test !try { `$echo 1` };
 	like( $@->{description}, qr/^Insecure \$ENV{TERM}/ );
     }
 
@@ -205,7 +205,7 @@ my $TEST = catfile(curdir(), 'TEST');
         skip "all directories are writeable", 2 unless $tmp;
 
 	local %ENV{PATH} = $tmp;
-	test !eval { `$echo 1` };
+	test !try { `$echo 1` };
 	test $@->{description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     }
 
@@ -213,14 +213,14 @@ my $TEST = catfile(curdir(), 'TEST');
         skip "This is not VMS", 4 unless $Is_VMS;
 
 	%ENV{'DCL$PATH'} = $TAINT;
-	test  eval { `$echo 1` } eq '';
+	test  try { `$echo 1` } eq '';
 	test $@->{description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
 	    %ENV{'DCL$PATH'} = $tmp;
-	    test eval { `$echo 1` } eq '';
+	    test try { `$echo 1` } eq '';
 	    test $@->{description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	}
 	%ENV{'DCL$PATH'} = '';
@@ -284,7 +284,7 @@ SKIP: {
     my $arg = catfile(curdir(), "arg$$");
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
-	eval { join('', @ARGV), kill 0 };
+	try { join('', @ARGV), kill 0 };
 	exit 0 if $@->{description} =~ m/^Insecure dependency/;
 	print "# Oops: \$@ was [$@]\n";
 	exit 1;
@@ -312,10 +312,10 @@ SKIP: {
 SKIP: {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
-    my @globs = eval { glob("*") };
+    my @globs = try { glob("*") };
     test @globs == 0 && $@->{description} =~ m/^Insecure dependency/;
 
-    @globs = eval { glob '*' };
+    @globs = try { glob '*' };
     test @globs == 0 && $@->{description} =~ m/^Insecure dependency/;
 }
 
@@ -417,7 +417,7 @@ SKIP: {
     $foo = $filename . $TAINT;
     unlink $filename;	# in any case
 
-    test !eval { open FOO, "<", $foo }, 'open for read';
+    test !try { open FOO, "<", $foo }, 'open for read';
     test $@ eq '', $@;		# NB: This should be allowed
 
     # Try first new style but allow also old style.
@@ -462,7 +462,7 @@ SKIP: {
         # wildcard expansion doesn't invoke shell on VMS, so is safe
         skip "This is not VMS", 2 unless $Is_VMS;
     
-	test join('', eval { glob $foo } ) ne '', 'globbing';
+	test join('', try { glob $foo } ) ne '', 'globbing';
 	test $@ eq '', $@;
     }
 }
@@ -557,7 +557,7 @@ SKIP: {
     test not tainted @bar[0];
     test     tainted @bar[1];
     test not tainted @bar[2];
-    my @baz = eval { "A", "tainted" . $TAINT, "B" };
+    my @baz = try { "A", "tainted" . $TAINT, "B" };
     test not tainted @baz[0];
     test     tainted @baz[1];
     test not tainted @baz[2];
@@ -588,7 +588,7 @@ SKIP: {
     # No reliable %Config check for getpw*
     SKIP: {
         skip "getpwent() is not available", 1 unless 
-          eval { setpwent(); getpwent() };
+          try { setpwent(); getpwent() };
 
 	setpwent();
 	my @getpwent = getpwent();
@@ -773,7 +773,7 @@ SKIP: {
 
     BEGIN {
 	use vars qw($has_fcntl);
-	eval { require Fcntl; Fcntl->import; };
+	try { require Fcntl; Fcntl->import; };
 	unless ($@) {
 	    $has_fcntl = 1;
 	}
@@ -905,7 +905,7 @@ SKIP: {
 
 ok( $^TAINT == 1, '$^TAINT is on' );
 
-eval { $^TAINT = 0 };
+try { $^TAINT = 0 };
 ok( $^TAINT,  '$^TAINT is not assignable' );
 ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
     'Assigning to $^TAINT fails' );
@@ -955,7 +955,7 @@ TODO: {
     dies_like( sub { system $TAINT 'notaint' }, $err, 'system');
     dies_like( sub { system {'notaint'} $TAINT }, $err, 'system');
 
-    eval { 
+    try { 
         no warnings;
         system("lskdfj does not exist","with","args"); 
     };
@@ -964,7 +964,7 @@ TODO: {
     SKIP: {
         skip "no exec() on MacOS Classic" if $Is_MacOS;
 
-	eval { 
+	try { 
             no warnings;
             exec("lskdfj does not exist","with","args"); 
         };
@@ -1116,7 +1116,7 @@ TERNARY_CONDITIONALS: {
 # statement
 
 {
-    eval { local $0, eval '1' };
+    try { local $0, eval '1' };
     test $@ eq '';
 }
 
@@ -1153,7 +1153,7 @@ SKIP:
 
 	%ENV{'PATH'} = $TAINT;
 	local %SIG{'PIPE'} = 'IGNORE';
-	eval {
+	try {
 	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {
 		die "open failed: $!";
@@ -1165,7 +1165,7 @@ SKIP:
 	};
 	test( ($@ && $@->{description}) !~ m/Insecure \$ENV/, 'fork triggers %ENV check');
 	is $@, '',               'pipe/fork/open/close failed';
-	eval {
+	try {
 	    open my $pipe, "|-", "$Invoke_Perl -e 1";
 	    close $pipe;
 	};
@@ -1177,11 +1177,11 @@ SKIP:
     # tests for tainted format in s?printf
     dies_like( sub { printf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in printf/, q/printf doesn't like tainted formats/);
-    eval { printf("# \%s\n", $TAINT . "foo") };
+    try { printf("# \%s\n", $TAINT . "foo") };
     ok(!$@, q/printf accepts other tainted args/);
     dies_like( sub { sprintf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in sprintf/, q/sprintf doesn't like tainted formats/);
-    eval { sprintf("# \%s\n", $TAINT . "foo") };
+    try { sprintf("# \%s\n", $TAINT . "foo") };
     ok(!$@, q/sprintf accepts other tainted args/);
 }
 

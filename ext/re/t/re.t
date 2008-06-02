@@ -31,7 +31,7 @@ my $warn;
 local $^WARN_HOOK = sub {
 	$warn = @_[0]->{description};
 };
-#eval { re::bits(1) };
+#try { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
 delete %ENV{PERL_RE_COLORS};

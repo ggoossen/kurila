@@ -49,7 +49,7 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 # XXX force Cwd to bootsrap its XSUBs since we have set @INC = "../lib"
 # XXX and subsequent chdir()s can make them impossible to find
-eval { fastcwd };
+try { fastcwd };
 
 # Must find an external pwd (or equivalent) command.
 

@@ -16,7 +16,7 @@ use Storable qw(freeze thaw);
 print "1..2\n";
 
 for my $test (1,2) {
-  eval {thaw "\xFF\xFF"};
+  try {thaw "\xFF\xFF"};
   if ($@->{description} =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
     {
       print "ok $test\n";

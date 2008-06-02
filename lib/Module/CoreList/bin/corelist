@@ -130,7 +130,7 @@ while (@ARGV) {
 	    module_version($mod,$ver);
 	} else {
 	    my $re;
-	    eval { $re = $2 ? qr/(?$2)($1)/ : qr/$1/; }; # trap exceptions while building regex
+	    try { $re = $2 ? qr/(?$2)($1)/ : qr/$1/; }; # trap exceptions while building regex
 	    if ($@) {
 		# regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
 		# then we drop text after ';' to shorten message
@@ -196,7 +196,7 @@ sub module_version {
 sub numify_version {
     my $ver = shift;
     if ($ver =~ m/\..+\./) {
-	eval { require version ; 1 }
+	try { require version ; 1 }
 	    or die "You need to install version.pm to use dotted version numbers\n";
         $ver = version->new($ver)->numify;
     }

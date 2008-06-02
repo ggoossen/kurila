@@ -35,7 +35,7 @@ $| = 1;
 
 print "1..8\n";
 
-eval {
+try {
     %SIG{ALRM} = sub { die; };
     alarm 60;
 };

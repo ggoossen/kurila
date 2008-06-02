@@ -53,13 +53,13 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
     my $strtab = strtab();
     is (ref $strtab, 'HASH', "The shared string table quacks like a hash");
     my $wibble = "\0";
-    eval {
+    try {
 	$strtab->{$wibble}++;
     };
     my $prefix = "Cannot modify shared string table in hv_";
     my $what = $prefix . 'fetch';
     like ($@->{description}, qr/^$what/,$what);
-    eval {
+    try {
 	XS::APItest::Hash::store($strtab, 'Boom!',  1)
     };
     $what = $prefix . 'store';
@@ -68,7 +68,7 @@ main_tests (\@keys, \@testkeys, ' [utf8 hash]');
 	A::B->method();
     }
     # DESTROY should be in there.
-    eval {
+    try {
 	delete $strtab->{DESTROY};
     };
     $what = $prefix . 'delete';

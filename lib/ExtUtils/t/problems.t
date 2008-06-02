@@ -36,7 +36,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 
     my $warning = '';
     local $^WARN_HOOK = sub { $warning = @_[0]->{description} };
-    eval { $MM->eval_in_subdirs; };
+    try { $MM->eval_in_subdirs; };
 
     is( $stdout->read, qq{\@INC has .\n}, 'cwd in @INC' );
     like( $@->{description}, 

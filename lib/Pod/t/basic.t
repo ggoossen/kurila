@@ -57,7 +57,7 @@ our %options = (sentence => 0);
 my $n = 2;
 for (sort keys %translators) {
     if ($_ eq 'Pod::Text::Color') {
-        eval { require Term::ANSIColor };
+        try { require Term::ANSIColor };
         if ($@) {
             print "ok $n # skip\n";
             $n++;

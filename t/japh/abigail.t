@@ -450,7 +450,7 @@ q[41342211132019313505])=~m[..]g]]e and y[yIbp][HJkP] and print;
 SKIP: Platform dependent.
 
 ####### die 5
-eval {die [[qq [Just another Perl Hacker]]]};; print
+try {die [[qq [Just another Perl Hacker]]]};; print
 ${${${@}}[$#{@{${@}}}]}[$#{${@{${@}}}[$#{@{${@}}}]}]
 SKIP: Abuses a fixed bug; what is in $#{...} must be an arrayref, not an array
 

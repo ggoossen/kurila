@@ -62,24 +62,24 @@ can_ok( 'DynaLoader' => 'dl_find_symbol_anywhere' ); # defined in AutoLoaded sec
 
 # Check error messages
 # .. for bootstrap()
-eval { DynaLoader::bootstrap() };
+try { DynaLoader::bootstrap() };
 like( $@->{description}, q{/^Usage: DynaLoader::bootstrap\(module\)/},
         "calling DynaLoader::bootstrap() with no argument" );
 
-eval { package egg_bacon_sausage_and_spam; DynaLoader::bootstrap("egg_bacon_sausage_and_spam") };
+try { package egg_bacon_sausage_and_spam; DynaLoader::bootstrap("egg_bacon_sausage_and_spam") };
 like( $@->{description}, q{/^Can't locate loadable object for module egg_bacon_sausage_and_spam/},
         "calling DynaLoader::bootstrap() with a package without binary object" );
 
 # .. for dl_load_file()
-eval { DynaLoader::dl_load_file() };
+try { DynaLoader::dl_load_file() };
 like( $@->{description}, q{/^Usage: DynaLoader::dl_load_file\(filename, flags=0\)/},
         "calling DynaLoader::dl_load_file() with no argument" );
 
-eval { no warnings 'uninitialized'; DynaLoader::dl_load_file(undef) };
+try { no warnings 'uninitialized'; DynaLoader::dl_load_file(undef) };
 is( $@, '', "calling DynaLoader::dl_load_file() with undefined argument" );     # is this expected ?
 
 my ($dlhandle, $dlerr);
-eval { $dlhandle = DynaLoader::dl_load_file("egg_bacon_sausage_and_spam") };
+try { $dlhandle = DynaLoader::dl_load_file("egg_bacon_sausage_and_spam") };
 $dlerr = DynaLoader::dl_error();
 SKIP: {
     skip "dl_load_file() does not attempt to load file on VMS (and thus does not fail) when \@dl_require_symbols is empty", 1 if $^O eq 'VMS';
@@ -94,7 +94,7 @@ ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" );
 # ... dl_findfile()
 SKIP: {
     my @files = ();
-    eval { @files = DynaLoader::dl_findfile("c") };
+    try { @files = DynaLoader::dl_findfile("c") };
     is( $@, '', "calling dl_findfile()" );
     # Some platforms are known to not have a "libc"
     # (not at least by that name) that the dl_findfile()
@@ -132,7 +132,7 @@ for my $libref (reverse @DynaLoader::dl_librefs) {
   SKIP: {
     skip "unloading unsupported on $^O", 2 if ($^O eq 'VMS' || $^O eq 'darwin');
     my $module = pop @loaded_modules;
-    my $r = eval { DynaLoader::dl_unload_file($libref) };
+    my $r = try { DynaLoader::dl_unload_file($libref) };
     is( $@, '', "calling dl_unload_file() for $module" );
     is( $r,  1, " - unload was successful" );
   }

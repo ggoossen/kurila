@@ -2695,7 +2695,7 @@ sub parse_version {
         my $eval = qq|
             package ExtUtils::MakeMaker::_version;
             no strict;
-            BEGIN \{ eval \{
+            BEGIN \{ try \{
                 # Ensure any version() routine which might have leaked
                 # into this package has been deleted.  Interferes with
                 # version->import()
@@ -3232,7 +3232,7 @@ sub max_exec_len {
     my $self = shift;
 
     if (!defined $self->{_MAX_EXEC_LEN}) {
-        if (my $arg_max = eval { require POSIX;  &POSIX::ARG_MAX }) {
+        if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX }) {
             $self->{_MAX_EXEC_LEN} = $arg_max;
         }
         else {      # POSIX minimum exec size

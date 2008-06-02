@@ -86,7 +86,7 @@ sub new {
     my $self = \%();
 
     if (%args{config_override}) {
-        eval {
+        try {
             $self->{':private:'}{Config} = \%( %{%args{config_override}} );
         } or Carp::croak(
             "The 'config_override' parameter must be a hash reference."
@@ -101,7 +101,7 @@ sub new {
     {
         my ($arg,$key,$val)=@$tuple;
         if ( %args{$arg} ) {
-            eval {
+            try {
                 $self->{':private:'}{$key} = \@( @{%args{$arg}} );
             } or Carp::croak(
                 "The '$arg' parameter must be an array reference."

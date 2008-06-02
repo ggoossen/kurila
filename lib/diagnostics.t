@@ -16,7 +16,7 @@ BEGIN { use_ok('diagnostics') }
 
 require base;
 
-eval {
+try {
     'base'->import(qw(I::do::not::exist));
 };
 

@@ -15,7 +15,7 @@ WriteMakefile(
 	# Un-comment this if you add C files to link with later:
     # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
 );
-if (eval {require ExtUtils::Constant; 1}) {
+if (try {require ExtUtils::Constant; 1}) {
   # Some older versions of glibc use only enums, no defines, hence all this
   # hassle (so old glibc that the define is GNU_LIBRARY, not GLIBC):
   my @names = 'CODESET'; # CODESET isn't an enum in old glibc's langinfo.h

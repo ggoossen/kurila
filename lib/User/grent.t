@@ -9,7 +9,7 @@ use Test::More;
 
 BEGIN {
     our $hasgr;
-    eval { my @n = getgrgid 0 };
+    try { my @n = getgrgid 0 };
     $hasgr = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($hasgr) { plan skip_all => "no getgrgid"; }
     use Config;

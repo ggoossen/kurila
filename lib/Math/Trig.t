@@ -16,7 +16,7 @@ BEGIN {
 }
 
 BEGIN {
-    eval { require Test::More };
+    try { require Test::More };
     if ($@) {
 	# We are willing to lose testing in e.g. 5.00504.
 	print "1..0 # No Test::More, skipping\n";

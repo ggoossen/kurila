@@ -269,7 +269,7 @@ ok(@ary == 3 &&
 {
     $p="a,b";
     utf8::encode $p;
-    eval { @a=split(m/[, ]+/,$p) };
+    try { @a=split(m/[, ]+/,$p) };
     is ("$@-@a-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
 }
 

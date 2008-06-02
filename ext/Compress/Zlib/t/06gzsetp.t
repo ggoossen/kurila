@@ -32,7 +32,7 @@ BEGIN
     # use Test::NoWarnings, if available
     $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 }
 
 my $ver = Compress::Zlib::zlib_version();
@@ -63,7 +63,7 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
     is $x->gzwrite($hello), $len_hello, "gzwrite returned $len_hello" ;
     
     # Error cases
-    eval { $x->gzsetparams() };
+    try { $x->gzsetparams() };
     like $@->{description}, mkErr('^Usage: Compress::Zlib::gzFile::gzsetparams\(file, level, strategy\)');
 
     # Change both Level & Strategy

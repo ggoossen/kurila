@@ -371,8 +371,8 @@ require		use strict
 dofile		do 'file'
 entereval	eval "1+1"
 leaveeval	eval "1+1"
-entertry	SKIP eval { 1+1 }
-leavetry	SKIP eval { 1+1 }
+entertry	SKIP try { 1+1 }
+leavetry	SKIP try { 1+1 }
 ghbyname	gethostbyname 'foo'
 ghbyaddr	gethostbyaddr 'foo'
 ghostent	gethostent

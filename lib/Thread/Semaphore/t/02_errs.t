@@ -14,32 +14,32 @@ use Test::More 'tests' => 12;
 
 my $err = qr/^Semaphore .* is not .* integer: /;
 
-eval { Thread::Semaphore->new(undef); };
+try { Thread::Semaphore->new(undef); };
 like($@ && $@->message, $err);
-eval { Thread::Semaphore->new(0.5); };
+try { Thread::Semaphore->new(0.5); };
 like($@ && $@->message, $err);
-eval { Thread::Semaphore->new('foo'); };
+try { Thread::Semaphore->new('foo'); };
 like($@ && $@->message, $err);
 
 my $s = Thread::Semaphore->new();
 ok($s, 'New semaphore');
 
-eval { $s->down(undef); };
+try { $s->down(undef); };
 like($@->message, $err);
-eval { $s->down(-1); };
+try { $s->down(-1); };
 like($@->message, $err);
-eval { $s->down(1.5); };
+try { $s->down(1.5); };
 like($@->message, $err);
-eval { $s->down('foo'); };
+try { $s->down('foo'); };
 like($@->message, $err);
 
-eval { $s->up(undef); };
+try { $s->up(undef); };
 like($@->message, $err);
-eval { $s->up(-1); };
+try { $s->up(-1); };
 like($@->message, $err);
-eval { $s->up(1.5); };
+try { $s->up(1.5); };
 like($@->message, $err);
-eval { $s->up('foo'); };
+try { $s->up('foo'); };
 like($@->message, $err);
 
 # EOF

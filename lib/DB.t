@@ -117,7 +117,7 @@ BEGIN {
         local (@DB::args, $DB::signal);
 
         my $line = __LINE__ + 1;
-        my @ret = eval { DB->backtrace() };
+        my @ret = try { DB->backtrace() };
         like( @ret[0], qr/file.+\Q$0\E/, 'DB::backtrace() should report current file');
         like( @ret[0], qr/line $line/, '... should report calling line number' );
         like( @ret[0], qr/eval {...}/, '... should catch eval BLOCK' );

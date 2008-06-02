@@ -56,7 +56,7 @@ my $header = Storable::read_magic ($test);
 is ($header->{byteorder}, %Config{byteorder},
     "header's byteorder and Config.pm's should agree");
 
-my $result = eval {thaw $test};
+my $result = try {thaw $test};
 isa_ok ($result, 'SCALAR', "Check thawing test data");
 is ($@, '', "causes no errors");
 is ($$result, 'Hell', 'and gives the expected data');
@@ -85,12 +85,12 @@ SKIP: {
 EOM
         skip "# No 1.x test file", 9;
     }
-    my $result = eval {thaw $real_thing};
+    my $result = try {thaw $real_thing};
     is ($result, undef, "By default should not be able to thaw");
     like ($@, qr/Byte order is not compatible/,
           "because the header byte order strings differ");
     local $Storable::interwork_56_64bit = 1;
-    $result = eval {thaw $real_thing};
+    $result = try {thaw $real_thing};
     isa_ok ($result, 'ARRAY', "With flag should now thaw");
     is ($@, '', "with no errors");
 
@@ -108,7 +108,7 @@ EOM
     is ($$result[3], "The End", "4th element");
 }
 
-$result = eval {thaw $test};
+$result = try {thaw $test};
 isa_ok ($result, 'SCALAR', "CHORUS: check thawing test data");
 is ($@, '', "        causes no errors");
 is ($$result, 'Hell', "        and gives the expected data");
@@ -124,12 +124,12 @@ my $header_kludge = Storable::read_magic ($test_kludge);
 cmp_ok (length ($header_kludge->{byteorder}), '==', $Config{longsize},
         "With 5.6 interwork kludge byteorder string should be same size as long"
        );
-$result = eval {thaw $test_kludge};
+$result = try {thaw $test_kludge};
 is ($result, undef, "By default should not be able to thaw");
 like ($@, qr/Byte order is not compatible/,
       "because the header byte order strings differ");
 
-$result = eval {thaw $test};
+$result = try {thaw $test};
 isa_ok ($result, 'SCALAR', "CHORUS: check thawing test data");
 is ($@, '', "        causes no errors");
 is ($$result, 'Hell', "        and gives the expected data");
@@ -137,19 +137,19 @@ is ($$result, 'Hell', "        and gives the expected data");
 {
     local $Storable::interwork_56_64bit = 1;
 
-    $result = eval {thaw $test_kludge};
+    $result = try {thaw $test_kludge};
     isa_ok ($result, 'SCALAR', "should be able to thaw kludge data");
     is ($@, '', "with no errors");
     is ($$result, 'Heck', "and gives expected data");
 
-    $result = eval {thaw $test};
+    $result = try {thaw $test};
     is ($result, undef, "But now can't thaw real data");
     like ($@, qr/Byte order is not compatible/,
           "because the header byte order strings differ");
 }
 
 #  All together now:
-$result = eval {thaw $test};
+$result = try {thaw $test};
 isa_ok ($result, 'SCALAR', "CHORUS: check thawing test data");
 is ($@, '', "        causes no errors");
 is ($$result, 'Hell', "        and gives the expected data");

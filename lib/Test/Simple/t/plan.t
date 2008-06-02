@@ -10,10 +10,10 @@ BEGIN {
 use Test::More;
 
 plan tests => 4;
-eval { plan tests => 4 };
+try { plan tests => 4 };
 is( $@->{description}, sprintf("You tried to plan twice at \%s line \%d.\n", $0, __LINE__ - 1),
     'disallow double plan' );
-eval { plan 'no_plan'  };
+try { plan 'no_plan'  };
 is( $@->{description}, sprintf("You tried to plan twice at \%s line \%d.\n", $0, __LINE__ -1),
     'disallow changing plan' );
 

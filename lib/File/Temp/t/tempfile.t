@@ -130,7 +130,7 @@ push( @still_there, $tempfile); # check at END
 #    on NFS
 # Try to do what we can.
 # Tempfile croaks on error so we need an eval
-$fh = eval { tempfile( 'ftmpXXXXX', DIR => File::Spec->tmpdir ) };
+$fh = try { tempfile( 'ftmpXXXXX', DIR => File::Spec->tmpdir ) };
 
 if ($fh) {
 

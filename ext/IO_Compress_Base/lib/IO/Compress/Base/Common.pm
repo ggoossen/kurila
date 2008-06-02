@@ -46,7 +46,7 @@ use constant STATUS_ERROR     => -1;
 sub hasEncode()
 {
     if (! defined $HAS_ENCODE) {
-        eval
+        try
         {
             require Encode;
             Encode->import();

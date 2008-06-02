@@ -43,7 +43,7 @@ ok(1, 1, 'Loaded');
 my $foo;
 my $bar = "foo";
 share($foo);
-eval { $foo = \$bar; };
+try { $foo = \$bar; };
 ok(2,my $temp1 = $@->{description} =~ m/^Invalid\b.*shared scalar/, "Wrong error message");
 
 share($bar);

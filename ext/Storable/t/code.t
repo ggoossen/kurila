@@ -90,7 +90,7 @@ ok($thawed->(), "JAPH");
 
 ######################################################################
 
-eval { $freezed = freeze @obj[4] };
+try { $freezed = freeze @obj[4] };
 ok($@, qr/The result of B::Deparse::coderef2text was empty/);
 
 ######################################################################
@@ -134,7 +134,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     for my $i (0 .. 1) {
 	$freezed = freeze @obj[$i];
 	$@ = "";
-	eval { $thawed  = thaw $freezed };
+	try { $thawed  = thaw $freezed };
 	ok($@, qr/Can\'t eval/);
     }
 }
@@ -144,7 +144,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     local $Storable::Deparse = 0;
     for my $i (0 .. 1) {
 	$@ = "";
-	eval { $freezed = freeze @obj[$i] };
+	try { $freezed = freeze @obj[$i] };
 	ok($@, qr/Can\'t store CODE items/);
     }
 }
@@ -155,7 +155,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     for my $i (0 .. 4) {
 	$freezed = freeze @obj[0]->[$i];
 	$@ = "";
-	eval { $thawed  = thaw $freezed };
+	try { $thawed  = thaw $freezed };
 	ok($@, "");
 	ok($$thawed, qr/^sub/);
     }
@@ -171,7 +171,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     open(STDERR, ">", $devnull) or
 	( print SAVEERR "Unable to redirect STDERR: $!\n" and exit(1) );
 
-    eval { $freezed = freeze @obj[0]->[0] };
+    try { $freezed = freeze @obj[0]->[0] };
 
     open(STDERR, ">&", \*SAVEERR);
 
@@ -185,12 +185,12 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 
     $freezed = freeze @obj[0]->[0];
     $@ = "";
-    eval { $thawed = thaw $freezed };
+    try { $thawed = thaw $freezed };
     ok($@, "");
     ok($thawed->(), "JAPH");
 
     $freezed = freeze @obj[0]->[6];
-    eval { $thawed = thaw $freezed };
+    try { $thawed = thaw $freezed };
     # The "Code sub ..." error message only appears if Log::Agent is installed
     ok($@, qr/(trapped|Code sub)/);
 
@@ -207,7 +207,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	substr($freezed, 4, 1, chr($len+length($bad_code)));
 	substr($freezed, -1, 0, $bad_code);
 	$@ = "";
-	eval { $thawed = thaw $freezed };
+	try { $thawed = thaw $freezed };
 	ok($@, qr/(trapped|Code sub)/);
     }
 }
@@ -220,7 +220,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 
     $freezed = freeze @obj[0]->[1];
     $@ = "";
-    eval { $thawed = thaw $freezed };
+    try { $thawed = thaw $freezed };
     ok($@, "");
     ok($thawed->(), 42);
 }
@@ -242,7 +242,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     local $Storable::Eval = sub { $safe->reval(@_[0]) };
 
     $freezed = freeze @obj[0];
-    eval { $thawed  = thaw $freezed };
+    try { $thawed  = thaw $freezed };
     ok($@, "");
 
     if ($@ ne "") {

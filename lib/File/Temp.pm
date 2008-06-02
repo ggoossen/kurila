@@ -152,7 +152,7 @@ require VMS::Stdio if $^O eq 'VMS';
 # us that Carp::Heavy won't load rather than an error telling us we
 # have run out of file handles. We either preload croak() or we
 # switch the calls to croak from _gettemp() to use die.
-eval { require Carp::Heavy; };
+try { require Carp::Heavy; };
 
 ### For the OO interface
 use base qw/ IO::Handle IO::Seekable /;
@@ -235,7 +235,7 @@ unless ($^O eq 'MacOS') {
   for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     no strict 'refs';
-    $OPENFLAGS ^|^= $bit if eval {
+    $OPENFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
       local $^WARN_HOOK = sub {};
@@ -244,7 +244,7 @@ unless ($^O eq 'MacOS') {
     };
   }
   # Special case O_EXLOCK
-  $LOCKFLAG = eval {
+  $LOCKFLAG = try {
     local %SIG{__DIE__} = sub {};
     local %SIG{__WARN__} = sub {};
     &Fcntl::O_EXLOCK();
@@ -264,7 +264,7 @@ unless ($^O eq 'MacOS') {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     local($@);
     no strict 'refs';
-    $OPENTEMPFLAGS ^|^= $bit if eval {
+    $OPENTEMPFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
       local $^WARN_HOOK = sub {};
@@ -737,7 +737,7 @@ sub _is_verysafe {
   local($@);
   my $chown_restricted;
   $chown_restricted = &POSIX::_PC_CHOWN_RESTRICTED()
-    if eval { &POSIX::_PC_CHOWN_RESTRICTED(); 1};
+    if try { &POSIX::_PC_CHOWN_RESTRICTED(); 1};
 
   # If chown_resticted is set to some value we should test it
   if (defined $chown_restricted) {

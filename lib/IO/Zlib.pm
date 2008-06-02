@@ -299,7 +299,7 @@ sub has_Compress_Zlib {
 }
 
 BEGIN {
-    eval { require Compress::Zlib };
+    try { require Compress::Zlib };
     $has_Compress_Zlib = $@ ? 0 : 1;
 }
 

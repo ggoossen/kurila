@@ -8,7 +8,7 @@ BEGIN {
 }
 
 BEGIN {
-    eval {
+    try {
 	require warnings;
     };
     if ($@) {

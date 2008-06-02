@@ -139,7 +139,7 @@ $VERSION = "1.14";
 
 @EXPORT = @IO::Seekable::EXPORT;
 
-eval {
+try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
     my @O = grep m/^O_/, @Fcntl::EXPORT;

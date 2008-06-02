@@ -29,7 +29,7 @@ foreach my $func (@Exported_Funcs) {
 
 my %hash = (foo => 42, bar => 23, locked => 'yep');
 lock_keys(%hash);
-eval { %hash{baz} = 99; };
+try { %hash{baz} = 99; };
 like( $@->{description}, qr/^Attempt to access disallowed key 'baz' in a restricted hash/,
                                                        'lock_keys()');
 is( %hash{bar}, 23 );
@@ -40,28 +40,28 @@ ok( !exists %hash{bar},'!exists $hash{bar}' );
 %hash{bar} = 69;
 is( %hash{bar}, 69 ,'$hash{bar} == 69');
 
-eval { () = %hash{i_dont_exist} };
+try { () = %hash{i_dont_exist} };
 like( $@->{description}, qr/^Attempt to access disallowed key 'i_dont_exist' in a restricted hash/,
       'Disallowed 1' );
 
 lock_value(%hash, 'locked');
-eval { print "# oops" if %hash{four} };
+try { print "# oops" if %hash{four} };
 like( $@->{description}, qr/^Attempt to access disallowed key 'four' in a restricted hash/,
       'Disallowed 2' );
 
-eval { %hash{"\x{2323}"} = 3 };
+try { %hash{"\x{2323}"} = 3 };
 like( $@->{description}, qr/^Attempt to access disallowed key '(.*)' in a restricted hash/,
                                                'wide hex key' );
 
-eval { delete %hash{locked} };
+try { delete %hash{locked} };
 like( $@->{description}, qr/^Attempt to delete readonly key 'locked' from a restricted hash/,
                                            'trying to delete a locked key' );
-eval { %hash{locked} = 42; };
+try { %hash{locked} = 42; };
 like( $@->{description}, qr/^Modification of a read-only value attempted/,
                                            'trying to change a locked key' );
 is( %hash{locked}, 'yep' );
 
-eval { delete %hash{I_dont_exist} };
+try { delete %hash{I_dont_exist} };
 like( $@->{description}, qr/^Attempt to delete disallowed key 'I_dont_exist' from a restricted hash/,
                              'trying to delete a key that doesnt exist' );
 
@@ -71,10 +71,10 @@ unlock_keys(%hash);
 %hash{I_dont_exist} = 42;
 is( %hash{I_dont_exist}, 42,    'unlock_keys' );
 
-eval { %hash{locked} = 42; };
+try { %hash{locked} = 42; };
 like( $@->{description}, qr/^Modification of a read-only value attempted/,
                              '  individual key still readonly' );
-eval { delete %hash{locked} },
+try { delete %hash{locked} },
 is( $@, '', '  but can be deleted :(' );
 
 unlock_value(%hash, 'locked');
@@ -86,7 +86,7 @@ is( %hash{locked}, 42,  'unlock_value' );
     my %hash = ( foo => 42, locked => 23 );
 
     lock_keys(%hash);
-    eval { %hash = ( wubble => 42 ) };  # we know this will bomb
+    try { %hash = ( wubble => 42 ) };  # we know this will bomb
     like( $@->{description}, qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' );
     unlock_keys(%hash);
 }
@@ -96,14 +96,14 @@ is( %hash{locked}, 42,  'unlock_value' );
     lock_keys(%hash);
     lock_value(%hash, 'RO');
 
-    eval { %hash = (KEY => 1) };
+    try { %hash = (KEY => 1) };
     like( $@->{description}, qr/^Attempt to delete readonly key 'RO' from a restricted hash/ );
 }
 
 {
     my %hash = (KEY => 1, RO => 2);
     lock_keys(%hash);
-    eval { %hash = (KEY => 1, RO => 2) };
+    try { %hash = (KEY => 1, RO => 2) };
     is( $@, '');
 }
 
@@ -115,12 +115,12 @@ is( %hash{locked}, 42,  'unlock_value' );
     is( keys %hash, 0,  'lock_keys() w/keyset shouldnt add new keys' );
     %hash{foo} = 42;
     is( keys %hash, 1 );
-    eval { %hash{wibble} = 42 };
+    try { %hash{wibble} = 42 };
     like( $@->{description}, qr/^Attempt to access disallowed key 'wibble' in a restricted hash/,
                         'write threw error (locked)');
 
     unlock_keys(%hash);
-    eval { %hash{wibble} = 23; };
+    try { %hash{wibble} = 23; };
     is( $@, '', 'unlock_keys' );
 }
 
@@ -131,10 +131,10 @@ is( %hash{locked}, 42,  'unlock_value' );
     is( keys %hash, 3,   'lock_keys() w/keyset didnt add new keys' );
     is_deeply( \%hash, \%( foo => 42, bar => undef, baz => 0 ),'is_deeply' );
 
-    eval { %hash{up} = 42; };
+    try { %hash{up} = 42; };
     is( $@, '','No error 1' );
 
-    eval { %hash{wibble} = 23 };
+    try { %hash{wibble} = 23 };
     like( $@->{description}, qr/^Attempt to access disallowed key 'wibble' in a restricted hash/,
           'locked "wibble"' );
 }
@@ -142,7 +142,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 
 {
     my %hash = (foo => 42, bar => undef);
-    eval { lock_keys(%hash, qw(foo baz)); };
+    try { lock_keys(%hash, qw(foo baz)); };
     is( $@->{description}, sprintf("Hash has key 'bar' which is not in the new key set"),
                     'carp test' );
 }
@@ -165,7 +165,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 
 
 lock_keys(%ENV);
-eval { () = %ENV{I_DONT_EXIST} };
+try { () = %ENV{I_DONT_EXIST} };
 like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted hash/,   'locked %ENV');
 
 {
@@ -190,11 +190,11 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 
     is (scalar keys %hash, 0, "place holder isn't a key");
 
-    eval {%hash{zeroeth} = 0};
+    try {%hash{zeroeth} = 0};
     like ($@->{description},
           qr/^Attempt to access disallowed key 'zeroeth' in a restricted hash/,
           'locked key never mentioned before should fail');
-    eval {%hash{first} = -1};
+    try {%hash{first} = -1};
     like ($@->{description},
           qr/^Attempt to access disallowed key 'first' in a restricted hash/,
           'previously locked place holders should also fail');
@@ -215,7 +215,7 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 
     is (scalar keys %hash, 2, "still two keys after locking");
 
-    eval {%hash{second} = -1};
+    try {%hash{second} = -1};
     like ($@->{description},
           qr/^Attempt to access disallowed key 'second' in a restricted hash/,
           'previously locked place holders should fail');

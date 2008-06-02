@@ -14,7 +14,7 @@ BEGIN
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
+        if try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
 
     my $tests = 249 ;
 
@@ -63,13 +63,13 @@ sub run
 
         my $buff ;
 
-        eval { getc($gz) } ;
+        try { getc($gz) } ;
         like $@->{description}, mkErr("^getc Not Available: File opened only for output");
 
-        eval { read($gz, $buff, 1) } ;
+        try { read($gz, $buff, 1) } ;
         like $@->{description}, mkErr("^read Not Available: File opened only for output");
 
-        eval { ~< $gz  } ;
+        try { ~< $gz  } ;
         like $@->{description}, mkErr("^readline Not Available: File opened only for output");
 
     }
@@ -89,13 +89,13 @@ sub run
 
         my $buff ;
 
-        eval { print $gz "abc" } ;
+        try { print $gz "abc" } ;
         like $@->{description}, mkErr("^print Not Available: File opened only for intput");
 
-        eval { printf $gz "fmt", "abc" } ;
+        try { printf $gz "fmt", "abc" } ;
         like $@->{description}, mkErr("^printf Not Available: File opened only for intput");
 
-        #eval { write($gz, $buff, 1) } ;
+        #try { write($gz, $buff, 1) } ;
         #like $@, mkErr("^write Not Available: File opened only for intput");
 
     }
@@ -259,7 +259,7 @@ EOT
                 my $io = $UncompressClass->new($name);
             
 
-                eval { read($io, $buf, -1) } ;
+                try { read($io, $buf, -1) } ;
                 like $@->{description}, mkErr("length parameter is negative");
 
                 is read($io, $buf, 0), 0, "Requested 0 bytes" ;

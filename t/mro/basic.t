@@ -60,7 +60,7 @@ is(try { MRO_N->testfunc() }, 123);
 
 # XXX TODO (when there's a way to backtrack through a glob's aliases)
 # push(@MRO_M::ISA, 'MRO_TestOtherBase');
-# is(eval { MRO_N->testfunctwo() }, 321);
+# is(try { MRO_N->testfunctwo() }, 321);
 
 # Simple DESTROY Baseline
 {

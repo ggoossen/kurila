@@ -17,7 +17,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
+        if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
     plan tests => 78 + $extra ;
 
@@ -35,31 +35,31 @@ EOM
 
 sub My::testParseParameters()
 {
-    eval { ParseParameters(1, \%(), 1) ; };
+    try { ParseParameters(1, \%(), 1) ; };
     like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
-    eval { ParseParameters(1, \%(), undef) ; };
+    try { ParseParameters(1, \%(), undef) ; };
     like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
-    eval { ParseParameters(1, \%(), \@()) ; };
+    try { ParseParameters(1, \%(), \@()) ; };
     like $@->{description}, mkErr(': Expected even number of parameters, got 1'), 
             "Trap odd number of params";
 
-    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_boolean, 0)), Fred => 'joe') ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_boolean, 0)), Fred => 'joe') ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be an int, got 'joe'"), 
             "wanted unsigned, got undef";
 
-    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_unsigned, 0)), Fred => undef) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_unsigned, 0)), Fred => undef) ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be an unsigned int, got 'undef'"), 
             "wanted unsigned, got undef";
 
-    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => undef) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => undef) ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be a signed int, got 'undef'"), 
             "wanted signed, got undef";
 
-    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => 'abc') ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => 'abc') ; };
     like $@->{description}, mkErr("Parameter 'Fred' must be a signed int, got 'abc'"), 
             "wanted signed, got 'abc'";
 
@@ -71,22 +71,22 @@ sub My::testParseParameters()
         skip 'readonly + threads', 1
             if %Config{useithreads};
 
-        eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
+        try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
         like $@->{description}, mkErr("Parameter 'Fred' not writable"), 
                 "wanted writable, got readonly";
     }
 
     my @xx;
-    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \@xx) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \@xx) ; };
     like $@->{description}, mkErr("Parameter 'Fred' not a scalar reference"), 
             "wanted scalar reference";
 
     local *ABC;
-    eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => *ABC) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => *ABC) ; };
     like $@->{description}, mkErr("Parameter 'Fred' not a scalar"), 
             "wanted scalar";
 
-    #eval { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_any|Parse_multiple, 0)), Fred => 1, Fred => 2) ; };
+    #try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_any|Parse_multiple, 0)), Fred => 1, Fred => 2) ; };
     #like $@, mkErr("Muliple instances of 'Fred' found"),
         #"wanted scalar";
 

@@ -15,7 +15,7 @@ use IO::Compress::Zip::Constants v2.006 ;
 use Compress::Raw::Zlib  v2.006 qw(crc32) ;
 BEGIN
 {
-eval { require IO::Compress::Adapter::Bzip2 ; 
+try { require IO::Compress::Adapter::Bzip2 ; 
    IO::Compress::Adapter::Bzip2->import( 2.006) ; 
    require IO::Compress::Bzip2 ; 
    IO::Compress::Bzip2->import( 2.006) ; 

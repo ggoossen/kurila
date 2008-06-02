@@ -46,6 +46,7 @@ Perl_ck_subr
 Perl_ck_substr
 Perl_ck_svconst
 Perl_ck_trunc
+Perl_ck_try
 Perl_ck_unpack
 Perl_pp_null
 Perl_pp_stub

@@ -602,7 +602,7 @@ sub config_sh {
 
 sub config_re {
     my $re = shift;
-    return map { chomp; $_ } grep eval{ m/^(?:$re)=/ }, split m/^/,
+    return map { chomp; $_ } grep try{ m/^(?:$re)=/ }, split m/^/,
     $Config_SH_expanded;
 }
 
