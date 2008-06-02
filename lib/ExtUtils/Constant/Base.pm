@@ -224,9 +224,8 @@ sub dump_names {
     }
     %used_types{$type}++;
     if ($type eq $default_type
-        # grr 5.6.1
         and length $_->{name}
-        and length $_->{name} == @($_->{name} =~ m/([A-Za-z0-9_])/g)
+        and ($_->{name} =~ m/^\w+$/)
         and !defined ($_->{macro}) and !defined ($_->{value})
         and !defined ($_->{default}) and !defined ($_->{pre})
         and !defined ($_->{post}) and !defined ($_->{def_pre})

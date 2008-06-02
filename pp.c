@@ -3685,6 +3685,8 @@ PP(pp_list)
 {
     dVAR; dSP; dMARK;
     if (GIMME != G_ARRAY) {
+	if (GIMME_V == G_SCALAR)
+	    Perl_croak(aTHX "list may not be used in scalar context");
 	if (++MARK <= SP)
 	    *MARK = *SP;		/* unwanted list, return last item */
 	else
