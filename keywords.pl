@@ -267,6 +267,7 @@ time
 times
 tr
 truncate
+try
 uc
 ucfirst
 umask
