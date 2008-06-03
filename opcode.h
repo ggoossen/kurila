@@ -174,6 +174,7 @@ EXTCONST char* const PL_op_name[] = {
 	"lslice",
 	"anonlist",
 	"anonhash",
+	"listlast",
 	"splice",
 	"push",
 	"pop",
@@ -534,6 +535,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"list slice",
 	"anonymous list (%())",
 	"anonymous hash (@())",
+	"listlast",
 	"splice",
 	"push",
 	"pop",
@@ -906,6 +908,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_lslice),
 	MEMBER_TO_FPTR(Perl_pp_anonlist),
 	MEMBER_TO_FPTR(Perl_pp_anonhash),
+	MEMBER_TO_FPTR(Perl_pp_listlast),
 	MEMBER_TO_FPTR(Perl_pp_splice),
 	MEMBER_TO_FPTR(Perl_pp_push),
 	MEMBER_TO_FPTR(Perl_pp_shift),	/* Perl_pp_pop */
@@ -1275,6 +1278,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* lslice */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonlist */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonhash */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* listlast */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* splice */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* push */
 	MEMBER_TO_FPTR(Perl_ck_shift),	/* pop */
@@ -1638,6 +1642,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00448400,	/* lslice */
 	0x00004801,	/* anonlist */
 	0x00004801,	/* anonhash */
+	0x00004805,	/* listlast */
 	0x05326801,	/* splice */
 	0x0004691d,	/* push */
 	0x00017604,	/* pop */
