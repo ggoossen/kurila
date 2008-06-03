@@ -5,21 +5,13 @@ pod/pod2text
 pod/pod2usage
 pod/podchecker
 pod/podselect
-utils/cpan
-utils/config_data
 utils/corelist
-utils/dprofpp
-utils/enc2xs
 utils/h2ph
 utils/h2xs
 utils/instmodsh
-utils/libnetcfg
 utils/perlbug	# link = utils/perlthanks
 utils/perldoc   # pod = pod/perldoc.pod
 utils/perlivp
-utils/piconv
 utils/pl2pm
-utils/prove
-utils/shasum
 utils/splain
 utils/xsubpp
