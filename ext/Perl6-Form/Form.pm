@@ -196,7 +196,7 @@ sub user_def {
 	my @to   = @{$opts->{field}{to}||=\@()};
 	my $count = @from;
 	for (my $i=0; $i+<@$spec; $i+=2, $count++) {
-		my ($pat, $fld) = @{$spec}[$i,$i+1];
+		my ($pat, $fld) = @{$spec}[[$i,$i+1]];
 		push @from, "$pat(?\{$count\})";
 		push @to,   (ref $fld eq 'CODE' ? $fld : sub{$fld});
 	}

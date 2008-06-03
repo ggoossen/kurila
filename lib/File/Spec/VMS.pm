@@ -402,7 +402,7 @@ sub rel2abs {
 
         # Split up paths
         my ( $path_directories, $path_file ) =
-            ($self->splitpath( $path ))[1,2] ;
+            ($self->splitpath( $path ))[[1,2]] ;
 
         my ( $base_volume, $base_directories ) =
             $self->splitpath( $base ) ;

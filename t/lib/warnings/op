@@ -552,6 +552,7 @@ no warnings 'parenthesis' ;
 my $c, $d = (1,2);
 EXPECT
 Parentheses missing around "my" list at - line 3.
+list may not be used in scalar context at - line 3, near ");"
 Parentheses missing around "my" list at - line 4.
 Global symbol "%bar" requires explicit package name at - line 4, near ",%bar"
 Global symbol "$quux" requires explicit package name at - line 4, near ",	$quux"
@@ -565,8 +566,8 @@ no warnings 'parenthesis' ;
 our $c, $d = (1,2);
 EXPECT
 Parentheses missing around "our" list at - line 3.
-Global symbol "$d" requires explicit package name at - line 5, near ", $d "
-Execution of - aborted due to compilation errors. at - line 5.
+list may not be used in scalar context at - line 3, near ");"
+BEGIN not safe after errors--compilation aborted at - line 4.
 ########
 # op.c
 our ($b, $c, $d);
@@ -577,8 +578,9 @@ no warnings 'parenthesis' ;
 local $c, $d = (1,2);
 EXPECT
 Parentheses missing around "local" list at - line 4.
+list may not be used in scalar context at - line 4, near ");"
 Parentheses missing around "local" list at - line 5.
-list may not be used in scalar context at - line 4.
+BEGIN not safe after errors--compilation aborted at - line 6.
 ########
 # op.c
 use warnings 'bareword' ;

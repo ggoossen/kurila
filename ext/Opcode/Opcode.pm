@@ -327,7 +327,7 @@ invert_opset function.
 
     match split qr
 
-    list lslice splice push pop shift unshift reverse
+    list listlast lslice splice push pop shift unshift reverse
 
     cond_expr flip flop andassign orassign dorassign and or dor xor
 
