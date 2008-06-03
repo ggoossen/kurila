@@ -68,6 +68,7 @@ PP(pp_padav)
 	PUSHs(TARG);
 	RETURN;
     }
+    assert(SvTYPE(TARG) == SVt_PVAV);
     gimme = GIMME_V;
     if (gimme == G_ARRAY) {
 	const I32 maxarg = AvFILL((AV*)TARG) + 1;
@@ -104,14 +105,6 @@ PP(pp_padhv)
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
     if (PL_op->op_flags & OPf_REF)
 	RETURN;
-    gimme = GIMME_V;
-    if (gimme == G_ARRAY) {
-	RETURNOP(do_kv());
-    }
-    else if (gimme == G_SCALAR) {
-	SV* const sv = Perl_hv_scalar(aTHX_ (HV*)TARG);
-	SETs(sv);
-    }
     RETURN;
 }
 
@@ -3803,16 +3796,9 @@ PP(pp_anonhash)
 	RETURN;
     }
 
-    if (gimme == G_ARRAY) { /* array wanted */
-	PUTBACK;
-	EXTEND(PL_stack_sp, 1);
-	*++PL_stack_sp = (SV*)hv;
-	return do_kv();
-    }
-    else if (gimme == G_SCALAR) {
-	PUTBACK;
-	XPUSHs( Perl_hv_scalar(aTHX_ hv) );
-    }
+/*     PUTBACK; */
+    XPUSHs( (SV*) hv );
+
     RETURN;
 }
 

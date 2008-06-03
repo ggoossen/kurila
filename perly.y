@@ -1189,7 +1189,8 @@ term	:	termbinop
 			  })
 			}
         |       '<' term
-			{ $$ = newUNOP(OP_RV2AV, 0, scalar($2));
+                        {
+                          $$ = convert(OP_ANONLIST, 0, $2);
 			  TOKEN_GETMAD($1,$$,'o');
                         }
 	|	NOAMP WORD listexpr                  /* foo(@args) */

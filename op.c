@@ -5536,7 +5536,7 @@ Perl_oopsAV(pTHX_ OP *o)
 	return ref(o, OP_RV2AV);
 
     case OP_RV2AV:
-	ref(o, OP_RV2AV);
+	return ref(o, OP_RV2AV);
 	break;
 
     case OP_ANONLIST:
@@ -5589,7 +5589,7 @@ Perl_newAVREF(pTHX_ OP *o)
     else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV || o->op_type == OP_ANONLIST )) {
 	yyerror(Perl_form(aTHX_ "Array may not be used as a reference"));
     }
-    return newUNOP(OP_RV2AV, OPf_REF, scalar(o));
+    return newUNOP(OP_RV2AV, 0, scalar(o));
 }
 
 OP *
