@@ -200,7 +200,7 @@ sub _push_tags {
     my $export_tags = \%{*{Symbol::fetch_glob("{$pkg}::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("{$pkg}::$var")}},
 	map { $export_tags->{$_} ? @{$export_tags->{$_}} 
-                                 : scalar(push(@nontag,$_),$_) }
+                                 : do { push(@nontag,$_); $_ } }
 		(@$syms) ? @$syms : keys %$export_tags);
     if (@nontag and $^W) {
 	# This may change to a die one day

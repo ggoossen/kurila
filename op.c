@@ -800,7 +800,7 @@ Perl_scalar(pTHX_ OP *o)
 	break;
     case OP_SCOPE:
     case OP_LINESEQ:
-    case OP_LIST:
+    case OP_LISTLAST:
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling) {
 	    if (kid->op_sibling)
 		scalarvoid(kid);
@@ -808,6 +808,9 @@ Perl_scalar(pTHX_ OP *o)
 		scalar(kid);
 	}
 	PL_curcop = &PL_compiling;
+	break;
+    case OP_LIST:
+	yyerror(Perl_form(aTHX_ "list may not be used in scalar context"));
 	break;
     case OP_SORT:
 	if (ckWARN(WARN_VOID))
@@ -1060,6 +1063,7 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_LEAVELOOP:
     case OP_LINESEQ:
     case OP_LIST:
+    case OP_LISTLAST:
     case OP_LEAVEGIVEN:
     case OP_LEAVEWHEN:
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
@@ -1504,6 +1508,12 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	    mod(kid, type);
 	break;
 
+    case OP_LISTLAST:
+	localize = 0;
+	if (o->op_flags & OPf_KIDS)
+	    mod(cLISTOPo->op_last, type);
+	break;
+
     case OP_RETURN:
 	if (type != OP_LEAVESUBLV)
 	    goto nomod;
@@ -1713,6 +1723,7 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 	/* FALL THROUGH */
     case OP_ENTER:
     case OP_LIST:
+    case OP_LISTLAST:
 	if (!(o->op_flags & OPf_KIDS))
 	    break;
 	doref(cLISTOPo->op_last, type, set_op_ref);
@@ -1989,8 +2000,10 @@ Perl_my_attrs(pTHX_ OP *o, OP *attrs)
     o = my_kid(o, attrs, &rops);
     if (rops) {
 	if (maybe_scalar && o->op_type == OP_PADSV) {
-	    o = scalar(append_list(OP_LIST, (LISTOP*)rops, (LISTOP*)o));
-	    o->op_private |= OPpLVAL_INTRO;
+	    o = append_list(OP_LISTLAST, (LISTOP*)rops, (LISTOP*)o);
+/* 	    o = append_list(OP_LISTLAST, (LISTOP*)o, (LISTOP*)(NULL)); */
+/* 	    o = append_list(OP_LIST, (LISTOP*)rops, (LISTOP*)o); */
+/* 	    o->op_private |= OPpLVAL_INTRO; */
 	}
 	else
 	    o = append_list(OP_LIST, (LISTOP*)o, (LISTOP*)rops);
@@ -2851,7 +2864,7 @@ Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP *first, OP *last)
 	first->op_sibling = last;
     listop->op_first = first;
     listop->op_last = last;
-    if (type == OP_LIST) {
+    if (type == OP_LIST || type == OP_LISTLAST) {
 	OP* const pushop = newOP(OP_PUSHMARK, 0);
 	pushop->op_sibling = first;
 	listop->op_first = pushop;
@@ -5574,7 +5587,7 @@ Perl_newAVREF(pTHX_ OP *o)
 	return o;
     }
     else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV || o->op_type == OP_ANONLIST )) {
-	Perl_croak(aTHX_ "Array may not be used as a reference");
+	yyerror(Perl_form(aTHX_ "Array may not be used as a reference"));
     }
     return newUNOP(OP_RV2AV, 0, scalar(o));
 }
@@ -5600,7 +5613,7 @@ Perl_newHVREF(pTHX_ OP *o)
 	return o;
     }
     else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV || o->op_type == OP_ANONHASH) {
-	Perl_croak(aTHX_ "Hash may not be used as a reference");
+	yyerror(Perl_form(aTHX_ "Hash may not be used as a reference"));
     }
     return newUNOP(OP_RV2HV, 0, scalar(o));
 }
@@ -5745,8 +5758,8 @@ Perl_ck_delete(pTHX_ OP *o)
 	case OP_HELEM:
 	    break;
 	default:
-	    Perl_croak(aTHX_ "%s argument is not a HASH or ARRAY element or slice",
-		  OP_DESC(o));
+	    yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element or slice",
+			      OP_DESC(o)));
 	}
 	op_null(kid);
     }
@@ -5869,7 +5882,8 @@ Perl_ck_try(pTHX_ OP *o)
 	    return o;
 	}
     }
-    Perl_croak(aTHX_ "invalid arguments to 'try'");
+    yyerror(Perl_form(aTHX_ "invalid arguments to 'try'"));
+    return o;
 }
 
 OP *
@@ -5995,9 +6009,9 @@ Perl_ck_rvconst(pTHX_ register OP *o)
 		break;
 	    }
 	    if (badthing)
-		Perl_croak(aTHX_
-			   "Can't use bareword (\"%"SVf"\") as %s ref while \"strict refs\" in use",
-			   SVfARG(kidsv), badthing);
+		yyerror(Perl_form(aTHX_
+				  "Can't use bareword (\"%"SVf"\") as %s ref while \"strict refs\" in use",
+				  SVfARG(kidsv), badthing));
 	}
 	/*
 	 * This is a little tricky.  We only want to add the symbol if we

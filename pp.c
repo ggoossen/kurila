@@ -3685,14 +3685,25 @@ PP(pp_list)
 {
     dVAR; dSP; dMARK;
     if (GIMME != G_ARRAY) {
-	if (GIMME_V == G_SCALAR)
-	    Perl_croak(aTHX_ "list may not be used in scalar context");
+/* 	if (GIMME_V == G_SCALAR) */
+/* 	    Perl_croak(aTHX_ "list may not be used in scalar context"); */
 	if (++MARK <= SP)
 	    *MARK = *SP;		/* unwanted list, return last item */
 	else
 	    *MARK = &PL_sv_undef;
 	SP = MARK;
     }
+    RETURN;
+}
+
+PP(pp_listlast)
+{
+    dVAR; dSP; dMARK;
+    if (++MARK <= SP)
+	*MARK = *SP;		/* unwanted list, return last item */
+    else
+	*MARK = &PL_sv_undef;
+    SP = MARK;
     RETURN;
 }
 
