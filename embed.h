@@ -539,6 +539,7 @@
 #define newGVREF		Perl_newGVREF
 #define newHVREF		Perl_newHVREF
 #define newHVhv			Perl_newHVhv
+#define hv_sethv		Perl_hv_sethv
 #define newIO			Perl_newIO
 #define newLISTOP		Perl_newLISTOP
 #ifdef USE_ITHREADS
@@ -838,6 +839,9 @@
 #define sv_clean_objs		Perl_sv_clean_objs
 #endif
 #define sv_clear		Perl_sv_clear
+#ifdef PERL_CORE
+#define sv_clear_body		Perl_sv_clear_body
+#endif
 #define sv_cmp			Perl_sv_cmp
 #define sv_compile_2op		Perl_sv_compile_2op
 #define getcwd_sv		Perl_getcwd_sv
@@ -2749,6 +2753,7 @@
 #define newGVREF(a,b)		Perl_newGVREF(aTHX_ a,b)
 #define newHVREF(a)		Perl_newHVREF(aTHX_ a)
 #define newHVhv(a)		Perl_newHVhv(aTHX_ a)
+#define hv_sethv(a,b)		Perl_hv_sethv(aTHX_ a,b)
 #define newIO()			Perl_newIO(aTHX)
 #define newLISTOP(a,b,c,d)	Perl_newLISTOP(aTHX_ a,b,c,d)
 #ifdef USE_ITHREADS
@@ -3045,6 +3050,9 @@
 #define sv_clean_objs()		Perl_sv_clean_objs(aTHX)
 #endif
 #define sv_clear(a)		Perl_sv_clear(aTHX_ a)
+#ifdef PERL_CORE
+#define sv_clear_body(a)	Perl_sv_clear_body(aTHX_ a)
+#endif
 #define sv_cmp(a,b)		Perl_sv_cmp(aTHX_ a,b)
 #define sv_compile_2op(a,b,c,d)	Perl_sv_compile_2op(aTHX_ a,b,c,d)
 #define getcwd_sv(a)		Perl_getcwd_sv(aTHX_ a)

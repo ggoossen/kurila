@@ -1251,6 +1251,84 @@ Perl_hv_ksplit(pTHX_ HV *hv, IV newmax)
     }
 }
 
+void
+Perl_hv_sethv(pTHX_ HV* dstr, HV* sstr)
+{
+    STRLEN hv_max, hv_fill;
+
+    hv_undef(dstr);
+
+    if (!sstr || (hv_fill = HvFILL(sstr)) == 0)
+	return;
+    hv_max = HvMAX(sstr);
+
+    if (!SvMAGICAL((SV *)sstr)) {
+	/* It's an ordinary hash, so copy it fast. AMS 20010804 */
+	STRLEN i;
+	const bool shared = !!HvSHAREKEYS(sstr);
+	HE **ents, ** const oents = (HE **)HvARRAY(sstr);
+	char *a;
+	Newx(a, PERL_HV_ARRAY_ALLOC_BYTES(hv_max+1), char);
+	ents = (HE**)a;
+
+	/* In each bucket... */
+	for (i = 0; i <= hv_max; i++) {
+	    HE *prev = NULL;
+	    HE *oent = oents[i];
+
+	    if (!oent) {
+		ents[i] = NULL;
+		continue;
+	    }
+
+	    /* Copy the linked list of entries. */
+	    for (; oent; oent = HeNEXT(oent)) {
+		const U32 hash   = HeHASH(oent);
+		const char * const key = HeKEY(oent);
+		const STRLEN len = HeKLEN(oent);
+		const int flags  = HeKFLAGS(oent);
+		HE * const ent   = new_HE();
+
+		HeVAL(ent)     = newSVsv(HeVAL(oent));
+		HeKEY_hek(ent)
+                    = shared ? share_hek_flags(key, len, hash, flags)
+                             :  save_hek_flags(key, len, hash, flags);
+		if (prev)
+		    HeNEXT(prev) = ent;
+		else
+		    ents[i] = ent;
+		prev = ent;
+		HeNEXT(ent) = NULL;
+	    }
+	}
+
+	HvMAX(dstr)   = hv_max;
+	HvFILL(dstr)  = hv_fill;
+	HvTOTALKEYS(dstr)  = HvTOTALKEYS(sstr);
+	HvARRAY(dstr) = ents;
+    } /* not magical */
+    else {
+	/* Iterate over sstr, copying keys and values one at a time. */
+	HE *entry;
+	const I32 riter = HvRITER_get(sstr);
+	HE * const eiter = HvEITER_get(sstr);
+
+	/* Can we use fewer buckets? (hv_max is always 2^n-1) */
+	while (hv_max && hv_max + 1 >= hv_fill * 2)
+	    hv_max = hv_max / 2;
+	HvMAX(dstr) = hv_max;
+
+	hv_iterinit(sstr);
+	while ((entry = hv_iternext_flags(sstr, 0))) {
+	    (void)hv_store_flags(dstr, HeKEY(entry), HeKLEN(entry),
+			         newSVsv(HeVAL(entry)), HeHASH(entry),
+			         HeKFLAGS(entry));
+	}
+	HvRITER_set(sstr, riter);
+	HvEITER_set(sstr, eiter);
+    }
+}
+
 HV *
 Perl_newHVhv(pTHX_ HV *ohv)
 {

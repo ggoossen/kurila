@@ -2896,6 +2896,13 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 
     (void)SvAMAGIC_off(dstr);
 
+    /* clear the destination sv if it will be upgraded to a hash or an array */
+    if ( (dtype == SVt_PVHV || dtype == SVt_PVAV )
+	 && dtype != stype ) {
+	Perl_sv_clear_body(aTHX_ dstr);
+	SvFLAGS(dstr) = SVt_NULL;
+    }
+
     /* There's a lot of redundancy below but we're going for speed here */
 
     switch (stype) {
@@ -2975,14 +2982,9 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    sv_upgrade(dstr, SVt_PVNV);
 	break;
     case SVt_PVAV:
-	if (dtype != SVt_PVAV) {
-	    sv_upgrade(dstr, SVt_PVAV);
-	}
-	break;
     case SVt_PVHV:
-	if (dtype != SVt_PVHV) {
-	    sv_upgrade(dstr, SVt_PVHV);
-	}
+	if (dtype != stype)
+	    sv_upgrade(dstr, stype);
 	break;
 
     default:
@@ -3023,12 +3025,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     }
  end_of_first_switch:
 
-    if( dtype == SVt_PVAV ) {
-	if (stype != SVt_PVAV) {
-	    av_undef( (AV*)dstr );
-	}
-    }
-
     /* dstr may have been upgraded.  */
     dtype = SvTYPE(dstr);
     sflags = SvFLAGS(sstr);
@@ -3049,6 +3045,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     } else if (dtype == SVt_PVAV) {
 	int i;
 	int len = av_len( (AV*)sstr);
+	av_undef( (AV*)dstr );
 	av_fill( (AV*)dstr, len );
 	for (i=0; i<=len; i++) {
 	    SV** val = av_fetch( (AV*)sstr, i, 0);
@@ -3059,18 +3056,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	}
 	
     } else if (dtype == SVt_PVHV) {
-	HE* ent;
 	hv_undef( (HV*)dstr );
-	if (hv_iterinit( (HV*)sstr)) {
-
-/* 	    while ((ent = hv_iternext( (HV*) sstr))) { */
-/* 		STRLEN len; */
-/* 		char* key = HePV(ent, len); */
-/* 		SvREFCNT_inc(HeVAL(ent)); */
-/* 		if( ! hv_store( (HV*)dstr, key, len, HeVAL(ent), HeHASH(ent) ) ) */
-/* 		    SvREFCNT_dec(HeVAL(ent)); */
-/* 	    } */
-	}
+	hv_sethv( (HV*)dstr, (HV*)sstr);
     } else if (sflags & SVf_ROK) {
 	if (isGV_with_GP(dstr) && dtype == SVt_PVGV
 	    && SvTYPE(SvRV(sstr)) == SVt_PVGV) {
@@ -4634,17 +4621,13 @@ instead.
 */
 
 void
-Perl_sv_clear(pTHX_ register SV *const sv)
+Perl_sv_clear_body(pTHX_ SV *const sv)
 {
     dVAR;
     const U32 type = SvTYPE(sv);
     const struct body_details *const sv_type_details
 	= bodies_by_type + type;
     HV *stash;
-
-    PERL_ARGS_ASSERT_SV_CLEAR;
-    assert(SvREFCNT(sv) == 0);
-    assert(SvTYPE(sv) != SVTYPEMASK);
 
     if (type <= SVt_IV) {
 	/* See the comment in sv.h about the collusion between this early
@@ -4657,8 +4640,6 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 	    else
 	        SvREFCNT_dec(target);
 	}
-	SvFLAGS(sv) &= SVf_BREAK;
-	SvFLAGS(sv) |= SVTYPEMASK;
 	return;
     }
 
@@ -4828,9 +4809,6 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 	break;
     }
 
-    SvFLAGS(sv) &= SVf_BREAK;
-    SvFLAGS(sv) |= SVTYPEMASK;
-
     if (sv_type_details->arena) {
 	del_body(((char *)SvANY(sv) + sv_type_details->offset),
 		 &PL_body_roots[type]);
@@ -4838,6 +4816,22 @@ Perl_sv_clear(pTHX_ register SV *const sv)
     else if (sv_type_details->body_size) {
 	my_safefree(SvANY(sv));
     }
+}
+
+void
+Perl_sv_clear(pTHX_ register SV *const sv)
+{
+    dVAR;
+    const U32 type = SvTYPE(sv);
+    HV *stash;
+
+    PERL_ARGS_ASSERT_SV_CLEAR;
+    assert(SvREFCNT(sv) == 0);
+    assert(SvTYPE(sv) != SVTYPEMASK);
+
+    Perl_sv_clear_body(aTHX_ sv);
+    SvFLAGS(sv) &= SVf_BREAK;
+    SvFLAGS(sv) |= SVTYPEMASK;
 }
 
 /*

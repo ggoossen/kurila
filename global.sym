@@ -308,6 +308,7 @@ Perl_newGVREF
 Perl_newHVREF
 Perl_newHV
 Perl_newHVhv
+Perl_hv_sethv
 Perl_newIO
 Perl_newLISTOP
 Perl_newPADOP

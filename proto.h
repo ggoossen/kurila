@@ -2011,6 +2011,12 @@ PERL_CALLCONV HV*	Perl_newHVhv(pTHX_ HV *hv)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
+PERL_CALLCONV void	Perl_hv_sethv(pTHX_ HV *dstr, HV *sstr)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_HV_SETHV	\
+	assert(dstr); assert(sstr)
+
 PERL_CALLCONV IO*	Perl_newIO(pTHX)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
@@ -2986,6 +2992,11 @@ PERL_CALLCONV void	Perl_sv_clean_objs(pTHX);
 PERL_CALLCONV void	Perl_sv_clear(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_CLEAR	\
+	assert(sv)
+
+PERL_CALLCONV void	Perl_sv_clear_body(pTHX_ SV *const sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SV_CLEAR_BODY	\
 	assert(sv)
 
 PERL_CALLCONV I32	Perl_sv_cmp(pTHX_ SV *const sv1, SV *const sv2);
