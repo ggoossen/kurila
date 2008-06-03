@@ -99,7 +99,7 @@ sub check
 
     if (! $aok) {
         diag "Command line: $cmd";
-        my ($file, $line) = (caller)[1,2];
+        my ($file, $line) = (caller)[[1,2]];
         diag "Test called from $file, line $line";
     }
 

@@ -10,7 +10,7 @@ which have a stable API, and which have functions of all 3 types.
 
 =head1 WHAT IS TESTED
 
-5 core packages are tested; Digest::MD5, B, B::Deparse, Data::Dumper,
+5 core packages are tested; B, B::Deparse, Data::Dumper,
 and POSIX.  These have a mix of the 3 expected implementation types;
 perl, XS, and constant (optimized constant subs).
 
@@ -130,9 +130,6 @@ my %matchers =
 my $testpkgs = \%(
     # packages to test, with expected types for named funcs
 
-    'Digest::MD5' => \%( perl => \@(qw/ import /),
-		     dflt => 'XS' ),
-
     'Data::Dumper' => \%( XS => \@(qw/ bootstrap Dumpxs /),
 		      dflt => 'perl' ),
     B => \%( 
@@ -167,8 +164,8 @@ my $testpkgs = \%(
 		     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
 		     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
 		     OPpSORT_INPLACE OPpSORT_INTEGER OPpSORT_NUMERIC
-		     OPpSORT_REVERSE OPpTARGET_MY OPpTRANS_COMPLEMENT
-		     OPpTRANS_DELETE OPpTRANS_SQUASH PMf_CONTINUE
+		     OPpSORT_REVERSE OPpTARGET_MY 
+		     PMf_CONTINUE
 		     PMf_EVAL PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
 		     PMf_MULTILINE PMf_SINGLELINE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK

@@ -35,7 +35,7 @@ ok( readonly($$var),	'de-reference to constant');
 
 ok( !readonly(*STDOUT),	'glob');
 
-sub try
+sub tryreadonly
 {
     my $v = \@_[0];
     return readonly $$v;
@@ -44,6 +44,6 @@ sub try
 $var = 123;
 {
     local $TODO = %Config::Config{useithreads} ? "doesn't work with threads" : undef;
-    ok( try ("abc"), 'reference a constant in a sub');
+    ok( tryreadonly("abc"), 'reference a constant in a sub');
 }
-ok( !try ($var), 'reference a non-constant in a sub');
+ok( !tryreadonly($var), 'reference a non-constant in a sub');
