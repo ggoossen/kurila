@@ -3778,32 +3778,38 @@ PP(pp_expand)
     dVAR; dSP;
     dTOPss;
     const I32 gimme = GIMME_V;
-    AV *const av = (AV*)sv;
 
     if (gimme == G_SCALAR)
 	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
 
-    if (SvTYPE(sv) != SVt_PVAV)
+    if (SvTYPE(sv) != SVt_PVAV && SvTYPE(sv) != SVt_PVHV)
 	Perl_croak(aTHX_ "expand operator should be used upon a array");
 
     if (gimme == G_ARRAY) {
-	const I32 maxarg = AvFILL(av) + 1;
-	(void)POPs;			/* XXXX May be optimized away? */
-	EXTEND(SP, maxarg);
-	if (SvRMAGICAL(av)) {
-	    U32 i;
-	    for (i=0; i < (U32)maxarg; i++) {
-		SV ** const svp = av_fetch(av, i, FALSE);
-		/* See note in pp_helem, and bug id #27839 */
-		SP[i+1] = svp
-		    ? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
-		    : &PL_sv_undef;
+	if (SvTYPE(sv) == SVt_PVAV) {
+	    AV *const av = (AV*)sv;
+	    const I32 maxarg = AvFILL(av) + 1;
+	    (void)POPs;			/* XXXX May be optimized away? */
+	    EXTEND(SP, maxarg);
+	    if (SvRMAGICAL(av)) {
+		U32 i;
+		for (i=0; i < (U32)maxarg; i++) {
+		    SV ** const svp = av_fetch(av, i, FALSE);
+		    /* See note in pp_helem, and bug id #27839 */
+		    SP[i+1] = svp
+			? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
+			: &PL_sv_undef;
+		}
 	    }
+	    else {
+		Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	    }
+	    SP += maxarg;
 	}
-	else {
-	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	else if (SvTYPE(sv) == SVt_PVHV) {
+	    *PL_stack_sp = sv;
+	    return do_kv();
 	}
-	SP += maxarg;
     }
 
     RETURN;

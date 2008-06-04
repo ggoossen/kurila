@@ -121,7 +121,7 @@
 %left ADDOP
 %left MULOP
 %left <i_tkval> MATCHOP
-%right <i_tkval> '!' '~' UMINUS REFGEN '<'
+%right <i_tkval> '!' '~' '<' UMINUS REFGEN
 %right <i_tkval> POWOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP
