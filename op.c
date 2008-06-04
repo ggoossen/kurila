@@ -816,6 +816,8 @@ Perl_scalar(pTHX_ OP *o)
 	if (ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID), "Useless use of sort in scalar context");
 	break;
+    case OP_ANONLIST:
+	break;
     }
     return o;
 }
@@ -1438,14 +1440,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_PADAV:
     case OP_PADHV:
-       PL_modcount = RETURN_UNLIMITED_NUMBER;
-	if (type == OP_REFGEN && o->op_flags & OPf_PARENS)
-	    return o;		/* Treat \(@foo) like ordinary list. */
-/* 	if (scalar_mod_type(o, type)) */
-/* 	    goto nomod; */
-	if (type == OP_LEAVESUBLV)
-	    o->op_private |= OPpMAYBE_LVSUB;
-	/* FALL THROUGH */
     case OP_PADSV:
 	PL_modcount++;
 	if (!type) /* local() */
@@ -1927,7 +1921,10 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 #endif
 	       ) {
 	return o;
-    } else if (type == OP_RV2SV ||	/* "our" declaration */
+    } else if (type == OP_EXPAND) {
+	my_kid(cUNOPo->op_first, attrs, imopsp);
+    }
+    else if (type == OP_RV2SV ||	/* "our" declaration */
 	       type == OP_RV2AV ||
 	       type == OP_RV2HV) { /* XXX does this let anything illegal in? */
 	if (cUNOPo->op_first->op_type != OP_GV) { /* MJD 20011224 */
@@ -5501,7 +5498,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 OP *
 Perl_newANONLIST(pTHX_ OP *o)
 {
-    return convert(OP_ANONLIST, OPf_REF, o);
+    return convert(OP_ANONLIST, 0, o);
 }
 
 OP *
@@ -5531,21 +5528,6 @@ Perl_oopsAV(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_OOPSAV;
 
-    switch (o->op_type) {
-    case OP_PADAV:
-	return ref(o, OP_RV2AV);
-
-    case OP_RV2AV:
-	return ref(o, OP_RV2AV);
-	break;
-
-    case OP_ANONLIST:
-	return ref(o, OP_RV2AV);
-
-    default:
-	Perl_croak(aTHX_ "oops: oopsAV");
-	break;
-    }
     return o;
 }
 
@@ -5582,8 +5564,8 @@ Perl_newAVREF(pTHX_ OP *o)
     PERL_ARGS_ASSERT_NEWAVREF;
 
     if (o->op_type == OP_PADANY) {
-	o->op_type = OP_PADAV;
-	o->op_ppaddr = PL_ppaddr[OP_PADAV];
+	o->op_type = OP_PADSV;
+	o->op_ppaddr = PL_ppaddr[OP_PADSV];
 	return o;
     }
     else if ((o->op_type == OP_RV2AV || o->op_type == OP_PADAV || o->op_type == OP_ANONLIST )) {
@@ -6165,7 +6147,7 @@ Perl_ck_fun(pTHX_ OP *o)
 			"Useless use of %s with no values",
 			PL_op_desc[type]);
 
-		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADAV)
+		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV)
 		    bad_type(numargs, "array", PL_op_desc[type], kid);
 		mod(kid, type);
 		break;

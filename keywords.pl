@@ -164,6 +164,7 @@ localtime
 lock
 log
 lstat
+nelems
 m
 map
 mkdir

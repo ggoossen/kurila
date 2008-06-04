@@ -65,31 +65,9 @@ PP(pp_padav)
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
     EXTEND(SP, 1);
     if (PL_op->op_flags & OPf_REF) {
-	PUSHs(TARG);
-	RETURN;
-    }
-    assert(SvTYPE(TARG) == SVt_PVAV);
-    gimme = GIMME_V;
-    if (gimme == G_ARRAY) {
-	const I32 maxarg = AvFILL((AV*)TARG) + 1;
-	EXTEND(SP, maxarg);
-	if (SvMAGICAL(TARG)) {
-	    U32 i;
-	    for (i=0; i < (U32)maxarg; i++) {
-		SV * const * const svp = av_fetch((AV*)TARG, i, FALSE);
-		SP[i+1] = (svp) ? *svp : &PL_sv_undef;
-	    }
-	}
-	else {
-	    Copy(AvARRAY((AV*)TARG), SP+1, maxarg, SV*);
-	}
-	SP += maxarg;
-    }
-    else if (gimme == G_SCALAR) {
-	SV* const sv = sv_newmortal();
-	const I32 maxarg = AvFILL((AV*)TARG) + 1;
-	sv_setiv(sv, maxarg);
-	PUSHs(sv);
+	mPUSHs( newRV_noinc(TARG) );
+    } else {
+	PUSHs( TARG );
     }
     RETURN;
 }
@@ -3755,21 +3733,14 @@ PP(pp_anonlist)
     const I32 gimme = GIMME_V;
     const I32 items = SP - MARK;
 
+    dORIGMARK;
+    SV * const av = (SV *) av_make(items, MARK+1);
+    SP = ORIGMARK;		/* av_make() might realloc stack_sp */
+
     if (PL_op->op_flags & OPf_REF) {
-	dORIGMARK;
-	SV * const av = (SV *) av_make(items, MARK+1);
-	SP = ORIGMARK;		/* av_make() might realloc stack_sp */
-
-	mXPUSHs(av);
-	RETURN;
-    }
-
-    if (gimme == G_ARRAY) {
-	/* Nothing: items are already on the stack */
-    } else if (gimme == G_SCALAR) {
-	SP = MARK;
-	mXPUSHi(items);
+	mXPUSHs( newRV_noinc(av) );
     } else {
+	mXPUSHs( av );
     }
     RETURN;
 }
@@ -3798,6 +3769,59 @@ PP(pp_anonhash)
 
 /*     PUTBACK; */
     XPUSHs( (SV*) hv );
+
+    RETURN;
+}
+
+PP(pp_expand)
+{
+    dVAR; dSP;
+    dTOPss;
+    const I32 gimme = GIMME_V;
+    AV *const av = (AV*)sv;
+
+    if (gimme == G_SCALAR)
+	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
+
+    if (SvTYPE(sv) != SVt_PVAV)
+	Perl_croak(aTHX_ "expand operator should be used upon a array");
+
+    if (gimme == G_ARRAY) {
+	const I32 maxarg = AvFILL(av) + 1;
+	(void)POPs;			/* XXXX May be optimized away? */
+	EXTEND(SP, maxarg);
+	if (SvRMAGICAL(av)) {
+	    U32 i;
+	    for (i=0; i < (U32)maxarg; i++) {
+		SV ** const svp = av_fetch(av, i, FALSE);
+		/* See note in pp_helem, and bug id #27839 */
+		SP[i+1] = svp
+		    ? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
+		    : &PL_sv_undef;
+	    }
+	}
+	else {
+	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	}
+	SP += maxarg;
+    }
+
+    RETURN;
+}
+
+PP(pp_nelems)
+{
+    dVAR; dSP;
+    dTOPss;
+    const I32 gimme = GIMME_V;
+    AV *const av = (AV*)sv;
+
+    if (SvTYPE(sv) != SVt_PVAV)
+	Perl_croak(aTHX_ "nelems may only be used upon an array" );
+
+    dTARGET;
+    const I32 maxarg = AvFILL(av) + 1;
+    SETi(maxarg);
 
     RETURN;
 }

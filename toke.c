@@ -4124,19 +4124,23 @@ Perl_yylex(pTHX)
 	    }
 /* 	    Perl_croak(aTHX_ "No operator expected, but found '<', '<=' or '<=>' operator"); */
 	}
-	s++;
 	{
-	    char tmp = *s++;
-	    if (tmp == '<')
+	    s++;
+	    char tmp = *s;
+	    if (tmp == '<') {
+		s++;
 		SHop(OP_LEFT_SHIFT);
+	    }
 
 	    if ((tmp == '+') && (*s == '>')) {
-		s++;
+		s += 2;
 		Eop(OP_NCMP);
 	    }
 
-	    if (tmp == '=')
+	    if (tmp == '=') {
+		s++;
 		Perl_croak(aTHX_ "'<=' operator is reserved");
+	    }
 
 	    OPERATOR('<');
 	}
@@ -5326,6 +5330,9 @@ Perl_yylex(pTHX)
 
 	case KEY_lstat:
 	    UNI(OP_LSTAT);
+
+	case KEY_nelems:
+	    UNI(OP_NELEMS);
 
 	case KEY_m:
 	    s = scan_pat(s,OP_MATCH);
@@ -7742,6 +7749,16 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
           }
 
           goto unknown;
+
+        case 'n':
+          if (name[1] == 'e' &&
+              name[2] == 'l' &&
+	      name[3] == 'e' &&
+	      name[4] == 'm' &&
+	      name[5] == 's')
+          {                                       /* nelems     */
+            return KEY_nelems;
+          }
 
         case 'p':
           if (name[1] == 'r' &&

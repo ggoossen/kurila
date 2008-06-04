@@ -800,6 +800,9 @@ anonlist	anonymous list (%())	ck_fun		m@	L
 anonhash	anonymous hash (@())	ck_fun		m@	L
 listlast	listlast		ck_null		ms@	L
 
+expand		expand			ck_fun		1	S
+nelems		numer of elements	ck_fun		t1	S
+
 splice		splice			ck_fun		m@	A S? S? L
 push		push			ck_fun		imsT@	A L
 pop		pop			ck_shift	s%	A?

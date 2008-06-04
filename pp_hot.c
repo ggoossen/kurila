@@ -778,89 +778,32 @@ PP(pp_rv2av)
 	sv = SvRV(sv);
 	if (SvTYPE(sv) != type)
 	    DIE(aTHX_ "Not %s reference", is_pp_rv2av ? an_array : a_hash);
-	if (PL_op->op_flags & OPf_REF) {
-	    SETs(sv);
-	    RETURN;
+	SETs(sv);
+	RETURN;
+    }
+    if (SvTYPE(sv) == type) {
+	SETs(sv);
+	RETURN;
+    }
+    GV *gv;
+	
+    if (SvTYPE(sv) != SVt_PVGV) {
+	if (SvGMAGICAL(sv)) {
+	    mg_get(sv);
+	    if (SvROK(sv))
+		goto wasref;
 	}
-	else if (PL_op->op_flags & OPf_MOD
-		&& PL_op->op_private & OPpLVAL_INTRO)
-	    Perl_croak(aTHX_ PL_no_localize_ref);
+	gv = Perl_softref2xv(aTHX_ sv, is_pp_rv2av ? an_array : a_hash);
+	if (!gv)
+	    RETURN;
     }
     else {
-	if (SvTYPE(sv) == type) {
-	    if (PL_op->op_flags & OPf_REF) {
-		SETs(sv);
-		RETURN;
-	    }
-	}
-	else {
-	    GV *gv;
-	
-	    if (SvTYPE(sv) != SVt_PVGV) {
-		if (SvGMAGICAL(sv)) {
-		    mg_get(sv);
-		    if (SvROK(sv))
-			goto wasref;
-		}
-		gv = Perl_softref2xv(aTHX_ sv, is_pp_rv2av ? an_array : a_hash);
-		if (!gv)
-		    RETURN;
-	    }
-	    else {
-		gv = (GV*)sv;
-	    }
-	    sv = is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);
-	    if (PL_op->op_private & OPpLVAL_INTRO)
-		sv = is_pp_rv2av ? (SV*)save_ary(gv) : (SV*)save_hash(gv);
-	    if (PL_op->op_flags & OPf_REF) {
-		SETs(sv);
-		RETURN;
-	    }
-	}
+	gv = (GV*)sv;
     }
-
-    if (is_pp_rv2av) {
-	AV *const av = (AV*)sv;
-	/* The guts of pp_rv2av, with no intenting change to preserve history
-	   (until such time as we get tools that can do blame annotation across
-	   whitespace changes.  */
-	if (gimme == G_ARRAY) {
-	    const I32 maxarg = AvFILL(av) + 1;
-	    (void)POPs;			/* XXXX May be optimized away? */
-	    EXTEND(SP, maxarg);
-	    if (SvRMAGICAL(av)) {
-		U32 i;
-		for (i=0; i < (U32)maxarg; i++) {
-		    SV ** const svp = av_fetch(av, i, FALSE);
-		    /* See note in pp_helem, and bug id #27839 */
-		    SP[i+1] = svp
-			? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
-			: &PL_sv_undef;
-		}
-	    }
-	    else {
-		Copy(AvARRAY(av), SP+1, maxarg, SV*);
-	    }
-	    SP += maxarg;
-	}
-	else if (gimme == G_SCALAR) {
-	    dTARGET;
-	    const I32 maxarg = AvFILL(av) + 1;
-	    SETi(maxarg);
-	}
-    } else {
-	/* The guts of pp_rv2hv  */
-	if (gimme == G_ARRAY) { /* array wanted */
-	    *PL_stack_sp = sv;
-	    return do_kv();
-	}
-	else if (gimme == G_SCALAR) {
-	    dTARGET;
-	    TARG = Perl_hv_scalar(aTHX_ (HV*)sv);
-	    SPAGAIN;
-	    SETTARG;
-	}
-    }
+    sv = is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);
+    if (PL_op->op_private & OPpLVAL_INTRO)
+	sv = is_pp_rv2av ? (SV*)save_ary(gv) : (SV*)save_hash(gv);
+    SETs(sv);
     RETURN;
 }
 

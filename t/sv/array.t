@@ -4,6 +4,8 @@ BEGIN { require './test.pl'; }
 
 plan (86);
 
+#sub is { @_[0] eq @_[1] or die "different: '@_[0]' - '@_[1]'"; };
+
 my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 
 #
