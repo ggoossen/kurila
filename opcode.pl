@@ -801,7 +801,7 @@ anonhash	anonymous hash (@())	ck_fun		m@	L
 listlast	listlast		ck_null		ms@	L
 
 expand		expand			ck_fun		1	S
-nelems		numer of elements	ck_fun		t1	S
+nelems		numer of elements	ck_fun		t1	A
 
 splice		splice			ck_fun		m@	A S? S? L
 push		push			ck_fun		imsT@	A L

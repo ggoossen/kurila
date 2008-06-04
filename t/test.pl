@@ -68,7 +68,7 @@ END {
 # Use this instead of "print STDERR" when outputing failure diagnostic
 # messages
 sub _diag {
-    return unless < @_;
+    return unless nelems @_;
     my @mess = @( map { m/^#/ ? "$_\n" : "# $_\n" }
                map { split m/\n/ } < @_ );
     my $func = $TODO ? \&_print : \&_print_stderr;
@@ -89,7 +89,7 @@ sub skip_all {
 }
 
 sub _ok {
-    my ($pass, $where, $name, @mess) = < @_;
+    my ($pass, $where, $name, < @mess) = < @_;
     # Do not try to microoptimize by factoring out the "not ".
     # VMS will avenge.
     my $out;
@@ -123,7 +123,7 @@ sub _where {
 
 # DON'T use this for matches. Use like() instead.
 sub ok ($@) {
-    my ($pass, $name, @mess) = < @_;
+    my ($pass, $name, < @mess) = < @_;
     _ok($pass, _where(), $name, < @mess);
 }
 

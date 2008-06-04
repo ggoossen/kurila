@@ -1438,6 +1438,11 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	PL_modcount++;
 	break;
 
+    case OP_EXPAND:
+        PL_modcount = RETURN_UNLIMITED_NUMBER;
+	mod(cUNOPo->op_first, type);
+	break;
+
     case OP_PADAV:
     case OP_PADHV:
     case OP_PADSV:
@@ -5538,21 +5543,6 @@ Perl_oopsHV(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_OOPSHV;
 
-    switch (o->op_type) {
-    case OP_PADHV:
-	return ref(o, OP_RV2HV);
-
-    case OP_RV2HV:
-	ref(o, OP_RV2HV);
-	break;
-
-    case OP_ANONHASH:
-	return ref(o, OP_RV2AV);
-
-    default:
-	Perl_croak(aTHX_ "oops: oopsHV");
-	break;
-    }
     return o;
 }
 
@@ -5590,8 +5580,8 @@ Perl_newHVREF(pTHX_ OP *o)
     PERL_ARGS_ASSERT_NEWHVREF;
 
     if (o->op_type == OP_PADANY) {
-	o->op_type = OP_PADHV;
-	o->op_ppaddr = PL_ppaddr[OP_PADHV];
+	o->op_type = OP_PADSV;
+	o->op_ppaddr = PL_ppaddr[OP_PADSV];
 	return o;
     }
     else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV || o->op_type == OP_ANONHASH) {
@@ -6152,7 +6142,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		mod(kid, type);
 		break;
 	    case OA_HVREF:
-		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADHV)
+		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV)
 		    bad_type(numargs, "hash", PL_op_desc[type], kid);
 		mod(kid, type);
 		break;
