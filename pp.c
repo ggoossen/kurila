@@ -3763,12 +3763,10 @@ PP(pp_anonhash)
     SP = ORIGMARK;
 
     if (PL_op->op_flags & OPf_REF) {
-	mXPUSHs((SV*)hv);
-	RETURN;
+	mXPUSHs( newRV_noinc((SV*)hv) );
+    } else {
+	mXPUSHs( (SV*)hv );
     }
-
-/*     PUTBACK; */
-    XPUSHs( (SV*) hv );
 
     RETURN;
 }
