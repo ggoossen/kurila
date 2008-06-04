@@ -39,7 +39,7 @@ sub _print_stderr {
 
 sub plan {
     my $n;
-    if (< @_ == 1) {
+    if (nelems @_ == 1) {
 	$n = shift;
 	if ($n eq 'no_plan') {
 	  undef $n;
@@ -169,7 +169,7 @@ sub display {
 }
 
 sub is ($$@) {
-    my ($got, $expected, $name, @mess) = < @_;
+    my ($got, $expected, $name, < @mess) = < @_;
 
     my $pass;
     if( !defined $got || !defined $expected ) {

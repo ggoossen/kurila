@@ -64,7 +64,7 @@
 #endif
 }
 
-%token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';' '<'
+%token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
 %token <opval> WORD METHOD THING PMFUNC PRIVATEREF
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
@@ -121,13 +121,13 @@
 %left ADDOP
 %left MULOP
 %left <i_tkval> MATCHOP
-%right <i_tkval> '!' '~' UMINUS REFGEN
+%right <i_tkval> '!' '~' UMINUS REFGEN '<'
 %right <i_tkval> POWOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
-%left '[' '{' ANONARY ANONHSH '<'
+%left '[' '{' ANONARY ANONHSH
 
 %token <i_tkval> PEG
 
@@ -1020,6 +1020,10 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 			{ $$ = newUNOP(OP_COMPLEMENT, 0, scalar($2));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
+	|	'<' term                               /* <$x */
+			{ $$ = newUNOP(OP_EXPAND, 0, scalar($2));
+			  TOKEN_GETMAD($1,$$,'o');
+			}
 	|	term POSTINC                           /* $x++ */
 			{ $$ = newUNOP(OP_POSTINC, 0,
 					mod(scalar($1), OP_POSTINC));
@@ -1188,11 +1192,6 @@ term	:	termbinop
                               APPEND_MADPROPS_PV("amper", $$, '>');
 			  })
 			}
-        |       '<' term
-                        {
-                          $$ = convert(OP_ANONLIST, 0, $2);
-			  TOKEN_GETMAD($1,$$,'o');
-                        }
 	|	NOAMP WORD listexpr                  /* foo(@args) */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 			    append_elem(OP_LIST, $3, scalar($2)));

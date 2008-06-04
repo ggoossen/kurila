@@ -175,6 +175,8 @@ EXTCONST char* const PL_op_name[] = {
 	"anonlist",
 	"anonhash",
 	"listlast",
+	"expand",
+	"nelems",
 	"splice",
 	"push",
 	"pop",
@@ -536,6 +538,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"anonymous list (%())",
 	"anonymous hash (@())",
 	"listlast",
+	"expand",
+	"numer of elements",
 	"splice",
 	"push",
 	"pop",
@@ -909,6 +913,8 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_anonlist),
 	MEMBER_TO_FPTR(Perl_pp_anonhash),
 	MEMBER_TO_FPTR(Perl_pp_listlast),
+	MEMBER_TO_FPTR(Perl_pp_expand),
+	MEMBER_TO_FPTR(Perl_pp_nelems),
 	MEMBER_TO_FPTR(Perl_pp_splice),
 	MEMBER_TO_FPTR(Perl_pp_push),
 	MEMBER_TO_FPTR(Perl_pp_shift),	/* Perl_pp_pop */
@@ -1279,6 +1285,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonlist */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonhash */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* listlast */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* expand */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* nelems */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* splice */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* push */
 	MEMBER_TO_FPTR(Perl_ck_shift),	/* pop */
@@ -1643,6 +1651,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x00004801,	/* anonlist */
 	0x00004801,	/* anonhash */
 	0x00004805,	/* listlast */
+	0x00002200,	/* expand */
+	0x00002208,	/* nelems */
 	0x05326801,	/* splice */
 	0x0004691d,	/* push */
 	0x00017604,	/* pop */

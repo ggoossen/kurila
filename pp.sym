@@ -186,6 +186,8 @@ Perl_pp_lslice
 Perl_pp_anonlist
 Perl_pp_anonhash
 Perl_pp_listlast
+Perl_pp_expand
+Perl_pp_nelems
 Perl_pp_splice
 Perl_pp_push
 Perl_pp_pop
