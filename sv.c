@@ -2900,7 +2900,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     if ( (dtype == SVt_PVHV || dtype == SVt_PVAV )
 	 && dtype != stype ) {
 	Perl_sv_clear_body(aTHX_ dstr);
-	SvFLAGS(dstr) = SVt_NULL;
+	SvFLAGS(dstr) = dtype = SVt_NULL;
     }
 
     /* There's a lot of redundancy below but we're going for speed here */
