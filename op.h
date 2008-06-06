@@ -137,6 +137,7 @@ Deprecated.  Use C<GIMME_V> instead.
 				/*  On OP_SMARTMATCH, an implicit smartmatch */
 				/*  On OP_ANONHASH and OP_ANONLIST, create a
 				    reference to the new anon hash or array */
+				/*  On OP_AASIGN last element of the assignment is an expanded array/hash */
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST

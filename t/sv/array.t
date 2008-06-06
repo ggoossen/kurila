@@ -77,7 +77,7 @@ ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
 is(%bar{'foo'}, 'bar');
 %bar = %( () );
 is(%bar{'foo'}, undef);
-(%bar,$a,$b) = (< %foo,'how','now');
+(< %bar ) = (< %foo,'how','now');
 is(%bar{'foo'}, 'bar');
 is(%bar{'how'}, 'now');
 %bar{[keys %foo]} = values %foo;

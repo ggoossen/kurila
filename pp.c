@@ -3783,6 +3783,11 @@ PP(pp_expand)
     if (SvTYPE(sv) != SVt_PVAV && SvTYPE(sv) != SVt_PVHV)
 	Perl_croak(aTHX_ "expand operator should be used upon a array");
 
+    if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
+	/* lhs of an assignment is handled by pp_aassign */
+	RETURN;
+    }
+
     if (gimme == G_ARRAY) {
 	if (SvTYPE(sv) == SVt_PVAV) {
 	    AV *const av = (AV*)sv;
