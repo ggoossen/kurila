@@ -1439,6 +1439,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_EXPAND:
+	if (type != OP_AASSIGN)
+	    goto nomod;
         PL_modcount = RETURN_UNLIMITED_NUMBER;
 	mod(cUNOPo->op_first, type);
 	break;
@@ -3629,6 +3631,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
             " in list context currently forbidden";
 	OP *curop;
 	bool maybe_common_vars = TRUE;
+	bool expand_assignment = FALSE;
 
 	PL_modcount = 0;
 	/* Grandfathering $[ assignment here.  Bletch.*/
@@ -3646,12 +3649,22 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	o = newBINOP(OP_AASSIGN, flags, list(force_list(right)), curop);
 	o->op_private = (U8)(0 | (flags >> 8));
 
+	if (left->op_type == OP_EXPAND) {
+	    expand_assignment = TRUE;
+	}
+
 	if ((left->op_type == OP_LIST
 	     || (left->op_type == OP_NULL && left->op_targ == OP_LIST)))
 	{
 	    OP* lop = ((LISTOP*)left)->op_first;
 	    maybe_common_vars = FALSE;
 	    while (lop) {
+		if (lop->op_type == OP_EXPAND) {
+		    if (lop->op_sibling)
+			yyerror(Perl_form(aTHX_ "expand only allowed on the last element of a list assignment"));
+		    expand_assignment = 1; /* Last element is list expansion */
+		}
+
 		if (lop->op_type == OP_PADSV ||
 		    lop->op_type == OP_PADAV ||
 		    lop->op_type == OP_PADHV ||
@@ -3791,6 +3804,10 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 		}
 	    }
 	}
+
+	if (expand_assignment)
+	    o->op_flags |= OPf_SPECIAL;
+
 	return o;
     }
     if (!right)

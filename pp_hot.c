@@ -882,80 +882,89 @@ PP(pp_aassign)
     while (lelem <= lastlelem) {
 	TAINT_NOT;		/* Each item stands on its own, taintwise. */
 	sv = *lelem++;
-	switch (SvTYPE(sv)) {
-/* 	case SVt_PVAV: */
-/* 	    ary = (AV*)sv; */
-/* 	    magic = SvMAGICAL(ary) != 0; */
-/* 	    av_clear(ary); */
-/* 	    av_extend(ary, lastrelem - relem); */
-/* 	    i = 0; */
-/* 	    while (relem <= lastrelem) {	/\* gobble up all the rest *\/ */
-/* 		SV **didstore; */
-/* 		assert(*relem); */
-/* 		sv = newSVsv(*relem); */
-/* 		*(relem++) = sv; */
-/* 		didstore = av_store(ary,i++,sv); */
-/* 		if (magic) { */
-/* 		    if (SvSMAGICAL(sv)) */
-/* 			mg_set(sv); */
-/* 		    if (!didstore) */
-/* 			sv_2mortal(sv); */
-/* 		} */
-/* 		TAINT_NOT; */
-/* 	    } */
-/* 	    if (PL_delaymagic & DM_ARRAY) */
-/* 		SvSETMAGIC((SV*)ary); */
-/* 	    break; */
-/* 	case SVt_PVHV: {				/\* normal hash *\/ */
-/* 		SV *tmpstr; */
-
-/* 		hash = (HV*)sv; */
-/* 		magic = SvMAGICAL(hash) != 0; */
-/* 		hv_clear(hash); */
-/* 		firsthashrelem = relem; */
-
-/* 		while (relem < lastrelem) {	/\* gobble up all the rest *\/ */
-/* 		    HE *didstore; */
-/* 		    sv = *relem ? *relem : &PL_sv_no; */
-/* 		    relem++; */
-/* 		    tmpstr = newSV(0); */
-/* 		    if (*relem) */
-/* 			sv_setsv(tmpstr,*relem);	/\* value *\/ */
-/* 		    *(relem++) = tmpstr; */
-/* 		    if (gimme != G_VOID && hv_exists_ent(hash, sv, 0)) */
-/* 			/\* key overwrites an existing entry *\/ */
-/* 			duplicates += 2; */
-/* 		    didstore = hv_store_ent(hash,sv,tmpstr,0); */
-/* 		    if (magic) { */
-/* 			if (SvSMAGICAL(tmpstr)) */
-/* 			    mg_set(tmpstr); */
-/* 			if (!didstore) */
-/* 			    sv_2mortal(tmpstr); */
-/* 		    } */
-/* 		    TAINT_NOT; */
-/* 		} */
-/* 		if (relem == lastrelem) { */
-/* 		    do_oddball(hash, relem, firstrelem); */
-/* 		    relem++; */
-/* 		} */
-/* 	    } */
-/* 	    break; */
-	default:
+	
+	if ( lelem <= lastlelem || ! (PL_op->op_flags & OPf_SPECIAL)) {
 	    if (SvIMMORTAL(sv)) {
 		if (relem <= lastrelem)
 		    relem++;
+	    } else {
+		if (relem <= lastrelem) {
+		    sv_setsv(sv, *relem);
+		    *(relem++) = sv;
+		}
+		else
+		    sv_setsv(sv, &PL_sv_undef);
+		SvSETMAGIC(sv);
+	    }
+	}
+	else {    /* Special handling of last element if it is an array/hash expand */
+	    TAINT_NOT;		/* Each item stands on its own, taintwise. */
+	    sv = *lastlelem;
+	    switch (SvTYPE(sv)) {
+	    case SVt_PVAV:
+		ary = (AV*)sv;
+		magic = SvMAGICAL(ary) != 0;
+		av_clear(ary);
+		av_extend(ary, lastrelem - relem);
+		i = 0;
+		while (relem <= lastrelem) {	/* gobble up all the rest */
+		    SV **didstore;
+		    assert(*relem);
+		    sv = newSVsv(*relem);
+		    *(relem++) = sv;
+		    didstore = av_store(ary,i++,sv);
+		    if (magic) {
+			if (SvSMAGICAL(sv))
+			    mg_set(sv);
+			if (!didstore)
+			    sv_2mortal(sv);
+		    }
+		    TAINT_NOT;
+		}
+		if (PL_delaymagic & DM_ARRAY)
+		    SvSETMAGIC((SV*)ary);
+		break;
+	    case SVt_PVHV: {				/* normal hash */
+		SV *tmpstr;
+
+		hash = (HV*)sv;
+		magic = SvMAGICAL(hash) != 0;
+		hv_clear(hash);
+		firsthashrelem = relem;
+
+		while (relem < lastrelem) {	/* gobble up all the rest */
+		    HE *didstore;
+		    sv = *relem ? *relem : &PL_sv_no;
+		    relem++;
+		    tmpstr = newSV(0);
+		    if (*relem)
+			sv_setsv(tmpstr,*relem);	/* value */
+		    *(relem++) = tmpstr;
+		    if (gimme != G_VOID && hv_exists_ent(hash, sv, 0))
+			/* key overwrites an existing entry */
+			duplicates += 2;
+		    didstore = hv_store_ent(hash,sv,tmpstr,0);
+		    if (magic) {
+			if (SvSMAGICAL(tmpstr))
+			    mg_set(tmpstr);
+			if (!didstore)
+			    sv_2mortal(tmpstr);
+		    }
+		    TAINT_NOT;
+		}
+		if (relem == lastrelem) {
+		    do_oddball(hash, relem, firstrelem);
+		    relem++;
+		}
+    	        }
+		break;
+	    default:
+		Perl_croak(aTHX_ "panic: expanded sv is not an array or hash");
 		break;
 	    }
-	    if (relem <= lastrelem) {
-		sv_setsv(sv, *relem);
-		*(relem++) = sv;
-	    }
-	    else
-		sv_setsv(sv, &PL_sv_undef);
-	    SvSETMAGIC(sv);
-	    break;
 	}
     }
+
     if (PL_delaymagic & ~DM_DELAY) {
 	if (PL_delaymagic & DM_UID) {
 #ifdef HAS_SETRESUID
