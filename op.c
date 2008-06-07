@@ -2439,13 +2439,12 @@ Perl_gen_constant_list(pTHX_ register OP *o)
     PL_op = curop;
     assert (!(curop->op_flags & OPf_SPECIAL));
     assert(curop->op_type == OP_RANGE);
-    PL_op->op_flags |= OPf_REF;
+    PL_op->op_flags &= ~OPf_REF;
     pp_anonlist();
     PL_tmps_floor = oldtmps_floor;
 
-    o->op_type = OP_RV2AV;
-    o->op_ppaddr = PL_ppaddr[OP_RV2AV];
-    o->op_flags &= ~OPf_REF;	/* treat \(1..2) like an ordinary list */
+    o->op_type = OP_EXPAND;
+    o->op_ppaddr = PL_ppaddr[OP_EXPAND];
     o->op_flags |= OPf_PARENS;	/* and flatten \(1..2,3) */
     o->op_opt = 0;		/* needs to be revisited in peep() */
     curop = ((UNOP*)o)->op_first;
