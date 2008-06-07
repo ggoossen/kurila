@@ -64,11 +64,7 @@ PP(pp_padav)
 	if (!(PL_op->op_private & OPpPAD_STATE))
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
     EXTEND(SP, 1);
-    if (PL_op->op_flags & OPf_REF) {
-	mPUSHs( newRV_noinc(TARG) );
-    } else {
-	PUSHs( TARG );
-    }
+    PUSHs( TARG );
     RETURN;
 }
 
@@ -81,8 +77,6 @@ PP(pp_padhv)
     if (PL_op->op_private & OPpLVAL_INTRO)
 	if (!(PL_op->op_private & OPpPAD_STATE))
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
-    if (PL_op->op_flags & OPf_REF)
-	RETURN;
     RETURN;
 }
 
@@ -3423,32 +3417,34 @@ PP(pp_aslice)
     register AV* const av = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
 
-    if (SvTYPE(av) == SVt_PVAV) {
-	if (lval && PL_op->op_private & OPpLVAL_INTRO) {
-	    register SV **svp;
-	    I32 max = -1;
-	    for (svp = MARK + 1; svp <= SP; svp++) {
-		const I32 elem = SvIV(*svp);
-		if (elem > max)
-		    max = elem;
-	    }
-	    if (max > AvMAX(av))
-		av_extend(av, max);
-	}
-	while (++MARK <= SP) {
-	    register SV **svp;
-	    I32 elem = SvIV(*MARK);
+    if (SvTYPE(av) != SVt_PVAV)
+	Perl_croak(aTHX_ "can't take an array slice from an %s", SvDESC(av));
 
-	    svp = av_fetch(av, elem, lval);
-	    if (lval) {
-		if (!svp || *svp == &PL_sv_undef)
-		    DIE(aTHX_ PL_no_aelem, elem);
-		if (PL_op->op_private & OPpLVAL_INTRO)
-		    save_aelem(av, elem, svp);
-	    }
-	    *MARK = svp ? *svp : &PL_sv_undef;
+    if (lval && PL_op->op_private & OPpLVAL_INTRO) {
+	register SV **svp;
+	I32 max = -1;
+	for (svp = MARK + 1; svp <= SP; svp++) {
+	    const I32 elem = SvIV(*svp);
+	    if (elem > max)
+		max = elem;
 	}
+	if (max > AvMAX(av))
+	    av_extend(av, max);
     }
+    while (++MARK <= SP) {
+	register SV **svp;
+	I32 elem = SvIV(*MARK);
+	
+	svp = av_fetch(av, elem, lval);
+	if (lval) {
+	    if (!svp || *svp == &PL_sv_undef)
+		DIE(aTHX_ PL_no_aelem, elem);
+	    if (PL_op->op_private & OPpLVAL_INTRO)
+		save_aelem(av, elem, svp);
+	}
+	*MARK = svp ? *svp : &PL_sv_undef;
+    }
+
     if (GIMME != G_ARRAY) {
 	MARK = ORIGMARK;
 	*++MARK = SP > ORIGMARK ? *SP : &PL_sv_undef;
@@ -3737,11 +3733,7 @@ PP(pp_anonlist)
     SV * const av = (SV *) av_make(items, MARK+1);
     SP = ORIGMARK;		/* av_make() might realloc stack_sp */
 
-    if (PL_op->op_flags & OPf_REF) {
-	mXPUSHs( newRV_noinc(av) );
-    } else {
-	mXPUSHs( av );
-    }
+    mXPUSHs( av );
     RETURN;
 }
 
@@ -3762,11 +3754,7 @@ PP(pp_anonhash)
     }
     SP = ORIGMARK;
 
-    if (PL_op->op_flags & OPf_REF) {
-	mXPUSHs( newRV_noinc((SV*)hv) );
-    } else {
-	mXPUSHs( (SV*)hv );
-    }
+    mXPUSHs( (SV*)hv );
 
     RETURN;
 }
