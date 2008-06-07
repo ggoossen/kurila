@@ -294,7 +294,7 @@ sub like_yn ($$$@) {
 		? "# expected !~ m/$expected/\n" : "# expected m/$expected/\n");
     }
     local $Level = $Level + 1;
-    _ok($pass, _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < (@mess || @()));
 }
 
 sub pass {

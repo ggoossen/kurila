@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan (84);
+plan (80);
 
 #sub is { @_[0] eq @_[1] or die "different: '@_[0]' - '@_[1]'"; };
 
@@ -277,7 +277,7 @@ is ($got, '');
     for (1,2) {
 	{
 	    local our @a;
-	    is ((< @a-1), -1);
+	    is (nelems @a, 0);
 	    @a=@(1..4)
 	}
     }
@@ -295,6 +295,5 @@ is ($got, '');
     (our $y, our $z) = ($x,$y);
     is("$x $y $z", "1 1 2");
 }
-
 
 "We're included by lib/Tie/Array/std.t so we need to return something true";
