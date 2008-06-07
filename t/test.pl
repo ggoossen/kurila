@@ -81,7 +81,7 @@ sub diag {
 
 sub skip_all {
     if (< @_) {
-	_print "1..0 # Skipped: < @_\n";
+	_print "1..0 # Skipped: @_\n";
     } else {
 	_print "1..0\n";
     }
@@ -306,7 +306,7 @@ sub fail {
 }
 
 sub curr_test {
-    $test = shift if < @_;
+    $test = shift if nelems @_;
     return $test;
 }
 

@@ -3781,7 +3781,7 @@ PP(pp_expand)
 	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
 
     if (SvTYPE(sv) != SVt_PVAV && SvTYPE(sv) != SVt_PVHV)
-	Perl_croak(aTHX_ "expand operator should be used upon a array");
+	Perl_croak(aTHX_ "expand operator may not be used upon a %s", SvDESC(sv));
 
     if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
 	/* lhs of an assignment is handled by pp_aassign */

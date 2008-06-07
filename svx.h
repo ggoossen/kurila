@@ -53,3 +53,16 @@ static __inline__ void iiSvIOKp_on(pTHX_ SV *sv) {
 }
 #define SvIOKp_on(sv) iiSvIOKp_on(aTHX_ sv)
 
+static __inline__ const char* iiSvDESC(pTHX_ SV *sv) {
+  switch (SvTYPE(sv)) {
+  case SVt_NULL: 
+    return "undef";
+  case SVt_PVHV:
+    return "hash";
+  case SVt_PVAV:
+    return "array";
+  default:
+    return "scalar";
+  }
+}
+#define SvDESC(sv) iiSvDESC(aTHX_ sv)

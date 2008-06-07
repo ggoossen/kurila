@@ -2847,24 +2847,28 @@ Perl_yylex(pTHX)
 	}
 
 	PL_expect = XTERM;
-	PL_lex_dojoin = (*PL_bufptr == '@');
+/* 	PL_lex_dojoin = (*PL_bufptr == '@'); */
+	PL_lex_dojoin = 0;
 	PL_lex_state = LEX_INTERPNORMAL;
-	if (PL_lex_dojoin) {
-	    start_force(PL_curforce);
-	    NEXTVAL_NEXTTOKE.ival = 0;
-	    force_next(',');
-	    start_force(PL_curforce);
-	    force_ident("\"", '$');
-	    start_force(PL_curforce);
-	    NEXTVAL_NEXTTOKE.ival = 0;
-	    force_next('$');
-	    start_force(PL_curforce);
-	    NEXTVAL_NEXTTOKE.ival = 0;
-	    force_next('(');
-	    start_force(PL_curforce);
-	    NEXTVAL_NEXTTOKE.ival = OP_JOIN;	/* emulate join($", ...) */
-	    force_next(FUNC);
-	}
+/* 	if (PL_lex_dojoin) { */
+/* 	    start_force(PL_curforce); */
+/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
+/* 	    force_next('<'); */
+/* 	    start_force(PL_curforce); */
+/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
+/* 	    force_next(','); */
+/* 	    start_force(PL_curforce); */
+/* 	    force_ident("\"", '$'); */
+/* 	    start_force(PL_curforce); */
+/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
+/* 	    force_next('$'); */
+/* 	    start_force(PL_curforce); */
+/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
+/* 	    force_next('('); */
+/* 	    start_force(PL_curforce); */
+/* 	    NEXTVAL_NEXTTOKE.ival = OP_JOIN;	/\* emulate join($", < ...) *\/ */
+/* 	    force_next(FUNC); */
+/* 	} */
 	if (PL_lex_starts++) {
 	    s = PL_bufptr;
 #ifdef PERL_MAD
