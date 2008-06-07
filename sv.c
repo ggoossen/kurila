@@ -1819,7 +1819,7 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
     dVAR;
     if (!sv)
 	return 0;
-    assert( ! (SvTYPE(sv) >= SVt_PVMG && SvVALID(sv)) ); /* FBMs are never used as ivs */
+    assert( ! (SvTYPE(sv) == SVt_PVMG && SvVALID(sv)) ); /* FBMs are never used as ivs */
     if (SvGMAGICAL(sv)) {
 	if (flags & SV_GMAGIC)
 	    mg_get(sv);
