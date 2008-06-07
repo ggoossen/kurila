@@ -110,11 +110,11 @@ typedef struct yy_parser {
     SV		*thiswhite;
 
 /* What we know when we're in LEX_KNOWNEXT state. */
-    NEXTMADTOKE	nexttoke[5];	/* value of next token, if any */
+    NEXTMADTOKE	nexttoke[6];	/* value of next token, if any */
     I32		curforce;
 #else
-    YYSTYPE	nextval[5];	/* value of next token, if any */
-    I32		nexttype[5];	/* type of next token */
+    YYSTYPE	nextval[6];	/* value of next token, if any */
+    I32		nexttype[6];	/* type of next token */
     I32		nexttoke;
 #endif
 

@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan (86);
+plan (84);
 
 #sub is { @_[0] eq @_[1] or die "different: '@_[0]' - '@_[1]'"; };
 
@@ -117,20 +117,20 @@ is($foo, 'b');
 #curr_test(38);
 
 @foo = @( < @foo );
-is("< @foo", "foo bar burbl blah");				# 38
+is((join ' ', < @foo), "foo bar burbl blah");				# 38
 
-(undef,@foo) = < @foo;
-is("< @foo", "bar burbl blah");					# 39
+(undef,<@foo) = < @foo;
+is((join ' ', < @foo), "bar burbl blah");					# 39
 
 @foo = @('XXX',< @foo, 'YYY');
-is("< @foo", "XXX bar burbl blah YYY");				# 40
+is((join ' ', < @foo), "XXX bar burbl blah YYY");				# 40
 
-@foo = @( @foo = @( qw(foo b\a\r bu\\rbl blah) ) );
-is("< @foo", 'foo b\a\r bu\\rbl blah');				# 41
+@foo = @( < ( @foo = @( qw(foo b\a\r bu\\rbl blah) ) ) );
+is((join ' ', < @foo), 'foo b\a\r bu\\rbl blah');				# 41
 
-@bar = @( @foo = @( qw(foo bar) ) );					# 42
-is("< @foo", "foo bar");
-is("< @bar", "foo bar");						# 43
+@bar = @( < ( @foo = @( qw(foo bar) ) ) );					# 42
+is((join ' ', < @foo), "foo bar");
+is((join ' ', < @bar), "foo bar");						# 43
 
 # try the same with local
 # XXX tie-stdarray fails the tests involving local, so we use
@@ -141,74 +141,69 @@ our @bim;
 {
 
     local @bee = @( < @bee );
-    is("< @bee", "foo bar burbl blah");				# 44
+    is((join ' ', < @bee), "foo bar burbl blah");				# 44
     {
-	local (undef,@bee) = < @bee;
-	is("< @bee", "bar burbl blah");				# 45
-	{
-	    local @bee = @('XXX',< @bee,'YYY');
-	    is("< @bee", "XXX bar burbl blah YYY");		# 46
-	    {
-		local @bee = @( local(@bee) = qw(foo bar burbl blah) );
-		is("< @bee", "foo bar burbl blah");		# 47
-		{
-		    local (@bim) = local(@bee) = qw(foo bar);
-		    is("< @bee", "foo bar");			# 48
-		    is("< @bim", "foo bar");			# 49
-		}
-		is("< @bee", "foo bar burbl blah");		# 50
-	    }
-	    is("< @bee", "XXX bar burbl blah YYY");		# 51
-	}
-	is("< @bee", "bar burbl blah");				# 52
+        local @bee = @('XXX',< @bee,'YYY');
+        is((join ' ', < @bee), "XXX foo bar burbl blah YYY");		# 46
+        {
+#             local @bee = local(@bee) = @(qw(foo bar burbl blah));
+#             is((join ' ', < @bee), "foo bar burbl blah");		# 47
+#             {
+#                 local (@bim) = local(@bee) = qw(foo bar);
+#                 is((join ' ', < @bee), "foo bar");			# 48
+#                 is((join ' ', < @bim), "foo bar");			# 49
+#             }
+#             is((join ' ', < @bee), "foo bar burbl blah");		# 50
+        }
+        is((join ' ', < @bee), "XXX foo bar burbl blah YYY");		# 51
     }
-    is("< @bee", "foo bar burbl blah");				# 53
+    is((join ' ', < @bee), "foo bar burbl blah");				# 53
 }
 
 # try the same with my
 {
     my @bee = @( < @bee );
-    is("< @bee", "foo bar burbl blah");				# 54
+    is((join ' ', <@bee), "foo bar burbl blah");				# 54
     {
-	my (undef,@bee) = < @bee;
-	is("< @bee", "bar burbl blah");				# 55
+	my (undef,<@bee) = < @bee;
+	is((join ' ', <@bee), "bar burbl blah");				# 55
 	{
 	    my @bee = @('XXX',< @bee,'YYY');
-	    is("< @bee", "XXX bar burbl blah YYY");		# 56
+	    is((join ' ', <@bee), "XXX bar burbl blah YYY");		# 56
 	    {
 		my @bee = @( my @bee = @( qw(foo bar burbl blah) ) );
-		is("< @bee", "foo bar burbl blah");		# 57
+		is((join ' ', <@bee), "foo bar burbl blah");		# 57
 		{
-		    my (@bim) = @( my(@bee) = @( qw(foo bar) ) );
-		    is("< @bee", "foo bar");			# 58
-		    is("< @bim", "foo bar");			# 59
+		    my (@bim) = my(@bee) = @( qw(foo bar) );
+		    is((join ' ', <@bee), "foo bar");			# 58
+		    is((join ' ', <@bim), "foo bar");			# 59
 		}
-		is("< @bee", "foo bar burbl blah");		# 60
+		is((join ' ', <@bee), "foo bar burbl blah");		# 60
 	    }
-	    is("< @bee", "XXX bar burbl blah YYY");		# 61
+	    is((join ' ', <@bee), "XXX bar burbl blah YYY");		# 61
 	}
-	is("< @bee", "bar burbl blah");				# 62
+	is((join ' ', <@bee), "bar burbl blah");				# 62
     }
-    is("< @bee", "foo bar burbl blah");				# 63
+    is((join ' ', <@bee), "foo bar burbl blah");				# 63
 }
 
 # try the same with our (except that previous values aren't restored)
 {
     our @bee = @( < @bee );
-    is("< @bee", "foo bar burbl blah");
+    is((join ' ', <@bee), "foo bar burbl blah");
     {
-	our (undef,@bee) = < @bee;
-	is("< @bee", "bar burbl blah");
+	our (undef,<@bee) = < @bee;
+	is((join ' ', <@bee), "bar burbl blah");
 	{
 	    our @bee = @('XXX',< @bee,'YYY');
-	    is("< @bee", "XXX bar burbl blah YYY");
+	    is((join ' ', <@bee), "XXX bar burbl blah YYY");
 	    {
-		our @bee = @( our @bee = @( qw(foo bar burbl blah) ) );
-		is("< @bee", "foo bar burbl blah");
+		our @bee = our @bee = @( qw(foo bar burbl blah) );
+		is((join ' ', <@bee), "foo bar burbl blah");
 		{
-		    our (@bim) = @( our(@bee) = @( qw(foo bar) ) );
-		    is("< @bee", "foo bar");
-		    is("< @bim", "foo bar");
+		    our (@bim) = our(@bee) = @( qw(foo bar) );
+		    is((join ' ', <@bee), "foo bar");
+		    is((join ' ', <@bim), "foo bar");
 		}
 	    }
 	}
@@ -217,7 +212,7 @@ our @bim;
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify { @_[1] = $t++; print "< @_\n"; }
+sub reify { @_[1] = $t++; print( (join ' ', <@_), "\n"); }
 reify('ok');
 reify('ok');
 
@@ -234,7 +229,7 @@ is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
 sub foo { "a" }
-my @foo= @((foo())[[0,0]] );
+my @foo= @( @(foo())[[0,0]] );
 is (@foo[1], "a");
 
 # bugid #15439 - clearing an array calls destructors which may try

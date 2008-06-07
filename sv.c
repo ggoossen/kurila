@@ -2523,6 +2523,9 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 	if (isGV_with_GP(sv))
 	    Perl_croak(aTHX_ "Tried to use glob as string");
 
+	if (SvTYPE(sv) == SVt_PVAV || SvTYPE(sv) == SVt_PVHV)
+	    Perl_croak(aTHX_ "%s may not be used as a string", (SvTYPE(sv) == SVt_PVAV ? "array" : "hash"));
+
 	if (lp)
 	    *lp = 0;
 	if (flags & SV_UNDEF_RETURNS_NULL)
@@ -2897,7 +2900,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     (void)SvAMAGIC_off(dstr);
 
     /* clear the destination sv if it will be upgraded to a hash or an array */
-    if ( (dtype == SVt_PVHV || dtype == SVt_PVAV )
+    if ( (dtype == SVt_PVHV || dtype == SVt_PVAV || stype == SVt_PVAV || stype == SVt_PVHV)
 	 && dtype != stype ) {
 	Perl_sv_clear_body(aTHX_ dstr);
 	SvFLAGS(dstr) = dtype = SVt_NULL;
