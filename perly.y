@@ -1158,10 +1158,10 @@ term	:	termbinop
 			{ $$ = $1; }
 	|	ary ASLICE expr ']' ']'                     /* array slice */
 			{ $$ = prepend_elem(OP_ASLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_ASLICE, 0,
-					list($3),
-					ref($1, OP_ASLICE)));
+                                            newOP(OP_PUSHMARK, 0),
+                                            newLISTOP(OP_ASLICE, 0,
+                                                      list($3),
+                                                      $1));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,']');

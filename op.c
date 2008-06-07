@@ -3595,12 +3595,6 @@ S_is_list_assignment(pTHX_ register const OP *o)
 	type == OP_ASLICE || type == OP_HSLICE)
 	return TRUE;
 
-/*     if (type == OP_PADAV || type == OP_PADHV) */
-/* 	return TRUE; */
-
-    if (type == OP_ANONLIST || type == OP_ANONHASH)
-	return TRUE;
-
     if (type == OP_RV2SV)
 	return FALSE;
 
