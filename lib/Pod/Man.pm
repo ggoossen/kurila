@@ -561,9 +561,9 @@ sub mapfonts {
     my ($fixed, $bold, $italic) = (0, 0, 0);
     my %magic = (F => \$fixed, B => \$bold, I => \$italic);
     my $last = '\fR';
-    $text =~ s<
+    $text =~ s#
         \\f\((.)(.)
-    > <{
+    #{
         my $sequence = '';
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
@@ -576,7 +576,7 @@ sub mapfonts {
             $last = $f;
             $sequence;
         }
-    }>gx;
+    }#gx;
     return $text;
 }
 
@@ -589,12 +589,12 @@ sub textmapfonts {
     my ($self, $text) = @_;
     my ($fixed, $bold, $italic) = (0, 0, 0);
     my %magic = (F => \$fixed, B => \$bold, I => \$italic);
-    $text =~ s<
+    $text =~ s#
         \\f\((.)(.)
-    > <{
+    #{
         ${ %magic{$1} } += ($2 eq 'S') ? 1 : -1;
         %$self{FONTS}->{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
-    }>gx;
+    }#gx;
     return $text;
 }
 
