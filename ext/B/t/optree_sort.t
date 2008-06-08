@@ -2,8 +2,7 @@
 
 BEGIN {
     if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/B/t');
+	push @INC, '../ext/B/t';
     } else {
 	unshift @INC, 't';
 	push @INC, "../../t";

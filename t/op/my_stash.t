@@ -2,11 +2,6 @@
 
 package Foo;
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Test;
 
 plan tests => 7;

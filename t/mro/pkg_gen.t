@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-chdir 't' if -d 't';
 require q(./test.pl); plan(tests => 6);
 
 {

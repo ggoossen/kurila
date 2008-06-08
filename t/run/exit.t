@@ -3,11 +3,6 @@
 # Tests for perl exit codes, playing with $?, etc...
 
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
 # Run some code, return its wait status.
 sub run {
     my($code) = shift;
@@ -21,7 +16,7 @@ BEGIN {
     $numtests = ($^O eq 'VMS') ? 16 : ($^O eq 'MacOS') ? 0 : 17;
 }
 
-require "test.pl";
+require "./test.pl";
 plan(tests => $numtests);
 
 my $native_success = 0;

@@ -3,19 +3,6 @@
 # testsuite for Data::Dumper
 #
 
-BEGIN {
-    if (%ENV{PERL_CORE}){
-        chdir 't' if -d 't';
-        @INC = '../lib';
-        our %Config;
-        require Config; Config->import;
-        if (%Config{'extensions'} !~ m/\bData\/Dumper\b/) {
-            print "1..0 # Skip: Data::Dumper was not built\n";
-            exit 0;
-        }
-    }
-}
-
 use Test::More;
 
 # Since Perl 5.8.1 because otherwise hash ordering is really random.

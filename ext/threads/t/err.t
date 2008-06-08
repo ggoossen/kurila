@@ -2,11 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir 't';
-        unshift @INC, '../lib';
-    }
-
     require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 
     use Config;

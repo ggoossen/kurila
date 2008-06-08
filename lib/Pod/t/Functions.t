@@ -1,10 +1,5 @@
 #!perl
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-}
-
 use File::Basename;
 use File::Spec;
 

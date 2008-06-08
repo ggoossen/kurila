@@ -1,8 +1,6 @@
 #!/usr/bin/perl -w                                         # -*- perl -*-
 
 BEGIN {
-   chdir 't' if -d 't';
-   unshift @INC, '../lib';
    unshift @INC, '../lib/Pod/t';
    require "pod2html-lib.pl";
 }

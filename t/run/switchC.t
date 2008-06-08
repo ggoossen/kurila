@@ -3,8 +3,6 @@
 # Tests for the command-line switches
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     unless ('PerlIO::Layer'->find( 'perlio')) {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;

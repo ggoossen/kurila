@@ -5,8 +5,6 @@ BEGIN {
         print "1..0 # Skip on VMS -- too picky about line endings for record-oriented pipes\n";
         exit;
     }
-    chdir 't' if -d 't';
-    @INC = '../lib';
 }
 
 use strict;

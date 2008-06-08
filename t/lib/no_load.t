@@ -3,15 +3,10 @@
 # Check that certain modules don't get loaded when other modules are used.
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
 use strict;
 use warnings;
 
-require "test.pl";
+require "./test.pl";
 
 #
 # Format: [Module-that-should-not-be-loaded => modules to test]

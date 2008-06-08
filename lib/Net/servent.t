@@ -1,11 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
-BEGIN {
     our $hasse;
     try { my @n = getservbyname "echo", "tcp" };
     $hasse = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;

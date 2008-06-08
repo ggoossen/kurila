@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir "t" if -d "t";
-    @INC = qw(. ../lib);
-}
-
 # Test srand.
 
 use strict;

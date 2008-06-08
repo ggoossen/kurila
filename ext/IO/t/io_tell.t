@@ -4,8 +4,6 @@ our $tell_file;
 
 BEGIN {
     unless(grep m/blib/, @INC) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
 	$tell_file = "TEST";
     }
     else {

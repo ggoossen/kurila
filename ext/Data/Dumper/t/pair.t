@@ -3,20 +3,6 @@
 # test for $Data::Dumper::Pair AKA Data::Dumper->new([ ... ])->Pair('...')
 #
 
-BEGIN {
-    if (%ENV{PERL_CORE}){
-        chdir 't' if -d 't';
-        unshift @INC, '../lib';
-        our %Config;
-        require Config; Config->import;
-        no warnings 'once';
-        if (%Config{'extensions'} !~ m/\bData\/Dumper\b/) {
-            print "1..0 # Skip: Data::Dumper was not built\n";
-            exit 0;
-        }
-    }
-}
-
 use strict;
 use vars qw($want_colon $want_comma);
 use Test::More tests => 9;

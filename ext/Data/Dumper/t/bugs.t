@@ -2,20 +2,6 @@
 #
 # regression tests for old bugs that don't fit other categories
 
-BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir 't' if -d 't';
-	unshift @INC, '../lib';
-        our %Config;
-	require Config; Config->import;
-	no warnings 'once';
-	if (%Config{'extensions'} !~ m/\bData\/Dumper\b/) {
-	    print "1..0 # Skip: Data::Dumper was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use strict;
 use Test::More tests => 3;
 use Data::Dumper;

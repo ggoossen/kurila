@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    
-}
 print "1..1\n";
 
 # there is an equivelent test in t/op/pat.t which does NOT fail

@@ -2,12 +2,6 @@
 
 use strict;
 use warnings;
-BEGIN {
-    unless (-d 'blib') {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-}
 
 require './test.pl';
 

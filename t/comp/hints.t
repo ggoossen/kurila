@@ -3,8 +3,7 @@
 # Tests the scoping of $^H and %^H
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
+    push @INC, qw(.);
 }
 
 

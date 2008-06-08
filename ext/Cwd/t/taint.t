@@ -3,14 +3,7 @@
 
 use strict;
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
 use Cwd;
-chdir 't';
 
 use File::Spec;
 use lib File::Spec->catdir('t', 'lib');

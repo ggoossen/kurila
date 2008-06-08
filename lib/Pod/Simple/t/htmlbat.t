@@ -1,10 +1,4 @@
 # Testing HTMLBatch
-BEGIN {
-    if(%ENV{PERL_CORE}) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
 
 # Time-stamp: "2004-05-24 02:07:47 ADT"
 use strict;

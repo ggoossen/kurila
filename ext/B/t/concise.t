@@ -1,19 +1,12 @@
 #!./perl
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib');
-    } else {
-	unshift @INC, 't';
-	push @INC, "../../t";
-    }
     require Config;
     if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
         exit 0;
     }
-    require 'test.pl';		# we use runperl from 'test.pl', so can't use Test::More
+    require './test.pl';		# we use runperl from 'test.pl', so can't use Test::More
 }
 
 use strict;

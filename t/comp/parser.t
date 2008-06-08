@@ -3,11 +3,6 @@
 # Checks if the parser behaves correctly in edge cases
 # (including weird syntax errors)
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 BEGIN { require "./test.pl"; }
 plan( tests => 85 );
 

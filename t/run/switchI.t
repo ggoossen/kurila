@@ -1,8 +1,6 @@
 #!./perl -IFoo::Bar -IBla
 
 BEGIN {
-    chdir 't' if -d 't';
-    unshift @INC, '../lib';
     require './test.pl';	# for which_perl() etc
 }
 
