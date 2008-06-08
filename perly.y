@@ -831,35 +831,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,']');
 			}
-	|	subscripted '[' expr ']'    /* $foo->[$bar]->[$baz] */
-			{ $$ = newBINOP(OP_AELEM, 0,
-					ref(newAVREF($1),OP_RV2AV),
-					scalar($3));
-			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,']');
-			}
-	|	subscripted HSLICE expr ']' ';' '}'    /* $foo->{[bar();]} */
-			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_HSLICE, 0,
-					list($3),
-					ref(newHVREF($1), OP_HSLICE)));
-			    PL_parser->expect = XOPERATOR;
-			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,';');
-			  TOKEN_GETMAD($6,$$,'}');
-			}
-	|	subscripted ASLICE expr ']' ']'                     /* $foo->[[...]] */
-			{ $$ = prepend_elem(OP_ASLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_ASLICE, 0,
-					list($3),
-					ref(newAVREF($1), OP_ASLICE)));
-			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,']');
-			}
 	|	hsh HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
 			{ $$ = prepend_elem(OP_HSLICE,
 				newOP(OP_PUSHMARK, 0),
@@ -889,15 +860,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($5,$$,';');
 			  TOKEN_GETMAD($6,$$,'}');
 			}
-	|	subscripted '{' expr ';' '}' /* $foo->[bar]->{baz;} */
-			{ $$ = newBINOP(OP_HELEM, 0,
-					ref(newHVREF($1),OP_RV2HV),
-					jmaybe($3));
-			    PL_parser->expect = XOPERATOR;
-			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
-			  TOKEN_GETMAD($5,$$,'}');
-			}
 	|	term ARROW '(' ')'          /* $subref->() */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				   newCVREF(0, scalar($1)));
@@ -912,20 +874,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
-			}
-
-	|	subscripted '(' expr ')'   /* $foo->{bar}->(@args) */
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				   append_elem(OP_LIST, $3,
-					       newCVREF(0, scalar($1))));
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($4,$$,')');
-			}
-	|	subscripted '(' ')'        /* $foo->{bar}->() */
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				   newCVREF(0, scalar($1)));
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($3,$$,')');
 			}
 	|	'(' expr ')' ASLICE expr ']' ']'            /* list slice */
 			{ $$ = newSLICEOP(0, $5, $2);
