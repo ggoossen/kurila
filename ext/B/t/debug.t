@@ -1,17 +1,6 @@
 #!./perl
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	if ($^O eq 'MacOS') {
-	    @INC = qw(: ::lib ::macos:lib);
-	} else {
-	    @INC = '.';
-	    push @INC, '../lib';
-	}
-    } else {
-	unshift @INC, 't';
-    }
     require Config;
     if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";

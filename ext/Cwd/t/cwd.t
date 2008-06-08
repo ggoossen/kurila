@@ -1,13 +1,6 @@
 #!./perl -w
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
 use Cwd;
-chdir 't';
 
 use strict;
 use Config;

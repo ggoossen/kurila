@@ -3,7 +3,6 @@
 
 BEGIN {
   if(%ENV{PERL_CORE}) {
-    chdir 't' if -d 't';
     # The ../../../../../lib is for finding lib/utf8.pm
     # when running under all-utf8 settings (pod/find.t)
     # does not directly require lib/utf8.pm but regular

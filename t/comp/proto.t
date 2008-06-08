@@ -9,11 +9,6 @@
 # we should test as many as we can.
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use strict;
 
 print "1..141\n";

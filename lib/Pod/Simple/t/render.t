@@ -1,11 +1,3 @@
-BEGIN {
-    if(%ENV{PERL_CORE}) {
-        chdir 't';
-        @INC = '../lib';
-    } else {
-        push @INC, '../lib';
-    }
-}
 
 use strict;
 use utf8;

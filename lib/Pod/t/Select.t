@@ -2,11 +2,6 @@
 use warnings;
 use strict;
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-};
-
 use Test::More tests => 9;
 
 require_ok( 'Pod::Select' );

@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't';
-    @INC = '../lib';
-}
-
 my $module = shift;
 
 # 'require open' confuses Perl, so we use instead.

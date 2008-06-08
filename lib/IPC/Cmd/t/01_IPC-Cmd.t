@@ -1,9 +1,6 @@
 ## IPC::Cmd test suite ###
 
-BEGIN { chdir 't' if -d 't' };
-
 use strict;
-use lib qw[../lib];
 use File::Spec ();
 use Test::More 'no_plan';
 

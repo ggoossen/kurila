@@ -2,19 +2,6 @@
 
 use Config;
 
-BEGIN {
-    unless (-d 'blib') {
-	keys %Config; # Silence warning
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-    elsif(!grep {m/blib/} @INC) {
-      unshift(@INC, qw(./inc ./blib/arch ./blib/lib));
-    }
-}
-
 use Test::More tests => 4;
 
 use Scalar::Util qw(tainted);

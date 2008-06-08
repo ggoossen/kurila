@@ -1,9 +1,3 @@
-BEGIN {
-        if (%ENV{PERL_CORE}) {
-                chdir 't' if -d 't';
-                @INC = '../lib';
-        }
-}
 
 print "1..2\n";
 

@@ -1,6 +1,3 @@
-BEGIN { chdir 't' if -d 't' };
-BEGIN { use lib '../lib' };
-
 use strict;
 use File::Spec;
 

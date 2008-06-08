@@ -1,9 +1,3 @@
-BEGIN {
-    if(%ENV{PERL_CORE}) {
-        chdir 't';
-        @INC = '../lib';
-    }
-}
 
 #use Pod::Simple::Debug (10);
 use Test;

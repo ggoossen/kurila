@@ -7,11 +7,6 @@
 #	-- Robin Barker <rmb@cise.npl.co.uk>
 #
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use strict;
 
 $_ = '';	# to avoid undef warning on m// etc.

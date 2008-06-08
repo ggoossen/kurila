@@ -33,8 +33,6 @@
 # across an exec (though native Windows file handles are).
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     use Config;
     if (!%Config{'d_fcntl'}) {
         print("1..0 # Skip: fcntl() is not available\n");

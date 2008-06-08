@@ -2,8 +2,7 @@
 
 BEGIN {    ## no critic strict
     if ( %ENV{PERL_CORE} ) {
-        chdir('t') if -d 't';
-	@INC = qw(../lib . lib);
+	push @INC, qw(lib);
     }
     else {
         unshift @INC, 't';

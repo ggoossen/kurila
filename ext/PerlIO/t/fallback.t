@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
     require "../t/test.pl";
     skip_all("No perlio") unless (PerlIO::Layer->find( 'perlio'));

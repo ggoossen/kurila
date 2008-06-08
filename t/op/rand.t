@@ -15,11 +15,6 @@
 # The Art of Computer Programming, Donald E. Knuth, volume 2,
 # chapter 3. ISBN 0-201-03822-6 (v. 2)
 
-BEGIN {
-    chdir "t" if -d "t";
-    @INC = qw(. ../lib);
-}
-
 use strict;
 use Config;
 

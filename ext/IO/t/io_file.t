@@ -1,12 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    unless(grep m/blib/, @INC) {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-    }
-}
-
 use strict;
 use bytes;
 require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");

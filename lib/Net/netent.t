@@ -1,11 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
-BEGIN {
     our $hasne;
     try { my @n = getnetbyname "loopback" };
     $hasne = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;

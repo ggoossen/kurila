@@ -1,9 +1,7 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '.';
-    push @INC, '../lib';
+    push @INC, '.';
 }
 
 # don't make this lexical

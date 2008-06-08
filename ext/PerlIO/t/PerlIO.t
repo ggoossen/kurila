@@ -1,6 +1,4 @@
 BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
 	require Config; Config->import;
 	unless (PerlIO::Layer->find( 'perlio')) {
 	    print "1..0 # Skip: PerlIO not used\n";

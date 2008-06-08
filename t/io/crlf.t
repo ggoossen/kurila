@@ -1,13 +1,8 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(. ../lib);
-}
-
 use Config;
 
-require "test.pl";
+require "./test.pl";
 
 my $file = "crlf$$.dat";
 END {

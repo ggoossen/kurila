@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib lib);
-}
-
 BEGIN { require "./test.pl"; }
 
 # This test depends on t/lib/Devel/switchd.pm.

@@ -5,8 +5,6 @@ my $perl;
 BEGIN {
     unless(grep m/blib/, @INC) {
 	$perl = './perl';
-	chdir 't' if -d 't';
-	@INC = '../lib';
     }
     else {
 	$perl = $^X;

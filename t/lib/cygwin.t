@@ -1,8 +1,6 @@
 #!perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = ('../lib');
     unless ($^O eq "cygwin") {
 	print "1..0 # skipped: cygwin specific test\n";
 	exit 0;

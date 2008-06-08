@@ -1,12 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    # We're not going to chdir() into 't' because we don't know if
-    # chdir() works!  Instead, we'll hedge our bets and put both
-    # possibilities into @INC.
-    @INC = qw(t . lib ../lib);
-}
-
 use Config;
 require "./test.pl";
 plan(tests => 48);
