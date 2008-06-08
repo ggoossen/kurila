@@ -591,12 +591,12 @@ sub seq_i { return @_[1] }
 sub _handle_element_end {
     my ($self, $element) = @_;
     if ($element eq 'head1') {
-        %$self{USAGE_HEAD1} = %$self{PENDING}[-1][1];
+        %$self{USAGE_HEAD1} = %$self{PENDING}->[-1]->[1];
         if ($self->{USAGE_OPTIONS}->{-verbose} +< 2) {
-            %$self{PENDING}[-1][1] =~ s/^\s*SYNOPSIS\s*$/USAGE/;
+            %$self{PENDING}->[-1]->[1] =~ s/^\s*SYNOPSIS\s*$/USAGE/;
         }
     } elsif ($element eq 'head2') {
-        %$self{USAGE_HEAD2} = %$self{PENDING}[-1][1];
+        %$self{USAGE_HEAD2} = %$self{PENDING}->[-1]->[1];
     }
     if ($element eq 'head1' || $element eq 'head2') {
         %$self{USAGE_SKIPPING} = 1;
@@ -616,11 +616,11 @@ sub _handle_element_end {
         # Try to do some lowercasing instead of all-caps in headings, and use
         # a colon to end all headings.
         if($self->{USAGE_OPTIONS}->{-verbose} +< 2) {
-            local $_ = %$self{PENDING}[-1][1];
+            local $_ = %$self{PENDING}->[-1]->[1];
             s{([A-Z])([A-Z]+)}{{((length($2) +> 2) ? $1 : lc($1)) . lc($2)}}g;
             s/\s*$/:/  unless (m/:\s*$/);
             $_ .= "\n";
-            %$self{PENDING}[-1][1] = $_;
+            %$self{PENDING}->[-1]->[1] = $_;
         }
     }
     if (%$self{USAGE_SKIPPING}) {

@@ -731,9 +731,9 @@ sub resolve_pod_link_by_table {
 
   if(defined $section) {
     $to = '' unless defined $to and length $to;
-    return $self->{'podhtml_LOT'}{"$to#$section"}; # quite possibly undef!
+    return $self->{'podhtml_LOT'}->{"$to#$section"}; # quite possibly undef!
   } else {
-    return $self->{'podhtml_LOT'}{$to};            # quite possibly undef!
+    return $self->{'podhtml_LOT'}->{$to};            # quite possibly undef!
   }
   return;
 }

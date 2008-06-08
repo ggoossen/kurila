@@ -91,7 +91,7 @@ sub _dump  # sometimes useful for debugging
         for my $f (sort {$fields->{$a} <+> $fields->{$b}} keys %$fields) {
             my $no = $fields->{$f};
             print "   $no: $f";
-            my $fattr = %attr{$pkg}[$no];
+            my $fattr = %attr{$pkg}->[$no];
             if (defined $fattr) {
                 my @a;
                 push(@a, "public")    if $fattr ^&^ PUBLIC;

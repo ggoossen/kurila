@@ -78,7 +78,7 @@ sub ckParams
     # unzip always needs crc32
     $got->value('CRC32' => 1);
 
-    *$self->{UnzipData}{Name} = $got->value('Name');
+    *$self->{UnzipData}->{Name} = $got->value('Name');
 
     return 1;
 }
@@ -112,7 +112,7 @@ sub readHeader
     my $self = shift;
     my $magic = shift ;
 
-    my $name =  *$self->{UnzipData}{Name} ;
+    my $name =  *$self->{UnzipData}->{Name} ;
     my $hdr = $self->_readZipHeader($magic) ;
 
     while (defined $hdr)
@@ -124,7 +124,7 @@ sub readHeader
 
         # skip the data
         my $buffer;
-        if (*$self->{ZipData}{Streaming}) {
+        if (*$self->{ZipData}->{Streaming}) {
 
             while (1) {
 
@@ -137,8 +137,8 @@ sub readHeader
                 my $out;
                 $status = *$self->{Uncomp}->uncompr(\$b, \$temp_buf, 0, $out);
 
-                return $self->saveErrorString(undef, *$self->{Uncomp}{Error}, 
-                                                     *$self->{Uncomp}{ErrorNo})
+                return $self->saveErrorString(undef, *$self->{Uncomp}->{Error}, 
+                                                     *$self->{Uncomp}->{ErrorNo})
                     if $self->saveStatus($status) == STATUS_ERROR;                
 
                 if ($status == STATUS_ENDSTREAM) {
@@ -178,11 +178,11 @@ sub chkTrailer
 
     my ($sig, $CRC32, $cSize, $uSize) ;
     my ($cSizeHi, $uSizeHi) = (0, 0);
-    if (*$self->{ZipData}{Streaming}) {
+    if (*$self->{ZipData}->{Streaming}) {
         $sig   = unpack ("V", substr($trailer, 0, 4));
         $CRC32 = unpack ("V", substr($trailer, 4, 4));
 
-        if (*$self->{ZipData}{Zip64} ) {
+        if (*$self->{ZipData}->{Zip64} ) {
             $cSize = U64::newUnpack_V64 substr($trailer,  8, 8);
             $uSize = U64::newUnpack_V64 substr($trailer, 16, 8);
         }
@@ -196,14 +196,14 @@ sub chkTrailer
     }
     else {
         ($CRC32, $cSize, $uSize) = 
-            (*$self->{ZipData}{Crc32},
-             *$self->{ZipData}{CompressedLen},
-             *$self->{ZipData}{UnCompressedLen});
+            (*$self->{ZipData}->{Crc32},
+             *$self->{ZipData}->{CompressedLen},
+             *$self->{ZipData}->{UnCompressedLen});
     }
 
     if (*$self->{Strict}) {
         return $self->TrailerError("CRC mismatch")
-            if $CRC32  != *$self->{ZipData}{CRC32} ;
+            if $CRC32  != *$self->{ZipData}->{CRC32} ;
 
         return $self->TrailerError("CSIZE mismatch.")
             if ! $cSize->equal(*$self->{CompSize});
@@ -508,7 +508,7 @@ sub _readZipHeader($)
     return $self->HeaderError("Patch content not supported")
         if $gpFlag ^&^ ZIP_GP_FLAG_PATCHED_MASK;
 
-    *$self->{ZipData}{Streaming} = $streamingMode;
+    *$self->{ZipData}->{Streaming} = $streamingMode;
 
 
     if ($filename_length)
@@ -569,18 +569,18 @@ sub _readZipHeader($)
         }
     }
 
-    *$self->{ZipData}{Zip64} = $zip64;
+    *$self->{ZipData}->{Zip64} = $zip64;
 
     if (! $streamingMode) {
-        *$self->{ZipData}{Streaming} = 0;
-        *$self->{ZipData}{Crc32} = $crc32;
-        *$self->{ZipData}{CompressedLen} = $compressedLength;
-        *$self->{ZipData}{UnCompressedLen} = $uncompressedLength;
+        *$self->{ZipData}->{Streaming} = 0;
+        *$self->{ZipData}->{Crc32} = $crc32;
+        *$self->{ZipData}->{CompressedLen} = $compressedLength;
+        *$self->{ZipData}->{UnCompressedLen} = $uncompressedLength;
         *$self->{CompressedInputLengthRemaining} =
             *$self->{CompressedInputLength} = $compressedLength->get32bit();
     }
 
-    *$self->{ZipData}{Method} = $compressedMethod;
+    *$self->{ZipData}->{Method} = $compressedMethod;
     if ($compressedMethod == ZIP_CM_DEFLATE)
     {
         *$self->{Type} = 'zip-deflate';
@@ -595,7 +595,7 @@ sub _readZipHeader($)
                                                               );
 
         *$self->{Uncomp} = $obj;
-        *$self->{ZipData}{CRC32} = crc32(undef);
+        *$self->{ZipData}->{CRC32} = crc32(undef);
 
     }
     elsif ($compressedMethod == ZIP_CM_STORE)
@@ -663,11 +663,11 @@ sub filterUncompressed
 {
     my $self = shift ;
 
-    if (*$self->{ZipData}{Method} == 12) {
-        *$self->{ZipData}{CRC32} = crc32(${@_[0]}, *$self->{ZipData}{CRC32});
+    if (*$self->{ZipData}->{Method} == 12) {
+        *$self->{ZipData}->{CRC32} = crc32(${@_[0]}, *$self->{ZipData}->{CRC32});
     }
     else {
-        *$self->{ZipData}{CRC32} = *$self->{Uncomp}->crc32() ;
+        *$self->{ZipData}->{CRC32} = *$self->{Uncomp}->crc32() ;
     }
 }    
 

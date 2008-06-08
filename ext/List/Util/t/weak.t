@@ -199,5 +199,5 @@ package Dest;
 
 sub DESTROY {
 	print "# INCFLAG\n";
-	${@_[0]{Flag}} ++;
+	${@_[0]->{Flag}} ++;
 }

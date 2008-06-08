@@ -747,7 +747,7 @@ sub install { #XXX OS-SPECIFIC
                 if ( $sourcefile=~m/$pat/ ) {
                     print "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;
-                    $result->{install_filtered}{$sourcefile} = $pat;
+                    $result->{install_filtered}->{$sourcefile} = $pat;
                     return;
                 }
             }
@@ -805,14 +805,14 @@ sub install { #XXX OS-SPECIFIC
                 $mode = $mode ^|^ 0222
                   if $realtarget ne $targetfile;
                 _chmod( $mode, $targetfile, $verbose );
-                $result->{install}{$targetfile} = $sourcefile;
+                $result->{install}->{$targetfile} = $sourcefile;
                 1
             } or do {
-                $result->{install_fail}{$targetfile} = $sourcefile;
+                $result->{install_fail}->{$targetfile} = $sourcefile;
                 die $@;
             };
         } else {
-            $result->{install_unchanged}{$targetfile} = $sourcefile;
+            $result->{install_unchanged}->{$targetfile} = $sourcefile;
             print "Skipping $targetfile (unchanged)\n" if $verbose;
         }
 
@@ -1083,7 +1083,7 @@ sub inc_uninstall {
             next;
         }
         if ($dry_run) {
-            $results->{uninstall}{$targetfile} = $filepath;
+            $results->{uninstall}->{$targetfile} = $filepath;
             if ($verbose) {
                 $Inc_uninstall_warn_handler ||= ExtUtils::Install::Warn->new();
                 $libdir =~ s|^\./||s ; # That's just cosmetics, no need to port. It looks prettier.
@@ -1100,10 +1100,10 @@ sub inc_uninstall {
                     if $ExtUtils::Install::Testing and
                        File::Spec->canonpath($ExtUtils::Install::Testing) eq $targetfile;
                 forceunlink($targetfile,'tryhard');
-                $results->{uninstall}{$targetfile} = $filepath;
+                $results->{uninstall}->{$targetfile} = $filepath;
                 1;
             } or do {
-                $results->{fail_uninstall}{$targetfile} = $filepath;
+                $results->{fail_uninstall}->{$targetfile} = $filepath;
                 if ($seen_ours) { 
                     warn "Failed to remove probably harmless shadow file '$targetfile'\n";
                 } else {
@@ -1216,7 +1216,7 @@ sub DESTROY {
             $plural = @{$self->{$file}} +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
             for (0..@{$self->{$file}}-1) {
-                print "rm ", $self->{$file}[$_], "\n";
+                print "rm ", $self->{$file}->[$_], "\n";
                 $i++;
             }
         }

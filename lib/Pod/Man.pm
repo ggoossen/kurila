@@ -222,7 +222,7 @@ sub init_page {
 sub _handle_text {
     my ($self, $text) = @_;
     DEBUG +> 3 and print "== $text\n";
-    my $tag = %$self{PENDING}[-1];
+    my $tag = %$self{PENDING}->[-1];
     @$tag[2] .= $self->format_text (@$tag[1], $text);
 }
 
@@ -256,7 +256,7 @@ sub _handle_element_start {
         # and also depends on our parent tags.  Thankfully, inside tags that
         # turn off guesswork and reformatting, nothing else can turn it back
         # on, so this can be strictly inherited.
-        my $formatting = %$self{PENDING}[-1][1];
+        my $formatting = %$self{PENDING}->[-1]->[1];
         $formatting = $self->formatting ($formatting, $element);
         push (@{ %$self{PENDING} }, \@( $attrs, $formatting, '' ));
         DEBUG +> 4 and print "Pending: [", pretty (%$self{PENDING}), "]\n";
@@ -287,7 +287,7 @@ sub _handle_element_end {
         my $text = $self->?$method (@$tag[0], @$tag[2]);
         if (defined $text) {
             if (@{ %$self{PENDING} } +> 1) {
-                %$self{PENDING}[-1][2] .= $text;
+                %$self{PENDING}->[-1]->[2] .= $text;
             } else {
                 $self->output ($text);
             }
@@ -568,7 +568,7 @@ sub mapfonts {
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
         ${ %magic{$1} } += ($2 eq 'S') ? 1 : -1;
-        $f = %$self{FONTS}{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
+        $f = %$self{FONTS}->{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
         if ($f eq $last) {
             '';
         } else {
@@ -593,7 +593,7 @@ sub textmapfonts {
         \\f\((.)(.)
     > <{
         ${ %magic{$1} } += ($2 eq 'S') ? 1 : -1;
-        %$self{FONTS}{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
+        %$self{FONTS}->{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
     }>gx;
     return $text;
 }
@@ -635,10 +635,10 @@ sub switchquotes {
         # to Roman rather than the actual previous font when used in headings.
         # troff output may still be broken, but at least we can fix nroff by
         # just switching the font changes to the non-fixed versions.
-        $nroff =~ s/\Q%$self{FONTS}{100}\E(.*)\\f[PR]/$1/g;
-        $nroff =~ s/\Q%$self{FONTS}{101}\E(.*)\\f([PR])/\\fI$1\\f$2/g;
-        $nroff =~ s/\Q%$self{FONTS}{110}\E(.*)\\f([PR])/\\fB$1\\f$2/g;
-        $nroff =~ s/\Q%$self{FONTS}{111}\E(.*)\\f([PR])/\\f\(BI$1\\f$2/g;
+        $nroff =~ s/\Q%$self{FONTS}->{100}\E(.*)\\f[PR]/$1/g;
+        $nroff =~ s/\Q%$self{FONTS}->{101}\E(.*)\\f([PR])/\\fI$1\\f$2/g;
+        $nroff =~ s/\Q%$self{FONTS}->{110}\E(.*)\\f([PR])/\\fB$1\\f$2/g;
+        $nroff =~ s/\Q%$self{FONTS}->{111}\E(.*)\\f([PR])/\\f\(BI$1\\f$2/g;
 
         # Now finally output the command.  Bother with .ie only if the nroff
         # and troff output aren't the same.

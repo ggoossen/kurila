@@ -33,7 +33,7 @@ sub make_tables {
 
         $size = "sizeof($size)" unless $size =~ s/^=//;
 
-        %arrays{$shriek ? 'shrieking' : 'normal'}{ord $chrmap->{$letter}} =
+        %arrays{$shriek ? 'shrieking' : 'normal'}->{ord $chrmap->{$letter}} =
             make_text($chrmap, $letter,
                       $unpredictable, $nocsum, $size, $condition);
     }

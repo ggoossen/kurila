@@ -584,7 +584,7 @@ sub IO::Compress::Base::Parameters::parse
             $got->{$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
-        $got->{$key}[OFF_PARSED] = 0 ;
+        $got->{$key}->[OFF_PARSED] = 0 ;
     }
 
     my %parsed = ();
@@ -599,9 +599,9 @@ sub IO::Compress::Base::Parameters::parse
         my $canonkey = lc $key;
  
         if ($got->{$canonkey} && ($firstTime ||
-                                  ! $got->{$canonkey}[OFF_FIRST_ONLY]  ))
+                                  ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
         {
-            my $type = $got->{$canonkey}[OFF_TYPE] ;
+            my $type = $got->{$canonkey}->[OFF_TYPE] ;
             my $parsed = %parsed{$canonkey};
             ++ %parsed{$canonkey};
 
@@ -614,8 +614,8 @@ sub IO::Compress::Base::Parameters::parse
 
             $value = $$value ;
             if ($type ^&^ Parse_multiple) {
-                $got->{$canonkey}[OFF_PARSED] = 1;
-                push @{ $got->{$canonkey}[OFF_FIXED] }, $s ;
+                $got->{$canonkey}->[OFF_PARSED] = 1;
+                push @{ $got->{$canonkey}->[OFF_FIXED] }, $s ;
             }
             else {
                 $got->{$canonkey} = \@(1, $type, $value, $s) ;
@@ -729,7 +729,7 @@ sub IO::Compress::Base::Parameters::parsed
     my $self = shift ;
     my $name = shift ;
 
-    return $self->{Got}{lc $name}[OFF_PARSED] ;
+    return $self->{Got}->{lc $name}->[OFF_PARSED] ;
 }
 
 sub IO::Compress::Base::Parameters::value
@@ -739,12 +739,12 @@ sub IO::Compress::Base::Parameters::value
 
     if (@_)
     {
-        $self->{Got}{lc $name}[OFF_PARSED]  = 1;
-        $self->{Got}{lc $name}[OFF_DEFAULT] = @_[0] ;
-        $self->{Got}{lc $name}[OFF_FIXED]   = @_[0] ;
+        $self->{Got}->{lc $name}->[OFF_PARSED]  = 1;
+        $self->{Got}->{lc $name}->[OFF_DEFAULT] = @_[0] ;
+        $self->{Got}->{lc $name}->[OFF_FIXED]   = @_[0] ;
     }
 
-    return $self->{Got}{lc $name}[OFF_FIXED] ;
+    return $self->{Got}->{lc $name}->[OFF_FIXED] ;
 }
 
 sub IO::Compress::Base::Parameters::valueOrDefault
@@ -753,7 +753,7 @@ sub IO::Compress::Base::Parameters::valueOrDefault
     my $name = shift ;
     my $default = shift ;
 
-    my $value = $self->{Got}{lc $name}[OFF_DEFAULT] ;
+    my $value = $self->{Got}->{lc $name}->[OFF_DEFAULT] ;
 
     return $value if defined $value ;
     return $default ;
@@ -764,7 +764,7 @@ sub IO::Compress::Base::Parameters::wantValue
     my $self = shift ;
     my $name = shift ;
 
-    return defined $self->{Got}{lc $name}[OFF_DEFAULT] ;
+    return defined $self->{Got}->{lc $name}->[OFF_DEFAULT] ;
 
 }
 

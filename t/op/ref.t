@@ -460,9 +460,9 @@ TODO: {
 
 # test derefs after list slice
 
-is ( (\%(foo => "bar"))[[0]]{foo}, "bar", 'hash deref from list slice w/o ->' );
+is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/o ->' );
 is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
-is ( (\@(qw/foo bar/))[[0]][1], "bar", 'array deref from list slice w/o ->' );
+is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/o ->' );
 is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
 is ( (sub {"bar"})[[0]](), "bar", 'code deref from list slice w/o ->' );
 is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
@@ -470,7 +470,7 @@ is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 # deref on empty list shouldn't autovivify
 {
     local $@->{description};
-    try { ()[[0]]{foo} };
+    try { ()[[0]]->{foo} };
     like ( "$@->{description}", "Can't use an undefined value as a HASH reference",
            "deref of undef from list slice fails" );
 }
@@ -516,6 +516,6 @@ our ($ref3, $ref1);
 }
 
 DESTROY {
-    print @_[0][0];
+    print @_[0]->[0];
 }
 

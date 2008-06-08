@@ -165,7 +165,7 @@ foreach my $value (\&foo, \$scalar, \@array, \%hash) {
 	foreach my $attr (@code, @other) {
 	    my $attribute = $negate . $attr;
 	    eval "use attributes __PACKAGE__, \$value, '$attribute'";
-	    if (%valid{$type}{$attr}) {
+	    if (%valid{$type}->{$attr}) {
 		if ($attribute eq '-shared') {
 		    like $@->message, qr/^A variable may not be unshared/;
 		} else {

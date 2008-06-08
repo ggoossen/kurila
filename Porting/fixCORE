@@ -34,7 +34,7 @@ while ($work)
     local $^I = '.sav';
     while ( ~< *ARGV)
      {
-      while (@ar && $. == @ar[0][0])
+      while (@ar && $. == @ar[0]->[0])
        {
         my ($line,$var) = @{shift(@ar)};
         if (s/(?<!CORE::)\b$var\b(?=\s*\()/CORE::$var/)

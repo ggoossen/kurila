@@ -102,11 +102,11 @@ sub SWASHNEW_real {
 		$val =~ s/[ _-]//g;
 
 		my $pa = %PropertyAlias{$enum} ? $enum : %PA_reverse{$enum};
-		my $f = %PropValueAlias{$pa}{$val} ? $val : %PVA_reverse{$pa}{lc $val};
+		my $f = %PropValueAlias{$pa}->{$val} ? $val : %PVA_reverse{$pa}->{lc $val};
 
 		if ($pa and $f) {
 		    $pa = "gc_sc" if $pa eq "gc" or $pa eq "sc";
-		    $file = "unicore/lib/$pa/%PVA_abbr_map{$pa}{lc $f}.pl";
+		    $file = "unicore/lib/$pa/%PVA_abbr_map{$pa}->{lc $f}.pl";
 		    last GETFILE;
 		}
 	    }
@@ -114,8 +114,8 @@ sub SWASHNEW_real {
 		my $t = lc $type;
 		$t =~ s/[ _-]//g;
 
-		if (%PropValueAlias{gc}{$t} or %PropValueAlias{sc}{$t}) {
-		    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}{$t}.pl";
+		if (%PropValueAlias{gc}->{$t} or %PropValueAlias{sc}->{$t}) {
+		    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}->{$t}.pl";
 		    last GETFILE;
 		}
 	    }

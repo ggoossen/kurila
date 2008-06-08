@@ -298,7 +298,7 @@ sub null {
 sub todo {
     my $self = shift;
     my($cv, $is_form) = @_;
-    return unless ($cv->FILE eq $0 || exists $self->{files}{$cv->FILE});
+    return unless ($cv->FILE eq $0 || exists $self->{files}->{$cv->FILE});
     my $seq;
     if ($cv->OUTSIDE_SEQ) {
 	$seq = $cv->OUTSIDE_SEQ;
@@ -309,7 +309,7 @@ sub todo {
     }
     push @{$self->{'subs_todo'}}, \@($seq, $cv, $is_form);
     unless ($is_form || class($cv->STASH) eq 'SPECIAL') {
-	$self->{'subs_deparsed'}{$cv->STASH->NAME."::".$cv->GV->NAME} = 1;
+	$self->{'subs_deparsed'}->{$cv->STASH->NAME."::".$cv->GV->NAME} = 1;
     }
 }
 
@@ -320,7 +320,7 @@ sub next_todo {
     my $gv = $cv->GV;
     my $name = $self->gv_name($gv);
     {
-	$self->{'subs_declared'}{$name} = 1;
+	$self->{'subs_declared'}->{$name} = 1;
 	if ($name eq "BEGIN") {
 	    my $use_dec = $self->begin_is_use($cv);
 	    if (defined ($use_dec) and $self->{'expand'} +< 5) {
@@ -464,7 +464,7 @@ sub stash_subs {
 	my $class = class($val);
         if ($class eq "GV") {
 	    if (class(my $cv = $val->CV) ne "SPECIAL") {
-		next if $self->{'subs_done'}{$$val}++;
+		next if $self->{'subs_done'}->{$$val}++;
 		next if $$val != ${$cv->GV};   # Ignore imposters
 		$self->todo($cv, 0);
 	    }
@@ -538,7 +538,7 @@ sub new {
 	    $self->{'use_dumper'} = 1;
 	    require Data::Dumper;
 	} elsif ($arg =~ m/^-f(.*)/) {
-	    $self->{'files'}{$1} = 1;
+	    $self->{'files'}->{$1} = 1;
 	} elsif ($arg eq "-l") {
 	    $self->{'linenums'} = 1;
 	} elsif ($arg eq "-p") {
@@ -686,10 +686,10 @@ sub ambient_pragmas {
 	    || $name eq 'utf8') {
 	    require "$name.pm";
 	    if ($val) {
-		$hint_bits ^|^= ${%::{"{$name}::"}{"hint_bits"}};
+		$hint_bits ^|^= ${%::{"{$name}::"}->{"hint_bits"}};
 	    }
 	    else {
-		$hint_bits ^&^= ^~^${%::{"{$name}::"}{"hint_bits"}};
+		$hint_bits ^&^= ^~^${%::{"{$name}::"}->{"hint_bits"}};
 	    }
 	}
 
@@ -960,7 +960,7 @@ sub maybe_local {
     my($op, $cx, $text) = @_;
     my $our_intro = ($op->name =~ m/^(gv|rv2)[ash]v$/) ? OPpOUR_INTRO : 0;
     if ($op->private ^&^ (OPpLVAL_INTRO^|^$our_intro)
-	and not $self->{'avoid_local'}{$$op}) {
+	and not $self->{'avoid_local'}->{$$op}) {
 	my $our_local = ($op->private ^&^ OPpLVAL_INTRO) ? "local" : "our";
 	if( $our_local eq 'our' ) {
 	    # XXX This assertion fails code with non-ASCII identifiers,
@@ -999,7 +999,7 @@ sub padname_sv {
 sub maybe_my {
     my $self = shift;
     my($op, $cx, $text) = @_;
-    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{'avoid_local'}{$$op}) {
+    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{'avoid_local'}->{$$op}) {
 	my $my = $op->private ^&^ OPpPAD_STATE ? "state" : "my";
 	if (want_scalar($op)) {
 	    return "$my $text";
@@ -1192,8 +1192,8 @@ sub lex_in_scope {
 
     return 0 if !defined($self->{'curcop'});
     my $seq = $self->{'curcop'}->cop_seq;
-    return 0 if !exists $self->{'curcvlex'}{$name};
-    for my $a (@{$self->{'curcvlex'}{$name}}) {
+    return 0 if !exists $self->{'curcvlex'}->{$name};
+    for my $a (@{$self->{'curcvlex'}->{$name}}) {
 	my ($st, $en) = @$a;
 	return 1 if $seq +> $st && $seq +<= $en;
     }
@@ -1222,7 +1222,7 @@ sub populate_curcvlex {
 		    ? (0, 999999)
 		    : (@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
-	    push @{$self->{'curcvlex'}{$name}}, \@($seq_st, $seq_en);
+	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
 	}
     }
 }
@@ -1282,7 +1282,7 @@ sub seq_subs {
 
     return "" if !defined $seq;
     while (scalar(@{$self->{'subs_todo'}})
-	   and $seq +> $self->{'subs_todo'}[0][0]) {
+	   and $seq +> $self->{'subs_todo'}->[0]->[0]) {
 	push @text, $self->next_todo;
     }
     return @text;
@@ -2450,9 +2450,9 @@ sub pp_list {
 	    } else {
 		$lop = $kid;
 	    }
-	    $self->{'avoid_local'}{$$lop}++;
+	    $self->{'avoid_local'}->{$$lop}++;
 	    $expr = $self->deparse($kid, 6);
-	    delete $self->{'avoid_local'}{$$lop};
+	    delete $self->{'avoid_local'}->{$$lop};
 	} else {
 	    $expr = $self->deparse($kid, 6);
 	}
@@ -3202,11 +3202,11 @@ sub pp_entersub {
     {
 	no strict 'refs';
 	no warnings 'uninitialized';
-	$declared = exists $self->{'subs_declared'}{$kid}
+	$declared = exists $self->{'subs_declared'}->{$kid}
 	    || (
 		 defined &{ %{Symbol::stash($self->{'curstash'})}{$kid} }
 		 && !exists
-		     $self->{'subs_deparsed'}{$self->{'curstash'}."::".$kid}
+		     $self->{'subs_deparsed'}->{$self->{'curstash'}."::".$kid}
 		 && defined prototype $self->{'curstash'}."::".$kid
 	       );
 	if (!$declared && defined($proto)) {

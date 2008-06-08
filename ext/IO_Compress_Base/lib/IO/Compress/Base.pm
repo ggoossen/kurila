@@ -609,8 +609,8 @@ sub syswrite
     my $outBuffer='';
     my $status = *$self->{Compress}->compr($buffer, $outBuffer) ;
 
-    return $self->saveErrorString(undef, *$self->{Compress}{Error}, 
-                                         *$self->{Compress}{ErrorNo})
+    return $self->saveErrorString(undef, *$self->{Compress}->{Error}, 
+                                         *$self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     *$self->{CompSize}->add(length $outBuffer) ;
@@ -659,8 +659,8 @@ sub flush
 
     my $outBuffer='';
     my $status = *$self->{Compress}->flush($outBuffer, @_) ;
-    return $self->saveErrorString(0, *$self->{Compress}{Error}, 
-                                    *$self->{Compress}{ErrorNo})
+    return $self->saveErrorString(0, *$self->{Compress}->{Error}, 
+                                    *$self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     if ( defined *$self->{FH} ) {
@@ -698,8 +698,8 @@ sub newStream
         or return 0;
     
     my $status = $self->reset() ;
-    return $self->saveErrorString(0, *$self->{Compress}{Error}, 
-                                  *$self->{Compress}{ErrorNo})
+    return $self->saveErrorString(0, *$self->{Compress}->{Error}, 
+                                  *$self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     *$self->{UnCompSize}->reset();
@@ -721,7 +721,7 @@ sub _writeTrailer
     my $trailer = '';
 
     my $status = *$self->{Compress}->close($trailer) ;
-    return $self->saveErrorString(0, *$self->{Compress}{Error}, *$self->{Compress}{ErrorNo})
+    return $self->saveErrorString(0, *$self->{Compress}->{Error}, *$self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     *$self->{CompSize}->add(length $trailer) ;

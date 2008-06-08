@@ -149,7 +149,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
 for my $p ('gc', 'sc') {
   while (my ($abbr) = each %{ %utf8::PropValueAlias{$p} }) {
     my $filename = 'File::Spec'->catfile(
-      $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}{$abbr}.pl"
+      $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{$abbr}.pl"
     );
 
     next unless -e $filename;
@@ -158,7 +158,7 @@ for my $p ('gc', 'sc') {
     my $str = char_range($h1, $h2);
 
     for my $x ($p, %( gc => 'General Category', sc => 'Script' ){$p}) {
-      for my $y ($abbr, %utf8::PropValueAlias{$p}{$abbr}, %utf8::PVA_abbr_map{gc_sc}{$abbr}) {
+      for my $y ($abbr, %utf8::PropValueAlias{$p}->{$abbr}, %utf8::PVA_abbr_map{gc_sc}->{$abbr}) {
         is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
         is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
         SKIP: {

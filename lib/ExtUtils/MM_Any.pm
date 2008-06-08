@@ -733,7 +733,7 @@ MAKE_FRAG
 
     my $prereq_pm = '';
     foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{PREREQ_PM}} ) {
-        my $ver = $self->{PREREQ_PM}{$mod};
+        my $ver = $self->{PREREQ_PM}->{$mod};
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
 
@@ -1075,11 +1075,11 @@ INSTALLDIRS) and *PREFIX.
 sub init_INSTALL {
     my($self) = shift;
 
-    if( $self->{ARGS}{INSTALL_BASE} and $self->{ARGS}{PREFIX} ) {
+    if( $self->{ARGS}->{INSTALL_BASE} and $self->{ARGS}->{PREFIX} ) {
         die "Only one of PREFIX or INSTALL_BASE can be given.  Not both.\n";
     }
 
-    if( $self->{ARGS}{INSTALL_BASE} ) {
+    if( $self->{ARGS}->{INSTALL_BASE} ) {
         $self->init_INSTALL_from_INSTALL_BASE;
     }
     else {

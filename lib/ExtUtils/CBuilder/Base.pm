@@ -13,11 +13,11 @@ sub new {
   my $class = shift;
   my $self = bless \%(@_), $class;
 
-  $self->{properties}{perl} = $class->find_perl_interpreter
+  $self->{properties}->{perl} = $class->find_perl_interpreter
     or warn "Warning: Can't locate your perl binary";
 
   while (my ($k,$v) = each %Config) {
-    $self->{config}{$k} = $v unless exists $self->{config}{$k};
+    $self->{config}->{$k} = $v unless exists $self->{config}->{$k};
   }
   return $self;
 }
@@ -33,7 +33,7 @@ sub find_perl_interpreter {
 sub add_to_cleanup {
   my $self = shift;
   foreach (@_) {
-    $self->{files_to_clean}{$_} = 1;
+    $self->{files_to_clean}->{$_} = 1;
   }
 }
 
@@ -49,7 +49,7 @@ sub object_file {
 
   # File name, minus the suffix
   (my $file_base = $filename) =~ s/\.[^.]+$//;
-  return "$file_base$self->{config}{obj_ext}";
+  return "$file_base$self->{config}->{obj_ext}";
 }
 
 sub arg_include_dirs {
@@ -66,7 +66,7 @@ sub arg_object_file {
 
 sub arg_share_object_file {
   my ($self, $file) = @_;
-  return ($self->split_like_shell($self->{config}{lddlflags}), '-o', $file);
+  return ($self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
 }
 
 sub arg_exec_file {
@@ -141,7 +141,7 @@ sub lib_file {
   my ($self, $dl_file) = @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
-  return "$dl_file.$self->{config}{dlext}";
+  return "$dl_file.$self->{config}->{dlext}";
 }
 
 
@@ -149,7 +149,7 @@ sub exe_file {
   my ($self, $dl_file) = @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
-  return "$dl_file$self->{config}{_exe}";
+  return "$dl_file$self->{config}->{_exe}";
 }
 
 sub need_prelink { 0 }
@@ -266,7 +266,7 @@ sub perl_src {
 sub perl_inc {
   my $self = shift;
 
-  $self->perl_src() || File::Spec->catdir($self->{config}{archlibexp},"CORE");
+  $self->perl_src() || File::Spec->catdir($self->{config}->{archlibexp},"CORE");
 }
 
 sub DESTROY {

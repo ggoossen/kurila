@@ -1385,10 +1385,10 @@ sub init_MAN3PODS {
 
     foreach my $name (keys %{$self->{PM}}) {
 	if ($name =~ m/\.pod\z/ ) {
-	    %manifypods{$name} = $self->{PM}{$name};
+	    %manifypods{$name} = $self->{PM}->{$name};
 	} elsif ($name =~ m/\.p[ml]\z/ ) {
 	    if( $self->_has_pod($name) ) {
-		%manifypods{$name} = $self->{PM}{$name};
+		%manifypods{$name} = $self->{PM}->{$name};
 	    }
 	}
     }
@@ -1478,7 +1478,7 @@ sub init_PM {
 	@{$self->{PMLIBPARENTDIRS}} = ('lib');
     }
 
-    return if $self->{PM} and $self->{ARGS}{PM};
+    return if $self->{PM} and $self->{ARGS}->{PM};
 
     if (@{$self->{PMLIBDIRS}}){
 	print "Searching PMLIBDIRS: @{$self->{PMLIBDIRS}}\n"
@@ -1509,7 +1509,7 @@ sub init_PM {
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
 	    return unless $inst;
-	    $self->{PM}{$path} = $inst;
+	    $self->{PM}->{$path} = $inst;
 	}, @{$self->{PMLIBDIRS}});
     }
 }
@@ -1743,7 +1743,7 @@ sub init_others {	# --- Initialize Other Attributes
     # May check $Config{libs} too, thus not empty.
     $self->{LIBS} = \@($self->{LIBS}) unless ref $self->{LIBS};
 
-    $self->{LIBS} = \@('') unless @{$self->{LIBS}} && defined $self->{LIBS}[0];
+    $self->{LIBS} = \@('') unless @{$self->{LIBS}} && defined $self->{LIBS}->[0];
     $self->{LD_RUN_PATH} = "";
 
     foreach my $libs ( @{$self->{LIBS}} ){
@@ -1774,7 +1774,7 @@ sub init_others {	# --- Initialize Other Attributes
     # 'static', since we either must use it (%Config says we can't
     # use dynamic loading) or the caller asked for it explicitly.
     if (!$self->{LINKTYPE}) {
-       $self->{LINKTYPE} = $self->{SKIPHASH}{'dynamic'}
+       $self->{LINKTYPE} = $self->{SKIPHASH}->{'dynamic'}
                         ? 'static'
                         : (%Config{usedl} ? 'dynamic' : 'static');
     };
@@ -2970,7 +2970,7 @@ PPD_HTML
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
-        my ($dep_ver) = join ",", (split (m/\./, $self->{PREREQ_PM}{$prereq}), 
+        my ($dep_ver) = join ",", (split (m/\./, $self->{PREREQ_PM}->{$prereq}), 
                                   (0) x 4) [[0 .. 3]];
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
         <DEPENDENCY NAME="%s" VERSION="%s" />
@@ -3055,7 +3055,7 @@ sub prefixify {
     print STDERR "  prefixify $var => $path\n" if $Verbose +>= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
-    if( $self->{ARGS}{PREFIX} && $self->file_name_is_absolute($path) && 
+    if( $self->{ARGS}->{PREFIX} && $self->file_name_is_absolute($path) && 
         $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
     {
 
@@ -3101,7 +3101,7 @@ sub processPL {
 	    # else we have a dependency loop.
 	    my $pm_dep;
 	    my $perlrun;
-	    if( defined $self->{PM}{$target} ) {
+	    if( defined $self->{PM}->{$target} ) {
 		$pm_dep  = '';
 		$perlrun = 'PERLRUN';
 	    }
@@ -3624,7 +3624,7 @@ sub top_targets {
     my($self) = shift;
     my(@m);
 
-    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}{'all'};
+    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}->{'all'};
 
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext

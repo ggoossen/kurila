@@ -104,9 +104,9 @@ sub first_release_raw {
     my ($discard, $module, $version) = @_;
 
     my @perls = $version
-        ? grep { exists %version{$_}{ $module } &&
-                        %version{$_}{ $module } +>= $version } keys %version
-        : grep { exists %version{$_}{ $module }             } keys %version;
+        ? grep { exists %version{$_}->{ $module } &&
+                        %version{$_}->{ $module } +>= $version } keys %version
+        : grep { exists %version{$_}->{ $module }             } keys %version;
 
     return @perls;
 }

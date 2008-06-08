@@ -459,13 +459,13 @@ sub _complain {
           if defined($expected) and 2 +< ($expected =~ m/(\n)/g);
     }
 
-    if(defined %Program_Lines{ %$detail{file} }[ %$detail{line} ]) {
+    if(defined %Program_Lines{ %$detail{file} }->[ %$detail{line} ]) {
         print $TESTERR
-          "#  %$detail{file} line %$detail{line} is: %Program_Lines{ %$detail{file} }[ %$detail{line} ]\n"
-         if %Program_Lines{ %$detail{file} }[ %$detail{line} ]
+          "#  %$detail{file} line %$detail{line} is: %Program_Lines{ %$detail{file} }->[ %$detail{line} ]\n"
+         if %Program_Lines{ %$detail{file} }->[ %$detail{line} ]
           =~ m/[^\s\#\(\)\{\}\[\]\;]/;  # Otherwise it's uninformative
 
-        undef %Program_Lines{ %$detail{file} }[ %$detail{line} ];
+        undef %Program_Lines{ %$detail{file} }->[ %$detail{line} ];
          # So we won't repeat it.
     }
 
@@ -543,7 +543,7 @@ sub _diff_complain_algdiff {
 
         my $count_lines = @diff_lines;
         my $s = $count_lines == 1 ? "" : "s";
-        my $first_line = @diff_lines[0][0] + 1;
+        my $first_line = @diff_lines[0]->[0] + 1;
 
         print $TESTERR "# $prefix ";
         if ($diff_kind eq "GOT") {
@@ -553,7 +553,7 @@ sub _diff_complain_algdiff {
             }
         } elsif ($diff_kind eq "EXP") {
             if ($count_lines +> 1) {
-                my $last_line = @diff_lines[-1][0] + 1;
+                my $last_line = @diff_lines[-1]->[0] + 1;
                 print $TESTERR "Lines $first_line-$last_line are";
             }
             else {
@@ -565,7 +565,7 @@ sub _diff_complain_algdiff {
             }
         } elsif ($diff_kind eq "CH") {
             if ($count_lines +> 1) {
-                my $last_line = @diff_lines[-1][0] + 1;
+                my $last_line = @diff_lines[-1]->[0] + 1;
                 print $TESTERR "Lines $first_line-$last_line are";
             }
             else {

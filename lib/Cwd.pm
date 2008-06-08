@@ -326,7 +326,7 @@ sub _backtick_pwd {
 # Since some ports may predefine cwd internally (e.g., NT)
 # we take care not to override an existing definition for cwd().
 
-unless (%METHOD_MAP{$^O}{cwd} or defined &cwd) {
+unless (%METHOD_MAP{$^O}->{cwd} or defined &cwd) {
     # The pwd command is not available in some chroot(2)'ed environments
     my $sep = %Config::Config{path_sep} || ':';
     my $os = $^O;  # Protect $^O from tainting

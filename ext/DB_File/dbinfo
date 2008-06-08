@@ -106,10 +106,10 @@ $magic = sprintf "\%06X", $magic ;
 
 my $ver_string = "Unknown" ;
 
-if ( defined $type->{Versions}{$version} )
+if ( defined $type->{Versions}->{$version} )
 {
-     $ver_string = $type->{Versions}{$version}[1];
-     if ($type->{Versions}{$version}[0] )
+     $ver_string = $type->{Versions}->{$version}->[1];
+     if ($type->{Versions}->{$version}->[0] )
        { $encrypt = @info[6] ? "Enabled" : "Disabled" }
      else
        { $encrypt = "Not Supported" }

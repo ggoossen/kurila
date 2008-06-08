@@ -52,7 +52,7 @@ sub dlsyms {
     my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || \%();
     my(@m);
 
-    if (not $self->{SKIPHASH}{'dynamic'}) {
+    if (not $self->{SKIPHASH}->{'dynamic'}) {
 	push(@m,"
 $self->{BASEEXT}.def: Makefile.PL
 ",

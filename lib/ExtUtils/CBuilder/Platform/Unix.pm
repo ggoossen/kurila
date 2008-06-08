@@ -10,8 +10,8 @@ $VERSION = '0.22';
 sub link_executable {
   my $self = shift;
   # $Config{cc} is usually a better bet for linking executables than $Config{ld}
-  local $self->{config}{ld} =
-    $self->{config}{cc} . " " . $self->{config}{ldflags};
+  local $self->{config}->{ld} =
+    $self->{config}->{cc} . " " . $self->{config}->{ldflags};
   return $self->SUPER::link_executable(@_);
 }
 
@@ -26,7 +26,7 @@ sub link {
   
   local $cf->{ld} = $cf->{ld};
   if (ref $cf->{ld}) {
-    unshift @{$cf->{ld}}, 'env' if $cf->{ld}[0] =~ m/^\s*\w+=/;
+    unshift @{$cf->{ld}}, 'env' if $cf->{ld}->[0] =~ m/^\s*\w+=/;
   } else {
     $cf->{ld} =~ s/^(\s*\w+=)/env $1/;
   }

@@ -131,7 +131,7 @@ sub Seen {
 	elsif ($k !~ m/^\$/) {
 	  $k = "\$" . $k;
 	}
-	$s->{seen}{$id} = \@($k, $v);
+	$s->{seen}->{$id} = \@($k, $v);
       }
       else {
 	warn "Only refs supported, ignoring non-ref item \$$k";
@@ -199,7 +199,7 @@ sub Dumpperl {
   for $val (@{$s->{todump}}) {
     my $out = "";
     @post = ();
-    $name = $s->{names}[$i++];
+    $name = $s->{names}->[$i++];
     if (defined $name) {
       if ($name =~ m/^[*](.*)$/) {
 	if (defined $val) {
@@ -283,16 +283,16 @@ sub _dump {
     # on it so we know when we hit it later
     if (defined($name) and length($name)) {
       # keep a tab on it so that we dont fall into recursive pit
-      if (exists $s->{seen}{$id}) {
+      if (exists $s->{seen}->{$id}) {
 #	if ($s->{expdepth} < $s->{level}) {
 	  if ($s->{purity} and $s->{level} +> 0) {
 	    $out = ($realtype eq 'HASH')  ? '\%()' :
 	      ($realtype eq 'ARRAY') ? '\@()' :
 		'do{my $o}' ;
-	    push @post, $name . " = " . $s->{seen}{$id}[0];
+	    push @post, $name . " = " . $s->{seen}->{$id}->[0];
 	  }
 	  else {
-	    $out = $s->{seen}{$id}[0];
+	    $out = $s->{seen}->{$id}->[0];
 	    if ($name =~ m/^([\@\%])/) {
 	      my $start = $1;
 	      if ($out =~ m/^\\$start/) {
@@ -308,7 +308,7 @@ sub _dump {
       }
       else {
         # store our name
-        $s->{seen}{$id} = \@( (($name =~ m/^[@%]/)     ? ('\' . $name ) :
+        $s->{seen}->{$id} = \@( (($name =~ m/^[@%]/)     ? ('\' . $name ) :
 			     ($realtype eq 'CODE' and
 			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
 			     $name          ),
@@ -468,16 +468,16 @@ sub _dump {
     # first, catalog the scalar
     if ($name ne '') {
       $id = format_refaddr($ref);
-      if (exists $s->{seen}{$id}) {
-        if ($s->{seen}{$id}[2]) {
-	  $out = $s->{seen}{$id}[0];
+      if (exists $s->{seen}->{$id}) {
+        if ($s->{seen}->{$id}->[2]) {
+	  $out = $s->{seen}->{$id}->[0];
 	  #warn "[<$out]\n";
 	  return "\$\{$out\}";
 	}
       }
       else {
 	#warn "[>\\$name]\n";
-	$s->{seen}{$id} = \@("\\$name", $ref);
+	$s->{seen}->{$id} = \@("\\$name", $ref);
       }
     }
     if (ref($ref) eq 'GLOB') {  # glob
@@ -527,10 +527,10 @@ sub _dump {
     # if we made it this far, $id was added to seen list at current
     # level, so remove it to get deep copies
     if ($s->{deepcopy}) {
-      delete($s->{seen}{$id});
+      delete($s->{seen}->{$id});
     }
     elsif ($name) {
-      $s->{seen}{$id}[2] = 1;
+      $s->{seen}->{$id}->[2] = 1;
     }
   }
   return $out;

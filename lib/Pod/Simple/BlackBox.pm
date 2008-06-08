@@ -189,7 +189,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       #  of order relative to pods, but in order relative to code.
       
     } elsif($line =~ m/^\s*$/s) {  # it's a blank line
-      if(!$self->{'start_of_pod_block'} and @$paras and $paras->[-1][0] eq '~Verbatim') {
+      if(!$self->{'start_of_pod_block'} and @$paras and $paras->[-1]->[0] eq '~Verbatim') {
         DEBUG +> 1 and print "Saving blank line at line %{$self}{'line_count'}\n";
         push @{$paras->[-1]}, $line;
       }  # otherwise it's not interesting
@@ -214,11 +214,11 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
          # by now it's safe to consider the previous paragraph as done.
                 
         push @$paras, $new; # the new incipient paragraph
-        DEBUG +> 1 and print "Starting new @{$paras}[-1][0] para at line %{$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Starting new @{$paras}[-1]->[0] para at line %{$self}{'line_count'}\n";
         
       } elsif($line =~ m/^\s/s) {
 
-        if(!$self->{'start_of_pod_block'} and @$paras and $paras->[-1][0] eq '~Verbatim') {
+        if(!$self->{'start_of_pod_block'} and @$paras and $paras->[-1]->[0] eq '~Verbatim') {
           DEBUG +> 1 and print "Resuming verbatim para at line %{$self}{'line_count'}\n";
           push @{$paras->[-1]}, $line;
         } else {
@@ -349,11 +349,11 @@ sub _handle_encoding_second_level {
     # It's already been handled.  Check for errors.
     if(! $self->{'encoding_command_statuses'} ) {
       DEBUG +> 2 and print " CRAZY ERROR: It wasn't really handled?!\n";
-    } elsif( $self->{'encoding_command_statuses'}[-1] ) {
-      $self->whine( $para->[1]{'start_line'},
+    } elsif( $self->{'encoding_command_statuses'}->[-1] ) {
+      $self->whine( $para->[1]->{'start_line'},
         sprintf "Couldn't do \%s: \%s",
-          $self->{'encoding_command_reqs'  }[-1],
-          $self->{'encoding_command_statuses'}[-1],
+          $self->{'encoding_command_reqs'  }->[-1],
+          $self->{'encoding_command_statuses'}->[-1],
       );
     } else {
       DEBUG +> 2 and print " (Yup, it was successfully handled already.)\n";
@@ -361,7 +361,7 @@ sub _handle_encoding_second_level {
     
   } else {
     # Otherwise it's a syntax error
-    $self->whine( $para->[1]{'start_line'},
+    $self->whine( $para->[1]->{'start_line'},
       "Invalid =encoding syntax: $content"
     );
   }
@@ -391,7 +391,7 @@ sub _gen_errata {
         $_
         #]
         ),
-        @{$self->{'errata'}{$line}}
+        @{$self->{'errata'}->{$line}}
       )
     ;
   }
@@ -481,7 +481,7 @@ sub _ponder_paragraph_buffer {
     $self->_handle_element_start(
       ($scratch = 'Document'),
       \%(
-        'start_line' => $paras->[0][1]{'start_line'},
+        'start_line' => $paras->[0]->[1]->{'start_line'},
         $starting_contentless ? ( 'contentless' => 1 ) : (),
       ),
     );
@@ -490,8 +490,8 @@ sub _ponder_paragraph_buffer {
   my($para, $para_type);
   while(@$paras) {
     last if @$paras == 1 and
-      ( $paras->[0][0] eq '=over' or $paras->[0][0] eq '~Verbatim'
-        or $paras->[0][0] eq '=item' )
+      ( $paras->[0]->[0] eq '=over' or $paras->[0]->[0] eq '~Verbatim'
+        or $paras->[0]->[0] eq '=item' )
     ;
     # Those're the three kinds of paragraphs that require lookahead.
     #   Actually, an "=item Foo" inside an <over type=text> region
@@ -524,7 +524,7 @@ sub _ponder_paragraph_buffer {
 
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    if(grep $_->[1]{'~ignore'}, @$curr_open) {
+    if(grep $_->[1]->{'~ignore'}, @$curr_open) {
       DEBUG +> 1 and
        print "Skipping $para_type paragraph because in ignore mode.\n";
       next;
@@ -557,11 +557,11 @@ sub _ponder_paragraph_buffer {
       if($para_type =~ m/^=head\d$/s
          and ! $self->{'accept_heads_anywhere'}
          and @$curr_open
-         and $curr_open->[-1][0] eq '=over'
+         and $curr_open->[-1]->[0] eq '=over'
       ) {
         DEBUG +> 2 and print "'=$para_type' inside an '=over'!\n";
         $self->whine(
-          $para->[1]{'start_line'},
+          $para->[1]->{'start_line'},
           "You forgot a '=back' before '$para_type'"
         );
         unshift @$paras, \@('=back', \%(), ''), $para;   # close the =over
@@ -574,31 +574,31 @@ sub _ponder_paragraph_buffer {
         my $over;
         unless(@$curr_open and ($over = $curr_open->[-1])->[0] eq '=over') {
           $self->whine(
-            $para->[1]{'start_line'},
+            $para->[1]->{'start_line'},
             "'=item' outside of any '=over'"
           );
           unshift @$paras,
-            \@('=over', \%('start_line' => $para->[1]{'start_line'}), ''),
+            \@('=over', \%('start_line' => $para->[1]->{'start_line'}), ''),
             $para
           ;
           next;
         }
         
         
-        my $over_type = $over->[1]{'~type'};
+        my $over_type = $over->[1]->{'~type'};
         
         if(!$over_type) {
           # Shouldn't happen1
           die "Typeless over in stack, starting at line "
-           . $over->[1]{'start_line'};
+           . $over->[1]->{'start_line'};
 
         } elsif($over_type eq 'block') {
-          unless($curr_open->[-1][1]{'~bitched_about'}) {
-            $curr_open->[-1][1]{'~bitched_about'} = 1;
+          unless($curr_open->[-1]->[1]->{'~bitched_about'}) {
+            $curr_open->[-1]->[1]->{'~bitched_about'} = 1;
             $self->whine(
-              $curr_open->[-1][1]{'start_line'},
+              $curr_open->[-1]->[1]->{'start_line'},
               "You can't have =items (as at line "
-              . $para->[1]{'start_line'}
+              . $para->[1]->{'start_line'}
               . ") unless the first thing after the =over is an =item"
             );
           }
@@ -618,8 +618,8 @@ sub _ponder_paragraph_buffer {
             die "Unknown item type $item_type"
              unless $item_type eq 'number' or $item_type eq 'bullet';
             # Undo our clobbering:
-            push @$para, $para->[1]{'~orig_content'};
-            delete $para->[1]{'number'};
+            push @$para, $para->[1]->{'~orig_content'};
+            delete $para->[1]->{'number'};
              # Only a PROPER item-number element is allowed
              #  to have a number attribute.
           } else {
@@ -633,23 +633,23 @@ sub _ponder_paragraph_buffer {
             # That kills the content of the item if it's a number or bullet.
           DEBUG and print " Item is of type ", $para->[0], " under $over_type\n";
           
-          my $expected_value = ++ $curr_open->[-1][1]{'~counter'};
+          my $expected_value = ++ $curr_open->[-1]->[1]->{'~counter'};
           
           if($item_type eq 'bullet') {
             # Hm, it's not numeric.  Correct for this.
-            $para->[1]{'number'} = $expected_value;
+            $para->[1]->{'number'} = $expected_value;
             $self->whine(
-              $para->[1]{'start_line'},
+              $para->[1]->{'start_line'},
               "Expected '=item $expected_value'"
             );
-            push @$para, $para->[1]{'~orig_content'};
+            push @$para, $para->[1]->{'~orig_content'};
               # restore the bullet, blocking the assimilation of next para
 
           } elsif($item_type eq 'text') {
             # Hm, it's not numeric.  Correct for this.
-            $para->[1]{'number'} = $expected_value;
+            $para->[1]->{'number'} = $expected_value;
             $self->whine(
-              $para->[1]{'start_line'},
+              $para->[1]->{'start_line'},
               "Expected '=item $expected_value'"
             );
             # Text content will still be there and will block next ~Para
@@ -657,27 +657,27 @@ sub _ponder_paragraph_buffer {
           } elsif($item_type ne 'number') {
             die "Unknown item type $item_type"; # should never happen
 
-          } elsif($expected_value == $para->[1]{'number'}) {
+          } elsif($expected_value == $para->[1]->{'number'}) {
             DEBUG +> 1 and print " Numeric item has the expected value of $expected_value\n";
             
           } else {
-            DEBUG +> 1 and print " Numeric item has ", $para->[1]{'number'},
+            DEBUG +> 1 and print " Numeric item has ", $para->[1]->{'number'},
              " instead of the expected value of $expected_value\n";
             $self->whine(
-              $para->[1]{'start_line'},
-              "You have '=item " . $para->[1]{'number'} .
+              $para->[1]->{'start_line'},
+              "You have '=item " . $para->[1]->{'number'} .
               "' instead of the expected '=item $expected_value'"
             );
-            $para->[1]{'number'} = $expected_value;  # correcting!!
+            $para->[1]->{'number'} = $expected_value;  # correcting!!
           }
             
           if(@$para == 2) {
             # For the cases where we /didn't/ push to @$para
-            if($paras->[0][0] eq '~Para') {
+            if($paras->[0]->[0] eq '~Para') {
               DEBUG and print "Assimilating following ~Para content into $over_type item\n";
               push @$para, splice @{shift @$paras},2;
             } else {
-              DEBUG and print "Can't assimilate following ", $paras->[0][0], "\n";
+              DEBUG and print "Can't assimilate following ", $paras->[0]->[0], "\n";
               push @$para, '';  # Just so it's not contentless
             }
           }
@@ -691,24 +691,24 @@ sub _ponder_paragraph_buffer {
           if($item_type eq 'bullet') {
             # as expected!
 
-            if( $para->[1]{'~_freaky_para_hack'} ) {
+            if( $para->[1]->{'~_freaky_para_hack'} ) {
               DEBUG and print "Accomodating '=item * Foo' tolerance hack.\n";
-              push @$para, delete $para->[1]{'~_freaky_para_hack'};
+              push @$para, delete $para->[1]->{'~_freaky_para_hack'};
             }
 
           } elsif($item_type eq 'number') {
             $self->whine(
-              $para->[1]{'start_line'},
+              $para->[1]->{'start_line'},
               "Expected '=item *'"
             );
-            push @$para, $para->[1]{'~orig_content'};
+            push @$para, $para->[1]->{'~orig_content'};
              # and block assimilation of the next paragraph
-            delete $para->[1]{'number'};
+            delete $para->[1]->{'number'};
              # Only a PROPER item-number element is allowed
              #  to have a number attribute.
           } elsif($item_type eq 'text') {
             $self->whine(
-              $para->[1]{'start_line'},
+              $para->[1]->{'start_line'},
               "Expected '=item *'"
             );
              # But doesn't need processing.  But it'll block assimilation
@@ -719,11 +719,11 @@ sub _ponder_paragraph_buffer {
 
           if(@$para == 2) {
             # For the cases where we /didn't/ push to @$para
-            if($paras->[0][0] eq '~Para') {
+            if($paras->[0]->[0] eq '~Para') {
               DEBUG and print "Assimilating following ~Para content into $over_type item\n";
               push @$para, splice @{shift @$paras},2;
             } else {
-              DEBUG and print "Can't assimilate following ", $paras->[0][0], "\n";
+              DEBUG and print "Can't assimilate following ", $paras->[0]->[0], "\n";
               push @$para, '';  # Just so it's not contentless
             }
           }
@@ -757,7 +757,7 @@ sub _ponder_paragraph_buffer {
         $para->[0] = 'Data';
         $para_type = '?Data';
       } elsif( $para_type =~ s/^=//s
-        and defined( $para_type = $self->{'accept_directives'}{$para_type} )
+        and defined( $para_type = $self->{'accept_directives'}->{$para_type} )
       ) {
         DEBUG +> 1 and print " Pondering known directive @{$para}[0] as $para_type\n";
       } else {
@@ -766,7 +766,7 @@ sub _ponder_paragraph_buffer {
          $para->[0], join(' ', sort keys %{$self->{'accept_directives'}} )
         ;
         $self->whine(
-          $para->[1]{'start_line'},
+          $para->[1]->{'start_line'},
           "Unknown directive: $para->[0]"
         );
 
@@ -780,25 +780,25 @@ sub _ponder_paragraph_buffer {
         } else {
           my @fors = grep $_->[0] eq '=for', @$curr_open;
           DEBUG +> 1 and print "Containing fors: ",
-            join(',', map $_->[1]{'target'}, @fors), "\n";
+            join(',', map $_->[1]->{'target'}, @fors), "\n";
           
           if(! @fors) {
             DEBUG and print "Treating $para_type paragraph as such because stack has no =for's\n";
             
           #} elsif(grep $_->[1]{'~resolve'}, @fors) {
           #} elsif(not grep !$_->[1]{'~resolve'}, @fors) {
-          } elsif( @fors[-1][1]{'~resolve'} ) {
+          } elsif( @fors[-1]->[1]->{'~resolve'} ) {
             # Look to the immediately containing for
           
             if($para_type eq 'Data') {
-              DEBUG and print "Treating Data paragraph as Plain/Verbatim because the containing =for (@fors[-1][1]{'target'}) is a resolver\n";
+              DEBUG and print "Treating Data paragraph as Plain/Verbatim because the containing =for (@fors[-1]->[1]->{'target'}) is a resolver\n";
               $para->[0] = 'Para';
               $para_type = 'Plain';
             } else {
-              DEBUG and print "Treating $para_type paragraph as such because the containing =for (@fors[-1][1]{'target'}) is a resolver\n";
+              DEBUG and print "Treating $para_type paragraph as such because the containing =for (@fors[-1]->[1]->{'target'}) is a resolver\n";
             }
           } else {
-            DEBUG and print "Treating $para_type paragraph as Data because the containing =for (@fors[-1][1]{'target'}) is a non-resolver\n";
+            DEBUG and print "Treating $para_type paragraph as Data because the containing =for (@fors[-1]->[1]->{'target'}) is a non-resolver\n";
             $para->[0] = $para_type = 'Data';
           }
         }
@@ -841,7 +841,7 @@ sub _ponder_for {
   # Fake it out as a begin/end
   my $target;
 
-  if(grep $_->[1]{'~ignore'}, @$curr_open) {
+  if(grep $_->[1]->{'~ignore'}, @$curr_open) {
     DEBUG +> 1 and print "Ignoring ignorable =for\n";
     return 1;
   }
@@ -854,7 +854,7 @@ sub _ponder_for {
   }
   unless(defined $target) {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=for without a target?"
     );
     return 1;
@@ -866,12 +866,12 @@ sub _ponder_for {
   
   unshift @$paras,
     \@('=begin',
-      \%('start_line' => $para->[1]{'start_line'}, '~really' => '=for'),
+      \%('start_line' => $para->[1]->{'start_line'}, '~really' => '=for'),
       $target,
     ),
     $para,
     \@('=end',
-      \%('start_line' => $para->[1]{'start_line'}, '~really' => '=for'),
+      \%('start_line' => $para->[1]->{'start_line'}, '~really' => '=for'),
       $target,
     ),
   ;
@@ -886,7 +886,7 @@ sub _ponder_begin {
   $content =~ s/\s+$//s;
   unless(length($content)) {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=begin without a target?"
     );
     DEBUG and print "Ignoring targetless =begin\n";
@@ -895,7 +895,7 @@ sub _ponder_begin {
   
   unless($content =~ m/^\S+$/s) {  # i.e., unless it's one word
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "'=begin' only takes one parameter, not several as in '=begin $content'"
     );
     DEBUG and print "Ignoring unintelligible =begin $content\n";
@@ -903,7 +903,7 @@ sub _ponder_begin {
   }
 
 
-  $para->[1]{'target'} = $content;  # without any ':'
+  $para->[1]->{'target'} = $content;  # without any ':'
 
   $content =~ s/^:!/!:/s;
   my $neg;  # whether this is a negation-match
@@ -919,33 +919,33 @@ sub _ponder_begin {
   ) {
     DEBUG +> 2 and
      print " Considering whether =begin $content matches $target_name\n";
-    next unless $self->{'accept_targets'}{$target_name};
+    next unless $self->{'accept_targets'}->{$target_name};
     
     DEBUG +> 2 and
      print "  It DOES match the acceptable target $target_name!\n";
     $to_resolve = 1
-      if $self->{'accept_targets'}{$target_name} eq 'force_resolve';
+      if $self->{'accept_targets'}->{$target_name} eq 'force_resolve';
     $dont_ignore = 1;
-    $para->[1]{'target_matching'} = $target_name;
+    $para->[1]->{'target_matching'} = $target_name;
     last; # stop looking at other target names
   }
 
   if($neg) {
     if( $dont_ignore ) {
       $dont_ignore = '';
-      delete $para->[1]{'target_matching'};
+      delete $para->[1]->{'target_matching'};
       DEBUG +> 2 and print " But the leading ! means that this is a NON-match!\n";
     } else {
       $dont_ignore = 1;
-      $para->[1]{'target_matching'} = '!';
+      $para->[1]->{'target_matching'} = '!';
       DEBUG +> 2 and print " But the leading ! means that this IS a match!\n";
     }
   }
 
   $para->[0] = '=for';  # Just what we happen to call these, internally
-  $para->[1]{'~really'} ||= '=begin';
-  $para->[1]{'~ignore'}   = (! $dont_ignore) || 0;
-  $para->[1]{'~resolve'}  = $to_resolve || 0;
+  $para->[1]->{'~really'} ||= '=begin';
+  $para->[1]->{'~ignore'}   = (! $dont_ignore) || 0;
+  $para->[1]->{'~resolve'}  = $to_resolve || 0;
 
   DEBUG +> 1 and print " Making note to ", $dont_ignore ? 'not ' : '',
     "ignore contents of this region\n";
@@ -954,7 +954,7 @@ sub _ponder_begin {
   DEBUG +> 1 and print " (Stack now: ", $self->_dump_curr_open(), ")\n";
 
   push @$curr_open, $para;
-  if(!$dont_ignore or scalar grep $_->[1]{'~ignore'}, @$curr_open) {
+  if(!$dont_ignore or scalar grep $_->[1]->{'~ignore'}, @$curr_open) {
     DEBUG +> 1 and print "Ignoring ignorable =begin\n";
   } else {
     $self->{'content_seen'} ||= 1;
@@ -973,10 +973,10 @@ sub _ponder_end {
   
   unless(length($content)) {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "'=end' without a target?" . (
-        ( @$curr_open and $curr_open->[-1][0] eq '=for' )
-        ? ( " (Should be \"=end " . $curr_open->[-1][1]{'target'} . '")' )
+        ( @$curr_open and $curr_open->[-1]->[0] eq '=for' )
+        ? ( " (Should be \"=end " . $curr_open->[-1]->[1]->{'target'} . '")' )
         : ''
       )
     );
@@ -986,7 +986,7 @@ sub _ponder_end {
   
   unless($content =~ m/^\S+$/) {  # i.e., unless it's one word
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "'=end $content' is invalid.  (Stack: "
       . $self->_dump_curr_open() . ')'
     );
@@ -994,9 +994,9 @@ sub _ponder_end {
     return 1;
   }
   
-  unless(@$curr_open and $curr_open->[-1][0] eq '=for') {
+  unless(@$curr_open and $curr_open->[-1]->[0] eq '=for') {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=end $content without matching =begin.  (Stack: "
       . $self->_dump_curr_open() . ')'
     );
@@ -1004,31 +1004,31 @@ sub _ponder_end {
     return 1;
   }
   
-  unless($content eq $curr_open->[-1][1]{'target'}) {
+  unless($content eq $curr_open->[-1]->[1]->{'target'}) {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=end $content doesn't match =begin " 
-      . $curr_open->[-1][1]{'target'}
+      . $curr_open->[-1]->[1]->{'target'}
       . ".  (Stack: "
       . $self->_dump_curr_open() . ')'
     );
-    DEBUG and print "Ignoring mistargetted =end $content at line $para->[1]{'start_line'}\n";
+    DEBUG and print "Ignoring mistargetted =end $content at line $para->[1]->{'start_line'}\n";
     return 1;
   }
 
   # Else it's okay to close...
-  if(grep $_->[1]{'~ignore'}, @$curr_open) {
+  if(grep $_->[1]->{'~ignore'}, @$curr_open) {
     DEBUG +> 1 and print "Not firing any event for this =end $content because in an ignored region\n";
     # And that may be because of this to-be-closed =for region, or some
     #  other one, but it doesn't matter.
   } else {
-    $curr_open->[-1][1]{'start_line'} = $para->[1]{'start_line'};
+    $curr_open->[-1]->[1]->{'start_line'} = $para->[1]->{'start_line'};
       # what's that for?
     
     $self->{'content_seen'} ||= 1;
     $self->_handle_element_end( my $scratch = 'for' );
   }
-  DEBUG +> 1 and print "Popping $curr_open->[-1][0] $curr_open->[-1][1]{'target'} because of =end $content\n";
+  DEBUG +> 1 and print "Popping $curr_open->[-1]->[0] $curr_open->[-1]->[1]->{'target'} because of =end $content\n";
   pop @$curr_open;
 
   return 1;
@@ -1075,7 +1075,7 @@ sub _ponder_doc_end {
 sub _ponder_pod {
   my ($self,$para,$curr_open,$paras) = @_;
   $self->whine(
-    $para->[1]{'start_line'},
+    $para->[1]->{'start_line'},
     "=pod directives shouldn't be over one line long!  Ignoring all "
      . (@$para - 2) . " lines of content"
   ) if @$para +> 3;
@@ -1088,47 +1088,47 @@ sub _ponder_over {
   return 1 unless @$paras;
   my $list_type;
 
-  if($paras->[0][0] eq '=item') { # most common case
+  if($paras->[0]->[0] eq '=item') { # most common case
     $list_type = $self->_get_initial_item_type($paras->[0]);
 
-  } elsif($paras->[0][0] eq '=back') {
+  } elsif($paras->[0]->[0] eq '=back') {
     # Ignore empty lists.  TODO: make this an option?
     shift @$paras;
     return 1;
     
-  } elsif($paras->[0][0] eq '~end') {
+  } elsif($paras->[0]->[0] eq '~end') {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=over is the last thing in the document?!"
     );
     return 1; # But feh, ignore it.
   } else {
     $list_type = 'block';
   }
-  $para->[1]{'~type'} = $list_type;
+  $para->[1]->{'~type'} = $list_type;
   push @$curr_open, $para;
    # yes, we reuse the paragraph as a stack item
   
   my $content = join ' ', splice @$para, 2;
   my $overness;
   if($content =~ m/^\s*$/s) {
-    $para->[1]{'indent'} = 4;
+    $para->[1]->{'indent'} = 4;
   } elsif($content =~ m/^\s*((?:\d*\.)?\d+)\s*$/s) {
     no integer;
-    $para->[1]{'indent'} = $1;
+    $para->[1]->{'indent'} = $1;
     if($1 == 0) {
       $self->whine(
-        $para->[1]{'start_line'},
+        $para->[1]->{'start_line'},
         "Can't have a 0 in =over $content"
       );
-      $para->[1]{'indent'} = 4;
+      $para->[1]->{'indent'} = 4;
     }
   } else {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=over should be: '=over' or '=over positive_number'"
     );
-    $para->[1]{'indent'} = 4;
+    $para->[1]->{'indent'} = 4;
   }
   DEBUG +> 1 and print "=over found of type $list_type\n";
   
@@ -1145,24 +1145,24 @@ sub _ponder_back {
   my $content = join ' ', splice @$para, 2;
   if($content =~ m/\S/) {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "=back doesn't take any parameters, but you said =back $content"
     );
   }
 
-  if(@$curr_open and $curr_open->[-1][0] eq '=over') {
+  if(@$curr_open and $curr_open->[-1]->[0] eq '=over') {
     DEBUG +> 1 and print "=back happily closes matching =over\n";
     # Expected case: we're closing the most recently opened thing
     #my $over = pop @$curr_open;
     $self->{'content_seen'} ||= 1;
     $self->_handle_element_end( my $scratch =
-      'over-' . ( (pop @$curr_open)->[1]{'~type'} )
+      'over-' . ( (pop @$curr_open)->[1]->{'~type'} )
     );
   } else {
     DEBUG +> 1 and print "=back found without a matching =over.  Stack: (",
         join(', ', map $_->[0], @$curr_open), ").\n";
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       '=back without =over'
     );
     return 1; # and ignore it
@@ -1174,31 +1174,31 @@ sub _ponder_item {
   my $over;
   unless(@$curr_open and ($over = $curr_open->[-1])->[0] eq '=over') {
     $self->whine(
-      $para->[1]{'start_line'},
+      $para->[1]->{'start_line'},
       "'=item' outside of any '=over'"
     );
     unshift @$paras,
-      \@('=over', \%('start_line' => $para->[1]{'start_line'}), ''),
+      \@('=over', \%('start_line' => $para->[1]->{'start_line'}), ''),
       $para
     ;
     return 1;
   }
   
   
-  my $over_type = $over->[1]{'~type'};
+  my $over_type = $over->[1]->{'~type'};
   
   if(!$over_type) {
     # Shouldn't happen1
     die "Typeless over in stack, starting at line "
-     . $over->[1]{'start_line'};
+     . $over->[1]->{'start_line'};
 
   } elsif($over_type eq 'block') {
-    unless($curr_open->[-1][1]{'~bitched_about'}) {
-      $curr_open->[-1][1]{'~bitched_about'} = 1;
+    unless($curr_open->[-1]->[1]->{'~bitched_about'}) {
+      $curr_open->[-1]->[1]->{'~bitched_about'} = 1;
       $self->whine(
-        $curr_open->[-1][1]{'start_line'},
+        $curr_open->[-1]->[1]->{'start_line'},
         "You can't have =items (as at line "
-        . $para->[1]{'start_line'}
+        . $para->[1]->{'start_line'}
         . ") unless the first thing after the =over is an =item"
       );
     }
@@ -1218,8 +1218,8 @@ sub _ponder_item {
       die "Unknown item type $item_type"
        unless $item_type eq 'number' or $item_type eq 'bullet';
       # Undo our clobbering:
-      push @$para, $para->[1]{'~orig_content'};
-      delete $para->[1]{'number'};
+      push @$para, $para->[1]->{'~orig_content'};
+      delete $para->[1]->{'number'};
        # Only a PROPER item-number element is allowed
        #  to have a number attribute.
     } else {
@@ -1233,23 +1233,23 @@ sub _ponder_item {
       # That kills the content of the item if it's a number or bullet.
     DEBUG and print " Item is of type ", $para->[0], " under $over_type\n";
     
-    my $expected_value = ++ $curr_open->[-1][1]{'~counter'};
+    my $expected_value = ++ $curr_open->[-1]->[1]->{'~counter'};
     
     if($item_type eq 'bullet') {
       # Hm, it's not numeric.  Correct for this.
-      $para->[1]{'number'} = $expected_value;
+      $para->[1]->{'number'} = $expected_value;
       $self->whine(
-        $para->[1]{'start_line'},
+        $para->[1]->{'start_line'},
         "Expected '=item $expected_value'"
       );
-      push @$para, $para->[1]{'~orig_content'};
+      push @$para, $para->[1]->{'~orig_content'};
         # restore the bullet, blocking the assimilation of next para
 
     } elsif($item_type eq 'text') {
       # Hm, it's not numeric.  Correct for this.
-      $para->[1]{'number'} = $expected_value;
+      $para->[1]->{'number'} = $expected_value;
       $self->whine(
-        $para->[1]{'start_line'},
+        $para->[1]->{'start_line'},
         "Expected '=item $expected_value'"
       );
       # Text content will still be there and will block next ~Para
@@ -1257,27 +1257,27 @@ sub _ponder_item {
     } elsif($item_type ne 'number') {
       die "Unknown item type $item_type"; # should never happen
 
-    } elsif($expected_value == $para->[1]{'number'}) {
+    } elsif($expected_value == $para->[1]->{'number'}) {
       DEBUG +> 1 and print " Numeric item has the expected value of $expected_value\n";
       
     } else {
-      DEBUG +> 1 and print " Numeric item has ", $para->[1]{'number'},
+      DEBUG +> 1 and print " Numeric item has ", $para->[1]->{'number'},
        " instead of the expected value of $expected_value\n";
       $self->whine(
-        $para->[1]{'start_line'},
-        "You have '=item " . $para->[1]{'number'} .
+        $para->[1]->{'start_line'},
+        "You have '=item " . $para->[1]->{'number'} .
         "' instead of the expected '=item $expected_value'"
       );
-      $para->[1]{'number'} = $expected_value;  # correcting!!
+      $para->[1]->{'number'} = $expected_value;  # correcting!!
     }
       
     if(@$para == 2) {
       # For the cases where we /didn't/ push to @$para
-      if($paras->[0][0] eq '~Para') {
+      if($paras->[0]->[0] eq '~Para') {
         DEBUG and print "Assimilating following ~Para content into $over_type item\n";
         push @$para, splice @{shift @$paras},2;
       } else {
-        DEBUG and print "Can't assimilate following ", $paras->[0][0], "\n";
+        DEBUG and print "Can't assimilate following ", $paras->[0]->[0], "\n";
         push @$para, '';  # Just so it's not contentless
       }
     }
@@ -1291,24 +1291,24 @@ sub _ponder_item {
     if($item_type eq 'bullet') {
       # as expected!
 
-      if( $para->[1]{'~_freaky_para_hack'} ) {
+      if( $para->[1]->{'~_freaky_para_hack'} ) {
         DEBUG and print "Accomodating '=item * Foo' tolerance hack.\n";
-        push @$para, delete $para->[1]{'~_freaky_para_hack'};
+        push @$para, delete $para->[1]->{'~_freaky_para_hack'};
       }
 
     } elsif($item_type eq 'number') {
       $self->whine(
-        $para->[1]{'start_line'},
+        $para->[1]->{'start_line'},
         "Expected '=item *'"
       );
-      push @$para, $para->[1]{'~orig_content'};
+      push @$para, $para->[1]->{'~orig_content'};
        # and block assimilation of the next paragraph
-      delete $para->[1]{'number'};
+      delete $para->[1]->{'number'};
        # Only a PROPER item-number element is allowed
        #  to have a number attribute.
     } elsif($item_type eq 'text') {
       $self->whine(
-        $para->[1]{'start_line'},
+        $para->[1]->{'start_line'},
         "Expected '=item *'"
       );
        # But doesn't need processing.  But it'll block assimilation
@@ -1319,11 +1319,11 @@ sub _ponder_item {
 
     if(@$para == 2) {
       # For the cases where we /didn't/ push to @$para
-      if($paras->[0][0] eq '~Para') {
+      if($paras->[0]->[0] eq '~Para') {
         DEBUG and print "Assimilating following ~Para content into $over_type item\n";
         push @$para, splice @{shift @$paras},2;
       } else {
-        DEBUG and print "Can't assimilate following ", $paras->[0][0], "\n";
+        DEBUG and print "Can't assimilate following ", $paras->[0]->[0], "\n";
         push @$para, '';  # Just so it's not contentless
       }
     }
@@ -1341,12 +1341,12 @@ sub _ponder_Plain {
   my ($self,$para) = @_;
   DEBUG and print " giving plain treatment...\n";
   unless( @$para == 2 or ( @$para == 3 and $para->[2] eq '' )
-    or $para->[1]{'~cooked'}
+    or $para->[1]->{'~cooked'}
   ) {
     push @$para,
     @{$self->_make_treelet(
       join("\n", splice(@$para, 2)),
-      $para->[1]{'start_line'}
+      $para->[1]->{'start_line'}
     )};
   }
   # Empty paragraphs don't need a treelet for any reason I can see.
@@ -1358,7 +1358,7 @@ sub _ponder_Verbatim {
   my ($self,$para) = @_;
   DEBUG and print " giving verbatim treatment...\n";
 
-  $para->[1]{'xml:space'} = 'preserve';
+  $para->[1]->{'xml:space'} = 'preserve';
   for(my $i = 2; $i +< @$para; $i++) {
     foreach my $line ($para->[$i]) { # just for aliasing
       while( $line =~
@@ -1375,7 +1375,7 @@ sub _ponder_Verbatim {
   
   # Now the VerbatimFormatted hoodoo...
   if( $self->{'accept_codes'} and
-      $self->{'accept_codes'}{'VerbatimFormatted'}
+      $self->{'accept_codes'}->{'VerbatimFormatted'}
   ) {
     while(@$para +> 3 and $para->[-1] !~ m/\S/) { pop @$para }
      # Kill any number of terminal newlines
@@ -1384,7 +1384,7 @@ sub _ponder_Verbatim {
     push @$para,
     @{$self->_make_treelet(
       join("\n", splice(@$para, 2)),
-      $para->[1]{'start_line'}, $para->[1]{'xml:space'}
+      $para->[1]->{'start_line'}, $para->[1]->{'xml:space'}
     )};
     $para->[-1] =~ s/\n+$//s; # Kill any number of terminal newlines
   } else {
@@ -1397,7 +1397,7 @@ sub _ponder_Verbatim {
 sub _ponder_Data {
   my ($self,$para) = @_;
   DEBUG and print " giving data treatment...\n";
-  $para->[1]{'xml:space'} = 'preserve';
+  $para->[1]->{'xml:space'} = 'preserve';
   push @$para, join "\n", splice(@$para, 2) if @$para +> 3;
   return;
 }
@@ -1443,7 +1443,7 @@ sub _closers_for_all_curr_open {
     }
 
     unless( @copy +> 2 ) {
-      push @copy, @copy[1]{'target'};
+      push @copy, @copy[1]->{'target'};
       @copy[-1] = '' unless defined @copy[-1];
        # since =over's don't have targets
     }
@@ -1803,14 +1803,14 @@ sub _stringify_lol {  # the real recursor
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 sub _dump_curr_open { # return a string representation of the stack
-  my $curr_open = @_[0]{'curr_open'};
+  my $curr_open = @_[0]->{'curr_open'};
 
   return '[empty]' unless @$curr_open;
   return join '; ',
     map {;
            ($_->[0] eq '=for')
-             ? ( ($_->[1]{'~really'} || '=over')
-               . ' ' . $_->[1]{'target'})
+             ? ( ($_->[1]->{'~really'} || '=over')
+               . ' ' . $_->[1]->{'target'})
              : $_->[0]
         }
     @$curr_open

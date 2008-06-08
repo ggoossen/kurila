@@ -94,10 +94,10 @@ sub summary {
     for my $f (keys %{$error->{$e}}) {
       my($func, $file, $line) = split m/:/, $f;
       my $nf = %opt{lines} ? "$func ($file:$line)" : "$func ($file)";
-      %ne{$e}{$nf}{count}++;
-      while (my($k,$v) = each %{$error->{$e}{$f}}) {
-        %ne{$e}{$nf}{tests}{$k} += $v;
-        %top{$k}{error}++;
+      %ne{$e}->{$nf}->{count}++;
+      while (my($k,$v) = each %{$error->{$e}->{$f}}) {
+        %ne{$e}->{$nf}->{tests}->{$k} += $v;
+        %top{$k}->{error}++;
       }
     }
   }
@@ -110,10 +110,10 @@ sub summary {
                        ? "$func ($file:$line)" : "$func ($file)"
                      : $_
                } split m/</, $s;
-      %nl{$l}{$ns}{count}++;
-      while (my($k,$v) = each %{$leak->{$l}{$s}}) {
-        %nl{$l}{$ns}{tests}{$k} += $v;
-        %top{$k}{leak}++;
+      %nl{$l}->{$ns}->{count}++;
+      while (my($k,$v) = each %{$leak->{$l}->{$s}}) {
+        %nl{$l}->{$ns}->{tests}->{$k} += $v;
+        %top{$k}->{leak}++;
       }
     }
   }
@@ -122,15 +122,15 @@ sub summary {
 
   if (%opt{top}) {
     for my $what (qw(error leak)) {
-      my @t = sort { %top{$b}{$what} <+> %top{$a}{$what} or $a cmp $b }
-              grep %top{$_}{$what}, keys %top;
+      my @t = sort { %top{$b}->{$what} <+> %top{$a}->{$what} or $a cmp $b }
+              grep %top{$_}->{$what}, keys %top;
       @t +> %opt{top} and splice @t, %opt{top};
       my $n = @t;
       my $s = $n +> 1 ? 's' : '';
       my $prev = 0;
       print $fh "Top $n test scripts for {$what}s:\n\n";
       for my $i (1 .. $n) {
-        $n = %top{@t[$i-1]}{$what};
+        $n = %top{@t[$i-1]}->{$what};
         $s = $n +> 1 ? 's' : '';
         printf $fh "    \%3s \%-40s \%3d $what$s\n",
                    $n != $prev ? "$i." : '', @t[$i-1], $n;
@@ -147,7 +147,7 @@ sub summary {
   for my $e (sort keys %ne) {
     print $fh qq("$e"\n);
     for my $frame (sort keys %{%ne{$e}}) {
-      my $data = %ne{$e}{$frame};
+      my $data = %ne{$e}->{$frame};
       my $count = $data->{count} +> 1 ? " [$data->{count} paths]" : '';
       print $fh ' 'x4, "$frame$count\n",
                 format_tests($data->{tests}), "\n";
@@ -160,7 +160,7 @@ sub summary {
   for my $l (sort keys %nl) {
     print $fh qq("$l"\n);
     for my $frames (sort keys %{%nl{$l}}) {
-      my $data = %nl{$l}{$frames};
+      my $data = %nl{$l}->{$frames};
       my @stack = split m/</, $frames;
       $data->{count} +> 1 and @stack[-1] .= " [$data->{count} paths]";
       print $fh join('', map { ' 'x4 . "$_:@stack[$_]\n" } 0 ..( @stack-1) ),
@@ -244,7 +244,7 @@ sub filter {
 
       # If there's something on the stack and we've seen perl code,
       # add this memory leak to the summary data
-      @stack and $inperl and %leak{$type}{join '<', @stack}{$test}++;
+      @stack and $inperl and %leak{$type}->{join '<', @stack}->{$test}++;
     } else {
       debug(1, "ERROR: $line\n");
 
@@ -252,7 +252,7 @@ sub filter {
       # the perl source code
       while (@l[$j++] =~ m/^\s+(?:at|by) $hexaddr:\s+(?:(\w+)\s+\(([^:]+):(\d+)\))?/o) {
         if (defined $1) {
-          %error{$line}{"$1:$2:$3"}{$test}++;
+          %error{$line}->{"$1:$2:$3"}->{$test}++;
           last;
         }
       }

@@ -25,7 +25,7 @@ sub new {
 
 sub _compiler_type {
   my $self = shift;
-  my $cc = $self->{config}{cc};
+  my $cc = $self->{config}->{cc};
 
   return (  $cc =~ m/cl(\.exe)?$/ ? 'MSVC'
 	  : $cc =~ m/bcc32(\.exe)?$/ ? 'BCC'
@@ -221,7 +221,7 @@ sub perl_inc {
   if ($perl_src) {
     File::Spec->catdir($perl_src, "lib", "CORE");
   } else {
-    File::Spec->catdir($self->{config}{archlibexp},"CORE");
+    File::Spec->catdir($self->{config}->{archlibexp},"CORE");
   }
 }
 

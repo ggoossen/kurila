@@ -88,7 +88,7 @@ sub chkTrailer
     my $trailer = shift;
 
     my $ADLER32 = unpack("N", $trailer) ;
-    *$self->{Info}{ADLER32} = $ADLER32;    
+    *$self->{Info}->{ADLER32} = $ADLER32;    
     return $self->TrailerError("CRC mismatch")
         if *$self->{Strict} && $ADLER32 != *$self->{Uncomp}->adler32() ;
 

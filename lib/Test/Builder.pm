@@ -429,7 +429,7 @@ ERR
         $result->{type}   = '';
     }
 
-    $self->{Test_Results}[$self->{Curr_Test}-1] = $result;
+    $self->{Test_Results}->[$self->{Curr_Test}-1] = $result;
     $out .= "\n";
 
     $self->_print($out);
@@ -816,7 +816,7 @@ sub skip {
     lock($self->{Curr_Test});
     $self->{Curr_Test}++;
 
-    $self->{Test_Results}[$self->{Curr_Test}-1] = &share(\%(
+    $self->{Test_Results}->[$self->{Curr_Test}-1] = &share(\%(
         'ok'      => 1,
         actual_ok => 1,
         name      => '',
@@ -857,7 +857,7 @@ sub todo_skip {
     lock($self->{Curr_Test});
     $self->{Curr_Test}++;
 
-    $self->{Test_Results}[$self->{Curr_Test}-1] = &share(\%(
+    $self->{Test_Results}->[$self->{Curr_Test}-1] = &share(\%(
         'ok'      => 1,
         actual_ok => 0,
         name      => '',

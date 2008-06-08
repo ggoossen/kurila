@@ -24,7 +24,7 @@ sub show_fields {
     my($base, $mask) = @_;
     no strict 'refs';
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
-    return grep { (%fields::attr{$base}[$fields->{$_}] ^&^ $mask) == $mask} 
+    return grep { (%fields::attr{$base}->[$fields->{$_}] ^&^ $mask) == $mask} 
                 keys %$fields;
 }
 
@@ -68,7 +68,7 @@ foreach (Foo->new) {
     my $a = Foo::Autoviv->new();
     $a->{foo} = \@('a', 'ok', 'c');
     $a->{bar} = \%( A => 'ok' );
-    is( $a->{foo}[1],    'ok' );
+    is( $a->{foo}->[1],    'ok' );
     is( $a->{bar}->{A},, 'ok' );
 }
 

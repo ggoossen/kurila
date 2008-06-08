@@ -62,13 +62,13 @@ my $got = shift ;
 
 my ($obj, $errstr, $errno) ;
 
-if (*$self->{ZipData}{Method} == ZIP_CM_STORE) {
+if (*$self->{ZipData}->{Method} == ZIP_CM_STORE) {
 ($obj, $errstr, $errno) = IO::Compress::Adapter::Identity::mkCompObject(
                                          $got->value('Level'),
                                          $got->value('Strategy')
                                          );
 }
-elsif (*$self->{ZipData}{Method} == ZIP_CM_DEFLATE) {
+elsif (*$self->{ZipData}->{Method} == ZIP_CM_DEFLATE) {
 ($obj, $errstr, $errno) = IO::Compress::Adapter::Deflate::mkCompObject(
                                          $got->value('CRC32'),
                                          $got->value('Adler32'),
@@ -76,21 +76,21 @@ elsif (*$self->{ZipData}{Method} == ZIP_CM_DEFLATE) {
                                          $got->value('Strategy')
                                          );
 }
-elsif (*$self->{ZipData}{Method} == ZIP_CM_BZIP2) {
+elsif (*$self->{ZipData}->{Method} == ZIP_CM_BZIP2) {
 ($obj, $errstr, $errno) = IO::Compress::Adapter::Bzip2::mkCompObject(
                                         $got->value('BlockSize100K'),
                                         $got->value('WorkFactor'),
                                         $got->value('Verbosity')
                                        );
-*$self->{ZipData}{CRC32} = crc32(undef);
+*$self->{ZipData}->{CRC32} = crc32(undef);
 }
 
 return $self->saveErrorString(undef, $errstr, $errno)
 if ! defined $obj;
 
-if (! defined *$self->{ZipData}{StartOffset}) {
-*$self->{ZipData}{StartOffset} = 0;
-*$self->{ZipData}{Offset} = U64->new() ;
+if (! defined *$self->{ZipData}->{StartOffset}) {
+*$self->{ZipData}->{StartOffset} = 0;
+*$self->{ZipData}->{Offset} = U64->new() ;
 }
 
 return $obj;    
@@ -101,7 +101,7 @@ sub reset
 my $self = shift ;
 
 *$self->{Compress}->reset();
-*$self->{ZipData}{CRC32} = Compress::Raw::Zlib::crc32('');
+*$self->{ZipData}->{CRC32} = Compress::Raw::Zlib::crc32('');
 
 return STATUS_OK;    
 }
@@ -110,11 +110,11 @@ sub filterUncompressed
 {
 my $self = shift ;
 
-if (*$self->{ZipData}{Method} == ZIP_CM_DEFLATE) {
-*$self->{ZipData}{CRC32} = *$self->{Compress}->crc32();
+if (*$self->{ZipData}->{Method} == ZIP_CM_DEFLATE) {
+*$self->{ZipData}->{CRC32} = *$self->{Compress}->crc32();
 }
 else {
-*$self->{ZipData}{CRC32} = crc32(${@_[0]}, *$self->{ZipData}{CRC32});
+*$self->{ZipData}->{CRC32} = crc32(${@_[0]}, *$self->{ZipData}->{CRC32});
 
 }
 }
@@ -124,7 +124,7 @@ sub mkHeader
 my $self  = shift;
 my $param = shift ;
 
-*$self->{ZipData}{StartOffset} = *$self->{ZipData}{Offset}->get32bit() ;
+*$self->{ZipData}->{StartOffset} = *$self->{ZipData}->{Offset}->get32bit() ;
 
 my $filename = '';
 $filename = $param->value('Name') || '';
@@ -142,13 +142,13 @@ my $empty = 0;
 my $osCode = $param->value('OS_Code') ;
 my $extFileAttr = 0 ;
 
-if (*$self->{ZipData}{Zip64}) {
+if (*$self->{ZipData}->{Zip64}) {
 $empty = 0xFFFF;
 
 my $x = '';
 $x .= pack "V V", 0, 0 ; # uncompressedLength   
 $x .= pack "V V", 0, 0 ; # compressedLength   
-$x .= *$self->{ZipData}{Offset}->getPacked_V64() ; # offset to local hdr
+$x .= *$self->{ZipData}->{Offset}->getPacked_V64() ; # offset to local hdr
 #$x .= pack "V  ", 0    ; # disk no
 
 $x = IO::Compress::Zlib::Extra::mkSubField(ZIP_EXTRA_ID_ZIP64, $x);
@@ -188,18 +188,18 @@ $ctlExtra .= $param->value('ExtraFieldCentral')
 
 my $gpFlag = 0 ;    
 $gpFlag ^|^= ZIP_GP_FLAG_STREAMING_MASK
-if *$self->{ZipData}{Stream} ;
+if *$self->{ZipData}->{Stream} ;
 
-my $method = *$self->{ZipData}{Method} ;
+my $method = *$self->{ZipData}->{Method} ;
 
 my $version = %ZIP_CM_MIN_VERSIONS{$method};
 $version = ZIP64_MIN_VERSION
-if ZIP64_MIN_VERSION +> $version && *$self->{ZipData}{Zip64};
+if ZIP64_MIN_VERSION +> $version && *$self->{ZipData}->{Zip64};
 my $madeBy = ($param->value('OS_Code') << 8) + $version;
 my $extract = $version;
 
-*$self->{ZipData}{Version} = $version;
-*$self->{ZipData}{MadeBy} = $madeBy;
+*$self->{ZipData}->{Version} = $version;
+*$self->{ZipData}->{MadeBy} = $madeBy;
 
 my $ifa = 0;
 $ifa ^|^= ZIP_IFA_TEXT_MASK
@@ -237,21 +237,21 @@ $ctl .= pack 'v', length $comment ;  # file comment length
 $ctl .= pack 'v', 0          ; # disk number start 
 $ctl .= pack 'v', $ifa       ; # internal file attributes
 $ctl .= pack 'V', $extFileAttr   ; # external file attributes
-if (! *$self->{ZipData}{Zip64}) {
-$ctl .= pack 'V', *$self->{ZipData}{Offset}->get32bit()  ; # offset to local header
+if (! *$self->{ZipData}->{Zip64}) {
+$ctl .= pack 'V', *$self->{ZipData}->{Offset}->get32bit()  ; # offset to local header
 }
 else {
 $ctl .= pack 'V', $empty ; # offset to local header
 }
 
 $ctl .= $filename ;
-*$self->{ZipData}{StartOffset64} = 4 + length $ctl;
+*$self->{ZipData}->{StartOffset64} = 4 + length $ctl;
 $ctl .= $ctlExtra ;
 $ctl .= $comment ;
 
-*$self->{ZipData}{Offset}->add(length $hdr) ;
+*$self->{ZipData}->{Offset}->add(length $hdr) ;
 
-*$self->{ZipData}{CentralHeader} = $ctl;
+*$self->{ZipData}->{CentralHeader} = $ctl;
 
 return $hdr;
 }
@@ -261,17 +261,17 @@ sub mkTrailer
 my $self = shift ;
 
 my $crc32 ;
-if (*$self->{ZipData}{Method} == ZIP_CM_DEFLATE) {
+if (*$self->{ZipData}->{Method} == ZIP_CM_DEFLATE) {
 $crc32 = pack "V", *$self->{Compress}->crc32();
 }
 else {
-$crc32 = pack "V", *$self->{ZipData}{CRC32};
+$crc32 = pack "V", *$self->{ZipData}->{CRC32};
 }
 
-my $ctl = *$self->{ZipData}{CentralHeader} ;
+my $ctl = *$self->{ZipData}->{CentralHeader} ;
 
 my $sizes ;
-if (! *$self->{ZipData}{Zip64}) {
+if (! *$self->{ZipData}->{Zip64}) {
 $sizes .= *$self->{CompSize}->getPacked_V32() ;   # Compressed size
 $sizes .= *$self->{UnCompSize}->getPacked_V32() ; # Uncompressed size
 }
@@ -285,27 +285,27 @@ my $data = $crc32 . $sizes ;
 
 my $hdr = '';
 
-if (*$self->{ZipData}{Stream}) {
+if (*$self->{ZipData}->{Stream}) {
 $hdr  = pack "V", ZIP_DATA_HDR_SIG ;                       # signature
 $hdr .= $data ;
 }
 else {
-$self->writeAt(*$self->{ZipData}{StartOffset} + 14, $data)
+$self->writeAt(*$self->{ZipData}->{StartOffset} + 14, $data)
     or return undef;
 }
 
-if (! *$self->{ZipData}{Zip64})
+if (! *$self->{ZipData}->{Zip64})
 { substr($ctl, 16, length $data, $data) }
 else {
 substr($ctl, 16, length $crc32, $crc32) ;
 my $s  = *$self->{UnCompSize}->getPacked_V64() ; # Uncompressed size
    $s .= *$self->{CompSize}->getPacked_V64() ;   # Compressed size
-substr($ctl, *$self->{ZipData}{StartOffset64}, length $s, $s) ;
+substr($ctl, *$self->{ZipData}->{StartOffset64}, length $s, $s) ;
 }
 
-*$self->{ZipData}{Offset}->add(length($hdr));
-*$self->{ZipData}{Offset}->add( *$self->{CompSize} );
-push @{ *$self->{ZipData}{CentralDir} }, $ctl ;
+*$self->{ZipData}->{Offset}->add(length($hdr));
+*$self->{ZipData}->{Offset}->add( *$self->{CompSize} );
+push @{ *$self->{ZipData}->{CentralDir} }, $ctl ;
 
 return $hdr;
 }
@@ -315,20 +315,20 @@ sub mkFinalTrailer
 my $self = shift ;
 
 my $comment = '';
-$comment = *$self->{ZipData}{ZipComment} ;
+$comment = *$self->{ZipData}->{ZipComment} ;
 
-my $cd_offset = *$self->{ZipData}{Offset}->get32bit() ; # offset to start central dir
+my $cd_offset = *$self->{ZipData}->{Offset}->get32bit() ; # offset to start central dir
 
-my $entries = @{ *$self->{ZipData}{CentralDir} };
-my $cd = join '', @{ *$self->{ZipData}{CentralDir} };
+my $entries = @{ *$self->{ZipData}->{CentralDir} };
+my $cd = join '', @{ *$self->{ZipData}->{CentralDir} };
 my $cd_len = length $cd ;
 
 my $z64e = '';
 
-if ( *$self->{ZipData}{Zip64} ) {
+if ( *$self->{ZipData}->{Zip64} ) {
 
-my $v  = *$self->{ZipData}{Version} ;
-my $mb = *$self->{ZipData}{MadeBy} ;
+my $v  = *$self->{ZipData}->{Version} ;
+my $mb = *$self->{ZipData}->{MadeBy} ;
 $z64e .= pack 'v', $v             ; # Version made by
 $z64e .= pack 'v', $mb            ; # Version to extract
 $z64e .= pack 'V', 0              ; # number of disk
@@ -336,17 +336,17 @@ $z64e .= pack 'V', 0              ; # number of disk with central dir
 $z64e .= U64::pack_V64 $entries   ; # entries in central dir on this disk
 $z64e .= U64::pack_V64 $entries   ; # entries in central dir
 $z64e .= U64::pack_V64 $cd_len    ; # size of central dir
-$z64e .= *$self->{ZipData}{Offset}->getPacked_V64() ; # offset to start central dir
+$z64e .= *$self->{ZipData}->{Offset}->getPacked_V64() ; # offset to start central dir
 
 $z64e  = pack("V", ZIP64_END_CENTRAL_REC_HDR_SIG) # signature
       .  U64::pack_V64(length $z64e)
       .  $z64e ;
 
-*$self->{ZipData}{Offset}->add(length $cd) ; 
+*$self->{ZipData}->{Offset}->add(length $cd) ; 
 
 $z64e .= pack "V", ZIP64_END_CENTRAL_LOC_HDR_SIG; # signature
 $z64e .= pack 'V', 0              ; # number of disk with central dir
-$z64e .= *$self->{ZipData}{Offset}->getPacked_V64() ; # offset to end zip64 central dir
+$z64e .= *$self->{ZipData}->{Offset}->getPacked_V64() ; # offset to end zip64 central dir
 $z64e .= pack 'V', 1              ; # Total number of disks 
 
 # TODO - fix these when info-zip 3 is fixed.
@@ -393,11 +393,11 @@ $got->value("ATime", $timeRef->[0]);
 $got->value("CTime", $timeRef->[2]);
 }
 
-*$self->{ZipData}{Zip64} = $got->value('Zip64');
-*$self->{ZipData}{Stream} = $got->value('Stream');
+*$self->{ZipData}->{Zip64} = $got->value('Zip64');
+*$self->{ZipData}->{Stream} = $got->value('Stream');
 
 return $self->saveErrorString(undef, "Zip64 only supported if Stream enabled")   
-if  *$self->{ZipData}{Zip64} && ! *$self->{ZipData}{Stream} ;
+if  *$self->{ZipData}->{Zip64} && ! *$self->{ZipData}->{Stream} ;
 
 my $method = $got->value('Method');
 return $self->saveErrorString(undef, "Unknown Method '$method'")   
@@ -407,9 +407,9 @@ return $self->saveErrorString(undef, "Bzip2 not available")
 if $method == ZIP_CM_BZIP2 and 
    ! defined $IO::Compress::Adapter::Bzip2::VERSION;
 
-*$self->{ZipData}{Method} = $method;
+*$self->{ZipData}->{Method} = $method;
 
-*$self->{ZipData}{ZipComment} = $got->value('ZipComment') ;
+*$self->{ZipData}->{ZipComment} = $got->value('ZipComment') ;
 
 for my $name (qw( ExtraFieldLocal ExtraFieldCentral ))
 {

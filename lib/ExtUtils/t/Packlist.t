@@ -29,16 +29,16 @@ is( $pl->{packfile}, 'packfile', 'TIEHASH() should store packfile name' );
 
 
 ExtUtils::Packlist::STORE($pl, 'key', 'value');
-is( $pl->{data}{key}, 'value', 'STORE() should stuff stuff in data member' );
+is( $pl->{data}->{key}, 'value', 'STORE() should stuff stuff in data member' );
 
 
-$pl->{data}{foo} = 'bar';
+$pl->{data}->{foo} = 'bar';
 is( ExtUtils::Packlist::FETCH($pl, 'foo'), 'bar', 'check FETCH()' );
 
 
 # test FIRSTKEY and NEXTKEY
 SKIP: {
-	$pl->{data}{bar} = 'baz';
+	$pl->{data}->{bar} = 'baz';
 	skip('not enough keys to test FIRSTKEY', 2)
       unless keys %{ $pl->{data} } +> 2;
 
@@ -64,7 +64,7 @@ ok( ExtUtils::Packlist::EXISTS($pl, 'bar'), 'EXISTS() should find keys' );
 
 
 ExtUtils::Packlist::DELETE($pl, 'bar');
-ok( !(exists $pl->{data}{bar}), 'DELETE() should delete cleanly' );
+ok( !(exists $pl->{data}->{bar}), 'DELETE() should delete cleanly' );
 
 
 ExtUtils::Packlist::CLEAR($pl);
@@ -140,11 +140,11 @@ SKIP: {
 
 	try{ ExtUtils::Packlist::read($pl, 'eplist') };
 	is( $@, '', 'read() should normally succeed' );
-	is( $pl->{data}{single}, undef, 'single keys should have undef value' );
-	is( ref($pl->{data}{hash}), 'HASH', 'multivalue keys should become hashes');
+	is( $pl->{data}->{single}, undef, 'single keys should have undef value' );
+	is( ref($pl->{data}->{hash}), 'HASH', 'multivalue keys should become hashes');
 
-	is( $pl->{data}{hash}{foo}, 'bar', 'hash values should be set' );
-	ok( exists $pl->{data}{'/abc'}, 'read() should resolve /./ to / in keys' );
+	is( $pl->{data}->{hash}->{foo}, 'bar', 'hash values should be set' );
+	ok( exists $pl->{data}->{'/abc'}, 'read() should resolve /./ to / in keys' );
 
 	# give validate a valid and an invalid file to find
 	$pl->{data} = \%(
@@ -155,7 +155,7 @@ SKIP: {
 	is( ExtUtils::Packlist::validate($pl), 1,
 		'validate() should find missing files' );
 	ExtUtils::Packlist::validate($pl, 1);
-	ok( !exists $pl->{data}{fake},
+	ok( !exists $pl->{data}->{fake},
 		'validate() should remove missing files when prompted' );
 
 	# one more new() test, to see if it calls read() successfully

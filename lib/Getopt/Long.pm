@@ -414,10 +414,10 @@ sub GetOptionsFromArray($@) {
 	    my $rl = ref(%linkage{$orig} = shift (@optionlist));
 
 	    if ( $rl eq "ARRAY" ) {
-		%opctl{$name}[CTL_DEST] = CTL_DEST_ARRAY;
+		%opctl{$name}->[CTL_DEST] = CTL_DEST_ARRAY;
 	    }
 	    elsif ( $rl eq "HASH" ) {
-		%opctl{$name}[CTL_DEST] = CTL_DEST_HASH;
+		%opctl{$name}->[CTL_DEST] = CTL_DEST_HASH;
 	    }
 	    elsif ( $rl eq "SCALAR" || $rl eq "REF" ) {
 #		if ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
@@ -442,13 +442,13 @@ sub GetOptionsFromArray($@) {
 	    # Make sure a valid perl identifier results.
 	    my $ov = $orig;
 	    $ov =~ s/\W/_/g;
-	    if ( %opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
+	    if ( %opctl{$name}->[CTL_DEST] == CTL_DEST_ARRAY ) {
 		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{\$orig\} = \\\@".$pkg."::opt_$ov;");
                 die if $@;
 	    }
-	    elsif ( %opctl{$name}[CTL_DEST] == CTL_DEST_HASH ) {
+	    elsif ( %opctl{$name}->[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{\$orig\} = \\\%".$pkg."::opt_$ov;");

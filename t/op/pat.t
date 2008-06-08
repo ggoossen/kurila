@@ -2780,7 +2780,7 @@ SKIP:{
     } 
     foreach (0..2) {
         if (@fetch[$_]) {
-            iseq(@fetch[$_][0],@fetch[$_][1],@names[$_]);
+            iseq(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
         } else {
             ok(0, @names[$_]);
         }
@@ -2819,7 +2819,7 @@ SKIP:{
     }
     foreach (0..3) {
 	if (@fetch[$_]) {
-	    iseq(@fetch[$_][0],@fetch[$_][1],@names[$_]);
+	    iseq(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
 	} else {
 	    ok(0, @names[$_]);
 	}

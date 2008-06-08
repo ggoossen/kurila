@@ -24,8 +24,8 @@ ok( exists &t5 && defined &t5 );
 'P2'->tmc;
 ok( not exists &P2::tmc && not defined &P2::tmc );
 my $ref;
-$ref->{A}[0] = \&t4;
-ok( exists &{$ref->{A}[0]} && not defined &{$ref->{A}[0]} );
+$ref->{A}->[0] = \&t4;
+ok( exists &{$ref->{A}->[0]} && not defined &{$ref->{A}->[0]} );
 undef &P1::tmc;
 ok( exists &P1::tmc && not defined &P1::tmc );
 eval_dies_like('exists &t5()',

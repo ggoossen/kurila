@@ -396,7 +396,7 @@ sub match_clause {
   my $body = '';
   my ($no, $yes, $either, $name, $inner_indent);
   if (ref $item eq 'ARRAY') {
-      die("utf8 removed '$item->[0]{name}' - '$item->[1]{name}'");
+      die("utf8 removed '$item->[0]->{name}' - '$item->[1]->{name}'");
   } else {
     $name = $item->{name};
     $inner_indent = $indent;

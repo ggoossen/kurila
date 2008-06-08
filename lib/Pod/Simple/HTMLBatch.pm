@@ -278,7 +278,7 @@ sub _do_one_batch_conversion {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub filespecsys { @_[0]{'_filespecsys'} || 'File::Spec' }
+sub filespecsys { @_[0]->{'_filespecsys'} || 'File::Spec' }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -403,9 +403,9 @@ sub _prep_contents_breakdown {
     my $toplevel = 
       $entry->[0] =~ m/^perl\w*$/ ? 'perl_core_docs'
           # group all the perlwhatever docs together
-      : $entry->[3][0] # normal case
+      : $entry->[3]->[0] # normal case
     ;
-    ++%toplevel_form_freq{ lc $toplevel }{ $toplevel };
+    ++%toplevel_form_freq{ lc $toplevel }->{ $toplevel };
     push @{ %toplevel{ lc $toplevel } }, $entry;
     push @$entry, lc($entry->[0]); # add a sort-order key to the end
   }

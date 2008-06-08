@@ -97,8 +97,8 @@ sub chkTrailer
 
     # Check CRC & ISIZE 
     my ($CRC32, $ISIZE) = unpack("V V", $trailer) ;
-    *$self->{Info}{CRC32} = $CRC32;    
-    *$self->{Info}{ISIZE} = $ISIZE;    
+    *$self->{Info}->{CRC32} = $CRC32;    
+    *$self->{Info}->{ISIZE} = $ISIZE;    
 
     if (*$self->{Strict}) {
         return $self->TrailerError("CRC mismatch")

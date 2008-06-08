@@ -139,7 +139,7 @@ sub new {
 # according to the current formatting instructions as we do.
 sub _handle_text {
     my ($self, $text) = @_;
-    my $tag = %$self{PENDING}[-1];
+    my $tag = %$self{PENDING}->[-1];
     @$tag[1] .= $text;
 }
 
@@ -185,7 +185,7 @@ sub _handle_element_end {
         my $text = $self->?$method (@$tag);
         if (defined $text) {
             if (@{ %$self{PENDING} } +> 1) {
-                %$self{PENDING}[-1][1] .= $text;
+                %$self{PENDING}->[-1]->[1] .= $text;
             } else {
                 $self->output ($text);
             }
@@ -293,7 +293,7 @@ sub item {
 
     # Calculate the indentation and margin.  $fits is set to true if the tag
     # will fit into the margin of the paragraph given our indentation level.
-    my $indent = %$self{INDENTS}[-1];
+    my $indent = %$self{INDENTS}->[-1];
     $indent = %$self{opt_indent} unless defined $indent;
     my $margin = ' ' x %$self{opt_margin};
     my $fits = (%$self{MARGIN} - $indent +>= length ($tag) + 1);
@@ -492,8 +492,8 @@ sub cmd_item_block  { my $self = shift; $self->item_common ('block',  @_) }
 ##############################################################################
 
 # The simple ones.
-sub cmd_b { return @_[0]{alt} ? "``@_[2]''" : @_[2] }
-sub cmd_f { return @_[0]{alt} ? "\"@_[2]\"" : @_[2] }
+sub cmd_b { return @_[0]->{alt} ? "``@_[2]''" : @_[2] }
+sub cmd_f { return @_[0]->{alt} ? "\"@_[2]\"" : @_[2] }
 sub cmd_i { return '*' . @_[2] . '*' }
 sub cmd_x { return '' }
 

@@ -18,7 +18,7 @@ sub prelink {
   die "Unexpected number of DEF files" unless @res == 1;
   die "Can't find DEF file in the output"
     unless @res[0] =~ m,^(.*)\.def$,si;
-  my $libname = "$1$self->{config}{lib_ext}";	# Put .LIB file near .DEF file
+  my $libname = "$1$self->{config}->{lib_ext}";	# Put .LIB file near .DEF file
   $self->do_system('emximp', '-o', $libname, @res[0]) or die "emxexp: res=$?";
   return (@res, $libname);
 }
@@ -40,15 +40,15 @@ sub _do_link {
     my $exp_dir = ($near_obj =~ m,(.*)[/\\],s ? "$1/" : '' );
 
     %args{dl_file} = $1 if $near_obj =~ m,(.*)\.,s; # put ExportList near OBJ
-    %args{lib_file} = "$lib_dir$lib.$self->{config}{dlext}";	# DLL file
+    %args{lib_file} = "$lib_dir$lib.$self->{config}->{dlext}";	# DLL file
 
     # XXX _do_link does not have place to put libraries?
-    push @$objs, $self->perl_inc() . "/libperl$self->{config}{lib_ext}";
+    push @$objs, $self->perl_inc() . "/libperl$self->{config}->{lib_ext}";
     %args{objects} = $objs;
   }
   # Some 'env' do exec(), thus return too early when run from ksh;
   # To avoid 'env', remove (useless) shrpenv
-  local $self->{config}{shrpenv} = '';
+  local $self->{config}->{shrpenv} = '';
   return $self->SUPER::_do_link($how, %args);
 }
 
@@ -63,7 +63,7 @@ sub extra_link_args_after_prelink {
     unless @DEF or not @{%args{prelink_res}};
 
   my @after_libs = ($OS2::is_aout ? ()
-      : $self->perl_inc() . "/libperl_override$self->{config}{lib_ext}");
+      : $self->perl_inc() . "/libperl_override$self->{config}->{lib_ext}");
   # , "-L", "-lperl"
   (@after_libs, @DEF);
 }
@@ -71,8 +71,8 @@ sub extra_link_args_after_prelink {
 sub link_executable {
   # ldflags is not expecting .exe extension given on command line; remove -Zexe
   my $self = shift;
-  local $self->{config}{ldflags} = $self->{config}{ldflags};
-  $self->{config}{ldflags} =~ s/(?<!\S)-Zexe(?!\S)//;
+  local $self->{config}->{ldflags} = $self->{config}->{ldflags};
+  $self->{config}->{ldflags} =~ s/(?<!\S)-Zexe(?!\S)//;
   return $self->SUPER::link_executable(@_);
 }
 
