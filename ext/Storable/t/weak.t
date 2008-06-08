@@ -63,7 +63,7 @@ ok (isweak($w->[0]), "element 0 is a weak reference");
 package OVERLOADED;
 
 use overload
-	'""' => sub { @_[0][0] };
+	'""' => sub { @_[0]->[0] };
 
 package main;
 

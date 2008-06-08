@@ -105,7 +105,7 @@ sub get_meta_info {
 	my $from = $1;	# temporary measure for Chip Salzenberg
 	$from =~ s/chip\@(atlantic\.net|perlsupport\.com)/chip\@pobox.com/;
 	$from =~ s/\(Tim Bunce\) \(Tim Bunce\)/(Tim Bunce)/;
-	$ls->{From}{$from} = 1
+	$ls->{From}->{$from} = 1
     }
     if (m/^Subject:\s+(?:Re: )?(.*\S)/i) {
 	my $title = $1;
@@ -114,11 +114,11 @@ sub get_meta_info {
 	$title =~ s/\bRe:\s+/ /g;
 	$title =~ s/\s+/ /g;
 	$title =~ s/^\s*(.*?)\s*$/$1/g;
-	$ls->{Title}{$title} = 1;
+	$ls->{Title}->{$title} = 1;
     }
-    $ls->{'Msg-ID'}{$1}=1 if m/^Message-Id:\s+(.*\S)/i;
-    $ls->{Date}{$1}=1     if m/^Date:\s+(.*\S)/i;
-    $ls->{$1}{$2}=1       if $::opt_M && m/^([-\w]+):\s+(.*\S)/;
+    $ls->{'Msg-ID'}->{$1}=1 if m/^Message-Id:\s+(.*\S)/i;
+    $ls->{Date}->{$1}=1     if m/^Date:\s+(.*\S)/i;
+    $ls->{$1}->{$2}=1       if $::opt_M && m/^([-\w]+):\s+(.*\S)/;
 }
 
 
@@ -243,7 +243,7 @@ foreach my $argv (@ARGV) {
     }
 
     # if we don't have a title for -m then use the file name
-    $ls->{Title}{"Untitled: $in"}=1 if $::opt_m
+    $ls->{Title}->{"Untitled: $in"}=1 if $::opt_m
 	and !$ls->{Title} and $ls->{out};
 
     $ls->{category} = $::opt_c

@@ -20,8 +20,8 @@ plan( tests => 26 );
     sub new_error2 { return new_error(); } $line2 = __LINE__;
     my $err = new_error2(); $line3 = __LINE__;
     is( (scalar @{$err->{stack}}), 2);
-    is((join '**', @{$err->{stack}[0]}), "main**../lib/error.t**$line2**main::new_error**");
-    is((join '**', @{$err->{stack}[1]}), "main**../lib/error.t**$line3**main::new_error2**");
+    is((join '**', @{$err->{stack}->[0]}), "main**../lib/error.t**$line2**main::new_error**");
+    is((join '**', @{$err->{stack}->[1]}), "main**../lib/error.t**$line3**main::new_error2**");
     is $err->message, <<MSG ;
 my message at ../lib/error.t line $line1.
     main::new_error called at ../lib/error.t line $line2.

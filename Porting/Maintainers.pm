@@ -35,7 +35,7 @@ if (open(MANIFEST, "<", "MANIFEST")) {
 
 sub get_module_pat {
     my $m = shift;
-    split ' ', %Modules{$m}{FILES};
+    split ' ', %Modules{$m}->{FILES};
 }
 
 sub get_module_files {
@@ -61,7 +61,7 @@ sub get_module_files {
 sub get_maintainer_modules {
     my $m = shift;
     sort { lc $a cmp lc $b }
-    grep { %Modules{$_}{MAINTAINER} eq $m }
+    grep { %Modules{$_}->{MAINTAINER} eq $m }
     keys %Modules;
 }
 
@@ -159,7 +159,7 @@ sub show_results {
 		    my @files = get_module_files($m);
 		    printf "\%-15s @files\n", $m;
 		} else {
-		    printf "\%-15s %Modules{$m}{MAINTAINER}\n", $m;
+		    printf "\%-15s %Modules{$m}->{MAINTAINER}\n", $m;
 		}
 	    }
 	}
@@ -236,7 +236,7 @@ sub show_results {
 	for my $file (@Files) {
 	    if (defined %ModuleByFile{$file}) {
 		my $module     = %ModuleByFile{$file};
-		my $maintainer = %Modules{%ModuleByFile{$file}}{MAINTAINER};
+		my $maintainer = %Modules{%ModuleByFile{$file}}->{MAINTAINER};
 		printf "\%-15s $module $maintainer %Maintainers{$maintainer}\n", $file;
 	    } else {
 		printf "\%-15s ?\n", $file;

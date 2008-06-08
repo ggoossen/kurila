@@ -291,30 +291,30 @@ sub Build_Aliases()
 	my ($prop, @data) = split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
-	    %PropValueAlias{$prop}{@data[1]} = \@( @data[[0,2]] );
-	    %PVA_reverse{$prop}{@data[2]} = \@( @data[[0,1]] );
+	    %PropValueAlias{$prop}->{@data[1]} = \@( @data[[0,2]] );
+	    %PVA_reverse{$prop}->{@data[2]} = \@( @data[[0,1]] );
 	}
 	else {
             next if @data[0] eq "n/a";
-	    %PropValueAlias{$prop}{@data[0]} = @data[1];
-            %PVA_reverse{$prop}{@data[1]} = @data[0];
+	    %PropValueAlias{$prop}->{@data[0]} = @data[1];
+            %PVA_reverse{$prop}->{@data[1]} = @data[0];
 	}
 
 	shift @data if $prop eq 'ccc';
 	next if @data[0] eq "n/a";
 
 	@data[1] =~ s/[ _-]//g;
-	%utf8::PropValueAlias{$prop}{lc @data[0]} = @data[1];
-	%utf8::PVA_reverse{$prop}{lc @data[1]} = @data[0];
+	%utf8::PropValueAlias{$prop}->{lc @data[0]} = @data[1];
+	%utf8::PVA_reverse{$prop}->{lc @data[1]} = @data[0];
 
 	my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ? 'gc_sc' : $prop;
-	%utf8::PVA_abbr_map{$abbr_class}{lc @data[0]} = @data[0];
+	%utf8::PVA_abbr_map{$abbr_class}->{lc @data[0]} = @data[0];
     }
     close PVA;
 
     # backwards compatibility for L& -> LC
-    %utf8::PropValueAlias{gc}{'l&'} = %utf8::PropValueAlias{gc}{lc};
-    %utf8::PVA_abbr_map{gc_sc}{'l&'} = %utf8::PVA_abbr_map{gc_sc}{lc};
+    %utf8::PropValueAlias{gc}->{'l&'} = %utf8::PropValueAlias{gc}->{lc};
+    %utf8::PVA_abbr_map{gc_sc}->{'l&'} = %utf8::PVA_abbr_map{gc_sc}->{lc};
 
 }
 
@@ -1009,7 +1009,7 @@ sub UnicodeData_Txt()
                 $Deco->Append($code, $deco);
                 if ($deco =~m/^<(\w+)>/)
                 {
-		    my $dshort = %PVA_reverse{dt}{ucfirst lc $1};
+		    my $dshort = %PVA_reverse{dt}->{ucfirst lc $1};
                     %DC{com}->Append($code);
 
                     %DC{$dshort} ||= Table->New();
@@ -1126,13 +1126,13 @@ sub UnicodeData_Txt()
     for (keys %Bidi) {
 	%Bidi{$_}->Write(
 	    \@("lib","bc","$_.pl"),
-	    "BidiClass category '%PropValueAlias{bc}{$_}'"
+	    "BidiClass category '%PropValueAlias{bc}->{$_}'"
 	);
     }
 
     $Comb->Write("CombiningClass.pl");
     for (keys %{ %PropValueAlias{ccc} }) {
-	my ($code, $name) = @{ %PropValueAlias{ccc}{$_} };
+	my ($code, $name) = @{ %PropValueAlias{ccc}->{$_} };
 	(my $c = Table->New())->Append($code);
 	$c->Write(
 	    \@("lib","ccc","$_.pl"),
@@ -1144,7 +1144,7 @@ sub UnicodeData_Txt()
     for (keys %DC) {
 	%DC{$_}->Write(
 	    \@("lib","dt","$_.pl"),
-	    "DecompositionType category '%PropValueAlias{dt}{$_}'"
+	    "DecompositionType category '%PropValueAlias{dt}->{$_}'"
 	);
     }
 
@@ -1152,7 +1152,7 @@ sub UnicodeData_Txt()
     for (keys %Number) {
 	%Number{$_}->Write(
 	    \@("lib","nt","$_.pl"),
-	    "NumericType category '%PropValueAlias{nt}{$_}'"
+	    "NumericType category '%PropValueAlias{nt}->{$_}'"
 	);
     }
 
@@ -1163,7 +1163,7 @@ sub UnicodeData_Txt()
     }
 
     for (keys %{ %PropValueAlias{gc} }) {
-	New_Alias(Is => %PropValueAlias{gc}{$_}, SameAs => $_, Fuzzy => 1);
+	New_Alias(Is => %PropValueAlias{gc}->{$_}, SameAs => $_, Fuzzy => 1);
     }
 }
 
@@ -1203,7 +1203,7 @@ sub LineBreak_Txt()
     for (keys %Lbrk) {
 	%Lbrk{$_}->Write(
 	    \@("lib","lb","$_.pl"),
-	    "Linebreak category '%PropValueAlias{lb}{$_}'"
+	    "Linebreak category '%PropValueAlias{lb}->{$_}'"
 	);
     }
 }
@@ -1244,7 +1244,7 @@ sub ArabicShaping_txt()
     for (keys %JoinType) {
 	%JoinType{$_}->Write(
 	    \@("lib","jt","$_.pl"),
-	    "JoiningType category '%PropValueAlias{jt}{$_}'"
+	    "JoiningType category '%PropValueAlias{jt}->{$_}'"
 	);
     }
 }
@@ -1281,7 +1281,7 @@ sub EastAsianWidth_txt()
     for (keys %EAW) {
 	%EAW{$_}->Write(
 	    \@("lib","ea","$_.pl"),
-	    "EastAsianWidth category '%PropValueAlias{ea}{$_}'"
+	    "EastAsianWidth category '%PropValueAlias{ea}->{$_}'"
 	);
     }
 }
@@ -1312,7 +1312,7 @@ sub HangulSyllableType_txt()
     for (keys %HST) {
 	%HST{$_}->Write(
 	    \@("lib","hst","$_.pl"),
-	    "HangulSyllableType category '%PropValueAlias{hst}{$_}'"
+	    "HangulSyllableType category '%PropValueAlias{hst}->{$_}'"
 	);
     }
 }
@@ -1778,7 +1778,7 @@ sub WriteAllMappings()
             {
                 ## 'Is' items lose 'Is' from the basename.
                 $filename = $Type eq 'Is' ?
-		    (%PVA_reverse{sc}{$Name} || $Name) :
+		    (%PVA_reverse{sc}->{$Name} || $Name) :
 		    "$Type$Name";
 
                 $filename =~ s/[^\w_]+/_/g; # "L&" -> "L_"

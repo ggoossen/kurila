@@ -392,11 +392,11 @@ sub parseEntry
 	# if and only if "all" CEs are [.0000.0000.0000].
     }
 
-    $self->{mapping}{$entry} = $is_L3_ignorable ? \@() : \@key;
+    $self->{mapping}->{$entry} = $is_L3_ignorable ? \@() : \@key;
 
     if (@uv +> 1) {
-	(!$self->{maxlength}{@uv[0]} || $self->{maxlength}{@uv[0]} +< @uv)
-	    and $self->{maxlength}{@uv[0]} = @uv;
+	(!$self->{maxlength}->{@uv[0]} || $self->{maxlength}->{@uv[0]} +< @uv)
+	    and $self->{maxlength}->{@uv[0]} = @uv;
     }
 }
 
@@ -505,7 +505,7 @@ sub splitEnt
 	# skip removed code point
 	if (! defined $jcps) {
 	    if ($wLen && @buf) {
-		@buf[-1][2] = $i + 1;
+		@buf[-1]->[2] = $i + 1;
 	    }
 	    next;
 	}
@@ -559,7 +559,7 @@ sub splitEnt
 	# skip completely ignorable
 	if ($map->{$jcps} && @{ $map->{$jcps} } == 0) {
 	    if ($wLen && @buf) {
-		@buf[-1][2] = $i + 1;
+		@buf[-1]->[2] = $i + 1;
 	    }
 	    next;
 	}
@@ -895,7 +895,7 @@ sub _eqArray($$$)
 
 	for my $w (0..@{ $substr->[$g] }-1) {
 	    for my $v (0..$lev-1) {
-		return if $source->[$g][$w][$v] != $substr->[$g][$w][$v];
+		return if $source->[$g]->[$w]->[$v] != $substr->[$g]->[$w]->[$v];
 	    }
 	}
     }
@@ -971,7 +971,7 @@ sub index
 
 	# fetch a grapheme
 	while ($i +<= $end && $found_base == 0) {
-	    for my $vwt ($self->getWt($strE->[$i][0])) {
+	    for my $vwt ($self->getWt($strE->[$i]->[0])) {
 		my($var, @wt) = unpack(VCE_TEMPLATE, $vwt);
 		my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
@@ -990,12 +990,12 @@ sub index
 
 		if (@strWt && !$var && !@wt[0]) {
 		    push @{ @strWt[-1] }, \@wt if $to_be_pushed;
-		    @finPos[-1] = $strE->[$i][2];
+		    @finPos[-1] = $strE->[$i]->[2];
 		} elsif ($to_be_pushed) {
 		    push @strWt, \@( \@wt );
-		    push @iniPos, $found_base ? NOMATCHPOS : $strE->[$i][1];
+		    push @iniPos, $found_base ? NOMATCHPOS : $strE->[$i]->[1];
 		    @finPos[-1] = NOMATCHPOS if $found_base;
-		    push @finPos, $strE->[$i][2];
+		    push @finPos, $strE->[$i]->[2];
 		    $found_base++;
 		}
 		# else ===> no-op

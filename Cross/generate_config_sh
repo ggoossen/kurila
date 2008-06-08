@@ -60,7 +60,7 @@ while ($line_in = ~< *FILE) {
 	my $key = $1;
 	my $value = $2;
 	if (ref($callbacks->{$key}) eq "ARRAY") {
-		($callbacks->{$key}[0])->($key,$value);
+		($callbacks->{$key}->[0])->($key,$value);
 	} else {
 		print($line_in);
 	}
@@ -69,38 +69,38 @@ while ($line_in = ~< *FILE) {
 sub backtick {
 	my $key = shift;
 	my $value = shift;
-	my $envvar = $callbacks->{$key}->[1][0];
+	my $envvar = $callbacks->{$key}->[1]->[0];
 
 	if (%ENV{$envvar}) {
 		my $rawtext = `$callbacks->{$key}->[1][1]`;
 		chomp($rawtext);
 		print("$key=\'$rawtext\'\n");
 	} else {
-		print("$key=\'$callbacks->{$key}->[1][2]\'\n");
+		print("$key=\'$callbacks->{$key}->[1]->[2]\'\n");
 	}
 }
 	
 
 sub simple_process {
 	my $key = shift;
-	my $envvar = $callbacks->{$key}->[1][0];
+	my $envvar = $callbacks->{$key}->[1]->[0];
 
 	if (%ENV{$envvar}) {
 		print("$key=\"%ENV{$envvar}\"\n");
 	} else {
-		print("$key=\'$callbacks->{$key}->[1][1]\'\n");
+		print("$key=\'$callbacks->{$key}->[1]->[1]\'\n");
 	}
 
 }
 
 sub simple_process_append {
 	my $key = shift;
-	my $envvar = $callbacks->{$key}->[1][0];
+	my $envvar = $callbacks->{$key}->[1]->[0];
 
 	if (%ENV{$envvar}) {
-		print("$key=\"%ENV{$envvar} $callbacks->{$key}->[1][2]\"\n");
+		print("$key=\"%ENV{$envvar} $callbacks->{$key}->[1]->[2]\"\n");
 	} else {
-		print("$key=\'$callbacks->{$key}->[1][1]\'\n");
+		print("$key=\'$callbacks->{$key}->[1]->[1]\'\n");
 	}
 
 }
@@ -108,10 +108,10 @@ sub simple_process_append {
 sub library_munge {
 	my $key = shift;
 	my $value = shift;
-	my $envvar = $callbacks->{$key}->[1][0];
+	my $envvar = $callbacks->{$key}->[1]->[0];
 
 	if (%ENV{$envvar}) {
-		$value =~ s/$callbacks->{$key}->[1][1]/%ENV{$envvar}/g;
+		$value =~ s/$callbacks->{$key}->[1]->[1]/%ENV{$envvar}/g;
 		print("$key=$value\n");
 	} else {
 		print("$key=$value\n");

@@ -203,7 +203,7 @@ sub createMerge
 
     my $def = *$self->{Compress} = $inf->createDeflate();
 
-    *$self->{Header} = *$inf->{Info}{Header};
+    *$self->{Header} = *$inf->{Info}->{Header};
     *$self->{UnCompSize} = *$inf->{UnCompSize}->clone();
     *$self->{CompSize} = *$inf->{CompSize}->clone();
     # TODO -- fix this
@@ -236,7 +236,7 @@ sub deflateParams
     my $strategy = shift ;
 
     my $status = *$self->{Compress}->deflateParams(Level => $level, Strategy => $strategy) ;
-    return $self->saveErrorString(0, *$self->{Compress}{Error}, *$self->{Compress}{ErrorNo})
+    return $self->saveErrorString(0, *$self->{Compress}->{Error}, *$self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     return 1;    

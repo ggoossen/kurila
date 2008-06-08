@@ -46,12 +46,12 @@ sub dlsyms {
     push(@m,"
 dynamic :: $self->{BASEEXT}.exp
 
-") unless $self->{SKIPHASH}{'dynamic'}; # dynamic and static are subs, so...
+") unless $self->{SKIPHASH}->{'dynamic'}; # dynamic and static are subs, so...
 
     push(@m,"
 static :: $self->{BASEEXT}.exp
 
-") unless $self->{SKIPHASH}{'static'};  # we avoid a warning if we tick them
+") unless $self->{SKIPHASH}->{'static'};  # we avoid a warning if we tick them
 
     push(@m,"
 $self->{BASEEXT}.exp: Makefile.PL

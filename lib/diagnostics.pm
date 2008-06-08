@@ -397,13 +397,13 @@ my %msg;
                 }
             }  
             my $lhs = join( '', @toks );
-	    %transfmt{$header}{pat} =
+	    %transfmt{$header}->{pat} =
               "    s\{^$lhs\}\n     \{\Q$header\E\}s\n\t&& return 1;\n";
-            %transfmt{$header}{len} = $conlen;
+            %transfmt{$header}->{len} = $conlen;
 	} else {
-            %transfmt{$header}{pat} =
+            %transfmt{$header}->{pat} =
 	      "    m\{^\Q$header\E\} && return 1;\n";
-            %transfmt{$header}{len} = length( $header );
+            %transfmt{$header}->{len} = length( $header );
 	} 
 
 	print STDERR "$WHOAMI: Duplicate entry: \"$header\"\n"
@@ -419,9 +419,9 @@ my %msg;
 
     # Apply patterns in order of decreasing sum of lengths of fixed parts
     # Seems the best way of hitting the right one.
-    for my $hdr ( sort { %transfmt{$b}{len} <+> %transfmt{$a}{len} }
+    for my $hdr ( sort { %transfmt{$b}->{len} <+> %transfmt{$a}->{len} }
                   keys %transfmt ){
-        $transmo .= %transfmt{$hdr}{pat};
+        $transmo .= %transfmt{$hdr}->{pat};
     }
     $transmo .= "    return 0;\n\}\n";
     print STDERR $transmo if $DEBUG;

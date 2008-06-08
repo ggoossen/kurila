@@ -185,9 +185,9 @@ sub module_version {
 
             printf "  \%-10s \%-10s\n",
                 $v,
-                %Module::CoreList::version{$v}{$mod}
+                %Module::CoreList::version{$v}->{$mod}
                     || 'undef'
-                    if exists %Module::CoreList::version{$v}{$mod};
+                    if exists %Module::CoreList::version{$v}->{$mod};
         }
         print "\n";
     }

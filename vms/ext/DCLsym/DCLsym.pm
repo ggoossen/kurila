@@ -118,7 +118,7 @@ sub FIRSTKEY {
   $self ->{IDX} = 0;
   $self->{CACHE} = $self->{TYPE} eq 'GLOBAL' ? \%Gblsyms : \%Locsyms;
   while (($name,$val) = each(%{$self->{CACHE}}) and !defined($name)) {
-    if ($self->{CACHE}{':ID'} eq 'GLOBAL') { return undef; }
+    if ($self->{CACHE}->{':ID'} eq 'GLOBAL') { return undef; }
     $self->{CACHE} = \%Gblsyms;
   }
   $name;
@@ -129,7 +129,7 @@ sub NEXTKEY {
   my($name,$val);
 
   while (($name,$val) = each(%{$self->{CACHE}}) and !defined($name)) {
-    if ($self->{CACHE}{':ID'} eq 'GLOBAL') { return undef; }
+    if ($self->{CACHE}->{':ID'} eq 'GLOBAL') { return undef; }
     $self->{CACHE} = \%Gblsyms;
   }
   $name;

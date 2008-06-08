@@ -62,7 +62,7 @@ my $neg_epoch_ok = defined ((localtime(-259200))[[0]]) ? 1 : 0;
 
 # use vmsish 'time' makes for oddness around the Unix epoch
 if ($^O eq 'VMS') {
-    @time[0][2]++;
+    @time[0]->[2]++;
     $neg_epoch_ok = 0; # time_t is unsigned
 }
 

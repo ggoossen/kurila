@@ -131,15 +131,15 @@ sub deq { # deep-equals
     for(my $i = 0; $i +< @{@_[0]}; $i++) {
       print("# NEQ ", Pod::Simple::pretty(@_[0]),
           "\n#  != ", Pod::Simple::pretty(@_[1]), "\n"),
-       return '' unless deq(@_[0][$i], @_[1][$i]); # recurse!
+       return '' unless deq(@_[0]->[$i], @_[1]->[$i]); # recurse!
     }
     return 1;
   } elsif(UNIVERSAL::isa(@_[0], 'HASH')) {
     return 1 if $hashes_dont_matter;
     return '' unless keys %{@_[0]} == keys %{@_[1]};
     foreach my $k (keys %{@_[0]}) {
-      return '' unless exists @_[1]{$k};
-      return '' unless deq(@_[0]{$k}, @_[1]{$k});
+      return '' unless exists @_[1]->{$k};
+      return '' unless deq(@_[0]->{$k}, @_[1]->{$k});
     }
     return 1;
   } else {

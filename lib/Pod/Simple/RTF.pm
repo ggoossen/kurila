@@ -293,7 +293,7 @@ sub do_middle {      # the main work
         next;
       }
 
-      defined($scratch = $self->{'Tagmap'}{$tagname}) or next;
+      defined($scratch = $self->{'Tagmap'}->{$tagname}) or next;
       $scratch =~ s/\#([^\#]+)\#/%{$self}{$1}/g; # interpolate
       print $fh $scratch;
       
@@ -313,7 +313,7 @@ sub do_middle {      # the main work
       } elsif( $tagname eq 'Verbatim' or $tagname eq 'VerbatimFormatted') {
         --$self->{'rtfverbatim'};
       }
-      defined($scratch = $self->{'Tagmap'}{"/$tagname"}) or next;
+      defined($scratch = $self->{'Tagmap'}->{"/$tagname"}) or next;
       $scratch =~ s/\#([^\#]+)\#/%{$self}{$1}/g; # interpolate
       print $fh $scratch;
     }

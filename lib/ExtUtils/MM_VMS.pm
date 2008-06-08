@@ -617,7 +617,7 @@ sub constants {
         my %tmp = ();
         for my $key (keys %{$self->{$macro}}) {
             %tmp{$self->fixpath($key,0)} = 
-                                     $self->fixpath($self->{$macro}{$key},0);
+                                     $self->fixpath($self->{$macro}->{$key},0);
         }
         $self->{$macro} = \%tmp;
     }
@@ -928,7 +928,7 @@ sub dlsyms {
     my($funclist)  = %attribs{FUNCLIST}  || $self->{FUNCLIST}  || \@();
     my(@m);
 
-    unless ($self->{SKIPHASH}{'dynamic'}) {
+    unless ($self->{SKIPHASH}->{'dynamic'}) {
 	push(@m,'
 dynamic :: $(INST_ARCHAUTODIR)$(BASEEXT).opt
 	$(NOECHO) $(NOOP)
@@ -938,7 +938,7 @@ dynamic :: $(INST_ARCHAUTODIR)$(BASEEXT).opt
     push(@m,'
 static :: $(INST_ARCHAUTODIR)$(BASEEXT).opt
 	$(NOECHO) $(NOOP)
-') unless $self->{SKIPHASH}{'static'};
+') unless $self->{SKIPHASH}->{'static'};
 
     push @m,'
 $(INST_ARCHAUTODIR)$(BASEEXT).opt : $(BASEEXT).opt
@@ -1626,7 +1626,7 @@ sub prefixify {
         print STDERR "  no Config found for $var.\n" if $Verbose +>= 2;
         $path = $self->_prefixify_default($rprefix, $default);
     }
-    elsif( !$self->{ARGS}{PREFIX} || !$self->file_name_is_absolute($path) ) {
+    elsif( !$self->{ARGS}->{PREFIX} || !$self->file_name_is_absolute($path) ) {
         # do nothing if there's no prefix or if its relative
     }
     elsif( $sprefix eq $rprefix ) {

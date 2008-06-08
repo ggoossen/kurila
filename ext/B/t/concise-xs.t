@@ -309,7 +309,7 @@ sub test_pkg {
 	next if %stash{$fn} eq 'skip';
 	my $res = checkXS("{$pkg}::$fn", %stash{$fn});
 	if ($res ne '1') {
-	    push @{%report{$pkg}{$res}}, $fn;
+	    push @{%report{$pkg}->{$res}}, $fn;
 	}
     }
 }
@@ -368,8 +368,8 @@ END {
 
 	foreach my $pkg (sort keys %report) {
 	    for my $type (keys %matchers) {
-		print "$pkg: $type: @{%report{$pkg}{$type}}\n"
-		    if @{%report{$pkg}{$type}};
+		print "$pkg: $type: @{%report{$pkg}->{$type}}\n"
+		    if @{%report{$pkg}->{$type}};
 	    }
 	}
     }

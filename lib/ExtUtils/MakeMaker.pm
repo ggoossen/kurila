@@ -359,7 +359,7 @@ sub new {
 
     # Store the original args passed to WriteMakefile()
     foreach my $k (keys %$self) {
-        $self->{ARGS}{$k} = $self->{$k};
+        $self->{ARGS}->{$k} = $self->{$k};
     }
 
     if ("@ARGV" =~ m/\bPREREQ_PRINT\b/) {
@@ -402,12 +402,12 @@ sub new {
 
         if ($@) {
             warn sprintf 'Warning: prerequisite %s %s not found.', 
-              $prereq, $self->{PREREQ_PM}{$prereq} 
+              $prereq, $self->{PREREQ_PM}->{$prereq} 
                    unless $self->{PREREQ_FATAL};
             %unsatisfied{$prereq} = 'not installed';
         } elsif ($pr_version +< $self->{PREREQ_PM}->{$prereq} ){
             warn sprintf "Warning: prerequisite \%s \%s not found. We have \%s.\n",
-              $prereq, $self->{PREREQ_PM}{$prereq}, 
+              $prereq, $self->{PREREQ_PM}->{$prereq}, 
                 ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
             %unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
@@ -449,13 +449,13 @@ END
     if (defined @Parent[-2]){
         $self->{PARENT} = @Parent[-2];
         for my $key (@Prepend_parent) {
-            next unless defined $self->{PARENT}{$key};
+            next unless defined $self->{PARENT}->{$key};
 
             # Don't stomp on WriteMakefile() args.
-            next if defined $self->{ARGS}{$key} and
-                    $self->{ARGS}{$key} eq $self->{$key};
+            next if defined $self->{ARGS}->{$key} and
+                    $self->{ARGS}->{$key} eq $self->{$key};
 
-            $self->{$key} = $self->{PARENT}{$key};
+            $self->{$key} = $self->{PARENT}->{$key};
 
             unless ($Is_VMS && $key =~ m/PERL$/) {
                 $self->{$key} = $self->catdir("..",$self->{$key})
@@ -589,13 +589,13 @@ END
 
     # turn the SKIP array into a SKIPHASH hash
     for my $skip (@{$self->{SKIP} || \@()}) {
-        $self->{SKIPHASH}{$skip} = 1;
+        $self->{SKIPHASH}->{$skip} = 1;
     }
     delete $self->{SKIP}; # free memory
 
     if ($self->{PARENT}) {
         for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
-            $self->{SKIPHASH}{$_} = 1;
+            $self->{SKIPHASH}->{$_} = 1;
         }
     }
 
@@ -692,7 +692,7 @@ sub parse_args{
         }
 
         # Remember the original args passed it.  It will be useful later.
-        $self->{ARGS}{uc $name} = $self->{uc $name} = $value;
+        $self->{ARGS}->{uc $name} = $self->{uc $name} = $value;
     }
 
     # catch old-style 'potential_libs' and inform user how to 'upgrade'
@@ -859,22 +859,22 @@ sub skipcheck {
     if ($section eq 'dynamic') {
         print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
-            if $self->{SKIPHASH}{dynamic_bs} && $Verbose;
+            if $self->{SKIPHASH}->{dynamic_bs} && $Verbose;
         print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_lib'\n"
-            if $self->{SKIPHASH}{dynamic_lib} && $Verbose;
+            if $self->{SKIPHASH}->{dynamic_lib} && $Verbose;
     }
     if ($section eq 'dynamic_lib') {
         print STDOUT "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
         "targets in skipped section 'dynamic_bs'\n"
-            if $self->{SKIPHASH}{dynamic_bs} && $Verbose;
+            if $self->{SKIPHASH}->{dynamic_bs} && $Verbose;
     }
     if ($section eq 'static') {
         print STDOUT "Warning (non-fatal): Target 'static' depends on targets ",
         "in skipped section 'static_lib'\n"
-            if $self->{SKIPHASH}{static_lib} && $Verbose;
+            if $self->{SKIPHASH}->{static_lib} && $Verbose;
     }
-    return 'skipped' if $self->{SKIPHASH}{$section};
+    return 'skipped' if $self->{SKIPHASH}->{$section};
     return '';
 }
 

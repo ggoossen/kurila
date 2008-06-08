@@ -808,7 +808,7 @@ sub _raw_read
                                     defined *$self->{CompressedInputLengthDone} ||
                                                 $self->smartEof(), $outSize);
 
-        return $self->saveErrorString(G_ERR, *$self->{Uncomp}{Error}, *$self->{Uncomp}{ErrorNo})
+        return $self->saveErrorString(G_ERR, *$self->{Uncomp}->{Error}, *$self->{Uncomp}->{ErrorNo})
             if $self->saveStatus($status) == STATUS_ERROR;
 
         $self->postBlockChk($buffer, $before_len) == STATUS_OK
@@ -836,9 +836,9 @@ sub _raw_read
         $temp_buf = '';
 
         my $trailer;
-        my $trailer_size = *$self->{Info}{TrailerLength} ;
+        my $trailer_size = *$self->{Info}->{TrailerLength} ;
         my $got = 0;
-        if (*$self->{Info}{TrailerLength})
+        if (*$self->{Info}->{TrailerLength})
         {
             $got = $self->smartRead(\$trailer, $trailer_size) ;
         }

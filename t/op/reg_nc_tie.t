@@ -24,8 +24,8 @@ pass( 'still alive' );
 # FETCH
 is(%+{a}, "h", "FETCH");
 is(%+{b}, "l", "FETCH");
-is(%-{a}[0], "h", "FETCH");
-is(%-{a}[1], "a", "FETCH");
+is(%-{a}->[0], "h", "FETCH");
+is(%-{a}->[1], "a", "FETCH");
 
 # STORE
 try { %+{a} = "yon" };

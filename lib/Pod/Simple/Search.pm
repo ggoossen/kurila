@@ -82,11 +82,11 @@ sub survey {
       $start_in = $try;
     }
 
-    if( $self->{'_dirs_visited'}{$start_in} ) {
+    if( $self->{'_dirs_visited'}->{$start_in} ) {
       $verbose and print "Directory '$start_in' already seen, skipping.\n";
       next;
     } else {
-      $self->{'_dirs_visited'}{$start_in} = 1;
+      $self->{'_dirs_visited'}->{$start_in} = 1;
     }
   
     unless(-e $start_in) {
@@ -136,7 +136,7 @@ sub _make_search_callback {
 
     if($isdir) { # this never gets called on the startdir itself, just subdirs
 
-      if( $self->{'_dirs_visited'}{$file} ) {
+      if( $self->{'_dirs_visited'}->{$file} ) {
         $verbose and print "Directory '$file' already seen, skipping.\n";
         return 'PRUNE';
       }
@@ -152,7 +152,7 @@ sub _make_search_callback {
         }
       } # end unless $laborious
 
-      $self->{'_dirs_visited'}{$file} = 1;
+      $self->{'_dirs_visited'}->{$file} = 1;
       return; # (not pruning);
     }
 

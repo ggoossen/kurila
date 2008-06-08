@@ -101,7 +101,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " @_[0]" }; }
     warn( OverridenWarn->foo() );
     warn OverridenWarn->foo();
 }
-BEGIN { *OverridenPop::pop = sub { ::is( @_[0][0], "ok" ) }; }
+BEGIN { *OverridenPop::pop = sub { ::is( @_[0]->[0], "ok" ) }; }
 {
     package OverridenPop;
     sub foo { \@( "ok" ) }

@@ -463,36 +463,36 @@ sub process_para {
 	push(@XSStack, \%(type => 'if'));
       } else {
 	death ("Error: `$statement' with no matching `if'")
-	  if @XSStack[-1]{type} ne 'if';
-	if (@XSStack[-1]{varname}) {
+	  if @XSStack[-1]->{type} ne 'if';
+	if (@XSStack[-1]->{varname}) {
 	  push(@InitFileCode, "#endif\n");
 	  push(@BootCode,     "#endif");
 	}
 	
-	my(@fns) = keys %{@XSStack[-1]{functions}};
+	my(@fns) = keys %{@XSStack[-1]->{functions}};
 	if ($statement ne 'endif') {
 	  # Hide the functions defined in other #if branches, and reset.
-	  %{@XSStack[-1]{other_functions}}{[@fns]} = (1) x @fns;
+	  %{@XSStack[-1]->{other_functions}}{[@fns]} = (1) x @fns;
 	  %{@XSStack[-1]}{[qw(varname functions)]} = ('', \%());
 	} else {
 	  my($tmp) = pop(@XSStack);
 	  0 while (--$XSS_work_idx
-		   && @XSStack[$XSS_work_idx]{type} ne 'if');
+		   && @XSStack[$XSS_work_idx]->{type} ne 'if');
 	  # Keep all new defined functions
 	  push(@fns, keys %{$tmp->{other_functions}});
-	  %{@XSStack[$XSS_work_idx]{functions}}{[@fns]} = (1) x @fns;
+	  %{@XSStack[$XSS_work_idx]->{functions}}{[@fns]} = (1) x @fns;
 	}
       }
     }
     
     return unless @line;
     
-    if ($XSS_work_idx && !@XSStack[$XSS_work_idx]{varname}) {
+    if ($XSS_work_idx && !@XSStack[$XSS_work_idx]->{varname}) {
       # We are inside an #if, but have not yet #defined its xsubpp variable.
       print "#define $cpp_next_tmp 1\n\n";
       push(@InitFileCode, "#if $cpp_next_tmp\n");
       push(@BootCode,     "#if $cpp_next_tmp");
-      @XSStack[$XSS_work_idx]{varname} = $cpp_next_tmp++;
+      @XSStack[$XSS_work_idx]->{varname} = $cpp_next_tmp++;
     }
 
     death ("Code is not inside a function"
@@ -573,11 +573,11 @@ sub process_para {
 
     # Check for duplicate function definition
     for my $tmp (@XSStack) {
-      next unless defined $tmp->{functions}{$Full_func_name};
+      next unless defined $tmp->{functions}->{$Full_func_name};
       Warn("Warning: duplicate function definition '$clean_func_name' detected");
       last;
     }
-    @XSStack[$XSS_work_idx]{functions}{$Full_func_name} ++ ;
+    @XSStack[$XSS_work_idx]->{functions}->{$Full_func_name} ++ ;
     %XsubAliases = %XsubAliasValues = %Interfaces = @Attributes = ();
     $DoSetMagic = 1;
 
@@ -1514,7 +1514,7 @@ EOF
 
 sub PopFile()
   {
-    return 0 unless @XSStack[-1]{type} eq 'file' ;
+    return 0 unless @XSStack[-1]->{type} eq 'file' ;
 
     my $data     = pop @XSStack ;
     my $ThisFile = $filename ;
@@ -1587,7 +1587,7 @@ sub check_cpp {
       } elsif (!$cpplevel) {
 	Warn("Warning: #else/elif/endif without #if in this function");
 	print STDERR "    (precede it with a blank line if the matching #if is outside the function)\n"
-	  if @XSStack[-1]{type} eq 'if';
+	  if @XSStack[-1]->{type} eq 'if';
 	return;
       } elsif ($cpp =~ m/^\#\s*endif/) {
 	$cpplevel--;
@@ -1610,7 +1610,7 @@ sub Q {
 sub fetch_para {
   # parse paragraph
   death ("Error: Unterminated `#if/#ifdef/#ifndef'")
-    if !defined $lastline && @XSStack[-1]{type} eq 'if';
+    if !defined $lastline && @XSStack[-1]->{type} eq 'if';
   @line = ();
   @line_no = () ;
   return PopFile() if !defined $lastline;

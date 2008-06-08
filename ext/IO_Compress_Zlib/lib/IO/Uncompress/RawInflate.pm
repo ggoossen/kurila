@@ -143,7 +143,7 @@ sub _isRawx
     *$self->{HeaderPending} = $temp_buf ;    
     $buffer = '';
     my $status = *$self->{Uncomp}->uncompr(\$temp_buf, \$buffer, $self->smartEof()) ;
-    return $self->saveErrorString(undef, *$self->{Uncomp}{Error}, STATUS_ERROR)
+    return $self->saveErrorString(undef, *$self->{Uncomp}->{Error}, STATUS_ERROR)
         if $status == STATUS_ERROR;
 
     #my $buf_len = *$self->{Uncomp}->uncompressedBytes();
@@ -287,7 +287,7 @@ sub zap
 {
     my $self  = shift ;
 
-    my $headerLength = *$self->{Info}{HeaderLength};
+    my $headerLength = *$self->{Info}->{HeaderLength};
     my $block_offset =  $headerLength + *$self->{Uncomp}->getLastBlockOffset();
     @_[0] = $headerLength + *$self->{Uncomp}->getEndOffset();
     #printf "# End $_[0], headerlen $headerLength \n";;

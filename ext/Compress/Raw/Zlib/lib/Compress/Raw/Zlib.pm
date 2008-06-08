@@ -191,7 +191,7 @@ sub Compress::Raw::Zlib::Parameters::parse
             $got->{$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
-        $got->{$key}[OFF_PARSED] = 0 ;
+        $got->{$key}->[OFF_PARSED] = 0 ;
     }
 
     for my $i (0.. @entered / 2 - 1) {
@@ -205,9 +205,9 @@ sub Compress::Raw::Zlib::Parameters::parse
         my $canonkey = lc $key;
  
         if ($got->{$canonkey} && ($firstTime ||
-                                  ! $got->{$canonkey}[OFF_FIRST_ONLY]  ))
+                                  ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
         {
-            my $type = $got->{$canonkey}[OFF_TYPE] ;
+            my $type = $got->{$canonkey}->[OFF_TYPE] ;
             my $s ;
             $self->_checkType($key, $value, $type, 1, \$s)
                 or return undef ;
@@ -299,7 +299,7 @@ sub Compress::Raw::Zlib::Parameters::parsed
     my $self = shift ;
     my $name = shift ;
 
-    return $self->{Got}{lc $name}[OFF_PARSED] ;
+    return $self->{Got}->{lc $name}->[OFF_PARSED] ;
 }
 
 sub Compress::Raw::Zlib::Parameters::value
@@ -309,12 +309,12 @@ sub Compress::Raw::Zlib::Parameters::value
 
     if (@_)
     {
-        $self->{Got}{lc $name}[OFF_PARSED]  = 1;
-        $self->{Got}{lc $name}[OFF_DEFAULT] = @_[0] ;
-        $self->{Got}{lc $name}[OFF_FIXED]   = @_[0] ;
+        $self->{Got}->{lc $name}->[OFF_PARSED]  = 1;
+        $self->{Got}->{lc $name}->[OFF_DEFAULT] = @_[0] ;
+        $self->{Got}->{lc $name}->[OFF_FIXED]   = @_[0] ;
     }
 
-    return $self->{Got}{lc $name}[OFF_FIXED] ;
+    return $self->{Got}->{lc $name}->[OFF_FIXED] ;
 }
 
 sub Compress::Raw::Zlib::Deflate::new

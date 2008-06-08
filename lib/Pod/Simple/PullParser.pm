@@ -200,7 +200,7 @@ sub get_token {
   }
   DEBUG and print "get_token about to return ",
    Pod::Simple::pretty( @{$self->{'token_buffer'}}
-     ? $self->{'token_buffer'}[-1] : undef
+     ? $self->{'token_buffer'}->[-1] : undef
    ), "\n";
   return shift @{$self->{'token_buffer'}}; # that's an undef if empty
 }

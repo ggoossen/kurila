@@ -385,9 +385,9 @@ sub cmd_for {
 
 # The simple formatting ones.  These are here mostly so that subclasses can
 # override them and do more complicated things.
-sub seq_b { return @_[0]{alt} ? "``@_[1]''" : @_[1] }
-sub seq_c { return @_[0]{alt} ? "``@_[1]''" : "`@_[1]'" }
-sub seq_f { return @_[0]{alt} ? "\"@_[1]\"" : @_[1] }
+sub seq_b { return @_[0]->{alt} ? "``@_[1]''" : @_[1] }
+sub seq_c { return @_[0]->{alt} ? "``@_[1]''" : "`@_[1]'" }
+sub seq_f { return @_[0]->{alt} ? "\"@_[1]\"" : @_[1] }
 sub seq_i { return '*' . @_[1] . '*' }
 
 # The complicated one.  Handle links.  Since this is plain text, we can't
@@ -461,7 +461,7 @@ sub item {
         return;
     }
     undef %$self{ITEM};
-    my $indent = %$self{INDENTS}[-1];
+    my $indent = %$self{INDENTS}->[-1];
     unless (defined $indent) { $indent = %$self{indent} }
     my $space = ' ' x $indent;
     $space =~ s/^ /:/ if %$self{alt};

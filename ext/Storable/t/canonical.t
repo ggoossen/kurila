@@ -129,10 +129,10 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3);
 
 my $hash;
 push @{%$hash{''}}, \%$hash{a};
-ok 6, %$hash{''}[0] == \%$hash{a};
+ok 6, %$hash{''}->[0] == \%$hash{a};
 
 my $cloned = dclone(dclone($hash));
-ok 7, %$cloned{''}[0] == \%$cloned{a};
+ok 7, %$cloned{''}->[0] == \%$cloned{a};
 
 %$cloned{a} = "blah";
-ok 8, %$cloned{''}[0] == \%$cloned{a};
+ok 8, %$cloned{''}->[0] == \%$cloned{a};

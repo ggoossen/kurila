@@ -3858,7 +3858,7 @@ sub cmd_wrapper {
     # command set and command name in %set. If we can't find it,
     # default to the older version of the command.
     my $call = 'cmd_'
-      . ( %set{$CommandSet}{$cmd}
+      . ( %set{$CommandSet}->{$cmd}
           || ( $cmd =~ m/^[<>{]+/o ? 'prepost' : $cmd ) );
 
     # Call the command subroutine, call it by name.
@@ -5615,8 +5615,8 @@ sub print_trace {
 
         # Grab and stringify the arguments if they are there.
         my $args =
-          defined @sub[$i]{args}
-          ? "(@{ @sub[$i]{args} })"
+          defined @sub[$i]->{args}
+          ? "(@{ @sub[$i]->{args} })"
           : '';
 
         # Shorten them up if $maxtrace says they're too long.
@@ -5624,26 +5624,26 @@ sub print_trace {
           if length $args +> $maxtrace;
 
         # Get the file name.
-        my $file = @sub[$i]{file};
+        my $file = @sub[$i]->{file};
 
         # Put in a filename header if short is off.
         $file = $file eq '-e' ? $file : "file `$file'" unless $short;
 
         # Get the actual sub's name, and shorten to $maxtrace's requirement.
-        $s = @sub[$i]{sub};
+        $s = @sub[$i]->{sub};
         $s = ( substr $s, 0, $maxtrace - 3 ) . '...' if length $s +> $maxtrace;
 
         # Short report uses trimmed file and sub names.
         if ($short) {
             my $sub = @_ +>= 4 ? @_[3] : $s;
-            print $fh "@sub[$i]{context}=$sub$args from $file:@sub[$i]{line}\n";
+            print $fh "@sub[$i]->{context}=$sub$args from $file:@sub[$i]->{line}\n";
         } ## end if ($short)
 
         # Non-short report includes full names.
         else {
-            print $fh "@sub[$i]{context} = $s$args"
+            print $fh "@sub[$i]->{context} = $s$args"
               . " called from $file"
-              . " line @sub[$i]{line}\n";
+              . " line @sub[$i]->{line}\n";
         }
     } ## end for ($i = 0 ; $i < @sub...
 } ## end sub print_trace

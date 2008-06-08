@@ -57,7 +57,7 @@ sub dlsyms {
     my(@m);
     (my $boot = $self->{NAME}) =~ s/:/_/g;
 
-    if (not $self->{SKIPHASH}{'dynamic'}) {
+    if (not $self->{SKIPHASH}->{'dynamic'}) {
 	push(@m,"
 $self->{BASEEXT}.def: Makefile.PL
 ",

@@ -588,7 +588,7 @@ sub checkErrs {
     
     foreach my $k (keys %{$tc->{errs}}) {
 	if (@got = grep m/^$k$/, keys %goterrs) {
-	    delete $tc->{errs}{$k};
+	    delete $tc->{errs}->{$k};
 	    delete %goterrs{$_} foreach @got;
 	}
     }
