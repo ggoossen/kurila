@@ -4179,18 +4179,6 @@ Perl_yylex(pTHX)
 	    if (PL_lex_state == LEX_NORMAL)
 		s = SKIPSPACE1(s);
 
-	    if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop)
-		&& intuit_more(s)) {
-		if (*s == '[') {
-		    Perl_croak(aTHX_ "array element should be @%s[...] instead of $%s[...]",
-			       &PL_tokenbuf[1], &PL_tokenbuf[1]);
-		}
-		else if (*s == '{') {
-		    Perl_croak(aTHX_ "hash element should be %%%s{...} instead of $%s{...}",
-			       &PL_tokenbuf[1], &PL_tokenbuf[1]);
-		}
-	    }
-
 	    PL_expect = XOPERATOR;
 	    if (PL_lex_state == LEX_NORMAL && isSPACE((char)tmp)) {
 		const bool islop = (PL_last_lop == PL_oldoldbufptr);
