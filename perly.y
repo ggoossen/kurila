@@ -794,7 +794,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             $$ = newCVREF(0, $1);
                             TOKEN_GETMAD($2,$$,'a');
                         }
-	|	ary '[' expr ']'          /* $array[$element] */
+	|	term '[' expr ']'          /* $array[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0, oopsAV($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
