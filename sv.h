@@ -1140,6 +1140,8 @@ the scalar's value cannot change unless written to.
    a reference */
 #  define prepare_SV_for_RV(sv)						\
     STMT_START {							\
+		    if (SvTYPE(sv) == SVt_PVAV || SvTYPE(sv) == SVt_PVHV)	\
+			Perl_croak(aTHX_ "Can't update array or hash to ref"); \
 		    if (SvTYPE(sv) < SVt_PV && SvTYPE(sv) != SVt_IV)	\
 			sv_upgrade(sv, SVt_IV);				\
 		    else if (SvTYPE(sv) >= SVt_PV) {			\
