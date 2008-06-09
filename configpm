@@ -119,9 +119,9 @@ package Config;
 # use vars pulls in Carp
 
 BEGIN {
-   my @heavy_subs = (qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
+   my @heavy_subs = @(qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
                        config_vars|);
-   for (@heavy_subs) { undef Symbol::fetch_glob($_)->*; }
+   for (< @heavy_subs) { undef Symbol::fetch_glob($_)->*; }
 }
 
 ENDOFBEG
@@ -136,13 +136,13 @@ package Config;
 # use strict;
 # use warnings; Pulls in Carp
 # use vars pulls in Carp
-@Config::EXPORT = qw(%%Config);
-@Config::EXPORT_OK = qw(myconfig config_sh config_vars config_re);
+@Config::EXPORT = @(qw(%%Config));
+@Config::EXPORT_OK = @(qw(myconfig config_sh config_vars config_re));
 
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
 
-my %%Export_Cache = map {($_ => 1)} (@Config::EXPORT, @Config::EXPORT_OK);
+my %%Export_Cache = %( map {($_ => 1)} (< @Config::EXPORT, < @Config::EXPORT_OK) );
 
 our %%Config;
 
@@ -151,12 +151,12 @@ sub import {
     my $pkg = shift;
     @_ = @Config::EXPORT unless @_;
 
-    my @funcs = grep $_ ne '%%Config', @_;
-    my $export_Config = @funcs +< @_ ? 1 : 0;
+    my @funcs = @( grep $_ ne '%%Config', < @_ );
+    my $export_Config = (nelems @funcs) +< (nelems @_) ? 1 : 0;
 
     no strict 'refs';
     my $callpkg = caller(0);
-    foreach my $func (@funcs) {
+    foreach my $func (< @funcs) {
 	die qq{"$func" is not exported by the {__PACKAGE__} module\n}
              unless %%Export_Cache{$func};
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{$func};
@@ -235,7 +235,7 @@ my $fetch_string = <<'EOT';
 
 # Search for it in the big string
 sub fetch_string {
-    my($self, $key) = @_;
+    my($self, $key) = < @_;
 
 EOT
 
@@ -693,9 +693,9 @@ my $fast_config = join '', map { "    $_,\n" } sort values %Common;
 # &launcher for some reason (eg it got truncated)
 $config_txt .= sprintf <<'ENDOFTIE', $fast_config;
 
-my @heavy_subs = (qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
+my @heavy_subs = @(qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
                      config_vars|);
-for my $name (@heavy_subs) {
+for my $name (< @heavy_subs) {
     Symbol::fetch_glob("Config::$name")->* =
        sub { require 'Config_heavy.pl';
              goto &{Symbol::fetch_glob("Config::$name")->*};
