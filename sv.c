@@ -2901,7 +2901,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 
     /* clear the destination sv if it will be upgraded to a hash or an array */
     if ( (dtype == SVt_PVHV || dtype == SVt_PVAV || stype == SVt_PVAV || stype == SVt_PVHV)
-	 && dtype != stype ) {
+        && dtype != stype ) {
 	Perl_sv_clear_body(aTHX_ dstr);
 	SvFLAGS(dstr) = dtype = SVt_NULL;
     }
@@ -3048,18 +3048,24 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     } else if (dtype == SVt_PVAV) {
 	int i;
 	int len = av_len( (AV*)sstr);
-	av_undef( (AV*)dstr );
-	av_fill( (AV*)dstr, len );
+	bool magic = SvMAGICAL( dstr ) != 0;
+	av_clear( (AV*)dstr );
+	av_extend( (AV*)dstr, len );
 	for (i=0; i<=len; i++) {
 	    SV** val = av_fetch( (AV*)sstr, i, 0);
-	    assert(*val);
-	    SvREFCNT_inc(*val);
-	    if ( ! av_store( (AV*)dstr, i, *val) )
-		SvREFCNT_dec(*val);
+	    SV* sv = newSVsv(*val);
+	    bool didstore = av_store( (AV*)dstr, i, sv);
+	    if (magic) {
+		if (SvSMAGICAL(sv))
+		    mg_set(sv);
+		if (!didstore)
+		    sv_2mortal(sv);
+	    }
 	}
+	if (PL_delaymagic & DM_ARRAY)
+	    SvSETMAGIC( dstr );
 	
     } else if (dtype == SVt_PVHV) {
-	hv_undef( (HV*)dstr );
 	hv_sethv( (HV*)dstr, (HV*)sstr);
     } else if (sflags & SVf_ROK) {
 	if (isGV_with_GP(dstr) && dtype == SVt_PVGV
