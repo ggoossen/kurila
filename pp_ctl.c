@@ -1422,14 +1422,6 @@ PP(pp_return)
 	if (CxTRYBLOCK(cx))
 	    break;
 	lex_end();
-	if (optype == OP_REQUIRE &&
-	    (MARK == SP || (gimme == G_SCALAR && !SvTRUE(*SP))) )
-	{
-	    /* Unassume the success we assumed earlier. */
-	    SV * const nsv = cx->blk_eval.old_namesv;
-	    (void)hv_delete(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv), G_DISCARD);
-	    DIE(aTHX_ "%"SVf" did not return a true value", SVfARG(nsv));
-	}
 	break;
     default:
 	DIE(aTHX_ "panic: return");
@@ -3000,20 +2992,9 @@ PP(pp_leaveeval)
     CvDEPTH(PL_compcv) = 0;
     lex_end();
 
-    if (optype == OP_REQUIRE &&
-	!(gimme == G_SCALAR ? SvTRUE(*SP) : SP > newsp))
-    {
-	/* Unassume the success we assumed earlier. */
-	SV * const nsv = cx->blk_eval.old_namesv;
-	(void)hv_delete(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv), G_DISCARD);
-	retop = Perl_die(aTHX_ "%"SVf" did not return a true value", SVfARG(nsv));
-	/* die_where() did LEAVE, or we won't be here */
-    }
-    else {
-	LEAVE;
-	if (!(save_flags & OPf_SPECIAL))
-	    sv_setpvn(ERRSV,"",0);
-    }
+    LEAVE;
+    if (!(save_flags & OPf_SPECIAL))
+	sv_setpvn(ERRSV,"",0);
 
     RETURNOP(retop);
 }
