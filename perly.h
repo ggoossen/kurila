@@ -78,35 +78,35 @@
      ADDOP = 293,
      DO = 294,
      NOAMP = 295,
-     HSLICE = 296,
-     ASLICE = 297,
-     ANONARY = 298,
-     ANONHSH = 299,
-     LOCAL = 300,
-     MY = 301,
-     MYSUB = 302,
-     REQUIRE = 303,
-     COLONATTR = 304,
-     PREC_LOW = 305,
-     DOROP = 306,
-     OROP = 307,
-     ANDOP = 308,
-     NOTOP = 309,
-     ASSIGNOP = 310,
-     DORDOR = 311,
-     OROR = 312,
-     ANDAND = 313,
-     BITOROP = 314,
-     BITANDOP = 315,
-     SHIFTOP = 316,
-     MATCHOP = 317,
-     REFGEN = 318,
-     UMINUS = 319,
-     POWOP = 320,
-     POSTDEC = 321,
-     POSTINC = 322,
-     PREDEC = 323,
-     PREINC = 324,
+     ANONARY = 296,
+     ANONHSH = 297,
+     LOCAL = 298,
+     MY = 299,
+     MYSUB = 300,
+     REQUIRE = 301,
+     COLONATTR = 302,
+     PREC_LOW = 303,
+     DOROP = 304,
+     OROP = 305,
+     ANDOP = 306,
+     NOTOP = 307,
+     ASSIGNOP = 308,
+     DORDOR = 309,
+     OROR = 310,
+     ANDAND = 311,
+     BITOROP = 312,
+     BITANDOP = 313,
+     SHIFTOP = 314,
+     MATCHOP = 315,
+     REFGEN = 316,
+     UMINUS = 317,
+     POWOP = 318,
+     POSTDEC = 319,
+     POSTINC = 320,
+     PREDEC = 321,
+     PREINC = 322,
+     ASLICE = 323,
+     HSLICE = 324,
      DEREFAMP = 325,
      DEREFSTAR = 326,
      DEREFHSH = 327,
@@ -155,35 +155,35 @@
 #define ADDOP 293
 #define DO 294
 #define NOAMP 295
-#define HSLICE 296
-#define ASLICE 297
-#define ANONARY 298
-#define ANONHSH 299
-#define LOCAL 300
-#define MY 301
-#define MYSUB 302
-#define REQUIRE 303
-#define COLONATTR 304
-#define PREC_LOW 305
-#define DOROP 306
-#define OROP 307
-#define ANDOP 308
-#define NOTOP 309
-#define ASSIGNOP 310
-#define DORDOR 311
-#define OROR 312
-#define ANDAND 313
-#define BITOROP 314
-#define BITANDOP 315
-#define SHIFTOP 316
-#define MATCHOP 317
-#define REFGEN 318
-#define UMINUS 319
-#define POWOP 320
-#define POSTDEC 321
-#define POSTINC 322
-#define PREDEC 323
-#define PREINC 324
+#define ANONARY 296
+#define ANONHSH 297
+#define LOCAL 298
+#define MY 299
+#define MYSUB 300
+#define REQUIRE 301
+#define COLONATTR 302
+#define PREC_LOW 303
+#define DOROP 304
+#define OROP 305
+#define ANDOP 306
+#define NOTOP 307
+#define ASSIGNOP 308
+#define DORDOR 309
+#define OROR 310
+#define ANDAND 311
+#define BITOROP 312
+#define BITANDOP 313
+#define SHIFTOP 314
+#define MATCHOP 315
+#define REFGEN 316
+#define UMINUS 317
+#define POWOP 318
+#define POSTDEC 319
+#define POSTINC 320
+#define PREDEC 321
+#define PREINC 322
+#define ASLICE 323
+#define HSLICE 324
 #define DEREFAMP 325
 #define DEREFSTAR 326
 #define DEREFHSH 327
