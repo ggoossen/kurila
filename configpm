@@ -538,7 +538,7 @@ $heavy_txt .= $fetch_string;
 $config_txt .= <<'ENDOFEND';
 
 sub FETCH {
-    my($self, $key) = @_;
+    my($self, $key) = < @_;
 
     # check for cached value (which may be undef so we use exists not defined)
     return $self->{$key} if exists $self->{$key};
@@ -982,8 +982,8 @@ die "$0: error processing $Config_PM"
 	;
 
 die "$0: error processing $Config_PM"
-	if eval '$Config{"cc"} = 1'
-	or eval 'delete $Config{"cc"}'
+	if eval '%Config{"cc"} = 1'
+	or eval 'delete %Config{"cc"}'
 	;
 
 
