@@ -4136,7 +4136,7 @@ Perl_yylex(pTHX)
 		SHop(OP_LEFT_SHIFT);
 	    }
 
-	    if ((tmp == '+') && (*s == '>')) {
+	    if ((tmp == '+') && (s[1] == '>')) {
 		s += 2;
 		Eop(OP_NCMP);
 	    }
