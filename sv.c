@@ -2596,6 +2596,13 @@ Perl_sv_2bool(pTHX_ register SV *const sv)
 
     SvGETMAGIC(sv);
 
+    if (SvTYPE(sv) == SVt_PVAV) {
+	return av_len((AV*)sv) != -1;
+    }
+    if (SvTYPE(sv) == SVt_PVHV) {
+	return HvUSEDKEYS((HV*)sv) == 0;
+    }
+
     if (!SvOK(sv))
 	return 0;
     if (SvROK(sv)) {
