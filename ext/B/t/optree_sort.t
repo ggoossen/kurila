@@ -16,7 +16,7 @@ BEGIN {
 }
 use OptreeCheck;
 use Config;
-plan tests => 11;
+plan tests => 9;
 
 SKIP: {
 skip "no perlio in this build", 11 unless %Config::Config{useperlio};
@@ -68,8 +68,8 @@ EOT_EOT
 # 7  <@> leave[1 ref] vKP/REFC
 EONT_EONT
 
-checkOptree ( name	=> 'sub {our @a = sort @a}',
-	      code	=> sub {our @a = sort @a},
+checkOptree ( name	=> 'sub {our @a; @a = sort @a}',
+	      code	=> sub {our @a; @a = sort @a},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -85,45 +85,24 @@ checkOptree ( name	=> 'sub {our @a = sort @a}',
 a  <2> aassign[t5] KS/COMMON
 b  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 65 optree.t:311) v
-# 2  <0> pushmark s
-# 3  <0> pushmark s
-# 4  <$> gv(*a) s
-# 5  <1> rv2av[t2] lK/1
-# 6  <@> sort lK
-# 7  <0> pushmark s
-# 8  <$> gv(*a) s
-# 9  <1> rv2av[t1] lKRM*/OURINTR,1
-# a  <2> aassign[t3] KS/COMMON
-# b  <1> leavesub[1 ref] K/REFC,1
+# 1  <;> nextstate(main 652 optree_sort.t:71) v
+# 2  <$> gv(*a) s
+# 3  <1> rv2av[t2] vK/OURINTR,1
+# 4  <;> nextstate(main 653 optree_sort.t:72) v
+# 5  <0> pushmark s
+# 6  <0> pushmark s
+# 7  <$> gv(*a) s
+# 8  <1> rv2av[t4] lK/1
+# 9  <@> sort lK
+# a  <0> pushmark s
+# b  <$> gv(*a) s
+# c  <1> rv2av[t3] lKRM*/1
+# d  <2> aassign[t5] KS/COMMON
+# e  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
-checkOptree ( name	=> '@a = sort @a',
-	      prog	=> '@a = sort @a',
-	      bcopts	=> '-exec',
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-1  <0> enter 
-2  <;> nextstate(main 1 -e:1) v:{
-3  <0> pushmark s
-4  <0> pushmark s
-5  <#> gv[*a] s
-6  <1> rv2av[t4] lKRM*/1
-7  <@> sort lK/INPLACE
-8  <@> leave[1 ref] vKP/REFC
-EOT_EOT
-# 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:{
-# 3  <0> pushmark s
-# 4  <0> pushmark s
-# 5  <$> gv(*a) s
-# 6  <1> rv2av[t2] lKRM*/1
-# 7  <@> sort lK/INPLACE
-# 8  <@> leave[1 ref] vKP/REFC
-EONT_EONT
-
-checkOptree ( name	=> 'sub {@a = sort @a; reverse @a}',
-	      code	=> sub {@a = sort @a; reverse @a},
+checkOptree ( name	=> 'sub {our @a; @a = sort @a; reverse @a}',
+	      code	=> sub {our @a; @a = sort @a; reverse @a},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -140,53 +119,21 @@ a  <1> rv2av[t7] lK/1
 b  <@> reverse[t8] K/1
 c  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 66 optree.t:345) v
-# 2  <0> pushmark s
-# 3  <0> pushmark s
-# 4  <$> gv(*a) s
-# 5  <1> rv2av[t2] lKRM*/1
-# 6  <@> sort lK/INPLACE
-# 7  <;> nextstate(main 66 optree.t:346) v
-# 8  <0> pushmark s
-# 9  <$> gv(*a) s
-# a  <1> rv2av[t4] lK/1
-# b  <@> reverse[t5] K/1
-# c  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
-
-checkOptree ( name	=> '@a = sort @a; reverse @a',
-	      prog	=> '@a = sort @a; reverse @a',
-	      errs      => \@('Useless use of reverse in void context at -e line 1.'),
-	      bcopts	=> '-exec',
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-1  <0> enter 
-2  <;> nextstate(main 1 -e:1) v:{
-3  <0> pushmark s
-4  <0> pushmark s
-5  <#> gv[*a] s
-6  <1> rv2av[t4] lKRM*/1
-7  <@> sort lK/INPLACE
-8  <;> nextstate(main 1 -e:1) v:{
-9  <0> pushmark s
-a  <#> gv[*a] s
-b  <1> rv2av[t7] lK/1
-c  <@> reverse[t8] vK/1
-d  <@> leave[1 ref] vKP/REFC
-EOT_EOT
-# 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:{
-# 3  <0> pushmark s
-# 4  <0> pushmark s
-# 5  <$> gv(*a) s
-# 6  <1> rv2av[t2] lKRM*/1
-# 7  <@> sort lK/INPLACE
-# 8  <;> nextstate(main 1 -e:1) v:{
-# 9  <0> pushmark s
-# a  <$> gv(*a) s
-# b  <1> rv2av[t4] lK/1
-# c  <@> reverse[t5] vK/1
-# d  <@> leave[1 ref] vKP/REFC
+# 1  <;> nextstate(main 654 optree_sort.t:104) v
+# 2  <$> gv(*a) s
+# 3  <1> rv2av[t2] vK/OURINTR,1
+# 4  <;> nextstate(main 655 optree_sort.t:105) v
+# 5  <0> pushmark s
+# 6  <0> pushmark s
+# 7  <$> gv(*a) s
+# 8  <1> rv2av[t4] lKRM*/1
+# 9  <@> sort lK/INPLACE
+# a  <;> nextstate(main 655 optree_sort.t:105) v:{
+# b  <0> pushmark s
+# c  <$> gv(*a) s
+# d  <1> rv2av[t6] lK/1
+# e  <@> reverse[t7] K/1
+# f  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
 checkOptree ( name	=> 'sub {my @a; @a = sort @a}',

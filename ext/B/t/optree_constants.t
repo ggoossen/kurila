@@ -1,6 +1,12 @@
 #!perl
 
 BEGIN {
+    if (%ENV{PERL_CORE}){
+	push @INC, '../ext/B/t';
+    } else {
+	unshift @INC, 't';
+	push @INC, "../../t";
+    }
     require Config;
     if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
@@ -73,7 +79,7 @@ INIT {
 #################################
 pass("RENDER CONSTANT SUBS RETURNING SCALARS");
 
-for $func (sort keys %$want) {
+for my $func (sort keys %$want) {
     # no strict 'refs';	# why not needed ?
     checkOptree ( name      => "$func() as a coderef",
 		  code      => \&{*{Symbol::fetch_glob($func)}},
@@ -88,7 +94,7 @@ EONT_EONT
 
 pass("RENDER CALLS TO THOSE CONSTANT SUBS");
 
-for $func (sort keys %$want) {
+for my $func (sort keys %$want) {
     # print "# doing $func\n";
     checkOptree ( name    => "call $func",
 		  code    => "$func",
@@ -128,14 +134,14 @@ checkOptree ( name	=> 'myyes() as coderef',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const[SPECIAL sv_yes] s ->5
 EOT_EOT
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const(SPECIAL sv_yes) s ->5
@@ -151,14 +157,14 @@ checkOptree ( name	=> 'myno() as coderef',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const[SPECIAL sv_no] s ->5
 EOT_EOT
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 2 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 2 -e:1) v:{ ->3
 # 5     <@> print vK ->6
 # 3        <0> pushmark s ->4
 # 4        <$> const(SPECIAL sv_no) s ->5
@@ -191,7 +197,7 @@ sub printem {
 my ($expect, $expect_nt) = (<<'EOT_EOT', <<'EONT_EONT');
 # 9  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->9
-# 1        <;> nextstate(main 635 optree_constants.t:163) v:& ->2
+# 1        <;> nextstate(main 635 optree_constants.t:163) v ->2
 # 8        <@> prtf sK ->9
 # 2           <0> pushmark s ->3
 # 3           <$> const[PV "myint %d mystr %s myfl %f pi %f\n"] s ->4
@@ -202,7 +208,7 @@ my ($expect, $expect_nt) = (<<'EOT_EOT', <<'EONT_EONT');
 EOT_EOT
 # 9  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->9
-# 1        <;> nextstate(main 635 optree_constants.t:163) v:& ->2
+# 1        <;> nextstate(main 635 optree_constants.t:163) v ->2
 # 8        <@> prtf sK ->9
 # 2           <0> pushmark s ->3
 # 3           <$> const(PV "myint %d mystr %s myfl %f pi %f\n") s ->4

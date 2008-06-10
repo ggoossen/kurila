@@ -35,7 +35,7 @@ sub f {
     shift;
     unshift @_, 'b';
     pop @_;
-    @_, defined wantarray ? wantarray ? 'x' :  'y' : 'z';
+    defined wantarray ? wantarray ? (@_, 'x') :  'y' : 'z';
 }
 
 sub d {
@@ -51,7 +51,7 @@ sub Foo::meth {
     shift;
     unshift @_, 'b';
     pop @_;
-    @_, defined wantarray ? wantarray ? 'x' :  'y' : 'z';
+    defined wantarray ? wantarray ? (@_, 'x') :  'y' : 'z';
 }
 
 sub Foo::d {

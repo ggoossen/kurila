@@ -89,7 +89,7 @@ BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
     chomp $_;
-    our(@F) = split(' ', $_, 0);
+    our(@main::F) = split(' ', $_, 0);
     '???';
 }
 EOF
@@ -283,16 +283,13 @@ my @x;
 print((reverse sort {$b <+> $a} @x));
 ####
 # 32
-our @a;
-print $_ foreach (reverse @a);
+print $_ foreach (reverse @main::a);
 ####
 # 33
-our @a;
 print $_ foreach (reverse 1, 2..5);
 ####
 # 34  (bug #38684)
-our @ary;
-@ary = split(' ', 'foo', 0);
+@main::ary = split(' ', 'foo', 0);
 ####
 # 35 (bug #40055)
 do { () }; 
@@ -343,7 +340,7 @@ state $x = 42;
 }
 ####
 # 48 state vars in anoymous subroutines
-$a = sub {
+$main::a = sub {
     state $x;
     return $x++;
 }
@@ -351,7 +348,7 @@ $a = sub {
 ####
 # 49 match
 {
-    $a =~ m/foo/;
+    $main::a =~ m/foo/;
 }
 ####
 # 51 Anonymous arrays and hashes, and references to them

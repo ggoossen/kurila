@@ -37,7 +37,7 @@ checkOptree ( name	=> 'canonical example w -basic',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 7  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->7
-# 1        <;> nextstate(foo bar) v:&,{ ->2
+# 1        <;> nextstate(foo bar) v:{ ->2
 # 6        <2> sassign sKS/2 ->7
 # 4           <2> add[t3] sK/2 ->5
 # -              <1> ex-rv2sv sK/1 ->3
@@ -48,7 +48,7 @@ checkOptree ( name	=> 'canonical example w -basic',
 EOT_EOT
 # 7  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->7
-# 1        <;> nextstate(main 60 optree_concise.t:122) v:&,{ ->2
+# 1        <;> nextstate(main 60 optree_concise.t:122) v:{ ->2
 # 6        <2> sassign sKS/2 ->7
 # 4           <2> add[t1] sK/2 ->5
 # -              <1> ex-rv2sv sK/1 ->3
@@ -62,7 +62,7 @@ checkOptree ( name	=> 'canonical example w -exec',
 	      bcopts	=> '-exec',
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 61 optree_concise.t:139) v:&,{
+# 1  <;> nextstate(main 61 optree_concise.t:139) v:{
 # 2  <#> gvsv[*b] s
 # 3  <$> const[IV 42] s
 # 4  <2> add[t3] sK/2
@@ -70,7 +70,7 @@ checkOptree ( name	=> 'canonical example w -exec',
 # 6  <2> sassign sKS/2
 # 7  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 61 optree_concise.t:139) v:&,{
+# 1  <;> nextstate(main 61 optree_concise.t:139) v:{
 # 2  <$> gvsv(*b) s
 # 3  <$> const(IV 42) s
 # 4  <2> add[t1] sK/2
@@ -86,7 +86,7 @@ checkOptree ( name	=> '-base3 sticky-exec',
 	      bcopts	=> '-base3',
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-1  <;> dbstate(main 24 optree_concise.t:132) v:&,{
+1  <;> dbstate(main 24 optree_concise.t:132) v:{
 2  <#> gvsv[*b] s
 10 <$> const[IV 42] s
 11 <2> add[t3] sK/2
@@ -94,7 +94,7 @@ checkOptree ( name	=> '-base3 sticky-exec',
 20 <2> sassign sKS/2
 21 <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 62 optree_concise.t:161) v:&,{
+# 1  <;> nextstate(main 62 optree_concise.t:161) v:{
 # 2  <$> gvsv(*b) s
 # 10 <$> const(IV 42) s
 # 11 <2> add[t1] sK/2
@@ -109,7 +109,7 @@ checkOptree ( name	=> 'sticky-base3, -basic over sticky-exec',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 21 <1> leavesub[1 ref] K/REFC,1 ->(end)
 -     <@> lineseq KP ->21
-1        <;> nextstate(main 32 optree_concise.t:164) v:&,{ ->2
+1        <;> nextstate(main 32 optree_concise.t:164) v:{ ->2
 20       <2> sassign sKS/2 ->21
 11          <2> add[t3] sK/2 ->12
 -              <1> ex-rv2sv sK/1 ->10
@@ -120,7 +120,7 @@ checkOptree ( name	=> 'sticky-base3, -basic over sticky-exec',
 EOT_EOT
 # 21 <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->21
-# 1        <;> nextstate(main 63 optree_concise.t:186) v:&,{ ->2
+# 1        <;> nextstate(main 63 optree_concise.t:186) v:{ ->2
 # 20       <2> sassign sKS/2 ->21
 # 11          <2> add[t1] sK/2 ->12
 # -              <1> ex-rv2sv sK/1 ->10
@@ -136,7 +136,7 @@ checkOptree ( name	=> '-base4',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 13 <1> leavesub[1 ref] K/REFC,1 ->(end)
 -     <@> lineseq KP ->13
-1        <;> nextstate(main 26 optree_concise.t:145) v:&,{ ->2
+1        <;> nextstate(main 26 optree_concise.t:145) v:{ ->2
 12       <2> sassign sKS/2 ->13
 10          <2> add[t3] sK/2 ->11
 -              <1> ex-rv2sv sK/1 ->3
@@ -147,7 +147,7 @@ checkOptree ( name	=> '-base4',
 EOT_EOT
 # 13 <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->13
-# 1        <;> nextstate(main 64 optree_concise.t:193) v:&,{ ->2
+# 1        <;> nextstate(main 64 optree_concise.t:193) v:{ ->2
 # 12       <2> sassign sKS/2 ->13
 # 10          <2> add[t1] sK/2 ->11
 # -              <1> ex-rv2sv sK/1 ->3
@@ -164,13 +164,13 @@ checkOptree ( name	=> "restore -base36 default",
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 3  <1> leavesub[1 ref] K/REFC,1 ->(end)
 -     <@> lineseq KP ->3
-1        <;> nextstate(main 27 optree_concise.t:161) v:& ->2
+1        <;> nextstate(main 27 optree_concise.t:161) v ->2
 -        <1> ex-rv2sv sK/1 ->-
 2           <#> gvsv[*a] s ->3
 EOT_EOT
 # 3  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->3
-# 1        <;> nextstate(main 65 optree_concise.t:210) v:& ->2
+# 1        <;> nextstate(main 65 optree_concise.t:210) v ->2
 # -        <1> ex-rv2sv sK/1 ->-
 # 2           <$> gvsv(*a) s ->3
 EONT_EONT
@@ -208,7 +208,7 @@ EONT_EONT
 pass("OPTIONS IN CMDLINE MODE");
 
 checkOptree ( name => 'cmdline invoke -basic works',
-	      prog => 'sort @a',
+	      prog => 'sort our @a',
 	      errs => \@( 'Useless use of sort in void context at -e line 1.',
 			'Name "main::a" used only once: possible typo at -e line 1.',
 			),
@@ -216,7 +216,7 @@ checkOptree ( name => 'cmdline invoke -basic works',
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 7  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 1 -e:1) v:{ ->3
 # 6     <@> sort vK ->7
 # 3        <0> pushmark s ->4
 # 5        <1> rv2av[t2] lK/1 ->6
@@ -224,22 +224,22 @@ checkOptree ( name => 'cmdline invoke -basic works',
 EOT_EOT
 # 7  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 1 -e:1) v:{ ->3
 # 6     <@> sort vK ->7
 # 3        <0> pushmark s ->4
-# 5        <1> rv2av[t1] lK/1 ->6
+# 5        <1> rv2av[t2] lK/OURINTR,1 ->6
 # 4           <$> gv(*a) s ->5
 EONT_EONT
 
 checkOptree ( name => 'cmdline invoke -exec works',
-	      prog => 'sort @a',
+	      prog => 'sort our @a',
 	      errs => \@( 'Useless use of sort in void context at -e line 1.',
 			'Name "main::a" used only once: possible typo at -e line 1.',
 			),
 	      bcopts => '-exec',
 	      expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 1  <0> enter 
-2  <;> nextstate(main 1 -e:1) v:&,{
+2  <;> nextstate(main 1 -e:1) v:{
 3  <0> pushmark s
 4  <#> gv[*a] s
 5  <1> rv2av[t2] lK/1
@@ -247,10 +247,10 @@ checkOptree ( name => 'cmdline invoke -exec works',
 7  <@> leave[1 ref] vKP/REFC
 EOT_EOT
 # 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:&,{
+# 2  <;> nextstate(main 1 -e:1) v:{
 # 3  <0> pushmark s
 # 4  <$> gv(*a) s
-# 5  <1> rv2av[t1] lK/1
+# 5  <1> rv2av[t2] lK/OURINTR,1
 # 6  <@> sort vK
 # 7  <@> leave[1 ref] vKP/REFC
 EONT_EONT
@@ -259,7 +259,7 @@ EONT_EONT
 
 checkOptree
     ( name	=> 'cmdline self-strict compile err using prog',
-      prog	=> 'use strict; sort @a',
+      prog	=> 'sort @a',
       bcopts	=> \@(qw/ -basic -concise -exec /),
       errs	=> 'Global symbol "@a" requires explicit package name at -e line 1.',
       expect	=> 'nextstate',
@@ -286,10 +286,10 @@ checkOptree
       strip_open_hints => 1,
       expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 # 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:&,{
+# 2  <;> nextstate(main 1 -e:1) v:{
 # 3  <#> gv[*a] s
 # 4  <1> rv2av[t3] vK/OURINTR,1
-# 5  <;> nextstate(main 2 -e:1) v:&,{
+# 5  <;> nextstate(main 2 -e:1) v:{
 # 6  <0> pushmark s
 # 7  <#> gv[*a] s
 # 8  <1> rv2av[t5] lK/1
@@ -297,10 +297,10 @@ checkOptree
 # a  <@> leave[1 ref] vKP/REFC
 EOT_EOT
 # 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:&,{
+# 2  <;> nextstate(main 1 -e:1) v:{
 # 3  <$> gv(*a) s
 # 4  <1> rv2av[t2] vK/OURINTR,1
-# 5  <;> nextstate(main 2 -e:1) v:&,{
+# 5  <;> nextstate(main 2 -e:1) v:{
 # 6  <0> pushmark s
 # 7  <$> gv(*a) s
 # 8  <1> rv2av[t3] lK/1
@@ -315,7 +315,7 @@ pass("B::Concise STYLE/CALLBACK TESTS");
 use B::Concise qw( walk_output add_style set_style_standard add_callback );
 
 # new relative style, added by set_up_relative_test()
-@stylespec =
+my @stylespec =
     ( "#hyphseq2 (*(   (x( ;)x))*)<#classsym> "
       . "#exname#arg(?([#targarglife])?)~#flags(?(/#privateb)?)(x(;~->#next)x) "
       . "(x(;~=> #extra)x)\n" # new 'variable' used here
@@ -324,6 +324,7 @@ use B::Concise qw( walk_output add_style set_style_standard add_callback );
       , "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"
       #. "(x(;~=> #extra)x)\n" # new 'variable' used here
       );
+our @scopeops;
 
 sub set_up_relative_test {
     # add a new style, and a callback which adds an 'extra' property
@@ -338,11 +339,6 @@ sub set_up_relative_test {
 	    # callback marks up const ops
 	    $h->{arg} .= ' CALLBACK' if $h->{name} eq 'const';
 	    $h->{extra} = '';
-
-	    if ($lastnext and $$lastnext != $$op) {
-		$h->{goto} = ($h->{seq} eq '-')
-		    ? 'unresolved' : $h->{seq};
-	    }
 
 	    # 2 style specific behaviors
 	    if ($style eq 'relative') {
@@ -364,7 +360,7 @@ checkOptree ( name	=> 'callback used, independent of style',
 	      bcopts	=> \@(qw/ -concise -exec /),
 	      code	=> sub{$a=$b+42},
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-1  <;> nextstate(main 76 optree_concise.t:337) v:&,{
+1  <;> nextstate(main 76 optree_concise.t:337) v:{
 2  <#> gvsv[*b] s
 3  <$> const[IV 42] CALLBACK s
 4  <2> add[t3] sK/2
@@ -372,7 +368,7 @@ checkOptree ( name	=> 'callback used, independent of style',
 6  <2> sassign sKS/2
 7  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
-# 1  <;> nextstate(main 455 optree_concise.t:328) v:&,{
+# 1  <;> nextstate(main 455 optree_concise.t:328) v:{
 # 2  <$> gvsv(*b) s
 # 3  <$> const(IV 42) CALLBACK s
 # 4  <2> add[t1] sK/2
