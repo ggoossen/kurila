@@ -2894,7 +2894,7 @@ pm_to_blib : $(TO_INST_PM)
 };
 
     my $pm_to_blib = $self->oneliner(<<CODE, \@('-MExtUtils::Install'));
-pm_to_blib(\\\%(\@ARGV), '$autodir', '\$(PM_FILTER)')
+pm_to_blib(\\\%( < \@ARGV ), '$autodir', '\$(PM_FILTER)')
 CODE
 
     my @cmds = @( < $self->split_command($pm_to_blib, < %{$self->{PM}}) );
