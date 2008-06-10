@@ -1,6 +1,12 @@
 #!perl
 
 BEGIN {
+    if (%ENV{PERL_CORE}){
+	push @INC, '../ext/B/t';
+    } else {
+	unshift @INC, 't';
+	push @INC, "../../t";
+    }
     require Config;
     if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
         print "1..0 # Skip -- Perl configured without B module\n";
@@ -42,15 +48,15 @@ checkOptree ( name	=> 'OP_AELEMFAST opclass',
 EOT_EOT
 # a  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->a
-# 1        <;> nextstate(main 634 optree_misc.t:27) v:& ->2
-# 2        <0> padav[@x:634,636] vM/LVINTRO ->3
-# 3        <;> nextstate(main 635 optree_misc.t:27) v:& ->4
+# 1        <;> nextstate(main 650 optree_misc.t:30) v ->2
+# 2        <0> padav[@x:650,652] vM/LVINTRO ->3
+# 3        <;> nextstate(main 651 optree_misc.t:30) v ->4
 # 5        <1> rv2av[t3] vK/OURINTR,1 ->6
 # 4           <$> gv(*y) s ->5
-# 6        <;> nextstate(main 636 optree_misc.t:27) v:&,{ ->7
-# 9        <2> add[t4] sK/2 ->a
+# 6        <;> nextstate(main 652 optree_misc.t:30) v:{ ->7
+# 9        <2> add[t5] sK/2 ->a
 # -           <1> ex-aelem sK/2 ->8
-# 7              <0> aelemfast[@x:634,636] sR* ->8
+# 7              <0> aelemfast[@x:650,652] sR* ->8
 # -              <0> ex-const s ->-
 # -           <1> ex-aelem sK/2 ->9
 # -              <1> ex-rv2av sKR/1 ->-
@@ -76,7 +82,7 @@ EOT_EOT
 my $nt = <<'EONT_EONT';
 # 8  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
-# 2     <;> nextstate(main 1 -e:1) v:&,{ ->3
+# 2     <;> nextstate(main 1 -e:1) v:{ ->3
 # 7     <2> sassign vKS/2 ->8
 # 5        <@> index[t1] sK/2 ->6
 # -           <0> ex-pushmark s ->3
