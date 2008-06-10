@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..56\n";
+print "1..55\n";
 
 my $x = 'x';
 
@@ -223,12 +223,7 @@ EOT
 {
   my $test = 47;
   our (@nosuch, @a, @example);
-  eval(q(">@nosuch<" eq "><")) || print "# $@", "not ";
-  print "ok $test\n";
-  ++$test;
-
-  # Look at this!  This is going to be a common error in the future:
-  eval(q("fred@example.com" eq "fred.com")) || print "# {$@->message}", "not ";
+  eval(q(">{join ' ', < @nosuch}<" eq "><")) || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
 
@@ -239,7 +234,7 @@ EOT
   ++$test;
 
   # Ditto.
-  eval(q{@nosuch = ('a', 'b', 'c'); ">@nosuch<" eq ">a b c<"}) 
+  eval(q{@nosuch = @('a', 'b', 'c'); ">{join ' ', <@nosuch}<" eq ">a b c<"}) 
       || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
@@ -250,7 +245,7 @@ EOT
     *R::crackers = \@array;
   }
 
-  eval(q{makearray(); ">@R::crackers<" eq ">fish dog carrot<"})
+  eval(q{makearray(); ">{join ' ', <@R::crackers}<" eq ">fish dog carrot<"})
     || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
@@ -267,7 +262,7 @@ my %str = %(
     'xyz::bar' => 1,
 );
 
-my $test = 52;
+my $test = 51;
 print ((exists %str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists %str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists %str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;

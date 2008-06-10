@@ -578,7 +578,7 @@ sub process_para {
       last;
     }
     @XSStack[$XSS_work_idx]->{functions}->{$Full_func_name} ++ ;
-    %XsubAliases = %( %XsubAliasValues = %( %Interfaces = %( @Attributes = @( () ) ) ) );
+    %XsubAliases = %XsubAliasValues =  %Interfaces = %( < ( @Attributes = @() ) );
     $DoSetMagic = 1;
 
     $orig_args =~ s/\\\s*/ /g;	# process line continuations
@@ -1058,7 +1058,7 @@ sub TrimWhitespace
 }
 
 sub TidyType {
-    local ($_) = (nelems @_) ;
+    local ($_) = @_[0] ;
 
     # rationalise any '*' by joining them into bunches and removing whitespace
     s#\s*(\*+)\s*#$1#g;
@@ -1085,7 +1085,7 @@ sub print_section {
     # the "do" is required for right semantics
     do { $_ = shift(@line) } while !m/\S/ && nelems @line;
 
-    print("#line ", @line_no[(nelems @line_no) - nelems @line -1], " \"$filepathname\"\n")
+    print("#line ", @line_no[(nelems @line_no) - (nelems @line) -1], " \"$filepathname\"\n")
 	if $WantLineNumbers && !m/^\s*#\s*line\b/ && !m/^#if XSubPPtmp/;
     for (;  defined($_) && !m/^$BLOCK_re/o;  $_ = shift(@line)) {
 	print "$_\n";
@@ -1697,7 +1697,7 @@ sub output_init {
 sub Warn
   {
     # work out the line number
-    my $line_no = @line_no[(nelems @line_no) - nelems @line -1] ;
+    my $line_no = @line_no[(nelems @line_no) - (nelems @line) -1] ;
 
     print STDERR "{join ' ', <@_} in $filename, line $line_no\n" ;
   }
