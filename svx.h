@@ -62,7 +62,7 @@ static __inline__ const char* iiSvDESC(pTHX_ SV *sv) {
   case SVt_PVAV:
     return "array";
   default:
-    return "scalar";
+    return "plain value";
   }
 }
 #define SvDESC(sv) iiSvDESC(aTHX_ sv)

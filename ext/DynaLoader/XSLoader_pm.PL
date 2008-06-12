@@ -126,7 +126,7 @@ print OUT <<'EOT';
 
     # See comment block above
     push(@DynaLoader::dl_shared_objects, $file); # record files loaded
-    return &$xs(@_);
+    return &$xs(<@_);
 
   retry:
     my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
@@ -143,7 +143,7 @@ sub bootstrap_inherit {
     local @DynaLoader::isa = @(@DynaLoader::isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     require DynaLoader;
-    DynaLoader::bootstrap(@_);
+    DynaLoader::bootstrap(<@_);
 }
 
 1;

@@ -3768,7 +3768,7 @@ PP(pp_expand)
     if (gimme == G_SCALAR)
 	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
 
-    if (SvTYPE(sv) != SVt_PVAV && SvTYPE(sv) != SVt_PVHV)
+    if ( ! (SvAVOK(sv) || SvHVOK(sv)) )
 	Perl_croak(aTHX_ "expand operator may not be used upon a %s", SvDESC(sv));
 
     if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
