@@ -15,13 +15,7 @@ you need only say
 
 at the top of your program. This aliases all the short names to the long
 names in the current package. Some even have medium names, generally
-borrowed from B<awk>. In general, it's best to use the
-
-    use English '-no_match_vars';
-
-invocation if you don't need $PREMATCH, $MATCH, or $POSTMATCH, as it avoids
-a certain performance hit with the use of regular expressions. See
-L<English>.
+borrowed from B<awk>.
 
 Variables that depend on the currently selected filehandle may be set by
 calling an appropriate object method on the IO::Handle object, although
@@ -164,7 +158,7 @@ See L<perlfunc/-X>
 
 =item *
 
-The pattern matching operations C<m//>, C<s///> and C<tr///> (aka C<y///>)
+The pattern matching operations C<m//> and C<s///>
 when used without an C<=~> operator.
 
 =item *
@@ -223,80 +217,31 @@ matched in nested blocks that have been exited already.  (Mnemonic:
 like \digits.)  These variables are all read-only and dynamically
 scoped to the current BLOCK.
 
-=item $MATCH
-
-=item $&
-X<$&> X<$MATCH>
-
-The string matched by the last successful pattern match (not counting
-any matches hidden within a BLOCK or eval() enclosed by the current
-BLOCK).  (Mnemonic: like & in some editors.)  This variable is read-only
-and dynamically scoped to the current BLOCK.
-
-The use of this variable anywhere in a program imposes a considerable
-performance penalty on all regular expression matches.  See L</BUGS>.
-
-See L</@-> for a replacement.
-
 =item $^MATCH
 X<$^MATCH>
 
-This is similar to C<$&> (C<$POSTMATCH>) except that it does not incur the
-performance penalty associated with that variable, and is only guaranteed
-to return a defined value when the pattern was compiled or executed with
-the C</p> modifier.
-
-=item $PREMATCH
-
-=item $`
-X<$`> X<$PREMATCH>
-
-The string preceding whatever was matched by the last successful
-pattern match (not counting any matches hidden within a BLOCK or eval
-enclosed by the current BLOCK).  (Mnemonic: C<`> often precedes a quoted
-string.)  This variable is read-only.
-
-The use of this variable anywhere in a program imposes a considerable
-performance penalty on all regular expression matches.  See L</BUGS>.
-
-See L</@-> for a replacement.
+The string matched by the last successful pattern match of a pattern
+compiled or executed with the C</p> modifier (not counting any matches
+hidden within a BLOCK or eval() enclosed by the current BLOCK).  This
+variable is read-only and dynamically scoped to the current BLOCK.
 
 =item $^PREMATCH
 X<$^PREMATCH>
 
-This is similar to C<$`> ($PREMATCH) except that it does not incur the
-performance penalty associated with that variable, and is only guaranteed
-to return a defined value when the pattern was compiled or executed with
-the C</p> modifier.
-
-=item $POSTMATCH
-
-=item $'
-X<$'> X<$POSTMATCH>
-
-The string following whatever was matched by the last successful
-pattern match (not counting any matches hidden within a BLOCK or eval()
-enclosed by the current BLOCK).  (Mnemonic: C<'> often follows a quoted
-string.)  Example:
-
-    local $_ = 'abcdefghi';
-    /def/;
-    print "$`:$&:$'\n";  	# prints abc:def:ghi
-
-This variable is read-only and dynamically scoped to the current BLOCK.
-
-The use of this variable anywhere in a program imposes a considerable
-performance penalty on all regular expression matches.  See L</BUGS>.
-
-See L</@-> for a replacement.
+The string preceding whatever was matched by the last successful
+pattern match of a pattern compiled or executed with the C</p>
+modifier (not counting any matches hidden within a BLOCK or eval()
+enclosed by the current BLOCK). This variable is read-only and
+dynamically scoped to the current BLOCK.
 
 =item $^POSTMATCH
 X<$^POSTMATCH>
 
-This is similar to C<$'> (C<$POSTMATCH>) except that it does not incur the
-performance penalty associated with that variable, and is only guaranteed
-to return a defined value when the pattern was compiled or executed with
-the C</p> modifier.
+The string following whatever was matched by the last successful
+pattern match of a pattern compiled or executed with the C</p>
+modifier (not counting any matches hidden within a BLOCK or eval()
+enclosed by the current BLOCK). This variable is read-only and
+dynamically scoped to the current BLOCK.
 
 =item $LAST_PAREN_MATCH
 
@@ -579,11 +524,11 @@ After a match against some variable $var:
 
 =over 5
 
-=item C<$`> is the same as C<substr($var, 0, @-[0])>
+=item C<$^PREMATCH> is the same as C<substr($var, 0, @-[0])>
 
-=item C<$&> is the same as C<substr($var, @-[0], @+[0] - @-[0])>
+=item C<$^MATCH> is the same as C<substr($var, @-[0], @+[0] - @-[0])>
 
-=item C<$'> is the same as C<substr($var, @+[0])>
+=item C<$^POSTMATCH> is the same as C<substr($var, @+[0])>
 
 =item C<$1> is the same as C<substr($var, @-[1], @+[1] - @-[1])>  
 

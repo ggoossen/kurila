@@ -232,15 +232,15 @@ X<binding> X<operator, binding> X<=~> X<!~>
 Binary "=~" binds a scalar expression to a pattern match.  Certain operations
 search or modify the string $_ by default.  This operator makes that kind
 of operation work on some other string.  The right argument is a search
-pattern, substitution, or transliteration.  The left argument is what is
-supposed to be searched, substituted, or transliterated instead of the default
+pattern, or substitution.  The left argument is what is
+supposed to be searched, or substituted instead of the default
 $_.  When used in scalar context, the return value generally indicates the
 success of the operation.  Behavior in list context depends on the particular
 operator.  See L</"Regexp Quote-Like Operators"> for details and
 L<perlretut> for examples using these operators.
 
-If the right argument is an expression rather than a search pattern,
-substitution, or transliteration, it is interpreted as a search pattern at run
+If the right argument is an expression rather than a search pattern, or
+substitution, it is interpreted as a search pattern at run
 time. Note that this means that its contents will be interpolated twice, so
 
   '\' =~ q'\';
@@ -824,12 +824,11 @@ any pair of delimiters you choose.
     Customary  Generic        Meaning	     Interpolates
 	''	 q{}	      Literal		  no
 	""	qq{}	      Literal		  yes
-	``	qx{}	      Command		  yes*
+	``	qx{}	      Command		  yes
 		qw{}	     Word list		  no
-	//	 m{}	   Pattern match	  yes*
-		qr{}	      Pattern		  yes*
-		 s{}{}	    Substitution	  yes*
-		tr{}{}	  Transliteration	  no (but see below)
+	//	 m{}	   Pattern match	  yes
+		qr{}	      Pattern		  yes
+		 s{}{}	    Substitution	  yes
         <<EOF                 here-doc            yes*
 
 	* unless the delimiter is ''.
@@ -861,9 +860,8 @@ from the next line.  This allows you to write:
     s {foo}  # Replace foo
       {bar}  # with bar.
 
-The following escape sequences are available in constructs that interpolate
-and in transliterations.
-X<\t> X<\n> X<\r> X<\f> X<\b> X<\a> X<\e> X<\x> X<\0> X<\c> X<\N>
+The following escape sequences are available in constructs that interpolate.
+X<\t> X<\n> X<\r> X<\f> X<\b> X<\a> X<\e> X<\x> X<\0> X<\c> X<\N> X<\l> X<\u> X<\L> X<\U> X<\E> X<\Q>
 
     \t		tab             (HT, TAB)
     \n		newline         (NL)
@@ -878,6 +876,12 @@ X<\t> X<\n> X<\r> X<\f> X<\b> X<\a> X<\e> X<\x> X<\0> X<\c> X<\N>
     \x{263a}	wide hex char	(example: SMILEY)
     \c[		control char    (example: ESC)
     \N{name}	named Unicode character
+    \l		lowercase next char
+    \u		uppercase next char
+    \L		lowercase till \E
+    \U		uppercase till \E
+    \E		end case modification
+    \Q		quote non-word characters till \E
 
 The character following C<\c> is mapped to some other character by
 converting letters to upper case and then (on ASCII systems) by inverting
@@ -889,17 +893,6 @@ in 0x00 through 0x1F and 0x7F.
 
 B<NOTE>: Unlike C and other languages, Perl has no \v escape sequence for
 the vertical tab (VT - ASCII 11), but you may use C<\ck> or C<\x0b>.
-
-The following escape sequences are available in constructs that interpolate
-but not in transliterations.
-X<\l> X<\u> X<\L> X<\U> X<\E> X<\Q>
-
-    \l		lowercase next char
-    \u		uppercase next char
-    \L		lowercase till \E
-    \U		uppercase till \E
-    \E		end case modification
-    \Q		quote non-word characters till \E
 
 If C<use locale> is in effect, the case map used by C<\l>, C<\L>,
 C<\u> and C<\U> is taken from the current locale.  See L<perllocale>.
@@ -1428,97 +1421,6 @@ put comments into a multi-line C<qw>-string.  For this reason, the
 C<use warnings> pragma and the B<-w> switch (that is, the C<$^W> variable)
 produces warnings if the STRING contains the "," or the "#" character.
 
-
-=item tr/SEARCHLIST/REPLACEMENTLIST/cds
-X<tr> X<y> X<transliterate> X</c> X</d> X</s>
-
-=item y/SEARCHLIST/REPLACEMENTLIST/cds
-
-Transliterates all occurrences of the characters found in the search list
-with the corresponding character in the replacement list.  It returns
-the number of characters replaced or deleted.  If no string is
-specified via the =~ or !~ operator, the $_ string is transliterated.  (The
-string specified with =~ must be a scalar variable, an array element, a
-hash element, or an assignment to one of those, i.e., an lvalue.)
-
-A character range may be specified with a hyphen, so C<tr/A-J/0-9/>
-does the same replacement as C<tr/ACEGIBDFHJ/0246813579/>.
-For B<sed> devotees, C<y> is provided as a synonym for C<tr>.  If the
-SEARCHLIST is delimited by bracketing quotes, the REPLACEMENTLIST has
-its own pair of quotes, which may or may not be bracketing quotes,
-e.g., C<tr[A-Z][a-z]> or C<tr(+\-*/)/ABCD/>.
-
-Note that C<tr> does B<not> do regular expression character classes
-such as C<\d> or C<[:lower:]>.  The C<tr> operator is not equivalent to
-the tr(1) utility.  If you want to map strings between lower/upper
-cases, see L<perlfunc/lc> and L<perlfunc/uc>, and in general consider
-using the C<s> operator if you need regular expressions.
-
-Note also that the whole range idea is rather unportable between
-character sets--and even within character sets they may cause results
-you probably didn't expect.  A sound principle is to use only ranges
-that begin from and end at either alphabets of equal case (a-e, A-E),
-or digits (0-4).  Anything else is unsafe.  If in doubt, spell out the
-character sets in full.
-
-Options:
-
-    c	Complement the SEARCHLIST.
-    d	Delete found but unreplaced characters.
-    s	Squash duplicate replaced characters.
-
-If the C</c> modifier is specified, the SEARCHLIST character set
-is complemented.  If the C</d> modifier is specified, any characters
-specified by SEARCHLIST not found in REPLACEMENTLIST are deleted.
-(Note that this is slightly more flexible than the behavior of some
-B<tr> programs, which delete anything they find in the SEARCHLIST,
-period.) If the C</s> modifier is specified, sequences of characters
-that were transliterated to the same character are squashed down
-to a single instance of the character.
-
-If the C</d> modifier is used, the REPLACEMENTLIST is always interpreted
-exactly as specified.  Otherwise, if the REPLACEMENTLIST is shorter
-than the SEARCHLIST, the final character is replicated till it is long
-enough.  If the REPLACEMENTLIST is empty, the SEARCHLIST is replicated.
-This latter is useful for counting characters in a class or for
-squashing character sequences in a class.
-
-Examples:
-
-    $ARGV[1] =~ tr/A-Z/a-z/;	# canonicalize to lower case
-
-    $cnt = tr/*/*/;		# count the stars in $_
-
-    $cnt = $sky =~ tr/*/*/;	# count the stars in $sky
-
-    $cnt = tr/0-9//;		# count the digits in $_
-
-    tr/a-zA-Z//s;		# bookkeeper -> bokeper
-
-    ($HOST = $host) =~ tr/a-z/A-Z/;
-
-    tr/a-zA-Z/ /cs;		# change non-alphas to single space
-
-    tr [\200-\377]
-       [\000-\177];		# delete 8th bit
-
-If multiple transliterations are given for a character, only the
-first one is used:
-
-    tr/AAA/XYZ/
-
-will transliterate any A to X.
-
-Because the transliteration table is built at compile time, neither
-the SEARCHLIST nor the REPLACEMENTLIST are subjected to double quote
-interpolation.  That means that if you want to use variables, you
-must use an eval():
-
-    eval "tr/$oldlist/$newlist/";
-    die $@ if $@;
-
-    eval "tr/$oldlist/$newlist/, 1" or die $@;
-
 =item <<EOF
 X<here-doc> X<heredoc> X<here-document> X<<< << >>>
 
@@ -1699,14 +1601,13 @@ and C<\[> are all skipped, and nested C<[> and C<]> are skipped as well.
 However, when backslashes are used as the delimiters (like C<qq\\> and
 C<tr\\\>), nothing is skipped.
 
-For constructs with three-part delimiters (C<s///>, C<y///>, and
-C<tr///>), the search is repeated once more.
+For constructs with three-part delimiters (C<s///>), the search is repeated once more.
 If the first delimiter is not an opening punctuation, three delimiters must
-be same such as C<s!!!> and C<tr)))>, in which case the second delimiter
+be same such as C<s!!!> and C<s)))>, in which case the second delimiter
 terminates the left part and starts the right part at once.
 If the left part is delimited by bracketing punctuations (that is C<()>,
 C<[]>, C<{}>, or C<< <> >>), the right part needs another pair of
-delimiters such as C<s(){}> and C<tr[]//>.  In these cases, whitespaces
+delimiters such as C<s(){}> and C<s[]//>.  In these cases, whitespaces
 and comments are allowed between both parts, though the comment must follow
 at least one whitespace; otherwise a character expected as the start of
 the comment may be regarded as the starting delimiter of the right part.
@@ -1751,15 +1652,6 @@ are not available for here-docs.
 
 No interpolation is performed. 
 Note that the combination C<\\> is left intact, as is C<\'>.
-
-=item C<tr///>, C<y///>
-
-No variable interpolation occurs.  String modifying combinations for
-case and quoting such as C<\Q>, C<\U>, and C<\E> are not recognized.
-The other escape sequences such as C<\200> and C<\t> and backslashed
-characters such as C<\\> and C<\-> are converted to appropriate literals.
-The character C<-> is treated specially and therefore C<\-> is treated
-as a literal C<->.
 
 =item C<"">, C<``>, C<qq//>, C<qx//>, C<<<"EOF">
 
