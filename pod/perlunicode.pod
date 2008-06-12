@@ -134,12 +134,6 @@ C<< (?>\PM\pM*) >>.
 
 =item *
 
-The C<tr///> operator translates characters instead of bytes.  Note
-that the C<tr///CU> functionality has been removed.  For similar
-functionality see pack('U0', ...) and pack('C0', ...).
-
-=item *
-
 Case translation operators use the Unicode case translation tables
 when character input is provided.  Note that C<uc()>, or C<\U> in
 interpolated strings, translates to uppercase, while C<ucfirst>,

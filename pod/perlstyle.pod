@@ -251,13 +251,6 @@ sufficient example:
 
 =item *
 
-Line up your transliterations when it makes sense:
-
-    tr [abc]
-       [xyz];
-
-=item *
-
 Think about reusability.  Why waste brainpower on a one-shot when you
 might want to do something like it again?  Consider generalizing your
 code.  Consider writing a module or object class.  Consider making your

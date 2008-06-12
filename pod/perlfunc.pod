@@ -101,7 +101,7 @@ X<scalar> X<string> X<character>
 
 C<chomp>, C<chop>, C<chr>, C<crypt>, C<hex>, C<index>, C<lc>, C<lcfirst>,
 C<length>, C<oct>, C<ord>, C<pack>, C<q//>, C<qq//>, C<reverse>,
-C<rindex>, C<sprintf>, C<substr>, C<tr///>, C<uc>, C<ucfirst>, C<y///>
+C<rindex>, C<sprintf>, C<substr>, C<uc>, C<ucfirst>
 
 =item Regular expressions and pattern matching
 X<regular expression> X<regex> X<regexp>
@@ -6405,10 +6405,6 @@ In scalar context, C<times> returns C<$user>.
 
 Note that times for children are included only after they terminate.
 
-=item tr///
-
-The transliteration operator.  Same as C<y///>.  See L<perlop>.
-
 =item truncate FILEHANDLE,LENGTH
 X<truncate>
 
@@ -6961,9 +6957,5 @@ is evaluated and the resulting string is used to look up the name of
 the FILEHANDLE at run time.  For more on formats, see L<perlform>.
 
 Note that write is I<not> the opposite of C<read>.  Unfortunately.
-
-=item y///
-
-The transliteration operator.  Same as C<tr///>.  See L<perlop>.
 
 =back
