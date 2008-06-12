@@ -91,14 +91,15 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila111delta> What is new for Perl Kurila 1.11, L<kurila110delta> What
-is new for Perl Kurila 1.10, L<kurila19delta> What is new for Perl Kurila
-1.9, L<kurila18delta> What is new for Perl Kurila 1.8, L<kurila17delta>
-What is new for Perl Kurila 1.7, L<kurila16delta> What is new for Perl
-Kurila 1.6, L<kurila15delta> What is new for Perl Kurila 1.5,
-L<kurila14delta> What is new for Perl Kurila 1.4, L<kurila13delta> What is
-new for Perl Kurila 1.3, L<kurila02delta> What is new for Perl Kurila 0.2,
-L<kurila01delta> What is new for Perl Kurila 0.1
+L<kurila112delta> What is new for Perl Kurila 1.12, L<kurila111delta> What
+is new for Perl Kurila 1.11, L<kurila110delta> What is new for Perl Kurila
+1.10, L<kurila19delta> What is new for Perl Kurila 1.9, L<kurila18delta>
+What is new for Perl Kurila 1.8, L<kurila17delta> What is new for Perl
+Kurila 1.7, L<kurila16delta> What is new for Perl Kurila 1.6,
+L<kurila15delta> What is new for Perl Kurila 1.5, L<kurila14delta> What is
+new for Perl Kurila 1.4, L<kurila13delta> What is new for Perl Kurila 1.3,
+L<kurila02delta> What is new for Perl Kurila 0.2, L<kurila01delta> What is
+new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -2090,18 +2091,17 @@ X<operator, quote-like>
 q/STRING/ X<q> X<quote, single> X<'> X<''>, 'STRING', qq/STRING/ X<qq>
 X<quote, double> X<"> X<"">, "STRING", qx/STRING/ X<qx> X<`> X<``>
 X<backtick>, `STRING`, qw/STRING/ X<qw> X<quote, list> X<quote, words>,
-tr/SEARCHLIST/REPLACEMENTLIST/cds X<tr> X<y> X<transliterate> X</c> X</d>
-X</s>, y/SEARCHLIST/REPLACEMENTLIST/cds, <<EOF X<here-doc> X<heredoc>
-X<here-document> X<<< << >>>, Double Quotes, Single Quotes, Backticks
+<<EOF X<here-doc> X<heredoc> X<here-document> X<<< << >>>, Double Quotes,
+Single Quotes, Backticks
 
 =item Gory details of parsing quoted constructs
 X<quote, gory details>
 
 Finding the end, Interpolation X<interpolation>, C<<<'EOF'>, C<''>, C<q//>,
-C<tr///>, C<y///>, C<"">, C<``>, C<qq//>, C<qx//>, C<<<"EOF">, the
-replacement of C<s///>, C<RE> in C<?RE?>, C</RE/>, C<m/RE/>, C<s/RE/foo/>,,
-parsing regular expressions X<regexp, parse>, Optimization of regular
-expressions X<regexp, optimization>
+C<"">, C<``>, C<qq//>, C<qx//>, C<<<"EOF">, the replacement of C<s///>,
+C<RE> in C<?RE?>, C</RE/>, C<m/RE/>, C<s/RE/foo/>,, parsing regular
+expressions X<regexp, parse>, Optimization of regular expressions X<regexp,
+optimization>
 
 =item I/O Operators
 X<operator, i/o> X<operator, io> X<io> X<while> X<filehandle>
@@ -2351,17 +2351,17 @@ X<shell>, system PROGRAM LIST, syswrite FILEHANDLE,SCALAR,LENGTH,OFFSET
 X<syswrite>, syswrite FILEHANDLE,SCALAR,LENGTH, syswrite FILEHANDLE,SCALAR,
 tell FILEHANDLE X<tell>, tell, telldir DIRHANDLE X<telldir>, tie
 VARIABLE,CLASSNAME,LIST X<tie>, tied VARIABLE X<tied>, time X<time>
-X<epoch>, times X<times>, tr///, truncate FILEHANDLE,LENGTH X<truncate>,
-truncate EXPR,LENGTH, uc EXPR X<uc> X<uppercase> X<toupper>, uc, ucfirst
-EXPR X<ucfirst> X<uppercase>, ucfirst, umask EXPR X<umask>, umask, undef
-EXPR X<undef> X<undefine>, undef, unlink LIST X<unlink> X<delete> X<remove>
+X<epoch>, times X<times>, truncate FILEHANDLE,LENGTH X<truncate>, truncate
+EXPR,LENGTH, uc EXPR X<uc> X<uppercase> X<toupper>, uc, ucfirst EXPR
+X<ucfirst> X<uppercase>, ucfirst, umask EXPR X<umask>, umask, undef EXPR
+X<undef> X<undefine>, undef, unlink LIST X<unlink> X<delete> X<remove>
 X<rm> X<del>, unlink, unpack TEMPLATE,EXPR X<unpack>, unpack TEMPLATE,
 untie VARIABLE X<untie>, unshift ARRAY,LIST X<unshift>, use Module VERSION
 LIST X<use> X<module> X<import>, use Module VERSION, use Module LIST, use
 Module, utime LIST X<utime>, values HASH X<values>, vec EXPR,OFFSET,BITS
 X<vec> X<bit> X<bit vector>, wait X<wait>, waitpid PID,FLAGS X<waitpid>,
 wantarray X<wantarray> X<context>, warn LIST X<warn> X<warning> X<STDERR>,
-write FILEHANDLE X<write>, write EXPR, write, y///
+write FILEHANDLE X<write>, write EXPR, write
 
 =back
 
@@ -2842,14 +2842,13 @@ X<memory usage>
 =item Predefined Names
 
 $ARG, $_ X<$_> X<$ARG>, $a, $b X<$a> X<$b>, $<I<digits>> X<$1> X<$2> X<$3>,
-$MATCH, $& X<$&> X<$MATCH>, $^MATCH X<$^MATCH>, $PREMATCH, $` X<$`>
-X<$PREMATCH>, $^PREMATCH X<$^PREMATCH>, $POSTMATCH, $' X<$'> X<$POSTMATCH>,
-$^POSTMATCH X<$^POSTMATCH>, $LAST_PAREN_MATCH, $+ X<$+>
-X<$LAST_PAREN_MATCH>, $LAST_SUBMATCH_RESULT, $^N X<$^N>, @LAST_MATCH_END,
-@+ X<@+> X<@LAST_MATCH_END>, %+ X<%+>, HANDLE->input_line_number(EXPR),
-$INPUT_LINE_NUMBER, $NR, $. X<$.> X<$NR> X<$INPUT_LINE_NUMBER> X<line
-number>, IO::Handle->input_record_separator(EXPR), $INPUT_RECORD_SEPARATOR,
-$RS, $/ X<$/> X<$RS> X<$INPUT_RECORD_SEPARATOR>, HANDLE->autoflush(EXPR),
+$^MATCH X<$^MATCH>, $^PREMATCH X<$^PREMATCH>, $^POSTMATCH X<$^POSTMATCH>,
+$LAST_PAREN_MATCH, $+ X<$+> X<$LAST_PAREN_MATCH>, $LAST_SUBMATCH_RESULT,
+$^N X<$^N>, @LAST_MATCH_END, @+ X<@+> X<@LAST_MATCH_END>, %+ X<%+>,
+HANDLE->input_line_number(EXPR), $INPUT_LINE_NUMBER, $NR, $. X<$.> X<$NR>
+X<$INPUT_LINE_NUMBER> X<line number>,
+IO::Handle->input_record_separator(EXPR), $INPUT_RECORD_SEPARATOR, $RS, $/
+X<$/> X<$RS> X<$INPUT_RECORD_SEPARATOR>, HANDLE->autoflush(EXPR),
 $OUTPUT_AUTOFLUSH, $| X<$|> X<autoflush> X<flush> X<$OUTPUT_AUTOFLUSH>,
 IO::Handle->output_field_separator EXPR, $OUTPUT_FIELD_SEPARATOR, $OFS, $,
 X<$,> X<$OFS> X<$OUTPUT_FIELD_SEPARATOR>,
@@ -2857,25 +2856,26 @@ IO::Handle->output_record_separator EXPR, $OUTPUT_RECORD_SEPARATOR, $ORS,
 $\ X<$\> X<$ORS> X<$OUTPUT_RECORD_SEPARATOR>, $LIST_SEPARATOR, $" X<$">
 X<$LIST_SEPARATOR>, $SUBSCRIPT_SEPARATOR, $SUBSEP, $; X<$;> X<$SUBSEP>
 X<SUBSCRIPT_SEPARATOR>, @LAST_MATCH_START, @- X<@-> X<@LAST_MATCH_START>,
-C<$`> is the same as C<substr($var, 0, @-[0])>, C<$&> is the same as
-C<substr($var, @-[0], @+[0] - @-[0])>, C<$'> is the same as C<substr($var,
-@+[0])>, C<$1> is the same as C<substr($var, @-[1], @+[1] - @-[1])>, C<$2>
-is the same as C<substr($var, @-[2], @+[2] - @-[2])>, C<$3> is the same as
-C<substr($var, @-[3], @+[3] - @-[3])>, %- X<%->, $CHILD_ERROR, $? X<$?>
-X<$CHILD_ERROR>, $^CHILD_ERROR_NATIVE X<$^CHILD_ERROR_NATIVE>, $^ENCODING
-X<$^ENCODING>, $OS_ERROR, $ERRNO, $! X<$!> X<$ERRNO> X<$OS_ERROR>,
-%OS_ERROR, %ERRNO, %! X<%!>, $EXTENDED_OS_ERROR, $^E X<$^E>
-X<$EXTENDED_OS_ERROR>, $EVAL_ERROR, $@ X<$@> X<$EVAL_ERROR>, $PROCESS_ID,
-$PID, $$ X<$$> X<$PID> X<$PROCESS_ID>, $REAL_USER_ID, $UID, $< X<< $< >>
-X<$UID> X<$REAL_USER_ID>, $EFFECTIVE_USER_ID, $EUID, $> X<< $> >> X<$EUID>
-X<$EFFECTIVE_USER_ID>, $REAL_GROUP_ID, $^GID, $EFFECTIVE_GROUP_ID, $^EGID,
-$PROGRAM_NAME, $0 X<$0> X<$PROGRAM_NAME>, $COMPILING, $^C X<$^C>
-X<$COMPILING>, $DEBUGGING, $^D X<$^D> X<$DEBUGGING>, $^RE_DEBUG_FLAGS,
-$^RE_TRIE_MAXBUF, $SYSTEM_FD_MAX, $^F X<$^F> X<$SYSTEM_FD_MAX>, $^H, %^H,
-$INPLACE_EDIT, $^I X<$^I> X<$INPLACE_EDIT>, $^M X<$^M>, $OSNAME, $^O X<$^O>
-X<$OSNAME>, $^OPEN, $PERLDB, $^P X<$^P> X<$PERLDB>, 0x01, 0x02, 0x04, 0x08,
-0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, $LAST_REGEXP_CODE_RESULT, $^R
-X<$^R> X<$LAST_REGEXP_CODE_RESULT>, $EXCEPTIONS_BEING_CAUGHT, $^S X<$^S>
+C<$^PREMATCH> is the same as C<substr($var, 0, @-[0])>, C<$^MATCH> is the
+same as C<substr($var, @-[0], @+[0] - @-[0])>, C<$^POSTMATCH> is the same
+as C<substr($var, @+[0])>, C<$1> is the same as C<substr($var, @-[1], @+[1]
+- @-[1])>, C<$2> is the same as C<substr($var, @-[2], @+[2] - @-[2])>,
+C<$3> is the same as C<substr($var, @-[3], @+[3] - @-[3])>, %- X<%->,
+$CHILD_ERROR, $? X<$?> X<$CHILD_ERROR>, $^CHILD_ERROR_NATIVE
+X<$^CHILD_ERROR_NATIVE>, $^ENCODING X<$^ENCODING>, $OS_ERROR, $ERRNO, $!
+X<$!> X<$ERRNO> X<$OS_ERROR>, %OS_ERROR, %ERRNO, %! X<%!>,
+$EXTENDED_OS_ERROR, $^E X<$^E> X<$EXTENDED_OS_ERROR>, $EVAL_ERROR, $@ X<$@>
+X<$EVAL_ERROR>, $PROCESS_ID, $PID, $$ X<$$> X<$PID> X<$PROCESS_ID>,
+$REAL_USER_ID, $UID, $< X<< $< >> X<$UID> X<$REAL_USER_ID>,
+$EFFECTIVE_USER_ID, $EUID, $> X<< $> >> X<$EUID> X<$EFFECTIVE_USER_ID>,
+$REAL_GROUP_ID, $^GID, $EFFECTIVE_GROUP_ID, $^EGID, $PROGRAM_NAME, $0 X<$0>
+X<$PROGRAM_NAME>, $COMPILING, $^C X<$^C> X<$COMPILING>, $DEBUGGING, $^D
+X<$^D> X<$DEBUGGING>, $^RE_DEBUG_FLAGS, $^RE_TRIE_MAXBUF, $SYSTEM_FD_MAX,
+$^F X<$^F> X<$SYSTEM_FD_MAX>, $^H, %^H, $INPLACE_EDIT, $^I X<$^I>
+X<$INPLACE_EDIT>, $^M X<$^M>, $OSNAME, $^O X<$^O> X<$OSNAME>, $^OPEN,
+$PERLDB, $^P X<$^P> X<$PERLDB>, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
+0x80, 0x100, 0x200, 0x400, $LAST_REGEXP_CODE_RESULT, $^R X<$^R>
+X<$LAST_REGEXP_CODE_RESULT>, $EXCEPTIONS_BEING_CAUGHT, $^S X<$^S>
 X<$EXCEPTIONS_BEING_CAUGHT>, $BASETIME, $^T X<$^T> X<$BASETIME>, $^TAINT,
 $^UNICODE, $^UTF8CACHE, $^UTF8LOCALE, $PERL_VERSION, $^V X<$^V>
 X<$PERL_VERSION>, $^WARN_HOOK X<$^WARN_HOOK>, $^DIE_HOOK, $WARNING, $^W
@@ -5943,10 +5943,6 @@ PAD_SAVE_SETNULLPAD X<PAD_SAVE_SETNULLPAD>, PAD_SETSV X<PAD_SETSV>,
 PAD_SET_CUR X<PAD_SET_CUR>, PAD_SET_CUR_NOSAVE X<PAD_SET_CUR_NOSAVE>,
 PAD_SV X<PAD_SV>, PAD_SVl X<PAD_SVl>, SAVECLEARSV X<SAVECLEARSV>,
 SAVECOMPPAD X<SAVECOMPPAD>, SAVEPADSV X<SAVEPADSV>
-
-=item GV Functions
-
-is_gv_magical X<is_gv_magical>, is_gv_magical_sv X<is_gv_magical_sv>
 
 =item IO Functions
 
@@ -11848,18 +11844,6 @@ Steve Hay E<lt>steve.hay@uk.radan.comE<gt>
 
 =head1 PRAGMA DOCUMENTATION
 
-=head2 attrs - set/get attributes of a subroutine (deprecated)
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-method, locked
-
-=back
-
 =head2 re - Perl pragma to alter regular expression behaviour
 
 =over 4
@@ -14667,82 +14651,6 @@ $io_handle ), $ctx->add_bits( $data, $nbits ), $ctx->add_bits( $bitstring
 
 =back
 
-=head2 Digest::MD5 - Perl interface to the MD5 Algorithm
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item FUNCTIONS
-
-md5($data,...), md5_hex($data,...), md5_base64($data,...)
-
-=item METHODS
-
-$md5 = Digest::MD5->new, $md5->reset, $md5->clone, $md5->add($data,...),
-$md5->addfile($io_handle), $md5->add_bits($data, $nbits),
-$md5->add_bits($bitstring), $md5->digest, $md5->hexdigest, $md5->b64digest
-
-=item EXAMPLES
-
-=item SEE ALSO
-
-=item COPYRIGHT
-
-=item AUTHORS
-
-=back
-
-=head2 Digest::SHA - Perl extension for SHA-1/224/256/384/512
-
-=over 4
-
-=item SYNOPSIS
-
-=item SYNOPSIS (HMAC-SHA)
-
-=item ABSTRACT
-
-=item DESCRIPTION
-
-=item NIST STATEMENT ON SHA-1
-
-=item PADDING OF BASE64 DIGESTS
-
-=item EXPORT
-
-=item EXPORTABLE FUNCTIONS
-
-B<sha1($data, ...)>, B<sha224($data, ...)>, B<sha256($data, ...)>,
-B<sha384($data, ...)>, B<sha512($data, ...)>, B<sha1_hex($data, ...)>,
-B<sha224_hex($data, ...)>, B<sha256_hex($data, ...)>, B<sha384_hex($data,
-...)>, B<sha512_hex($data, ...)>, B<sha1_base64($data, ...)>,
-B<sha224_base64($data, ...)>, B<sha256_base64($data, ...)>,
-B<sha384_base64($data, ...)>, B<sha512_base64($data, ...)>, B<new($alg)>,
-B<reset($alg)>, B<hashsize>, B<algorithm>, B<clone>, B<add($data, ...)>,
-B<add_bits($data, $nbits)>, B<add_bits($bits)>, B<addfile(*FILE)>,
-B<addfile($filename [, $mode])>, B<dump($filename)>, B<load($filename)>,
-B<digest>, B<hexdigest>, B<b64digest>, B<hmac_sha1($data, $key)>,
-B<hmac_sha224($data, $key)>, B<hmac_sha256($data, $key)>,
-B<hmac_sha384($data, $key)>, B<hmac_sha512($data, $key)>,
-B<hmac_sha1_hex($data, $key)>, B<hmac_sha224_hex($data, $key)>,
-B<hmac_sha256_hex($data, $key)>, B<hmac_sha384_hex($data, $key)>,
-B<hmac_sha512_hex($data, $key)>, B<hmac_sha1_base64($data, $key)>,
-B<hmac_sha224_base64($data, $key)>, B<hmac_sha256_base64($data, $key)>,
-B<hmac_sha384_base64($data, $key)>, B<hmac_sha512_base64($data, $key)>
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item ACKNOWLEDGMENTS
-
-=item COPYRIGHT AND LICENSE
-
-=back
-
 =head2 Digest::base - Digest base class
 
 =over 4
@@ -14848,8 +14756,6 @@ variables
 =item SYNOPSIS
 
 =item DESCRIPTION
-
-=item PERFORMANCE
 
 =back
 
@@ -21776,262 +21682,6 @@ modules, verbose, nocache
 
 =back
 
-=head2 Net::Cmd - Network Command class (as used by FTP, SMTP etc)
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item USER METHODS
-
-debug ( VALUE ), message (), code (), ok (), status (), datasend ( DATA ),
-dataend ()
-
-=item CLASS METHODS
-
-debug_print ( DIR, TEXT ), debug_text ( TEXT ), command ( CMD [, ARGS, ...
-]), unsupported (), response (), parse_response ( TEXT ), getline (),
-ungetline ( TEXT ), rawdatasend ( DATA ), read_until_dot (), tied_fh ()
-
-=item EXPORTS
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Net::Config - Local configuration data for libnet
-
-=over 4
-
-=item SYNOPSYS
-
-=item DESCRIPTION
-
-=item METHODS
-
-requires_firewall HOST
-
-=item NetConfig VALUES
-
-nntp_hosts, snpp_hosts, pop3_hosts, smtp_hosts, ph_hosts, daytime_hosts,
-time_hosts, inet_domain, ftp_firewall, ftp_firewall_type, ftp_ext_passive,
-ftp_int_passive, local_netmask, test_hosts, test_exists
-
-=back
-
-=head2 Net::Domain - Attempt to evaluate the current host's internet name
-and domain
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-hostfqdn (), domainname (), hostname (), hostdomain ()
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Net::FTP - FTP Client class
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item OVERVIEW
-
-=item CONSTRUCTOR
-
-new ([ HOST ] [, OPTIONS ])
-
-=item METHODS
-
-login ([LOGIN [,PASSWORD [, ACCOUNT] ] ]), authorize ( [AUTH [, RESP]]),
-site (ARGS), ascii, binary, rename ( OLDNAME, NEWNAME ), delete ( FILENAME
-), cwd ( [ DIR ] ), cdup (), pwd (), restart ( WHERE ), rmdir ( DIR [,
-RECURSE ]), mkdir ( DIR [, RECURSE ]), alloc ( SIZE [, RECORD_SIZE] ), ls (
-[ DIR ] ), dir ( [ DIR ] ), get ( REMOTE_FILE [, LOCAL_FILE [, WHERE]] ),
-put ( LOCAL_FILE [, REMOTE_FILE ] ), put_unique ( LOCAL_FILE [, REMOTE_FILE
-] ), append ( LOCAL_FILE [, REMOTE_FILE ] ), unique_name (), mdtm ( FILE ),
-size ( FILE ), supported ( CMD ), hash ( [FILEHANDLE_GLOB_REF],[
-BYTES_PER_HASH_MARK] ), feature ( NAME ), nlst ( [ DIR ] ), list ( [ DIR ]
-), retr ( FILE ), stor ( FILE ), stou ( FILE ), appe ( FILE ), port ( [
-PORT ] ), pasv (), pasv_xfer ( SRC_FILE, DEST_SERVER [, DEST_FILE ] ),
-pasv_xfer_unique ( SRC_FILE, DEST_SERVER [, DEST_FILE ] ), pasv_wait (
-NON_PASV_SERVER ), abort (), quit ()
-
-=over 4
-
-=item Methods for the adventurous
-
-quot (CMD [,ARGS])
-
-=back
-
-=item THE dataconn CLASS
-
-read ( BUFFER, SIZE [, TIMEOUT ] ), write ( BUFFER, SIZE [, TIMEOUT ] ),
-bytes_read (), abort (), close ()
-
-=item UNIMPLEMENTED
-
-B<SMNT>, B<HELP>, B<MODE>, B<SYST>, B<STAT>, B<STRU>, B<REIN>
-
-=item REPORTING BUGS
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=item USE EXAMPLES
-
-http://www.csh.rit.edu/~adam/Progs/
-
-=item CREDITS
-
-=item COPYRIGHT
-
-=back
-
-=head2 Net::NNTP - NNTP Client class
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item CONSTRUCTOR
-
-new ( [ HOST ] [, OPTIONS ])
-
-=item METHODS
-
-article ( [ MSGID|MSGNUM ], [FH] ), body ( [ MSGID|MSGNUM ], [FH] ), head (
-[ MSGID|MSGNUM ], [FH] ), articlefh ( [ MSGID|MSGNUM ] ), bodyfh ( [
-MSGID|MSGNUM ] ), headfh ( [ MSGID|MSGNUM ] ), nntpstat ( [ MSGID|MSGNUM ]
-), group ( [ GROUP ] ), ihave ( MSGID [, MESSAGE ]), last (), date (),
-postok (), authinfo ( USER, PASS ), list (), newgroups ( SINCE [,
-DISTRIBUTIONS ]), newnews ( SINCE [, GROUPS [, DISTRIBUTIONS ]]), next (),
-post ( [ MESSAGE ] ), postfh (), slave (), quit ()
-
-=over 4
-
-=item Extension methods
-
-newsgroups ( [ PATTERN ] ), distributions (), subscriptions (),
-overview_fmt (), active_times (), active ( [ PATTERN ] ), xgtitle ( PATTERN
-), xhdr ( HEADER, MESSAGE-SPEC ), xover ( MESSAGE-SPEC ), xpath (
-MESSAGE-ID ), xpat ( HEADER, PATTERN, MESSAGE-SPEC), xrover, listgroup ( [
-GROUP ] ), reader
-
-=back
-
-=item UNSUPPORTED
-
-=item DEFINITIONS
-
-MESSAGE-SPEC, PATTERN, Examples, C<[^]-]>, C<*bdc>, C<[0-9a-zA-Z]>, C<a??d>
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Net::POP3 - Post Office Protocol 3 Client class (RFC1939)
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item CONSTRUCTOR
-
-new ( [ HOST ] [, OPTIONS ] 0
-
-=item METHODS
-
-auth ( USERNAME, PASSWORD ), user ( USER ), pass ( PASS ), login ( [ USER
-[, PASS ]] ), apop ( [ USER [, PASS ]] ), banner (), capa (),  capabilities
-(), top ( MSGNUM [, NUMLINES ] ), list ( [ MSGNUM ] ), get ( MSGNUM [, FH ]
-), getfh ( MSGNUM ), last (), popstat (), ping ( USER ), uidl ( [ MSGNUM ]
-), delete ( MSGNUM ), reset (), quit ()
-
-=item NOTES
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Net::SMTP - Simple Mail Transfer Protocol Client
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item EXAMPLES
-
-=item CONSTRUCTOR
-
-new ( [ HOST ] [, OPTIONS ] )
-
-=item METHODS
-
-banner (), domain (), hello ( DOMAIN ), host (), etrn ( DOMAIN ), auth (
-USERNAME, PASSWORD ), mail ( ADDRESS [, OPTIONS] ), send ( ADDRESS ),
-send_or_mail ( ADDRESS ), send_and_mail ( ADDRESS ), reset (), recipient (
-ADDRESS [, ADDRESS, [...]] [, OPTIONS ] ), to ( ADDRESS [, ADDRESS [...]]
-), cc ( ADDRESS [, ADDRESS [...]] ), bcc ( ADDRESS [, ADDRESS [...]] ),
-data ( [ DATA ] ), expand ( ADDRESS ), verify ( ADDRESS ), help ( [
-$subject ] ), quit ()
-
-=item ADDRESSES
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
-=head2 Net::Time - time and daytime network client interface
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-inet_time ( [HOST [, PROTOCOL [, TIMEOUT]]]), inet_daytime ( [HOST [,
-PROTOCOL [, TIMEOUT]]])
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=back
-
 =head2 Net::hostent - by-name interface to Perl's built-in gethost*()
 functions
 
@@ -22046,107 +21696,6 @@ functions
 =item NOTE
 
 =item AUTHOR
-
-=back
-
-=head2 Net::libnetFAQ, libnetFAQ - libnet Frequently Asked Questions
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Where to get this document
-
-=item How to contribute to this document
-
-=back
-
-=item Author and Copyright Information
-
-=over 4
-
-=item Disclaimer
-
-=back
-
-=item Obtaining and installing libnet
-
-=over 4
-
-=item What is libnet ?
-
-=item Which version of perl do I need ?
-
-=item What other modules do I need ?
-
-=item What machines support libnet ?
-
-=item Where can I get the latest libnet release
-
-=back
-
-=item Using Net::FTP
-
-=over 4
-
-=item How do I download files from an FTP server ?
-
-=item How do I transfer files in binary mode ?
-
-=item How can I get the size of a file on a remote FTP server ?
-
-=item How can I get the modification time of a file on a remote FTP server
-?
-
-=item How can I change the permissions of a file on a remote server ?
-
-=item Can I do a reget operation like the ftp command ?
-
-=item How do I get a directory listing from an FTP server ?
-
-=item Changing directory to "" does not fail ?
-
-=item I am behind a SOCKS firewall, but the Firewall option does not work ?
-
-=item I am behind an FTP proxy firewall, but cannot access machines outside
-?
-
-=item My ftp proxy firewall does not listen on port 21
-
-=item Is it possible to change the file permissions of a file on an FTP
-server ?
-
-=item I have seen scripts call a method message, but cannot find it
-documented ?
-
-=item Why does Net::FTP not implement mput and mget methods
-
-=back
-
-=item Using Net::SMTP
-
-=over 4
-
-=item Why can't the part of an Email address after the @ be used as the
-hostname ?
-
-=item Why does Net::SMTP not do DNS MX lookups ?
-
-=item The verify method always returns true ?
-
-=back
-
-=item Debugging scripts
-
-=over 4
-
-=item How can I debug my scripts that use Net::* modules ?
-
-=back
-
-=item AUTHOR AND COPYRIGHT
 
 =back
 
@@ -22196,35 +21745,6 @@ functions
 =item NOTE
 
 =item AUTHOR
-
-=back
-
-=head2 Netrc, Net::Netrc - OO interface to users netrc file
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item THE .netrc FILE
-
-machine name, default, login name, password string, account string, macdef
-name
-
-=item CONSTRUCTOR
-
-lookup ( MACHINE [, LOGIN ])
-
-=item METHODS
-
-login (), password (), account (), lpa ()
-
-=item AUTHOR
-
-=item SEE ALSO
-
-=item COPYRIGHT
 
 =back
 
@@ -25814,81 +25334,6 @@ L<Test::Harness>
 
 =back
 
-=head2 Text::Balanced - Extract delimited text sequences from strings.
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item General behaviour in list contexts
-
-[0], [1], [2]
-
-=item General behaviour in scalar and void contexts
-
-=item A note about prefixes
-
-=item C<extract_delimited>
-
-=item C<extract_bracketed>
-
-=item C<extract_variable>
-
-[0], [1], [2]
-
-=item C<extract_tagged>
-
-C<reject =E<gt> $listref>, C<ignore =E<gt> $listref>, C<fail =E<gt> $str>,
-[0], [1], [2], [3], [4], [5]
-
-=item C<gen_extract_tagged>
-
-=item C<extract_quotelike>
-
-[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]
-
-=item C<extract_quotelike> and "here documents"
-
-[0], [1], [2], [3], [4], [5], [6], [7..10]
-
-=item C<extract_codeblock>
-
-=item C<extract_multiple>
-
-=item C<gen_delimited_pat>
-
-=item C<delimited_pat>
-
-=back
-
-=item DIAGNOSTICS
-
- C<Did not find a suitable bracket: "%s">,  C<Did not find prefix: /%s/>, 
-C<Did not find opening bracket after prefix: "%s">,  C<No quotelike
-operator found after prefix: "%s">,  C<Unmatched closing bracket: "%c">, 
-C<Unmatched opening bracket(s): "%s">, C<Unmatched embedded quote (%s)>,
-C<Did not find closing delimiter to match '%s'>,  C<Mismatched closing
-bracket: expected "%c" but found "%s">,  C<No block delimiter found after
-quotelike "%s">, C<Did not find leading dereferencer>, C<Bad identifier
-after dereferencer>, C<Did not find expected opening bracket at %s>,
-C<Improperly nested codeblock at %s>,  C<Missing second block for quotelike
-"%s">, C<No match found for opening bracket>, C<Did not find opening tag:
-/%s/>, C<Unable to construct closing tag to match: /%s/>, C<Found invalid
-nested tag: %s>, C<Found unbalanced nested tag: %s>, C<Did not find closing
-tag>
-
-=item AUTHOR
-
-=item BUGS AND IRRITATIONS
-
-=item COPYRIGHT
-
-=back
-
 =head2 Text::ParseWords - parse text into an array of tokens or array of
 arrays
 
@@ -25901,24 +25346,6 @@ arrays
 =item EXAMPLES
 
 =item AUTHORS
-
-=back
-
-=head2 Text::Soundex - Implementation of the soundex algorithm.
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item EXAMPLES
-
-=item LIMITATIONS
-
-=item MAINTAINER
-
-=item HISTORY
 
 =back
 
@@ -26223,81 +25650,6 @@ $flags = 0), clock(), stat, stat FH, stat EXPR
 
 =back
 
-=head2 Time::Piece - Object Oriented time objects
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item USAGE
-
-=over 4
-
-=item Local Locales
-
-=item Date Calculations
-
-=item Date Comparisons
-
-=item Date Parsing
-
-=item YYYY-MM-DDThh:mm:ss
-
-=item Week Number
-
-=item Global Overriding
-
-=back
-
-=item AUTHOR
-
-=item License
-
-=item SEE ALSO
-
-=item BUGS
-
-=back
-
-=head2 Time::Piece::Seconds, Time::Seconds - a simple API to convert
-seconds to other date values
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=item AUTHOR
-
-=item LICENSE
-
-=item Bugs
-
-=back
-
-=head2 Time::Seconds - a simple API to convert seconds to other date values
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-=item AUTHOR
-
-=item LICENSE
-
-=item Bugs
-
-=back
-
 =head2 Time::gmtime - by-name interface to Perl's built-in gmtime()
 function
 
@@ -26348,10 +25700,10 @@ function
 
 =item DESCRIPTION
 
-C<< $obj->isa( TYPE ) >>, C<< CLASS->isa( TYPE ) >>, C<< eval { VAL->isa(
+C<< $obj->isa( TYPE ) >>, C<< CLASS->isa( TYPE ) >>, C<< try { VAL->isa(
 TYPE ) } >>, C<TYPE>, C<$obj>, C<CLASS>, C<VAL>, C<< $obj->DOES( ROLE ) >>,
 C<< CLASS->DOES( ROLE ) >>, C<< $obj->can( METHOD ) >>, C<< CLASS->can(
-METHOD ) >>, C<< eval { VAL->can( METHOD ) } >>, C<VERSION ( [ REQUIRE ] )>
+METHOD ) >>, C<< try { VAL->can( METHOD ) } >>, C<VERSION ( [ REQUIRE ] )>
 
 =item EXPORTS
 

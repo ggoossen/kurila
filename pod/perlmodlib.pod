@@ -51,10 +51,6 @@ The following pragmas are defined (and have their own documentation).
 
 Get/set subroutine or variable attributes
 
-=item attrs
-
-Set/get attributes of a subroutine (deprecated)
-
 =item autouse
 
 Postpone load of modules until a function is used
@@ -288,14 +284,6 @@ Stringified perl data structures, suitable for both printing and C<eval>
 =item Digest
 
 Modules that calculate message digests
-
-=item Digest::MD5
-
-Perl interface to the MD5 Algorithm
-
-=item Digest::SHA
-
-Perl extension for SHA-1/224/256/384/512
 
 =item Digest::base
 
@@ -833,49 +821,9 @@ Looking up module information / loading at runtime
 
 Mark modules as loaded or unloaded
 
-=item Net::Cmd
-
-Network Command class (as used by FTP, SMTP etc)
-
-=item Net::Config
-
-Local configuration data for libnet
-
-=item Net::Domain
-
-Attempt to evaluate the current host's internet name and domain
-
-=item Net::FTP
-
-FTP Client class
-
-=item Net::NNTP
-
-NNTP Client class
-
-=item Net::Netrc
-
-OO interface to users netrc file
-
-=item Net::POP3
-
-Post Office Protocol 3 Client class (RFC1939)
-
-=item Net::SMTP
-
-Simple Mail Transfer Protocol Client
-
-=item Net::Time
-
-Time and daytime network client interface
-
 =item Net::hostent
 
 By-name interface to Perl's built-in gethost*() functions
-
-=item Net::libnetFAQ
-
-Libnet Frequently Asked Questions
 
 =item Net::netent
 
@@ -1213,17 +1161,9 @@ A tutorial about writing really basic tests
 
 Create an abbreviation table from a list
 
-=item Text::Balanced
-
-Extract delimited text sequences from strings.
-
 =item Text::ParseWords
 
 Parse text into an array of tokens or array of arrays
-
-=item Text::Soundex
-
-Implementation of the soundex algorithm.
 
 =item Text::Tabs
 
@@ -1276,14 +1216,6 @@ High resolution alarm, sleep, gettimeofday, interval timers
 =item Time::Local
 
 Efficiently compute time from local and GMT time
-
-=item Time::Piece
-
-Object Oriented time objects
-
-=item Time::Piece::Seconds
-
-A simple API to convert seconds to other date values
 
 =item Time::gmtime
 
