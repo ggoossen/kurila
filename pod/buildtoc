@@ -86,13 +86,13 @@ foreach ( ~< *MASTER) {
   next if m/^\#/;
 
   # At least one upper case letter somewhere in the first group
-  if (m/^(\S+)\s(.*)/ && $1 =~ tr/h//) {
+  if (m/^(\S+)\s(.*)/ && $1 =~ m/h/) {
     # it's a heading
     my $flags = $1;
-    $flags =~ tr/h//d;
+    $flags =~ s/h//g;
     my %flags = (header => 1);
-    %flags{toc_omit} = 1 if $flags =~ tr/o//d;
-    %flags{aux} = 1 if $flags =~ tr/a//d;
+    %flags{toc_omit} = 1 if $flags =~ s/o//g;
+    %flags{aux} = 1 if $flags =~ s/a//g;
     die "$0: Unknown flag found in heading line: $_" if length $flags;
     push @Master, \@(\%flags, $2);
 
@@ -102,19 +102,19 @@ foreach ( ~< *MASTER) {
 
     my %flags = (indent => 0);
     %flags{indent} = $1 if $flags =~ s/(\d+)//;
-    %flags{toc_omit} = 1 if $flags =~ tr/o//d; 
-    %flags{aux} = 1 if $flags =~ tr/a//d;
+    %flags{toc_omit} = 1 if $flags =~ s/o//g; 
+    %flags{aux} = 1 if $flags =~ s/a//g;
 
-    if ($flags =~ tr/D//d) {
+    if ($flags =~ s/D//g) {
       %flags{perlpod_omit} = 1;
       $delta_source = "$filename.pod";
     }
-    if ($flags =~ tr/d//d) {
+    if ($flags =~ s/d//g) {
       %flags{manifest_omit} = 1;
       $delta_target = "$filename.pod";
     }
 
-    if ($flags =~ tr/r//d) {
+    if ($flags =~ s/r//g) {
       my $readme = $filename;
       $readme =~ s/^perl//;
       %Readmepods{$filename} = %Readmes{$readme} = $desc;
@@ -129,7 +129,7 @@ foreach ( ~< *MASTER) {
   } elsif (m/^$/) {
     push @Master, undef;
   } else {
-    die "$0: Malformed line: $_" if $1 =~ tr/A-Z//;
+    die "$0: Malformed line: $_" if $1 =~ m/[A-Z]/;
   }
 }
 if (defined $delta_source) {
@@ -378,7 +378,7 @@ sub podset {
     my $pod;
 
     while( ~< *ARGV) {
-	tr/\015//d;
+	s/\015//g;
 	if (s/^=head1 (NAME)\s*/=head2 /) {
 	    $pod = path2modname($ARGV);
 	    unhead1();

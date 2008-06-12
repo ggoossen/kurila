@@ -13,9 +13,9 @@ use Cwd;
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-$origdir = cwd;
+my $origdir = cwd;
 chdir dirname($0);
-$file = basename($0, '.PL');
+my $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
 
 open OUT, ">","$file" or die "Can't create $file: $!";
@@ -27,8 +27,6 @@ print "Extracting $file (with variable substitutions)\n";
 
 print OUT <<"!GROK!THIS!";
 %Config{startperl}
-    eval 'exec %Config{perlpath} -S \$0 \$\{1+"\$@"\}'
-	if \$running_under_some_shell;
 !GROK!THIS!
 
 # In the following, perl variables are not expanded during extraction.
@@ -59,14 +57,15 @@ print OUT <<'!NO!SUBS!';
 #	Check for pod directives following any kind of unempty line, not
 #	just lines of whitespace.
 
-@directive = qw(head1 head2 item over back cut pod for begin end);
-@directive{@directive} = (1) x @directive;
+my @directive = qw(head1 head2 item over back cut pod for begin end);
+my %directive;
+%directive{[@directive]} = (1) x @directive;
 
-$exit = $last_unempty = 0;
-while (<>) {
+my $exit = my $last_unempty = 0;
+while (~< *ARGV) {
     s/(\012|\015\012|\015)$//;
-    if (/^=(\S+)/ && $directive{$1} && $last_unempty) {
-	printf "%s: line %5d, no blank line preceding directive =%s\n",
+    if (m/^=(\S+)/ && %directive{$1} && $last_unempty) {
+	printf '%s: line %5d, no blank line preceding directive =%s' . "\n",
 		$ARGV, $., $1;
 	$exit = 1;
     }

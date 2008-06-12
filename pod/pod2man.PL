@@ -29,8 +29,6 @@ print "Extracting $file (with variable substitutions)\n";
 
 print OUT <<"!GROK!THIS!";
 %Config{startperl}
-    eval 'exec %Config{perlpath} -S \$0 \$\{1+"\$@"\}'
-        if \$running_under_some_shell;
 !GROK!THIS!
 
 # In the following, perl variables are not expanded during extraction.
@@ -67,20 +65,20 @@ GetOptions (\%options, 'section|s=s', 'release|r:s', 'center|c=s',
             'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
             'fixedbolditalic=s', 'name|n=s', 'official|o', 'quotes|q=s',
             'lax|l', 'help|h', 'verbose|v') or exit 1;
-pod2usage (0) if $options{help};
+pod2usage (0) if %options{help};
 
 # Official sets --center, but don't override things explicitly set.
-if ($options{official} && !defined $options{center}) {
-    $options{center} = 'Perl Programmers Reference Guide';
+if (%options{official} && !defined %options{center}) {
+    %options{center} = 'Perl Programmers Reference Guide';
 }
 
 # Verbose is only our flag, not a Pod::Man flag.
-my $verbose = $options{verbose};
-delete $options{verbose};
+my $verbose = %options{verbose};
+delete %options{verbose};
 
 # This isn't a valid Pod::Man option and is only accepted for backwards
 # compatibility.
-delete $options{lax};
+delete %options{lax};
 
 # Initialize and run the formatter, pulling a pair of input and output off at
 # a time.
@@ -88,7 +86,7 @@ my $parser = Pod::Man->new (%options);
 my @files;
 do {
     @files = splice (@ARGV, 0, 2);
-    print "  $files[1]\n" if $verbose;
+    print "  @files[1]\n" if $verbose;
     $parser->parse_from_file (@files);
 } while (@ARGV);
 
