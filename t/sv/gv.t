@@ -7,7 +7,7 @@
 use warnings;
 
 require './test.pl';
-plan( tests => 141 );
+plan( tests => 140 );
 
 our ($foo, $bar);
 
@@ -214,8 +214,6 @@ is(@j[0], 1);
 
 {
     # test the assignment of a GLOB to an LVALUE
-    my $e = '';
-    local $^DIE_HOOK = sub { $e = @_[0]->message };
     my $v;
     sub f { @_[0] = 0; @_[0] = "a"; @_[0] = *DATA }
     f($v);
@@ -223,21 +221,16 @@ is(@j[0], 1);
     my $x = ~< $v;
     is ($x, "perl\n");
 }
-print STDERR "{dump::view($^DIE_HOOK)}foobar\n";
-die "xx";
 
 {
-    our $e = '';
     # GLOB assignment to tied element
-    local $^DIE_HOOK = sub { $e = @_[0]->message };
     sub T::TIEARRAY  { bless \@() => "T" }
     sub T::STORE     { @_[0]->[ @_[1] ] = @_[2] }
     sub T::FETCH     { @_[0]->[ @_[1] ] }
-    sub T::FETCHSIZE { < @{@_[0]} }
+    sub T::FETCHSIZE { nelems @{@_[0]} }
     tie my @ary => "T";
     @ary[0] = *DATA;
     is (@ary[0], '*main::DATA');
-    is ($e, '');
     my $x = readline Symbol::fetch_glob(@ary[0]);
     is($x, "rocks\n");
 }

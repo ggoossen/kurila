@@ -172,7 +172,7 @@ sub force_unlink {
 ## write the lines to the file only if the contents have not changed.
 ## Filename can be given as an arrayref of directory names
 ##
-sub WriteIfChanged($@)
+sub WriteIfChanged($$)
 {
     my $file  = shift;
     my $lines = shift;
@@ -329,7 +329,7 @@ sub Build_Aliases()
 ## Table->New constructor is called), but there are times when it needs to
 ## be done after-the-fact...)
 ##
-sub New_Prop($$$@)
+sub New_Prop($$$<)
 {
     my $Type = shift; ## "Is" or "In";
     my $Name = shift;
@@ -697,7 +697,7 @@ sub Table::InvalidCode
 ##
 ## This creates 'IsAll' as an alias for 'IsAny'
 ##
-sub New_Alias($$$@)
+sub New_Alias($$$<)
 {
     my $Type   = shift; ## "Is" or "In"
     my $Alias  = shift;
@@ -1818,7 +1818,7 @@ sub WriteAllMappings()
                 my $Desc = %TableDesc{$Type}->{$Name} || "";
                 ## get list of names this table is reference by
                 my @Supported = @( $Name );
-                while (my ($Orig, $Alias) = each %{ %AliasInfo{$Type} })
+                while (my ($Orig, $Alias) = each %{ %AliasInfo{$Type} || \%() })
                 {
                     if ($Orig eq $Name) {
                         push @Supported, $Alias;
@@ -1870,7 +1870,7 @@ sub WriteAllMappings()
         }
 
         ## Register aliase info
-        for my $Name (sort {length $a <+> length $b} keys %{%AliasInfo{$Type}})
+        for my $Name (sort {length $a <+> length $b} keys %{%AliasInfo{$Type} || \%()})
         {
             my $Alias    = %AliasInfo{$Type}->{$Name};
             my $IsFuzzy  = %FuzzyNames{$Type}->{$Alias};

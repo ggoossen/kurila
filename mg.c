@@ -743,6 +743,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		break;
 	    case 'D':
 		if (strEQ(remaining, "DIE_HOOK")) { /* $^DIE_HOOK */
+		    sv_setsv(sv, PL_diehook);
 		    break;
 		}
 		break;

@@ -6124,7 +6124,6 @@ Perl_ck_fun(pTHX_ OP *o)
 #endif
 	    switch (oa & 7) {
 	    case OA_SCALAR:
-	    case OA_HVREF:
 		/* list seen where single (scalar) arg expected? */
 		if (numargs == 1 && !(oa >> 4)
 		    && kid->op_type == OP_LIST && type != OP_SCALAR)
@@ -6150,6 +6149,12 @@ Perl_ck_fun(pTHX_ OP *o)
 
 		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONLIST)
 		    bad_type(numargs, "array", PL_op_desc[type], kid);
+		mod(kid, type);
+		break;
+	    case OA_HVREF:
+		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONHASH)
+		    bad_type(numargs, "hash", PL_op_desc[type], kid);
+		mod(kid, type);
 		break;
 	    case OA_CVREF:
 		{
@@ -7234,11 +7239,16 @@ Perl_ck_subr(pTHX_ OP *o)
 		    goto oops;
 	    case '$':
 	    case '%':
-	    case '@':
 		proto++;
 		arg++;
 		scalar(o2);
 		break;
+	    case '@':
+            case '<':
+		if (proto[1])
+		    goto oops;
+		list(o2);
+                break;
 	    case '&':
 		proto++;
 		arg++;
@@ -7397,7 +7407,7 @@ Perl_ck_subr(pTHX_ OP *o)
 	prev->op_sibling = o2; /* instead of cvop */
     }
     if (proto && !optional && proto_end > proto &&
-	(*proto != '@' && *proto != '%' && *proto != ';' && *proto != '_'))
+	(*proto != '<' && *proto != '@' && *proto != ';' && *proto != '_'))
 	return too_few_arguments(o, gv_ename(namegv));
     if(delete_op) {
 #ifdef PERL_MAD
