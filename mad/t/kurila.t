@@ -36,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_eval_to_try();
+t_array_hash();
 die;
+t_eval_to_try();
 t_anon_aryhsh();
 t_strict_vars();
 t_no_bracket_names();
@@ -995,6 +996,107 @@ our @bar;
 our @foo;
 our @bar;
 @bar;
+====
+END
+}
+
+sub t_array_hash {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo { }
+my @a = (1, 2);
+my @b = foo();
+----
+sub foo { }
+my @a = @(1, 2);
+my @b = @( foo() );
+====
+my @a;
+for (@a) { }
+for (@_) { }
+my $n = shift;
+print STDOUT @_;
+----
+my @a;
+for (< @a) { }
+for (< @_) { }
+my $n = shift;
+print STDOUT < @_;
+====
+my ($a, $b) = (1, 2);
+my @a = (1, 2);
+my %a = (1, 2);
+----
+my ($a, $b) = (1, 2);
+my @a = @(1, 2);
+my %a = %(1, 2);
+====
+my %h;
+my $x = %h{'key'};
+my @x = %h{['key']};
+exists %h{'key'};
+each %h;
+values %h;
+undef %h;
+tied %h;
+tie %h, "Foo", \%();
+foo(@x[0]);
+push @x, 2;
+1 if %h;
+@x[0] = @x[1];
+delete @x[[0, 1]];
+----
+my %h;
+my $x = %h{'key'};
+my @x = @( %h{['key']} );
+exists %h{'key'};
+each %h;
+values %h;
+undef %h;
+tied %h;
+tie %h, "Foo", \%();
+foo(@x[0]);
+push @x, 2;
+1 if %h;
+@x[0] = @x[1];
+delete @x[[0, 1]];
+====
+0 + @_;
+@_ + 1;
+0 + @(1,2);
+0 + \@(1,2);
+----
+0 + nelems @_;
+(nelems @_) + 1;
+0 + nelems @(1,2);
+0 + \@(1,2);
+====
+my $x = \@_;
+----
+my $x = \@_;
+====
+my ($x, @a) = @_;
+----
+my ($x, < @a) = < @_;
+====
+my (%h, %g);
+%h = %g;
+----
+my (%h, %g);
+%h = %( < %g );
+====
+our @a;
+"@a @a";
+----
+our @a;
+"{join ' ', <@a} {join ' ', <@a}";
+====
+sub foo(\@\%$) { }
+my (@a, $s, %h);
+foo(@a, %h, $s);
+----
+sub foo(\@\%$) { }
+my (@a, $s, %h);
+foo(@a, %h, $s);
 ====
 END
 }

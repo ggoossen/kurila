@@ -2178,7 +2178,7 @@ package PLXML::op_aslice;
 sub astnull {
     my $self = shift;
     my @newkids;
-    push @newkids, $self->madness('[');
+    push @newkids, $self->madness('a [');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast(@_);
     }
@@ -2192,7 +2192,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('[');
+    push @newkids, $self->madness('a [');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast(@_);
     }
@@ -2270,7 +2270,7 @@ package PLXML::op_hslice;
 sub astnull {
     my $self = shift;
     my @newkids;
-    push @newkids, $self->madness('{');
+    push @newkids, $self->madness('a {');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast(@_);
     }
@@ -2284,7 +2284,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('{');
+    push @newkids, $self->madness('a {');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast(@_);
     }
