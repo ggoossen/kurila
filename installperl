@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir '..' if !-d 'lib' and -d '../lib';
-    @INC = 'lib';
+    @INC = @('lib');
     %ENV{PERL5LIB} = 'lib';
 }
 
@@ -69,7 +69,7 @@ if ($Is_NetWare) {
 
 # override the ones in the rest of the script
 sub mkpath {
-    File::Path::mkpath(@_) unless $nonono;
+    File::Path::mkpath(<@_) unless $nonono;
 }
 
 my $mainperldir = "/usr/bin";
@@ -152,9 +152,9 @@ while (~< *SCRIPTS) {
 }
 close SCRIPTS;
 
-if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
+if ($scr_ext) { @scripts = @( map { "$_$scr_ext" } < @scripts); }
 
-my @pods = $nopods ? () : (glob("pod/*.pod"));
+my @pods = $nopods ? () : @(glob("pod/*.pod"));
 
 # Specify here any .pm files that are actually architecture-dependent.
 # (Those included with XS extensions under ext/ are automatically
@@ -162,7 +162,7 @@ my @pods = $nopods ? () : (glob("pod/*.pod"));
 # Now that the default privlib has the full perl version number included,
 # we no longer have to play the trick of sticking version-specific .pm
 # files under the archlib directory.
-my %archpms = (
+my %archpms = %(
     Config => 1,
     lib => 1,
     Cwd => 1,
@@ -174,7 +174,7 @@ if ($^O eq 'dos') {
 }
 
 if ((-e "testcompile") && (defined(%ENV{'COMPILE'}))) {
-    push(@scripts, map("$_.exe", @scripts));
+    push(@scripts, @( map("$_.exe", <@scripts)));
 }
 
 find(sub {
@@ -394,11 +394,11 @@ my @corefiles;
 if ($Is_VMS) {  # We did core file selection during build
     my $coredir = "lib/%Config{archname}/$ver/CORE";
     $coredir =~ s/[.]/_/g;
-    map { s|^$coredir/||i; } @corefiles = glob("$coredir/*.*");
+    map { s|^$coredir/||i; } @corefiles = @(glob("$coredir/*.*"));
 }
 else {
     # [als] hard-coded 'libperl' name... not good!
-    @corefiles = glob("*.h libperl*.* perl*%Config{lib_ext}");
+    @corefiles = @(glob("*.h libperl*.* perl*%Config{lib_ext}"));
 
     # AIX needs perl.exp installed as well.
     push(@corefiles,'perl.exp') if $^O eq 'aix';
@@ -410,7 +410,7 @@ else {
     # If they have built sperl.o...
     push(@corefiles,'sperl.o') if -f 'sperl.o';
 }
-foreach my $file (@corefiles) {
+foreach my $file (<@corefiles) {
     # HP-UX (at least) needs to maintain execute permissions
     # on dynamically-loadable libraries. So we do it for all.
     if (copy_if_diff($file,"$installarchlib/CORE/$file")) {
@@ -508,7 +508,7 @@ if (! $versiononly && (-f 'cppstdin') && (! samepath($installbin, '.'))) {
 }
 
 sub script_alias {
-    my ($installscript, $orig, $alias, $scr_ext) = @_;
+    my ($installscript, $orig, $alias, $scr_ext) = <@_;
 
     safe_unlink("$installscript/$alias$scr_ext");
     if ($^O eq 'dos' or $Is_VMS or $^O eq 'transit') {
@@ -526,28 +526,28 @@ sub script_alias {
 # Install scripts.
 mkpath($installscript, $verbose, 0777);
 if ($versiononly) {
-    for (@scripts) {
+    for (<@scripts) {
 	(my $base = $_) =~ s#.*/##;
 	$base .= $ver;
 	copy($_,    "$installscript/$base");
 	chmod(0755, "$installscript/$base");
     }
 
-    for (@tolink) {
-	my ($from, $to) = map { "$_$ver" } @$_;
+    for (<@tolink) {
+	my ($from, $to) = map { "$_$ver" } <@$_;
 	(my $frbase = $from) =~ s#.*/##;
 	(my $tobase = $to) =~ s#.*/##;
 	script_alias($installscript, $frbase, $tobase, $scr_ext);
     }
 } else {
-    for (@scripts) {
+    for (<@scripts) {
 	(my $base = $_) =~ s#.*/##;
 	copy($_, "$installscript/$base");
 	chmod(0755, "$installscript/$base");
     }
 
-    for (@tolink) {
-	my ($from, $to) = @$_;
+    for (<@tolink) {
+	my ($from, $to) = <@$_;
 	(my $frbase = $from) =~ s#.*/##;
 	(my $tobase = $to) =~ s#.*/##;
 	script_alias($installscript, $frbase, $tobase, $scr_ext);
@@ -576,7 +576,7 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
 	}
     }
 
-    for (@pods) {
+    for (<@pods) {
 	# $_ is a name like  pod/perl.pod
 	(my $base = $_) =~ s#.*/##;
 	copy_if_diff($_, "{$installprivlib}/$pod/{$base}");
@@ -594,7 +594,7 @@ if (!$versiononly && $otherperls) {
     my ($path, @path);
     my $dirsep = ($Is_OS2 || $Is_W32 || $Is_NetWare) ? ';' : ':' ;
     ($path = %ENV{"PATH"}) =~ s:\\:/:g ;
-    @path = split(m/$dirsep/, $path);
+    @path = @(split(m/$dirsep/, $path));
     if ($Is_VMS) {
 	my $i = 0;
 	while (exists %ENV{'DCL$PATH' . $i}) {
@@ -604,7 +604,7 @@ if (!$versiononly && $otherperls) {
     }
     my @otherperls;
     my %otherperls;
-    for (@path) {
+    for (<@path) {
 	next unless m,^/,;
 	# Use &samepath here because some systems have other dirs linked
 	# to $mainperldir (like SunOS)
@@ -619,7 +619,7 @@ if (!$versiononly && $otherperls) {
     if (@otherperls) {
 	warn "\nWarning: $perl appears in your path in the following " .
 	    "locations beyond where\nwe just installed it:\n";
-	for (@otherperls) {
+	for (<@otherperls) {
 	    warn "    $_\n";
 	}
 	warn "\n";
@@ -635,7 +635,7 @@ exit 0;
 ###############################################################################
 
 sub yn {
-    my($prompt) = @_;
+    my($prompt) = <@_;
     my($answer);
     my($default) = $prompt =~ m/\[([yn])\]\s*$/i;
     print STDERR $prompt;
@@ -645,12 +645,12 @@ sub yn {
 }
 
 sub unlink {
-    my(@names) = @_;
+    my @names = @_;
     my($cnt) = 0;
 
-    return scalar(@names) if $Is_VMS;
+    return nelems(@names) if $Is_VMS;
 
-    foreach my $name (@names) {
+    foreach my $name (<@names) {
 	next unless -e $name;
 	chmod 0777, $name if ($Is_OS2 || $Is_W32 || $Is_Cygwin || $Is_NetWare);
 	print "  unlink $name\n" if $verbose;
@@ -663,7 +663,7 @@ sub unlink {
 sub safe_unlink {
     return if $nonono or $Is_VMS;
     my @names = @_;
-    foreach my $name (@names) {
+    foreach my $name (<@names) {
 	next unless -e $name;
 	chmod 0777, $name if ($Is_OS2 || $Is_W32 || $Is_NetWare);
 	print "  unlink $name\n" if $verbose;
@@ -678,7 +678,7 @@ sub safe_unlink {
 }
 
 sub safe_rename {
-    my($from,$to) = @_;
+    my($from,$to) = <@_;
     if (-f $to and not unlink($to)) {
 	my($i);
 	for ($i = 1; $i +< 50; $i++) {
@@ -692,7 +692,7 @@ sub safe_rename {
 }
 
 sub link {
-    my($from,$to) = @_;
+    my($from,$to) = <@_;
     my($success) = 0;
 
     my $xfrom = $from;
@@ -726,7 +726,7 @@ sub link {
 }
 
 sub chmod {
-    my($mode,$name) = @_;
+    my($mode,$name) = <@_;
 
     return if ($^O eq 'dos');
     printf '  chmod %o %s'."\n", $mode, $name if $verbose;
@@ -736,7 +736,7 @@ sub chmod {
 }
 
 sub copy {
-    my($from,$to) = @_;
+    my($from,$to) = <@_;
 
     my $xto = $to;
     $xto =~ s/^\Q$destdir\E// if $destdir;
@@ -752,7 +752,7 @@ sub copy {
 }
 
 sub samepath {
-    my($p1, $p2) = @_;
+    my($p1, $p2) = <@_;
 
     return (lc($p1) eq lc($p2)) if ($Is_W32 || $Is_NetWare);
 
@@ -882,7 +882,7 @@ sub installlib {
 # Return true if copying occurred.
 
 sub copy_if_diff {
-    my($from,$to)=@_;
+    my($from,$to)=<@_;
     return 1 if (($^O eq 'VMS') && (-d $from));
     my $xto = $to;
     $xto =~ s/^\Q$destdir\E// if $destdir;
@@ -919,7 +919,7 @@ sub copy_if_diff {
 
 sub strip
 {
-    my(@args) = @_;
+    my @args = @_;
 
     return unless $dostrip;
 
@@ -928,14 +928,14 @@ sub strip
 	push @opts, shift @args;
     }
 
-    foreach my $file (@args) {
+    foreach my $file (<@args) {
 	if (-f $file) {
 	    if ($verbose) {
-		print "  strip " . join(' ', @opts);
+		print "  strip " . join(' ', <@opts);
 		print " " if (@opts);
 		print "$file\n";
 	    }
-	    system("strip", @opts, $file);
+	    system("strip", <@opts, $file);
 	} else {
 	    print "# file '$file' skipped\n" if $verbose;
 	}
