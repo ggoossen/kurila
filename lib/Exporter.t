@@ -132,7 +132,7 @@ my @tags = @( qw(:This :tray) );
 Testing->import(< @tags);
 
 ::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
-             map { < @$_ } < @{%Testing::EXPORT_TAGS{nelems @tags}}),
+             map { < @$_ } %Testing::EXPORT_TAGS{[ map { s/^://; $_ } <@tags ]}),
       'import by tags' );
 
 

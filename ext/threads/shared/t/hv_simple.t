@@ -12,7 +12,7 @@ BEGIN {
 use ExtUtils::testlib;
 
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
 
     # You have to do it this way or VMS will get confused.
     if ($ok) {
@@ -68,7 +68,7 @@ ok(13, %seen{"foo"} == 1, "Keys..");
 # wrong thread memory pool, which crashes on Windows.
 ok(14, exists %hash{1}, "Check numeric key");
 
-threads->create(sub { %hash = () })->join();
+threads->create(sub { %hash = %() })->join();
 ok(15, keys %hash == 0, "Check clear");
 
 ok(16, is_shared(%hash), "Check for sharing");

@@ -1342,8 +1342,8 @@ void
 Perl_die_nocontext(const char* pat, ...)
 {
     dTHX;
-    PERL_ARGS_ASSERT_DIE_NOCONTEXT;
     va_list args;
+    PERL_ARGS_ASSERT_DIE_NOCONTEXT;
     va_start(args, pat);
     vdie(pat, &args);
     /* NOTREACHED */
@@ -1356,8 +1356,8 @@ void
 Perl_croak_nocontext(const char *pat, ...)
 {
     dTHX;
-    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
     va_list args;
+    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
     va_start(args, pat);
     vdie(pat, &args);
     /* NOTREACHED */

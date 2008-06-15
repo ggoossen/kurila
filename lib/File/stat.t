@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Test::More;
 use strict;
 
@@ -12,13 +7,13 @@ our @stat;
 
 BEGIN {
     our $hasst;
-    try { my @n = stat "TEST" };
+    try { my @n = @(stat "TEST") };
     $hasst = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($hasst) { plan skip_all => "no stat"; exit 0 }
     use Config;
     $hasst = 0 unless %Config{'i_sysstat'} eq 'define';
     unless ($hasst) { plan skip_all => "no sys/stat.h"; exit 0 }
-    @stat = stat "TEST"; # This is the function stat.
+    @stat = @(stat "TEST"); # This is the function stat.
     unless (@stat) { plan skip_all => "1..0 # Skip: no file TEST"; exit 0 }
 }
 
@@ -81,7 +76,7 @@ SKIP: {
 
 	main::skip("OS/2: inode number is not constant on os/2", 1) if $^O eq 'os2';
 
-	main::is( "@$stat", "@$stat3", '... and must match normal stat' );
+	main::is( (join ' ', <@$stat), (join ' ', <@$stat3), '... and must match normal stat' );
 }
 
 local $!;

@@ -1814,7 +1814,7 @@ sub init_others {	# --- Initialize Other Attributes
     $self->{VERBINST}   ||= 0;
     $self->{MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', \@('-MExtUtils::Install'));
-install(\%(@ARGV), '$(VERBINST)', 0, '$(UNINST)');
+install(\%(<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
 CODE
     $self->{DOC_INSTALL}        ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';

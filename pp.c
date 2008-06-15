@@ -59,7 +59,6 @@ PP(pp_stub)
 PP(pp_padav)
 {
     dVAR; dSP; dTARGET;
-    I32 gimme;
     if (PL_op->op_private & OPpLVAL_INTRO)
 	if (!(PL_op->op_private & OPpPAD_STATE))
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
@@ -71,7 +70,6 @@ PP(pp_padav)
 PP(pp_padhv)
 {
     dVAR; dSP; dTARGET;
-    I32 gimme;
 
     XPUSHs(TARG);
     if (PL_op->op_private & OPpLVAL_INTRO)
@@ -210,6 +208,8 @@ PP(pp_rv2sv)
 PP(pp_pos)
 {
     dVAR; dSP; dTARGET; dPOPss;
+
+    do_arg_check(SP-1);
 
     if (PL_op->op_flags & OPf_MOD) {
 	TARG = sv_newmortal();
@@ -535,6 +535,8 @@ PP(pp_study)
     register I32 *snext;
     STRLEN len;
 
+    do_arg_check(SP-1);
+
     if (sv == PL_lastscream) {
 	if (SvSCREAM(sv))
 	    RETPUSHYES;
@@ -602,6 +604,7 @@ PP(pp_study)
 PP(pp_schop)
 {
     dVAR; dSP; dTARGET;
+    do_arg_check(SP-1);
     do_chop(TARG, TOPs);
     SETTARG;
     RETURN;
@@ -610,6 +613,7 @@ PP(pp_schop)
 PP(pp_chop)
 {
     dVAR; dSP; dMARK; dTARGET; dORIGMARK;
+    do_arg_check(MARK+1);
     while (MARK < SP)
 	do_chop(TARG, *++MARK);
     SP = ORIGMARK;
@@ -620,6 +624,7 @@ PP(pp_chop)
 PP(pp_schomp)
 {
     dVAR; dSP; dTARGET;
+    do_arg_check(SP-1);
     SETi(do_chomp(TOPs));
     RETURN;
 }
@@ -628,6 +633,7 @@ PP(pp_chomp)
 {
     dVAR; dSP; dMARK; dTARGET;
     register I32 count = 0;
+    do_arg_check(MARK+1);
 
     while (SP > MARK)
 	count += do_chomp(POPs);
@@ -3418,7 +3424,7 @@ PP(pp_aslice)
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
 
     if (SvTYPE(av) != SVt_PVAV)
-	Perl_croak(aTHX_ "can't take an array slice from an %s", SvDESC(av));
+	Perl_croak(aTHX_ "can't take an array slice from an %s", SvDESC((SV*)av));
 
     if (lval && PL_op->op_private & OPpLVAL_INTRO) {
 	register SV **svp;
@@ -3463,6 +3469,15 @@ PP(pp_each)
     HE *entry;
     const I32 gimme = GIMME_V;
 
+    if ( ! SvHVOK(hash) ) {
+	if ( ! SvOK(hash) ) {
+	    if (gimme == G_SCALAR)
+		RETPUSHUNDEF;
+	    RETURN;
+	}
+	bad_arg(1, "hash", PL_op_desc[PL_op->op_type], (SV*)hash);
+	/* not reached */
+    }
     PUTBACK;
     /* might clobber stack_sp */
     entry = hv_iternext(hash);
@@ -3726,7 +3741,6 @@ PP(pp_lslice)
 PP(pp_anonlist)
 {
     dVAR; dSP; dMARK;
-    const I32 gimme = GIMME_V;
     const I32 items = SP - MARK;
 
     dORIGMARK;
@@ -3740,7 +3754,6 @@ PP(pp_anonlist)
 PP(pp_anonhash)
 {
     dVAR; dSP; dMARK; dORIGMARK;
-    const I32 gimme = GIMME_V;
     HV* const hv = newHV();
 
     while (MARK < SP) {
@@ -3764,6 +3777,8 @@ PP(pp_expand)
     dVAR; dSP;
     dTOPss;
     const I32 gimme = GIMME_V;
+
+    do_arg_check(SP);
 
     if (gimme == G_SCALAR)
 	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
@@ -3810,15 +3825,15 @@ PP(pp_nelems)
 {
     dVAR; dSP;
     dTOPss;
-    const I32 gimme = GIMME_V;
     AV *const av = (AV*)sv;
 
-    if (SvTYPE(sv) != SVt_PVAV)
-	Perl_croak(aTHX_ "nelems may only be used upon an array" );
+    do_arg_check(SP);
 
-    dTARGET;
-    const I32 maxarg = AvFILL(av) + 1;
-    SETi(maxarg);
+    {
+	dTARGET;
+	const I32 maxarg = AvFILL(av) + 1;
+	SETi(maxarg);
+    }
 
     RETURN;
 }
@@ -3836,6 +3851,8 @@ PP(pp_splice)
     I32 after;
     I32 diff;
     const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
+
+    do_arg_check(MARK);
 
     if (mg) {
 	*MARK-- = SvTIED_obj((SV*)ary, mg);
@@ -4032,6 +4049,8 @@ PP(pp_push)
     register AV * const ary = (AV*)*++MARK;
     const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
 
+    do_arg_check(MARK);
+
     if (SvTYPE(ary) != SVt_PVAV) {
 	Perl_croak(aTHX_ "First argument must be an array");
     }
@@ -4069,14 +4088,19 @@ PP(pp_shift)
 {
     dVAR;
     dSP;
-    AV * const av = (AV*)POPs;
-    SV * const sv = PL_op->op_type == OP_SHIFT ? av_shift(av) : av_pop(av);
-    EXTEND(SP, 1);
-    assert (sv);
-    if (AvREAL(av))
-	(void)sv_2mortal(sv);
-    PUSHs(sv);
-    RETURN;
+
+    do_arg_check(SP);
+
+    {
+	AV * const av = (AV*)POPs;
+	SV * const sv = PL_op->op_type == OP_SHIFT ? av_shift(av) : av_pop(av);
+	EXTEND(SP, 1);
+	assert (sv);
+	if (AvREAL(av))
+	    (void)sv_2mortal(sv);
+	PUSHs(sv);
+	RETURN;
+    }
 }
 
 PP(pp_unshift)
@@ -4084,6 +4108,8 @@ PP(pp_unshift)
     dVAR; dSP; dMARK; dORIGMARK; dTARGET;
     register AV *ary = (AV*)*++MARK;
     const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
+
+    do_arg_check(MARK);
 
     if (mg) {
 	*MARK-- = SvTIED_obj((SV*)ary, mg);
@@ -4226,11 +4252,9 @@ PP(pp_split)
 	ary = GvAVn(pm->op_pmreplrootu.op_pmtargetgv);
     }
 #endif
-    else if (gimme != G_ARRAY)
-	ary = GvAVn(PL_defgv);
     else
 	ary = NULL;
-    if (ary && (gimme != G_ARRAY)) {
+    if (ary) {
 	realarray = 1;
 	PUTBACK;
 	av_extend(ary,0);

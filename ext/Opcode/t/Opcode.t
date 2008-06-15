@@ -11,6 +11,8 @@ BEGIN {
     }
 }
 
+use Test::More;
+
 use Opcode qw(
 	opcodes opdesc opmask verify_opset
 	opset opset_to_ops opset_to_hex invert_opset
@@ -19,74 +21,67 @@ use Opcode qw(
 
 use strict;
 
-my $t = 1;
-my $last_test; # initalised at end
-print "1..$last_test\n";
+plan tests => 23;
 
 my($s1, $s2, $s3);
 my(@o1, @o2, @o3);
 
 # --- opset_to_ops and opset
 
-my @empty_l = @( < opset_to_ops(empty_opset) );
-print (nelems @empty_l) == 0 ?   "ok $t\n" : "not ok $t\n"; $t++;
+my @empty_l = @( opset_to_ops(empty_opset) );
+is((nelems @empty_l), 0);
 
-my @full_l1  = @( < opset_to_ops(full_opset) );
-print (nelems @full_l1) == opcodes() ? "ok $t\n" : "not ok $t\n"; $t++;
+my @full_l1  = @( opset_to_ops(full_opset) );
+is((nelems @full_l1), opcodes());
 my @full_l2 = @( < @full_l1 );	# = opcodes();	# XXX to be fixed
-print "{join ' ', <@full_l1}" eq "{join ' ', <@full_l2}" ? "ok $t\n" : "not ok $t\n"; $t++;
+is("{join ' ', <@full_l1}", "{join ' ', <@full_l2}");
 
-@empty_l = @( < opset_to_ops(opset(':none')) );
-print (nelems @empty_l) == 0 ?   "ok $t\n" : "not ok $t\n"; $t++;
+@empty_l = @( opset_to_ops(opset(':none')) );
+is((nelems @empty_l), 0);
 
-my @full_l3 = @( < opset_to_ops(opset(':all')) );
-print  (nelems @full_l1)  ==  nelems @full_l3  ? "ok $t\n" : "not ok $t\n"; $t++;
-print "{join ' ', <@full_l1}" eq "{join ' ', <@full_l3}" ? "ok $t\n" : "not ok $t\n"; $t++;
+my @full_l3 = @( opset_to_ops(opset(':all')) );
+is((nelems @full_l1), nelems @full_l3);
+is("{join ' ', <@full_l1}", "{join ' ', <@full_l3}");
 
-die $t unless $t == 7;
 $s1 = opset(      'padsv');
 $s2 = opset($s1,  'padav');
 $s3 = opset($s2, '!padav');
-print $s1 eq $s2 ? "not ok $t\n" : "ok $t\n"; ++$t;
-print $s1 eq $s3 ? "ok $t\n" : "not ok $t\n"; ++$t;
+is($s1, $s2);
+is($s1, $s3);
 
 # --- define_optag
 
-print try { opset(':_tst_') } ? "not ok $t\n" : "ok $t\n"; ++$t;
+ok( try { opset(':_tst_') } );
 define_optag(":_tst_", opset(qw(padsv padav padhv)));
-print try { opset(':_tst_') } ? "ok $t\n" : "not ok $t\n"; ++$t;
+ok( try { opset(':_tst_') } );
 
 # --- opdesc and opcodes
 
-die $t unless $t == 11;
-print opdesc("gv") eq "glob value" ? "ok $t\n" : "not ok $t\n"; $t++;
-my @desc = @( < opdesc(':_tst_','stub') );
-print "{join ' ', <@desc}" eq "private variable private array private hash stub"
-				    ? "ok $t\n" : "not ok $t\n#{join ' ', <@desc}\n"; $t++;
-print opcodes() ? "ok $t\n" : "not ok $t\n"; $t++;
-print "ok $t\n"; ++$t;
+is( opdesc("gv"), "glob value" );
+my @desc = @( opdesc(':_tst_','stub') );
+is( "{join ' ', <@desc}", "private variable private array private hash stub");
+ok( opcodes() );
 
 # --- invert_opset
 
 $s1 = opset(qw(fileno padsv padav));
-@o2 = @( < opset_to_ops(invert_opset($s1)) );
-print (nelems @o2) == opcodes-3 ? "ok $t\n" : "not ok $t\n"; $t++;
+@o2 = @( opset_to_ops(invert_opset($s1)) );
+is((nelems @o2), opcodes-3);
 
 # --- opmask
 
-die $t unless $t == 16;
-print opmask() eq empty_opset() ? "ok $t\n" : "not ok $t\n"; $t++;	# work
-print length opmask() == int((opcodes()+7)/8) ? "ok $t\n" : "not ok $t\n"; $t++;
+is(opmask(), empty_opset());# work
+is(length opmask(), int((opcodes()+7)/8));
 
 # --- verify_opset
 
-print verify_opset($s1) && !verify_opset(42) ? "ok $t\n":"not ok $t\n"; $t++;
+ok( verify_opset($s1) && !verify_opset(42) );
 
 # --- opmask_add
 
 opmask_add(opset(qw(fileno)));	# add to global op_mask
-print eval 'fileno STDOUT' ? "not ok $t\n" : "ok $t\n";	$t++; # fail
-print $@ && $@->{description} =~ m/'fileno' trapped/ ? "ok $t\n" : "not ok $t\n# $@\n"; $t++;
+ok( ! eval 'fileno STDOUT' ); # fail
+ok( $@ && $@->{description} =~ m/'fileno' trapped/ );
 
 # --- check use of bit vector ops on opsets
 
@@ -95,20 +90,17 @@ $s2 = opset('padav');
 $s3 = opset('padsv', 'padav', 'padhv');
 
 # Non-negated
-print (($s1 ^|^ $s2) eq opset($s1,$s2) ? "ok $t\n":"not ok $t\n"); $t++;
-print (($s2 ^&^ $s3) eq opset($s2)     ? "ok $t\n":"not ok $t\n"); $t++;
-print (($s2 ^^^ $s3) eq opset('padsv','padhv') ? "ok $t\n":"not ok $t\n"); $t++;
+is(($s1 ^|^ $s2), opset($s1,$s2));
+is(($s2 ^&^ $s3), opset($s2));
+is(($s2 ^^^ $s3), opset('padsv','padhv'));
 
 # Negated, e.g., with possible extra bits in last byte beyond last op bit.
 # The extra bits mean we can't just say ~mask eq invert_opset(mask).
 
-@o1 = @( < opset_to_ops(           ^~^ $s3) );
-@o2 = @( < opset_to_ops(invert_opset $s3) );
-print "{join ' ', <@o1}" eq "{join ' ', <@o2}" ? "ok $t\n":"not ok $t\n"; $t++;
+@o1 = @( opset_to_ops(           ^~^ $s3) );
+@o2 = @( opset_to_ops(invert_opset $s3) );
+is("{join ' ', <@o1}", "{join ' ', <@o2}");
 
 # --- finally, check some opname assertions
 
 foreach(< @full_l1) { die "bad opname: $_" if m/\W/ or m/^\d/ }
-
-print "ok $last_test\n";
-BEGIN { $last_test = 25 }

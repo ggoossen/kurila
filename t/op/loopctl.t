@@ -964,7 +964,8 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 
 }
 
-{
+TODO: {
+    todo_skip("modification of readonly value", 1);
     our @a37725;
     @a37725[3] = 1; # use package var
     our $i = 2;

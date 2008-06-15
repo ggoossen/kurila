@@ -1,4 +1,3 @@
-
 #!./perl -w
 #
 #  Copyright (c) 1995-2000, Raphael Manfredi
@@ -12,7 +11,7 @@ use Config;
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
+	push @INC, '../ext/Storable/t';
     } else {
 	unshift @INC, 't';
     }

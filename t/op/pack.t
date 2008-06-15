@@ -1736,7 +1736,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     @out = @( unpack("N/S*", pack("N/S15", < @array) . "abcd") );
     is("{join ' ', <@out}", "{join ' ', <@array}", "pack N/S15 works");
     @out = @( unpack("N/S*", pack("N/S13", < @array) . "abcd") );
-    is("{join ' ', <@out}", "@array[[0..12]]", "pack N/S13 works");
+    is("{join ' ', <@out}", "{join ' ', @array[[0..12]]}", "pack N/S13 works");
     @out = @( unpack("N/S*", pack("N/S0", < @array) . "abcd") );
     is("{join ' ', <@out}", "", "pack N/S0 works");
     is(pack("Z*/a0", "abc"), "0\0", "pack Z*/a0 makes a short string");

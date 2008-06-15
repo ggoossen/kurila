@@ -395,7 +395,7 @@ sub _can_write_dir {
 
     my ($vol, $dirs, $file) = < File::Spec->splitpath($dir,1);
     my @dirs = @( < File::Spec->splitdir($dirs) );
-    unshift @dirs, < File::Spec->curdir
+    unshift @dirs, File::Spec->curdir
         unless File::Spec->file_name_is_absolute($dir);
 
     my $path='';
@@ -410,9 +410,9 @@ sub _can_write_dir {
             next;
         }
         if ( _have_write_access($dir) ) {
-            return 1,$dir,@make
+            return @(1,$dir,@make);
         } else {
-            return 0,$dir,@make
+            return @(0,$dir,@make);
         }
     } continue {
         pop @dirs;
@@ -743,7 +743,7 @@ sub install { #XXX OS-SPECIFIC
             my $sourcedir  = File::Spec->catdir($source, $File::Find::dir);
             my $sourcefile = File::Spec->catfile($sourcedir, $origfile);
 
-            for my $pat (< @$skip) {
+            for my $pat (< @{$skip || \@()}) {
                 if ( $sourcefile=~m/$pat/ ) {
                     print "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;

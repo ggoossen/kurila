@@ -117,8 +117,8 @@ sub check_same {
   ok (!$fail);
 }
 
-my (%orig) = %( my (%inc) = %( my (%dec) = %( my (%postinc) = %( my (%postdec)
-  = %(1 => 1, ab => "ab") ) ) ) );
+my %orig = my %inc = my %dec = my %postinc = my %postdec
+  = %(1 => 1, ab => "ab");
 my %up = %(1=>2, ab => 'ac');
 my %down = %(1=>0, ab => -1);
 

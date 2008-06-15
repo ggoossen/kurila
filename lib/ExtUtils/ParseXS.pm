@@ -125,7 +125,7 @@ sub process_file {
   for (%args{filename}) {
     die "Missing required parameter 'filename'" unless $_;
     $filepathname = $_;
-    ($dir, $filename) = ( <dirname($_), < basename($_));
+    ($dir, $filename) = ( dirname($_), basename($_));
     $filepathname =~ s/\\/\\\\/g;
     %IncludedFiles{$_}++;
   }
@@ -327,7 +327,7 @@ EOM
 
 EOF
 
-  print < 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+  print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
   $lastline    = $_;
   $lastline_no = $.;
@@ -357,18 +357,18 @@ MAKE_FETCHMETHOD_WORK
 
   # print initialization routine
 
-  print < Q(<<"EOF");
+  print Q(<<"EOF");
 ##ifdef __cplusplus
 #extern "C"
 ##endif
 EOF
 
-  print < Q(<<"EOF");
+  print Q(<<"EOF");
 #XS(boot_$Module_cname); /* prototype to pass -Wmissing-prototypes */
 #XS(boot_$Module_cname)
 EOF
 
-  print < Q(<<"EOF");
+  print Q(<<"EOF");
 #[[
 ##ifdef dVAR
 #    dVAR; dXSARGS;
@@ -379,29 +379,29 @@ EOF
 
   #-Wall: if there is no $Full_func_name there are no xsubs in this .xs
   #so `file' is unused
-  print < Q(<<"EOF") if $Full_func_name;
+  print Q(<<"EOF") if $Full_func_name;
 #    char* file = __FILE__;
 EOF
 
-  print < Q("#\n");
+  print Q("#\n");
 
-  print < Q(<<"EOF");
+  print Q(<<"EOF");
 #    PERL_UNUSED_VAR(cv); /* -W */
 #    PERL_UNUSED_VAR(items); /* -W */
 EOF
     
-  print < Q(<<"EOF") if $WantVersionChk ;
+  print Q(<<"EOF") if $WantVersionChk ;
 #    XS_VERSION_BOOTCHECK ;
 #
 EOF
 
-  print < Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
 #    \{
 #        CV * cv ;
 #
 EOF
 
-  print < Q(<<"EOF") if ($Overload);
+  print Q(<<"EOF") if ($Overload);
 #    /* register the overloading (type 'A') magic */
 #    PL_amagic_generation++;
 #    /* The magic for overload gets a GV* via gv_fetchmeth as */
@@ -415,7 +415,7 @@ EOF
 
   print < @InitFileCode;
 
-  print < Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
 #    \}
 EOF
 
@@ -432,7 +432,7 @@ EOF
          call_list(PL_scopestack_ix, PL_unitcheckav);
 EOF
 
-  print < Q(<<"EOF");
+  print Q(<<"EOF");
 #    XSRETURN_YES;
 #]]
 #
@@ -702,7 +702,7 @@ sub process_para {
     $externC = $externC ? qq[extern "C"] : "";
 
     # print function header
-    print < Q(<<"EOF");
+    print Q(<<"EOF");
 #$externC
 #XS(XS_$Full_func_name); /* prototype to pass -Wmissing-prototypes */
 #XS(XS_$Full_func_name)
@@ -713,10 +713,10 @@ sub process_para {
 #    dXSARGS;
 ##endif
 EOF
-    print < Q(<<"EOF") if $ALIAS ;
+    print Q(<<"EOF") if $ALIAS ;
 #    dXSI32;
 EOF
-    print < Q(<<"EOF") if $INTERFACE ;
+    print Q(<<"EOF") if $INTERFACE ;
 #    dXSFUNCTION($ret_type);
 EOF
     if ($ellipsis) {
@@ -727,25 +727,25 @@ EOF
       $cond = qq(items < $min_args || items > $num_args);
     }
 
-    print < Q(<<"EOF") if $except;
+    print Q(<<"EOF") if $except;
 #    char errbuf[1024];
 #    *errbuf = '\0';
 EOF
 
     if ($ALIAS)
-      { print < Q(<<"EOF") if $cond }
+      { print Q(<<"EOF") if $cond }
 #    if ($cond)
 #       Perl_croak(aTHX_ "Usage: \%s(\%s)", GvNAME(CvGV(cv)), "$report_args");
 EOF
     else
-      { print < Q(<<"EOF") if $cond }
+      { print Q(<<"EOF") if $cond }
 #    if ($cond)
 #       Perl_croak(aTHX_ "Usage: \%s(\%s)", "$pname", "$report_args");
 EOF
     
      # cv doesn't seem to be used, in most cases unless we go in 
      # the if of this else
-     print < Q(<<"EOF");
+     print Q(<<"EOF");
 #    PERL_UNUSED_VAR(cv); /* -W */
 EOF
 
@@ -754,11 +754,11 @@ EOF
     #hence `ax' (setup by dXSARGS) is unused
     #XXX: could breakup the dXSARGS; into dSP;dMARK;dITEMS
     #but such a move could break third-party extensions
-    print < Q(<<"EOF") if $PPCODE;
+    print Q(<<"EOF") if $PPCODE;
 #    PERL_UNUSED_VAR(ax); /* -Wall */
 EOF
 
-    print < Q(<<"EOF") if $PPCODE;
+    print Q(<<"EOF") if $PPCODE;
 #    SP -= items;
 EOF
 
@@ -772,7 +772,7 @@ EOF
     &check_cpp;
     while ((nelems @line)) {
       &CASE_handler if check_keyword("CASE");
-      print < Q(<<"EOF");
+      print Q(<<"EOF");
 #   $except [[
 EOF
 
@@ -786,7 +786,7 @@ EOF
       INPUT_handler() ;
       process_keyword("INPUT|PREINIT|INTERFACE_MACRO|C_ARGS|ALIAS|ATTRS|PROTOTYPE|SCOPE|OVERLOAD") ;
 
-      print < Q(<<"EOF") if $ScopeThisXSUB;
+      print Q(<<"EOF") if $ScopeThisXSUB;
 #   ENTER;
 #   [[
 EOF
@@ -920,18 +920,18 @@ EOF
       # do cleanup
       process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE|OVERLOAD") ;
       
-      print < Q(<<"EOF") if $ScopeThisXSUB;
+      print Q(<<"EOF") if $ScopeThisXSUB;
 #   ]]
 EOF
-      print < Q(<<"EOF") if $ScopeThisXSUB and not $PPCODE;
+      print Q(<<"EOF") if $ScopeThisXSUB and not $PPCODE;
 #   LEAVE;
 EOF
       
       # print function trailer
-      print < Q(<<"EOF");
+      print Q(<<"EOF");
 #    ]]
 EOF
-      print < Q(<<"EOF") if $except;
+      print Q(<<"EOF") if $except;
 #    BEGHANDLERS
 #    CATCHALL
 #	sprintf(errbuf, "\%s: \%s\\tpropagated", Xname, Xreason);
@@ -947,22 +947,22 @@ EOF
       death(m/^$BLOCK_re/o ? "Misplaced `$1:'" : "Junk at end of function");
     }
     
-    print < Q(<<"EOF") if $except;
+    print Q(<<"EOF") if $except;
 #    if (errbuf[0])
 #	Perl_croak(aTHX_ errbuf);
 EOF
     
     if ($xsreturn) {
-      print < Q(<<"EOF") unless $PPCODE;
+      print Q(<<"EOF") unless $PPCODE;
 #    XSRETURN($xsreturn);
 EOF
     } else {
-      print < Q(<<"EOF") unless $PPCODE;
+      print Q(<<"EOF") unless $PPCODE;
 #    XSRETURN_EMPTY;
 EOF
     }
 
-    print < Q(<<"EOF");
+    print Q(<<"EOF");
 #]]
 #
 EOF
@@ -1039,11 +1039,11 @@ sub standard_typemap_locations {
   my @tm = @( qw(typemap) );
   
   my $updir = File::Spec->updir;
-  foreach my $dir ( <File::Spec->catdir(($updir) x 1), < File::Spec->catdir(($updir) x 2), <
-		   File::Spec->catdir(($updir) x 3), < File::Spec->catdir(($updir) x 4)) {
+  foreach my $dir (File::Spec->catdir(($updir) x 1), File::Spec->catdir(($updir) x 2),
+		   File::Spec->catdir(($updir) x 3), File::Spec->catdir(($updir) x 4)) {
     
-    unshift @tm, < File::Spec->catfile($dir, 'typemap');
-    unshift @tm, < File::Spec->catfile($dir, lib => ExtUtils => 'typemap');
+    unshift @tm, File::Spec->catfile($dir, 'typemap');
+    unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap');
   }
   foreach my $dir (< @INC) {
     my $file = File::Spec->catfile($dir, ExtUtils => 'typemap');
@@ -1090,7 +1090,7 @@ sub print_section {
     for (;  defined($_) && !m/^$BLOCK_re/o;  $_ = shift(@line)) {
 	print "$_\n";
     }
-    print < 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+    print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 }
 
 sub merge_section {
@@ -1259,7 +1259,7 @@ sub INTERFACE_handler() {
     $name =~ s/^$Prefix//;
     %Interfaces{$name} = $_;
   }
-  print < Q(<<"EOF");
+  print Q(<<"EOF");
 #	XSFUNCTION = $interface_macro($ret_type,cv,XSANY.any_dptr);
 EOF
   $interface = 1;		# local
@@ -1491,7 +1491,7 @@ sub INCLUDE_handler ()
     # open the new file
     open ($FH, "<", "$_") or death("Cannot open '$_': $!") ;
 
-    print < Q(<<"EOF");
+    print Q(<<"EOF");
 #
 #/* INCLUDE:  Including '$_' from '$filename' */
 #
@@ -1542,7 +1542,7 @@ sub PopFile()
       exit 1 ;
     }
 
-    print < Q(<<"EOF");
+    print Q(<<"EOF");
 #
 #/* INCLUDE: Returning to '$filename' from '$ThisFile' */
 #

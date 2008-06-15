@@ -55,10 +55,6 @@ foreach my $prog (< @prgs) {
 
 __END__
 ########
-$a = ":="; split m/($a)/o, "a:=b:=c"; print "@_"
-EXPECT
-a := b := c
-########
 our $cusp = ^~^0 ^^^ (^~^0 >> 1);
 use integer;
 $, = " ";
@@ -134,28 +130,6 @@ our %as_ary;
 %as_ary{0}="a0";
 our @ordered_array=sort by_number keys(%as_ary);
 ########
-our $count;
-   {
-       package FAKEARRAY;
-   
-       sub TIEARRAY
-       { print "TIEARRAY @_\n"; 
-         die "bomb out\n" unless $count ++ ;
-         bless \@('foo') 
-       }
-       sub FETCH { print "fetch @_\n"; @_[0]->[@_[1]] }
-       sub STORE { print "store @_\n"; @_[0]->[@_[1]] = @_[2] }
-       sub DESTROY { print "DESTROY \n"; undef @{@_[0]}; }
-   }
-   
-our @h;
-eval 'tie @h, "FAKEARRAY", "fred"' ;
-tie @h, "FAKEARRAY", "fred" ;
-EXPECT
-TIEARRAY FAKEARRAY fred
-TIEARRAY FAKEARRAY fred
-DESTROY 
-########
 BEGIN { die "phooey" }
 EXPECT
 phooey at - line 1.
@@ -175,12 +149,12 @@ BEGIN failed--compilation aborted
     package foo;
     sub PRINT {
         shift;
-        print join(' ', reverse @_)."\n";
+        print join(' ', reverse < @_)."\n";
     }
     sub PRINTF {
         shift;
 	  my $fmt = shift;
-        print sprintf($fmt, @_)."\n";
+        print sprintf($fmt, < @_)."\n";
     }
     sub TIEHANDLE {
         bless \%(), shift;
@@ -193,7 +167,7 @@ BEGIN failed--compilation aborted
   }
   sub READ {
       shift;
-      print STDOUT "foo->can(READ)(@_)\n";
+      print STDOUT "foo->can(READ)({join ' ', <@_})\n";
       return 100; 
   }
   sub GETC {
@@ -222,14 +196,14 @@ Don't GETC, Get Perl
 Perl is number 1
 and destroyed as well
 ########
-my @a; @a[2] = 1; for (@a) { $_ = 2 } print "@a\n"
+my @a; @a[2] = 1; for (<@a) { $_ = 2 } print "{join ' ', <@a}\n"
 EXPECT
 2 2 2
 ########
 # used to attach defelem magic to all immortal values,
 # which made restore of local $_ fail.
 foo(2+>1);
-sub foo { bar() for @_;  }
+sub foo { bar() for <@_;  }
 sub bar { local $_; }
 print "ok\n";
 EXPECT
@@ -293,13 +267,9 @@ map {#this newline here tickles the bug
 $s += $_} (1,2,4);
 print "eat flaming death\n" unless ($s == 7);
 ########
-sub foo { local $_ = shift; split; @_ }
-our @x = foo(' x  y  z ');
-print "you die joe!\n" unless "@x" eq 'x y z';
-########
-BEGIN { @ARGV = qw(a b c d e) }
-BEGIN { print "argv <@ARGV>\nbegin <",shift,">\n" }
-END { print "end <",shift,">\nargv <@ARGV>\n" }
+BEGIN { @ARGV = @( qw(a b c d e) ) }
+BEGIN { print "argv <{join ' ', <@ARGV}>\nbegin <",shift,">\n" }
+END { print "end <",shift,">\nargv <{join ' ', <@ARGV}>\n" }
 INIT { print "init <",shift,">\n" }
 CHECK { print "check <",shift,">\n" }
 EXPECT
@@ -483,12 +453,12 @@ EXPECT
 "x" =~ m/(\G?x)?/;
 ########
 # Bug 20010515.004
-my @h = 1 .. 10;
-bad(@h);
+my @h = @(1 .. 10);
+bad(<@h);
 sub bad {
    undef @h;
    print "O";
-   print for @_;
+   print for <@_;
    print "K";
 }
 EXPECT
@@ -519,12 +489,6 @@ ok
 print "ok" if 'X' =~ m/\X/;
 EXPECT
 ok
-######## segfault in 5.6.1 within peep()
-my @a = (1..9);
-my @b = sort { my @c = sort { my @d = sort { 0 } @a; @d; } @a; } @a;
-print join '', @a, "\n";
-EXPECT
-123456789
 ######## example from Camel 5, ch. 15, pp.406 (with my)
 # SKIP: ord "A" == 193 # EBCDIC
 use utf8;

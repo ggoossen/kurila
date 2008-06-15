@@ -695,6 +695,76 @@ Perl_do_kv(pTHX)
     return NORMAL;
 }
 
+void
+Perl_bad_arg(pTHX_ I32 n, const char *t, const char *name, SV *arg)
+{
+    PERL_ARGS_ASSERT_BAD_ARG;
+
+    Perl_croak(aTHX_ "Type of arg %d to %s must be %s (not %s)",
+	       (int)n, name, t, SvDESC(arg));
+}
+
+void
+Perl_do_arg_check(pTHX_ SV** base)
+{
+    dSP;
+    const int type = PL_op->op_type;
+    register I32 opargs = PL_opargs[type];
+    register I32 oa = opargs >> OASHIFT;
+    SV** arg = base;
+    I32 numargs = 0;
+
+/*     if (opargs & OA_MARK) { */
+/* 	arg = PL_stack_base + TOPMARK; */
+/*     } else { */
+/* 	I32 xoa = oa; */
+/* 	xoa >>= 4; */
+/* 	while (xoa) { */
+/* 	    arg--; */
+/* 	    xoa >>= 4; */
+/* 	} */
+/*     } */
+
+    while (oa) {
+	if ( (oa & 7) == OA_LIST) {
+	    assert(oa < 16);
+	    break;
+	}
+
+	if (arg > SP) {
+	    if ( ! (oa & OA_OPTIONAL) )
+		Perl_croak(aTHX_ "Not enough arguments for %s", PL_op_desc[type]);
+	    break;
+	}
+
+	numargs++;
+	switch (oa & 7) {
+	case OA_SCALAR:
+	    break;
+	case OA_AVREF:
+	    if ( ! SvAVOK(*arg) && SvOK(*arg) )
+		bad_arg(numargs, "array", PL_op_desc[type], *arg);
+	    break;
+	case OA_HVREF:
+		if ( ! SvHVOK(*arg) )
+		    bad_arg(numargs, "hash", PL_op_desc[type], *arg);
+		break;
+/* 	    case OA_CVREF: */
+/* 		break; */
+/* 	    case OA_FILEREF: */
+/* 		break; */
+/* 	    case OA_SCALARREF: */
+/* 		if ( ! SvROK(*arg) || ! SvAVOK(SvRV(*arg)) ) */
+/* 		    bad_arg(numargs, "array", SvDESC(arg)); */
+/* 		break; */
+	default:
+	    Perl_croak(aTHX_ "panic: unknown expeced arugment type");
+	}
+	oa >>= 4;
+	arg++;
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

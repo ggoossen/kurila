@@ -34,10 +34,10 @@ my @sys_consts = @( < check qw(
     _SC_STREAM_MAX _SC_VERSION _SC_TZNAME_MAX
 ) );
 
-my $tests = 2 * 3 * nelems @path_consts +
-            2 * 3 * nelems @path_consts_terminal +
-            2 * 3 * nelems @path_consts_fifo +
-                3 * nelems @sys_consts;
+my $tests = 2 * 3 * (nelems @path_consts) +
+            2 * 3 * (nelems @path_consts_terminal) +
+            2 * 3 * (nelems @path_consts_fifo) +
+                3 * (nelems @sys_consts);
 plan $tests 
      ? (tests => $tests) 
      : (skip_all => "No tests to run on this OS")

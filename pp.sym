@@ -58,7 +58,6 @@ Perl_pp_gvsv
 Perl_pp_gv
 Perl_pp_gelem
 Perl_pp_padsv
-Perl_pp_padav
 Perl_pp_padhv
 Perl_pp_padany
 Perl_pp_pushre
@@ -67,7 +66,6 @@ Perl_pp_rv2sv
 Perl_pp_rv2cv
 Perl_pp_anoncode
 Perl_pp_prototype
-Perl_pp_refgen
 Perl_pp_srefgen
 Perl_pp_ref
 Perl_pp_bless

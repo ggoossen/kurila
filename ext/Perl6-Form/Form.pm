@@ -218,7 +218,7 @@ my %std_opt = %(
 	bullet 	=> \%( set => \&strings_or_undef, def => \@()					),
 	height	=> \%( set => \&height_vals,		def => \%(min=>0, max=>$unlimited) ),
 	layout	=> \%( set => \&layout_word,		def => 'balanced',			),
-	break 	=> \%( set => \&code,				def => < break_at('-'),		),
+	break 	=> \%( set => \&code,				def => break_at('-'),		),
 	page	=> \%( set => \&page_hash,		def => \%(< %def_page),			),
 	under	=> \%( set => sub { "@_[0]" },		def => undef				),
 	interleave	=> \%( set => \&boolean,		def => 0					),
@@ -226,7 +226,7 @@ my %std_opt = %(
 	locale  	=> \%( set => \&boolean,		def => 0,					),
 );
 
-my %def_opts = %( map {$_=>%std_opt{$_}{def}}  keys %std_opt );
+my %def_opts = %( map {$_=>%std_opt{$_}->{def}}  keys %std_opt );
 
 sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
     use POSIX;
@@ -699,13 +699,13 @@ sub segment ($\@\%$\%) {
 	@_[-1] = $fldcnt;	# remember field count
 	# Distribute {*} widths...
 	for my $f (< @vstarred) {
-		$f->{maxwidth} = max 0, map {length} split "\n", ${$f->{src}};
+		$f->{maxwidth} = max @(0, map {length} split "\n", ${$f->{src}});
 	}
 	if ((nelems @starred)||nelems @vstarred) {
 		my $fldwidth = int($width/((nelems @starred)+nelems @vstarred));
 		for my $f (< @vstarred) {
 			$f->{width} = (nelems @starred) ? $f->{maxwidth} 
-								   : min $fldwidth, $f->{maxwidth};
+								   : min @($fldwidth, $f->{maxwidth});
 			$width += $fldwidth - $f->{width};
 		}
 		$fldwidth = int($width/((nelems @starred)+nelems @vstarred)) if (nelems @starred);
@@ -755,13 +755,13 @@ sub layout_groups {
 		}
 		push @groups, \@($f);
 	}
-	return @groups;
+	return < @groups;
 }
 
 sub make_col {
 	my ($f, $opts, $maxheight, $tabular) = < @_;
-	$maxheight = min $unlimited,
-					 grep defined(), $maxheight, $f->{opts}{height}{max};
+	$maxheight = min @($unlimited,
+					  grep defined(), $maxheight, $f->{opts}{height}{max});
 	my ($str_ref, $width) = $f->{[qw(src width)]};
 	my @col;
 	my ($more, $text) = (1,"");
@@ -922,8 +922,8 @@ sub make_cols($$\@\%$) {
 			next if $f->{isbullet} || $f->{opts}{height}{minimal};
 			$parts->[$col] = make_col($f,$opts, $maxheight);
 		}
-		$maxheight = min $maxheight, <
-						 max map { defined() ? scalar nelems @$_ : 0 } < @$parts
+		$maxheight = min @($maxheight,
+						 max @(map { defined() ? scalar nelems @$_ : 0 } < @$parts))
 			if $has_nonminimal;
 		for my $col (0..(nelems @$formatters)-1) {
 			my $f = $formatters->[$col];
@@ -991,8 +991,8 @@ sub make_cols($$\@\%$) {
 					 < @{make_col($f,$opts, $maxheight, $tabular_more)};
 				$finished &&= !$tabular_more;
 			}
-			my $minimaxheight = min $maxheight, <
-							 max map { defined() ? scalar nelems @$_ : 0 } < @$parts
+			my $minimaxheight = min @($maxheight,
+							 max @( map { defined() ? scalar nelems @$_ : 0 } < @$parts))
 				if $has_nonminimal;
 			for my $col (0..(nelems @$formatters)-1) {
 				my $tabular = 1;
@@ -1120,19 +1120,19 @@ sub form {
 		while (1) {
 			my $parity = $page->{number}%2 ? 'odd' : 'even';
 			my $header =
-			 $page->{header}{$pagetype} ? $page->{header}{$pagetype}($sect_opts)
-			 : $page->{header}{$parity} ? $page->{header}{$parity}($sect_opts)
-		     : $page->{header}{other}   ? $page->{header}{other}($sect_opts)
+			 $page->{header}->{$pagetype} ? $page->{header}->{$pagetype}->($sect_opts)
+			 : $page->{header}->{$parity} ? $page->{header}->{$parity}->($sect_opts)
+		     : $page->{header}->{other}   ? $page->{header}->{other}->($sect_opts)
 			 : "";
 			my $footer = 
-			 $page->{footer}{$pagetype} ? $page->{footer}{$pagetype}($sect_opts)
-			 : $page->{footer}{$parity} ? $page->{footer}{$parity}($sect_opts)
-			 : $page->{footer}{other}   ? $page->{footer}{other}($sect_opts)
+			 $page->{footer}->{$pagetype} ? $page->{footer}->{$pagetype}->($sect_opts)
+			 : $page->{footer}->{$parity} ? $page->{footer}->{$parity}->($sect_opts)
+			 : $page->{footer}->{other}   ? $page->{footer}->{other}->($sect_opts)
 			 : "";
 			my $feed = 
-			 $page->{feed}{$pagetype} ? $page->{feed}{$pagetype}($sect_opts)
-			 : $page->{feed}{$parity} ? $page->{feed}{$parity}($sect_opts)
-			 : $page->{feed}{other}   ? $page->{feed}{other}($sect_opts)
+			 $page->{feed}->{$pagetype} ? $page->{feed}->{$pagetype}->($sect_opts)
+			 : $page->{feed}->{$parity} ? $page->{feed}->{$parity}->($sect_opts)
+			 : $page->{feed}->{other}   ? $page->{feed}->{other}->($sect_opts)
 			 : "";
 			length and s/\n?\z/\n/ for $header, $footer;  # NOT for $feed 
 			my $bodyfn = $page->{body}{$pagetype}
@@ -1143,10 +1143,10 @@ sub form {
 			my ($pagetext, $more) = < make_page($section, $sect_opts, $bodylen);
 			if (!$more && $section == @section[-1]) {
 				my $lastheader =
-					$page->{header}{last} ? $page->{header}{last}($sect_opts)
+					$page->{header}->{last} ? $page->{header}->{last}->($sect_opts)
 							              : $header;
 				my $lastfooter =
-					$page->{footer}{last} ? $page->{footer}{last}($sect_opts)
+					$page->{footer}->{last} ? $page->{footer}->{last}->($sect_opts)
 							              : $footer;
 				length and s/\n?\z/\n/ for $lastheader, $lastfooter;
 				my $lastlen =
@@ -1155,10 +1155,10 @@ sub form {
 					$pagetype = 'last';
 					($header, $footer, $bodylen)
 						= ($lastheader, $lastfooter, $lastlen);
-				    $feed = $page->{feed}{last}($sect_opts)
-						if $page->{feed}{last};
-				    $bodyfn = $page->{body}{last}
-						if $page->{body}{last};
+				    $feed = $page->{feed}->{last}->($sect_opts)
+						if $page->{feed}->{last};
+				    $bodyfn = $page->{body}->{last}
+						if $page->{body}->{last};
 				}
 			}
 			my $fill = $pagelen +< $unlimited ? \@(("\n") x ($bodylen-nelems @$pagetext))
@@ -1187,7 +1187,8 @@ sub make_page {
 		while ((nelems @text) +< $bodylen && nelems @{$section->{formatters}}) {
 			$prevformatters = $formatters;
 			$formatters = $section->{formatters}[0];
-			$more = make_cols($formatters,$prevformatters,my < @parts, %$sect_opts, $bodylen-nelems @text);
+                        my @parts;
+			$more = make_cols($formatters,$prevformatters, @parts, %$sect_opts, $bodylen-(nelems @text));
 			shift @{$section->{formatters}} unless $more;
 			my $maxheight = 0;
 			my $maxwidth = 0;
@@ -1244,7 +1245,7 @@ sub section {
             die "Can't drill ", ($what ? lc $what : $structure) , " of $type";
         }
     }
-    return @section;
+    return < @section;
 }
 
 sub slice {
@@ -1258,10 +1259,9 @@ sub drill (\[@%];@) {
     my ($structure, < @indices) = < @_;
 	return $structure unless (nelems @indices);
 	my $index = shift @indices;
-	my @section = @( \@( (nelems @$index) ? < slice($structure,< @$index) : < vals($structure) ) );
 	return @section unless (nelems @indices);
 	for my $index (< @indices) {
-		@section = @( map { <section $_, < @$index} < @section );
+		@section = @( map {section $_, < @$index} < @section );
 	}
 	return @section;
 }

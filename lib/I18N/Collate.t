@@ -1,8 +1,6 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     our %Config;
     require Config; Config->import;
     if (!%Config{d_setlocale} || %Config{ccflags} =~ m/\bD?NO_LOCALE\b/) {

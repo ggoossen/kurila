@@ -29,7 +29,7 @@ sub subb {"in s"}
 @INPUT = @( ~< *DATA );
 @simple_input = @( grep m/^\s*\w+\s*\$\w+\s*[#\n]/, < @INPUT );
 
-plan 11 + nelems @INPUT + nelems @simple_input;
+plan 11 + (nelems @INPUT) + nelems @simple_input;
 
 sub wrn {"{join ' ', <@_}"}
 
@@ -170,7 +170,7 @@ ref $cstr			# ref nonref
 `$undefed`			# backtick undef skip(MSWin32)
 ~< *OP				# readline
 'faked'				# rcatline
-(@z = (1 .. 3))			# aassign
+(<@z) = (1 .. 3)			# aassign
 chop $chopit			# chop
 (chop (@x=@chopar))		# schop
 chomp $chopit			# chomp

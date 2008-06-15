@@ -122,7 +122,7 @@ sub ok {
     }
     else {
 	print "not ok $n\n";
-    	print "# {join ' ', <@info}\n" if (nelems @info);
+    	print "# {join ' ', <@info}\n" if @info;
     }
 }
 
@@ -130,15 +130,15 @@ unless ($have_gettimeofday) {
     skip 2..6;
 }
 else {
-    my @one = @( < gettimeofday() );
-    ok 2, (nelems @one) == 2, 'gettimeofday returned ', 0+nelems @one, ' args';
-    ok 3, @one[0] +> 850_000_000, "{join ' ', <@one} too small";
+    my @one = @( gettimeofday() );
+    ok 2, (nelems @one) == 2, 'gettimeofday returned 2 args';
+    ok 3, @one[0] +> 850_000_000, '@one[0] too small';
 
     sleep 1;
 
-    my @two = @( < gettimeofday() );
+    my @two = @(gettimeofday());
     ok 4, (@two[0] +> @one[0] || (@two[0] == @one[0] && @two[1] +> @one[1])),
-    	    "{join ' ', <@two} is not greater than {join ' ', <@one}";
+    	    '@two is not greater than @one';
 
     my $f = Time::HiRes::time();
     ok 5, $f +> 850_000_000, "$f too small";

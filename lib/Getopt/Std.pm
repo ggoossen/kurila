@@ -257,7 +257,6 @@ sub getopts ($;$) {
 		    %$hash{$first} = 1;
 		}
 		else {
-                    no strict 'refs';
 		    ${*{Symbol::fetch_glob("opt_$first")}} = 1;
 		    push( @EXPORT, "\$opt_$first" );
 		}

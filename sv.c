@@ -4852,8 +4852,6 @@ void
 Perl_sv_clear(pTHX_ register SV *const sv)
 {
     dVAR;
-    const U32 type = SvTYPE(sv);
-    HV *stash;
 
     PERL_ARGS_ASSERT_SV_CLEAR;
     assert(SvREFCNT(sv) == 0);
@@ -11130,20 +11128,12 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 
     case OP_RV2AV:
     case OP_RV2HV:
-    case OP_PADAV:
-    case OP_PADHV:
       {
-	const bool pad  = (obase->op_type == OP_PADAV || obase->op_type == OP_PADHV);
 	const bool hash = (obase->op_type == OP_PADHV || obase->op_type == OP_RV2HV);
 	I32 index = 0;
 	SV *keysv = NULL;
 	int subscript_type = FUV_SUBSCRIPT_WITHIN;
 
-	if (pad) { /* @lex, %lex */
-	    sv = PAD_SVl(obase->op_targ);
-	    gv = NULL;
-	}
-	else {
 	    if (cUNOPx(obase)->op_first->op_type == OP_GV) {
 	    /* @global, %global */
 		gv = cGVOPx_gv(cUNOPx(obase)->op_first);
@@ -11154,7 +11144,6 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	    else /* @{expr}, %{expr} */
 		return find_uninit_var(cUNOPx(obase)->op_first,
 						    uninit_sv, match);
-	}
 
 	/* attempt to find a match within the aggregate */
 	if (hash) {
@@ -11238,7 +11227,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 
 	/* get the av or hv, and optionally the gv */
 	sv = NULL;
-	if  (o->op_type == OP_PADAV || o->op_type == OP_PADHV) {
+	if  (o->op_type == OP_PADSV) {
 	    sv = PAD_SV(o->op_targ);
 	}
 	else if ((o->op_type == OP_RV2AV || o->op_type == OP_RV2HV)
@@ -11292,10 +11281,8 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	    }
 	    if (match)
 		break;
-	    return varname(gv,
-		(o->op_type == OP_PADAV || o->op_type == OP_RV2AV)
-		? '@' : '%',
-		o->op_targ, NULL, 0, FUV_SUBSCRIPT_WITHIN);
+	    return varname(gv, '%',
+			   o->op_targ, NULL, 0, FUV_SUBSCRIPT_WITHIN);
 	}
 	break;
 

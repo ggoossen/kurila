@@ -165,11 +165,7 @@ sub item {
         return $item;
     }
     else {
-<<<<<<< HEAD:lib/Pod/ParseUtils.pm
         return @{$self->{_items}};
-=======
-        return nelems @{$self->{_items}};
->>>>>>> 95cf2b6... and more array/hash stuff:lib/Pod/ParseUtils.pm
     }
 }
 

@@ -361,7 +361,7 @@ ok( "abc" =~ m/^(??{"a"})b/ );
 my $matched;
 $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/;
 
-@ans = @( @ans1 = @( () ) );
+@ans = @ans1 = @();
 push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp;
 
 ok( "{join ' ', <@ans}" eq "1 1 1" );
@@ -2258,8 +2258,7 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     my $i;
     ok('-1-3-5-' eq join('', split m/((??{$i++}))/, '-1-3-5-'),
 	"[perl #21411] (??\{ .. \}) corrupts split's stack");
-    split m/(?{'WOW'})/, 'abc';
-    ok('a|b|c' eq join ('|', < @_),
+    ok('a|b|c' eq join ('|', split m/(?{'WOW'})/, 'abc'),
        "[perl #21411] (?\{ .. \}) version of the above");
 }
 
@@ -2614,10 +2613,10 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
 
     local $" = ','; # non-whitespace and non-RE-specific
     ok('abc' =~ m/(.)(.)(.)/, 'the last successful match is bogus');
-    ok("A{join ' ', <@+}B"  =~ m/A{join ' ', <@{\@+}}B/,  'interpolation of @+ in /@{+}/');
-    ok("A{join ' ', <@-}B"  =~ m/A{join ' ', <@{\@-}}B/,  'interpolation of @- in /@{-}/');
-    ok("A{join ' ', <@+}B"  =~ m/A{join ' ', <@{\@+}}B/x, 'interpolation of @+ in /@{+}/x');
-    ok("A{join ' ', <@-}B"  =~ m/A{join ' ', <@{\@-}}B/x, 'interpolation of @- in /@{-}/x');
+    ok("A{join ' ', <@+}B"  =~ m/A{join ' ', <@+}B/,  'interpolation of @+ in /@{+}/');
+    ok("A{join ' ', <@-}B"  =~ m/A{join ' ', <@-}B/,  'interpolation of @- in /@{-}/');
+    ok("A{join ' ', <@+}B"  =~ m/A{join ' ', <@+}B/x, 'interpolation of @+ in /@{+}/x');
+    ok("A{join ' ', <@-}B"  =~ m/A{join ' ', <@-}B/x, 'interpolation of @- in /@{-}/x');
 }
 
 {
@@ -3209,7 +3208,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     local $Message = "RT#22614";
     local $_='ab';
     our @len= @(() );
-    m/(.){1,}(?{push @len,0+@-})(.){1,}(?{})^/;
+    m/(.){1,}(?{push @len,0+(nelems @-)})(.){1,}(?{})^/;
     iseq("{join ' ', <@len}","2 2 2");
 }
 {

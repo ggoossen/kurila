@@ -760,6 +760,7 @@ sub tryfunc {
 	skip "skip $function: $skip_exception", 1;
       }
       else {
+        die if $@;
 	ok $@, '', $function;
       }
       return;

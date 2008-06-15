@@ -1,16 +1,5 @@
 #!/usr/bin/perl
 
-BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
-chdir 't';
-
 use strict;
 use Test::More;
 

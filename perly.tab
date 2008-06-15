@@ -206,7 +206,7 @@ static const char *const yytname[] =
   "MY", "MYSUB", "REQUIRE", "COLONATTR", "PREC_LOW", "DOROP", "OROP",
   "ANDOP", "NOTOP", "','", "ASSIGNOP", "'?'", "':'", "DORDOR", "OROR",
   "ANDAND", "BITOROP", "BITANDOP", "SHIFTOP", "MATCHOP", "'!'", "'~'",
-  "'<'", "REFGEN", "UMINUS", "POWOP", "POSTDEC", "POSTINC", "PREDEC",
+  "'<'", "SREFGEN", "UMINUS", "POWOP", "POSTDEC", "POSTINC", "PREDEC",
   "PREINC", "ASLICE", "HSLICE", "DEREFAMP", "DEREFSTAR", "DEREFHSH",
   "DEREFARY", "DEREFSCL", "ARROW", "')'", "'('", "PEG", "$accept", "prog",
   "block", "remember", "mydefsv", "progstart", "mblock", "mremember",

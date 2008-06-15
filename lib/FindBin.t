@@ -2,7 +2,7 @@
 
 BEGIN {
     # Can't chdir in BEGIN before FindBin runs, as it then can't find us.
-    @INC = -d 't' ? 'lib' : '../lib';
+    @INC = @( -d 't' ? 'lib' : '../lib' );
 }
 
 print "1..2\n";

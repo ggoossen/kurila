@@ -6,7 +6,7 @@ BEGIN {
 
 # use strict;
 
-plan tests => 223;
+plan tests => 217;
 
 my @comma = @("key", "value");
 
@@ -197,8 +197,8 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   is (%utf8c{"" . $key}, $value, 'is key present? (unoptimised)');
   my $tempval = sprintf '%%utf8c{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
-  eval $tempval or die "'$tempval' gave $@";
+  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
+  eval $tempval or die "'$tempval' gave {$@->message}";
   is (%utf8c{@temp[0]}, $value, 'is key present? (using LHS of $tempval)');
 
   @temp = @( < %utf8c );
@@ -216,7 +216,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   is (%temp{"" . $key}, $value, 'is key present? (unoptimised)');
   $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
+  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
   is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
@@ -239,7 +239,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   is (%utf8a{$key . ""}, $value, 'is key present? (unoptimised)');
   $tempval = sprintf '%%utf8a{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
+  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
   is (%utf8a{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
@@ -258,7 +258,7 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   is (%temp{'' . $key}, $value, 'is key present? (unoptimised)');
   $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
   is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = ("\x{%x}" => undef)', $chr;
+  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
   eval $tempval or die "'$tempval' gave $@";
   is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
@@ -276,18 +276,8 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 # duplicate keys [perl #24380]
 {
     my %h; my $x; my $ar;
-    is( (join ':', %h = %( (1) x 8 )), '1:1',
+    is( (join ':', ((<%h) = (1) x 8 )), '1:1',
 	'hash assignment in list context removes duplicates' );
-    is( scalar( %h = %(1,2,1,3,1,4,1,5) ), 2,
-	'hash assignment in scalar context' );
-    is( scalar( ($x,< %h) = (0,1,2,1,3,1,4,1,5) ), 3,
-	'scalar + hash assignment in scalar context' );
-    $ar = \@( %h = %(1,2,1,3,1,4,1,5) );
-    is( ((nelems @$ar)-1), 1, 'hash assignment in list context' );
-    is( "{join ' ', <@$ar}", "1 5", '...gets the last values' );
-    $ar = \@( ($x,< %h) = (0,1,2,1,3,1,4,1,5) );
-    is( ((nelems @$ar)-1), 2, 'scalar + hash assignment in list context' );
-    is( "{join ' ', <@$ar}", "0 1 5", '...gets the last values' );
 }
 
 # test stringification of keys

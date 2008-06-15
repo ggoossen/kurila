@@ -10,8 +10,7 @@ use Config;
 
 sub BEGIN {
     if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
+	push @INC, '../ext/Storable/t';
     } else {
 	unshift @INC, 't';
     }
@@ -32,7 +31,7 @@ package OBJ_REAL;
 
 use Storable qw(freeze thaw);
 
-my @x = ('a', 1);
+my @x = @('a', 1);
 
 sub make { bless \@(), shift }
 
@@ -46,32 +45,32 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
-	my ($x, $obj) = @_;
+	my ($x, $obj) = <@_;
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	my $len = length $x;
 	my $a = thaw $x;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
-	die "STORABLE_thaw #3" unless @$a == 2 && $a->[0] eq 'a' && $a->[1] == 1;
+	die "STORABLE_thaw #3" unless nelems @$a == 2 && $a->[0] eq 'a' && $a->[1] == 1;
 	@$self = @$a;
 	die "STORABLE_thaw #4" unless Storable::is_retrieving;
 }
 
 package OBJ_SYNC;
 
-@x = ('a', 1);
+@x = @('a', 1);
 
 sub make { bless \%(), shift }
 
 sub STORABLE_freeze {
 	my $self = shift;
-	my ($cloning) = @_;
+	my ($cloning) = <@_;
 	return if $cloning;
 	return ("", \@x, $self);
 }
 
 sub STORABLE_thaw {
 	my $self = shift;
-	my ($cloning, $undef, $a, $obj) = @_;
+	my ($cloning, $undef, $a, $obj) = <@_;
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY' || @$a != 2;
 	$self->{ok} = $self;
@@ -83,7 +82,7 @@ use Storable qw(dclone);
 
 sub make {
 	my $self = bless \%(), shift;
-	my ($ext) = @_;
+	my ($ext) = <@_;
 	$self->{sync} = OBJ_SYNC->make;
 	$self->{ext} = $ext;
 	return $self;
@@ -99,13 +98,13 @@ sub STORABLE_freeze {
 
 sub STORABLE_thaw {
 	my $self = shift;
-	my ($cloning, $undef, $a, $r, $obj, $ext) = @_;
+	my ($cloning, $undef, $a, $r, $obj, $ext) = <@_;
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
 	die "STORABLE_thaw #3" unless ref $r eq 'HASH';
 	die "STORABLE_thaw #4" unless $a->[1] == $r->{ext};
 	$self->{ok} = $self;
-	($self->{sync}, $self->{ext}) = @$a;
+	($self->{sync}, $self->{ext}) = <@$a;
 }
 
 package OBJ_REAL2;
@@ -128,7 +127,7 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
-	my ($x, $obj) = @_;
+	my ($x, $obj) = <@_;
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	$self->[0] = thaw($x) if $x ne "no";
 	$recursed--;
@@ -210,12 +209,12 @@ sub new {
 }
 
 sub STORABLE_freeze {
-	my($self,$clonning) = @_;
+	my($self,$clonning) = <@_;
 	return "$self->{a}", $self->{b};
 }
 
 sub STORABLE_thaw {
-	my($self,$clonning,$dummy,$o) = @_;
+	my($self,$clonning,$dummy,$o) = <@_;
 	$self->{a} = $dummy;
 	$self->{b} = $o;
 }
@@ -247,7 +246,7 @@ package CLASS_2;
 
 sub make {
 	my $self = bless \%(), shift;
-	my ($o) = @_;
+	my ($o) = <@_;
 	$self->{c1} = CLASS_1->make();
 	$self->{o} = $o;
 	$self->{c3} = bless CLASS_1->make(), "CLASS_3";
@@ -256,12 +255,12 @@ sub make {
 }
 
 sub STORABLE_freeze {
-	my($self, $clonning) = @_;
+	my($self, $clonning) = <@_;
 	return "", $self->{c1}, $self->{c3}, $self->{o};
 }
 
 sub STORABLE_thaw {
-	my($self, $clonning, $frozen, $c1, $c3, $o) = @_;
+	my($self, $clonning, $frozen, $c1, $c3, $o) = <@_;
 	main::ok 29, ref $self eq "CLASS_2";
 	main::ok 30, ref $c1 eq "CLASS_1";
 	main::ok 31, ref $c3 eq "CLASS_3";

@@ -47,7 +47,7 @@ die unless PL::Foo::bar() == 42;
 
 # Had a bug where PL_FILES weren't sent the file to generate
 die "argv empty\n" unless @ARGV;
-die "too many in argv: @ARGV\n" unless @ARGV == 1;
+die "too many in argv: {join ' ', <@ARGV}\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
 open OUT, ">", "$file" or die $!;
@@ -72,7 +72,7 @@ try { require PL::Foo; };
 
 # Had a bug where PL_FILES weren't sent the file to generate
 die "argv empty\n" unless @ARGV;
-die "too many in argv: @ARGV\n" unless @ARGV == 1;
+die "too many in argv: @ARGV\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
 open OUT, ">", "$file" or die $!;

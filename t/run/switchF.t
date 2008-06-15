@@ -1,4 +1,4 @@
- @( )#!./perl -anFx+
+#!./perl -anFx+
 
 BEGIN {
     print "1..2\n";

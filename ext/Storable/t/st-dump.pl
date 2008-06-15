@@ -127,7 +127,7 @@ sub dump_scalar {
 # Dump array
 sub dump_array {
 	my ($aref) = < @_;
-	my $items = 0 + nelems @{$aref};
+	my $items = nelems @{$aref};
 	$dumped .= "ARRAY items=$items\n";
 	foreach my $item (< @{$aref}) {
 		unless (defined $item) {

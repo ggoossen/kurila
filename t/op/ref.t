@@ -3,7 +3,7 @@
 require './test.pl';
 use strict qw(refs subs);
 
-plan(124);
+plan(116);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -147,13 +147,13 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
     my $z = \66;
     is($z->$, 66);
     my $y = \@(1,2,3,4);
-    is(join(':', $y->@), "1:2:3:4");
+    is(join(':', < $y->@), "1:2:3:4");
     my $x = \%( aap => 'noot', mies => "teun" );
-    is("".$x->%, "".%$x);
+    is((join "*", keys $x->%), join "*", keys %$x);
     my $w = \*foo428;
     is( <Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return @_[0]; };
-    is( <$v->&(55), 55);
+    is($v->(55), 55);
 }
 
 # Test bless operator.
@@ -172,7 +172,8 @@ main::is (ref $object2,	'MYHASH');
 &mymethod($object,"argument");
 
 sub mymethod {
-    local($THIS, < @ARGS) = < @_;
+    local($THIS) = shift;
+    local @ARGS = @_;
     die 'Got a "' . ref($THIS). '" instead of a MYHASH'
 	unless ref $THIS eq 'MYHASH';
     main::is (@ARGS[0], "argument");
@@ -220,27 +221,7 @@ sub BASEOBJ::doit {
     $ref->{shift()};
 }
 
-#
-# test the \(@foo) construct
-#
 package main;
-@foo = @( \(1..3) );
-@bar = @( \(< @foo) );
-@baz = @( \(1,< @foo,< @bar) );
-is (scalar (nelems @bar), 3);
-is (scalar grep(ref($_), < @bar), 3);
-is (scalar (nelems @baz), 3);
-
-my(@fuu) = @( \(1..2,3) );
-my(@baa) = @( \(< @fuu) );
-my(@bzz) = @( \(1,< @fuu,< @baa) );
-is (scalar (nelems @baa), 3);
-is (scalar grep(ref($_), < @baa), 3);
-is (scalar (nelems @bzz), 3);
-
-# also, it can't be an lvalue
-eval_dies_like('our ($x, $y); \($x, $y) = (1, 2);',
-               qr/Can\'t modify.*ref.*in.*assignment/);
 
 # test for proper destruction of lexical objects
 $test = curr_test();
@@ -464,8 +445,7 @@ is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/o ->' 
 is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
 is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/o ->' );
 is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
-is ( < (sub {"bar"})[[0]](), "bar", 'code deref from list slice w/o ->' );
-is ( < (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
+is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 
 # deref on empty list shouldn't autovivify
 {

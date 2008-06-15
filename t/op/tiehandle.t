@@ -41,7 +41,7 @@ sub PRINTF {
 
 sub READLINE {
     ::compare(READLINE => < @_);
-    wantarray ? @data : shift @data;
+    wantarray ? < @data : shift @data;
 }
 
 sub GETC {
@@ -88,15 +88,16 @@ is($r, 1);
 $r = printf $fh @expect[[2,3]];
 is($r, 2);
 
-$text = (@data = @("the line\n"))[[0]];
+@data = @("the line\n");
+$text = @data[0];
 @expect = @(READLINE => $ob);
 $ln = ~< $fh;
 is($ln, $text);
 
 @expect = @( () );
-@in = @( @data = @( qw(a line at a time) ) );
+@in = @data = @( qw(a line at a time) );
 @line = @( ~< $fh );
-@expect = @( < @in );
+@expect = @in;
 compare(< @line);
 
 @expect = @(GETC => $ob);

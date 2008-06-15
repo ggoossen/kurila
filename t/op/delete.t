@@ -55,11 +55,10 @@ cmp_ok("{join ' ', <@list}",'eq',"foo", 'autoviv and delete hashref');
 
 {
     my %a = %('bar', 33);
-    my($a) = \(values %a);
     my $b = \%a{bar};
     my $c = \delete %a{bar};
 
-    ok($a == $b && $b == $c,'a b c equivalent');
+    ok($b == $c,'a b c equivalent');
 }
 
 # delete() on array elements
@@ -116,11 +115,10 @@ cmp_ok( scalar(nelems @{@refary[0]}),'==',1,'one down');
 {
     no strict 'subs';
     my @a = @( 33 );
-    my($a) = \(< @a);
     my $b = \@a[0];
     my $c = \delete @a['bar'];
 
-    ok($a == $b && $b == $c,'a b c also equivalent');
+    ok($b == $c,'b c also equivalent');
 }
 
 {

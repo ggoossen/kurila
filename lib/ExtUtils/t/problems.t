@@ -1,15 +1,8 @@
 # Test problems in Makefile.PL's and hint files.
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = @('../lib', 'lib');
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
+  unshift @INC, 'lib';
 }
-chdir 't';
 
 use strict;
 use Test::More tests => 6;

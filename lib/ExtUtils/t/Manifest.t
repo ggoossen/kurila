@@ -91,11 +91,11 @@ ok( -e 'MANIFEST', 'create MANIFEST file' );
 
 my @list = @( < read_manifest() );
 is( (nelems @list), 2, 'check files in MANIFEST' );
-ok( ! ExtUtils::Manifest::filecheck(), 'no additional files in directory' );
+ok( ! @(ExtUtils::Manifest::filecheck()), 'no additional files in directory' );
 
 # after adding bar, the MANIFEST is out of date
 ok( add_file( 'bar' ), 'add another file' );
-ok( ! manicheck(), 'MANIFEST now out of sync' );
+ok( ! @(manicheck()), 'MANIFEST now out of sync' );
 
 # it reports that bar has been added and throws a warning
 ($res, $warn) = < catch_warning( \&filecheck );

@@ -1,7 +1,7 @@
 #!./perl
 
 require "./test.pl";
-plan( tests => 57 );
+plan( tests => 55 );
 
 our (@b, @a, @foo, @bar, $c, $d, %c, $x);
 
@@ -44,10 +44,10 @@ cmp_ok($b,'==',2,'short list 2 defined');
 ok(!defined($c),'short list 3 undef');
 ok(!defined($d),'short list 4 undef');
 
-@foo = @( @bar = @(1) );
+@foo =  @bar = @(1);
 cmp_ok(join(':',< @foo,< @bar),'eq','1:1','list reassign');
 
-@foo = @( @bar = @(2,3) );
+@foo = @bar = @(2,3);
 cmp_ok(join(':',join('+',< @foo),join('-',< @bar)),'eq','2+3:2-3','long list reassign');
 
 @foo = @( () );
@@ -134,9 +134,6 @@ cmp_ok(join('',(1,2),3,(4,5)),'eq','12345','list (..).(..)');
     cmp_ok(scalar(nelems @b),'==',scalar(nelems @c),'slice and slice');
     cmp_ok(scalar(nelems @c),'==',2,'slice len');
 
-    @b = @(29, scalar @c[[()]]);
-    cmp_ok(join(':',< @b),'eq','29:','slice ary nil');
-
     my %h = %(a => 1);
     @b = @(30, scalar %h{[()]});
     cmp_ok(join(':',< @b),'eq','30:','slice hash nil');
@@ -149,12 +146,11 @@ cmp_ok(join('',(1,2),3,(4,5)),'eq','12345','list (..).(..)');
     # perl #39882
     sub test_zero_args {
         my $test_name = shift;
-        is(scalar(nelems @_), 0, $test_name);
+        is((nelems @_), 0, $test_name);
     }
     test_zero_args("simple list slice",      (10,11)[[2,3]]);
     test_zero_args("grepped list slice",     grep(1, (10,11)[[2,3]]));
     test_zero_args("sorted list slice",      sort((10,11)[[2,3]]));
-    test_zero_args("assigned list slice",    my @tmp = @( (10,11)[[2,3]] ));
     test_zero_args("do-returned list slice", do { (10,11)[[2,3]]; });
 }
 

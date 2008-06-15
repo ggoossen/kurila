@@ -5,7 +5,7 @@ plan( tests => 15 );
 
 our (@oops, @ops, %files, $not, @glops, $x);
 
-@oops = @( @ops = glob@( <"op/*") );
+@oops = @ops = @( glob("op/*") );
 
 if ($^O eq 'MSWin32') {
   map { %files{lc($_)}++ } glob( <"op/*");

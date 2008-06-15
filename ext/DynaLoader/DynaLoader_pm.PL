@@ -124,7 +124,7 @@ our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[qw(dlext so dlsrc)]};
 EOT
 }
 
-print OUT < expand_os_specific(<<'EOT');
+print OUT expand_os_specific(<<'EOT');
 
 <<$^O-eq-VMS>>
 # Some systems need special handling to expand file specifications
@@ -248,7 +248,7 @@ EOT
 
 
 # following long string contains $^O-specific stuff, which is factored out
-print OUT < expand_os_specific(<<'EOT');
+print OUT expand_os_specific(<<'EOT');
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
 boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
@@ -271,7 +271,7 @@ sub bootstrap_inherit {
     local *isa = *{Symbol::fetch_glob("$module\::ISA")};
     local @isa = @( < @isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
-    bootstrap(@_);
+    bootstrap(<@_);
 }
 
 # The bootstrap function cannot be autoloaded (without complications)

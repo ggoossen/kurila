@@ -13,7 +13,7 @@ use ExtUtils::testlib;
 
 my $Base = 0;
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
     $id += $Base;
 
     # You have to do it this way or VMS will get confused.

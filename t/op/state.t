@@ -8,7 +8,7 @@ BEGIN {
 use strict;
 use feature "state";
 
-plan tests => 68;
+plan tests => 62;
 
 ok( ! defined state $uninit, q(state vars are undef by default) );
 
@@ -197,7 +197,6 @@ is( pugnax(), 42, 'scalar state assignment return value' );
 
 foreach my $forbidden (~< *DATA) {
     chomp $forbidden;
-    no strict 'vars';
     eval $forbidden;
     like $@->{description}, qr/Initialization of state variables in list context currently forbidden/, "Currently forbidden: $forbidden";
 }
@@ -248,12 +247,6 @@ foreach my $forbidden (~< *DATA) {
 __DATA__
 state ($a) = 1;
 (state $a) = 1;
-state @a = 1;
-state (@a) = 1;
-(state @a) = 1;
-state %a = ();
-state (%a) = ();
-(state %a) = ();
 state ($a, $b) = ();
 state ($a, @b) = ();
 (state $a, state $b) = ();

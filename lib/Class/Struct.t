@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-}
-
 #
 # A couple of simple classes to use as struct elements.
 #

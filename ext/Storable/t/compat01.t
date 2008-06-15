@@ -26,7 +26,7 @@ my @dumps = @(
     "perl-store\0\x041234\4\4\4\x94y\22\b\3\1\0\0\0vxz\22\b\b\x81Xk\3\0\0\0oneX",      # 0.4@7
 );
 
-print "1.." . nelems @dumps . "\n";
+print "1.." . (nelems @dumps) . "\n";
 
 my $testno;
 for my $dump (< @dumps) {

@@ -8,10 +8,7 @@
 
 BEGIN {
     if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
-    } else {
-	unshift @INC, 't';
+	push @INC, '../ext/Storable/t';
     }
     require 'st-dump.pl';
 }
@@ -31,14 +28,14 @@ sub TIEHASH {
 
 sub FETCH {
 	my $self = shift;
-	my ($key) = @_;
+	my ($key) = <@_;
 	$main::hash_fetch++;
 	return $self->{$key};
 }
 
 sub STORE {
 	my $self = shift;
-	my ($key, $val) = @_;
+	my ($key, $val) = <@_;
 	$self->{$key} = $val;
 }
 
@@ -46,7 +43,7 @@ package SIMPLE;
 
 sub make {
 	my $self = bless \@(), shift;
-	my ($x) = @_;
+	my ($x) = <@_;
 	$self->[0] = $x;
 	return $self;
 }
@@ -63,7 +60,7 @@ sub make {
 		push(@pool, SIMPLE->make($i));
 	}
 	$self->{obj} = \@pool;
-	my @a = ('string', $h, $self);
+	my @a = @('string', $h, $self);
 	$self->{a} = \@a;
 	$self->{num} = \@(1, 0, -3, -3.14159, 456, 4.5);
 	$h->{key1} = 'val1';

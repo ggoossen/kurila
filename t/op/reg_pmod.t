@@ -15,7 +15,7 @@ our @tests = @(
     \@( '',     "456",    undef,  undef,  undef ),
 );
 
-plan tests => 4 * nelems @tests + 2;
+plan tests => 4 * (nelems @tests) + 2;
 my $W = "";
 
 $^WARN_HOOK = sub { $W.=join("",< @_); };

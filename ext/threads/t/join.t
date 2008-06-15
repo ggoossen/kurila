@@ -65,7 +65,7 @@ sub skip {
 }
 {
     my ($thread) = threads->create(sub { return (1,2,3) });
-    my @retval = $thread->join();
+    my @retval = @($thread->join());
     ok(@retval[0] == 1 && @retval[1] == 2 && @retval[2] == 3,'');
 }
 {

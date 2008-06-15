@@ -12,7 +12,7 @@ BEGIN {
 use ExtUtils::testlib;
 
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
     if (! defined($name)) {
         $name = '';
     }
@@ -48,11 +48,11 @@ for(1..10) {
     ok($test_count++, $foo eq "foo");
     threads->create(sub { $foo = "bar" })->join();
     ok($test_count++, $foo eq "bar");
-    my @foo : shared = ("foo","bar");
+    my @foo : shared = @("foo","bar");
     ok($test_count++, @foo[1] eq "bar");
     threads->create(sub { ok($test_count++, shift(@foo) eq "foo")})->join();
     ok($test_count++, @foo[0] eq "bar");
-    my %foo : shared = ( foo => "bar" );
+    my %foo : shared = %( foo => "bar" );
     ok($test_count++, %foo{foo} eq "bar");
     threads->create(sub { %foo{bar} = "foo" })->join();
     ok($test_count++, %foo{bar} eq "foo");

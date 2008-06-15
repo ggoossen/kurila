@@ -85,12 +85,8 @@ foreach my $i (26, 27) {
 print "not " if $i ne "outer";
 print "ok 28\n";
 
-# Ensure that C<my @y> (without parens) doesn't force scalar context.
-my @x;
-{ @x = @( my < @y ) }
-print +((nelems @x) ? "not " : ""), "ok 29\n";
-{ @x = @( my < %y ) }
-print +((nelems @x) ? "not " : ""), "ok 30\n";
+print "ok 29\n";
+print "ok 30\n";
 
 # Found in HTML::FormatPS
 my %fonts = %( qw(nok 31) );

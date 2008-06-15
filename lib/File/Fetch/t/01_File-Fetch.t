@@ -1,7 +1,3 @@
-BEGIN { chdir 't' if -d 't' };
-
-use strict;
-use lib '../lib';
 
 use Test::More 'no_plan';
 
@@ -47,7 +43,7 @@ if( $File::Fetch::DEBUG ) {
 
 ### _parse_uri tests
 ### these go on all platforms
-my @map = (
+my @map = @(
     \%(   uri     => 'ftp://cpan.org/pub/mirror/index.txt',
         scheme  => 'ftp',
         host    => 'cpan.org',
@@ -116,7 +112,7 @@ push @map, (
 
 
 ### parse uri tests ###
-for my $entry (@map ) {
+for my $entry (<@map ) {
     my $uri = $entry->{'uri'};
 
     my $href = File::Fetch->_parse_uri( $uri );
@@ -129,7 +125,7 @@ for my $entry (@map ) {
 }
 
 ### File::Fetch->new tests ###
-for my $entry (@map) {
+for my $entry (<@map) {
     my $ff = File::Fetch->new( uri => $entry->{uri} );
 
     ok( $ff,                    "Object for uri '$entry->{uri}'" );

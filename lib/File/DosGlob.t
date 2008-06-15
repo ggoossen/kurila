@@ -133,7 +133,7 @@ print "ok 9\n";
 eval <<'EOT';
 use File::DosGlob 'GLOBAL_glob';
 package Bar;
-@s = ();
+@s = @();
 if ($^O eq 'MacOS') {
     while (glob(":*:a*.t")) {
 	my $i = 0;
@@ -157,6 +157,6 @@ if ($^O eq 'MacOS') {
 	print " >\n";
     }
 }
-print "not " if "@r" ne "@s";
+print "not " if (join ' ', <@r) ne (join ' ', <@s);
 print "ok 10\n";
 EOT

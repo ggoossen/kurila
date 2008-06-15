@@ -98,7 +98,7 @@
      BITANDOP = 313,
      SHIFTOP = 314,
      MATCHOP = 315,
-     REFGEN = 316,
+     SREFGEN = 316,
      UMINUS = 317,
      POWOP = 318,
      POSTDEC = 319,
@@ -175,7 +175,7 @@
 #define BITANDOP 313
 #define SHIFTOP 314
 #define MATCHOP 315
-#define REFGEN 316
+#define SREFGEN 316
 #define UMINUS 317
 #define POWOP 318
 #define POSTDEC 319

@@ -121,7 +121,7 @@
 %left ADDOP
 %left MULOP
 %left <i_tkval> MATCHOP
-%right <i_tkval> '!' '~' '<' UMINUS REFGEN
+%right <i_tkval> '!' '~' '<' UMINUS SREFGEN
 %right <i_tkval> POWOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
@@ -1124,8 +1124,8 @@ term	:	termbinop
 			  TOKEN_GETMAD($4,$$,':');
                           APPEND_MADPROPS_PV("?",$$,'>');
 			}
-	|	REFGEN term                          /* \$x, \@y, \%z */
-			{ $$ = newUNOP(OP_REFGEN, 0, mod($2,OP_REFGEN));
+	|	SREFGEN term                          /* \$x, \@y, \%z */
+                        { $$ = newUNOP(OP_SREFGEN, 0, mod(scalar($2),OP_SREFGEN));
 			  TOKEN_GETMAD($1,$$,'o');
                           APPEND_MADPROPS_PV("operator",$$,'>');
 			}

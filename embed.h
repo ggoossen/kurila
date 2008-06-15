@@ -206,6 +206,8 @@
 #define do_join			Perl_do_join
 #ifdef PERL_CORE
 #define do_kv			Perl_do_kv
+#define bad_arg			Perl_bad_arg
+#define do_arg_check		Perl_do_arg_check
 #endif
 #define do_open9		Perl_do_open9
 #define do_openn		Perl_do_openn
@@ -1163,7 +1165,6 @@
 #define new_logop		S_new_logop
 #define simplify_sort		S_simplify_sort
 #define gv_ename		S_gv_ename
-#define scalar_mod_type		S_scalar_mod_type
 #define my_kid			S_my_kid
 #define dup_attrlist		S_dup_attrlist
 #define apply_attrs		S_apply_attrs
@@ -1905,6 +1906,7 @@
 #define ck_substr		Perl_ck_substr
 #define ck_svconst		Perl_ck_svconst
 #define ck_trunc		Perl_ck_trunc
+#define ck_try			Perl_ck_try
 #define ck_unpack		Perl_ck_unpack
 #define pp_aassign		Perl_pp_aassign
 #define pp_abs			Perl_pp_abs
@@ -1977,6 +1979,7 @@
 #define pp_exists		Perl_pp_exists
 #define pp_exit			Perl_pp_exit
 #define pp_exp			Perl_pp_exp
+#define pp_expand		Perl_pp_expand
 #define pp_fcntl		Perl_pp_fcntl
 #define pp_fileno		Perl_pp_fileno
 #define pp_flip			Perl_pp_flip
@@ -2088,6 +2091,7 @@
 #define pp_link			Perl_pp_link
 #define pp_list			Perl_pp_list
 #define pp_listen		Perl_pp_listen
+#define pp_listlast		Perl_pp_listlast
 #define pp_localtime		Perl_pp_localtime
 #define pp_lock			Perl_pp_lock
 #define pp_log			Perl_pp_log
@@ -2109,6 +2113,7 @@
 #define pp_ncmp			Perl_pp_ncmp
 #define pp_ne			Perl_pp_ne
 #define pp_negate		Perl_pp_negate
+#define pp_nelems		Perl_pp_nelems
 #define pp_next			Perl_pp_next
 #define pp_nextstate		Perl_pp_nextstate
 #define pp_not			Perl_pp_not
@@ -2121,7 +2126,6 @@
 #define pp_ord			Perl_pp_ord
 #define pp_pack			Perl_pp_pack
 #define pp_padany		Perl_pp_padany
-#define pp_padav		Perl_pp_padav
 #define pp_padhv		Perl_pp_padhv
 #define pp_padsv		Perl_pp_padsv
 #define pp_pipe_op		Perl_pp_pipe_op
@@ -2152,7 +2156,6 @@
 #define pp_ref			Perl_pp_ref
 #define pp_ref_eq		Perl_pp_ref_eq
 #define pp_ref_ne		Perl_pp_ref_ne
-#define pp_refgen		Perl_pp_refgen
 #define pp_regcmaybe		Perl_pp_regcmaybe
 #define pp_regcomp		Perl_pp_regcomp
 #define pp_regcreset		Perl_pp_regcreset
@@ -2417,6 +2420,8 @@
 #define do_join(a,b,c,d)	Perl_do_join(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
 #define do_kv()			Perl_do_kv(aTHX)
+#define bad_arg(a,b,c,d)	Perl_bad_arg(aTHX_ a,b,c,d)
+#define do_arg_check(a)		Perl_do_arg_check(aTHX_ a)
 #endif
 #define do_open9(a,b,c,d,e,f,g,h,i)	Perl_do_open9(aTHX_ a,b,c,d,e,f,g,h,i)
 #define do_openn(a,b,c,d,e,f,g,h,i)	Perl_do_openn(aTHX_ a,b,c,d,e,f,g,h,i)
@@ -3370,7 +3375,6 @@
 #define new_logop(a,b,c,d)	S_new_logop(aTHX_ a,b,c,d)
 #define simplify_sort(a)	S_simplify_sort(aTHX_ a)
 #define gv_ename(a)		S_gv_ename(aTHX_ a)
-#define scalar_mod_type		S_scalar_mod_type
 #define my_kid(a,b,c)		S_my_kid(aTHX_ a,b,c)
 #define dup_attrlist(a)		S_dup_attrlist(aTHX_ a)
 #define apply_attrs(a,b,c,d)	S_apply_attrs(aTHX_ a,b,c,d)
@@ -4129,6 +4133,7 @@
 #define ck_substr(a)		Perl_ck_substr(aTHX_ a)
 #define ck_svconst(a)		Perl_ck_svconst(aTHX_ a)
 #define ck_trunc(a)		Perl_ck_trunc(aTHX_ a)
+#define ck_try(a)		Perl_ck_try(aTHX_ a)
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
 #define pp_aassign()		Perl_pp_aassign(aTHX)
 #define pp_abs()		Perl_pp_abs(aTHX)
@@ -4201,6 +4206,7 @@
 #define pp_exists()		Perl_pp_exists(aTHX)
 #define pp_exit()		Perl_pp_exit(aTHX)
 #define pp_exp()		Perl_pp_exp(aTHX)
+#define pp_expand()		Perl_pp_expand(aTHX)
 #define pp_fcntl()		Perl_pp_fcntl(aTHX)
 #define pp_fileno()		Perl_pp_fileno(aTHX)
 #define pp_flip()		Perl_pp_flip(aTHX)
@@ -4312,6 +4318,7 @@
 #define pp_link()		Perl_pp_link(aTHX)
 #define pp_list()		Perl_pp_list(aTHX)
 #define pp_listen()		Perl_pp_listen(aTHX)
+#define pp_listlast()		Perl_pp_listlast(aTHX)
 #define pp_localtime()		Perl_pp_localtime(aTHX)
 #define pp_lock()		Perl_pp_lock(aTHX)
 #define pp_log()		Perl_pp_log(aTHX)
@@ -4333,6 +4340,7 @@
 #define pp_ncmp()		Perl_pp_ncmp(aTHX)
 #define pp_ne()			Perl_pp_ne(aTHX)
 #define pp_negate()		Perl_pp_negate(aTHX)
+#define pp_nelems()		Perl_pp_nelems(aTHX)
 #define pp_next()		Perl_pp_next(aTHX)
 #define pp_nextstate()		Perl_pp_nextstate(aTHX)
 #define pp_not()		Perl_pp_not(aTHX)
@@ -4345,7 +4353,6 @@
 #define pp_ord()		Perl_pp_ord(aTHX)
 #define pp_pack()		Perl_pp_pack(aTHX)
 #define pp_padany()		Perl_pp_padany(aTHX)
-#define pp_padav()		Perl_pp_padav(aTHX)
 #define pp_padhv()		Perl_pp_padhv(aTHX)
 #define pp_padsv()		Perl_pp_padsv(aTHX)
 #define pp_pipe_op()		Perl_pp_pipe_op(aTHX)
@@ -4376,7 +4383,6 @@
 #define pp_ref()		Perl_pp_ref(aTHX)
 #define pp_ref_eq()		Perl_pp_ref_eq(aTHX)
 #define pp_ref_ne()		Perl_pp_ref_ne(aTHX)
-#define pp_refgen()		Perl_pp_refgen(aTHX)
 #define pp_regcmaybe()		Perl_pp_regcmaybe(aTHX)
 #define pp_regcomp()		Perl_pp_regcomp(aTHX)
 #define pp_regcreset()		Perl_pp_regcreset(aTHX)

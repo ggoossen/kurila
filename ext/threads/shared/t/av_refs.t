@@ -12,7 +12,7 @@ BEGIN {
 use ExtUtils::testlib;
 
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
 
     # You have to do it this way or VMS will get confused.
     if ($ok) {
@@ -65,10 +65,10 @@ ok(5,$av->[1]->[0] eq 'hi', 'Shared in shared');
 threads->create(sub { @av[0] = "hihi" })->join();
 ok(6,$av->[1]->[0] eq 'hihi', 'Replaced shared in shared');
 ok(7, pop(@{$av->[1]}) eq "foo", 'Pop shared array');
-ok(8, scalar(@{$av->[1]}) == 1, 'Array size');
+ok(8, nelems(@{$av->[1]}) == 1, 'Array size');
 
 threads->create(sub { @$av = () })->join();
-threads->create(sub { ok(9, scalar @$av == 0, 'Array cleared in thread'); })->join();
+threads->create(sub { ok(9, nelems @$av == 0, 'Array cleared in thread'); })->join();
 
 threads->create(sub {
     unshift(@$av, threads->create(sub {

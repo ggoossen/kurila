@@ -8,10 +8,7 @@
 
 sub BEGIN {
     if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
-    } else {
-	unshift @INC, 't';
+	push @INC, '../ext/Storable/t';
     }
     require 'st-dump.pl';
 }
@@ -21,7 +18,7 @@ sub ok;
 use Storable qw(freeze thaw);
 
 %::immortals
-  = (u => \undef,
+  = %(u => \undef,
      'y' => \(1 == 1),
      n => \(1 == 0)
 );
