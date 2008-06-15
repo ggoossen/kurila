@@ -296,7 +296,7 @@ sub _handle_encoding_line {
       $self->{'_transcoder'}->(< @x);
     };
     $@ && die( $enc_error =
-      "Really unexpected error setting up encoding $e: $@\nAborting"
+      "Really unexpected error setting up encoding $e: {$@->message}\nAborting"
     );
 
   } else {
@@ -379,7 +379,7 @@ sub _gen_errata {
   # Return 0 or more fake-o paragraphs explaining the accumulated
   #  errors on this document.
 
-  return() unless $self->{'errata'} and keys %{$self->{'errata'}};
+  return @() unless $self->{'errata'} and keys %{$self->{'errata'}};
 
   my @out;
   
@@ -488,7 +488,7 @@ sub _ponder_paragraph_buffer {
   }
 
   my($para, $para_type);
-  while((nelems @$paras)) {
+  while(@$paras) {
     last if (nelems @$paras) == 1 and
       ( $paras->[0]->[0] eq '=over' or $paras->[0]->[0] eq '~Verbatim'
         or $paras->[0]->[0] eq '=item' )

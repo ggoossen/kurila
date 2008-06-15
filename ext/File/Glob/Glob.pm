@@ -147,7 +147,7 @@ sub csh_glob {
 	    %entries{$cxix} = \@( map { < doglob($_, $DEFAULT_FLAGS) } < @pat );
 	}
 	else {
-	    %entries{$cxix} = \@( < doglob($pat, $DEFAULT_FLAGS) );
+	    %entries{$cxix} = \@( doglob($pat, $DEFAULT_FLAGS) );
 	}
     }
 

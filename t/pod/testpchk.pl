@@ -9,7 +9,7 @@ BEGIN {
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { < 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
    require VMS::Filespec if $^O eq 'VMS';
 }
 
@@ -38,7 +38,7 @@ sub msgcmp( $ $ ) {
       s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/{"$1 ".lc($2)}/;
       s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/{lc($1)." $2"}/;
    }
-   return  @($line1 ne $line2);
+   return $line1 ne $line2;
 }
 
 sub testpodcheck( @ ) {
@@ -83,7 +83,7 @@ sub testpodchecker( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar nelems @testpods, "\n"  unless (%opts{'-xrgen'});
+   print "1..", nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
    for $podfile (< @testpods) {
       ($testname, $_) = < fileparse($podfile);

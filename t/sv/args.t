@@ -73,8 +73,8 @@ pass();
 
 $|=1;
 
-sub foo { local(@_) = @('p', 'q', 'r'); return < @_ }
-sub bar { unshift @_, 'D'; < @_ }
+sub foo { local(@_) = @('p', 'q', 'r'); return @_ }
+sub bar { unshift @_, 'D'; @_ }
 sub baz { push @_, 'E'; return @_ }
 for (1..3) { 
     is(join('', <foo('a', 'b', 'c')),'pqr');

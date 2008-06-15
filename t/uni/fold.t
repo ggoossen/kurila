@@ -1,8 +1,3 @@
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use File::Spec;
 
 use utf8;
@@ -28,11 +23,11 @@ if (open(CF, "<", $CF)) {
 
     die qq[$0: failed to find casefoldings from "$CF"\n] unless @CF;
 
-    print "1..", scalar @CF, "\n";
+    print "1..", (nelems @CF), "\n";
 
     my $i = 0;
-    for my $cf (@CF) {
-	my ($code, $status, $mapping, $name) = @$cf;
+    for my $cf (<@CF) {
+	my ($code, $status, $mapping, $name) = < @$cf;
 	$i++;
 	my $a = pack("U0U*", hex $code);
 	my $b = pack("U0U*", map { hex } split " ", $mapping);

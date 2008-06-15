@@ -23,7 +23,7 @@ $foo = *main::bar;
 ok($foo);
 is(ref(\$foo), 'GLOB');
 
-is( <Symbol::glob_name($foo), 'main::bar');
+is( Symbol::glob_name($foo), 'main::bar');
 is(ref(\$foo), 'GLOB');
 try { my $x = "$foo" };
 like($@->{description}, qr/Tried to use glob as string/);
@@ -50,7 +50,7 @@ is(ref(\$baa), 'GLOB');
 
 { package Foo::Bar; no warnings 'once'; our $test=1; }
 ok(exists %Foo::{'Bar::'});
-is( <Symbol::glob_name(%Foo::{'Bar::'}), 'Foo::Bar::');
+is(Symbol::glob_name(%Foo::{'Bar::'}), 'Foo::Bar::');
 
 
 # test undef operator clearing out entire glob
@@ -102,11 +102,11 @@ $x = "ok $test\n";
 %x = %("ok $test" => "\n");
 ++$test;
 sub x { "ok $test\n" }
-print ${*x{SCALAR}}, < @{*x{ARRAY}}, < %{*x{HASH}}, < &{*x{CODE}};
+print ${*x{SCALAR}}, < @{*x{ARRAY}}, < %{*x{HASH}}, &{*x{CODE}};
 
 curr_test(++$test);
 *x = *STDOUT;
-is ( <Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
+is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 
 {
     my $test = curr_test();
@@ -217,7 +217,7 @@ is(@j[0], 1);
     my $v;
     sub f { @_[0] = 0; @_[0] = "a"; @_[0] = *DATA }
     f($v);
-    is ( <Symbol::glob_name($v), 'main::DATA');
+    is (Symbol::glob_name($v), 'main::DATA');
     my $x = ~< $v;
     is ($x, "perl\n");
 }
@@ -419,7 +419,7 @@ is (ref \%::{plunk}, 'GLOB', "Symbol table has full typeglob");
     try {slosh->rip;};
     like ($@->{description}, qr/^Can't locate object method "rip"/, "Even with SUPER");
 
-    is( <slosh->isa('swoosh'), '');
+    is(slosh->isa('swoosh'), '');
 
     %CORE::GLOBAL::{"lock"}=\@();
     eval "no warnings; lock";

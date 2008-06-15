@@ -84,7 +84,7 @@ sub pipe {
     my $r = IO::Handle->new();
     my $w = IO::Handle->new();
     CORE::pipe($r, $w) or return undef;
-    ($r, $w);
+    return @($r, $w);
 }
 
 # Rebless standard file handles

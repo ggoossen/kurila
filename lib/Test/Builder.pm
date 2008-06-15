@@ -1015,11 +1015,8 @@ DIAGNOSTIC
 =item B<_try>
 
     my $return_from_code          = $Test->try(sub { code });
-    my($return_from_code, $error) = $Test->try(sub { code });
 
 Works like eval BLOCK except it ensures it has no effect on the rest of the test (ie. $@ is not set) nor is effected by outside interference (ie. $SIG{__DIE__}) and works around some quirks in older Perls.
-
-$error is what would normally be in $@.
 
 It is suggested you use this in place of eval BLOCK.
 
@@ -1032,7 +1029,7 @@ sub _try {
     local $@;               # don't set $@ in the test
     my $return = try { $code->() };
     
-    return wantarray ?  @($return, $@ && $@->{description}) : $return;
+    return $return;
 }
 
 =end private
@@ -1613,7 +1610,7 @@ sub todo {
 
     return $self->{TODO} if defined $self->{TODO};
 
-    $pack = $pack || $self->caller(1) || $self->exported_to;
+    $pack = $pack || $self->caller(1)[0] || $self->exported_to;
     return 0 unless $pack;
 
     return defined ${*{Symbol::fetch_glob($pack.'::TODO')}} ? ${*{Symbol::fetch_glob($pack.'::TODO')}}
@@ -1637,7 +1634,7 @@ sub caller {
     $height ||= 0;
 
     my @caller = @( CORE::caller($self->level + $height + 1) );
-    return wantarray ? @caller : @caller[0];
+    return @caller;
 }
 
 =back

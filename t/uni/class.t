@@ -1,7 +1,5 @@
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib .);
-    require "test.pl";
+    require "./test.pl";
 }
 
 plan tests => 4784;
@@ -30,7 +28,7 @@ END
 sub test_regexp ($$) {
   # test that given string consists of N-1 chars matching $qr1, and 1
   # char matching $qr2
-  my ($str, $blk) = @_;
+  my ($str, $blk) = <@_;
 
   # constructing these objects here makes the last test loop go much faster
   my $qr1 = qr/(\p{$blk}+)/;
@@ -100,7 +98,7 @@ my $updir = 'File::Spec'->updir;
 no warnings 'utf8'; # we do not want warnings about surrogates etc
 
 sub char_range {
-    my ($h1, $h2) = @_;
+    my ($h1, $h2) = <@_;
 
     my $str;
 
@@ -114,7 +112,7 @@ sub char_range {
 	    }
 	}
     } else {
-	$str = join "", map chr, $h1 .. (($h2 || $h1) + 1);
+	$str = join "", map { chr $_ } $h1 .. (($h2 || $h1) + 1);
     }
 
     return $str;

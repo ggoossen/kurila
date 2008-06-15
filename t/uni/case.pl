@@ -1,6 +1,6 @@
 use File::Spec;
 
-require "test.pl";
+require "./test.pl";
 
 require bytes;
 use utf8;
@@ -24,7 +24,7 @@ sub casetest {
 		    },
 		   )} < @funcs );
 
-    my $file = 'File::Spec'->catfile( <'File::Spec'->catdir( <'File::Spec'->updir,
+    my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
 						      "lib", "unicore", "To"),
 				   "$base.pl");
     my $simple = do $file or die $@;

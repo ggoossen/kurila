@@ -218,7 +218,7 @@ sub textblock {
     if (defined %$self{ITEM}) {
         $self->item ($_ . "\n");
     } else {
-        $self->output ( <$self->reformat ($_ . "\n"));
+        $self->output ( $self->reformat ($_ . "\n"));
     }
 }
 
@@ -472,7 +472,7 @@ sub item {
         $output =~ s/\n*$/\n/;
         $self->output ($output);
         %$self{MARGIN} = $margin;
-        $self->output ( <$self->reformat ($_)) if m/\S/;
+        $self->output ( $self->reformat ($_)) if m/\S/;
     } else {
         $_ = $self->reformat ($_);
         s/^ /:/ if (%$self{alt} && $indent +> 0);

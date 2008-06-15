@@ -60,7 +60,7 @@ sub runperl {
     } elsif ($actual_stderr ne $stderr) {
       return  @(0, "Stderr mismatch: expected:\n[$stderr]\nsaw:\n[$actual_stderr]");
     } else {
-      return 1;                 # success
+      return @(1, '');                 # success
     }
   } else {                      # child
     for my $k (keys %$env) {

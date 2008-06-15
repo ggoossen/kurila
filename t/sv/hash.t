@@ -113,6 +113,6 @@ sub hash {
 use constant PVBM => 'foo';
 
 my $dummy = index 'foo', PVBM;
-try { my %h = %(a => < PVBM); 1 };
+try { my %h = %(a => PVBM); 1 };
 
 ok (!$@, 'fbm scalar can be inserted into a hash');
