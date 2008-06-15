@@ -137,7 +137,7 @@ sub split_command {
     my($self, $cmd, < @args) = < @_;
 
     my @cmds = @( () );
-    return @(@cmds) unless (nelems @args);
+    return @cmds unless (nelems @args);
 
     # If the command was given as a here-doc, there's probably a trailing
     # newline.
@@ -167,7 +167,7 @@ sub split_command {
         }
         chop $arg_str;
 
-        push @cmds, < $self->escape_newlines("$cmd \n$arg_str");
+        push @cmds, $self->escape_newlines("$cmd \n$arg_str");
     } while (nelems @args);
 
     return @cmds;
@@ -477,8 +477,8 @@ clean :: clean_subdirs
                     $(BASEEXT).exp $(BASEEXT).x
                    ]);
 
-    push(@files, < $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
-    push(@files, < $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
+    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.all'));
+    push(@files, $self->catfile('$(INST_ARCHAUTODIR)','extralibs.ld'));
 
     # core files
     push(@files, qw[core core.*perl.*.? *perl.core]);
@@ -486,7 +486,7 @@ clean :: clean_subdirs
 
     # OS specific things to clean up.  Use @dirs since we don't know
     # what might be in here.
-    push @dirs, < $self->extra_clean_files;
+    push @dirs, $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
     { my(%f) = %( map { ($_ => 1) } < @files ); @files = @( keys %f ); }
@@ -1643,7 +1643,7 @@ canonicalized.  This override fixes that bug.
 
 sub catfile {
     my $self = shift;
-    return $self->canonpath( <$self->SUPER::catfile(< @_));
+    return $self->canonpath( $self->SUPER::catfile(< @_));
 }
 
 

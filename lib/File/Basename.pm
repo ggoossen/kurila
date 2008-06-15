@@ -171,8 +171,7 @@ sub fileparse {
 
   # Ensure taint is propgated from the path to its pieces.
   $tail .= $taint;
-  wantarray ? ($basename .= $taint, $dirpath .= $taint, $tail)
-            : ($basename .= $taint);
+  return @($basename .= $taint, $dirpath .= $taint, $tail);
 }
 
 
