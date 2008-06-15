@@ -5388,7 +5388,7 @@ Perl_newANONATTRSUB(pTHX_ I32 floor, OP *proto, OP *attrs, OP *block)
 {
     return newUNOP(OP_SREFGEN, 0,
 	newSVOP(OP_ANONCODE, 0,
-		(SV*)newATTRSUB(floor, 0, proto, attrs, block)));
+		(SV*)newATTRSUB(floor, 0, proto, attrs, scalar(block))));
 }
 
 OP *
@@ -6742,7 +6742,7 @@ Perl_ck_return(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_CK_RETURN;
 
-    return o;
+    return ck_fun(o);
 }
 
 OP *
