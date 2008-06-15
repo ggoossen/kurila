@@ -1021,7 +1021,7 @@ WARNING
             if ($self->file_name_is_absolute($name)) {     # /foo/bar
                 $abs = $name;
             } elsif ($self->canonpath($name) eq 
-                     $self->canonpath( <basename($name))) {  # foo
+                     $self->canonpath(basename($name))) {  # foo
                 $abs = $self->catfile($dir, $name);
             } else {                                            # foo/bar
                 $abs = $self->catfile($Curdir, $name);
@@ -2289,7 +2289,7 @@ sub lsdir {
     my(@ls);
     my $dh = DirHandle->new();
     $dh->open($dir || ".") or return ();
-    @ls = @( < $dh->read );
+    @ls = @( $dh->read );
     $dh->close;
     @ls = @( grep(m/$regex/, < @ls) ) if $regex;
     @ls;
@@ -2888,7 +2888,7 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 sub pm_to_blib {
     my $self = shift;
-    my($autodir) = < $self->catdir('$(INST_LIB)','auto');
+    my $autodir = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
 pm_to_blib : $(TO_INST_PM)
 };
@@ -3185,7 +3185,7 @@ sub oneliner {
     $cmd =~ s{\n+$}{};
 
     my @cmds = @( split m/\n/, $cmd );
-    $cmd = join " \n\t  -e ", map < $self->quote_literal($_), < @cmds;
+    $cmd = join " \n\t  -e ", map { $self->quote_literal($_) } < @cmds;
     $cmd = $self->escape_newlines($cmd);
 
     $switches = join ' ', < @$switches;
@@ -3322,7 +3322,7 @@ sub staticmake {
     # And as it's not yet built, we add the current extension
     # but only if it has some C code (or XS code, which implies C code)
     if ((nelems @{$self->{C}})) {
-	@static = @( < $self->catfile($self->{INST_ARCHLIB},
+	@static = @( $self->catfile($self->{INST_ARCHLIB},
 				 "auto",
 				 $self->{FULLEXT},
 				 "$self->{BASEEXT}$self->{LIB_EXT}"
@@ -3445,14 +3445,14 @@ END
     push(@m, "\n");
 
     push(@m, "test_dynamic :: pure_all\n");
-    push(@m, < $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)')) 
+    push(@m, $self->test_via_harness('$(FULLPERLRUN)', '$(TEST_FILES)')) 
       if $tests;
-    push(@m, < $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)')) 
+    push(@m, $self->test_via_script('$(FULLPERLRUN)', '$(TEST_FILE)')) 
       if -f "test.pl";
     push(@m, "\n");
 
     push(@m, "testdb_dynamic :: pure_all\n");
-    push(@m, < $self->test_via_script('$(FULLPERLRUN) $(TESTDB_SW)', 
+    push(@m, $self->test_via_script('$(FULLPERLRUN) $(TESTDB_SW)', 
                                     '$(TEST_FILE)'));
     push(@m, "\n");
 
@@ -3461,11 +3461,11 @@ END
 
     if ($self->needs_linking()) {
 	push(@m, "test_static :: pure_all \$(MAP_TARGET)\n");
-	push(@m, < $self->test_via_harness('./$(MAP_TARGET)', '$(TEST_FILES)')) if $tests;
-	push(@m, < $self->test_via_script('./$(MAP_TARGET)', '$(TEST_FILE)')) if -f "test.pl";
+	push(@m, $self->test_via_harness('./$(MAP_TARGET)', '$(TEST_FILES)')) if $tests;
+	push(@m, $self->test_via_script('./$(MAP_TARGET)', '$(TEST_FILE)')) if -f "test.pl";
 	push(@m, "\n");
 	push(@m, "testdb_static :: pure_all \$(MAP_TARGET)\n");
-	push(@m, < $self->test_via_script('./$(MAP_TARGET) $(TESTDB_SW)', '$(TEST_FILE)'));
+	push(@m, $self->test_via_script('./$(MAP_TARGET) $(TESTDB_SW)', '$(TEST_FILE)'));
 	push(@m, "\n");
     } else {
 	push @m, "test_static :: test_dynamic\n";
@@ -3556,7 +3556,7 @@ sub tool_xsubpp {
     }
 
     my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
-    my(@tmdeps) = @( < $self->catfile($tmdir,'typemap') );
+    my(@tmdeps) = @( $self->catfile($tmdir,'typemap') );
     if( $self->{TYPEMAPS} ){
         foreach my $typemap (< @{$self->{TYPEMAPS}}){
             if( ! -f  $typemap ) {
@@ -3624,7 +3624,7 @@ sub top_targets {
     my($self) = shift;
     my(@m);
 
-    push @m, < $self->all_target, "\n" unless $self->{SKIPHASH}->{'all'};
+    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}->{'all'};
 
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext

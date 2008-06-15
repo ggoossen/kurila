@@ -538,7 +538,7 @@ END
     $self->init_others();
     $self->init_platform();
     $self->init_PERM();
-    my($argv) = < neatvalue(\@ARGV);
+    my $argv = neatvalue(\@ARGV);
     $argv =~ s/^\[/(/;
     $argv =~ s/\]$/)/;
 
@@ -559,7 +559,7 @@ END
     foreach my $key (sort keys %initial_att){
         next if $key eq 'ARGS';
 
-        my($v) = < neatvalue(%initial_att{$key});
+        my $v = neatvalue(%initial_att{$key});
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
         $v =~ s/\n+/ /g;
         push @{$self->{RESULT}}, "#     $key => $v";
@@ -611,14 +611,14 @@ END
         $method .= '_target' unless $self->can($method);
 
         print "Processing Makefile '$section' section\n" if ($Verbose +>= 2);
-        my($skipit) = < $self->skipcheck($section);
+        my $skipit = $self->skipcheck($section);
         if ($skipit){
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
         } else {
-            my(%a) = %( < %{$self->{$section} || \%()} );
+            my %a = %( < %{$self->{$section} || \%()} );
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
             push @{$self->{RESULT}}, "# " . join ", ", < %a if $Verbose && %a;
-            push @{$self->{RESULT}}, < $self->maketext_filter( <
+            push @{$self->{RESULT}}, $self->maketext_filter(
                 $self->?$method( < %a )
             );
         }
@@ -784,7 +784,7 @@ sub _run_hintfile {
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into @INC
-    local @INC = @( <File::Spec->curdir, < @INC);
+    local @INC = @( File::Spec->curdir, < @INC);
     my $ret = do $hint_file;
     if( !defined $ret ) {
         my $error = $@ && $@->message || $!;
