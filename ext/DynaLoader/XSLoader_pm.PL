@@ -24,7 +24,7 @@ our $VERSION = "0.08";
 
 EOT
 
-print OUT '  my $dl_dlext = ', < to_string(%Config::Config{'dlext'}), ";\n" ;
+print OUT '  my $dl_dlext = ', to_string(%Config::Config{'dlext'}), ";\n" ;
 
 print OUT <<'EOT';
 
@@ -140,7 +140,7 @@ sub bootstrap_inherit {
 
     my $module = @_[0];
     local *DynaLoader::isa = *{Symbol::fetch_glob("$module\::ISA")};
-    local @DynaLoader::isa = @(@DynaLoader::isa, 'DynaLoader');
+    local @DynaLoader::isa = @(<@DynaLoader::isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     require DynaLoader;
     DynaLoader::bootstrap(<@_);

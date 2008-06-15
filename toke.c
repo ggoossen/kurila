@@ -341,7 +341,7 @@ static struct debug_tokens {
     { PREDEC,		TOKENTYPE_NONE,		"PREDEC" },
     { PREINC,		TOKENTYPE_NONE,		"PREINC" },
     { PRIVATEREF,	TOKENTYPE_OPVAL,	"PRIVATEREF" },
-    { REFGEN,		TOKENTYPE_NONE,		"REFGEN" },
+    { SREFGEN,		TOKENTYPE_NONE,		"SREFGEN" },
     { RELOP,		TOKENTYPE_OPNUM,	"RELOP" },
     { SHIFTOP,		TOKENTYPE_OPNUM,	"SHIFTOP" },
     { SUB,		TOKENTYPE_NONE,		"SUB" },
@@ -3031,12 +3031,12 @@ Perl_yylex(pTHX)
 			if ((*PL_splitstr == '/' || *PL_splitstr == '\''
 			     || *PL_splitstr == '"')
 			      && strchr(PL_splitstr + 1, *PL_splitstr))
-			    Perl_sv_catpvf(aTHX_ PL_linestr, "our @F=split(%s);", PL_splitstr);
+			    Perl_sv_catpvf(aTHX_ PL_linestr, "our @F=@(split(%s));", PL_splitstr);
 			else {
 			    /* "q\0${splitstr}\0" is legal perl. Yes, even NUL
 			       bytes can be used as quoting characters.  :-) */
 			    const char *splits = PL_splitstr;
-			    sv_catpvs(PL_linestr, "our @F=split(q\0");
+			    sv_catpvs(PL_linestr, "our @F=@(split(q\0");
 			    do {
 				/* Need to \ \s  */
 				if (*splits == '\\')
@@ -3046,11 +3046,11 @@ Perl_yylex(pTHX)
 			    /* This loop will embed the trailing NUL of
 			       PL_linestr as the last thing it does before
 			       terminating.  */
-			    sv_catpvs(PL_linestr, ");");
+			    sv_catpvs(PL_linestr, "));");
 			}
 		    }
 		    else
-		        sv_catpvs(PL_linestr,"our @F=split(' ');");
+		        sv_catpvs(PL_linestr,"our @F=@(split(' '));");
 		}
 	    }
 	    if (PL_minus_E)
@@ -4129,8 +4129,7 @@ Perl_yylex(pTHX)
 /* 	    Perl_croak(aTHX_ "No operator expected, but found '<', '<=' or '<=>' operator"); */
 	}
 	{
-	    s++;
-	    char tmp = *s;
+	    char tmp = *++s;
 	    if (tmp == '<') {
 		s++;
 		SHop(OP_LEFT_SHIFT);
@@ -4359,7 +4358,7 @@ Perl_yylex(pTHX)
 	    }
 	    no_op("Backslash",s);
 	}
-	OPERATOR(REFGEN);
+	OPERATOR(SREFGEN);
 
     case 'v':
 	if (isDIGIT(s[1]) && PL_expect != XOPERATOR) {

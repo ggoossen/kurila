@@ -1754,11 +1754,7 @@ sub go_ahead($$$){
     my $res = '';
     my @closing = @($closing);
     while( $$rstr =~
-<<<<<<< HEAD:lib/Pod/Html.pm
-      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|{join ' ', <@{\@( <pattern @closing[0])}})//s ){
-=======
-      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|{join ' ', pattern @closing[0]})//s ){
->>>>>>> 95cf2b6... and more array/hash stuff:lib/Pod/Html.pm
+      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|{join ' ', < pattern @closing[0]})//s ){
 	$res .= $1;
 	unless( $3 ){
 	    shift @closing;

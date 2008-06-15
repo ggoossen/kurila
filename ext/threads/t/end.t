@@ -36,7 +36,7 @@ BEGIN {
 ok(1, 'Loaded');
 
 sub ok {
-    my ($ok, $name) = @_;
+    my ($ok, $name) = < @_;
 
     lock($TEST);
     my $id = $TEST++;

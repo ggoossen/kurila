@@ -327,7 +327,7 @@ invert_opset function.
 
     match split qr
 
-    list listlast lslice splice push pop shift unshift reverse
+    list listlast lslice splice push pop shift unshift reverse expand nelems
 
     cond_expr flip flop andassign orassign dorassign and or dor xor
 
@@ -392,7 +392,7 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     padsv padav padhv padany
 
-    rv2gv refgen srefgen ref
+    rv2gv srefgen ref
 
     bless -- could be used to change ownership of objects (reblessing)
 

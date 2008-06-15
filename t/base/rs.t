@@ -67,7 +67,8 @@ open TESTFILE, "<", "./foo";
 binmode TESTFILE;
 
 # Test straight number
-$/ = \2;
+my $x = 2;
+$/ = \$x;
 $bar = ~< *TESTFILE;
 if ($bar eq "12") {print "ok 7\n";} else {print "not ok 7\n";}
 

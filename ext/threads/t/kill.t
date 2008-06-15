@@ -45,7 +45,7 @@ my $TEST = 1;
 
 sub ok($$)
 {
-    my ($xok, $xname) = @_;
+    my ($xok, $xname) = < @_;
     $q->enqueue($xok, $xname);
 
     while ($q->pending()) {

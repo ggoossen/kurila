@@ -7,7 +7,7 @@ plan( tests => 12 );
 # Used to segfault (bug #15479)
 fresh_perl_is(
     '%:: = ""',
-    'recursive die',
+    '',
     \%( switches => \@( '-w' ) ),
     'delete error::message and print a warning',
 );

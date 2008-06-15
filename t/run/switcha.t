@@ -1,4 +1,4 @@
- @( )#!./perl -na
+#!./perl -na
 
 our $i;
 

@@ -1,8 +1,6 @@
 #!./perl -w
 
 BEGIN {
-        chdir 't' if -d 't';
-        @INC = '../lib';
 	require Config;
 	if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
 		print "1..0 # Skip -- Perl configured without List::Util module\n";
@@ -30,14 +28,14 @@ BEGIN {
         my $callflag = 0;
         local $DB::sub = sub {
                 $callflag += shift || 1;
-                my @vals = (1, 4, 9);
-                return @vals;
+                my @vals = @(1, 4, 9);
+                return wantarray;
         };
         my $ret = DB::sub;
-        is( $ret, 3, 'DB::sub() should handle scalar context' );
+        is( $ret, '', 'DB::sub() should handle scalar context' );
         is( $callflag, 1, '... should call $DB::sub contents' );
         $ret = join(' ', DB::sub(2));
-        is( $ret, '1 4 9', '... should handle scalar context' );
+        is( $ret, '1', '... should handle scalar context' );
         is( $callflag, 3, '... should pass along arguments to the sub' );
         ok( defined($DB::ret),'$DB::ret should be defined after successful return');
         DB::sub;
@@ -117,13 +115,13 @@ BEGIN {
         local (@DB::args, $DB::signal);
 
         my $line = __LINE__ + 1;
-        my @ret = try { DB->backtrace() };
+        my @ret = try { @( DB->backtrace() ) };
         like( @ret[0], qr/file.+\Q$0\E/, 'DB::backtrace() should report current file');
         like( @ret[0], qr/line $line/, '... should report calling line number' );
         like( @ret[0], qr/eval {...}/, '... should catch eval BLOCK' );
 
-        @ret = eval "one(2)";
-        is( scalar @ret, 1, '... should report from provided stack frame number' );
+        @ret = @( eval 'one(2)' );
+        is( (nelems @ret), 1, '... should report from provided stack frame number' );
         like( @ret[0], qr/\@ = &eval \'one.+?2\)\'/, #'
                 '... should find eval STRING construct');
         @ret[0] = check_context(1);
@@ -131,9 +129,9 @@ BEGIN {
                 '... should respect context of calling construct');
         
         $DB::signal = 1;
-        @DB::args = (1, 7);
-        @ret = three(1);
-        is( scalar @ret, 1, '... should end loop if $DB::signal is true' );
+        @DB::args = @(1, 7);
+        @ret = @( three(1) );
+        is( (nelems @ret), 1, '... should end loop if $DB::signal is true' );
 
         # does not check 'require' or @DB::args mangling
 }
@@ -141,9 +139,9 @@ BEGIN {
 sub check_context {
         return (eval "one(@_[0])")[-1];
 }
-sub one { DB->backtrace(@_) }
-sub two { one(@_) }
-sub three { two(@_) }
+sub one { DB->backtrace(<@_) }
+sub two { one(<@_) }
+sub three { two(<@_) }
 
 # test DB::trace_toggle
 {
@@ -159,12 +157,12 @@ sub three { two(@_) }
         local %DB::sub;
         my $subs = DB->subs;
         is( $subs, 0, 'DB::subs() should return keys of %DB::subs' );
-        %DB::sub = ( foo => 'foo:23-45' , bar => 'ba:r:7-890' );
+        %DB::sub = %( foo => 'foo:23-45' , bar => 'ba:r:7-890' );
         $subs = DB->subs;
         is( $subs, 2, '... same song, different key' );
-        my @subs = DB->subs( 'foo', 'boo', 'bar' );
-        is( scalar @subs, 2, '... should report only for requested subs' );
-        my @expected = ( \@( 'foo', 23, 45 ), \@( 'ba:r', 7, 890 ) );
+        my @subs = @( DB->subs( 'foo', 'boo', 'bar' ) );
+        is( (nelems @subs), 2, '... should report only for requested subs' );
+        my @expected = @( \@( 'foo', 23, 45 ), \@( 'ba:r', 7, 890 ) );
         ok( eq_array( \@subs, \@expected ), '... find file, start, end for subs' );
 }
 
@@ -172,15 +170,15 @@ sub three { two(@_) }
 {
         local ($DB::filename, %DB::sub);
         $DB::filename = 'baz';
-        %DB::sub = map { $_ => $_ } qw( bazbar bazboo boobar booboo boobaz );
-        my @ret = DB->filesubs();
-        is( scalar @ret, 2, 'DB::filesubs() should use $DB::filename with no args');
-        @ret = grep { m/^baz/ } @ret;    
-        is( scalar @ret, 2, '... should pick up subs in proper file' );
-        @ret = DB->filesubs('boo');
-        is( scalar @ret, 3, '... should use argument to find subs' );
-        @ret = grep { m/^boo/ } @ret;    
-        is( scalar @ret, 3, '... should pick up subs in proper file with argument');
+        %DB::sub = %( map { $_ => $_ } qw( bazbar bazboo boobar booboo boobaz ) );
+        my @ret = @( DB->filesubs() );
+        is( (nelems @ret), 2, 'DB::filesubs() should use $DB::filename with no args');
+        @ret = @( grep { m/^baz/ } < @ret );
+        is( (nelems @ret), 2, '... should pick up subs in proper file' );
+        @ret = @( DB->filesubs('boo') );
+        is( (nelems @ret), 3, '... should use argument to find subs' );
+        @ret = @( grep { m/^boo/ } < @ret );
+        is( (nelems @ret), 3, '... should pick up subs in proper file with argument');
 }
 
 # test DB::files()
@@ -192,7 +190,7 @@ sub three { two(@_) }
 
 # test DB::lines()
 {
-        local @DB::dbline = ( 'foo' );
+        local @DB::dbline = @( 'foo' );
         is( DB->lines->[0], 'foo', 'DB::lines() should return ref to @DB::dbline' );
 }
 
@@ -222,24 +220,24 @@ SKIP: {
         local $DB::filename = 'baz';
         local *baz = *{Symbol::fetch_glob( "main::_<baz") };
         
-        @baz = map { dualvar(1, $_) } qw( one two three four five );
-        %baz = (
+        @baz = @( map { dualvar(1, $_) } qw( one two three four five ) );
+        %baz = %(
                 1 => "foo\0bar",
                 3 => "boo\0far",
                 4 => "fazbaz",
         );
-        my %ret = DB->lineevents();
+        my %ret = %( DB->lineevents() );
         is( scalar keys %ret, 3, 'DB::lineevents() should pick up defined lines' );
 
         # array access in DB::lineevents() starts at element 1, not 0
-        is( join(' ', @{ %ret{1} }), 'two foo bar', '... should stash data in hash');
+        is( join(' ', < @{ %ret{1} }), 'two foo bar', '... should stash data in hash');
 }
 
 # test DB::set_break()
 {
         local ($DB::lineno, *DB::dbline, $DB::package);
 
-        %DB::dbline = (
+        %DB::dbline = %(
                 1 => "\0",
                 2 => undef,
                 3 => "123\0\0\0abc",
@@ -248,7 +246,7 @@ SKIP: {
 
         *DB::dbline = \@( $dualfalse, $dualtrue, $dualfalse, $dualfalse, $dualtrue );
 
-        local %DB::sub = (
+        local %DB::sub = %(
                 'main::foo'     => 'foo:1-4',
         );
          
@@ -263,7 +261,7 @@ SKIP: {
         DB->set_break(4);
         is( %DB::dbline{4}, "1\0abc", '... should use default condition if needed');
 
-        local %DB::sub = (
+        local %DB::sub = %(
                 'main::foo'     => 'foo:1-4',
         );
         DB->set_break('foo', 'baz');
@@ -286,7 +284,7 @@ SKIP: {
         DB->set_tbreak(1);
         is( %DB::dbline{1}, ';9', 'DB::set_tbreak() should set tbreak condition' );
 
-        local %DB::sub = (
+        local %DB::sub = %(
                 'main::foo'     => 'foo:1-4',
         );
         DB->set_tbreak('foo', 'baz');
@@ -307,7 +305,7 @@ SKIP: {
         local *{Symbol::fetch_glob( "::_<foo") } = \@foo;
 
         local $DB::package;
-        local %DB::sub = (
+        local %DB::sub = %(
                 'TEST::foo'     => 'foo:10-15',
                 'main::foo'     => 'foo:11-12',
                 'bar::bar'      => 'foo:10-16',
@@ -337,7 +335,7 @@ SKIP: {
 # test DB::clr_breaks()
 {
         local *DB::dbline;
-        my %lines = (
+        my %lines = %(
                 1 => "\0",
                 2 => undef,
                 3 => "123\0\0\0abc",
@@ -354,7 +352,7 @@ SKIP: {
         local *{Symbol::fetch_glob( "::_<foo") } = \@( 0, 0, 0, 1 );
 
         local $DB::package;
-        local %DB::sub = (
+        local %DB::sub = %(
                 'main::foo'     => 'foo:1-3',
         );
 
@@ -369,12 +367,12 @@ SKIP: {
         is( $db->{output}, "Subroutine not found.\n", 
                 '... should output warning if sub cannot be found');
 
-        @DB::dbline = (1 .. 4);
-        %DB::dbline = (%lines, 5 => "\0" );
+        @DB::dbline = @(1 .. 4);
+        %DB::dbline = %( <%lines, 5 => "\0" );
 
         DB::clr_breaks();
 
-        is( scalar keys %DB::dbline, 4, 
+        is( (nelems @(keys %DB::dbline)), 4, 
                 'Relying on @DB::dbline in DB::clr_breaks() should clear breaks' );
         ok( ! exists(%DB::dbline{1}), '... should delete empty actions' );
         is( %DB::dbline{3}, "\0\0\0abc", '... should remove break, leaving action');
@@ -387,7 +385,7 @@ SKIP: {
 {
         local *DB::dbline;
 
-        %DB::dbline = (
+        %DB::dbline = %(
                 2 => "\0abc",
         );
 
@@ -412,7 +410,7 @@ SKIP: {
 # test DB::clr_actions()
 {
         local *DB::dbline;
-        my %lines = (
+        my %lines = %(
                 1 => "\0",
                 2 => undef,
                 3 => "123\0abc",
@@ -432,7 +430,7 @@ SKIP: {
         local *{Symbol::fetch_glob( "::_<foo") } = \@( 0, 0, 0, 1 );
 
         local $DB::package;
-        local %DB::sub = (
+        local %DB::sub = %(
                 'main::foo'     => 'foo:1-3',
         );
 
@@ -446,12 +444,12 @@ SKIP: {
         is( $db->{output}, "Subroutine not found.\n", 
                 '... should output warning if sub cannot be found');
 
-        @DB::dbline = (1 .. 4);
-        %DB::dbline = (%lines, 5 => "\0" );
+        @DB::dbline = @(1 .. 4);
+        %DB::dbline = %(<%lines, 5 => "\0" );
 
         DB::clr_actions();
 
-        is( scalar keys %DB::dbline, 4, 
+        is( (nelems @(keys %DB::dbline)), 4, 
                 'Relying on @DB::dbline in DB::clr_actions() should clear actions' );
         ok( ! exists(%DB::dbline{1}), '... should delete empty actions' );
         is( %DB::dbline{3}, "123", '... should remove action, leaving break');
@@ -504,15 +502,15 @@ sub new {
 }
 
 sub set_tbreak {
-        my ($self, $val) = @_;
+        my ($self, $val) = <@_;
         $self->{tbreak} = $val;
 }
 
 sub output {
         my $self = shift;
         if (ref $self) {
-                $self->{output} = join('', @_);
+                $self->{output} = join('', <@_);
         } else {
-                $output .= join('', @_);
+                $output .= join('', <@_);
         }
 }

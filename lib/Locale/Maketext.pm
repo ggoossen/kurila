@@ -229,12 +229,12 @@ sub maketext {
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:
   if($@) {
-    my $err = $@;
+    my $err = $@->message;
     # pretty up the error message
     $err =~ s<\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)\.?\n?>
              <\n in bracket code [compiled line $1],>s;
     #$err =~ s/\n?$/\n/s;
-    Carp::croak "Error in maketexting \"$phrase\":\n$err as used";
+    die "Error in maketexting \"$phrase\":\n$err as used";
     # Rather unexpected, but suppose that the sub tried calling
     # a method that didn't exist.
   } else {

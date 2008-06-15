@@ -412,15 +412,15 @@ require DynaLoader;
 use vars qw ($VERSION @ISA @EXPORT_OK);
 
 $VERSION = '0.01';
-@ISA = qw(Exporter DynaLoader);
+@ISA = @(qw(Exporter DynaLoader));
 EOT
   # Having this qw( in the here doc confuses cperl mode far too much to be
   # helpful. And I'm using cperl mode to edit this, even if you're not :-)
-  print FH "\@EXPORT_OK = qw(\n";
+  print FH "\@EXPORT_OK = \@(qw(\n";
 
   # Print the names of all our autoloaded constants
   print FH "\t$_\n" foreach (< @$export_names);
-  print FH ");\n";
+  print FH "));\n";
   print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
   close FH or die "close $pm: $!\n";
 
@@ -696,7 +696,7 @@ if (defined $notdef) {
 }
 $test++;
 
-my %compass = (
+my %compass = %(
 EOT
 
 while (my ($point, $bearing) = each %compass) {

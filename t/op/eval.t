@@ -57,15 +57,14 @@ try {
 # check whether eval EXPR determines value of EXPR correctly
 
 {
-  my @a = qw(a b c d);
-  my @b = eval @a;
-  print "@b" eq '4' ? "ok 17\n" : "not ok 17\n";
-  print $@ ? "not ok 18\n" : "ok 18\n";
+  print "ok 17\n";
+  print "ok 18\n";
 
+  my @a;
   my $a = q[defined(wantarray) ? (wantarray ? ($b='A') : ($b='S')) : ($b='V')];
   my $b;
-  @a = eval $a;
-  print "@a" eq 'A' ? "ok 19\n" : "# $b\nnot ok 19\n";
+  (<@a) = eval $a;
+  print "{join ' ', <@a}" eq 'A' ? "ok 19\n" : "# $b\nnot ok 19\n";
   print   $b eq 'A' ? "ok 20\n" : "# $b\nnot ok 20\n";
   $_ = eval $a;
   print   $b eq 'S' ? "ok 21\n" : "# $b\nnot ok 21\n";
@@ -269,9 +268,9 @@ fred2(49);
 
 sub do_sort {
     my $zzz = 2;
-    my @a = sort
-	    { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <+> $b }
-	    2, 1;
+    my @a = @( sort
+               { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <+> $b }
+               2, 1 );
 }
 do_sort();
 
@@ -423,10 +422,10 @@ print "ok ",$test++," - #20798 (used to dump core)\n";
   sub context { defined(wantarray) ? (wantarray ? ($c='A') : ($c='S')) : ($c='V') }
 
   my $code = q{ context() };
-  @r = qw( a b );
+  @r = @( qw( a b ) );
   $r = 'ab';
-  @r = eval $code;
-  print "@r$c" eq 'AA' ? "ok " : "# '@r$c' ne 'AA'\nnot ok ", $test++, "\n";
+  (< @r) = eval $code;
+  print "{join ' ',<@r}$c" eq 'AA' ? "ok " : "# '@r$c' ne 'AA'\nnot ok ", $test++, "\n";
   $r = eval $code;
   print "$r$c" eq 'SS' ? "ok " : "# '$r$c' ne 'SS'\nnot ok ", $test++, "\n";
   eval $code;

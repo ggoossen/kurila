@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 134;
+plan tests => 132;
 
 our ($FS, $c, @ary, $x, $foo, $res, @list1, @list2, @a, $p, $n);
 
@@ -119,7 +119,7 @@ $_ = join ':', split m/^/, "ab\ncd\nef\n";
 is($_, "ab\n:cd\n:ef\n");
 
 # see if @a = @b = split(...) optimization works
-@list1 = @( @list2 = @( split ('p',"a p b c p") ) );
+@list1 = @list2 = @( split ('p',"a p b c p") );
 ok((nelems @list1) == nelems @list2 &&
    "{join ' ', <@list1}" eq "{join ' ', <@list2}" &&
    (nelems @list1) == 2 &&
@@ -271,14 +271,6 @@ ok((nelems @ary) == 3 &&
     utf8::encode $p;
     try { @a= @(split(m/[, ]+/,$p) ) };
     is ("$@-{join ' ', <@a}-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
-}
-
-{
-    no strict 'refs';
-    cmp_ok(\@a, '\==', \@{*{Symbol::fetch_glob("a")}}, '@a must be global for following test');
-    $p="";
-    $n = @a = @( split m/,/,$p );
-    is ($n, 0, '#21765 - pmreplroot hack used to return undef for 0 iters');
 }
 
 {

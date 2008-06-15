@@ -608,7 +608,7 @@ sub config_re {
 
 sub config_vars {
     # implements -V:cfgvar option (see perlrun -V:)
-    foreach (@_) {
+    foreach (<@_) {
 	# find optional leading, trailing colons; and query-spec
 	my ($notag,$qry,$lncont) = m/^(:)?(.*?)(:)?$/;	# flags fore and aft, 
 	# map colon-flags to print decorations
@@ -617,9 +617,9 @@ sub config_vars {
 
 	# all config-vars are by definition \w only, any \W means regex
 	if ($qry =~ m/\W/) {
-	    my @matches = config_re($qry);
-	    print map "$_$lnend", @matches ? @matches : "$qry: not found"		if !$notag;
-	    print map { s/\w+=//; "$_$lnend" } @matches ? @matches : "$qry: not found"	if  $notag;
+	    my @matches = @(config_re($qry));
+	    print map "$_$lnend", @matches ? <@matches : "$qry: not found"		if !$notag;
+	    print map { s/\w+=//; "$_$lnend" } @matches ? <@matches : "$qry: not found"	if  $notag;
 	} else {
 	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';

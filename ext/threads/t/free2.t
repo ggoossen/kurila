@@ -35,7 +35,7 @@ my $TEST = 1;
 
 sub ok
 {
-    $q->enqueue(@_) if @_;
+    $q->enqueue(<@_) if @_;
 
     while ($q->pending()) {
         my $ok   = $q->dequeue();

@@ -649,6 +649,18 @@ PERL_CALLCONV void	Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
 	assert(sv); assert(delim); assert(mark); assert(sp)
 
 PERL_CALLCONV OP*	Perl_do_kv(pTHX);
+PERL_CALLCONV void	Perl_bad_arg(pTHX_ I32 n, const char* t, const char* name, SV *arg)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3)
+			__attribute__nonnull__(pTHX_4);
+#define PERL_ARGS_ASSERT_BAD_ARG	\
+	assert(t); assert(name); assert(arg)
+
+PERL_CALLCONV void	Perl_do_arg_check(pTHX_ SV** base)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DO_ARG_CHECK	\
+	assert(base)
+
 /* PERL_CALLCONV bool	Perl_do_open(pTHX_ GV* gv, const char* name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO* supplied_fp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2); */
@@ -4360,12 +4372,6 @@ STATIC const char*	S_gv_ename(pTHX_ GV *gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_ENAME	\
 	assert(gv)
-
-STATIC bool	S_scalar_mod_type(const OP *o, I32 type)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(1);
-#define PERL_ARGS_ASSERT_SCALAR_MOD_TYPE	\
-	assert(o)
 
 STATIC OP *	S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 			__attribute__nonnull__(pTHX_3);

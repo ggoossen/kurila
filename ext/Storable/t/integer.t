@@ -56,7 +56,7 @@ my @numbers =
    2559831922.0,
   );
 
-plan tests => (nelems @processes) * nelems @numbers * 5;
+plan tests => (nelems @processes) * (nelems @numbers) * 5;
 
 my $file = "integer.$$";
 die "Temporary file '$file' already exists" if -e $file;

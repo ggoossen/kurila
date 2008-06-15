@@ -817,7 +817,7 @@ sub ParseOptionSpec ($$) {
     my $entry;
     if ( $spec eq '' || $spec eq '+' || $spec eq '!' ) {
 	# Fields are hard-wired here.
-	$entry = \@($spec,$orig,undef, <CTL_DEST_SCALAR,0,0);
+	$entry = \@($spec,$orig,undef, CTL_DEST_SCALAR,0,0);
     }
     elsif ( $spec =~ m/^:(-?\d+|\+)([@%])?$/ ) {
 	my $def = $1;
@@ -885,7 +885,7 @@ sub ParseOptionSpec ($$) {
 	    warn($_."\n");
 	}
     }
-    (@names[0], $orig);
+    return @(@names[0], $orig);
 }
 
 # Option lookup.

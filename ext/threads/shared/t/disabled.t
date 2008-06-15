@@ -43,7 +43,7 @@ foreach my $func (qw(cond_wait cond_signal cond_broadcast)) {
 # lock() should be a no-op.  The return value is currently undefined.
 {
     my @array = @( qw(1 2 3 4) );
-    lock(< @array);
+    lock(@array);
     is( "{join ' ', <@array}", "1 2 3 4" );
 }
 

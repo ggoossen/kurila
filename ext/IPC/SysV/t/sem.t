@@ -1,8 +1,5 @@
 BEGIN {
-    chdir 't' if -d 't';
-
-    @INC = qw(. ../lib);
-    require 'test.pl';
+    require './test.pl';
 }
 
 use Config;
@@ -53,14 +50,14 @@ ok(my $st = $sem->stat,'stat it');
 
 ok($sem->setall( (0) x 10),'set all');
 
-my @sem = $sem->getall;
-cmp_ok(join("",@sem),'eq',"0000000000",'get all');
+my @sem = @($sem->getall);
+cmp_ok(join("",<@sem),'eq',"0000000000",'get all');
 
 @sem[2] = 1;
-ok($sem->setall( @sem ),'set after change');
+ok($sem->setall( <@sem ),'set after change');
 
-@sem = $sem->getall;
-cmp_ok(join("",@sem),'eq',"0010000000",'get again');
+@sem = @($sem->getall);
+cmp_ok(join("",<@sem),'eq',"0010000000",'get again');
 
 my $ncnt = $sem->getncnt(0);
 ok(!$sem->getncnt(0),'procs waiting now');

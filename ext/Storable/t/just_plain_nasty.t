@@ -6,25 +6,12 @@
 #  Everyone's invited! :-D
 
 use Config;
-sub BEGIN {
-    if (%ENV{PERL_CORE}){
-        chdir('t') if -d 't';
-        @INC = ('.', '../lib');
-    } else {
-        unshift @INC, 't';
-    }
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
-}
 
 use strict;
 BEGIN {
     if (!eval q{
         use Test;
         use B::Deparse 0.61;
-        use 5.006;
         1;
     }) {
         print "1..0 # skip: tests only work with B::Deparse 0.61 and at least perl 5.6.0\n";

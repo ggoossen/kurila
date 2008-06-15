@@ -6,7 +6,7 @@ require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = qw(File::Spec::Unix);
+@ISA = @(qw(File::Spec::Unix));
 
 use File::Basename;
 use VMS::Filespec;
@@ -34,7 +34,7 @@ Removes redundant portions of file specifications according to VMS syntax.
 =cut
 
 sub canonpath {
-    my($self,$path) = @_;
+    my($self,$path) = <@_;
 
     return undef unless defined $path;
 
@@ -90,11 +90,11 @@ cases (e.g. elements other than the first being absolute filespecs).
 sub catdir {
     my $self = shift;
     my $dir = pop;
-    my @dirs = grep {defined() && length()} @_;
+    my @dirs = @( grep {defined() && length()} < @_ );
 
     my $rslt;
     if (@dirs) {
-	my $path = (@dirs == 1 ? @dirs[0] : $self->catdir(@dirs));
+	my $path = ((nelems @dirs) == 1) ? @dirs[0] : $self->catdir(< @dirs);
 	my ($spath,$sdir) = ($path,$dir);
 	$spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
 	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
@@ -124,11 +124,11 @@ VMS-syntax file specification.
 sub catfile {
     my $self = shift;
     my $file = $self->canonpath(pop());
-    my @files = grep {defined() && length()} @_;
+    my @files = @(grep {defined() && length()} < @_);
 
     my $rslt;
     if (@files) {
-	my $path = (@files == 1 ? @files[0] : $self->catdir(@files));
+	my $path = ((nelems @files) == 1) ? @files[0] : $self->catdir(<@files);
 	my $spath = $path;
 	$spath =~ s/\.dir\Z(?!\n)//;
 	if ($spath =~ m/^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
@@ -223,7 +223,7 @@ to C<split> string value of C<%ENV{'PATH'}>.
 sub path {
     my (@dirs,$dir,$i);
     while ($dir = %ENV{'DCL$PATH;' . $i++}) { push(@dirs,$dir); }
-    return @dirs;
+    return < @dirs;
 }
 
 =item file_name_is_absolute (override)
@@ -233,7 +233,7 @@ Checks for VMS directory spec as well as Unix separators.
 =cut
 
 sub file_name_is_absolute {
-    my ($self,$file) = @_;
+    my ($self,$file) = <@_;
     # If it's a logical name, expand it.
     $file = %ENV{$file} while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && %ENV{$file};
     return scalar($file =~ m!^/!s             ||
@@ -248,7 +248,7 @@ Splits using VMS syntax.
 =cut
 
 sub splitpath {
-    my($self,$path) = @_;
+    my($self,$path) = <@_;
     my($dev,$dir,$file) = ('','','');
 
     vmsify($path) =~ m/(.+:)?([\[<].*[\]>])?(.*)/s;
@@ -262,9 +262,9 @@ Split dirspec using VMS syntax.
 =cut
 
 sub splitdir {
-    my($self,$dirspec) = @_;
-    my @dirs = ();
-    return @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
+    my($self,$dirspec) = <@_;
+    my @dirs = @();
+    return < @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
     $dirspec =~ s/</[/g;
     $dirspec =~ s/>/]/g;			# < and >	==> [ and ]
     $dirspec =~ s/\]\[\./\.\]\[/g;		# ][.		==> .][
@@ -281,9 +281,9 @@ sub splitdir {
 						# [--]		==> [-.-]
     $dirspec = "[$dirspec]" unless $dirspec =~ m/[\[<]/; # make legal
     $dirspec =~ s/^(\[|<)\./$1/;
-    @dirs = split m/(?<!\^)\./, vmspath($dirspec);
+    @dirs = @( split m/(?<!\^)\./, vmspath($dirspec) );
     @dirs[0] =~ s/^[\[<]//s;  @dirs[-1] =~ s/[\]>]\Z(?!\n)//s;
-    @dirs;
+    < @dirs;
 }
 
 
@@ -294,7 +294,7 @@ Construct a complete filespec using VMS syntax
 =cut
 
 sub catpath {
-    my($self,$dev,$dir,$file) = @_;
+    my($self,$dev,$dir,$file) = <@_;
     
     # We look for a volume in $dev, then in $dir, but not both
     my ($dir_volume, $dir_dir, $dir_file) = $self->splitpath($dir);
@@ -318,10 +318,10 @@ Use VMS syntax when converting filespecs.
 
 sub abs2rel {
     my $self = shift;
-    return vmspath(File::Spec::Unix::abs2rel( $self, @_ ))
-        if grep m{/}, @_;
+    return vmspath(File::Spec::Unix::abs2rel( $self, < @_ ))
+        if grep m{/}, < @_;
 
-    my($path,$base) = @_;
+    my($path,$base) = < @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
     for ($path, $base) { $_ = $self->canonpath($_) }
@@ -379,7 +379,7 @@ Use VMS syntax when converting filespecs.
 
 sub rel2abs {
     my $self = shift ;
-    my ($path,$base ) = @_;
+    my ($path,$base ) = < @_;
     return undef unless defined $path;
     if ($path =~ m/\//) {
 	$path = ( -d $path || $path =~ m/\/\z/  # educated guessing about

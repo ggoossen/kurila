@@ -26,7 +26,7 @@ my $mm = bless \%( NAME => "Foo" ), "MM";
 # I don't expect anything to have a length shorter than 256 chars.
 cmp_ok( $mm->max_exec_len, '+>=', 256,   'max_exec_len' );
 
-my $echo = $mm->oneliner(q{print @ARGV}, \@('-l'));
+my $echo = $mm->oneliner(q{print <@ARGV}, \@('-l'));
 
 # Force a short command length to make testing split_command easier.
 $mm->{_MAX_EXEC_LEN} = length($echo) + 15;
@@ -48,7 +48,7 @@ isnt( (nelems @cmds), 0 );
 @results = @( < _run(< @cmds) );
 like( join('', < @results ), qr/^1+$/,         'pairs preserved' );
 
-is( $mm->split_command($echo), 0,  'no args means no commands' );
+is( (nelems @($mm->split_command($echo))), 0,  'no args means no commands' );
 
 
 sub _run {

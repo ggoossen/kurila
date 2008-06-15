@@ -12,7 +12,7 @@ BEGIN {
 use ExtUtils::testlib;
 
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
 
     # You have to do it this way or VMS will get confused.
     if ($ok) {

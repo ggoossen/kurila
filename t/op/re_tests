@@ -154,8 +154,8 @@ abc)	-	c	-	Unmatched )
 ((a))	abc	y	$^MATCH-$1-$2	a-a-a
 ((a))	abc	y	@-[0]-@-[1]-@-[2]	0-0-0
 ((a))	abc	y	@+[0]-@+[1]-@+[2]	1-1-1
-((a))	abc	b	@-	0 0 0
-((a))	abc	b	@+	1 1 1
+((a))	abc	b	{join '*', <@-}	0*0*0
+((a))	abc	b	{join '*', <@+}	1*1*1
 (a)b(c)	abc	y	$^MATCH-$1-$2	abc-a-c
 (a)b(c)	abc	y	@-[0]-@-[1]-@-[2]	0-0-2
 (a)b(c)	abc	y	@+[0]-@+[1]-@+[2]	3-1-3

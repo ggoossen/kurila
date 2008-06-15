@@ -13,7 +13,7 @@ use ExtUtils::testlib;
 
 my $Base = 0;
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
     $id += $Base;
 
     # You have to do it this way or VMS will get confused.
@@ -59,7 +59,7 @@ sub forko (&$$); # To prevent deadlock from underlying pthread_* bugs (as in
 *forko = ($^O =~ m/^dos|os2|mswin32|netware|vms$/i)
 ? sub (&$$) { my $code = shift; goto &$code; }
 : sub (&$$) {
-  my ($code, $expected, $patience) = @_;
+  my ($code, $expected, $patience) = <@_;
   my ($test_num, $pid);
   local *CHLD;
 
@@ -101,7 +101,7 @@ ok(4, (prototype(\&cond_timedwait) eq '\[$@%]$;\[$@%]'),
 
 $Base += 4;
 
-my @wait_how = (
+my @wait_how = @(
    "simple",  # cond var == lock var; implicit lock; e.g.: cond_wait($c)
    "repeat",  # cond var == lock var; explicit lock; e.g.: cond_wait($c, $c)
    "twain"    # cond var != lock var; explicit lock; e.g.: cond_wait($c, $l)
@@ -130,12 +130,12 @@ SYNC_SHARED: {
 
   # - TEST cond_wait
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_wait [$_]";
       threads->create(\&cw)->join;
       $Base += 5;
     }
-  }, 5*@wait_how, 90);
+  }, 5*(nelems @wait_how), 90);
 
   sub cw {
       # which lock to obtain?
@@ -156,12 +156,12 @@ SYNC_SHARED: {
   # - TEST cond_timedwait success
 
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_timedwait [$_]";
       threads->create(\&ctw, 5)->join;
       $Base += 5;
     }
-  }, 5*@wait_how, 90);
+  }, 5*(nelems @wait_how), 90);
 
   sub ctw($) {
       my $to = shift;
@@ -185,20 +185,20 @@ SYNC_SHARED: {
   # - TEST cond_timedwait timeout
 
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_timedwait pause, timeout [$_]";
       threads->create(\&ctw_fail, 3)->join;
       $Base += 2;
     }
-  }, 2*@wait_how, 90);
+  }, 2*(nelems @wait_how), 90);
 
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_timedwait instant timeout [$_]";
       threads->create(\&ctw_fail, -60)->join;
       $Base += 2;
     }
-  }, 2*@wait_how, 90);
+  }, 2*(nelems @wait_how), 90);
 
   # cond_timedwait timeout (relative timeout)
   sub ctw_fail {
@@ -253,12 +253,12 @@ SYNCH_REFS: {
 
   # - TEST cond_wait
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_wait [$_]";
       threads->create(\&cw2)->join;
       $Base += 5;
     }
-  }, 5*@wait_how, 90);
+  }, 5*(nelems @wait_how), 90);
 
   sub cw2 {
       # which lock to obtain?
@@ -279,12 +279,12 @@ SYNCH_REFS: {
   # - TEST cond_timedwait success
 
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_timedwait [$_]";
       threads->create(\&ctw2, 5)->join;
       $Base += 5;
     }
-  }, 5*@wait_how, 90);
+  }, 5*(nelems @wait_how), 90);
 
   sub ctw2($) {
       my $to = shift;
@@ -308,20 +308,20 @@ SYNCH_REFS: {
   # - TEST cond_timedwait timeout
 
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_timedwait pause, timeout [$_]";
       threads->create(\&ctw_fail2, 3)->join;
       $Base += 2;
     }
-  }, 2*@wait_how, 90);
+  }, 2*(nelems @wait_how), 90);
 
   forko( sub {
-    foreach (@wait_how) {
+    foreach (<@wait_how) {
       $test = "cond_timedwait instant timeout [$_]";
       threads->create(\&ctw_fail2, -60)->join;
       $Base += 2;
     }
-  }, 2*@wait_how, 90);
+  }, 2*(nelems @wait_how), 90);
 
   sub ctw_fail2 {
     my $to = shift;

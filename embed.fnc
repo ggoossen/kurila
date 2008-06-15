@@ -228,6 +228,8 @@ p	|I32	|do_shmio	|I32 optype|NN SV** mark|NN SV** sp
 #endif
 Ap	|void	|do_join	|NN SV *sv|NN SV *delim|NN SV **mark|NN SV **sp
 p	|OP*	|do_kv
+p	|void	|bad_arg	|I32 n|NN const char* t|NN const char* name|NN SV *arg
+p	|void	|do_arg_check	|NN SV** base	
 Apmb	|bool	|do_open	|NN GV* gv|NN const char* name|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO* supplied_fp
 Ap	|bool	|do_open9	|NN GV *gv|NN const char *name|I32 len|int as_raw \
@@ -1184,7 +1186,6 @@ sR	|OP*	|newDEFSVOP
 sR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp
 s	|void	|simplify_sort	|NN OP *o
 s	|const char*	|gv_ename	|NN GV *gv
-sRn	|bool	|scalar_mod_type|NN const OP *o|I32 type
 s	|OP *	|my_kid		|NULLOK OP *o|NULLOK OP *attrs|NN OP **imopsp
 s	|OP *	|dup_attrlist	|NN OP *o
 s	|void	|apply_attrs	|NN HV *stash|NN SV *target|NULLOK OP *attrs|bool for_my

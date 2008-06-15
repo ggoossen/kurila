@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 147 );
+plan( tests => 141 );
 
 our (@a, @b);
 
@@ -152,7 +152,7 @@ dies_like( sub { @b = @( sort twoface 4,1 ) },
 
 eval <<'CODE';
     # "sort 'one', 'two'" should not try to parse "'one" as a sort sub
-    my @result = sort 'one', 'two';
+    my @result = @(sort 'one', 'two');
 CODE
 cmp_ok($@,'eq','',q(one is not a sub));
 
@@ -331,36 +331,31 @@ package main;
 {
     my ($r1,$r2,@a);
     our @g;
-    @g = @(3,2,1); $r1 = \@g[2]; @g = sort < @g; $r2 = \@g[0];
-    cmp_ok($r1, '\==', $r2);
+    @g = @(3,2,1); $r1 = \@g[2]; @g = @( sort < @g); $r2 = \@g[0];
     is "{join ' ', <@g}", "1 2 3", "inplace sort of global";
 
-    @a = @( qw(b a c) ); $r1 = \@a[1]; @a = sort < @a; $r2 = \@a[0];
-    cmp_ok($r1, '\==', $r2);
+    @a = @( qw(b a c) ); $r1 = \@a[1]; @a = @(sort < @a); $r2 = \@a[0];
     is "{join ' ', <@a}", "a b c", "inplace sort of lexical";
 
-    @g = @(2,3,1); $r1 = \@g[1]; @g = sort { $b <+> $a } < @g; $r2 = \@g[0];
-    cmp_ok($r1, '\==', $r2);
+    @g = @(2,3,1); $r1 = \@g[1]; @g = @(sort { $b <+> $a } < @g); $r2 = \@g[0];
     is "{join ' ', <@g}", "3 2 1", "inplace reversed sort of global";
 
     @g = @(2,3,1);
-    $r1 = \@g[1]; @g = sort { $a+<$b?1:$a+>$b?-1:0 } < @g; $r2 = \@g[0];
-    cmp_ok($r1, '\==', $r2);
+    $r1 = \@g[1]; @g = @(sort { $a+<$b?1:$a+>$b?-1:0 } < @g); $r2 = \@g[0];
     is "{join ' ', <@g}", "3 2 1", "inplace custom sort of global";
 
     sub mysort { $b cmp $a };
-    @a = @( qw(b c a) ); $r1 = \@a[1]; @a = sort mysort < @a; $r2 = \@a[0];
-    cmp_ok($r1, '\==', $r2);
+    @a = @( qw(b c a) ); $r1 = \@a[1]; @a = @(sort mysort < @a); $r2 = \@a[0];
     is "{join ' ', <@a}", "c b a", "inplace sort with function of lexical";
 
     use Tie::Array;
     my @t;
     tie @t, 'Tie::StdArray';
 
-    @t = @( qw(b c a) ); @t = sort < @t;
+    @t = @( qw(b c a) ); @t = @(sort < @t);
     is "{join ' ', <@t}", "a b c", "inplace sort of tied array";
 
-    @t = @( qw(b c a) ); @t = sort mysort < @t;
+    @t = @( qw(b c a) ); @t = @(sort mysort < @t);
     is "{join ' ', <@t}", "c b a", "inplace sort of tied array with function";
 
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
@@ -416,8 +411,8 @@ my @input = @( < &generate );
 my @output = @( sort < @input );
 is join(" ", map {0+$_} < @output), "0 1 2 3 4 5 6 7 8", "Simple stable sort";
 
-@input = @( < &generate );
-@input = sort < @input;
+@input = @( &generate );
+@input = @(sort < @input);
 is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
     "Simple stable in place sort";
 
@@ -430,8 +425,8 @@ is "{join ' ', <@output}", "A A A B B B C C C", 'stable $a <=> $b sort';
 @output = @( sort {$a cmp $b} < @input );
 is join(" ", map {0+$_} < @output), "0 1 2 3 4 5 6 7 8", 'stable $a cmp $b sort';
 
-@input = @( < &generate );
-@input = sort {$a cmp $b} < @input;
+@input = @( &generate );
+@input = @(sort {$a cmp $b} < @input);
 is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
     'stable $a cmp $b in place sort';
 
@@ -439,8 +434,8 @@ is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
 @output = @( sort {$b cmp $a} < @input );
 is join(" ", map {0+$_} < @output), "6 7 8 3 4 5 0 1 2", 'stable $b cmp $a sort';
 
-@input = @( < &generate );
-@input = sort {$b cmp $a} < @input;
+@input = @( &generate );
+@input = @(sort {$b cmp $a} < @input);
 is join(" ", map {0+$_} < @input), "6 7 8 3 4 5 0 1 2",
     'stable $b cmp $a in place sort';
 
@@ -565,24 +560,25 @@ is "{join ' ', <@output}", "A B C D E F G H I", 'stable $a cmp $b sort';
 @output = @( sort {$a <+> $b} < @input );
 is "{join ' ', <@output}", "A B C D E F G H I", 'stable $a <=> $b sort';
 
-@input = @( < &generate1 );
-@input = sort {$a <+> $b} < @input;
+@input = @( &generate1 );
+@input = @(sort {$a <+> $b} < @input);
 is "{join ' ', <@input}", "A B C D E F G H I", 'stable $a <=> $b in place sort';
 
 @input = @( < &generate1 );
 @output = @( sort {$b <+> $a} < @input );
 is "{join ' ', <@output}", "G H I D E F A B C", 'stable $b <=> $a sort';
 
-@input = @( < &generate1 );
-@input = sort {$b <+> $a} < @input;
+@input = @( &generate1 );
+@input = @(sort {$b <+> $a} < @input);
 is "{join ' ', <@input}", "G H I D E F A B C", 'stable $b <=> $a in place sort';
 
 # test that optimized {$b cmp $a} and {$b <=> $a} remain stable
 # (new in 5.9) without overloading
 { no warnings;
-@b = @( sort { $b <+> $a } @input = @( qw/5first 6first 5second 6second/ ) );
+@input = @( qw/5first 6first 5second 6second/ );
+@b = @( sort { $b <+> $a } <@input );
 is "{join ' ', <@b}" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
-@input = sort {$b <+> $a} < @input;
+@input = @(sort {$b <+> $a} < @input);
 is "{join ' ', <@input}" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
 };
 
@@ -757,12 +753,6 @@ sub min {
   } < @_ );
   @list[0];
 }
-
-# Bug 7567 - an array shouldn't be modifiable while it's being
-# sorted in-place.
-try { @a=@(1..8); @a = @( sort { @a = @(0) } < @a ); },
-main::like($@->{description}, qr(^Modification of a read-only value attempted), 'bug 7567');
-
 
 # Sorting shouldn't increase the refcount of a sub
 sub foo {(1+$a) <+> (1+$b)}

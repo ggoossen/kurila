@@ -1,11 +1,6 @@
 #!./perl -i.inplace
 # note the extra switch, for the test below
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Test::More tests => 43;
 
 use English qw( -no_match_vars ) ;
@@ -64,8 +59,8 @@ undef $OUTPUT_FIELD_SEPARATOR;
 
 our $threads;
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
-my @foo = (8, 9);
-@foo = split(m/\n/, "@foo");
+my @foo = @(8, 9);
+@foo = @( split(m/\n/, join $", < @foo ) );
 is( @foo[0], 8, '$"' );
 is( @foo[1], 9, '$LIST_SEPARATOR' );
 
@@ -116,7 +111,7 @@ $SUBSCRIPT_SEPARATOR = '|';
 %hash{'d','e','f'} = 1;
 $SUBSEP = ',';
 %hash{'a', 'b', 'c'} = 1;
-my @keys = sort keys %hash;
+my @keys = @( sort keys %hash );
 
 is( @keys[0], 'a,b,c', '$SUBSCRIPT_SEPARATOR' );
 is( @keys[1], 'd|e|f', '$SUBSCRIPT_SEPARATOR' );

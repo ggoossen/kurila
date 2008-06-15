@@ -626,12 +626,20 @@ PP(pp_aelemfast)
     AV * const av = PL_op->op_flags & OPf_SPECIAL ?
 		(AV*)PAD_SV(PL_op->op_targ) : GvAV(cGVOP_gv);
     const U32 lval = PL_op->op_flags & OPf_MOD;
-    SV** const svp = av_fetch(av, PL_op->op_private, lval);
-    SV *sv = (svp ? *svp : &PL_sv_undef);
-    EXTEND(SP, 1);
-    if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
-	sv = sv_mortalcopy(sv);
-    PUSHs(sv);
+    if (!SvAVOK(av)) {
+	if (lval && ! SvOK(av))
+	    sv_upgrade((SV*)av, SVt_PVAV);
+	else
+	    bad_arg(1, "array", PL_op_desc[PL_op->op_type], (SV*)av);
+    }
+    {
+	SV** const svp = av_fetch(av, PL_op->op_private, lval);
+	SV *sv = (svp ? *svp : &PL_sv_undef);
+	EXTEND(SP, 1);
+	if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
+	    sv = sv_mortalcopy(sv);
+	PUSHs(sv);
+    }
     RETURN;
 }
 
@@ -765,11 +773,11 @@ PP(pp_print)
 PP(pp_rv2av)
 {
     dVAR; dSP; dTOPss;
-    const I32 gimme = GIMME_V;
     static const char an_array[] = "an ARRAY";
     static const char a_hash[] = "a HASH";
     const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
     const svtype type = is_pp_rv2av ? SVt_PVAV : SVt_PVHV;
+    GV *gv;
 
     if (SvROK(sv)) {
       wasref:
@@ -785,7 +793,6 @@ PP(pp_rv2av)
 	SETs(sv);
 	RETURN;
     }
-    GV *gv;
 	
     if (SvTYPE(sv) != SVt_PVGV) {
 	if (SvGMAGICAL(sv)) {
@@ -1601,6 +1608,7 @@ PP(pp_enter)
 PP(pp_helem)
 {
     dVAR; dSP;
+    do_arg_check(SP-1);
     HE* he;
     SV **svp;
     SV * const keysv = POPs;
@@ -2619,11 +2627,14 @@ PP(pp_aelem)
     IV elem = SvIV(elemsv);
     AV* const av = (AV*)POPs;
     const U32 lval = PL_op->op_flags & OPf_MOD;
-    const U32 defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
+    U32 defer;
     SV *sv;
 
-    if (SvTYPE(av) != SVt_PVAV)
-	RETPUSHUNDEF;
+    if ( ! SvAVOK(av) )
+	Perl_croak(aTHX_ "Can't take an element from a %s", SvDESC(sv));
+
+    defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
+
     svp = av_fetch(av, elem, lval && !defer);
     if (lval) {
 #ifdef PERL_MALLOC_WRAP

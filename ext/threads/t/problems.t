@@ -42,7 +42,7 @@ my $test :shared = 2;
 # parts of Test::* may have already been freed by then
 sub is($$$)
 {
-    my ($got, $want, $desc) = @_;
+    my ($got, $want, $desc) = < @_;
     lock($test);
     if ($got ne $want) {
         print("# EXPECTED: $want\n");
@@ -147,8 +147,8 @@ for my $decl ('my $x : unique', 'sub foo : unique') {
 
 # Nothing is checking that total keys gets cloned correctly.
 
-my %h = (1,2,3,4);
-is(keys(%h), 2, "keys correct in parent");
+my %h = %(1,2,3,4);
+is(nelems @(keys(%h)), 2, "keys correct in parent");
 
 my $child = threads->create(sub { return (scalar(keys(%h))); })->join;
 is($child, 2, "keys correct in child");
@@ -156,7 +156,7 @@ is($child, 2, "keys correct in child");
 lock_keys(%h);
 delete(%h{1});
 
-is(keys(%h), 1, "keys correct in parent with restricted hash");
+is(nelems @(keys(%h)), 1, "keys correct in parent with restricted hash");
 
 $child = threads->create(sub { return (scalar(keys(%h))); })->join;
 is($child, 1, "keys correct in child with restricted hash");

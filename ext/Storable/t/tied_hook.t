@@ -10,8 +10,7 @@ use Config;
 
 sub BEGIN {
     if (%ENV{PERL_CORE}){
-	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
+	push @INC, '../ext/Storable/t';
     } else {
 	unshift @INC, 't';
     }
@@ -39,14 +38,14 @@ sub TIEHASH {
 
 sub FETCH {
 	my $self = shift;
-	my ($key) = @_;
+	my ($key) = <@_;
 	$main::hash_fetch++;
 	return $self->{$key};
 }
 
 sub STORE {
 	my $self = shift;
-	my ($key, $value) = @_;
+	my ($key, $value) = <@_;
 	$self->{$key} = $value;
 }
 
@@ -70,9 +69,9 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my ($self, $cloning, $frozen) = @_;
 	my ($keys, $values) = split(m/;/, $frozen);
-	my @keys = split(m/:/, $keys);
-	my @values = split(m/:/, $values);
-	for (my $i = 0; $i +< @keys; $i++) {
+	my @keys = @(split(m/:/, $keys));
+	my @values = @(split(m/:/, $values));
+	for (my $i = 0; $i +< nelems @keys; $i++) {
 		$self->{@keys[$i]} = @values[$i];
 	}
 	$main::hash_hook2++;
@@ -87,31 +86,31 @@ sub TIEARRAY {
 
 sub FETCH {
 	my $self = shift;
-	my ($idx) = @_;
+	my ($idx) = <@_;
 	$main::array_fetch++;
 	return $self->[$idx];
 }
 
 sub STORE {
 	my $self = shift;
-	my ($idx, $value) = @_;
+	my ($idx, $value) = <@_;
 	$self->[$idx] = $value;
 }
 
 sub FETCHSIZE {
 	my $self = shift;
-	return @{$self};
+	return nelems @{$self};
 }
 
 sub STORABLE_freeze {
 	my $self = shift;
 	$main::array_hook1++;
-	return join(":", @$self);
+	return join(":", <@$self);
 }
 
 sub STORABLE_thaw {
-	my ($self, $cloning, $frozen) = @_;
-	@$self = split(m/:/, $frozen);
+	my ($self, $cloning, $frozen) = <@_;
+	@$self = @(split(m/:/, $frozen));
 	$main::array_hook2++;
 }
 
@@ -131,7 +130,7 @@ sub FETCH {
 
 sub STORE {
 	my $self = shift;
-	my ($value) = @_;
+	my ($value) = <@_;
 	$$self = $value;
 }
 
@@ -142,7 +141,7 @@ sub STORABLE_freeze {
 }
 
 sub STORABLE_thaw {
-	my ($self, $cloning, $frozen) = @_;
+	my ($self, $cloning, $frozen) = <@_;
 	$$self = $frozen;
 	$main::scalar_hook2++;
 }
@@ -163,9 +162,9 @@ $scalar = 'foo';
 @array[2] = dump::view(\@array);
 @array[3] = "plaine scalaire";
 
-my @tied = (\$scalar, \@array, \%hash);
-my %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
-my @a = ('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
+my @tied = @(\$scalar, \@array, \%hash);
+my %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
+my @a = @('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
          $b, \$a, $a, $c, \$c, \%a, \@array, \%hash, \@tied);
 
 my $f;
@@ -186,16 +185,16 @@ my $g = freeze($root);
 ok 6, length($f) == length($g);
 
 # Ensure the tied items in the retrieved image work
-my @old = ($scalar_fetch, $array_fetch, $hash_fetch);
-@tied = our ($tscalar, $tarray, $thash) = @{$root->[@$root-1]};
-my @type = qw(SCALAR  ARRAY  HASH);
+my @old = @($scalar_fetch, $array_fetch, $hash_fetch);
+(<@tied) = our ($tscalar, $tarray, $thash) = < @{$root->[(nelems @$root)-1]};
+my @type = @(qw(SCALAR  ARRAY  HASH));
 
 ok 7, tied $$tscalar;
 ok 8, tied @{$tarray};
 ok 9, tied %{$thash};
 
-our @new = ($$tscalar, $tarray->[0], $thash->{'attribute'});
-@new = ($scalar_fetch, $array_fetch, $hash_fetch);
+our @new = @($$tscalar, $tarray->[0], $thash->{'attribute'});
+@new = @($scalar_fetch, $array_fetch, $hash_fetch);
 
 # Tests 10..15
 for (my $i = 0; $i +< @new; $i++) {

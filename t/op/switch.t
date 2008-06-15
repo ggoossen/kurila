@@ -399,7 +399,7 @@ sub bar {"bar"}
 
 {
     my $ok = 0;
-    my %foo = ("bar", 0);
+    my %foo = %("bar", 0);
     given(0) {
 	when(exists %foo{bar}) {
 	    $ok = 1;
@@ -442,9 +442,9 @@ sub bar {"bar"}
 }
 
 TODO: {
-    local $TODO = "RT #50538: when( \@n && \%n ) fails to smart match";
+    todo_skip "RT #50538: when( \@n && \%n ) fails to smart match", 3;
     { # this should smart match on each side of &&
- 	my @n = qw(fred barney betty);
+ 	my @n = @(qw(fred barney betty));
 	my @m = @n;
 	
 	my $ok = 0;
@@ -464,8 +464,8 @@ TODO: {
     }
 
     { # this should smart match on each side of &&
-	my @n = qw(fred barney betty);
-	my %n = map { $_, 1 } @n;
+	my @n = @(qw(fred barney betty));
+	my %n = %(map { $_, 1 } <@n);
 	
 	my $ok = 0;
 	given( "fred" ) {
@@ -509,22 +509,22 @@ TODO: {
 { # A helper class to count the number of accesses.
     package FetchCounter;
     sub TIESCALAR {
-	my ($class) = @_;
+	my ($class) = <@_;
 	bless \%( value => undef, count => 0 ), $class;
     }
     sub STORE {
-        my ($self, $val) = @_;
+        my ($self, $val) = <@_;
         $self->{count} = 0;
         $self->{value} = $val;
     }
     sub FETCH {
-	my ($self) = @_;
+	my ($self) = <@_;
 	# Avoid pre/post increment here
 	$self->{count} = 1 + $self->{count};
 	$self->{value};
     }
     sub count {
-	my ($self) = @_;
+	my ($self) = <@_;
 	$self->{count};
     }
 }
@@ -730,7 +730,7 @@ sub contains_x {
     use overload '""' => sub{"string value of obj"};
 
     use overload "~~" => sub {
-        my ($self, $other, $reversed) = @_;
+        my ($self, $other, $reversed) = <@_;
         if ($reversed) {
 	    $self->{left}  = $other;
 	    $self->{right} = $self;
@@ -745,7 +745,7 @@ sub contains_x {
     };
     
     sub new {
-	my ($pkg, $retval) = @_;
+	my ($pkg, $retval) = <@_;
 	bless \%(
 	    called => 0,
 	    retval => $retval,

@@ -43,7 +43,6 @@ EXTCONST char* const PL_op_name[] = {
 	"gv",
 	"gelem",
 	"padsv",
-	"padav",
 	"padhv",
 	"padany",
 	"pushre",
@@ -52,7 +51,6 @@ EXTCONST char* const PL_op_name[] = {
 	"rv2cv",
 	"anoncode",
 	"prototype",
-	"refgen",
 	"srefgen",
 	"ref",
 	"bless",
@@ -406,7 +404,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"glob value",
 	"glob elem",
 	"private variable",
-	"private array",
 	"private hash",
 	"private value",
 	"push regexp",
@@ -415,7 +412,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"subroutine dereference",
 	"anonymous subroutine",
 	"subroutine prototype",
-	"reference constructor",
 	"single ref constructor",
 	"reference-type operator",
 	"bless",
@@ -781,7 +777,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_gv),
 	MEMBER_TO_FPTR(Perl_pp_gelem),
 	MEMBER_TO_FPTR(Perl_pp_padsv),
-	MEMBER_TO_FPTR(Perl_pp_padav),
 	MEMBER_TO_FPTR(Perl_pp_padhv),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_padany */
 	MEMBER_TO_FPTR(Perl_pp_pushre),
@@ -790,7 +785,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_rv2cv),
 	MEMBER_TO_FPTR(Perl_pp_anoncode),
 	MEMBER_TO_FPTR(Perl_pp_prototype),
-	MEMBER_TO_FPTR(Perl_pp_refgen),
 	MEMBER_TO_FPTR(Perl_pp_srefgen),
 	MEMBER_TO_FPTR(Perl_pp_ref),
 	MEMBER_TO_FPTR(Perl_pp_bless),
@@ -1153,7 +1147,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gelem */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* padsv */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* padav */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* padhv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* padany */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushre */
@@ -1162,7 +1155,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2cv */
 	MEMBER_TO_FPTR(Perl_ck_anoncode),	/* anoncode */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* prototype */
-	MEMBER_TO_FPTR(Perl_ck_spair),	/* refgen */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* srefgen */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* ref */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* bless */
@@ -1519,7 +1511,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000c44,	/* gv */
 	0x00022440,	/* gelem */
 	0x00000044,	/* padsv */
-	0x00000040,	/* padav */
 	0x00000040,	/* padhv */
 	0x00000040,	/* padany */
 	0x00000a40,	/* pushre */
@@ -1528,7 +1519,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000240,	/* rv2cv */
 	0x00000c00,	/* anoncode */
 	0x00003604,	/* prototype */
-	0x00004201,	/* refgen */
 	0x00002206,	/* srefgen */
 	0x0001368c,	/* ref */
 	0x00122804,	/* bless */

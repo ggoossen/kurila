@@ -157,34 +157,34 @@ tryrun(\%(PERL5OPT => '-t'),
     '');
 
 tryrun(\%(PERLLIB => "foobar%Config{path_sep}42"),
-    \@('-e', 'print grep { $_ eq "foobar" } @INC'),
+    \@('-e', 'print grep { $_ eq "foobar" } < @INC'),
     'foobar',
     '');
 
 tryrun(\%(PERLLIB => "foobar%Config{path_sep}42"),
-    \@('-e', 'print grep { $_ eq "42" } @INC'),
+    \@('-e', 'print grep { $_ eq "42" } < @INC'),
     '42',
     '');
 
 tryrun(\%(PERL5LIB => "foobar%Config{path_sep}42"),
-    \@('-e', 'print grep { $_ eq "foobar" } @INC'),
+    \@('-e', 'print grep { $_ eq "foobar" } < @INC'),
     'foobar',
     '');
 
 tryrun(\%(PERL5LIB => "foobar%Config{path_sep}42"),
-    \@('-e', 'print grep { $_ eq "42" } @INC'),
+    \@('-e', 'print grep { $_ eq "42" } < @INC'),
     '42',
     '');
 
 tryrun(\%(PERL5LIB => "foo",
      PERLLIB => "bar"),
-    \@('-e', 'print grep { $_ eq "foo" } @INC'),
+    \@('-e', 'print grep { $_ eq "foo" } < @INC'),
     'foo',
     '');
 
 tryrun(\%(PERL5LIB => "foo",
      PERLLIB => "bar"),
-    \@('-e', 'print grep { $_ eq "bar" } @INC'),
+    \@('-e', 'print grep { $_ eq "bar" } < @INC'),
     '',
     '');
 

@@ -920,7 +920,7 @@ sub cmpthese{
     }
 
     # Sort by rate
-    @vals = sort { $a->[7] <+> $b->[7] } < @vals;
+    @vals = @(sort { $a->[7] <+> $b->[7] } < @vals);
 
     # If more than half of the rates are greater than one...
     my $display_as_rate = (nelems @vals) ? (@vals[((nelems @vals)-1)>>1]->[7] +> 1) : 0;

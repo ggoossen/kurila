@@ -56,7 +56,7 @@ is ($class->file_name_is_absolute('Bombdadil'),
     File::Spec->file_name_is_absolute('Bombdadil'),
      'file_name_is_absolute()');
 
-is ($class->path(), File::Spec->path(), 'path() same as File::Spec->path()');
+is ((join ' ', $class->path()), (join ' ', File::Spec->path()), 'path() same as File::Spec->path()');
 
 foreach (qw/updir curdir rootdir/)
   {

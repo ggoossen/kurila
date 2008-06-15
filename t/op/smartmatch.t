@@ -5,6 +5,9 @@ BEGIN {
 }
 use strict;
 
+skip_all "remove smartmach from kurila";
+exit 0;
+
 use Tie::Array;
 use Tie::Hash;
 
@@ -49,7 +52,7 @@ sub match_test {
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
     die "{$@->message} in '$tstr'" if $@;
-    ok( ($yn =~ m/!/ xor $res), "$tstr: $res");
+    ok( ($yn =~ m/!/ xor $res), "$tstr: {dump::view($res)}");
 }
 
 

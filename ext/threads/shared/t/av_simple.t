@@ -12,7 +12,7 @@ BEGIN {
 use ExtUtils::testlib;
 
 sub ok {
-    my ($id, $ok, $name) = @_;
+    my ($id, $ok, $name) = <@_;
 
     # You have to do it this way or VMS will get confused.
     if ($ok) {
@@ -47,7 +47,7 @@ ok(5, !defined @foo[1], "Check undef value");
 @foo[2] = "test";
 ok(6, @foo[2] eq "test", "Check extending the array works");
 ok(7, !defined @foo[1], "Check undef value again");
-ok(8, scalar(@foo) == 3, "Check the length of the array");
+ok(8, nelems(@foo) == 3, "Check the length of the array");
 ok(9,@foo == 3, "Check last element of array");
 threads->create(sub { @foo[0] = "thread1" })->join;
 ok(10, @foo[0] eq "thread1", "Check that a value can be changed in another thread");
@@ -90,7 +90,7 @@ my $i = 0;
 foreach my $var (@foo) {
     $i++;
 }
-ok(29, scalar @foo == $i, "Check foreach");
+ok(29, nelems @foo == $i, "Check foreach");
 my $ref = \@foo;
 ok(30, $ref->[0] == 3, "Check reference access");
 threads->create(sub { $ref->[0] = "thread4"})->join();
@@ -108,7 +108,7 @@ ok(36, delete(@foo[20]) eq "sky", "Check delete works");
 threads->create(sub { delete(@foo[0])})->join();
 ok(37, !defined delete(@foo[0]), "Check that delete works from a thread");
 
-@foo = (1,2,3,4,5);
+@foo = @(1,2,3,4,5);
 
 {
     my ($t1,$t2) = @foo[[2,3]];

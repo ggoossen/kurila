@@ -4,7 +4,7 @@ use TestInit;
 
 our @Methods;
 BEGIN {
-    @Methods = (qw(wraplist
+    @Methods = @(qw(wraplist
                    rootdir
                    ext
                    guess_name

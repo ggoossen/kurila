@@ -1,10 +1,6 @@
 BEGIN {
-    chdir 't' if -d 't';
-
-    @INC = qw(. ../lib);
-
     require Config; Config->import;
-    require 'test.pl';
+    require './test.pl';
 }
 
 if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
@@ -177,25 +173,25 @@ SKIP: {
 
     is(length($data),length(pack("s!*",(0) x $nsem)), 'right length');
 
-    my @data = unpack("s!*",$data);
+    my @data = @(unpack("s!*",$data));
 
     my $adata = "0" x $nsem;
 
-    is(scalar(@data),$nsem,'right amount');
-    cmp_ok(join("",@data),'eq',$adata,'right data');
+    is(nelems(@data),$nsem,'right amount');
+    cmp_ok(join("",<@data),'eq',$adata,'right data');
 
     my $poke = 2;
 
     @data[$poke] = 1;
-    ok(semctl($sem,0,SETALL,pack("s!*",@data)),'poke it');
+    ok(semctl($sem,0,SETALL,pack("s!*",<@data)),'poke it');
     
     $data = "";
     ok(semctl($sem,0,GETALL,$data),'and get it back');
 
-    @data = unpack("s!*",$data);
+    @data = @(unpack("s!*",$data));
     my $bdata = "0" x $poke . "1" . "0" x ($nsem-$poke-1);
 
-    cmp_ok(join("",@data),'eq',$bdata,'changed');
+    cmp_ok(join("",<@data),'eq',$bdata,'changed');
 } # SKIP
 
 END {

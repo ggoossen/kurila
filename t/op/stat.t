@@ -267,9 +267,9 @@ SKIP: {
 
     my $try = sub {
 	my @c1 = @( eval qq[\$DEV =~ m/^@_[0].*/mg] );
-	my @c2 = @( eval qq[grep \{ @_[1] "/dev/\$_" \} \@DEV] );
-	my $c1 = scalar nelems @c1;
-	my $c2 = scalar nelems @c2;
+	my @c2 = @( eval qq[grep \{ @_[1] "/dev/\$_" \} < \@DEV] );
+	my $c1 = nelems @c1;
+	my $c2 = nelems @c2;
 	is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");
     };
 
@@ -416,8 +416,8 @@ ok(-f(),    '     -f() "');
 unlink $tmpfile or print "# unlink failed: $!\n";
 
 # bug id 20011101.069
-my @r = @( \stat($Curdir) );
-is(scalar nelems @r, 13,   'stat returns full 13 elements');
+my @r = @( stat($Curdir) );
+is(nelems @r, 13,   'stat returns full 13 elements');
 
 stat $0;
 dies_like( sub { lstat _ },

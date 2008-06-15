@@ -1,10 +1,5 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = ('../lib');
-}
-
 use warnings;
 use strict;
 use vars qw($foo $bar $baz $ballast);
@@ -45,8 +40,8 @@ is ($bar, 5, "benchmarked code was run 5 times");
 
 # is coderef called with spurious arguments?
 my $foo;
-timeit( 1, sub { $foo = @_ });
-is ($foo, 0, "benchmarked code called without arguments");
+timeit( 1, sub { $foo = @_[0] });
+is ($foo, undef, "benchmarked code called without arguments");
 
 
 print "# Burning CPU to benchmark things will take time...\n";
@@ -263,7 +258,7 @@ sub check_graph_consistency {
     my (	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
         $fastr, $fastratet, $fastslowt, $fastfast)
-        = @_;
+        = < @_;
     my $all_passed = 1;
     $all_passed
       ^&^= is ($slowc, $slowr, "left col tag should be top row tag");
@@ -324,7 +319,7 @@ sub check_graph_consistency {
 }
 
 sub check_graph_vs_output {
-    my ($chart, $got) = @_;
+    my ($chart, $got) = < @_;
     my (	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
         $fastr, $fastratet, $fastslowt, $fastfast)
@@ -345,18 +340,18 @@ sub check_graph_vs_output {
 }
 
 sub check_graph {
-    my ($title, $row1, $row2) = @_;
-    is (scalar @$title, 4, "Four entries in title row");
-    is (scalar @$row1, 4, "Four entries in first row");
-    is (scalar @$row2, 4, "Four entries in second row");
+    my ($title, $row1, $row2) = < @_;
+    is (nelems @$title, 4, "Four entries in title row");
+    is (nelems @$row1, 4, "Four entries in first row");
+    is (nelems @$row2, 4, "Four entries in second row");
     is (shift @$title, '', "First entry of output graph should be ''");
-    check_graph_consistency (@$title, @$row1, @$row2);
+    check_graph_consistency (<@$title, <@$row1, <@$row2);
 }
 
 {
     select(OUT);
     my $start = times;
-    my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i = sqrt( our \$i++)" ), "auto" ) ;
+    my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt( \$i++)" ), "auto" ) ;
     my $end = times;
     select(STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
@@ -378,7 +373,7 @@ sub check_graph {
 {
     select(OUT);
     my $start = times;
-    my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i = sqrt(our \$i++)" ) ) ;
+    my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt(\$i++)" ) ) ;
     my $end = times;
     select(STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
@@ -433,7 +428,7 @@ sub check_graph {
     # Some of these will go bang if the preceding test fails. There will be
     # a big clue as to why, from the previous test's diagnostic
     is (ref $chart->[0], 'ARRAY', "output should be an array of arrays");
-    check_graph (@$chart);
+    check_graph (<@$chart);
 }
 
 {
@@ -464,7 +459,7 @@ sub check_graph {
     # Some of these will go bang if the preceding test fails. There will be
     # a big clue as to why, from the previous test's diagnostic
     is (ref $chart->[0], 'ARRAY', "output should be an array of arrays");
-    check_graph (@$chart);
+    check_graph (<@$chart);
 }
 
 ###}my $out = tie *OUT, 'TieOut'; my ($got); ###
@@ -502,11 +497,11 @@ untie *STDERR;
 # being used, merely what's become cached.
 
 clearallcache();
-my @before_keys = keys %Benchmark::Cache;
+my @before_keys = @(keys %Benchmark::Cache);
 $bar = 0;
 isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
-my @after5_keys = keys %Benchmark::Cache;
+my @after5_keys = @(keys %Benchmark::Cache);
 $bar = 0;
 isa_ok(timeit(10, '++$bar'), 'Benchmark', "timeit eval");
 is ($bar, 10, "benchmarked code was run 10 times");
@@ -526,9 +521,9 @@ is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
     my %usage = %Benchmark::_Usage;
     delete %usage{runloop};  # not public, not worrying about it just now
 
-    my @takes_no_args = qw(clearallcache disablecache enablecache);
+    my @takes_no_args = @(qw(clearallcache disablecache enablecache));
 
-    my %cmpthese = ('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
+    my %cmpthese = %('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
                      'not result' => 'cmpthese(42)',
                      'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
                     );
@@ -537,7 +532,7 @@ is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
         is( $@->{description}, %usage{cmpthese}, "cmpthese usage: $name" );
     }
 
-    my %timethese = ('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
+    my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
                        'no code'    => 'timethese(42)',
                        'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
                       );
@@ -549,12 +544,12 @@ is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
 
 
     while( my($func, $usage) = each %usage ) {
-        next if grep $func eq $_, @takes_no_args;
+        next if grep $func eq $_, < @takes_no_args;
         eval "$func()";
         is( $@->{description}, $usage, "$func usage: no args" );
     }
 
-    foreach my $func (@takes_no_args) {
+    foreach my $func (< @takes_no_args) {
         eval "$func(42)";
         is( $@->{description}, %usage{$func}, "$func usage: with args" );
     }
@@ -570,12 +565,12 @@ sub TIEHANDLE {
 
 sub PRINT {
     my $self = shift;
-    $$self .= join('', @_);
+    $$self .= join('', <@_);
 }
 
 sub PRINTF {
     my $self = shift;
-    $$self .= sprintf shift, @_;
+    $$self .= sprintf shift, <@_;
 }
 
 sub read {

@@ -313,7 +313,7 @@ sub F2::FETCH { my $self = shift; my $x = @f1[3]; $self }
 my @f2;
 tie @f2, 'F2';
 
-print @f2[4][0],"\n";
+print @f2[4]->[0],"\n";
 
 sub F3::TIEHASH { bless \@(), 'F3' }
 sub F3::FETCH { 1 }
@@ -325,18 +325,18 @@ sub F4::FETCH { my $self = shift; my $x = %f3{3}; $self }
 my %f4;
 tie %f4, 'F4';
 
-print %f4{'foo'}[0],"\n";
+print %f4{'foo'}->[0],"\n";
 
 EXPECT
 2
 3
 ########
-# test untie() from within FETCH
+# TODO test untie() from within FETCH
 package Foo;
 sub TIESCALAR { my $pkg = shift; return bless \@(@_), $pkg; }
 sub FETCH {
   my $self = shift;
-  my ($obj, $field) = @$self;
+  my ($obj, $field) = <@$self;
   untie $obj->{$field};
   $obj->{$field} = "Bar";
 }
@@ -384,7 +384,7 @@ use strict;
 use warnings;
 package MyTied;
 sub TIESCALAR {
-    my ($class,$code) = @_;
+    my ($class,$code) = <@_;
     bless $code, $class;
 }
 sub FETCH {
@@ -435,14 +435,14 @@ package Overlay;
 sub TIESCALAR
 {
         my $pkg = shift;
-        my ($ref, $val) = @_;
+        my ($ref, $val) = < @_;
         return bless \@( $ref, $val ), $pkg;
 }
 
 sub FETCH
 {
         my $self = shift;
-        my ($ref, $val) = @$self;
+        my ($ref, $val) = < @$self;
         #print "WILL INTERNAL UNITE $ref\n";
         $counter++;
         untie $$ref;
@@ -481,100 +481,6 @@ STORE set 'BOBBINS'
 FETCH
 FETCH
 joinBOBBINSthingsBOBBINSup
-########
-
-# test SCALAR method
-package TieScalar;
-
-sub TIEHASH {
-    my $pkg = shift;
-    bless \%() => $pkg;
-}
-
-sub STORE {
-    @_[0]->{@_[1]} = @_[2];
-}
-
-sub FETCH {
-    @_[0]->{@_[1]}
-}
-
-sub CLEAR {
-    %{ @_[0] } = ();
-}
-
-sub SCALAR {
-    print "SCALAR\n";
-    return 0 if ! keys %{@_[0]};
-    sprintf '%i/%i', scalar keys %{@_[0]}, scalar keys %{@_[0]};
-}
-
-package main;
-tie my %h => "TieScalar";
-%h{key1} = "val1";
-%h{key2} = "val2";
-print scalar %h, "\n";
-%h = ();
-print scalar %h, "\n";
-EXPECT
-SCALAR
-2/2
-SCALAR
-0
-########
-
-# test scalar on tied hash when no SCALAR method has been given
-package TieScalar;
-
-sub TIEHASH {
-    my $pkg = shift;
-    bless \%() => $pkg;
-}
-sub STORE {
-    @_[0]->{@_[1]} = @_[2];
-}
-sub FETCH {
-    @_[0]->{@_[1]}
-}
-sub CLEAR {
-    %{ @_[0] } = ();
-}
-sub FIRSTKEY {
-    my $a = keys %{ @_[0] };
-    print "FIRSTKEY\n";
-    each %{ @_[0] };
-}
-
-package main;
-tie my %h => "TieScalar";
-
-if (!%h) {
-    print "empty\n";
-} else {
-    print "not empty\n";
-}
-
-%h{key1} = "val1";
-print "not empty\n" if %h;
-print "not empty\n" if %h;
-print "-->\n";
-my ($k,$v) = each %h;
-print "<--\n";
-print "not empty\n" if %h;
-%h = ();
-print "empty\n" if ! %h;
-EXPECT
-FIRSTKEY
-empty
-FIRSTKEY
-not empty
-FIRSTKEY
-not empty
--->
-FIRSTKEY
-<--
-not empty
-FIRSTKEY
 empty
 ########
 sub TIESCALAR { bless \%() }
@@ -599,23 +505,24 @@ print $x ^|^ $y;
 EXPECT
 10
 ########
-# Bug 36267
+# TODO Bug 36267
+
 sub TIEHASH  { bless \%(), @_[0] }
 sub STORE    { @_[0]->{@_[1]} = @_[2] }
 sub FIRSTKEY { my $a = scalar keys %{@_[0]}; each %{@_[0]} }
 sub NEXTKEY  { each %{@_[0]} }
 sub DELETE   { delete @_[0]->{@_[1]} }
-sub CLEAR    { %{@_[0]} = () }
+sub CLEAR    { %{@_[0]} = %() }
 our %h;
 our %i;
 %h{b}=1;
 delete %h{b};
-print scalar keys %h, "\n";
+print nelems(@(keys %h)), "\n";
 tie %h, 'main';
 %i{a}=1;
 %h = %i;
 untie %h;
-print scalar keys %h, "\n";
+print nelems(@(keys %h)), "\n";
 EXPECT
 0
 0

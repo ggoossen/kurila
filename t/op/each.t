@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 34;
+plan tests => 27;
 
 our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total, 
      %hash, @foo, %u, $A, %b);
@@ -61,21 +61,6 @@ is ($i, 30, "each count");
 @keys = @('blurfl', keys(%h), 'dyick');
 is (((nelems @keys)-1), 31, "added a key");
 
-$size = ((split('/',scalar %h))[[1]]);
-keys %h = $size * 5;
-$newsize = ((split('/',scalar %h))[[1]]);
-is ($newsize, $size * 8, "resize");
-keys %h = 1;
-$size = ((split('/',scalar %h))[[1]]);
-is ($size, $newsize, "same size");
-%h = %(1,1);
-$size = ((split('/',scalar %h))[[1]]);
-is ($size, $newsize, "still same size");
-undef %h;
-%h = %(1,1);
-$size = ((split('/',scalar %h))[[1]]);
-is ($size, 8, "size 8");
-
 # test scalar each
 %hash = %( 1..20 );
 $total = 0;
@@ -98,14 +83,6 @@ values %hash;
 $total = 0;
 $total += $key while $key = each %hash;
 is ($total, 100, "test values keys resets iterator");
-
-$size = (split('/', scalar %hash))[[1]];
-keys(%hash) = $size / 2;
-is ($size, (split('/', scalar %hash))[[1]]);
-keys(%hash) = $size + 100;
-isnt ($size, (split('/', scalar %hash))[[1]]);
-
-is (keys(%hash), 10, "keys (\%hash)");
 
 $i = 0;
 %h = %(a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');

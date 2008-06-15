@@ -710,8 +710,7 @@ sub _gen_css_wad {
       $this_css =~ s/\bthin\b/medium/g;
     }
     $this_css =~ s<#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])\b>
-                  <{ join '', '#', ($1,$2,$3)[[< @swap]] 
-}>g   if (nelems @swap);
+                  |{ join '', '#', ($1,$2,$3)[[< @swap]] }|g   if (nelems @swap);
 
     if(   $flipmode =~ m/a/)
        { $this_css =~ s/#fff\b/#999/gi } # black -> dark grey

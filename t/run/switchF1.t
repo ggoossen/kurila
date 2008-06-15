@@ -11,7 +11,7 @@ my $prog = <<'EOT';
 BEGIN {
     *ARGV = *DATA;
 }
-print "@F";
+print join ' ', < @F;
 
 __DATA__
 okx1

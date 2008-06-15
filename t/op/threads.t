@@ -25,7 +25,7 @@ use threads;
 # Attempt to free unreferenced scalar: SV 0x40173f3c
 fresh_perl_is(<<'EOI', 'ok', \%( ), 'delete() under threads');
 use threads;
-threads->create(sub { my %h=(1,2); delete %h{1}})->join for 1..2;
+threads->create(sub { my %h=%(1,2); delete %h{1}})->join for 1..2;
 print "ok";
 EOI
 
@@ -66,12 +66,12 @@ sub mycmp { length($b) <+> length($a) }
 sub do_sort_one_thread {
    my $kid = shift;
    print "# kid $kid before sort\n";
-   my @list = ( 'x', 'yy', 'zzz', 'a', 'bb', 'ccc', 'aaaaa', 'z',
-                'hello', 's', 'thisisalongname', '1', '2', '3',
-                'abc', 'xyz', '1234567890', 'm', 'n', 'p' );
+   my @list = @( 'x', 'yy', 'zzz', 'a', 'bb', 'ccc', 'aaaaa', 'z',
+                 'hello', 's', 'thisisalongname', '1', '2', '3',
+                 'abc', 'xyz', '1234567890', 'm', 'n', 'p' );
 
    for my $j (1..99999) {
-      for my $k (sort mycmp @list) {}
+      for my $k (sort mycmp <@list) {}
    }
    print "# kid $kid after sort, sleeping 1\n";
    sleep(1);
@@ -80,13 +80,13 @@ sub do_sort_one_thread {
 
 sub do_sort_threads {
    my $nthreads = shift;
-   my @kids = ();
+   my @kids = @();
    for my $i (1..$nthreads) {
       my $t = threads->create(\&do_sort_one_thread, $i);
       print "# parent $$: continue\n";
       push(@kids, $t);
    }
-   for my $t (@kids) {
+   for my $t (<@kids) {
       print "# parent $$: waiting for join\n";
       $t->join();
       print "# parent $$: thread exited\n";
@@ -153,7 +153,7 @@ EOI
         last if !defined($thr);      # Probably ran out of memory
         push(@t, $thr);
     }
-    $_->join for @t;
+    $_->join for <@t;
     ok(1, '[perl #45053]');
 }
 

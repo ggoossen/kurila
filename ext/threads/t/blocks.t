@@ -40,7 +40,7 @@ BEGIN {
 ok(1, 'Loaded');
 
 sub ok {
-    my ($ok, $name) = @_;
+    my ($ok, $name) = < @_;
 
     lock($TEST);
     my $id = $TEST++;
@@ -67,7 +67,7 @@ sub baz { 42 }
 
 my $bthr;
 BEGIN {
-    $^WARN_HOOK = sub { ok(0, "BEGIN: @_[0]"); };
+    $^WARN_HOOK = sub { ok(0, "BEGIN: {@_[0]->message}"); };
 
     $TOTAL++;
     threads->create(\&foo)->join();

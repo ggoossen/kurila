@@ -56,7 +56,7 @@ sub dorecurse {
     my $ret;
     print $val;
     if(@_) {
-        $ret = threads->create(\&dorecurse, @_);
+        $ret = threads->create(\&dorecurse, < @_);
         $ret->join;
     }
 }
@@ -98,7 +98,7 @@ sub testsprintf {
 }
 
 sub threaded {
-    my ($string, $string_end) = @_;
+    my ($string, $string_end) = < @_;
 
   # Do the match, saving the output in appropriate variables
     $string =~ m/(.*)(is)(.*)/;
@@ -210,12 +210,12 @@ SKIP: {
     sub DESTROY    { %d{"A-". ref @_[0]}++ }
 
     package A1;
-    our @ISA = qw(A);
+    our @ISA = @(qw(A));
     sub CLONE_SKIP { %c{"A1-@_[0]"}++; 1; }
     sub DESTROY    { %d{"A1-". ref @_[0]}++ }
 
     package A2;
-    our @ISA = qw(A1);
+    our @ISA = @(qw(A1));
 
     # ---
 
@@ -224,12 +224,12 @@ SKIP: {
     sub DESTROY    { %d{"B-" . ref @_[0]}++ }
 
     package B1;
-    our @ISA = qw(B);
+    our @ISA = @(qw(B));
     sub CLONE_SKIP { %c{"B1-@_[0]"}++; 1; }
     sub DESTROY    { %d{"B1-" . ref @_[0]}++ }
 
     package B2;
-    our @ISA = qw(B1);
+    our @ISA = @(qw(B1));
 
     # ---
 
@@ -238,12 +238,12 @@ SKIP: {
     sub DESTROY    { %d{"C-" . ref @_[0]}++ }
 
     package C1;
-    our @ISA = qw(C);
+    our @ISA = @(qw(C));
     sub CLONE_SKIP { %c{"C1-@_[0]"}++; 0; }
     sub DESTROY    { %d{"C1-" . ref @_[0]}++ }
 
     package C2;
-    our @ISA = qw(C1);
+    our @ISA = @(qw(C1));
 
     # ---
 
@@ -251,7 +251,7 @@ SKIP: {
     sub DESTROY    { %d{"D-" . ref @_[0]}++ }
 
     package D1;
-    our @ISA = qw(D);
+    our @ISA = @(qw(D));
 
     package main;
 
@@ -264,7 +264,7 @@ SKIP: {
         sub f {
             my $depth = shift;
             my $cloned = ""; # XXX due to recursion, doesn't get initialized
-            $cloned .= "{dump::view($_)}" =~ m/ARRAY/ ? '1' : '0' for @objs;
+            $cloned .= "{dump::view($_)}" =~ m/ARRAY/ ? '1' : '0' for < @objs;
             is($cloned, ($depth ? '00010001111' : '11111111111'),
                 "objs clone skip at depth $depth");
             threads->create( \&f, $depth+1)->join if $depth +< 2;
