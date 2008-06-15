@@ -527,7 +527,7 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 #ifdef MAD
 			  {
 			      OP* o = newSVOP(OP_ANONCODE, 0,
-				(SV*)newATTRSUB($2, $3, $4, $5, $6));
+                                              (SV*)newATTRSUB($2, $3, $4, $5, scalar($6)));
 			      $$ = newOP(OP_NULL,0);
 			      op_getmad(o,$$,'&');
 			      op_getmad($3,$$,'n');
@@ -539,7 +539,7 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 			      $6->op_madprop = 0;
 			    }
 #else
-			  newATTRSUB($2, $3, $4, $5, $6);
+			  newATTRSUB($2, $3, $4, $5, scalar($6));
 			  $$ = (OP*)NULL;
 #endif
 			}

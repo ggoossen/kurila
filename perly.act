@@ -470,7 +470,7 @@ case 2:
 #ifdef MAD
 			  {
 			      OP* o = newSVOP(OP_ANONCODE, 0,
-				(SV*)newATTRSUB((ps[(2) - (6)].val.ival), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval), (ps[(6) - (6)].val.opval)));
+                                              (SV*)newATTRSUB((ps[(2) - (6)].val.ival), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval), scalar((ps[(6) - (6)].val.opval))));
 			      (yyval.opval) = newOP(OP_NULL,0);
 			      op_getmad(o,(yyval.opval),'&');
 			      op_getmad((ps[(3) - (6)].val.opval),(yyval.opval),'n');
@@ -482,7 +482,7 @@ case 2:
 			      (ps[(6) - (6)].val.opval)->op_madprop = 0;
 			    }
 #else
-			  newATTRSUB((ps[(2) - (6)].val.ival), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval), (ps[(6) - (6)].val.opval));
+			  newATTRSUB((ps[(2) - (6)].val.ival), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval), scalar((ps[(6) - (6)].val.opval)));
 			  (yyval.opval) = (OP*)NULL;
 #endif
 			;}
