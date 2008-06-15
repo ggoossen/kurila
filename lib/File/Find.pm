@@ -1282,7 +1282,7 @@ sub wrap_wanted {
 
 sub find {
     my $wanted = shift;
-    _find_opt( <wrap_wanted($wanted), < @_);
+    _find_opt( wrap_wanted($wanted), < @_);
 }
 
 sub finddepth {

@@ -18,7 +18,7 @@ WriteMakefile(
 package MY;
 
 sub upupfile {
-    File::Spec->catfile( <File::Spec->updir, < File::Spec->updir, @_[0]);
+    File::Spec->catfile( File::Spec->updir, File::Spec->updir, @_[0]);
 }
 
 sub postamble {

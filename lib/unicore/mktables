@@ -144,7 +144,7 @@ if ($FileList) {
 }
 
 foreach my $lib ('To', 'lib',
-		 map { <File::Spec->catdir("lib",$_)}
+		 map { File::Spec->catdir("lib",$_)}
 		 qw(gc_sc dt bc hst ea jt lb nt ccc)) {
   next if -d $lib;
   mkdir $lib, 0755 or die "mkdir '$lib': $!";
@@ -1037,7 +1037,7 @@ sub UnicodeData_Txt()
     ## Unassigned is the same as 'Cn'
     New_Alias(Is => 'Unassigned', SameAs => 'Cn', Fuzzy => 0);
 
-    %Cat{C}->Replace( <%Cat{C}->Merge(%Cat{Cn}));  ## Now merge in Cn into C
+    %Cat{C}->Replace( %Cat{C}->Merge(%Cat{Cn}));  ## Now merge in Cn into C
 
 
     # LC is Ll, Lu, and Lt.

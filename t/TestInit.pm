@@ -18,8 +18,8 @@ package TestInit;
 our $VERSION = 1.01;
 
 BEGIN {
-#    chdir 't' if -d 't';
-#    @INC = '../lib';
+    chdir 't' if -d 't';
+    @INC = @('../lib');
 }
 
 # Don't interfere with the taintedness of %ENV, this could perturbate tests

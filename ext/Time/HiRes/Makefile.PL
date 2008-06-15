@@ -158,7 +158,7 @@ __EOD__
 
 	    if ( $ok && exists %args{run} && %args{run}) {
 		my $tmp_exe =
-		    File::Spec->catfile( <File::Spec->curdir, $tmp_exe);
+		    File::Spec->catfile( File::Spec->curdir, $tmp_exe);
 		printf "Running $tmp_exe..." if $VERBOSE;
 		if (system($tmp_exe) == 0) {
 		    $ok = 1;

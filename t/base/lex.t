@@ -259,7 +259,7 @@ EOT
 sub xyz::foo { "bar" }
 no strict 'subs';
 my %str = %(
-    foo      => 1, <
+    foo      => 1,
     xyz::foo => 1,
     'xyz::bar' => 1,
 );

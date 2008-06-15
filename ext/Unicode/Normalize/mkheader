@@ -105,7 +105,7 @@ sub decomposeHangul {
 ##
 ## converts string "hhhh hhhh hhhh" to a numeric list
 ##
-sub _getHexArray { map hex, @_[0] =~ m/([0-9A-Fa-f]+)/g }
+sub _getHexArray { return @(map hex, @_[0] =~ m/([0-9A-Fa-f]+)/g) }
 
 while ($Combin =~ m/(.+)/g) {
     my @tab = @( split m/\t/, $1 );
@@ -224,7 +224,7 @@ sub split_into_char {
 
 sub _U_stringify {
     sprintf '"%s"', join '',
-	map sprintf("\\x\%02x", $_), < split_into_char( <_pack_U(< @_));
+	map sprintf("\\x\%02x", $_), < split_into_char( _pack_U(< @_));
 }
 
 foreach my $hash (\%Canon, \%Compat) {

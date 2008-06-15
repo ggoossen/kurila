@@ -32,7 +32,7 @@ sub post_constants {
 
 sub headerpath {
     if ($core) {
-	return File::Spec->catdir( <File::Spec->updir, <
+	return File::Spec->catdir( File::Spec->updir,
 				   File::Spec->updir);
     } else {
 	return File::Spec->catdir(%Config::Config{archlibexp}, "CORE");
@@ -41,7 +41,7 @@ sub headerpath {
 
 sub MY::postamble {
     my $headerpath = headerpath();
-    my @headers = @( map { < File::Spec->catfile($headerpath, $_) } qw(op.h cop.h) );
+    my @headers = @( map { File::Spec->catfile($headerpath, $_) } qw(op.h cop.h) );
     my $noecho = shift->{NOECHO};
 
 "

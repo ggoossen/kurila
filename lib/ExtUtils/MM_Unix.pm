@@ -1504,7 +1504,7 @@ sub init_PM {
                 if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
 	                                       {$1}i;
 
-	    my($inst) = < $self->catfile($prefix,$striplibpath);
+	    my $inst = $self->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose +>= 2);

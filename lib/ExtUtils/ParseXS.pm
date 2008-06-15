@@ -999,17 +999,17 @@ EOF
       %XsubAliases{$pname} = 0
 	unless defined %XsubAliases{$pname} ;
       while ( ($name, $value) = each %XsubAliases) {
-	push(@InitFileCode, < Q(<<"EOF"));
+	push(@InitFileCode, Q(<<"EOF"));
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        XSANY.any_i32 = $value ;
 EOF
-	push(@InitFileCode, < Q(<<"EOF")) if $proto;
+	push(@InitFileCode, Q(<<"EOF")) if $proto;
 #        sv_setpv((SV*)cv$proto) ;
 EOF
       }
     }
     elsif ((nelems @Attributes)) {
-      push(@InitFileCode, < Q(<<"EOF"));
+      push(@InitFileCode, Q(<<"EOF"));
 #        cv = newXS(\"$pname\", XS_$Full_func_name, file);
 #        apply_attrs_string("$Package", cv, "{join ' ', <@Attributes}", 0);
 EOF
@@ -1017,11 +1017,11 @@ EOF
     elsif ($interface) {
       while ( ($name, $value) = each %Interfaces) {
 	$name = "$Package\::$name" unless $name =~ m/::/;
-	push(@InitFileCode, < Q(<<"EOF"));
+	push(@InitFileCode, Q(<<"EOF"));
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        $interface_macro_set(cv,$value) ;
 EOF
-	push(@InitFileCode, < Q(<<"EOF")) if $proto;
+	push(@InitFileCode, Q(<<"EOF")) if $proto;
 #        sv_setpv((SV*)cv$proto) ;
 EOF
       }

@@ -102,7 +102,7 @@ sub _quote_args {
 }
 
 sub _populate_hash {
-    return map {$_, 1} split m/\s+/, @_[0];
+    return @( map {$_, 1} split m/\s+/, @_[0] );
 }
 
 if ($::failed) {

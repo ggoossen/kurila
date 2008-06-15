@@ -29,7 +29,7 @@ $Verbose = defined %ENV{PERL_MM_MANIFEST_VERBOSE} ?
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 
-$DEFAULT_MSKIP = File::Spec->catfile( < dirname(__FILE__), "$MANIFEST.SKIP" );
+$DEFAULT_MSKIP = File::Spec->catfile( dirname(__FILE__), "$MANIFEST.SKIP" );
 
 
 =head1 NAME
@@ -84,7 +84,7 @@ that are found in the existing F<MANIFEST> file in the new one.
 =cut
 
 sub _sort {
-    return sort { lc $a cmp lc $b } < @_;
+    return @(sort { lc $a cmp lc $b } < @_);
 }
 
 sub mkmanifest {

@@ -60,7 +60,7 @@ sub _catname {
 	$to = ':' . $to if $to !~ m/:/;
     }
 
-    return File::Spec->catfile($to, < basename($from));
+    return File::Spec->catfile($to, basename($from));
 }
 
 # _eq($from, $to) tells whether $from and $to are identical
