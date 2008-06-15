@@ -172,14 +172,14 @@ sub force_unlink {
 ## write the lines to the file only if the contents have not changed.
 ## Filename can be given as an arrayref of directory names
 ##
-sub WriteIfChanged($\@)
+sub WriteIfChanged($@)
 {
     my $file  = shift;
     my $lines = shift;
 
     $file = File::Spec->catfile(< @$file) if ref $file;
 
-    my $TextToWrite = join '', < @$lines;
+    my $TextToWrite = join '', < $lines;
     if (open IN, "<", $file) {
         local($/) = undef;
         my $PreviousText = ~< *IN;
@@ -631,7 +631,7 @@ sub Table::Write
 
     push @OUT, "END\n";
 
-    WriteIfChanged($filename, < @OUT);
+    WriteIfChanged($filename, @OUT);
 }
 
 ## This used only for making the test script.
@@ -1115,11 +1115,11 @@ sub UnicodeData_Txt()
 			      PVA_reverse PVA_abbr_map)) {
 	    # Should I really jump through typeglob hoops just to avoid a
 	    # symbolic reference? (%{"utf8::$name})
-	    push @PVA, "\n", "\%utf8::$name = (\n", <
+	    push @PVA, "\n", "\%utf8::$name = \%(\n", <
 		simple_dumper (< %{%utf8::{$name}}), ");\n";
 	}
 	push @PVA, "1;\n";
-	WriteIfChanged("PVA.pl", < @PVA);
+	WriteIfChanged("PVA.pl", @PVA);
     }
 
     # $Bidi->Write("Bidirectional.pl");
@@ -1904,7 +1904,7 @@ sub WriteAllMappings()
                    "##\n\n",
                    sort { substr($a,2) cmp substr($b, 2) } < @MAP,
                   );
-        WriteIfChanged('Properties', < @OUT);
+        WriteIfChanged('Properties', @OUT);
     }
 
     use Text::Tabs ();  ## using this makes the files about half the size
@@ -1917,7 +1917,7 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n",
                    "##\n\n",
                    "## Mapping from name to filename in ./lib/gc_sc\n",
-                   "\%utf8::Exact = (\n",
+                   "\%utf8::Exact = \%(\n",
                   );
 
 	%Exact{InGreek} = 'InGreekA';  # this is evil kludge
@@ -1930,7 +1930,7 @@ sub WriteAllMappings()
         }
         push @OUT, ");\n1;\n";
 
-        WriteIfChanged('Exact.pl', < @OUT);
+        WriteIfChanged('Exact.pl', @OUT);
     }
 
     ## Write Canonical.pl
@@ -1941,7 +1941,7 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n",
                    "##\n\n",
                    "## Mapping from lc(canonical name) to filename in ./lib\n",
-                   "\%utf8::Canonical = (\n",
+                   "\%utf8::Canonical = \%(\n",
                   );
         my $Trail = ""; ## used just to keep the spacing pretty
         for my $Name (sort keys %Canonical)
@@ -1959,7 +1959,7 @@ sub WriteAllMappings()
             push @OUT, < Text::Tabs::unexpand($Text);
         }
         push @OUT, ");\n1\n";
-        WriteIfChanged('Canonical.pl', < @OUT);
+        WriteIfChanged('Canonical.pl', @OUT);
     }
 
     MakePropTestScript() if $MakeTestScript;
@@ -2012,7 +2012,7 @@ sub SpecialCasing_txt()
 	    @(
 	     $HEADER, "\n",
 	     "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-	     "\%utf8::ToSpec$case =\n(\n",
+	     "\%utf8::ToSpec$case =\n\%(\n",
 	    );
 
         for my $prop (sort { $a->[0] <+> $b->[0] } < @{%CaseInfo{$case}}) {
@@ -2031,7 +2031,7 @@ sub SpecialCasing_txt()
                     $NormalCase,
                     "END\n"
                     );
-        WriteIfChanged(\@("To","$case.pl"), < @OUT);
+        WriteIfChanged(\@("To","$case.pl"), @OUT);
     }
 }
 
@@ -2075,7 +2075,7 @@ sub CaseFolding_txt()
 	@(
 	 $HEADER, "\n",
 	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-	 "\%utf8::ToSpecFold =\n(\n",
+	 "\%utf8::ToSpecFold =\n\%(\n",
 	);
     for my $code (sort { $a <+> $b } keys %Fold) {
         my $foldstr =
@@ -2089,7 +2089,7 @@ sub CaseFolding_txt()
                 "END\n",
                );
 
-    WriteIfChanged(\@("To","Fold.pl"), < @OUT);
+    WriteIfChanged(\@("To","Fold.pl"), @OUT);
 }
 
 ## Do it....

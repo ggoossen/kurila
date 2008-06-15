@@ -168,8 +168,8 @@ parent
 child
 ########
 $| = 1;
-my @a = (1..3);
-for (@a) {
+my @a = @(1..3);
+for (<@a) {
     if (fork) {
 	print "parent $_\n";
 	$_ = "[$_]";
@@ -179,7 +179,7 @@ for (@a) {
 	$_ = "-$_-";
     }
 }
-print "@a\n";
+print "{join ' ', <@a}\n";
 EXPECT
 parent 1
 child 1
@@ -471,7 +471,7 @@ EXPECT
 1
 ########
 # [perl #39145] Perl_dounwind() crashing with Win32's fork() emulation
-sub { @_ = 3; fork ? die "1" : die "1" }->(2);
+sub { @_ = @(3); fork ? die "1" : die "1" }->(2);
 EXPECT
 1 at - line 2.
     main::__ANON__ called at - line 2.

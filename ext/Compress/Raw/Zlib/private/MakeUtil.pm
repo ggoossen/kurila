@@ -217,7 +217,7 @@ sub doUpDown
     return if -d @_[0];
 
     local ($^I) = ($^O eq 'VMS') ? "_bak" : ".bak";
-    local (< @ARGV) = shift;
+    local @ARGV = @(shift);
  
     while ( ~< *ARGV)
     {
@@ -225,13 +225,13 @@ sub doUpDown
 
         &{ $our_sub }() if $our_sub ;
         &{ $warn_sub }() if $warn_sub ;
-        print ;
+        print $_;
     }
 
     return if eof ;
 
     while ( ~< *ARGV)
-      { print }
+      { print $_; }
 }
 
 sub doUpDownViaCopy

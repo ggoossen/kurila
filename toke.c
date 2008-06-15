@@ -4039,7 +4039,7 @@ Perl_yylex(pTHX)
 	    if (tmp == '~')
 		PMop(OP_MATCH);
 	    if (tmp && isSPACE(*s) && ckWARN(WARN_SYNTAX)
-		&& strchr("+-*/%.^&|<",tmp))
+		&& strchr("+-*/%.^&|",tmp))
 		Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
 			    "Reversed %c= operator",(int)tmp);
 	    s--;

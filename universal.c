@@ -1877,11 +1877,20 @@ XS(XS_dump_view)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
 
-    if (SvGMAGICAL(sv))
-	mg_get(sv);
+    SvGETMAGIC(sv);
 
     if ( ! SvOK(sv) ) {
 	sv_setpv(retsv, "undef");
+	XSRETURN(1);
+    }
+
+    if ( SvAVOK(sv) ) {
+	sv_setpv(retsv, "@(ARRAY (TODO))");
+	XSRETURN(1);
+    }
+
+    if ( SvHVOK(sv) ) {
+	sv_setpv(retsv, "%(HASH (TODO))");
 	XSRETURN(1);
     }
 

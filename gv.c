@@ -1227,7 +1227,7 @@ Perl_gv_fullname4(pTHX_ SV *sv, const GV *gv, const char *prefix, bool keepmain)
     PERL_ARGS_ASSERT_GV_FULLNAME4;
 
     if (!hv) {
-	SvOK_off(sv);
+	SvPVOK_off(sv);
 	return;
     }
     sv_setpv(sv, prefix ? prefix : "");

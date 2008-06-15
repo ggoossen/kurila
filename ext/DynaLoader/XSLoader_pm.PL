@@ -49,7 +49,7 @@ sub load {
 
     goto retry unless $module and defined &dl_load_file;
 
-    my @modparts = split(m/::/,$module);
+    my @modparts = @( split(m/::/,$module) );
     my $modfname = @modparts[-1];
 
 EOT
@@ -70,9 +70,9 @@ print OUT <<'EOT' if $^O eq 'os2';
 EOT
 
 print OUT <<'EOT';
-    my $modpname = join('/',@modparts);
+    my $modpname = join('/', < @modparts);
     my $modlibname = (caller())[1];
-    my $c = @modparts;
+    my $c = nelems @modparts;
     $modlibname =~ s,[\\/][^\\/]+$,, while $c--;	# Q&D basename
     my $file = "$modlibname/auto/$modpname/$modfname.$dl_dlext";
 
@@ -85,7 +85,7 @@ print OUT <<'EOT';
 
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
-    @DynaLoader::dl_require_symbols = ($bootname);
+    @DynaLoader::dl_require_symbols = @($bootname);
 
     my $boot_symbol_ref;
 
@@ -140,7 +140,7 @@ sub bootstrap_inherit {
 
     my $module = @_[0];
     local *DynaLoader::isa = *{Symbol::fetch_glob("$module\::ISA")};
-    local @DynaLoader::isa = (@DynaLoader::isa, 'DynaLoader');
+    local @DynaLoader::isa = @(@DynaLoader::isa, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     require DynaLoader;
     DynaLoader::bootstrap(@_);

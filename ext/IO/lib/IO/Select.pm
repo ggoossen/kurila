@@ -103,7 +103,7 @@ sub can_read
  my $timeout = shift;
  my $r = $vec->[VEC_BITS];
 
- defined($r) && (select($r,undef,undef,$timeout) +> 0)
+ defined($r) && ((nelems @(select($r,undef,undef,$timeout))) +> 0)
     ? handles($vec, $r)
     : ();
 }

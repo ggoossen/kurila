@@ -60,7 +60,7 @@ our %foo = %( qw(even more random stuff) );
 undef *foo;
 is ($foo, undef);
 is (scalar nelems @foo, 0);
-is (scalar %foo, 0);
+is ((scalar %foo), %foo);
 
 {
     # test warnings from assignment of undef to glob
@@ -223,6 +223,8 @@ is(@j[0], 1);
     my $x = ~< $v;
     is ($x, "perl\n");
 }
+print STDERR "{dump::view($^DIE_HOOK)}foobar\n";
+die "xx";
 
 {
     our $e = '';
@@ -270,7 +272,6 @@ foreach (qw (oonk ga_shloip)) {
 my $proto = eval 'prototype \&oonk';
 die if $@;
 is ($proto, "pie", "String is promoted to prototype");
-
 
 # A reference to a value is used to generate a constant subroutine
 foreach my $value (3, "Perl rules", \42, qr/whatever/, \@(1,2,3), \%(1=>2),

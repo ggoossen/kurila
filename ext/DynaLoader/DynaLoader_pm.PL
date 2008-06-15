@@ -140,9 +140,9 @@ my $Mac_FS;
 $Mac_FS = try { require Mac::FileSpec::Unixish };
 <</$^O-eq-MacOS>>
 
-our @dl_require_symbols = ();       # names of symbols we need
-our @dl_resolve_using   = ();       # names of files to link with
-our @dl_library_path    = ();       # path to look for files
+our @dl_require_symbols = @();       # names of symbols we need
+our @dl_resolve_using   = @();       # names of files to link with
+our @dl_library_path    = @();       # path to look for files
 
 #XSLoader.pm may have added elements before we were required
 our @dl_shared_objects;       # shared objects for symbols we have 
