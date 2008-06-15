@@ -12,7 +12,7 @@
 #    doesn't understand) may be split into two lines that will still be run
 #    with one shell.
 
-my ($filein, $fileout) = @ARGV;
+my ($filein, $fileout) = < @ARGV;
 
 open my $in, "<", $filein or die "Error opening input file: $!\n";
 open my $out, ">", " $fileout" or die "Error opening output file: $!\n";

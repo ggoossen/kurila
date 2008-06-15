@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -26,36 +26,36 @@ require Pod::Simple::DumpAsXML; ok 1;
 
 require Pod::Simple::XMLOutStream; ok 1;
 
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
+sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 print "# Simple identity tests...\n";
 
-&ok( e "", "" );
-&ok( e "\n", "", );
-&ok( e "\n", "\n", );
-&ok( e "puppies\n\n\n\n", "", );
+&ok( < e "", "" );
+&ok( < e "\n", "", );
+&ok( < e "\n", "\n", );
+&ok( < e "puppies\n\n\n\n", "", );
 
 
 print "# Contentful identity tests...\n";
 
-&ok( e "=pod\n\nFoo\n",         "=pod\n\nFoo\n"         );
-&ok( e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\n\n\nFoo\n\n\n" );
-&ok( e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\nFoo\n"         );
+&ok( < e "=pod\n\nFoo\n",         "=pod\n\nFoo\n"         );
+&ok( < e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\n\n\nFoo\n\n\n" );
+&ok( < e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\nFoo\n"         );
 
 # Now with some more newlines
-&ok( e "\n\n=pod\n\nFoo\n",     "\n\n=pod\n\nFoo\n"     );
-&ok( e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\n\n\nFoo\n\n\n" );
-&ok( e "=pod\n\n\n\nFoo\n\n\n", "\n\n=pod\n\nFoo\n"     );
+&ok( < e "\n\n=pod\n\nFoo\n",     "\n\n=pod\n\nFoo\n"     );
+&ok( < e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\n\n\nFoo\n\n\n" );
+&ok( < e "=pod\n\n\n\nFoo\n\n\n", "\n\n=pod\n\nFoo\n"     );
 
 
-&ok( e "=head1 Foo\n",          "=head1 Foo\n"          );
-&ok( e "=head1 Foo\n\n=cut\n",  "=head1 Foo\n\n=cut\n"  );
-&ok( e "=head1 Foo\n\n=cut\n",  "=head1 Foo\n"          );
+&ok( < e "=head1 Foo\n",          "=head1 Foo\n"          );
+&ok( < e "=head1 Foo\n\n=cut\n",  "=head1 Foo\n\n=cut\n"  );
+&ok( < e "=head1 Foo\n\n=cut\n",  "=head1 Foo\n"          );
 
 # Now just add some newlines...
-&ok( e "\n\n\n\n=head1 Foo\n",  "\n\n\n\n=head1 Foo\n"  );
-&ok( e "=head1 Foo\n\n=cut\n",  "=head1 Foo\n\n=cut\n"  );
-&ok( e "=head1 Foo\n\n=cut\n",  "\n\n\n\n=head1 Foo\n"  );
+&ok( < e "\n\n\n\n=head1 Foo\n",  "\n\n\n\n=head1 Foo\n"  );
+&ok( < e "=head1 Foo\n\n=cut\n",  "=head1 Foo\n\n=cut\n"  );
+&ok( < e "=head1 Foo\n\n=cut\n",  "\n\n\n\n=head1 Foo\n"  );
 
 
 print "# Simple XMLification tests...\n";

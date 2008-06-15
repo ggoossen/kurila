@@ -18,7 +18,7 @@ my $Perl = which_perl();
 
 $|=1;
 
-my @prgs = ();
+my @prgs = @( () );
 while( ~< *DATA) { 
     if(m/^#{8,}\s*(.*)/) { 
         push @prgs, \@('', $1);
@@ -27,10 +27,10 @@ while( ~< *DATA) {
         @prgs[-1]->[0] .= $_;
     }
 }
-plan tests => scalar @prgs;
+plan tests => scalar nelems @prgs;
 
-foreach my $prog (@prgs) {
-    my($raw_prog, $name) = @$prog;
+foreach my $prog (< @prgs) {
+    my($raw_prog, $name) = < @$prog;
 
     my $switch;
     if ($raw_prog =~ s/^\s*(-\w.*)\n//){

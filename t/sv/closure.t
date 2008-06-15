@@ -20,7 +20,7 @@ sub test (&) {
 }
 
 my $i = 1;
-sub foo { $i = shift if @_; $i }
+sub foo { $i = shift if (nelems @_); $i }
 
 # no closure
 test { foo == 1 };
@@ -28,8 +28,8 @@ foo(2);
 test { foo == 2 };
 
 # closure: lexical outside sub
-my $foo = sub {$i = shift if @_; $i };
-my $bar = sub {$i = shift if @_; $i };
+my $foo = sub {$i = shift if (nelems @_); $i };
+my $bar = sub {$i = shift if (nelems @_); $i };
 test {&$foo() == 2 };
 &$foo(3);
 test {&$foo() == 3 };
@@ -41,7 +41,7 @@ test {&$bar() == 3 };
 # closure: lexical inside sub
 sub bar {
   my $i = shift;
-  sub { $i = shift if @_; $i }
+  sub { $i = shift if (nelems @_); $i }
 }
 
 $foo = bar(4);
@@ -54,12 +54,12 @@ test {&$bar() == 5 };
 # nested closures
 sub bizz {
   my $i = 7;
-  if (@_) {
+  if ((nelems @_)) {
     my $i = shift;
-    sub {$i = shift if @_; $i };
+    sub {$i = shift if (nelems @_); $i };
   } else {
     my $i = $i;
-    sub {$i = shift if @_; $i };
+    sub {$i = shift if (nelems @_); $i };
   }
 }
 $foo = bizz();
@@ -76,7 +76,7 @@ test {&$foo(11)-1 == &$bar()};
 my @foo;
 for (qw(0 1 2 3 4)) {
   my $i = $_;
-  @foo[$_] = sub {$i = shift if @_; $i };
+  @foo[$_] = sub {$i = shift if (nelems @_); $i };
 }
 
 test {
@@ -103,12 +103,12 @@ sub barf {
   my @foo;
   for (qw(0 1 2 3 4)) {
     my $i = $_;
-    @foo[$_] = sub {$i = shift if @_; $i };
+    @foo[$_] = sub {$i = shift if (nelems @_); $i };
   }
   @foo;
 }
 
-@foo = barf();
+@foo = @( < barf() );
 test {
   &{@foo[0]}() == 0 and
   &{@foo[1]}() == 1 and
@@ -174,7 +174,7 @@ test {
 {
     my $w;
     $w = sub {
-	my ($i) = @_;
+	my ($i) = < @_;
 	test { $i == 10 };
 	sub { $w };
     };
@@ -194,7 +194,7 @@ test {
     $debugging = 1 if defined(@ARGV[0]) and @ARGV[0] eq '-debug';
 
     # The expected values for these tests
-    %expected = (
+    %expected = %(
 	'global_scalar'	=> 1001,
 	'global_array'	=> 2101,
 	'global_hash'	=> 3004,
@@ -316,13 +316,13 @@ END
 	  }
 
 	  $sub_test = $test;
-	  @inners = ( qw!global_scalar global_array global_hash! ,
+	  @inners = @( qw!global_scalar global_array global_hash! ,
 	    qw!fs_scalar fs_array fs_hash! );
 	  push @inners, 'foreach' if $within eq 'foreach';
 	  if ($where_declared ne 'filescope') {
 	    push @inners, qw!sub_scalar sub_array sub_hash!;
 	  }
-	  for $inner_sub_test (@inners) {
+	  for $inner_sub_test (< @inners) {
 
 	    if ($inner_type eq 'named') {
 	      $code .= "    sub named_$sub_test "
@@ -388,7 +388,7 @@ END
 	  }
 
 	  # Now, we can actually prep to run the tests.
-	  for $inner_sub_test (@inners) {
+	  for $inner_sub_test (< @inners) {
 	    $expected = %expected{$inner_sub_test} or
 	      die "expected $inner_sub_test missing";
 
@@ -442,7 +442,7 @@ END
 	      close READ2;
 	      open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $!";
 	      open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $!";
-	      exec which_perl(), '-w', '-MTestInit', '-'
+	      exec < which_perl(), '-w', '-MTestInit', '-'
 		or die "Can't exec perl: $!";
 	    } else {
 	      # Parent process here.
@@ -460,7 +460,7 @@ END
 	    # No fork().  Do it the hard way.
 	    my $cmdfile = "tcmd$$";  $cmdfile++ while -e $cmdfile;
 	    my $errfile = "terr$$";  $errfile++ while -e $errfile;
-	    my @tmpfiles = ($cmdfile, $errfile);
+	    my @tmpfiles = @($cmdfile, $errfile);
 	    open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
 	    my $cmd = which_perl();
 	    $cmd .= " -w $cmdfile 2>$errfile";
@@ -479,11 +479,11 @@ END
 	    }
 	    if ($?) {
 	      printf "not ok: exited with error code \%04X\n", $?;
-	      $debugging or do { 1 while unlink @tmpfiles };
+	      $debugging or do { 1 while unlink < @tmpfiles };
 	      exit;
 	    }
 	    { local $/; open IN, "<", $errfile; $errors = ~< *IN; close IN }
-	    1 while unlink @tmpfiles;
+	    1 while unlink < @tmpfiles;
 	  }
 	  print $output;
 	  print STDERR $errors;
@@ -531,7 +531,7 @@ $a = eval q(
 	sub { eval '$x' }
     ]
 );
-@a = ('\1\1\1\1\1\1\1') x 100; # realloc recently-freed CVs
+@a = @( ('\1\1\1\1\1\1\1') x 100 ); # realloc recently-freed CVs
 test { $a->() == 123 };
 
 # this coredumped on <= 5.8.0 because evaling the closure caused

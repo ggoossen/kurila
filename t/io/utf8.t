@@ -149,9 +149,9 @@ SKIP: {
 	my @warnings;
 	open F, "<:utf8", "a" or die $!;
 	$x = ~< *F; chomp $x;
-	local $^WARN_HOOK = sub { push @warnings, @_[0]->message; };
+	local $^WARN_HOOK = sub { push @warnings, < @_[0]->message; };
 	try { sprintf "\%vd\n", $x };
-	is (scalar @warnings, 1);
+	is (scalar nelems @warnings, 1);
 	like (@warnings[0], qr/Malformed UTF-8 character \(unexpected continuation byte 0x82, with no preceding start byte/);
 }
 
@@ -159,9 +159,9 @@ close F;
 unlink('a');
 
 open F, ">:utf8", "a";
-my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
+my @a = @( map { chr(1 << ($_ << 2)) } 0..5 ); # 0x1, 0x10, .., 0x100000
 unshift @a, chr(0); # ... and a null byte in front just for fun
-print F @a;
+print F < @a;
 close F;
 
 my $c;
@@ -170,7 +170,7 @@ my $c;
 open F, "<:utf8", "a";
 $a = 0;
 my $failed;
-for (@a) {
+for (< @a) {
     unless (($c = read(F, $b, 1) == 1)  &&
             length($b)           == 1  &&
             ord($b)              == ord($_) &&
@@ -178,7 +178,7 @@ for (@a) {
         print '# ord($_)           == ', ord($_), "\n";
         print '# ord($b)           == ', ord($b), "\n";
         print '# length($b)        == ', length($b), "\n";
-        print '# bytes::length($b) == ', bytes::length($b), "\n";
+        print '# bytes::length($b) == ', < bytes::length($b), "\n";
         print '# tell(F)           == ', tell(F), "\n";
         print '# $a                == ', $a, "\n";
         print '# $c                == ', $c, "\n";
@@ -190,13 +190,13 @@ close F;
 is($failed, undef);
 
 {
-    my @a = ( \@( 0x007F, "bytes" ),
+    my @a = @( \@( 0x007F, "bytes" ),
 	      \@( 0x0080, "bytes" ),
 	      \@( 0x0080, "utf8"  ),
 	      \@( 0x0100, "utf8"  ) );
     my $t = 34;
-    for my $u (@a) {
-	for my $v (@a) {
+    for my $u (< @a) {
+	for my $v (< @a) {
 	    # print "# @$u - @$v\n";
 	    open F, ">", "a";
 	    binmode(F, ":" . $u->[1]);

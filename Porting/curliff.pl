@@ -11,7 +11,7 @@ use strict;
 use vars qw($r);
 
 # This list is also in makerel.
-my @FILES = qw(
+my @FILES = @( qw(
 	       djgpp/configure.bat
 	       README.ce
 	       README.dos
@@ -27,10 +27,10 @@ my @FILES = qw(
 	       win32/ce-helpers/compile-all.bat
 	       win32/ce-helpers/compile.bat
 	       win32/ce-helpers/registry.bat
-	       );
+	       ) );
 
 {
-    local($^I, @ARGV) = ('.orig', @FILES);
+    local($^I, < @ARGV) = ('.orig', < @FILES);
     while ( ~< *ARGV) {
 	if ($r) {
 	    s/\015\012/\012/;		# Curliffs to liffs.

@@ -5,17 +5,17 @@ use strict ;
 use warnings ;
 
 die "Usage: gzappend gz-file file...\n"
-    unless @ARGV ;
+    unless (nelems @ARGV) ;
 
 
 my $output = shift @ARGV ;
 
-@ARGV = '-' unless @ARGV ;
+@ARGV = @( '-' ) unless (nelems @ARGV) ;
 
 my $gz = IO::Compress::Gzip->new( $output, Merge => 1)
      or die "Cannot open $output: $GzipError\n" ;
 
-$gz->write( \@(@ARGV) )
+$gz->write( \@(< @ARGV) )
      or die "Cannot open $output: $GzipError\n" ;
 
 $gz->close;

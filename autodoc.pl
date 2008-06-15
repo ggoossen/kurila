@@ -48,13 +48,13 @@ sub walk_table (&@) {
 	s/\s+$//;
 	my @args;
 	if (m/^\s*(#|$)/) {
-	    @args = $_;
+	    @args = @( $_ );
 	}
 	else {
-	    @args = split m/\s*\|\s*/, $_;
+	    @args = @( split m/\s*\|\s*/, $_ );
 	}
-	s/\b(NN|NULLOK)\b\s+//g for @args;
-	print $F $function->(@args);
+	s/\b(NN|NULLOK)\b\s+//g for < @args;
+	print $F < $function->(< @args);
     }
     print $F $trailer if $trailer;
     unless (ref $filename) {
@@ -70,7 +70,7 @@ my %seenfuncs;
 my $curheader = "Unknown section";
 
 sub autodoc ($$) { # parse a file and extract documentation info
-    my($fh,$file) = @_;
+    my($fh,$file) = < @_;
     my($in, $doc, $line);
 FUNC:
     while (defined($in = ~< $fh)) {
@@ -82,7 +82,7 @@ FUNC:
 	if ($in =~ m/^=for\s+apidoc\s+(.*?)\s*\n/) {
 	    my $proto = $1;
 	    $proto = "||$proto" unless $proto =~ m/\|/;
-	    my($flags, $ret, $name, @args) = split m/\|/, $proto;
+	    my($flags, $ret, $name, < @args) = split m/\|/, $proto;
 	    my $docs = "";
 DOC:
 	    while (defined($doc = ~< $fh)) {
@@ -97,14 +97,14 @@ DOC:
 	    $docs = "\n$docs" if $docs and $docs !~ m/^\n/;
 	    if ($flags =~ m/m/) {
 		if ($flags =~ m/A/) {
-		    %apidocs{$curheader}{$name} = \@($flags, $docs, $ret, $file, @args);
+		    %apidocs{$curheader}{$name} = \@($flags, $docs, $ret, $file, < @args);
 		}
 		else {
-		    %gutsdocs{$curheader}{$name} = \@($flags, $docs, $ret, $file, @args);
+		    %gutsdocs{$curheader}{$name} = \@($flags, $docs, $ret, $file, < @args);
 		}
 	    }
 	    else {
-		%docfuncs{$name} = \@($flags, $docs, $ret, $file, $curheader, @args);
+		%docfuncs{$name} = \@($flags, $docs, $ret, $file, $curheader, < @args);
 	    }
 	    if (defined $doc) {
 		if ($doc =~ m/^=(?:for|head)/) {
@@ -119,8 +119,8 @@ DOC:
 }
 
 sub docout ($$$) { # output the docs for one function
-    my($fh, $name, $docref) = @_;
-    my($flags, $docs, $ret, $file, @args) = @$docref;
+    my($fh, $name, $docref) = < @_;
+    my($flags, $docs, $ret, $file, < @args) = < @$docref;
     $name =~ s/\s*$//;
 
     $docs .= "NOTE: this function is experimental and may change or be
@@ -138,7 +138,7 @@ removed without notice.\n\n" if $flags =~ m/x/;
 	print $fh "\t$ret\t$name\n\n";
     } else { # full usage
 	print $fh "\t$ret\t$name";
-	print $fh "(" . join(", ", @args) . ")";
+	print $fh "(" . join(", ", < @args) . ")";
 	print $fh "\n\n";
     }
     print $fh "=for hackers\nFound in file $file\n\n";
@@ -185,22 +185,22 @@ safer_unlink "pod/perlapi.pod";
 my $doc = safer_open("pod/perlapi.pod");
 
 walk_table {	# load documented functions into appropriate hash
-    if (@_ +> 1) {
-	my($flags, $retval, $func, @args) = @_;
+    if ((nelems @_) +> 1) {
+	my($flags, $retval, $func, < @args) = < @_;
 	return "" unless $flags =~ m/d/;
 	$func =~ s/\t//g; $flags =~ s/p//; # clean up fields from embed.pl
 	$retval =~ s/\t//;
 	my $docref = delete %docfuncs{$func};
 	%seenfuncs{$func} = 1;
-	if ($docref and @$docref) {
+	if ($docref and nelems @$docref) {
 	    if ($flags =~ m/A/) {
 		$docref->[0].="x" if $flags =~ m/M/;
 		%apidocs{$docref->[4]}{$func} =
 		    \@($docref->[0] . 'A', $docref->[1], $retval, $docref->[3],
-			@args);
+			< @args);
 	    } else {
 		%gutsdocs{$docref->[4]}{$func} =
-		    \@($docref->[0], $docref->[1], $retval, $docref->[3], @args);
+		    \@($docref->[0], $docref->[1], $retval, $docref->[3], < @args);
 	    }
 	}
 	else {

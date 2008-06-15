@@ -38,7 +38,7 @@ use vars qw/ $VERSION @EXPORT /;
 
 $VERSION = '0.02';
 
-@EXPORT = (qw/
+@EXPORT = @(qw/
 	   T_SV
 	   T_SVREF
 	   T_AVREF

@@ -98,8 +98,8 @@ is($XS::APItest::END_called_PP, undef, "END not yet called");
     local $^WARN_HOOK = sub { push @trap, @_[0]->{description} };
     require XS::APItest;
 
-    @trap = sort @trap;
-    is(scalar @trap, 2, "There were 2 warnings");
+    @trap = sort < @trap;
+    is(scalar nelems @trap, 2, "There were 2 warnings");
     is(@trap[0], "Too late to run CHECK block");
     is(@trap[1], "Too late to run INIT block");
 }

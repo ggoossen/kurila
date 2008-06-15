@@ -15,7 +15,7 @@ use strict;
 my $MASTER_CFG = "config_h.SH";
 my %MASTER_CFG;
 
-my @CFG = (
+my @CFG = @(
 	   # This list contains both 5.8.x and 5.9.x files,
 	   # we check from MANIFEST whether they are expected to be present.
 	   # We can't base our check on $], because that's the version of the
@@ -38,7 +38,7 @@ my @CFG = (
 	  );
 
 sub read_file {
-    my ($fn, $sub) = @_;
+    my ($fn, $sub) = < @_;
     if (open(my $fh, "<", $fn)) {
 	local $_;
 	while ( ~< $fh) {
@@ -60,7 +60,7 @@ sub config_h_SH_reader {
     }
 }
 
-read_file($MASTER_CFG,
+read_file($MASTER_CFG, <
 	  config_h_SH_reader(\%MASTER_CFG));
 
 my %MANIFEST;
@@ -70,16 +70,16 @@ read_file("MANIFEST",
 	      %MANIFEST{$1}++ if m/^(.+?)\t/;
 	  });
 
-my @MASTER_CFG = sort keys %MASTER_CFG;
+my @MASTER_CFG = @( sort keys %MASTER_CFG );
 
 sub check_cfg {
-    my ($fn, $cfg) = @_;
-    for my $v (@MASTER_CFG) {
+    my ($fn, $cfg) = < @_;
+    for my $v (< @MASTER_CFG) {
 	print "$fn: missing '$v'\n" unless exists $cfg->{$v};
     }
 }
 
-for my $cfg (@CFG) {
+for my $cfg (< @CFG) {
     unless (exists %MANIFEST{$cfg}) {
 	print "[skipping not-expected '$cfg']\n";
 	next;

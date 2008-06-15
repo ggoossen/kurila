@@ -8,7 +8,7 @@ use Digest;
     $VERSION = 1;
 
     require Digest::base;
-    @ISA = qw(Digest::base);
+    @ISA = @( qw(Digest::base) );
 
     sub new {
 	my $class = shift;

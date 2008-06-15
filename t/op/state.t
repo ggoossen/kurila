@@ -19,22 +19,22 @@ sub stateful {
     state $y //= 1;
     my $z = 2;
     state ($t) //= 3;
-    return ($x++, $y++, $z++, $t++);
+    return  @($x++, $y++, $z++, $t++);
 }
 
-my ($x, $y, $z, $t) = stateful();
+my ($x, $y, $z, $t) = < stateful();
 is( $x, 0, 'uninitialized state var' );
 is( $y, 1, 'initialized state var' );
 is( $z, 2, 'lexical' );
 is( $t, 3, 'initialized state var, list syntax' );
 
-($x, $y, $z, $t) = stateful();
+($x, $y, $z, $t) = < stateful();
 is( $x, 1, 'incremented state var' );
 is( $y, 2, 'incremented state var' );
 is( $z, 2, 'reinitialized lexical' );
 is( $t, 4, 'incremented state var, list syntax' );
 
-($x, $y, $z, $t) = stateful();
+($x, $y, $z, $t) = < stateful();
 is( $x, 2, 'incremented state var' );
 is( $y, 3, 'incremented state var' );
 is( $z, 2, 'reinitialized lexical' );
@@ -47,14 +47,14 @@ sub nesting {
     my $t;
     { state $bar //= 12; $t = ++$bar }
     ++$foo;
-    return ($foo, $t);
+    return  @($foo, $t);
 }
 
-($x, $y) = nesting();
+($x, $y) = < nesting();
 is( $x, 11, 'outer state var' );
 is( $y, 13, 'inner state var' );
 
-($x, $y) = nesting();
+($x, $y) = < nesting();
 is( $x, 12, 'outer state var' );
 is( $y, 14, 'inner state var' );
 
@@ -118,7 +118,7 @@ is( stateless(), 43, 'stateless function, second time' );
 sub stateful_array {
     state @x;
     push @x, 'x';
-    return (@x-1);
+    return  @((nelems @x)-1);
 }
 
 my $xsize = stateful_array();
@@ -206,7 +206,7 @@ foreach my $forbidden (~< *DATA) {
 
 {
     my @warnings;
-    local $^WARN_HOOK = sub { push @warnings, @_[0]->message };
+    local $^WARN_HOOK = sub { push @warnings, < @_[0]->message };
 
     eval q{
 	use warnings;
@@ -226,20 +226,20 @@ foreach my $forbidden (~< *DATA) {
     };
     is $@, '', "eval f_49522";
     # shouldn't be any 'not available' or 'not stay shared' warnings
-    ok !@warnings, "suppress warnings part 1 [@warnings]";
+    ok !nelems @warnings, "suppress warnings part 1 [{join ' ', <@warnings}]";
 
-    @warnings = ();
+    @warnings = @( () );
     my $f = f_49522();
     is $f->(), 88, "state var closure 1";
     is g_49522(), 88, "state var closure 2";
-    ok !@warnings, "suppress warnings part 2 [@warnings]";
+    ok !nelems @warnings, "suppress warnings part 2 [{join ' ', <@warnings}]";
 
 
-    @warnings = ();
+    @warnings = @( () );
     $f = i_49522();
     h_49522(); # initialise $t
     is $f->(), 99, "state var closure 3";
-    ok !@warnings, "suppress warnings part 3 [@warnings]";
+    ok !nelems @warnings, "suppress warnings part 3 [{join ' ', <@warnings}]";
 
 
 }

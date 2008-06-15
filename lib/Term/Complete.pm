@@ -2,8 +2,8 @@ package Term::Complete;
 require Exporter;
 
 use strict;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(Complete);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(Complete) );
 our $VERSION = '1.402';
 
 #      @(#)complete.pl,v1.2            (me@anywhere.EBay.Sun.COM) 09/23/91
@@ -92,10 +92,10 @@ sub Complete {
 
     $prompt = shift;
     if (ref @_[0] || @_[0] =~ m/^\*/) {
-	@cmp_lst = sort @{@_[0]};
+	@cmp_lst = @( sort < @{@_[0]} );
     }
     else {
-	@cmp_lst = sort(@_);
+	@cmp_lst = @( sort(< @_) );
     }
 
     # Attempt to save the current stty state, to be restored later
@@ -118,10 +118,10 @@ sub Complete {
             CASE: {
                 # (TAB) attempt completion
                 $_ eq "\t" && do {
-                    @match = grep(m/^\Q$return/, @cmp_lst);
-                    unless ((@match-1) +< 0) {
+                    @match = @( grep(m/^\Q$return/, < @cmp_lst) );
+                    unless (((nelems @match)-1) +< 0) {
                         $l = length($test = shift(@match));
-                        foreach $cmp (@match) {
+                        foreach $cmp (< @match) {
                             until (substr($cmp, 0, $l) eq substr($test, 0, $l)) {
                                 $l--;
                             }
@@ -135,7 +135,7 @@ sub Complete {
 
                 # (^D) completion list
                 $_ eq $complete && do {
-                    print(join("\r\n", '', grep(m/^\Q$return/, @cmp_lst)), "\r\n");
+                    print(join("\r\n", '', grep(m/^\Q$return/, < @cmp_lst)), "\r\n");
                     redo LOOP;
                 };
 

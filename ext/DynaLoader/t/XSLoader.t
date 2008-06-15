@@ -14,7 +14,7 @@ BEGIN {
 }
 
 
-my %modules = (
+my %modules = %(
     # ModuleName  => q|code to check that it was loaded|,
     'Cwd'        => q| ::can_ok( 'Cwd' => 'fastcwd'         ) |,  # 5.7 ?
     'File::Glob' => q| ::can_ok( 'File::Glob' => 'doglob'   ) |,  # 5.6

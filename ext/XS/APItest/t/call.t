@@ -46,7 +46,7 @@ sub d {
 my $obj = bless \@(), 'Foo';
 
 sub Foo::meth {
-    return 'bad_self' unless @_ && ref @_[0] && ref(@_[0]) eq 'Foo';
+    return 'bad_self' unless (nelems @_) && ref @_[0] && ref(@_[0]) eq 'Foo';
     shift;
     shift;
     unshift @_, 'b';
@@ -71,21 +71,21 @@ for my $test (
     \@( G_DISCARD, \@( qw(a p q) ), \@( qw(0) ),       '3 args, G_DISCARD' ),
 )
 {
-    my ($flags, $args, $expected, $description) = @$test;
+    my ($flags, $args, $expected, $description) = < @$test;
 
-    ok(eq_array( \@( call_sv(\&f, $flags, @$args) ), $expected),
+    ok(eq_array( \@( < call_sv(\&f, $flags, < @$args) ), $expected),
 	"$description call_sv(\\&f)");
 
-    ok(eq_array( \@( call_sv(*f,  $flags, @$args) ), $expected),
+    ok(eq_array( \@( < call_sv(*f,  $flags, < @$args) ), $expected),
 	"$description call_sv(*f)");
 
-    ok(eq_array( \@( call_pv('f', $flags, @$args) ), $expected),
+    ok(eq_array( \@( < call_pv('f', $flags, < @$args) ), $expected),
 	"$description call_pv('f')");
 
-    ok(eq_array( \@( eval_sv('f(' . join(',',map"'$_'",@$args) . ')', $flags) ),
+    ok(eq_array( \@( < eval_sv('f(' . join(',',map"'$_'",< @$args) . ')', $flags) ),
 	$expected), "$description eval_sv('f(args)')");
 
-    ok(eq_array( \@( call_method('meth', $flags, $obj, @$args) ), $expected),
+    ok(eq_array( \@( < call_method('meth', $flags, $obj, < @$args) ), $expected),
 	"$description call_method('meth')");
 
     my $returnval = ((($flags ^&^ G_WANT) == G_ARRAY) || ($flags ^&^ G_DISCARD))
@@ -96,42 +96,42 @@ for my $test (
 			    : "its_dead_jim\n";
 
 	$@ = "before\n";
-	ok(eq_array( \@( call_pv('d', $flags^|^G_EVAL^|^$keep, @$args) ), 
+	ok(eq_array( \@( < call_pv('d', $flags^|^G_EVAL^|^$keep, < @$args) ), 
 		    $returnval),
 		    "$desc G_EVAL call_pv('d')");
 	is($@->{description}, $exp_err, "$desc G_EVAL call_pv('d') - \$@");
 
 	$@ = "before\n";
-	ok(eq_array( \@( eval_sv('d()', $flags^|^$keep) ),
+	ok(eq_array( \@( < eval_sv('d()', $flags^|^$keep) ),
 		    $returnval),
 		    "$desc eval_sv('d()')");
 	is($@->{description}, $exp_err, "$desc eval_sv('d()') - \$@");
 
 	$@ = "before\n";
-	ok(eq_array( \@( call_method('d', $flags^|^G_EVAL^|^$keep, $obj, @$args) ),
+	ok(eq_array( \@( < call_method('d', $flags^|^G_EVAL^|^$keep, $obj, < @$args) ),
 		    $returnval),
 		    "$desc G_EVAL call_method('d')");
 	is($@->{description}, $exp_err, "$desc G_EVAL call_method('d') - \$@");
     }
 
-    ok(eq_array( \@( sub { call_pv('f', $flags^|^G_NOARGS, "bad") }->(@$args) ),
+    ok(eq_array( \@( < sub { call_pv('f', $flags^|^G_NOARGS, "bad") }->(< @$args) ),
 	$expected), "$description G_NOARGS call_pv('f')");
 
-    ok(eq_array( \@( sub { eval_sv('f(@_)', $flags^|^G_NOARGS) }->(@$args) ),
-	$expected), "$description G_NOARGS eval_sv('f(@_)')");
+    ok(eq_array( \@( < sub { eval_sv('f(@_)', $flags^|^G_NOARGS) }->(< @$args) ),
+	$expected), "$description G_NOARGS eval_sv('f({join ' ', <@_})')");
 
     # XXX call_method(G_NOARGS) isn't tested: I'm assuming
     # it's not a sensible combination. DAPM.
 
-    ok(eq_array( \@( try { call_pv('d', $flags, @$args) }, $@->{description} ),
+    ok(eq_array( \@( try { < call_pv('d', $flags, < @$args) }, $@->{description} ),
 	\@( "its_dead_jim\n" )), "$description eval \{ call_pv('d') \}");
 
-    ok(eq_array( \@( try { eval_sv('d', $flags), $@ && $@->message }, $@ && $@->message ),
-	\@( @$returnval,
+    ok(eq_array( \@( try { < eval_sv('d', $flags), $@ && < $@->message }, $@ && < $@->message ),
+	\@( < @$returnval,
 		"its_dead_jim\n", '' )),
 	"$description eval \{ eval_sv('d') \}");
 
-    ok(eq_array( \@( try { call_method('d', $flags, $obj, @$args) }, $@->{description} ),
+    ok(eq_array( \@( try { < call_method('d', $flags, $obj, < @$args) }, $@->{description} ),
 	\@( "its_dead_jim\n" )), "$description eval \{ call_method('d') \}");
 
 };

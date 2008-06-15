@@ -27,7 +27,7 @@ our (@a, @c, $c, $d, $foo, %foo, @foo, @dogs, %kennel, $mutts, $e, $f, $i,
 
 
 sub TEST {
-  my ($string, $name) = @_;
+  my ($string, $name) = < @_;
   no strict;
   my $t = eval $string;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
@@ -101,7 +101,7 @@ is Data::Dumper->Dumpxs(\@('123xyz{$@%'), \@(qw(a))), '#$a = "123xyz\{\$\@\%";' 
 #############
 #############
 
-@c = ("c");
+@c = @("c");
 $c = \@c;
 $b = \%();
 $a = \@(1, $b, $c);
@@ -324,8 +324,8 @@ EOT
   package main;
   use Data::Dumper;
   $foo = 5;
-  @foo = (-10,\*foo);
-  %foo = (a=>1,b=>\$foo,c=>\@foo);
+  @foo = @(-10,\*foo);
+  %foo = %(a=>1,b=>\$foo,c=>\@foo);
   %foo{d} = \%foo;
   @foo[2] = \%foo;
 
@@ -491,8 +491,8 @@ EOT
 #############
 {
   package main;
-  @dogs = ( 'Fido', 'Wags' );
-  %kennel = (
+  @dogs = @( 'Fido', 'Wags' );
+  %kennel = %(
             First => \@dogs[0],
             Second =>  \@dogs[1],
            );
@@ -911,7 +911,7 @@ TEST q(Data::Dumper->new(\@($c))->Dumpxs;)
 {
   $i = 5;
   $c = \%( map { (++$i, "$_$_$_") } 'I'..'Q' );
-  $d = \%( reverse %$c );
+  $d = \%( reverse < %$c );
   local $Data::Dumper::Sortkeys = \&sort205;
   sub sort205 {
     my $hash = shift;
@@ -996,13 +996,13 @@ EOT
 
 # Numbers (seen by the tokeniser as numbers, stored as numbers.
   @numbers =
-  (
+  @(
    0, +1, -2, 3.0, +4.0, -5.0, 6.5, +7.5, -8.5,
     9,  +10,  -11,  12.0,  +13.0,  -14.0,  15.5,  +16.25,  -17.75,
   );
 # Strings
   @strings =
-  (
+  @(
    "0", "+1", "-2", "3.0", "+4.0", "-5.0", "6.5", "+7.5", "-8.5", " 9",
    " +10", " -11", " 12.0", " +13.0", " -14.0", " 15.5", " +16.25", " -17.75",
   );
@@ -1126,23 +1126,23 @@ EOT
 EOT
 
 # Some of these tests will be redundant.
-@numbers_s = @numbers_i = @numbers_is = @numbers_n = @numbers_ns = @numbers_ni
-  = @numbers_nis = @numbers;
-@strings_s = @strings_i = @strings_is = @strings_n = @strings_ns = @strings_ni
-  = @strings_nis = @strings;
+@numbers_s = @( @numbers_i = @( @numbers_is = @( @numbers_n = @( @numbers_ns = @( @numbers_ni
+  = @( @numbers_nis = @( < @numbers ) ) ) ) ) ) );
+@strings_s = @( @strings_i = @( @strings_is = @( @strings_n = @( @strings_ns = @( @strings_ni
+  = @( @strings_nis = @( < @strings ) ) ) ) ) ) );
 # Use them in an integer context
-foreach (@numbers_i, @numbers_ni, @numbers_nis, @numbers_is,
-         @strings_i, @strings_ni, @strings_nis, @strings_is) {
+foreach (< @numbers_i, < @numbers_ni, < @numbers_nis, < @numbers_is,
+         < @strings_i, < @strings_ni, < @strings_nis, < @strings_is) {
   my $b = sprintf "\%d", $_;
 }
 # Use them in a floating point context
-foreach (@numbers_n, @numbers_ni, @numbers_nis, @numbers_ns,
-         @strings_n, @strings_ni, @strings_nis, @strings_ns) {
+foreach (< @numbers_n, < @numbers_ni, < @numbers_nis, < @numbers_ns,
+         < @strings_n, < @strings_ni, < @strings_nis, < @strings_ns) {
   my $b = sprintf "\%e", $_;
 }
 # Use them in a string context
-foreach (@numbers_s, @numbers_is, @numbers_nis, @numbers_ns,
-         @strings_s, @strings_is, @strings_nis, @strings_ns) {
+foreach (< @numbers_s, < @numbers_is, < @numbers_nis, < @numbers_ns,
+         < @strings_s, < @strings_is, < @strings_nis, < @strings_ns) {
   my $b = sprintf "\%s", $_;
 }
 
@@ -1236,7 +1236,7 @@ EOT
 }
 
 {
-  @a = (
+  @a = @(
         999999999,
         1000000000,
         9999999999,
@@ -1369,7 +1369,7 @@ EOT
   local $Data::Dumper::Purity = 1;
   local $Data::Dumper::Sortkeys;
   $ping = 5;
-  %ping = (chr (0xDECAF) x 4  =>\$ping);
+  %ping = %(chr (0xDECAF) x 4  =>\$ping);
   for $Data::Dumper::Sortkeys (0, 1) {
       TEST q(Data::Dumper->Dump(\@(\*ping, \%ping), \@('*ping', '*pong')));
       TEST q(Data::Dumper->Dumpxs(\@(\*ping, \%ping), \@('*ping', '*pong'))) if $XS;
@@ -1388,7 +1388,7 @@ EOT
   local $Data::Dumper::Quotekeys = 0;
   my $k = 'perl' . chr 256;
   chop $k;
-  %foo = ($k => 'rocks');
+  %foo = %($k => 'rocks');
 
   TEST q(Data::Dumper->Dump(\@(\%foo))), "quotekeys == 0 for utf8 flagged ASCII";
   TEST q(Data::Dumper->Dumpxs(\@(\%foo))),
@@ -1403,7 +1403,7 @@ EOT
 #  1
 #);
 EOT
-    @foo = ();
+    @foo = @( () );
     @foo[2] = 1;
     TEST q(Data::Dumper->Dump(\@(\@foo))), 'Richard Clamp, Message-Id: <20030104005247.GA27685@mirth.demon.co.uk>';
     TEST q(Data::Dumper->Dumpxs(\@(\@foo))) if $XS;

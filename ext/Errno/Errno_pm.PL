@@ -4,8 +4,8 @@ use strict;
 
 our $VERSION = "1.10";
 
-my %err = ();
-my %wsa = ();
+my %err = %( () );
+my %wsa = %( () );
 
 # Symbian cross-compiling environment.
 my $IsSymbian = exists %ENV{SDK} && -d "%ENV{SDK}\\epoc32";
@@ -16,14 +16,14 @@ unlink "Errno.pm" if -f "Errno.pm";
 open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $!";
 select OUT;
 my $file;
-my @files = get_files();
+my @files = @( < get_files() );
 if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
     # all in .c file and process that instead.
     open INCS, ">", 'includes.c' or
 	die "Cannot open includes.c";
-    foreach $file (@files) {
+    foreach $file (< @files) {
 	next if $file eq 'errno.c';
 	next unless -f $file;
 	print INCS qq[#include "$file"\n];
@@ -33,7 +33,7 @@ if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     unlink 'includes.c';
 }
 else {
-    foreach $file (@files) {
+    foreach $file (< @files) {
 	process_file($file);
     }
 }
@@ -41,7 +41,7 @@ write_errno_pm();
 unlink "errno.c" if -f "errno.c";
 
 sub process_file {
-    my($file) = @_;
+    my($file) = < @_;
 
     # for win32 perl under cygwin, we need to get a windows pathname
     if ($^O eq 'MSWin32' && %Config{cc} =~ m/\B-mno-cygwin\b/ &&
@@ -102,7 +102,7 @@ sub default_cpp {
     unless (defined $cppstdin) {
 	use File::Spec;
 	$cppstdin = %Config{cppstdin};
-	my $upup_cppstdin = File::Spec->catfile(File::Spec->updir,
+	my $upup_cppstdin = File::Spec->catfile( <File::Spec->updir, <
 						File::Spec->updir,
 						"cppstdin");
 	my $cppstdin_is_wrapper =
@@ -115,7 +115,7 @@ sub default_cpp {
 }
 
 sub get_files {
-    my %file = ();
+    my %file = %( () );
     # VMS keeps its include files in system libraries (well, except for Gcc)
     if ($^O eq 'VMS') {
 	if (%Config{vms_cc_type} eq 'decc') {
@@ -271,7 +271,7 @@ sub write_errno_pm {
 		or die "Cannot exec $cpp";
 	}
 
-	%err = ();
+	%err = %( () );
 
 	while( ~< *CPPO) {
 	    my($name,$expr);
@@ -300,13 +300,13 @@ sub write_errno_pm {
 
     if ($^O eq 'beos') {
 	if (open(C, ">", "errno.c")) {
-	    my @allerrs = keys %err;
+	    my @allerrs = @( keys %err );
 	    print C <<EOF;
 #include <errno.h>
 #include <stdio.h>
 int main() \{
 EOF
-            for (@allerrs) {
+            for (< @allerrs) {
 		print C qq[printf("$_ \%d\n", $_);]
 	    }
             print C "\}\n";
@@ -351,8 +351,8 @@ use strict;
 EDQ
    
     my $len = 0;
-    my @err = sort { %err{$a} <+> %err{$b} } keys %err;
-    map { $len = length if length +> $len } @err;
+    my @err = @( sort { %err{$a} <+> %err{$b} } keys %err );
+    map { $len = length if length +> $len } < @err;
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
@@ -381,7 +381,7 @@ ESQ
     $k =~ s/(.{50,70})\s/$1\n\t/g;
     print "\t",$k,"\n    ))\n);\n\n";
 
-    foreach $err (@err) {
+    foreach $err (< @err) {
 	printf "sub \%s () \{ \%d \}\n",,$err,%err{$err};
     }
 

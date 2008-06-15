@@ -11,24 +11,24 @@
 use strict;
 use warnings;
 
-my ($cSH, $ch, @ch, %ch) = ("config_h.SH");
+my ($cSH, $ch, < @ch, < %ch) = ("config_h.SH");
 open $ch, "<", "$cSH" or die "Cannot open $cSH: $!\n";
 {   local $/ = "\n\n";
-    @ch = ~< $ch;
+    @ch = @( ~< $ch );
     close  $ch;
     }
 
 sub ch_index ()
 {
-    %ch = ();
-    foreach my $ch (0 .. (@ch-1)) {
+    %ch = %( () );
+    foreach my $ch (0 .. ((nelems @ch)-1)) {
 	while (@ch[$ch] =~ m{^/\* ([A-Z]\w+)}gm) {
 	    %ch{$1} = $ch;
 	    }
 	}
     } # ch_index
 
-my %dep = (
+my %dep = %(
     # This symbol must be defined BEFORE ...
     BYTEORDER		=> \@( qw( UVSIZE				) ),
     LONGSIZE		=> \@( qw( BYTEORDER			) ),
@@ -44,7 +44,7 @@ do {
     $changed = 0;
     foreach my $sym (keys %dep) {
 	ch_index;
-	foreach my $dep (@{%dep{$sym}}) {
+	foreach my $dep (< @{%dep{$sym}}) {
 	    print STDERR "Check if $sym\t(%ch{$sym}) precedes $dep\t(%ch{$dep})\n";
 	    %ch{$sym} +< %ch{$dep} and next;
 	    my $ch = splice @ch, %ch{$sym}, 1;
@@ -56,7 +56,7 @@ do {
     } while ($changed);
 
 # 30327
-for (grep m{echo .Extracting \$CONFIG_H} => @ch) {
+for (grep m{echo .Extracting \$CONFIG_H} => < @ch) {
     my $case = join "\n",
 	qq{case "\$CONFIG_H" in},
 	qq{already-done) echo "Not re-extracting config.h" ;;},
@@ -75,5 +75,5 @@ print $ch <<EOW;
 
 EOW
 
-print $ch @ch;
+print $ch < @ch;
 close $ch;

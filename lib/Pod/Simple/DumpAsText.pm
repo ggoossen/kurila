@@ -2,7 +2,7 @@
 package Pod::Simple::DumpAsText;
 our $VERSION = '2.02';
 use Pod::Simple ();
-BEGIN {our @ISA = ('Pod::Simple')}
+BEGIN {our @ISA = @('Pod::Simple')}
 
 use strict;
 
@@ -12,7 +12,7 @@ BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
 sub new {
   my $self = shift;
-  my $new = $self->SUPER::new(@_);
+  my $new = $self->SUPER::new(< @_);
   $new->{'output_fh'} ||= *STDOUT{IO};
   $new->accept_codes('VerbatimFormatted');
   return $new;
@@ -71,7 +71,7 @@ sub _handle_element_end {
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sub _perly_escape {
-  foreach my $x (@_) {
+  foreach my $x (< @_) {
     # Escape things very cautiously:
     $x =~ s/([^-\n\t \&\<\>\'!\#\%\(\)\*\+,\.\/\:\;=\?\~\[\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/{sprintf'\x{%X}',ord($1)}/g;
   }

@@ -17,13 +17,13 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 
     my $text;
     { local $/; $text = ~< *FOO }
-    is(count_chars($text, "\015\012"), 0);
-    is(count_chars($text, "\n"), 2000);
+    is( <count_chars($text, "\015\012"), 0);
+    is( <count_chars($text, "\n"), 2000);
 
     binmode(FOO);
     seek(FOO,0,0);
     { local $/; $text = ~< *FOO }
-    is(count_chars($text, "\015\012"), 2000);
+    is( <count_chars($text, "\015\012"), 2000);
 
     SKIP:
     {
@@ -74,7 +74,7 @@ else {
 }
 
 sub count_chars {
-    my($text, $chars) = @_;
+    my($text, $chars) = < @_;
     my $seen = 0;
     $seen++ while $text =~ m/$chars/g;
     return $seen;

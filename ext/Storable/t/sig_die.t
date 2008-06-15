@@ -11,7 +11,7 @@ use Config;
 sub BEGIN {
     if (%ENV{PERL_CORE}){
        chdir('t') if -d 't';
-       @INC = ('.', '../lib');
+       @INC = @('.', '../lib');
     } else {
        unshift @INC, 't';
     }
@@ -36,10 +36,10 @@ BEGIN { plan tests => 1 }
 
 my @warns;
 $^WARN_HOOK = sub { push @warns, shift };
-$^DIE_HOOK  = sub { require Carp; warn Carp::longmess(); warn "Evil die!" };
+$^DIE_HOOK  = sub { require Carp; warn < Carp::longmess(); warn "Evil die!" };
 
 require Storable;
 
 Storable::dclone(\%(foo => "bar"));
 
-is(join("", @warns), "", "__DIE__ is not evil here");
+is(join("", < @warns), "", "__DIE__ is not evil here");

@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-try {my @n = getgrgid 0};
+try {my @n = @( getgrgid 0 )};
 if ($@ and $@->{description} =~ m/(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
@@ -91,9 +91,9 @@ ok( setgrent(), 'setgrent' ) || print "# $!\n";
 while ( ~< *GR) {
     chomp;
     # LIMIT -1 so that groups with no users don't fall off
-    my @s = split m/:/, $_, -1;
-    my ($name_s,$passwd_s,$gid_s,$members_s) = @s;
-    if (@s) {
+    my @s = @( split m/:/, $_, -1 );
+    my ($name_s,$passwd_s,$gid_s,$members_s) = < @s;
+    if ((nelems @s)) {
 	push @{ %seen{$name_s} }, $.;
     } else {
 	warn "# Your $where line $. is empty.\n";
@@ -106,18 +106,18 @@ while ( ~< *GR) {
     }
     # In principle we could whine if @s != 4 but do we know enough
     # of group file formats everywhere?
-    if (@s == 4) {
+    if ((nelems @s) == 4) {
 	$members_s =~ s/\s*,\s*/,/g;
 	$members_s =~ s/\s+$//;
 	$members_s =~ s/^\s+//;
-	my @n = getgrgid($gid_s);
+	my @n = @( getgrgid($gid_s) );
 	# 'nogroup' et al.
-	next unless @n;
-	my ($name,$passwd,$gid,$members) = @n;
+	next unless (nelems @n);
+	my ($name,$passwd,$gid,$members) = < @n;
 	# Protect against one-to-many and many-to-one mappings.
 	if ($name_s ne $name) {
-	    @n = getgrnam($name_s);
-	    ($name,$passwd,$gid,$members) = @n;
+	    @n = @( getgrnam($name_s) );
+	    ($name,$passwd,$gid,$members) = < @n;
 	    next if $name_s ne $name;
 	}
 	# NOTE: group names *CAN* contain whitespace.
@@ -182,6 +182,6 @@ for (1..$max) {
 }
 endgrent();
 
-is("@gr1", "@gr2");
+is("{join ' ', <@gr1}", "{join ' ', <@gr2}");
 
 close(GR);

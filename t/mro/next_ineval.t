@@ -37,7 +37,7 @@ This tests the use of an eval{} block to wrap a next::method call.
     }
 }
 
-like(B->foo, 
+like( <B->foo, 
    qr/^A::foo died/, 
    'method resolved inside eval{}');
 

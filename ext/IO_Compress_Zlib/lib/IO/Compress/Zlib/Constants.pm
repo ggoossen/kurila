@@ -11,9 +11,9 @@ our ($VERSION, @ISA, @EXPORT);
 
 $VERSION = '2.006';
 
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 
-@EXPORT= qw(
+@EXPORT= @( qw(
 
         ZLIB_HEADER_SIZE
         ZLIB_TRAILER_SIZE
@@ -42,7 +42,7 @@ $VERSION = '2.006';
 
         ZLIB_FDICT_SIZE
 
-        );
+        ) );
 
 # Constant names derived from RFC1950
 

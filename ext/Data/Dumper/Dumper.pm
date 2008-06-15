@@ -20,9 +20,9 @@ require overload;
 our $Useperl;
 
 BEGIN {
-    our @ISA = qw(Exporter);
-    our @EXPORT = qw(Dumper);
-    our @EXPORT_OK = qw(DumperX);
+    our @ISA = @( qw(Exporter) );
+    our @EXPORT = @( qw(Dumper) );
+    our @EXPORT_OK = @( qw(DumperX) );
 
     # if run under miniperl, or otherwise lacking dynamic loading,
     # XSLoader should be attempted to load, or the pure perl flag
@@ -61,7 +61,7 @@ our $Deparse    //= 0;
 # to cause output of arrays and hashes rather than refs.
 #
 sub new {
-  my($c, $v, $n) = @_;
+  my($c, $v, $n) = < @_;
 
   die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
     unless (defined($v) && (ref($v) eq 'ARRAY'));
@@ -107,7 +107,7 @@ sub new {
 
   *format_refaddr  = sub {
     require Scalar::Util;
-    pack "J", Scalar::Util::refaddr(shift);
+    pack "J", < Scalar::Util::refaddr(shift);
   };
 }
 
@@ -115,7 +115,7 @@ sub new {
 # add-to or query the table of already seen references
 #
 sub Seen {
-  my($s, $g) = @_;
+  my($s, $g) = < @_;
   if (defined($g) && (ref($g) eq 'HASH'))  {
     init_refaddr_format();
     my($k, $v, $id);
@@ -140,7 +140,7 @@ sub Seen {
     return $s;
   }
   else {
-    return map { @$_ } values %{$s->{seen}};
+    return map { < @$_ } values %{$s->{seen}};
   }
 }
 
@@ -148,9 +148,9 @@ sub Seen {
 # set or query the values to be dumped
 #
 sub Values {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   if (defined($v) && (ref($v) eq 'ARRAY'))  {
-    $s->{todump} = \@(@$v);        # make a copy
+    $s->{todump} = \@(< @$v);        # make a copy
     return $s;
   }
   else {
@@ -162,9 +162,9 @@ sub Values {
 # set or query the names of the values to be dumped
 #
 sub Names {
-  my($s, $n) = @_;
+  my($s, $n) = < @_;
   if (defined($n) && (ref($n) eq 'ARRAY'))  {
-    $s->{names} = \@(@$n);         # make a copy
+    $s->{names} = \@(< @$n);         # make a copy
     return $s;
   }
   else {
@@ -194,11 +194,11 @@ sub Dumpperl {
   local(@post);
   init_refaddr_format();
 
-  $s = $s->new(@_) unless ref $s;
+  $s = $s->new(< @_) unless ref $s;
 
-  for $val (@{$s->{todump}}) {
+  for $val (< @{$s->{todump}}) {
     my $out = "";
-    @post = ();
+    @post = @( () );
     $name = $s->{names}->[$i++];
     if (defined $name) {
       if ($name =~ m/^[*](.*)$/) {
@@ -232,14 +232,14 @@ sub Dumpperl {
       $valstr = $s->_dump($val, $name);
     }
 
-    $valstr = "$name = " . $valstr . ';' if @post or !$s->{terse};
+    $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{terse};
     $out .= $s->{pad} . $valstr . $s->{sep};
-    $out .= $s->{pad} . join(';' . $s->{sep} . $s->{pad}, @post) 
-      . ';' . $s->{sep} if @post;
+    $out .= $s->{pad} . join(';' . $s->{sep} . $s->{pad}, < @post) 
+      . ';' . $s->{sep} if (nelems @post);
 
     push @out, $out;
   }
-  return wantarray ? @out : join('', @out);
+  return wantarray ? @out : join('', < @out);
 }
 
 # wrap string in single quotes (escaping if needed)
@@ -256,7 +256,7 @@ sub _quote {
 # and curse if no recourse.
 #
 sub _dump {
-  my($s, $val, $name) = @_;
+  my($s, $val, $name) = < @_;
   my($sname);
   my($out, $realpack, $realtype, $type, $ipad, $id, $blesspad);
 
@@ -385,11 +385,11 @@ sub _dump {
 	($name =~ m/^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
 	  ($mname = $name . '->');
       $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-      for $v (@$val) {
+      for $v (< @$val) {
 	$sname = $mname . '[' . $i . ']';
 	$out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
 	$out .= $pad . $ipad . $s->_dump($v, $sname);
-	$out .= "," if $i++ +< @$val -1;
+	$out .= "," if $i++ +< (nelems @$val) -1;
       }
       $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
       $out .= ')';
@@ -419,7 +419,7 @@ sub _dump {
 	}
       }
       while (($k, $v) = ! $sortkeys ? (each %$val) :
-	     @$keys ? ($key = shift(@$keys), $val->{$key}) :
+	     (nelems @$keys) ? ($key = shift(@$keys), $val->{$key}) :
 	     () ) 
       {
 	my $nk = $s->_dump($k, "");
@@ -499,7 +499,7 @@ sub _dump {
 	  next if $k eq "SCALAR" && ! defined $$gval;  # always there
 
 	  # _dump can push into @post, so we hold our place using $postlen
-	  my $postlen = scalar @post;
+	  my $postlen = scalar nelems @post;
 	  @post[$postlen] = "\*$sname = ";
 	  local ($s->{apad}) = " " x length(@post[$postlen]) if $s->{indent} +>= 2;
 	  @post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
@@ -540,17 +540,17 @@ sub _dump {
 # non-OO style of earlier version
 #
 sub Dumper {
-  return Data::Dumper->Dump(\@(@_));
+  return Data::Dumper->Dump(\@(< @_));
 }
 
 # compat stub
 sub DumperX {
-  return Data::Dumper->Dumpxs(\@(@_), \@());
+  return Data::Dumper->Dumpxs(\@(< @_), \@());
 }
 
-sub Dumpf { return Data::Dumper->Dump(@_) }
+sub Dumpf { return Data::Dumper->Dump(< @_) }
 
-sub Dumpp { print Data::Dumper->Dump(@_) }
+sub Dumpp { print < Data::Dumper->Dump(< @_) }
 
 #
 # reset the "seen" cache 
@@ -562,7 +562,7 @@ sub Reset {
 }
 
 sub Indent {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   if (defined($v)) {
     if ($v == 0) {
       $s->{xpad} = "";
@@ -581,82 +581,82 @@ sub Indent {
 }
 
 sub Pair {
-    my($s, $v) = @_;
+    my($s, $v) = < @_;
     defined($v) ? (($s->{pair} = $v), return $s) : $s->{pair};
 }
 
 sub Pad {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{pad} = $v), return $s) : $s->{pad};
 }
 
 sub Varname {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{varname} = $v), return $s) : $s->{varname};
 }
 
 sub Purity {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{purity} = $v), return $s) : $s->{purity};
 }
 
 sub Useqq {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{useqq} = $v), return $s) : $s->{useqq};
 }
 
 sub Terse {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{terse} = $v), return $s) : $s->{terse};
 }
 
 sub Freezer {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{freezer} = $v), return $s) : $s->{freezer};
 }
 
 sub Toaster {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{toaster} = $v), return $s) : $s->{toaster};
 }
 
 sub Deepcopy {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{deepcopy} = $v), return $s) : $s->{deepcopy};
 }
 
 sub Quotekeys {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{quotekeys} = $v), return $s) : $s->{quotekeys};
 }
 
 sub Bless {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{'bless'} = $v), return $s) : $s->{'bless'};
 }
 
 sub Maxdepth {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{'maxdepth'} = $v), return $s) : $s->{'maxdepth'};
 }
 
 sub Useperl {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{'useperl'} = $v), return $s) : $s->{'useperl'};
 }
 
 sub Sortkeys {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{'sortkeys'} = $v), return $s) : $s->{'sortkeys'};
 }
 
 sub Deparse {
-  my($s, $v) = @_;
+  my($s, $v) = < @_;
   defined($v) ? (($s->{'deparse'} = $v), return $s) : $s->{'deparse'};
 }
 
 # used by qquote below
-my %esc = (  
+my %esc = %(  
     "\a" => "\\a",
     "\b" => "\\b",
     "\t" => "\\t",

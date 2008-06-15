@@ -7,7 +7,7 @@ BEGIN {
         chdir 't' if -d 't';
 
         if ( %ENV{PERL_CORE} ) {
-           @INC = '../lib';
+           @INC = @( '../lib' );
         }
 }
 
@@ -46,7 +46,7 @@ if (open(TCOUT, ">", "tcout")) {
 
 # termcap_path -- the names are hardcoded in Term::Cap
 %ENV{TERMCAP} = '';
-my $path = join '', Term::Cap::termcap_path();
+my $path = join '', < Term::Cap::termcap_path();
 is( $path, $files, 'termcap_path() should find default files' );
 
 SKIP: {
@@ -54,11 +54,11 @@ SKIP: {
 	skip("-f $file fails, some tests difficult now", 2) unless -f $file;
 
 	%ENV{TERMCAP} = %ENV{TERMPATH} = $file;
-	ok( grep($file, Term::Cap::termcap_path()), 
+	ok( grep($file, < Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMCAP}' );
 
 	%ENV{TERMCAP} = '/';
-	ok( grep($file, Term::Cap::termcap_path()), 
+	ok( grep($file, < Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMPATH}' );
 }
 
@@ -223,7 +223,7 @@ sub TIEHANDLE {
 
 sub PRINT {
 	my $self = shift;
-	$$self .= join('', @_);
+	$$self .= join('', < @_);
 }
 
 sub read {

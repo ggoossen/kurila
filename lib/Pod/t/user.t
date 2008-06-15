@@ -46,12 +46,12 @@ my $user_postamble = <<POST;
 POST
 
 # Create a new parser
-my %params = (
+my %params = %(
 	UserPreamble => $user_preamble,
 	UserPostamble => $user_postamble
 );
 
-my $parser = Pod::LaTeX->new(%params);
+my $parser = Pod::LaTeX->new(< %params);
 ok($parser);
 
 # Create an output file
@@ -65,11 +65,11 @@ close(OUTFH) or die "Error closing OUTFH test.tex: $!\n";
 
 # Now read in OUTFH and compare
 open(INFH, "<", "test.tex") or die "Unable to read test tex file: $!\n";
-my @output = ~< *INFH;
+my @output = @( ~< *INFH );
 
-ok(@output, @reference);
+ok((nelems @output), nelems @reference);
 
-for my $i (0..(@reference-1)) {
+for my $i (0..((nelems @reference)-1)) {
   next if @reference[$i] =~ m/^%%/; # skip timestamp comments
   ok(@output[$i], @reference[$i]);
 }

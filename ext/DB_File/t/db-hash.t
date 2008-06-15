@@ -18,7 +18,7 @@ use Fcntl;
 
 print "1..166\n";
 
-unlink glob "__db.*";
+unlink glob < "__db.*";
 
 sub ok
 {
@@ -137,7 +137,7 @@ die "Could not tie: $!" unless $X;
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 
-my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
+my %noMode = %( map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
 ok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640) ||
    %noMode{$^O} );
@@ -214,10 +214,10 @@ ok(22, $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640) );
 delete %h{'goner1'};
 $X->DELETE('goner3');
 
-my @keys = keys(%h);
-my @values = values(%h);
+my @keys = @( keys(%h) );
+my @values = @( values(%h) );
 
-ok(23, @keys == 30 && @values == 30) ;
+ok(23, (nelems @keys) == 30 && (nelems @values) == 30) ;
 
 $i = 0 ;
 while (($key,$value) = each(%h)) {
@@ -229,8 +229,8 @@ while (($key,$value) = each(%h)) {
 
 ok(24, $i == 30) ;
 
-@keys = ('blurfl', keys(%h), 'dyick');
-ok(25, @keys == 32) ;
+@keys = @('blurfl', keys(%h), 'dyick');
+ok(25, (nelems @keys) == 32) ;
 
 %h{'foo'} = '';
 ok(26, %h{'foo'} eq '' );
@@ -257,8 +257,8 @@ ok(28, $ok );
 ok(29, $size +> 0 );
 
 %h{[0..200]} = 200..400;
-my @foo = %h{[0..200]};
-ok(30, join(':',200..400) eq join(':',@foo) );
+my @foo = @( %h{[0..200]} );
+ok(30, join(':',200..400) eq join(':',< @foo) );
 
 
 # Now check all the non-tie specific stuff
@@ -353,7 +353,7 @@ while (($key,$value) = each(%h)) {
 ok(45, $i == 10);
 
 # now clear the hash
-%h = () ;
+%h = %( () ) ;
 
 # check it is empty
 $i = 0 ;
@@ -507,7 +507,7 @@ EOM
    sub checkOutput
    {
        no warnings 'uninitialized';
-       my($fk, $sk, $fv, $sv) = @_ ;
+       my($fk, $sk, $fv, $sv) = < @_ ;
 
        print "# Fetch Key   : expected '$fk' got '$fetch_key'\n" 
            if $fetch_key ne $fk ;
@@ -537,12 +537,12 @@ EOM
 
    %h{"fred"} = "joe" ;
    #                   fk   sk     fv   sv
-   ok(64, checkOutput( "", "fred", "", "joe")) ;
+   ok(64, < checkOutput( "", "fred", "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(65, %h{"fred"} eq "joe");
    #                   fk    sk     fv    sv
-   ok(66, checkOutput( "", "fred", "joe", "")) ;
+   ok(66, < checkOutput( "", "fred", "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    my ($k, $v) ;
@@ -551,27 +551,27 @@ EOM
    ok(68, $k eq "fred") ;
    ok(69, $v eq "joe") ;
    #                    fk     sk  fv  sv
-   ok(70, checkOutput( "fred", "fred", "joe", "")) ;
+   ok(70, < checkOutput( "fred", "fred", "joe", "")) ;
 
    # replace the filters, but remember the previous set
-   my ($old_fk) = $db->filter_fetch_key   
+   my ($old_fk) = < $db->filter_fetch_key   
    			(sub { $_ = uc $_ ; $fetch_key = $_ }) ;
-   my ($old_sk) = $db->filter_store_key   
+   my ($old_sk) = < $db->filter_store_key   
    			(sub { $_ = lc $_ ; $store_key = $_ }) ;
-   my ($old_fv) = $db->filter_fetch_value 
+   my ($old_fv) = < $db->filter_fetch_value 
    			(sub { $_ = "[$_]"; $fetch_value = $_ }) ;
-   my ($old_sv) = $db->filter_store_value 
+   my ($old_sv) = < $db->filter_store_value 
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
-   ok(71, checkOutput( "", "fred", "", "Jxe")) ;
+   ok(71, < checkOutput( "", "fred", "", "Jxe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(72, %h{"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
-   ok(73, checkOutput( "", "fred", "[Jxe]", "")) ;
+   ok(73, < checkOutput( "", "fred", "[Jxe]", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    $k = 'Fred'; $v ='';
@@ -580,7 +580,7 @@ EOM
     print "# k [$k]\n" ;
    ok(76, $v eq "[Jxe]") ;
    #                   fk   sk     fv    sv
-   ok(77, checkOutput( "FRED", "fred", "[Jxe]", "")) ;
+   ok(77, < checkOutput( "FRED", "fred", "[Jxe]", "")) ;
 
    # put the original filters back
    $db->filter_fetch_key   ($old_fk);
@@ -590,11 +590,11 @@ EOM
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{"fred"} = "joe" ;
-   ok(78, checkOutput( "", "fred", "", "joe")) ;
+   ok(78, < checkOutput( "", "fred", "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(79, %h{"fred"} eq "joe");
-   ok(80, checkOutput( "", "fred", "joe", "")) ;
+   ok(80, < checkOutput( "", "fred", "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    #ok(77, $db->FIRSTKEY() eq "fred") ;
@@ -603,7 +603,7 @@ EOM
    ok(82, $k eq "fred") ;
    ok(83, $v eq "joe") ;
    #                   fk   sk     fv    sv
-   ok(84, checkOutput( "fred", "fred", "joe", "")) ;
+   ok(84, < checkOutput( "fred", "fred", "joe", "")) ;
 
    # delete the filters
    $db->filter_fetch_key   (undef);
@@ -613,18 +613,18 @@ EOM
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{"fred"} = "joe" ;
-   ok(85, checkOutput( "", "", "", "")) ;
+   ok(85, < checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(86, %h{"fred"} eq "joe");
-   ok(87, checkOutput( "", "", "", "")) ;
+   ok(87, < checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    $k = 'fred';
    ok(88, ! $db->seq($k, $v, R_FIRST) ) ;
    ok(89, $k eq "fred") ;
    ok(90, $v eq "joe") ;
-   ok(91, checkOutput( "", "", "", "")) ;
+   ok(91, < checkOutput( "", "", "", "")) ;
 
    undef $db ;
    untie %h;
@@ -641,24 +641,24 @@ EOM
     unlink $Dfile;
     ok(92, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
-    my %result = () ;
+    my %result = %( () ) ;
 
     sub Closure
     {
-        my ($name) = @_ ;
+        my ($name) = < @_ ;
 	my $count = 0 ;
-	my @kept = () ;
+	my @kept = @( () ) ;
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     %result{$name} = "$name - $count: [@kept]" ;
+		     %result{$name} = "$name - $count: [{join ' ', <@kept}]" ;
 		   }
     }
 
-    $db->filter_store_key(Closure("store key")) ;
-    $db->filter_store_value(Closure("store value")) ;
-    $db->filter_fetch_key(Closure("fetch key")) ;
-    $db->filter_fetch_value(Closure("fetch value")) ;
+    $db->filter_store_key( <Closure("store key")) ;
+    $db->filter_store_value( <Closure("store value")) ;
+    $db->filter_fetch_key( <Closure("fetch key")) ;
+    $db->filter_fetch_value( <Closure("fetch value")) ;
 
     $_ = "original" ;
 
@@ -796,7 +796,7 @@ EOM
     local $^WARN_HOOK = sub {$a = @_[0]} ;
     
     tie %h, 'DB_File', $Dfile or die "Can't open file: $!\n" ;
-    %h = (); ;
+    %h = %( () ); ;
     ok(119, $a eq "") ;
     untie %h ;
     unlink $Dfile;
@@ -815,7 +815,7 @@ EOM
 
     unlink $Dfile;
     my $bad_key = 0 ;
-    my %h = () ;
+    my %h = %( () ) ;
     my $db ;
     ok(120, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
@@ -910,8 +910,8 @@ EOM
     ok(129, $h1_count +> 0);
     ok(130, $h1_count == $h2_count);
 
-    ok(131, safeUntie \%hash1);
-    ok(132, safeUntie \%hash2);
+    ok(131, < safeUntie \%hash1);
+    ok(132, < safeUntie \%hash2);
     unlink $Dfile, $Dfile2;
 }
 
@@ -963,7 +963,7 @@ EOM
    %h{"fred"} = "joe" ;
    ok(137, %h{"fred"} eq "joe");
 
-   try { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= @( grep { %h{$_} } (1, 2, 3) ) };
    ok (138, ! $@);
 
 
@@ -979,7 +979,7 @@ EOM
 
    ok(140, $db->FIRSTKEY() eq "fred") ;
    
-   try { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= @( grep { %h{$_} } (1, 2, 3) ) };
    ok (141, ! $@);
 
    undef $db ;
@@ -1054,7 +1054,7 @@ EOM
     local $^WARN_HOOK = sub {$warned = @_[0]} ;
 
     # db-put with substr of key
-    my %remember = () ;
+    my %remember = %( () ) ;
     for my $ix ( 1 .. 2 )
     {
         my $key = $ix . "data" ;
@@ -1107,7 +1107,7 @@ EOM
     ok 156, $warned eq '' 
       or print "# Caught warning [$warned]\n" ;
 
-    my %bad = () ;
+    my %bad = %( () ) ;
     $key = '';
     for ($status = $db->seq($key, $value, R_FIRST ) ;
          $status == 0 ;
@@ -1174,7 +1174,7 @@ EOM
    $_ = 'fred';
 
     # db-put with substr of key
-    my %remember = () ;
+    my %remember = %( () ) ;
     my $status = 0 ;
     for my $ix ( 1 .. 2 )
     {
@@ -1194,7 +1194,7 @@ EOM
        $db->filter_store_value (undef);
     }
 
-    my %bad = () ;
+    my %bad = %( () ) ;
     my $key = '';
     my $value = '';
     for ($status = $db->seq($key, $value, R_FIRST ) ;

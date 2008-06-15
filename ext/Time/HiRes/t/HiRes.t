@@ -112,17 +112,17 @@ if (open(XDEFINE, "<", "xdefine")) {
 my $limit = 0.25; # 25% is acceptable slosh for testing timers
 
 sub skip {
-    map { print "ok $_ # skipped\n" } @_;
+    map { print "ok $_ # skipped\n" } < @_;
 }
 
 sub ok {
-    my ($n, $result, @info) = @_;
+    my ($n, $result, < @info) = < @_;
     if ($result) {
     	print "ok $n\n";
     }
     else {
 	print "not ok $n\n";
-    	print "# @info\n" if @info;
+    	print "# {join ' ', <@info}\n" if (nelems @info);
     }
 }
 
@@ -130,15 +130,15 @@ unless ($have_gettimeofday) {
     skip 2..6;
 }
 else {
-    my @one = gettimeofday();
-    ok 2, @one == 2, 'gettimeofday returned ', 0+@one, ' args';
-    ok 3, @one[0] +> 850_000_000, "@one too small";
+    my @one = @( < gettimeofday() );
+    ok 2, (nelems @one) == 2, 'gettimeofday returned ', 0+nelems @one, ' args';
+    ok 3, @one[0] +> 850_000_000, "{join ' ', <@one} too small";
 
     sleep 1;
 
-    my @two = gettimeofday();
+    my @two = @( < gettimeofday() );
     ok 4, (@two[0] +> @one[0] || (@two[0] == @one[0] && @two[1] +> @one[1])),
-    	    "@two is not greater than @one";
+    	    "{join ' ', <@two} is not greater than {join ' ', <@one}";
 
     my $f = Time::HiRes::time();
     ok 5, $f +> 850_000_000, "$f too small";
@@ -179,7 +179,7 @@ unless ($have_gettimeofday) {
     skip 10;
 }
 else {
-    my $r = \@(gettimeofday());
+    my $r = \@( <gettimeofday());
     my $f = tv_interval $r;
     ok 10, $f +< 2, $f;
 }
@@ -188,7 +188,7 @@ unless ($have_usleep && $have_gettimeofday) {
     skip 11;
 }
 else {
-    my $r = \@( gettimeofday() );
+    my $r = \@( < gettimeofday() );
     Time::HiRes::sleep( 0.5 );
     my $f = tv_interval $r;
     ok 11, $f +> 0.4 && $f +< 0.9, "slept $f instead of 0.5 secs.";
@@ -253,21 +253,21 @@ unless (   defined &Time::HiRes::gettimeofday
     print "# time...$f\n";
     print "ok 15\n";
 
-    $r = \@(Time::HiRes::gettimeofday());
+    $r = \@( <Time::HiRes::gettimeofday());
     sleep (0.5);
-    print "# sleep...", Time::HiRes::tv_interval($r), "\nok 16\n";
+    print "# sleep...", < Time::HiRes::tv_interval($r), "\nok 16\n";
 
-    $r = \@(Time::HiRes::gettimeofday());
+    $r = \@( <Time::HiRes::gettimeofday());
     $i = 5;
     my $oldaction;
     if ($use_sigaction) {
 	$oldaction = POSIX::SigAction->new();
-	printf "# sigaction tick, ALRM = \%d\n", &POSIX::SIGALRM;
+	printf "# sigaction tick, ALRM = \%d\n", < &POSIX::SIGALRM;
 
 	# Perl's deferred signals may be too wimpy to break through
 	# a restartable select(), so use POSIX::sigaction if available.
 
-	POSIX::sigaction(&POSIX::SIGALRM,
+	POSIX::sigaction( <&POSIX::SIGALRM, <
 			 POSIX::SigAction->new(\&tick),
 			 $oldaction)
 	    or die "Error setting SIGALRM handler with sigaction: $!\n";
@@ -321,7 +321,7 @@ unless (   defined &Time::HiRes::gettimeofday
     }
 
     if ($use_sigaction) {
-	POSIX::sigaction(&POSIX::SIGALRM, $oldaction);
+	POSIX::sigaction( <&POSIX::SIGALRM, $oldaction);
     } else {
 	alarm(0); # can't cancel usig %SIG
     }
@@ -341,28 +341,28 @@ unless (   defined &Time::HiRes::setitimer
     use Time::HiRes qw(setitimer getitimer ITIMER_VIRTUAL);
 
     my $i = 3;
-    my $r = \@(Time::HiRes::gettimeofday());
+    my $r = \@( <Time::HiRes::gettimeofday());
 
     %SIG{VTALRM} = sub {
 	$i ? $i-- : setitimer(&ITIMER_VIRTUAL, 0);
-	print "# Tick! $i ", Time::HiRes::tv_interval($r), "\n";
+	print "# Tick! $i ", < Time::HiRes::tv_interval($r), "\n";
     };	
 
-    print "# setitimer: ", join(" ", setitimer(ITIMER_VIRTUAL, 0.5, 0.4)), "\n";
+    print "# setitimer: ", join(" ", < setitimer(ITIMER_VIRTUAL, 0.5, 0.4)), "\n";
 
     # Assume interval timer granularity of $limit * 0.5 seconds.  Too bold?
     my $virt = getitimer(&ITIMER_VIRTUAL);
     print "not " unless defined $virt && abs($virt / 0.5) - 1 +< $limit;
     print "ok 18\n";
 
-    print "# getitimer: ", join(" ", getitimer(ITIMER_VIRTUAL)), "\n";
+    print "# getitimer: ", join(" ", < getitimer(ITIMER_VIRTUAL)), "\n";
 
     while (getitimer(&ITIMER_VIRTUAL)) {
 	my $j;
 	for (1..1000) { $j++ } # Can't be unbreakable, must test getitimer().
     }
 
-    print "# getitimer: ", join(" ", getitimer(ITIMER_VIRTUAL)), "\n";
+    print "# getitimer: ", join(" ", < getitimer(ITIMER_VIRTUAL)), "\n";
 
     $virt = getitimer(&ITIMER_VIRTUAL);
     print "not " unless defined $virt && $virt == 0;
@@ -491,7 +491,7 @@ if ($have_ualarm) {
 
     # The time-burner which takes at least T (default 1) seconds.
     my $Delay = sub {
-	my $c = @_ ? shift : 1;
+	my $c = (nelems @_) ? shift : 1;
 	my $n = $c * $DelayN;
 	my $i;
 	for ($i = 0; $i +< $n; $i++) { }
@@ -514,7 +514,7 @@ if ($have_ualarm) {
 
     %SIG{ALRM} = sub {
 	$a++;
-	print "# Alarm $a - ", time(), "\n";
+	print "# Alarm $a - ", < time(), "\n";
 	alarm(0) if $a +>= $A; # Disarm the alarm.
 	$Delay->(2); # Try burning CPU at least for 2T seconds.
     }; 
@@ -537,11 +537,11 @@ if ($have_clock_gettime &&
  TRY: {
 	for my $try (1..3) {
 	    print "# CLOCK_REALTIME: try = $try\n";
-	    my $t0 = clock_gettime(&CLOCK_REALTIME);
+	    my $t0 = clock_gettime( <&CLOCK_REALTIME);
 	    use Time::HiRes qw(sleep);
 	    my $T = 1.5;
 	    sleep($T);
-	    my $t1 = clock_gettime(&CLOCK_REALTIME);
+	    my $t1 = clock_gettime( <&CLOCK_REALTIME);
 	    if ($t0 +> 0 && $t1 +> $t0) {
 		print "# t1 = $t1, t0 = $t0\n";
 		my $dt = $t1 - $t0;
@@ -584,7 +584,7 @@ if ($have_clock_getres) {
 if ($have_clock_nanosleep &&
     has_symbol('CLOCK_REALTIME')) {
     my $s = 1.5e9;
-    my $t = clock_nanosleep(&CLOCK_REALTIME, $s);
+    my $t = clock_nanosleep( <&CLOCK_REALTIME, $s);
     my $r = abs(1 - $t / $s);
     if ($r +< 2 * $limit) {
 	print "ok 32\n";
@@ -597,12 +597,12 @@ if ($have_clock_nanosleep &&
 }
 
 if ($have_clock) {
-    my @clock = clock();
-    print "# clock = @clock\n";
+    my @clock = @( < clock() );
+    print "# clock = {join ' ', <@clock}\n";
     for my $i (1..3) {
 	for (my $j = 0; $j +< 1e6; $j++) { }
-	push @clock, clock();
-	print "# clock = @clock\n";
+	push @clock, < clock();
+	print "# clock = {join ' ', <@clock}\n";
     }
     if (@clock[0] +>= 0 &&
 	@clock[1] +> @clock[0] &&
@@ -624,7 +624,7 @@ if ($have_ualarm) {
 	       \@(35, 1_100_000),
 	       \@(36, 2_200_000),
 	       \@(37, 4_300_000)) {
-	my ($i, $n) = @$t;
+	my ($i, $n) = < @$t;
 	my $alarmed = 0;
 	local %SIG{ ALRM } = sub { $alarmed++ };
 	my $t0 = Time::HiRes::time();
@@ -658,22 +658,22 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 	open(X, ">", "$$");
 	print X $$;
 	close(X);
-	@stat = Time::HiRes::stat($$);
+	@stat = @( < Time::HiRes::stat($$) );
 	push @mtime, @stat[9];
 	Time::HiRes::sleep(rand(0.1) + 0.1);
 	open(X, "<", "$$");
 	~< *X;
 	close(X);
-	@stat = Time::HiRes::stat($$);
+	@stat = @( < Time::HiRes::stat($$) );
 	push @atime, @stat[8];
     }
     1 while unlink $$;
-    print "# mtime = @mtime\n";
-    print "# atime = @atime\n";
+    print "# mtime = {join ' ', <@mtime}\n";
+    print "# atime = {join ' ', <@atime}\n";
     my $ai = 0;
     my $mi = 0;
     my $ss = 0;
-    for (my $i = 1; $i +< @atime; $i++) {
+    for (my $i = 1; $i +< nelems @atime; $i++) {
 	if (@atime[$i] +>= @atime[$i-1]) {
 	    $ai++;
 	}
@@ -681,7 +681,7 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 	    $ss++;
 	}
     }
-    for (my $i = 1; $i +< @mtime; $i++) {
+    for (my $i = 1; $i +< nelems @mtime; $i++) {
 	if (@mtime[$i] +>= @mtime[$i-1]) {
 	    $mi++;
 	}
@@ -695,8 +695,8 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
     if ($ss == 0) {
 	print "# No subsecond timestamps detected\n";
 	skip 38;
-    } elsif ($mi/(@mtime-1) +>= 0.75 && $ai/(@atime-1) +>= 0.75 &&
-	     $ss/(@mtime+@atime) +>= 0.2) {
+    } elsif ($mi/((nelems @mtime)-1) +>= 0.75 && $ai/((nelems @atime)-1) +>= 0.75 &&
+	     $ss/((nelems @mtime)+nelems @atime) +>= 0.2) {
 	print "ok 38\n";
     } else {
 	print "not ok 38\n";

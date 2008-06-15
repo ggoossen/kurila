@@ -6,10 +6,10 @@ use vars qw( @ISA $VERSION );
 use strict;
 
 # Package globals
-@ISA = ( 'DynaLoader' );
+@ISA = @( 'DynaLoader' );
 $VERSION = '1.03';
-my(%Locsyms) = ( ':ID' => 'LOCAL' );
-my(%Gblsyms) = ( ':ID' => 'GLOBAL');
+my(%Locsyms) = %( ':ID' => 'LOCAL' );
+my(%Gblsyms) = %( ':ID' => 'GLOBAL');
 my $DoCache = 1;
 my $Cache_set = 0;
 
@@ -17,17 +17,17 @@ my $Cache_set = 0;
 #====> OO methods
 
 sub new {
-  my($pkg,$type) = @_;
+  my($pkg,$type) = < @_;
   bless \%( TYPE => $type ), $pkg;
 }
 
 sub DESTROY { }
 
 sub getsym {
-  my($self,$name) = @_;
+  my($self,$name) = < @_;
   my($val,$table);
 
-  if (($val,$table) = _getsym($name)) {
+  if (($val,$table) = < _getsym($name)) {
     if ($table eq 'GLOBAL') { %Gblsyms{$name} = $val; }
     else                    { %Locsyms{$name} = $val; }
   }
@@ -35,7 +35,7 @@ sub getsym {
 }
 
 sub setsym {
-  my($self,$name,$val,$table) = @_;
+  my($self,$name,$val,$table) = < @_;
 
   $table = $self->{TYPE} unless $table;
   if (_setsym($name,$val,$table)) {
@@ -47,7 +47,7 @@ sub setsym {
 }
   
 sub delsym {
-  my($self,$name,$table) = @_;
+  my($self,$name,$table) = < @_;
 
   $table = $self->{TYPE} unless $table;
   if (_delsym($name,$table)) {
@@ -59,12 +59,12 @@ sub delsym {
 }
 
 sub clearcache {
-  my($self,$perm) = @_;
+  my($self,$perm) = < @_;
   my($old);
 
   $Cache_set = 0;
-  %Locsyms = ( ':ID' => 'LOCAL');
-  %Gblsyms = ( ':ID' => 'GLOBAL');
+  %Locsyms = %( ':ID' => 'LOCAL');
+  %Gblsyms = %( ':ID' => 'GLOBAL');
   $old = $DoCache;
   $DoCache = $perm if defined($perm);
   $old;
@@ -73,31 +73,31 @@ sub clearcache {
 #====> TIEHASH methods
 
 sub TIEHASH {
-  @_[0]->new(@_);
+  @_[0]->new(< @_);
 }
 
 sub FETCH {
-  my($self,$name) = @_;
+  my($self,$name) = < @_;
   if    ($name eq ':GLOBAL') { $self->{TYPE} eq 'GLOBAL'; }
   elsif ($name eq ':LOCAL' ) { $self->{TYPE} eq 'LOCAL';  }
   else                       { scalar($self->getsym($name)); }
 }
 
 sub STORE {
-  my($self,$name,$val) = @_;
+  my($self,$name,$val) = < @_;
   if    ($name eq ':GLOBAL') { $self->{TYPE} = 'GLOBAL'; }
   elsif ($name eq ':LOCAL' ) { $self->{TYPE} = 'LOCAL';  }
   else                       { $self->setsym($name,$val); }
 }
 
 sub DELETE {
-  my($self,$name) = @_;
+  my($self,$name) = < @_;
 
   $self->delsym($name);
 }
 
 sub FIRSTKEY {
-  my($self) = @_;
+  my($self) = < @_;
   my($name,$eqs,$val);
 
   if (!$DoCache || !$Cache_set) {
@@ -125,7 +125,7 @@ sub FIRSTKEY {
 }
 
 sub NEXTKEY {
-  my($self) = @_;
+  my($self) = < @_;
   my($name,$val);
 
   while (($name,$val) = each(%{$self->{CACHE}}) and !defined($name)) {
@@ -136,7 +136,7 @@ sub NEXTKEY {
 }
 
 
-sub EXISTS { defined(@_[0]->FETCH(@_)) ? 1 : 0 }
+sub EXISTS { defined(@_[0]->FETCH(< @_)) ? 1 : 0 }
 
 sub CLEAR { }
 

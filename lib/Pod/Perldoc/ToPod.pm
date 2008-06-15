@@ -19,7 +19,7 @@ sub output_extension   { 'pod' }
 sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
 sub parse_from_file {
-  my( $self, $in, $outfh ) = @_;
+  my( $self, $in, $outfh ) = < @_;
 
   open(IN, "<", $in) or die "Can't read-open $in: $!\nAborting";
 

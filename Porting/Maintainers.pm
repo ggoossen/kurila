@@ -12,10 +12,10 @@ require "Maintainers.pl";
 use vars qw(%Modules %Maintainers);
 
 use vars qw(@ISA @EXPORT_OK);
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(%Modules %Maintainers
+@ISA = @( qw(Exporter) );
+@EXPORT_OK = @( qw(%Modules %Maintainers
 		get_module_files get_module_pat
-		show_results process_options);
+		show_results process_options) );
 require Exporter;
 
 use File::Find;
@@ -35,7 +35,7 @@ if (open(MANIFEST, "<", "MANIFEST")) {
 
 sub get_module_pat {
     my $m = shift;
-    split ' ', %Modules{$m}->{FILES};
+ @(    split ' ', %Modules{$m}->{FILES});
 }
 
 sub get_module_files {
@@ -54,8 +54,8 @@ sub get_module_files {
 		     }, $_);
 		@files;
 	    }
-	: glob($_) # The rest are globbable patterns.
-	} get_module_pat($m);
+	: glob( <$_) # The rest are globbable patterns.
+	} < get_module_pat($m);
 }
 
 sub get_maintainer_modules {
@@ -104,14 +104,14 @@ sub process_options {
     my @Files;
    
     if ($Opened) {
-	my @raw = `p4 opened`;
+	my @raw = @( `p4 opened` );
 	die if $?;
-	@Files =  map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} @raw;
+	@Files = @(  map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} < @raw );
     } else {
-	@Files = @ARGV;
+	@Files = @( < @ARGV );
     }
 
-    usage() if @Files && ($Maintainer || $Module || $Files);
+    usage() if (nelems @Files) && ($Maintainer || $Module || $Files);
 
     for my $mean ($Maintainer, $Module) {
 	warn "$0: Did you mean '$0 $mean'?\n"
@@ -124,28 +124,28 @@ sub process_options {
     warn "$0: Did you mean '$0 -ma $Module'?\n"
 	if defined $Module     && exists %Maintainers{$Module};
 
-    return ($Maintainer, $Module, $Files, @Files);
+    return  @($Maintainer, $Module, $Files, @Files);
 }
 
 sub show_results {
-    my ($Maintainer, $Module, $Files, @Files) = @_;
+    my ($Maintainer, $Module, $Files, < @Files) = < @_;
 
     if ($Maintainer) {
 	for my $m (sort keys %Maintainers) {
 	    if ($m =~ m/$Maintainer/io || %Maintainers{$m} =~ m/$Maintainer/io) {
-		my @modules = get_maintainer_modules($m);
+		my @modules = @( < get_maintainer_modules($m) );
 		if ($Module) {
-		    @modules = grep { m/$Module/io } @modules;
+		    @modules = @( grep { m/$Module/io } < @modules );
 		}
 		if ($Files) {
 		    my @files;
-		    for my $module (@modules) {
-			push @files, get_module_files($module);
+		    for my $module (< @modules) {
+			push @files, < get_module_files($module);
 		    }
-		    printf "\%-15s @files\n", $m;
+		    printf "\%-15s {join ' ', <@files}\n", $m;
 		} else {
 		    if ($Module) {
-			printf "\%-15s @modules\n", $m;
+			printf "\%-15s {join ' ', <@modules}\n", $m;
 		    } else {
 			printf "\%-15s %Maintainers{$m}\n", $m;
 		    }
@@ -156,32 +156,32 @@ sub show_results {
 	for my $m (sort { lc $a cmp lc $b } keys %Modules) {
 	    if ($m =~ m/$Module/io) {
 		if ($Files) {
-		    my @files = get_module_files($m);
-		    printf "\%-15s @files\n", $m;
+		    my @files = @( < get_module_files($m) );
+		    printf "\%-15s {join ' ', <@files}\n", $m;
 		} else {
 		    printf "\%-15s %Modules{$m}->{MAINTAINER}\n", $m;
 		}
 	    }
 	}
     } elsif ($Check) {
-        if( @Files ) {
-	    missing_maintainers( qr{\.(?:[chty]|p[lm]|xs)\z}msx, @Files)
+        if( (nelems @Files) ) {
+	    missing_maintainers( qr{\.(?:[chty]|p[lm]|xs)\z}msx, < @Files)
 	}
 	else { 
 	    duplicated_maintainers();
 	}
-    } elsif (@Files) {
+    } elsif ((nelems @Files)) {
 	my %ModuleByFile;
 
-	for (@Files) { s:^\./:: }
+	for (< @Files) { s:^\./:: }
 
-	%ModuleByFile{[@Files]} = ();
+	%ModuleByFile{[< @Files]} = ();
 
 	# First try fast match.
 
 	my %ModuleByPat;
 	for my $module (keys %Modules) {
-	    for my $pat (get_module_pat($module)) {
+	    for my $pat ( <get_module_pat($module)) {
 		%ModuleByPat{$pat} = $module;
 	    }
 	}
@@ -191,31 +191,31 @@ sub show_results {
 	    if (-e $pat) {
 		%ExpModuleByPat{$pat} = %ModuleByPat{$pat};
 	    } else {
-		for my $exp (glob($pat)) {
+		for my $exp (glob( <$pat)) {
 		    %ExpModuleByPat{$exp} = %ModuleByPat{$pat};
 		}
 	    }
 	}
-	%ModuleByPat = %ExpModuleByPat;
-	for my $file (@Files) {
+	%ModuleByPat = %( < %ExpModuleByPat );
+	for my $file (< @Files) {
 	    %ModuleByFile{$file} = %ModuleByPat{$file}
 	        if exists %ModuleByPat{$file};
 	}
 
 	# If still unresolved files...
-	if (my @ToDo = grep { !defined %ModuleByFile{$_} } keys %ModuleByFile) {
+	if (my @ToDo = @( grep { !defined %ModuleByFile{$_} } keys %ModuleByFile )) {
 
 	    # Cannot match what isn't there.
-	    @ToDo = grep { -e $_ } @ToDo;
+	    @ToDo = @( grep { -e $_ } < @ToDo );
 
-	    if (@ToDo) {
+	    if ((nelems @ToDo)) {
 		# Try prefix matching.
 
 		# Remove trailing slashes.
-		for (@ToDo) { s|/$|| }
+		for (< @ToDo) { s|/$|| }
 
 		my %ToDo;
-		%ToDo{[@ToDo]} = ();
+		%ToDo{[< @ToDo]} = ();
 
 		for my $pat (keys %ModuleByPat) {
 		    last unless keys %ToDo;
@@ -227,13 +227,13 @@ sub show_results {
 				push @Done, $file;
 			    }
 			}
-			delete %ToDo{[@Done]};
+			delete %ToDo{[< @Done]};
 		    }
 		}
 	    }
 	}
 
-	for my $file (@Files) {
+	for my $file (< @Files) {
 	    if (defined %ModuleByFile{$file}) {
 		my $module     = %ModuleByFile{$file};
 		my $maintainer = %Modules{%ModuleByFile{$file}}->{MAINTAINER};
@@ -251,9 +251,9 @@ sub show_results {
 my %files;
 
 sub maintainers_files {
-    %files = ();
+    %files = %( () );
     for my $k (keys %Modules) {
-	for my $f (get_module_files($k)) {
+	for my $f ( <get_module_files($k)) {
 	    ++%files{$f};
 	}
     }
@@ -274,14 +274,14 @@ sub warn_maintainer {
 }
 
 sub missing_maintainers {
-    my($check, @path) = @_;
+    my($check, < @path) = < @_;
     maintainers_files();
     my @dir;
-    for my $d (@path) {
+    for my $d (< @path) {
 	if( -d $d ) { push @dir, $d } else { warn_maintainer($d) }
     }
-    find sub { warn_maintainer($File::Find::name) if m/$check/; }, @dir
-	if @dir;
+    find sub { warn_maintainer($File::Find::name) if m/$check/; }, < @dir
+	if (nelems @dir);
 }
 
 1;

@@ -137,11 +137,11 @@ EOM
         # Skip to the flush point -- no-op for plain file
         my $status = $k->inflateSync();
         is $status, 1 
-            or diag $k->error() ;
+            or diag < $k->error() ;
      
         my $rest; 
         is $k->read($rest, length($hello)), length($hello)
-            or diag $k->error() ;
+            or diag < $k->error() ;
         ok $rest eq $hello ;
 
         ok $k->close();
@@ -180,12 +180,12 @@ EOM
         # Skip to the flush point
         $status = $k->inflateSync();
         is $status, 1, "   inflateSync returned 1"
-            or diag $k->error() ;
+            or diag < $k->error() ;
      
         my $rest; 
         is $k->read($rest, length($hello) + length($goodbye)), 
                 length($goodbye)
-            or diag $k->error() ;
+            or diag < $k->error() ;
         ok $rest eq $goodbye, " got expected output" ;
 
         ok $k->close();
@@ -217,7 +217,7 @@ EOM
         # Skip to the flush point
         $status = $k->inflateSync();
         is $status, 0 
-            or diag $k->error() ;
+            or diag < $k->error() ;
      
         ok $k->close();
         is $k->inflateSync(), 0 ;

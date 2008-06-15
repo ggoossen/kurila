@@ -36,7 +36,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 	print "ok 2\n";
 
 	print "# Connected to " .
-		inet_ntoa((unpack_sockaddr_in(getpeername(T)))[[1]])."\n";
+		inet_ntoa(( <unpack_sockaddr_in(getpeername(T)))[[1]])."\n";
 
 	arm(5);
 	syswrite(T,"hello",5);
@@ -80,7 +80,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 	print "ok 5\n";
 
 	print "# Connected to " .
-		inet_ntoa((unpack_sockaddr_in(getpeername(S)))[[1]])."\n";
+		inet_ntoa(( <unpack_sockaddr_in(getpeername(S)))[[1]])."\n";
 
 	arm(5);
 	syswrite(S,"olleh",5);
@@ -126,15 +126,15 @@ print ($w == 1 ? "ok 8\n" : "not ok 8\n") ;
 
 # Thest that whatever we give into pack/unpack_sockaddr retains
 # the value thru the entire chain.
-if((inet_ntoa((unpack_sockaddr_in(pack_sockaddr_in(100,inet_aton("10.250.230.10"))))[[1]])) eq '10.250.230.10') {
+if((inet_ntoa(( <unpack_sockaddr_in( <pack_sockaddr_in(100, <inet_aton("10.250.230.10"))))[[1]])) eq '10.250.230.10') {
     print "ok 9\n"; 
 } else {
     print "not ok 9\n"; 
 }
-print ((inet_ntoa(inet_aton("10.20.30.40")) eq "10.20.30.40") ? "ok 10\n" : "not ok 10\n");
+print ((inet_ntoa( <inet_aton("10.20.30.40")) eq "10.20.30.40") ? "ok 10\n" : "not ok 10\n");
 print ((inet_ntoa("\x{a}\x{14}\x{1e}\x{28}") eq "10.20.30.40") ? "ok 11\n" : "not ok 11\n");
 {
-    my ($port,$addr) = unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
+    my ($port,$addr) = < unpack_sockaddr_in( <pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
     print (($port == 100) ? "ok 12\n" : "not ok 12\n");
     print ((inet_ntoa($addr) eq "10.10.10.10") ? "ok 13\n" : "not ok 13\n");
 }
@@ -142,7 +142,7 @@ print ((inet_ntoa("\x{a}\x{14}\x{1e}\x{28}") eq "10.20.30.40") ? "ok 11\n" : "no
 try { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") };
 print (($@->{description} =~ m/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/) ? "ok 14\n" : "not ok 14\n");
 
-if (sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))) == AF_INET) {
+if (sockaddr_family( <pack_sockaddr_in(100, <inet_aton("10.250.230.10"))) == AF_INET) {
     print "ok 15\n";
 } else {
     print "not ok 15\n";
@@ -155,7 +155,7 @@ if ($^O eq 'linux') {
     # see if we can handle abstract sockets
     my $test_abstract_socket = chr(0) . '/tmp/test-perl-socket';
     my $addr = sockaddr_un ($test_abstract_socket);
-    my ($path) = sockaddr_un ($addr);
+    my ($path) = < sockaddr_un ($addr);
     if ($test_abstract_socket eq $path) {
         print "ok 17\n";
     }

@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -18,14 +18,14 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e     ($$) { Pod::Simple::XMLOutStream->_duo(\&nowhine, @_) }
+sub e     ($$) { Pod::Simple::XMLOutStream->_duo(\&nowhine, < @_) }
 
 sub nowhine {
 #  $_[0]->{'no_whining'} = 1;
   @_[0]->accept_targets("*");
 }
 
-&ok(e(
+&ok( <e(
 "=begin :foo\n\n=begin :bar\n\nZaz\n\n",
 "=begin :foo\n\n=begin :bar\n\nZaz\n\n=end :bar\n\n=end :foo\n\n",
 ));

@@ -13,9 +13,9 @@ use vars qw(@BAR);
 
 sub array_equal
 {
-    my ($a, $b) = @_;
-    return 0 unless scalar(@$a) == scalar(@$b);
-    for my $i (0..scalar(@$a) - 1) {
+    my ($a, $b) = < @_;
+    return 0 unless scalar(nelems @$a) == scalar(nelems @$b);
+    for my $i (0..scalar(nelems @$a) - 1) {
 	return 0 unless $a->[$i] eq $b->[$i];
     }
     return 1;
@@ -25,13 +25,13 @@ our $check;
 our $i;
 sub test
 {
-    my ($desc, $code) = @_;
+    my ($desc, $code) = < @_;
 
     &$code;
 
     print "# $desc...\n";
-    print "#    FOO = (", join(", ", @FOO), ")\n";
-    print "#    BAR = (", join(", ", @BAR), ")\n";
+    print "#    FOO = (", join(", ", < @FOO), ")\n";
+    print "#    BAR = (", join(", ", < @BAR), ")\n";
 
     if (defined $check) { print "not " unless &$check; }
     else { print "not " unless array_equal(\@FOO, \@BAR); }
@@ -42,8 +42,8 @@ sub test
 print "1..11\n";
 
 test "Assignment", sub {
-    @FOO = qw(a B c);
-    @BAR = qw(a B c);
+    @FOO = @( qw(a B c) );
+    @BAR = @( qw(a B c) );
 };
 
 test "Storing", sub {
@@ -82,13 +82,13 @@ test "Unshift", sub {
 };
 
 test "Reverse", sub {
-    @FOO = reverse @FOO;
-    @BAR = reverse @BAR;
+    @FOO = @( reverse < @FOO );
+    @BAR = @( reverse < @BAR );
 };
 
 test "Sort", sub {
-    @FOO = sort @FOO;
-    @BAR = sort @BAR;
+    @FOO = sort < @FOO;
+    @BAR = @( sort < @BAR );
 };
 
 test "Splice", sub {

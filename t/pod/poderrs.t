@@ -6,7 +6,7 @@ BEGIN {
    TestPodChecker->import();
 }
 
-my %options = map { $_ => 1 } @ARGV;  ## convert cmdline to options-hash
+my %options = %( map { $_ => 1 } < @ARGV );  ## convert cmdline to options-hash
 my $passed  = testpodchecker \%options, $0;
 exit( ($passed == 1) ? 0 : -1 )  unless %ENV{HARNESS_ACTIVE};
 

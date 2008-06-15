@@ -5,7 +5,7 @@ use Config;
 BEGIN {
     if (%ENV{PERL_CORE}){
         chdir('t') if -d 't';
-        @INC = ('.', '../lib', '../ext/Storable/t');
+        @INC = @('.', '../lib', '../ext/Storable/t');
     } else {
         unshift @INC, 't';
     }
@@ -20,16 +20,16 @@ use strict;
 use Storable qw(retrieve);
 
 my $file = "xx-$$.pst";
-my @dumps = (
+my @dumps = @(
     # some sample dumps of the hash { one => 1 }
     "perl-store\x041234\4\4\4\x94y\22\b\3\1\0\0\0vxz\22\b\1\1\0\0\x001Xk\3\0\0\0oneX", # 0.1
     "perl-store\0\x041234\4\4\4\x94y\22\b\3\1\0\0\0vxz\22\b\b\x81Xk\3\0\0\0oneX",      # 0.4@7
 );
 
-print "1.." . @dumps . "\n";
+print "1.." . nelems @dumps . "\n";
 
 my $testno;
-for my $dump (@dumps) {
+for my $dump (< @dumps) {
     $testno++;
 
     open(FH, ">", "$file") || die "Can't create $file: $!";

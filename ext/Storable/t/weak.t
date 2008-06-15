@@ -11,7 +11,7 @@ use Config;
 sub BEGIN {
   if (%ENV{PERL_CORE}){
     chdir('t') if -d 't';
-    @INC = ('.', '../lib', '../ext/Storable/t');
+    @INC = @('.', '../lib', '../ext/Storable/t');
   } else {
     # This lets us distribute Test::More in t/
     unshift @INC, 't';
@@ -27,7 +27,7 @@ sub BEGIN {
 
   require Scalar::Util;
   Scalar::Util->import(qw(weaken isweak));
-  if (grep { m/weaken/ } @Scalar::Util::EXPORT_FAIL) {
+  if (grep { m/weaken/ } < @Scalar::Util::EXPORT_FAIL) {
     print("1..0 # Skip: No support for weaken in Scalar::Util\n");
     exit 0;
   }
@@ -40,7 +40,7 @@ use vars '$file';
 use strict;
 
 sub tester {
-  my ($contents, $sub, $testersub, $what) = @_;
+  my ($contents, $sub, $testersub, $what) = < @_;
   # Test that if we re-write it, everything still works:
   my $clone = &$sub ($contents);
   is ($@, "", "There should be no error extracting for $what");
@@ -73,10 +73,10 @@ my $o = \@($a, $a);
 weaken $o->[0];
 ok (isweak($o->[0]), "element 0 is a weak reference");
 
-my @tests = (
+my @tests = @(
 \@($s1,
  sub  {
-  my ($clone, $what) = @_;
+  my ($clone, $what) = < @_;
   isa_ok($clone,'ARRAY');
   isa_ok($clone->[0],'HASH');
   isa_ok($clone->[1],'HASH');
@@ -88,7 +88,7 @@ my @tests = (
 # be able to make references to it. So try it second.
 \@($s0,
  sub  {
-  my ($clone, $what) = @_;
+  my ($clone, $what) = < @_;
   isa_ok($clone,'ARRAY');
   isa_ok($clone->[0],'HASH');
   isa_ok($clone->[1],'HASH');
@@ -98,7 +98,7 @@ my @tests = (
 ),
 \@($w,
  sub  {
-  my ($clone, $what) = @_;
+  my ($clone, $what) = < @_;
   isa_ok($clone,'ARRAY');
   if ($what eq 'nothing') {
     # We're the original, so we're still a weakref to a hash
@@ -111,7 +111,7 @@ my @tests = (
 ),
 \@($o,
 sub {
-  my ($clone, $what) = @_;
+  my ($clone, $what) = < @_;
   isa_ok($clone,'ARRAY');
   isa_ok($clone->[0],'OVERLOADED');
   isa_ok($clone->[1],'OVERLOADED');
@@ -123,8 +123,8 @@ sub {
 ),
 );
 
-foreach (@tests) {
-  my ($input, $testsub) = @$_;
+foreach (< @tests) {
+  my ($input, $testsub) = < @$_;
 
   tester($input, sub {return shift}, $testsub, 'nothing');
 

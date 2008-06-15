@@ -98,13 +98,13 @@ sub walk_table (&@) {
 	s/\s+$//;
 	my @args;
 	if (m/^\s*(#|$)/) {
-	    @args = $_;
+	    @args = @( $_ );
 	}
 	else {
-	    @args = split m/\s*\|\s*/, $_;
+	    @args = @( split m/\s*\|\s*/, $_ );
 	}
-	my @outs = &{$function}(@args);
-	print $F @outs; # $function->(@args) is not 5.003
+	my @outs = @( < &{$function}(< @args) );
+	print $F < @outs; # $function->(@args) is not 5.003
     }
     print $F $trailer if $trailer;
     unless (ref $filename) {
@@ -115,13 +115,13 @@ sub walk_table (&@) {
 
 sub munge_c_files () {
     my $functions = \%();
-    unless (@ARGV) {
+    unless (nelems @ARGV) {
 	warn "\@ARGV empty, nothing to do\n";
 	return;
     }
     walk_table {
-	if (@_ +> 1) {
-	    $functions->{@_[2]} = \@_ if @_[@_-1] =~ m/\.\.\./;
+	if ((nelems @_) +> 1) {
+	    $functions->{@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./;
 	}
     } '/dev/null', '', '';
     local $^I = '.bak';
@@ -150,12 +150,12 @@ my $wrote_protected = 0;
 
 sub write_protos {
     my $ret = "";
-    if (@_ == 1) {
+    if ((nelems @_) == 1) {
 	my $arg = shift;
 	$ret .= "$arg\n";
     }
     else {
-	my ($flags,$retval,$plain_func,@args) = @_;
+	my ($flags,$retval,$plain_func,< @args) = < @_;
 	my @nonnull;
 	my $has_context = ( $flags !~ m/n/ );
 	my $never_returns = ( $flags =~ m/r/ );
@@ -187,11 +187,11 @@ sub write_protos {
 	}
 	$ret .= "$retval\t$func(";
 	if ( $has_context ) {
-	    $ret .= @args ? "pTHX_ " : "pTHX";
+	    $ret .= (nelems @args) ? "pTHX_ " : "pTHX";
 	}
-	if (@args) {
+	if ((nelems @args)) {
 	    my $n;
-	    for my $arg ( @args ) {
+	    for my $arg ( < @args ) {
 		++$n;
 		if ( $arg =~ m/\*/ && $arg !~ m/\b(NN|NULLOK)\b/ ) {
 		    warn "$func: $arg needs NN or NULLOK\n";
@@ -219,7 +219,7 @@ sub write_protos {
 		    push @names_of_nn, $1;
 		}
 	    }
-	    $ret .= join ", ", @args;
+	    $ret .= join ", ", < @args;
 	}
 	else {
 	    $ret .= "void" if !$has_context;
@@ -240,29 +240,29 @@ sub write_protos {
 	}
 	if( $flags =~ m/f/ ) {
 	    my $prefix	= $has_context ? 'pTHX_' : '';
-	    my $args	= scalar @args;
+	    my $args	= scalar nelems @args;
  	    my $pat	= $args - 1;
-	    my $macro	= @nonnull && @nonnull[-1] == $pat  
+	    my $macro	= (nelems @nonnull) && @nonnull[-1] == $pat  
 				? '__attribute__format__'
 				: '__attribute__format__null_ok__';
 	    push @attrs, sprintf "\%s(__printf__,\%s\%d,\%s\%d)", $macro,
 				$prefix, $pat, $prefix, $args;
 	}
-	if ( @nonnull ) {
-	    my @pos = map { $has_context ? "pTHX_$_" : $_ } @nonnull;
-	    push @attrs, map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } @pos;
+	if ( (nelems @nonnull) ) {
+	    my @pos = @( map { $has_context ? "pTHX_$_" : $_ } < @nonnull );
+	    push @attrs, map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } < @pos;
 	}
-	if ( @attrs ) {
+	if ( (nelems @attrs) ) {
 	    $ret .= "\n";
-	    $ret .= join( "\n", map { "\t\t\t$_" } @attrs );
+	    $ret .= join( "\n", map { "\t\t\t$_" } < @attrs );
 	}
 	$ret .= ";";
 	$ret = "/* $ret */" if $commented_out;
-	if (@names_of_nn) {
+	if ((nelems @names_of_nn)) {
 	    $ret .= "\n#define PERL_ARGS_ASSERT_\U$plain_func\E\t\\\n\t"
-		. join '; ', map "assert($_)", @names_of_nn;
+		. join '; ', map "assert($_)", < @names_of_nn;
 	}
-	$ret .= @attrs ? "\n\n" : "\n";
+	$ret .= (nelems @attrs) ? "\n\n" : "\n";
     }
     $ret;
 }
@@ -272,8 +272,8 @@ sub write_protos {
   my %seen;
   sub write_global_sym {
       my $ret = "";
-      if (@_ +> 1) {
-	  my ($flags,$retval,$func,@args) = @_;
+      if ((nelems @_) +> 1) {
+	  my ($flags,$retval,$func,< @args) = < @_;
 	  # If a function is defined twice, for example before and after an
 	  # #else, only process the flags on the first instance for global.sym
 	  return $ret if %seen{$func}++;
@@ -297,7 +297,7 @@ walk_table(\&write_global_sym, "global.sym", undef, "# ex: set ro:\n");
 #       warnhook
 #       hints
 #       copline
-my @extvars = qw(sv_undef sv_yes sv_no na dowarn
+my @extvars = @( qw(sv_undef sv_yes sv_no na dowarn
 		 curcop compiling
 		 tainting tainted stack_base stack_sp sv_arenaroot
 		 no_modify
@@ -312,10 +312,10 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 		 dirty
 		 perl_destruct_level
 		 ppaddr
-                );
+                ) );
 
 sub readsyms (\%$) {
-    my ($syms, $file) = @_;
+    my ($syms, $file) = < @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
 	or die "embed.pl: Can't open $file: $!\n";
@@ -335,7 +335,7 @@ sub readsyms (\%$) {
 readsyms my %ppsym, 'pp.sym';
 
 sub readvars(\%$$@) {
-    my ($syms, $file,$pre,$keep_pre) = @_;
+    my ($syms, $file,$pre,$keep_pre) = < @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
 	or die "embed.pl: Can't open $file: $!\n";
@@ -361,35 +361,35 @@ readvars %globvar, 'perlvars.h','G';
 my $sym;
 
 sub undefine ($) {
-    my ($sym) = @_;
+    my ($sym) = < @_;
     "#undef  $sym\n";
 }
 
 sub hide ($$) {
-    my ($from, $to) = @_;
+    my ($from, $to) = < @_;
     my $t = int(length($from) / 8);
     "#define $from" . "\t" x ($t +< 3 ? 3 - $t : 1) . "$to\n";
 }
 
 sub bincompat_var ($$) {
-    my ($pfx, $sym) = @_;
+    my ($pfx, $sym) = < @_;
     my $arg = ($pfx eq 'G' ? 'NULL' : 'aTHX');
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_{$pfx}{$sym}_ptr($arg))");
 }
 
 sub multon ($$$) {
-    my ($sym,$pre,$ptr) = @_;
+    my ($sym,$pre,$ptr) = < @_;
     hide("PL_$sym", "($ptr$pre$sym)");
 }
 
 sub multoff ($$) {
-    my ($sym,$pre) = @_;
+    my ($sym,$pre) = < @_;
     return hide("PL_$pre$sym", "PL_$sym");
 }
 
 my $em = safer_open('embed.h-new');
 
-print $em do_not_edit ("embed.h"), <<'END';
+print $em < do_not_edit ("embed.h"), <<'END';
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -418,12 +418,12 @@ my $ifdef_state = '';
 walk_table {
     my $ret = "";
     my $new_ifdef_state = '';
-    if (@_ == 1) {
+    if ((nelems @_) == 1) {
 	my $arg = shift;
 	$ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/;
     }
     else {
-	my ($flags,$retval,$func,@args) = @_;
+	my ($flags,$retval,$func,< @args) = < @_;
 	unless ($flags =~ m/[om]/) {
 	    if ($flags =~ m/s/) {
 		$ret .= hide($func,"S_$func");
@@ -461,7 +461,7 @@ if ($ifdef_state) {
 
 for $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
-    print $em hide($sym, "Perl_$sym");
+    print $em < hide($sym, "Perl_$sym");
 }
 
 print $em <<'END';
@@ -470,20 +470,20 @@ print $em <<'END';
 
 END
 
-my @az = ('a'..'z');
+my @az = @('a'..'z');
 
 $ifdef_state = '';
 walk_table {
     my $ret = "";
     my $new_ifdef_state = '';
-    if (@_ == 1) {
+    if ((nelems @_) == 1) {
 	my $arg = shift;
 	$ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/;
     }
     else {
-	my ($flags,$retval,$func,@args) = @_;
+	my ($flags,$retval,$func,< @args) = < @_;
 	unless ($flags =~ m/[om]/) {
-	    my $args = scalar @args;
+	    my $args = scalar nelems @args;
 	    if ($args and @args[$args-1] =~ m/\.\.\./) {
 	        # we're out of luck for varargs functions under CPP
 	    }
@@ -540,10 +540,10 @@ if ($ifdef_state) {
 for $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
     if ($sym =~ m/^ck_/) {
-	print $em hide("$sym(a)", "Perl_$sym(aTHX_ a)");
+	print $em < hide("$sym(a)", "Perl_$sym(aTHX_ a)");
     }
     elsif ($sym =~ m/^pp_/) {
-	print $em hide("$sym()", "Perl_$sym(aTHX)");
+	print $em < hide("$sym()", "Perl_$sym(aTHX)");
     }
     else {
 	warn "Illegal symbol '$sym' in pp.sym";
@@ -643,7 +643,7 @@ rename_if_different('embed.h-new', 'embed.h');
 
 $em = safer_open('embedvar.h-new');
 
-print $em do_not_edit ("embedvar.h"), <<'END';
+print $em < do_not_edit ("embedvar.h"), <<'END';
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -672,7 +672,7 @@ print $em do_not_edit ("embedvar.h"), <<'END';
 END
 
 for $sym (sort keys %intrp) {
-    print $em multon($sym,'I','vTHX->');
+    print $em < multon($sym,'I','vTHX->');
 }
 
 print $em <<'END';
@@ -684,7 +684,7 @@ print $em <<'END';
 END
 
 for $sym (sort keys %intrp) {
-    print $em multoff($sym,'I');
+    print $em < multoff($sym,'I');
 }
 
 print $em <<'END';
@@ -700,8 +700,8 @@ print $em <<'END';
 END
 
 for $sym (sort keys %globvar) {
-    print $em multon($sym,   'G','my_vars->');
-    print $em multon("G$sym",'', 'my_vars->');
+    print $em < multon($sym,   'G','my_vars->');
+    print $em < multon("G$sym",'', 'my_vars->');
 }
 
 print $em <<'END';
@@ -711,7 +711,7 @@ print $em <<'END';
 END
 
 for $sym (sort keys %globvar) {
-    print $em multoff($sym,'G');
+    print $em < multoff($sym,'G');
 }
 
 print $em <<'END';
@@ -722,8 +722,8 @@ print $em <<'END';
 
 END
 
-for $sym (sort @extvars) {
-    print $em hide($sym,"PL_$sym");
+for $sym (sort < @extvars) {
+    print $em < hide($sym,"PL_$sym");
 }
 
 print $em <<'END';
@@ -739,7 +739,7 @@ rename_if_different('embedvar.h-new', 'embedvar.h');
 my $capi = safer_open('perlapi.c-new');
 my $capih = safer_open('perlapi.h-new');
 
-print $capih do_not_edit ("perlapi.h"), <<'EOT';
+print $capih < do_not_edit ("perlapi.h"), <<'EOT';
 
 /* declare accessor functions for Perl variables */
 #ifndef __perlapi_h__
@@ -844,11 +844,11 @@ END_EXTERN_C
 EOT
 
 foreach $sym (sort keys %intrp) {
-    print $capih bincompat_var('I',$sym);
+    print $capih < bincompat_var('I',$sym);
 }
 
 foreach $sym (sort keys %globvar) {
-    print $capih bincompat_var('G',$sym);
+    print $capih < bincompat_var('G',$sym);
 }
 
 print $capih <<'EOT';
@@ -863,7 +863,7 @@ EOT
 safer_close($capih);
 rename_if_different('perlapi.h-new', 'perlapi.h');
 
-print $capi do_not_edit ("perlapi.c"), <<'EOT';
+print $capi < do_not_edit ("perlapi.c"), <<'EOT';
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -948,7 +948,7 @@ rename_if_different('perlapi.c-new', 'perlapi.c');
 # functions that take va_list* for implementing vararg functions
 # NOTE: makedef.pl must be updated if you add symbols to %vfuncs
 # XXX %vfuncs currently unused
-my %vfuncs = qw(
+my %vfuncs = %( qw(
     Perl_croak			Perl_vcroak
     Perl_warn			Perl_vwarn
     Perl_warner			Perl_vwarner
@@ -964,6 +964,6 @@ my %vfuncs = qw(
     Perl_sv_catpvf_mg		Perl_sv_vcatpvf_mg
     Perl_dump_indent		Perl_dump_vindent
     Perl_default_protect	Perl_vdefault_protect
-);
+) );
 
 # ex: set ts=8 sts=4 sw=4 noet:

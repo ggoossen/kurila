@@ -34,7 +34,7 @@ use Fcntl;
 
 print "1..197\n";
 
-unlink glob "__db.*";
+unlink glob < "__db.*";
 
 sub ok
 {
@@ -47,17 +47,17 @@ sub ok
 
 sub lexical
 {
-    my(@a) = unpack ("C*", $a) ;
-    my(@b) = unpack ("C*", $b) ;
+    my(@a) = @( unpack ("C*", $a) ) ;
+    my(@b) = @( unpack ("C*", $b) ) ;
 
-    my $len = (@a +> @b ? @b : @a) ;
+    my $len = ((nelems @a) +> nelems @b ? (nelems @b) : nelems @a) ;
     my $i = 0 ;
 
     foreach $i ( 0 .. $len -1) {
         return @a[$i] - @b[$i] if @a[$i] != @b[$i] ;
     }
 
-    return @a - @b ;
+    return (nelems @a) - nelems @b ;
 }
 
 {
@@ -175,7 +175,7 @@ die "Could not tie: $!" unless $X;
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 
-my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
+my %noMode = %( map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
 ok(18, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
    || %noMode{$^O} );
@@ -251,10 +251,10 @@ ok(24, $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640, $DB_BTREE)) ;
 delete %h{'goner1'};
 $X->DELETE('goner3');
 
-my @keys = keys(%h);
-my @values = values(%h);
+my @keys = @( keys(%h) );
+my @values = @( values(%h) );
 
-ok(25, (@keys-1) == 29 && (@values-1) == 29) ;
+ok(25, ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29) ;
 
 $i = 0 ;
 while (($key,$value) = each(%h)) {
@@ -266,13 +266,13 @@ while (($key,$value) = each(%h)) {
 
 ok(26, $i == 30) ;
 
-@keys = ('blurfl', keys(%h), 'dyick');
-ok(27, (@keys-1) == 31) ;
+@keys = @('blurfl', keys(%h), 'dyick');
+ok(27, ((nelems @keys)-1) == 31) ;
 
 #Check that the keys can be retrieved in order
-my @b = keys %h ;
-my @c = sort lexical @b ;
-ok(28, ArrayCompare(\@b, \@c)) ;
+my @b = @( keys %h ) ;
+my @c = @( sort lexical < @b ) ;
+ok(28, < ArrayCompare(\@b, \@c)) ;
 
 %h{'foo'} = '';
 ok(29, %h{'foo'} eq '' ) ;
@@ -299,8 +299,8 @@ ok(31, $ok);
 ok(32, $size +> 0 );
 
 %h{[0..200]} = 200..400;
-my @foo = %h{[0..200]};
-ok(33, join(':',200..400) eq join(':',@foo) );
+my @foo = @( %h{[0..200]} );
+ok(33, join(':',200..400) eq join(':',< @foo) );
 
 # Now check all the non-tie specific stuff
 
@@ -494,27 +494,27 @@ ok(76, scalar $YY->get_dup('Smith') == 1 );
 ok(77, scalar $YY->get_dup('Wall') == 4 );
 
 # now in list context
-my @unknown = $YY->get_dup('Unknown') ;
-ok(78, "@unknown" eq "" );
+my @unknown = @( < $YY->get_dup('Unknown') ) ;
+ok(78, "{join ' ', <@unknown}" eq "" );
 
-my @smith = $YY->get_dup('Smith') ;
-ok(79, "@smith" eq "John" );
+my @smith = @( < $YY->get_dup('Smith') ) ;
+ok(79, "{join ' ', <@smith}" eq "John" );
 
 {
-my @wall = $YY->get_dup('Wall') ;
+my @wall = @( < $YY->get_dup('Wall') ) ;
 my %wall ;
-%wall{[@wall]} = @wall ;
-ok(80, (@wall == 4 && %wall{'Larry'} && %wall{'Stone'} && %wall{'Brick'}) );
+%wall{[< @wall]} = < @wall ;
+ok(80, ((nelems @wall) == 4 && %wall{'Larry'} && %wall{'Stone'} && %wall{'Brick'}) );
 }
 
 # hash
-my %unknown = $YY->get_dup('Unknown', 1) ;
+my %unknown = %( < $YY->get_dup('Unknown', 1) ) ;
 ok(81, keys %unknown == 0 );
 
-my %smith = $YY->get_dup('Smith', 1) ;
+my %smith = %( < $YY->get_dup('Smith', 1) ) ;
 ok(82, keys %smith == 1 && %smith{'John'}) ;
 
-my %wall = $YY->get_dup('Wall', 1) ;
+my %wall = %( < $YY->get_dup('Wall', 1) ) ;
 ok(83, keys %wall == 3 && %wall{'Larry'} == 1 && %wall{'Stone'} == 1 
 		&& %wall{'Brick'} == 2);
 
@@ -545,16 +545,16 @@ tie(%h, 'DB_File',$Dfile1, O_RDWR^|^O_CREAT, 0640, $dbh1 ) or die $!;
 tie(%g, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) or die $!;
 tie(%k, 'DB_File',$Dfile3, O_RDWR^|^O_CREAT, 0640, $dbh3 ) or die $!;
  
-my @Keys = qw( 0123 12 -1234 9 987654321 def  ) ;
+my @Keys = @( qw( 0123 12 -1234 9 987654321 def  ) ) ;
 my (@srt_1, @srt_2, @srt_3);
 { 
   no warnings 'numeric' ;
-  @srt_1 = sort { $a <+> $b } @Keys ; 
+  @srt_1 = @( sort { $a <+> $b } < @Keys ) ; 
 }
-@srt_2 = sort { $a cmp $b } @Keys ;
-@srt_3 = sort { length $a <+> length $b } @Keys ;
+@srt_2 = @( sort { $a cmp $b } < @Keys ) ;
+@srt_3 = @( sort { length $a <+> length $b } < @Keys ) ;
  
-foreach (@Keys) {
+foreach (< @Keys) {
     %h{$_} = 1 ;
     %g{$_} = 1 ;
     %k{$_} = 1 ;
@@ -562,11 +562,11 @@ foreach (@Keys) {
  
 sub ArrayCompare
 {
-    my($a, $b) = @_ ;
+    my($a, $b) = < @_ ;
  
-    return 0 if @$a != @$b ;
+    return 0 if (nelems @$a) != nelems @$b ;
  
-    foreach (1 .. length @$a)
+    foreach (1 .. length nelems @$a)
     {
         return 0 unless @$a[$_] eq @$b[$_] ;
     }
@@ -574,9 +574,9 @@ sub ArrayCompare
     1 ;
 }
  
-ok(84, ArrayCompare (\@srt_1, \@(keys %h)) );
-ok(85, ArrayCompare (\@srt_2, \@(keys %g)) );
-ok(86, ArrayCompare (\@srt_3, \@(keys %k)) );
+ok(84, < ArrayCompare (\@srt_1, \@(keys %h)) );
+ok(85, < ArrayCompare (\@srt_2, \@(keys %g)) );
+ok(86, < ArrayCompare (\@srt_3, \@(keys %k)) );
 
 untie %h ;
 untie %g ;
@@ -598,7 +598,7 @@ while (($key,$value) = each(%h)) {
 ok(88, $i == 10);
 
 # now clear the hash
-%h = () ;
+%h = %( () ) ;
 
 # check it is empty
 $i = 0 ;
@@ -725,7 +725,7 @@ EOM
 
    sub checkOutput
    {
-       my($fk, $sk, $fv, $sv) = @_ ;
+       my($fk, $sk, $fv, $sv) = < @_ ;
        return
            $fetch_key eq $fk && $store_key eq $sk && 
 	   $fetch_value eq $fv && $store_value eq $sv &&
@@ -743,42 +743,42 @@ EOM
 
    %h{"fred"} = "joe" ;
    #                   fk   sk     fv   sv
-   ok(102, checkOutput( "", "fred", "", "joe")) ;
+   ok(102, < checkOutput( "", "fred", "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(103, %h{"fred"} eq "joe");
    #                   fk    sk     fv    sv
-   ok(104, checkOutput( "", "fred", "joe", "")) ;
+   ok(104, < checkOutput( "", "fred", "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(105, $db->FIRSTKEY() eq "fred") ;
    #                    fk     sk  fv  sv
-   ok(106, checkOutput( "fred", "", "", "")) ;
+   ok(106, < checkOutput( "fred", "", "", "")) ;
 
    # replace the filters, but remember the previous set
-   my ($old_fk) = $db->filter_fetch_key   
+   my ($old_fk) = < $db->filter_fetch_key   
    			(sub { $_ = uc $_ ; $fetch_key = $_ }) ;
-   my ($old_sk) = $db->filter_store_key   
+   my ($old_sk) = < $db->filter_store_key   
    			(sub { $_ = lc $_ ; $store_key = $_ }) ;
-   my ($old_fv) = $db->filter_fetch_value 
+   my ($old_fv) = < $db->filter_fetch_value 
    			(sub { $_ = "[$_]"; $fetch_value = $_ }) ;
-   my ($old_sv) = $db->filter_store_value 
+   my ($old_sv) = < $db->filter_store_value 
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
-   ok(107, checkOutput( "", "fred", "", "Jxe")) ;
+   ok(107, < checkOutput( "", "fred", "", "Jxe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(108, %h{"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
-   ok(109, checkOutput( "", "fred", "[Jxe]", "")) ;
+   ok(109, < checkOutput( "", "fred", "[Jxe]", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(110, $db->FIRSTKEY() eq "FRED") ;
    #                   fk   sk     fv    sv
-   ok(111, checkOutput( "FRED", "", "", "")) ;
+   ok(111, < checkOutput( "FRED", "", "", "")) ;
 
    # put the original filters back
    $db->filter_fetch_key   ($old_fk);
@@ -788,15 +788,15 @@ EOM
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{"fred"} = "joe" ;
-   ok(112, checkOutput( "", "fred", "", "joe")) ;
+   ok(112, < checkOutput( "", "fred", "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(113, %h{"fred"} eq "joe");
-   ok(114, checkOutput( "", "fred", "joe", "")) ;
+   ok(114, < checkOutput( "", "fred", "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(115, $db->FIRSTKEY() eq "fred") ;
-   ok(116, checkOutput( "fred", "", "", "")) ;
+   ok(116, < checkOutput( "fred", "", "", "")) ;
 
    # delete the filters
    $db->filter_fetch_key   (undef);
@@ -806,15 +806,15 @@ EOM
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{"fred"} = "joe" ;
-   ok(117, checkOutput( "", "", "", "")) ;
+   ok(117, < checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(118, %h{"fred"} eq "joe");
-   ok(119, checkOutput( "", "", "", "")) ;
+   ok(119, < checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(120, $db->FIRSTKEY() eq "fred") ;
-   ok(121, checkOutput( "", "", "", "")) ;
+   ok(121, < checkOutput( "", "", "", "")) ;
 
    undef $db ;
    untie %h;
@@ -831,24 +831,24 @@ EOM
     unlink $Dfile;
     ok(122, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 
-    my %result = () ;
+    my %result = %( () ) ;
 
     sub Closure
     {
-        my ($name) = @_ ;
+        my ($name) = < @_ ;
 	my $count = 0 ;
-	my @kept = () ;
+	my @kept = @( () ) ;
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     %result{$name} = "$name - $count: [@kept]" ;
+		     %result{$name} = "$name - $count: [{join ' ', <@kept}]" ;
 		   }
     }
 
-    $db->filter_store_key(Closure("store key")) ;
-    $db->filter_store_value(Closure("store value")) ;
-    $db->filter_fetch_key(Closure("fetch key")) ;
-    $db->filter_fetch_value(Closure("fetch value")) ;
+    $db->filter_store_key( <Closure("store key")) ;
+    $db->filter_store_value( <Closure("store value")) ;
+    $db->filter_fetch_key( <Closure("fetch key")) ;
+    $db->filter_fetch_value( <Closure("fetch value")) ;
 
     $_ = "original" ;
 
@@ -924,7 +924,7 @@ EOM
 
     sub Compare
     {
-        my ($key1, $key2) = @_ ;
+        my ($key1, $key2) = < @_ ;
         (lc "$key1") cmp (lc "$key2") ;
     }
 
@@ -1094,18 +1094,18 @@ EOM
     my $cnt  = $x->get_dup("Wall") ;
     print "Wall occurred $cnt times\n" ;
 
-    my %hash = $x->get_dup("Wall", 1) ;
+    my %hash = %( < $x->get_dup("Wall", 1) ) ;
     print "Larry is there\n" if %hash{'Larry'} ;
     print "There are %hash{'Brick'} Brick Walls\n" ;
 
-    my @list = sort $x->get_dup("Wall") ;
-    print "Wall =>	[@list]\n" ;
+    my @list = @( sort < $x->get_dup("Wall") ) ;
+    print "Wall =>	[{join ' ', <@list}]\n" ;
 
-    @list = $x->get_dup("Smith") ;
-    print "Smith =>	[@list]\n" ;
+    @list = @( < $x->get_dup("Smith") ) ;
+    print "Smith =>	[{join ' ', <@list}]\n" ;
  
-    @list = $x->get_dup("Dog") ;
-    print "Dog =>	[@list]\n" ; 
+    @list = @( < $x->get_dup("Dog") ) ;
+    print "Dog =>	[{join ' ', <@list}]\n" ; 
  
     undef $x ;
     untie %h ;
@@ -1324,7 +1324,7 @@ EOM
     
     tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
 	or die "Can't open file: $!\n" ;
-    %h = (); ;
+    %h = %( () ); ;
     ok(155, $a eq "") ;
     untie %h ;
     unlink $Dfile;
@@ -1343,7 +1343,7 @@ EOM
 
     unlink $Dfile;
     my $bad_key = 0 ;
-    my %h = () ;
+    my %h = %( () ) ;
     my $db ;
     ok(156, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
@@ -1440,8 +1440,8 @@ ok(165,1);
     ok(168, $h1_count +> 0);
     ok(169, $h1_count == $h2_count);
 
-    ok(170, safeUntie \%hash1);
-    ok(171, safeUntie \%hash2);
+    ok(170, < safeUntie \%hash1);
+    ok(171, < safeUntie \%hash2);
     unlink $Dfile, $Dfile2;
 }
 
@@ -1465,7 +1465,7 @@ ok(165,1);
    %h{"fred"} = "joe" ;
    ok(173, %h{"fred"} eq "joe");
 
-   try { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= @( grep { %h{$_} } (1, 2, 3) ) };
    ok (174, ! $@);
 
 
@@ -1481,7 +1481,7 @@ ok(165,1);
 
    ok(176, $db->FIRSTKEY() eq "fred") ;
    
-   try { my @r= grep { %h{$_} } (1, 2, 3) };
+   try { my @r= @( grep { %h{$_} } (1, 2, 3) ) };
    ok (177, ! $@);
 
    undef $db ;
@@ -1557,7 +1557,7 @@ ok(165,1);
     local $^WARN_HOOK = sub {$warned = @_[0]} ;
 
     # db-put with substr of key
-    my %remember = () ;
+    my %remember = %( () ) ;
     for my $ix ( 10 .. 12 )
     {
         my $key = $ix . "data" ;
@@ -1610,7 +1610,7 @@ ok(165,1);
     ok 192, $warned eq '' 
       or print "# Caught warning [$warned]\n" ;
 
-    my %bad = () ;
+    my %bad = %( () ) ;
     $key = '';
     for ($status = $db->seq($key, $value, R_FIRST ) ;
          $status == 0 ;

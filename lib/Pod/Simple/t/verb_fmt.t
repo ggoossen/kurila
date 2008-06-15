@@ -11,8 +11,8 @@ use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e  ($$) { Pod::Simple::DumpAsXML->_duo(\&without_vf, @_) }
-sub ev ($$) { Pod::Simple::DumpAsXML->_duo(\&with_vf,    @_) }
+sub e  ($$) { Pod::Simple::DumpAsXML->_duo(\&without_vf, < @_) }
+sub ev ($$) { Pod::Simple::DumpAsXML->_duo(\&with_vf,    < @_) }
 
 sub with_vf    { @_[0]->  accept_codes('VerbatimFormatted') }
 sub without_vf { @_[0]->unaccept_codes('VerbatimFormatted') }
@@ -27,7 +27,7 @@ print "# Testing VerbatimFormatted...\n";
     # #:^^^^^^^^^^^^^^^^^              /////////////         
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -40,7 +40,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -53,7 +53,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -65,7 +65,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -74,7 +74,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -83,7 +83,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -92,7 +92,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -102,7 +102,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 # with a tab:
 q{=pod
 
@@ -114,7 +114,7 @@ q{=pod
 
 
 # Now testing the % too:
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -123,7 +123,7 @@ q{=pod
 );
 
 
-&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
    Hooboy!
@@ -145,15 +145,15 @@ q{=pod
 print "# Now running some tests adapted from verbatims.t...\n#\n#\n";
 
 print "# Without VerbatimFormatted...\n";
-&ok(  e "", "" );
-&ok(  e "\n", "", );
-&ok(  e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
-&ok(  e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
+&ok( <  e "", "" );
+&ok( <  e "\n", "", );
+&ok( <  e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
+&ok( <  e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
 print "# With VerbatimFormatted...\n";
-&ok( ev "", "" );
-&ok( ev "\n", "", );
-&ok( ev "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
-&ok( ev "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
+&ok( < ev "", "" );
+&ok( < ev "\n", "", );
+&ok( < ev "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
+&ok( < ev "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
 
 
 print "# Now testing via XMLOutStream without VerbatimFormatted...\n";

@@ -16,7 +16,7 @@ use strict;
 #--------------------------------------------------------------------------
 
 sub new {
-  my($class,$delay) = @_;
+  my($class,$delay) = < @_;
   my $self = bless \%('quiet_until' => 1),  ref($class) || $class;
   $self->to(*STDOUT{IO});
   $self->delay(defined($delay) ? $delay : 5);
@@ -25,12 +25,12 @@ sub new {
 
 sub copy { 
   my $orig = shift;
-  bless \%(%$orig, 'quiet_until' => 1), ref($orig);
+  bless \%(< %$orig, 'quiet_until' => 1), ref($orig);
 }
 #--------------------------------------------------------------------------
 
 sub reach {
-  my($self, $point, $note) = @_;
+  my($self, $point, $note) = < @_;
   if( (my $now = time) +>= $self->{'quiet_until'}) {
     my $goal;
     my    $to = $self->{'to'};
@@ -55,7 +55,7 @@ sub reach {
 #--------------------------------------------------------------------------
 
 sub done {
-  my($self, $note) = @_;
+  my($self, $note) = < @_;
   $self->{'quiet_until'} = 1;
   return $self->reach( undef, $note );
 }
@@ -64,11 +64,11 @@ sub done {
 # Simple accessors:
 
 sub delay {
-  return @_[0]->{'delay'} if @_ == 1; @_[0]->{'delay'} = @_[1]; return @_[0] }
+  return @_[0]->{'delay'} if (nelems @_) == 1; @_[0]->{'delay'} = @_[1]; return @_[0] }
 sub goal {
-  return @_[0]->{'goal' } if @_ == 1; @_[0]->{'goal' } = @_[1]; return @_[0] }
+  return @_[0]->{'goal' } if (nelems @_) == 1; @_[0]->{'goal' } = @_[1]; return @_[0] }
 sub to   {
-  return @_[0]->{'to'   } if @_ == 1; @_[0]->{'to'   } = @_[1]; return @_[0] }
+  return @_[0]->{'to'   } if (nelems @_) == 1; @_[0]->{'to'   } = @_[1]; return @_[0] }
 
 #--------------------------------------------------------------------------
 

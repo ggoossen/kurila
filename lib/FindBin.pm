@@ -101,9 +101,9 @@ use File::Spec;
 
 
 our ($Bin, $Script, $RealBin, $RealScript, $Dir, $RealDir);
-our @EXPORT_OK = qw($Bin $Script $RealBin $RealScript $Dir $RealDir);
-our %EXPORT_TAGS = (ALL => \@(qw($Bin $Script $RealBin $RealScript $Dir $RealDir)));
-our @ISA = qw(Exporter);
+our @EXPORT_OK = @( qw($Bin $Script $RealBin $RealScript $Dir $RealDir) );
+our %EXPORT_TAGS = %(ALL => \@(qw($Bin $Script $RealBin $RealScript $Dir $RealDir)));
+our @ISA = @( qw(Exporter) );
 
 our $VERSION = "1.49";
 
@@ -152,7 +152,7 @@ sub init
             && -f $script)
       {
        my $dir;
-       foreach $dir (File::Spec->path)
+       foreach $dir ( <File::Spec->path)
         {
         my $scr = File::Spec->catfile($dir, $script);
 
@@ -175,17 +175,17 @@ sub init
 
      # Ensure $script contains the complete path in case we C<chdir>
 
-     $script = File::Spec->catfile(cwd2(), $script)
+     $script = File::Spec->catfile( <cwd2(), $script)
        unless File::Spec->file_name_is_absolute($script);
 
-     ($Script,$Bin) = fileparse($script);
+     ($Script,$Bin) = < fileparse($script);
 
      # Resolve $script if it is a link
      while(1)
       {
        my $linktext = readlink($script);
 
-       ($RealScript,$RealBin) = fileparse($script);
+       ($RealScript,$RealBin) = < fileparse($script);
        last unless defined $linktext;
 
        $script = (File::Spec->file_name_is_absolute($linktext))

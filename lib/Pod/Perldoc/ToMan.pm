@@ -13,21 +13,21 @@ sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'txt' }
 
-sub __filter_nroff  { shift->_perldoc_elem('__filter_nroff'  , @_) }
-sub __nroffer       { shift->_perldoc_elem('__nroffer'       , @_) }
-sub __bindir        { shift->_perldoc_elem('__bindir'        , @_) }
-sub __pod2man       { shift->_perldoc_elem('__pod2man'       , @_) }
-sub __output_file   { shift->_perldoc_elem('__output_file'   , @_) }
+sub __filter_nroff  { shift->_perldoc_elem('__filter_nroff'  , < @_) }
+sub __nroffer       { shift->_perldoc_elem('__nroffer'       , < @_) }
+sub __bindir        { shift->_perldoc_elem('__bindir'        , < @_) }
+sub __pod2man       { shift->_perldoc_elem('__pod2man'       , < @_) }
+sub __output_file   { shift->_perldoc_elem('__output_file'   , < @_) }
 
-sub center          { shift->_perldoc_elem('center'         , @_) }
-sub date            { shift->_perldoc_elem('date'           , @_) }
-sub fixed           { shift->_perldoc_elem('fixed'          , @_) }
-sub fixedbold       { shift->_perldoc_elem('fixedbold'      , @_) }
-sub fixeditalic     { shift->_perldoc_elem('fixeditalic'    , @_) }
-sub fixedbolditalic { shift->_perldoc_elem('fixedbolditalic', @_) }
-sub quotes          { shift->_perldoc_elem('quotes'         , @_) }
-sub release         { shift->_perldoc_elem('release'        , @_) }
-sub section         { shift->_perldoc_elem('section'        , @_) }
+sub center          { shift->_perldoc_elem('center'         , < @_) }
+sub date            { shift->_perldoc_elem('date'           , < @_) }
+sub fixed           { shift->_perldoc_elem('fixed'          , < @_) }
+sub fixedbold       { shift->_perldoc_elem('fixedbold'      , < @_) }
+sub fixeditalic     { shift->_perldoc_elem('fixeditalic'    , < @_) }
+sub fixedbolditalic { shift->_perldoc_elem('fixedbolditalic', < @_) }
+sub quotes          { shift->_perldoc_elem('quotes'         , < @_) }
+sub release         { shift->_perldoc_elem('release'        , < @_) }
+sub section         { shift->_perldoc_elem('section'        , < @_) }
 
 sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
@@ -35,7 +35,7 @@ use File::Spec::Functions qw(catfile);
 
 sub parse_from_file {
   my $self = shift;
-  my($file, $outfh) = @_;
+  my($file, $outfh) = < @_;
 
   my $render = $self->{'__nroffer'} || die "no nroffer set!?";
   
@@ -110,7 +110,7 @@ sub parse_from_file {
     ;
     # A desperate fallthru:
     require Pod::Perldoc::ToPod;
-    return  Pod::Perldoc::ToPod->new->parse_from_file(@_);
+    return  Pod::Perldoc::ToPod->new->parse_from_file(< @_);
     
   } else {
     print $outfh $rslt
@@ -123,13 +123,13 @@ sub parse_from_file {
 
 sub ___Do_filter_nroff {
   my $self = shift;
-  my @data = split m/\n{2,}/, shift;
+  my @data = @( split m/\n{2,}/, shift );
   
-  shift @data while @data and @data[0] !~ m/\S/; # Go to header
-  shift @data if @data and @data[0] =~ m/Contributed\s+Perl/; # Skip header
-  pop @data if @data and @data[-1] =~ m/^\w/; # Skip footer, like
+  shift @data while (nelems @data) and @data[0] !~ m/\S/; # Go to header
+  shift @data if (nelems @data) and @data[0] =~ m/Contributed\s+Perl/; # Skip header
+  pop @data if (nelems @data) and @data[-1] =~ m/^\w/; # Skip footer, like
 				# 28/Jan/99 perl 5.005, patch 53 1
-  join "\n\n", @data;
+  join "\n\n", < @data;
 }
 
 1;

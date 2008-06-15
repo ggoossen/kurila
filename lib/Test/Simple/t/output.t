@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -18,7 +18,7 @@ print "1..5\n";
 my $test_num = 1;
 # Utility testing functions.
 sub ok ($;$) {
-    my($test, $name) = @_;
+    my($test, $name) = < @_;
     my $ok = '';
     $ok .= "not " unless $test;
     $ok .= "ok $test_num";
@@ -59,7 +59,7 @@ close *$out;
 undef $out;
 select $old;
 open(IN, "<", $tmpfile) or die $!;
-my @lines = ~< *IN;
+my @lines = @( ~< *IN );
 close IN;
 
 ok(@lines[0] =~ m/hi!/);

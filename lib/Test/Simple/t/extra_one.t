@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 
 require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my($out, $err) = < Test::Simple::Catch::caught();
 
 # Can't use Test.pm, that's a 5.005 thing.
 package My::Test;
@@ -24,7 +24,7 @@ require Test::Builder;
 my $TB = Test::Builder->create;
 $TB->plan(tests => 2);
 
-sub is { $TB->is_eq(@_) }
+sub is { $TB->is_eq(< @_) }
 
 
 package main;

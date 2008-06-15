@@ -4,12 +4,12 @@ use strict;
 BEGIN {
     if ( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
 package Term::ReadLine::Mock;
-our @ISA = 'Term::ReadLine::Stub';
+our @ISA = @( 'Term::ReadLine::Stub' );
 sub ReadLine {'Term::ReadLine::Mock'};
 sub readline { "a line" }
 sub new      { bless \%() }

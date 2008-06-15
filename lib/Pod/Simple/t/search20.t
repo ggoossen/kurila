@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -19,7 +19,7 @@ die "Couldn't make an object!?" unless ok defined $x;
 $x->inc(0);
 
 $x->callback(sub {
-  print "#  ", join("  ", map "\{$_\}", @_), "\n";
+  print "#  ", join("  ", map "\{$_\}", < @_), "\n";
   return;
 });
 
@@ -52,14 +52,14 @@ if(        -e ($here1 = source_path('testlib1'))) {
 print "# OK, found the test corpora\n#  as $here1\n# and $here2\n";
 ok 1;
 
-print $x->_state_as_string;
+print < $x->_state_as_string;
 #$x->verbose(12);
 
 use Pod::Simple;
 *pretty = \&Pod::Simple::BlackBox::pretty;
 
 print "# OK, starting run...\n# [[\n";
-my($name2where, $where2name) = $x->survey($here1, $here2);
+my($name2where, $where2name) = < $x->survey($here1, $here2);
 print "# ]]\n#OK, run done.\n";
 
 my $p = pretty( $where2name, $name2where )."\n";

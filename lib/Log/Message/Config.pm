@@ -13,13 +13,13 @@ BEGIN {
 
 sub new {
     my $class = shift;
-    my %hash  = @_;
+    my %hash  = %( < @_ );
 
     ### find out if the user specified a config file to use
     ### and/or a default configuration object
     ### and remove them from the argument hash
-    my %special =   map { lc, delete %hash{$_} }
-                    grep m/^config|default$/i, keys %hash;
+    my %special = %(   map { lc, delete %hash{$_} }
+                    grep m/^config|default$/i, keys %hash );
 
     ### allow provided arguments to override the values from the config ###
     my $tmpl = \%(
@@ -31,12 +31,12 @@ sub new {
         chrono  => \%( default => 1       ),
     );
 
-    my %lc_hash = map { lc, %hash{$_} } keys %hash;
+    my %lc_hash = %( map { lc, %hash{$_} } keys %hash );
 
     my $file_conf;
     if( %special{config} ) {
         $file_conf = _read_config_file( %special{config} )
-                        or ( warn( loc(q[Could not parse config file!]) ), return );
+                        or ( warn( < loc(q[Could not parse config file!]) ), return );
     }
 
     my $def_conf = \%{ %special{default} || \%() };
@@ -48,7 +48,7 @@ sub new {
     ### 1: arguments passed
     ### 2: any config file passed
     ### 3: any default config passed
-    my %to_check =  map     { @$_ }
+    my %to_check = %(  map     { < @$_ }
                     grep    { defined $_->[1] }
                     map     {   \@( $_ =>
                                     defined %lc_hash{$_}        ? %lc_hash{$_}      :
@@ -56,10 +56,10 @@ sub new {
                                     defined $def_conf->{$_}     ? $def_conf->{$_}   :
                                     undef
                                 )
-                            } keys %$tmpl;
+                            } keys %$tmpl );
 
     my $rv = check( $tmpl, \%to_check, 1 )
-                or ( warn( loc(q[Could not validate arguments!]) ), return );
+                or ( warn( < loc(q[Could not validate arguments!]) ), return );
 
     return bless $rv, $class;
 }
@@ -70,7 +70,7 @@ sub _read_config_file {
     my $conf = \%();
     my $FH = FileHandle->new();
     $FH->open("$file") or (
-                        warn(loc(q[Could not open config file '%1': %2],$file,$!)),
+                        warn( <loc(q[Could not open config file '%1': %2],$file,$!)),
                         return \%()
                     );
 

@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -16,7 +16,7 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
+sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 print "# With weird leading whitespace...\n";
 # With weird whitespace
@@ -44,7 +44,7 @@ ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo\n>\n"),
 
 
 print "#\n# Tests for wedges outside of formatting codes...\n";
-&ok( Pod::Simple::XMLOutStream->_out("=pod\n\nX < 3 and N > 19\n"),
+&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\nX < 3 and N > 19\n"), <
      Pod::Simple::XMLOutStream->_out("=pod\n\nX E<lt> 3 and N E<gt> 19\n")
 );
 

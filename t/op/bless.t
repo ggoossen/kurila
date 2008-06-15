@@ -9,7 +9,7 @@ plan (108);
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
 sub expected {
-    my($object, $package, $type) = @_;
+    my($object, $package, $type) = < @_;
     print "# {dump::view($object)} $package $type\n";
     is(ref($object), $package);
     my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/;
@@ -96,22 +96,22 @@ expected(bless(\%(), $1), "E", "HASH");
 # no class, or empty string (with a warning), or undef (with two)
 expected(bless(\@()), 'main', "ARRAY");
 {
-    local $^WARN_HOOK = sub { push @w, @_[0]->message };
+    local $^WARN_HOOK = sub { push @w, < @_[0]->message };
     use warnings;
 
     my $m = bless \@();
     expected($m, 'main', "ARRAY");
-    is (scalar @w, 0);
+    is (scalar nelems @w, 0);
 
-    @w = ();
+    @w = @( () );
     $m = bless \@(), '';
     expected($m, 'main', "ARRAY");
-    is (scalar @w, 1);
+    is (scalar nelems @w, 1);
 
-    @w = ();
+    @w = @( () );
     $m = bless \@(), undef;
     expected($m, 'main', "ARRAY");
-    is (scalar @w, 2);
+    is (scalar nelems @w, 2);
 }
 
 # class is a ref
@@ -130,7 +130,7 @@ is ($@, '', "class is an overloaded ref");
 expected($c4, 'C4', "SCALAR");
 
 {
-    my %h = 1..2;
+    my %h = %( 1..2 );
     my($k) = keys %h; 
     my $x=\$k;
     bless $x, 'pam';

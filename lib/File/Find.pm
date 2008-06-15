@@ -411,8 +411,8 @@ The first fixed version of File::Find was 1.01.
 
 =cut
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(find finddepth);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(find finddepth) );
 
 
 use strict;
@@ -431,7 +431,7 @@ our ($wanted_callback, $avoid_nlink, $bydepth, $no_chdir, $follow,
     $pre_process, $post_process, $dangling_symlinks);
 
 sub contract_name {
-    my ($cdir,$fn) = @_;
+    my ($cdir,$fn) = < @_;
 
     return substr($cdir,0,rindex($cdir,'/')) if $fn eq $File::Find::current_dir;
 
@@ -450,7 +450,7 @@ sub contract_name {
 
 # return the absolute name of a directory or file
 sub contract_name_Mac {
-    my ($cdir,$fn) = @_;
+    my ($cdir,$fn) = < @_;
     my $abs_name;
 
     if ($fn =~ m/^(:+)(.*)$/) { # valid pathname starting with a ':'
@@ -496,7 +496,7 @@ sub contract_name_Mac {
 }
 
 sub PathCombine($$) {
-    my ($Base,$Name) = @_;
+    my ($Base,$Name) = < @_;
     my $AbsName;
 
     if ($Is_MacOS) {
@@ -531,7 +531,7 @@ sub PathCombine($$) {
 }
 
 sub Follow_SymLink($) {
-    my ($AbsName) = @_;
+    my ($AbsName) = < @_;
 
     my ($NewName,$DEV, $INO);
     ($DEV, $INO)= lstat $AbsName;
@@ -641,7 +641,7 @@ sub _find_opt {
     my ($abs_dir, $Is_Dir);
 
     Proc_Top_Item:
-    foreach my $TOP (@_) {
+    foreach my $TOP (< @_) {
 	my $top_item = $TOP;
 
 	($topdev,$topino,$topmode,$topnlink) = $follow ? stat $top_item : lstat $top_item;
@@ -722,7 +722,7 @@ sub _find_opt {
 	}
 
 	unless ($Is_Dir) {
-	    unless (($_,$dir) = File::Basename::fileparse($abs_dir)) {
+	    unless (($_,$dir) = < File::Basename::fileparse($abs_dir)) {
 		if ($Is_MacOS) {
 		    ($dir,$_) = (':', $top_item); # $File::Find::dir, $_
 		}
@@ -779,7 +779,7 @@ sub _find_opt {
 #  chdir (if not no_chdir) to dir
 
 sub _find_dir($$$) {
-    my ($wanted, $p_dir, $nlink) = @_;
+    my ($wanted, $p_dir, $nlink) = < @_;
     my ($CdLvl,$Level) = (0,0);
     my @Stack;
     my @filenames;
@@ -891,9 +891,9 @@ sub _find_dir($$$) {
 	    warnings::warnif "Can't opendir($dir_name): $!\n";
 	    next;
 	}
-	@filenames = readdir DIR;
+	@filenames = @( readdir DIR );
 	closedir(DIR);
-	@filenames = $pre_process->(@filenames) if $pre_process;
+	@filenames = @( < $pre_process->(< @filenames) ) if $pre_process;
 	push @Stack,\@($CdLvl,$dir_name,"",-2)   if $post_process;
 
 	# default: use whatever was specifid
@@ -904,7 +904,7 @@ sub _find_dir($$$) {
 
 	if ($nlink == 2 && !$no_nlink) {
 	    # This dir has no subdirectories.
-	    for my $FN (@filenames) {
+	    for my $FN (< @filenames) {
 		if ($Is_VMS) {
 		# Big hammer here - Compensate for VMS trailing . and .dir
 		# No win situation until this is changed, but this
@@ -928,9 +928,9 @@ sub _find_dir($$$) {
 	    # HACK: insert directories at this position. so as to preserve
 	    # the user pre-processed ordering of files.
 	    # EG: directory traversal is in user sorted order, not at random.
-            my $stack_top = @Stack;
+            my $stack_top = (nelems @Stack);
 
-	    for my $FN (@filenames) {
+	    for my $FN (< @filenames) {
 		next if $FN =~ $File::Find::skip_pattern;
 		if ($subcount +> 0 || $no_nlink) {
 		    # Seen all the subdirs?
@@ -962,7 +962,7 @@ sub _find_dir($$$) {
     }
     continue {
 	while ( defined ($SE = pop @Stack) ) {
-	    ($Level, $p_dir, $dir_rel, $nlink) = @$SE;
+	    ($Level, $p_dir, $dir_rel, $nlink) = < @$SE;
 	    if ($CdLvl +> $Level && !$no_chdir) {
 		my $tmp;
 		if ($Is_MacOS) {
@@ -1049,7 +1049,7 @@ sub _find_dir($$$) {
 #  chdir (if not no_chdir) to dir
 
 sub _find_dir_symlnk($$$) {
-    my ($wanted, $dir_loc, $p_dir) = @_; # $dir_loc is the absolute directory
+    my ($wanted, $dir_loc, $p_dir) = < @_; # $dir_loc is the absolute directory
     my @Stack;
     my @filenames;
     my $new_loc;
@@ -1155,10 +1155,10 @@ sub _find_dir_symlnk($$$) {
 	    warnings::warnif "Can't opendir($dir_loc): $!\n";
 	    next;
 	}
-	@filenames = readdir DIR;
+	@filenames = @( readdir DIR );
 	closedir(DIR);
 
-	for my $FN (@filenames) {
+	for my $FN (< @filenames) {
 	    if ($Is_VMS) {
 	    # Big hammer here - Compensate for VMS trailing . and .dir
 	    # No win situation until this is changed, but this
@@ -1209,7 +1209,7 @@ sub _find_dir_symlnk($$$) {
     }
     continue {
 	while (defined($SE = pop @Stack)) {
-	    ($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = @$SE;
+	    ($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = < @$SE;
 	    if ($Is_MacOS) {
 		# $p_dir always has a trailing ':', except for the starting dir,
 		# where $dir_rel eq ':'
@@ -1282,13 +1282,13 @@ sub wrap_wanted {
 
 sub find {
     my $wanted = shift;
-    _find_opt(wrap_wanted($wanted), @_);
+    _find_opt( <wrap_wanted($wanted), < @_);
 }
 
 sub finddepth {
     my $wanted = wrap_wanted(shift);
     $wanted->{bydepth} = 1;
-    _find_opt($wanted, @_);
+    _find_opt($wanted, < @_);
 }
 
 # default

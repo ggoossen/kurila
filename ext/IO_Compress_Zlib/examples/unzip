@@ -6,7 +6,7 @@ use IO::File;
 use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError);
 
 die "Usage: zipcat file" 
-    if @ARGV != 1 ;
+    if (nelems @ARGV) != 1 ;
 
 my $file = @ARGV[0] ;
 

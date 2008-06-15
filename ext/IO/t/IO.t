@@ -25,13 +25,13 @@ plan(tests => 18);
 
 	# use_ok() calls import, which we do not want to do
 	require_ok( 'IO' );
-	ok( @load, 'IO should call XSLoader::load()' );
+	ok( < @load, 'IO should call XSLoader::load()' );
 	is( @load[0]->[0], 'IO', '... loading the IO library' );
 	is( @load[0]->[1], $IO::VERSION, '... with the current .pm version' );
 }
 
-my @default = map { "IO/$_.pm" } qw( Handle Seekable File Pipe Socket Dir );
-delete %INC{[@default ]};
+my @default = @( map { "IO/$_.pm" } qw( Handle Seekable File Pipe Socket Dir ) );
+delete %INC{[< @default ]};
 
 my $warn = '' ;
 local $^WARN_HOOK = sub { $warn = @_[0]->{description} } ;
@@ -74,7 +74,7 @@ local $^WARN_HOOK = sub { $warn = @_[0]->{description} } ;
     $warn = '' ;
 }
 
-foreach my $default (@default)
+foreach my $default (< @default)
 {
 	ok( exists %INC{ $default }, "... import should default load $default" );
 }
@@ -114,7 +114,7 @@ SKIP:
 {
 	skip("Could not write to disk", 2 ) unless $flag;
 	try { IO->import( 'fakemod' ) };
-	ok( IO::fakemod::exists(), 'import() should import IO:: modules by name' );
+	ok( < IO::fakemod::exists(), 'import() should import IO:: modules by name' );
 	is( $@, '', '... and should not call import() on imported modules' );
 }
 

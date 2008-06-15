@@ -1,7 +1,7 @@
 package Tie::StdHandle; 
 
 use Tie::Handle;
-our @ISA = 'Tie::Handle';
+our @ISA = @( 'Tie::Handle' );
 use Carp;
 
 sub TIEHANDLE 
@@ -9,7 +9,7 @@ sub TIEHANDLE
  my $class = shift;
  my $fh    = \do { local *HANDLE};
  bless $fh,$class;
- $fh->OPEN(@_) if (@_);
+ $fh->OPEN(< @_) if (nelems @_);
  return $fh;
 }
 
@@ -23,7 +23,7 @@ sub BINMODE { binmode(@_[0]) }
 sub OPEN
 {
  @_[0]->CLOSE if defined(@_[0]->FILENO);
- @_ == 2 ? open(@_[0], @_[1]) : open(@_[0], @_[1], @_[2]);
+ (nelems @_) == 2 ? open(@_[0], @_[1]) : open(@_[0], @_[1], @_[2]);
 }
 
 sub READ     { read(@_[0],@_[1],@_[2]) }

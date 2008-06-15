@@ -9,9 +9,9 @@ $VERSION = '3.2701';
 
 require Exporter;
 
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 
-@EXPORT = qw(
+@EXPORT = @( qw(
 	canonpath
 	catdir
 	catfile
@@ -21,9 +21,9 @@ require Exporter;
 	no_upwards
 	file_name_is_absolute
 	path
-);
+) );
 
-@EXPORT_OK = qw(
+@EXPORT_OK = @( qw(
 	devnull
 	tmpdir
 	splitpath
@@ -32,14 +32,14 @@ require Exporter;
 	abs2rel
 	rel2abs
 	case_tolerant
-);
+) );
 
-%EXPORT_TAGS = ( ALL => \@( @EXPORT_OK, @EXPORT ) );
+%EXPORT_TAGS = %( ALL => \@( < @EXPORT_OK, < @EXPORT ) );
 
-foreach my $meth (@EXPORT, @EXPORT_OK) {
+foreach my $meth (< @EXPORT, < @EXPORT_OK) {
     my $sub = File::Spec->can($meth);
     no strict 'refs';
-    *{Symbol::fetch_glob($meth)} = sub {&$sub('File::Spec', @_)};
+    *{Symbol::fetch_glob($meth)} = sub {&$sub('File::Spec', < @_)};
 }
 
 

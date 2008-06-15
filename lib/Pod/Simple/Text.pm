@@ -9,7 +9,7 @@ use Pod::Simple::Methody ();
 use Pod::Simple ();
 use vars qw( @ISA $VERSION $FREAKYMODE);
 $VERSION = '2.02';
-@ISA = ('Pod::Simple::Methody');
+@ISA = @('Pod::Simple::Methody');
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
           ? \&Pod::Simple::DEBUG
           : sub() {0}
@@ -21,7 +21,7 @@ $Text::Wrap::wrap = 'overflow';
 
 sub new {
   my $self = shift;
-  my $new = $self->SUPER::new(@_);
+  my $new = $self->SUPER::new(< @_);
   $new->{'output_fh'} ||= *STDOUT{IO};
   $new->accept_target_as_text(qw( text plaintext plain ));
   $new->nix_X_codes(1);

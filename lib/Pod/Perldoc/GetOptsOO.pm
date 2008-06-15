@@ -26,24 +26,24 @@ BEGIN { # Make a DEBUG constant ASAP
 
 
 sub getopts {
-  my($target, $args, $truth) = @_;
+  my($target, $args, $truth) = < @_;
   
   $args ||= \@ARGV;
 
   $target->aside(
-    "Starting switch processing.  Scanning arguments [@$args]\n"
+    "Starting switch processing.  Scanning arguments [{join ' ', <@$args}]\n"
   ) if $target->can('aside');
 
-  return unless @$args;
+  return unless (nelems @$args);
 
-  $truth = 1 unless @_ +> 2;
+  $truth = 1 unless (nelems @_) +> 2;
 
   DEBUG +> 3 and print "   Truth is $truth\n";
 
 
   my $error_count = 0;
 
-  while( @$args  and  ($_ = $args->[0]) =~ m/^-(.)(.*)/s ) {
+  while( (nelems @$args)  and  ($_ = $args->[0]) =~ m/^-(.)(.*)/s ) {
     my($first,$rest) = ($1,$2);
     if ($_ eq '--') {	# early exit if "--"
       shift @$args;
@@ -53,7 +53,7 @@ sub getopts {
     if( $target->can($method) ) {  # it's argumental
       if($rest eq '') {   # like -f bar
         shift @$args;
-        warn "Option $first needs a following argument!\n" unless @$args;
+        warn "Option $first needs a following argument!\n" unless (nelems @$args);
         $rest = shift @$args;
       } else {            # like -fbar  (== -f bar)
         shift @$args;
@@ -95,7 +95,7 @@ sub getopts {
   
 
   $target->aside(
-    "Ending switch processing.  Args are [@$args] with $error_count errors.\n"
+    "Ending switch processing.  Args are [{join ' ', <@$args}] with $error_count errors.\n"
   ) if $target->can('aside');
 
   $error_count == 0;

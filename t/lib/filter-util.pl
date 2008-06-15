@@ -6,7 +6,7 @@ use vars qw( $Perl $Inc);
 
 sub readFile
 {
-    my ($filename) = @_ ;
+    my ($filename) = < @_ ;
     my ($string) = '' ;
 
     open (F, "<", "$filename") 
@@ -19,18 +19,18 @@ sub readFile
 
 sub writeFile
 {
-    my($filename, @strings) = @_ ;
+    my($filename, < @strings) = < @_ ;
     open (F, ">", "$filename") 
 	or die "Cannot open $filename: $!\n" ;
     binmode(F) if $filename =~ m/bin$/i;
-    foreach (@strings)
+    foreach (< @strings)
       { print F }
     close F or die "Could not close: $!" ;
 }
 
 sub ok
 {
-    my($number, $result, $note) = @_ ;
+    my($number, $result, $note) = < @_ ;
  
     $note = "" if ! defined $note ;
     if ($note) {
@@ -43,7 +43,7 @@ sub ok
 }
 
 $Inc = '' ;
-foreach (@INC)
+foreach (< @INC)
  { $Inc .= "\"-I$_\" " }
 $Inc = "-I::lib" if $^O eq 'MacOS';
 

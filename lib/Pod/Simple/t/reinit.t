@@ -40,7 +40,7 @@ foreach my $file (
     $precooked =~ s<\.pod><o.txt>s;
     $parser->reinit;
     $parser->output_string(\$outstring);
-    $parser->parse_file(source_path($file));
+    $parser->parse_file( <source_path($file));
 
     open(IN, "<", $precooked) or die "Can't read-open $precooked: $!";
     {

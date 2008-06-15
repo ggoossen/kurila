@@ -104,7 +104,7 @@ if(exists %Opts{v} ){
         exit 1;
     }
 
-    if ( !@ARGV ) {
+    if ( !nelems @ARGV ) {
 	print "\nThe following modules were in perl v%Opts{v} CORE\n";
 	print "$_ ", $version_hash->{$_} || " ","\n"
 	for sort keys %$version_hash;
@@ -113,17 +113,17 @@ if(exists %Opts{v} ){
     }
 }
 
-if ( !@ARGV ) {
+if ( !nelems @ARGV ) {
     pod2usage(0);
 }
 
-while (@ARGV) {
+while ((nelems @ARGV)) {
 	my ($mod, $ver);
 	if (@ARGV[0] =~ m/=/) {
 	    ($mod, $ver) = split m/=/, shift @ARGV;
 	} else {
 	    $mod = shift @ARGV;
-	    $ver = (@ARGV && @ARGV[0] =~ m/^\d/) ? shift @ARGV : "";
+	    $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ? shift @ARGV : "";
 	}
 
 	if ($mod !~ m|^/(.*)/([imosx]*)$|) { # not a regex
@@ -138,9 +138,9 @@ while (@ARGV) {
 		warn "\n$mod  is a bad regex: $errmsg\n";
 		next;
 	    }
-	    my @mod = Module::CoreList->find_modules($re);
-	    if (@mod) {
-		module_version($_, $ver) for @mod;
+	    my @mod = @( < Module::CoreList->find_modules($re) );
+	    if ((nelems @mod)) {
+		module_version($_, $ver) for < @mod;
 	    } else {
 		$ver ^|^= '';
 		print "\n$mod $ver has no match in CORE (or so I think)\n";
@@ -152,7 +152,7 @@ while (@ARGV) {
 exit();
 
 sub module_version {
-    my($mod,$ver) = @_;
+    my($mod,$ver) = < @_;
 
     if ( %Opts{v} ) {
 	my $version_hash = Module::CoreList->find_version(%Opts{v});
@@ -164,8 +164,8 @@ sub module_version {
     }
 
     my $ret = %Opts{d}
-	? Module::CoreList->first_release_by_date(@_)
-	: Module::CoreList->first_release(@_);
+	? Module::CoreList->first_release_by_date(< @_)
+	: Module::CoreList->first_release(< @_);
     my $msg = $mod;
     $msg .= " $ver" if $ver;
 

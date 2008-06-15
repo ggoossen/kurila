@@ -6,8 +6,8 @@ use Carp;
 
 require Exporter;
 
-our @ISA     = qw/ Exporter /;
-our @EXPORT  = qw/ hostname /;
+our @ISA     = @( qw/ Exporter / );
+our @EXPORT  = @( qw/ hostname / );
 
 our $VERSION;
 
@@ -81,7 +81,7 @@ sub hostname {
 	require "sys/syscall.ph";
 	require "sys/systeminfo.ph";
 	$host = "\0" x 65; ## preload scalar
-	syscall(&SYS_systeminfo, &SI_HOSTNAME, $host, 65) != -1;
+	syscall(&SYS_systeminfo, < &SI_HOSTNAME, $host, 65) != -1;
     }
 
     # method 3 - trusty old hostname command
@@ -94,7 +94,7 @@ sub hostname {
     # correct
     || try {
 	require POSIX;
-	$host = (POSIX::uname())[1];
+	$host = ( <POSIX::uname())[1];
     }
 
     # method 5 - sysV uname command (may truncate)

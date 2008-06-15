@@ -17,13 +17,13 @@ use B::Showlex ();
 
 plan tests => 15;
 
-my $verbose = @ARGV; # set if ANY ARGS
+my $verbose = (nelems @ARGV); # set if ANY ARGS
 
 my $a;
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } @INC;
+my $path = join " ", map { qq["-I$_"] } < @INC;
 $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
 my $redir = $Is_MacOS ? "" : "2>&1";
 my $is_thread = %Config{use5005threads} && %Config{use5005threads} eq 'define';
@@ -42,7 +42,7 @@ my ($na,$nb,$nc);	# holds regex-strs
 my ($out, $newlex);	# output, option-flag
 
 sub padrep {
-    my ($varname,$newlex) = @_;
+    my ($varname,$newlex) = < @_;
     return ($newlex)
 	? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
 	: "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
@@ -92,10 +92,10 @@ SKIP: {
 
     # fibonacci function under test
     my $asub = sub {
-	my ($self,%props)=@_;
+	my ($self,< %props)=< @_;
 	my $total;
 	{ # inner block vars
-	    my (@fib)=(1,2);
+	    my (@fib)=@(1,2);
 	    for (my $i=2; $i+<10; $i++) {
 		@fib[$i] = @fib[$i-2] + @fib[$i-1];
 	    }

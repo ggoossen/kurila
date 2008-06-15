@@ -26,9 +26,9 @@ while ( ~< *DESC) {
         (@type[$ind], @code[$ind], @args[$ind], @longj[$ind]) 
           = split m/[,\s]\s*/, $desc, 4;
     } else {
-        my ($type,@lists)=split m/\s*\t+\s*/, $_;
-        die "No list? $type" if !@lists;
-        foreach my $list (@lists) {
+        my ($type,< @lists)=split m/\s*\t+\s*/, $_;
+        die "No list? $type" if !nelems @lists;
+        foreach my $list (< @lists) {
             my ($names,$special)=split m/:/, $list , 2;
             $special ||= "";
             foreach my $name (split m/,/,$names) {
@@ -37,15 +37,15 @@ while ( ~< *DESC) {
                         : "{$type}_$name";
                 my @suffix;
                 if (!$special) {
-                   @suffix=("");
+                   @suffix=@("");
                 } elsif ($special=~m/\d/) {
-                    @suffix=(1..$special);
+                    @suffix=@(1..$special);
                 } elsif ($special eq 'FAIL') {
-                    @suffix=("","_fail");
+                    @suffix=@("","_fail");
                 } else {
                     die "unknown :type ':$special'";
                 }
-                foreach my $suffix (@suffix) {
+                foreach my $suffix (< @suffix) {
                     $ind++;
                     @name[$ind]="$real$suffix";
                     @type[$ind]=$type;
@@ -209,7 +209,7 @@ while (~< $fh) {
 	%reverse{$newval} = $1;
     }
 }    
-my %vrxf=reverse %rxfv;
+my %vrxf= %(reverse < %rxfv );
 printf $out "\t/* Bits in extflags defined: \%032b */\n",$val;
 for (0..31) {
     my $n=%vrxf{2**$_}||"UNUSED_BIT_$_";

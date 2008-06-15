@@ -15,8 +15,8 @@ plan(tests => 6);
 
 my $r;
 
-my @tmpfiles = ();
-END { unlink @tmpfiles }
+my @tmpfiles = @( () );
+END { unlink < @tmpfiles }
 
 my $b = pack("C*", unpack("U0C*", pack("U",256)));
 
@@ -55,6 +55,6 @@ require utf8;
 $r = runperl( switches => \@( '-CA', '-w' ),
 	      prog     => 'use utf8; print ord shift',
               stderr   => 1,
-              args     => \@( utf8::chr(256) ) );
+              args     => \@( < utf8::chr(256) ) );
 like( $r, qr/^256(?:\r?\n)?$/s, '-CA: @ARGV' );
 

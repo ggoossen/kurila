@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -26,7 +26,7 @@ isa_ok($mm, 'ExtUtils::MM_Any');
 
 
 sub try_oneliner {
-    my($code, $switches, $expect, $name) = @_;
+    my($code, $switches, $expect, $name) = < @_;
     my $cmd = $mm->oneliner($code, $switches);
     $cmd =~ s{\$\(ABSPERLRUN\)}{$^X};
 

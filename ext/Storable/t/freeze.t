@@ -9,7 +9,7 @@
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
+	@INC = @('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
@@ -29,8 +29,8 @@ our $d = \%();
 our $e = \@();
 $d->{'a'} = $e;
 $e->[0] = $d;
-our %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
-our @a = ('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
+our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
+our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
 	$b, \$a, $a, $c, \$c, \%a);
 
 print "not " unless defined (our $f1 = freeze(\@a));
@@ -49,7 +49,7 @@ print "ok 4\n";
 print "not " unless $got eq $dumped; 
 print "ok 5\n";
 
-package FOO; our @ISA = qw(Storable);
+package FOO; our @ISA = @( qw(Storable) );
 
 sub make {
 	my $self = bless \%();
@@ -117,7 +117,7 @@ try {
 };
 ok 16, $@;
 
-my %to_be_frozen = (foo => 'bar');
+my %to_be_frozen = %(foo => 'bar');
 my $frozen;
 try {
 	$frozen = freeze \%to_be_frozen;

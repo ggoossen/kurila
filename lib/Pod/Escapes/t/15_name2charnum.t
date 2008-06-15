@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -52,7 +52,7 @@ ok e2charnum('65') ne e2charnum('lt');
 print "# eacute tests...\n";
 ok defined e2charnum('eacute');
 
-print "#    eacute is <", e2charnum('eacute'), "> which is code ",
+print "#    eacute is <", < e2charnum('eacute'), "> which is code ",
       ord(e2charnum('eacute')), "\n";
 
 ok e2charnum('eacute'), e2charnum('233');
@@ -63,7 +63,7 @@ ok e2charnum('eacute'), e2charnum('xE9');
 print "# pi tests...\n";
 ok defined e2charnum('pi');
 
-print "#    pi is <", e2charnum('pi'), "> which is code ",
+print "#    pi is <", < e2charnum('pi'), "> which is code ", <
       e2charnum('pi'), "\n";
 
 ok e2charnum('pi'), e2charnum('960');

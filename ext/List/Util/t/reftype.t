@@ -20,7 +20,7 @@ use Symbol qw(gensym);
 # Ensure we do not trigger and tied methods
 tie *F, 'MyTie';
 
-my @test = (
+my @test = @(
  \@( undef, 1,		'number'	),
  \@( undef, 'A',		'string'	),
  \@( HASH   => \%(),	'HASH ref'	),
@@ -28,13 +28,13 @@ my @test = (
  \@( SCALAR => \$t,	'SCALAR ref'	),
  \@( REF    => \(\$t),	'REF ref'	),
  \@( GLOB   => \*F,	'tied GLOB ref'	),
- \@( GLOB   => gensym,	'GLOB ref'	),
+ \@( GLOB   => < gensym,	'GLOB ref'	),
  \@( CODE   => sub {},	'CODE ref'	),
 # \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
 );
 
-foreach my $test (@test) {
-  my($type,$what, $n) = @$test;
+foreach my $test (< @test) {
+  my($type,$what, $n) = < @$test;
 
   is( reftype($what), $type, $n);
   next unless ref($what);

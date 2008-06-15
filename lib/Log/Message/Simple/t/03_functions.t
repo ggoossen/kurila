@@ -2,8 +2,8 @@ use Test::More 'no_plan';
 use strict;
 
 my $Class   = 'Log::Message::Simple';
-my @Carp    = qw[carp croak cluck confess];
-my @Msg     = qw[msg debug error];
+my @Carp    = @( qw[carp croak cluck confess] );
+my @Msg     = @( qw[msg debug error] );
 my $Text    = 'text';
 my $Pkg     = 'Test::A';
 
@@ -16,7 +16,7 @@ use_ok( $Class );
     ### about warnings
     ### close stderr/warnings for that same purpose, as carp
     ### & friends will print there
-    for my $name (@Carp, @Msg) {
+    for my $name (< @Carp, < @Msg) {
         no strict 'refs';
         *{Symbol::fetch_glob($name)} = sub {  
                     local $^W;
@@ -40,18 +40,18 @@ use_ok( $Class );
                     my $ref = $Class->can( $name );
 
 
-                    $ref->( @_ );
+                    $ref->( < @_ );
                 };
     }      
 }
 
-for my $name (@Carp, @Msg) {
+for my $name (< @Carp, < @Msg) {
     
     my $ref = $Pkg->can( $name );
     ok( $ref,                   "Found function for '$name'" );
 
     ### start with an empty stack?
-    cmp_ok( scalar @{\@($Class->stack)}, '==', 0,
+    cmp_ok( scalar nelems @{\@( <$Class->stack)}, '==', 0,
                                 "   Starting with empty stack" );
     ok(!$Class->stack_as_string,"   Stringified stack empty" );                                
     
@@ -59,8 +59,8 @@ for my $name (@Carp, @Msg) {
     ### eval this -- the croak/confess functions die
     try { $ref->( $Text ); };
     
-    my @stack = $Class->stack;
-    cmp_ok( scalar(@stack), '==', 1,
+    my @stack = @( < $Class->stack );
+    cmp_ok( scalar(nelems @stack), '==', 1,
                                 "   Text logged to stack" );
                                 
     for my $re ( $Text, quotemeta '['.uc($name).']' ) {                               
@@ -70,7 +70,7 @@ for my $name (@Carp, @Msg) {
 
     ### empty stack again ###    
     ok( $Class->flush,          "   Stack flushed" );
-    cmp_ok( scalar @{\@($Class->stack)}, '==', 0,
+    cmp_ok( scalar nelems @{\@( <$Class->stack)}, '==', 0,
                                 "   Starting with empty stack" );
     ok(!$Class->stack_as_string,"   Stringified stack empty" );                                
 }

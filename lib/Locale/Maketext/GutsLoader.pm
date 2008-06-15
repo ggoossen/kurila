@@ -1,7 +1,7 @@
 
 package Locale::Maketext::GutsLoader;
 use strict;
-sub zorp { return scalar @_ }
+sub zorp { return scalar nelems @_ }
 
 BEGIN {
   $Locale::Maketext::GutsLoader::GUTSPATH = __FILE__;

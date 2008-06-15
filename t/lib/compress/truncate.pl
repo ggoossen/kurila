@@ -24,7 +24,7 @@ EOM
     my $blocksize = 10 ;
 
 
-    my ($info, $compressed) = mkComplete($CompressClass, $hello);
+    my ($info, $compressed) = < mkComplete($CompressClass, $hello);
 
     my $header_size  = $info->{HeaderLength};
     my $trailer_size = $info->{TrailerLength};

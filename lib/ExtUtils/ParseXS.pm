@@ -9,8 +9,8 @@ use strict;
 
 require Exporter;
 
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(process_file);
+our @ISA = @( qw(Exporter) );
+our @EXPORT_OK = @( qw(process_file) );
 
 # use strict;  # One of these days...
 
@@ -68,12 +68,12 @@ our $SymSet;
 sub process_file {
   
   # Allow for $package->process_file(%hash) in the future
-  my ($pkg, %args) = @_ % 2 ? @_ : (__PACKAGE__, @_);
+  my ($pkg, < %args) = (nelems @_) % 2 ? < @_ : (__PACKAGE__, < @_);
   
   $ProtoUsed = exists %args{prototypes};
   
   # Set defaults.
-  %args = (
+  %args = %(
 	   # 'C++' => 0, # Doesn't seem to *do* anything...
 	   hiertype => 0,
 	   except => 0,
@@ -87,7 +87,7 @@ sub process_file {
 	   typemap => \@(),
 	   output => \*STDOUT,
 	   csuffix => '.c',
-	   %args,
+	   < %args,
 	  );
 
   # Global Constants
@@ -98,9 +98,9 @@ sub process_file {
     require ExtUtils::XSSymSet;
     $SymSet = ExtUtils::XSSymSet->new( 28);
   }
-  @XSStack = (\%(type => 'none'));
+  @XSStack = @(\%(type => 'none'));
   ($XSS_work_idx, $cpp_next_tmp) = (0, "XSubPPtmpAAAA");
-  @InitFileCode = ();
+  @InitFileCode = @( () );
   $FH = Symbol::gensym();
   $proto_re = "[" . quotemeta('\$%&*@;[]') . "]" ;
   $Overload = 0;
@@ -120,12 +120,12 @@ sub process_file {
   $WantOptimize = %args{optimize};
   $process_inout = %args{inout};
   $process_argtypes = %args{argtypes};
-  @tm = ref %args{typemap} ? @{%args{typemap}} : (%args{typemap});
+  @tm = @( ref %args{typemap} ? < @{%args{typemap}} : (%args{typemap}) );
   
   for (%args{filename}) {
     die "Missing required parameter 'filename'" unless $_;
     $filepathname = $_;
-    ($dir, $filename) = (dirname($_), basename($_));
+    ($dir, $filename) = ( <dirname($_), < basename($_));
     $filepathname =~ s/\\/\\\\/g;
     %IncludedFiles{$_}++;
   }
@@ -164,13 +164,13 @@ sub process_file {
     select %args{output};
   }
 
-  foreach my $typemap (@tm) {
+  foreach my $typemap (< @tm) {
     die "Can't find $typemap in $pwd\n" unless -r $typemap;
   }
 
-  push @tm, standard_typemap_locations();
+  push @tm, < standard_typemap_locations();
 
-  foreach my $typemap (@tm) {
+  foreach my $typemap (< @tm) {
     next unless -f $typemap ;
     # skip directories, binary files etc.
     warn("Warning: ignoring non-text typemap file '$typemap'\n"), next
@@ -327,19 +327,19 @@ EOM
 
 EOF
 
-  print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+  print < 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
   $lastline    = $_;
   $lastline_no = $.;
 
  PARAGRAPH:
   while (fetch_para()) {
-      process_para(%args);
+      process_para(< %args);
   }
 
   if ($Overload) # make it findable with fetchmethod
   {
-    print Q(<<"EOF");
+    print < Q(<<"EOF");
 #XS(XS_{$Packid}_nil); /* prototype to pass -Wmissing-prototypes */
 #XS(XS_{$Packid}_nil)
 #\{
@@ -357,18 +357,18 @@ MAKE_FETCHMETHOD_WORK
 
   # print initialization routine
 
-  print Q(<<"EOF");
+  print < Q(<<"EOF");
 ##ifdef __cplusplus
 #extern "C"
 ##endif
 EOF
 
-  print Q(<<"EOF");
+  print < Q(<<"EOF");
 #XS(boot_$Module_cname); /* prototype to pass -Wmissing-prototypes */
 #XS(boot_$Module_cname)
 EOF
 
-  print Q(<<"EOF");
+  print < Q(<<"EOF");
 #[[
 ##ifdef dVAR
 #    dVAR; dXSARGS;
@@ -379,29 +379,29 @@ EOF
 
   #-Wall: if there is no $Full_func_name there are no xsubs in this .xs
   #so `file' is unused
-  print Q(<<"EOF") if $Full_func_name;
+  print < Q(<<"EOF") if $Full_func_name;
 #    char* file = __FILE__;
 EOF
 
-  print Q("#\n");
+  print < Q("#\n");
 
-  print Q(<<"EOF");
+  print < Q(<<"EOF");
 #    PERL_UNUSED_VAR(cv); /* -W */
 #    PERL_UNUSED_VAR(items); /* -W */
 EOF
     
-  print Q(<<"EOF") if $WantVersionChk ;
+  print < Q(<<"EOF") if $WantVersionChk ;
 #    XS_VERSION_BOOTCHECK ;
 #
 EOF
 
-  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+  print < Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
 #    \{
 #        CV * cv ;
 #
 EOF
 
-  print Q(<<"EOF") if ($Overload);
+  print < Q(<<"EOF") if ($Overload);
 #    /* register the overloading (type 'A') magic */
 #    PL_amagic_generation++;
 #    /* The magic for overload gets a GV* via gv_fetchmeth as */
@@ -413,16 +413,16 @@ EOF
 #    );
 EOF
 
-  print @InitFileCode;
+  print < @InitFileCode;
 
-  print Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+  print < Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
 #    \}
 EOF
 
-  if (@BootCode)
+  if ((nelems @BootCode))
   {
     print "\n    /* Initialisation Section */\n\n" ;
-    @line = @BootCode;
+    @line = @( < @BootCode );
     print_section();
     print "\n    /* End of Initialisation Section */\n\n" ;
   }
@@ -432,7 +432,7 @@ EOF
          call_list(PL_scopestack_ix, PL_unitcheckav);
 EOF
 
-  print Q(<<"EOF");
+  print < Q(<<"EOF");
 #    XSRETURN_YES;
 #]]
 #
@@ -450,16 +450,16 @@ EOF
 }
 
 sub process_para {
-    my %args = @_;
+    my %args = %( < @_ );
 
     # Print initial preprocessor statements and blank lines
-    while (@line && @line[0] !~ m/^[^\#]/) {
+    while ((nelems @line) && @line[0] !~ m/^[^\#]/) {
       my $line = shift(@line);
       print $line, "\n";
       next unless $line =~ m/^\#\s*((if)(?:n?def)?|elsif|else|endif)\b/;
       my $statement = $+;
       if ($statement eq 'if') {
-	$XSS_work_idx = @XSStack;
+	$XSS_work_idx = (nelems @XSStack);
 	push(@XSStack, \%(type => 'if'));
       } else {
 	death ("Error: `$statement' with no matching `if'")
@@ -469,10 +469,10 @@ sub process_para {
 	  push(@BootCode,     "#endif");
 	}
 	
-	my(@fns) = keys %{@XSStack[-1]->{functions}};
+	my(@fns) = @( keys %{@XSStack[-1]->{functions}} );
 	if ($statement ne 'endif') {
 	  # Hide the functions defined in other #if branches, and reset.
-	  %{@XSStack[-1]->{other_functions}}{[@fns]} = (1) x @fns;
+	  %{@XSStack[-1]->{other_functions}}{[< @fns]} = (1) x nelems @fns;
 	  %{@XSStack[-1]}{[qw(varname functions)]} = ('', \%());
 	} else {
 	  my($tmp) = pop(@XSStack);
@@ -480,12 +480,12 @@ sub process_para {
 		   && @XSStack[$XSS_work_idx]->{type} ne 'if');
 	  # Keep all new defined functions
 	  push(@fns, keys %{$tmp->{other_functions}});
-	  %{@XSStack[$XSS_work_idx]->{functions}}{[@fns]} = (1) x @fns;
+	  %{@XSStack[$XSS_work_idx]->{functions}}{[< @fns]} = (1) x nelems @fns;
 	}
       }
     }
     
-    return unless @line;
+    return unless (nelems @line);
     
     if ($XSS_work_idx && !@XSStack[$XSS_work_idx]->{varname}) {
       # We are inside an #if, but have not yet #defined its xsubpp variable.
@@ -529,15 +529,15 @@ sub process_para {
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
       no strict 'refs';
       &{*{Symbol::fetch_glob("{$kwd}_handler")}}() ;
-      next PARAGRAPH unless @line ;
+      next PARAGRAPH unless (nelems @line) ;
       $_ = shift(@line);
     }
 
     if (check_keyword("BOOT")) {
       &check_cpp;
-      push (@BootCode, "#line @line_no[@line_no - @line] \"$filepathname\"")
+      push (@BootCode, "#line @line_no[(nelems @line_no) - nelems @line] \"$filepathname\"")
 	if $WantLineNumbers && @line[0] !~ m/^\s*#\s*line\b/;
-      push (@BootCode, @line, "") ;
+      push (@BootCode, < @line, "") ;
       next PARAGRAPH ;
     }
 
@@ -553,7 +553,7 @@ sub process_para {
 
     # a function definition needs at least 2 lines
     blurt ("Error: Function definition too short '$ret_type'"), next PARAGRAPH
-      unless @line ;
+      unless (nelems @line) ;
 
     $externC = 1 if $ret_type =~ s/^extern "C"\s+//;
     $static  = 1 if $ret_type =~ s/^static\s+//;
@@ -572,13 +572,13 @@ sub process_para {
     }
 
     # Check for duplicate function definition
-    for my $tmp (@XSStack) {
+    for my $tmp (< @XSStack) {
       next unless defined $tmp->{functions}->{$Full_func_name};
       Warn("Warning: duplicate function definition '$clean_func_name' detected");
       last;
     }
     @XSStack[$XSS_work_idx]->{functions}->{$Full_func_name} ++ ;
-    %XsubAliases = %XsubAliasValues = %Interfaces = @Attributes = ();
+    %XsubAliases = %( %XsubAliasValues = %( %Interfaces = %( @Attributes = @( () ) ) ) );
     $DoSetMagic = 1;
 
     $orig_args =~ s/\\\s*/ /g;	# process line continuations
@@ -588,8 +588,8 @@ sub process_para {
     if ($process_argtypes and $orig_args =~ m/\S/) {
       my $args = "$orig_args ,";
       if ($args =~ m/^( (??{ $C_arg }) , )* $ /x) {
-	@args = ($args =~ m/\G ( (??{ $C_arg }) ) , /xg);
-	for ( @args ) {
+	@args = @($args =~ m/\G ( (??{ $C_arg }) ) , /xg);
+	for ( < @args ) {
 	  s/^\s+//;
 	  s/\s+$//;
 	  my ($arg, $default) = m/ ( [^=]* ) ( (?: = .* )? ) /x;
@@ -627,12 +627,12 @@ sub process_para {
 	  %in_out{$name} = $out_type if $out_type;
 	}
       } else {
-	@args = split(m/\s*,\s*/, $orig_args);
+	@args = @( split(m/\s*,\s*/, $orig_args) );
 	Warn("Warning: cannot parse argument list '$orig_args', fallback to split");
       }
     } else {
-      @args = split(m/\s*,\s*/, $orig_args);
-      for (@args) {
+      @args = @( split(m/\s*,\s*/, $orig_args) );
+      for (< @args) {
 	if ($process_inout and s/^(IN|IN_OUTLIST|OUTLIST|IN_OUT|OUT)\s+//) {
 	  my $out_type = $1;
 	  next if $out_type eq 'IN';
@@ -644,7 +644,7 @@ sub process_para {
       }
     }
     my $extra_args = 0;
-    my @args_num = ();
+    my @args_num = @( () );
     my $num_args = 0;
     my $report_args = '';
     if (defined($class)) {
@@ -653,10 +653,10 @@ sub process_para {
       unshift(@args, $arg0);
       ($report_args = "$arg0, $report_args") =~ s/^\w+, $/$arg0/;
     }
-    foreach my $i (0 ..( @args-1)) {
+    foreach my $i (0 ..( (nelems @args)-1)) {
       if (@args[$i] =~ s/\.\.\.//) {
 	$ellipsis = 1;
-	if (@args[$i] eq '' && $i ==( @args-1)) {
+	if (@args[$i] eq '' && $i ==( (nelems @args)-1)) {
 	  $report_args .= ", ...";
 	  pop(@args);
 	  last;
@@ -679,30 +679,30 @@ sub process_para {
     my $min_args = $num_args - $extra_args;
     $report_args =~ s/"/\\"/g;
     $report_args =~ s/^,\s+//;
-    my @func_args = @args;
+    my @func_args = @( < @args );
     shift @func_args if defined($class);
 
-    for (@func_args) {
+    for (< @func_args) {
       s/^/&/ if %in_out{$_};
     }
-    $func_args = join(", ", @func_args);
-    %args_match{[@args]} = @args_num;
+    $func_args = join(", ", < @func_args);
+    %args_match{[< @args]} = < @args_num;
 
-    $PPCODE = grep(m/^\s*PPCODE\s*:/, @line);
-    $CODE = grep(m/^\s*CODE\s*:/, @line);
+    $PPCODE = grep(m/^\s*PPCODE\s*:/, < @line);
+    $CODE = grep(m/^\s*CODE\s*:/, < @line);
     # Detect CODE: blocks which use ST(n)= or XST_m*(n,v)
     #   to set explicit return values.
     $EXPLICIT_RETURN = ($CODE &&
-			("@line" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
-    $ALIAS  = grep(m/^\s*ALIAS\s*:/,  @line);
-    $INTERFACE  = grep(m/^\s*INTERFACE\s*:/,  @line);
+			("{join ' ', <@line}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
+    $ALIAS  = grep(m/^\s*ALIAS\s*:/,  < @line);
+    $INTERFACE  = grep(m/^\s*INTERFACE\s*:/,  < @line);
 
     $xsreturn = 1 if $EXPLICIT_RETURN;
 
     $externC = $externC ? qq[extern "C"] : "";
 
     # print function header
-    print Q(<<"EOF");
+    print < Q(<<"EOF");
 #$externC
 #XS(XS_$Full_func_name); /* prototype to pass -Wmissing-prototypes */
 #XS(XS_$Full_func_name)
@@ -713,10 +713,10 @@ sub process_para {
 #    dXSARGS;
 ##endif
 EOF
-    print Q(<<"EOF") if $ALIAS ;
+    print < Q(<<"EOF") if $ALIAS ;
 #    dXSI32;
 EOF
-    print Q(<<"EOF") if $INTERFACE ;
+    print < Q(<<"EOF") if $INTERFACE ;
 #    dXSFUNCTION($ret_type);
 EOF
     if ($ellipsis) {
@@ -727,25 +727,25 @@ EOF
       $cond = qq(items < $min_args || items > $num_args);
     }
 
-    print Q(<<"EOF") if $except;
+    print < Q(<<"EOF") if $except;
 #    char errbuf[1024];
 #    *errbuf = '\0';
 EOF
 
     if ($ALIAS)
-      { print Q(<<"EOF") if $cond }
+      { print < Q(<<"EOF") if $cond }
 #    if ($cond)
 #       Perl_croak(aTHX_ "Usage: \%s(\%s)", GvNAME(CvGV(cv)), "$report_args");
 EOF
     else
-      { print Q(<<"EOF") if $cond }
+      { print < Q(<<"EOF") if $cond }
 #    if ($cond)
 #       Perl_croak(aTHX_ "Usage: \%s(\%s)", "$pname", "$report_args");
 EOF
     
      # cv doesn't seem to be used, in most cases unless we go in 
      # the if of this else
-     print Q(<<"EOF");
+     print < Q(<<"EOF");
 #    PERL_UNUSED_VAR(cv); /* -W */
 EOF
 
@@ -754,11 +754,11 @@ EOF
     #hence `ax' (setup by dXSARGS) is unused
     #XXX: could breakup the dXSARGS; into dSP;dMARK;dITEMS
     #but such a move could break third-party extensions
-    print Q(<<"EOF") if $PPCODE;
+    print < Q(<<"EOF") if $PPCODE;
 #    PERL_UNUSED_VAR(ax); /* -Wall */
 EOF
 
-    print Q(<<"EOF") if $PPCODE;
+    print < Q(<<"EOF") if $PPCODE;
 #    SP -= items;
 EOF
 
@@ -770,9 +770,9 @@ EOF
     push(@line_no, @line_no[-1]);
     $_ = '';
     &check_cpp;
-    while (@line) {
+    while ((nelems @line)) {
       &CASE_handler if check_keyword("CASE");
-      print Q(<<"EOF");
+      print < Q(<<"EOF");
 #   $except [[
 EOF
 
@@ -780,13 +780,13 @@ EOF
       $thisdone = 0;
       $retvaldone = 0;
       $deferred = "";
-      %arg_list = () ;
+      %arg_list = %( () ) ;
       $gotRETVAL = 0;
 	
       INPUT_handler() ;
       process_keyword("INPUT|PREINIT|INTERFACE_MACRO|C_ARGS|ALIAS|ATTRS|PROTOTYPE|SCOPE|OVERLOAD") ;
 
-      print Q(<<"EOF") if $ScopeThisXSUB;
+      print < Q(<<"EOF") if $ScopeThisXSUB;
 #   ENTER;
 #   [[
 EOF
@@ -818,8 +818,8 @@ EOF
 	    if $WantOptimize and %targetable{%type_kind{$ret_type}};
 	}
 	
-	if (@fake_INPUT or @fake_INPUT_pre) {
-	  unshift @line, @fake_INPUT_pre, @fake_INPUT, $_;
+	if ((nelems @fake_INPUT) or nelems @fake_INPUT_pre) {
+	  unshift @line, < @fake_INPUT_pre, < @fake_INPUT, $_;
 	  $_ = "";
 	  $processing_arg_with_types = 1;
 	  INPUT_handler() ;
@@ -830,7 +830,7 @@ EOF
 	
 	if (check_keyword("PPCODE")) {
 	  print_section();
-	  death ("PPCODE must be last thing") if @line;
+	  death ("PPCODE must be last thing") if (nelems @line);
 	  print "\tLEAVE;\n" if $ScopeThisXSUB;
 	  print "\tPUTBACK;\n\treturn;\n";
 	} elsif (check_keyword("CODE")) {
@@ -911,27 +911,27 @@ EOF
       
       $xsreturn = 1 if $ret_type ne "void";
       my $num = $xsreturn;
-      my $c = @outlist;
+      my $c = (nelems @outlist);
       print "\tXSprePUSH;" if $c and not $prepush_done;
       print "\tEXTEND(SP,$c);\n" if $c;
       $xsreturn += $c;
-      generate_output(%var_types{$_}, $num++, $_, 0, 1) for @outlist;
+      generate_output(%var_types{$_}, $num++, $_, 0, 1) for < @outlist;
       
       # do cleanup
       process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE|OVERLOAD") ;
       
-      print Q(<<"EOF") if $ScopeThisXSUB;
+      print < Q(<<"EOF") if $ScopeThisXSUB;
 #   ]]
 EOF
-      print Q(<<"EOF") if $ScopeThisXSUB and not $PPCODE;
+      print < Q(<<"EOF") if $ScopeThisXSUB and not $PPCODE;
 #   LEAVE;
 EOF
       
       # print function trailer
-      print Q(<<"EOF");
+      print < Q(<<"EOF");
 #    ]]
 EOF
-      print Q(<<"EOF") if $except;
+      print < Q(<<"EOF") if $except;
 #    BEGHANDLERS
 #    CATCHALL
 #	sprintf(errbuf, "\%s: \%s\\tpropagated", Xname, Xreason);
@@ -947,22 +947,22 @@ EOF
       death(m/^$BLOCK_re/o ? "Misplaced `$1:'" : "Junk at end of function");
     }
     
-    print Q(<<"EOF") if $except;
+    print < Q(<<"EOF") if $except;
 #    if (errbuf[0])
 #	Perl_croak(aTHX_ errbuf);
 EOF
     
     if ($xsreturn) {
-      print Q(<<"EOF") unless $PPCODE;
+      print < Q(<<"EOF") unless $PPCODE;
 #    XSRETURN($xsreturn);
 EOF
     } else {
-      print Q(<<"EOF") unless $PPCODE;
+      print < Q(<<"EOF") unless $PPCODE;
 #    XSRETURN_EMPTY;
 EOF
     }
 
-    print Q(<<"EOF");
+    print < Q(<<"EOF");
 #]]
 #
 EOF
@@ -986,7 +986,7 @@ EOF
 	push @proto_arg, "$s\@"
 	  if $ellipsis ;
 	
-	$proto = join ("", grep defined, @proto_arg);
+	$proto = join ("", grep defined, < @proto_arg);
       }
       else {
 	# User has specified a prototype
@@ -999,29 +999,29 @@ EOF
       %XsubAliases{$pname} = 0
 	unless defined %XsubAliases{$pname} ;
       while ( ($name, $value) = each %XsubAliases) {
-	push(@InitFileCode, Q(<<"EOF"));
+	push(@InitFileCode, < Q(<<"EOF"));
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        XSANY.any_i32 = $value ;
 EOF
-	push(@InitFileCode, Q(<<"EOF")) if $proto;
+	push(@InitFileCode, < Q(<<"EOF")) if $proto;
 #        sv_setpv((SV*)cv$proto) ;
 EOF
       }
     }
-    elsif (@Attributes) {
-      push(@InitFileCode, Q(<<"EOF"));
+    elsif ((nelems @Attributes)) {
+      push(@InitFileCode, < Q(<<"EOF"));
 #        cv = newXS(\"$pname\", XS_$Full_func_name, file);
-#        apply_attrs_string("$Package", cv, "@Attributes", 0);
+#        apply_attrs_string("$Package", cv, "{join ' ', <@Attributes}", 0);
 EOF
     }
     elsif ($interface) {
       while ( ($name, $value) = each %Interfaces) {
 	$name = "$Package\::$name" unless $name =~ m/::/;
-	push(@InitFileCode, Q(<<"EOF"));
+	push(@InitFileCode, < Q(<<"EOF"));
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        $interface_macro_set(cv,$value) ;
 EOF
-	push(@InitFileCode, Q(<<"EOF")) if $proto;
+	push(@InitFileCode, < Q(<<"EOF")) if $proto;
 #        sv_setpv((SV*)cv$proto) ;
 EOF
       }
@@ -1036,16 +1036,16 @@ sub errors { $errors }
 
 sub standard_typemap_locations {
   # Add all the default typemap locations to the search path
-  my @tm = qw(typemap);
+  my @tm = @( qw(typemap) );
   
   my $updir = File::Spec->updir;
-  foreach my $dir (File::Spec->catdir(($updir) x 1), File::Spec->catdir(($updir) x 2),
-		   File::Spec->catdir(($updir) x 3), File::Spec->catdir(($updir) x 4)) {
+  foreach my $dir ( <File::Spec->catdir(($updir) x 1), < File::Spec->catdir(($updir) x 2), <
+		   File::Spec->catdir(($updir) x 3), < File::Spec->catdir(($updir) x 4)) {
     
-    unshift @tm, File::Spec->catfile($dir, 'typemap');
-    unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap');
+    unshift @tm, < File::Spec->catfile($dir, 'typemap');
+    unshift @tm, < File::Spec->catfile($dir, lib => ExtUtils => 'typemap');
   }
-  foreach my $dir (@INC) {
+  foreach my $dir (< @INC) {
     my $file = File::Spec->catfile($dir, ExtUtils => 'typemap');
     unshift @tm, $file if -e $file;
   }
@@ -1058,7 +1058,7 @@ sub TrimWhitespace
 }
 
 sub TidyType {
-    local ($_) = @_ ;
+    local ($_) = (nelems @_) ;
 
     # rationalise any '*' by joining them into bunches and removing whitespace
     s#\s*(\*+)\s*#$1#g;
@@ -1077,26 +1077,26 @@ sub TidyType {
 # Output: ($_, @line) == (rest of line, following lines).
 # Return: the matched keyword if found, otherwise 0
 sub check_keyword {
-	$_ = shift(@line) while !m/\S/ && @line;
+	$_ = shift(@line) while !m/\S/ && nelems @line;
 	s/^(\s*)(@_[0])\s*:\s*(?:#.*)?/$1/s && $2;
 }
 
 sub print_section {
     # the "do" is required for right semantics
-    do { $_ = shift(@line) } while !m/\S/ && @line;
+    do { $_ = shift(@line) } while !m/\S/ && nelems @line;
 
-    print("#line ", @line_no[@line_no - @line -1], " \"$filepathname\"\n")
+    print("#line ", @line_no[(nelems @line_no) - nelems @line -1], " \"$filepathname\"\n")
 	if $WantLineNumbers && !m/^\s*#\s*line\b/ && !m/^#if XSubPPtmp/;
     for (;  defined($_) && !m/^$BLOCK_re/o;  $_ = shift(@line)) {
 	print "$_\n";
     }
-    print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+    print < 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 }
 
 sub merge_section {
     my $in = '';
 
-    while (!m/\S/ && @line) {
+    while (!m/\S/ && nelems @line) {
       $_ = shift(@line);
     }
 
@@ -1109,7 +1109,7 @@ sub merge_section {
 
 sub process_keyword($)
   {
-    my($pattern) = @_ ;
+    my($pattern) = < @_ ;
     my $kwd ;
 
     &{*{Symbol::fetch_glob("{$kwd}_handler")}}()
@@ -1259,7 +1259,7 @@ sub INTERFACE_handler() {
     $name =~ s/^$Prefix//;
     %Interfaces{$name} = $_;
   }
-  print Q(<<"EOF");
+  print < Q(<<"EOF");
 #	XSFUNCTION = $interface_macro($ret_type,cv,XSANY.any_dptr);
 EOF
   $interface = 1;		# local
@@ -1273,7 +1273,7 @@ sub INIT_handler()    { print_section() }
 
 sub GetAliases
   {
-    my ($line) = @_ ;
+    my ($line) = < @_ ;
     my ($orig) = $line ;
     my ($alias) ;
     my ($value) ;
@@ -1344,7 +1344,7 @@ sub FALLBACK_handler()
   # FALSE or UNDEF
   
   TrimWhitespace($_) ;
-  my %map = (
+  my %map = %(
 	     TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes",
 	     FALSE => "&PL_sv_no", 0 => "&PL_sv_no",
 	     UNDEF => "&PL_sv_undef",
@@ -1491,7 +1491,7 @@ sub INCLUDE_handler ()
     # open the new file
     open ($FH, "<", "$_") or death("Cannot open '$_': $!") ;
 
-    print Q(<<"EOF");
+    print < Q(<<"EOF");
 #
 #/* INCLUDE:  Including '$_' from '$filename' */
 #
@@ -1533,8 +1533,8 @@ sub PopFile()
     $filepathname = $data->{Filepathname} ;
     $lastline   = $data->{LastLine} ;
     $lastline_no = $data->{LastLineNo} ;
-    @line       = @{ $data->{Line} } ;
-    @line_no    = @{ $data->{LineNo} } ;
+    @line       = @( < @{ $data->{Line} } ) ;
+    @line_no    = @( < @{ $data->{LineNo} } ) ;
 
     if ($isPipe and $? ) {
       -- $lastline_no ;
@@ -1542,7 +1542,7 @@ sub PopFile()
       exit 1 ;
     }
 
-    print Q(<<"EOF");
+    print < Q(<<"EOF");
 #
 #/* INCLUDE: Returning to '$filename' from '$ThisFile' */
 #
@@ -1553,7 +1553,7 @@ EOF
 
 sub ValidProtoString ($)
   {
-    my($string) = @_ ;
+    my($string) = < @_ ;
 
     if ( $string =~ m/^$proto_re+$/ ) {
       return $string ;
@@ -1564,7 +1564,7 @@ sub ValidProtoString ($)
 
 sub C_string ($)
   {
-    my($string) = @_ ;
+    my($string) = < @_ ;
 
     $string =~ s[\\][\\\\]g ;
     $string ;
@@ -1572,16 +1572,16 @@ sub C_string ($)
 
 sub ProtoString ($)
   {
-    my ($type) = @_ ;
+    my ($type) = < @_ ;
 
     %proto_letter{$type} or "\$" ;
   }
 
 sub check_cpp {
-  my @cpp = grep(m/^\#\s*(?:if|e\w+)/, @line);
-  if (@cpp) {
+  my @cpp = @( grep(m/^\#\s*(?:if|e\w+)/, < @line) );
+  if ((nelems @cpp)) {
     my ($cpp, $cpplevel);
-    for $cpp (@cpp) {
+    for $cpp (< @cpp) {
       if ($cpp =~ m/^\#\s*if/) {
 	$cpplevel++;
       } elsif (!$cpplevel) {
@@ -1599,7 +1599,7 @@ sub check_cpp {
 
 
 sub Q {
-  my($text) = @_;
+  my($text) = < @_;
   $text =~ s/^#//gm;
   $text =~ s/\[\[/\{/g;
   $text =~ s/\]\]/\}/g;
@@ -1611,8 +1611,8 @@ sub fetch_para {
   # parse paragraph
   death ("Error: Unterminated `#if/#ifdef/#ifndef'")
     if !defined $lastline && @XSStack[-1]->{type} eq 'if';
-  @line = ();
-  @line_no = () ;
+  @line = @( () );
+  @line_no = @( () ) ;
   return PopFile() if !defined $lastline;
 
   if ($lastline =~
@@ -1647,7 +1647,7 @@ sub fetch_para {
 	#   obj-c:	import
 	#   others:	ident (gcc notes that some cpps have this one)
 	$lastline =~ m/^#[ \t]*(?:(?:if|ifn?def|elif|else|endif|define|undef|pragma|error|warning|line\s+\d+|ident)\b|(?:include(?:_next)?|import)\s*["<].*[>"])/) {
-      last if $lastline =~ m/^\S/ && @line && @line[-1] eq "";
+      last if $lastline =~ m/^\S/ && nelems @line && @line[-1] eq "";
       push(@line, $lastline);
       push(@line_no, $lastline_no) ;
     }
@@ -1662,12 +1662,12 @@ sub fetch_para {
     chomp $lastline;
     $lastline =~ s/^\s+$//;
   }
-  pop(@line), pop(@line_no) while @line && @line[-1] eq "";
+  pop(@line), pop(@line_no) while (nelems @line) && @line[-1] eq "";
   1;
 }
 
 sub output_init {
-  local($type, $num, $var, $init, $name_printed) = @_;
+  local($type, $num, $var, $init, $name_printed) = < @_;
   local($arg) = "ST(" . ($num - 1) . ")";
 
   if (  $init =~ m/^=/  ) {
@@ -1697,21 +1697,21 @@ sub output_init {
 sub Warn
   {
     # work out the line number
-    my $line_no = @line_no[@line_no - @line -1] ;
+    my $line_no = @line_no[(nelems @line_no) - nelems @line -1] ;
 
-    print STDERR "@_ in $filename, line $line_no\n" ;
+    print STDERR "{join ' ', <@_} in $filename, line $line_no\n" ;
   }
 
 sub blurt
   {
-    Warn @_ ;
+    Warn < @_ ;
     $errors ++
   }
 
 sub death
   {
-    Warn @_ ;
-    die @_;
+    Warn < @_ ;
+    die < @_;
   }
 
 sub evalqq {
@@ -1722,7 +1722,7 @@ sub evalqq {
 }
 
 sub generate_init {
-  local($type, $num, $var) = @_;
+  local($type, $num, $var) = < @_;
   local($arg) = "ST(" . ($num - 1) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1798,7 +1798,7 @@ sub generate_init {
 }
 
 sub generate_output {
-  local($type, $num, $var, $do_setmagic, $do_push) = @_;
+  local($type, $num, $var, $do_setmagic, $do_push) = < @_;
   local($arg) = "ST(" . ($num - ($num != 0)) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1871,7 +1871,7 @@ sub generate_output {
 }
 
 sub map_type {
-  my($type, $varname) = @_;
+  my($type, $varname) = < @_;
   
   # C++ has :: in types too so skip this
   $type =~ s/:/_/g unless $hiertype;
@@ -1894,7 +1894,7 @@ use strict;
 our ($SECTION_END_MARKER);
 
 sub TIEHANDLE {
-  my ($class, $cfile, $fh) = @_;
+  my ($class, $cfile, $fh) = < @_;
   $cfile =~ s/\\/\\\\/g;
   $SECTION_END_MARKER = qq{#line --- "$cfile"};
   
@@ -1906,7 +1906,7 @@ sub TIEHANDLE {
 
 sub PRINT {
   my $self = shift;
-  for (@_) {
+  for (< @_) {
     $self->{buffer} .= $_;
     while ($self->{buffer} =~ s/^([^\n]*\n)//) {
       my $line = $1;
@@ -1920,7 +1920,7 @@ sub PRINT {
 sub PRINTF {
   my $self = shift;
   my $fmt = shift;
-  $self->PRINT(sprintf($fmt, @_));
+  $self->PRINT(sprintf($fmt, < @_));
 }
 
 sub DESTROY {

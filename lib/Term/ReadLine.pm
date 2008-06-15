@@ -177,7 +177,7 @@ or you can try using the 4-argument form of Term::ReadLine->new().
 use strict;
 
 package Term::ReadLine::Stub;
-our @ISA = qw'Term::ReadLine::Tk Term::ReadLine::TermCap';
+our @ISA = @( qw'Term::ReadLine::Tk Term::ReadLine::TermCap' );
 
 $DB::emacs = $DB::emacs;	# To peacify -w
 our @rl_term_set;
@@ -188,7 +188,7 @@ sub PERL_UNICODE_STDIN () { 0x0001 }
 sub ReadLine {'Term::ReadLine::Stub'}
 sub readline {
   my $self = shift;
-  my ($in,$out,$str) = @$self;
+  my ($in,$out,$str) = < @$self;
   my $prompt = shift;
   print $out @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
   $self->register_Tk 
@@ -243,11 +243,11 @@ sub findConsole {
 
 sub new {
   die "method new called with wrong number of arguments" 
-    unless @_==2 or @_==4;
+    unless (nelems @_)==2 or (nelems @_)==4;
   #local (*FIN, *FOUT);
   my ($FIN, $FOUT, $ret);
-  if (@_==2) {
-    my($console, $consoleOUT) = @_[0]->findConsole;
+  if ((nelems @_)==2) {
+    my($console, $consoleOUT) = < @_[0]->findConsole;
 
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
@@ -277,7 +277,7 @@ sub new {
 }
 
 sub newTTY {
-  my ($self, $in, $out) = @_;
+  my ($self, $in, $out) = < @_;
   $self->[0] = $in;
   $self->[1] = $out;
   my $sel = select($out);
@@ -290,7 +290,7 @@ sub OUT { shift->[1] }
 sub MinLine { undef }
 sub Attribs { \%() }
 
-my %features = (tkRunning => 1, ornaments => 1, 'newTTY' => 1);
+my %features = %(tkRunning => 1, ornaments => 1, 'newTTY' => 1);
 sub Features { \%features }
 
 sub get_line {
@@ -325,20 +325,20 @@ if ($which) {
 # in debugger).
 our @ISA;
 if (defined &Term::ReadLine::Gnu::readline) {
-  @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub);
+  @ISA = @( qw(Term::ReadLine::Gnu Term::ReadLine::Stub) );
 } elsif (defined &Term::ReadLine::Perl::readline) {
-  @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub);
+  @ISA = @( qw(Term::ReadLine::Perl Term::ReadLine::Stub) );
 } elsif (defined $which && defined &{*{Symbol::fetch_glob("Term::ReadLine::$which\::readline")}}) {
-  @ISA = "Term::ReadLine::$which";
+  @ISA = @( "Term::ReadLine::$which" );
 } else {
-  @ISA = qw(Term::ReadLine::Stub);
+  @ISA = @( qw(Term::ReadLine::Stub) );
 }
 
 package Term::ReadLine::TermCap;
 
 # Prompt-start, prompt-end, command-line-start, command-line-end
 #     -- zero-width beautifies to emit around prompt and the command line.
-our @rl_term_set = ("","","","");
+our @rl_term_set = @("","","","");
 # string encoded:
 our $rl_term_set = ',,,';
 
@@ -352,18 +352,18 @@ sub LoadTermCap {
 
 sub ornaments {
   shift;
-  return $rl_term_set unless @_;
+  return $rl_term_set unless (nelems @_);
   $rl_term_set = shift;
   $rl_term_set ||= ',,,';
   $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
-  my @ts = split m/,/, $rl_term_set, 4;
+  my @ts = @( split m/,/, $rl_term_set, 4 );
   try { LoadTermCap };
   unless (defined $terminal) {
     warn("Cannot find termcap: $@\n") unless $Term::ReadLine::termcap_nowarn;
     $rl_term_set = ',,,';
     return;
   }
-  @rl_term_set = map {$_ ? $terminal->Tputs($_,1) || '' : ''} @ts;
+  @rl_term_set = @( map {$_ ? $terminal->Tputs($_,1) || '' : ''} < @ts );
   return $rl_term_set;
 }
 
@@ -386,11 +386,11 @@ sub Tk_loop {
 sub register_Tk {
   my $self = shift;
   $Term::ReadLine::registered++ 
-    or Tk->fileevent($self->IN,'readable',\&handle);
+    or Tk->fileevent( <$self->IN,'readable',\&handle);
 }
 
 sub tkRunning {
-  $Term::ReadLine::toloop = @_[1] if @_ +> 1;
+  $Term::ReadLine::toloop = @_[1] if (nelems @_) +> 1;
   $Term::ReadLine::toloop;
 }
 

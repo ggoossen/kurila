@@ -37,14 +37,14 @@ my $tmpl = \%(
 {
     my $args = \%{ $tmpl };
 
-    is( $term->get_reply( %$args ), 'blue', q[Checking reply with defaults and choices] );
+    is( $term->get_reply( < %$args ), 'blue', q[Checking reply with defaults and choices] );
 }
 
 {
     my $args = \%{ $tmpl };
     delete $args->{choices};
 
-    is( $term->get_reply( %$args ), 'blue', q[Checking reply with defaults] );
+    is( $term->get_reply( < %$args ), 'blue', q[Checking reply with defaults] );
 }
 
 {
@@ -53,7 +53,7 @@ my $tmpl = \%(
         default => 'y',
     );
 
-    is( $term->ask_yn( %$args ), 1, q[Asking yes/no with 'yes' as default] );
+    is( $term->ask_yn( < %$args ), 1, q[Asking yes/no with 'yes' as default] );
 }
 
 {
@@ -62,7 +62,7 @@ my $tmpl = \%(
         default => 'n',
     );
 
-    is( $term->ask_yn( %$args ), 0, q[Asking yes/no with 'no' as default] );
+    is( $term->ask_yn( < %$args ), 0, q[Asking yes/no with 'no' as default] );
 }
 
 
@@ -75,7 +75,7 @@ my $tmpl = \%(
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= @_[0]->message };
     
-    my $res = $term->get_reply( %$args );
+    my $res = $term->get_reply( < %$args );
 
     ok( !$res,                  "Empty result on autoreply without default" );
     is( $warnings, '',          "   No warnings with empty default" );
@@ -92,9 +92,9 @@ my $tmpl = \%(
     );
     
     my $warnings = '';
-    local $^WARN_HOOK = sub { $warnings .= "@_" };
+    local $^WARN_HOOK = sub { $warnings .= "{join ' ', <@_}" };
     
-    my $res = $term->get_reply( %$args );
+    my $res = $term->get_reply( < %$args );
 
     ok( !$res,                  "Empty result on autoreply without default" );
     is( $warnings, '',          "   No warnings with failing allow" );
@@ -119,7 +119,7 @@ my $tmpl = \%(
             single      => q[blah'],
     );
 
-    my ($href,$rest) = $term->parse_options( $str );
+    my ($href,$rest) = < $term->parse_options( $str );
 
     is_deeply($href, $expected, qq[Parsing options] );
     is($rest, $munged,          qq[Remaining unparsed string '$munged'] );

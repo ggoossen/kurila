@@ -13,7 +13,7 @@ use vars qw($debugging $verbose);
 print "1..8\n";
 
 sub ok {
-    my($testno, $ok) = @_;
+    my($testno, $ok) = < @_;
     print "not " unless $ok;
     print "ok $testno\n";
 }
@@ -41,7 +41,7 @@ if ($debugging) {
     our $gotdd  = !$@;
 }
 
-our @fixed_strings = ("January", "February", "March", "April", "May", "June",
+our @fixed_strings = @("January", "February", "March", "April", "May", "June",
 		  "July", "August", "September", "October", "November", "December" );
 
 # Build some arbitrarily complex data structure starting with a top level hash
@@ -60,7 +60,7 @@ for (my $i = 0; $i +< $hashsize; $i++) {
 		my($hash2size) = int(rand($maxhash2size));
 		while ($hash2size--) {
 			my($k2) = $k . $i . int(rand(100));
-			$hash2->{$k2} = @fixed_strings[rand(int(@fixed_strings))];
+			$hash2->{$k2} = @fixed_strings[rand(int(nelems @fixed_strings))];
 		}
 		%a1{$k}->{value} = $hash2;
 	}
@@ -71,14 +71,14 @@ for (my $i = 0; $i +< $hashsize; $i++) {
 		my($arr_ref) = \@();
 		my($arraysize) = int(rand($maxarraysize));
 		while ($arraysize--) {
-			push(@$arr_ref, @fixed_strings[rand(int(@fixed_strings))]);
+			push(@$arr_ref, @fixed_strings[rand(int(nelems @fixed_strings))]);
 		}
 		%a1{$k}->{value} = $arr_ref;
 	}	
 }
 
 
-print STDERR Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
+print STDERR < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
 
 
 # Copy the hash, element by element in order of the keys

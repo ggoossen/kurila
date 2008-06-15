@@ -5,7 +5,7 @@ use ExtUtils::CBuilder::Platform::Unix;
 
 use vars qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+@ISA = @( qw(ExtUtils::CBuilder::Platform::Unix) );
 
 sub compile {
   my $self = shift;
@@ -15,7 +15,7 @@ sub compile {
   # it's mistakenly in Config.pm as both.  Make the correction here.
   local $cf->{ccflags} = $cf->{ccflags};
   $cf->{ccflags} =~ s/-flat_namespace//;
-  $self->SUPER::compile(@_);
+  $self->SUPER::compile(< @_);
 }
 
 

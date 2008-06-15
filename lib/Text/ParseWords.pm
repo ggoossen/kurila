@@ -6,56 +6,56 @@ $VERSION = "3.26"
 ;
 
 use Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(shellwords quotewords nested_quotewords parse_line);
-@EXPORT_OK = qw(old_shellwords);
+@ISA = @( qw(Exporter) );
+@EXPORT = @( qw(shellwords quotewords nested_quotewords parse_line) );
+@EXPORT_OK = @( qw(old_shellwords) );
 
 
 sub shellwords {
-    my (@lines) = @_;
+    my (@lines) = @( < @_ );
     my @allwords;
 
-    foreach my $line (@lines) {
+    foreach my $line (< @lines) {
 	$line =~ s/^\s+//;
-	my @words = parse_line('\s+', 0, $line);
-	pop @words if (@words and !defined @words[-1]);
-	return() unless (@words || !length($line));
-	push(@allwords, @words);
+	my @words = @( < parse_line('\s+', 0, $line) );
+	pop @words if ((nelems @words) and !defined @words[-1]);
+	return() unless ((nelems @words) || !length($line));
+	push(@allwords, < @words);
     }
-    return(@allwords);
+    return @(@allwords);
 }
 
 
 
 sub quotewords {
-    my($delim, $keep, @lines) = @_;
+    my($delim, $keep, < @lines) = < @_;
     my($line, @words, @allwords);
 
-    foreach $line (@lines) {
-	@words = parse_line($delim, $keep, $line);
-	return() unless (@words || !length($line));
-	push(@allwords, @words);
+    foreach $line (< @lines) {
+	@words = @( < parse_line($delim, $keep, $line) );
+	return() unless ((nelems @words) || !length($line));
+	push(@allwords, < @words);
     }
-    return(@allwords);
+    return @(@allwords);
 }
 
 
 
 sub nested_quotewords {
-    my($delim, $keep, @lines) = @_;
+    my($delim, $keep, < @lines) = < @_;
     my($i, @allwords);
 
-    for ($i = 0; $i +< @lines; $i++) {
-	@{@allwords[$i]} = parse_line($delim, $keep, @lines[$i]);
-	return() unless (@{@allwords[$i]} || !length(@lines[$i]));
+    for ($i = 0; $i +< nelems @lines; $i++) {
+	@{@allwords[$i]} = @( < parse_line($delim, $keep, @lines[$i]) );
+	return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
     }
-    return(@allwords);
+    return @(@allwords);
 }
 
 
 
 sub parse_line {
-    my($delimiter, $keep, $line) = @_;
+    my($delimiter, $keep, $line) = < @_;
     my($word, @pieces);
 
     no warnings 'uninitialized';	# we will be testing undef strings
@@ -113,7 +113,7 @@ sub parse_line {
             push(@pieces, $word);
 	}
     }
-    return(@pieces);
+    return @(@pieces);
 }
 
 
@@ -129,7 +129,7 @@ sub old_shellwords {
     #	@words = old_shellwords();	# defaults to $_ (and clobbers it)
 
     no warnings 'uninitialized';	# we will be testing undef strings
-    local *_ = \join('', @_) if @_;
+    local *_ = \join('', < @_) if (nelems @_);
     my (@words, $snippet);
 
     s/\A\s+//;

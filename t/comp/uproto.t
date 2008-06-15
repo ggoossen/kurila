@@ -6,7 +6,7 @@ BEGIN {
 
 plan(tests => 39);
 
-sub f($$_) { my $x = shift; is("@_", $x) }
+sub f($$_) { my $x = shift; is("{join ' ', <@_}", $x) }
 
 our $undef;
 our $foo = "FOO";
@@ -71,7 +71,7 @@ opt("seen");
 sub unop (_) { is(@_[0], 11, "unary op") }
 unop 11, 22; # takes only the first parameter into account
 
-sub mymkdir (_;$) { is("@_", $expected, "mymkdir") }
+sub mymkdir (_;$) { is("{join ' ', <@_}", $expected, "mymkdir") }
 $expected = $_ = "mydir"; mymkdir();
 mymkdir($expected = "foo");
 $expected = "foo 493"; mymkdir foo => 0755;

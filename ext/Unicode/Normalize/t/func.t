@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -23,7 +23,7 @@ BEGIN { plan tests => 211 };
 use Unicode::Normalize qw(:all);
 ok(1); # If we made it this far, we're ok.
 
-sub _pack_U { Unicode::Normalize::pack_U(@_) }
+sub _pack_U { Unicode::Normalize::pack_U(< @_) }
 sub hexU { _pack_U map hex, split ' ', shift }
 
 #########################
@@ -182,43 +182,43 @@ ok($sCtg, "\x{30DB}\x{309A}");
 
 sub answer { defined @_[0] ? @_[0] ? "YES" : "NO" : "MAYBE" }
 
-ok(answer(checkNFD("")),  "YES");
-ok(answer(checkNFC("")),  "YES");
-ok(answer(checkNFKD("")), "YES");
-ok(answer(checkNFKC("")), "YES");
-ok(answer(check("NFD", "")), "YES");
-ok(answer(check("NFC", "")), "YES");
-ok(answer(check("NFKD","")), "YES");
-ok(answer(check("NFKC","")), "YES");
+ok(answer( <checkNFD("")),  "YES");
+ok(answer( <checkNFC("")),  "YES");
+ok(answer( <checkNFKD("")), "YES");
+ok(answer( <checkNFKC("")), "YES");
+ok(answer( <check("NFD", "")), "YES");
+ok(answer( <check("NFC", "")), "YES");
+ok(answer( <check("NFKD","")), "YES");
+ok(answer( <check("NFKC","")), "YES");
 
 # U+0000 to U+007F are prenormalized in all the normalization forms.
-ok(answer(checkNFD("AZaz\t12!#`")),  "YES");
-ok(answer(checkNFC("AZaz\t12!#`")),  "YES");
-ok(answer(checkNFKD("AZaz\t12!#`")), "YES");
-ok(answer(checkNFKC("AZaz\t12!#`")), "YES");
-ok(answer(check("D", "AZaz\t12!#`")), "YES");
-ok(answer(check("C", "AZaz\t12!#`")), "YES");
-ok(answer(check("KD","AZaz\t12!#`")), "YES");
-ok(answer(check("KC","AZaz\t12!#`")), "YES");
+ok(answer( <checkNFD("AZaz\t12!#`")),  "YES");
+ok(answer( <checkNFC("AZaz\t12!#`")),  "YES");
+ok(answer( <checkNFKD("AZaz\t12!#`")), "YES");
+ok(answer( <checkNFKC("AZaz\t12!#`")), "YES");
+ok(answer( <check("D", "AZaz\t12!#`")), "YES");
+ok(answer( <check("C", "AZaz\t12!#`")), "YES");
+ok(answer( <check("KD","AZaz\t12!#`")), "YES");
+ok(answer( <check("KC","AZaz\t12!#`")), "YES");
 
-ok(answer(checkNFD(NFD(_pack_U(0xC1, 0x1100, 0x1173, 0x11AF)))), "YES");
-ok(answer(checkNFD(hexU("20 C1 1100 1173 11AF"))), "NO");
-ok(answer(checkNFC(hexU("20 C1 1173 11AF"))), "MAYBE");
-ok(answer(checkNFC(hexU("20 C1 AE00 1100"))), "YES");
-ok(answer(checkNFC(hexU("20 C1 AE00 1100 0300"))), "MAYBE");
-ok(answer(checkNFC(hexU("212B 1100 0300"))), "NO");
-ok(answer(checkNFC(hexU("1100 0300 212B"))), "NO");
-ok(answer(checkNFC(hexU("0041 0327 030A"))), "MAYBE"); # A+cedilla+ring
-ok(answer(checkNFC(hexU("0041 030A 0327"))), "NO");    # A+ring+cedilla
-ok(answer(checkNFC(hexU("20 C1 FF71 2025"))),"YES");
-ok(answer(check("NFC", hexU("20 C1 212B 300"))), "NO");
-ok(answer(checkNFKD(hexU("20 C1 FF71 2025"))),   "NO");
-ok(answer(checkNFKC(hexU("20 C1 AE00 2025"))), "NO");
-ok(answer(checkNFKC(hexU("212B 1100 0300"))), "NO");
-ok(answer(checkNFKC(hexU("1100 0300 212B"))), "NO");
-ok(answer(checkNFKC(hexU("0041 0327 030A"))), "MAYBE"); # A+cedilla+ring
-ok(answer(checkNFKC(hexU("0041 030A 0327"))), "NO");    # A+ring+cedilla
-ok(answer(check("NFKC", hexU("20 C1 212B 300"))), "NO");
+ok(answer( <checkNFD(NFD(_pack_U(0xC1, 0x1100, 0x1173, 0x11AF)))), "YES");
+ok(answer( <checkNFD(hexU("20 C1 1100 1173 11AF"))), "NO");
+ok(answer( <checkNFC(hexU("20 C1 1173 11AF"))), "MAYBE");
+ok(answer( <checkNFC(hexU("20 C1 AE00 1100"))), "YES");
+ok(answer( <checkNFC(hexU("20 C1 AE00 1100 0300"))), "MAYBE");
+ok(answer( <checkNFC(hexU("212B 1100 0300"))), "NO");
+ok(answer( <checkNFC(hexU("1100 0300 212B"))), "NO");
+ok(answer( <checkNFC(hexU("0041 0327 030A"))), "MAYBE"); # A+cedilla+ring
+ok(answer( <checkNFC(hexU("0041 030A 0327"))), "NO");    # A+ring+cedilla
+ok(answer( <checkNFC(hexU("20 C1 FF71 2025"))),"YES");
+ok(answer( <check("NFC", hexU("20 C1 212B 300"))), "NO");
+ok(answer( <checkNFKD(hexU("20 C1 FF71 2025"))),   "NO");
+ok(answer( <checkNFKC(hexU("20 C1 AE00 2025"))), "NO");
+ok(answer( <checkNFKC(hexU("212B 1100 0300"))), "NO");
+ok(answer( <checkNFKC(hexU("1100 0300 212B"))), "NO");
+ok(answer( <checkNFKC(hexU("0041 0327 030A"))), "MAYBE"); # A+cedilla+ring
+ok(answer( <checkNFKC(hexU("0041 030A 0327"))), "NO");    # A+ring+cedilla
+ok(answer( <check("NFKC", hexU("20 C1 212B 300"))), "NO");
 
 "012ABC" =~ m/(\d+)(\w+)/;
 ok("012" eq NFC $1 && "ABC" eq NFC $2);

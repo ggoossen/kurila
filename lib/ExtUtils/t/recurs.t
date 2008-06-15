@@ -5,7 +5,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -45,10 +45,10 @@ ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
 
 
 # Check recursive Makefile building.
-my @mpl_out = run(qq{$perl Makefile.PL});
+my @mpl_out = @( < run(qq{$perl Makefile.PL}) );
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
+  diag(< @mpl_out);
 
 my $makefile = makefile_name();
 
@@ -68,10 +68,10 @@ ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
 
 
 # Check NORECURS
-@mpl_out = run(qq{$perl Makefile.PL "NORECURS=1"});
+@mpl_out = @( < run(qq{$perl Makefile.PL "NORECURS=1"}) );
 
 cmp_ok( $?, '==', 0, 'Makefile.PL NORECURS=1 exited with zero' ) ||
-  diag(@mpl_out);
+  diag(< @mpl_out);
 
 $makefile = makefile_name();
 
@@ -93,10 +93,10 @@ ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
 
 # Check that arguments aren't stomped when they have .. prepended
 # [rt.perl.org 4345]
-@mpl_out = run(qq{$perl Makefile.PL "INST_SCRIPT=cgi"});
+@mpl_out = @( < run(qq{$perl Makefile.PL "INST_SCRIPT=cgi"}) );
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
+  diag(< @mpl_out);
 
 $makefile = makefile_name();
 my $submakefile = File::Spec->catfile('prj2',$makefile);
@@ -104,7 +104,7 @@ my $submakefile = File::Spec->catfile('prj2',$makefile);
 ok( -e $makefile,    'Makefile written' );
 ok( -e $submakefile, 'sub Makefile written' );
 
-my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
+my $inst_script = File::Spec->catdir( <File::Spec->updir, 'cgi');
 ok( open(MAKEFILE, "<", $submakefile) ) || diag("Can't open $submakefile: $!");
 { local $/;  
   like( ~< *MAKEFILE, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 

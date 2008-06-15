@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -24,7 +24,7 @@ use Pod::Escapes ();
     "\n\nPerl $^V",
     " under $^O ",
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-      ? ("(Win32::BuildNumber ", &Win32::BuildNumber(), ")") : (),
+      ? ("(Win32::BuildNumber ", < &Win32::BuildNumber(), ")") : (),
     (defined $MacPerl::Version)
       ? ("(MacPerl version $MacPerl::Version)") : (),
     "\n"
@@ -32,11 +32,11 @@ use Pod::Escapes ();
 
   # Ugly code to walk the symbol tables:
   my %v;
-  my @stack = ('');  # start out in %::
+  my @stack = @('');  # start out in %::
   my $this;
   my $count = 0;
   my $pref;
-  while(@stack) {
+  while((nelems @stack)) {
     $this = shift @stack;
     die "Too many packages?" if ++$count +> 1000;
     next if exists %v{$this};
@@ -65,12 +65,12 @@ use Pod::Escapes ();
   push @out, " Modules in memory:\n";
   delete %v{['', '[none]']};
   foreach my $p (sort {lc($a) cmp lc($b)} keys %v) {
-    my $indent = ' ' x (2 + @($p =~ m/(:)/g));
+    my $indent = ' ' x (2 + nelems @($p =~ m/(:)/g));
     push @out,  '  ', $indent, $p, defined(%v{$p}) ? " v%v{$p};\n" : ";\n";
   }
   push @out, sprintf "[at \%s (local) / \%s (GMT)]\n",
     scalar(gmtime), scalar(localtime);
-  my $x = join '', @out;
+  my $x = join '', < @out;
   $x =~ s/^/#/mg;
   print $x;
 }
@@ -80,7 +80,7 @@ print "# Running",
   "#\n",
 ;
 
-print "# \@INC:\n", map("#   [$_]\n", @INC), "#\n#\n";
+print "# \@INC:\n", map("#   [$_]\n", < @INC), "#\n#\n";
 
 print "# \%INC:\n";
 foreach my $x (sort {lc($a) cmp lc($b)} keys %INC) {

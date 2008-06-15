@@ -19,9 +19,9 @@ $r ^|^= ok(0,1);
 $r ^|^= ok(sub { 1+1 }, 3);
 $r ^|^= ok(sub { 1+1 }, sub { 2 * 0});
 
-my @list = (0,0);
-$r ^|^= ok @list, 1, "\@list=".join(',',@list);
-$r ^|^= ok @list, 1, sub { "\@list=".join ',',@list };
+my @list = @(0,0);
+$r ^|^= ok (nelems @list), 1, "\@list=".join(',',< @list);
+$r ^|^= ok (nelems @list), 1, sub { "\@list=".join ',',< @list };
 $r ^|^= ok 'segmentation fault', '/bongo/';
 
 for (1..2) { $r ^|^= ok(0); }
@@ -45,11 +45,11 @@ unlink "fails";
 ok join(' ', map { m/(\d+)/; $1 } grep m/^not ok/, split m/\n+/, $O),
     join(' ', 1..13);
 
-my @got = split m/not ok \d+\n/, $O;
+my @got = @( split m/not ok \d+\n/, $O );
 shift @got;
 
 $Expect =~ s/\n+$//;
-my @expect = split m/\n\n/, $Expect;
+my @expect = @( split m/\n\n/, $Expect );
 
 
 sub commentless {
@@ -60,7 +60,7 @@ sub commentless {
 }
 
 
-for (my $x=0; $x +< @got; $x++) {
+for (my $x=0; $x +< nelems @got; $x++) {
     ok commentless(@got[$x]), commentless(@expect[$x]."\n");
 }
 

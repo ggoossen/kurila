@@ -115,9 +115,9 @@ use warnings::register;
 
 require Exporter;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(collate_xfrm setlocale LC_COLLATE);
-our @EXPORT_OK = qw();
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(collate_xfrm setlocale LC_COLLATE) );
+our @EXPORT_OK = @( qw() );
 
 use overload (
               'fallback'	=> 1,

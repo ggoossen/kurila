@@ -238,10 +238,10 @@ The default is to return the newest ones first
 ### subs ###
 sub import {
     my $pkg     = shift;
-    my %hash    = @_;
+    my %hash    = %( < @_ );
 
-    $CONFIG = Log::Message::Config->new( %hash)
-                or die loc(qq[Problem initialising \%1], __PACKAGE__);
+    $CONFIG = Log::Message::Config->new( < %hash)
+                or die < loc(qq[Problem initialising \%1], __PACKAGE__);
 
 }
 
@@ -281,9 +281,9 @@ An object marked private will always have an empty stack to begin with
 
 sub new {
     my $class   = shift;
-    my %hash    = @_;
+    my %hash    = %( < @_ );
 
-    my $conf = Log::Message::Config->new( %hash, default => $CONFIG) or return undef;
+    my $conf = Log::Message::Config->new( < %hash, default => $CONFIG) or return undef;
 
     if( $conf->private || $CONFIG->private ) {
 
@@ -295,7 +295,7 @@ sub new {
         ### if it was an empty stack, this was the first object
         ### in that case, set the global stack to match it for
         ### subsequent new, non-private objects
-        $STACK = $obj->{STACK} unless scalar @$STACK;
+        $STACK = $obj->{STACK} unless scalar nelems @$STACK;
 
         return $obj;
     }
@@ -303,7 +303,7 @@ sub new {
 
 sub _new_stack {
     my $class = shift;
-    my %hash  = @_;
+    my %hash  = %( < @_ );
 
     my $tmpl = \%(
         stack   => \%( default        => \@() ),
@@ -313,15 +313,15 @@ sub _new_stack {
                 ),
     );
 
-    my $args = check( $tmpl, \%hash, $CONFIG->verbose ) or (
-        warn(loc(q[Could not create a new stack object: %1], 
+    my $args = check( $tmpl, \%hash, < $CONFIG->verbose ) or (
+        warn( <loc(q[Could not create a new stack object: %1], < 
                 Params::Check->last_error)
         ),
         return
     );
 
 
-    my %self = map { uc, $args->{$_} } keys %$args;
+    my %self = %( map { uc, $args->{$_} } keys %$args );
 
     return bless \%self, $class;
 }
@@ -378,7 +378,7 @@ as issue a warning as to why it failed.
 ### should extra be stored in the item object perhaps for later retrieval?
 sub store {
     my $self = shift;
-    my %hash = ();
+    my %hash = %( () );
 
     my $tmpl = \%(
         message => \%(
@@ -386,30 +386,30 @@ sub store {
                 strict_type => 1,
                 required    => 1,
             ),
-        tag     => \%( default => $self->_get_conf('tag')     ),
-        level   => \%( default => $self->_get_conf('level'),  ),
+        tag     => \%( default => < $self->_get_conf('tag')     ),
+        level   => \%( default => < $self->_get_conf('level'),  ),
         extra   => \%( default => \@(), strict_type => 1 ),
     );
 
     ### single arg means just the message
     ### otherwise, they are named
-    if( @_ == 1 ) {
+    if( (nelems @_) == 1 ) {
         %hash{message} = shift;
     } else {
-        %hash = @_;
+        %hash = %( < @_ );
     }
 
     my $args = check( $tmpl, \%hash ) or ( 
-        warn( loc(q[Could not store error: %1], Params::Check->last_error) ), 
+        warn( < loc(q[Could not store error: %1], < Params::Check->last_error) ), 
         return 
     );
 
     my $extra = delete $args->{extra};
-    my $item = Log::Message::Item->new(   %$args,
+    my $item = Log::Message::Item->new(   < %$args,
                                         parent  => $self,
-                                        id      => scalar @{$self->{STACK}}
+                                        id      => scalar nelems @{$self->{STACK}}
                                     )
-            or ( warn( loc(q[Could not create new log item!]) ), return undef );
+            or ( warn( < loc(q[Could not create new log item!]) ), return undef );
 
     push @{$self->{STACK}}, $item;
 
@@ -417,7 +417,7 @@ sub store {
 
         my $sub = $args->{level};
 
-        $item->?$sub( @$extra );
+        $item->?$sub( < @$extra );
     }
 
     return 1;
@@ -468,46 +468,46 @@ undef will be returned.
 
 sub retrieve {
     my $self = shift;
-    my %hash = ();
+    my %hash = %( () );
 
     my $tmpl = \%(
         tag     => \%( default => qr/.*/ ),
         level   => \%( default => qr/.*/ ),
         message => \%( default => qr/.*/ ),
         amount  => \%( default => '' ),
-        remove  => \%( default => $self->_get_conf('remove')  ),
-        chrono  => \%( default => $self->_get_conf('chrono')  ),
+        remove  => \%( default => < $self->_get_conf('remove')  ),
+        chrono  => \%( default => < $self->_get_conf('chrono')  ),
     );
 
     ### single arg means just the amount
     ### otherwise, they are named
-    if( @_ == 1 ) {
+    if( (nelems @_) == 1 ) {
         %hash{amount} = shift;
     } else {
-        %hash = @_;
+        %hash = %( < @_ );
     }
 
     my $args = check( $tmpl, \%hash ) or (
-        warn( loc(q[Could not parse input: %1], Params::Check->last_error) ), 
+        warn( < loc(q[Could not parse input: %1], < Params::Check->last_error) ), 
         return 
     );
     
-    my @list =
+    my @list = @(
             grep { $_->tag      =~ m/$args->{tag}/       ? 1 : 0 }
             grep { $_->level    =~ m/$args->{level}/     ? 1 : 0 }
             grep { $_->message  =~ m/$args->{message}/   ? 1 : 0 }
             grep { defined }
                 $args->{chrono}
-                    ? @{$self->{STACK}}
-                    : reverse @{$self->{STACK}};
+                    ? < @{$self->{STACK}}
+                    : reverse < @{$self->{STACK}} );
 
-    my $amount = $args->{amount} || scalar @list;
+    my $amount = $args->{amount} || scalar nelems @list;
 
-    my @rv = map {
-                $args->{remove} ? $_->remove : $_
-           } scalar @list +> $amount
+    my @rv = @( map {
+                $args->{remove} ? < $_->remove : $_
+           } scalar nelems @list +> $amount
                             ? splice(@list,0,$amount)
-                            : @list;
+                            : < @list );
 
     return wantarray ? @rv : @rv[0];
 }
@@ -528,8 +528,8 @@ Furthermore, it can take the same arguments as C<retrieve> can.
 sub first {
     my $self = shift;
 
-    my $amt = @_ == 1 ? shift : 1;
-    return $self->retrieve( amount => $amt, @_, chrono => 1 );
+    my $amt = (nelems @_) == 1 ? shift : 1;
+    return $self->retrieve( amount => $amt, < @_, chrono => 1 );
 }
 
 =head2 last
@@ -549,8 +549,8 @@ Furthermore, it can take the same arguments as C<retrieve> can.
 sub final {
     my $self = shift;
 
-    my $amt = @_ == 1 ? shift : 1;
-    return $self->retrieve( amount => $amt, @_, chrono => 0 );
+    my $amt = (nelems @_) == 1 ? shift : 1;
+    return $self->retrieve( amount => $amt, < @_, chrono => 0 );
 }
 
 =head2 flush

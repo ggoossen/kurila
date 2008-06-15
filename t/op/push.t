@@ -1,6 +1,6 @@
 #!./perl
 
-our @tests = split(m/\n/, <<EOF);
+our @tests = @( split(m/\n/, <<EOF) );
 0 3,			0 1 2,		3 4 5 6 7
 0 0 a b c,		,		a b c 0 1 2 3 4 5 6 7
 8 0 a b c,		,		0 1 2 3 4 5 6 7 a b c
@@ -14,35 +14,35 @@ our @tests = split(m/\n/, <<EOF);
 -4,			4 5 6 7,	0 1 2 3
 EOF
 
-print "1..", 2 + @tests, "\n";
-die "blech" unless @tests;
+print "1..", 2 + nelems @tests, "\n";
+die "blech" unless (nelems @tests);
 
-our @x = (1,2,3);
-push(@x,@x);
-if (join(':',@x) eq '1:2:3:1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
+our @x = @(1,2,3);
+push(@x,< @x);
+if (join(':',< @x) eq '1:2:3:1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
 push(@x,4);
-if (join(':',@x) eq '1:2:3:1:2:3:4') {print "ok 2\n";} else {print "not ok 2\n";}
+if (join(':',< @x) eq '1:2:3:1:2:3:4') {print "ok 2\n";} else {print "not ok 2\n";}
 
 our $test = 3;
-foreach my $line (@tests) {
+foreach my $line (< @tests) {
     my ($list,$get,$leave) = split(m/,\t*/,$line);
-    my ($pos, $len, @list) = split(' ',$list);
-    my @get = split(' ',$get);
-    my @leave = split(' ',$leave);
-    @x = (0,1,2,3,4,5,6,7);
+    my ($pos, $len, < @list) = split(' ',$list);
+    my @get = @( split(' ',$get) );
+    my @leave = @( split(' ',$leave) );
+    @x = @(0,1,2,3,4,5,6,7);
     my @got;
     if (defined $len) {
-	@got = splice(@x, $pos, $len, @list);
+	@got = @( splice(@x, $pos, $len, < @list) );
     }
     else {
-	@got = splice(@x, $pos);
+	@got = @( splice(@x, $pos) );
     }
-    if (join(':',@got) eq join(':',@get) &&
-	join(':',@x) eq join(':',@leave)) {
+    if (join(':',< @got) eq join(':',< @get) &&
+	join(':',< @x) eq join(':',< @leave)) {
 	print "ok ",$test++,"\n";
     }
     else {
-	print "not ok ",$test++," got: @got == @get left: @x == @leave\n";
+	print "not ok ",$test++," got: {join ' ', <@got} == {join ' ', <@get} left: {join ' ', <@x} == {join ' ', <@leave}\n";
     }
 }
 

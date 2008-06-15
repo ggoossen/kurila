@@ -49,11 +49,11 @@ BEGIN {
     use Log::Message private => 0;
 
     use vars      qw[ @EXPORT $HISTORY_FH ];
-    @EXPORT     = qw[ history ];
+    @EXPORT     = @( qw[ history ] );
     my $log     = Log::Message->new();
     $HISTORY_FH = \*STDOUT;
 
-    for my $func ( @EXPORT ) {
+    for my $func ( < @EXPORT ) {
         no strict 'refs';
         
         *{Symbol::fetch_glob($func)} = sub {  my $msg     = shift;
@@ -61,7 +61,7 @@ BEGIN {
                                 message => $msg,
                                 tag     => uc $func,
                                 level   => $func,
-                                extra   => \@(@_)
+                                extra   => \@(< @_)
                         );
                 };
     }
@@ -69,7 +69,7 @@ BEGIN {
     sub history_as_string {
         my $class = shift;
 
-        return join $/, map { $_->message } __PACKAGE__->stack;
+        return join $/, map { < $_->message } < __PACKAGE__->stack;
     }
 }
 

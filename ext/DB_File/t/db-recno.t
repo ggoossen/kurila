@@ -26,7 +26,7 @@ our ($dbh, $Dfile, $bad_ones, $FA);
     $FA = 0 ;
     my @a ; 
     tie @a, 'try' ;
-    my $a = @a ;
+    my $a = (nelems @a) ;
 }
 
 
@@ -87,7 +87,7 @@ sub safeUntie
     my $hashref = shift ;
     my $no_inner = 1;
     local $^WARN_HOOK = sub {-- $no_inner } ;
-    untie @$hashref;
+    untie < @$hashref;
     return $no_inner;
 }
 
@@ -127,7 +127,7 @@ EOM
 sub normalise
 {
     return unless $^O eq 'cygwin' ;
-    foreach (@_)
+    foreach (< @_)
       { s#\r\n#\n#g }     
 }
 
@@ -138,7 +138,7 @@ BEGIN
     }
  
     if ($@) {
-        *Dumper = sub { my $a = shift; return "[ @{ $a } ]" } ;
+        *Dumper = sub { my $a = shift; return "[ {join ' ', <@{ $a }} ]" } ;
     }          
 }
 
@@ -197,29 +197,29 @@ my $X  ;
 my @h ;
 ok(17, $X = tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) ;
 
-my %noMode = map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ;
+my %noMode = %( map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
 ok(18, ((stat($Dfile))[[2]] ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
 	||  %noMode{$^O} );
 
 #my $l = @h ;
 my $l = $X->length ;
-ok(19, ($FA ? @h == 0 : !$l) );
+ok(19, ($FA ? (nelems @h) == 0 : !$l) );
 
-my @data = qw( a b c d ever f g h  i j k longername m n o p) ;
+my @data = @( qw( a b c d ever f g h  i j k longername m n o p) ) ;
 
 @h[0] = shift @data ;
 ok(20, @h[0] eq 'a' );
 
 my $ i;
-foreach (@data)
+foreach (< @data)
   { @h[++$i] = $_ }
 
 unshift (@data, 'a') ;
 
 ok(21, defined @h[1] );
 ok(22, ! defined @h[16] );
-ok(23, $FA ? @h == @data : $X->length == @data );
+ok(23, $FA ? (nelems @h) == nelems @data : $X->length == nelems @data );
 
 
 # Overwrite an entry & check fetch it
@@ -228,9 +228,9 @@ ok(23, $FA ? @h == @data : $X->length == @data );
 ok(24, @h[3] eq 'replaced' );
 
 #PUSH
-my @push_data = qw(added to the end) ;
-($FA ? push(@h, @push_data) : $X->push(@push_data)) ;
-push (@data, @push_data) ;
+my @push_data = @( qw(added to the end) ) ;
+($FA ? push(@h, < @push_data) : $X->push(< @push_data)) ;
+push (@data, < @push_data) ;
 ok(25, @h[++$i] eq 'added' );
 ok(26, @h[++$i] eq 'to' );
 ok(27, @h[++$i] eq 'the' );
@@ -250,12 +250,12 @@ ok(30, $value eq $shifted );
 
 # empty list
 ($FA ? unshift @h,() : $X->unshift) ;
-ok(31, ($FA ? @h == @data : $X->length == @data ));
+ok(31, ($FA ? (nelems @h) == nelems @data : $X->length == nelems @data ));
 
-my @new_data = qw(add this to the start of the array) ;
-$FA ? unshift (@h, @new_data) : $X->unshift (@new_data) ;
-unshift (@data, @new_data) ;
-ok(32, $FA ? @h == @data : $X->length == @data );
+my @new_data = @( qw(add this to the start of the array) ) ;
+$FA ? unshift (@h, < @new_data) : $X->unshift (< @new_data) ;
+unshift (@data, < @new_data) ;
+ok(32, $FA ? (nelems @h) == nelems @data : $X->length == nelems @data );
 ok(33, @h[0] eq "add") ;
 ok(34, @h[1] eq "this") ;
 ok(35, @h[2] eq "to") ;
@@ -269,10 +269,10 @@ ok(41, @h[8] eq @data[8]) ;
 # Brief test for SPLICE - more thorough 'soak test' is later.
 my @old;
 if ($FA) {
-    @old = splice(@h, 1, 2, qw(bananas just before));
+    @old = @( splice(@h, 1, 2, qw(bananas just before)) );
 }
 else {
-    @old = $X->splice(1, 2, qw(bananas just before));
+    @old = @( < $X->splice(1, 2, qw(bananas just before)) );
 }
 ok(42, @h[0] eq "add") ;
 ok(43, @h[1] eq "bananas") ;
@@ -284,13 +284,13 @@ ok(48, @h[6] eq "of") ;
 ok(49, @h[7] eq "the") ;
 ok(50, @h[8] eq "array") ;
 ok(51, @h[9] eq @data[8]) ;
-$FA ? splice(@h, 1, 3, @old) : $X->splice(1, 3, @old);
+$FA ? splice(@h, 1, 3, < @old) : $X->splice(1, 3, < @old);
 
 # Now both arrays should be identical
 
 my $ok = 1 ;
 my $j = 0 ;
-foreach (@data)
+foreach (< @data)
 {
    $ok = 0, last if $_ ne @h[$j ++] ; 
 }
@@ -300,7 +300,7 @@ ok(52, $ok );
 
 # get the last element of the array
 ok(53, @h[-1] eq @data[-1] );
-ok(54, @h[-1] eq @h[ ($FA ? @h : $X->length) -1] );
+ok(54, @h[-1] eq @h[ ($FA ? (nelems @h) : $X->length) -1] );
 
 # get the first element using a negative subscript
 eval '@h[ - ( $FA ? @h : $X->length)] = "abcd"' ;
@@ -314,7 +314,7 @@ ok(57, $@->{description} =~ '^Modification of non-creatable array value attempte
 # IMPORTANT - $X must be undefined before the untie otherwise the
 #             underlying DB close routine will not get called.
 undef $X ;
-ok(58, safeUntie \@h);
+ok(58, < safeUntie \@h);
 
 unlink $Dfile;
 
@@ -322,13 +322,13 @@ unlink $Dfile;
 {
     # Check bval defaults to \n
 
-    my @h = () ;
+    my @h = @( () ) ;
     my $dbh = DB_File::RECNOINFO->new() ;
     ok(59, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
     @h[0] = "abc" ;
     @h[1] = "def" ;
     @h[3] = "ghi" ;
-    ok(60, safeUntie \@h);
+    ok(60, < safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
     ok(61, $x eq "abc\ndef\n\nghi\n") ;
@@ -337,14 +337,14 @@ unlink $Dfile;
 {
     # Change bval
 
-    my @h = () ;
+    my @h = @( () ) ;
     my $dbh = DB_File::RECNOINFO->new() ;
     $dbh->{bval} = "-" ;
     ok(62, tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $dbh ) ;
     @h[0] = "abc" ;
     @h[1] = "def" ;
     @h[3] = "ghi" ;
-    ok(63, safeUntie \@h);
+    ok(63, < safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
     my $ok = ($x eq "abc-def--ghi-") ;
@@ -355,7 +355,7 @@ unlink $Dfile;
 {
     # Check R_FIXEDLEN with default bval (space)
 
-    my @h = () ;
+    my @h = @( () ) ;
     my $dbh = DB_File::RECNOINFO->new() ;
     $dbh->{flags} = R_FIXEDLEN ;
     $dbh->{reclen} = 5 ;
@@ -363,7 +363,7 @@ unlink $Dfile;
     @h[0] = "abc" ;
     @h[1] = "def" ;
     @h[3] = "ghi" ;
-    ok(66, safeUntie \@h);
+    ok(66, < safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
     my $ok = ($x eq "abc  def       ghi  ") ;
@@ -374,7 +374,7 @@ unlink $Dfile;
 {
     # Check R_FIXEDLEN with user-defined bval
 
-    my @h = () ;
+    my @h = @( () ) ;
     my $dbh = DB_File::RECNOINFO->new() ;
     $dbh->{flags} = R_FIXEDLEN ;
     $dbh->{bval} = "-" ;
@@ -383,7 +383,7 @@ unlink $Dfile;
     @h[0] = "abc" ;
     @h[1] = "def" ;
     @h[3] = "ghi" ;
-    ok(69, safeUntie \@h);
+    ok(69, < safeUntie \@h);
     my $x = docat($Dfile) ;
     unlink $Dfile;
     my $ok = ($x eq "abc--def-------ghi--") ;
@@ -492,7 +492,7 @@ EOM
     main::ok(81, $ret eq "[[11]]") ;
 
     undef $X;
-    main::ok(82, main::safeUntie \@h);
+    main::ok(82, < main::safeUntie \@h);
     unlink "SubDB.pm", "recno.tmp" ;
 
 }
@@ -507,9 +507,9 @@ EOM
     @h[1] = "def" ;
     @h[2] = "ghi" ;
     @h[3] = "jkl" ;
-    ok(84, $FA ? (@h-1) == 3 : $self->length() == 4) ;
+    ok(84, $FA ? ((nelems @h)-1) == 3 : $self->length() == 4) ;
     undef $self ;
-    ok(85, safeUntie \@h);
+    ok(85, < safeUntie \@h);
     my $x = docat($Dfile) ;
     ok(86, $x eq "abc\ndef\nghi\njkl\n") ;
 
@@ -521,9 +521,9 @@ EOM
       { splice @h, 4 }
     else 
       { $self->STORESIZE(4) }
-    ok(88, $FA ? (@h-1) == 3 : $self->length() == 4) ;
+    ok(88, $FA ? ((nelems @h)-1) == 3 : $self->length() == 4) ;
     undef $self ;
-    ok(89, safeUntie \@h);
+    ok(89, < safeUntie \@h);
     $x = docat($Dfile) ;
     ok(90, $x eq "abc\ndef\nghi\njkl\n") ;
 
@@ -533,9 +533,9 @@ EOM
       { @h[6] = @h[6] }
     else 
       { $self->STORESIZE(7) }
-    ok(92, $FA ? (@h-1) == 6 : $self->length() == 7) ;
+    ok(92, $FA ? ((nelems @h)-1) == 6 : $self->length() == 7) ;
     undef $self ;
-    ok(93, safeUntie \@h);
+    ok(93, < safeUntie \@h);
     $x = docat($Dfile) ;
     ok(94, $x eq "abc\ndef\nghi\njkl\n\n\n\n") ;
 
@@ -545,9 +545,9 @@ EOM
       { splice @h, 3 }
     else 
       { $self->STORESIZE(3) }
-    ok(96, $FA ? @h == 3 : $self->length() == 3) ;
+    ok(96, $FA ? (nelems @h) == 3 : $self->length() == 3) ;
     undef $self ;
-    ok(97, safeUntie \@h);
+    ok(97, < safeUntie \@h);
     $x = docat($Dfile) ;
     ok(98, $x eq "abc\ndef\nghi\n") ;
 
@@ -566,7 +566,7 @@ EOM
 
    sub checkOutput
    {
-       my($fk, $sk, $fv, $sv) = @_ ;
+       my($fk, $sk, $fv, $sv) = < @_ ;
 
        print "# Fetch Key   : expected '$fk' got '$fetch_key'\n" 
            if $fetch_key ne $fk ;
@@ -596,42 +596,42 @@ EOM
 
    @h[0] = "joe" ;
    #                   fk   sk     fv   sv
-   ok(100, checkOutput( "", 0, "", "joe")) ;
+   ok(100, < checkOutput( "", 0, "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(101, @h[0] eq "joe");
    #                   fk  sk  fv    sv
-   ok(102, checkOutput( "", 0, "joe", "")) ;
+   ok(102, < checkOutput( "", 0, "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(103, $db->FIRSTKEY() == 0) ;
    #                    fk     sk  fv  sv
-   ok(104, checkOutput( 0, "", "", "")) ;
+   ok(104, < checkOutput( 0, "", "", "")) ;
 
    # replace the filters, but remember the previous set
-   my ($old_fk) = $db->filter_fetch_key   
+   my ($old_fk) = < $db->filter_fetch_key   
    			(sub { ++ $_ ; $fetch_key = $_ }) ;
-   my ($old_sk) = $db->filter_store_key   
+   my ($old_sk) = < $db->filter_store_key   
    			(sub { $_ *= 2 ; $store_key = $_ }) ;
-   my ($old_fv) = $db->filter_fetch_value 
+   my ($old_fv) = < $db->filter_fetch_value 
    			(sub { $_ = "[$_]"; $fetch_value = $_ }) ;
-   my ($old_sv) = $db->filter_store_value 
+   my ($old_sv) = < $db->filter_store_value 
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    @h[1] = "Joe" ;
    #                   fk   sk     fv    sv
-   ok(105, checkOutput( "", 2, "", "Jxe")) ;
+   ok(105, < checkOutput( "", 2, "", "Jxe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(106, @h[1] eq "[Jxe]");
    #                   fk   sk     fv    sv
-   ok(107, checkOutput( "", 2, "[Jxe]", "")) ;
+   ok(107, < checkOutput( "", 2, "[Jxe]", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(108, $db->FIRSTKEY() == 1) ;
    #                   fk   sk     fv    sv
-   ok(109, checkOutput( 1, "", "", "")) ;
+   ok(109, < checkOutput( 1, "", "", "")) ;
    
    # put the original filters back
    $db->filter_fetch_key   ($old_fk);
@@ -641,15 +641,15 @@ EOM
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    @h[0] = "joe" ;
-   ok(110, checkOutput( "", 0, "", "joe")) ;
+   ok(110, < checkOutput( "", 0, "", "joe")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(111, @h[0] eq "joe");
-   ok(112, checkOutput( "", 0, "joe", "")) ;
+   ok(112, < checkOutput( "", 0, "joe", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(113, $db->FIRSTKEY() == 0) ;
-   ok(114, checkOutput( 0, "", "", "")) ;
+   ok(114, < checkOutput( 0, "", "", "")) ;
 
    # delete the filters
    $db->filter_fetch_key   (undef);
@@ -659,18 +659,18 @@ EOM
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    @h[0] = "joe" ;
-   ok(115, checkOutput( "", "", "", "")) ;
+   ok(115, < checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(116, @h[0] eq "joe");
-   ok(117, checkOutput( "", "", "", "")) ;
+   ok(117, < checkOutput( "", "", "", "")) ;
 
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok(118, $db->FIRSTKEY() == 0) ;
-   ok(119, checkOutput( "", "", "", "")) ;
+   ok(119, < checkOutput( "", "", "", "")) ;
 
    undef $db ;
-   ok(120, safeUntie \@h);
+   ok(120, < safeUntie \@h);
    unlink $Dfile;
 }
 
@@ -684,24 +684,24 @@ EOM
     unlink $Dfile;
     ok(121, $db = tie(@h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_RECNO ) );
 
-    my %result = () ;
+    my %result = %( () ) ;
 
     sub Closure
     {
-        my ($name) = @_ ;
+        my ($name) = < @_ ;
 	my $count = 0 ;
-	my @kept = () ;
+	my @kept = @( () ) ;
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     %result{$name} = "$name - $count: [@kept]" ;
+		     %result{$name} = "$name - $count: [{join ' ', <@kept}]" ;
 		   }
     }
 
-    $db->filter_store_key(Closure("store key")) ;
-    $db->filter_store_value(Closure("store value")) ;
-    $db->filter_fetch_key(Closure("fetch key")) ;
-    $db->filter_fetch_value(Closure("fetch value")) ;
+    $db->filter_store_key( <Closure("store key")) ;
+    $db->filter_store_value( <Closure("store value")) ;
+    $db->filter_fetch_key( <Closure("fetch key")) ;
+    $db->filter_fetch_value( <Closure("fetch value")) ;
 
     $_ = "original" ;
 
@@ -734,7 +734,7 @@ EOM
     ok(143, $_ eq "original") ;
 
     undef $db ;
-    ok(144, safeUntie \@h);
+    ok(144, < safeUntie \@h);
     unlink $Dfile;
 }		
 
@@ -753,7 +753,7 @@ EOM
    ok(146, $@->{description} =~ m/^recursion detected in filter_store_key/ );
    
    undef $db ;
-   ok(147, safeUntie \@h);
+   ok(147, < safeUntie \@h);
    unlink $Dfile;
 }
 
@@ -784,7 +784,7 @@ EOM
     $FA ? push @h, "green", "black" 
         : $x->push("green", "black") ;
 
-    my $elements = $FA ? scalar @h : $x->length ;
+    my $elements = $FA ? scalar nelems @h : $x->length ;
     print "The array contains $elements entries\n" ;
 
     my $last = $FA ? pop @h : $x->pop ;
@@ -803,7 +803,7 @@ EOM
     print "The 2nd last element is @h[-2]\n" ;
 
     undef $x ;
-    untie @h ;
+    untie < @h ;
 
     unlink $filename ;
   }  
@@ -888,7 +888,7 @@ EOM
       { print "$k: $v\n" }
 
     undef $H ;
-    untie @h ;    
+    untie < @h ;    
 
     unlink $file ;
   }  
@@ -942,7 +942,7 @@ EOM
 	or die "Can't open file: $!\n" ;
     @h[0] = undef;
     ok(150, $a eq "") ;
-    ok(151, safeUntie \@h);
+    ok(151, < safeUntie \@h);
     unlink $Dfile;
 }
 
@@ -960,9 +960,9 @@ EOM
     
     tie @h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_RECNO 
 	or die "Can't open file: $!\n" ;
-    @h = (); ;
+    @h = @( () ); ;
     ok(152, $a eq "") ;
-    ok(153, safeUntie \@h);
+    ok(153, < safeUntie \@h);
     unlink $Dfile;
 }
 
@@ -986,7 +986,7 @@ EOM
    @h[0] = "joe" ;
    ok(155, @h[0] eq "joe");
 
-   try { my @r= grep { @h[$_] } (1, 2, 3) };
+   try { my @r= @( grep { @h[$_] } (1, 2, 3) ) };
    ok (156, ! $@);
 
 
@@ -1000,11 +1000,11 @@ EOM
 
    ok(157, @h[1] eq "joe");
 
-   try { my @r= grep { @h[$_] } (1, 2, 3) };
+   try { my @r= @( grep { @h[$_] } (1, 2, 3) ) };
    ok (158, ! $@);
 
    undef $db ;
-   untie @h;
+   untie < @h;
    unlink $Dfile;
 }
 
@@ -1050,7 +1050,7 @@ EOM
    ok 168, $_ eq 'fred';
 
    undef $db ;
-   untie @h;
+   untie < @h;
    unlink $Dfile;
 }
 
@@ -1076,7 +1076,7 @@ EOM
     local $^WARN_HOOK = sub {$warned = @_[0]} ;
 
     # db-put with substr of key
-    my %remember = () ;
+    my %remember = %( () ) ;
     for my $ix ( 0 .. 2 )
     {
         my $key = $ix . "data" ;
@@ -1129,7 +1129,7 @@ EOM
     ok 173, $warned eq '' 
       or print "# Caught warning [$warned]\n" ;
 
-    my %bad = () ;
+    my %bad = %( () ) ;
     my $key = '';
     for (my $status = $db->seq($key, $value, R_FIRST ) ;
          $status == 0 ;
@@ -1173,7 +1173,7 @@ EOM
     $warned = '';
 
     undef $db ;
-    untie @h;
+    untie < @h;
     unlink $Dfile;
 }
 
@@ -1190,7 +1190,7 @@ exit unless $FA ;
     use strict;
 
     my $a = '';
-    my @a = (1);
+    my @a = @(1);
     local $^WARN_HOOK = sub {$a = @_[0]->{description}} ;
 
     unlink $Dfile;
@@ -1252,7 +1252,7 @@ exit unless $FA ;
     splice(@tied, 3);
     ok(192, $a eq '');
 
-    ok(193, safeUntie \@tied);
+    ok(193, < safeUntie \@tied);
     unlink $Dfile;
 }
 
@@ -1265,7 +1265,7 @@ exit unless $FA ;
 # The expected result is not needed because we get that by running
 # Perl's built-in splice().
 # 
-my @tests = (\@( \@( 'falsely', 'dinosaur', 'remedy', 'commotion',
+my @tests = @(\@( \@( 'falsely', 'dinosaur', 'remedy', 'commotion',
 		 'rarely', 'paleness' ),
 	       -4, -2,
 	       \@( 'redoubled', 'Taylorize', 'Zoe', 'halogen' ),
@@ -1316,10 +1316,10 @@ my @tests = (\@( \@( 'falsely', 'dinosaur', 'remedy', 'commotion',
 my $testnum = 194;
 my $failed = 0;
 my $tmp = "dbr$$";
-foreach my $test (@tests) {
-    my $err = test_splice(@$test);
+foreach my $test (< @tests) {
+    my $err = test_splice(< @$test);
     if (defined $err) {
-	print STDERR "# failed: ", Dumper($test);
+	print STDERR "# failed: ", < Dumper($test);
 	print STDERR "# error: $err\n";
 	$failed = 1;
 	ok($testnum++, 0);
@@ -1337,9 +1337,9 @@ else {
     srand(0);
     foreach (0 .. 1000 - 1) {
 	my $test = rand_test();
-	my $err = test_splice(@$test);
+	my $err = test_splice(< @$test);
 	if (defined $err) {
-	    print STDERR "# failed: ", Dumper($test);
+	    print STDERR "# failed: ", < Dumper($test);
 	    print STDERR "# error: $err\n";
 	    $failed = 1;
 	    print STDERR "# skipping any remaining random tests\n";
@@ -1374,10 +1374,10 @@ exit ;
 # Reads global variable $tmp.
 # 
 sub test_splice {
-    die 'usage: test_splice(array, offset, length, list, context)' if @_ != 5;
-    my ($array, $offset, $length, $list, $context) = @_;
-    my @array = @$array;
-    my @list = @$list;
+    die 'usage: test_splice(array, offset, length, list, context)' if (nelems @_) != 5;
+    my ($array, $offset, $length, $list, $context) = < @_;
+    my @array = @( < @$array );
+    my @list = @( < @$list );
 
     unlink $tmp;
     
@@ -1386,7 +1386,7 @@ sub test_splice {
       or die "cannot open $tmp: $!";
 
     my $i = 0;
-    foreach ( @array ) { @h[$i++] = $_ }
+    foreach ( < @array ) { @h[$i++] = $_ }
     
     return "basic DB_File sanity check failed"
       if list_diff(\@array, \@h);
@@ -1401,7 +1401,7 @@ sub test_splice {
 	my @r;
 	try {
 	    local $^WARN_HOOK = $gather_warning;
-	    @r = splice @array, $offset, $length, @list;
+	    @r = @( splice @array, $offset, $length, < @list );
 	};
 	$s_error = $@ && $@->{description};
 	$s_r = \@r;
@@ -1410,7 +1410,7 @@ sub test_splice {
 	my $r;
 	try {
 	    local $^WARN_HOOK = $gather_warning;
-	    $r = splice @array, $offset, $length, @list;
+	    $r = splice @array, $offset, $length, < @list;
 	};
 	$s_error = $@ && $@->{description};
 	$s_r = \@( $r );
@@ -1418,7 +1418,7 @@ sub test_splice {
     elsif ($context eq 'void') {
 	try {
 	    local $^WARN_HOOK = $gather_warning;
-	    splice @array, $offset, $length, @list;
+	    splice @array, $offset, $length, < @list;
 	};
 	$s_error = $@ && $@->{description};
 	$s_r = \@();
@@ -1427,7 +1427,7 @@ sub test_splice {
 	die "bad context $context";
     }
 
-    foreach ($s_error, @s_warnings) {
+    foreach ($s_error, < @s_warnings) {
 	chomp;
 	s/ at \S+ line \d+\.$//;
 	# only built-in splice identifies name of uninit value
@@ -1441,7 +1441,7 @@ sub test_splice {
 	my @r;
 	try {
 	    local $^WARN_HOOK = $gather_warning;
-	    @r = splice @h, $offset, $length, @list;
+	    @r = @( splice @h, $offset, $length, < @list );
 	};
 	$ms_error = $@ && $@->{description};
 	$ms_r = \@r;
@@ -1450,7 +1450,7 @@ sub test_splice {
 	my $r;
 	try {
 	    local $^WARN_HOOK = $gather_warning;
-	    $r = splice @h, $offset, $length, @list;
+	    $r = splice @h, $offset, $length, < @list;
 	};
 	$ms_error = $@ && $@->{description};
 	$ms_r = \@( $r );
@@ -1458,7 +1458,7 @@ sub test_splice {
     elsif ($context eq 'void') {
 	try {
 	    local $^WARN_HOOK = $gather_warning;
-	    splice @h, $offset, $length, @list;
+	    splice @h, $offset, $length, < @list;
 	};
 	$ms_error = $@ && $@->{description};
 	$ms_r = \@();
@@ -1467,25 +1467,25 @@ sub test_splice {
 	die "bad context $context";
     }
 
-    foreach ($ms_error, @ms_warnings) {
+    foreach ($ms_error, < @ms_warnings) {
 	chomp;
 	s/ at \S+ line \d+\.?.*//s;
     }
 
     return "different errors: '$s_error' vs '$ms_error'"
       if $s_error ne $ms_error;
-    return('different return values: ' . Dumper($s_r) . ' vs ' . Dumper($ms_r))
+    return @('different return values: ' . Dumper($s_r) . ' vs ' . Dumper($ms_r))
       if list_diff($s_r, $ms_r);
-    return('different changed list: ' . Dumper(\@array) . ' vs ' . Dumper(\@h))
+    return @('different changed list: ' . Dumper(\@array) . ' vs ' . Dumper(\@h))
       if list_diff(\@array, \@h);
 
-    if ((scalar @s_warnings) != (scalar @ms_warnings)) {
-        print STDERR "s_warnings: ", @s_warnings, "ABC\n";
-        print STDERR "ms_warnings: ", @ms_warnings, "DEF\n";
+    if ((scalar nelems @s_warnings) != (scalar nelems @ms_warnings)) {
+        print STDERR "s_warnings: ", < @s_warnings, "ABC\n";
+        print STDERR "ms_warnings: ", < @ms_warnings, "DEF\n";
 	return 'different number of warnings';
     }
 
-    while (@s_warnings) {
+    while ((nelems @s_warnings)) {
 	my $sw  = shift @s_warnings;
 	my $msw = shift @ms_warnings;
 	
@@ -1504,12 +1504,12 @@ sub test_splice {
     }
     
     undef $H;
-    untie @h;
+    untie < @h;
     
     open(TEXT, "<", $tmp) or die "cannot open $tmp: $!";
-    @h = ~< *TEXT; normalise @h; chomp @h;
+    @h = @( ~< *TEXT ); normalise < @h; chomp @h;
     close TEXT or die "cannot close $tmp: $!";
-    return('list is different when re-read from disk: '
+    return @('list is different when re-read from disk: '
 	   . Dumper(\@array) . ' vs ' . Dumper(\@h))
       if list_diff(\@array, \@h);
 
@@ -1534,11 +1534,11 @@ sub test_splice {
 # 
 sub list_diff {
     die 'usage: list_diff(ref to first list, ref to second list)'
-      if @_ != 2;
-    my ($a, $b) = @_;
-    my @a = @$a; my @b = @$b;
-    return 1 if (scalar @a) != (scalar @b);
-    for (my $i = 0; $i +< @a; $i++) {
+      if (nelems @_) != 2;
+    my ($a, $b) = < @_;
+    my @a = @( < @$a ); my @b = @( < @$b );
+    return 1 if (scalar nelems @a) != (scalar nelems @b);
+    for (my $i = 0; $i +< nelems @a; $i++) {
 	my ($ae, $be) = (@a[$i], @b[$i]);
 	if (defined $ae and defined $be) {
 	    return 1 if $ae ne $be;
@@ -1561,34 +1561,34 @@ sub list_diff {
 # undefined.  Return a 'test' - a listref of these five things.
 # 
 sub rand_test {
-    die 'usage: rand_test()' if @_;
-    my @contexts = qw<list scalar void>;
-    my $context = @contexts[int(rand @contexts)];
-    return \@( rand_list(),
+    die 'usage: rand_test()' if (nelems @_);
+    my @contexts = @( qw<list scalar void> );
+    my $context = @contexts[int(rand nelems @contexts)];
+    return \@( < rand_list(),
 	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
-	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef,
+	     (rand() +< 0.5) ? (int(rand(20)) - 10) : undef, <
 	     rand_list(),
 	     $context );
 }
 
 
 sub rand_list {
-    die 'usage: rand_list()' if @_;
+    die 'usage: rand_list()' if (nelems @_);
     my @r;
 
-    while (rand() +> 0.1 * (scalar @r + 1)) {
-	push @r, rand_word();
+    while (rand() +> 0.1 * (scalar (nelems @r) + 1)) {
+	push @r, < rand_word();
     }
     return \@r;
 }
 
 
 sub rand_word {
-    die 'usage: rand_word()' if @_;
+    die 'usage: rand_word()' if (nelems @_);
     my $r = '';
-    my @chars = qw<a b c d e f g h i j k l m n o p q r s t u v w x y z>;
+    my @chars = @( qw<a b c d e f g h i j k l m n o p q r s t u v w x y z> );
     while (rand() +> 0.1 * (length($r) + 1)) {
-	$r .= @chars[int(rand(scalar @chars))];
+	$r .= @chars[int(rand(scalar nelems @chars))];
     }
     return $r;
 }

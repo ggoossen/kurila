@@ -10,17 +10,17 @@ plan (3);
 {
     # array without '@'.
     no strict 'vars';
-    our @foox = ( 'foo', 'bar', 'burbl');
+    our @foox = @( 'foo', 'bar', 'burbl');
     eval q| push(foox, 'blah') |;
     like($@->message, qr/Type of arg 1 to push must be array/);
-    is(0+@foox, 3);
+    is(0+nelems @foox, 3);
 }
 
 # OA_HVREF
 {
     # hash without '%'.
     no strict 'vars';
-    our %foox = ( foo => 'bar' );
+    our %foox = %( foo => 'bar' );
     eval q| keys foox |;
     like($@ && $@->message, qr/Type of arg 1 to keys must be hash/);
 }

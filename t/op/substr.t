@@ -269,7 +269,7 @@ eval_dies_like( 'substr($a,0,0,"") = "abc"',
 is ($a, "foo");
 
 $a = "abcdefgh";
-is(sub { shift }->(substr($a, 0, 4, "xxxx")), 'abcd');
+is( <sub { shift }->(substr($a, 0, 4, "xxxx")), 'abcd');
 is($a, 'xxxxefgh');
 
 {
@@ -458,7 +458,7 @@ is($x, "\x{100}\x{200}ab");
     my $s = "ab";
     my @r; 
     @r[$_] = \ substr $s, $_, 1 for (0, 1);
-    is(join("", map { $$_ } @r), "ab");
+    is(join("", map { $$_ } < @r), "ab");
 }
 
 # [perl #24605]
@@ -500,9 +500,9 @@ is($x, "\x{100}\x{200}ab");
 {
     # lvalue ref count
     my $foo = "bar";
-    is(Internals::SvREFCNT(\$foo), 2);
+    is( <Internals::SvREFCNT(\$foo), 2);
     substr($foo, -2, 2, "la");
-    is(Internals::SvREFCNT(\$foo), 2);
+    is( <Internals::SvREFCNT(\$foo), 2);
 }
 
 }

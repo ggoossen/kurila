@@ -51,7 +51,7 @@ of when it occurred.
 
 sub carp {
     my $self = shift;
-    warn join " ", $self->message, $self->shortmess, 'at', $self->when, "\n";
+    warn join " ", < $self->message, < $self->shortmess, 'at', < $self->when, "\n";
 }
 
 =head2 croak
@@ -63,7 +63,7 @@ timestamp of when it occurred.
 
 sub croak {
     my $self = shift;
-    die join " ", $self->message, $self->shortmess, 'at', $self->when, "\n";
+    die join " ", < $self->message, < $self->shortmess, 'at', < $self->when, "\n";
 }
 
 =head2 cluck
@@ -75,7 +75,7 @@ timestamp of when it occurred.
 
 sub cluck {
     my $self = shift;
-    warn join " ", $self->message, $self->longmess, 'at', $self->when, "\n";
+    warn join " ", < $self->message, < $self->longmess, 'at', < $self->when, "\n";
 }
 
 =head2 confess
@@ -87,7 +87,7 @@ timestamp of when it occurred
 
 sub confess {
     my $self = shift;
-    die join " ", $self->message, $self->longmess, 'at', $self->when, "\n";
+    die join " ", < $self->message, < $self->longmess, 'at', < $self->when, "\n";
 }
 
 =head2 die
@@ -96,7 +96,7 @@ Will simply die with the error message of the item
 
 =cut
 
-sub die  { die  shift->message; }
+sub die  { die <  shift->message; }
 
 
 =head2 warn
@@ -105,7 +105,7 @@ Will simply warn with the error message of the item
 
 =cut
 
-sub warn { warn shift->message; }
+sub warn { warn < shift->message; }
 
 
 =head2 trace
@@ -118,7 +118,7 @@ occurrent, clucking with every item as it comes across it.
 sub trace {
     my $self = shift;
 
-    for my $item( $self->parent->retrieve( chrono => 0 ) ) {
+    for my $item( < $self->parent->retrieve( chrono => 0 ) ) {
         $item->cluck;
     }
 }
@@ -128,7 +128,7 @@ sub trace {
 =cut
 
 sub add_handler {
-    my ($class, $name, $handler) = @_;
+    my ($class, $name, $handler) = < @_;
 
     Symbol::fetch_glob($name)->* = \&$handler;
     Symbol::fetch_glob("Log::Message::Item::$name")->* = \&$handler;

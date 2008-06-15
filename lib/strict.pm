@@ -9,7 +9,7 @@ unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
     die("Incorrect use of pragma '{__PACKAGE__}' at $f line $l.\n");
 }
 
-my %bitmask = (
+my %bitmask = %(
 refs => 0x00000002,
 subs => 0x00000200,
 vars => 0x00000400
@@ -18,11 +18,11 @@ vars => 0x00000400
 sub bits {
     my $bits = 0;
     my @wrong;
-    foreach my $s (@_) {
+    foreach my $s (< @_) {
 	push @wrong, $s unless exists %bitmask{$s};
         $bits ^|^= %bitmask{$s} || 0;
     }
-    if (@wrong) {
+    if ((nelems @wrong)) {
         die("Unknown 'strict' tag(s) '{dump::view(\@wrong)}'");
     }
     $bits;
@@ -32,12 +32,12 @@ my $default_bits = bits(qw(refs subs vars));
 
 sub import {
     shift;
-    $^H ^|^= @_ ? bits(@_) : $default_bits;
+    $^H ^|^= (nelems @_) ? bits(< @_) : $default_bits;
 }
 
 sub unimport {
     shift;
-    $^H ^&^= ^~^ (@_ ? bits(@_) : $default_bits);
+    $^H ^&^= ^~^ ((nelems @_) ? bits(< @_) : $default_bits);
 }
 
 1;

@@ -1,6 +1,6 @@
 use Perl6::Form;
 
-print form
+print < form
 	\%(page=>\%(length=>4, header=>'==========')),
 	"\{>>>>>>>>\} \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
      "foo bar baz qux",

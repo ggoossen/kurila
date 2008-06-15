@@ -10,8 +10,8 @@ ok(1);
 
 #########################
 
-sub _pack_U   { Unicode::Collate::pack_U(@_) }
-sub _unpack_U { Unicode::Collate::unpack_U(@_) }
+sub _pack_U   { Unicode::Collate::pack_U(< @_) }
+sub _unpack_U { Unicode::Collate::unpack_U(< @_) }
 
 my $A_acute = _pack_U(0xC1);
 my $acute   = _pack_U(0x0301);
@@ -21,7 +21,7 @@ my $Collator = Unicode::Collate->new(
   normalization => undef,
 );
 
-my %origAlt = $Collator->change(alternate => 'Blanked');
+my %origAlt = %( < $Collator->change(alternate => 'Blanked') );
 
 is($Collator->cmp("death", "de luge"), -1);
 is($Collator->cmp("de luge", "de-luge"), -1);
@@ -53,7 +53,7 @@ is($Collator->cmp("de luge", "de-luge"), -1);
 is($Collator->cmp("de-luge", "deLuge"), -1);
 is($Collator->cmp("deLuge", "de Luge"), -1);
 
-$Collator->change(%origAlt);
+$Collator->change(< %origAlt);
 
 is($Collator->{alternate}, 'shifted');
 

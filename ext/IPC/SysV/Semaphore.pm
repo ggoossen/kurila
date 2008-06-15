@@ -33,7 +33,7 @@ $VERSION = eval $VERSION;
 }
 
 sub new {
-    @_ == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )';
+    (nelems @_) == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )';
     my $class = shift;
 
     my $id = semget(@_[0],@_[1],@_[2]);
@@ -54,7 +54,7 @@ sub remove {
 }
 
 sub getncnt {
-    @_ == 2 || croak '$sem->getncnt( SEM )';
+    (nelems @_) == 2 || croak '$sem->getncnt( SEM )';
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETNCNT,0);
@@ -62,7 +62,7 @@ sub getncnt {
 }
 
 sub getzcnt {
-    @_ == 2 || croak '$sem->getzcnt( SEM )';
+    (nelems @_) == 2 || croak '$sem->getzcnt( SEM )';
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETZCNT,0);
@@ -70,7 +70,7 @@ sub getzcnt {
 }
 
 sub getval {
-    @_ == 2 || croak '$sem->getval( SEM )';
+    (nelems @_) == 2 || croak '$sem->getval( SEM )';
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETVAL,0);
@@ -78,7 +78,7 @@ sub getval {
 }
 
 sub getpid {
-    @_ == 2 || croak '$sem->getpid( SEM )';
+    (nelems @_) == 2 || croak '$sem->getpid( SEM )';
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETPID,0);
@@ -86,10 +86,10 @@ sub getpid {
 }
 
 sub op {
-    @_ +>= 4 || croak '$sem->op( OPLIST )';
+    (nelems @_) +>= 4 || croak '$sem->op( OPLIST )';
     my $self = shift;
-    croak 'Bad arg count' if @_ % 3;
-    my $data = pack("s!*",@_);
+    croak 'Bad arg count' if (nelems @_) % 3;
+    my $data = pack("s!*",< @_);
     semop($$self,$data);
 }
 
@@ -105,12 +105,12 @@ sub set {
     my $self = shift;
     my $ds;
 
-    if(@_ == 1) {
+    if((nelems @_) == 1) {
 	$ds = shift;
     }
     else {
-	croak 'Bad arg count' if @_ % 2;
-	my %arg = @_;
+	croak 'Bad arg count' if (nelems @_) % 2;
+	my %arg = %( < @_ );
 	$ds = $self->stat
 		or return undef;
 	my($key,$val);
@@ -132,12 +132,12 @@ sub getall {
 
 sub setall {
     my $self = shift;
-    my $data = pack("s!*",@_);
+    my $data = pack("s!*",< @_);
     semctl($$self,0,SETALL,$data);
 }
 
 sub setval {
-    @_ == 3 || croak '$sem->setval( SEM, VAL )';
+    (nelems @_) == 3 || croak '$sem->setval( SEM, VAL )';
     my $self = shift;
     my $sem = shift;
     my $val = shift;

@@ -11,9 +11,9 @@ my $file ;
 my $buffer ;
 my $s;
 
-@ARGV = '-' unless @ARGV ;
+@ARGV = @( '-' ) unless (nelems @ARGV) ;
 
-foreach $file (@ARGV) {
+foreach $file (< @ARGV) {
     
     my $gz = IO::Uncompress::Gunzip->new( $file)
          or die "Cannot open $file: $GunzipError\n" ;

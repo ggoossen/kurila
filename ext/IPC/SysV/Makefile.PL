@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 sub MY::libscan
 {
   package MY;
-  my($self, $path) = @_;
+  my($self, $path) = < @_;
   return $path if $self->SUPER::libscan($path) and
                   $path !~ m! [~%]$
                             | \.(cache\.cm|swp|orig|rej)$

@@ -12,7 +12,7 @@ $VERSION = eval $VERSION;
 # platform we're on.  I don't know of a systematic way.  These values
 # came from the latest (bleadperl) perlport.pod.
 
-my %OSTYPES = qw(
+my %OSTYPES = %( qw(
 		 aix       Unix
 		 bsdos     Unix
 		 dgux      Unix
@@ -51,7 +51,7 @@ my %OSTYPES = qw(
 		 riscos    RiscOS
 		 amigaos   Amiga
 		 mpeix     MPEiX
-		);
+		) );
 
 # We only use this once - don't waste a symbol table entry on it.
 # More importantly, don't make it an inheritable method.
@@ -59,17 +59,17 @@ my $load = sub {
   my $mod = shift;
   eval "use $mod";
   die $@ if $@;
-  @ISA = ($mod);
+  @ISA = @($mod);
 };
 
 {
-  my @package = split m/::/, __PACKAGE__;
+  my @package = @( split m/::/, __PACKAGE__ );
   
-  if (grep {-e File::Spec->catfile($_, @package, 'Platform', $^O) . '.pm'} @INC) {
+  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^O) . '.pm'} < @INC) {
     $load->(__PACKAGE__ . "::Platform::$^O");
     
   } elsif (exists %OSTYPES{$^O} and
-	   grep {-e File::Spec->catfile($_, @package, 'Platform', %OSTYPES{$^O}) . '.pm'} @INC) {
+	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^O}) . '.pm'} < @INC) {
     $load->(__PACKAGE__ . "::Platform::%OSTYPES{$^O}");
     
   } else {

@@ -9,7 +9,7 @@ use strict;
 use vars qw($VERSION @ISA %Escape $WRAP %Tagmap);
 $VERSION = '2.02';
 use Pod::Simple::PullParser ();
-BEGIN {@ISA = ('Pod::Simple::PullParser')}
+BEGIN {@ISA = @('Pod::Simple::PullParser')}
 
 use Carp ();
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
@@ -22,12 +22,12 @@ sub _openclose {
  return map {;
    m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
    ( $1,  "\{\\$2\n",   "/$1",  "\}" );
- } @_;
+ } < @_;
 }
 
 my @_to_accept;
 
-%Tagmap = (
+%Tagmap = %( <
  # 'foo=bar' means ('foo' => '{\bar'."\n", '/foo' => '}')
  _openclose(
   'B=cs18\b',
@@ -91,16 +91,16 @@ my @_to_accept;
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub new {
-  my $new = shift->SUPER::new(@_);
+  my $new = shift->SUPER::new(< @_);
   $new->nix_X_codes(1);
   $new->nbsp_for_S(1);
   $new->accept_targets( 'rtf', 'RTF' );
 
-  $new->{'Tagmap'} = \%(%Tagmap);
+  $new->{'Tagmap'} = \%(< %Tagmap);
 
-  $new->accept_codes(@_to_accept);
+  $new->accept_codes(< @_to_accept);
   $new->accept_codes('VerbatimFormatted');
-  DEBUG +> 2 and print "To accept: ", join(' ',@_to_accept), "\n";
+  DEBUG +> 2 and print "To accept: ", join(' ',< @_to_accept), "\n";
   $new->doc_lang(
     (  %ENV{'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ? $1
     : (%ENV{'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ? hex($1)
@@ -160,13 +160,13 @@ sub do_middle {      # the main work
   
     if( ($type = $token->type) eq 'text' ) {
       if( $self->{'rtfverbatim'} ) {
-        DEBUG +> 1 and print "  $type " , $token->text, " in verbatim!\n";
+        DEBUG +> 1 and print "  $type " , < $token->text, " in verbatim!\n";
         rtf_esc_codely($scratch = $token->text);
         print $fh $scratch;
         next;
       }
 
-      DEBUG +> 1 and print "  $type " , $token->text, "\n";
+      DEBUG +> 1 and print "  $type " , < $token->text, "\n";
       
       $scratch = $token->text;
       $scratch =~ s/\t/ /g;
@@ -205,8 +205,8 @@ sub do_middle {      # the main work
       print $fh $scratch;
 
     } elsif( $type eq 'start' ) {
-      DEBUG +> 1 and print "  +$type ",$token->tagname,
-        " (", map("<$_> ", %{$token->attr_hash}), ")\n";
+      DEBUG +> 1 and print "  +$type ", <$token->tagname,
+        " (", map("<$_> ", < %{$token->attr_hash}), ")\n";
 
       if( ($tagname = $token->tagname) eq 'Verbatim'
           or $tagname eq 'VerbatimFormatted'
@@ -235,7 +235,7 @@ sub do_middle {      # the main work
         # It's not terribly pretty, but it really does make things pretty.
         #
         while(1) {
-          push @to_unget, $self->get_token;
+          push @to_unget, < $self->get_token;
           pop(@to_unget), last unless defined @to_unget[-1];
            # Erroneously used to be "unshift" instead of pop!  Adds instead
            # of removes, and operates on the beginning instead of the end!
@@ -245,7 +245,7 @@ sub do_middle {      # the main work
               DEBUG +> 1 and print "    item-* is too long to be keepn'd.\n";
               last;
             }
-          } elsif (@to_unget +> 1 and
+          } elsif ((nelems @to_unget) +> 1 and
             @to_unget[-2]->type eq 'end' and
             @to_unget[-2]->tagname =~ m/^item-/s
           ) {
@@ -254,22 +254,22 @@ sub do_middle {      # the main work
               @to_unget[-1]->type eq 'start' and
               @to_unget[-1]->tagname eq 'Para';
 
-            DEBUG +> 1 and printf "    item-* before \%s(\%s) \%s keepn'd.\n",
+            DEBUG +> 1 and printf "    item-* before \%s(\%s) \%s keepn'd.\n", <
               @to_unget[-1]->type,
-              @to_unget[-1]->can('tagname') ? @to_unget[-1]->tagname : '',
+              @to_unget[-1]->can('tagname') ? < @to_unget[-1]->tagname : '',
               $self->{'rtfitemkeepn'} ? "gets" : "doesn't get";
             last;
-          } elsif (@to_unget +> 40) {
+          } elsif ((nelems @to_unget) +> 40) {
             DEBUG +> 1 and print "    item-* now has too many tokens (",
-              scalar(@to_unget),
-              (DEBUG +> 4) ? (q<: >, map($_->dump, @to_unget)) : (),
+              scalar(nelems @to_unget),
+              (DEBUG +> 4) ? (q<: >, map( <$_->dump, < @to_unget)) : (),
               ") to be keepn'd.\n";
             last; # give up
           }
           # else keep while'ing along
         }
         # Now put it aaaaall back...
-        $self->unget_token(@to_unget);
+        $self->unget_token(< @to_unget);
 
       } elsif( $tagname =~ m/^over-/s ) {
         push @stack, $1;
@@ -288,7 +288,7 @@ sub do_middle {      # the main work
           $self->unget_token($next);
           next;
         }
-        DEBUG and print "    raw text ", $next->text, "\n";
+        DEBUG and print "    raw text ", < $next->text, "\n";
         printf $fh "\n" . $next->text . "\n";
         next;
       }
@@ -298,14 +298,14 @@ sub do_middle {      # the main work
       print $fh $scratch;
       
       if ($tagname eq 'item-number') {
-        print $fh $token->attr('number'), ". \n";
+        print $fh < $token->attr('number'), ". \n";
       } elsif ($tagname eq 'item-bullet') {
         print $fh "\\'95 \n";
         #for funky testing: print $fh '', rtf_esc("\x{4E4B}\x{9053}");
       }
 
     } elsif( $type eq 'end' ) {
-      DEBUG +> 1 and print "  -$type ",$token->tagname,"\n";
+      DEBUG +> 1 and print "  -$type ", <$token->tagname,"\n";
       if( ($tagname = $token->tagname) =~ m/^over-/s ) {
         DEBUG and print "Indenting back @indent_stack[-1] twips.\n";
         $self->{'rtfindent'} -= pop @indent_stack;
@@ -325,12 +325,12 @@ sub do_middle {      # the main work
 sub do_beginning {
   my $self = @_[0];
   my $fh = $self->{'output_fh'};
-  return print $fh join '',
-    $self->doc_init,
-    $self->font_table,
-    $self->stylesheet,
-    $self->color_table,
-    $self->doc_info,
+  return print $fh join '', <
+    $self->doc_init, <
+    $self->font_table, <
+    $self->stylesheet, <
+    $self->color_table, <
+    $self->doc_info, <
     $self->doc_start,
     "\n"
   ;
@@ -345,7 +345,7 @@ sub do_end {
 ###########################################################################
 
 sub stylesheet {
-  return sprintf <<'END',
+  return sprintf <<'END', <
 {\stylesheet
 {\snext0 Normal;}
 {\*\cs10 \additive Default Paragraph Font;}
@@ -372,10 +372,10 @@ sub stylesheet {
 
 END
 
-   @_[0]->codeblock_halfpoint_size(),
-   @_[0]->head1_halfpoint_size(),
-   @_[0]->head2_halfpoint_size(),
-   @_[0]->head3_halfpoint_size(),
+   @_[0]->codeblock_halfpoint_size(), <
+   @_[0]->head1_halfpoint_size(), <
+   @_[0]->head2_halfpoint_size(), <
+   @_[0]->head3_halfpoint_size(), <
    @_[0]->head4_halfpoint_size(),
   ;
 }
@@ -433,7 +433,7 @@ END
 
   # None of the following things should need escaping, I dare say!
     $tag, 
-    @ISA[0], @ISA[0]->VERSION(),
+    @ISA[0], < @ISA[0]->VERSION(),
     $^V, scalar(gmtime),
   ;
 }
@@ -468,9 +468,9 @@ p.\chpgn\par}
 \fs%s
 
 END
-    ($self->doc_lang) x 2,
+    ( <$self->doc_lang) x 2, <
     $self->header_halfpoint_size,
-    $title,
+    $title, <
     $self->normal_halfpoint_size,
   ;
 }
@@ -482,7 +482,7 @@ use integer;
 sub rtf_esc {
   my $x; # scratch
   if(!defined wantarray) { # void context: alter in-place!
-    for(@_) {
+    for(< @_) {
       s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
       s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
     }
@@ -492,9 +492,9 @@ sub rtf_esc {
       s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
       $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
       $x;
-    } @_;
+    } < @_;
   } else { # return a single scalar
-    ($x = ((@_ == 1) ? @_[0] : join '', @_)
+    ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
     ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
              # Escape \, {, }, -, control chars, and 7f-ff.
     $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
@@ -511,7 +511,7 @@ sub rtf_esc_codely {
   
   my $x; # scratch
   if(!defined wantarray) { # void context: alter in-place!
-    for(@_) {
+    for(< @_) {
       s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
       s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
     }
@@ -521,9 +521,9 @@ sub rtf_esc_codely {
       s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
       $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
       $x;
-    } @_;
+    } < @_;
   } else { # return a single scalar
-    ($x = ((@_ == 1) ? @_[0] : join '', @_)
+    ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
     ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
              # Escape \, {, }, -, control chars, and 7f-ff.
     $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
@@ -531,7 +531,7 @@ sub rtf_esc_codely {
   }
 }
 
-%Escape = (
+%Escape = %(
   map( (chr($_),chr($_)),       # things not apparently needing escaping
        0x20 .. 0x7E ),
   map( (chr($_),sprintf("\\'\%02x", $_)),    # apparently escapeworthy things

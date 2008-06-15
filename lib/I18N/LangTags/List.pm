@@ -92,16 +92,16 @@ sub is_decent {
       )*
     $/xs;
 
-  my @supers = ();
+  my @supers = @( () );
   foreach my $bit (split('-', $tag)) {
     push @supers, 
-      scalar(@supers) ? (@supers[-1] . '-' . $bit) : $bit;
+      scalar(nelems @supers) ? (@supers[-1] . '-' . $bit) : $bit;
   }
-  return 0 unless @supers;
+  return 0 unless (nelems @supers);
   shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s;
-  return 0 unless @supers;
+  return 0 unless (nelems @supers);
 
-  foreach my $f ($tag, @supers) {
+  foreach my $f ($tag, < @supers) {
     return 0 if %Is_Disrec{$f};
     return 2 if %Name{$f};
      # so that decent subforms of indecent tags are decent

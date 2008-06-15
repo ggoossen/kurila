@@ -1,7 +1,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -17,7 +17,7 @@ require Test::Builder;
 my $TB = Test::Builder->create;
 $TB->plan(tests => 2);
 
-sub is { $TB->is_eq(@_) }
+sub is { $TB->is_eq(< @_) }
 
 
 package main;
@@ -25,7 +25,7 @@ package main;
 require Test::Simple;
 
 require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my($out, $err) = < Test::Simple::Catch::caught();
 local %ENV{HARNESS_ACTIVE} = 0;
 
 Test::Simple->import(tests => 5);

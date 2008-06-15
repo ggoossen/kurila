@@ -101,51 +101,51 @@ END {
 
 
 sub first_release_raw {
-    my ($discard, $module, $version) = @_;
+    my ($discard, $module, $version) = < @_;
 
-    my @perls = $version
+    my @perls = @( $version
         ? grep { exists %version{$_}->{ $module } &&
                         %version{$_}->{ $module } +>= $version } keys %version
-        : grep { exists %version{$_}->{ $module }             } keys %version;
+        : grep { exists %version{$_}->{ $module }             } keys %version );
 
     return @perls;
 }
 
 sub first_release_by_date {
-    my @perls = &first_release_raw;
-    return unless @perls;
-    return (sort { %released{$a} cmp %released{$b} } @perls)[[0]];
+    my @perls = @( < &first_release_raw );
+    return unless (nelems @perls);
+    return (sort { %released{$a} cmp %released{$b} } < @perls)[[0]];
 }
 
 sub first_release {
-    my @perls = &first_release_raw;
-    return unless @perls;
-    return (sort { $a cmp $b } @perls)[[0]];
+    my @perls = @( < &first_release_raw );
+    return unless (nelems @perls);
+    return (sort { $a cmp $b } < @perls)[[0]];
 }
 
 sub find_modules {
     my $discard = shift;
     my $regex = shift;
-    my @perls = @_;
-    @perls = keys %version unless @perls;
+    my @perls = @( < @_ );
+    @perls = @( keys %version ) unless (nelems @perls);
 
     my %mods;
-    foreach (@perls) {
+    foreach (< @perls) {
         while (my ($k, $v) = each %{%version{$_}}) {
             %mods{$k}++ if $k =~ $regex;
         }
     }
-    return sort keys %mods
+    return @( sort keys %mods)
 }
 
 sub find_version {
-    my ($class, $v) = @_;
+    my ($class, $v) = < @_;
     return %version{$v} if defined %version{$v};
     return undef;
 }
 
 # when things escaped
-%released = (
+%released = %(
     5.000    => '1994-10-17',
     5.001    => '1995-03-14',
     5.002    => '1996-02-96',
@@ -178,7 +178,7 @@ sub find_version {
    );
 
 # perforce branches and patch levels
-%patchlevel = (
+%patchlevel = %(
     5.005    => \@(perl => 1647),
     5.00503  => \@('maint-5.005' => 3198),
     5.00405  => \@('maint-5.004' => 3296),
@@ -211,7 +211,7 @@ for my $version ( sort { $a <+> $b } keys %released ) {
 }
 
 
-%version = (
+%version = %(
     5.000 => \%(
         'AnyDBM_File'           => undef,  # lib/AnyDBM_File.pm
         'AutoLoader'            => undef,  # lib/AutoLoader.pm

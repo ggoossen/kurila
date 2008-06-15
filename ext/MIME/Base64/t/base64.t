@@ -32,7 +32,7 @@ sub encodeTest
 {
     print "# encode test\n";
 
-    my @encode_tests = (
+    my @encode_tests = @(
 	# All values
 	\@("\000" => "AA=="),
 	\@("\001" => "AQ=="),
@@ -296,26 +296,26 @@ sub encodeTest
 	\@("\000\000\000" => "AAAA"),
 
         \@(''    => ''),
-	\@(ASCII('a')   => 'YQ=='),
-	\@(ASCII('aa')  => 'YWE='),
-	\@(ASCII('aaa') => 'YWFh'),
+	\@( <ASCII('a')   => 'YQ=='),
+	\@( <ASCII('aa')  => 'YWE='),
+	\@( <ASCII('aaa') => 'YWFh'),
 
-	\@(ASCII('aaa') => 'YWFh'),
-	\@(ASCII('aaa') => 'YWFh'),
-	\@(ASCII('aaa') => 'YWFh'),
+	\@( <ASCII('aaa') => 'YWFh'),
+	\@( <ASCII('aaa') => 'YWFh'),
+	\@( <ASCII('aaa') => 'YWFh'),
 
 
 	# from HTTP spec
-	\@(ASCII('Aladdin:open sesame') => 'QWxhZGRpbjpvcGVuIHNlc2FtZQ=='),
+	\@( <ASCII('Aladdin:open sesame') => 'QWxhZGRpbjpvcGVuIHNlc2FtZQ=='),
 
 	\@(ASCII('a') x 100 => 'YWFh' x 33 . 'YQ=='),
 
-	\@(ASCII('Multipurpose Internet Mail Extensions: The Base64 Content-Transfer-Encoding is designed to represent sequences of octets in a form that is not humanly readable. ')
+	\@( <ASCII('Multipurpose Internet Mail Extensions: The Base64 Content-Transfer-Encoding is designed to represent sequences of octets in a form that is not humanly readable. ')
 	=> "TXVsdGlwdXJwb3NlIEludGVybmV0IE1haWwgRXh0ZW5zaW9uczogVGhlIEJhc2U2NCBDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nIGlzIGRlc2lnbmVkIHRvIHJlcHJlc2VudCBzZXF1ZW5jZXMgb2Ygb2N0ZXRzIGluIGEgZm9ybSB0aGF0IGlzIG5vdCBodW1hbmx5IHJlYWRhYmxlLiA="),
 
     );
 
-    for $test (@encode_tests) {
+    for $test (< @encode_tests) {
 	my($plain, $expected) = (@$test[0], @$test[1]);
 
 	my $encoded = encode_base64($plain, '');
@@ -340,25 +340,25 @@ sub decodeTest
 
     local $^WARN_HOOK = sub { print @_[0] };  # avoid warnings on stderr
 
-    my @decode_tests = (
-	\@('YWE='   => ASCII('aa')),
-	\@(' YWE='  =>  ASCII('aa')),
-	\@('Y WE='  =>  ASCII('aa')),
-	\@('YWE= '  =>  ASCII('aa')),
-	\@("Y\nW\r\nE=" =>  ASCII('aa')),
+    my @decode_tests = @(
+	\@('YWE='   => < ASCII('aa')),
+	\@(' YWE='  => <  ASCII('aa')),
+	\@('Y WE='  => <  ASCII('aa')),
+	\@('YWE= '  => <  ASCII('aa')),
+	\@("Y\nW\r\nE=" => <  ASCII('aa')),
 
 	# These will generate some warnings
-        \@('YWE=====' =>  ASCII('aa')),    # extra padding
-	\@('YWE'      =>  ASCII('aa')),    # missing padding
-        \@('YWFh====' =>  ASCII('aaa')),
-        \@('YQ'       =>  ASCII('a')),
+        \@('YWE=====' => <  ASCII('aa')),    # extra padding
+	\@('YWE'      => <  ASCII('aa')),    # missing padding
+        \@('YWFh====' => <  ASCII('aaa')),
+        \@('YQ'       => <  ASCII('a')),
         \@('Y'        => ''),
         \@('x=='      => ''),
         \@(''         => ''),
         \@(undef()    => ''),
     );
 
-    for $test (@decode_tests) {
+    for $test (< @decode_tests) {
 	my($encoded, $expected) = (@$test[0], @$test[1]);
 
 	my $decoded = decode_base64($encoded);

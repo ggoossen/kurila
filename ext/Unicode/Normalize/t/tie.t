@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -25,7 +25,7 @@ BEGIN { plan tests => 16 };
 
 package tiescalar;
 sub TIESCALAR {
-    my ($class, $instance) = @_;
+    my ($class, $instance) = < @_;
     return bless \$instance => $class;
 }
 sub FETCH   { return ${@_[0]}++ }

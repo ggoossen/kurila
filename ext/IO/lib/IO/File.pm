@@ -133,18 +133,18 @@ use File::Spec;
 
 require Exporter;
 
-@ISA = qw(IO::Handle IO::Seekable Exporter);
+@ISA = @( qw(IO::Handle IO::Seekable Exporter) );
 
 $VERSION = "1.14";
 
-@EXPORT = @IO::Seekable::EXPORT;
+@EXPORT = @( < @IO::Seekable::EXPORT );
 
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = grep m/^O_/, @Fcntl::EXPORT;
-    Fcntl->import(@O);  # first we import what we want to export
-    push(@EXPORT, @O);
+    my @O = @( grep m/^O_/, < @Fcntl::EXPORT );
+    Fcntl->import(< @O);  # first we import what we want to export
+    push(@EXPORT, < @O);
 };
 
 ################################################
@@ -154,11 +154,11 @@ try {
 sub new {
     my $type = shift;
     my $class = ref($type) || $type || "IO::File";
-    @_ +>= 0 && @_ +<= 3
+    (nelems @_) +>= 0 && (nelems @_) +<= 3
 	or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
     my $fh = $class->SUPER::new();
-    if (@_) {
-	$fh->open(@_)
+    if ((nelems @_)) {
+	$fh->open(< @_)
 	    or return undef;
     }
     $fh;
@@ -169,15 +169,15 @@ sub new {
 ##
 
 sub open {
-    @_ +>= 2 && @_ +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
-    my ($fh, $file) = @_;
-    if (@_ +> 2) {
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
+    my ($fh, $file) = < @_;
+    if ((nelems @_) +> 2) {
 	my ($mode, $perms) = @_[[2, 3]];
 	if ($mode =~ m/^\d+$/) {
 	    defined $perms or $perms = 0666;
 	    return sysopen($fh, $file, $mode, $perms);
 	} elsif ($mode =~ m/:/) {
-	    return open($fh, $mode, $file) if @_ == 3;
+	    return open($fh, $mode, $file) if (nelems @_) == 3;
 	    die 'usage: $fh->open(FILENAME, IOLAYERS)';
 	} else {
             return open($fh, IO::Handle::_open_mode_string($mode), $file);
@@ -192,9 +192,9 @@ sub open {
 ##
 
 sub binmode {
-    ( @_ == 1 or @_ == 2 ) or die 'usage $fh->binmode([LAYER])';
+    ( (nelems @_) == 1 or (nelems @_) == 2 ) or die 'usage $fh->binmode([LAYER])';
 
-    my($fh, $layer) = @_;
+    my($fh, $layer) = < @_;
 
     return binmode $$fh unless $layer;
     return binmode $$fh, $layer;

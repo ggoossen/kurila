@@ -97,14 +97,14 @@ use Exporter;
 use ExtUtils::Constant::Utils qw(C_stringify);
 use ExtUtils::Constant::XS qw(%XS_Constant %XS_TypeSet);
 
-@ISA = 'Exporter';
+@ISA = @( 'Exporter' );
 
-%EXPORT_TAGS = ( 'all' => \@( qw(
+%EXPORT_TAGS = %( 'all' => \@( qw(
 	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
 ) ) );
 
-@EXPORT_OK = ( @{ %EXPORT_TAGS{'all'} } );
+@EXPORT_OK = @( < @{ %EXPORT_TAGS{'all'} } );
 
 =item constant_types
 
@@ -118,12 +118,12 @@ sub constant_types {
 }
 
 sub C_constant {
-  my ($package, $subname, $default_type, $what, $indent, $breakout, @items)
-    = @_;
+  my ($package, $subname, $default_type, $what, $indent, $breakout, < @items)
+    = < @_;
   ExtUtils::Constant::XS->C_constant(\%(package => $package, subname => $subname,
                                         default_type => $default_type,
                                         types => $what, indent => $indent,
-                                        breakout => $breakout), @items);
+                                        breakout => $breakout), < @items);
 }
 
 =item XS_constant PACKAGE, TYPES, SUBNAME, C_SUBNAME
@@ -283,7 +283,7 @@ C<XS_FILE> are recognised.
 =cut
 
 sub WriteMakefileSnippet {
-  my %args = @_;
+  my %args = %( < @_ );
   my $indent = %args{INDENT} || 2;
 
   my $result = <<"EOT";
@@ -305,7 +305,7 @@ EOT
   $result =~ s/^/{' 'x$indent}/gm;
   return ExtUtils::Constant::XS->dump_names(\%(default_type=>%args{DEFAULT_TYPE},
                                                indent=>$indent,),
-					    @{%args{NAMES}})
+					    < @{%args{NAMES}})
     . $result;
 }
 
@@ -378,12 +378,12 @@ C<constant_10> with the default I<XS_SUBNAME>.
 
 sub WriteConstants {
   my %ARGS =
-    ( # defaults
+    %( # defaults
      C_FILE =>       'const-c.inc',
      XS_FILE =>      'const-xs.inc',
      SUBNAME =>      'constant',
      DEFAULT_TYPE => 'IV',
-     @_);
+     < @_);
 
   %ARGS{C_SUBNAME} ||= %ARGS{SUBNAME}; # No-one sane will have C_SUBNAME eq '0'
 
@@ -407,7 +407,7 @@ sub WriteConstants {
       require ExtUtils::Constant::ProxySubs;
       %ARGS{C_FH} = $c_fh;
       %ARGS{XS_FH} = $xs_fh;
-      ExtUtils::Constant::ProxySubs->WriteConstants(%ARGS);
+      ExtUtils::Constant::ProxySubs->WriteConstants(< %ARGS);
   } else {
       die "Ony ProxySubs are supported";
   }

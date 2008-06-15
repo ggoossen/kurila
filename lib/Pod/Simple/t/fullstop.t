@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -18,10 +18,10 @@ use Pod::Simple;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
+sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
-&ok( e "", "" );
-&ok( e "\n", "", );
+&ok( < e "", "" );
+&ok( < e "\n", "", );
 
 die unless ok !! Pod::Simple::XMLOutStream->can('fullstop_space_harden');
 sub harden { @_[0]->fullstop_space_harden(1) }

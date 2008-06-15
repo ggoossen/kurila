@@ -4,10 +4,10 @@ require Config;
 use File::Spec::Functions;
 
 sub convert_n_test {
-    my($podfile, $testname) = @_;
+    my($podfile, $testname) = < @_;
 
     my $cwd = Cwd::cwd();
-    my $base_dir = catdir $cwd, updir(), "lib", "Pod";
+    my $base_dir = catdir $cwd, < updir(), "lib", "Pod";
     my $new_dir  = catdir $base_dir, "t";
     my $infile   = catfile $new_dir, "$podfile.pod";
     my $outfile  = catfile $new_dir, "$podfile.html";

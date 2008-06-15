@@ -6,7 +6,7 @@ print q(1..42
 # This is() function is written to avoid ""
 my $test = 1;
 sub is {
-    my($left, $right) = @_;
+    my($left, $right) = < @_;
 
     if ($left eq $right) {
       printf 'ok %d
@@ -43,7 +43,7 @@ is ("\x{0x4E}", chr 0);
 is ("\x{x4E}", chr 0);
 
 is("\x[65]", chr 101);
-is("\x[FF]", bytes::chr(0xFF));
+is("\x[FF]", < bytes::chr(0xFF));
 is("\x[\%0]", chr 0);
 is("\x[9]", '');
 is("\x[FF9]", "\x[FF]");
@@ -66,16 +66,16 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
 
 {
   require utf8;
-  is ("\x{0065}", utf8::chr(101));
-  is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
+  is ("\x{0065}", < utf8::chr(101));
+  is ("\x{000000000000000000000000000000000000000000000000000000000000000072}", <
       utf8::chr(114));
-  is ("\x{0_06_5}", utf8::chr(101));
-  is ("\x{1234}", utf8::chr(4660));
-  is ("\x{10FFFD}", utf8::chr(1114109));
+  is ("\x{0_06_5}", < utf8::chr(101));
+  is ("\x{1234}", < utf8::chr(4660));
+  is ("\x{10FFFD}", < utf8::chr(1114109));
   
   use charnames ':full';
   is ("\N{LATIN SMALL LETTER A}", "a");
-  is ("\N{NEL}", utf8::chr(0x85));
+  is ("\N{NEL}", < utf8::chr(0x85));
 }
 
 # variable interpolation
@@ -89,11 +89,11 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
   # Array and derefence, this doesn't really belong in 'op/concat' but I
   # couldn't find a better place
 
-  my @x = qw|aap noot|;
-  my $dx = \@(@x);
+  my @x = @( qw|aap noot| );
+  my $dx = \@(< @x);
 
-  is("@x", "aap noot");
-  is("@$dx", "aap noot");
+  is("{join ' ', <@x}", "aap noot");
+  is("{join ' ', <@$dx}", "aap noot");
   is("$dx->@", "aap noot");
 
   # Okay, so that wasn't very challenging.  Let's go Unicode.

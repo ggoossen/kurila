@@ -18,7 +18,7 @@ sub foo2
 
 my $test = 1;
 sub ok {
-    my($ok, $name) = @_;
+    my($ok, $name) = < @_;
 
     # You have to do it this way or VMS will get confused.
     printf "\%s \%d\%s\n", $ok ? "ok" : "not ok", 
@@ -49,13 +49,13 @@ $result = do{ ok 1; 'value';};
 ok( $result eq 'value',  ":$result: eq :value:" );
 
 sub blather {
-    ok 1 foreach @_;
+    ok 1 foreach < @_;
 }
 
 do blather("ayep","sho nuff");
-@x = ("jeepers", "okydoke");
-@y = ("uhhuh", "yeppers");
-do blather(@x,"noofie",@y);
+@x = @("jeepers", "okydoke");
+@y = @("uhhuh", "yeppers");
+do blather(< @x,"noofie",< @y);
 
 unshift @INC, '.';
 
@@ -71,7 +71,7 @@ if (open(DO, ">", "$$.17")) {
     close DO or die "Could not close: $!";
 }
 
-my @a = do "$$.17"; die $@ if $@;
+my @a = @( do "$$.17" ); die $@ if $@;
 
 if (open(DO, ">", "$$.18")) {
     print DO "ok(1, 'do in void context') if not defined wantarray\n";
@@ -92,7 +92,7 @@ ok( (!defined do 6) && $!, "'do 6' : $!" );
 
 # [perl #19545]
 push @t, ($u = (do {} . "This should be pushed."));
-ok( (@t-1) == 0, "empty do result value" );
+ok( ((nelems @t)-1) == 0, "empty do result value" );
 
 END {
     1 while unlink("$$.16", "$$.17", "$$.18");

@@ -29,10 +29,10 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GzipError);
 $VERSION = '2.006';
 $GzipError = '' ;
 
-@ISA    = qw(IO::Compress::RawDeflate Exporter);
-@EXPORT_OK = qw( $GzipError gzip ) ;
-%EXPORT_TAGS = %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ;
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+@ISA    = @( qw(IO::Compress::RawDeflate Exporter) );
+@EXPORT_OK = @( qw( $GzipError gzip ) ) ;
+%EXPORT_TAGS = %( < %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ) ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 sub new
@@ -41,14 +41,14 @@ sub new
 
     my $obj = createSelfTiedObject($class, \$GzipError);
 
-    $obj->_create(undef, @_);
+    $obj->_create(undef, < @_);
 }
 
 
 sub gzip
 {
     my $obj = createSelfTiedObject(undef, \$GzipError);
-    return $obj->_def(@_);
+    return $obj->_def(< @_);
 }
 
 #sub newHeader
@@ -62,7 +62,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    return (
+    return  @(
             # zlib behaviour
             $self->getZlibParams(),
 
@@ -161,13 +161,13 @@ sub ckParams
 sub mkTrailer
 {
     my $self = shift ;
-    return pack("V V", *$self->{Compress}->crc32(), 
+    return pack("V V", < *$self->{Compress}->crc32(), < 
                        *$self->{UnCompSize}->get32bit());
 }
 
 sub getInverseClass
 {
-    return ('IO::Uncompress::Gunzip',
+    return  @('IO::Uncompress::Gunzip',
                 \$IO::Uncompress::Gunzip::GunzipError);
 }
 

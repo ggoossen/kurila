@@ -38,9 +38,9 @@ ok open(STDOUT, ">&", $oldout), "restore STDOUT";
 ok open(my $foo, "<", "foo.out"), "open foo.out";
 #print "# Test output by reading from file\n";
 # now test the output
-my @output = map { chomp; $_ } ~< $foo;
+my @output = @( map { chomp; $_ } ~< $foo );
 close $foo;
-ok @output +>= 4, "captured at least four output lines";
+ok (nelems @output) +>= 4, "captured at least four output lines";
 
 is(@output[0], "5.000", "print_double");
 is(@output[1], "3", "print_int");

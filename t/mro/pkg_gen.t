@@ -7,7 +7,7 @@ require q(./test.pl); plan(tests => 6);
 
 {
     package Foo;
-    our @ISA = qw//;
+    our @ISA = @( qw// );
 }
 
 ok(!mro::get_pkg_gen('ReallyDoesNotExist'),
@@ -24,12 +24,12 @@ my $new_f_gen = mro::get_pkg_gen('Foo');
 ok($new_f_gen +> $f_gen, 'Foo pkg_gen incs for methods');
 $f_gen = $new_f_gen;
 
-@Foo::ISA = qw/Bar/;
+@Foo::ISA = @( qw/Bar/ );
 $new_f_gen = mro::get_pkg_gen('Foo');
 ok($new_f_gen +> $f_gen, 'Foo pkg_gen incs for @ISA');
 
 undef %Foo::;
-is(mro::get_pkg_gen('Foo'), 1, "pkg_gen 1 for undef \%Pkg::");
+is( <mro::get_pkg_gen('Foo'), 1, "pkg_gen 1 for undef \%Pkg::");
 
 delete %::{"Foo::"};
-is(mro::get_pkg_gen('Foo'), 0, 'pkg_gen 0 for delete $::{Pkg::}');
+is( <mro::get_pkg_gen('Foo'), 0, 'pkg_gen 0 for delete $::{Pkg::}');

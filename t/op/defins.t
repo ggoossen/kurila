@@ -114,7 +114,7 @@ cmp_ok($seen,'==',1,'seen in glob hash while()');
 unlink($saved_filename);
 ok(!(-f $saved_filename),'work file unlinked');
 
-my %hash = (0 => 1, 1 => 2);
+my %hash = %(0 => 1, 1 => 2);
 
 $seen = 0;
 while (my $name = each %hash)

@@ -37,8 +37,8 @@ sub compare_addr {
 	}
 	return 0;
     }
-    my @a = unpack_sockaddr_in($a);
-    my @b = unpack_sockaddr_in($b);
+    my @a = @( < unpack_sockaddr_in($a) );
+    my @b = @( < unpack_sockaddr_in($b) );
     "@a[0]@a[1]" eq "@b[0]@b[1]";
 }
 
@@ -60,24 +60,24 @@ my $udpb = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
 
 print "ok 2\n";
 
-$udpa->send("ok 4\n",0,$udpb->sockname);
+$udpa->send("ok 4\n",0, <$udpb->sockname);
 
 print "not "
-  unless compare_addr($udpa->peername,$udpb->sockname, 'peername', 'sockname');
+  unless compare_addr( <$udpa->peername, <$udpb->sockname, 'peername', 'sockname');
 print "ok 3\n";
 
 my $where = $udpb->recv(my $buf="",5);
 print $buf;
 
-my @xtra = ();
+my @xtra = @( () );
 
-unless(compare_addr($where,$udpa->sockname, 'recv name', 'sockname')) {
+unless(compare_addr($where, <$udpa->sockname, 'recv name', 'sockname')) {
     print "not ";
-    @xtra = (0,$udpa->sockname);
+    @xtra = @(0, <$udpa->sockname);
 }
 print "ok 5\n";
 
-$udpb->send("ok 6\n",@xtra);
+$udpb->send("ok 6\n",< @xtra);
 $udpa->recv($buf="",5);
 print $buf;
 

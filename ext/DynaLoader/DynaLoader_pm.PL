@@ -1,7 +1,7 @@
 use Config;
 
 sub to_string {
-    my ($value) = @_;
+    my ($value) = < @_;
     $value =~ s/\\/\\\\/g;
     $value =~ s/'/\\'/g;
     return "'$value'";
@@ -31,7 +31,7 @@ sub to_string {
 # The latter is better for some for cross-compilation setups.
 #
 sub _expansion {
-    my ($op, $os, $expr) = @_;
+    my ($op, $os, $expr) = < @_;
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my ($if,$el) = ($1,$2);
@@ -113,9 +113,9 @@ sub dl_load_flags { 0x00 }
 EOT
 
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
-    print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (",
-              to_string(%Config{'dlext'}), ",",
-              to_string(%Config{'so'}), ",",
+    print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (", <
+              to_string(%Config{'dlext'}), ",", <
+              to_string(%Config{'so'}), ",", <
               to_string(%Config{'dlsrc'}), ")\n;" ;
 }
 else {
@@ -124,7 +124,7 @@ our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[qw(dlext so dlsrc)]};
 EOT
 }
 
-print OUT expand_os_specific(<<'EOT');
+print OUT < expand_os_specific(<<'EOT');
 
 <<$^O-eq-VMS>>
 # Some systems need special handling to expand file specifications
@@ -159,7 +159,7 @@ push(@dl_library_path, split(' ', %Config::Config{libpth}));
 EOT
 
 sub dquoted_comma_list {
-    join(", ", map {'"'.quotemeta($_).'"'} @_);
+    join(", ", map {'"'.quotemeta($_).'"'} < @_);
 }
 
 our @dl_library_path;
@@ -167,7 +167,7 @@ our @dl_library_path;
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     eval $cfg_dl_library_path;
     if (!%ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
-        my $dl_library_path = dquoted_comma_list(@dl_library_path);
+        my $dl_library_path = dquoted_comma_list(< @dl_library_path);
         print OUT <<EOT;
 # The below \@dl_library_path has been expanded (\%Config) in Perl build time.
 
@@ -236,7 +236,7 @@ EOT
 }
 
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS} && %ENV{PERL_BUILD_EXPAND_ENV_VARS}) {
-    my $dl_library_path = dquoted_comma_list(@dl_library_path);
+    my $dl_library_path = dquoted_comma_list(< @dl_library_path);
     print OUT <<EOT;
 # The below \@dl_library_path has been expanded (\%Config, \%ENV)
 # in Perl build time.
@@ -248,7 +248,7 @@ EOT
 
 
 # following long string contains $^O-specific stuff, which is factored out
-print OUT expand_os_specific(<<'EOT');
+print OUT < expand_os_specific(<<'EOT');
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
 boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&

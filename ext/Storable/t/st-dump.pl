@@ -11,14 +11,14 @@
 # ext/Storable into @INC.
 
 sub ok {
-	my ($num, $ok, $name) = @_;
+	my ($num, $ok, $name) = < @_;
         $num .= " - $name" if defined $name and length $name;
 	print $ok ? "ok $num\n" : "not ok $num\n";
         $ok;
 }
 
 sub num_equal {
-	my ($num, $left, $right, $name) = @_;
+	my ($num, $left, $right, $name) = < @_;
         my $ok = ((defined $left) ? $left == $right : undef);
         unless (ok ($num, $ok, $name)) {
           print "# Expected $right\n";
@@ -37,7 +37,7 @@ sub num_equal {
 package dump;
 use Carp;
 
-my %dump = (
+my %dump = %(
 	'SCALAR'	=> 'dump_scalar',
 	'LVALUE'	=> 'dump_scalar',
 	'ARRAY'		=> 'dump_array',
@@ -49,7 +49,7 @@ our (%dumped, %object, $count, $dumped);
 
 # Given an object, dump its transitive data closure
 sub main::dump {
-	my ($object) = @_;
+	my ($object) = < @_;
 	croak "Not a reference!" unless ref($object);
 	local %dumped;
 	local %object;
@@ -66,7 +66,7 @@ sub main::dump {
 # address is not to be dumped in the %dumped table since it's not a
 # user-visible object.
 sub recursive_dump {
-	my ($object, $link) = @_;
+	my ($object, $link) = < @_;
 
 	# Get something like SCALAR(0x...) or TYPE=SCALAR(0x...).
 	# Then extract the bless, ref and address parts of that string.
@@ -108,13 +108,13 @@ sub recursive_dump {
 
 # Indicate that current object is blessed
 sub bless {
-	my ($class) = @_;
+	my ($class) = < @_;
 	$dumped .= "BLESS $class\n";
 }
 
 # Dump single scalar
 sub dump_scalar {
-	my ($sref) = @_;
+	my ($sref) = < @_;
 	my $scalar = $$sref;
 	unless (defined $scalar) {
 		$dumped .= "UNDEF\n";
@@ -126,10 +126,10 @@ sub dump_scalar {
 
 # Dump array
 sub dump_array {
-	my ($aref) = @_;
-	my $items = 0 + @{$aref};
+	my ($aref) = < @_;
+	my $items = 0 + nelems @{$aref};
 	$dumped .= "ARRAY items=$items\n";
-	foreach my $item (@{$aref}) {
+	foreach my $item (< @{$aref}) {
 		unless (defined $item) {
 			$dumped .= 'ITEM_UNDEF' . "\n";
 			next;
@@ -141,7 +141,7 @@ sub dump_array {
 
 # Dump hash table
 sub dump_hash {
-	my ($href) = @_;
+	my ($href) = < @_;
 	my $items = scalar(keys %{$href});
 	$dumped .= "HASH items=$items\n";
 	foreach my $key (sort keys %{$href}) {
@@ -158,7 +158,7 @@ sub dump_hash {
 
 # Dump reference to reference
 sub dump_ref {
-	my ($rref) = @_;
+	my ($rref) = < @_;
 	my $deref = $$rref;				# Follow reference to reference
 	$dumped .= 'REF ';
 	&recursive_dump($deref, 1);		# $dref is a reference

@@ -15,7 +15,7 @@ BEGIN {
 }
 
 push @Term::ReadLine::Stub::ISA, __PACKAGE__
-        unless grep { $_ eq __PACKAGE__ } @Term::ReadLine::Stub::ISA;
+        unless grep { $_ eq __PACKAGE__ } < @Term::ReadLine::Stub::ISA;
 
 
 =pod
@@ -116,7 +116,7 @@ See the C<EXAMPLES> section for samples of how to use this function.
 
 sub get_reply {
     my $term = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my $tmpl = \%(
         default     => \%( default => undef,  strict_type => 1 ),
@@ -128,7 +128,7 @@ sub get_reply {
     );
 
     my $args = check( $tmpl, \%hash, $VERBOSE )
-                or ( carp( loc(q[Could not parse arguments]) ), return );
+                or ( carp( < loc(q[Could not parse arguments]) ), return );
 
 
     ### add this to the prompt to indicate the default
@@ -137,10 +137,10 @@ sub get_reply {
     
     ### if you supplied several choices to pick from,
     ### we'll print them seperately before the prompt
-    if( @{$args->{choices}} ) {
+    if( (nelems @{$args->{choices}}) ) {
         my $i;
 
-        for my $choice ( @{$args->{choices}} ) {
+        for my $choice ( < @{$args->{choices}} ) {
             $i++;   # the answer counter -- but humans start counting
                     # at 1 :D
             
@@ -166,7 +166,7 @@ sub get_reply {
     }
 
     ### we set up the defaults, prompts etc, dispatch to the readline call
-    return $term->_tt_readline( %$args, prompt_add => $prompt_add );
+    return $term->_tt_readline( < %$args, prompt_add => $prompt_add );
 
 } 
 
@@ -192,7 +192,7 @@ See the C<EXAMPLES> section for samples of how to use this function.
 
 sub ask_yn {
     my $term = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my $tmpl = \%(
         default     => \%( default => undef, allow => \@(qw|0 1 y n|),
@@ -211,7 +211,7 @@ sub ask_yn {
     ### uppercase the default choice, if there is one, to be added
     ### to the prompt in a 'foo? [Y/n]' type style.
     my $prompt_add;
-    {   my @list = @{$args->{choices}};
+    {   my @list = @( < @{$args->{choices}} );
         if( defined $args->{default} ) {
 
             ### if you supplied the default as a boolean, rather than y/n
@@ -220,16 +220,16 @@ sub ask_yn {
                                 ? %( 0 => 'n', 1 => 'y' ){ $args->{default} }
                                 : $args->{default};
         
-            @list = map { lc $args->{default} eq lc $_
+            @list = @( map { lc $args->{default} eq lc $_
                                 ? uc $args->{default}
                                 : $_
-                    } @list;
+                    } < @list );
         }
 
-        $prompt_add .= join("/", @list);
+        $prompt_add .= join("/", < @list);
     }
 
-    my $rv = $term->_tt_readline( %$args, prompt_add => $prompt_add );
+    my $rv = $term->_tt_readline( < %$args, prompt_add => $prompt_add );
     
     return $rv =~ m/^y/i ? 1 : 0;
 }
@@ -238,7 +238,7 @@ sub ask_yn {
 
 sub _tt_readline {
     my $term = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     local $Params::Check::VERBOSE = 0;  # why is this?
     local $| = 1;                       # print ASAP
@@ -274,7 +274,7 @@ sub _tt_readline {
     if ($AUTOREPLY) {
         
         ### you used autoreply, but didnt provide a default!
-        warn loc(   
+        warn < loc(   
             q[You have '%1' set to true, but did not provide a default!],
             '$AUTOREPLY' 
         ) if( !defined $default && $VERBOSE);
@@ -293,10 +293,10 @@ sub _tt_readline {
         ### annoying bug in T::R::Perl that mucks up lines with a \n
         ### in them; So split by \n, save the last line as the prompt
         ### and just print the rest
-        {   my @lines   = split "\n", $prompt;
+        {   my @lines   = @( split "\n", $prompt );
             $prompt     = pop @lines;
             
-            history( "$_\n" ) for @lines;
+            history( "$_\n" ) for < @lines;
         }
         
         ### pose the question
@@ -310,14 +310,14 @@ sub _tt_readline {
 
         ### if we're allowed to give multiple answers, split
         ### the answer on whitespace
-        my @answers = $multi ? split(m/\s+/, $answer) : $answer;
+        my @answers = @( $multi ? split(m/\s+/, $answer) : $answer );
 
         ### the return value list
         my @rv;
         
-        if( @$choices ) {
+        if( (nelems @$choices) ) {
             
-            for my $answer (@answers) {
+            for my $answer (< @answers) {
                 
                 ### a digit implies a multiple choice question, 
                 ### a non-digit is an open answer
@@ -337,14 +337,14 @@ sub _tt_readline {
         ### (or otherwise the default!) pass the allow handler
         } else {       
             push @rv, grep { allow( $_, $allow ) }
-                        scalar @answers ? @answers : ($default);  
+                        scalar nelems @answers ? < @answers : ($default);  
         }
 
         ### if not all the answers made it to the return value list,
         ### at least one of them was an invalid answer -- make the 
         ### user do it again
-        if( (@rv != @answers) or 
-            (scalar(@$choices) and not scalar(@answers)) 
+        if( ((nelems @rv) != nelems @answers) or 
+            (scalar(nelems @$choices) and not scalar(nelems @answers)) 
         ) {
             $prompt = $INVALID;
             $prompt .= "[$prompt_add] " if $prompt_add;
@@ -422,11 +422,11 @@ sub parse_options {
             $return->{$1} = 1;
 
         } else {
-            carp(loc(q[I do not understand option "%1"\n], $match)) if $VERBOSE;
+            carp( <loc(q[I do not understand option "%1"\n], $match)) if $VERBOSE;
         }
     }
 
-    return wantarray ? ($return,$input) : $return;
+    return wantarray ?  @($return,$input) : $return;
 }
 
 =head2 $str = $term->history_as_string

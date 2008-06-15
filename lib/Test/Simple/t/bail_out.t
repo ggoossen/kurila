@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -35,11 +35,11 @@ plan tests => 4;
 BAIL_OUT("ROCKS FALL! EVERYONE DIES!");
 
 
-$Test->is_eq( $output->read, <<'OUT' );
+$Test->is_eq( < $output->read, <<'OUT' );
 1..4
 Bail out!  ROCKS FALL! EVERYONE DIES!
 OUT
 
 $Test->is_eq( $Exit_Code, 255 );
 
-$Test->ok( $Test->can("BAILOUT"), "Backwards compat" );
+$Test->ok( < $Test->can("BAILOUT"), "Backwards compat" );

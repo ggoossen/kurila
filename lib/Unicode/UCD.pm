@@ -9,16 +9,16 @@ use Storable qw(dclone);
 
 require Exporter;
 
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 
-our @EXPORT_OK = qw(charinfo
+our @EXPORT_OK = @( qw(charinfo
 		    charblock charscript
 		    charblocks charscripts
 		    charinrange
 		    general_categories bidi_types
 		    compexcl
 		    casefold casespec
-		    namedseq);
+		    namedseq) );
 
 use Carp;
 use utf8;
@@ -77,17 +77,17 @@ my $CASESPECFH;
 my $NAMEDSEQFH;
 
 sub openunicode {
-    my ($rfh, @path) = @_;
+    my ($rfh, < @path) = < @_;
     my $f;
     unless (defined $$rfh) {
-	for my $d (@INC) {
+	for my $d (< @INC) {
 	    use File::Spec;
-	    $f = File::Spec->catfile($d, "unicore", @path);
+	    $f = File::Spec->catfile($d, "unicore", < @path);
 	    last if open($$rfh, "<", $f);
 	    undef $f;
 	}
-	croak __PACKAGE__, ": failed to find ",
-              File::Spec->catfile(@path), " in @INC"
+	croak __PACKAGE__, ": failed to find ", <
+              File::Spec->catfile(< @path), " in {join ' ', <@INC}"
 	    unless defined $f;
     }
     return $f;
@@ -160,9 +160,9 @@ if ($hasHangulUtil) {
 
 sub hangul_decomp { # internal: called from charinfo
     if ($hasHangulUtil) {
-	my @tmp = decomposeHangul(shift);
-	return sprintf("\%04X \%04X",      @tmp) if @tmp == 2;
-	return sprintf("\%04X \%04X \%04X", @tmp) if @tmp == 3;
+	my @tmp = @( < decomposeHangul(shift) );
+	return sprintf("\%04X \%04X",      < @tmp) if (nelems @tmp) == 2;
+	return sprintf("\%04X \%04X \%04X", < @tmp) if (nelems @tmp) == 3;
     }
     return;
 }
@@ -175,7 +175,7 @@ sub han_charname { # internal: called from charinfo
     return sprintf("CJK UNIFIED IDEOGRAPH-\%04X", shift);
 }
 
-my @CharinfoRanges = (
+my @CharinfoRanges = @(
 # block name
 # [ first, last, coderef to name, coderef to decompose ],
 # CJK Ideographs Extension A
@@ -207,7 +207,7 @@ sub charinfo {
 	unless defined $code;
     my $hexk = sprintf("\%06X", $code);
     my($rcode,$rname,$rdec);
-    foreach my $range (@CharinfoRanges){
+    foreach my $range (< @CharinfoRanges){
       if ($range->[0] +<= $code && $code +<= $range->[1]) {
         $rcode = $hexk;
 	$rcode =~ s/^0+//;
@@ -251,7 +251,7 @@ sub charinfo {
 }
 
 sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
-    my ($table, $lo, $hi, $code) = @_;
+    my ($table, $lo, $hi, $code) = < @_;
 
     return if $lo +> $hi;
 
@@ -271,11 +271,11 @@ sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
 }
 
 sub charinrange {
-    my ($range, $arg) = @_;
+    my ($range, $arg) = < @_;
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
 	unless defined $code;
-    _search($range, 0, (@$range-1), $code);
+    _search($range, 0, ((nelems @$range)-1), $code);
 }
 
 =head2 charblock
@@ -308,7 +308,7 @@ my @BLOCKS;
 my %BLOCKS;
 
 sub _charblocks {
-    unless (@BLOCKS) {
+    unless (nelems @BLOCKS) {
 	if (openunicode(\$BLOCKSFH, "Blocks.txt")) {
 	    local $_;
 	    while ( ~< $BLOCKSFH) {
@@ -327,12 +327,12 @@ sub _charblocks {
 sub charblock {
     my $arg = shift;
 
-    _charblocks() unless @BLOCKS;
+    _charblocks() unless (nelems @BLOCKS);
 
     my $code = _getcode($arg);
 
     if (defined $code) {
-	_search(\@BLOCKS, 0, (@BLOCKS-1), $code);
+	_search(\@BLOCKS, 0, ((nelems @BLOCKS)-1), $code);
     } else {
 	if (exists %BLOCKS{$arg}) {
 	    return dclone %BLOCKS{$arg};
@@ -370,7 +370,7 @@ my @SCRIPTS;
 my %SCRIPTS;
 
 sub _charscripts {
-    unless (@SCRIPTS) {
+    unless (nelems @SCRIPTS) {
 	if (openunicode(\$SCRIPTSFH, "Scripts.txt")) {
 	    local $_;
 	    while ( ~< $SCRIPTSFH) {
@@ -384,7 +384,7 @@ sub _charscripts {
 		}
 	    }
 	    close($SCRIPTSFH);
-	    @SCRIPTS = sort { $a->[0] <+> $b->[0] } @SCRIPTS;
+	    @SCRIPTS = @( sort { $a->[0] <+> $b->[0] } < @SCRIPTS );
 	}
     }
 }
@@ -392,12 +392,12 @@ sub _charscripts {
 sub charscript {
     my $arg = shift;
 
-    _charscripts() unless @SCRIPTS;
+    _charscripts() unless (nelems @SCRIPTS);
 
     my $code = _getcode($arg);
 
     if (defined $code) {
-	_search(\@SCRIPTS, 0, (@SCRIPTS-1), $code);
+	_search(\@SCRIPTS, 0, ((nelems @SCRIPTS)-1), $code);
     } else {
 	if (exists %SCRIPTS{$arg}) {
 	    return dclone %SCRIPTS{$arg};
@@ -495,7 +495,7 @@ by L</charblocks> and L</charscripts> by using charinrange():
 =cut
 
 my %GENERAL_CATEGORIES =
- (
+ %(
     'L'  =>         'Letter',
     'LC' =>         'CasedLetter',
     'Lu' =>         'UppercaseLetter',
@@ -556,7 +556,7 @@ one returned from charinfo() under the C<category> key.
 =cut
 
 my %BIDI_TYPES =
- (
+ %(
    'L'   => 'Left-to-Right',
    'LRE' => 'Left-to-Right Embedding',
    'LRO' => 'Left-to-Right Override',
@@ -864,8 +864,8 @@ sub _namedseq {
 	    while ( ~< $NAMEDSEQFH) {
 		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my ($n, $s) = ($1, $2);
-		    my @s = map { chr(hex($_)) } split(' ', $s);
-		    %NAMEDSEQ{$n} = join("", @s);
+		    my @s = @( map { chr(hex($_)) } split(' ', $s) );
+		    %NAMEDSEQ{$n} = join("", < @s);
 		}
 	    }
 	    close($NAMEDSEQFH);
@@ -878,13 +878,13 @@ sub namedseq {
     my $wantarray = wantarray();
     if (defined $wantarray) {
 	if ($wantarray) {
-	    if (@_ == 0) {
+	    if ((nelems @_) == 0) {
 		return %NAMEDSEQ;
-	    } elsif (@_ == 1) {
+	    } elsif ((nelems @_) == 1) {
 		my $s = %NAMEDSEQ{ @_[0] };
 		return defined $s ? map { ord($_) } split('', $s) : ();
 	    }
-	} elsif (@_ == 1) {
+	} elsif ((nelems @_) == 1) {
 	    return %NAMEDSEQ{ @_[0] };
 	}
     }

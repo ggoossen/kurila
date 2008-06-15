@@ -9,7 +9,7 @@
 BEGIN {
     if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
-	@INC = '../lib';
+	@INC = @( '../lib' );
     }
 }
 
@@ -26,7 +26,7 @@ my ($args, $op, $target, $test, $test_set, $try, $val, $zvalue, @set, @val);
 
 $test = 0;
 $| = 1;
-my @script = (
+my @script = @(
     'my ($res, $s0,$s1,$s2,$s3,$s4,$s5,$s6,$s7,$s8,$s9,$s10,$z0,$z1,$z2,$bad,$z);' .
 	"\n\n"
 );
@@ -53,18 +53,18 @@ while ( ~< *DATA) {
 	elsif (s/^\|//) {
 		$test_set = 1;	# Requests we loop over the set...
 	}
-	my @args = split(m/:/);
+	my @args = @( split(m/:/) );
 	if ($test_set == 1) {
 		my $i;
-		for ($i = 0; $i +< @set; $i++) {
+		for ($i = 0; $i +< nelems @set; $i++) {
 			# complex number
 			$target = @set[$i];
 			# textual value as found in set definition
 			$zvalue = @val[$i];
-			test($zvalue, $target, @args);
+			test($zvalue, $target, < @args);
 		}
 	} else {
-		test($op, undef, @args);
+		test($op, undef, < @args);
 	}
 }
 
@@ -129,7 +129,7 @@ push(@script, $constants);
 # test the divbyzeros
 
 sub test_dbz {
-    for my $op (@_) {
+    for my $op (< @_) {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
@@ -144,7 +144,7 @@ EOT
 # test the logofzeros
 
 sub test_loz {
-    for my $op (@_) {
+    for my $op (< @_) {
 	$test++;
 	push(@script, <<EOT);
 	eval '$op';
@@ -188,7 +188,7 @@ test_loz(
 # test the bad roots
 
 sub test_broot {
-    for my $op (@_) {
+    for my $op (< @_) {
 	$test++;
 	push(@script, <<EOT);
 	eval 'root(2, $op)';
@@ -204,7 +204,7 @@ test_broot(qw(-3 -2.1 0 0.99));
 
 sub test_display_format {
     is(Math::Complex->display_format, 'cartesian');
-    my $j = (root(1,3))[[1]];
+    my $j = ( <root(1,3))[[1]];
 
     $j->display_format('polar');
     is($j->display_format, 'polar');
@@ -213,7 +213,7 @@ sub test_display_format {
 
     my %display_format;
 
-    %display_format = $j->display_format;
+    %display_format = %( < $j->display_format );
 
     is(%display_format{style}, 'polar');
 
@@ -223,7 +223,7 @@ sub test_display_format {
 
     is("$j", "-0.50000+0.86603i");
 
-    %display_format = $j->display_format;
+    %display_format = %( < $j->display_format );
     is(%display_format{format}, '%.5f');
     is(keys %display_format, 3);
 
@@ -346,9 +346,9 @@ sub test_atan2 {
     push @script, <<'EOS';
 print "# atan2() with some real arguments\n";
 EOS
-    my @real = (-1, 0, 1);
-    for my $x (@real) {
-	for my $y (@real) {
+    my @real = @(-1, 0, 1);
+    for my $x (< @real) {
+	for my $y (< @real) {
 	    next if $x == 0 && $y == 0;
 	    $test++;
 	    push @script, <<EOS;
@@ -393,23 +393,23 @@ test_atan2();
 test_decplx();
 
 print "1..$test\n";
-print @script, "\n";
-eval join '', @script;
+print < @script, "\n";
+eval join '', < @script;
 die if $@;
 
 sub abop {
-	my ($op) = @_;
+	my ($op) = < @_;
 
 	push(@script, qq(print "# $op=\n";));
 }
 
 sub test {
-	my ($op, $z, @args) = @_;
+	my ($op, $z, < @args) = < @_;
 	my ($baop) = 0;
 	$test++;
 	my $i;
 	$baop = 1 if ($op =~ s/;=$//);
-	for ($i = 0; $i +< @args; $i++) {
+	for ($i = 0; $i +< nelems @args; $i++) {
 		$val = value(@args[$i]);
 		push @script, "\$z$i = $val;\n";
 	}
@@ -417,10 +417,10 @@ sub test {
 		$args = "'$op'";		# Really the value
 		$try = "abs(\$z0 - \$z1) +<= $eps ? \$z1 : \$z0";
 		push @script, "\$res = $try; ";
-		push @script, "check($test, @args[0], \$res, \$z{@args-1}, $args);\n";
+		push @script, "check($test, @args[0], \$res, \$z{(nelems @args)-1}, $args);\n";
 	} else {
 		my ($try, $args);
-		if (@args == 2) {
+		if ((nelems @args) == 2) {
 			$try = ($op =~ m/^\w/) ? "\$z0->$op" : "$op \$z0";
 			$args = "'@args[0]'";
 		} else {
@@ -428,8 +428,8 @@ sub test {
 			$args = "'@args[0]', '@args[1]'";
 		}
 		push @script, "\$res = $try; ";
-		push @script, "check($test, '$try', \$res, \$z{@args-1}, $args);\n";
-		if (@args +> 2 and $baop) { # binary assignment ops
+		push @script, "check($test, '$try', \$res, \$z{(nelems @args)-1}, $args);\n";
+		if ((nelems @args) +> 2 and $baop) { # binary assignment ops
 			$test++;
 			# check the op= works
 			push @script, <<EOB;
@@ -443,7 +443,7 @@ sub test {
 	\$za $op= \$zb;
 	my (\$zbr, \$zbi) = \@\{\$zb->_cartesian\};
 
-	check($test, '\$z0 $op= \$z1', \$za, \$z{@args-1}, $args);
+	check($test, '\$z0 $op= \$z1', \$za, \$z{(nelems @args)-1}, $args);
 EOB
 			$test++;
 			# check that the rhs has not changed
@@ -455,13 +455,13 @@ EOB
 }
 
 sub set {
-	my ($set, $setref, $valref) = @_;
-	@{$setref} = ();
-	@{$valref} = ();
-	my @set = split(m/;\s*/, $set);
+	my ($set, $setref, $valref) = < @_;
+	@{$setref} = @( () );
+	@{$valref} = @( () );
+	my @set = @( split(m/;\s*/, $set) );
 	my @res;
 	my $i;
-	for ($i = 0; $i +< @set; $i++) {
+	for ($i = 0; $i +< nelems @set; $i++) {
 		push(@{$valref}, @set[$i]);
 		my $val = value(@set[$i]);
 		push @script, "\$s$i = $val;\n";
@@ -470,7 +470,7 @@ sub set {
 }
 
 sub value {
-	local ($_) = @_;
+	local ($_) = (nelems @_);
 	if (m/^\s*\((.*),(.*)\)/) {
 		return "cplx($1,$2)";
 	}
@@ -496,9 +496,9 @@ sub value {
 }
 
 sub check {
-	my ($test, $try, $got, $expected, @z) = @_;
+	my ($test, $try, $got, $expected, < @z) = < @_;
 
-	print "# @_\n";
+	print "# {join ' ', <@_}\n";
 
 	if ("$got" eq "$expected"
 	    ||
@@ -511,18 +511,18 @@ sub check {
 		print "ok $test\n";
 	} else {
 		print "not ok $test\n";
-		my $args = (@z == 1) ? "z = @z[0]" : "z0 = @z[0], z1 = @z[1]";
+		my $args = ((nelems @z) == 1) ? "z = @z[0]" : "z0 = @z[0], z1 = @z[1]";
 		print "# '$try' expected: '$expected' got: '$got' for $args\n";
 	}
 }
 
 sub addsq {
-    my ($z1, $z2) = @_;
+    my ($z1, $z2) = < @_;
     return ($z1 + i*$z2) * ($z1 - i*$z2);
 }
 
 sub subsq {
-    my ($z1, $z2) = @_;
+    my ($z1, $z2) = < @_;
     return ($z1 + $z2) * ($z1 - $z2);
 }
 

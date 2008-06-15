@@ -46,11 +46,11 @@ $a = do {
 };
 warn;
 
-for (@warn) {
+for (< @warn) {
     print "# $_";
 }
 
-print "not " unless join("", @warn) eq <<"EOT"; print "ok 1\n";
+print "not " unless join("", < @warn) eq <<"EOT"; print "ok 1\n";
 Warning: something's wrong
 Premature end of base64 data
 Premature padding of base64 data

@@ -71,14 +71,14 @@ our $VERSION = '1.03';
 
 require Exporter;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(%Kinds %Type %Flavor %Type_Description @Type_Order);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(%Kinds %Type %Flavor %Type_Description @Type_Order) );
 
 use Perl6::Form;
 
 our(%Kinds, %Type, %Flavor);
 
-our %Type_Description = (
+our %Type_Description = %(
     'ARRAY'	=> 'Functions for real @ARRAYs',
     'Binary'	=> 'Functions for fixed length data or records',
     'File'	=> 'Functions for filehandles, files, or directories',
@@ -101,7 +101,7 @@ our %Type_Description = (
     'Namespace'	=> 'Keywords altering or affecting scoping of identifiers',
 );
 
-our @Type_Order = qw{
+our @Type_Order = @( qw{
     String
     Regexp
     Math
@@ -122,7 +122,7 @@ our @Type_Order = qw{
     User
     Network
     Time
-};
+} );
 
 while ( ~< *DATA) {
     chomp;
@@ -140,11 +140,11 @@ close DATA;
 
 my( $typedesc, $list );
 unless (caller) {
-    foreach my $type ( @Type_Order ) {
-	$list = join(", ", sort @{%Kinds{$type}});
+    foreach my $type ( < @Type_Order ) {
+	$list = join(", ", sort < @{%Kinds{$type}});
 	$typedesc = %Type_Description{$type} . ":";
 
-        print form("",
+        print < form("",
                    "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
                    $typedesc,
                    "     \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",

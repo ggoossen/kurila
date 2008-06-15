@@ -27,7 +27,7 @@ no warnings 'redefine';
 
 package version::Bad;
 use base 'version';
-sub new { my($self,$n)=@_;  bless \$n, $self }
+sub new { my($self,$n)=< @_;  bless \$n, $self }
 
 package main;
 my $testobj = version::Empty->new(1.002_003);
@@ -65,7 +65,7 @@ unlike ($@, qr/^Subroutine main::qv redefined/,
 
 sub BaseTests {
 
-    my ($CLASS, $no_qv) = @_;
+    my ($CLASS, $no_qv) = < @_;
     
     # Insert your test code below, the Test module is use()ed here so read
     # its man page ( perldoc Test ) for help writing this test script.
@@ -487,7 +487,7 @@ SKIP: {
 	my $loc;
 	while ( ~< *DATA) {
 	    chomp;
-	    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_);
+	    $loc = POSIX::setlocale( < &POSIX::LC_ALL, $_);
 	    last if POSIX::localeconv()->{decimal_point} eq ',';
 	}
 	skip 'Cannot test locale handling without a comma locale', 4

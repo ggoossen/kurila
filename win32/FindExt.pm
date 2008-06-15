@@ -25,13 +25,13 @@ sub set_static_extensions {
     # statics in case scan_ext hasn't been called yet.
     # if '*' is passed then all XS extensions are static
     # (with possible exclusions)
-    %static = ();
-    my @list = @_;
+    %static = %( () );
+    my @list = @( < @_ );
     if (@_[0] eq '*') {
-	my %excl = map {$_=>1} map {m/^!(.*)$/} @_[[1 .. (@_-1)]];
-	@list = grep {!exists %excl{$_}} keys %ext;
+	my %excl = %( map {$_=>1} map {m/^!(.*)$/} @_[[1 .. ((nelems @_)-1)]] );
+	@list = @( grep {!exists %excl{$_}} keys %ext );
     }
-    for (@list) {
+    for (< @list) {
         %static{$_} = 1;
         %ext{$_} = 'static' if %ext{$_} && %ext{$_} eq 'dynamic';
     }
@@ -45,33 +45,33 @@ sub scan_ext
  ($ext = getcwd()) =~ s,/,\\,g;
  find_ext('');
  chdir($here) || die "Cannot cd to $here\n";
- my @ext = extensions();
+ my @ext = @( < extensions() );
 }
 
 sub dynamic_ext
 {
- return sort grep %ext{$_} eq 'dynamic',keys %ext;
+ return @( sort grep %ext{$_} eq 'dynamic',keys %ext);
 }
 
 sub static_ext
 {
- return sort grep %ext{$_} eq 'static',keys %ext;
+ return @( sort grep %ext{$_} eq 'static',keys %ext);
 }
 
 sub nonxs_ext
 {
- return sort grep %ext{$_} eq 'nonxs',keys %ext;
+ return @( sort grep %ext{$_} eq 'nonxs',keys %ext);
 }
 
 sub extensions
 {
- return sort grep %ext{$_} ne 'known',keys %ext;
+ return @( sort grep %ext{$_} ne 'known',keys %ext);
 }
 
 sub known_extensions
 {
  # faithfully copy Configure in not including nonxs extensions for the nonce
- return sort grep %ext{$_} ne 'nonxs',keys %ext;
+ return @( sort grep %ext{$_} ne 'nonxs',keys %ext);
 }
 
 sub is_static
@@ -84,18 +84,18 @@ sub is_static
 sub find_ext
 {
     opendir my $dh, '.';
-    my @items = grep { !m/^\.\.?$/ } readdir $dh;
+    my @items = @( grep { !m/^\.\.?$/ } readdir $dh );
     closedir $dh;
-    for my $xxx (@items) {
+    for my $xxx (< @items) {
         if ($xxx ne "DynaLoader") {
             if (-f "$xxx/$xxx.xs" || -f "$xxx/$xxx.c" ) {
                 %ext{"@_[0]$xxx"} = %static{"@_[0]$xxx"} ? 'static' : 'dynamic';
             } elsif (-f "$xxx/Makefile.PL") {
                 %ext{"@_[0]$xxx"} = 'nonxs';
             } else {
-                if (-d $xxx && @_ +< 10) {
+                if (-d $xxx && (nelems @_) +< 10) {
                     chdir $xxx;
-                    find_ext("@_[0]$xxx/", @_);
+                    find_ext("@_[0]$xxx/", < @_);
                     chdir "..";
                 }
             }

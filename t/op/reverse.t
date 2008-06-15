@@ -10,8 +10,8 @@ print "not " unless reverse()         eq "raboof";
 print "ok 2\n";
 
 {
-    my @a = ("foo", "bar");
-    my @b = reverse @a;
+    my @a = @("foo", "bar");
+    my @b = @( reverse < @a );
 
     print "not " unless @b[0] eq @a[1] && @b[1] eq @a[0];
     print "ok 3\n";

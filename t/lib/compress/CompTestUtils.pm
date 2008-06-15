@@ -21,7 +21,7 @@ sub title
 
 sub like_eval
 {
-    like $@->{description}, @_ ;
+    like $@->{description}, nelems @_ ;
 }
 
 {
@@ -33,22 +33,22 @@ sub like_eval
     sub new
     {
         my $self = shift ;
-        foreach (@_)
+        foreach (< @_)
         {
             # autogenerate the name unless if none supplied
             $_ = "tst" . $index ++ . ".tmp"
                 unless defined $_;
         }
-        chmod 0777, @_;
-        for (@_) { 1 while unlink $_ } ;
-        bless \@( @_ ), $self ;
+        chmod 0777, < @_;
+        for (< @_) { 1 while unlink $_ } ;
+        bless \@( < @_ ), $self ;
     }
 
     sub DESTROY
     {
         my $self = shift ;
-        chmod 0777, @{ $self } ;
-        for (@$self) { 1 while unlink $_ } ;
+        chmod 0777, < @{ $self } ;
+        for (< @$self) { 1 while unlink $_ } ;
     }
 
 }
@@ -60,14 +60,14 @@ sub like_eval
     sub new
     {
         my $self = shift ;
-        foreach (@_) { rmtree $_ }
-        bless \@( @_ ), $self ;
+        foreach (< @_) { rmtree $_ }
+        bless \@( < @_ ), $self ;
     }
 
     sub DESTROY
     {
         my $self = shift ;
-        foreach (@$self) { rmtree $_ }
+        foreach (< @$self) { rmtree $_ }
     }
 }
 sub readFile
@@ -80,7 +80,7 @@ sub readFile
     {
         my $pos = tell($f);
         seek($f, 0,0);
-        @strings = ~< $f ;	
+        @strings = @( ~< $f ) ;	
         seek($f, 0, $pos);
     }
     else
@@ -88,27 +88,27 @@ sub readFile
         open (F, "<", "$f") 
             or die "Cannot open $f: $!\n" ;
         binmode F;
-        @strings = ~< *F ;	
+        @strings = @( ~< *F ) ;	
         close F ;
     }
 
     return @strings if wantarray ;
-    return join "", @strings ;
+    return join "", < @strings ;
 }
 
 sub touch
 {
-    foreach (@_) { writeFile($_, '') }
+    foreach (< @_) { writeFile($_, '') }
 }
 
 sub writeFile
 {
-    my($filename, @strings) = @_ ;
+    my($filename, < @strings) = < @_ ;
     1 while unlink $filename ;
     open (F, ">", "$filename") 
         or croak "Cannot open $filename: $!\n" ;
     binmode F;
-    foreach (@strings) {
+    foreach (< @strings) {
         no warnings ;
         print F $_ ;
     }
@@ -157,12 +157,12 @@ sub hexDump
         printf "# \%8.8lx    ", $offset;
         $offset += 16;
 
-        my @array = unpack('C*', $data);
-        foreach (@array) {
+        my @array = @( unpack('C*', $data) );
+        foreach (< @array) {
             printf('%2.2x ', $_);
         }
-        print "   " x (16 - @array)
-            if @array +< 16 ;
+        print "   " x (16 - nelems @array)
+            if (nelems @array) +< 16 ;
         $data =~ s/[\0-\37\177-\377]/./g;
         print "  $data\n";
     }
@@ -172,14 +172,14 @@ sub hexDump
 sub readHeaderInfo
 {
     my $name = shift ;
-    my %opts = @_ ;
+    my %opts = %( < @_ ) ;
 
     my $string = <<EOM;
 some text
 EOM
 
     my $x;
-    ok $x = IO::Compress::Gzip->new( $name, %opts) 
+    ok $x = IO::Compress::Gzip->new( $name, < %opts) 
         or diag "GzipError is $IO::Compress::Gzip::GzipError" ;
     ok $x->write($string) ;
     ok $x->close ;
@@ -201,7 +201,7 @@ EOM
 
 sub cmpFile
 {
-    my ($filename, $uue) = @_ ;
+    my ($filename, $uue) = < @_ ;
     return readFile($filename) eq unpack("u", $uue) ;
 }
 
@@ -210,7 +210,7 @@ sub uncompressBuffer
     my $compWith = shift ;
     my $buffer = shift ;
 
-    my %mapping = ( 'IO::Compress::Gzip'                     => 'IO::Uncompress::Gunzip',
+    my %mapping = %( 'IO::Compress::Gzip'                     => 'IO::Uncompress::Gunzip',
                     'IO::Compress::Gzip::gzip'               => 'IO::Uncompress::Gunzip',
                     'IO::Compress::Deflate'                  => 'IO::Uncompress::Inflate',
                     'IO::Compress::Deflate::deflate'         => 'IO::Uncompress::Inflate',
@@ -235,7 +235,7 @@ sub uncompressBuffer
 
 }
 
-my %ErrorMap = (    'IO::Compress::Gzip'                => \$IO::Compress::Gzip::GzipError,
+my %ErrorMap = %(    'IO::Compress::Gzip'                => \$IO::Compress::Gzip::GzipError,
                     'IO::Compress::Gzip::gzip'          => \$IO::Compress::Gzip::GzipError,
                     'IO::Uncompress::Gunzip'            => \$IO::Uncompress::Gunzip::GunzipError,
                     'IO::Uncompress::Gunzip::gunzip'    => \$IO::Uncompress::Gunzip::GunzipError,
@@ -274,7 +274,7 @@ my %ErrorMap = (    'IO::Compress::Gzip'                => \$IO::Compress::Gzip:
                     'IO::Uncompress::DummyUncomp::dummyuncomp' => \$IO::Uncompress::DummyUncomp::DummyUncompError,
                );
 
-my %TopFuncMap = (  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip',
+my %TopFuncMap = %(  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip',
                     'IO::Uncompress::Gunzip'      => 'IO::Uncompress::Gunzip::gunzip',
 
                     'IO::Compress::Deflate'       => 'IO::Compress::Deflate::deflate',
@@ -299,15 +299,15 @@ my %TopFuncMap = (  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip',
                     'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp',
                  );
 
-   %TopFuncMap = map { ($_              => %TopFuncMap{$_}, 
+   %TopFuncMap = %( map { ($_              => %TopFuncMap{$_}, 
                         %TopFuncMap{$_} => %TopFuncMap{$_}) } 
-                 keys %TopFuncMap ;
+                 keys %TopFuncMap ) ;
 
  #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) } 
                  #keys %TopFuncMap ;
 
 
-my %inverse  = ( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gunzip',
+my %inverse  = %( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gunzip',
                  'IO::Compress::Gzip::gzip'              => 'IO::Uncompress::Gunzip::gunzip',
                  'IO::Compress::Deflate'                 => 'IO::Uncompress::Inflate',
                  'IO::Compress::Deflate::deflate'        => 'IO::Uncompress::Inflate::inflate',
@@ -325,7 +325,7 @@ my %inverse  = ( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gun
                  'IO::Compress::DummyComp'               => 'IO::Uncompress::DummyUncomp',
              );
 
-%inverse  = map { ($_ => %inverse{$_}, %inverse{$_} => $_) } keys %inverse;
+%inverse  = %( map { ($_ => %inverse{$_}, %inverse{$_} => $_) } keys %inverse );
 
 sub getInverse
 {
@@ -360,7 +360,7 @@ sub compressBuffer
     my $compWith = shift ;
     my $buffer = shift ;
 
-    my %mapping = ( 'IO::Uncompress::Gunzip'                  => 'IO::Compress::Gzip',
+    my %mapping = %( 'IO::Uncompress::Gunzip'                  => 'IO::Compress::Gzip',
                     'IO::Uncompress::Gunzip::gunzip'          => 'IO::Compress::Gzip',
                     'IO::Uncompress::Inflate'                 => 'IO::Compress::Deflate',
                     'IO::Uncompress::Inflate::inflate'        => 'IO::Compress::Deflate',
@@ -400,10 +400,10 @@ sub anyUncompress
     my $buffer = shift ;
     my $already = shift;
 
-    my @opts = ();
+    my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
     {
-        @opts = @$buffer;
+        @opts = @( < @$buffer );
         $buffer = shift @opts;
     }
 
@@ -443,7 +443,7 @@ sub anyUncompress
                     Append => 1, 
                     Transparent => 0, 
                     RawInflate => 1,
-                    @opts)
+                    < @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
     1 while $o->read($out) +> 0 ;
@@ -460,10 +460,10 @@ sub getHeaders
     my $buffer = shift ;
     my $already = shift;
 
-    my @opts = ();
+    my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
     {
-        @opts = @$buffer;
+        @opts = @( < @$buffer );
         $buffer = shift @opts;
     }
 
@@ -504,7 +504,7 @@ sub getHeaders
                 Append => 1, 
                 Transparent => 0, 
                 RawInflate => 1,
-                @opts)
+                < @opts)
         or croak "Cannot open buffer/file: $AnyUncompressError" ;
 
     1 while $o->read($out) +> 0 ;
@@ -512,7 +512,7 @@ sub getHeaders
     croak "Error uncompressing -- " . $o->error()
         if $o->error() ;
 
-    return ($o->getHeaderInfo()) ;
+    return  @($o->getHeaderInfo()) ;
 
 }
 
@@ -523,17 +523,17 @@ sub mkComplete
     my $Error = getErrorRef($class);
 
     my $buffer ;
-    my %params = ();
+    my %params = %( () );
 
     if ($class eq 'IO::Compress::Gzip') {
-        %params = (
+        %params = %(
             Name       => "My name",
             Comment    => "a comment",
             ExtraField => \@('ab' => "extra"),
             HeaderCRC  => 1);
     }
     elsif ($class eq 'IO::Compress::Zip'){
-        %params = (
+        %params = %(
             Name              => "My name",
             Comment           => "a comment",
             ZipComment        => "last comment",
@@ -543,7 +543,7 @@ sub mkComplete
         );
     }
 
-    my $z = $class-> new(( \$buffer, %params))
+    my $z = $class-> new(( \$buffer, < %params))
         or croak "Cannot create $class object: $$Error";
     $z->write($data);
     $z->close();
@@ -555,7 +555,7 @@ sub mkComplete
     my $info = $u->getHeaderInfo() ;
 
 
-    return wantarray ? ($info, $buffer) : $buffer ;
+    return wantarray ?  @($info, $buffer) : $buffer ;
 }
 
 sub mkErr
@@ -582,9 +582,9 @@ sub dumpObj
 
     my ($dummy, $file, $line) = caller ;
 
-    if (@_)
+    if ((nelems @_))
     {
-        print "#\n# dumpOBJ from $file line $line @_\n" ;
+        print "#\n# dumpOBJ from $file line $line {join ' ', <@_}\n" ;
     }
     else
     {
@@ -612,8 +612,8 @@ sub getMultiValues
 {
     my $class = shift ;
 
-    return (0,0) if $class =~ m/lzf/i;
-    return (1,0);
+    return  @(0,0) if $class =~ m/lzf/i;
+    return  @(1,0);
 }
 
 

@@ -17,12 +17,12 @@ BEGIN {
     use vars        qw[ $VERSION @ISA $VERBOSE $CACHE @EXPORT_OK 
                         $FIND_VERSION $ERROR $CHECK_INC_HASH];
     use Exporter;
-    @ISA            = qw[Exporter];
+    @ISA            = @( qw[Exporter] );
     $VERSION        = '0.22';
     $VERBOSE        = 0;
     $FIND_VERSION   = 1;
     $CHECK_INC_HASH = 0;
-    @EXPORT_OK      = qw[check_install can_load requires];
+    @EXPORT_OK      = @( qw[check_install can_load requires] );
 }
 
 =pod
@@ -144,7 +144,7 @@ true, since C<check_install> had no way to verify clearly.
 ### if the installed version is higher or equal to the one we want, it will return
 ### a hashref with he module name and version in it.. so 'true' as well.
 sub check_install {
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my $tmpl = \%(
             version => \%( default    => '0.0'    ),
@@ -154,7 +154,7 @@ sub check_install {
 
     my $args;
     unless( $args = check( $tmpl, \%hash, $VERBOSE ) ) {
-        warn loc( q[A problem occurred checking arguments] ) if $VERBOSE;
+        warn < loc( q[A problem occurred checking arguments] ) if $VERBOSE;
         return;
     }
 
@@ -188,7 +188,7 @@ sub check_install {
     ### so scan the dirs
     unless( $filename ) {
 
-        DIR: for my $dir ( @INC ) {
+        DIR: for my $dir ( < @INC ) {
     
             my $fh;
     
@@ -200,14 +200,14 @@ sub check_install {
                     ($fh) = $dir->($dir, $file);
     
                 } elsif (UNIVERSAL::isa($dir, 'ARRAY')) {
-                    ($fh) = $dir->[0]->($dir, $file, %{$dir}{[1..(@{$dir}-1)]})
+                    ($fh) = $dir->[0]->($dir, $file, %{$dir}{[1..((nelems @{$dir})-1)]})
     
                 } elsif (UNIVERSAL::can($dir, 'INC')) {
                     ($fh) = $dir->INC->($dir, $file);
                 }
     
                 if (!UNIVERSAL::isa($fh, 'GLOB')) {
-                    warn loc(q[Cannot open file '%1': %2], $file, $!)
+                    warn < loc(q[Cannot open file '%1': %2], $file, $!)
                             if $args->{verbose};
                     next;
                 }
@@ -220,7 +220,7 @@ sub check_install {
     
                 $fh = FileHandle->new;
                 if (!$fh->open($filename)) {
-                    warn loc(q[Cannot open file '%1': %2], $file, $!)
+                    warn < loc(q[Cannot open file '%1': %2], $file, $!)
                             if $args->{verbose};
                     next;
                 }
@@ -268,7 +268,7 @@ sub check_install {
             local $^W;
 
             ### if we got here, we didn't find the version
-            warn loc(q[Could not check version on '%1'], $args->{module} )
+            warn < loc(q[Could not check version on '%1'], $args->{module} )
                     if $args->{verbose} and $args->{version} +> 0;
         }
         $href->{uptodate} = 1;
@@ -384,7 +384,7 @@ cache, but you can override that by setting C<nocache> to true.
 =cut
 
 sub can_load {
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my $tmpl = \%(
         modules     => \%( default => \%(), strict_type => 1 ),
@@ -453,7 +453,7 @@ sub can_load {
             push @load, $mod;
         }
 
-        for my $mod ( @load ) {
+        for my $mod ( < @load ) {
 
             if ( $CACHE->{$mod}->{uptodate} ) {
 
@@ -483,7 +483,7 @@ sub can_load {
 
     if( defined $error ) {
         $ERROR = $error;
-        Carp::carp( loc(q|%1 [THIS MAY BE A PROBLEM!]|,$error) ) if $args->{verbose};
+        Carp::carp( < loc(q|%1 [THIS MAY BE A PROBLEM!]|,$error) ) if $args->{verbose};
         return;
     } else {
         return 1;
@@ -513,18 +513,18 @@ sub requires {
     my $who = shift;
 
     unless( check_install( module => $who ) ) {
-        warn loc(q[You do not have module '%1' installed], $who) if $VERBOSE;
+        warn < loc(q[You do not have module '%1' installed], $who) if $VERBOSE;
         return undef;
     }
 
-    my $lib = join " ", map { qq["-I$_"] } @INC;
+    my $lib = join " ", map { qq["-I$_"] } < @INC;
     my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
 
-    return  sort
+    return @(  sort
                 grep { !m/^$who$/  }
                 map  { chomp; s|/|::|g; $_ }
                 grep { s|\.pm$||i; }
-            `$cmd`;
+            `$cmd`);
 }
 
 1;

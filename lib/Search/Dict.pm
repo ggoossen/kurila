@@ -4,8 +4,8 @@ require Exporter;
 use strict;
 
 our $VERSION = '1.02';
-our @ISA = qw(Exporter);
-our @EXPORT = qw(look);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(look) );
 
 =head1 NAME
 
@@ -47,9 +47,9 @@ transform the lines read from the filehandle before their comparison.
 =cut
 
 sub look {
-    my($fh,$key,$dict,$fold) = @_;
+    my($fh,$key,$dict,$fold) = < @_;
     my ($comp, $xfrm);
-    if (@_ == 3 && ref $dict eq 'HASH') {
+    if ((nelems @_) == 3 && ref $dict eq 'HASH') {
 	my $params = $dict;
 	$dict = 0;
 	$dict = $params->{dict} if exists $params->{dict};
@@ -59,7 +59,7 @@ sub look {
     }
     $comp = sub { @_[0] cmp @_[1] } unless defined $comp;
     local($_);
-    my(@stat) = stat($fh)
+    my(@stat) = @( stat($fh) )
 	or return -1;
     my($size, $blksize) = @stat[[7,11]];
     $blksize ||= 8192;

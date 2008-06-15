@@ -25,7 +25,7 @@ use vars qw(@ISA %ESCAPES $VERSION);
 
 # We inherit from Pod::Select instead of Pod::Parser so that we can be used
 # by Pod::Usage.
-@ISA = qw(Pod::Select);
+@ISA = @( qw(Pod::Select) );
 
 $VERSION = '2.02';
 
@@ -37,7 +37,7 @@ $VERSION = '2.02';
 # This table is taken near verbatim from Pod::PlainText in Pod::Parser,
 # which got it near verbatim from the original Pod::Text.  It is therefore
 # credited to Tom Christiansen, and I'm glad I didn't have to write it.  :)
-%ESCAPES = (
+%ESCAPES = %(
     'amp'       =>    '&',      # ampersand
     'lt'        =>    '<',      # left chevron, less-than
     'gt'        =>    '>',      # right chevron, greater-than
@@ -147,7 +147,7 @@ sub command {
     return if (%$self{EXCLUDE} && $command ne 'end');
     $self->item ("\n") if defined %$self{ITEM};
     $command = 'cmd_' . $command;
-    $self->?$command (@_);
+    $self->?$command (< @_);
 }
 
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and
@@ -199,13 +199,13 @@ sub textblock {
     } {{
         local $_ = $1;
         s%L</([^>]+)>%$1%g;
-        my @items = split m/(?:,?\s+(?:and\s+)?)/;
+        my @items = @( split m/(?:,?\s+(?:and\s+)?)/ );
         my $string = "the ";
         my $i;
-        for ($i = 0; $i +< @items; $i++) {
+        for ($i = 0; $i +< nelems @items; $i++) {
             $string .= @items[$i];
-            $string .= ", " if @items +> 2 && $i != @items-1;
-            $string .= " and " if ($i == @items - 2);
+            $string .= ", " if (nelems @items) +> 2 && $i != (nelems @items)-1;
+            $string .= " and " if ($i == (nelems @items) - 2);
         }
         $string .= " entries elsewhere in this document";
         $string;
@@ -218,7 +218,7 @@ sub textblock {
     if (defined %$self{ITEM}) {
         $self->item ($_ . "\n");
     } else {
-        $self->output ($self->reformat ($_ . "\n"));
+        $self->output ( <$self->reformat ($_ . "\n"));
     }
 }
 
@@ -472,7 +472,7 @@ sub item {
         $output =~ s/\n*$/\n/;
         $self->output ($output);
         %$self{MARGIN} = $margin;
-        $self->output ($self->reformat ($_)) if m/\S/;
+        $self->output ( <$self->reformat ($_)) if m/\S/;
     } else {
         $_ = $self->reformat ($_);
         s/^ /:/ if (%$self{alt} && $indent +> 0);
@@ -555,7 +555,7 @@ sub pod2text {
     }
 
     # Now that we know what arguments we're using, create the parser.
-    my $parser = Pod::PlainText->new (@args);
+    my $parser = Pod::PlainText->new (< @args);
 
     # If two arguments were given, the second argument is going to be a file
     # handle.  That means we want to call parse_from_filehandle(), which
@@ -568,9 +568,9 @@ sub pod2text {
             return;
         }
         @_[0] = \*IN;
-        return $parser->parse_from_filehandle (@_);
+        return $parser->parse_from_filehandle (< @_);
     } else {
-        return $parser->parse_from_file (@_);
+        return $parser->parse_from_file (< @_);
     }
 }
 

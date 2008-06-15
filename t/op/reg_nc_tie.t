@@ -10,7 +10,7 @@ print "1..13\n";
 
 # PL_curpm->paren_names can be a null pointer. See that this succeeds anyway.
 'x' =~ m/(.)/;
-() = %+;
+() = < %+;
 pass( 'still alive' );
 
 "hlagh" =~ m/
@@ -36,7 +36,7 @@ try { delete %+{a} };
 ok(index($@->{description}, "read-only") != -1, "DELETE");
 
 # CLEAR
-try { %+ = () };
+try { %+ = %( () ) };
 ok(index($@->{description}, "read-only") != -1, "CLEAR");
 
 # EXISTS

@@ -7,8 +7,8 @@ sub mungepath {
     $p =~ s/^[ ;]+//;
     $p =~ s/[ ;]+$//;
     $p =~ s/'/"/g;
-    my @p = map { $_ = "\"$_\"" if m/\s/ and !m/^".*"$/; $_ } split m/;/, $p;
-    return join(' ', @p);
+    my @p = @( map { $_ = "\"$_\"" if m/\s/ and !m/^".*"$/; $_ } split m/;/, $p );
+    return join(' ', < @p);
 }
 
 # generate an array of option strings from command-line args
@@ -22,8 +22,8 @@ sub loadopts {
 	open OPTF, "<", $optfile or die "Can't open $optfile: $!\n";
 	my @opts;
 	chomp(my $line = ~< *OPTF);
-	my @vars = split(m/\t+~\t+/, $line);
-	for (@vars) {
+	my @vars = @( split(m/\t+~\t+/, $line) );
+	for (< @vars) {
 	    push(@opts, $_) unless (m/^\s*$/);
 	}
 	close OPTF;
@@ -37,7 +37,7 @@ sub loadopts {
 my %opt;
 
 my $optref = loadopts();
-while (@{$optref} && $optref->[0] =~ m/^([\w_]+)=(.*)$/) {
+while ((nelems @{$optref}) && $optref->[0] =~ m/^([\w_]+)=(.*)$/) {
     %opt{$1}=$2;
     shift(@{$optref});
 }
@@ -46,11 +46,11 @@ FindExt::scan_ext("../ext");
 FindExt::scan_ext("ext") if -d 'ext';  # also look in win32/ext/ if it exists
 FindExt::set_static_extensions(split ' ', %opt{'static_ext'});
 
-%opt{'nonxs_ext'}        = join(' ',FindExt::nonxs_ext()) || ' ';
-%opt{'static_ext'}       = join(' ',FindExt::static_ext()) || ' ';
-%opt{'dynamic_ext'}      = join(' ',FindExt::dynamic_ext()) || ' ';
-%opt{'extensions'}       = join(' ',FindExt::extensions()) || ' ';
-%opt{'known_extensions'} = join(' ',FindExt::known_extensions()) || ' ';
+%opt{'nonxs_ext'}        = join(' ', <FindExt::nonxs_ext()) || ' ';
+%opt{'static_ext'}       = join(' ', <FindExt::static_ext()) || ' ';
+%opt{'dynamic_ext'}      = join(' ', <FindExt::dynamic_ext()) || ' ';
+%opt{'extensions'}       = join(' ', <FindExt::extensions()) || ' ';
+%opt{'known_extensions'} = join(' ', <FindExt::known_extensions()) || ' ';
 
 my $pl_h = '../patchlevel.h';
 

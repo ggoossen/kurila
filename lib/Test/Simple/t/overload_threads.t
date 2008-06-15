@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -43,7 +43,7 @@ sub new {
 package main;
 
 my $warnings = '';
-local $^WARN_HOOK = sub { $warnings = join '', @_ };
+local $^WARN_HOOK = sub { $warnings = join '', < @_ };
 
 # overloaded object as name
 my $obj = Overloaded->new('foo');

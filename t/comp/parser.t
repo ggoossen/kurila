@@ -76,8 +76,8 @@ is( $@, '', 'PL_lex_brackstack' );
     my $a="A";
     is("{$a}\{", "A\{", "interpolation, qq//");
     is("{$a}[", "A[", "interpolation, qq//");
-    my @b=("B");
-    is("{join ' ', @b}\{", "B\{", "interpolation, qq//");
+    my @b=@("B");
+    is("{join ' ', < @b}\{", "B\{", "interpolation, qq//");
     is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
     $c =~ m/$a(?:){/p;
@@ -87,7 +87,7 @@ is( $@, '', 'PL_lex_brackstack' );
     $c =~ s/foo/{$a}\{/;
     is($c, 'A{', "interpolation, s//.../");
     is(<<"{$a}{", "A\{ A[ B\{\n", "interpolation, here doc");
-{$a}\{ {$a}[ {join ' ', @b}\{
+{$a}\{ {$a}[ {join ' ', < @b}\{
 {$a}{
 }
 
@@ -97,7 +97,7 @@ is($@, '', "';&' sub prototype confuses the lexer");
 # Bug #21575
 # ensure that the second print statement works, by playing a bit
 # with the test output.
-my %data = ( foo => "\n" );
+my %data = %( foo => "\n" );
 print "#";
 print(
 %data{foo});
@@ -223,7 +223,7 @@ like($@->message, qr/BEGIN failed--compilation aborted/, 'BEGIN 7' );
 # with sane line reporting for any other test failures
 
 sub check ($$$) {
-    my ($file, $line, $name) =  @_;
+    my ($file, $line, $name) =  < @_;
     my (undef, $got_file, $got_line) = caller;
     like ($got_file, $file, "file of $name");
     is ($got_line, $line, "line of $name");
@@ -293,10 +293,10 @@ check(qr/^Great hail!.*no more\.$/, 61, "Overflow both small buffer checks");
 EOSTANZA
 
 {
-    my @x = 'string';
+    my @x = @( 'string' );
     is(eval q{ "@x[0]->strung" }, 'string->strung',
 	'literal -> after an array subscript within ""');
-    @x = \@('string');
+    @x = @( \@('string') );
     # this used to give "string"
     dies_like( sub { "@x[0]-> [0]" }, qr/reference as string/ );
 }

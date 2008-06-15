@@ -7,7 +7,7 @@ print "1..50\n";
 my $test = 1;
 
 sub ok {
-  my ($pass, $wrong, $err) = @_;
+  my ($pass, $wrong, $err) = < @_;
   if ($pass) {
     print "ok $test\n";
     $test = $test + 1; # Would be doubleplusbad to use ++ in the ++ test.
@@ -96,7 +96,7 @@ ok (!defined($a--), do { $a=undef; $a-- }, "postdec undef returns undef");
 # Verify that shared hash keys become unshared.
 
 sub check_same {
-  my ($orig, $suspect) = @_;
+  my ($orig, $suspect) = < @_;
   my $fail;
   while (my ($key, $value) = each %$suspect) {
     if (exists $orig->{$key}) {
@@ -117,10 +117,10 @@ sub check_same {
   ok (!$fail);
 }
 
-my (%orig) = my (%inc) = my (%dec) = my (%postinc) = my (%postdec)
-  = (1 => 1, ab => "ab");
-my %up = (1=>2, ab => 'ac');
-my %down = (1=>0, ab => -1);
+my (%orig) = %( my (%inc) = %( my (%dec) = %( my (%postinc) = %( my (%postdec)
+  = %(1 => 1, ab => "ab") ) ) ) );
+my %up = %(1=>2, ab => 'ac');
+my %down = %(1=>0, ab => -1);
 
 foreach (keys %inc) {
   my $ans = %up{$_};
@@ -201,10 +201,10 @@ ok ($a == 2147483647, $a);
 # sparcs have a 112 bit mantissa for their long doubles. Just to be awkward :-)
 
 sub check_some_code {
-    my ($start, $warn, $action, $description) = @_;
+    my ($start, $warn, $action, $description) = < @_;
     my $warn_line = ($warn ? 'use' : 'no') . " warnings 'imprecision';";
     my @warnings;
-    local $^WARN_HOOK = sub {push @warnings, @_[0]->message};
+    local $^WARN_HOOK = sub {push @warnings, < @_[0]->message};
 
     print "# checking $action under $warn_line\n";
     my $code = <<"EOC";
@@ -218,17 +218,17 @@ EOC
     eval $code or die "# $@\n$code";
 
     if ($warn) {
-	unless (ok (scalar @warnings == 2, scalar @warnings)) {
-	    print STDERR "# $_" foreach @warnings;
+	unless (ok (scalar nelems @warnings == 2, scalar nelems @warnings)) {
+	    print STDERR "# $_" foreach < @warnings;
 	}
-	foreach (@warnings) {
+	foreach (< @warnings) {
 	    unless (ok (m/Lost precision when incrementing \d+/, $_)) {
 		print STDERR "# $_"
 	    }
 	}
     } else {
-	unless (ok (scalar @warnings == 0)) {
-	    print STDERR "# @$_" foreach @warnings;
+	unless (ok (scalar nelems @warnings == 0)) {
+	    print STDERR "# {join ' ', <@$_}" foreach < @warnings;
 	}
     }
 }
@@ -259,10 +259,10 @@ for my $n (47..113) {
 
     foreach my $warn (0, 1) {
 	foreach (\@('++$i', 'pre-inc'), \@('$i++', 'post-inc')) {
-	    check_some_code($start_p, $warn, @$_);
+	    check_some_code($start_p, $warn, < @$_);
 	}
 	foreach (\@('--$i', 'pre-dec'), \@('$i--', 'post-dec')) {
-	    check_some_code($start_n, $warn, @$_);
+	    check_some_code($start_n, $warn, < @$_);
 	}
     }
 

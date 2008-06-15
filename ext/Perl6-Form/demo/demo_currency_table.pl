@@ -1,9 +1,9 @@
 use Perl6::Form;
 
-my @amounts = (0, 1, 1.2345, 1234.56, -1234.56, 1234567.89);
+my @amounts = @(0, 1, 1.2345, 1234.56, -1234.56, 1234567.89);
 # my @amounts = qw(0 1,0 1,2345 1234,56 -1234,56 1234567,89);
 
-my %format = (
+my %format = %(
 	"Canadian (English)"	=> q/   {-$],]]],]]].0}/,
 	"Canadian (French)"		=> q/    {-] ]]] ]]],0 $}/,
 	"Dutch"					=> q/     {],]]],]]].0-EUR}/,
@@ -15,7 +15,7 @@ my %format = (
 );
 
 while (my($style, $format) = each %format) {
-	print form
+	print < form
 		"$style:\n\n",
 		"    $format",
 		\@amounts,

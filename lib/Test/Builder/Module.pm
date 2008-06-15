@@ -5,7 +5,7 @@ use strict;
 use Test::Builder;
 
 require Exporter;
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 
 our $VERSION = '0.78';
 
@@ -15,7 +15,7 @@ my $_export_to_level = sub {
       my $level = shift;
       (undef) = shift;                  # redundant arg
       my $callpkg = caller($level);
-      $pkg->export($callpkg, @_);
+      $pkg->export($callpkg, < @_);
 };
 
 
@@ -94,11 +94,11 @@ sub import {
     $test->exported_to($caller);
 
     $class->import_extra(\@_);
-    my(@imports) = $class->_strip_imports(\@_);
+    my(@imports) = @( < $class->_strip_imports(\@_) );
 
-    $test->plan(@_);
+    $test->plan(< @_);
 
-    $class->?$_export_to_level(1, $class, @imports);
+    $class->?$_export_to_level(1, $class, < @imports);
 }
 
 
@@ -106,14 +106,14 @@ sub _strip_imports {
     my $class = shift;
     my $list  = shift;
 
-    my @imports = ();
-    my @other   = ();
+    my @imports = @( () );
+    my @other   = @( () );
     my $idx = 0;
-    while( $idx +<= @$list -1 ) {
+    while( $idx +<= (nelems @$list) -1 ) {
         my $item = $list->[$idx];
 
         if( defined $item and $item eq 'import' ) {
-            push @imports, @{$list->[$idx+1]};
+            push @imports, < @{$list->[$idx+1]};
             $idx++;
         }
         else {
@@ -123,7 +123,7 @@ sub _strip_imports {
         $idx++;
     }
 
-    @$list = @other;
+    @$list = @( < @other );
 
     return @imports;
 }

@@ -16,7 +16,7 @@ BEGIN {
 ### to its parent are required. all the other things it can fill in itself
 sub new {
     my $class   = shift;
-    my %hash    = @_;
+    my %hash    = %( < @_ );
 
     my $tmpl = \%(
         when        => \%( no_override    => 1,   default    => scalar localtime ),
@@ -25,8 +25,8 @@ sub new {
         parent      => \%( required        => 1    ),
         level       => \%( default        => ''   ),      # default may be conf dependant
         tag         => \%( default        => ''   ),      # default may be conf dependant
-        longmess    => \%( default        => _clean(Carp::longmess()) ),
-        shortmess   => \%( default        => _clean(Carp::shortmess())),
+        longmess    => \%( default        => < _clean( <Carp::longmess()) ),
+        shortmess   => \%( default        => < _clean( <Carp::shortmess())),
     );
 
     my $args = check($tmpl, \%hash) or return undef;

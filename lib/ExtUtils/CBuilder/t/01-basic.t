@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
-    @INC = qw(../..);
+    @INC = @( qw(../..) );
   }
 }
 
@@ -42,7 +42,7 @@ ok $object_file, $b->compile(source => $source_file);
 my $lib_file = $b->lib_file($object_file);
 ok 1;
 
-my ($lib, @temps) = $b->link(objects => $object_file,
+my ($lib, < @temps) = < $b->link(objects => $object_file,
                              module_name => 'compilet');
 $lib =~ s/"|'//g;
 ok $lib_file, $lib;
@@ -52,14 +52,14 @@ for ($source_file, $object_file, $lib_file) {
   1 while unlink;
 }
 
-my @words = $b->split_like_shell(' foo bar');
+my @words = @( < $b->split_like_shell(' foo bar') );
 if ($^O eq 'MSWin32') {
-  ok @words, 1;
+  ok (nelems @words), 1;
   ok @words[0], ' foo bar';
   skip 'No splitting in split_like_shell() on Win32';
 }
 else {
-  ok @words, 2;
+  ok (nelems @words), 2;
   ok @words[0], 'foo';
   ok @words[1], 'bar';
 }

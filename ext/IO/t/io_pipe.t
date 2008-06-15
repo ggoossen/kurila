@@ -3,7 +3,7 @@
 my $perl;
 
 BEGIN {
-    unless(grep m/blib/, @INC) {
+    unless(grep m/blib/, < @INC) {
 	$perl = './perl';
     }
     else {

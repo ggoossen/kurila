@@ -8,7 +8,7 @@ use Cwd qw(cwd);
 use File::Spec;
 use strict;
 
-my %opt = (
+my %opt = %(
   frames  => 3,
   lines   => 0,
   tests   => 0,
@@ -43,7 +43,7 @@ else {
 
 # Assemble regex for functions whose leaks should be hidden
 # (no, a hash won't be significantly faster)
-my $hidden = do { local $"='|'; %opt{hide} ? qr/^(?:@{%opt{hide}})$/o : '' };
+my $hidden = do { local $"='|'; %opt{hide} ? qr/^(?:{join ' ', <@{%opt{hide}}})$/o : '' };
 
 # Setup our output file handle
 # (do it early, as it may fail)
@@ -85,7 +85,7 @@ summary($fh, \%error, \%leak);
 exit 0;
 
 sub summary {
-  my($fh, $error, $leak) = @_;
+  my($fh, $error, $leak) = < @_;
   my(%ne, %nl, %top);
 
   # Prepare the data
@@ -122,10 +122,10 @@ sub summary {
 
   if (%opt{top}) {
     for my $what (qw(error leak)) {
-      my @t = sort { %top{$b}->{$what} <+> %top{$a}->{$what} or $a cmp $b }
-              grep %top{$_}->{$what}, keys %top;
-      @t +> %opt{top} and splice @t, %opt{top};
-      my $n = @t;
+      my @t = @( sort { %top{$b}->{$what} <+> %top{$a}->{$what} or $a cmp $b }
+              grep %top{$_}->{$what}, keys %top );
+      (nelems @t) +> %opt{top} and splice @t, %opt{top};
+      my $n = (nelems @t);
       my $s = $n +> 1 ? 's' : '';
       my $prev = 0;
       print $fh "Top $n test scripts for {$what}s:\n\n";
@@ -149,7 +149,7 @@ sub summary {
     for my $frame (sort keys %{%ne{$e}}) {
       my $data = %ne{$e}->{$frame};
       my $count = $data->{count} +> 1 ? " [$data->{count} paths]" : '';
-      print $fh ' 'x4, "$frame$count\n",
+      print $fh ' 'x4, "$frame$count\n", <
                 format_tests($data->{tests}), "\n";
     }
     print $fh "\n";
@@ -161,9 +161,9 @@ sub summary {
     print $fh qq("$l"\n);
     for my $frames (sort keys %{%nl{$l}}) {
       my $data = %nl{$l}->{$frames};
-      my @stack = split m/</, $frames;
+      my @stack = @( split m/</, $frames );
       $data->{count} +> 1 and @stack[-1] .= " [$data->{count} paths]";
-      print $fh join('', map { ' 'x4 . "$_:@stack[$_]\n" } 0 ..( @stack-1) ),
+      print $fh join('', map { ' 'x4 . "$_:@stack[$_]\n" } 0 ..( (nelems @stack)-1) ), <
                 format_tests($data->{tests}), "\n\n";
     }
   }
@@ -196,7 +196,7 @@ sub filter {
   debug(1, "processing $test ($_)\n");
 
   # Get all the valgrind output lines
-  my @l = do {
+  my @l = @( do {
     my $fh = IO::File->new( $_) or die "$0: cannot open $_ ($!)\n";
     # Process outputs can interrupt each other, so sort by pid first
     my %pid; local $_;
@@ -204,8 +204,8 @@ sub filter {
       chomp;
       s/^==(\d+)==\s?// and push @{%pid{$1}}, $_;
     }
-    map @$_, values %pid;
-  };
+    map < @$_, values %pid;
+  } );
 
   # Setup some useful regexes
   my $hexaddr  = '0x[[:xdigit:]]+';
@@ -213,7 +213,7 @@ sub filter {
   my $address  = qr/^\s+Address $hexaddr is \d+ bytes (?:before|inside|after) a block of size \d+/;
   my $leak     = qr/^\s*\d+ bytes in \d+ blocks are (still reachable|(?:definite|possib)ly lost)/;
 
-  for my $i (0 ..( @l-1)) {
+  for my $i (0 ..( (nelems @l)-1)) {
     @l[$i]   =~ $topframe or next; # Match on any topmost frame...
     @l[$i-1] =~ $address and next; # ...but not if it's only address details
     my $line = @l[$i-1]; # The error / leak description line
@@ -234,7 +234,7 @@ sub filter {
         defined $file && ++$inperl or $inperl && last;
 
         # A function that should be hidden? => clear stack and leave
-        $hidden && $func =~ $hidden and @stack = (), last;
+        $hidden && $func =~ $hidden and @stack = @( () ), last;
 
         # Add stack frame if it's within our threshold
         if ($inperl +<= %opt{frames}) {
@@ -244,7 +244,7 @@ sub filter {
 
       # If there's something on the stack and we've seen perl code,
       # add this memory leak to the summary data
-      @stack and $inperl and %leak{$type}->{join '<', @stack}->{$test}++;
+      (nelems @stack) and $inperl and %leak{$type}->{join '<', < @stack}->{$test}++;
     } else {
       debug(1, "ERROR: $line\n");
 
@@ -262,7 +262,7 @@ sub filter {
 
 sub debug {
   my $level = shift;
-  %opt{verbose} +>= $level and print STDERR @_;
+  %opt{verbose} +>= $level and print STDERR < @_;
 }
 
 __END__

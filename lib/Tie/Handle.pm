@@ -123,7 +123,7 @@ use warnings::register;
 
 sub new {
     my $pkg = shift;
-    $pkg->TIEHANDLE(@_);
+    $pkg->TIEHANDLE(< @_);
 }
 
 # "Grandfather" the new, a la Tie::Hash
@@ -132,7 +132,7 @@ sub TIEHANDLE {
     my $pkg = shift;
     if (defined &{Symbol::fetch_glob("\{$pkg\}::new")}) {
 	warnings::warnif("WARNING: calling {$pkg}->new since {$pkg}->TIEHANDLE is missing");
-	$pkg->new(@_);
+	$pkg->new(< @_);
     }
     else {
 	croak "$pkg doesn't define a TIEHANDLE method";
@@ -142,7 +142,7 @@ sub TIEHANDLE {
 sub PRINT {
     my $self = shift;
     if($self->can('WRITE') != \&WRITE) {
-	my $buf = join(defined $, ? $, : "",@_);
+	my $buf = join(defined $, ? $, : "",< @_);
 	$buf .= $\ if defined $\;
 	$self->WRITE($buf,length($buf),0);
     }
@@ -155,7 +155,7 @@ sub PRINTF {
     my $self = shift;
     
     if($self->can('WRITE') != \&WRITE) {
-	my $buf = sprintf(shift,@_);
+	my $buf = sprintf(shift,< @_);
 	$self->WRITE($buf,length($buf),0);
     }
     else {

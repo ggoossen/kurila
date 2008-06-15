@@ -4,12 +4,12 @@ use Test::More  'no_plan';
 
 my $Class   = 'Module::Load::Conditional';
 my $Meth    = '_parse_version';
-my $Verbose = @ARGV ? 1 : 0;
+my $Verbose = (nelems @ARGV) ? 1 : 0;
 
 use_ok( $Class );
 
 ### versions that should parse
-{   for my $str ( __PACKAGE__->_succeed ) {
+{   for my $str ( < __PACKAGE__->_succeed ) {
         my $res = $Class->?$Meth( $str, $Verbose );
         ok( defined $res,       "String '$str' identified as version string" );
         
@@ -37,7 +37,7 @@ use_ok( $Class );
 }
 
 ### version that should fail
-{   for my $str ( __PACKAGE__->_fail ) {
+{   for my $str ( < __PACKAGE__->_fail ) {
         my $res = $Class->?$Meth( $str, $Verbose );
         ok( ! defined $res,     "String '$str' is not a version string" );
     }

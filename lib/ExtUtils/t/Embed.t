@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 chdir 't';
@@ -37,7 +37,7 @@ my (@cmd2) if $^O eq 'VMS';
 # will be wrong.
 if ($^O eq 'VMS') {
     push(@cmd,$cc,"/Obj=$obj");
-    my (@incs) = ($inc);
+    my (@incs) = @($inc);
     my $crazy = ccflags();
     if ($crazy =~ s#/inc[^=/]*=([\w\$\_\-\.\[\]\:]+)##i) {
         push(@incs,$1);
@@ -46,7 +46,7 @@ if ($^O eq 'VMS') {
         push(@incs,$1);
     }
     $crazy =~ s#/Obj[^=/]*=[\w\$\_\-\.\[\]\:]+##i;
-    push(@cmd,"/Include=(".join(',',@incs).")");
+    push(@cmd,"/Include=(".join(',',< @incs).")");
     push(@cmd,$crazy);
     push(@cmd,"embed_test.c");
 
@@ -70,7 +70,7 @@ if ($^O eq 'VMS') {
        push @cmd, "-non_shared";
    }
 
-   push(@cmd,"-I$inc",ccflags(),'embed_test.c');
+   push(@cmd,"-I$inc", <ccflags(),'embed_test.c');
    if ($^O eq 'MSWin32') {
     $inc = File::Spec->catdir($inc,'win32');
     push(@cmd,"-I$inc");
@@ -80,7 +80,7 @@ if ($^O eq 'VMS') {
 	push(@cmd,'-link',"-libpath:$lib",%Config{'libperl'},%Config{'libs'});
     }
     else {
-	push(@cmd,"-L$lib",File::Spec->catfile($lib,%Config{'libperl'}),%Config{'libc'});
+	push(@cmd,"-L$lib", <File::Spec->catfile($lib,%Config{'libperl'}),%Config{'libc'});
     }
    }
    elsif ($^O eq 'os390' && %Config{usedl}) {
@@ -92,16 +92,16 @@ if ($^O eq 'VMS') {
     };
     push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
 	if $^O eq 'os2' and %Config{ldflags} =~ m/(?<!\S)-Zomf\b/;
-    push(@cmd,ldopts());
+    push(@cmd, <ldopts());
    }
    if ($borl) {
-     @cmd = (@cmd[0],(grep{m/^-[LI]/}@cmd[[1..(@cmd-1)]]),(grep{!m/^-[LI]/}@cmd[[1..(@cmd-1)]]));
+     @cmd = @(@cmd[0],(grep{m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]),(grep{!m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]));
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
     my ($perl_exp) = grep { -f } qw(perl.exp ../perl.exp);
     die "where is perl.exp?\n" unless defined $perl_exp;
-    for (@cmd) {
+    for (< @cmd) {
         s!-bE:(\S+)!-bE:$perl_exp!;
     }
    }
@@ -128,20 +128,20 @@ if ($^O eq 'VMS') {
 }
 my $status;
 # On OS/2 the linker will always emit an empty line to STDOUT; filter these
-my $cmd = join ' ', @cmd;
+my $cmd = join ' ', < @cmd;
 chomp($cmd); # where is the newline coming from? ldopts()?
 print "# $cmd\n";
-my @out = `$cmd`;
+my @out = @( `$cmd` );
 $status = $?;
-print "# $_\n" foreach @out;
+print "# $_\n" foreach < @out;
 
 if ($^O eq 'VMS' && !$status) {
-  print "# @cmd2\n";
-  $status = system(join(' ',@cmd2)); 
+  print "# {join ' ', <@cmd2}\n";
+  $status = system(join(' ',< @cmd2)); 
 }
 print (($status? 'not ': '')."ok 1\n");
 
-my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
+my $embed_test = File::Spec->catfile( <File::Spec->curdir, $exe);
 $embed_test = "run/nodebug $exe" if $^O eq 'VMS';
 print "# embed_test = $embed_test\n";
 $status = system($embed_test);
@@ -150,7 +150,7 @@ unlink($exe,"embed_test.c",$obj);
 unlink("$exe.manifest") if $cl and %Config{'ccversion'} =~ m/^(\d+)/ and $1 +>= 14;
 unlink("$exe%Config{exe_ext}") if $skip_exe;
 unlink("embed_test.map","embed_test.lis") if $^O eq 'VMS';
-unlink(glob("./*.dll")) if $^O eq 'cygwin';
+unlink(glob( <"./*.dll")) if $^O eq 'cygwin';
 unlink($testlib)	       if $libperl_copied;
 
 # gcc -g -I.. -L../ -o perl_test perl_test.c -lperl `../perl -I../lib -MExtUtils::Embed -I../ -e ccflags -e ldopts`

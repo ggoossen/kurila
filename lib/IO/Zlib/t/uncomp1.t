@@ -1,6 +1,6 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-	@INC = '../lib';
+	@INC = @( '../lib' );
 	chdir 't';
     }
 }
@@ -9,7 +9,7 @@ use IO::Zlib;
 
 sub ok
 {
-    my ($no, $ok) = @_ ;
+    my ($no, $ok) = < @_ ;
 
     #++ $total ;
     #++ $totalBad unless $ok ;
@@ -36,12 +36,12 @@ if (open(FH, ">", "$name")) {
 }
 
 ok(1, my $file = IO::Zlib->new());
-ok(2, $file->open($name, "rb"));
+ok(2, < $file->open($name, "rb"));
 ok(3, !$file->eof());
 ok(4, $file->read(my $uncomp, 1024) == length($hello));
-ok(5, $file->eof());
-ok(6, $file->opened());
-ok(7, $file->close());
+ok(5, < $file->eof());
+ok(6, < $file->opened());
+ok(7, < $file->close());
 ok(8, !$file->opened());
 
 unlink($name);

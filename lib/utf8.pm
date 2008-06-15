@@ -39,8 +39,8 @@ sub length (_) {
 sub substr ($$;$$) {
     BEGIN { utf8::import() }
     return
-	@_ == 2 ? CORE::substr(@_[0], @_[1]) :
-	@_ == 3 ? CORE::substr(@_[0], @_[1], @_[2]) :
+	(nelems @_) == 2 ? CORE::substr(@_[0], @_[1]) :
+	(nelems @_) == 3 ? CORE::substr(@_[0], @_[1], @_[2]) :
 	          CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
 }
 
@@ -57,14 +57,14 @@ sub chr (_) {
 sub index ($$;$) {
     BEGIN { utf8::import() }
     return
-	@_ == 2 ? CORE::index(@_[0], @_[1]) :
+	(nelems @_) == 2 ? CORE::index(@_[0], @_[1]) :
 	          CORE::index(@_[0], @_[1], @_[2]) ;
 }
 
 sub rindex ($$;$) {
     BEGIN { utf8::import() }
     return
-	@_ == 2 ? CORE::rindex(@_[0], @_[1]) :
+	(nelems @_) == 2 ? CORE::rindex(@_[0], @_[1]) :
 	          CORE::rindex(@_[0], @_[1], @_[2]) ;
 }
 

@@ -27,7 +27,7 @@ From the parrot test t/pmc/object-meths.t
     package t::lib::F; use mro 'c3'; use base ('t::lib::C', 't::lib::D');
 }
 
-ok(eq_array(
+ok( <eq_array( <
     mro::get_linear_isa('t::lib::F'),
     \@( qw(t::lib::F t::lib::C t::lib::D t::lib::A t::lib::B t::lib::E) )
 ), '... got the right MRO for t::lib::F');  

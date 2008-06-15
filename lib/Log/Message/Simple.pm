@@ -128,7 +128,7 @@ Exported by default, or using the C<:STD> tag.
         my $msg     = '['. $self->tag . '] ' . $self->message;
 
         print $Log::Message::Simple::STACKTRACE_ON_ERROR 
-                    ? Carp::shortmess($msg) 
+                    ? < Carp::shortmess($msg) 
                     : $msg . "\n";
 
         select $old_fh;
@@ -194,19 +194,19 @@ BEGIN {
     use Params::Check   qw[ check ];
     use vars            qw[ @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA ];;
 
-    @ISA            = 'Exporter';
-    @EXPORT         = qw[error msg debug];
-    @EXPORT_OK      = qw[carp cluck croak confess];
+    @ISA            = @( 'Exporter' );
+    @EXPORT         = @( qw[error msg debug] );
+    @EXPORT_OK      = @( qw[carp cluck croak confess] );
     
-    %EXPORT_TAGS    = (
+    %EXPORT_TAGS    = %(
         STD     => \@EXPORT,
         CARP    => \@EXPORT_OK,
-        ALL     => \@( @EXPORT, @EXPORT_OK ),
+        ALL     => \@( < @EXPORT, < @EXPORT_OK ),
     );        
 
     my $log         = Log::Message->new();
 
-    for my $func ( @EXPORT, @EXPORT_OK ) {
+    for my $func ( < @EXPORT, < @EXPORT_OK ) {
                         ### up the carplevel for the carp emulation
                         ### functions
         *{Symbol::fetch_glob($func)}
@@ -216,13 +216,13 @@ BEGIN {
                                 message => $msg,
                                 tag     => uc $func,
                                 level   => $func,
-                                extra   => \@(@_)
+                                extra   => \@(< @_)
                         );
                 };
     }
 
     sub flush {
-        return @{\@( reverse $log->flush )};
+        return @{\@( reverse < $log->flush )};
     }
 
     sub stack {
@@ -237,7 +237,7 @@ BEGIN {
                         '[' . $_->tag . '] [' . $_->when . '] ' .
                         ($trace ? $_->message . ' ' . $_->longmess
                                 : $_->message);
-                    } __PACKAGE__->stack;
+                    } < __PACKAGE__->stack;
     }
 }
 

@@ -28,7 +28,7 @@ $_->{write_c} = \@(1..length($_->{data})),
     for (); # $t1, $t2;
 
 my $c;	# len write tests, for each: one _all test, and 3 each len+2
-$c += @{$_->{write_c}} * (1 + 3*@{$_->{read_c}}) for $t1, $t2;
+$c += (nelems @{$_->{write_c}}) * (1 + 3*nelems @{$_->{read_c}}) for $t1, $t2;
 $c *= 3*2*2;	# $how_w, file/pipe, 2 reports
 
 $c += 6;	# Tests with sleep()...
@@ -40,7 +40,7 @@ $set_out = "binmode STDOUT, ':crlf'"
     if defined  $main::use_crlf && $main::use_crlf == 1;
 
 sub testread ($$$$$$$) {
-  my ($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) = @_;
+  my ($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) = < @_;
   my $buf = '';
   if ($how_r eq 'readline_all') {
     $buf .= $_ while ~< $fh;
@@ -64,7 +64,7 @@ sub testread ($$$$$$$) {
 }
 
 sub testpipe ($$$$$$) {
-  my ($str, $write_c, $read_c, $how_w, $how_r, $why) = @_;
+  my ($str, $write_c, $read_c, $how_w, $how_r, $why) = < @_;
   (my $quoted = $str) =~ s/\n/\\n/g;;
   my $fh;
   if ($how_w eq 'print') {	# AUTOFLUSH???
@@ -86,8 +86,8 @@ sub testpipe ($$$$$$) {
 }
 
 sub testfile ($$$$$$) {
-  my ($str, $write_c, $read_c, $how_w, $how_r, $why) = @_;
-  my @data = grep length, split m/(.{1,$write_c})/s, $str;
+  my ($str, $write_c, $read_c, $how_w, $how_r, $why) = < @_;
+  my @data = @( grep length, split m/(.{1,$write_c})/s, $str );
 
   open my $fh, '>', 'io_io.tmp' or die;
   select $fh;
@@ -95,12 +95,12 @@ sub testfile ($$$$$$) {
       if defined $main::use_crlf && $main::use_crlf == 1;
   if ($how_w eq 'print') {	# AUTOFLUSH???
     $| = 0;
-    print $fh $_ for @data;
+    print $fh $_ for < @data;
   } elsif ($how_w eq 'print/flush') {
     $| = 1;
-    print $fh $_ for @data;
+    print $fh $_ for < @data;
   } elsif ($how_w eq 'syswrite') {
-    syswrite $fh, $_ for @data;
+    syswrite $fh, $_ for < @data;
   } else {
     die "Unrecognized write: '$how_w'";
   }
@@ -120,8 +120,8 @@ $c = undef;
 my @c;
 push @c, ord $c while $c = getc $fh;
 ok(1, 'got chars');
-is(scalar @c, 9, 'got 9 chars');
-is("@c", '97 10 98 10 10 99 10 10 10', 'got expected chars');
+is(scalar nelems @c, 9, 'got 9 chars');
+is("{join ' ', <@c}", '97 10 98 10 10 99 10 10 10', 'got expected chars');
 ok(close($fh), 'close');
 
 for my $s (1..2) {
@@ -129,8 +129,8 @@ for my $s (1..2) {
   my $str = $t->{data};
   my $r = $t->{read_c};
   my $w = $t->{write_c};
-  for my $read_c (@$r) {
-    for my $write_c (@$w) {
+  for my $read_c (< @$r) {
+    for my $write_c (< @$w) {
       for my $how_r (qw(readline_all readline read sysread)) {
 	next if $how_r eq 'readline_all' and $read_c != 1;
         for my $how_w (qw(print print/flush syswrite)) {

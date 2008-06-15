@@ -26,16 +26,16 @@ is( $v,	9,	'4-arg divide');
 $v = reduce { $a / $b } 6;
 is( $v,	6,	'one arg');
 
-my @a = map { rand } 0 .. 20;
-$v = reduce { $a +< $b ? $a : $b } @a;
-is( $v,	min(@a),	'min');
+my @a = @( map { rand } 0 .. 20 );
+$v = reduce { $a +< $b ? $a : $b } < @a;
+is( $v,	min(< @a),	'min');
 
-@a = map { pack("C", int(rand(256))) } 0 .. 20;
-$v = reduce { $a . $b } @a;
-is( $v,	join("",@a),	'concat');
+@a = @( map { pack("C", int(rand(256))) } 0 .. 20 );
+$v = reduce { $a . $b } < @a;
+is( $v,	join("",< @a),	'concat');
 
 sub add {
-  my($aa, $bb) = @_;
+  my($aa, $bb) = < @_;
   return $aa + $bb;
 }
 
@@ -130,11 +130,11 @@ if (!$::PERL_ONLY) { SKIP: {
       if !$List::Util::REAL_MULTICALL;
 
     # Can we goto a label from the reduction sub?
-    try {()=reduce{goto foo} 1,2; foo: 1};
+    try {()= <reduce{goto foo} 1,2; foo: 1};
     like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
-    try {()=reduce{goto sub{}} 1,2;};
+    try {()= <reduce{goto sub{}} 1,2;};
     like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 } }

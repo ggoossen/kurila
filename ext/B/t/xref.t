@@ -30,7 +30,7 @@ open STDOUT, ">&", \*SAVEOUT or diag $!;
 # Now parse the output
 # line 200
 my ($curfile, $cursub, $curpack) = ('') x 3;
-our %xreftable = ();
+our %xreftable = %( () );
 open XREF, "<", $file or die "# Can't open $file: $!\n";
 while ( ~< *XREF) {
     chomp;
@@ -109,6 +109,6 @@ END {
 
 # line 1000
 package Testing::Xref;
-sub foo { print FOO %::xreftable; }
-sub bar { print FOO foo; }
+sub foo { print FOO < %::xreftable; }
+sub bar { print FOO < foo; }
 

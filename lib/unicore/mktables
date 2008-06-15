@@ -33,7 +33,7 @@ my $UseDir         = "";
 my $FileList       = "$0.lst";
 my $MakeList       = 0;
 
-while (@ARGV)
+while ((nelems @ARGV))
 {
     my $arg = shift @ARGV;
     if ($arg eq '-v') {
@@ -86,26 +86,26 @@ if ($FileList) {
             push @$list, $file;
         }
         my %dupe;
-        @$list = grep !%dupe{ $_ }++, @$list;
+        @$list = @( grep !%dupe{ $_ }++, < @$list );
     }
     close $fh;
     die "No input or output files in '$FileList'!"
-        if !@input or !@output;
+        if !nelems @input or !nelems @output;
     if ( $MakeList ) {
-        foreach my $file (@output) {
+        foreach my $file (< @output) {
             unlink $file;
         }
     }            
     if ( $Verbose ) {
-        print "Expecting ".scalar( @input )." input files. ",
-              "Checking ".scalar( @output )." output files.\n";
+        print "Expecting ".scalar( nelems @input )." input files. ",
+              "Checking ".scalar( nelems @output )." output files.\n";
     }
     # we set maxtime to be the youngest input file, including $0 itself.
     my $maxtime = -M $0; # do this before the chdir!
     if ($UseDir) {
         chdir $UseDir or die "Failed to chdir to '$UseDir':$!";
     }
-    foreach my $in (@input) {
+    foreach my $in (< @input) {
         my $time = -M $in;
         die "Missing input file '$in'" unless defined $time;
         $maxtime = $time if $maxtime +< $time;
@@ -114,7 +114,7 @@ if ($FileList) {
     # now we check to see if any output files are older than maxtime, if
     # they are we need to continue on, otherwise we can presumably bail.
     my $ok = 1;
-    foreach my $out (@output) {
+    foreach my $out (< @output) {
         if ( ! -e $out ) {
             print "'$out' is missing.\n"
                 if $Verbose;
@@ -144,7 +144,7 @@ if ($FileList) {
 }
 
 foreach my $lib ('To', 'lib',
-		 map {File::Spec->catdir("lib",$_)}
+		 map { <File::Spec->catdir("lib",$_)}
 		 qw(gc_sc dt bc hst ea jt lb nt ccc)) {
   next if -d $lib;
   mkdir $lib, 0755 or die "mkdir '$lib': $!";
@@ -177,9 +177,9 @@ sub WriteIfChanged($\@)
     my $file  = shift;
     my $lines = shift;
 
-    $file = File::Spec->catfile(@$file) if ref $file;
+    $file = File::Spec->catfile(< @$file) if ref $file;
 
-    my $TextToWrite = join '', @$lines;
+    my $TextToWrite = join '', < @$lines;
     if (open IN, "<", $file) {
         local($/) = undef;
         my $PreviousText = ~< *IN;
@@ -255,11 +255,11 @@ sub Build_Aliases()
 
     # Placate the warnings about used only once. (They are used again, but
     # via a typeglob lookup)
-    %utf8::PropertyAlias = ();
-    %utf8::PA_reverse = ();
-    %utf8::PropValueAlias = ();
-    %utf8::PVA_reverse = ();
-    %utf8::PVA_abbr_map = ();
+    %utf8::PropertyAlias = %( () );
+    %utf8::PA_reverse = %( () );
+    %utf8::PropValueAlias = %( () );
+    %utf8::PVA_reverse = %( () );
+    %utf8::PVA_abbr_map = %( () );
 
     open PA, "<", "PropertyAliases.txt"
 	or die "Can't open PropertyAliases.txt: $!";
@@ -288,7 +288,7 @@ sub Build_Aliases()
 	s/\s+$//;
 	next if m/^$/;
 
-	my ($prop, @data) = split m/\s*;\s*/;
+	my ($prop, < @data) = split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
 	    %PropValueAlias{$prop}->{@data[1]} = \@( @data[[0,2]] );
@@ -336,7 +336,7 @@ sub New_Prop($$$@)
     my $Table = shift;
 
     ## remaining args are optional key/val
-    my %Args = @_;
+    my %Args = %( < @_ );
 
     my $Fuzzy = delete %Args{Fuzzy};
     my $Desc  = delete %Args{Desc}; # description
@@ -373,7 +373,7 @@ sub New_Prop($$$@)
 sub Table::New
 {
     my $class = shift;
-    my %Args = @_;
+    my %Args = %( < @_ );
 
     my $Table = bless \@(), $class;
 
@@ -415,7 +415,7 @@ sub Table::Replace($$)
     my $Table = shift; #self
     my $New   = shift;
 
-    @$Table = @$New;
+    @$Table = @( < @$New );
 }
 
 ##
@@ -527,7 +527,7 @@ sub Table::Invert
 
     my $New = Table->New();
     my $max = -1;
-    for my $range (@$Table)
+    for my $range (< @$Table)
     {
         my $start = $range->[RANGE_START];
         my $end   = $range->[RANGE_END];
@@ -554,15 +554,15 @@ sub Table::Invert
 sub Table::Merge
 {
     shift(@_) if not ref @_[0]; ## if called as a constructor, lose the class
-    my @Tables = @_;
+    my @Tables = @( < @_ );
 
     ## Accumulate all records from all tables
     my @Records;
-    for my $Arg (@Tables)
+    for my $Arg (< @Tables)
     {
         if (ref $Arg) {
             ## arg is a table -- get its ranges
-            push @Records, @$Arg;
+            push @Records, < @$Arg;
         } else {
             ## arg is a codepoint, make a range
             push @Records, \@( $Arg, $Arg )
@@ -570,11 +570,11 @@ sub Table::Merge
     }
 
     ## sort by range start, with longer ranges coming first.
-    my ($first, @Rest) = sort {
+    my ($first, < @Rest) = sort {
         ($a->[RANGE_START] <+> $b->[RANGE_START])
           or
         ($b->[RANGE_END]   <+> $b->[RANGE_END])
-    } @Records;
+    } < @Records;
 
     my $New = Table->New();
 
@@ -583,7 +583,7 @@ sub Table::Merge
                       $first->[RANGE_END]);
 
     ## Fold in records so long as they add new information.
-    for my $set (@Rest)
+    for my $set (< @Rest)
     {
         my $start = $set->[RANGE_START];
         my $end   = $set->[RANGE_END];
@@ -608,7 +608,7 @@ sub Table::Write
     my $filename = shift;
     my $comment  = shift;
 
-    my @OUT = $HEADER;
+    my @OUT = @( $HEADER );
     if (defined $comment) {
         $comment =~ s/\s+\Z//;
         $comment =~ s/^/# /gm;
@@ -616,7 +616,7 @@ sub Table::Write
     }
     push @OUT, "return <<'END';\n";
 
-    for my $set (@$Table)
+    for my $set (< @$Table)
     {
         my $start = $set->[RANGE_START];
         my $end   = $set->[RANGE_END];
@@ -631,7 +631,7 @@ sub Table::Write
 
     push @OUT, "END\n";
 
-    WriteIfChanged($filename, @OUT);
+    WriteIfChanged($filename, < @OUT);
 }
 
 ## This used only for making the test script.
@@ -654,7 +654,7 @@ sub IsUsable($)
 sub Table::ValidCode
 {
     my $Table = shift; #self
-    for my $set (@$Table) {
+    for my $set (< @$Table) {
         return $set->[RANGE_END] if IsUsable($set->[RANGE_END]);
     }
     return ();
@@ -667,9 +667,9 @@ sub Table::InvalidCode
 {
     my $Table = shift; #self
 
-    return 0x1234 if not @$Table;
+    return 0x1234 if not nelems @$Table;
 
-    for my $set (@$Table)
+    for my $set (< @$Table)
     {
         if (IsUsable($set->[RANGE_END] + 1))
         {
@@ -705,7 +705,7 @@ sub New_Alias($$$@)
     my $Name   = shift;
 
     ## remaining args are optional key/val
-    my %Args = @_;
+    my %Args = %( < @_ );
 
     my $Fuzzy = delete %Args{Fuzzy};
 
@@ -751,12 +751,12 @@ my %Cat;
 sub simple_dumper {
     my @lines;
     my $item;
-    foreach $item (@_) {
+    foreach $item (< @_) {
 	if (ref $item) {
 	    if (ref $item eq 'ARRAY') {
-		push @lines, '\@('."\n", simple_dumper (@$item), "),\n";
+		push @lines, '\@('."\n", < simple_dumper (< @$item), "),\n";
 	    } elsif (ref $item eq 'HASH') {
-		push @lines, '\%('."\n", simple_dumper (%$item), "),\n";
+		push @lines, '\%('."\n", < simple_dumper (< %$item), "),\n";
 	    } else {
 		die "Can't cope with $item";
 	    }
@@ -838,7 +838,7 @@ sub UnicodeData_Txt()
         my ($name, ## Name ("LATIN CAPITAL LETTER A")
             $cat,  ## Category ("Lu", "Zp", "Nd", etc.)
             $code, ## Code point (as an integer)
-            $op) = @_;
+            $op) = < @_;
 
         my $MajorCat = substr($cat, 0, 1); ## L, M, Z, S, etc
 
@@ -1037,7 +1037,7 @@ sub UnicodeData_Txt()
     ## Unassigned is the same as 'Cn'
     New_Alias(Is => 'Unassigned', SameAs => 'Cn', Fuzzy => 0);
 
-    %Cat{C}->Replace(%Cat{C}->Merge(%Cat{Cn}));  ## Now merge in Cn into C
+    %Cat{C}->Replace( <%Cat{C}->Merge(%Cat{Cn}));  ## Now merge in Cn into C
 
 
     # LC is Ll, Lu, and Lt.
@@ -1110,16 +1110,16 @@ sub UnicodeData_Txt()
     $Name->Write("Name.pl");
 
     {
-	my @PVA = $HEADER;
+	my @PVA = @( $HEADER );
 	foreach my $name (qw (PropertyAlias PA_reverse PropValueAlias
 			      PVA_reverse PVA_abbr_map)) {
 	    # Should I really jump through typeglob hoops just to avoid a
 	    # symbolic reference? (%{"utf8::$name})
-	    push @PVA, "\n", "\%utf8::$name = (\n",
-		simple_dumper (%{%utf8::{$name}}), ");\n";
+	    push @PVA, "\n", "\%utf8::$name = (\n", <
+		simple_dumper (< %{%utf8::{$name}}), ");\n";
 	}
 	push @PVA, "1;\n";
-	WriteIfChanged("PVA.pl", @PVA);
+	WriteIfChanged("PVA.pl", < @PVA);
     }
 
     # $Bidi->Write("Bidirectional.pl");
@@ -1132,7 +1132,7 @@ sub UnicodeData_Txt()
 
     $Comb->Write("CombiningClass.pl");
     for (keys %{ %PropValueAlias{ccc} }) {
-	my ($code, $name) = @{ %PropValueAlias{ccc}->{$_} };
+	my ($code, $name) = < @{ %PropValueAlias{ccc}->{$_} };
 	(my $c = Table->New())->Append($code);
 	$c->Write(
 	    \@("lib","ccc","$_.pl"),
@@ -1362,9 +1362,9 @@ sub Scripts_txt()
     my %Script;
     my $Scripts = Table->New();
 
-    for my $script (sort { $a->[0] <+> $b->[0] } @ScriptInfo)
+    for my $script (sort { $a->[0] <+> $b->[0] } < @ScriptInfo)
     {
-        my ($first, $last, $name) = @$script;
+        my ($first, $last, $name) = < @$script;
         $Scripts->Append($first, $name);
 
         %Script{$name} ||= Table->New(Is    => $name,
@@ -1471,9 +1471,9 @@ sub PropList_txt()
     my $Props = Table->New();
     my %Prop;
 
-    for my $prop (sort { $a->[0] <+> $b->[0] } @PropInfo)
+    for my $prop (sort { $a->[0] <+> $b->[0] } < @PropInfo)
     {
-        my ($first, $last, $name) = @$prop;
+        my ($first, $last, $name) = < @$prop;
         $Props->Append($first, $name);
 
         %Prop{$name} ||= Table->New(Is    => $name,
@@ -1600,7 +1600,7 @@ sub ExpectError($$)
 }
 
 ## This used only for making the test script
-my @GoodSeps = (
+my @GoodSeps = @(
                 " ",
                 "-",
                 " \t ",
@@ -1608,7 +1608,7 @@ my @GoodSeps = (
                 "",
                 "_",
                );
-my @BadSeps = (
+my @BadSeps = @(
                "--",
                "__",
                " _",
@@ -1624,12 +1624,12 @@ sub RandomlyFuzzifyName($;$)
     my @parts;
     for my $part (split m/[-\s_]+/, $Name)
     {
-        if (@parts) {
+        if ((nelems @parts)) {
             if ($WantError and rand() +< 0.3) {
-                push @parts, @BadSeps[rand(@BadSeps)];
+                push @parts, @BadSeps[rand(nelems @BadSeps)];
                 $WantError = 0;
             } else {
-                push @parts, @GoodSeps[rand(@GoodSeps)];
+                push @parts, @GoodSeps[rand(nelems @GoodSeps)];
             }
         }
         my $switch = int rand(4);
@@ -1643,13 +1643,13 @@ sub RandomlyFuzzifyName($;$)
             push @parts, $part;
         }
     }
-    my $new = join('', @parts);
+    my $new = join('', < @parts);
 
     if ($WantError) {
         if (rand() +>= 0.5) {
-            $new .= @BadSeps[rand(@BadSeps)];
+            $new .= @BadSeps[rand(nelems @BadSeps)];
         } else {
-            $new = @BadSeps[rand(@BadSeps)] . $new;
+            $new = @BadSeps[rand(nelems @BadSeps)] . $new;
         }
     }
     return $new;
@@ -1676,9 +1676,9 @@ sub MakePropTestScript()
     while (my ($Name, $Table) = each %FuzzyNameToTest)
     {
         my $Orig  = %CanonicalToOrig{$Name};
-        my %Names = (
+        my %Names = %(
                      $Name => 1,
-                     $Orig => 1,
+                     $Orig => 1, <
                      RandomlyFuzzifyName($Orig) => 1
                     );
 
@@ -1817,7 +1817,7 @@ sub WriteAllMappings()
             {
                 my $Desc = %TableDesc{$Type}->{$Name} || "";
                 ## get list of names this table is reference by
-                my @Supported = $Name;
+                my @Supported = @( $Name );
                 while (my ($Orig, $Alias) = each %{ %AliasInfo{$Type} })
                 {
                     if ($Orig eq $Name) {
@@ -1829,7 +1829,7 @@ sub WriteAllMappings()
                 my $OrigProp;
 
                 $Comment = "This file supports:\n";
-                for my $N (@Supported)
+                for my $N (< @Supported)
                 {
                     my $IsFuzzy = %FuzzyNames{$Type}->{$N};
                     my $Prop    = "\\p\{$TypeToShow$Name\}";
@@ -1895,23 +1895,23 @@ sub WriteAllMappings()
     ## Write out the property list
     ##
     {
-        my @OUT = (
+        my @OUT = @(
                    "##\n",
                    "## This file created by $0\n",
                    "## List of built-in \\p\{...\}/\\P\{...\} properties.\n",
                    "##\n",
                    "## '*' means name may be 'fuzzy'\n",
                    "##\n\n",
-                   sort { substr($a,2) cmp substr($b, 2) } @MAP,
+                   sort { substr($a,2) cmp substr($b, 2) } < @MAP,
                   );
-        WriteIfChanged('Properties', @OUT);
+        WriteIfChanged('Properties', < @OUT);
     }
 
     use Text::Tabs ();  ## using this makes the files about half the size
 
     ## Write Exact.pl
     {
-        my @OUT = (
+        my @OUT = @(
                    $HEADER,
                    "##\n",
                    "## Data in this file used by ../utf8_heavy.pl\n",
@@ -1926,16 +1926,16 @@ sub WriteAllMappings()
             my $File = %Exact{$Name};
             $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
             my $Text = sprintf("\%-15s => \%s,\n", $Name, qq/'$File'/);
-            push @OUT, Text::Tabs::unexpand($Text);
+            push @OUT, < Text::Tabs::unexpand($Text);
         }
         push @OUT, ");\n1;\n";
 
-        WriteIfChanged('Exact.pl', @OUT);
+        WriteIfChanged('Exact.pl', < @OUT);
     }
 
     ## Write Canonical.pl
     {
-        my @OUT = (
+        my @OUT = @(
                    $HEADER,
                    "##\n",
                    "## Data in this file used by ../utf8_heavy.pl\n",
@@ -1956,10 +1956,10 @@ sub WriteAllMappings()
             }
             $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
             my $Text = sprintf("  \%-41s => \%s,\n$Trail", $Name, qq/'$File'/);
-            push @OUT, Text::Tabs::unexpand($Text);
+            push @OUT, < Text::Tabs::unexpand($Text);
         }
         push @OUT, ");\n1\n";
-        WriteIfChanged('Canonical.pl', @OUT);
+        WriteIfChanged('Canonical.pl', < @OUT);
     }
 
     MakePropTestScript() if $MakeTestScript;
@@ -2009,14 +2009,14 @@ sub SpecialCasing_txt()
         my $NormalCase = do "To/$case.pl" || die "$0: $@\n";
 
         my @OUT =
-	    (
+	    @(
 	     $HEADER, "\n",
 	     "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
 	     "\%utf8::ToSpec$case =\n(\n",
 	    );
 
-        for my $prop (sort { $a->[0] <+> $b->[0] } @{%CaseInfo{$case}}) {
-            my ($ix, $code, $to) = @$prop;
+        for my $prop (sort { $a->[0] <+> $b->[0] } < @{%CaseInfo{$case}}) {
+            my ($ix, $code, $to) = < @$prop;
             my $tostr =
               join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', $to;
             push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ } unpack("U0C*", pack("U", $ix)));
@@ -2031,7 +2031,7 @@ sub SpecialCasing_txt()
                     $NormalCase,
                     "END\n"
                     );
-        WriteIfChanged(\@("To","$case.pl"), @OUT);
+        WriteIfChanged(\@("To","$case.pl"), < @OUT);
     }
 }
 
@@ -2072,7 +2072,7 @@ sub CaseFolding_txt()
     my $CommonFold = do "To/Fold.pl" || die "$0: To/Fold.pl: $!\n";
 
     my @OUT =
-	(
+	@(
 	 $HEADER, "\n",
 	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
 	 "\%utf8::ToSpecFold =\n(\n",
@@ -2089,7 +2089,7 @@ sub CaseFolding_txt()
                 "END\n",
                );
 
-    WriteIfChanged(\@("To","Fold.pl"), @OUT);
+    WriteIfChanged(\@("To","Fold.pl"), < @OUT);
 }
 
 ## Do it....
@@ -2135,9 +2135,9 @@ if ( $FileList and $MakeList ) {
 # Input files:
 
 EOFHEADER
-    my @input=("version",glob('*.txt'));
+    my @input=@("version",glob( <'*.txt'));
     print $ofh "$_\n" for 
-        @input,
+        < @input,
         "\n=================================\n",
         "# Output files:\n",
         # special files
@@ -2157,13 +2157,13 @@ EOFHEADER
         },
     ),"."); 
     
-    print $ofh "\n# ",scalar(@input)," input files\n",
+    print $ofh "\n# ",scalar(nelems @input)," input files\n",
                "# ",scalar($count+1)," output files\n\n",
                "# End list\n";  
     close $ofh 
         or warn "Failed to close $ofh: $!";
     
-    print "Filelist has ",scalar(@input)," input files and ",
+    print "Filelist has ",scalar(nelems @input)," input files and ",
           scalar($count+1)," output files\n"
         if $Verbose;
 }

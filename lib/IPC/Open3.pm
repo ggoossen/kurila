@@ -10,8 +10,8 @@ use Carp;
 use Symbol qw(gensym qualify);
 
 $VERSION	= 1.02;
-@ISA		= qw(Exporter);
-@EXPORT		= qw(open3);
+@ISA		= @( qw(Exporter) );
+@EXPORT		= @( qw(open3) );
 
 =head1 NAME
 
@@ -180,10 +180,10 @@ my $do_spawn = $^O eq 'os2' || $^O eq 'MSWin32';
 
 sub _open3 {
     local $Me = shift;
-    my($package, $dad_wtr, $dad_rdr, $dad_err, @cmd) = @_;
+    my($package, $dad_wtr, $dad_rdr, $dad_err, < @cmd) = < @_;
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
-    if (@cmd +> 1 and @cmd[0] eq '-') {
+    if ((nelems @cmd) +> 1 and @cmd[0] eq '-') {
 	croak "Arguments don't make sense when the command is '-'"
     }
 
@@ -252,7 +252,7 @@ sub _open3 {
 		# I have to use a fileno here because in this one case
 		# I'm doing a dup but the filehandle might be a reference
 		# (from the special case above).
-		xopen \*STDERR, ">&", xfileno($dad_err)
+		xopen \*STDERR, ">&", < xfileno($dad_err)
 		    if fileno(STDERR) != xfileno($dad_err);
 	    } else {
 		xclose $dad_err;
@@ -263,8 +263,8 @@ sub _open3 {
 	}
 	return 0 if (@cmd[0] eq '-');
 	local($")=(" ");
-	exec @cmd or do {
-	    carp "$Me: exec of @cmd failed";
+	exec < @cmd or do {
+	    carp "$Me: exec of {join ' ', <@cmd} failed";
 	    try { require POSIX; POSIX::_exit(255); };
 	    exit 255;
 	};
@@ -306,7 +306,7 @@ sub _open3 {
 				  \%( mode => 'w',
 				    open_as => $kid_err,
 				    handle => \*STDERR ),
-				), \@close, @cmd);
+				), \@close, < @cmd);
 	};
 	die "$Me: $@" if $@;
     }
@@ -323,11 +323,11 @@ sub _open3 {
 }
 
 sub open3 {
-    if (@_ +< 4) {
+    if ((nelems @_) +< 4) {
 	local $" = ', ';
-	croak "open3(@_): not enough arguments";
+	croak "open3({join ' ', <@_}): not enough arguments";
     }
-    return _open3 'open3', scalar caller, @_
+    return _open3 'open3', scalar caller, < @_
 }
 
 sub spawn_with_handles {
@@ -336,11 +336,11 @@ sub spawn_with_handles {
     my ($fd, $pid, @saved_fh, $saved, %saved, @errs);
     require Fcntl;
 
-    foreach $fd (@$fds) {
+    foreach $fd (< @$fds) {
 	$fd->{tmp_copy} = IO::Handle->new_from_fd($fd->{handle}, $fd->{mode});
 	%saved{fileno $fd->{handle}} = $fd->{tmp_copy};
     }
-    foreach $fd (@$fds) {
+    foreach $fd (< @$fds) {
 	bless $fd->{handle}, 'IO::Handle'
 	    unless try { $fd->{handle}->isa('IO::Handle') } ;
 	# If some of handles to redirect-to coincide with handles to
@@ -350,22 +350,22 @@ sub spawn_with_handles {
     }
     unless ($^O eq 'MSWin32') {
 	# Stderr may be redirected below, so we save the err text:
-	foreach $fd (@$close_in_child) {
+	foreach $fd (< @$close_in_child) {
 	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $!"
 		unless %saved{fileno $fd}; # Do not close what we redirect!
 	}
     }
 
-    unless (@errs) {
-	$pid = try { system 1, @_ }; # 1 == P_NOWAIT
+    unless (nelems @errs) {
+	$pid = try { system 1, < @_ }; # 1 == P_NOWAIT
 	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid +< 0;
     }
 
-    foreach $fd (@$fds) {
+    foreach $fd (< @$fds) {
 	$fd->{handle}->fdopen($fd->{tmp_copy}, $fd->{mode});
 	$fd->{tmp_copy}->close or croak "Can't close: $!";
     }
-    croak join "\n", @errs if @errs;
+    croak join "\n", < @errs if (nelems @errs);
     return $pid;
 }
 

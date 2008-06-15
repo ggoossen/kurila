@@ -6,10 +6,10 @@ use vars qw($VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK);
 require Exporter;
 require DynaLoader;
 
-@ISA = qw(Exporter DynaLoader);
+@ISA = @( qw(Exporter DynaLoader) );
 
-@EXPORT = qw( );
-@EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
+@EXPORT = @( qw( ) );
+@EXPORT_OK = @( qw (usleep sleep ualarm alarm gettimeofday time tv_interval
 		 getitimer setitimer nanosleep clock_gettime clock_getres
 		 clock clock_nanosleep
 		 CLOCK_HIGHRES CLOCK_MONOTONIC CLOCK_PROCESS_CPUTIME_ID
@@ -21,14 +21,14 @@ require DynaLoader;
 		 d_nanosleep d_clock_gettime d_clock_getres
 		 d_clock d_clock_nanosleep
 		 stat
-		);
+		) );
 
 $VERSION = v1.9712;
 $XS_VERSION = $VERSION;
 
 sub import {
     my $this = shift;
-    for my $i (@_) {
+    for my $i (< @_) {
 	if (($i eq 'clock_getres'    && !&d_clock_getres)    ||
 	    ($i eq 'clock_gettime'   && !&d_clock_gettime)   ||
 	    ($i eq 'clock_nanosleep' && !&d_clock_nanosleep) ||
@@ -40,7 +40,7 @@ sub import {
 	    Carp::croak("Time::HiRes::$i(): unimplemented in this platform");
 	}
     }
-    Time::HiRes->export_to_level(1, $this, @_);
+    Time::HiRes->export_to_level(1, $this, < @_);
 }
 
 Time::HiRes->bootstrap();
@@ -49,8 +49,8 @@ Time::HiRes->bootstrap();
 
 sub tv_interval {
     # probably could have been done in C
-    my ($a, $b) = @_;
-    $b = \@(gettimeofday()) unless defined($b);
+    my ($a, $b) = < @_;
+    $b = \@( <gettimeofday()) unless defined($b);
     (@{$b}[0] - @{$a}[0]) + ((@{$b}[1] - @{$a}[1]) / 1_000_000);
 }
 

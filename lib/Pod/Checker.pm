@@ -344,12 +344,12 @@ use Exporter;
 use Pod::Parser;
 
 use vars qw(@ISA @EXPORT);
-@ISA = qw(Pod::Parser);
-@EXPORT = qw(&podchecker);
+@ISA = @( qw(Pod::Parser) );
+@EXPORT = @( qw(&podchecker) );
 
 use vars qw(%VALID_COMMANDS %VALID_SEQUENCES);
 
-my %VALID_COMMANDS = (
+my %VALID_COMMANDS = %(
     'pod'    =>  1,
     'cut'    =>  1,
     'head1'  =>  1,
@@ -365,7 +365,7 @@ my %VALID_COMMANDS = (
     'encoding' => '1',
 );
 
-my %VALID_SEQUENCES = (
+my %VALID_SEQUENCES = %(
     'I'  =>  1,
     'B'  =>  1,
     'S'  =>  1,
@@ -378,7 +378,7 @@ my %VALID_SEQUENCES = (
 );
 
 # stolen from HTML::Entities
-my %ENTITIES = (
+my %ENTITIES = %(
  # Some normal chars that have special meaning in SGML context
  amp    => '&',  # ampersand 
 'gt'    => '>',  # greater than
@@ -499,7 +499,7 @@ my %ENTITIES = (
 ##---------------------------------
 
 sub podchecker( $ ; $ % ) {
-    my ($infile, $outfile, %options) = @_;
+    my ($infile, $outfile, < %options) = < @_;
     local $_;
 
     ## Set defaults
@@ -507,7 +507,7 @@ sub podchecker( $ ; $ % ) {
     $outfile ||= \*STDERR;
 
     ## Now create a pod checker
-    my $checker = Pod::Checker->new(%options);
+    my $checker = Pod::Checker->new(< %options);
 
     ## Now check the pod document for errors
     $checker->parse_from_file($infile, $outfile);
@@ -605,10 +605,10 @@ The error level, should be 'WARNING' or 'ERROR'.
 # Invoked as $self->poderror( @args ), or $self->poderror( {%opts}, @args )
 sub poderror {
     my $self = shift;
-    my %opts = (ref @_[0]) ? %{shift()} : ();
+    my %opts = %( (ref @_[0]) ? < %{shift()} : () );
 
     ## Retrieve options
-    chomp( my $msg  = (%opts{-msg} || "")."@_" );
+    chomp( my $msg  = (%opts{-msg} || "")."{join ' ', <@_}" );
     my $line = (exists %opts{-line}) ? " at line %opts{-line}" : "";
     my $file = (exists %opts{-file}) ? " in file %opts{-file}" : "";
     unless (exists %opts{-severity}) {
@@ -638,7 +638,7 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors {
-   return (@_ +> 1) ? (@_[0]->{_NUM_ERRORS} = @_[1]) : @_[0]->{_NUM_ERRORS};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{_NUM_ERRORS} = @_[1]) : @_[0]->{_NUM_ERRORS};
 }
 
 ##################################
@@ -650,7 +650,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings {
-   return (@_ +> 1) ? (@_[0]->{_NUM_WARNINGS} = @_[1]) : @_[0]->{_NUM_WARNINGS};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{_NUM_WARNINGS} = @_[1]) : @_[0]->{_NUM_WARNINGS};
 }
 
 ##################################
@@ -663,8 +663,8 @@ found in the C<=head1 NAME> section.
 =cut
 
 sub name {
-    return (@_ +> 1 && @_[1]) ?
-        (@_[0]->{-name} = @_[1]) : @_[0]->{-name};  
+    return ((nelems @_) +> 1 && @_[1]) ?
+         @(@_[0]->{-name} = @_[1]) : @_[0]->{-name};  
 }
 
 ##################################
@@ -679,7 +679,7 @@ collapsed to a single blank.
 =cut
 
 sub node {
-    my ($self,$text) = @_;
+    my ($self,$text) = < @_;
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -689,7 +689,7 @@ sub node {
         $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    @{$self->{_nodes}};
+    < @{$self->{_nodes}};
 }
 
 ##################################
@@ -704,7 +704,7 @@ of whitespace is collapsed to a single blank.
 
 # set/return index entries of current POD
 sub idx {
-    my ($self,$text) = @_;
+    my ($self,$text) = < @_;
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -714,7 +714,7 @@ sub idx {
         $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    @{$self->{_index}};
+    < @{$self->{_index}};
 }
 
 ##################################
@@ -736,7 +736,7 @@ sub hyperlink {
         push(@{$self->{_links}}, @_[0]);
         return @_[0];
     }
-    @{$self->{_links}};
+    < @{$self->{_links}};
 }
 
 ## overrides for Pod::Parser
@@ -747,7 +747,7 @@ sub end_pod {
     my $self   = shift;
     my $infile = $self->input_file();
 
-    if(@{$self->{_list_stack}}) {
+    if((nelems @{$self->{_list_stack}})) {
         my $list;
         while(($list = $self->_close_list('EOF',$infile)) &&
           $list->indent() ne 'auto') {
@@ -760,7 +760,7 @@ sub end_pod {
     # check validity of document internal hyperlinks
     # first build the node names from the paragraph text
     my %nodes;
-    foreach($self->node()) {
+    foreach( <$self->node()) {
         %nodes{$_} = 1;
         if(m/^(\S+)\s+\S/) {
             # we have more than one word. Use the first as a node, too.
@@ -768,15 +768,15 @@ sub end_pod {
             %nodes{$1} ||= 2; # derived node
         }
     }
-    foreach($self->idx()) {
+    foreach( <$self->idx()) {
         %nodes{$_} = 3; # index node
     }
-    foreach($self->hyperlink()) {
-        my ($line,$link) = @$_;
+    foreach( <$self->hyperlink()) {
+        my ($line,$link) = < @$_;
         # _TODO_ what if there is a link to the page itself by the name,
         # e.g. in Tk::Pod : L<Tk::Pod/"DESCRIPTION">
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink') {
-            my $node = $self->_check_ptree($self->parse_text($link->node(),
+            my $node = $self->_check_ptree( <$self->parse_text( <$link->node(),
                 $line), $line, $infile, 'L');
             if($node && !%nodes{$node}) {
                 $self->poderror(\%( -line => $line || '', -file => $infile,
@@ -803,8 +803,8 @@ sub end_pod {
 
 # check a POD command directive
 sub command { 
-    my ($self, $cmd, $paragraph, $line_num, $pod_para) = @_;
-    my ($file, $line) = $pod_para->file_line;
+    my ($self, $cmd, $paragraph, $line_num, $pod_para) = < @_;
+    my ($file, $line) = < $pod_para->file_line;
     ## Check the command syntax
     my $arg; # this will hold the command argument
     if (! %VALID_COMMANDS{$cmd}) {
@@ -834,7 +834,7 @@ sub command {
         }
         elsif($cmd eq 'item') {
             # are we in a list?
-            unless(@{$self->{_list_stack}}) {
+            unless(nelems @{$self->{_list_stack}}) {
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
                      -msg => "=item without previous =over" ));
@@ -898,7 +898,7 @@ sub command {
         }
         elsif($cmd eq 'back') {
             # check if we have an open list
-            unless(@{$self->{_list_stack}}) {
+            unless(nelems @{$self->{_list_stack}}) {
                 $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'ERROR', 
                          -msg => "=back without previous =over" ));
@@ -942,7 +942,7 @@ sub command {
             $self->{_commands_in_head} = -1;
             $self->{_last_head} = $hnum;
             # check if there is an open list
-            if(@{$self->{_list_stack}}) {
+            if((nelems @{$self->{_list_stack}})) {
                 my $list;
                 while(($list = $self->_close_list($line,$file)) &&
                   $list->indent() ne 'auto') {
@@ -1033,7 +1033,7 @@ sub command {
 
 sub _open_list
 {
-    my ($self,$indent,$line,$file) = @_;
+    my ($self,$indent,$line,$file) = < @_;
     my $list = Pod::List->new(
            -indent => $indent,
            -start => $line,
@@ -1045,7 +1045,7 @@ sub _open_list
 
 sub _close_list
 {
-    my ($self,$line,$file) = @_;
+    my ($self,$line,$file) = < @_;
     my $list = shift(@{$self->{_list_stack}});
     if(defined $self->{_list_item_contents} &&
       $self->{_list_item_contents} == 0) {
@@ -1059,19 +1059,19 @@ sub _close_list
 
 # process a block of some text
 sub interpolate_and_check {
-    my ($self, $paragraph, $line, $file) = @_;
+    my ($self, $paragraph, $line, $file) = < @_;
     ## Check the interior sequences in the command-text
     # and return the text
-    $self->_check_ptree(
+    $self->_check_ptree( <
         $self->parse_text($paragraph,$line), $line, $file, '');
 }
 
 sub _check_ptree {
-    my ($self,$ptree,$line,$file,$nestlist) = @_;
+    my ($self,$ptree,$line,$file,$nestlist) = < @_;
     local($_);
     my $text = '';
     # process each node in the parse tree
-    foreach(@$ptree) {
+    foreach(< @$ptree) {
         # regular text chunk
         unless(ref) {
             # count the unescaped angle brackets
@@ -1090,7 +1090,7 @@ sub _check_ptree {
         # have an interior sequence
         my $cmd = $_->cmd_name();
         my $contents = $_->parse_tree();
-        ($file,$line) = $_->file_line();
+        ($file,$line) = < $_->file_line();
         # check for valid tag
         if (! %VALID_SEQUENCES{$cmd}) {
             $self->poderror(\%( -line => $line, -file => $file,
@@ -1109,7 +1109,7 @@ sub _check_ptree {
         }
         if($cmd eq 'E') {
             # preserve entities
-            if(@$contents +> 1 || ref @$contents[0] || @$contents[0] !~ m/^\w+$/) {
+            if((nelems @$contents) +> 1 || ref @$contents[0] || @$contents[0] !~ m/^\w+$/) {
                 $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
                     -msg => "garbled entity " . $_->raw_text()));
@@ -1152,7 +1152,7 @@ sub _check_ptree {
         }
         elsif($cmd eq 'L') {
             # try to parse the hyperlink
-            my $link = Pod::Hyperlink->new($contents->raw_text());
+            my $link = Pod::Hyperlink->new( <$contents->raw_text());
             unless(defined $link) {
                 $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
@@ -1161,14 +1161,14 @@ sub _check_ptree {
             }
             $link->line($line); # remember line
             if($self->{-warnings}) {
-                foreach my $w ($link->warning()) {
+                foreach my $w ( <$link->warning()) {
                     $self->poderror(\%( -line => $line, -file => $file,
                         -severity => 'WARNING', 
                         -msg => $w ));
                 }
             }
             # check the link text
-            $text .= $self->_check_ptree($self->parse_text($link->text(),
+            $text .= $self->_check_ptree( <$self->parse_text( <$link->text(),
                 $line), $line, $file, "$nestlist$cmd");
             # remember link
             $self->hyperlink(\@($line,$link));
@@ -1207,12 +1207,12 @@ sub _check_ptree {
 # process a block of verbatim text
 sub verbatim { 
     ## Nothing particular to check
-    my ($self, $paragraph, $line_num, $pod_para) = @_;
+    my ($self, $paragraph, $line_num, $pod_para) = < @_;
 
     $self->_preproc_par($paragraph);
 
     if($self->{_current_head1} eq 'NAME') {
-        my ($file, $line) = $pod_para->file_line;
+        my ($file, $line) = < $pod_para->file_line;
         $self->poderror(\%( -line => $line, -file => $file,
             -severity => 'WARNING',
             -msg => 'Verbatim paragraph in NAME section' ));
@@ -1221,8 +1221,8 @@ sub verbatim {
 
 # process a block of regular text
 sub textblock { 
-    my ($self, $paragraph, $line_num, $pod_para) = @_;
-    my ($file, $line) = $pod_para->file_line;
+    my ($self, $paragraph, $line_num, $pod_para) = < @_;
+    my ($file, $line) = < $pod_para->file_line;
 
     $self->_preproc_par($paragraph);
 
@@ -1245,7 +1245,7 @@ sub _preproc_par
     if(@_[0]) {
         $self->{_commands_in_head}++;
         $self->{_list_item_contents}++ if(defined $self->{_list_item_contents});
-        if(@{$self->{_list_stack}} && !$self->{_list_stack}->[0]->item()) {
+        if((nelems @{$self->{_list_stack}}) && !$self->{_list_stack}->[0]->item()) {
             $self->{_list_stack}->[0]->{_has_par} = 1;
         }
     }

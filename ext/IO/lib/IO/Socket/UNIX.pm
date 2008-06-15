@@ -11,7 +11,7 @@ our(@ISA, $VERSION);
 use IO::Socket;
 use Carp;
 
-@ISA = qw(IO::Socket);
+@ISA = @( qw(IO::Socket) );
 $VERSION = "1.23";
 $VERSION = eval $VERSION;
 
@@ -19,12 +19,12 @@ IO::Socket::UNIX->register_domain( AF_UNIX );
 
 sub new {
     my $class = shift;
-    unshift(@_, "Peer") if @_ == 1;
-    return $class->SUPER::new(@_);
+    unshift(@_, "Peer") if (nelems @_) == 1;
+    return $class->SUPER::new(< @_);
 }
 
 sub configure {
-    my($sock,$arg) = @_;
+    my($sock,$arg) = < @_;
     my($bport,$cport);
 
     my $type = $arg->{Type} || SOCK_STREAM;
@@ -51,15 +51,15 @@ sub configure {
 }
 
 sub hostpath {
-    @_ == 1 or croak 'usage: $sock->hostpath()';
+    (nelems @_) == 1 or croak 'usage: $sock->hostpath()';
     my $n = @_[0]->sockname || return undef;
-    (sockaddr_un($n))[0];
+    ( <sockaddr_un($n))[0];
 }
 
 sub peerpath {
-    @_ == 1 or croak 'usage: $sock->peerpath()';
+    (nelems @_) == 1 or croak 'usage: $sock->peerpath()';
     my $n = @_[0]->peername || return undef;
-    (sockaddr_un($n))[0];
+    ( <sockaddr_un($n))[0];
 }
 
 1; # Keep require happy

@@ -25,7 +25,7 @@ pass("SORT OPTIMIZATION");
 
 our @a;
 checkOptree ( name	=> 'sub {sort @a}',
-	      code	=> sub {sort @a},
+	      code	=> sub { @(sort < @a)},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -69,7 +69,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'sub {our @a; @a = sort @a}',
-	      code	=> sub {our @a; @a = sort @a},
+	      code	=> sub {our @a; @a = @( sort < @a )},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -102,7 +102,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'sub {our @a; @a = sort @a; reverse @a}',
-	      code	=> sub {our @a; @a = sort @a; reverse @a},
+	      code	=> sub {our @a; @a = sort < @a; reverse < @a},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -137,7 +137,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'sub {my @a; @a = sort @a}',
-	      code	=> sub {my @a; @a = sort @a},
+	      code	=> sub {my @a; @a = @( sort < @a )},
 	      bcopts	=> '-exec',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
@@ -193,7 +193,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'sub {my @a; @a = sort @a; push @a, 1}',
-	      code	=> sub {my @a; @a = sort @a; push @a, 1},
+	      code	=> sub {my @a; @a = sort < @a; push @a, 1},
 	      bcopts	=> '-exec',
 	      debug	=> 0,
 	      strip_open_hints => 1,
@@ -228,7 +228,7 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'sub {my @a; @a = sort @a; 1}',
-	      code	=> sub {my @a; @a = sort @a; 1},
+	      code	=> sub {my @a; @a = sort < @a; 1},
 	      bcopts	=> '-exec',
 	      debug	=> 0,
 	      strip_open_hints => 1,

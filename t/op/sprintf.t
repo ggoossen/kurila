@@ -11,7 +11,7 @@ use version;
 use Config;
 use strict;
 
-my @tests = ();
+my @tests = @( () );
 my ($i, $template, $data, $result, $comment, $w, $x, $evalData, $n, $p);
 
 my $Is_VMS_VAX = 0;
@@ -50,7 +50,7 @@ while ( ~< *DATA) {
     push @tests, \@($template, $evalData, $result, $comment, $data);
 }
 
-print '1..', scalar @tests, "\n";
+print '1..', scalar nelems @tests, "\n";
 
 $^WARN_HOOK = sub {
     if (@_[0]->{description} =~ m/^Invalid conversion/) {
@@ -62,10 +62,10 @@ $^WARN_HOOK = sub {
     }
 };
 
-for ($i = 1; @tests; $i++) {
-    ($template, $evalData, $result, $comment, $data) = @{shift @tests};
+for ($i = 1; (nelems @tests); $i++) {
+    ($template, $evalData, $result, $comment, $data) = < @{shift @tests};
     $w = undef;
-    $x = sprintf(">$template<", @$evalData);
+    $x = sprintf(">$template<", < @$evalData);
     substr($x, -1, 0, $w) if $w;
     # $x may have 3 exponent digits, not 2
     my $y = $x;

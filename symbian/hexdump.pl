@@ -11,7 +11,7 @@ my $RSC = "$EPOC32\\data\\z\\system\\apps\\perlapp\\perlapp.rsc";
 
 use Fcntl qw(O_RDONLY);
 
-my %new = ($EXE => 'perlappmin.hex',
+my %new = %($EXE => 'perlappmin.hex',
 	   $RSC => 'perlrscmin.hex');
 
 for my $fn ($EXE, $RSC) {

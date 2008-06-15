@@ -10,7 +10,7 @@ use Locale::Currency;
 # otherwise "ok N".
 #-----------------------------------------------------------------------
 our @TESTS =
-(
+@(
 	#================================================
 	# TESTS FOR code2currency
 	#================================================
@@ -67,10 +67,10 @@ our @TESTS =
  'currency2code("Canadian Dollar") eq "cad"',       # last in DATA segment
 );
 
-print "1..", int(@TESTS), "\n";
+print "1..", int(nelems @TESTS), "\n";
 
 my $testid = 1;
-foreach my $test (@TESTS)
+foreach my $test (< @TESTS)
 {
     eval "print (($test) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
     print "not ok $testid\n" if $@;

@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -130,7 +130,7 @@ foreach ( qw /
 ###############################################################################
 # some more detailed tests for the methods above
 
-ok ( join (' ', $class->dist_basics()), 'distclean :: realclean distcheck');
+ok ( join (' ', < $class->dist_basics()), 'distclean :: realclean distcheck');
 
 ###############################################################################
 # has_link_code tests

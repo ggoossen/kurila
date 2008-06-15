@@ -34,14 +34,14 @@ my $lots_of_9C = do {
 my $max_iv = ^~^0 >> 1;
 my $min_iv = do {use integer; -$max_iv-1}; # 2s complement assumption
 
-my @processes = (\@("dclone", \&do_clone),
+my @processes = @(\@("dclone", \&do_clone),
                  \@("freeze/thaw", \&freeze_and_thaw),
                  \@("nfreeze/thaw", \&nfreeze_and_thaw),
                  \@("store/retrieve", \&store_and_retrieve),
                  \@("nstore/retrieve", \&nstore_and_retrieve),
                 );
 my @numbers =
-  (# IV bounds of 8 bits
+  @(# IV bounds of 8 bits
    -1, 0, 1, -127, -128, -129, 42, 126, 127, 128, 129, 254, 255, 256, 257,
    # IV bounds of 32 bits
    -2147483647, -2147483648, -2147483649, 2147483646, 2147483647, 2147483648,
@@ -56,7 +56,7 @@ my @numbers =
    2559831922.0,
   );
 
-plan tests => @processes * @numbers * 5;
+plan tests => (nelems @processes) * nelems @numbers * 5;
 
 my $file = "integer.$$";
 die "Temporary file '$file' already exists" if -e $file;
@@ -107,9 +107,9 @@ sub nstore_and_retrieve {
   return $copy;
 }
 
-foreach (@processes) {
-  my ($process, $sub) = @$_;
-  foreach my $number (@numbers) {
+foreach (< @processes) {
+  my ($process, $sub) = < @$_;
+  foreach my $number (< @numbers) {
     # as $number is an alias into @numbers, we don't want any side effects of
     # conversion macros affecting later runs, so pass a copy to Storable:
     my $copy1 = my $copy2 = my $copy0 = $number;

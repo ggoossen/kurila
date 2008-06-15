@@ -14,8 +14,8 @@ BEGIN {
                         $SANITY_CHECK_TEMPLATE $CALLER_DEPTH $_ERROR_STRING
                     ];
 
-    @ISA        =   qw[ Exporter ];
-    @EXPORT_OK  =   qw[check allow last_error];
+    @ISA        = @(   qw[ Exporter ] );
+    @EXPORT_OK  = @(   qw[check allow last_error] );
 
     $VERSION                = '0.26';
     $VERBOSE                = $^W ? 1 : 0;
@@ -30,9 +30,9 @@ BEGIN {
     $CALLER_DEPTH           = 0;
 }
 
-my %known_keys = map { $_ => 1 }
+my %known_keys = %( map { $_ => 1 }
                     qw| required allow default strict_type no_override
-                        store defined |;
+                        store defined | );
 
 =pod
 
@@ -244,7 +244,7 @@ on this.
 =cut
 
 sub check {
-    my ($utmpl, $href, $verbose) = @_;
+    my ($utmpl, $href, $verbose) = < @_;
 
     ### did we get the arguments we need? ###
     return if !$utmpl or !$href;
@@ -269,9 +269,9 @@ sub check {
                     or return;
 
     ### deref only once ###
-    my %utmpl   = %$utmpl;
-    my %args    = %$args;
-    my %defs    = %$defs;
+    my %utmpl   = %( < %$utmpl );
+    my %args    = %( < %$args );
+    my %defs    = %( < %$defs );
 
     ### flag to see if anything went wrong ###
     my $wrong; 
@@ -290,9 +290,9 @@ sub check {
 
             ### warn about the error ###
             } else {
-                _store_error(
+                _store_error( <
                     loc("Key '\%1' is not a valid key for \%2 provided by \%3",
-                        $key, _who_was_it(), _who_was_it(1)), $verbose);
+                        $key, < _who_was_it(), < _who_was_it(1)), $verbose);
                 $warned ||= 1;
             }
             next;
@@ -300,9 +300,9 @@ sub check {
 
         ### check if you're even allowed to override this key ###
         if( %utmpl{$key}->{'no_override'} ) {
-            _store_error(
+            _store_error( <
                 loc(q[You are not allowed to override key '%1'].
-                    q[for %2 from %3], $key, _who_was_it(), _who_was_it(1)),
+                    q[for %2 from %3], $key, < _who_was_it(), < _who_was_it(1)),
                 $verbose
             );
             $warned ||= 1;
@@ -310,13 +310,13 @@ sub check {
         }
 
         ### copy of this keys template instructions, to save derefs ###
-        my %tmpl = %{%utmpl{$key}};
+        my %tmpl = %( < %{%utmpl{$key}} );
 
         ### check if you were supposed to provide defined() values ###
         if( (%tmpl{'defined'} || $ONLY_ALLOW_DEFINED) and
             not defined %args{$key}
         ) {
-            _store_error(loc(q|Key '%1' must be defined when passed|, $key),
+            _store_error( <loc(q|Key '%1' must be defined when passed|, $key),
                 $verbose );
             $wrong ||= 1;
             next;
@@ -326,7 +326,7 @@ sub check {
         if( (%tmpl{'strict_type'} || $STRICT_TYPE) and
             (ref %args{$key} ne ref %tmpl{'default'})
         ) {
-            _store_error(loc(q|Key '%1' needs to be of type '%2'|,
+            _store_error( <loc(q|Key '%1' needs to be of type '%2'|,
                         $key, ref %tmpl{'default'} || 'SCALAR'), $verbose );
             $wrong ||= 1;
             next;
@@ -341,9 +341,9 @@ sub check {
         ) {
             ### stringify the value in the error report -- we don't want dumps
             ### of objects, but we do want to see *roughly* what we passed
-            _store_error(loc(q|Key '%1' (%2) is of invalid type for '%3' |.
+            _store_error( <loc(q|Key '%1' (%2) is of invalid type for '%3' |.
                              q|provided by %4|,
-                            $key, dump::view(%args{$key}), _who_was_it(),
+                            $key, < dump::view(%args{$key}), < _who_was_it(), <
                             _who_was_it(1)), $verbose);
             $wrong ||= 1;
             next;
@@ -356,7 +356,7 @@ sub check {
 
     ### croak with the collected errors if there were errors and 
     ### we have the fatal flag toggled.
-    die(__PACKAGE__->last_error) if ($wrong || $warned) && $WARNINGS_FATAL;
+    die( <__PACKAGE__->last_error) if ($wrong || $warned) && $WARNINGS_FATAL;
 
     ### done with our loop... if $wrong is set, somethign went wrong
     ### and the user is already informed, just return...
@@ -435,7 +435,7 @@ sub allow {
         ### loop over the elements, see if one of them says the
         ### value is OK
         ### also, short-cicruit when possible
-        for ( @{@_[1]} ) {
+        for ( < @{@_[1]} ) {
             return 1 if allow( @_[0], $_ );
         }
         
@@ -457,7 +457,7 @@ sub _clean_up_args {
     ### don't even bother to loop, if there's nothing to clean up ###
     return @_[0] if $PRESERVE_CASE and !$STRIP_LEADING_DASHES;
 
-    my %args = %{@_[0]};
+    my %args = %( < %{@_[0]} );
 
     ### keys are note aliased ###
     for my $key (keys %args) {
@@ -473,8 +473,8 @@ sub _clean_up_args {
 }
 
 sub _sanity_check_and_defaults {
-    my %utmpl   = %{@_[0]};
-    my %args    = %{@_[1]};
+    my %utmpl   = %( < %{@_[0]} );
+    my %args    = %( < %{@_[1]} );
     my $verbose = @_[2];
 
     my %defs; my $fail;
@@ -485,9 +485,9 @@ sub _sanity_check_and_defaults {
         ### at which point, the utmpl keys must match, but that's the users
         ### problem.
         if( %utmpl{$key}->{'required'} and not exists %args{$key} ) {
-            _store_error(
+            _store_error( <
                 loc(q|Required option '%1' is not provided for %2 by %3|,
-                    $key, _who_was_it(1), _who_was_it(2)), $verbose );
+                    $key, < _who_was_it(1), < _who_was_it(2)), $verbose );
 
             ### mark the error ###
             $fail++;
@@ -502,7 +502,7 @@ sub _sanity_check_and_defaults {
             ### last, check if they provided any weird template keys
             ### -- do this last so we don't always execute this code.
             ### just a small optimization.
-            map {   _store_error(
+            map {   _store_error( <
                         loc(q|Template type '%1' not supported [at key '%2']|,
                         $_, $key), 1, 1 );
             } grep {
@@ -511,7 +511,7 @@ sub _sanity_check_and_defaults {
         
             ### make sure you passed a ref, otherwise, complain about it!
             if ( exists %utmpl{$key}->{'store'} ) {
-                _store_error( loc(
+                _store_error( < loc(
                     q|Store variable for '%1' is not a reference!|, $key
                 ), 1, 1 ) unless ref %utmpl{$key}->{'store'};
             }

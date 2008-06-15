@@ -3,9 +3,9 @@ package Text::Wrap;
 use warnings::register;
 require Exporter;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(wrap fill);
-our @EXPORT_OK = qw($columns $break $huge);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(wrap fill) );
+our @EXPORT_OK = @( qw($columns $break $huge) );
 
 our $VERSION = 2006.1117;
 
@@ -28,12 +28,12 @@ use Text::Tabs qw(expand unexpand);
 
 sub wrap
 {
-	my ($ip, $xp, @t) = @_;
+	my ($ip, $xp, < @t) = < @_;
 
 	local($Text::Tabs::tabstop) = $tabstop;
 	my $r = "";
 	my $tail = pop(@t);
-	my $t = expand(join("", (map { m/\s+\z/ ? ( $_ ) : ($_, ' ') } @t), $tail));
+	my $t = expand(join("", (map { m/\s+\z/ ? ( $_ ) : ($_, ' ') } < @t), $tail));
 	my $lead = $ip;
 	my $ll = $columns - length(expand($ip)) - 1;
 	$ll = 0 if $ll +< 0;
@@ -65,7 +65,7 @@ sub wrap
 		} elsif ($columns +< 2) {
 			warnings::warnif "Increasing \$Text::Wrap::columns from $columns to 2";
 			$columns = 2;
-			return ($ip, $xp, @t);
+			return  @($ip, $xp, @t);
 		} else {
 			die "This shouldn't happen";
 		}
@@ -94,11 +94,11 @@ sub wrap
 
 sub fill 
 {
-	my ($ip, $xp, @raw) = @_;
+	my ($ip, $xp, < @raw) = < @_;
 	my @para;
 	my $pp;
 
-	for $pp (split(m/\n\s+/, join("\n",@raw))) {
+	for $pp (split(m/\n\s+/, join("\n",< @raw))) {
 		$pp =~ s/\s+/ /g;
 		my $x = wrap($ip, $xp, $pp);
 		push(@para, $x);
@@ -108,7 +108,7 @@ sub fill
 	# separate paragraphs with blank lines
 
 	my $ps = ($ip eq $xp) ? "\n\n" : "\n";
-	return join ($ps, @para);
+	return join ($ps, < @para);
 }
 
 1;

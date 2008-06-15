@@ -12,17 +12,17 @@ our $MaxArgLen  = 64;   # How much of each argument to print. 0 = all.
 our $MaxArgNums = 8;    # How many arguments to print. 0 = all.
 
 require Exporter;
-our @ISA = ('Exporter');
-our @EXPORT = qw(confess croak carp);
-our @EXPORT_OK = qw(cluck verbose longmess shortmess);
-our @EXPORT_FAIL = qw(verbose);	# hook to enable verbose mode
+our @ISA = @('Exporter');
+our @EXPORT = @( qw(confess croak carp) );
+our @EXPORT_OK = @( qw(cluck verbose longmess shortmess) );
+our @EXPORT_FAIL = @( qw(verbose) );	# hook to enable verbose mode
 
 # if the caller specifies verbose usage ("perl -MCarp=verbose script.pl")
 # then the following method will be called by the Exporter which knows
 # to do this thanks to @EXPORT_FAIL, above.  $_[1] will contain the word
 # 'verbose'.
 
-sub export_fail { shift; $Verbose = shift if @_[0] eq 'verbose'; @_ }
+sub export_fail { shift; $Verbose = shift if @_[0] eq 'verbose'; < @_ }
 
 # fixed hooks for stashes to point to
 sub longmess  { goto &longmess_jmp }
@@ -41,10 +41,10 @@ sub shortmess_jmp  {
     goto &longmess_real;
 }
 
-sub croak   { die  shortmess @_ }
-sub confess { die  longmess  @_ }
-sub carp    { warn shortmess @_ }
-sub cluck   { warn longmess  @_ }
+sub croak   { die <  shortmess < @_ }
+sub confess { die <  longmess  < @_ }
+sub carp    { warn < shortmess < @_ }
+sub cluck   { warn < longmess  < @_ }
 
 1;
 __END__

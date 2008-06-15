@@ -8,7 +8,7 @@ our %alias;
 sub import
 {
  my $class = shift;
- while (@_)
+ while ((nelems @_))
   {
    my $layer = shift;
    if (exists %alias{$layer})

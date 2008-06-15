@@ -37,15 +37,15 @@ use constant THRESHOLD => 14;
 use constant START     => "a";
 
 # some initial hash data
-my %h2 = map {$_ => 1} 'a'..'cc';
+my %h2 = %( map {$_ => 1} 'a'..'cc' );
 
 ok (!Internals::HvREHASH(%h2), 
     "starting with pre-populated non-pathological hash (rehash flag if off)");
 
-my @keys = get_keys(\%h2);
-%h2{$_}++ for @keys;
+my @keys = @( < get_keys(\%h2) );
+%h2{$_}++ for < @keys;
 ok (Internals::HvREHASH(%h2), 
-    scalar(@keys) . " colliding into the same bucket keys are triggering rehash");
+    scalar(nelems @keys) . " colliding into the same bucket keys are triggering rehash");
 
 sub get_keys {
     my $hr = shift;
@@ -70,7 +70,7 @@ sub get_keys {
     my $c = 0;
     # get 2 keys on top of the THRESHOLD
     my $hash;
-    while (@keys +< THRESHOLD+2) {
+    while ((nelems @keys) +< THRESHOLD+2) {
         # next if exists $hash->{$s};
         $hash = hash($s);
         next unless ($hash ^&^ $mask) == 0;
@@ -90,9 +90,9 @@ sub get_keys {
 # can't do it perl, without doing some tricks
 sub hash {
     my $s = shift;
-    my @c = split m//, $s;
+    my @c = @( split m//, $s );
     my $u = HASH_SEED;
-    for (@c) {
+    for (< @c) {
         # (A % M) + (B % M) == (A + B) % M
         # This works because '+' produces a NV, which is big enough to hold
         # the intermediate result. We only need the % before any "^" and "&"
@@ -113,6 +113,6 @@ sub hash {
 use constant PVBM => 'foo';
 
 my $dummy = index 'foo', PVBM;
-try { my %h = (a => PVBM); 1 };
+try { my %h = %(a => < PVBM); 1 };
 
 ok (!$@, 'fbm scalar can be inserted into a hash');

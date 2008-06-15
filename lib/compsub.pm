@@ -1,12 +1,12 @@
 package compsub;
 
 sub define {
-    my %arg = @_;
+    my %arg = %( < @_ );
     # warning: alwyas create a new hash; %^H is saved, and altering
     # values referenced by it, will have effect on it.
     %^H{'compsub'} = \%(
-                        %{ %^H{'compsub'} || \%() },
-                        %arg,
+                        < %{ %^H{'compsub'} || \%() },
+                        < %arg,
                        );
 }
 

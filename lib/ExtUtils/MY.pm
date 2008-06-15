@@ -4,11 +4,11 @@ use strict;
 require ExtUtils::MM;
 
 our $VERSION = 6.44;
-our @ISA = qw(ExtUtils::MM);
+our @ISA = @( qw(ExtUtils::MM) );
 
 {
     package MY;
-    our @ISA = qw(ExtUtils::MY);
+    our @ISA = @( qw(ExtUtils::MY) );
 }
 
 sub DESTROY {}

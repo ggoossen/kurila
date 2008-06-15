@@ -8,7 +8,7 @@ use strict;
 use Test;
 my @modules;
 BEGIN {
-  @modules = qw(
+  @modules = @( qw(
 
 Pod::Escapes
 
@@ -23,14 +23,14 @@ Pod::Simple::RTF	Pod::Simple::Search	Pod::Simple::SimpleTree
 Pod::Simple::Text	Pod::Simple::TextContent	Pod::Simple::TiedOutFH
 Pod::Simple::Transcode	Pod::Simple::XMLOutStream
 
-  );
-  plan tests => 2 + @modules;
+  ) );
+  plan tests => 2 + nelems @modules;
 };
 
 ok 1;
 
 #chdir "t" if -e "t";
-foreach my $m (@modules) {
+foreach my $m (< @modules) {
   print "# Loading $m ...\n";
   eval "require $m;";
   die if $@;
@@ -43,7 +43,7 @@ foreach my $m (@modules) {
     "\n\nPerl $^V",
     " under $^O ",
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-      ? ("(Win32::BuildNumber ", &Win32::BuildNumber(), ")") : (),
+      ? ("(Win32::BuildNumber ", < &Win32::BuildNumber(), ")") : (),
     (defined $MacPerl::Version)
       ? ("(MacPerl version $MacPerl::Version)") : (),
     "\n"
@@ -51,11 +51,11 @@ foreach my $m (@modules) {
 
   # Ugly code to walk the symbol tables:
   my %v;
-  my @stack = ('');  # start out in %::
+  my @stack = @('');  # start out in %::
   my $this;
   my $count = 0;
   my $pref;
-  while(@stack) {
+  while((nelems @stack)) {
     $this = shift @stack;
     die "Too many packages?" if ++$count +> 1000;
     next if exists %v{$this};
@@ -85,12 +85,12 @@ foreach my $m (@modules) {
   push @out, " Modules in memory:\n";
   delete %v{['', '[none]']};
   foreach my $p (sort {lc($a) cmp lc($b)} keys %v) {
-    my $indent = ' ' x (2 + @($p =~ m/(:)/g));
+    my $indent = ' ' x (2 + nelems @($p =~ m/(:)/g));
     push @out,  '  ', $indent, $p, defined(%v{$p}) ? " v%v{$p};\n" : ";\n";
   }
   push @out, sprintf "[at \%s (local) / \%s (GMT)]\n",
     scalar(gmtime), scalar(localtime);
-  my $x = join '', @out;
+  my $x = join '', < @out;
   $x =~ s/^/#/mg;
   print $x;
 }
@@ -100,7 +100,7 @@ print "# Running",
   "#\n",
 ;
 
-print "# \@INC:\n", map("#   [$_]\n", @INC), "#\n#\n";
+print "# \@INC:\n", map("#   [$_]\n", < @INC), "#\n#\n";
 
 print "# \%INC:\n";
 foreach my $x (sort {lc($a) cmp lc($b)} keys %INC) {

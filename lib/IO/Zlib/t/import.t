@@ -1,6 +1,6 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-	@INC = '../lib';
+	@INC = @( '../lib' );
 	chdir 't';
     }
 }
@@ -9,7 +9,7 @@ print "1..1\n";
 
 sub ok
 {
-    my ($no, $ok) = @_ ;
+    my ($no, $ok) = < @_ ;
     print "ok $no\n" if $ok ;
     print "not ok $no\n" unless $ok ;
 }

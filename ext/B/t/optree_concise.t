@@ -316,7 +316,7 @@ use B::Concise qw( walk_output add_style set_style_standard add_callback );
 
 # new relative style, added by set_up_relative_test()
 my @stylespec =
-    ( "#hyphseq2 (*(   (x( ;)x))*)<#classsym> "
+    @( "#hyphseq2 (*(   (x( ;)x))*)<#classsym> "
       . "#exname#arg(?([#targarglife])?)~#flags(?(/#privateb)?)(x(;~->#next)x) "
       . "(x(;~=> #extra)x)\n" # new 'variable' used here
       
@@ -329,12 +329,12 @@ our @scopeops;
 sub set_up_relative_test {
     # add a new style, and a callback which adds an 'extra' property
 
-    add_style ( "relative"	=> @stylespec );
+    add_style ( "relative"	=> < @stylespec );
     #set_style_standard ( "relative" );
 
     add_callback
 	( sub {
-	    my ($h, $op, $format, $level, $style) = @_;
+	    my ($h, $op, $format, $level, $style) = < @_;
 
 	    # callback marks up const ops
 	    $h->{arg} .= ' CALLBACK' if $h->{name} eq 'const';
@@ -347,7 +347,7 @@ sub set_up_relative_test {
 	    }
 	    elsif ($style eq 'scope') {
 		# supress printout entirely
-		$$format="" unless grep { $h->{name} eq $_ } @scopeops;
+		$$format="" unless grep { $h->{name} eq $_ } < @scopeops;
 	    }
 	});
 }
@@ -430,7 +430,7 @@ EONT_EONT
 
 #################################
 
-@scopeops = qw( leavesub enter leave nextstate );
+@scopeops = @( qw( leavesub enter leave nextstate ) );
 add_style
 	( 'scope'  # concise copy
 	  , "#hyphseq2 (*(   (x( ;)x))*)<#classsym> "

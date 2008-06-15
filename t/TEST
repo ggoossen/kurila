@@ -16,13 +16,13 @@ BEGIN { require '../lib/warnings.pm'; warnings->import() };
 %ENV{PERL_CORE} = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
-@ARGV = grep($_,@ARGV) if $^O eq 'VMS';
+@ARGV = @( grep($_,< @ARGV) ) if $^O eq 'VMS';
 our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
 {
-    my @argv = ();
-    foreach my $iargv (@ARGV) {
+    my @argv = @( () );
+    foreach my $iargv (< @ARGV) {
 	push( @argv, $iargv ), next unless $iargv =~ m/^-(\S+)$/;
 	$::core    = 1 if $1 eq 'core';
 	$::verbose = 1 if $1 eq 'v';
@@ -38,7 +38,7 @@ our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 	    $::deparse_opts = $1;
 	}
     }
-    @ARGV = @argv;
+    @ARGV = @( < @argv );
 }
 
 chdir 't' if -f 't/TEST';
@@ -74,7 +74,7 @@ my $curdir = File::Spec->curdir;
 my $updir  = File::Spec->updir;
 
 sub _find_tests {
-    my($dir) = @_;
+    my($dir) = < @_;
     opendir my $dirh, $dir or die "Trouble opening $dir: $!";
     foreach my $f (sort { $a cmp $b } readdir $dirh) {
 	next if $f eq $curdir or $f eq $updir or
@@ -89,7 +89,7 @@ sub _find_tests {
 }
 
 sub _quote_args {
-    my ($args) = @_;
+    my ($args) = < @_;
     my $argstring = '';
 
     foreach (split(m/\s+/,$args)) {
@@ -111,11 +111,11 @@ if ($::failed) {
     push @ARGV, map { chomp; $_ } ~< $fh;
     close $fh;
     if ($::failed +> 1) {
-        @ARGV = (@ARGV[0]);
+        @ARGV = @(@ARGV[0]);
     }
 }
 
-unless (@ARGV) {
+unless (nelems @ARGV) {
     foreach my $dir (qw(base comp cmd run io lex sv op uni mro)) {
 	_find_tests($dir);
     }
@@ -132,10 +132,10 @@ unless (@ARGV) {
 	    if (m/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
 		# $1 resetting bugs.
-		%extensions = _populate_hash ("$1");
+		%extensions = %( < _populate_hash ("$1") );
 	    }
 	    elsif (m/^known_extensions=['"](.*)['"]$/) {
-		%known_extensions = _populate_hash ($1);
+		%known_extensions = %( < _populate_hash ($1) );
 	    }
 	}
 	if (%extensions) {
@@ -181,14 +181,14 @@ unless (@ARGV) {
 }
 
 if ($::deparse) {
-    _testprogs('deparse', '',   @ARGV);
+    _testprogs('deparse', '',   < @ARGV);
 }
 elsif ($::with_utf16) {
     for my $e (0, 1) {
 	for my $b (0, 1) {
 	    print STDERR "# ENDIAN $e BOM $b\n";
 	    my @UARGV;
-	    for my $a (@ARGV) {
+	    for my $a (< @ARGV) {
 		my $u = $a . "." . ($e ? "l" : "b") . "e" . ($b ? "b" : "");
 		my $f = $e ? "v" : "n";
 		push @UARGV, $u;
@@ -204,17 +204,17 @@ elsif ($::with_utf16) {
 		    close($afh);
 		}
 	    }
-	    _testprogs('perl', '', @UARGV);
-	    unlink(@UARGV);
+	    _testprogs('perl', '', < @UARGV);
+	    unlink(< @UARGV);
 	}
     }
 }
 else {
-    _testprogs('perl',    '',   @ARGV);
+    _testprogs('perl',    '',   < @ARGV);
 }
 
 sub _testprogs {
-    my ($type, $args, @tests) = @_;
+    my ($type, $args, < @tests) = < @_;
 
     print <<'EOT' if ($type eq 'deparse');
 ------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ EOT
 
     $::bad_files = 0;
 
-    foreach my $t (@tests) {
+    foreach my $t (< @tests) {
       unless (exists %::path_to_name{$t}) {
 	my $tname = File::Spec->catfile('t',$t);
 	$tname = VMS::Filespec::unixify($tname) if $^O eq 'VMS';
@@ -232,7 +232,7 @@ EOT
       }
     }
     my $maxlen = 0;
-    foreach (%::path_to_name{[@tests]}) {
+    foreach (%::path_to_name{[< @tests]}) {
 	s/\.\w+\z/./;
 	my $len = length ;
 	$maxlen = $len if $len +> $maxlen;
@@ -241,7 +241,7 @@ EOT
     my $dotdotdot = $maxlen + 3 ;
     my $valgrind = 0;
     my $valgrind_log = 'current.valgrind';
-    my $total_files = @tests;
+    my $total_files = (nelems @tests);
     my $good_files = 0;
     my $tested_files  = 0;
     my $totmax = 0;
@@ -368,7 +368,7 @@ EOT
 			$failure ||= 'FAILED--seen duplicate leader';
 		    }
 		    $max = $1;
-		    %todo = map { $_ => 1 } split m/ /, $3 if $3;
+		    %todo = %( map { $_ => 1 } split m/ /, $3 ) if $3;
 		    $totmax += $max;
 		    $tested_files++;
 		    if ($seen_ok) {
@@ -433,7 +433,7 @@ EOT
 	    my @valgrind;
 	    if (-e $valgrind_log) {
 		if (open(my $v, "<", $valgrind_log)) {
-		    @valgrind = ~< $v;
+		    @valgrind = @( ~< $v );
 		    close $v;
 		} else {
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
@@ -446,10 +446,10 @@ EOT
 		    warn "$0: Failed to create '$test.valgrind': $!\n";
 		}
 	    }
-	    elsif (@valgrind) {
+	    elsif ((nelems @valgrind)) {
 		my $leaks = 0;
 		my $errors = 0;
-		for my $i (0..@valgrind-1) {
+		for my $i (0..(nelems @valgrind)-1) {
 		    local $_ = @valgrind[$i];
 		    if (m/^==\d+== ERROR SUMMARY: (\d+) errors? /) {
 			$errors += $1;   # there may be multiple error summaries

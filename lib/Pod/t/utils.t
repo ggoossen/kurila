@@ -8,7 +8,7 @@ use Pod::ParseUtils;
 
 # First test the hyperlinks
 
-my @links = qw{
+my @links = @( qw{
   name
   name/ident
   name/"sec"
@@ -19,9 +19,9 @@ my @links = qw{
   text|name/ident
   text|name/"sec"
   text|"sec"
-};
+} );
 
-my @results = (
+my @results = @(
 	       "P<name>",
 	       "Q<ident> in P<name>",
 	       "Q<sec> in P<name>",
@@ -34,7 +34,7 @@ my @results = (
 	       "Q<text>",
 	      );
 
-for my $i( 0..@links ) {
+for my $i( 0..nelems @links ) {
   my $link = Pod::Hyperlink->new( @links[$i]);
   is($link->markup, @results[$i]);
 }
@@ -75,7 +75,7 @@ is($cache->find_page("Junk"), undef);
 
 # Make sure that the item we found is the same one as the
 # first in the list
-my @i = $cache->item;
+my @i = @( < $cache->item );
 cmp_ok(@i[0], '\==', $item);
 
 # Check the contents

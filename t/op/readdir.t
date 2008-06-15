@@ -12,7 +12,7 @@ for my $i (1..2000) {
 }
 
 if (opendir(OP, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
-our @D = grep(m/^[^\.].*\.t$/i, readdir(OP));
+our @D = @( grep(m/^[^\.].*\.t$/i, readdir(OP)) );
 closedir(OP);
 
 open my $man, "<", "../MANIFEST" or die "Can't open ../MANIFEST: $!";
@@ -21,25 +21,25 @@ while (~< $man) {
     ++$expect if m!^t/op/[^/]+\t!;
 }
 my ($min, $max) = ($expect - 10, $expect + 10);
-if (@D +> $min && @D +< $max) { print "ok 2\n"; }
+if ((nelems @D) +> $min && (nelems @D) +< $max) { print "ok 2\n"; }
 else {
     printf "not ok 2 # counting op/*.t, expect $min < \%d < $max files\n",
-      scalar @D;
+      scalar nelems @D;
 }
 
-our @R = sort @D;
-our @G = sort glob("op/*.t");
-@G = sort glob(":op:*.t") if $^O eq 'MacOS';
+our @R = @( sort < @D );
+our @G = @( sort glob( <"op/*.t") );
+@G = @( sort glob( <":op:*.t") ) if $^O eq 'MacOS';
 if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
-    @G = grep(s#.*\](\w+\.t).*#op/$1#i,glob("op/*.t"));
+    @G = @( grep(s#.*\](\w+\.t).*#op/$1#i,glob( <"op/*.t")) );
 }
-while (@R && @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
+while ((nelems @R) && nelems @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
 	shift(@R);
 	shift(@G);
 }
-if (@R == 0 && @G == 0) { print "ok 3\n"; } else { print "not ok 3\n"; }
+if ((nelems @R) == 0 && (nelems @G) == 0) { print "ok 3\n"; } else { print "not ok 3\n"; }
 
 our ($fh, @fh, %fh);
 if (opendir($fh, "op")) { print "ok 4\n"; } else { print "not ok 4\n"; }

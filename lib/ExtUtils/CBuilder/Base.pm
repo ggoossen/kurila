@@ -11,7 +11,7 @@ $VERSION = '0.22';
 
 sub new {
   my $class = shift;
-  my $self = bless \%(@_), $class;
+  my $self = bless \%(< @_), $class;
 
   $self->{properties}->{perl} = $class->find_perl_interpreter
     or warn "Warning: Can't locate your perl binary";
@@ -32,7 +32,7 @@ sub find_perl_interpreter {
 
 sub add_to_cleanup {
   my $self = shift;
-  foreach (@_) {
+  foreach (< @_) {
     $self->{files_to_clean}->{$_} = 1;
   }
 }
@@ -45,7 +45,7 @@ sub cleanup {
 }
 
 sub object_file {
-  my ($self, $filename) = @_;
+  my ($self, $filename) = < @_;
 
   # File name, minus the suffix
   (my $file_base = $filename) =~ s/\.[^.]+$//;
@@ -54,68 +54,68 @@ sub object_file {
 
 sub arg_include_dirs {
   my $self = shift;
-  return map {"-I$_"} @_;
+  return map {"-I$_"} < @_;
 }
 
 sub arg_nolink { '-c' }
 
 sub arg_object_file {
-  my ($self, $file) = @_;
-  return ('-o', $file);
+  my ($self, $file) = < @_;
+  return  @('-o', $file);
 }
 
 sub arg_share_object_file {
-  my ($self, $file) = @_;
-  return ($self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
+  my ($self, $file) = < @_;
+  return  @($self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
 }
 
 sub arg_exec_file {
-  my ($self, $file) = @_;
-  return ('-o', $file);
+  my ($self, $file) = < @_;
+  return  @('-o', $file);
 }
 
 sub arg_defines {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   return map "-D$_=%args{$_}", keys %args;
 }
 
 sub compile {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   die "Missing 'source' argument to compile()" unless defined %args{source};
   
   my $cf = $self->{config}; # For convenience
 
   %args{object_file} ||= $self->object_file(%args{source});
   
-  my @include_dirs = $self->arg_include_dirs
-    (@{%args{include_dirs} || \@()},
-     $self->perl_inc());
+  my @include_dirs = @( < $self->arg_include_dirs
+    (< @{%args{include_dirs} || \@()}, <
+     $self->perl_inc()) );
   
-  my @defines = $self->arg_defines( %{%args{defines} || \%()} );
+  my @defines = @( < $self->arg_defines( < %{%args{defines} || \%()} ) );
   
-  my @extra_compiler_flags = $self->split_like_shell(%args{extra_compiler_flags});
-  my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
-  my @ccflags = $self->split_like_shell($cf->{ccflags});
-  my @optimize = $self->split_like_shell($cf->{optimize});
-  my @flags = (@include_dirs, @defines, @cccdlflags, @extra_compiler_flags,
+  my @extra_compiler_flags = @( < $self->split_like_shell(%args{extra_compiler_flags}) );
+  my @cccdlflags = @( < $self->split_like_shell($cf->{cccdlflags}) );
+  my @ccflags = @( < $self->split_like_shell($cf->{ccflags}) );
+  my @optimize = @( < $self->split_like_shell($cf->{optimize}) );
+  my @flags = @(< @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags, <
 	       $self->arg_nolink,
-	       @ccflags, @optimize,
+	       < @ccflags, < @optimize, <
 	       $self->arg_object_file(%args{object_file}),
 	      );
   
-  my @cc = $self->split_like_shell($cf->{cc});
+  my @cc = @( < $self->split_like_shell($cf->{cc}) );
   
-  $self->do_system(@cc, @flags, %args{source})
+  $self->do_system(< @cc, < @flags, %args{source})
     or die "error building %args{object_file} from '%args{source}'";
 
   return %args{object_file};
 }
 
 sub have_compiler {
-  my ($self) = @_;
+  my ($self) = < @_;
   return $self->{have_compiler} if defined $self->{have_compiler};
   
-  my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
+  my $tmpfile = File::Spec->catfile( <File::Spec->tmpdir, 'compilet.c');
   {
     local *FH;
     open FH, ">", "$tmpfile" or die "Can't create $tmpfile: $!";
@@ -126,19 +126,19 @@ sub have_compiler {
   my ($obj_file, @lib_files);
   try {
     $obj_file = $self->compile(source => $tmpfile);
-    @lib_files = $self->link(objects => $obj_file, module_name => 'compilet');
+    @lib_files = @( < $self->link(objects => $obj_file, module_name => 'compilet') );
   };
   warn $@ if $@;
   my $result = $self->{have_compiler} = $@ ? 0 : 1;
   
-  foreach (grep defined, $tmpfile, $obj_file, @lib_files) {
+  foreach (grep defined, $tmpfile, $obj_file, < @lib_files) {
     1 while unlink;
   }
   return $result;
 }
 
 sub lib_file {
-  my ($self, $dl_file) = @_;
+  my ($self, $dl_file) = < @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   return "$dl_file.$self->{config}->{dlext}";
@@ -146,7 +146,7 @@ sub lib_file {
 
 
 sub exe_file {
-  my ($self, $dl_file) = @_;
+  my ($self, $dl_file) = < @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   return "$dl_file$self->{config}->{_exe}";
@@ -157,7 +157,7 @@ sub need_prelink { 0 }
 sub extra_link_args_after_prelink { return }
 
 sub prelink {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   
   (%args{dl_file} = %args{dl_name}) =~ s/.*::// unless %args{dl_file};
   
@@ -178,17 +178,17 @@ sub prelink {
 }
 
 sub link {
-  my ($self, %args) = @_;
-  return $self->_do_link('lib_file', lddl => 1, %args);
+  my ($self, < %args) = < @_;
+  return $self->_do_link('lib_file', lddl => 1, < %args);
 }
 
 sub link_executable {
-  my ($self, %args) = @_;
-  return $self->_do_link('exe_file', lddl => 0, %args);
+  my ($self, < %args) = < @_;
+  return $self->_do_link('exe_file', lddl => 0, < %args);
 }
 
 sub _do_link {
-  my ($self, $type, %args) = @_;
+  my ($self, $type, < %args) = < @_;
 
   my $cf = $self->{config}; # For convenience
   
@@ -197,33 +197,33 @@ sub _do_link {
   my $out = %args{$type} || $self->?$type($objects->[0]);
   
   my @temp_files;
-  @temp_files =
-    $self->prelink(%args,
-		   dl_name => %args{module_name}) if %args{lddl} && $self->need_prelink;
+  @temp_files = @( <
+    $self->prelink(< %args,
+		   dl_name => %args{module_name}) ) if %args{lddl} && $self->need_prelink;
   
-  my @linker_flags = ($self->split_like_shell(%args{extra_linker_flags}),
-		      $self->extra_link_args_after_prelink(%args, dl_name => %args{module_name},
+  my @linker_flags = @( <$self->split_like_shell(%args{extra_linker_flags}), <
+		      $self->extra_link_args_after_prelink(< %args, dl_name => %args{module_name},
 							   prelink_res => \@temp_files));
 
-  my @output = %args{lddl} ? $self->arg_share_object_file($out) : $self->arg_exec_file($out);
-  my @shrp = $self->split_like_shell($cf->{shrpenv});
-  my @ld = $self->split_like_shell($cf->{ld});
+  my @output = @( %args{lddl} ? < $self->arg_share_object_file($out) : < $self->arg_exec_file($out) );
+  my @shrp = @( < $self->split_like_shell($cf->{shrpenv}) );
+  my @ld = @( < $self->split_like_shell($cf->{ld}) );
   
-  $self->do_system(@shrp, @ld, @output, @$objects, @linker_flags)
-    or die "error building $out from @$objects";
+  $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
+    or die "error building $out from {join ' ', <@$objects}";
   
-  return wantarray ? ($out, @temp_files) : $out;
+  return wantarray ?  @($out, @temp_files) : $out;
 }
 
 
 sub do_system {
-  my ($self, @cmd) = @_;
-  print "@cmd\n" if !$self->{quiet};
-  return !system(@cmd);
+  my ($self, < @cmd) = < @_;
+  print "{join ' ', <@cmd}\n" if !$self->{quiet};
+  return !system(< @cmd);
 }
 
 sub split_like_shell {
-  my ($self, $string) = @_;
+  my ($self, $string) = < @_;
   
   return () unless defined($string);
   return @$string if UNIVERSAL::isa($string, 'ARRAY');

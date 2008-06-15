@@ -3,9 +3,9 @@
 my @WARN;
 
 BEGIN {
-    unless(grep m/blib/, @INC) {
+    unless(grep m/blib/, < @INC) {
 	chdir 't' if -d 't';
-	@INC = '../lib';
+	@INC = @( '../lib' );
 	require './test.pl';
     }
     $^WARN_HOOK = sub { push @WARN, @_[0]->{description} };
@@ -151,7 +151,7 @@ sub to_bytes {
 
 {
     print "not " unless
-	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
+	sprintf("\%04X", < charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 19\n";
 
     print "not " if
@@ -166,7 +166,7 @@ sub to_bytes {
     print "ok 21\n";
 
     print "not " unless
-	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
+	sprintf("\%04X", < charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 22\n";
 
 }
@@ -226,7 +226,7 @@ print "ok 33\n";
     print "not " unless "\N{HORIZONTAL TABULATION}" eq "\t";
     print "ok 34\n";
 
-    print "not " unless grep { m/"HORIZONTAL TABULATION" is deprecated/ } @WARN;
+    print "not " unless grep { m/"HORIZONTAL TABULATION" is deprecated/ } < @WARN;
     print "ok 35\n";
 
     no warnings 'deprecated';
@@ -234,7 +234,7 @@ print "ok 33\n";
     print "not " unless "\N{VERTICAL TABULATION}" eq "\013";
     print "ok 36\n";
 
-    print "not " if grep { m/"VERTICAL TABULATION" is deprecated/ } @WARN;
+    print "not " if grep { m/"VERTICAL TABULATION" is deprecated/ } < @WARN;
     print "ok 37\n";
 }
 
@@ -269,25 +269,25 @@ print "ok 42\n";
 print "not " if defined charnames::viacode(0x110000);
 print "ok 45\n";
 
-print "not " if grep { m/you asked for U+110000/ } @WARN;
+print "not " if grep { m/you asked for U+110000/ } < @WARN;
 print "ok 46\n";
 
 
 # ---- Alias extensions
 
 my $tmpfile = "tmp0000";
-my $alifile = File::Spec->catfile(File::Spec->updir, qw(lib unicore xyzzy_alias.pl));
+my $alifile = File::Spec->catfile( <File::Spec->updir, qw(lib unicore xyzzy_alias.pl));
 my $i = 0;
 1 while -e ++$tmpfile;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs;
 {   local $/ = undef;
-    @prgs = split "\n########\n", ~< *DATA;
+    @prgs = @( split "\n########\n", ~< *DATA );
     }
 
 my $i = 46;
-for (@prgs) {
+for (< @prgs) {
     my ($code, $exp) = ((split m/\nEXPECT\n/), '$');
     my ($prog, $fil) = ((split m/\nFILE\n/, $code), "");
     $prog = "use utf8; " . $prog;

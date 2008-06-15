@@ -6,7 +6,7 @@ BEGIN {
     use_ok("Errno");
 }
 
-BAIL_OUT("No errno's are exported") unless @Errno::EXPORT_OK;
+BAIL_OUT("No errno's are exported") unless (nelems @Errno::EXPORT_OK);
 
 my $err = @Errno::EXPORT_OK[0];
 my $num = &{*{Symbol::fetch_glob("Errno::$err")}};
@@ -19,7 +19,7 @@ ok(exists %!{$err});
 $! = 0;
 ok(! %!{$err});
 
-ok(join(",",sort keys(%!)) eq join(",",sort @Errno::EXPORT_OK));
+ok(join(",",sort keys(%!)) eq join(",",sort < @Errno::EXPORT_OK));
 
 try { exists %!{''} };
 ok(! $@);

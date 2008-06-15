@@ -4,7 +4,7 @@ use MIME::QuotedPrint;
 my $x70 = "x" x 70;
 
 my @tests =
-  (
+  @(
    # plain ascii should not be encoded
    \@("", ""),
    \@("quoted printable"  =>
@@ -86,13 +86,13 @@ y. -- H. L. Mencken=\n"),
    \@("foo\t \n \t", "foo=09=20\n=20=09=\n"),
 );
 
-my $notests = @tests + 15;
+my $notests = (nelems @tests) + 15;
 print "1..$notests\n";
 
 my $testno = 0;
-for (@tests) {
+for (< @tests) {
     $testno++;
-    my ($plain, $encoded) = @$_;
+    my ($plain, $encoded) = < @$_;
     if (ord('A') == 193) {  # EBCDIC 8 bit chars are different
         if ($testno == 2) { $plain =~ s/\xe5/\x47/; $plain =~ s/\xe6/\x9c/g; $plain =~ s/\xf8/\x70/; }
         if ($testno == 7) { $plain =~ s/\xff/\xdf/; }

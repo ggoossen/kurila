@@ -26,7 +26,7 @@ use ExtUtils::MakeMaker qw( neatvalue );
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-our @ISA = qw( ExtUtils::MM_Unix );
+our @ISA = @( qw( ExtUtils::MM_Unix ) );
 our $VERSION = '6.44';
 
 %ENV{EMXSHELL} = 'sh'; # to run `commands`
@@ -44,7 +44,7 @@ my $GCC     = %Config{'cc'} =~ m/^gcc/i ? 1 : 0;
 =cut
 
 sub dlsyms {
-    my($self,%attribs) = @_;
+    my($self,< %attribs) = < @_;
 
     my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || \%();
     my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || \@();
@@ -63,13 +63,13 @@ $self->{BASEEXT}.def: Makefile.PL
      # a bug in the 4DOS/4NT command line interpreter.  The visible
      # result of the bug was files named q('extension_name',) *with the
      # single quotes and the comma* in the extension build directories.
-     q!', 'DL_FUNCS' => !,neatvalue($funcs),
-     q!, 'FUNCLIST' => !,neatvalue($funclist),
-     q!, 'IMPORTS' => !,neatvalue($imports),
-     q!, 'DL_VARS' => !, neatvalue($vars), q!);"
+     q!', 'DL_FUNCS' => !, <neatvalue($funcs),
+     q!, 'FUNCLIST' => !, <neatvalue($funclist),
+     q!, 'IMPORTS' => !, <neatvalue($imports),
+     q!, 'DL_VARS' => !, < neatvalue($vars), q!);"
 !);
     }
-    join('',@m);
+    join('',< @m);
 }
 
 =item replace_manpage_separator
@@ -79,7 +79,7 @@ Changes the path separator with .
 =cut
 
 sub replace_manpage_separator {
-    my($self,$man) = @_;
+    my($self,$man) = < @_;
     $man =~ s,/+,.,g;
     $man;
 }
@@ -97,19 +97,19 @@ used by default.
 =cut
 
 sub maybe_command {
-    my($self,$file) = @_;
-    my @e = exists(%ENV{'PATHEXT'})
+    my($self,$file) = < @_;
+    my @e = @( exists(%ENV{'PATHEXT'})
           ? split(m/;/, %ENV{PATHEXT})
-	  : qw(.com .exe .bat .cmd);
+	  : qw(.com .exe .bat .cmd) );
     my $e = '';
-    for (@e) { $e .= "\Q$_\E|" }
+    for (< @e) { $e .= "\Q$_\E|" }
     chop $e;
     # see if file ends in one of the known extensions
     if ($file =~ m/($e)$/i) {
 	return $file if -e $file;
     }
     else {
-	for (@e) {
+	for (< @e) {
 	    return "$file$_" if -e "$file$_";
 	}
     }
@@ -149,7 +149,7 @@ Adjustments are made for Borland's quirks needing -L to come first.
 =cut
 
 sub init_others {
-    my ($self) = @_;
+    my ($self) = < @_;
 
     # Used in favor of echo because echo won't strip quotes. :(
     $self->{ECHO}     ||= $self->oneliner('print qq{@ARGV}', \@('-l'));
@@ -230,7 +230,7 @@ Add .USESHELL target for dmake.
 =cut
 
 sub special_targets {
-    my($self) = @_;
+    my($self) = < @_;
 
     my $make_frag = $self->SUPER::special_targets;
 
@@ -252,7 +252,7 @@ to its own method.
 =cut
 
 sub static_lib {
-    my($self) = @_;
+    my($self) = < @_;
     return '' unless $self->has_link_code;
 
     my(@m);
@@ -280,7 +280,7 @@ q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
 MAKE_FRAG
 
-    join('', @m);
+    join('', < @m);
 }
 
 
@@ -291,7 +291,7 @@ Complicated stuff for Win32 that I don't understand. :(
 =cut
 
 sub dynamic_lib {
-    my($self, %attribs) = @_;
+    my($self, < %attribs) = < @_;
     return '' unless $self->needs_linking(); #might be because of a subdir
 
     return '' unless $self->has_link_code;
@@ -352,7 +352,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 	$(CHMOD) $(PERM_RWX) $@
 ';
 
-    join('',@m);
+    join('',< @m);
 }
 
 =item extra_clean_files
@@ -365,7 +365,7 @@ gcc.  Otherwise, take out all *.pdb files.
 sub extra_clean_files {
     my $self = shift;
 
-    return $GCC ? (qw(dll.base dll.exp)) : ('*.pdb');
+    return $GCC ?  @(@(qw(dll.base dll.exp))) :  @('*.pdb');
 }
 
 =item init_linker
@@ -388,7 +388,7 @@ Checks for the perl program under several common perl extensions.
 =cut
 
 sub perl_script {
-    my($self,$file) = @_;
+    my($self,$file) = < @_;
     return $file if -r $file && -f _;
     return "$file.pl"  if -r "$file.pl" && -f _;
     return "$file.plx" if -r "$file.plx" && -f _;
@@ -429,7 +429,7 @@ for other Windows shells, I don't know.
 =cut
 
 sub oneliner {
-    my($self, $cmd, $switches) = @_;
+    my($self, $cmd, $switches) = < @_;
     $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
@@ -439,14 +439,14 @@ sub oneliner {
     $cmd = $self->quote_literal($cmd);
     $cmd = $self->escape_newlines($cmd);
 
-    $switches = join ' ', @$switches;
+    $switches = join ' ', < @$switches;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --};
 }
 
 
 sub quote_literal {
-    my($self, $text) = @_;
+    my($self, $text) = < @_;
 
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
@@ -466,7 +466,7 @@ sub quote_literal {
 
 
 sub escape_newlines {
-    my($self, $text) = @_;
+    my($self, $text) = < @_;
 
     # Escape newlines
     $text =~ s{\n}{\\\n}g;
@@ -490,13 +490,13 @@ NOTE: This only works with simple relative directories.  Throw it an absolute di
 =cut
 
 sub cd {
-    my($self, $dir, @cmds) = @_;
+    my($self, $dir, < @cmds) = < @_;
 
-    return $self->SUPER::cd($dir, @cmds) unless $self->make eq 'nmake';
+    return $self->SUPER::cd($dir, < @cmds) unless $self->make eq 'nmake';
 
-    my $cmd = join "\n\t", map "$_", @cmds;
+    my $cmd = join "\n\t", map "$_", < @cmds;
 
-    my $updirs = $self->catdir(map { $self->updir } $self->splitdir($dir));
+    my $updirs = $self->catdir(map { < $self->updir } < $self->splitdir($dir));
 
     # No leading tab and no trailing newline makes for easier embedding.
     my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs;
@@ -531,7 +531,7 @@ Windows is Win32.
 =cut
 
 sub os_flavor {
-    return('Win32');
+    return @('Win32');
 }
 
 
@@ -544,7 +544,7 @@ defined.
 =cut
 
 sub cflags {
-    my($self,$libperl)=@_;
+    my($self,$libperl)=< @_;
     return $self->{CFLAGS} if $self->{CFLAGS};
     return '' unless $self->needs_linking();
 

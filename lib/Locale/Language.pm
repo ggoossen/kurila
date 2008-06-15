@@ -14,15 +14,15 @@ require Exporter;
 #-----------------------------------------------------------------------
 use vars qw($VERSION @ISA @EXPORT);
 $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA          = qw(Exporter);
-@EXPORT       = qw(&code2language &language2code
-                   &all_language_codes &all_language_names );
+@ISA          = @( qw(Exporter) );
+@EXPORT       = @( qw(&code2language &language2code
+                   &all_language_codes &all_language_names ) );
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
 #-----------------------------------------------------------------------
-my %CODES     = ();
-my %LANGUAGES = ();
+my %CODES     = %( () );
+my %LANGUAGES = %( () );
 
 
 #=======================================================================

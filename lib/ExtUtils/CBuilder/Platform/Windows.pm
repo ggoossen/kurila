@@ -10,11 +10,11 @@ use ExtUtils::CBuilder::Base;
 
 use vars qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = qw(ExtUtils::CBuilder::Base);
+@ISA = @( qw(ExtUtils::CBuilder::Base) );
 
 sub new {
   my $class = shift;
-  my $self = $class->SUPER::new(@_);
+  my $self = $class->SUPER::new(< @_);
   my $cf = $self->{config};
 
   # Inherit from an appropriate compiler driver class
@@ -27,7 +27,7 @@ sub _compiler_type {
   my $self = shift;
   my $cc = $self->{config}->{cc};
 
-  return (  $cc =~ m/cl(\.exe)?$/ ? 'MSVC'
+  return  @(  $cc =~ m/cl(\.exe)?$/ ? 'MSVC'
 	  : $cc =~ m/bcc32(\.exe)?$/ ? 'BCC'
 	  : 'GCC');
 }
@@ -36,49 +36,49 @@ sub split_like_shell {
   # Since Windows will pass the whole command string (not an argument
   # array) to the target program and make the program parse it itself,
   # we don't actually need to do any processing here.
-  (my $self, local $_) = @_;
+  (my $self, local $_) = < @_;
   
   return @$_ if defined() && UNIVERSAL::isa($_, 'ARRAY');
   return unless defined() && length();
-  return ($_);
+  return  @($_);
 }
 
 sub arg_defines {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   s/"/\\"/g foreach values %args;
   return map qq{"-D$_=%args{$_}"}, keys %args;
 }
 
 sub compile {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   my $cf = $self->{config};
 
   die "Missing 'source' argument to compile()" unless defined %args{source};
 
   my ($basename, $srcdir) =
-    ( File::Basename::fileparse(%args{source}, '\.[^.]+$') )[[0,1]];
+    ( < File::Basename::fileparse(%args{source}, '\.[^.]+$') )[[0,1]];
 
   $srcdir ||= File::Spec->curdir();
 
-  my @defines = $self->arg_defines( %{ %args{defines} || \%() } );
+  my @defines = @( < $self->arg_defines( < %{ %args{defines} || \%() } ) );
 
-  my %spec = (
+  my %spec = %(
     srcdir      => $srcdir,
     builddir    => $srcdir,
     basename    => $basename,
     source      => %args{source},
     output      => File::Spec->catfile($srcdir, $basename) . $cf->{obj_ext},
     cc          => $cf->{cc},
-    cflags      => \@(
-                     $self->split_like_shell($cf->{ccflags}),
-                     $self->split_like_shell($cf->{cccdlflags}),
+    cflags      => \@( <
+                     $self->split_like_shell($cf->{ccflags}), <
+                     $self->split_like_shell($cf->{cccdlflags}), <
                      $self->split_like_shell(%args{extra_compiler_flags}),
                    ),
-    optimize    => \@( $self->split_like_shell($cf->{optimize})    ),
+    optimize    => \@( < $self->split_like_shell($cf->{optimize})    ),
     defines     => \@defines,
-    includes    => \@( @{%args{include_dirs} || \@()} ),
-    perlinc     => \@(
-                     $self->perl_inc(),
+    includes    => \@( < @{%args{include_dirs} || \@()} ),
+    perlinc     => \@( <
+                     $self->perl_inc(), <
                      $self->split_like_shell($cf->{incpath}),
                    ),
     use_scripts => 1, # XXX provide user option to change this???
@@ -91,9 +91,9 @@ sub compile {
      %spec{perlinc},
   );
 
-  my @cmds = $self->format_compiler_cmd(%spec);
+  my @cmds = @( < $self->format_compiler_cmd(< %spec) );
   while ( my $cmd = shift @cmds ) {
-    $self->do_system( @$cmd )
+    $self->do_system( < @$cmd )
       or die "error building $cf->{dlext} file from '%args{source}'";
   }
 
@@ -104,11 +104,11 @@ sub compile {
 sub need_prelink { 1 }
 
 sub link {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   my $cf = $self->{config};
 
-  my @objects = ( ref %args{objects} eq 'ARRAY' ? @{%args{objects}} : %args{objects} );
-  my $to = join '', (File::Spec->splitpath(@objects[0]))[[0,1]];
+  my @objects = @( ref %args{objects} eq 'ARRAY' ? < @{%args{objects}} : %args{objects} );
+  my $to = join '', ( <File::Spec->splitpath(@objects[0]))[[0,1]];
   $to ||= File::Spec->curdir();
 
   (my $file_base = %args{module_name}) =~ s/.*:://;
@@ -120,7 +120,7 @@ sub link {
   my $perl_src = $self->perl_src();
   $lddlflags =~ s/\Q$cf->{archlibexp}\E[\\\/]CORE/$perl_src/ if $perl_src;
 
-  my %spec = (
+  my %spec = %(
     srcdir        => $to,
     builddir      => $to,
     startup       => \@( ),
@@ -129,10 +129,10 @@ sub link {
     output        => $output,
     ld            => $cf->{ld},
     libperl       => $cf->{libperl},
-    perllibs      => \@( $self->split_like_shell($cf->{perllibs})  ),
-    libpath       => \@( $self->split_like_shell($cf->{libpth})    ),
-    lddlflags     => \@( $self->split_like_shell($lddlflags) ),
-    other_ldflags => \@( $self->split_like_shell(%args{extra_linker_flags} || '') ),
+    perllibs      => \@( < $self->split_like_shell($cf->{perllibs})  ),
+    libpath       => \@( < $self->split_like_shell($cf->{libpth})    ),
+    lddlflags     => \@( < $self->split_like_shell($lddlflags) ),
+    other_ldflags => \@( < $self->split_like_shell(%args{extra_linker_flags} || '') ),
     use_scripts   => 1, # XXX provide user option to change this???
   );
 
@@ -166,7 +166,7 @@ sub link {
 
   $self->add_to_cleanup(
     grep defined,
-    @{\@( %spec{[qw(manifest implib explib dbg_file def_file base_file map_file)]} )}
+    < @{\@( %spec{[qw(manifest implib explib dbg_file def_file base_file map_file)]} )}
   );
 
   foreach my $opt ( qw(output manifest implib explib dbg_file def_file map_file base_file) ) {
@@ -183,9 +183,9 @@ sub link {
                   dl_file => $def_base,
                   dl_base => %spec{basename} );
 
-  my @cmds = $self->format_linker_cmd(%spec);
+  my @cmds = @( < $self->format_linker_cmd(< %spec) );
   while ( my $cmd = shift @cmds ) {
-    $self->do_system( @$cmd );
+    $self->do_system( < @$cmd );
   }
 
   %spec{output} =~ s/'|"//g;
@@ -196,10 +196,10 @@ sub link {
 
 # canonize & quote paths
 sub normalize_filespecs {
-  my ($self, @specs) = @_;
-  foreach my $spec ( grep defined, @specs ) {
+  my ($self, < @specs) = < @_;
+  foreach my $spec ( grep defined, < @specs ) {
     if ( ref $spec eq 'ARRAY') {
-      $self->normalize_filespecs( map {\$_} grep defined, @$spec )
+      $self->normalize_filespecs( map {\$_} grep defined, < @$spec )
     } elsif ( ref $spec eq 'SCALAR' ) {
       $$spec =~ s/"//g if $$spec;
       next unless $$spec;
@@ -251,30 +251,30 @@ commandlines under some shells.
 package ExtUtils::CBuilder::Platform::Windows::MSVC;
 
 sub format_compiler_cmd {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
-  foreach my $path ( @{ %spec{includes} || \@() },
-                     @{ %spec{perlinc}  || \@() } ) {
+  foreach my $path ( < @{ %spec{includes} || \@() },
+                     < @{ %spec{perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
-  %spec = $self->write_compiler_script(%spec)
+  %spec = %( < $self->write_compiler_script(< %spec) )
     if %spec{use_scripts};
 
   return \@( grep {defined && length} (
     %spec{cc},'-nologo','-c',
-    @{%spec{includes}}      ,
-    @{%spec{cflags}}        ,
-    @{%spec{optimize}}      ,
-    @{%spec{defines}}       ,
-    @{%spec{perlinc}}       ,
+    < @{%spec{includes}}      ,
+    < @{%spec{cflags}}        ,
+    < @{%spec{optimize}}      ,
+    < @{%spec{defines}}       ,
+    < @{%spec{perlinc}}       ,
     "-Fo%spec{output}"      ,
     %spec{source}           ,
   ) );
 }
 
 sub write_compiler_script {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
   my $script = File::Spec->catfile( %spec{srcdir},
                                     %spec{basename} . '.ccs' );
@@ -286,7 +286,7 @@ sub write_compiler_script {
     or die( "Could not create script '$script': $!" );
 
   print SCRIPT join( "\n",
-    map { ref $_ ? @{$_} : $_ }
+    map { ref $_ ? < @{$_} : $_ }
     grep defined,
     delete(
       %spec{[qw(includes cflags optimize defines perlinc) ]} )
@@ -300,10 +300,10 @@ sub write_compiler_script {
 }
 
 sub format_linker_cmd {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
   my $cf = $self->{config};
 
-  foreach my $path ( @{%spec{libpath}} ) {
+  foreach my $path ( < @{%spec{libpath}} ) {
     $path = "-libpath:$path";
   }
 
@@ -315,21 +315,21 @@ sub format_linker_cmd {
   %spec{implib}    &&= '-implib:'   . %spec{implib};
   %spec{map_file}  &&= '-map:'      . %spec{map_file};
 
-  %spec = $self->write_linker_script(%spec)
+  %spec = %( < $self->write_linker_script(< %spec) )
     if %spec{use_scripts};
 
   my @cmds; # Stores the series of commands needed to build the module.
 
   push @cmds, \@( grep {defined && length} (
     %spec{ld}               ,
-    @{%spec{lddlflags}}     ,
-    @{%spec{libpath}}       ,
-    @{%spec{other_ldflags}} ,
-    @{%spec{startup}}       ,
-    @{%spec{objects}}       ,
+    < @{%spec{lddlflags}}     ,
+    < @{%spec{libpath}}       ,
+    < @{%spec{other_ldflags}} ,
+    < @{%spec{startup}}       ,
+    < @{%spec{objects}}       ,
     %spec{map_file}         ,
     %spec{libperl}          ,
-    @{%spec{perllibs}}      ,
+    < @{%spec{perllibs}}      ,
     %spec{def_file}         ,
     %spec{implib}           ,
     %spec{output}           ,
@@ -346,7 +346,7 @@ sub format_linker_cmd {
 }
 
 sub write_linker_script {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
   my $script = File::Spec->catfile( %spec{srcdir},
                                     %spec{basename} . '.lds' );
@@ -359,7 +359,7 @@ sub write_linker_script {
     or die( "Could not create script '$script': $!" );
 
   print SCRIPT join( "\n",
-    map { ref $_ ? @{$_} : $_ }
+    map { ref $_ ? < @{$_} : $_ }
     grep defined,
     delete(
       %spec{[qw(lddlflags libpath other_ldflags
@@ -380,30 +380,30 @@ sub write_linker_script {
 package ExtUtils::CBuilder::Platform::Windows::BCC;
 
 sub format_compiler_cmd {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
-  foreach my $path ( @{ %spec{includes} || \@() },
-                     @{ %spec{perlinc}  || \@() } ) {
+  foreach my $path ( < @{ %spec{includes} || \@() },
+                     < @{ %spec{perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
-  %spec = $self->write_compiler_script(%spec)
+  %spec = %( < $self->write_compiler_script(< %spec) )
     if %spec{use_scripts};
 
   return \@( grep {defined && length} (
     %spec{cc}, '-c'         ,
-    @{%spec{includes}}      ,
-    @{%spec{cflags}}        ,
-    @{%spec{optimize}}      ,
-    @{%spec{defines}}       ,
-    @{%spec{perlinc}}       ,
+    < @{%spec{includes}}      ,
+    < @{%spec{cflags}}        ,
+    < @{%spec{optimize}}      ,
+    < @{%spec{defines}}       ,
+    < @{%spec{perlinc}}       ,
     "-o%spec{output}"       ,
     %spec{source}           ,
   ) );
 }
 
 sub write_compiler_script {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
   my $script = File::Spec->catfile( %spec{srcdir},
                                     %spec{basename} . '.ccs' );
@@ -421,7 +421,7 @@ sub write_compiler_script {
   # result is is a floating point number in the source file where a
   # string is expected. So we leave the macros on the command line.
   print SCRIPT join( "\n",
-    map { ref $_ ? @{$_} : $_ }
+    map { ref $_ ? < @{$_} : $_ }
     grep defined,
     delete(
       %spec{[qw(includes cflags optimize perlinc) ]} )
@@ -435,35 +435,35 @@ sub write_compiler_script {
 }
 
 sub format_linker_cmd {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
-  foreach my $path ( @{%spec{libpath}} ) {
+  foreach my $path ( < @{%spec{libpath}} ) {
     $path = "-L$path";
   }
 
   push( @{%spec{startup}}, 'c0d32.obj' )
-    unless ( %spec{starup} && @{%spec{startup}} );
+    unless ( %spec{starup} && nelems @{%spec{startup}} );
 
-  %spec = $self->write_linker_script(%spec)
+  %spec = %( < $self->write_linker_script(< %spec) )
     if %spec{use_scripts};
 
   return \@( grep {defined && length} (
     %spec{ld}               ,
-    @{%spec{lddlflags}}     ,
-    @{%spec{libpath}}       ,
-    @{%spec{other_ldflags}} ,
-    @{%spec{startup}}       ,
-    @{%spec{objects}}       , ',',
+    < @{%spec{lddlflags}}     ,
+    < @{%spec{libpath}}       ,
+    < @{%spec{other_ldflags}} ,
+    < @{%spec{startup}}       ,
+    < @{%spec{objects}}       , ',',
     %spec{output}           , ',',
     %spec{map_file}         , ',',
     %spec{libperl}          ,
-    @{%spec{perllibs}}      , ',',
+    < @{%spec{perllibs}}      , ',',
     %spec{def_file}
   ) );
 }
 
 sub write_linker_script {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
   # To work around Borlands "unique" commandline syntax,
   # two scripts are used:
@@ -482,7 +482,7 @@ sub write_linker_script {
     or die( "Could not create linker script '$ld_script': $!" );
 
   print LD_SCRIPT join( " +\n",
-    map { @{$_} }
+    map { < @{$_} }
     grep defined,
     delete(
       %spec{[qw(lddlflags libpath other_ldflags startup objects) ]} )
@@ -496,7 +496,7 @@ sub write_linker_script {
 
   print LD_LIBS join( " +\n",
      (delete %spec{libperl}  || ''),
-    @{delete %spec{perllibs} || \@()},
+    < @{delete %spec{perllibs} || \@()},
   );
 
   close LD_LIBS;
@@ -513,30 +513,30 @@ sub write_linker_script {
 package ExtUtils::CBuilder::Platform::Windows::GCC;
 
 sub format_compiler_cmd {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
-  foreach my $path ( @{ %spec{includes} || \@() },
-                     @{ %spec{perlinc}  || \@() } ) {
+  foreach my $path ( < @{ %spec{includes} || \@() },
+                     < @{ %spec{perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
   # split off any -arguments included in cc
-  my @cc = split m/ (?=-)/, %spec{cc};
+  my @cc = @( split m/ (?=-)/, %spec{cc} );
 
   return \@( grep {defined && length} (
-    @cc, '-c'               ,
-    @{%spec{includes}}      ,
-    @{%spec{cflags}}        ,
-    @{%spec{optimize}}      ,
-    @{%spec{defines}}       ,
-    @{%spec{perlinc}}       ,
+    < @cc, '-c'               ,
+    < @{%spec{includes}}      ,
+    < @{%spec{cflags}}        ,
+    < @{%spec{optimize}}      ,
+    < @{%spec{defines}}       ,
+    < @{%spec{perlinc}}       ,
     '-o', %spec{output}     ,
     %spec{source}           ,
   ) );
 }
 
 sub format_linker_cmd {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
   # The Config.pm variable 'libperl' is hardcoded to the full name
   # of the perl import library (i.e. 'libperl56.a'). GCC will not
@@ -544,7 +544,7 @@ sub format_linker_cmd {
   %spec{libperl} =~ s/^(?:lib)?([^.]+).*$/-l$1/;
 
   unshift( @{%spec{other_ldflags}}, '-nostartfiles' )
-    if ( %spec{startup} && @{%spec{startup}} );
+    if ( %spec{startup} && nelems @{%spec{startup}} );
 
   # From ExtUtils::MM_Win32:
   #
@@ -555,10 +555,10 @@ sub format_linker_cmd {
   File::Basename::basename( %spec{output} ) =~ m/(....)(.{0,4})/;
   %spec{image_base} = sprintf( "0x\%x0000", unpack('n', $1 ^^^ $2) );
 
-  %spec = $self->write_linker_script(%spec)
+  %spec = %( < $self->write_linker_script(< %spec) )
     if %spec{use_scripts};
 
-  foreach my $path ( @{%spec{libpath}} ) {
+  foreach my $path ( < @{%spec{libpath}} ) {
     $path = "-L$path";
   }
 
@@ -570,20 +570,20 @@ sub format_linker_cmd {
   );
 
   # split off any -arguments included in ld
-  my @ld = split m/ (?=-)/, %spec{ld};
+  my @ld = @( split m/ (?=-)/, %spec{ld} );
 
   push @cmds, \@( grep {defined && length} (
-    @ld                       ,
+    < @ld                       ,
     '-o', %spec{output}       ,
     "-Wl,--base-file,%spec{base_file}"   ,
     "-Wl,--image-base,%spec{image_base}" ,
-    @{%spec{lddlflags}}       ,
-    @{%spec{libpath}}         ,
-    @{%spec{startup}}         ,
-    @{%spec{objects}}         ,
-    @{%spec{other_ldflags}}   ,
+    < @{%spec{lddlflags}}       ,
+    < @{%spec{libpath}}         ,
+    < @{%spec{startup}}         ,
+    < @{%spec{objects}}         ,
+    < @{%spec{other_ldflags}}   ,
     %spec{libperl}            ,
-    @{%spec{perllibs}}        ,
+    < @{%spec{perllibs}}        ,
     %spec{explib}             ,
     %spec{map_file} ? ('-Map', %spec{map_file}) : ''
   ) );
@@ -595,16 +595,16 @@ sub format_linker_cmd {
   );
 
   push @cmds, \@( grep {defined && length} (
-    @ld                       ,
+    < @ld                       ,
     '-o', %spec{output}       ,
     "-Wl,--image-base,%spec{image_base}" ,
-    @{%spec{lddlflags}}       ,
-    @{%spec{libpath}}         ,
-    @{%spec{startup}}         ,
-    @{%spec{objects}}         ,
-    @{%spec{other_ldflags}}   ,
+    < @{%spec{lddlflags}}       ,
+    < @{%spec{libpath}}         ,
+    < @{%spec{startup}}         ,
+    < @{%spec{objects}}         ,
+    < @{%spec{other_ldflags}}   ,
     %spec{libperl}            ,
-    @{%spec{perllibs}}        ,
+    < @{%spec{perllibs}}        ,
     %spec{explib}             ,
     %spec{map_file} ? ('-Map', %spec{map_file}) : ''
   ) );
@@ -613,7 +613,7 @@ sub format_linker_cmd {
 }
 
 sub write_linker_script {
-  my ($self, %spec) = @_;
+  my ($self, < %spec) = < @_;
 
   my $script = File::Spec->catfile( %spec{srcdir},
                                     %spec{basename} . '.lds' );
@@ -626,24 +626,24 @@ sub write_linker_script {
     or die( "Could not create script '$script': $!" );
 
   print( SCRIPT 'SEARCH_DIR(' . $_ . ")\n" )
-    for @{delete %spec{libpath} || \@()};
+    for < @{delete %spec{libpath} || \@()};
 
   # gcc takes only one startup file, so the first object in startup is
   # specified as the startup file and any others are shifted into the
   # beginning of the list of objects.
-  if ( %spec{startup} && @{%spec{startup}} ) {
+  if ( %spec{startup} && nelems @{%spec{startup}} ) {
     print SCRIPT 'STARTUP(' . shift( @{%spec{startup}} ) . ")\n";
     unshift @{%spec{objects}},
-      @{delete %spec{startup} || \@()};
+      < @{delete %spec{startup} || \@()};
   }
 
   print SCRIPT 'INPUT(' . join( ',',
-    @{delete %spec{objects}  || \@()}
+    < @{delete %spec{objects}  || \@()}
   ) . ")\n";
 
   print SCRIPT 'INPUT(' . join( ' ',
      (delete %spec{libperl}  || ''),
-    @{delete %spec{perllibs} || \@()},
+    < @{delete %spec{perllibs} || \@()},
   ) . ")\n";
 
   close SCRIPT;

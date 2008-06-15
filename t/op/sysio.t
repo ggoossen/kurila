@@ -7,7 +7,7 @@ use strict;
 our ($reopen, $x, $outfile);
 
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $!";
-@INC = '../../lib';
+@INC = @( '../../lib' );
 
 open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $!";
 

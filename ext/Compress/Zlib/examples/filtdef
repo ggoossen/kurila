@@ -13,7 +13,7 @@ my $x = deflateInit()
 my ($output, $status) ;
 while ( ~< *ARGV)
 {
-    ($output, $status) = $x->deflate($_) ;
+    ($output, $status) = < $x->deflate($_) ;
 
     $status == Z_OK
         or die "deflation failed\n" ;
@@ -21,7 +21,7 @@ while ( ~< *ARGV)
     print $output ;
 }
 
-($output, $status) = $x->flush() ;
+($output, $status) = < $x->flush() ;
 
 $status == Z_OK
     or die "deflation failed\n" ;

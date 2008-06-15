@@ -7,13 +7,13 @@ sub TIEHANDLE {
 
 sub PRINT {
     my $self = shift;
-    $$self .= join('', @_);
+    $$self .= join('', < @_);
 }
 
 sub PRINTF {
     my $self = shift;
     my $fmt  = shift;
-    $$self .= sprintf $fmt, @_;
+    $$self .= sprintf $fmt, < @_;
 }
 
 sub FILENO {}

@@ -12,7 +12,7 @@ use strict;
 $_ = '';	# to avoid undef warning on m// etc.
 
 sub ok {
-    my($test,$ok) = @_;
+    my($test,$ok) = < @_;
     print "not " unless $ok;
     print "ok $test\n";
 }

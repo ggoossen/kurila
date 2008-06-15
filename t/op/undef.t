@@ -18,13 +18,13 @@ print defined($a) ? "ok 4\n" : "not ok 4\n";
 $a = $b;
 print defined($a) ? "not ok 5\n" : "ok 5\n";
 
-@ary = ("1arg");
+@ary = @("1arg");
 $a = pop(@ary);
 print defined($a) ? "ok 6\n" : "not ok 6\n";
 $a = pop(@ary);
 print defined($a) ? "not ok 7\n" : "ok 7\n";
 
-@ary = ("1arg");
+@ary = @("1arg");
 $a = shift(@ary);
 print defined($a) ? "ok 8\n" : "not ok 8\n";
 $a = shift(@ary);
@@ -42,9 +42,9 @@ undef @ary;
 print defined(@ary) ? "not ok 15\n" : "ok 15\n";
 undef %ary;
 print defined(%ary) ? "not ok 16\n" : "ok 16\n";
-@ary = (1);
+@ary = @(1);
 print defined @ary ? "ok 17\n" : "not ok 17\n";
-%ary = (1,1);
+%ary = %(1,1);
 print defined %ary ? "ok 18\n" : "not ok 18\n";
 
 sub foo { print "ok 19\n"; }
@@ -65,7 +65,7 @@ print $@->{description} =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n
     require Tie::Hash;
     tie my %foo, 'Tie::StdHash';
     print defined %foo ? "ok 24\n" : "not ok 24\n";
-    %foo = ( a => 1 );
+    %foo = %( a => 1 );
     print defined %foo ? "ok 25\n" : "not ok 25\n";
 }
 
@@ -73,7 +73,7 @@ print $@->{description} =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n
     require Tie::Array;
     tie my @foo, 'Tie::StdArray';
     print defined @foo ? "ok 26\n" : "not ok 26\n";
-    @foo = ( a => 1 );
+    @foo = @( a => 1 );
     print defined @foo ? "ok 27\n" : "not ok 27\n";
 }
 
@@ -88,7 +88,7 @@ print $@->{description} =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n
 # modify the hash. To them, the hash should appear empty.
 
 $test = 29;
-%hash = (
+%hash = %(
     key1 => bless(\%(), 'X'),
     key2 => bless(\%(), 'X'),
 );

@@ -165,18 +165,18 @@ ok( $_ eq 'aabbcc  224466xxyyzz' );
 # test recursive substitutions
 # code based on the recursive expansion of makefile variables
 
-my %MK = (
+my %MK = %(
     AAAAA => '$(B)', B=>'$(C)', C => 'D',			# long->short
     E     => '$(F)', F=>'p $(G) q', G => 'HHHHH',	# short->long
     DIR => '$(UNDEFINEDNAME)/xxx',
 );
 sub var { 
-    my($var,$level) = @_;
+    my($var,$level) = < @_;
     return "\$($var)" unless exists %MK{$var};
     return exp_vars(%MK{$var}, $level+1); # can recurse
 }
 sub exp_vars { 
-    my($str,$level) = @_;
+    my($str,$level) = < @_;
     $str =~ s/\$\((\w+)\)/{var($1, $level+1)}/g; # can recurse
     #warn "exp_vars $level = '$str'\n";
     $str;
@@ -216,7 +216,7 @@ ok( $_ eq "foobarfoobbar" && $snum == 1 );
 
 eval 's{foo} # this is a comment, not a delimiter
        {bar};';
-ok( ! @?, 'parsing of split subst with comment' );
+ok( ! nelems @?, 'parsing of split subst with comment' );
 
 $_ = "ab";
 ok( s/a/b/ == 1 );
@@ -479,7 +479,7 @@ is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
 # [perl #20682] @- not visible in replacement
 $_ = "123";
 m/(2)/;	# seed @- with something else
-s/(1)(2)(3)/{@- -1} (@-)/;
+s/(1)(2)(3)/{(nelems @-) -1} ({join ' ', <@-})/;
 is($_, "3 (0 0 1 2)", '#20682 @- not visible in replacement');
 
 # [perl #20682] $^N not visible in replacement

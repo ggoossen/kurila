@@ -17,9 +17,9 @@ require threads;
 sub thread_it {
     # Generate things like './op/regexp.t', './t/op/regexp.t', ':op:regexp.t'
     my @paths
-	= (join ('/', '.', @_), join ('/', '.', 't', @_), join (':', @_));
+	= @(join ('/', '.', < @_), join ('/', '.', 't', < @_), join (':', < @_));
 		 
-    for my $file (@paths) {
+    for my $file (< @paths) {
 	if (-r $file) {
 	    print "# found tests in $file\n";
 	    $::running_as_thread = "running tests in a new thread";
@@ -33,7 +33,7 @@ sub thread_it {
 	    exit;
 	}
     }
-    die "Cannot find " . join (" or ", @paths) . "\n";
+    die "Cannot find " . join (" or ", < @paths) . "\n";
 }
 
 1;

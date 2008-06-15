@@ -146,7 +146,7 @@ print "# T_CHAR\n";
 
 is( T_CHAR("a"), "a");
 is( T_CHAR("-"), "-");
-is( T_CHAR(bytes::chr(128)),bytes::chr(128));
+is( T_CHAR( <bytes::chr(128)),bytes::chr(128));
 ok( T_CHAR(chr(256)) ne chr(256));
 
 # T_U_CHAR
@@ -162,7 +162,7 @@ ok( T_U_CHAR(300) != 300);
 print "# T_FLOAT\n";
 
 # limited precision
-is( sprintf("%6.3f",T_FLOAT(52.345)), sprintf("%6.3f",52.345));
+is( sprintf("%6.3f", <T_FLOAT(52.345)), sprintf("%6.3f",52.345));
 
 # T_NV
 print "# T_NV\n";
@@ -172,7 +172,7 @@ is( T_NV(52.345), 52.345);
 # T_DOUBLE
 print "# T_DOUBLE\n";
 
-is( sprintf("%6.3f",T_DOUBLE(52.345)), sprintf("%6.3f",52.345));
+is( sprintf("%6.3f", <T_DOUBLE(52.345)), sprintf("%6.3f",52.345));
 
 # T_PV
 print "# T_PV\n";
@@ -247,11 +247,11 @@ is( T_OPAQUEPTR_OUT($p), $t);
 # T_OPAQUEPTR with a struct
 print "# T_OPAQUEPTR with a struct\n";
 
-my @test = (5,6,7);
-$p = T_OPAQUEPTR_IN_struct(@test);
-my @result = T_OPAQUEPTR_OUT_struct($p);
-is(scalar(@result),scalar(@test));
-for (0..(@test-1)) {
+my @test = @(5,6,7);
+$p = T_OPAQUEPTR_IN_struct(< @test);
+my @result = @( < T_OPAQUEPTR_OUT_struct($p) );
+is(scalar(nelems @result),scalar(nelems @test));
+for (0..((nelems @test)-1)) {
   is(@result[$_], @test[$_]);
 }
 
@@ -266,11 +266,11 @@ is(T_OPAQUE_OUT( $p ), $t );         # Test using T_OPQAQUE
 # T_OPAQUE_array
 print "# A packed  array\n";
 
-my @opq = (2,4,8);
-my $packed = T_OPAQUE_array(@opq);
-my @uopq = unpack("i*",$packed);
-is(scalar(@uopq), scalar(@opq));
-for (0..(@opq-1)) {
+my @opq = @(2,4,8);
+my $packed = T_OPAQUE_array(< @opq);
+my @uopq = @( unpack("i*",$packed) );
+is(scalar(nelems @uopq), scalar(nelems @opq));
+for (0..((nelems @opq)-1)) {
   is( @uopq[$_], @opq[$_]);
 }
 
@@ -284,11 +284,11 @@ for (0..(@opq-1)) {
 
 # T_ARRAY
 print "# T_ARRAY\n";
-my @inarr = (1,2,3,4,5,6,7,8,9,10);
-my @outarr = T_ARRAY( 5, @inarr );
-is(scalar(@outarr), scalar(@inarr));
+my @inarr = @(1,2,3,4,5,6,7,8,9,10);
+my @outarr = @( < T_ARRAY( 5, < @inarr ) );
+is(scalar(nelems @outarr), scalar(nelems @inarr));
 
-for (0..(@inarr-1)) {
+for (0..((nelems @inarr)-1)) {
   is(@outarr[$_], @inarr[$_]);
 }
 
@@ -305,7 +305,7 @@ ok( $fh );
 # write to it using perl
 if (defined $fh) {
 
-  my @lines = ("NormalSTDIO\n", "PerlIO\n");
+  my @lines = @("NormalSTDIO\n", "PerlIO\n");
 
   # print to it using FILE* through XS
   is( T_STDIO_print($fh, @lines[0]), length(@lines[0]));

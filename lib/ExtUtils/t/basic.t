@@ -6,7 +6,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -51,19 +51,19 @@ END {
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my @mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
+my @mpl_out = @( < run(qq{$perl Makefile.PL "PREFIX=../dummy-install"}) );
 END { rmtree '../dummy-install'; }
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
+  diag(< @mpl_out);
 
 my $makefile = makefile_name();
 ok( grep(m/^Writing $makefile for Big::Dummy/, 
-         @mpl_out) == 1,
+         < @mpl_out) == 1,
                                            'Makefile.PL output looks right');
 
 ok( grep(m/^Current package is: main$/,
-         @mpl_out) == 1,
+         < @mpl_out) == 1,
                                            'Makefile.PL run in package main');
 
 ok( -e $makefile,       'Makefile exists' );
@@ -72,7 +72,7 @@ ok( -e $makefile,       'Makefile exists' );
 my $mtime = (stat($makefile))[[9]];
 cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' );
 
-END { unlink makefile_name(), makefile_backup() }
+END { unlink < makefile_name(), < makefile_backup() }
 
 my $make = make_run();
 
@@ -140,7 +140,7 @@ like( $install_out, qr/^Installing /m );
 like( $install_out, qr/^Writing /m );
 
 ok( -r '../dummy-install',     '  install dir created' );
-my %files = ();
+my %files = %( () );
 find( sub { 
     # do it case-insensitive for non-case preserving OSs
     my $file = lc $_;
@@ -166,7 +166,7 @@ SKIP: {
     like( $install_out, qr/^Writing /m );
 
     ok( -r 'elsewhere',     '  install dir created' );
-    %files = ();
+    %files = %( () );
     find( sub { %files{$_} = $File::Find::name; }, 'elsewhere' );
     ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
     ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
@@ -187,7 +187,7 @@ SKIP: {
     like( $install_out, qr/^Writing /m );
 
     ok( -d 'other',  '  destdir created' );
-    %files = ();
+    %files = %( () );
     my $perllocal;
     find( sub { 
         %files{$_} = $File::Find::name;
@@ -229,7 +229,7 @@ SKIP: {
 
     ok( !-d 'elsewhere',       '  install dir not created' );
     ok( -d 'other/elsewhere',  '  destdir created' );
-    %files = ();
+    %files = %( () );
     find( sub { %files{$_} = $File::Find::name; }, 'other/elsewhere' );
     ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
     ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
@@ -294,21 +294,21 @@ is( $manifest->{'meta.yml'}, 'Module meta-data (added by MakeMaker)' );
 # Test NO_META META.yml suppression
 unlink $meta_yml;
 ok( !-f $meta_yml,   'META.yml deleted' );
-@mpl_out = run(qq{$perl Makefile.PL "NO_META=1"});
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+@mpl_out = @( < run(qq{$perl Makefile.PL "NO_META=1"}) );
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(< @mpl_out);
 my $distdir_out = run("$make distdir");
 is( $?, 0, 'distdir' ) || diag($distdir_out);
 ok( !-f $meta_yml,   'META.yml generation suppressed by NO_META' );
 
 
 # Make sure init_dirscan doesn't go into the distdir
-@mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
+@mpl_out = @( < run(qq{$perl Makefile.PL "PREFIX=../dummy-install"}) );
 
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(@mpl_out);
+cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) || diag(< @mpl_out);
 
-ok( grep(m/^Writing $makefile for Big::Dummy/, @mpl_out) == 1,
+ok( grep(m/^Writing $makefile for Big::Dummy/, < @mpl_out) == 1,
                                 'init_dirscan skipped distdir') || 
-  diag(@mpl_out);
+  diag(< @mpl_out);
 
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.

@@ -8,7 +8,7 @@ unless (-f $0) {
     }
     die "`$0' not found.\n";
 }
-doit: exec "perl", "-x", $0, @ARGV;
+doit: exec "perl", "-x", $0, < @ARGV;
 die "Failed to exec `$0': $!";
 __END__
 

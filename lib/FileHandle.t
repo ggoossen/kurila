@@ -74,18 +74,18 @@ if ($^O eq 'dos')
     exit(0);
 }
 
-my ($rd,$wr) = FileHandle::pipe;
+my ($rd,$wr) = < FileHandle::pipe;
 
 if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O eq 'NetWare' ||
     %Config{d_fork} ne 'define') {
   $wr->autoflush;
   $wr->printf("ok \%d\n",11);
-  print $rd->getline;
+  print < $rd->getline;
 }
 else {
   if (fork) {
    $wr->close;
-   print $rd->getline;
+   print < $rd->getline;
   }
   else {
    $rd->close;

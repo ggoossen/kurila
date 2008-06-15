@@ -2,14 +2,14 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = @( '../lib' );
     %ENV{PERL5LIB} = '../lib';
 }
 
 $| = 1;
 undef $/;
-my @prgs = split "\n########\n", ~< *DATA;
-print "1..", scalar @prgs, "\n";
+my @prgs = @( split "\n########\n", ~< *DATA );
+print "1..", scalar nelems @prgs, "\n";
 
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MSWin32 = $^O eq 'MSWin32';
@@ -20,20 +20,20 @@ my $i = 0 ;
 1 while -e ++$tmpfile;
 END {  if ($tmpfile) { 1 while unlink $tmpfile} }
 
-for (@prgs){
+for (< @prgs){
     my $switch = "";
-    my @temps = () ;
+    my @temps = @( () ) ;
     if (s/^(\s*-\w+)//){
         $switch = $1;
     }
     my($prog,$expected) = split(m/\nEXPECT\n/, $_);
     if ( $prog =~ m/--FILE--/) {
-        my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
+        my(@files) = @( split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ) ;
 	shift @files ;
 	die "Internal error test $i didn't split into pairs, got " . 
-		scalar(@files) . "[" . join("\%\%\%\%", @files) ."]\n"
-	    if @files % 2 ;
-	while (@files +> 2) {
+		scalar(nelems @files) . "[" . join("\%\%\%\%", < @files) ."]\n"
+	    if (nelems @files) % 2 ;
+	while ((nelems @files) +> 2) {
 	    my $filename = shift @files ;
 	    my $code = shift @files ;
     	    push @temps, $filename ;
@@ -77,7 +77,7 @@ for (@prgs){
         print "not ";
     }
     print "ok ", ++$i, "\n";
-    foreach (@temps) 
+    foreach (< @temps) 
 	{ unlink $_ if $_ } 
 }
 

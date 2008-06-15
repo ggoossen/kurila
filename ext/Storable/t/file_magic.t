@@ -24,7 +24,7 @@ for my $f (<data_*>) {
 print ");\n";
 EOT
 
-my @tests = (
+my @tests = @(
     \@(
         "perl-store\x[04]1234\4\4\4\x[D4]\x[C2]\32\b\3\13\0\0\0v\b\x[C5]\32\b...",
         \%(
@@ -380,7 +380,7 @@ my @tests = (
     ),
 );
 
-plan tests => 31 + 2 * @tests;
+plan tests => 31 + 2 * nelems @tests;
 
 my $file = "xx-$$.pst";
 
@@ -403,7 +403,7 @@ store(\%(), $file);
 
     ok(!$info->{netorder}, "no netorder");
 
-    my %attrs = (
+    my %attrs = %(
         nvsize  => 5.006, 
         ptrsize => 5.005, 
         map {$_ => 5.004} qw(byteorder intsize longsize)
@@ -432,8 +432,8 @@ nstore(\%(), $file);
     }
 }
 
-for my $test (@tests) {
-    my($data, $expected) = @$test;
+for my $test (< @tests) {
+    my($data, $expected) = < @$test;
     open(FH, ">", "$file") || die "Can't create $file: $!";
     binmode(FH);
     print FH $data;
@@ -448,5 +448,5 @@ for my $test (@tests) {
     is_deeply($info, $expected, "file_magic $name");
 
     $expected->{file} = 1;
-    is_deeply(Storable::read_magic($data), $expected, "read magic $name");
+    is_deeply( <Storable::read_magic($data), $expected, "read magic $name");
 }

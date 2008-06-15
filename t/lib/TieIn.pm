@@ -6,7 +6,7 @@ sub TIEHANDLE {
 
 sub write {
     my $self = shift;
-    $$self .= join '', @_;
+    $$self .= join '', < @_;
 }
 
 sub READLINE {

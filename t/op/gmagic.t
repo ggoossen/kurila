@@ -10,8 +10,8 @@ my $t = 1;
 tie my $c => 'Tie::Monitor';
 
 sub ok {
-    my($ok, $got, $exp, $rexp, $wexp) = @_;
-    my($rgot, $wgot) = (tied $c)->init(0);
+    my($ok, $got, $exp, $rexp, $wexp) = < @_;
+    my($rgot, $wgot) = < (tied $c)->init(0);
     print $ok ? "ok $t\n" : "# expected $exp, got $got\nnot ok $t\n";
     ++$t;
     if ($rexp == $rgot && $wexp == $wgot) {
@@ -24,9 +24,9 @@ sub ok {
     ++$t;
 }
 
-sub ok_undef { ok(!defined(@_[0]), shift, "undef", @_) }
-sub ok_numeric { ok(@_[0] == @_[1], @_) }
-sub ok_string { ok(@_[0] eq @_[1], @_) }
+sub ok_undef { ok(!defined(@_[0]), shift, "undef", < @_) }
+sub ok_numeric { ok(@_[0] == @_[1], < @_) }
+sub ok_string { ok(@_[0] eq @_[1], < @_) }
 
 my($r, $s);
 # the thing itself
@@ -52,7 +52,7 @@ ok_string($s, '00', 3, 1);
 package Tie::Monitor;
 
 sub TIESCALAR {
-    my($class, $value) = @_;
+    my($class, $value) = < @_;
     bless \%(
 	read => 0,
 	write => 0,
@@ -63,18 +63,18 @@ sub TIESCALAR {
 sub FETCH {
     my $self = shift;
     ++$self->{read};
-    $self->{values}->[@{ $self->{values} }-1];
+    $self->{values}->[(nelems @{ $self->{values} })-1];
 }
 
 sub STORE {
-    my($self, $value) = @_;
+    my($self, $value) = < @_;
     ++$self->{write};
     push @{ $self->{values} }, $value;
 }
 
 sub init {
     my $self = shift;
-    my @results = ($self->{read}, $self->{write});
+    my @results = @($self->{read}, $self->{write});
     $self->{read} = $self->{write} = 0;
     $self->{values} = \@( 0 );
     @results;

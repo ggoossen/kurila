@@ -14,7 +14,7 @@ $list_assignment_supported = 0 if ($^O eq 'VMS');
 
 
 sub foo {
-    local($a, $b) = @_;
+    local($a, $b) = < @_;
     local($c, $d);
     $c = "c 3";
     $d = "d 4";
@@ -30,7 +30,7 @@ $c = "c 7";
 $d = "d 8";
 
 my @res;
-@res =  &foo("a 1","b 2");
+@res = @( <  &foo("a 1","b 2") );
 is(@res[0], "c 3");
 is(@res[1], "d 4");
 
@@ -44,27 +44,27 @@ is($y, "c 10");
 # same thing, only with arrays and associative arrays
 
 sub foo2 {
-    local($a, @b) = @_;
+    local($a, < @b) = < @_;
     local(@c, %d);
-    @c = "c 3";
+    @c = @( "c 3" );
     %d{''} = "d 4";
-    { local($a,@c) = ("a 19", "c 20"); ($x, $y) = ($a, @c); }
+    { local($a,< @c) = ("a 19", "c 20"); ($x, $y) = ($a, < @c); }
     is($a, "a 1");
-    is("@b", "b 2");
+    is("{join ' ', <@b}", "b 2");
     @c[0], %d{''};
 }
 
 $a = "a 5";
-@b = "b 6";
-@c = "c 7";
+@b = @( "b 6" );
+@c = @( "c 7" );
 %d{''} = "d 8";
 
-@res = &foo2("a 1","b 2");
+@res = @( < &foo2("a 1","b 2") );
 is(@res[0], "c 3");
 is(@res[1], "d 4");
 
 is($a, "a 5");
-is("@b", "b 6");
+is("{join ' ', <@b}", "b 6");
 is(@c[0], "c 7");
 is(%d{''}, "d 8");
 is($x, "a 19");
@@ -82,7 +82,7 @@ like($@->{description}, qr/Can't localize through a reference/);
 
 # Array and hash elements
 
-@a = ('a', 'b', 'c');
+@a = @('a', 'b', 'c');
 {
     local(@a[1]) = 'foo';
     local(@a[2]) = @a[2];
@@ -94,19 +94,19 @@ is(@a[1], 'b');
 is(@a[2], 'c');
 ok(!defined @a[0]);
 
-@a = ('a', 'b', 'c');
+@a = @('a', 'b', 'c');
 {
     local(@a[1]) = "X";
     shift @a;
 }
 is(@a[0].@a[1], "Xb");
 {
-    my $d = "@a";
-    local @a = @a;
-    is("@a", $d);
+    my $d = "{join ' ', <@a}";
+    local @a = @( < @a );
+    is("{join ' ', <@a}", $d);
 }
 
-%h = ('a' => 1, 'b' => 2, 'c' => 3);
+%h = %('a' => 1, 'b' => 2, 'c' => 3);
 {
     local(%h{'a'}) = 'foo';
     local(%h{'b'}) = %h{'b'};
@@ -119,7 +119,7 @@ is(%h{'a'}, 1);
 is(%h{'b'}, 2);
 {
     my $d = join("\n", map { "$_=>%h{$_}" } sort keys %h);
-    local %h = %h;
+    local %h = %( < %h );
     is(join("\n", map { "$_=>%h{$_}" } sort keys %h), $d);
 }
 is(%h{'c'}, 3);
@@ -145,28 +145,28 @@ is($m, 5);
     sub TIEARRAY { bless \@(), @_[0] }
     sub STORE { print "# STORE [{dump::view(\@_)}]\n"; @_[0]->[@_[1]] = @_[2] }
     sub FETCH { my $v = @_[0]->[@_[1]]; print "# FETCH [{dump::view(\@_)}=$v]\n"; $v }
-    sub CLEAR { print "# CLEAR [{dump::view(\@_)}]\n"; @{@_[0]} = (); }
-    sub FETCHSIZE { scalar(@{@_[0]}) }
+    sub CLEAR { print "# CLEAR [{dump::view(\@_)}]\n"; @{@_[0]} = @( () ); }
+    sub FETCHSIZE { scalar(nelems @{@_[0]}) }
     sub SHIFT { shift (@{@_[0]}) }
     sub EXTEND {}
 }
 
 tie @a, 'TA';
-@a = ('a', 'b', 'c');
+@a = @('a', 'b', 'c');
 {
     local(@a[1]) = 'foo';
     local(@a[2]) = @a[2];
     is(@a[1], 'foo');
     is(@a[2], 'c');
-    @a = ();
+    @a = @( () );
 }
 is(@a[1], 'b');
 is(@a[2], 'c');
 ok(!defined @a[0]);
 {
-    my $d = "@a";
-    local @a = @a;
-    is("@a", $d);
+    my $d = "{join ' ', <@a}";
+    local @a = @( < @a );
+    is("{join ' ', <@a}", $d);
 }
 
 {
@@ -176,14 +176,14 @@ ok(!defined @a[0]);
     sub FETCH { my $v = @_[0]->{@_[1]}; print "# FETCH [{dump::view(\@_)}=$v]\n"; $v }
     sub EXISTS { print "# EXISTS [{dump::view(\@_)}]\n"; exists @_[0]->{@_[1]}; }
     sub DELETE { print "# DELETE [{dump::view(\@_)}]\n"; delete @_[0]->{@_[1]}; }
-    sub CLEAR { print "# CLEAR [{dump::view(@_)}]\n"; %{@_[0]} = (); }
-    sub FIRSTKEY { print "# FIRSTKEY [@_]\n"; keys %{@_[0]}; each %{@_[0]} }
-    sub NEXTKEY { print "# NEXTKEY [@_]\n"; each %{@_[0]} }
+    sub CLEAR { print "# CLEAR [{dump::view(< @_)}]\n"; %{@_[0]} = %( () ); }
+    sub FIRSTKEY { print "# FIRSTKEY [{join ' ', <@_}]\n"; keys %{@_[0]}; each %{@_[0]} }
+    sub NEXTKEY { print "# NEXTKEY [{join ' ', <@_}]\n"; each %{@_[0]} }
 }
 
 # see if localization works on tied hashes
 tie %h, 'TH';
-%h = ('a' => 1, 'b' => 2, 'c' => 3);
+%h = %('a' => 1, 'b' => 2, 'c' => 3);
 
 {
     local(%h{'a'}) = 'foo';
@@ -204,11 +204,11 @@ ok(! exists %h{'z'});
 TODO: {
     todo_skip("Localize entire tied hash");
     my $d = join("\n", map { "$_=>%h{$_}" } sort keys %h);
-    local %h = %h;
+    local %h = %( < %h );
     is(join("\n", map { "$_=>%h{$_}" } sort keys %h), $d);
 }
 
-@a = ('a', 'b', 'c');
+@a = @('a', 'b', 'c');
 {
     local(@a[1]) = "X";
     shift @a;
@@ -236,7 +236,7 @@ cmp_ok(%SIG{INT}, '\==', \&foo);
 cmp_ok($^WARN_HOOK, '\==', \&foo);
 {
     my $d = join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG);
-    local %SIG = %SIG;
+    local %SIG = %( < %SIG );
     is(join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG), $d);
 }
 
@@ -266,7 +266,7 @@ SKIP: {
     skip("Can't make list assignment to \%ENV on this system")
 	unless $list_assignment_supported;
     my $d = join("\n", map { "$_=>%ENV{$_}" } sort keys %ENV);
-    local %ENV = %ENV;
+    local %ENV = %( < %ENV );
     is(join("\n", map { "$_=>%ENV{$_}" } sort keys %ENV), $d);
 }
 
@@ -286,7 +286,7 @@ while (m/(o.+?),/gc) {
     sub FETCH { die "read  \$_ forbidden" }
     sub STORE { die "write \$_ forbidden" }
     tie $_, __PACKAGE__;
-    my @tests = (
+    my @tests = @(
 	"Nesting"     => sub { print '#'; for (1..3) { print }
 			       print "\n" },			1,
 	"Reading"     => sub { print },				0,
@@ -423,7 +423,7 @@ is($@, "");
 # when localising a hash element, the key should be copied, not referenced
 
 {
-    my %h=('k1' => 111);
+    my %h=%('k1' => 111);
     my $k='k1';
     {
 	local %h{$k}=222;
@@ -435,7 +435,7 @@ is($@, "");
     is(%h{'k1'},111);
 }
 {
-    my %h=('k1' => 111);
+    my %h=%('k1' => 111);
     our $k = 'k1';  # try dynamic too
     {
 	local %h{$k}=222;

@@ -22,7 +22,7 @@ sub ext {
 }
 
 sub _unix_os2_ext {
-    my($self,$potential_libs, $verbose, $give_libs) = @_;
+    my($self,$potential_libs, $verbose, $give_libs) = < @_;
     $verbose ||= 0;
 
     if ($^O =~ 'os2' and %Config{perllibs}) { 
@@ -32,7 +32,7 @@ sub _unix_os2_ext {
 	$potential_libs .= " " if $potential_libs;
 	$potential_libs .= %Config{perllibs};
     }
-    return ("", "", "", "", ($give_libs ? \@() : ())) unless $potential_libs;
+    return  @("", "", "", "",  @($give_libs ? \@() : ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
     my($so)   = %Config{so};
@@ -45,11 +45,11 @@ sub _unix_os2_ext {
     # this is a rewrite of Andy Dougherty's extliblist in perl
 
     my(@searchpath); # from "-L/path" entries in $potential_libs
-    my(@libpath) = split " ", %Config{'libpth'};
+    my(@libpath) = @( split " ", %Config{'libpth'} );
     my(@ldloadlibs, @bsloadlibs, @extralibs, @ld_run_path, %ld_run_path_seen);
     my(@libs, %libs_seen);
     my($fullname, @fullname);
-    my($pwd) = cwd(); # from Cwd.pm
+    my($pwd) = < cwd(); # from Cwd.pm
     my($found) = 0;
 
     foreach my $thislib (split ' ', $potential_libs) {
@@ -87,7 +87,7 @@ sub _unix_os2_ext {
 	}
 
 	my($found_lib)=0;
-	foreach my $thispth (@searchpath, @libpath) {
+	foreach my $thispth (< @searchpath, < @libpath) {
 
 		# Try to find the full name of the library.  We need this to
 		# determine whether it's a dynamically-loadable library or not.
@@ -95,8 +95,8 @@ sub _unix_os2_ext {
 		# For gcc-2.6.2 on linux (March 1995), DLD can not load
 		# .sa libraries, with the exception of libm.sa, so we
 		# deliberately skip them.
-	    if (@fullname =
-		    $self->lsdir($thispth,"^\Qlib$thislib.$so.\E[0-9]+")){
+	    if (@fullname = @( <
+		    $self->lsdir($thispth,"^\Qlib$thislib.$so.\E[0-9]+") )){
 		# Take care that libfoo.so.10 wins against libfoo.so.9.
 		# Compare two libraries to find the most recent version
 		# number.  E.g.  if you have libfoo.so.9.0.7 and
@@ -122,7 +122,7 @@ sub _unix_os2_ext {
 			while (length($ma) +< length($mb)) { $ma .= ".00"; }
 			while (length($mb) +< length($ma)) { $mb .= ".00"; }
 			# Comparison deliberately backwards
-			$mb cmp $ma;} @fullname)[[0]];
+			$mb cmp $ma;} < @fullname)[[0]];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
 		 && ((%Config{'dlsrc'} ne "dl_dld.xs") || ($thislib eq "m"))){
 	    } elsif (-f ($fullname="$thispth/lib{$thislib}_s$Config_libext")
@@ -160,7 +160,7 @@ sub _unix_os2_ext {
 
             # include the path to the lib once in the dynamic linker path
             # but only if it is a dynamic lib and not in Perl itself
-            my($fullnamedir) = dirname($fullname);
+            my($fullnamedir) = < dirname($fullname);
             push @ld_run_path, $fullnamedir
                  if $is_dyna && !$in_perl &&
                     !%ld_run_path_seen{$fullnamedir}++;
@@ -205,11 +205,11 @@ sub _unix_os2_ext {
     }
 
     unless( $found ) {
-        return ('','','','', ($give_libs ? \@libs : ()));
+        return  @('','','','',  @($give_libs ? \@libs : ()));
     }
     else {
-        return ("@extralibs", "@bsloadlibs", "@ldloadlibs",
-                join(":",@ld_run_path), ($give_libs ? \@libs : ()));
+        return  @("{join ' ', <@extralibs}", "{join ' ', <@bsloadlibs}", "{join ' ', <@ldloadlibs}",
+                join(":",< @ld_run_path),  @($give_libs ? \@libs : ()));
     }
 }
 
@@ -217,12 +217,12 @@ sub _win32_ext {
 
     require Text::ParseWords;
 
-    my($self, $potential_libs, $verbose, $give_libs) = @_;
+    my($self, $potential_libs, $verbose, $give_libs) = < @_;
     $verbose ||= 0;
 
     # If user did not supply a list, we punt.
     # (caller should probably use the list in $Config{libs})
-    return ("", "", "", "", ($give_libs ? \@() : ())) unless $potential_libs;
+    return  @("", "", "", "",  @($give_libs ? \@() : ())) unless $potential_libs;
 
     my $cc		= %Config{cc};
     my $VC		= $cc =~ m/^cl/i;
@@ -251,7 +251,7 @@ sub _win32_ext {
     # compute $extralibs from $potential_libs
 
     my @searchpath;		    # from "-L/path" in $potential_libs
-    my @libpath		= Text::ParseWords::quotewords('\s+', 0, $libpth);
+    my @libpath		= @( < Text::ParseWords::quotewords('\s+', 0, $libpth) );
     my @extralibs;
     my $pwd		= cwd();    # from Cwd.pm
     my $lib		= '';
@@ -266,7 +266,7 @@ sub _win32_ext {
         push @libpath, split m/;/, %ENV{LIB};
     }
 
-    foreach (Text::ParseWords::quotewords('\s+', 0, $potential_libs)){
+    foreach ( <Text::ParseWords::quotewords('\s+', 0, $potential_libs)){
 
 	my $thislib = $_;
 
@@ -321,7 +321,7 @@ sub _win32_ext {
 	}
 
 	my $found_lib = 0;
-	foreach my $thispth (@searchpath, @libpath){
+	foreach my $thispth (< @searchpath, < @libpath){
 	    unless (-f ($fullname="$thispth\\$_")) {
 		warn "'$thislib' not found as '$fullname'\n" if $verbose;
 		next;
@@ -352,12 +352,12 @@ sub _win32_ext {
 
     }
 
-    return ('','','','', ($give_libs ? \@libs : ())) unless $found;
+    return  @('','','','',  @($give_libs ? \@libs : ())) unless $found;
 
     # make sure paths with spaces are properly quoted
-    @extralibs = map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @extralibs;
-    @libs = map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @libs;
-    $lib = join(' ',@extralibs);
+    @extralibs = @( map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } < @extralibs );
+    @libs = @( map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } < @libs );
+    $lib = join(' ',< @extralibs);
 
     # normalize back to backward slashes (to help braindead tools)
     # XXX this may break equally braindead GNU tools that don't understand
@@ -370,11 +370,11 @@ sub _win32_ext {
 
 
 sub _vms_ext {
-  my($self, $potential_libs, $verbose, $give_libs) = @_;
+  my($self, $potential_libs, $verbose, $give_libs) = < @_;
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
-  @crtls = ( (%Config{'ldflags'} =~ m-/Debug-i ? %Config{'dbgprefix'} : '')
+  @crtls = @( (%Config{'ldflags'} =~ m-/Debug-i ? %Config{'dbgprefix'} : '')
               . 'PerlShr/Share' );
   push(@crtls, grep { not m/\(/ } split m/\s+/, %Config{'perllibs'});
   push(@crtls, grep { not m/\(/ } split m/\s+/, %Config{'libc'});
@@ -385,7 +385,7 @@ sub _vms_ext {
   # which a system-wide logical may point.
   if ($self->{PERL_SRC}) {
     my($locspec,$type);
-    foreach my $lib (@crtls) { 
+    foreach my $lib (< @crtls) { 
       if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= %Config{'exe_ext'}; }
         elsif (lc $type eq '/library') { $locspec .= %Config{'lib_ext'}; }
@@ -395,11 +395,11 @@ sub _vms_ext {
       }
     }
   }
-  $crtlstr = @crtls ? join(' ',@crtls) : '';
+  $crtlstr = (nelems @crtls) ? join(' ',< @crtls) : '';
 
   unless ($potential_libs) {
     warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose;
-    return ('', '', $crtlstr, '', ($give_libs ? \@() : ()));
+    return  @('', '', $crtlstr, '',  @($give_libs ? \@() : ()));
   }
 
   my(%found,@fndlibs,$ldlib);
@@ -409,7 +409,7 @@ sub _vms_ext {
   # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
   my(@flibs, %libs_seen);
-  my %libmap = ( 'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => '',
+  my %libmap = %( 'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => '',
                  'malloc' => '', 'crypt' => '', 'resolv' => '', 'c_s' => '',
                  'socket' => '', 'X11' => 'DECW$XLIBSHR',
                  'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
@@ -432,7 +432,7 @@ sub _vms_ext {
   # Now make sure we've got VMS-syntax absolute directory specs
   # (We don't, however, check whether someone's hidden a relative
   # path in a logical name.)
-  foreach my $dir (@dirs) {
+  foreach my $dir (< @dirs) {
     unless (-d $dir) {
       warn "Skipping nonexistent Directory $dir\n" if $verbose +> 1;
       $dir = '';
@@ -446,10 +446,10 @@ sub _vms_ext {
         $dir = $self->catdir($cwd,$dir); 
     }
   }
-  @dirs = grep { length($_) } @dirs;
+  @dirs = @( grep { length($_) } < @dirs );
   unshift(@dirs,''); # Check each $lib without additions first
 
-  LIB: foreach my $lib (@libs) {
+  LIB: foreach my $lib (< @libs) {
     if (exists %libmap{$lib}) {
       next unless length %libmap{$lib};
       $lib = %libmap{$lib};
@@ -468,10 +468,10 @@ sub _vms_ext {
     }
     push(@variants,$lib);
     warn "Looking for $lib\n" if $verbose;
-    foreach my $variant (@variants) {
+    foreach my $variant (< @variants) {
       my($fullname, $name);
 
-      foreach my $dir (@dirs) {
+      foreach my $dir (< @dirs) {
         my($type);
 
         $name = "$dir$variant";
@@ -532,10 +532,10 @@ sub _vms_ext {
 		 ."No library found for $lib\n";
   }
 
-  push @fndlibs, @{%found{OBJ}}                      if exists %found{OBJ};
-  push @fndlibs, map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
-  push @fndlibs, map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
-  my $lib = join(' ',@fndlibs);
+  push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
+  push @fndlibs, map { "$_/Library" } < @{%found{OLB}} if exists %found{OLB};
+  push @fndlibs, map { "$_/Share"   } < @{%found{SHR}} if exists %found{SHR};
+  my $lib = join(' ',< @fndlibs);
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;

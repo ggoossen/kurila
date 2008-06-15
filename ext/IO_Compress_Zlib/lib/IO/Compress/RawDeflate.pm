@@ -19,10 +19,10 @@ our ($VERSION, @ISA, @EXPORT_OK, %DEFLATE_CONSTANTS, %EXPORT_TAGS, $RawDeflateEr
 $VERSION = '2.006';
 $RawDeflateError = '';
 
-@ISA = qw(IO::Compress::Base Exporter);
-@EXPORT_OK = qw( $RawDeflateError rawdeflate ) ;
+@ISA = @( qw(IO::Compress::Base Exporter) );
+@EXPORT_OK = @( qw( $RawDeflateError rawdeflate ) ) ;
 
-%EXPORT_TAGS = ( flush     => \@(qw{  
+%EXPORT_TAGS = %( flush     => \@(qw{  
                                     Z_NO_FLUSH
                                     Z_PARTIAL_FLUSH
                                     Z_SYNC_FLUSH
@@ -52,15 +52,15 @@ $RawDeflateError = '';
     {
         push @{%EXPORT_TAGS{constants}}, 
                  grep { !%seen{$_}++ } 
-                 @{ %EXPORT_TAGS{$_} }
+                 < @{ %EXPORT_TAGS{$_} }
     }
     %EXPORT_TAGS{all} = %EXPORT_TAGS{constants} ;
 }
 
 
-%DEFLATE_CONSTANTS = %EXPORT_TAGS;
+%DEFLATE_CONSTANTS = %( < %EXPORT_TAGS );
 
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 
 Exporter::export_ok_tags('all');
               
@@ -72,13 +72,13 @@ sub new
 
     my $obj = createSelfTiedObject($class, \$RawDeflateError);
 
-    return $obj->_create(undef, @_);
+    return $obj->_create(undef, < @_);
 }
 
 sub rawdeflate
 {
     my $obj = createSelfTiedObject(undef, \$RawDeflateError);
-    return $obj->_def(@_);
+    return $obj->_def(< @_);
 }
 
 sub ckParams
@@ -95,10 +95,10 @@ sub mkComp
     my $class = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) = IO::Compress::Adapter::Deflate::mkCompObject(
-                                                 $got->value('CRC32'),
-                                                 $got->value('Adler32'),
-                                                 $got->value('Level'),
+    my ($obj, $errstr, $errno) = < IO::Compress::Adapter::Deflate::mkCompObject( <
+                                                 $got->value('CRC32'), <
+                                                 $got->value('Adler32'), <
+                                                 $got->value('Level'), <
                                                  $got->value('Strategy')
                                                  );
 
@@ -147,7 +147,7 @@ sub getZlibParams
     use Compress::Raw::Zlib  v2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
     
-    return (
+    return  @(
         
             # zlib behaviour
             #'Method'   => [0, 1, Parse_unsigned,  Z_DEFLATED],
@@ -164,7 +164,7 @@ sub getZlibParams
 
 sub getInverseClass
 {
-    return ('IO::Uncompress::RawInflate', 
+    return  @('IO::Uncompress::RawInflate', 
                 \$IO::Uncompress::RawInflate::RawInflateError);
 }
 
@@ -184,7 +184,7 @@ sub createMerge
     my $outValue = shift ;
     my $outType = shift ;
 
-    my ($invClass, $error_ref) = $self->getInverseClass();
+    my ($invClass, $error_ref) = < $self->getInverseClass();
     eval "require $invClass" 
         or die "aaaahhhh" ;
 
@@ -197,9 +197,9 @@ sub createMerge
 
     my $end_offset = 0;
     $inf->scan() 
-        or return $self->saveErrorString(undef, "Error Scanning: $$error_ref", $inf->errorNo) ;
+        or return $self->saveErrorString(undef, "Error Scanning: $$error_ref", < $inf->errorNo) ;
     $inf->zap($end_offset) 
-        or return $self->saveErrorString(undef, "Error Zapping: $$error_ref", $inf->errorNo) ;
+        or return $self->saveErrorString(undef, "Error Zapping: $$error_ref", < $inf->errorNo) ;
 
     my $def = *$self->{Compress} = $inf->createDeflate();
 

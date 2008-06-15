@@ -10,9 +10,9 @@ use Compress::Zlib ;
 
 my $filename ;
 
-@ARGV = '-' unless @ARGV ;
+@ARGV = @( '-' ) unless (nelems @ARGV) ;
 
-foreach my $filename (@ARGV) {
+foreach my $filename (< @ARGV) {
     my $buffer ;
 
     my $gz = gzopen($filename, "rb") 

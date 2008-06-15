@@ -66,7 +66,7 @@ foreach my $foo (undef, 0) {
 {   # any object that can print should be ok for walk_output
     package Hugo;
     sub new { my $foo = bless \%() };
-    sub print { CORE::print @_ }
+    sub print { CORE::print < @_ }
 }
 my $foo = Hugo->new();	# suggested this API fix
 try {  walk_output($foo) };
@@ -94,28 +94,28 @@ SKIP: {
 ## add_style
 my @stylespec;
 $@='';
-try { add_style ('junk_B' => @stylespec) };
+try { add_style ('junk_B' => < @stylespec) };
 like ($@->{description}, 'expecting 3 style-format args',
     "add_style rejects insufficient args");
 
-@stylespec = (0,0,0); # right length, invalid values
+@stylespec = @(0,0,0); # right length, invalid values
 $@='';
-try { add_style ('junk' => @stylespec) };
+try { add_style ('junk' => < @stylespec) };
 is ($@, '', "add_style accepts: stylename => 3-arg-array");
 
 $@='';
-try { add_style (junk => @stylespec) };
+try { add_style (junk => < @stylespec) };
 like ($@->{description}, qr/style 'junk' already exists, choose a new name/,
     "add_style correctly disallows re-adding same style-name" );
 
 # test new arg-checks on set_style
 $@='';
-try { set_style (@stylespec) };
+try { set_style (< @stylespec) };
 is ($@, '', "set_style accepts 3 style-format args");
 
-@stylespec = (); # bad style
+@stylespec = @( () ); # bad style
 
-try { set_style (@stylespec) };
+try { set_style (< @stylespec) };
 like ($@->{description}, qr/expecting 3 style-format args/,
       "set_style rejects bad style-format args");
 
@@ -126,9 +126,9 @@ my $func = sub{ $a = $b+42 };	# canonical example asub
 
 sub render {
     walk_output(\my $out);
-    try { B::Concise::compile(@_)->() };
+    try { B::Concise::compile(< @_)->() };
     # diag "rendering $@\n";
-    return ($out, $@) if wantarray;
+    return  @($out, $@) if wantarray;
     return $out;
 }
 
@@ -139,12 +139,12 @@ SKIP: {
     
     set_style_standard('concise');  # MUST CALL before output needed
     
-    my @options = qw(
+    my @options = @( qw(
 		  -basic -exec -tree -compact -loose -vt -ascii
 		  -base10 -bigendian -littleendian
-		  );
-    foreach my $opt (@options) {
-	my ($out) = render($opt, $func);
+		  ) );
+    foreach my $opt (< @options) {
+	my ($out) = < render($opt, $func);
 	isnt($out, '', "got output with option $opt");
     }
     
@@ -191,20 +191,20 @@ SKIP: {
 	#local $TODO = "\tdoes this handling make sense ?";
 
 	sub declared_only;
-	($res,$err) = render('-basic', \&declared_only);
+	($res,$err) = < render('-basic', \&declared_only);
 	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
 	      "'sub decl_only' seen as having no START");
 
 	sub defd_empty {};
-	($res,$err) = render('-basic', \&defd_empty);
-	my @lines = split(m/\n/, $res);
-	is(scalar @lines, 3,
+	($res,$err) = < render('-basic', \&defd_empty);
+	my @lines = @( split(m/\n/, $res) );
+	is(scalar nelems @lines, 3,
 	   "'sub defd_empty \{\}' seen as 3 liner");
 
 	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,
 	   "'sub defd_empty \{\}' seen as 2 ops: leavesub,nextstate");
 
-	($res,$err) = render('-basic', \&not_even_declared);
+	($res,$err) = < render('-basic', \&not_even_declared);
 	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
 	      "'\&not_even_declared' seen as having no START");
 
@@ -214,21 +214,21 @@ SKIP: {
 	    sub AUTOLOAD { print "# in AUTOLOAD body: $AUTOLOAD\n" }
 	}
         no strict 'subs';
-	($res,$err) = render('-basic', 'Bar::auto_func');
+	($res,$err) = < render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,
 	      "Bar::auto_func seen as unknown function");
 
-	($res,$err) = render('-basic', \&Bar::auto_func);
+	($res,$err) = < render('-basic', \&Bar::auto_func);
 	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
 	      "'\&Bar::auto_func' seen as having no START");
 
-	($res,$err) = render('-basic', \&Bar::AUTOLOAD);
+	($res,$err) = < render('-basic', \&Bar::AUTOLOAD);
 	like ($res, qr/in AUTOLOAD body: /, "found body of Bar::AUTOLOAD");
 
     }
     {
         no strict 'subs';
-        ($res,$err) = render('-basic', 'Foo::bar');
+        ($res,$err) = < render('-basic', 'Foo::bar');
         like ($res, qr/unknown function \(Foo::bar\)/,
               "BC::compile detects fn-name as unknown function");
     }
@@ -251,12 +251,12 @@ SKIP: {
 
     # bang at it combinatorically
     my %combos;
-    my @modes = qw( -basic -exec );
-    my @styles = qw( -concise -debug -linenoise -terse );
+    my @modes = @( qw( -basic -exec ) );
+    my @styles = @( qw( -concise -debug -linenoise -terse ) );
 
     # prep samples
-    for my $style (@styles) {
-	for my $mode (@modes) {
+    for my $style (< @styles) {
+	for my $mode (< @modes) {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($style, $mode);
@@ -264,17 +264,17 @@ SKIP: {
 	}
     }
     # crosscheck that samples are all text-different
-    my @list = sort keys %combos;
-    for my $i (0..(@list-1)) {
-	for my $j ($i+1..(@list-1)) {
+    my @list = @( sort keys %combos );
+    for my $i (0..((nelems @list)-1)) {
+	for my $j ($i+1..((nelems @list)-1)) {
 	    isnt (%combos{@list[$i]}, %combos{@list[$j]},
 		  "combos for @list[$i] and @list[$j] are different, as expected");
 	}
     }
     
     # add samples with styles in different order
-    for my $mode (@modes) {
-	for my $style (@styles) {
+    for my $mode (< @modes) {
+	for my $style (< @styles) {
 	    reset_sequence();
 	    walk_output(\$sample);
 	    $walker->($mode, $style);
@@ -282,23 +282,23 @@ SKIP: {
 	}
     }
     # test commutativity of flags, ie that AB == BA
-    for my $mode (@modes) {
-	for my $style (@styles) {
+    for my $mode (< @modes) {
+	for my $style (< @styles) {
 	    is ( %combos{"$style$mode"},
 		 %combos{"$mode$style"},
 		 "results for $style$mode vs $mode$style are the same" );
 	}
     }
 
-    my %save = %combos;
-    %combos = ();	# outputs for $mode=any($order) and any($style)
+    my %save = %( < %combos );
+    %combos = %( () );	# outputs for $mode=any($order) and any($style)
 
     # add more samples with switching modes & sticky styles
-    for my $style (@styles) {
+    for my $style (< @styles) {
 	walk_output(\$sample);
 	reset_sequence();
 	$walker->($style);
-	for my $mode (@modes) {
+	for my $mode (< @modes) {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($mode);
@@ -306,20 +306,20 @@ SKIP: {
 	}
     }
     # crosscheck that samples are all text-different
-    my @nm = sort keys %combos;
-    for my $i (0..(@nm-1)) {
-	for my $j ($i+1..(@nm-1)) {
+    my @nm = @( sort keys %combos );
+    for my $i (0..((nelems @nm)-1)) {
+	for my $j ($i+1..((nelems @nm)-1)) {
 	    isnt (%combos{@nm[$i]}, %combos{@nm[$j]},
 		  "results for @nm[$i] and @nm[$j] are different, as expected");
 	}
     }
     
     # add samples with switching styles & sticky modes
-    for my $mode (@modes) {
+    for my $mode (< @modes) {
 	walk_output(\$sample);
 	reset_sequence();
 	$walker->($mode);
-	for my $style (@styles) {
+	for my $style (< @styles) {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($style);
@@ -327,8 +327,8 @@ SKIP: {
 	}
     }
     # test commutativity of flags, ie that AB == BA
-    for my $mode (@modes) {
-	for my $style (@styles) {
+    for my $mode (< @modes) {
+	for my $style (< @styles) {
 	    is ( %combos{"$style/$mode"},
 		 %combos{"$mode/$style"},
 		 "results for $style/$mode vs $mode/$style are the same" );
@@ -337,11 +337,11 @@ SKIP: {
 
 
     #now do double crosschecks: commutativity across stick / nostick
-    %combos = (%combos, %save);
+    %combos = %(< %combos, < %save);
 
     # test commutativity of flags, ie that AB == BA
-    for my $mode (@modes) {
-	for my $style (@styles) {
+    for my $mode (< @modes) {
+	for my $style (< @styles) {
 
 	    is ( %combos{"$style$mode"},
 		 %combos{"$style/$mode"},

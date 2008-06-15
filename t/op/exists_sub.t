@@ -13,7 +13,7 @@ sub t5 {1;}
     package P1;
     sub tmc {1;}
     package P2;
-    our @ISA = 'P1';
+    our @ISA = @( 'P1' );
 }
 
 ok( exists &t1 && not defined &t1 );

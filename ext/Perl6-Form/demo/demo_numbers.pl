@@ -2,13 +2,13 @@ use Perl6::Form;
 
 my $nums = do{local$/; ~< *DATA};
 
-print form
+print < form
 	 "Brittannia      Continental     East Indies      Tyrol           Nippon",
      "_____________   _____________   ______________   _____________   _____________",
      "\{],]]],]]].[\}   \{].]]].]]],[\}    \{]],]],]]].[\}   \{]']]]']]],[\}   \{]]]],]]]].[\}",
      "$nums",         "$nums",         "$nums",        "$nums",        "$nums";
 
-print form
+print < form
 	 "",
 	 "Quintuple ",
      "_____________",

@@ -47,7 +47,7 @@ my $RV_class = 'IV';
 my $want = \%(	# expected types, how value renders in-line, todos (maybe)
     mystr	=> \@( 'PVIV', '"'.mystr.'"' ),
     myhref	=> \@( 'IV', ''),
-    pi		=> \@( 'NV', pi ),
+    pi		=> \@( 'NV', < pi ),
     myglob	=> \@( 'IV', '' ),
     mysub	=> \@( 'IV', '' ),
     myunsub	=> \@( 'IV', '' ),
@@ -56,8 +56,8 @@ my $want = \%(	# expected types, how value renders in-line, todos (maybe)
     #myno	=> [ 'RV', ],
     myrex	=> \@( $RV_class, '\\\\"\\(?-xism:Foo\\)"' ),
     myundef	=> \@( 'NULL', ),
-    myfl	=> \@( 'PVNV', myfl ),
-    myint	=> \@( 'PVIV', myint ),
+    myfl	=> \@( 'PVNV', < myfl ),
+    myint	=> \@( 'PVIV', < myint ),
     myrex	=> \@( 'PVNV', '' ),
     myundef	=> \@( 'PVIV', ),
 );
@@ -191,7 +191,7 @@ checkOptree ( name	=> 'constant sub returning list',
 
 sub printem {
     printf "myint \%d mystr \%s myfl \%f pi \%f\n"
-	, myint, mystr, myfl, pi;
+	, < myint, < mystr, < myfl, < pi;
 }
 
 my ($expect, $expect_nt) = (<<'EOT_EOT', <<'EONT_EONT');

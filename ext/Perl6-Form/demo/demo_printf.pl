@@ -1,31 +1,31 @@
 use Perl6::Form;
 
-my @data = ~< *DATA;
+my @data = @( ~< *DATA );
 
-for (@data) {
+for (< @data) {
 	my ($pid, $cmd, $time, $cpu) = split;
 	$cmd =~ s/_/ /g;
-	print form
+	print < form
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{>>>>>>\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu;
 }
 
 print "---------------------------------------------\n";
 
-for (@data) {
+for (< @data) {
 	my ($pid, $cmd, $time, $cpu) = split;
 	$cmd =~ s/_/ /g;
-	print form
+	print < form
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}   \{>\{5.2\}.<\%\}",
 		  $pid,  $cmd,             $time,    $cpu;
 }
 
 print "---------------------------------------------\n";
 
-for (@data) {
+for (< @data) {
 	my ($pid, $cmd, $time, $cpu) = split;
 	$cmd =~ s/_/ /g;
-	print form
+	print < form
 		 \%(single=>'%'),
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu, '%';
@@ -33,17 +33,17 @@ for (@data) {
 
 print "---------------------------------------------\n";
 
-for (@data) {
+for (< @data) {
 	my ($pid, $cmd, $time, $cpu) = split;
 	$cmd =~ s/_/ /g;
-	print form
+	print < form
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]+\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu;
 }
 
 print "---------------------------------------------\n";
 
-for (@data) {
+for (< @data) {
 	my ($pid, $cmd, $time, $cpu) = split;
 	$cmd =~ s/_/ /g;
 	printf "\%5d  \%-16s  \%8s  \%5.1f\%\%\n",

@@ -8,11 +8,11 @@ use integer;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
 $VERSION   = '1.18_01';
 
-@ISA       = qw( Exporter );
-@EXPORT    = qw( timegm timelocal );
-@EXPORT_OK = qw( timegm_nocheck timelocal_nocheck );
+@ISA       = @( qw( Exporter ) );
+@EXPORT    = @( qw( timegm timelocal ) );
+@EXPORT_OK = @( qw( timegm_nocheck timelocal_nocheck ) );
 
-my @MonthDays = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
+my @MonthDays = @( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
 # Determine breakpoint for rolling century
 my $ThisYear    = ( localtime() )[[5]];
@@ -55,7 +55,7 @@ else {
     $Epoc = _daygm( gmtime(0) );
 }
 
-%Cheat = ();    # clear the cache as epoc has changed
+%Cheat = %( () );    # clear the cache as epoc has changed
 
 sub _daygm {
 
@@ -85,7 +85,7 @@ sub _timegm {
 }
 
 sub timegm {
-    my ( $sec, $min, $hour, $mday, $month, $year ) = @_;
+    my ( $sec, $min, $hour, $mday, $month, $year ) = < @_;
 
     if ( $year +>= 1000 ) {
         $year -= 1900;

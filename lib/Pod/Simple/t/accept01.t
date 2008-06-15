@@ -2,7 +2,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -17,7 +17,7 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
+sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 my $x = 'Pod::Simple::XMLOutStream';
 sub accept_N { @_[0]->accept_codes('N') }
@@ -55,7 +55,7 @@ ok( $x->_out( \&accept_N,  "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"),
 print "# Tests of nonacceptance...\n";
 
 sub starts_with {
-  my($large, $small) = @_;
+  my($large, $small) = < @_;
   print("# supahstring is undef\n"),
    return '' unless defined $large;
   print("# supahstring $large is smaller than target-starter $small\n"),
@@ -70,17 +70,17 @@ sub starts_with {
 }
 
 
-ok( starts_with( $x->_out( "=pod\n\nB<N<foo\t>>\n"), # without the mutor
+ok( starts_with( < $x->_out( "=pod\n\nB<N<foo\t>>\n"), # without the mutor
   '<Document><Para><B>foo </B></Para>'
   # make sure it DOESN'T pass thru the N<...>, when not accepted
 ));
 
-ok( starts_with( $x->_out( "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"), # !mutor
+ok( starts_with( < $x->_out( "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"), # !mutor
   '<Document><Para><B>pie<F>zorch</F>foo<I>pling</I></B></Para>'
   # make sure it DOESN'T pass thru the N<...>, when not accepted
 ));
 
-ok( starts_with( $x->_out( "=pod\n\nB<pieF<zorch>N<C<foo>>I<pling>>\n"), # !mutor
+ok( starts_with( < $x->_out( "=pod\n\nB<pieF<zorch>N<C<foo>>I<pling>>\n"), # !mutor
   '<Document><Para><B>pie<F>zorch</F><C>foo</C><I>pling</I></B></Para>'
   # make sure it DOESN'T pass thru the N<...>, when not accepted
 ));

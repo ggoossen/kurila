@@ -11,11 +11,11 @@ our $VERSION = '1.19';
 
 use XSLoader ();
 require Exporter;
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 
 # walkoptree_slow comes from B.pm (you are there),
 # walkoptree comes from B.xs
-our @EXPORT_OK = qw(minus_c ppname save_BEGINs
+our @EXPORT_OK = @( qw(minus_c ppname save_BEGINs
 		class peekop cast_I32 cstring cchar hash
 		main_root main_start main_cv svref_2object opnumber
 		sub_generation amagic_generation perlstring
@@ -24,38 +24,38 @@ our @EXPORT_OK = qw(minus_c ppname save_BEGINs
 		begin_av init_av check_av end_av regex_padav dowarn defstash
 		curstash warnhook diehook inc_gv @optype @specialsv_name
                 unitcheck_av
-		);
+		) );
 
 sub OPf_KIDS ();
 use strict;
-@B::SV::ISA = 'B::OBJECT';
-@B::NULL::ISA = 'B::SV';
-@B::PV::ISA = 'B::SV';
-@B::IV::ISA = 'B::SV';
-@B::NV::ISA = 'B::SV';
+@B::SV::ISA = @( 'B::OBJECT' );
+@B::NULL::ISA = @( 'B::SV' );
+@B::PV::ISA = @( 'B::SV' );
+@B::IV::ISA = @( 'B::SV' );
+@B::NV::ISA = @( 'B::SV' );
 # RV is eliminated with 5.11.0, but effectively is a specialisation of IV now.
-@B::RV::ISA = 'B::IV';
-@B::PVIV::ISA = qw(B::PV B::IV);
-@B::PVNV::ISA = qw(B::PVIV B::NV);
-@B::PVMG::ISA = 'B::PVNV';
-@B::REGEXP::ISA = 'B::PVMG';
+@B::RV::ISA = @( 'B::IV' );
+@B::PVIV::ISA = @( qw(B::PV B::IV) );
+@B::PVNV::ISA = @( qw(B::PVIV B::NV) );
+@B::PVMG::ISA = @( 'B::PVNV' );
+@B::REGEXP::ISA = @( 'B::PVMG' );
 # Change in the inheritance hierarchy post 5.9.0
-@B::PVLV::ISA = 'B::GV';
-@B::BM::ISA = 'B::PVMG';
-@B::AV::ISA = 'B::PVMG';
-@B::GV::ISA = 'B::PVMG';
-@B::HV::ISA = 'B::PVMG';
-@B::CV::ISA = 'B::PVMG';
-@B::IO::ISA = 'B::PVMG';
-@B::FM::ISA = 'B::CV';
+@B::PVLV::ISA = @( 'B::GV' );
+@B::BM::ISA = @( 'B::PVMG' );
+@B::AV::ISA = @( 'B::PVMG' );
+@B::GV::ISA = @( 'B::PVMG' );
+@B::HV::ISA = @( 'B::PVMG' );
+@B::CV::ISA = @( 'B::PVMG' );
+@B::IO::ISA = @( 'B::PVMG' );
+@B::FM::ISA = @( 'B::CV' );
 
-@B::SPECIAL::ISA = 'B::OBJECT';
+@B::SPECIAL::ISA = @( 'B::OBJECT' );
 
 # bytecode.pl contained the following comment:
 # Nullsv *must* come first in the following so that the condition
 # ($$sv == 0) can continue to be used to test (sv == Nullsv).
-@B::specialsv_name = qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
-			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD);
+@B::specialsv_name = @( qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
+			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD) );
 
 {
     # Stop "-w" from complaining about the lack of a real B::OBJECT class
@@ -78,8 +78,8 @@ sub B::GV::SAFENAME {
 }
 
 sub B::IV::int_value {
-  my ($self) = @_;
-  return (($self->FLAGS() ^&^ SVf_IVisUV()) ? $self->UVX : $self->IV);
+  my ($self) = < @_;
+  return  @(($self->FLAGS() ^&^ SVf_IVisUV()) ? $self->UVX : $self->IV);
 }
 
 sub B::NULL::as_string() {""}
@@ -88,10 +88,10 @@ sub B::PV::as_string()   {goto &B::PV::PV}
 
 my $debug;
 my $op_count = 0;
-my @parents = ();
+my @parents = @( () );
 
 sub debug {
-    my ($class, $value) = @_;
+    my ($class, $value) = < @_;
     $debug = $value;
     walkoptree_debug($value);
 }
@@ -108,14 +108,14 @@ sub parents { \@parents }
 # For debugging
 sub peekop {
     my $op = shift;
-    return sprintf("\%s (0x\%x) \%s", class($op), $$op, $op->name);
+    return sprintf("\%s (0x\%x) \%s", < class($op), $$op, < $op->name);
 }
 
 sub walkoptree_slow {
-    my($op, $method, $level) = @_;
+    my($op, $method, $level) = < @_;
     $op_count++; # just for statistics
     $level ||= 0;
-    warn(sprintf("walkoptree: \%d. \%s\n", $level, peekop($op))) if $debug;
+    warn(sprintf("walkoptree: \%d. \%s\n", $level, < peekop($op))) if $debug;
     $op->?$method($level) if $op->can($method);
     if ($$op && ($op->flags ^&^ OPf_KIDS)) {
 	my $kid;
@@ -131,7 +131,7 @@ sub walkoptree_slow {
 	&& $op->pmreplroot->isa( 'B::OP' ))
     {
 	unshift(@parents, $op);
-	walkoptree_slow($op->pmreplroot, $method, $level + 1);
+	walkoptree_slow( <$op->pmreplroot, $method, $level + 1);
 	shift @parents;
     }
 }
@@ -150,11 +150,11 @@ sub timing_info {
 my %symtable;
 
 sub clearsym {
-    %symtable = ();
+    %symtable = %( () );
 }
 
 sub savesym {
-    my ($obj, $value) = @_;
+    my ($obj, $value) = < @_;
 #    warn(sprintf("savesym: sym_%x => %s\n", $$obj, $value)); # debug
     %symtable{sprintf("sym_\%x", $$obj)} = $value;
 }
@@ -165,7 +165,7 @@ sub objsym {
 }
 
 sub walkoptree_exec {
-    my ($op, $method, $level) = @_;
+    my ($op, $method, $level) = < @_;
     $level ||= 0;
     my ($sym, $ppname);
     my $prefix = "    " x $level;
@@ -175,14 +175,14 @@ sub walkoptree_exec {
 	    print $prefix, "goto $sym\n";
 	    return;
 	}
-	savesym($op, sprintf("\%s (0x\%lx)", class($op), $$op));
+	savesym($op, sprintf("\%s (0x\%lx)", < class($op), $$op));
 	$op->?$method($level);
 	$ppname = $op->name;
 	if ($ppname =~
 	    m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
 	    print $prefix, uc($1), " => \{\n";
-	    walkoptree_exec($op->other, $method, $level + 1);
+	    walkoptree_exec( <$op->other, $method, $level + 1);
 	    print $prefix, "\}\n";
 	} elsif ($ppname eq "match" || $ppname eq "subst") {
 	    my $pmreplstart = $op->pmreplstart;
@@ -193,16 +193,16 @@ sub walkoptree_exec {
 	    }
 	} elsif ($ppname eq "substcont") {
 	    print $prefix, "SUBSTCONT => \{\n";
-	    walkoptree_exec($op->other->pmreplstart, $method, $level + 1);
+	    walkoptree_exec( <$op->other->pmreplstart, $method, $level + 1);
 	    print $prefix, "\}\n";
 	    $op = $op->other;
 	} elsif ($ppname eq "enterloop") {
 	    print $prefix, "REDO => \{\n";
-	    walkoptree_exec($op->redoop, $method, $level + 1);
+	    walkoptree_exec( <$op->redoop, $method, $level + 1);
 	    print $prefix, "\}\n", $prefix, "NEXT => \{\n";
-	    walkoptree_exec($op->nextop, $method, $level + 1);
+	    walkoptree_exec( <$op->nextop, $method, $level + 1);
 	    print $prefix, "\}\n", $prefix, "LAST => \{\n";
-	    walkoptree_exec($op->lastop,  $method, $level + 1);
+	    walkoptree_exec( <$op->lastop,  $method, $level + 1);
 	    print $prefix, "\}\n";
 	} elsif ($ppname eq "subst") {
 	    my $replstart = $op->pmreplstart;
@@ -216,7 +216,7 @@ sub walkoptree_exec {
 }
 
 sub walksymtable {
-    my ($symref, $method, $recurse, $prefix) = @_;
+    my ($symref, $method, $recurse, $prefix) = < @_;
     my $sym;
     my $ref;
     my $fullname;
@@ -241,7 +241,7 @@ sub walksymtable {
     my %sections;
 
     sub new {
-	my ($class, $section, $symtable, $default) = @_;
+	my ($class, $section, $symtable, $default) = < @_;
 	$output_fh ||= FileHandle->new_tmpfile;
 	my $obj = bless \@(-1, $section, $symtable, $default), $class;
 	%sections{$section} = $obj;
@@ -249,7 +249,7 @@ sub walksymtable {
     }
 
     sub get {
-	my ($class, $section) = @_;
+	my ($class, $section) = < @_;
 	return %sections{$section};
     }
 
@@ -282,7 +282,7 @@ sub walksymtable {
     }
 
     sub output {
-	my ($section, $fh, $format) = @_;
+	my ($section, $fh, $format) = < @_;
 	my $name = $section->name;
 	my $sym = $section->symtable || \%();
 	my $default = $section->default;

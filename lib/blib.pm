@@ -59,7 +59,7 @@ sub import
      $dir = getcwd;
  }
  if ($^O eq 'VMS') { ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--; }
- if (@_)
+ if ((nelems @_))
   {
    $dir = shift;
    $dir =~ s/blib\z//;
@@ -89,7 +89,7 @@ sub import
      warn "Using $blib\n" if $Verbose;
      return;
     }
-   $dir = File::Spec->catdir($dir, File::Spec->updir);
+   $dir = File::Spec->catdir($dir, < File::Spec->updir);
   }
  die "Cannot find blib even in $dir\n";
 }

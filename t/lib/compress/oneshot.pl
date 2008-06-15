@@ -28,7 +28,7 @@ sub run
     my $TopFuncName     = getTopFuncName($CompressClass);
 
 
-    my @MultiValues     = getMultiValues($CompressClass);
+    my @MultiValues     = @( < getMultiValues($CompressClass) );
 
     foreach my $bit ($CompressClass, $UncompressClass,
                      'IO::Uncompress::AnyUncompress',
@@ -106,7 +106,7 @@ sub run
         }
 
         {
-            my %x = () ;
+            my %x = %( () ) ;
             my $object = bless \%x, "someClass" ;
 
             # Buffer not a scalar reference
@@ -264,8 +264,8 @@ sub run
         my $TopTypeInverse = getInverse($bit);
         my $FuncInverse = getTopFuncRef($TopTypeInverse);
 
-        my @opts = ();
-        @opts = (RawInflate => 1)
+        my @opts = @( () );
+        @opts = @(RawInflate => 1)
             if $CompressClass eq 'IO::Compress::RawInflate';
 
         for my $append ( 1, 0 )
@@ -298,7 +298,7 @@ sub run
                 {
                     title "$TopType - From Buff to Array Ref content '$disp_content' Append $append" ;
 
-                    my @output = ('first') ;
+                    my @output = @('first') ;
                     ok &$Func(\$buffer, \@output, Append => $append), '  Compressed ok' ;
 
                     is @output[0], 'first', "  Array[0] unchanged";
@@ -313,8 +313,8 @@ sub run
 
                     my $lex = LexFile->new( my $in_file) ;
                     writeFile($in_file, $buffer);
-                    my @output = ('first') ;
-                    my @input = ($in_file);
+                    my @output = @('first') ;
+                    my @input = @($in_file);
                     ok &$Func(\@input, \@output, Append => $append), '  Compressed ok' ;
 
                     is @output[0], 'first', "  Array[0] unchanged";
@@ -517,30 +517,30 @@ sub run
         #my @expected = ( $file2, "abcde", "data1");
         #my @uexpected = ("data2", "abcde", "data1");
 
-        my @input = (   $file1, $file2) ;
+        my @input = @(   $file1, $file2) ;
         #my @expected = ( $file1, $file2);
-        my @expected = ("data1", "data2");
-        my @uexpected = ("data1", "data2");
+        my @expected = @("data1", "data2");
+        my @uexpected = @("data1", "data2");
 
-        my @keep = @input ;
+        my @keep = @( < @input ) ;
 
         {
             title "$TopType - From Array Ref to Array Ref" ;
 
-            my @output = ('first') ;
+            my @output = @('first') ;
             ok &$Func(\@input, \@output, AutoClose => 0), '  Compressed ok' ;
 
             is @output[0], 'first', "  Array[0] unchanged";
 
             is_deeply \@input, \@keep, "  Input array not changed" ;
-            my @got = shift @output;
-            foreach (@output) { push @got, anyUncompress($_) }
+            my @got = @( shift @output );
+            foreach (< @output) { push @got, < anyUncompress($_) }
 
-            is_deeply \@got, \@('first', @expected), "  Got Expected uncompressed data";
+            is_deeply \@got, \@('first', < @expected), "  Got Expected uncompressed data";
 
         }
 
-        foreach my $ms (@MultiValues)
+        foreach my $ms (< @MultiValues)
         {
             {
                 title "$TopType - From Array Ref to Buffer, MultiStream $ms" ;
@@ -554,9 +554,9 @@ sub run
 
                 my $got = anyUncompress(\@( \$output, MultiStream => $ms ));
 
-                is $got, join('', @uexpected), "  Got Expected uncompressed data";
-                my @headers = getHeaders(\$output);
-                is @headers, $ms ? @input : 1, "  Header count ok";
+                is $got, join('', < @uexpected), "  Got Expected uncompressed data";
+                my @headers = @( < getHeaders(\$output) );
+                is (nelems @headers), $ms ? (nelems @input) : 1, "  Header count ok";
             }
 
             {
@@ -572,9 +572,9 @@ sub run
 
                 my $got = anyUncompress(\@( $file3, MultiStream => $ms ));
 
-                is $got, join('', @uexpected), "  Got Expected uncompressed data";
-                my @headers = getHeaders($file3);
-                is @headers, $ms ? @input : 1, "  Header count ok";
+                is $got, join('', < @uexpected), "  Got Expected uncompressed data";
+                my @headers = @( < getHeaders($file3) );
+                is (nelems @headers), $ms ? (nelems @input) : 1, "  Header count ok";
             }
 
             {
@@ -594,9 +594,9 @@ sub run
 
                 my $got = anyUncompress(\@( $file3, MultiStream => $ms ));
 
-                is $got, join('', @uexpected), "  Got Expected uncompressed data";
-                my @headers = getHeaders($file3);
-                is @headers, $ms ? @input : 1, "  Header count ok";
+                is $got, join('', < @uexpected), "  Got Expected uncompressed data";
+                my @headers = @( < getHeaders($file3) );
+                is (nelems @headers), $ms ? (nelems @input) : 1, "  Header count ok";
             }
         }
     }
@@ -860,49 +860,49 @@ sub run
             ok   -d $tmpDir1, "  Temp Directory $tmpDir1 exists";
             #ok ! -d $tmpDir2, "  Temp Directory $tmpDir2 does not exist";
 
-            my @files = map { "$tmpDir1/$_.tmp" } @$files ;
-            foreach (@files) { writeFile($_, "abc $_") }
+            my @files = @( map { "$tmpDir1/$_.tmp" } < @$files ) ;
+            foreach (< @files) { writeFile($_, "abc $_") }
 
-            my @expected = map { "abc $_" } @files ;
-            my @outFiles = map { s/$tmpDir1/$tmpDir2/; $_ } @files ;
+            my @expected = @( map { "abc $_" } < @files ) ;
+            my @outFiles = @( map { s/$tmpDir1/$tmpDir2/; $_ } < @files ) ;
 
             {
-                title "$TopType - From FileGlob to FileGlob files [@$files]" ;
+                title "$TopType - From FileGlob to FileGlob files [{join ' ', <@$files}]" ;
 
                 ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>"), '  Compressed ok' 
                     or diag $$Error ;
 
-                my @copy = @expected;
-                for my $file (@outFiles)
+                my @copy = @( < @expected );
+                for my $file (< @outFiles)
                 {
                     is anyUncompress($file), shift @copy, "  got expected from $file" ;
                 }
 
-                is @copy, 0, "  got all files";
+                is (nelems @copy), 0, "  got all files";
             }
 
             {
-                title "$TopType - From FileGlob to Array files [@$files]" ;
+                title "$TopType - From FileGlob to Array files [{join ' ', <@$files}]" ;
 
-                my @buffer = ('first') ;
+                my @buffer = @('first') ;
                 ok &$Func("<$tmpDir1/a*.tmp>" => \@buffer), '  Compressed ok' 
                     or diag $$Error ;
 
                 is shift @buffer, 'first';
 
-                my @copy = @expected;
-                for my $buffer (@buffer)
+                my @copy = @( < @expected );
+                for my $buffer (< @buffer)
                 {
                     is anyUncompress($buffer), shift @copy, "  got expected " ;
                 }
 
-                is @copy, 0, "  got all files";
+                is (nelems @copy), 0, "  got all files";
             }
 
-            foreach my $ms (@MultiValues)
+            foreach my $ms (< @MultiValues)
             {
                 {
-                    title "$TopType - From FileGlob to Buffer files [@$files], MS $ms" ;
+                    title "$TopType - From FileGlob to Buffer files [{join ' ', <@$files}], MS $ms" ;
 
                     my $buffer ;
                     ok &$Func("<$tmpDir1/a*.tmp>" => \$buffer, 
@@ -913,13 +913,13 @@ sub run
 
                     my $got = anyUncompress(\@( \$buffer, MultiStream => $ms ));
 
-                    is $got, join("", @expected), "  got expected" ;
-                    my @headers = getHeaders(\$buffer);
-                    is @headers, $ms ? @files : 1, "  Header count ok";
+                    is $got, join("", < @expected), "  got expected" ;
+                    my @headers = @( < getHeaders(\$buffer) );
+                    is (nelems @headers), $ms ? (nelems @files) : 1, "  Header count ok";
                 }
 
                 {
-                    title "$TopType - From FileGlob to Filename files [@$files], MS $ms" ;
+                    title "$TopType - From FileGlob to Filename files [{join ' ', <@$files}], MS $ms" ;
 
                     my $filename = "abcde";
                     my $lex = LexFile->new($filename) ;
@@ -932,13 +932,13 @@ sub run
 
                     my $got = anyUncompress(\@($filename, MultiStream => $ms));
 
-                    is $got, join("", @expected), "  got expected" ;
-                    my @headers = getHeaders($filename);
-                    is @headers, $ms ? @files : 1, "  Header count ok";
+                    is $got, join("", < @expected), "  got expected" ;
+                    my @headers = @( < getHeaders($filename) );
+                    is (nelems @headers), $ms ? (nelems @files) : 1, "  Header count ok";
                 }
 
                 {
-                    title "$TopType - From FileGlob to Filehandle files [@$files], MS $ms" ;
+                    title "$TopType - From FileGlob to Filehandle files [{join ' ', <@$files}], MS $ms" ;
 
                     my $filename = "abcde";
                     my $lex = LexFile->new($filename) ;
@@ -952,9 +952,9 @@ sub run
 
                     my $got = anyUncompress(\@($filename, MultiStream => $ms));
 
-                    is $got, join("", @expected), "  got expected" ;
-                    my @headers = getHeaders($filename);
-                    is @headers, $ms ? @files : 1, "  Header count ok";
+                    is $got, join("", < @expected), "  got expected" ;
+                    my @headers = @( < getHeaders($filename) );
+                    is (nelems @headers), $ms ? (nelems @files) : 1, "  Header count ok";
                 }
             }
         }
@@ -973,13 +973,13 @@ sub run
         my $buffer2 = "ABCDE" ;
         my $keep_orig = $buffer;
 
-        my $comp = compressBuffer(getTopFuncName($UncompressClass), $buffer) ;
-        my $comp2 = compressBuffer(getTopFuncName($UncompressClass), $buffer2) ;
+        my $comp = compressBuffer( <getTopFuncName($UncompressClass), $buffer) ;
+        my $comp2 = compressBuffer( <getTopFuncName($UncompressClass), $buffer2) ;
         my $keep_comp = $comp;
 
         my $incumbent = "incumbent data" ;
 
-        my @opts = (Strict => 1);
+        my @opts = @(Strict => 1);
         push @opts,  (RawInflate => 1)
             if $bit eq 'IO::Uncompress::AnyUncompress';
 
@@ -993,7 +993,7 @@ sub run
 
                 my $output ;
                 $output = $incumbent if $append ;
-                ok &$Func(\$comp, \$output, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func(\$comp, \$output, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 is $keep_comp, $comp, "  Input buffer not changed" ;
                 is $output, $expected, "  Uncompressed matches original";
@@ -1002,15 +1002,15 @@ sub run
             {
                 title "$TopType - From Buff to Array, Append($append)" ;
 
-                my @output = ('first');
+                my @output = @('first');
                 #$output = $incumbent if $append ;
-                ok &$Func(\$comp, \@output, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func(\$comp, \@output, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 is $keep_comp, $comp, "  Input buffer not changed" ;
                 is @output[0], 'first', "  Uncompressed matches original";
                 is ${ @output[1] }, $buffer, "  Uncompressed matches original"
                     or diag @output[1] ;
-                is @output, 2, "  only 2 elements in the array" ;
+                is (nelems @output), 2, "  only 2 elements in the array" ;
             }
 
             {
@@ -1022,7 +1022,7 @@ sub run
                 else
                   { ok ! -e $out_file, "  Output file does not exist" }
 
-                ok &$Func(\$comp, $out_file, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func(\$comp, $out_file, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 ok -e $out_file, "  Created output file";
                 my $content = readFile($out_file) ;
@@ -1046,7 +1046,7 @@ sub run
                 }
                 isa_ok $of, 'IO::File', '  $of' ;
 
-                ok &$Func(\$comp, $of, Append => $append, AutoClose => 1, @opts), '  Uncompressed ok' ;
+                ok &$Func(\$comp, $of, Append => $append, AutoClose => 1, < @opts), '  Uncompressed ok' ;
 
                 ok -e $out_file, "  Created output file";
                 my $content = readFile($out_file) ;
@@ -1066,7 +1066,7 @@ sub run
 
                 writeFile($in_file, $comp);
 
-                ok &$Func($in_file, $out_file, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func($in_file, $out_file, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 ok -e $out_file, "  Created output file";
                 my $content = readFile($out_file) ;
@@ -1092,7 +1092,7 @@ sub run
 
                 writeFile($in_file, $comp);
 
-                ok &$Func($in_file, $out, Append => $append, AutoClose => 1, @opts), '  Uncompressed ok' ;
+                ok &$Func($in_file, $out, Append => $append, AutoClose => 1, < @opts), '  Uncompressed ok' ;
 
                 ok -e $out_file, "  Created output file";
                 my $content = readFile($out_file) ;
@@ -1110,7 +1110,7 @@ sub run
                 my $output ;
                 $output = $incumbent if $append ;
 
-                ok &$Func($in_file, \$output, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func($in_file, \$output, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 is $keep_comp, $comp, "  Input buffer not changed" ;
                 is $output, $expected, "  Uncompressed matches original";
@@ -1128,7 +1128,7 @@ sub run
                 writeFile($in_file, $comp);
                 my $in = 'IO::File'->new( "$in_file", "<") ;
 
-                ok &$Func($in, $out_file, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func($in, $out_file, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 ok -e $out_file, "  Created output file";
                 my $content = readFile($out_file) ;
@@ -1155,7 +1155,7 @@ sub run
                 writeFile($in_file, $comp);
                 my $in = 'IO::File'->new( "$in_file", "<") ;
 
-                ok &$Func($in, $out, Append => $append, AutoClose => 1, @opts), '  Uncompressed ok' ;
+                ok &$Func($in, $out, Append => $append, AutoClose => 1, < @opts), '  Uncompressed ok' ;
 
                 ok -e $out_file, "  Created output file";
                 my $content = readFile($out_file) ;
@@ -1174,7 +1174,7 @@ sub run
                 my $output ;
                 $output = $incumbent if $append ;
 
-                ok &$Func($in, \$output, Append => $append, @opts), '  Uncompressed ok' ;
+                ok &$Func($in, \$output, Append => $append, < @opts), '  Uncompressed ok' ;
 
                 is $keep_comp, $comp, "  Input buffer not changed" ;
                 is $output, $expected, "  Uncompressed matches original";
@@ -1193,7 +1193,7 @@ sub run
                 my $output ;
                 $output = $incumbent if $append ;
 
-                ok &$Func('-', \$output, Append => $append, @opts), '  Uncompressed ok' 
+                ok &$Func('-', \$output, Append => $append, < @opts), '  Uncompressed ok' 
                     or diag $$Error ;
 
                 open(STDIN, "<&", \*SAVEIN);
@@ -1215,7 +1215,7 @@ sub run
             writeFile($in_file, $comp . $appended . $comp . $appended) ;
             my $in = 'IO::File'->new( "$in_file", "<") ;
 
-            ok &$Func($in, \$out, Transparent => 0, InputLength => length $comp, @opts), '  Uncompressed ok' ;
+            ok &$Func($in, \$out, Transparent => 0, InputLength => length $comp, < @opts), '  Uncompressed ok' ;
 
             is $out, $expected, "  Uncompressed matches original";
 
@@ -1224,7 +1224,7 @@ sub run
             is $buff, $appended, "  Appended data ok";
 
             $out = '';
-            ok &$Func($in, \$out, Transparent => 0, InputLength => length $comp, @opts), '  Uncompressed ok' ;
+            ok &$Func($in, \$out, Transparent => 0, InputLength => length $comp, < @opts), '  Uncompressed ok' ;
 
             is $out, $expected, "  Uncompressed matches original";
 
@@ -1249,7 +1249,7 @@ sub run
 
             my $output ;
 
-            ok &$Func($stdin, \$output, Transparent => 0, InputLength => length $comp, @opts), '  Uncompressed ok' 
+            ok &$Func($stdin, \$output, Transparent => 0, InputLength => length $comp, < @opts), '  Uncompressed ok' 
                 or diag $$Error ;
 
             my $buff ;
@@ -1275,39 +1275,39 @@ sub run
         my $buffer = "abcde" ;
         my $keep_orig = $buffer;
 
-        my $null = compressBuffer(getTopFuncName($UncompressClass), "") ;
-        my $undef = compressBuffer(getTopFuncName($UncompressClass), undef) ;
-        my $comp = compressBuffer(getTopFuncName($UncompressClass), $buffer) ;
+        my $null = compressBuffer( <getTopFuncName($UncompressClass), "") ;
+        my $undef = compressBuffer( <getTopFuncName($UncompressClass), undef) ;
+        my $comp = compressBuffer( <getTopFuncName($UncompressClass), $buffer) ;
         my $keep_comp = $comp;
 
-        my @opts = ();
-        @opts = (RawInflate => 1)
+        my @opts = @( () );
+        @opts = @(RawInflate => 1)
             if $bit eq 'IO::Uncompress::AnyUncompress';
 
         my $incumbent = "incumbent data" ;
 
         my $lex = LexFile->new(my $file1, my $file2) ;
 
-        writeFile($file1, compressBuffer(getTopFuncName($UncompressClass),"data1"));
-        writeFile($file2, compressBuffer(getTopFuncName($UncompressClass),"data2"));
+        writeFile($file1, < compressBuffer( <getTopFuncName($UncompressClass),"data1"));
+        writeFile($file2, < compressBuffer( <getTopFuncName($UncompressClass),"data2"));
 
         my $of = 'IO::File'->new( "$file1", "<") ;
         ok $of, "  Created output filehandle" ;
 
         #my @input    = ($file2, \$undef, \$null, \$comp, $of) ;
         #my @expected = ('data2', '',      '',    'abcde', 'data1');
-        my @input    = ($file1, $file2);
-        my @expected = ('data1', 'data2');
+        my @input    = @($file1, $file2);
+        my @expected = @('data1', 'data2');
 
-        my @keep = @input ;
+        my @keep = @( < @input ) ;
 
         {
             title "$TopType - From ArrayRef to Buffer" ;
 
             my $output  ;
-            ok &$Func(\@input, \$output, AutoClose => 0, @opts), '  UnCompressed ok' ;
+            ok &$Func(\@input, \$output, AutoClose => 0, < @opts), '  UnCompressed ok' ;
 
-            is $output, join('', @expected)
+            is $output, join('', < @expected)
         }
 
         {
@@ -1316,9 +1316,9 @@ sub run
             my $lex = LexFile->new( my $output);
             $of->open("$file1", "<") ;
 
-            ok &$Func(\@input, $output, AutoClose => 0, @opts), '  UnCompressed ok' ;
+            ok &$Func(\@input, $output, AutoClose => 0, < @opts), '  UnCompressed ok' ;
 
-            is readFile($output), join('', @expected)
+            is readFile($output), join('', < @expected)
         }
 
         {
@@ -1328,22 +1328,22 @@ sub run
             my $fh = 'IO::File'->new( "$output", ">") ;
             $of->open("$file1", "<") ;
 
-            ok &$Func(\@input, $fh, AutoClose => 0, @opts), '  UnCompressed ok' ;
+            ok &$Func(\@input, $fh, AutoClose => 0, < @opts), '  UnCompressed ok' ;
             $fh->close;
 
-            is readFile($output), join('', @expected)
+            is readFile($output), join('', < @expected)
         }
 
         {
             title "$TopType - From Array Ref to Array Ref" ;
 
-            my @output = (\'first') ;
+            my @output = @(\'first') ;
             $of->open("$file1", '<') ;
-            ok &$Func(\@input, \@output, AutoClose => 0, @opts), '  UnCompressed ok' ;
+            ok &$Func(\@input, \@output, AutoClose => 0, < @opts), '  UnCompressed ok' ;
 
             is_deeply \@input, \@keep, "  Input array not changed" ;
-            is_deeply \@(map { defined $$_ ? $$_ : "" } @output), 
-                      \@('first', @expected), 
+            is_deeply \@(map { defined $$_ ? $$_ : "" } < @output), 
+                      \@('first', < @expected), 
                       "  Got Expected uncompressed data";
 
         }
@@ -1366,58 +1366,58 @@ sub run
         mkdir $tmpDir1, 0777;
         mkdir $tmpDir2, 0777;
 
-        my @opts = ();
-        @opts = (RawInflate => 1)
+        my @opts = @( () );
+        @opts = @(RawInflate => 1)
             if $bit eq 'IO::Uncompress::AnyUncompress';
 
         ok   -d $tmpDir1, "  Temp Directory $tmpDir1 exists";
         #ok ! -d $tmpDir2, "  Temp Directory $tmpDir2 does not exist";
 
-        my @files = map { "$tmpDir1/$_.tmp" } qw( a1 a2 a3) ;
-        foreach (@files) { writeFile($_, compressBuffer(getTopFuncName($UncompressClass), "abc $_")) }
+        my @files = @( map { "$tmpDir1/$_.tmp" } qw( a1 a2 a3) ) ;
+        foreach (< @files) { writeFile($_, < compressBuffer( <getTopFuncName($UncompressClass), "abc $_")) }
 
-        my @expected = map { "abc $_" } @files ;
-        my @outFiles = map { s/$tmpDir1/$tmpDir2/; $_ } @files ;
+        my @expected = @( map { "abc $_" } < @files ) ;
+        my @outFiles = @( map { s/$tmpDir1/$tmpDir2/; $_ } < @files ) ;
 
         {
             title "$TopType - From FileGlob to FileGlob" ;
 
-            ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>", @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>", < @opts), '  UnCompressed ok' 
                 or diag $$Error ;
 
-            my @copy = @expected;
-            for my $file (@outFiles)
+            my @copy = @( < @expected );
+            for my $file (< @outFiles)
             {
                 is readFile($file), shift @copy, "  got expected from $file" ;
             }
 
-            is @copy, 0, "  got all files";
+            is (nelems @copy), 0, "  got all files";
         }
 
         {
             title "$TopType - From FileGlob to Arrayref" ;
 
-            my @output = (\'first');
-            ok &$Func("<$tmpDir1/a*.tmp>" => \@output, @opts), '  UnCompressed ok' 
+            my @output = @(\'first');
+            ok &$Func("<$tmpDir1/a*.tmp>" => \@output, < @opts), '  UnCompressed ok' 
                 or diag $$Error ;
 
-            my @copy = ('first', @expected);
-            for my $data (@output)
+            my @copy = @('first', < @expected);
+            for my $data (< @output)
             {
                 is $$data, shift @copy, "  got expected data" ;
             }
 
-            is @copy, 0, "  got all files";
+            is (nelems @copy), 0, "  got all files";
         }
 
         {
             title "$TopType - From FileGlob to Buffer" ;
 
             my $output ;
-            ok &$Func("<$tmpDir1/a*.tmp>" => \$output, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => \$output, < @opts), '  UnCompressed ok' 
                 or diag $$Error ;
 
-            is $output, join('', @expected), "  got expected uncompressed data";
+            is $output, join('', < @expected), "  got expected uncompressed data";
         }
 
         {
@@ -1425,11 +1425,11 @@ sub run
 
             my $lex = LexFile->new( my $output) ;
             ok ! -e $output, "  $output does not exist" ;
-            ok &$Func("<$tmpDir1/a*.tmp>" => $output, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => $output, < @opts), '  UnCompressed ok' 
                 or diag $$Error ;
 
             ok -e $output, "  $output does exist" ;
-            is readFile($output), join('', @expected), "  got expected uncompressed data";
+            is readFile($output), join('', < @expected), "  got expected uncompressed data";
         }
 
         {
@@ -1438,11 +1438,11 @@ sub run
             my $output = 'abc' ;
             my $lex = LexFile->new( $output) ;
             my $fh = 'IO::File'->new( "$output", ">") ;
-            ok &$Func("<$tmpDir1/a*.tmp>" => $fh, AutoClose => 1, @opts), '  UnCompressed ok' 
+            ok &$Func("<$tmpDir1/a*.tmp>" => $fh, AutoClose => 1, < @opts), '  UnCompressed ok' 
                 or diag $$Error ;
 
             ok -e $output, "  $output does exist" ;
-            is readFile($output), join('', @expected), "  got expected uncompressed data";
+            is readFile($output), join('', < @expected), "  got expected uncompressed data";
         }
 
     }
@@ -1493,7 +1493,7 @@ sub run
 
         title "Array Input Error tests" ;
 
-        my @data = (
+        my @data = @(
                    \@( '\@()',    "empty array reference"),
                    \@( '\@(\@())',    "unknown input parameter"),
                    \@( '\@(\@(\@()))',   "unknown input parameter"),
@@ -1506,9 +1506,9 @@ sub run
                 ) ;
 
 
-        foreach my $data (@data)
+        foreach my $data (< @data)
         {
-            my ($send, $get) = @$data ;
+            my ($send, $get) = < @$data ;
 
             my $fh1 = 'IO::File'->new( "$file1", "<") ;
             my $fh2 = 'IO::File'->new( "$file2", "<") ;
@@ -1526,13 +1526,13 @@ sub run
 
         }
 
-        @data = (
+        @data = @(
                    '\@("")', 
                    '\@(undef)', 
                 ) ;
 
 
-        foreach my $send (@data)
+        foreach my $send (< @data)
         {
             title "$send";
             my($copy);

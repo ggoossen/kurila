@@ -53,8 +53,8 @@ local $Module::Load::Conditional::VERBOSE   = 0;
 use constant ON_WIN         => ($^O eq 'MSWin32');
 use constant ON_VMS         => ($^O eq 'VMS');                                
 use constant ON_UNIX        => (!ON_WIN and !ON_VMS);
-use constant HAS_VOL        => (ON_WIN or ON_VMS);
-use constant HAS_SHARE      => (ON_WIN);
+use constant HAS_VOL        => (ON_WIN or < ON_VMS);
+use constant HAS_SHARE      => ( <ON_WIN);
 =pod
 
 =head1 NAME
@@ -159,27 +159,27 @@ result of $ff->output_file will be used.
         no strict 'refs';
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
-                        $self->{$method} = @_[0] if @_;
+                        $self->{$method} = @_[0] if (nelems @_);
                         return $self->{$method};
                     }
     }
     
     sub _create {
         my $class = shift;
-        my %hash  = @_;
+        my %hash  = %( < @_ );
         
         my $args = check( $Tmpl, \%hash ) or return;
         
         bless $args, $class;
     
         if( lc($args->scheme) ne 'file' and not $args->host ) {
-            return File::Fetch->_error(loc(
-                "Hostname required when fetching from '\%1'",$args->scheme));
+            return File::Fetch->_error( <loc(
+                "Hostname required when fetching from '\%1'", <$args->scheme));
         }
         
         for (qw[path file]) {
             unless( $args->?$_ ) {
-                return File::Fetch->_error(loc("No '\%1' specified",$_));
+                return File::Fetch->_error( <loc("No '\%1' specified",$_));
             }
         }
         
@@ -260,7 +260,7 @@ Returns false on failure.
 
 sub new {
     my $class = shift;
-    my %hash  = @_;
+    my %hash  = %( < @_ );
 
     my ($uri);
     my $tmpl = \%(
@@ -273,7 +273,7 @@ sub new {
     my $href    = __PACKAGE__->_parse_uri( $uri ) or return;
 
     ### make it into a FFI object ###
-    my $ff      = File::Fetch->_create( %$href ) or return;
+    my $ff      = File::Fetch->_create( < %$href ) or return;
 
 
     ### return the object ###
@@ -335,7 +335,7 @@ sub _parse_uri {
     ### http://en.wikipedia.org/wiki/File://
     if( $href->{scheme} eq 'file' ) {
         
-        my @parts = split '/',$uri;
+        my @parts = @( split '/',$uri );
 
         ### file://hostname/...
         ### file://hostname/...
@@ -370,7 +370,7 @@ sub _parse_uri {
         } 
 
         ### rebuild the path from the leftover parts;
-        $href->{path} = join '/', '', splice( @parts, $index, (@parts-1) );
+        $href->{path} = join '/', '', splice( @parts, $index, ((nelems @parts)-1) );
 
     } else {
         ### using anything but qw() in hash slices may produce warnings 
@@ -379,7 +379,7 @@ sub _parse_uri {
     }
 
     ### split the path into file + dir ###
-    {   my @parts = File::Spec::Unix->splitpath( delete $href->{path} );
+    {   my @parts = @( < File::Spec::Unix->splitpath( delete $href->{path} ) );
         $href->{path} = @parts[1];
         $href->{file} = @parts[2];
     }
@@ -404,11 +404,11 @@ on failure.
 
 sub fetch {
     my $self = shift or return;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my $to;
     my $tmpl = \%(
-        to  => \%( default => cwd(), store => \$to ),
+        to  => \%( default => < cwd(), store => \$to ),
     );
 
     check( $tmpl, \%hash ) or return;
@@ -417,7 +417,7 @@ sub fetch {
     unless( -d $to ) {
         try { mkpath( $to ) };
 
-        return $self->_error(loc("Could not create path '\%1'",$to)) if $@;
+        return $self->_error( <loc("Could not create path '\%1'",$to)) if $@;
     }
 
     ### set passive ftp if required ###
@@ -426,19 +426,19 @@ sub fetch {
     ### we dont use catfile on win32 because if we are using a cygwin tool
     ### under cmd.exe they wont understand windows style separators.
     my $out_to = ON_WIN ? $to.'/'.$self->output_file 
-                        : File::Spec->catfile( $to, $self->output_file );
+                        : File::Spec->catfile( $to, < $self->output_file );
     
-    for my $method ( @{ $METHODS->{$self->scheme} } ) {
+    for my $method ( < @{ $METHODS->{$self->scheme} } ) {
         my $sub =  '_'.$method.'_fetch';
 
         unless( __PACKAGE__->can($sub) ) {
-            $self->_error(loc("Cannot call method for '\%1' -- WEIRD!",
+            $self->_error( <loc("Cannot call method for '\%1' -- WEIRD!",
                         $method));
             next;
         }
 
         ### method is blacklisted ###
-        next if grep { lc $_ eq $method } @$BLACKLIST;
+        next if grep { lc $_ eq $method } < @$BLACKLIST;
 
         ### method is known to fail ###
         next if $METHOD_FAIL->{$method};
@@ -456,7 +456,7 @@ sub fetch {
         )){
 
             unless( -e $file && -s _ ) {
-                $self->_error(loc("'\%1' said it fetched '\%2', ".
+                $self->_error( <loc("'\%1' said it fetched '\%2', ".
                      "but it was not created",$method,$file));
 
                 ### mark the failure ###
@@ -485,7 +485,7 @@ sub fetch {
 ### LWP fetching ###
 sub _lwp_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -506,13 +506,13 @@ sub _lwp_fetch {
     if( can_load(modules => $use_list) ) {
 
         ### setup the uri object
-        my $uri = URI->new( File::Spec::Unix->catfile(
-                                    $self->path, $self->file
+        my $uri = URI->new( < File::Spec::Unix->catfile( <
+                                    $self->path, < $self->file
                         ) );
 
         ### special rules apply for file:// uris ###
-        $uri->scheme( $self->scheme );
-        $uri->host( $self->scheme eq 'file' ? '' : $self->host );
+        $uri->scheme( < $self->scheme );
+        $uri->host( $self->scheme eq 'file' ? '' : < $self->host );
         $uri->userinfo("anonymous:$FROM_EMAIL") if $self->scheme ne 'file';
 
         ### set up the useragent object
@@ -529,8 +529,8 @@ sub _lwp_fetch {
             return $to;
 
         } else {
-            return $self->_error(loc("Fetch failed! HTTP response: \%1 \%2 [\%3]",
-                        $res->code, HTTP::Status::status_message($res->code),
+            return $self->_error( <loc("Fetch failed! HTTP response: \%1 \%2 [\%3]", <
+                        $res->code, < HTTP::Status::status_message( <$res->code), <
                         $res->status_line));
         }
 
@@ -543,7 +543,7 @@ sub _lwp_fetch {
 ### Net::FTP fetching
 sub _netftp_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -558,15 +558,15 @@ sub _netftp_fetch {
 
         ### make connection ###
         my $ftp;
-        my @options = ($self->host);
+        my @options = @( <$self->host);
         push(@options, Timeout => $TIMEOUT) if $TIMEOUT;
-        unless( $ftp = Net::FTP->new( @options ) ) {
-            return $self->_error(loc("Ftp creation failed: \%1",$@));
+        unless( $ftp = Net::FTP->new( < @options ) ) {
+            return $self->_error( <loc("Ftp creation failed: \%1",$@));
         }
 
         ### login ###
         unless( $ftp->login( anonymous => $FROM_EMAIL ) ) {
-            return $self->_error(loc("Could not login to '\%1'",$self->host));
+            return $self->_error( <loc("Could not login to '\%1'", <$self->host));
         }
 
         ### set binary mode, just in case ###
@@ -574,13 +574,13 @@ sub _netftp_fetch {
 
         ### create the remote path 
         ### remember remote paths are unix paths! [#11483]
-        my $remote = File::Spec::Unix->catfile( $self->path, $self->file );
+        my $remote = File::Spec::Unix->catfile( < $self->path, < $self->file );
 
         ### fetch the file ###
         my $target;
         unless( $target = $ftp->get( $remote, $to ) ) {
-            return $self->_error(loc("Could not fetch '\%1' from '\%2'",
-                        $remote, $self->host));
+            return $self->_error( <loc("Could not fetch '\%1' from '\%2'",
+                        $remote, < $self->host));
         }
 
         ### log out ###
@@ -597,7 +597,7 @@ sub _netftp_fetch {
 ### /bin/wget fetch ###
 sub _wget_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -621,7 +621,7 @@ sub _wget_fetch {
         push @$cmd, '--output-document', 
                     ### DO NOT quote things for IPC::Run, it breaks stuff.
                     $IPC::Cmd::USE_IPC_RUN
-                        ? ($to, $self->uri)
+                        ? ($to, < $self->uri)
                         : (QUOTE. $to .QUOTE, QUOTE. $self->uri .QUOTE);
 
         ### shell out ###
@@ -634,7 +634,7 @@ sub _wget_fetch {
             ### fails.. so unlink it in that case
             1 while unlink $to;
             
-            return $self->_error(loc( "Command failed: \%1", $captured || '' ));
+            return $self->_error( <loc( "Command failed: \%1", $captured || '' ));
         }
 
         return $to;
@@ -649,7 +649,7 @@ sub _wget_fetch {
 ### /bin/ftp fetch ###
 sub _ftp_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -665,10 +665,10 @@ sub _ftp_fetch {
         local %SIG{CHLD} = 'IGNORE';
 
         unless ($fh->open("|$ftp -n")) {
-            return $self->_error(loc("\%1 creation failed: \%2", $ftp, $!));
+            return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $!));
         }
 
-        my @dialog = (
+        my @dialog = @(
             "lcd " . dirname($to),
             "open " . $self->host,
             "user anonymous $FROM_EMAIL",
@@ -679,7 +679,7 @@ sub _ftp_fetch {
             "quit",
         );
 
-        foreach (@dialog) { $fh->print($_, "\n") }
+        foreach (< @dialog) { $fh->print($_, "\n") }
         $fh->close or return;
 
         return $to;
@@ -690,7 +690,7 @@ sub _ftp_fetch {
 ### use /bin/lynx to fetch files
 sub _lynx_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -704,14 +704,14 @@ sub _lynx_fetch {
         unless( IPC::Cmd->can_capture_buffer ) {
             $METHOD_FAIL->{'lynx'} = 1;
 
-            return $self->_error(loc( 
+            return $self->_error( <loc( 
                 "Can not capture buffers. Can not use '\%1' to fetch files",
                 'lynx' ));
         }            
 
         ### write to the output file ourselves, since lynx ass_u_mes to much
         my $local = FileHandle->new(">$to")
-                        or return $self->_error(loc(
+                        or return $self->_error( <loc(
                             "Could not open '\%1' for writing: \%2",$to,$!));
 
         ### dump to stdout ###
@@ -725,7 +725,7 @@ sub _lynx_fetch {
 
         ### DO NOT quote things for IPC::Run, it breaks stuff.
         push @$cmd, $IPC::Cmd::USE_IPC_RUN
-                        ? $self->uri
+                        ? < $self->uri
                         : QUOTE. $self->uri .QUOTE;
 
 
@@ -735,7 +735,7 @@ sub _lynx_fetch {
                     buffer  => \$captured,
                     verbose => $DEBUG )
         ) {
-            return $self->_error(loc("Command failed: \%1", $captured || ''));
+            return $self->_error( <loc("Command failed: \%1", $captured || ''));
         }
 
         ### print to local file ###
@@ -760,7 +760,7 @@ sub _lynx_fetch {
 ### use /bin/ncftp to fetch files
 sub _ncftp_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -778,15 +778,15 @@ sub _ncftp_fetch {
         my $cmd = \@(
             $ncftp,
             '-V',                   # do not be verbose
-            '-p', $FROM_EMAIL,      # email as password
-            $self->host,            # hostname
+            '-p', $FROM_EMAIL, <      # email as password
+            $self->host, <            # hostname
             dirname($to),           # local dir for the file
                                     # remote path to the file
             ### DO NOT quote things for IPC::Run, it breaks stuff.
             $IPC::Cmd::USE_IPC_RUN
-                        ? File::Spec::Unix->catdir( $self->path, $self->file )
-                        : QUOTE. File::Spec::Unix->catdir( 
-                                        $self->path, $self->file ) .QUOTE
+                        ? < File::Spec::Unix->catdir( < $self->path, < $self->file )
+                        : QUOTE. File::Spec::Unix->catdir( < 
+                                        $self->path, < $self->file ) .QUOTE
             
         );
 
@@ -796,7 +796,7 @@ sub _ncftp_fetch {
                     buffer  => \$captured,
                     verbose => $DEBUG )
         ) {
-            return $self->_error(loc("Command failed: \%1", $captured || ''));
+            return $self->_error( <loc("Command failed: \%1", $captured || ''));
         }
 
         return $to;
@@ -810,7 +810,7 @@ sub _ncftp_fetch {
 ### use /bin/curl to fetch files
 sub _curl_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -837,7 +837,7 @@ sub _curl_fetch {
         push @$cmd, '--fail', '--location', '--output', 
                     ### DO NOT quote things for IPC::Run, it breaks stuff.
                     $IPC::Cmd::USE_IPC_RUN
-                        ? ($to, $self->uri)
+                        ? ($to, < $self->uri)
                         : (QUOTE. $to .QUOTE, QUOTE. $self->uri .QUOTE);
 
         my $captured;
@@ -846,7 +846,7 @@ sub _curl_fetch {
                     verbose => $DEBUG )
         ) {
 
-            return $self->_error(loc("Command failed: \%1", $captured || ''));
+            return $self->_error( <loc("Command failed: \%1", $captured || ''));
         }
 
         return $to;
@@ -866,7 +866,7 @@ sub _curl_fetch {
     
 sub _file_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -895,7 +895,7 @@ sub _file_fetch {
 
     my $remote;
     if (!$share and $self->host) {
-        return $self->_error(loc( 
+        return $self->_error( <loc( 
             "Currently \%1 cannot handle hosts in \%2 urls",
             'File::Fetch', 'file://'
         ));            
@@ -903,7 +903,7 @@ sub _file_fetch {
     
     if( $vol ) {
         $path   = File::Spec->catdir( split m/\//, $path );
-        $remote = File::Spec->catpath( $vol, $path, $self->file);
+        $remote = File::Spec->catpath( $vol, $path, < $self->file);
 
     } elsif( $share ) {
         ### win32 specific, and a share name, so we wont bother with File::Spec
@@ -911,7 +911,7 @@ sub _file_fetch {
         $remote = "\\\\".$self->host."\\$share\\$path";
 
     } else {
-        $remote  = File::Spec->catfile( $path, $self->file );
+        $remote  = File::Spec->catfile( $path, < $self->file );
     }
 
     ### File::Copy is littered with 'die' statements :( ###
@@ -919,7 +919,7 @@ sub _file_fetch {
 
     ### something went wrong ###
     if( !$rv or $@ ) {
-        return $self->_error(loc("Could not copy '\%1' to '\%2': \%3 \%4",
+        return $self->_error( <loc("Could not copy '\%1' to '\%2': \%3 \%4",
                              $remote, $to, $!, $@));
     }
 
@@ -929,7 +929,7 @@ sub _file_fetch {
 ### use /usr/bin/rsync to fetch files
 sub _rsync_fetch {
     my $self = shift;
-    my %hash = @_;
+    my %hash = %( < @_ );
 
     my ($to);
     my $tmpl = \%(
@@ -948,7 +948,7 @@ sub _rsync_fetch {
 
         ### DO NOT quote things for IPC::Run, it breaks stuff.
         push @$cmd, $IPC::Cmd::USE_IPC_RUN
-                        ? ($self->uri, $to)
+                        ? ( <$self->uri, $to)
                         : (QUOTE. $self->uri .QUOTE, QUOTE. $to .QUOTE);
 
         my $captured;
@@ -957,8 +957,8 @@ sub _rsync_fetch {
                     verbose => $DEBUG )
         ) {
 
-            return $self->_error(loc("Command \%1 failed: \%2", 
-                "@$cmd" || '', $captured || ''));
+            return $self->_error( <loc("Command \%1 failed: \%2", 
+                "{join ' ', <@$cmd}" || '', $captured || ''));
         }
 
         return $to;
@@ -990,10 +990,10 @@ sub _error {
     my $error   = shift;
     
     $self->_error_msg( $error );
-    $self->_error_msg_long( Carp::longmess($error) );
+    $self->_error_msg_long( < Carp::longmess($error) );
     
     if( $WARN ) {
-        carp $DEBUG ? $self->_error_msg_long : $self->_error_msg;
+        carp $DEBUG ? < $self->_error_msg_long : < $self->_error_msg;
     }
 
     return;

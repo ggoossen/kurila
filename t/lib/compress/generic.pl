@@ -122,7 +122,7 @@ foreach my $name (qw(print printf write))
 title "Testing $CompressClass and $UncompressClass";
 
 {
-    my ($a, $x, @x) = ("","","") ;
+    my ($a, $x, < @x) = ("","","") ;
 
     # Buffer not a scalar reference
     eval qq[\$a = $CompressClass->new(\\\@x) ;] ;
@@ -137,7 +137,7 @@ foreach my $Type ( $CompressClass, $UncompressClass)
 {
     # Check error handling with IO::Compress::Deflate and IO::Uncompress::Inflate
 
-    my ($a, $x, @x) = ("","","") ;
+    my ($a, $x, < @x) = ("","","") ;
 
     # Odd number of parameters
     eval qq[\$a = $Type->new("abc", -Output) ] ;
@@ -648,8 +648,8 @@ EOT
 
     my $lex = LexFile->new( my $name) ;
 
-    my %opts = () ;
-    my $iow = $CompressClass-> new( $name, %opts);
+    my %opts = %( () ) ;
+    my $iow = $CompressClass-> new( $name, < %opts);
     is $iow->input_line_number, undef; 
     $iow->print($str) ;
     is $iow->input_line_number, undef; 
@@ -665,11 +665,11 @@ EOT
         ok ! $io->eof, "eof";
         is $io->tell(), 0, "tell 0" ;
         #my @lines = <$io>;
-        my @lines = $io->getlines();
-        is @lines, 6
-            or print "# Got " . scalar(@lines) . " lines, expected 6\n" ;
+        my @lines = @( < $io->getlines() );
+        is (nelems @lines), 6
+            or print "# Got " . scalar(nelems @lines) . " lines, expected 6\n" ;
         is @lines[1], "of a paragraph\n" ;
-        is join('', @lines), $str ;
+        is join('', < @lines), $str ;
         is $., 6; 
         is $io->input_line_number, 6; 
         is $io->tell(), length($str) ;
@@ -677,7 +677,7 @@ EOT
         ok $io->eof;
 
         ok ! ( defined($io->getline)  ||
-                  (@tmp = $io->getlines) ||
+                  (@tmp = @( < $io->getlines )) ||
                   defined($io->getline)         ||
                   defined($io->getc)     ||
                   $io->read($buf, 100)   != 0) ;
@@ -690,11 +690,11 @@ EOT
         is $., 0; 
         is $io->input_line_number, 0; 
         ok ! $io->eof;
-        my @lines = $io->getlines;
+        my @lines = @( < $io->getlines );
         is $., 1; 
         is $io->input_line_number, 1; 
         ok $io->eof;
-        ok @lines == 1 && @lines[0] eq $str;
+        ok (nelems @lines) == 1 && @lines[0] eq $str;
 
         $io = $UncompressClass->new($name);
         ok ! $io->eof;
@@ -709,12 +709,12 @@ EOT
         is $., 0; 
         is $io->input_line_number, 0; 
         ok ! $io->eof;
-        my @lines = $io->getlines();
+        my @lines = @( < $io->getlines() );
         is $., 2; 
         is $io->input_line_number, 2; 
         ok $io->eof;
-        ok @lines == 2 
-            or print "# Got " . scalar(@lines) . " lines, expected 2\n" ;
+        ok (nelems @lines) == 2 
+            or print "# Got " . scalar(nelems @lines) . " lines, expected 2\n" ;
         ok @lines[0] eq "This is an example\nof a paragraph\n\n\n"
             or print "# @lines[0]\n";
         ok @lines[1] eq "and a single line.\n\n";
@@ -732,11 +732,11 @@ EOT
         is $io->input_line_number, 0; 
 
         ok ! $io->eof;
-        my @lines = $io->getlines();
+        my @lines = @( < $io->getlines() );
         is $., $expected_records; 
         is $io->input_line_number, $expected_records; 
         ok $io->eof;
-        is @lines, $expected_records, 
+        is (nelems @lines), $expected_records, 
             "Got $expected_records records\n" ;
         ok @lines[0] eq substr($str, 0, $reclen)
             or print "# @lines[0]\n";
@@ -746,7 +746,7 @@ EOT
     {
         local $/ = "is";
         my $io = $UncompressClass->new($name);
-        my @lines = ();
+        my @lines = @( () );
         my $no = 0;
         my $err = 0;
         ok ! $io->eof;
@@ -760,9 +760,9 @@ EOT
 
         is $., 3; 
         is $io->input_line_number, 3; 
-        ok @lines == 3 
-            or print "# Got " . scalar(@lines) . " lines, expected 3\n" ;
-        ok join("-", @lines) eq
+        ok (nelems @lines) == 3 
+            or print "# Got " . scalar(nelems @lines) . " lines, expected 3\n" ;
+        ok join("-", < @lines) eq
                          "This- is- an example\n" .
                         "of a paragraph\n\n\n" .
                         "and a single line.\n\n";
@@ -826,10 +826,10 @@ EOT
         ok defined $io;
         ok ! $io->eof;
         ok $io->tell() == 0 ;
-        my @lines = $io->getlines();
-        is @lines, 6; 
+        my @lines = @( < $io->getlines() );
+        is (nelems @lines), 6; 
         ok @lines[1] eq "of a paragraph\n" ;
-        ok join('', @lines) eq $str ;
+        ok join('', < @lines) eq $str ;
         is $., 6; 
         is $io->input_line_number, 6; 
         ok $io->tell() == length($str) ;
@@ -837,7 +837,7 @@ EOT
         ok $io->eof;
 
         ok ! ( defined($io->getline)  ||
-                  (@tmp = $io->getlines) ||
+                  (@tmp = @( < $io->getlines )) ||
                   defined($io->getline)         ||
                   defined($io->getc)     ||
                   $io->read($buf, 100)   != 0) ;
@@ -848,11 +848,11 @@ EOT
         local $/;  # slurp mode
         my $io = $UncompressClass->new($name);
         ok ! $io->eof;
-        my @lines = $io->getlines;
+        my @lines = @( < $io->getlines );
         is $., 1; 
         is $io->input_line_number, 1; 
         ok $io->eof;
-        ok @lines == 1 && @lines[0] eq $str;
+        ok (nelems @lines) == 1 && @lines[0] eq $str;
 
         $io = $UncompressClass->new($name);
         ok ! $io->eof;
@@ -867,12 +867,12 @@ EOT
         local $/ = "";  # paragraph mode
         my $io = $UncompressClass->new($name);
         ok ! $io->eof;
-        my @lines = $io->getlines;
+        my @lines = @( < $io->getlines );
         is $., 2; 
         is $io->input_line_number, 2; 
         ok $io->eof;
-        ok @lines == 2 
-            or print "# exected 2 lines, got " . scalar(@lines) . "\n";
+        ok (nelems @lines) == 2 
+            or print "# exected 2 lines, got " . scalar(nelems @lines) . "\n";
         ok @lines[0] eq "This is an example\nof a paragraph\n\n\n"
             or print "# [@lines[0]]\n" ;
         ok @lines[1] eq "and a single line.\n\n";
@@ -890,11 +890,11 @@ EOT
         is $io->input_line_number, 0; 
 
         ok ! $io->eof;
-        my @lines = $io->getlines();
+        my @lines = @( < $io->getlines() );
         is $., $expected_records; 
         is $io->input_line_number, $expected_records; 
         ok $io->eof;
-        is @lines, $expected_records, 
+        is (nelems @lines), $expected_records, 
             "Got $expected_records records\n" ;
         ok @lines[0] eq substr($str, 0, $reclen)
             or print "# @lines[0]\n";
@@ -904,7 +904,7 @@ EOT
     {
         local $/ = "is";
         my $io = $UncompressClass->new($name);
-        my @lines = ();
+        my @lines = @( () );
         my $no = 0;
         my $err = 0;
         ok ! $io->eof;
@@ -919,8 +919,8 @@ EOT
         ok $io->eof;
 
 
-        ok @lines == 3 ;
-        ok join("-", @lines) eq
+        ok (nelems @lines) == 3 ;
+        ok join("-", < @lines) eq
                          "This- is- an example\n" .
                         "of a paragraph\n\n\n" .
                         "and a single line.\n\n";
@@ -1368,7 +1368,7 @@ foreach my $file (0, 1)
 
     #ok ! -e $name1, "  File $name1 does not exist";
 
-    my @data = (
+    my @data = @(
         \@( '\%()',         "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ), 
         \@( '\@( \%() )',     "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ), 
         \@( '\@( \@( \%() ) )', "{$CompressClass}::write: input parameter not a filename, filehandle, array ref or scalar ref" ), 
@@ -1379,9 +1379,9 @@ foreach my $file (0, 1)
         # same filehandle twice, 'xx'
        ) ;
 
-    foreach my $data (@data)
+    foreach my $data (< @data)
     {
-        my ($send, $get) = @$data ;
+        my ($send, $get) = < @$data ;
         title "{$CompressClass}::write( $send )";
         my($copy);
         eval "\$copy = $send";

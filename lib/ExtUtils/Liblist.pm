@@ -7,7 +7,7 @@ our $VERSION = '6.44';
 use File::Spec;
 require ExtUtils::Liblist::Kid;
 use strict;
-our @ISA = qw(ExtUtils::Liblist::Kid File::Spec);
+our @ISA = @( qw(ExtUtils::Liblist::Kid File::Spec) );
 
 # Backwards compatibility with old interface.
 sub ext {
@@ -18,7 +18,7 @@ sub lsdir {
   shift;
   my $rex = qr/@_[1]/;
   opendir DIR, @_[0];
-  my @out = grep m/$rex/, readdir DIR;
+  my @out = @( grep m/$rex/, readdir DIR );
   closedir DIR;
   return @out;
 }

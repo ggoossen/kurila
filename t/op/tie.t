@@ -12,12 +12,12 @@
 $|=1;
 
 undef $/;
-our @prgs = split m/^########\n/m, ~< *DATA;
+our @prgs = @( split m/^########\n/m, ~< *DATA );
 
 BEGIN { require './test.pl'; }
-plan(tests => scalar @prgs);
+plan(tests => scalar nelems @prgs);
 my $i;
-for (@prgs){
+for (< @prgs){
     ++$i;
     my($prog,$expected) = split(m/\nEXPECT\n/, $_, 2);
     print("not ok $i # bad test format\n"), next

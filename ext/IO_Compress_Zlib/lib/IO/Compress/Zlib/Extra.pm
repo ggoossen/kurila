@@ -27,7 +27,7 @@ sub validateExtraFieldPair
         unless ref $pair &&  ref $pair eq 'ARRAY';
 
     return ExtraFieldError("SubField must have two parts")
-        unless @$pair == 2 ;
+        unless (nelems @$pair) == 2 ;
 
     return ExtraFieldError("SubField ID is a reference")
         if ref $pair->[0] ;
@@ -148,21 +148,21 @@ sub parseExtraField
     if (ref $data eq 'ARRAY') {    
         if (ref $data->[0]) {
 
-            foreach my $pair (@$data) {
+            foreach my $pair (< @$data) {
                 return ExtraFieldError("Not list of lists")
                     unless ref $pair eq 'ARRAY' ;
 
                 my $bad = validateExtraFieldPair($pair, $strict, $gzipMode) ;
                 return $bad if $bad ;
 
-                $out .= mkSubField(@$pair);
+                $out .= mkSubField(< @$pair);
             }   
         }   
         else {
             return ExtraFieldError("Not even number of elements")
-                unless @$data % 2  == 0;
+                unless (nelems @$data) % 2  == 0;
 
-            for (my $ix = 0; $ix +<= length(@$data) -1 ; $ix += 2) {
+            for (my $ix = 0; $ix +<= length(nelems @$data) -1 ; $ix += 2) {
                 my $bad = validateExtraFieldPair(\@($data->[$ix],
                                                   $data->[$ix+1]), 
                                                  $strict, $gzipMode) ;

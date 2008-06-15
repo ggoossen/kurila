@@ -16,16 +16,16 @@ $_ = 'a:b:c';
 
 is(join(';',$a,$b,$c), 'a;b;c');
 
-@ary = split(m/:b:/);
-is(join("$_",@ary), 'aa:b:cc');
+@ary = @( split(m/:b:/) );
+is(join("$_",< @ary), 'aa:b:cc');
 
 $_ = "abc\n";
-my @xyz = (@ary = split(m//));
-is(join(".",@ary), "a.b.c.\n");
+my @xyz = @(@ary = @( split(m//) ));
+is(join(".",< @ary), "a.b.c.\n");
 
 $_ = "a:b:c::::";
-@ary = split(m/:/);
-is(join(".",@ary), "a.b.c");
+@ary = @( split(m/:/) );
+is(join(".",< @ary), "a.b.c");
 
 $_ = join(':',split(' ',"    a b\tc \t d "));
 is($_, 'a:b:c:d');
@@ -108,8 +108,8 @@ is($_, "aa b |\naa d |");
 
 # Greedyness:
 $_ = "a : b :c: d";
-@ary = split(m/\s*:\s*/);
-is(($res = join(".",@ary)), "a.b.c.d", $res);
+@ary = @( split(m/\s*:\s*/) );
+is(($res = join(".",< @ary)), "a.b.c.d", $res);
 
 # use of match result as pattern (!)
 is('p:q:r:s', join ':', split('abc' =~ m/b/, 'p1q1r1s'));
@@ -119,11 +119,11 @@ $_ = join ':', split m/^/, "ab\ncd\nef\n";
 is($_, "ab\n:cd\n:ef\n");
 
 # see if @a = @b = split(...) optimization works
-@list1 = @list2 = split ('p',"a p b c p");
-ok(@list1 == @list2 &&
-   "@list1" eq "@list2" &&
-   @list1 == 2 &&
-   "@list1" eq "a   b c ");
+@list1 = @( @list2 = @( split ('p',"a p b c p") ) );
+ok((nelems @list1) == nelems @list2 &&
+   "{join ' ', <@list1}" eq "{join ' ', <@list2}" &&
+   (nelems @list1) == 2 &&
+   "{join ' ', <@list1}" eq "a   b c ");
 
 # zero-width assertion
 $_ = join ':', split m/(?=\w)/, "rm b";
@@ -133,26 +133,26 @@ is($_, "r:m :b");
 
 use utf8;
 
-@ary = split(m/\x{FE}/, "\x{FF}\x{FE}\x{FD}"); # bug id 20010105.016
-ok(@ary == 2 &&
+@ary = @( split(m/\x{FE}/, "\x{FF}\x{FE}\x{FD}") ); # bug id 20010105.016
+ok((nelems @ary) == 2 &&
    @ary[0] eq "\x{FF}"   && @ary[1] eq "\x{FD}" &&
    @ary[0] eq "\x{FF}" && @ary[1] eq "\x{FD}");
 
-@ary = split(m/(\x{FE}\x{FE})/, "\x{FF}\x{FF}\x{FE}\x{FE}\x{FD}\x{FD}"); # variant of 31
-ok(@ary == 3 &&
+@ary = @( split(m/(\x{FE}\x{FE})/, "\x{FF}\x{FF}\x{FE}\x{FE}\x{FD}\x{FD}") ); # variant of 31
+ok((nelems @ary) == 3 &&
    @ary[0] eq "\x{FF}\x{FF}" &&
    @ary[1] eq "\x{FE}\x{FE}"     &&
    @ary[2] eq "\x{FD}\x{FD}");
 
 {
-    my @a = map ord, split(m//, join("", map chr, (1234, 123, 2345)));
-    is("@a", "1234 123 2345");
+    my @a = @( map ord, split(m//, join("", map chr, (1234, 123, 2345))) );
+    is("{join ' ', <@a}", "1234 123 2345");
 }
 
 {
     my $x = 'A';
-    my @a = map ord, split(m/$x/, join("", map chr, (1234, ord($x), 2345)));
-    is("@a", "1234 2345");
+    my @a = @( map ord, split(m/$x/, join("", map chr, (1234, ord($x), 2345))) );
+    is("{join ' ', <@a}", "1234 2345");
 }
 
 {
@@ -163,9 +163,9 @@ ok(@ary == 3 &&
 
     my $sushi = "\x{b36c}\x{5a8c}\x{ff5b}\x{5079}\x{505b}";
 
-    my @charlist = split m//, $sushi;
+    my @charlist = @( split m//, $sushi );
     my $r = '';
-    foreach my $ch (@charlist) {
+    foreach my $ch (< @charlist) {
 	$r = $r . " " . sprintf "U+\%04X", ord($ch);
     }
 
@@ -210,9 +210,9 @@ ok(@ary == 3 &&
 
     my $a = "ABC\x{263A}";
 
-    my @b = split( m//, $a );
+    my @b = @( split( m//, $a ) );
 
-    is(scalar @b, 4);
+    is(scalar nelems @b, 4);
 
     ok(length(@b[3]) == 1 && @b[3] eq "\x{263A}");
 
@@ -222,9 +222,9 @@ ok(@ary == 3 &&
 
 {
     no utf8;
-    my @a = split(m/\xFE/, "\x[FF]\x[FE]\x[FD]");
+    my @a = @( split(m/\xFE/, "\x[FF]\x[FE]\x[FD]") );
 
-    ok(@a == 2 && @a[0] eq "\x[FF]" && @a[1] eq "\x[FD]");
+    ok((nelems @a) == 2 && @a[0] eq "\x[FF]" && @a[1] eq "\x[FD]");
 }
 
 {
@@ -240,17 +240,17 @@ ok(@ary == 3 &&
 
 {
     # split /(A)|B/, "1B2" should return (1, undef, 2)
-    my @x = split m/(A)|B/, "1B2";
+    my @x = @( split m/(A)|B/, "1B2" );
     ok(@x[0] eq '1' and (not defined @x[1]) and @x[2] eq '2');
 }
 
 {
     # [perl #17064]
     my $warn;
-    local $^WARN_HOOK = sub { $warn = join '', @_; chomp $warn };
+    local $^WARN_HOOK = sub { $warn = join '', < @_; chomp $warn };
     my $char = "\x{10f1ff}";
-    my @a = split m/\r?\n/, "$char\n";
-    ok(@a == 1 && @a[0] eq $char && !defined($warn));
+    my @a = @( split m/\r?\n/, "$char\n" );
+    ok((nelems @a) == 1 && @a[0] eq $char && !defined($warn));
 }
 
 {
@@ -260,8 +260,8 @@ ok(@ary == 3 &&
 	    $_ = 'readin,database,readout';
 	    utf8::encode $_ if $u;
 	    m/(.+)/;
-	    my @d = split m/[,]/,$1;
-	    is(join (':',@d), 'readin:database:readout', "[perl #18195]");
+	    my @d = @( split m/[,]/,$1 );
+	    is(join (':',< @d), 'readin:database:readout', "[perl #18195]");
 	}
     }
 }
@@ -269,15 +269,15 @@ ok(@ary == 3 &&
 {
     $p="a,b";
     utf8::encode $p;
-    try { @a=split(m/[, ]+/,$p) };
-    is ("$@-@a-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
+    try { @a= @(split(m/[, ]+/,$p) ) };
+    is ("$@-{join ' ', <@a}-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
 }
 
 {
     no strict 'refs';
     cmp_ok(\@a, '\==', \@{*{Symbol::fetch_glob("a")}}, '@a must be global for following test');
     $p="";
-    $n = @a = split m/,/,$p;
+    $n = @a = @( split m/,/,$p );
     is ($n, 0, '#21765 - pmreplroot hack used to return undef for 0 iters');
 }
 
@@ -287,7 +287,7 @@ ok(@ary == 3 &&
     # in the inner elements
 
     my $x;
-    @a = split m/,/, ',,,,,';
+    @a = @( split m/,/, ',,,,,' );
     @a[3]=1;
     $x = \@a[2];
     is (ref $x, 'SCALAR', '#28938 - garbage after extend');
@@ -303,7 +303,7 @@ ok(@ary == 3 &&
     # Copyright (c) 1991-2006 Unicode, Inc.
     # For terms of use, see http://www.unicode.org/terms_of_use.html
     # For documentation, see UCD.html
-    my @spaces=(
+    my @spaces=@(
 	ord("\t"),      # Cc       <control-0009>
 	ord("\n"),      # Cc       <control-000A>
 	# not PerlSpace # Cc       <control-000B>
@@ -323,31 +323,31 @@ ok(@ary == 3 &&
         0x3000          # Zs       IDEOGRAPHIC SPACE
     );
     #diag "Have @{[0+@spaces]} to test\n";
-    foreach my $cp (@spaces) {
+    foreach my $cp (< @spaces) {
 	my $msg = sprintf "Space: U+\%04x", $cp;
         my $space = chr($cp);
         my $str="A:$space:B";
 
-        my @res=split(m/\s+/,$str);
-        ok(@res == 2 && join('-',@res) eq "A:-:B", "$msg - /\\s+/");
+        my @res= @(split(m/\s+/,$str) );
+        ok((nelems @res) == 2 && join('-',< @res) eq "A:-:B", "$msg - /\\s+/");
 
         my $s2 = "$space$space:A:$space$space:B";
 
-        my @r2 = split(' ',$s2);
-        ok(@r2 == 2 && join('-', @r2) eq ":A:-:B",  "$msg - ' '");
+        my @r2 = @( split(' ',$s2) );
+        ok((nelems @r2) == 2 && join('-', < @r2) eq ":A:-:B",  "$msg - ' '");
 
-        my @r3 = split(m/\s+/, $s2);
-        ok(@r3 == 3 && join('-', @r3) eq "-:A:-:B", "$msg - /\\s+/ No.2");
+        my @r3 = @( split(m/\s+/, $s2) );
+        ok((nelems @r3) == 3 && join('-', < @r3) eq "-:A:-:B", "$msg - /\\s+/ No.2");
     }
 }
 
 {
     my $src = "ABC \0 FOO \0  XYZ";
-    my @s = split(" \0 ", $src);
-    my @r = split(m/ \0 /, $src);
-    is(scalar(@s), 3);
+    my @s = @( split(" \0 ", $src) );
+    my @r = @( split(m/ \0 /, $src) );
+    is(scalar(nelems @s), 3);
     is(@s[0], "ABC");
     is(@s[1], "FOO");
     is(@s[2]," XYZ");
-    is(join(':',@s), join(':',@r));
+    is(join(':',< @s), join(':',< @r));
 }

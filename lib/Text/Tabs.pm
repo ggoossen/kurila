@@ -5,8 +5,8 @@ require Exporter;
 
 use strict;
 
-our @ISA = ('Exporter');
-our @EXPORT = qw(expand unexpand $tabstop);
+our @ISA = @('Exporter');
+our @EXPORT = @( qw(expand unexpand $tabstop) );
 
 use vars qw($VERSION $tabstop $debug);
 $VERSION = 2007.1117;
@@ -19,7 +19,7 @@ BEGIN	{
 sub expand {
 	my @l;
 	my $pad;
-	for ( @_ ) {
+	for ( < @_ ) {
 		my $s = '';
 		for (split(m/^/m, $_, -1)) {
 			my $offs = 0;
@@ -38,24 +38,24 @@ sub expand {
 
 sub unexpand
 {
-	my (@l) = @_;
+	my (@l) = @( < @_ );
 	my @e;
 	my $x;
 	my $line;
 	my @lines;
 	my $lastbit;
 	my $ts_as_space = " "x$tabstop;
-	for $x (@l) {
-		@lines = split("\n", $x, -1);
-		for $line (@lines) {
+	for $x (< @l) {
+		@lines = @( split("\n", $x, -1) );
+		for $line (< @lines) {
 			$line = expand($line);
-			@e = split(m/(.{$tabstop})/,$line,-1);
+			@e = @( split(m/(.{$tabstop})/,$line,-1) );
 			$lastbit = pop(@e);
 			$lastbit = '' 
 				unless defined $lastbit;
 			$lastbit = "\t"
 				if $lastbit eq $ts_as_space;
-			for $_ (@e) {
+			for $_ (< @e) {
 				if ($debug) {
 					my $x = $_;
 					$x =~ s/\t/^I\t/gs;
@@ -63,9 +63,9 @@ sub unexpand
 				}
 				s/  +$/\t/;
 			}
-			$line = join('',@e, $lastbit);
+			$line = join('',< @e, $lastbit);
 		}
-		$x = join("\n", @lines);
+		$x = join("\n", < @lines);
 	}
 	return @l if wantarray;
 	return @l[0];

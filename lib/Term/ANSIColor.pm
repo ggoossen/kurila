@@ -21,10 +21,10 @@ use vars qw($AUTORESET $EACHLINE @ISA @EXPORT @EXPORT_OK
             %EXPORT_TAGS $VERSION %attributes %attributes_r);
 
 use Exporter ();
-@ISA         = qw(Exporter);
-@EXPORT      = qw(color colored);
-@EXPORT_OK   = qw(uncolor);
-%EXPORT_TAGS = (constants => \@(qw(CLEAR RESET BOLD DARK UNDERLINE UNDERSCORE
+@ISA         = @( qw(Exporter) );
+@EXPORT      = @( qw(color colored) );
+@EXPORT_OK   = @( qw(uncolor) );
+%EXPORT_TAGS = %(constants => \@(qw(CLEAR RESET BOLD DARK UNDERLINE UNDERSCORE
                                  BLINK REVERSE CONCEALED BLACK RED GREEN
                                  YELLOW BLUE MAGENTA CYAN WHITE ON_BLACK
                                  ON_RED ON_GREEN ON_YELLOW ON_BLUE ON_MAGENTA
@@ -37,7 +37,7 @@ $VERSION = '1.12';
 # Internal data structures
 ##############################################################################
 
-%attributes = ('clear'      => 0,
+%attributes = %('clear'      => 0,
                'reset'      => 0,
                'bold'       => 1,
                'dark'       => 2,
@@ -107,9 +107,9 @@ for my $attr (keys %attributes) {
 # Return the escape code for a given set of color attributes.
 sub color {
     return '' if defined %ENV{ANSI_COLORS_DISABLED};
-    my @codes = map { split } @_;
+    my @codes = @( map { split } < @_ );
     my $attribute = '';
-    foreach (@codes) {
+    foreach (< @codes) {
         $_ = lc $_;
         unless (defined %attributes{$_}) {
             require Carp;
@@ -126,7 +126,7 @@ sub color {
 # empty escape sequence '' or "\e[m" gives an empty list of attrs.
 sub uncolor {
     my (@nums, @result);
-    for (@_) {
+    for (< @_) {
         my $escape = $_;
         $escape =~ s/^\e\[//;
         $escape =~ s/m$//;
@@ -136,7 +136,7 @@ sub uncolor {
         }
         push (@nums, split (m/;/, $1));
     }
-    for (@nums) {
+    for (< @nums) {
 	$_ += 0; # Strip leading zeroes
 	my $name = %attributes_r{$_};
 	if (!defined $name) {
@@ -159,21 +159,21 @@ sub uncolor {
 sub colored {
     my ($string, @codes);
     if (ref @_[0]) {
-        @codes = @{+shift};
-        $string = join ('', @_);
+        @codes = @( < @{+shift} );
+        $string = join ('', < @_);
     } else {
         $string = shift;
-        @codes = @_;
+        @codes = @( < @_ );
     }
     return $string if defined %ENV{ANSI_COLORS_DISABLED};
     if (defined $EACHLINE) {
-        my $attr = color (@codes);
+        my $attr = color (< @codes);
         join '',
             map { $_ ne $EACHLINE ? $attr . $_ . "\e[0m" : $_ }
                 grep { length ($_) +> 0 }
                     split (m/(\Q$EACHLINE\E)/, $string);
     } else {
-        color (@codes) . $string . "\e[0m";
+        color (< @codes) . $string . "\e[0m";
     }
 }
 

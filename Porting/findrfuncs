@@ -20,7 +20,7 @@ use File::Find;
 
 my @EXES;
 my $NMU = 'nm -u';
-my @INCDIRS = qw(/usr/include);
+my @INCDIRS = @( qw(/usr/include) );
 my $SO = 'so';
 my $EXE = '';
 
@@ -36,7 +36,7 @@ push @EXES, "perl$EXE";
 
 find(sub {push @EXES, $File::Find::name if m/\.$SO$/}, '.' );
 
-push @EXES, @ARGV;
+push @EXES, < @ARGV;
 
 if ($^O eq 'dec_osf') {
     $NMU = 'nm -Bu';
@@ -59,7 +59,7 @@ find(sub {
 	    }
 	}
 	close F;
-     }, @INCDIRS);
+     }, < @INCDIRS);
 
 # delete bogus symbols grepped out of comments and such
 delete %rfuncs{setlocale_r} if $^O eq 'linux';
@@ -107,7 +107,7 @@ if ($netdb_r_obsolete) {
 
 my %syms;
 
-for my $exe (@EXES) {
+for my $exe (< @EXES) {
     # warn "#--- $exe\n";
     for my $sym (`$NMU $exe 2>/dev/null`) {
         chomp $sym;
@@ -122,12 +122,12 @@ for my $exe (@EXES) {
         }
     }
     
-    if (@syms) {
+    if ((nelems @syms)) {
         print "\nFollowing symbols in $exe have reentrant versions:\n";
-        for my $sym (@syms) {
-	    my @f = sort keys %{%rfuncs{$sym . '_r'}};
-    	    print "$sym => $sym" . "_r (@f)\n";
+        for my $sym (< @syms) {
+	    my @f = @( sort keys %{%rfuncs{$sym . '_r'}} );
+    	    print "$sym => $sym" . "_r ({join ' ', <@f})\n";
         }
     }
-    @syms = ();
+    @syms = @( () );
 }

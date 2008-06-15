@@ -6,17 +6,17 @@ use strict;
 use Cwd;
 
 use File::Spec;
-use lib File::Spec->catdir('t', 'lib');
+use lib < File::Spec->catdir('t', 'lib');
 use Test::More tests => 17;
 
 use Scalar::Util qw/tainted/;
 
-my @Functions = qw(getcwd cwd fastcwd fastgetcwd
+my @Functions = @( qw(getcwd cwd fastcwd fastgetcwd
                    abs_path fast_abs_path
                    realpath fast_realpath
-                  );
+                  ) );
 
-foreach my $func (@Functions) {
+foreach my $func (< @Functions) {
     no strict 'refs';
     my $cwd;
     try { $cwd = &{*{Symbol::fetch_glob('Cwd::'.$func)}} };

@@ -46,17 +46,17 @@ print "not "
 print "ok 4\n";
 }
 
-my @h = $poll->handles;
+my @h = @( < $poll->handles );
 print "not "
-	unless @h == 2;
+	unless (nelems @h) == 2;
 print "ok 5\n";
 
 $poll->remove($stdout);
 
-@h = $poll->handles;
+@h = @( < $poll->handles );
 
 print "not "
-	unless @h == 1;
+	unless (nelems @h) == 1;
 print "ok 6\n";
 
 print "not "

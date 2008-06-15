@@ -1,14 +1,14 @@
 package MakeMaker::Test::Setup::Problem;
 
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 require Exporter;
-our @EXPORT = qw(setup_recurs teardown_recurs);
+our @EXPORT = @( qw(setup_recurs teardown_recurs) );
 
 use strict;
 use File::Path;
 use File::Basename;
 
-my %Files = (
+my %Files = %(
              'Problem-Module/Makefile.PL'   => <<'END',
 use ExtUtils::MakeMaker;
 
@@ -30,7 +30,7 @@ END
 sub setup_recurs {
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile( <'File::Spec'->curdir, split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;

@@ -87,7 +87,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 }
 
 sub mysprintf_int_flags {
-    my ($fmt, $num) = @_;
+    my ($fmt, $num) = < @_;
     die "wrong format $fmt" if $fmt !~ m/^%([-+ 0]+)([1-9][0-9]*)d\z/;
     my $flag  = $1;
     my $width = $2;
@@ -108,11 +108,11 @@ sub mysprintf_int_flags {
 # Whole tests for "%4d" with 2 to 4 flags;
 # total counts: 3 * (4**2 + 4**3 + 4**4) == 1008
 
-my @flags = ("-", "+", " ", "0");
+my @flags = @("-", "+", " ", "0");
 for my $num (0, -1, 1) {
-    for my $f1 (@flags) {
-	for my $f2 (@flags) {
-	    for my $f3 ('', @flags) { # '' for doubled flags
+    for my $f1 (< @flags) {
+	for my $f2 (< @flags) {
+	    for my $f3 ('', < @flags) { # '' for doubled flags
 		my $flag = $f1.$f2.$f3;
 		my $width = 4;
 		my $fmt   = '%'."{$flag}{$width}d";
@@ -122,7 +122,7 @@ for my $num (0, -1, 1) {
 
 	        next if $f3 eq '';
 
-		for my $f4 (@flags) { # quadrupled flags
+		for my $f4 (< @flags) { # quadrupled flags
 		    my $flag = $f1.$f2.$f3.$f4;
 		    my $fmt   = '%'."{$flag}{$width}d";
 		    my $result = sprintf($fmt, $num);

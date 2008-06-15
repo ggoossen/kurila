@@ -56,13 +56,13 @@ use Scalar::Util qw(refaddr);
 sub TIEHASH
 {
 	my $pkg = shift;
-	return bless \@( @_ ), $pkg;
+	return bless \@( < @_ ), $pkg;
 }
 sub FETCH
 {
 	my $self = shift;
 	my $key = shift;
-	my ($underlying) = @$self;
+	my ($underlying) = < @$self;
 	return $underlying->{refaddr($key)};
 }
 sub STORE
@@ -70,6 +70,6 @@ sub STORE
 	my $self = shift;
 	my $key = shift;
 	my $value = shift;
-	my ($underlying) = @$self;
-	return ($underlying->{refaddr($key)} = $key);
+	my ($underlying) = < @$self;
+	return  @($underlying->{refaddr($key)} = $key);
 }

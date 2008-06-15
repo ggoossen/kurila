@@ -40,7 +40,7 @@ is($x, "1a line\n2a line\n", '~< *ARGV from two files');
     is( 0+$?, 0, q(eof() doesn't segfault) );
 }
 
-@ARGV = ('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
+@ARGV = @('Io_argv1.tmp', 'Io_argv1.tmp', $devnull, 'Io_argv1.tmp');
 our $y;
 while ( ~< *ARGV) {
     $y .= $. . $_;
@@ -56,7 +56,7 @@ open(TRY, ">", 'Io_argv1.tmp') or die "Can't open temp file: $!";
 close TRY or die "Could not close: $!";
 open(TRY, ">", 'Io_argv2.tmp') or die "Can't open temp file: $!";
 close TRY or die "Could not close: $!";
-@ARGV = ('Io_argv1.tmp', 'Io_argv2.tmp');
+@ARGV = @('Io_argv1.tmp', 'Io_argv2.tmp');
 $^I = '_bak';   # not .bak which confuses VMS
 $/ = undef;
 my $i = 7;
@@ -81,19 +81,19 @@ ok( eof TRY );
 }
 
 open STDIN, "<", 'Io_argv1.tmp' or die $!;
-@ARGV = ();
+@ARGV = @( () );
 ok( !eof(),     'STDIN has something' );
 
 is( ~< *ARGV, "ok 7\n" );
 
 open STDIN, '<', $devnull or die $!;
-@ARGV = ();
+@ARGV = @( () );
 ok( eof(),      'eof() true with empty @ARGV' );
 
-@ARGV = ('Io_argv1.tmp');
+@ARGV = @('Io_argv1.tmp');
 ok( !eof() );
 
-@ARGV = ($devnull, $devnull);
+@ARGV = @($devnull, $devnull);
 ok( !eof() );
 
 close ARGV or die $!;

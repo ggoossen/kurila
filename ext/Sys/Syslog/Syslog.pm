@@ -10,9 +10,9 @@ require Exporter;
 
 {
     our $VERSION = '0.24';
-    our @ISA = qw(Exporter);
+    our @ISA = @( qw(Exporter) );
 
-    our %EXPORT_TAGS = (
+    our %EXPORT_TAGS = %(
         standard => \@(qw(openlog syslog closelog setlogmask)),
         extended => \@(qw(setlogsock)),
         macros => \@(
@@ -49,13 +49,13 @@ require Exporter;
         ),
     );
 
-    our @EXPORT = (
-        @{%EXPORT_TAGS{standard}}, 
+    our @EXPORT = @(
+        < @{%EXPORT_TAGS{standard}}, 
     );
 
-    our @EXPORT_OK = (
-        @{%EXPORT_TAGS{extended}}, 
-        @{%EXPORT_TAGS{macros}}, 
+    our @EXPORT_OK = @(
+        < @{%EXPORT_TAGS{extended}}, 
+        < @{%EXPORT_TAGS{macros}}, 
     );
 
     try {
@@ -87,9 +87,9 @@ my $transmit_ok = 0;            # flag to indicate if the last message was trans
 my $current_proto = undef;      # current mechanism used to transmit messages
 my $ident = '';                 # identifiant prepended to each message
 $facility = '';                 # current facility
-my $maskpri = LOG_UPTO(&LOG_DEBUG);     # current log mask
+my $maskpri = LOG_UPTO( <&LOG_DEBUG);     # current log mask
 
-my %options = (
+my %options = %(
     ndelay  => 0, 
     nofatal => 0, 
     nowait  => 0, 
@@ -98,9 +98,9 @@ my %options = (
 
 # Default is now to first use the native mechanism, so Perl programs 
 # behave like other normal Unix programs, then try other mechanisms.
-my @connectMethods = qw(native tcp udp unix pipe stream console);
+my @connectMethods = @( qw(native tcp udp unix pipe stream console) );
 if ($^O =~ m/^(freebsd|linux)$/) {
-    @connectMethods = grep { $_ ne 'udp' } @connectMethods;
+    @connectMethods = @( grep { $_ ne 'udp' } < @connectMethods );
 }
 
 # use EventLog on Win32
@@ -113,15 +113,15 @@ if (not $@) {
     warn $@;
 }
 
-my @defaultMethods = @connectMethods;
-my @fallbackMethods = ();
+my @defaultMethods = @( < @connectMethods );
+my @fallbackMethods = @( () );
 
 # coderef for a nicer handling of errors
 my $err_sub = %options{nofatal} ? \&warnings::warnif : \&croak;
 
 
 sub openlog {
-    ($ident, my $logopt, $facility) = @_;
+    ($ident, my $logopt, $facility) = < @_;
 
     # default values
     $ident    ||= basename($0) || getlogin() || getpwuid($<) || 'syslog';
@@ -153,21 +153,21 @@ sub setlogsock {
     $syslog_path = shift;
     disconnect_log() if $connected;
     $transmit_ok = 0;
-    @fallbackMethods = ();
-    @connectMethods = @defaultMethods;
+    @fallbackMethods = @( () );
+    @connectMethods = @( < @defaultMethods );
 
     if (ref $setsock eq 'ARRAY') {
-	@connectMethods = @$setsock;
+	@connectMethods = @( < @$setsock );
 
     } elsif (lc $setsock eq 'stream') {
 	if (not defined $syslog_path) {
-	    my @try = qw(/dev/log /dev/conslog);
+	    my @try = @( qw(/dev/log /dev/conslog) );
 
             if (length &_PATH_LOG) {        # Undefined _PATH_LOG is "".
-		unshift @try, &_PATH_LOG;
+		unshift @try, < &_PATH_LOG;
             }
 
-	    for my $try (@try) {
+	    for my $try (< @try) {
 		if (-w $try) {
 		    $syslog_path = $try;
 		    last;
@@ -184,20 +184,20 @@ sub setlogsock {
             warnings::warnif "stream passed to setlogsock, but $syslog_path is not writable";
 	    return undef;
 	} else {
-            @connectMethods = qw(stream);
+            @connectMethods = @( qw(stream) );
 	}
 
     } elsif (lc $setsock eq 'unix') {
         if (length _PATH_LOG() || (defined $syslog_path && -w $syslog_path)) {
 	    $syslog_path = _PATH_LOG() unless defined $syslog_path;
-            @connectMethods = qw(unix);
+            @connectMethods = @( qw(unix) );
         } else {
             warnings::warnif 'unix passed to setlogsock, but path not available';
 	    return undef;
         }
 
     } elsif (lc $setsock eq 'pipe') {
-        for my $path ($syslog_path, &_PATH_LOG, "/dev/log") {
+        for my $path ($syslog_path, < &_PATH_LOG, "/dev/log") {
             next unless defined $path and length $path and -p $path and -w _;
             $syslog_path = $path;
             last
@@ -208,14 +208,14 @@ sub setlogsock {
             return undef
         }
 
-        @connectMethods = qw(pipe);
+        @connectMethods = @( qw(pipe) );
 
     } elsif (lc $setsock eq 'native') {
-        @connectMethods = qw(native);
+        @connectMethods = @( qw(native) );
 
     } elsif (lc $setsock eq 'eventlog') {
         if (eval "use Win32::EventLog; 1") {
-            @connectMethods = qw(eventlog);
+            @connectMethods = @( qw(eventlog) );
         } else {
             warnings::warnif "eventlog passed to setlogsock, but operating system isn't Win32-compatible";
             return undef;
@@ -223,7 +223,7 @@ sub setlogsock {
 
     } elsif (lc $setsock eq 'tcp') {
 	if (getservbyname('syslog', 'tcp') || getservbyname('syslogng', 'tcp')) {
-            @connectMethods = qw(tcp);
+            @connectMethods = @( qw(tcp) );
 	} else {
             warnings::warnif "tcp passed to setlogsock, but tcp service unavailable";
 	    return undef;
@@ -231,17 +231,17 @@ sub setlogsock {
 
     } elsif (lc $setsock eq 'udp') {
 	if (getservbyname('syslog', 'udp')) {
-            @connectMethods = qw(udp);
+            @connectMethods = @( qw(udp) );
 	} else {
             warnings::warnif "udp passed to setlogsock, but udp service unavailable";
 	    return undef;
 	}
 
     } elsif (lc $setsock eq 'inet') {
-	@connectMethods = ( 'tcp', 'udp' );
+	@connectMethods = @( 'tcp', 'udp' );
 
     } elsif (lc $setsock eq 'console') {
-	@connectMethods = qw(console);
+	@connectMethods = @( qw(console) );
 
     } else {
         croak "Invalid argument passed to setlogsock; must be 'stream', 'pipe', ",
@@ -269,11 +269,11 @@ sub syslog {
     croak "syslog: expecting argument \$priority" unless defined $priority;
     croak "syslog: expecting argument \$format"   unless defined $mask;
 
-    @words = split(m/\W+/, $priority, 2);    # Allow "level" or "level|facility".
+    @words = @( split(m/\W+/, $priority, 2) );    # Allow "level" or "level|facility".
     undef $numpri;
     undef $numfac;
 
-    foreach (@words) {
+    foreach (< @words) {
 	$num = xlate($_);		    # Translate word to number.
 	if ($num +< 0) {
 	    croak "syslog: invalid level/facility: $_"
@@ -301,13 +301,13 @@ sub syslog {
 
     if ($mask =~ m/\%m/) {
         # escape percent signs for sprintf()
-        $error =~ s/%/\%\%/g if @_;
+        $error =~ s/%/\%\%/g if (nelems @_);
         # replace %m with $error, if preceded by an even number of percent signs
         $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g;
     }
 
     $mask .= "\n" unless $mask =~ m/\n$/;
-    $message = @_ ? sprintf($mask, @_) : $mask;
+    $message = (nelems @_) ? sprintf($mask, < @_) : $mask;
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
     chomp $message if $^O =~ m/darwin/;
@@ -336,10 +336,10 @@ sub syslog {
     # then we'll get ECONNREFUSED on the send). So what we
     # want to do at this point is to fallback onto a different
     # connection method.
-    while (scalar @fallbackMethods || $syslog_send) {
+    while (scalar nelems @fallbackMethods || $syslog_send) {
 	if ($failed && (time - $fail_time) +> 60) {
 	    # it's been a while... maybe things have been fixed
-	    @fallbackMethods = ();
+	    @fallbackMethods = @( () );
 	    disconnect_log();
 	    $transmit_ok = 0; # make it look like a fresh attempt
 	    connect_log();
@@ -371,7 +371,7 @@ sub syslog {
 }
 
 sub _syslog_send_console {
-    my ($buf) = @_;
+    my ($buf) = < @_;
     chop($buf); # delete the NUL from the end
     # The console print is a method which could block
     # so we do it in a child process and always return success
@@ -382,7 +382,7 @@ sub _syslog_send_console {
 	    return 1;
 	} else {
 	    if (waitpid($pid, 0) +>= 0) {
-	    	return ($? >> 8);
+	    	return  @($? >> 8);
 	    } else {
 		# it's possible that the caller has other
 		# plans for SIGCHLD, so let's not interfere
@@ -400,7 +400,7 @@ sub _syslog_send_console {
 }
 
 sub _syslog_send_stream {
-    my ($buf) = @_;
+    my ($buf) = < @_;
     # XXX: this only works if the OS stream implementation makes a write 
     # look like a putmsg() with simple header. For instance it works on 
     # Solaris 8 but not Solaris 7.
@@ -409,18 +409,18 @@ sub _syslog_send_stream {
 }
 
 sub _syslog_send_pipe {
-    my ($buf) = @_;
+    my ($buf) = < @_;
     return print SYSLOG $buf;
 }
 
 sub _syslog_send_socket {
-    my ($buf) = @_;
+    my ($buf) = < @_;
     return syswrite(SYSLOG, $buf, length($buf));
     #return send(SYSLOG, $buf, 0);
 }
 
 sub _syslog_send_native {
-    my ($buf, $numpri) = @_;
+    my ($buf, $numpri) = < @_;
     syslog_xs($numpri, $buf);
     return 1;
 }
@@ -431,7 +431,7 @@ sub _syslog_send_native {
 # private function to translate names to numeric values
 # 
 sub xlate {
-    my($name) = @_;
+    my($name) = < @_;
     return $name+0 if $name =~ m/^\s*\d+\s*$/;
     $name = uc $name;
     $name = "LOG_$name" unless $name =~ m/^LOG_/;
@@ -449,7 +449,7 @@ sub xlate {
 # selected order. 
 # 
 sub connect_log {
-    @fallbackMethods = @connectMethods unless scalar @fallbackMethods;
+    @fallbackMethods = @( < @connectMethods ) unless scalar nelems @fallbackMethods;
 
     if ($transmit_ok && $current_proto) {
         # Retry what we were on, because it has worked in the past.
@@ -457,7 +457,7 @@ sub connect_log {
     }
 
     $connected = 0;
-    my @errs = ();
+    my @errs = @( () );
     my $proto = undef;
 
     while ($proto = shift @fallbackMethods) {
@@ -472,14 +472,14 @@ sub connect_log {
 	$current_proto = $proto;
         my ($old) = select(SYSLOG); $| = 1; select($old);
     } else {
-	@fallbackMethods = ();
-        $err_sub->(join "\n\t- ", "no connection to syslog available", @errs);
+	@fallbackMethods = @( () );
+        $err_sub->(join "\n\t- ", "no connection to syslog available", < @errs);
         return undef;
     }
 }
 
 sub connect_tcp {
-    my ($errs) = @_;
+    my ($errs) = < @_;
 
     my $tcp = getprotobyname('tcp');
     if (!defined $tcp) {
@@ -527,7 +527,7 @@ sub connect_tcp {
 }
 
 sub connect_udp {
-    my ($errs) = @_;
+    my ($errs) = < @_;
 
     my $udp = getprotobyname('udp');
     if (!defined $udp) {
@@ -576,7 +576,7 @@ sub connect_udp {
 }
 
 sub connect_stream {
-    my ($errs) = @_;
+    my ($errs) = < @_;
     # might want syslog_path to be variable based on syslog.h (if only
     # it were in there!)
     $syslog_path = '/dev/conslog' unless defined $syslog_path; 
@@ -593,7 +593,7 @@ sub connect_stream {
 }
 
 sub connect_pipe {
-    my ($errs) = @_;
+    my ($errs) = < @_;
 
     $syslog_path ||= &_PATH_LOG || "/dev/log";
 
@@ -613,7 +613,7 @@ sub connect_pipe {
 }
 
 sub connect_unix {
-    my ($errs) = @_;
+    my ($errs) = < @_;
 
     $syslog_path ||= _PATH_LOG() if length _PATH_LOG();
 
@@ -654,7 +654,7 @@ sub connect_unix {
 }
 
 sub connect_native {
-    my ($errs) = @_;
+    my ($errs) = < @_;
     my $logopt = 0;
 
     # reconstruct the numeric equivalent of the options
@@ -662,7 +662,7 @@ sub connect_native {
         $logopt += xlate($opt) if %options{$opt}
     }
 
-    try { openlog_xs($ident, $logopt, xlate($facility)) };
+    try { openlog_xs($ident, $logopt, < xlate($facility)) };
     if ($@) {
         push @$errs, $@;
         return 0;
@@ -674,7 +674,7 @@ sub connect_native {
 }
 
 sub connect_eventlog {
-    my ($errs) = @_;
+    my ($errs) = < @_;
 
     $syslog_xobj = Sys::Syslog::Win32::_install();
     $syslog_send = \&Sys::Syslog::Win32::_syslog_send;
@@ -683,7 +683,7 @@ sub connect_eventlog {
 }
 
 sub connect_console {
-    my ($errs) = @_;
+    my ($errs) = < @_;
     if (!-w '/dev/console') {
 	push @$errs, "console is not writable";
 	return 0;
@@ -707,7 +707,7 @@ sub connection_ok {
     my $rin = '';
     vec($rin, fileno(SYSLOG), 1) = 1;
     my $ret = select $rin, undef, $rin, 0.25;
-    return ($ret ? 0 : 1);
+    return  @($ret ? 0 : 1);
 }
 
 sub disconnect_log {

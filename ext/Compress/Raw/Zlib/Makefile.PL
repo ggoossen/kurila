@@ -58,7 +58,7 @@ EOM
 
 ParseCONFIG() ;
 
-UpDowngrade(getPerlFiles('MANIFEST')) 
+UpDowngrade( <getPerlFiles('MANIFEST')) 
     unless %ENV{PERL_CORE};
 
 WriteMakefile( 
@@ -72,7 +72,7 @@ WriteMakefile(
 
     (
       $BUILD_ZLIB
-        ? zlib_files($ZLIB_LIB)
+        ? < zlib_files($ZLIB_LIB)
         : (LIBS => \@( "-L$ZLIB_LIB -lz " ))
     ),
       
@@ -84,7 +84,7 @@ WriteMakefile(
 
 ) ;
 
-my @names = qw(
+my @names = @( qw(
 
     DEF_WBITS
     MAX_MEM_LEVEL
@@ -121,14 +121,14 @@ my @names = qw(
     Z_UNKNOWN
     Z_VERSION_ERROR
 
-);
+) );
     #ZLIB_VERNUM
 
 require ExtUtils::Constant;
 
 {
     # Check the constants above all appear in @EXPORT in Zlib.pm
-    my %names = map { $_, 1} @names, 'ZLIB_VERSION';
+    my %names = %( map { $_, 1} < @names, 'ZLIB_VERSION' );
     open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
     while (~< *F)
     {
@@ -164,11 +164,11 @@ require ExtUtils::Constant;
 sub ParseCONFIG
 {
     my ($k, $v) ;
-    my @badkey = () ;
-    my %Info = () ;
-    my @Options = qw( INCLUDE LIB BUILD_ZLIB OLD_ZLIB GZIP_OS_CODE ) ;
-    my %ValidOption = map {$_, 1} @Options ;
-    my %Parsed = %ValidOption ;
+    my @badkey = @( () ) ;
+    my %Info = %( () ) ;
+    my @Options = @( qw( INCLUDE LIB BUILD_ZLIB OLD_ZLIB GZIP_OS_CODE ) ) ;
+    my %ValidOption = %( map {$_, 1} < @Options ) ;
+    my %Parsed = %( < %ValidOption ) ;
     my $CONFIG = 'config.in' ;
 
     print "Parsing $CONFIG...\n" ;
@@ -191,13 +191,13 @@ sub ParseCONFIG
     }
     close F ;
 
-    print "Unknown keys in $CONFIG ignored [@badkey]\n"
-	if @badkey ;
+    print "Unknown keys in $CONFIG ignored [{join ' ', <@badkey}]\n"
+	if (nelems @badkey) ;
 
     # check parsed values
-    my @missing = () ;
-    die "The following keys are missing from $CONFIG  [@missing]\n" 
-        if @missing = keys %Parsed ;
+    my @missing = @( () ) ;
+    die "The following keys are missing from $CONFIG  [{join ' ', <@missing}]\n" 
+        if @missing = @( keys %Parsed ) ;
 
     $ZLIB_INCLUDE = %ENV{'ZLIB_INCLUDE'} || %Info{'INCLUDE'} ;
     $ZLIB_LIB = %ENV{'ZLIB_LIB'} || %Info{'LIB'} ;
@@ -270,43 +270,43 @@ sub zlib_files
 {
     my $dir = shift ;
 
-    my @h_files = ();
-    my @c_files = ();
+    my @h_files = @( () );
+    my @c_files = @( () );
     
     if (-f catfile($dir, "infback.c")) {
         # zlib 1.2.0 or greater
         #
-        @h_files = qw(crc32.h    inffast.h inflate.h  trees.h    zconf.in.h 
+        @h_files = @( qw(crc32.h    inffast.h inflate.h  trees.h    zconf.in.h 
     	              zutil.h    deflate.h inffixed.h inftrees.h zconf.h  
     		      zlib.h 
-    		 );
-        @c_files = qw(adler32  crc32   infback  inflate  uncompr
+    		 ) );
+        @c_files = @( qw(adler32  crc32   infback  inflate  uncompr
     		      compress deflate inffast  inftrees  
     		      trees    zutil 
-    		 );
+    		 ) );
     }
     else {
         # zlib 1.1.x
     
-        @h_files = qw(deflate.h  infcodes.h inftrees.h zconf.h zutil.h
+        @h_files = @( qw(deflate.h  infcodes.h inftrees.h zconf.h zutil.h
     		      infblock.h inffast.h  infutil.h  zlib.h
-    		 );
-        @c_files = qw(adler32  compress crc32    uncompr
+    		 ) );
+        @c_files = @( qw(adler32  compress crc32    uncompr
     		      deflate  trees    zutil    inflate infblock
     		      inftrees infcodes infutil  inffast
-    		 );
+    		 ) );
     }
     
-    @h_files = map { catfile($dir, $_)  } @h_files ;
-    my @o_files = map { "$_\$(OBJ_EXT)" } 'Zlib', @c_files;
-    @c_files = map { "$_.c" } 'Zlib', @c_files ;
+    @h_files = @( map { < catfile($dir, $_)  } < @h_files ) ;
+    my @o_files = @( map { "$_\$(OBJ_EXT)" } 'Zlib', < @c_files );
+    @c_files = @( map { "$_.c" } 'Zlib', < @c_files ) ;
 
-    foreach my $file (@c_files)
-      { copy(catfile($dir, $file), '.') }
+    foreach my $file (< @c_files)
+      { copy( <catfile($dir, $file), '.') }
     
-    return (
+    return  @(
         #'H'         =>  [ @h_files ],
-    	'C'         =>  \@( @c_files ) ,
+    	'C'         =>  \@( < @c_files ) ,
         #'OBJECT'    => qq[ @o_files ],
         'OBJECT'    => q[ $(O_FILES) ],
         
@@ -320,7 +320,7 @@ use vars qw ( @GZIP_OS_Names  %OSnames) ;
 
 BEGIN
 {
-  @GZIP_OS_Names = (
+  @GZIP_OS_Names = @(
     \@( ''        => 0,    'MS-DOS'                       ),
     \@( 'amigaos' => 1,    'Amiga'                        ),
     \@( 'VMS'     => 2,    'VMS'                          ),
@@ -343,8 +343,8 @@ BEGIN
     \@( ''        => 255,  'Unknown OS'                   ),
   );
 
-  %OSnames = map { @$_[1] => @$_[2] }  
-             @GZIP_OS_Names ;
+  %OSnames = %( map { @$_[1] => @$_[2] }  
+             < @GZIP_OS_Names ) ;
 }
 
 sub getOSCode
@@ -353,9 +353,9 @@ sub getOSCode
 
     my $uname = $^O;
 
-    for my $h (@GZIP_OS_Names)
+    for my $h (< @GZIP_OS_Names)
     {
-        my ($pattern, $code, $name) = @$h;
+        my ($pattern, $code, $name) = < @$h;
 
         return $code
             if $pattern && $uname eq $pattern ;

@@ -11,16 +11,16 @@ BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
  # define the constant 'DEBUG' at compile-time
 
 $VERSION = "1.03";
-@ISA = ();
+@ISA = @( () );
 use I18N::LangTags qw(alternate_language_tags locale2language_tag);
 
-sub _uniq { my %seen; return grep(!(%seen{$_}++), @_); }
+sub _uniq { my %seen; return grep(!(%seen{$_}++), < @_); }
 sub _normalize {
-  my(@languages) =
+  my(@languages) = @(
     map lc($_),
     grep $_,
-    map {; $_, alternate_language_tags($_) } @_;
-  return _uniq(@languages) if wantarray;
+    map {; $_, < alternate_language_tags($_) } < @_ );
+  return _uniq(< @languages) if wantarray;
   return @languages[0];
 }
 
@@ -45,7 +45,7 @@ sub ambient_langprefs { # always returns things untainted
     next unless %ENV{$envname};
     DEBUG and print "Noting \$$envname: %ENV{$envname}\n";
     push @languages,
-      map locale2language_tag($_),
+      map < locale2language_tag($_),
         # if it's a lg tag, fine, pass thru (untainted)
         # if it's a locale ID, try converting to a lg tag (untainted),
         # otherwise nix it.
@@ -63,7 +63,7 @@ sub ambient_langprefs { # always returns things untainted
     push @languages, Win32::Locale::get_language() || ''
      if defined &Win32::Locale::get_language;
   }
-  return _normalize @languages;
+  return _normalize < @languages;
 }
 
 #---------------------------------------------------------------------------
@@ -74,7 +74,7 @@ sub http_accept_langs {
   # Hm.  Should I just move this into I18N::LangTags at some point?
   no integer;
 
-  my $in = (@_ +> 1) ? @_[1] : %ENV{'HTTP_ACCEPT_LANGUAGE'};
+  my $in = ((nelems @_) +> 1) ? @_[1] : %ENV{'HTTP_ACCEPT_LANGUAGE'};
   # (always ends up untainting)
 
   return() unless defined $in and length $in;
@@ -92,11 +92,11 @@ sub http_accept_langs {
   # Else it's complicated...
 
   $in =~ s/\s+//g;  # Yes, we can just do without the WS!
-  my @in = $in =~ m/([^,]+)/g;
+  my @in = @( $in =~ m/([^,]+)/g );
   my %pref;
   
   my $q;
-  foreach my $tag (@in) {
+  foreach my $tag (< @in) {
     next unless $tag =~
      m/^([a-zA-Z][-a-zA-Z]+)
         (?:
@@ -118,7 +118,7 @@ sub http_accept_langs {
 
   return _normalize(
     # Read off %pref, in descending key order...
-    map @{%pref{$_}},
+    map < @{%pref{$_}},
     sort {$b <+> $a}
     keys %pref
   );
@@ -126,7 +126,7 @@ sub http_accept_langs {
 
 #===========================================================================
 
-my %tried = ();
+my %tried = %( () );
   # memoization of whether we've used this module, or found it unusable.
 
 sub _try_use {   # Basically a wrapper around "require Modulename"
@@ -135,7 +135,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
 
   my $module = @_[0];   # ASSUME sane module name!
   { no strict 'refs';
-    return(%tried{$module} = 1)
+    return @(%tried{$module} = 1)
      if defined(%{*{Symbol::fetch_glob($module . "::Lexicon")}}) or defined(@{*{Symbol::fetch_glob($module . "::ISA")}});
     # weird case: we never use'd it, but there it is!
   }

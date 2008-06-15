@@ -5,7 +5,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -35,15 +35,15 @@ END {
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $!");
 
-my @mpl_out = run(qq{$perl Makefile.PL "INSTALL_BASE=../dummy-install"});
+my @mpl_out = @( < run(qq{$perl Makefile.PL "INSTALL_BASE=../dummy-install"}) );
 END { rmtree '../dummy-install'; }
 
 cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag(@mpl_out);
+  diag(< @mpl_out);
 
 my $makefile = makefile_name();
 ok( grep(m/^Writing $makefile for Big::Dummy/, 
-         @mpl_out) == 1,
+         < @mpl_out) == 1,
                                            'Makefile.PL output looks right');
 
 my $make = make_run();
@@ -56,14 +56,14 @@ like( $install_out, qr/^Writing /m );
 ok( -r '../dummy-install',      '  install dir created' );
 
 my @installed_files = 
-  ('../dummy-install/lib/perl5/Big/Dummy.pm',
+  @('../dummy-install/lib/perl5/Big/Dummy.pm',
    '../dummy-install/lib/perl5/Big/Liar.pm',
    '../dummy-install/bin/program',
    "../dummy-install/lib/perl5/%Config{archname}/perllocal.pod",
    "../dummy-install/lib/perl5/%Config{archname}/auto/Big/Dummy/.packlist"
   );
 
-foreach my $file (@installed_files) {
+foreach my $file (< @installed_files) {
     ok( -e $file, "  $file installed" );
     ok( -r $file, "  $file readable" );
 }

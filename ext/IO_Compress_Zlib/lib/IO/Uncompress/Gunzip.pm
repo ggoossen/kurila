@@ -19,10 +19,10 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GunzipError);
 
-@ISA = qw( IO::Uncompress::RawInflate Exporter );
-@EXPORT_OK = qw( $GunzipError gunzip );
-%EXPORT_TAGS = %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ;
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+@ISA = @( qw( IO::Uncompress::RawInflate Exporter ) );
+@EXPORT_OK = @( qw( $GunzipError gunzip ) );
+%EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ) ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 $GunzipError = '';
@@ -35,19 +35,19 @@ sub new
     $GunzipError = '';
     my $obj = createSelfTiedObject($class, \$GunzipError);
 
-    $obj->_create(undef, 0, @_);
+    $obj->_create(undef, 0, < @_);
 }
 
 sub gunzip
 {
     my $obj = createSelfTiedObject(undef, \$GunzipError);
-    return $obj->_inf(@_) ;
+    return $obj->_inf(< @_) ;
 }
 
 sub getExtraParams
 {
     use IO::Compress::Base::Common  v2.006 qw(:Parse);
-    return ( 'ParseExtra' => \@(1, 1, Parse_boolean,  0) ) ;
+    return  @( 'ParseExtra' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
 sub ckParams
@@ -123,7 +123,7 @@ sub isGzipMagic
 
 sub _readFullGzipHeader($)
 {
-    my ($self) = @_ ;
+    my ($self) = < @_ ;
     my $magic = '' ;
 
     $self->smartReadExact(\$magic, GZIP_ID_SIZE);
@@ -145,7 +145,7 @@ sub _readFullGzipHeader($)
 
 sub _readGzipHeader($)
 {
-    my ($self, $magic) = @_ ;
+    my ($self, $magic) = < @_ ;
     my ($HeaderCRC) ;
     my ($buffer) = '' ;
 
@@ -167,7 +167,7 @@ sub _readGzipHeader($)
         if $flag ^&^ GZIP_FLG_RESERVED ; 
 
     my $EXTRA ;
-    my @EXTRA = () ;
+    my @EXTRA = @( () ) ;
     if ($flag ^&^ GZIP_FLG_FEXTRA) {
         $EXTRA = "" ;
         $self->smartReadExact(\$buffer, GZIP_FEXTRA_HEADER_SIZE) 
@@ -260,7 +260,7 @@ sub _readGzipHeader($)
         'Flags'         => $flag,
         'ExtraFlags'    => $xfl,
         'ExtraFieldRaw' => $EXTRA,
-        'ExtraField'    => \@( @EXTRA ),
+        'ExtraField'    => \@( < @EXTRA ),
 
 
         #'CompSize'=> $compsize,

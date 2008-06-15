@@ -58,8 +58,8 @@ To recreate it use the following command:
 
      $me -p $file $outfile
 
-Created at @{\@(scalar localtime)}
-#########################################################################
+Created at {join ' ', <@{\@(scalar localtime)}
+}#########################################################################
 __UU__
 EOFBLURB
     }
@@ -181,7 +181,7 @@ sub vms_check_name {
     $file = VMS::Filespec::vmsify($file);
     return $file if -e $file;
 
-    my ($vol,$dirs,$base) = File::Spec->splitpath($file);
+    my ($vol,$dirs,$base) = < File::Spec->splitpath($file);
     my $tmp = $base;
     1 while $tmp =~ s/([^\.]+)\.(.+\..+)/$1_$2/;
     my $try = File::Spec->catpath($vol, $dirs, $tmp);
@@ -198,9 +198,9 @@ sub vms_check_name {
 my $opts = \%();
 GetOptions($opts,'u','p','c', 'D', 'm:s','s','d=s','v','h');
 
-die "Can't pack and unpack at the same time!\n", usage()
+die "Can't pack and unpack at the same time!\n", < usage()
     if $opts->{'u'} && $opts->{'p'};
-die usage() if $opts->{'h'};
+die < usage() if $opts->{'h'};
 
 if ( $opts->{'d'} ) {
     chdir $opts->{'d'}
@@ -213,13 +213,13 @@ if ( exists $opts->{'m'} or exists $opts->{'c'} ) {
     bulk_process($opts);
     exit(0);
 } else {
-    if (@ARGV) {
-        handle_file($opts, @ARGV);
+    if ((nelems @ARGV)) {
+        handle_file($opts, < @ARGV);
     } else {
-        die "No file to process specified!\n", usage();
+        die "No file to process specified!\n", < usage();
     }
     exit(0);
 }
 
 
-die usage();
+die < usage();

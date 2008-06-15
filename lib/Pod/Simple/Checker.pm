@@ -10,7 +10,7 @@ use Pod::Simple::Methody ();
 use Pod::Simple ();
 use vars qw( @ISA $VERSION );
 $VERSION = '2.02';
-@ISA = ('Pod::Simple::Methody');
+@ISA = @('Pod::Simple::Methody');
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
           ? \&Pod::Simple::DEBUG
           : sub() {0}
@@ -26,7 +26,7 @@ sub any_errata_seen {  # read-only accessor
 
 sub new {
   my $self = shift;
-  my $new = $self->SUPER::new(@_);
+  my $new = $self->SUPER::new(< @_);
   $new->{'output_fh'} ||= *STDOUT{IO};
   $new->nix_X_codes(1);
   $new->nbsp_for_S(1);

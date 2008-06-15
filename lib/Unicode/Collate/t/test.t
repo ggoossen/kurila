@@ -7,7 +7,7 @@ BEGIN {
     }
     if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
-	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+	@INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -20,8 +20,8 @@ use Unicode::Collate;
 
 ok(1);
 
-sub _pack_U   { Unicode::Collate::pack_U(@_) }
-sub _unpack_U { Unicode::Collate::unpack_U(@_) }
+sub _pack_U   { Unicode::Collate::pack_U(< @_) }
+sub _unpack_U { Unicode::Collate::unpack_U(< @_) }
 
 my $A_acute = _pack_U(0xC1);
 my $a_acute = _pack_U(0xE1);
@@ -44,12 +44,12 @@ ok($Collator->eq("", ""));
 is($Collator->cmp("", "perl"), -1);
 
 is(
-  join(':', $Collator->sort( qw/ acha aca ada acia acka / ) ),
+  join(':', < $Collator->sort( qw/ acha aca ada acia acka / ) ),
   join(':',                  qw/ aca acha acia acka ada / ),
 );
 
 is(
-  join(':', $Collator->sort( qw/ ACHA ACA ADA ACIA ACKA / ) ),
+  join(':', < $Collator->sort( qw/ ACHA ACA ADA ACIA ACKA / ) ),
   join(':',                  qw/ ACA ACHA ACIA ACKA ADA / ),
 );
 
@@ -59,14 +59,14 @@ is($Collator->cmp("A$acute", $A_acute), 0); # @version 3.1.1 (prev: -1)
 is($Collator->cmp($a_acute, $A_acute), -1);
 ok($Collator->eq("A\cA$acute", $A_acute)); # UCA v9. \cA is invariant.
 
-my %old_level = $Collator->change(level => 1);
+my %old_level = %( < $Collator->change(level => 1) );
 ok($Collator->eq("A$acute", $A_acute));
 ok($Collator->eq("A", $A_acute));
 
 ok($Collator->change(level => 2)->eq($a_acute, $A_acute));
 is($Collator->cmp("A", $A_acute), -1);
 
-is($Collator->change(%old_level)->cmp("A", $A_acute), -1);
+is($Collator->change(< %old_level)->cmp("A", $A_acute), -1);
 is($Collator->cmp("A", $A_acute), -1);
 is($Collator->cmp("A", $a_acute), -1);
 is($Collator->cmp($a_acute, $A_acute), -1);
@@ -94,7 +94,7 @@ is( $Collator->cmp("a\x{C544}b", "a\x{30A2}b"), -1 ); # hangul < hiragana
 
 ##### 32..40
 
-$Collator->change(%old_level, katakana_before_hiragana => 1);
+$Collator->change(< %old_level, katakana_before_hiragana => 1);
 
 is($Collator->{level}, 4);
 
@@ -151,7 +151,7 @@ ENTRIES
 );
 
 ok(
-  join(':', $onlyABC->sort( qw/ ABA BAC cc A Ab cAc aB / ) ),
+  join(':', < $onlyABC->sort( qw/ ABA BAC cc A Ab cAc aB / ) ),
   join(':',                 qw/ A aB Ab ABA BAC cAc cc / ),
 );
 
@@ -218,7 +218,7 @@ ENTRIES
 
 # defined before undefined
 
-my $sortABC = join '',
+my $sortABC = join '', <
     $few_entries->sort(split m//, "ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
 
 ok($sortABC eq "PERL ABCDFGHIJKMNOQSTUVWXYZ");
@@ -321,7 +321,7 @@ is($O_str   ->cmp("\x{200B}", "A"), 1);
 
 ##### 97..107
 
-my %origVer = $Collator->change(UCA_Version => 8);
+my %origVer = %( < $Collator->change(UCA_Version => 8) );
 
 $Collator->change(level => 3);
 
@@ -338,7 +338,7 @@ $Collator->change(level => 4);
 is($Collator->cmp("!\x{300}", "!"), 1);
 is($Collator->cmp("!\x{300}", "\x{300}"), -1);
 
-$Collator->change(%origVer, level => 3);
+$Collator->change(< %origVer, level => 3);
 
 ok($Collator->eq("!\x{300}", ""));
 ok($Collator->eq("!\x{300}", "!"));
@@ -372,15 +372,15 @@ $temp = $c->viewSortKey("abc");
 ok($_, 'Foo');
 
 $_ = 'Foo';
-@temp = $c->sort("abc", "xyz", "def");
+@temp = @( < $c->sort("abc", "xyz", "def") );
 ok($_, 'Foo');
 
 $_ = 'Foo';
-@temp = $c->index("perl5", "RL");
+@temp = @( < $c->index("perl5", "RL") );
 ok($_, 'Foo');
 
 $_ = 'Foo';
-@temp = $c->index("perl5", "LR");
+@temp = @( < $c->index("perl5", "LR") );
 ok($_, 'Foo');
 
 #####

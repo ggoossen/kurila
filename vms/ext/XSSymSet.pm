@@ -6,7 +6,7 @@ $VERSION = '1.1';
 
 
 sub new { 
-  my($pkg,$maxlen,$silent) = @_;
+  my($pkg,$maxlen,$silent) = < @_;
   $maxlen ||= 31;
   $silent ||= 0;
   my($obj) = \%( '__M@xLen' => $maxlen, '__S!lent' => $silent );
@@ -15,7 +15,7 @@ sub new {
 
 
 sub trimsym {
-  my($self,$name,$maxlen,$silent) = @_;
+  my($self,$name,$maxlen,$silent) = < @_;
 
   unless (defined $maxlen) {
     if (ref $self) { $maxlen ||= $self->{'__M@xLen'}; }
@@ -73,7 +73,7 @@ sub trimsym {
 
 
 sub addsym {
-  my($self,$sym,$maxlen,$silent) = @_;
+  my($self,$sym,$maxlen,$silent) = < @_;
   my $trimmed = $self->get_trimmed($sym);
 
   return $trimmed if defined $trimmed;
@@ -99,7 +99,7 @@ sub addsym {
 
 
 sub delsym {
-  my($self,$sym) = @_;
+  my($self,$sym) = < @_;
   my $trimmed = $self->{'__N+Map'}->{$sym};
   if (defined $trimmed) {
     delete $self->{'__N+Map'}->{$sym};
@@ -110,13 +110,13 @@ sub delsym {
 
 
 sub get_trimmed {
-  my($self,$sym) = @_;
+  my($self,$sym) = < @_;
   $self->{'__N+Map'}->{$sym};
 }
 
 
 sub get_orig {
-  my($self,$trimmed) = @_;
+  my($self,$trimmed) = < @_;
   $self->{$trimmed};
 }
 

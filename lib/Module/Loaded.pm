@@ -7,7 +7,7 @@ BEGIN { use base 'Exporter';
         use vars qw[@EXPORT $VERSION];
         
         $VERSION = '0.01';
-        @EXPORT  = qw[mark_as_loaded mark_as_unloaded is_loaded];
+        @EXPORT  = @( qw[mark_as_loaded mark_as_unloaded is_loaded] );
 }
 
 =head1 NAME 

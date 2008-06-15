@@ -31,8 +31,8 @@ SKIP: {
 ok( File::Temp->can('print'), 'tmp can print' );
 
 # let's see what we're exporting...
-my $c = scalar @File::Temp::EXPORT;
-my $l = join ' ', @File::Temp::EXPORT;
+my $c = scalar nelems @File::Temp::EXPORT;
+my $l = join ' ', < @File::Temp::EXPORT;
 ok( $c == 9, "really exporting $c: $l" );
 
 ok(defined try { SEEK_SET() }, 'SEEK_SET defined by File::Temp') or diag $@;

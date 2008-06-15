@@ -11,7 +11,7 @@ use File::Spec;
 mkdir "lib", 0755;
 
 # virtual paths given to EU::MM
-my %virtual_path = ( 'Syslog.pm' => '$(INST_LIBDIR)/Syslog.pm' );
+my %virtual_path = %( 'Syslog.pm' => '$(INST_LIBDIR)/Syslog.pm' );
 
 # detect when to use Win32::EvenLog
 my (@extra_params, @extra_prereqs);
@@ -53,7 +53,7 @@ NOTICE
 }
 
 # detect when being built in Perl core
-if (not grep { $_ eq 'PERL_CORE=1' } @ARGV) {
+if (not grep { $_ eq 'PERL_CORE=1' } < @ARGV) {
     push @extra_params, 
         DEFINE      => '-DUSE_PPPORT_H';
 }
@@ -69,12 +69,12 @@ WriteMakefile(
     PREREQ_PM       => \%(
         'Test::More' => 0,
         'XSLoader'   => 0,
-        @extra_prereqs,
+        < @extra_prereqs,
     ),
     dist            => \%( COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
     clean           => \%( FILES => 'Sys-Syslog-*' ), 
     realclean       => \%( FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
-    @extra_params
+    < @extra_params
 );
 
 
@@ -108,12 +108,12 @@ else {
 # if possible, generate the code that handles the constants with 
 # ExtUtils::Constant, otherwise use cached copy in fallback/
 if(try {require ExtUtils::Constant; 1}) {
-    my @levels = qw(
+    my @levels = @( qw(
         LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
         LOG_INFO LOG_NOTICE LOG_WARNING
-    );
+    ) );
 
-    my @facilities = (
+    my @facilities = @(
         # standard facilities
         qw(
             LOG_AUTH LOG_AUTHPRIV LOG_CRON LOG_DAEMON LOG_FTP LOG_KERN
@@ -136,26 +136,26 @@ if(try {require ExtUtils::Constant; 1}) {
         \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
     );
 
-    my @options = qw(
+    my @options = @( qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
-    );
+    ) );
 
-    my @others_macros = (
+    my @others_macros = @(
         qw(LOG_FACMASK),
         \%( name => "_PATH_LOG", type => "PV", default => \@( "PV", qq("$_PATH_LOG") ) ),
         \%( name => "LOG_PRIMASK",     type => "IV", default => \@( "IV", 7) ),
-        \%( name => "LOG_NFACILITIES", type => "IV", default => \@( "IV", scalar @facilities) ),
+        \%( name => "LOG_NFACILITIES", type => "IV", default => \@( "IV", scalar nelems @facilities) ),
     );
 
     ExtUtils::Constant::WriteConstants(
         PROXYSUBS => 1,
         NAME => 'Sys::Syslog',
-        NAMES => \@( @levels, @facilities, @options, @others_macros ),
+        NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
     );
 
-    my @names = map { ref $_ ? $_->{name} : $_ } @levels, @facilities, @options;
+    my @names = @( map { ref $_ ? $_->{name} : $_ } < @levels, < @facilities, < @options );
     open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $!\n";
-    print MACROS join $/, @names;
+    print MACROS join $/, < @names;
     close(MACROS);
 }
 else {

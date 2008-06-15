@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -24,7 +24,7 @@ require Test::Simple;
 chdir 't';
 push @INC, '../t/lib/';
 require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my($out, $err) = < Test::Simple::Catch::caught();
 local %ENV{HARNESS_ACTIVE} = 0;
 
 Test::Simple->import(tests => 3);

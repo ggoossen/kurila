@@ -9,16 +9,16 @@ our $VERSION = '1.00';
 
 BEGIN { 
     use Exporter   ();
-    @EXPORT      = qw(stat lstat);
-    @EXPORT_OK   = qw( $st_dev	   $st_ino    $st_mode 
+    @EXPORT      = @( qw(stat lstat) );
+    @EXPORT_OK   = @( qw( $st_dev	   $st_ino    $st_mode 
 		       $st_nlink   $st_uid    $st_gid 
 		       $st_rdev    $st_size 
 		       $st_atime   $st_mtime  $st_ctime 
 		       $st_blksize $st_blocks
-		    );
-    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
+		    ) );
+    %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
-use vars @EXPORT_OK;
+use vars < @EXPORT_OK;
 
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }
@@ -32,12 +32,12 @@ struct 'File::stat' => \@(
 );
 
 sub populate (@) {
-    return unless @_;
+    return unless (nelems @_);
     my $stob = new();
-    @$stob = (
+    @$stob = @( (
 	$st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid, $st_rdev,
         $st_size, $st_atime, $st_mtime, $st_ctime, $st_blksize, $st_blocks ) 
-	    = @_;
+	    = < @_ );
     return $stob;
 } 
 

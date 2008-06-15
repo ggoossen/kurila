@@ -49,11 +49,11 @@ sub  longmess_real {
     # behaviour, so the replacement has to emulate that behaviour.
     my $call_pack = caller();
     if (%Internal{$call_pack} or %CarpInternal{$call_pack}) {
-      return longmess_heavy(@_);
+      return longmess_heavy(< @_);
     }
     else {
       local $CarpLevel = $CarpLevel + 1;
-      return longmess_heavy(@_);
+      return longmess_heavy(< @_);
     }
 };
 
@@ -61,8 +61,8 @@ our @CARP_NOT;
 
 sub shortmess_real {
     # Icky backwards compatibility wrapper. :-(
-    local @CARP_NOT = caller();
-    shortmess_heavy(@_);
+    local @CARP_NOT = @( caller() );
+    shortmess_heavy(< @_);
 };
 
 # replace the two hooks added by Carp
@@ -93,13 +93,13 @@ sub caller_info {
 
   my $sub_name = Carp::get_subname(\%call_info);
   if (%call_info{has_args}) {
-    my @args = map {Carp::format_arg($_)} @DB::args;
-    if ($MaxArgNums and @args +> $MaxArgNums) { # More than we want to show?
+    my @args = @( map { <Carp::format_arg($_)} < @DB::args );
+    if ($MaxArgNums and (nelems @args) +> $MaxArgNums) { # More than we want to show?
       splice @args, $MaxArgNums;
       push @args, '...';
     }
     # Push the args onto the subroutine
-    $sub_name .= '(' . join (', ', @args) . ')';
+    $sub_name .= '(' . join (', ', < @args) . ')';
   }
   %call_info{sub_name} = $sub_name;
   return wantarray() ? %call_info : \%call_info;
@@ -122,7 +122,7 @@ sub format_arg {
 sub get_status {
     my $cache = shift;
     my $pkg = shift;
-    $cache->{$pkg} ||= \@(\%($pkg => $pkg), \@(trusts_directly($pkg)));
+    $cache->{$pkg} ||= \@(\%($pkg => $pkg), \@( <trusts_directly($pkg)));
     return @{$cache->{$pkg}};
 }
 
@@ -174,15 +174,15 @@ sub long_error_loc {
 sub longmess_heavy {
   return @_ if ref(@_[0]); # don't break references as exceptions
   my $i = long_error_loc();
-  return ret_backtrace($i, @_);
+  return ret_backtrace($i, < @_);
 }
 
 # Returns a full stack backtrace starting from where it is
 # told.
 sub ret_backtrace {
-  my ($i, @error) = @_;
+  my ($i, < @error) = < @_;
   my $mess;
-  my $err = join '', @error;
+  my $err = join '', < @error;
   $i++;
 
   my $tid_msg = '';
@@ -191,10 +191,10 @@ sub ret_backtrace {
     $tid_msg = " thread $tid" if $tid;
   }
 
-  my %i = caller_info($i);
+  my %i = %( < caller_info($i) );
   $mess = "$err at %i{file} line %i{line}$tid_msg\n";
 
-  while (my %i = caller_info(++$i)) {
+  while (my %i = %( < caller_info(++$i) )) {
       $mess .= "\t%i{sub_name} called at %i{file} line %i{line}$tid_msg\n";
   }
   
@@ -202,8 +202,8 @@ sub ret_backtrace {
 }
 
 sub ret_summary {
-  my ($i, @error) = @_;
-  my $err = join '', @error;
+  my ($i, < @error) = < @_;
+  my $err = join '', < @error;
   $i++;
 
   my $tid_msg = '';
@@ -212,7 +212,7 @@ sub ret_summary {
     $tid_msg = " thread $tid" if $tid;
   }
 
-  my %i = caller_info($i);
+  my %i = %( < caller_info($i) );
   return "$err at %i{file} line %i{line}$tid_msg\n";
 }
 
@@ -241,14 +241,14 @@ sub short_error_loc {
 
 
 sub shortmess_heavy {
-  return longmess_heavy(@_) if $Verbose;
+  return longmess_heavy(< @_) if $Verbose;
   return @_ if ref(@_[0]); # don't break references as exceptions
   my $i = short_error_loc();
   if ($i) {
-    ret_summary($i, @_);
+    ret_summary($i, < @_);
   }
   else {
-    longmess_heavy(@_);
+    longmess_heavy(< @_);
   }
 }
 
@@ -272,16 +272,16 @@ sub trusts {
     my $child = shift;
     my $parent = shift;
     my $cache = shift;
-    my ($known, $partial) = get_status($cache, $child);
+    my ($known, $partial) = < get_status($cache, $child);
     # Figure out consequences until we have an answer
-    while (@$partial and not exists $known->{$parent}) {
+    while ((nelems @$partial) and not exists $known->{$parent}) {
         my $anc = shift @$partial;
         next if exists $known->{$anc};
         $known->{$anc}++;
-        my ($anc_knows, $anc_partial) = get_status($cache, $anc);
-        my @found = keys %$anc_knows;
-        %$known{[@found]} = ();
-        push @$partial, @$anc_partial;
+        my ($anc_knows, $anc_partial) = < get_status($cache, $anc);
+        my @found = @( keys %$anc_knows );
+        %$known{[< @found]} = ();
+        push @$partial, < @$anc_partial;
     }
     return exists $known->{$parent};
 }
@@ -291,9 +291,9 @@ sub trusts_directly {
     my $class = shift;
     no strict 'refs';
     no warnings 'once'; 
-    return @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-      ? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-      : @{*{Symbol::fetch_glob("$class\::ISA")}};
+    return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
+)      ? < @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
+      : < @{*{Symbol::fetch_glob("$class\::ISA")}};
 }
 
 1;

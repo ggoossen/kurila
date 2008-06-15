@@ -9,11 +9,11 @@ use Carp ();
 use Pod::Simple ();
 use vars qw( @ISA $VERSION );
 $VERSION = '2.02';
-@ISA = ('Pod::Simple');
+@ISA = @('Pod::Simple');
 
 sub new {
   my $self = shift;
-  my $new = $self->SUPER::new(@_);
+  my $new = $self->SUPER::new(< @_);
   $new->{'output_fh'} ||= *STDOUT{IO};
   $new->nix_X_codes(1);
   return $new;

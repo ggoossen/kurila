@@ -6,7 +6,7 @@ use Storable qw(nfreeze);
 
 # If this looks like a hack, it's probably because it is :-)
 sub uuencode_it {
-  my ($data, $name) = @_;
+  my ($data, $name) = < @_;
   my $frozen = nfreeze $data;
 
   my $uu = pack 'u', $frozen;
@@ -17,7 +17,7 @@ sub uuencode_it {
 }
 
 
-my %hash = (perl=>"rules");
+my %hash = %(perl=>"rules");
 
 lock_hash %hash;
 
@@ -72,7 +72,7 @@ $utf8 x= 256;
 uuencode_it (\$utf8, "Long 24 bit utf8 data");
 
 # Hash which has the utf8 bit set, but no longer has any utf8 keys
-my %uhash = ("\x{100}", "gone", "perl", "rules");
+my %uhash = %("\x{100}", "gone", "perl", "rules");
 delete %uhash{"\x{100}"};
 
 # use Devel::Peek; Dump \%uhash;
@@ -81,7 +81,7 @@ uuencode_it (\%uhash, "Hash with utf8 flag but no utf8 keys");
 $utf8 = "Schlo\xdf" . chr 256;
 chop $utf8;
 my $a_circumflex = (ord ('A') == 193 ? "\x47" : "\xe5");
-%uhash = (map {$_, $_} 'castle', "ch{$a_circumflex}teau", $utf8, "\x{57CE}");
+%uhash = %(map {$_, $_} 'castle', "ch{$a_circumflex}teau", $utf8, "\x{57CE}");
 
 uuencode_it (\%uhash, "Hash with utf8 keys");
 

@@ -14,7 +14,7 @@ if (defined umask && (umask() ^&^ 0444)) {
 getopts('Dd:rlhaQe');
 use vars qw($opt_D $opt_d $opt_r $opt_l $opt_h $opt_a $opt_Q $opt_e);
 die "-r and -a options are mutually exclusive\n" if ($opt_r and $opt_a);
-my @inc_dirs = inc_dirs() if $opt_a;
+my @inc_dirs = @( < inc_dirs() ) if $opt_a;
 
 my $Exit = 0;
 
@@ -22,22 +22,22 @@ my $Dest_dir = $opt_d || %Config{installsitearch};
 die "Destination directory $Dest_dir doesn't exist or isn't a directory\n"
     unless -d $Dest_dir;
 
-my @isatype = qw(
+my @isatype = @( qw(
 	char	uchar	u_char
 	short	ushort	u_short
 	int	uint	u_int
 	long	ulong	u_long
 	FILE	key_t	caddr_t
 	float	double	size_t
-);
+) );
 
 my %isatype;
-%isatype{[@isatype]} = (1) x @isatype;
+%isatype{[< @isatype]} = (1) x nelems @isatype;
 my $inif = 0;
 my %Is_converted;
-my %bad_file = ();
+my %bad_file = %( () );
 
-@ARGV = ('-') unless @ARGV;
+@ARGV = @('-') unless (nelems @ARGV);
 
 build_preamble_if_necessary();
 
@@ -75,7 +75,7 @@ while (defined (my $file = next_file())) {
 	}
 
 	if ($opt_a) { # automagic mode:  locate header file in @inc_dirs
-	    foreach (@inc_dirs) {
+	    foreach (< @inc_dirs) {
 		chdir $_;
 		last if -f $file;
 	    }
@@ -127,7 +127,7 @@ while (defined (my $file = next_file())) {
 		    } else {
                       print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t{$args}eval q($new);\n    \}\n\}\n";
 		    }
-		    %curargs = ();
+		    %curargs = %( () );
 		} else {
 		    s/^\s+//;
 		    expr();
@@ -250,9 +250,9 @@ while (defined (my $file = next_file())) {
 	    s/\s+/ /g;
 	    next unless m/^\s?(typedef\s?)?enum\s?([a-zA-Z_]\w*)?\s?\{(.*)\}\s?([a-zA-Z_]\w*)?\s?;/;
 	    (my $enum_subs = $3) =~ s/\s//g;
-	    my @enum_subs = split(m/,/, $enum_subs);
+	    my @enum_subs = @( split(m/,/, $enum_subs) );
 	    my $enum_val = -1;
-	    foreach my $enum (@enum_subs) {
+	    foreach my $enum (< @enum_subs) {
 		my ($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
 		$enum_name or next;
 		$enum_value =~ s/^=//;
@@ -304,16 +304,16 @@ while (defined (my $file = next_file())) {
 		}
 	    }
 	    $args = (
-		@args
-		? "my(" . (join ',', map "\$$_", @args) . ") = \@_;\n$t    "
+		(nelems @args)
+		? "my(" . (join ',', map "\$$_", < @args) . ") = \@_;\n$t    "
 		: ""
 	    );
-	    my $proto = @args ? '' : '() ';
+	    my $proto = (nelems @args) ? '' : '() ';
 	    $new = '';
 	    s/\breturn\b//g; # "return" doesn't occur in macros usually...
 	    expr();
 	    # try to find and perlify local C variables
-	    our @local_variables = (); # needs to be a our(): (?{...}) bug workaround
+	    our @local_variables = @( () ); # needs to be a our(): (?{...}) bug workaround
 	    {
 		use re "eval";
 		my $typelist = join '|', keys %isatype;
@@ -323,7 +323,7 @@ while (defined (my $file = next_file())) {
 		  (?:long\s+)?
 		  (?:$typelist)\s+
 		  (\w+)
-		  (?\{ push @local_variables, $1 \})
+		  (?\{ push {join ' ', <@local_variables}, $1 \})
 		  ']
 		 [my \$$1]gx;
 		$new =~ s['
@@ -332,11 +332,11 @@ while (defined (my $file = next_file())) {
 		  (?:long\s+)?
 		  (?:$typelist)\s+
 		  ' \s+ &(\w+) \s* ;
-		  (?\{ push @local_variables, $1 \})
+		  (?\{ push {join ' ', <@local_variables}, $1 \})
 		  ]
 		 [my \$$1;]gx;
 	     }
-	    $new =~ s/&$_\b/\$$_/g for @local_variables;
+	    $new =~ s/&$_\b/\$$_/g for < @local_variables;
 	    $new =~ s/(["\\])/\\$1/g;       #"]);
 	    # now that's almost like a macro (we hope)
 	    goto EMIT;
@@ -595,7 +595,7 @@ sub next_file
 {
     my $file;
 
-    while (@ARGV) {
+    while ((nelems @ARGV)) {
         $file = shift @ARGV;
 
         if ($file eq '-' or -f $file or -l $file) {
@@ -620,7 +620,7 @@ sub next_file
 # Put all the files in $directory into @ARGV for processing.
 sub expand_glob
 {
-    my ($directory)  = @_;
+    my ($directory)  = < @_;
 
     $directory =~ s:/$::;
 
@@ -642,7 +642,7 @@ sub expand_glob
 # Otherwise, just duplicate the file or directory.
 sub link_if_possible
 {
-    my ($dirlink)  = @_;
+    my ($dirlink)  = < @_;
     my $target  = eval 'readlink($dirlink)';
 
     if ($target =~ m:^\.\./: or $target =~ m:^/:) {
@@ -676,7 +676,7 @@ sub link_if_possible
 # and files we've already processed.
 sub queue_includes_from
 {
-    my ($file)    = @_;
+    my ($file)    = < @_;
     my $line;
 
     return if ($file eq "-");
@@ -733,7 +733,7 @@ sub build_preamble_if_necessary
         return if $1 == $VERSION;
     }
 
-    my (%define) = _extract_cc_defines();
+    my (%define) = %( < _extract_cc_defines() );
 
     open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $!";
 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";

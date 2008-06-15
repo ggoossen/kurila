@@ -7,7 +7,7 @@ use Pod::Simple ();
 use vars qw( $ATTR_PAD @ISA $VERSION $SORT_ATTRS);
 $VERSION = '2.02';
 BEGIN {
-  @ISA = ('Pod::Simple');
+  @ISA = @('Pod::Simple');
   *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG;
 }
 
@@ -18,7 +18,7 @@ $SORT_ATTRS = 0 unless defined $SORT_ATTRS;
 
 sub new {
   my $self = shift;
-  my $new = $self->SUPER::new(@_);
+  my $new = $self->SUPER::new(< @_);
   $new->{'output_fh'} ||= *STDOUT{IO};
   #$new->accept_codes('VerbatimFormatted');
   return $new;
@@ -73,7 +73,7 @@ sub _handle_element_end {
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 sub _xml_escape {
-  foreach my $x (@_) {
+  foreach my $x (< @_) {
     # Escape things very cautiously:
     $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/{'&#'.(ord($1)).';'
 }/g;

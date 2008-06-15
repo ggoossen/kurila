@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -16,7 +16,7 @@ use ExtUtils::MakeMaker;
 
 my $Has_Version = eval 'require version; "version"->import; 1';
 
-my %versions = (q[$VERSION = '1.00']        => '1.00',
+my %versions = %(q[$VERSION = '1.00']        => '1.00',
                 q[*VERSION = \'1.01']       => '1.01',
                 q[($VERSION) = q$Revision: 32208 $ =~ m/(\d+)/g;] => 32208,
                 q[$FOO::VERSION = '1.10';]  => '1.10',

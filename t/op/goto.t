@@ -254,7 +254,7 @@ is(curr_test(), 5, 'eval "goto $x"');
 
 sub two {
     my ($pack, $file, $line) = caller;	# Should indicate original call stats.
-    is("@_ $pack $file $line", "1 2 3 main $::FILE $::LINE",
+    is("{join ' ', <@_} $pack $file $line", "1 2 3 main $::FILE $::LINE",
 	'autoloading mechanism.');
 }
 
@@ -281,7 +281,7 @@ $::LINE = __LINE__ + 1;
   my $i;
   package Foo;
   sub DESTROY	{ my $s = shift; ::is($s->[0], $i, "destroy $i"); }
-  sub show	{ ::is(+@_, 5, "show $i",); }
+  sub show	{ ::is(+nelems @_, 5, "show $i",); }
   sub start	{ push @_, 1, "foo", \%(); goto &show; }
   for (1..3)	{ $i = $_; start(bless(\@($_)), 'bar'); }
 }
@@ -393,7 +393,7 @@ is(recurse1(500), 500, 'recursive goto &foo');
 
 # [perl #32039] Chained goto &sub drops data too early. 
 
-sub a32039 { @_=("foo"); goto &b32039; }
+sub a32039 { @_=@("foo"); goto &b32039; }
 sub b32039 { goto &c32039; }
 sub c32039 { is(@_[0], 'foo', 'chained &goto') }
 a32039();

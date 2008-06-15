@@ -47,9 +47,9 @@ my $v = v1.2_3;
 is( ref($v), 'version', 'v-string objects with v' );
 
 # [perl #16010]
-my %h = (v65 => 42);
+my %h = %(v65 => 42);
 ok( exists %h{v65}, "v-stringness is not engaged for vX" );
-%h = (v65.66 => 42);
+%h = %(v65.66 => 42);
 ok( exists %h{'v65.66'}, "v-stringness is engaged for vX.Y" );
 eval ' %h = (65.66.67 => 42); ';
 like($@->{description}, qr/Too many decimal points/);

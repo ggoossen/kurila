@@ -6,24 +6,24 @@ use B;
 
 require DynaLoader;
 use vars qw( @ISA $VERSION );
-@ISA = qw(DynaLoader);
+@ISA = @( qw(DynaLoader) );
 $VERSION = '1.10';
 
 B::OP->bootstrap($VERSION);
 
-@B::OP::ISA = 'B::OBJECT';
-@B::UNOP::ISA = 'B::OP';
-@B::BINOP::ISA = 'B::UNOP';
-@B::LOGOP::ISA = 'B::UNOP';
-@B::LISTOP::ISA = 'B::BINOP';
-@B::SVOP::ISA = 'B::OP';
-@B::PADOP::ISA = 'B::OP';
-@B::PVOP::ISA = 'B::OP';
-@B::LOOP::ISA = 'B::LISTOP';
-@B::PMOP::ISA = 'B::LISTOP';
-@B::COP::ISA = 'B::OP';
+@B::OP::ISA = @( 'B::OBJECT' );
+@B::UNOP::ISA = @( 'B::OP' );
+@B::BINOP::ISA = @( 'B::UNOP' );
+@B::LOGOP::ISA = @( 'B::UNOP' );
+@B::LISTOP::ISA = @( 'B::BINOP' );
+@B::SVOP::ISA = @( 'B::OP' );
+@B::PADOP::ISA = @( 'B::OP' );
+@B::PVOP::ISA = @( 'B::OP' );
+@B::LOOP::ISA = @( 'B::LISTOP' );
+@B::PMOP::ISA = @( 'B::LISTOP' );
+@B::COP::ISA = @( 'B::OP' );
 
-@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP);
+@B::optype = @( qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP) );
 
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 
@@ -31,10 +31,10 @@ use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 sub linklist {
     my $o = shift;
     if ( $o->can("first") and $o->first and ${ $o->first } ) {
-        $o->next( $o->first->linklist );
+        $o->next( < $o->first->linklist );
         for ( my $kid = $o->first; $$kid; $kid = $kid->sibling ) {
             if ( ${ $kid->sibling } ) {
-                $kid->next( $kid->sibling->linklist );
+                $kid->next( < $kid->sibling->linklist );
             }
             else {
                 $kid->next($o);
@@ -49,7 +49,7 @@ sub linklist {
 }
 
 sub append_elem {
-    my ( $class, $type, $first, $last ) = @_;
+    my ( $class, $type, $first, $last ) = < @_;
     return $last  unless $first and $$first;
     return $first unless $last  and $$last;
 
@@ -72,13 +72,13 @@ sub append_elem {
 }
 
 sub prepend_elem {
-    my ( $class, $type, $first, $last ) = @_;
+    my ( $class, $type, $first, $last ) = < @_;
     if ( $last->type() != $type ) {
         return B::LISTOP->new( $type, 0, $first, $last );
     }
 
     if ( $type == OP_LIST ) {
-        $first->sibling( $last->first->sibling );
+        $first->sibling( < $last->first->sibling );
         $last->first->sibling($first);
         $last->flags( $last->flags ^&^ ^~^B::OPf_PARENS )
             unless ( $first->flags ^&^ B::OPf_PARENS );
@@ -88,7 +88,7 @@ sub prepend_elem {
             $last->last($first);
             $last->flags( $last->flags ^|^ B::OPf_KIDS );
         }
-        $first->sibling( $last->first );
+        $first->sibling( < $last->first );
         $last->first($first);
     }
     $last->flags( $last->flags ^|^ B::OPf_KIDS );
@@ -99,14 +99,14 @@ sub scope {
     my $o = shift;
     return unless $o and $$o;
     if ( $o->flags ^&^ B::OPf_PARENS ) {
-        $o = B::OP->prepend_elem( B::opnumber("lineseq"),
+        $o = B::OP->prepend_elem( < B::opnumber("lineseq"), <
             B::OP->new( "enter", 0 ), $o );
-        $o->type( B::opnumber("leave") );
+        $o->type( < B::opnumber("leave") );
     }
     else {
         if ( $o->type == B::opnumber("lineseq") ) {
             my $kid;
-            $o->type( B::opnumber("scope") );
+            $o->type( < B::opnumber("scope") );
             $kid = $o->first;
             die "This probably shouldn't happen (\$kid->null)\n"
                 if ( $kid->type == B::opnumber("nextstate")
@@ -116,7 +116,7 @@ sub scope {
             $o = B::LISTOP->new( "scope", 0, $o, undef );
         }
     }
-    return ($o);
+    return  @($o);
 }
 
 1;

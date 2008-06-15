@@ -11,7 +11,7 @@ while (~< $fh) {
     %declared{$1}++ if m/^#define\s+(PERL_ARGS_ASSERT[A-Za-z_]+)\s+/;
 }
 
-if (!@ARGV) {
+if (!nelems @ARGV) {
     open my $fh, '<', 'MANIFEST' or die "Can't open MANIFEST: $!";
     while (~<$fh) {
 	# *.c or */*.c

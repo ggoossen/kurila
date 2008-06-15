@@ -6,7 +6,7 @@ our $VERSION = '1.06';
 my $locale_encoding;
 
 sub _get_encname {
-    return ($1, Encode::resolve_alias($1)) if @_[0] =~ m/^:?encoding\((.+)\)$/;
+    return  @($1, Encode::resolve_alias($1)) if @_[0] =~ m/^:?encoding\((.+)\)$/;
     return;
 }
 
@@ -26,18 +26,18 @@ sub _drop_oldenc {
     #
     # If we find a match, we pop the old stack (once, since
     # the utf8 is just a flag on the encoding layer)
-    my ($h, @new) = @_;
-    return unless @new +>= 1 && @new[-1] =~ m/^:encoding\(.+\)$/;
-    my @old = PerlIO::get_layers($h);
-    return unless @old +>= 3 &&
+    my ($h, < @new) = < @_;
+    return unless (nelems @new) +>= 1 && @new[-1] =~ m/^:encoding\(.+\)$/;
+    my @old = @( < PerlIO::get_layers($h) );
+    return unless (nelems @old) +>= 3 &&
 	          @old[-1] eq 'utf8' &&
                   @old[-2] =~ m/^encoding\(.+\)$/;
     require Encode;
-    my ($loname, $lcname) = _get_encname(@old[-2]);
+    my ($loname, $lcname) = < _get_encname(@old[-2]);
     unless (defined $lcname) { # Should we trust get_layers()?
 	die("open: Unknown encoding '$loname'");
     }
-    my ($voname, $vcname) = _get_encname(@new[-1]);
+    my ($voname, $vcname) = < _get_encname(@new[-1]);
     unless (defined $vcname) {
 	die("open: Unknown encoding '$voname'");
     }
@@ -47,11 +47,11 @@ sub _drop_oldenc {
 }
 
 sub import {
-    my ($class,@args) = @_;
-    die("open: needs explicit list of PerlIO layers") unless @args;
+    my ($class,< @args) = < @_;
+    die("open: needs explicit list of PerlIO layers") unless (nelems @args);
     my $std;
     my ($in,$out) = split(m/\0/,($^OPEN || "\0"), -1);
-    while (@args) {
+    while ((nelems @args)) {
 	my $type = shift(@args);
 	my $dscp;
 	if ($type =~ m/^:?(utf8|encoding\(.+\))$/) {
@@ -78,17 +78,17 @@ sub import {
 	    }
 	}
 	if ($type eq 'IN') {
-	    _drop_oldenc(*STDIN, @val);
-	    $in  = join(' ', @val);
+	    _drop_oldenc(*STDIN, < @val);
+	    $in  = join(' ', < @val);
 	}
 	elsif ($type eq 'OUT') {
-	    _drop_oldenc(*STDOUT, @val);
-	    $out = join(' ', @val);
+	    _drop_oldenc(*STDOUT, < @val);
+	    $out = join(' ', < @val);
 	}
 	elsif ($type eq 'IO') {
-	    _drop_oldenc(*STDIN,  @val);
-	    _drop_oldenc(*STDOUT, @val);
-	    $in = $out = join(' ', @val);
+	    _drop_oldenc(*STDIN,  < @val);
+	    _drop_oldenc(*STDOUT, < @val);
+	    $in = $out = join(' ', < @val);
 	}
 	else {
 	    die "Unknown PerlIO layer class '$type'";

@@ -8,7 +8,7 @@ use B qw|svref_2object|;
     # cop_io
     use open IN  => ":crlf", OUT => ":bytes";
     sub foo {
-        return @_ + 1;
+        return (nelems @_) + 1;
     }
 
     my $cop = svref_2object(\&foo)->START;

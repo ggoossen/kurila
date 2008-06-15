@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 
 use Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my($out, $err) = < Test::Simple::Catch::caught();
 
 
 # Can't use Test.pm, that's a 5.005 thing.
@@ -27,12 +27,12 @@ $TB->plan(tests => 4);
 
 # Utility testing functions.
 sub ok ($;$) {
-    return $TB->ok(@_);
+    return $TB->ok(< @_);
 }
 
 
 sub main::err_ok ($) {
-    my($expect) = @_;
+    my($expect) = < @_;
     my $got = $err->read;
 
     return $TB->is_eq( $got, $expect );

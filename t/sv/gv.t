@@ -23,7 +23,7 @@ $foo = *main::bar;
 ok($foo);
 is(ref(\$foo), 'GLOB');
 
-is(Symbol::glob_name($foo), 'main::bar');
+is( <Symbol::glob_name($foo), 'main::bar');
 is(ref(\$foo), 'GLOB');
 try { my $x = "$foo" };
 like($@->{description}, qr/Tried to use glob as string/);
@@ -32,10 +32,10 @@ like($@->{description}, qr/Tried to use glob as string/);
 sub foo {
   local($bar) = *main::foo;
   $foo = *main::bar;
-  return ($foo, $bar);
+  return  @($foo, $bar);
 }
 
-our ($fuu, $baa) = foo();
+our ($fuu, $baa) = < foo();
 ok(defined $fuu);
 is(ref(\$fuu), 'GLOB');
 
@@ -50,16 +50,16 @@ is(ref(\$baa), 'GLOB');
 
 { package Foo::Bar; no warnings 'once'; our $test=1; }
 ok(exists %Foo::{'Bar::'});
-is(Symbol::glob_name(%Foo::{'Bar::'}), 'Foo::Bar::');
+is( <Symbol::glob_name(%Foo::{'Bar::'}), 'Foo::Bar::');
 
 
 # test undef operator clearing out entire glob
 $foo = 'stuff';
-our @foo = qw(more stuff);
-our %foo = qw(even more random stuff);
+our @foo = @( qw(more stuff) );
+our %foo = %( qw(even more random stuff) );
 undef *foo;
 is ($foo, undef);
-is (scalar @foo, 0);
+is (scalar nelems @foo, 0);
 is (scalar %foo, 0);
 
 {
@@ -97,16 +97,16 @@ my $test = curr_test();
 # test *glob{THING} syntax
 $x = "ok $test\n";
 ++$test;
-@x = ("ok $test\n");
+@x = @("ok $test\n");
 ++$test;
-%x = ("ok $test" => "\n");
+%x = %("ok $test" => "\n");
 ++$test;
 sub x { "ok $test\n" }
-print ${*x{SCALAR}}, @{*x{ARRAY}}, %{*x{HASH}}, &{*x{CODE}};
+print ${*x{SCALAR}}, < @{*x{ARRAY}}, < %{*x{HASH}}, < &{*x{CODE}};
 
 curr_test(++$test);
 *x = *STDOUT;
-is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
+is ( <Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 
 {
     my $test = curr_test();
@@ -175,7 +175,7 @@ is (Symbol::glob_name(*{*x{GLOB}}), "main::STDOUT");
 
 # [ID 20010526.001] localized glob loses value when assigned to
 
-$j=1; %j=(a=>1); @j=(1); local *j=*j; *j = sub{};
+$j=1; %j=%(a=>1); @j=@(1); local *j=*j; *j = sub{};
 
 is($j, 1);
 is(%j{a}, 1);
@@ -219,7 +219,7 @@ is(@j[0], 1);
     my $v;
     sub f { @_[0] = 0; @_[0] = "a"; @_[0] = *DATA }
     f($v);
-    is (Symbol::glob_name($v), 'main::DATA');
+    is ( <Symbol::glob_name($v), 'main::DATA');
     my $x = ~< $v;
     is ($x, "perl\n");
 }
@@ -231,7 +231,7 @@ is(@j[0], 1);
     sub T::TIEARRAY  { bless \@() => "T" }
     sub T::STORE     { @_[0]->[ @_[1] ] = @_[2] }
     sub T::FETCH     { @_[0]->[ @_[1] ] }
-    sub T::FETCHSIZE { @{@_[0]} }
+    sub T::FETCHSIZE { < @{@_[0]} }
     tie my @ary => "T";
     @ary[0] = *DATA;
     is (@ary[0], '*main::DATA');
@@ -316,7 +316,7 @@ foreach my $value (3, "Perl rules", \42, qr/whatever/, \@(1,2,3), \%(1=>2),
 
 my $ref_oonk = ''; # Was 'SCALAR';
 
-@::zwot = ('Zwot!');
+@::zwot = @('Zwot!');
 
 # Check that assignment to an existing typeglob works
 {
@@ -329,7 +329,7 @@ my $ref_oonk = ''; # Was 'SCALAR';
 is (ref %::{oonk}, $ref_oonk, "Export doesn't affect original");
 is (eval 'zwot', "Value", "Constant has correct value");
 is (ref \%::{zwot}, 'GLOB', "Symbol table has full typeglob");
-is (join ('!', @::zwot), 'Zwot!', "Existing array still in typeglob");
+is (join ('!', < @::zwot), 'Zwot!', "Existing array still in typeglob");
 
 sub spritsits () {
     "Traditional";
@@ -425,7 +425,7 @@ is (ref \%::{plunk}, 'GLOB', "Symbol table has full typeglob");
     try {slosh->rip;};
     like ($@->{description}, qr/^Can't locate object method "rip"/, "Even with SUPER");
 
-    is(slosh->isa('swoosh'), '');
+    is( <slosh->isa('swoosh'), '');
 
     %CORE::GLOBAL::{"lock"}=\@();
     eval "no warnings; lock";

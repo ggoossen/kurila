@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = qw(../lib .);
+    @INC = @( qw(../lib .) );
     require "test.pl";
 }
 
@@ -140,14 +140,14 @@ my $c = 0x200;
     is(substr($sprintf,0,2), $w, "utf8 echo echo");
 }
 
-my @values =(chr 110, chr 255, chr 256);
+my @values =@(chr 110, chr 255, chr 256);
 
-foreach my $prefix (@values) {
-    foreach my $vector (map {$_ . $_} @values) {
+foreach my $prefix (< @values) {
+    foreach my $vector (map {$_ . $_} < @values) {
 
 	my $format = "$prefix\%*vd";
 
-	foreach my $dot (@values) {
+	foreach my $dot (< @values) {
 	    my $result = sprintf $format, $dot, $vector;
 	    is (length $result, 8)
 		or print "# ", join (',', map {ord $_} $prefix, $dot, $vector),

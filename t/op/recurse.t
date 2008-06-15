@@ -34,15 +34,15 @@ sub fibonacci {
 sub ackermann {
     return @_[1] + 1               if (@_[0] == 0);
     return ackermann(@_[0] - 1, 1) if (@_[1] == 0);
-    ackermann(@_[0] - 1, ackermann(@_[0], @_[1] - 1));
+    ackermann(@_[0] - 1, < ackermann(@_[0], @_[1] - 1));
 }
 
 # Highly recursive, highly boring.
 
 sub takeuchi {
     @_[1] +< @_[0] ?
-	takeuchi(takeuchi(@_[0] - 1, @_[1], @_[2]),
-		 takeuchi(@_[1] - 1, @_[2], @_[0]),
+	takeuchi( <takeuchi(@_[0] - 1, @_[1], @_[2]), <
+		 takeuchi(@_[1] - 1, @_[2], @_[0]), <
 		 takeuchi(@_[2] - 1, @_[0], @_[1]))
 	    : @_[2];
 }
@@ -53,13 +53,13 @@ is(gcd(1908, 2016), 36, "gcd(1908, 2016) == 36");
 
 is(factorial(10), 3628800, "factorial(10) == 3628800");
 
-is(factorial(factorial(3)), 720, "factorial(factorial(3)) == 720");
+is(factorial( <factorial(3)), 720, "factorial(factorial(3)) == 720");
 
 is(fibonacci(10), 89, "fibonacci(10) == 89");
 
-is(fibonacci(fibonacci(7)), 17711, "fibonacci(fibonacci(7)) == 17711");
+is(fibonacci( <fibonacci(7)), 17711, "fibonacci(fibonacci(7)) == 17711");
 
-my @ack = qw(1 2 3 4 2 3 4 5 3 5 7 9 5 13 29 61);
+my @ack = @( qw(1 2 3 4 2 3 4 5 3 5 7 9 5 13 29 61) );
 
 for my $x (0..3) { 
     for my $y (0..3) {
@@ -74,11 +74,11 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 
 {
     sub get_first1 {
-	get_list1(@_)->[0];
+	get_list1(< @_)->[0];
     }
 
     sub get_list1 {
-	return \@(curr_test) unless @_[0];
+	return \@( <curr_test) unless @_[0];
 	my $u = get_first1(0);
 	\@($u);
     }
@@ -88,11 +88,11 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 
 {
     sub get_first2 {
-	return get_list2(@_)->[0];
+	return get_list2(< @_)->[0];
     }
 
     sub get_list2 {
-	return \@(curr_test) unless @_[0];
+	return \@( <curr_test) unless @_[0];
 	my $u = get_first2(0);
 	return \@($u);
     }

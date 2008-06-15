@@ -5,8 +5,8 @@ use Config;
 require Exporter;
 
 $VERSION = '0.01';
-@ISA = 'Exporter';
-@EXPORT_OK = '%Extensions';
+@ISA = @( 'Exporter' );
+@EXPORT_OK = @( '%Extensions' );
 
 foreach my $type (qw(static dynamic nonxs)) {
     foreach (split m/\s+/, %Config{$type . '_ext'}) {

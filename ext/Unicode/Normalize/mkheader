@@ -73,7 +73,7 @@ sub decomposeHangul {
     my $LIndex = int( $SIndex / NCount);
     my $VIndex = int(($SIndex % NCount) / TCount);
     my $TIndex =      $SIndex % TCount;
-    my @ret = (
+    my @ret = @(
        LBase + $LIndex,
        VBase + $VIndex,
       $TIndex ? (TBase + $TIndex) : (),
@@ -84,7 +84,7 @@ sub decomposeHangul {
 ########## getting full decomposion ##########
 {
     my($f, $fh);
-    foreach my $d (@INC) {
+    foreach my $d (< @INC) {
 	$f = File::Spec->catfile($d, "unicore", "CompositionExclusions.txt");
 	last if open($fh, "<", $f);
 	$f = File::Spec->catfile($d, "unicode", "CompExcl.txt");
@@ -92,7 +92,7 @@ sub decomposeHangul {
 	$f = undef;
     }
     die "$PACKAGE: neither unicore/CompositionExclusions.txt "
-	. "nor unicode/CompExcl.txt is found in @INC" unless defined $f;
+	. "nor unicode/CompExcl.txt is found in {join ' ', <@INC}" unless defined $f;
 
     while ( ~< $fh) {
 	next if m/^#/ or m/^$/;
@@ -108,7 +108,7 @@ sub decomposeHangul {
 sub _getHexArray { map hex, @_[0] =~ m/([0-9A-Fa-f]+)/g }
 
 while ($Combin =~ m/(.+)/g) {
-    my @tab = split m/\t/, $1;
+    my @tab = @( split m/\t/, $1 );
     my $ini = hex @tab[0];
     if (@tab[1] eq '') {
 	%Combin{ $ini } = @tab[2];
@@ -118,13 +118,13 @@ while ($Combin =~ m/(.+)/g) {
 }
 
 while ($Decomp =~ m/(.+)/g) {
-    my @tab = split m/\t/, $1;
+    my @tab = @( split m/\t/, $1 );
     my $compat = @tab[2] =~ s/<[^>]+>//;
-    my $dec = \@( _getHexArray(@tab[2]) ); # decomposition
+    my $dec = \@( < _getHexArray(@tab[2]) ); # decomposition
     my $ini = hex(@tab[0]); # initial decomposable character
 
     my $listname =
-	@$dec == 2 ? sprintf("{$structname}_\%06x", $dec->[0]) : 'USELESS';
+	(nelems @$dec) == 2 ? sprintf("{$structname}_\%06x", $dec->[0]) : 'USELESS';
 		# %04x is bad since it'd place _3046 after _1d157.
 
     if (@tab[1] eq '') {
@@ -133,7 +133,7 @@ while ($Decomp =~ m/(.+)/g) {
 	if (! $compat) {
 	    %Canon{ $ini } = $dec;
 
-	    if (@$dec == 2) {
+	    if ((nelems @$dec) == 2) {
 		if (%Combin{ $dec->[0] }) {
 		    %NonStD{ $ini } = 1;
 		} else {
@@ -141,7 +141,7 @@ while ($Decomp =~ m/(.+)/g) {
 		    %Comp1st{ $dec->[0] } = $listname;
 		    %Comp2nd{ $dec->[1] } = 1 if ! %Exclus{$ini};
 		}
-	    } elsif (@$dec == 1) {
+	    } elsif ((nelems @$dec) == 1) {
 		%Single{ $ini } = 1;
 	    } else {
 		die("Weird Canonical Decomposition of U+@tab[0]");
@@ -154,7 +154,7 @@ while ($Decomp =~ m/(.+)/g) {
 	    if (! $compat) {
 		%Canon{ $u } = $dec;
 
-		if (@$dec == 2) {
+		if ((nelems @$dec) == 2) {
 		    if (%Combin{ $dec->[0] }) {
 			%NonStD{ $u } = 1;
 		    } else {
@@ -162,7 +162,7 @@ while ($Decomp =~ m/(.+)/g) {
 			%Comp1st{ $dec->[0] } = $listname;
 			%Comp2nd{ $dec->[1] } = 1 if ! %Exclus{$u};
 		    }
-		} elsif (@$dec == 1) {
+		} elsif ((nelems @$dec) == 1) {
 		    %Single{ $u } = 1;
 		} else {
 		    die("Weird Canonical Decomposition of U+@tab[0]");
@@ -178,37 +178,37 @@ foreach my $j (0x1161..0x1175, 0x11A8..0x11C2) {
 }
 
 sub getCanonList {
-    my @src = @_;
-    my @dec = map {
-	(SBase +<= $_ && $_ +<= SFinal) ? decomposeHangul($_)
-	    : %Canon{$_} ? @{ %Canon{$_} } : $_
-		} @src;
-    return join(" ",@src) eq join(" ",@dec) ? @dec : getCanonList(@dec);
+    my @src = @( < @_ );
+    my @dec = @( map {
+	(SBase +<= $_ && $_ +<= SFinal) ? < decomposeHangul($_)
+	    : %Canon{$_} ? < @{ %Canon{$_} } : $_
+		} < @src );
+    return join(" ",< @src) eq join(" ",< @dec) ? @dec : getCanonList(< @dec);
     # condition @src == @dec is not ok.
 }
 
 sub getCompatList {
-    my @src = @_;
-    my @dec = map {
-	(SBase +<= $_ && $_ +<= SFinal) ? decomposeHangul($_)
-	    : %Compat{$_} ? @{ %Compat{$_} } : $_
-		} @src;
-    return join(" ",@src) eq join(" ",@dec) ? @dec : getCompatList(@dec);
+    my @src = @( < @_ );
+    my @dec = @( map {
+	(SBase +<= $_ && $_ +<= SFinal) ? < decomposeHangul($_)
+	    : %Compat{$_} ? < @{ %Compat{$_} } : $_
+		} < @src );
+    return join(" ",< @src) eq join(" ",< @dec) ? @dec : getCompatList(< @dec);
     # condition @src == @dec is not ok.
 }
 
 # exhaustive decomposition
 foreach my $key (keys %Canon) {
-    %Canon{$key}  = \@( getCanonList($key) );
+    %Canon{$key}  = \@( < getCanonList($key) );
 }
 
 # exhaustive decomposition
 foreach my $key (keys %Compat) {
-    %Compat{$key} = \@( getCompatList($key) );
+    %Compat{$key} = \@( < getCompatList($key) );
 }
 
 sub _pack_U {
-    return pack('U*', @_);
+    return pack('U*', < @_);
 }
 
 sub split_into_char {
@@ -224,18 +224,18 @@ sub split_into_char {
 
 sub _U_stringify {
     sprintf '"%s"', join '',
-	map sprintf("\\x\%02x", $_), split_into_char(_pack_U(@_));
+	map sprintf("\\x\%02x", $_), < split_into_char( <_pack_U(< @_));
 }
 
 foreach my $hash (\%Canon, \%Compat) {
     foreach my $key (keys %$hash) {
-	$hash->{$key} = _U_stringify( @{ $hash->{$key} } );
+	$hash->{$key} = _U_stringify( < @{ $hash->{$key} } );
     }
 }
 
 ########## writing header files ##########
 
-my @boolfunc = (
+my @boolfunc = @(
     \%(
 	name => "Exclusion",
 	type => "bool",
@@ -269,24 +269,24 @@ binmode FH; select FH;
  */
 EOF
 
-foreach my $tbl (@boolfunc) {
-    my @temp = sort {$a <+> $b} keys %{$tbl->{hash}};
+foreach my $tbl (< @boolfunc) {
+    my @temp = @( sort {$a <+> $b} keys %{$tbl->{hash}} );
     my $type = $tbl->{type};
     my $name = $tbl->{name};
     print "$type is$name (UV uv)\n\{\nreturn\n\t";
 
-    while (@temp) {
+    while ((nelems @temp)) {
 	my $cur = shift @temp;
-	if (@temp && $cur + 1 == @temp[0]) {
+	if ((nelems @temp) && $cur + 1 == @temp[0]) {
 	    print "($cur <= uv && uv <= ";
-	    while (@temp && $cur + 1 == @temp[0]) {
+	    while ((nelems @temp) && $cur + 1 == @temp[0]) {
 		$cur = shift @temp;
 	    }
 	    print "$cur)";
-	    print "\n\t|| " if @temp;
+	    print "\n\t|| " if (nelems @temp);
 	} else {
 	    print "uv == $cur";
-	    print "\n\t|| " if @temp;
+	    print "\n\t|| " if (nelems @temp);
 	}
     }
     print "\n\t? TRUE : FALSE;\n\}\n\n";
@@ -307,7 +307,7 @@ foreach my $i (sort keys %CompList) {
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 
-my @tripletable = (
+my @tripletable = @(
     \%(
 	file => "unfcmb",
 	name => "combin",
@@ -339,7 +339,7 @@ my @tripletable = (
     ),
 );
 
-foreach my $tbl (@tripletable) {
+foreach my $tbl (< @tripletable) {
     my $file = "$tbl->{file}.h";
     my $head = "{$prefix}$tbl->{name}";
     my $type = $tbl->{type};
@@ -363,7 +363,7 @@ EOF
     foreach my $uv (keys %$hash) {
 	die sprintf("a Unicode code point 0x\%04X over 0x10FFFF.", $uv)
 	    unless $uv +<= 0x10FFFF;
-	my @c = unpack 'CCCC', pack 'N', $uv;
+	my @c = @( unpack 'CCCC', pack 'N', $uv );
 	%val{ @c[1] }->{ @c[2] }->{ @c[3] } = $hash->{$uv};
     }
 

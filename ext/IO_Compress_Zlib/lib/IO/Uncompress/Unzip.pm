@@ -29,13 +29,13 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnzipError, %headerLookup);
 $VERSION = '2.006';
 $UnzipError = '';
 
-@ISA    = qw(IO::Uncompress::RawInflate Exporter);
-@EXPORT_OK = qw( $UnzipError unzip );
-%EXPORT_TAGS = %IO::Uncompress::RawInflate::EXPORT_TAGS ;
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+@ISA    = @( qw(IO::Uncompress::RawInflate Exporter) );
+@EXPORT_OK = @( qw( $UnzipError unzip ) );
+%EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::EXPORT_TAGS ) ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
-%headerLookup = (
+%headerLookup = %(
         ZIP_CENTRAL_HDR_SIG,            \&skipCentralDirectory,
         ZIP_END_CENTRAL_HDR_SIG,        \&skipEndCentralDirectory,
         ZIP64_END_CENTRAL_REC_HDR_SIG,  \&skipCentralDirectory64Rec,
@@ -48,13 +48,13 @@ sub new
 {
     my $class = shift ;
     my $obj = createSelfTiedObject($class, \$UnzipError);
-    $obj->_create(undef, 0, @_);
+    $obj->_create(undef, 0, < @_);
 }
 
 sub unzip
 {
     my $obj = createSelfTiedObject(undef, \$UnzipError);
-    return $obj->_inf(@_) ;
+    return $obj->_inf(< @_) ;
 }
 
 sub getExtraParams
@@ -62,7 +62,7 @@ sub getExtraParams
     use IO::Compress::Base::Common  v2.006 qw(:Parse);
 
     
-    return (
+    return  @(
 #            # Zip header fields
             'Name'      => \@(1, 1, Parse_any,       undef),
 
@@ -451,7 +451,7 @@ sub _isZipMagic
 
 sub _readFullZipHeader($)
 {
-    my ($self) = @_ ;
+    my ($self) = < @_ ;
     my $magic = '' ;
 
     $self->smartReadExact(\$magic, 4);
@@ -473,7 +473,7 @@ sub _readFullZipHeader($)
 
 sub _readZipHeader($)
 {
-    my ($self, $magic) = @_ ;
+    my ($self, $magic) = < @_ ;
     my ($HeaderCRC) ;
     my ($buffer) = '' ;
 
@@ -496,7 +496,7 @@ sub _readZipHeader($)
 
     my $filename;
     my $extraField;
-    my @EXTRA = ();
+    my @EXTRA = @( () );
     my $streamingMode = ($gpFlag ^&^ ZIP_GP_FLAG_STREAMING_MASK) ? 1 : 0 ;
 
     return $self->HeaderError("Streamed Stored content not supported")
@@ -533,7 +533,7 @@ sub _readZipHeader($)
         $keep .= $extraField ;
 
         my %Extra ;
-        for (@EXTRA)
+        for (< @EXTRA)
         {
             %Extra{$_->[0]} = \$_->[1];
         }
@@ -628,7 +628,7 @@ sub _readZipHeader($)
         'UncompressedLength' => $uncompressedLength ,
         'CRC32'              => $crc32 ,
         'Name'               => $filename,
-        'Time'               => _dosToUnixTime($lastModTime),
+        'Time'               => < _dosToUnixTime($lastModTime),
         'Stream'             => $streamingMode,
 
         'MethodID'           => $compressedMethod,
@@ -653,7 +653,7 @@ sub _readZipHeader($)
 #        'Flags'         => $flag,
 #        'ExtraFlags'    => $xfl,
         'ExtraFieldRaw' => $extraField,
-        'ExtraField'    => \@( @EXTRA ),
+        'ExtraField'    => \@( < @EXTRA ),
 
 
       )
