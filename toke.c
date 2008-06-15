@@ -3647,10 +3647,10 @@ Perl_yylex(pTHX)
     case '^':
 	s++;
 	if ( ! strchr("^&|~", *s ) )
-	    Perl_croak(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s);
+	    yyerror(Perl_form(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s));
 	s++;
 	if (*s != '^')
-	    Perl_croak(aTHX_ "Expected a '^' after ^%c'", *(s-1));
+	    yyerror(Perl_form(aTHX_ "Expected a '^' after ^%c'", *(s-1)));
 	s++;
 	switch (*(s-2)) {
 	case '^': BOop(OP_BIT_XOR);
@@ -3671,7 +3671,7 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    UNI(OP_READLINE);
 	}
-	Perl_croak(aTHX_ "Unknown operator '~' found");
+	yyerror("Unknown operator '~' found");
     case '[':
 	s++;
 	if (PL_expect == XOPERATOR && *s == '[') {
@@ -3960,7 +3960,7 @@ Perl_yylex(pTHX)
     case '}':
 	s++;
 	if (PL_lex_brackets <= 0)
-	    Perl_croak(aTHX_ "Unmatched right curly bracket");
+	    yyerror("Unmatched right curly bracket");
 	else
 	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets];
 	if (PL_lex_state == LEX_INTERPBLOCK) {
@@ -4027,7 +4027,7 @@ Perl_yylex(pTHX)
 	if (*s++ == '|')
 	    AOPERATOR(OROR);
 	s--;
-	Perl_croak(aTHX_ "Unknown operator '|' found. Did you mean '||' or '^|^'?");
+	yyerror("Unknown operator '|' found. Did you mean '||' or '^|^'?");
     case '=':
 	s++;
 	{
@@ -4142,7 +4142,7 @@ Perl_yylex(pTHX)
 
 	    if (tmp == '=') {
 		s++;
-		Perl_croak(aTHX_ "'<=' operator is reserved");
+		yyerror("'<=' operator is reserved");
 	    }
 
 	    OPERATOR('<');
@@ -4152,13 +4152,13 @@ Perl_yylex(pTHX)
 	if (*s++ == '>')
 	    SHop(OP_RIGHT_SHIFT);
 	
-	Perl_croak(aTHX_ "'>' is reserved for hashes");
+	yyerror(aTHX_ "'>' is reserved for hashes");
 
     case '$':
 	CLINE;
 
 	if (s[1] == '#' && (isIDFIRST_lazy_if(s+2,UTF) || strchr("{$:+-", s[2]))) {
-	    Perl_croak(aTHX_ "$# is not allowed");
+	    yyerror(aTHX_ "$# is not allowed");
 	}
 
 	PL_tokenbuf[0] = '$';
@@ -4242,8 +4242,8 @@ Perl_yylex(pTHX)
 	    s = SKIPSPACE1(s);
 	if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop) && intuit_more(s)) {
 	    if (*s == '{') {
-		Perl_croak(aTHX_ "hash slice should be %%%s{[...]} instead of @%s{...}",
-			   PL_tokenbuf+1, PL_tokenbuf+1);
+		yyerror(Perl_form(aTHX_ "hash slice should be %%%s{[...]} instead of @%s{...}",
+				  PL_tokenbuf+1, PL_tokenbuf+1));
 		PL_tokenbuf[0] = '%';
 	    }
 	}
@@ -4585,7 +4585,7 @@ Perl_yylex(pTHX)
 		    PL_tokenbuf[len - 2] == ':' && PL_tokenbuf[len - 1] == ':')
 		{
 		    /* And if "Foo::", then that's what it certainly is. */
-		    Perl_croak(aTHX_ "Bareword \"%s\" refering to a package are not allowed", PL_tokenbuf);
+		    yyerror(Perl_form(aTHX_ "Bareword \"%s\" refering to a package are not allowed", PL_tokenbuf));
 		}
 
 		if (!gv) {
@@ -5991,10 +5991,10 @@ Perl_yylex(pTHX)
 	    LOP(OP_WAITPID,XTERM);
 
 	case KEY_wantarray:
-	    FUN0(OP_WANTARRAY);
+	    yyerror(Perl_form(aTHX_ "wantarray keyword is removed"));
 
 	case KEY_write:
-	    Perl_croak(aTHX_ "write keyword is removed");
+	    yyerror(Perl_form(aTHX_ "write keyword is removed"));
 
 	case KEY_x:
 	    if (PL_expect == XOPERATOR)
@@ -6007,7 +6007,7 @@ Perl_yylex(pTHX)
 	    OPERATOR(OROP);
 
 	case KEY_y:
-	    Perl_croak(aTHX_ "y transliteration operator is removed");
+	    yyerror(Perl_form(aTHX_ "y transliteration operator is removed"));
 	}
     }}
 }
