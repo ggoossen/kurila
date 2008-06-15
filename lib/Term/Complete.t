@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-}
-
 use warnings;
 use strict;
 use Test::More tests => 8;
@@ -29,10 +24,10 @@ SKIP: {
 
     my $in = tie *STDIN, 'FakeIn', "fro\t";
     my $out = tie *STDOUT, 'FakeOut';
-    my @words = ( 'frobnitz', 'frobozz', 'frostychocolatemilkshakes' );
+    my @words = @( 'frobnitz', 'frobozz', 'frostychocolatemilkshakes' );
 
     Complete('', \@words);
-    my $data = get_expected('fro', @words);
+    my $data = get_expected('fro', < @words);
     
     # there should be an \a after our word
     like( $$out, qr/fro\a/, 'found bell character' );
@@ -46,14 +41,14 @@ SKIP: {
 
     # should only find 'frobnitz' and 'frobozz'
     $in->add('frob');
-    Complete('', @words);
+    Complete('', <@words);
     $out->scrub();
     is( $$out, get_expected('frob', 'frobnitz', 'frobozz'), 'expected frob*' );
     $out->clear();
 
     # should only do 'frobozz'
     $in->add('frobo');
-    Complete('', @words);
+    Complete('', <@words);
     $out->scrub();
     is( $$out, get_expected( 'frobo', 'frobozz' ), 'only frobozz possible' );
     $out->clear();
@@ -61,7 +56,7 @@ SKIP: {
     # change the completion character
     $complete = "!";
     $in->add('frobn');
-    Complete('prompt:', @words);
+    Complete('prompt:', <@words);
     $out->scrub();
     like( $$out, qr/prompt:frobn/, 'prompt is okay' );
 
@@ -74,19 +69,19 @@ SKIP: {
 # easier than matching space characters
 sub get_expected {
 	my $word = shift;
-	return join('.', $word, @_, $word, '.');
+	return join('.', $word, <@_, $word, '.');
 }
 
 package FakeIn;
 
 sub TIEHANDLE {
-	my ($class, $text) = @_;
+	my ($class, $text) = <@_;
 	$text .= "$main::complete\025";
 	bless(\$text, $class);
 }
 
 sub add {
-	my ($self, $text) = @_;
+	my ($self, $text) = <@_;
 	$$self = $text . "$main::complete\025";
 }
 
@@ -113,5 +108,5 @@ sub scrub {
 # must shift off self
 sub PRINT {
 	my $self = shift;
-	($$self .= join('', @_)) =~ s/\s+/./gm;
+	($$self .= join('', <@_)) =~ s/\s+/./gm;
 }

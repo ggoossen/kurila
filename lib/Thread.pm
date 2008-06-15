@@ -18,9 +18,9 @@ use threads 'yield';
 use threads::shared;
 
 require Exporter;
-our @ISA = qw(Exporter threads);
-our @EXPORT = qw(cond_wait cond_broadcast cond_signal);
-our @EXPORT_OK = qw(async yield);
+our @ISA = @( qw(Exporter threads) );
+our @EXPORT = @( qw(cond_wait cond_broadcast cond_signal) );
+our @EXPORT_OK = @( qw(async yield) );
 
 sub async (&;@) { return Thread->new(shift); }
 

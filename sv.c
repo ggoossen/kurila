@@ -1877,6 +1877,11 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
     }
     if (!SvIOKp(sv)) {
 
+	if (SvAVOK(sv))
+	    Perl_croak(aTHX_ "Array may not be used as a number");
+	if (SvHVOK(sv))
+	    Perl_croak(aTHX_ "Hash may not be used as a number");
+
 	if (SvNOKp(sv)) {
 	    return I_V(SvNVX(sv));
 	}
@@ -1984,6 +1989,11 @@ Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
 	}
     }
     if (!SvIOKp(sv)) {
+
+	if (SvAVOK(sv))
+	    Perl_croak(aTHX_ "Array may not be used as a number");
+	if (SvHVOK(sv))
+	    Perl_croak(aTHX_ "Hash may not be used as a number");
 
 	if (SvNOKp(sv)) {
 #if defined(NAN_COMPARE_BROKEN) && defined(Perl_isnan)
@@ -2307,6 +2317,10 @@ Perl_sv_2num(pTHX_ register SV *const sv)
 	}
 	Perl_croak(aTHX_ "Reference can't be used as a number");
     }
+    if (SvAVOK(sv))
+	Perl_croak(aTHX_ "Array can't be used as a number");
+    if (SvHVOK(sv))
+	Perl_croak(aTHX_ "Hash can't be used as a number");
     return sv;
 }
 

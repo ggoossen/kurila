@@ -341,7 +341,7 @@ sub clean_data($){
 
 
 sub pod2html {
-    local(< @ARGV) = < @_;
+    local(@ARGV) = @_;
     local($/);
     local $_;
 
@@ -1754,7 +1754,11 @@ sub go_ahead($$$){
     my $res = '';
     my @closing = @($closing);
     while( $$rstr =~
+<<<<<<< HEAD:lib/Pod/Html.pm
       s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|{join ' ', <@{\@( <pattern @closing[0])}})//s ){
+=======
+      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|{join ' ', pattern @closing[0]})//s ){
+>>>>>>> 95cf2b6... and more array/hash stuff:lib/Pod/Html.pm
 	$res .= $1;
 	unless( $3 ){
 	    shift @closing;

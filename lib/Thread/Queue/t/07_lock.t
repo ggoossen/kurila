@@ -2,10 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir('t');
-        unshift(@INC, '../lib');
-    }
     use Config;
     if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
@@ -36,14 +32,14 @@ threads->create(sub {
         $st->down();
         threads::yield();
         select(undef, undef, undef, 0.1);
-        my @x = $q->extract(5,2);
+        my @x = @( $q->extract(5,2) );
         is_deeply(\@x, \@(6,7), 'Thread dequeues under lock');
     }
 })->detach();
 
 $sm->down();
 $st->up();
-my @x = $q->dequeue_nb(100);
+my @x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1..5,8..10), 'Main dequeues');
 threads::yield();
 

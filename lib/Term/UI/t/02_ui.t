@@ -1,7 +1,6 @@
 ### Term::UI test suite ###
 
 use strict;
-use lib qw[../lib lib];
 use Test::More tests => 13;
 use Term::ReadLine;
 

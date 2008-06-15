@@ -1,15 +1,9 @@
 ### Module::Load test suite ###
 BEGIN { 
-    if( %ENV{PERL_CORE} ) {
-        chdir '../lib/Module/Load' if -d '../lib/Module/Load';
-        unshift @INC, '../../..';
-    }
+    push @INC, "../lib/Module/Load/t/to_load";
 } 
 
-BEGIN { chdir 't' if -d 't' }
-
 use strict;
-use lib qw[../lib to_load];
 use Module::Load;
 use Test::More tests => 13;
 

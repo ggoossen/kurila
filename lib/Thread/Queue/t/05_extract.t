@@ -2,10 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir('t');
-        unshift(@INC, '../lib');
-    }
     use Config;
     if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
@@ -39,15 +35,15 @@ $q = Thread::Queue->new(1..10);
 ok($q, 'New queue');
 
 threads->create(sub {
-    my @x = $q->extract(0, 2);                  # 3..10 left
+    my @x = @( $q->extract(0, 2) );                  # 3..10 left
     is_deeply(\@x, \@(1,2), '2 from head');
-    @x = $q->extract(6, 2);                     # 3..8 left
+    @x = @( $q->extract(6, 2) );                     # 3..8 left
     is_deeply(\@x, \@(9,10), '2 from tail');
-    @x = $q->extract(2, 2);                     # 3,4,7,8 left
+    @x = @( $q->extract(2, 2) );                     # 3,4,7,8 left
     is_deeply(\@x, \@(5,6), '2 from middle');
-    @x = $q->extract(2, 4);                     # 3,4 left
+    @x = @( $q->extract(2, 4) );                     # 3,4 left
     is_deeply(\@x, \@(7,8), 'Lots from tail');
-    @x = $q->extract(3, 4);                     # unchanged
+    @x = @( $q->extract(3, 4) );                     # unchanged
     is_deeply(\@x, \@(), 'Too far');
 })->join();
 
@@ -55,17 +51,17 @@ $q = Thread::Queue->new(1..10);
 ok($q, 'New queue');
 
 threads->create(sub {
-    my @x = $q->extract(-4, 2);                 # 1..6,9,10 left
+    my @x = @( $q->extract(-4, 2) );                 # 1..6,9,10 left
     is_deeply(\@x, \@(7,8), 'Neg index');
-    @x = $q->extract(-2, 4);                    # 1..6 left
+    @x = @( $q->extract(-2, 4) );                    # 1..6 left
     is_deeply(\@x, \@(9,10), 'Lots from tail');
-    @x = $q->extract(-6, 2);                    # 3..6 left
+    @x = @( $q->extract(-6, 2) );                    # 3..6 left
     is_deeply(\@x, \@(1,2), 'Max neg index');
-    @x = $q->extract(-10, 3);                   # unchanged
+    @x = @( $q->extract(-10, 3) );                   # unchanged
     is_deeply(\@x, \@(), 'Too far');
-    @x = $q->extract(-6, 3);                    # 4..6 left
+    @x = @( $q->extract(-6, 3) );                    # 4..6 left
     is_deeply(\@x, \@(3), 'Neg overlap');
-    @x = $q->extract(-5, 10);                   # empty
+    @x = @( $q->extract(-5, 10) );                   # empty
     is_deeply(\@x, \@(4..6), 'Neg big overlap');
 })->join();
 

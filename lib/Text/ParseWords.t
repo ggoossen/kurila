@@ -1,16 +1,11 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use warnings;
 use strict;
 use Text::ParseWords;
 use Test::More tests => 27;
 
-our @words = shellwords(qq(foo "bar quiz" zoo));
+our @words = @( shellwords(qq(foo "bar quiz" zoo)) );
 is(@words[0], 'foo');
 is(@words[1], 'bar quiz');
 is(@words[2], 'zoo');
@@ -20,13 +15,13 @@ is(@words[2], 'zoo');
   no warnings 'uninitialized' ;
 
   # Test quotewords() with other parameters and null last field
-  @words = quotewords(':+', 1, 'foo:::"bar:foo":zoo zoo:');
-  is(join(";", @words), qq(foo;"bar:foo";zoo zoo;));
+  @words = @( quotewords(':+', 1, 'foo:::"bar:foo":zoo zoo:') );
+  is(join(";", < @words), qq(foo;"bar:foo";zoo zoo;));
 }
 
 # Test $keep eq 'delimiters' and last field zero
-@words = quotewords('\s+', 'delimiters', '4 3 2 1 0');
-is(join(";", @words), qq(4; ;3; ;2; ;1; ;0));
+@words = @( quotewords('\s+', 'delimiters', '4 3 2 1 0') );
+is(join(";", < @words), qq(4; ;3; ;2; ;1; ;0));
 
 # Big ol' nasty test (thanks, Joerk!)
 our $string = 'aaaa"bbbbb" cc\ cc \\\"dddd" eee\\\"ffff" "gg"';
@@ -45,30 +40,30 @@ $result = join('|', parse_line('\s+', 0, $string));
 is($result, 'aaaabbbbb|cc cc|\\\"dddd eee\\\\\\"ffff|gg');
 
 # Make sure @nested_quotewords does the right thing
-our @lists = nested_quotewords('\s+', 0, 'a b c', '1 2 3', 'x y z');
-is (@lists, 3);
-is (@{@lists[0]}, 3);
-is (@{@lists[1]}, 3);
-is (@{@lists[2]}, 3);
+our @lists = @( nested_quotewords('\s+', 0, 'a b c', '1 2 3', 'x y z') );
+is ((nelems @lists), 3);
+is ((nelems @{@lists[0]}), 3);
+is ((nelems @{@lists[1]}), 3);
+is ((nelems @{@lists[2]}), 3);
 
 # Now test error return
 $string = 'foo bar baz"bach blech boop';
 
-@words = shellwords($string);
-is(@words, 0);
+@words = @( shellwords($string) );
+is((nelems @words), 0);
 
-@words = parse_line('s+', 0, $string);
-is(@words, 0);
+@words = @( parse_line('s+', 0, $string) );
+is((nelems @words), 0);
 
-@words = quotewords('s+', 0, $string);
-is(@words, 0);
+@words = @( quotewords('s+', 0, $string) );
+is((nelems @words), 0);
 
 {
   # Gonna get some more undefined things back
   no warnings 'uninitialized' ;
 
-  @words = nested_quotewords('s+', 0, $string);
-  is(@words, 0);
+  @words = @( nested_quotewords('s+', 0, $string) );
+  is((nelems @words), 0);
 
   # Now test empty fields
   $result = join('|', parse_line(':', 0, 'foo::0:"":::'));
@@ -91,8 +86,8 @@ $result = join('|', parse_line('\s+', 0, $string));
 is($result, q<aaaabbbbb|cc cc|\\"dddd eee\\\\\"ffff|gg>);
 
 # test whitespace in the delimiters
-@words = quotewords(' ', 1, '4 3 2 1 0');
-is(join(";", @words), qq(4;3;2;1;0));
+@words = @( quotewords(' ', 1, '4 3 2 1 0') );
+is(join(";", < @words), qq(4;3;2;1;0));
 
 # [perl #30442] Text::ParseWords does not handle backslashed newline inside quoted text
 $string = qq{"field1"	"field2\\\nstill field2"	"field3"};
@@ -121,6 +116,6 @@ is($result, "aa| | bb| |cc|dd|ee ");
 
 %SIG{ALRM} = sub {die "Timeout!"};
 alarm(3);
-@words = Text::ParseWords::old_shellwords("foo\\");
-is(@words, 1);
+@words = @( Text::ParseWords::old_shellwords("foo\\") );
+is((nelems @words), 1);
 alarm(0);

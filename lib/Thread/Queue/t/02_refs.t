@@ -2,10 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir('t');
-        unshift(@INC, '../lib');
-    }
     use Config;
     if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
@@ -22,11 +18,11 @@ Test::More->import();
 plan('tests' => 39);
 
 # Regular array
-my @ary1 = qw/foo bar baz/;
+my @ary1 = @( qw/foo bar baz/ );
 push(@ary1, \@( 1..3 ), \%( 'qux' => 99 ));
 
 # Shared array
-my @ary2 :shared = (99, 21, 86);
+my @ary2 :shared = @(99, 21, 86);
 
 # Regular hash-based object
 my $obj1 = \%(
@@ -80,7 +76,7 @@ threads->create(sub {
     my $tary2 = $q->dequeue();
     ok($tary2, 'Thread got item');
     is(ref($tary2), 'ARRAY', 'Item is array ref');
-    for (my $ii=0; $ii +< @ary2; $ii++) {
+    for (my $ii=0; $ii +< nelems @ary2; $ii++) {
         is(@$tary2[$ii], @ary2[$ii], 'Shared array element check');
     }
     @$tary2[1] = 444;

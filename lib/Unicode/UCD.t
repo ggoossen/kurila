@@ -1,19 +1,4 @@
 #!perl -w
-BEGIN {
-    if (ord("A") == 193) {
-	print "1..0 # Skip: EBCDIC\n";
-	exit 0;
-    }
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    @INC = "::lib" if $^O eq 'MacOS'; # module parses @INC itself
-    our %Config;
-    require Config; Config->import;
-    if (%Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built; Unicode::UCD uses Storable\n";
-        exit 0;
-    }
-}
 
 use strict;
 use Unicode::UCD;
@@ -308,7 +293,7 @@ ok($casespec->{az}->{code} eq '0307' &&
 
 for (1) {my $a=compexcl $_}
 ok(1, 'compexcl read-only $_: perl #7305');
-map {compexcl $_} %{\%(1=>2)};
+map {compexcl $_} (1=>2);
 ok(1, 'compexcl read-only hash: perl #7305');
 
 is(Unicode::UCD::_getcode('123'),     123, "_getcode(123)");
@@ -326,11 +311,11 @@ is(Unicode::UCD::_getcode('U+123x'),  undef, "_getcode(x123)");
 
 {
     my $r1 = charscript('Latin');
-    my $n1 = @$r1;
+    my $n1 = nelems @$r1;
     is($n1, 35, "number of ranges in Latin script (Unicode 5.0.0)");
     shift @$r1 while @$r1;
     my $r2 = charscript('Latin');
-    is(@$r2, $n1, "modifying results should not mess up internal caches");
+    is((nelems @$r2), $n1, "modifying results should not mess up internal caches");
 }
 
 {
@@ -343,12 +328,12 @@ is(namedseq("KATAKANA LETTER AINU P"), "\x{31F7}\x{309A}", "namedseq");
 is(namedseq("KATAKANA LETTER AINU Q"), undef);
 is(namedseq(), undef);
 is(namedseq(qw(foo bar)), undef);
-my @ns = namedseq("KATAKANA LETTER AINU P");
-is(scalar @ns, 2);
+my @ns = @( namedseq("KATAKANA LETTER AINU P") );
+is((nelems @ns), 2);
 is(@ns[0], 0x31F7);
 is(@ns[1], 0x309A);
-my %ns = namedseq();
+my %ns = %( namedseq() );
 is(%ns{"KATAKANA LETTER AINU P"}, "\x{31F7}\x{309A}");
-@ns = namedseq(42);
-is(@ns, 0);
+@ns = @( namedseq(42) );
+is((nelems @ns), 0);
 

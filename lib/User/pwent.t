@@ -1,13 +1,8 @@
 #!./perl
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
-BEGIN {
     our $haspw;
-    try { my @n = getpwuid 0 };
+    try { my @n = @( getpwuid 0 ) };
     $haspw = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($haspw) { print "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config;
@@ -25,7 +20,7 @@ BEGIN {
     # It is better to use the $< uid for testing on VMS instead.
     if ( $^O eq 'VMS' ) { $uid = $< ; }
     if ( $^O eq 'cygwin' ) { $uid = 500 ; }
-    our @pwent = getpwuid $uid; # This is the function getpwuid.
+    our @pwent = @( getpwuid $uid ); # This is the function getpwuid.
     unless (@pwent) { print "1..0 # Skip: no uid $uid\n"; exit 0 }
 }
 

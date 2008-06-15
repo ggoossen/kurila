@@ -300,7 +300,7 @@ sub bootstrap {
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
 
     <</$^O-eq-os2>>
-    my @modparts = split(m/::/,$module);
+    my @modparts = @( split(m/::/,$module) );
     my $modfname = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
@@ -315,14 +315,14 @@ sub bootstrap {
 	}
     <</$^O-eq-NetWare>>
 
-    my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,@modparts);
+    my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,<@modparts);
 
     print STDERR "DynaLoader::bootstrap for $module ",
 		       <<$^O-eq-MacOS>> "(:auto:$modpname:$modfname.$dl_dlext)\n" 
 		       <<|$^O-eq-MacOS>>"(auto/$modpname/$modfname.$dl_dlext)\n"<</$^O-eq-MacOS>>
 	if $dl_debug;
 
-    foreach (@INC) {
+    foreach (<@INC) {
 	<<$^O-eq-VMS>>chop($_ = VMS::Filespec::unixpath($_));<</$^O-eq-VMS>>
 	<<$^O-eq-MacOS>>
 	    my $path = $_;
@@ -347,7 +347,7 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    $file = dl_findfile(map("-L$_",@dirs,@INC), $modfname) unless $file;
+    ($file) = < dl_findfile(map("-L$_",<@dirs,<@INC), $modfname) unless $file;
 
     die("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
 	unless $file;	# wording similar to error from 'require'
@@ -355,7 +355,7 @@ sub bootstrap {
     <<$^O-eq-VMS>>$file = uc($file) if %Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
-    @dl_require_symbols = ($bootname);
+    @dl_require_symbols = @($bootname);
 
     # Execute optional '.bootstrap' perl script for this module.
     # The .bs file can be used to configure @dl_resolve_using etc to
@@ -405,7 +405,7 @@ sub bootstrap {
 
 	push(@dl_shared_objects, $file); # record files loaded
 
-    &$xs(@args);
+    &$xs(<@args);
 }
 
 
@@ -431,7 +431,7 @@ sub dl_findfile {
     print STDERR "dl_findfile(@args)\n" if $dl_debug;
 
     # accumulate directories but process files as they appear
-    arg: foreach(@args) {
+    arg: foreach(<@args) {
         #  Special fast case: full filepath requires no search
 	<<$^O-eq-VMS>>
         if (m%[:>/\]]% && -f $_) {
@@ -466,11 +466,11 @@ sub dl_findfile {
             my(@names, $name);    # what filenames to look for
 	    s/^-l//;
 	    push(@names, $_);
-            foreach $dir (@dirs, @dl_library_path) {
+            foreach $dir (<@dirs, <@dl_library_path) {
             	next unless -d $dir;
 		$dir =~ s/^([^:]+)$/:$1/;
 		$dir =~ s/:$//;
-            	foreach $name (@names) {
+            	foreach $name (<@names) {
 	    	    my($file) = "$dir:$name";
                     print STDERR " checking in $dir for $name\n" if $dl_debug;
 		    if (-f $file) {
@@ -515,12 +515,12 @@ sub dl_findfile {
 	    @dl_library_path = map { "$drive:$_" } @dl_library_path;
 	}
 	<</$^O-eq-symbian>>
-        foreach $dir (@dirs, @dl_library_path) {
+        foreach $dir (<@dirs, <@dl_library_path) {
             next unless -d $dir;
 	    <<$^O-eq-VMS>>
             chop($dir = VMS::Filespec::unixpath($dir));
 	    <</$^O-eq-VMS>>
-            foreach $name (@names) {
+            foreach $name (<@names) {
 		my($file) = "$dir$dirsep$name";
                 print STDERR " checking in $dir for $name\n" if $dl_debug;
 		$file = ($do_expand) ? dl_expandspec($file) : (-f $file && $file);
@@ -533,12 +533,11 @@ sub dl_findfile {
         }
     }
     if ($dl_debug) {
-        foreach(@dirs) {
+        foreach(<@dirs) {
             print STDERR " dl_findfile ignored non-existent directory: $_\n" unless -d $_;
         }
         print STDERR "dl_findfile found: @found\n";
     }
-    return @found[0] unless wantarray;
     @found;
 }
 
@@ -573,7 +572,7 @@ sub dl_find_symbol_anywhere
 {
     my $sym = shift;
     my $libref;
-    foreach $libref (@dl_librefs) {
+    foreach $libref (<@dl_librefs) {
 	my $symref = dl_find_symbol($libref,$sym);
 	return $symref if $symref;
     }

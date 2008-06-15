@@ -408,7 +408,7 @@ sub _dump {
       my ($sortkeys, $keys, $key) = ($s->{sortkeys});
       if ($sortkeys) {
 	if (ref($s->{sortkeys}) eq 'CODE') {
-	  $keys = $s->{sortkeys}($val);
+	  $keys = $s->{sortkeys}->($val);
 	  unless (ref($keys) eq 'ARRAY') {
 	    warn "Sortkeys subroutine did not return ARRAYREF";
 	    $keys = \@();

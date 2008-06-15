@@ -15,7 +15,7 @@ my ($make_shared, $validate_count, $validate_index);
 sub new
 {
     my $class = shift;
-    my @queue :shared = map { < $make_shared->($_) } < @_;
+    my @queue :shared = @( map { $make_shared->($_) } < @_ );
     return bless(\@queue, $class);
 }
 
@@ -23,8 +23,8 @@ sub new
 sub enqueue
 {
     my $queue = shift;
-    lock(< @$queue);
-    push(@$queue, map { < $make_shared->($_) } < @_)
+    lock(@$queue);
+    push(@$queue, map { $make_shared->($_) } < @_)
         and cond_signal(@$queue);
 }
 
@@ -32,7 +32,7 @@ sub enqueue
 sub pending
 {
     my $queue = shift;
-    lock(< @$queue);
+    lock(@$queue);
     return scalar(nelems @$queue);
 }
 
@@ -40,7 +40,7 @@ sub pending
 sub dequeue
 {
     my $queue = shift;
-    lock(< @$queue);
+    lock(@$queue);
 
     my $count = (nelems @_) ? $validate_count->(shift) : 1;
 
@@ -61,7 +61,7 @@ sub dequeue
 sub dequeue_nb
 {
     my $queue = shift;
-    lock(< @$queue);
+    lock(@$queue);
 
     my $count = (nelems @_) ? $validate_count->(shift) : 1;
 
@@ -81,7 +81,7 @@ sub dequeue_nb
 sub peek
 {
     my $queue = shift;
-    lock(< @$queue);
+    lock(@$queue);
     my $index = (nelems @_) ? $validate_index->(shift) : 0;
     return @$queue[$index];
 }
@@ -90,7 +90,7 @@ sub peek
 sub insert
 {
     my $queue = shift;
-    lock(< @$queue);
+    lock(@$queue);
 
     my $index = $validate_index->(shift);
 
@@ -124,7 +124,7 @@ sub insert
 sub extract
 {
     my $queue = shift;
-    lock(< @$queue);
+    lock(@$queue);
 
     my $index = (nelems @_) ? $validate_index->(shift) : 0;
     my $count = (nelems @_) ? $validate_count->(shift) : 1;

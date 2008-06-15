@@ -1,17 +1,6 @@
 #!perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = @('../lib', 'lib');
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
-chdir 't';
-
-BEGIN {
     # There was a bug with overloaded objects and threads.
     # See rt.cpan.org 4218
     try { require threads; 'threads'->import; 1; };

@@ -773,7 +773,7 @@ Perl_scalar(pTHX_ OP *o)
     case OP_SPLIT:
 	if ((kid = cLISTOPo->op_first) && kid->op_type == OP_PUSHRE) {
 	    if (!kPMOP->op_pmreplrootu.op_pmreplroot)
-		deprecate_old("implicit split to @_");
+		Perl_croak(aTHX_ "implicit split to @_ is not allowed");
 	}
 	/* FALL THROUGH */
     case OP_MATCH:
@@ -7357,11 +7357,11 @@ Perl_ck_subr(pTHX_ OP *o)
 			bad_type(arg, "array", gv_ename(namegv), o3);
 		    break;
 		case '%':
-/* 		    if (o3->op_type == OP_RV2HV || */
-/* 			o3->op_type == OP_PADHV) */
-/* 			 goto wrapref; */
-/* 		    if (!contextclass) */
-/* 			 bad_type(arg, "hash", gv_ename(namegv), o3); */
+		    if (o3->op_type == OP_RV2HV ||
+			o3->op_type == OP_PADHV)
+			 goto wrapref;
+		    if (!contextclass)
+			 bad_type(arg, "hash", gv_ename(namegv), o3);
 		    break;
 		wrapref:
 		    {
