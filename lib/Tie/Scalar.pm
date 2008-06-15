@@ -83,7 +83,7 @@ use warnings::register;
 
 sub new {
     my $pkg = shift;
-    $pkg->TIESCALAR(@_);
+    $pkg->TIESCALAR(< @_);
 }
 
 # "Grandfather" the new, a la Tie::Hash
@@ -92,7 +92,7 @@ sub TIESCALAR {
     my $pkg = shift;
 	if ($pkg->can('new') and $pkg ne __PACKAGE__) {
 	warnings::warnif("WARNING: calling {$pkg}->new since {$pkg}->TIESCALAR is missing");
-	$pkg->new(@_);
+	$pkg->new(< @_);
     }
     else {
 	die "$pkg doesn't define a TIESCALAR method";
@@ -115,7 +115,7 @@ sub STORE {
 # tweak a small bit.
 #
 package Tie::StdScalar;
-our @ISA = qw(Tie::Scalar);
+our @ISA = @( qw(Tie::Scalar) );
 
 sub TIESCALAR {
     my $class = shift;

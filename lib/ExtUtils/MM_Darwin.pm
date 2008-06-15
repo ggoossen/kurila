@@ -4,7 +4,7 @@ use strict;
 
 BEGIN {
     require ExtUtils::MM_Unix;
-    our @ISA = qw( ExtUtils::MM_Unix );
+    our @ISA = @( qw( ExtUtils::MM_Unix ) );
 }
 
 
@@ -39,7 +39,7 @@ sub init_dist {
     $self->{TAR} ||= 
         'COPY_EXTENDED_ATTRIBUTES_DISABLE=1 COPYFILE_DISABLE=1 tar';
     
-    $self->SUPER::init_dist(@_);
+    $self->SUPER::init_dist(< @_);
 }
 
 1;

@@ -55,8 +55,8 @@ my $Perl = which_perl();
 
 {
     ok( open(my $f, '<', 'afile'),      "open(my \$f, '<', 'afile')" );
-    my @rows = ~< $f;
-    is( scalar @rows, 2,                '       readline, list context' );
+    my @rows = @( ~< $f );
+    is( scalar nelems @rows, 2,                '       readline, list context' );
     is( @rows[0], "a row\n",            '       first line read' );
     is( @rows[1], "a row\n",            '       second line' );
     ok( close($f),                      '       close' );
@@ -66,8 +66,8 @@ my $Perl = which_perl();
     ok( -s 'afile' +< 20,                '-s' );
 
     ok( open(my $f, '+<', 'afile'),     'open +<' );
-    my @rows = ~< $f;
-    is( scalar @rows, 2,                '       readline, list context' );
+    my @rows = @( ~< $f );
+    is( scalar nelems @rows, 2,                '       readline, list context' );
     ok( seek($f, 0, 1),                 '       seek cur' );
     ok( (print $f "yet another row\n"), '       print' );
     ok( close($f),                      '       close' );
@@ -83,8 +83,8 @@ SKIP: {
     $Perl -e "print qq(a row\\n); print qq(another row\\n)"
 EOC
 
-    my @rows = ~< $f;
-    is( scalar @rows, 2,                '       readline, list context' );
+    my @rows = @( ~< $f );
+    is( scalar nelems @rows, 2,                '       readline, list context' );
     ok( close($f),                      '       close' );
 }
 
@@ -95,7 +95,7 @@ SKIP: {
     $Perl -pe "s/^not //"
 EOC
 
-    my @rows = ~< $f;
+    my @rows = @( ~< $f );
     my $test = curr_test;
     print $f "not ok $test - piped in\n";
     next_test;
@@ -152,8 +152,8 @@ like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 
 {
     ok( open(local $f, '<', 'afile'),   'open local $f, "<", ...' );
-    my @rows = ~< $f;
-    is( scalar @rows, 2,                '       readline list context' );
+    my @rows = @( ~< $f );
+    is( scalar nelems @rows, 2,                '       readline list context' );
     ok( close($f),                      '       close' );
 }
 
@@ -161,8 +161,8 @@ ok( -s 'afile' +< 20,                '       -s' );
 
 {
     ok( open(local $f, '+<', 'afile'),  'open local $f, "+<", ...' );
-    my @rows = ~< $f;
-    is( scalar @rows, 2,                '       readline list context' );
+    my @rows = @( ~< $f );
+    is( scalar nelems @rows, 2,                '       readline list context' );
     ok( seek($f, 0, 1),                 '       seek cur' );
     ok( (print $f "yet another row\n"), '       print' );
     ok( close($f),                      '       close' );
@@ -177,9 +177,9 @@ SKIP: {
     ok( open(local $f, '-|', <<EOC),  'open local $f, "-|", ...' );
     $Perl -e "print qq(a row\\n); print qq(another row\\n)"
 EOC
-    my @rows = ~< $f;
+    my @rows = @( ~< $f );
 
-    is( scalar @rows, 2,                '       readline list context' );
+    is( scalar nelems @rows, 2,                '       readline list context' );
     ok( close($f),                      '       close' );
 }
 
@@ -190,7 +190,7 @@ SKIP: {
     $Perl -pe "s/^not //"
 EOC
 
-    my @rows = ~< $f;
+    my @rows = @( ~< $f );
     my $test = curr_test;
     print $f "not ok $test - piping\n";
     next_test;

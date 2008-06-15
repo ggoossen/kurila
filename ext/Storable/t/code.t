@@ -32,7 +32,7 @@ $blessed_code = bless sub { "blessed" }, "Some::Package";
 local *FOO;
 
 @obj =
-    (\@(\&code,                   # code reference
+    @(\@(\&code,                   # code reference
       sub { 6*7 },
       $blessed_code,            # blessed code reference
       \&Another::Package::foo,  # code in another package
@@ -271,14 +271,14 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     for my $sub ($short_sub, $long_sub) {
 	my $res;
 
-	$res = thaw freeze \@($sub, $sub);
+	$res = thaw < freeze \@($sub, $sub);
 	ok(int($res->[0]), int($res->[1]));
 
-	$res = thaw freeze \@($sclr, $sub, $sub, $sclr);
+	$res = thaw < freeze \@($sclr, $sub, $sub, $sclr);
 	ok(int($res->[0]), int($res->[3]));
 	ok(int($res->[1]), int($res->[2]));
 
-	$res = thaw freeze \@($sub, $sub, $sclr, $sclr);
+	$res = thaw < freeze \@($sub, $sub, $sclr, $sclr);
 	ok(int($res->[0]), int($res->[1]));
 	ok(int($res->[2]), int($res->[3]));
     }

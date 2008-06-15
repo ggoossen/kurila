@@ -76,11 +76,11 @@ exit;
 our $COP;
 
 sub find_op_cop {
-    my ( $sub, $op ) = @_;
+    my ( $sub, $op ) = < @_;
     my $cv = svref_2object($sub);
     local $COP;
 
-    if ( not _find_op_cop( $cv->ROOT, $op ) ) {
+    if ( not _find_op_cop( < $cv->ROOT, $op ) ) {
         $COP = undef;
     }
 
@@ -95,7 +95,7 @@ sub find_op_cop {
 }
 
 sub _find_op_cop {
-    my ( $op, $name ) = @_;
+    my ( $op, $name ) = < @_;
 
     # Fail on B::NULL or whatever.
     return 0 if not $op;
@@ -116,9 +116,9 @@ sub _find_op_cop {
 
     # Recurse depth first passing success up if it happens.
     if ( $op->can('first') ) {
-        return 1 if _find_op_cop( $op->first, $name );
+        return 1 if _find_op_cop( < $op->first, $name );
     }
-    return 1 if _find_op_cop( $op->sibling, $name );
+    return 1 if _find_op_cop( < $op->sibling, $name );
 
     # Oh well. Hopefully our caller knows where to try next.
     return 0;

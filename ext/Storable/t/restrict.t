@@ -9,7 +9,7 @@
 sub BEGIN {
     chdir('t') if -d 't';
     if (%ENV{PERL_CORE}){
-	@INC = ('.', '../lib', '../ext/Storable/t');
+	@INC = @('.', '../lib', '../ext/Storable/t');
         require Config;
         if (%Config::Config{'extensions'} !~ m/\bStorable\b/) {
             print "1..0 # Skip: Storable was not built\n";
@@ -35,7 +35,7 @@ use Hash::Util qw(lock_hash unlock_value);
 
 print "1..100\n";
 
-my %hash = (question => '?', answer => 42, extra => 'junk', undef => undef);
+my %hash = %(question => '?', answer => 42, extra => 'junk', undef => undef);
 lock_hash %hash;
 unlock_value %hash, 'answer';
 unlock_value %hash, 'extra';
@@ -46,7 +46,7 @@ my $test;
 package Restrict_Test;
 
 sub me_second {
-  return (undef, @_[0]);
+  return  @(undef, @_[0]);
 }
 
 package main;
@@ -61,19 +61,19 @@ sub testit {
   my $cloner = shift;
   my $copy = &$cloner($hash);
 
-  my @in_keys = sort keys %$hash;
-  my @out_keys = sort keys %$copy;
-  unless (ok ++$test, "@in_keys" eq "@out_keys") {
+  my @in_keys = @( sort keys %$hash );
+  my @out_keys = @( sort keys %$copy );
+  unless (ok ++$test, "{join ' ', <@in_keys}" eq "{join ' ', <@out_keys}") {
     print "# Failed: keys mis-match after deep clone.\n";
-    print "# Original keys: @in_keys\n";
-    print "# Copy's keys: @out_keys\n";
+    print "# Original keys: {join ' ', <@in_keys}\n";
+    print "# Copy's keys: {join ' ', <@out_keys}\n";
   }
 
   # $copy = $hash;	# used in initial debug of the tests
 
-  ok ++$test, Internals::SvREADONLY(%$copy), "cloned hash restricted?";
+  ok ++$test, < Internals::SvREADONLY(%$copy), "cloned hash restricted?";
 
-  ok ++$test, Internals::SvREADONLY($copy->{question}),
+  ok ++$test, < Internals::SvREADONLY($copy->{question}),
     "key 'question' not locked in copy?";
 
   ok ++$test, !Internals::SvREADONLY($copy->{answer}),

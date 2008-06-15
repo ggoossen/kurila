@@ -16,11 +16,11 @@ print "# Make sure we can assign to ENV entries\n",
 delete %ENV{'MYORP'};
 delete %ENV{'SWUZ'};
 
-sub j { "[" . join(' ', map "\"$_\"", @_) . "]" ;}
+sub j { "[" . join(' ', map "\"$_\"", < @_) . "]" ;}
 
 sub show {
   print "#  (Seeing \{", join(' ',
-    map(qq{<$_>}, @_)), "\} at line ", (caller)[[2]], ")\n";
+    map(qq{<$_>}, < @_)), "\} at line ", (caller)[[2]], ")\n";
   printenv();
   return @_[0] || '';
 }
@@ -42,7 +42,7 @@ print "# Test LANGUAGE...\n";
 %ENV{'LC_MESSAGES'}    = '';
 %ENV{'LANG'}           = '';
 ok show( scalar I18N::LangTags::Detect::detect()),    "eu-mt";
-ok show( j      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print "# Test LC_ALL...\n";
@@ -53,7 +53,7 @@ print "# Test LC_ALL...\n";
 %ENV{'LANG'}           = '';
 
 ok show( scalar I18N::LangTags::Detect::detect()),    "eu-mt";
-ok show( j      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 print "# Test LC_MESSAGES...\n";
 %ENV{'REQUEST_METHOD'} = '';
@@ -63,7 +63,7 @@ print "# Test LC_MESSAGES...\n";
 %ENV{'LANG'}           = '';
 
 ok show( scalar I18N::LangTags::Detect::detect()),    "eu-mt";
-ok show( j      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print "# Test LANG...\n";
@@ -74,7 +74,7 @@ print "# Test LANG...\n";
 %ENV{'LANG'}           = 'Eu_MT';
 
 ok show( scalar I18N::LangTags::Detect::detect()),    "eu-mt";
-ok show( j      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 
@@ -86,7 +86,7 @@ print "# Test LANG...\n";
 %ENV{'LANG'}     = 'Eu_MT';
 
 ok show( scalar I18N::LangTags::Detect::detect()),    "eu-mt";
-ok show( j      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 
@@ -95,16 +95,16 @@ print "# Test HTTP_ACCEPT_LANGUAGE...\n";
 %ENV{'REQUEST_METHOD'}       = 'GET';
 %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'eu-MT';
 ok show( scalar I18N::LangTags::Detect::detect()),    "eu-mt";
-ok show( j      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eu-MT, i-klung';
 ok show( scalar I18N::LangTags::Detect::detect()), "x-plorp";
-ok show( j      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
 
 %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eU-Mt, i-klung';
 ok show( scalar I18N::LangTags::Detect::detect()), "x-plorp";
-ok show( j      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
+ok show( < j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
 
 
 

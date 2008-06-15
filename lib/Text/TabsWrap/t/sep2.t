@@ -2,7 +2,7 @@
 
 use strict;
 
-my @tests = (split(m/\nEND\n/s, <<DONE));
+my @tests = @(split(m/\nEND\n/s, <<DONE));
 TEST1
 This 
 is
@@ -102,7 +102,7 @@ DONE
 
 $| = 1;
 
-print "1..", 1 +@tests, "\n";
+print "1..", 1 +nelems @tests, "\n";
 
 use Text::Wrap;
 $Text::Wrap::separator2 = '=';
@@ -112,8 +112,8 @@ my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
 my $tn = 1;
 
-my @st = @tests;
-while (@st) {
+my @st = @( < @tests );
+while ((nelems @st)) {
 	my $in = shift(@st);
 	my $out = shift(@st);
 
@@ -146,17 +146,17 @@ while (@st) {
 
 }
 
-@st = @tests;
-while(@st) {
+@st = @( < @tests );
+while((nelems @st)) {
 	my $in = shift(@st);
 	my $out = shift(@st);
 
 	$in =~ s/^TEST(\d+)?\n//;
 
-	my @in = split("\n", $in, -1);
-	@in = ((map { "$_\n" } @in[[0..(@in-1)-1]]), @in[-1]);
+	my @in = @( split("\n", $in, -1) );
+	@in = @((map { "$_\n" } @in[[0..((nelems @in)-1)-1]]), @in[-1]);
 	
-	my $back = wrap('   ', ' ', @in);
+	my $back = wrap('   ', ' ', < @in);
 
 	if ($back eq $out) {
 		print "ok $tn\n";

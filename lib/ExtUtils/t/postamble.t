@@ -5,7 +5,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -37,7 +37,7 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
 {
     my $warnings = '';
     local $^WARN_HOOK = sub {
-        $warnings = join '', @_;
+        $warnings = join '', < @_;
     };
 
     my $stdout = tie *STDOUT, 'TieOut' or die;
@@ -53,7 +53,7 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
 }
 
 sub MY::postamble {
-    my($self, %extra) = @_;
+    my($self, < %extra) = < @_;
 
     is_deeply( \%extra, \%( FOO => 1, BAR => 'fugawazads' ), 
                'postamble args passed' );

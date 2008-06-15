@@ -50,7 +50,7 @@ sub explain {
 #
 EOM
     }
-    print "1..0 # Skip: @_\n" if @_;
+    print "1..0 # Skip: {join ' ', <@_}\n" if (nelems @_);
 }
 
 $| = 1;
@@ -92,9 +92,9 @@ print BIG "big" or
 close(BIG) or
     do { warn "close big1 failed: $!\n"; bye };
 
-my @s1 = stat("big1");
+my @s1 = @( stat("big1") );
 
-print "# s1 = @s1\n";
+print "# s1 = {join ' ', <@s1}\n";
 
 open(BIG, ">", "big2") or
     do { warn "open big2 failed: $!\n"; bye };
@@ -107,9 +107,9 @@ print BIG "big" or
 close(BIG) or
     do { warn "close big2 failed; $!\n"; bye };
 
-my @s2 = stat("big2");
+my @s2 = @( stat("big2") );
 
-print "# s2 = @s2\n";
+print "# s2 = {join ' ', <@s2}\n";
 
 zap();
 
@@ -159,9 +159,9 @@ unless ($print && $close) {
     bye();
 }
 
-@s = stat("big");
+@s = @( stat("big") );
 
-print "# @s\n";
+print "# {join ' ', <@s}\n";
 
 unless (@s[7] == 5_000_000_003) {
     explain("kernel/fs not configured to use large files?");
@@ -174,7 +174,7 @@ sub fail () {
 }
 
 sub offset ($$) {
-    my ($offset_will_be, $offset_want) = @_;
+    my ($offset_will_be, $offset_want) = < @_;
     my $offset_is = eval $offset_will_be;
     unless ($offset_is == $offset_want) {
         print "# bad offset $offset_is, want $offset_want\n";

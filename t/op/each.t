@@ -40,11 +40,11 @@ our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total,
 %h{'y'} = 'Y';
 %h{'z'} = 'Z';
 
-@keys = keys %h;
-@values = values %h;
+@keys = @( keys %h );
+@values = @( values %h );
 
-is ((@keys-1), 29, "keys");
-is ((@values-1), 29, "values");
+is (((nelems @keys)-1), 29, "keys");
+is (((nelems @values)-1), 29, "values");
 
 $i = 0;		# stop -w complaints
 
@@ -58,8 +58,8 @@ while (($key,$value) = each(%h)) {
 
 is ($i, 30, "each count");
 
-@keys = ('blurfl', keys(%h), 'dyick');
-is ((@keys-1), 31, "added a key");
+@keys = @('blurfl', keys(%h), 'dyick');
+is (((nelems @keys)-1), 31, "added a key");
 
 $size = ((split('/',scalar %h))[[1]]);
 keys %h = $size * 5;
@@ -68,32 +68,32 @@ is ($newsize, $size * 8, "resize");
 keys %h = 1;
 $size = ((split('/',scalar %h))[[1]]);
 is ($size, $newsize, "same size");
-%h = (1,1);
+%h = %(1,1);
 $size = ((split('/',scalar %h))[[1]]);
 is ($size, $newsize, "still same size");
 undef %h;
-%h = (1,1);
+%h = %(1,1);
 $size = ((split('/',scalar %h))[[1]]);
 is ($size, 8, "size 8");
 
 # test scalar each
-%hash = 1..20;
+%hash = %( 1..20 );
 $total = 0;
 $total += $key while $key = each %hash;
 is ($total, 100, "test scalar each");
 
-for (1..3) { @foo = each %hash }
+for (1..3) { @foo = @( each %hash ) }
 keys %hash;
 $total = 0;
 $total += $key while $key = each %hash;
 is ($total, 100, "test scalar keys resets iterator");
 
-for (1..3) { @foo = each %hash }
+for (1..3) { @foo = @( each %hash ) }
 $total = 0;
 $total += $key while $key = each %hash;
 isnt ($total, 100, "test iterator of each is being maintained");
 
-for (1..3) { @foo = each %hash }
+for (1..3) { @foo = @( each %hash ) }
 values %hash;
 $total = 0;
 $total += $key while $key = each %hash;
@@ -108,9 +108,9 @@ isnt ($size, (split('/', scalar %hash))[[1]]);
 is (keys(%hash), 10, "keys (\%hash)");
 
 $i = 0;
-%h = (a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');
-@keys = keys(%h);
-@values = values(%h);
+%h = %(a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');
+@keys = @( keys(%h) );
+@values = @( values(%h) );
 while (($key, $value) = each(%h)) {
 	if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 		$i++;
@@ -118,7 +118,7 @@ while (($key, $value) = each(%h)) {
 }
 is ($i, 5);
 
-our @tests = (&next_test, &next_test, &next_test);
+our @tests = @( <&next_test, < &next_test, < &next_test);
 {
     package Obj;
     sub DESTROY { print "ok @::tests[1] # DESTROY called\n"; }
@@ -133,7 +133,7 @@ our @tests = (&next_test, &next_test, &next_test);
 
 # Check for Unicode hash keys.
 use utf8;
-%u = ("\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo");
+%u = %("\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo");
 %u{"\x{12345}"}  = "bar";
 %u{["\x{10FFFD}"]} = "zap";
 
@@ -145,8 +145,8 @@ foreach (keys %u) {
 ok (eq_hash(\%u, \%u2), "copied unicode hash keys correctly?");
 
 $a = "\x[e3]\x[81]\x[82]"; $A = "\x{3042}";
-%b = ( $a => "non-utf8");
-%u = ( $A => "utf8");
+%b = %( $a => "non-utf8");
+%u = %( $A => "utf8");
 
 is (exists %b{$A}, '1', "hash uses byte-string");
 is (exists %u{$a}, '1', "hash uses byte-string");

@@ -11,20 +11,20 @@ sub unidump {
 }
 
 sub casetest {
-    my ($base, $spec, @funcs) = @_;
+    my ($base, $spec, < @funcs) = < @_;
     # For each provided function run it, and run a version with some extra
     # characters afterwards. Use a recycling symbol, as it doesn't change case.
     my $ballast = chr (0x2672) x 3;
-    @funcs = map {my $f = $_;
+    @funcs = @( map {my $f = $_;
 		  ($f,
 		   sub {my $r = $f->(@_[0] . $ballast); # Add it before
 			$r =~ s/$ballast\z//so # Remove it afterwards
 			    or die "'@_[0]' to '$r' mangled";
 			$r; # Result with $ballast removed.
 		    },
-		   )} @funcs;
+		   )} < @funcs );
 
-    my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
+    my $file = 'File::Spec'->catfile( <'File::Spec'->catdir( <'File::Spec'->updir,
 						      "lib", "unicore", "To"),
 				   "$base.pl");
     my $simple = do $file or die $@;
@@ -63,7 +63,7 @@ sub casetest {
     my $tests = 
 	((scalar keys %simple) +
 	 (scalar keys %$spec) +
-	 (scalar keys %none)) * @funcs;
+	 (scalar keys %none)) * nelems @funcs;
     print "1..$tests\n";
 
     my $test = 1;
@@ -71,7 +71,7 @@ sub casetest {
     for my $i (sort keys %simple) {
 	my $w = %simple{$i};
 	my $c = pack "U0U", hex $i;
-	foreach my $func (@funcs) {
+	foreach my $func (< @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
 	    print $d eq pack("U0U", hex %simple{$i}) ?
@@ -84,7 +84,7 @@ sub casetest {
 	my $w = unidump($spec->{$i});
         #my $c = substr $i, 0, 1;
 	my $h = unidump($i);
-	foreach my $func (@funcs) {
+	foreach my $func (< @funcs) {
 	    my $d = $func->($i);
 	    my $e = unidump($d);
 	    if (bytes::ord "A" == 193) { # EBCDIC
@@ -144,7 +144,7 @@ sub casetest {
     for my $i (sort { $a <+> $b } keys %none) {
 	my $w = $i = sprintf "\%04X", $i;
 	my $c = pack "U0U", hex $i;
-	foreach my $func (@funcs) {
+	foreach my $func (< @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
 	    print $d eq $c ?

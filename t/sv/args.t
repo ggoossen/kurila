@@ -42,7 +42,7 @@ sub new4 { goto &new2 }
 
 sub methimpl {
     my $refarg = \@_;
-    die( "got: @_\n" );
+    die( "got: {join ' ', <@_}\n" );
 }
 
 sub method {
@@ -73,13 +73,13 @@ pass();
 
 $|=1;
 
-sub foo { local(@_) = ('p', 'q', 'r'); }
-sub bar { unshift @_, 'D'; @_ }
+sub foo { local(< @_) = ('p', 'q', 'r'); }
+sub bar { unshift @_, 'D'; < @_ }
 sub baz { push @_, 'E'; return @_ }
 for (1..3) { 
-    is(join('',foo('a', 'b', 'c')),'pqr');
-    is(join('',bar('d')),'Dd');
-    is(join('',baz('e')),'eE');
+    is(join('', <foo('a', 'b', 'c')),'pqr');
+    is(join('', <bar('d')),'Dd');
+    is(join('', <baz('e')),'eE');
 } 
 
 # [perl #28032] delete $_[0] was freeing things too early

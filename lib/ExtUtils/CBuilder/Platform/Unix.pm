@@ -5,14 +5,14 @@ use ExtUtils::CBuilder::Base;
 
 use vars qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = qw(ExtUtils::CBuilder::Base);
+@ISA = @( qw(ExtUtils::CBuilder::Base) );
 
 sub link_executable {
   my $self = shift;
   # $Config{cc} is usually a better bet for linking executables than $Config{ld}
   local $self->{config}->{ld} =
     $self->{config}->{cc} . " " . $self->{config}->{ldflags};
-  return $self->SUPER::link_executable(@_);
+  return $self->SUPER::link_executable(< @_);
 }
 
 sub link {
@@ -31,7 +31,7 @@ sub link {
     $cf->{ld} =~ s/^(\s*\w+=)/env $1/;
   }
   
-  return $self->SUPER::link(@_);
+  return $self->SUPER::link(< @_);
 }
 
 1;

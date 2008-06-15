@@ -180,8 +180,8 @@ use warnings::register;
 
 require Exporter;
 use XSLoader ();
-@ISA = qw(Exporter);
-@EXPORT = qw(
+@ISA = @( qw(Exporter) );
+@EXPORT = @( qw(
 	inet_aton inet_ntoa
 	sockaddr_family
 	pack_sockaddr_in unpack_sockaddr_in
@@ -340,9 +340,9 @@ use XSLoader ();
 	SO_XOPEN
 	SO_XSE
 	UIO_MAXIOV
-);
+) );
 
-@EXPORT_OK = qw(CR LF CRLF $CR $LF $CRLF
+@EXPORT_OK = @( qw(CR LF CRLF $CR $LF $CRLF
 
 	       IPPROTO_IP
 	       IPPROTO_IPV6
@@ -355,11 +355,11 @@ use XSLoader ();
 	       TCP_MAXRT
 	       TCP_MAXSEG
 	       TCP_NODELAY
-	       TCP_STDURG);
+	       TCP_STDURG) );
 
-%EXPORT_TAGS = (
+%EXPORT_TAGS = %(
     crlf    => \@(qw(CR LF CRLF $CR $LF $CRLF)),
-    all     => \@(@EXPORT, @EXPORT_OK),
+    all     => \@(< @EXPORT, < @EXPORT_OK),
 );
 
 BEGIN {
@@ -368,32 +368,32 @@ BEGIN {
     sub CRLF () {"\015\012"}
 }
 
-*CR   = \CR();
-*LF   = \LF();
-*CRLF = \CRLF();
+*CR   = \ <CR();
+*LF   = \ <LF();
+*CRLF = \ <CRLF();
 
 sub sockaddr_in {
-    if (@_ == 6 && !wantarray) { # perl5.001m compat; use this && die
-	my($af, $port, @quad) = @_;
+    if ((nelems @_) == 6 && !wantarray) { # perl5.001m compat; use this && die
+	my($af, $port, < @quad) = < @_;
 	warnings::warn "6-ARG sockaddr_in call is deprecated" 
 	    if warnings::enabled();
-	pack_sockaddr_in($port, inet_aton(join('.', @quad)));
+	pack_sockaddr_in($port, < inet_aton(join('.', < @quad)));
     } elsif (wantarray) {
-	croak "usage:   (port,iaddr) = sockaddr_in(sin_sv)" unless @_ == 1;
-        unpack_sockaddr_in(@_);
+	croak "usage:   (port,iaddr) = sockaddr_in(sin_sv)" unless (nelems @_) == 1;
+        unpack_sockaddr_in(< @_);
     } else {
-	croak "usage:   sin_sv = sockaddr_in(port,iaddr))" unless @_ == 2;
-        pack_sockaddr_in(@_);
+	croak "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
+        pack_sockaddr_in(< @_);
     }
 }
 
 sub sockaddr_un {
     if (wantarray) {
-	croak "usage:   (filename) = sockaddr_un(sun_sv)" unless @_ == 1;
-        unpack_sockaddr_un(@_);
+	croak "usage:   (filename) = sockaddr_un(sun_sv)" unless (nelems @_) == 1;
+        unpack_sockaddr_un(< @_);
     } else {
-	croak "usage:   sun_sv = sockaddr_un(filename)" unless @_ == 1;
-        pack_sockaddr_un(@_);
+	croak "usage:   sun_sv = sockaddr_un(filename)" unless (nelems @_) == 1;
+        pack_sockaddr_un(< @_);
     }
 }
 

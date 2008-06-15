@@ -56,12 +56,12 @@ use Test::More tests => 13;
 
 ### Test importing functions ###
 {   my $mod     = 'TestModule';
-    my @funcs   = qw[func1 func2];
+    my @funcs   = @( qw[func1 func2] );
     
-    try { load $mod, @funcs };
+    try { load $mod, < @funcs };
     is( $@, '', qq[Loaded exporter module '$mod'] );
     
-    for my $func (@funcs) {
+    for my $func (< @funcs) {
         ok( $mod->can($func),           "$mod -> can( $func )" );
         ok( __PACKAGE__->can($func),    "we -> can ( $func )"  ); 
     }        

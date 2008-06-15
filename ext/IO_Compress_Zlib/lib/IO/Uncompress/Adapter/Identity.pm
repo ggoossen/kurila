@@ -20,9 +20,9 @@ sub mkUncompObject
     bless \%( 'CompSize'   => 0,
             'UnCompSize' => 0,
             'wantCRC32'  => $crc32,
-            'CRC32'      => Compress::Raw::Zlib::crc32(''),
+            'CRC32'      => < Compress::Raw::Zlib::crc32(''),
             'wantADLER32'=> $adler32,
-            'ADLER32'    => Compress::Raw::Zlib::adler32(''),
+            'ADLER32'    => < Compress::Raw::Zlib::adler32(''),
           ) ;
 }
 

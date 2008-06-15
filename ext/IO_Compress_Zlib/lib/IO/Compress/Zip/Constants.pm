@@ -9,9 +9,9 @@ our ($VERSION, @ISA, @EXPORT, %ZIP_CM_MIN_VERSIONS);
 
 $VERSION = '2.006';
 
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 
-@EXPORT= qw(
+@EXPORT= @( qw(
 
     ZIP_CM_STORE
     ZIP_CM_DEFLATE
@@ -44,7 +44,7 @@ $VERSION = '2.006';
     %ZIP_CM_MIN_VERSIONS
     ZIP64_MIN_VERSION
 
-    );
+    ) );
 
 # Compression types supported
 use constant ZIP_CM_STORE                      => 0 ;
@@ -81,10 +81,10 @@ use constant ZIP_EXTRA_ID_INFO_ZIP_UNIX2       => "Ux";
 
 use constant ZIP64_MIN_VERSION                 => 45;
 
-%ZIP_CM_MIN_VERSIONS = (
-            ZIP_CM_STORE()                      => 20,
-            ZIP_CM_DEFLATE()                    => 20,
-            ZIP_CM_BZIP2()                      => 46,
+%ZIP_CM_MIN_VERSIONS = %( <
+            ZIP_CM_STORE()                      => 20, <
+            ZIP_CM_DEFLATE()                    => 20, <
+            ZIP_CM_BZIP2()                      => 46, <
             ZIP_CM_LZMA()                       => 63,
             );
 

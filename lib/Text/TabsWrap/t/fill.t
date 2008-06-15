@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w -I.
 
 use strict;
-our @tests = (split(m/\nEND\n/s, <<DONE));
+our @tests = @(split(m/\nEND\n/s, <<DONE));
 TEST1
 Cyberdog Information
 
@@ -50,7 +50,7 @@ DONE
 
 $| = 1;
 
-my $numtests = scalar(@tests) / 2;
+my $numtests = scalar(nelems @tests) / 2;
 print "1..$numtests\n";
 
 use Text::Wrap;
@@ -60,7 +60,7 @@ use strict;
 my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
 my $tn = 1;
-while (@tests) {
+while ((nelems @tests)) {
 	my $in = shift(@tests);
 	my $out = shift(@tests);
 
@@ -96,12 +96,12 @@ while (@tests) {
 
 sub write_file
 {
-	my ($f, @data) = @_;
+	my ($f, < @data) = < @_;
 
 	local(*F);
 
 	open(F, ">", "$f") || die "open >$f: $!";
-	(print F @data) || die "write $f: $!";
+	(print F < @data) || die "write $f: $!";
 	close(F) || die "close $f: $!";
 	return 1;
 }

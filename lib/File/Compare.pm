@@ -7,9 +7,9 @@ our($VERSION, @ISA, @EXPORT, @EXPORT_OK, $Too_Big);
 require Exporter;
 
 $VERSION = '1.1005';
-@ISA = qw(Exporter);
-@EXPORT = qw(compare);
-@EXPORT_OK = qw(cmp compare_text);
+@ISA = @( qw(Exporter) );
+@EXPORT = @( qw(compare) );
+@EXPORT_OK = @( qw(cmp compare_text) );
 
 $Too_Big = 1024 * 1024 * 2;
 
@@ -20,9 +20,9 @@ sub croak {
 
 sub compare {
     croak("Usage: compare( file1, file2 [, buffersize]) ")
-      unless(@_ == 2 || @_ == 3);
+      unless((nelems @_) == 2 || (nelems @_) == 3);
 
-    my ($from,$to,$size) = @_;
+    my ($from,$to,$size) = < @_;
     my $text_mode = defined($size) && (ref($size) eq 'CODE' || $size +< 0);
 
     my ($fromsize,$closefrom,$closeto);
@@ -119,11 +119,11 @@ sub cmp;
 *cmp = \&compare;
 
 sub compare_text {
-    my ($from,$to,$cmp) = @_;
+    my ($from,$to,$cmp) = < @_;
     croak("Usage: compare_text( file1, file2 [, cmp-function])")
-	unless @_ == 2 || @_ == 3;
+	unless (nelems @_) == 2 || (nelems @_) == 3;
     croak("Third arg to compare_text() function must be a code reference")
-	if @_ == 3 && ref($cmp) ne 'CODE';
+	if (nelems @_) == 3 && ref($cmp) ne 'CODE';
 
     # Using a negative buffer size puts compare into text_mode too
     $cmp = -1 unless defined $cmp;

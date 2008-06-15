@@ -1,6 +1,6 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-	@INC = '../lib';
+	@INC = @( '../lib' );
 	chdir 't';
     }
 }
@@ -11,7 +11,7 @@ use bytes;
 
 sub ok
 {
-    my ($no, $ok) = @_ ;
+    my ($no, $ok) = < @_ ;
 
     #++ $total ;
     #++ $totalBad unless $ok ;
@@ -32,12 +32,12 @@ foreach (1 .. 5000)
 }
 
 ok(1, my $file = IO::Zlib->new($name, "wb"));
-ok(2, $file->print($contents));
-ok(3, $file->close());
+ok(2, < $file->print($contents));
+ok(3, < $file->close());
 
 ok(4, $file = IO::Zlib->new($name, "rb"));
 ok(5, $file->read(my $uncomp, 8192) == length($contents));
-ok(6, $file->close());
+ok(6, < $file->close());
 
 unlink($name);
 

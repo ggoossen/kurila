@@ -60,8 +60,8 @@ See the individual methods/properties for details.
 sub new {
     my $this = shift;
     my $class = ref($this) || $this;
-    my %params = @_;
-    my $self = \%(%params);
+    my %params = %( < @_ );
+    my $self = \%(< %params);
     bless $self, $class;
     $self->initialize();
     return $self;
@@ -86,7 +86,7 @@ method or by calling the B<file()> method with a scalar argument.
 
 # The POD file name the list appears in
 sub file {
-   return (@_ +> 1) ? (@_[0]->{-file} = @_[1]) : @_[0]->{-file};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-file} = @_[1]) : @_[0]->{-file};
 }
 
 =item $list-E<gt>start()
@@ -100,7 +100,7 @@ argument.
 
 # The line in the file the node appears
 sub start {
-   return (@_ +> 1) ? (@_[0]->{-start} = @_[1]) : @_[0]->{-start};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-start} = @_[1]) : @_[0]->{-start};
 }
 
 =item $list-E<gt>indent()
@@ -114,7 +114,7 @@ with a scalar argument.
 
 # indent level
 sub indent {
-   return (@_ +> 1) ? (@_[0]->{-indent} = @_[1]) : @_[0]->{-indent};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-indent} = @_[1]) : @_[0]->{-indent};
 }
 
 =item $list-E<gt>type()
@@ -129,7 +129,7 @@ with a scalar argument.
 
 # The type of the list (UL, OL, ...)
 sub type {
-   return (@_ +> 1) ? (@_[0]->{-type} = @_[1]) : @_[0]->{-type};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-type} = @_[1]) : @_[0]->{-type};
 }
 
 =item $list-E<gt>rx()
@@ -146,7 +146,7 @@ with a scalar argument.
 
 # The regular expression to simplify the items
 sub rx {
-   return (@_ +> 1) ? (@_[0]->{-rx} = @_[1]) : @_[0]->{-rx};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-rx} = @_[1]) : @_[0]->{-rx};
 }
 
 =item $list-E<gt>item()
@@ -159,7 +159,7 @@ If an argument has been given, it is pushed on the list of items.
 
 # The individual =items of this list
 sub item {
-    my ($self,$item) = @_;
+    my ($self,$item) = < @_;
     if(defined $item) {
         push(@{$self->{_items}}, $item);
         return $item;
@@ -182,7 +182,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # lists's parent object
 sub parent {
-   return (@_ +> 1) ? (@_[0]->{-parent} = @_[1]) : @_[0]->{-parent};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-parent} = @_[1]) : @_[0]->{-parent};
 }
 
 =item $list-E<gt>tag()
@@ -200,7 +200,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # list's object
 sub tag {
-   return (@_ +> 1) ? (@_[0]->{-tag} = @_[1]) : @_[0]->{-tag};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-tag} = @_[1]) : @_[0]->{-tag};
 }
 
 #-----------------------------------------------------------------------------
@@ -242,7 +242,7 @@ sub new {
     if(defined @_[0]) {
         if(ref(@_[0])) {
             # called with a list of parameters
-            %$self = %{@_[0]};
+            %$self = %( < %{@_[0]} );
             $self->_construct_text();
         }
         else {
@@ -455,7 +455,7 @@ have to be implemented in the translator.
 
 #' retrieve/set markuped text
 sub markup {
-    return (@_ +> 1) ? (@_[0]->{_markup} = @_[1]) : @_[0]->{_markup};
+    return ((nelems @_) +> 1) ?  @(@_[0]->{_markup} = @_[1]) : @_[0]->{_markup};
 }
 
 =item $link-E<gt>text()
@@ -487,8 +487,8 @@ parsing process.
 # Set/retrieve warnings
 sub warning {
     my $self = shift;
-    if(@_) {
-        push(@{$self->{_warnings}}, @_);
+    if((nelems @_)) {
+        push(@{$self->{_warnings}}, < @_);
         return @_;
     }
     return @{$self->{_warnings}};
@@ -505,12 +505,12 @@ the link was encountered in. Has to be filled in manually.
 
 # The line in the file the link appears
 sub line {
-    return (@_ +> 1) ? (@_[0]->{-line} = @_[1]) : @_[0]->{-line};
+    return ((nelems @_) +> 1) ?  @(@_[0]->{-line} = @_[1]) : @_[0]->{-line};
 }
 
 # The POD file name the link appears in
 sub file {
-    return (@_ +> 1) ? (@_[0]->{-file} = @_[1]) : @_[0]->{-file};
+    return ((nelems @_) +> 1) ?  @(@_[0]->{-file} = @_[1]) : @_[0]->{-file};
 }
 
 =item $link-E<gt>page()
@@ -521,7 +521,7 @@ This method sets or returns the POD page this link points to.
 
 # The POD page the link appears on
 sub page {
-    if (@_ +> 1) {
+    if ((nelems @_) +> 1) {
         @_[0]->{-page} = @_[1];
         @_[0]->_construct_text();
     }
@@ -536,7 +536,7 @@ As above, but the destination node text of the link.
 
 # The link destination
 sub node {
-    if (@_ +> 1) {
+    if ((nelems @_) +> 1) {
         @_[0]->{-node} = @_[1];
         @_[0]->_construct_text();
     }
@@ -551,7 +551,7 @@ Sets or returns an alternative text specified in the link.
 
 # Potential alternative text
 sub alttext {
-    if (@_ +> 1) {
+    if ((nelems @_) +> 1) {
         @_[0]->{-alttext} = @_[1];
         @_[0]->_construct_text();
     }
@@ -567,7 +567,7 @@ there is also C<hyperlink>, derived from e.g. C<LE<lt>http://perl.comE<gt>>
 
 # The type: item or headn
 sub type {
-    return (@_ +> 1) ? (@_[0]->{-type} = @_[1]) : @_[0]->{-type};
+    return ((nelems @_) +> 1) ?  @(@_[0]->{-type} = @_[1]) : @_[0]->{-type};
 }
 
 =item $link-E<gt>link()
@@ -604,7 +604,7 @@ sub link {
 }
 
 sub _invalid_link {
-    my ($msg) = @_;
+    my ($msg) = < @_;
     # this sets @_
     #try { die "$msg\n" };
     #chomp $@;
@@ -651,9 +651,9 @@ list of all cache elements.
 =cut
 
 sub item {
-    my ($self,%param) = @_;
+    my ($self,< %param) = < @_;
     if(%param) {
-        my $item = Pod::Cache::Item->new(%param);
+        my $item = Pod::Cache::Item->new(< %param);
         push(@$self, $item);
         return $item;
     }
@@ -673,8 +673,8 @@ not found.
 =cut
 
 sub find_page {
-    my ($self,$page) = @_;
-    foreach(@$self) {
+    my ($self,$page) = < @_;
+    foreach(< @$self) {
         if($_->page() eq $page) {
             return $_;
         }
@@ -703,8 +703,8 @@ Create a new object.
 sub new {
     my $this = shift;
     my $class = ref($this) || $this;
-    my %params = @_;
-    my $self = \%(%params);
+    my %params = %( < @_ );
+    my $self = \%(< %params);
     bless $self, $class;
     $self->initialize();
     return $self;
@@ -723,7 +723,7 @@ Set/retrieve the POD document name (e.g. "Pod::Parser").
 
 # The POD page
 sub page {
-   return (@_ +> 1) ? (@_[0]->{-page} = @_[1]) : @_[0]->{-page};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-page} = @_[1]) : @_[0]->{-page};
 }
 
 =item $cacheitem-E<gt>description()
@@ -735,7 +735,7 @@ section.
 
 # The POD description, taken out of NAME if present
 sub description {
-   return (@_ +> 1) ? (@_[0]->{-description} = @_[1]) : @_[0]->{-description};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-description} = @_[1]) : @_[0]->{-description};
 }
 
 =item $cacheitem-E<gt>path()
@@ -746,7 +746,7 @@ Set/retrieve the POD file storage path.
 
 # The file path
 sub path {
-   return (@_ +> 1) ? (@_[0]->{-path} = @_[1]) : @_[0]->{-path};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-path} = @_[1]) : @_[0]->{-path};
 }
 
 =item $cacheitem-E<gt>file()
@@ -757,7 +757,7 @@ Set/retrieve the POD file name.
 
 # The POD file name
 sub file {
-   return (@_ +> 1) ? (@_[0]->{-file} = @_[1]) : @_[0]->{-file};
+   return ((nelems @_) +> 1) ?  @(@_[0]->{-file} = @_[1]) : @_[0]->{-file};
 }
 
 =item $cacheitem-E<gt>nodes()
@@ -773,9 +773,9 @@ unique id for the C<find_node> method to work correctly.
 
 # The POD nodes
 sub nodes {
-    my ($self,@nodes) = @_;
-    if(@nodes) {
-        push(@{$self->{-nodes}}, @nodes);
+    my ($self,< @nodes) = < @_;
+    if((nelems @nodes)) {
+        push(@{$self->{-nodes}}, < @nodes);
         return @nodes;
     }
     else {
@@ -792,11 +792,11 @@ stored in the node array) or undef if not found.
 =cut
 
 sub find_node {
-    my ($self,$node) = @_;
+    my ($self,$node) = < @_;
     my @search;
-    push(@search, @{$self->{-nodes}}) if($self->{-nodes});
-    push(@search, @{$self->{-idx}}) if($self->{-idx});
-    foreach(@search) {
+    push(@search, < @{$self->{-nodes}}) if($self->{-nodes});
+    push(@search, < @{$self->{-idx}}) if($self->{-idx});
+    foreach(< @search) {
         if($_->[0] eq $node) {
             return $_->[1]; # id
         }
@@ -819,9 +819,9 @@ unique id.
 
 # The POD index entries
 sub idx {
-    my ($self,@idx) = @_;
-    if(@idx) {
-        push(@{$self->{-idx}}, @idx);
+    my ($self,< @idx) = < @_;
+    if((nelems @idx)) {
+        push(@{$self->{-idx}}, < @idx);
         return @idx;
     }
     else {

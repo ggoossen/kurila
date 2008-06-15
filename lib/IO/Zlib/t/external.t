@@ -1,6 +1,6 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-	@INC = '../lib';
+	@INC = @( '../lib' );
 	chdir 't';
     }
 }
@@ -22,7 +22,7 @@ unless( -x $gzip &&
 
 sub ok
 {
-    my ($no, $ok) = @_ ;
+    my ($no, $ok) = < @_ ;
     print "ok $no\n" if $ok ;
     print "not ok $no\n" unless $ok ;
 }
@@ -51,7 +51,7 @@ eval "use IO::Zlib";
 ok(3, !$@);
 
 ok(4,
-   $hasCompressZlib || IO::Zlib::gzip_used());
+   $hasCompressZlib || < IO::Zlib::gzip_used());
 
 ok(5,
    !defined IO::Zlib::gzip_external());
@@ -78,10 +78,10 @@ ok(10,
 
 eval "use IO::Zlib qw(:gzip_external 1)";
 
-ok(11,
+ok(11, <
    IO::Zlib::gzip_used());
 
-ok(12,
+ok(12, <
    IO::Zlib::gzip_external());
 
 ok(13,
@@ -101,18 +101,18 @@ this is a test
 EOM
 
 ok(15, my $file = IO::Zlib->new($name, "wb"));
-ok(16, $file->print($hello));
-ok(17, $file->opened());
-ok(18, $file->close());
+ok(16, < $file->print($hello));
+ok(17, < $file->opened());
+ok(18, < $file->close());
 ok(19, !$file->opened());
 
 ok(20, $file = IO::Zlib->new());
-ok(21, $file->open($name, "rb"));
+ok(21, < $file->open($name, "rb"));
 ok(22, !$file->eof());
 ok(23, $file->read(my $uncomp, 1024) == length($hello));
-ok(24, $file->eof());
-ok(25, $file->opened());
-ok(26, $file->close());
+ok(24, < $file->eof());
+ok(25, < $file->opened());
+ok(26, < $file->close());
 ok(27, !$file->opened());
 
 unlink($name);

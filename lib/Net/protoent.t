@@ -2,7 +2,7 @@
 
 BEGIN {
     our $haspe;
-    try { my @n = getprotobyname "tcp" };
+    try { my @n = @( getprotobyname "tcp" ) };
     $haspe = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($haspe) { print "1..0 # Skip: no getprotobyname\n"; exit 0 }
     use Config;
@@ -15,8 +15,8 @@ use strict;
 our @protoent;
 
 BEGIN {
-    @protoent = getprotobyname "tcp"; # This is the function getprotobyname.
-    unless (@protoent) { print "1..0 # Skip: no tcp protocol\n"; exit 0 }
+    @protoent = @( getprotobyname "tcp" ); # This is the function getprotobyname.
+    unless (nelems @protoent) { print "1..0 # Skip: no tcp protocol\n"; exit 0 }
 }
 
 print "1..3\n";

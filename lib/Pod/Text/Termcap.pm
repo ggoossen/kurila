@@ -25,7 +25,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 use utf8;
 
-@ISA = qw(Pod::Text);
+@ISA = @( qw(Pod::Text) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -39,9 +39,9 @@ $VERSION = 2.03;
 # In the initialization method, grab our terminal characteristics as well as
 # do all the stuff we normally do.
 sub new {
-    my ($self, @args) = @_;
+    my ($self, < @args) = < @_;
     my ($ospeed, $term, $termios);
-    $self = $self->SUPER::new (@args);
+    $self = $self->SUPER::new (< @args);
 
     # $ENV{HOME} is usually not set on Windows.  The default Term::Cap path
     # may not work on Solaris.
@@ -75,14 +75,14 @@ sub new {
 
 # Make level one headings bold.
 sub cmd_head1 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head1 ($attrs, "%$self{BOLD}$text%$self{NORM}");
 }
 
 # Make level two headings bold.
 sub cmd_head2 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head2 ($attrs, "%$self{BOLD}$text%$self{NORM}");
 }
@@ -93,7 +93,7 @@ sub cmd_i { my $self = shift; return "%$self{UNDL}@_[1]%$self{NORM}" }
 
 # Output any included code in bold.
 sub output_code {
-    my ($self, $code) = @_;
+    my ($self, $code) = < @_;
     $self->output (%$self{BOLD} . $code . %$self{NORM});
 }
 

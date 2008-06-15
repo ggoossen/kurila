@@ -4,7 +4,7 @@ use strict;
 our $VERSION = '6.44';
 
 require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+our @ISA = @( qw(ExtUtils::MM_Unix) );
 
 
 =head1 NAME
@@ -32,7 +32,7 @@ Cleanup VOS core files
 =cut
 
 sub extra_clean_files {
-    return qw(*.kp);
+    return @(qw(*.kp));
 }
 
 

@@ -15,9 +15,9 @@ BEGIN {
 }
 
 
-my @getters = qw(getcflag getiflag getispeed getlflag getoflag getospeed);
+my @getters = @( qw(getcflag getiflag getispeed getlflag getoflag getospeed) );
 
-plan tests => 3 + 2 * (3 + NCCS() + @getters);
+plan tests => 3 + 2 * (3 + NCCS() + nelems @getters);
 
 my $r;
 
@@ -58,7 +58,7 @@ for my $i (0..NCCS()-1) {
 }
 
 # testing getcflag()
-for my $method (@getters) {
+for my $method (< @getters) {
     $r = try { $termios->?$method() };
     is( $@, '', "calling $method()" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );

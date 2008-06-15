@@ -7,7 +7,7 @@ print "1..71\n";
 my $test = 1;
 
 sub test ($$$) {
-  my ($act, $string, $value) = @_;
+  my ($act, $string, $value) = < @_;
   my $result;
   if ($act eq 'oct') {
     $result = oct $string;

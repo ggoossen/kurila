@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -17,7 +17,7 @@ use ExtUtils::MakeMaker;
 use ExtUtils::MM_VMS;
 
 sub test_filter {
-    my($text, $vms_text) = @_;
+    my($text, $vms_text) = < @_;
     
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     is( ExtUtils::MM_Any->maketext_filter($text), $text,     'default filter' );

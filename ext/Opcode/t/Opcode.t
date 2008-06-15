@@ -28,20 +28,20 @@ my(@o1, @o2, @o3);
 
 # --- opset_to_ops and opset
 
-my @empty_l = opset_to_ops(empty_opset);
-print @empty_l == 0 ?   "ok $t\n" : "not ok $t\n"; $t++;
+my @empty_l = @( < opset_to_ops(empty_opset) );
+print (nelems @empty_l) == 0 ?   "ok $t\n" : "not ok $t\n"; $t++;
 
-my @full_l1  = opset_to_ops(full_opset);
-print @full_l1 == opcodes() ? "ok $t\n" : "not ok $t\n"; $t++;
-my @full_l2 = @full_l1;	# = opcodes();	# XXX to be fixed
-print "@full_l1" eq "@full_l2" ? "ok $t\n" : "not ok $t\n"; $t++;
+my @full_l1  = @( < opset_to_ops(full_opset) );
+print (nelems @full_l1) == opcodes() ? "ok $t\n" : "not ok $t\n"; $t++;
+my @full_l2 = @( < @full_l1 );	# = opcodes();	# XXX to be fixed
+print "{join ' ', <@full_l1}" eq "{join ' ', <@full_l2}" ? "ok $t\n" : "not ok $t\n"; $t++;
 
-@empty_l = opset_to_ops(opset(':none'));
-print @empty_l == 0 ?   "ok $t\n" : "not ok $t\n"; $t++;
+@empty_l = @( < opset_to_ops(opset(':none')) );
+print (nelems @empty_l) == 0 ?   "ok $t\n" : "not ok $t\n"; $t++;
 
-my @full_l3 = opset_to_ops(opset(':all'));
-print  @full_l1  ==  @full_l3  ? "ok $t\n" : "not ok $t\n"; $t++;
-print "@full_l1" eq "@full_l3" ? "ok $t\n" : "not ok $t\n"; $t++;
+my @full_l3 = @( < opset_to_ops(opset(':all')) );
+print  (nelems @full_l1)  ==  nelems @full_l3  ? "ok $t\n" : "not ok $t\n"; $t++;
+print "{join ' ', <@full_l1}" eq "{join ' ', <@full_l3}" ? "ok $t\n" : "not ok $t\n"; $t++;
 
 die $t unless $t == 7;
 $s1 = opset(      'padsv');
@@ -60,17 +60,17 @@ print try { opset(':_tst_') } ? "ok $t\n" : "not ok $t\n"; ++$t;
 
 die $t unless $t == 11;
 print opdesc("gv") eq "glob value" ? "ok $t\n" : "not ok $t\n"; $t++;
-my @desc = opdesc(':_tst_','stub');
-print "@desc" eq "private variable private array private hash stub"
-				    ? "ok $t\n" : "not ok $t\n#@desc\n"; $t++;
+my @desc = @( < opdesc(':_tst_','stub') );
+print "{join ' ', <@desc}" eq "private variable private array private hash stub"
+				    ? "ok $t\n" : "not ok $t\n#{join ' ', <@desc}\n"; $t++;
 print opcodes() ? "ok $t\n" : "not ok $t\n"; $t++;
 print "ok $t\n"; ++$t;
 
 # --- invert_opset
 
 $s1 = opset(qw(fileno padsv padav));
-@o2 = opset_to_ops(invert_opset($s1));
-print @o2 == opcodes-3 ? "ok $t\n" : "not ok $t\n"; $t++;
+@o2 = @( < opset_to_ops(invert_opset($s1)) );
+print (nelems @o2) == opcodes-3 ? "ok $t\n" : "not ok $t\n"; $t++;
 
 # --- opmask
 
@@ -102,13 +102,13 @@ print (($s2 ^^^ $s3) eq opset('padsv','padhv') ? "ok $t\n":"not ok $t\n"); $t++;
 # Negated, e.g., with possible extra bits in last byte beyond last op bit.
 # The extra bits mean we can't just say ~mask eq invert_opset(mask).
 
-@o1 = opset_to_ops(           ^~^ $s3);
-@o2 = opset_to_ops(invert_opset $s3);
-print "@o1" eq "@o2" ? "ok $t\n":"not ok $t\n"; $t++;
+@o1 = @( < opset_to_ops(           ^~^ $s3) );
+@o2 = @( < opset_to_ops(invert_opset $s3) );
+print "{join ' ', <@o1}" eq "{join ' ', <@o2}" ? "ok $t\n":"not ok $t\n"; $t++;
 
 # --- finally, check some opname assertions
 
-foreach(@full_l1) { die "bad opname: $_" if m/\W/ or m/^\d/ }
+foreach(< @full_l1) { die "bad opname: $_" if m/\W/ or m/^\d/ }
 
 print "ok $last_test\n";
 BEGIN { $last_test = 25 }

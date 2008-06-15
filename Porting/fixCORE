@@ -2,7 +2,7 @@
 use Data::Dumper;
 
 my $targ = shift;
-my $inc  = join(' ',map("-I$_",@INC));
+my $inc  = join(' ',map("-I$_",< @INC));
 
 my $work = 1;
 while ($work)
@@ -26,17 +26,17 @@ while ($work)
   my $changed = 0;
   foreach my $file (keys %fix)
    {          
-    my @ar = sort( { $a->[0] <+> $b->[0] } @{delete %fix{$file}});
+    my @ar = @( sort( { $a->[0] <+> $b->[0] } < @{delete %fix{$file}}) );
     my @miss;
     my $fixed = 0;
-    @ARGV = ($file);
+    @ARGV = @($file);
     $. = 0;
     local $^I = '.sav';
     while ( ~< *ARGV)
      {
-      while (@ar && $. == @ar[0]->[0])
+      while ((nelems @ar) && $. == @ar[0]->[0])
        {
-        my ($line,$var) = @{shift(@ar)};
+        my ($line,$var) = < @{shift(@ar)};
         if (s/(?<!CORE::)\b$var\b(?=\s*\()/CORE::$var/)
          {
           warn "$file:$line: FIX $var\n"; 
@@ -53,11 +53,11 @@ while ($work)
     unless ($fixed)
      {
       rename("$file$^I",$file);
-      if (@miss)
+      if ((nelems @miss))
        {
-        while (@miss)
+        while ((nelems @miss))
          {
-          my ($line,$var,$txt) = @{shift(@miss)};
+          my ($line,$var,$txt) = < @{shift(@miss)};
           warn "$file:$line:$var | $txt";
          }
        }

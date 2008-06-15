@@ -3,7 +3,7 @@
 # This ok() function is specially written to avoid any concatenation.
 my $test = 1;
 sub ok {
-    my($ok, $name) = @_;
+    my($ok, $name) = < @_;
 
     printf "\%sok \%d - \%s\n", ($ok ? "" : "not "), $test, $name;
 

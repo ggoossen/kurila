@@ -15,7 +15,7 @@ use File::Spec;
 # File::Temp since this END block must be evaluated after the
 # END block configured by File::Temp
 my @files; # list of files to remove
-END { foreach (@files) { ok( !(-e $_) )} }
+END { foreach (< @files) { ok( !(-e $_) )} }
 
 use File::Temp qw/ tempfile unlink0 /;
 ok(1);
@@ -88,7 +88,7 @@ sub test_security {
   # Create the tempfile
   my $template = "tmpXXXXX";
   my ($fh1, $fname1) = try { tempfile ( $template, 
-				  DIR => File::Spec->tmpdir,
+				  DIR => < File::Spec->tmpdir,
 				  UNLINK => 1,
 				);
 			    };

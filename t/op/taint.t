@@ -49,11 +49,11 @@ my $Invoke_Perl = $Is_VMS      ? 'MCR Sys$Disk:[]Perl.exe' :
                   $Is_MacOS    ? ':perl'                :
                   $Is_NetWare  ? 'perl'                 : 
                                  './perl'               ;
-my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
+my @MoreEnv = @( qw/IFS CDPATH ENV BASH_ENV/ );
 
 if ($Is_VMS) {
     my (%old, $x);
-    for $x ('DCL$PATH', @MoreEnv) {
+    for $x ('DCL$PATH', < @MoreEnv) {
 	(%old{$x}) = %ENV{$x} =~ m/^(.*)$/ if exists %ENV{$x};
     }
     # VMS note:  PATH and TERM are automatically created by the C
@@ -89,12 +89,12 @@ my $TAINT0;
 # This taints each argument passed. All must be lvalues.
 # Side effect: It also stringifies them. :-(
 sub taint_these (@) {
-    for (@_) { $_ .= $TAINT }
+    for (< @_) { $_ .= $TAINT }
 }
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    return scalar grep { tainted($_) } @_;
+    return scalar grep { tainted($_) } < @_;
 }
 sub tainted ($) {
     my $tainted = not try { @_[0], kill 0; 1};
@@ -102,13 +102,13 @@ sub tainted ($) {
     return $tainted;
 }
 sub all_tainted (@) {
-    for (@_) { return 0 unless tainted $_ }
+    for (< @_) { return 0 unless tainted $_ }
     1;
 }
 
 
 sub test ($;$) {
-    my($ok, $diag) = @_;
+    my($ok, $diag) = < @_;
 
     my $curr_test = curr_test();
 
@@ -138,7 +138,7 @@ print PROG 'print "@ARGV\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
 
-my $TEST = catfile(curdir(), 'TEST');
+my $TEST = catfile( <curdir(), 'TEST');
 
 # First, let's make sure that Perl is checking the dangerous
 # environment variables. Maybe they aren't set yet, so we'll
@@ -163,7 +163,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	}
     }
     %ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
-    delete %ENV{[@MoreEnv]};
+    delete %ENV{[< @MoreEnv]};
     %ENV{TERM} = 'dumb';
 
     test try { `$echo 1` } eq "1\n";
@@ -172,14 +172,14 @@ my $TEST = catfile(curdir(), 'TEST');
         skip "Environment tainting tests skipped", 4
           if $Is_MSWin32 || $Is_NetWare || $Is_VMS || $Is_Dos || $Is_MacOS;
 
-	my @vars = ('PATH', @MoreEnv);
+	my @vars = @('PATH', < @MoreEnv);
 	while (my $v = @vars[0]) {
 	    local %ENV{$v} = $TAINT;
 	    last if try { `$echo 1` };
 	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
-	test !@vars, "@vars";
+	test !nelems @vars, "{join ' ', <@vars}";
 
 	# tainted $TERM is unsafe only if it contains metachars
 	local %ENV{TERM};
@@ -241,10 +241,10 @@ my $TEST = catfile(curdir(), 'TEST');
     taint_these($foo);
     test tainted $foo;
 
-    my @list = 1..10;
-    test not any_tainted @list;
+    my @list = @( 1..10 );
+    test not any_tainted < @list;
     taint_these @list[[1,3,5,7,9]];
-    test any_tainted @list;
+    test any_tainted < @list;
     test all_tainted @list[[1,3,5,7,9]];
     test not any_tainted @list[[0,2,4,6,8]];
 
@@ -281,7 +281,7 @@ my $TEST = catfile(curdir(), 'TEST');
 # How about command-line arguments? The problem is that we don't
 # always get some, so we'll run another process with some.
 SKIP: {
-    my $arg = catfile(curdir(), "arg$$");
+    my $arg = catfile( <curdir(), "arg$$");
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
 	try { join('', @ARGV), kill 0 };
@@ -312,11 +312,11 @@ SKIP: {
 SKIP: {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
-    my @globs = try { glob("*") };
-    test @globs == 0 && $@->{description} =~ m/^Insecure dependency/;
+    my @globs = @( try { glob( <"*") } );
+    test (nelems @globs) == 0 && $@->{description} =~ m/^Insecure dependency/;
 
-    @globs = try { glob '*' };
-    test @globs == 0 && $@->{description} =~ m/^Insecure dependency/;
+    @globs = @( try { glob < '*' } );
+    test (nelems @globs) == 0 && $@->{description} =~ m/^Insecure dependency/;
 }
 
 # Output of commands should be tainted
@@ -340,8 +340,8 @@ SKIP: {
     $foo =~ m/(...)(...)(...)/;
     test not any_tainted $1, $2, $3, $+;
 
-    my @bar = $foo =~ m/(...)(...)(...)/;
-    test not any_tainted @bar;
+    my @bar = @( $foo =~ m/(...)(...)(...)/ );
+    test not any_tainted < @bar;
 
     test tainted $foo;	# $foo should still be tainted!
     test $foo eq "abcdefghi";
@@ -462,7 +462,7 @@ SKIP: {
         # wildcard expansion doesn't invoke shell on VMS, so is safe
         skip "This is not VMS", 2 unless $Is_VMS;
     
-	test join('', try { glob $foo } ) ne '', 'globbing';
+	test join('', try { glob < $foo } ) ne '', 'globbing';
 	test $@ eq '', $@;
     }
 }
@@ -549,35 +549,35 @@ SKIP: {
 
 # Test assignment and return of lists
 {
-    my @foo = ("A", "tainted" . $TAINT, "B");
+    my @foo = @("A", "tainted" . $TAINT, "B");
     test not tainted @foo[0];
     test     tainted @foo[1];
     test not tainted @foo[2];
-    my @bar = @foo;
+    my @bar = @( < @foo );
     test not tainted @bar[0];
     test     tainted @bar[1];
     test not tainted @bar[2];
-    my @baz = try { "A", "tainted" . $TAINT, "B" };
+    my @baz = @( try { "A", "tainted" . $TAINT, "B" } );
     test not tainted @baz[0];
     test     tainted @baz[1];
     test not tainted @baz[2];
-    my @plugh = eval q[ "A", "tainted" . $TAINT, "B" ];
+    my @plugh = @( eval q[ "A", "tainted" . $TAINT, "B" ] );
     test not tainted @plugh[0];
     test     tainted @plugh[1];
     test not tainted @plugh[2];
     my $nautilus = sub { "A", "tainted" . $TAINT, "B" };
-    test not tainted ((&$nautilus)[[0]]);
-    test     tainted ((&$nautilus)[[1]]);
-    test not tainted ((&$nautilus)[[2]]);
-    my @xyzzy = &$nautilus;
+    test not tainted (( <&$nautilus)[[0]]);
+    test     tainted (( <&$nautilus)[[1]]);
+    test not tainted (( <&$nautilus)[[2]]);
+    my @xyzzy = @( < &$nautilus );
     test not tainted @xyzzy[0];
     test     tainted @xyzzy[1];
     test not tainted @xyzzy[2];
     my $red_october = sub { return "A", "tainted" . $TAINT, "B" };
-    test not tainted ((&$red_october)[[0]]);
-    test     tainted ((&$red_october)[[1]]);
-    test not tainted ((&$red_october)[[2]]);
-    my @corge = &$red_october;
+    test not tainted (( <&$red_october)[[0]]);
+    test     tainted (( <&$red_october)[[1]]);
+    test not tainted (( <&$red_october)[[2]]);
+    my @corge = @( < &$red_october );
     test not tainted @corge[0];
     test     tainted @corge[1];
     test not tainted @corge[2];
@@ -591,8 +591,8 @@ SKIP: {
           try { setpwent(); getpwent() };
 
 	setpwent();
-	my @getpwent = getpwent();
-	die "getpwent: $!\n" unless (@getpwent);
+	my @getpwent = @( getpwent() );
+	die "getpwent: $!\n" unless (nelems @getpwent);
 	test (    not tainted @getpwent[0]
 	          and     tainted @getpwent[1]
 	          and not tainted @getpwent[2]
@@ -624,7 +624,7 @@ SKIP: {
 	unlink($symlink);
 	my $sl = "/something/naughty";
 	# it has to be a real path on Mac OS
-	$sl = MacPerl::MakePath((MacPerl::Volumes())[[0]]) if $Is_MacOS;
+	$sl = MacPerl::MakePath(( <MacPerl::Volumes())[[0]]) if $Is_MacOS;
 	symlink($sl, $symlink) or die "symlink: $!\n";
 	my $readlink = readlink($symlink);
 	test tainted $readlink;
@@ -899,7 +899,7 @@ SKIP: {
 	    push @untainted, "# '$k' = '$v'\n";
 	}
     }
-    test @untainted == 0, "untainted:\n @untainted";
+    test (nelems @untainted) == 0, "untainted:\n {join ' ', <@untainted}";
 }
 
 
@@ -983,7 +983,7 @@ TODO: {
 
 {
     # [perl #24291] this used to dump core
-    our %nonmagicalenv = ( PATH => "util" );
+    our %nonmagicalenv = %( PATH => "util" );
     local *ENV = \%nonmagicalenv;
     dies_like(sub { system("lskdfj") },
               qr/^\%ENV is aliased to another variable while running with -T switch/);
@@ -1086,8 +1086,8 @@ TERNARY_CONDITIONALS: {
 
     if ( $foo eq '' ) {
     }
-    elsif ( my @bar = $foo =~ m/([$valid_chars]+)/o ) {
-        test not any_tainted @bar;
+    elsif ( my @bar = @( $foo =~ m/([$valid_chars]+)/o ) ) {
+        test not any_tainted < @bar;
     }
 }
 
@@ -1227,9 +1227,9 @@ SKIP:
 
 {
     my $value = "foo bar";
-    my @values = split(m/\s+/, $value, 2);
+    my @values = @( split(m/\s+/, $value, 2) );
     ok(!tainted(@values[1]), "result of split is not tainted if input was not tainted");
-    my @values = split(m/\s+/, $value . $TAINT, 2);
+    my @values = @( split(m/\s+/, $value . $TAINT, 2) );
     ok(tainted(@values[1]), "result of split is tainted if input was tainted");
 }
 

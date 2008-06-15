@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
       or die "Can't chdir to lib/ExtUtils/ParseXS: $!";
-    @INC = qw(../.. ../../.. .);
+    @INC = @( qw(../.. ../../.. .) );
   }
 }
 use strict;
@@ -57,7 +57,7 @@ if ($b->have_compiler) {
   # Win32 needs to close the DLL before it can unlink it, but unfortunately
   # dl_unload_file was missing on Win32 prior to perl change #24679!
   if ($^O eq 'MSWin32' and defined &DynaLoader::dl_unload_file) {
-    for (my $i = 0; $i +< @DynaLoader::dl_modules; $i++) {
+    for (my $i = 0; $i +< nelems @DynaLoader::dl_modules; $i++) {
       if (@DynaLoader::dl_modules[$i] eq $module) {
         DynaLoader::dl_unload_file(@DynaLoader::dl_librefs[$i]);
         last;
@@ -75,5 +75,5 @@ if ($b->have_compiler) {
 #####################################################################
 
 sub Foo::TIEHANDLE { bless \%(), 'Foo' }
-sub Foo::PRINT { shift->{buf} .= join '', @_ }
+sub Foo::PRINT { shift->{buf} .= join '', < @_ }
 sub Foo::content { shift->{buf} }

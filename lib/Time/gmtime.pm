@@ -6,31 +6,31 @@ use Time::tm;
 our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 BEGIN { 
     use Exporter   ();
-    @ISA         = qw(Exporter Time::tm);
-    @EXPORT      = qw(gmtime gmctime);
-    @EXPORT_OK   = qw(  
+    @ISA         = @( qw(Exporter Time::tm) );
+    @EXPORT      = @( qw(gmtime gmctime) );
+    @EXPORT_OK   = @( qw(  
 			$tm_sec $tm_min $tm_hour $tm_mday 
 			$tm_mon $tm_year $tm_wday $tm_yday 
 			$tm_isdst
-		    );
-    %EXPORT_TAGS = ( FIELDS => \@( @EXPORT_OK, @EXPORT ) );
+		    ) );
+    %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
     $VERSION     = 1.03;
 }
-use vars      @EXPORT_OK;
+use vars      < @EXPORT_OK;
 
 sub populate (@) {
-    return unless @_;
+    return unless (nelems @_);
     my $tmob = Time::tm->new();
-    @$tmob = (
+    @$tmob = @( (
 		$tm_sec, $tm_min, $tm_hour, $tm_mday, 
 		$tm_mon, $tm_year, $tm_wday, $tm_yday, 
 		$tm_isdst )
-	    = @_;
+	    = < @_ );
     return $tmob;
 } 
 
-sub gmtime (;$)    { populate CORE::gmtime(@_ ? shift : time)}
-sub gmctime (;$)   { scalar   CORE::gmtime(@_ ? shift : time)} 
+sub gmtime (;$)    { populate CORE::gmtime((nelems @_) ? shift : time)}
+sub gmctime (;$)   { scalar   CORE::gmtime((nelems @_) ? shift : time)} 
 
 1;
 __END__

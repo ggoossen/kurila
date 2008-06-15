@@ -51,20 +51,20 @@ EOM
         my $cc ;
         my $gz ;
         my $hsize ;
-        my %headers = () ;
+        my %headers = %( () ) ;
         
 
         foreach my $fb ( qw( file filehandle buffer ) )
         {
 
-            foreach my $i (1 .. @buffers) {
+            foreach my $i (1 .. nelems @buffers) {
 
                 title "Testing $CompressClass with $i streams to $fb";
 
-                my @buffs = @buffers[[0..$i -1]] ;
+                my @buffs = @( @buffers[[0..$i -1]] ) ;
 
                 if ($CompressClass eq 'IO::Compress::Gzip') {
-                    %headers = (
+                    %headers = %(
                                   Strict     => 1,
                                   Comment    => "this is a comment",
                                   ExtraField => \@("so" => "me extra"),
@@ -88,10 +88,10 @@ EOM
                     $output = $name ;
                 }
 
-                my $x = $CompressClass-> new(($output, AutoClose => 1, %headers));
+                my $x = $CompressClass-> new(($output, AutoClose => 1, < %headers));
                 isa_ok $x, $CompressClass, '  $x' ;
 
-                foreach my $buffer (@buffs) {
+                foreach my $buffer (< @buffs) {
                     ok $x->write($buffer), "    Write OK" ;
                     # this will add an extra "empty" stream
                     ok $x->newStream(), "    newStream OK" ;
@@ -107,11 +107,11 @@ EOM
                     {
                         $cc = 'IO::File'->new( "$name", "<") ;
                     }
-                    my @opts = $unc ne $UncompressClass 
+                    my @opts = @( $unc ne $UncompressClass 
                                     ? (RawInflate => 1)
-                                    : ();
+                                    : () );
                     my $gz = $unc-> new(($cc,
-                                   @opts,
+                                   < @opts,
                                    Strict      => 1,
                                    AutoClose   => 1,
                                    Append      => 1,
@@ -131,7 +131,7 @@ EOM
 
                     is $gz->streamCount(), $i +1, "    streamCount ok " .  ($i +1)
                         or diag "Stream count is " . $gz->streamCount();
-                    ok $un eq join('', @buffs), "    expected output" ;
+                    ok $un eq join('', < @buffs), "    expected output" ;
 
                 }
 
@@ -142,11 +142,11 @@ EOM
                     {
                         $cc = 'IO::File'->new( "$name", "<") ;
                     }
-                    my @opts = $unc ne $UncompressClass 
+                    my @opts = @( $unc ne $UncompressClass 
                                     ? (RawInflate => 1)
-                                    : ();
+                                    : () );
                     my $gz = $unc-> new(($cc,
-                                   @opts,
+                                   < @opts,
                                    Strict      => 1,
                                    AutoClose   => 1,
                                    Append      => 1,
@@ -158,8 +158,8 @@ EOM
                     for my $stream (1 .. $i)
                     {
                         my $buff = @buffs[$stream-1];
-                        my @lines = split("\n", $buff);
-                        my $lines = @lines;
+                        my @lines = @( split("\n", $buff) );
+                        my $lines = (nelems @lines);
 
                         my $un = '';
                         #while (<$gz>) {

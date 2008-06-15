@@ -16,8 +16,8 @@ use Config;
 our $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
 
 my $r;
-my @tmpfiles = ();
-END { unlink @tmpfiles }
+my @tmpfiles = @( () );
+END { unlink < @tmpfiles }
 
 $r = runperl(
     switches	=> \@(),
@@ -318,17 +318,17 @@ __EOF__
     runperl( switches => \@('-pi.bak'), prog => 's/foo/bar/', args => \@('file') );
 
     open(FILE, "<", "file") or die "$0: Failed to open 'file': $!";
-    chomp(my @file = ~< *FILE);
+    chomp(my @file = @( ~< *FILE ));
     close FILE;
 
     open(BAK, "<", "file.bak") or die "$0: Failed to open 'file': $!";
-    chomp(my @bak = ~< *BAK);
+    chomp(my @bak = @( ~< *BAK ));
     close BAK;
 
-    is(join(":", @file),
+    is(join(":", < @file),
        "bar yada dada:bada bar bing:king kong bar",
        "-i new file");
-    is(join(":", @bak),
+    is(join(":", < @bak),
        "foo yada dada:bada foo bing:king kong foo",
        "-i backup file");
 }

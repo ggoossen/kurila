@@ -30,13 +30,13 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $ZipError);
 $VERSION = '2.006';
 $ZipError = '';
 
-@ISA = qw(IO::Compress::RawDeflate Exporter);
-@EXPORT_OK = qw( $ZipError zip ) ;
-%EXPORT_TAGS = %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ;
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+@ISA = @( qw(IO::Compress::RawDeflate Exporter) );
+@EXPORT_OK = @( qw( $ZipError zip ) ) ;
+%EXPORT_TAGS = %( < %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ) ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 
 %EXPORT_TAGS{zip_method} = \@(qw( ZIP_CM_STORE ZIP_CM_DEFLATE ZIP_CM_BZIP2 ));
-push @{ %EXPORT_TAGS{all} }, @{ %EXPORT_TAGS{zip_method} };
+push @{ %EXPORT_TAGS{all} }, < @{ %EXPORT_TAGS{zip_method} };
 
 Exporter::export_ok_tags('all');
 
@@ -45,13 +45,13 @@ sub new
 my $class = shift ;
 
 my $obj = createSelfTiedObject($class, \$ZipError);    
-$obj->_create(undef, @_);
+$obj->_create(undef, < @_);
 }
 
 sub zip
 {
 my $obj = createSelfTiedObject(undef, \$ZipError);    
-return $obj->_def(@_);
+return $obj->_def(< @_);
 }
 
 sub mkComp
@@ -63,23 +63,23 @@ my $got = shift ;
 my ($obj, $errstr, $errno) ;
 
 if (*$self->{ZipData}->{Method} == ZIP_CM_STORE) {
-($obj, $errstr, $errno) = IO::Compress::Adapter::Identity::mkCompObject(
-                                         $got->value('Level'),
+($obj, $errstr, $errno) = < IO::Compress::Adapter::Identity::mkCompObject( <
+                                         $got->value('Level'), <
                                          $got->value('Strategy')
                                          );
 }
 elsif (*$self->{ZipData}->{Method} == ZIP_CM_DEFLATE) {
-($obj, $errstr, $errno) = IO::Compress::Adapter::Deflate::mkCompObject(
-                                         $got->value('CRC32'),
-                                         $got->value('Adler32'),
-                                         $got->value('Level'),
+($obj, $errstr, $errno) = < IO::Compress::Adapter::Deflate::mkCompObject( <
+                                         $got->value('CRC32'), <
+                                         $got->value('Adler32'), <
+                                         $got->value('Level'), <
                                          $got->value('Strategy')
                                          );
 }
 elsif (*$self->{ZipData}->{Method} == ZIP_CM_BZIP2) {
-($obj, $errstr, $errno) = IO::Compress::Adapter::Bzip2::mkCompObject(
-                                        $got->value('BlockSize100K'),
-                                        $got->value('WorkFactor'),
+($obj, $errstr, $errno) = < IO::Compress::Adapter::Bzip2::mkCompObject( <
+                                        $got->value('BlockSize100K'), <
+                                        $got->value('WorkFactor'), <
                                         $got->value('Verbosity')
                                        );
 *$self->{ZipData}->{CRC32} = crc32(undef);
@@ -134,7 +134,7 @@ $comment = $param->value('Comment') || '';
 
 my $hdr = '';
 
-my $time = _unixToDosTime($param->value('Time'));
+my $time = _unixToDosTime( <$param->value('Time'));
 
 my $extra = '';
 my $ctlExtra = '';
@@ -159,16 +159,16 @@ $ctlExtra .= $x;
 if (! $param->value('Minimal')) {
 if (defined $param->value('exTime'))
 {
-    $extra .= mkExtendedTime($param->value('MTime'), 
-                            $param->value('ATime'), 
+    $extra .= mkExtendedTime( <$param->value('MTime'), < 
+                            $param->value('ATime'), < 
                             $param->value('CTime'));
 
-    $ctlExtra .= mkExtendedTime($param->value('MTime'));
+    $ctlExtra .= mkExtendedTime( <$param->value('MTime'));
 }
 
 if ( $param->value('UID') && $osCode == ZIP_OS_CODE_UNIX)
 {
-    $extra    .= mkUnix2Extra( $param->value('UID'), $param->value('GID'));
+    $extra    .= mkUnix2Extra( < $param->value('UID'), < $param->value('GID'));
     $ctlExtra .= mkUnix2Extra();
 }
 
@@ -238,7 +238,7 @@ $ctl .= pack 'v', 0          ; # disk number start
 $ctl .= pack 'v', $ifa       ; # internal file attributes
 $ctl .= pack 'V', $extFileAttr   ; # external file attributes
 if (! *$self->{ZipData}->{Zip64}) {
-$ctl .= pack 'V', *$self->{ZipData}->{Offset}->get32bit()  ; # offset to local header
+$ctl .= pack 'V', < *$self->{ZipData}->{Offset}->get32bit()  ; # offset to local header
 }
 else {
 $ctl .= pack 'V', $empty ; # offset to local header
@@ -262,7 +262,7 @@ my $self = shift ;
 
 my $crc32 ;
 if (*$self->{ZipData}->{Method} == ZIP_CM_DEFLATE) {
-$crc32 = pack "V", *$self->{Compress}->crc32();
+$crc32 = pack "V", < *$self->{Compress}->crc32();
 }
 else {
 $crc32 = pack "V", *$self->{ZipData}->{CRC32};
@@ -319,8 +319,8 @@ $comment = *$self->{ZipData}->{ZipComment} ;
 
 my $cd_offset = *$self->{ZipData}->{Offset}->get32bit() ; # offset to start central dir
 
-my $entries = @{ *$self->{ZipData}->{CentralDir} };
-my $cd = join '', @{ *$self->{ZipData}->{CentralDir} };
+my $entries = (nelems @{ *$self->{ZipData}->{CentralDir} });
+my $cd = join '', < @{ *$self->{ZipData}->{CentralDir} };
 my $cd_len = length $cd ;
 
 my $z64e = '';
@@ -385,7 +385,7 @@ if (! $got->parsed('exTime') ) {
 my $timeRef = $got->value('exTime');
 if ( defined $timeRef) {
     return $self->saveErrorString(undef, "exTime not a 3-element array ref")   
-        if ref $timeRef ne 'ARRAY' || @$timeRef != 3;
+        if ref $timeRef ne 'ARRAY' || (nelems @$timeRef) != 3;
 }
 
 $got->value("MTime", $timeRef->[1]);
@@ -444,12 +444,12 @@ my $self = shift ;
 use IO::Compress::Base::Common  v2.006 qw(:Parse);
 use Compress::Raw::Zlib  v2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
-my @Bzip2 = ();
+my @Bzip2 = @( () );
 
-@Bzip2 = IO::Compress::Bzip2::getExtraParams($self)
+@Bzip2 = @( < IO::Compress::Bzip2::getExtraParams($self) )
 if defined $IO::Compress::Bzip2::VERSION;
 
-return (
+return  @(
     # zlib behaviour
     $self->getZlibParams(),
 
@@ -478,7 +478,7 @@ return (
 
 sub getInverseClass
 {
-return ('IO::Uncompress::Unzip',
+return  @('IO::Uncompress::Unzip',
         \$IO::Uncompress::Unzip::UnzipError);
 }
 
@@ -520,7 +520,7 @@ my $times = '';
 my $bit = 1 ;
 my $flags = 0;
 
-for my $time (@_)
+for my $time (< @_)
 {
 if (defined $time)
 {
@@ -538,7 +538,7 @@ return IO::Compress::Zlib::Extra::mkSubField(ZIP_EXTRA_ID_EXT_TIMESTAMP,
 sub mkUnix2Extra
 {
 my $ids = '';
-for my $id (@_)
+for my $id (< @_)
 {
 $ids .= pack("v", $id);
 }

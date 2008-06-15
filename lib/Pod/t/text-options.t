@@ -34,7 +34,7 @@ while ( ~< *DATA) {
         print TMP $_;
     }
     close TMP;
-    my $parser = Pod::Text->new (%options) or die "Cannot create parser\n";
+    my $parser = Pod::Text->new (< %options) or die "Cannot create parser\n";
     open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;

@@ -6,7 +6,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -58,7 +58,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
         )
     );
     is $warnings, 
-    sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n",
+    sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n", <
             strict->VERSION);
 
     $warnings = '';
@@ -81,7 +81,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
     );
     is $warnings, 
     "Warning: prerequisite I::Do::Not::Exist 0 not found.".
-    sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n",
+    sprintf("Warning: prerequisite strict 99999 not found. We have \%s.\n", <
             strict->VERSION);
     
     $warnings = '';

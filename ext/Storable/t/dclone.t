@@ -9,7 +9,7 @@
 sub BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
-	@INC = ('.', '../lib', '../ext/Storable/t');
+	@INC = @('.', '../lib', '../ext/Storable/t');
     } else {
 	unshift @INC, 't';
     }
@@ -25,8 +25,8 @@ $a = 'toto';
 $b = \$a;
 our $c = bless \%(), 'CLASS';
 $c->{attribute} = 'attrval';
-our %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
-our @a = ('first', undef, 3, -4, -3.14159, 456, 4.5,
+our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
+our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
 
 print "not " unless defined (our $aref = dclone(\@a));
@@ -41,7 +41,7 @@ print "ok 3\n";
 print "not " unless $got eq $dumped; 
 print "ok 4\n";
 
-package FOO; our @ISA = qw(Storable);
+package FOO; our @ISA = @( qw(Storable) );
 
 sub make {
 	my $self = bless \%();
@@ -75,7 +75,7 @@ print "ok 9\n";
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
 package TestString;
 sub new {
-    my ($type, $string) = @_;
+    my ($type, $string) = < @_;
     return bless(\$string, $type);
 }
 package main;
@@ -93,7 +93,7 @@ if (try { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     %tie{array} = \@(1,2,3,4);
     %tie{hash} = \%(1,2,3,4);
     my $clone_array = dclone %tie{array};
-    print "not " unless "@$clone_array" eq "@{%tie{array}}";
+    print "not " unless "{join ' ', <@$clone_array}" eq "{join ' ', <@{%tie{array}}}";
     print "ok 11\n";
     my $clone_hash = dclone %tie{hash};
     print "not " unless $clone_hash->{1} eq %tie{hash}{1};

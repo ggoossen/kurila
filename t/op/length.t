@@ -111,7 +111,7 @@ my $warnings = 0;
 
 $^WARN_HOOK = sub {
     $warnings++;
-    warn @_;
+    warn < @_;
 };
 
 is(length(undef), undef, "Length of literal undef");

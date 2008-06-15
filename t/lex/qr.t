@@ -5,7 +5,7 @@ print "1..7\n";
 # This is() function is written to avoid ""
 my $test = 1;
 sub is {
-    my($left, $right) = @_;
+    my($left, $right) = < @_;
 
     if ($left eq $right) {
       printf 'ok %d

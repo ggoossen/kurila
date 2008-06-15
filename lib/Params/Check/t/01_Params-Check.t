@@ -20,12 +20,12 @@ use constant TRUE   => sub { 1 };
     ok( allow( $0, $0),         "   Allow based on string" );
     ok( allow( 42, \@(0,42) ),    "   Allow based on list" );
     ok( allow( 42, \@(50,sub{1})),"   Allow based on list containing sub");
-    ok( allow( 42, TRUE ),      "   Allow based on constant sub" );
+    ok( allow( 42, < TRUE ),      "   Allow based on constant sub" );
     ok(!allow( $0, qr/^\d+$/ ), "Disallowing based on regex" );
     ok(!allow( 42, $0 ),        "   Disallowing based on string" );
     ok(!allow( 42, \@(0,$0) ),    "   Disallowing based on list" );
     ok(!allow( 42, \@(50,sub{0})),"   Disallowing based on list containing sub");
-    ok(!allow( 42, FALSE ),     "   Disallowing based on constant sub" );
+    ok(!allow( 42, < FALSE ),     "   Disallowing based on constant sub" );
 
     ### check that allow short circuits where required 
     {   my $sub_called;
@@ -148,13 +148,13 @@ use constant TRUE   => sub { 1 };
 }
 
 ### strict_type tests ###
-{   my @list = (
+{   my @list = @(
         \@( \%( strict_type => 1, default => \@() ),  0 ),
         \@( \%( default => \@() ),                    1 ),
     );
 
     ### check for strict_type global, and in the template key ###
-    for my $aref (@list) {
+    for my $aref (< @list) {
 
         my $tmpl = \%( foo => $aref->[0] );
         local   $Params::Check::STRICT_TYPE = $aref->[1];
@@ -195,13 +195,13 @@ use constant TRUE   => sub { 1 };
 }
 
 ### defined tests ###
-{   my @list = (
+{   my @list = @(
         \@( \%( defined => 1, default => 1 ),  0 ),
         \@( \%( default => 1 ),                1 ),
     );
 
     ### check for strict_type global, and in the template key ###
-    for my $aref (@list) {
+    for my $aref (< @list) {
 
         my $tmpl = \%( foo => $aref->[0] );
         local   $Params::Check::ONLY_ALLOW_DEFINED = $aref->[1];
@@ -321,7 +321,7 @@ use constant TRUE   => sub { 1 };
     );
 
     ### the rv we expect ###
-    my $get = \%( %$try, bureau => 'NSA' );
+    my $get = \%( < %$try, bureau => 'NSA' );
 
     my $rv = check( $tmpl, $try );
     
@@ -333,9 +333,9 @@ use constant TRUE   => sub { 1 };
 
 ### $Params::Check::CALLER_DEPTH test
 {
-    sub wrapper { check  ( @_ ) };
-    sub inner   { wrapper( @_ ) };
-    sub outer   { inner  ( @_ ) };
+    sub wrapper { check  ( < @_ ) };
+    sub inner   { wrapper( < @_ ) };
+    sub outer   { inner  ( < @_ ) };
     outer( \%( dummy => \%( required => 1 )), \%() );
 
     like( last_error, qr/for .*::wrapper by .*::inner$/,

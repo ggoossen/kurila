@@ -4,7 +4,7 @@ use strict;
 use Test::More;
 my @Exported_Funcs;
 BEGIN {
-    @Exported_Funcs = qw(
+    @Exported_Funcs = @( qw(
                      hash_seed all_keys
                      lock_keys unlock_keys
                      lock_value unlock_value
@@ -19,15 +19,15 @@ BEGIN {
                      hidden_ref_keys legal_ref_keys
                      hv_store
 
-                    );
-    plan tests => 204 + @Exported_Funcs;
-    use_ok 'Hash::Util', @Exported_Funcs;
+                    ) );
+    plan tests => 204 + nelems @Exported_Funcs;
+    use_ok 'Hash::Util', < @Exported_Funcs;
 }
-foreach my $func (@Exported_Funcs) {
+foreach my $func (< @Exported_Funcs) {
     can_ok __PACKAGE__, $func;
 }
 
-my %hash = (foo => 42, bar => 23, locked => 'yep');
+my %hash = %(foo => 42, bar => 23, locked => 'yep');
 lock_keys(%hash);
 try { %hash{baz} = 99; };
 like( $@->{description}, qr/^Attempt to access disallowed key 'baz' in a restricted hash/,
@@ -83,34 +83,34 @@ is( %hash{locked}, 42,  'unlock_value' );
 
 
 {
-    my %hash = ( foo => 42, locked => 23 );
+    my %hash = %( foo => 42, locked => 23 );
 
     lock_keys(%hash);
-    try { %hash = ( wubble => 42 ) };  # we know this will bomb
+    try { %hash = %( wubble => 42 ) };  # we know this will bomb
     like( $@->{description}, qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' );
     unlock_keys(%hash);
 }
 
 {
-    my %hash = (KEY => 'val', RO => 'val');
+    my %hash = %(KEY => 'val', RO => 'val');
     lock_keys(%hash);
     lock_value(%hash, 'RO');
 
-    try { %hash = (KEY => 1) };
+    try { %hash = %(KEY => 1) };
     like( $@->{description}, qr/^Attempt to delete readonly key 'RO' from a restricted hash/ );
 }
 
 {
-    my %hash = (KEY => 1, RO => 2);
+    my %hash = %(KEY => 1, RO => 2);
     lock_keys(%hash);
-    try { %hash = (KEY => 1, RO => 2) };
+    try { %hash = %(KEY => 1, RO => 2) };
     is( $@, '');
 }
 
 
 
 {
-    my %hash = ();
+    my %hash = %( () );
     lock_keys(%hash, qw(foo bar));
     is( keys %hash, 0,  'lock_keys() w/keyset shouldnt add new keys' );
     %hash{foo} = 42;
@@ -126,7 +126,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 
 
 {
-    my %hash = (foo => 42, bar => undef, baz => 0);
+    my %hash = %(foo => 42, bar => undef, baz => 0);
     lock_keys(%hash, qw(foo bar baz up down));
     is( keys %hash, 3,   'lock_keys() w/keyset didnt add new keys' );
     is_deeply( \%hash, \%( foo => 42, bar => undef, baz => 0 ),'is_deeply' );
@@ -141,7 +141,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 
 
 {
-    my %hash = (foo => 42, bar => undef);
+    my %hash = %(foo => 42, bar => undef);
     try { lock_keys(%hash, qw(foo baz)); };
     is( $@->{description}, sprintf("Hash has key 'bar' which is not in the new key set"),
                     'carp test' );
@@ -149,7 +149,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 
 
 {
-    my %hash = (foo => 42, bar => 23);
+    my %hash = %(foo => 42, bar => 23);
     lock_hash( %hash );
 
     ok( Internals::SvREADONLY(%hash),'Was locked %hash' );
@@ -231,7 +231,7 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
   # bug whereby hash iterators could lose hash keys (and values, as the code
   # is common) for restricted hashes.
 
-  my @keys = qw(small medium large);
+  my @keys = @( qw(small medium large) );
 
   # There should be no difference whether it is restricted or not
   foreach my $lock (0, 1) {
@@ -241,16 +241,16 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
       for my $bits (0,1,2) {
 	push @usekeys, @keys[$bits] if $usekeys ^&^ (1 << $bits);
       }
-      my %clean = map {$_ => length $_} @usekeys;
+      my %clean = %( map {$_ => length $_} < @usekeys );
       my %target;
-      lock_keys ( %target, @keys ) if $lock;
+      lock_keys ( %target, < @keys ) if $lock;
 
       while (my ($k, $v) = each %clean) {
 	%target{$k} = $v;
       }
 
       my $message
-	= ($lock ? 'locked' : 'not locked') . ' keys ' . join ',', @usekeys;
+	= ($lock ? 'locked' : 'not locked') . ' keys ' . join ',', < @usekeys;
 
       is (scalar keys %target, scalar keys %clean, "scalar keys for $message");
       is (scalar values %target, scalar values %clean,
@@ -265,7 +265,7 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
       is_deeply( \@(sort values %target) , \@(sort values %clean),
 		 "list values for $message");
 
-      is_deeply( \@(sort %target) , \@(sort %clean),
+      is_deeply( \@(sort < %target) , \@(sort < %clean),
 		 "hash in list context for $message");
 
       my (@clean, @target);
@@ -276,7 +276,7 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 	push @target, $k, $v;
       }
 
-      is_deeply( \@(sort @target) , \@(sort @clean),
+      is_deeply( \@(sort < @target) , \@(sort < @clean),
 		 "iterating with each for $message");
     }
   }
@@ -286,13 +286,13 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 {
     my %hash;
     lock_hash(%hash);
-    %hash = ();
+    %hash = %( () );
     ok(keys(%hash) == 0, 'clear empty lock_hash() hash');
 }
 {
     my %hash;
     lock_keys(%hash);
-    %hash = ();
+    %hash = %( () );
     ok(keys(%hash) == 0, 'clear empty lock_keys() hash');
 }
 
@@ -327,12 +327,12 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
 	is ($counter, 0, "0 objects when hash key is deleted $state");
 	%hash{a} = undef;
 	is ($counter, 0, "Still 0 objects $state");
-	%hash = ();
+	%hash = %( () );
 	is ($counter, 0, "0 objects after clear $state");
     }
 }
 {
-    my %hash = map {$_,$_} qw(fwiffffff foosht teeoo);
+    my %hash = %( map {$_,$_} qw(fwiffffff foosht teeoo) );
     lock_keys(%hash);
     delete %hash{fwiffffff};
     is (scalar keys %hash, 2,"Count of keys after delete on locked hash");
@@ -360,95 +360,95 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
 }
 
 {
-    my %hash=map { $_ => 1 } qw( a b c d e f);
+    my %hash= %(map { $_ => 1 } qw( a b c d e f) );
     delete %hash{c};
     lock_keys(%hash);
     ok(Internals::SvREADONLY(%hash),'lock_keys DDS/t 1');
     delete %hash{[qw(b e)]};
-    my @hidden=sort(hidden_keys(%hash));
-    my @legal=sort(legal_keys(%hash));
-    my @keys=sort(keys(%hash));
+    my @hidden= @(sort( <hidden_keys(%hash)) );
+    my @legal= @(sort( <legal_keys(%hash)) );
+    my @keys= @(sort(keys(%hash)) );
     #warn "@legal\n@keys\n";
-    is("@hidden","b e",'lock_keys @hidden DDS/t');
-    is("@legal","a b d e f",'lock_keys @legal DDS/t');
-    is("@keys","a d f",'lock_keys @keys DDS/t');
+    is("{join ' ', <@hidden}","b e",'lock_keys @hidden DDS/t');
+    is("{join ' ', <@legal}","a b d e f",'lock_keys @legal DDS/t');
+    is("{join ' ', <@keys}","a d f",'lock_keys @keys DDS/t');
 }
 {
-    my %hash=(0..9);
+    my %hash=%(0..9);
     lock_keys(%hash);
     ok(Internals::SvREADONLY(%hash),'lock_keys DDS/t 2');
     Hash::Util::unlock_keys(%hash);
     ok(!Internals::SvREADONLY(%hash),'unlock_keys DDS/t 2');
 }
 {
-    my %hash=(0..9);
+    my %hash=%(0..9);
     lock_keys(%hash,keys(%hash),'a'..'f');
     ok(Internals::SvREADONLY(%hash),'lock_keys args DDS/t');
-    my @hidden=sort(hidden_keys(%hash));
-    my @legal=sort(legal_keys(%hash));
-    my @keys=sort(keys(%hash));
-    is("@hidden","a b c d e f",'lock_keys() @hidden DDS/t 3');
-    is("@legal","0 2 4 6 8 a b c d e f",'lock_keys() @legal DDS/t 3');
-    is("@keys","0 2 4 6 8",'lock_keys() @keys');
+    my @hidden= @(sort( <hidden_keys(%hash)) );
+    my @legal= @(sort( <legal_keys(%hash)) );
+    my @keys= @(sort(keys(%hash)) );
+    is("{join ' ', <@hidden}","a b c d e f",'lock_keys() @hidden DDS/t 3');
+    is("{join ' ', <@legal}","0 2 4 6 8 a b c d e f",'lock_keys() @legal DDS/t 3');
+    is("{join ' ', <@keys}","0 2 4 6 8",'lock_keys() @keys');
 }
 {
-    my %hash=map { $_ => 1 } qw( a b c d e f);
+    my %hash= %(map { $_ => 1 } qw( a b c d e f) );
     delete %hash{c};
     lock_ref_keys(\%hash);
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys DDS/t');
     delete %hash{[qw(b e)]};
-    my @hidden=sort(hidden_keys(%hash));
-    my @legal=sort(legal_keys(%hash));
-    my @keys=sort(keys(%hash));
+    my @hidden= @(sort( <hidden_keys(%hash)) );
+    my @legal= @(sort( <legal_keys(%hash)) );
+    my @keys= @(sort(keys(%hash)) );
     #warn "@legal\n@keys\n";
-    is("@hidden","b e",'lock_ref_keys @hidden DDS/t 1');
-    is("@legal","a b d e f",'lock_ref_keys @legal DDS/t 1');
-    is("@keys","a d f",'lock_ref_keys @keys DDS/t 1');
+    is("{join ' ', <@hidden}","b e",'lock_ref_keys @hidden DDS/t 1');
+    is("{join ' ', <@legal}","a b d e f",'lock_ref_keys @legal DDS/t 1');
+    is("{join ' ', <@keys}","a d f",'lock_ref_keys @keys DDS/t 1');
 }
 {
-    my %hash=(0..9);
+    my %hash=%(0..9);
     lock_ref_keys(\%hash,keys %hash,'a'..'f');
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys args DDS/t');
-    my @hidden=sort(hidden_keys(%hash));
-    my @legal=sort(legal_keys(%hash));
-    my @keys=sort(keys(%hash));
-    is("@hidden","a b c d e f",'lock_ref_keys() @hidden DDS/t 2');
-    is("@legal","0 2 4 6 8 a b c d e f",'lock_ref_keys() @legal DDS/t 2');
-    is("@keys","0 2 4 6 8",'lock_ref_keys() @keys DDS/t 2');
+    my @hidden= @(sort( <hidden_keys(%hash)) );
+    my @legal= @(sort( <legal_keys(%hash)) );
+    my @keys= @(sort(keys(%hash)) );
+    is("{join ' ', <@hidden}","a b c d e f",'lock_ref_keys() @hidden DDS/t 2');
+    is("{join ' ', <@legal}","0 2 4 6 8 a b c d e f",'lock_ref_keys() @legal DDS/t 2');
+    is("{join ' ', <@keys}","0 2 4 6 8",'lock_ref_keys() @keys DDS/t 2');
 }
 {
-    my %hash=(0..9);
+    my %hash=%(0..9);
     lock_ref_keys_plus(\%hash,'a'..'f');
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys_plus args DDS/t');
-    my @hidden=sort(hidden_keys(%hash));
-    my @legal=sort(legal_keys(%hash));
-    my @keys=sort(keys(%hash));
-    is("@hidden","a b c d e f",'lock_ref_keys_plus() @hidden DDS/t');
-    is("@legal","0 2 4 6 8 a b c d e f",'lock_ref_keys_plus() @legal DDS/t');
-    is("@keys","0 2 4 6 8",'lock_ref_keys_plus() @keys DDS/t');
+    my @hidden= @(sort( <hidden_keys(%hash)) );
+    my @legal= @(sort( <legal_keys(%hash)) );
+    my @keys= @(sort(keys(%hash)) );
+    is("{join ' ', <@hidden}","a b c d e f",'lock_ref_keys_plus() @hidden DDS/t');
+    is("{join ' ', <@legal}","0 2 4 6 8 a b c d e f",'lock_ref_keys_plus() @legal DDS/t');
+    is("{join ' ', <@keys}","0 2 4 6 8",'lock_ref_keys_plus() @keys DDS/t');
 }
 {
-    my %hash=(0..9);
+    my %hash=%(0..9);
     lock_keys_plus(%hash,'a'..'f');
     ok(Internals::SvREADONLY(%hash),'lock_keys_plus args DDS/t');
-    my @hidden=sort(hidden_keys(%hash));
-    my @legal=sort(legal_keys(%hash));
-    my @keys=sort(keys(%hash));
-    is("@hidden","a b c d e f",'lock_keys_plus() @hidden DDS/t 3');
-    is("@legal","0 2 4 6 8 a b c d e f",'lock_keys_plus() @legal DDS/t 3');
-    is("@keys","0 2 4 6 8",'lock_keys_plus() @keys DDS/t 3');
+    my @hidden= @(sort( <hidden_keys(%hash)) );
+    my @legal= @(sort( <legal_keys(%hash)) );
+    my @keys= @(sort(keys(%hash)) );
+    is("{join ' ', <@hidden}","a b c d e f",'lock_keys_plus() @hidden DDS/t 3');
+    is("{join ' ', <@legal}","0 2 4 6 8 a b c d e f",'lock_keys_plus() @legal DDS/t 3');
+    is("{join ' ', <@keys}","0 2 4 6 8",'lock_keys_plus() @keys DDS/t 3');
 }
 
 {
-    my %hash = ('a'..'f');
-    my @keys = ();
-    my @ph = ();
-    my @lock = ('a', 'c', 'e', 'g');
-    lock_keys(%hash, @lock);
-    my $ref = all_keys(%hash, @keys, @ph);
-    my @crrack = sort(@keys);
-    my @ooooff = qw(a c e);
-    my @bam = qw(g);
+    my %hash = %('a'..'f');
+    my @keys = @( () );
+    my @ph = @( () );
+    my @lock = @('a', 'c', 'e', 'g');
+    lock_keys(%hash, < @lock);
+    my $ref = all_keys(%hash, < @keys, < @ph);
+    my @crrack = @( sort(< @keys) );
+    my @ooooff = @( qw(a c e) );
+    my @bam = @( qw(g) );
 
     ok(ref $ref eq ref \%hash && $ref == \%hash, 
             "all_keys() - \$ref is a reference to \%hash");

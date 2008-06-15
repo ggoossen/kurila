@@ -2,18 +2,18 @@ use Perl6::Form;
 
 my $bullet = "<>";
 
-my @items = ~< *DATA;
-s/\\n/\n/g for @items;
-s/\\r/\r/g for @items;
+my @items = @( ~< *DATA );
+s/\\n/\n/g for < @items;
+s/\\r/\r/g for < @items;
 
-print form
+print < form
 	\%(bullet=>'<>'),
 	 "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
 		 \@items,                     \@items;
 
-my $items = join "", @items;
+my $items = join "", < @items;
 
-print form
+print < form
 	 "-----------------------",
      \%(bullet=>'<>'),
 	 "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",

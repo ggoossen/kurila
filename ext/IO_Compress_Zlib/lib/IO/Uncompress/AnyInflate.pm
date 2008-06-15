@@ -24,10 +24,10 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyInflateError);
 $VERSION = '2.006';
 $AnyInflateError = '';
 
-@ISA = qw( IO::Uncompress::Base Exporter );
-@EXPORT_OK = qw( $AnyInflateError anyinflate ) ;
-%EXPORT_TAGS = %IO::Uncompress::Base::DEFLATE_CONSTANTS ;
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+@ISA = @( qw( IO::Uncompress::Base Exporter ) );
+@EXPORT_OK = @( qw( $AnyInflateError anyinflate ) ) ;
+%EXPORT_TAGS = %( < %IO::Uncompress::Base::DEFLATE_CONSTANTS ) ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 # TODO - allow the user to pick a set of the three formats to allow
@@ -37,19 +37,19 @@ sub new
 {
     my $class = shift ;
     my $obj = createSelfTiedObject($class, \$AnyInflateError);
-    $obj->_create(undef, 0, @_);
+    $obj->_create(undef, 0, < @_);
 }
 
 sub anyinflate
 {
     my $obj = createSelfTiedObject(undef, \$AnyInflateError);
-    return $obj->_inf(@_) ;
+    return $obj->_inf(< @_) ;
 }
 
 sub getExtraParams
 {
     use IO::Compress::Base::Common  v2.006 qw(:Parse);
-    return ( 'RawInflate' => \@(1, 1, Parse_boolean,  0) ) ;
+    return  @( 'RawInflate' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
 sub ckParams
@@ -70,18 +70,18 @@ sub mkUncomp
     my $class = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) = IO::Uncompress::Adapter::Inflate::mkUncompObject();
+    my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Inflate::mkUncompObject();
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
 
     *$self->{Uncomp} = $obj;
     
-     my @possible = qw( Inflate Gunzip Unzip );
+     my @possible = @( qw( Inflate Gunzip Unzip ) );
      unshift @possible, 'RawInflate' 
         if 1 || $got->value('RawInflate');
 
-     my $magic = $self->ckMagic( @possible );
+     my $magic = $self->ckMagic( < @possible );
 
      if ($magic) {
         *$self->{Info} = $self->readHeader($magic)
@@ -98,10 +98,10 @@ sub mkUncomp
 sub ckMagic
 {
     my $self = shift;
-    my @names = @_ ;
+    my @names = @( < @_ ) ;
 
     my $keep = ref $self ;
-    for my $class ( map { "IO::Uncompress::$_" } @names)
+    for my $class ( map { "IO::Uncompress::$_" } < @names)
     {
         bless $self => $class;
         my $magic = $self->ckMagic();

@@ -1,8 +1,8 @@
 use Perl6::Form;
 
-my @text = ~< *DATA;
+my @text = @( ~< *DATA );
 
-my %page = (
+my %page = %(
 	header => \%( first => qq{Hamlet's soliloquy begins...\n\n},
 	            odd   => qq{Hamlet's soliloquy continues...\n\n},
    				even  => sub { form "\{>>\{70\}>>\}\n\n",
@@ -18,9 +18,9 @@ my %page = (
 	feed   => "^L\n",
 );
 
-print form \%(page=>\%page),
+print < form \%(page=>\%page),
 	 '{]]]]]}  {"{*}"}  {[[[[[}',
-	 \@(1..@text), \@text,  \@(1..@text);
+	 \@(1..nelems @text), \@text,  \@(1..nelems @text);
 	 
 __DATA__
 To be, or not to be -- that is the question:

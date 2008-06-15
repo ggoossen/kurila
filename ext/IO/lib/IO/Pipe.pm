@@ -18,22 +18,22 @@ $VERSION = "1.13";
 sub new {
     my $type = shift;
     my $class = ref($type) || $type || "IO::Pipe";
-    @_ == 0 || @_ == 2 or croak "usage: new $class [READFH, WRITEFH]";
+    (nelems @_) == 0 || (nelems @_) == 2 or croak "usage: new $class [READFH, WRITEFH]";
 
     my $me = bless gensym(), $class;
 
-    my($readfh,$writefh) = @_ ? @_ : $me->handles;
+    my($readfh,$writefh) = (nelems @_) ? < @_ : < $me->handles;
 
     pipe($readfh, $writefh)
 	or return undef;
 
-    @{*$me} = ($readfh, $writefh);
+    @{*$me} = @($readfh, $writefh);
 
     $me;
 }
 
 sub handles {
-    @_ == 1 or croak 'usage: $pipe->handles()';
+    (nelems @_) == 1 or croak 'usage: $pipe->handles()';
     (IO::Pipe::End->new(), IO::Pipe::End->new());
 }
 
@@ -70,7 +70,7 @@ sub _doit {
 	$fh->close;
 
         if ($do_spawn) {
-          $pid = try { system 1, @_ }; # 1 == P_NOWAIT
+          $pid = try { system 1, < @_ }; # 1 == P_NOWAIT
           my $err = $!;
     
           $io->fdopen($save, $mode);
@@ -78,7 +78,7 @@ sub _doit {
           croak "IO::Pipe: Cannot spawn-NOWAIT: $err" if not $pid or $pid +< 0;
           return $pid;
         } else {
-          exec @_ or
+          exec < @_ or
             croak "IO::Pipe: Cannot exec: $!";
         }
     }
@@ -90,7 +90,7 @@ sub _doit {
 }
 
 sub reader {
-    @_ +>= 1 or croak 'usage: $pipe->reader( [SUB_COMMAND_ARGS] )';
+    (nelems @_) +>= 1 or croak 'usage: $pipe->reader( [SUB_COMMAND_ARGS] )';
     my $me = shift;
 
     return undef
@@ -98,13 +98,13 @@ sub reader {
 
     my $fh  = $me->*->[0];
     my $pid;
-    $pid = $me->_doit(0, $fh, @_)
-        if(@_);
+    $pid = $me->_doit(0, $fh, < @_)
+        if(nelems @_);
 
     close($me->*->[1]);
     bless $me, ref($fh);
     *$me = *$fh;          # Alias self to handle
-    $me->fdopen($fh->fileno,"r")
+    $me->fdopen( <$fh->fileno,"r")
 	unless defined($me->fileno);
     bless $fh;                  # Really wan't un-bless here
     $me->*->$->{'io_pipe_pid'} = $pid
@@ -114,7 +114,7 @@ sub reader {
 }
 
 sub writer {
-    @_ +>= 1 or croak 'usage: $pipe->writer( [SUB_COMMAND_ARGS] )';
+    (nelems @_) +>= 1 or croak 'usage: $pipe->writer( [SUB_COMMAND_ARGS] )';
     my $me = shift;
 
     return undef
@@ -122,13 +122,13 @@ sub writer {
 
     my $fh  = @{*$me}[1];
     my $pid;
-    $pid = $me->_doit(1, $fh, @_)
-        if(@_);
+    $pid = $me->_doit(1, $fh, < @_)
+        if(nelems @_);
 
     close @{*$me}[0];
     bless $me, ref($fh);
     *$me = *$fh;          # Alias self to handle
-    $me->fdopen($fh->fileno,"w")
+    $me->fdopen( <$fh->fileno,"w")
 	unless defined($me->fileno);
     bless $fh;                  # Really wan't un-bless here
     %{*$me}{'io_pipe_pid'} = $pid
@@ -141,11 +141,11 @@ package IO::Pipe::End;
 
 our(@ISA);
 
-@ISA = qw(IO::Handle);
+@ISA = @( qw(IO::Handle) );
 
 sub close {
     my $fh = shift;
-    my $r = $fh->SUPER::close(@_);
+    my $r = $fh->SUPER::close(< @_);
 
     waitpid(%{*$fh}{'io_pipe_pid'},0)
 	if(defined %{*$fh}{'io_pipe_pid'});

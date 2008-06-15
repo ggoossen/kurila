@@ -15,7 +15,7 @@ my $result = GetOptions ("rank" => \$rank,		    # rank authors
 			 "reverse" => \$reverse,
 			);
 
-if (!$result or (($rank||0) + ($ta||0) + (@authors ? 1 : 0) != 1) or !@ARGV) {
+if (!$result or (($rank||0) + ($ta||0) + ((nelems @authors) ? 1 : 0) != 1) or !nelems @ARGV) {
   die <<"EOS";
 $0 --rank Changelogs                        # rank authors by patches
 $0 --acknowledged <authors file> Changelogs # Display unacknowledged authors
@@ -118,9 +118,9 @@ while ( ~< *DATA) {
 ;
 
 
-if (@authors) {
+if ((nelems @authors)) {
   my %raw;
-  foreach my $filename (@authors) {
+  foreach my $filename (< @authors) {
     open FH, "<", "$filename" or die "Can't open $filename: $!";
     while ( ~< *FH) {
       next if m/^\#/;
@@ -150,9 +150,9 @@ while ( ~< *ARGV) {
   next if m/^-+/;
   if (m!^\[\s+(\d+)\]\s+By:\s+(\S+)\s+on!) {
     # new patch
-    my @new = ($1, $2);
+    my @new = @($1, $2);
     &process ($committer, $patch, $log);
-    ($patch, $committer) = @new;
+    ($patch, $committer) = < @new;
     undef $log;
   } elsif (s/^(\s+Log: )//) {
     die "Duplicate Log:" if $log;
@@ -203,13 +203,13 @@ sub display_ordered {
     $total += $count;
   }
 
-  my $i = @sorted;
-  return unless @sorted;
+  my $i = (nelems @sorted);
+  return unless (nelems @sorted);
   my $sum = 0;
-  foreach my $i ($reverse ? 0 ..( @sorted-1) : reverse 0 ..( @sorted-1)) {
+  foreach my $i ($reverse ? 0 ..( (nelems @sorted)-1) : reverse 0 ..( (nelems @sorted)-1)) {
     next unless @sorted[$i];
     my $prefix;
-    $sum += $i * @{@sorted[$i]};
+    $sum += $i * nelems @{@sorted[$i]};
     # Value to display is either this one, or the cumulative sum.
     my $value = $cumulative ? $sum : $i;
     if ($percentage) {
@@ -217,17 +217,17 @@ sub display_ordered {
     } else {
 	$prefix = "$value:\t";
     }
-    print wrap ($prefix, "\t", join (" ", sort @{@sorted[$i]}), "\n");
+    print < wrap ($prefix, "\t", join (" ", sort < @{@sorted[$i]}), "\n");
   }
 }
 
 sub process {
-  my ($committer, $patch, $log) = @_;
+  my ($committer, $patch, $log) = < @_;
   return unless $committer;
-  my @authors = $log =~ m/From:\s+.*?([^"\@ \t\n<>]+\@[^"\@ \t\n<>]+)/gm;
+  my @authors = @( $log =~ m/From:\s+.*?([^"\@ \t\n<>]+\@[^"\@ \t\n<>]+)/gm );
 
-  if (@authors) {
-    foreach (@authors) {
+  if ((nelems @authors)) {
+    foreach (< @authors) {
       s/^<//;
       s/>$//;
       $_ = lc $_;

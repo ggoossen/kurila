@@ -251,12 +251,12 @@ use SelectSaver;
 use IO ();	# Load the XS module
 
 require Exporter;
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 
 $VERSION = "1.27_01";
 $VERSION = eval $VERSION;
 
-@EXPORT_OK = qw(
+@EXPORT_OK = @( qw(
     autoflush
     output_field_separator
     output_record_separator
@@ -277,7 +277,7 @@ $VERSION = eval $VERSION;
     _IOFBF
     _IOLBF
     _IONBF
-);
+) );
 
 ################################################
 ## Constructors, destructors.
@@ -285,17 +285,17 @@ $VERSION = eval $VERSION;
 
 sub new {
     my $class = ref(@_[0]) || @_[0] || "IO::Handle";
-    @_ == 1 or die "usage: new $class";
+    (nelems @_) == 1 or die "usage: new $class";
     my $io = gensym;
     bless $io, $class;
 }
 
 sub new_from_fd {
     my $class = ref(@_[0]) || @_[0] || "IO::Handle";
-    @_ == 3 or die "usage: new_from_fd $class FD, MODE";
+    (nelems @_) == 3 or die "usage: new_from_fd $class FD, MODE";
     my $io = gensym;
     shift;
-    IO::Handle::fdopen($io, @_)
+    IO::Handle::fdopen($io, < @_)
 	or return undef;
     bless $io, $class;
 }
@@ -305,7 +305,7 @@ sub new_from_fd {
 ##
 
 sub _open_mode_string {
-    my ($mode) = @_;
+    my ($mode) = < @_;
     $mode =~ m/^\+?(<|>>?)$/
       or $mode =~ s/^r(\+?)$/$1</
       or $mode =~ s/^w(\+?)$/$1>/
@@ -315,8 +315,8 @@ sub _open_mode_string {
 }
 
 sub fdopen {
-    @_ == 3 or die 'usage: $io->fdopen(FD, MODE)';
-    my ($io, $fd, $mode) = @_;
+    (nelems @_) == 3 or die 'usage: $io->fdopen(FD, MODE)';
+    my ($io, $fd, $mode) = < @_;
 
     my $fdmode = '&';
     if (!ref($fd) && $fd =~ m#^\d+$#) {
@@ -329,8 +329,8 @@ sub fdopen {
 }
 
 sub close {
-    @_ == 1 or die 'usage: $io->close()';
-    my($io) = @_;
+    (nelems @_) == 1 or die 'usage: $io->close()';
+    my($io) = < @_;
 
     close($io);
 }
@@ -343,39 +343,39 @@ sub close {
 # select
 
 sub opened {
-    @_ == 1 or die 'usage: $io->opened()';
+    (nelems @_) == 1 or die 'usage: $io->opened()';
     defined fileno(@_[0]);
 }
 
 sub fileno {
-    @_ == 1 or die 'usage: $io->fileno()';
+    (nelems @_) == 1 or die 'usage: $io->fileno()';
     fileno(@_[0]);
 }
 
 sub getc {
-    @_ == 1 or die 'usage: $io->getc()';
+    (nelems @_) == 1 or die 'usage: $io->getc()';
     getc(@_[0]);
 }
 
 sub eof {
-    @_ == 1 or die 'usage: $io->eof()';
+    (nelems @_) == 1 or die 'usage: $io->eof()';
     eof(@_[0]);
 }
 
 sub print {
-    @_ or die 'usage: $io->print(ARGS)';
+    (nelems @_) or die 'usage: $io->print(ARGS)';
     my $this = shift;
-    print $this @_;
+    print $this < @_;
 }
 
 sub printf {
-    @_ +>= 2 or die 'usage: $io->printf(FMT,[ARGS])';
+    (nelems @_) +>= 2 or die 'usage: $io->printf(FMT,[ARGS])';
     my $this = shift;
-    printf $this @_;
+    printf $this < @_;
 }
 
 sub getline {
-    @_ == 1 or die 'usage: $io->getline()';
+    (nelems @_) == 1 or die 'usage: $io->getline()';
     my $this = shift;
     return scalar ~< $this;
 } 
@@ -383,7 +383,7 @@ sub getline {
 *gets = \&getline;  # deprecated
 
 sub getlines {
-    @_ == 1 or die 'usage: $io->getlines()';
+    (nelems @_) == 1 or die 'usage: $io->getlines()';
     wantarray or
 	die q|Can't call $io->getlines in a scalar context, use $io->getline|;
     my $this = shift;
@@ -391,29 +391,29 @@ sub getlines {
 }
 
 sub truncate {
-    @_ == 2 or die 'usage: $io->truncate(LEN)';
+    (nelems @_) == 2 or die 'usage: $io->truncate(LEN)';
     truncate(@_[0], @_[1]);
 }
 
 sub read {
-    @_ == 3 || @_ == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
+    (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
     read(@_[0], @_[1], @_[2], @_[3] || 0);
 }
 
 sub sysread {
-    @_ == 3 || @_ == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
+    (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
     sysread(@_[0], @_[1], @_[2], @_[3] || 0);
 }
 
 sub write {
-    @_ +>= 2 && @_ +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
     local($\) = "";
     @_[2] = length(@_[1]) unless defined @_[2];
     print { @_[0] } substr(@_[1], @_[3] || 0, @_[2]);
 }
 
 sub syswrite {
-    @_ +>= 2 && @_ +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined(@_[2])) {
 	syswrite(@_[0], @_[1], @_[2], @_[3] || 0);
     } else {
@@ -422,7 +422,7 @@ sub syswrite {
 }
 
 sub stat {
-    @_ == 1 or die 'usage: $io->stat()';
+    (nelems @_) == 1 or die 'usage: $io->stat()';
     stat(@_[0]);
 }
 
@@ -431,9 +431,9 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = SelectSaver->new( qualify(@_[0], caller));
+    my $old = SelectSaver->new( < qualify(@_[0], caller));
     my $prev = $|;
-    $| = @_ +> 1 ? @_[1] : 1;
+    $| = (nelems @_) +> 1 ? @_[1] : 1;
     $prev;
 }
 
@@ -441,7 +441,7 @@ sub output_field_separator {
     warn "output_field_separator is not supported on a per-handle basis"
 	if ref(@_[0]);
     my $prev = $,;
-    $, = @_[1] if @_ +> 1;
+    $, = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
@@ -449,7 +449,7 @@ sub output_record_separator {
     warn "output_record_separator is not supported on a per-handle basis"
 	if ref(@_[0]);
     my $prev = $\;
-    $\ = @_[1] if @_ +> 1;
+    $\ = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
@@ -457,7 +457,7 @@ sub input_record_separator {
     warn "input_record_separator is not supported on a per-handle basis"
 	if ref(@_[0]);
     my $prev = $/;
-    $/ = @_[1] if @_ +> 1;
+    $/ = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
@@ -465,21 +465,21 @@ sub input_line_number {
     local $.;
     () = tell qualify(@_[0], caller) if ref(@_[0]);
     my $prev = $.;
-    $. = @_[1] if @_ +> 1;
+    $. = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
 # XXX undocumented
 sub fcntl {
-    @_ == 3 || die 'usage: $io->fcntl( OP, VALUE );';
-    my ($io, $op) = @_;
+    (nelems @_) == 3 || die 'usage: $io->fcntl( OP, VALUE );';
+    my ($io, $op) = < @_;
     return fcntl($io, $op, @_[2]);
 }
 
 # XXX undocumented
 sub ioctl {
-    @_ == 3 || die 'usage: $io->ioctl( OP, VALUE );';
-    my ($io, $op) = @_;
+    (nelems @_) == 3 || die 'usage: $io->ioctl( OP, VALUE );';
+    my ($io, $op) = < @_;
     return ioctl($io, $op, @_[2]);
 }
 
@@ -502,13 +502,13 @@ sub constant {
 sub printflush {
     my $io = shift;
     my $old;
-    $old = SelectSaver->new( qualify($io, caller)) if ref($io);
+    $old = SelectSaver->new( < qualify($io, caller)) if ref($io);
     local $| = 1;
     if(ref($io)) {
-        print $io @_;
+        print $io < @_;
     }
     else {
-	print @_;
+	print < @_;
     }
 }
 

@@ -54,8 +54,8 @@ use File::Find;
 use Cwd;
 
 use vars qw(@ISA @EXPORT_OK $VERSION);
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(&pod_find &simplify_name &pod_where &contains_pod);
+@ISA = @( qw(Exporter) );
+@EXPORT_OK = @( qw(&pod_find &simplify_name &pod_where &contains_pod) );
 
 # package global variables
 my $SIMPLIFY_RX;
@@ -119,13 +119,13 @@ sub pod_find
 {
     my %opts;
     if(ref @_[0]) {
-        %opts = %{shift()};
+        %opts = %( < %{shift()} );
     }
 
     %opts{-verbose} ||= 0;
     %opts{-perl}    ||= 0;
 
-    my (@search) = @_;
+    my (@search) = @( < @_ );
 
     if(%opts{-script}) {
         require Config;
@@ -137,8 +137,8 @@ sub pod_find
     if(%opts{-inc}) {
         if ($^O eq 'MacOS') {
             # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-            my @new_INC = @INC;
-            for (@new_INC) {
+            my @new_INC = @( < @INC );
+            for (< @new_INC) {
                 if ( $_ eq '.' ) {
                     $_ = ':';
                 } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
@@ -147,9 +147,9 @@ sub pod_find
                     $_ =~ s|^\./|:|;
                 }
             }
-            push(@search, grep($_ ne File::Spec->curdir, @new_INC));
+            push(@search, grep($_ ne File::Spec->curdir, < @new_INC));
         } else {
-            push(@search, grep($_ ne File::Spec->curdir, @INC));
+            push(@search, grep($_ ne File::Spec->curdir, < @INC));
         }
 
         %opts{-perl} = 1;
@@ -181,7 +181,7 @@ sub pod_find
     my %names;
     my $pwd = cwd();
 
-    foreach my $try (@search) {
+    foreach my $try (< @search) {
         unless(File::Spec->file_name_is_absolute($try)) {
             # make path absolute
             $try = File::Spec->catfile($pwd,$try);
@@ -232,7 +232,7 @@ sub pod_find
 }
 
 sub _check_for_duplicates {
-    my ($file, $name, $names_ref, $pods_ref) = @_;
+    my ($file, $name, $names_ref, $pods_ref) = < @_;
     if(%$names_ref{$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
@@ -245,7 +245,7 @@ sub _check_for_duplicates {
 }
 
 sub _check_and_extract_name {
-    my ($file, $verbose, $root_rx) = @_;
+    my ($file, $verbose, $root_rx) = < @_;
 
     # check extension or executable flag
     # this involves testing the .bat extension on Win32!
@@ -290,7 +290,7 @@ F<.bat>, F<.cmd> on Win32 and OS/2, or F<.com> on VMS, respectively.
 # basic simplification of the POD name:
 # basename & strip extension
 sub simplify_name {
-    my ($str) = @_;
+    my ($str) = < @_;
     # remove all path components
     if ($^O eq 'MacOS') {
         $str =~ s/^.*://s;
@@ -361,10 +361,10 @@ contain some pod documentation.
 sub pod_where {
 
   # default options
-  my %options = (
+  my %options = %(
          '-inc' => 0,
          '-verbose' => 0,
-         '-dirs' => \@( File::Spec->curdir ),
+         '-dirs' => \@( < File::Spec->curdir ),
         );
 
   # Check for an options hash as first argument
@@ -372,20 +372,20 @@ sub pod_where {
     my $opt = shift;
 
     # Merge default options with supplied options
-    %options = (%options, %$opt);
+    %options = %(< %options, < %$opt);
   }
 
   # Check usage
-  warn 'Usage: pod_where({options}, $pod)' unless (scalar(@_));
+  warn 'Usage: pod_where({options}, $pod)' unless (scalar(nelems @_));
 
   # Read argument
   my $pod = shift;
 
   # Split on :: and then join the name together using File::Spec
-  my @parts = split (m/::/, $pod);
+  my @parts = @( split (m/::/, $pod) );
 
   # Get full directory list
-  my @search_dirs = @{ %options{'-dirs'} };
+  my @search_dirs = @( < @{ %options{'-dirs'} } );
 
   if (%options{'-inc'}) {
 
@@ -394,8 +394,8 @@ sub pod_where {
     # Add @INC
     if ($^O eq 'MacOS' && %options{'-inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-        my @new_INC = @INC;
-        for (@new_INC) {
+        my @new_INC = @( < @INC );
+        for (< @new_INC) {
             if ( $_ eq '.' ) {
                 $_ = ':';
             } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
@@ -404,9 +404,9 @@ sub pod_where {
                 $_ =~ s|^\./|:|;
             }
         }
-        push (@search_dirs, @new_INC);
+        push (@search_dirs, < @new_INC);
     } elsif (%options{'-inc'}) {
-        push (@search_dirs, @INC);
+        push (@search_dirs, < @INC);
     }
 
     # Add location of pod documentation for perl man pages (eg perlfunc)
@@ -421,11 +421,11 @@ sub pod_where {
       if -d %Config::Config{'scriptdir'};
   }
 
-  warn "Search path is: ".join(' ', @search_dirs)."\n"
+  warn "Search path is: ".join(' ', < @search_dirs)."\n"
         if %options{'-verbose'};
 
   # Loop over directories
-  Dir: foreach my $dir ( @search_dirs ) {
+  Dir: foreach my $dir ( < @search_dirs ) {
 
     # Don't bother if can't find the directory
     if (-d $dir) {
@@ -433,7 +433,7 @@ sub pod_where {
         if %options{'-verbose'};
 
       # Now concatenate this directory with the pod we are searching for
-      my $fullname = File::Spec->catfile($dir, @parts);
+      my $fullname = File::Spec->catfile($dir, < @parts);
       warn "Filename is now $fullname\n"
         if %options{'-verbose'};
 
@@ -481,7 +481,7 @@ information.
 sub contains_pod {
   my $file = shift;
   my $verbose = 0;
-  $verbose = shift if @_;
+  $verbose = shift if (nelems @_);
 
   # check for one line of POD
   unless(open(POD, "<","$file")) {

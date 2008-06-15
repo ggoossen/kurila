@@ -32,22 +32,22 @@ sub hock { "yarrow" }
 
 package main;
 use vars qw(%Subs);
-local %Subs = ();
+local %Subs = %( () );
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::');
 
 sub B::GV::find_syms {
-    my($symbol) = @_;
+    my($symbol) = < @_;
 
     %main::Subs{$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }
 
-my @syms = map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car
-                                               BEGIN);
+my @syms = @( map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car
+                                               BEGIN) );
 push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.
-ok( join('', sort @syms) eq join('', sort keys %Subs), 'all symbols found' );
+ok( join('', sort < @syms) eq join('', sort keys %Subs), 'all symbols found' );
 
 # Make sure we only hit them each once.
 ok( (!grep $_ != 1, values %Subs), '...and found once' );

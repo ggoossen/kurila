@@ -4,7 +4,7 @@ print "1..8\n";
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = @( '../lib' );
 }
 
 use Text::Abbrev;
@@ -14,8 +14,8 @@ print "ok 1\n";
 # old style as reference
 our %x;
 local(%x);
-my @z = qw(list edit send abort gripe listen);
-abbrev(*x, @z);
+my @z = @( qw(list edit send abort gripe listen) );
+abbrev(*x, < @z);
 my $r = join ':', sort keys %x; 
 print "not " if exists %x{'l'}   ||
                 exists %x{'li'}  ||
@@ -37,16 +37,16 @@ print "ok 4\n";
 my $test = 5;
 
 # wantarray
-my %y = abbrev @z;
+my %y = %( < abbrev < @z );
 my $s = join ':', sort keys %y;
 print (($r eq $s)?"ok $test\n":"not ok $test\n"); $test++;
 
-my $y = abbrev @z;
+my $y = abbrev < @z;
 $s = join ':', sort keys %$y;
 print (($r eq $s)?"ok $test\n":"not ok $test\n"); $test++;
 
-%y = ();
-abbrev \%y, @z;
+%y = %( () );
+abbrev \%y, < @z;
 
 $s = join ':', sort keys %y;
 print (($r eq $s)?"ok $test\n":"not ok $test\n"); $test++;

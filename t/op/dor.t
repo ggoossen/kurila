@@ -31,12 +31,12 @@ $x = '';
 $x //= 0;
 is($x, '', 		'//=: left-hand operand defined but empty');
 
-@ARGV = (undef, 0, 3);
+@ARGV = @(undef, 0, 3);
 is(shift       // 7, 7,	'shift // ... works');
 is(shift()     // 7, 0,	'shift() // ... works');
 is(shift @ARGV // 7, 3,	'shift @array // ... works');
 
-@ARGV = (3, 0, undef);
+@ARGV = @(3, 0, undef);
 is(pop         // 7, 7,	'pop // ... works');
 is(pop()       // 7, 0,	'pop() // ... works');
 is(pop @ARGV   // 7, 3,	'pop @array // ... works');

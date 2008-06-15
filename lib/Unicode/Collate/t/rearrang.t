@@ -7,7 +7,7 @@ BEGIN {
     }
     if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
-	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+	@INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -32,7 +32,7 @@ my $Collator = Unicode::Collate->new(
 
 ##### 2..9
 
-my %old_rearrange = $Collator->change(rearrange => undef);
+my %old_rearrange = %( < $Collator->change(rearrange => undef) );
 
 is($Collator->cmp("\x{0E41}A", "\x{0E40}B"), 1);
 is($Collator->cmp("A\x{0E41}A", "A\x{0E40}B"), 1);
@@ -42,7 +42,7 @@ $Collator->change(rearrange => \@( 0x61 ));
 
 is($Collator->cmp("ab", "AB"), 1); # as 'ba' > 'AB'
 
-$Collator->change(%old_rearrange);
+$Collator->change(< %old_rearrange);
 
 is($Collator->cmp("ab", "AB"), -1);
 is($Collator->cmp("\x{0E40}", "\x{0E41}"), -1);

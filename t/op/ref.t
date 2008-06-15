@@ -62,7 +62,7 @@ is (ref($vstref), "version", "ref(vstr) eq 'version'");
 # Test references to real arrays.
 
 my $test = curr_test();
-@ary = ($test,$test+1,$test+2,$test+3);
+@ary = @($test,$test+1,$test+2,$test+3);
 @ref[0] = \@a;
 @ref[1] = \@b;
 @ref[2] = \@c;
@@ -70,12 +70,12 @@ my $test = curr_test();
 for my $i (3,1,2,0) {
     push(@{@ref[$i]}, "ok @ary[$i]\n");
 }
-print @a;
+print < @a;
 print @{@ref[1]}[0];
 print @{@ref[2]}[[0]];
 {
     no strict 'refs';
-    print @{*{Symbol::fetch_glob('d')}};
+    print < @{*{Symbol::fetch_glob('d')}};
 }
 curr_test($test+4);
 
@@ -88,10 +88,10 @@ is ($$$refref, 'Good');
 # Test nested anonymous lists.
 
 $ref = \@(\@(),2,\@(3,4,5,));
-is (scalar @$ref, 3);
+is (scalar nelems @$ref, 3);
 is (@$ref[1], 2);
 is (@{@$ref[2]}[2], 5);
-is (scalar @{@$ref[0]}, 0);
+is (scalar nelems @{@$ref[0]}, 0);
 
 is ($ref->[1], 2);
 is ($ref->[2]->[0], 3);
@@ -107,13 +107,13 @@ is ($refref->{"key"}->[2]->[0], 3);
 @spring[5]->[0] = 123;
 @spring[5]->[1] = 456;
 push(@{@spring[5]}, 789);
-is (join(':',@{@spring[5]}), "123:456:789");
+is (join(':',< @{@spring[5]}), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-@{%spring2{"foo"}} = (1,2,3);
+@{%spring2{"foo"}} = @(1,2,3);
 %spring2{"foo"}->[3] = 4;
-is (join(':',@{%spring2{"foo"}}), "1:2:3:4");
+is (join(':',< @{%spring2{"foo"}}), "1:2:3:4");
 
 # Test references to subroutines.
 
@@ -126,7 +126,7 @@ is (join(':',@{%spring2{"foo"}}), "1:2:3:4");
 }
 
 $subrefref = \\&mysub2;
-is ($$subrefref->("GOOD"), "good");
+is ( <$$subrefref->("GOOD"), "good");
 sub mysub2 { lc shift }
 
 # Test the ref operator.
@@ -151,9 +151,9 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
     my $x = \%( aap => 'noot', mies => "teun" );
     is("".$x->%, "".%$x);
     my $w = \*foo428;
-    is(Symbol::glob_name($w->*), "main::foo428");
+    is( <Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return @_[0]; };
-    is($v->&(55), 55);
+    is( <$v->&(55), 55);
 }
 
 # Test bless operator.
@@ -172,7 +172,7 @@ main::is (ref $object2,	'MYHASH');
 &mymethod($object,"argument");
 
 sub mymethod {
-    local($THIS, @ARGS) = @_;
+    local($THIS, < @ARGS) = < @_;
     die 'Got a "' . ref($THIS). '" instead of a MYHASH'
 	unless ref $THIS eq 'MYHASH';
     main::is (@ARGS[0], "argument");
@@ -199,7 +199,7 @@ DESTROY {
 
 package OBJ;
 
-our @ISA = ('BASEOBJ');
+our @ISA = @('BASEOBJ');
 
 $main::object = bless \%(FOO => 'foo', BAR => 'bar');
 
@@ -207,7 +207,7 @@ package main;
 
 # Test arrow-style method invocation.
 
-is ($object->doit("BAR"), 'bar');
+is ( <$object->doit("BAR"), 'bar');
 
 # Test not working indirect-object-style method invocation.
 
@@ -224,19 +224,19 @@ sub BASEOBJ::doit {
 # test the \(@foo) construct
 #
 package main;
-@foo = \(1..3);
-@bar = \(@foo);
-@baz = \(1,@foo,@bar);
-is (scalar (@bar), 3);
-is (scalar grep(ref($_), @bar), 3);
-is (scalar (@baz), 3);
+@foo = @( \(1..3) );
+@bar = @( \(< @foo) );
+@baz = @( \(1,< @foo,< @bar) );
+is (scalar (nelems @bar), 3);
+is (scalar grep(ref($_), < @bar), 3);
+is (scalar (nelems @baz), 3);
 
-my(@fuu) = \(1..2,3);
-my(@baa) = \(@fuu);
-my(@bzz) = \(1,@fuu,@baa);
-is (scalar (@baa), 3);
-is (scalar grep(ref($_), @baa), 3);
-is (scalar (@bzz), 3);
+my(@fuu) = @( \(1..2,3) );
+my(@baa) = @( \(< @fuu) );
+my(@bzz) = @( \(1,< @fuu,< @baa) );
+is (scalar (nelems @baa), 3);
+is (scalar grep(ref($_), < @baa), 3);
+is (scalar (nelems @bzz), 3);
 
 # also, it can't be an lvalue
 eval_dies_like('our ($x, $y); \($x, $y) = (1, 2);',
@@ -315,7 +315,7 @@ curr_test($test + 2);
     my @a;
     @a[1] = "good";
     my $got;
-    for (@a) {
+    for (< @a) {
 	$got .= ${\$_};
 	$got .= ';';
     }
@@ -353,7 +353,7 @@ sub x::DESTROY {print "ok ", $test + shift->[0], "\n"}
 }
 curr_test($test+4);
 
-is (runperl (switches=> \@('-l'),
+is ( <runperl (switches=> \@('-l'),
 	     prog=> 'print 1; print qq-*$\*-;print 1;'),
     "1\n*\n*\n1\n");
 
@@ -365,7 +365,7 @@ is ($?, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 # bug #27268: freeing self-referential typeglobs could trigger
 # "Attempt to free unreferenced scalar" warnings
 
-is (runperl(
+is ( <runperl(
     prog => 'use Symbol;my $x=bless \gensym,"t"; print;*$$x=$x',
     stderr => 1
 ), '', 'freeing self-referential typeglob');
@@ -374,7 +374,7 @@ is (runperl(
 # REGEX pad had already been freed (ithreads build only). The
 # object is required to trigger the early freeing of GV refs to to STDOUT
 
-like (runperl(
+like ( <runperl(
     prog => 'our $x=bless \@(); sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
     stderr => 1
       ), qr/^(ok)+$/, 'STDOUT destructor');
@@ -454,8 +454,8 @@ TODO: {
     *{Symbol::fetch_glob($name1)} = sub {"One"};
     *{Symbol::fetch_glob($name2)} = sub {"Two"};
 
-    is (&{*{Symbol::fetch_glob($name1)}}, "One");
-    is (&{*{Symbol::fetch_glob($name2)}}, "Two");
+    is ( <&{*{Symbol::fetch_glob($name1)}}, "One");
+    is ( <&{*{Symbol::fetch_glob($name2)}}, "Two");
 }
 
 # test derefs after list slice
@@ -464,8 +464,8 @@ is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/o ->' 
 is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
 is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/o ->' );
 is ( (\@(qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
-is ( (sub {"bar"})[[0]](), "bar", 'code deref from list slice w/o ->' );
-is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
+is ( < (sub {"bar"})[[0]](), "bar", 'code deref from list slice w/o ->' );
+is ( < (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 
 # deref on empty list shouldn't autovivify
 {

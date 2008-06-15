@@ -69,7 +69,7 @@ $::opt_W = 70;	# set wrap width columns (see Text::Wrap module)
 $::opt_C = 0;	# 'Chip' mode (handle from/tags/article/bug files) undocumented
 $::opt_X = 0;	# list patchfiles that patch the same file
 
-usage unless @ARGV;
+usage unless (nelems @ARGV);
 
 getopts("dmnihlvecC45Xp:f:IM:W:") or usage;
 
@@ -80,10 +80,10 @@ $::opt_4 = 1 if $::opt_5;
 $::opt_i = 1 if $::opt_X;
 
 # see get_meta_info()
-my @show_meta = split(' ', $::opt_M || 'Title From Msg-ID Files');
-my %show_meta = map { ($_,1) } @show_meta;
+my @show_meta = @( split(' ', $::opt_M || 'Title From Msg-ID Files') );
+my %show_meta = %( map { ($_,1) } < @show_meta );
 
-my %cat_title = (
+my %cat_title = %(
     'BUILD'	=> 'BUILD PROCESS',
     'CORE'	=> 'CORE LANGUAGE',
     'DOC'	=> 'DOCUMENTATION',
@@ -154,7 +154,7 @@ my (%removed, %added);
 my $prologue = 1;	# assume prologue till patch or /^exit\b/ seen
 
 
-foreach my $argv (@ARGV) {
+foreach my $argv (< @ARGV) {
     $in = $argv;
     if (-d $in) {
 	warn "Ignored directory $in\n";
@@ -166,7 +166,7 @@ foreach my $argv (@ARGV) {
 	warn "Unable to open $in: $!\n";
 	next;
     }
-    print "Reading $in...\n" if $::opt_v and @ARGV +> 1;
+    print "Reading $in...\n" if $::opt_v and (nelems @ARGV) +> 1;
     $ls = %ls{$in} ||= \%( is_in => 1, in => $in );
     my $type;
     while ( ~< *F) {
@@ -249,31 +249,31 @@ foreach my $argv (@ARGV) {
     $ls->{category} = $::opt_c
 	? categorize_files(\@(keys %{ $ls->{out} }), $::opt_v) : '';
 }
-print scalar(@ARGV)." files read.\n" if $::opt_v and @ARGV +> 1;
+print scalar(nelems @ARGV)." files read.\n" if $::opt_v and (nelems @ARGV) +> 1;
 
 
 # --- Firstly we filter and sort as needed ---
 
-my @ls  = values %ls;
+my @ls  = @( values %ls );
 
 if ($::opt_f) {		# filter out patches based on -f <regexp>
     $::opt_f .= '$' unless $::opt_f =~ m:/:;
-    @ls = grep {
+    @ls = @( grep {
 	my $match = 0;
 	if ($_->{is_in}) {
-	    my @out = keys %{ $_->{out} };
-	    $match=1 if grep { m/$::opt_f/o } @out;
+	    my @out = @( keys %{ $_->{out} } );
+	    $match=1 if grep { m/$::opt_f/o } < @out;
 	}
 	else {
 	    $match=1 if $_->{in} =~ m/$::opt_f/o;
 	}
 	$match;
-    } @ls;
+    } < @ls );
 }
 
 @ls  = sort {
     $a->{category} cmp $b->{category} || $a->{in} cmp $b->{in}
-} @ls;
+} < @ls;
 
 
 # --- Handle special modes ---
@@ -282,15 +282,15 @@ if ($::opt_4) {
     my $tail = ($::opt_5) ? "|| exit 1" : "";
     print map { "p4 delete $_$tail\n" } sort keys %removed if %removed;
     print map { "p4 add    $_$tail\n" } sort keys %added   if %added;
-    my @patches = sort grep { $_->{is_in} } @ls;
-    my @no_outs = grep { keys %{$_->{out}} == 0 } @patches;
+    my @patches = @( sort grep { $_->{is_in} } < @ls );
+    my @no_outs = @( grep { keys %{$_->{out}} == 0 } < @patches );
     warn "Warning: Some files contain no patches:",
-	join("\n\t", '', map { $_->{in} } @no_outs), "\n" if @no_outs;
+	join("\n\t", '', map { $_->{in} } < @no_outs), "\n" if (nelems @no_outs);
 
-    my %patched = map { ($_, 1) } map { keys %{$_->{out}} } @patches;
+    my %patched = %( map { ($_, 1) } map { keys %{$_->{out}} } < @patches );
     delete %patched{[keys %added]};
-    my @patched = sort keys %patched;
-    foreach(@patched) {
+    my @patched = @( sort keys %patched );
+    foreach(< @patched) {
 	next if %removed{$_};
 	my $edit = ($::opt_e && !-f $_) ? "add " : "edit";
 	print "p4 $edit   $_$tail\n";
@@ -304,28 +304,28 @@ if ($::opt_I) {
     my($in,$out);
     my %all_out;
     my @no_outs;
-    foreach $in (@ls) {
+    foreach $in (< @ls) {
 	next unless $in->{is_in};
 	++$n_patches;
-	my @outs = keys %{$in->{out}};
-	push @no_outs, $in unless @outs;
-	%all_out{[@outs]} = ($in->{in}) x @outs;
+	my @outs = @( keys %{$in->{out}} );
+	push @no_outs, $in unless (nelems @outs);
+	%all_out{[< @outs]} = ($in->{in}) x nelems @outs;
     }
-    my @all_out = sort keys %all_out;
-    my @missing = grep { ! -f $_ } @all_out;
-    print "$n_patches patch files patch ".@all_out." files (".@missing." missing)\n";
-    print @no_outs." patch files don't contain patches.\n" if @no_outs;
+    my @all_out = @( sort keys %all_out );
+    my @missing = @( grep { ! -f $_ } < @all_out );
+    print "$n_patches patch files patch ".nelems @all_out." files (".nelems @missing." missing)\n";
+    print (nelems @no_outs)." patch files don't contain patches.\n" if (nelems @no_outs);
     print "(use -v to list patches which patch 'missing' files)\n"
-	    if (@missing || @no_outs) && !$::opt_v;
-    if ($::opt_v and @no_outs) {
+	    if ((nelems @missing) || nelems @no_outs) && !$::opt_v;
+    if ($::opt_v and nelems @no_outs) {
 	print "Patch files which don't contain patches:\n";
-	foreach $out (@no_outs) {
+	foreach $out (< @no_outs) {
 	    printf "  \%-20s\n", $out->{in};
 	}
     }
-    if ($::opt_v and @missing) {
+    if ($::opt_v and nelems @missing) {
 	print "Missing files:\n";
-	foreach $out (@missing) {
+	foreach $out (< @missing) {
 	    printf "  \%-20s\t", $out	unless $::opt_h;
 	    print %all_out{$out}	unless $::opt_l;
 	    print "\n";
@@ -333,11 +333,11 @@ if ($::opt_I) {
     }
     print "Added files:   ".join(" ",sort keys %added  )."\n" if %added;
     print "Removed files: ".join(" ",sort keys %removed)."\n" if %removed;
-    exit 0+@missing;
+    exit 0+nelems @missing;
 }
 
 unless ($::opt_c and $::opt_m) {
-    foreach $ls (@ls) {
+    foreach $ls (< @ls) {
 	next unless ($::opt_i) ? $ls->{is_out} : $ls->{is_in};
 	next if $::opt_X and keys %{$ls->{out}} +<= 1;
 	list_files_by_patch($ls);
@@ -345,7 +345,7 @@ unless ($::opt_c and $::opt_m) {
 }
 else {
     my $c = '';
-    foreach $ls (@ls) {
+    foreach $ls (< @ls) {
 	next unless ($::opt_i) ? $ls->{is_out} : $ls->{is_in};
 	print "\n  ------  %cat_title{$ls->{category}}  ------\n"
 	    if $ls->{category} ne $c;
@@ -357,8 +357,8 @@ else {
 	    my $out = $ls->{in};
 	    print "\n$out patched by:\n";
 	    # find all the patches which patch $out and list them
-	    my @p = grep { $_->{out}->{$out} } values %ls;
-	    foreach $ls (@p) {
+	    my @p = @( grep { $_->{out}->{$out} } values %ls );
+	    foreach $ls (< @p) {
 		list_files_by_patch($ls, '');
 	    }
 	}
@@ -388,7 +388,7 @@ sub add_patched_file {
     my $i = %ls{$out} ||= \%(
 	is_out   => 1,
 	in       => $out,
-	category => $::opt_c ? categorize_files(\@( $out ), $::opt_v) : '',
+	category => $::opt_c ? < categorize_files(\@( $out ), $::opt_v) : '',
     );
     $i->{out}->{$in} = 1;
 }
@@ -426,38 +426,38 @@ sub trim_name {		# reduce/tidy file paths from diff lines
 
 
 sub list_files_by_patch {
-    my($ls, $name) = @_;
+    my($ls, $name) = < @_;
     $name = $ls->{in} unless defined $name;
     my @meta;
     if ($::opt_m) {
 	my $meta;
-	foreach $meta (@show_meta) {
+	foreach $meta (< @show_meta) {
 	    next unless $ls->{$meta};
-	    my @list = sort keys %{$ls->{$meta}};
+	    my @list = @( sort keys %{$ls->{$meta}} );
 	    push @meta, sprintf "\%7s:  ", $meta;
 	    if ($meta eq 'Title') {
-		@list = map { "\"$_\""; } @list;
+		@list = @( map { "\"$_\""; } < @list );
 		push @list, "#$1" if $::opt_C && $ls->{in} =~ m:\b(\w\d+)/patch$:;
 	    }
 	    elsif ($meta eq 'From') {
 		# fix-up bizzare addresses from japan and ibm :-)
-		foreach(@list) {
+		foreach(< @list) {
 		    s:\W+=?iso.*?<: <:;
 		    s/\d\d-\w\w\w-\d{4}\s+\d\d:\S+\s*//;
 		}
 	    }
 	    elsif ($meta eq 'Msg-ID') {
 		my %from; # limit long threads to one msg-id per site
-		@list = map {
+		@list = @( map {
 		    %from{(m/@(.*?)>/ ? $1 : $_)}++ ? () : ($_);
-		} @list;
+		} < @list );
 	    }
-	    push @meta, my_wrap("","          ", join(", ",@list)."\n");
+	    push @meta, < my_wrap("","          ", join(", ",< @list)."\n");
 	}
-	$name = "\n$name" if @meta and $name;
+	$name = "\n$name" if (nelems @meta) and $name;
     }
     # don't print the header unless the file contains something interesting
-    return if !@meta and !$ls->{out} and !$::opt_v;
+    return if !nelems @meta and !$ls->{out} and !$::opt_v;
     if ($::opt_l) {	# -l = no listing, just names
 	print "$ls->{in}";
 	my $n = keys %{ $ls->{out} };
@@ -470,13 +470,13 @@ sub list_files_by_patch {
     my $cat = ($ls->{category} and !$::opt_m) ? "\t$ls->{category}" : "";
     print "$name$cat: "	unless ($::opt_h and !$::opt_v) or !"$name$cat";
     my $sep = "\n";
-    $sep = "" if @show_meta==1 && $::opt_c && $::opt_h;
-    print join('', $sep, @meta) if @meta;
+    $sep = "" if (nelems @show_meta)==1 && $::opt_c && $::opt_h;
+    print join('', $sep, < @meta) if (nelems @meta);
 
     return if $::opt_m && !%show_meta{Files};
-    my @v = sort PATORDER keys %{ $ls->{out} };
-    my $n = @v;
-    my $v = "@v";
+    my @v = @( sort PATORDER keys %{ $ls->{out} } );
+    my $n = (nelems @v);
+    my $v = "{join ' ', <@v}";
     print $::opt_m ? "  Files:  ".my_wrap("","          ",$v) : $v;
     print " ($n patches)" if $::opt_n and $n+>1;
     print "\n";
@@ -484,18 +484,18 @@ sub list_files_by_patch {
 
 
 sub my_wrap {
-	my $txt = try { expand(wrap(@_)) };	# die's on long lines!
+	my $txt = try { expand( <wrap(< @_)) };	# die's on long lines!
     return $txt unless $@;
-	return expand("@_");
+	return expand("{join ' ', <@_}");
 }
 
 
 
 sub categorize_files {
-    my($files, $verb) = @_;
+    my($files, $verb) = < @_;
     my(%c, $refine);
 
-    foreach (@$files) {	# assign a score to a file path
+    foreach (< @$files) {	# assign a score to a file path
 	# the order of some of the tests is important
 	%c{TEST} += 5,next   if m:^t/:;
 	%c{DOC}  += 5,next   if m:^pod/:;
@@ -520,22 +520,22 @@ sub categorize_files {
     if (keys %c +> 1) {	# sort to find category with highest score
       refine:
 	++$refine;
-	my @c = sort { %c{$b} <+> %c{$a} || $a cmp $b } keys %c;
-	my @v = map  { %c{$_} } @c;
-	if (@v +> 1 and $refine +<= 1 and "@v" =~ m/^(\d) \1/
+	my @c = @( sort { %c{$b} <+> %c{$a} || $a cmp $b } keys %c );
+	my @v = @( map  { %c{$_} } < @c );
+	if ((nelems @v) +> 1 and $refine +<= 1 and "{join ' ', <@v}" =~ m/^(\d) \1/
 		and @c[0] =~ m/^(DOC|TESTS|OTHER)/) { # rare
 	    print "Tie, promoting @c[1] over @c[0]\n" if $::opt_d;
 	    ++%c{@c[1]};
 	    goto refine;
 	}
-	print "  ".@$files." patches: ", join(", ", map { "$_: %c{$_}" } @c),".\n"
+	print "  ".nelems @$files." patches: ", join(", ", map { "$_: %c{$_}" } < @c),".\n"
 	    if $verb;
 	return @c[0] || 'OTHER';
     }
     else {
-	my($c, $v) = %c;
+	my($c, $v) = < %c;
 	$c ||= 'UNKNOWN'; $v ||= 0;
-	print "  ".@$files." patches: $c: $v\n" if $verb;
+	print "  ".nelems @$files." patches: $c: $v\n" if $verb;
 	return $c;
     }
 }

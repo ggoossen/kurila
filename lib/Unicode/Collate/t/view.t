@@ -7,7 +7,7 @@ BEGIN {
     }
     if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
-	@INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+	@INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -109,7 +109,7 @@ $Collator->change(level => 4);
 
 # Variable
 
-our %origVar = $Collator->change(variable => 'Blanked');
+our %origVar = %( < $Collator->change(variable => 'Blanked') );
 ok($Collator->viewSortKey("1+2"),
     '[0A0C 0A0D | 0020 0020 | 0002 0002 | 0031 002B 0032]');
 
@@ -146,7 +146,7 @@ ok($Collator->viewSortKey("?\x{300}!\x{301}\x{315}."),
 
 ok($Collator->viewSortKey("?!."), '[| | | 024E 024B 0255]');
 
-$Collator->change(%origVar);
+$Collator->change(< %origVar);
 
 #####
 

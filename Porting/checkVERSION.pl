@@ -17,7 +17,7 @@ find(
 		 print "$File::Find::name\n";
 	     }
 	 }
-     }, @ARGV ? shift : ".");
+     }, (nelems @ARGV) ? shift : ".");
 
 sub parse_file {
     my $parsefile = shift;

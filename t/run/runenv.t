@@ -33,32 +33,32 @@ delete %ENV{PERL5OPT};
 # second element is an explanation of the failure
 sub runperl {
   local *F;
-  my ($env, $args, $stdout, $stderr) = @_;
+  my ($env, $args, $stdout, $stderr) = < @_;
 
   unshift @$args, '-I../lib';
 
   $stdout = '' unless defined $stdout;
   $stderr = '' unless defined $stderr;
-  local %ENV = %ENV;
+  local %ENV = %( < %ENV );
   delete %ENV{PERLLIB};
   delete %ENV{PERL5LIB};
   delete %ENV{PERL5OPT};
   my $pid = fork;
-  return (0, "Couldn't fork: $!") unless defined $pid;   # failure
+  return  @(0, "Couldn't fork: $!") unless defined $pid;   # failure
   if ($pid) {                   # parent
     my ($actual_stdout, $actual_stderr);
     wait;
-    return (0, "Failure in child.\n") if ($?>>8) == $FAILURE_CODE;
+    return  @(0, "Failure in child.\n") if ($?>>8) == $FAILURE_CODE;
 
-    open F, "<", $STDOUT or return (0, "Couldn't read $STDOUT file");
+    open F, "<", $STDOUT or return  @(0, "Couldn't read $STDOUT file");
     { local $/; $actual_stdout = ~< *F }
-    open F, "<", $STDERR or return (0, "Couldn't read $STDERR file");
+    open F, "<", $STDERR or return  @(0, "Couldn't read $STDERR file");
     { local $/; $actual_stderr = ~< *F }
 
     if ($actual_stdout ne $stdout) {
-      return (0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]");
+      return  @(0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]");
     } elsif ($actual_stderr ne $stderr) {
-      return (0, "Stderr mismatch: expected:\n[$stderr]\nsaw:\n[$actual_stderr]");
+      return  @(0, "Stderr mismatch: expected:\n[$stderr]\nsaw:\n[$actual_stderr]");
     } else {
       return 1;                 # success
     }
@@ -68,7 +68,7 @@ sub runperl {
     }
     open STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
     open STDERR, ">", $STDERR or it_didnt_work();
-    { exec $PERL, @$args }
+    { exec $PERL, < @$args }
     it_didnt_work();
   }
 }
@@ -80,7 +80,7 @@ sub it_didnt_work {
 }
 
 sub tryrun {
-  my ($success, $reason) = runperl(@_);
+  my ($success, $reason) = < runperl(< @_);
   ok( !!$success, 1, $reason );
 }
 

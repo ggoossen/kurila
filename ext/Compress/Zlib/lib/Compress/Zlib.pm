@@ -20,19 +20,19 @@ $VERSION = '2.007';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
+@EXPORT = @( qw(
         deflateInit inflateInit
 
         compress uncompress
 
         gzopen $gzerrno
-    );
+    ) );
 
-push @EXPORT, @Compress::Raw::Zlib::EXPORT ;
+push @EXPORT, < @Compress::Raw::Zlib::EXPORT ;
 
 BEGIN
 {
@@ -41,7 +41,7 @@ BEGIN
 
 # typeglob constants.
 for my $name (qw|DEF_WBITS MAX_MEM_LEVEL MAX_WBITS OS_CODE|,
-              grep { m/^Z_/ } @Compress::Raw::Zlib::EXPORT) {
+              grep { m/^Z_/ } < @Compress::Raw::Zlib::EXPORT) {
     Symbol::fetch_glob($name)->* = Symbol::fetch_glob("Compress::Raw::Zlib::$name")->*;
 }
 
@@ -52,7 +52,7 @@ use constant FLAG_CONSUME_INPUT      => 8 ;
 
 our (@my_z_errmsg);
 
-@my_z_errmsg = (
+@my_z_errmsg = @(
     "need dictionary",     # Z_NEED_DICT     2
     "stream end",          # Z_STREAM_END    1
     "",                    # Z_OK            0
@@ -100,10 +100,10 @@ sub _save_gzerr
 
 sub gzopen($$)
 {
-    my ($file, $mode) = @_ ;
+    my ($file, $mode) = < @_ ;
 
     my $gz ;
-    my %defOpts = (Level    => Z_DEFAULT_COMPRESSION(),
+    my %defOpts = %(Level    => Z_DEFAULT_COMPRESSION(),
                    Strategy => Z_DEFAULT_STRATEGY(),
                   );
 
@@ -117,7 +117,7 @@ sub gzopen($$)
     %defOpts{Append}   = 1                if $mode =~ m/a/i;
 
     my $infDef = $writing ? 'deflate' : 'inflate';
-    my @params = () ;
+    my @params = @( () ) ;
 
     croak "gzopen: file parameter is not a filehandle or filename"
         unless isaFilehandle $file || isaFilename $file  || 
@@ -130,7 +130,7 @@ sub gzopen($$)
 
     if ($writing) {
         $gz = IO::Compress::Gzip->new($file, Minimal => 1, AutoClose => 1, 
-                                     %defOpts) 
+                                     < %defOpts) 
             or $Compress::Zlib::gzerrno = $IO::Compress::Gzip::GzipError;
     }
     else {
@@ -258,7 +258,7 @@ sub Compress::Zlib::gzFile::gzsetparams
 {
     my $self = shift ;
     croak "Usage: Compress::Zlib::gzFile::gzsetparams(file, level, strategy)"
-        unless @_ eq 2 ;
+        unless (nelems @_) eq 2 ;
 
     my $gz = $self->[0] ;
     my $level = shift ;
@@ -294,7 +294,7 @@ sub compress($;$)
         $in = \@_[0] ;
     }
 
-    my $level = (@_ == 2 ? @_[1] : Z_DEFAULT_COMPRESSION() );
+    my $level = ((nelems @_) == 2 ? @_[1] : Z_DEFAULT_COMPRESSION() );
 
     $x = Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level)
             or return undef ;
@@ -333,7 +333,7 @@ sub uncompress($)
  
 sub deflateInit(@)
 {
-    my ($got) = ParseParameters(0,
+    my ($got) = < ParseParameters(0,
                 \%(
                 'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                 'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
@@ -342,7 +342,7 @@ sub deflateInit(@)
                 'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
                 'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
                 'Dictionary'    => \@(1, 1, Parse_any,      ""),
-                ), @_ ) ;
+                ), < @_ ) ;
 
     croak "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
             $got->value('Bufsize')
@@ -351,28 +351,28 @@ sub deflateInit(@)
     my $obj ;
  
     my $status = 0 ;
-    ($obj, $status) = 
-      Compress::Raw::Zlib::_deflateInit(0,
-                $got->value('Level'), 
-                $got->value('Method'), 
-                $got->value('WindowBits'), 
-                $got->value('MemLevel'), 
-                $got->value('Strategy'), 
-                $got->value('Bufsize'),
+    ($obj, $status) = < 
+      Compress::Raw::Zlib::_deflateInit(0, <
+                $got->value('Level'), < 
+                $got->value('Method'), < 
+                $got->value('WindowBits'), < 
+                $got->value('MemLevel'), < 
+                $got->value('Strategy'), < 
+                $got->value('Bufsize'), <
                 $got->value('Dictionary')) ;
 
     my $x = ($status == Z_OK() ? bless $obj, "Zlib::OldDeflate"  : undef) ;
-    return wantarray ? ($x, $status) : $x ;
+    return wantarray ?  @($x, $status) : $x ;
 }
  
 sub inflateInit(@)
 {
-    my ($got) = ParseParameters(0,
+    my ($got) = < ParseParameters(0,
                 \%(
                 'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                 'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
                 'Dictionary'    => \@(1, 1, Parse_any,      ""),
-                ), @_) ;
+                ), < @_) ;
 
 
     croak "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
@@ -381,9 +381,9 @@ sub inflateInit(@)
 
     my $status = 0 ;
     my $obj ;
-    ($obj, $status) = Compress::Raw::Zlib::_inflateInit(FLAG_CONSUME_INPUT,
-                                $got->value('WindowBits'), 
-                                $got->value('Bufsize'), 
+    ($obj, $status) = < Compress::Raw::Zlib::_inflateInit( <FLAG_CONSUME_INPUT, <
+                                $got->value('WindowBits'), < 
+                                $got->value('Bufsize'), < 
                                 $got->value('Dictionary')) ;
 
     my $x = ($status == Z_OK() ? bless $obj, "Zlib::OldInflate"  : undef) ;
@@ -394,7 +394,7 @@ sub inflateInit(@)
 package Zlib::OldDeflate ;
 
 our (@ISA);
-@ISA = qw(Compress::Raw::Zlib::deflateStream);
+@ISA = @( qw(Compress::Raw::Zlib::deflateStream) );
 
 
 sub deflate
@@ -419,7 +419,7 @@ sub flush
 package Zlib::OldInflate ;
 
 our (@ISA);
-@ISA = qw(Compress::Raw::Zlib::inflateStream);
+@ISA = @( qw(Compress::Raw::Zlib::inflateStream) );
 
 sub inflate
 {

@@ -8,7 +8,7 @@ use bytes ();		# for $bytes::hint_bits
 
 use utf8;
 
-my %alias1 = (
+my %alias1 = %(
 		# Icky 3.2 names with parentheses.
 		'LINE FEED'		=> 'LINE FEED (LF)',
 		'FORM FEED'		=> 'FORM FEED (FF)',
@@ -27,7 +27,7 @@ my %alias1 = (
 		'BOM'			=> 'BYTE ORDER MARK',
 	    );
 
-my %alias2 = (
+my %alias2 = %(
 		# Pre-3.2 compatibility (only for the first 256 characters).
 		'HORIZONTAL TABULATION'	=> 'CHARACTER TABULATION',
 		'VERTICAL TABULATION'	=> 'LINE TABULATION',
@@ -39,21 +39,21 @@ my %alias2 = (
 		'PARTIAL LINE UP'	=> 'PARTIAL LINE BACKWARD',
 	    );
 
-my %alias3 = (
+my %alias3 = %( (
 		# User defined aliasses. Even more convenient :)
-	    );
+	    ) );
 my $txt;
 
 sub alias (@)
 {
-  @_ or return %alias3;
-  my $alias = ref @_[0] ? @_[0] : \%( @_ );
+  (nelems @_) or return %alias3;
+  my $alias = ref @_[0] ? @_[0] : \%( < @_ );
   %alias3{[keys %$alias]} = values %$alias;
 } # alias
 
 sub alias_file ($)
 {
-  my ($arg, $file) = @_;
+  my ($arg, $file) = < @_;
   if (-f $arg && File::Spec->file_name_is_absolute ($arg)) {
     $file = $arg;
   }
@@ -63,13 +63,13 @@ sub alias_file ($)
   else {
     die "Charnames alias files can only have identifier characters";
   }
-  if (my @alias = do $file) {
-    @alias == 1 && !defined @alias[0] and
+  if (my @alias = @( do $file )) {
+    (nelems @alias) == 1 && !defined @alias[0] and
       die "$file cannot be used as alias file for charnames";
-    @alias % 2 and
+    (nelems @alias) % 2 and
       die "$file did not return a (valid) list of alias pairs";
-    alias (@alias);
-    return (1);
+    alias (< @alias);
+    return  @(1);
   }
   0;
 } # alias_file
@@ -110,38 +110,38 @@ sub charnames
 
     ## If :full, look for the name exactly
     if (%^H{charnames_full} and $txt =~ m/\t\t\Q$name\E$/m) {
-      @off = (@-[0], @+[0]);
+      @off = @(@-[0], @+[0]);
     }
 
     ## If we didn't get above, and :short allowed, look for the short name.
     ## The short name is like "greek:Sigma"
-    unless (@off) {
+    unless (nelems @off) {
       if (%^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
         my $uc_cname = uc($cname);
         my $uc_script = uc($script);
 	if ($txt =~ m/\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m) {
-	  @off = (@-[0], @+[0]);
+	  @off = @(@-[0], @+[0]);
 	}
       }
     }
 
     ## If we still don't have it, check for the name among the loaded
     ## scripts.
-    if (not @off) {
+    if (not nelems @off) {
       my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
-      for my $script (@{%^H{charnames_scripts}}) {
+      for my $script (< @{%^H{charnames_scripts}}) {
         my $ucname = uc($name);
 	if ($txt =~ m/\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
-	  @off = (@-[0], @+[0]);
+	  @off = @(@-[0], @+[0]);
 	  last;
 	}
       }
     }
 
     ## If we don't have it by now, give up.
-    unless (@off) {
+    unless (nelems @off) {
       warn "Unknown charname '$name'";
       return "\x{FFFD}";
     }
@@ -184,7 +184,7 @@ sub import
 {
   shift; ## ignore class name
 
-  if (not @_) {
+  if (not nelems @_) {
     warn("`use charnames' needs explicit imports list");
   }
   %^H{charnames} = \&charnames ;
@@ -192,10 +192,10 @@ sub import
   ##
   ## fill %h keys with our @_ args.
   ##
-  my ($promote, %h, @args) = (0);
+  my ($promote, < %h, < @args) = (0);
   while (my $arg = shift) {
     if ($arg eq ":alias") {
-      @_ or
+      (nelems @_) or
 	die ":alias needs an argument in charnames";
       my $alias = shift;
       if (ref $alias) {
@@ -219,8 +219,8 @@ sub import
     }
     push @args, $arg;
   }
-  @args == 0 && $promote and @args = (":full");
-  %h{[@args]} = (1) x @args;
+  (nelems @args) == 0 && $promote and @args = @(":full");
+  %h{[< @args]} = (1) x nelems @args;
 
   %^H{charnames_full} = delete %h{':full'};
   %^H{charnames_short} = delete %h{':short'};
@@ -230,10 +230,10 @@ sub import
   ## If utf8? warnings are enabled, and some scripts were given,
   ## see if at least we can find one letter of each script.
   ##
-  if (warnings::enabled('utf8') && @{%^H{charnames_scripts}}) {
+  if (warnings::enabled('utf8') && nelems @{%^H{charnames_scripts}}) {
     $txt = do "unicore/Name.pl" unless $txt;
 
-    for my $script (@{%^H{charnames_scripts}}) {
+    for my $script (< @{%^H{charnames_scripts}}) {
       if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /) {
 	warnings::warn('utf8',  "No such script: '$script'");
       }
@@ -245,7 +245,7 @@ my %viacode;
 
 sub viacode
 {
-  if (@_ != 1) {
+  if ((nelems @_) != 1) {
     warn "charnames::viacode() expects one argument";
     return;
   }
@@ -283,7 +283,7 @@ my %vianame;
 
 sub vianame
 {
-  if (@_ != 1) {
+  if ((nelems @_) != 1) {
     warn "charnames::vianame() expects one name argument";
     return ()
   }

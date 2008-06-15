@@ -86,25 +86,25 @@ if ($has_perlio) {
     binmode(RIGHT, ":bytes");
 }
 
-my @left = ("hello ", "world\n");
-my @right = ("perl ", "rules!"); # Not like I'm trying to bias any survey here.
+my @left = @("hello ", "world\n");
+my @right = @("perl ", "rules!"); # Not like I'm trying to bias any survey here.
 
-foreach (@left) {
+foreach (< @left) {
   # is (syswrite (LEFT, $_), length $_, "write " . _qq ($_) . " to left");
   is (syswrite (LEFT, $_), length $_, "syswrite to left");
 }
-foreach (@right) {
+foreach (< @right) {
   # is (syswrite (RIGHT, $_), length $_, "write " . _qq ($_) . " to right");
   is (syswrite (RIGHT, $_), length $_, "syswrite to right");
 }
 
 # stream socket, so our writes will become joined:
 my ($buffer, $expect);
-$expect = join '', @right;
+$expect = join '', < @right;
 undef $buffer;
 is (read (LEFT, $buffer, length $expect), length $expect, "read on left");
 is ($buffer, $expect, "content what we expected?");
-$expect = join '', @left;
+$expect = join '', < @left;
 undef $buffer;
 is (read (RIGHT, $buffer, length $expect), length $expect, "read on right");
 is ($buffer, $expect, "content what we expected?");
@@ -147,14 +147,14 @@ my $err = $!;
     or printf "\$\!=\%d(\%s)\n", $err, $err;
 }
 
-my @gripping = (chr 255, chr 127);
-foreach (@gripping) {
+my @gripping = @(chr 255, chr 127);
+foreach (< @gripping) {
   is (syswrite (RIGHT, $_), length $_, "syswrite to right");
 }
 
 ok (!eof LEFT, "left is not at EOF");
 
-$expect = join '', @gripping;
+$expect = join '', < @gripping;
 undef $buffer;
 is (read (LEFT, $buffer, length $expect), length $expect, "read on left");
 is ($buffer, $expect, "content what we expected?");
@@ -180,25 +180,25 @@ if ($has_perlio) {
     binmode(RIGHT, ":bytes");
 }
 
-foreach (@left) {
+foreach (< @left) {
   # is (syswrite (LEFT, $_), length $_, "write " . _qq ($_) . " to left");
   is (syswrite (LEFT, $_), length $_, "syswrite to left");
 }
-foreach (@right) {
+foreach (< @right) {
   # is (syswrite (RIGHT, $_), length $_, "write " . _qq ($_) . " to right");
   is (syswrite (RIGHT, $_), length $_, "syswrite to right");
 }
 
 # stream socket, so our writes will become joined:
 my ($total);
-$total = join '', @right;
-foreach $expect (@right) {
+$total = join '', < @right;
+foreach $expect (< @right) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");
 }
-$total = join '', @left;
-foreach $expect (@left) {
+$total = join '', < @left;
+foreach $expect (< @left) {
   undef $buffer;
   is (sysread (RIGHT, $buffer, length $total), length $expect, "read on right");
   is ($buffer, $expect, "content what we expected?");
@@ -226,12 +226,12 @@ alarm 30;
 
 #ok (eof RIGHT, "right is at EOF");
 
-foreach (@gripping) {
+foreach (< @gripping) {
   is (syswrite (RIGHT, $_), length $_, "syswrite to right");
 }
 
-$total = join '', @gripping;
-foreach $expect (@gripping) {
+$total = join '', < @gripping;
+foreach $expect (< @gripping) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");

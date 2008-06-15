@@ -4,7 +4,7 @@ my $has_perlio;
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = @( '../lib' );
     require './test.pl';
     unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
 	print <<EOF;
@@ -57,10 +57,10 @@ plan tests => 36;
 	my $length_chars = length($s);
 	my $length_bytes;
 	{ use bytes; $length_bytes = length($s) }
-	my @regex_chars = $s =~ m/(.)/g;
-	my $regex_chars = @regex_chars;
-	my @split_chars = split m//, $s;
-	my $split_chars = @split_chars;
+	my @regex_chars = @( $s =~ m/(.)/g );
+	my $regex_chars = (nelems @regex_chars);
+	my @split_chars = @( split m//, $s );
+	my $split_chars = (nelems @split_chars);
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "1/1/1/3");
     }
@@ -77,10 +77,10 @@ plan tests => 36;
 	my $length_chars = length($s);
 	my $length_bytes;
 	{ use bytes; $length_bytes = length($s) }
-	my @regex_chars = $s =~ m/(.)/g;
-	my $regex_chars = @regex_chars;
-	my @split_chars = split m//, $s;
-	my $split_chars = @split_chars;
+	my @regex_chars = @( $s =~ m/(.)/g );
+	my $regex_chars = (nelems @regex_chars);
+	my @split_chars = @( split m//, $s );
+	my $split_chars = (nelems @split_chars);
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "2/2/2/6");
     }
@@ -122,7 +122,7 @@ CODE
 END
     my (@i, $s);
 
-    @i = ();
+    @i = @( () );
     push @i, $s = index($a, '6');     # 60
     push @i, $s = index($a, '.', $s); # next . after 60 is 62
     push @i, $s = index($a, '5');     # 50
@@ -131,9 +131,9 @@ END
     push @i, $s = index($a, '.', $s); # next . after 70 is 72
     push @i, $s = index($a, '4');     # 40
     push @i, $s = index($a, '.', $s); # next . after 40 is 42
-    is("@i", "60 62 50 52 70 72 40 42", "utf8 heredoc index");
+    is("{join ' ', <@i}", "60 62 50 52 70 72 40 42", "utf8 heredoc index");
 
-    @i = ();
+    @i = @( () );
     push @i, $s = rindex($a, '6');     # 60
     push @i, $s = rindex($a, '.', $s); # previous . before 60 is 58
     push @i, $s = rindex($a, '5');     # 50
@@ -142,9 +142,9 @@ END
     push @i, $s = rindex($a, '.', $s); # previous . before 70 is 68
     push @i, $s = rindex($a, '4');     # 40
     push @i, $s = rindex($a, '.', $s); # previous . before 40 is 38
-    is("@i", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex");
+    is("{join ' ', <@i}", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex");
 
-    @i = ();
+    @i = @( () );
     push @i, $s =  index($a, '6');     # 60
     push @i,  index($a, '.', $s);      # next     . after  60 is 62
     push @i, rindex($a, '.', $s);      # previous . before 60 is 58
@@ -154,7 +154,7 @@ END
     push @i, $s =  index($a, '7', $s); # 70
     push @i,  index($a, '.', $s);      # next     . after  70 is 72
     push @i, rindex($a, '.', $s);      # previous . before 70 is 68
-    is("@i", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex");
+    is("{join ' ', <@i}", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex");
 }
 
 SKIP: {

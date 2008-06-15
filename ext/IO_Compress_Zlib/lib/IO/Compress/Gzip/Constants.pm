@@ -11,9 +11,9 @@ our ($GZIP_FNAME_INVALID_CHAR_RE, $GZIP_FCOMMENT_INVALID_CHAR_RE);
 
 $VERSION = '2.006';
 
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 
-@EXPORT= qw(
+@EXPORT= @( qw(
 
     GZIP_ID_SIZE
     GZIP_ID1
@@ -58,7 +58,7 @@ $VERSION = '2.006';
 
     GZIP_MINIMUM_HEADER
 
-    );
+    ) );
 
 # Constant names derived from RFC 1952
 
@@ -107,7 +107,7 @@ use constant GZIP_ISIZE_MOD_VALUE   => GZIP_ISIZE_MAX + 1 ;
 # OS Names sourced from http://www.gzip.org/format.txt
 
 use constant GZIP_OS_DEFAULT=> 0xFF ;
-%GZIP_OS_Names = (
+%GZIP_OS_Names = %(
     0   => 'MS-DOS',
     1   => 'Amiga',
     2   => 'VMS',
@@ -126,13 +126,13 @@ use constant GZIP_OS_DEFAULT=> 0xFF ;
     15  => 'MVS',
     16  => 'BeOS',
     17  => 'Tandem/NSK',
-    18  => 'THEOS',
+    18  => 'THEOS', <
     GZIP_OS_DEFAULT()   => 'Unknown',
     ) ;
 
-use constant GZIP_MINIMUM_HEADER =>   pack("C4 V C C",  
-        GZIP_ID1, GZIP_ID2, GZIP_CM_DEFLATED, GZIP_FLG_DEFAULT,
-        GZIP_MTIME_DEFAULT, GZIP_XFL_DEFAULT, GZIP_OS_DEFAULT) ;
+use constant GZIP_MINIMUM_HEADER =>   pack("C4 V C C", <  
+        GZIP_ID1, < GZIP_ID2, < GZIP_CM_DEFLATED, < GZIP_FLG_DEFAULT, <
+        GZIP_MTIME_DEFAULT, < GZIP_XFL_DEFAULT, < GZIP_OS_DEFAULT) ;
 
 
 1;

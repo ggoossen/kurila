@@ -11,9 +11,9 @@ use vars (qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), #public-ish
 
 # In case a test is run in a persistent environment.
 sub _reset_globals {
-    %todo       = ();
-    %history    = ();
-    @FAILDETAIL = ();
+    %todo       = %( () );
+    %history    = %( () );
+    @FAILDETAIL = @( () );
     $ntest      = 1;
     $TestLevel  = 0;		# how many extra stack frames to skip
     $planned    = 0;
@@ -21,10 +21,10 @@ sub _reset_globals {
 
 $VERSION = '1.25';
 require Exporter;
-@ISA=('Exporter');
+@ISA=@('Exporter');
 
-@EXPORT    = qw(&plan &ok &skip);
-@EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
+@EXPORT    = @( qw(&plan &ok &skip) );
+@EXPORT_OK = @( qw($ntest $TESTOUT $TESTERR) );
 
 $|=1;
 $TESTOUT = *STDOUT{IO};
@@ -146,7 +146,7 @@ in a C<BEGIN {...}> block, like so:
 =cut
 
 sub plan {
-    die "Test::plan(\%args): odd number of arguments" if @_ ^&^ 1;
+    die "Test::plan(\%args): odd number of arguments" if (nelems @_) ^&^ 1;
     die "Test::plan(): should not be called more than once" if $planned;
 
     local($\, $,);   # guard against -l and other things that screw with
@@ -157,20 +157,20 @@ sub plan {
     _read_program( (caller)[[1]] );
 
     my $max=0;
-    while (@_) {
+    while ((nelems @_)) {
 	my ($k,$v) = splice(@_, 0, 2);
 	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
-	       $k eq 'failok') { for (@$v) { %todo{$_}=1; }; }
+	       $k eq 'failok') { for (< @$v) { %todo{$_}=1; }; }
 	elsif ($k eq 'onfail') {
 	    ref $v eq 'CODE' or die "Test::plan(onfail => $v): must be CODE";
 	    $ONFAIL = $v;
 	}
 	else { warn "Test::plan(): skipping unrecognized directive '$k'" }
     }
-    my @todo = sort { $a <+> $b } keys %todo;
-    if (@todo) {
-	print $TESTOUT "1..$max todo ".join(' ', @todo).";\n";
+    my @todo = @( sort { $a <+> $b } keys %todo );
+    if ((nelems @todo)) {
+	print $TESTOUT "1..$max todo ".join(' ', < @todo).";\n";
     } else {
 	print $TESTOUT "1..$max\n";
     }
@@ -178,7 +178,7 @@ sub plan {
     print $TESTOUT "# Running under perl version $^V for $^O",
       (chr(65) eq 'A') ? "\n" : " in a non-ASCII world\n";
 
-    print $TESTOUT "# Win32::BuildNumber ", &Win32::BuildNumber(), "\n"
+    print $TESTOUT "# Win32::BuildNumber ", < &Win32::BuildNumber(), "\n"
       if defined(&Win32::BuildNumber) and defined &Win32::BuildNumber();
 
     print $TESTOUT "# MacPerl version $MacPerl::Version\n"
@@ -202,7 +202,7 @@ sub _read_program {
   %Program_Lines{$file} = \@( ~< *SOURCEFILE);
   close(SOURCEFILE);
 
-  foreach my $x (@{%Program_Lines{$file}})
+  foreach my $x (< @{%Program_Lines{$file}})
    { $x =~ s/[\cm\cj\n\r]//g }
 
   unshift @{%Program_Lines{$file}}, '';
@@ -222,7 +222,7 @@ values through this.
 =cut
 
 sub _to_value {
-    my ($v) = @_;
+    my ($v) = < @_;
     return ref $v eq 'CODE' ? $v->() : $v;
 }
 
@@ -380,7 +380,7 @@ sub ok ($;$$) {
     my $ok=0;
     my $result = _to_value(shift);
     my ($expected, $isregex, $regex);
-    if (@_ == 0) {
+    if ((nelems @_) == 0) {
 	$ok = $result;
     } else {
         $compare = 1;
@@ -418,7 +418,7 @@ sub ok ($;$$) {
            'result' => $result, 'todo' => $todo,
            'file' => $file, 'line' => $line,
            'context' => $context, 'compare' => $compare,
-           @_ ? ('diagnostic' =>  _to_value(shift)) : (),
+           (nelems @_) ? ('diagnostic' => <  _to_value(shift)) : (),
         ));
 
     }
@@ -428,7 +428,7 @@ sub ok ($;$$) {
 
 
 sub _complain {
-    my($result, $expected, $detail) = @_;
+    my($result, $expected, $detail) = < @_;
     %$detail{expected} = $expected if defined $expected;
 
     # Get the user's diagnostic, protecting against multi-line
@@ -476,9 +476,9 @@ sub _complain {
 
 
 sub _diff_complain {
-    my($result, $expected, $detail, $prefix) = @_;
-    return _diff_complain_external(@_) if %ENV{PERL_TEST_DIFF};
-    return _diff_complain_algdiff(@_)
+    my($result, $expected, $detail, $prefix) = < @_;
+    return _diff_complain_external(< @_) if %ENV{PERL_TEST_DIFF};
+    return _diff_complain_algdiff(< @_)
      if try { require Algorithm::Diff; Algorithm::Diff->VERSION(1.15); 1; };
 
     $told_about_diff++ or print $TESTERR <<"EOT";
@@ -493,12 +493,12 @@ EOT
 
 
 sub _diff_complain_external {
-    my($result, $expected, $detail, $prefix) = @_;
+    my($result, $expected, $detail, $prefix) = < @_;
     my $diff = %ENV{PERL_TEST_DIFF} || die "WHAAAA?";
 
     require File::Temp;
-    my($got_fh, $got_filename) = File::Temp::tempfile("test-got-XXXXX");
-    my($exp_fh, $exp_filename) = File::Temp::tempfile("test-exp-XXXXX");
+    my($got_fh, $got_filename) = < File::Temp::tempfile("test-got-XXXXX");
+    my($exp_fh, $exp_filename) = < File::Temp::tempfile("test-exp-XXXXX");
     unless ($got_fh && $exp_fh) {
       warn "Can't get tempfiles";
       return;
@@ -530,10 +530,10 @@ sub _diff_complain_external {
 
 
 sub _diff_complain_algdiff {
-    my($result, $expected, $detail, $prefix) = @_;
+    my($result, $expected, $detail, $prefix) = < @_;
 
-    my @got = split(m/^/, $result);
-    my @exp = split(m/^/, $expected);
+    my @got = @( split(m/^/, $result) );
+    my @exp = @( split(m/^/, $expected) );
 
     my $diff_kind;
     my @diff_lines;
@@ -541,14 +541,14 @@ sub _diff_complain_algdiff {
     my $diff_flush = sub {
         return unless $diff_kind;
 
-        my $count_lines = @diff_lines;
+        my $count_lines = (nelems @diff_lines);
         my $s = $count_lines == 1 ? "" : "s";
         my $first_line = @diff_lines[0]->[0] + 1;
 
         print $TESTERR "# $prefix ";
         if ($diff_kind eq "GOT") {
             print $TESTERR "Got $count_lines extra line$s at line $first_line:\n";
-            for my $i (@diff_lines) {
+            for my $i (< @diff_lines) {
                 print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
         } elsif ($diff_kind eq "EXP") {
@@ -560,7 +560,7 @@ sub _diff_complain_algdiff {
                 print $TESTERR "Line $first_line is";
             }
             print $TESTERR " missing:\n";
-            for my $i (@diff_lines) {
+            for my $i (< @diff_lines) {
                 print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
             }
         } elsif ($diff_kind eq "CH") {
@@ -572,7 +572,7 @@ sub _diff_complain_algdiff {
                 print $TESTERR "Line $first_line is";
             }
             print $TESTERR " changed:\n";
-            for my $i (@diff_lines) {
+            for my $i (< @diff_lines) {
                 print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
                 print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
@@ -580,23 +580,23 @@ sub _diff_complain_algdiff {
 
         # reset
         $diff_kind = undef;
-        @diff_lines = ();
+        @diff_lines = @( () );
     };
 
     my $diff_collect = sub {
         my $kind = shift;
         &$diff_flush() if $diff_kind && $diff_kind ne $kind;
         $diff_kind = $kind;
-        push(@diff_lines, \@(@_));
+        push(@diff_lines, \@(< @_));
     };
 
 
     Algorithm::Diff::traverse_balanced(
         \@got, \@exp,
         \%(
-            DISCARD_A => sub { &$diff_collect("GOT", @_) },
-            DISCARD_B => sub { &$diff_collect("EXP", @_) },
-            CHANGE    => sub { &$diff_collect("CH",  @_) },
+            DISCARD_A => sub { &$diff_collect("GOT", < @_) },
+            DISCARD_B => sub { &$diff_collect("EXP", < @_) },
+            CHANGE    => sub { &$diff_collect("CH",  < @_) },
             MATCH     => sub { &$diff_flush() },
         ),
     );
@@ -693,7 +693,7 @@ sub skip ($;$$$) {
                      # print
 
     my $whyskip = _to_value(shift);
-    if (!@_ or $whyskip) {
+    if (!nelems @_ or $whyskip) {
 	$whyskip = '' if $whyskip =~ m/^\d+$/;
         $whyskip =~ s/^[Ss]kip(?:\s+|$)//;  # backwards compatibility, old
                                             # versions required the reason
@@ -715,7 +715,7 @@ sub skip ($;$$$) {
 #WARN
 
 	local($TestLevel) = $TestLevel+1;  #to ignore this stack frame
-        return &ok(@_);
+        return &ok(< @_);
     }
 }
 
@@ -724,7 +724,7 @@ sub skip ($;$$$) {
 =cut
 
 END {
-    $ONFAIL->(\@FAILDETAIL) if @FAILDETAIL && $ONFAIL;
+    $ONFAIL->(\@FAILDETAIL) if (nelems @FAILDETAIL) && $ONFAIL;
 }
 
 1;

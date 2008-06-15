@@ -35,17 +35,17 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
 
     ### retrieval tests
     {
-        my @list = $log->retrieve();
+        my @list = @( < $log->retrieve() );
 
-        ok( @list == 2, q[Stored 2 messages] );
+        ok( (nelems @list) == 2, q[Stored 2 messages] );
     }
 
     $log->store('zot'); $log->store('quux');
 
     {
-        my @list = $log->retrieve( amount => 3 );
+        my @list = @( < $log->retrieve( amount => 3 ) );
 
-        ok( @list == 3, q[Retrieving 3 messages] );
+        ok( (nelems @list) == 3, q[Retrieving 3 messages] );
     }
 
     {
@@ -109,7 +109,7 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
 
     {
         my $i = $item->test;
-        my @a = $item->test2(1,2,3);
+        my @a = @( < $item->test2(1,2,3) );
 
         is( $item, $i,              q[Item handler check] );
         is_deeply( $item, $i,       q[  Item handler deep check] );
@@ -118,13 +118,13 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
 
     {
         ok( $item->remove,          q[Removing item from stack] );
-        ok( (!grep{ $item \== $_ } $log->retrieve), 
+        ok( (!grep{ $item \== $_ } < $log->retrieve), 
                                     q[  Item removed from stack] );
     }
 
     {
         $log->flush;
-        ok( @{$log->{STACK}} == 0,  q[Flushing stack] );
+        ok( (nelems @{$log->{STACK}}) == 0,  q[Flushing stack] );
     }
 }
     

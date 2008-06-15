@@ -60,7 +60,7 @@ example taken from: L<http://gauss.gwydiondylan.org/books/drm/drm_50.html>
     use base ('Intelligent', 'Humanoid');
 }
 
-ok(eq_array(
+ok( <eq_array( <
     mro::get_linear_isa('Vulcan'),
     \@( qw(Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object) )
 ), '... got the right MRO for the Vulcan Dylan Example');  

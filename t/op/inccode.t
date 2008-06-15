@@ -20,7 +20,7 @@ use File::Spec;
 require "./test.pl";
 plan(tests => 45 + !$minitest * (3 + 7 * $can_fork));
 
-my @tempfiles = ();
+my @tempfiles = @( () );
 
 sub get_temp_fh {
     my $f = "DummyModule0000";
@@ -28,16 +28,16 @@ sub get_temp_fh {
     push @tempfiles, $f;
     open my $fh, ">", "$f" or die "Can't create $f: $!";
     print $fh "package ".substr(@_[0],0,-3).";\n1;\n";
-    print $fh @_[1] if @_ +> 1;
+    print $fh @_[1] if (nelems @_) +> 1;
     close $fh or die "Couldn't close: $!";
     open $fh, "<", $f or die "Can't open $f: $!";
     return $fh;
 }
 
-END { 1 while unlink @tempfiles }
+END { 1 while unlink < @tempfiles }
 
 sub fooinc {
-    my ($self, $filename) = @_;
+    my ($self, $filename) = < @_;
     if (substr($filename,0,3) eq 'Foo') {
 	return get_temp_fh($filename);
     }
@@ -76,7 +76,7 @@ pop @INC;
 
 
 sub fooinc2 {
-    my ($self, $filename) = @_;
+    my ($self, $filename) = < @_;
     if (substr($filename, 0, length($self->[1])) eq $self->[1]) {
 	return get_temp_fh($filename);
     }
@@ -114,7 +114,7 @@ cmp_ok( %INC{'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in %INC' 
 pop @INC;
 
 sub FooLoader::INC {
-    my ($self, $filename) = @_;
+    my ($self, $filename) = < @_;
     if (substr($filename,0,4) eq 'Quux') {
 	return get_temp_fh($filename);
     }
@@ -163,7 +163,7 @@ cmp_ok( %INC{'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct in %INC
 pop @INC;
 
 push @INC, sub {
-    my ($self, $filename) = @_;
+    my ($self, $filename) = < @_;
     if (substr($filename,0,4) eq 'Toto') {
 	%INC{$filename} = 'xyz';
 	return get_temp_fh($filename);
@@ -183,7 +183,7 @@ is( %INC{'Toto.pm'}, 'xyz',	   '  val Toto.pm is correct in %INC' );
 pop @INC;
 
 push @INC, sub {
-    my ($self, $filename) = @_;
+    my ($self, $filename) = < @_;
     if ($filename eq 'abc.pl') {
 	return get_temp_fh($filename, qq(return "abc";\n));
     }
@@ -199,11 +199,11 @@ is( $ret, 'abc', 'do "abc.pl" sees return value' );
 {
     my $filename = $^O eq 'MacOS' ? ':Foo:Foo.pm' : './Foo.pm';
     #local @INC; # local fails on tied @INC
-    my @old_INC = @INC; # because local doesn't work on tied arrays
-    @INC = sub { $filename = 'seen'; return undef; };
+    my @old_INC = @( < @INC ); # because local doesn't work on tied arrays
+    @INC = @( sub { $filename = 'seen'; return undef; } );
     try { require $filename; };
     is( $filename, 'seen', 'the coderef sees fully-qualified pathnames' );
-    @INC = @old_INC;
+    @INC = @( < @old_INC );
 }
 
 exit if $minitest;
@@ -213,7 +213,7 @@ SKIP: {
     pop @INC;
 
     push @INC, sub {
-        my ($cr, $filename) = @_;
+        my ($cr, $filename) = < @_;
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
              \"package $module; sub complain \{ warn q(barf) \}; \$::file = __FILE__;"
@@ -231,7 +231,7 @@ SKIP: {
         my $warning;
         local $^WARN_HOOK = sub { $warning = shift };
         Publius::Vergilius::Maro::complain();
-        like( $warning->message, qr{barf at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
+        like( < $warning->message, qr{barf at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
     }
 }
 pop @INC;
@@ -265,13 +265,13 @@ if ($can_fork) {
 	die "Can't get here: $!";
     };
 
-    @::bbblplast = ();
+    @::bbblplast = @( () );
     require BBBLPLAST5;
-    is ("@::bbblplast", "0 1 2 3 4 5", "All ran");
+    is ("{join ' ', <@::bbblplast}", "0 1 2 3 4 5", "All ran");
 
     foreach (keys %INC) {
 	delete %INC{$_} if m/^BBBLPLAST/;
     }
 
-    @::bbblplast = ();
+    @::bbblplast = @( () );
 }

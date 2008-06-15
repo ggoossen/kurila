@@ -2,7 +2,7 @@ use strict;
 use Config;
 
 sub to_string {
-    my ($value) = @_;
+    my ($value) = < @_;
     $value =~ s/\\/\\\\/g;
     $value =~ s/'/\\'/g;
     return "'$value'";
@@ -24,7 +24,7 @@ our $VERSION = "0.08";
 
 EOT
 
-print OUT '  my $dl_dlext = ', to_string(%Config::Config{'dlext'}), ";\n" ;
+print OUT '  my $dl_dlext = ', < to_string(%Config::Config{'dlext'}), ";\n" ;
 
 print OUT <<'EOT';
 

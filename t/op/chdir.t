@@ -17,7 +17,7 @@ use File::Spec::Functions qw(:DEFAULT splitdir rel2abs splitpath);
 # Can't use Cwd::abs_path() because it has different ideas about
 # path separators than File::Spec.
 sub abs_path {
-    my $d = rel2abs(curdir);
+    my $d = rel2abs( <curdir);
 
     $d = uc($d) if $IsVMS;
     $d = lc($d) if $^O =~ m/^uwin/;
@@ -28,12 +28,12 @@ my $Cwd = abs_path;
 
 # Let's get to a known position
 SKIP: {
-    my ($vol,$dir) = splitpath(abs_path,1);
+    my ($vol,$dir) = < splitpath( <abs_path,1);
     my $test_dir = $IsVMS ? 'T' : 't';
-    skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
+    skip("Already in t/", 2) if ( <splitdir($dir))[-1] eq $test_dir;
 
     ok( chdir($test_dir),     'chdir($test_dir)');
-    is( abs_path, catdir($Cwd, $test_dir),    '  abs_path() agrees' );
+    is( < abs_path, < catdir($Cwd, $test_dir),    '  abs_path() agrees' );
 }
 
 $Cwd = abs_path;
@@ -103,22 +103,22 @@ SKIP: {
 }
 
 # The environment variables chdir() pays attention to.
-my @magic_envs = qw(HOME LOGDIR SYS$LOGIN);
+my @magic_envs = @( qw(HOME LOGDIR SYS$LOGIN) );
 
 sub check_env {
-    my($key) = @_;
+    my($key) = < @_;
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS ) {
         ok( !chdir(),         "chdir() on $^O ignores only \$ENV\{$key\} set" );
-        is( abs_path, $Cwd,   '  abs_path() did not change' );
+        is( < abs_path, $Cwd,   '  abs_path() did not change' );
         pass( "  no need to test SYS\$LOGIN on $^O" ) for 1..7;
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{$key}, '  abs_path() agrees' );
+        is( < abs_path, %ENV{$key}, '  abs_path() agrees' );
         chdir($Cwd);
-        is( abs_path, $Cwd,       '  and back again' );
+        is( < abs_path, $Cwd,       '  and back again' );
 
         my $warning = '';
         local $^WARN_HOOK = sub { $warning .= @_[0]->{description} . "\n" };
@@ -127,7 +127,7 @@ sub check_env {
         # Check the deprecated chdir(undef) feature.
 #line 64
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
+        is( < abs_path, %ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir
 Use of chdir('') or chdir(undef) as chdir() is deprecated
@@ -139,7 +139,7 @@ WARNING
         $warning = '';
 #line 76
         ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
+        is( < abs_path, %ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
@@ -148,9 +148,9 @@ WARNING
     }
 }
 
-my %Saved_Env = ();
+my %Saved_Env = %( () );
 sub clean_env {
-    foreach my $env (@magic_envs) {
+    foreach my $env (< @magic_envs) {
         %Saved_Env{$env} = %ENV{$env};
 
         # Can't actually delete SYS$ stuff on VMS.
@@ -173,7 +173,7 @@ END {
     no warnings 'uninitialized';
 
     # Restore the environment for VMS (and doesn't hurt for anyone else)
-    %ENV{[@magic_envs]} = %Saved_Env{[@magic_envs]};
+    %ENV{[< @magic_envs]} = %Saved_Env{[< @magic_envs]};
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.
@@ -181,7 +181,7 @@ END {
 }
 
 
-foreach my $key (@magic_envs) {
+foreach my $key (< @magic_envs) {
     # We're going to be using undefs a lot here.
     no warnings 'uninitialized';
 
@@ -198,5 +198,5 @@ foreach my $key (@magic_envs) {
     } else {
         ok( !chdir(),                   'chdir() w/o any ENV set' );
     }
-    is( abs_path, $Cwd,             '  abs_path() agrees' );
+    is( < abs_path, $Cwd,             '  abs_path() agrees' );
 }

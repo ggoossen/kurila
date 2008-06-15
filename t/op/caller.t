@@ -12,10 +12,10 @@ my @c;
 
 print "# Tests with caller(0)\n";
 
-@c = caller(0);
-ok( (!@c), "caller(0) in main program" );
+@c = @( caller(0) );
+ok( (!nelems @c), "caller(0) in main program" );
 
-try { @c = caller(0) };
+try { @c = @( caller(0) ) };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
 ok( !@c[4], "hasargs false in an eval \{\}" );
 
@@ -23,12 +23,12 @@ eval q{ @c = (Caller(0))[3] };
 is( @c[3], "(eval)", "subroutine name in an eval ''" );
 ok( !@c[4], "hasargs false in an eval ''" );
 
-sub { @c = caller(0) } -> ();
+sub { @c = @( caller(0) ) } -> ();
 is( @c[3], "main::__ANON__", "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 # Bug 20020517.003, used to dump core
-sub foo { @c = caller(0) }
+sub foo { @c = @( caller(0) ) }
 my $fooref = delete %::{foo};
 $fooref -> ();
 is( @c[3], "(unknown)", "unknown subroutine name" );
@@ -36,7 +36,7 @@ ok( @c[4], "hasargs true with unknown sub" );
 
 print "# Tests with caller(1)\n";
 
-sub f { @c = caller(1) }
+sub f { @c = @( caller(1) ) }
 
 sub callf { f(); }
 callf();
@@ -78,7 +78,7 @@ sub show_bits
 sub check_bits
 {
     local our $Level = $Level + 2;
-    my ($got, $exp, $desc) = @_;
+    my ($got, $exp, $desc) = < @_;
     if (! ok($got eq $exp, $desc)) {
         diag('     got: ' . show_bits($got));
         diag('expected: ' . show_bits($exp));
@@ -153,14 +153,14 @@ print "# caller can now return the compile time state of \%^H\n";
 sub hint_exists {
     my $key = shift;
     my $level = shift;
-    my @results = caller($level||0);
+    my @results = @( caller($level||0) );
     exists @results[10]->{$key};
 }
 
 sub hint_fetch {
     my $key = shift;
     my $level = shift;
-    my @results = caller($level||0);
+    my @results = @( caller($level||0) );
     @results[10]->{$key};
 }
 

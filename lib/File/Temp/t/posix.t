@@ -23,7 +23,7 @@ print "# TMPNAM file name: $tmpnam\n";
 
 # TMPNAM list context
 # Not strict posix behaviour
-(my $fh, $tmpnam) = tmpnam();
+(my $fh, $tmpnam) = < tmpnam();
 
 print "# TMPNAM: in list context: {dump::view($fh)} $tmpnam\n";
 

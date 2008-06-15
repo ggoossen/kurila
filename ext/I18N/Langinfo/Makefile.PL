@@ -18,7 +18,7 @@ WriteMakefile(
 if (try {require ExtUtils::Constant; 1}) {
   # Some older versions of glibc use only enums, no defines, hence all this
   # hassle (so old glibc that the define is GNU_LIBRARY, not GLIBC):
-  my @names = 'CODESET'; # CODESET isn't an enum in old glibc's langinfo.h
+  my @names = @( 'CODESET' ); # CODESET isn't an enum in old glibc's langinfo.h
   push @names,           # This lot are always enums in old langinfo.h:
     \%( name=>$_, type=>"IV",
         macro=> \@("#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n",

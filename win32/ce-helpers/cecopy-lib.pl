@@ -16,7 +16,7 @@ sub mk {
   system("..\\miniperl.exe -I..\\lib -MCross comp.pl --do cemkdir [p]\\lib\\$r");
   %dirs{$r}++;
 }
-for (@files) {
+for (< @files) {
   if (m/\//) {
     m/^(.*)\/[^\/]*?$/;
     mk($1);
@@ -26,7 +26,7 @@ for (@files) {
 }
 
 sub BEGIN {
- @files = qw(
+ @files = @( qw(
     attributes.pm
     AutoLoader.pm
     AutoSplit.pm
@@ -202,5 +202,5 @@ sub BEGIN {
     Attribute/Handlers/demo/Demo.pm
     Attribute/Handlers/demo/Descriptions.pm
     Attribute/Handlers/demo/MyClass.pm
-  );
+  ) );
 }

@@ -10,7 +10,7 @@ sub handle_on { # some horrible frightening things are encapsulated in here
   my $class = shift;
   $class = ref($class) || $class;
   
-  Carp::croak "Usage: {$class}->handle_on(\$somescalar)" unless @_;
+  Carp::croak "Usage: {$class}->handle_on(\$somescalar)" unless (nelems @_);
   
   my $x = (defined(@_[0]) and ref(@_[0]))
     ? @_[0]
@@ -28,14 +28,14 @@ sub handle_on { # some horrible frightening things are encapsulated in here
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub TIEHANDLE {  # Ties to just a scalar ref
-  my($class, $scalar_ref) = @_;
+  my($class, $scalar_ref) = < @_;
   $$scalar_ref = '' unless defined $$scalar_ref;
   return bless \$scalar_ref,  ref($class) || $class;
 }
 
 sub PRINT {
   my $it = shift;
-  foreach my $x (@_) { $$$it .= $x }
+  foreach my $x (< @_) { $$$it .= $x }
 
   #Pod::Simple::DEBUG > 10 and print " appended to $$it = \"$$$it\"\n";
 
@@ -49,7 +49,7 @@ sub FETCH {
 sub PRINTF {
   my $it = shift;
   my $format = shift;
-  $$$it .= sprintf $format, @_;
+  $$$it .= sprintf $format, < @_;
   return 1;
 }
 

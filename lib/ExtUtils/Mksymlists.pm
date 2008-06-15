@@ -7,12 +7,12 @@ use Carp;
 use Exporter;
 use Config;
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(&Mksymlists);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(&Mksymlists) );
 our $VERSION = '6.44';
 
 sub Mksymlists {
-    my(%spec) = @_;
+    my(%spec) = %( < @_ );
     my($osname) = $^O;
 
     croak("Insufficient information specified to Mksymlists")
@@ -24,12 +24,12 @@ sub Mksymlists {
     %spec{FUNCLIST} = \@() unless %spec{FUNCLIST};
     %spec{DL_FUNCS} = \%( %spec{NAME} => \@() )
         unless ( (%spec{DL_FUNCS} and keys %{%spec{DL_FUNCS}}) or
-                 @{%spec{FUNCLIST}});
+                 nelems @{%spec{FUNCLIST}});
     if (defined %spec{DL_FUNCS}) {
         foreach my $package (keys %{%spec{DL_FUNCS}}) {
             my($packprefix,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
-            foreach my $sym (@{%spec{DL_FUNCS}->{$package}}) {
+            foreach my $sym (< @{%spec{DL_FUNCS}->{$package}}) {
                 if ($sym =~ m/^boot_/) {
                     push(@{%spec{FUNCLIST}},$sym);
                     $bootseen++;
@@ -61,20 +61,20 @@ sub Mksymlists {
 
 
 sub _write_aix {
-    my($data) = @_;
+    my($data) = < @_;
 
     rename "$data->{FILE}.exp", "$data->{FILE}.exp_old";
 
     open( my $exp, ">", "$data->{FILE}.exp")
         or croak("Can't create $data->{FILE}.exp: $!\n");
-    print $exp join("\n",@{$data->{DL_VARS}}, "\n") if @{$data->{DL_VARS}};
-    print $exp join("\n",@{$data->{FUNCLIST}}, "\n") if @{$data->{FUNCLIST}};
+    print $exp join("\n",< @{$data->{DL_VARS}}, "\n") if (nelems @{$data->{DL_VARS}});
+    print $exp join("\n",< @{$data->{FUNCLIST}}, "\n") if (nelems @{$data->{FUNCLIST}});
     close $exp;
 }
 
 
 sub _write_os2 {
-    my($data) = @_;
+    my($data) = < @_;
     require Config;
     my $threaded = (%Config::Config{archname} =~ m/-thread/ ? " threaded" : "");
 
@@ -103,8 +103,8 @@ sub _write_os2 {
     print $def "CODE LOADONCALL\n";
     print $def "DATA LOADONCALL NONSHARED MULTIPLE\n";
     print $def "EXPORTS\n  ";
-    print $def join("\n  ",@{$data->{DL_VARS}}, "\n") if @{$data->{DL_VARS}};
-    print $def join("\n  ",@{$data->{FUNCLIST}}, "\n") if @{$data->{FUNCLIST}};
+    print $def join("\n  ",< @{$data->{DL_VARS}}, "\n") if (nelems @{$data->{DL_VARS}});
+    print $def join("\n  ",< @{$data->{FUNCLIST}}, "\n") if (nelems @{$data->{FUNCLIST}});
     if (%{$data->{IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
@@ -116,7 +116,7 @@ sub _write_os2 {
 }
 
 sub _write_win32 {
-    my($data) = @_;
+    my($data) = < @_;
 
     require Config;
     if (not $data->{DLBASE}) {
@@ -139,16 +139,16 @@ sub _write_win32 {
     # so this is only to cover the case when the extension DLL may be
     # linked to directly from C. GSAR 97-07-10
     if (%Config::Config{'cc'} =~ m/^bcc/i) {
-        for (@{$data->{DL_VARS}}, @{$data->{FUNCLIST}}) {
+        for (< @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
             push @syms, "_$_", "$_ = _$_";
         }
     }
     else {
-        for (@{$data->{DL_VARS}}, @{$data->{FUNCLIST}}) {
+        for (< @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
             push @syms, "$_", "_$_ = $_";
         }
     }
-    print $def join("\n  ",@syms, "\n") if @syms;
+    print $def join("\n  ",< @syms, "\n") if (nelems @syms);
     if (%{$data->{IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
@@ -161,13 +161,13 @@ sub _write_win32 {
 
 
 sub _write_vms {
-    my($data) = @_;
+    my($data) = < @_;
 
     require Config; # a reminder for once we do $^O
     require ExtUtils::XSSymSet;
 
     my($isvax) = %Config::Config{'archname'} =~ m/VAX/i;
-    my($set) = ExtUtils::XSSymSet->new;
+    my($set) = < ExtUtils::XSSymSet->new;
 
     rename "$data->{FILE}.opt", "$data->{FILE}.opt_old";
 
@@ -184,13 +184,13 @@ sub _write_vms {
     print $opt "case_sensitive=yes\n"
         if %Config::Config{d_vms_case_sensitive_symbols};
 
-    foreach my $sym (@{$data->{FUNCLIST}}) {
+    foreach my $sym (< @{$data->{FUNCLIST}}) {
         my $safe = $set->addsym($sym);
         if ($isvax) { print $opt "UNIVERSAL=$safe\n" }
         else        { print $opt "SYMBOL_VECTOR=($safe=PROCEDURE)\n"; }
     }
 
-    foreach my $sym (@{$data->{DL_VARS}}) {
+    foreach my $sym (< @{$data->{DL_VARS}}) {
         my $safe = $set->addsym($sym);
         print $opt "PSECT_ATTR={$sym},PIC,OVR,RD,NOEXE,WRT,NOSHR\n";
         if ($isvax) { print $opt "UNIVERSAL=$safe\n" }

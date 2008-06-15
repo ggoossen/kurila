@@ -335,10 +335,10 @@ sub can_gunzip {
 
 sub _import {
     my $import = shift;
-    while (@_) {
+    while ((nelems @_)) {
 	if (@_[0] eq ':gzip_external') {
 	    shift;
-	    if (@_) {
+	    if ((nelems @_)) {
 		$gzip_external = shift;
 	    } else {
 		croak "$import: ':gzip_external' requires an argument";
@@ -346,7 +346,7 @@ sub _import {
 	}
 	elsif (@_[0] eq ':gzip_read_open') {
 	    shift;
-	    if (@_) {
+	    if ((nelems @_)) {
 		$gzip_read_open = shift;
 		croak "$import: ':gzip_read_open' '$gzip_read_open' is illegal"
 		    unless $gzip_read_open =~ m/^.+\%s.+$/;
@@ -356,7 +356,7 @@ sub _import {
 	}
 	elsif (@_[0] eq ':gzip_write_open') {
 	    shift;
-	    if (@_) {
+	    if ((nelems @_)) {
 		$gzip_write_open = shift;
 		croak "$import: ':gzip_write_open' '$gzip_read_open' is illegal"
 		    unless $gzip_write_open =~ m/^.+\%s.*$/;
@@ -399,24 +399,24 @@ sub _alias {
 sub import {
     shift;
     my $import = "IO::Zlib::import";
-    if (@_) {
-	if (_import($import, @_)) {
-	    croak "$import: '@_' is illegal";
+    if ((nelems @_)) {
+	if (_import($import, < @_)) {
+	    croak "$import: '{join ' ', <@_}' is illegal";
 	}
     }
     _alias($import);
 }
 
-@ISA = qw(Tie::Handle);
+@ISA = @( qw(Tie::Handle) );
 
 sub TIEHANDLE
 {
     my $class = shift;
-    my @args = @_;
+    my @args = @( < @_ );
 
     my $self = bless \%(), $class;
 
-    return @args ? $self->OPEN(@args) : $self;
+    return (nelems @args) ? $self->OPEN(< @args) : $self;
 }
 
 sub DESTROY
@@ -479,7 +479,7 @@ sub READLINE
 
     return $line unless wantarray;
 
-    my @lines = $line;
+    my @lines = @( $line );
 
     while ($self->{'file'}->gzreadline($line) +> 0)
     {
@@ -516,13 +516,13 @@ sub FILENO
 sub new
 {
     my $class = shift;
-    my @args = @_;
+    my @args = @( < @_ );
 
-    _alias("new", @_) unless $aliased; # Some call new IO::Zlib directly...
+    _alias("new", < @_) unless $aliased; # Some call new IO::Zlib directly...
 
     my $self = gensym();
 
-    tie *{$self}, $class, @args;
+    tie *{$self}, $class, < @args;
 
     return tied(${$self}) ? bless $self, $class : undef;
 }
@@ -555,12 +555,12 @@ for my $name (qw|OPEN CLOSE READ READLINE PRINT PRINTF GETC BINMODE WRITE EOF TE
     Symbol::fetch_glob(lc $name)->* =
         sub {
             my $self = shift;
-            tied(*{$self})->?$name(@_);
+            tied(*{$self})->?$name(< @_);
         };
 }
 
 sub gzopen_external {
-    my ($filename, $mode) = @_;
+    my ($filename, $mode) = < @_;
     require IO::Handle;
     my $fh = IO::Handle->new();
     if ($mode =~ m/r/) {
@@ -618,7 +618,7 @@ sub gzread_external {
     # mix reads and readlines, and we don't want to mess
     # the stdio buffering.  See also gzreadline_external()
     # and gzwrite_external().
-    my $nread = read(@_[0], @_[1], @_ == 3 ? @_[2] : 4096);
+    my $nread = read(@_[0], @_[1], (nelems @_) == 3 ? @_[2] : 4096);
     defined $nread ? $nread : -1;
 }
 

@@ -23,11 +23,11 @@ open F, "<", "skips" or die "open skips: $!";
 
 ok $skipped, 1, 'not skipped?';
 
-my @T = ~< *F;
-chop @T;
-my @expect = split m/\n+/, join('', ~< *DATA);
-ok @T, 4;
-for (my $x=0; $x +< @T; $x++) {
+my @T = @( ~< *F );
+chop < @T;
+my @expect = @( split m/\n+/, join('', ~< *DATA) );
+ok (nelems @T), 4;
+for (my $x=0; $x +< nelems @T; $x++) {
     ok @T[$x], @expect[$x];
 }
 

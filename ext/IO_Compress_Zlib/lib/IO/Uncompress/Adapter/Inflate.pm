@@ -23,21 +23,21 @@ sub mkUncompObject
 
     if ($scan)
     {
-        ($inflate, $status) = Compress::Raw::Zlib::InflateScan->new(
+        ($inflate, $status) = < Compress::Raw::Zlib::InflateScan->new(
                                     CRC32        => $crc32,
                                     ADLER32      => $adler32,
                                     WindowBits   => - MAX_WBITS) ;
     }
     else
     {
-        ($inflate, $status) = Compress::Raw::Zlib::Inflate->new(
+        ($inflate, $status) = < Compress::Raw::Zlib::Inflate->new(
                                     AppendOutput => 1,
                                     CRC32        => $crc32,
                                     ADLER32      => $adler32,
                                     WindowBits   => - MAX_WBITS) ;
     }
 
-    return (undef, "Could not create Inflation object: $status", $status) 
+    return  @(undef, "Could not create Inflation object: $status", $status) 
         if $status != Z_OK ;
 
     return bless \%('Inf'        => $inflate,
@@ -119,7 +119,7 @@ sub adler32
 sub sync
 {
     my $self = shift ;
-    ( $self->{Inf}->inflateSync(@_) == Z_OK) 
+    ( $self->{Inf}->inflateSync(< @_) == Z_OK) 
             ? STATUS_OK 
             : STATUS_ERROR ;
 }
@@ -140,13 +140,13 @@ sub getEndOffset
 sub resetLastBlockByte
 {
     my $self = shift ;
-    $self->{Inf}->resetLastBlockByte(@_);
+    $self->{Inf}->resetLastBlockByte(< @_);
 }
 
 sub createDeflateStream
 {
     my $self = shift ;
-    my $deflate = $self->{Inf}->createDeflateStream(@_);
+    my $deflate = $self->{Inf}->createDeflateStream(< @_);
     return bless \%('Def'        => $deflate,
                   'CompSize'   => 0,
                   'UnCompSize' => 0,

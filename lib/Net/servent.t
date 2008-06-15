@@ -2,7 +2,7 @@
 
 BEGIN {
     our $hasse;
-    try { my @n = getservbyname "echo", "tcp" };
+    try { my @n = @( getservbyname "echo", "tcp" ) };
     $hasse = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasse) { print "1..0 # Skip: no getservbyname\n"; exit 0 }
     use Config;
@@ -15,8 +15,8 @@ use strict;
 our @servent;
 
 BEGIN {
-    @servent = getservbyname "echo", "tcp"; # This is the function getservbyname.
-    unless (@servent) { print "1..0 # Skip: no echo service\n"; exit 0 }
+    @servent = @( getservbyname "echo", "tcp" ); # This is the function getservbyname.
+    unless (nelems @servent) { print "1..0 # Skip: no echo service\n"; exit 0 }
 }
 
 print "1..3\n";

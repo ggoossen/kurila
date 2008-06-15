@@ -113,7 +113,7 @@ use Test::More 'no_plan';
 require_ok("B::Concise");
 
 my %matchers = 
-    ( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
+    %( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
 		      |(?-x:coderef .* has no START) }x,
       XS	=> qr/ is XS code/,
       perl	=> qr/ (next|db)state/,
@@ -252,7 +252,7 @@ if (%opts) {
     Data::Dumper->import('Dumper');
     $Data::Dumper::Sortkeys = 1;
 }
-my @argpkgs = @ARGV;
+my @argpkgs = @( < @ARGV );
 my %report;
 
 if (%opts{r}) {
@@ -261,12 +261,12 @@ if (%opts{r}) {
 }
 
 unless (%opts{a}) {
-    unless (@argpkgs) {
+    unless (nelems @argpkgs) {
 	foreach my $pkg (sort keys %$testpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     } else {
-	foreach my $pkg (@argpkgs) {
+	foreach my $pkg (< @argpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     }
@@ -276,19 +276,19 @@ unless (%opts{a}) {
 ############
 
 sub test_pkg {
-    my ($pkg, $fntypes) = @_;
+    my ($pkg, $fntypes) = < @_;
     require_ok($pkg);
 
     # build %stash: keys are func-names, vals filled in below
-    my (%stash) = map
+    my (%stash) = %( map
 	( ($_ => 0)
 	  => ( grep exists &{*{Symbol::fetch_glob("$pkg\::$_")}}	# grab CODE symbols
 	       => grep !m/__ANON__/		# but not anon subs
 	       => keys %{*{Symbol::fetch_glob($pkg.'::')}}		# from symbol table
-	       ));
+	       )) );
 
     for my $type (keys %matchers) {
-	foreach my $fn (@{$fntypes->{$type}}) {
+	foreach my $fn (< @{$fntypes->{$type}}) {
 	    carp "$fn can only be one of $type, %stash{$fn}\n"
 		if %stash{$fn};
 	    %stash{$fn} = $type;
@@ -299,11 +299,11 @@ sub test_pkg {
     for my $k (keys %stash) {
 	%stash{$k} = $dflt unless %stash{$k};
     }
-    %stash{$_} = 'skip' foreach @{$fntypes->{skip}};
+    %stash{$_} = 'skip' foreach < @{$fntypes->{skip}};
 
     if (%opts{v}) {
-	diag("fntypes: " => Dumper($fntypes));
-	diag("$pkg stash: " => Dumper(\%stash));
+	diag("fntypes: " => < Dumper($fntypes));
+	diag("$pkg stash: " => < Dumper(\%stash));
     }
     foreach my $fn (reverse sort keys %stash) {
 	next if %stash{$fn} eq 'skip';
@@ -315,12 +315,12 @@ sub test_pkg {
 }
 
 sub checkXS {
-    my ($func_name, $want) = @_;
+    my ($func_name, $want) = < @_;
 
     croak "unknown type $want: $func_name\n"
 	unless defined %matchers{$want};
 
-    my ($buf, $err) = render($func_name);
+    my ($buf, $err) = < render($func_name);
     my $res = like($buf, %matchers{$want}, "$want sub:\t $func_name");
 
     unless ($res) {
@@ -333,7 +333,7 @@ sub checkXS {
 }
 
 sub render {
-    my ($func_name) = @_;
+    my ($func_name) = < @_;
 
     B::Concise::reset_sequence();
     B::Concise::walk_output(\my $buf);
@@ -343,7 +343,7 @@ sub render {
     diag("err: $@ $buf") if $@;
     diag("verbose: $buf") if %opts{V};
 
-    return ($buf, $@);
+    return  @($buf, $@);
 }
 
 sub corecheck {
@@ -354,9 +354,9 @@ sub corecheck {
     }
     my $mods = %Module::CoreList::version{'5.009002'};
     $mods = \@( sort keys %$mods );
-    print Dumper($mods);
+    print < Dumper($mods);
 
-    foreach my $pkgnm (@$mods) {
+    foreach my $pkgnm (< @$mods) {
 	test_pkg($pkgnm);
     }
 }
@@ -364,12 +364,12 @@ sub corecheck {
 END {
     if (%opts{c}) {
 	$Data::Dumper::Indent = 1;
-	print "Corrections: ", Dumper(\%report);
+	print "Corrections: ", < Dumper(\%report);
 
 	foreach my $pkg (sort keys %report) {
 	    for my $type (keys %matchers) {
-		print "$pkg: $type: @{%report{$pkg}->{$type}}\n"
-		    if @{%report{$pkg}->{$type}};
+		print "$pkg: $type: {join ' ', <@{%report{$pkg}->{$type}}}\n"
+		    if (nelems @{%report{$pkg}->{$type}});
 	    }
 	}
     }

@@ -7,8 +7,8 @@ BEGIN {
 # don't make this lexical
 our $i = 1;
 
-my @fjles_to_delete = qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
-krunch.pm krunch.pmc whap.pm whap.pmc);
+my @fjles_to_delete = @( qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
+krunch.pm krunch.pmc whap.pm whap.pmc) );
 
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
@@ -18,8 +18,8 @@ if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
 
 sub do_require {
-    %INC = ();
-    write_file('bleah.pm',@_);
+    %INC = %( () );
+    write_file('bleah.pm',< @_);
     try { require "bleah.pm" };
     my @a; # magic guard for scope violations (must be first lexical in file)
 }
@@ -29,7 +29,7 @@ sub write_file {
     open(REQ, ">","$f") or die "Can't write '$f': $!";
     binmode REQ;
     use bytes;
-    print REQ @_;
+    print REQ < @_;
     close REQ or die "Could not close $f: $!";
 }
 
@@ -128,11 +128,11 @@ print "ok $i - require() context\n";
 our ($foo, @foo);
                               delete %INC{"bleah.pm"}; ++$::i;
 $foo = eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-@foo = eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
+@foo = @( eval q{require bleah} ); delete %INC{"bleah.pm"}; ++$::i;
        eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
        eval q{$_=$_+2;require bleah}; delete %INC{"bleah.pm"}; ++$::i;
 $foo = try  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-@foo = try  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
+@foo = @( try  {require bleah} ); delete %INC{"bleah.pm"}; ++$::i;
        try  {require bleah};
 
 # Test for fix of RT #24404 : "require $scalar" may load a directory
@@ -155,7 +155,7 @@ if ($@->message =~ m/^This is an expected error/) {
 }
 
 sub write_file_not_thing {
-    my ($file, $thing, $test) = @_;
+    my ($file, $thing, $test) = < @_;
     write_file($file, <<"EOT");
     print "not ok $test\n";
     die "The $thing file should not be loaded";
@@ -238,7 +238,7 @@ my $utf8 = utf8::chr(0xFEFF);
 $i++; do_require(qq({$utf8}print "ok $i\n"; 1;\n));
 
 END {
-    foreach my $file (@fjles_to_delete) {
+    foreach my $file (< @fjles_to_delete) {
 	1 while unlink $file;
     }
 }

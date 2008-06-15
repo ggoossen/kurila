@@ -6,8 +6,8 @@ use ExtUtils::Constant::Utils 'perl_stringify';
 require ExtUtils::Constant::Base;
 
 
-@ISA = qw(ExtUtils::Constant::Base Exporter);
-@EXPORT_OK = qw(%XS_Constant %XS_TypeSet);
+@ISA = @( qw(ExtUtils::Constant::Base Exporter) );
+@EXPORT_OK = @( qw(%XS_Constant %XS_TypeSet) );
 
 $VERSION = '0.02';
 
@@ -39,7 +39,7 @@ others
 
 # '' is used as a flag to indicate non-ascii macro names, and hence the need
 # to pass in the utf8 on/off flag.
-%XS_Constant = (
+%XS_Constant = %(
 		''    => '',
 		IV    => 'PUSHi(iv)',
 		UV    => 'PUSHu((UV)iv)',
@@ -52,7 +52,7 @@ others
 		UNDEF => '',	# implicit undef
 );
 
-%XS_TypeSet = (
+%XS_TypeSet = %(
 		IV    => '*iv_return = ',
 		UV    => '*iv_return = (IV)',
 		NV    => '*nv_return = ',
@@ -74,11 +74,11 @@ sub header {
     push @lines, "#define PERL_constant_IS$_\t$start\n"; $start++;
   }
 
-  return join '', @lines;
+  return join '', < @lines;
 }
 
 sub valid_type {
-  my ($self, $type) = @_;
+  my ($self, $type) = < @_;
   return exists %XS_TypeSet{$type};
 }
 
@@ -90,18 +90,18 @@ sub assignment_clause_for_type {
   my $typeset = %XS_TypeSet{$type};
   if (ref $typeset) {
     die "Type $type is aggregate, but only single value given"
-      if @_ == 1;
-    return map {"$typeset->[$_]@_[$_];"} 0 .. (@$typeset-1);
+      if (nelems @_) == 1;
+    return map {"$typeset->[$_]@_[$_];"} 0 .. ((nelems @$typeset)-1);
   } elsif (defined $typeset) {
     die "Aggregate value given for type $type"
-      if @_ +> 1;
+      if (nelems @_) +> 1;
     return "$typeset@_[0];";
   }
   return ();
 }
 
 sub return_statement_for_type {
-  my ($self, $type) = @_;
+  my ($self, $type) = < @_;
   # In the future may pass in an options hash
   $type = $type->{type} if ref $type;
   "return PERL_constant_IS$type;";
@@ -122,14 +122,14 @@ sub default_type {
 }
 
 sub macro_from_name {
-  my ($self, $item) = @_;
+  my ($self, $item) = < @_;
   my $macro = $item->{name};
   $macro = $item->{value} unless defined $macro;
   $macro;
 }
 
 sub macro_from_item {
-  my ($self, $item) = @_;
+  my ($self, $item) = < @_;
   my $macro = $item->{macro};
   $macro = $self->macro_from_name($item) unless defined $macro;
   $macro;
@@ -141,7 +141,7 @@ sub memEQ {
 }
 
 sub params {
-  my ($self, $what) = @_;
+  my ($self, $what) = < @_;
   foreach (sort keys %$what) {
     warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{$_};
   }
@@ -168,7 +168,7 @@ sub namelen_param_definition {
 }
 
 sub C_constant_other_params_defintion {
-  my ($self, $params) = @_;
+  my ($self, $params) = < @_;
   my $body = '';
   $body .= ", IV *iv_return" if $params->{IV};
   $body .= ", NV *nv_return" if $params->{NV};
@@ -178,7 +178,7 @@ sub C_constant_other_params_defintion {
 }
 
 sub C_constant_other_params {
-  my ($self, $params) = @_;
+  my ($self, $params) = < @_;
   my $body = '';
   $body .= ", iv_return" if $params->{IV};
   $body .= ", nv_return" if $params->{NV};
@@ -188,7 +188,7 @@ sub C_constant_other_params {
 }
 
 sub dogfood {
-  my ($self, $args, @items) = @_;
+  my ($self, $args, < @items) = < @_;
   my ($package, $subname, $default_type, $what, $indent, $breakout) =
     %{$args}{[qw(package subname default_type what indent breakout)]};
   my $result = <<"EOT";
@@ -208,7 +208,7 @@ use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 EOT
   $result .= $self->dump_names (\%(default_type=>$default_type, what=>$what,
 				 indent=>0, declare_types=>1),
-				@items);
+				< @items);
   $result .= <<'EOT';
 
 print constant_types(), "\n"; # macro defs

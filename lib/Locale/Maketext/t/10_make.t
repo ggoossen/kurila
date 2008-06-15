@@ -8,14 +8,14 @@ ok 1;
 # declare some classes...
 {
   package Woozle;
-  our @ISA = ('Locale::Maketext');
+  our @ISA = @('Locale::Maketext');
   sub dubbil   { return @_[1] * 2 }
   sub numerate { return @_[2] . 'en' }
 }
 {
   package Woozle::elx;
-  our @ISA = ('Woozle');
-  our %Lexicon = (
+  our @ISA = @('Woozle');
+  our %Lexicon = %(
    'd2' => 'hum [dubbil,_1]',
    'd3' => 'hoo [quant,_1,zaz]',
    'd4' => 'hoo [*,_1,zaz]',

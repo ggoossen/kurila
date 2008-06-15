@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -42,9 +42,9 @@ ok join('', $treelet),  'abc';  # implicit
 
 print "# Testing non-coreferentiality...\n";
 {
-  my @stack = ($bare_treelet);
+  my @stack = @($bare_treelet);
   my $this;
-  while(@stack) {
+  while((nelems @stack)) {
     $this = shift @stack;
     if(ref($this || '') eq 'ARRAY') {
       push @stack, splice @$this;
@@ -53,7 +53,7 @@ print "# Testing non-coreferentiality...\n";
       push @stack, splice @$this;
       push @$this, ("BAD!") x 3;
     } elsif(ref($this || '') eq 'HASH') {
-      %$this = ();
+      %$this = %( () );
     }
   }
   # These will fail if $treelet and $bare_treelet are coreferential,

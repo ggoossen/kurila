@@ -20,9 +20,9 @@ $| = 1;
 
 open(PIPE, "|-", "-") || exec $Perl, '-pe', 's/Y/k/g; s/X/o/g';
 
-printf PIPE "Xk \%d - open |- || exec\n", curr_test();
+printf PIPE "Xk \%d - open |- || exec\n", < curr_test();
 next_test();
-printf PIPE "oY \%d -    again\n", curr_test();
+printf PIPE "oY \%d -    again\n", < curr_test();
 next_test();
 close PIPE;
 
@@ -39,7 +39,7 @@ SKIP: {
 	close PIPE;        # avoid zombies
     }
     else {
-	printf STDOUT "not ok \%d - open -|\n", curr_test();
+	printf STDOUT "not ok \%d - open -|\n", < curr_test();
         next_test();
         my $tnum = curr_test;
         next_test();
@@ -53,18 +53,18 @@ SKIP: {
     if (open(PIPE, "-|", "-")) {
 	$_ = join '', ~< *PIPE;
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = map ord, split m//, $raw;
-	my @r1 = map ord, split m//, $raw1;
+	my @r  = @( map ord, split m//, $raw );
+	my @r1 = @( map ord, split m//, $raw1 );
         if ($raw1 eq $raw) {
-	    s/^not (ok \d+ -) .*/$1 '@r1' passes through '-|'\n/s;
+	    s/^not (ok \d+ -) .*/$1 '{join ' ', <@r1}' passes through '-|'\n/s;
 	} else {
-	    s/^(not ok \d+ -) .*/$1 expect '@r', got '@r1'\n/s;
+	    s/^(not ok \d+ -) .*/$1 expect '{join ' ', <@r}', got '{join ' ', <@r1}'\n/s;
 	}
 	print;
 	close PIPE;        # avoid zombies
     }
     else {
-	printf STDOUT "not ok \%d - $raw", curr_test();
+	printf STDOUT "not ok \%d - $raw", < curr_test();
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -72,18 +72,18 @@ SKIP: {
     next_test();
 
     if (open(PIPE, "|-", "-")) {
-	printf PIPE "not ok \%d - $raw", curr_test();
+	printf PIPE "not ok \%d - $raw", < curr_test();
 	close PIPE;        # avoid zombies
     }
     else {
 	$_ = join '', ~< *STDIN;
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = map ord, split m//, $raw;
-	my @r1 = map ord, split m//, $raw1;
+	my @r  = @( map ord, split m//, $raw );
+	my @r1 = @( map ord, split m//, $raw1 );
         if ($raw1 eq $raw) {
-	    s/^not (ok \d+ -) .*/$1 '@r1' passes through '|-'\n/s;
+	    s/^not (ok \d+ -) .*/$1 '{join ' ', <@r1}' passes through '|-'\n/s;
 	} else {
-	    s/^(not ok \d+ -) .*/$1 expect '@r', got '@r1'\n/s;
+	    s/^(not ok \d+ -) .*/$1 expect '{join ' ', <@r}', got '{join ' ', <@r1}'\n/s;
 	}
 	print;
         exec $Perl, '-e0';	# Do not run END()...
@@ -109,7 +109,7 @@ SKIP: {
         else {
             die "Couldn't fork" unless defined $pid;
             close READER;
-            printf WRITER "not ok \%d - pipe & fork\n", curr_test;
+            printf WRITER "not ok \%d - pipe & fork\n", < curr_test;
             next_test;
 
             open(STDOUT, ">&",\*WRITER) || die "Can't dup WRITER to STDOUT";
@@ -133,10 +133,10 @@ close READER;
 
 sub broken_pipe {
     %SIG{'PIPE'} = 'IGNORE';       # loop preventer
-    printf "ok \%d - SIGPIPE\n", curr_test;
+    printf "ok \%d - SIGPIPE\n", < curr_test;
 }
 
-printf WRITER "not ok \%d - SIGPIPE\n", curr_test;
+printf WRITER "not ok \%d - SIGPIPE\n", < curr_test;
 close WRITER;
 sleep 1;
 next_test;

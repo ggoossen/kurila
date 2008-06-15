@@ -1,5 +1,5 @@
 use re Debug=>qw(DUMP EXECUTE OFFSETS TRIEC);
-my @tests=(
+my @tests=@(
   XY     =>  'X(A|[B]Q||C|D)Y' ,
   foobar =>  '[f][o][o][b][a][r]',
   x  =>  '.[XY].',
@@ -8,7 +8,7 @@ my @tests=(
   'm/(\.COM|\.EXE|\.BAT|\.CMD|\.VBS|\.VBE|\.JS|\.JSE|\.WSF|\.WSH|\.pyo|\.pyc|\.pyw|\.py)$/i',
   'q'=>'[q]',
 );
-while (@tests) {
+while ((nelems @tests)) {
     my ($str,$pat)=splice @tests,0,2;
     print STDERR "\n";
     $pat="m/$pat/" if substr($pat,0,2) ne 'm/';

@@ -5,12 +5,12 @@ BEGIN {
    use File::Spec;
    use Cwd qw(abs_path);
    push @INC, '..';
-   my $THISDIR = abs_path(dirname $0);
+   my $THISDIR = abs_path( <dirname $0);
    unshift @INC, $THISDIR;
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, map { < 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
 }
 
 #use strict;
@@ -21,10 +21,10 @@ use Exporter;
 
 use vars qw($MYPKG @EXPORT @ISA);
 $MYPKG = try { (caller)[[0]] };
-@EXPORT = qw(&testpodplaintext);
+@EXPORT = @( qw(&testpodplaintext) );
 BEGIN {
     require Pod::PlainText;
-    @ISA = qw( Pod::PlainText );
+    @ISA = @( qw( Pod::PlainText ) );
     require VMS::Filespec if $^O eq 'VMS';
 }
 
@@ -32,18 +32,18 @@ BEGIN {
 ## reproducible results between environments
 %ENV{[qw(TERMCAP COLUMNS)]} = ('co=76:do=^J', 76);
 
-sub catfile(@) { 'File::Spec'->catfile(@_); }
+sub catfile(@) { 'File::Spec'->catfile(< @_); }
 
-my $INSTDIR = abs_path(dirname $0);
+my $INSTDIR = abs_path( <dirname $0);
 $INSTDIR = VMS::Filespec::unixpath($INSTDIR) if $^O eq 'VMS';
 $INSTDIR =~ s#/$## if $^O eq 'VMS';
 $INSTDIR =~ s#:$## if $^O eq 'MacOS';
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 'pod');
 $INSTDIR =~ s#:$## if $^O eq 'MacOS';
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 't');
-my @PODINCDIRS = ( catfile($INSTDIR, 'lib', 'Pod'),
-                   catfile($INSTDIR, 'scripts'),
-                   catfile($INSTDIR, 'pod'),
+my @PODINCDIRS = @( < catfile($INSTDIR, 'lib', 'Pod'), <
+                   catfile($INSTDIR, 'scripts'), <
+                   catfile($INSTDIR, 'pod'), <
                    catfile($INSTDIR, 't', 'pod')
                  );
 
@@ -57,33 +57,33 @@ sub findinclude {
 
     ## Need to search for it. Look in the following directories ...
     ##   1. the directory containing this pod file
-    my $thispoddir = dirname $self->input_file;
+    my $thispoddir = dirname < $self->input_file;
     ##   2. the parent directory of the above
     my $parentdir  = dirname $thispoddir;
-    my @podincdirs = ($thispoddir, $parentdir, @PODINCDIRS);
+    my @podincdirs = @($thispoddir, $parentdir, < @PODINCDIRS);
 
-    for (@podincdirs) {
+    for (< @podincdirs) {
        my $incfile = catfile($_, $incname);
        return $incfile  if (-r $incfile);
     }
-    warn("*** Can't find =include file $incname in @podincdirs\n");
+    warn("*** Can't find =include file $incname in {join ' ', <@podincdirs}\n");
     return "";
 }
 
 sub command {
     my $self = shift;
-    my ($cmd, $text, $line_num, $pod_para)  = @_;
+    my ($cmd, $text, $line_num, $pod_para)  = < @_;
     $cmd     = ''  unless (defined $cmd);
     local $_ = $text || '';
     my $out_fh  = $self->output_handle;
 
     ## Defer to the superclass for everything except '=include'
-    return  $self->SUPER::command(@_) unless ($cmd eq "include");
+    return  $self->SUPER::command(< @_) unless ($cmd eq "include");
 
     ## We have an '=include' command
     my $incdebug = 1; ## debugging
-    my @incargs = split;
-    if (@incargs == 0) {
+    my @incargs = @( split );
+    if ((nelems @incargs) == 0) {
         warn("*** No filename given for '=include'\n");
         return;
     }
@@ -99,14 +99,14 @@ sub begin_input {
 }
 
 sub podinc2plaintext( $ $ ) {
-    my ($infile, $outfile) = @_;
+    my ($infile, $outfile) = < @_;
     local $_;
     my $text_parser = $MYPKG->new;
     $text_parser->parse_from_file($infile, $outfile);
 }
 
 sub testpodinc2plaintext( @ ) {
-   my %args = @_;
+   my %args = %( < @_ );
    my $infile  = %args{'-In'}  || die "No input file given!";
    my $outfile = %args{'-Out'} || die "No output file given!";
    my $cmpfile = %args{'-Cmp'} || die "No compare-result file given!";
@@ -133,8 +133,8 @@ sub testpodinc2plaintext( @ ) {
 }
 
 sub testpodplaintext( @ ) {
-   my %opts = (ref @_[0] eq 'HASH') ? %{shift()} : ();
-   my @testpods = @_;
+   my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
+   my @testpods = @( < @_ );
    my ($testname, $testdir) = ("", "");
    my ($podfile, $cmpfile) = ("", "");
    my ($outfile, $errfile) = ("", "");
@@ -142,10 +142,10 @@ sub testpodplaintext( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar @testpods, "\n"  unless (%opts{'-xrgen'});
+   print "1..", scalar nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
-   for $podfile (@testpods) {
-      ($testname, $_) = fileparse($podfile);
+   for $podfile (< @testpods) {
+      ($testname, $_) = < fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;
       $cmpfile   =  $testdir . $testname . '.xr';

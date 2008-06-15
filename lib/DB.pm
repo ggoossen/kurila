@@ -24,14 +24,14 @@ BEGIN {
   # these are hardcoded in perl source (some are magical)
 
   $DB::sub = '';        # name of current subroutine
-  %DB::sub = ();        # "filename:fromline-toline" for every known sub
+  %DB::sub = %( () );        # "filename:fromline-toline" for every known sub
   $DB::single = 0;      # single-step flag (set it to 1 to enable stops in BEGIN/use)
   $DB::signal = 0;      # signal flag (will cause a stop at the next line)
   $DB::trace = 0;       # are we tracing through subroutine calls?
-  @DB::args = ();       # arguments of current subroutine or @ARGV array
-  @DB::dbline = ();     # list of lines in currently loaded file
-  %DB::dbline = ();     # actions in current file (keyed by line number)
-  @DB::ret = ();        # return value of last sub executed in list context
+  @DB::args = @( () );       # arguments of current subroutine or @ARGV array
+  @DB::dbline = @( () );     # list of lines in currently loaded file
+  %DB::dbline = %( () );     # actions in current file (keyed by line number)
+  @DB::ret = @( () );        # return value of last sub executed in list context
   $DB::ret = '';        # return value of last sub executed in scalar context
 
   # other "public" globals  
@@ -46,12 +46,12 @@ BEGIN {
   # initialize private globals to avoid warnings
 
   $running = 1;         # are we running, or are we stopped?
-  @stack = (0);
-  @clients = ();
+  @stack = @(0);
+  @clients = @( () );
   $deep = 100;
   $ready = 0;
-  @saved = ();
-  @skippkg = ();
+  @saved = @( () );
+  @skippkg = @( () );
   $usrctxt = '';
   $evalarg = '';
 }
@@ -62,7 +62,7 @@ BEGIN {
 sub sub {
   push(@stack, $DB::single);
   $DB::single ^&^= 1;
-  $DB::single ^|^= 4 if( @stack-1) == $deep;
+  $DB::single ^|^= 4 if( (nelems @stack)-1) == $deep;
   if ((! ref $DB::sub and ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY'))
       or not defined wantarray) {
     &$DB::sub;
@@ -70,9 +70,9 @@ sub sub {
     $DB::ret = undef;
   }
   elsif (wantarray) {
-    @DB::ret = &$DB::sub;
+    @DB::ret = @( < &$DB::sub );
     $DB::single ^|^= pop(@stack);
-    @DB::ret;
+    < @DB::ret;
   }
   else {
     $DB::ret = &$DB::sub;
@@ -89,7 +89,7 @@ sub DB {
   &save;
   ($DB::package, $DB::filename, $DB::lineno) = caller;
 
-  return if @skippkg and grep { $_ eq $DB::package } @skippkg;
+  return if (nelems @skippkg) and grep { $_ eq $DB::package } < @skippkg;
 
   $usrctxt = "package $DB::package;";		# this won't let them modify, alas
   local(*DB::dbline) = "::_<$DB::filename";
@@ -98,7 +98,7 @@ sub DB {
   # not attached to a filename, but instead stored in Dev:Pseudo)
   # since this is done late, $DB::filename will be "wrong" after
   # skippkg
-  if ($^O eq 'MacOS' &&( @DB::dbline-1) +< 0) {
+  if ($^O eq 'MacOS' &&( (nelems @DB::dbline)-1) +< 0) {
     $DB::filename = 'Dev:Pseudo';
     *DB::dbline = "::_<$DB::filename";
   }
@@ -120,14 +120,14 @@ sub DB {
   }
   $evalarg = $action, &eval if $action;
   if ($DB::single || $DB::signal) {
-    _outputall((@stack-1) . " levels deep in subroutine calls.\n") if $DB::single ^&^ 4;
+    _outputall(((nelems @stack)-1) . " levels deep in subroutine calls.\n") if $DB::single ^&^ 4;
     $DB::single = 0;
     $DB::signal = 0;
     $running = 0;
     
     &eval if ($evalarg = DB->prestop);
     my $c;
-    for $c (@clients) {
+    for $c (< @clients) {
       # perform any client-specific prestop actions
       &eval if ($evalarg = $c->cprestop);
       
@@ -145,7 +145,7 @@ sub DB {
     }
     &eval if ($evalarg = DB->poststop);
   }
-  ($@, $!, $,, $/, $\, $^W) = @saved;
+  ($@, $!, $,, $/, $\, $^W) = < @saved;
   ();
 }
   
@@ -153,7 +153,7 @@ sub DB {
 # this takes its argument via $evalarg to preserve current @_
 #    
 sub eval {
-  ($@, $!, $,, $/, $\, $^W) = @saved;
+  ($@, $!, $,, $/, $\, $^W) = < @saved;
   eval "$usrctxt $evalarg; &DB::save";
   _outputall($@) if $@;
 }
@@ -165,12 +165,12 @@ sub eval {
 use strict;                # this can run only after DB() and sub() are defined
 
 sub save {
-  @saved = ($@, $!, $,, $/, $\, $^W);
+  @saved = @($@, $!, $,, $/, $\, $^W);
   $, = ""; $/ = "\n"; $\ = ""; $^W = 0;
 }
 
 sub catch {
-  for (@clients) { $_->awaken; }
+  for (< @clients) { $_->awaken; }
   $DB::signal = 1;
   $ready = 1;
 }
@@ -190,10 +190,10 @@ sub register {
 sub done {
   my $s = shift;
   $s = _clientname($s) if ref($s);
-  @clients = grep {$_ ne $s} @clients;
+  @clients = @( grep {$_ ne $s} < @clients );
   $s->cleanup;
 #  $running = 3 unless @clients;
-  exit(0) unless @clients;
+  exit(0) unless (nelems @clients);
 }
 
 sub _clientname {
@@ -218,7 +218,7 @@ sub cont {
   my $s = shift;
   my $i = shift;
   $s->set_tbreak($i) if $i;
-  for ($i = 0; $i +<=( @stack-1);) {
+  for ($i = 0; $i +<=( (nelems @stack)-1);) {
 	@stack[$i++] ^&^= ^~^1;
   }
   $DB::single = 0;
@@ -234,7 +234,7 @@ sub ret {
   my $s = shift;
   my $i = shift;      # how many levels to get to DB sub
   $i = 0 unless defined $i;
-  @stack[(@stack-1)-$i] ^|^= 1;
+  @stack[((nelems @stack)-1)-$i] ^|^= 1;
   $DB::single = 0;
   $running = 1;
 }
@@ -250,15 +250,15 @@ sub backtrace {
   my($p,$f,$l,$s,$h,$w,$e,$r,$a, @a, @ret,$i);
   $start = 1 unless $start;
   for ($i = $start; ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i); $i++) {
-    @a = @DB::args;
-    for (@a) {
+    @a = @( < @DB::args );
+    for (< @a) {
       s/'/\\'/g;
       s/([^\0]*)/'$1'/ unless m/^-?[\d.]+$/;
       s/([\200-\377])/{sprintf("M-\%c",ord($1)^&^0177)}/g;
       s/([\0-\37\177])/{sprintf("^\%c",ord($1)^^^64)}/g;
     }
     $w = $w ? '@ = ' : '$ = ';
-    $a = $h ? '(' . join(', ', @a) . ')' : '';
+    $a = $h ? '(' . join(', ', < @a) . ')' : '';
     $e =~ s/\n\s*\;\s*\Z// if $e;
     $e =~ s/[\\\']/\\$1/g if $e;
     if ($r) {
@@ -277,8 +277,8 @@ sub backtrace {
 
 sub _outputall {
   my $c;
-  for $c (@clients) {
-    $c->output(@_);
+  for $c (< @clients) {
+    $c->output(< @_);
   }
 }
 
@@ -294,9 +294,9 @@ sub trace_toggle {
 #
 sub subs {
   my $s = shift;
-  if (@_) {
-    my(@ret) = ();
-    while (@_) {
+  if ((nelems @_)) {
+    my(@ret) = @( () );
+    while ((nelems @_)) {
       my $name = shift;
       push @ret, \@(%DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/) 
 	if exists %DB::sub{$name};
@@ -323,8 +323,8 @@ sub filesubs {
 #
 sub files {
   my $s = shift;
-  my(@f) = grep(m|^_<|, keys %main::);
-  return map { substr($_,2) } @f;
+  my(@f) = @( grep(m|^_<|, keys %main::) );
+  return map { substr($_,2) } < @f;
 }
 
 ####
@@ -341,7 +341,7 @@ sub lines {
 #
 sub loadfile {
   my $s = shift;
-  my($file, $line) = @_;
+  my($file, $line) = < @_;
   if (!defined %main::{'_<' . $file}) {
     my $try;
     if (($try) = grep(m|^_<.*$file|, keys %main::)) {  
@@ -353,7 +353,7 @@ sub loadfile {
 #    _outputall("Loading file $file..");
     *DB::dbline = "::_<$file";
     $DB::filename = $file;
-    for $c (@clients) {
+    for $c (< @clients) {
 #      print "2 ", $file, '|', $line, "\n";
       $c->showfile($file, $line);
     }
@@ -365,11 +365,11 @@ sub loadfile {
 sub lineevents {
   my $s = shift;
   my $fname = shift;
-  my(%ret) = ();
+  my(%ret) = %( () );
   my $i;
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
-  for ($i = 1; $i +<=( @DB::dbline-1); $i++) {
+  for ($i = 1; $i +<=( (nelems @DB::dbline)-1); $i++) {
     %ret{$i} = \@(@DB::dbline[$i], split(m/\0/, %DB::dbline{$i})) 
       if defined %DB::dbline{$i};
   }
@@ -426,8 +426,8 @@ sub _find_subline {
 sub clr_breaks {
   my $s = shift;
   my $i;
-  if (@_) {
-    while (@_) {
+  if ((nelems @_)) {
+    while ((nelems @_)) {
       $i = shift;
       $i = _find_subline($i) if ($i =~ m/\D/);
       $s->output("Subroutine not found.\n") unless $i;
@@ -440,7 +440,7 @@ sub clr_breaks {
     }
   }
   else {
-    for ($i = 1; $i +<=( @DB::dbline-1) ; $i++) {
+    for ($i = 1; $i +<=( (nelems @DB::dbline)-1) ; $i++) {
       if (defined %DB::dbline{$i}) {
         %DB::dbline{$i} =~ s/^[^\0]+//;
         if (%DB::dbline{$i} =~ s/^\0?$//) {
@@ -471,8 +471,8 @@ sub set_action {
 sub clr_actions {
   my $s = shift;
   my $i;
-  if (@_) {
-    while (@_) {
+  if ((nelems @_)) {
+    while ((nelems @_)) {
       my $i = shift;
       $i = _find_subline($i) if ($i =~ m/\D/);
       $s->output("Subroutine not found.\n") unless $i;
@@ -483,7 +483,7 @@ sub clr_actions {
     }
   }
   else {
-    for ($i = 1; $i +<=( @DB::dbline-1) ; $i++) {
+    for ($i = 1; $i +<=( (nelems @DB::dbline)-1) ; $i++) {
       if (defined %DB::dbline{$i}) {
 	%DB::dbline{$i} =~ s/\0[^\0]*//;
 	delete %DB::dbline{$i} if %DB::dbline{$i} =~ s/^\0?$//;
@@ -493,12 +493,12 @@ sub clr_actions {
 }
 
 sub prestop {
-  my ($client, $val) = @_;
+  my ($client, $val) = < @_;
   return defined($val) ? $preeval->{$client} = $val : $preeval->{$client};
 }
 
 sub poststop {
-  my ($client, $val) = @_;
+  my ($client, $val) = < @_;
   return defined($val) ? $posteval->{$client} = $val : $posteval->{$client};
 }
 
@@ -515,11 +515,11 @@ sub awaken {}
 
 sub skippkg {
   my $s = shift;
-  push @skippkg, @_ if @_;
+  push @skippkg, < @_ if (nelems @_);
 }
 
 sub evalcode {
-  my ($client, $val) = @_;
+  my ($client, $val) = < @_;
   if (defined $val) {
     $running = 2;    # hand over to DB() to evaluate in its context
     $ineval->{$client} = $val;
@@ -543,7 +543,7 @@ sub output {}
 #
 # client init
 #
-for (@clients) { $_->init }
+for (< @clients) { $_->init }
 
 %SIG{'INT'} = \&DB::catch;
 

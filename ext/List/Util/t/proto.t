@@ -12,7 +12,7 @@ BEGIN {
 }
 
 use Scalar::Util ();
-use Test::More  (grep { m/set_prototype/ } @Scalar::Util::EXPORT_FAIL)
+use Test::More  (grep { m/set_prototype/ } < @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'set_prototype requires XS version')
 			: (tests => 13);
 

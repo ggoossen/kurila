@@ -2,7 +2,7 @@
 
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-        @INC = '../lib';
+        @INC = @( '../lib' );
         chdir 't';
     }
 }
@@ -35,8 +35,8 @@ is($foo, 'foo');
 my @foo;
 
 ok( !Internals::SvREADONLY @foo );
-@foo = (1..3);
-is(scalar(@foo), 3);
+@foo = @(1..3);
+is(scalar(nelems @foo), 3);
 is(@foo[2], 3);
 
 ok(  Internals::SvREADONLY @foo, 1 );
@@ -49,13 +49,13 @@ try { shift(@foo); };
 like($@->message, $ro_err, q/Can't shift read-only array/);
 try { push(@foo, 'bork'); };
 like($@->message, $ro_err, q/Can't push onto read-only array/);
-try { @foo = qw/foo bar/; };
+try { @foo = @( qw/foo bar/ ); };
 like($@->message, $ro_err, q/Can't reassign read-only array/);
 
 ok( !Internals::SvREADONLY @foo, 0 );
 ok( !Internals::SvREADONLY @foo );
-try { @foo = qw/foo bar/; };
-is(scalar(@foo), 2);
+try { @foo = @( qw/foo bar/ ); };
+is(scalar(nelems @foo), 2);
 is(@foo[1], 'bar');
 
 ### Read-only array element
@@ -103,7 +103,7 @@ is(@foo[2], 'xyzzy');
 my %foo;
 
 ok( !Internals::SvREADONLY %foo );
-%foo = ('foo' => 1, 2 => 'bar');
+%foo = %('foo' => 1, 2 => 'bar');
 is(scalar(keys(%foo)), 2);
 is(%foo{'foo'}, 1);
 
@@ -113,7 +113,7 @@ try { undef(%foo); };
 like($@->message, $ro_err, q/Can't undef read-only hash/);
 TODO: {
     local $TODO = 'Due to restricted hashes implementation';
-    try { %foo = ('ping' => 'pong'); };
+    try { %foo = %('ping' => 'pong'); };
     like($@->message, $ro_err, q/Can't modify read-only hash/);
 }
 try { %foo{'baz'} = 123; };

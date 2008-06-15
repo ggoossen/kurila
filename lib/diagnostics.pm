@@ -197,7 +197,7 @@ if ($^O eq 'VMS') {
     $privlib = VMS::Filespec::unixify($privlib);
     $archlib = VMS::Filespec::unixify($archlib);
 }
-my @trypod = (
+my @trypod = @(
 	   "$archlib/pod/perldiag.pod",
 	   "$privlib/pod/perldiag-%Config{version}.pod",
 	   "$privlib/pod/perldiag.pod",
@@ -207,11 +207,11 @@ my @trypod = (
 	  );
 # handy for development testing of new warnings etc
 unshift @trypod, "./pod/perldiag.pod" if -e "pod/perldiag.pod";
-(my $PODFILE) = ((grep { -e } @trypod), @trypod[-1])[[0]];
+(my $PODFILE) = ((grep { -e } < @trypod), @trypod[-1])[[0]];
 
 if ($^O eq 'MacOS') {
     # just updir one from each lib dir, we'll find it ...
-    ($PODFILE) = grep { -e } map { "$_:pod:perldiag.pod" } @INC;
+    ($PODFILE) = grep { -e } map { "$_:pod:perldiag.pod" } < @INC;
 }
 
 
@@ -245,7 +245,7 @@ CONFIG: {
 
     if (caller) {
 	INCPATH: {
-	    for my $file ( (map { "$_/$WHOAMI.pm" } @INC), $0) {
+	    for my $file ( (map { "$_/$WHOAMI.pm" } < @INC), $0) {
 		warn "Checking $file\n" if $DEBUG;
 		if (open(POD_DIAG, "<", $file)) {
 		    while ( ~< *POD_DIAG) {
@@ -263,11 +263,11 @@ CONFIG: {
     }
 }
 if (eof(POD_DIAG)) { 
-    die "couldn't find diagnostic data in $PODFILE @INC $0";
+    die "couldn't find diagnostic data in $PODFILE {join ' ', <@INC} $0";
 }
 
 
-%HTML_2_Troff = (
+%HTML_2_Troff = %(
     'amp'	=>	'&',	#   ampersand
     'lt'	=>	'<',	#   left chevron, less-than
     'gt'	=>	'>',	#   right chevron, greater-than
@@ -278,7 +278,7 @@ if (eof(POD_DIAG)) {
 
 );
 
-%HTML_2_Latin_1 = (
+%HTML_2_Latin_1 = %(
     'amp'	=>	'&',	#   ampersand
     'lt'	=>	'<',	#   left chevron, less-than
     'gt'	=>	'>',	#   right chevron, greater-than
@@ -289,7 +289,7 @@ if (eof(POD_DIAG)) {
     # etc
 );
 
-%HTML_2_ASCII_7 = (
+%HTML_2_ASCII_7 = %(
     'amp'	=>	'&',	#   ampersand
     'lt'	=>	'<',	#   left chevron, less-than
     'gt'	=>	'>',	#   right chevron, greater-than
@@ -310,7 +310,7 @@ our %HTML_Escapes;
 
 *THITHER = $standalone ? *STDOUT : *STDERR;
 
-my %transfmt = (); 
+my %transfmt = %( () ); 
 my $transmo = <<EOFUNC;
 sub transmo \{
     #local \$^W = 0;  # recursive warnings we do NOT need!
@@ -375,17 +375,17 @@ my %msg;
 	# strip formatting directives from =item line
 	$header =~ s/[A-Z]<(.*?)>/$1/g;
 
-        my @toks = split( m/(\%l?[dx]|\%c|%(?:\.\d+)?s)/, $header );
-	if (@toks +> 1) {
+        my @toks = @( split( m/(\%l?[dx]|\%c|%(?:\.\d+)?s)/, $header ) );
+	if ((nelems @toks) +> 1) {
             my $conlen = 0;
-            for my $i (0..@toks-1){
+            for my $i (0..(nelems @toks)-1){
                 if( $i % 2 ){
                     if(      @toks[$i] eq '%c' ){
                         @toks[$i] = '.';
                     } elsif( @toks[$i] eq '%d' ){
                         @toks[$i] = '\d+';
                     } elsif( @toks[$i] eq '%s' ){
-                        @toks[$i] = $i == @toks-1 ? '.*' : '.*?';
+                        @toks[$i] = $i == (nelems @toks)-1 ? '.*' : '.*?';
                     } elsif( @toks[$i] =~ '%.(\d+)s' ){
                         @toks[$i] = ".\{$1\}";
                      } elsif( @toks[$i] =~ '^%l*x$' ){
@@ -396,7 +396,7 @@ my %msg;
                     $conlen += length( @toks[$i] );
                 }
             }  
-            my $lhs = join( '', @toks );
+            my $lhs = join( '', < @toks );
 	    %transfmt{$header}->{pat} =
               "    s\{^$lhs\}\n     \{\Q$header\E\}s\n\t&& return 1;\n";
             %transfmt{$header}->{len} = $conlen;
@@ -430,7 +430,7 @@ my %msg;
 }
 
 if ($standalone) {
-    if (!@ARGV and -t *STDIN) { print STDERR "$0: Reading from STDIN\n" } 
+    if (!nelems @ARGV and -t *STDIN) { print STDERR "$0: Reading from STDIN\n" } 
     while (defined (my $error = ~< *ARGV)) {
 	splainthis($error) || print THITHER $error;
     } 
@@ -446,7 +446,7 @@ sub import {
 	     # tough, if you want diags, you want diags.
     return if defined $^WARN_HOOK && ($^WARN_HOOK eq \&warn_trap);
 
-    for (@_) {
+    for (< @_) {
 
 	m/^-d(ebug)?$/ 	   	&& do {
 				    $DEBUG++;
@@ -495,7 +495,7 @@ sub warn_trap {
     my $warning = @_[0];
     if (caller eq $WHOAMI or !splainthis($warning)) {
 	if ($WARNTRACE) {
-	    print STDERR Carp::longmess($warning);
+	    print STDERR < Carp::longmess($warning);
 	} else {
 	    print STDERR $warning;
 	}
@@ -559,10 +559,10 @@ sub splainthis {
     # Discard 1st " at <file> line <no>" and all text beyond
     # but be aware of messsages containing " at this-or-that"
     my $real = 0;
-    my @secs = split( m/ at / );
-    return unless @secs;
+    my @secs = @( split( m/ at / ) );
+    return unless (nelems @secs);
     $_ = @secs[0];
-    for my $i ( 1..@secs-1 ){
+    for my $i ( 1..(nelems @secs)-1 ){
         if( @secs[$i] =~ m/.+? (?:line|chunk) \d+/ ){
             $real = 1;
             last;
@@ -607,7 +607,7 @@ sub splainthis {
 
 sub autodescribe {
     if ($VERBOSE and not $count) {
-	print THITHER &{$PRETTY ? \&bold : \&noop}("DESCRIPTION OF DIAGNOSTICS"),
+	print THITHER < &{$PRETTY ? \&bold : \&noop}("DESCRIPTION OF DIAGNOSTICS"),
 		"\n%msg{DESCRIPTION}\n";
     } 
 } 

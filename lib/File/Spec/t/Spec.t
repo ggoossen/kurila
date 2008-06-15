@@ -3,7 +3,7 @@
 use Test;
 
 # Grab all of the plain routines from File::Spec
-use File::Spec @File::Spec::EXPORT_OK ;
+use File::Spec < @File::Spec::EXPORT_OK ;
 
 require File::Spec::Unix ;
 require File::Spec::Win32 ;
@@ -45,7 +45,7 @@ if ($^O eq 'MacOS') {
 # maintenance easy, and should be OK since perl should be pretty functional
 # before these tests are run.
 
-my @tests = (
+my @tests = @(
 # [ Function          ,            Expected          ,         Platform ]
 
 \@( "Unix->case_tolerant()",         '0'  ),
@@ -701,12 +701,12 @@ my @tests = (
 
 
 
-plan tests => scalar @tests + 1;
+plan tests => scalar (nelems @tests) + 1;
 
 {
     package File::Spec::FakeWin32;
     use vars qw(@ISA);
-    @ISA = qw(File::Spec::Win32);
+    @ISA = @( qw(File::Spec::Win32) );
 
     sub _cwd { 'C:\one\two' }
 
@@ -723,7 +723,7 @@ plan tests => scalar @tests + 1;
 	      return;
 	    };
 	    *Cwd::getdcwd = *Cwd::getdcwd; # Avoid a 'used only once' warning
-	    return $self->SUPER::rel2abs(@_);
+	    return $self->SUPER::rel2abs(< @_);
 	};
 	*rel2abs = *rel2abs; # Avoid a 'used only once' warning
     }
@@ -733,8 +733,8 @@ plan tests => scalar @tests + 1;
 ok("Win32->can('_cwd')", "Win32->can('_cwd')");
 
 # Test out the class methods
-for ( @tests ) {
-   tryfunc( @$_ ) ;
+for ( < @tests ) {
+   tryfunc( < @$_ ) ;
 }
 
 

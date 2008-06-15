@@ -9,7 +9,7 @@ our $VERSION = '6.44';
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+our @ISA = @( qw(ExtUtils::MM_Unix) );
 
 =pod
 
@@ -38,7 +38,7 @@ Define TO_UNIX to convert OS2 linefeeds to Unix style.
 =cut
 
 sub init_dist {
-    my($self) = @_;
+    my($self) = < @_;
 
     $self->{TO_UNIX} ||= <<'MAKE_TEXT';
 $(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
@@ -48,7 +48,7 @@ MAKE_TEXT
 }
 
 sub dlsyms {
-    my($self,%attribs) = @_;
+    my($self,< %attribs) = < @_;
 
     my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || \%();
     my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || \@();
@@ -65,10 +65,10 @@ $self->{BASEEXT}.def: Makefile.PL
      Mksymlists("NAME" => "$(NAME)", "DLBASE" => "$(DLBASE)", |,
      '"VERSION" => "$(VERSION)", "DISTNAME" => "$(DISTNAME)", ',
      '"INSTALLDIRS" => "$(INSTALLDIRS)", ',
-     '"DL_FUNCS" => ',neatvalue($funcs),
-     ', "FUNCLIST" => ',neatvalue($funclist),
-     ', "IMPORTS" => ',neatvalue($imports),
-     ', "DL_VARS" => ', neatvalue($vars), q|);'
+     '"DL_FUNCS" => ', <neatvalue($funcs),
+     ', "FUNCLIST" => ', <neatvalue($funclist),
+     ', "IMPORTS" => ', <neatvalue($imports),
+     ', "DL_VARS" => ', < neatvalue($vars), q|);'
 |);
     }
     if ($self->{IMPORTS} && %{$self->{IMPORTS}}) {
@@ -83,35 +83,35 @@ $self->{BASEEXT}.def: Makefile.PL
 	# print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";
 	system "emximp -o tmpimp%Config::Config{lib_ext} tmpimp.imp" 
 	    and die "Cannot make import library: $!, \$?=$?";
-	unlink glob("tmp_imp/*");
+	unlink glob( <"tmp_imp/*");
 	system "cd tmp_imp; %Config::Config{ar} x ../tmpimp%Config::Config{lib_ext}" 
 	    and die "Cannot extract import objects: $!, \$?=$?";      
     }
-    join('',@m);
+    join('',< @m);
 }
 
 sub static_lib {
-    my($self) = @_;
+    my($self) = < @_;
     my $old = $self->ExtUtils::MM_Unix::static_lib();
     return $old unless $self->{IMPORTS} && %{$self->{IMPORTS}};
     
-    my @chunks = split m/\n{2,}/, $old;
+    my @chunks = @( split m/\n{2,}/, $old );
     shift @chunks unless length @chunks[0]; # Empty lines at the start
     @chunks[0] .= <<'EOC';
 
 	$(AR) $(AR_STATIC_ARGS) $@ tmp_imp/* && $(RANLIB) $@
 EOC
-    return join "\n\n". '', @chunks;
+    return join "\n\n". '', < @chunks;
 }
 
 sub replace_manpage_separator {
-    my($self,$man) = @_;
+    my($self,$man) = < @_;
     $man =~ s,/+,.,g;
     $man;
 }
 
 sub maybe_command {
-    my($self,$file) = @_;
+    my($self,$file) = < @_;
     $file =~ s,[/\\]+,/,g;
     return $file if -x $file && ! -d _;
     return "$file.exe" if -x "$file.exe" && ! -d _;
@@ -141,7 +141,7 @@ OS/2 is OS/2
 =cut
 
 sub os_flavor {
-    return('OS/2');
+    return @('OS/2');
 }
 
 =back

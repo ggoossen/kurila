@@ -10,9 +10,9 @@ sub foo {
 }
 
 $a=foo;
-our @a=foo;
+our @a= @( <foo );
 foo;
-foo(foo);
+foo( <foo);
 
 my $before = curr_test();
 our %h;

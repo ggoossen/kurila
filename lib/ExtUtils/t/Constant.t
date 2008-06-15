@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
     use Config;
     unless (%Config{usedl}) {
@@ -92,12 +92,12 @@ sub TIEHANDLE {
 
 sub PRINT {
     my $self = shift;
-    $$self .= join('', @_);
+    $$self .= join('', < @_);
 }
 
 sub PRINTF {
     my $self = shift;
-    $$self .= sprintf shift, @_;
+    $$self .= sprintf shift, < @_;
 }
 
 sub read {
@@ -109,7 +109,7 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = map {($^O eq 'VMS' ? lc($_) : $_), 1} @_;
+  my %expect = %( map {($^O eq 'VMS' ? lc($_) : $_), 1} < @_ );
 
   my $fail;
   opendir DIR, $dir or die "opendir '$dir': $!";
@@ -130,12 +130,12 @@ sub check_for_bonus_files {
 }
 
 sub build_and_run {
-  my ($tests, $expect, $files) = @_;
+  my ($tests, $expect, $files) = < @_;
   my $core = %ENV{PERL_CORE} ? ' PERL_CORE=1' : '';
-  my @perlout = `$runperl Makefile.PL $core`;
+  my @perlout = @( `$runperl Makefile.PL $core` );
   if ($?) {
     print "not ok $realtest # $runperl Makefile.PL failed: $?\n";
-    print "# $_" foreach @perlout;
+    print "# $_" foreach < @perlout;
     exit($?);
   } else {
     print "ok $realtest\n";
@@ -181,10 +181,10 @@ sub build_and_run {
   }
 
   print "# make = '$make'\n";
-  @makeout = `$make`;
+  @makeout = @( `$make` );
   if ($?) {
     print "not ok $realtest # $make failed: $?\n";
-    print "# $_" foreach @makeout;
+    print "# $_" foreach < @makeout;
     exit($?);
   } else {
     print "ok $realtest\n";
@@ -198,10 +198,10 @@ sub build_and_run {
   } else {
     my $makeperl = "$make perl";
     print "# make = '$makeperl'\n";
-    @makeout = `$makeperl`;
+    @makeout = @( `$makeperl` );
     if ($?) {
       print "not ok $realtest # $makeperl failed: $?\n";
-      print "# $_" foreach @makeout;
+      print "# $_" foreach < @makeout;
       exit($?);
     } else {
       print "ok $realtest\n";
@@ -212,7 +212,7 @@ sub build_and_run {
   my $maketest = "$make test";
   print "# make = '$maketest'\n";
 
-  @makeout = `$maketest`;
+  @makeout = @( `$maketest` );
 
   if (open OUTPUT, "<", "$output") {
     local $/; # Slurp it - faster.
@@ -226,7 +226,7 @@ sub build_and_run {
   $realtest += $tests;
   if ($?) {
     print "not ok $realtest # $maketest failed: $?\n";
-    print "# $_" foreach @makeout;
+    print "# $_" foreach < @makeout;
   } else {
     print "ok $realtest - maketest\n";
   }
@@ -258,16 +258,16 @@ sub build_and_run {
 
   my $makeclean = "$make clean";
   print "# make = '$makeclean'\n";
-  @makeout = `$makeclean`;
+  @makeout = @( `$makeclean` );
   if ($?) {
     print "not ok $realtest # $make failed: $?\n";
-    print "# $_" foreach @makeout;
+    print "# $_" foreach < @makeout;
   } else {
     print "ok $realtest\n";
   }
   $realtest++;
 
-  check_for_bonus_files ('.', @$files, $output, $makefile_rename, '.', '..');
+  check_for_bonus_files ('.', < @$files, $output, $makefile_rename, '.', '..');
 
   rename $makefile_rename, $makefile . $makefile_ext
     or die "Can't rename '$makefile_rename' to '$makefile$makefile_ext': $!";
@@ -277,19 +277,19 @@ sub build_and_run {
   # Need to make distclean to remove ../../lib/ExtTest.pm
   my $makedistclean = "$make distclean";
   print "# make = '$makedistclean'\n";
-  @makeout = `$makedistclean`;
+  @makeout = @( `$makedistclean` );
   if ($?) {
     print "not ok $realtest # $make failed: $?\n";
-    print "# $_" foreach @makeout;
+    print "# $_" foreach < @makeout;
   } else {
     print "ok $realtest\n";
   }
   $realtest++;
 
-  check_for_bonus_files ('.', @$files, '.', '..');
+  check_for_bonus_files ('.', < @$files, '.', '..');
 
   unless ($keep_files) {
-    foreach (@$files) {
+    foreach (< @$files) {
       unlink $_ or warn "unlink $_: $!";
     }
   }
@@ -320,20 +320,20 @@ EOT
 }
 
 sub MANIFEST {
-  my (@files) = @_;
+  my (@files) = @( < @_ );
   ################ MANIFEST
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
   push @files, $manifest;
   open FH, ">", "$manifest" or die "open >$manifest: $!\n";
-  print FH "$_\n" foreach @files;
+  print FH "$_\n" foreach < @files;
   close FH or die "close $manifest: $!\n";
   return @files;
 }
 
 sub write_and_run_extension {
   my ($name, $items, $export_names, $package, $header, $testfile, $num_tests,
-      $wc_args) = @_;
+      $wc_args) = < @_;
 
   my $c = tie *C, 'TieOut';
   my $xs = tie *XS, 'TieOut';
@@ -343,7 +343,7 @@ sub write_and_run_extension {
 				     NAME => $package,
 				     NAMES => $items,
                                      PROXYSUBS => 1,
-				     @$wc_args,
+				     < @$wc_args,
 				     );
 
   my $C_code = $c->read();
@@ -419,7 +419,7 @@ EOT
   print FH "\@EXPORT_OK = qw(\n";
 
   # Print the names of all our autoloaded constants
-  print FH "\t$_\n" foreach (@$export_names);
+  print FH "\t$_\n" foreach (< @$export_names);
   print FH ");\n";
   print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
   close FH or die "close $pm: $!\n";
@@ -431,7 +431,7 @@ EOT
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
-use $package qw(@$export_names);
+use $package qw({join ' ', <@$export_names});
 
 print "1..2\n";
 if (open OUTPUT, ">", "$output") \{
@@ -453,8 +453,8 @@ if (close OUTPUT) \{
 EOT
   close FH or die "close $testpl: $!\n";
 
-  push @files, Makefile_PL($package);
-  @files = MANIFEST (@files);
+  push @files, < Makefile_PL($package);
+  @files = @( < MANIFEST (< @files) );
 
   build_and_run ($num_tests, $expect, \@files);
 
@@ -475,7 +475,7 @@ sub start_tests {
   $here = $dummytest;
 }
 sub end_tests {
-  my ($name, $items, $export_names, $header, $testfile, $args) = @_;
+  my ($name, $items, $export_names, $header, $testfile, $args) = < @_;
   push @tests, \@($name, $items, $export_names, $package, $header, $testfile,
                $dummytest - $here, $args);
   $dummytest += $after_tests;
@@ -486,23 +486,23 @@ use utf8;
 my $pound;
 $pound = "pound" . chr(163); # A pound sign. (Currency)
 
-my @common_items = (
+my @common_items = @(
                     \%(name=>"perl", type=>"PV",),
                     \%(name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1),
                     \%(name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1),
                     \%(name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1),
                    );
 
-my @args = undef;
+my @args = @( undef );
 push @args, \@(PROXYSUBS => 1);
-foreach my $args (@args)
+foreach my $args (< @args)
 {
   # Simple tests
   start_tests();
   my $parent_rfc1149 =
     'A Standard for the Transmission of IP Datagrams on Avian Carriers';
   # Test the code that generates 1 and 2 letter name comparisons.
-  my %compass = (
+  my %compass = %(
                  N => 0, 'NE' => 45, E => 90, SE => 135,
                  S => 180, SW => 225, W => 270, NW => 315
                 );
@@ -525,7 +525,7 @@ EOT
     $header .= "#define $point $bearing\n"
   }
 
-  my @items = ("FIVE", \%(name=>"OK6", type=>"PV",),
+  my @items = @("FIVE", \%(name=>"OK6", type=>"PV",),
                \%(name=>"OK7", type=>"PVN",
                 value=>\@('"not ok 7\n\0ok 7\n"', 15)),
                \%(name => "FARTHING", type=>"NV"),
@@ -550,10 +550,10 @@ EOT
 
   # Automatically compile the list of all the macro names, and make them
   # exported constants.
-  my @export_names = map {(ref $_) ? $_->{name} : $_} @items;
+  my @export_names = @( map {(ref $_) ? $_->{name} : $_} < @items );
 
   # Exporter::Heavy (currently) isn't able to export the last 3 of these:
-  push @items, @common_items;
+  push @items, < @common_items;
 
   my $test_body = <<"EOT";
 
@@ -766,7 +766,7 @@ $dummytest+=18;
 
 # XXX I think that I should merge this into the utf8 test above.
 sub explict_call_constant {
-  my ($string, $expect) = @_;
+  my ($string, $expect) = < @_;
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
 \{
@@ -803,10 +803,10 @@ EOT
 sub simple {
   start_tests();
   # Deliberately leave $name in @_, so that it is indexed from 1.
-  my ($name, @items) = @_;
+  my ($name, < @items) = < @_;
   my $test_header;
   my $test_body = "my \$value;\n";
-  foreach my $counter (1 .. (@_-1)) {
+  foreach my $counter (1 .. ((nelems @_)-1)) {
     my $thisname = @_[$counter];
     $test_header .= "#define $thisname $counter\n";
     $test_body .= <<"EOT";
@@ -849,7 +849,7 @@ simple ("Three end and four symetry", qw(ean ear eat barb marm tart));
 # --$dummytest;
 print "1..$dummytest\n";
 
-write_and_run_extension @$_ foreach @tests;
+write_and_run_extension < @$_ foreach < @tests;
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.

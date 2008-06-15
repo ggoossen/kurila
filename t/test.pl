@@ -39,7 +39,7 @@ sub _print_stderr {
 
 sub plan {
     my $n;
-    if (nelems @_ == 1) {
+    if ((nelems @_) == 1) {
 	$n = shift;
 	if ($n eq 'no_plan') {
 	  undef $n;
@@ -68,7 +68,7 @@ END {
 # Use this instead of "print STDERR" when outputing failure diagnostic
 # messages
 sub _diag {
-    return unless nelems @_;
+    return unless (nelems @_);
     my @mess = @( map { m/^#/ ? "$_\n" : "# $_\n" }
                map { split m/\n/ } < @_ );
     my $func = $TODO ? \&_print : \&_print_stderr;
@@ -80,8 +80,8 @@ sub diag {
 }
 
 sub skip_all {
-    if (< @_) {
-	_print "1..0 # Skipped: @_\n";
+    if ((nelems @_)) {
+	_print "1..0 # Skipped: {join ' ', <@_}\n";
     } else {
 	_print "1..0\n";
     }
@@ -124,7 +124,7 @@ sub _where {
 # DON'T use this for matches. Use like() instead.
 sub ok ($@) {
     my ($pass, $name, < @mess) = < @_;
-    _ok($pass, _where(), $name, < @mess);
+    _ok($pass, < _where(), $name, < @mess);
 }
 
 sub _q {
@@ -165,7 +165,7 @@ sub display {
         return $x unless wantarray;
         push @result, $x;
     }
-    return < @result;
+    return @result;
 }
 
 sub is ($$@) {
@@ -188,11 +188,11 @@ sub is ($$@) {
 	unshift(@mess, "#      got "._q($got)."\n",
 		       "# expected "._q($expected)."\n");
     }
-    _ok($pass, _where(), $name, < @mess);
+    _ok($pass, < _where(), $name, < @mess);
 }
 
 sub isnt ($$@) {
-    my ($got, $isnt, $name, @mess) = < @_;
+    my ($got, $isnt, $name, < @mess) = < @_;
 
     my $pass;
     if( !defined $got || !defined $isnt ) {
@@ -210,11 +210,11 @@ sub isnt ($$@) {
         unshift(@mess, "# it should not be "._q($got)."\n",
                        "# but it is.\n");
     }
-    _ok($pass, _where(), $name, < @mess);
+    _ok($pass, < _where(), $name, < @mess);
 }
 
 sub cmp_ok ($$$@) {
-    my($got, $type, $expected, $name, @mess) = < @_;
+    my($got, $type, $expected, $name, < @mess) = < @_;
 
     my $pass;
     {
@@ -238,7 +238,7 @@ sub cmp_ok ($$$@) {
         unshift(@mess, "#      got "._q($got)."\n",
                        "# expected $type "._q($expected)."\n");
     }
-    _ok($pass, _where(), $name, < @mess);
+    _ok($pass, < _where(), $name, < @mess);
 }
 
 # Check that $got is within $range of $expected
@@ -248,7 +248,7 @@ sub cmp_ok ($$$@) {
 # Here $range must be numeric, >= 0
 # Non numeric ranges might be a useful future extension. (eg %)
 sub within ($$$@) {
-    my ($got, $expected, $range, $name, @mess) = < @_;
+    my ($got, $expected, $range, $name, < @mess) = < @_;
     my $pass;
     if (!defined $got or !defined $expected or !defined $range) {
         # This is a fail, but doesn't need extra diagnostics
@@ -275,7 +275,7 @@ sub within ($$$@) {
 	unshift@mess, "#      got "._q($got)."\n",
 		      "# expected "._q($expected)." (within "._q($range).")\n";
     }
-    _ok($pass, _where(), $name, < @mess);
+    _ok($pass, < _where(), $name, < @mess);
 }
 
 # Note: this isn't quite as fancy as Test::More::like().
@@ -284,7 +284,7 @@ sub like   ($$@) { like_yn (0,< @_) }; # 0 for -
 sub unlike ($$@) { like_yn (1,< @_) }; # 1 for un-
 
 sub like_yn ($$$@) {
-    my ($flip, $got, $expected, $name, @mess) = < @_;
+    my ($flip, $got, $expected, $name, < @mess) = < @_;
     my $pass;
     $pass = $got =~ m/$expected/ if !$flip;
     $pass = $got !~ m/$expected/ if $flip;
@@ -294,7 +294,7 @@ sub like_yn ($$$@) {
 		? "# expected !~ m/$expected/\n" : "# expected m/$expected/\n");
     }
     local $Level = $Level + 1;
-    _ok($pass, _where(), $name, < (@mess || @()));
+    _ok($pass, < _where(), $name, < @mess);
 }
 
 sub pass {
@@ -302,11 +302,11 @@ sub pass {
 }
 
 sub fail {
-    _ok(0, _where(), < @_);
+    _ok(0, < _where(), < @_);
 }
 
 sub curr_test {
-    $test = shift if nelems @_;
+    $test = shift if (nelems @_);
     return $test;
 }
 
@@ -320,7 +320,7 @@ sub next_test {
 # be compatible with Test::More::skip().
 sub skip {
     my $why = shift;
-    my $n    = < @_ ? shift : 1;
+    my $n    = (nelems @_) ? shift : 1;
     for (1..$n) {
         _print "ok $test # skip: $why\n";
         $test = $test + 1;
@@ -331,7 +331,7 @@ sub skip {
 
 sub todo_skip {
     my $why = shift;
-    my $n   = < @_ ? shift : 1;
+    my $n   = (nelems @_) ? shift : 1;
 
     for (1..$n) {
         _print "not ok $test # TODO & SKIP: $why\n";
@@ -343,8 +343,8 @@ sub todo_skip {
 
 sub eq_array {
     my ($ra, $rb) = < @_;
-    return 0 unless < @$ra == < @$rb;
-    for my $i (0..< @$ra-1) {
+    return 0 unless (nelems @$ra) == nelems @$rb;
+    for my $i (0..(nelems @$ra)-1) {
 	next     if !defined $ra->[$i] && !defined $rb->[$i];
 	return 0 if !defined $ra->[$i];
 	return 0 if !defined $rb->[$i];
@@ -361,12 +361,12 @@ sub eq_hash {
     $key = "" . $key;
     if (exists $orig->{$key}) {
       if ($orig->{$key} ne $value) {
-        _print "# key ", _qq($key), " was ", _qq($orig->{$key}),
-                     " now ", _qq($value), "\n";
+        _print "# key ", < _qq($key), " was ", < _qq($orig->{$key}),
+                     " now ", < _qq($value), "\n";
         $fail = 1;
       }
     } else {
-      _print "# key ", _qq($key), " is ", _qq($value),
+      _print "# key ", < _qq($key), " is ", < _qq($value),
                    ", not in original.\n";
       $fail = 1;
     }
@@ -375,7 +375,7 @@ sub eq_hash {
     # Force a hash recompute if this perl's internals can cache the hash key.
     $_ = "" . $_;
     next if (exists $suspect->{$_});
-    _print "# key ", _qq($_), " was ", _qq($orig->{$_}), " now missing.\n";
+    _print "# key ", < _qq($_), " was ", < _qq($orig->{$_}), " now missing.\n";
     $fail = 1;
   }
   !$fail;
@@ -386,7 +386,7 @@ sub require_ok ($) {
     eval <<REQUIRE_OK;
 require $require;
 REQUIRE_OK
-    _ok(!$@, _where(), "require $require");
+    _ok(!$@, < _where(), "require $require");
 }
 
 sub use_ok ($) {
@@ -394,7 +394,7 @@ sub use_ok ($) {
     eval <<USE_OK;
 use $use;
 USE_OK
-    _ok(!$@, _where(), "use $use");
+    _ok(!$@, < _where(), "use $use");
 }
 
 # runperl - Runs a separate perl interpreter.
@@ -564,7 +564,7 @@ sub runperl {
 *run_perl = \&runperl; # Nice alias.
 
 sub DIE {
-    _print_stderr "# < @_\n";
+    _print_stderr "# {join ' ', <@_}\n";
     exit 1;
 }
 
@@ -599,7 +599,7 @@ sub which_perl {
 		warn "test.pl had problems loading File::Spec: $@";
 		$Perl = "./$perl";
 	    } else {
-		$Perl = 'File::Spec'->catfile('File::Spec'->curdir(), $perl);
+		$Perl = 'File::Spec'->catfile( <'File::Spec'->curdir(), $perl);
 	    }
 	}
 
@@ -682,7 +682,7 @@ sub _fresh_perl {
     my $pass = $resolve->($results);
     unless ($pass) {
         _diag "# PROG: \n$prog\n";
-        _diag "# EXPECTED:\n", $resolve->(), "\n";
+        _diag "# EXPECTED:\n", < $resolve->(), "\n";
         _diag "# GOT:\n$results\n";
         _diag "# STATUS: $status\n";
     }
@@ -694,7 +694,7 @@ sub _fresh_perl {
         $name .= '...' if length $first_line +> length $name;
     }
 
-    _ok($pass, _where(), "fresh_perl - $name");
+    _ok($pass, < _where(), "fresh_perl - $name");
 }
 
 #
@@ -708,7 +708,7 @@ sub fresh_perl_is {
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
-		sub { < @_ ? @_[0] eq $expected : $expected },
+		sub { (nelems @_) ? @_[0] eq $expected : $expected },
 		$runperl_args, $name);
 }
 
@@ -722,18 +722,18 @@ sub fresh_perl_like {
     my($prog, $expected, $runperl_args, $name) = < @_;
     local $Level = 2;
     _fresh_perl($prog,
-		sub { < @_ ?
+		sub { (nelems @_) ?
 			  @_[0] =~ (ref $expected ? $expected : m/$expected/) :
 		          $expected },
 		$runperl_args, $name);
 }
 
 sub can_ok ($@) {
-    my($proto, @methods) = < @_;
+    my($proto, < @methods) = < @_;
     my $class = ref $proto || $proto;
 
-    unless( < @methods ) {
-        return _ok( 0, _where(), "$class->can(...)" );
+    unless( nelems @methods ) {
+        return _ok( 0, < _where(), "$class->can(...)" );
     }
 
     my @nok = @( () );
@@ -744,10 +744,10 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name = < @methods == 1 ? "$class->can('@methods[0]')"
+    $name = (nelems @methods) == 1 ? "$class->can('@methods[0]')"
                           : "$class->can(...)";
 
-    _ok( !< @nok, _where(), $name );
+    _ok( !nelems @nok, < _where(), $name );
 }
 
 sub isa_ok ($$;$) {
@@ -787,7 +787,7 @@ WHOA
         }
     }
 
-    _ok( !$diag, _where(), $name );
+    _ok( !$diag, < _where(), $name );
 }
 
 sub dies_not(&;$) {
@@ -796,7 +796,7 @@ sub dies_not(&;$) {
     if (try { $e->(); 1; }) {
         return ok(1, $name);
     }
-    diag $@->message;
+    diag < $@->message;
     return ok(0, $name);
 }
 

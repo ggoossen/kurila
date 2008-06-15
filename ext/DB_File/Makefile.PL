@@ -30,7 +30,7 @@ WriteMakefile(
 	'clean'		=> \%(FILES => 'constants.h constants.xs'),
 	);
 
-my @names = qw(
+my @names = @( qw(
 	BTREEMAGIC
 	BTREEVERSION
 	DB_LOCK
@@ -59,10 +59,10 @@ my @names = qw(
 	R_SETCURSOR
 	R_SNAPSHOT
 	__R_UNUSED
-	);
+	) );
 
     # Check the constants above all appear in @EXPORT in DB_File.pm
-    my %names = map { $_, 1} @names;
+    my %names = %( map { $_, 1} < @names );
     open F, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
     while ( ~< *F)
     {

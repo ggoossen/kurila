@@ -18,7 +18,7 @@ use IO::File;
 
 sub lineno
 {
-  my ($f) = @_;
+  my ($f) = < @_;
   my $l;
   $l .= "$. ";
   $l .= $f->input_line_number;

@@ -38,7 +38,7 @@ sub saveErrorString
     my $self   = shift ;
     my $retval = shift ;
     ${ *$self->{Error} } = shift() . (${*$self->{Error}} ? "\nprevious: ${*$self->{Error}}" : "") ;
-    ${ *$self->{ErrorNo} } = shift() + 0 if @_ ;
+    ${ *$self->{ErrorNo} } = shift() + 0 if (nelems @_) ;
 
     return $retval;
 }
@@ -132,7 +132,7 @@ sub output
 
 sub getOneShotParams
 {
-    return ( 'MultiStream' => \@(1, 1, Parse_boolean,   1),
+    return  @( 'MultiStream' => \@(1, 1, Parse_boolean,   1),
            );
 }
 
@@ -152,13 +152,13 @@ sub checkParams
             'Append'    => \@(1, 1, Parse_boolean,   0),
             'BinModeIn' => \@(1, 1, Parse_boolean,   0),
 
-            'FilterEnvelope' => \@(1, 1, Parse_any,   undef),
+            'FilterEnvelope' => \@(1, 1, Parse_any,   undef), <
 
             $self->getExtraParams(),
-            *$self->{OneShot} ? $self->getOneShotParams() 
+            *$self->{OneShot} ? < $self->getOneShotParams() 
                               : (),
         ), 
-        @_) or $self->croakError("{$class}: $got->{Error}")  ;
+        < @_) or $self->croakError("{$class}: $got->{Error}")  ;
 
     return $got ;
 }
@@ -172,7 +172,7 @@ sub _create
 
     my $class = ref $obj;
     $obj->croakError("$class: Missing Output parameter")
-        if ! @_ && ! $got ;
+        if ! nelems @_ && ! $got ;
 
     my $outValue = shift ;
     my $oneShot = 1 ;
@@ -180,7 +180,7 @@ sub _create
     if (! $got)
     {
         $oneShot = 0 ;
-        $got = $obj->checkParams($class, undef, @_)
+        $got = $obj->checkParams($class, undef, < @_)
           or $obj->croakError("invalid params");
     }
 
@@ -314,10 +314,10 @@ sub _def
     my $name = (caller(1))[[3]] ;
 
     $obj->croakError("$name: expected at least 1 parameters\n")
-        unless @_ +>= 1 ;
+        unless (nelems @_) +>= 1 ;
 
     my $input = shift ;
-    my $haveOut = @_ ;
+    my $haveOut = (nelems @_) ;
     my $output = shift ;
 
     my $x = Validator->new($class, *$obj->{Error}, $name, $input, $output)
@@ -327,7 +327,7 @@ sub _def
 
     *$obj->{OneShot} = 1 ;
 
-    my $got = $obj->checkParams($name, undef, @_)
+    my $got = $obj->checkParams($name, undef, < @_)
         or return undef ;
 
     $x->{Got} = $got ;
@@ -349,14 +349,14 @@ sub _def
     if ($x->{GlobMap})
     {
         $x->{oneInput} = 1 ;
-        foreach my $pair (@{ $x->{Pairs} })
+        foreach my $pair (< @{ $x->{Pairs} })
         {
-            my ($from, $to) = @$pair ;
-            $obj->_singleTarget($x, 1, $from, $to, @_)
+            my ($from, $to) = < @$pair ;
+            $obj->_singleTarget($x, 1, $from, $to, < @_)
                 or return undef ;
         }
 
-        return scalar @{ $x->{Pairs} } ;
+        return scalar nelems @{ $x->{Pairs} } ;
     }
 
     if (! $x->{oneOutput} )
@@ -366,12 +366,12 @@ sub _def
 
         $x->{inType} = $inFile ? 'filename' : 'buffer';
         
-        foreach my $in ($x->{oneInput} ? $input : @$input)
+        foreach my $in ($x->{oneInput} ? $input : < @$input)
         {
             my $out ;
             $x->{oneInput} = 1 ;
 
-            $obj->_singleTarget($x, $inFile, $in, \$out, @_)
+            $obj->_singleTarget($x, $inFile, $in, \$out, < @_)
                 or return undef ;
 
             push @$output, \$out ;
@@ -385,7 +385,7 @@ sub _def
     }
 
     # finally the 1 to 1 and n to 1
-    return $obj->_singleTarget($x, 1, $input, $output, @_);
+    return $obj->_singleTarget($x, 1, $input, $output, < @_);
 
     croak "should not be here" ;
 }
@@ -402,7 +402,7 @@ sub _singleTarget
         $obj->getFileInfo($x->{Got}, $input)
             if isaFilename($input) and $inputIsFilename ;
 
-        my $z = $obj->_create($x->{Got}, @_)
+        my $z = $obj->_create($x->{Got}, < @_)
             or return undef ;
 
 
@@ -418,7 +418,7 @@ sub _singleTarget
         my $keep = $x->{Got}->clone();
 
         #for my $element ( ($x->{inType} eq 'hash') ? keys %$input : @$input)
-        for my $element ( @$input)
+        for my $element ( < @$input)
         {
             my $isFilename = isaFilename($element);
 
@@ -432,7 +432,7 @@ sub _singleTarget
                 $obj->getFileInfo($x->{Got}, $element)
                     if $isFilename;
 
-                $obj->_create($x->{Got}, @_)
+                $obj->_create($x->{Got}, < @_)
                     or return undef ;
             }
 
@@ -462,7 +462,7 @@ sub _wr2
 
     if ( ref $input && ref $input eq 'SCALAR' )
     {
-        return $self->syswrite($input, @_) ;
+        return $self->syswrite($input, < @_) ;
     }
 
     if ( ! ref $input  || isaFilehandle($input))
@@ -483,7 +483,7 @@ sub _wr2
         my $count = 0 ;
         while (($status = read($fh, $buff, 16 * 1024)) +> 0) {
             $count += length $buff;
-            defined $self->syswrite($buff, @_) 
+            defined $self->syswrite($buff, < @_) 
                 or return undef ;
         }
 
@@ -549,7 +549,7 @@ sub DESTROY
     # TODO - memory leak with 5.8.0 - this isn't called until 
     #        global destruction
     #
-    %{ *$self } = () ;
+    %{ *$self } = %( () ) ;
     undef $self ;
 }
 
@@ -574,13 +574,13 @@ sub syswrite
     }
 
 
-    if (@_ +> 1) {
+    if ((nelems @_) +> 1) {
         my $slen = defined $$buffer ? length($$buffer) : 0;
         my $len = $slen;
         my $offset = 0;
         $len = @_[1] if @_[1] +< $len;
 
-        if (@_ +> 2) {
+        if ((nelems @_) +> 2) {
             $offset = @_[2] || 0;
             $self->croakError(*$self->{ClassName} . "::write: offset outside string") 
                 if $offset +> $slen;
@@ -631,15 +631,15 @@ sub print
 
     if (defined $\) {
         if (defined $,) {
-            defined $self->syswrite(join($,, @_) . $\);
+            defined $self->syswrite(join($,, < @_) . $\);
         } else {
-            defined $self->syswrite(join("", @_) . $\);
+            defined $self->syswrite(join("", < @_) . $\);
         }
     } else {
         if (defined $,) {
-            defined $self->syswrite(join($,, @_));
+            defined $self->syswrite(join($,, < @_));
         } else {
-            defined $self->syswrite(join("", @_));
+            defined $self->syswrite(join("", < @_));
         }
     }
 }
@@ -648,7 +648,7 @@ sub printf
 {
     my $self = shift;
     my $fmt = shift;
-    defined $self->syswrite(sprintf($fmt, @_));
+    defined $self->syswrite(sprintf($fmt, < @_));
 }
 
 
@@ -658,7 +658,7 @@ sub flush
     my $self = shift ;
 
     my $outBuffer='';
-    my $status = *$self->{Compress}->flush($outBuffer, @_) ;
+    my $status = *$self->{Compress}->flush($outBuffer, < @_) ;
     return $self->saveErrorString(0, *$self->{Compress}->{Error}, 
                                     *$self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
@@ -687,7 +687,7 @@ sub newStream
     $self->_writeTrailer()
         or return 0 ;
 
-    my $got = $self->checkParams('newStream', *$self->{Got}, @_)
+    my $got = $self->checkParams('newStream', *$self->{Got}, < @_)
         or return 0 ;    
 
     $self->ckParams($got)
@@ -737,7 +737,7 @@ sub _writeFinalTrailer
 {
     my $self = shift ;
 
-    return $self->output($self->mkFinalTrailer());
+    return $self->output( <$self->mkFinalTrailer());
 }
 
 sub close
@@ -891,7 +891,7 @@ sub autoflush
 {
     my $self     = shift ;
     return defined *$self->{FH} 
-            ? *$self->{FH}->autoflush(@_) 
+            ? *$self->{FH}->autoflush(< @_) 
             : undef ;
 }
 

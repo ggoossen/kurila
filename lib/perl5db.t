@@ -22,7 +22,7 @@ plan(1);
 
 sub rc {
     open RC, ">", ".perldb" or die $!;
-    print RC @_;
+    print RC < @_;
     close(RC);
     # overly permissive perms gives "Must not source insecure rcfile"
     # and hangs at the DB(1> prompt

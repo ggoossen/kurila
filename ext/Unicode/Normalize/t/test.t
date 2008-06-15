@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -23,8 +23,8 @@ BEGIN { plan tests => 58 };
 use Unicode::Normalize;
 ok(1); # If we made it this far, we're ok.
 
-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
-sub _unpack_U { Unicode::Normalize::unpack_U(@_) }
+sub _pack_U   { Unicode::Normalize::pack_U(< @_) }
+sub _unpack_U { Unicode::Normalize::unpack_U(< @_) }
 
 #########################
 
@@ -57,12 +57,12 @@ ok($sNFKC, "\x{FA26}");
 
 
 sub hexNFC {
-  join " ", map sprintf("\%04X", $_),
-  _unpack_U NFC _pack_U map hex, split ' ', shift;
+  join " ", map sprintf("\%04X", $_), <
+  _unpack_U < NFC _pack_U map hex, split ' ', shift;
 }
 sub hexNFD {
-  join " ", map sprintf("\%04X", $_),
-  _unpack_U NFD _pack_U map hex, split ' ', shift;
+  join " ", map sprintf("\%04X", $_), <
+  _unpack_U < NFD _pack_U map hex, split ' ', shift;
 }
 
 ok(hexNFD("1E14 AC01"), "0045 0304 0300 1100 1161 11A8");

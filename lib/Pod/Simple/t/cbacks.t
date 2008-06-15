@@ -1,7 +1,7 @@
 BEGIN {
     if(%ENV{PERL_CORE}) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -18,7 +18,7 @@ use Pod::Simple::XMLOutStream;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::DumpAsText;
 
-my @from = (
+my @from = @(
  'Pod::Simple::XMLOutStream'
   => '<Document><head1>I LIKE PIE</head1></Document>',
    
@@ -32,10 +32,10 @@ my @from = (
 
 
 # Might as well test all the classes...
-while(@from) {
+while((nelems @from)) {
   my($x => $expected) = splice(@from, 0,2);
   my $more = '';
-  print "#Testing via class $x, version ", $x->VERSION(), "\n";
+  print "#Testing via class $x, version ", < $x->VERSION(), "\n";
   my $p = $x->new;
   my($got, $exp);
   ok scalar($got = $x->_out(
@@ -57,8 +57,8 @@ while(@from) {
     => scalar($exp = $expected);
   ;
   unless($got eq $exp) {
-    print '# Got vs exp:\n# ', Pod::Simple::BlackBox::pretty($got),
-     "\n# ",Pod::Simple::BlackBox::pretty($exp),"\n";
+    print '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
+     "\n# ", <Pod::Simple::BlackBox::pretty($exp),"\n";
   }
   
   ok scalar($got = $more), scalar($exp = join "\n" =>
@@ -71,8 +71,8 @@ while(@from) {
    "",
   );
   unless($got eq $exp) {
-   print '# Got vs exp:\n# ', Pod::Simple::BlackBox::pretty($got),
-    "\n# ",Pod::Simple::BlackBox::pretty($exp),"\n";
+   print '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
+    "\n# ", <Pod::Simple::BlackBox::pretty($exp),"\n";
   }
 }
 

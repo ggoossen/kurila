@@ -43,7 +43,7 @@ package My::Passthru;
 sub PRINT  {
     my $self = shift;
     my $handle = $self->[0];
-    print $handle @_;
+    print $handle < @_;
 }
 
 sub TIEHANDLE {

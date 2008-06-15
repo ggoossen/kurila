@@ -28,8 +28,8 @@ See L<perlmodlib/Pragmatic Modules> and L<strict/strict subs>.
 sub import {
     my $callpack = caller;
     my $pack = shift;
-    my @imports = @_;
-    foreach my $sym (@imports) {
+    my @imports = @( < @_ );
+    foreach my $sym (< @imports) {
         no strict 'refs';
 	*{Symbol::fetch_glob("{$callpack}::$sym")} = \&{*{Symbol::fetch_glob("{$callpack}::$sym")}};
     }

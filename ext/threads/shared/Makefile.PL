@@ -14,12 +14,12 @@ sub check_cc
 
     my $cmd = @_[0];
     if (-x $cmd or MM->maybe_command($cmd)) {
-        return (1);       # CC command found
+        return  @(1);       # CC command found
     }
-    for my $dir (File::Spec->path(), '.') {
+    for my $dir ( <File::Spec->path(), '.') {
         my $abs = File::Spec->catfile($dir, $cmd);
         if (-x $abs or MM->maybe_command($abs)) {
-            return (1);   # CC command found
+            return  @(1);   # CC command found
         }
     }
     return;
@@ -31,11 +31,11 @@ sub have_cc
     if ($@) {
         try { require Config; };   # Everyone else
     }
-    my @chunks = split(m/ /, %Config::Config{cc});
+    my @chunks = @( split(m/ /, %Config::Config{cc}) );
     # $Config{cc} may contain args; try to find out the program part
-    while (@chunks) {
-        if (check_cc("@chunks")) {
-            return (1);   # CC command found
+    while ((nelems @chunks)) {
+        if (check_cc("{join ' ', <@chunks}")) {
+            return  @(1);   # CC command found
         }
         pop(@chunks);
     }
@@ -45,7 +45,7 @@ sub have_cc
 
 # Build options for different environments
 my @conditional_params;
-if (not grep { $_ eq 'PERL_CORE=1' } @ARGV) {
+if (not grep { $_ eq 'PERL_CORE=1' } < @ARGV) {
     # CPAN
 
     # Verify that a 'C' compiler is available
@@ -81,7 +81,7 @@ WriteMakefile(
 
     'LICENSE'  => 'perl',
 
-    @conditional_params
+    < @conditional_params
 );
 
 # Additional 'make' targets

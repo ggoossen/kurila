@@ -51,8 +51,8 @@ use strict;
 use warnings;
 our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase);
 require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(fileparse fileparse_set_fstype basename dirname);
+@ISA = @( qw(Exporter) );
+@EXPORT = @( qw(fileparse fileparse_set_fstype basename dirname) );
 $VERSION = "2.76";
 
 fileparse_set_fstype($^O);
@@ -101,7 +101,7 @@ denote the same location as the original $path.
 
 
 sub fileparse {
-  my($fullname,@suffices) = @_;
+  my($fullname,< @suffices) = < @_;
 
   unless (defined $fullname) {
       require Carp;
@@ -159,8 +159,8 @@ sub fileparse {
 
   my $tail   = '';
   my $suffix = '';
-  if (@suffices) {
-    foreach $suffix (@suffices) {
+  if ((nelems @suffices)) {
+    foreach $suffix (< @suffices) {
       my $pat = ($igncase ? '(?i)' : '') . "($suffix)\$";
       if ($basename =~ s/$pat//s) {
         $taint .= substr($suffix,0,0);
@@ -218,7 +218,7 @@ sub basename {
   # character present in string (after first stripping trailing slashes)
   _strip_trailing_sep($path);
 
-  my($basename, $dirname, $suffix) = fileparse( $path, map("\Q$_\E",@_) );
+  my($basename, $dirname, $suffix) = < fileparse( $path, map("\Q$_\E",< @_) );
 
   # From BSD basename(1)
   # The suffix is not stripped if it is identical to the remaining 
@@ -290,7 +290,7 @@ sub dirname {
         return dirname($path);
     }
 
-    my($basename, $dirname) = fileparse($path);
+    my($basename, $dirname) = < fileparse($path);
 
     if ($type eq 'VMS') { 
         $dirname ||= %ENV{DEFAULT};
@@ -298,14 +298,14 @@ sub dirname {
     elsif ($type eq 'MacOS') {
 	if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
             _strip_trailing_sep($dirname);
-	    ($basename,$dirname) = fileparse $dirname;
+	    ($basename,$dirname) = < fileparse $dirname;
 	}
 	$dirname .= ":" unless $dirname =~ m/:\z/;
     }
     elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
-	    ($basename,$dirname) = fileparse $dirname;
+	    ($basename,$dirname) = < fileparse $dirname;
 	    _strip_trailing_sep($dirname);
 	}
     }
@@ -317,7 +317,7 @@ sub dirname {
     else {
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
-	    ($basename,$dirname) = fileparse $dirname;
+	    ($basename,$dirname) = < fileparse $dirname;
 	    _strip_trailing_sep($dirname);
 	}
     }
@@ -369,22 +369,22 @@ call only.
 
 BEGIN {
 
-my @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc);
-my @Types = (@Ignore_Case, qw(Unix));
+my @Ignore_Case = @( qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc) );
+my @Types = @(< @Ignore_Case, qw(Unix));
 
 sub fileparse_set_fstype {
     my $old = $Fileparse_fstype;
 
-    if (@_) {
+    if ((nelems @_)) {
         my $new_type = shift;
 
         $Fileparse_fstype = 'Unix';  # default
-        foreach my $type (@Types) {
+        foreach my $type (< @Types) {
             $Fileparse_fstype = $type if $new_type =~ m/^$type/i;
         }
 
         $Fileparse_igncase = 
-          (grep $Fileparse_fstype eq $_, @Ignore_Case) ? 1 : 0;
+          (grep $Fileparse_fstype eq $_, < @Ignore_Case) ? 1 : 0;
     }
 
     return $old;

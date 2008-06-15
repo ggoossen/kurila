@@ -8,7 +8,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -114,7 +114,7 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 
 # Every INSTALL* variable must start with some PREFIX.
-my %Install_Vars = (
+my %Install_Vars = %(
  PERL   => \@(qw(archlib    privlib   bin       man1dir       man3dir   script)),
  SITE   => \@(qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)),
  VENDOR => \@(qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir))
@@ -122,12 +122,12 @@ my %Install_Vars = (
 
 while( my($type, $vars) = each %Install_Vars) {
     SKIP: {
-        skip "VMS must expand macros in INSTALL* vars", scalar @$vars 
+        skip "VMS must expand macros in INSTALL* vars", scalar nelems @$vars 
           if $Is_VMS;    
-        skip '$Config{usevendorprefix} not set', scalar @$vars
+        skip '$Config{usevendorprefix} not set', scalar nelems @$vars
           if $type eq 'VENDOR' and !%Config{usevendorprefix};
 
-        foreach my $var (@$vars) {
+        foreach my $var (< @$vars) {
             my $installvar = "install$var";
             my $prefix = '$('.$type.'PREFIX)';
 
@@ -170,7 +170,7 @@ while( my($type, $vars) = each %Install_Vars) {
 # Check that when installvendorman*dir is set in Config it is honored
 # [rt.cpan.org 2949]
 {
-    _set_config(installvendorman1dir => File::Spec->catdir('foo','bar') );
+    _set_config(installvendorman1dir => < File::Spec->catdir('foo','bar') );
     _set_config(installvendorman3dir => '' );
     _set_config(usevendorprefix => 1 );
     _set_config(vendorprefixexp => 'something' );
@@ -196,8 +196,8 @@ while( my($type, $vars) = each %Install_Vars) {
 # Check that when installsiteman*dir isn't set in Config it falls back
 # to installman*dir
 {
-    _set_config(installman1dir => File::Spec->catdir('foo', 'bar') );
-    _set_config(installman3dir => File::Spec->catdir('foo', 'baz') );
+    _set_config(installman1dir => < File::Spec->catdir('foo', 'bar') );
+    _set_config(installman3dir => < File::Spec->catdir('foo', 'baz') );
     _set_config(installsiteman1dir => '' );
     _set_config(installsiteman3dir => '' );
     _set_config(installvendorman1dir => '' );
@@ -229,8 +229,8 @@ while( my($type, $vars) = each %Install_Vars) {
 # Check that when usevendoprefix and installvendorman*dir aren't set in 
 # Config it leaves them unset.
 {
-    _set_config(installman1dir => File::Spec->catdir('foo', 'bar') );
-    _set_config(installman3dir => File::Spec->catdir('foo', 'baz') );
+    _set_config(installman1dir => < File::Spec->catdir('foo', 'bar') );
+    _set_config(installman3dir => < File::Spec->catdir('foo', 'baz') );
     _set_config(installsiteman1dir => '' );
     _set_config(installsiteman3dir => '' );
     _set_config(installvendorman1dir => '' );
@@ -259,7 +259,7 @@ while( my($type, $vars) = each %Install_Vars) {
 
 
 sub _set_config {
-    my($k,$v) = @_;
+    my($k,$v) = < @_;
     (my $k_no_install = $k) =~ s/^install//i;
     %Config{$k} = $v;
 

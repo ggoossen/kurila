@@ -29,7 +29,7 @@ sub import {
   my $pkg = shift;
   my $callpkg = caller($ExportLevel);
 
-  if ($pkg eq "Exporter" and @_ and @_[0] eq "import") {
+  if ($pkg eq "Exporter" and nelems @_ and @_[0] eq "import") {
     *{Symbol::fetch_glob($callpkg."::import")} = \&import;
     return;
   }
@@ -37,37 +37,37 @@ sub import {
   # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
   my($exports, $fail) = (\@{*{Symbol::fetch_glob("$pkg\::EXPORT")}}, 
                          \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
-  return export $pkg, $callpkg, @_
-    if $Verbose or $Debug or @$fail +> 1;
+  return export $pkg, $callpkg, < @_
+    if $Verbose or $Debug or (nelems @$fail) +> 1;
   my $export_cache = (%Cache{$pkg} ||= \%());
-  my $args = @_ or @_ = @$exports;
+  my $args = (nelems @_) or @_ = @( < @$exports );
 
   local $_;
   if ($args and not %$export_cache) {
     s/^&//, $export_cache->{$_} = 1
-      foreach (@$exports, @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}});
+      foreach (< @$exports, < @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}});
   }
   my $heavy;
   # Try very hard not to use {} and hence have to  enter scope on the foreach
   # We bomb out of the loop with last as soon as heavy is set.
   if ($args or $fail) {
     ($heavy = (m/\W/ or $args and not exists $export_cache->{$_}
-               or @$fail and $_ eq $fail->[0])) and last
-                 foreach (@_);
+               or (nelems @$fail) and $_ eq $fail->[0])) and last
+                 foreach (< @_);
   } else {
     ($heavy = m/\W/) and last
-      foreach (@_);
+      foreach (< @_);
   }
-  return export $pkg, $callpkg, ($args ? @_ : ()) if $heavy;
+  return export $pkg, $callpkg, ($args ? < @_ : ()) if $heavy;
   # shortcut for the common case of no type character
-  *{Symbol::fetch_glob("$callpkg\::$_")} = \&{*{Symbol::fetch_glob("$pkg\::$_")}} foreach @_;
+  *{Symbol::fetch_glob("$callpkg\::$_")} = \&{*{Symbol::fetch_glob("$pkg\::$_")}} foreach < @_;
 }
 
 # Default methods
 
 sub export_fail {
     my $self = shift;
-    @_;
+    < @_;
 }
 
 # Unfortunately, caller(1)[3] "does not work" if the caller is aliased as

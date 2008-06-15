@@ -6,10 +6,10 @@ our $VERSION = "0.06";
 # method was left behind because gv.c expects a Purl-Perl method in
 # this package when it loads the tie magic for %+ and %-
 
-my ($one, $all) = Tie::Hash::NamedCapture::flags();
+my ($one, $all) = < Tie::Hash::NamedCapture::flags();
 
 sub TIEHASH {
-    my ($pkg, %arg) = @_;
+    my ($pkg, < %arg) = < @_;
     my $flag = %arg{all} ? $all : $one;
     bless \$flag => $pkg;
 }

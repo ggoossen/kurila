@@ -22,8 +22,8 @@ $|=1;
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
 undef $/;
-@prgs = split "\n########\n", ~< *DATA;
-print "1..", scalar @prgs, "\n";
+@prgs = @( split "\n########\n", ~< *DATA );
+print "1..", scalar nelems @prgs, "\n";
 
 $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
@@ -31,7 +31,7 @@ END { close TEST; unlink $tmpfile if $tmpfile; }
 
 $CAT = (($^O eq 'MSWin32') ? '.\perl -e "print ~< *ARGV"' : (($^O eq 'NetWare') ? 'perl -e "print ~< *ARGV"' : 'cat'));
 
-for (@prgs){
+for (< @prgs){
     my $switch;
     if (s/^\s*(-\w.*)//){
 	$switch = $1;
@@ -39,7 +39,7 @@ for (@prgs){
     my($prog,$expected) = split(m/\nEXPECT\n/, $_);
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
-    my @expected = sort split m/\n/, $expected;
+    my @expected = @( sort split m/\n/, $expected );
     open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
     print TEST $prog, "\n";
     close TEST or die "Cannot close $tmpfile: $!";
@@ -62,8 +62,8 @@ for (@prgs){
     $results =~ s/^(syntax|parse) error/syntax error/mig;
     $results =~ s/^\n*Process terminated by SIG\w+\n?//mg
 	if $^O eq 'os2';
-    my @results = sort split m/\n/, $results;
-    if ( "@results" ne "@expected" ) {
+    my @results = @( sort split m/\n/, $results );
+    if ( "{join ' ', <@results}" ne "{join ' ', <@expected}" ) {
 	print STDERR "PROG: $switch\n$prog\n";
 	print STDERR "EXPECTED:\n$expected\n";
 	print STDERR "GOT:\n$results\n";

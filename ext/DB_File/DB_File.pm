@@ -16,7 +16,7 @@ use warnings;
 use strict;
 use Carp;
 require Tie::Hash;
-@DB_File::HASHINFO::ISA = qw(Tie::Hash);
+@DB_File::HASHINFO::ISA = @( qw(Tie::Hash) );
 
 sub new
 {
@@ -116,7 +116,7 @@ package DB_File::RECNOINFO ;
 use warnings;
 use strict ;
 
-@DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) ;
+@DB_File::RECNOINFO::ISA = @( qw(DB_File::HASHINFO) ) ;
 
 sub TIEHASH
 {
@@ -134,7 +134,7 @@ package DB_File::BTREEINFO ;
 use warnings;
 use strict ;
 
-@DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) ;
+@DB_File::BTREEINFO::ISA = @( qw(DB_File::HASHINFO) ) ;
 
 sub TIEHASH
 {
@@ -183,12 +183,12 @@ BEGIN {
     if ($@) {
         $use_XSLoader = 0 ;
         require DynaLoader;
-        @ISA = qw(DynaLoader);
+        @ISA = @( qw(DynaLoader) );
     }
 }
 
 push @ISA, qw(Tie::Hash Exporter);
-@EXPORT = qw(
+@EXPORT = @( qw(
         $DB_BTREE $DB_HASH $DB_RECNO 
 
 	BTREEMAGIC
@@ -220,14 +220,14 @@ push @ISA, qw(Tie::Hash Exporter);
 	R_SNAPSHOT
 	__R_UNUSED
 
-);
+) );
 
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = grep m/^O_/, @Fcntl::EXPORT;
-    Fcntl->import(@O);  # first we import what we want to export
-    push(@EXPORT, @O);
+    my @O = @( grep m/^O_/, < @Fcntl::EXPORT );
+    Fcntl->import(< @O);  # first we import what we want to export
+    push(@EXPORT, < @O);
 };
 
 if ($use_XSLoader)
@@ -240,7 +240,7 @@ else
 
 sub tie_hash_or_array
 {
-    my (@arg) = @_ ;
+    my (@arg) = @( < @_ ) ;
     my $tieHASH = ( (caller(1))[[3]] =~ m/TIEHASH/ ) ;
 
     use File::Spec;
@@ -248,10 +248,10 @@ sub tie_hash_or_array
         if defined @arg[1] ;
 
     @arg[4] = tied %{ @arg[4] } 
-	if @arg +>= 5 && ref @arg[4] && (dump::view(@arg[4]) =~ m/=HASH/) && tied %{ @arg[4] } ;
+	if (nelems @arg) +>= 5 && ref @arg[4] && (dump::view(@arg[4]) =~ m/=HASH/) && tied %{ @arg[4] } ;
 
-    @arg[2] = O_CREAT()^|^O_RDWR() if @arg +>=3 && ! defined @arg[2];
-    @arg[3] = 0666               if @arg +>=4 && ! defined @arg[3];
+    @arg[2] = O_CREAT()^|^O_RDWR() if (nelems @arg) +>=3 && ! defined @arg[2];
+    @arg[3] = 0666               if (nelems @arg) +>=4 && ! defined @arg[3];
 
     # make recno in Berkeley DB version 2 (or better) work like 
     # recno in version 1.
@@ -266,17 +266,17 @@ sub tie_hash_or_array
 	chmod @arg[3] ? @arg[3] : 0666 , @arg[1] ;
     }
 
-    DoTie_($tieHASH, @arg) ;
+    DoTie_($tieHASH, < @arg) ;
 }
 
 sub TIEHASH
 {
-    tie_hash_or_array(@_) ;
+    tie_hash_or_array(< @_) ;
 }
 
 sub TIEARRAY
 {
-    tie_hash_or_array(@_) ;
+    tie_hash_or_array(< @_) ;
 }
 
 sub CLEAR 
@@ -284,14 +284,14 @@ sub CLEAR
     my $self = shift;
     my $key = 0 ;
     my $value = "" ;
-    my $status = $self->seq($key, $value, R_FIRST());
+    my $status = $self->seq($key, $value, < R_FIRST());
     my @keys;
  
     while ($status == 0) {
         push @keys, $key;
-        $status = $self->seq($key, $value, R_NEXT());
+        $status = $self->seq($key, $value, < R_NEXT());
     }
-    foreach $key (reverse @keys) {
+    foreach $key (reverse < @keys) {
         my $s = $self->del($key); 
     }
 }
@@ -324,13 +324,13 @@ sub SPLICE
 	$offset = 0;
     }
 
-    my $no_length = ! @_;
-    my $length = @_ ? shift : 0;
+    my $no_length = ! nelems @_;
+    my $length = (nelems @_) ? shift : 0;
     # Carping about definedness comes _after_ the OFFSET sanity check.
     # This is so we get the same error messages as Perl's splice().
     # 
 
-    my @list = @_;
+    my @list = @( < @_ );
 
     my $size = $self->FETCHSIZE();
     
@@ -387,7 +387,7 @@ sub SPLICE
     # 'Removes the elements designated by OFFSET and LENGTH from an
     # array,'...
     # 
-    my @removed = ();
+    my @removed = @( () );
     foreach (0 .. $length - 1) {
 	my $old;
 	my $status = $self->get($offset, $old);
@@ -433,7 +433,7 @@ sub SPLICE
 	    $status = $self->put($pos, $elem);
 	}
 	else {
-	    $status = $self->put($pos, $elem, $self->R_IBEFORE);
+	    $status = $self->put($pos, $elem, < $self->R_IBEFORE);
 	}
 
 	if ($status != 0) {
@@ -467,7 +467,7 @@ sub SPLICE
 	# 'In scalar context, returns the last element removed, or
 	# undef if no elements are removed.'
 	# 
-	if (@removed) {
+	if ((nelems @removed)) {
 	    my $last = pop @removed;
 	    return "$last";
 	}
@@ -485,16 +485,16 @@ sub ::DB_File::splice { &SPLICE }
 sub find_dup
 {
     croak "Usage: \$db->find_dup(key,value)\n"
-        unless @_ == 3 ;
+        unless (nelems @_) == 3 ;
  
     my $db        = shift ;
-    my ($origkey, $value_wanted) = @_ ;
+    my ($origkey, $value_wanted) = < @_ ;
     my ($key, $value) = ($origkey, 0);
     my ($status) = 0 ;
 
-    for ($status = $db->seq($key, $value, R_CURSOR() ) ;
+    for ($status = $db->seq($key, $value, < R_CURSOR() ) ;
          $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT() ) ) {
+         $status = $db->seq($key, $value, < R_NEXT() ) ) {
 
         return 0 if $key eq $origkey and $value eq $value_wanted ;
     }
@@ -505,21 +505,21 @@ sub find_dup
 sub del_dup
 {
     croak "Usage: \$db->del_dup(key,value)\n"
-        unless @_ == 3 ;
+        unless (nelems @_) == 3 ;
  
     my $db        = shift ;
-    my ($key, $value) = @_ ;
-    my ($status) = $db->find_dup($key, $value) ;
+    my ($key, $value) = < @_ ;
+    my ($status) = < $db->find_dup($key, $value) ;
     return $status if $status != 0 ;
 
-    $status = $db->del($key, R_CURSOR() ) ;
+    $status = $db->del($key, < R_CURSOR() ) ;
     return $status ;
 }
 
 sub get_dup
 {
     croak "Usage: \$db->get_dup(key [,flag])\n"
-        unless @_ == 2 or @_ == 3 ;
+        unless (nelems @_) == 2 or (nelems @_) == 3 ;
  
     my $db        = shift ;
     my $key       = shift ;
@@ -527,16 +527,16 @@ sub get_dup
     my $value 	  = 0 ;
     my $origkey   = $key ;
     my $wantarray = wantarray ;
-    my %values	  = () ;
-    my @values    = () ;
+    my %values	  = %( () ) ;
+    my @values    = @( () ) ;
     my $counter   = 0 ;
     my $status    = 0 ;
  
     # iterate through the database until either EOF ($status == 0)
     # or a different key is encountered ($key ne $origkey).
-    for ($status = $db->seq($key, $value, R_CURSOR()) ;
+    for ($status = $db->seq($key, $value, < R_CURSOR()) ;
 	 $status == 0 and $key eq $origkey ;
-         $status = $db->seq($key, $value, R_NEXT()) ) {
+         $status = $db->seq($key, $value, < R_NEXT()) ) {
  
         # save the value or count number of matches
         if ($wantarray) {
@@ -550,7 +550,7 @@ sub get_dup
      
     }
  
-    return ($wantarray ? ($flag ? %values : @values) : $counter) ;
+    return  @($wantarray ?  @($flag ? %values : @values) : $counter) ;
 }
 
 

@@ -25,7 +25,7 @@ use File::Spec;
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
 
-our @ISA = qw( ExtUtils::MM_Unix );
+our @ISA = @( qw( ExtUtils::MM_Unix ) );
 our $VERSION = '6.44';
 
 
@@ -36,7 +36,7 @@ BeOS is BeOS.
 =cut
 
 sub os_flavor {
-    return('BeOS');
+    return @('BeOS');
 }
 
 =item init_linker

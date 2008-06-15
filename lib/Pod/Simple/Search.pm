@@ -38,14 +38,14 @@ sub new {
 sub init {
   my $self = shift;
   $self->inc(1);
-  $self->verbose(DEBUG);
+  $self->verbose( <DEBUG);
   return $self;
 }
 
 #--------------------------------------------------------------------------
 
 sub survey {
-  my($self, @search_dirs) = @_;
+  my($self, < @search_dirs) = < @_;
   $self = $self->new unless ref $self; # tolerate being a class method
 
   $self->_expand_inc( \@search_dirs );
@@ -55,12 +55,12 @@ sub survey {
   $self->{'_dirs_visited'} = \%();
   $self->path2name( \%() );
   $self->name2path( \%() );
-  $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{'limit_glob'};
+  $self->limit_re( < $self->_limit_glob_to_limit_re ) if $self->{'limit_glob'};
   my $cwd = cwd();
   my $verbose  = $self->verbose;
   local $_; # don't clobber the caller's $_ !
 
-  foreach my $try (@search_dirs) {
+  foreach my $try (< @search_dirs) {
     unless( File::Spec->file_name_is_absolute($try) ) {
       # make path absolute
       $try = File::Spec->catfile( $cwd ,$try);
@@ -77,7 +77,7 @@ sub survey {
       );
       $modname_prefix = \@(grep length($_), split m{[:/\\]}, $self->{'dir_prefix'});
       $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",
-        "giving $start_in (= @$modname_prefix)\n";
+        "giving $start_in (= {join ' ', <@$modname_prefix})\n";
     } else {
       $start_in = $try;
     }
@@ -132,7 +132,7 @@ sub _make_search_callback {
 
   my($file, $shortname, $isdir, $modname_bits);
   return sub {
-    ($file, $shortname, $isdir, $modname_bits) = @_;
+    ($file, $shortname, $isdir, $modname_bits) = < @_;
 
     if($isdir) { # this never gets called on the startdir itself, just subdirs
 
@@ -221,7 +221,7 @@ sub _make_search_callback {
 #==========================================================================
 
 sub _path2modname {
-  my($self, $file, $shortname, $modname_bits) = @_;
+  my($self, $file, $shortname, $modname_bits) = < @_;
 
   # this code simplifies the POD name for Perl modules:
   # * remove "site_perl"
@@ -230,20 +230,20 @@ sub _path2modname {
   # * remove pod/ if followed by perl*.pod (e.g. in pod/perlfunc.pod)
   # * dig into the file for case-preserved name if not already mixed case
 
-  my @m = @$modname_bits;
+  my @m = @( < @$modname_bits );
   my $x;
   my $verbose = $self->verbose;
 
   # Shaving off leading naughty-bits
-  while(@m
+  while((nelems @m)
     and defined($x = lc( @m[0] ))
     and(  $x eq 'site_perl'
-       or($x eq 'pod' and @m == 1 and $shortname =~ m{^perl.*\.pod$}s )
+       or($x eq 'pod' and (nelems @m) == 1 and $shortname =~ m{^perl.*\.pod$}s )
        or $x =~ m{\\d+\\.z\\d+([_.]?\\d+)?}  # if looks like a vernum
        or $x eq lc( %Config::Config{'archname'} )
   )) { shift @m }
 
-  my $name = join '::', @m, $shortname;
+  my $name = join '::', < @m, $shortname;
   $self->_simplify_base($name);
 
   # On VMS, case-preserved document names can't be constructed from
@@ -285,7 +285,7 @@ sub _path2modname {
 #==========================================================================
 
 sub _recurse_dir {
-  my($self, $startdir, $callback, $modname_bits) = @_;
+  my($self, $startdir, $callback, $modname_bits) = < @_;
 
   my $maxdepth = $self->{'fs_recursion_maxdepth'} || 10;
   my $verbose = $self->verbose;
@@ -296,9 +296,9 @@ sub _recurse_dir {
 
   my $recursor;
   $recursor = sub {
-    my($dir_long, $dir_bare) = @_;
-    if( @$modname_bits +>= 10 ) {
-      $verbose and print "Too deep! [@$modname_bits]\n";
+    my($dir_long, $dir_bare) = < @_;
+    if( (nelems @$modname_bits) +>= 10 ) {
+      $verbose and print "Too deep! [{join ' ', <@$modname_bits}]\n";
       return;
     }
 
@@ -311,13 +311,13 @@ sub _recurse_dir {
       closedir(INDIR);
       return
     }
-    my @items = sort readdir(INDIR);
+    my @items = @( sort readdir(INDIR) );
     closedir(INDIR);
 
     push @$modname_bits, $dir_bare unless $dir_bare eq '';
 
     my $i_full;
-    foreach my $i (@items) {
+    foreach my $i (< @items) {
       next if $i eq $here_string or $i eq $up_string or $i eq '';
       $i_full = File::Spec->catfile( $dir_long, $i );
 
@@ -337,7 +337,7 @@ sub _recurse_dir {
           $verbose +> 1 and print "OK, pruning";
         } else {
           # Otherwise, recurse into it
-          $recursor->( File::Spec->catdir($dir_long, $i) , $i);
+          $recursor->( < File::Spec->catdir($dir_long, $i) , $i);
         }
       } else {
         $verbose +> 1 and print "Skipping oddity $i_full\n";
@@ -362,9 +362,9 @@ sub run {
   # A function, useful in one-liners
 
   my $self = __PACKAGE__->new;
-  $self->limit_glob(@ARGV[0]) if @ARGV;
+  $self->limit_glob(@ARGV[0]) if (nelems @ARGV);
   $self->callback( sub {
-    my($file, $name) = @_;
+    my($file, $name) = < @_;
     my $version = '';
      
     # Yes, I know we won't catch the version in like a File/Thing.pm
@@ -420,7 +420,7 @@ sub run {
 #==========================================================================
 
 sub simplify_name {
-  my($self, $str) = @_;
+  my($self, $str) = < @_;
     
   # Remove all path components
   #                             XXX Why not just use basename()? -- SMB
@@ -451,16 +451,16 @@ sub _simplify_base {   # Internal method only
 #==========================================================================
 
 sub _expand_inc {
-  my($self, $search_dirs) = @_;
+  my($self, $search_dirs) = < @_;
   
   return unless $self->{'inc'};
 
   if ($^O eq 'MacOS') {
     push @$search_dirs,
-      grep $_ ne File::Spec->curdir, $self->_mac_whammy(@INC);
+      grep $_ ne File::Spec->curdir, < $self->_mac_whammy(< @INC);
   # Any other OSs need custom handling here?
   } else {
-    push @$search_dirs, grep $_ ne File::Spec->curdir,  @INC;
+    push @$search_dirs, grep $_ ne File::Spec->curdir,  < @INC;
   }
 
   $self->{'laborious'} = 0;   # Since inc said to use INC
@@ -471,8 +471,8 @@ sub _expand_inc {
 
 sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   my @them;
-  (undef,@them) = @_;
-  for $_ (@them) {
+  (undef,< @them) = < @_;
+  for $_ (< @them) {
     if ( $_ eq '.' ) {
       $_ = ':';
     } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
@@ -514,7 +514,7 @@ sub _limit_glob_to_limit_re {
 # contribution mostly from Tim Jenness <t.jenness@jach.hawaii.edu>
 
 sub find {
-  my($self, $pod, @search_dirs) = @_;
+  my($self, $pod, < @search_dirs) = < @_;
   $self = $self->new unless ref $self; # tolerate being a class method
 
   # Check usage
@@ -524,16 +524,16 @@ sub find {
   my $verbose = $self->verbose;
 
   # Split on :: and then join the name together using File::Spec
-  my @parts = split m/::/, $pod;
-  $verbose and print "Chomping \{$pod\} => \{@parts\}\n";
+  my @parts = @( split m/::/, $pod );
+  $verbose and print "Chomping \{$pod\} => \{{join ' ', <@parts}\}\n";
 
   #@search_dirs = File::Spec->curdir unless @search_dirs;
   
   if( $self->inc ) {
     if( $^O eq 'MacOS' ) {
-      push @search_dirs, $self->_mac_whammy(@INC);
+      push @search_dirs, < $self->_mac_whammy(< @INC);
     } else {
-      push @search_dirs,                    @INC;
+      push @search_dirs,                    < @INC;
     }
 
     # Add location of pod documentation for perl man pages (eg perlfunc)
@@ -550,7 +550,7 @@ sub find {
 
   my %seen_dir;
  Dir:
-  foreach my $dir ( @search_dirs ) {
+  foreach my $dir ( < @search_dirs ) {
     next unless defined $dir and length $dir;
     next if %seen_dir{$dir};
     %seen_dir{$dir} = 1;
@@ -560,7 +560,7 @@ sub find {
     }
 
     print "Looking in directory $dir\n" if $verbose;
-    my $fullname = File::Spec->catfile( $dir, @parts );
+    my $fullname = File::Spec->catfile( $dir, < @parts );
     print "Filename is now $fullname\n" if $verbose;
 
     foreach my $ext ('', '.pod', '.pm', '.pl') {   # possible extensions
@@ -584,7 +584,7 @@ sub find {
 #==========================================================================
 
 sub contains_pod {
-  my($self, $file) = @_;
+  my($self, $file) = < @_;
   my $verbose = $self->{'verbose'};
 
   # check for one line of POD
@@ -616,15 +616,15 @@ sub contains_pod {
 sub _accessorize {  # A simple-minded method-maker
   shift;
   no strict 'refs';
-  foreach my $attrname (@_) {
+  foreach my $attrname (< @_) {
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
       use strict;
       $Carp::CarpLevel = 1,  Carp::croak(
        "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
-      ) unless (@_ == 1 or @_ == 2) and ref @_[0];
+      ) unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0];
 
       # Read access:
-      return @_[0]->{$attrname} if @_ == 1;
+      return @_[0]->{$attrname} if (nelems @_) == 1;
 
       # Write access:
       @_[0]->{$attrname} = @_[1];
@@ -639,12 +639,12 @@ sub _accessorize {  # A simple-minded method-maker
 sub _state_as_string {
   my $self = @_[0];
   return '' unless ref $self;
-  my @out = "\{\n  # State of {dump::view($self)} ...\n";
+  my @out = @( "\{\n  # State of {dump::view($self)} ...\n" );
   foreach my $k (sort keys %$self) {
     push @out, "  {dump::view($k)} => {dump::view($self->{$k})}\n";
   }
   push @out, "\}\n";
-  my $x = join '', @out;
+  my $x = join '', < @out;
   $x =~ s/^/#/mg;
   return $x;
 }

@@ -7,14 +7,14 @@ use lib "symbian";
 
 do "sanity.pl" or die $@;
 
-my %VERSION = %{ do "version.pl" or die $@ };
+my %VERSION = %( < %{ do "version.pl" or die $@ } );
 my $VERSION = "%VERSION{REVISION}%VERSION{VERSION}%VERSION{SUBVERSION}";
 my $R_V_SV  = "%VERSION{REVISION}.%VERSION{VERSION}.%VERSION{SUBVERSION}";
 
 my ($SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION) =
-    @{ do "sdk.pl" or die $@ };
+    < @{ do "sdk.pl" or die $@ };
 my $UID  = do "uid.pl" or die $@;
-my %PORT = %{ do "port.pl" or die $@ };
+my %PORT = %( < %{ do "port.pl" or die $@ } );
 
 my $ARM = 'thumb'; # TODO
 my $S60SDK = %ENV{S60SDK}; # from sdk.pl
@@ -27,18 +27,18 @@ $UREL =~ s/-ARM-/$ARM/;
 my $app = '!:\System\Apps\Perl';
 my $lib = '!:\System\Libs';
 
-my @target = @ARGV
-  ? @ARGV
+my @target = @( (nelems @ARGV)
+  ? < @ARGV
   : (
     "miniperl",          "perl",
     "perl{$VERSION}dll", "perl{$VERSION}lib",
     "perl{$VERSION}ext"
-  );
+  ) );
 
 my %suffix;
 %suffix{["miniperl", "perl", "perl$VERSION" ]} = ( "exe", "exe", "dll", );
 
-for my $target (@target) {
+for my $target (< @target) {
     $target = "perl{$VERSION}" if $target eq "perl{$VERSION}dll";
 
     my %copy;
@@ -90,10 +90,10 @@ for my $target (@target) {
     }
 
     if ( $target eq "perl{$VERSION}ext" ) {
-        my @lst = glob("symbian/*.lst");
+        my @lst = glob@( <"symbian/*.lst");
         print "Extensions...\n";
-        print "\t(none found)\n" unless @lst;
-        for my $lst (@lst) {
+        print "\t(none found)\n" unless (nelems @lst);
+        for my $lst (< @lst) {
             $lst =~ m:^symbian/(.+)\.:;
             my $ext = $1;
             $ext =~ s!-!::!g;
@@ -120,10 +120,10 @@ for my $target (@target) {
         warn "$0: $file does not exist\n" unless -f $file;
     }
 
-    my @copy = map { qq["$_"-"%copy{$_}"] } sort keys %copy;
-    my $copy = join( "\n", @copy );
+    my @copy = @( map { qq["$_"-"%copy{$_}"] } sort keys %copy );
+    my $copy = join( "\n", < @copy );
 
-    my %UID = (
+    my %UID = %(
         "miniperl"          => 0,
         "perl"              => 0,
         "perl{$VERSION}"    => $UID + 0,

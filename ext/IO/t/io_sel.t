@@ -14,8 +14,8 @@ print "ok 1\n";
 $sel->add(\@(\*STDOUT, 'foo')) == 1 or print "not ";
 print "ok 2\n";
 
-my @handles = $sel->handles;
-print "not " unless $sel->count == 4 && @handles == 4;
+my @handles = @( < $sel->handles );
+print "not " unless $sel->count == 4 && (nelems @handles) == 4;
 print "ok 3\n";
 #print $sel->as_string, "\n";
 
@@ -50,29 +50,29 @@ if ( grep $^O eq $_, qw(MSWin32 NetWare dos VMS riscos beos) ) {
     goto POST_SOCKET;
 }
 
-my @a = $sel->can_read();  # should return imediately
-print "not " unless @a == 0;
+my @a = @( < $sel->can_read() );  # should return imediately
+print "not " unless (nelems @a) == 0;
 print "ok 10\n";
 
 # we assume that we can write to STDOUT :-)
 $sel->add(\@(\*STDOUT, "ok 12\n"));
 
-@a = $sel->can_write;
-print "not " unless @a == 1;
+@a = @( < $sel->can_write );
+print "not " unless (nelems @a) == 1;
 print "ok 11\n";
 
-my($fd, $msg) = @{shift @a};
+my($fd, $msg) = < @{shift @a};
 print $fd $msg;
 
 $sel->add(\*STDOUT);  # update
 
-@a = IO::Select::select(undef, $sel, undef, 1);
-print "not " unless @a == 3;
+@a = @( < IO::Select::select(undef, $sel, undef, 1) );
+print "not " unless (nelems @a) == 3;
 print "ok 13\n";
 
-my ($r, $w, $e) = @a;
+my ($r, $w, $e) = < @a;
 
-print "not " unless @$r == 0 && @$w == 1 && @$e == 0;
+print "not " unless (nelems @$r) == 0 && (nelems @$w) == 1 && (nelems @$e) == 0;
 print "ok 14\n";
 
 $fd = $w->[0];
@@ -105,7 +105,7 @@ $sel->add(5,6,7,8,9,10);
 print "not " unless $sel->count == 7;
 print "ok 20\n";
 
-$sel->remove($sel->handles);
+$sel->remove( <$sel->handles);
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 21\n";
 

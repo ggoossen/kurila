@@ -7,7 +7,7 @@ $::VERSION = '2.006' ;
 use private::MakeUtil;
 use ExtUtils::MakeMaker v5.16 ;
 
-UpDowngrade(getPerlFiles('MANIFEST')) 
+UpDowngrade( <getPerlFiles('MANIFEST')) 
     unless %ENV{PERL_CORE};
 
 WriteMakefile( 

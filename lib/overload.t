@@ -249,7 +249,7 @@ is("b{$a}c", "_._.b.__.xx._.__.c._");
 # Check inheritance of overloading;
 {
   package OscalarI;
-  our @ISA = 'Oscalar';
+  our @ISA = @( 'Oscalar' );
 }
 
 my $aI = OscalarI->new( "$a");
@@ -333,9 +333,9 @@ is($out, $foo);
 is($out1, q|f'o\\o|);
 is($out1, $foo1);
 is($out2, "a\afoo,\,");
-is("@q", "foo q f'o\\\\o q a\\a qq ,\\, qq");
+is("{join ' ', <@q}", "foo q f'o\\\\o q a\\a qq ,\\, qq");
 is($q, 11);
-is("@qr", "b\\b qq .\\. qq");
+is("{join ' ', <@qr}", "b\\b qq .\\. qq");
 is($qr, 9);
 
 our $res;
@@ -357,10 +357,10 @@ EOF
   s'first part'second part';
   s/yet another/tail here/;
 }
-is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("@q1", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
+is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("{join ' ', <@q1}", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
  q second part s tail here s");
-is("@qr1", "b\\b qq .\\. qq try it qq first part qq yet another qq");
+is("{join ' ', <@qr1}", "b\\b qq .\\. qq try it qq first part qq yet another qq");
 is($res, 1);
 is($a, "_<oups
 >_");
@@ -372,24 +372,24 @@ is($b, "_<oups1
   use overload nomethod => \&wrap, '""' => \&str, '0+' => \&num,
       '=' => \&cpy, '++' => \&inc, '--' => \&dec;
 
-  sub new { shift; bless \@('n', @_) }
+  sub new { shift; bless \@('n', < @_) }
   sub cpy {
     my $self = shift;
-    bless \@(@$self), ref $self;
+    bless \@(< @$self), ref $self;
   }
   sub inc { @_[0] = bless \@('++', @_[0], 1); }
   sub dec { @_[0] = bless \@('--', @_[0], 1); }
   sub wrap {
-    my ($obj, $other, $inv, $meth) = @_;
+    my ($obj, $other, $inv, $meth) = < @_;
     if ($meth eq '++' or $meth eq '--') {
-      @$obj = ($meth, (bless \@(@$obj)), 1); # Avoid circular reference
+      @$obj = @($meth, (bless \@(< @$obj)), 1); # Avoid circular reference
       return $obj;
     }
     ($obj, $other) = ($other, $obj) if $inv;
     bless \@($meth, $obj, $other);
   }
   sub str {
-    my ($meth, $a, $b) = @{+shift};
+    my ($meth, $a, $b) = < @{+shift};
     $a = 'u' unless defined $a;
     if (defined $b) {
       "[$meth $a $b]";
@@ -397,12 +397,12 @@ is($b, "_<oups1
       "[$meth $a]";
     }
   } 
-  my %subr = ( 'n' => sub {@_[0]} );
+  my %subr = %( 'n' => sub {@_[0]} );
   foreach my $op (split " ", %overload::ops{with_assign}) {
     %subr{$op} = %subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
-  my @bins = qw(binary 3way_comparison num_comparison str_comparison);
-  foreach my $op (split " ", "%overload::ops{[ @bins ]}") {
+  my @bins = @( qw(binary 3way_comparison num_comparison str_comparison) );
+  foreach my $op (split " ", "%overload::ops{[ < @bins ]}") {
     %subr{$op} = eval "sub \{shift() $op shift()\}";
   }
   foreach my $op (split " ", "%overload::ops{[qw(unary func)]}") {
@@ -412,17 +412,17 @@ is($b, "_<oups1
   %subr{'--'} = %subr{'-'};
   
   sub num {
-    my ($meth, $a, $b) = @{+shift};
+    my ($meth, $a, $b) = < @{+shift};
     my $subr = %subr{$meth} 
       or die "Do not know how to ($meth) in symbolic";
     $a = $a->num if ref $a eq __PACKAGE__;
     $b = $b->num if ref $b eq __PACKAGE__;
     $subr->($a,$b);
   }
-  sub TIESCALAR { my $pack = shift; $pack->new(@_) }
+  sub TIESCALAR { my $pack = shift; $pack->new(< @_) }
   sub FETCH { shift }
   sub nop {  }		# Around a bug
-  sub vars { my $p = shift; tie($_, $p), $_->nop foreach @_; }
+  sub vars { my $p = shift; tie($_, $p), $_->nop foreach < @_; }
   sub STORE { 
     my $obj = shift; 
     #@$obj = 2; 
@@ -495,22 +495,22 @@ is($b, "_<oups1
   # Mutator inc/dec
   use overload nomethod => \&wrap, '""' => \&str, '0+' => \&num, '=' => \&cpy;
 
-  sub new { shift; bless \@('n', @_) }
+  sub new { shift; bless \@('n', < @_) }
   sub cpy {
     my $self = shift;
-    bless \@(@$self), ref $self;
+    bless \@(< @$self), ref $self;
   }
   sub wrap {
-    my ($obj, $other, $inv, $meth) = @_;
+    my ($obj, $other, $inv, $meth) = < @_;
     if ($meth eq '++' or $meth eq '--') {
-      @$obj = ($meth, (bless \@(@$obj)), 1); # Avoid circular reference
+      @$obj = @($meth, (bless \@(< @$obj)), 1); # Avoid circular reference
       return $obj;
     }
     ($obj, $other) = ($other, $obj) if $inv;
     bless \@($meth, $obj, $other);
   }
   sub str {
-    my ($meth, $a, $b) = @{+shift};
+    my ($meth, $a, $b) = < @{+shift};
     $a = 'u' unless defined $a;
     if (defined $b) {
       "[$meth $a $b]";
@@ -518,12 +518,12 @@ is($b, "_<oups1
       "[$meth $a]";
     }
   } 
-  my %subr = ( 'n' => sub {@_[0]} );
+  my %subr = %( 'n' => sub {@_[0]} );
   foreach my $op (split " ", %overload::ops{with_assign}) {
     %subr{$op} = %subr{"$op="} = eval "sub \{shift() $op shift()\}";
   }
-  my @bins = qw(binary 3way_comparison num_comparison str_comparison);
-  foreach my $op (split " ", "%overload::ops{[ @bins ]}") {
+  my @bins = @( qw(binary 3way_comparison num_comparison str_comparison) );
+  foreach my $op (split " ", "%overload::ops{[ < @bins ]}") {
     %subr{$op} = eval "sub \{shift() $op shift()\}";
   }
   foreach my $op (split " ", "%overload::ops{[qw(unary func)]}") {
@@ -533,17 +533,17 @@ is($b, "_<oups1
   %subr{'--'} = %subr{'-'};
   
   sub num {
-    my ($meth, $a, $b) = @{+shift};
+    my ($meth, $a, $b) = < @{+shift};
     my $subr = %subr{$meth} 
       or die "Do not know how to ($meth) in symbolic";
     $a = $a->num if ref $a eq __PACKAGE__;
     $b = $b->num if ref $b eq __PACKAGE__;
     $subr->($a,$b);
   }
-  sub TIESCALAR { my $pack = shift; $pack->new(@_) }
+  sub TIESCALAR { my $pack = shift; $pack->new(< @_) }
   sub FETCH { shift }
   sub nop {  }		# Around a bug
-  sub vars { my $p = shift; tie($_, $p), $_->nop foreach @_; }
+  sub vars { my $p = shift; tie($_, $p), $_->nop foreach < @_; }
   sub STORE { 
     my $obj = shift; 
     #@$obj = 2; 
@@ -614,7 +614,7 @@ is($b, "_<oups1
 {
   package two_face;		# Scalars with separate string and
                                 # numeric values.
-  sub new { my $p = shift; bless \@(@_), $p }
+  sub new { my $p = shift; bless \@(< @_), $p }
   use overload '""' => \&str, '0+' => \&num, fallback => 1;
   sub num {shift->[1]}
   sub str {shift->[0]}
@@ -630,20 +630,20 @@ is($b, "_<oups1
 {
   package sorting;
   use overload 'cmp' => \&comp;
-  sub new { my ($p, $v) = @_; bless \$v, $p }
-  sub comp { my ($x,$y) = @_; ($$x * 3 % 10) <+> ($$y * 3 % 10) or $$x cmp $$y }
+  sub new { my ($p, $v) = < @_; bless \$v, $p }
+  sub comp { my ($x,$y) = < @_; ($$x * 3 % 10) <+> ($$y * 3 % 10) or $$x cmp $$y }
 }
 {
-  my @arr = map sorting->new($_), 0..12;
-  my @sorted1 = sort @arr;
-  my @sorted2 = map $$_, @sorted1;
-  is("@sorted2", '0 10 7 4 1 11 8 5 12 2 9 6 3');
+  my @arr = @( map < sorting->new($_), 0..12 );
+  my @sorted1 = @( sort < @arr );
+  my @sorted2 = @( map $$_, < @sorted1 );
+  is("{join ' ', <@sorted2}", '0 10 7 4 1 11 8 5 12 2 9 6 3');
 }
 {
   package iterator;
   use overload '<>' => \&iter;
-  sub new { my ($p, $v) = @_; bless \$v, $p }
-  sub iter { my ($x) = @_; return undef if $$x +< 0; return $$x--; }
+  sub new { my ($p, $v) = < @_; bless \$v, $p }
+  sub iter { my ($x) = < @_; return undef if $$x +< 0; return $$x--; }
 }
 
 # XXX iterator overload not intended to work with CORE::GLOBAL?
@@ -668,7 +668,7 @@ else {
   package deref;
   use overload '%{}' => \&hderef, '&{}' => \&cderef, 
     '*{}' => \&gderef, '${}' => \&sderef, '@{}' => \&aderef;
-  sub new { my ($p, $v) = @_; bless \$v, $p }
+  sub new { my ($p, $v) = < @_; bless \$v, $p }
   sub deref {
     my ($self, $key) = (shift, shift);
     my $class = ref $self;
@@ -691,24 +691,24 @@ else {
                         g => \*srt,
                       ), 'deref';
   # Hash:
-  my @cont = sort %$deref;
+  my @cont = @( sort < %$deref );
   if ("\t" eq "\011") { # ASCII
-      is("@cont", '23 5 fake foo');
+      is("{join ' ', <@cont}", '23 5 fake foo');
   } 
   else {                # EBCDIC alpha-numeric sort order
-      is("@cont", 'fake foo 23 5');
+      is("{join ' ', <@cont}", 'fake foo 23 5');
   }
-  my @keys = sort keys %$deref;
-  is("@keys", 'fake foo');
-  my @val = sort values %$deref;
-  is("@val", '23 5');
+  my @keys = @( sort keys %$deref );
+  is("{join ' ', <@keys}", 'fake foo');
+  my @val = @( sort values %$deref );
+  is("{join ' ', <@val}", '23 5');
   is($deref->{foo}, 5);
   is(defined $deref->{bar}, '');
   my $key;
-  @keys = ();
+  @keys = @( () );
   push @keys, $key while $key = each %$deref;
-  @keys = sort @keys;
-  is("@keys", 'fake foo');
+  @keys = sort < @keys;
+  is("{join ' ', <@keys}", 'fake foo');
   is(exists $deref->{bar}, '');
   is(exists $deref->{foo}, 1);
   # Code:
@@ -719,17 +719,17 @@ else {
   my $srt = bless \%( c => sub {$b <+> $a}
                     ), 'deref';
   *srt = \&$srt;
-  my @sorted = sort srt 11, 2, 5, 1, 22;
-  is("@sorted", '22 11 5 2 1');
+  my @sorted = @( sort srt 11, 2, 5, 1, 22 );
+  is("{join ' ', <@sorted}", '22 11 5 2 1');
   # Scalar
   is($$deref, 123);
   # Code
-  @sorted = sort $srt 11, 2, 5, 1, 22;
-  is("@sorted", '22 11 5 2 1');
+  @sorted = @( sort $srt 11, 2, 5, 1, 22 );
+  is("{join ' ', <@sorted}", '22 11 5 2 1');
   # Array
-  is("@$deref", '11 12 13');
-  is((scalar @$deref), '3');
-  my $l = @$deref;
+  is("{join ' ', <@$deref}", '11 12 13');
+  is((scalar nelems @$deref), '3');
+  my $l = (nelems @$deref);
   is($l, 3);
   is($deref->[2], '13');
   $l = pop @$deref;
@@ -747,7 +747,7 @@ else {
   use overload '%{}' => \&gethash, '@{}' => sub { ${shift()} };
   sub new { 
     my $p = shift; 
-    bless \\@(@_), $p;
+    bless \\@(< @_), $p;
   }
   sub gethash {
     my %h;
@@ -782,7 +782,7 @@ is($bar->[3], 13);
 
 {
   package two_refs_o;
-  our @ISA = ('two_refs');
+  our @ISA = @('two_refs');
 }
 
 $bar = two_refs_o->new( 3,4,5,6);
@@ -797,7 +797,7 @@ is($bar->[3], 13);
                '@{}' => sub { ${shift()}->[0] };
   sub new { 
     my $p = shift; 
-    my $a = \@(@_);
+    my $a = \@(< @_);
     my %h;
     tie %h, $p, $a;
     bless \\@($a, \%h), $p;
@@ -835,7 +835,7 @@ is($bar->[3], 13);
 
 {
   package two_refs1_o;
-  our @ISA = ('two_refs1');
+  our @ISA = @('two_refs1');
 }
 
 $bar = two_refs1_o->new( 3,4,5,6);
@@ -1008,10 +1008,10 @@ is("$utfvar", "\x{c8}\x{2}\x{1}"); # 223 - stringify
 package Hderef;
 use overload '%{}' => sub { (caller(0))[0] eq 'Foo' ? @_[0] : die "zap" };
 package Foo;
-@Foo::ISA = 'Hderef';
+@Foo::ISA = @( 'Hderef' );
 sub new { bless \%(), shift }
-sub xet { @_ == 2 ? @_[0]->{@_[1]} :
-	  @_ == 3 ? (@_[0]->{@_[1]} = @_[2]) : undef }
+sub xet { (nelems @_) == 2 ? @_[0]->{@_[1]} :
+	  (nelems @_) == 3 ?  @(@_[0]->{@_[1]} = @_[2]) : undef }
 package main;
 my $a = Foo->new;
 $a->xet('b', 42);
@@ -1082,10 +1082,10 @@ like ($@->{description}, qr/zap/);
 
 # These are all check that overloaded values rather than reference addresses
 # are what is getting tested.
-my ($two, $one, $un, $deux) = map {Numify->new( $_)} 2, 1, 1, 2;
+my ($two, $one, $un, $deux) = map { <Numify->new( $_)} 2, 1, 1, 2;
 my ($ein, $zwei) = (1, 2);
 
-my %map = (one => 1, un => 1, ein => 1, deux => 2, two => 2, zwei => 2);
+my %map = %(one => 1, un => 1, ein => 1, deux => 2, two => 2, zwei => 2);
 foreach my $op (qw(<+> == != +< +<= +> +>=)) {
     foreach my $l (keys %map) {
 	foreach my $r (keys %map) {

@@ -15,7 +15,7 @@ my (@files, @dirs, @still_there);
 # And a test for files that should still be around
 # These are tidied up
 END {
-  foreach (@still_there) {
+  foreach (< @still_there) {
     ok( -f $_ );
     ok( unlink( $_ ) );
     ok( !(-f $_) );
@@ -23,10 +23,10 @@ END {
 }
 
 # Loop over an array hoping that the files dont exist
-END { foreach (@files) { ok( !(-e $_) )} }
+END { foreach (< @files) { ok( !(-e $_) )} }
 
 # And a test for directories
-END { foreach (@dirs)  { ok( !(-d $_) )} }
+END { foreach (< @dirs)  { ok( !(-d $_) )} }
 
 # Need to make sure that the END blocks are setup before
 # the ones that File::Temp configures since END blocks are evaluated
@@ -40,7 +40,7 @@ ok(1);
 
 # Tempfile
 # Open tempfile in some directory, unlink at end
-my ($fh, $tempfile) = tempfile(
+my ($fh, $tempfile) = < tempfile(
 			       UNLINK => 1,
 			       SUFFIX => '.txt',
 			      );
@@ -57,7 +57,7 @@ push(@files, $tempfile);
 my $template = 'tmpdirXXXXXX';
 print "# Template: $template\n";
 my $tempdir = tempdir( $template ,
-		       DIR => File::Spec->curdir,
+		       DIR => < File::Spec->curdir,
 		       CLEANUP => 1,
 		     );
 
@@ -67,7 +67,7 @@ ok( (-d $tempdir) );
 push(@dirs, $tempdir);
 
 # Create file in the temp dir
-($fh, $tempfile) = tempfile(
+($fh, $tempfile) = < tempfile(
 			    DIR => $tempdir,
 			    UNLINK => 1,
 			    SUFFIX => '.dat',
@@ -80,7 +80,7 @@ push(@files, $tempfile);
 
 # Test tempfile
 # ..and again
-($fh, $tempfile) = tempfile(
+($fh, $tempfile) = < tempfile(
 			    DIR => $tempdir,
 			   );
 
@@ -90,7 +90,7 @@ push(@files, $tempfile);
 
 # Test tempfile
 # ..and another with changed permissions (read-only)
-($fh, $tempfile) = tempfile(
+($fh, $tempfile) = < tempfile(
                            DIR => $tempdir,
                           );
 chmod 0444, $tempfile;
@@ -102,7 +102,7 @@ print "# TEMPFILE: Created $tempfile\n";
 
 # and another (with template)
 
-($fh, $tempfile) = tempfile( 'helloXXXXXXX',
+($fh, $tempfile) = < tempfile( 'helloXXXXXXX',
 			    DIR => $tempdir,
 			    UNLINK => 1,
 			    SUFFIX => '.dat',
@@ -116,7 +116,7 @@ push(@files, $tempfile);
 
 # Create a temporary file that should stay around after
 # it has been closed
-($fh, $tempfile) = tempfile( 'permXXXXXXX', UNLINK => 0 );
+($fh, $tempfile) = < tempfile( 'permXXXXXXX', UNLINK => 0 );
 print "# TEMPFILE: Created $tempfile\n";
 ok( -f $tempfile );
 ok( close( $fh ) );
@@ -130,7 +130,7 @@ push( @still_there, $tempfile); # check at END
 #    on NFS
 # Try to do what we can.
 # Tempfile croaks on error so we need an eval
-$fh = try { tempfile( 'ftmpXXXXX', DIR => File::Spec->tmpdir ) };
+$fh = try { tempfile( 'ftmpXXXXX', DIR => < File::Spec->tmpdir ) };
 
 if ($fh) {
 

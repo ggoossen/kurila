@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = $^O eq 'MacOS' ? qw(::lib) : qw(../lib);
+        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
     }
 }
 
@@ -50,9 +50,9 @@ for my $u (0xD800, 0xDFFF, 0xFDD0, 0xFDEF, 0xFEFF, 0xFFFE, 0xFFFF,
 our $proc;    # before the last starter
 our $unproc;  # the last starter and after
 
-sub _pack_U   { Unicode::Normalize::pack_U(@_) }
+sub _pack_U   { Unicode::Normalize::pack_U(< @_) }
 
-($proc, $unproc) = splitOnLastStarter(_pack_U(0x41, 0x300, 0x327, 0xFFFF));
+($proc, $unproc) = < splitOnLastStarter( <_pack_U(0x41, 0x300, 0x327, 0xFFFF));
 ok($proc   eq _pack_U(0x41, 0x300, 0x327));
 ok($unproc eq "\x{FFFF}");
 

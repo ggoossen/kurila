@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 
 require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my($out, $err) = < Test::Simple::Catch::caught();
 local %ENV{HARNESS_ACTIVE} = 0;
 
 
@@ -27,15 +27,15 @@ my $TB = Test::Builder->create;
 $TB->plan(tests => 17);
 
 sub like ($$;$) {
-    $TB->like(@_);
+    $TB->like(< @_);
 }
 
 sub is ($$;$) {
-    $TB->is_eq(@_);
+    $TB->is_eq(< @_);
 }
 
 sub main::err_ok ($) {
-    my($expect) = @_;
+    my($expect) = < @_;
     my $got = $err->read;
 
     return $TB->is_eq( $got, $expect );

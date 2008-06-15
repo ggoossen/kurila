@@ -17,11 +17,11 @@ use Locale::Constants;
 #-----------------------------------------------------------------------
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 $VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA       = qw(Exporter);
-@EXPORT    = qw(code2script script2code
+@ISA       = @( qw(Exporter) );
+@EXPORT    = @( qw(code2script script2code
                 all_script_codes all_script_names
 		script_code2code
-		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC);
+		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC) );
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
@@ -38,7 +38,7 @@ my $COUNTRIES = \@();
 sub code2script
 {
     my $code = shift;
-    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $code;
@@ -81,7 +81,7 @@ sub code2script
 sub script2code
 {
     my $script = shift;
-    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $script;
@@ -107,7 +107,7 @@ sub script2code
 #=======================================================================
 sub script_code2code
 {
-    (@_ == 3) or croak "script_code2code() takes 3 arguments!";
+    ((nelems @_) == 3) or croak "script_code2code() takes 3 arguments!";
 
     my $code = shift;
     my $inset = shift;
@@ -131,7 +131,7 @@ sub script_code2code
 #=======================================================================
 sub all_script_codes
 {
-    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     return keys %{ $CODES->[$codeset] };
 }
@@ -144,7 +144,7 @@ sub all_script_codes
 #=======================================================================
 sub all_script_names
 {
-    my $codeset = @_ +> 0 ? shift : LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
     return values %{ $CODES->[$codeset] };
 }

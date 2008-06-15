@@ -27,7 +27,7 @@ my $test = 1;
 # We use the \x notation instead of raw binary bytes for \x00-\x1f\x7f-\xff
 # because e.g. many patch programs have issues with binary data.
 
-my @MK = split(m/\n/, <<__EOMK__);
+my @MK = @( split(m/\n/, <<__EOMK__) );
 1	Correct UTF-8
 1.1.1 y "\x[ce]\x[ba]\x[e1]\x[bd]\x[b9]\x[cf]\x[83]\x[ce]\x[bc]\x[ce]\x[b5]"	-		11	ce:ba:e1:bd:b9:cf:83:ce:bc:ce:b5	5
 2	Boundary conditions
@@ -140,25 +140,25 @@ __EOMK__
     };
 
     sub moan {
-	print "$id: @_";
+	print "$id: {join ' ', <@_}";
     }
 
     sub warn_unpack_U {
 	$x_warn = '';
-	my @null = unpack('U0U*', @_[0]);
+	my @null = @( unpack('U0U*', @_[0]) );
 	return $x_warn;
     }
 
-    for (@MK) {
+    for (< @MK) {
 	if (m/^(?:\d+(?:\.\d+)?)\s/ || m/^#/) {
 	    # print "# $_\n";
 	} elsif (m/^(\d+\.\d+\.\d+[bu]?)\s+([yn])\s+"(.+)"\s+([0-9a-f]{1,8}|-)\s+(\d+)\s+([0-9a-f]{2}(?::[0-9a-f]{2})*)(?:\s+((?:\d+|-)(?:\s+(.+))?))?$/) {
 	    $id = $1;
 	    my ($okay, $bytes, $Unicode, $byteslen, $hex, $charslen, $experr) =
 		($2, $3, $4, $5, $6, $7, $8);
-	    my @hex = split(m/:/, $hex);
-	    unless (@hex == $byteslen) {
-		my $nhex = @hex;
+	    my @hex = @( split(m/:/, $hex) );
+	    unless ((nelems @hex) == $byteslen) {
+		my $nhex = (nelems @hex);
 		moan "amount of hex ($nhex) not equal to byteslen ($byteslen)\n";
 	    }
 	    {

@@ -71,8 +71,8 @@ and version_mess() with the switches string as an argument.
 
 =cut
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(getopt getopts);
+our @ISA = @( qw(Exporter) );
+our @EXPORT = @( qw(getopt getopts) );
 our $VERSION = '1.05';
 
 our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
@@ -90,13 +90,13 @@ our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
 #	getopt('oDI');  # -o, -D & -I take arg.  Sets opt_* as a side effect.
 
 sub getopt (;$$) {
-    my ($argumentative, $hash) = @_;
+    my ($argumentative, $hash) = < @_;
     $argumentative = '' if !defined $argumentative;
     my ($first,$rest);
     local $_;
     local @EXPORT;
 
-    while (@ARGV && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/) {
+    while ((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/) {
 	($first,$rest) = ($1,$2);
 	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
@@ -160,7 +160,7 @@ EOM
 sub version_mess ($;$) {
     my $args = shift;
     my $h = output_h;
-    if (@_ and defined &main::VERSION_MESSAGE) {
+    if ((nelems @_) and defined &main::VERSION_MESSAGE) {
 	main::VERSION_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
 	my $v = $main::VERSION;
@@ -178,21 +178,21 @@ EOH
 sub help_mess ($;$) {
     my $args = shift;
     my $h = output_h;
-    if (@_ and defined &main::HELP_MESSAGE) {
+    if ((nelems @_) and defined &main::HELP_MESSAGE) {
 	main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
-	my (@witharg) = ($args =~ m/(\S)\s*:/g);
-	my (@rest) = ($args =~ m/([^\s:])(?!\s*:)/g);
+	my (@witharg) = @($args =~ m/(\S)\s*:/g);
+	my (@rest) = @($args =~ m/([^\s:])(?!\s*:)/g);
 	my ($help, $arg) = ('', '');
-	if (@witharg) {
-	    $help .= "\n\tWith arguments: -" . join " -", @witharg;
+	if ((nelems @witharg)) {
+	    $help .= "\n\tWith arguments: -" . join " -", < @witharg;
 	    $arg = "\nSpace is not required between options and their arguments.";
 	}
-	if (@rest) {
-	    $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
+	if ((nelems @rest)) {
+	    $help .= "\n\tBoolean (without arguments): -" . join " -", < @rest;
 	}
 	my ($scr) = ($0 =~ m,([^/\\]+)$,);
-	print $h <<EOH if @_;			# Let the script override this
+	print $h <<EOH if (nelems @_);			# Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
 EOH
@@ -222,14 +222,14 @@ EOH
 #			#  side effect.
 
 sub getopts ($;$) {
-    my ($argumentative, $hash) = @_;
+    my ($argumentative, $hash) = < @_;
     my (@args,$first,$rest,$exit);
     my $errs = 0;
     local $_;
     local @EXPORT;
 
-    @args = split( m/ */, $argumentative );
-    while(@ARGV && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s) {
+    @args = @( split( m/ */, $argumentative ) );
+    while((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s) {
 	($first,$rest) = ($1,$2);
 	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
@@ -240,7 +240,7 @@ sub getopts ($;$) {
 	    if (defined(@args[$pos+1]) and (@args[$pos+1] eq ':')) {
 		shift(@ARGV);
 		if ($rest eq '') {
-		    ++$errs unless @ARGV;
+		    ++$errs unless (nelems @ARGV);
 		    $rest = shift(@ARGV);
 		}
 		if (ref $hash) {

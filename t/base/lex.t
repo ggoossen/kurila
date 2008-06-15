@@ -12,7 +12,7 @@ $x = '';
 if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
 our @x;
-$x = (@x-1);
+$x = ((nelems @x)-1);
 
 if ($x eq '-1') {print "ok 3\n";} else {print "not ok 3\n";}
 
@@ -78,18 +78,18 @@ ok 18
 # previous line intentionally left blank.
 
 print <<E1 eq "foo\n\n" ? "ok 19\n" : "not ok 19\n";
-@{\@( <<E2 )}
+{join ' ', <@{\@( <<E2 )}
 foo
 E2
-E1
+}E1
 
 print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
-@{\@(
+{join ' ', <@{\@(
   <<E2
 foo
 E2
 )}
-E1
+}E1
 
 {
     $foo = 'FOO';
@@ -110,7 +110,7 @@ print "ABC" =~ m/^@ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
 print "ok 26\n";
 
 # MJD 19980425
-($X, @X) = qw(a b c d); 
+($X, < @X) = qw(a b c d); 
 print "d" =~ m/^@X[-1]$/ ? "ok 27\n" : "not ok 27\n";
 print "a1" !~ m/^@X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
@@ -190,7 +190,7 @@ print $foo;
 # see if eval '', s///e, and heredocs mix
 
 sub T {
-    my ($where, $num) = @_;
+    my ($where, $num) = < @_;
     my ($p,$f,$l) = caller;
     print "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/;
     print "ok $num\n";
@@ -234,8 +234,8 @@ EOT
 
   # Let's make sure that normal array interpolation still works right
   # For some reason, this appears not to be tested anywhere else.
-  my @a = (1,2,3);
-  print +((">@a<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
+  my @a = @(1,2,3);
+  print +((">{join ' ', <@a}<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
   ++$test;
 
   # Ditto.
@@ -246,7 +246,7 @@ EOT
 
   # This isn't actually a lex test, but it's testing the same feature
   sub makearray {
-    my @array = ('fish', 'dog', 'carrot');
+    my @array = @('fish', 'dog', 'carrot');
     *R::crackers = \@array;
   }
 
@@ -261,8 +261,8 @@ EOT
 
 sub xyz::foo { "bar" }
 no strict 'subs';
-my %str = (
-    foo      => 1,
+my %str = %(
+    foo      => 1, <
     xyz::foo => 1,
     'xyz::bar' => 1,
 );

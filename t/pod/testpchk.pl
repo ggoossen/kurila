@@ -9,7 +9,7 @@ BEGIN {
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, map { < 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
    require VMS::Filespec if $^O eq 'VMS';
 }
 
@@ -20,8 +20,8 @@ use vars qw(@ISA @EXPORT $MYPKG);
 use Exporter;
 #use File::Compare;
 
-@ISA = qw(Exporter);
-@EXPORT = qw(&testpodchecker);
+@ISA = @( qw(Exporter) );
+@EXPORT = @( qw(&testpodchecker) );
 $MYPKG = try { (caller)[[0]] };
 
 sub stripname( $ ) {
@@ -31,18 +31,18 @@ sub stripname( $ ) {
 
 sub msgcmp( $ $ ) {
    ## filter out platform-dependent aspects of error messages
-   my ($line1, $line2) = @_;
+   my ($line1, $line2) = < @_;
    for ($line1, $line2) {
       ## remove filenames from error messages to avoid any
       ## filepath naming differences between OS platforms
       s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/{"$1 ".lc($2)}/;
       s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/{lc($1)." $2"}/;
    }
-   return ($line1 ne $line2);
+   return  @($line1 ne $line2);
 }
 
 sub testpodcheck( @ ) {
-   my %args = @_;
+   my %args = %( < @_ );
    my $infile  = %args{'-In'}  || die "No input file given!";
    my $outfile = %args{'-Out'} || die "No output file given!";
    my $cmpfile = %args{'-Cmp'} || die "No compare-result file given!";
@@ -74,8 +74,8 @@ sub testpodcheck( @ ) {
 }
 
 sub testpodchecker( @ ) {
-   my %opts = (ref @_[0] eq 'HASH') ? %{shift()} : ();
-   my @testpods = @_;
+   my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
+   my @testpods = @( < @_ );
    my ($testname, $testdir) = ("", "");
    my ($podfile, $cmpfile) = ("", "");
    my ($outfile, $errfile) = ("", "");
@@ -83,10 +83,10 @@ sub testpodchecker( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar @testpods, "\n"  unless (%opts{'-xrgen'});
+   print "1..", scalar nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
-   for $podfile (@testpods) {
-      ($testname, $_) = fileparse($podfile);
+   for $podfile (< @testpods) {
+      ($testname, $_) = < fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;
       $cmpfile   =  $testdir . $testname . '.xr';

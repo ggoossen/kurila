@@ -13,7 +13,7 @@ use Locale::Country;
 # If it is true (1), the test is treated as passing, otherwise it failed.
 #-----------------------------------------------------------------------
 our @TESTS =
-(
+@(
 	#================================================
 	# TESTS FOR code2country
 	#================================================
@@ -130,10 +130,10 @@ our @TESTS =
 
 );
 
-print "1..", int(@TESTS), "\n";
+print "1..", int(nelems @TESTS), "\n";
 
 my $testid = 1;
-foreach my $test (@TESTS)
+foreach my $test (< @TESTS)
 {
     eval "print (($test->[0]) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
     if ($@)

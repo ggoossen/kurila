@@ -1,11 +1,11 @@
 #!perl -w
 use File::DosGlob;
 $| = 1;
-while (@ARGV) {
+while ((nelems @ARGV)) {
     my $arg = shift;
-    my @m = File::DosGlob::doglob(1,$arg);
-    print (@m ? join("\0", sort @m) : $arg);
-    print "\0" if @ARGV;
+    my @m = @( < File::DosGlob::doglob(1,$arg) );
+    print ((nelems @m) ? join("\0", sort < @m) : $arg);
+    print "\0" if (nelems @ARGV);
 }
 __END__
 

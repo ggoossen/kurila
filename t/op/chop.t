@@ -20,14 +20,14 @@ sub foo {
     chop;
 }
 
-@foo = ("hi \n","there\n","!\n");
-@bar = @foo;
-chop(@bar);
-is (join('',@bar), 'hi there!');
+@foo = @("hi \n","there\n","!\n");
+@bar = @( < @foo );
+chop(< @bar);
+is (join('',< @bar), 'hi there!');
 
 $foo = "\n";
-chop($foo,@foo);
-is (join('',$foo,@foo), 'hi there!');
+chop($foo,< @foo);
+is (join('',$foo,< @foo), 'hi there!');
 
 $_ = "foo\n\n";
 $got = chomp();
@@ -122,17 +122,17 @@ $_ = "\x{1234}\x{2345}";
 chop;
 is ($_, "\x{1234}");
 
-my @stuff = qw(this that);
+my @stuff = @( qw(this that) );
 is (chop(@stuff[[0,1]]), 't');
 
 # bug id 20010305.012
-@stuff = qw(ab cd ef);
-is (chop(@stuff = @stuff), 'f');
+@stuff = @( qw(ab cd ef) );
+is (chop(@stuff = @( < @stuff )), 'f');
 
-@stuff = qw(ab cd ef);
+@stuff = @( qw(ab cd ef) );
 is (chop(@stuff[[0, 2]]), 'f');
 
-my %stuff = (1..4);
+my %stuff = %(1..4);
 is (chop(%stuff{[1, 3]}), '4');
 
 }
@@ -148,8 +148,8 @@ is (ref($_), "ARRAY", "chomp ref (no modify)");
 
 $/ = "\n";
 
-%chomp = ("One" => "One", "Two\n" => "Two", "" => "");
-%chop = ("One" => "On", "Two\n" => "Two", "" => "");
+%chomp = %("One" => "One", "Two\n" => "Two", "" => "");
+%chop = %("One" => "On", "Two\n" => "Two", "" => "");
 
 foreach (keys %chomp) {
   my $key = $_;

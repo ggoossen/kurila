@@ -3,7 +3,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '.'; 
+    @INC = @( '.' ); 
     push @INC, '../lib';
 }    
 
@@ -55,7 +55,7 @@ try { %a{def} = 456 };
 print "not " unless $@ && $@->{description} =~ m/Table is full \(3 elements\)/;
 print "ok 9\n";
 
-%a = ();
+%a = %( () );
 
 print "not " unless keys %a == 0;
 print "ok 10\n";

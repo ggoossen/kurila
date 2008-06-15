@@ -6,7 +6,7 @@ require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = qw(File::Spec::Unix);
+@ISA = @( qw(File::Spec::Unix) );
 
 sub devnull {
     return "/dev/nul";
@@ -17,15 +17,15 @@ sub case_tolerant {
 }
 
 sub file_name_is_absolute {
-    my ($self,$file) = @_;
+    my ($self,$file) = < @_;
     return scalar($file =~ m{^([a-z]:)?[\\/]}is);
 }
 
 sub path {
     my $path = %ENV{PATH};
     $path =~ s:\\:/:g;
-    my @path = split(';',$path);
-    foreach (@path) { $_ = '.' if $_ eq '' }
+    my @path = @( split(';',$path) );
+    foreach (< @path) { $_ = '.' if $_ eq '' }
     return @path;
 }
 
@@ -37,23 +37,23 @@ sub _cwd {
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    my @d = %ENV{[qw(TMPDIR TEMP TMP)]};	# function call could autovivivy
-    $tmpdir = @_[0]->_tmpdir( @d, '/tmp', '/'  );
+    my @d = @( %ENV{[qw(TMPDIR TEMP TMP)]} );	# function call could autovivivy
+    $tmpdir = @_[0]->_tmpdir( < @d, '/tmp', '/'  );
 }
 
 sub catdir {
     my $self = shift;
-    my @args = @_;
-    foreach (@args) {
+    my @args = @( < @_ );
+    foreach (< @args) {
 	s[\\][/]g;
         # append a backslash to each argument unless it has one there
         $_ .= "/" unless m{/$};
     }
-    return $self->canonpath(join('', @args));
+    return $self->canonpath(join('', < @args));
 }
 
 sub canonpath {
-    my ($self,$path) = @_;
+    my ($self,$path) = < @_;
     return unless defined $path;
 
     $path =~ s/^([a-z]:)/{lc($1)}/s;
@@ -70,7 +70,7 @@ sub canonpath {
 
 
 sub splitpath {
-    my ($self,$path, $nofile) = @_;
+    my ($self,$path, $nofile) = < @_;
     my ($volume,$directory,$file) = ('','','');
     if ( $nofile ) {
         $path =~ 
@@ -94,18 +94,18 @@ sub splitpath {
         $file      = $3;
     }
 
-    return ($volume,$directory,$file);
+    return  @($volume,$directory,$file);
 }
 
 
 sub splitdir {
-    my ($self,$directories) = @_ ;
-    split m|[\\/]|, $directories, -1;
+    my ($self,$directories) = < @_ ;
+ @(    split m|[\\/]|, $directories, -1);
 }
 
 
 sub catpath {
-    my ($self,$volume,$directory,$file) = @_;
+    my ($self,$volume,$directory,$file) = < @_;
 
     # If it's UNC, make sure the glue separator is there, reusing
     # whatever separator is first in the $volume
@@ -134,7 +134,7 @@ sub catpath {
 
 
 sub abs2rel {
-    my($self,$path,$base) = @_;
+    my($self,$path,$base) = < @_;
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {
@@ -153,16 +153,16 @@ sub abs2rel {
     }
 
     # Split up paths
-    my ( $path_volume, $path_directories, $path_file ) = $self->splitpath( $path, 1 ) ;
-    my ( $base_volume, $base_directories ) = $self->splitpath( $base, 1 ) ;
+    my ( $path_volume, $path_directories, $path_file ) = < $self->splitpath( $path, 1 ) ;
+    my ( $base_volume, $base_directories ) = < $self->splitpath( $base, 1 ) ;
     return $path unless $path_volume eq $base_volume;
 
     # Now, remove all leading components that are the same
-    my @pathchunks = $self->splitdir( $path_directories );
-    my @basechunks = $self->splitdir( $base_directories );
+    my @pathchunks = @( < $self->splitdir( $path_directories ) );
+    my @basechunks = @( < $self->splitdir( $base_directories ) );
 
-    while ( @pathchunks && 
-            @basechunks && 
+    while ( (nelems @pathchunks) && 
+            nelems @basechunks && 
             lc( @pathchunks[0] ) eq lc( @basechunks[0] ) 
           ) {
         shift @pathchunks ;
@@ -170,8 +170,8 @@ sub abs2rel {
     }
 
     # No need to catdir, we know these are well formed.
-    $path_directories = CORE::join( '/', @pathchunks );
-    $base_directories = CORE::join( '/', @basechunks );
+    $path_directories = CORE::join( '/', < @pathchunks );
+    $base_directories = CORE::join( '/', < @basechunks );
 
     # $base_directories now contains the directories the resulting relative
     # path must ascend out of before it can descend to $path_directory.  So, 
@@ -190,14 +190,14 @@ sub abs2rel {
         $path_directories = "$base_directories$path_directories" ;
     }
 
-    return $self->canonpath( 
+    return $self->canonpath( < 
         $self->catpath( "", $path_directories, $path_file ) 
     ) ;
 }
 
 
 sub rel2abs {
-    my ($self,$path,$base ) = @_;
+    my ($self,$path,$base ) = < @_;
 
     if ( ! $self->file_name_is_absolute( $path ) ) {
 
@@ -212,13 +212,13 @@ sub rel2abs {
         }
 
         my ( $path_directories, $path_file ) =
-            ($self->splitpath( $path, 1 ))[[1,2]] ;
+            ( <$self->splitpath( $path, 1 ))[[1,2]] ;
 
-        my ( $base_volume, $base_directories ) =
+        my ( $base_volume, $base_directories ) = <
             $self->splitpath( $base, 1 ) ;
 
         $path = $self->catpath( 
-            $base_volume, 
+            $base_volume, < 
             $self->catdir( $base_directories, $path_directories ), 
             $path_file
         ) ;

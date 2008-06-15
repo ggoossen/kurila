@@ -12,7 +12,7 @@ sub import {
     my($sym, $pkg);
     my $void = 0;
     $pkg = (caller)[[0]];
-    foreach $sym (@_) {
+    foreach $sym (< @_) {
 	if ($sym eq ":void") {
 	    $void = 1;
 	}
@@ -24,60 +24,60 @@ sub import {
 
 sub fill_protos {
   my $proto = shift;
-  my ($n, $isref, @out, @out1, $seen_semi) = -1;
+  my ($n, $isref, < @out, < @out1, $seen_semi) = -1;
   while ($proto =~ m/\S/) {
     $n++;
-    push(@out1,\@($n,@out)) if $seen_semi;
+    push(@out1,\@($n,< @out)) if $seen_semi;
     push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
     push(@out, "\@_[[$n..\@_-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
     $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
-  push(@out1,\@($n+1,@out));
+  push(@out1,\@($n+1,< @out));
   @out1;
 }
 
 sub write_invocation {
-  my ($core, $call, $name, $void, @argvs) = @_;
-  if (@argvs == 1) {		# No optional arguments
-    my @argv = @{@argvs[0]};
+  my ($core, $call, $name, $void, < @argvs) = < @_;
+  if ((nelems @argvs) == 1) {		# No optional arguments
+    my @argv = @( < @{@argvs[0]} );
     shift @argv;
-    return "\t" . one_invocation($core, $call, $name, $void, @argv) . ";\n";
+    return "\t" . one_invocation($core, $call, $name, $void, < @argv) . ";\n";
   } else {
     my $else = "\t";
     my (@out, @argv, $n);
-    while (@argvs) {
-      @argv = @{shift @argvs};
+    while ((nelems @argvs)) {
+      @argv = @( < @{shift @argvs} );
       $n = shift @argv;
       push @out, "{$else}if (\@_ == $n) \{\n";
       $else = "\t\} els";
       push @out, 
-          "\t\treturn " . one_invocation($core, $call, $name, $void, @argv) . ";\n";
+          "\t\treturn " . one_invocation($core, $call, $name, $void, < @argv) . ";\n";
     }
     push @out, <<EOC;
 	\}
 	die "$name(\@_): Do not expect to get ", scalar \@_, " arguments";
 EOC
-    return join '', @out;
+    return join '', < @out;
   }
 }
 
 sub one_invocation {
-  my ($core, $call, $name, $void, @argv) = @_;
+  my ($core, $call, $name, $void, < @argv) = < @_;
   local $" = ', ';
   if ($void) { 
-    return qq/(defined wantarray)?$call(@argv):
-              $call(@argv) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})/ . 
+    return qq/(defined wantarray)?$call({join ' ', <@argv}):
+              $call({join ' ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})/ . 
            ($core ? ': $!' : ', \$! is \"$!\"') . '"'
   } else {
-    return qq{$call(@argv) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
+    return qq{$call({join ' ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
            ($core ? ': $!' : ', \$! is \"$!\"') . '"';
   }
 }
 
 sub _make_fatal {
-    my($sub, $pkg, $void) = @_;
+    my($sub, $pkg, $void) = < @_;
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
@@ -112,8 +112,8 @@ sub _make_fatal {
 sub$real_proto \{
 	local(\$", \$!) = (', ', 0);
 EOS
-    my @protos = fill_protos($proto);
-    $code .= write_invocation($core, $call, $name, $void, @protos);
+    my @protos = @( < fill_protos($proto) );
+    $code .= write_invocation($core, $call, $name, $void, < @protos);
     $code .= "\}\n";
     print $code if $Debug;
     {

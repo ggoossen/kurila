@@ -38,7 +38,7 @@ Available commands are:
    q                  - Quit the module
 EOF
 
-my %Module_Commands = (
+my %Module_Commands = %(
                        f => \&list_installed,
                        d => \&list_directories,
                        v => \&validate_packlist,
@@ -47,7 +47,7 @@ my %Module_Commands = (
                       );
 
 sub do_module($) {
-    my ($module) = @_;
+    my ($module) = < @_;
 
     print($Module_Help);
     MODULE_CMD: while (1) {
@@ -72,15 +72,15 @@ sub do_module($) {
 
 
 sub list_installed {
-    my($reply, $module) = @_;
+    my($reply, $module) = < @_;
 
     my $class = (split(' ', $reply))[[1]];
     $class = 'all' unless $class;
 
     my @files;
-    if (try { @files = $Inst->files($module, $class); }) {
+    if (try { @files = @( < $Inst->files($module, $class) ); }) {
         print("$class files in $module are:\n   ",
-              join("\n   ", @files), "\n");
+              join("\n   ", < @files), "\n");
     }
     else { 
         print($@); 
@@ -89,15 +89,15 @@ sub list_installed {
 
 
 sub list_directories {
-    my($reply, $module) = @_;
+    my($reply, $module) = < @_;
 
     my $class = (split(' ', $reply))[[1]];
     $class = 'all' unless $class;
 
     my @dirs;
-    if (try { @dirs = $Inst->directories($module, $class); }) {
+    if (try { @dirs = @( < $Inst->directories($module, $class) ); }) {
         print("$class directories in $module are:\n   ",
-              join("\n   ", @dirs), "\n");
+              join("\n   ", < @dirs), "\n");
     }
     else { 
         print($@); 
@@ -106,7 +106,7 @@ sub list_directories {
 
 
 sub create_archive {
-    my($reply, $module) = @_;
+    my($reply, $module) = < @_;
 
     my $file = (split(' ', $reply))[[1]];
 
@@ -114,12 +114,12 @@ sub create_archive {
         print "No tar file specified\n";
     }
     elsif( try { require Archive::Tar } ) {
-        Archive::Tar->create_archive($file, 0, $Inst->files($module));
+        Archive::Tar->create_archive($file, 0, < $Inst->files($module));
     }
     else {
-        my($first, @rest) = $Inst->files($module);
+        my($first, < @rest) = < $Inst->files($module);
         system('tar', 'cvf', $file, $first);
-        for my $f (@rest) {
+        for my $f (< @rest) {
             system('tar', 'rvf', $file, $f);
         }
         print "Can't use tar\n" if $?;
@@ -128,11 +128,11 @@ sub create_archive {
 
 
 sub validate_packlist {
-    my($reply, $module) = @_;
+    my($reply, $module) = < @_;
 
-    if (my @missing = $Inst->validate($module)) {
+    if (my @missing = @( < $Inst->validate($module) )) {
         print("Files missing from $module are:\n   ",
-              join("\n   ", @missing), "\n");
+              join("\n   ", < @missing), "\n");
     }
     else {
         print("$module has no missing files\n");
@@ -164,7 +164,7 @@ while (1)
       {
       $reply eq 'l' and do
          {
-         print("Installed modules are:\n   ", join("\n   ", @Modules), "\n");
+         print("Installed modules are:\n   ", join("\n   ", < @Modules), "\n");
          last CASE;
          };
       $reply =~ m/^m\s+/ and do
@@ -186,7 +186,7 @@ while (1)
 ###############################################################################
 
 $Inst = ExtUtils::Installed->new();
-@Modules = $Inst->modules();
+@Modules = @( < $Inst->modules() );
 toplevel();
 
 ###############################################################################

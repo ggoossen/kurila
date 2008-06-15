@@ -31,7 +31,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 use utf8;
 
-@ISA = qw(Pod::Text);
+@ISA = @( qw(Pod::Text) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -44,7 +44,7 @@ $VERSION = 2.00;
 
 # Make level one headings bold, overridding any existing formatting.
 sub cmd_head1 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
     $text = $self->strip_format ($text);
     $text =~ s/(.)/$1\b$1/g;
@@ -53,7 +53,7 @@ sub cmd_head1 {
 
 # Make level two headings bold, overriding any existing formatting.
 sub cmd_head2 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
     $text = $self->strip_format ($text);
     $text =~ s/(.)/$1\b$1/g;
@@ -62,7 +62,7 @@ sub cmd_head2 {
 
 # Make level three headings underscored, overriding any existing formatting.
 sub cmd_head3 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
     $text = $self->strip_format ($text);
     $text =~ s/(.)/_\b$1/g;
@@ -71,7 +71,7 @@ sub cmd_head3 {
 
 # Level four headings look like level three headings.
 sub cmd_head4 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
     $text = $self->strip_format ($text);
     $text =~ s/(.)/_\b$1/g;
@@ -81,7 +81,7 @@ sub cmd_head4 {
 # The common code for handling all headers.  We have to override to avoid
 # interpolating twice and because we don't want to honor alt.
 sub heading {
-    my ($self, $text, $indent, $marker) = @_;
+    my ($self, $text, $indent, $marker) = < @_;
     $self->item ("\n\n") if defined %$self{ITEM};
     $text .= "\n" if %$self{opt_loose};
     my $margin = ' ' x (%$self{opt_margin} + $indent);
@@ -96,7 +96,7 @@ sub cmd_i { local $_ = @_[0]->strip_format (@_[2]); s/(.)/_\b$1/g; $_ }
 
 # Output any included code in bold.
 sub output_code {
-    my ($self, $code) = @_;
+    my ($self, $code) = < @_;
     $code =~ s/(.)/$1\b$1/g;
     $self->output ($code);
 }
@@ -133,7 +133,7 @@ sub wrap {
 # Strip all of the formatting from a provided string, returning the stripped
 # version.
 sub strip_format {
-    my ($self, $text) = @_;
+    my ($self, $text) = < @_;
     $text =~ s/(.)[\b]\1/$1/g;
     $text =~ s/_[\b]//g;
     return $text;

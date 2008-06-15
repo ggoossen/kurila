@@ -21,8 +21,8 @@ unlink "junk";
 $ntest = 1;
 
 sub myfail {
-    my ($f) = @_;
-    ok(@$f, 1);
+    my ($f) = < @_;
+    ok((nelems @$f), 1);
 
     my $t = @$f[0];
     ok(%$t{diagnostic}, $why);

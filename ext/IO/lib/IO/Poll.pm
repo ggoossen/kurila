@@ -12,24 +12,24 @@ use IO::Handle;
 use Exporter ();
 our(@ISA, @EXPORT_OK, @EXPORT, $VERSION);
 
-@ISA = qw(Exporter);
+@ISA = @( qw(Exporter) );
 $VERSION = "0.07";
 
-@EXPORT = qw( POLLIN
+@EXPORT = @( qw( POLLIN
 	      POLLOUT
 	      POLLERR
 	      POLLHUP
 	      POLLNVAL
-	    );
+	    ) );
 
-@EXPORT_OK = qw(
+@EXPORT_OK = @( qw(
  POLLPRI   
  POLLRDNORM
  POLLWRNORM
  POLLRDBAND
  POLLWRBAND
  POLLNORM  
-	       );
+	       ) );
 
 # [0] maps fd's to requested masks
 # [1] maps fd's to returned  masks
@@ -48,7 +48,7 @@ sub mask {
     my $fd = fileno($io);
     return unless defined $fd;
     $io = dump::view($io);
-    if (@_) {
+    if ((nelems @_)) {
 	my $mask = shift;
 	if($mask) {
 	  $self->[0]->{$fd}->{$io} = $mask; # the error events are always returned
@@ -71,12 +71,12 @@ sub mask {
 
 
 sub poll {
-    my($self,$timeout) = @_;
+    my($self,$timeout) = < @_;
 
     $self->[1] = \%();
 
     my($fd,$mask,$iom);
-    my @poll = ();
+    my @poll = @( () );
 
     while(($fd,$iom) = each %{$self->[0]}) {
 	$mask   = 0;
@@ -84,12 +84,12 @@ sub poll {
 	push(@poll,$fd => $mask);
     }
 
-    my $ret = @poll ? _poll(defined($timeout) ? $timeout * 1000 : -1,@poll) : 0;
+    my $ret = (nelems @poll) ? _poll(defined($timeout) ? $timeout * 1000 : -1,< @poll) : 0;
 
     return $ret
 	unless $ret +> 0;
 
-    while(@poll) {
+    while((nelems @poll)) {
 	my($fd,$got) = splice(@poll,0,2);
 	$self->[1]->{$fd} = $got if $got;
     }
@@ -115,11 +115,11 @@ sub remove {
 
 sub handles {
     my $self = shift;
-    return values %{$self->[2]} unless @_;
+    return values %{$self->[2]} unless (nelems @_);
 
     my $events = shift || 0;
     my($fd,$ev,$io,$mask);
-    my @handles = ();
+    my @handles = @( () );
 
     while(($fd,$ev) = each %{$self->[1]}) {
 	while (($io,$mask) = each %{$self->[0]->{$fd}}) {

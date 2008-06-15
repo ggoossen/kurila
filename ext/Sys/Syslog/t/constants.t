@@ -7,9 +7,9 @@ use Test::More;
 my $macrosall = %ENV{PERL_CORE} ? File::Spec->catfile(qw(.. ext Sys Syslog macros.all))
                                 : 'macros.all';
 open(MACROS, "<", $macrosall) or plan skip_all => "can't read '$macrosall': $!";
-my @names = map {chomp;$_} ~< *MACROS;
+my @names = @( map {chomp;$_} ~< *MACROS );
 close(MACROS);
-plan tests => @names * 2 + 2;
+plan tests => (nelems @names) * 2 + 2;
 
 my $callpack = my $testpack = 'Sys::Syslog';
 eval "use $callpack";
@@ -21,8 +21,8 @@ eval "{$callpack}::NOSUCHNAME()";
 like( $@->{description}, "/^Undefined subroutine/", "trying a non-existing macro");
 
 # Testing all macros
-if(@names) {
-    for my $name (@names) {
+if((nelems @names)) {
+    for my $name (< @names) {
         SKIP: {
             $name =~ m/^(\w+)$/ or skip "invalid name '$name'", 2;
             $name = $1;

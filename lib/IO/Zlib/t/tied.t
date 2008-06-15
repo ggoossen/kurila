@@ -1,6 +1,6 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-	@INC = '../lib';
+	@INC = @( '../lib' );
 	chdir 't';
     }
 }
@@ -9,7 +9,7 @@ use IO::Zlib;
 
 sub ok
 {
-    my ($no, $ok) = @_ ;
+    my ($no, $ok) = < @_ ;
 
     #++ $total ;
     #++ $totalBad unless $ok ;

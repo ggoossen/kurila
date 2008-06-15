@@ -5,19 +5,19 @@ use strict;
 use warnings;
 
 our $VERSION     = "0.09";
-our @ISA         = qw(Exporter);
-my @XS_FUNCTIONS = qw(regmust);
-my %XS_FUNCTIONS = map { $_ => 1 } @XS_FUNCTIONS;
-our @EXPORT_OK   = (@XS_FUNCTIONS,
+our @ISA         = @( qw(Exporter) );
+my @XS_FUNCTIONS = @( qw(regmust) );
+my %XS_FUNCTIONS = %( map { $_ => 1 } < @XS_FUNCTIONS );
+our @EXPORT_OK   = @(< @XS_FUNCTIONS,
                     qw(is_regexp regexp_pattern
                        regname regnames regnames_count));
-our %EXPORT_OK = map { $_ => 1 } @EXPORT_OK;
+our %EXPORT_OK = %( map { $_ => 1 } < @EXPORT_OK );
 
 # *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 #
 # If you modify these values see comment below!
 
-my %bitmask = (
+my %bitmask = %(
     taint   => 0x00100000, # HINT_RE_TAINT
     eval    => 0x00200000, # HINT_RE_EVAL
 );
@@ -38,8 +38,8 @@ sub setcolor {
 
   my $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
   my $props = %ENV{PERL_RE_TC} || 'md,me,so,se,us,ue';
-  my @props = split m/,/, $props;
-  my $colors = join "\t", map {$terminal->Tputs($_,1)} @props;
+  my @props = @( split m/,/, $props );
+  my $colors = join "\t", map { <$terminal->Tputs($_,1)} < @props;
 
   $colors =~ s/\0//g;
   %ENV{PERL_RE_COLORS} = $colors;
@@ -50,7 +50,7 @@ sub setcolor {
 
 }
 
-our %flags = (
+our %flags = %(
     COMPILE         => 0x0000FF,
     PARSE           => 0x000001,
     OPTIMISE        => 0x000002,
@@ -91,7 +91,7 @@ sub _do_install {
 }
 
 sub _load_unload {
-    my ($on)= @_;
+    my ($on)= < @_;
     if ($on) {
         _do_install();        
         if ( ! $installed ) {
@@ -115,15 +115,15 @@ sub _load_unload {
 sub bits {
     my $on = shift;
     my $bits = 0;
-    unless (@_) {
+    unless (nelems @_) {
 	warn("Useless use of \"re\" pragma"); 
     }
-    foreach my $idx (0..(@_-1)){
+    foreach my $idx (0..((nelems @_)-1)){
         my $s=@_[$idx];
         if ($s eq 'Debug' or $s eq 'Debugcolor') {
             setcolor() if $s =~m/color/i;
             $^RE_DEBUG_FLAGS = 0 unless defined $^RE_DEBUG_FLAGS;
-            for my $idx ($idx+1..(@_-1)) {
+            for my $idx ($idx+1..((nelems @_)-1)) {
                 if (%flags{@_[$idx]}) {
                     if ($on) {
                         $^RE_DEBUG_FLAGS ^|^= %flags{@_[$idx]};
@@ -164,12 +164,12 @@ sub bits {
 
 sub import {
     shift;
-    $^H ^|^= bits(1, @_);
+    $^H ^|^= bits(1, < @_);
 }
 
 sub unimport {
     shift;
-    $^H ^&^= ^~^ bits(0, @_);
+    $^H ^&^= ^~^ bits(0, < @_);
 }
 
 1;

@@ -23,7 +23,7 @@ foreach my $class (
     DEBUG and print "Couldn't load $class: $@\n";
   } else {
     DEBUG and print "OK, loaded $class.\n";
-    @ISA = ($class);
+    @ISA = @($class);
     last;
   }
 }

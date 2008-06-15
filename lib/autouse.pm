@@ -9,8 +9,8 @@ $autouse::DEBUG ||= 0;
 sub vet_import ($);
 
 sub import {
-    my $class = @_ ? shift : 'autouse';
-    die "usage: use $class MODULE [,SUBS...]" unless @_;
+    my $class = (nelems @_) ? shift : 'autouse';
+    die "usage: use $class MODULE [,SUBS...]" unless (nelems @_);
     my $module = shift;
 
     (my $pm = $module) =~ s{::}{/}g;
@@ -19,7 +19,7 @@ sub import {
 	vet_import $module;
 	local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
 	# $Exporter::Verbose = 1;
-	return $module->import(map { (my $f = $_) =~ s/\(.*?\)$//; $f } @_);
+	return $module->import(map { (my $f = $_) =~ s/\(.*?\)$//; $f } < @_);
     }
 
     # It is not loaded: need to do real work.
@@ -27,7 +27,7 @@ sub import {
     print "autouse called from $callpkg\n" if $autouse::DEBUG;
 
     my $index;
-    for my $f (@_) {
+    for my $f (< @_) {
 	my $proto;
 	$proto = $1 if (my $func = $f) =~ s/\((.*)\)$//;
 

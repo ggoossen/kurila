@@ -18,7 +18,7 @@ our ($Error);
 
 our ($VERSION, @EXPORT_OK);
 $VERSION = '0.000_02';
-@EXPORT_OK = qw( globmap );
+@EXPORT_OK = @( qw( globmap ) );
 
 
 our ($noPreBS, $metachars, $matchMetaRE, %mapping, %wildCount);
@@ -26,7 +26,7 @@ $noPreBS = '(?<!\\)' ; # no preceeding backslash
 $metachars = '.*?[](){}';
 $matchMetaRE = '[' . quotemeta($metachars) . ']';
 
-%mapping = (
+%mapping = %(
                 '*' => '([^/]*)',
                 '?' => '([^/])',
                 '.' => '\.',
@@ -35,14 +35,14 @@ $matchMetaRE = '[' . quotemeta($metachars) . ']';
                 ')' => ')',
            );
 
-%wildCount = map { $_ => 1 } qw/ * ? . { ( [ /;           
+%wildCount = %( map { $_ => 1 } qw/ * ? . { ( [ / );           
 
 sub globmap ($$;)
 {
     my $inputGlob = shift ;
     my $outputGlob = shift ;
 
-    my $obj = File::GlobMapper->new($inputGlob, $outputGlob, @_)
+    my $obj = File::GlobMapper->new($inputGlob, $outputGlob, < @_)
         or croak "globmap: $Error" ;
     return $obj->getFileMap();
 }
@@ -63,7 +63,7 @@ sub new
     $outputGlob =~ s/\s*\>\s*$//;
 
     my %object =
-            (   InputGlob   => $inputGlob,
+            %(   InputGlob   => $inputGlob,
                 OutputGlob  => $outputGlob,
                 GlobFlags   => $flags,
                 Braces      => 0,
@@ -80,7 +80,7 @@ sub new
     $self->_parseOutputGlob()
         or return undef ;
     
-    my @inputFiles = globber($self->{InputGlob}, $flags) ;
+    my @inputFiles = @( < globber($self->{InputGlob}, $flags) ) ;
 
     if (GLOB_ERROR)
     {
@@ -90,7 +90,7 @@ sub new
 
     #if (whatever)
     {
-        my $missing = grep { ! -e $_ } @inputFiles ;
+        my $missing = grep { ! -e $_ } < @inputFiles ;
 
         if ($missing)
         {
@@ -318,10 +318,10 @@ sub _getFiles
 {
     my $self = shift ;
 
-    my %outInMapping = ();
-    my %inFiles = () ;
+    my %outInMapping = %( () );
+    my %inFiles = %( () ) ;
 
-    foreach my $inFile (@{ $self->{InputFiles} })
+    foreach my $inFile (< @{ $self->{InputFiles} })
     {
         next if %inFiles{$inFile} ++ ;
 
@@ -356,7 +356,7 @@ sub getHash
 {
     my $self = shift ;
 
-    return \%( map { $_->[0] => $_->[1] } @{ $self->{Pairs} } ) ;
+    return \%( map { $_->[0] => $_->[1] } < @{ $self->{Pairs} } ) ;
 }
 
 1;

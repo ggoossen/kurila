@@ -34,11 +34,11 @@ sub foobar {  first { !defined(wantarray) || wantarray } "not ","not ","not " }
 is($v, undef, 'wantarray');
 
 # Can we leave the sub with 'return'?
-$v = first {return ($_+>6)} 2,4,6,12;
+$v = first {return  @($_+>6)} 2,4,6,12;
 is($v, 12, 'return');
 
 # ... even in a loop?
-$v = first {while(1) {return ($_+>6)} } 2,4,6,12;
+$v = first {while(1) {return  @($_+>6)} } 2,4,6,12;
 is($v, 12, 'return from loop');
 
 # Does it work from another package?
@@ -92,11 +92,11 @@ if (!$::PERL_ONLY) { SKIP: {
       if !$List::Util::REAL_MULTICALL;
 
     # Can we goto a label from the 'first' sub?
-    try {()=first{goto foo} 1,2; foo: 1};
+    try {()= <first{goto foo} 1,2; foo: 1};
     like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
-    try {()=first{goto sub{}} 1,2;};
+    try {()= <first{goto sub{}} 1,2;};
     like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 } }

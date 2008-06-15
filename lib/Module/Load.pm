@@ -30,7 +30,7 @@ sub load (*;@)  {
             die $err if $err;
         }
     }
-    __PACKAGE__->_export_to_level(1, $mod, @_) if @_;
+    __PACKAGE__->_export_to_level(1, $mod, < @_) if (nelems @_);
 }
 
 ### 5.004's Exporter doesn't have export_to_level.
@@ -41,19 +41,19 @@ sub _export_to_level {
     my $mod     = shift;
     my $callpkg = caller($level);
 
-    $mod->export($callpkg, @_);
+    $mod->export($callpkg, < @_);
 }
 
 sub _to_file{
     local $_    = shift;
     my $pm      = shift || '';
 
-    my @parts = split m/::/;
+    my @parts = @( split m/::/ );
 
     ### because of [perl #19213], see caveats ###
     my $file = $^O eq 'MSWin32'
-                    ? join "/", @parts
-                    : File::Spec->catfile( @parts );
+                    ? join "/", < @parts
+                    : File::Spec->catfile( < @parts );
 
     $file   .= '.pm' if $pm;
     

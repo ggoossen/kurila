@@ -8,41 +8,41 @@ package Implement;
 sub TIEARRAY
 {
  %seen{'TIEARRAY'}++;
- my ($class,@val) = @_;
+ my ($class,< @val) = < @_;
  return bless \@val,$class;
 }
 
 sub STORESIZE
 {        
  %seen{'STORESIZE'}++;
- my ($ob,$sz) = @_; 
- return (@$ob = $sz)-1;
+ my ($ob,$sz) = < @_; 
+ return (@$ob = @( $sz ))-1;
 }
 
 sub EXTEND
 {        
  %seen{'EXTEND'}++;
- my ($ob,$sz) = @_; 
- return @$ob = $sz;
+ my ($ob,$sz) = < @_; 
+ return @$ob = @( $sz );
 }
 
 sub FETCHSIZE
 {        
  %seen{'FETCHSIZE'}++;
- return scalar(@{@_[0]});
+ return scalar(nelems @{@_[0]});
 }
 
 sub FETCH
 {
  %seen{'FETCH'}++;
- my ($ob,$id) = @_;
+ my ($ob,$id) = < @_;
  return $ob->[$id]; 
 }
 
 sub STORE
 {
  %seen{'STORE'}++;
- my ($ob,$id,$val) = @_;
+ my ($ob,$id,$val) = < @_;
  $ob->[$id] = $val; 
 }                 
 
@@ -50,20 +50,20 @@ sub UNSHIFT
 {
  %seen{'UNSHIFT'}++;
  my $ob = shift;
- unshift(@$ob,@_);
+ unshift(@$ob,< @_);
 }                 
 
 sub PUSH
 {
  %seen{'PUSH'}++;
  my $ob = shift;;
- push(@$ob,@_);
+ push(@$ob,< @_);
 }                 
 
 sub CLEAR
 {
  %seen{'CLEAR'}++;
- @{@_[0]} = ();
+ @{@_[0]} = @( () );
 }
 
 sub DESTROY
@@ -74,14 +74,14 @@ sub DESTROY
 sub POP
 {
  %seen{'POP'}++;
- my ($ob) = @_;
+ my ($ob) = < @_;
  return pop(@$ob);
 }
 
 sub SHIFT
 {
  %seen{'SHIFT'}++;
- my ($ob) = @_;
+ my ($ob) = < @_;
  return shift(@$ob);
 }
 
@@ -89,41 +89,41 @@ sub SPLICE
 {
  %seen{'SPLICE'}++;
  my $ob  = shift;                    
- my $off = @_ ? shift : 0;
- my $len = @_ ? shift : @$ob-1;
- return splice(@$ob,$off,$len,@_);
+ my $off = (nelems @_) ? shift : 0;
+ my $len = (nelems @_) ? shift : (nelems @$ob)-1;
+ return splice(@$ob,$off,$len,< @_);
 }
 
 package NegIndex;               # 20020220 MJD
-our @ISA = 'Implement';
+our @ISA = @( 'Implement' );
 
 # simulate indices -2 .. 2
 my $offset = 2;
 $NegIndex::NEGATIVE_INDICES = 1;
 
 sub FETCH {
-  my ($ob,$id) = @_;
+  my ($ob,$id) = < @_;
 #  print "# FETCH @_\n";
   $id += $offset;
   $ob->[$id];
 }
 
 sub STORE {
-  my ($ob,$id,$value) = @_;
+  my ($ob,$id,$value) = < @_;
 #  print "# STORE @_\n";
   $id += $offset;
   $ob->[$id] = $value;
 }
 
 sub DELETE {
-  my ($ob,$id) = @_;
+  my ($ob,$id) = < @_;
 #  print "# DELETE @_\n";
   $id += $offset;
   delete $ob->[$id];
 }
 
 sub EXISTS {
-  my ($ob,$id) = @_;
+  my ($ob,$id) = < @_;
 #  print "# EXISTS @_\n";
   $id += $offset;
   exists $ob->[$id];
@@ -155,32 +155,32 @@ my $test = 1;
 }
 
 
-print "not " unless @ary == 3;
+print "not " unless (nelems @ary) == 3;
 print "ok ", $test++,"\n";
 
-print "not " unless (@ary-1) == 2;
+print "not " unless ((nelems @ary)-1) == 2;
 print "ok ", $test++,"\n";
 
-print "not " unless join(':',@ary) eq '3:2:1';
+print "not " unless join(':',< @ary) eq '3:2:1';
 print "ok ", $test++,"\n";         
 
 print "not " unless %seen{'FETCH'} +>= 3;
 print "ok ", $test++,"\n";
 
-@ary = (1,2,3);
+@ary = @(1,2,3);
 
 print "not " unless %seen{'STORE'} +>= 3;
 print "ok ", $test++,"\n";
-print "not " unless join(':',@ary) eq '1:2:3';
+print "not " unless join(':',< @ary) eq '1:2:3';
 print "ok ", $test++,"\n";         
 
-{my @thing = @ary;
-print "not " unless join(':',@thing) eq '1:2:3';
+{my @thing = @( < @ary );
+print "not " unless join(':',< @thing) eq '1:2:3';
 print "ok ", $test++,"\n";         
 
 tie @thing,'Implement';
-@thing = @ary;
-print "not " unless join(':',@thing) eq '1:2:3';
+@thing = @( < @ary );
+print "not " unless join(':',< @thing) eq '1:2:3';
 print "ok ", $test++,"\n";
 } 
 
@@ -188,33 +188,33 @@ print "not " unless pop(@ary) == 3;
 print "ok ", $test++,"\n";
 print "not " unless %seen{'POP'} == 1;
 print "ok ", $test++,"\n";
-print "not " unless join(':',@ary) eq '1:2';
+print "not " unless join(':',< @ary) eq '1:2';
 print "ok ", $test++,"\n";
 
 push(@ary,4);
 print "not " unless %seen{'PUSH'} == 1;
 print "ok ", $test++,"\n";
-print "not " unless join(':',@ary) eq '1:2:4';
+print "not " unless join(':',< @ary) eq '1:2:4';
 print "ok ", $test++,"\n";
 
-my @x = splice(@ary,1,1,7);
+my @x = @( splice(@ary,1,1,7) );
 
 
 print "not " unless %seen{'SPLICE'} == 1;
 print "ok ", $test++,"\n";
 
-print "not " unless @x == 1;
+print "not " unless (nelems @x) == 1;
 print "ok ", $test++,"\n";
 print "not " unless @x[0] == 2;
 print "ok ", $test++,"\n";
-print "not " unless join(':',@ary) eq '1:7:4';
+print "not " unless join(':',< @ary) eq '1:7:4';
 print "ok ", $test++,"\n";             
 
 print "not " unless shift(@ary) == 1;
 print "ok ", $test++,"\n";
 print "not " unless %seen{'SHIFT'} == 1;
 print "ok ", $test++,"\n";
-print "not " unless join(':',@ary) eq '7:4';
+print "not " unless join(':',< @ary) eq '7:4';
 print "ok ", $test++,"\n";             
 
 my $n = unshift(@ary,5,6);
@@ -222,23 +222,23 @@ print "not " unless %seen{'UNSHIFT'} == 1;
 print "ok ", $test++,"\n";
 print "not " unless $n == 4;
 print "ok ", $test++,"\n";
-print "not " unless join(':',@ary) eq '5:6:7:4';
+print "not " unless join(':',< @ary) eq '5:6:7:4';
 print "ok ", $test++,"\n";
 
-@ary = split(m/:/,'1:2:3');
-print "not " unless join(':',@ary) eq '1:2:3';
+@ary = @( split(m/:/,'1:2:3') );
+print "not " unless join(':',< @ary) eq '1:2:3';
 print "ok ", $test++,"\n";         
 
   
 my $t = 0;
-foreach $n (@ary)
+foreach $n (< @ary)
  {
   print "not " unless $n == ++$t;
   print "ok ", $test++,"\n";         
  }
 
 # (30-33) 20020303 mjd-perl-patch+@plover.com
-@ary = ();
+@ary = @( () );
 %seen{POP} = 0;
 pop @ary;                       # this didn't used to call POP at all
 print "not " unless %seen{POP} == 1;
@@ -256,11 +256,11 @@ unshift @ary;                   # this didn't used to call UNSHIFT at all
 print "not " unless %seen{UNSHIFT} == 1;
 print "ok ", $test++,"\n";         
 
-@ary = qw(3 2 1);
-print "not " unless join(':',@ary) eq '3:2:1';
+@ary = @( qw(3 2 1) );
+print "not " unless join(':',< @ary) eq '3:2:1';
 print "ok ", $test++,"\n";         
 
-untie @ary;   
+untie < @ary;   
 
 }
 
@@ -331,7 +331,7 @@ untie @ary;
 
 {
     tie my @dummy, "NegFetchsize";
-    try { "@dummy"; };
+    try { "{join ' ', <@dummy}"; };
     print "# $@->{description}\n" if $@;
     print "not " unless $@->{description} =~ m/^FETCHSIZE returned a negative value/;
     print "ok ", $test++, " - croak on negative FETCHSIZE\n";

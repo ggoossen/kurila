@@ -4,7 +4,7 @@ use strict;
 our $VERSION = 6.44;
 
 require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+our @ISA = @( qw(ExtUtils::MM_Unix) );
 
 
 =head1 NAME
@@ -34,7 +34,7 @@ In addition to being Unix, we're U/WIN.
 =cut
 
 sub os_flavor {
-    return('Unix', 'U/WIN');
+    return @('Unix', 'U/WIN');
 }
 
 
@@ -43,7 +43,7 @@ sub os_flavor {
 =cut
 
 sub replace_manpage_separator {
-    my($self, $man) = @_;
+    my($self, $man) = < @_;
 
     $man =~ s,/+,.,g;
     return $man;

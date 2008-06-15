@@ -6,7 +6,7 @@ require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = qw(File::Spec::Unix);
+@ISA = @( qw(File::Spec::Unix) );
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ and then File::Spec::Unix canonpath() is called on the result.
 =cut
 
 sub canonpath {
-    my($self,$path) = @_;
+    my($self,$path) = < @_;
     return unless defined $path;
 
     $path =~ s|\\|/|g;
@@ -53,15 +53,15 @@ sub canonpath {
 
 sub catdir {
     my $self = shift;
-    return unless @_;
+    return unless (nelems @_);
 
     # Don't create something that looks like a //network/path
     if (@_[0] and (@_[0] eq '/' or @_[0] eq '\')) {
         shift;
-        return $self->SUPER::catdir('', @_);
+        return $self->SUPER::catdir('', < @_);
     }
 
-    $self->SUPER::catdir(@_);
+    $self->SUPER::catdir(< @_);
 }
 
 =pod
@@ -75,7 +75,7 @@ and if not, File::Spec::Unix file_name_is_absolute() is called.
 
 
 sub file_name_is_absolute {
-    my ($self,$file) = @_;
+    my ($self,$file) = < @_;
     return 1 if $file =~ m{^([a-z]:)?[\\/]}is; # C:/test
     return $self->SUPER::file_name_is_absolute($file);
 }
@@ -117,7 +117,7 @@ sub case_tolerant () {
 
   my $drive = shift;
   if (! $drive) {
-      my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
+      my @flags = @( split(m/,/, Cygwin::mount_flags('/cygwin')) );
       my $prefix = pop(@flags);
       if (! $prefix || $prefix eq 'cygdrive') {
           $drive = '/cygdrive/c';

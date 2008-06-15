@@ -6,12 +6,12 @@
 require Tie::Array;
 
 package Tie::BasicArray;
-our @ISA = 'Tie::Array';
+our @ISA = @( 'Tie::Array' );
 sub TIEARRAY  { bless \@(), @_[0] }
 sub STORE     { @_[0]->[@_[1]] = @_[2] }
 sub FETCH     { @_[0]->[@_[1]] }
-sub FETCHSIZE { scalar(@{@_[0]})} 
-sub STORESIZE { (@{@_[0]} = @_[1]+2)-1 }
+sub FETCHSIZE { scalar(nelems @{@_[0]})} 
+sub STORESIZE { (@{@_[0]} = @( @_[1]+2 ))-1 }
 
 package main;
 
@@ -58,12 +58,12 @@ try {
 not_hash($@);
 
 try {
-    @keys = keys %$a;
+    @keys = @( keys %$a );
 };
 not_hash($@);
 
 try {
-    @values = values %$a;
+    @values = @( values %$a );
 };
 not_hash($@);
 
@@ -108,7 +108,7 @@ not_hash($@);
 # quick check with tied array & tied hash
 require Tie::Hash;
 tie %fake, 'Tie::StdHash';
-%fake = %$sch;
+%fake = %( < %$sch );
 $a->[0] = \%fake;
 
 try {
@@ -133,13 +133,13 @@ not_hash($@);
 my $avhv = \@(\%());
 
 try {
-    () = %$avhv;
+    () = < %$avhv;
 };
 not_hash($@);
 
 push @$avhv, "a";
 try {
-    () = %$avhv;
+    () = < %$avhv;
 };
 not_hash($@);
 
@@ -220,7 +220,7 @@ try {
 };
 not_hash($@);
 try {
-    @x = delete %{$avhv}{['foo','pants']};
+    @x = @( delete %{$avhv}{['foo','pants']} );
 };
 not_hash($@);
 try {
@@ -230,45 +230,45 @@ not_hash($@);
 
 # hash assignment
 try {
-    %$avhv = ();
+    %$avhv = %( () );
 };
 not_hash($@);
 
 try {
-    %hv = %$avhv;
+    %hv = %( < %$avhv );
 };
 not_hash($@);
 
 try {
-    %$avhv = (foo => 29, pants => 2, bar => 0);
+    %$avhv = %(foo => 29, pants => 2, bar => 0);
 };
 not_hash($@);
 
 my $extra;
 my @extra;
 try {
-    ($extra, %$avhv) = ("moo", foo => 42, pants => 53, bar => "HIKE!");
+    ($extra, < %$avhv) = ("moo", foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
 try {
-    %$avhv = ();
-    (%$avhv, $extra) = (foo => 42, pants => 53, bar => "HIKE!");
+    %$avhv = %( () );
+    (< %$avhv, $extra) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
 try {
-    @extra = qw(whatever and stuff);
-    %$avhv = ();
+    @extra = @( qw(whatever and stuff) );
+    %$avhv = %( () );
 };
 not_hash($@);
 try {
-    (%$avhv, @extra) = (foo => 42, pants => 53, bar => "HIKE!");
+    (< %$avhv, < @extra) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 
 try {
-    (@extra, %$avhv) = (foo => 42, pants => 53, bar => "HIKE!");
+    (< @extra, < %$avhv) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 

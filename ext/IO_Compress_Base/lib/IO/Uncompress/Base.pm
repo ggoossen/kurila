@@ -7,7 +7,7 @@ use bytes;
 
 our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 #@ISA    = qw(Exporter IO::File);
-@ISA    = qw(Exporter );
+@ISA    = @( qw(Exporter ) );
 
 
 $VERSION = '2.006';
@@ -24,8 +24,8 @@ use Scalar::Util qw(readonly);
 use List::Util qw(min);
 use Carp ;
 
-%EXPORT_TAGS = ( );
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+%EXPORT_TAGS = %( ( ) );
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 
@@ -212,7 +212,7 @@ sub saveErrorString
     #return $retval if ${ *$self->{Error} };
 
     ${ *$self->{Error} } = shift ;
-    *$self->{ErrorNo} = shift() + 0 if @_ ;
+    *$self->{ErrorNo} = shift() + 0 if (nelems @_) ;
 
     #warn "saveErrorString: " . ${ *$self->{Error} } . " " . *$self->{Error} . "\n" ;
     return $retval;
@@ -263,7 +263,7 @@ sub HeaderError
 sub TrailerError
 {
     my ($self) = shift;
-    return $self->saveErrorString(G_ERR, "Trailer Error: @_[0]", STATUS_ERROR);
+    return $self->saveErrorString( <G_ERR, "Trailer Error: @_[0]", STATUS_ERROR);
 }
 
 sub TruncatedHeader
@@ -300,7 +300,7 @@ sub checkParams
                     'Transparent'   => \@(1, 1, Parse_any,      1),
                     'Scan'          => \@(1, 1, Parse_boolean,  0),
                     'InputLength'   => \@(1, 1, Parse_unsigned, undef),
-                    'BinModeOut'    => \@(1, 1, Parse_boolean,  0),
+                    'BinModeOut'    => \@(1, 1, Parse_boolean,  0), <
                     #'Encode'        => [1, 1, Parse_any,       undef],
 
                    #'ConsumeInput'  => [1, 1, Parse_boolean,  0],
@@ -314,7 +314,7 @@ sub checkParams
     $Valid->{TrailingData} = \@(1, 1, Parse_writable_scalar, undef)
         if  *$self->{OneShot} ;
         
-    $got->parse($Valid, @_ ) 
+    $got->parse($Valid, < @_ ) 
         or $self->croakError("{$class}: $got->{Error}")  ;
 
     $self->postCheckParams($got) 
@@ -331,7 +331,7 @@ sub _create
 
     my $class = ref $obj;
     $obj->croakError("$class: Missing Input parameter")
-        if ! @_ && ! $got ;
+        if ! nelems @_ && ! $got ;
 
     my $inValue = shift ;
 
@@ -339,8 +339,8 @@ sub _create
 
     if (! $got)
     {
-        $got = $obj->checkParams($class, undef, @_)
-          or die $obj->croakError("$class: Failed checkParams");
+        $got = $obj->checkParams($class, undef, < @_)
+          or die < $obj->croakError("$class: Failed checkParams");
     }
 
     my $inType  = whatIsInput($inValue, 1);
@@ -484,10 +484,10 @@ sub _inf
     my $name = (caller(1))[[3]] ;
 
     $obj->croakError("$name: expected at least 1 parameters\n")
-        unless @_ +>= 1 ;
+        unless (nelems @_) +>= 1 ;
 
     my $input = shift ;
-    my $haveOut = @_ ;
+    my $haveOut = (nelems @_) ;
     my $output = shift ;
 
 
@@ -498,7 +498,7 @@ sub _inf
 
     *$obj->{OneShot} = 1 ;
     
-    my $got = $obj->checkParams($name, undef, @_)
+    my $got = $obj->checkParams($name, undef, < @_)
         or return undef ;
 
     if ($got->parsed('TrailingData'))
@@ -528,14 +528,14 @@ sub _inf
     if ($x->{GlobMap})
     {
         $x->{oneInput} = 1 ;
-        foreach my $pair (@{ $x->{Pairs} })
+        foreach my $pair (< @{ $x->{Pairs} })
         {
-            my ($from, $to) = @$pair ;
-            $obj->_singleTarget($x, $from, $to, @_)
+            my ($from, $to) = < @$pair ;
+            $obj->_singleTarget($x, $from, $to, < @_)
                 or return undef ;
         }
 
-        return scalar @{ $x->{Pairs} } ;
+        return scalar nelems @{ $x->{Pairs} } ;
     }
 
     if (! $x->{oneOutput} )
@@ -545,12 +545,12 @@ sub _inf
 
         $x->{inType} = $inFile ? 'filename' : 'buffer';
         
-        foreach my $in ($x->{oneInput} ? $input : @$input)
+        foreach my $in ($x->{oneInput} ? $input : < @$input)
         {
             my $out ;
             $x->{oneInput} = 1 ;
 
-            $obj->_singleTarget($x, $in, $output, @_)
+            $obj->_singleTarget($x, $in, $output, < @_)
                 or return undef ;
         }
 
@@ -558,7 +558,7 @@ sub _inf
     }
 
     # finally the 1 to 1 and n to 1
-    return $obj->_singleTarget($x, $input, $output, @_);
+    return $obj->_singleTarget($x, $input, $output, < @_);
 
     croak "should not be here" ;
 }
@@ -618,7 +618,7 @@ sub _singleTarget
     }
     else
     {
-        for my $element ( ($x->{inType} eq 'hash') ? keys %$input : @$input)
+        for my $element ( ($x->{inType} eq 'hash') ? keys %$input : < @$input)
         {
             defined $self->_rd2($x, $element, $output) 
                 or return undef ;
@@ -645,7 +645,7 @@ sub _rd2
         
     my $z = createSelfTiedObject($x->{Class}, *$self->{Error});
     
-    $z->_create($x->{Got}, 1, $input, @_)
+    $z->_create($x->{Got}, 1, $input, < @_)
         or return undef ;
 
     my $status ;
@@ -767,7 +767,7 @@ sub _raw_read
         my $tmp_buff ;
         my $len = $self->smartRead(\$tmp_buff, *$self->{BlockSize}) ;
         
-        return $self->saveErrorString(G_ERR, "Error reading data: $!", $!) 
+        return $self->saveErrorString( <G_ERR, "Error reading data: $!", $!) 
                 if $len +< 0 ;
 
         if ($len == 0 ) {
@@ -805,10 +805,10 @@ sub _raw_read
         my $beforeC_len = length $temp_buf;
         my $before_len = defined $$buffer ? length $$buffer : 0 ;
         $status = *$self->{Uncomp}->uncompr(\$temp_buf, $buffer,
-                                    defined *$self->{CompressedInputLengthDone} ||
+                                    defined *$self->{CompressedInputLengthDone} || <
                                                 $self->smartEof(), $outSize);
 
-        return $self->saveErrorString(G_ERR, *$self->{Uncomp}->{Error}, *$self->{Uncomp}->{ErrorNo})
+        return $self->saveErrorString( <G_ERR, *$self->{Uncomp}->{Error}, *$self->{Uncomp}->{ErrorNo})
             if $self->saveStatus($status) == STATUS_ERROR;
 
         $self->postBlockChk($buffer, $before_len) == STATUS_OK
@@ -961,7 +961,7 @@ sub streamCount
 {
     my $self = shift ;
     return 1 if ! defined *$self->{InfoList};
-    return scalar @{ *$self->{InfoList} }  ;
+    return scalar nelems @{ *$self->{InfoList} }  ;
 }
 
 sub read
@@ -1185,9 +1185,9 @@ sub eof
 {
     my $self = shift ;
 
-    return (*$self->{Closed} ||
-              (!length *$self->{Pending} 
-                && ( $self->smartEof() || *$self->{EndStream}))) ;
+    return  @(*$self->{Closed} ||
+               @(!length *$self->{Pending} 
+                &&  @( $self->smartEof() || *$self->{EndStream}))) ;
 }
 
 sub tell
@@ -1278,7 +1278,7 @@ sub seek
     my $offset = $target - $here ;
 
     my $got;
-    while (($got = $self->read(my $buffer, min($offset, *$self->{BlockSize})) ) +> 0)
+    while (($got = $self->read(my $buffer, < min($offset, *$self->{BlockSize})) ) +> 0)
     {
         $offset -= $got;
         last if $offset == 0 ;
@@ -1314,7 +1314,7 @@ sub autoflush
 {
     my $self     = shift ;
     return defined *$self->{FH} 
-            ? *$self->{FH}->autoflush(@_) 
+            ? *$self->{FH}->autoflush(< @_) 
             : undef ;
 }
 
@@ -1322,7 +1322,7 @@ sub input_line_number
 {
     my $self = shift ;
     my $last = *$self->{LineNo};
-    $. = *$self->{LineNo} = @_[1] if @_ ;
+    $. = *$self->{LineNo} = @_[1] if (nelems @_) ;
     return $last;
 }
 

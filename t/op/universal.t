@@ -18,10 +18,10 @@ package Human;
 sub eat {}
 
 package Female;
-our @ISA=qw(Human);
+our @ISA= @(qw(Human) );
 
 package Alice;
-our @ISA=qw(Bob Female);
+our @ISA= @(qw(Bob Female) );
 sub sing;
 sub drink { return "drinking " . @_[1]  }
 sub new { bless \%() }
@@ -89,15 +89,15 @@ ok (Cedric->isa('Programmer'));
 ok $a->isa('Programmer');
 ok $a->isa("Female");
 
-@Cedric::ISA = qw(Bob);
+@Cedric::ISA = @( qw(Bob) );
 
 ok (!Cedric->isa('Programmer'));
 
 my $b = 'abc';
-my @refs = qw(SCALAR SCALAR     LVALUE      GLOB ARRAY HASH CODE);
-my @vals = (  \$b,   \3.14, \vec($b,1,1), \*b,  \@(),  \%(), sub {} );
-for (my $p=0; $p +< @refs; $p++) {
-    for (my $q=0; $q +< @vals; $q++) {
+my @refs = @( qw(SCALAR SCALAR     LVALUE      GLOB ARRAY HASH CODE) );
+my @vals = @(  \$b,   \3.14, \vec($b,1,1), \*b,  \@(),  \%(), sub {} );
+for (my $p=0; $p +< nelems @refs; $p++) {
+    for (my $q=0; $q +< nelems @vals; $q++) {
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1);
     };
 };
@@ -175,7 +175,7 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
 # bugid 3284
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching
 
-@X::ISA=();
+@X::ISA= @(() );
 my $x = \%(); bless $x, 'X';
 ok $x->isa('UNIVERSAL');
 ok $x->isa('UNIVERSAL');
@@ -196,7 +196,7 @@ sub DOES { 1 }
 
 package Bar;
 
-@Bar::ISA = 'Foo';
+@Bar::ISA = @( 'Foo' );
 
 package Baz;
 

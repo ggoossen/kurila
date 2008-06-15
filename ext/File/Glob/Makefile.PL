@@ -13,7 +13,7 @@ WriteMakefile(
 use Config;
 sub MY::cflags {
   package MY;
-  my $inherited = shift->SUPER::cflags(@_);
+  my $inherited = shift->SUPER::cflags(< @_);
   if (%Config::Config{archname} =~ m/^aix/ and 
       %Config::Config{use64bitall} eq 'define') {
     $inherited =~ s/\s-O\d?//m;

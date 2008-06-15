@@ -22,7 +22,7 @@ require q(./test.pl); plan(tests => 12);
     isa_ok($foo, 'Foo');
 
     can_ok($foo, 'bar');
-    is($foo->bar(), 'Foo::bar', '... got the right return value');    
+    is( <$foo->bar(), 'Foo::bar', '... got the right return value');    
 
     # fail calling it from a subclass
 
@@ -31,7 +31,7 @@ require q(./test.pl); plan(tests => 12);
         use strict;
         use warnings;
         use mro 'c3';
-        our @ISA = ('Foo');
+        our @ISA = @('Foo');
     }  
     
     my $bar = Bar->new();
@@ -62,7 +62,7 @@ require q(./test.pl); plan(tests => 12);
         use strict;
         use warnings;
         use mro 'c3';
-        our @ISA = ('Foo');
+        our @ISA = @('Foo');
     }      
     
     my $baz = Baz->new();

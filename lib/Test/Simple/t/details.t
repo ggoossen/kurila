@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -88,8 +88,8 @@ push @Expected_Details, \%( 'ok'      => 1,
                           reason    => 'incrementing test number',
                         );
 
-my @details = $Test->details();
-$Test->is_num( scalar @details, 6,
+my @details = @( < $Test->details() );
+$Test->is_num( scalar nelems @details, 6,
     'details() should return a list of all test details');
 
 $Test->level(1);
@@ -100,8 +100,8 @@ is_deeply( \@details, \@Expected_Details );
 {
     my $curr_test = $Test->current_test;
     $Test->current_test(4);
-    my @details = $Test->details();
+    my @details = @( < $Test->details() );
 
     $Test->current_test($curr_test);
-    $Test->is_num( scalar @details, 4 );
+    $Test->is_num( scalar nelems @details, 4 );
 }

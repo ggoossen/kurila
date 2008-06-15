@@ -6,8 +6,8 @@ use warnings::register;
 use Scalar::Util qw(reftype);
 
 require Exporter;
-our @ISA        = qw(Exporter);
-our @EXPORT_OK  = qw(
+our @ISA        = @( qw(Exporter) );
+our @EXPORT_OK  = @( qw(
                      fieldhash fieldhashes
 
                      all_keys
@@ -25,10 +25,10 @@ our @EXPORT_OK  = qw(
 
                      hash_seed hv_store
 
-                    );
+                    ) );
 our $VERSION    = 0.07;
 require DynaLoader;
-local @ISA = qw(DynaLoader);
+local @ISA = @( qw(DynaLoader) );
 Hash::Util->bootstrap($VERSION);
 
 sub import {
@@ -129,23 +129,23 @@ Both routines return a reference to the hash operated on.
 =cut
 
 sub lock_ref_keys {
-    my($hash, @keys) = @_;
+    my($hash, < @keys) = < @_;
 
     Internals::hv_clear_placeholders %$hash;
-    if( @keys ) {
-        my %keys = map { ($_ => 1) } @keys;
-        my %original_keys = map { ($_ => 1) } keys %$hash;
+    if( (nelems @keys) ) {
+        my %keys = %( map { ($_ => 1) } < @keys );
+        my %original_keys = %( map { ($_ => 1) } keys %$hash );
         foreach my $k (keys %original_keys) {
             die "Hash has key '$k' which is not in the new key set"
               unless %keys{$k};
         }
 
-        foreach my $k (@keys) {
+        foreach my $k (< @keys) {
             $hash->{$k} = undef unless exists $hash->{$k};
         }
         Internals::SvREADONLY %$hash, 1;
 
-        foreach my $k (@keys) {
+        foreach my $k (< @keys) {
             delete $hash->{$k} unless %original_keys{$k};
         }
     }
@@ -163,8 +163,8 @@ sub unlock_ref_keys {
     return $hash;
 }
 
-sub   lock_keys (\%;@) {   lock_ref_keys(@_) }
-sub unlock_keys (\%)   { unlock_ref_keys(@_) }
+sub   lock_keys (\%;@) {   lock_ref_keys(< @_) }
+sub unlock_keys (\%)   { unlock_ref_keys(< @_) }
 
 =item B<lock_keys_plus>
 
@@ -182,21 +182,21 @@ Returns a reference to %hash
 
 
 sub lock_ref_keys_plus {
-    my ($hash,@keys)=@_;
+    my ($hash,< @keys)=< @_;
     my @delete;
     Internals::hv_clear_placeholders(%$hash);
-    foreach my $key (@keys) {
+    foreach my $key (< @keys) {
         unless (exists($hash->{$key})) {
             $hash->{$key}=undef;
             push @delete,$key;
         }
     }
     Internals::SvREADONLY(%$hash,1);
-    delete %{$hash}{[@delete]};
+    delete %{$hash}{[< @delete]};
     return $hash
 }
 
-sub lock_keys_plus(\%;@) { lock_ref_keys_plus(@_) }
+sub lock_keys_plus(\%;@) { lock_ref_keys_plus(< @_) }
 
 
 =item B<lock_value>
@@ -217,7 +217,7 @@ Returns a reference to the %hash.
 =cut
 
 sub lock_ref_value {
-    my($hash, $key) = @_;
+    my($hash, $key) = < @_;
     # I'm doubtful about this warning, as it seems not to be true.
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
@@ -228,13 +228,13 @@ sub lock_ref_value {
 }
 
 sub unlock_ref_value {
-    my($hash, $key) = @_;
+    my($hash, $key) = < @_;
     Internals::SvREADONLY $hash->{$key}, 0;
     return $hash
 }
 
-sub   lock_value (\%$) {   lock_ref_value(@_) }
-sub unlock_value (\%$) { unlock_ref_value(@_) }
+sub   lock_value (\%$) {   lock_ref_value(< @_) }
+sub unlock_value (\%$) { unlock_ref_value(< @_) }
 
 
 =item B<lock_hash>
@@ -280,8 +280,8 @@ sub unlock_hashref {
     return $hash;
 }
 
-sub   lock_hash (\%) {   lock_hashref(@_) }
-sub unlock_hash (\%) { unlock_hashref(@_) }
+sub   lock_hash (\%) {   lock_hashref(< @_) }
+sub unlock_hash (\%) { unlock_hashref(< @_) }
 
 =item B<lock_hash_recurse>
 
@@ -333,8 +333,8 @@ sub unlock_hashref_recurse {
     return $hash;
 }
 
-sub   lock_hash_recurse (\%) {   lock_hashref_recurse(@_) }
-sub unlock_hash_recurse (\%) { unlock_hashref_recurse(@_) }
+sub   lock_hash_recurse (\%) {   lock_hashref_recurse(< @_) }
+sub unlock_hash_recurse (\%) { unlock_hashref_recurse(< @_) }
 
 
 =item B<hash_unlocked>
@@ -350,7 +350,7 @@ sub hashref_unlocked {
     return Internals::SvREADONLY($hash)
 }
 
-sub hash_unlocked(\%) { hashref_unlocked(@_) }
+sub hash_unlocked(\%) { hashref_unlocked(< @_) }
 
 =for demerphqs_editor
 sub legal_ref_keys{}
@@ -359,8 +359,8 @@ sub all_keys{}
 
 =cut
 
-sub legal_keys(\%) { legal_ref_keys(@_)  }
-sub hidden_keys(\%){ hidden_ref_keys(@_) }
+sub legal_keys(\%) { legal_ref_keys(< @_)  }
+sub hidden_keys(\%){ hidden_ref_keys(< @_) }
 
 =item B<legal_keys>
 

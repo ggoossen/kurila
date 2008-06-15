@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::XS;
 
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 require Exporter;
-our @EXPORT = qw(setup_xs teardown_xs);
+our @EXPORT = @( qw(setup_xs teardown_xs) );
 
 use strict;
 use File::Path;
@@ -11,7 +11,7 @@ use MakeMaker::Test::Utils;
 
 my $Is_VMS = $^O eq 'VMS';
 
-my %Files = (
+my %Files = %(
              'XS-Test/lib/XS/Test.pm'     => <<'END',
 package XS::Test;
 
@@ -72,7 +72,7 @@ sub setup_xs {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = File::Spec->catfile(File::Spec->curdir, split m{\/}, $file);
+        $file = File::Spec->catfile( <File::Spec->curdir, split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;

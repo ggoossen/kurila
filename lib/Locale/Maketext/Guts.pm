@@ -1,6 +1,6 @@
 
 package Locale::Maketext::Guts;
-BEGIN { *zorp = sub { return scalar @_ } unless defined &zorp; }
+BEGIN { *zorp = sub { return scalar nelems @_ } unless defined &zorp; }
  # Just so we're nice and define SOMETHING in "our" package.
 
 package Locale::Maketext;
@@ -22,7 +22,7 @@ sub _compile {
   my $target = ref(@_[0]) || @_[0];
   
   my(@code);
-  my(@c) = (''); # "chunks" -- scratch.
+  my(@c) = @(''); # "chunks" -- scratch.
   my $call_count = 0;
   my $big_pile = '';
   {
@@ -61,7 +61,7 @@ sub _compile {
           } else {
             $in_group = 1;
           }
-          die "How come \@c is empty?? in <@_[1]>" unless @c; # sanity
+          die "How come \@c is empty?? in <@_[1]>" unless (nelems @c); # sanity
           if(length @c[-1]) {
             # Now actually processing the preceding literal
             $big_pile .= @c[-1];
@@ -77,7 +77,7 @@ sub _compile {
               push @code, q{ '} . @c[-1] . "',\n";
               @c[-1] = ''; # reuse this slot
             } else {
-              push @code, ' @c[' . (@c-1) . "],\n";
+              push @code, ' @c[' . ((nelems @c)-1) . "],\n";
               push @c, ''; # new chunk
             }
           }
@@ -101,15 +101,15 @@ sub _compile {
           
            #$c[-1] =~ s/^\s+//s;
            #$c[-1] =~ s/\s+$//s;
-          ($m,@params) = split(",", @c[-1], -1);  # was /\s*,\s*/
+          ($m,< @params) = split(",", @c[-1], -1);  # was /\s*,\s*/
           
           # A bit of a hack -- we've turned "~,"'s into DELs, so turn
           #  'em into real commas here.
           if (ord('A') == 65) { # ASCII, etc
-            foreach($m, @params) { s/\x7F/,/g } 
+            foreach($m, < @params) { s/\x7F/,/g } 
           } else {              # EBCDIC (1047, 0037, POSIX-BC)
             # Thanks to Peter Prymmer for the EBCDIC handling
-            foreach($m, @params) { s/\x07/,/g } 
+            foreach($m, < @params) { s/\x07/,/g } 
           }
           
           # Special-case handling of some method names:
@@ -155,7 +155,7 @@ sub _compile {
           pop @c; # we don't need that chunk anymore
           ++$call_count;
           
-          foreach my $p (@params) {
+          foreach my $p (< @params) {
             if($p eq '_*') {
               # Meaning: all parameters except @_[0]
               @code[-1] .= ' @_[1 .. $#_], ';
@@ -176,7 +176,7 @@ sub _compile {
             } else {
               # Stow it on the chunk-stack, and just refer to that.
               push @c, $p;
-              push @code, ' $c[' . (@c-1) . "], ";
+              push @code, ' $c[' . ((nelems @c)-1) . "], ";
             }
           }
           @code[-1] .= "),\n";
@@ -232,20 +232,20 @@ sub _compile {
     return \$big_pile;
   }
 
-  die "Last chunk isn't null??" if @c and length @c[-1]; # sanity
-  print scalar(@c), " chunks under closure\n" if DEBUG;
-  if(@code == 0) { # not possible?
+  die "Last chunk isn't null??" if (nelems @c) and length @c[-1]; # sanity
+  print scalar(nelems @c), " chunks under closure\n" if DEBUG;
+  if((nelems @code) == 0) { # not possible?
     print "Empty code\n" if DEBUG;
     return \'';
-  } elsif(@code +> 1) { # most cases, presumably!
+  } elsif((nelems @code) +> 1) { # most cases, presumably!
     unshift @code, "join '',\n";
   }
   unshift @code, "use strict; sub \{\n";
   push @code, "\}\n";
 
-  print @code if DEBUG;
-  my $sub = eval(join '', @code);
-  die "{$@->message} while evalling" . join('', @code) if $@; # Should be impossible.
+  print < @code if DEBUG;
+  my $sub = eval(join '', < @code);
+  die "{$@->message} while evalling" . join('', < @code) if $@; # Should be impossible.
   return $sub;
 }
 

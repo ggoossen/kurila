@@ -20,7 +20,7 @@ require VMS::Filespec if $^O eq 'VMS';
 
 
 unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } < @ARGV;
 }
 
 %ENV{SKIP_FOR_CORE} = 1 if %ENV{PERL_CORE} || %ENV{MY_PERL_CORE} ;
@@ -45,15 +45,15 @@ sub MY::postamble
     return ''
         if %ENV{PERL_CORE} ;
 
-    my @files = getPerlFiles('MANIFEST');
+    my @files = @( < getPerlFiles('MANIFEST') );
 
     my $postamble = '
 
 MyTrebleCheck:
-	@echo Checking for $$^W in files: '. "@files" . q|
+	@echo Checking for $$^W in files: '. "{join ' ', <@files}" . q|
 	@perl -ne '						\
 	    exit 1 if /^\s*local\s*\(\s*\$$\^W\s*\)/;		\
-         ' | . " @files || " . '				\
+         ' | . " {join ' ', <@files} || " . '				\
 	(echo found unexpected $$^W ; exit 1)
 	@echo All is ok.
 
@@ -64,11 +64,11 @@ MyTrebleCheck:
 
 sub getPerlFiles
 {
-    my @manifests = @_ ;
+    my @manifests = @( < @_ ) ;
 
-    my @files = ();
+    my @files = @( () );
 
-    for my $manifest (@manifests)
+    for my $manifest (< @manifests)
     {
         my $prefix = './';
 
@@ -109,7 +109,7 @@ sub UpDowngrade
 {
     return if defined %ENV{TipTop};
 
-    my @files = @_ ;
+    my @files = @( < @_ ) ;
 
     # our and use bytes/utf8 is stable from 5.6.0 onward
     # warnings is stable from 5.6.1 onward
@@ -196,7 +196,7 @@ sub UpDowngrade
           { return }
     }
 
-    foreach (@files) {
+    foreach (< @files) {
         #if (-l $_ )
           { doUpDown($our_sub, $warn_sub, $_) }
           #else  
@@ -217,7 +217,7 @@ sub doUpDown
     return if -d @_[0];
 
     local ($^I) = ($^O eq 'VMS') ? "_bak" : ".bak";
-    local (@ARGV) = shift;
+    local (< @ARGV) = shift;
  
     while ( ~< *ARGV)
     {
@@ -249,7 +249,7 @@ sub doUpDownViaCopy
     copy($file, $backup)
         or die "Cannot copy $file to $backup: $!";
 
-    my @keep = ();
+    my @keep = @( () );
 
     {
         open F, "<", "$file"
@@ -278,7 +278,7 @@ sub doUpDownViaCopy
     {
         open F, ">", "$file"
             or die "Cannot open $file: $!\n";
-        print F @keep ;
+        print F < @keep ;
         close F;
     }
 }

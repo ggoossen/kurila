@@ -9,7 +9,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ("Just another Perl hacker," ne (glob("*"))[0]) {
+    if ("Just another Perl hacker," ne (glob( <"*"))[0]) {
         die <<EOMessage;
 Your version of perl ($^V) doesn't seem to allow extensions to override
 the core glob operator.
@@ -21,26 +21,26 @@ use File::Glob ':globally';
 print "ok 1\n";
 
 $_ = $^O eq "MacOS" ? ":op:*.t" : "op/*.t";
-my @r = glob;
+my @r = @( glob < );
 print "not " if $_ ne ($^O eq "MacOS" ? ":op:*.t" : "op/*.t");
 print "ok 2\n";
 
-print "# |@r|\nnot " if @r +< 3;
+print "# |{join ' ', <@r}|\nnot " if (nelems @r) +< 3;
 print "ok 3\n";
 
 # check if <*/*> works
 if ($^O eq "MacOS") {
-    @r = glob(":*:*.t");
+    @r = glob@( <":*:*.t");
 } else {
-    @r = glob("*/*.t");
+    @r = glob@( <"*/*.t");
 }
 # at least t/global.t t/basic.t, t/taint.t
-print "not " if @r +< 3;
+print "not " if (nelems @r) +< 3;
 print "ok 4\n";
-my $r = scalar @r;
+my $r = scalar nelems @r;
 
 # check if scalar context works
-@r = ();
+@r = @( () );
 if ($^O eq "MacOS") {
     while (defined($_ = glob(":*:*.t"))) {
 	#print "# $_\n";
@@ -52,27 +52,27 @@ if ($^O eq "MacOS") {
 	push @r, $_;
     }
 }
-print "not " if @r != $r;
+print "not " if (nelems @r) != $r;
 print "ok 5\n";
 
 # check if list context works
-@r = ();
+@r = @( () );
 if ($^O eq "MacOS") {
-    for (glob(":*:*.t")) {
+    for (glob( <":*:*.t")) {
 	#print "# $_\n";
 	push @r, $_;
     }
 } else {
-    for (glob("*/*.t")) {
+    for (glob( <"*/*.t")) {
 	#print "# $_\n";
 	push @r, $_;
     }
 }
-print "not " if @r != $r;
+print "not " if (nelems @r) != $r;
 print "ok 6\n";
 
 # test if implicit assign to $_ in while() works
-@r = ();
+@r = @( () );
 if ($^O eq "MacOS") {
     while (glob(":*:*.t")) {
 	#print "# $_\n";
@@ -84,31 +84,31 @@ if ($^O eq "MacOS") {
 	push @r, $_;
     }
 }
-print "not " if @r != $r;
+print "not " if (nelems @r) != $r;
 print "ok 7\n";
 
 # test if explicit glob() gets assign magic too
-my @s = ();
+my @s = @( () );
 while (glob($^O eq 'MacOS' ? ':*:*.t' : '*/*.t')) {
     #print "# $_\n";
     push @s, $_;
 }
-print "not " if "@r" ne "@s";
+print "not " if "{join ' ', <@r}" ne "{join ' ', <@s}";
 print "ok 8\n";
 
 # how about in a different package, like?
 package Foo;
 use File::Glob ':globally';
-@s = ();
+@s = @( () );
 while (glob($^O eq 'MacOS' ? ':*:*.t' : '*/*.t')) {
     #print "# $_\n";
     push @s, $_;
 }
-print "not " if "@r" ne "@s";
+print "not " if "{join ' ', <@r}" ne "{join ' ', <@s}";
 print "ok 9\n";
 
 # test if different glob ops maintain independent contexts
-@s = ();
+@s = @( () );
 my $i = 0;
 if ($^O eq "MacOS") {
     while (glob(":*:*.t")) {
@@ -131,5 +131,5 @@ if ($^O eq "MacOS") {
 	#print " >\n";
     }
 }
-print "not " if "@r" ne "@s" or not $i;
+print "not " if "{join ' ', <@r}" ne "{join ' ', <@s}" or not $i;
 print "ok 10\n";

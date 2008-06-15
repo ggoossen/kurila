@@ -62,7 +62,7 @@ if(my $pid = fork()) {
     print "ok 2\n";
 
     $sock->autoflush(1);
-    print $sock->getline();
+    print < $sock->getline();
 
     print $sock "ok 4\n";
 
@@ -88,7 +88,7 @@ if(my $pid = fork()) {
 
     print $sock "ok 3\n";
 
-    print $sock->getline();
+    print < $sock->getline();
 
     $sock->close;
 
@@ -219,7 +219,7 @@ local our @data;
 if( !open( SRC, "<", "$0")) {
     print "not ok 15 - $!\n";
 } else {
-    @data = ~< *SRC;
+    @data = @( ~< *SRC );
     close(SRC);
     print "ok 15\n";
 }
@@ -248,7 +248,7 @@ if( $server_pid) {
     if ($sock) {
 	$sock->print("send\n");
 
-	my @array = ();
+	my @array = @( () );
 	while( ~< $sock) {
 	    push( @array, $_);
 	}
@@ -256,7 +256,7 @@ if( $server_pid) {
 	$sock->print("done\n");
 	$sock->close;
 
-	print "not " if( @array != @data);
+	print "not " if( (nelems @array) != nelems @data);
     } else {
 	print "not ";
     }
@@ -306,7 +306,7 @@ if( $server_pid) {
 
 	$sock->print("send\n");
 
-	my @array = ();
+	my @array = @( () );
 	while( !eof( $sock ) ){
 	    while( ~< $sock) {
 		push( @array, $_);
@@ -317,7 +317,7 @@ if( $server_pid) {
 	$sock->print("done\n");
 	$sock->close;
 
-	print "not " if( @array != @data);
+	print "not " if( (nelems @array) != nelems @data);
     } else {
 	print "not ";
     }
@@ -365,7 +365,7 @@ if( $server_pid) {
 		next;
 	    }
 	    if (m/^send/) {
-		print $sock @data;
+		print $sock < @data;
 		last;
 	    }
 	    print;

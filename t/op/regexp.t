@@ -80,7 +80,7 @@ if (!defined $file) {
 	|| open(TESTS, "<",':op:re_tests') || die "Can't open re_tests";
 }
 
-my @tests = ~< *TESTS;
+my @tests = @( ~< *TESTS );
 
 close TESTS;
 
@@ -98,11 +98,11 @@ $nulnul = "\0" x 2;
 $OP = $qr ? 'qr' : 'm';
 
 $| = 1;
-printf "1..\%d\n# $iters iterations\n", scalar @tests;
+printf "1..\%d\n# $iters iterations\n", scalar nelems @tests;
 
 my $test;
 TEST:
-foreach (@tests) {
+foreach (< @tests) {
     $test++;
     if (!m/\S/ || m/^\s*#/ || m/^__END__$/) {
         print "ok $test # (Blank line or comment)\n";

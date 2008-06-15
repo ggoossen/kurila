@@ -2,7 +2,7 @@ BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
         use File::Spec;
-        @INC = (File::Spec->rel2abs('../lib') );
+        @INC = @( <File::Spec->rel2abs('../lib') );
     }
 }
 use strict;
@@ -18,7 +18,7 @@ print "#  Test the scanning of the whole of \@INC ...\n";
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
 ok $x->inc; # make sure inc=1 is the default
-print $x->_state_as_string;
+print < $x->_state_as_string;
 #$x->verbose(12);
 
 use Pod::Simple;
@@ -26,14 +26,14 @@ use Pod::Simple;
 
 my $found = 0;
 $x->callback(sub {
-  print "#  ", join("  ", map "\{$_\}", @_), "\n";
+  print "#  ", join("  ", map "\{$_\}", < @_), "\n";
   ++$found;
   return;
 });
 
-print "# \@INC == @INC\n";
+print "# \@INC == {join ' ', <@INC}\n";
 
-my $t = time();   my($name2where, $where2name) = $x->survey();
+my $t = time();   my($name2where, $where2name) = < $x->survey();
 $t = time() - $t;
 ok $found;
 
@@ -51,9 +51,9 @@ ok grep( m/strict\.(pod|pm)/, keys %$where2name );
 
 my  $strictpath = $name2where->{'strict'};
 if( $strictpath ) {
-  my @x = ($x->find('strict')||'(nil)', $strictpath);
+  my @x = @($x->find('strict')||'(nil)', $strictpath);
   print "# Comparing \"@x[0]\" to \"@x[1]\"\n";
-  for(@x) { s{[/\\]}{/}g; }
+  for(< @x) { s{[/\\]}{/}g; }
   print "#        => \"@x[0]\" to \"@x[1]\"\n";
   ok @x[0], @x[1], " find('strict') should match survey's name2where\{strict\}";
 } else {
@@ -62,6 +62,6 @@ if( $strictpath ) {
 
 ok 1;
 print "# Byebye from ", __FILE__, "\n";
-print "# @INC\n";
+print "# {join ' ', <@INC}\n";
 __END__
 

@@ -3,14 +3,14 @@ package feature;
 our $VERSION = '1.13';
 
 # (feature name) => (internal name, used in %^H)
-my %feature = (
+my %feature = %(
     switch => 'feature_switch',
     state  => "feature_state",
 );
 
 # NB. the latest bundle must be loaded by the -E switch (see toke.c)
 
-my %feature_bundle = (
+my %feature_bundle = %(
     "5.10" => \@(qw(switch state)),
     "5.11" => \@(qw(switch state)),
 );
@@ -136,10 +136,10 @@ with the same effect.
 
 sub import {
     my $class = shift;
-    if (@_ == 0) {
+    if ((nelems @_) == 0) {
 	die("No features specified");
     }
-    while (@_) {
+    while ((nelems @_)) {
 	my $name = shift(@_);
 	if (substr($name, 0, 1) eq ":") {
 	    my $v = substr($name, 1);
@@ -149,7 +149,7 @@ sub import {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, @{%feature_bundle{$v}};
+	    unshift @_, < @{%feature_bundle{$v}};
 	    next;
 	}
 	if (!exists %feature{$name}) {
@@ -163,12 +163,12 @@ sub unimport {
     my $class = shift;
 
     # A bare C<no feature> should disable *all* features
-    if (!@_) {
+    if (!nelems @_) {
 	delete %^H{[values(%feature) ]};
 	return;
     }
 
-    while (@_) {
+    while ((nelems @_)) {
 	my $name = shift;
 	if (substr($name, 0, 1) eq ":") {
 	    my $v = substr($name, 1);
@@ -178,7 +178,7 @@ sub unimport {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, @{%feature_bundle{$v}};
+	    unshift @_, < @{%feature_bundle{$v}};
 	    next;
 	}
 	if (!exists(%feature{$name})) {

@@ -18,11 +18,11 @@ if ($Is_NetWare) {
 $Needs_Write = $Is_OS2 || $Is_W32 || $Is_Cygwin || $Is_NetWare;
 
 sub safer_unlink {
-  my @names = @_;
+  my @names = @( < @_ );
   my $cnt = 0;
 
   my $name;
-  foreach $name (@names) {
+  foreach $name (< @names) {
     next unless -e $name;
     chmod 0777, $name if $Needs_Write;
     ( CORE::unlink($name) and ++$cnt
@@ -32,7 +32,7 @@ sub safer_unlink {
 }
 
 sub safer_rename_silent {
-  my ($from, $to) = @_;
+  my ($from, $to) = < @_;
 
   # Some dosish systems can't rename over an existing file:
   safer_unlink $to;
@@ -41,7 +41,7 @@ sub safer_rename_silent {
 }
 
 sub rename_if_different {
-  my ($from, $to) = @_;
+  my ($from, $to) = < @_;
 
   if (compare($from, $to) == 0) {
       warn "no changes between '$from' & '$to'\n";

@@ -32,10 +32,10 @@ use vars qw(@ISA @EXPORT $VERSION);
 use Exporter ();
 use Pod::Simple ();
 
-@ISA = qw(Pod::Simple Exporter);
+@ISA = @( qw(Pod::Simple Exporter) );
 
 # We have to export pod2text for backward compatibility.
-@EXPORT = qw(pod2text);
+@EXPORT = @( qw(pod2text) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -50,7 +50,7 @@ $VERSION = 3.08;
 # Pod::Simple and therefore doesn't work as a regular method call, but all it
 # does is call output_code with the line.
 sub handle_code {
-    my ($line, $number, $parser) = @_;
+    my ($line, $number, $parser) = < @_;
     $parser->output_code ($line . "\n");
 }
 
@@ -84,9 +84,9 @@ sub new {
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    my %opts = @_;
-    my @opts = map { ("opt_$_", %opts{$_}) } keys %opts;
-    %$self = (%$self, @opts);
+    my %opts = %( < @_ );
+    my @opts = @( map { ("opt_$_", %opts{$_}) } keys %opts );
+    %$self = %(< %$self, < @opts);
 
     # Initialize various things from our parameters.
     %$self{opt_alt}      = 0  unless defined %$self{opt_alt};
@@ -138,14 +138,14 @@ sub new {
 # Add a block of text to the contents of the current node, formatting it
 # according to the current formatting instructions as we do.
 sub _handle_text {
-    my ($self, $text) = @_;
+    my ($self, $text) = < @_;
     my $tag = %$self{PENDING}->[-1];
     @$tag[1] .= $text;
 }
 
 # Given an element name, get the corresponding method name.
 sub method_for_element {
-    my ($self, $element) = @_;
+    my ($self, $element) = < @_;
     $element =~ s/-/_/;
     $element =~ s/([A-Z])/{lc($1)}/g;
     $element =~ s/[^_a-z0-9]//g;
@@ -157,7 +157,7 @@ sub method_for_element {
 # element method, and create a new tree into which we'll collect blocks of
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start {
-    my ($self, $element, $attrs) = @_;
+    my ($self, $element, $attrs) = < @_;
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, we need to accumulate the contents of the
@@ -174,7 +174,7 @@ sub _handle_element_start {
 # this is where we pass along the text that we've accumulated.  Otherwise, if
 # we have an end_ method for the element, call that.
 sub _handle_element_end {
-    my ($self, $element) = @_;
+    my ($self, $element) = < @_;
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, pull off the pending text and pass it to
@@ -182,9 +182,9 @@ sub _handle_element_end {
     if ($self->can ("cmd_$method")) {
         my $tag = pop @{ %$self{PENDING} };
         my $method = 'cmd_' . $method;
-        my $text = $self->?$method (@$tag);
+        my $text = $self->?$method (< @$tag);
         if (defined $text) {
-            if (@{ %$self{PENDING} } +> 1) {
+            if ((nelems @{ %$self{PENDING} }) +> 1) {
                 %$self{PENDING}->[-1]->[1] .= $text;
             } else {
                 $self->output ($text);
@@ -243,7 +243,7 @@ sub reformat {
 
 # Output text to the output device.
 sub output {
-    my ($self, $text) = @_;
+    my ($self, $text) = < @_;
     $text =~ s/\x{a0}/ /g; # non-breaking space
     $text =~ s/\x{ad}//g; # soft hyphen
     print { %$self{output_fh} } $text;
@@ -283,7 +283,7 @@ sub start_document {
 # enough room for us to output the item tag in the margin of the text or if we
 # have to put it on a separate line.
 sub item {
-    my ($self, $text) = @_;
+    my ($self, $text) = < @_;
     my $tag = %$self{ITEM};
     unless (defined $tag) {
         warn "Item called without tag";
@@ -315,7 +315,7 @@ sub item {
 
         $self->output ($output);
         %$self{MARGIN} = $realindent;
-        $self->output ($self->reformat ($text)) if ($text && $text =~ m/\S/);
+        $self->output ( <$self->reformat ($text)) if ($text && $text =~ m/\S/);
     } else {
         my $space = ' ' x $indent;
         $space =~ s/^$margin /$margin:/ if %$self{opt_alt};
@@ -330,12 +330,12 @@ sub item {
 # Handle a basic block of text.  The only tricky thing here is that if there
 # is a pending item tag, we need to format this as an item paragraph.
 sub cmd_para {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$/\n/;
     if (defined %$self{ITEM}) {
         $self->item ($text . "\n");
     } else {
-        $self->output ($self->reformat ($text . "\n"));
+        $self->output ( <$self->reformat ($text . "\n"));
     }
     return '';
 }
@@ -343,7 +343,7 @@ sub cmd_para {
 # Handle a verbatim paragraph.  Just print it out, but indent it according to
 # our margin.
 sub cmd_verbatim {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $self->item if defined %$self{ITEM};
     return if $text =~ m/^\s*$/;
     $text =~ s/^(\n*)(\s*\S+)/{$1 . (' ' x %$self{MARGIN}) . $2}/gm;
@@ -355,7 +355,7 @@ sub cmd_verbatim {
 # Handle literal text (produced by =for and similar constructs).  Just output
 # it with the minimum of changes.
 sub cmd_data {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/^\n+//;
     $text =~ s/\n{0,2}$/\n/;
     $self->output ($text);
@@ -369,7 +369,7 @@ sub cmd_data {
 # The common code for handling all headers.  Takes the header text, the
 # indentation, and the surrounding marker for the alt formatting method.
 sub heading {
-    my ($self, $text, $indent, $marker) = @_;
+    my ($self, $text, $indent, $marker) = < @_;
     $self->item ("\n\n") if defined %$self{ITEM};
     $text =~ s/\s+$//;
     if (%$self{opt_alt}) {
@@ -386,25 +386,25 @@ sub heading {
 
 # First level heading.
 sub cmd_head1 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $self->heading ($text, 0, '====');
 }
 
 # Second level heading.
 sub cmd_head2 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $self->heading ($text, %$self{opt_indent} / 2, '==  ');
 }
 
 # Third level heading.
 sub cmd_head3 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $self->heading ($text, %$self{opt_indent} * 2 / 3 + 0.5, '=   ');
 }
 
 # Fourth level heading.
 sub cmd_head4 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $self->heading ($text, %$self{opt_indent} * 3 / 4 + 0.5, '-   ');
 }
 
@@ -416,7 +416,7 @@ sub cmd_head4 {
 # first argument, and then the attr hash.  This is called by the handlers for
 # the four different types of lists (bullet, number, text, and block).
 sub over_common_start {
-    my ($self, $attrs) = @_;
+    my ($self, $attrs) = < @_;
     $self->item ("\n\n") if defined %$self{ITEM};
 
     # Find the indentation level.
@@ -434,7 +434,7 @@ sub over_common_start {
 # End an =over block.  Takes no options other than the class pointer.  Output
 # any pending items and then pop one level of indentation.
 sub over_common_end {
-    my ($self) = @_;
+    my ($self) = < @_;
     $self->item ("\n\n") if defined %$self{ITEM};
     %$self{MARGIN} = pop @{ %$self{INDENTS} };
     return '';
@@ -453,7 +453,7 @@ sub end_over_block  { @_[0]->over_common_end }
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.
 sub item_common {
-    my ($self, $type, $attrs, $text) = @_;
+    my ($self, $type, $attrs, $text) = < @_;
     $self->item if defined %$self{ITEM};
 
     # Clean up the text.  We want to end up with two variables, one ($text)
@@ -482,10 +482,10 @@ sub item_common {
 }
 
 # Dispatch the item commands to the appropriate place.
-sub cmd_item_bullet { my $self = shift; $self->item_common ('bullet', @_) }
-sub cmd_item_number { my $self = shift; $self->item_common ('number', @_) }
-sub cmd_item_text   { my $self = shift; $self->item_common ('text',   @_) }
-sub cmd_item_block  { my $self = shift; $self->item_common ('block',  @_) }
+sub cmd_item_bullet { my $self = shift; $self->item_common ('bullet', < @_) }
+sub cmd_item_number { my $self = shift; $self->item_common ('number', < @_) }
+sub cmd_item_text   { my $self = shift; $self->item_common ('text',   < @_) }
+sub cmd_item_block  { my $self = shift; $self->item_common ('block',  < @_) }
 
 ##############################################################################
 # Formatting codes
@@ -501,7 +501,7 @@ sub cmd_x { return '' }
 # benefit from being quoted.  These originally come from Barrie Slaymaker and
 # largely duplicate code in Pod::Man.
 sub cmd_c {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
 
     # A regex that matches the portion of a variable reference that's the
     # array or hash index, separated out just because we want to use it in
@@ -533,7 +533,7 @@ sub cmd_c {
 # Links reduce to the text that we're given, wrapped in angle brackets if it's
 # a URL.
 sub cmd_l {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     return %$attrs{type} eq 'url' ? "<$text>" : $text;
 }
 
@@ -560,14 +560,14 @@ sub pod2text {
     }
 
     # Now that we know what arguments we're using, create the parser.
-    my $parser = Pod::Text->new (@args);
+    my $parser = Pod::Text->new (< @args);
 
     # If two arguments were given, the second argument is going to be a file
     # handle.  That means we want to call parse_from_filehandle(), which means
     # we need to turn the first argument into a file handle.  Magic open will
     # handle the <&STDIN case automagically.
     if (defined @_[1]) {
-        my @fhs = @_;
+        my @fhs = @( < @_ );
         local *IN;
         unless (open (IN, "<", @fhs[0])) {
             die ("Can't open @fhs[0] for reading: $!\n");
@@ -580,7 +580,7 @@ sub pod2text {
         close $fh;
         return $retval;
     } else {
-        return $parser->parse_file (@_);
+        return $parser->parse_file (< @_);
     }
 }
 
@@ -601,7 +601,7 @@ sub parse_from_file {
     }
 
     # Do the work.
-    my $retval = $self->Pod::Simple::parse_from_file (@_);
+    my $retval = $self->Pod::Simple::parse_from_file (< @_);
 
     # Flush output, since Pod::Simple doesn't do this.  Ideally we should also
     # close the file descriptor if we had to open one, but we can't easily
@@ -621,7 +621,7 @@ sub parse_from_file {
 # parse_from_file supports.
 sub parse_from_filehandle {
     my $self = shift;
-    $self->parse_from_file (@_);
+    $self->parse_from_file (< @_);
 }
 
 ##############################################################################

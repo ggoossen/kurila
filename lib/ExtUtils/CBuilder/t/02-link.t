@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
-    @INC = qw(../..);
+    @INC = @( qw(../..) );
   }
 }
 
@@ -48,7 +48,7 @@ ok $object_file = $b->compile(source => $source_file);
 
 # Link
 my ($exe_file, @temps);
-($exe_file, @temps) = $b->link_executable(objects => $object_file);
+($exe_file, < @temps) = < $b->link_executable(objects => $object_file);
 ok $exe_file;
 
 if ($^O eq 'os2') {		# Analogue of LDLOADPATH...

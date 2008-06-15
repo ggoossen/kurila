@@ -13,7 +13,7 @@ require Exporter;
 
 $VERSION = "1.17";
 
-@ISA = qw(Exporter); # This is only so we can do version checking
+@ISA = @( qw(Exporter) ); # This is only so we can do version checking
 
 sub VEC_BITS () {0}
 sub FD_COUNT () {1}
@@ -26,21 +26,21 @@ sub new
 
  my $vec = bless \@(undef,0), $type;
 
- $vec->add(@_)
-    if @_;
+ $vec->add(< @_)
+    if (nelems @_);
 
  $vec;
 }
 
 sub add
 {
- shift->_update('add', @_);
+ shift->_update('add', < @_);
 }
 
 
 sub remove
 {
- shift->_update('remove', @_);
+ shift->_update('remove', < @_);
 }
 
 
@@ -55,7 +55,7 @@ sub exists
 
 sub _fileno
 {
- my($self, $f) = @_;
+ my($self, $f) = < @_;
  return unless defined $f;
  $f = $f->[0] if ref($f) eq 'ARRAY';
  return fileno($f) if ref $f;
@@ -72,7 +72,7 @@ sub _update
 
  my $count = 0;
  my $f;
- foreach $f (@_)
+ foreach $f (< @_)
   {
    my $fn = $vec->_fileno($f);
    next unless defined $fn;
@@ -157,9 +157,9 @@ sub as_string  # for debugging
  my $count = $vec->count;
  $str .= defined($bits) ? unpack("b*", $bits) : "undef";
  $str .= " $count";
- my @handles = @$vec;
+ my @handles = @( < @$vec );
  splice(@handles, 0, FIRST_FD);
- for (@handles) {
+ for (< @handles) {
      $str .= " " . (defined($_) ? "$_" : "-");
  }
  $str;
@@ -167,7 +167,7 @@ sub as_string  # for debugging
 
 sub _max
 {
- my($a,$b,$c) = @_;
+ my($a,$b,$c) = < @_;
  $a +> $b
     ? $a +> $c
         ? $a
@@ -182,8 +182,8 @@ sub select
  shift
    if defined @_[0] && !ref(@_[0]);
 
- my($r,$w,$e,$t) = @_;
- my @result = ();
+ my($r,$w,$e,$t) = < @_;
+ my @result = @( () );
 
  my $rb = defined $r ? $r->[VEC_BITS] : undef;
  my $wb = defined $w ? $w->[VEC_BITS] : undef;
@@ -191,12 +191,12 @@ sub select
 
  if(select($rb,$wb,$eb,$t) +> 0)
   {
-   my @r = ();
-   my @w = ();
-   my @e = ();
-   my $i = _max(defined $r ? scalar(@$r)-1 : 0,
-                defined $w ? scalar(@$w)-1 : 0,
-                defined $e ? scalar(@$e)-1 : 0);
+   my @r = @( () );
+   my @w = @( () );
+   my @e = @( () );
+   my $i = _max(defined $r ? scalar(nelems @$r)-1 : 0,
+                defined $w ? scalar(nelems @$w)-1 : 0,
+                defined $e ? scalar(nelems @$e)-1 : 0);
 
    for( ; $i +>= FIRST_FD ; $i--)
     {
@@ -209,7 +209,7 @@ sub select
         if defined $eb && defined $e->[$i] && vec($eb, $j, 1);
     }
 
-   @result = (\@r, \@w, \@e);
+   @result = @(\@r, \@w, \@e);
   }
  @result;
 }
@@ -219,9 +219,9 @@ sub handles
 {
  my $vec = shift;
  my $bits = shift;
- my @h = ();
+ my @h = @( () );
  my $i;
- my $max = scalar(@$vec) - 1;
+ my $max = scalar(nelems @$vec) - 1;
 
  for ($i = FIRST_FD; $i +<= $max; $i++)
   {

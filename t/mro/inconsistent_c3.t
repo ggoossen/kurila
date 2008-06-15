@@ -28,11 +28,11 @@ except TypeError:
     package Y;
     
     package XY;
-    our @ISA = ('X', 'Y');
+    our @ISA = @('X', 'Y');
     
     package YX;
-    our @ISA = ('Y', 'X');
+    our @ISA = @('Y', 'X');
 }
 
-try { @Z::ISA = ('XY', 'YX') };
+try { @Z::ISA = @('XY', 'YX') };
 like($@->{description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');

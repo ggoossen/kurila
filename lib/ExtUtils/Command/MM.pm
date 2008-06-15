@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 require Exporter;
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 
-our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
-                  warn_if_old_packlist);
+our @EXPORT  = @( qw(test_harness pod2man perllocal_install uninstall 
+                  warn_if_old_packlist) );
 our $VERSION = '6.44';
 
 my $Is_VMS = $^O eq 'VMS';
@@ -53,11 +53,11 @@ sub test_harness {
     # Because Windows doesn't do this for us and listing all the *.t files
     # out on the command line can blow over its exec limit.
     require ExtUtils::Command;
-    my @argv = ExtUtils::Command::expand_wildcards(@ARGV);
+    my @argv = @( < ExtUtils::Command::expand_wildcards(< @ARGV) );
 
-    local @INC = @INC;
-    unshift @INC, map { File::Spec->rel2abs($_) } @_;
-    Test::Harness::runtests(sort { lc $a cmp lc $b } @argv);
+    local @INC = @( < @INC );
+    unshift @INC, map { < File::Spec->rel2abs($_) } < @_;
+    Test::Harness::runtests(sort { lc $a cmp lc $b } < @argv);
 }
 
 
@@ -88,14 +88,14 @@ If no arguments are given to pod2man it will read from @ARGV.
 =cut
 
 sub pod2man {
-    local @ARGV = @_ ? @_ : @ARGV;
+    local @ARGV = @( (nelems @_) ? < @_ : < @ARGV );
 
     require Pod::Man;
     require Getopt::Long;
 
     # We will cheat and just use Getopt::Long.  We fool it by putting
     # our arguments into @ARGV.  Should be safe.
-    my %options = ();
+    my %options = %( () );
     Getopt::Long::config ('bundling_override');
     Getopt::Long::GetOptions (\%options, 
                 'section|s=s', 'release|r=s', 'center|c=s',
@@ -105,7 +105,7 @@ sub pod2man {
     );
 
     # If there's no files, don't bother going further.
-    return 0 unless @ARGV;
+    return 0 unless (nelems @ARGV);
 
     # Official sets --center, but don't override things explicitly set.
     if (%options{official} && !defined %options{center}) {
@@ -125,7 +125,7 @@ sub pod2man {
 
         print "Manifying $man\n";
 
-        my $parser = Pod::Man->new(%options);
+        my $parser = Pod::Man->new(< %options);
         $parser->parse_from_file($pod, $man)
           or do { warn("Could not install $man\n");  next };
 
@@ -133,7 +133,7 @@ sub pod2man {
             chmod(oct(%options{perm_rw}), $man)
               or do { warn("chmod %options{perm_rw} $man: $!\n"); next };
         }
-    }} while @ARGV;
+    }} while (nelems @ARGV);
 
     return 1;
 }
@@ -192,8 +192,8 @@ sub perllocal_install {
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    my @mod_info = $Is_VMS ? split m/\|/, ~< *STDIN
-                           : @ARGV;
+    my @mod_info = @( $Is_VMS ? split m/\|/, ~< *STDIN
+                           : < @ARGV );
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;
@@ -213,7 +213,7 @@ POD
  
 POD
 
-    } while(@mod_info);
+    } while(nelems @mod_info);
 
     $pod .= "=back\n\n";
     $pod =~ s/^ //mg;

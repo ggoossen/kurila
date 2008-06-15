@@ -18,9 +18,9 @@ our $PACKAGE = __PACKAGE__;
 require Exporter;
 require DynaLoader;
 
-our @ISA = qw(Exporter DynaLoader);
-our @EXPORT = qw( NFC NFD NFKC NFKD );
-our @EXPORT_OK = qw(
+our @ISA = @( qw(Exporter DynaLoader) );
+our @EXPORT = @( qw( NFC NFD NFKC NFKD ) );
+our @EXPORT_OK = @( qw(
     normalize decompose reorder compose
     checkNFD checkNFKD checkNFC checkNFKC check
     getCanon getCompat getComposite getCombinClass
@@ -28,10 +28,10 @@ our @EXPORT_OK = qw(
     isNFD_NO isNFC_NO isNFC_MAYBE isNFKD_NO isNFKC_NO isNFKC_MAYBE
     FCD checkFCD FCC checkFCC composeContiguous
     splitOnLastStarter
-);
-our %EXPORT_TAGS = (
-    all       => \@( @EXPORT, @EXPORT_OK ),
-    normalize => \@( @EXPORT, qw/normalize decompose reorder compose/ ),
+) );
+our %EXPORT_TAGS = %(
+    all       => \@( < @EXPORT, < @EXPORT_OK ),
+    normalize => \@( < @EXPORT, qw/normalize decompose reorder compose/ ),
     check     => \@( qw/checkNFD checkNFKD checkNFC checkNFKC check/ ),
     fast      => \@( qw/FCD checkFCD FCC checkFCC composeContiguous/ ),
 );
@@ -47,7 +47,7 @@ Unicode::Normalize->bootstrap( $VERSION);
 ##
 
 sub pack_U {
-    return pack('U*', @_);
+    return pack('U*', < @_);
 }
 
 sub unpack_U {
@@ -64,7 +64,7 @@ sub FCD ($) {
     return checkFCD($str) ? $str : NFD($str);
 }
 
-our %formNorm = (
+our %formNorm = %(
     NFC  => \&NFC,	C  => \&NFC,
     NFD  => \&NFD,	D  => \&NFD,
     NFKC => \&NFKC,	KC => \&NFKC,
@@ -87,7 +87,7 @@ sub normalize($$)
 ## quick check
 ##
 
-our %formCheck = (
+our %formCheck = %(
     NFC  => \&checkNFC, 	C  => \&checkNFC,
     NFD  => \&checkNFD, 	D  => \&checkNFD,
     NFKC => \&checkNFKC,	KC => \&checkNFKC,

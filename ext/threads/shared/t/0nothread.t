@@ -10,7 +10,7 @@ my %hash;
 
 sub hash
 {
-    my @val = @_;
+    my @val = @( < @_ );
     is(keys %hash, 0, "hash empty");
     %hash{0} = @val[0];
     is(keys %hash,1, "Assign grows hash");
@@ -21,9 +21,9 @@ sub hash
     is(%hash{2},@val[2],"Value correct");
     %hash{1} = @val[1];
     is(keys %hash,3,"Size correct");
-    my @keys = keys %hash;
-    is(join(',',sort @keys),'0,1,2',"Keys correct");
-    my @hval = %hash{[0,1,2]};
+    my @keys = @( keys %hash );
+    is(join(',',sort < @keys),'0,1,2',"Keys correct");
+    my @hval = @( %hash{[0,1,2]} );
     is_deeply(\@hval,\@val,"Values correct");
     my $val = delete %hash{1};
     is($val,@val[1],"Delete value correct");
@@ -31,29 +31,29 @@ sub hash
     while (my ($k,$v) = each %hash) {
         is($v,@val[$k],"each works");
     }
-    %hash = ();
+    %hash = %( () );
     is(keys %hash,0,"Clear hash");
 }
 
 sub array
 {
-    my @val = @_;
-    is(@array, 0, "array empty");
+    my @val = @( < @_ );
+    is((nelems @array), 0, "array empty");
     @array[0] = @val[0];
-    is(@array,1, "Assign grows array");
+    is((nelems @array),1, "Assign grows array");
     is(@array[0],@val[0],"Value correct");
     unshift(@array,@val[2]);
     is(@array[0],@val[2],"Unshift worked");
     is(@array[-1],@val[0],"-ve index");
     push(@array,@val[1]);
     is(@array[-1],@val[1],"Push worked");
-    is(@array,3,"Size correct");
+    is((nelems @array),3,"Size correct");
     is(shift(@array),@val[2],"Shift worked");
-    is(@array,2,"Size correct");
+    is((nelems @array),2,"Size correct");
     is(pop(@array),@val[1],"Pop worked");
-    is(@array,1,"Size correct");
-    @array = ();
-    is(@array,0,"Clear array");
+    is((nelems @array),1,"Size correct");
+    @array = @( () );
+    is((nelems @array),0,"Clear array");
 }
 
 ok((require threads::shared),"Require module");

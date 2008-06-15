@@ -2,9 +2,9 @@ package attributes;
 
 our $VERSION = 0.08;
 
-our @EXPORT_OK = qw(get reftype);
-our @EXPORT = ();
-our %EXPORT_TAGS = (ALL => \@(@EXPORT, @EXPORT_OK));
+our @EXPORT_OK = @( qw(get reftype) );
+our @EXPORT = @( () );
+our %EXPORT_TAGS = %(ALL => \@(< @EXPORT, < @EXPORT_OK));
 
 use strict;
 
@@ -19,11 +19,11 @@ use strict;
 BEGIN { attributes->bootstrap }
 
 sub import {
-    @_ +> 2 && ref @_[2] or do {
+    (nelems @_) +> 2 && ref @_[2] or do {
 	require Exporter;
 	goto &Exporter::import;
     };
-    my (undef,$home_stash,$svref,@attrs) = @_;
+    my (undef,$home_stash,$svref,< @attrs) = < @_;
 
     my $svtype = uc reftype($svref);
     my $pkgmeth;
@@ -31,36 +31,36 @@ sub import {
 	if defined $home_stash && $home_stash ne '';
     my @badattrs;
     if ($pkgmeth) {
-	my @pkgattrs = _modify_attrs($svref, @attrs);
-	@badattrs = $pkgmeth->($home_stash, $svref, @pkgattrs);
-	if (!@badattrs && @pkgattrs) {
+	my @pkgattrs = @( < _modify_attrs($svref, < @attrs) );
+	@badattrs = @( < $pkgmeth->($home_stash, $svref, < @pkgattrs) );
+	if (!nelems @badattrs && nelems @pkgattrs) {
             require warnings;
 	    return unless warnings::enabled('reserved');
-	    @pkgattrs = grep { m/\A[[:lower:]]+(?:\z|\()/ } @pkgattrs;
-	    if (@pkgattrs) {
-		for my $attr (@pkgattrs) {
+	    @pkgattrs = @( grep { m/\A[[:lower:]]+(?:\z|\()/ } < @pkgattrs );
+	    if ((nelems @pkgattrs)) {
+		for my $attr (< @pkgattrs) {
 		    $attr =~ s/\(.+\z//s;
 		}
-		my $s = ((@pkgattrs == 1) ? '' : 's');
+		my $s = (((nelems @pkgattrs) == 1) ? '' : 's');
 		warn "$svtype package attribute$s " .
 		    "may clash with future reserved word$s: " .
-		    join(' : ' , @pkgattrs);
+		    join(' : ' , < @pkgattrs);
 	    }
 	}
     }
     else {
-	@badattrs = _modify_attrs($svref, @attrs);
+	@badattrs = @( < _modify_attrs($svref, < @attrs) );
     }
-    if (@badattrs) {
+    if ((nelems @badattrs)) {
 	die "Invalid $svtype attribute" .
-	    (( @badattrs == 1 ) ? '' : 's') .
+	    (( (nelems @badattrs) == 1 ) ? '' : 's') .
 	    ": " .
-	    join(' : ', @badattrs);
+	    join(' : ', < @badattrs);
     }
 }
 
 sub get ($) {
-    @_ == 1  && ref @_[0] or
+    (nelems @_) == 1  && ref @_[0] or
 	die 'Usage: '.__PACKAGE__.'::get $ref';
     my $svref = shift;
     my $svtype = uc reftype $svref;
@@ -70,8 +70,8 @@ sub get ($) {
     $pkgmeth = UNIVERSAL::can($stash, "FETCH_{$svtype}_ATTRIBUTES")
 	if defined $stash && $stash ne '';
     return $pkgmeth ?
-		(_fetch_attrs($svref), $pkgmeth->($stash, $svref)) :
-		(_fetch_attrs($svref))
+		 @(_fetch_attrs($svref), $pkgmeth->($stash, $svref)) :
+		 @(_fetch_attrs($svref))
 	;
 }
 

@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib/');
+        @INC = @('../lib', 'lib/');
     }
     else {
         unshift @INC, 't/lib/';
@@ -17,7 +17,7 @@ use Test::More tests => 3;
 
 # Having the CWD in @INC masked a bug in finding hint files
 my $curdir = File::Spec->curdir;
-@INC = grep { $_ ne $curdir && $_ ne '.' } @INC;
+@INC = @( grep { $_ ne $curdir && $_ ne '.' } < @INC );
 
 mkdir('hints', 0777);
 (my $os = $^O) =~ s/\./_/g;

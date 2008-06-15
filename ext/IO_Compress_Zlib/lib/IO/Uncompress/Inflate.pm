@@ -16,10 +16,10 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $InflateError);
 $VERSION = '2.006';
 $InflateError = '';
 
-@ISA    = qw( IO::Uncompress::RawInflate Exporter );
-@EXPORT_OK = qw( $InflateError inflate ) ;
-%EXPORT_TAGS = %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ;
-push @{ %EXPORT_TAGS{all} }, @EXPORT_OK ;
+@ISA    = @( qw( IO::Uncompress::RawInflate Exporter ) );
+@EXPORT_OK = @( qw( $InflateError inflate ) ) ;
+%EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ) ;
+push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 
@@ -28,13 +28,13 @@ sub new
     my $class = shift ;
     my $obj = createSelfTiedObject($class, \$InflateError);
 
-    $obj->_create(undef, 0, @_);
+    $obj->_create(undef, 0, < @_);
 }
 
 sub inflate
 {
     my $obj = createSelfTiedObject(undef, \$InflateError);
-    return $obj->_inf(@_);
+    return $obj->_inf(< @_);
 }
 
 sub getExtraParams
@@ -138,7 +138,7 @@ sub bits
 
 sub _readDeflateHeader
 {
-    my ($self, $buffer) = @_ ;
+    my ($self, $buffer) = < @_ ;
 
 #    if (! $buffer) {
 #        $self->smartReadExact(\$buffer, ZLIB_HEADER_SIZE);
@@ -178,12 +178,12 @@ sub _readDeflateHeader
         'Header'        => $buffer,
 
         CMF     =>      $CMF                                               ,
-        CM      => bits($CMF, ZLIB_CMF_CM_OFFSET,     ZLIB_CMF_CM_BITS    ),
-        CINFO   => bits($CMF, ZLIB_CMF_CINFO_OFFSET,  ZLIB_CMF_CINFO_BITS ),
+        CM      => < bits($CMF, ZLIB_CMF_CM_OFFSET,     ZLIB_CMF_CM_BITS    ),
+        CINFO   => < bits($CMF, ZLIB_CMF_CINFO_OFFSET,  ZLIB_CMF_CINFO_BITS ),
         FLG     =>      $FLG                                               ,
-        FCHECK  => bits($FLG, ZLIB_FLG_FCHECK_OFFSET, ZLIB_FLG_FCHECK_BITS),
-        FDICT   => bits($FLG, ZLIB_FLG_FDICT_OFFSET,  ZLIB_FLG_FDICT_BITS ),
-        FLEVEL  => bits($FLG, ZLIB_FLG_LEVEL_OFFSET,  ZLIB_FLG_LEVEL_BITS ),
+        FCHECK  => < bits($FLG, ZLIB_FLG_FCHECK_OFFSET, ZLIB_FLG_FCHECK_BITS),
+        FDICT   => < bits($FLG, ZLIB_FLG_FDICT_OFFSET,  ZLIB_FLG_FDICT_BITS ),
+        FLEVEL  => < bits($FLG, ZLIB_FLG_LEVEL_OFFSET,  ZLIB_FLG_LEVEL_BITS ),
         DICTID  =>      $DICTID                                            ,
 
     );

@@ -32,11 +32,11 @@ ok 1 == similarity_language_tag('en-ca', 'en-us');
 ok 2 == similarity_language_tag('en-us-southern', 'en-us-western');
 ok 2 == similarity_language_tag('en-us-southern', 'en-us');
 
-ok grep $_ eq 'hi', panic_languages('kok');
-ok grep $_ eq 'en', panic_languages('x-woozle-wuzzle');
-ok ! grep $_ eq 'mr', panic_languages('it');
-ok grep $_ eq 'es', panic_languages('it');
-ok grep $_ eq 'it', panic_languages('es');
+ok grep $_ eq 'hi', < panic_languages('kok');
+ok grep $_ eq 'en', < panic_languages('x-woozle-wuzzle');
+ok ! grep $_ eq 'mr', < panic_languages('it');
+ok grep $_ eq 'es', < panic_languages('it');
+ok grep $_ eq 'it', < panic_languages('es');
 
 
 print "# Now the ::List tests...\n";

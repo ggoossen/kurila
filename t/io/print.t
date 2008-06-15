@@ -21,20 +21,20 @@ print foo "ok 6\n";
 printf "ok \%d\n",7;
 printf("ok \%d\n",8);
 
-my @a = ("ok \%d\%c",9,ord("\n"));
-printf @a;
+my @a = @("ok \%d\%c",9,ord("\n"));
+printf < @a;
 
 @a[1] = 10;
-printf STDOUT @a;
+printf STDOUT < @a;
 
 $, = ' ';
 $\ = "\n";
 
 print "ok","11";
 
-my @x = ("ok","12\nok","13\nok");
-my @y = ("15\nok","16");
-print @x,"14\nok",@y;
+my @x = @("ok","12\nok","13\nok");
+my @y = @("15\nok","16");
+print < @x,"14\nok",< @y;
 {
     local $\ = "ok 17\n# null =>[\000]\nok 18\n";
     print "";

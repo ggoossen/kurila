@@ -8,7 +8,7 @@ BEGIN {
 
 plan tests => 223;
 
-my @comma = ("key", "value");
+my @comma = @("key", "value");
 
 # The peephole optimiser already knows that it should convert the string in
 # $foo{string} into a shared hash key scalar. It might be worth making the
@@ -18,7 +18,7 @@ my @comma = ("key", "value");
 # And really we should also try utf8 literals in {} and => in utf8.t
 
 # Some of these tests are (effectively) duplicated in each.t
-my %comma = @comma;
+my %comma = %( < @comma );
 ok (keys %comma == 1, 'keys on comma hash');
 ok (values %comma == 1, 'values on comma hash');
 # defeat any tokeniser or optimiser cunning
@@ -27,38 +27,38 @@ is (%comma{"k" . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%comma{key}, "value", 'is key present? (maybe optimised)');
 #tokeniser may treat => differently.
-my @temp = (key=>undef);
+my @temp = @(key=>undef);
 is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
-@temp = %comma;
+@temp = @( < %comma );
 ok (eq_array (\@comma, \@temp), 'list from comma hash');
 
-@temp = each %comma;
+@temp = @( each %comma );
 ok (eq_array (\@comma, \@temp), 'first each from comma hash');
-@temp = each %comma;
+@temp = @( each %comma );
 ok (eq_array (\@(), \@temp), 'last each from comma hash');
 
-my %temp = %comma;
+my %temp = %( < %comma );
 
 ok (keys %temp == 1, 'keys on copy of comma hash');
 ok (values %temp == 1, 'values on copy of comma hash');
 is (%temp{'k' . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{key}, "value", 'is key present? (maybe optimised)');
-@temp = (key=>undef);
+@temp = @(key=>undef);
 is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
-@temp = %temp;
+@temp = @( < %temp );
 ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
 
-@temp = each %temp;
+@temp = @( each %temp );
 ok (eq_array (\@temp, \@temp), 'first each from copy of comma hash');
-@temp = each %temp;
+@temp = @( each %temp );
 ok (eq_array (\@(), \@temp), 'last each from copy of comma hash');
 
-my @arrow = (Key =>"Value");
+my @arrow = @(Key =>"Value");
 
-my %arrow = @arrow;
+my %arrow = %( < @arrow );
 ok (keys %arrow == 1, 'keys on arrow hash');
 ok (values %arrow == 1, 'values on arrow hash');
 # defeat any tokeniser or optimiser cunning
@@ -67,72 +67,72 @@ is (%arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%arrow{Key}, "Value", 'is key present? (maybe optimised)');
 #tokeniser may treat => differently.
-@temp = ('Key', undef);
+@temp = @('Key', undef);
 is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
-@temp = %arrow;
+@temp = @( < %arrow );
 ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
 
-@temp = each %arrow;
+@temp = @( each %arrow );
 ok (eq_array (\@arrow, \@temp), 'first each from arrow hash');
-@temp = each %arrow;
+@temp = @( each %arrow );
 ok (eq_array (\@(), \@temp), 'last each from arrow hash');
 
-%temp = %arrow;
+%temp = %( < %arrow );
 
 ok (keys %temp == 1, 'keys on copy of arrow hash');
 ok (values %temp == 1, 'values on copy of arrow hash');
 is (%temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
-@temp = ('Key', undef);
+@temp = @('Key', undef);
 is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
-@temp = %temp;
+@temp = @( < %temp );
 ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
 
-@temp = each %temp;
+@temp = @( each %temp );
 ok (eq_array (\@temp, \@temp), 'first each from copy of arrow hash');
-@temp = each %temp;
+@temp = @( each %temp );
 ok (eq_array (\@(), \@temp), 'last each from copy of arrow hash');
 
-my %direct = ('Camel', 2, 'Dromedary', 1);
+my %direct = %('Camel', 2, 'Dromedary', 1);
 my %slow;
 %slow{Dromedary} = 1;
 %slow{Camel} = 2;
 
 ok (eq_hash (\%slow, \%direct), "direct list assignment to hash");
-%direct = (Camel => 2, 'Dromedary' => 1);
+%direct = %(Camel => 2, 'Dromedary' => 1);
 ok (eq_hash (\%slow, \%direct), "direct list assignment to hash using =>");
 
 %slow{Llama} = 0; # A llama is not a camel :-)
 ok (!eq_hash (\%direct, \%slow), "different hashes should not be equal!");
 
 my (%names, %names_copy);
-%names = ('$' => 'Scalar', '@' => 'Array', # Grr '
+%names = %('$' => 'Scalar', '@' => 'Array', # Grr '
           '%', 'Hash', '&', 'Code');
-%names_copy = %names;
+%names_copy = %( < %names );
 ok (eq_hash (\%names, \%names_copy), "check we can copy our hash");
 
 sub in {
-  my %args = @_;
+  my %args = %( < @_ );
   return eq_hash (\%names, \%args);
 }
 
-ok (in (%names), "pass hash into a method");
+ok (in (< %names), "pass hash into a method");
 
 sub in_method {
   my $self = shift;
-  my %args = @_;
+  my %args = %( < @_ );
   return eq_hash (\%names, \%args);
 }
 
-ok (main->in_method (%names), "pass hash into a method");
+ok (main->in_method (< %names), "pass hash into a method");
 
 sub out {
   return %names;
 }
-%names_copy = out ();
+%names_copy = %( < out () );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash from a subroutine");
 
@@ -140,42 +140,42 @@ sub out_method {
   my $self = shift;
   return %names;
 }
-%names_copy = main->out_method ();
+%names_copy = %( < main->out_method () );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash from a method");
 
 sub in_out {
-  my %args = @_;
+  my %args = %( < @_ );
   return %args;
 }
-%names_copy = in_out (%names);
+%names_copy = %( < in_out (< %names) );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash to and from a subroutine");
 
 sub in_out_method {
   my $self = shift;
-  my %args = @_;
+  my %args = %( < @_ );
   return %args;
 }
-%names_copy = main->in_out_method (%names);
+%names_copy = %( < main->in_out_method (< %names) );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash to and from a method");
 
-my %names_copy2 = %names;
+my %names_copy2 = %( < %names );
 ok (eq_hash (\%names, \%names_copy2), "check copy worked");
 
 # This should get ignored.
-%names_copy = ('%', 'Associative Array', %names);
+%names_copy = %('%', 'Associative Array', < %names);
 
 ok (eq_hash (\%names, \%names_copy), "duplicates at the start of a list");
 
 # This should not
-%names_copy = ('*', 'Typeglob', %names);
+%names_copy = %('*', 'Typeglob', < %names);
 
 %names_copy2{'*'} = 'Typeglob';
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
 
-%names_copy = ('%', 'Associative Array', '*', 'Endangered species', %names,
+%names_copy = %('%', 'Associative Array', '*', 'Endangered species', < %names,
               '*', 'Typeglob',);
 
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
@@ -188,8 +188,8 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 
   my ($key, $value) = (chr ($chr) . "\x{ABCD}", "$chr\x{ABCD}");
   chop ($key, $value);
-  my @utf8c = ($key, $value);
-  my %utf8c = @utf8c;
+  my @utf8c = @($key, $value);
+  my %utf8c = %( < @utf8c );
 
   ok (keys %utf8c == 1, 'keys on utf8 comma hash');
   ok (values %utf8c == 1, 'values on utf8 comma hash');
@@ -201,15 +201,15 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   eval $tempval or die "'$tempval' gave $@";
   is (%utf8c{@temp[0]}, $value, 'is key present? (using LHS of $tempval)');
 
-  @temp = %utf8c;
+  @temp = @( < %utf8c );
   ok (eq_array (\@utf8c, \@temp), 'list from utf8 comma hash');
 
-  @temp = each %utf8c;
+  @temp = @( each %utf8c );
   ok (eq_array (\@utf8c, \@temp), 'first each from utf8 comma hash');
-  @temp = each %utf8c;
+  @temp = @( each %utf8c );
   ok (eq_array (\@(), \@temp), 'last each from utf8 comma hash');
 
-  %temp = %utf8c;
+  %temp = %( < %utf8c );
 
   ok (keys %temp == 1, 'keys on copy of utf8 comma hash');
   ok (values %temp == 1, 'values on copy of utf8 comma hash');
@@ -220,19 +220,19 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   eval $tempval or die "'$tempval' gave $@";
   is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
-  @temp = %temp;
+  @temp = @( < %temp );
   ok (eq_array (\@temp, \@temp), 'list from copy of utf8 comma hash');
 
-  @temp = each %temp;
+  @temp = @( each %temp );
   ok (eq_array (\@temp, \@temp), 'first each from copy of utf8 comma hash');
-  @temp = each %temp;
+  @temp = @( each %temp );
   ok (eq_array (\@(), \@temp), 'last each from copy of utf8 comma hash');
 
   my $assign = sprintf '("\x{%x}" => "%d")', $chr, $chr;
   print "# $assign\n";
-  my (@utf8a) = eval $assign;
+  my (@utf8a) = @( eval $assign );
 
-  my %utf8a = @utf8a;
+  my %utf8a = %( < @utf8a );
   ok (keys %utf8a == 1, 'keys on utf8 arrow hash');
   ok (values %utf8a == 1, 'values on utf8 arrow hash');
   # defeat any tokeniser or optimiser cunning
@@ -243,15 +243,15 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   eval $tempval or die "'$tempval' gave $@";
   is (%utf8a{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
-  @temp = %utf8a;
+  @temp = @( < %utf8a );
   ok (eq_array (\@utf8a, \@temp), 'list from utf8 arrow hash');
 
-  @temp = each %utf8a;
+  @temp = @( each %utf8a );
   ok (eq_array (\@utf8a, \@temp), 'first each from utf8 arrow hash');
-  @temp = each %utf8a;
+  @temp = @( each %utf8a );
   ok (eq_array (\@(), \@temp), 'last each from utf8 arrow hash');
 
-  %temp = %utf8a;
+  %temp = %( < %utf8a );
 
   ok (keys %temp == 1, 'keys on copy of utf8 arrow hash');
   ok (values %temp == 1, 'values on copy of utf8 arrow hash');
@@ -262,12 +262,12 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
   eval $tempval or die "'$tempval' gave $@";
   is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
 
-  @temp = %temp;
+  @temp = @( < %temp );
   ok (eq_array (\@temp, \@temp), 'list from copy of utf8 arrow hash');
 
-  @temp = each %temp;
+  @temp = @( each %temp );
   ok (eq_array (\@temp, \@temp), 'first each from copy of utf8 arrow hash');
-  @temp = each %temp;
+  @temp = @( each %temp );
   ok (eq_array (\@(), \@temp), 'last each from copy of utf8 arrow hash');
 
 }
@@ -276,32 +276,32 @@ foreach my $chr (60, 200, 600, 6000, 60000) {
 # duplicate keys [perl #24380]
 {
     my %h; my $x; my $ar;
-    is( (join ':', %h = (1) x 8), '1:1',
+    is( (join ':', %h = %( (1) x 8 )), '1:1',
 	'hash assignment in list context removes duplicates' );
-    is( scalar( %h = (1,2,1,3,1,4,1,5) ), 2,
+    is( scalar( %h = %(1,2,1,3,1,4,1,5) ), 2,
 	'hash assignment in scalar context' );
-    is( scalar( ($x,%h) = (0,1,2,1,3,1,4,1,5) ), 3,
+    is( scalar( ($x,< %h) = (0,1,2,1,3,1,4,1,5) ), 3,
 	'scalar + hash assignment in scalar context' );
-    $ar = \@( %h = (1,2,1,3,1,4,1,5) );
-    is( (@$ar-1), 1, 'hash assignment in list context' );
-    is( "@$ar", "1 5", '...gets the last values' );
-    $ar = \@( ($x,%h) = (0,1,2,1,3,1,4,1,5) );
-    is( (@$ar-1), 2, 'scalar + hash assignment in list context' );
-    is( "@$ar", "0 1 5", '...gets the last values' );
+    $ar = \@( %h = %(1,2,1,3,1,4,1,5) );
+    is( ((nelems @$ar)-1), 1, 'hash assignment in list context' );
+    is( "{join ' ', <@$ar}", "1 5", '...gets the last values' );
+    $ar = \@( ($x,< %h) = (0,1,2,1,3,1,4,1,5) );
+    is( ((nelems @$ar)-1), 2, 'scalar + hash assignment in list context' );
+    is( "{join ' ', <@$ar}", "0 1 5", '...gets the last values' );
 }
 
 # test stringification of keys
 {
     no warnings 'once';
-    my @refs =    ( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
+    my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
     our %h;
-    for my $ref (@refs) {
+    for my $ref (< @refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
 
-    bless $_ for @refs;
-    %h = ();
-    for my $ref (@refs) {
+    bless $_ for < @refs;
+    %h = %( () );
+    for my $ref (< @refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
 }

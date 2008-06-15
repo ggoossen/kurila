@@ -7,7 +7,7 @@ our $VERSION = '6.44';
 
 require ExtUtils::Liblist;
 require ExtUtils::MakeMaker;
-our @ISA = qw(ExtUtils::Liblist ExtUtils::MakeMaker);
+our @ISA = @( qw(ExtUtils::Liblist ExtUtils::MakeMaker) );
 
 =head1 NAME
 
@@ -37,7 +37,7 @@ away.
 {
     # Convenient alias.
     package MM;
-    our @ISA = qw(ExtUtils::MM);
+    our @ISA = @( qw(ExtUtils::MM) );
     sub DESTROY {}
 }
 
@@ -48,7 +48,7 @@ sub _is_win95 {
                                    : ! defined %ENV{SYSTEMROOT}; 
 }
 
-my %Is = ();
+my %Is = %( () );
 %Is{VMS}    = $^O eq 'VMS';
 %Is{OS2}    = $^O eq 'os2';
 %Is{MacOS}  = $^O eq 'MacOS';

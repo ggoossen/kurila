@@ -1,7 +1,7 @@
 use Perl6::Form;
 
 
-print form \%(interleave=>1,,single=>'^'),\%(single=>'='),\%(single=>'_'),
+print < form \%(interleave=>1,,single=>'^'),\%(single=>'='),\%(single=>'_'),
 		   <<'.',
 ~~~~~~~~~
 ^ = ^ _ ^ {|||}
@@ -11,7 +11,7 @@ print form \%(interleave=>1,,single=>'^'),\%(single=>'='),\%(single=>'_'),
 
 print "\n--------------------------\n\n";
 
-print form \%(single=>'='), \%(interleave=>1), <<'.',
+print < form \%(single=>'='), \%(interleave=>1), <<'.',
    ^
  = | {""""""""""""""""""""""""""""""""""""}
    +--------------------------------------->
@@ -20,7 +20,7 @@ print form \%(single=>'='), \%(interleave=>1), <<'.',
  "Height", \@( ~< *DATA), "Time";
 
 
-print form <<'.',
+print < form <<'.',
 Passed:
 	{[[[[[[[[[[[[[[[[[[[}
 Failed:
@@ -29,7 +29,7 @@ Failed:
 \@(qw(Smith Simmons Sutton Smee)), \@(qw(Richards Royce Raighley));
 
 
-print form \%(interleave=>1), <<'.',
+print < form \%(interleave=>1), <<'.',
 Passed:
 	{[[[[[[[[[[[[[[[[[[[}
 Failed:

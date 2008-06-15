@@ -6,7 +6,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = @( '../lib' );
 }
 
 print "1..10\n";
@@ -21,50 +21,50 @@ if ($^O eq 'MacOS') {
 } else {
     $expected = $_ = "op/a*.t";
 }
-my @r = glob;
+my @r = @( glob < );
 print "not " if $_ ne $expected;
 print "ok 1\n";
-print "# |@r|\nnot " if @r +< 4;
+print "# |{join ' ', <@r}|\nnot " if (nelems @r) +< 4;
 print "ok 2\n";
 
 # check if <*/*> works
 if ($^O eq 'MacOS') {
-    @r = glob(":*:a*.t");
+    @r = glob@( <":*:a*.t");
 } else {
-    @r = glob("*/a*.t");
+    @r = glob@( <"*/a*.t");
 }
 # atleast {argv,abbrev,anydbm,autoloader,append,arith,array,assignwarn,auto}.t
-print "# |@r|\nnot " if @r +< 9;
+print "# |{join ' ', <@r}|\nnot " if (nelems @r) +< 9;
 print "ok 3\n";
-my $r = scalar @r;
+my $r = scalar nelems @r;
 
 # check if scalar context works
-@r = ();
+@r = @( () );
 while (defined($_ = ($^O eq 'MacOS') ? glob(":*:a*.t") : glob("*/a*.t"))) {
     print "# $_\n";
     push @r, $_;
 }
-print "not " if @r != $r;
+print "not " if (nelems @r) != $r;
 print "ok 4\n";
 
 # check if list context works
-@r = ();
+@r = @( () );
 if ($^O eq 'MacOS') {
-    for (glob(":*:a*.t")) {
+    for (glob( <":*:a*.t")) {
     	print "# $_\n";
     	push @r, $_;
     }
 } else {
-    for (glob("*/a*.t")) {
+    for (glob( <"*/a*.t")) {
     	print "# $_\n";
     	push @r, $_;
     }
 }
-print "not " if @r != $r;
+print "not " if (nelems @r) != $r;
 print "ok 5\n";
 
 # test if implicit assign to $_ in while() works
-@r = ();
+@r = @( () );
 if ($^O eq 'MacOS') {
     while (glob(":*:a*.t")) {
     	print "# $_\n";
@@ -76,33 +76,33 @@ if ($^O eq 'MacOS') {
 	push @r, $_;
     }
 }
-print "not " if @r != $r;
+print "not " if (nelems @r) != $r;
 print "ok 6\n";
 
 # test if explicit glob() gets assign magic too
-my @s = ();
+my @s = @( () );
 my $pat = ($^O eq 'MacOS') ? ':*:a*.t': '*/a*.t';
 while (glob ($pat)) {
     print "# $_\n";
     push @s, $_;
 }
-print "not " if "@r" ne "@s";
+print "not " if "{join ' ', <@r}" ne "{join ' ', <@s}";
 print "ok 7\n";
 
 # how about in a different package, like?
 package Foo;
 use File::DosGlob 'glob';
-@s = ();
+@s = @( () );
 $pat = $^O eq 'MacOS' ? ':*:a*.t' : '*/a*.t';
 while (glob($pat)) {
     print "# $_\n";
     push @s, $_;
 }
-print "not " if "@r" ne "@s";
+print "not " if "{join ' ', <@r}" ne "{join ' ', <@s}";
 print "ok 8\n";
 
 # test if different glob ops maintain independent contexts
-@s = ();
+@s = @( () );
 if ($^O eq 'MacOS') {
     while (glob(":*:a*.t")) {
 	my $i = 0;
@@ -126,7 +126,7 @@ if ($^O eq 'MacOS') {
 	print " >\n";
     }
 }
-print "not " if "@r" ne "@s";
+print "not " if "{join ' ', <@r}" ne "{join ' ', <@s}";
 print "ok 9\n";
 
 # how about a global override, hm?

@@ -15,8 +15,8 @@ use File::Path;
 use File::Spec;
 
 
-@ISA = ('Exporter');
-@EXPORT = ('install','uninstall','pm_to_blib', 'install_default');
+@ISA = @('Exporter');
+@EXPORT = @('install','uninstall','pm_to_blib', 'install_default');
 
 =pod 
 
@@ -112,25 +112,25 @@ my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
 
 sub _estr(@) {
-    return join "\n",'!' x 72,@_,'!' x 72,'';
+    return join "\n",'!' x 72,< @_,'!' x 72,'';
 }
 
 {my %warned;
 sub _warnonce(@) {
     my $first=shift;
-    my $msg=_estr "WARNING: $first",@_;
+    my $msg=_estr "WARNING: $first",< @_;
     warn $msg unless %warned{$msg}++;
 }}
 
 sub _choke(@) {
     my $first=shift;
-    my $msg=_estr "ERROR: $first",@_;
+    my $msg=_estr "ERROR: $first",< @_;
     die($msg);
 }
 
 
 sub _chmod($$;$) {
-    my ( $mode, $item, $verbose )=@_;
+    my ( $mode, $item, $verbose )=< @_;
     $verbose ||= 0;
     if (chmod $mode, $item) {
         print "chmod($mode, $item)\n" if $verbose +> 1;
@@ -166,7 +166,7 @@ If $moan is true then returns 0 on error and warns instead of dies.
 
 
 sub _move_file_at_boot { #XXX OS-SPECIFIC
-    my ( $file, $target, $moan  )= @_;
+    my ( $file, $target, $moan  )= < @_;
     Carp::confess("Panic: Can't _move_file_at_boot on this platform!")
          unless $CanMoveAtBoot;
 
@@ -176,13 +176,13 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
 
     if ( ! $Has_Win32API_File ) {
 
-        my @msg=(
+        my @msg=@(
             "Cannot schedule $descr at reboot.",
             "Try installing Win32API::File to allow operations on locked files",
             "to be scheduled during reboot. Or try to perform the operation by",
             "hand yourself. (You may need to close other perl processes first)"
         );
-        if ( $moan ) { _warnonce(@msg) } else { _choke(@msg) }
+        if ( $moan ) { _warnonce(< @msg) } else { _choke(< @msg) }
         return 0;
     }
     my $opts= Win32API::File::MOVEFILE_DELAY_UNTIL_REBOOT();
@@ -196,12 +196,12 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
         $MUST_REBOOT ||= ref $target ? 0 : 1;
         return 1;
     } else {
-        my @msg=(
+        my @msg=@(
             "MoveFileEx $descr at reboot failed: $^E",
             "You may try to perform the operation by hand yourself. ",
             "(You may need to close other perl processes first).",
         );
-        if ( $moan ) { _warnonce(@msg) } else { _choke(@msg) }
+        if ( $moan ) { _warnonce(< @msg) } else { _choke(< @msg) }
     }
     return 0;
 }
@@ -243,7 +243,7 @@ On failure throws a fatal error.
 
 
 sub _unlink_or_rename { #XXX OS-SPECIFIC
-    my ( $file, $tryhard, $installing )= @_;
+    my ( $file, $tryhard, $installing )= < @_;
 
     _chmod( 0666, $file );
     unlink $file
@@ -295,7 +295,7 @@ Handles loading the INSTALL.SKIP file. Returns an array of patterns to use.
 
 
 sub _get_install_skip {
-    my ( $skip, $verbose )= @_;
+    my ( $skip, $verbose )= < @_;
     if (%ENV{EU_INSTALL_IGNORE_SKIP}) {
         print "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
@@ -338,7 +338,7 @@ sub _get_install_skip {
             if $verbose+>1;
         $skip= \@();
     }
-    warn "Got @{\@(0+@$skip)} skip patterns.\n"
+    warn "Got {join ' ', <@{\@(0+nelems @$skip)}} skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
@@ -359,7 +359,7 @@ Abstract a -w check that tries to use POSIX::access() if possible.
             $has_posix= (!$Is_cygwin && eval 'local $^W; require POSIX; 1') || 0; 
         }
         if ($has_posix) {
-            return POSIX::access($dir, POSIX::W_OK());
+            return POSIX::access($dir, < POSIX::W_OK());
         } else {
             return -w $dir;
         }
@@ -393,15 +393,15 @@ sub _can_write_dir {
     return
         unless defined $dir and length $dir;
 
-    my ($vol, $dirs, $file) = File::Spec->splitpath($dir,1);
-    my @dirs = File::Spec->splitdir($dirs);
-    unshift @dirs, File::Spec->curdir
+    my ($vol, $dirs, $file) = < File::Spec->splitpath($dir,1);
+    my @dirs = @( < File::Spec->splitdir($dirs) );
+    unshift @dirs, < File::Spec->curdir
         unless File::Spec->file_name_is_absolute($dir);
 
     my $path='';
     my @make;
-    while (@dirs) {
-        $dir = File::Spec->catdir(@dirs);
+    while ((nelems @dirs)) {
+        $dir = File::Spec->catdir(< @dirs);
         $dir = File::Spec->catpath($vol,$dir,'') 
                 if defined $vol and length $vol;
         next if ( $dir eq $path );
@@ -439,7 +439,7 @@ writable.
 =cut
 
 sub _mkpath {
-    my ($dir,$show,$mode,$verbose,$dry_run)=@_;
+    my ($dir,$show,$mode,$verbose,$dry_run)=< @_;
     if ( $verbose && $verbose +> 1 && ! -d $dir) {
         $show= 1;
         printf "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
@@ -450,20 +450,20 @@ sub _mkpath {
         }
 
     }
-    my ($can,$root,@make)=_can_write_dir($dir);
+    my ($can,$root,< @make)= <_can_write_dir($dir);
     if (!$can) {
-        my @msg=(
+        my @msg=@(
             "Can't create '$dir'",
             $root ? "Do not have write permissions on '$root'"
                   : "Unknown Error"
         );
         if ($dry_run) {
-            _warnonce @msg;
+            _warnonce < @msg;
         } else {
-            _choke @msg;
+            _choke < @msg;
         }
     } elsif ($show and $dry_run) {
-        print "$_\n" for @make;
+        print "$_\n" for < @make;
     }
     
 }
@@ -484,13 +484,13 @@ Dies if the copy fails.
 
 
 sub _copy {
-    my ( $from, $to, $verbose, $dry_run)=@_;
+    my ( $from, $to, $verbose, $dry_run)=< @_;
     if ($verbose && $verbose+>1) {
         printf "copy(\%s,\%s)\n", $from, $to;
     }
     if (!$dry_run) {
         File::Copy::copy($from,$to)
-            or Carp::croak( _estr "ERROR: Cannot copy '$from' to '$to': $!" );
+            or Carp::croak( < _estr "ERROR: Cannot copy '$from' to '$to': $!" );
     }
 }
 
@@ -509,14 +509,14 @@ Dies if the copy fails.
 =cut
 
 sub _symlink {
-    my ( $old, $new, $verbose, $nonono)=@_;
+    my ( $old, $new, $verbose, $nonono)=< @_;
     if ($verbose && $verbose+>1) {
         printf "symlink(\%s,\%s)\n", $old, $new;
     }
     if (!$nonono) {
         $old = File::Spec->rel2abs( $old );
         symlink($old,$new)
-            or Carp::croak( _estr "ERROR: Cannot symlink '$new' to '$old': $!" );
+            or Carp::croak( < _estr "ERROR: Cannot symlink '$new' to '$old': $!" );
     }
 }
 
@@ -533,7 +533,7 @@ dies on error.
 =cut
 
 sub _chdir {
-    my ($dir)= @_;
+    my ($dir)= < @_;
     my $ret;
     if (defined wantarray) {
         $ret= cwd;
@@ -664,9 +664,9 @@ provided then the returned hashref will be the passed in hashref.
 =cut
 
 sub install { #XXX OS-SPECIFIC
-    my($from_to,$verbose,$dry_run,$uninstall_shadows,$skip,$always_copy,$result) = @_;
-    if (@_==1 and try { 1+@$from_to }) {
-        my %opts        = @$from_to;
+    my($from_to,$verbose,$dry_run,$uninstall_shadows,$skip,$always_copy,$result) = < @_;
+    if ((nelems @_)==1 and try { 1+nelems @$from_to }) {
+        my %opts        = %( < @$from_to );
         $from_to        = %opts{from_to} 
                             or Carp::confess("from_to is a mandatory parameter");
         $verbose        = %opts{verbose};
@@ -687,9 +687,9 @@ sub install { #XXX OS-SPECIFIC
                  || 0
         unless defined $always_copy;
 
-    my(%from_to) = %$from_to;
+    my(%from_to) = %( < %$from_to );
     my(%pack, $dir, %warned);
-    my($packlist) = ExtUtils::Packlist->new();
+    my($packlist) = < ExtUtils::Packlist->new();
 
     local(*DIR);
     for (qw/read write/) {
@@ -743,7 +743,7 @@ sub install { #XXX OS-SPECIFIC
             my $sourcedir  = File::Spec->catdir($source, $File::Find::dir);
             my $sourcefile = File::Spec->catfile($sourcedir, $origfile);
 
-            for my $pat (@$skip) {
+            for my $pat (< @$skip) {
                 if ( $sourcefile=~m/$pat/ ) {
                     print "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;
@@ -780,9 +780,9 @@ sub install { #XXX OS-SPECIFIC
     foreach my $targetdir (sort keys %check_dirs) {
         _mkpath( $targetdir, 0, 0755, $verbose, $dry_run );
     }
-    foreach my $found (@found_files) {
+    foreach my $found (< @found_files) {
         my ($diff, $ffd, $origfile, $mode, $size, $atime, $mtime,
-            $targetdir, $targetfile, $sourcedir, $sourcefile)= @$found;
+            $targetdir, $targetfile, $sourcedir, $sourcefile)= < @$found;
         
         my $realtarget= $targetfile;
         if ($diff) {
@@ -828,10 +828,10 @@ sub install { #XXX OS-SPECIFIC
     }
 
     if (%pack{'write'}) {
-        $dir = install_rooted_dir(dirname(%pack{'write'}));
+        $dir = install_rooted_dir( <dirname(%pack{'write'}));
         _mkpath( $dir, 0, 0755, $verbose, $dry_run );
         print "Writing %pack{'write'}\n";
-        $packlist->write(install_rooted_file(%pack{'write'})) unless $dry_run;
+        $packlist->write( <install_rooted_file(%pack{'write'})) unless $dry_run;
     }
 
     _do_cleanup($verbose);
@@ -850,13 +850,13 @@ Handles converting $MUST_REBOOT to a die for instance.
 =cut
 
 sub _do_cleanup {
-    my ($verbose) = @_;
+    my ($verbose) = < @_;
     if ($MUST_REBOOT) {
-        die _estr "Operation not completed! ",
+        die < _estr "Operation not completed! ",
             "You must reboot to complete the installation.",
             "Sorry.";
     } elsif (defined $MUST_REBOOT ^&^ $verbose) {
-        warn _estr "Installation will be completed at the next reboot.\n",
+        warn < _estr "Installation will be completed at the next reboot.\n",
              "However it is not necessary to reboot immediately.\n";
     }
 }
@@ -910,7 +910,7 @@ reboot. A wrapper for _unlink_or_rename().
 
 
 sub forceunlink {
-    my ( $file, $tryhard )= @_; #XXX OS-SPECIFIC
+    my ( $file, $tryhard )= < @_; #XXX OS-SPECIFIC
     _unlink_or_rename( $file, $tryhard, not("installing") );
 }
 
@@ -926,7 +926,7 @@ Returns 0 if there is not.
 =cut
 
 sub directory_not_empty ($) {
-  my($dir) = @_;
+  my($dir) = < @_;
   my $files = 0;
   find(sub {
            return if $_ eq ".exists";
@@ -962,8 +962,8 @@ Consider its use discouraged.
 =cut
 
 sub install_default {
-  @_ +< 2 or Carp::croak("install_default should be called with 0 or 1 argument");
-  my $FULLEXT = @_ ? shift : @ARGV[0];
+  (nelems @_) +< 2 or Carp::croak("install_default should be called with 0 or 1 argument");
+  my $FULLEXT = (nelems @_) ? shift : @ARGV[0];
   defined $FULLEXT or die "Do not know to where to write install log";
   my $INST_LIB = File::Spec->catdir($Curdir,"blib","lib");
   my $INST_ARCHLIB = File::Spec->catdir($Curdir,"blib","arch");
@@ -1002,15 +1002,15 @@ without actually doing it.  Default is false.
 =cut
 
 sub uninstall {
-    my($fil,$verbose,$dry_run) = @_;
+    my($fil,$verbose,$dry_run) = < @_;
     $verbose ||= 0;
     $dry_run  ||= 0;
 
-    die _estr "ERROR: no packlist file found: '$fil'"
+    die < _estr "ERROR: no packlist file found: '$fil'"
         unless -f $fil;
     # my $my_req = $self->catfile(qw(auto ExtUtils Install forceunlink.al));
     # require $my_req; # Hairy, but for the first
-    my ($packlist) = ExtUtils::Packlist->new($fil);
+    my ($packlist) = < ExtUtils::Packlist->new($fil);
     foreach (sort(keys(%$packlist))) {
         chomp;
         print "unlink $_\n" if $verbose;
@@ -1041,17 +1041,17 @@ removed and values of the source files they would shadow.
 =cut
 
 sub inc_uninstall {
-    my($filepath,$libdir,$verbose,$dry_run,$ignore,$results) = @_;
+    my($filepath,$libdir,$verbose,$dry_run,$ignore,$results) = < @_;
     my($dir);
     $ignore||="";
-    my $file = (File::Spec->splitpath($filepath))[[2]];
-    my %seen_dir = ();
+    my $file = ( <File::Spec->splitpath($filepath))[[2]];
+    my %seen_dir = %( () );
     
-    my @PERL_ENV_LIB = split %Config{path_sep}, defined %ENV{'PERL5LIB'}
-      ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '';
+    my @PERL_ENV_LIB = @( split %Config{path_sep}, defined %ENV{'PERL5LIB'}
+      ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '' );
         
-    my @dirs=( @PERL_ENV_LIB, 
-               @INC, 
+    my @dirs=@( < @PERL_ENV_LIB, 
+               < @INC, 
                %Config{[qw(archlibexp
                           privlibexp
                           sitearchexp
@@ -1059,7 +1059,7 @@ sub inc_uninstall {
     
     #warn join "\n","---",@dirs,"---";
     my $seen_ours;
-    foreach $dir ( @dirs ) {
+    foreach $dir ( < @dirs ) {
         my $canonpath = File::Spec->canonpath($dir);
         next if $canonpath eq $Curdir;
         next if %seen_dir{$canonpath}++;
@@ -1087,7 +1087,7 @@ sub inc_uninstall {
             if ($verbose) {
                 $Inc_uninstall_warn_handler ||= ExtUtils::Install::Warn->new();
                 $libdir =~ s|^\./||s ; # That's just cosmetics, no need to port. It looks prettier.
-                $Inc_uninstall_warn_handler->add(
+                $Inc_uninstall_warn_handler->add( <
                                      File::Spec->catfile($libdir, $file),
                                      $targetfile
                                     );
@@ -1125,7 +1125,7 @@ Filter $src using $cmd into $dest.
 =cut
 
 sub run_filter {
-    my ($cmd, $src, $dest) = @_;
+    my ($cmd, $src, $dest) = < @_;
     local(*CMD, *SRC);
     open(CMD, '|-', "$cmd >$dest") || die "Cannot fork: $!";
     open(SRC, "<", $src)           || die "Cannot open $src: $!";
@@ -1159,7 +1159,7 @@ be prepended as a directory to each installed file (and directory).
 =cut
 
 sub pm_to_blib {
-    my($fromto,$autodir,$pm_filter) = @_;
+    my($fromto,$autodir,$pm_filter) = < @_;
 
     _mkpath($autodir,0,0755);
     while(my($from, $to) = each %$fromto) {
@@ -1184,7 +1184,7 @@ sub pm_to_blib {
             # we wont try hard here. its too likely to mess things up.
             forceunlink($to);
         } else {
-            _mkpath(dirname($to),0,0755);
+            _mkpath( <dirname($to),0,0755);
         }
         if ($need_filtering) {
             run_filter($pm_filter, $from, $to);
@@ -1204,7 +1204,7 @@ package ExtUtils::Install::Warn;
 sub new { bless \%(), shift }
 
 sub add {
-    my($self,$file,$targetfile) = @_;
+    my($self,$file,$targetfile) = < @_;
     push @{$self->{$file}}, $targetfile;
 }
 
@@ -1213,9 +1213,9 @@ sub DESTROY {
         my $self = shift;
         my($file,$i,$plural);
         foreach $file (sort keys %$self) {
-            $plural = @{$self->{$file}} +> 1 ? "s" : "";
+            $plural = (nelems @{$self->{$file}}) +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
-            for (0..@{$self->{$file}}-1) {
+            for (0..(nelems @{$self->{$file}})-1) {
                 print "rm ", $self->{$file}->[$_], "\n";
                 $i++;
             }
@@ -1244,7 +1244,7 @@ sub _invokant {
     my @stack;
     my $frame = 0;
     while (my $file = (caller($frame++))[[1]]) {
-        push @stack, (File::Spec->splitpath($file))[[2]];
+        push @stack, ( <File::Spec->splitpath($file))[[2]];
     }
 
     my $builder;

@@ -36,14 +36,14 @@ use strict;
 
 my $bison = 'bison';
 
-if (@ARGV +>= 2 and @ARGV[0] eq '-b') {
+if ((nelems @ARGV) +>= 2 and @ARGV[0] eq '-b') {
     shift;
     $bison = shift;
 }
 
 my $y_file = shift || 'perly.y';
 
-usage unless @ARGV==0 && $y_file =~ m/\.y$/;
+usage unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/;
 
 (my $h_file    = $y_file) =~ s/\.y$/.h/;
 (my $act_file  = $y_file) =~ s/\.y$/.act/;
@@ -86,7 +86,7 @@ die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file;
 close CTMPFILE;
 
-my ($actlines, $tablines) = extract($clines);
+my ($actlines, $tablines) = < extract($clines);
 
 $tablines .= make_type_tab($y_file, $tablines);
 
@@ -217,7 +217,7 @@ sub extract {
 # perly.y
 
 sub make_type_tab {
-    my ($y_file, $tablines) = @_;
+    my ($y_file, $tablines) = < @_;
     my %tokens;
     my %types;
     my $default_token;
@@ -271,15 +271,15 @@ sub make_type_tab {
 
 
 sub my_system {
-    system(@_);
+    system(< @_);
     if ($? == -1) {
-	die "failed to execute command '@_': $!\n";
+	die "failed to execute command '{join ' ', <@_}': $!\n";
     }
     elsif ($? ^&^ 127) {
-	die sprintf "command '@_' died with signal \%d\n",
+	die sprintf "command '{join ' ', <@_}' died with signal \%d\n",
 	    ($? ^&^ 127);
     }
     elsif ($? >> 8) {
-	die sprintf "command '@_' exited with value \%d\n", $? >> 8;
+	die sprintf "command '{join ' ', <@_}' exited with value \%d\n", $? >> 8;
     }
 }

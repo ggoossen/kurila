@@ -4,7 +4,7 @@
 
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-        @INC = ('../../lib', '../lib', 'lib');
+        @INC = @('../../lib', '../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -80,7 +80,7 @@ ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
 open(my $packlist, '<', 'install-test/packlist' ) or die;
-my %packlist = map { chomp;  ($_ => 1) } ~< $packlist;
+my %packlist = %( map { chomp;  ($_ => 1) } ~< $packlist );
 close $packlist or die;
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
@@ -111,7 +111,7 @@ close DUMMY;
 {
   ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
 
-  local @INC = ('install-test/lib/perl');
+  local @INC = @('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
   install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -128,11 +128,11 @@ close DUMMY;
 {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile; 
-  local @INC = ('install-test/other_lib/perl','install-test/lib/perl');
+  local @INC = @('install-test/other_lib/perl','install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
+  local $^WARN_HOOK=sub { push @warn, < @_[0]->message; return };
   my $ok=try {
     install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -142,7 +142,7 @@ close DUMMY;
     1
   };
   ok($ok,'  we didnt die');
-  ok(0+@warn,"  we did warn");
+  ok(0+nelems @warn,"  we did warn");
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -154,11 +154,11 @@ close DUMMY;
 {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile;
-  local @INC = ('install-test/lib/perl','install-test/other_lib/perl');
+  local @INC = @('install-test/lib/perl','install-test/other_lib/perl');
   local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local %SIG{__WARN__}=sub { push @warn,@_; return };
+  local %SIG{__WARN__}=sub { push @warn,< @_; return };
   my $ok=try {
     install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -167,7 +167,7 @@ close DUMMY;
     1
   };
   ok(!$ok,'  we did die');
-  ok(!@warn,"  we didnt warn");
+  ok(!nelems @warn,"  we didnt warn");
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -176,7 +176,7 @@ close DUMMY;
 
 # Test UNINST=1 removing other versions in other dirs.
 {
-  local @INC = ('install-test/lib/perl');
+  local @INC = @('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
   ok( -r 'install-test/lib/perl/Big/Dummy.pm','different install exists' );
   install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
@@ -192,7 +192,7 @@ close DUMMY;
 
 # Test EU_ALWAYS_COPY triggers copy.
 {
-  local @INC = ('install-test/lib/perl');
+  local @INC = @('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
   local %ENV{EU_INSTALL_ALWAYS_COPY}=1;
   my $tfile='install-test/other_lib/perl/Big/Dummy.pm';
@@ -213,7 +213,7 @@ close DUMMY;
 }
 # Test nothing is copied.
 {
-  local @INC = ('install-test/lib/perl');
+  local @INC = @('install-test/lib/perl');
   local %ENV{PERL5LIB} = '';
   local %ENV{EU_INSTALL_ALWAYS_COPY}=0;
   my $tfile='install-test/other_lib/perl/Big/Dummy.pm';

@@ -10,8 +10,8 @@ use Config;
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN {
     use Exporter   ();
-    @EXPORT      = qw(getpwent getpwuid getpwnam getpw);
-    @EXPORT_OK   = qw(
+    @EXPORT      = @( qw(getpwent getpwuid getpwnam getpw) );
+    @EXPORT_OK   = @( qw(
                         pw_has
 
                         $pw_name    $pw_passwd  $pw_uid  $pw_gid
@@ -21,13 +21,13 @@ BEGIN {
                         $pw_quota   $pw_comment
                         $pw_expire
 
-                   );
-    %EXPORT_TAGS = (
-        FIELDS => \@( grep(m/^\$pw_/, @EXPORT_OK), @EXPORT ),
-        ALL    => \@( @EXPORT, @EXPORT_OK ),
+                   ) );
+    %EXPORT_TAGS = %(
+        FIELDS => \@( grep(m/^\$pw_/, < @EXPORT_OK), < @EXPORT ),
+        ALL    => \@( < @EXPORT, < @EXPORT_OK ),
     );
 }
-use vars grep m/^\$pw_/, @EXPORT_OK;
+use vars grep m/^\$pw_/, < @EXPORT_OK;
 
 #
 # XXX: these mean somebody hacked this module's source
@@ -91,7 +91,7 @@ sub _feature_init {
         %Groks{$short} = defined %Config{ "d_" . $feep };
     }
     # assume that any that are left are always there
-    for my $feep (grep m/^\$pw_/s, @EXPORT_OK) {
+    for my $feep (grep m/^\$pw_/s, < @EXPORT_OK) {
         $feep =~ m/^\$pw_(.*)/;
         %Groks{$1} = 1 unless defined %Groks{$1};
     }
@@ -113,12 +113,12 @@ sub pw_has {
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
                     ? \&die
-                    : sub { die("$IE @_") };
-    if (@_ == 0) {
-        my @valid = sort grep { %Groks{$_} } keys %Groks;
-        return wantarray ? @valid : "@valid";
+                    : sub { die("$IE {join ' ', <@_}") };
+    if ((nelems @_) == 0) {
+        my @valid = @( sort grep { %Groks{$_} } keys %Groks );
+        return wantarray ? @valid : "{join ' ', <@valid}";
     }
-    for my $feep (map { split } @_) {
+    for my $feep (map { split } < @_) {
         defined %Groks{$feep}
             || $sploder->("$feep is never a valid struct pwd field");
         $cando &&= %Groks{$feep};
@@ -127,7 +127,7 @@ sub pw_has {
 }
 
 sub _populate (@) {
-    return unless @_;
+    return unless (nelems @_);
     my $pwob = new();
 
     # Any that haven't been pw_had are assumed on "all" platforms of

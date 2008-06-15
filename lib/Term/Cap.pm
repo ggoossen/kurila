@@ -106,8 +106,8 @@ output the string to $FH if specified.
 
 if ( $^O eq 'VMS' )
 {
-    chomp( my @entry = ~< *DATA );
-    $VMS_TERMCAP = join '', @entry;
+    chomp( my @entry = @( ~< *DATA ) );
+    $VMS_TERMCAP = join '', < @entry;
 }
 
 # Returns a list of termcap files to check.
@@ -142,7 +142,7 @@ sub termcap_path
     }
 
     # return the list of those termcaps that exist
-    return grep { defined $_ && -f $_ } @termcap_path;
+    return grep { defined $_ && -f $_ } < @termcap_path;
 }
 
 =item B<Tgetent>
@@ -202,7 +202,7 @@ It calls C<croak> on failure.
 sub Tgetent
 {    ## public -- static method
     my $class = shift;
-    my ($self) = @_;
+    my ($self) = < @_;
 
     $self = \%() unless defined $self;
     bless $self, $class;
@@ -224,7 +224,7 @@ sub Tgetent
     {
 
         # delays for old style speeds
-        my @pad = (
+        my @pad = @(
             0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3,
             16.7, 8.3, 5.5,   4.1,  2,    1,    .5, .2
         );
@@ -271,9 +271,9 @@ sub Tgetent
         $entry = $foo;
     }
 
-    my @termcap_path = termcap_path();
+    my @termcap_path = @( < termcap_path() );
 
-    unless ( @termcap_path || $entry )
+    unless ( (nelems @termcap_path) || $entry )
     {
 
         # last resort--fake up a termcap from terminfo
@@ -308,7 +308,7 @@ sub Tgetent
         }
     }
 
-    croak "Can't find a valid termcap file" unless @termcap_path || $entry;
+    croak "Can't find a valid termcap file" unless (nelems @termcap_path) || $entry;
 
     $state = 1;    # 0 == finished
                    # 1 == next file
@@ -478,7 +478,7 @@ The padded $string is returned.
 sub Tpad
 {    ## public
     my $self = shift;
-    my ( $string, $cnt, $FH ) = @_;
+    my ( $string, $cnt, $FH ) = < @_;
     my ( $decr, $ms );
 
     if ( defined $string && $string =~ m/(^[\d.]+)(\*?)(.*)$/ )
@@ -530,7 +530,7 @@ The appropriate string for the capability will be returned.
 sub Tputs
 {    ## public
     my $self = shift;
-    my ( $cap, $cnt, $FH ) = @_;
+    my ( $cap, $cnt, $FH ) = < @_;
     my $string;
 
     $cnt = 0 unless $cnt;
@@ -605,12 +605,12 @@ The output string will be returned.
 sub Tgoto
 {    ## public
     my $self = shift;
-    my ( $cap, $code, $tmp, $FH ) = @_;
+    my ( $cap, $code, $tmp, $FH ) = < @_;
     my $string = $self->{ '_' . $cap };
     my $result = '';
     my $after  = '';
     my $online = 0;
-    my @tmp    = ( $tmp, $code );
+    my @tmp    = @( $tmp, $code );
     my $cnt    = $code;
 
     while ($string =~ m/^([^%]*)%(.)(.*)/) {
@@ -639,8 +639,8 @@ sub Tgoto
 	    $online = !$online;
 	}
 	elsif ($code eq 'r') {
-	    ($code,$tmp) = @tmp;
-	    @tmp = ($tmp,$code);
+	    ($code,$tmp) = < @tmp;
+	    @tmp = @($tmp,$code);
 	    $online = !$online;
 	}
 	elsif ($code eq '>') {
@@ -658,8 +658,8 @@ sub Tgoto
 	    $online = !$online;
 	}
 	elsif ($code eq 'i') {
-	    ($code,$tmp) = @tmp;
-	    @tmp = ($code+1,$tmp+1);
+	    ($code,$tmp) = < @tmp;
+	    @tmp = @($code+1,$tmp+1);
 	}
 	else {
 	    return "OOPS";
@@ -683,12 +683,12 @@ sub Trequire
 {    ## public
     my $self = shift;
     my ( $cap, @undefined );
-    foreach $cap (@_)
+    foreach $cap (< @_)
     {
         push( @undefined, $cap )
           unless defined $self->{ '_' . $cap } && $self->{ '_' . $cap };
     }
-    croak "Terminal does not support: (@undefined)" if @undefined;
+    croak "Terminal does not support: ({join ' ', <@undefined})" if (nelems @undefined);
 }
 
 =back

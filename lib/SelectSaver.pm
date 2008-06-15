@@ -35,10 +35,10 @@ that was selected when it was created.
 =cut
 
 sub new {
-    @_ +>= 1 && @_ +<= 2 or die 'usage: SelectSaver->new([FILEHANDLE])';
+    (nelems @_) +>= 1 && (nelems @_) +<= 2 or die 'usage: SelectSaver->new([FILEHANDLE])';
     my $fh = select;
     my $self = bless \$fh, @_[0];
-    select @_[1] if @_ +> 1;
+    select @_[1] if (nelems @_) +> 1;
     $self;
 }
 

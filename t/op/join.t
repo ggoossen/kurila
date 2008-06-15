@@ -2,8 +2,8 @@
 
 print "1..22\n";
 
-my @x = (1, 2, 3);
-if (join(':',@x) eq '1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
+my @x = @(1, 2, 3);
+if (join(':',< @x) eq '1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
 
 if (join('',1,2,3) eq '123') {print "ok 2\n";} else {print "not ok 2\n";}
 
@@ -73,7 +73,7 @@ use utf8;
   my $u = "abc\x{0100}";
 
   sub join_into_my_variable {
-    my $r = join("", @_);
+    my $r = join("", < @_);
     return $r;
   }
 

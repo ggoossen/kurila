@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -14,7 +14,7 @@ use strict;
 
 use Test::Builder;
 require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my($out, $err) = < Test::Simple::Catch::caught();
 Test::Builder->new->no_header(1);
 Test::Builder->new->no_ending(1);
 local %ENV{HARNESS_ACTIVE} = 0;
@@ -29,11 +29,11 @@ $TB->plan(tests => 73);
 
 # Utility testing functions.
 sub ok ($;$) {
-    return $TB->ok(@_);
+    return $TB->ok(< @_);
 }
 
 sub is ($$;$) {
-    my($this, $that, $name) = @_;
+    my($this, $that, $name) = < @_;
 
     my $ok = $TB->is_eq($$this, $that, $name);
 
@@ -43,7 +43,7 @@ sub is ($$;$) {
 }
 
 sub like ($$;$) {
-    my($this, $regex, $name) = @_;
+    my($this, $regex, $name) = < @_;
     $regex = "/$regex/" if !ref $regex and $regex !~ m{^/.*/$}s;
 
     my $ok = $TB->like($$this, $regex, $name);
@@ -199,7 +199,7 @@ my $bar = \%(
 
 #line 198
 ok !is_deeply( $foo, $bar, 'deep structures' );
-ok( @Test::More::Data_Stack == 0, '@Data_Stack not holding onto things' );
+ok( (nelems @Test::More::Data_Stack) == 0, '@Data_Stack not holding onto things' );
 is( $out, "not ok 11 - deep structures\n",  'deep structures' );
 is( $err, <<ERR,                            '    right diagnostic' );
 #   Failed test 'deep structures'
@@ -211,17 +211,17 @@ ERR
 
 
 #line 221
-my @tests = (\@(),
+my @tests = @(\@(),
              \@(qw(42)),
              \@(qw(42 23), qw(42 23))
             );
 
-foreach my $test (@tests) {
-    my $num_args = @$test;
+foreach my $test (< @tests) {
+    my $num_args = (nelems @$test);
 
     my $warning;
     local $^WARN_HOOK = sub { $warning .= @_[0]->message; };
-    ok !is_deeply(@$test);
+    ok !is_deeply(< @$test);
 
     like \$warning, 
          "/^is_deeply\\(\\) takes two or three args, you gave $num_args\.\n/";
@@ -231,7 +231,7 @@ foreach my $test (@tests) {
 #line 240
 # [rt.cpan.org 6837]
 ok !is_deeply(\@(\%(Foo => undef)),\@(\%(Foo => ""))), 'undef != ""';
-ok( @Test::More::Data_Stack == 0, '@Data_Stack not holding onto things' );
+ok( (nelems @Test::More::Data_Stack) == 0, '@Data_Stack not holding onto things' );
 
 
 #line 258

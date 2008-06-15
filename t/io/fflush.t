@@ -38,7 +38,7 @@ $runperl .= qq{ "-I../lib"};
 my @delete;
 
 END {
-    for (@delete) {
+    for (< @delete) {
 	unlink $_ or warn "unlink $_: $!";
     }
 }
@@ -101,7 +101,7 @@ if (!$d_fork) {
 }
 
 # Test flush on system/qx/pipe open
-my %subs = (
+my %subs = %(
             "system" => sub {
                 my $c = shift;
                 system $c;

@@ -1,7 +1,7 @@
 #!./perl
 
 use File::Spec;
-use lib File::Spec->catdir('t', 'lib');
+use lib < File::Spec->catdir('t', 'lib');
 use Test::More;
 
 if( $^O eq 'MSWin32' ) {

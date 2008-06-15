@@ -2,7 +2,7 @@
 
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-        @INC = ('../lib', 'lib');
+        @INC = @('../lib', 'lib');
     }
     else {
         unshift @INC, 't/lib';
@@ -22,18 +22,18 @@ BEGIN {
 chdir File::Spec->updir;
 my $manifest = File::Spec->catfile('MANIFEST');
 open(MANIFEST, "<", $manifest) or die "Can't open $manifest: $!";
-my @modules = map { m{^lib/(\S+)}; $1 } 
+my @modules = @( map { m{^lib/(\S+)}; $1 } 
               grep { m{^lib/ExtUtils/\S*\.pm} } 
-              grep { !m{/t/} } ~< *MANIFEST;
+              grep { !m{/t/} } ~< *MANIFEST );
 chomp @modules;
 close MANIFEST;
 
 chdir 'lib';
-plan tests => scalar @modules * 2;
-foreach my $file (@modules) {
+plan tests => scalar (nelems @modules) * 2;
+foreach my $file (< @modules) {
     # Make sure we look at the local files and do not reload them if
     # they're already loaded.  This avoids recompilation warnings.
-    local @INC = @INC;
+    local @INC = @( < @INC );
     unshift @INC, ".";
     ok try { require($file); 1 } or diag "require $file failed.\n{$@->message}";
 

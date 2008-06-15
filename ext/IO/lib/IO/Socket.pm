@@ -20,24 +20,24 @@ use Errno;
 require IO::Socket::INET;
 require IO::Socket::UNIX if ($^O ne 'epoc' && $^O ne 'symbian');
 
-@ISA = qw(IO::Handle);
+@ISA = @( qw(IO::Handle) );
 
 $VERSION = "1.30_01";
 
-@EXPORT_OK = qw(sockatmark);
+@EXPORT_OK = @( qw(sockatmark) );
 
 sub import {
     my $pkg = shift;
-    if (@_ && @_[0] eq 'sockatmark') { # not very extensible but for now, fast
+    if ((nelems @_) && @_[0] eq 'sockatmark') { # not very extensible but for now, fast
 	Exporter::export_to_level('IO::Socket', 1, $pkg, 'sockatmark');
     } else {
 	my $callpkg = caller;
-	Exporter::export 'Socket', $callpkg, @_;
+	Exporter::export 'Socket', $callpkg, < @_;
     }
 }
 
 sub new {
-    my($class,%arg) = @_;
+    my($class,< %arg) = < @_;
     my $sock = $class->SUPER::new();
 
     $sock->autoflush(1);
@@ -51,12 +51,12 @@ sub new {
 my @domain2pkg;
 
 sub register_domain {
-    my($p,$d) = @_;
+    my($p,$d) = < @_;
     @domain2pkg[$d] = $p;
 }
 
 sub configure {
-    my($sock,$arg) = @_;
+    my($sock,$arg) = < @_;
     my $domain = delete $arg->{Domain};
 
     croak 'IO::Socket: Cannot configure a generic socket'
@@ -73,8 +73,8 @@ sub configure {
 }
 
 sub socket {
-    @_ == 4 or croak 'usage: $sock->socket(DOMAIN, TYPE, PROTOCOL)';
-    my($sock,$domain,$type,$protocol) = @_;
+    (nelems @_) == 4 or croak 'usage: $sock->socket(DOMAIN, TYPE, PROTOCOL)';
+    my($sock,$domain,$type,$protocol) = < @_;
 
     socket($sock,$domain,$type,$protocol) or
     	return undef;
@@ -87,8 +87,8 @@ sub socket {
 }
 
 sub socketpair {
-    @_ == 4 || croak 'usage: IO::Socket->socketpair(DOMAIN, TYPE, PROTOCOL)';
-    my($class,$domain,$type,$protocol) = @_;
+    (nelems @_) == 4 || croak 'usage: IO::Socket->socketpair(DOMAIN, TYPE, PROTOCOL)';
+    my($class,$domain,$type,$protocol) = < @_;
     my $sock1 = $class->new();
     my $sock2 = $class->new();
 
@@ -102,7 +102,7 @@ sub socketpair {
 }
 
 sub connect {
-    @_ == 2 or croak 'usage: $sock->connect(NAME)';
+    (nelems @_) == 2 or croak 'usage: $sock->connect(NAME)';
     my $sock = shift;
     my $addr = shift;
     my $timeout = %{*$sock}{'io_socket_timeout'};
@@ -153,7 +153,7 @@ sub connect {
 sub blocking {
     my $sock = shift;
 
-    return $sock->SUPER::blocking(@_)
+    return $sock->SUPER::blocking(< @_)
         if $^O ne 'MSWin32';
 
     # Windows handles blocking differently
@@ -173,7 +173,7 @@ sub blocking {
 
     my $orig= !%{*$sock}{io_sock_nonblocking};
         
-    return $orig unless @_;
+    return $orig unless (nelems @_);
 
     my $block = shift;
     
@@ -188,14 +188,14 @@ sub blocking {
 
 
 sub close {
-    @_ == 1 or croak 'usage: $sock->close()';
+    (nelems @_) == 1 or croak 'usage: $sock->close()';
     my $sock = shift;
     %{*$sock}{'io_socket_peername'} = undef;
     $sock->SUPER::close();
 }
 
 sub bind {
-    @_ == 2 or croak 'usage: $sock->bind(NAME)';
+    (nelems @_) == 2 or croak 'usage: $sock->bind(NAME)';
     my $sock = shift;
     my $addr = shift;
 
@@ -204,8 +204,8 @@ sub bind {
 }
 
 sub listen {
-    @_ +>= 1 && @_ +<= 2 or croak 'usage: $sock->listen([QUEUE])';
-    my($sock,$queue) = @_;
+    (nelems @_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: $sock->listen([QUEUE])';
+    my($sock,$queue) = < @_;
     $queue = 5
 	unless $queue && $queue +> 0;
 
@@ -214,7 +214,7 @@ sub listen {
 }
 
 sub accept {
-    @_ == 1 || @_ == 2 or croak 'usage $sock->accept([PKG])';
+    (nelems @_) == 1 || (nelems @_) == 2 or croak 'usage $sock->accept([PKG])';
     my $sock = shift;
     my $pkg = shift || $sock;
     my $timeout = %{*$sock}{'io_socket_timeout'};
@@ -236,29 +236,29 @@ sub accept {
     $peer = accept($new,$sock)
 	or return;
 
-    return wantarray ? ($new, $peer)
+    return wantarray ?  @($new, $peer)
     	      	     : $new;
 }
 
 sub sockname {
-    @_ == 1 or croak 'usage: $sock->sockname()';
+    (nelems @_) == 1 or croak 'usage: $sock->sockname()';
     getsockname(@_[0]);
 }
 
 sub peername {
-    @_ == 1 or croak 'usage: $sock->peername()';
-    my($sock) = @_;
+    (nelems @_) == 1 or croak 'usage: $sock->peername()';
+    my($sock) = < @_;
     %{*$sock}{'io_socket_peername'} ||= getpeername($sock);
 }
 
 sub connected {
-    @_ == 1 or croak 'usage: $sock->connected()';
-    my($sock) = @_;
+    (nelems @_) == 1 or croak 'usage: $sock->connected()';
+    my($sock) = < @_;
     getpeername($sock);
 }
 
 sub send {
-    @_ +>= 2 && @_ +<= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])';
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])';
     my $sock  = @_[0];
     my $flags = @_[2] || 0;
     my $peer  = @_[3] || $sock->peername;
@@ -272,13 +272,13 @@ sub send {
 
     # remember who we send to, if it was successful
     %{*$sock}{'io_socket_peername'} = $peer
-	if(@_ == 4 && defined $r);
+	if((nelems @_) == 4 && defined $r);
 
     $r;
 }
 
 sub recv {
-    @_ == 3 || @_ == 4 or croak 'usage: $sock->recv(BUF, LEN [, FLAGS])';
+    (nelems @_) == 3 || (nelems @_) == 4 or croak 'usage: $sock->recv(BUF, LEN [, FLAGS])';
     my $sock  = @_[0];
     my $len   = @_[2];
     my $flags = @_[3] || 0;
@@ -288,21 +288,21 @@ sub recv {
 }
 
 sub shutdown {
-    @_ == 2 or croak 'usage: $sock->shutdown(HOW)';
-    my($sock, $how) = @_;
+    (nelems @_) == 2 or croak 'usage: $sock->shutdown(HOW)';
+    my($sock, $how) = < @_;
     %{*$sock}{'io_socket_peername'} = undef;
     shutdown($sock, $how);
 }
 
 sub setsockopt {
-    @_ == 4 or croak '$sock->setsockopt(LEVEL, OPTNAME, OPTVAL)';
+    (nelems @_) == 4 or croak '$sock->setsockopt(LEVEL, OPTNAME, OPTVAL)';
     setsockopt(@_[0],@_[1],@_[2],@_[3]);
 }
 
 my $intsize = length(pack("i",0));
 
 sub getsockopt {
-    @_ == 3 or croak '$sock->getsockopt(LEVEL, OPTNAME)';
+    (nelems @_) == 3 or croak '$sock->getsockopt(LEVEL, OPTNAME)';
     my $r = getsockopt(@_[0],@_[1],@_[2]);
     # Just a guess
     $r = unpack("i", $r)
@@ -312,42 +312,42 @@ sub getsockopt {
 
 sub sockopt {
     my $sock = shift;
-    @_ == 1 ? $sock->getsockopt(SOL_SOCKET,@_)
-	    : $sock->setsockopt(SOL_SOCKET,@_);
+    (nelems @_) == 1 ? $sock->getsockopt(SOL_SOCKET,< @_)
+	    : $sock->setsockopt(SOL_SOCKET,< @_);
 }
 
 sub atmark {
-    @_ == 1 or croak 'usage: $sock->atmark()';
-    my($sock) = @_;
+    (nelems @_) == 1 or croak 'usage: $sock->atmark()';
+    my($sock) = < @_;
     sockatmark($sock);
 }
 
 sub timeout {
-    @_ == 1 || @_ == 2 or croak 'usage: $sock->timeout([VALUE])';
-    my($sock,$val) = @_;
+    (nelems @_) == 1 || (nelems @_) == 2 or croak 'usage: $sock->timeout([VALUE])';
+    my($sock,$val) = < @_;
     my $r = %{*$sock}{'io_socket_timeout'};
 
     %{*$sock}{'io_socket_timeout'} = defined $val ? 0 + $val : $val
-	if(@_ == 2);
+	if((nelems @_) == 2);
 
     $r;
 }
 
 sub sockdomain {
-    @_ == 1 or croak 'usage: $sock->sockdomain()';
+    (nelems @_) == 1 or croak 'usage: $sock->sockdomain()';
     my $sock = shift;
     %{*$sock}{'io_socket_domain'};
 }
 
 sub socktype {
-    @_ == 1 or croak 'usage: $sock->socktype()';
+    (nelems @_) == 1 or croak 'usage: $sock->socktype()';
     my $sock = shift;
     %{*$sock}{'io_socket_type'}
 }
 
 sub protocol {
-    @_ == 1 or croak 'usage: $sock->protocol()';
-    my($sock) = @_;
+    (nelems @_) == 1 or croak 'usage: $sock->protocol()';
+    my($sock) = < @_;
     %{*$sock}{'io_socket_proto'};
 }
 

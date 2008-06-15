@@ -100,7 +100,7 @@ use fields qw(b1);
 
 package main;
 
-my %EXPECT = (
+my %EXPECT = %(
               B1 => \@(qw(b1 b2 b3)),
               D1 => \@(qw(b1 b2 b3 d1 d2 d3)),
               D2 => \@(qw(b1 b2 b3 _d1 _d2 d1 d2)),
@@ -129,9 +129,9 @@ my %EXPECT = (
 
 while(my($class, $efields) = each %EXPECT) {
     no strict 'refs';
-    my %fields = %{*{Symbol::fetch_glob($class.'::FIELDS')}};
+    my %fields = %( < %{*{Symbol::fetch_glob($class.'::FIELDS')}} );
     my %expected_fields;
-    foreach my $idx (1..@$efields) {
+    foreach my $idx (1..nelems @$efields) {
         my $key = $efields->[$idx-1];
         next unless $key;
         %expected_fields{$key} = $idx;

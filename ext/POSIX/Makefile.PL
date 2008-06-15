@@ -12,18 +12,18 @@ if (%Config{sig_name} =~ m/\bRTMIN\b/ && %Config{sig_name} =~ m/\bRTMAX\b/) {
 
 my @libs;
 if ($^O ne 'MSWin32') {
-    @libs = ('LIBS' => \@("-lm -lposix -lcposix"));
+    @libs = @('LIBS' => \@("-lm -lposix -lcposix"));
 }
 WriteMakefile(
     NAME	=> 'POSIX',
-    @libs,
+    < @libs,
     XSPROTOARG	=> '-noprototypes',	# XXX remove later?
     VERSION_FROM => 'POSIX.pm',
     realclean	=> \%(FILES=> 'const-c.inc const-xs.inc'),
 );
 
 my @names =
-  (
+  @(
    qw(ARG_MAX B0 B110 B1200 B134 B150 B1800 B19200 B200 B2400 B300 B38400 B4800
       B50 B600 B75 B9600 BRKINT BUFSIZ CHAR_BIT CHAR_MAX CHAR_MIN CHILD_MAX
       CLOCAL CLOCKS_PER_SEC CREAD CS5 CS6 CS7 CS8 CSIZE CSTOPB E2BIG

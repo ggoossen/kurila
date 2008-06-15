@@ -77,7 +77,7 @@ is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
 # send one expected line of text to child process and then wait for it
 select(FH4); $| = 1; select(STDOUT);
 
-printf FH4 "ok \%d - text sent to fourth process\n", curr_test();
+printf FH4 "ok \%d - text sent to fourth process\n", < curr_test();
 next_test();
 print "# waiting for process $pid4 to exit\n";
 my $reap_pid = waitpid $pid4, 0;

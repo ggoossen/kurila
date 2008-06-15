@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = @( '../lib' );
 }
 
 BEGIN {
@@ -17,8 +17,8 @@ use strict;
 our @gmtime;
 
 BEGIN {
-    @gmtime = gmtime 0; # This is the function gmtime.
-    unless (@gmtime) { print "1..0 # Skip: gmtime failed\n"; exit 0 }
+    @gmtime = @( gmtime 0 ); # This is the function gmtime.
+    unless (nelems @gmtime) { print "1..0 # Skip: gmtime failed\n"; exit 0 }
 }
 
 print "1..10\n";

@@ -37,7 +37,7 @@ help() if $h;
 open(MANIFEST, "<", "MANIFEST") or die "MANIFEST: $!";
 
 my %mani;
-my %mand = qw(. 1);
+my %mand = %( qw(. 1) );
 use File::Basename qw(dirname);
 
 while ( ~< *MANIFEST) {
@@ -76,11 +76,11 @@ for (sort keys %mani) {
 
 $" = "\n" if $l;
 
-unshift @xtra, "extra:"   if @xtra && !$x;
-unshift @miss, "missing:" if @miss && !$m;
+unshift @xtra, "extra:"   if (nelems @xtra) && !$x;
+unshift @miss, "missing:" if (nelems @miss) && !$m;
 
-print "@xtra\n", if @xtra && !$m;
-print "@miss\n"  if @miss && !$x;
+print "{join ' ', <@xtra}\n", if (nelems @xtra) && !$m;
+print "{join ' ', <@miss}\n"  if (nelems @miss) && !$x;
 
 exit 0;
 

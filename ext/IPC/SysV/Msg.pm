@@ -36,7 +36,7 @@ $VERSION = eval $VERSION;
 }
 
 sub new {
-    @_ == 3 || croak 'new IPC::Msg ( KEY , FLAGS )';
+    (nelems @_) == 3 || croak 'new IPC::Msg ( KEY , FLAGS )';
     my $class = shift;
 
     my $id = msgget(@_[0],@_[1]);
@@ -63,12 +63,12 @@ sub set {
     my $self = shift;
     my $ds;
 
-    if(@_ == 1) {
+    if((nelems @_) == 1) {
 	$ds = shift;
     }
     else {
-	croak 'Bad arg count' if @_ % 2;
-	my %arg = @_;
+	croak 'Bad arg count' if (nelems @_) % 2;
+	my %arg = %( < @_ );
 	$ds = $self->stat
 		or return undef;
 	my($key,$val);
@@ -85,7 +85,7 @@ sub remove {
 }
 
 sub rcv {
-    @_ +<= 5 && @_ +>= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
+    (nelems @_) +<= 5 && (nelems @_) +>= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
     my $self = shift;
     my $buf = "";
     msgrcv($$self,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
@@ -96,7 +96,7 @@ sub rcv {
 }
 
 sub snd {
-    @_ +<= 4 && @_ +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
+    (nelems @_) +<= 4 && (nelems @_) +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
     my $self = shift;
     msgsnd($$self,pack("l! a*",@_[0],@_[1]), @_[2] || 0);
 }

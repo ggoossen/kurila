@@ -6,7 +6,7 @@ require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = qw(File::Spec::Unix);
+@ISA = @( qw(File::Spec::Unix) );
 
 my $macfiles;
 if ($^O eq 'MacOS') {
@@ -39,7 +39,7 @@ On Mac OS, there's nothing to be done. Returns what it's given.
 =cut
 
 sub canonpath {
-    my ($self,$path) = @_;
+    my ($self,$path) = < @_;
     return $path;
 }
 
@@ -193,8 +193,8 @@ yields
 
 sub catdir {
 	my $self = shift;
-	return '' unless @_;
-	my @args = @_;
+	return '' unless (nelems @_);
+	my @args = @( < @_ );
 	my $first_arg;
 	my $relative;
 
@@ -233,12 +233,12 @@ sub catdir {
 	# (c) add a trailing ':' if need be
 
 	my $result = $first_arg;
-	while (@args) {
+	while ((nelems @args)) {
 		my $arg = shift @args;
 		unless (($arg eq '') || ($arg eq ':')) {
 			if ($arg =~ m/^::+\Z(?!\n)/ ) { # updir colon path like ':::'
 				my $updir_count = length($arg) - 1;
-				while ((@args) && (@args[0] =~ m/^::+\Z(?!\n)/) ) { # while updir colon path
+				while ((nelems @args) && (@args[0] =~ m/^::+\Z(?!\n)/) ) { # while updir colon path
 					$arg = shift @args;
 					$updir_count += (length($arg) - 1);
 				}
@@ -309,10 +309,10 @@ you are encouraged to use C<catpath()> (see below).
 
 sub catfile {
     my $self = shift;
-    return '' unless @_;
+    return '' unless (nelems @_);
     my $file = pop @_;
-    return $file unless @_;
-    my $dir = $self->catdir(@_);
+    return $file unless (nelems @_);
+    my $dir = $self->catdir(< @_);
     $file =~ s/^://s;
     return $dir.$file;
 }
@@ -355,7 +355,7 @@ sub rootdir {
 #  volume is returned, since that's the closest in concept.
 #
     return '' unless $macfiles;
-    my $system = Mac::Files::FindFolder(&Mac::Files::kOnSystemDisk,
+    my $system = Mac::Files::FindFolder( <&Mac::Files::kOnSystemDisk, <
 	&Mac::Files::kSystemFolderType);
     $system =~ s/:.*\Z(?!\n)/:/s;
     return $system;
@@ -408,9 +408,9 @@ E.g.
 =cut
 
 sub file_name_is_absolute {
-    my ($self,$file) = @_;
+    my ($self,$file) = < @_;
     if ($file =~ m/:/) {
-	return (! ($file =~ m/^:/s) );
+	return  @(! ($file =~ m/^:/s) );
     } elsif ( $file eq '' ) {
         return 1 ;
     } else {
@@ -458,7 +458,7 @@ The results can be passed to C<catpath()> to get back a path equivalent to
 =cut
 
 sub splitpath {
-    my ($self,$path, $nofile) = @_;
+    my ($self,$path, $nofile) = < @_;
     my ($volume,$directory,$file);
 
     if ( $nofile ) {
@@ -486,7 +486,7 @@ sub splitpath {
     }
     $file = '' unless defined($file);
 
-    return ($volume,$directory,$file);
+    return  @($volume,$directory,$file);
 }
 
 
@@ -526,12 +526,12 @@ yields:
 =cut
 
 sub splitdir {
-	my ($self, $path) = @_;
-	my @result = ();
+	my ($self, $path) = < @_;
+	my @result = @( () );
 	my ($head, $sep, $tail, $volume, $directories);
 
 	return @result if ( (!defined($path)) || ($path eq '') );
-	return (':') if ($path eq ':');
+	return  @(':') if ($path eq ':');
 
 	( $volume, $sep, $directories ) = $path =~ m|^((?:[^:]+:)?)(:*)(.*)|s;
 
@@ -577,7 +577,7 @@ resulting path will have a trailing ':'.
 =cut
 
 sub catpath {
-    my ($self,$volume,$directory,$file) = @_;
+    my ($self,$volume,$directory,$file) = < @_;
 
     if ( (! $volume) && (! $directory) ) {
 	$file =~ s/^:// if $file;
@@ -586,7 +586,7 @@ sub catpath {
 
     # We look for a volume in $volume, then in $directory, but not both
 
-    my ($dir_volume, $dir_dirs) = $self->splitpath($directory, 1);
+    my ($dir_volume, $dir_dirs) = < $self->splitpath($directory, 1);
 
     $volume = $dir_volume unless length $volume;
     my $path = $volume; # may be ''
@@ -654,7 +654,7 @@ sub _resolve_updirs {
 
 
 sub abs2rel {
-    my($self,$path,$base) = @_;
+    my($self,$path,$base) = < @_;
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {
@@ -674,17 +674,17 @@ sub abs2rel {
     }
 
     # Split up paths - ignore $base's file
-    my ( $path_vol, $path_dirs, $path_file ) =  $self->splitpath( $path );
-    my ( $base_vol, $base_dirs )             =  $self->splitpath( $base );
+    my ( $path_vol, $path_dirs, $path_file ) = <  $self->splitpath( $path );
+    my ( $base_vol, $base_dirs )             = <  $self->splitpath( $base );
 
     return $path unless lc( $path_vol ) eq lc( $base_vol );
 
     # Now, remove all leading components that are the same
-    my @pathchunks = $self->splitdir( $path_dirs );
-    my @basechunks = $self->splitdir( $base_dirs );
+    my @pathchunks = @( < $self->splitdir( $path_dirs ) );
+    my @basechunks = @( < $self->splitdir( $base_dirs ) );
 	
-    while ( @pathchunks &&
-	    @basechunks &&
+    while ( (nelems @pathchunks) &&
+	    nelems @basechunks &&
 	    lc( @pathchunks[0] ) eq lc( @basechunks[0] ) ) {
         shift @pathchunks ;
         shift @basechunks ;
@@ -692,12 +692,12 @@ sub abs2rel {
 
     # @pathchunks now has the directories to descend in to.
     # ensure relative path, even if @pathchunks is empty
-    $path_dirs = $self->catdir( ':', @pathchunks );
+    $path_dirs = $self->catdir( ':', < @pathchunks );
 
     # @basechunks now contains the number of directories to climb out of.
-    $base_dirs = (':' x @basechunks) . ':' ;
+    $base_dirs = (':' x nelems @basechunks) . ':' ;
 
-    return $self->catpath( '', $self->catdir( $base_dirs, $path_dirs ), $path_file ) ;
+    return $self->catpath( '', < $self->catdir( $base_dirs, $path_dirs ), $path_file ) ;
 }
 
 =item rel2abs
@@ -726,7 +726,7 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 sub rel2abs {
-    my ($self,$path,$base) = @_;
+    my ($self,$path,$base) = < @_;
 
     if ( ! $self->file_name_is_absolute($path) ) {
         # Figure out the effective $base and clean it up.
@@ -740,10 +740,10 @@ sub rel2abs {
 	# Split up paths
 
 	# igonore $path's volume
-        my ( $path_dirs, $path_file ) = ($self->splitpath($path))[[1,2]] ;
+        my ( $path_dirs, $path_file ) = ( <$self->splitpath($path))[[1,2]] ;
 
         # ignore $base's file part
-	my ( $base_vol, $base_dirs ) = $self->splitpath($base) ;
+	my ( $base_vol, $base_dirs ) = < $self->splitpath($base) ;
 
 	# Glom them together
 	$path_dirs = ':' if ($path_dirs eq '');

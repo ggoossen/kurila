@@ -7,7 +7,7 @@ use File::Spec;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-our @ISA = qw( ExtUtils::MM_Unix );
+our @ISA = @( qw( ExtUtils::MM_Unix ) );
 
 our $VERSION = '6.44';
 
@@ -33,7 +33,7 @@ We're Unix and Cygwin.
 =cut
 
 sub os_flavor {
-    return('Unix', 'Cygwin');
+    return @('Unix', 'Cygwin');
 }
 
 =item cflags
@@ -43,7 +43,7 @@ if configured for dynamic loading, triggers #define EXT in EXTERN.h
 =cut
 
 sub cflags {
-    my($self,$libperl)=@_;
+    my($self,$libperl)=< @_;
     return $self->{CFLAGS} if $self->{CFLAGS};
     return '' unless $self->needs_linking();
 
@@ -69,7 +69,7 @@ replaces strings '::' with '.' in MAN*POD man page names
 =cut
 
 sub replace_manpage_separator {
-    my($self, $man) = @_;
+    my($self, $man) = < @_;
     $man =~ s{/+}{.}g;
     return $man;
 }

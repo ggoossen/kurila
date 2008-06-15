@@ -8,12 +8,12 @@ $VERSION = '1.15';
 #=======================================================================
 
 # Some names are evil choices.
-my %keywords = map +($_, 1), qw{ BEGIN INIT CHECK UNITCHECK END DESTROY };
+my %keywords = %( map +($_, 1), qw{ BEGIN INIT CHECK UNITCHECK END DESTROY } );
 
-my %forced_into_main = map +($_, 1),
-    qw{ STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG };
+my %forced_into_main = %( map +($_, 1),
+    qw{ STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG } );
 
-my %forbidden = (%keywords, %forced_into_main);
+my %forbidden = %(< %keywords, < %forced_into_main);
 
 #=======================================================================
 # import() - import symbols into user's namespace
@@ -25,7 +25,7 @@ my %forbidden = (%keywords, %forced_into_main);
 #=======================================================================
 sub import {
     my $class = shift;
-    return unless @_;			# Ignore 'use constant;'
+    return unless (nelems @_);			# Ignore 'use constant;'
     my $constants;
     my $multiple  = ref @_[0];
     my $pkg = caller;
@@ -74,7 +74,7 @@ sub import {
 	# Looks like a boolean
 	# use constant FRED == fred;
 	} elsif ($name =~ m/^[01]?\z/) {
-	    if (@_) {
+	    if ((nelems @_)) {
 		die("Constant name '$name' is invalid");
 	    } else {
 		die("Constant name looks like boolean value");
@@ -89,11 +89,11 @@ sub import {
 	    no strict 'refs';
 	    my $full_name = "{$pkg}::$name";
 	    %declared{$full_name}++;
-	    if ($multiple || @_ == 1) {
+	    if ($multiple || (nelems @_) == 1) {
 		my $scalar = $multiple ? $constants->{$name} : @_[0];
                 *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
-	    } elsif (@_) {
-		my @list = @_;
+	    } elsif ((nelems @_)) {
+		my @list = @( < @_ );
 		*{Symbol::fetch_glob($full_name)} = sub () { @list };
 	    } else {
 		*{Symbol::fetch_glob($full_name)} = sub () { };

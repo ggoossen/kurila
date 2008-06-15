@@ -48,10 +48,10 @@ anonymous subroutine.
     }
 }
 
-is(B->foo, "B::foo => A::foo",
+is( <B->foo, "B::foo => A::foo",
    'method resolved inside anonymous sub');
 
-is(B->bar, "B::bar => A::bar",
+is( <B->bar, "B::bar => A::bar",
    'method resolved inside nested anonymous subs');
 
 

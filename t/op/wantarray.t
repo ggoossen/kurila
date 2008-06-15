@@ -2,7 +2,7 @@
 
 print "1..12\n";
 sub context {
-  my ( $cona, $testnum ) = @_;
+  my ( $cona, $testnum ) = < @_;
   my $conb = (defined wantarray) ? ( wantarray ? 'A' : 'S' ) : 'V';
   unless ( $cona eq $conb ) {
 	print "# Context $conb should be $cona\nnot ";
@@ -12,7 +12,7 @@ sub context {
 
 context('V',1);
 $a = context('S',2);
-our @a = context('A',3);
+our @a = @( < context('A',3) );
 scalar context('S',4);
 $a = scalar context('S',5);
 ($a) = context('A',6);
@@ -25,9 +25,9 @@ $a = scalar context('S',5);
     my $a = wantarray ? simple() : simple();
     $a;
   }
-  my @b = inline();
+  my @b = @( < inline() );
   my $c = inline();
-  print +(@b == 1 && "@b" eq "2") ? "ok 8\n" : "not ok 8\t# <@b>\n";
+  print +((nelems @b) == 1 && "{join ' ', <@b}" eq "2") ? "ok 8\n" : "not ok 8\t# <{join ' ', <@b}>\n";
   print +($c == 2) ? "ok 9\n" : "not ok 9\t# <$c>\n";
 }
 
@@ -39,7 +39,7 @@ eval $qcontext;
 print $q eq 'V' ? "ok 10\n" : "not ok 10\n";
 $a = eval $qcontext;
 print $q eq 'S' ? "ok 11\n" : "not ok 11\n";
-@a = eval $qcontext;
+@a = @( eval $qcontext );
 print $q eq 'A' ? "ok 12\n" : "not ok 12\n";
 
 1;

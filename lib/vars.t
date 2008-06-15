@@ -10,22 +10,22 @@ print "1..27\n";
 my @warns;
 BEGIN { $^WARN_HOOK = sub { push @warns, @_[0]->{description} }; $^W = 1 };
 
-%main::x = ();
+%main::x = %( () );
 $main::y = 3;
-@main::z = ();
+@main::z = @( () );
 $X::x = 13;
 
 use vars qw($p @q %r *s &t);
 
-my $e = !(grep m/^Name "X::x" used only once: possible typo/, @warns) && 'not ';
+my $e = !(grep m/^Name "X::x" used only once: possible typo/, < @warns) && 'not ';
 print "{$e}ok 1\n";
-$e = !(grep m/^Name "main::x" used only once: possible typo/, @warns) && 'not ';
+$e = !(grep m/^Name "main::x" used only once: possible typo/, < @warns) && 'not ';
 print "{$e}ok 2\n";
-$e = !(grep m/^Name "main::y" used only once: possible typo/, @warns) && 'not ';
+$e = !(grep m/^Name "main::y" used only once: possible typo/, < @warns) && 'not ';
 print "{$e}ok 3\n";
-$e = !(grep m/^Name "main::z" used only once: possible typo/, @warns) && 'not ';
+$e = !(grep m/^Name "main::z" used only once: possible typo/, < @warns) && 'not ';
 print "{$e}ok 4\n";
-($e, @warns) = @warns != 4 && 'not ';
+($e, < @warns) = (nelems @warns) != 4 && 'not ';
 print "{$e}ok 5\n";
 
 # this is inside eval() to avoid creation of symbol table entries and
@@ -75,15 +75,15 @@ print "ok 21\n";
 print "ok 22\n";
 print "ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
-my @errs = split m/\n/, $@->message;
-$e = @errs != 4 && 'not ';
+my @errs = @( split m/\n/, $@->message );
+$e = (nelems @errs) != 4 && 'not ';
 print "{$e}ok 24\n";
-$e = !(grep(m/^Global symbol "\$u" requires explicit package name/, @errs))
+$e = !(grep(m/^Global symbol "\$u" requires explicit package name/, < @errs))
 			&& 'not ';
 print "{$e}ok 25\n";
-$e = !(grep(m/^Global symbol "\@v" requires explicit package name/, @errs))
+$e = !(grep(m/^Global symbol "\@v" requires explicit package name/, < @errs))
 			&& 'not ';
 print "{$e}ok 26\n";
-$e = !(grep(m/^Global symbol "\%w" requires explicit package name/, @errs))
+$e = !(grep(m/^Global symbol "\%w" requires explicit package name/, < @errs))
 			&& 'not ';
 print "{$e}ok 27\n";

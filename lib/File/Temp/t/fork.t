@@ -60,7 +60,7 @@ myok( 4, -f $file->filename(), "OO File exists in parent" );
 
 # non-OO interface
 
-my ($fh, $filename) = File::Temp::tempfile();
+my ($fh, $filename) = < File::Temp::tempfile();
 
 myok( 5, -f $filename, "non-OO File exists" );
 
@@ -93,7 +93,7 @@ unlink($filename);   # Cleanup
 
 # Local ok sub handles explicit number
 sub myok {
-  my ($count, $test, $msg) = @_;
+  my ($count, $test, $msg) = < @_;
 
   if ($test) {
     print "ok $count - $msg\n";

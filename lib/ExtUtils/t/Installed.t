@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't' if -d 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
     else {
         unshift @INC, 't/lib/';
@@ -64,7 +64,7 @@ $prefix = VMS::Filespec::unixify($prefix) if $Is_VMS;
 # ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
 $prefix = %Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
 
-ok( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'),
+ok( $ei->_is_type( < File::Spec->catfile($prefix, 'bar'), 'prog'),
         "... should find prog file under $prefix" );
 
 SKIP: {
@@ -80,9 +80,9 @@ ok( !$ei->_is_type('whocares', 'someother'), '... nor other type anywhere' );
 # _is_under
 ok( $ei->_is_under('foo'), '_is_under() should return true with no dirs' );
 
-my @under = qw( boo bar baz );
-ok( !$ei->_is_under('foo', @under), '... should find no file not under dirs');
-ok( $ei->_is_under('baz', @under),  '... should find file under dir' );
+my @under = @( qw( boo bar baz ) );
+ok( !$ei->_is_under('foo', < @under), '... should find no file not under dirs');
+ok( $ei->_is_under('baz', < @under),  '... should find file under dir' );
 
 
 rmtree 'auto/FakeMod';
@@ -104,13 +104,13 @@ FAKE
 
 close FAKEMOD;
 
-my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
+my $fake_mod_dir = File::Spec->catdir( <cwd(), 'auto', 'FakeMod');
 {
     # avoid warning and death by localizing glob
     local *ExtUtils::Installed::Config;
-    %ExtUtils::Installed::Config = (
-        %Config,
-        archlibexp         => cwd(),
+    %ExtUtils::Installed::Config = %(
+        < %Config,
+        archlibexp         => < cwd(),
         sitearchexp        => $fake_mod_dir,
     );
 
@@ -133,10 +133,10 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 {
     local %ENV{PERL5LIB} = join %Config{path_sep}, $fake_mod_dir;
     local *ExtUtils::Installed::Config;
-    %ExtUtils::Installed::Config = (
-        %Config,
-        archlibexp         => cwd(),
-        sitearchexp        => cwd(),
+    %ExtUtils::Installed::Config = %(
+        < %Config,
+        archlibexp         => < cwd(),
+        sitearchexp        => < cwd(),
     );
 
     my $realei = ExtUtils::Installed->new();
@@ -156,12 +156,12 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 # Do the same thing as the last block, but with overrides for
 # %Config and @INC.
 {
-    my $config_override = \%( %Config::Config );
+    my $config_override = \%( < %Config::Config );
     $config_override->{archlibexp} = cwd();
     $config_override->{sitearchexp} = $fake_mod_dir;
     $config_override->{version} = 'fake_test_version';
 
-    my @inc_override = (@INC, $fake_mod_dir);
+    my @inc_override = @(< @INC, $fake_mod_dir);
 
     my $realei = ExtUtils::Installed->new(
         'config_override' => $config_override,
@@ -181,7 +181,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 # Check if extra_libs works.
 {
     my $realei = ExtUtils::Installed->new(
-        'extra_libs' => \@( cwd() ),
+        'extra_libs' => \@( < cwd() ),
     );
     isa_ok( $realei, 'ExtUtils::Installed' );
     isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
@@ -198,7 +198,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 
 # modules
 $ei->{$_} = 1 for qw( abc def ghi );
-is( join(' ', $ei->modules()), 'abc def ghi',
+is( join(' ', < $ei->modules()), 'abc def ghi',
     'modules() should return sorted keys' );
 
 # This didn't work for a long time due to a sort in scalar context oddity.
@@ -208,11 +208,11 @@ is( $ei->modules, 3,    'modules() in scalar context' );
 $ei->{goodmod} = \%(
         packlist => \%(
                 (%Config{man1direxp} ?
-                    (File::Spec->catdir(%Config{man1direxp}, 'foo') => 1) :
+                    ( <File::Spec->catdir(%Config{man1direxp}, 'foo') => 1) :
                         ()),
                 (%Config{man3direxp} ?
-                    (File::Spec->catdir(%Config{man3direxp}, 'bar') => 1) :
-                        ()),
+                    ( <File::Spec->catdir(%Config{man3direxp}, 'bar') => 1) :
+                        ()), <
                 File::Spec->catdir($prefix, 'foobar') => 1,
                 foobaz  => 1,
         ),
@@ -227,38 +227,38 @@ my @files;
 SKIP: {
     skip('no man directory man1dir on this system', 2)
       unless %Config{man1direxp};
-    @files = $ei->files('goodmod', 'doc', %Config{man1direxp});
-    is( scalar @files, 1, '... should find doc file under given dir' );
-    is( (grep { m/foo$/ } @files), 1, '... checking file name' );
+    @files = @( < $ei->files('goodmod', 'doc', %Config{man1direxp}) );
+    is( scalar nelems @files, 1, '... should find doc file under given dir' );
+    is( (grep { m/foo$/ } < @files), 1, '... checking file name' );
 }
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @files = $ei->files('goodmod', 'doc');
-    is( scalar @files, $mandirs, '... should find all doc files with no dir' );
+    @files = @( < $ei->files('goodmod', 'doc') );
+    is( scalar nelems @files, $mandirs, '... should find all doc files with no dir' );
 }
 
-@files = $ei->files('goodmod', 'prog', 'fake', 'fake2');
-is( scalar @files, 0, '... should find no doc files given wrong dirs' );
-@files = $ei->files('goodmod', 'prog');
-is( scalar @files, 1, '... should find doc file in correct dir' );
+@files = @( < $ei->files('goodmod', 'prog', 'fake', 'fake2') );
+is( scalar nelems @files, 0, '... should find no doc files given wrong dirs' );
+@files = @( < $ei->files('goodmod', 'prog') );
+is( scalar nelems @files, 1, '... should find doc file in correct dir' );
 like( @files[0], qr/foobar[>\]]?$/, '... checking file name' );
-@files = $ei->files('goodmod');
-is( scalar @files, 2 + $mandirs, '... should find all files with no type specified' );
-my %dirnames = map { lc($_) => dirname($_) } @files;
+@files = @( < $ei->files('goodmod') );
+is( scalar nelems @files, 2 + $mandirs, '... should find all files with no type specified' );
+my %dirnames = %( map { lc($_) => < dirname($_) } < @files );
 
 # directories
-my @dirs = $ei->directories('goodmod', 'prog', 'fake');
-is( scalar @dirs, 0, 'directories() should return no dirs if no files found' );
+my @dirs = @( < $ei->directories('goodmod', 'prog', 'fake') );
+is( scalar nelems @dirs, 0, 'directories() should return no dirs if no files found' );
 
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = $ei->directories('goodmod', 'doc');
-    is( scalar @dirs, $mandirs, '... should find all files files() would' );
+    @dirs = @( < $ei->directories('goodmod', 'doc') );
+    is( scalar nelems @dirs, $mandirs, '... should find all files files() would' );
 }
-@dirs = $ei->directories('goodmod');
-is( scalar @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = sort map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } @files;
-is( join(' ', @files), join(' ', @dirs), '... should sort output' );
+@dirs = @( < $ei->directories('goodmod') );
+is( scalar nelems @dirs, 2 + $mandirs, '... should find all files files() would, again' );
+@files = @( sort map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } < @files );
+is( join(' ', < @files), join(' ', < @dirs), '... should sort output' );
 
 # directory_tree
 my $expectdirs =
@@ -268,9 +268,9 @@ my $expectdirs =
 
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = $ei->directory_tree('goodmod', 'doc', %Config{man1direxp} ?
-       dirname(%Config{man1direxp}) : dirname(%Config{man3direxp}));
-    is( scalar @dirs, $expectdirs,
+    @dirs = @( < $ei->directory_tree('goodmod', 'doc', %Config{man1direxp} ? <
+       dirname(%Config{man1direxp}) : < dirname(%Config{man3direxp})) );
+    is( scalar nelems @dirs, $expectdirs,
         'directory_tree() should report intermediate dirs to those requested' );
 }
 

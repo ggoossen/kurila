@@ -5,7 +5,7 @@ no strict 'refs';
 unless( eval q{require warnings::register; warnings::register->import; 1} ) {
     *warnings::warnif = sub { 
         require Carp;
-        Carp::carp(@_);
+        Carp::carp(< @_);
     }
 }
 use vars qw(%attr $VERSION);
@@ -29,13 +29,13 @@ sub PROTECTED  () { 2**3  }
 
 sub import {
     my $class = shift;
-    return unless @_;
+    return unless (nelems @_);
     my $package = caller(0);
     # avoid possible typo warnings
-    %{*{Symbol::fetch_glob("$package\::FIELDS")}} = () unless %{*{Symbol::fetch_glob("$package\::FIELDS")}};
+    %{*{Symbol::fetch_glob("$package\::FIELDS")}} = %( () ) unless %{*{Symbol::fetch_glob("$package\::FIELDS")}};
     my $fields = \%{*{Symbol::fetch_glob("$package\::FIELDS")}};
     my $fattr = (%attr{$package} ||= \@(1));
-    my $next = @$fattr;
+    my $next = (nelems @$fattr);
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
     bless \%{*{Symbol::fetch_glob("$package\::FIELDS")}}, 'pseudohash';
@@ -47,7 +47,7 @@ sub import {
         # Looks like a possible module reload...
         $next = $fattr->[0];
     }
-    foreach my $f (@_) {
+    foreach my $f (< @_) {
         my $fno = $fields->{$f};
 
         # Allow the module to be reloaded so long as field positions
@@ -63,7 +63,7 @@ sub import {
         $fattr->[$next] = ($f =~ m/^_/) ? PRIVATE : PUBLIC;
         $next += 1;
     }
-    if (@$fattr +> $next) {
+    if ((nelems @$fattr) +> $next) {
         # Well, we gave them the benefit of the doubt by guessing the
         # module was reloaded, but they appear to be declaring fields
         # in more than one place.  We can't be sure (without some extra
@@ -83,8 +83,8 @@ sub _dump  # sometimes useful for debugging
 {
     for my $pkg (sort keys %attr) {
         print "\n$pkg";
-        if (@{*{Symbol::fetch_glob("$pkg\::ISA")}}) {
-            print " (", join(", ", @{*{Symbol::fetch_glob("$pkg\::ISA")}}), ")";
+        if ((nelems @{*{Symbol::fetch_glob("$pkg\::ISA")}})) {
+            print " (", join(", ", < @{*{Symbol::fetch_glob("$pkg\::ISA")}}), ")";
         }
         print "\n";
         my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
@@ -97,7 +97,7 @@ sub _dump  # sometimes useful for debugging
                 push(@a, "public")    if $fattr ^&^ PUBLIC;
                 push(@a, "private")   if $fattr ^&^ PRIVATE;
                 push(@a, "inherited") if $fattr ^&^ INHERITED;
-                print "\t(", join(", ", @a), ")";
+                print "\t(", join(", ", < @a), ")";
             }
             print "\n";
         }
@@ -111,15 +111,15 @@ sub new {
     my $self = bless \%(), $class;
 
     # The lock_keys() prototype won't work since we require Hash::Util :(
-    &Hash::Util::lock_keys(\%$self, _accessible_keys($class));
+    &Hash::Util::lock_keys(\%$self, < _accessible_keys($class));
     return $self;
 }
 
 sub _accessible_keys {
-    my ($class) = @_;
-    return (
+    my ($class) = < @_;
+    return  @(
         keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
-        map(_accessible_keys($_), @{*{Symbol::fetch_glob($class.'::ISA')}}),
+        map( <_accessible_keys($_), < @{*{Symbol::fetch_glob($class.'::ISA')}}),
     );
 }
 

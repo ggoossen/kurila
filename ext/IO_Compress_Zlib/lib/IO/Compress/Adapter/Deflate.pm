@@ -18,7 +18,7 @@ sub mkCompObject
     my $level    = shift ;
     my $strategy = shift ;
 
-    my ($def, $status) = Compress::Raw::Zlib::Deflate->new(
+    my ($def, $status) = < Compress::Raw::Zlib::Deflate->new(
                                 -AppendOutput   => 1,
                                 -CRC32          => $crc32,
                                 -ADLER32        => $adler32,
@@ -26,7 +26,7 @@ sub mkCompObject
                                 -Strategy       => $strategy,
                                 -WindowBits     => - MAX_WBITS);
 
-    return (undef, "Cannot create Deflate object: $status", $status) 
+    return  @(undef, "Cannot create Deflate object: $status", $status) 
         if $status != Z_OK;    
 
     return bless \%('Def'        => $def,
@@ -105,7 +105,7 @@ sub deflateParams
 
     my $def   = $self->{Def};
 
-    my $status = $def->deflateParams(@_);
+    my $status = $def->deflateParams(< @_);
     $self->{ErrorNo} = $status;
     if ($status != Z_OK)
     {

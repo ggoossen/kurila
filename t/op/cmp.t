@@ -23,28 +23,28 @@ $iv_min = $iv_max;
 my $uv_bigi = $iv_big;
 $uv_bigi ^|^= 0x0;
 
-my @array = qw(perl rules);
+my @array = @( qw(perl rules) );
 
 our (@FOO, $expect);
 
 # Seems one needs to perform the maths on 'Inf' to get the NV correctly primed.
-@FOO = ('s', 'N/A', 'a', 'NaN', -1, undef, 0, 1, 3.14, 1e37, 0.632120558, -.5,
+@FOO = @('s', 'N/A', 'a', 'NaN', -1, undef, 0, 1, 3.14, 1e37, 0.632120558, -.5,
 	'Inf'+1, '-Inf'-1, 0x0, 0x1, 0x5, 0xFFFFFFFF, $uv_max, $uv_maxm1,
 	$uv_big, $uv_bigi, $iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big,
 	$iv_small);
 
-$expect = 5 * ((@FOO-1)+2) * ((@FOO-1)+1);
+$expect = 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
 print "1..$expect\n";
 
 sub nok ($$$$$$$$) {
-  my ($test, $left, $threeway, $right, $result, $i, $j, $boolean) = @_;
+  my ($test, $left, $threeway, $right, $result, $i, $j, $boolean) = < @_;
   $result = defined $result ? "'$result'" : 'undef';
   print "not ok $test # ($left <=> $right) gives: $result \$i=$i \$j=$j, $boolean disagrees\n";
 }
 
 my $ok = 0;
-for my $i (0..(@FOO-1)) {
-    for my $j ($i..(@FOO-1)) {
+for my $i (0..((nelems @FOO)-1)) {
+    for my $j ($i..((nelems @FOO)-1)) {
 	$ok++;
 	# Comparison routines may convert these internally, which would change
 	# what is used to determine the comparison on later runs. Hence copy

@@ -21,21 +21,21 @@ is_deeply( \@(sort keys %Foo::FIELDS),
 );
 
 sub show_fields {
-    my($base, $mask) = @_;
+    my($base, $mask) = < @_;
     no strict 'refs';
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
     return grep { (%fields::attr{$base}->[$fields->{$_}] ^&^ $mask) == $mask} 
                 keys %$fields;
 }
 
-is_deeply( \@(sort &show_fields('Foo', fields::PUBLIC)),
+is_deeply( \@(sort < &show_fields('Foo', fields::PUBLIC)),
            \@(sort qw(Pants who what)));
-is_deeply( \@(sort &show_fields('Foo', fields::PRIVATE)),
+is_deeply( \@(sort < &show_fields('Foo', fields::PRIVATE)),
            \@(sort qw(_no _up_yours)));
 
-foreach (Foo->new) {
+foreach ( <Foo->new) {
     my $obj = $_;
-    my %test = ( Pants => 'Whatever', _no => 'Yeah',
+    my %test = %( Pants => 'Whatever', _no => 'Yeah',
                  what  => 'Ahh',      who => 'Moo',
                  _up_yours => 'Yip' );
 
@@ -78,7 +78,7 @@ use fields qw(a b c);
 
 sub new {
     my $self = fields::new(shift);
-    %$self = @_ if @_;
+    %$self = %( < @_ ) if (nelems @_);
     $self;
 }
 

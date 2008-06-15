@@ -45,14 +45,14 @@ print "ok 1\n";
 
 # Map of translators to file extensions to find the formatted output to
 # compare against.
-my %translators = ('Pod::Man'              => 'man',
+my %translators = %('Pod::Man'              => 'man',
                    'Pod::Text'             => 'txt',
                    'Pod::Text::Color'      => 'clr',
                    'Pod::Text::Overstrike' => 'ovr',
                    'Pod::Text::Termcap'    => 'cap');
 
 # Set default options to match those of pod2man and pod2text.
-our %options = (sentence => 0);
+our %options = %(sentence => 0);
 
 my $n = 2;
 for (sort keys %translators) {
@@ -67,7 +67,7 @@ for (sort keys %translators) {
         }
         require Pod::Text::Color;
     }
-    my $parser = $_->new (%options);
+    my $parser = $_->new (< %options);
     print (($parser && ref ($parser) eq $_) ? "ok $n\n" : "not ok $n\n");
     $n++;
 
@@ -75,7 +75,7 @@ for (sort keys %translators) {
     # line.  That means that we don't check those things; oh well.  The header
     # changes with each version change or touch of the input file.
     open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
-    $parser->parse_from_file (source_path ('basic.pod'), \*OUT);
+    $parser->parse_from_file ( <source_path ('basic.pod'), \*OUT);
     close OUT;
     if ($_ eq 'Pod::Man') {
         open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
@@ -93,7 +93,7 @@ for (sort keys %translators) {
     }
     {
         local $/;
-        open (MASTER, "<", source_path ("basic.%translators{$_}"))
+        open (MASTER, "<", < source_path ("basic.%translators{$_}"))
             or die "Cannot open basic.%translators{$_}: $!\n";
         open (OUTPUT, "<", "out.%translators{$_}")
             or die "Cannot open out.%translators{$_}: $!\n";

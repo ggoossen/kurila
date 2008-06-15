@@ -15,8 +15,8 @@ my $Is_MacOS = $^O eq 'MacOS';
 $|=1;
 
 undef $/;
-our @prgs = split "\n########\n", ~< *DATA;
-print "1..", scalar @prgs, "\n";
+our @prgs = @( split "\n########\n", ~< *DATA );
+print "1..", scalar nelems @prgs, "\n";
 
 our $tmpfile = "runltmp000";
 1 while -f ++$tmpfile;
@@ -24,7 +24,7 @@ END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 our $i;
 
-for (@prgs){
+for (< @prgs){
     my $switch = "";
     if (s/^\s*(-\w+)//){
        $switch = $1;

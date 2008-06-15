@@ -35,19 +35,19 @@ try {
 
 package Multi;
 require IO::Socket::INET;
-our @ISA=qw(IO::Socket::INET);
+our @ISA= @(qw(IO::Socket::INET) );
 
 use Socket qw(inet_aton inet_ntoa unpack_sockaddr_in);
 
 sub _get_addr
 {
-    my($sock,$addr_str, $multi) = @_;
+    my($sock,$addr_str, $multi) = < @_;
     #print "_get_addr($sock, $addr_str, $multi)\n";
 
     print "not " unless $multi;
     print "ok 2\n";
 
-    (
+     @(
      # private IP-addresses which I hope does not work anywhere :-)
      inet_aton("10.250.230.10"),
      inet_aton("10.250.230.12"),
@@ -58,8 +58,8 @@ sub _get_addr
 sub connect
 {
     my $self = shift;
-    if (@_ == 1) {
-	my($port, $addr) = unpack_sockaddr_in(@_[0]);
+    if ((nelems @_) == 1) {
+	my($port, $addr) = < unpack_sockaddr_in(@_[0]);
 	$addr = inet_ntoa($addr);
 	#print "connect($self, $port, $addr)\n";
 	if($addr eq "10.250.230.10") {
@@ -71,7 +71,7 @@ sub connect
 	    return 0;
 	}
     }
-    $self->SUPER::connect(@_);
+    $self->SUPER::connect(< @_);
 }
 
 
@@ -94,7 +94,7 @@ if(my $pid = fork()) {
     my $sock = $listen->accept() or die "$!";
     print "ok 5\n";
 
-    print $sock->getline();
+    print < $sock->getline();
     print $sock "ok 7\n";
 
     waitpid($pid,0);
@@ -114,7 +114,7 @@ if(my $pid = fork()) {
 
     print $sock "ok 6\n";
     sleep(1); # race condition
-    print $sock->getline();
+    print < $sock->getline();
 
     $sock->close;
 

@@ -4,7 +4,7 @@ use strict;
 our $VERSION = '6.44';
 
 require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+our @ISA = @( qw(ExtUtils::MM_Unix) );
 
 use ExtUtils::MakeMaker qw(neatvalue);
 
@@ -34,7 +34,7 @@ Define DL_FUNCS and DL_VARS and write the *.exp files.
 =cut
 
 sub dlsyms {
-    my($self,%attribs) = @_;
+    my($self,< %attribs) = < @_;
 
     return '' unless $self->needs_linking();
 
@@ -56,12 +56,12 @@ static :: $self->{BASEEXT}.exp
     push(@m,"
 $self->{BASEEXT}.exp: Makefile.PL
 ",q|	$(PERLRUN) -e 'use ExtUtils::Mksymlists; \
-	Mksymlists("NAME" => "|,$self->{NAME},'", "DL_FUNCS" => ',
-	neatvalue($funcs), ', "FUNCLIST" => ', neatvalue($funclist),
-	', "DL_VARS" => ', neatvalue($vars), q|);'
+	Mksymlists("NAME" => "|,$self->{NAME},'", "DL_FUNCS" => ', <
+	neatvalue($funcs), ', "FUNCLIST" => ', < neatvalue($funclist),
+	', "DL_VARS" => ', < neatvalue($vars), q|);'
 |);
 
-    join('',@m);
+    join('',< @m);
 }
 
 

@@ -13,7 +13,7 @@ use Test::More 'tests' => 32;
 use Thread::Queue;
 
 # Regular array
-my @ary1 = qw/foo bar baz/;
+my @ary1 = @( qw/foo bar baz/ );
 push(@ary1, \@( 1..3 ), \%( 'qux' => 99 ));
 
 # Shared array
@@ -73,7 +73,7 @@ is($q->pending(), 7, 'Queue count');
     my $tary2 = $q->dequeue();
     ok($tary2, 'Thread got item');
     is(ref($tary2), 'ARRAY', 'Item is array ref');
-    for (my $ii=0; $ii +< @ary2; $ii++) {
+    for (my $ii=0; $ii +< nelems @ary2; $ii++) {
         is(@$tary2[$ii], @ary2[$ii], 'Shared array element check');
     }
 

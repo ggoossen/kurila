@@ -76,14 +76,14 @@ Gregor N. Purdy E<lt>F<gregor@focusresearch.com>E<gt>
 sub import {
     my ($callpack) = caller(0);
     my $pack = shift;
-    my @vars = grep m/^[\$\@]?[A-Za-z_]\w*$/, (@_ ? @_ : keys(%ENV));
-    return unless @vars;
+    my @vars = @( grep m/^[\$\@]?[A-Za-z_]\w*$/, ((nelems @_) ? < @_ : keys(%ENV)) );
+    return unless (nelems @vars);
 
-    @vars = map { m/^[\$\@]/ ? $_ : '$'.$_ } @vars;
+    @vars = @( map { m/^[\$\@]/ ? $_ : '$'.$_ } < @vars );
 
-    eval "package $callpack; use vars qw(" . join(' ', @vars) . ")";
+    eval "package $callpack; use vars qw(" . join(' ', < @vars) . ")";
     die $@ if $@;
-    foreach (@vars) {
+    foreach (< @vars) {
 	my ($type, $name) = m/^([\$\@])(.*)$/;
 	if ($type eq '$') {
 	    tie ${*{Symbol::fetch_glob("{$callpack}::$name")}}, 'Env', $name;
@@ -102,12 +102,12 @@ sub TIESCALAR {
 }
 
 sub FETCH {
-    my ($self) = @_;
+    my ($self) = < @_;
     %ENV{$$self};
 }
 
 sub STORE {
-    my ($self, $value) = @_;
+    my ($self, $value) = < @_;
     if (defined($value)) {
 	%ENV{$$self} = $value;
     } else {
@@ -122,7 +122,7 @@ package Env::Array;
 use Config;
 use Tie::Array;
 
-our @ISA = qw(Tie::Array);
+our @ISA = @( qw(Tie::Array) );
 
 my $sep = %Config::Config{path_sep};
 
@@ -131,86 +131,86 @@ sub TIEARRAY {
 }
 
 sub FETCHSIZE {
-    my ($self) = @_;
-    my @temp = split($sep, %ENV{$$self});
-    return scalar(@temp);
+    my ($self) = < @_;
+    my @temp = @( split($sep, %ENV{$$self}) );
+    return scalar(nelems @temp);
 }
 
 sub STORESIZE {
-    my ($self, $size) = @_;
-    my @temp = split($sep, %ENV{$$self});
-    if (@temp +> $size) {
+    my ($self, $size) = < @_;
+    my @temp = @( split($sep, %ENV{$$self}) );
+    if ((nelems @temp) +> $size) {
         splice @temp, $size;
     } else {
         @temp[$size-1] = @temp[$size-1];
     }
-    %ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, < @temp);
 }
 
 sub CLEAR {
-    my ($self) = @_;
+    my ($self) = < @_;
     %ENV{$$self} = '';
 }
 
 sub FETCH {
-    my ($self, $index) = @_;
+    my ($self, $index) = < @_;
     return (split($sep, %ENV{$$self}))[[$index]];
 }
 
 sub STORE {
-    my ($self, $index, $value) = @_;
-    my @temp = split($sep, %ENV{$$self});
+    my ($self, $index, $value) = < @_;
+    my @temp = @( split($sep, %ENV{$$self}) );
     @temp[$index] = $value;
-    %ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, < @temp);
     return $value;
 }
 
 sub PUSH {
     my $self = shift;
-    my @temp = split($sep, %ENV{$$self});
-    push @temp, @_;
-    %ENV{$$self} = join($sep, @temp);
-    return scalar(@temp);
+    my @temp = @( split($sep, %ENV{$$self}) );
+    push @temp, < @_;
+    %ENV{$$self} = join($sep, < @temp);
+    return scalar(nelems @temp);
 }
 
 sub POP {
-    my ($self) = @_;
-    my @temp = split($sep, %ENV{$$self});
+    my ($self) = < @_;
+    my @temp = @( split($sep, %ENV{$$self}) );
     my $result = pop @temp;
-    %ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, < @temp);
     return $result;
 }
 
 sub UNSHIFT {
     my $self = shift;
-    my @temp = split($sep, %ENV{$$self});
-    my $result = unshift @temp, @_;
-    %ENV{$$self} = join($sep, @temp);
+    my @temp = @( split($sep, %ENV{$$self}) );
+    my $result = unshift @temp, < @_;
+    %ENV{$$self} = join($sep, < @temp);
     return $result;
 }
 
 sub SHIFT {
-    my ($self) = @_;
-    my @temp = split($sep, %ENV{$$self});
+    my ($self) = < @_;
+    my @temp = @( split($sep, %ENV{$$self}) );
     my $result = shift @temp;
-    %ENV{$$self} = join($sep, @temp);
+    %ENV{$$self} = join($sep, < @temp);
     return $result;
 }
 
 sub SPLICE {
     my $self = shift;
-    my @temp = split($sep, %ENV{$$self});
+    my @temp = @( split($sep, %ENV{$$self}) );
     if (wantarray) {
-	my @result = @_ +>= 2 ? splice @temp, shift, shift, @_
-          : @_ +>= 1 ?
-            splice @temp, shift : splice @temp;
-	%ENV{$$self} = join($sep, @temp);
+	my @result = @( (nelems @_) +>= 2 ? splice @temp, shift, shift, < @_
+          : (nelems @_) +>= 1 ?
+            splice @temp, shift : splice @temp );
+	%ENV{$$self} = join($sep, < @temp);
 	return @result;
     } else {
-	my $result = @_ +>= 2 ? splice @temp, shift, shift, @_
-          : @_ +>= 1 ?
+	my $result = (nelems @_) +>= 2 ? splice @temp, shift, shift, < @_
+          : (nelems @_) +>= 1 ?
             splice @temp, shift : splice @temp;
-	%ENV{$$self} = join($sep, @temp);
+	%ENV{$$self} = join($sep, < @temp);
 	return $result;
     }
 }
@@ -220,21 +220,21 @@ sub SPLICE {
 package Env::Array::VMS;
 use Tie::Array;
 
-@ISA = qw(Tie::Array);
+@ISA = @( qw(Tie::Array) );
  
 sub TIEARRAY {
     bless \(@_[1]);
 }
 
 sub FETCHSIZE {
-    my ($self) = @_;
+    my ($self) = < @_;
     my $i = 0;
     while ($i +< 127 and defined %ENV{$$self . ';' . $i}) { $i++; };
     return $i;
 }
 
 sub FETCH {
-    my ($self, $index) = @_;
+    my ($self, $index) = < @_;
     return %ENV{$$self . ';' . $index};
 }
 

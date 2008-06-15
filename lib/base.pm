@@ -20,13 +20,13 @@ my $Fattr = \%fields::attr;
 sub has_fields {
     my($base) = shift;
     my $fglob = %{*{Symbol::fetch_glob("$base\::")}}{FIELDS};
-    return( ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0 );
+    return @( ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0 );
 }
 
 sub has_version {
     my($base) = shift;
     my $vglob = %{*{Symbol::fetch_glob($base.'::')}}{VERSION};
-    return( ($vglob && *$vglob{SCALAR}) ? 1 : 0 );
+    return @( ($vglob && *$vglob{SCALAR}) ? 1 : 0 );
 }
 
 sub has_attr {
@@ -49,7 +49,7 @@ sub get_fields {
 sub import {
     my $class = shift;
 
-    return SUCCESS unless @_;
+    return SUCCESS unless (nelems @_);
 
     # List of base classes from which we will inherit %FIELDS.
     my $fields_base;
@@ -57,12 +57,12 @@ sub import {
     my $inheritor = caller(0);
 
     my @bases;
-    foreach my $base (@_) {
+    foreach my $base (< @_) {
         if ( $inheritor eq $base ) {
             warn "Class '$inheritor' tried to inherit from itself\n";
         }
 
-        next if grep $_->isa($base), ($inheritor, @bases);
+        next if grep $_->isa($base), ($inheritor, < @bases);
 
         if (has_version($base)) {
             ${*{Symbol::fetch_glob($base.'::VERSION')}} = '-1, set by base.pm' 
@@ -80,7 +80,7 @@ sub import {
                     die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
-    or make that module available in \@INC (\@INC contains: @INC).
+    or make that module available in \@INC (\@INC contains: {join ' ', <@INC}).
 ERROR
                 }
             }
@@ -99,7 +99,7 @@ ERROR
         }
     }
     # Save this until the end so it's all or nothing if the above loop croaks.
-    push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, @bases;
+    push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, < @bases;
 
     if( defined $fields_base ) {
         inherit_fields($inheritor, $fields_base);
@@ -108,7 +108,7 @@ ERROR
 
 
 sub inherit_fields {
-    my($derived, $base) = @_;
+    my($derived, $base) = < @_;
 
     return SUCCESS unless $base;
 
@@ -117,7 +117,7 @@ sub inherit_fields {
     my $dfields = get_fields($derived);
     my $bfields = get_fields($base);
 
-    $dattr->[0] = @$battr;
+    $dattr->[0] = (nelems @$battr);
 
     if( keys %$dfields ) {
         warn <<"END";
@@ -146,7 +146,7 @@ END
         }
     }
 
-    foreach my $idx (1..@$battr-1) {
+    foreach my $idx (1..(nelems @$battr)-1) {
         next if defined $dattr->[$idx];
         $dattr->[$idx] = $battr->[$idx] ^&^ INHERITED;
     }

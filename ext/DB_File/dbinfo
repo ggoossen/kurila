@@ -17,7 +17,7 @@
 use strict ;
 
 my %Data =
-	(
+	%(
 	0x053162 =>	\%(
 			  Type 	   => "Btree",
 			  Versions => 
@@ -59,7 +59,7 @@ my %Data =
 			),
 	) ;
 
-die "Usage: dbinfo file\n" unless @ARGV == 1 ;
+die "Usage: dbinfo file\n" unless (nelems @ARGV) == 1 ;
 
 print "testing file @ARGV[0]...\n\n" ;
 open (F, "<", "@ARGV[0]") or die "Cannot open file @ARGV[0]: $!\n" ;
@@ -68,8 +68,8 @@ my $buff ;
 read F, $buff, 30 ;
 
 
-my (@info) = unpack("NNNNNNC", $buff) ;
-my (@info1) = unpack("VVVVVVC", $buff) ;
+my (@info) = @( unpack("NNNNNNC", $buff) ) ;
+my (@info1) = @( unpack("VVVVVVC", $buff) ) ;
 my ($magic, $version, $endian, $encrypt) ;
 
 if (%Data{@info[0]}) # first try DB 1.x format, big endian

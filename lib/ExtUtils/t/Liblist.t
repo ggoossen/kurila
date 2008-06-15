@@ -27,10 +27,10 @@ ok( defined &ExtUtils::Liblist::ext,
     local $^WARN_HOOK = sub {push @warn, \@(@_[0]->{description})};
 
     my $ll = bless \%(), 'ExtUtils::Liblist';
-    my @out = $ll->ext('-ln0tt43r3_perl');
-    is( @out, 4, 'enough output' );
+    my @out = @( < $ll->ext('-ln0tt43r3_perl') );
+    is( (nelems @out), 4, 'enough output' );
     unlike( @out[2], qr/-ln0tt43r3_perl/, 'bogus library not added' );
-    ok( @warn, 'had warning');
+    ok( (nelems @warn), 'had warning');
 
-    is( grep(m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, map { @$_ } @warn), 1 ) || diag join "\n", @warn;
+    is( grep(m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, map { < @$_ } < @warn), 1 ) || diag join "\n", < @warn;
 }

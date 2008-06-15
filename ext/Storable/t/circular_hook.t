@@ -28,7 +28,7 @@ my $thawed = Storable::thaw( $string );
 # is_deeply infinite loops in ciculars, so do it manually
 # is_deeply( $array, $thawed, 'Circular hooked objects work' );
 is( ref($thawed), 'ARRAY', 'Top level ARRAY' );
-is( scalar(@$thawed), 1, 'ARRAY contains one element' );
+is( scalar(nelems @$thawed), 1, 'ARRAY contains one element' );
 isa_ok( $thawed->[0], 'Foo' );
 is( scalar(keys %{$thawed->[0]}), 1, 'Foo contains one element' );
 isa_ok( $thawed->[0]->{Foo}, 'Bar' );
@@ -45,19 +45,19 @@ is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first
 
 package Foo;
 
-our @order = ();
+our @order = @( () );
 
 sub STORABLE_freeze {
-	my ($self, $clone) = @_;
+	my ($self, $clone) = < @_;
 	my $class = ref $self;
 	
 	# print "# Freezing $class\n";
 
-	return ($class, $self->{$class});
+	return  @($class, $self->{$class});
 }
 
 sub STORABLE_thaw {
-	my ($self, $clone, $string, @refs) = @_;
+	my ($self, $clone, $string, < @refs) = < @_;
 	my $class = ref $self;
 
 	# print "# Thawing $class\n";
@@ -72,7 +72,7 @@ sub STORABLE_thaw {
 package Bar;
 
 BEGIN {
-our @ISA = 'Foo';
+our @ISA = @( 'Foo' );
 }
 
 1;

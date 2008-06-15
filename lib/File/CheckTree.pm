@@ -7,8 +7,8 @@ use warnings;
 use strict;
 
 our $VERSION = '4.3';
-our @ISA     = qw(Exporter);
-our @EXPORT  = qw(validate);
+our @ISA     = @( qw(Exporter) );
+our @EXPORT  = @( qw(validate) );
 
 =head1 NAME
 
@@ -103,17 +103,17 @@ sub validate {
         if ($test =~ s/ ^ (!?-) (\w{2,}) \b /$1Z/x) {
             $testlist = $2;
             # split bundled tests, e.g. "ug" to 'u', 'g'
-            @testlist = split(m//, $testlist);
+            @testlist = @( split(m//, $testlist) );
         }
         else {
             # put in placeholder Z for stand-alone test
-            @testlist = ('Z');
+            @testlist = @('Z');
         }
 
         # will compare these two later to stop on 1st warning w/in a bundle
         $oldwarnings = $Warnings;
 
-        foreach my $one (@testlist) {
+        foreach my $one (< @testlist) {
             # examples of $test: "!-Z || die" or "-w || warn"
             my $this = $test;
 
@@ -152,10 +152,10 @@ sub validate {
                 local $^WARN_HOOK = sub {
                     ++$Warnings;
                     if ( $orig_sigwarn ) {
-                        $orig_sigwarn->(@_);
+                        $orig_sigwarn->(< @_);
                     }
                     else {
-                        print STDERR @_[0]->message;
+                        print STDERR < @_[0]->message;
                     }
                 };
 
@@ -185,7 +185,7 @@ sub validate {
     return $Warnings;
 }
 
-my %Val_Message = (
+my %Val_Message = %(
     'r' => "is not readable by uid $>.",
     'w' => "is not writable by uid $>.",
     'x' => "is not executable by uid $>.",
@@ -212,7 +212,7 @@ my %Val_Message = (
 );
 
 sub valmess {
-    my ($disposition, $test, $file) = @_;
+    my ($disposition, $test, $file) = < @_;
     my $ferror;
 
     if ($test =~ m/ ^ (!?) -(\w) \s* $ /x) {

@@ -6,7 +6,7 @@ package My::Test;
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = '../lib';
+        @INC = @( '../lib' );
     }
 }
 
@@ -31,7 +31,7 @@ my $IsVMS = $^O eq 'VMS';
 
 print "# Ahh!  I see you're running VMS.\n" if $IsVMS;
 
-my %Tests = (
+my %Tests = %(
              #                      Everyone Else   VMS
              'success.plx'              => \@(0,      0),
              'one_fail.plx'             => \@(1,      4),

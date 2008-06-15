@@ -25,7 +25,7 @@ require warnings;
 
 sub mkMask
 {
-    my ($bit) = @_;
+    my ($bit) = < @_;
     my $mask = "";
 
     vec($mask, $bit, 1) = 1;

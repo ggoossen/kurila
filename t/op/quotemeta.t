@@ -15,7 +15,7 @@ if (%Config{ebcdic} eq 'define') {
     $_ = quotemeta $_;
     is(length($_), 158, "quotemeta string");
     # 104 non-backslash characters
-    is(@(m/([^\\])/g), 104, "tr count non-backslashed");
+    is((nelems @(m/([^\\])/g)), 104, "tr count non-backslashed");
 } else { # some ASCII descendant, then.
     $_ = join "", map chr($_), 32..127;
 
@@ -24,7 +24,7 @@ if (%Config{ebcdic} eq 'define') {
     $_ = quotemeta $_;
     is(length($_), 129, "quotemeta string");
     # 95 non-backslash characters
-    is(@(m/([^\\])/g), 95, "tr count non-backslashed");
+    is((nelems @(m/([^\\])/g)), 95, "tr count non-backslashed");
 }
 
 is(length(quotemeta ""), 0, "quotemeta empty string");

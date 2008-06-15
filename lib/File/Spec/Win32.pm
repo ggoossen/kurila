@@ -7,7 +7,7 @@ require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = qw(File::Spec::Unix);
+@ISA = @( qw(File::Spec::Unix) );
 
 # Some regexes we use for path splitting
 my $DRIVE_RX = '[a-zA-Z]:';
@@ -107,11 +107,11 @@ volume, 1 if it's absolute with no volume, 0 otherwise.
 
 sub file_name_is_absolute {
 
-    my ($self,$file) = @_;
+    my ($self,$file) = < @_;
 
     if ($file =~ m{^($VOL_RX)}o) {
       my $vol = $1;
-      return ($vol =~ m{^$UNC_RX}o ? 2
+      return  @($vol =~ m{^$UNC_RX}o ? 2
 	      : $file =~ m{^$DRIVE_RX(?:[\\/])}o ? 2
 	      : 0);
     }
@@ -130,15 +130,15 @@ sub catfile {
 
     # Legacy / compatibility support
     #
-    shift, return _canon_cat( "/", @_ )
+    shift, return _canon_cat( "/", < @_ )
 	if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catfile('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( (@_[0].'\\'), @_[[1..(@_-1)]] )
+    return _canon_cat( (@_[0].'\\'), @_[[1..((nelems @_)-1)]] )
         if @_[0] =~ m{^$DRIVE_RX\z}o;
 
-    return _canon_cat( @_ );
+    return _canon_cat( < @_ );
 }
 
 sub catdir {
@@ -147,22 +147,22 @@ sub catdir {
     # Legacy / compatibility support
     #
     return ""
-    	unless @_;
-    shift, return _canon_cat( "/", @_ )
+    	unless (nelems @_);
+    shift, return _canon_cat( "/", < @_ )
 	if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catdir('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( (@_[0].'\\'), @_[[1..(@_-1)]] )
+    return _canon_cat( (@_[0].'\\'), @_[[1..((nelems @_)-1)]] )
         if @_[0] =~ m{^$DRIVE_RX\z}o;
 
-    return _canon_cat( @_ );
+    return _canon_cat( < @_ );
 }
 
 sub path {
-    my @path = split(';', %ENV{PATH});
-    s/"//g for @path;
-    @path = grep length, @path;
+    my @path = @( split(';', %ENV{PATH}) );
+    s/"//g for < @path;
+    @path = @( grep length, < @path );
     unshift(@path, ".");
     return @path;
 }
@@ -205,7 +205,7 @@ The results can be passed to L</catpath> to get back a path equivalent to
 =cut
 
 sub splitpath {
-    my ($self,$path, $nofile) = @_;
+    my ($self,$path, $nofile) = < @_;
     my ($volume,$directory,$file) = ('','','');
     if ( $nofile ) {
         $path =~ 
@@ -224,7 +224,7 @@ sub splitpath {
         $file      = $3;
     }
 
-    return ($volume,$directory,$file);
+    return  @($volume,$directory,$file);
 }
 
 
@@ -251,7 +251,7 @@ Yields:
 =cut
 
 sub splitdir {
-    my ($self,$directories) = @_ ;
+    my ($self,$directories) = < @_ ;
     #
     # split() likes to forget about trailing null fields, so here we
     # check to be sure that there will not be any before handling the
@@ -265,8 +265,8 @@ sub splitdir {
         # since there was a trailing separator, add a file name to the end, 
         # then do the split, then replace it with ''.
         #
-        my( @directories )= split( m|[\\/]|, "{$directories}dummy" ) ;
-        @directories[( @directories-1) ]= '' ;
+        my( @directories )= @( split( m|[\\/]|, "{$directories}dummy" ) ) ;
+        @directories[( (nelems @directories)-1) ]= '' ;
         return @directories ;
     }
 }
@@ -281,7 +281,7 @@ the $volume become significant.
 =cut
 
 sub catpath {
-    my ($self,$volume,$directory,$file) = @_;
+    my ($self,$volume,$directory,$file) = < @_;
 
     # If it's UNC, make sure the glue separator is there, reusing
     # whatever separator is first in the $volume
@@ -314,7 +314,7 @@ sub _same {
 }
 
 sub rel2abs {
-    my ($self,$path,$base ) = @_;
+    my ($self,$path,$base ) = < @_;
 
     my $is_abs = $self->file_name_is_absolute($path);
 
@@ -323,13 +323,13 @@ sub rel2abs {
 
     if ($is_abs) {
       # It's missing a volume, add one
-      my $vol = ($self->splitpath( $self->_cwd() ))[[0]];
+      my $vol = ( <$self->splitpath( < $self->_cwd() ))[[0]];
       return $self->canonpath( $vol . $path );
     }
 
     if ( !defined( $base ) || $base eq '' ) {
       require Cwd ;
-      $base = Cwd::getdcwd( ($self->splitpath( $path ))[[0]] ) if defined &Cwd::getdcwd ;
+      $base = Cwd::getdcwd( ( <$self->splitpath( $path ))[[0]] ) if defined &Cwd::getdcwd ;
       $base = $self->_cwd() unless defined $base ;
     }
     elsif ( ! $self->file_name_is_absolute( $base ) ) {
@@ -340,13 +340,13 @@ sub rel2abs {
     }
 
     my ( $path_directories, $path_file ) =
-      ($self->splitpath( $path, 1 ))[[1,2]] ;
+      ( <$self->splitpath( $path, 1 ))[[1,2]] ;
 
-    my ( $base_volume, $base_directories ) =
+    my ( $base_volume, $base_directories ) = <
       $self->splitpath( $base, 1 ) ;
 
     $path = $self->catpath( 
-			   $base_volume, 
+			   $base_volume, < 
 			   $self->catdir( $base_directories, $path_directories ), 
 			   $path_file
 			  ) ;
@@ -387,7 +387,7 @@ sub _canon_cat(@)				# @path -> path
 	       : $first =~ s{ \A [\\/] }{}x			# root dir
 	       ? "\\"
 	       : "";
-    my $path   = join "\\", $first, @_;
+    my $path   = join "\\", $first, < @_;
 
     $path =~ s#[\\/]+#\\#g;		# xx/yy --> xx\yy & xx\\yy --> xx\yy
 

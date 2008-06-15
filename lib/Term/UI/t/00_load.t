@@ -4,7 +4,7 @@ use strict;
 BEGIN { 
     chdir 't' if -d 't';
     use File::Spec;
-    use lib File::Spec->catdir( qw[.. lib] );
+    use lib < File::Spec->catdir( qw[.. lib] );
 }
 
 my $Class = 'Term::UI';

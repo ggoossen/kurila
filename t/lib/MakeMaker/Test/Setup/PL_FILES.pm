@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::PL_FILES;
 
-our @ISA = qw(Exporter);
+our @ISA = @( qw(Exporter) );
 require Exporter;
-our @EXPORT = qw(setup teardown);
+our @EXPORT = @( qw(setup teardown) );
 
 use strict;
 use File::Path;
@@ -10,7 +10,7 @@ use File::Basename;
 use File::Spec;
 use MakeMaker::Test::Utils;
 
-my %Files = (
+my %Files = %(
              'PL_FILES-Module/Makefile.PL'   => <<'END',
 use ExtUtils::MakeMaker;
 
@@ -24,9 +24,9 @@ WriteMakefile(
 );
 END
 
-	     'PL_FILES-Module/single.PL'        => _gen_pl_files(),
-	     'PL_FILES-Module/multi.PL'         => _gen_pl_files(),
-	     'PL_FILES-Module/Bar_pm.PL'        => _gen_pm_files(),
+	     'PL_FILES-Module/single.PL'        => < _gen_pl_files(),
+	     'PL_FILES-Module/multi.PL'         => < _gen_pl_files(),
+	     'PL_FILES-Module/Bar_pm.PL'        => < _gen_pm_files(),
 	     'PL_FILES-Module/lib/PL/Foo.pm' => <<'END',
 # Module to load to ensure PL_FILES have blib in @INC.
 package PL::Foo;
@@ -93,7 +93,7 @@ sub setup {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile( <'File::Spec'->curdir, split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;

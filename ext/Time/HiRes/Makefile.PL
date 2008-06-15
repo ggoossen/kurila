@@ -25,7 +25,7 @@ my $ld_exeext = ($^O eq 'cygwin' ||
                 (($^O eq 'vos') ? %Config{exe_ext} : '');
 
 unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } < @ARGV;
 }
 
 # Perls 5.002 and 5.003 did not have File::Spec, fake what we need.
@@ -39,15 +39,15 @@ sub my_dirsep {
 
 sub my_catdir {
     shift;
-    my $catdir = join(my_dirsep, @_);
+    my $catdir = join(my_dirsep, < @_);
     $^O eq 'VMS' ? "[$catdir]" : $catdir;
 }
 
 sub my_catfile {
     shift;
-    return join(my_dirsep, @_) unless $^O eq 'VMS';
+    return join(my_dirsep, < @_) unless $^O eq 'VMS';
     my $file = pop;
-    return my_catdir (undef, @_) . $file;
+    return my_catdir (undef, < @_) . $file;
 }
 
 sub my_updir {
@@ -78,7 +78,7 @@ my $nop3 = *File::Spec::catfile;
 # release. Sorry, Edward :)
 
 sub try_compile_and_link {
-    my ($c, %args) = @_;
+    my ($c, < %args) = < @_;
 
     my ($ok) = 0;
     my ($tmp) = "tmp$$";
@@ -134,7 +134,7 @@ __EOD__
 	    $errornull = '';
 	}
 
-        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c @$LIBS $errornull"
+        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c {join ' ', <@$LIBS} $errornull"
 	    unless defined $cccmd;
 
        if ($^O eq 'VMS') {
@@ -158,7 +158,7 @@ __EOD__
 
 	    if ( $ok && exists %args{run} && %args{run}) {
 		my $tmp_exe =
-		    File::Spec->catfile(File::Spec->curdir, $tmp_exe);
+		    File::Spec->catfile( <File::Spec->curdir, $tmp_exe);
 		printf "Running $tmp_exe..." if $VERBOSE;
 		if (system($tmp_exe) == 0) {
 		    $ok = 1;
@@ -215,10 +215,10 @@ EOM
 }
 
 sub has_x {
-    my ($x, %args) = @_;
+    my ($x, < %args) = < @_;
 
     return 1 if
-    try_compile_and_link(<<EOM, %args);
+    try_compile_and_link(<<EOM, < %args);
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -270,7 +270,7 @@ EOM
 }
 
 sub has_include {
-    my ($inc) = @_;
+    my ($inc) = < @_;
     return 1 if
     try_compile_and_link(<<EOM);
 #include "EXTERN.h"
@@ -359,7 +359,7 @@ EOM
 }
 
 sub DEFINE {
-    my ($def, $val) = @_;
+    my ($def, $val) = < @_;
     my $define = defined $val ? "$def=$val" : $def ;
     unless ($DEFINE =~ m/(?:^| )-D\Q$define\E(?: |$)/) {
 	$DEFINE .= " -D$define";
@@ -374,7 +374,7 @@ sub init {
 	do $hints;
 	if (exists $self->{LIBS}) {
 	    $LIBS = $self->{LIBS};
-	    print "Extra libraries: @$LIBS...\n";
+	    print "Extra libraries: {join ' ', <@$LIBS}...\n";
 	}
     }
 
@@ -746,7 +746,7 @@ EOM
 }
 
 sub doMakefile {
-    my @makefileopts = ();
+    my @makefileopts = @( () );
 
 	DEFINE('ATLEASTFIVEOHOHFIVE');
 
@@ -766,12 +766,12 @@ sub doMakefile {
         realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
     );
 
-    WriteMakefile(@makefileopts);
+    WriteMakefile(< @makefileopts);
 }
 
 sub doConstants {
     if (try {require ExtUtils::Constant; 1}) {
-	my @names = qw(CLOCK_HIGHRES CLOCK_MONOTONIC
+	my @names = @( qw(CLOCK_HIGHRES CLOCK_MONOTONIC
 		       CLOCK_PROCESS_CPUTIME_ID
 		       CLOCK_REALTIME
 		       CLOCK_SOFTTIME
@@ -780,7 +780,7 @@ sub doConstants {
 		       CLOCKS_PER_SEC
 		       ITIMER_REAL ITIMER_VIRTUAL ITIMER_PROF
 		       ITIMER_REALPROF
-		       TIMER_ABSTIME);
+		       TIMER_ABSTIME) );
 	foreach (qw (d_usleep d_ualarm d_gettimeofday d_getitimer d_setitimer
 		     d_nanosleep d_clock_gettime d_clock_getres
 		     d_clock d_clock_nanosleep d_hires_stat)) {

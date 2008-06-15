@@ -40,7 +40,7 @@ skip_all "Unhappy on MacOS" if $^O eq 'MacOS';
 #
 sub skip {
     my $why  = shift;
-    my $n    = @_ ? shift : 1;
+    my $n    = (nelems @_) ? shift : 1;
     for (1..$n) {
         my $test = curr_test;
         print STDOUT "ok $test # skip: $why\n";
@@ -53,8 +53,8 @@ sub skip {
 # ./test.pl doesn't give use 'notok', so we make it here.
 #
 sub notok {
-    my ($pass, $name, @mess) = @_;
-    _ok(!$pass, _where(), $name, @mess);
+    my ($pass, $name, < @mess) = < @_;
+    _ok(!$pass, < _where(), $name, < @mess);
 }
 
 my $JaPH   = "Just another Perl Hacker";
@@ -75,11 +75,11 @@ plan tests => 99;
 
 
 {   
-    my @primes     = (2,  3,  7, 13, 53, 101,  557, 1429);
-    my @composites = (4, 10, 25, 32, 75, 143, 1333, 1728);
+    my @primes     = @(2,  3,  7, 13, 53, 101,  557, 1429);
+    my @composites = @(4, 10, 25, 32, 75, 143, 1333, 1728);
 
-    my %primeness  = ((map {$_ => 1} @primes),
-                      (map {$_ => 0} @composites));
+    my %primeness  = %((map {$_ => 1} < @primes),
+                      (map {$_ => 0} < @composites));
 
     while (my ($num, $is_prime) = each %primeness) {
         my $comment = "$num is " . ($is_prime ? "prime." : "composite.");
@@ -186,7 +186,7 @@ plan tests => 99;
         }
     }
 
-    foreach my $program (@progs) {
+    foreach my $program (< @progs) {
         if (exists $program -> {SKIP}) {
             chomp  $program -> {SKIP};
             skip   $program -> {SKIP}, 1;
@@ -194,20 +194,20 @@ plan tests => 99;
         }
 
 	chomp @{$program -> {SKIP_OS}};
-        if (@{$program -> {SKIP_OS}}) {
-            if (grep {$^O eq $_} @{$program -> {SKIP_OS}}) {
+        if ((nelems @{$program -> {SKIP_OS}})) {
+            if (grep {$^O eq $_} < @{$program -> {SKIP_OS}}) {
                 skip "Your OS uses different quoting.", 1;
                 next;
             }
         }
 
-        map {s/\$datafile/$datafile/} @{$program -> {ARGS}};
+        map {s/\$datafile/$datafile/} < @{$program -> {ARGS}};
         $program -> {EXPECT} = $JaPH unless exists $program -> {EXPECT};
         $program -> {EXPECT} =~ s/\$JaPH_s\b/$JaPH_s/g;
         $program -> {EXPECT} =~ s/\$JaPh_c\b/$JaPh_c/g;
         $program -> {EXPECT} =~ s/\$JaPh\b/$JaPh/g;
-        chomp ($program -> {EXPECT}, @{$program -> {SWITCHES}},
-                                     @{$program -> {ARGS}});
+        chomp ($program -> {EXPECT}, < @{$program -> {SWITCHES}},
+                                     < @{$program -> {ARGS}});
         fresh_perl_is ($program -> {CODE},
                        $program -> {EXPECT},
                       \%(switches => $program -> {SWITCHES},

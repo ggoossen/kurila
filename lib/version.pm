@@ -11,7 +11,7 @@ $CLASS = 'version';
 
 # Preloaded methods go here.
 sub import {
-    my ($class) = @_;
+    my ($class) = < @_;
     my $callpkg = caller();
     no strict 'refs';
     

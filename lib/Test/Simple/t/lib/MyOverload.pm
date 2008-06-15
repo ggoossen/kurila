@@ -8,7 +8,7 @@ sub new {
 
 package Overloaded::Compare;
 use vars qw(@ISA);
-@ISA = qw(Overloaded);
+@ISA = @( qw(Overloaded) );
 
 # Sometimes objects have only comparison ops overloaded and nothing else.
 # For example, DateTime objects.
@@ -20,7 +20,7 @@ use overload
 
 package Overloaded::Ify;
 use vars qw(@ISA);
-@ISA = qw(Overloaded);
+@ISA = @( qw(Overloaded) );
 
 use overload
         q{""}    => sub { @_[0]->{string} },

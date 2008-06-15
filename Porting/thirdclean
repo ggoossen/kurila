@@ -1,66 +1,66 @@
 local $/;
 $_ = ~< *ARGV;
 
-my @accv = m/(^-+ \w+ -- \d+ --(?:.(?!^-))+)/msg;
-my @leak = m/(\d+ bytes? in \d+ leaks? .+? created at:(?:.(?!^[\d-]))+)/msg;
+my @accv = @( m/(^-+ \w+ -- \d+ --(?:.(?!^-))+)/msg );
+my @leak = @( m/(\d+ bytes? in \d+ leaks? .+? created at:(?:.(?!^[\d-]))+)/msg );
 
 @leak[ 0] =~ s/.* were found:\n\n//m; # Snip off totals.
 
 # Weed out the known access violations.
 
-@accv = grep { ! m/-- ru[hs] --.+setlocale.+Perl_init_i18nl10n/s }  @accv;
-@accv = grep { ! m/-- [rw][ui]s --.+_doprnt_dis/s }                 @accv;
-@accv = grep { ! m/-- (?:fon|ris) --.+__strxfrm/s }                 @accv;
-@accv = grep { ! m/-- rus --.+__catgets/s }                         @accv;
-@accv = grep { ! m/-- rus --.+__execvp/s }                          @accv;
-@accv = grep { ! m/-- rus --.+tmpnam.+tmpfile/s }                   @accv;
-@accv = grep { ! m/-- rus --.+__gethostbyname/s }                   @accv;
-@accv = grep { ! m/-- ris --.+__actual_atof/s }                     @accv;
-@accv = grep { ! m/-- ris --.+__strftime/s }                        @accv;
+@accv = @( grep { ! m/-- ru[hs] --.+setlocale.+Perl_init_i18nl10n/s }  < @accv );
+@accv = @( grep { ! m/-- [rw][ui]s --.+_doprnt_dis/s }                 < @accv );
+@accv = @( grep { ! m/-- (?:fon|ris) --.+__strxfrm/s }                 < @accv );
+@accv = @( grep { ! m/-- rus --.+__catgets/s }                         < @accv );
+@accv = @( grep { ! m/-- rus --.+__execvp/s }                          < @accv );
+@accv = @( grep { ! m/-- rus --.+tmpnam.+tmpfile/s }                   < @accv );
+@accv = @( grep { ! m/-- rus --.+__gethostbyname/s }                   < @accv );
+@accv = @( grep { ! m/-- ris --.+__actual_atof/s }                     < @accv );
+@accv = @( grep { ! m/-- ris --.+__strftime/s }                        < @accv );
 
 # Weed out untraceable access violations.
-@accv = grep { ! m/ ----- /s }                                      @accv;
-@accv = grep { ! m/-- r[ui][hs] --.+proc_at_/s }                    @accv;
-@accv = grep { ! m/-- r[ui][hs] --.+pc = 0x/s }                     @accv;
+@accv = @( grep { ! m/ ----- /s }                                      < @accv );
+@accv = @( grep { ! m/-- r[ui][hs] --.+proc_at_/s }                    < @accv );
+@accv = @( grep { ! m/-- r[ui][hs] --.+pc = 0x/s }                     < @accv );
 
 # The following look like being caused by the intrinsic inlined
 # string handling functions reading one or few bytes beyond the
 # actual length.
-@accv = grep { ! m/-- rih --.+(?:memmove|strcpy).+moreswitches/s }  @accv;
-@accv = grep { ! m/-- (?:rih|rus) --.+strcpy.+gv_fetchfile/s }      @accv;
-@accv = grep { ! m/-- rih --.+strcmp.+doopen_pm/s }                 @accv;
-@accv = grep { ! m/-- rih --.+strcmp.+gv_fetchpv/s }                @accv;
-@accv = grep { ! m/-- r[ui]h --.+strcmp.+gv_fetchmeth/s }           @accv;
-@accv = grep { ! m/-- rih --.+memmove.+my_setenv/s }                @accv;
-@accv = grep { ! m/-- rih --.+memmove.+catpvn_flags/s }             @accv;
+@accv = @( grep { ! m/-- rih --.+(?:memmove|strcpy).+moreswitches/s }  < @accv );
+@accv = @( grep { ! m/-- (?:rih|rus) --.+strcpy.+gv_fetchfile/s }      < @accv );
+@accv = @( grep { ! m/-- rih --.+strcmp.+doopen_pm/s }                 < @accv );
+@accv = @( grep { ! m/-- rih --.+strcmp.+gv_fetchpv/s }                < @accv );
+@accv = @( grep { ! m/-- r[ui]h --.+strcmp.+gv_fetchmeth/s }           < @accv );
+@accv = @( grep { ! m/-- rih --.+memmove.+my_setenv/s }                < @accv );
+@accv = @( grep { ! m/-- rih --.+memmove.+catpvn_flags/s }             < @accv );
 
 # yyparse.
-@accv = grep { ! m/Perl_yyparse/s }                                 @accv;
+@accv = @( grep { ! m/Perl_yyparse/s }                                 < @accv );
 
 # Weed out the known memory leaks.
 
-@leak = grep { ! m/setlocale.+Perl_init_i18nl10n/s }   @leak;
-@leak = grep { ! m/setlocale.+set_numeric_standard/s } @leak;
-@leak = grep { ! m/_findiop.+fopen/s }                 @leak;
-@leak = grep { ! m/_findiop.+__fdopen/s }              @leak;
-@leak = grep { ! m/__localtime/s }                     @leak;
-@leak = grep { ! m/__get_libc_context/s }              @leak;
-@leak = grep { ! m/__sia_init/s }                      @leak;
+@leak = @( grep { ! m/setlocale.+Perl_init_i18nl10n/s }   < @leak );
+@leak = @( grep { ! m/setlocale.+set_numeric_standard/s } < @leak );
+@leak = @( grep { ! m/_findiop.+fopen/s }                 < @leak );
+@leak = @( grep { ! m/_findiop.+__fdopen/s }              < @leak );
+@leak = @( grep { ! m/__localtime/s }                     < @leak );
+@leak = @( grep { ! m/__get_libc_context/s }              < @leak );
+@leak = @( grep { ! m/__sia_init/s }                      < @leak );
 
 # Weed out untraceable memory leaks.
-@leak = grep { ! m/ ----- /s }                         @leak;
-@leak = grep { ! m/pc = 0x/s }                         @leak;
-@leak = grep { ! m/_pc_range_table/s }                 @leak;
-@leak = grep { ! m/_add_gp_range/s }                   @leak;
+@leak = @( grep { ! m/ ----- /s }                         < @leak );
+@leak = @( grep { ! m/pc = 0x/s }                         < @leak );
+@leak = @( grep { ! m/_pc_range_table/s }                 < @leak );
+@leak = @( grep { ! m/_add_gp_range/s }                   < @leak );
 
 # yyparse.
-@leak = grep { ! m/Perl_yyparse/s }                    @leak;
+@leak = @( grep { ! m/Perl_yyparse/s }                    < @leak );
 
 # Output the cleaned up report.
 
 # Access violations.
 
-for (my $i = 0; $i +< @accv; $i++) {
+for (my $i = 0; $i +< nelems @accv; $i++) {
   $_ = @accv[$i];
   s/\d+/$i/;
   print;
@@ -70,7 +70,7 @@ for (my $i = 0; $i +< @accv; $i++) {
 
 my ($leakb, $leakn, $leaks);
 
-for (my $i = 0; $i +< @leak; $i++) {
+for (my $i = 0; $i +< nelems @leak; $i++) {
   $_ = @leak[$i];
   print $_, "\n";
   m/^(\d+) bytes? in (\d+) leak/;

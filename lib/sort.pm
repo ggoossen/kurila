@@ -14,7 +14,7 @@ use strict;
 
 sub import {
     shift;
-    if (@_ == 0) {
+    if ((nelems @_) == 0) {
 	require Carp;
 	Carp::croak("sort pragma requires arguments");
     }
@@ -39,7 +39,7 @@ sub import {
 
 sub unimport {
     shift;
-    if (@_ == 0) {
+    if ((nelems @_) == 0) {
 	die("sort pragma requires arguments");
     }
     local $_;
@@ -64,8 +64,8 @@ sub current {
 	push @sort, 'mergesort' if %^H{sort} ^&^ $sort::mergesort_bit;
 	push @sort, 'stable'    if %^H{sort} ^&^ $sort::stable_bit;
     }
-    push @sort, 'mergesort' unless @sort;
-    join(' ', @sort);
+    push @sort, 'mergesort' unless (nelems @sort);
+    join(' ', < @sort);
 }
 
 1;

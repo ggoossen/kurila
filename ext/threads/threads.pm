@@ -38,7 +38,7 @@ sub import
     my $class = shift;   # Not used
 
     # Exported subroutines
-    my @EXPORT = qw(async);
+    my @EXPORT = @( qw(async) );
 
     # Handle args
     while (my $sym = shift) {
@@ -68,7 +68,7 @@ sub import
 
     # Export subroutine names
     my $caller = caller();
-    foreach my $sym (@EXPORT) {
+    foreach my $sym (< @EXPORT) {
         no strict 'refs';
         *{Symbol::fetch_glob($caller.'::'.$sym)} = \&{$sym};
     }
@@ -85,7 +85,7 @@ sub import
 # Exit from a thread (only)
 sub exit
 {
-    my ($class, $status) = @_;
+    my ($class, $status) = < @_;
     if (! defined($status)) {
         $status = 0;
     }
@@ -119,7 +119,7 @@ sub async (&;@)
 # Thread object equality checking
 use overload (
     '==' => \&equal,
-    '!=' => sub { ! equal(@_) },
+    '!=' => sub { ! equal(< @_) },
     'fallback' => 1
 );
 

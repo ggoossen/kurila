@@ -24,7 +24,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 use utf8;
 
-@ISA = qw(Pod::Text);
+@ISA = @( qw(Pod::Text) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -37,16 +37,16 @@ $VERSION = 2.03;
 
 # Make level one headings bold.
 sub cmd_head1 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
-    $self->SUPER::cmd_head1 ($attrs, colored ($text, 'bold'));
+    $self->SUPER::cmd_head1 ($attrs, < colored ($text, 'bold'));
 }
 
 # Make level two headings bold.
 sub cmd_head2 {
-    my ($self, $attrs, $text) = @_;
+    my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
-    $self->SUPER::cmd_head2 ($attrs, colored ($text, 'bold'));
+    $self->SUPER::cmd_head2 ($attrs, < colored ($text, 'bold'));
 }
 
 # Fix the various formatting codes.
@@ -56,7 +56,7 @@ sub cmd_i { return colored (@_[2], 'yellow') }
 
 # Output any included code in green.
 sub output_code {
-    my ($self, $code) = @_;
+    my ($self, $code) = < @_;
     $code = colored ($code, 'green');
     $self->output ($code);
 }

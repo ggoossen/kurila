@@ -8,7 +8,7 @@ use Data::Dumper;
 
 {
     sub iterate_hash {
-	my ($h) = @_;
+	my ($h) = < @_;
 	my $count = 0;
 	$count++ while each %$h;
 	return $count;
@@ -36,7 +36,7 @@ foo(\%());
 ok(1, "[perl #38612]"); # Still no core dump? We are fine.
 
 {
-    my %h = (1,2,3,4);
+    my %h = %(1,2,3,4);
     each %h;
 
     my $d = Data::Dumper->new(\@(\%h));

@@ -4,7 +4,7 @@
 #!perl -w
 use strict;
 use File::Spec;
-my (undef, $headerpath) = @ARGV;
+my (undef, $headerpath) = < @ARGV;
 my ($out) = __FILE__ =~ m/(^.*)\.PL/i;
 $out =~ s/_h$/.h/;
 unlink $out if -l $out;

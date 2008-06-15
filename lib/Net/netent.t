@@ -2,7 +2,7 @@
 
 BEGIN {
     our $hasne;
-    try { my @n = getnetbyname "loopback" };
+    try { my @n = @( getnetbyname "loopback" ) };
     $hasne = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasne) { print "1..0 # Skip: no getnetbyname\n"; exit 0 }
     use Config;
@@ -13,8 +13,8 @@ BEGIN {
 our @netent;
 
 BEGIN {
-    @netent = getnetbyname "loopback"; # This is the function getnetbyname.
-    unless (@netent) { print "1..0 # Skip: no loopback net\n"; exit 0 }
+    @netent = @( getnetbyname "loopback" ); # This is the function getnetbyname.
+    unless (nelems @netent) { print "1..0 # Skip: no loopback net\n"; exit 0 }
 }
 
 print "1..2\n";

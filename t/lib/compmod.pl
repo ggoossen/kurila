@@ -6,7 +6,7 @@ my $module = shift;
 eval "use $module ();";
 if( $@ ) {
     print "not ";
-    warn "# require failed with {dump::view($@->message)}\n";
+    warn "# require failed with {dump::view( <$@->message)}\n";
 }
 print "ok - $module\n";
 

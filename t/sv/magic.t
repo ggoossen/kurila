@@ -2,7 +2,7 @@
 
 BEGIN {
     $| = 1;
-    $^WARN_HOOK = sub { die "Dying on warning: ", @_ };
+    $^WARN_HOOK = sub { die "Dying on warning: ", < @_ };
 }
 
 use warnings;
@@ -10,7 +10,7 @@ use Config;
 
 my $test = 1;
 sub ok {
-    my($ok, $info, $todo) = @_;
+    my($ok, $info, $todo) = < @_;
 
     # You have to do it this way or VMS will get confused.
     printf "\%s $test\%s\n", $ok ? "ok" : "not ok",
@@ -26,7 +26,7 @@ sub ok {
 }
 
 sub skip {
-    my($reason) = @_;
+    my($reason) = < @_;
 
     printf "ok $test # skipped\%s\n", defined $reason ? ": $reason" : '';
 
@@ -134,30 +134,30 @@ END
 }
 
 # can we slice ENV?
-my @val1 = %ENV{[keys(%ENV)]};
-my @val2 = values(%ENV);
-ok join(':',@val1) eq join(':',@val2);
-ok @val1 +> 1;
+my @val1 = @( %ENV{[keys(%ENV)]} );
+my @val2 = @( values(%ENV) );
+ok join(':',< @val1) eq join(':',< @val2);
+ok (nelems @val1) +> 1;
 
 # regex vars
 'foobarbaz' =~ m/b(a)r/;
 ok $+ eq 'a', $+;
 
 # $"
-my @a = qw(foo bar baz);
-ok "@a" eq "foo bar baz", "@a";
+my @a = @( qw(foo bar baz) );
+ok "{join ' ', <@a}" eq "foo bar baz", "{join ' ', <@a}";
 {
     local $" = ',';
-    ok "@a" eq "foo,bar,baz", "@a";
+    ok "{join ' ', <@a}" eq "foo,bar,baz", "{join ' ', <@a}";
 }
 
 # $;
-my %h = ();
+my %h = %( () );
 %h{'foo', 'bar'} = 1;
 ok((keys %h)[[0]] eq "foo\034bar", (keys %h)[[0]]);
 {
     local $; = 'x';
-    %h = ();
+    %h = %( () );
     %h{'foo', 'bar'} = 1;
     ok((keys %h)[[0]] eq 'fooxbar', (keys %h)[[0]]);
 }
@@ -192,7 +192,7 @@ our ($wd, $script);
        chomp($wd = `pwd`);
        $wd =~ s#/t$##;
        if ($Is_Cygwin) {
-	   $wd = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($wd, 1));
+	   $wd = Cygwin::win_to_posix_path( <Cygwin::posix_to_win_path($wd, 1));
        }
     }
     elsif($Is_os2) {
@@ -294,7 +294,7 @@ else {
 	    my $PATH = %ENV{PATH};
 	    my $PDL = %ENV{PERL_DESTRUCT_LEVEL} || 0;
 	    %ENV{foo} = "bar";
-	    %ENV = ();
+	    %ENV = %( () );
 	    %ENV{PATH} = $PATH;
 	    %ENV{PERL_DESTRUCT_LEVEL} = $PDL || 0;
 	    ok ($Is_MSWin32 ? (`set foo 2>NUL` eq "")
@@ -347,7 +347,7 @@ else {
 {
     my $ok = 1;
     my $warn = '';
-    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @_; };
+    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', < @_; };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }
@@ -355,7 +355,7 @@ else {
 # test case-insignificance of %ENV (these tests must be enabled only
 # when perl is compiled with -DENV_IS_CASELESS)
 if ($Is_MSWin32 || $Is_NetWare) {
-    %ENV = ();
+    %ENV = %( () );
     %ENV{'Foo'} = 'bar';
     %ENV{'fOo'} = 'baz';
     ok (scalar(keys(%ENV)) == 1);
@@ -381,7 +381,7 @@ if ($Is_miniperl) {
    ok scalar eval q{
       %!;
       defined %Errno::;
-   }, $@ && $@->message;
+   }, $@ && < $@->message;
 }
 
 if ($Is_miniperl) {
@@ -394,7 +394,7 @@ if ($Is_miniperl) {
 
     open(FOO, "<", "nonesuch"); # Generate ENOENT
     no strict 'refs';
-    my %errs = %{*{Symbol::fetch_glob("!")}}; # Cause Errno.pm to be loaded at run-time
+    my %errs = %( < %{*{Symbol::fetch_glob("!")}} ); # Cause Errno.pm to be loaded at run-time
     ok %{*{Symbol::fetch_glob("!")}}{ENOENT};
 }
 
@@ -411,8 +411,8 @@ ok $^TAINT == 0;
 # into double-quoted strings
 # 20020414 mjd-perl-patch+@plover.com
 "I like pie" =~ m/(I) (like) (pie)/;
-ok "@-" eq  "0 0 2 7";
-ok "@+" eq "10 1 6 10";
+ok "{join ' ', <@-}" eq  "0 0 2 7";
+ok "{join ' ', <@+}" eq "10 1 6 10";
 
 # Tests for the magic get of $\
 {
@@ -437,11 +437,11 @@ ok "@+" eq "10 1 6 10";
     my $x;
     sub f {
 	"abc" =~ m/(.)./;
-	$x = "@+";
+	$x = "{join ' ', <@+}";
 	return @+;
     };
-    my @y = f();
-    ok( $x eq "@y", "return a magic array ($x) vs (@y)" );
+    my @y = @( < f() );
+    ok( $x eq "{join ' ', <@y}", "return a magic array ($x) vs ({join ' ', <@y})" );
 }
 
 # Test for bug [perl #36434]
@@ -455,10 +455,10 @@ if (!$Is_VMS) {
     try { push @ISA, __FILE__ };
     ok( $@ eq '', 'Push a constant on a magic array');
     $@ and print "# $@";
-    try { %ENV = (PATH => __PACKAGE__) };
+    try { %ENV = %(PATH => __PACKAGE__) };
     ok( $@ eq '', 'Assign a constant to a magic hash');
     $@ and print "# $@";
-    try { my %h = qw(A B); %ENV = (PATH => (keys %h)[[0]]) };
+    try { my %h = %( qw(A B) ); %ENV = %(PATH => (keys %h)[[0]]) };
     ok( $@ eq '', 'Assign a shared key to a magic hash');
     $@ and print "# $@";
 }

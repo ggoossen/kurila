@@ -21,10 +21,10 @@ require utf8;
 use strict;
 use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
 
-@RESTRICT_TESTS = ('Locked hash', 'Locked hash placeholder',
+@RESTRICT_TESTS = @('Locked hash', 'Locked hash placeholder',
                    'Locked keys', 'Locked keys placeholder',
                   );
-%R_HASH = (perl => 'rules');
+%R_HASH = %(perl => 'rules');
 
 {
   # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
@@ -39,7 +39,7 @@ use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
   # an a circumflex, so we need to be explicit.
 
   my $a_circumflex = "\xe5"; # a byte.
-  %U_HASH = (map {$_, $_} 'castle', "ch{$a_circumflex}teau", $utf8, chr 0x57CE);
+  %U_HASH = %(map {$_, $_} 'castle', "ch{$a_circumflex}teau", $utf8, chr 0x57CE);
   plan tests => 162;
 }
 
@@ -64,7 +64,7 @@ my %tests;
 
 # use Data::Dumper; $Data::Dumper::Useqq = 1; print Dumper \%tests;
 sub thaw_hash {
-  my ($name, $expected) = @_;
+  my ($name, $expected) = < @_;
   my $hash = try {thaw %tests{$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($hash, 'HASH');
@@ -75,7 +75,7 @@ sub thaw_hash {
 }
 
 sub thaw_scalar {
-  my ($name, $expected, $bug) = @_;
+  my ($name, $expected, $bug) = < @_;
   my $scalar = try {thaw %tests{$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");
@@ -84,7 +84,7 @@ sub thaw_scalar {
 }
 
 sub thaw_fail {
-  my ($name, $expected) = @_;
+  my ($name, $expected) = < @_;
   my $thing = try {thaw %tests{$name}};
   is ($thing, undef, "Thawed $name failed as expected?");
   like ($@->{description}, $expected, "Error as predicted?");
@@ -92,7 +92,7 @@ sub thaw_fail {
 
 sub test_locked_hash {
   my $hash = shift;
-  my @keys = keys %$hash;
+  my @keys = @( keys %$hash );
   my ($key, $value) = each %$hash;
   try {$hash->{$key} = reverse $value};
   like( $@->{description}, "/^Modification of a read-only value attempted/",
@@ -106,7 +106,7 @@ sub test_locked_hash {
 
 sub test_restricted_hash {
   my $hash = shift;
-  my @keys = keys %$hash;
+  my @keys = @( keys %$hash );
   my ($key, $value) = each %$hash;
   try {$hash->{$key} = reverse $value};
   is( $@, '',

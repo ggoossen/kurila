@@ -10,16 +10,16 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(@_) }
+sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
-&ok( e "", "" );
-&ok( e "\n", "", );
-
-
+&ok( < e "", "" );
+&ok( < e "\n", "", );
 
 
-&ok( e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
-&ok( e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
+
+
+&ok( < e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
+&ok( < e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
 
 
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n"),
@@ -92,7 +92,7 @@ ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\n\ns
 
 print "# Testing tab expansion...\n";
 
-&ok( e
+&ok( < e
 q{=pod
 
  here we go now
@@ -157,7 +157,7 @@ a
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-&ok( e
+&ok( < e
 q{=pod
 
  here we go now
@@ -222,7 +222,7 @@ a
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-&ok( e
+&ok( < e
 q{=pod
 
  here we go now
@@ -288,7 +288,7 @@ a
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-&ok( e
+&ok( < e
 q{=pod
 
  here we go now

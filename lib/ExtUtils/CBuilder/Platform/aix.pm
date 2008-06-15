@@ -6,12 +6,12 @@ use File::Spec;
 
 use vars qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = qw(ExtUtils::CBuilder::Platform::Unix);
+@ISA = @( qw(ExtUtils::CBuilder::Platform::Unix) );
 
 sub need_prelink { 1 }
 
 sub link {
-  my ($self, %args) = @_;
+  my ($self, < %args) = < @_;
   my $cf = $self->{config};
 
   (my $baseext = %args{module_name}) =~ s/.*:://;
@@ -24,7 +24,7 @@ sub link {
     s/\Q$(PERL_INC)\E/$perl_inc/;
   }
 
-  return $self->SUPER::link(%args);
+  return $self->SUPER::link(< %args);
 }
 
 

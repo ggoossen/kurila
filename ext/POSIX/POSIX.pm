@@ -2,7 +2,7 @@ package POSIX;
 use strict;
 use warnings;
 
-our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, %SIGRT) = ();
+our(@ISA, < %EXPORT_TAGS, < @EXPORT_OK, < @EXPORT, < %SIGRT) = ();
 
 our $VERSION = "1.13";
 
@@ -19,14 +19,14 @@ my $loaded;
 sub import {
     load_imports() unless $loaded++;
     my $this = shift;
-    my @list = map { m/^\w+_h$/ ? ":$_" : $_ } @_;
+    my @list = @( map { m/^\w+_h$/ ? ":$_" : $_ } < @_ );
     local $Exporter::ExportLevel = 1;
-    Exporter::import($this,@list);
+    Exporter::import($this,< @list);
 }
 
 XSLoader::load 'POSIX', $VERSION;
 
-my %NON_CONSTS = (map {($_,1)}
+my %NON_CONSTS = %(map {($_,1)}
                   qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
@@ -39,7 +39,7 @@ package POSIX::SigRt;
 use Tie::Hash;
 
 use vars qw($SIGACTION_FLAGS $_SIGRTMIN $_SIGRTMAX $_sigrtn @ISA);
-@POSIX::SigRt::ISA = qw(Tie::StdHash);
+@POSIX::SigRt::ISA = @( qw(Tie::StdHash) );
 
 $SIGACTION_FLAGS = 0;
 
@@ -50,45 +50,45 @@ sub DESTROY {};
 package POSIX;
 
 sub usage {
-    my ($mess) = @_;
+    my ($mess) = < @_;
     die "Usage: POSIX::$mess";
 }
 
 sub redef {
-    my ($mess) = @_;
+    my ($mess) = < @_;
     die "Use method $mess instead";
 }
 
 sub unimpl {
-    my ($mess) = @_;
+    my ($mess) = < @_;
     $mess =~ s/xxx//;
     die "Unimplemented: POSIX::$mess";
 }
 
 sub assert {
-    usage "assert(expr)" if @_ != 1;
+    usage "assert(expr)" if (nelems @_) != 1;
     if (!@_[0]) {
 	die "Assertion failed";
     }
 }
 
 sub tolower {
-    usage "tolower(string)" if @_ != 1;
+    usage "tolower(string)" if (nelems @_) != 1;
     lc(@_[0]);
 }
 
 sub toupper {
-    usage "toupper(string)" if @_ != 1;
+    usage "toupper(string)" if (nelems @_) != 1;
     uc(@_[0]);
 }
 
 sub closedir {
-    usage "closedir(dirhandle)" if @_ != 1;
+    usage "closedir(dirhandle)" if (nelems @_) != 1;
     CORE::closedir(@_[0]);
 }
 
 sub opendir {
-    usage "opendir(directory)" if @_ != 1;
+    usage "opendir(directory)" if (nelems @_) != 1;
     my $dirhandle;
     CORE::opendir($dirhandle, @_[0])
 	? $dirhandle
@@ -96,87 +96,87 @@ sub opendir {
 }
 
 sub readdir {
-    usage "readdir(dirhandle)" if @_ != 1;
+    usage "readdir(dirhandle)" if (nelems @_) != 1;
     CORE::readdir(@_[0]);
 }
 
 sub rewinddir {
-    usage "rewinddir(dirhandle)" if @_ != 1;
+    usage "rewinddir(dirhandle)" if (nelems @_) != 1;
     CORE::rewinddir(@_[0]);
 }
 
 sub errno {
-    usage "errno()" if @_ != 0;
+    usage "errno()" if (nelems @_) != 0;
     $! + 0;
 }
 
 sub creat {
-    usage "creat(filename, mode)" if @_ != 2;
+    usage "creat(filename, mode)" if (nelems @_) != 2;
     &open(@_[0], &O_WRONLY ^|^ &O_CREAT ^|^ &O_TRUNC, @_[1]);
 }
 
 sub fcntl {
-    usage "fcntl(filehandle, cmd, arg)" if @_ != 3;
+    usage "fcntl(filehandle, cmd, arg)" if (nelems @_) != 3;
     CORE::fcntl(@_[0], @_[1], @_[2]);
 }
 
 sub getgrgid {
-    usage "getgrgid(gid)" if @_ != 1;
+    usage "getgrgid(gid)" if (nelems @_) != 1;
     CORE::getgrgid(@_[0]);
 }
 
 sub getgrnam {
-    usage "getgrnam(name)" if @_ != 1;
+    usage "getgrnam(name)" if (nelems @_) != 1;
     CORE::getgrnam(@_[0]);
 }
 
 sub atan2 {
-    usage "atan2(x,y)" if @_ != 2;
+    usage "atan2(x,y)" if (nelems @_) != 2;
     CORE::atan2(@_[0], @_[1]);
 }
 
 sub cos {
-    usage "cos(x)" if @_ != 1;
+    usage "cos(x)" if (nelems @_) != 1;
     CORE::cos(@_[0]);
 }
 
 sub exp {
-    usage "exp(x)" if @_ != 1;
+    usage "exp(x)" if (nelems @_) != 1;
     CORE::exp(@_[0]);
 }
 
 sub fabs {
-    usage "fabs(x)" if @_ != 1;
+    usage "fabs(x)" if (nelems @_) != 1;
     CORE::abs(@_[0]);
 }
 
 sub log {
-    usage "log(x)" if @_ != 1;
+    usage "log(x)" if (nelems @_) != 1;
     CORE::log(@_[0]);
 }
 
 sub pow {
-    usage "pow(x,exponent)" if @_ != 2;
+    usage "pow(x,exponent)" if (nelems @_) != 2;
     @_[0] ** @_[1];
 }
 
 sub sin {
-    usage "sin(x)" if @_ != 1;
+    usage "sin(x)" if (nelems @_) != 1;
     CORE::sin(@_[0]);
 }
 
 sub sqrt {
-    usage "sqrt(x)" if @_ != 1;
+    usage "sqrt(x)" if (nelems @_) != 1;
     CORE::sqrt(@_[0]);
 }
 
 sub getpwnam {
-    usage "getpwnam(name)" if @_ != 1;
+    usage "getpwnam(name)" if (nelems @_) != 1;
     CORE::getpwnam(@_[0]);
 }
 
 sub getpwuid {
-    usage "getpwuid(uid)" if @_ != 1;
+    usage "getpwuid(uid)" if (nelems @_) != 1;
     CORE::getpwuid(@_[0]);
 }
 
@@ -197,12 +197,12 @@ sub sigsetjmp {
 }
 
 sub kill {
-    usage "kill(pid, sig)" if @_ != 2;
+    usage "kill(pid, sig)" if (nelems @_) != 2;
     CORE::kill @_[1], @_[0];
 }
 
 sub raise {
-    usage "raise(sig)" if @_ != 1;
+    usage "raise(sig)" if (nelems @_) != 1;
     CORE::kill @_[0], $$;	# Is this good enough?
 }
 
@@ -299,28 +299,28 @@ sub fwrite {
 }
 
 sub getc {
-    usage "getc(handle)" if @_ != 1;
+    usage "getc(handle)" if (nelems @_) != 1;
     CORE::getc(@_[0]);
 }
 
 sub getchar {
-    usage "getchar()" if @_ != 0;
+    usage "getchar()" if (nelems @_) != 0;
     CORE::getc(STDIN);
 }
 
 sub gets {
-    usage "gets()" if @_ != 0;
+    usage "gets()" if (nelems @_) != 0;
     scalar ~< *STDIN;
 }
 
 sub perror {
-    print STDERR "@_: " if @_;
+    print STDERR "{join ' ', <@_}: " if (nelems @_);
     print STDERR $!,"\n";
 }
 
 sub printf {
-    usage "printf(pattern, args...)" if @_ +< 1;
-    CORE::printf STDOUT @_;
+    usage "printf(pattern, args...)" if (nelems @_) +< 1;
+    CORE::printf STDOUT < @_;
 }
 
 sub putc {
@@ -336,17 +336,17 @@ sub puts {
 }
 
 sub remove {
-    usage "remove(filename)" if @_ != 1;
+    usage "remove(filename)" if (nelems @_) != 1;
     (-d @_[0]) ? CORE::rmdir(@_[0]) : CORE::unlink(@_[0]);
 }
 
 sub rename {
-    usage "rename(oldfilename, newfilename)" if @_ != 2;
+    usage "rename(oldfilename, newfilename)" if (nelems @_) != 2;
     CORE::rename(@_[0], @_[1]);
 }
 
 sub rewind {
-    usage "rewind(filehandle)" if @_ != 1;
+    usage "rewind(filehandle)" if (nelems @_) != 1;
     CORE::seek(@_[0],0,0);
 }
 
@@ -355,8 +355,8 @@ sub scanf {
 }
 
 sub sprintf {
-    usage "sprintf(pattern,args)" if @_ == 0;
-    CORE::sprintf(shift,@_);
+    usage "sprintf(pattern,args)" if (nelems @_) == 0;
+    CORE::sprintf(shift,< @_);
 }
 
 sub sscanf {
@@ -384,7 +384,7 @@ sub vsprintf {
 }
 
 sub abs {
-    usage "abs(x)" if @_ != 1;
+    usage "abs(x)" if (nelems @_) != 1;
     CORE::abs(@_[0]);
 }
 
@@ -417,7 +417,7 @@ sub div {
 }
 
 sub exit {
-    usage "exit(status)" if @_ != 1;
+    usage "exit(status)" if (nelems @_) != 1;
     CORE::exit(@_[0]);
 }
 
@@ -426,7 +426,7 @@ sub free {
 }
 
 sub getenv {
-    usage "getenv(name)" if @_ != 1;
+    usage "getenv(name)" if (nelems @_) != 1;
     %ENV{@_[0]};
 }
 
@@ -459,7 +459,7 @@ sub srand {
 }
 
 sub system {
-    usage "system(command)" if @_ != 1;
+    usage "system(command)" if (nelems @_) != 1;
     CORE::system(@_[0]);
 }
 
@@ -504,7 +504,7 @@ sub strcspn {
 }
 
 sub strerror {
-    usage "strerror(errno)" if @_ != 1;
+    usage "strerror(errno)" if (nelems @_) != 1;
     local $! = @_[0];
     $! . "";
 }
@@ -538,7 +538,7 @@ sub strspn {
 }
 
 sub strstr {
-    usage "strstr(big, little)" if @_ != 2;
+    usage "strstr(big, little)" if (nelems @_) != 2;
     CORE::index(@_[0], @_[1]);
 }
 
@@ -547,71 +547,71 @@ sub strtok {
 }
 
 sub chmod {
-    usage "chmod(mode, filename)" if @_ != 2;
+    usage "chmod(mode, filename)" if (nelems @_) != 2;
     CORE::chmod(@_[0], @_[1]);
 }
 
 sub fstat {
-    usage "fstat(fd)" if @_ != 1;
+    usage "fstat(fd)" if (nelems @_) != 1;
     local *TMP;
     CORE::open(TMP, "<&", @_[0]);		# Gross.
-    my @l = CORE::stat(*TMP);
+    my @l = @( CORE::stat(*TMP) );
     CORE::close(TMP);
     @l;
 }
 
 sub mkdir {
-    usage "mkdir(directoryname, mode)" if @_ != 2;
+    usage "mkdir(directoryname, mode)" if (nelems @_) != 2;
     CORE::mkdir(@_[0], @_[1]);
 }
 
 sub stat {
-    usage "stat(filename)" if @_ != 1;
+    usage "stat(filename)" if (nelems @_) != 1;
     CORE::stat(@_[0]);
 }
 
 sub umask {
-    usage "umask(mask)" if @_ != 1;
+    usage "umask(mask)" if (nelems @_) != 1;
     CORE::umask(@_[0]);
 }
 
 sub wait {
-    usage "wait()" if @_ != 0;
+    usage "wait()" if (nelems @_) != 0;
     CORE::wait();
 }
 
 sub waitpid {
-    usage "waitpid(pid, options)" if @_ != 2;
+    usage "waitpid(pid, options)" if (nelems @_) != 2;
     CORE::waitpid(@_[0], @_[1]);
 }
 
 sub gmtime {
-    usage "gmtime(time)" if @_ != 1;
+    usage "gmtime(time)" if (nelems @_) != 1;
     CORE::gmtime(@_[0]);
 }
 
 sub localtime {
-    usage "localtime(time)" if @_ != 1;
+    usage "localtime(time)" if (nelems @_) != 1;
     CORE::localtime(@_[0]);
 }
 
 sub time {
-    usage "time()" if @_ != 0;
+    usage "time()" if (nelems @_) != 0;
     CORE::time;
 }
 
 sub alarm {
-    usage "alarm(seconds)" if @_ != 1;
+    usage "alarm(seconds)" if (nelems @_) != 1;
     CORE::alarm(@_[0]);
 }
 
 sub chdir {
-    usage "chdir(directory)" if @_ != 1;
+    usage "chdir(directory)" if (nelems @_) != 1;
     CORE::chdir(@_[0]);
 }
 
 sub chown {
-    usage "chown(uid, gid, filename)" if @_ != 3;
+    usage "chown(uid, gid, filename)" if (nelems @_) != 3;
     CORE::chown(@_[0], @_[1], @_[2]);
 }
 
@@ -640,68 +640,68 @@ sub execvp {
 }
 
 sub fork {
-    usage "fork()" if @_ != 0;
+    usage "fork()" if (nelems @_) != 0;
     CORE::fork;
 }
 
 sub getegid {
-    usage "getegid()" if @_ != 0;
+    usage "getegid()" if (nelems @_) != 0;
     $^EGID + 0;
 }
 
 sub geteuid {
-    usage "geteuid()" if @_ != 0;
+    usage "geteuid()" if (nelems @_) != 0;
     $> + 0;
 }
 
 sub getgid {
-    usage "getgid()" if @_ != 0;
+    usage "getgid()" if (nelems @_) != 0;
     $^GID + 0;
 }
 
 sub getgroups {
-    usage "getgroups()" if @_ != 0;
+    usage "getgroups()" if (nelems @_) != 0;
     my %seen;
     grep(!%seen{$_}++, split(' ', $^EGID ));
 }
 
 sub getlogin {
-    usage "getlogin()" if @_ != 0;
+    usage "getlogin()" if (nelems @_) != 0;
     CORE::getlogin();
 }
 
 sub getpgrp {
-    usage "getpgrp()" if @_ != 0;
+    usage "getpgrp()" if (nelems @_) != 0;
     CORE::getpgrp;
 }
 
 sub getpid {
-    usage "getpid()" if @_ != 0;
+    usage "getpid()" if (nelems @_) != 0;
     $$;
 }
 
 sub getppid {
-    usage "getppid()" if @_ != 0;
+    usage "getppid()" if (nelems @_) != 0;
     CORE::getppid;
 }
 
 sub getuid {
-    usage "getuid()" if @_ != 0;
+    usage "getuid()" if (nelems @_) != 0;
     $<;
 }
 
 sub isatty {
-    usage "isatty(filehandle)" if @_ != 1;
+    usage "isatty(filehandle)" if (nelems @_) != 1;
     -t @_[0];
 }
 
 sub link {
-    usage "link(oldfilename, newfilename)" if @_ != 2;
+    usage "link(oldfilename, newfilename)" if (nelems @_) != 2;
     CORE::link(@_[0], @_[1]);
 }
 
 sub rmdir {
-    usage "rmdir(directoryname)" if @_ != 1;
+    usage "rmdir(directoryname)" if (nelems @_) != 1;
     CORE::rmdir(@_[0]);
 }
 
@@ -714,22 +714,22 @@ sub setvbuf {
 }
 
 sub sleep {
-    usage "sleep(seconds)" if @_ != 1;
+    usage "sleep(seconds)" if (nelems @_) != 1;
     @_[0] - CORE::sleep(@_[0]);
 }
 
 sub unlink {
-    usage "unlink(filename)" if @_ != 1;
+    usage "unlink(filename)" if (nelems @_) != 1;
     CORE::unlink(@_[0]);
 }
 
 sub utime {
-    usage "utime(filename, atime, mtime)" if @_ != 3;
+    usage "utime(filename, atime, mtime)" if (nelems @_) != 3;
     CORE::utime(@_[1], @_[2], @_[0]);
 }
 
 sub load_imports {
-%EXPORT_TAGS = (
+%EXPORT_TAGS = %(
 
     assert_h =>	\@(qw(assert NDEBUG)),
 
@@ -882,13 +882,13 @@ sub load_imports {
 {
   # De-duplicate the export list: 
   my %export;
-  %export{[map {@$_} values %EXPORT_TAGS]} = ();
+  %export{[map {< @$_} values %EXPORT_TAGS]} = ();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
   push @EXPORT, keys %export;
 }
 
-@EXPORT_OK = qw(
+@EXPORT_OK = @( qw(
 		abs
 		alarm
 		atan2
@@ -945,7 +945,7 @@ sub load_imports {
 		wait
 		waitpid
 		write
-);
+) );
 
 require Exporter;
 }
@@ -953,10 +953,10 @@ require Exporter;
 package POSIX::SigAction;
 
 sub new { bless \%(HANDLER => @_[1], MASK => @_[2], FLAGS => @_[3] || 0, SAFE => 0), @_[0] }
-sub handler { @_[0]->{HANDLER} = @_[1] if @_ +> 1; @_[0]->{HANDLER} };
-sub mask    { @_[0]->{MASK}    = @_[1] if @_ +> 1; @_[0]->{MASK} };
-sub flags   { @_[0]->{FLAGS}   = @_[1] if @_ +> 1; @_[0]->{FLAGS} };
-sub safe    { @_[0]->{SAFE}    = @_[1] if @_ +> 1; @_[0]->{SAFE} };
+sub handler { @_[0]->{HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{HANDLER} };
+sub mask    { @_[0]->{MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{MASK} };
+sub flags   { @_[0]->{FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{FLAGS} };
+sub safe    { @_[0]->{SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{SAFE} };
 
 package POSIX::SigRt;
 
@@ -988,14 +988,14 @@ sub _exist {
 }
 
 sub _check {
-    my ($rtsig, $ok) = &_exist;
+    my ($rtsig, $ok) = < &_exist;
     die "No POSIX::SigRt signal @_[1] (valid range SIGRTMIN..SIGRTMAX, or $_SIGRTMIN..$_SIGRTMAX)"
 	unless $ok;
     return $rtsig;
 }
 
 sub new {
-    my ($rtsig, $handler, $flags) = @_;
+    my ($rtsig, $handler, $flags) = < @_;
     my $sigset = POSIX::SigSet->new($rtsig);
     my $sigact = POSIX::SigAction->new($handler,
 				       $sigset,
