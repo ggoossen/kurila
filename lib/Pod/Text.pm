@@ -315,7 +315,7 @@ sub item {
 
         $self->output ($output);
         %$self{MARGIN} = $realindent;
-        $self->output ( <$self->reformat ($text)) if ($text && $text =~ m/\S/);
+        $self->output ( $self->reformat ($text)) if ($text && $text =~ m/\S/);
     } else {
         my $space = ' ' x $indent;
         $space =~ s/^$margin /$margin:/ if %$self{opt_alt};
@@ -335,7 +335,7 @@ sub cmd_para {
     if (defined %$self{ITEM}) {
         $self->item ($text . "\n");
     } else {
-        $self->output ( <$self->reformat ($text . "\n"));
+        $self->output ( $self->reformat ($text . "\n"));
     }
     return '';
 }

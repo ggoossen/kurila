@@ -384,10 +384,8 @@ sub getline {
 
 sub getlines {
     (nelems @_) == 1 or die 'usage: $io->getlines()';
-    wantarray or
-	die q|Can't call $io->getlines in a scalar context, use $io->getline|;
     my $this = shift;
-    return ~< $this;
+    return @( ~< $this );
 }
 
 sub truncate {

@@ -689,7 +689,7 @@ sub node {
         $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    < @{$self->{_nodes}};
+    return @{$self->{_nodes}};
 }
 
 ##################################
@@ -714,7 +714,7 @@ sub idx {
         $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    < @{$self->{_index}};
+    return @{$self->{_index}};
 }
 
 ##################################
@@ -736,7 +736,7 @@ sub hyperlink {
         push(@{$self->{_links}}, @_[0]);
         return @_[0];
     }
-    < @{$self->{_links}};
+    return @{$self->{_links}};
 }
 
 ## overrides for Pod::Parser
@@ -776,7 +776,7 @@ sub end_pod {
         # _TODO_ what if there is a link to the page itself by the name,
         # e.g. in Tk::Pod : L<Tk::Pod/"DESCRIPTION">
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink') {
-            my $node = $self->_check_ptree( <$self->parse_text( <$link->node(),
+            my $node = $self->_check_ptree( $self->parse_text( $link->node(),
                 $line), $line, $infile, 'L');
             if($node && !%nodes{$node}) {
                 $self->poderror(\%( -line => $line || '', -file => $infile,
@@ -1062,7 +1062,7 @@ sub interpolate_and_check {
     my ($self, $paragraph, $line, $file) = < @_;
     ## Check the interior sequences in the command-text
     # and return the text
-    $self->_check_ptree( <
+    $self->_check_ptree( 
         $self->parse_text($paragraph,$line), $line, $file, '');
 }
 
@@ -1152,7 +1152,7 @@ sub _check_ptree {
         }
         elsif($cmd eq 'L') {
             # try to parse the hyperlink
-            my $link = Pod::Hyperlink->new( <$contents->raw_text());
+            my $link = Pod::Hyperlink->new( $contents->raw_text());
             unless(defined $link) {
                 $self->poderror(\%( -line => $line, -file => $file,
                     -severity => 'ERROR', 
@@ -1168,7 +1168,7 @@ sub _check_ptree {
                 }
             }
             # check the link text
-            $text .= $self->_check_ptree( <$self->parse_text( <$link->text(),
+            $text .= $self->_check_ptree( $self->parse_text( $link->text(),
                 $line), $line, $file, "$nestlist$cmd");
             # remember link
             $self->hyperlink(\@($line,$link));

@@ -5,12 +5,12 @@ BEGIN {
    use File::Spec;
    use Cwd qw(abs_path);
    push @INC, '..';
-   my $THISDIR = abs_path( <dirname $0);
+   my $THISDIR = abs_path(dirname $0);
    unshift @INC, $THISDIR;
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { < 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
 }
 
 #use strict;
@@ -34,16 +34,16 @@ BEGIN {
 
 sub catfile(@) { 'File::Spec'->catfile(< @_); }
 
-my $INSTDIR = abs_path( <dirname $0);
+my $INSTDIR = abs_path(dirname $0);
 $INSTDIR = VMS::Filespec::unixpath($INSTDIR) if $^O eq 'VMS';
 $INSTDIR =~ s#/$## if $^O eq 'VMS';
 $INSTDIR =~ s#:$## if $^O eq 'MacOS';
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 'pod');
 $INSTDIR =~ s#:$## if $^O eq 'MacOS';
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 't');
-my @PODINCDIRS = @( < catfile($INSTDIR, 'lib', 'Pod'), <
-                   catfile($INSTDIR, 'scripts'), <
-                   catfile($INSTDIR, 'pod'), <
+my @PODINCDIRS = @(catfile($INSTDIR, 'lib', 'Pod'),
+                   catfile($INSTDIR, 'scripts'),
+                   catfile($INSTDIR, 'pod'),
                    catfile($INSTDIR, 't', 'pod')
                  );
 
@@ -57,7 +57,7 @@ sub findinclude {
 
     ## Need to search for it. Look in the following directories ...
     ##   1. the directory containing this pod file
-    my $thispoddir = dirname < $self->input_file;
+    my $thispoddir = dirname $self->input_file;
     ##   2. the parent directory of the above
     my $parentdir  = dirname $thispoddir;
     my @podincdirs = @($thispoddir, $parentdir, < @PODINCDIRS);

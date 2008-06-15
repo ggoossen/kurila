@@ -22,7 +22,7 @@ sub simple_delimiters {
 sub textblock {
     my($parser,$text,$line) = < @_;
     print {$parser->output_handle()}
- <	$parser->parse_text(
+      $parser->parse_text(
 	    \%( -expand_text => q(escape_ltgt),
 	      -expand_seq => q(simple_delimiters) ),
 	    $text, $line ) -> raw_text(); 

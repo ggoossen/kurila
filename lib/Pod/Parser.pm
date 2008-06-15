@@ -261,7 +261,7 @@ method with the command paragraph).
 sub command {
     my ($self, $cmd, $text, $line_num, $pod_para)  = < @_;
     ## Just treat this like a textblock
-    $self->textblock( <$pod_para->raw_text(), $line_num, $pod_para);
+    $self->textblock( $pod_para->raw_text(), $line_num, $pod_para);
 }
 
 ##---------------------------------------------------------------------------
@@ -751,7 +751,7 @@ sub parse_text {
         $xseq_sub = sub {
             my ($self, $iseq) = < @_;
             my $args = join("", < $iseq->parse_tree->children);
-            return  $self->interior_sequence( <$iseq->name, $args, $iseq);
+            return  $self->interior_sequence( $iseq->name, $args, $iseq);
         };
     }
     ref $xseq_sub    or  $xseq_sub   = sub { shift()->?$expand_seq(< @_) };
@@ -809,7 +809,7 @@ sub parse_text {
             if (length) {
                 ## In the middle of a sequence, append this text to it, and
                 ## dont forget to "expand" it if that's what the caller wanted
-                $seq->append($expand_text ? < &$xtext_sub($self,$_,$seq) : $_);
+                $seq->append($expand_text ? &$xtext_sub($self,$_,$seq) : $_);
                 $_ .= $seq_end;
             }
             if (length $seq_end) {
@@ -818,7 +818,7 @@ sub parse_text {
                 ## Pop it off the stack of "in progress" sequences
                 pop @seq_stack;
                 ## Append result to its parent in current parse tree
-                @seq_stack[-1]->append($expand_seq ? < &$xseq_sub($self,$seq)
+                @seq_stack[-1]->append($expand_seq ? &$xseq_sub($self,$seq)
                                                    : $seq);
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1) {
@@ -833,7 +833,7 @@ sub parse_text {
         elsif (length) {
             ## In the middle of a sequence, append this text to it, and
             ## dont forget to "expand" it if that's what the caller wanted
-            $seq->append($expand_text ? < &$xtext_sub($self,$_,$seq) : $_);
+            $seq->append($expand_text ? &$xtext_sub($self,$_,$seq) : $_);
         }
         ## Keep track of line count
         $line += s/\r*\n//;
@@ -844,7 +844,7 @@ sub parse_text {
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ? $self->errorsub() : undef;
     while ((nelems @seq_stack) +> 1) {
-       ($cmd, $file, $line) = ( <$seq->name, < $seq->file_line);
+       ($cmd, $file, $line) = ( $seq->name, < $seq->file_line);
        $ldelim  = $seq->ldelim;
        ($rdelim = $ldelim) =~ s/</>/g;
        $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;

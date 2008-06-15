@@ -26,7 +26,7 @@ sub getoutput
     my $exit = $?>>8;
     s/^/#/ for < @out;
     print "#EXIT=$exit OUTPUT=+++#{join '', <@out}#+++\n";
-    return($exit, join("",< @out));
+    return @($exit, join("",< @out));
   }
   # child
   open(STDERR, ">&", \*STDOUT);
@@ -42,7 +42,7 @@ sub compare
   $right =~ s/^#\s+/#/gm;
   $left  =~ s/\s+/ /gm;
   $right =~ s/\s+/ /gm;
-  $left eq $right;
+  return $left eq $right;
 }
 
 my ($exit, $text) = < getoutput( sub { pod2usage() } );

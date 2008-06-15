@@ -210,8 +210,7 @@ sub _accept_directives {
   DEBUG +> 6 and print "$this\'s accept_directives : ", <
    pretty($this->{'accept_directives'}), "\n";
   
-  return @( sort keys %{ $this->{'accept_directives'} }) if wantarray;
-  return;
+  return @( sort keys %{ $this->{'accept_directives'} });
 }
 
 #--------------------------------------------------------------------------
@@ -230,8 +229,7 @@ sub unaccept_directives {
     delete $this->{'accept_directives'}->{$d};
     DEBUG +> 2 and print "OK, won't accept \"=$d\" as directive.\n";
   }
-  return @( sort keys %{ $this->{'accept_directives'} }) if wantarray;
-  return
+  return @( sort keys %{ $this->{'accept_directives'} });
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -255,8 +253,7 @@ sub _accept_targets {
     $this->{'accept_targets'}->{$t} = $type;
     DEBUG +> 2 and print "Learning to accept \"$t\" as target of type $type\n";
   }    
-  return @( sort keys %{ $this->{'accept_targets'} }) if wantarray;
-  return;
+  return @( sort keys %{ $this->{'accept_targets'} });
 }
 
 #--------------------------------------------------------------------------
@@ -270,8 +267,7 @@ sub unaccept_targets {
     delete $this->{'accept_targets'}->{$t};
     DEBUG +> 2 and print "OK, won't accept \"$t\" as target.\n";
   }    
-  return @( sort keys %{ $this->{'accept_targets'} }) if wantarray;
-  return;
+  return @( sort keys %{ $this->{'accept_targets'} });
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1457,9 +1453,6 @@ sub _duo {
   
   my $class = shift(@_);
   
-  die "But $class->_duo is useful only in list context!"
-   unless wantarray;
-
   my $mutor = shift(@_) if (nelems @_) and ref(@_[0] || '') eq 'CODE';
 
   die "But $class->_duo takes two parameters, not: {join ' ', <@_}"

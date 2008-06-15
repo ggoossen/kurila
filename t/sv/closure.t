@@ -442,7 +442,7 @@ END
 	      close READ2;
 	      open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $!";
 	      open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $!";
-	      exec < which_perl(), '-w', '-MTestInit', '-'
+	      exec which_perl(), '-w', '-MTestInit', '-'
 		or die "Can't exec perl: $!";
 	    } else {
 	      # Parent process here.

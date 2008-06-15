@@ -124,7 +124,7 @@ sub _where {
 # DON'T use this for matches. Use like() instead.
 sub ok ($@) {
     my ($pass, $name, < @mess) = < @_;
-    _ok($pass, < _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < @mess);
 }
 
 sub _q {
@@ -188,7 +188,7 @@ sub is ($$@) {
 	unshift(@mess, "#      got "._q($got)."\n",
 		       "# expected "._q($expected)."\n");
     }
-    _ok($pass, < _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < @mess);
 }
 
 sub isnt ($$@) {
@@ -210,7 +210,7 @@ sub isnt ($$@) {
         unshift(@mess, "# it should not be "._q($got)."\n",
                        "# but it is.\n");
     }
-    _ok($pass, < _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < @mess);
 }
 
 sub cmp_ok ($$$@) {
@@ -238,7 +238,7 @@ sub cmp_ok ($$$@) {
         unshift(@mess, "#      got "._q($got)."\n",
                        "# expected $type "._q($expected)."\n");
     }
-    _ok($pass, < _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < @mess);
 }
 
 # Check that $got is within $range of $expected
@@ -294,7 +294,7 @@ sub like_yn ($$$@) {
 		? "# expected !~ m/$expected/\n" : "# expected m/$expected/\n");
     }
     local $Level = $Level + 1;
-    _ok($pass, < _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < @mess);
 }
 
 sub pass {
@@ -682,7 +682,7 @@ sub _fresh_perl {
     my $pass = $resolve->($results);
     unless ($pass) {
         _diag "# PROG: \n$prog\n";
-        _diag "# EXPECTED:\n", < $resolve->(), "\n";
+        _diag "# EXPECTED:\n", $resolve->(), "\n";
         _diag "# GOT:\n$results\n";
         _diag "# STATUS: $status\n";
     }
@@ -694,7 +694,7 @@ sub _fresh_perl {
         $name .= '...' if length $first_line +> length $name;
     }
 
-    _ok($pass, < _where(), "fresh_perl - $name");
+    _ok($pass, _where(), "fresh_perl - $name");
 }
 
 #

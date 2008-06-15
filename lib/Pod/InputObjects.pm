@@ -402,7 +402,7 @@ by a colon (':'), followed by the line number.
 sub file_line {
    my @loc = @(@_[0]->{'-file'} || '<unknown-file>',
               @_[0]->{'-line'} || 0);
-   return (wantarray) ? @loc : join(':', < @loc);
+   return @loc;
 }
 
 ##---------------------------------------------------------------------------
@@ -695,7 +695,7 @@ by a colon (':'), followed by the line number.
 sub file_line {
    my @loc = @(@_[0]->{'-file'}  || '<unknown-file>',
               @_[0]->{'-line'}  || 0);
-   return (wantarray) ? @loc : join(':', < @loc);
+   return @loc;
 }
 
 ##---------------------------------------------------------------------------
