@@ -346,7 +346,7 @@ use strict;
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;
-\@ISA = qw(Exporter);
+\@ISA = \@( qw(Exporter) );
 
 EDQ
    
@@ -354,12 +354,12 @@ EDQ
     my @err = @( sort { %err{$a} <+> %err{$b} } keys %err );
     map { $len = length if length +> $len } < @err;
 
-    my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
+    my $j = "\@EXPORT_OK = \@( qw(" . join(" ",keys %err) . ") );\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
     print $j,"\n";
 
 print <<'ESQ';
-%EXPORT_TAGS = (
+%EXPORT_TAGS = %(
     POSIX => \@(qw(
 ESQ
 
@@ -390,7 +390,7 @@ ESQ
 sub TIEHASH { bless \@() }
 
 sub FETCH {
-    my ($self, $errname) = @_;
+    my ($self, $errname) = < @_;
     my $proto = prototype("Errno::$errname");
     my $errno = "";
     if (defined($proto) && $proto eq "") {
@@ -422,7 +422,7 @@ sub FIRSTKEY {
 }
 
 sub EXISTS {
-    my ($self, $errname) = @_;
+    my ($self, $errname) = < @_;
     my $r = ref $errname;
     my $proto = !$r || $r eq 'CODE' ? prototype($errname) : undef;
     defined($proto) && $proto eq "";

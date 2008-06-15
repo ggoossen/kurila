@@ -4032,6 +4032,10 @@ PP(pp_push)
     register AV * const ary = (AV*)*++MARK;
     const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
 
+    if (SvTYPE(ary) != SVt_PVAV) {
+	Perl_croak(aTHX_ "First argument must be an array");
+    }
+
     if (mg) {
 	*MARK-- = SvTIED_obj((SV*)ary, mg);
 	PUSHMARK(MARK);

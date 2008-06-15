@@ -1285,8 +1285,8 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 		   cache.  */
 	    }
 	} else {
-	    assert(!SvOK(sv));
-	    SvOK_off(sv);
+	    assert(!SvPVOK(sv));
+	    SvPVOK_off(sv);
 #ifndef NODEFAULT_SHAREKEYS
 	    HvSHAREKEYS_on(sv);         /* key-sharing on by default */
 #endif
@@ -2600,7 +2600,7 @@ Perl_sv_2bool(pTHX_ register SV *const sv)
 	return av_len((AV*)sv) != -1;
     }
     if (SvTYPE(sv) == SVt_PVHV) {
-	return HvUSEDKEYS((HV*)sv) == 0;
+	return HvUSEDKEYS((HV*)sv) != 0;
     }
 
     if (!SvOK(sv))

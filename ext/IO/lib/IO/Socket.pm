@@ -226,7 +226,7 @@ sub accept {
 
 	my $sel = IO::Select->new( $sock);
 
-	unless ($sel->can_read($timeout)) {
+	unless ( @( $sel->can_read($timeout) ) ) {
 	    $@ = 'accept: timeout';
 	    $! = (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT : 1);
 	    return;

@@ -695,10 +695,15 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 #define assert_not_glob(sv)	
 #endif
 
-#define SvOK(sv)		((SvTYPE(sv) == SVt_BIND)		\
+#define SvAVOK(sv)              (SvTYPE(sv) == SVt_PVAV)
+#define SvHVOK(sv)              (SvTYPE(sv) == SVt_PVHV)
+
+#define SvPVOK(sv)		((SvTYPE(sv) == SVt_BIND)		\
 				 ? (SvFLAGS(SvRV(sv)) & SVf_OK)		\
 				 : (SvFLAGS(sv) & SVf_OK))
-#define SvOK_off(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
+#define SvOK(sv)		(SvAVOK(sv) || SvHVOK(sv) || SvPVOK(sv))
+#define SvOK_off(sv)		( SvAVOK(sv) || SvHVOK(sv) ? sv_setsv(sv, NULL) : SvPVOK_off(sv) )
+#define SvPVOK_off(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &=	~(SVf_OK|		\
 						  SVf_IVisUV),	\
 							SvOOK_off(sv))

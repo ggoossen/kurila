@@ -130,7 +130,7 @@ sub _choke(@) {
 
 
 sub _chmod($$;$) {
-    my ( $mode, $item, $verbose )=< @_;
+    my ( $mode, $item, $verbose )= < @_;
     $verbose ||= 0;
     if (chmod $mode, $item) {
         print "chmod($mode, $item)\n" if $verbose +> 1;
@@ -439,7 +439,7 @@ writable.
 =cut
 
 sub _mkpath {
-    my ($dir,$show,$mode,$verbose,$dry_run)=< @_;
+    my ($dir,$show,$mode,$verbose,$dry_run)= < @_;
     if ( $verbose && $verbose +> 1 && ! -d $dir) {
         $show= 1;
         printf "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
@@ -484,7 +484,7 @@ Dies if the copy fails.
 
 
 sub _copy {
-    my ( $from, $to, $verbose, $dry_run)=< @_;
+    my ( $from, $to, $verbose, $dry_run)= < @_;
     if ($verbose && $verbose+>1) {
         printf "copy(\%s,\%s)\n", $from, $to;
     }

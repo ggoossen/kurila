@@ -176,7 +176,7 @@ returns the definition of the CCCMD macro which uses these parts.
 #'
 
 sub cflags {
-    my($self,$libperl)=< @_;
+    my($self,$libperl) = < @_;
     return $self->{CFLAGS} if $self->{CFLAGS};
     return '' unless $self->needs_linking();
 
@@ -282,7 +282,7 @@ definition in CONST_CCCMD.
 =cut
 
 sub const_cccmd {
-    my($self,$libperl)=< @_;
+    my($self,$libperl)= < @_;
     return $self->{CONST_CCCMD} if $self->{CONST_CCCMD};
     return '' unless $self->needs_linking();
     return $self->{CONST_CCCMD} =
@@ -3657,7 +3657,7 @@ Obsolete, deprecated method. Not used since Version 5.21.
 
 sub writedoc {
 # --- perllocal.pod section ---
-    my($self,$what,$name,< @attribs)=< @_;
+    my($self,$what,$name,< @attribs)= < @_;
     my $time = localtime;
     print "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
     print join "\n\n=item *\n\n", map("C<$_>",< @attribs);

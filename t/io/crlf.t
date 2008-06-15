@@ -62,7 +62,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	    binmode(FOO);
 	    my $foo = scalar ~< *FOO;
 	    close FOO;
-	    print join(" ", "#", map { sprintf("%02x", $_) } unpack("C*", $foo)),
+	    print join(" ", "#", map { sprintf('%02x', $_) } unpack("C*", $foo)),
 	    "\n";
 	    ok($foo =~ m/\x0d\x0a$/);
 	    ok($foo !~ m/\x0d\x0d/);

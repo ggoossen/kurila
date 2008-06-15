@@ -81,7 +81,8 @@ print <<E1 eq "foo\n\n" ? "ok 19\n" : "not ok 19\n";
 {join ' ', <@{\@( <<E2 )}
 foo
 E2
-}E1
+}
+E1
 
 print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
 {join ' ', <@{\@(
@@ -89,7 +90,8 @@ print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
 foo
 E2
 )}
-}E1
+}
+E1
 
 {
     $foo = 'FOO';

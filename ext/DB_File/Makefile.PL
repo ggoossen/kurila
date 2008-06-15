@@ -66,7 +66,7 @@ my @names = @( qw(
     open F, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
     while ( ~< *F)
     {
-        last if m/^\s*\@EXPORT\s+=\s+qw\(/ ;
+        last if m/^\s*\@EXPORT\s+=\s+ \@\( \s+ qw\(/x ;
     }
 
     while ( ~< *F)

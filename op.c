@@ -6124,6 +6124,7 @@ Perl_ck_fun(pTHX_ OP *o)
 #endif
 	    switch (oa & 7) {
 	    case OA_SCALAR:
+	    case OA_HVREF:
 		/* list seen where single (scalar) arg expected? */
 		if (numargs == 1 && !(oa >> 4)
 		    && kid->op_type == OP_LIST && type != OP_SCALAR)
@@ -6147,14 +6148,8 @@ Perl_ck_fun(pTHX_ OP *o)
 			"Useless use of %s with no values",
 			PL_op_desc[type]);
 
-		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV)
+		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONLIST)
 		    bad_type(numargs, "array", PL_op_desc[type], kid);
-		mod(kid, type);
-		break;
-	    case OA_HVREF:
-		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV)
-		    bad_type(numargs, "hash", PL_op_desc[type], kid);
-		mod(kid, type);
 		break;
 	    case OA_CVREF:
 		{
@@ -7238,14 +7233,11 @@ Perl_ck_subr(pTHX_ OP *o)
 		if (proto[1] && proto[1] != ';')
 		    goto oops;
 	    case '$':
+	    case '%':
+	    case '@':
 		proto++;
 		arg++;
 		scalar(o2);
-		break;
-	    case '%':
-	    case '@':
-		list(o2);
-		arg++;
 		break;
 	    case '&':
 		proto++;
@@ -7355,11 +7347,11 @@ Perl_ck_subr(pTHX_ OP *o)
 			bad_type(arg, "array", gv_ename(namegv), o3);
 		    break;
 		case '%':
-		    if (o3->op_type == OP_RV2HV ||
-			o3->op_type == OP_PADHV)
-			 goto wrapref;
-		    if (!contextclass)
-			 bad_type(arg, "hash", gv_ename(namegv), o3);
+/* 		    if (o3->op_type == OP_RV2HV || */
+/* 			o3->op_type == OP_PADHV) */
+/* 			 goto wrapref; */
+/* 		    if (!contextclass) */
+/* 			 bad_type(arg, "hash", gv_ename(namegv), o3); */
 		    break;
 		wrapref:
 		    {

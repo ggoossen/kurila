@@ -137,7 +137,7 @@ END
 my @val1 = @( %ENV{[keys(%ENV)]} );
 my @val2 = @( values(%ENV) );
 ok join(':',< @val1) eq join(':',< @val2);
-ok (nelems @val1) +> 1;
+ok( (nelems @val1) +> 1 );
 
 # regex vars
 'foobarbaz' =~ m/b(a)r/;
@@ -148,7 +148,7 @@ my @a = @( qw(foo bar baz) );
 ok "{join ' ', <@a}" eq "foo bar baz", "{join ' ', <@a}";
 {
     local $" = ',';
-    ok "{join ' ', <@a}" eq "foo,bar,baz", "{join ' ', <@a}";
+    ok qq|{join $", <@a}| eq "foo,bar,baz", "{join ' ', <@a}";
 }
 
 # $;

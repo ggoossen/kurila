@@ -796,8 +796,8 @@ join		join or string		ck_fun		mst@	S L
 
 list		list			ck_null		m@	L
 lslice		list slice		ck_null		2	H L L
-anonlist	anonymous list (%())	ck_fun		m@	L
-anonhash	anonymous hash (@())	ck_fun		m@	L
+anonlist	anonymous list (@())	ck_fun		m@	L
+anonhash	anonymous hash (%())	ck_fun		m@	L
 listlast	listlast		ck_null		ms@	L
 
 expand		expand			ck_fun		1	S
