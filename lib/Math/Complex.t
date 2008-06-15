@@ -6,13 +6,6 @@
 # -- Jarkko Hietaniemi	since Mar 1997
 # -- Daniel S. Lewart	since Sep 1997
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = @( '../lib' );
-    }
-}
-
 BEGIN { require "./test.pl" }
 
 use Math::Complex;
@@ -434,14 +427,14 @@ sub test {
 			# check the op= works
 			push @script, <<EOB;
 \{
-	my \$za = cplx(ref \$z0 ? \@\{\$z0->_cartesian\} : (\$z0, 0));
+	my \$za = cplx(ref \$z0 ? < \@\{\$z0->_cartesian\} : (\$z0, 0));
 
-	my (\$z1r, \$z1i) = ref \$z1 ? \@\{\$z1->_cartesian\} : (\$z1, 0);
+	my (\$z1r, \$z1i) = ref \$z1 ? < \@\{\$z1->_cartesian\} : (\$z1, 0);
 
 	my \$zb = cplx(\$z1r, \$z1i);
 
 	\$za $op= \$zb;
-	my (\$zbr, \$zbi) = \@\{\$zb->_cartesian\};
+	my (\$zbr, \$zbi) = < \@\{\$zb->_cartesian\};
 
 	check($test, '\$z0 $op= \$z1', \$za, \$z{(nelems @args)-1}, $args);
 EOB

@@ -2559,6 +2559,8 @@ PP(pp_require)
     if (!tryrsfp) {
 	AV * const ar = GvAVn(PL_incgv);
 	I32 i;
+	if (!SvAVOK(ar)) 
+	    Perl_croak(aTHX_ "@INC must be an array not a %s", SvDESC((SV*)ar));
 #ifdef VMS
 	if (vms_unixname)
 #endif

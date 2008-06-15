@@ -1,13 +1,6 @@
 use strict;
 use warnings;
 
-BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir('t');
-        unshift(@INC, '../lib');
-    }
-}
-
 use Test::More 'tests' => 32;
 
 use Thread::Queue;
@@ -17,7 +10,7 @@ my @ary1 = @( qw/foo bar baz/ );
 push(@ary1, \@( 1..3 ), \%( 'qux' => 99 ));
 
 # Shared array
-my @ary2 :shared = (99, 21, 86);
+my @ary2 :shared = @(99, 21, 86);
 
 # Regular hash-based object
 my $obj1 = \%(

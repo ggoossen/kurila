@@ -52,7 +52,7 @@ use strict;
 
 my \$archname         = $Config_archname;
 my \$version          = $Config_version;
-my \@inc_version_list = $Config_inc_version_list;
+my \@inc_version_list = \@( $Config_inc_version_list );
 
 !GROK!THIS!
 print $out <<'!NO!SUBS!';
@@ -70,7 +70,7 @@ sub import {
     shift;
 
     my %names;
-    foreach (reverse @_) {
+    foreach (reverse < @_) {
 	my $path = $_;		# we'll be modifying it, so break the alias
 	if ($path eq '') {
 	    require Carp;
@@ -85,7 +85,7 @@ sub import {
 	}
 	unshift(@INC, $path);
 	# Add any previous version directories we found at configure time
-	foreach my $incver (@inc_version_list)
+	foreach my $incver (< @inc_version_list)
 	{
 	    my $dir = $Is_MacOS
 		? File::Spec->catdir( $path, $incver )
@@ -102,7 +102,7 @@ sub import {
     }
 
     # remove trailing duplicates
-    @INC = grep { ++%names{$_} == 1 } @INC;
+    @INC = @( grep { ++%names{$_} == 1 } < @INC );
     return;
 }
 
@@ -111,7 +111,7 @@ sub unimport {
     shift;
 
     my %names;
-    foreach (@_) {
+    foreach (< @_) {
 	my $path = _nativize($_);
 
 	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
@@ -123,12 +123,12 @@ sub unimport {
     }
 
     # Remove ALL instances of each named directory.
-    @INC = grep { !exists %names{$_} } @INC;
+    @INC = @( grep { !exists %names{$_} } < @INC );
     return;
 }
 
 sub _get_dirs {
-    my($dir) = @_;
+    my($dir) = < @_;
     my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir);
 
     # we could use this for all platforms in the future, but leave it
@@ -148,7 +148,7 @@ sub _get_dirs {
 }
 
 sub _nativize {
-    my($dir) = @_;
+    my($dir) = < @_;
 
     if ($Is_MacOS && $Mac_FS && ! -d $dir) {
 	$dir = Mac::FileSpec::Unixish::nativize($dir);

@@ -621,7 +621,7 @@ sub getWt
 	    }
 
 	    @hangulCE = @( map({
-		    $map->{$_} ? @{ $map->{$_} } : $der->($_);
+		    $map->{$_} ? < @{ $map->{$_} } : $der->($_);
 		} < @decH) );
 	}
 	return map < _varCE($vbl, $_), < @hangulCE;

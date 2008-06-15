@@ -2,10 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir('t');
-        unshift(@INC, '../lib');
-    }
     use Config;
     if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
@@ -47,7 +43,7 @@ for (1..20) {
 
 $q->enqueue((-1) x $nthreads);   # One end marker for each thread
 
-$_->join() foreach @threads;
+$_->join() foreach < @threads;
 undef(@threads);
 
 is($q->pending(), 0, 'Empty queue');
@@ -59,11 +55,11 @@ $q = Thread::Queue->new();
 ok($q, 'New queue');
 is($q->pending(), 0, 'Empty queue');
 
-my @items = qw/foo bar baz/;
-$q->enqueue(@items);
+my @items = @( qw/foo bar baz/ );
+$q->enqueue(< @items);
 
 threads->create(sub {
-    is($q->pending(), scalar(@items), 'Queue count in thread');
+    is($q->pending(), nelems(@items), 'Queue count in thread');
     while (my $el = $q->dequeue_nb()) {
         is($el, shift(@items), "Thread got $el");
     }
@@ -83,8 +79,8 @@ my $count = 3;
 sub reader2 {
     my $id = threads->tid();
     while (1) {
-        my @el = $q->dequeue($count);
-        is(scalar(@el), $count, "Thread $id got @el");
+        my @el = @( $q->dequeue($count) );
+        is(nelems(@el), $count, "Thread $id got {join ' ', <@el}");
         select(undef, undef, undef, rand(1));
         return if (@el[0] == 0);
     }
@@ -95,7 +91,7 @@ push(@threads, threads->create(\&reader2)) for (1..$nthreads);
 $q->enqueue(1..4*$count*$nthreads);
 $q->enqueue((0) x ($count*$nthreads));
 
-$_->join() foreach @threads;
+$_->join() foreach < @threads;
 undef(@threads);
 
 is($q->pending(), 0, 'Empty queue');
@@ -103,16 +99,16 @@ is($q->pending(), 0, 'Empty queue');
 
 ### ->dequeue_nb(COUNT) test ###
 
-@items = qw/foo bar baz qux exit/;
-$q->enqueue(@items);
-is($q->pending(), scalar(@items), 'Queue count');
+@items = @( qw/foo bar baz qux exit/ );
+$q->enqueue(<@items);
+is($q->pending(), nelems(@items), 'Queue count');
 
 threads->create(sub {
-    is($q->pending(), scalar(@items), 'Queue count in thread');
-    while (my @el = $q->dequeue_nb(2)) {
+    is($q->pending(), nelems(@items), 'Queue count in thread');
+    while (my @el = @( $q->dequeue_nb(2) ) ) {
         is(@el[0], shift(@items), "Thread got @el[0]");
         if (@el[0] eq 'exit') {
-            is(scalar(@el), 1, 'Thread to exit');
+            is(nelems(@el), 1, 'Thread to exit');
         } else {
             is(@el[1], shift(@items), "Thread got @el[1]");
         }

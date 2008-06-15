@@ -2,9 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-
     use Config;
     if (! %Config{usethreads}) {
         print("1..0 # Skip: No threads\n");

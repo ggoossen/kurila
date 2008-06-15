@@ -2,10 +2,6 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (%ENV{'PERL_CORE'}){
-        chdir('t');
-        unshift(@INC, '../lib');
-    }
     use Config;
     if (! %Config{'useithreads'}) {
         print("1..0 # Skip: Perl not compiled with 'useithreads'\n");
@@ -30,7 +26,7 @@ threads->create(sub {
     $q->insert(-100);
 })->join();
 
-my @x = $q->dequeue_nb(100);
+my @x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1..10), 'No-op inserts');
 
 
@@ -42,7 +38,7 @@ threads->create(sub {
     $q->insert(0, qw/head/);
 })->join();
 
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@('head',1..10,'tail'), 'Edge inserts');
 
 
@@ -54,7 +50,7 @@ threads->create(sub {
     $q->insert(-2, qw/qux/);
 })->join();
 
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1..5,'foo','bar',6..8,'qux',9,10), 'Middle inserts');
 
 
@@ -66,26 +62,26 @@ threads->create(sub {
     $q->insert(-20, qw/head/);
 })->join();
 
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@('head',1..10,'tail'), 'Extreme inserts');
 
 
 $q = Thread::Queue->new();
 ok($q, 'New queue');
 threads->create(sub { $q->insert(0, 1..3); })->join();
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1..3), 'Empty queue insert');
 
 $q = Thread::Queue->new();
 ok($q, 'New queue');
 threads->create(sub { $q->insert(20, 1..3); })->join();
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1..3), 'Empty queue insert');
 
 $q = Thread::Queue->new();
 ok($q, 'New queue');
 threads->create(sub { $q->insert(-1, 1..3); })->join();
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1..3), 'Empty queue insert');
 
 $q = Thread::Queue->new();
@@ -94,7 +90,7 @@ threads->create(sub {
     $q->insert(2, 1..3);
     $q->insert(1, 'foo');
 })->join();
-@x = $q->dequeue_nb(100);
+@x = @( $q->dequeue_nb(100) );
 is_deeply(\@x, \@(1,'foo',2,3), 'Empty queue insert');
 
 # EOF

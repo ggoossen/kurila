@@ -1,15 +1,10 @@
 #!./perl
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Test::More;
 
 BEGIN {
     our $hasgr;
-    try { my @n = getgrgid 0 };
+    try { my @n = @( getgrgid 0 ) };
     $hasgr = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($hasgr) { plan skip_all => "no getgrgid"; }
     use Config;
@@ -21,7 +16,7 @@ use strict;
 our ($gid, @grent);
 BEGIN {
     $gid = $^O ne 'cygwin' ? 0 : 18;
-    @grent = getgrgid $gid; # This is the function getgrgid.
+    @grent = @( getgrgid $gid ); # This is the function getgrgid.
     unless (@grent) { plan skip_all => "no gid 0"; }
 }
 
