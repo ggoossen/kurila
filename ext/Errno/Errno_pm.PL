@@ -102,7 +102,7 @@ sub default_cpp {
     unless (defined $cppstdin) {
 	use File::Spec;
 	$cppstdin = %Config{cppstdin};
-	my $upup_cppstdin = File::Spec->catfile( <File::Spec->updir, <
+	my $upup_cppstdin = File::Spec->catfile(File::Spec->updir,
 						File::Spec->updir,
 						"cppstdin");
 	my $cppstdin_is_wrapper =
@@ -213,7 +213,7 @@ sub get_files {
 	}
 	close(CPPO);
     }
-    return keys %file;
+    return @(keys %file);
 }
 
 sub write_errno_pm {

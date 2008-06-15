@@ -107,7 +107,7 @@ sub partition_names {
 	    # It can be "not found" unless it's the default (invert the macro)
 	    # or the "macro" is an empty string (ie no macro)
 	    push @notfound, $item unless $item->{invert_macro}
-		or !$self->macro_to_ifdef( <$self->macro_from_item($item));
+		or !$self->macro_to_ifdef( $self->macro_from_item($item));
 	}
 
 	if ($item->{pre} or $item->{post} or $item->{not_constant}
@@ -118,7 +118,7 @@ sub partition_names {
 	}
     }
     # use Data::Dumper; print Dumper \%found;
-    (\%found, \@notfound, \@trouble);
+    return @(\%found, \@notfound, \@trouble);
 }
 
 sub boottime_iterator {
@@ -132,7 +132,7 @@ sub boottime_iterator {
 
     my $athx = $self->C_constant_prefix_param();
 
-    return sprintf <<"EOBOOT", < &$generator( <&$extractor($iterator));
+    return sprintf <<"EOBOOT", &$generator( &$extractor($iterator));
         while ($iterator->name) \{
 	    $subname($athx $hash, $iterator->name,
 				$iterator->namelen, \%s);
@@ -151,7 +151,7 @@ sub name_len_value_macro {
     $name = C_stringify($name);
 
     my $macro = $self->macro_from_item($item);
-    ($name, $namelen, $value, $macro);
+    return @($name, $namelen, $value, $macro);
 }
 
 sub WriteConstants {
@@ -191,7 +191,7 @@ sub WriteConstants {
     my $athx = $self->C_constant_prefix_param();
     my $symbol_table = C_stringify($package) . '::';
 
-    print $c_fh < $self->header(), <<"EOADD";
+    print $c_fh $self->header(), <<"EOADD";
 static void
 {$c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
 	newCONSTSUB(hash, name, value);
@@ -319,8 +319,8 @@ EOBOOT
 		    "        /* This is the default value: */\n" if $type;
 		print $xs_fh "#else\n";
 	    }
-	    print $xs_fh "        \{ ", join (', ', "\"$name\"", $namelen, <
-					     &$type_to_value($value)), " \},\n", <
+	    print $xs_fh "        \{ ", join (', ', "\"$name\"", $namelen, 
+					     &$type_to_value($value)), " \},\n",
 						 $self->macro_to_endif($macro);
 	}
 
@@ -345,7 +345,7 @@ EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
     foreach my $type (sort keys %$found) {
-	print $xs_fh < $self->boottime_iterator($type, %iterator{$type}, 
+	print $xs_fh $self->boottime_iterator($type, %iterator{$type}, 
 					      'symbol_table',
 					      $add_symbol_subname);
     }
@@ -445,17 +445,17 @@ EOBOOT
 	# statements, we can't declare and assign to the temporaries in one.
 	$counter = 0;
 	printf $xs_fh "            temp\%d = \%s;\n", $counter++, $_
-	    foreach < &$type_to_value($value);
+	    foreach &$type_to_value($value);
 
 	my @tempvarnames = @( map {sprintf 'temp%d', $_} 0 .. $counter - 1 );
-	printf $xs_fh <<"EOBOOT", $name, < &$generator(< @tempvarnames);
+	printf $xs_fh <<"EOBOOT", $name, &$generator(<@tempvarnames);
 	    {$c_subname}_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT
 	print $xs_fh "        $item->{post}\n" if $item->{post};
 	print $xs_fh "        \}\n";
 
-        print $xs_fh < $self->macro_to_endif($macro);
+        print $xs_fh $self->macro_to_endif($macro);
     }
 
     print $xs_fh <<EOBOOT;

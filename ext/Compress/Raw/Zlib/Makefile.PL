@@ -297,12 +297,12 @@ sub zlib_files
     		 ) );
     }
     
-    @h_files = @( map { < catfile($dir, $_)  } < @h_files ) ;
+    @h_files = @( map { catfile($dir, $_)  } < @h_files ) ;
     my @o_files = @( map { "$_\$(OBJ_EXT)" } 'Zlib', < @c_files );
     @c_files = @( map { "$_.c" } 'Zlib', < @c_files ) ;
 
     foreach my $file (< @c_files)
-      { copy( <catfile($dir, $file), '.') }
+      { copy( catfile($dir, $file), '.') }
     
     return  @(
         #'H'         =>  [ @h_files ],

@@ -67,8 +67,7 @@ sub unexpand
 		}
 		$x = join("\n", < @lines);
 	}
-	return @l if wantarray;
-	return @l[0];
+	return @l;
 }
 
 1;

@@ -536,7 +536,7 @@ sub _chdir {
     my ($dir)= < @_;
     my $ret;
     if (defined wantarray) {
-        $ret= cwd;
+        $ret= cwd();
     }
     chdir $dir
         or _choke("Couldn't chdir to '$dir': $!");
@@ -1184,7 +1184,7 @@ sub pm_to_blib {
             # we wont try hard here. its too likely to mess things up.
             forceunlink($to);
         } else {
-            _mkpath( <dirname($to),0,0755);
+            _mkpath( dirname($to),0,0755);
         }
         if ($need_filtering) {
             run_filter($pm_filter, $from, $to);

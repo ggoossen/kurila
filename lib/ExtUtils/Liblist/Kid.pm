@@ -49,7 +49,7 @@ sub _unix_os2_ext {
     my(@ldloadlibs, @bsloadlibs, @extralibs, @ld_run_path, %ld_run_path_seen);
     my(@libs, %libs_seen);
     my($fullname, @fullname);
-    my($pwd) = < cwd(); # from Cwd.pm
+    my $pwd = cwd(); # from Cwd.pm
     my($found) = 0;
 
     foreach my $thislib (split ' ', $potential_libs) {
@@ -160,7 +160,7 @@ sub _unix_os2_ext {
 
             # include the path to the lib once in the dynamic linker path
             # but only if it is a dynamic lib and not in Perl itself
-            my($fullnamedir) = < dirname($fullname);
+            my $fullnamedir = dirname($fullname);
             push @ld_run_path, $fullnamedir
                  if $is_dyna && !$in_perl &&
                     !%ld_run_path_seen{$fullnamedir}++;
