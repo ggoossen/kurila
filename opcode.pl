@@ -147,9 +147,9 @@ END
 my $i = 0;
 for (< @ops) {
     # print $on "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
-      print $on "\t", < &tab(3,"OP_\U$_"), " = ", $i++, ",\n";
+      print $on "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n";
 }
-print $on "\t", < &tab(3,"OP_max"), "\n";
+print $on "\t", &tab(3,"OP_max"), "\n";
 print $on "\} opcode;\n";
 print $on "\n#define MAXO ", scalar nelems @ops, "\n";
 print $on "#define OP_phoney_INPUT_ONLY -1\n";
@@ -275,7 +275,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 END
 
 for (< @ops) {
-    print "\t", < &tab(3, "MEMBER_TO_FPTR(Perl_%check{$_}),"), "\t/* $_ */\n";
+    print "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{$_}),"), "\t/* $_ */\n";
 }
 
 print <<END;
@@ -376,7 +376,7 @@ for my $op (< @ops) {
 	$argshift += 4;
     }
     $argsum = sprintf("0x\%08x", $argsum);
-    print "\t", < &tab(3, "$argsum,"), "/* $op */\n";
+    print "\t",  tab(3, "$argsum,"), "/* $op */\n";
 }
 
 print <<END;
@@ -851,7 +851,7 @@ enteriter	foreach loop entry	ck_null		d{
 iter		foreach loop iterator	ck_null		0	
 enterloop	loop entry		ck_null		d{	
 leaveloop	loop exit		ck_null		2	
-return		return			ck_return	dm@	L
+return		return			ck_return	dm@	S?
 last		last			ck_null		ds}	
 next		next			ck_null		ds}	
 redo		redo			ck_null		ds}	
