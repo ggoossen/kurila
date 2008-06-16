@@ -418,7 +418,7 @@ sub ok ($;$$) {
            'result' => $result, 'todo' => $todo,
            'file' => $file, 'line' => $line,
            'context' => $context, 'compare' => $compare,
-           (nelems @_) ? ('diagnostic' => <  _to_value(shift)) : (),
+           (nelems @_) ? ('diagnostic' => _to_value(shift)) : (),
         ));
 
     }

@@ -78,10 +78,10 @@ sub my_test_test
   my $wanted;
 
   # stdout
-  $t->ok( <$out->check, "STDOUT $text");
+  $t->ok( $out->check, "STDOUT $text");
 
   # stderr
-  $t->ok( <$err->check, "STDERR $text");
+  $t->ok( $err->check, "STDERR $text");
 }
 
 ####################################################################

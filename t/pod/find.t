@@ -95,7 +95,7 @@ if ($^O eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
 }
 else {
     $compare = %ENV{PERL_CORE} ?
-      'File::Spec'->catfile( <'File::Spec'->updir, 'lib','File','Find.pm')
+      'File::Spec'->catfile( 'File::Spec'->updir, 'lib','File','Find.pm')
       : 'File::Spec'->catfile(%Config::Config{privlib},"File","Find.pm");
     ok(_canon($result),_canon($compare));
 }
@@ -104,7 +104,7 @@ else {
 my $searchpod = 'Stuff';
 print "### searching for $searchpod.pod\n";
 $result = pod_where(
-  \%( -dirs => \@( < 'File::Spec'->catdir(
+  \%( -dirs => \@( 'File::Spec'->catdir(
     %ENV{PERL_CORE} ? () : qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
     -verbose => $VERBOSE ), $searchpod)
   || "undef - $searchpod.pod not found!";

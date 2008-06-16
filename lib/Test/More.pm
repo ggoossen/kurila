@@ -793,7 +793,7 @@ WARNING
         }
         else {
             $ok = $tb->ok(0, $name);
-            $tb->diag( <_format_stack(< @Data_Stack));
+            $tb->diag( _format_stack(< @Data_Stack));
         }
     }
 

@@ -26,31 +26,31 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))
 
     my $taint = $arg; substr($taint, 0, undef, $ary->[1]);
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, before test");
+    is( tainted($taint), tainted($arg), "tainted: $encode, before test");
 
     my $lconcat = $taint;
        $lconcat .= UTF8;
     is($lconcat, $string.UTF8, "compare: $encode, concat left");
 
-    is( <tainted($lconcat), < tainted($arg), "tainted: $encode, concat left");
+    is( tainted($lconcat), tainted($arg), "tainted: $encode, concat left");
 
     my $rconcat = UTF8;
        $rconcat .= $taint;
     is($rconcat, UTF8.$string, "compare: $encode, concat right");
 
-    is( <tainted($rconcat), < tainted($arg), "tainted: $encode, concat right");
+    is( tainted($rconcat), tainted($arg), "tainted: $encode, concat right");
 
-    my $ljoin = join('!', $taint, < UTF8);
-    is($ljoin, join('!', $string, < UTF8), "compare: $encode, join left");
+    my $ljoin = join('!', $taint, UTF8);
+    is($ljoin, join('!', $string, UTF8), "compare: $encode, join left");
 
-    is( <tainted($ljoin), < tainted($arg), "tainted: $encode, join left");
+    is( tainted($ljoin), tainted($arg), "tainted: $encode, join left");
 
-    my $rjoin = join('!', < UTF8, $taint);
-    is($rjoin, join('!', < UTF8, $string), "compare: $encode, join right");
+    my $rjoin = join('!', UTF8, $taint);
+    is($rjoin, join('!', UTF8, $string), "compare: $encode, join right");
 
-    is( <tainted($rjoin), < tainted($arg), "tainted: $encode, join right");
+    is( tainted($rjoin), tainted($arg), "tainted: $encode, join right");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, after test");
+    is( tainted($taint), tainted($arg), "tainted: $encode, after test");
 }
 
 
@@ -67,7 +67,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))
 
     is(pack('a*',$taint), pack('a*',$byte), "bytecmp: $encode, encode utf8");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, encode utf8");
+    is( tainted($taint), tainted($arg), "tainted: $encode, encode utf8");
 
     my $taint = $arg; substr($taint, 0, undef, $byte);
     utf8::decode($taint);
@@ -76,7 +76,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))
 
     is(pack('a*',$taint), pack('a*',$utf8), "bytecmp: $encode, decode byte");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, decode byte");
+    is( tainted($taint), tainted($arg), "tainted: $encode, decode byte");
 }
 
 
@@ -93,7 +93,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]")) {
 
     is(pack('a*',$taint), pack('a*',$up), "bytecmp: $encode, upgrade up");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, upgrade up");
+    is( tainted($taint), tainted($arg), "tainted: $encode, upgrade up");
 
     my $taint = $arg; substr($taint, 0, undef, $down);
     utf8::encode($taint);
@@ -102,7 +102,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]")) {
 
     is(pack('a*',$taint), pack('a*',$up), "bytecmp: $encode, upgrade down");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, upgrade down");
+    is( tainted($taint), tainted($arg), "tainted: $encode, upgrade down");
 
     my $taint = $arg; substr($taint, 0, undef, $up);
 
@@ -110,7 +110,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]")) {
 
     is(pack('a*',$taint), pack('a*',$down), "bytecmp: $encode, downgrade up");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, downgrade up");
+    is( tainted($taint), tainted($arg), "tainted: $encode, downgrade up");
 
     my $taint = $arg; substr($taint, 0, undef, $down);
 
@@ -118,7 +118,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]")) {
 
     is(pack('a*',$taint), pack('a*',$down), "bytecmp: $encode, downgrade down");
 
-    is( <tainted($taint), < tainted($arg), "tainted: $encode, downgrade down");
+    is( tainted($taint), tainted($arg), "tainted: $encode, downgrade down");
 }
 
 {

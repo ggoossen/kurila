@@ -12,17 +12,17 @@ use Exporter;
 
 
 sub shellwords {
-    my (@lines) = @( < @_ );
+    my @lines = @_;
     my @allwords;
 
     foreach my $line (< @lines) {
 	$line =~ s/^\s+//;
-	my @words = @( < parse_line('\s+', 0, $line) );
-	pop @words if ((nelems @words) and !defined @words[-1]);
+	my @words = parse_line('\s+', 0, $line);
+	pop @words if (nelems @words) and !defined @words[-1];
 	return() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);
     }
-    return @(@allwords);
+    return @allwords;
 }
 
 
@@ -36,7 +36,7 @@ sub quotewords {
 	return() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);
     }
-    return @(@allwords);
+    return @allwords;
 }
 
 
@@ -49,7 +49,7 @@ sub nested_quotewords {
 	@{@allwords[$i]} = @( < parse_line($delim, $keep, @lines[$i]) );
 	return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
     }
-    return @(@allwords);
+    return @allwords;
 }
 
 
@@ -86,11 +86,11 @@ sub parse_line {
                         |   # --OR--
                             (?!^)(?=["'])               # a quote
                         )
-		    )//xs or return;		# extended layout
+		    )//xs or return @();		# extended layout
         my ($quote, $quoted, $unquoted, $delim) = (($1 ? ($1,$2) : ($3,$4)), $5, $6);
 
 
-	return() unless( defined($quote) || length($unquoted) || length($delim));
+	return @() unless( defined($quote) || length($unquoted) || length($delim));
 
         if ($keep) {
 	    $quoted = "$quote$quoted$quote";
@@ -113,7 +113,7 @@ sub parse_line {
             push(@pieces, $word);
 	}
     }
-    return @(@pieces);
+    return @pieces;
 }
 
 
