@@ -66,10 +66,10 @@ sub OverloadedStringify {
   my $package = shift;
   $package = ref $package if ref $package;
   #$package->can('(""')
-  ov_method < mycan($package, '(""'), $package
-    or ov_method < mycan($package, '(0+'), $package
-    or ov_method < mycan($package, '(bool'), $package
-    or ov_method < mycan($package, '(nomethod'), $package;
+  ov_method mycan($package, '(""'), $package
+    or ov_method mycan($package, '(0+'), $package
+    or ov_method mycan($package, '(bool'), $package
+    or ov_method mycan($package, '(nomethod'), $package;
 }
 
 sub Method {
@@ -82,7 +82,7 @@ sub Method {
     return undef if !defined $package;
   }
   #my $meth = $package->can('(' . shift);
-  ov_method < mycan($package, '(' . shift), $package;
+  ov_method mycan($package, '(' . shift), $package;
   #return $meth if $meth ne \&nil;
   #return $ {*{$meth}};
 }

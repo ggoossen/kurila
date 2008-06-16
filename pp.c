@@ -3783,8 +3783,12 @@ PP(pp_expand)
     if (gimme == G_SCALAR)
 	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
 
-    if ( ! (SvAVOK(sv) || SvHVOK(sv)) )
-	Perl_croak(aTHX_ "expand operator may not be used upon a %s", SvDESC(sv));
+    if ( ! (SvAVOK(sv) || SvHVOK(sv)) ) {
+	if ( SvOK(sv) )
+	    Perl_croak(aTHX_ "expand operator may not be used upon a %s", SvDESC(sv));
+	(void)POPs;
+	RETURN;
+    }
 
     if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
 	/* lhs of an assignment is handled by pp_aassign */
@@ -3825,14 +3829,15 @@ PP(pp_nelems)
 {
     dVAR; dSP;
     dTOPss;
+    dTARGET;
     AV *const av = (AV*)sv;
 
     do_arg_check(SP);
 
-    {
-	dTARGET;
-	const I32 maxarg = AvFILL(av) + 1;
-	SETi(maxarg);
+    if (SvAVOK(av)) {
+	SETi( av_len(av) + 1);
+    } else {
+	SETi(0);
     }
 
     RETURN;

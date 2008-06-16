@@ -162,7 +162,6 @@ sub display {
             }
             $x = $y;
         }
-        return $x unless wantarray;
         push @result, $x;
     }
     return @result;

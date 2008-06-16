@@ -19,7 +19,7 @@ BEGIN	{
 sub expand {
 	my @l;
 	my $pad;
-	for ( < @_ ) {
+	for ( @_[0] ) {
 		my $s = '';
 		for (split(m/^/m, $_, -1)) {
 			my $offs = 0;
@@ -32,7 +32,6 @@ sub expand {
 		}
 		push(@l, $s);
 	}
-	return @l if wantarray;
 	return @l[0];
 }
 
@@ -45,7 +44,7 @@ sub unexpand
 	my @lines;
 	my $lastbit;
 	my $ts_as_space = " "x$tabstop;
-	for $x (< @l) {
+	for $x (@l[0]) {
 		@lines = @( split("\n", $x, -1) );
 		for $line (< @lines) {
 			$line = expand($line);
@@ -67,7 +66,7 @@ sub unexpand
 		}
 		$x = join("\n", < @lines);
 	}
-	return @l;
+	return @l[0];
 }
 
 1;

@@ -296,9 +296,9 @@ Find out whether a plan has been defined. $plan is either C<undef> (no plan has 
 sub has_plan {
     my $self = shift;
 
-    return @($self->{Expected_Tests}) if $self->{Expected_Tests};
-    return @('no_plan') if $self->{No_Plan};
-    return @(undef);
+    return $self->{Expected_Tests} if $self->{Expected_Tests};
+    return 'no_plan' if $self->{No_Plan};
+    return undef;
 };
 
 

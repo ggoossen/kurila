@@ -75,11 +75,7 @@ sub abbrev {
         $hashref->{$word} = $word;
     }
     return if $returnvoid;
-    if (wantarray) {
-      %{$hashref};
-    } else {
-      $hashref;
-    }
+    %{$hashref};
 }
 
 1;
