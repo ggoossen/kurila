@@ -76,7 +76,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO NOAMP
-%token <i_tkval> ANONARY ANONHSH
+%token <i_tkval> ANONARY ANONHSH ANONSCALAR
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -127,7 +127,7 @@
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
-%left '[' '{' ANONARY ANONHSH
+%left '[' '{' ANONARY ANONHSH ANONSCALAR
 
 %token <i_tkval> PEG
 
@@ -1361,6 +1361,23 @@ scalar	:	'$' indirob
 			{ $$ = newSVREF($2);
 			  TOKEN_GETMAD($1,$$,'$');
 			}
+        |       ANONSCALAR expr ')'  /* $( ... ) */
+                        { $$ = convert(OP_ANONSCALAR, 0, $2);
+			  TOKEN_GETMAD($1,$$,'[');
+			  TOKEN_GETMAD($3,$$,']');
+
+                          if (PL_parser->lex_brackets <= 0)
+                            yyerror("Unmatched right paren");
+                          else
+                            --PL_parser->lex_brackets;
+
+                          if (PL_parser->lex_state == LEX_INTERPNORMAL) {
+                            if ( PL_parser->lex_brackets == 0 )
+                              PL_parser->lex_state = LEX_INTERPEND;
+                          }
+
+			}
+
 	;
 
 ary	:	'@' indirob

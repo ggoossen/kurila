@@ -3738,6 +3738,14 @@ PP(pp_lslice)
     RETURN;
 }
 
+PP(pp_anonscalar)
+{
+    dVAR; dSP;
+    SV * const sv = POPs;
+    mXPUSHs( newSVsv(sv) );
+    RETURN;
+}
+
 PP(pp_anonlist)
 {
     dVAR; dSP; dMARK;
