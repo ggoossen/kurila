@@ -69,6 +69,7 @@ Perl_pp_prototype
 Perl_pp_srefgen
 Perl_pp_ref
 Perl_pp_bless
+Perl_pp_anonscalar
 Perl_pp_backtick
 Perl_pp_glob
 Perl_pp_readline

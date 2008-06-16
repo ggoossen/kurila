@@ -54,6 +54,7 @@ EXTCONST char* const PL_op_name[] = {
 	"srefgen",
 	"ref",
 	"bless",
+	"anonscalar",
 	"backtick",
 	"glob",
 	"readline",
@@ -415,6 +416,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"single ref constructor",
 	"reference-type operator",
 	"bless",
+	"anonymous scalar ($())",
 	"quoted execution (``, qx)",
 	"glob",
 	"<HANDLE>",
@@ -788,6 +790,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_srefgen),
 	MEMBER_TO_FPTR(Perl_pp_ref),
 	MEMBER_TO_FPTR(Perl_pp_bless),
+	MEMBER_TO_FPTR(Perl_pp_anonscalar),
 	MEMBER_TO_FPTR(Perl_pp_backtick),
 	MEMBER_TO_FPTR(Perl_pp_glob),
 	MEMBER_TO_FPTR(Perl_pp_readline),
@@ -1158,6 +1161,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* srefgen */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* ref */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* bless */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonscalar */
 	MEMBER_TO_FPTR(Perl_ck_open),	/* backtick */
 	MEMBER_TO_FPTR(Perl_ck_glob),	/* glob */
 	MEMBER_TO_FPTR(Perl_ck_readline),	/* readline */
@@ -1522,6 +1526,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00002206,	/* srefgen */
 	0x0001368c,	/* ref */
 	0x00122804,	/* bless */
+	0x00002c00,	/* anonscalar */
 	0x00013688,	/* backtick */
 	0x00012808,	/* glob */
 	0x0001d608,	/* readline */
