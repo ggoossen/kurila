@@ -323,13 +323,13 @@ sub rel2abs {
 
     if ($is_abs) {
       # It's missing a volume, add one
-      my $vol = ( <$self->splitpath( $self->_cwd() ))[[0]];
+      my $vol = $self->splitpath( $self->_cwd() )[0];
       return $self->canonpath( $vol . $path );
     }
 
     if ( !defined( $base ) || $base eq '' ) {
       require Cwd ;
-      $base = Cwd::getdcwd( ( <$self->splitpath( $path ))[[0]] ) if defined &Cwd::getdcwd ;
+      $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if defined &Cwd::getdcwd ;
       $base = $self->_cwd() unless defined $base ;
     }
     elsif ( ! $self->file_name_is_absolute( $base ) ) {
@@ -340,13 +340,13 @@ sub rel2abs {
     }
 
     my ( $path_directories, $path_file ) =
-      ( <$self->splitpath( $path, 1 ))[[1,2]] ;
+      $self->splitpath( $path, 1 )[[1,2]] ;
 
     my ( $base_volume, $base_directories ) = <
       $self->splitpath( $base, 1 ) ;
 
     $path = $self->catpath( 
-			   $base_volume, < 
+			   $base_volume, 
 			   $self->catdir( $base_directories, $path_directories ), 
 			   $path_file
 			  ) ;

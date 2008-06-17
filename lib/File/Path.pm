@@ -528,16 +528,6 @@ my $Is_MacOS = $^O eq 'MacOS';
 my $Force_Writeable = ($^O eq 'os2' || $^O eq 'dos' || $^O eq 'MSWin32' ||
 		       $^O eq 'amigaos' || $^O eq 'MacOS' || $^O eq 'epoc');
 
-sub _carp {
-    require Carp;
-    goto &Carp::carp;
-}
-
-sub _croak {
-    require Carp;
-    goto &Carp::croak;
-}
-
 sub _error {
     my $arg     = shift;
     my $message = shift;
@@ -548,7 +538,7 @@ sub _error {
         push @{${$arg->{error}}}, \%($object => "$message: $!");
     }
     else {
-        _carp(defined($object) ? "$message for $object: $!" : "$message: $!");
+        warn(defined($object) ? "$message for $object: $!" : "$message: $!");
     }
 }
 
@@ -621,7 +611,7 @@ sub _mkpath {
                     push @{${$arg->{error}}}, \%($path => $e);
                 }
                 else {
-                    _croak("mkdir $path: $e");
+                    die("mkdir $path: $e");
                 }
 	}
     }
@@ -670,7 +660,7 @@ sub rmtree {
     };
     for ($arg->{cwd}) { m/\A(.*)\Z/; $_ = $1 } # untaint
 
-    %{$arg}{[qw(device inode)]} = (stat $arg->{cwd})[[0,1]] or do {
+    %{$arg}{[qw(device inode)]} = @(stat $arg->{cwd})[[0,1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{cwd});
         return 0;
     };
@@ -708,7 +698,7 @@ sub _rmtree {
             : $root
         ;
 
-        my ($ldev, $lino, $perm) = (lstat $root)[[0,1,2]] or next ROOT_DIR;
+        my ($ldev, $lino, $perm) = @(lstat $root)[[0,1,2]] or next ROOT_DIR;
 
 	if ( -d _ ) {
             $root = VMS::Filespec::pathify($root) if $Is_VMS;
@@ -727,13 +717,13 @@ sub _rmtree {
                 }
             }
 
-            my ($device, $inode, $perm) = (stat $curdir)[[0,1,2]] or do {
+            my ($device, $inode, $perm) = @(stat $curdir)[[0,1,2]] or do {
                 _error($arg, "cannot stat current working directory", $canon);
                 next ROOT_DIR;
             };
 
             ($ldev eq $device and $lino eq $inode)
-                or _croak("directory $canon changed before chdir, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
+                or die("directory $canon changed before chdir, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
 
             $perm ^&^= 07777; # don't forget setuid, setgid, sticky bits
             my $nperm = $perm ^|^ 0700;
@@ -792,15 +782,15 @@ sub _rmtree {
 
             # don't leave the client code in an unexpected directory
             chdir($arg->{cwd})
-                or _croak("cannot chdir to $arg->{cwd} from $canon: $!, aborting.");
+                or die("cannot chdir to $arg->{cwd} from $canon: $!, aborting.");
 
             # ensure that a chdir upwards didn't take us somewhere other
             # than we expected (see CVE-2002-0435)
-            ($device, $inode) = (stat $curdir)[[0,1]]
-                or _croak("cannot stat prior working directory $arg->{cwd}: $!, aborting.");
+            ($device, $inode) = @(stat $curdir)[[0,1]]
+                or die("cannot stat prior working directory $arg->{cwd}: $!, aborting.");
 
             ($arg->{device} eq $device and $arg->{inode} eq $inode)
-                or _croak("previous directory $arg->{cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
+                or die("previous directory $arg->{cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
 
             if ($arg->{depth} or !$arg->{keep_root}) {
                 if ($arg->{safe} &&

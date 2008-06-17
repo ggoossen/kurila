@@ -53,7 +53,7 @@ sub canonpath {
 
 sub catdir {
     my $self = shift;
-    return unless (nelems @_);
+    return '' unless (nelems @_);
 
     # Don't create something that looks like a //network/path
     if (@_[0] and (@_[0] eq '/' or @_[0] eq '\')) {
