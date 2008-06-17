@@ -3,7 +3,7 @@ package Test::Simple::Catch;
 
 use Symbol;
 use TieOut;
-my($out_fh, $err_fh) = ( <gensym, < gensym);
+my($out_fh, $err_fh) = (gensym, gensym);
 my $out = tie *$out_fh, 'TieOut';
 my $err = tie *$err_fh, 'TieOut';
 

@@ -313,7 +313,7 @@ sub _new_stack {
                 ),
     );
 
-    my $args = check( $tmpl, \%hash, < $CONFIG->verbose ) or (
+    my $args = check( $tmpl, \%hash, $CONFIG->verbose ) or (
         warn( <loc(q[Could not create a new stack object: %1], < 
                 Params::Check->last_error)
         ),
@@ -386,8 +386,8 @@ sub store {
                 strict_type => 1,
                 required    => 1,
             ),
-        tag     => \%( default => < $self->_get_conf('tag')     ),
-        level   => \%( default => < $self->_get_conf('level'),  ),
+        tag     => \%( default => $self->_get_conf('tag')     ),
+        level   => \%( default => $self->_get_conf('level'),  ),
         extra   => \%( default => \@(), strict_type => 1 ),
     );
 
@@ -509,7 +509,7 @@ sub retrieve {
                             ? splice(@list,0,$amount)
                             : < @list );
 
-    return wantarray ? @rv : @rv[0];
+    return @rv;
 }
 
 =head2 first

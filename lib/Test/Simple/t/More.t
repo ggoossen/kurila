@@ -8,7 +8,7 @@ BEGIN {
 }
 
 use lib 't/lib';
-use Test::More tests => 51;
+use Test::More tests => 49;
 
 # Make sure we don't mess with $@ or $!.  Test at bottom.
 my $Err   = "this should not be touched";
@@ -68,15 +68,15 @@ pass('pass() passed');
 
 ok( eq_array(\@(qw(this that whatever)), \@(qw(this that whatever))),
     'eq_array with simple arrays' );
-is (nelems @Test::More::Data_Stack), 0, '@Data_Stack not holding onto things';
+is( (nelems @Test::More::Data_Stack), 0, '@Data_Stack not holding onto things');
 
 ok( eq_hash(\%( foo => 42, bar => 23 ), \%(bar => 23, foo => 42)),
     'eq_hash with simple hashes' );
-is (nelems @Test::More::Data_Stack), 0;
+is( (nelems @Test::More::Data_Stack), 0);
 
 ok( eq_set(\@(qw(this that whatever)), \@(qw(that whatever this))),
     'eq_set with simple sets' );
-is (nelems @Test::More::Data_Stack), 0;
+is( (nelems @Test::More::Data_Stack), 0);
 
 my @complex_array1 = @(
                       \@(qw(this that whatever)),
@@ -106,11 +106,11 @@ my @array2 = @(qw(this that whatever),
 
 ok( !eq_array(\@array1, \@array2),
     'eq_array with slightly different complicated arrays' );
-is (nelems @Test::More::Data_Stack), 0;
+is( (nelems @Test::More::Data_Stack), 0);
 
 ok( !eq_set(\@array1, \@array2),
     'eq_set with slightly different complicated arrays' );
-is (nelems @Test::More::Data_Stack), 0;
+is( (nelems @Test::More::Data_Stack), 0);
 
 my %hash1 = %( foo => 23,
               bar => \@(qw(this that whatever)),
@@ -135,7 +135,7 @@ ok( eq_hash(\%hash1, \%hash2),  'eq_hash with complicated hashes');
 
 ok( !eq_hash(\%hash1, \%hash2),
     'eq_hash with slightly different complicated hashes' );
-is (nelems @Test::More::Data_Stack), 0;
+is( (nelems @Test::More::Data_Stack), 0);
 
 cmp_ok( Test::Builder->new, '\==', Test::More->builder,    'builder()' );
 
@@ -167,7 +167,3 @@ is_deeply( $glob, $glob, 'the same glob' );
 is_deeply( \%( foo => $sub, bar => \@(1, $glob) ),
            \%( foo => $sub, bar => \@(1, $glob) )
          );
-
-# These two tests must remain at the end.
-is( $@, $Err,               '$@ untouched' );
-cmp_ok( $!, '==', $Errno,   '$! untouched' );

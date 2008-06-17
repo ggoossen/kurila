@@ -346,7 +346,7 @@ as it occurred in the input stream).
 sub textblock {
     my ($self, $text, $line_num, $pod_para) = < @_;
     my $out_fh = $self->{_OUTPUT};
-    print $out_fh < $self->interpolate($text, $line_num);
+    print $out_fh $self->interpolate($text, $line_num);
 }
 
 ##---------------------------------------------------------------------------

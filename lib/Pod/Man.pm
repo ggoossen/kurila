@@ -143,10 +143,10 @@ sub init_fonts {
     # bold, third is italic.
     %$self{FONTS} = \%( '000' => '\fR', '001' => '\fI',
                         '010' => '\fB', '011' => '\f(BI',
-                        '100' => < toescape (%$self{fixed}),
-                        '101' => < toescape (%$self{fixeditalic}),
-                        '110' => < toescape (%$self{fixedbold}),
-                        '111' => < toescape (%$self{fixedbolditalic}) );
+                        '100' => toescape (%$self{fixed}),
+                        '101' => toescape (%$self{fixeditalic}),
+                        '110' => toescape (%$self{fixedbold}),
+                        '111' => toescape (%$self{fixedbolditalic}) );
 }
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
@@ -923,7 +923,7 @@ sub cmd_para {
     $text =~ s/\s*$/\n/;
 
     # Output the paragraph.
-    $self->output ( <$self->protect ( <$self->textmapfonts ($text)));
+    $self->output ( $self->protect ( $self->textmapfonts ($text)));
     $self->outindex;
     %$self{NEEDSPACE} = 1;
     return '';
@@ -1008,7 +1008,7 @@ sub cmd_head1 {
     $text =~ s/\\s-?\d//g;
     $text = $self->heading_common ($text, %$attrs{start_line});
     my $isname = ($text eq 'NAME' || $text =~ m/\(NAME\)/);
-    $self->output ( <$self->switchquotes ('.SH', < $self->mapfonts ($text)));
+    $self->output ( $self->switchquotes ('.SH', $self->mapfonts ($text)));
     $self->outindex ('Header', $text) unless $isname;
     %$self{NEEDSPACE} = 0;
     %$self{IN_NAME} = $isname;
@@ -1019,7 +1019,7 @@ sub cmd_head1 {
 sub cmd_head2 {
     my ($self, $attrs, $text) = < @_;
     $text = $self->heading_common ($text, %$attrs{start_line});
-    $self->output ( <$self->switchquotes ('.Sh', < $self->mapfonts ($text)));
+    $self->output ( $self->switchquotes ('.Sh', $self->mapfonts ($text)));
     $self->outindex ('Subsection', $text);
     %$self{NEEDSPACE} = 0;
     return '';
@@ -1191,7 +1191,7 @@ sub item_common {
 
     # Now, output the item tag itself.
     $item = $self->textmapfonts ($item);
-    $self->output ( <$self->switchquotes ('.IP', $item, %$self{INDENT}));
+    $self->output ( $self->switchquotes ('.IP', $item, %$self{INDENT}));
     %$self{NEEDSPACE} = 0;
     %$self{ITEMS}++;
     %$self{SHIFTWAIT} = 0;
@@ -1200,7 +1200,7 @@ sub item_common {
     if ($text) {
         $text =~ s/\s*$/\n/;
         $self->makespace;
-        $self->output ( <$self->protect ( <$self->textmapfonts ($text)));
+        $self->output ( $self->protect ( $self->textmapfonts ($text)));
         %$self{NEEDSPACE} = 1;
     }
     $self->outindex ($index ? ('Item', $index) : ());

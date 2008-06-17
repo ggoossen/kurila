@@ -62,9 +62,9 @@ foreach my $file (
     push @out, '';
     $p->output_string(\@out[-1]);
     my $t = mytime();
-    $p->parse_file( <source_path($file));
+    $p->parse_file( source_path($file));
     printf "# \%s \%s \%sb, \%.03fs\n",
-     ref($p), < source_path($file), length(@out[-1]), mytime() - $t ;
+     ref($p), source_path($file), length(@out[-1]), mytime() - $t ;
     ok 1;
   }
 

@@ -75,7 +75,7 @@ for (sort keys %translators) {
     # line.  That means that we don't check those things; oh well.  The header
     # changes with each version change or touch of the input file.
     open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
-    $parser->parse_from_file ( <source_path ('basic.pod'), \*OUT);
+    $parser->parse_from_file ( source_path ('basic.pod'), \*OUT);
     close OUT;
     if ($_ eq 'Pod::Man') {
         open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
@@ -93,7 +93,7 @@ for (sort keys %translators) {
     }
     {
         local $/;
-        open (MASTER, "<", < source_path ("basic.%translators{$_}"))
+        open (MASTER, "<", source_path ("basic.%translators{$_}"))
             or die "Cannot open basic.%translators{$_}: $!\n";
         open (OUTPUT, "<", "out.%translators{$_}")
             or die "Cannot open out.%translators{$_}: $!\n";

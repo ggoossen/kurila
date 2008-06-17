@@ -8,23 +8,7 @@
 # 
 # -- Jarkko Hietaniemi, April 1997
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-	chdir 't' if -d 't';
-	@INC = @( '../lib' );
-    }
-}
-
-BEGIN {
-    try { require Test::More };
-    if ($@) {
-	# We are willing to lose testing in e.g. 5.00504.
-	print "1..0 # No Test::More, skipping\n";
-	exit(0);
-    } else {
-	Test::More->import();
-    }
-}
+use Test::More;
 
 plan(tests => 153);
 
@@ -182,8 +166,8 @@ use Math::Trig ':radial';
     ok(near(great_circle_distance(0, 0, pi, pi), pi));
 
     # London to Tokyo.
-    my @L = @( <deg2rad(-0.5), <  deg2rad(90 - 51.3));
-    my @T = @( <deg2rad(139.8), < deg2rad(90 - 35.7));
+    my @L = @( deg2rad(-0.5),  deg2rad(90 - 51.3));
+    my @T = @( deg2rad(139.8), deg2rad(90 - 35.7));
 
     my $km = great_circle_distance(< @L, < @T, 6378);
 
@@ -213,10 +197,10 @@ use Math::Trig ':radial';
 # Retired test: Relies on atan2(0, 0), which is not portable.
 #	ok(near(great_circle_direction(0, 0, pi, pi), -pi()/2));
 
-    my @London  = @( <deg2rad(  -0.167), < deg2rad(90 - 51.3));
-    my @Tokyo   = @( <deg2rad( 139.5), <   deg2rad(90 - 35.7));
-    my @Berlin  = @( <deg2rad ( 13.417), < deg2rad(90 - 52.533));
-    my @Paris   = @( <deg2rad (  2.333), < deg2rad(90 - 48.867));
+    my @London  = @(deg2rad(  -0.167), deg2rad(90 - 51.3));
+    my @Tokyo   = @(deg2rad( 139.5),   deg2rad(90 - 35.7));
+    my @Berlin  = @(deg2rad ( 13.417), deg2rad(90 - 52.533));
+    my @Paris   = @(deg2rad (  2.333), deg2rad(90 - 48.867));
 
     ok(near(rad2deg(great_circle_direction(< @London, < @Tokyo)),
 	    31.791945393073));

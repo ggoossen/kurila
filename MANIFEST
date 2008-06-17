@@ -1575,7 +1575,6 @@ lib/Test/Simple/t/BEGIN_require_ok.t	Test::More require_ok() testing
 lib/Test/Simple/t/BEGIN_use_ok.t	Test::More use_ok() testing
 lib/Test/Simple/t/buffer.t	Test::Builder buffering test
 lib/Test/Simple/t/Builder.t	Test::Builder tests
-lib/Test/Simple/t/carp.t	Test::Builder test
 lib/Test/Simple/t/circular_data.t	Test::Simple test
 lib/Test/Simple/t/cmp_ok.t	Test::More test
 lib/Test/Simple/t/create.t	Test::Simple test

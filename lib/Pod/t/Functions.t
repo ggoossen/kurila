@@ -42,7 +42,7 @@ ok( eq_array( \@cat_keys, \@catagories ),
 
 my( undef, $path ) = < fileparse( $0 );
 my $pod_functions = File::Spec->catfile( 
-    $path, < File::Spec->updir, 'Functions.pm' );
+    $path, File::Spec->updir, 'Functions.pm' );
 
 SKIP: {
 	my $test_out = do { local $/; ~< *DATA }; 

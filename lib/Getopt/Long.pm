@@ -263,24 +263,8 @@ use constant PAT_XINT  =>
 use constant PAT_FLOAT => "[-+]?[0-9._]+(\.[0-9_]+)?([eE][-+]?[0-9_]+)?";
 
 sub GetOptions(@) {
-    # Shift in default array.
-    unshift(@_, \@ARGV);
-    # Try to keep caller() and Carp consitent.
-    goto &GetOptionsFromArray;
-}
-
-sub GetOptionsFromString($@) {
-    my ($string) = shift;
-    require Text::ParseWords;
-    my $args = \@( < Text::ParseWords::shellwords($string) );
-    $caller ||= (caller)[[0]];	# current context
-    my $ret = GetOptionsFromArray($args, < @_);
-    return  @( $ret, $args ) if wantarray;
-    if ( (nelems @$args) ) {
-	$ret = 0;
-	warn("GetOptionsFromString: Excess data \"{join ' ', <@$args}\" in string \"$string\"\n");
-    }
-    $ret;
+  my $string = shift;
+  return GetOptionsFromArray(\@ARGV, $string, <@_);
 }
 
 sub GetOptionsFromArray($@) {

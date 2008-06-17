@@ -214,7 +214,7 @@ sub plan {
     local $Level = $Level + 1;
 
     if( $self->{Have_Plan} ) {
-        $self->croak("You tried to plan twice");
+        die("You tried to plan twice");
     }
 
     if( $cmd eq 'no_plan' ) {
@@ -229,15 +229,15 @@ sub plan {
             return $self->expected_tests($arg);
         }
         elsif( !defined $arg ) {
-            $self->croak("Got an undefined number of tests");
+            die("Got an undefined number of tests");
         }
         elsif( !$arg ) {
-            $self->croak("You said to run 0 tests");
+            die("You said to run 0 tests");
         }
     }
     else {
         my @args = @( grep { defined } ($cmd, $arg) );
-        $self->croak("plan() doesn't understand {join ' ', <@args}");
+        die("plan() doesn't understand {join ' ', <@args}");
     }
 
     return 1;
@@ -258,7 +258,7 @@ sub expected_tests {
     my($max) = < @_;
 
     if( (nelems @_) ) {
-        $self->croak("Number of tests must be a positive integer.  You gave it '$max'")
+        die("Number of tests must be a positive integer.  You gave it '$max'")
           unless $max =~ m/^\+?\d+$/ and $max +> 0;
 
         $self->{Expected_Tests} = $max;
@@ -524,8 +524,6 @@ sub is_eq {
     my($self, $got, $expect, $name) = < @_;
     local $Level = $Level + 1;
 
-    $self->_unoverload_str(\$got, \$expect);
-
     if( !defined $got || !defined $expect ) {
         # undef only matches undef and nothing else
         my $test = !defined $got && !defined $expect;
@@ -542,6 +540,8 @@ sub is_eq {
         $self->_is_diag($got, '\==', $expect) unless $test;
         return $test;
     }
+
+    $self->_unoverload_str(\$got, \$expect);
 
     return $self->cmp_ok($got, 'eq', $expect, $name);
 }
@@ -1415,46 +1415,12 @@ sub _copy_io_layers {
     });
 }
 
-=item carp
-
-  $tb->carp(@message);
-
-Warns with C<@message> but the message will appear to come from the
-point where the original test function was called (C<$tb->caller>).
-
-=item croak
-
-  $tb->croak(@message);
-
-Dies with C<@message> but the message will appear to come from the
-point where the original test function was called (C<$tb->caller>).
-
-=cut
-
-sub _message_at_caller {
-    my $self = shift;
-
-    local $Level = $Level + 1;
-    my($pack, $file, $line) = < $self->caller;
-    return join("", < @_) . " at $file line $line.\n";
-}
-
-sub carp {
-    my $self = shift;
-    warn < $self->_message_at_caller(< @_);
-}
-
-sub croak {
-    my $self = shift;
-    die < $self->_message_at_caller(< @_);
-}
-
 sub _plan_check {
     my $self = shift;
 
     unless( $self->{Have_Plan} ) {
         local $Level = $Level + 2;
-        $self->croak("You tried to run a test without a plan");
+        die("You tried to run a test without a plan");
     }
 }
 
@@ -1485,7 +1451,7 @@ sub current_test {
     lock($self->{Curr_Test});
     if( defined $num ) {
         unless( $self->{Have_Plan} ) {
-            $self->croak("Can't change the current test number without a plan!");
+            die("Can't change the current test number without a plan!");
         }
 
         $self->{Curr_Test} = $num;
@@ -1680,7 +1646,7 @@ sub _whoa {
     my($self, $check, $desc) = < @_;
     if( $check ) {
         local $Level = $Level + 1;
-        $self->croak(<<"WHOA");
+        die(<<"WHOA");
 WHOA!  $desc
 This should never happen!  Please contact the author immediately!
 WHOA

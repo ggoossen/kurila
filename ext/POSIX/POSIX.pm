@@ -984,7 +984,7 @@ sub _getsig {
 sub _exist {
     my $rtsig = _getsig(@_[1]);
     my $ok    = $rtsig +>= $_SIGRTMIN && $rtsig +<= $_SIGRTMAX;
-    ($rtsig, $ok);
+    return @($rtsig, $ok);
 }
 
 sub _check {

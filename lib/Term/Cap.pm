@@ -271,7 +271,7 @@ sub Tgetent
         $entry = $foo;
     }
 
-    my @termcap_path = @( < termcap_path() );
+    my @termcap_path = @( termcap_path() );
 
     unless ( (nelems @termcap_path) || $entry )
     {

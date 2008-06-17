@@ -534,10 +534,7 @@ dies on error.
 
 sub _chdir {
     my ($dir)= < @_;
-    my $ret;
-    if (defined wantarray) {
-        $ret= cwd();
-    }
+    my $ret = cwd();
     chdir $dir
         or _choke("Couldn't chdir to '$dir': $!");
     return $ret;

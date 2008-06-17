@@ -436,20 +436,17 @@ sub dl_findfile {
 	<<$^O-eq-VMS>>
         if (m%[:>/\]]% && -f $_) {
 	    push(@found,dl_expandspec(VMS::Filespec::vmsify($_)));
-	    last arg unless wantarray;
 	    next;
         }
 	<</$^O-eq-VMS>>
 	<<$^O-eq-MacOS>>
 	    if (m/:/ && -f $_) {
 	    	push(@found,$_);
-	    	last arg unless wantarray;
 	    }
 	<</$^O-eq-MacOS>>
 	<<$^O-ne-VMS>>
         if (m:/: && -f $_) {
 	    push(@found,$_);
-	    last arg unless wantarray;
 	    next;
 	}
 	<</$^O-ne-VMS>>

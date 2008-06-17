@@ -238,7 +238,7 @@ sub findConsole {
     if (!defined $consoleOUT) {
       $consoleOUT = defined fileno(STDERR) && $^O ne 'MSWin32' ? "&STDERR" : "&STDOUT";
     }
-    ($console,$consoleOUT);
+    return @($console,$consoleOUT);
 }
 
 sub new {

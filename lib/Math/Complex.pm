@@ -332,7 +332,7 @@ sub i () {
         return $i if ($i);
 	$i = bless \%();
 	$i->{'cartesian'} = \@(0, 1);
-	$i->{'polar'}     = \@(1, < pip2);
+	$i->{'polar'}     = \@(1, pip2);
 	$i->{c_dirty} = 0;
 	$i->{p_dirty} = 0;
 	return $i;
@@ -1379,17 +1379,12 @@ sub display_format {
 	if (ref $self) { # Called as an object method
 	    $self->{display_format} = \%( < %display_format );
 	    return
-		wantarray ?
-		    %{$self->{display_format}} :
-		    $self->{display_format}->{style};
+              %{$self->{display_format}};
 	}
 
         # Called as a class method
 	%DISPLAY_FORMAT = %( < %display_format );
-	return
-	    wantarray ?
-		%DISPLAY_FORMAT :
-		    %DISPLAY_FORMAT{style};
+	return %DISPLAY_FORMAT;
 }
 
 #
@@ -1405,7 +1400,7 @@ sub display_format {
 sub _stringify {
 	my ($z) = shift;
 
-	my $style = $z->display_format;
+	my $style = $z->display_format(){'style'};
 
 	$style = %DISPLAY_FORMAT{style} unless defined $style;
 
@@ -1423,7 +1418,7 @@ sub _stringify_cartesian {
 	my ($x, $y) = < @{$z->_cartesian};
 	my ($re, $im);
 
-	my %format = %( < $z->display_format );
+	my %format = $z->display_format;
 	my $format = %format{format};
 
 	if ($x) {
@@ -1485,7 +1480,7 @@ sub _stringify_polar {
 	my ($r, $t) = < @{$z->_polar};
 	my $theta;
 
-	my %format = %( < $z->display_format );
+	my %format = $z->display_format;
 	my $format = %format{format};
 
 	if ($t =~ m/^NaN[QS]?$/i || $t =~ m/^-?\Q$Inf\E$/i) {

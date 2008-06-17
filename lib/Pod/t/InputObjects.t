@@ -54,10 +54,10 @@ use_ok( 'Pod::InputObjects' );
 
     # Pod::Parser->parse_tree() / ptree()
     
-    is( $p_p1->file_line(), '<unknown-file>:0', 
+    is( (join ':', <$p_p1->file_line()), '<unknown-file>:0', 
         'Pod::Paragraph->file_line()' );
     $p_p2->{ '-file' } = 'test'; $p_p2->{ '-line' } = 3;
-    is( $p_p2->file_line(), 'test:3', 
+    is( (join ':', <$p_p2->file_line()), 'test:3', 
         'Pod::Paragraph->file_line()' );
 }
 

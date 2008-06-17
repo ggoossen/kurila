@@ -189,6 +189,8 @@ to use the items.
 
 =cut
 
+package Log::Mesage::Simple;
+
 BEGIN {
     use Exporter;
     use Params::Check   qw[ check ];
@@ -220,26 +222,26 @@ BEGIN {
                         );
                 };
     }
+}
 
-    sub flush {
-        return @{\@( reverse < $log->flush )};
-    }
+sub flush {
+  return @{\@( reverse < $log->flush )};
+}
 
-    sub stack {
-        return $log->retrieve( chrono => 1 );
-    }
+sub stack {
+  return $log->retrieve( chrono => 1 );
+}
 
-    sub stack_as_string {
-        my $class = shift;
-        my $trace = shift() ? 1 : 0;
+sub stack_as_string {
+  my $class = shift;
+  my $trace = shift() ? 1 : 0;
 
-        return join $/, map {
+  return join $/, map {
                         '[' . $_->tag . '] [' . $_->when . '] ' .
                         ($trace ? $_->message . ' ' . $_->longmess
                                 : $_->message);
                     } < __PACKAGE__->stack;
     }
-}
 
 =head1 GLOBAL VARIABLES
 

@@ -469,7 +469,7 @@ sub _handle_element_start {
   my $self = shift;   # leaving ($element_name, $attr_hash_r)
   DEBUG +> 2 and print "++ @_[0] (", map("<$_> ", < %{@_[1]}), ")\n";
   
-  push @{ $self->{'token_buffer'} }, <
+  push @{ $self->{'token_buffer'} }, 
        $self->{'start_token_class'}->new(< @_);
   return;
 }
@@ -477,7 +477,7 @@ sub _handle_element_start {
 sub _handle_text {
   my $self = shift;   # leaving ($text)
   DEBUG +> 2 and print "== @_[0]\n";
-  push @{ $self->{'token_buffer'} }, <
+  push @{ $self->{'token_buffer'} },
        $self->{'text_token_class'}->new(< @_);
   return;
 }
@@ -485,7 +485,7 @@ sub _handle_text {
 sub _handle_element_end {
   my $self = shift;   # leaving ($element_name);
   DEBUG +> 2 and print "-- @_[0]\n";
-  push @{ $self->{'token_buffer'} }, < 
+  push @{ $self->{'token_buffer'} },
        $self->{'end_token_class'}->new(< @_);
   return;
 }

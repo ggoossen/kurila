@@ -19,10 +19,10 @@ $WRAP = 1 unless defined $WRAP;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub _openclose {
- return map {;
+ return @(map {;
    m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
    ( $1,  "\{\\$2\n",   "/$1",  "\}" );
- } < @_;
+ } < @_);
 }
 
 my @_to_accept;
@@ -161,7 +161,7 @@ sub do_middle {      # the main work
     if( ($type = $token->type) eq 'text' ) {
       if( $self->{'rtfverbatim'} ) {
         DEBUG +> 1 and print "  $type " , < $token->text, " in verbatim!\n";
-        rtf_esc_codely($scratch = $token->text);
+        $scratch = rtf_esc_codely($token->text);
         print $fh $scratch;
         next;
       }
@@ -191,7 +191,7 @@ sub do_middle {      # the main work
         /\cb$1\cc/xsg
       ;
       
-      rtf_esc($scratch);
+      $scratch = rtf_esc($scratch);
       $scratch =~
          s/(
             [^\cm\cj\n]{65}        # Snare 65 characters from a line
@@ -481,25 +481,11 @@ END
 use integer;
 sub rtf_esc {
   my $x; # scratch
-  if(!defined wantarray) { # void context: alter in-place!
-    for(< @_) {
-      s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
-      s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
-    }
-    return;
-  } elsif(wantarray) {  # return an array
-    return map {; ($x = $_) =~
-      s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{$1}/g;  # ESCAPER
-      $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
-      $x;
-    } < @_;
-  } else { # return a single scalar
-    ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
-    ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
-             # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
-    return $x;
-  }
+  ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
+  ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
+  # Escape \, {, }, -, control chars, and 7f-ff.
+  $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
+  return $x;
 }
 
 sub rtf_esc_codely {
@@ -510,25 +496,11 @@ sub rtf_esc_codely {
   #  looks just like a normal dash character).
   
   my $x; # scratch
-  if(!defined wantarray) { # void context: alter in-place!
-    for(< @_) {
-      s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
-      s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
-    }
-    return;
-  } elsif(wantarray) {  # return an array
-    return map {; ($x = $_) =~
-      s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
-      $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
-      $x;
-    } < @_;
-  } else { # return a single scalar
-    ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
-    ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
-             # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
-    return $x;
-  }
+  ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
+  ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
+  # Escape \, {, }, -, control chars, and 7f-ff.
+  $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
+  return $x;
 }
 
 %Escape = %(

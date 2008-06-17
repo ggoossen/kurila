@@ -24,18 +24,18 @@ sub x {
 ok 1;
 
 print "# a bit of meta-testing...\n";
-&ok( < deq( 1,     1     ));
+&ok( deq( 1,     1     ));
 &ok(!deq( 2,     1     ));
 
-&ok( < deq( undef, undef ));
+&ok( deq( undef, undef ));
 &ok(!deq( undef, 1     ));
 &ok(!deq( 1,     undef ));
 
-&ok( < deq( \@( ),   \@( )    ));
+&ok( deq( \@( ),   \@( )    ));
 &ok(!deq( \@( ),   1      ));
 &ok(!deq( 1,     \@( )    ));
 
-&ok( < deq( \@(1),   \@(1)    ));
+&ok( deq( \@(1),   \@(1)    ));
 &ok(!deq( \@(1),   1      ));
 &ok(!deq( 1,     \@(1)    ));
 &ok(!deq( \@(1),   \@( )    ));
@@ -43,28 +43,27 @@ print "# a bit of meta-testing...\n";
 &ok(!deq( \@(1),   \@(2)    ));
 &ok(!deq( \@(2),   \@(1)    ));
 
-&ok( < deq( \@( ),   \@( )    ));
+&ok( deq( \@( ),   \@( )    ));
 &ok(!deq( \@( ),   1      ));
 &ok(!deq( 1,     \@( )    ));
 
-&ok( < deq( \%(),    \%()     ));
+&ok( deq( \%(),    \%()     ));
 &ok(!deq( \%(),    1      ));
 &ok(!deq( 1,     \%()     ));
 &ok(!deq( \%(1,2), \%()     ));
 &ok(!deq( \%(),    \%(1,2)  ));
-&ok( < deq( \%(1,2), \%(1,2)  ));
+&ok( deq( \%(1,2), \%(1,2)  ));
 &ok(!deq( \%(2,1), \%(1,2)  ));
 
 
 
-
-print '# ', < Pod::Simple::pretty( <x( "=pod\n\nI like pie.\n" )), "\n";
+print '# ', Pod::Simple::pretty( x( "=pod\n\nI like pie.\n" )), "\n";
 print "# Making sure we get a tree at all...\n";
 ok x( "=pod\n\nI like pie.\n" );
 
 
 print "# Some real tests...\n";
-&ok( < deq( < x( "=pod\n\nI like pie.\n"),
+&ok( deq( x( "=pod\n\nI like pie.\n"),
   \@( "Document", \%("start_line"=>1),
     \@( "Para",   \%("start_line"=>3),
       "I like pie."
@@ -74,7 +73,7 @@ print "# Some real tests...\n";
 
 $hashes_dont_matter = 1;
 
-&ok( < deq( < x("=pod\n\nB<foo\t>\n"),
+&ok( deq( x("=pod\n\nB<foo\t>\n"),
   \@( "Document", \%(),
     \@( "Para",   \%(),
       \@("B",     \%(),
@@ -85,7 +84,7 @@ $hashes_dont_matter = 1;
 ));
 
 
-&ok( < deq( < x("=pod\n\nB<pieF<zorch>X<foo>I<pling>>\n"),
+&ok( deq( x("=pod\n\nB<pieF<zorch>X<foo>I<pling>>\n"),
   \@( "Document", \%(),
     \@( "Para",   \%(),
       \@("B",     \%(),
@@ -98,7 +97,7 @@ $hashes_dont_matter = 1;
   )
 ));
 
-&ok( < deq( < x("=over\n\n=item B<pieF<zorch>X<foo>I<pling>>!\n\n=back"),
+&ok( deq( x("=over\n\n=item B<pieF<zorch>X<foo>I<pling>>!\n\n=back"),
   \@( "Document", \%(),
     \@( "over-text", \%(),
       \@( "item-text", \%(),
@@ -129,14 +128,14 @@ sub deq { # deep-equals
   if(UNIVERSAL::isa(@_[0], 'ARRAY')) {
     return '' unless (nelems @{@_[0]}) == nelems @{@_[1]};
     for(my $i = 0; $i +< nelems @{@_[0]}; $i++) {
-      print("# NEQ ", < Pod::Simple::pretty(@_[0]),
-          "\n#  != ", < Pod::Simple::pretty(@_[1]), "\n"),
+      print("# NEQ ", Pod::Simple::pretty(@_[0]),
+          "\n#  != ", Pod::Simple::pretty(@_[1]), "\n"),
        return '' unless deq(@_[0]->[$i], @_[1]->[$i]); # recurse!
     }
     return 1;
   } elsif(UNIVERSAL::isa(@_[0], 'HASH')) {
     return 1 if $hashes_dont_matter;
-    return '' unless keys %{@_[0]} == keys %{@_[1]};
+    return '' unless nelems(@(keys %{@_[0]})) == (nelems(@( keys %{@_[1]})));
     foreach my $k (keys %{@_[0]}) {
       return '' unless exists @_[1]->{$k};
       return '' unless deq(@_[0]->{$k}, @_[1]->{$k});

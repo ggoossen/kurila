@@ -146,7 +146,7 @@ sub cylindrical_to_cartesian {
 }
 
 sub cylindrical_to_spherical {
-    return  @( cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) ) );
+    return  @( < cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) ) );
 }
 
 sub great_circle_distance {
