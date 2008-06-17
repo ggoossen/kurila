@@ -342,7 +342,7 @@ sub unixify ($) {
       my($steps) = shift @dirs;
       for (1..length($steps)) { unshift @dirs, '..'; }
     }
-    join('/',@dirs) . "/$base";
+    return join('/',@dirs) . "/$base";
   }
   else {
     $fspec = rmsexpand($fspec,'_N_O_T_:[_R_E_A_L_]');
@@ -353,7 +353,7 @@ sub unixify ($) {
       my($steps) = shift @dirs;
       for (1..length($steps)) { unshift @dirs, '..'; }
     }
-    "/$dev/" . join('/',@dirs) . "/$base";
+    return "/$dev/" . join('/',@dirs) . "/$base";
   }
 }
 

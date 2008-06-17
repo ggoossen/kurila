@@ -154,7 +154,7 @@ sub plan {
 
     _reset_globals();
 
-    _read_program( (caller)[[1]] );
+    _read_program( @(caller)[[1]] );
 
     my $max=0;
     while ((nelems @_)) {

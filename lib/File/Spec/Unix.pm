@@ -372,8 +372,8 @@ sub abs2rel {
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume;
 
-    my $path_directories = ( <$self->splitpath($path, 1))[[1]];
-    my $base_directories = ( <$self->splitpath($base, 1))[[1]];
+    my $path_directories = $self->splitpath($path, 1)[[1]];
+    my $base_directories = $self->splitpath($base, 1)[[1]];
 
     # For UNC paths, the user might give a volume like //foo/bar that
     # strictly speaking has no directory portion.  Treat it as if it
@@ -388,7 +388,7 @@ sub abs2rel {
 
     if ($base_directories eq $self->rootdir) {
       shift @pathchunks;
-      return $self->canonpath( < $self->catpath('', < $self->catdir( < @pathchunks ), '') );
+      return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') );
     }
 
     while ((nelems @pathchunks) && nelems @basechunks && $self->_same(@pathchunks[0], @basechunks[0])) {

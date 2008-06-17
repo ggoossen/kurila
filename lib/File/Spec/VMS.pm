@@ -252,7 +252,7 @@ sub splitpath {
     my($dev,$dir,$file) = ('','','');
 
     vmsify($path) =~ m/(.+:)?([\[<].*[\]>])?(.*)/s;
-    return ($1 || '',$2 || '',$3);
+    return @($1 || '',$2 || '',$3);
 }
 
 =item splitdir (override)
@@ -264,7 +264,7 @@ Split dirspec using VMS syntax.
 sub splitdir {
     my($self,$dirspec) = <@_;
     my @dirs = @();
-    return < @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
+    return @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
     $dirspec =~ s/</[/g;
     $dirspec =~ s/>/]/g;			# < and >	==> [ and ]
     $dirspec =~ s/\]\[\./\.\]\[/g;		# ][.		==> .][
@@ -433,7 +433,7 @@ sub rel2abs {
 # Please consider these two methods deprecated.  Do not patch them,
 # patch the ones in ExtUtils::MM_VMS instead.
 sub eliminate_macros {
-    my($self,$path) = @_;
+    my($self,$path) = <@_;
     return '' unless (defined $path) && ($path ne '');
     $self = \%() unless ref $self;
 
@@ -441,8 +441,8 @@ sub eliminate_macros {
       return join ' ', map { $self->eliminate_macros($_) } split m/\s+/, $path;
     }
 
-    my($npath) = unixify($path);
-    my($complex) = 0;
+    my $npath = unixify($path);
+    my $complex = 0;
     my($head,$macro,$tail);
 
     # perform m##g in scalar context so it acts as an iterator
@@ -451,7 +451,7 @@ sub eliminate_macros {
             ($head,$macro,$tail) = ($1,$2,$3);
             if (ref $self->{$macro}) {
                 if (ref $self->{$macro} eq 'ARRAY') {
-                    $macro = join ' ', @{$self->{$macro}};
+                    $macro = join ' ', <@{$self->{$macro}};
                 }
                 else {
                     print "Note: can't expand macro \$($macro) containing ",ref($self->{$macro}),

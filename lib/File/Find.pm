@@ -584,6 +584,7 @@ sub is_tainted_pp {
     my $nada = substr($arg, 0, 0); # zero-length
     local $@;
     try { eval "# $nada" };
+    die if $@;
     return length($@) != 0;
 }
 
@@ -936,7 +937,7 @@ sub _find_dir($$$) {
 		    # Seen all the subdirs?
 		    # check for directoriness.
 		    # stat is faster for a file in the current directory
-		    $sub_nlink = (lstat ($no_chdir ? $dir_pref . $FN : $FN))[[3]];
+		    $sub_nlink = @(lstat ($no_chdir ? $dir_pref . $FN : $FN))[[3]];
 
 		    if (-d _) {
 			--$subcount;

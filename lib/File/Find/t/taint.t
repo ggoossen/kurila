@@ -28,7 +28,7 @@ BEGIN {
 				 or
 				 substr($dir,0,1) ne "/"
 				 or
-				 (stat $dir)[[2]] ^&^ 002);
+				 @(stat $dir)[[2]] ^&^ 002);
     }
     %ENV{'PATH'} = join($sep,< @path);
 }
@@ -45,7 +45,7 @@ cleanup();
 
 my $found;
 find(\%(wanted => sub { $found = 1 if ($_ eq 'commonsense.t') },
-		untaint => 1, untaint_pattern => qr|^(.+)$|), < File::Spec->curdir);
+        untaint => 1, untaint_pattern => qr|^(.+)$|), File::Spec->curdir);
 
 ok($found, 'commonsense.t found');
 $found = 0;

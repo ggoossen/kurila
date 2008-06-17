@@ -410,7 +410,7 @@ E.g.
 sub file_name_is_absolute {
     my ($self,$file) = < @_;
     if ($file =~ m/:/) {
-	return  @(! ($file =~ m/^:/s) );
+	return ! ($file =~ m/^:/s);
     } elsif ( $file eq '' ) {
         return 1 ;
     } else {
@@ -433,7 +433,7 @@ sub path {
 #  Under MPW, it has a meaning.
 #
     return unless exists %ENV{Commands};
-    return split(m/,/, %ENV{Commands});
+    return @(split(m/,/, %ENV{Commands}));
 }
 
 =item splitpath
@@ -697,7 +697,7 @@ sub abs2rel {
     # @basechunks now contains the number of directories to climb out of.
     $base_dirs = (':' x nelems @basechunks) . ':' ;
 
-    return $self->catpath( '', < $self->catdir( $base_dirs, $path_dirs ), $path_file ) ;
+    return $self->catpath( '', $self->catdir( $base_dirs, $path_dirs ), $path_file ) ;
 }
 
 =item rel2abs
@@ -740,7 +740,7 @@ sub rel2abs {
 	# Split up paths
 
 	# igonore $path's volume
-        my ( $path_dirs, $path_file ) = ( <$self->splitpath($path))[[1,2]] ;
+        my ( $path_dirs, $path_file ) = $self->splitpath($path)[[1,2]] ;
 
         # ignore $base's file part
 	my ( $base_vol, $base_dirs ) = < $self->splitpath($base) ;

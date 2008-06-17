@@ -753,7 +753,8 @@ sub tryfunc {
     }
 
     $function =~ s/^([^\$].*->)/File::Spec::$1/;
-    my $got = join ',', eval $function;
+    my $got = eval $function;
+    $got = join ',', <$got if (ref \$got) eq "ARRAY";
 
     if ( $@ ) {
       if ( $@->{description} =~ m/^\Q$skip_exception/ ) {

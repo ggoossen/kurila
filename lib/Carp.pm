@@ -43,8 +43,8 @@ sub shortmess_jmp  {
 
 sub croak   { die <  shortmess < @_ }
 sub confess { die <  longmess  < @_ }
-sub carp    { warn < shortmess < @_ }
-sub cluck   { warn < longmess  < @_ }
+sub carp    { warn shortmess < @_ }
+sub cluck   { warn longmess  < @_ }
 
 1;
 __END__

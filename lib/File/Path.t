@@ -17,7 +17,7 @@ my $Is_VMS   = $^O eq 'VMS';
 # first check for stupid permissions second for full, so we clean up
 # behind ourselves
 for my $perm (0111,0777) {
-    my $path = catdir( <curdir(), "mhx", "bar");
+    my $path = catdir(curdir(), "mhx", "bar");
     mkpath($path);
     chmod $perm, "mhx", $path;
 
@@ -31,16 +31,16 @@ for my $perm (0111,0777) {
 
 # find a place to work
 my ($error, $list, $file, $message);
-my $tmp_base = catdir( <
+my $tmp_base = catdir(
     curdir(),
     sprintf( 'test-%x-%x-%x', time, $$, rand(99999) ),
 );
 
 # invent some names
-my @dir = @( <
-    catdir($tmp_base, qw(a b)), <
-    catdir($tmp_base, qw(a c)), <
-    catdir($tmp_base, qw(z b)), <
+my @dir = @(
+    catdir($tmp_base, qw(a b)),
+    catdir($tmp_base, qw(a c)),
+    catdir($tmp_base, qw(z b)),
     catdir($tmp_base, qw(z c)),
 );
 
@@ -62,7 +62,7 @@ my $dir2;
 
 SKIP: {
     $dir = catdir($tmp_base, 'B');
-    $dir2 = catdir($dir, < updir());
+    $dir2 = catdir($dir, updir());
     # IOW: File::Spec->catdir( qw(foo bar), File::Spec->updir ) eq 'foo'
     # rather than foo/bar/..    
     skip "updir() canonicalises path on this platform", 2
@@ -110,13 +110,13 @@ is($count, $removed, "removed directory safe mode");
 # mkdir foo ./E/../Y
 # Y should exist
 # existence of E is neither here nor there
-$dir = catdir($tmp_base, 'E', < updir(), 'Y');
+$dir = catdir($tmp_base, 'E', updir(), 'Y');
 @created = @( <mkpath($dir) );
 cmp_ok(scalar(nelems @created), '+>=', 1, "made one or more dirs because of ..");
 cmp_ok(scalar(nelems @created), '+<=', 2, "made less than two dirs because of ..");
 ok( -d catdir($tmp_base, 'Y'), "directory after parent" );
 
-@created = @( < mkpath( <catdir( <curdir(), $tmp_base)) );
+@created = @(< mkpath(catdir(curdir(), $tmp_base)) );
 is(scalar(nelems @created), 0, "nothing created")
     or diag(< @created);
 
@@ -221,7 +221,7 @@ SKIP: {
         or diag(< @created);
 }
 
-my $extra =  catdir( <curdir(), qw(EXTRA 1 a));
+my $extra =  catdir(curdir(), qw(EXTRA 1 a));
 
 SKIP: {
     skip "extra scenarios not set up, see eg/setup-extra-tests", 14

@@ -310,13 +310,17 @@ PP(pp_eq)
     }
 #endif
 #ifdef PERL_PRESERVE_IVUV
-    if (SvIOK(TOPs)) {
+
+    SV* sva = sv_2num(TOPm1s);
+    SV* svb = sv_2num(TOPs);
+
+    if (SvIOK(svb)) {
 	/* Unless the left argument is integer in range we are going
 	   to have to use NV maths. Hence only attempt to coerce the
 	   right argument if we know the left is integer.  */
-	if (SvIOK(TOPm1s)) {
-	    const bool auvok = SvUOK(TOPm1s);
-	    const bool buvok = SvUOK(TOPs);
+	if (SvIOK(sva)) {
+	    const bool auvok = SvUOK(sva);
+	    const bool buvok = SvUOK(svb);
 	
 	    if (auvok == buvok) { /* ## IV == IV or UV == UV ## */
                 /* Casting IV to UV before comparison isn't going to matter
