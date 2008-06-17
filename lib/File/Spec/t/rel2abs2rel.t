@@ -4,7 +4,7 @@
 # VMS has some trouble with these.
 
 use File::Spec;
-use lib < File::Spec->catdir('t', 'lib');
+use lib File::Spec->catdir('t', 'lib');
 
 use Test::More (-x $^X
 		? (tests => 5)
@@ -29,7 +29,7 @@ use Config;
 # Change 'perl' to './perl' so the shell doesn't go looking through PATH.
 sub safe_rel {
     my($perl) = shift;
-    $perl = File::Spec->catfile( <File::Spec->curdir, $perl) unless
+    $perl = File::Spec->catfile(File::Spec->curdir, $perl) unless
       File::Spec->file_name_is_absolute($perl);
 
     return $perl;
@@ -66,8 +66,8 @@ is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$$.pl` works" );
 $perl = File::Spec->canonpath($perl);
 is( sayok($perl), "ok\n",   "canonpath(rel2abs($^X)) = $perl" );
 
-$perl = safe_rel( <File::Spec->abs2rel($perl));
+$perl = safe_rel(File::Spec->abs2rel($perl));
 is( sayok($perl), "ok\n",   "safe_rel(abs2rel(canonpath(rel2abs($^X)))) = $perl" );
 
-$perl = safe_rel( <File::Spec->canonpath($^X));
+$perl = safe_rel(File::Spec->canonpath($^X));
 is( sayok($perl), "ok\n",   "safe_rel(canonpath($^X)) = $perl" );

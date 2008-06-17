@@ -190,7 +190,7 @@ sub abs2rel {
         $path_directories = "$base_directories$path_directories" ;
     }
 
-    return $self->canonpath( < 
+    return $self->canonpath( 
         $self->catpath( "", $path_directories, $path_file ) 
     ) ;
 }

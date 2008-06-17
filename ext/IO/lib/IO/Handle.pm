@@ -429,7 +429,7 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = SelectSaver->new( < qualify(@_[0], caller));
+    my $old = SelectSaver->new( qualify(@_[0], caller));
     my $prev = $|;
     $| = (nelems @_) +> 1 ? @_[1] : 1;
     $prev;

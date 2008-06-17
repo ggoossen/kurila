@@ -539,7 +539,7 @@ sub _gettemp {
 	# in case of odd umask
 	chmod(0700, $path);
 
-	return undef, $path;
+	return @(undef, $path);
       } else {
 
 	# Abort with error if the reason for failure was anything
