@@ -1111,7 +1111,7 @@ sub process_head {
       print HTML "</p>\n";
     }
 
-    my $name = anchorify( < depod( $heading ) );
+    my $name = anchorify( depod( $heading ) );
     my $convert = process_text( \$heading );
     print HTML "<h$level><a name=\"$name\">$convert</a></h$level>\n";
 }
@@ -1125,7 +1125,7 @@ my $EmittedItem;
 
 sub emit_item_tag($$$){
     my( $otext, $text, $compact ) = < @_;
-    my $item = fragment_id( < depod($text) , -generate);
+    my $item = fragment_id( depod($text) , -generate);
     Carp::confess("Undefined fragment '$text' (".depod($text).") from fragment_id() in emit_item_tag() in $Podfile")
         if !defined $item;
     $EmittedItem = $item;
@@ -1137,7 +1137,7 @@ sub emit_item_tag($$$){
     } else {
         my $name = $item;
         $name = anchorify($name);
-	print HTML qq{<a name="$name" class="item">}, < process_text( \$otext ), '</a>';
+	print HTML qq{<a name="$name" class="item">}, process_text( \$otext ), '</a>';
     }
     print HTML "</strong>";
     undef( $EmittedItem );
@@ -1754,13 +1754,13 @@ sub go_ahead($$$){
     my $res = '';
     my @closing = @($closing);
     while( $$rstr =~
-      s/\A(.*?)(([BCEFILSXZ])<(<+\s+)?|{join ' ', < pattern @closing[0]})//s ){
+           s/\A (.*?) (([BCEFILSXZ])<(<+\s+)?| $(pattern @closing[0]) )//xs ){
 	$res .= $1;
 	unless( $3 ){
 	    shift @closing;
-	    return $res unless (nelems @closing);
+	    return $res unless @closing;
 	} else {
-	    unshift @closing, < closing $4;
+	    unshift @closing, closing $4;
 	}
 	$res .= $2;
     }

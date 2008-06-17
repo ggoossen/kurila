@@ -160,7 +160,7 @@ $p->set_source( \@('','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') );
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {
-  print "# Got a token: ", < $t->dump, "\n#\n";
+  print "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
 }
 ok scalar(nelems @t), 5; # count of tokens
@@ -189,7 +189,7 @@ $p->set_source( \@( map "$_\n",
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {
-  print "# Got a token: ", < $t->dump, "\n#\n";
+  print "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
 }
 ok scalar(nelems @t), 5; # count of tokens
@@ -227,7 +227,7 @@ $p->set_source("temp.pod");
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print "# Got a token: ", < $t->dump, "\n#\n";
+  print "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
   print "#  That's token number ", scalar(nelems @t), "\n";
 }
@@ -257,7 +257,7 @@ $p->set_source(*IN);
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print "# Got a token: ", < $t->dump, "\n#\n";
+  print "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
   print "#  That's token number ", scalar(nelems @t), "\n";
 }
@@ -288,7 +288,7 @@ $p->set_source(\*IN);
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print "# Got a token: ", < $t->dump, "\n#\n";
+  print "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
   print "#  That's token number ", scalar(nelems @t), "\n";
 }
@@ -319,7 +319,7 @@ $p->set_source(*IN{IO});
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print "# Got a token: ", < $t->dump, "\n#\n";
+  print "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
   print "#  That's token number ", scalar(nelems @t), "\n";
 }

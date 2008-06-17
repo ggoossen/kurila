@@ -368,32 +368,16 @@ BEGIN {
     sub CRLF () {"\015\012"}
 }
 
-*CR   = \ <CR();
-*LF   = \ <LF();
-*CRLF = \ <CRLF();
+*CR   = \CR();
+*LF   = \LF();
+*CRLF = \CRLF();
 
 sub sockaddr_in {
-    if ((nelems @_) == 6 && !wantarray) { # perl5.001m compat; use this && die
-	my($af, $port, < @quad) = < @_;
-	warnings::warn "6-ARG sockaddr_in call is deprecated" 
-	    if warnings::enabled();
-	pack_sockaddr_in($port, < inet_aton(join('.', < @quad)));
-    } elsif (wantarray) {
-	croak "usage:   (port,iaddr) = sockaddr_in(sin_sv)" unless (nelems @_) == 1;
-        unpack_sockaddr_in(< @_);
+    if (nelems @_ == 1) {
+        return unpack_sockaddr_in(< @_);
     } else {
-	croak "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
-        pack_sockaddr_in(< @_);
-    }
-}
-
-sub sockaddr_un {
-    if (wantarray) {
-	croak "usage:   (filename) = sockaddr_un(sun_sv)" unless (nelems @_) == 1;
-        unpack_sockaddr_un(< @_);
-    } else {
-	croak "usage:   sun_sv = sockaddr_un(filename)" unless (nelems @_) == 1;
-        pack_sockaddr_un(< @_);
+	die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
+        return pack_sockaddr_in(< @_);
     }
 }
 

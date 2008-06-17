@@ -27,7 +27,7 @@ print "# Testing VerbatimFormatted...\n";
     # #:^^^^^^^^^^^^^^^^^              /////////////         
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -40,7 +40,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -53,7 +53,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -65,7 +65,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -74,7 +74,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -83,7 +83,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -92,7 +92,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -102,7 +102,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 # with a tab:
 q{=pod
 
@@ -114,7 +114,7 @@ q{=pod
 
 
 # Now testing the % too:
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
   What do you want?  i like pie. [or whatever]
@@ -123,7 +123,7 @@ q{=pod
 );
 
 
-&ok( < Pod::Simple::XMLOutStream->_out(\&with_vf,
+&ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 
    Hooboy!

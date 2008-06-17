@@ -44,7 +44,7 @@ ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo\n>\n"),
 
 
 print "#\n# Tests for wedges outside of formatting codes...\n";
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\nX < 3 and N > 19\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\nX < 3 and N > 19\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\nX E<lt> 3 and N E<gt> 19\n")
 );
 

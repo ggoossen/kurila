@@ -31,61 +31,61 @@ sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 print "# Testing some basic mnemonic E sequences...\n";
 
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<lt>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<lt>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1<2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<gt>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<gt>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1>2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<verbar>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<verbar>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1|2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<sol>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<sol>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1/2\n")
 );
 
 
 print "# Testing some more mnemonic E sequences...\n";
 
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<apos>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<apos>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1'2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<quot>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<quot>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1\"2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1&2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1&2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<amp>2\n")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<eacute>2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<eacute>2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<233>2\n")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<infin>2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<infin>2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<8734>2\n")
 );
 
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<lchevron>2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<lchevron>2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<171>2\n")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<rchevron>2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<rchevron>2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<187>2\n")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<laquo>2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<laquo>2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<171>2\n")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<raquo>2"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<raquo>2"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1E<187>2\n")
 );
 
 
 
 print "# Testing numeric E sequences...\n";
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<0101>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<0101>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1A2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<65>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<65>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1A2")
 );
-&ok( < Pod::Simple::XMLOutStream->_out("=pod\n\n1E<0x41>2\n"), <
+&ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<0x41>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1A2")
 );
 

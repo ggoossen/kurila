@@ -426,7 +426,7 @@ sub parse_options {
         }
     }
 
-    return wantarray ?  @($return,$input) : $return;
+    return @($return,$input);
 }
 
 =head2 $str = $term->history_as_string

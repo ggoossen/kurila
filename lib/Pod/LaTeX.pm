@@ -830,7 +830,6 @@ Returns array ref in scalar context
 
 sub lists {
   my $self = shift;
-  return @{ $self->{_Lists} } if wantarray();
   return $self->{_Lists};
 }
 
@@ -1292,7 +1291,7 @@ sub interior_sequence {
       my $markup = $link->markup;
       my ($file, $line) = < $pod_seq->file_line();
 
-      return $self->interpolate( <$link->markup, $line);
+      return $self->interpolate( $link->markup, $line);
     }
 
 
@@ -1351,9 +1350,9 @@ sub begin_list {
 
   # Indicate that a list should be started for the next item
   # need to do this to work out the type of list
-  push ( @{$self->lists}, < Pod::List->new(-indent => $indent, 
+  push ( @{$self->lists}, Pod::List->new(-indent => $indent, 
 					-start => $line_num,
-					-file => < $self->input_file,)	 
+					-file => $self->input_file,)	 
        );
 
 }

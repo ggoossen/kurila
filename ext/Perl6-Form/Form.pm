@@ -1061,10 +1061,8 @@ sub linecount($) {
 use warnings::register;
 
 sub form {
-	die "Useless call to &form in void context" unless defined wantarray;
-	
-	# Handle formatting calls...
-	my ($package, $file, $line) = caller;
+  # Handle formatting calls...
+  my ($package, $file, $line) = caller;
     my $caller_opts = %caller_opts{$package,$file} ||= \%();
     if (keys %$caller_opts) {
         $line = first { $_ +< $line } sort {$b<+>$a} keys %$caller_opts;
@@ -1095,7 +1093,7 @@ sub form {
 		}
 		$format =~ s/\n?\z/\n/;
 		$prevformat = $currformat;
-		$currformat = segment($format, < @_, %opts, $fldcnt, %argcache);
+		$currformat = segment($format, @_, \%opts, $fldcnt, %argcache);
 		resolve_overflows($currformat, $prevformat);
 		if (defined %opts{under}) {
 			push @{@section[-1]{formatters}}, < 
@@ -1257,13 +1255,14 @@ sub vals { return ref eq 'HASH' ? values %$_ : < @$_ for @_[0] }
 
 sub drill (\[@%];@) {
     my ($structure, < @indices) = < @_;
-	return $structure unless (nelems @indices);
-	my $index = shift @indices;
-	return @section unless (nelems @indices);
-	for my $index (< @indices) {
-		@section = @( map {section $_, < @$index} < @section );
-	}
-	return @section;
+    return $structure unless (nelems @indices);
+    my $index = shift @indices;
+    my @section = (nelems @$index) ? slice($structure,< @$index) : vals($structure);
+    return @section unless (nelems @indices);
+    for my $index (< @indices) {
+      @section = @( map {section $_, < @$index} < @section );
+    }
+    return @section;
 }
 
 sub break_lit {

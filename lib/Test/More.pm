@@ -497,9 +497,9 @@ sub isa_ok ($$;$) {
     }
     else {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
-        my($rslt, $error) = < $tb->_try(sub { $object->isa($class) });
-        if( $error ) {
-            if( $error =~ m/^Can't call method "isa" on unblessed reference/ ) {
+        my $rslt = try { $object->isa($class) };
+        if( $@ ) {
+            if( $@->message =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 # Its an unblessed reference
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
@@ -509,7 +509,7 @@ sub isa_ok ($$;$) {
                 die <<WHOA;
 WHOA! I tried to call ->isa on your object and got some weird error.
 Here's the error.
-$error
+{$@->message}
 WHOA
             }
         }
@@ -784,7 +784,7 @@ WARNING
     }
     elsif( !ref $got xor !ref $expected ) {  	# one's a reference, one isn't
         $ok = $tb->ok(0, $name);
-	$tb->diag( < _format_stack(\%( vals => \@( $got, $expected ) )) );
+	$tb->diag( _format_stack(\%( vals => \@( $got, $expected ) )) );
     }
     else {			       		# both references
         local @Data_Stack = @( () );

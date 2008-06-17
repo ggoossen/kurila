@@ -54,8 +54,6 @@ BEGIN {
     $HISTORY_FH = \*STDOUT;
 
     for my $func ( < @EXPORT ) {
-        no strict 'refs';
-        
         *{Symbol::fetch_glob($func)} = sub {  my $msg     = shift;
                         $log->store(
                                 message => $msg,
@@ -69,7 +67,7 @@ BEGIN {
     sub history_as_string {
         my $class = shift;
 
-        return join $/, map { < $_->message } < __PACKAGE__->stack;
+        return join $/, map { < $_->message } < Log::Message::Simple->stack;
     }
 }
 

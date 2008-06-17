@@ -38,7 +38,7 @@ sub new {
 sub init {
   my $self = shift;
   $self->inc(1);
-  $self->verbose( <DEBUG);
+  $self->verbose( DEBUG);
   return $self;
 }
 
@@ -55,7 +55,7 @@ sub survey {
   $self->{'_dirs_visited'} = \%();
   $self->path2name( \%() );
   $self->name2path( \%() );
-  $self->limit_re( < $self->_limit_glob_to_limit_re ) if $self->{'limit_glob'};
+  $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{'limit_glob'};
   my $cwd = cwd();
   my $verbose  = $self->verbose;
   local $_; # don't clobber the caller's $_ !
@@ -115,9 +115,7 @@ sub survey {
   $self->progress and $self->progress->done(
    "Noted %$self{'_scan_count'} Pod files total");
 
-  return unless defined wantarray; # void
-  return $self->name2path unless wantarray; # scalar
-  return $self->name2path, $self->path2name; # list
+  return $self->name2path;
 }
 
 
@@ -337,7 +335,7 @@ sub _recurse_dir {
           $verbose +> 1 and print "OK, pruning";
         } else {
           # Otherwise, recurse into it
-          $recursor->( < File::Spec->catdir($dir_long, $i) , $i);
+          $recursor->( File::Spec->catdir($dir_long, $i) , $i);
         }
       } else {
         $verbose +> 1 and print "Skipping oddity $i_full\n";

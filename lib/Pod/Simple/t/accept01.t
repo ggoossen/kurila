@@ -70,17 +70,17 @@ sub starts_with {
 }
 
 
-ok( starts_with( < $x->_out( "=pod\n\nB<N<foo\t>>\n"), # without the mutor
+ok( starts_with( $x->_out( "=pod\n\nB<N<foo\t>>\n"), # without the mutor
   '<Document><Para><B>foo </B></Para>'
   # make sure it DOESN'T pass thru the N<...>, when not accepted
 ));
 
-ok( starts_with( < $x->_out( "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"), # !mutor
+ok( starts_with( $x->_out( "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"), # !mutor
   '<Document><Para><B>pie<F>zorch</F>foo<I>pling</I></B></Para>'
   # make sure it DOESN'T pass thru the N<...>, when not accepted
 ));
 
-ok( starts_with( < $x->_out( "=pod\n\nB<pieF<zorch>N<C<foo>>I<pling>>\n"), # !mutor
+ok( starts_with( $x->_out( "=pod\n\nB<pieF<zorch>N<C<foo>>I<pling>>\n"), # !mutor
   '<Document><Para><B>pie<F>zorch</F><C>foo</C><I>pling</I></B></Para>'
   # make sure it DOESN'T pass thru the N<...>, when not accepted
 ));

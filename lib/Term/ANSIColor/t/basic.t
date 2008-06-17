@@ -31,7 +31,7 @@ if (colored ("testing", 'blue', 'bold') eq "\e[34;1mtesting\e[0m") {
 }
 
 # Test the constants.
-if (BLUE < BOLD "testing" eq "\e[34m\e[1mtesting") {
+if (BLUE BOLD "testing" eq "\e[34m\e[1mtesting") {
     print "ok 4\n";
 } else {
     print "not ok 4\n";
@@ -39,7 +39,7 @@ if (BLUE < BOLD "testing" eq "\e[34m\e[1mtesting") {
 
 # Test AUTORESET.
 $Term::ANSIColor::AUTORESET = 1;
-if (BLUE < BOLD "testing" eq "\e[34m\e[1mtesting\e[0m\e[0m") {
+if (BLUE BOLD "testing" eq "\e[34m\e[1mtesting\e[0m\e[0m") {
     print "ok 5\n";
 } else {
     print "not ok 5\n";
@@ -51,7 +51,7 @@ if (colored ("test\n\ntest", 'bold')
     eq "\e[1mtest\e[0m\n\n\e[1mtest\e[0m") {
     print "ok 6\n";
 } else {
-    print < colored ("test\n\ntest", 'bold'), "\n";
+    print colored ("test\n\ntest", 'bold'), "\n";
     print "not ok 6\n";
 }
 

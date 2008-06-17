@@ -32,13 +32,13 @@ my $h = gethost('localhost');
 ok(defined $h,  "gethost('localhost')") ||
   DIE("Can't continue without working gethost: $!");
 
-is( inet_ntoa( <$h->addr), "127.0.0.1",   'addr from gethost' );
+is( inet_ntoa($h->addr), "127.0.0.1",   'addr from gethost' );
 
 my $i = gethostbyaddr(inet_aton("127.0.0.1"));
 ok(defined $i,  "gethostbyaddr('127.0.0.1')") || 
   DIE("Can't continue without working gethostbyaddr: $!");
 
-is( inet_ntoa( <$i->addr), "127.0.0.1",   'addr from gethostbyaddr' );
+is( inet_ntoa($i->addr), "127.0.0.1",   'addr from gethostbyaddr' );
 
 # need to skip the name comparisons on Win32 because windows will
 # return the name of the machine instead of "localhost" when resolving

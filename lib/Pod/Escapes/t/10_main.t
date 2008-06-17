@@ -76,7 +76,7 @@ ok e2char('65') ne e2char('lt');
 print "# eacute tests...\n";
 ok defined e2char('eacute');
 
-print "#    eacute is <", < e2char('eacute'), "> which is code ",
+print "#    eacute is <", e2char('eacute'), "> which is code ",
       ord(e2char('eacute')), "\n";
 
 ok e2char('eacute'), e2char('233');
@@ -87,7 +87,7 @@ ok e2char('eacute'), e2char('xE9');
 print "# pi tests...\n";
 ok defined e2char('pi');
 
-print "#    pi is <", < e2char('pi'), "> which is code ",
+print "#    pi is <", e2char('pi'), "> which is code ",
       ord(e2char('pi')), "\n";
 
 ok e2char('pi'), e2char('960');

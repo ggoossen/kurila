@@ -190,10 +190,10 @@ sub load_loc {
 	die "Unknown Style: $style";
     }
 
-    return %Loc{$pkg}, sub {
+    return @(%Loc{$pkg}, sub {
 	$lh = $pkg->get_handle(< @_);
 	$lh = $pkg->get_handle(< @_);
-    };
+    });
 }
 
 sub default_loc {

@@ -93,7 +93,7 @@ sub caller_info {
 
   my $sub_name = Carp::get_subname(\%call_info);
   if (%call_info{has_args}) {
-    my @args = @( map { <Carp::format_arg($_)} < @DB::args );
+    my @args = @( map { Carp::format_arg($_)} < @DB::args );
     if ($MaxArgNums and (nelems @args) +> $MaxArgNums) { # More than we want to show?
       splice @args, $MaxArgNums;
       push @args, '...';
@@ -102,7 +102,7 @@ sub caller_info {
     $sub_name .= '(' . join (', ', < @args) . ')';
   }
   %call_info{sub_name} = $sub_name;
-  return wantarray() ? %call_info : \%call_info;
+  return %call_info;
 }
 
 # Transform an argument to a function into a string.
@@ -291,9 +291,9 @@ sub trusts_directly {
     my $class = shift;
     no strict 'refs';
     no warnings 'once'; 
-    return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-)      ? < @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-      : < @{*{Symbol::fetch_glob("$class\::ISA")}};
+    return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}})
+      ? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
+      : @{*{Symbol::fetch_glob("$class\::ISA")}};
 }
 
 1;

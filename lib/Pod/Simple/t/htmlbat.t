@@ -18,9 +18,9 @@ print "# CWD: $cwd\n";
 my $t_dir;
 my $corpus_dir;
 
-foreach my $t_maybe ( <
-  File::Spec->catdir( < File::Spec->updir(), 'lib','Pod','Simple','t'), <
-  File::Spec->catdir( $cwd ), <
+foreach my $t_maybe (
+  File::Spec->catdir( File::Spec->updir(), 'lib','Pod','Simple','t'),
+  File::Spec->catdir( $cwd ),
   File::Spec->catdir( $cwd, 't' ),
   'OHSNAP'
 ) {

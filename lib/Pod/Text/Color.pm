@@ -39,14 +39,14 @@ $VERSION = 2.03;
 sub cmd_head1 {
     my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
-    $self->SUPER::cmd_head1 ($attrs, < colored ($text, 'bold'));
+    $self->SUPER::cmd_head1 ($attrs, colored ($text, 'bold'));
 }
 
 # Make level two headings bold.
 sub cmd_head2 {
     my ($self, $attrs, $text) = < @_;
     $text =~ s/\s+$//;
-    $self->SUPER::cmd_head2 ($attrs, < colored ($text, 'bold'));
+    $self->SUPER::cmd_head2 ($attrs, colored ($text, 'bold'));
 }
 
 # Fix the various formatting codes.

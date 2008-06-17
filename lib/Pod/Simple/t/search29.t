@@ -55,7 +55,7 @@ if(        -e ($here1 = source_path(   'testlib1'      ))) {
 print "# OK, found the test corpora\n#  as $here1\n# and $here2\n# and $here3\n#\n";
 ok 1;
 
-print < $x->_state_as_string;
+print $x->_state_as_string;
 #$x->verbose(12);
 
 use Pod::Simple;
@@ -65,12 +65,7 @@ my $glob = '*z?k*';
 print "# Limiting to $glob\n";
 $x->limit_glob($glob);
 
-my($name2where, $where2name) = < $x->survey($here1, $here2, $here3);
-
-my $p = pretty( $where2name, $name2where )."\n";
-$p =~ s/, +/,\n/g;
-$p =~ s/^/#  /mg;
-print $p;
+my $name2where = $x->survey($here1, $here2, $here3);
 
 {
 my $names = join "|", sort values %$where2name;

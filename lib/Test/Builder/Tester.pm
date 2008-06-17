@@ -5,7 +5,6 @@ our $VERSION = "1.13";
 
 use Test::Builder;
 use Symbol;
-use Carp;
 
 =head1 NAME
 
@@ -337,7 +336,7 @@ sub test_test
    }
 
     # er, are we testing?
-    croak "Not testing.  You must declare output with a test function first."
+    die "Not testing.  You must declare output with a test function first."
 	unless $testing;
 
     # okay, reconnect the test suite back to the saved handles
