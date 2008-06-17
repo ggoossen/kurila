@@ -4131,13 +4131,13 @@ Perl_yylex(pTHX)
 	if (*s++ == '>')
 	    SHop(OP_RIGHT_SHIFT);
 	
-	yyerror(aTHX_ "'>' is reserved for hashes");
+	yyerror("'>' is reserved for hashes");
 
     case '$':
 	CLINE;
 
 	if (s[1] == '#' && (isIDFIRST_lazy_if(s+2,UTF) || strchr("{$:+-", s[2]))) {
-	    yyerror(aTHX_ "$# is not allowed");
+	    yyerror("$# is not allowed");
 	}
 
 	if (s[1] == '(') {

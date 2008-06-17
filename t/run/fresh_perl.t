@@ -219,25 +219,12 @@ print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
 ok
 ########
-sub thing { 0 || return qw(now is the time) }
-print thing(), "\n";
-EXPECT
-nowisthetime
-########
 our $ren = 'joy';
 our $stimpy = 'happy';
 { local %main::{ren} = *stimpy; print $ren, ' ' }
 print $ren, "\n";
 EXPECT
 happy joy
-########
-package p;
-sub func { print 'really ' unless wantarray; 'p' }
-sub groovy { 'groovy' }
-package main;
-print p::func()->groovy(), "\n"
-EXPECT
-really groovy
 ########
 my $a = 'outer';
 eval q[ my $a = 'inner'; eval q[ print "$a " ] ];
@@ -527,51 +514,6 @@ ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 our $eval = eval 'sub { eval q|sub { %S }| }';
 $eval->(\%());
-######## glob() bug Mon, 01 Sep 2003 02:25:41 -0700 <200309010925.h819Pf0X011457@smtp3.ActiveState.com>
--lw
-BEGIN {
-  if ($^O eq 'os390') {
-    require File::Glob;
-    File::Glob->import(':glob');
-  }
-}
-BEGIN {
-  eval 'require Fcntl';
-  if ($@) { print qq[./"TEST"\n./"TEST"\n]; exit 0 } # running minitest?
-}
-if ($^O eq 'VMS') { # VMS is not *that* kind of a glob.
-print qq[./"TEST"\n./"TEST"\n];
-} else {
-print glob(q(./"TEST"));
-use File::Glob;
-print glob(q(./"TEST"));
-}
-EXPECT
-./"TEST"
-./"TEST"
-######## glob() bug Mon, 01 Sep 2003 02:25:41 -0700 <200309010925.h819Pf0X011457@smtp3.ActiveState.com>
--lw
-BEGIN {
-  if ($^O eq 'os390') {
-    require File::Glob;
-    File::Glob->import(':glob');
-  }
-}
-BEGIN {
-  eval 'require Fcntl';
-  if ($@) { print qq[./"TEST"\n./"TEST"\n]; exit 0 } # running minitest?
-}
-if ($^O eq 'VMS') { # VMS is not *that* kind of a glob.
-print qq[./"TEST"\n./"TEST"\n];
-} else {
-use File::Glob;
-print glob(q(./"TEST"));
-use File::Glob;
-print glob(q(./"TEST"));
-}
-EXPECT
-./"TEST"
-./"TEST"
 ######## "Segfault using HTML::Entities", Richard Jolly <richardjolly@mac.com>, <A3C7D27E-C9F4-11D8-B294-003065AE00B6@mac.com> in perl-unicode@perl.org
 -lw
 # SKIP: use Config; %ENV{PERL_CORE_MINITEST} or " %Config::Config{'extensions'} " !~ m[ Encode ] # Perl configured without Encode module

@@ -45,11 +45,11 @@ while building DBIx::Class. Thanks Matt!!!!
     sub foo { 'Diamond_D::foo => ' . (shift)->SUPER::foo }    
 }
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Diamond_D'),
     \@( qw(Diamond_D Diamond_C Diamond_B Diamond_A) )
 ), '... got the right MRO for Diamond_D');
 
-is( <Diamond_D->foo, 
+is(Diamond_D->foo, 
    'Diamond_D::foo => Diamond_B::foo => Diamond_A::foo', 
    '... got the right next::method dispatch path');

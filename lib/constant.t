@@ -1,12 +1,5 @@
 #!./perl -T
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-        chdir 't' if -d 't';
-        @INC = @( '../lib' );
-    }
-}
-
 use warnings;
 use vars qw{ @warnings $fagwoosh $putt $kloong};
 BEGIN {				# ...and save 'em for later
@@ -43,15 +36,15 @@ is UNDEF3, undef,       '    short way';
 
 # XXX Why is this way different than the other ones?
 my @undef = @( < UNDEF1 );
-is (nelems @undef), 1;
+is( (nelems @undef), 1);
 is @undef[0], undef;
 
 @undef = @( < UNDEF2 );
-is (nelems @undef), 0;
+is( (nelems @undef), 0);
 @undef = @( < UNDEF3 );
-is (nelems @undef), 0;
+is( (nelems @undef), 0);
 @undef = @( < EMPTY );
-is (nelems @undef), 0;
+is( (nelems @undef), 0);
 
 use constant COUNTDOWN	=> scalar reverse 1, 2, 3, 4, 5;
 use constant COUNTLIST	=> reverse 1, 2, 3, 4, 5;

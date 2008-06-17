@@ -764,18 +764,11 @@ Perl_scalar(pTHX_ OP *o)
     case OP_REPEAT:
 	scalar(cBINOPo->op_first);
 	break;
-    case OP_OR:
-    case OP_AND:
+
     case OP_COND_EXPR:
 	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
 	    scalar(kid);
 	break;
-    case OP_SPLIT:
-	if ((kid = cLISTOPo->op_first) && kid->op_type == OP_PUSHRE) {
-	    if (!kPMOP->op_pmreplrootu.op_pmreplroot)
-		Perl_croak(aTHX_ "implicit split to @_ is not allowed");
-	}
-	/* FALL THROUGH */
     case OP_MATCH:
     case OP_QR:
     case OP_SUBST:
@@ -810,7 +803,10 @@ Perl_scalar(pTHX_ OP *o)
 	PL_curcop = &PL_compiling;
 	break;
     case OP_LIST:
-	yyerror(Perl_form(aTHX_ "list may not be used in scalar context"));
+    case OP_MAPSTART:
+    case OP_REVERSE:
+    case OP_SPLIT:
+	yyerror(Perl_form(aTHX_ "%s may not be used in scalar context", PL_op_desc[o->op_type]));
 	break;
     case OP_SORT:
 	if (ckWARN(WARN_VOID))

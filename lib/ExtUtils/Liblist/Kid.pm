@@ -365,7 +365,7 @@ sub _win32_ext {
     $lib =~ s,/,\\,g;
 
     warn "Result: $lib\n" if $verbose;
-    wantarray ? ($lib, '', $lib, '', ($give_libs ? \@libs : ())) : $lib;
+    return @($lib, '', $lib, '', ($give_libs ? \@libs : ()));
 }
 
 
@@ -539,7 +539,7 @@ sub _vms_ext {
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;
-  wantarray ? ($lib, '', $ldlib, '', ($give_libs ? \@flibs : ())) : $lib;
+  return @($lib, '', $ldlib, '', ($give_libs ? \@flibs : ()));
 }
 
 1;

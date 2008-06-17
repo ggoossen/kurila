@@ -10,8 +10,6 @@
 # Makefile.PL and $module.pm
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     # FIXME (or rather FIXh2xs)
     require Config;
     if ((%Config::Config{'extensions'} !~ m!\bDevel/PPPort\b!) ){

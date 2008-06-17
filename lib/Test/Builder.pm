@@ -1493,7 +1493,7 @@ Of course, test #1 is $tests[0], etc...
 sub summary {
     my($self) = shift;
 
-    return map { $_->{'ok'} } < @{ $self->{Test_Results} };
+    return @(map { $_->{'ok'} } < @{ $self->{Test_Results} });
 }
 
 =item B<details>

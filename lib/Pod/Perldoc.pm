@@ -1042,8 +1042,7 @@ sub render_findings {
   }
 
   DEBUG and print "Finished writing to $out.\n";
-  return @($out, $formatter) if wantarray;
-  return $out;
+  return @($out, $formatter);
 }
 
 #..........................................................................

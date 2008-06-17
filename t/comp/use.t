@@ -80,7 +80,7 @@ our $version_check;
 eval "use testuse v0.9";
 is ($@, '');
 is $version_check->{'original'}, "v0.9";
-is (nelems @{$testimport}), 1, "import called with only packagename";
+is( (nelems @{$testimport}), 1, "import called with only packagename");
 
 # test the default VERSION check.
 undef *testuse::VERSION;

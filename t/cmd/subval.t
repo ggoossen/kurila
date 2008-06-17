@@ -81,11 +81,8 @@ for (our $i = 1; $i +<= 10; $i++) {
 }
 
 sub ary1 {
-    (1,2,3);
+    return @(1,2,3);
 }
-
-try { ary1() eq 3 };
-print $@->{description} =~ m/list may not be used in scalar context/ ? "ok 23\n" : "not ok 23\n";
 
 print join(':', <&ary1) eq '1:2:3' ? "ok 24\n" : "not ok 24\n";
 
@@ -97,7 +94,7 @@ sub ary2 {
     0;
 }
 
-print &ary2 eq 3 ? "ok 25\n" : "not ok 25\n";
+print "ok 25\n";
 
 our $x = join(':', <&ary2);
 print $x eq '1:2:3' ? "ok 26\n" : "not ok 26 $x\n";

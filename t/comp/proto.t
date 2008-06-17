@@ -180,7 +180,7 @@ testing \&scalar_and_hash, '$%';
 
 sub scalar_and_hash ($%) {
     print "# \@_ = (",join(",",< @_),")\n";
-    scalar(nelems @_)
+    nelems @_;
 }
 
 print "not " unless 1 == scalar_and_hash(1);

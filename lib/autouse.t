@@ -9,7 +9,7 @@ BEGIN {
 }
 
 use Test;
-BEGIN { plan tests => 9; }
+BEGIN { plan tests => 8; }
 
 BEGIN {
     require autouse;
@@ -42,13 +42,9 @@ ok( !exists %INC{$mod_file} );
 ok( EPERM ); # test if non-zero
 ok( exists %INC{$mod_file} );
 
-use autouse Env => "something";
-try { something() };
-ok( $@->{description}, qr/^\Qautoused module Env has unique import() method/ );
-
 # Check that UNIVERSAL.pm doesn't interfere with modules that don't use
 # Exporter and have no import() of their own.
 require UNIVERSAL;
 autouse->import("Class::ISA" => 'self_and_super_versions');
-my %versions = %( self_and_super_versions("Class::ISA") );
+my %versions = %( < self_and_super_versions("Class::ISA") );
 ok( %versions{"Class::ISA"}, $Class::ISA::VERSION );

@@ -709,7 +709,7 @@ sub inc_dirs
            $from_gcc = '';
        };
     };
-    length($from_gcc) ? ($from_gcc, %Config{usrinc}) : (%Config{usrinc});
+    length($from_gcc) ? @($from_gcc, %Config{usrinc}) : @(%Config{usrinc});
 }
 
 

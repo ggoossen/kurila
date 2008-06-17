@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-}
-
 # this must come before main, or tests will fail
 package TieTest;
 

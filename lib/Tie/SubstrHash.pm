@@ -48,15 +48,14 @@ sub TIEHASH {
     my $pack = shift;
     my ($klen, $vlen, $tsize) = < @_;
     my $rlen = 1 + $klen + $vlen;
-    $tsize = \@($tsize, <
-	      findgteprime($tsize * 1.1)); # Allow 10% empty.
+    $tsize = \@($tsize, findgteprime($tsize * 1.1)); # Allow 10% empty.
     local $self = bless \@("\0", $klen, $vlen, $tsize, $rlen, 0, -1);
     @$self[0] x= $rlen * $tsize->[1];
     $self;
 }
 
 sub CLEAR {
-    local($self) = (nelems @_);
+    local($self) = < @_;
     @$self[0] = "\0" x (@$self[4] * @$self[3]->[1]);
     @$self[5] =  0;
     @$self[6] = -1;
@@ -136,13 +135,13 @@ sub DELETE {
 }
 
 sub FIRSTKEY {
-    local($self) = (nelems @_);
+    local($self) = < @_;
     @$self[6] = -1;
     &NEXTKEY;
 }
 
 sub NEXTKEY {
-    local($self) = (nelems @_);
+    local($self) = < @_;
     local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = @$self[[1..6]];
     for (++$iterix; $iterix +< $tsize->[1]; ++$iterix) {
 	next unless substr(@$self[0], $iterix * $rlen, 1) eq "\2";

@@ -1,8 +1,6 @@
 #!./perl -- -*- mode: cperl; cperl-indent-level: 4 -*-
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
     require Config;
     if ((%Config::Config{'extensions'} !~ m!\bList/Util\b!) ){
 	print "1..0 # Skip -- Perl configured without List::Util module\n";
@@ -17,13 +15,13 @@ $|=1;
 my @prgs;
 {
     local $/;
-    @prgs = split "########\n", ~< *DATA;
+    @prgs = @(split "########\n", ~< *DATA);
     close DATA;
 }
 
 use Test::More;
 
-plan tests => scalar @prgs;
+plan tests => (nelems @prgs);
 
 require "dumpvar.pl";
 
@@ -41,11 +39,11 @@ sub dumpvalue {
 
 package Foo;
 
-sub new { my $class = shift; bless \@( @_ ), $class }
+sub new { my $class = shift; bless \@( <@_ ), $class }
 
 package Bar;
 
-sub new { my $class = shift; bless \@( @_ ), $class }
+sub new { my $class = shift; bless \@( <@_ ), $class }
 
 use overload '""' => sub { "Bar<@{@_[0]}>" };
 
@@ -54,7 +52,7 @@ package main;
 my $foo = Foo->new(1..5);
 my $bar = Bar->new(1..5);
 
-for (@prgs) {
+for (<@prgs) {
     my($prog, $expected) = split(m/\nEXPECT\n?/, $_);
     # TODO: dumpvar::stringify() is controlled by a pile of package
     # dumpvar variables: $printUndef, $unctrl, $quoteHighBit, $bareStringify,
@@ -82,7 +80,7 @@ sub TIEHANDLE {
 
 sub PRINT {
     my $self = shift;
-    $$self .= join('', @_);
+    $$self .= join('', <@_);
 }
 
 sub read {

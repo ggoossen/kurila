@@ -300,9 +300,9 @@ sub jleft {
 	$str =~ s/^\s+|\s+$//g;
 	unless (%val{last}) {
 		my $rem = %val{width}-length($str);
-		$str = reverse $str;
+		$str = join '', reverse split m//, $str;
 		1 while $rem+>0 && $str =~ s/( +)/{($rem--+>0?" ":"").$1}/g;
-		@_[0] = reverse $str;
+		@_[0] = join '', reverse split m//, $str;
 	}
 	&jleft;
  }
@@ -484,7 +484,7 @@ $nestedbraces = qr/ \{ (?: (?> ((?!\{|\}).)+ ) | (??{ $nestedbraces }) )* \} /sx
 sub segment ($\@\%$\%) {
 	my ($format, $args, $opts, $fldcnt, $argcache) = < @_;
 	my $width =
-		defined $opts->{page}{width} ? $opts->{page}{width} : length($format);
+		defined $opts->{page}->{width} ? $opts->{page}->{width} : length($format);
 	my $userdef = join("|", < @{$opts->{field}{from}}) || qr/(?!)/;
 	my $bullet  = join("|", map quotemeta, < @{$opts->{bullet}}) || qr/(?!)/;
 	use re 'eval';
@@ -1093,7 +1093,7 @@ sub form {
 		}
 		$format =~ s/\n?\z/\n/;
 		$prevformat = $currformat;
-		$currformat = segment($format, @_, \%opts, $fldcnt, %argcache);
+		$currformat = segment($format, @_, %opts, $fldcnt, %argcache);
 		resolve_overflows($currformat, $prevformat);
 		if (defined %opts{under}) {
 			push @{@section[-1]{formatters}}, < 

@@ -141,10 +141,9 @@ Sean M. Burke C<sburke@cpan.org>
 ###########################################################################
 
 sub self_and_super_versions {
-  no strict 'refs';
-  map {
+  @( map {
         $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ? ${*{Symbol::fetch_glob("$_\::VERSION")}} : undef)
-      } < self_and_super_path(@_[0])
+      } < self_and_super_path(@_[0]))
 }
 
 # Also consider magic like:

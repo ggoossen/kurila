@@ -2,7 +2,7 @@
 
 # tests that aren't important enough for base.term
 
-print "1..14\n";
+print "1..12\n";
 
 our $x = "\\n";
 print "#1\t:$x: eq " . ':\n:' . "\n";
@@ -28,6 +28,3 @@ if ("{$one}b" eq "ab") { print "ok 11\n";} else {print "not ok 11\n";}
 
 my @foo = @(1,2,3);
 if ("@foo[1]b" eq "2b") { print "ok 12\n";} else {print "not ok 12\n";}
-if ("@foo[[0..1]]b" eq "1 2b") { print "ok 13\n";} else {print "not ok 13\n";}
-$" = '::';
-if ("@foo[[0..1]]b" eq "1::2b") { print "ok 14\n";} else {print "not ok 14\n";}

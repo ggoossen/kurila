@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 141 );
+plan( tests => 120 );
 
 our (@a, @b);
 
@@ -270,36 +270,6 @@ main::cmp_ok("{join ' ', <@b}",'eq','90 5 255 1996 19','not in main:: 2');
 # check if context for sort arguments is handled right
 
 
-sub test_if_list {
-    my $gimme = wantarray;
-    main::is($gimme,1,'wantarray 1');
-
-
-}
-my $m = sub { $a <+> $b };
-
-sub cxt_one { sort $m < test_if_list() }
-cxt_one();
-sub cxt_two { sort { $a <+> $b } < test_if_list() }
-cxt_two();
-sub cxt_three { @( sort < &test_if_list()) }
-cxt_three();
-
-sub test_if_scalar {
-    my $gimme = wantarray;
-    main::is(!($gimme or !defined($gimme)),1,'wantarray 2');
-
-
-}
-
-$m = \&test_if_scalar;
-sub cxt_four { sort $m 1,2 }
-our @x = @( < cxt_four() );
-sub cxt_five { sort { test_if_scalar($a,$b); } 1,2 }
-@x = @( < cxt_five() );
-sub cxt_six { sort test_if_scalar 1,2 }
-@x = @( < cxt_six() );
-
 # test against a reentrancy bug
 {
     package Bar;
@@ -320,7 +290,7 @@ sub cxt_six { sort test_if_scalar 1,2 }
 
 
 {
-    sub routine { "one", "two" };
+    sub routine { @("one", "two") };
     @a = @( sort( <routine(1)) );
     main::cmp_ok("{join ' ', <@a}",'eq',"one two",'bug id 19991001.003');
 }
@@ -404,14 +374,14 @@ package main;
 
 sub generate {
     my $count = 0;
-    map { <Oscalar->new($_, $count++)} qw(A A A B B B C C C);
+    @( map { Oscalar->new($_, $count++)} qw(A A A B B B C C C) );
 }
 
 my @input = @( < &generate );
 my @output = @( sort < @input );
 is join(" ", map {0+$_} < @output), "0 1 2 3 4 5 6 7 8", "Simple stable sort";
 
-@input = @( &generate );
+@input = @( < &generate );
 @input = @(sort < @input);
 is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
     "Simple stable in place sort";
@@ -425,7 +395,7 @@ is "{join ' ', <@output}", "A A A B B B C C C", 'stable $a <=> $b sort';
 @output = @( sort {$a cmp $b} < @input );
 is join(" ", map {0+$_} < @output), "0 1 2 3 4 5 6 7 8", 'stable $a cmp $b sort';
 
-@input = @( &generate );
+@input = @( < &generate );
 @input = @(sort {$a cmp $b} < @input);
 is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
     'stable $a cmp $b in place sort';
@@ -434,7 +404,7 @@ is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
 @output = @( sort {$b cmp $a} < @input );
 is join(" ", map {0+$_} < @output), "6 7 8 3 4 5 0 1 2", 'stable $b cmp $a sort';
 
-@input = @( &generate );
+@input = @( < &generate );
 @input = @(sort {$b cmp $a} < @input);
 is join(" ", map {0+$_} < @input), "6 7 8 3 4 5 0 1 2",
     'stable $b cmp $a in place sort';
@@ -449,11 +419,6 @@ is join(" ", map {0+$_} < @input), "8 7 6 5 4 3 2 1 0",
     "Reversed stable in place sort";
 
 @input = @( < &generate );
-my $output = reverse sort < @input;
-is $output, "CCCBBBAAA", "Reversed stable sort in scalar context";
-
-
-@input = @( < &generate );
 @output = @( reverse sort {$a cmp $b} < @input );
 is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
     'reversed stable $a cmp $b sort';
@@ -464,10 +429,6 @@ is join(" ", map {0+$_} < @input), "8 7 6 5 4 3 2 1 0",
     'revesed stable $a cmp $b in place sort';
 
 @input = @( < &generate );
-$output = reverse sort {$a cmp $b} < @input;
-is $output, "CCCBBBAAA", 'Reversed stable $a cmp $b sort in scalar context';
-
-@input = @( < &generate );
 @output = @( reverse sort {$b cmp $a} < @input );
 is join(" ", map {0+$_} < @output), "2 1 0 5 4 3 8 7 6",
     'reversed stable $b cmp $a sort';
@@ -476,10 +437,6 @@ is join(" ", map {0+$_} < @output), "2 1 0 5 4 3 8 7 6",
 @input = @( reverse sort {$b cmp $a} < @input );
 is join(" ", map {0+$_} < @input), "2 1 0 5 4 3 8 7 6",
     'revesed stable $b cmp $a in place sort';
-
-@input = @( < &generate );
-$output = reverse sort {$b cmp $a} < @input;
-is $output, "AAABBBCCC", 'Reversed stable $b cmp $a sort in scalar context';
 
 sub stuff {
     # Something complex enough to defeat any constant folding optimiser
@@ -496,59 +453,43 @@ is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
 is join(" ", map {0+$_} < @input), "8 7 6 5 4 3 2 1 0",
     'revesed stable complex in place sort';
 
-@input = @( < &generate );
-$output = reverse sort {stuff || $a cmp $b } < @input;
-is $output, "CCCBBBAAA", 'Reversed stable complex sort in scalar context';
-
 sub sortr {
-    reverse sort < @_;
+    @( reverse sort < @_ );
 }
 
 @output = @( < sortr < &generate );
 is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
     'reversed stable sort return list context';
-$output = sortr < &generate;
-is $output, "CCCBBBAAA",
-    'reversed stable sort return scalar context';
 
 sub sortcmpr {
-    reverse sort {$a cmp $b} < @_;
+    return @( reverse sort {$a cmp $b} < @_ );
 }
 
 @output = @( < sortcmpr < &generate );
 is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
     'reversed stable $a cmp $b sort return list context';
-$output = sortcmpr < &generate;
-is $output, "CCCBBBAAA",
-    'reversed stable $a cmp $b sort return scalar context';
 
 sub sortcmprba {
-    reverse sort {$b cmp $a} < @_;
+    @( reverse sort {$b cmp $a} < @_ );
 }
 
 @output = @( < sortcmprba < &generate );
 is join(" ", map {0+$_} < @output), "2 1 0 5 4 3 8 7 6",
     'reversed stable $b cmp $a sort return list context';
-$output = sortcmprba < &generate;
-is $output, "AAABBBCCC",
-'reversed stable $b cmp $a sort return scalar context';
 
 sub sortcmprq {
-    reverse sort {stuff || $a cmp $b} < @_;
+    @(reverse sort {stuff || $a cmp $b} < @_);
 }
 
 @output = @( < sortcmpr < &generate );
 is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
     'reversed stable complex sort return list context';
-$output = sortcmpr < &generate;
-is $output, "CCCBBBAAA",
-    'reversed stable complex sort return scalar context';
 
 # And now with numbers
 
 sub generate1 {
     my $count = 'A';
-    map { <Oscalar->new($count++, $_)} 0, 0, 0, 1, 1, 1, 2, 2, 2;
+    @(map { Oscalar->new($count++, $_)} 0, 0, 0, 1, 1, 1, 2, 2, 2);
 }
 
 # This won't be very interesting
@@ -560,7 +501,7 @@ is "{join ' ', <@output}", "A B C D E F G H I", 'stable $a cmp $b sort';
 @output = @( sort {$a <+> $b} < @input );
 is "{join ' ', <@output}", "A B C D E F G H I", 'stable $a <=> $b sort';
 
-@input = @( &generate1 );
+@input = @( < &generate1 );
 @input = @(sort {$a <+> $b} < @input);
 is "{join ' ', <@input}", "A B C D E F G H I", 'stable $a <=> $b in place sort';
 
@@ -568,7 +509,7 @@ is "{join ' ', <@input}", "A B C D E F G H I", 'stable $a <=> $b in place sort';
 @output = @( sort {$b <+> $a} < @input );
 is "{join ' ', <@output}", "G H I D E F A B C", 'stable $b <=> $a sort';
 
-@input = @( &generate1 );
+@input = @( < &generate1 );
 @input = @(sort {$b <+> $a} < @input);
 is "{join ' ', <@input}", "G H I D E F A B C", 'stable $b <=> $a in place sort';
 
@@ -592,20 +533,12 @@ is "{join ' ', <@output}", "I H G F E D C B A", "Reversed stable sort";
 is "{join ' ', <@input}", "I H G F E D C B A", "Reversed stable in place sort";
 
 @input = @( < &generate1 );
-$output = reverse sort < @input;
-is $output, "IHGFEDCBA", "Reversed stable sort in scalar context";
-
-@input = @( < &generate1 );
 @output = @( reverse sort {$a <+> $b} < @input );
 is "{join ' ', <@output}", "I H G F E D C B A", 'reversed stable $a <=> $b sort';
 
 @input = @( < &generate1 );
 @input = @( reverse sort {$a <+> $b} < @input );
 is "{join ' ', <@input}", "I H G F E D C B A", 'revesed stable $a <=> $b in place sort';
-
-@input = @( < &generate1 );
-$output = reverse sort {$a <+> $b} < @input;
-is $output, "IHGFEDCBA", 'reversed stable $a <=> $b sort in scalar context';
 
 @input = @( < &generate1 );
 @output = @( reverse sort {$b <+> $a} < @input );
@@ -616,10 +549,6 @@ is "{join ' ', <@output}", "C B A F E D I H G", 'reversed stable $b <=> $a sort'
 is "{join ' ', <@input}", "C B A F E D I H G", 'revesed stable $b <=> $a in place sort';
 
 @input = @( < &generate1 );
-$output = reverse sort {$b <+> $a} < @input;
-is $output, "CBAFEDIHG", 'reversed stable $b <=> $a sort in scalar context';
-
-@input = @( < &generate1 );
 @output = @( reverse sort {stuff || $a <+> $b} < @input );
 is "{join ' ', <@output}", "I H G F E D C B A", 'reversed stable complex sort';
 
@@ -627,39 +556,29 @@ is "{join ' ', <@output}", "I H G F E D C B A", 'reversed stable complex sort';
 @input = @( reverse sort {stuff || $a <+> $b} < @input );
 is "{join ' ', <@input}", "I H G F E D C B A", 'revesed stable complex in place sort';
 
-@input = @( < &generate1 );
-$output = reverse sort {stuff || $a <+> $b} < @input;
-is $output, "IHGFEDCBA", 'reversed stable complex sort in scalar context';
-
 sub sortnumr {
-    reverse sort {$a <+> $b} < @_;
+    @(reverse sort {$a <+> $b} < @_);
 }
 
 @output = @( < sortnumr < &generate1 );
 is "{join ' ', <@output}", "I H G F E D C B A",
     'reversed stable $a <=> $b sort return list context';
-$output = sortnumr < &generate1;
-is $output, "IHGFEDCBA", 'reversed stable $a <=> $b sort return scalar context';
 
 sub sortnumrba {
-    reverse sort {$b <+> $a} < @_;
+    @(reverse sort {$b <+> $a} < @_);
 }
 
 @output = @( < sortnumrba < &generate1 );
 is "{join ' ', <@output}", "C B A F E D I H G",
     'reversed stable $b <=> $a sort return list context';
-$output = sortnumrba < &generate1;
-is $output, "CBAFEDIHG", 'reversed stable $b <=> $a sort return scalar context';
 
 sub sortnumrq {
-    reverse sort {stuff || $a <+> $b} < @_;
+    @(reverse sort {stuff || $a <+> $b} < @_);
 }
 
 @output = @( < sortnumrq < &generate1 );
 is "{join ' ', <@output}", "I H G F E D C B A",
     'reversed stable complex sort return list context';
-$output = sortnumrq < &generate1;
-is $output, "IHGFEDCBA", 'reversed stable complex sort return scalar context';
 
 @output = @( reverse (sort(qw(C A B)), 0) );
 is "{join ' ', <@output}", "0 C B A", 'reversed sort with trailing argument';
@@ -771,7 +690,7 @@ main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'in-pl
 
 
 # Using return() should be okay even in a deeper context
-@b = @( sort {while (1) {return  @($a <+> $b)} } 1..10 );
+@b = @( sort {while (1) {return  $a <+> $b} } 1..10 );
 main::is("{join ' ', <@b}", "1 2 3 4 5 6 7 8 9 10", "return within loop");
 
 # Using return() should be okay even if there are other items

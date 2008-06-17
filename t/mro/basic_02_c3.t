@@ -79,37 +79,37 @@ Level 0                 0 | A |                (more specialized)
     use mro 'c3';    
 }
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Test::F'),
     \@( qw(Test::F Test::O) )
 ), '... got the right MRO for Test::F');
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Test::E'),
     \@( qw(Test::E Test::O) )
 ), '... got the right MRO for Test::E');    
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Test::D'),
     \@( qw(Test::D Test::O) )
 ), '... got the right MRO for Test::D');       
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Test::C'),
     \@( qw(Test::C Test::D Test::F Test::O) )
 ), '... got the right MRO for Test::C'); 
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Test::B'),
     \@( qw(Test::B Test::D Test::E Test::O) )
 ), '... got the right MRO for Test::B');     
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Test::A'),
     \@( qw(Test::A Test::B Test::C Test::D Test::E Test::F Test::O) )
 ), '... got the right MRO for Test::A');  
     
-is( <'Test::A'->C_or_D, 'Test::C', '... got the expected method output');
-is( <'Test::A'->can('C_or_D')->(), 'Test::C', '... can got the expected method output');
-is( <'Test::A'->C_or_E, 'Test::C', '... got the expected method output');
-is( <'Test::A'->can('C_or_E')->(), 'Test::C', '... can got the expected method output');
+is('Test::A'->C_or_D, 'Test::C', '... got the expected method output');
+is('Test::A'->can('C_or_D')->(), 'Test::C', '... can got the expected method output');
+is('Test::A'->C_or_E, 'Test::C', '... got the expected method output');
+is('Test::A'->can('C_or_E')->(), 'Test::C', '... can got the expected method output');

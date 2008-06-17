@@ -1392,7 +1392,10 @@ Perl_do_readline(pTHX)
 	    XPUSHs(SvTIED_obj((SV*)io, mg));
 	    PUTBACK;
 	    ENTER;
-	    call_method("READLINE", gimme);
+	    if (gimme == G_ARRAY)
+		call_method("READLINES", gimme);
+	    else
+		call_method("READLINE", gimme);
 	    LEAVE;
 	    SPAGAIN;
 	    if (gimme == G_SCALAR) {

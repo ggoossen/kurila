@@ -602,8 +602,8 @@ sub config_sh {
 
 sub config_re {
     my $re = shift;
-    return map { chomp; $_ } grep try{ m/^(?:$re)=/ }, split m/^/,
-    $Config_SH_expanded;
+    return @(map { chomp; $_ } grep try{ m/^(?:$re)=/ }, split m/^/,
+             $Config_SH_expanded );
 }
 
 sub config_vars {

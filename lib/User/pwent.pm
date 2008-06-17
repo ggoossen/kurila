@@ -116,7 +116,7 @@ sub pw_has {
                     : sub { die("$IE {join ' ', <@_}") };
     if ((nelems @_) == 0) {
         my @valid = @( sort grep { %Groks{$_} } keys %Groks );
-        return wantarray ? @valid : "{join ' ', <@valid}";
+        return @valid;
     }
     for my $feep (map { split } < @_) {
         defined %Groks{$feep}

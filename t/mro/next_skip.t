@@ -56,20 +56,20 @@ This tests the classic diamond inheritence pattern.
 
 }
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Diamond_D'),
     \@( qw(Diamond_D Diamond_B Diamond_C Diamond_A) )
 ), '... got the right MRO for Diamond_D');
 
-is( <Diamond_D->foo, 'Diamond_D::foo => Diamond_C::foo', '... skipped B and went to C correctly');
-is( <Diamond_D->bar, 'Diamond_D::bar => Diamond_A::bar', '... skipped B & C and went to A correctly');
-is( <Diamond_D->baz, 'Diamond_B::baz => Diamond_A::baz', '... called B method, skipped C and went to A correctly');
-is( <Diamond_D->buz, 'Diamond_D::buz => Diamond_B::baz => Diamond_A::baz', '... called D method dispatched to , different method correctly');
+is(Diamond_D->foo, 'Diamond_D::foo => Diamond_C::foo', '... skipped B and went to C correctly');
+is(Diamond_D->bar, 'Diamond_D::bar => Diamond_A::bar', '... skipped B & C and went to A correctly');
+is(Diamond_D->baz, 'Diamond_B::baz => Diamond_A::baz', '... called B method, skipped C and went to A correctly');
+is(Diamond_D->buz, 'Diamond_D::buz => Diamond_B::baz => Diamond_A::baz', '... called D method dispatched to , different method correctly');
 try { Diamond_D->fuz };
 like($@->{description}, qr/^No next::method 'fuz' found for Diamond_D/, '... cannot re-dispatch to a method which is not there');
 
-is( <Diamond_D->woz, 'Diamond_D::woz can => 1', '... can re-dispatch figured out correctly');
-is( <Diamond_D->noz, 'Diamond_D::noz can => 0', '... cannot re-dispatch figured out correctly');
+is(Diamond_D->woz, 'Diamond_D::woz can => 1', '... can re-dispatch figured out correctly');
+is(Diamond_D->noz, 'Diamond_D::noz can => 0', '... cannot re-dispatch figured out correctly');
 
-is( <Diamond_D->maybe, 'Diamond_D::maybe => Diamond_C::maybe', '... redispatched D to C when it exists');
-is( <Diamond_D->moybe, 'Diamond_D::moybe => 0', '... quietly failed redispatch from D');
+is(Diamond_D->maybe, 'Diamond_D::maybe => Diamond_C::maybe', '... redispatched D to C when it exists');
+is(Diamond_D->moybe, 'Diamond_D::moybe => 0', '... quietly failed redispatch from D');

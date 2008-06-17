@@ -169,7 +169,7 @@ sub change {
 	# else => ignored
     }
     $self->checkCollator();
-    return wantarray ? %old : $self;
+    return %old;
 }
 
 sub _checkLevel {
@@ -582,7 +582,7 @@ sub getWt
     my $der  = $self->{derivCode};
 
     return if !defined $u;
-    return map( <_varCE($vbl, $_), < @{ $map->{$u} })
+    return @(map( <_varCE($vbl, $_), < @{ $map->{$u} }))
 	if $map->{$u};
 
     # JCPS must not be a contraction, then it's a code point.
@@ -624,19 +624,19 @@ sub getWt
 		    $map->{$_} ? < @{ $map->{$_} } : $der->($_);
 		} < @decH) );
 	}
-	return map < _varCE($vbl, $_), < @hangulCE;
+	return @(map < _varCE($vbl, $_), < @hangulCE);
     }
     elsif (_isUIdeo($u, $self->{UCA_Version})) {
 	my $cjk  = $self->{overrideCJK};
-	return map < _varCE($vbl, $_),
+	return @(map { < _varCE($vbl, $_) }
 	    $cjk
 		? map(pack(VCE_TEMPLATE, < NON_VAR, < @$_), < &$cjk($u))
 		: defined $cjk && $self->{UCA_Version} +<= 8 && $u +< 0x10000
 		    ? < _uideoCE_8($u)
-		    : < $der->($u);
+		    : < $der->($u) );
     }
     else {
-	return map < _varCE($vbl, $_), < $der->($u);
+	return @( map { _varCE($vbl, $_) } < $der->($u) );
     }
 }
 
@@ -746,9 +746,9 @@ sub ne  { @_[0]->getSortKey(@_[1]) ne  @_[0]->getSortKey(@_[2]) }
 sub sort {
     my $obj = shift;
     return
-	map { $_->[1] }
-	    sort{ $a->[0] cmp $b->[0] }
-		map \@( < $obj->getSortKey($_), $_ ), < @_;
+	@( map { $_[1] }
+           sort { $a[0] cmp $b[0] }
+           map { @( $obj->getSortKey($_), $_) } < @_ );
 }
 
 
@@ -765,8 +765,8 @@ sub _derivCE_14 {
     my $aaaa = $base + ($u >> 15);
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
     return
-	pack(VCE_TEMPLATE, < NON_VAR, $aaaa, < Min2Wt, < Min3Wt, $u),
-	pack(VCE_TEMPLATE, < NON_VAR, $bbbb,      0,      0, $u);
+	@( pack(VCE_TEMPLATE, < NON_VAR, $aaaa, < Min2Wt, < Min3Wt, $u),
+           pack(VCE_TEMPLATE, < NON_VAR, $bbbb,      0,      0, $u) );
 }
 
 sub _derivCE_9 {
@@ -782,8 +782,8 @@ sub _derivCE_9 {
     my $aaaa = $base + ($u >> 15);
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
     return
-	pack(VCE_TEMPLATE, < NON_VAR, $aaaa, < Min2Wt, < Min3Wt, $u),
-	pack(VCE_TEMPLATE, < NON_VAR, $bbbb,      0,      0, $u);
+	@( pack(VCE_TEMPLATE, < NON_VAR, $aaaa, < Min2Wt, < Min3Wt, $u),
+           pack(VCE_TEMPLATE, < NON_VAR, $bbbb,      0,      0, $u) );
 }
 
 sub _derivCE_8 {
@@ -791,8 +791,8 @@ sub _derivCE_8 {
     my $aaaa =  0xFF80 + ($code >> 15);
     my $bbbb = ($code ^&^ 0x7FFF) ^|^ 0x8000;
     return
-	pack(VCE_TEMPLATE, < NON_VAR, $aaaa, 2, 1, $code),
-	pack(VCE_TEMPLATE, < NON_VAR, $bbbb, 0, 0, $code);
+	@( pack(VCE_TEMPLATE, < NON_VAR, $aaaa, 2, 1, $code),
+           pack(VCE_TEMPLATE, < NON_VAR, $bbbb, 0, 0, $code) );
 }
 
 sub _uideoCE_8 {
@@ -823,7 +823,7 @@ sub getWtHangulTerm {
 ##
 ## "hhhh hhhh hhhh" to (dddd, dddd, dddd)
 ##
-sub _getHexArray { map hex, @_[0] =~ m/([0-9a-fA-F]+)/g }
+sub _getHexArray { @( map hex, @_[0] =~ m/([0-9a-fA-F]+)/g ) }
 
 #
 # $code *must* be in Hangul syllable.

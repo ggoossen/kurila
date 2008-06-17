@@ -5,7 +5,7 @@ use Unicode::UCD;
 use Test::More;
 use utf8;
 
-BEGIN { plan tests => 194 };
+BEGIN { plan tests => 193 };
 
 use Unicode::UCD 'charinfo';
 
@@ -324,16 +324,15 @@ is(Unicode::UCD::_getcode('U+123x'),  undef, "_getcode(x123)");
 
 use Unicode::UCD qw(namedseq);
 
-is(namedseq("KATAKANA LETTER AINU P"), "\x{31F7}\x{309A}", "namedseq");
-is(namedseq("KATAKANA LETTER AINU Q"), undef);
-is(namedseq(), undef);
+is((join '*', <namedseq("KATAKANA LETTER AINU P")), '12791*12442', "namedseq");
+is(namedseq("KATAKANA LETTER AINU Q")[0], undef);
 is(namedseq(qw(foo bar)), undef);
-my @ns = @( namedseq("KATAKANA LETTER AINU P") );
+my @ns = namedseq("KATAKANA LETTER AINU P");
 is((nelems @ns), 2);
 is(@ns[0], 0x31F7);
 is(@ns[1], 0x309A);
-my %ns = %( namedseq() );
+my %ns = namedseq();
 is(%ns{"KATAKANA LETTER AINU P"}, "\x{31F7}\x{309A}");
-@ns = @( namedseq(42) );
+@ns = @( < namedseq(42) );
 is((nelems @ns), 0);
 

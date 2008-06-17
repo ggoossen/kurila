@@ -147,26 +147,12 @@ sub csh_glob {
 	    %entries{$cxix} = \@( map { < doglob($_, $DEFAULT_FLAGS) } < @pat );
 	}
 	else {
-	    %entries{$cxix} = \@( doglob($pat, $DEFAULT_FLAGS) );
+	    %entries{$cxix} = \@( < doglob($pat, $DEFAULT_FLAGS) );
 	}
     }
 
     # chuck it all out, quick or slow
-    if (wantarray) {
-        delete %iter{$cxix};
-        return @{delete %entries{$cxix}};
-    }
-    else {
-        if (%iter{$cxix} = scalar nelems @{%entries{$cxix}}) {
-            return shift @{%entries{$cxix}};
-        }
-        else {
-            # return undef for EOL
-            delete %iter{$cxix};
-            delete %entries{$cxix};
-            return undef;
-        }
-    }
+    return @{delete %entries{$cxix}};
 }
 
 1;

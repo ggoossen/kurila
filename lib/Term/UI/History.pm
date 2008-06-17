@@ -67,7 +67,7 @@ BEGIN {
     sub history_as_string {
         my $class = shift;
 
-        return join $/, map { < $_->message } < Log::Message::Simple->stack;
+        return join $/, map { < $_->message } < __PACKAGE__->stack;
     }
 }
 

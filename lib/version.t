@@ -487,7 +487,7 @@ SKIP: {
 	my $loc;
 	while ( ~< *DATA) {
 	    chomp;
-	    $loc = POSIX::setlocale( < &POSIX::LC_ALL, $_);
+	    $loc = POSIX::setlocale(&POSIX::LC_ALL, $_);
 	    last if POSIX::localeconv()->{decimal_point} eq ',';
 	}
 	skip 'Cannot test locale handling without a comma locale', 4

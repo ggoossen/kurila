@@ -875,18 +875,11 @@ sub _namedseq {
 
 sub namedseq {
     _namedseq() unless %NAMEDSEQ;
-    my $wantarray = wantarray();
-    if (defined $wantarray) {
-	if ($wantarray) {
-	    if ((nelems @_) == 0) {
-		return %NAMEDSEQ;
-	    } elsif ((nelems @_) == 1) {
-		my $s = %NAMEDSEQ{ @_[0] };
-		return defined $s ? map { ord($_) } split('', $s) : ();
-	    }
-	} elsif ((nelems @_) == 1) {
-	    return %NAMEDSEQ{ @_[0] };
-	}
+    if ((nelems @_) == 0) {
+        return %NAMEDSEQ;
+    } elsif ((nelems @_) == 1) {
+        my $s = %NAMEDSEQ{ @_[0] };
+        return @( map { ord($_) } split('', $s) );
     }
     return;
 }

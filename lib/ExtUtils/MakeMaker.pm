@@ -385,9 +385,9 @@ sub new {
     check_hints($self);
 
     my %configure_att;         # record &{$self->{CONFIGURE}} attributes
-    my(%initial_att) = %( < %$self ); # record initial attributes
+    my %initial_att  = %$self; # record initial attributes
 
-    my(%unsatisfied) = %( () );
+    my %unsatisfied = %();
     foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.

@@ -126,7 +126,7 @@ is (join(':',< @{%spring2{"foo"}}), "1:2:3:4");
 }
 
 $subrefref = \\&mysub2;
-is ( <$$subrefref->("GOOD"), "good");
+is ( $$subrefref->("GOOD"), "good");
 sub mysub2 { lc shift }
 
 # Test the ref operator.
@@ -151,7 +151,7 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
     my $x = \%( aap => 'noot', mies => "teun" );
     is((join "*", keys $x->%), join "*", keys %$x);
     my $w = \*foo428;
-    is( <Symbol::glob_name($w->*), "main::foo428");
+    is(Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return @_[0]; };
     is($v->(55), 55);
 }
@@ -208,7 +208,7 @@ package main;
 
 # Test arrow-style method invocation.
 
-is ( <$object->doit("BAR"), 'bar');
+is ($object->doit("BAR"), 'bar');
 
 # Test not working indirect-object-style method invocation.
 
@@ -334,7 +334,7 @@ sub x::DESTROY {print "ok ", $test + shift->[0], "\n"}
 }
 curr_test($test+4);
 
-is ( <runperl (switches=> \@('-l'),
+is (runperl (switches=> \@('-l'),
 	     prog=> 'print 1; print qq-*$\*-;print 1;'),
     "1\n*\n*\n1\n");
 
@@ -346,7 +346,7 @@ is ($?, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 # bug #27268: freeing self-referential typeglobs could trigger
 # "Attempt to free unreferenced scalar" warnings
 
-is ( <runperl(
+is (runperl(
     prog => 'use Symbol;my $x=bless \gensym,"t"; print;*$$x=$x',
     stderr => 1
 ), '', 'freeing self-referential typeglob');
@@ -355,7 +355,7 @@ is ( <runperl(
 # REGEX pad had already been freed (ithreads build only). The
 # object is required to trigger the early freeing of GV refs to to STDOUT
 
-like ( <runperl(
+like (runperl(
     prog => 'our $x=bless \@(); sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
     stderr => 1
       ), qr/^(ok)+$/, 'STDOUT destructor');
@@ -435,8 +435,8 @@ TODO: {
     *{Symbol::fetch_glob($name1)} = sub {"One"};
     *{Symbol::fetch_glob($name2)} = sub {"Two"};
 
-    is ( <&{*{Symbol::fetch_glob($name1)}}, "One");
-    is ( <&{*{Symbol::fetch_glob($name2)}}, "Two");
+    is (&{*{Symbol::fetch_glob($name1)}}, "One");
+    is (&{*{Symbol::fetch_glob($name2)}}, "Two");
 }
 
 # test derefs after list slice

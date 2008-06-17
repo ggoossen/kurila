@@ -1762,7 +1762,7 @@ sub init_others {	# --- Initialize Other Attributes
     } else {
 	# init_dirscan should have found out, if we have C files
 	$self->{OBJECT} = "";
-	$self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if (nelems @{$self->{C}||\@()});
+	$self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}};
     }
     $self->{OBJECT} =~ s/\n+/ \\\n\t/g;
     $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ? "$self->{BASEEXT}_BS" : "";
@@ -2289,10 +2289,10 @@ sub lsdir {
     my(@ls);
     my $dh = DirHandle->new();
     $dh->open($dir || ".") or return ();
-    @ls = @( $dh->read );
+    @ls = $dh->readdirs;
     $dh->close;
     @ls = @( grep(m/$regex/, < @ls) ) if $regex;
-    @ls;
+    return @ls;
 }
 
 =item macro (o)

@@ -561,7 +561,7 @@ x(~~)*(?:(?:F)?)?	x~~	y	-	-
 (?=(a+?))(\1ab)	aaab	y	$2	aab
 ^(?=(a+?))\1ab	aaab	n	-	-
 (\w+:)+	one:	y	$1	one:
-$(?<=^(a))	a	y	$1	a
+\Z(?<=^(a))	a	y	$1	a
 (?=(a+?))(\1ab)	aaab	y	$2	aab
 ^(?=(a+?))\1ab	aaab	n	-	-
 ([\w:]+::)?(\w+)$	abcd:	n	-	-
@@ -978,7 +978,7 @@ x(?#	x	c	-	Sequence (?#... not terminated
 (a|aa|aaa|aaaa|aaaaa|aaaaaa)(??{$1&&"foo"})(b|c)	aaaaaaaaaaaaaaab	n	-	-
 ^(a*?)(?!(aa|aaaa)*$)	aaaaaaaaaaaaaaaaaaaa	y	$1	a	# [perl #34195]
 ^(a*?)(?!(aa|aaaa)*$)(?=a\z)	aaaaaaaa	y	$1	aaaaaaa
-^(.)\s+.$(?(1))	A B	y	$1	A	# [perl #37688]
+^(.)\s+.\Z(?(1))	A B	y	$1	A	# [perl #37688]
 (?:r?)*?r|(.{2,4})	abcde	y	$1	abcd
 (?!)+?|(.{2,4})	abcde	y	$1	abcd
 ^(a*?)(?!(a{6}|a{5})*$)	aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa	y	@+[1]	12	# super-linear cache bug may return 18

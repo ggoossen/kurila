@@ -41,9 +41,9 @@ if ($^O ne 'VMS') {
   SKIP: {
     skip("No POSIX", 3) unless $posix_ok;
     skip("No POSIX wait macros", 3) unless $wait_macros_ok;
-    ok( <POSIX::WIFEXITED($^CHILD_ERROR_NATIVE), "WIFEXITED");
+    ok(POSIX::WIFEXITED($^CHILD_ERROR_NATIVE), "WIFEXITED");
     ok(!POSIX::WIFSIGNALED($^CHILD_ERROR_NATIVE), "WIFSIGNALED");
-    is( <POSIX::WEXITSTATUS($^CHILD_ERROR_NATIVE), 42, "WEXITSTATUS");
+    is(POSIX::WEXITSTATUS($^CHILD_ERROR_NATIVE), 42, "WEXITSTATUS");
   }
 
   SKIP: {
@@ -59,8 +59,8 @@ if ($^O ne 'VMS') {
       skip("No POSIX", 3) unless $posix_ok;
       skip("No POSIX wait macros", 3) unless $wait_macros_ok;
       ok(!POSIX::WIFEXITED($^CHILD_ERROR_NATIVE), "WIFEXITED");
-      ok( <POSIX::WIFSIGNALED($^CHILD_ERROR_NATIVE), "WIFSIGNALED");
-      is( <POSIX::WTERMSIG($^CHILD_ERROR_NATIVE), 15, "WTERMSIG");
+      ok(POSIX::WIFSIGNALED($^CHILD_ERROR_NATIVE), "WIFSIGNALED");
+      is(POSIX::WTERMSIG($^CHILD_ERROR_NATIVE), 15, "WTERMSIG");
     }
   }
 

@@ -49,8 +49,8 @@ for my $pkg ( qw[ Log::Message          Log::Message::Config
     }
 
     {
-        is( $log->first->message, 'foo',    q[  Retrieving first message] );
-        is( $log->final->message, 'quux',   q[  Retrieving final message] );
+        is( $log->first[0]->message, 'foo',    q[  Retrieving first message] );
+        is( $log->final[0]->message, 'quux',   q[  Retrieving final message] );
     }
 
     {

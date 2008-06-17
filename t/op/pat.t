@@ -352,7 +352,7 @@ push @ans, $res while $res = matchit;
 
 ok("{join ' ', <@ans}" eq "1 1 1");
 
-@ans = @( < matchit );
+@ans = @( matchit );
 
 ok( "{join ' ', <@ans}" eq $expect );
 

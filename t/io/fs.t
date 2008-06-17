@@ -69,7 +69,7 @@ else {
     `rm -f tmp 2>/dev/null; mkdir tmp 2>/dev/null`;
 }
 
-chdir catdir( <curdir(), 'tmp');
+chdir catdir(curdir(), 'tmp');
 
 `/bin/rm -rf a b c x` if -x '/bin/rm';
 

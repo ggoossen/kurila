@@ -118,7 +118,7 @@ is( stateless(), 43, 'stateless function, second time' );
 sub stateful_array {
     state @x;
     push @x, 'x';
-    return  @((nelems @x)-1);
+    return  (nelems @x)-1;
 }
 
 my $xsize = stateful_array();
@@ -205,7 +205,7 @@ foreach my $forbidden (~< *DATA) {
 
 {
     my @warnings;
-    local $^WARN_HOOK = sub { push @warnings, < @_[0]->message };
+    local $^WARN_HOOK = sub { push @warnings, @_[0]->message };
 
     eval q{
 	use warnings;
