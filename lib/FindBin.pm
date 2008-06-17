@@ -175,7 +175,7 @@ sub init
 
      # Ensure $script contains the complete path in case we C<chdir>
 
-     $script = File::Spec->catfile( <cwd2(), $script)
+     $script = File::Spec->catfile(cwd2(), $script)
        unless File::Spec->file_name_is_absolute($script);
 
      ($Script,$Bin) = < fileparse($script);

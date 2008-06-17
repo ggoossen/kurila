@@ -252,7 +252,7 @@ sub _open3 {
 		# I have to use a fileno here because in this one case
 		# I'm doing a dup but the filehandle might be a reference
 		# (from the special case above).
-		xopen \*STDERR, ">&", < xfileno($dad_err)
+		xopen \*STDERR, ">&", xfileno($dad_err)
 		    if fileno(STDERR) != xfileno($dad_err);
 	    } else {
 		xclose $dad_err;

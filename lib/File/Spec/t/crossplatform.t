@@ -2,7 +2,7 @@
 
 use strict;
 use File::Spec;
-use lib < File::Spec->catfile('t', 'lib');
+use lib File::Spec->catfile('t', 'lib');
 use Test::More;
 local $|=1;
 
@@ -51,14 +51,14 @@ foreach my $platform (< @platforms) {
 
     my ($file, $base, $result);
 
-    $base = $module->catpath($v, < $module->catdir('', 'foo'), '');
-    $base = $module->catdir( <$module->rootdir, 'foo');
+    $base = $module->catpath($v, $module->catdir('', 'foo'), '');
+    $base = $module->catdir($module->rootdir, 'foo');
 
     is $module->file_name_is_absolute($base), 1, "$base is absolute on $platform";
 
     # splitdir('') -> ()
     my @result = @( < $module->splitdir('') );
-    is (nelems @result), 0, "$platform->splitdir('') -> ()";
+    is( (nelems @result), 0, "$platform->splitdir('') -> ()");
 
     # canonpath() -> undef
     $result = $module->canonpath();
@@ -69,34 +69,34 @@ foreach my $platform (< @platforms) {
     is $result, undef, "$platform->canonpath(undef) -> undef";
 
     # abs2rel('A:/foo/bar', 'A:/foo')    ->  'bar'
-    $file = $module->catpath($v, < $module->catdir( <$module->rootdir, 'foo', 'bar'), 'file');
-    $base = $module->catpath($v, < $module->catdir( <$module->rootdir, 'foo'), '');
+    $file = $module->catpath($v, $module->catdir($module->rootdir, 'foo', 'bar'), 'file');
+    $base = $module->catpath($v, $module->catdir($module->rootdir, 'foo'), '');
     $result = $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
     
     # abs2rel('A:/foo/bar', 'B:/foo')    ->  'A:/foo/bar'
-    $base = $module->catpath($other_v, < $module->catdir( <$module->rootdir, 'foo'), '');
+    $base = $module->catpath($other_v, $module->catdir($module->rootdir, 'foo'), '');
     $result = volumes_differ($module, $file, $base) ? $file : $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
 
     # abs2rel('A:/foo/bar', '/foo')      ->  'A:/foo/bar'
-    $base = $module->catpath('', < $module->catdir( <$module->rootdir, 'foo'), '');
+    $base = $module->catpath('', $module->catdir($module->rootdir, 'foo'), '');
     $result = volumes_differ($module, $file, $base) ? $file : $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
 
     # abs2rel('/foo/bar/file', 'A:/foo')    ->  '/foo/bar'
-    $file = $module->catpath('', < $module->catdir( <$module->rootdir, 'foo', 'bar'), 'file');
-    $base = $module->catpath($v, < $module->catdir( <$module->rootdir, 'foo'), '');
+    $file = $module->catpath('', $module->catdir($module->rootdir, 'foo', 'bar'), 'file');
+    $base = $module->catpath($v, $module->catdir($module->rootdir, 'foo'), '');
     $result = volumes_differ($module, $file, $base) ? $module->rel2abs($file) : $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
     
     # abs2rel('/foo/bar', 'B:/foo')    ->  '/foo/bar'
-    $base = $module->catpath($other_v, < $module->catdir( <$module->rootdir, 'foo'), '');
+    $base = $module->catpath($other_v, $module->catdir($module->rootdir, 'foo'), '');
     $result = volumes_differ($module, $file, $base) ? $module->rel2abs($file) : $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
     
     # abs2rel('/foo/bar', '/foo')      ->  'bar'
-    $base = $module->catpath('', < $module->catdir( <$module->rootdir, 'foo'), '');
+    $base = $module->catpath('', $module->catdir($module->rootdir, 'foo'), '');
     $result = $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
   }
@@ -104,7 +104,7 @@ foreach my $platform (< @platforms) {
 
 sub volumes_differ {
   my ($module, $one, $two) = < @_;
-  my ($one_v) = < $module->splitpath( < $module->rel2abs($one) );
-  my ($two_v) = < $module->splitpath( < $module->rel2abs($two) );
+  my ($one_v) = < $module->splitpath( $module->rel2abs($one) );
+  my ($two_v) = < $module->splitpath( $module->rel2abs($two) );
   return $one_v ne $two_v;
 }

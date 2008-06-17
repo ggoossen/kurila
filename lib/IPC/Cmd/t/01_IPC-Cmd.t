@@ -192,7 +192,7 @@ my @Prefs = @(
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         my $ok = run( command => "$^X -ledie" );
-        ok( !$ok,               "Failure caught" );
+        ok( !$ok[0],               "Failure caught" );
     }
 }    
 

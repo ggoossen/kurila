@@ -192,7 +192,7 @@ sub can_run {
 
     } else {
         for my $dir (
-            (split m/\Q%Config::Config{path_sep}\E/, %ENV{PATH}), <
+            (split m/\Q%Config::Config{path_sep}\E/, %ENV{PATH}),
             File::Spec->curdir
         ) {           
             my $abs = File::Spec->catfile($dir, $command);
@@ -381,13 +381,9 @@ sub run {
     
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
-    return wantarray
-                ? $have_buffer
+    return $have_buffer
                     ?  @($ok, $?, \@buffer, \@buff_out, \@buff_err)
-                    :  @($ok, $? )
-                : $ok
-    
-    
+                    :  @($ok, $? );
 }
 
 sub _open3_run { 
@@ -583,9 +579,9 @@ sub _system_run {
     use Symbol;
 
     my %Map = %(
-        STDOUT => \@(qw|>&|, \*STDOUT, < Symbol::gensym() ),
-        STDERR => \@(qw|>&|, \*STDERR, < Symbol::gensym() ),
-        STDIN  => \@(qw|<&|, \*STDIN, <  Symbol::gensym() ),
+        STDOUT => \@(qw|>&|, \*STDOUT, Symbol::gensym() ),
+        STDERR => \@(qw|>&|, \*STDERR, Symbol::gensym() ),
+        STDIN  => \@(qw|<&|, \*STDIN,  Symbol::gensym() ),
     );
 
     ### dups FDs and stores them in a cache

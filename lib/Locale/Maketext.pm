@@ -258,7 +258,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
       @languages = @(
        map {; $_, < I18N::LangTags::alternate_language_tags($_) }
         # Catch alternation
-       map < I18N::LangTags::locale2language_tag($_),
+       map I18N::LangTags::locale2language_tag($_),
         # If it's a lg tag, fine, pass thru (untainted)
         # If it's a locale ID, try converting to a lg tag (untainted),
         # otherwise nix it.
@@ -276,7 +276,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
     next unless length $module_name; # sanity
     next if %seen{$module_name}++        # Already been here, and it was no-go
             || !&_try_use($module_name); # Try to use() it, but can't it.
-    return @($module_name->new); # Make it!
+    return $module_name->new; # Make it!
   }
 
   return undef; # Fail!

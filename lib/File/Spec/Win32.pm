@@ -111,9 +111,9 @@ sub file_name_is_absolute {
 
     if ($file =~ m{^($VOL_RX)}o) {
       my $vol = $1;
-      return  @($vol =~ m{^$UNC_RX}o ? 2
+      return  $vol =~ m{^$UNC_RX}o ? 2
 	      : $file =~ m{^$DRIVE_RX(?:[\\/])}o ? 2
-	      : 0);
+	      : 0;
     }
     return $file =~  m{^[\\/]} ? 1 : 0;
 }
@@ -258,7 +258,7 @@ sub splitdir {
     # simple case.
     #
     if ( $directories !~ m|[\\/]\Z(?!\n)| ) {
-        return split( m|[\\/]|, $directories );
+        return @( split( m|[\\/]|, $directories ) );
     }
     else {
         #
@@ -323,7 +323,7 @@ sub rel2abs {
 
     if ($is_abs) {
       # It's missing a volume, add one
-      my $vol = ( <$self->splitpath( < $self->_cwd() ))[[0]];
+      my $vol = ( <$self->splitpath( $self->_cwd() ))[[0]];
       return $self->canonpath( $vol . $path );
     }
 

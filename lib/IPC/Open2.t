@@ -46,7 +46,7 @@ STDERR->autoflush;
 
 print "1..7\n";
 
-ok 1, $pid = open2 'READ', 'WRITE', $perl, '-e', <
+ok 1, $pid = open2 'READ', 'WRITE', $perl, '-e',
 	cmd_line('print scalar ~< *STDIN');
 ok 2, print WRITE "hi kid\n";
 ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;

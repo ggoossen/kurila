@@ -20,7 +20,7 @@ require Exporter;
 
 $VERSION = "0.35";
 
-sub uniq { my %seen; return grep(!(%seen{$_}++), < @_); } # a util function
+sub uniq { my %seen; return @( grep(!(%seen{$_}++), < @_) ); } # a util function
 
 
 =head1 NAME
@@ -361,7 +361,7 @@ sub super_languages {
   }
   pop @supers if (nelems @supers);
   shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
-  return reverse < @supers;
+  return @(reverse < @supers);
 }
 
 ###########################################################################
@@ -738,7 +738,7 @@ sub panic_languages {
     # push @out, super_languages($t); # nah, keep that separate
     push @out, < @{ %Panic{lc $t} || next };
   }
-  return grep !%seen{$_}++,  < @out, 'en';
+  return @(grep !%seen{$_}++,  < @out, 'en');
 }
 
 #---------------------------------------------------------------------------
