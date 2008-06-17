@@ -95,7 +95,7 @@ sub import {
 	# Put a corresponding archlib directory in front of $path if it
 	# looks like $path has an archlib directory below it.
 	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
-	    = _get_dirs($path);
+	    = < _get_dirs($path);
 	unshift(@INC, $arch_dir)         if -d $arch_auto_dir;
 	unshift(@INC, $version_dir)      if -d $version_dir;
 	unshift(@INC, $version_arch_dir) if -d $version_arch_dir;
@@ -115,7 +115,7 @@ sub unimport {
 	my $path = _nativize($_);
 
 	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
-	    = _get_dirs($path);
+	    = < _get_dirs($path);
 	++%names{$path};
 	++%names{$arch_dir}         if -d $arch_auto_dir;
 	++%names{$version_dir}      if -d $version_dir;
@@ -144,7 +144,7 @@ sub _get_dirs {
 	$version_dir      = "$dir/$version";
 	$version_arch_dir = "$dir/$version/$archname";
     }
-    return($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir);
+    return @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir);
 }
 
 sub _nativize {

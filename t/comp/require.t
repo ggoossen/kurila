@@ -13,7 +13,8 @@ krunch.pm krunch.pmc whap.pm whap.pmc) );
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 my $Is_UTF8   = ($^OPEN || "") =~ m/:utf8/;
-my $total_tests = 38;
+my $total_tests = 30;
+
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
 
@@ -56,12 +57,9 @@ print "ok ",$i++,"\n";
 write_file('bleah.pm', "print 'ok $i\n'; 1;\n");
 require "bleah.pm";
 $i++;
+delete %INC{'bleah.pm'};
 
 # run-time failure in require
-do_require "0;\n";
-print "# $@\nnot " unless $@->message =~ m/did not return a true/;
-print "ok ",$i++,"\n";
-
 print "not " if exists %INC{'bleah.pm'};
 print "ok ",$i++,"\n";
 
@@ -115,25 +113,6 @@ do "bleah.do" or die $@;
 dofile();
 sub dofile { do "bleah.do" or die $@; };
 print $x;
-
-# Test that scalar context is forced for require
-
-write_file('bleah.pm', <<'**BLEAH**'
-our $i;
-print "not " if !defined wantarray || wantarray ne '';
-print "ok $i - require() context\n";
-1;
-**BLEAH**
-);
-our ($foo, @foo);
-                              delete %INC{"bleah.pm"}; ++$::i;
-$foo = eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-@foo = @( eval q{require bleah} ); delete %INC{"bleah.pm"}; ++$::i;
-       eval q{require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-       eval q{$_=$_+2;require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-$foo = try  {require bleah}; delete %INC{"bleah.pm"}; ++$::i;
-@foo = @( try  {require bleah} ); delete %INC{"bleah.pm"}; ++$::i;
-       try  {require bleah};
 
 # Test for fix of RT #24404 : "require $scalar" may load a directory
 my $r = "threads";

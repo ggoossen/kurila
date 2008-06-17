@@ -274,7 +274,7 @@ sub within ($$$@) {
 	unshift@mess, "#      got "._q($got)."\n",
 		      "# expected "._q($expected)." (within "._q($range).")\n";
     }
-    _ok($pass, < _where(), $name, < @mess);
+    _ok($pass, _where(), $name, < @mess);
 }
 
 # Note: this isn't quite as fancy as Test::More::like().
@@ -301,7 +301,7 @@ sub pass {
 }
 
 sub fail {
-    _ok(0, < _where(), < @_);
+    _ok(0, _where(), < @_);
 }
 
 sub curr_test {
@@ -746,7 +746,7 @@ sub can_ok ($@) {
     $name = (nelems @methods) == 1 ? "$class->can('@methods[0]')"
                           : "$class->can(...)";
 
-    _ok( !nelems @nok, < _where(), $name );
+    _ok( !nelems @nok, _where(), $name );
 }
 
 sub isa_ok ($$;$) {
@@ -786,7 +786,7 @@ WHOA
         }
     }
 
-    _ok( !$diag, < _where(), $name );
+    _ok( !$diag, _where(), $name );
 }
 
 sub dies_not(&;$) {
@@ -795,7 +795,7 @@ sub dies_not(&;$) {
     if (try { $e->(); 1; }) {
         return ok(1, $name);
     }
-    diag < $@->message;
+    diag $@->message;
     return ok(0, $name);
 }
 

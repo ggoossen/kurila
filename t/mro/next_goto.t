@@ -29,7 +29,7 @@ use mro;
     sub quux { shift->Proxy::can_proxy()->() }
 }
 
-is( <TTop->foo, 42, 'proxy next::method via goto');
-is( <TTop->bar, 24, 'proxy maybe::next::method via goto');
+is(TTop->foo, 42, 'proxy next::method via goto');
+is(TTop->bar, 24, 'proxy maybe::next::method via goto');
 ok(!TTop->baz, 'proxy maybe::next::method via goto with no method');
-is( <TTop->quux, 242, 'proxy next::can via goto');
+is(TTop->quux, 242, 'proxy next::can via goto');

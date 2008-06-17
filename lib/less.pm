@@ -9,17 +9,15 @@ sub _pack_tags {
 }
 
 sub _unpack_tags {
-    return grep { defined and length }
+    return @(grep { defined and length }
         map  { split ' ' }
-        grep {defined} < @_;
+        grep {defined} < @_);
 }
 
 sub of {
     my $class = shift @_;
 
     # If no one wants the result, don't bother computing it.
-    return unless defined wantarray;
-
     my $hinthash = ( caller 0 )[[10]];
     my %tags;
     %tags{[ <_unpack_tags( $hinthash->{$class} ) ]} = ();
@@ -29,7 +27,7 @@ sub of {
         return;
     }
     else {
-        return keys %tags;
+        return @(keys %tags);
     }
 }
 

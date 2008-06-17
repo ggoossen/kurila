@@ -22,7 +22,7 @@ require q(./test.pl); plan(tests => 12);
     isa_ok($foo, 'Foo');
 
     can_ok($foo, 'bar');
-    is( <$foo->bar(), 'Foo::bar', '... got the right return value');    
+    is($foo->bar(), 'Foo::bar', '... got the right return value');    
 
     # fail calling it from a subclass
 

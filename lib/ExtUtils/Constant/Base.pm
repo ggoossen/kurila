@@ -316,7 +316,7 @@ sub assign {
     unless $self->valid_type($type);
 
   $clause .= join '', map {"$indent$_\n"}
- <    $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_);
+    < $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_);
   chomp $post;
   if (length $post) {
     $clause .= "$post";

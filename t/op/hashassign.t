@@ -19,8 +19,8 @@ my @comma = @("key", "value");
 
 # Some of these tests are (effectively) duplicated in each.t
 my %comma = %( < @comma );
-ok (keys %comma == 1, 'keys on comma hash');
-ok (values %comma == 1, 'values on comma hash');
+ok (nelems(@(keys %comma)) == 1, 'keys on comma hash');
+ok (nelems(@(values %comma)) == 1, 'values on comma hash');
 # defeat any tokeniser or optimiser cunning
 my $key = 'ey';
 is (%comma{"k" . $key}, "value", 'is key present? (unoptimised)');

@@ -73,10 +73,16 @@ sub close {
     closedir($dh);
 }
 
-sub read {
+sub readdir {
     (nelems @_) == 1 or die 'usage: $dh->read()';
     my ($dh) = < @_;
-    readdir($dh);
+    return $( CORE::readdir($dh) );
+}
+
+sub readdirs {
+    (nelems @_) == 1 or die 'usage: $dh->read()';
+    my ($dh) = < @_;
+    return @( CORE::readdir($dh) ); # Force list context.
 }
 
 sub rewind {

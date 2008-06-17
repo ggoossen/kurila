@@ -6,13 +6,11 @@
 my ($BigWidth, $BigEnough, $RootWidth, $ItemFormat, @TestSizes, $WellSoaked);
 
 BEGIN {
-    chdir 't' if -d 't';
-    @INC = qw(../lib);
     $BigWidth  = 6;				# Digits in $BigEnough-1
     $BigEnough = 10**$BigWidth;			# Largest array we'll attempt
     $RootWidth = int(($BigWidth+1)/2);		# Digits in sqrt($BigEnough-1)
     $ItemFormat = "\%0{$RootWidth}d\%0{$BigWidth}d";	# Array item format
-    @TestSizes = (0, 1, 2);			# Small special cases
+    @TestSizes = @(0, 1, 2);			# Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)
     # in pp_sort that should be tested, but 10_000 is ample.
@@ -25,7 +23,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::More tests => @TestSizes * 2	# sort() tests
+use Test::More tests => (nelems @TestSizes) * 2	# sort() tests
 			* 6		# number of pragmas to test
 			+ 1 		# extra test for qsort instability
 			+ 3		# tests for sort::current
@@ -133,7 +131,7 @@ sub main {
 }
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
+main(sub { @(sort {&{@_[0]}} @{@_[1]}) }, 0);
 
 {
     use sort qw(_qsort);

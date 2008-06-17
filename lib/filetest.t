@@ -1,10 +1,5 @@
 #!./perl
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-}
-
 use Config;
 use Test::More tests => 15;
 

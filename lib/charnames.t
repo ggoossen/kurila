@@ -151,7 +151,7 @@ sub to_bytes {
 
 {
     print "not " unless
-	sprintf("\%04X", < charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
+	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 19\n";
 
     print "not " if
@@ -166,7 +166,7 @@ sub to_bytes {
     print "ok 21\n";
 
     print "not " unless
-	sprintf("\%04X", < charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
+	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 22\n";
 
 }
@@ -276,7 +276,7 @@ print "ok 46\n";
 # ---- Alias extensions
 
 my $tmpfile = "tmp0000";
-my $alifile = File::Spec->catfile( <File::Spec->updir, qw(lib unicore xyzzy_alias.pl));
+my $alifile = File::Spec->catfile(File::Spec->updir, qw(lib unicore xyzzy_alias.pl));
 my $i = 0;
 1 while -e ++$tmpfile;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }

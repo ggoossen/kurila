@@ -38,9 +38,9 @@ foreach my $test (< @tests) {
     SKIP: {
         skip "/$pat/$p failed to match", 3
             unless $ok;
-        is($^PREMATCH,  $l, <_u "$test_name: ^PREMATCH",$l);
-        is($^MATCH,     $m, <_u "$test_name: ^MATCH",$m );
-        is($^POSTMATCH, $r, <_u "$test_name: ^POSTMATCH",$r );
+        is($^PREMATCH,  $l, _u "$test_name: ^PREMATCH",$l);
+        is($^MATCH,     $m, _u "$test_name: ^MATCH",$m );
+        is($^POSTMATCH, $r, _u "$test_name: ^POSTMATCH",$r );
     }
 }
 is($W,"","No warnings should be produced");

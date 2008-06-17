@@ -67,7 +67,7 @@ sub SPLICE {
     for (my $i=0; $i +< nelems @_; $i++) {
         $obj->STORE($off+$i,@_[$i]);
     }
-    return wantarray ? @result : pop @result;
+    return @result;
 }
 
 sub EXISTS {

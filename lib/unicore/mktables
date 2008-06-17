@@ -1926,7 +1926,7 @@ sub WriteAllMappings()
             my $File = %Exact{$Name};
             $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
             my $Text = sprintf("\%-15s => \%s,\n", $Name, qq/'$File'/);
-            push @OUT, < Text::Tabs::unexpand($Text);
+            push @OUT, Text::Tabs::unexpand($Text);
         }
         push @OUT, ");\n1;\n";
 
@@ -1956,7 +1956,7 @@ sub WriteAllMappings()
             }
             $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
             my $Text = sprintf("  \%-41s => \%s,\n$Trail", $Name, qq/'$File'/);
-            push @OUT, < Text::Tabs::unexpand($Text);
+            push @OUT, Text::Tabs::unexpand($Text);
         }
         push @OUT, ");\n1\n";
         WriteIfChanged('Canonical.pl', @OUT);

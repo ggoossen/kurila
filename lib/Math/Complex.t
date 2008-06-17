@@ -121,16 +121,17 @@ push(@script, $constants);
 
 # test the divbyzeros
 
+sub real_test_dbz {
+    my $op = shift;
+    eval_dies_like("$op", qr/Division by zero/);
+}
+
 sub test_dbz {
     for my $op (< @_) {
 	$test++;
 	push(@script, <<EOT);
-	eval '$op';
-	(\$bad) = (\$\@->\{description\} =~ m/(.+)/);
-	print "# $test op = $op divbyzero? \$bad... \$\@->\{description\}\n";
-	print 'not ' unless (\$\@->\{description\} =~ m/Division by zero/);
+        real_test_dbz('$op');
 EOT
-        push(@script, qq(print "ok $test\\n";\n));
     }
 }
 

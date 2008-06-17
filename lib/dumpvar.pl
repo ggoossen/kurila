@@ -38,7 +38,7 @@ sub main::dumpValue {
   local %address;
   local $^W=0;
   (print "undef\n"), return unless defined @_[0];
-  (print < &stringify(@_[0]), "\n"), return unless ref @_[0];
+  (print &stringify(@_[0]), "\n"), return unless ref @_[0];
   push @_, -1 if (nelems @_) == 1;
   dumpvar::unwrap(@_[0], 0, @_[1]);
 }

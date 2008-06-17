@@ -90,7 +90,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
     package xx::DBIx::Class::Relationship::CascadeActions; our @ISA = @( () ); use mro 'c3';
 }
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('xx::DBIx::Class::Core'),
     \@(qw/
         xx::DBIx::Class::Core

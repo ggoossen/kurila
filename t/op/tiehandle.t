@@ -41,7 +41,12 @@ sub PRINTF {
 
 sub READLINE {
     ::compare(READLINE => < @_);
-    wantarray ? < @data : shift @data;
+    return shift @data;
+}
+
+sub READLINES {
+    ::compare(READLINE => < @_);
+    return @data;
 }
 
 sub GETC {

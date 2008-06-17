@@ -1241,6 +1241,7 @@ XS(XS_PerlIO_get_layers)
 	     I32 i;
 	     const I32 last = av_len(av);
 	     I32 nitem = 0;
+	     AV* retav = (AV*)sv_2mortal((SV*)newAV());
 	     
 	     for (i = last; i >= 0; i -= 3) {
 		  SV * const * const namsvp = av_fetch(av, i - 2, FALSE);
@@ -1252,45 +1253,43 @@ XS(XS_PerlIO_get_layers)
 		  const bool flgok = flgsvp && *flgsvp && SvIOK(*flgsvp);
 
 		  if (details) {
-		      /* Indents of 5? Yuck.  */
 		      /* We know that PerlIO_get_layers creates a new SV for
 			 the name and flags, so we can just take a reference
 			 and "steal" it when we free the AV below.  */
-		       XPUSHs(namok
-			      ? sv_2mortal(SvREFCNT_inc_simple_NN(*namsvp))
+		      av_push(retav, namok
+			      ? SvREFCNT_inc_simple_NN(*namsvp)
 			      : &PL_sv_undef);
-		       XPUSHs(argok
+		      av_push(retav, argok
 			      ? newSVpvn_flags(SvPVX_const(*argsvp),
 					       SvCUR(*argsvp),
-					       SVs_TEMP)
+					       0)
 			      : &PL_sv_undef);
-		       XPUSHs(namok
-			      ? sv_2mortal(SvREFCNT_inc_simple_NN(*flgsvp))
+		      av_push(retav, namok
+			      ? SvREFCNT_inc_simple_NN(*flgsvp)
 			      : &PL_sv_undef);
-		       nitem += 3;
 		  }
 		  else {
 		       if (namok && argok)
-			    XPUSHs(sv_2mortal(Perl_newSVpvf(aTHX_ "%"SVf"(%"SVf")",
-						 SVfARG(*namsvp),
-						 SVfARG(*argsvp))));
+			   av_push(retav, Perl_newSVpvf(aTHX_ "%"SVf"(%"SVf")",
+						  SVfARG(*namsvp),
+						  SVfARG(*argsvp)));
 		       else if (namok)
-			   XPUSHs(sv_2mortal(SvREFCNT_inc_simple_NN(*namsvp)));
+			   av_push(retav, SvREFCNT_inc_simple_NN(*namsvp));
 		       else
-			    XPUSHs(&PL_sv_undef);
-		       nitem++;
+			   av_push(retav, &PL_sv_undef);
 		       if (flgok) {
 			    const IV flags = SvIVX(*flgsvp);
 
 			    if (flags & PERLIO_F_UTF8) {
-				 XPUSHs(newSVpvs_flags("utf8", SVs_TEMP));
-				 nitem++;
+				av_push(retav, newSVpvs_flags("utf8", 0));
 			    }
 		       }
 		  }
 	     }
 
 	     SvREFCNT_dec(av);
+
+	     XPUSHs((SV*)retav);
 
 	     XSRETURN(nitem);
 	}
@@ -1809,15 +1808,17 @@ XS(XS_Tie_Hash_NamedCapture_flags)
 {
     dVAR;
     dXSARGS;
+    AV* av;
     PERL_UNUSED_ARG(cv);
 
     if (items != 0)
         Perl_croak(aTHX_ "Usage: Tie::Hash::NamedCapture::flags()");
 
-	mXPUSHu(RXapif_ONE);
-	mXPUSHu(RXapif_ALL);
-	PUTBACK;
-	return;
+    av = newAV();
+    av_push(av, newSVuv(RXapif_ONE));
+    av_push(av, newSVuv(RXapif_ALL));
+    mXPUSHs((SV*)av);
+    XSRETURN(1);
 }
 
 XS(XS_Symbol_fetch_glob)

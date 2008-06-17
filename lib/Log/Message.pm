@@ -475,8 +475,8 @@ sub retrieve {
         level   => \%( default => qr/.*/ ),
         message => \%( default => qr/.*/ ),
         amount  => \%( default => '' ),
-        remove  => \%( default => < $self->_get_conf('remove')  ),
-        chrono  => \%( default => < $self->_get_conf('chrono')  ),
+        remove  => \%( default => $self->_get_conf('remove')  ),
+        chrono  => \%( default => $self->_get_conf('chrono')  ),
     );
 
     ### single arg means just the amount

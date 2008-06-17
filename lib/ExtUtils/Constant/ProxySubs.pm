@@ -30,7 +30,7 @@ $VERSION = '0.06';
      NV => sub { @_[0] . '->value' },
      UV => sub { @_[0] . '->value' },
      PV => sub { @_[0] . '->value' },
-     PVN => sub { @_[0] . '->value', @_[0] . '->len' },
+     PVN => sub { @_[0] . '->len' },
      YES => sub {},
      NO => sub {},
      UNDEF => sub {},
@@ -61,7 +61,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my ($self, $type) = < @_;
-    return %type_to_C_value{$type} || sub {return map {ref $_ ? < @$_ : $_} < @_};
+    return %type_to_C_value{$type} || sub {return @(map {ref $_ ? < @$_ : $_} < @_) };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -320,7 +320,7 @@ EOBOOT
 		print $xs_fh "#else\n";
 	    }
 	    print $xs_fh "        \{ ", join (', ', "\"$name\"", $namelen, 
-					     &$type_to_value($value)), " \},\n",
+                                              < &$type_to_value($value)), " \},\n",
 						 $self->macro_to_endif($macro);
 	}
 
@@ -445,7 +445,7 @@ EOBOOT
 	# statements, we can't declare and assign to the temporaries in one.
 	$counter = 0;
 	printf $xs_fh "            temp\%d = \%s;\n", $counter++, $_
-	    foreach &$type_to_value($value);
+	    foreach < &$type_to_value($value);
 
 	my @tempvarnames = @( map {sprintf 'temp%d', $_} 0 .. $counter - 1 );
 	printf $xs_fh <<"EOBOOT", $name, &$generator(<@tempvarnames);

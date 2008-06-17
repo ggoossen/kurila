@@ -98,15 +98,15 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " @_[0]" }; }
     BEGIN { *OverridenWarn::warn = sub { CORE::warn "{join ' ', <@_} overriden"; }; }
     package OverridenWarn;
     sub foo { "ok" }
-    warn( < OverridenWarn->foo() );
-    warn < OverridenWarn->foo();
+    warn( OverridenWarn->foo() );
+    warn OverridenWarn->foo();
 }
 BEGIN { *OverridenPop::pop = sub { ::is( @_[0]->[0], "ok" ) }; }
 {
     package OverridenPop;
     sub foo { \@( "ok" ) }
-    pop( < OverridenPop->foo() );
-    pop < OverridenPop->foo();
+    pop( OverridenPop->foo() );
+    pop OverridenPop->foo();
 }
 
 {

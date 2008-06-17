@@ -45,21 +45,21 @@ This tests the classic diamond inheritence pattern.
     sub foo { 'Diamond_D::foo => ' . (shift)->next::method() }   
 }
 
-ok( <eq_array( <
+ok(eq_array(
     mro::get_linear_isa('Diamond_D'),
     \@( qw(Diamond_D Diamond_B Diamond_C Diamond_A) )
 ), '... got the right MRO for Diamond_D');
 
-is( <Diamond_D->hello, 'Diamond_C::hello => Diamond_A::hello', '... method resolved itself as expected');
+is(Diamond_D->hello, 'Diamond_C::hello => Diamond_A::hello', '... method resolved itself as expected');
 
-is( <Diamond_D->can('hello')->('Diamond_D'), 
+is(Diamond_D->can('hello')->('Diamond_D'), 
    'Diamond_C::hello => Diamond_A::hello', 
    '... can(method) resolved itself as expected');
    
-is( <UNIVERSAL::can("Diamond_D", 'hello')->('Diamond_D'), 
+is(UNIVERSAL::can("Diamond_D", 'hello')->('Diamond_D'), 
    'Diamond_C::hello => Diamond_A::hello', 
    '... can(method) resolved itself as expected');
 
-is( <Diamond_D->foo, 
+is(Diamond_D->foo, 
     'Diamond_D::foo => Diamond_B::foo => Diamond_C::foo => Diamond_A::foo', 
     '... method foo resolved itself as expected');

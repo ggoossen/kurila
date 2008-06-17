@@ -1,17 +1,10 @@
 #!./perl
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = '../lib';
-	push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
-	require Config; Config->import;
-}
-
 use Test::More tests => 22;
 
 # open::import expects 'open' as its first argument, but it clashes with open()
 sub import {
-	open::import( 'open', @_ );
+	open::import( 'open', < @_ );
 }
 
 # can't use require_ok() here, with a name like 'open'
@@ -76,9 +69,9 @@ EOE
     die if $@;
 
     open F, ">", "a";
-    my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
+    my @a = @(map { chr(1 << ($_ << 2)) } 0..5); # 0x1, 0x10, .., 0x100000
     unshift @a, chr(0); # ... and a null byte in front just for fun
-    print F @a;
+    print F <@a;
     close F;
 
     sub systell {
@@ -93,7 +86,7 @@ EOE
 
     open F, "<:utf8", "a";
     $ok = $a = 0;
-    for (@a) {
+    for (<@a) {
         unless (
 		($c = sysread(F, $b, 1)) == 1  &&
 		length($b)               == 1  &&
@@ -112,7 +105,7 @@ EOE
 	$ok++;
     }
     close F;
-    ok($ok == @a,
+    ok($ok == (nelems @a),
        "on :utf8 streams sysread() should work on characters, not bytes");
 
     sub diagnostics {
@@ -124,7 +117,7 @@ EOE
     }
 
 
-    my %actions = (
+    my %actions = %(
 		   syswrite => sub { syswrite G, shift; },
 		   'syswrite len' => sub { syswrite G, shift, 1; },
 		   'syswrite len pad' => sub {
@@ -144,9 +137,9 @@ EOE
 
 	print "# $key\n";
 	$ok = $a = 0;
-	for (@a) {
+	for (<@a) {
 	    unless (
-		    ($c = %actions{$key}($_)) == 1 &&
+		    ($c = %actions{$key}->($_)) == 1 &&
 		    systell(*G)                == ($a += bytes::length($_))
 		   ) {
 		diagnostics();
@@ -155,12 +148,12 @@ EOE
 	    $ok++;
 	}
 	close G;
-	ok($ok == @a,
+	ok($ok == (nelems @a),
 	   "on :utf8 streams syswrite() should work on characters, not bytes");
 
 	open G, "<:utf8", "b";
 	$ok = $a = 0;
-	for (@a) {
+	for (<@a) {
 	    unless (
 		    ($c = sysread(G, $b, 1)) == 1 &&
 		    length($b)               == 1 &&
@@ -179,7 +172,7 @@ EOE
 	    $ok++;
 	}
 	close G;
-	ok($ok == @a,
+	ok($ok == (nelems @a),
 	   "checking syswrite() output on :utf8 streams by reading it back in");
     }
 }

@@ -28,8 +28,8 @@ else {
 }
 
 our @R = @( sort < @D );
-our @G = @( sort glob( <"op/*.t") );
-@G = @( sort glob( <":op:*.t") ) if $^O eq 'MacOS';
+our @G = @( sort < glob("op/*.t") );
+@G = @( sort < glob(":op:*.t") ) if $^O eq 'MacOS';
 if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir

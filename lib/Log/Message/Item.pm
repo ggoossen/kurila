@@ -34,7 +34,7 @@ sub new {
     return bless $args, $class;
 }
 
-sub _clean { my $x = shift; map { s/\s*//; chomp; $_ } $x; }
+sub _clean { my $x = shift; @( map { s/\s*//; chomp; $_ } $x); }
 
 sub remove {
     my $item = shift;

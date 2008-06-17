@@ -16,6 +16,6 @@ use Test::More;
 
 plan tests => 2;
 
-ok( ! grep { not tainted($_) } shellwords("$0$^X") );
+ok( ! grep { not tainted($_) } < shellwords("$0$^X") );
 
-ok( ! grep { not tainted($_) } old_shellwords("$0$^X") );
+ok( ! grep { not tainted($_) } < old_shellwords("$0$^X") );

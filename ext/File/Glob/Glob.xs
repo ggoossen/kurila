@@ -40,6 +40,7 @@ PREINIT:
     int retval;
     int flags = 0;
     SV *tmp;
+    AV *av;
 PPCODE:
     {
 	dMY_CXT;
@@ -54,17 +55,20 @@ PPCODE:
         MY_CXT.x_GLOB_ERROR = retval;
 
 	/* return any matches found */
-	EXTEND(sp, pglob.gl_pathc);
+        av = (AV*)sv_2mortal((SV*)newAV());
 	for (i = 0; i < pglob.gl_pathc; i++) {
 	    /* printf("# bsd_glob: %s\n", pglob.gl_pathv[i]); */
-	    tmp = sv_2mortal(newSVpvn(pglob.gl_pathv[i],
-				      strlen(pglob.gl_pathv[i])));
+	    tmp = newSVpvn(pglob.gl_pathv[i],
+			  strlen(pglob.gl_pathv[i]));
 	    TAINT;
 	    SvTAINT(tmp);
-	    PUSHs(tmp);
+            av_push(av, tmp);
 	}
 
 	bsd_globfree(&pglob);
+
+	EXTEND(sp, 1);
+        PUSHs((SV*)av);
     }
 
 IV

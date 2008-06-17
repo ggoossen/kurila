@@ -222,14 +222,14 @@ BEGIN {
                         );
                 };
     }
-}
 
-sub flush {
-  return @{\@( reverse < $log->flush )};
-}
+    sub flush {
+        return @( reverse < $log->flush );
+    }
 
-sub stack {
-  return $log->retrieve( chrono => 1 );
+    sub stack {
+        return $log->retrieve( chrono => 1 );
+    }
 }
 
 sub stack_as_string {

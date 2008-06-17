@@ -138,7 +138,7 @@ print PROG 'print "{join q| |, <@ARGV}\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
 
-my $TEST = catfile( <curdir(), 'TEST');
+my $TEST = catfile(curdir(), 'TEST');
 
 # First, let's make sure that Perl is checking the dangerous
 # environment variables. Maybe they aren't set yet, so we'll
@@ -281,7 +281,7 @@ my $TEST = catfile( <curdir(), 'TEST');
 # How about command-line arguments? The problem is that we don't
 # always get some, so we'll run another process with some.
 SKIP: {
-    my $arg = catfile( <curdir(), "arg$$");
+    my $arg = catfile(curdir(), "arg$$");
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
 	try { join('', <@ARGV), kill 0 };
@@ -565,15 +565,15 @@ SKIP: {
     test not tainted @plugh[0];
     test     tainted @plugh[1];
     test not tainted @plugh[2];
-    my $nautilus = sub { "A", "tainted" . $TAINT, "B" };
-    test not tainted (( <&$nautilus)[[0]]);
-    test     tainted (( <&$nautilus)[[1]]);
-    test not tainted (( <&$nautilus)[[2]]);
+    my $nautilus = sub { @("A", "tainted" . $TAINT, "B") };
+    test not tainted ($nautilus->()[0]);
+    test     tainted ($nautilus->()[1]);
+    test not tainted ($nautilus->()[2]);
     my @xyzzy = @( < &$nautilus );
     test not tainted @xyzzy[0];
     test     tainted @xyzzy[1];
     test not tainted @xyzzy[2];
-    my $red_october = sub { return "A", "tainted" . $TAINT, "B" };
+    my $red_october = sub { return @("A", "tainted" . $TAINT, "B") };
     test not tainted (( <&$red_october)[[0]]);
     test     tainted (( <&$red_october)[[1]]);
     test not tainted (( <&$red_october)[[2]]);

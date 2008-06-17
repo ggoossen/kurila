@@ -3342,7 +3342,6 @@ struct nextmadtoken {
 #include "regexp.h"
 #include "util.h"
 #include "form.h"
-#include "gv.h"
 #include "pad.h"
 #include "cv.h"
 #include "opnames.h"
@@ -4795,6 +4794,7 @@ END_EXTERN_C
 
 START_EXTERN_C
 
+#include "gv.h"
 #include "svx.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the

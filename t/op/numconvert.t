@@ -219,7 +219,7 @@ for my $num_chain (1..$max_chain) {
 		     and @ans[0] eq $max_uv_p1_as_uv) {
               # as aboce
 	      print "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
-	    } elsif (grep {m/^N$/} @opnames[[@{@curops[0]}]]
+	    } elsif (grep {m/^N$/} @opnames[[<@{@curops[0]}]]
 		     and @ans[0] == @ans[1] and @ans[0] +<= ^~^0
                      # First must be in E notation (ie not just digits) and
                      # second must still be an integer.

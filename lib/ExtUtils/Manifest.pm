@@ -214,7 +214,7 @@ refs.
 =cut
 
 sub fullcheck {
-    return \@( <_check_files()), \@( <_check_manifest());
+    return @(\@( <_check_files()), \@( <_check_manifest()));
 }
 
 
