@@ -31,16 +31,6 @@ require Exporter;
 
 $Too_Big = 1024 * 1024 * 2;
 
-sub croak {
-    require Carp;
-    goto &Carp::croak;
-}
-
-sub carp {
-    require Carp;
-    goto &Carp::carp;
-}
-
 my $macfiles;
 if ($^O eq 'MacOS') {
 	$macfiles = try { require Mac::MoreFiles };
@@ -72,7 +62,7 @@ sub _eq {
 }
 
 sub copy {
-    croak("Usage: copy(FROM, TO [, BUFFERSIZE]) ")
+    die("Usage: copy(FROM, TO [, BUFFERSIZE]) ")
       unless((nelems @_) == 2 || (nelems @_) == 3);
 
     my $from = shift;
@@ -90,7 +80,7 @@ sub copy {
 			 : (ref(\$to) eq 'GLOB'));
 
     if (_eq($from, $to)) { # works for references, too
-	carp("'$from' and '$to' are identical (not copied)");
+	warn("'$from' and '$to' are identical (not copied)");
         # The "copy" was a success as the source and destination contain
         # the same data.
         return 1;
@@ -102,7 +92,7 @@ sub copy {
 	if ((nelems @fs)) {
 	    my @ts = @( stat($to) );
 	    if ((nelems @ts) && @fs[0] == @ts[0] && @fs[1] == @ts[1]) {
-		carp("'$from' and '$to' are identical (not copied)");
+		warn("'$from' and '$to' are identical (not copied)");
                 return 0;
 	    }
 	}
@@ -174,7 +164,7 @@ sub copy {
 
     if ((nelems @_)) {
 	$size = shift(@_) + 0;
-	croak("Bad buffer size for copy: $size\n") unless ($size +> 0);
+	die("Bad buffer size for copy: $size\n") unless ($size +> 0);
     } else {
 	$size = tied(*$from_h) ? 0 : -s $from_h || 0;
 	$size = 1024 if ($size +< 512);
@@ -219,7 +209,7 @@ sub copy {
 }
 
 sub move {
-    croak("Usage: move(FROM, TO) ") unless (nelems @_) == 2;
+    die("Usage: move(FROM, TO) ") unless (nelems @_) == 2;
 
     my($from,$to) = < @_;
 

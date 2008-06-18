@@ -1,12 +1,5 @@
 #!./perl
 
-BEGIN {
-   if( %ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = @( '../lib' );
-    }
-}
-
 use Test::More;
 use strict;
 
@@ -28,7 +21,7 @@ foreach my $code ("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
                  )
 {
     eval $code;
-    like $@->{description}, qr/^Usage: /, "'$code' is a usage error";
+    like $@->message, qr/^Usage: /, "'$code' is a usage error";
 }
 
 

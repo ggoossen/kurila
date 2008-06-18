@@ -113,7 +113,7 @@ sub _verify_att {
         my @sigs   = @( ref $sig ? < @$sig : $sig );
         my $given  = ref $val;
         unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } < @sigs ) {
-            my $takes = join " or ", map { < _format_att($_) } < @sigs;
+            my $takes = join " or ", map { _format_att($_) } < @sigs;
 
             my $has = _format_att($given);
             warn "WARNING: $key takes a $takes not a $has.\n".
@@ -173,7 +173,7 @@ sub eval_in_subdirs {
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir (< @{$self->{DIR}}){
-        my($abs) = < $self->catdir($pwd,$dir);
+        my($abs) = $self->catdir($pwd,$dir);
         try { $self->eval_in_x($abs); };
         last if $@;
     }
