@@ -831,16 +831,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,']');
 			}
-	|	term ASLICE expr ']' ']'                     /* array slice */
-			{ $$ = prepend_elem(OP_ASLICE,
-                                            newOP(OP_PUSHMARK, 0),
-                                            newLISTOP(OP_ASLICE, 0,
-                                                      list($3),
-                                                      $1));
-			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,']');
-			}
 	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
 			{ $$ = prepend_elem(OP_HSLICE,
 				newOP(OP_PUSHMARK, 0),
@@ -884,6 +874,22 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
+			}
+	|	'(' expr ')' ASLICE expr ']' ']'            /* list slice */
+			{ $$ = newSLICEOP(0, $5, $2);
+			  TOKEN_GETMAD($1,$$,'(');
+			  TOKEN_GETMAD($3,$$,')');
+			  TOKEN_GETMAD($4,$$,'[');
+			  TOKEN_GETMAD($6,$$,'j');
+			  TOKEN_GETMAD($7,$$,']');
+			}
+	|	'(' ')' ASLICE expr ']' ']'                 /* empty list slice! */
+			{ $$ = newSLICEOP(0, $4, (OP*)NULL);
+			  TOKEN_GETMAD($1,$$,'(');
+			  TOKEN_GETMAD($2,$$,')');
+			  TOKEN_GETMAD($3,$$,'[');
+			  TOKEN_GETMAD($5,$$,'j');
+			  TOKEN_GETMAD($6,$$,']');
 			}
 	|	'(' expr ')' '[' expr ']'            /* list element */
 			{ $$ = newBINOP(OP_AELEM, 0,
@@ -1150,6 +1156,16 @@ term	:	termbinop
 			{ $$ = $1; }
 	|       subscripted
 			{ $$ = $1; }
+	|	ary ASLICE expr ']' ']'                     /* array slice */
+			{ $$ = prepend_elem(OP_ASLICE,
+                                            newOP(OP_PUSHMARK, 0),
+                                            newLISTOP(OP_ASLICE, 0,
+                                                      list($3),
+                                                      $1));
+			  TOKEN_GETMAD($2,$$,'[');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,']');
+			}
 	|	THING	%prec '('
 			{ $$ = $1; }
 	|	amper                                /* &foo; */

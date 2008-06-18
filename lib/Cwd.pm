@@ -305,10 +305,6 @@ unless ($pwd_cmd) {
     $pwd_cmd = 'pwd';
 }
 
-# Lazy-load Carp
-sub _carp  { require Carp; Carp::carp(< @_)  }
-sub _croak { require Carp; Carp::croak(< @_) }
-
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
@@ -499,7 +495,7 @@ sub _perl_abs_path
 
     unless (@cst = @( stat( $start ) ))
     {
-	_carp("stat($start): $!");
+	warn("stat($start): $!");
 	return '';
     }
 
@@ -539,7 +535,7 @@ sub _perl_abs_path
 	}
 	unless (@cst = @( stat($dotdots) ))
 	{
-	    _carp("stat($dotdots): $!");
+	    war("stat($dotdots): $!");
 	    closedir($parent);
 	    return '';
 	}
@@ -553,7 +549,7 @@ sub _perl_abs_path
 	    {
 		unless (defined ($dir = readdir($parent)))
 	        {
-		    _carp("readdir($dotdots): $!");
+		    war("readdir($dotdots): $!");
 		    closedir($parent);
 		    return '';
 		}
@@ -583,7 +579,7 @@ sub fast_abs_path {
     ($cwd)  = $cwd  =~ m/(.*)/;
 
     unless (-e $path) {
- 	_croak("$path: No such file or directory");
+ 	die("$path: No such file or directory");
     }
 
     unless (-d _) {
@@ -608,11 +604,11 @@ sub fast_abs_path {
     }
 
     if (!CORE::chdir($path)) {
- 	_croak("Cannot chdir to $path: $!");
+ 	die("Cannot chdir to $path: $!");
     }
     my $realpath = getcwd();
     if (! ((-d $cwd) && (CORE::chdir($cwd)))) {
- 	_croak("Cannot chdir back to $cwd: $!");
+ 	die("Cannot chdir back to $cwd: $!");
     }
     $realpath;
 }

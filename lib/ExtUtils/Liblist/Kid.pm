@@ -113,7 +113,7 @@ sub _unix_os2_ext {
 		#TODO: iterate through the directory instead of sorting
 
 		$fullname = "$thispth/" .
-		(sort { my($ma) = $a;
+		@(sort { my($ma) = $a;
 			my($mb) = $b;
 			$ma =~ s/[A-Za-z]+/0/g;
 			$ma =~ s/\b(\d)\b/0$1/g;
