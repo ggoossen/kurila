@@ -1354,7 +1354,7 @@ sub tempfile {
   # important if they want a child process to use the file)
   # For this reason, tie unlink_on_close to the return context regardless
   # of OS.
-  my $unlink_on_close = ( wantarray ? 0 : 1);
+  my $unlink_on_close = 0;
 
   # Create the file
   my ($fh, $path, $errstr);

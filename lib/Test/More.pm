@@ -9,7 +9,7 @@ $VERSION = eval $VERSION;    # make the alpha version come out as a number
 use Test::Builder::Module;
 @ISA    = @( qw(Test::Builder::Module) );
 @EXPORT = @( qw(ok use_ok require_ok
-             is isnt like unlike is_deeply
+             is isnt like unlike is_deeply dies_like
              cmp_ok
              skip todo todo_skip
              pass fail
@@ -663,6 +663,23 @@ sub _eval {
     my $eval_error  = $@;
 
     return @($eval_result, $eval_error);
+}
+
+=item B<dies_like>
+
+=cut
+
+sub dies_like {
+    my ($coderef, $like, $name) = < @_;
+
+    my $tb = Test::More->builder;
+
+    if (try { $coderef->(); 1; }) {
+        $tb->diag("didn't die");
+        return $tb->ok(0, $name);
+    }
+    my $err = $@->message;
+    return $tb->like($err, $like, $name);
 }
 
 =item B<require_ok>

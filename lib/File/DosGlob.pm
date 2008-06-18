@@ -385,21 +385,8 @@ sub glob {
 	}
 
     # chuck it all out, quick or slow
-    if (wantarray) {
-	delete %iter{$cxix};
-	return @{delete %entries{$cxix}};
-    }
-    else {
-	if (%iter{$cxix} = scalar nelems @{%entries{$cxix}}) {
-	    return shift @{%entries{$cxix}};
-	}
-	else {
-	    # return undef for EOL
-	    delete %iter{$cxix};
-	    delete %entries{$cxix};
-	    return undef;
-	}
-    }
+    delete %iter{$cxix};
+    return @{delete %entries{$cxix}};
 }
 
 {

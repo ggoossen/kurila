@@ -584,8 +584,7 @@ sub is_tainted_pp {
     my $nada = substr($arg, 0, 0); # zero-length
     local $@;
     try { eval "# $nada" };
-    die if $@;
-    return length($@) != 0;
+    return $@ ? 1 : 0;
 }
 
 sub _find_opt {

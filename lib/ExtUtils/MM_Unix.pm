@@ -3383,7 +3383,7 @@ sub subdirs {
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
     foreach my $dir (< @{$self->{DIR}}){
-	push(@m, < $self->subdir_x($dir));
+	push(@m, $self->subdir_x($dir));
 ####	print "Including $dir subdirectory\n";
     }
     if ((nelems @m)){

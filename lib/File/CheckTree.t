@@ -72,7 +72,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( !$@ && @warnings == 1
+    if ( !$@ && (nelems @warnings) == 1
              && @warnings[0] =~ m/lib is not a plain file/
              && defined($num_warnings)
              && $num_warnings == 1 )
@@ -103,7 +103,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( !$@ && @warnings == 3
+    if ( !$@ && (nelems @warnings) == 3
              && @warnings[0] =~ m/lib is not a plain file/
              && @warnings[1] =~ m/README is not a directory/
              && @warnings[2] =~ m/my warning: lib/
@@ -140,7 +140,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    if ( !$@ && @warnings == 2
+    if ( !$@ && (nelems @warnings) == 2
              && @warnings[0] =~ m/Spec is not a plain file/
              && @warnings[1] =~ m/INSTALL is not a directory/
              && defined($num_warnings)

@@ -24,7 +24,8 @@ sub import {
 
 sub fill_protos {
   my $proto = shift;
-  my ($n, $isref, < @out, < @out1, $seen_semi) = -1;
+  my $n = -1;
+  my ($isref, @out, @out1, $seen_semi);
   while ($proto =~ m/\S/) {
     $n++;
     push(@out1,\@($n,< @out)) if $seen_semi;
@@ -35,7 +36,7 @@ sub fill_protos {
     die "Unknown prototype letters: \"$proto\"";
   }
   push(@out1,\@($n+1,< @out));
-  @out1;
+  return @out1;
 }
 
 sub write_invocation {

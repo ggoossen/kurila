@@ -53,8 +53,8 @@ local $Module::Load::Conditional::VERBOSE   = 0;
 use constant ON_WIN         => ($^O eq 'MSWin32');
 use constant ON_VMS         => ($^O eq 'VMS');                                
 use constant ON_UNIX        => (!ON_WIN and !ON_VMS);
-use constant HAS_VOL        => (ON_WIN or < ON_VMS);
-use constant HAS_SHARE      => ( <ON_WIN);
+use constant HAS_VOL        => (ON_WIN or ON_VMS);
+use constant HAS_SHARE      => (ON_WIN);
 =pod
 
 =head1 NAME

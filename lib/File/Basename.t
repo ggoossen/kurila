@@ -1,10 +1,5 @@
 #!./perl -Tw
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-}
-
 use Test::More tests => 64;
 
 BEGIN { use_ok 'File::Basename' }
@@ -17,7 +12,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
     ok length fileparse_set_fstype('unix'), 'set fstype to unix';
     is( fileparse_set_fstype(), 'Unix',     'get fstype' );
 
-    my($base,$path,$type) = fileparse('/virgil/aeneid/draft.book7',
+    my($base,$path,$type) = < fileparse('/virgil/aeneid/draft.book7',
                                       qr'\.book\d+');
     is($base, 'draft');
     is($path, '/virgil/aeneid/');
@@ -33,7 +28,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 {
     is(fileparse_set_fstype('VMS'), 'Unix', 'set fstype to VMS');
 
-    my($base,$path,$type) = fileparse('virgil:[aeneid]draft.book7',
+    my($base,$path,$type) = <fileparse('virgil:[aeneid]draft.book7',
                                       qr{\.book\d+});
     is($base, 'draft');
     is($path, 'virgil:[aeneid]');
@@ -56,7 +51,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 {
     is(fileparse_set_fstype('DOS'), 'VMS', 'set fstype to DOS');
 
-    my($base,$path,$type) = fileparse('C:\virgil\aeneid\draft.book7',
+    my($base,$path,$type) = <fileparse('C:\virgil\aeneid\draft.book7',
                                       '\.book\d+');
     is($base, 'draft');
     is($path, 'C:\virgil\aeneid\');
@@ -81,7 +76,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 {
     is(fileparse_set_fstype('MacOS'), 'MSDOS', 'set fstype to MacOS');
 
-    my($base,$path,$type) = fileparse('virgil:aeneid:draft.book7',
+    my($base,$path,$type) = < fileparse('virgil:aeneid:draft.book7',
                                       '\.book\d+');
     is($base, 'draft');
     is($path, 'virgil:aeneid:');
@@ -108,7 +103,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 {
     fileparse_set_fstype 'DOS';
     # perl5.003_18 gives C:/perl/.\
-    is((fileparse 'C:/perl/lib')[1], 'C:/perl/');
+    is((< fileparse 'C:/perl/lib')[1], 'C:/perl/');
     # perl5.003_18 gives C:\perl\
     is(dirname('C:\perl\lib\'), 'C:\perl');
 
@@ -174,5 +169,5 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 
     fileparse_set_fstype 'Unix';
     ok tainted(dirname($TAINT.'/perl/lib//'));
-    ok all_tainted(fileparse($TAINT.'/dir/draft.book7','\.book\d+'));
+    ok all_tainted(< fileparse($TAINT.'/dir/draft.book7','\.book\d+'));
 }

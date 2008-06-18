@@ -44,19 +44,6 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 
     my $mm;
 
-    try {
-        $mm = WriteMakefile(
-            NAME            => 'Big::Dummy',
-            VERSION_FROM    => 'lib/Big/Dummy.pm',
-            MAN3PODS        => ' ', # common mistake
-        );
-    };
-
-    is( $warnings, <<VERIFY );
-WARNING: MAN3PODS takes a HASH reference not a string/number.
-         Please inform the author.
-VERIFY
-
     $warnings = '';
     try {
         $mm = WriteMakefile(
