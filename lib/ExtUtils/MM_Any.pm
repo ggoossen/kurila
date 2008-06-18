@@ -1718,7 +1718,7 @@ installation.
 
 sub libscan {
     my($self,$path) = < @_;
-    my($dirs,$file) = ( <$self->splitpath($path))[[1,2]];
+    my($dirs,$file) = (<$self->splitpath($path))[[1,2]];
     return '' if grep m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/, < 
                      $self->splitdir($dirs), $file;
 
