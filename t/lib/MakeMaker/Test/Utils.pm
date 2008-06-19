@@ -304,12 +304,13 @@ sub have_compiler {
 
     # ExtUtils::CBuilder prints its compilation lines to the screen.
     # Shut it up.
-    use TieOut;
     local *STDOUT = *STDOUT;
     local *STDERR = *STDERR;
 
-    tie *STDOUT, 'TieOut';
-    tie *STDERR, 'TieOut';
+    my $buffer;
+    open my $fh, '>', \$buffer;
+    *STDOUT = $fh;
+    *STDERR = $fh;
 
     try {
 	require ExtUtils::CBuilder;
