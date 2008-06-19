@@ -2,19 +2,9 @@
 
 use Config;
 
-BEGIN {
-    unless (-d 'blib') {
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
-
 use List::Util qw(reduce min);
 use Test::More;
-plan tests => ($::PERL_ONLY ? 21 : 23);
+plan tests => ($::PERL_ONLY ? 20 : 22);
 
 my $v = reduce {};
 
@@ -48,10 +38,6 @@ is( $v,	10,	'use eval{}');
 
 $v = !defined try { reduce { die if $b +> 2; $a + $b } 0,1,2,3,4 };
 ok($v, 'die');
-
-sub foobar { reduce { (defined(wantarray) && !wantarray) ? $a+1 : 0 } 0,1,2,3 }
-($v) = foobar();
-is( $v,	3,	'scalar context');
 
 sub add2 { $a + $b }
 

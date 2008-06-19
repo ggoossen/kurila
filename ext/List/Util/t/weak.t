@@ -106,8 +106,8 @@ my $flag = 0;
 	weaken($y->{Self});
 	print "# WKED\n";
 	ok( ref($y) );
-	print "# VALS: HASH ", <dump::view($y),"   SELF ", <dump::view(\$y->{Self}),"  Y ", <dump::view(\$y), 
-		"    FLAG: ", <dump::view(\$y->{Flag}),"\n";
+	print "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{Self}),"  Y ", dump::view(\$y), 
+		"    FLAG: ", dump::view(\$y->{Flag}),"\n";
 	print "# VPRINT\n";
 }
 print "# OUT $flag\n";

@@ -459,13 +459,13 @@ sub _open3_run {
             ### check for $len. it may be 0, at which point we're
             ### done reading, so don't try to process it.
             ### if we would print anyway, we'd provide bogus information
-            $_out_handler->( "$buf" ) if $len && $h == $kidout;
-            $_err_handler->( "$buf" ) if $len && $h == $kiderror;
+            $_out_handler->( "$buf" ) if $len && $h \== $kidout;
+            $_err_handler->( "$buf" ) if $len && $h \== $kiderror;
 
             ### Wait till child process is done printing to both
             ### stdout and stderr.
-            $stdout_done = 1 if $h == $kidout   and $len == 0;
-            $stderr_done = 1 if $h == $kiderror and $len == 0;
+            $stdout_done = 1 if $h \== $kidout   and $len == 0;
+            $stderr_done = 1 if $h \== $kiderror and $len == 0;
             last OUTER if ($stdout_done && $stderr_done);
         }
     }

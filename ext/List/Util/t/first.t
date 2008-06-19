@@ -2,7 +2,7 @@
 
 use List::Util qw(first);
 use Test::More;
-plan tests => ($::PERL_ONLY ? 15 : 17);
+plan tests => ($::PERL_ONLY ? 14 : 16);
 my $v;
 
 ok(defined &first,	'defined');
@@ -28,17 +28,12 @@ is($v, 5, 'use of eval');
 $v = try { first { die if $_ } 0,0,1 };
 is($v, undef, 'use of die');
 
-sub foobar {  first { !defined(wantarray) || wantarray } "not ","not ","not " }
-
-($v) = foobar();
-is($v, undef, 'wantarray');
-
 # Can we leave the sub with 'return'?
-$v = first {return  @($_+>6)} 2,4,6,12;
+$v = first {return ($_+>6)} 2,4,6,12;
 is($v, 12, 'return');
 
 # ... even in a loop?
-$v = first {while(1) {return  @($_+>6)} } 2,4,6,12;
+$v = first {while(1) {return  ($_+>6)} } 2,4,6,12;
 is($v, 12, 'return from loop');
 
 # Does it work from another package?

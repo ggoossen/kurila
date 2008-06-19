@@ -373,7 +373,7 @@ sub heading {
     $self->item ("\n\n") if defined %$self{ITEM};
     $text =~ s/\s+$//;
     if (%$self{opt_alt}) {
-        my $closemark = reverse (split (m//, $marker));
+        my $closemark = join '', reverse (split (m//, $marker));
         my $margin = ' ' x %$self{opt_margin};
         $self->output ("\n" . "$margin$marker $text $closemark" . "\n\n");
     } else {

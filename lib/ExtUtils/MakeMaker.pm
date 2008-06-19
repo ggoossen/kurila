@@ -364,7 +364,7 @@ sub new {
 
     if ("{join ' ', <@ARGV}" =~ m/\bPREREQ_PRINT\b/) {
         require Data::Dumper;
-        print < Data::Dumper->Dump(\@($self->{PREREQ_PM}), \@(qw(PREREQ_PM)));
+        print Data::Dumper->Dump(\@($self->{PREREQ_PM}), \@(qw(PREREQ_PM)));
         exit 0;
     }
 

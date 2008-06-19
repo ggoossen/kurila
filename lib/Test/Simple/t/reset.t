@@ -78,7 +78,7 @@ ok( fileno $tb->failure_output == fileno %Original_Output{failure_output},
 ok( fileno $tb->todo_output    == fileno %Original_Output{todo_output},
                                         'todo_output' );
 ok( $tb->current_test   == 0,           'current_test' );
-ok( $tb->summary        == 0,           'summary' );
+ok( (nelems $tb->summary)        == 0,           'summary' );
 ok( (nelems $tb->details)        == 0,           'details' );
 
 $tb->no_ending(1);

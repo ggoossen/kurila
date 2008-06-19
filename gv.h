@@ -99,7 +99,7 @@ Return the SV from the GV.
 #define INLINE1(ret, name, arg1) static __inline__ ret ii##name(pTHX_ arg1)
 INLINE1(AV*, GvAVn, GV *gv) {
     if (GvGP(gv)->gp_av) {
-	assert(SvTYPE(GvGP(gv)->gp_av) == SVt_PVAV);
+	/* assert(SvTYPE(GvGP(gv)->gp_av) == SVt_PVAV); */
 	return GvGP(gv)->gp_av;
     } else {
 	return GvGP(gv_AVadd(gv))->gp_av;

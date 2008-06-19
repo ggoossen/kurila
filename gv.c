@@ -501,6 +501,7 @@ S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
     gv = *gvp;
     gv_init(gv, stash, "ISA", 3, TRUE);
     superisa = GvAVn(gv);
+    assert(SvTYPE(superisa) == SVt_PVAV);
     GvMULTI_on(gv);
     sv_magic((SV*)superisa, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
 #ifdef USE_ITHREADS

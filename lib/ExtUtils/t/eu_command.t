@@ -44,7 +44,7 @@ BEGIN {
     unless (-f $self) {
         my ($vol, $dirs, $file) = < File::Spec->splitpath($self);
         my @dirs = @( < File::Spec->splitdir($dirs) );
-        unshift(@dirs, < File::Spec->updir);
+        unshift(@dirs, File::Spec->updir);
         $dirs = File::Spec->catdir(< @dirs);
         $self = File::Spec->catpath($vol, $dirs, $file);
     }
@@ -249,7 +249,7 @@ BEGIN {
     }
 
     # remove some files
-    my @files = @( @ARGV = @( < File::Spec->catfile( 'ecmddir', $Testfile ), <
+    my @files = @( @ARGV = @( File::Spec->catfile( 'ecmddir', $Testfile ),
     File::Spec->catfile( 'ecmddir', 'temp2', $Testfile ) ) );
     rm_f();
 

@@ -19,7 +19,7 @@ sub shellwords {
 	$line =~ s/^\s+//;
 	my @words = parse_line('\s+', 0, $line);
 	pop @words if (nelems @words) and !defined @words[-1];
-	return() unless ((nelems @words) || !length($line));
+	return @() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);
     }
     return @allwords;

@@ -1,12 +1,5 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = @( '../lib' );
-    }
-}
-
 # Make sure this is in place before Test::More is loaded.
 my $handler;
 BEGIN {

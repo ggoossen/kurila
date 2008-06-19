@@ -1,21 +1,12 @@
 #!./perl -w
 
-no strict;
-
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-	@INC = @( '../lib' );
-	chdir 't';
-    }
-}
-
 use Getopt::Long qw(GetOptionsFromString :config no_ignore_case);
 my $want_version="2.3501";
 die("Getopt::Long version $want_version required--this is only version ".
     $Getopt::Long::VERSION)
   unless $Getopt::Long::VERSION +>= $want_version;
 
-print "1..14\n";
+print "1..12\n";
 
 our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
 
@@ -48,9 +39,4 @@ $args = "-Foo -baR blech --foo bar";
 @ARGV = @( qw(foo bar) );
 undef $opt_baR;
 undef $opt_bar;
-{ my $ret;
-  ($ret, $args) = < GetOptionsFromString($args, "foo", "Foo=s");
-  print ($ret ? "" : "not ", "ok 12\n");
-  print ("{join ' ', <@$args}" eq "blech bar" ? "" : "{join ' ', <@$args}\nnot ", "ok 13\n");
-}
-print ("{join ' ', <@ARGV}" eq "foo bar" ? "" : "not ", "ok 14\n");
+print ("{join ' ', <@ARGV}" eq "foo bar" ? "" : "not ", "ok 12\n");

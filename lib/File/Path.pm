@@ -745,10 +745,10 @@ sub _rmtree {
             }
             else {
 		no strict 'refs';
-		if (!defined ${*{Symbol::fetch_glob("\cTAINT")}} or ${*{Symbol::fetch_glob("\cTAINT")}}) {
+		if (!defined ${*{Symbol::fetch_glob("^TAINT")}} or ${*{Symbol::fetch_glob("^TAINT")}}) {
                     # Blindly untaint dir names if taint mode is
                     # active, or any perl < 5.006
-                    @files = @( map { m/\A(.*)\z/s; $1 } readdir $d );
+                    @files = @( map { m/\A(.*)\z/s; $1 } < readdir $d );
                 }
                 else {
 		    @files = @( readdir $d );

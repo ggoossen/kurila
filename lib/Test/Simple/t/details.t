@@ -19,7 +19,7 @@ $Test->level(0);
 
 my @Expected_Details;
 
-$Test->is_num( scalar $Test->summary(), 0,   'no tests yet, no summary' );
+$Test->is_num( (nelems $Test->summary()), 0,   'no tests yet, no summary' );
 push @Expected_Details, \%( 'ok'      => 1,
                           actual_ok => 1,
                           name      => 'no tests yet, no summary',
@@ -71,7 +71,7 @@ for ($start_test..$Test->current_test) { print "ok $_\n" }
 $Test->output($out_fh);
 $Test->todo_output($todo_fh);
 
-$Test->is_num( scalar $Test->summary(), 4,   'summary' );
+$Test->is_num( (nelems $Test->summary()), 4,   'summary' );
 push @Expected_Details, \%( 'ok'      => 1,
                           actual_ok => 1,
                           name      => 'summary',

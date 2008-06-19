@@ -29,7 +29,7 @@ my @cd_args = @("some/dir", "command1", "command2");
     {
         local *make = sub { "nmake" };
 
-        my @dirs = @( ( <File::Spec->updir) x 2 );
+        my @dirs = @( (File::Spec->updir) x 2 );
         my $expected_updir = File::Spec->catdir(< @dirs);
         
         ::is $mm->cd(< @cd_args),

@@ -85,7 +85,7 @@ if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O 
 else {
   if (fork) {
    $wr->close;
-   print < $rd->getline;
+   print $rd->getline;
   }
   else {
    $rd->close;
