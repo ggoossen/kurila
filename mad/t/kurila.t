@@ -986,6 +986,41 @@ eval "1";
 END
 }
 
+sub t_no_auto_deref {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+$a->[0][0];
+----
+$a->[0]->[0];
+====
+our @a;
+@a[0][1];
+my $x;
+@$x[0];
+----
+our @a;
+@a[0]->[1];
+my $x;
+@$x[0];
+====
+$a->{foo}{bar};
+----
+$a->{foo}->{bar};
+====
+s/$a/%ENV{$a}/g;
+delete $a->{foo}{bar};
+----
+s/$a/%ENV{$a}/g;
+delete $a->{foo}->{bar};
+====
+# TODO no_auto_deref of sub.
+$a->[0]();
+----
+# TODO no_auto_deref of sub.
+$a->[0]->();
+====
+END
+}
+
 sub t_strict_vars {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
 @foo;
