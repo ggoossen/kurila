@@ -2169,20 +2169,7 @@ XS(XS_ref_svtype)
 	const char* type; 
 	if (SvMAGICAL(sv))
 	    mg_get(sv);
-	switch (Dtype(sv)) {
-	case Dt_UNDEF:
-	    type = "UNDEF";
-	case Dt_ARRAY:
-	    type = "ARRAY";
-	case Dt_HASH:
-	    type = "HASH";
-	case Dt_REF:
-	    type = "REF";
-	case Dt_PLAIN:
-	    type = "PLAINVALUE";
-	case Dt_COMPLEX:
-	    type = "COMPLEX";
-	}
+	type = Ddesc(sv);
 	SP -= items;
 	mPUSHp(type, strlen(type));
 	XSRETURN(1);
