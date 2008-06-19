@@ -112,7 +112,7 @@ if (open(XDEFINE, "<", "xdefine")) {
 my $limit = 0.25; # 25% is acceptable slosh for testing timers
 
 sub skip {
-    map { print "ok $_ # skipped\n" } < @_;
+    print "ok $_ # skipped\n" for < @_ ;
 }
 
 sub ok {
@@ -179,7 +179,7 @@ unless ($have_gettimeofday) {
     skip 10;
 }
 else {
-    my $r = \@( <gettimeofday());
+    my $r = \@(gettimeofday());
     my $f = tv_interval $r;
     ok 10, $f +< 2, $f;
 }

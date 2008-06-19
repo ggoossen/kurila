@@ -136,6 +136,8 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
         SV** isa_ptr = AvARRAY(isa);
         while(items--) {
             SV* const isa_item = *isa_ptr++;
+	    if ( ! SvPVOK(isa_item) )
+		Perl_croak(aTHX_ "@ISA element which is not an plain value");
             HV* const isa_item_stash = gv_stashsv(isa_item, 0);
             if(!isa_item_stash) {
                 /* if no stash, make a temporary fake MRO

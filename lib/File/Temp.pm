@@ -1331,11 +1331,11 @@ sub tempfile {
 
     if (%options{"DIR"}) {
 
-      $template = File::Spec->catfile(%options{"DIR"}, < TEMPXXX);
+      $template = File::Spec->catfile(%options{"DIR"}, TEMPXXX);
 
     } else {
 
-      $template = File::Spec->catfile( <File::Spec->tmpdir, < TEMPXXX);
+      $template = File::Spec->catfile(File::Spec->tmpdir, TEMPXXX);
 
     }
 
@@ -1377,25 +1377,11 @@ sub tempfile {
   _deferred_unlink($fh, $path, 0) if %options{"UNLINK"};
 
   # Return
-  if (wantarray()) {
-
-    if (%options{'OPEN'}) {
+  if (%options{'OPEN'}) {
       return  @($fh, $path);
-    } else {
-      return  @(undef, $path);
-    }
-
   } else {
-
-    # Unlink the file. It is up to unlink0 to decide what to do with
-    # this (whether to unlink now or to defer until later)
-    unlink0($fh, $path) or croak "Error unlinking file $path using unlink0";
-
-    # Return just the filehandle.
-    return $fh;
+      return  @(undef, $path);
   }
-
-
 }
 
 =item B<tempdir>
@@ -1601,12 +1587,7 @@ sub mkstemp {
 				    "ErrStr" => \$errstr,
 				   ) );
 
-  if (wantarray()) {
-    return  @($fh, $path);
-  } else {
-    return $fh;
-  }
-
+  return  @($fh, $path);
 }
 
 
@@ -1646,12 +1627,7 @@ sub mkstemps {
 				    "ErrStr" => \$errstr,
 				   ) );
 
-  if (wantarray()) {
-    return  @($fh, $path);
-  } else {
-    return $fh;
-  }
-
+  return  @($fh, $path);
 }
 
 =item B<mkdtemp>
@@ -1785,12 +1761,7 @@ sub tmpnam {
    # Use a ten character template and append to tmpdir
    my $template = File::Spec->catfile($tmpdir, < TEMPXXX);
 
-   if (wantarray() ) {
-       return mkstemp($template);
-   } else {
-       return mktemp($template);
-   }
-
+   return mkstemp($template);
 }
 
 =item B<tmpfile>

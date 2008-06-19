@@ -359,7 +359,7 @@ Abstract a -w check that tries to use POSIX::access() if possible.
             $has_posix= (!$Is_cygwin && eval 'local $^W; require POSIX; 1') || 0; 
         }
         if ($has_posix) {
-            return POSIX::access($dir, < POSIX::W_OK());
+            return POSIX::access($dir, POSIX::W_OK());
         } else {
             return -w $dir;
         }

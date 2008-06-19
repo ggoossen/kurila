@@ -535,7 +535,7 @@ sub pod2usage {
     if ( !%opts{"-noperldoc"}
              and  %opts{"-verbose"} +>= 2 
              and  !ref(%opts{"-input"})
-             and  %opts{"-output"} == \*STDOUT )
+             and  %opts{"-output"} \== \*STDOUT )
     {
        ## spit out the entire PODs. Might as well invoke perldoc
        my $progpath = File::Spec->catfile(%Config{scriptdir}, "perldoc");

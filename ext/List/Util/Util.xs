@@ -201,20 +201,7 @@ CODE:
 {
     dVAR;
     int index;
-#if (PERL_VERSION < 9)
-    struct op dmy_op;
-    struct op *old_op = PL_op;
-
-    /* We call pp_rand here so that Drand01 get initialized if rand()
-       or srand() has not already been called
-    */
-    memzero((char*)(&dmy_op), sizeof(struct op));
-    /* we let pp_rand() borrow the TARG allocated for this XS sub */
-    dmy_op.op_targ = PL_op->op_targ;
-    PL_op = &dmy_op;
-    (void)*(PL_ppaddr[OP_RAND])(aTHX);
-    PL_op = old_op;
-#else
+    AV* ret;
     /* Initialize Drand01 if rand() or srand() has
        not already been called
     */
@@ -222,15 +209,19 @@ CODE:
         (void)seedDrand01((Rand_seed_t)Perl_seed(aTHX));
         PL_srand_called = TRUE;
     }
-#endif
 
-    for (index = items ; index > 1 ; ) {
+    ret = (AV*)sv_2mortal((SV*)newAV());
+
+    for (index = items ; index > 0 ; ) {
 	int swap = (int)(Drand01() * (double)(index--));
 	SV *tmp = ST(swap);
 	ST(swap) = ST(index);
 	ST(index) = tmp;
+        av_push(ret, SvREFCNT_inc(tmp));
     }
-    XSRETURN(items);
+    SP -= items;
+    PUSHs((SV*)ret);
+    XSRETURN(1);
 }
 
 
@@ -321,23 +312,15 @@ weaken(sv)
 	SV *sv
 PROTOTYPE: $
 CODE:
-#ifdef SvWEAKREF
 	sv_rvweaken(sv);
-#else
-	croak("weak references are not implemented in this release of perl");
-#endif
 
 void
 isweak(sv)
 	SV *sv
 PROTOTYPE: $
 CODE:
-#ifdef SvWEAKREF
 	ST(0) = boolSV(SvROK(sv) && SvWEAKREF(sv));
 	XSRETURN(1);
-#else
-	croak("weak references are not implemented in this release of perl");
-#endif
 
 int
 readonly(sv)
@@ -362,16 +345,7 @@ looks_like_number(sv)
 	SV *sv
 PROTOTYPE: $
 CODE:
-#if (PERL_VERSION < 8) || (PERL_VERSION == 8 && PERL_SUBVERSION <5)
-  if (SvPOK(sv) || SvPOKp(sv)) {
-    RETVAL = looks_like_number(sv);
-  }
-  else {
-    RETVAL = SvFLAGS(sv) & (SVf_NOK|SVp_NOK|SVf_IOK|SVp_IOK);
-  }
-#else
   RETVAL = looks_like_number(sv);
-#endif
 OUTPUT:
   RETVAL
 
@@ -410,21 +384,9 @@ BOOT:
     HV *lu_stash = gv_stashpvn("List::Util", 10, TRUE);
     GV *rmcgv = *(GV**)hv_fetch(lu_stash, "REAL_MULTICALL", 14, TRUE);
     SV *rmcsv;
-#if !defined(SvWEAKREF)
-    HV *su_stash = gv_stashpvn("Scalar::Util", 12, TRUE);
-    GV *vargv = *(GV**)hv_fetch(su_stash, "EXPORT_FAIL", 11, TRUE);
-    AV *varav;
-    if (SvTYPE(vargv) != SVt_PVGV)
-	gv_init(vargv, su_stash, "Scalar::Util", 12, TRUE);
-    varav = GvAVn(vargv);
-#endif
     if (SvTYPE(rmcgv) != SVt_PVGV)
 	gv_init(rmcgv, lu_stash, "List::Util", 12, TRUE);
     rmcsv = GvSVn(rmcgv);
-#ifndef SvWEAKREF
-    av_push(varav, newSVpv("weaken",6));
-    av_push(varav, newSVpv("isweak",6));
-#endif
 #ifdef REAL_MULTICALL
     sv_setsv(rmcsv, &PL_sv_yes);
 #else

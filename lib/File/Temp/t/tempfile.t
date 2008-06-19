@@ -57,7 +57,7 @@ push(@files, $tempfile);
 my $template = 'tmpdirXXXXXX';
 print "# Template: $template\n";
 my $tempdir = tempdir( $template ,
-		       DIR => < File::Spec->curdir,
+		       DIR => File::Spec->curdir,
 		       CLEANUP => 1,
 		     );
 

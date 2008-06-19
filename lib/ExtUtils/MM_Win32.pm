@@ -496,7 +496,7 @@ sub cd {
 
     my $cmd = join "\n\t", map "$_", < @cmds;
 
-    my $updirs = $self->catdir(map { < $self->updir } < $self->splitdir($dir));
+    my $updirs = $self->catdir(map { $self->updir } < $self->splitdir($dir));
 
     # No leading tab and no trailing newline makes for easier embedding.
     my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs;

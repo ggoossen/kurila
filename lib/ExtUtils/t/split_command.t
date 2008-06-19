@@ -41,14 +41,14 @@ is( join('', < @results), join('', < @test_args));
 
 
 my %test_args = %( foo => 42, bar => 23, car => 'har' );
-my $even_args = $mm->oneliner(q{print !(@ARGV % 2)});
+my $even_args = $mm->oneliner(q{print !((nelems @ARGV) % 2)});
 @cmds = @( < $mm->split_command($even_args, < %test_args) );
 isnt( (nelems @cmds), 0 );
 
 @results = @( < _run(< @cmds) );
 like( join('', < @results ), qr/^1+$/,         'pairs preserved' );
 
-is( (nelems @($mm->split_command($echo))), 0,  'no args means no commands' );
+is( (nelems $mm->split_command($echo)), 0,  'no args means no commands' );
 
 
 sub _run {
@@ -62,5 +62,5 @@ sub _run {
         s{\\\n}{} foreach < @cmds;
     }
 
-    return map { s/\n+$//; $_ } map { `$_` } < @cmds
+    return @( map { s/\n+$//; $_ } map { `$_` } < @cmds);
 }

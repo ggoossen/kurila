@@ -212,7 +212,7 @@ package The::Import;
 
 use Exporter 'import';
 
-::ok(\&import == \&Exporter::import, "imported the import routine");
+::ok(\&import \== \&Exporter::import, "imported the import routine");
 
 our @EXPORT = @( qw( wibble ) );
 sub wibble {return "wobble"};

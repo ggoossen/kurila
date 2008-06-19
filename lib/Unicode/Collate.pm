@@ -429,7 +429,7 @@ sub _varCE
 sub viewSortKey
 {
     my $self = shift;
-    $self->visualizeSortKey( <$self->getSortKey(< @_));
+    $self->visualizeSortKey($self->getSortKey(< @_));
 }
 
 sub visualizeSortKey
@@ -478,7 +478,7 @@ sub splitEnt
     }
 
     # get array of Unicode code point of string.
-    my @src = @( < unpack_U($str) );
+    my @src = @( unpack_U($str) );
 
     # rearrangement:
     # Character positions are not kept if rearranged,
@@ -729,7 +729,7 @@ sub getSortKey
 	}
     }
 
-    join LEVEL_SEP, map pack(KEY_TEMPLATE, < @$_), < @ret;
+    return join LEVEL_SEP, map pack(KEY_TEMPLATE, < @$_), < @ret;
 }
 
 
@@ -926,14 +926,14 @@ sub index
     if (! nelems @$subE) {
 	my $temp = $pos +<= 0 ? 0 : $len +<= $pos ? $len : $pos;
 	return $grob
-	    ? map(\@($_, 0), $temp..$len)
-	    : wantarray ?  @($temp,0) : $temp;
+	    ? @( map(\@($_, 0), $temp..$len) )
+	    : @($temp,0);
     }
     $len +< $pos
-	and return wantarray ? () : NOMATCHPOS;
+	and return;
     my $strE = $self->splitEnt($pos ? substr($str, $pos) : $str, < TRUE);
     (nelems @$strE)
-	or return wantarray ? () : NOMATCHPOS;
+	or return;
 
     my(@strWt, @iniPos, @finPos, @subWt, @g_ret);
 
@@ -1017,9 +1017,7 @@ sub index
 		    splice @finPos, 0, ((nelems @subWt)-1);
 		}
 		else {
-		    return wantarray
-			?  @($temp, @finPos[((nelems @subWt)-1)] - @iniPos[0])
-			:  $temp;
+		    return @($temp, @finPos[((nelems @subWt)-1)] - @iniPos[0]);
 		}
 	    }
 	    shift @strWt;
@@ -1030,7 +1028,7 @@ sub index
 
     return $grob
 	? @g_ret
-	: wantarray ? () : NOMATCHPOS;
+	: ();
 }
 
 ##
@@ -1041,7 +1039,7 @@ sub match
     my $self = shift;
     if (my($pos,$len) = < $self->index(@_[0], @_[1])) {
 	my $temp = substr(@_[0], $pos, $len);
-	return wantarray ? $temp : \$temp;
+	return $temp;
 	# An lvalue ref \substr should be avoided,
 	# since its value is affected by modification of its referent.
     }
@@ -1058,8 +1056,8 @@ sub gmatch
     my $self = shift;
     my $str  = shift;
     my $sub  = shift;
-    return map substr($str, $_->[0], $_->[1]), <
-		$self->index($str, $sub, 0, 'g');
+    return @( map substr($str, $_->[0], $_->[1]), <
+		$self->index($str, $sub, 0, 'g') );
 }
 
 ##

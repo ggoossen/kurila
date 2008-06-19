@@ -5,8 +5,7 @@
 
 BEGIN {
     if( %ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = @('../lib', 'lib');
+        push @INC, 'lib';
     }
     else {
         unshift @INC, 't/lib';
@@ -14,15 +13,13 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 28;
+use Test::More tests => 27;
 
 use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
 use ExtUtils::MakeMaker;
-
-chdir 't';
 
 perl_lib();
 
