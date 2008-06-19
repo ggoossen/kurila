@@ -20,7 +20,7 @@ is( ref(ExtUtils::Packlist::mkfh()), 'GLOB', 'mkfh() should return a FH' );
 # new calls tie()
 my $pl = ExtUtils::Packlist->new();
 isa_ok( $pl, 'ExtUtils::Packlist' );
-is( ref tied %$pl, 'ExtUtils::Packlist', 'obj should be tied underneath' );
+is( (ref tied %$pl), 'ExtUtils::Packlist', 'obj should be tied underneath' );
 
 
 $pl = ExtUtils::Packlist::TIEHASH( 'tieclass', 'packfile' );

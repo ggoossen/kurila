@@ -400,7 +400,7 @@ sub _can_write_dir {
 
     my $path='';
     my @make;
-    while ((nelems @dirs)) {
+    while (@dirs) {
         $dir = File::Spec->catdir(< @dirs);
         $dir = File::Spec->catpath($vol,$dir,'') 
                 if defined $vol and length $vol;
@@ -686,7 +686,7 @@ sub install { #XXX OS-SPECIFIC
 
     my(%from_to) = %( < %$from_to );
     my(%pack, $dir, %warned);
-    my($packlist) = < ExtUtils::Packlist->new();
+    my $packlist = ExtUtils::Packlist->new();
 
     local(*DIR);
     for (qw/read write/) {
@@ -825,10 +825,10 @@ sub install { #XXX OS-SPECIFIC
     }
 
     if (%pack{'write'}) {
-        $dir = install_rooted_dir( <dirname(%pack{'write'}));
+        $dir = install_rooted_dir(dirname(%pack{'write'}));
         _mkpath( $dir, 0, 0755, $verbose, $dry_run );
         print "Writing %pack{'write'}\n";
-        $packlist->write( <install_rooted_file(%pack{'write'})) unless $dry_run;
+        $packlist->write(install_rooted_file(%pack{'write'})) unless $dry_run;
     }
 
     _do_cleanup($verbose);

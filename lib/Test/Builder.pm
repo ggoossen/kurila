@@ -380,9 +380,6 @@ sub ok {
     lock $self->{Curr_Test};
     $self->{Curr_Test}++;
 
-    # In case $name is a string overloaded object, force it to stringify.
-    $self->_unoverload_str(\$name);
-
     $self->diag(<<ERR) if defined $name and $name =~ m/^[\d\s]+$/;
     You named your test '$name'.  You shouldn't use numbers for your test names.
     Very confusing.
@@ -393,8 +390,6 @@ ERR
     # Capture the value of $TODO for the rest of this ok() call
     # so it can more easily be found by other routines.
     local $self->{TODO} = $todo;
-
-    $self->_unoverload_str(\$todo);
 
     my $out;
     my $result = &share(\%());
@@ -451,45 +446,10 @@ ERR
     return $test ? 1 : 0;
 }
 
-
-sub _unoverload {
-    my $self  = shift;
-    my $type  = shift;
-
-    $self->_try(sub { require overload } ) || return;
-
-    foreach my $thing (< @_) {
-        if( $self->_is_object($$thing) ) {
-            if( my $string_meth = overload::Method($$thing, $type) ) {
-                $$thing = $$thing->?$string_meth();
-            }
-        }
-    }
-}
-
-
 sub _is_object {
     my($self, $thing) = < @_;
 
     return $self->_try(sub { ref $thing && $thing->isa('UNIVERSAL') }) ? 1 : 0;
-}
-
-
-sub _unoverload_str {
-    my $self = shift;
-
-    $self->_unoverload(q[""], < @_);
-}    
-
-sub _unoverload_num {
-    my $self = shift;
-
-    $self->_unoverload('0+', < @_);
-
-    for my $val (< @_) {
-        next unless $self->_is_dualvar($$val);
-        $$val = $$val+0;
-    }
 }
 
 
@@ -541,16 +501,12 @@ sub is_eq {
         return $test;
     }
 
-    $self->_unoverload_str(\$got, \$expect);
-
     return $self->cmp_ok($got, 'eq', $expect, $name);
 }
 
 sub is_num {
     my($self, $got, $expect, $name) = < @_;
     local $Level = $Level + 1;
-
-    $self->_unoverload_num(\$got, \$expect);
 
     if( !defined $got || !defined $expect ) {
         # undef only matches undef and nothing else
@@ -572,10 +528,6 @@ sub _is_diag {
             if( $type eq 'eq' ) {
                 # quote and force string context
                 $$val = dump::view($$val);
-            }
-            else {
-                # force numeric context
-                $self->_unoverload_num($val);
             }
         }
         else {
@@ -699,14 +651,6 @@ my %numeric_cmps = %( map { ($_, 1) }
 sub cmp_ok {
     my($self, $got, $type, $expect, $name) = < @_;
 
-    # Treat overloaded objects as numbers if we're asked to do a
-    # numeric comparison.
-    my $unoverload = %numeric_cmps{$type} ? '_unoverload_num'
-                                          : '_unoverload_str';
-
-    $self->?$unoverload(\$got, \$expect);
-
-
     my $test;
     {
         local($@,$!);  # isolate eval
@@ -809,7 +753,6 @@ Skips the current test, reporting $why.
 sub skip {
     my($self, $why) = < @_;
     $why ||= '';
-    $self->_unoverload_str(\$why);
 
     $self->_plan_check;
 

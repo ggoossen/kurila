@@ -698,7 +698,7 @@ sub _rmtree {
             : $root
         ;
 
-        my ($ldev, $lino, $perm) = @(lstat $root)[[0,1,2]] or next ROOT_DIR;
+        my ($ldev, $lino, $perm) = (lstat $root)[[0,1,2]] or next ROOT_DIR;
 
 	if ( -d _ ) {
             $root = VMS::Filespec::pathify($root) if $Is_VMS;
@@ -717,7 +717,7 @@ sub _rmtree {
                 }
             }
 
-            my ($device, $inode, $perm) = @(stat $curdir)[[0,1,2]] or do {
+            my ($device, $inode, $perm) = (stat $curdir)[[0,1,2]] or do {
                 _error($arg, "cannot stat current working directory", $canon);
                 next ROOT_DIR;
             };

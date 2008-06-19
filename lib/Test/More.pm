@@ -793,25 +793,15 @@ WARNING
 
     my($got, $expected, $name) = < @_;
 
-    $tb->_unoverload_str(\$expected, \$got);
-
     my $ok;
-    if( !ref $got and !ref $expected ) {  		# neither is a reference
-        $ok = $tb->is_eq($got, $expected, $name);
+
+    local @Data_Stack = @( () );
+    if( _deep_check($got, $expected) ) {
+        $ok = $tb->ok(1, $name);
     }
-    elsif( !ref $got xor !ref $expected ) {  	# one's a reference, one isn't
+    else {
         $ok = $tb->ok(0, $name);
-	$tb->diag( _format_stack(\%( vals => \@( $got, $expected ) )) );
-    }
-    else {			       		# both references
-        local @Data_Stack = @( () );
-        if( _deep_check($got, $expected) ) {
-            $ok = $tb->ok(1, $name);
-        }
-        else {
-            $ok = $tb->ok(0, $name);
-            $tb->diag( _format_stack(< @Data_Stack));
-        }
+        $tb->diag( _format_stack(< @Data_Stack));
     }
 
     return $ok;
@@ -1204,11 +1194,9 @@ sub _deep_check {
         # Quiet uninitialized value warnings when comparing undefs.
         local $^W = 0; 
 
-        $tb->_unoverload_str(\$e1, \$e2);
-
         # Either they're both references or both not.
         my $both_ref = (ref $e1 and ref $e2);
-	my $not_ref  = (!ref $e1 and !ref $e2);
+	my $not_ref  = (ref::svtype($e1) eq "PLAINVALUE" and ref::svtype($e2) eq "PLAINVALUE");
 
         if( defined $e1 xor defined $e2 ) {
             $ok = 0;
@@ -1232,32 +1220,23 @@ sub _deep_check {
             }
             %Refs_Seen{ref::address $e1} = ref::address $e2;
 
-            my $type = _type($e1);
-            $type = 'DIFFERENT' unless _type($e2) eq $type;
+            my $type = ref::svtype($e1);
+            $type = 'DIFFERENT' unless ref::svtype($e2) eq $type;
 
             if( $type eq 'DIFFERENT' ) {
                 push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
                 $ok = 0;
             }
             elsif( $type eq 'ARRAY' ) {
-                $ok = _eq_array($e1, $e2);
+                $ok = _eq_array(\$e1, \$e2);
             }
             elsif( $type eq 'HASH' ) {
-                $ok = _eq_hash($e1, $e2);
+                $ok = _eq_hash(\$e1, \$e2);
             }
-            elsif( $type eq 'REF' ) {
+            elsif( $type eq 'REFERENCE' ) {
                 push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
                 $ok = _deep_check($$e1, $$e2);
                 pop @Data_Stack if $ok;
-            }
-            elsif( $type eq 'SCALAR' ) {
-                push @Data_Stack, \%( type => 'REF', vals => \@($e1, $e2) );
-                $ok = _deep_check($$e1, $$e2);
-                pop @Data_Stack if $ok;
-            }
-            elsif( $type ) {
-                push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
-                $ok = 0;
             }
 	    else {
 		_whoa(1, "No type in _deep_check");

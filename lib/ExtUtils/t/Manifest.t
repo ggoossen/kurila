@@ -25,7 +25,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 # We're going to be chdir'ing and modules are sometimes loaded on the
 # fly in this test, so we need an absolute @INC.
-@INC = @( map { < File::Spec->rel2abs($_) } < @INC );
+@INC = @( map { File::Spec->rel2abs($_) } < @INC );
 
 # keep track of everything added so it can all be deleted
 my %Files;
@@ -49,7 +49,7 @@ sub read_manifest {
 sub catch_warning {
     my $warn = '';
     local $^WARN_HOOK = sub { $warn .= @_[0]->{description} };
-    return join('', < @_[0]->() ), $warn;
+    return @( @_[0]->(), $warn );
 }
 
 sub remove_dir {
@@ -91,17 +91,17 @@ ok( -e 'MANIFEST', 'create MANIFEST file' );
 
 my @list = @( < read_manifest() );
 is( (nelems @list), 2, 'check files in MANIFEST' );
-ok( ! @(ExtUtils::Manifest::filecheck()), 'no additional files in directory' );
+ok( ! ExtUtils::Manifest::filecheck(), 'no additional files in directory' );
 
 # after adding bar, the MANIFEST is out of date
 ok( add_file( 'bar' ), 'add another file' );
-ok( ! @(manicheck()), 'MANIFEST now out of sync' );
+ok( ! manicheck(), 'MANIFEST now out of sync' );
 
 # it reports that bar has been added and throws a warning
 ($res, $warn) = < catch_warning( \&filecheck );
 
 like( $warn, qr/^Not in MANIFEST: bar/, 'warning that bar has been added' );
-is( $res, 'bar', 'bar reported as new' );
+is_deeply( $res, @('bar'), 'bar reported as new' );
 
 # now quiet the warning that bar was added and test again
 ($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
@@ -130,7 +130,7 @@ is( join( ' ', < @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
 
 # add a subdirectory and a file there that should be found
 ok( mkdir( 'moretest', 0777 ), 'created moretest directory' );
-add_file( < File::Spec->catfile('moretest', 'quux'), 'quux' );
+add_file( File::Spec->catfile('moretest', 'quux'), 'quux' );
 ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ), 
                                         "manifind found moretest/quux" );
 
@@ -206,7 +206,7 @@ add_file( 'MANIFEST.SKIP' => 'foo' );
 add_file( 'MANIFEST'      => "foobar\n"   );
 add_file( 'foobar'        => '123' );
 ($res, $warn) = < catch_warning( \&manicheck );
-is( $res,  '',      'MANIFEST overrides MANIFEST.SKIP' );
+is( $res,  undef,      'MANIFEST overrides MANIFEST.SKIP' );
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
 $files = maniread;

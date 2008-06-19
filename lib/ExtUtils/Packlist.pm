@@ -19,10 +19,8 @@ Make a filehandle. Same kind of idea as Symbol::gensym().
 
 sub mkfh()
 {
-no strict;
-my $fh = \*{Symbol::fetch_glob($fhname++)};
-use strict;
-return @($fh);
+    my $fh = \*{Symbol::fetch_glob($fhname++)};
+    return $fh;
 }
 
 =item __find_relocations
@@ -55,7 +53,7 @@ my ($class, $packfile) = < @_;
 $class = ref($class) || $class;
 my %self;
 tie(%self, $class, $packfile);
-return @(bless(\%self, $class));
+return (bless(\%self, $class));
 }
 
 sub TIEHASH
@@ -64,7 +62,7 @@ my ($class, $packfile) = < @_;
 my $self = \%( packfile => $packfile );
 bless($self, $class);
 $self->read($packfile) if (defined($packfile) && -f $packfile);
-return @($self);
+return ($self);
 }
 
 sub STORE

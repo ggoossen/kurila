@@ -2214,7 +2214,7 @@ sub installbin {
 
     my %fromto;
     for my $from (< @exefiles) {
-	my($path)= < $self->catfile('$(INST_SCRIPT)', < basename($from));
+	my($path)= $self->catfile('$(INST_SCRIPT)', basename($from));
 
 	local($_) = $path; # for backwards compatibility
 	my $to = $self->libscan($path);

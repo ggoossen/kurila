@@ -38,7 +38,7 @@ sub _is_prefix {
         $prefix =~ s|\\|/|g;
         return 1 if $path =~ m{^\Q$prefix\E}i;
     }
-    return @(0);
+    return 0;
 }
 
 sub _is_doc {
@@ -46,35 +46,35 @@ sub _is_doc {
 
     my $man1dir = $self->{':private:'}->{Config}->{man1direxp};
     my $man3dir = $self->{':private:'}->{Config}->{man3direxp};
-    return @(($man1dir && $self->_is_prefix($path, $man1dir))
+    return ($man1dir && $self->_is_prefix($path, $man1dir))
            ||
            ($man3dir && $self->_is_prefix($path, $man3dir))
-           ? 1 : 0)
+           ? 1 : 0;
 }
 
 sub _is_type {
     my ($self, $path, $type) = < @_;
     return 1 if $type eq "all";
 
-    return @($self->_is_doc($path)) if $type eq "doc";
+    return $self->_is_doc($path) if $type eq "doc";
 
     if ($type eq "prog") {
-        return @($self->_is_prefix($path, $self->{':private:'}->{Config}->{prefix} || $self->{':private:'}->{Config}->{prefixexp})
+        return ($self->_is_prefix($path, $self->{':private:'}->{Config}->{prefix} || $self->{':private:'}->{Config}->{prefixexp})
                &&
                !($self->_is_doc($path))
                ? 1 : 0);
     }
-    return @(0);
+    return 0;
 }
 
 sub _is_under {
     my ($self, $path, < @under) = < @_;
     @under[0] = "" if (! nelems @under);
     foreach my $dir (< @under) {
-        return @(1) if ($self->_is_prefix($path, $dir));
+        return 1 if ($self->_is_prefix($path, $dir));
     }
 
-    return @(0);
+    return 0;
 }
 
 sub new {
@@ -88,7 +88,7 @@ sub new {
     if (%args{config_override}) {
         try {
             $self->{':private:'}->{Config} = \%( < %{%args{config_override}} );
-        } or Carp::croak(
+        } or die(
             "The 'config_override' parameter must be a hash reference."
         );
     }
@@ -137,7 +137,7 @@ sub new {
     
     # Read the core packlist
     $self->{Perl}->{packlist} =
-      ExtUtils::Packlist->new( < File::Spec->catfile($archlib, '.packlist') );
+      ExtUtils::Packlist->new( File::Spec->catfile($archlib, '.packlist') );
     $self->{Perl}->{version} = $self->{':private:'}->{Config}->{version};
 
     # Read the module packlists
@@ -181,7 +181,7 @@ sub new {
     $self->{':private:'}->{LIBDIRS} = \@dirs;    
     find($sub, < @dirs) if (nelems @dirs);
 
-    return @(bless($self, $class));
+    return bless($self, $class);
 }
 
 # VMS's non-case preserving file-system means the package name can't
@@ -218,18 +218,16 @@ sub modules {
     my ($self) = < @_;
 
     # Bug/feature of sort in scalar context requires this.
-    return wantarray
-        ? @( sort grep { not m/^:private:$/ } keys %$self)
-        : grep { not m/^:private:$/ } keys %$self;
+    return @( sort grep { not m/^:private:$/ } keys %$self);
 }
 
 sub files {
     my ($self, $module, $type, < @under) = < @_;
 
     # Validate arguments
-    Carp::croak("$module is not installed") if (! exists($self->{$module}));
+    die("$module is not installed") if (! exists($self->{$module}));
     $type = "all" if (! defined($type));
-    Carp::croak('type must be "all", "prog" or "doc"')
+    die('type must be "all", "prog" or "doc"')
         if ($type ne "all" && $type ne "prog" && $type ne "doc");
 
     my (@files);
@@ -238,7 +236,7 @@ sub files {
           if ($self->_is_type($file, $type) &&
               $self->_is_under($file, < @under));
     }
-    return @(@files);
+    return @files;
 }
 
 sub directories {
@@ -269,19 +267,19 @@ sub directory_tree {
 sub validate {
     my ($self, $module, $remove) = < @_;
     Carp::croak("$module is not installed") if (! exists($self->{$module}));
-    return @($self->{$module}->{packlist}->validate($remove));
+    return $self->{$module}->{packlist}->validate($remove);
 }
 
 sub packlist {
     my ($self, $module) = < @_;
     Carp::croak("$module is not installed") if (! exists($self->{$module}));
-    return @($self->{$module}->{packlist});
+    return $self->{$module}->{packlist};
 }
 
 sub version {
     my ($self, $module) = < @_;
     Carp::croak("$module is not installed") if (! exists($self->{$module}));
-    return @($self->{$module}->{version});
+    return $self->{$module}->{version};
 }
 
 
