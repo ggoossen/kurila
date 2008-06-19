@@ -64,6 +64,17 @@ typedef enum {
 	SVt_LAST	/* keep last in enum. used to size arrays */
 } svtype;
 
+
+typedef enum {
+    Dt_UNDEF,
+    Dt_PLAIN,
+    Dt_REF,
+    Dt_ARRAY,
+    Dt_HASH,
+    Dt_COMPLEX
+} datatype;
+
+
 /* There is collusion here with sv_clear - sv_clear exits early for SVt_NULL
    and SVt_IV, so never reaches the clause at the end that uses
    sv_type_details->body_size to determine whether to call safefree(). Hence

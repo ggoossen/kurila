@@ -20,8 +20,8 @@ sub link {
   # Massage some very naughty bits in %Config
   local $cf->{lddlflags} = $cf->{lddlflags};
   for ($cf->{lddlflags}) {
-    s/\Q$(BASEEXT)\E/$baseext/;
-    s/\Q$(PERL_INC)\E/$perl_inc/;
+    s/\$ [(] BASEEXT [)] /$baseext/x;
+    s/\$ [(] PERL_INC [)] /$perl_inc/x;
   }
 
   return $self->SUPER::link(< %args);

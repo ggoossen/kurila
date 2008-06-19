@@ -6038,6 +6038,9 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
+    if ( SvOK(sv) && ! SvPVOK(sv) )
+	Perl_croak(aTHX_ "Can't coerce '%s' to a number", Ddesc(sv) );
+
     flags = SvFLAGS(sv);
     if ((flags & (SVp_NOK|SVp_IOK)) == SVp_NOK) {
 	/* It's (privately or publicly) a float, but not tested as an

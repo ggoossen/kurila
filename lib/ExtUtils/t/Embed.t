@@ -70,7 +70,7 @@ if ($^O eq 'VMS') {
        push @cmd, "-non_shared";
    }
 
-   push(@cmd,"-I$inc", <ccflags(),'embed_test.c');
+   push(@cmd,"-I$inc", ccflags(),'embed_test.c');
    if ($^O eq 'MSWin32') {
     $inc = File::Spec->catdir($inc,'win32');
     push(@cmd,"-I$inc");
@@ -80,7 +80,7 @@ if ($^O eq 'VMS') {
 	push(@cmd,'-link',"-libpath:$lib",%Config{'libperl'},%Config{'libs'});
     }
     else {
-	push(@cmd,"-L$lib", <File::Spec->catfile($lib,%Config{'libperl'}),%Config{'libc'});
+	push(@cmd,"-L$lib", File::Spec->catfile($lib,%Config{'libperl'}),%Config{'libc'});
     }
    }
    elsif ($^O eq 'os390' && %Config{usedl}) {
@@ -92,7 +92,7 @@ if ($^O eq 'VMS') {
     };
     push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
 	if $^O eq 'os2' and %Config{ldflags} =~ m/(?<!\S)-Zomf\b/;
-    push(@cmd, <ldopts());
+    push(@cmd, ldopts());
    }
    if ($borl) {
      @cmd = @(@cmd[0],(grep{m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]),(grep{!m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]));
@@ -141,7 +141,7 @@ if ($^O eq 'VMS' && !$status) {
 }
 print (($status? 'not ': '')."ok 1\n");
 
-my $embed_test = File::Spec->catfile( <File::Spec->curdir, $exe);
+my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
 $embed_test = "run/nodebug $exe" if $^O eq 'VMS';
 print "# embed_test = $embed_test\n";
 $status = system($embed_test);

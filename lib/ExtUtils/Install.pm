@@ -1007,7 +1007,7 @@ sub uninstall {
         unless -f $fil;
     # my $my_req = $self->catfile(qw(auto ExtUtils Install forceunlink.al));
     # require $my_req; # Hairy, but for the first
-    my ($packlist) = < ExtUtils::Packlist->new($fil);
+    my $packlist = ExtUtils::Packlist->new($fil);
     foreach (sort(keys(%$packlist))) {
         chomp;
         print "unlink $_\n" if $verbose;

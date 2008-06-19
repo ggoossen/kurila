@@ -59,7 +59,7 @@ sub hexdigest {
 sub b64digest {
     my $self = shift;
     require MIME::Base64;
-    my $b64 = MIME::Base64::encode( <$self->digest(< @_), "");
+    my $b64 = MIME::Base64::encode($self->digest(< @_), "");
     $b64 =~ s/=+$//;
     return $b64;
 }

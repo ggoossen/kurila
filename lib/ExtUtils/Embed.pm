@@ -137,7 +137,7 @@ sub static_ext {
       @Extensions = @( sort split m/\s+/, $static_ext );
 	unshift @Extensions, qw(DynaLoader);
     }
-    < @Extensions;
+    @Extensions;
 }
 
 sub _escape {

@@ -65,7 +65,7 @@ sub extra_link_args_after_prelink {
   my @after_libs = @($OS2::is_aout ? ()
       : $self->perl_inc() . "/libperl_override$self->{config}->{lib_ext}");
   # , "-L", "-lperl"
-  (@after_libs, @DEF);
+  return @(@after_libs, @DEF);
 }
 
 sub link_executable {

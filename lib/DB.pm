@@ -63,16 +63,10 @@ sub sub {
   push(@stack, $DB::single);
   $DB::single ^&^= 1;
   $DB::single ^|^= 4 if( (nelems @stack)-1) == $deep;
-  if ((! ref $DB::sub and ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY'))
-      or not defined wantarray) {
+  if ((! ref $DB::sub and ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY'))) {
     &$DB::sub;
     $DB::single ^|^= pop(@stack);
     $DB::ret = undef;
-  }
-  elsif (wantarray) {
-    @DB::ret = @( < &$DB::sub );
-    $DB::single ^|^= pop(@stack);
-    < @DB::ret;
   }
   else {
     $DB::ret = &$DB::sub;
@@ -303,7 +297,7 @@ sub subs {
     }
     return @ret;
   }
-  return keys %DB::sub;
+  return @(keys %DB::sub);
 }
 
 ####
@@ -324,7 +318,7 @@ sub filesubs {
 sub files {
   my $s = shift;
   my(@f) = @( grep(m|^_<|, keys %main::) );
-  return map { substr($_,2) } < @f;
+  return @( map { substr($_,2) } < @f );
 }
 
 ####
