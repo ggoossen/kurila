@@ -354,7 +354,7 @@ sub _maniskip {
 	s/\r//;
 	next if m/^#/;
 	next if m/^\s*$/;
-	push @skip, < _macify($_);
+	push @skip, _macify($_);
     }
     close M;
     return sub {0} unless (scalar nelems @skip +> 0);

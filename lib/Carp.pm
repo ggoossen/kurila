@@ -41,8 +41,8 @@ sub shortmess_jmp  {
     goto &longmess_real;
 }
 
-sub croak   { die <  shortmess < @_ }
-sub confess { die <  longmess  < @_ }
+sub croak   { die shortmess < @_ }
+sub confess { die longmess  < @_ }
 sub carp    { warn shortmess < @_ }
 sub cluck   { warn longmess  < @_ }
 

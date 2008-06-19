@@ -24,9 +24,9 @@ WriteMakefile(
 );
 END
 
-	     'PL_FILES-Module/single.PL'        => < _gen_pl_files(),
-	     'PL_FILES-Module/multi.PL'         => < _gen_pl_files(),
-	     'PL_FILES-Module/Bar_pm.PL'        => < _gen_pm_files(),
+	     'PL_FILES-Module/single.PL'        => _gen_pl_files(),
+	     'PL_FILES-Module/multi.PL'         => _gen_pl_files(),
+	     'PL_FILES-Module/Bar_pm.PL'        => _gen_pm_files(),
 	     'PL_FILES-Module/lib/PL/Foo.pm' => <<'END',
 # Module to load to ensure PL_FILES have blib in @INC.
 package PL::Foo;
@@ -93,7 +93,7 @@ sub setup {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile( <'File::Spec'->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;

@@ -56,7 +56,7 @@ is ($class->file_name_is_absolute('Bombdadil'),
     File::Spec->file_name_is_absolute('Bombdadil'),
      'file_name_is_absolute()');
 
-is ((join ' ', $class->path()), (join ' ', File::Spec->path()), 'path() same as File::Spec->path()');
+is_deeply($class->path(), File::Spec->path(), 'path() same as File::Spec->path()');
 
 foreach (qw/updir curdir rootdir/)
   {
@@ -130,7 +130,7 @@ foreach ( qw /
 ###############################################################################
 # some more detailed tests for the methods above
 
-ok ( join (' ', < $class->dist_basics()), 'distclean :: realclean distcheck');
+ok ( $class->dist_basics(), 'distclean :: realclean distcheck');
 
 ###############################################################################
 # has_link_code tests
