@@ -880,6 +880,17 @@ sub sv_array_hash {
     }
 }
 
+sub no_auto_deref {
+    my $xml = shift;
+    for my $x (qw|a h|) {
+        for my $op ($xml->findnodes("//op_${x}elem"), $xml->findnodes(qq|//op_null[\@was="${x}elem"]|)) {
+            next unless $op->child(1)->tag eq "op_rv2${x}v";
+            next if $op->child(1)->child(0)->tag eq "madprops";
+            set_madprop($op, 'arrow', '->');
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -952,9 +963,10 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.10') {
 
 if ($from->{branch} ne "kurila" or $from->{v} < qv '1.11') {
     anon_aryhsh($twig);
+    eval_to_try($twig);
+    no_auto_deref($twig);
 }
 
-# eval_to_try($twig);
 sv_array_hash($twig);
 
 # print
