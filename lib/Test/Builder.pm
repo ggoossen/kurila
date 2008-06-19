@@ -935,7 +935,7 @@ $code" . q{$test = $this =~ m/$usable_regex/ ? 1 : 0};
     }
 
     unless( $ok ) {
-        $this = defined $this ? "'$this'" : 'undef';
+        $this = dump::view($this);
         my $match = $cmp eq '=~' ? "doesn't match" : "matches";
 
         local $Level = $Level + 1;

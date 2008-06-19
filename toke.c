@@ -3636,6 +3636,8 @@ Perl_yylex(pTHX)
 	case '&': BAop(OP_BIT_AND);
 	case '|': BOop(OP_BIT_OR);
 	case '~': OPERATOR('~');
+	default: 
+	    yyerror(Perl_form(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s));
 	}
     case '~':
 	if (s[1] == '~'

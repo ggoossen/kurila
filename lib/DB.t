@@ -16,7 +16,7 @@ use Scalar::Util qw( dualvar );
 my $dualfalse = dualvar(0, 'false');
 my $dualtrue = dualvar(1, 'true');
 
-use Test::More tests => 104;
+use Test::More tests => 103;
 
 # must happen at compile time for DB:: package variable localizations to work
 BEGIN {
@@ -29,19 +29,11 @@ BEGIN {
         local $DB::sub = sub {
                 $callflag += shift || 1;
                 my @vals = @(1, 4, 9);
-                return wantarray;
+                return 42;
         };
         my $ret = DB::sub;
-        is( $ret, '', 'DB::sub() should handle scalar context' );
+        is( $ret, 42, 'DB::sub() should handle scalar context' );
         is( $callflag, 1, '... should call $DB::sub contents' );
-        $ret = join(' ', DB::sub(2));
-        is( $ret, '1', '... should handle scalar context' );
-        is( $callflag, 3, '... should pass along arguments to the sub' );
-        ok( defined($DB::ret),'$DB::ret should be defined after successful return');
-        DB::sub;
-        ok( !defined($DB::ret), '... should respect void context' );
-        $DB::sub = '::DESTROY';
-        ok( !defined($DB::ret), '... should return undef for DESTROY()' );
 }
 
 # test DB::DB()
@@ -115,18 +107,15 @@ BEGIN {
         local (@DB::args, $DB::signal);
 
         my $line = __LINE__ + 1;
-        my @ret = try { @( DB->backtrace() ) };
+        my @ret = try { @( < DB->backtrace() ) };
         like( @ret[0], qr/file.+\Q$0\E/, 'DB::backtrace() should report current file');
         like( @ret[0], qr/line $line/, '... should report calling line number' );
         like( @ret[0], qr/eval {...}/, '... should catch eval BLOCK' );
 
-        @ret = @( eval 'one(2)' );
+        @ret = eval 'one(2)';
         is( (nelems @ret), 1, '... should report from provided stack frame number' );
-        like( @ret[0], qr/\@ = &eval \'one.+?2\)\'/, #'
+        like( @ret[0], qr/\$ = &eval \'one.+?2\)\'/, #'
                 '... should find eval STRING construct');
-        @ret[0] = check_context(1);
-        like( @ret[0], qr/\$ = &main::check_context/, 
-                '... should respect context of calling construct');
         
         $DB::signal = 1;
         @DB::args = @(1, 7);
@@ -136,9 +125,6 @@ BEGIN {
         # does not check 'require' or @DB::args mangling
 }
 
-sub check_context {
-        return (eval "one(@_[0])")[-1];
-}
 sub one { DB->backtrace(<@_) }
 sub two { one(<@_) }
 sub three { two(<@_) }
@@ -156,14 +142,14 @@ sub three { two(<@_) }
 {
         local %DB::sub;
         my $subs = DB->subs;
-        is( $subs, 0, 'DB::subs() should return keys of %DB::subs' );
+        is( $subs, undef, 'DB::subs() should return keys of %DB::subs' );
         %DB::sub = %( foo => 'foo:23-45' , bar => 'ba:r:7-890' );
         $subs = DB->subs;
-        is( $subs, 2, '... same song, different key' );
-        my @subs = @( DB->subs( 'foo', 'boo', 'bar' ) );
+        is( nelems($subs), 2, '... same song, different key' );
+        my @subs = DB->subs( 'foo', 'boo', 'bar' );
         is( (nelems @subs), 2, '... should report only for requested subs' );
         my @expected = @( \@( 'foo', 23, 45 ), \@( 'ba:r', 7, 890 ) );
-        ok( eq_array( \@subs, \@expected ), '... find file, start, end for subs' );
+        is_deeply( @subs, @expected, '... find file, start, end for subs' );
 }
 
 # test DB::filesubs()

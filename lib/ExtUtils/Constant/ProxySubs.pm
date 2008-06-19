@@ -26,11 +26,11 @@ $VERSION = '0.06';
 
 %type_from_struct =
     %(
-     IV => sub { @_[0] . '->value' },
-     NV => sub { @_[0] . '->value' },
-     UV => sub { @_[0] . '->value' },
-     PV => sub { @_[0] . '->value' },
-     PVN => sub { @_[0] . '->len' },
+     IV => sub { @( @_[0] . '->value' ) },
+     NV => sub { @( @_[0] . '->value' ) },
+     UV => sub { @( @_[0] . '->value' ) },
+     PV => sub { @( @_[0] . '->value' ) },
+     PVN => sub { @( @_[0] . '->value', @_[0] . '->len' ) },
      YES => sub {},
      NO => sub {},
      UNDEF => sub {},
@@ -132,7 +132,7 @@ sub boottime_iterator {
 
     my $athx = $self->C_constant_prefix_param();
 
-    return sprintf <<"EOBOOT", &$generator( &$extractor($iterator));
+    return sprintf <<"EOBOOT", &$generator( < &$extractor($iterator));
         while ($iterator->name) \{
 	    $subname($athx $hash, $iterator->name,
 				$iterator->namelen, \%s);

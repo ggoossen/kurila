@@ -288,7 +288,7 @@ sub _liblist_ext {
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;
-  wantarray ? ($lib, '', $ldlib, '', ($give_libs ? \@flibs : ())) : $lib;
+  return @($lib, '', $ldlib, '', ($give_libs ? \@flibs : ()));
 }
 
 1;

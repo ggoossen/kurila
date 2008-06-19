@@ -54,7 +54,7 @@ sub object_file {
 
 sub arg_include_dirs {
   my $self = shift;
-  return map {"-I$_"} < @_;
+  return @( map {"-I$_"} < @_ );
 }
 
 sub arg_nolink { '-c' }
@@ -66,7 +66,7 @@ sub arg_object_file {
 
 sub arg_share_object_file {
   my ($self, $file) = < @_;
-  return  @($self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
+  return  @(< $self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
 }
 
 sub arg_exec_file {
@@ -76,7 +76,7 @@ sub arg_exec_file {
 
 sub arg_defines {
   my ($self, < %args) = < @_;
-  return map "-D$_=%args{$_}", keys %args;
+  return @( map "-D$_=%args{$_}", keys %args );
 }
 
 sub compile {
@@ -88,7 +88,7 @@ sub compile {
   %args{object_file} ||= $self->object_file(%args{source});
   
   my @include_dirs = @( < $self->arg_include_dirs
-    (< @{%args{include_dirs} || \@()}, <
+    (< @{%args{include_dirs} || \@()},
      $self->perl_inc()) );
   
   my @defines = @( < $self->arg_defines( < %{%args{defines} || \%()} ) );
@@ -97,10 +97,10 @@ sub compile {
   my @cccdlflags = @( < $self->split_like_shell($cf->{cccdlflags}) );
   my @ccflags = @( < $self->split_like_shell($cf->{ccflags}) );
   my @optimize = @( < $self->split_like_shell($cf->{optimize}) );
-  my @flags = @(< @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags, <
+  my @flags = @(< @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags,
 	       $self->arg_nolink,
-	       < @ccflags, < @optimize, <
-	       $self->arg_object_file(%args{object_file}),
+	       < @ccflags, < @optimize,
+	       < $self->arg_object_file(%args{object_file}),
 	      );
   
   my @cc = @( < $self->split_like_shell($cf->{cc}) );
@@ -115,7 +115,7 @@ sub have_compiler {
   my ($self) = < @_;
   return $self->{have_compiler} if defined $self->{have_compiler};
   
-  my $tmpfile = File::Spec->catfile( <File::Spec->tmpdir, 'compilet.c');
+  my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
   {
     local *FH;
     open FH, ">", "$tmpfile" or die "Can't create $tmpfile: $!";
@@ -212,7 +212,7 @@ sub _do_link {
   $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
     or die "error building $out from {join ' ', <@$objects}";
   
-  return wantarray ?  @($out, @temp_files) : $out;
+  return @($out, @temp_files);
 }
 
 

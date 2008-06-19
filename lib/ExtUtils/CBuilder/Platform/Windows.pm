@@ -46,7 +46,7 @@ sub split_like_shell {
 sub arg_defines {
   my ($self, < %args) = < @_;
   s/"/\\"/g foreach values %args;
-  return map qq{"-D$_=%args{$_}"}, keys %args;
+  return @( map qq{"-D$_=%args{$_}"}, keys %args );
 }
 
 sub compile {
@@ -189,9 +189,7 @@ sub link {
   }
 
   %spec{output} =~ s/'|"//g;
-  return wantarray
-    ? grep defined, %spec{[qw[output manifest implib explib dbg_file def_file map_file base_file]]}
-    : %spec{output};
+  return @( grep defined, %spec{[qw[output manifest implib explib dbg_file def_file map_file base_file]]} )
 }
 
 # canonize & quote paths

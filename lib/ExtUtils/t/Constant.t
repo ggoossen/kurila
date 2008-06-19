@@ -453,7 +453,7 @@ if (close OUTPUT) \{
 EOT
   close FH or die "close $testpl: $!\n";
 
-  push @files, < Makefile_PL($package);
+  push @files, Makefile_PL($package);
   @files = @( < MANIFEST (< @files) );
 
   build_and_run ($num_tests, $expect, \@files);

@@ -17,7 +17,7 @@ use TieOut;
 use File::Path;
 use File::Spec;
 
-use Test::More tests => 52;
+use Test::More tests => 51;
 
 use MakeMaker::Test::Setup::BFD;
 
@@ -133,16 +133,12 @@ close DUMMY;
   local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local $^WARN_HOOK=sub { push @warn, < @_[0]->message; return };
-  my $ok=try {
-    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
-         ),
-       0, 0, 1);
-    1
-  };
-  ok($ok,'  we didnt die');
+  local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
+  install( \%( 'blib/lib' => 'install-test/other_lib/perl',
+               read   => 'install-test/packlist',
+               write  => 'install-test/packlist'
+             ),
+           0, 0, 1);
   ok(0+nelems @warn,"  we did warn");
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );

@@ -1233,13 +1233,20 @@ sub _deep_check {
             elsif( $type eq 'HASH' ) {
                 $ok = _eq_hash(\$e1, \$e2);
             }
-            elsif( $type eq 'REFERENCE' ) {
+            elsif( $type eq 'REF' ) {
                 push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
                 $ok = _deep_check($$e1, $$e2);
                 pop @Data_Stack if $ok;
             }
+            elsif( $type eq 'UNDEF' ) {
+                $ok = 1;
+            }
+            elsif( $type eq 'COMPLEX' ) {
+                push @Data_Stack, \%( type => $type, vals => \@('...', '...') );
+                $ok = 0;
+            }
 	    else {
-		_whoa(1, "No type in _deep_check");
+		_whoa(1, "Unknown type '$type' in _deep_check");
 	    }
         }
     }

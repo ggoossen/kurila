@@ -10,14 +10,13 @@ BEGIN {
         unshift @INC, 't/lib';
     }
 }
-chdir 't';
 
 use strict;
 use TieOut;
 use File::Path;
 use File::Spec;
 
-use Test::More tests => 70;
+use Test::More tests => 69;
 
 use MakeMaker::Test::Setup::BFD;
 
@@ -37,7 +36,7 @@ END {
 # ensure the env doesnt pollute our tests
 local %ENV{EU_INSTALL_ALWAYS_COPY};
 local %ENV{EU_ALWAYS_COPY};    
-    
+
 chdir 'Big-Dummy';
 
 my $stdout = tie *STDOUT, 'TieOut';
@@ -132,16 +131,12 @@ close DUMMY;
   local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local $^WARN_HOOK=sub { push @warn, < @_[0]->message; return };
-  my $ok=try {
-    install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
-         ),
+  local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
+  install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
+                           read   => 'install-test/packlist',
+                           write  => 'install-test/packlist'
+                         ),
        uninstall_shadows=>1));
-    1
-  };
-  ok($ok,'  we didnt die');
   ok(0+nelems @warn,"  we did warn");
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );

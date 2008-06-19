@@ -49,56 +49,56 @@ sub __find_relocations
 
 sub new($$)
 {
-my ($class, $packfile) = < @_;
-$class = ref($class) || $class;
-my %self;
-tie(%self, $class, $packfile);
-return (bless(\%self, $class));
+    my ($class, $packfile) = < @_;
+    $class = ref($class) || $class;
+    my %self;
+    tie(%self, $class, $packfile);
+    return (bless(\%self, $class));
 }
 
 sub TIEHASH
 {
-my ($class, $packfile) = < @_;
-my $self = \%( packfile => $packfile );
-bless($self, $class);
-$self->read($packfile) if (defined($packfile) && -f $packfile);
-return ($self);
+    my ($class, $packfile) = < @_;
+    my $self = \%( packfile => $packfile );
+    bless($self, $class);
+    $self->read($packfile) if (defined($packfile) && -f $packfile);
+    return ($self);
 }
 
 sub STORE
 {
-@_[0]->{data}->{@_[1]} = @_[2];
+    @_[0]->{data}->{@_[1]} = @_[2];
 }
 
 sub FETCH
 {
-return @(@_[0]->{data}->{@_[1]});
+    return @_[0]->{data}->{@_[1]};
 }
 
 sub FIRSTKEY
 {
-my $reset = scalar(keys(%{@_[0]->{data}}));
-return @(each(%{@_[0]->{data}}));
+    my $reset = scalar(keys(%{@_[0]->{data}}));
+    return each(%{@_[0]->{data}});
 }
 
 sub NEXTKEY
 {
-return @(each(%{@_[0]->{data}}));
+    return each(%{@_[0]->{data}});
 }
 
 sub EXISTS
 {
-return @(exists(@_[0]->{data}->{@_[1]}));
+    return exists(@_[0]->{data}->{@_[1]});
 }
 
 sub DELETE
 {
-return @(delete(@_[0]->{data}->{@_[1]}));
+    return delete(@_[0]->{data}->{@_[1]});
 }
 
 sub CLEAR
 {
-%{@_[0]->{data}} = %( () );
+    %{@_[0]->{data}} = %( () );
 }
 
 sub DESTROY
