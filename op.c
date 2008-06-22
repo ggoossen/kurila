@@ -1308,13 +1308,15 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	    mod(kid, type);
 	break;
 
-    case OP_RV2AV:
-    case OP_RV2HV:
     case OP_RV2GV:
 /* 	if (scalar_mod_type(o, type)) */
 /* 	    goto nomod; */
 	ref(cUNOPo->op_first, o->op_type);
-	/* FALL THROUGH */
+	if (type == OP_LEAVESUBLV)
+	    o->op_private |= OPpMAYBE_LVSUB;
+	localize = 1;
+	PL_modcount = RETURN_UNLIMITED_NUMBER;
+	break;
     case OP_ASLICE:
     case OP_HSLICE:
 	if (type == OP_LEAVESUBLV)
@@ -1324,8 +1326,10 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_AASSIGN:
     case OP_NEXTSTATE:
     case OP_DBSTATE:
-       PL_modcount = RETURN_UNLIMITED_NUMBER;
+	PL_modcount = RETURN_UNLIMITED_NUMBER;
 	break;
+    case OP_RV2AV:
+    case OP_RV2HV:
     case OP_RV2SV:
 	ref(cUNOPo->op_first, o->op_type);
 	localize = 1;
@@ -1450,10 +1454,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	case 0:
 	    break;
 	case -1:
-	    if (ckWARN(WARN_SYNTAX)) {
-		Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-		    "Useless localization of %s", OP_DESC(o));
-	    }
+	    Perl_croak(aTHX_ "Can't localize %s", OP_DESC(o));
 	}
     }
     else if (type != OP_GREPSTART && type != OP_ENTERSUB

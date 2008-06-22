@@ -130,7 +130,7 @@ ok ! UNIVERSAL::can(\%(), "can");
 
 ok UNIVERSAL::isa(Alice => "UNIVERSAL");
 
-cmp_ok UNIVERSAL::can(Alice => "can"), '==', \&UNIVERSAL::can;
+cmp_ok UNIVERSAL::can(Alice => "can"), '\==', \&UNIVERSAL::can;
 
 # now use UNIVERSAL.pm and see what changes
 eval "use UNIVERSAL";
@@ -155,7 +155,7 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
     use UNIVERSAL qw( isa can VERSION );
 
     ::ok isa "Pickup", 'UNIVERSAL';
-    ::cmp_ok can( "Pickup", "can" ), '==', \&UNIVERSAL::can;
+    ::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can;
     ::ok VERSION "UNIVERSAL" ;
 }
 

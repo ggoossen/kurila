@@ -22,11 +22,11 @@ sub foo {
 
 @foo = @("hi \n","there\n","!\n");
 @bar = @( < @foo );
-chop(< @bar);
+chop(@bar);
 is (join('',< @bar), 'hi there!');
 
 $foo = "\n";
-chop($foo,< @foo);
+chop($foo, @foo);
 is (join('',$foo,< @foo), 'hi there!');
 
 $_ = "foo\n\n";

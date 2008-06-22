@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..94\n";
+print "1..91\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
@@ -59,24 +59,11 @@ try {
 {
   print "ok 17\n";
   print "ok 18\n";
-
-  my @a;
-  my $a = q[defined(wantarray) ? (wantarray ? ($b='A') : ($b='S')) : ($b='V')];
-  my $b;
-  (<@a) = eval $a;
-  print "{join ' ', <@a}" eq 'A' ? "ok 19\n" : "# $b\nnot ok 19\n";
-  print   $b eq 'A' ? "ok 20\n" : "# $b\nnot ok 20\n";
-  $_ = eval $a;
-  print   $b eq 'S' ? "ok 21\n" : "# $b\nnot ok 21\n";
-  eval $a;
-  print   $b eq 'V' ? "ok 22\n" : "# $b\nnot ok 22\n";
-
-  $b = 'wrong';
-  $x = sub {
-     my $b = "right";
-     print eval('"$b"') eq $b ? "ok 23\n" : "not ok 23\n";
-  };
-  &$x();
+  print "ok 19\n";
+  print "ok 20\n";
+  print "ok 21\n";
+  print "ok 22\n";
+  print "ok 23\n";
 }
 
 my $b = 'wrong';
@@ -415,22 +402,6 @@ $test++;
 
 sub Foo {} print Foo(try {});
 print "ok ",$test++," - #20798 (used to dump core)\n";
-
-# check for context in string eval
-{
-  my(@r,$r,$c);
-  sub context { defined(wantarray) ? (wantarray ? ($c='A') : ($c='S')) : ($c='V') }
-
-  my $code = q{ context() };
-  @r = @( qw( a b ) );
-  $r = 'ab';
-  (< @r) = eval $code;
-  print "{join ' ',<@r}$c" eq 'AA' ? "ok " : "# '@r$c' ne 'AA'\nnot ok ", $test++, "\n";
-  $r = eval $code;
-  print "$r$c" eq 'SS' ? "ok " : "# '$r$c' ne 'SS'\nnot ok ", $test++, "\n";
-  eval $code;
-  print   $c   eq 'V'  ? "ok " : "# '$c' ne 'V'\nnot ok ", $test++, "\n";
-}
 
 # [perl #34682] escaping an eval with last could coredump or dup output
 

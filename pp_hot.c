@@ -774,50 +774,6 @@ PP(pp_print)
     RETURN;
 }
 
-PP(pp_rv2av)
-{
-    dVAR; dSP; dTOPss;
-    static const char an_array[] = "an ARRAY";
-    static const char a_hash[] = "a HASH";
-    const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
-    const svtype type = is_pp_rv2av ? SVt_PVAV : SVt_PVHV;
-    GV *gv;
-
-    if (SvROK(sv)) {
-      wasref:
-	tryAMAGICunDEREF_var(is_pp_rv2av ? to_av_amg : to_hv_amg);
-
-	sv = SvRV(sv);
-	if (SvTYPE(sv) != type)
-	    DIE(aTHX_ "Not %s reference", is_pp_rv2av ? an_array : a_hash);
-	SETs(sv);
-	RETURN;
-    }
-    if (SvTYPE(sv) == type) {
-	SETs(sv);
-	RETURN;
-    }
-	
-    if (SvTYPE(sv) != SVt_PVGV) {
-	if (SvGMAGICAL(sv)) {
-	    mg_get(sv);
-	    if (SvROK(sv))
-		goto wasref;
-	}
-	gv = Perl_softref2xv(aTHX_ sv, is_pp_rv2av ? an_array : a_hash);
-	if (!gv)
-	    RETURN;
-    }
-    else {
-	gv = (GV*)sv;
-    }
-    sv = is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);
-    if (PL_op->op_private & OPpLVAL_INTRO)
-	sv = is_pp_rv2av ? (SV*)save_ary(gv) : (SV*)save_hash(gv);
-    SETs(sv);
-    RETURN;
-}
-
 STATIC void
 S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
 {

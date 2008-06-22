@@ -31,7 +31,7 @@ sub ok {
     return $ok;
 }
 
-print "1..22\n";
+print "1..19\n";
 
 # Test do &sub and proper @_ handling.
 @_[0] = 0;
@@ -58,27 +58,6 @@ do blather("ayep","sho nuff");
 do blather(< @x,"noofie",< @y);
 
 unshift @INC, '.';
-
-if (open(DO, ">", "$$.16")) {
-    print DO "ok(1, 'do in scalar context') if defined wantarray && not wantarray\n";
-    close DO or die "Could not close: $!";
-}
-
-my $a = do "$$.16"; die $@ if $@;
-
-if (open(DO, ">", "$$.17")) {
-    print DO "ok(1, 'do in list context') if defined wantarray &&     wantarray\n";
-    close DO or die "Could not close: $!";
-}
-
-my @a = @( do "$$.17" ); die $@ if $@;
-
-if (open(DO, ">", "$$.18")) {
-    print DO "ok(1, 'do in void context') if not defined wantarray\n";
-    close DO or die "Could not close: $!";
-}
-
-do "$$.18"; die $@ if $@;
 
 # bug ID 20010920.007
 eval qq{ do qq(a file that does not exist); };

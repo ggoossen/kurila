@@ -782,19 +782,7 @@ PP(pp_tie)
 	    methname = "TIEARRAY";
 	    break;
 	case SVt_PVGV:
-#ifdef GV_UNIQUE_CHECK
-	    if (GvUNIQUE((GV*)varsv)) {
-                Perl_croak(aTHX_ "Attempt to tie unique GV");
-	    }
-#endif
-	    methname = "TIEHANDLE";
-	    how = PERL_MAGIC_tiedscalar;
-	    /* For tied filehandles, we apply tiedscalar magic to the IO
-	       slot of the GP rather than the GV itself. AMS 20010812 */
-	    if (!GvIOp(varsv))
-		GvIOp(varsv) = newIO();
-	    varsv = (SV *)GvIOp(varsv);
-	    break;
+	    Perl_croak(aTHX_ "glob may not be tied");
 	default:
 	    methname = "TIESCALAR";
 	    how = PERL_MAGIC_tiedscalar;

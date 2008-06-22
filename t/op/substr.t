@@ -288,7 +288,7 @@ is($a, 'xxxxefgh');
     $x = "\x{263a}\x{263a}";
     substr($x,0,1, "abcd");
     is($x, "abcd\x{263a}");
-    $x = reverse $x;
+    $x = join '', reverse split m//, $x;
     is($x, "\x{263a}dcba");
 }
 {
@@ -300,7 +300,7 @@ is($a, 'xxxxefgh');
     $x = $x x 2;
     substr($x,0,1, "abcd");
     is($x, "abcd\x[E2]");
-    $x = reverse $x;
+    $x = join '', reverse split m//, $x;
     is($x, "\x[E2]dcba");
 }
 

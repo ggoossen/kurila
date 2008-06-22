@@ -484,7 +484,7 @@ TODO: {
     }
 
     { # this should smart match on each side of &&
-	my %n = map { $_, 1 } qw(fred barney betty);
+	my %n = %( map { $_, 1 } qw(fred barney betty) );
 	my %m = %n;
 	
 	my $ok = 0;
@@ -764,7 +764,7 @@ sub contains_x {
     
     is($obj->{called},  1, "$test: called");
     ok($matched, "$test: matched");
-    is($obj->{left}, "string value of obj", "$test: left");
+    is(''.$obj->{left}, "string value of obj", "$test: left");
     is($obj->{right}, "other arg", "$test: right");
     ok(!$obj->{reversed}, "$test: not reversed");
 }
@@ -779,7 +779,7 @@ sub contains_x {
     
     is($obj->{called},  1, "$test: called");
     ok(!$matched, "$test: not matched");
-    is($obj->{left}, "string value of obj", "$test: left");
+    is(''.$obj->{left}, "string value of obj", "$test: left");
     is($obj->{right}, "other arg", "$test: right");
     ok(!$obj->{reversed}, "$test: not reversed");
 }
@@ -796,7 +796,7 @@ sub contains_x {
     is($obj->{called},  1, "$test: called");
     ok($matched, "$test: matched");
     is($obj->{left}, "topic", "$test: left");
-    is($obj->{right}, "string value of obj", "$test: right");
+    is(''.$obj->{right}, "string value of obj", "$test: right");
     ok($obj->{reversed}, "$test: reversed");
 }
 
@@ -812,7 +812,7 @@ sub contains_x {
     is($obj->{called}, 1, "$test: called");
     ok(!$matched, "$test: not matched");
     is($obj->{left}, "topic", "$test: left");
-    is($obj->{right}, "string value of obj", "$test: right");
+    is(''.$obj->{right}, "string value of obj", "$test: right");
     ok($obj->{reversed}, "$test: reversed");
 }
 

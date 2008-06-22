@@ -21,7 +21,7 @@ sub foo {
     { local($a,$c) = ("a 9", "c 10"); ($x, $y) = ($a, $c); }
     is($a, "a 1");
     is($b, "b 2");
-    $c, $d;
+    return @($c, $d);
 }
 
 $a = "a 5";
@@ -44,14 +44,14 @@ is($y, "c 10");
 # same thing, only with arrays and associative arrays
 
 sub foo2 {
-    local($a, < @b) = < @_;
+    local($a, @b) = (shift, @_);
     local(@c, %d);
     @c = @( "c 3" );
     %d{''} = "d 4";
-    { local($a,< @c) = ("a 19", "c 20"); ($x, $y) = ($a, < @c); }
+    { local($a, @c) = ("a 19", @("c 20")); ($x, $y) = ($a, < @c); }
     is($a, "a 1");
     is("{join ' ', <@b}", "b 2");
-    @c[0], %d{''};
+    return @(@c[0], %d{''});
 }
 
 $a = "a 5";

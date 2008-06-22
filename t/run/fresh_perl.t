@@ -145,57 +145,6 @@ EXPECT
 Modification of a read-only value attempted at - line 1.
 BEGIN failed--compilation aborted
 ########
-{
-    package foo;
-    sub PRINT {
-        shift;
-        print join(' ', reverse < @_)."\n";
-    }
-    sub PRINTF {
-        shift;
-	  my $fmt = shift;
-        print sprintf($fmt, < @_)."\n";
-    }
-    sub TIEHANDLE {
-        bless \%(), shift;
-    }
-    sub READLINE {
-	"Out of inspiration";
-    }
-    sub DESTROY {
-	print "and destroyed as well\n";
-  }
-  sub READ {
-      shift;
-      print STDOUT "foo->can(READ)({join ' ', <@_})\n";
-      return 100; 
-  }
-  sub GETC {
-      shift;
-      print STDOUT "Don't GETC, Get Perl\n";
-      return "a"; 
-  }    
-}
-{
-    local(*FOO);
-    tie(*FOO,'foo');
-    print FOO "sentence.", "reversed", "a", "is", "This";
-    print "-- ", (~< *FOO), " --\n";
-    my($buf,$len,$offset);
-    $buf = "string";
-    $len = 10; $offset = 1;
-    read(FOO, $buf, $len, $offset) == 100 or die "foo->READ failed";
-    getc(FOO) eq "a" or die "foo->GETC failed";
-    printf "\%s is number \%d\n", "Perl", 1;
-}
-EXPECT
-This is a reversed sentence.
--- Out of inspiration --
-foo->can(READ)(string 10 1)
-Don't GETC, Get Perl
-Perl is number 1
-and destroyed as well
-########
 my @a; @a[2] = 1; for (<@a) { $_ = 2 } print "{join ' ', <@a}\n"
 EXPECT
 2 2 2

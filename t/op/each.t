@@ -95,7 +95,7 @@ while (($key, $value) = each(%h)) {
 }
 is ($i, 5);
 
-our @tests = @( <&next_test, < &next_test, < &next_test);
+our @tests = @(&next_test, &next_test, &next_test);
 {
     package Obj;
     sub DESTROY { print "ok @::tests[1] # DESTROY called\n"; }

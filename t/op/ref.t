@@ -1,9 +1,8 @@
 #!./perl
 
 require './test.pl';
-use strict qw(refs subs);
 
-plan(116);
+plan(115);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -459,14 +458,9 @@ is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 {
     my $ref;
     foreach $ref (*STDOUT{IO}) {
-	try { $$ref };
-	like($@->{description}, qr/Not a SCALAR reference/, "Scalar dereference");
-	try { @$ref };
-	like($@->{description}, qr/Not an ARRAY reference/, "Array dereference");
-	try { %$ref };
-	like($@->{description}, qr/Not a HASH reference/, "Hash dereference");
-	try { &$ref };
-	like($@->{description}, qr/Not a CODE reference/, "Code dereference");
+	dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
+	dies_like(sub { %$ref }, qr/Not a HASH reference/, "Hash dereference");
+	dies_like(sub { &$ref }, qr/Not a CODE reference/, "Code dereference");
     }
 
     $ref = *STDOUT{IO};
