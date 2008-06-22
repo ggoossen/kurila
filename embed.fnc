@@ -1260,9 +1260,6 @@ s	|SV *	|incpush_if_exists|NN SV *dir
 #if defined(PERL_IN_PP_C) || defined(PERL_DECL_PROT)
 sR	|SV*	|refto		|NN SV* sv
 #endif
-#if defined(PERL_IN_PP_C) || defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
-pRxo	|GV*	|softref2xv	|NN SV *const sv|NN const char *const what
-#endif
 
 #if defined(PERL_IN_PP_PACK_C) || defined(PERL_DECL_PROT)
 s	|I32	|unpack_rec	|NN struct tempsym* symptr|NN const char *s \

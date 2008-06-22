@@ -16,7 +16,7 @@ sub STORESIZE { (@{@_[0]} = @( @_[1]+2 ))-1 }
 package main;
 
 require './test.pl';
-plan(tests => 40);
+plan(tests => 37);
 
 # Helper function to check the typical error message.
 sub not_hash {
@@ -252,23 +252,8 @@ try {
 not_hash($@);
 
 try {
-    %$avhv = %( () );
-    (< %$avhv, $extra) = (foo => 42, pants => 53, bar => "HIKE!");
-};
-not_hash($@);
-
-try {
     @extra = @( qw(whatever and stuff) );
     %$avhv = %( () );
-};
-not_hash($@);
-try {
-    (< %$avhv, < @extra) = (foo => 42, pants => 53, bar => "HIKE!");
-};
-not_hash($@);
-
-try {
-    (< @extra, < %$avhv) = (foo => 42, pants => 53, bar => "HIKE!");
 };
 not_hash($@);
 

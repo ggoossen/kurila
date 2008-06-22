@@ -75,28 +75,6 @@ after eval
 - ZZZ
 OK
 ########
-package TEST;
- 
-sub TIEHANDLE {
-  my $foo;
-  return bless \$foo;
-}
-sub PRINT {
-print STDERR "PRINT CALLED\n";
-(split(m/./, 'x'x10000))[0];
-eval('die("test\n")');
-}
- 
-package main;
- 
-open FH, ">&", \*STDOUT;
-tie *FH, 'TEST';
-print FH "OK\n";
-print STDERR "DONE\n";
-EXPECT
-PRINT CALLED
-DONE
-########
 sub warnhook {
   print "WARNHOOK\n";
   eval('die("foooo\n")');
@@ -288,38 +266,3 @@ sub d {
 }
 EXPECT
 0
-########
-sub TIEHANDLE { bless \%() }
-sub PRINT { next }
-
-tie *STDERR, '';
-{ map ++$_, 1 }
-
-EXPECT
-recursive die
-########
-sub TIEHANDLE { bless \%() }
-sub PRINT { print "[TIE] @_[1]" }
-
-tie *STDERR, '';
-die "DIE";
-
-EXPECT
-[TIE] DIE at - line 5.
-########
-sub TIEHANDLE { bless \%() }
-sub PRINT { 
-    (split(m/./, 'x'x10000))[0];
-    eval('die("test\n")');
-    warn "[TIE] @_[1]";
-}
-open OLDERR, '>&', \*STDERR;
-tie *STDERR, '';
-
-use warnings FATAL => qw(uninitialized);
-print undef;
-
-EXPECT
-[TIE] Use of uninitialized value in print at - line 11.
- at - line 5.
-    main::PRINT called at - line 11.

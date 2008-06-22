@@ -184,57 +184,6 @@ die "self-tied scalar not DESTROYed" unless $destroyed == 1;
 EXPECT
 ########
 
-# Allowed glob self-ties
-my $destroyed = 0;
-my $printed   = 0;
-sub Self2::TIEHANDLE { bless @_[1], @_[0] }
-sub Self2::DESTROY   { $destroyed = 1; }
-sub Self2::PRINT     { $printed = 1; }
-{
-    use Symbol;
-    my $c = gensym;
-    tie *$c, 'Self2', $c;
-    print $c 'Hello';
-}
-die "self-tied glob not PRINTed" unless $printed == 1;
-die "self-tied glob not DESTROYed" unless $destroyed == 1;
-EXPECT
-########
-
-# Allowed IO self-ties
-my $destroyed = 0;
-my $printed = 0;
-sub Self3::TIEHANDLE { bless @_[1], @_[0] }
-sub Self3::DESTROY   { $destroyed = 1; }
-sub Self3::PRINT     { $printed = 1; }
-{
-    use Symbol 'geniosym';
-    my $c = geniosym;
-    tie *$c, 'Self3', $c;
-    print $c 'Hello';
-}
-die "self-tied IO not PRINTed" unless $printed == 1;
-die "self-tied IO not DESTROYed" unless $destroyed == 1;
-EXPECT
-########
-
-# TODO IO "self-tie" via TEMP glob
-my $destroyed = 0;
-my $printed = 0;
-sub Self3::TIEHANDLE { bless @_[1], @_[0] }
-sub Self3::DESTROY   { $destroyed = 1; }
-sub Self3::PRINT     { $printed = 1; }
-{
-    use Symbol 'geniosym';
-    my $c = geniosym;
-    tie *$c, 'Self3', \*$c;
-    print $c 'Hello';
-}
-die "IO tied to TEMP glob not PRINTed" unless $printed == 1;
-die "IO tied to TEMP glob not DESTROYed" unless $destroyed == 1;
-EXPECT
-########
-
 # Interaction of tie and vec
 
 my ($a, $b);

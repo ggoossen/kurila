@@ -1,29 +1,12 @@
 #!./perl
 
-print "1..4\n";
+require './test.pl';
 
-print "not " unless reverse("abc")    eq "cba";
-print "ok 1\n";
-
-$_ = "foobar";
-print "not " unless reverse()         eq "raboof";
-print "ok 2\n";
+plan( tests => 1 );
 
 {
     my @a = @("foo", "bar");
     my @b = @( reverse < @a );
 
-    print "not " unless @b[0] eq @a[1] && @b[1] eq @a[0];
-    print "ok 3\n";
-}
-
-{
-    # Unicode.
-
-    use utf8;
-    my $a = "\x{263A}\x{263A}x\x{263A}y\x{263A}";
-    my $b = scalar reverse($a);
-    my $c = scalar reverse($b);
-    print "not " unless $a eq $c;
-    print "ok 4\n";
+    ok( @b[0] eq @a[1] && @b[1] eq @a[0] );
 }

@@ -198,6 +198,10 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	POSION_SV_HEAD(p);				\
 	SvARENA_CHAIN(p) = (void *)PL_sv_root;		\
 	SvFLAGS(p) = SVTYPEMASK;			\
+	VALGRIND_MAKE_MEM_UNDEFINED(p, sizeof(SV));     \
+	VALGRIND_MAKE_MEM_DEFINED(&SvARENA_CHAIN(p), sizeof(void*));	\
+	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
+	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
 	PL_sv_root = (p);				\
 	--PL_sv_count;					\
     } STMT_END
@@ -234,7 +238,6 @@ S_more_sv(pTHX)
 
 /* new_SV(): return a new, empty SV head */
 
-#ifdef DEBUG_LEAKING_SCALARS
 /* provide a real function for a debugger to play with */
 STATIC SV*
 S_new_SV(pTHX)
@@ -248,6 +251,7 @@ S_new_SV(pTHX)
     SvANY(sv) = 0;
     SvREFCNT(sv) = 1;
     SvFLAGS(sv) = 0;
+#ifdef DEBUG_LEAKING_SCALARS
     sv->sv_debug_optype = PL_op ? PL_op->op_type : 0;
     sv->sv_debug_line = (U16) (PL_parser
 	    ?  PL_parser->copline == NOLINE
@@ -259,23 +263,11 @@ S_new_SV(pTHX)
     sv->sv_debug_inpad = 0;
     sv->sv_debug_cloned = 0;
     sv->sv_debug_file = PL_curcop ? savepv(CopFILE(PL_curcop)): NULL;
+#endif
     
     return sv;
 }
 #  define new_SV(p) (p)=S_new_SV(aTHX)
-
-#else
-#  define new_SV(p) \
-    STMT_START {					\
-	if (PL_sv_root)					\
-	    uproot_SV(p);				\
-	else						\
-	    (p) = S_more_sv(aTHX);			\
-	SvANY(p) = 0;					\
-	SvREFCNT(p) = 1;				\
-	SvFLAGS(p) = 0;					\
-    } STMT_END
-#endif
 
 
 /* del_SV(): return an empty SV head to the free list */

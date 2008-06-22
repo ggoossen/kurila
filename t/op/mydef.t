@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..68\n";
+print "1..66\n";
 
 my $test = 0;
 sub ok ($$) {
@@ -111,12 +111,6 @@ $_ = "global";
     ok( $x eq '1globallocal-2globallocal', 'map without {}' );
 }
 {
-    for my $_ (1) {
-	my $x = map $_, qw(a b);
-	ok( $x == 2, 'map in scalar context' );
-    }
-}
-{
     my $buf = '';
     sub tgrep1 { m/(.)/; $buf .= $1 }
     my $_ = 'y';
@@ -152,12 +146,6 @@ $_ = "global";
     $s =~ m/to(?{ ok( $_ eq 'toto', 'my $_ in code-match # TODO' ) })to/
 	or ok( 0, "\$s=$s should match!" );
     ok( our $_ eq 'global', '...our $_ restored outside code-match' );
-}
-
-{
-    my $_ = "abc";
-    my $x = reverse;
-    ok( $x eq "cba", 'reverse without arguments picks up $_' );
 }
 
 {

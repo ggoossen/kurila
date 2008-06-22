@@ -142,23 +142,14 @@ PP(pp_rv2gv)
     RETURN;
 }
 
-/* Helper function for pp_rv2sv and pp_rv2av  */
-GV *
-Perl_softref2xv(pTHX_ SV *const sv, const char *const what)
-{
-    PERL_ARGS_ASSERT_SOFTREF2XV;
-
-    if (SvOK(sv))
-	Perl_die(aTHX_ PL_no_symref_sv, sv, what);
-    else
-	Perl_die(aTHX_ PL_no_usym, what);
-    return NULL;
-}
-
 PP(pp_rv2sv)
 {
     dVAR; dSP; dTOPss;
     GV *gv = NULL;
+    const bool is_pp_rv2sv = PL_op->op_type == OP_RV2SV;
+    const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
+    static const char an_array[] = "an ARRAY";
+    static const char a_hash[] = "a HASH";
 
     if (SvROK(sv)) {
       wasref:
@@ -175,22 +166,25 @@ PP(pp_rv2sv)
 		if (SvROK(sv))
 		    goto wasref;
 	    }
-	    gv = Perl_softref2xv(aTHX_ sv, "a SCALAR");
-	    if (!gv)
-		RETURN;
-	}
-	sv = GvSVn(gv);
-    }
-    if (PL_op->op_flags & OPf_MOD) {
-	if (PL_op->op_private & OPpLVAL_INTRO) {
-	    if (cUNOP->op_first->op_type == OP_NULL)
-		sv = save_scalar((GV*)TOPs);
-	    else if (gv)
-		sv = save_scalar(gv);
+	    if (SvOK(sv))
+		Perl_die(aTHX_ PL_no_symref_sv, sv, "a scalar");
 	    else
-		Perl_croak(aTHX_ PL_no_localize_ref);
+		Perl_die(aTHX_ PL_no_usym, "a scalar");
 	}
-	else if (PL_op->op_private & OPpDEREF)
+
+	sv = is_pp_rv2sv ? GvSVn(gv) : is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);
+    }
+    if (PL_op->op_private & OPpLVAL_INTRO) {
+	if (cUNOP->op_first->op_type == OP_NULL)
+	    Perl_croak(aTHX_ "panic: what is this?");
+	/* 		sv = save_scalar((GV*)TOPs); */
+	else if (gv)
+	    sv = is_pp_rv2sv ? save_scalar(gv) : is_pp_rv2av ? (SV*)save_ary(gv) : (SV*)save_hash(gv);
+	else
+	    Perl_croak(aTHX_ PL_no_localize_ref);
+    }
+    else if (PL_op->op_flags & OPf_MOD) {
+	if (PL_op->op_private & OPpDEREF)
 	    vivify_ref(sv, PL_op->op_private & OPpDEREF);
     }
     SETs(sv);
@@ -4154,58 +4148,7 @@ PP(pp_reverse)
 	SP = oldsp;
     }
     else {
-	register char *up;
-	register char *down;
-	register I32 tmp;
-	dTARGET;
-	STRLEN len;
-	PADOFFSET padoff_du;
-
-	if (SP - MARK > 1)
-	    do_join(TARG, &PL_sv_no, MARK, SP);
-	else
-	    sv_setsv(TARG, (SP > MARK)
-		    ? *SP
-		    : (padoff_du = find_rundefsvoffset(),
-			(padoff_du == NOT_IN_PAD
-			 || PAD_COMPNAME_FLAGS_isOUR(padoff_du))
-			? DEFSV : PAD_SVl(padoff_du)));
-	up = SvPV_force(TARG, len);
-	if (len > 1) {
-	    if (DO_UTF8(TARG)) {	/* first reverse each character */
-		char* s = SvPVX(TARG);
-		const char* send = (s + len);
-		while (s < send) {
-		    if (UTF8_IS_INVARIANT(*s)) {
-			s++;
-			continue;
-		    }
-		    else {
-			if (!utf8_to_uvchr(s, 0))
-			    break;
-			up = (char*)s;
-			s += UTF8SKIP(s);
-			down = (char*)(s - 1);
-			/* reverse this character */
-			while (down > up) {
-			    tmp = *up;
-			    *up++ = *down;
-			    *down-- = (char)tmp;
-			}
-		    }
-		}
-		up = SvPVX(TARG);
-	    }
-	    down = SvPVX(TARG) + len - 1;
-	    while (down > up) {
-		tmp = *up;
-		*up++ = *down;
-		*down-- = (char)tmp;
-	    }
-	    (void)SvPOK_only(TARG);
-	}
-	SP = MARK + 1;
-	SETTARG;
+	Perl_croak(aTHX_ "reverse not in list context");
     }
     RETURN;
 }

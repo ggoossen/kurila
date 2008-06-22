@@ -103,8 +103,8 @@ sub walk_table (&@) {
 	else {
 	    @args = @( split m/\s*\|\s*/, $_ );
 	}
-	my @outs = @( < &{$function}(< @args) );
-	print $F < @outs; # $function->(@args) is not 5.003
+	my @outs = @( $function->(< @args) );
+	print $F < @outs;
     }
     print $F $trailer if $trailer;
     unless (ref $filename) {
@@ -389,7 +389,7 @@ sub multoff ($$) {
 
 my $em = safer_open('embed.h-new');
 
-print $em < do_not_edit ("embed.h"), <<'END';
+print $em do_not_edit ("embed.h"), <<'END';
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -461,7 +461,7 @@ if ($ifdef_state) {
 
 for $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
-    print $em < hide($sym, "Perl_$sym");
+    print $em hide($sym, "Perl_$sym");
 }
 
 print $em <<'END';
@@ -540,10 +540,10 @@ if ($ifdef_state) {
 for $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
     if ($sym =~ m/^ck_/) {
-	print $em < hide("$sym(a)", "Perl_$sym(aTHX_ a)");
+	print $em hide("$sym(a)", "Perl_$sym(aTHX_ a)");
     }
     elsif ($sym =~ m/^pp_/) {
-	print $em < hide("$sym()", "Perl_$sym(aTHX)");
+	print $em hide("$sym()", "Perl_$sym(aTHX)");
     }
     else {
 	warn "Illegal symbol '$sym' in pp.sym";
@@ -643,7 +643,7 @@ rename_if_different('embed.h-new', 'embed.h');
 
 $em = safer_open('embedvar.h-new');
 
-print $em < do_not_edit ("embedvar.h"), <<'END';
+print $em do_not_edit ("embedvar.h"), <<'END';
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -672,7 +672,7 @@ print $em < do_not_edit ("embedvar.h"), <<'END';
 END
 
 for $sym (sort keys %intrp) {
-    print $em < multon($sym,'I','vTHX->');
+    print $em multon($sym,'I','vTHX->');
 }
 
 print $em <<'END';
@@ -684,7 +684,7 @@ print $em <<'END';
 END
 
 for $sym (sort keys %intrp) {
-    print $em < multoff($sym,'I');
+    print $em multoff($sym,'I');
 }
 
 print $em <<'END';
@@ -700,8 +700,8 @@ print $em <<'END';
 END
 
 for $sym (sort keys %globvar) {
-    print $em < multon($sym,   'G','my_vars->');
-    print $em < multon("G$sym",'', 'my_vars->');
+    print $em multon($sym,   'G','my_vars->');
+    print $em multon("G$sym",'', 'my_vars->');
 }
 
 print $em <<'END';
@@ -711,7 +711,7 @@ print $em <<'END';
 END
 
 for $sym (sort keys %globvar) {
-    print $em < multoff($sym,'G');
+    print $em multoff($sym,'G');
 }
 
 print $em <<'END';
@@ -723,7 +723,7 @@ print $em <<'END';
 END
 
 for $sym (sort < @extvars) {
-    print $em < hide($sym,"PL_$sym");
+    print $em hide($sym,"PL_$sym");
 }
 
 print $em <<'END';
@@ -739,7 +739,7 @@ rename_if_different('embedvar.h-new', 'embedvar.h');
 my $capi = safer_open('perlapi.c-new');
 my $capih = safer_open('perlapi.h-new');
 
-print $capih < do_not_edit ("perlapi.h"), <<'EOT';
+print $capih do_not_edit ("perlapi.h"), <<'EOT';
 
 /* declare accessor functions for Perl variables */
 #ifndef __perlapi_h__
@@ -844,11 +844,11 @@ END_EXTERN_C
 EOT
 
 foreach $sym (sort keys %intrp) {
-    print $capih < bincompat_var('I',$sym);
+    print $capih bincompat_var('I',$sym);
 }
 
 foreach $sym (sort keys %globvar) {
-    print $capih < bincompat_var('G',$sym);
+    print $capih bincompat_var('G',$sym);
 }
 
 print $capih <<'EOT';
@@ -863,7 +863,7 @@ EOT
 safer_close($capih);
 rename_if_different('perlapi.h-new', 'perlapi.h');
 
-print $capi < do_not_edit ("perlapi.c"), <<'EOT';
+print $capi do_not_edit ("perlapi.c"), <<'EOT';
 
 #include "EXTERN.h"
 #include "perl.h"

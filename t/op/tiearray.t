@@ -150,7 +150,7 @@ my $test = 1;
 { my $ob = tie @ary,'Implement',3,2,1;
   print "not " unless $ob;
   print "ok ", $test++,"\n";
-  print "not " unless tied(@ary) == $ob;
+  print "not " unless tied(@ary) \== $ob;
   print "ok ", $test++,"\n";
 }
 

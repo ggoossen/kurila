@@ -129,8 +129,8 @@ sub testwarn {
 # fixed.
 
 my $debugger_test =  q<
-    my @stackinfo = caller(0);
-    return scalar @stackinfo;
+    my @stackinfo = @(caller(0));
+    return nelems @stackinfo;
 >;
 
 sub pb { return (caller(0))[[3]] }

@@ -8,6 +8,8 @@
  *
  */
 
+#include "valgrind/memcheck.h"
+
 #ifdef sv_flags
 #undef sv_flags		/* Convex has this in <signal.h> for sigvec() */
 #endif

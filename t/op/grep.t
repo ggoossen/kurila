@@ -5,7 +5,7 @@
 #
 
 require "./test.pl";
-plan( tests => 60 );
+plan( tests => 52 );
 
 our $test;
 
@@ -15,7 +15,7 @@ our $test;
     cmp_ok("{join ' ', <@mapped}", 'eq', "3 0 3", 'map scalar list of list');
 
     my @grepped = @( grep {scalar nelems @$_} < @lol );
-    cmp_ok( (join ' ', map { < dump::view($_) } < @grepped), 'eq',
+    cmp_ok( (join ' ', map { dump::view($_) } < @grepped), 'eq',
             dump::view(@lol[0]) . ' ' . dump::view(@lol[2]), 'grep scalar list of list');
     $test++;
 
@@ -156,48 +156,6 @@ our $test;
     # Add also a sample test from [perl #18153].  (The same bug).
     $a = 1; map {if ($a){}} (2);
     pass( '[perl #18153] (not dead yet)' ); # no core dump is all we need
-}
-
-{
-    sub add_an_x(@){
-        map {"{$_}x"} < @_;
-    };
-    cmp_ok( join("-", <add_an_x(1,2,3,4)), 'eq', "1x-2x-3x-4x", 'add-an-x');
-}
-
-{
-    my $gimme;
-
-    sub gimme {
-        my $want = wantarray();
-        if (defined $want) {
-            $gimme = $want ? 'list' : 'scalar';
-        } else {
-            $gimme = 'void';
-        }
-    }
-
-    my @list = @( 0..9 );
-
-    undef $gimme; gimme for < @list;      cmp_ok($gimme, 'eq', 'void',   'gimme a V!');
-    undef $gimme; grep { gimme } < @list; cmp_ok($gimme, 'eq', 'scalar', 'gimme an S!');
-    undef $gimme; map { < gimme } < @list;  cmp_ok($gimme, 'eq', 'list',   'gimme an L!');
-}
-
-{
-    # test scalar context return
-    my @list = @(7, 14, 21);
-
-    my $x = map {$_ *= 2} < @list;
-    cmp_ok("{join ' ', <@list}", 'eq', "14 28 42", 'map scalar return');
-    cmp_ok($x, '==', 3, 'map scalar count');
-
-    @list = @(9, 16, 25, 36);
-    $x = grep {$_ % 2} < @list;
-    cmp_ok($x, '==', 2, 'grep scalar count');
-
-    my @res = @( grep {$_ % 2} < @list );
-    cmp_ok("{join ' ', <@res}", 'eq', "9 25", 'grep extract');
 }
 
 {

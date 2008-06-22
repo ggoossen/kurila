@@ -17,7 +17,7 @@ use File::Spec::Functions qw(:DEFAULT splitdir rel2abs splitpath);
 # Can't use Cwd::abs_path() because it has different ideas about
 # path separators than File::Spec.
 sub abs_path {
-    my $d = rel2abs( <curdir);
+    my $d = rel2abs(curdir);
 
     $d = uc($d) if $IsVMS;
     $d = lc($d) if $^O =~ m/^uwin/;
@@ -28,7 +28,7 @@ my $Cwd = abs_path;
 
 # Let's get to a known position
 SKIP: {
-    my ($vol,$dir) = < splitpath( <abs_path,1);
+    my ($vol,$dir) = < splitpath(abs_path,1);
     my $test_dir = $IsVMS ? 'T' : 't';
     skip("Already in t/", 2) if ( <splitdir($dir))[-1] eq $test_dir;
 
@@ -111,23 +111,22 @@ sub check_env {
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS ) {
         ok( !chdir(),         "chdir() on $^O ignores only \$ENV\{$key\} set" );
-        is( < abs_path, $Cwd,   '  abs_path() did not change' );
+        is( abs_path, $Cwd,   '  abs_path() did not change' );
         pass( "  no need to test SYS\$LOGIN on $^O" ) for 1..7;
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );
-        is( < abs_path, %ENV{$key}, '  abs_path() agrees' );
+        is( abs_path, %ENV{$key}, '  abs_path() agrees' );
         chdir($Cwd);
-        is( < abs_path, $Cwd,       '  and back again' );
+        is( abs_path, $Cwd,       '  and back again' );
 
         my $warning = '';
         local $^WARN_HOOK = sub { $warning .= @_[0]->{description} . "\n" };
 
 
         # Check the deprecated chdir(undef) feature.
-#line 64
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
-        is( < abs_path, %ENV{$key},   '  abs_path() agrees' );
+        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir
 Use of chdir('') or chdir(undef) as chdir() is deprecated
@@ -137,9 +136,8 @@ WARNING
 
         # Ditto chdir('').
         $warning = '';
-#line 76
         ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
-        is( < abs_path, %ENV{$key},   '  abs_path() agrees' );
+        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
@@ -198,5 +196,5 @@ foreach my $key (< @magic_envs) {
     } else {
         ok( !chdir(),                   'chdir() w/o any ENV set' );
     }
-    is( < abs_path, $Cwd,             '  abs_path() agrees' );
+    is( abs_path, $Cwd,             '  abs_path() agrees' );
 }

@@ -17,7 +17,7 @@ sub expected {
     if (dump::view($object) =~ $r) {
 	is($1, $type);
 	# in 64-bit platforms hex warns for 32+ -bit values
-	cmp_ok(do {no warnings 'portable'; hex($2)}, '==', $object);
+	cmp_ok(do {no warnings 'portable'; hex($2)}, '==', ref::address($object));
     }
     else {
 	fail(); fail();
@@ -30,7 +30,7 @@ $a1 = bless \%(), "A";
 expected($a1, "A", "HASH");
 $b1 = bless \@(), "B";
 expected($b1, "B", "ARRAY");
-$c1 = bless \(map "$_", "test"), "C";
+$c1 = bless \$("test"), "C";
 expected($c1, "C", "SCALAR");
 our $test = "foo"; $d1 = bless \*test, "D";
 expected($d1, "D", "GLOB");
@@ -96,7 +96,7 @@ expected(bless(\%(), $1), "E", "HASH");
 # no class, or empty string (with a warning), or undef (with two)
 expected(bless(\@()), 'main', "ARRAY");
 {
-    local $^WARN_HOOK = sub { push @w, < @_[0]->message };
+    local $^WARN_HOOK = sub { push @w, @_[0]->message };
     use warnings;
 
     my $m = bless \@();

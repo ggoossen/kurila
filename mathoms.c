@@ -918,9 +918,14 @@ PP(pp_bit_xor)
     return pp_bit_or();
 }
 
+PP(pp_rv2av)
+{
+    return Perl_pp_rv2sv(aTHX);
+}
+
 PP(pp_rv2hv)
 {
-    return Perl_pp_rv2av(aTHX);
+    return Perl_pp_rv2sv(aTHX);
 }
 
 char *

@@ -134,7 +134,7 @@ sub _q {
 
 sub _qq {
     my $x = shift;
-    return defined $x ? '"' . display ($x) . '"' : 'undef';
+    return dump::view($x);
 };
 
 # keys are the codes \n etc map to, values are 2 char strings such as \n
@@ -145,26 +145,7 @@ foreach my $x (split m//, q|nrtfa\'"|) {
 # A way to display scalars containing control characters and Unicode.
 # Trying to avoid setting $_, or relying on local $_ to work.
 sub display {
-    my @result;
-    foreach my $x (< @_) {
-        if (defined $x and not ref $x) {
-            my $y = '';
-            foreach my $c (unpack("U*", $x)) {
-                if ($c +> 255) {
-                    $y .= sprintf "\\x\{\%x\}", $c;
-                } elsif (%backslash_escape{$c}) {
-                    $y .= %backslash_escape{$c};
-                } else {
-                    my $z = chr $c; # Maybe we can get away with a literal...
-                    $z = sprintf "\\\%03o", $c if $z =~ m/[[:^print:]]/;
-                    $y .= $z;
-                }
-            }
-            $x = $y;
-        }
-        push @result, $x;
-    }
-    return @result;
+    return dump::view(@_[0]);
 }
 
 sub is ($$@) {
@@ -360,12 +341,12 @@ sub eq_hash {
     $key = "" . $key;
     if (exists $orig->{$key}) {
       if ($orig->{$key} ne $value) {
-        _print "# key ", < _qq($key), " was ", < _qq($orig->{$key}),
-                     " now ", < _qq($value), "\n";
+        _print "# key ", _qq($key), " was ", _qq($orig->{$key}),
+                     " now ", _qq($value), "\n";
         $fail = 1;
       }
     } else {
-      _print "# key ", < _qq($key), " is ", < _qq($value),
+      _print "# key ", _qq($key), " is ", _qq($value),
                    ", not in original.\n";
       $fail = 1;
     }

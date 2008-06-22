@@ -48,7 +48,7 @@ BEGIN {
   *iseq = *is;
 }
 
-plan 1774;
+plan 1767;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);
@@ -351,10 +351,6 @@ our (@ans, $res, @ans1);
 push @ans, $res while $res = matchit;
 
 ok("{join ' ', <@ans}" eq "1 1 1");
-
-@ans = @( matchit );
-
-ok( "{join ' ', <@ans}" eq $expect );
 
 ok( "abc" =~ m/^(??{"a"})b/ );
 
@@ -2611,12 +2607,11 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     ok("X\@A" =~ m/X(@)A/, '@)');
     ok("X\@A" =~ m/X@|ZA/, '@|');
 
-    local $" = ','; # non-whitespace and non-RE-specific
     ok('abc' =~ m/(.)(.)(.)/, 'the last successful match is bogus');
-    ok("A{join ' ', <@+}B"  =~ m/A{join ' ', <@+}B/,  'interpolation of @+ in /@{+}/');
-    ok("A{join ' ', <@-}B"  =~ m/A{join ' ', <@-}B/,  'interpolation of @- in /@{-}/');
-    ok("A{join ' ', <@+}B"  =~ m/A{join ' ', <@+}B/x, 'interpolation of @+ in /@{+}/x');
-    ok("A{join ' ', <@-}B"  =~ m/A{join ' ', <@-}B/x, 'interpolation of @- in /@{-}/x');
+    ok("A{join ',', <@+}B"  =~ m/A$(join ',', <@+)B/,  'interpolation of @+ in /@{+}/');
+    ok("A{join ',', <@-}B"  =~ m/A$(join ',', <@-)B/,  'interpolation of @- in /@{-}/');
+    ok("A{join ',', <@+}B"  =~ m/A$(join ',', <@+)B/x, 'interpolation of @+ in /@{+}/x');
+    ok("A{join ',', <@-}B"  =~ m/A$(join ',', <@-)B/x, 'interpolation of @- in /@{-}/x');
 }
 
 {
@@ -3522,22 +3517,16 @@ sub kt
     $ok=exists(%-{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
     iseq($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
-    iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~m/(?<x>foo)|bar/');
-    iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists(%+{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
     iseq($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
-    iseq(scalar(%+), 0, 'scalar %+ == 0 after "bar"=~m/(?<x>foo)|bar/');
-    iseq(scalar(%-), 1, 'scalar %- == 1 after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists(%-{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
     iseq($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
-    iseq(scalar(%+), 1, 'scalar %+ == 1 after "foo"=~m/(?<x>foo)|bar/');
-    iseq(scalar(%-), 1, 'scalar %- == 1 after "foo"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists(%+{x}) ? 1 : 0
