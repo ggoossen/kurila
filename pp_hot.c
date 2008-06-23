@@ -1571,11 +1571,12 @@ PP(pp_enter)
 PP(pp_helem)
 {
     dVAR; dSP;
-    do_arg_check(SP-1);
     HE* he;
     SV **svp;
     SV * const keysv = POPs;
     HV * const hv = (HV*)POPs;
+    if ( SvOK(hv) && ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
     const U32 lval = PL_op->op_flags & OPf_MOD;
     const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
     SV *sv;

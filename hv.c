@@ -342,8 +342,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
     if (!hv)
 	return NULL;
-    if (SvTYPE(hv) == SVTYPEMASK)
-	return NULL;
 
     assert(SvTYPE(hv) == SVt_PVHV);
 

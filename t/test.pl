@@ -32,6 +32,8 @@ sub _print {
     print STDOUT < @_;
 }
 
+1;
+__END__
 sub _print_stderr {
     local($\, $", $,) = (undef, ' ', '');
     print STDERR < @_;

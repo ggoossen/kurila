@@ -150,6 +150,7 @@ PP(pp_rv2sv)
     const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
     static const char an_array[] = "an ARRAY";
     static const char a_hash[] = "a HASH";
+    static const char a_scalar[] = "a SCALAR";
 
     if (SvROK(sv)) {
       wasref:
@@ -167,12 +168,22 @@ PP(pp_rv2sv)
 		    goto wasref;
 	    }
 	    if (SvOK(sv))
-		Perl_die(aTHX_ PL_no_symref_sv, sv, "a scalar");
+		Perl_croak(aTHX_ PL_no_symref_sv, sv, is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
 	    else
-		Perl_die(aTHX_ PL_no_usym, "a scalar");
+		Perl_croak(aTHX_ PL_no_usym, is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
 	}
 
 	sv = is_pp_rv2sv ? GvSVn(gv) : is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);
+    }
+    if ( ! is_pp_rv2sv ) {
+	if (is_pp_rv2av) {
+	    if ( ! SvOK(sv) && ! SvAVOK(sv) )
+		Perl_croak(aTHX_ "Not an ARRAY reference");
+	}
+	else {
+	    if ( ! SvOK(sv) && ! SvHVOK(sv) )
+		Perl_croak(aTHX_ "Not a HASH reference");
+	}
     }
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	if (cUNOP->op_first->op_type == OP_NULL)
@@ -3567,6 +3578,10 @@ PP(pp_exists)
     }
     tmpsv = POPs;
     hv = (HV*)POPs;
+
+    if ( ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
+
     if (SvTYPE(hv) == SVt_PVHV) {
 	if (hv_exists_ent(hv, tmpsv, 0))
 	    RETPUSHYES;
@@ -3604,6 +3619,9 @@ PP(pp_hslice)
              && gv_fetchmethod(stash, "EXISTS")
              && gv_fetchmethod(stash, "DELETE"));
     }
+
+    if ( ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
 
     while (++MARK <= SP) {
         SV * const keysv = *MARK;
