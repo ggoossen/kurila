@@ -1412,17 +1412,19 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	    SvCUR_set(PL_errors, 0);
 	}
 
-	ENTER;
-	PUSHSTACKi(PERLSI_WARNHOOK);
-	PUSHMARK(SP);
-	XPUSHs(msv);
-	PUTBACK;
-	call_sv(PL_errorcreatehook, G_SCALAR);
-	SPAGAIN;
-	msv = POPs;
-	PUTBACK;
-	POPSTACK;
-	LEAVE;
+	if (PL_errorcreatehook) {
+	    ENTER;
+	    PUSHSTACKi(PERLSI_WARNHOOK);
+	    PUSHMARK(SP);
+	    XPUSHs(msv);
+	    PUTBACK;
+	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    SPAGAIN;
+	    msv = POPs;
+	    PUTBACK;
+	    POPSTACK;
+	    LEAVE;
+	}
     }
 
     vdie_common(msv, TRUE);

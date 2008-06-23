@@ -636,6 +636,9 @@ Perl_do_kv(pTHX)
 	RETURN;
     }
 
+    if ( ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
+
     keys = hv;
     (void)hv_iterinit(keys);	/* always reset iterator regardless */
 

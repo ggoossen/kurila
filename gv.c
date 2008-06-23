@@ -185,8 +185,6 @@ Perl_newGP(pTHX_ GV *const gv)
 #endif
 
     gp->gp_line = PL_curcop ? CopLINE(PL_curcop) : 0;
-    /* XXX Ideally this cast would be replaced with a change to const char*
-       in the struct.  */
     gp->gp_file_hek = share_hek(file, len, hash);
     gp->gp_egv = gv;
     gp->gp_refcnt = 1;

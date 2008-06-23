@@ -471,6 +471,7 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
     const char * const stashname = HvNAME_get(stash);
     const STRLEN stashname_len = HvNAMELEN_get(stash);
 
+    assert( SvHVOK(PL_isarev) );
     SV ** const svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
     HV * const isarev = svp ? (HV*)*svp : NULL;
 

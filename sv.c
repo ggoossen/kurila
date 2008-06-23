@@ -199,6 +199,7 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	SvARENA_CHAIN(p) = (void *)PL_sv_root;		\
 	SvFLAGS(p) = SVTYPEMASK;			\
 	VALGRIND_MAKE_MEM_UNDEFINED(p, sizeof(SV));     \
+        VALGRIND_MEMPOOL_FREE(&PL_sv_arenaroot, p);            \
 	VALGRIND_MAKE_MEM_DEFINED(&SvARENA_CHAIN(p), sizeof(void*));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
@@ -248,6 +249,7 @@ S_new_SV(pTHX)
 	uproot_SV(sv);
     else
 	sv = S_more_sv(aTHX);
+    VALGRIND_MEMPOOL_ALLOC(&PL_sv_arenaroot, sv, sizeof(SV));
     SvANY(sv) = 0;
     SvREFCNT(sv) = 1;
     SvFLAGS(sv) = 0;
@@ -508,7 +510,7 @@ static void
 do_clean_all(pTHX_ SV *const sv)
 {
     dVAR;
-    if (sv == (SV*)PL_fdpid || sv == (SV*)PL_strtab) /* don't clean pid table and strtab */
+    if (sv == (SV*)PL_fdpid || sv == (SV*)PL_strtab || sv == (SV*)PL_isarev ) /* don't clean pid table and strtab */
 	return;
     DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning loops: SV at 0x%"UVxf"\n", PTR2UV(sv)) ));
     SvFLAGS(sv) |= SVf_BREAK;
@@ -597,8 +599,9 @@ Perl_sv_free_arenas(pTHX)
 	while (svanext && SvFAKE(svanext))
 	    svanext = (SV*) SvANY(svanext);
 
-	if (!SvFAKE(sva))
+	if (!SvFAKE(sva)) {
 	    Safefree(sva);
+	}
     }
 
     {

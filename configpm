@@ -617,7 +617,7 @@ sub config_vars {
 
 	# all config-vars are by definition \w only, any \W means regex
 	if ($qry =~ m/\W/) {
-	    my @matches = @(config_re($qry));
+	    my @matches = @(<config_re($qry));
 	    print map "$_$lnend", @matches ? <@matches : "$qry: not found"		if !$notag;
 	    print map { s/\w+=//; "$_$lnend" } @matches ? <@matches : "$qry: not found"	if  $notag;
 	} else {

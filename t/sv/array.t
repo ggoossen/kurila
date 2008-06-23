@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require './test.pl'; }
-
+__END__
 plan (80);
 
 #sub is { @_[0] eq @_[1] or die "different: '@_[0]' - '@_[1]'"; };
