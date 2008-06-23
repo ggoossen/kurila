@@ -158,8 +158,8 @@ sub process_file {
       $cfile = %args{filename};
       $cfile =~ s/\.xs$/$csuffix/i or $cfile .= $csuffix;
     }
-    tie(*PSEUDO_STDOUT, 'ExtUtils::ParseXS::CountLines', $cfile, %args{output});
-    select PSEUDO_STDOUT;
+    binmode ':via(ExtUtils::ParseXS::CountLines', %args{output};
+    select %args{output};
   } else {
     select %args{output};
   }
@@ -1890,11 +1890,12 @@ sub map_type {
 #########################################################
 package
   ExtUtils::ParseXS::CountLines;
+
 use strict;
 our ($SECTION_END_MARKER);
 
-sub TIEHANDLE {
-  my ($class, $cfile, $fh) = < @_;
+sub PUSHED {
+  my ($class, $mode, $fh, $cfile) = < @_;
   $cfile =~ s/\\/\\\\/g;
   $SECTION_END_MARKER = qq{#line --- "$cfile"};
   
@@ -1904,33 +1905,22 @@ sub TIEHANDLE {
                  ), $class;
 }
 
-sub PRINT {
-  my $self = shift;
-  for (< @_) {
-    $self->{buffer} .= $_;
+sub WRITE {
+    my ($self,$buf,$fh) = @_;
+    $self->{buffer} .= $buf;
     while ($self->{buffer} =~ s/^([^\n]*\n)//) {
-      my $line = $1;
-      ++ $self->{line_no};
-      $line =~ s|^\#line\s+---(?=\s)|#line $self->{line_no}|;
-      print {$self->{fh}} $line;
+        my $line = $1;
+        ++ $self->{line_no};
+        $line =~ s|^\#line\s+---(?=\s)|#line $self->{line_no}|;
+        print {$self->{fh}} $line;
     }
-  }
 }
 
-sub PRINTF {
-  my $self = shift;
-  my $fmt = shift;
-  $self->PRINT(sprintf($fmt, < @_));
-}
-
-sub DESTROY {
-  # Not necessary if we're careful to end with a "\n"
-  my $self = shift;
-  print {$self->{fh}} $self->{buffer};
-}
-
-sub UNTIE {
-  # This sub does nothing, but is neccessary for references to be released.
+sub FLUSH {
+    my ($self,$fh) = @_;
+    print $fh $self->{buffer} or return -1;
+    $self->{buffer} = '';
+    return 0;
 }
 
 sub end_marker {
