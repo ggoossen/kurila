@@ -162,6 +162,8 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 
     PERL_ARGS_ASSERT_OFFER_NICE_CHUNK;
 
+    VALGRIND_MAKE_MEM_UNDEFINED(chunk, chunk_size);
+
     new_chunk = (void *)(chunk);
     new_chunk_size = (chunk_size);
     if (new_chunk_size > PL_nice_chunk_size) {
@@ -4718,7 +4720,6 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
-	    SvREFCNT_dec(SvOURSTASH(sv));
 	} else if (SvMAGIC(sv))
 	    mg_free(sv);
     }
@@ -9485,7 +9486,6 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 	       FIXME - instrument and check that assumption  */
 	    if (sv_type >= SVt_PVMG) {
 		if ((sv_type == SVt_PVMG) && SvPAD_OUR(dstr)) {
-		    SvOURSTASH_set(dstr, hv_dup_inc(SvOURSTASH(dstr), param));
 		} else if (SvMAGIC(dstr))
 		    SvMAGIC_set(dstr, mg_dup(SvMAGIC(dstr), param));
 		if (SvSTASH(dstr))

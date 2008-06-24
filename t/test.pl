@@ -28,12 +28,10 @@ $NO_ENDING = 0;
 
 # Use this instead of print to avoid interference while testing globals.
 sub _print {
-#     local($\, $", $,) = (undef, ' ', '');
-#     print STDOUT < @_;
+    local($\, $", $,) = (undef, ' ', '');
+    print STDOUT < @_;
 }
 
-1;
-__END__
 sub _print_stderr {
     local($\, $", $,) = (undef, ' ', '');
     print STDERR < @_;

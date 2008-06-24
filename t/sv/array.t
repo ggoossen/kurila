@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require './test.pl'; }
-__END__
+
 plan (80);
 
 #sub is { @_[0] eq @_[1] or die "different: '@_[0]' - '@_[1]'"; };
@@ -239,7 +239,7 @@ my $got = runperl (
 	prog => q{
                     our @a;
 		    sub X::DESTROY { @a = () }
-		    @a = (bless \%(), "X");
+		    @a = @(bless \%(), "X");
 		    @a = ();
 		},
 	stderr => 1

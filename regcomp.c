@@ -4797,11 +4797,11 @@ SV*
 Perl_reg_qr_package(pTHX_ REGEXP * const rx)
 {
     PERL_ARGS_ASSERT_REG_QR_PACKAGE;
-	PERL_UNUSED_ARG(rx);
-	if (0)
-	    return NULL;
-	else
-	    return newSVpvs("Regexp");
+    PERL_UNUSED_ARG(rx);
+    if (0)
+	return NULL;
+    else
+	return newSVpvs("Regexp");
 }
 
 /* Scans the name of a named buffer from the pattern.
@@ -7481,7 +7481,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 		STRLEN numlen;
 		char* d;
 		/* use temporary buffer of at least the length of the parsed string */
-		SV* buf = newSV(RExC_end - RExC_parse + 1);
+		SV* buf = sv_2mortal(newSV(RExC_end - RExC_parse + 1));
 		SvPOK_on(buf);
 		d = SvPV_mutable(buf, len);
 		RExC_parse = (char*)parse_escape(RExC_parse-1, d, &len, RExC_end);
