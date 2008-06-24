@@ -127,13 +127,12 @@ Perl_gv_HVadd
 Perl_gv_IOadd
 Perl_gv_check
 Perl_gv_efullname3
-Perl_gv_efullname4
 Perl_gv_fetchfile
 Perl_gv_fetchfile_flags
 Perl_gv_fetchmeth
 Perl_gv_fetchmethod
 Perl_gv_fetchpv
-Perl_gv_fullname4
+Perl_gv_fullname3
 Perl_gv_init
 Perl_gv_name_set
 Perl_gv_stashpv

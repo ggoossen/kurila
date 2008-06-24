@@ -740,7 +740,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	/* So is ccstack[dbcxix]. */
 	if (isGV(cvgv)) {
 	    SV * const sv = newSV(0);
-	    gv_efullname4(sv, cvgv, NULL, TRUE);
+	    gv_efullname3(sv, cvgv, NULL);
 	    av_push(av, sv);
 	}
 	else {
@@ -1850,7 +1850,7 @@ XS(XS_Symbol_glob_name)
     if (SvTYPE(ST(0)) != SVt_PVGV)
        Perl_croak(aTHX_ "Argument must be glob");
 
-    gv_efullname4(sv, (GV*)ST(0), NULL, TRUE);
+    gv_efullname3(sv, (GV*)ST(0), NULL);
     ST(0) = sv;
     
     XSRETURN(1);
@@ -2123,7 +2123,7 @@ XS(XS_dump_view)
     }
     
     if (isGV(sv)) {
-	gv_efullname4(retsv, (GV*)sv, "*", TRUE);
+	gv_efullname3(retsv, (GV*)sv, "*");
 
 	XSRETURN(1);
     }

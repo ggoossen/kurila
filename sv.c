@@ -3303,7 +3303,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     }
     else {
 	if (isGV_with_GP(sstr)) {
-	    gv_efullname4(dstr, (GV *)sstr, "*", TRUE);
+	    gv_efullname3(dstr, (GV *)sstr, "*");
 	}
 	else
 	    (void)SvOK_off(dstr);
@@ -4332,8 +4332,6 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 		sv_unmagic(tsv, PERL_MAGIC_backref);
 	    } else {
 		av = newAV();
-		AvREAL_off(av);
-		SvREFCNT_inc_simple_void(av);
 	    }
 	    *avp = av;
 	}
@@ -4344,7 +4342,6 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 	    av = (AV*)mg->mg_obj;
 	else {
 	    av = newAV();
-	    AvREAL_off(av);
 	    sv_magic(tsv, (SV*)av, PERL_MAGIC_backref, NULL, 0);
 	    /* av now has a refcnt of 2, which avoids it getting freed
 	     * before us during global cleanup. The extra ref is removed
@@ -4453,6 +4450,7 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 	}
     }
     SvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
+    assert(SvREFCNT(av) == 0);
     return 0;
 }
 
@@ -6862,7 +6860,7 @@ Perl_sv_2cv(pTHX_ SV *sv, HV **const st, GV **const gvp, const I32 lref)
 	    SV *tmpsv;
 	    ENTER;
 	    tmpsv = newSV(0);
-	    gv_efullname4(tmpsv, gv, NULL,TRUE);
+	    gv_efullname3(tmpsv, gv, NULL);
 	    /* XXX this is probably not what they think they're getting.
 	     * It has the same effect as "sub name;", i.e. just a forward
 	     * declaration! */
@@ -7330,7 +7328,7 @@ S_sv_unglob(pTHX_ SV *const sv)
 
     assert(SvTYPE(sv) == SVt_PVGV);
     SvFAKE_off(sv);
-    gv_efullname4(temp, (GV *) sv, "*", TRUE);
+    gv_efullname3(temp, (GV *) sv, "*");
 
     if (GvGP(sv)) {
         if(GvCVu((GV*)sv) && (stash = GvSTASH((GV*)sv)) && HvNAME_get(stash))
@@ -11059,7 +11057,7 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
 	buffer[0] = gvtype;
 	buffer[1] = 0;
 
-	gv_fullname4(name, gv, buffer, 0);
+	gv_fullname3(name, gv, buffer);
     }
     else {
 	CV * const cv = find_runcv(NULL);

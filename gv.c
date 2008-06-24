@@ -791,7 +791,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    name_cursor+=2;
 	    name = name_cursor;
 	    if (name == name_end)
-		return gv ? gv : (GV*)*hv_fetchs(PL_defstash, "main::", TRUE);
+		return gv;
 	}
     }
     len = name_cursor - name;
@@ -1217,13 +1217,13 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 }
 
 void
-Perl_gv_fullname4(pTHX_ SV *sv, const GV *gv, const char *prefix, bool keepmain)
+Perl_gv_fullname3(pTHX_ SV *sv, const GV *gv, const char *prefix)
 {
     const char *name;
     STRLEN namelen;
     const HV * const hv = GvSTASH(gv);
 
-    PERL_ARGS_ASSERT_GV_FULLNAME4;
+    PERL_ARGS_ASSERT_GV_FULLNAME3;
 
     if (!hv) {
 	SvPVOK_off(sv);
@@ -1239,21 +1239,20 @@ Perl_gv_fullname4(pTHX_ SV *sv, const GV *gv, const char *prefix, bool keepmain)
 	namelen = 8;
     }
 
-    if (keepmain || strNE(name, "main")) {
-	sv_catpvn(sv,name,namelen);
-	sv_catpvs(sv,"::");
-    }
+    sv_catpvn(sv,name,namelen);
+    sv_catpvs(sv,"::");
+
     sv_catpvn(sv,GvNAME(gv),GvNAMELEN(gv));
 }
 
 void
-Perl_gv_efullname4(pTHX_ SV *sv, const GV *gv, const char *prefix, bool keepmain)
+Perl_gv_efullname3(pTHX_ SV *sv, const GV *gv, const char *prefix)
 {
     const GV * const egv = GvEGV(gv);
 
-    PERL_ARGS_ASSERT_GV_EFULLNAME4;
+    PERL_ARGS_ASSERT_GV_EFULLNAME3;
 
-    gv_fullname4(sv, egv ? egv : gv, prefix, keepmain);
+    gv_fullname3(sv, egv ? egv : gv, prefix);
 }
 
 IO *

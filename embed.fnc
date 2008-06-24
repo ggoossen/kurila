@@ -281,15 +281,14 @@ Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
-Apmb	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
-Ap	|void	|gv_efullname4	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix|bool keepmain
+Ap	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 Ap	|GV*	|gv_fetchfile	|NN const char* name
 Ap	|GV*	|gv_fetchfile_flags|NN const char *const name|const STRLEN len\
 				|const U32 flags
 Apd	|GV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
 Apdb	|GV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
 Ap	|GV*	|gv_fetchpv	|NN const char* nambeg|I32 add|const svtype sv_type
-Ap	|void	|gv_fullname4	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix|bool keepmain
+Ap	|void	|gv_fullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 pMox	|GP *	|newGP		|NN GV *const gv
 Ap	|void	|gv_init	|NN GV* gv|NULLOK HV* stash|NN const char* name|STRLEN len|int multi
 Ap	|void	|gv_name_set	|NN GV* gv|NN const char *name|U32 len|U32 flags

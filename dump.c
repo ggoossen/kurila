@@ -129,7 +129,7 @@ Perl_dump_sub(pTHX_ const GV *gv)
 
     PERL_ARGS_ASSERT_DUMP_SUB;
 
-    gv_fullname4(sv, gv, NULL,TRUE);
+    gv_fullname3(sv, gv, NULL);
     Perl_dump_indent(aTHX_ 0, Perl_debug_log, "SUB %s = ", SvPVX_const(sv));
     if (CvISXSUB(GvCV(gv)))
 	Perl_dump_indent(aTHX_ 0, Perl_debug_log, "(xsub 0x%"UVxf" %d)\n",
@@ -1026,7 +1026,7 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 		SV * const tmpsv = newSV(0);
 		ENTER;
 		SAVEFREESV(tmpsv);
-		gv_fullname4(tmpsv, (GV*)cSVOPo->op_sv, NULL, TRUE);
+		gv_fullname3(tmpsv, (GV*)cSVOPo->op_sv, NULL);
 		Perl_dump_indent(aTHX_ level, file, "GV = %s\n",
 				 SvPV_nolen_const(tmpsv));
 		LEAVE;
@@ -1132,10 +1132,10 @@ Perl_gv_dump(pTHX_ GV *gv)
     }
     sv = sv_newmortal();
     PerlIO_printf(Perl_debug_log, "{\n");
-    gv_fullname4(sv, gv, NULL, TRUE);
+    gv_fullname3(sv, gv, NULL);
     Perl_dump_indent(aTHX_ 1, Perl_debug_log, "GV_NAME = %s", SvPVX_const(sv));
     if (gv != GvEGV(gv)) {
-	gv_efullname4(sv, GvEGV(gv), NULL, TRUE);
+	gv_efullname3(sv, GvEGV(gv), NULL);
 	Perl_dump_indent(aTHX_ 1, Perl_debug_log, "-> %s", SvPVX_const(sv));
     }
     PerlIO_putc(Perl_debug_log, '\n');
@@ -1915,7 +1915,7 @@ Perl_debop(pTHX_ const OP *o)
     case OP_GV:
 	if (cGVOPo_gv) {
 	    SV * const sv = newSV(0);
-	    gv_fullname4(sv, cGVOPo_gv, NULL, TRUE);
+	    gv_fullname3(sv, cGVOPo_gv, NULL);
 	    PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
 	    SvREFCNT_dec(sv);
 	}
@@ -2087,7 +2087,7 @@ Perl_xmldump_sub(pTHX_ const GV *gv)
 
     PERL_ARGS_ASSERT_XMLDUMP_SUB;
 
-    gv_fullname4(sv, gv, NULL, TRUE);
+    gv_fullname3(sv, gv, NULL);
     Perl_xmldump_indent(aTHX_ 0, PL_xmlfp, "\nSUB %s = ", SvPVX_const(sv));
     if (CvXSUB(GvCV(gv)))
 	Perl_xmldump_indent(aTHX_ 0, PL_xmlfp, "(xsub 0x%"UVxf" %d)\n",
@@ -2593,7 +2593,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    ENTER;
 	    SAVEFREESV(tmpsv1);
 	    SAVEFREESV(tmpsv2);
-	    gv_fullname4(tmpsv1, (GV*)cSVOPo->op_sv, NULL, TRUE);
+	    gv_fullname3(tmpsv1, (GV*)cSVOPo->op_sv, NULL);
 	    s = SvPV(tmpsv1,len);
 	    sv_catxmlpvn(tmpsv2, s, len);
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"%s\"", SvPV(tmpsv2, len));
