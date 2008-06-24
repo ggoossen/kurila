@@ -312,8 +312,6 @@ perl_construct(pTHXx)
 
     VALGRIND_CREATE_MEMPOOL(&PL_sv_arenaroot, 0, 0);
 
-    newSViv(4);
-
     /* set read-only and try to insure than we wont see REFCNT==0
        very often */
 
@@ -1166,9 +1164,10 @@ perl_destruct(pTHXx)
 	for (;;) {
 	    if (hent && ckWARN_d(WARN_INTERNAL)) {
 		HE * const next = HeNEXT(hent);
-		Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
-		     "Unbalanced string table refcount: (%ld) for \"%s\"",
-		     (long)hent->he_valu.hent_refcount, HeKEY(hent));
+		/* FIXME, turn this on when leaked scalars are found */
+/* 		Perl_warner(aTHX_ packWARN(WARN_INTERNAL), */
+/* 		     "Unbalanced string table refcount: (%ld) for \"%s\"", */
+/* 		     (long)hent->he_valu.hent_refcount, HeKEY(hent)); */
 		Safefree(hent);
 		hent = next;
 	    }
@@ -1296,8 +1295,6 @@ perl_destruct(pTHXx)
 #ifdef USE_REENTRANT_API
     Perl_reentrant_free(aTHX);
 #endif
-
-    VALGRIND_DESTROY_MEMPOOL(&PL_sv_arenaroot);
 
     sv_free_arenas();
 

@@ -6059,7 +6059,7 @@ S_pending_ident(pTHX)
             /* might be an "our" variable" */
             if (PAD_COMPNAME_FLAGS_isOUR(tmp)) {
                 /* build ops for a bareword */
-		HV *  const stash = PAD_COMPNAME_OURSTASH(tmp);
+		HV *  const stash = PL_curstash; /* FIXME might be wrong stash, if the current package is changed */
 		HEK * const stashname = HvNAME_HEK(stash);
 		SV *  const sym = newSVhek(stashname);
                 sv_catpvs(sym, "::");

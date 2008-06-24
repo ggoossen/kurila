@@ -3,6 +3,7 @@
 BEGIN {
     require './test.pl';
 }
+
 use strict;
 use warnings;
 

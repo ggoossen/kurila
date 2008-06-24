@@ -724,7 +724,7 @@ XS(XS_version_qv)
 
 STATIC
 AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
-    AV* av = newAV();
+    AV* av = (AV*)sv_2mortal((SV*)newAV());
     const char *stashname;
     
     stashname = CopSTASHPV(cx->blk_oldcop);
@@ -780,7 +780,7 @@ STATIC AV* S_error_backtrace(pTHX)
 
     AV* trace;
 
-    trace = newAV();
+    trace = av_2mortal(newAV());
 
     for(;;) {
 	/* we may be in a higher stacklevel, so dig down deeper */

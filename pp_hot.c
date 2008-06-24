@@ -1036,7 +1036,7 @@ PP(pp_qr)
     dVAR; dSP;
     register PMOP * const pm = cPMOP;
     REGEXP * rx = PM_GETRE(pm);
-    SV * const pkg = rx ? CALLREG_PACKAGE(rx) : NULL;
+    SV * const pkg = rx ? sv_2mortal(CALLREG_PACKAGE(rx)) : NULL;
     SV * const rv = sv_newmortal();
 
     SvUPGRADE(rv, SVt_IV);

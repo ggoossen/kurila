@@ -398,13 +398,13 @@ Perl_allocmy(pTHX_ const char *const name)
     /* allocate a spare slot and store the name in that slot */
 
     off = pad_add_name(name,
-		    (is_our
+		       (is_our
 		        /* $_ is always in main::, even with our */
 			? (PL_curstash && !strEQ(name,"$_") ? PL_curstash : PL_defstash)
 			: NULL
-		    ),
-		    0, /*  not fake */
-		    PL_parser->in_my == KEY_state
+			   ),
+		       0, /*  not fake */
+		       PL_parser->in_my == KEY_state
     );
     /* anon sub prototypes contains state vars should always be cloned,
      * otherwise the state var would be shared between anon subs */

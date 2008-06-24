@@ -423,7 +423,6 @@ union _xivu {
 
 union _xmgu {
     MAGIC*  xmg_magic;		/* linked list of magicalness */
-    HV*	    xmg_ourstash;	/* Stash for our (when SvPAD_OUR is true) */
 };
 
 struct xpv {
@@ -929,14 +928,6 @@ the scalar's value cannot change unless written to.
 #  define SvPAD_OUR_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_OUR)
 #  define SvPAD_STATE_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_STATE)
 #endif
-
-#define SvOURSTASH(sv)	\
-	(SvPAD_OUR(sv) ? ((XPVMG*) SvANY(sv))->xmg_u.xmg_ourstash : NULL)
-#define SvOURSTASH_set(sv, st)					\
-        STMT_START {						\
-	    assert(SvTYPE(sv) == SVt_PVMG);			\
-	    ((XPVMG*) SvANY(sv))->xmg_u.xmg_ourstash = st;	\
-	} STMT_END
 
 #ifdef PERL_DEBUG_COW
 #else

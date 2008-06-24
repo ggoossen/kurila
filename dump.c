@@ -1591,9 +1591,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
-	    HV * const ost = SvOURSTASH(sv);
-	    if (ost)
-		do_hv_dump(level, file, "  OURSTASH", ost);
 	} else {
 	    if (SvMAGIC(sv))
 		do_magic_dump(level, file, SvMAGIC(sv), nest, maxnest, dumpops, pvlim);
