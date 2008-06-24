@@ -2595,7 +2595,7 @@ PP(pp_aelem)
     SV *sv;
 
     if ( ! SvAVOK(av) )
-	Perl_croak(aTHX_ "Can't take an element from a %s", SvDESC(sv));
+	Perl_croak(aTHX_ "Can't take an element from a %s", SvDESC(av));
 
     defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
 

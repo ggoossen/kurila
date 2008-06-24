@@ -831,8 +831,8 @@ perl_destruct(pTHXx)
 	 * destructors and destructees still exist.  Some sv's might remain.
 	 * Non-referenced objects are on their own.
 	 */
-	sv_clean_objs();
-	PL_sv_objcount = 0;
+/* 	sv_clean_objs(); */
+/* 	PL_sv_objcount = 0; */
 	if (PL_defoutgv && !SvREFCNT(PL_defoutgv))
 	    PL_defoutgv = NULL; /* may have been freed */
     }

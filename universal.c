@@ -754,7 +754,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     if (CxTYPE(cx) == CXt_EVAL) {
 	/* eval STRING */
 	if (CxOLD_OP_TYPE(cx) == OP_ENTEREVAL) {
-	    av_push(av, cx->blk_eval.cur_text);
+	    av_push(av, newSVsv(cx->blk_eval.cur_text));
 	}
 	/* require */
 	else if (cx->blk_eval.old_namesv) {
@@ -805,7 +805,7 @@ STATIC AV* S_error_backtrace(pTHX)
 	    break;
 
 	/* make stack entry */
-	av_push(trace, newRV_inc( (SV*) S_context_info(aTHX_ &ccstack[cxix]) ));
+	av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
 
 	cxix = dopoptosub_at(ccstack, cxix - 1);
     }
@@ -922,7 +922,7 @@ XS(XS_error_create)
 	}
 	    
 	/* backtrace */
-	(void)hv_stores(hv, "stack", newRV_inc( (SV*) S_error_backtrace(aTHX) ));
+	(void)hv_stores(hv, "stack", SvREFCNT_inc((SV*) S_error_backtrace(aTHX) ));
 
 	mPUSHs(rv);
 	XSRETURN(1);
@@ -962,14 +962,14 @@ XS(XS_error_message)
 	    sv_catpv(res, "\n");
 
 	    sv = hv_fetchs(err, "stack", 0);
-	    if (sv && SvROK(*sv)) {
-		AV *av = (AV*)SvRV(*sv);
+	    if (sv && SvAVOK(*sv)) {
+		AV *av = (AV*)(*sv);
 		SV** svp = AvARRAY(av);
 		int avlen = av_len(av);
 		int i=0;
 		for (i=0; i<=avlen;i++) {
-		    if (svp[i] && SvROK(svp[i])) {
-			AV* item = (AV*)SvRV(svp[i]);
+		    if (svp[i] && SvAVOK(svp[i])) {
+			AV* item = (AV*)(svp[i]);
 
 			SV **v = av_fetch(item, 3, 0);
 			sv_catpv(res, "    ");
