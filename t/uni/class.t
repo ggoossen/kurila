@@ -63,7 +63,7 @@ is(($str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 is(($str =~ m/(\p{l}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 # make sure it finds user-defined class
-is(($str =~ m/(\p{MyUniClass}+)/)[0], '0123456789:;<=>?@ABCDEFGHIJKLMNO');
+is(($str =~ m/(\p{main::MyUniClass}+)/)[0], '0123456789:;<=>?@ABCDEFGHIJKLMNO');
 
 # make sure it finds class in other package
 is(($str =~ m/(\p{Other::Class}+)/)[0], '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_');

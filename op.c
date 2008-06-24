@@ -397,12 +397,25 @@ Perl_allocmy(pTHX_ const char *const name)
 
     /* allocate a spare slot and store the name in that slot */
 
+    GV* ourgv = NULL;
+    if (is_our) {
+	                                 /* $_ is always in main::, even with our */
+	HV *  const stash = PL_curstash && !strEQ(name,"$_") ? PL_curstash : PL_defstash;
+	HEK * const stashname = HvNAME_HEK(stash);
+	SV *  const sym = newSVhek(stashname);
+	sv_catpvs(sym, "::");
+	sv_catpv(sym, name+1);
+	ourgv = gv_fetchsv(sym,
+			   (PL_in_eval
+			    ? (GV_ADDMULTI | GV_ADDINEVAL)
+			    : GV_ADDMULTI
+			    ),
+			   SVt_PVGV
+			   );
+    }
+
     off = pad_add_name(name,
-		       (is_our
-		        /* $_ is always in main::, even with our */
-			? (PL_curstash && !strEQ(name,"$_") ? PL_curstash : PL_defstash)
-			: NULL
-			   ),
+		       ourgv,
 		       0, /*  not fake */
 		       PL_parser->in_my == KEY_state
     );
