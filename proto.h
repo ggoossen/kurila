@@ -838,16 +838,10 @@ PERL_CALLCONV void	Perl_gv_check(pTHX_ const HV* stash)
 #define PERL_ARGS_ASSERT_GV_CHECK	\
 	assert(stash)
 
-/* PERL_CALLCONV void	Perl_gv_efullname3(pTHX_ SV* sv, const GV* gv, const char* prefix)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2); */
-#define PERL_ARGS_ASSERT_GV_EFULLNAME3	\
-	assert(sv); assert(gv)
-
-PERL_CALLCONV void	Perl_gv_efullname4(pTHX_ SV* sv, const GV* gv, const char* prefix, bool keepmain)
+PERL_CALLCONV void	Perl_gv_efullname3(pTHX_ SV* sv, const GV* gv, const char* prefix)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_GV_EFULLNAME4	\
+#define PERL_ARGS_ASSERT_GV_EFULLNAME3	\
 	assert(sv); assert(gv)
 
 PERL_CALLCONV GV*	Perl_gv_fetchfile(pTHX_ const char* name)
@@ -875,10 +869,10 @@ PERL_CALLCONV GV*	Perl_gv_fetchpv(pTHX_ const char* nambeg, I32 add, const svtyp
 #define PERL_ARGS_ASSERT_GV_FETCHPV	\
 	assert(nambeg)
 
-PERL_CALLCONV void	Perl_gv_fullname4(pTHX_ SV* sv, const GV* gv, const char* prefix, bool keepmain)
+PERL_CALLCONV void	Perl_gv_fullname3(pTHX_ SV* sv, const GV* gv, const char* prefix)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_GV_FULLNAME4	\
+#define PERL_ARGS_ASSERT_GV_FULLNAME3	\
 	assert(sv); assert(gv)
 
 PERL_CALLCONV GP *	Perl_newGP(pTHX_ GV *const gv)

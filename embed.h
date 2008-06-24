@@ -261,13 +261,13 @@
 #define gv_HVadd		Perl_gv_HVadd
 #define gv_IOadd		Perl_gv_IOadd
 #define gv_check		Perl_gv_check
-#define gv_efullname4		Perl_gv_efullname4
+#define gv_efullname3		Perl_gv_efullname3
 #define gv_fetchfile		Perl_gv_fetchfile
 #define gv_fetchfile_flags	Perl_gv_fetchfile_flags
 #define gv_fetchmeth		Perl_gv_fetchmeth
 #define gv_fetchmethod		Perl_gv_fetchmethod
 #define gv_fetchpv		Perl_gv_fetchpv
-#define gv_fullname4		Perl_gv_fullname4
+#define gv_fullname3		Perl_gv_fullname3
 #define gv_init			Perl_gv_init
 #define gv_name_set		Perl_gv_name_set
 #define gv_stashpv		Perl_gv_stashpv
@@ -2475,13 +2475,13 @@
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
 #define gv_check(a)		Perl_gv_check(aTHX_ a)
-#define gv_efullname4(a,b,c,d)	Perl_gv_efullname4(aTHX_ a,b,c,d)
+#define gv_efullname3(a,b,c)	Perl_gv_efullname3(aTHX_ a,b,c)
 #define gv_fetchfile(a)		Perl_gv_fetchfile(aTHX_ a)
 #define gv_fetchfile_flags(a,b,c)	Perl_gv_fetchfile_flags(aTHX_ a,b,c)
 #define gv_fetchmeth(a,b,c,d)	Perl_gv_fetchmeth(aTHX_ a,b,c,d)
 #define gv_fetchmethod(a,b)	Perl_gv_fetchmethod(aTHX_ a,b)
 #define gv_fetchpv(a,b,c)	Perl_gv_fetchpv(aTHX_ a,b,c)
-#define gv_fullname4(a,b,c,d)	Perl_gv_fullname4(aTHX_ a,b,c,d)
+#define gv_fullname3(a,b,c)	Perl_gv_fullname3(aTHX_ a,b,c)
 #ifdef PERL_CORE
 #endif
 #define gv_init(a,b,c,d,e)	Perl_gv_init(aTHX_ a,b,c,d,e)

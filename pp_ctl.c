@@ -1027,7 +1027,7 @@ PP(pp_caller)
 	/* So is ccstack[dbcxix]. */
 	if (isGV(cvgv)) {
 	    SV * const sv = newSV(0);
-	    gv_efullname4(sv, cvgv, NULL, TRUE);
+	    gv_efullname3(sv, cvgv, NULL);
 	    mPUSHs(sv);
 	    PUSHs(boolSV(CxHASARGS(cx)));
 	}
@@ -1722,7 +1722,7 @@ PP(pp_goto)
 		    if (cv != GvCV(gv) && (cv = GvCV(gv)))
 			goto retry;
 		    tmpstr = sv_newmortal();
-		    gv_efullname4(tmpstr, gv, NULL, TRUE);
+		    gv_efullname3(tmpstr, gv, NULL);
 		    DIE(aTHX_ "Goto undefined subroutine &%"SVf"", SVfARG(tmpstr));
 		}
 		DIE(aTHX_ "Goto undefined subroutine");

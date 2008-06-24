@@ -312,6 +312,8 @@ perl_construct(pTHXx)
 
     VALGRIND_CREATE_MEMPOOL(&PL_sv_arenaroot, 0, 0);
 
+    newSViv(4);
+
     /* set read-only and try to insure than we wont see REFCNT==0
        very often */
 
@@ -1003,9 +1005,15 @@ perl_destruct(pTHXx)
 
     /* shortcuts just get cleared */
     PL_envgv = NULL;
+    SvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
+    SvREFCNT_dec(PL_defgv);
+    PL_defgv = NULL;
     PL_hintgv = NULL;
+    SvREFCNT_dec(PL_errgv);
     PL_errgv = NULL;
+    SvREFCNT_dec(PL_globalstash);
+    PL_globalstash = NULL;
     PL_argvgv = NULL;
     PL_argvoutgv = NULL;
     PL_stdingv = NULL;
@@ -1096,9 +1104,12 @@ perl_destruct(pTHXx)
 
     /* Prepare to destruct main symbol table.  */
 
+    PL_curstash=NULL;
+
     hv = PL_defstash;
     PL_defstash = 0;
     SvREFCNT_dec(hv);
+    PL_curstash = NULL;
     SvREFCNT_dec(PL_curstname);
     PL_curstname = NULL;
 
@@ -1131,7 +1142,7 @@ perl_destruct(pTHXx)
 /*     while (sv_clean_all() > 3) */
 /* 	; */
 
-    AvREAL_off(PL_fdpid);		/* no surviving entries */
+ /*    AvREAL_off(PL_fdpid);		/\* no surviving entries *\/ */
     SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
     PL_fdpid = NULL;
 
@@ -1203,8 +1214,9 @@ perl_destruct(pTHXx)
         }
     }
 
-    if (PL_sv_count != 0 && ckWARN_d(WARN_INTERNAL))
-	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count);
+    /* '1' because of PL_sv_undef */
+    if (PL_sv_count != 1 && ckWARN_d(WARN_INTERNAL))
+	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count -1);
 
 #ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
     {
@@ -1651,7 +1663,6 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	while (PL_scopestack_ix > oldscope)
 	    LEAVE;
 	FREETMPS;
-	PL_curstash = PL_defstash;
 	if (PL_unitcheckav)
 	    call_list(oldscope, PL_unitcheckav);
 	if (PL_checkav)
@@ -2225,7 +2236,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 #endif
     CopLINE_set(PL_curcop, 0);
-    PL_curstash = PL_defstash;
     if (PL_e_script) {
 	SvREFCNT_dec(PL_e_script);
 	PL_e_script = NULL;
@@ -2295,7 +2305,6 @@ perl_run(pTHXx)
 	while (PL_scopestack_ix > oldscope)
 	    LEAVE;
 	FREETMPS;
-	PL_curstash = PL_defstash;
 	if (!(PL_exit_flags & PERL_EXIT_DESTRUCT_END) &&
 	    PL_endav && !PL_minus_c)
 	    call_list(oldscope, PL_endav);
@@ -2665,7 +2674,6 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	    /* FALL THROUGH */
 	case 2:
 	    /* my_exit() was called */
-	    PL_curstash = PL_defstash;
 	    FREETMPS;
 	    JMPENV_POP;
 	    if (PL_statusvalue && !(PL_exit_flags & PERL_EXIT_EXPECTED))
@@ -2766,7 +2774,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 	/* FALL THROUGH */
     case 2:
 	/* my_exit() was called */
-	PL_curstash = PL_defstash;
 	FREETMPS;
 	JMPENV_POP;
 	if (PL_statusvalue && !(PL_exit_flags & PERL_EXIT_EXPECTED))
@@ -3507,13 +3514,13 @@ S_init_main_stash(pTHX)
        8 bytes.  */
     PL_curstname = newSVpvs_share("main");
     gv = gv_fetchpvs("main::", GV_ADD|GV_NOTQUAL, SVt_PVHV);
+    PL_curstash = GvHV(gv);
+    hv_name_set(PL_curstash, "main", 4, 0);
     /* If we hadn't caused another reference to "main" to be in the shared
        string table above, then it would be worth reordering these two,
        because otherwise all we do is delete "main" from it as a consequence
        of the SvREFCNT_dec, only to add it again with hv_name_set */
-    SvREFCNT_dec(GvHV(gv));
-    hv_name_set(PL_defstash, "main", 4, 0);
-    GvHV(gv) = (HV*)SvREFCNT_inc_simple(PL_defstash);
+    hv_name_set(PL_defstash, "namespace", 9, 0);
     SvREADONLY_on(gv);
     PL_incgv = gv_HVadd(gv_AVadd(gv_fetchpvs("INC", GV_ADD|GV_NOTQUAL,
 					     SVt_PVAV)));
@@ -3534,7 +3541,6 @@ S_init_main_stash(pTHX)
 #endif
     sv_grow(ERRSV, 240);	/* Preallocate - for immediate signals. */
     sv_setpvn(ERRSV, "", 0);
-    PL_curstash = PL_defstash;
     CopSTASH_set(&PL_compiling, PL_defstash);
     PL_debstash = GvHV(gv_fetchpvs("DB::", GV_ADDMULTI, SVt_PVHV));
     PL_globalstash = GvHV(gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI,
@@ -5139,7 +5145,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 	    while (PL_scopestack_ix > oldscope)
 		LEAVE;
 	    FREETMPS;
-	    PL_curstash = PL_defstash;
 	    PL_curcop = &PL_compiling;
 	    CopLINE_set(PL_curcop, oldline);
 	    JMPENV_POP;

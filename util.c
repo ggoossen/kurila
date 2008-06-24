@@ -5838,7 +5838,7 @@ Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 	    SvREFCNT_dec(tmp);
 	}
 	else {
-	    gv_efullname4(dbsv, gv, NULL, TRUE);
+	    gv_efullname3(dbsv, gv, NULL);
 	}
     }
     else {

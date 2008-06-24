@@ -2373,7 +2373,7 @@ PP(pp_entersub)
 	}
 	if (!cv) {
 	    SV* sub_name = sv_newmortal();
-	    gv_efullname4(sub_name, (GV*)sv, NULL, TRUE);
+	    gv_efullname3(sub_name, (GV*)sv, NULL);
 	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
 	}
 	break;
@@ -2444,7 +2444,7 @@ PP(pp_entersub)
 
 	/* sorry */
 	sub_name = sv_newmortal();
-	gv_efullname4(sub_name, gv, NULL, TRUE);
+	gv_efullname3(sub_name, gv, NULL);
 	DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
     }
 
@@ -2577,7 +2577,7 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 	Perl_warner(aTHX_ packWARN(WARN_RECURSION), "Deep recursion on anonymous subroutine");
     else {
 	SV* const tmpstr = sv_newmortal();
-	gv_efullname4(tmpstr, CvGV(cv), NULL, TRUE);
+	gv_efullname3(tmpstr, CvGV(cv), NULL);
 	Perl_warner(aTHX_ packWARN(WARN_RECURSION), "Deep recursion on subroutine \"%"SVf"\"",
 		    SVfARG(tmpstr));
     }
