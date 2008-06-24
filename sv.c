@@ -4720,6 +4720,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
+	    SvREFCNT_dec(SvOURGV(sv));
 	} else if (SvMAGIC(sv))
 	    mg_free(sv);
     }
@@ -9486,6 +9487,7 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 	       FIXME - instrument and check that assumption  */
 	    if (sv_type >= SVt_PVMG) {
 		if ((sv_type == SVt_PVMG) && SvPAD_OUR(dstr)) {
+		    SvOURGV_set(dstr, gv_dup_inc(SvOURGV(dstr), param));
 		} else if (SvMAGIC(dstr))
 		    SvMAGIC_set(dstr, mg_dup(SvMAGIC(dstr), param));
 		if (SvSTASH(dstr))

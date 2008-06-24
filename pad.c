@@ -74,7 +74,9 @@ in PL_op->op_targ), wasting a name SV for them doesn't make sense.
 The SVs in the names AV have their PV being the name of the variable.
 xlow+1..xhigh inclusive in the NV union is a range of cop_seq numbers for
 which the name is valid.  For typed lexicals name SV is SVt_PVMG and SvSTASH
-points at the type.  For C<our> lexicals, the type is also SVt_PVMG.  SvUVX is
+points at the type.  For C<our> lexicals, the type is also SVt_PVMG, with the
+SvOURSTASH slot pointing at the stash of the associated global (so that
+duplicate C<our> declarations in the same package can be detected). SvUVX is
 sometimes hijacked to store the generation number during compilation.
 
 If SvFAKE is set on the name SV, then that slot in the frame AV is
@@ -337,19 +339,19 @@ Perl_pad_undef(pTHX_ CV* cv)
 
 Create a new name and associated PADMY SV in the current pad; return the
 offset.
-If C<our> is valid, it's an our lexical.
+If C<ourgv> is valid, it's an our lexical, set the SvOURGV to that value
 
 If fake, it means we're cloning an existing entry
 
 =cut */
 
 PADOFFSET
-Perl_pad_add_name(pTHX_ const char *name, bool our, bool fake, bool state)
+Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake, bool state)
 {
     dVAR;
     const PADOFFSET offset = pad_alloc(OP_PADSV, SVs_PADMY);
     SV* const namesv
-	= newSV_type(our ? SVt_PVMG : SVt_PVNV);
+	= newSV_type(ourgv ? SVt_PVMG : SVt_PVNV);
 
     PERL_ARGS_ASSERT_PAD_ADD_NAME;
 
@@ -357,8 +359,10 @@ Perl_pad_add_name(pTHX_ const char *name, bool our, bool fake, bool state)
 
     sv_setpv(namesv, name);
 
-    if (our) {
+    if (ourgv) {
 	SvPAD_OUR_on(namesv);
+	SvOURGV_set(namesv, ourgv);
+	SvREFCNT_inc((SV*)ourgv);
     }
     else if (state) {
 	SvPAD_STATE_on(namesv);
@@ -837,7 +841,7 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 
 	new_offset = pad_add_name(
 	    SvPVX_const(*out_name_sv),
-	    SvPAD_OUR(*out_name_sv),
+	    SvOURGV(*out_name_sv),
 	    1,  /* fake */
 	    SvPAD_STATE(*out_name_sv) ? 1 : 0 /* state variable ? */
 	);

@@ -266,8 +266,8 @@ at offset C<po>. Assumes a valid slot entry.
 Return the type (stash) of the current compiling pad name at offset
 C<po>. Must be a valid name. Returns null if not typed.
 
-=for apidoc m|HV *|PAD_COMPNAME_OURSTASH|PADOFFSET po
-Return the stash associated with an C<our> variable.
+=for apidoc m|HV *|PAD_COMPNAME_OURGV|PADOFFSET po
+Return the gv associated with an C<our> variable.
 Assumes the slot entry is a valid C<our> lexical.
 
 =for apidoc m|STRLEN|PAD_COMPNAME_GEN|PADOFFSET po
@@ -288,8 +288,8 @@ ling pad (lvalue) to C<gen>.  Note that C<SvUV_set> is hijacked for this purpose
   ((PAD_COMPNAME_FLAGS(po) & (SVpad_NAME|SVpad_OUR)) == (SVpad_NAME|SVpad_OUR))
 #define PAD_COMPNAME_PV(po) SvPV_nolen(PAD_COMPNAME_SV(po))
 
-#define PAD_COMPNAME_OURSTASH(po) \
-    (SvOURSTASH(PAD_COMPNAME_SV(po)))
+#define PAD_COMPNAME_OURGV(po) \
+    (SvOURGV(PAD_COMPNAME_SV(po)))
 
 #define PAD_COMPNAME_GEN(po) ((STRLEN)SvUVX(AvARRAY(PL_comppad_name)[po]))
 
