@@ -941,12 +941,6 @@ perl_destruct(pTHXx)
         }
     }
 
-    /* '1' because of PL_sv_undef */
-    if (PL_sv_count != 1 && ckWARN_d(WARN_INTERNAL)) {
-	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count -1);
-	sv_report_used();
-    }
-
 #ifdef PERL_DEBUG_READONLY_OPS
     free(PL_slabs);
     PL_slabs = NULL;
@@ -1001,6 +995,11 @@ perl_destruct(pTHXx)
 #ifdef USE_REENTRANT_API
     Perl_reentrant_free(aTHX);
 #endif
+
+    if (PL_sv_count != 0 && ckWARN_d(WARN_INTERNAL)) {
+	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count);
+	sv_report_used();
+    }
 
     sv_free_arenas();
 
