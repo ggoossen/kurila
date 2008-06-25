@@ -836,10 +836,6 @@
 #define sv_vcatpvf		Perl_sv_vcatpvf
 #define sv_catpv		Perl_sv_catpv
 #define sv_chop			Perl_sv_chop
-#ifdef PERL_CORE
-#define sv_clean_all		Perl_sv_clean_all
-#define sv_clean_objs		Perl_sv_clean_objs
-#endif
 #define sv_clear		Perl_sv_clear
 #ifdef PERL_CORE
 #define sv_clear_body		Perl_sv_clear_body
@@ -1747,11 +1743,6 @@
 #define gv_fetchpvn_flags	Perl_gv_fetchpvn_flags
 #define gv_fetchsv		Perl_gv_fetchsv
 #define stashpv_hvname_match	Perl_stashpv_hvname_match
-#ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-#ifdef PERL_CORE
-#define dump_sv_child		Perl_dump_sv_child
-#endif
-#endif
 #ifdef PERL_DONT_CREATE_GVSV
 #define gv_SVadd		Perl_gv_SVadd
 #endif
@@ -3049,10 +3040,6 @@
 #define sv_vcatpvf(a,b,c)	Perl_sv_vcatpvf(aTHX_ a,b,c)
 #define sv_catpv(a,b)		Perl_sv_catpv(aTHX_ a,b)
 #define sv_chop(a,b)		Perl_sv_chop(aTHX_ a,b)
-#ifdef PERL_CORE
-#define sv_clean_all()		Perl_sv_clean_all(aTHX)
-#define sv_clean_objs()		Perl_sv_clean_objs(aTHX)
-#endif
 #define sv_clear(a)		Perl_sv_clear(aTHX_ a)
 #ifdef PERL_CORE
 #define sv_clear_body(a)	Perl_sv_clear_body(aTHX_ a)
@@ -3969,11 +3956,6 @@
 #define gv_fetchpvn_flags(a,b,c,d)	Perl_gv_fetchpvn_flags(aTHX_ a,b,c,d)
 #define gv_fetchsv(a,b,c)	Perl_gv_fetchsv(aTHX_ a,b,c)
 #define stashpv_hvname_match(a,b)	Perl_stashpv_hvname_match(aTHX_ a,b)
-#ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-#ifdef PERL_CORE
-#define dump_sv_child(a)	Perl_dump_sv_child(aTHX_ a)
-#endif
-#endif
 #ifdef PERL_DONT_CREATE_GVSV
 #define gv_SVadd(a)		Perl_gv_SVadd(aTHX_ a)
 #endif

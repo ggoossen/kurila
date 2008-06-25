@@ -113,24 +113,6 @@ called by visit() for each SV]):
     sv_report_used() / do_report_used()
 			dump all remaining SVs (debugging aid)
 
-    sv_clean_objs() / do_clean_objs(),do_clean_named_objs()
-			Attempt to free all objects pointed to by RVs,
-			and, unless DISABLE_DESTRUCTOR_KLUDGE is defined,
-			try to do the same for all objects indirectly
-			referenced by typeglobs too.  Called once from
-			perl_destruct(), prior to calling sv_clean_all()
-			below.
-
-    sv_clean_all() / do_clean_all()
-			SvREFCNT_dec(sv) each remaining SV, possibly
-			triggering an sv_free(). It also sets the
-			SVf_BREAK flag on the SV to indicate that the
-			refcnt has been artificially lowered, and thus
-			stopping sv_free() from giving spurious warnings
-			about SVs which unexpectedly have a refcnt
-			of zero.  called repeatedly from perl_destruct()
-			until there are no SVs left.
-
 =head2 Arena allocator API Summary
 
 Private API to rest of sv.c
@@ -143,7 +125,7 @@ Private API to rest of sv.c
 
 Public API:
 
-    sv_report_used(), sv_clean_objs(), sv_clean_all(), sv_free_arenas()
+    sv_report_used(), sv_free_arenas()
 
 =cut
 
@@ -408,116 +390,6 @@ Perl_sv_report_used(pTHX)
 #else
     PERL_UNUSED_CONTEXT;
 #endif
-}
-
-/* called by sv_clean_objs() for each live SV */
-
-static void
-do_clean_objs(pTHX_ SV *const ref)
-{
-    dVAR;
-    assert (SvROK(ref));
-    {
-	SV * const target = SvRV(ref);
-	if (SvOBJECT(target)) {
-	    DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning object ref:\n "), sv_dump(ref)));
-	    if (SvWEAKREF(ref)) {
-		sv_del_backref(target, ref);
-		SvWEAKREF_off(ref);
-		SvRV_set(ref, NULL);
-	    } else {
-		SvROK_off(ref);
-		SvRV_set(ref, NULL);
-		SvREFCNT_dec(target);
-	    }
-	}
-    }
-
-    /* XXX Might want to check arrays, etc. */
-}
-
-/* called by sv_clean_objs() for each live SV */
-
-#ifndef DISABLE_DESTRUCTOR_KLUDGE
-static void
-do_clean_named_objs(pTHX_ SV *const sv)
-{
-    dVAR;
-    assert(SvTYPE(sv) == SVt_PVGV);
-    assert(isGV_with_GP(sv));
-    if (GvGP(sv)) {
-	if ((
-#ifdef PERL_DONT_CREATE_GVSV
-	     GvSV(sv) &&
-#endif
-	     SvOBJECT(GvSV(sv))) ||
-	     (GvAV(sv) && SvOBJECT(GvAV(sv))) ||
-	     (GvHV(sv) && SvOBJECT(GvHV(sv))) ||
-	     /* In certain rare cases GvIOp(sv) can be NULL, which would make SvOBJECT(GvIO(sv)) dereference NULL. */
-	     (GvIO(sv) ? (SvFLAGS(GvIOp(sv)) & SVs_OBJECT) : 0) ||
-	     (GvCV(sv) && SvOBJECT(GvCV(sv))) )
-	{
-	    DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning named glob object:\n "), sv_dump(sv)));
-	    SvFLAGS(sv) |= SVf_BREAK;
-	    SvREFCNT_dec(sv);
-	}
-    }
-}
-#endif
-
-/*
-=for apidoc sv_clean_objs
-
-Attempt to destroy all objects not yet freed
-
-=cut
-*/
-
-void
-Perl_sv_clean_objs(pTHX)
-{
-    dVAR;
-    PL_in_clean_objs = TRUE;
-    visit(do_clean_objs, SVf_ROK, SVf_ROK);
-#ifndef DISABLE_DESTRUCTOR_KLUDGE
-    /* some barnacles may yet remain, clinging to typeglobs */
-    visit(do_clean_named_objs, SVt_PVGV|SVpgv_GP, SVTYPEMASK|SVp_POK|SVpgv_GP);
-#endif
-    PL_in_clean_objs = FALSE;
-}
-
-/* called by sv_clean_all() for each live SV */
-
-static void
-do_clean_all(pTHX_ SV *const sv)
-{
-    dVAR;
-    if (sv == (SV*)PL_fdpid || sv == (SV*)PL_strtab || sv == (SV*)PL_isarev ) /* don't clean pid table and strtab */
-	return;
-    DEBUG_D((PerlIO_printf(Perl_debug_log, "Cleaning loops: SV at 0x%"UVxf"\n", PTR2UV(sv)) ));
-    SvFLAGS(sv) |= SVf_BREAK;
-    SvREFCNT_dec(sv);
-}
-
-/*
-=for apidoc sv_clean_all
-
-Decrement the refcnt of each remaining SV, possibly triggering a
-cleanup. This function may have to be called multiple times to free
-SVs which are in complex self-referential hierarchies.
-
-=cut
-*/
-
-I32
-Perl_sv_clean_all(pTHX)
-{
-    dVAR;
-    I32 cleaned;
-    PL_in_clean_all = TRUE;
-    cleaned = visit(do_clean_all, 0,0);
-    PL_in_clean_all = FALSE;
-    return cleaned;
 }
 
 /*
