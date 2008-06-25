@@ -509,10 +509,6 @@ Perl_op_free(pTHX_ OP *o)
     }
   do_free:
     FreeOp(o);
-#ifdef DEBUG_LEAKING_SCALARS
-    if (PL_op == o)
-	PL_op = NULL;
-#endif
 }
 
 void

@@ -175,12 +175,6 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
     }
 }
 
-#ifdef DEBUG_LEAKING_SCALARS
-#  define FREE_SV_DEBUG_FILE(sv) Safefree((sv)->sv_debug_file)
-#else
-#  define FREE_SV_DEBUG_FILE(sv)
-#endif
-
 #ifdef PERL_POISON
 #  define SvARENA_CHAIN(sv)	((sv)->sv_u.svu_rv)
 /* Whilst I'd love to do this, it seems that things like to check on
@@ -196,7 +190,6 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 
 #define plant_SV(p) \
     STMT_START {					\
-	FREE_SV_DEBUG_FILE(p);				\
 	POSION_SV_HEAD(p);				\
 	SvARENA_CHAIN(p) = (void *)PL_sv_root;		\
 	SvFLAGS(p) = SVTYPEMASK;			\
@@ -255,19 +248,6 @@ S_new_SV(pTHX)
     SvANY(sv) = 0;
     SvREFCNT(sv) = 1;
     SvFLAGS(sv) = 0;
-#ifdef DEBUG_LEAKING_SCALARS
-    sv->sv_debug_optype = PL_op ? PL_op->op_type : 0;
-    sv->sv_debug_line = (U16) (PL_parser
-	    ?  PL_parser->copline == NOLINE
-		?  PL_curcop
-		    ? CopLINE(PL_curcop)
-		    : 0
-		: PL_parser->copline
-	    : 0);
-    sv->sv_debug_inpad = 0;
-    sv->sv_debug_cloned = 0;
-    sv->sv_debug_file = PL_curcop ? savepv(CopFILE(PL_curcop)): NULL;
-#endif
     
     return sv;
 }
@@ -4589,14 +4569,7 @@ Perl_sv_replace(pTHX_ register SV *const sv, register SV *const nsv)
     SvREFCNT(sv) = 0;
     sv_clear(sv);
     assert(!SvREFCNT(sv));
-#ifdef DEBUG_LEAKING_SCALARS
-    sv->sv_flags  = nsv->sv_flags;
-    sv->sv_any    = nsv->sv_any;
-    sv->sv_refcnt = nsv->sv_refcnt;
-    sv->sv_u      = nsv->sv_u;
-#else
     StructCopy(nsv,sv,SV);
-#endif
     if(SvTYPE(sv) == SVt_IV) {
 	SvANY(sv)
 	    = (XPVIV*)((char*)&(sv->sv_u.svu_iv) - STRUCT_OFFSET(XPVIV, xiv_iv));
@@ -4905,28 +4878,11 @@ Perl_sv_free(pTHX_ SV *const sv)
 	    return;
 	}
 	if (ckWARN_d(WARN_INTERNAL)) {
-#ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-	    Perl_dump_sv_child(aTHX_ sv);
-#else
-  #ifdef DEBUG_LEAKING_SCALARS
-	    sv_dump(sv);
-  #endif
-#ifdef DEBUG_LEAKING_SCALARS_ABORT
-	    if (PL_warnhook == PERL_WARNHOOK_FATAL
-		|| ckDEAD(packWARN(WARN_INTERNAL))) {
-		/* Don't let Perl_warner cause us to escape our fate:  */
-		abort();
-	    }
-#endif
 	    /* This may not return:  */
 	    Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
                         "Attempt to free unreferenced scalar: SV 0x%"UVxf
                         pTHX__FORMAT, PTR2UV(sv) pTHX__VALUE);
-#endif
 	}
-#ifdef DEBUG_LEAKING_SCALARS_ABORT
-	abort();
-#endif
 	return;
     }
     if (--(SvREFCNT(sv)) > 0)
@@ -9359,9 +9315,6 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
     if (!sstr)
 	return NULL;
     if (SvTYPE(sstr) == SVTYPEMASK) {
-#ifdef DEBUG_LEAKING_SCALARS_ABORT
-	abort();
-#endif
 	return NULL;
     }
     /* look for it in the table first */
@@ -9382,14 +9335,6 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 
     /* create anew and remember what it is */
     new_SV(dstr);
-
-#ifdef DEBUG_LEAKING_SCALARS
-    dstr->sv_debug_optype = sstr->sv_debug_optype;
-    dstr->sv_debug_line = sstr->sv_debug_line;
-    dstr->sv_debug_inpad = sstr->sv_debug_inpad;
-    dstr->sv_debug_cloned = 1;
-    dstr->sv_debug_file = savepv(sstr->sv_debug_file);
-#endif
 
     ptr_table_store(PL_ptr_table, sstr, dstr);
 
