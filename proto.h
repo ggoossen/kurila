@@ -2993,8 +2993,6 @@ PERL_CALLCONV void	Perl_sv_chop(pTHX_ SV *const sv, const char *const ptr)
 #define PERL_ARGS_ASSERT_SV_CHOP	\
 	assert(sv)
 
-PERL_CALLCONV I32	Perl_sv_clean_all(pTHX);
-PERL_CALLCONV void	Perl_sv_clean_objs(pTHX);
 PERL_CALLCONV void	Perl_sv_clear(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_CLEAR	\
@@ -5937,14 +5935,6 @@ PERL_CALLCONV bool	Perl_stashpv_hvname_match(pTHX_ const COP *c, const HV *hv)
 #define PERL_ARGS_ASSERT_STASHPV_HVNAME_MATCH	\
 	assert(c); assert(hv)
 
-
-#ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-PERL_CALLCONV void	Perl_dump_sv_child(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DUMP_SV_CHILD	\
-	assert(sv)
-
-#endif
 
 #ifdef PERL_DONT_CREATE_GVSV
 PERL_CALLCONV GV*	Perl_gv_SVadd(pTHX_ GV* gv)
