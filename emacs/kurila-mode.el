@@ -5207,9 +5207,9 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		"\\|"
 		;; 1+6+2=9 extra () before this:
 		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>" ; QUOTED CONSTRUCT
-		"\\|"
 		;; 1+6+2+1=10 extra () before this:
-		"\\([?/<]\\)"	; /blah/ or ?blah? or <file*glob>
+		"\\|"
+		"\\([]\\)"	; Perserver count of pars
 		"\\|"
 		;; 1+6+2+1+1=11 extra () before this
 		"\\<sub\\>"		;  sub with proto/attr
