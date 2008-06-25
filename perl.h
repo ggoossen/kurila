@@ -4397,12 +4397,6 @@ EXTCONST char* PL_block_type[];
    allow us add a comparison check in perlmain.c in the near future.  */
 #ifdef DOINIT
 EXTCONST char PL_bincompat_options[] =
-#  ifdef DEBUG_LEAKING_SCALARS
-			     " DEBUG_LEAKING_SCALARS"
-#  endif
-#  ifdef DEBUG_LEAKING_SCALARS_FORK_DUMP
-			     " DEBUG_LEAKING_SCALARS_FORK_DUMP"
-#  endif
 #  ifdef FAKE_THREADS
 			     " FAKE_THREADS"
 #  endif
