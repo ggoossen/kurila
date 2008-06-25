@@ -942,10 +942,10 @@ perl_destruct(pTHXx)
     }
 
     /* '1' because of PL_sv_undef */
-    if (PL_sv_count != 1 && ckWARN_d(WARN_INTERNAL))
+    if (PL_sv_count != 1 && ckWARN_d(WARN_INTERNAL)) {
 	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count -1);
-
-    PL_sv_count = 0;
+	sv_report_used();
+    }
 
 #ifdef PERL_DEBUG_READONLY_OPS
     free(PL_slabs);
