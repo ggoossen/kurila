@@ -329,7 +329,7 @@ Clone the state variables associated with running and compiling pads.
 #define PAD_CLONE_VARS(proto_perl, param)				\
     PL_comppad = (AV *) ptr_table_fetch(PL_ptr_table, proto_perl->Icomppad); \
     PL_curpad = PL_comppad ?  AvARRAY(PL_comppad) : NULL;		\
-    PL_comppad_name		= av_dup(proto_perl->Icomppad_name, param); \
+    SVcpREPLACE(PL_comppad_name, av_dup(proto_perl->Icomppad_name, param)); \
     PL_comppad_name_fill	= proto_perl->Icomppad_name_fill;	\
     PL_comppad_name_floor	= proto_perl->Icomppad_name_floor;	\
     PL_min_intro_pending	= proto_perl->Imin_intro_pending;	\

@@ -10710,12 +10710,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     SvREFCNT_dec(param->stashes);
 
-    /* orphaned? eg threads->new inside BEGIN or use */
-    if (PL_compcv && ! SvREFCNT(PL_compcv)) {
-	SvREFCNT_inc_simple_void(PL_compcv);
-	SAVEFREESV(PL_compcv);
-    }
-
     return my_perl;
 }
 
@@ -11294,16 +11288,6 @@ do_sv_tmprefcnt(pTHX_ SV *const sv)
     switch (type) {
 	/* case SVt_BIND: */
     case SVt_PVIO:
-	if (IoIFP(sv) &&
-	    IoIFP(sv) != PerlIO_stdin() &&
-	    IoIFP(sv) != PerlIO_stdout() &&
-	    IoIFP(sv) != PerlIO_stderr())
-	{
-	    io_close((IO*)sv, FALSE);
-	}
-	if (IoDIRP(sv) && !(IoFLAGS(sv) & IOf_FAKE_DIRP))
-	    PerlDir_close(IoDIRP(sv));
-	IoDIRP(sv) = (DIR*)NULL;
 	goto freescalar;
     case SVt_REGEXP:
 	/* FIXME for plugins */

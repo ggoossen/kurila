@@ -695,15 +695,16 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     }
 
     if (!len) {
+	SvREFCNT_dec(parser->linestr);
 	parser->linestr = newSVpvs("\n;");
     } else if (SvREADONLY(line) || s[len-1] != ';') {
+	SvREFCNT_dec(parser->linestr);
 	parser->linestr = newSVsv(line);
 	if (s[len-1] != ';')
 	    sv_catpvs(parser->linestr, "\n;");
     } else {
 	SvTEMP_off(line);
-	SvREFCNT_inc_simple_void_NN(line);
-	parser->linestr = line;
+	SVcpREPLACE(parser->linestr, line);
     }
     parser->oldoldbufptr =
 	parser->oldbufptr =
@@ -1599,14 +1600,13 @@ S_sublex_push(pTHX)
     SAVEGENERICPV(PL_lex_brackstack);
     SAVEGENERICPV(PL_lex_casestack);
 
-    PL_linestr = PL_lex_stuff.str_sv;
-    PL_lex_stuff.str_sv = NULL;
+    SVcpREPLACE(PL_linestr, PL_lex_stuff.str_sv);
+    SVcpREPLACE(PL_lex_stuff.str_sv, NULL);
 
     PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart
 	= SvPVX(PL_linestr);
     PL_bufend += SvCUR(PL_linestr);
     PL_last_lop = PL_last_uni = NULL;
-    SAVEFREESV(PL_linestr);
 
     PL_lex_dojoin = FALSE;
     PL_lex_brackets = 0;
@@ -1652,21 +1652,20 @@ S_sublex_done(pTHX)
 
     /* Is there a right-hand side to take care of? (s//RHS/) */
     if (PL_lex_repl.str_sv && (PL_lex_inwhat == OP_SUBST)) {
-	PL_linestr = PL_lex_repl.str_sv;
+	SVcpREPLACE(PL_linestr, PL_lex_repl.str_sv);
 	PL_lex_stuff.flags = PL_lex_repl.flags;
 	PL_lex_repl.flags = 0;
 	PL_lex_flags = 0;
 	PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart = SvPVX(PL_linestr);
 	PL_bufend += SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;
-	SAVEFREESV(PL_linestr);
 	PL_lex_dojoin = FALSE;
 	PL_lex_brackets = 0;
 	PL_lex_casemods = 0;
 	*PL_lex_casestack = '\0';
 	PL_lex_starts = 0;
 	PL_lex_state = LEX_INTERPCONCAT;
-	PL_lex_repl.str_sv = NULL;
+	SVcpREPLACE(PL_lex_repl.str_sv, NULL);
 	return ',';
     }
     else {
@@ -10745,7 +10744,7 @@ Perl_start_subparse(pTHX_ U32 flags)
     save_item(PL_subname);
     SAVESPTR(PL_compcv);
 
-    PL_compcv = (CV*)newSV_type(SVt_PVCV);
+    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CvFLAGS(PL_compcv) |= flags;
 
     PL_subline = CopLINE(PL_curcop);

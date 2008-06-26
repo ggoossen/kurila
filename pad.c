@@ -209,7 +209,7 @@ Perl_pad_new(pTHX_ int flags)
 
     /* ... then update state variables */
 
-    PL_comppad_name	= (AV*)(*av_fetch(padlist, 0, FALSE));
+    SVcpREPLACE(PL_comppad_name, (*av_fetch(padlist, 0, FALSE)));
     PL_comppad		= (AV*)(*av_fetch(padlist, 1, FALSE));
     PL_curpad		= AvARRAY(PL_comppad);
 
@@ -319,7 +319,7 @@ Perl_pad_undef(pTHX_ CV* cv)
 	const SV* const sv = AvARRAY(padlist)[ix--];
 	if (sv) {
 	    if (sv == (SV*)PL_comppad_name)
-		PL_comppad_name = NULL;
+		SVcpNULL(PL_comppad_name)
 	    else if (sv == (SV*)PL_comppad) {
 		PL_comppad = NULL;
 		PL_curpad = NULL;
@@ -883,7 +883,7 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 	SV *new_namesv;
 	AV *  const ocomppad_name = PL_comppad_name;
 	PAD * const ocomppad = PL_comppad;
-	PL_comppad_name = (AV*)AvARRAY(padlist)[0];
+	SVcpREPLACE(PL_comppad_name, (AV*)AvARRAY(padlist)[0]);
 	PL_comppad = (AV*)AvARRAY(padlist)[1];
 	PL_curpad = AvARRAY(PL_comppad);
 
@@ -916,7 +916,7 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 	*out_name_sv = new_namesv;
 	*out_flags = PARENT_FAKELEX_FLAGS(new_namesv);
 
-	PL_comppad_name = ocomppad_name;
+	SVcpREPLACE(PL_comppad_name, ocomppad_name);
 	PL_comppad = ocomppad;
 	PL_curpad = ocomppad ? AvARRAY(ocomppad) : NULL;
     }
@@ -1501,6 +1501,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     ENTER;
     SAVESPTR(PL_compcv);
 
+    SVcpNULL(PL_compcv);
     cv = PL_compcv = (CV*)newSV_type(SvTYPE(proto));
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE|CVf_WEAKOUTSIDE);
     CvCLONED_on(cv);

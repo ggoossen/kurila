@@ -2054,8 +2054,8 @@ Perl_newPROG(pTHX_ OP *o)
     }
     else {
 	if (o->op_type == OP_STUB) {
-	    PL_comppad_name = 0;
-	    PL_compcv = 0;
+	    SVcpNULL(PL_comppad_name);
+	    SVcpNULL(PL_compcv);
 	    S_op_destroy(aTHX_ o);
 	    return;
 	}
@@ -2066,7 +2066,7 @@ Perl_newPROG(pTHX_ OP *o)
 	OpREFCNT_set(PL_main_root, 1);
 	PL_main_root->op_next = 0;
 	CALL_PEEP(PL_main_start);
-	PL_compcv = 0;
+	SVcpNULL(PL_compcv);
 
 	/* Register with debugger */
 	if (PERLDB_INTER) {
@@ -3162,7 +3162,7 @@ Perl_package(pTHX_ OP *o)
     save_hptr(&PL_curstash);
     save_item(PL_curstname);
 
-    PL_curstash = gv_stashsv(sv, GV_ADD);
+    SVcpREPLACE(PL_curstash, gv_stashsv(sv, GV_ADD));
 
     sv_setsv(PL_curstname, sv);
 
@@ -4849,8 +4849,8 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	else
 	    sv_setiv((SV*)gv, -1);
 
-	SvREFCNT_dec(PL_compcv);
-	cv = PL_compcv = NULL;
+	SVcpNULL(PL_compcv);
+	cv = NULL;
 	goto done;
     }
 
@@ -4900,6 +4900,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 		}
 		/* just a "sub foo;" when &foo is already defined */
 		SAVEFREESV(PL_compcv);
+		PL_compcv = NULL;
 		goto done;
 	    }
 	    if (block
@@ -4954,8 +4955,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	if (PL_madskills)
 	    goto install_block;
 	op_free(block);
-	SvREFCNT_dec(PL_compcv);
-	PL_compcv = NULL;
+	SVcpNULL(PL_compcv);
 	goto done;
     }
     if (attrs) {
@@ -5002,6 +5002,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	     ) {
 	    /* got here with just attrs -- work done, so bug out */
 	    SAVEFREESV(PL_compcv);
+	    PL_compcv = NULL;
 	    goto done;
 	}
 	/* transfer PL_compcv to cv */
@@ -5017,8 +5018,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	/* inner references to PL_compcv must be fixed up ... */
 	pad_fixup_inner_anons(CvPADLIST(cv), PL_compcv, cv);
 	/* ... before we throw it away */
-	SvREFCNT_dec(PL_compcv);
-	PL_compcv = cv;
+	SVcpREPLACE(PL_compcv, cv);
 	if (PERLDB_INTER)/* Advice debugger on the new sub. */
 	  ++PL_sub_generation;
     }
@@ -5240,7 +5240,7 @@ Perl_newCONSTSUB(pTHX_ HV *stash, const char *name, SV *sv)
     if (stash) {
 	SAVESPTR(PL_curstash);
 	SAVECOPSTASH(PL_curcop);
-	PL_curstash = stash;
+	SVcpREPLACE(PL_curstash, stash);
 	CopSTASH_set(PL_curcop,stash);
     }
 

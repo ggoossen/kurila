@@ -461,6 +461,7 @@ Perl_save_sptr(pTHX_ SV **sptr)
     SSCHECK(3);
     SSPUSHPTR(*sptr);
     SSPUSHPTR(sptr);
+    SvREFCNT_inc(*sptr);
     SSPUSHINT(SAVEt_SPTR);
 }
 
@@ -479,27 +480,15 @@ Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off)
 void
 Perl_save_hptr(pTHX_ HV **hptr)
 {
-    dVAR;
-
     PERL_ARGS_ASSERT_SAVE_HPTR;
-
-    SSCHECK(3);
-    SSPUSHPTR(*hptr);
-    SSPUSHPTR(hptr);
-    SSPUSHINT(SAVEt_HPTR);
+    save_sptr((SV**)(hptr));
 }
 
 void
 Perl_save_aptr(pTHX_ AV **aptr)
 {
-    dVAR;
-
     PERL_ARGS_ASSERT_SAVE_APTR;
-
-    SSCHECK(3);
-    SSPUSHPTR(*aptr);
-    SSPUSHPTR(aptr);
-    SSPUSHINT(SAVEt_APTR);
+    save_sptr((SV**)(aptr));
 }
 
 void
@@ -800,6 +789,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    break;
 	case SAVEt_SPTR:			/* SV* reference */
 	    ptr = SSPOPPTR;
+	    SvREFCNT_dec(*(SV**)ptr);
 	    *(SV**)ptr = (SV*)SSPOPPTR;
 	    break;
 	case SAVEt_VPTR:			/* random* reference */
