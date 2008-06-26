@@ -973,17 +973,17 @@ XS(XS_error_message)
 
 			SV **v = av_fetch(item, 3, 0);
 			sv_catpv(res, "    ");
-			if (v)
+			if (v && SvOK(*v))
 			    sv_catsv(res, *v);
 
 			sv_catpv(res, " called at ");
 			v = av_fetch(item, 1, 0);
-			if (v)
+			if (v && SvOK(*v))
 			    sv_catsv(res, *v);
 
 			sv_catpv(res, " line ");
 			v = av_fetch(item, 2, 0);
-			if (v)
+			if (v && SvOK(*v))
 			    sv_catsv(res, *v);
 			sv_catpv(res, ".\n");
 		    }
@@ -1833,7 +1833,7 @@ XS(XS_Symbol_fetch_glob)
        Perl_croak(aTHX_ "Usage: %s(%s)", "Symbol::fetch_glob", "sv");
 
     ST(0) = (SV*)gv_fetchsv(ST(0), GV_ADD | GV_ADDMULTI, SVt_PVGV);
-    ST(0) = newRV_noinc(ST(0));
+    ST(0) = sv_2mortal(newRV(ST(0)));
     XSRETURN(1);
 }
 
