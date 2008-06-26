@@ -1758,7 +1758,7 @@ Can be overwritten by `kurila-hairy' if nil."
   :type '(choice (const null) boolean)
   :group 'kurila-affected-by-hairy)
 
-(defcustom kurila-electric-parens-string "({[]})<"
+(defcustom kurila-electric-parens-string "({[]})"
   "*String of parentheses that should be electric in Kurila.
 Closing ones are electric only if the region is highlighted."
   :type 'string
@@ -2642,7 +2642,6 @@ versions of Emacs."
   (kurila-define-key "{" 'kurila-electric-lbrace)
   (kurila-define-key "[" 'kurila-electric-paren)
   (kurila-define-key "(" 'kurila-electric-paren)
-  (kurila-define-key "<" 'kurila-electric-paren)
   (kurila-define-key "}" 'kurila-electric-brace)
   (kurila-define-key "]" 'kurila-electric-rparen)
   (kurila-define-key ")" 'kurila-electric-rparen)
@@ -3314,18 +3313,18 @@ or as help on variables `kurila-tips', `kurila-problems',
   (set 'vc-header-alist (or kurila-vc-header-alist ; Avoid warning
 			    (` ((SCCS (, (car kurila-vc-sccs-header)))
 				     (RCS (, (car kurila-vc-rcs-header)))))))
-  (cond ((boundp 'compilation-error-regexp-alist-alist);; xemacs 20.x
-	 (make-local-variable 'compilation-error-regexp-alist-alist)
-	 (set 'compilation-error-regexp-alist-alist
-	      (cons (cons 'kurila kurila-compilation-error-regexp-alist)
-		    (symbol-value 'compilation-error-regexp-alist-alist)))
-	 (let ((f 'compilation-build-compilation-error-regexp-alist))
-	   (funcall f)))
-	((boundp 'compilation-error-regexp-alist);; xmeacs 19.x
-	 (make-local-variable 'compilation-error-regexp-alist)
-	 (set 'compilation-error-regexp-alist
-	       (cons kurila-compilation-error-regexp-alist
-		     (symbol-value 'compilation-error-regexp-alist)))))
+;;   (cond ((boundp 'compilation-error-regexp-alist-alist);; xemacs 20.x
+;; 	 (make-local-variable 'compilation-error-regexp-alist-alist)
+;; 	 (set 'compilation-error-regexp-alist-alist
+;; 	      (cons (cons 'kurila kurila-compilation-error-regexp-alist)
+;; 		    (symbol-value 'compilation-error-regexp-alist-alist)))
+;; 	 (let ((f 'compilation-build-compilation-error-regexp-alist))
+;; 	   (funcall f)))
+;; 	((boundp 'compilation-error-regexp-alist);; xmeacs 19.x
+;; 	 (make-local-variable 'compilation-error-regexp-alist)
+;; 	 (set 'compilation-error-regexp-alist
+;; 	       (cons kurila-compilation-error-regexp-alist
+;; 		     (symbol-value 'compilation-error-regexp-alist)))))
   (make-local-variable 'font-lock-defaults)
   (setq	font-lock-defaults
 	(cond
@@ -5209,7 +5208,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>" ; QUOTED CONSTRUCT
 		;; 1+6+2+1=10 extra () before this:
 		"\\|"
-		"\\([]\\)"	; Perserver count of pars
+		"\\(somethingveryrare\\)"	; Perserver count of pars
 		"\\|"
 		;; 1+6+2+1+1=11 extra () before this
 		"\\<sub\\>"		;  sub with proto/attr
