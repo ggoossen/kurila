@@ -764,10 +764,11 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (len + 2 <= (I32)sizeof (smallbuf))
 		    tmpbuf = smallbuf;
 		else
-		    Newx(tmpbuf, len+2, char);
+		    Newx(tmpbuf, len+3, char);
 		Copy(name, tmpbuf, len, char);
 		tmpbuf[len++] = ':';
 		tmpbuf[len++] = ':';
+		tmpbuf[len] = '\0';
 		gvp = (GV**)hv_fetch(stash,tmpbuf,len,add);
 		gv = gvp ? *gvp : NULL;
 		if (gv && gv != (GV*)&PL_sv_undef) {
@@ -784,7 +785,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (!(stash = GvHV(gv)))
 		    stash = GvHV(gv) = newHV();
 		if ( ! SvHVOK(stash) )
-		    Perl_croak(aTHX_ "stash is not a hash but %s", Ddesc(stash));
+		    Perl_croak(aTHX_ "stash '%s' is not a hash but %s", tmpbuf, Ddesc(stash));
 
 		if (!HvNAME_get(stash))
 		    hv_name_set(stash, nambeg, name_cursor - nambeg, 0);
@@ -1393,6 +1394,22 @@ Perl_gp_free(pTHX_ GV *gv)
 
     Safefree(gp);
     GvGP(gv) = 0;
+}
+
+void
+Perl_gp_tmprefcnt(pTHX_ GV *gv)
+{
+    dVAR;
+    GP* gp;
+
+    if (!gv || !isGV_with_GP(gv) || !(gp = GvGP(gv)))
+	return;
+
+    SvTMPREFCNT_inc(gp->gp_sv);
+    SvTMPREFCNT_inc(gp->gp_av);
+    SvTMPREFCNT_inc(gp->gp_hv);
+    SvTMPREFCNT_inc(gp->gp_io);
+    SvTMPREFCNT_inc(gp->gp_cv);
 }
 
 int

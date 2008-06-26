@@ -4186,6 +4186,7 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 		sv_unmagic(tsv, PERL_MAGIC_backref);
 	    } else {
 		av = newAV();
+		AvREAL_off(av);
 	    }
 	    *avp = av;
 	}
@@ -4196,6 +4197,7 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 	    av = (AV*)mg->mg_obj;
 	else {
 	    av = newAV();
+	    AvREAL_off(av);
 	    sv_magic(tsv, (SV*)av, PERL_MAGIC_backref, NULL, 0);
 	    /* av now has a refcnt of 2, which avoids it getting freed
 	     * before us during global cleanup. The extra ref is removed
@@ -4784,8 +4786,8 @@ Perl_sv_free2(pTHX_ SV *const sv)
 	return;
     }
     sv_clear(sv);
-    if (! SvREFCNT(sv))
-	del_SV(sv);
+    assert(SvREFCNT(sv) == 0);
+    del_SV(sv);
 }
 
 /*
@@ -11248,6 +11250,116 @@ Perl_report_uninit(pTHX_ SV* uninit_sv)
     else
 	Perl_warner(aTHX_ packWARN(WARN_UNINITIALIZED), PL_warn_uninit,
 		    "", "", "");
+}
+
+static void
+do_reset_tmprefcnt(pTHX_ SV *const sv)
+{
+    SvTMPREFCNT(sv) = 0;
+}
+
+static void
+do_sv_tmprefcnt(pTHX_ SV *const sv)
+{
+    dVAR;
+    const U32 type = SvTYPE(sv);
+    const struct body_details *const sv_type_details
+	= bodies_by_type + type;
+    HV *stash;
+
+    if (sv == PL_strtab)
+	return;
+
+    if (type <= SVt_IV) {
+	/* See the comment in sv.h about the collusion between this early
+	   return and the overloading of the NULL and IV slots in the size
+	   table.  */
+	if (SvROK(sv)) {
+	    SV * const target = SvRV(sv);
+	    if ( ! SvWEAKREF(sv))
+	        SvTMPREFCNT_inc(target);
+	}
+	return;
+    }
+
+    if (SvOBJECT(sv)) {
+	SvTMPREFCNT_inc(SvSTASH(sv));	/* possibly of changed persuasion */
+    }
+    if (type >= SVt_PVMG) {
+	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
+	    SvTMPREFCNT_inc(SvOURGV(sv));
+	} else if (SvMAGIC(sv))
+	    Perl_mg_tmprefcnt(aTHX_ sv);
+    }
+    switch (type) {
+	/* case SVt_BIND: */
+    case SVt_PVIO:
+	if (IoIFP(sv) &&
+	    IoIFP(sv) != PerlIO_stdin() &&
+	    IoIFP(sv) != PerlIO_stdout() &&
+	    IoIFP(sv) != PerlIO_stderr())
+	{
+	    io_close((IO*)sv, FALSE);
+	}
+	if (IoDIRP(sv) && !(IoFLAGS(sv) & IOf_FAKE_DIRP))
+	    PerlDir_close(IoDIRP(sv));
+	IoDIRP(sv) = (DIR*)NULL;
+	goto freescalar;
+    case SVt_REGEXP:
+	/* FIXME for plugins */
+	preg_tmprefcnt((REGEXP*) sv);
+	goto freescalar;
+    case SVt_PVCV:
+	cv_tmprefcnt((CV*)sv);
+	goto freescalar;
+    case SVt_PVHV:
+	hv_tmprefcnt((HV*)sv);
+	break;
+    case SVt_PVAV:
+	av_tmprefcnt((AV*)sv);
+	break;
+    case SVt_PVLV:
+	if (LvTYPE(sv) != 't') /* unless tie: unrefcnted fake SV**  */
+	    SvTMPREFCNT_inc(LvTARG(sv));
+    case SVt_PVGV:
+	if (isGV_with_GP(sv)) {
+	    gp_tmprefcnt((GV*)sv);
+	}
+    case SVt_PVMG:
+    case SVt_PVNV:
+    case SVt_PVIV:
+    case SVt_PV:
+      freescalar:
+	/* Don't bother with SvOOK_off(sv); as we're only going to free it.  */
+	if (SvROK(sv)) {
+	    SV * const target = SvRV(sv);
+	    if ( ! SvWEAKREF(sv))
+	        SvTMPREFCNT_inc(target);
+	}
+	break;
+    case SVt_NV:
+	break;
+    }
+}
+
+static void
+do_check_tmprefcnt(pTHX_ SV* const sv)
+{
+    if (SvTMPREFCNT(sv) > SvREFCNT(sv)) {
+	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least(%ld)\n", 
+		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
+	sv_dump(sv);
+	visit(do_reset_tmprefcnt, 0, 0);
+	visit(do_sv_tmprefcnt, 0, 0);
+    }
+}
+
+void
+Perl_refcnt_check(pTHX)
+{
+    visit(do_reset_tmprefcnt, 0, 0);
+    visit(do_sv_tmprefcnt, 0, 0);
+    visit(do_check_tmprefcnt, 0, 0);
 }
 
 /*

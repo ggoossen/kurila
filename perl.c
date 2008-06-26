@@ -1411,6 +1411,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     SAVEFREESV(sv);
     init_main_stash();
 
+    Perl_refcnt_check(aTHX);
+
     PL_isarev = newHV();
 
     boot_core_PerlIO();
@@ -3218,7 +3220,9 @@ S_init_main_stash(pTHX)
        table, so it's a small saving to use it rather than allocate another
        8 bytes.  */
     PL_curstname = newSVpvs_share("main");
+    Perl_refcnt_check(aTHX);
     gv = gv_fetchpvs("main::", GV_ADD|GV_NOTQUAL, SVt_PVHV);
+    Perl_refcnt_check(aTHX);
     PL_curstash = GvHV(gv);
     hv_name_set(PL_curstash, "main", 4, 0);
     /* If we hadn't caused another reference to "main" to be in the shared

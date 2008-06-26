@@ -101,6 +101,7 @@ typedef struct hek HEK;
 #define _SV_HEAD(ptrtype) \
     ptrtype	sv_any;		/* pointer to body */	\
     U32		sv_refcnt;	/* how many references to us */	\
+    U32		sv_tmprefcnt;	/* temporary how many references to us */	\
     U32		sv_flags	/* what we are */
 
 #define _SV_HEAD_UNION \
@@ -215,6 +216,7 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SvANY(sv)	(sv)->sv_any
 #define SvFLAGS(sv)	(sv)->sv_flags
 #define SvREFCNT(sv)	(sv)->sv_refcnt
+#define SvTMPREFCNT(sv)	(sv)->sv_tmprefcnt
 
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define SvREFCNT_inc(sv)		\
@@ -252,6 +254,14 @@ perform the upgrade if necessary.  See C<svtype>.
 #  define SvREFCNT_inc_void(sv) \
 	(void)((PL_Sv=(SV*)(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
 #endif
+
+#  define SvTMPREFCNT_inc(sv)		\
+    ({					\
+	SV * const _sv = (SV*)(sv);	\
+	if (_sv)			\
+	     (SvTMPREFCNT(_sv))++;		\
+	_sv;				\
+    })
 
 /* These guys don't need the curly blocks */
 #define SvREFCNT_inc_simple_void(sv)	STMT_START { if (sv) SvREFCNT(sv)++; } STMT_END

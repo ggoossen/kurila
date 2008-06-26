@@ -121,6 +121,7 @@ EXp	|void	|av_reify	|NN AV *av
 ApdR	|SV*	|av_shift	|NN AV *av
 Apd	|SV**	|av_store	|NN AV *av|I32 key|NULLOK SV *val
 Apd	|void	|av_undef	|NN AV *av
+Apd	|void	|av_tmprefcnt	|NN AV *av
 ApdoxM	|SV**	|av_create_and_unshift_one|NN AV **const avp|NN SV *const val
 Apd	|void	|av_unshift	|NN AV *av|I32 num
 pR	|OP*	|bind_match	|I32 type|NN OP *left|NN OP *right
@@ -168,6 +169,7 @@ pd	|CV*	|cv_clone	|NN CV* proto
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
+Apd	|void	|cv_tmprefcnt	|NN CV* cv
 Ap	|void	|cx_dump	|NN PERL_CONTEXT* cx
 Ap	|SV*	|filter_add	|NULLOK filter_t funcp|NULLOK SV* datasv
 Ap	|void	|filter_del	|NN filter_t funcp
@@ -276,6 +278,7 @@ p	|char*	|getenv_len	|NN const char *env_elem|NN unsigned long *len
 #endif
 pox	|void	|get_db_sub	|NULLOK SV **svp|NN CV *cv
 Ap	|void	|gp_free	|NULLOK GV* gv
+Ap	|void	|gp_tmprefcnt	|NN GV* gv
 Ap	|GP*	|gp_ref		|NULLOK GP* gp
 Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
@@ -329,6 +332,7 @@ Abmd	|HE*	|hv_store_ent	|NULLOK HV *hv|NULLOK SV *key|NULLOK SV *val\
 AbmdM	|SV**	|hv_store_flags	|NULLOK HV *hv|NULLOK const char *key \
 				|I32 klen|NULLOK SV *val|U32 hash|int flags
 Apd	|void	|hv_undef	|NULLOK HV *hv
+Apd	|void	|hv_tmprefcnt	|NN HV *hv
 ApP	|I32	|ibcmp		|NN const char* a|NN const char* b|I32 len
 ApP	|I32	|ibcmp_locale	|NN const char* a|NN const char* b|I32 len
 Apd	|I32	|ibcmp_utf8	|NN const char* s1|NULLOK char **pe1|UV l1 \
@@ -476,6 +480,7 @@ Apd	|int	|mg_copy	|NN SV *sv|NN SV *nsv|NULLOK const char *key \
 pd	|void	|mg_localize	|NN SV* sv|NN SV* nsv
 ApdR	|MAGIC*	|mg_find	|NULLOK const SV* sv|int type
 Apd	|int	|mg_free	|NN SV* sv
+Apd	|void	|mg_tmprefcnt	|NN SV* sv
 Apd	|int	|mg_get		|NN SV* sv
 Apd	|U32	|mg_length	|NN SV* sv
 Apd	|void	|mg_magical	|NN SV* sv
@@ -669,6 +674,7 @@ Ap	|I32	|pregexec	|NN REGEXP * const prog|NN char* stringarg \
 				|NN SV* screamer|U32 nosave
 Ap	|void	|pregfree	|NULLOK REGEXP* r
 Ap	|void	|pregfree2	|NN REGEXP *rx
+Ap	|void	|preg_tmprefcnt	|NN REGEXP *rx
 EXp	|REGEXP*|reg_temp_copy	|NN REGEXP* r
 Ap	|void	|regfree_internal|NN REGEXP *const rx
 #if defined(USE_ITHREADS)
@@ -1623,6 +1629,7 @@ s	|void	|deb_stack_n	|NN SV** stack_base|I32 stack_min \
 
 pda	|PADLIST*|pad_new	|int flags
 pd	|void	|pad_undef	|NN CV* cv
+pd	|void	|pad_tmprefcnt	|NN CV* cv
 pd	|PADOFFSET|pad_add_name	|NN const char *name\
 				|NULLOK GV* ourgv|bool clone|bool state
 pd	|PADOFFSET|pad_add_anon	|NN SV* sv|OPCODE op_type
@@ -1766,6 +1773,8 @@ XEopMa	|STRLEN *|new_warnings_bitfield|NULLOK STRLEN *buffer \
 				|NN const char *const bits|STRLEN size
 
 p	|void	|offer_nice_chunk	|NN void *const chunk|const U32 chunk_size
+
+p	|void	|refcnt_check
 
 #ifndef SPRINTF_RETURNS_STRLEN
 Apnod	|int	|my_sprintf	|NN char *buffer|NN const char *pat|...

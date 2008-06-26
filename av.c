@@ -498,6 +498,16 @@ Perl_av_undef(pTHX_ register AV *av)
     if(SvRMAGICAL(av)) mg_clear((SV*)av);
 }
 
+void
+Perl_av_tmprefcnt(pTHX_ AV *av)
+{
+    if (AvREAL(av)) {
+	register I32 key = AvFILLp(av) + 1;
+	while (key)
+	    SvTMPREFCNT_inc(AvARRAY(av)[--key]);
+    }
+}
+
 /*
 
 =for apidoc av_create_and_push
