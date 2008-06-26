@@ -418,9 +418,9 @@ PP(pp_grepstart)
     src = PL_stack_base[*PL_markstack_ptr];
     SvTEMP_off(src);
     if (PL_op->op_private & OPpGREP_LEX)
-	PAD_SVl(PL_op->op_targ) = src;
+	SVcpREPLACE(PAD_SVl(PL_op->op_targ), src)
     else
-	DEFSV = src;
+	SVcpREPLACE(DEFSV, src);
 
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
@@ -529,9 +529,9 @@ PP(pp_mapwhile)
 	src = PL_stack_base[PL_markstack_ptr[-1]];
 	SvTEMP_off(src);
 	if (PL_op->op_private & OPpGREP_LEX)
-	    PAD_SVl(PL_op->op_targ) = src;
+	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), src)
 	else
-	    DEFSV = src;
+	    SVcpREPLACE(DEFSV, src);
 
 	RETURNOP(cLOGOP->op_other);
     }
@@ -2277,6 +2277,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     PUSHMARK(SP);
 
     SAVESPTR(PL_compcv);
+    SVcpNULL(PL_compcv);
     PL_compcv = (CV*)newSV_type(SVt_PVCV);
     CvEVAL_on(PL_compcv);
     assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
@@ -2298,7 +2299,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
     if (CopSTASH_ne(PL_curcop, PL_curstash)) {
 	SAVESPTR(PL_curstash);
-	PL_curstash = CopSTASH(PL_curcop);
+	SVcpREPLACE(PL_curstash, CopSTASH(PL_curcop));
     }
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */
     SAVESPTR(PL_beginav);

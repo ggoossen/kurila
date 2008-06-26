@@ -830,14 +830,12 @@ perl_destruct(pTHXx)
 
     /* Prepare to destruct main symbol table.  */
 
-    PL_curstash=NULL;
+    SVcpNULL(PL_curstash);
 
     hv = PL_defstash;
     PL_defstash = 0;
     SvREFCNT_dec(hv);
-    PL_curstash = NULL;
-    SvREFCNT_dec(PL_curstname);
-    PL_curstname = NULL;
+    SVcpNULL(PL_curstname);
 
     /* clear queued errors */
     SvREFCNT_dec(PL_errors);
@@ -946,7 +944,7 @@ perl_destruct(pTHXx)
 #ifdef DEBUGGING
     if (PL_sv_count != 0) {
 	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count);
-	sv_report_used();
+/* 	sv_report_used(); */
     }
 #endif
 
@@ -1800,6 +1798,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	}
     }
 
+    SVcpNULL(PL_compcv);
     PL_main_cv = PL_compcv = (CV*)newSV_type(SVt_PVCV);
     CvUNIQUE_on(PL_compcv);
 
@@ -3215,7 +3214,8 @@ S_init_main_stash(pTHX)
     dVAR;
     GV *gv;
 
-    PL_curstash = PL_defstash = newHV();
+    PL_defstash = newHV();
+    SVcpREPLACE(PL_curstash, PL_defstash); /* Temporary have the default stash as the main stash */
     /* We know that the string "main" will be in the global shared string
        table, so it's a small saving to use it rather than allocate another
        8 bytes.  */
@@ -3223,7 +3223,7 @@ S_init_main_stash(pTHX)
     Perl_refcnt_check(aTHX);
     gv = gv_fetchpvs("main::", GV_ADD|GV_NOTQUAL, SVt_PVHV);
     Perl_refcnt_check(aTHX);
-    PL_curstash = GvHV(gv);
+    SVcpREPLACE(PL_curstash, GvHV(gv));
     hv_name_set(PL_curstash, "main", 4, 0);
     /* If we hadn't caused another reference to "main" to be in the shared
        string table above, then it would be worth reordering these two,
@@ -4140,7 +4140,7 @@ Perl_init_debugger(pTHX)
     dVAR;
     HV * const ostash = PL_curstash;
 
-    PL_curstash = PL_debstash;
+    SVcpREPLACE(PL_curstash, PL_debstash);
     PL_dbargs = GvAV(gv_AVadd((gv_fetchpvs("DB::args", GV_ADDMULTI,
 					   SVt_PVAV))));
     AvREAL_off(PL_dbargs);
@@ -4153,7 +4153,7 @@ Perl_init_debugger(pTHX)
     sv_setiv(PL_DBtrace, 0);
     PL_DBsignal = GvSV((gv_fetchpvs("DB::signal", GV_ADDMULTI, SVt_PV)));
     sv_setiv(PL_DBsignal, 0);
-    PL_curstash = ostash;
+    SVcpREPLACE(PL_curstash, ostash);
 }
 
 #ifndef STRESS_REALLOC

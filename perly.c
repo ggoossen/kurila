@@ -362,6 +362,8 @@ Perl_yyparse (pTHX)
 
     YYDPRINTF ((Perl_debug_log, "Entering state %d\n", yystate));
 
+    refcnt_check();
+
 #ifndef DISABLE_STACK_FREE
     if (yy_type_tab[yystos[yystate]] == toketype_opval && ps->val.opval) {
 	ps->val.opval->op_latefree  = 1;
