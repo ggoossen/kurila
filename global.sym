@@ -77,6 +77,7 @@ Perl_printf_nocontext
 Perl_cv_ckproto
 Perl_cv_const_sv
 Perl_cv_undef
+Perl_cv_tmprefcnt
 Perl_cx_dump
 Perl_filter_add
 Perl_filter_del
@@ -247,6 +248,7 @@ Perl_mg_clear
 Perl_mg_copy
 Perl_mg_find
 Perl_mg_free
+Perl_mg_tmprefcnt
 Perl_mg_get
 Perl_mg_length
 Perl_mg_magical

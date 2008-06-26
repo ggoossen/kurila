@@ -332,6 +332,58 @@ Perl_pad_undef(pTHX_ CV* cv)
 }
 
 
+void
+Perl_pad_tmprefcnt(pTHX_ CV* cv)
+{
+    dVAR;
+    I32 ix;
+    const PADLIST * const padlist = CvPADLIST(cv);
+
+    PERL_ARGS_ASSERT_PAD_UNDEF;
+
+    if (!padlist)
+	return;
+    if (SvIS_FREED(padlist)) /* may be during global destruction */
+	return;
+
+    /* detach any '&' anon children in the pad; if afterwards they
+     * are still live, fix up their CvOUTSIDEs to point to our outside,
+     * bypassing us. */
+    /* XXX DAPM for efficiency, we should only do this if we know we have
+     * children, or integrate this loop with general cleanup */
+
+    if (!PL_dirty) { /* don't bother during global destruction */
+	CV * const outercv = CvOUTSIDE(cv);
+        const U32 seq = CvOUTSIDE_SEQ(cv);
+	AV *  const comppad_name = (AV*)AvARRAY(padlist)[0];
+	SV ** const namepad = AvARRAY(comppad_name);
+	AV *  const comppad = (AV*)AvARRAY(padlist)[1];
+	SV ** const curpad = AvARRAY(comppad);
+	for (ix = AvFILLp(comppad_name); ix > 0; ix--) {
+	    SV * const namesv = namepad[ix];
+	    if (namesv && namesv != &PL_sv_undef
+		&& *SvPVX_const(namesv) == '&')
+	    {
+		CV * const innercv = (CV*)curpad[ix];
+		U32 inner_rc = SvREFCNT(innercv);
+		assert(inner_rc);
+		SvTMPREFCNT_inc(namesv);
+
+		if (SvREFCNT(comppad) < 2) { /* allow for /(?{ sub{} })/  */
+		    SvTMPREFCNT_inc(innercv);
+		    inner_rc--;
+		}
+	    }
+	}
+    }
+
+    ix = AvFILLp(padlist);
+    while (ix >= 0) {
+	const SV* const sv = AvARRAY(padlist)[ix--];
+	SvTMPREFCNT_inc(sv);
+    }
+    SvTMPREFCNT_inc((SV*)CvPADLIST(cv));
+}
 
 
 /*

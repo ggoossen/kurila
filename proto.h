@@ -242,6 +242,11 @@ PERL_CALLCONV void	Perl_av_undef(pTHX_ AV *av)
 #define PERL_ARGS_ASSERT_AV_UNDEF	\
 	assert(av)
 
+PERL_CALLCONV void	Perl_av_tmprefcnt(pTHX_ AV *av)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_AV_TMPREFCNT	\
+	assert(av)
+
 PERL_CALLCONV SV**	Perl_av_create_and_unshift_one(pTHX_ AV **const avp, SV *const val)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -431,6 +436,11 @@ PERL_CALLCONV SV*	Perl_op_const_sv(pTHX_ const OP* o, CV* cv)
 PERL_CALLCONV void	Perl_cv_undef(pTHX_ CV* cv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CV_UNDEF	\
+	assert(cv)
+
+PERL_CALLCONV void	Perl_cv_tmprefcnt(pTHX_ CV* cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CV_TMPREFCNT	\
 	assert(cv)
 
 PERL_CALLCONV void	Perl_cx_dump(pTHX_ PERL_CONTEXT* cx)
@@ -817,6 +827,11 @@ PERL_CALLCONV void	Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 	assert(cv)
 
 PERL_CALLCONV void	Perl_gp_free(pTHX_ GV* gv);
+PERL_CALLCONV void	Perl_gp_tmprefcnt(pTHX_ GV* gv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_GP_TMPREFCNT	\
+	assert(gv)
+
 PERL_CALLCONV GP*	Perl_gp_ref(pTHX_ GP* gp);
 PERL_CALLCONV GV*	Perl_gv_AVadd(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
@@ -1016,6 +1031,11 @@ PERL_CALLCONV void	Perl_hv_ksplit(pTHX_ HV *hv, IV newmax)
 /* PERL_CALLCONV HE*	Perl_hv_store_ent(pTHX_ HV *hv, SV *key, SV *val, U32 hash); */
 /* PERL_CALLCONV SV**	Perl_hv_store_flags(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash, int flags); */
 PERL_CALLCONV void	Perl_hv_undef(pTHX_ HV *hv);
+PERL_CALLCONV void	Perl_hv_tmprefcnt(pTHX_ HV *hv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_HV_TMPREFCNT	\
+	assert(hv)
+
 PERL_CALLCONV I32	Perl_ibcmp(pTHX_ const char* a, const char* b, I32 len)
 			__attribute__pure__
 			__attribute__nonnull__(pTHX_1)
@@ -1738,6 +1758,11 @@ PERL_CALLCONV int	Perl_mg_free(pTHX_ SV* sv)
 #define PERL_ARGS_ASSERT_MG_FREE	\
 	assert(sv)
 
+PERL_CALLCONV void	Perl_mg_tmprefcnt(pTHX_ SV* sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_MG_TMPREFCNT	\
+	assert(sv)
+
 PERL_CALLCONV int	Perl_mg_get(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_MG_GET	\
@@ -2430,6 +2455,11 @@ PERL_CALLCONV void	Perl_pregfree(pTHX_ REGEXP* r);
 PERL_CALLCONV void	Perl_pregfree2(pTHX_ REGEXP *rx)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PREGFREE2	\
+	assert(rx)
+
+PERL_CALLCONV void	Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PREG_TMPREFCNT	\
 	assert(rx)
 
 PERL_CALLCONV REGEXP*	Perl_reg_temp_copy(pTHX_ REGEXP* r)
@@ -5663,6 +5693,11 @@ PERL_CALLCONV void	Perl_pad_undef(pTHX_ CV* cv)
 #define PERL_ARGS_ASSERT_PAD_UNDEF	\
 	assert(cv)
 
+PERL_CALLCONV void	Perl_pad_tmprefcnt(pTHX_ CV* cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PAD_TMPREFCNT	\
+	assert(cv)
+
 PERL_CALLCONV PADOFFSET	Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool clone, bool state)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PAD_ADD_NAME	\
@@ -5958,6 +5993,8 @@ PERL_CALLCONV void	Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chun
 #define PERL_ARGS_ASSERT_OFFER_NICE_CHUNK	\
 	assert(chunk)
 
+
+PERL_CALLCONV void	Perl_refcnt_check(pTHX);
 
 #ifndef SPRINTF_RETURNS_STRLEN
 PERL_CALLCONV int	Perl_my_sprintf(char *buffer, const char *pat, ...)

@@ -8816,6 +8816,32 @@ Perl_pregfree2(pTHX_ REGEXP *rx)
     Safefree(r->offs);
 }
 
+void
+Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
+{
+    dVAR;
+    struct regexp *const r = (struct regexp *)SvANY(rx);
+
+    PERL_ARGS_ASSERT_PREGFREE2;
+
+    if (r->mother_re) {
+        SvTMPREFCNT_inc(r->mother_re);
+    } else {
+        if (RXp_PAREN_NAMES(r))
+            SvTMPREFCNT_inc(RXp_PAREN_NAMES(r));
+    }        
+    if (r->substrs) {
+        if (r->anchored_substr)
+            SvTMPREFCNT_inc(r->anchored_substr);
+        if (r->float_substr)
+            SvTMPREFCNT_inc(r->float_substr);
+    }
+#ifdef PERL_OLD_COPY_ON_WRITE
+    if (r->saved_copy)
+        SvTMPREFCNT_inc(r->saved_copy);
+#endif
+}
+
 /*  reg_temp_copy()
     
     This is a hacky workaround to the structural issue of match results

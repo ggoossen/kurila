@@ -529,6 +529,26 @@ Perl_mg_free(pTHX_ SV *sv)
     return 0;
 }
 
+void
+Perl_mg_tmprefcnt(pTHX_ SV *sv)
+{
+    MAGIC* mg;
+    MAGIC* moremagic;
+
+    PERL_ARGS_ASSERT_MG_TMPREFCNT;
+
+    for (mg = SvMAGIC(sv); mg; mg = moremagic) {
+	moremagic = mg->mg_moremagic;
+	if (mg->mg_ptr && mg->mg_type != PERL_MAGIC_regex_global) {
+	    if (mg->mg_len == HEf_SVKEY)
+		SvTMPREFCNT_inc((SV*)mg->mg_ptr);
+	}
+	if (mg->mg_flags & MGf_REFCOUNTED)
+	    SvTMPREFCNT_inc(mg->mg_obj);
+    }
+    return 0;
+}
+
 #include <signal.h>
 
 U32

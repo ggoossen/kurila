@@ -1796,6 +1796,66 @@ Perl_hv_undef(pTHX_ HV *hv)
 	mg_clear((SV*)hv);
 }
 
+void
+Perl_hv_tmprefcnt(pTHX_ HV *hv)
+{
+    dVAR;
+    register XPVHV* xhv;
+    const char *name;
+
+    if (!hv)
+	return;
+
+    DEBUG_A(Perl_hv_assert(aTHX_ hv));
+    xhv = (XPVHV*)SvANY(hv);
+
+	if (SvOOK(hv)) {
+	    HE *entry;
+            struct mro_meta *meta;
+	    struct xpvhv_aux *iter = HvAUX(hv);
+	    /* If there are weak references to this HV, we need to avoid
+	       freeing them up here.  In particular we need to keep the AV
+	       visible as what we're deleting might well have weak references
+	       back to this HV, so the for loop below may well trigger
+	       the removal of backreferences from this array.  */
+
+	    SvTMPREFCNT_inc(iter->xhv_backreferences);
+
+	    entry = iter->xhv_eiter; /* HvEITER(hv) */
+	    if (entry && HvLAZYDEL(hv)) {	/* was deleted earlier? */
+		SvTMPREFCNT_inc(HeVAL(entry));
+		if (HeKLEN(entry) == HEf_SVKEY) {
+		    SvTMPREFCNT_inc(HeKEY_sv(entry));
+		}
+	    }
+
+            if((meta = iter->xhv_mro_meta)) {
+                SvTMPREFCNT_inc(meta->mro_linear_c3);
+                SvTMPREFCNT_inc(meta->mro_nextmethod);
+            }
+	}
+
+	HE ** const array = HvARRAY(hv);
+	I32 i = HvMAX(hv);
+
+	if (array) {
+	    do {
+		/* Loop down the linked list heads  */
+		HE *entry = array[i];
+
+		while (entry) {
+		    SvTMPREFCNT_inc(HeVAL(entry));
+		    if (HeKLEN(entry) == HEf_SVKEY) {
+			SvTMPREFCNT_inc(HeKEY_sv(entry));
+		    }
+
+		    entry = HeNEXT(entry);
+		}
+	    } while (--i >= 0);
+	}
+
+}
+
 static struct xpvhv_aux*
 S_hv_auxinit(HV *hv) {
     struct xpvhv_aux *iter;

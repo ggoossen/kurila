@@ -4590,6 +4590,25 @@ Perl_cv_undef(pTHX_ CV *cv)
 }
 
 void
+Perl_cv_tmprefcnt(pTHX_ CV *cv)
+{
+    dVAR;
+
+    PERL_ARGS_ASSERT_CV_TMPREFCNT;
+
+    pad_tmprefcnt(cv);
+
+    /* remove CvOUTSIDE unless this is an undef rather than a free */
+    if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
+	if (!CvWEAKOUTSIDE(cv))
+	    SvTMPREFCNT_inc(CvOUTSIDE(cv));
+    }
+    if (CvCONST(cv)) {
+	SvTMPREFCNT_inc((SV*)CvXSUBANY(cv).any_ptr);
+    }
+}
+
+void
 Perl_cv_ckproto_len(pTHX_ const CV *cv, const GV *gv, const char *p,
 		    const STRLEN len)
 {

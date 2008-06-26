@@ -71,6 +71,7 @@
 #define av_shift		Perl_av_shift
 #define av_store		Perl_av_store
 #define av_undef		Perl_av_undef
+#define av_tmprefcnt		Perl_av_tmprefcnt
 #define av_unshift		Perl_av_unshift
 #ifdef PERL_CORE
 #define bind_match		Perl_bind_match
@@ -126,6 +127,7 @@
 #define op_const_sv		Perl_op_const_sv
 #endif
 #define cv_undef		Perl_cv_undef
+#define cv_tmprefcnt		Perl_cv_tmprefcnt
 #define cx_dump			Perl_cx_dump
 #define filter_add		Perl_filter_add
 #define filter_del		Perl_filter_del
@@ -256,6 +258,7 @@
 #endif
 #endif
 #define gp_free			Perl_gp_free
+#define gp_tmprefcnt		Perl_gp_tmprefcnt
 #define gp_ref			Perl_gp_ref
 #define gv_AVadd		Perl_gv_AVadd
 #define gv_HVadd		Perl_gv_HVadd
@@ -286,6 +289,7 @@
 #define hv_iterval		Perl_hv_iterval
 #define hv_ksplit		Perl_hv_ksplit
 #define hv_undef		Perl_hv_undef
+#define hv_tmprefcnt		Perl_hv_tmprefcnt
 #define ibcmp			Perl_ibcmp
 #define ibcmp_locale		Perl_ibcmp_locale
 #define ibcmp_utf8		Perl_ibcmp_utf8
@@ -458,6 +462,7 @@
 #endif
 #define mg_find			Perl_mg_find
 #define mg_free			Perl_mg_free
+#define mg_tmprefcnt		Perl_mg_tmprefcnt
 #define mg_get			Perl_mg_get
 #define mg_length		Perl_mg_length
 #define mg_magical		Perl_mg_magical
@@ -666,6 +671,7 @@
 #define pregexec		Perl_pregexec
 #define pregfree		Perl_pregfree
 #define pregfree2		Perl_pregfree2
+#define preg_tmprefcnt		Perl_preg_tmprefcnt
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define reg_temp_copy		Perl_reg_temp_copy
 #endif
@@ -1564,6 +1570,7 @@
 #ifdef PERL_CORE
 #define pad_new			Perl_pad_new
 #define pad_undef		Perl_pad_undef
+#define pad_tmprefcnt		Perl_pad_tmprefcnt
 #define pad_add_name		Perl_pad_add_name
 #define pad_add_anon		Perl_pad_add_anon
 #define pad_check_dup		Perl_pad_check_dup
@@ -1748,6 +1755,9 @@
 #endif
 #ifdef PERL_CORE
 #define offer_nice_chunk	Perl_offer_nice_chunk
+#endif
+#ifdef PERL_CORE
+#define refcnt_check		Perl_refcnt_check
 #endif
 #ifndef SPRINTF_RETURNS_STRLEN
 #endif
@@ -2291,6 +2301,7 @@
 #define av_shift(a)		Perl_av_shift(aTHX_ a)
 #define av_store(a,b,c)		Perl_av_store(aTHX_ a,b,c)
 #define av_undef(a)		Perl_av_undef(aTHX_ a)
+#define av_tmprefcnt(a)		Perl_av_tmprefcnt(aTHX_ a)
 #define av_unshift(a,b)		Perl_av_unshift(aTHX_ a,b)
 #ifdef PERL_CORE
 #define bind_match(a,b,c)	Perl_bind_match(aTHX_ a,b,c)
@@ -2330,6 +2341,7 @@
 #define op_const_sv(a,b)	Perl_op_const_sv(aTHX_ a,b)
 #endif
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
+#define cv_tmprefcnt(a)		Perl_cv_tmprefcnt(aTHX_ a)
 #define cx_dump(a)		Perl_cx_dump(aTHX_ a)
 #define filter_add(a,b)		Perl_filter_add(aTHX_ a,b)
 #define filter_del(a)		Perl_filter_del(aTHX_ a)
@@ -2461,6 +2473,7 @@
 #ifdef PERL_CORE
 #endif
 #define gp_free(a)		Perl_gp_free(aTHX_ a)
+#define gp_tmprefcnt(a)		Perl_gp_tmprefcnt(aTHX_ a)
 #define gp_ref(a)		Perl_gp_ref(aTHX_ a)
 #define gv_AVadd(a)		Perl_gv_AVadd(aTHX_ a)
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
@@ -2495,6 +2508,7 @@
 #define hv_iterval(a,b)		Perl_hv_iterval(aTHX_ a,b)
 #define hv_ksplit(a,b)		Perl_hv_ksplit(aTHX_ a,b)
 #define hv_undef(a)		Perl_hv_undef(aTHX_ a)
+#define hv_tmprefcnt(a)		Perl_hv_tmprefcnt(aTHX_ a)
 #define ibcmp(a,b,c)		Perl_ibcmp(aTHX_ a,b,c)
 #define ibcmp_locale(a,b,c)	Perl_ibcmp_locale(aTHX_ a,b,c)
 #define ibcmp_utf8(a,b,c,d,e,f)	Perl_ibcmp_utf8(aTHX_ a,b,c,d,e,f)
@@ -2665,6 +2679,7 @@
 #endif
 #define mg_find(a,b)		Perl_mg_find(aTHX_ a,b)
 #define mg_free(a)		Perl_mg_free(aTHX_ a)
+#define mg_tmprefcnt(a)		Perl_mg_tmprefcnt(aTHX_ a)
 #define mg_get(a)		Perl_mg_get(aTHX_ a)
 #define mg_length(a)		Perl_mg_length(aTHX_ a)
 #define mg_magical(a)		Perl_mg_magical(aTHX_ a)
@@ -2871,6 +2886,7 @@
 #define pregexec(a,b,c,d,e,f,g)	Perl_pregexec(aTHX_ a,b,c,d,e,f,g)
 #define pregfree(a)		Perl_pregfree(aTHX_ a)
 #define pregfree2(a)		Perl_pregfree2(aTHX_ a)
+#define preg_tmprefcnt(a)	Perl_preg_tmprefcnt(aTHX_ a)
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define reg_temp_copy(a)	Perl_reg_temp_copy(aTHX_ a)
 #endif
@@ -3773,6 +3789,7 @@
 #ifdef PERL_CORE
 #define pad_new(a)		Perl_pad_new(aTHX_ a)
 #define pad_undef(a)		Perl_pad_undef(aTHX_ a)
+#define pad_tmprefcnt(a)	Perl_pad_tmprefcnt(aTHX_ a)
 #define pad_add_name(a,b,c,d)	Perl_pad_add_name(aTHX_ a,b,c,d)
 #define pad_add_anon(a,b)	Perl_pad_add_anon(aTHX_ a,b)
 #define pad_check_dup(a,b,c)	Perl_pad_check_dup(aTHX_ a,b,c)
@@ -3963,6 +3980,9 @@
 #endif
 #ifdef PERL_CORE
 #define offer_nice_chunk(a,b)	Perl_offer_nice_chunk(aTHX_ a,b)
+#endif
+#ifdef PERL_CORE
+#define refcnt_check()		Perl_refcnt_check(aTHX)
 #endif
 #ifndef SPRINTF_RETURNS_STRLEN
 #endif
