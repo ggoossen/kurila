@@ -381,7 +381,7 @@ if ($Is_miniperl) {
    ok scalar eval q{
       %!;
       defined %Errno::;
-   }, $@ && < $@->message;
+   }, $@ && $@->message;
 }
 
 if ($Is_miniperl) {
