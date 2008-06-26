@@ -402,7 +402,7 @@ Perl_allocmy(pTHX_ const char *const name)
 	                                 /* $_ is always in main::, even with our */
 	HV *  const stash = PL_curstash && !strEQ(name,"$_") ? PL_curstash : PL_defstash;
 	HEK * const stashname = HvNAME_HEK(stash);
-	SV *  const sym = newSVhek(stashname);
+	SV *  const sym = sv_2mortal(newSVhek(stashname));
 	sv_catpvs(sym, "::");
 	sv_catpv(sym, name+1);
 	ourgv = gv_fetchsv(sym,

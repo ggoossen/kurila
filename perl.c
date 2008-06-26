@@ -941,6 +941,15 @@ perl_destruct(pTHXx)
         }
     }
 
+    nuke_stacks();
+
+#ifdef DEBUGGING
+    if (PL_sv_count != 0) {
+	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count);
+	sv_report_used();
+    }
+#endif
+
 #ifdef PERL_DEBUG_READONLY_OPS
     free(PL_slabs);
     PL_slabs = NULL;
@@ -976,7 +985,6 @@ perl_destruct(pTHXx)
     PL_bitcount = NULL;
     Safefree(PL_psig_pend);
     PL_psig_pend = (int*)NULL;
-    nuke_stacks();
     PL_tainting = FALSE;
     PL_taint_warn = FALSE;
     PL_hints = 0;		/* Reset hints. Should hints be per-interpreter ? */
@@ -995,11 +1003,6 @@ perl_destruct(pTHXx)
 #ifdef USE_REENTRANT_API
     Perl_reentrant_free(aTHX);
 #endif
-
-    if (PL_sv_count != 0 && ckWARN_d(WARN_INTERNAL)) {
-	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),"Scalars leaked: %ld\n", (long)PL_sv_count);
-	sv_report_used();
-    }
 
     sv_free_arenas();
 
