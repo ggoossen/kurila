@@ -2302,11 +2302,9 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     }
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */
     SAVESPTR(PL_beginav);
-    PL_beginav = newAV();
-    SAVEFREESV(PL_beginav);
+    SVcpSTEAL(PL_beginav, newAV());
     SAVESPTR(PL_unitcheckav);
-    PL_unitcheckav = newAV();
-    SAVEFREESV(PL_unitcheckav);
+    SVcpSTEAL(PL_unitcheckav, newAV());
 
 #ifdef PERL_MAD
     SAVEBOOL(PL_madskills);
@@ -2904,7 +2902,7 @@ PP(pp_entereval)
 	GvHV(PL_hintgv) = saved_hh;
 
     SAVESPTR(PL_diehook);
-    PL_diehook = SvREFCNT_inc(PERL_DIEHOOK_IGNORE);
+    SVcpREPLACE(PL_diehook, PERL_DIEHOOK_IGNORE);
 
     SAVECOMPILEWARNINGS();
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
@@ -3052,7 +3050,7 @@ PP(pp_entertry)
     PERL_CONTEXT * const cx = create_eval_scope(0);
 
     SAVESPTR(PL_diehook);
-    PL_diehook = SvREFCNT_inc(PERL_DIEHOOK_IGNORE);
+    SVcpREPLACE(PL_diehook, PERL_DIEHOOK_IGNORE);
 
     cx->blk_eval.retop = cLOGOP->op_other->op_next;
     return DOCATCH(PL_op->op_next);

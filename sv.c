@@ -180,7 +180,7 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	VALGRIND_MAKE_MEM_DEFINED(&SvARENA_CHAIN(p), sizeof(void*));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
-	PL_sv_root = (p); /* Disable to do memory debugging */					\
+	PL_sv_root = (p); /* Disable to do memory debugging */	\
 	--PL_sv_count;					\
     } STMT_END
 
@@ -11346,6 +11346,10 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_curstash);
     SvTMPREFCNT_inc(PL_defgv);
     SvTMPREFCNT_inc(PL_compcv);
+    SvTMPREFCNT_inc(PL_diehook);
+    SvTMPREFCNT_inc(PL_main_cv);
+    SvTMPREFCNT_inc(PL_beginav);
+    SvTMPREFCNT_inc(PL_unitcheckav);
     visit(do_check_tmprefcnt, 0, 0);
 }
 
