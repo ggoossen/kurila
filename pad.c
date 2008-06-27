@@ -1501,8 +1501,8 @@ Perl_cv_clone(pTHX_ CV *proto)
     ENTER;
     SAVESPTR(PL_compcv);
 
-    SVcpNULL(PL_compcv);
-    cv = PL_compcv = (CV*)newSV_type(SvTYPE(proto));
+    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SvTYPE(proto)));
+    cv = PL_compcv;
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE|CVf_WEAKOUTSIDE);
     CvCLONED_on(cv);
 

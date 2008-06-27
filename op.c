@@ -4955,7 +4955,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	if (PL_madskills)
 	    goto install_block;
 	op_free(block);
-	SVcpNULL(PL_compcv);
 	goto done;
     }
     if (attrs) {
@@ -5001,8 +5000,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 #endif
 	     ) {
 	    /* got here with just attrs -- work done, so bug out */
-	    SAVEFREESV(PL_compcv);
-	    PL_compcv = NULL;
 	    goto done;
 	}
 	/* transfer PL_compcv to cv */
@@ -5025,7 +5022,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     else {
 	cv = PL_compcv;
 	if (name) {
-	    GvCV(gv) = cv;
+	    GvCV(gv) = SvREFCNT_inc(cv);
 	    if (PL_madskills) {
 		if (strEQ(name, "import")) {
 		    Perl_warner(aTHX_ packWARN(WARN_VOID), "%lx\n", (long)cv);

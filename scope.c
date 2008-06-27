@@ -791,6 +791,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    ptr = SSPOPPTR;
 	    SvREFCNT_dec(*(SV**)ptr);
 	    *(SV**)ptr = (SV*)SSPOPPTR;
+	    assert( SvREFCNT(*(SV**)(ptr)) > 0 );
 	    break;
 	case SAVEt_VPTR:			/* random* reference */
 	case SAVEt_PPTR:			/* char* reference */
