@@ -298,10 +298,9 @@ Perl_pad_undef(pTHX_ CV* cv)
 
 		/* in use, not just a prototype */
 		if (inner_rc && (CvOUTSIDE(innercv) == cv)) {
-		    assert(CvWEAKOUTSIDE(innercv));
+		    assert(0);
 		    /* don't relink to grandfather if he's being freed */
 		    if (outercv && SvREFCNT(outercv)) {
-			CvWEAKOUTSIDE_off(innercv);
 			CvOUTSIDE(innercv) = outercv;
 			CvOUTSIDE_SEQ(innercv) = seq;
 			SvREFCNT_inc_simple_void_NN(outercv);
@@ -546,14 +545,6 @@ Perl_pad_add_anon(pTHX_ SV* sv, OPCODE op_type)
     /* XXX DAPM use PL_curpad[] ? */
     av_store(PL_comppad, ix, sv);
     SvPADMY_on(sv);
-
-    /* to avoid ref loops, we never have parent + child referencing each
-     * other simultaneously */
-    if (CvOUTSIDE((CV*)sv)) {
-	assert(!CvWEAKOUTSIDE((CV*)sv));
-	CvWEAKOUTSIDE_on((CV*)sv);
-	SvREFCNT_dec(CvOUTSIDE((CV*)sv));
-    }
     return ix;
 }
 
@@ -1503,7 +1494,7 @@ Perl_cv_clone(pTHX_ CV *proto)
 
     SVcpSTEAL(PL_compcv, (CV*)newSV_type(SvTYPE(proto)));
     cv = PL_compcv;
-    CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE|CVf_WEAKOUTSIDE);
+    CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
     CvCLONED_on(cv);
 
 #ifdef USE_ITHREADS
@@ -1637,7 +1628,7 @@ Perl_pad_fixup_inner_anons(pTHX_ PADLIST *padlist, CV *old_cv, CV *new_cv)
 	    && *SvPVX_const(namesv) == '&')
 	{
 	    CV * const innercv = (CV*)curpad[ix];
-	    assert(CvWEAKOUTSIDE(innercv));
+	    assert(0);
 	    assert(CvOUTSIDE(innercv) == old_cv);
 	    CvOUTSIDE(innercv) = new_cv;
 	}

@@ -4574,8 +4574,7 @@ Perl_cv_undef(pTHX_ CV *cv)
 
     /* remove CvOUTSIDE unless this is an undef rather than a free */
     if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	if (!CvWEAKOUTSIDE(cv))
-	    SvREFCNT_dec(CvOUTSIDE(cv));
+	SvREFCNT_dec(CvOUTSIDE(cv));
 	CvOUTSIDE(cv) = NULL;
     }
     if (CvCONST(cv)) {
@@ -4585,8 +4584,8 @@ Perl_cv_undef(pTHX_ CV *cv)
     if (CvISXSUB(cv) && CvXSUB(cv)) {
 	CvXSUB(cv) = NULL;
     }
-    /* delete all flags except WEAKOUTSIDE */
-    CvFLAGS(cv) &= CVf_WEAKOUTSIDE;
+    /* delete all flags */
+    CvFLAGS(cv) = 0;
 }
 
 void
@@ -4600,8 +4599,7 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
 
     /* remove CvOUTSIDE unless this is an undef rather than a free */
     if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	if (!CvWEAKOUTSIDE(cv))
-	    SvTMPREFCNT_inc(CvOUTSIDE(cv));
+	SvTMPREFCNT_inc(CvOUTSIDE(cv));
     }
     if (CvCONST(cv)) {
 	SvTMPREFCNT_inc((SV*)CvXSUBANY(cv).any_ptr);
@@ -5005,8 +5003,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	/* transfer PL_compcv to cv */
 	cv_undef(cv);
 	CvFLAGS(cv) = CvFLAGS(PL_compcv);
-	if (!CvWEAKOUTSIDE(cv))
-	    SvREFCNT_dec(CvOUTSIDE(cv));
+	SvREFCNT_dec(CvOUTSIDE(cv));
 	CvOUTSIDE(cv) = CvOUTSIDE(PL_compcv);
 	CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(PL_compcv);
 	CvOUTSIDE(PL_compcv) = 0;
