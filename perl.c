@@ -542,8 +542,7 @@ perl_destruct(pTHXx)
 	PL_main_root = NULL;
     }
     PL_main_start = NULL;
-    SvREFCNT_dec(PL_main_cv);
-    PL_main_cv = NULL;
+    SVcpNULL(PL_main_cv);
     PL_dirty = TRUE;
 
     /* Tell PerlIO we are about to tear things apart in case
@@ -712,20 +711,18 @@ perl_destruct(pTHXx)
     PL_efloatsize = 0;
 
     /* startup and shutdown function lists */
-    SvREFCNT_dec(PL_beginav);
+    SVcpNULL(PL_beginav);
     SvREFCNT_dec(PL_beginav_save);
     SvREFCNT_dec(PL_endav);
     SvREFCNT_dec(PL_checkav);
     SvREFCNT_dec(PL_checkav_save);
-    SvREFCNT_dec(PL_unitcheckav);
+    SVcpNULL(PL_unitcheckav);
     SvREFCNT_dec(PL_unitcheckav_save);
     SvREFCNT_dec(PL_initav);
-    PL_beginav = NULL;
     PL_beginav_save = NULL;
     PL_endav = NULL;
     PL_checkav = NULL;
     PL_checkav_save = NULL;
-    PL_unitcheckav = NULL;
     PL_unitcheckav_save = NULL;
     PL_initav = NULL;
 
@@ -1341,8 +1338,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	PL_main_root = NULL;
     }
     PL_main_start = NULL;
-    SvREFCNT_dec(PL_main_cv);
-    PL_main_cv = NULL;
+    SVcpNULL(PL_main_cv);
 
     time(&PL_basetime);
     oldscope = PL_scopestack_ix;
@@ -1399,7 +1395,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #ifdef USE_SITECUSTOMIZE
     bool minus_f = FALSE;
 #endif
-    SV *linestr_sv = newSV_type(SVt_PV);
+    SV *linestr_sv = sv_2mortal(newSV_type(SVt_PV));
     bool add_read_e_script = FALSE;
 
     SvGROW(linestr_sv, 80);
@@ -1799,7 +1795,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 
     SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
-    PL_main_cv = PL_compcv;
+    SVcpREPLACE(PL_main_cv, PL_compcv);
     CvUNIQUE_on(PL_compcv);
 
     CvPADLIST(PL_compcv) = pad_new(0);
@@ -1913,8 +1909,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     lex_start(linestr_sv, rsfp, TRUE);
     PL_subname = newSVpvs("main");
-
-    SvREFCNT_dec(linestr_sv); /* should probably be a mortal */
 
     if (add_read_e_script)
 	filter_add(read_e_script, NULL);
