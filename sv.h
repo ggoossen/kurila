@@ -101,8 +101,8 @@ typedef struct hek HEK;
 #define _SV_HEAD(ptrtype) \
     ptrtype	sv_any;		/* pointer to body */	\
     U32		sv_refcnt;	/* how many references to us */	\
-    U32		sv_tmprefcnt;	/* temporary how many references to us */	\
-    U32		sv_flags	/* what we are */
+    U32		sv_flags;	/* what we are */  \
+    U32		sv_tmprefcnt	/* temporary how many references to us */
 
 #define _SV_HEAD_UNION \
     union {				\

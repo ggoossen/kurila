@@ -510,7 +510,7 @@ peg	:	PEG
 
 /* Unimplemented "my sub foo { }" */
 mysubrout:	MYSUB startsub subname proto subattrlist subbody
-			{ SvREFCNT_inc_simple_void(PL_compcv);
+			{ 
 #ifdef MAD
 			  $$ = newMYSUB($2, $3, $4, $5, $6);
 			  token_getmad($1,$$,'d');
@@ -523,7 +523,7 @@ mysubrout:	MYSUB startsub subname proto subattrlist subbody
 
 /* Subroutine definition */
 subrout	:	SUB startsub subname proto subattrlist subbody
-			{ SvREFCNT_inc_simple_void(PL_compcv);
+			{
 #ifdef MAD
 			  {
 			      OP* o = newSVOP(OP_ANONCODE, 0,
@@ -546,14 +546,14 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 	;
 
 startsub:	/* NULL */	/* start a regular subroutine scope */
-			{ $$ = start_subparse(0);
-			    SAVEFREESV(PL_compcv); }
+			{ $$ = start_subparse(0); 
+                        }
 
 	;
 
 startanonsub:	/* NULL */	/* start an anonymous subroutine scope */
 			{ $$ = start_subparse(CVf_ANON);
-			    SAVEFREESV(PL_compcv); }
+			}
 	;
 
 /* Name of a subroutine - must be a bareword, could be special */
@@ -633,7 +633,7 @@ package :	PACKAGE WORD ';'
 use	:	USE startsub
 			{ CvSPECIAL_on(PL_compcv); /* It's a BEGIN {} */ }
 		    THING WORD listexpr ';'
-			{ SvREFCNT_inc_simple_void(PL_compcv);
+			{ 
 #ifdef MAD
 			  $$ = utilize(IVAL($1), $2, $4, $5, $6);
 			  token_getmad($1,$$,'o');
@@ -736,7 +736,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
                           APPEND_MADPROPS_PV("func", $$, '>');
 			}
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
-			{ SvREFCNT_inc_simple_void(PL_compcv);
+			{
 			  $<opval>$ = newANONATTRSUB($2, 0, (OP*)NULL, $3); }
 		    listexpr		%prec LSTOP  /* ... @bar */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
@@ -1050,7 +1050,7 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 /* Constructors for anonymous data */
 anonymous:
 	ANONSUB startanonsub proto subattrlist block	%prec '('
-			{ SvREFCNT_inc_simple_void(PL_compcv);
+			{
 			  $$ = newANONATTRSUB($2, $3, $4, $5);
 			  TOKEN_GETMAD($1,$$,'o');
 			  OP_GETMAD($3,$$,'s');
@@ -1173,7 +1173,8 @@ term	:	termbinop
                               APPEND_MADPROPS_PV("amper", $$, '>');
                         }
 	|	amper '(' ')'                        /* &foo() */
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1));
+			{
+                          $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1));
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($3,$$,')');
                           APPEND_MADPROPS_PV("amper", $$, '>');
@@ -1193,7 +1194,8 @@ term	:	termbinop
 			  })
 			}
 	|	NOAMP WORD listexpr                  /* foo(@args) */
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+			{ 
+                          $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 			    append_elem(OP_LIST, $3, scalar($2)));
 			  TOKEN_GETMAD($1,$$,'o');
                           APPEND_MADPROPS_PV("noamp", $$, '>');

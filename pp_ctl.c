@@ -2277,8 +2277,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     PUSHMARK(SP);
 
     SAVESPTR(PL_compcv);
-    SVcpNULL(PL_compcv);
-    PL_compcv = (CV*)newSV_type(SVt_PVCV);
+    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CvEVAL_on(PL_compcv);
     assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
     cxstack[cxstack_ix].blk_eval.cv = PL_compcv;
