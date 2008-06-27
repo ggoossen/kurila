@@ -327,7 +327,7 @@ PP(pp_backtick)
 	else if (gimme == G_SCALAR) {
 	    ENTER;
 	    SAVESPTR(PL_rs);
-	    PL_rs = &PL_sv_undef;
+	    SVcpREPLACE(PL_rs, &PL_sv_undef);
 	    sv_setpvn(TARG, "", 0);	/* note that this preserves previous buffer */
 	    while (sv_gets(TARG, fp, SvCUR(TARG)) != NULL)
 		NOOP;
@@ -385,10 +385,10 @@ PP(pp_glob)
 #endif /* !VMS */
 
     SAVESPTR(PL_last_in_gv);	/* We don't want this to be permanent. */
-    PL_last_in_gv = (GV*)*PL_stack_sp--;
+    SVcpREPLACE(PL_last_in_gv, (GV*)*PL_stack_sp--);
 
     SAVESPTR(PL_rs);		/* This is not permanent, either. */
-    PL_rs = newSVpvs_flags("\000", SVs_TEMP);
+    SVcpSTEAL(PL_rs, newSVpvs("\000"));
 #ifndef DOSISH
 #ifndef CSH
     *SvPVX(PL_rs) = '\n';
@@ -403,7 +403,7 @@ PP(pp_glob)
 PP(pp_rcatline)
 {
     dVAR;
-    PL_last_in_gv = cGVOP_gv;
+    SVcpREPLACE(PL_last_in_gv, cGVOP_gv);
     return do_readline();
 }
 
@@ -1647,7 +1647,8 @@ PP(pp_eof)
     if (MAXARG == 0) {
 	if (PL_op->op_flags & OPf_SPECIAL) {	/* eof() */
 	    IO *io;
-	    gv = PL_last_in_gv = GvEGV(PL_argvgv);
+	    gv = GvEGV(PL_argvgv);
+	    SVcpREPLACE(PL_last_in_gv, gv);
 	    io = GvIO(gv);
 	    if (io && !IoIFP(io)) {
 		if ((IoFLAGS(io) & IOf_START) && av_len(GvAVn(gv)) < 0) {
@@ -1669,8 +1670,10 @@ PP(pp_eof)
 	else
 	    gv = PL_last_in_gv;			/* eof */
     }
-    else
-	gv = PL_last_in_gv = (GV*)POPs;		/* eof(FH) */
+    else {
+	gv = (GV*)POPs;		/* eof(FH) */
+	SVcpREPLACE(PL_last_in_gv, gv);
+    }
 
     if (gv) {
 	IO * const io = GvIO(gv);
@@ -1698,7 +1701,7 @@ PP(pp_tell)
     IO *io;
 
     if (MAXARG != 0)
-	PL_last_in_gv = (GV*)POPs;
+	SVcpREPLACE(PL_last_in_gv, (GV*)POPs);
     gv = PL_last_in_gv;
 
     if (gv && (io = GvIO(gv))) {
@@ -1733,7 +1736,8 @@ PP(pp_sysseek)
     const Off_t offset = (Off_t)SvIV(POPs);
 #endif
 
-    GV * const gv = PL_last_in_gv = (GV*)POPs;
+    GV * const gv = (GV*)POPs;
+    SVcpREPLACE(PL_last_in_gv, gv);
     IO *io;
 
     if (gv && (io = GvIO(gv))) {

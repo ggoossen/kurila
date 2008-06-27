@@ -284,16 +284,16 @@ PP(pp_readline)
 {
     dVAR;
     tryAMAGICunTARGET(iter, 0);
-    PL_last_in_gv = (GV*)(*PL_stack_sp--);
+    SVcpREPLACE(PL_last_in_gv, *PL_stack_sp--);
     if (SvTYPE(PL_last_in_gv) != SVt_PVGV) {
 	if (SvROK(PL_last_in_gv) && SvTYPE(SvRV(PL_last_in_gv)) == SVt_PVGV)
-	    PL_last_in_gv = (GV*)SvRV(PL_last_in_gv);
+	    SVcpREPLACE(PL_last_in_gv, (GV*)SvRV(PL_last_in_gv));
 	else {
 	    dSP;
 	    XPUSHs((SV*)PL_last_in_gv);
 	    PUTBACK;
 	    pp_rv2gv();
-	    PL_last_in_gv = (GV*)(*PL_stack_sp--);
+	    SVcpREPLACE(PL_last_in_gv, (GV*)(*PL_stack_sp--));
 	}
     }
     return do_readline();

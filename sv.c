@@ -4623,11 +4623,6 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	    if (!SvVALID(sv) && (stash = GvSTASH(sv)))
 		    sv_del_backref((SV*)stash, sv);
 	}
-	/* FIXME. There are probably more unreferenced pointers to SVs in the
-	   interpreter struct that we should check and tidy in a similar
-	   fashion to this:  */
-	if ((GV*)sv == PL_last_in_gv)
-	    PL_last_in_gv = NULL;
     case SVt_PVMG:
     case SVt_PVNV:
     case SVt_PVIV:
@@ -11350,6 +11345,8 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_main_cv);
     SvTMPREFCNT_inc(PL_beginav);
     SvTMPREFCNT_inc(PL_unitcheckav);
+    SvTMPREFCNT_inc(PL_last_in_gv);
+    SvTMPREFCNT_inc(PL_rs);
     visit(do_check_tmprefcnt, 0, 0);
 }
 
