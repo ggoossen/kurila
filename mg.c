@@ -2494,8 +2494,7 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         }
         break;
     case '/':
-        SvREFCNT_dec(PL_rs);
-        PL_rs = newSVsv(sv);
+        SVcpSTEAL(PL_rs, newSVsv(sv));
         break;
     case '\\':
         if (PL_ors_sv)

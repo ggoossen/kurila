@@ -685,8 +685,7 @@ perl_destruct(pTHXx)
     SvREFCNT_dec(PL_ors_sv);	/* $\ */
     PL_ors_sv = NULL;
 
-    SvREFCNT_dec(PL_rs);	/* $/ */
-    PL_rs = NULL;
+    SVcpNULL(PL_rs);	/* $/ */
 
     Safefree(PL_osname);	/* $^O */
     PL_osname = NULL;
@@ -741,7 +740,7 @@ perl_destruct(pTHXx)
     PL_argvoutgv = NULL;
     PL_stdingv = NULL;
     PL_stderrgv = NULL;
-    PL_last_in_gv = NULL;
+    SVcpNULL(PL_last_in_gv);
     PL_replgv = NULL;
     PL_DBgv = NULL;
     PL_DBline = NULL;
@@ -2712,7 +2711,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	 I32 flags = 0;
 	 STRLEN numlen;
 
-	 SvREFCNT_dec(PL_rs);
+	 SVcpNULL(PL_rs);
 	 if (s[1] == 'x' && s[2]) {
 	      const char *e = s+=2;
 	      char *tmps;

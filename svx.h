@@ -108,7 +108,14 @@ static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
 }
 
 
-#define SVcpREPLACE(sv_d, sv_s) { SvREFCNT_inc(sv_s); SvREFCNT_dec(sv_d); sv_d = sv_s; }
+#define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
+static __inline__ void inline_SVcpREPLACE(SV**sv_d, SV*sv_s) 
+{
+  SvREFCNT_inc(sv_s);
+  SvREFCNT_dec(*sv_d);
+  *sv_d = sv_s;
+}
+
 #define SVcpNULL(sv) { SvREFCNT_dec(sv); sv = NULL; }
 #define SVcpSTEAL(sv_d, sv_s) { SvREFCNT_dec(sv_d); sv_d = sv_s; }
 

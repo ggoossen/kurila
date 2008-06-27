@@ -418,7 +418,7 @@ PP(pp_grepstart)
     src = PL_stack_base[*PL_markstack_ptr];
     SvTEMP_off(src);
     if (PL_op->op_private & OPpGREP_LEX)
-	SVcpREPLACE(PAD_SVl(PL_op->op_targ), src)
+	SVcpREPLACE(PAD_SVl(PL_op->op_targ), src);
     else
 	SVcpREPLACE(DEFSV, src);
 
@@ -529,7 +529,7 @@ PP(pp_mapwhile)
 	src = PL_stack_base[PL_markstack_ptr[-1]];
 	SvTEMP_off(src);
 	if (PL_op->op_private & OPpGREP_LEX)
-	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), src)
+	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), src);
 	else
 	    SVcpREPLACE(DEFSV, src);
 
@@ -2296,6 +2296,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	SAVESPTR(PL_curstash);
 	SVcpREPLACE(PL_curstash, CopSTASH(PL_curcop));
     }
+
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */
     SAVESPTR(PL_beginav);
     SVcpSTEAL(PL_beginav, newAV());
