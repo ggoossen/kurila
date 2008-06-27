@@ -2290,10 +2290,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     CvPADLIST(PL_compcv) = pad_new(padnew_SAVE);
     PL_op = NULL; /* avoid PL_op and PL_curpad referring to different CVs */
 
-
-    if (!PL_madskills)
-	SAVEMORTALIZESV(PL_compcv);	/* must remain until end of current statement */
-
     /* make sure we compile in the right package */
 
     if (CopSTASH_ne(PL_curcop, PL_curstash)) {
