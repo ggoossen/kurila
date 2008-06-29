@@ -2232,11 +2232,6 @@ Perl_find_runcv(pTHX_ U32 *db_seqp)
 	    const PERL_CONTEXT *cx = &(si->si_cxstack[ix]);
 	    if (CxTYPE(cx) == CXt_SUB) {
 		CV * const cv = cx->blk_sub.cv;
-		/* skip DB:: code */
-		if (db_seqp && PL_debstash && CvSTASH(cv) == PL_debstash) {
-		    *db_seqp = cx->blk_oldcop->cop_seq;
-		    continue;
-		}
 		return cv;
 	    }
 	    else if (CxTYPE(cx) == CXt_EVAL && !CxTRYBLOCK(cx))

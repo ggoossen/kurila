@@ -248,8 +248,6 @@ usage:
 	case SVt_PVCV:
 	    if (CvGV(sv) && isGV(CvGV(sv)) && GvSTASH(CvGV(sv)))
 		stash = GvSTASH(CvGV(sv));
-	    else if (/* !CvANON(sv) && */ CvSTASH(sv))
-		stash = CvSTASH(sv);
 	    break;
 	case SVt_PVGV:
 	    if (GvGP(sv) && GvESTASH((GV*)sv))

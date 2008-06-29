@@ -1476,7 +1476,6 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvFILE(cv)		= CvFILE(proto);
 #endif
     CvGV(cv)		= CvGV(proto);
-    CvSTASH(cv)		= CvSTASH(proto);
     OP_REFCNT_LOCK;
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;
@@ -1560,7 +1559,7 @@ Perl_cv_clone(pTHX_ CV *proto)
 	SV* const const_sv = op_const_sv(CvSTART(cv), cv);
 	if (const_sv) {
 	    SvREFCNT_dec(cv);
-	    cv = newCONSTSUB(CvSTASH(proto), NULL, const_sv);
+	    cv = newCONSTSUB(NULL, NULL, const_sv);
 	}
 	else {
 	    CvCONST_off(cv);

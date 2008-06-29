@@ -11,7 +11,6 @@
 typedef U16 cv_flags_t;
 
 #define _XPVCV_COMMON								\
-    HV *	xcv_stash;							\
     union {									\
 	OP *	xcv_start;							\
 	ANY	xcv_xsubany;							\
@@ -51,9 +50,6 @@ Null CV pointer.
 
 =head1 CV Manipulation Functions
 
-=for apidoc Am|HV*|CvSTASH|CV* cv
-Returns the stash of the CV.
-
 =cut
 */
 
@@ -61,7 +57,6 @@ Returns the stash of the CV.
 #  define Nullcv Null(CV*)
 #endif
 
-#define CvSTASH(sv)	((XPVCV*)SvANY(sv))->xcv_stash
 #define CvSTART(sv)	((XPVCV*)SvANY(sv))->xcv_start_u.xcv_start
 #define CvROOT(sv)	((XPVCV*)SvANY(sv))->xcv_root_u.xcv_root
 #define CvXSUB(sv)	((XPVCV*)SvANY(sv))->xcv_root_u.xcv_xsub

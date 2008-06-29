@@ -2331,7 +2331,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	  && (PL_DBcv || (PL_DBcv = GvCV(PL_DBsub)))
 	   /* Try harder, since this may have been a sighandler, thus
 	    * curstash may be meaningless. */
-	  && (SvTYPE(sv) != SVt_PVCV || CvSTASH((CV*)sv) != PL_debstash)
+	  && (SvTYPE(sv) != SVt_PVCV)
 	  && !(flags & G_NODEBUG))
 	PL_op->op_private |= OPpENTERSUB_DB;
 

@@ -5016,9 +5016,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
         mro_method_changed_in( /* sub Foo::Bar () { 123 } */
             (CvGV(cv) && GvSTASH(CvGV(cv)))
                 ? GvSTASH(CvGV(cv))
-                : CvSTASH(cv)
-                    ? CvSTASH(cv)
-                    : PL_curstash
+	        : PL_curstash
         );
 	if (PL_madskills)
 	    goto install_block;
@@ -5042,8 +5040,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    CvFLAGS(cv) |= (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS);
 	    if (CvGV(cv) && GvSTASH(CvGV(cv)))
 		stash = GvSTASH(CvGV(cv));
-	    else if (CvSTASH(cv))
-		stash = CvSTASH(cv);
 	    else
 		stash = PL_curstash;
 	}
@@ -5100,7 +5096,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     }
     CvGV(cv) = gv;
     CvFILE_set_from_cop(cv, PL_curcop);
-    CvSTASH(cv) = PL_curstash;
 
     if (ps)
 	sv_setpvn((SV*)cv, ps, ps_len);
@@ -5301,13 +5296,6 @@ Perl_newCONSTSUB(pTHX_ HV *stash, const char *name, SV *sv)
     SAVEHINTS();
     PL_hints &= ~HINT_BLOCK_SCOPE;
 
-    if (stash) {
-	SAVESPTR(PL_curstash);
-	SAVECOPSTASH(PL_curcop);
-	SVcpREPLACE(PL_curstash, stash);
-	CopSTASH_set(PL_curcop,stash);
-    }
-
     /* file becomes the CvFILE. For an XS, it's supposed to be static storage,
        and so doesn't get free()d.  (It's expected to be from the C pre-
        processor __FILE__ directive). But we need a dynamically allocated one,
@@ -5317,10 +5305,6 @@ Perl_newCONSTSUB(pTHX_ HV *stash, const char *name, SV *sv)
     CvCONST_on(cv);
     Safefree(file);
 
-#ifdef USE_ITHREADS
-    if (stash)
-	CopSTASH_free(PL_curcop);
-#endif
     LEAVE;
 
     return cv;
