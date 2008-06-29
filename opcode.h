@@ -43,7 +43,6 @@ EXTCONST char* const PL_op_name[] = {
 	"gv",
 	"gelem",
 	"padsv",
-	"padhv",
 	"padany",
 	"pushre",
 	"rv2gv",
@@ -405,7 +404,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"glob value",
 	"glob elem",
 	"private variable",
-	"private hash",
 	"private value",
 	"push regexp",
 	"ref-to-glob cast",
@@ -779,7 +777,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_gv),
 	MEMBER_TO_FPTR(Perl_pp_gelem),
 	MEMBER_TO_FPTR(Perl_pp_padsv),
-	MEMBER_TO_FPTR(Perl_pp_padhv),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_padany */
 	MEMBER_TO_FPTR(Perl_pp_pushre),
 	MEMBER_TO_FPTR(Perl_pp_rv2gv),
@@ -1150,7 +1147,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gelem */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* padsv */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* padhv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* padany */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushre */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2gv */
@@ -1515,7 +1511,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000c44,	/* gv */
 	0x00022440,	/* gelem */
 	0x00000044,	/* padsv */
-	0x00000040,	/* padhv */
 	0x00000040,	/* padany */
 	0x00000a40,	/* pushre */
 	0x00000244,	/* rv2gv */

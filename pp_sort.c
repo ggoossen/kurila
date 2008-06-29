@@ -1637,9 +1637,9 @@ PP(pp_sort)
 		SAVESPTR(PL_firstgv);
 		SAVESPTR(PL_secondgv);
 		SAVESPTR(PL_sortstash);
-		PL_firstgv = gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV);
-		PL_secondgv = gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV);
-		PL_sortstash = stash;
+		SVcpREPLACE(PL_firstgv, gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV));
+		SVcpREPLACE(PL_secondgv, gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV));
+		SVcpREPLACE(PL_sortstash, stash);
 		SAVESPTR(GvSV(PL_firstgv));
 		SAVESPTR(GvSV(PL_secondgv));
 	    }
@@ -1742,8 +1742,8 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
  
     PERL_ARGS_ASSERT_SORTCV;
 
-    GvSV(PL_firstgv) = a;
-    GvSV(PL_secondgv) = b;
+    SVcpREPLACE(GvSV(PL_firstgv), a);
+    SVcpREPLACE(GvSV(PL_secondgv), b);
     PL_stack_sp = PL_stack_base;
     PL_op = PL_sortcop;
     CALLRUNOPS(aTHX);

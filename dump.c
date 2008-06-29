@@ -1916,7 +1916,6 @@ Perl_debop(pTHX_ const OP *o)
 	    PerlIO_printf(Perl_debug_log, "(NULL)");
 	break;
     case OP_PADSV:
-    case OP_PADHV:
 	{
 	/* print the lexical's name */
 	CV * const cv = deb_curcv(cxstack_ix);
