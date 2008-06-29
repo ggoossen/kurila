@@ -54,7 +54,7 @@ sub heavy_export {
 	    my $tagdata;
 	    my %imports;
 	    my($remove, $spec, @names, @allexports);
-	    negated first item implies starting with default set:
+	    # negated first item implies starting with default set:
 	    unshift @imports, ':DEFAULT' if @imports[0] =~ m/^!/;
 	    foreach $spec (< @imports){
 		$remove = $spec =~ s/^!//;

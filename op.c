@@ -973,7 +973,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_GV:
     case OP_SMARTMATCH:
     case OP_PADSV:
-    case OP_PADHV:
     case OP_PADANY:
     case OP_REF:
     case OP_SREFGEN:
@@ -1443,7 +1442,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	    goto nomod;
 	break;
 
-    case OP_PADHV:
     case OP_PADSV:
     case OP_ANONLIST:
     case OP_ANONHASH:
@@ -1640,7 +1638,6 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 	doref(cUNOPo->op_first, o->op_type, set_op_ref);
 	break;
 
-    case OP_PADHV:
     case OP_ANONLIST:
     case OP_ANONHASH:
 	if (set_op_ref)
@@ -1763,8 +1760,7 @@ S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
     if (!attrs)
 	return;
 
-    assert(target->op_type == OP_PADSV ||
-	   target->op_type == OP_PADHV);
+    assert(target->op_type == OP_PADSV);
 
     /* Ensure that attributes.pm is loaded. */
     apply_attrs(stash, PAD_SV(target->op_targ), attrs, TRUE);
@@ -1898,7 +1894,6 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 	return o;
     }
     else if (type != OP_PADSV &&
-	     type != OP_PADHV &&
 	     type != OP_PUSHMARK)
     {
 	yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
@@ -1987,8 +1982,7 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 
     PERL_ARGS_ASSERT_BIND_MATCH;
 
-    if ( (ltype == OP_RV2AV || ltype == OP_RV2HV
-	  || ltype == OP_PADHV) && ckWARN(WARN_MISC))
+    if ( (ltype == OP_RV2AV || ltype == OP_RV2HV) && ckWARN(WARN_MISC))
     {
       const char * const desc
 	  = PL_op_desc[(rtype == OP_SUBST)
@@ -3096,7 +3090,6 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 			    break;
 		    }
 		    else if (curop->op_type == OP_PADSV ||
-			     curop->op_type == OP_PADHV ||
 			     curop->op_type == OP_PADANY)
 		    {
 			repl_has_vars = 1;
@@ -3602,7 +3595,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 		}
 
 		if (lop->op_type == OP_PADSV ||
-		    lop->op_type == OP_PADHV ||
 		    lop->op_type == OP_PADANY) {
 		    if (!(lop->op_private & OPpLVAL_INTRO))
 			maybe_common_vars = TRUE;
@@ -3633,7 +3625,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	}
 	else if ((left->op_private & OPpLVAL_INTRO)
 		&& (   left->op_type == OP_PADSV
-		    || left->op_type == OP_PADHV
 		    || left->op_type == OP_PADANY))
 	{
 	    maybe_common_vars = FALSE;
@@ -3679,7 +3670,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 			GvASSIGN_GENERATION_set(gv, PL_generation);
 		    }
 		    else if (curop->op_type == OP_PADSV ||
-			     curop->op_type == OP_PADHV ||
 			     curop->op_type == OP_PADANY)
 		    {
 			if (PAD_COMPNAME_GEN(curop->op_targ)
@@ -3894,8 +3884,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 		    && (( o2 = o2->op_sibling)) )
 	    )
 		o2 = other;
-	    if ((o2->op_type == OP_PADSV
-			|| o2->op_type == OP_PADHV)
+	    if ((o2->op_type == OP_PADSV)
 		&& o2->op_private & OPpLVAL_INTRO
 		&& !(o2->op_private & OPpPAD_STATE)
 		&& ckWARN(WARN_DEPRECATED))
@@ -4429,8 +4418,7 @@ S_ref_array_or_hash(pTHX_ OP *cond)
 {
     if (cond
     && (cond->op_type == OP_RV2AV
-    ||  cond->op_type == OP_RV2HV
-    ||  cond->op_type == OP_PADHV))
+    ||  cond->op_type == OP_RV2HV))
 
 	return newUNOP(OP_SREFGEN,
 		       0, mod(cond, OP_SREFGEN));
@@ -5550,7 +5538,7 @@ Perl_newHVREF(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[OP_PADSV];
 	return o;
     }
-    else if (o->op_type == OP_RV2HV || o->op_type == OP_PADHV || o->op_type == OP_ANONHASH) {
+    else if (o->op_type == OP_RV2HV || o->op_type == OP_ANONHASH) {
 	yyerror(Perl_form(aTHX_ "Hash may not be used as a reference"));
     }
     return newUNOP(OP_RV2HV, 0, scalar(o));
@@ -5659,7 +5647,6 @@ Perl_ck_spair(pTHX_ OP *o)
 	if (newop) {
 	    const OPCODE type = newop->op_type;
 	    if (newop->op_sibling || !(PL_opargs[type] & OA_RETSCALAR) ||
-		    type == OP_PADHV ||
 		    type == OP_RV2AV || type == OP_RV2HV)
 		return o;
 	}
@@ -6451,12 +6438,6 @@ Perl_ck_defined(pTHX_ OP *o)		/* 19990527 MJD */
 	       to work.   Do not break Tk.
 	       */
 	    break;                      /* Globals via GV can be undef */
-	case OP_PADHV:
-	    Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
-			"defined(%%hash) is deprecated");
-	    Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
-			"\t(Maybe you should just omit the defined()?)\n");
-	    break;
 	default:
 	    /* no warning */
 	    break;

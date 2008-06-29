@@ -10933,7 +10933,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
     case OP_RV2AV:
     case OP_RV2HV:
       {
-	const bool hash = (obase->op_type == OP_PADHV || obase->op_type == OP_RV2HV);
+	const bool hash = (obase->op_type == OP_RV2HV);
 	I32 index = 0;
 	SV *keysv = NULL;
 	int subscript_type = FUV_SUBSCRIPT_WITHIN;
@@ -11356,6 +11356,9 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_stashcache);
     SvTMPREFCNT_inc(PL_patchlevel);
     SvTMPREFCNT_inc(PL_compiling.cop_hints_hash);
+    SvTMPREFCNT_inc(PL_firstgv);
+    SvTMPREFCNT_inc(PL_secondgv);
+    SvTMPREFCNT_inc(PL_sortstash);
 
     {
 	PERL_SI *si;

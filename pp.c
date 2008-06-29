@@ -54,30 +54,6 @@ PP(pp_stub)
     RETURN;
 }
 
-/* Pushy stuff. */
-
-PP(pp_padav)
-{
-    dVAR; dSP; dTARGET;
-    if (PL_op->op_private & OPpLVAL_INTRO)
-	if (!(PL_op->op_private & OPpPAD_STATE))
-	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
-    EXTEND(SP, 1);
-    PUSHs( TARG );
-    RETURN;
-}
-
-PP(pp_padhv)
-{
-    dVAR; dSP; dTARGET;
-
-    XPUSHs(TARG);
-    if (PL_op->op_private & OPpLVAL_INTRO)
-	if (!(PL_op->op_private & OPpPAD_STATE))
-	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
-    RETURN;
-}
-
 /* Translations. */
 
 PP(pp_rv2gv)
