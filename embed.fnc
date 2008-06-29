@@ -796,7 +796,7 @@ Ap	|SV**	|stack_grow	|NN SV** sp|NN SV** p|int n
 Ap	|I32	|start_subparse	|U32 flags
 p	|void	|sub_crush_depth|NN CV* cv
 Apd	|bool	|sv_2bool	|NN SV *const sv
-Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN HV **const st|NN GV **const gvp|const I32 lref
+Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN GV **const gvp|const I32 lref
 Apd	|IO*	|sv_2io		|NN SV *const sv
 Amb	|IV	|sv_2iv		|NULLOK SV *const sv
 Apd	|IV	|sv_2iv_flags	|NULLOK SV *const sv|const I32 flags

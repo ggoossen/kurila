@@ -213,7 +213,6 @@ PP(pp_rv2cv)
 {
     dVAR; dSP;
     GV *gv;
-    HV *stash_unused;
     const I32 flags = (PL_op->op_flags & OPf_SPECIAL)
 	? 0
 	: ((PL_op->op_private & (OPpLVAL_INTRO|OPpMAY_RETURN_CONSTANT)) == OPpMAY_RETURN_CONSTANT)
@@ -222,7 +221,7 @@ PP(pp_rv2cv)
     /* We usually try to add a non-existent subroutine in case of AUTOLOAD. */
     /* (But not in defined().) */
 
-    CV *cv = sv_2cv(TOPs, &stash_unused, &gv, flags);
+    CV *cv = sv_2cv(TOPs, &gv, flags);
     if (cv) {
 	if (CvCLONE(cv))
 	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
@@ -243,7 +242,6 @@ PP(pp_prototype)
 {
     dVAR; dSP;
     CV *cv;
-    HV *stash;
     GV *gv;
     SV *ret = &PL_sv_undef;
 
@@ -307,7 +305,7 @@ PP(pp_prototype)
 	    }
 	}
     }
-    cv = sv_2cv(TOPs, &stash, &gv, 0);
+    cv = sv_2cv(TOPs, &gv, 0);
     if (cv && SvPOK(cv))
 	ret = newSVpvn_flags(SvPVX_const(cv), SvCUR(cv), SVs_TEMP);
   set:
@@ -3545,7 +3543,7 @@ PP(pp_exists)
     if (PL_op->op_private & OPpEXISTS_SUB) {
 	GV *gv;
 	SV * const sv = POPs;
-	CV * const cv = sv_2cv(sv, &hv, &gv, 0);
+	CV * const cv = sv_2cv(sv, &gv, 0);
 	if (cv)
 	    RETPUSHYES;
 	if (gv && isGV(gv) && GvCV(gv) && !GvCVGEN(gv))

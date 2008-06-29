@@ -1473,7 +1473,6 @@ PP(pp_sort)
     register SV **p1 = ORIGMARK+1, **p2;
     register I32 max, i;
     AV* av = NULL;
-    HV *stash;
     GV *gv;
     CV *cv = NULL;
     I32 gimme = GIMME;
@@ -1510,10 +1509,9 @@ PP(pp_sort)
 	    kid = kUNOP->op_first;			/* pass rv2gv */
 	    kid = kUNOP->op_first;			/* pass leave */
 	    PL_sortcop = kid->op_next;
-	    stash = CopSTASH(PL_curcop);
 	}
 	else {
-	    cv = sv_2cv(*++MARK, &stash, &gv, 0);
+	    cv = sv_2cv(*++MARK, &gv, 0);
 	    if (cv && SvPOK(cv)) {
 		const char * const proto = SvPV_nolen_const((SV*)cv);
 		if (proto && strEQ(proto, "$$")) {
@@ -1543,7 +1541,6 @@ PP(pp_sort)
     }
     else {
 	PL_sortcop = NULL;
-	stash = CopSTASH(PL_curcop);
     }
 
     /* optimiser converts "@a = sort @a" to "sort \@a";
@@ -1636,10 +1633,8 @@ PP(pp_sort)
 	    if (!hasargs && !is_xsub) {
 		SAVESPTR(PL_firstgv);
 		SAVESPTR(PL_secondgv);
-		SAVESPTR(PL_sortstash);
 		SVcpREPLACE(PL_firstgv, gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV));
 		SVcpREPLACE(PL_secondgv, gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV));
-		SVcpREPLACE(PL_sortstash, stash);
 		SAVESPTR(GvSV(PL_firstgv));
 		SAVESPTR(GvSV(PL_secondgv));
 	    }

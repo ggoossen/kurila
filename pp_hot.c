@@ -2368,8 +2368,7 @@ PP(pp_entersub)
 	/* This is overwhelming the most common case:  */
     case SVt_PVGV:
 	if (!(cv = GvCVu((GV*)sv))) {
-	    HV *stash;
-	    cv = sv_2cv(sv, &stash, &gv, 0);
+	    cv = sv_2cv(sv, &gv, 0);
 	}
 	if (!cv) {
 	    SV* sub_name = sv_newmortal();

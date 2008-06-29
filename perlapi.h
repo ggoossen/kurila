@@ -554,8 +554,6 @@ END_EXTERN_C
 #define PL_sort_RealCmp		(*Perl_Isort_RealCmp_ptr(aTHX))
 #undef  PL_sortcop
 #define PL_sortcop		(*Perl_Isortcop_ptr(aTHX))
-#undef  PL_sortstash
-#define PL_sortstash		(*Perl_Isortstash_ptr(aTHX))
 #undef  PL_splitstr
 #define PL_splitstr		(*Perl_Isplitstr_ptr(aTHX))
 #undef  PL_srand_called

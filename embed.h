@@ -2127,7 +2127,6 @@
 #define pp_ord			Perl_pp_ord
 #define pp_pack			Perl_pp_pack
 #define pp_padany		Perl_pp_padany
-#define pp_padhv		Perl_pp_padhv
 #define pp_padsv		Perl_pp_padsv
 #define pp_pipe_op		Perl_pp_pipe_op
 #define pp_pop			Perl_pp_pop
@@ -3031,7 +3030,7 @@
 #define sub_crush_depth(a)	Perl_sub_crush_depth(aTHX_ a)
 #endif
 #define sv_2bool(a)		Perl_sv_2bool(aTHX_ a)
-#define sv_2cv(a,b,c,d)		Perl_sv_2cv(aTHX_ a,b,c,d)
+#define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
 #define sv_2iv_flags(a,b)	Perl_sv_2iv_flags(aTHX_ a,b)
 #define sv_2mortal(a)		Perl_sv_2mortal(aTHX_ a)
@@ -4353,7 +4352,6 @@
 #define pp_ord()		Perl_pp_ord(aTHX)
 #define pp_pack()		Perl_pp_pack(aTHX)
 #define pp_padany()		Perl_pp_padany(aTHX)
-#define pp_padhv()		Perl_pp_padhv(aTHX)
 #define pp_padsv()		Perl_pp_padsv(aTHX)
 #define pp_pipe_op()		Perl_pp_pipe_op(aTHX)
 #define pp_pop()		Perl_pp_pop(aTHX)

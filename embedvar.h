@@ -259,7 +259,6 @@
 #define PL_slabs		(vTHX->Islabs)
 #define PL_sort_RealCmp		(vTHX->Isort_RealCmp)
 #define PL_sortcop		(vTHX->Isortcop)
-#define PL_sortstash		(vTHX->Isortstash)
 #define PL_splitstr		(vTHX->Isplitstr)
 #define PL_srand_called		(vTHX->Isrand_called)
 #define PL_stack_base		(vTHX->Istack_base)
@@ -554,7 +553,6 @@
 #define PL_Islabs		PL_slabs
 #define PL_Isort_RealCmp	PL_sort_RealCmp
 #define PL_Isortcop		PL_sortcop
-#define PL_Isortstash		PL_sortstash
 #define PL_Isplitstr		PL_splitstr
 #define PL_Isrand_called	PL_srand_called
 #define PL_Istack_base		PL_stack_base

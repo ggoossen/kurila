@@ -6616,14 +6616,14 @@ Perl_sv_2io(pTHX_ SV *const sv)
 =for apidoc sv_2cv
 
 Using various gambits, try to get a CV from an SV; in addition, try if
-possible to set C<*st> and C<*gvp> to the stash and GV associated with it.
+possible to set C<*gvp> to the GV associated with it.
 The flags in C<lref> are passed to sv_fetchsv.
 
 =cut
 */
 
 CV *
-Perl_sv_2cv(pTHX_ SV *sv, HV **const st, GV **const gvp, const I32 lref)
+Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 {
     dVAR;
     GV *gv = NULL;
@@ -6632,24 +6632,20 @@ Perl_sv_2cv(pTHX_ SV *sv, HV **const st, GV **const gvp, const I32 lref)
     PERL_ARGS_ASSERT_SV_2CV;
 
     if (!sv) {
-	*st = NULL;
 	*gvp = NULL;
 	return NULL;
     }
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
-	*st = CvSTASH(sv);
 	*gvp = NULL;
 	return (CV*)sv;
     case SVt_PVHV:
     case SVt_PVAV:
-	*st = NULL;
 	*gvp = NULL;
 	return NULL;
     case SVt_PVGV:
 	gv = (GV*)sv;
 	*gvp = gv;
-	*st = GvESTASH(gv);
 	goto fix_gv;
 
     default:
@@ -6662,7 +6658,6 @@ Perl_sv_2cv(pTHX_ SV *sv, HV **const st, GV **const gvp, const I32 lref)
 	    if (SvTYPE(sv) == SVt_PVCV) {
 		cv = (CV*)sv;
 		*gvp = NULL;
-		*st = CvSTASH(cv);
 		return cv;
 	    }
 	    else if(isGV(sv))
@@ -6676,15 +6671,12 @@ Perl_sv_2cv(pTHX_ SV *sv, HV **const st, GV **const gvp, const I32 lref)
 	    gv = gv_fetchsv(sv, lref, SVt_PVCV);
 	*gvp = gv;
 	if (!gv) {
-	    *st = NULL;
 	    return NULL;
 	}
 	/* Some flags to gv_fetchsv mean don't really create the GV  */
 	if (SvTYPE(gv) != SVt_PVGV) {
-	    *st = NULL;
 	    return NULL;
 	}
-	*st = GvESTASH(gv);
     fix_gv:
 	if (lref && !GvCVu(gv)) {
 	    SV *tmpsv;
@@ -11361,7 +11353,6 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_compiling.cop_hints_hash);
     SvTMPREFCNT_inc(PL_firstgv);
     SvTMPREFCNT_inc(PL_secondgv);
-    SvTMPREFCNT_inc(PL_sortstash);
 
     {
 	PERL_SI *si;

@@ -138,7 +138,6 @@ PERLVAR(Ilastgotoprobe,	OP*)		/* from pp_ctl.c */
 
 /* sort stuff */
 PERLVAR(Isortcop,	OP *)		/* user defined sort routine */
-PERLVAR(Isortstash,	HV *)		/* which is in some package or other */
 PERLVAR(Ifirstgv,	GV *)		/* $a */
 PERLVAR(Isecondgv,	GV *)		/* $b */
 
