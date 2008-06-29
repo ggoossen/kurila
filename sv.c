@@ -178,6 +178,7 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	VALGRIND_MAKE_MEM_UNDEFINED(p, sizeof(SV));     \
         VALGRIND_MEMPOOL_FREE(&PL_sv_arenaroot, p);            \
 	VALGRIND_MAKE_MEM_DEFINED(&SvARENA_CHAIN(p), sizeof(void*));	\
+	VALGRIND_MAKE_MEM_NOACCESS(&SvARENA_CHAIN(p), sizeof(void*));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
 	PL_sv_root = (p); /* Disable to do memory debugging */	\
@@ -187,7 +188,9 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 #define uproot_SV(p) \
     STMT_START {					\
 	(p) = PL_sv_root;				\
+	VALGRIND_MAKE_MEM_DEFINED(&SvARENA_CHAIN(p), sizeof(void*));	\
 	PL_sv_root = (SV*)SvARENA_CHAIN(p);		\
+	VALGRIND_MAKE_MEM_NOACCESS(&SvARENA_CHAIN(p), sizeof(void*));	\
 	++PL_sv_count;					\
     } STMT_END
 

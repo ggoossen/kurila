@@ -2139,7 +2139,6 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     /* switch to eval mode */
 
     if (IN_PERL_COMPILETIME) {
-	SAVECOPSTASH_FREE(&PL_compiling);
 	CopSTASH_set(&PL_compiling, PL_curstash);
     }
     if (PERLDB_NAMEEVAL && CopLINE(PL_curcop)) {

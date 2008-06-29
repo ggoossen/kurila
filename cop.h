@@ -194,7 +194,6 @@ struct cop {
 #  define CopLABEL(c)		((c)->cop_label)
 #  define CopLABEL_set(c,pv)	(CopLABEL(c) = (pv))
 #  ifdef NETWARE
-#    define CopSTASH_free(c) SAVECOPSTASH_FREE(c)
 #    define CopFILE_free(c) SAVECOPFILE_FREE(c)
 #    define CopLABEL_free(c) SAVECOPLABEL_FREE(c)
 #    define CopLABEL_alloc(pv)	((pv)?savepv(pv):NULL)

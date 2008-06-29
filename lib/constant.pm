@@ -29,9 +29,6 @@ sub import {
     my $constants;
     my $multiple  = ref @_[0];
     my $pkg = caller;
-    my $symtab;
-
-    $symtab = \%{*{Symbol::fetch_glob($pkg . '::')}};
 
     if ( $multiple ) {
 	if (ref @_[0] ne 'HASH') {
