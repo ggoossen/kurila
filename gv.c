@@ -265,7 +265,6 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	assert(SvTYPE(GvCV(gv)) == SVt_PVCV);
 	CvGV(GvCV(gv)) = gv;
 	CvFILE_set_from_cop(GvCV(gv), PL_curcop);
-	CvSTASH(GvCV(gv)) = PL_curstash;
 	if (proto) {
 	    sv_usepvn_flags((SV*)GvCV(gv), proto, protolen,
 			    SV_HAS_TRAILING_NUL);

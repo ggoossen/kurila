@@ -165,7 +165,7 @@ Null HV pointer.
 
 =for apidoc Am|char*|HvNAME|HV* stash
 Returns the package name of a stash, or NULL if C<stash> isn't a stash.
-See C<SvSTASH>, C<CvSTASH>.
+See C<SvSTASH>.
 
 =for apidoc Am|void*|HeKEY|HE* he
 Returns the actual pointer stored in the key slot of the hash entry. The
