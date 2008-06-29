@@ -25,7 +25,6 @@ foreach my $const (qw(
 		      CVf_METHOD
 		      CVf_NODEBUG
 		      CVf_UNIQUE
-		      CVf_WEAKOUTSIDE
 		      GVf_IMPORTED_AV
 		      GVf_IMPORTED_CV
 		      GVf_IMPORTED_HV

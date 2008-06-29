@@ -4381,7 +4381,6 @@ EXTCONST char* const PL_block_type[] = {
 	"LOOP_LAZYSV",
 	"LOOP_LAZYIV",
 	"SUB",
-	"FORMAT",
 	"EVAL",
 	"SUBST"
 };

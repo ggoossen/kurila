@@ -835,7 +835,6 @@ dorassign	defined or assignment (//=)	ck_null		s|
 method		method lookup		ck_method	d1
 entersub	subroutine entry	ck_subr		dmt1	L
 leavesub	subroutine exit		ck_null		1	
-leavesublv	lvalue subroutine return	ck_null		1	
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L
 die		die			ck_die		dimst@	L

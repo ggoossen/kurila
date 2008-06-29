@@ -2216,7 +2216,18 @@ PP(pp_leavesub)
     cxstack_ix++; /* temporarily protect top context */
 
     TAINT_NOT;
-    if (gimme == G_SCALAR) {
+    if (gimme == G_VOID) {
+	MARK = newsp + 1;
+	if (MARK <= SP) {
+	    if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
+		FREETMPS;
+	    }
+	}
+	MEXTEND(MARK, 0);
+	*MARK = &PL_sv_undef;
+	SP = MARK;
+    }
+    else if (gimme == G_SCALAR) {
 	MARK = newsp + 1;
 	if (MARK <= SP) {
 	    if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
@@ -2246,99 +2257,6 @@ PP(pp_leavesub)
 	    if (!SvTEMP(*MARK)) {
 		*MARK = sv_mortalcopy(*MARK);
 		TAINT_NOT;	/* Each item is independent */
-	    }
-	}
-    }
-    PUTBACK;
-
-    LEAVE;
-    cxstack_ix--;
-    POPSUB(cx,sv);	/* Stack values are safe: release CV and @_ ... */
-    PL_curpm = newpm;	/* ... and pop $1 et al */
-
-    LEAVESUB(sv);
-    return cx->blk_sub.retop;
-}
-
-/* This duplicates the above code because the above code must not
- * get any slower by more conditions */
-PP(pp_leavesublv)
-{
-    dVAR; dSP;
-    SV **mark;
-    SV **newsp;
-    PMOP *newpm;
-    I32 gimme;
-    register PERL_CONTEXT *cx;
-    SV *sv;
-
-    if (CxMULTICALL(&cxstack[cxstack_ix]))
-	return 0;
-
-    POPBLOCK(cx,newpm);
-    cxstack_ix++; /* temporarily protect top context */
-
-    TAINT_NOT;
-
-    if (CxLVAL(cx) & OPpENTERSUB_INARGS) {
-	/* We are an argument to a function or grep().
-	 * This kind of lvalueness was legal before lvalue
-	 * subroutines too, so be backward compatible:
-	 * cannot report errors.  */
-
-	/* Scalar context *is* possible, on the LHS of -> only,
-	 * as in f()->meth().  But this is not an lvalue. */
-	if (gimme == G_SCALAR)
-	    goto temporise;
-	if (gimme == G_ARRAY) {
-	    goto temporise_array;
-	}
-    }
-    else if (CxLVAL(cx)) {     /* Leave it as it is if we can. */
-	/* Here we go for robustness, not for speed, so we change all
-	 * the refcounts so the caller gets a live guy. Cannot set
-	 * TEMP, so sv_2mortal is out of question. */
-	LEAVE;
-	cxstack_ix--;
-	POPSUB(cx,sv);
-	PL_curpm = newpm;
-	LEAVESUB(sv);
-	DIE(aTHX_ "Can't modify non-lvalue subroutine call");
-    }
-    else {
-	if (gimme == G_SCALAR) {
-	  temporise:
-	    MARK = newsp + 1;
-	    if (MARK <= SP) {
-		if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
-		    if (SvTEMP(TOPs)) {
-			*MARK = SvREFCNT_inc(TOPs);
-			FREETMPS;
-			sv_2mortal(*MARK);
-		    }
-		    else {
-			sv = SvREFCNT_inc(TOPs); /* FREETMPS could clobber it */
-			FREETMPS;
-			*MARK = sv_mortalcopy(sv);
-			SvREFCNT_dec(sv);
-		    }
-		}
-		else
-		    *MARK = SvTEMP(TOPs) ? TOPs : sv_mortalcopy(TOPs);
-	    }
-	    else {
-		MEXTEND(MARK, 0);
-		*MARK = &PL_sv_undef;
-	    }
-	    SP = MARK;
-	}
-	else if (gimme == G_ARRAY) {
-	  temporise_array:
-	    for (MARK = newsp + 1; MARK <= SP; MARK++) {
-		if (!SvTEMP(*MARK)) {
-		    *MARK = sv_mortalcopy(*MARK);
-		    TAINT_NOT;  /* Each item is independent */
-		}
 	    }
 	}
     }

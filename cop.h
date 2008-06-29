@@ -517,8 +517,8 @@ struct block {
 	cx->blk_oldscopesp	= PL_scopestack_ix,			\
 	cx->blk_oldpm		= PL_curpm,				\
 	cx->blk_gimme		= (U8)gimme;				\
-	DEBUG_l( PerlIO_printf(Perl_debug_log, "Entering block %ld, type %s\n",	\
-		    (long)cxstack_ix, PL_block_type[CxTYPE(cx)]); )
+	DEBUG_l( PerlIO_printf(Perl_debug_log, "Entering block %ld, type %s, gimme %d\n",	\
+			       (long)cxstack_ix, PL_block_type[CxTYPE(cx)], gimme); )
 
 /* Exit a block (RETURN and LAST). */
 #define POPBLOCK(cx,pm) cx = &cxstack[cxstack_ix--],			\
@@ -529,8 +529,8 @@ struct block {
 	pm		 = cx->blk_oldpm,				\
 	gimme		 = cx->blk_gimme;				\
 	DEBUG_SCOPE("POPBLOCK");					\
-	DEBUG_l( PerlIO_printf(Perl_debug_log, "Leaving block %ld, type %s\n",		\
-		    (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)]); )
+	DEBUG_l( PerlIO_printf(Perl_debug_log, "Leaving block %ld, type %s, gimme %d\n",		\
+			       (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)], gimme); )
 
 /* Continue a block elsewhere (NEXT and REDO). */
 #define TOPBLOCK(cx) cx  = &cxstack[cxstack_ix],			\

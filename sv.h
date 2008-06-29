@@ -222,8 +222,10 @@ perform the upgrade if necessary.  See C<svtype>.
 #  define SvREFCNT_inc(sv)		\
     ({					\
 	SV * const _sv = (SV*)(sv);	\
-	if (_sv)			\
+	if (_sv) {				\
+	    assert(SvTYPE(_sv) != SVTYPEMASK);	\
 	     (SvREFCNT(_sv))++;		\
+        }  \
 	_sv;				\
     })
 #  define SvREFCNT_inc_simple(sv)	\
@@ -258,8 +260,10 @@ perform the upgrade if necessary.  See C<svtype>.
 #  define SvTMPREFCNT_inc(sv)		\
     ({					\
 	SV * const _sv = (SV*)(sv);	\
-	if (_sv)			\
+	if (_sv) {			\
+	    if(SvTYPE(_sv) == SVTYPEMASK) sleep(200);	\
 	     (SvTMPREFCNT(_sv))++;		\
+        } \
 	_sv;				\
     })
 
@@ -275,8 +279,8 @@ perform the upgrade if necessary.  See C<svtype>.
 	SV * const _sv = (SV*)(sv);	\
 	if (_sv) {			\
 	    if (SvREFCNT(_sv)) {	\
-		if (--(SvREFCNT(_sv)) == 0) \
-		    Perl_sv_free2(aTHX_ _sv);	\
+		if (--(SvREFCNT(_sv)) == 0) {			\
+		    Perl_sv_free2(aTHX_ _sv);	} 		\
 	    } else {			\
 		sv_free(_sv);		\
 	    }				\
