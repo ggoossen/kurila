@@ -360,6 +360,8 @@ Perl_yyparse (pTHX)
 
     yystate = ps->state;
 
+    DEBUG_R(refcnt_check());
+
     YYDPRINTF ((Perl_debug_log, "Entering state %d\n", yystate));
 
 #ifndef DISABLE_STACK_FREE

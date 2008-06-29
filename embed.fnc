@@ -609,6 +609,7 @@ ApP	|char*	|ninstr		|NN const char* big|NN const char* bigend \
 				|NN const char* little|NN const char* lend
 pr	|OP*	|oopsCV		|NN OP* o
 Ap	|void	|op_free	|NULLOK OP* arg
+Ap	|void	|op_tmprefcnt	|NULLOK OP* arg
 #ifdef PERL_MAD
 p	|OP*	|package	|NN OP* o
 #else

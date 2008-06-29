@@ -862,7 +862,6 @@ perl_destruct(pTHXx)
 /*     while (sv_clean_all() > 3) */
 /* 	; */
 
- /*    AvREAL_off(PL_fdpid);		/\* no surviving entries *\/ */
     SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
     PL_fdpid = NULL;
 
@@ -1404,7 +1403,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     SAVEFREESV(sv);
     init_main_stash();
 
-    Perl_refcnt_check(aTHX);
+    DEBUG_R(refcnt_check());
 
     PL_isarev = newHV();
 
@@ -3213,9 +3212,7 @@ S_init_main_stash(pTHX)
        table, so it's a small saving to use it rather than allocate another
        8 bytes.  */
     PL_curstname = newSVpvs_share("main");
-    Perl_refcnt_check(aTHX);
     gv = gv_fetchpvs("main::", GV_ADD|GV_NOTQUAL, SVt_PVHV);
-    Perl_refcnt_check(aTHX);
     SVcpREPLACE(PL_curstash, GvHV(gv));
     hv_name_set(PL_curstash, "main", 4, 0);
     /* If we hadn't caused another reference to "main" to be in the shared

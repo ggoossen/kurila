@@ -593,6 +593,7 @@
 #define oopsCV			Perl_oopsCV
 #endif
 #define op_free			Perl_op_free
+#define op_tmprefcnt		Perl_op_tmprefcnt
 #ifdef PERL_MAD
 #ifdef PERL_CORE
 #define package			Perl_package
@@ -2809,6 +2810,7 @@
 #define oopsCV(a)		Perl_oopsCV(aTHX_ a)
 #endif
 #define op_free(a)		Perl_op_free(aTHX_ a)
+#define op_tmprefcnt(a)		Perl_op_tmprefcnt(aTHX_ a)
 #ifdef PERL_MAD
 #ifdef PERL_CORE
 #define package(a)		Perl_package(aTHX_ a)

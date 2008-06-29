@@ -367,7 +367,7 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 	    SAVESPTR(DEFSV) ;					\
             if (name[7] == 's')                                 \
                 arg = newSVsv(arg);                             \
-	    DEFSV = arg ;					\
+	    SVcpREPLACE(DEFSV, arg);				\
 	    SvTEMP_off(arg) ;					\
 	    PUSHMARK(SP) ;					\
 	    PUTBACK ;						\

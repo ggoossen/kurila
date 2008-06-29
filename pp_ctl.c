@@ -882,8 +882,7 @@ Perl_die_where(pTHX_ SV *msv)
     PERL_ARGS_ASSERT_DIE_WHERE;
 
     if (ERRSV != msv) {
-	SvREFCNT_dec(ERRSV);
-	ERRSV = SvREFCNT_inc(msv);
+	SVcpREPLACE(ERRSV, msv);
     }
 
     if (PL_in_eval) {
@@ -2350,8 +2349,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 		       (*msg ? msg : "Unknown error\n"));
 	}
 	else {
-	    SV *msv;
-
 	    dSP;
 	    ENTER;
 	    PUSHSTACKi(PERLSI_DIEHOOK);
@@ -2361,9 +2358,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
-	    msv = SvREFCNT_inc(POPs);
-	    SvREFCNT_dec(ERRSV);
-	    ERRSV = msv;
+	    SVcpREPLACE(ERRSV, POPs);
 	    PUTBACK;
 
 	    POPSTACK;
@@ -3110,6 +3105,8 @@ PP(pp_entergiven)
     ENTER;
     SAVETMPS;
 
+    assert(0);
+
     if (PL_op->op_targ == 0) {
 	SV ** const defsv_p = &GvSV(PL_defgv);
 	*defsv_p = newSVsv(POPs);
@@ -3765,7 +3762,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	SAVETMPS;
 	EXTEND(SP, 2);
 
-	DEFSV = upstream;
+	SVcpREPLACE(DEFSV, upstream);
 	PUSHMARK(SP);
 	mPUSHi(0);
 	if (filter_state) {

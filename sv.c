@@ -11323,7 +11323,7 @@ static void
 do_check_tmprefcnt(pTHX_ SV* const sv)
 {
     if (SvTMPREFCNT(sv) > SvREFCNT(sv)) {
-	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least(%ld)\n", 
+	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least (%ld)\n", 
 		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
 	sv_dump(sv);
 	visit(do_reset_tmprefcnt, 0, 0);
@@ -11336,6 +11336,7 @@ Perl_refcnt_check(pTHX)
 {
     visit(do_reset_tmprefcnt, 0, 0);
     visit(do_sv_tmprefcnt, 0, 0);
+    SvTMPREFCNT_inc(PL_defstash);
     SvTMPREFCNT_inc(PL_curstash);
     SvTMPREFCNT_inc(PL_defgv);
     SvTMPREFCNT_inc(PL_compcv);
@@ -11345,6 +11346,31 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_unitcheckav);
     SvTMPREFCNT_inc(PL_last_in_gv);
     SvTMPREFCNT_inc(PL_rs);
+    SvTMPREFCNT_inc(PL_fdpid);
+    SvTMPREFCNT_inc(PL_modglobal);
+    SvTMPREFCNT_inc(PL_errors);
+#ifdef USE_ITHREADS
+    SvTMPREFCNT_inc(PL_regex_padav);
+#endif
+    SvTMPREFCNT_inc(PL_strtab);
+    SvTMPREFCNT_inc(PL_stashcache);
+    SvTMPREFCNT_inc(PL_patchlevel);
+    SvTMPREFCNT_inc(PL_compiling.cop_hints_hash);
+
+    {
+	PERL_SI *si;
+	si = PL_curstackinfo;
+	while (si) {
+	    SvTMPREFCNT_inc(si->si_stack);
+	    si = si->si_next;
+	}
+	si = PL_curstackinfo;
+	si = si->si_prev;
+	while (si) {
+	    SvTMPREFCNT_inc(si->si_stack);
+	    si = si->si_prev;
+	}
+    }
     visit(do_check_tmprefcnt, 0, 0);
 }
 
