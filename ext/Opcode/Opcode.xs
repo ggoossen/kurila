@@ -301,7 +301,7 @@ PPCODE:
     PL_defstash = gv_stashpv(Package, GV_ADDWARN); /* should exist already	*/
 
     save_hptr(&PL_curstash);
-    PL_curstash = PL_defstash;
+    SVcpREPLACE(PL_curstash, PL_defstash);
 
     /* defstash must itself contain a main:: so we'll add that now	*/
     /* take care with the ref counts (was cause of long standing bug)	*/

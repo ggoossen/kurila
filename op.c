@@ -3231,7 +3231,7 @@ Perl_package(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_PACKAGE;
 
-    save_hptr(&PL_curstash);
+    SAVESPTR(PL_curstash);
     save_item(PL_curstname);
 
     SVcpREPLACE(PL_curstash, gv_stashsv(sv, GV_ADD));

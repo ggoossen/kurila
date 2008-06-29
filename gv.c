@@ -257,11 +257,12 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 		GvIMPORTED_CV_on(gv);
 	} else {
 	    (void) start_subparse(0);	/* Create empty CV in compcv. */
-	    GvCV(gv) = PL_compcv;
+	    GvCV(gv) = (CV*)SvREFCNT_inc((SV*)PL_compcv);
 	}
 	LEAVE;
 
         mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar($) { (shift) } sub ASDF::baz($); *ASDF::baz = \&Foo::bar */
+	assert(SvTYPE(GvCV(gv)) == SVt_PVCV);
 	CvGV(GvCV(gv)) = gv;
 	CvFILE_set_from_cop(GvCV(gv), PL_curcop);
 	CvSTASH(GvCV(gv)) = PL_curstash;
@@ -678,6 +679,7 @@ Perl_gv_stashpvn(pTHX_ const char *name, U32 namelen, I32 flags)
     if (!GvHV(tmpgv))
 	GvHV(tmpgv) = newHV();
     stash = GvHV(tmpgv);
+    assert(SvTYPE(stash) == SVt_PVHV);
     if (!HvNAME_get(stash))
 	hv_name_set(stash, name, namelen, 0);
     return stash;
@@ -785,7 +787,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (!(stash = GvHV(gv)))
 		    stash = GvHV(gv) = newHV();
 		if ( ! SvHVOK(stash) )
-		    Perl_croak(aTHX_ "stash '%s' is not a hash but %s", tmpbuf, Ddesc(stash));
+		    Perl_croak(aTHX_ "stash '%s' is not a hash but %s", tmpbuf, Ddesc((SV*)stash));
 
 		if (!HvNAME_get(stash))
 		    hv_name_set(stash, nambeg, name_cursor - nambeg, 0);
