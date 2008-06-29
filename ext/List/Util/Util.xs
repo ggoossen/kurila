@@ -132,7 +132,6 @@ CODE:
     SV *ret = sv_newmortal();
     int index;
     GV *agv,*bgv,*gv;
-    HV *stash;
     I32 gimme = G_SCALAR;
     SV **args = &PL_stack_base[ax];
     CV *cv;
@@ -140,7 +139,7 @@ CODE:
     if(items <= 1) {
 	XSRETURN_UNDEF;
     }
-    cv = sv_2cv(block, &stash, &gv, 0);
+    cv = sv_2cv(block, &gv, 0);
     PUSH_MULTICALL(cv);
     agv = gv_fetchpv("a", TRUE, SVt_PV);
     bgv = gv_fetchpv("b", TRUE, SVt_PV);
@@ -167,7 +166,6 @@ CODE:
     dVAR; dMULTICALL;
     int index;
     GV *gv;
-    HV *stash;
     I32 gimme = G_SCALAR;
     SV **args = &PL_stack_base[ax];
     CV *cv;
@@ -175,7 +173,7 @@ CODE:
     if(items <= 1) {
 	XSRETURN_UNDEF;
     }
-    cv = sv_2cv(block, &stash, &gv, 0);
+    cv = sv_2cv(block, &gv, 0);
     PUSH_MULTICALL(cv);
     SAVESPTR(GvSV(PL_defgv));
 
