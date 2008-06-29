@@ -820,8 +820,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",TARGET_MY");
     }
     else if (optype == OP_LEAVESUB ||
-	     optype == OP_LEAVE ||
-	     optype == OP_LEAVESUBLV) {
+	     optype == OP_LEAVE) {
 	if (o->op_private & OPpREFCOUNTED)
 	    sv_catpv(tmpsv, ",REFCOUNTED");
     }
@@ -872,8 +871,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 		sv_catpv(tmpsv, ",HV");
 		break;
 	    }
-	    if (o->op_private & OPpMAYBE_LVSUB)
-		sv_catpv(tmpsv, ",MAYBE_LVSUB");
 	}
 	if (optype == OP_AELEM || optype == OP_HELEM) {
 	    if (o->op_private & OPpLVAL_DEFER)
@@ -1095,7 +1092,6 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVE:
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
-    case OP_LEAVESUBLV:
     case OP_SCOPE:
 	if (o->op_private & OPpREFCOUNTED)
 	    Perl_dump_indent(aTHX_ level, file, "REFCNT = %"UVuf"\n", (UV)o->op_targ);

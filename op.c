@@ -461,7 +461,6 @@ Perl_op_free(pTHX_ OP *o)
     if (o->op_private & OPpREFCOUNTED) {
 	switch (type) {
 	case OP_LEAVESUB:
-	case OP_LEAVESUBLV:
 	case OP_LEAVEEVAL:
 	case OP_LEAVE:
 	case OP_SCOPE:
@@ -1399,15 +1398,11 @@ Perl_mod(pTHX_ OP *o, I32 type)
 /* 	if (scalar_mod_type(o, type)) */
 /* 	    goto nomod; */
 	ref(cUNOPo->op_first, o->op_type);
-	if (type == OP_LEAVESUBLV)
-	    o->op_private |= OPpMAYBE_LVSUB;
 	localize = 1;
 	PL_modcount = RETURN_UNLIMITED_NUMBER;
 	break;
     case OP_ASLICE:
     case OP_HSLICE:
-	if (type == OP_LEAVESUBLV)
-	    o->op_private |= OPpMAYBE_LVSUB;
 	localize = 1;
 	/* FALL THROUGH */
     case OP_AASSIGN:
@@ -1461,8 +1456,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	goto lvalue_func;
     case OP_POS:
     case OP_VEC:
-	if (type == OP_LEAVESUBLV)
-	    o->op_private |= OPpMAYBE_LVSUB;
       lvalue_func:
 	if (o->op_flags & OPf_KIDS)
 	    mod(cBINOPo->op_first->op_sibling, type);
@@ -1474,8 +1467,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (type == OP_ENTERSUB &&
 	     !(o->op_private & (OPpLVAL_INTRO | OPpDEREF)))
 	    o->op_private |= OPpLVAL_DEFER;
-	if (type == OP_LEAVESUBLV)
-	    o->op_private |= OPpMAYBE_LVSUB;
 	localize = 1;
 	PL_modcount++;
 	break;
@@ -1513,8 +1504,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_RETURN:
-	if (type != OP_LEAVESUBLV)
-	    goto nomod;
+	goto nomod;
 	break; /* mod()ing was handled by ck_return() */
     }
 
@@ -1525,8 +1515,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
         PL_check[o->op_type] == MEMBER_TO_FPTR(Perl_ck_ftst))
         return o;
 
-    if (type != OP_LEAVESUBLV)
-        o->op_flags |= OPf_MOD;
+    o->op_flags |= OPf_MOD;
 
     if (type == OP_AASSIGN || type == OP_SASSIGN)
 	o->op_flags |= OPf_SPECIAL|OPf_REF;
@@ -1543,8 +1532,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	    Perl_croak(aTHX_ "Can't localize %s", OP_DESC(o));
 	}
     }
-    else if (type != OP_GREPSTART && type != OP_ENTERSUB
-             && type != OP_LEAVESUBLV)
+    else if (type != OP_GREPSTART && type != OP_ENTERSUB)
 	o->op_flags |= OPf_REF;
     return o;
 }
@@ -3324,7 +3312,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	/* Fake up a method call to import/unimport */
 	meth = aver
 	    ? newSVpvs_share("import") : newSVpvs_share("unimport");
-	imop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL,
+	imop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL|OPf_WANT_VOID,
 		       append_elem(OP_LIST,
 				   prepend_elem(OP_LIST, pack, list(arg)),
 				   newSVOP(OP_METHOD_NAMED, 0, meth)));
@@ -7539,7 +7527,7 @@ Perl_peep(pTHX_ register OP *o)
 		    ((PL_op = pop->op_next)) &&
 		    pop->op_next->op_type == OP_AELEM &&
 		    !(pop->op_next->op_private &
-		      (OPpLVAL_INTRO|OPpLVAL_DEFER|OPpDEREF|OPpMAYBE_LVSUB)) &&
+		      (OPpLVAL_INTRO|OPpLVAL_DEFER|OPpDEREF)) &&
 		    (i = SvIV(((SVOP*)pop)->op_sv))
 				<= 255 &&
 		    i >= 0)

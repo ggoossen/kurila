@@ -181,9 +181,9 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	VALGRIND_MAKE_MEM_NOACCESS(&SvARENA_CHAIN(p), sizeof(void*));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
-	PL_sv_root = (p); /* Disable to do memory debugging */	\
 	--PL_sv_count;					\
     } STMT_END
+/* 	PL_sv_root = (p); /\* Disable to do memory debugging *\/	\ */
 
 #define uproot_SV(p) \
     STMT_START {					\
@@ -2561,6 +2561,7 @@ S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
 
     PERL_ARGS_ASSERT_GLOB_ASSIGN_GLOB;
 
+    Perl_croak(aTHX_ "glob to glob assignment have been removed");
     if (dtype != SVt_PVGV) {
 	const char * const name = GvNAME(sstr);
 	const STRLEN len = GvNAMELEN(sstr);
@@ -2937,6 +2938,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	}
 	if (PL_delaymagic & DM_ARRAY)
 	    SvSETMAGIC( dstr );
+	PL_delaymagic = 0;
 	
     } else if (dtype == SVt_PVHV) {
 	hv_sethv( (HV*)dstr, (HV*)sstr);
@@ -11318,6 +11320,7 @@ do_check_tmprefcnt(pTHX_ SV* const sv)
     if (SvTMPREFCNT(sv) > SvREFCNT(sv)) {
 	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least (%ld)\n", 
 		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
+	sleep(200);
 	sv_dump(sv);
 	visit(do_reset_tmprefcnt, 0, 0);
 	visit(do_sv_tmprefcnt, 0, 0);

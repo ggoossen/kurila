@@ -101,7 +101,7 @@ sub AddrRef {
   return sprintf("$class_prefix$type(0x\%x)", $addr);
 }
 
-*StrVal = *AddrRef;
+*StrVal = \&AddrRef;
 
 sub mycan {				# Real can would leave stubs.
   my ($package, $meth) = < @_;

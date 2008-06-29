@@ -582,9 +582,6 @@ before tar-ing (or shar-ing).
 
 =cut
 
-# For backwards compatibility.
-*dist_dir = *distdir;
-
 sub distdir {
     my($self) = shift;
 
