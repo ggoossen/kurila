@@ -74,6 +74,7 @@
 #define SSPOPPTR (PL_savestack[--PL_savestack_ix].any_ptr)
 #define SSPOPDPTR (PL_savestack[--PL_savestack_ix].any_dptr)
 #define SSPOPDXPTR (PL_savestack[--PL_savestack_ix].any_dxptr)
+#define SSTOPPTR(i) (PL_savestack[PL_savestack_ix - i - 1].any_ptr)
 
 /*
 =head1 Callback Functions

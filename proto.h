@@ -2254,6 +2254,7 @@ PERL_CALLCONV OP*	Perl_oopsCV(pTHX_ OP* o)
 	assert(o)
 
 PERL_CALLCONV void	Perl_op_free(pTHX_ OP* arg);
+PERL_CALLCONV void	Perl_op_tmprefcnt(pTHX_ OP* arg);
 #ifdef PERL_MAD
 PERL_CALLCONV OP*	Perl_package(pTHX_ OP* o)
 			__attribute__nonnull__(pTHX_1);

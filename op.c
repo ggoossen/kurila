@@ -512,6 +512,85 @@ Perl_op_free(pTHX_ OP *o)
 }
 
 void
+Perl_op_tmprefcnt(pTHX_ OP *o)
+{
+    dVAR;
+    OPCODE type;
+
+    if (!o)
+	return;
+    if (o->op_latefreed) {
+	return;
+    }
+
+    return;
+
+    type = o->op_type;
+
+    if (o->op_flags & OPf_KIDS) {
+        register OP *kid;
+	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling) {
+	    op_tmprefcnt(kid);
+	}
+    }
+    if (type == OP_NULL)
+	type = (OPCODE)o->op_targ;
+
+    /* COP* is not cleared by op_clear() so that we may track line
+     * numbers etc even after null() */
+    if (type == OP_NEXTSTATE || type == OP_DBSTATE) {
+	SvTMPREFCNT_inc(((COP*)o)->cop_hints_hash);
+    }
+
+ retry:
+    switch (o->op_type) {
+    case OP_NULL:	/* Was holding old type, if any. */
+	if (PL_madskills && o->op_targ != OP_NULL) {
+	    o->op_type = (optype)o->op_targ;
+	    o->op_targ = 0;
+	    goto retry;
+	}
+    case OP_ENTEREVAL:	/* Was holding hints. */
+	o->op_targ = 0;
+	break;
+    default:
+	if (!(o->op_flags & OPf_REF)
+	    || (PL_check[o->op_type] != MEMBER_TO_FPTR(Perl_ck_ftst)))
+	    break;
+	/* FALL THROUGH */
+    case OP_GVSV:
+    case OP_GV:
+    case OP_AELEMFAST:
+	if (! (o->op_type == OP_AELEMFAST && o->op_flags & OPf_SPECIAL)) {
+	    /* not an OP_PADSV replacement */
+	    SvTMPREFCNT_inc(cSVOPo->op_sv);
+	}
+	break;
+    case OP_METHOD_NAMED:
+    case OP_CONST:
+    case OP_HINTSEVAL:
+	SvTMPREFCNT_inc(cSVOPo->op_sv);
+	break;
+    case OP_GOTO:
+    case OP_NEXT:
+    case OP_LAST:
+    case OP_REDO:
+	break;
+    case OP_SUBST:
+	op_tmprefcnt(cPMOPo->op_pmreplrootu.op_pmreplroot);
+	goto clear_pmop;
+    case OP_PUSHRE:
+	SvTMPREFCNT_inc((SV*)cPMOPo->op_pmreplrootu.op_pmtargetgv);
+	/* FALL THROUGH */
+    case OP_MATCH:
+    case OP_QR:
+clear_pmop:
+	SvTMPREFCNT_inc(PM_GETRE(cPMOPo));
+	break;
+    }
+}
+
+void
 Perl_op_clear(pTHX_ OP *o)
 {
 
@@ -4595,6 +4674,9 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
 
     PERL_ARGS_ASSERT_CV_TMPREFCNT;
 
+    if (!CvISXSUB(cv) && CvROOT(cv)) {
+	op_tmprefcnt(CvROOT(cv));
+    }
     pad_tmprefcnt(cv);
 
     /* remove CvOUTSIDE unless this is an undef rather than a free */
@@ -5003,8 +5085,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	/* transfer PL_compcv to cv */
 	cv_undef(cv);
 	CvFLAGS(cv) = CvFLAGS(PL_compcv);
-	SvREFCNT_dec(CvOUTSIDE(cv));
-	CvOUTSIDE(cv) = CvOUTSIDE(PL_compcv);
+	SVcpREPLACE(CvOUTSIDE(cv), CvOUTSIDE(PL_compcv));
 	CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(PL_compcv);
 	CvOUTSIDE(PL_compcv) = 0;
 	CvPADLIST(cv) = CvPADLIST(PL_compcv);
@@ -5122,6 +5203,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
   done:
     if (PL_parser)
 	PL_parser->copline = NOLINE;
+    SvREFCNT_inc(cv);
     LEAVE_SCOPE(floor);
     return cv;
 }

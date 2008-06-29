@@ -357,9 +357,6 @@ perform the upgrade if necessary.  See C<svtype>.
 #define PRIVSHIFT 4	/* (SVp_?OK >> PRIVSHIFT) == SVf_?OK */
 
 #define SVf_AMAGIC	0x10000000  /* has magical overloaded methods */
-/* Ensure this value does not clash with the GV_ADD* flags in gv.h: */
-#define SVf_NOTUSED    0x20000000  /* was: SVf_UTF8. SvPV is UTF-8 encoded */
-					   
 
 /* Some private flags. */
 

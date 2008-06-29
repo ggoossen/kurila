@@ -49,6 +49,7 @@ Perl_av_reify
 Perl_av_shift
 Perl_av_store
 Perl_av_undef
+Perl_av_tmprefcnt
 Perl_av_unshift
 Perl_block_gimme
 Perl_call_list
@@ -122,6 +123,7 @@ Perl_form
 Perl_vform
 Perl_free_tmps
 Perl_gp_free
+Perl_gp_tmprefcnt
 Perl_gp_ref
 Perl_gv_AVadd
 Perl_gv_HVadd
@@ -163,6 +165,7 @@ Perl_hv_store
 Perl_hv_store_ent
 Perl_hv_store_flags
 Perl_hv_undef
+Perl_hv_tmprefcnt
 Perl_ibcmp
 Perl_ibcmp_locale
 Perl_ibcmp_utf8
@@ -348,6 +351,7 @@ Perl_vstringify
 Perl_vcmp
 Perl_ninstr
 Perl_op_free
+Perl_op_tmprefcnt
 Perl_find_rundefsvoffset
 Perl_pad_sv
 Perl_reentrant_size
@@ -385,6 +389,7 @@ Perl_regdump
 Perl_pregexec
 Perl_pregfree
 Perl_pregfree2
+Perl_preg_tmprefcnt
 Perl_reg_temp_copy
 Perl_regfree_internal
 Perl_regdupe_internal

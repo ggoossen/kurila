@@ -2193,7 +2193,7 @@ PP(pp_grepwhile)
 	if (PL_op->op_private & OPpGREP_LEX)
 	    PAD_SVl(PL_op->op_targ) = src;
 	else
-	    DEFSV = src;
+	    SVcpREPLACE(DEFSV, src);
 
 	RETURNOP(cLOGOP->op_other);
     }

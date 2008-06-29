@@ -177,11 +177,11 @@ PP(pp_rv2sv)
     }
     if ( ! is_pp_rv2sv ) {
 	if (is_pp_rv2av) {
-	    if ( ! SvOK(sv) && ! SvAVOK(sv) )
+	    if ( SvOK(sv) && ! SvAVOK(sv) )
 		Perl_croak(aTHX_ "Not an ARRAY reference");
 	}
 	else {
-	    if ( ! SvOK(sv) && ! SvHVOK(sv) )
+	    if ( SvOK(sv) && ! SvHVOK(sv) )
 		Perl_croak(aTHX_ "Not a HASH reference");
 	}
     }

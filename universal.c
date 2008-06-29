@@ -882,7 +882,7 @@ XS(XS_error_create)
 	hv = (HV*)newSVrv(rv, "error"); 
 	(void)sv_upgrade((SV*)hv, SVt_PVHV); /* needs to be an HV type */
 
-	(void)hv_stores(hv, "description", SvREFCNT_inc(vs));
+	(void)hv_stores(hv, "description", newSVsv(vs));
 
 	if ( strcmp(classname,"error") != 0 ) /* inherited new() */
 	    sv_bless(rv, gv_stashpv(classname, GV_ADD));

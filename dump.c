@@ -1879,9 +1879,9 @@ Perl_runops_debug(pTHX)
 	    if (DEBUG_t_TEST_) debop(PL_op);
 	    if (DEBUG_P_TEST_) debprof(PL_op);
 	}
-	refcnt_check(aTHX);
+	DEBUG_R(refcnt_check(aTHX));
     } while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX)));
-    refcnt_check(aTHX);
+    DEBUG_R(refcnt_check(aTHX));
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 
     TAINT_NOT;

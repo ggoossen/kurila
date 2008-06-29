@@ -350,32 +350,6 @@ Perl_pad_tmprefcnt(pTHX_ CV* cv)
      * bypassing us. */
     /* XXX DAPM for efficiency, we should only do this if we know we have
      * children, or integrate this loop with general cleanup */
-
-    if (!PL_dirty) { /* don't bother during global destruction */
-	CV * const outercv = CvOUTSIDE(cv);
-        const U32 seq = CvOUTSIDE_SEQ(cv);
-	AV *  const comppad_name = (AV*)AvARRAY(padlist)[0];
-	SV ** const namepad = AvARRAY(comppad_name);
-	AV *  const comppad = (AV*)AvARRAY(padlist)[1];
-	SV ** const curpad = AvARRAY(comppad);
-	for (ix = AvFILLp(comppad_name); ix > 0; ix--) {
-	    SV * const namesv = namepad[ix];
-	    if (namesv && namesv != &PL_sv_undef
-		&& *SvPVX_const(namesv) == '&')
-	    {
-		CV * const innercv = (CV*)curpad[ix];
-		U32 inner_rc = SvREFCNT(innercv);
-		assert(inner_rc);
-		SvTMPREFCNT_inc(namesv);
-
-		if (SvREFCNT(comppad) < 2) { /* allow for /(?{ sub{} })/  */
-		    SvTMPREFCNT_inc(innercv);
-		    inner_rc--;
-		}
-	    }
-	}
-    }
-
     ix = AvFILLp(padlist);
     while (ix >= 0) {
 	const SV* const sv = AvARRAY(padlist)[ix--];
@@ -1327,8 +1301,6 @@ Perl_pad_free(pTHX_ PADOFFSET po)
 	PL_padix = po - 1;
 }
 
-
-
 /*
 =for apidoc do_dump_pad
 
@@ -1493,7 +1465,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     SAVESPTR(PL_compcv);
 
     SVcpSTEAL(PL_compcv, (CV*)newSV_type(SvTYPE(proto)));
-    cv = PL_compcv;
+    cv = SvREFCNT_inc(PL_compcv);
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
     CvCLONED_on(cv);
 
