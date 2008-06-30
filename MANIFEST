@@ -2411,8 +2411,6 @@ t/lib/Test/Simple/sample_tests/success.plx		for exit.t
 t/lib/Test/Simple/sample_tests/too_few_fail.plx		for exit.t
 t/lib/Test/Simple/sample_tests/too_few.plx		for exit.t
 t/lib/Test/Simple/sample_tests/two_fail.plx		for exit.t
-t/lib/TieIn.pm			Testing library for dummy input handles
-t/lib/TieOut.pm			Testing library to capture prints
 t/lib/warnings/1global		Tests of global warnings for warnings.t
 t/lib/warnings/2use		Tests for "use warnings" for warnings.t
 t/lib/warnings/3both		Tests for interaction of $^W and "use warnings"

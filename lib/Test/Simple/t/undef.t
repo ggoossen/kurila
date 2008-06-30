@@ -76,17 +76,17 @@ warnings_like("Use of uninitialized value.* at $Filename line 64\\.\n");
 
 my $tb = Test::More->builder;
 
-use TieOut;
-my $caught = tie *CATCH, 'TieOut';
+my $caught;
+open(*CATCH, '+<', \$caught) or die;
 my $old_fail = $tb->failure_output;
 $tb->failure_output(\*CATCH);
 diag(undef);
 $tb->failure_output($old_fail);
 
-is( $caught->read, "# undef\n" );
+is( $caught, "# undef\n" );
 no_warnings;
 
-
+$caught = "";
 $tb->maybe_regex(undef);
-is( $caught->read, '' );
+is( $caught, '' );
 no_warnings;

@@ -15,39 +15,39 @@ use Test::More tests => 13;
 # Using Symbol because it's core and exports lots of stuff.
 {
     package Foo::one;
-    ::use_ok("Symbol");
-    ::ok( defined &gensym,        'use_ok() no args exports defaults' );
+    main::use_ok("Symbol");
+    main::ok( defined &gensym,        'use_ok() no args exports defaults' );
 }
 
 {
     package Foo::two;
-    ::use_ok("Symbol", qw(qualify));
-    ::ok( !defined &gensym,       '  one arg, defaults overriden' );
-    ::ok( defined &qualify,       '  right function exported' );
+    main::use_ok("Symbol", qw(qualify));
+    main::ok( !defined &gensym,       '  one arg, defaults overriden' );
+    main::ok( defined &qualify,       '  right function exported' );
 }
 
 {
     package Foo::three;
-    ::use_ok("Symbol", qw(gensym ungensym));
-    ::ok( defined &gensym && defined &ungensym,   '  multiple args' );
+    main::use_ok("Symbol", qw(gensym ungensym));
+    main::ok( defined &gensym && defined &ungensym,   '  multiple args' );
 }
 
 {
     package Foo::four;
     my $warn; local $^WARN_HOOK = sub { $warn .= shift; };
-    ::use_ok("constant", qw(foo bar));
-    ::ok( defined &foo, 'constant' );
-    ::is( $warn, undef, 'no warning');
+    main::use_ok("constant", qw(foo bar));
+    main::ok( defined &foo, 'constant' );
+    main::is( $warn, undef, 'no warning');
 }
 
 {
     package Foo::five;
-    ::use_ok("Symbol", v1.02);
+    main::use_ok("Symbol", v1.02);
 }
 
 {
     package Foo::six;
-    ::use_ok("NoExporter", v1.02);
+    main::use_ok("NoExporter", v1.02);
 }
 
 {
@@ -56,5 +56,5 @@ use Test::More tests => 13;
         # Old perls will warn on X.YY_ZZ style versions.  Not our problem
         warn < @_ unless @_[0] =~ m/^Argument "\d+\.\d+_\d+" isn't numeric/;
     };
-    ::use_ok("Test::More", v0.47);
+    main::use_ok("Test::More", v0.47);
 }
