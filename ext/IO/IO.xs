@@ -478,59 +478,59 @@ BOOT:
      */
     stash = gv_stashpvn("IO::Poll", 8, TRUE);
 #ifdef	POLLIN
-	newCONSTSUB(stash,"POLLIN",newSViv(POLLIN));
+	newCONSTSUB("POLLIN",newSViv(POLLIN));
 #endif
 #ifdef	POLLPRI
-        newCONSTSUB(stash,"POLLPRI", newSViv(POLLPRI));
+        newCONSTSUB("POLLPRI", newSViv(POLLPRI));
 #endif
 #ifdef	POLLOUT
-        newCONSTSUB(stash,"POLLOUT", newSViv(POLLOUT));
+        newCONSTSUB("POLLOUT", newSViv(POLLOUT));
 #endif
 #ifdef	POLLRDNORM
-        newCONSTSUB(stash,"POLLRDNORM", newSViv(POLLRDNORM));
+        newCONSTSUB("POLLRDNORM", newSViv(POLLRDNORM));
 #endif
 #ifdef	POLLWRNORM
-        newCONSTSUB(stash,"POLLWRNORM", newSViv(POLLWRNORM));
+        newCONSTSUB("POLLWRNORM", newSViv(POLLWRNORM));
 #endif
 #ifdef	POLLRDBAND
-        newCONSTSUB(stash,"POLLRDBAND", newSViv(POLLRDBAND));
+        newCONSTSUB("POLLRDBAND", newSViv(POLLRDBAND));
 #endif
 #ifdef	POLLWRBAND
-        newCONSTSUB(stash,"POLLWRBAND", newSViv(POLLWRBAND));
+        newCONSTSUB("POLLWRBAND", newSViv(POLLWRBAND));
 #endif
 #ifdef	POLLNORM
-        newCONSTSUB(stash,"POLLNORM", newSViv(POLLNORM));
+        newCONSTSUB("POLLNORM", newSViv(POLLNORM));
 #endif
 #ifdef	POLLERR
-        newCONSTSUB(stash,"POLLERR", newSViv(POLLERR));
+        newCONSTSUB("POLLERR", newSViv(POLLERR));
 #endif
 #ifdef	POLLHUP
-        newCONSTSUB(stash,"POLLHUP", newSViv(POLLHUP));
+        newCONSTSUB("POLLHUP", newSViv(POLLHUP));
 #endif
 #ifdef	POLLNVAL
-        newCONSTSUB(stash,"POLLNVAL", newSViv(POLLNVAL));
+        newCONSTSUB("POLLNVAL", newSViv(POLLNVAL));
 #endif
     /*
      * constant subs for IO::Handle
      */
     stash = gv_stashpvn("IO::Handle", 10, TRUE);
 #ifdef _IOFBF
-        newCONSTSUB(stash,"_IOFBF", newSViv(_IOFBF));
+        newCONSTSUB("_IOFBF", newSViv(_IOFBF));
 #endif
 #ifdef _IOLBF
-        newCONSTSUB(stash,"_IOLBF", newSViv(_IOLBF));
+        newCONSTSUB("_IOLBF", newSViv(_IOLBF));
 #endif
 #ifdef _IONBF
-        newCONSTSUB(stash,"_IONBF", newSViv(_IONBF));
+        newCONSTSUB("_IONBF", newSViv(_IONBF));
 #endif
 #ifdef SEEK_SET
-        newCONSTSUB(stash,"SEEK_SET", newSViv(SEEK_SET));
+        newCONSTSUB("SEEK_SET", newSViv(SEEK_SET));
 #endif
 #ifdef SEEK_CUR
-        newCONSTSUB(stash,"SEEK_CUR", newSViv(SEEK_CUR));
+        newCONSTSUB("SEEK_CUR", newSViv(SEEK_CUR));
 #endif
 #ifdef SEEK_END
-        newCONSTSUB(stash,"SEEK_END", newSViv(SEEK_END));
+        newCONSTSUB("SEEK_END", newSViv(SEEK_END));
 #endif
 }
 

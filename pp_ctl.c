@@ -2287,7 +2287,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
     if (CopSTASH_ne(PL_curcop, PL_curstash)) {
 	SAVESPTR(PL_curstash);
-	SVcpREPLACE(PL_curstash, CopSTASH(PL_curcop));
+	HVcpREPLACE(PL_curstash, CopSTASH(PL_curcop));
     }
 
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */

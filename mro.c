@@ -141,19 +141,21 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
 		refcnt_check();
 		Perl_croak(aTHX_ "@ISA element which is not an plain value");
 	    }
-            HV* const isa_item_stash = gv_stashsv(isa_item, 0);
-            if(!isa_item_stash) {
-                /* if no stash, make a temporary fake MRO
-                   containing just itself */
-                AV* const isa_lin = newAV();
-                av_push(isa_lin, newSVsv(isa_item));
-                av_push(seqs, (SV*)isa_lin);
-            }
-            else {
-                /* recursion */
-                AV* const isa_lin = mro_get_linear_isa_c3(isa_item_stash, level + 1);
-                av_push(seqs, SvREFCNT_inc_simple_NN((SV*)isa_lin));
-            }
+	    {
+		HV* const isa_item_stash = gv_stashsv(isa_item, 0);
+		if(!isa_item_stash) {
+		    /* if no stash, make a temporary fake MRO
+		       containing just itself */
+		    AV* const isa_lin = newAV();
+		    av_push(isa_lin, newSVsv(isa_item));
+		    av_push(seqs, (SV*)isa_lin);
+		}
+		else {
+		    /* recursion */
+		    AV* const isa_lin = mro_get_linear_isa_c3(isa_item_stash, level + 1);
+		    av_push(seqs, SvREFCNT_inc_simple_NN((SV*)isa_lin));
+		}
+	    }
         }
         av_push(seqs, SvREFCNT_inc_simple_NN((SV*)isa));
 
@@ -474,7 +476,6 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
     const char * const stashname = HvNAME_get(stash);
     const STRLEN stashname_len = HvNAMELEN_get(stash);
 
-    assert( SvHVOK(PL_isarev) );
     SV ** const svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
     HV * const isarev = svp ? (HV*)*svp : NULL;
 

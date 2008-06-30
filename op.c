@@ -371,6 +371,7 @@ Perl_allocmy(pTHX_ const char *const name)
     dVAR;
     PADOFFSET off;
     const bool is_our = (PL_parser->in_my == KEY_our);
+    GV* ourgv = NULL;
 
     PERL_ARGS_ASSERT_ALLOCMY;
 
@@ -397,7 +398,6 @@ Perl_allocmy(pTHX_ const char *const name)
 
     /* allocate a spare slot and store the name in that slot */
 
-    GV* ourgv = NULL;
     if (is_our) {
 	                                 /* $_ is always in main::, even with our */
 	HV *  const stash = PL_curstash && !strEQ(name,"$_") ? PL_curstash : PL_defstash;
@@ -3222,7 +3222,7 @@ Perl_package(pTHX_ OP *o)
     SAVESPTR(PL_curstash);
     save_item(PL_curstname);
 
-    SVcpREPLACE(PL_curstash, gv_stashsv(sv, GV_ADD));
+    HVcpREPLACE(PL_curstash, gv_stashsv(sv, GV_ADD));
 
     sv_setsv(PL_curstname, sv);
 
@@ -4999,7 +4999,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	}
 	else {
 	    GvCV(gv) = NULL;
-	    cv = newCONSTSUB(NULL, name, const_sv);
+	    cv = newCONSTSUB(name, const_sv);
 	}
         mro_method_changed_in( /* sub Foo::Bar () { 123 } */
             (CvGV(cv) && GvSTASH(CvGV(cv)))
@@ -5057,7 +5057,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	/* transfer PL_compcv to cv */
 	cv_undef(cv);
 	CvFLAGS(cv) = CvFLAGS(PL_compcv);
-	SVcpREPLACE(CvOUTSIDE(cv), CvOUTSIDE(PL_compcv));
+	CVcpREPLACE(CvOUTSIDE(cv), CvOUTSIDE(PL_compcv));
 	CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(PL_compcv);
 	CvOUTSIDE(PL_compcv) = 0;
 	CvPADLIST(cv) = CvPADLIST(PL_compcv);
@@ -5065,14 +5065,14 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	/* inner references to PL_compcv must be fixed up ... */
 	pad_fixup_inner_anons(CvPADLIST(cv), PL_compcv, cv);
 	/* ... before we throw it away */
-	SVcpREPLACE(PL_compcv, cv);
+	CVcpREPLACE(PL_compcv, cv);
 	if (PERLDB_INTER)/* Advice debugger on the new sub. */
 	  ++PL_sub_generation;
     }
     else {
 	cv = PL_compcv;
 	if (name) {
-	    GvCV(gv) = SvREFCNT_inc(cv);
+	    GvCV(gv) = (CV*)SvREFCNT_inc(cv);
 	    if (PL_madskills) {
 		if (strEQ(name, "import")) {
 		    Perl_warner(aTHX_ packWARN(WARN_VOID), "%lx\n", (long)cv);
@@ -5255,7 +5255,7 @@ eligible for inlining at compile-time.
 */
 
 CV *
-Perl_newCONSTSUB(pTHX_ HV *stash, const char *name, SV *sv)
+Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
 {
     dVAR;
     CV* cv;

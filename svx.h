@@ -101,7 +101,6 @@ static __inline__ const char* iiSvDESC(pTHX_ SV *sv) {
 #define SvDESC(sv) iiSvDESC(aTHX_ sv)
 
 
-
 #define av_2mortal(av) inline_av_2mortal(aTHX_ av)
 static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
     return (AV*)sv_2mortal((SV*)av);
@@ -109,8 +108,7 @@ static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
 
 
 #define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
-static __inline__ void inline_SVcpREPLACE(SV**sv_d, SV*sv_s) 
-{
+static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
   SvREFCNT_inc(sv_s);
   SvREFCNT_dec(*sv_d);
   *sv_d = sv_s;
@@ -119,4 +117,20 @@ static __inline__ void inline_SVcpREPLACE(SV**sv_d, SV*sv_s)
 #define SVcpNULL(sv) { SvREFCNT_dec(sv); sv = NULL; }
 #define SVcpSTEAL(sv_d, sv_s) { SvREFCNT_dec(sv_d); sv_d = sv_s; }
 
-    
+
+#define XVcpREPLACE(XV) \
+    static __inline__ void inline_cpREPLACE_##XV( XV **sv_d, XV *sv_s) { \
+        inline_SVcpREPLACE(aTHX_ (SV**)sv_d, (SV*)sv_s);                \
+    }
+#define call_XVcpREPLACE(XV, sv_d, sv_s) inline_cpREPLACE_##XV(&sv_d, sv_s)
+
+
+XVcpREPLACE(HV)
+#define HVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(HV, sv_d, sv_s)
+XVcpREPLACE(GV)
+#define GVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(GV, sv_d, sv_s)
+XVcpREPLACE(AV)
+#define AVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(AV, sv_d, sv_s)
+XVcpREPLACE(CV)
+#define CVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(CV, sv_d, sv_s)
+

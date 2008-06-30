@@ -546,7 +546,6 @@ Perl_mg_tmprefcnt(pTHX_ SV *sv)
 	if (mg->mg_flags & MGf_REFCOUNTED)
 	    SvTMPREFCNT_inc(mg->mg_obj);
     }
-    return 0;
 }
 
 #include <signal.h>
