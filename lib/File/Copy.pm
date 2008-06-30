@@ -145,7 +145,6 @@ sub copy {
        $from_h = $from;
     } else {
 	$from = _protect($from) if $from =~ m/^\s/s;
-       $from_h = \do { local *FH };
        open($from_h, "<", "$from\0") or goto fail_open1;
        binmode $from_h or die "($!,$^E)";
 	$closefrom = 1;
@@ -156,7 +155,6 @@ sub copy {
        $to_h = $to;
     } else {
 	$to = _protect($to) if $to =~ m/^\s/s;
-       $to_h = \do { local *FH };
        open($to_h,">", "$to\0") or goto fail_open2;
        binmode $to_h or die "($!,$^E)";
 	$closeto = 1;

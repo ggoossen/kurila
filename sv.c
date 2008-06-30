@@ -2562,75 +2562,6 @@ S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
     PERL_ARGS_ASSERT_GLOB_ASSIGN_GLOB;
 
     Perl_croak(aTHX_ "glob to glob assignment have been removed");
-    if (dtype != SVt_PVGV) {
-	const char * const name = GvNAME(sstr);
-	const STRLEN len = GvNAMELEN(sstr);
-	/* don't upgrade SVt_PVLV: it can hold a glob */
-	if (dtype != SVt_PVLV) {
-	    if (dtype >= SVt_PV) {
-		SvPV_free(dstr);
-		SvPV_set(dstr, 0);
-		SvLEN_set(dstr, 0);
-		SvCUR_set(dstr, 0);
-	    }
-	    sv_upgrade(dstr, SVt_PVGV);
-	    (void)SvOK_off(dstr);
-	    /* FIXME - why are we doing this, then turning it off and on again
-	       below?  */
-	    isGV_with_GP_on(dstr);
-	}
-	GvSTASH(dstr) = GvSTASH(sstr);
-	if (GvSTASH(dstr))
-	    Perl_sv_add_backref(aTHX_ (SV*)GvSTASH(dstr), dstr);
-	gv_name_set((GV *)dstr, name, len, GV_ADD);
-	SvFAKE_on(dstr);	/* can coerce to non-glob */
-    }
-
-#ifdef GV_UNIQUE_CHECK
-    if (GvUNIQUE((GV*)dstr)) {
-	Perl_croak(aTHX_ PL_no_modify);
-    }
-#endif
-
-    if(GvGP((GV*)sstr)) {
-        /* If source has method cache entry, clear it */
-        if(GvCVGEN(sstr)) {
-            SvREFCNT_dec(GvCV(sstr));
-            GvCV(sstr) = NULL;
-            GvCVGEN(sstr) = 0;
-        }
-        /* If source has a real method, then a method is
-           going to change */
-        else if(GvCV((GV*)sstr)) {
-            mro_changes = 1;
-        }
-    }
-
-    /* If dest already had a real method, that's a change as well */
-    if(!mro_changes && GvGP((GV*)dstr) && GvCVu((GV*)dstr)) {
-        mro_changes = 1;
-    }
-
-    if(strEQ(GvNAME((GV*)dstr),"ISA"))
-        mro_changes = 2;
-
-    gp_free((GV*)dstr);
-    isGV_with_GP_off(dstr);
-    (void)SvOK_off(dstr);
-    isGV_with_GP_on(dstr);
-    GvINTRO_off(dstr);		/* one-shot flag */
-    GvGP(dstr) = gp_ref(GvGP(sstr));
-    if (SvTAINTED(sstr))
-	SvTAINT(dstr);
-    if (GvIMPORTED(dstr) != GVf_IMPORTED
-	&& CopSTASH_ne(PL_curcop, GvSTASH(dstr)))
-	{
-	    GvIMPORTED_on(dstr);
-	}
-    GvMULTI_on(dstr);
-    if(mro_changes == 2) mro_isa_changed_in(GvSTASH(dstr));
-    else if(mro_changes) mro_method_changed_in(GvSTASH(dstr));
-    return;
 }
 
 static void
@@ -11320,7 +11251,6 @@ do_check_tmprefcnt(pTHX_ SV* const sv)
     if (SvTMPREFCNT(sv) > SvREFCNT(sv)) {
 	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least (%ld)\n", 
 		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
-	sleep(200);
 	sv_dump(sv);
 	visit(do_reset_tmprefcnt, 0, 0);
 	visit(do_sv_tmprefcnt, 0, 0);

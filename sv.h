@@ -261,7 +261,7 @@ perform the upgrade if necessary.  See C<svtype>.
     ({					\
 	SV * const _sv = (SV*)(sv);	\
 	if (_sv) {			\
-	    if(SvTYPE(_sv) == SVTYPEMASK) sleep(200);	\
+	    assert(SvTYPE(_sv) != SVTYPEMASK);	\
 	     (SvTMPREFCNT(_sv))++;		\
         } \
 	_sv;				\

@@ -28,46 +28,7 @@ unless(%ENV{PERL_CORE}) {
     %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } < @ARGV;
 }
 
-# Perls 5.002 and 5.003 did not have File::Spec, fake what we need.
-
-sub my_dirsep {
-    $^O eq 'VMS' ? '.' :
-	$^O =~ m/mswin32|netware|djgpp/i ? '\' :
-	    $^O eq 'MacOS' ? ':'
-		: '/';
-}
-
-sub my_catdir {
-    shift;
-    my $catdir = join(my_dirsep, < @_);
-    $^O eq 'VMS' ? "[$catdir]" : $catdir;
-}
-
-sub my_catfile {
-    shift;
-    return join(my_dirsep, < @_) unless $^O eq 'VMS';
-    my $file = pop;
-    return my_catdir (undef, < @_) . $file;
-}
-
-sub my_updir {
-    shift;
-    $^O eq 'VMS' ? "-" : "..";
-}
-
-BEGIN {
-    try { require File::Spec };
-    if ($@) {
-	*File::Spec::catdir  = \&my_catdir;
-	*File::Spec::updir   = \&my_updir;
-	*File::Spec::catfile = \&my_catfile;
-    }
-}
-
-# Avoid 'used only once' warnings.
-my $nop1 = *File::Spec::catdir;
-my $nop2 = *File::Spec::updir;
-my $nop3 = *File::Spec::catfile;
+use File::Spec;
 
 # if you have 5.004_03 (and some slightly older versions?), xsubpp
 # tries to generate line numbers in the C code generated from the .xs.
