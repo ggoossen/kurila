@@ -1866,7 +1866,7 @@ XS(XS_Symbol_stash)
        Perl_croak(aTHX_ "Usage: %s(%s)", "Symbol::stash", "sv");
 
     ST(0) = (SV*)gv_stashsv(ST(0), GV_ADD);
-    ST(0) = sv_2mortal(newRV_noinc(ST(0)));
+    ST(0) = sv_2mortal(newRV(ST(0)));
     XSRETURN(1);
 }
 
