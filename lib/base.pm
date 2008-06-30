@@ -19,13 +19,13 @@ my $Fattr = \%fields::attr;
 
 sub has_fields {
     my($base) = shift;
-    my $fglob = %{*{Symbol::fetch_glob("$base\::")}}{FIELDS};
+    my $fglob = Symbol::fetch_glob("$base\::FIELDS");
     return ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ? 1 : 0;
 }
 
 sub has_version {
     my($base) = shift;
-    my $vglob = %{*{Symbol::fetch_glob($base.'::')}}{VERSION};
+    my $vglob = Symbol::fetch_glob($base.'::VERSION');
     return ($vglob && *$vglob{SCALAR}) ? 1 : 0;
 }
 

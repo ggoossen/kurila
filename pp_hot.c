@@ -2370,6 +2370,12 @@ PP(pp_entersub)
     }
 
     gimme = GIMME_V;
+
+    /* subs are always in scalar context */
+    if (gimme == G_ARRAY) {
+	gimme= G_SCALAR;
+    }
+
     if ((PL_op->op_private & OPpENTERSUB_DB) && GvCV(PL_DBsub) && !CvNODEBUG(cv)) {
 	 Perl_get_db_sub(aTHX_ &sv, cv);
 	 if (CvISXSUB(cv))
