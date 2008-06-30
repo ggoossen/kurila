@@ -785,8 +785,9 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
 		if (!(stash = GvHV(gv)))
 		    stash = GvHV(gv) = newHV();
-		if ( ! SvHVOK(stash) )
+		if ( ! SvHVOK(stash) ) {
 		    Perl_croak(aTHX_ "stash '%s' is not a hash but %s", tmpbuf, Ddesc((SV*)stash));
+		}
 
 		if (!HvNAME_get(stash))
 		    hv_name_set(stash, nambeg, name_cursor - nambeg, 0);
