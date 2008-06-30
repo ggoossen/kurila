@@ -72,11 +72,9 @@ sub SWASHNEW_real {
 	    my $caller1 = $type =~ s/(.+)::// ? $1 : caller(1);
 
 	    if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
-		my $prop = *{Symbol::fetch_glob("{$caller1}::$type")};
-		if (exists &{$prop}) {
-		    no strict 'refs';
-		    
-		    $list = &{$prop};
+		my $prop = Symbol::fetch_glob("{$caller1}::$type");
+		if (exists &{*{$prop}}) {
+		    $list = &{*{$prop}};
 		    last GETFILE;
 		}
 	    }

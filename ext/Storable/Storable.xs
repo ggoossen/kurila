@@ -6084,9 +6084,9 @@ PROTOTYPES: ENABLE
 BOOT:
 {
     HV *stash = gv_stashpvn("Storable", 8, GV_ADD);
-    newCONSTSUB(stash, "BIN_MAJOR", newSViv(STORABLE_BIN_MAJOR));
-    newCONSTSUB(stash, "BIN_MINOR", newSViv(STORABLE_BIN_MINOR));
-    newCONSTSUB(stash, "BIN_WRITE_MINOR", newSViv(STORABLE_BIN_WRITE_MINOR));
+    newCONSTSUB("BIN_MAJOR", newSViv(STORABLE_BIN_MAJOR));
+    newCONSTSUB("BIN_MINOR", newSViv(STORABLE_BIN_MINOR));
+    newCONSTSUB("BIN_WRITE_MINOR", newSViv(STORABLE_BIN_WRITE_MINOR));
 
     init_perinterp(aTHX);
     gv_fetchpv("Storable::drop_utf8",   GV_ADDMULTI, SVt_PV);

@@ -31,5 +31,5 @@ ok($new_f_gen +> $f_gen, 'Foo pkg_gen incs for @ISA');
 undef %Foo::;
 is(mro::get_pkg_gen('Foo'), 1, "pkg_gen 1 for undef \%Pkg::");
 
-delete %::{"Foo::"};
+delete %{Symbol::fetch_glob("Foo::")->*};
 is(mro::get_pkg_gen('Foo'), 0, 'pkg_gen 0 for delete $::{Pkg::}');
