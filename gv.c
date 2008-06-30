@@ -249,7 +249,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	ENTER;
 	if (has_constant) {
 	    /* newCONSTSUB takes ownership of the reference from us.  */
-	    GvCV(gv) = newCONSTSUB(stash, name, has_constant);
+	    GvCV(gv) = newCONSTSUB(name, has_constant);
 	    /* If this reference was a copy of another, then the subroutine
 	       must have been "imported", by a Perl space assignment to a GV
 	       from a reference to CV.  */

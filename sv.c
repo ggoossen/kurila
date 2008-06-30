@@ -2557,8 +2557,6 @@ copy-ish functions and macros use this underneath.
 static void
 S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
 {
-    I32 mro_changes = 0; /* 1 = method, 2 = isa */
-
     PERL_ARGS_ASSERT_GLOB_ASSIGN_GLOB;
 
     Perl_croak(aTHX_ "glob to glob assignment have been removed");
@@ -2859,7 +2857,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	for (i=0; i<=len; i++) {
 	    SV** val = av_fetch( (AV*)sstr, i, 0);
 	    SV* sv = newSVsv(*val);
-	    bool didstore = av_store( (AV*)dstr, i, sv);
+	    SV** didstore = av_store( (AV*)dstr, i, sv);
 	    if (magic) {
 		if (SvSMAGICAL(sv))
 		    mg_set(sv);
@@ -11176,11 +11174,8 @@ do_sv_tmprefcnt(pTHX_ SV *const sv)
 {
     dVAR;
     const U32 type = SvTYPE(sv);
-    const struct body_details *const sv_type_details
-	= bodies_by_type + type;
-    HV *stash;
 
-    if (sv == PL_strtab)
+    if (sv == (SV*)PL_strtab)
 	return;
 
     if (type <= SVt_IV) {

@@ -438,7 +438,7 @@ BOOT:
     int i;
 
     for(i = 0 ; (name = IPC__SysV__const[i].n) ; i++) {
-	newCONSTSUB(stash,name, newSViv(IPC__SysV__const[i].v));
+	newCONSTSUB(name, newSViv(IPC__SysV__const[i].v));
     }
 }
 

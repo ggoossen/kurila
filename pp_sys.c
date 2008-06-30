@@ -385,7 +385,7 @@ PP(pp_glob)
 #endif /* !VMS */
 
     SAVESPTR(PL_last_in_gv);	/* We don't want this to be permanent. */
-    SVcpREPLACE(PL_last_in_gv, (GV*)*PL_stack_sp--);
+    GVcpREPLACE(PL_last_in_gv, (GV*)*PL_stack_sp--);
 
     SAVESPTR(PL_rs);		/* This is not permanent, either. */
     SVcpSTEAL(PL_rs, newSVpvs("\000"));
@@ -403,7 +403,7 @@ PP(pp_glob)
 PP(pp_rcatline)
 {
     dVAR;
-    SVcpREPLACE(PL_last_in_gv, cGVOP_gv);
+    GVcpREPLACE(PL_last_in_gv, cGVOP_gv);
     return do_readline();
 }
 
@@ -1648,7 +1648,7 @@ PP(pp_eof)
 	if (PL_op->op_flags & OPf_SPECIAL) {	/* eof() */
 	    IO *io;
 	    gv = GvEGV(PL_argvgv);
-	    SVcpREPLACE(PL_last_in_gv, gv);
+	    GVcpREPLACE(PL_last_in_gv, gv);
 	    io = GvIO(gv);
 	    if (io && !IoIFP(io)) {
 		if ((IoFLAGS(io) & IOf_START) && av_len(GvAVn(gv)) < 0) {
@@ -1672,7 +1672,7 @@ PP(pp_eof)
     }
     else {
 	gv = (GV*)POPs;		/* eof(FH) */
-	SVcpREPLACE(PL_last_in_gv, gv);
+	GVcpREPLACE(PL_last_in_gv, gv);
     }
 
     if (gv) {
@@ -1701,7 +1701,7 @@ PP(pp_tell)
     IO *io;
 
     if (MAXARG != 0)
-	SVcpREPLACE(PL_last_in_gv, (GV*)POPs);
+	GVcpREPLACE(PL_last_in_gv, (GV*)POPs);
     gv = PL_last_in_gv;
 
     if (gv && (io = GvIO(gv))) {
@@ -1737,8 +1737,8 @@ PP(pp_sysseek)
 #endif
 
     GV * const gv = (GV*)POPs;
-    SVcpREPLACE(PL_last_in_gv, gv);
     IO *io;
+    GVcpREPLACE(PL_last_in_gv, gv);
 
     if (gv && (io = GvIO(gv))) {
 	MAGIC * const mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar);

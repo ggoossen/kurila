@@ -2083,7 +2083,6 @@
 #define pp_leavegiven		Perl_pp_leavegiven
 #define pp_leaveloop		Perl_pp_leaveloop
 #define pp_leavesub		Perl_pp_leavesub
-#define pp_leavesublv		Perl_pp_leavesublv
 #define pp_leavetry		Perl_pp_leavetry
 #define pp_leavewhen		Perl_pp_leavewhen
 #define pp_left_shift		Perl_pp_left_shift
@@ -2735,7 +2734,7 @@
 #define newANONSUB(a,b,c)	Perl_newANONSUB(aTHX_ a,b,c)
 #define newASSIGNOP(a,b,c,d)	Perl_newASSIGNOP(aTHX_ a,b,c,d)
 #define newCONDOP(a,b,c,d)	Perl_newCONDOP(aTHX_ a,b,c,d)
-#define newCONSTSUB(a,b,c)	Perl_newCONSTSUB(aTHX_ a,b,c)
+#define newCONSTSUB(a,b)	Perl_newCONSTSUB(aTHX_ a,b)
 #ifdef PERL_MAD
 #define newFORM(a,b,c)		Perl_newFORM(aTHX_ a,b,c)
 #else
@@ -4308,7 +4307,6 @@
 #define pp_leavegiven()		Perl_pp_leavegiven(aTHX)
 #define pp_leaveloop()		Perl_pp_leaveloop(aTHX)
 #define pp_leavesub()		Perl_pp_leavesub(aTHX)
-#define pp_leavesublv()		Perl_pp_leavesublv(aTHX)
 #define pp_leavetry()		Perl_pp_leavetry(aTHX)
 #define pp_leavewhen()		Perl_pp_leavewhen(aTHX)
 #define pp_left_shift()		Perl_pp_left_shift(aTHX)

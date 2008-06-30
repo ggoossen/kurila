@@ -194,7 +194,7 @@ sub WriteConstants {
     print $c_fh $self->header(), <<"EOADD";
 static void
 {$c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
-	newCONSTSUB(hash, name, value);
+	newCONSTSUB(name, value);
 \}
 
 EOADD
@@ -391,8 +391,7 @@ EXPLODE
 		/* It turns out to be incredibly hard to deal with all the
 		   corner cases of sub foo (); and reporting errors correctly,
 		   so lets cheat a bit.  Start with a constant subroutine  */
-		CV *cv = newCONSTSUB(symbol_table,
-				     value_for_notfound->name,
+		CV *cv = newCONSTSUB(value_for_notfound->name,
 				     &PL_sv_yes);
 		/* and then turn it into a non constant declaration only.  */
 		SvREFCNT_dec(CvXSUBANY(cv).any_ptr);

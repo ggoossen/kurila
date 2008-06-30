@@ -1633,8 +1633,8 @@ PP(pp_sort)
 	    if (!hasargs && !is_xsub) {
 		SAVESPTR(PL_firstgv);
 		SAVESPTR(PL_secondgv);
-		SVcpREPLACE(PL_firstgv, gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV));
-		SVcpREPLACE(PL_secondgv, gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV));
+		GVcpREPLACE(PL_firstgv, gv_fetchpvs("a", GV_ADD|GV_NOTQUAL, SVt_PV));
+		GVcpREPLACE(PL_secondgv, gv_fetchpvs("b", GV_ADD|GV_NOTQUAL, SVt_PV));
 		SAVESPTR(GvSV(PL_firstgv));
 		SAVESPTR(GvSV(PL_secondgv));
 	    }

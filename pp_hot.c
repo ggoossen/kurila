@@ -162,8 +162,7 @@ PP(pp_sassign)
 		   all sorts of fun as the reference to our new sub is
 		   donated to the GV that we're about to assign to.
 		*/
-		SvRV_set(left, (SV *)newCONSTSUB(GvSTASH(right), NULL,
-						 SvRV(cv)));
+		SvRV_set(left, (SV *)newCONSTSUB(NULL, SvRV(cv)));
 		SvREFCNT_dec(cv);
 		LEAVE;
 	    } else {
@@ -284,16 +283,16 @@ PP(pp_readline)
 {
     dVAR;
     tryAMAGICunTARGET(iter, 0);
-    SVcpREPLACE(PL_last_in_gv, *PL_stack_sp--);
+    GVcpREPLACE(PL_last_in_gv, (GV*)*PL_stack_sp--);
     if (SvTYPE(PL_last_in_gv) != SVt_PVGV) {
 	if (SvROK(PL_last_in_gv) && SvTYPE(SvRV(PL_last_in_gv)) == SVt_PVGV)
-	    SVcpREPLACE(PL_last_in_gv, (GV*)SvRV(PL_last_in_gv));
+	    GVcpREPLACE(PL_last_in_gv, (GV*)SvRV(PL_last_in_gv));
 	else {
 	    dSP;
 	    XPUSHs((SV*)PL_last_in_gv);
 	    PUTBACK;
 	    pp_rv2gv();
-	    SVcpREPLACE(PL_last_in_gv, (GV*)(*PL_stack_sp--));
+	    GVcpREPLACE(PL_last_in_gv, (GV*)(*PL_stack_sp--));
 	}
     }
     return do_readline();
@@ -311,51 +310,53 @@ PP(pp_eq)
 #endif
 #ifdef PERL_PRESERVE_IVUV
 
-    SV* sva = sv_2num(TOPm1s);
-    SV* svb = sv_2num(TOPs);
+    {
+	SV* sva = sv_2num(TOPm1s);
+	SV* svb = sv_2num(TOPs);
 
-    if (SvIOK(svb)) {
-	/* Unless the left argument is integer in range we are going
-	   to have to use NV maths. Hence only attempt to coerce the
-	   right argument if we know the left is integer.  */
-	if (SvIOK(sva)) {
-	    const bool auvok = SvUOK(sva);
-	    const bool buvok = SvUOK(svb);
+	if (SvIOK(svb)) {
+	    /* Unless the left argument is integer in range we are going
+	       to have to use NV maths. Hence only attempt to coerce the
+	       right argument if we know the left is integer.  */
+	    if (SvIOK(sva)) {
+		const bool auvok = SvUOK(sva);
+		const bool buvok = SvUOK(svb);
 	
-	    if (auvok == buvok) { /* ## IV == IV or UV == UV ## */
-                /* Casting IV to UV before comparison isn't going to matter
-                   on 2s complement. On 1s complement or sign&magnitude
-                   (if we have any of them) it could to make negative zero
-                   differ from normal zero. As I understand it. (Need to
-                   check - is negative zero implementation defined behaviour
-                   anyway?). NWC  */
-		const UV buv = SvUVX(POPs);
-		const UV auv = SvUVX(TOPs);
+		if (auvok == buvok) { /* ## IV == IV or UV == UV ## */
+		    /* Casting IV to UV before comparison isn't going to matter
+		       on 2s complement. On 1s complement or sign&magnitude
+		       (if we have any of them) it could to make negative zero
+		       differ from normal zero. As I understand it. (Need to
+		       check - is negative zero implementation defined behaviour
+		       anyway?). NWC  */
+		    const UV buv = SvUVX(POPs);
+		    const UV auv = SvUVX(TOPs);
 		
-		SETs(boolSV(auv == buv));
-		RETURN;
-	    }
-	    {			/* ## Mixed IV,UV ## */
-                SV *ivp, *uvp;
-		IV iv;
+		    SETs(boolSV(auv == buv));
+		    RETURN;
+		}
+		{			/* ## Mixed IV,UV ## */
+		    SV *ivp, *uvp;
+		    IV iv;
 		
-		/* == is commutative so doesn't matter which is left or right */
-		if (auvok) {
-		    /* top of stack (b) is the iv */
-                    ivp = *SP;
-                    uvp = *--SP;
-                } else {
-                    uvp = *SP;
-                    ivp = *--SP;
-                }
-                iv = SvIVX(ivp);
-		if (iv < 0)
-                    /* As uv is a UV, it's >0, so it cannot be == */
-                    SETs(&PL_sv_no);
-		else
-		    /* we know iv is >= 0 */
-		    SETs(boolSV((UV)iv == SvUVX(uvp)));
-		RETURN;
+		    /* == is commutative so doesn't matter which is left or right */
+		    if (auvok) {
+			/* top of stack (b) is the iv */
+			ivp = *SP;
+			uvp = *--SP;
+		    } else {
+			uvp = *SP;
+			ivp = *--SP;
+		    }
+		    iv = SvIVX(ivp);
+		    if (iv < 0)
+			/* As uv is a UV, it's >0, so it cannot be == */
+			SETs(&PL_sv_no);
+		    else
+			/* we know iv is >= 0 */
+			SETs(boolSV((UV)iv == SvUVX(uvp)));
+		    RETURN;
+		}
 	    }
 	}
     }
@@ -1575,13 +1576,16 @@ PP(pp_helem)
     SV **svp;
     SV * const keysv = POPs;
     HV * const hv = (HV*)POPs;
-    if ( SvOK(hv) && ! SvHVOK(hv) )
-	Perl_croak(aTHX_ "Not a HASH");
     const U32 lval = PL_op->op_flags & OPf_MOD;
     const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
     SV *sv;
-    const U32 hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
+    U32 hash;
     I32 preeminent = 0;
+
+    if ( SvOK(hv) && ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
+
+    hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
 
     if (SvTYPE(hv) != SVt_PVHV)
 	RETPUSHUNDEF;
@@ -2512,7 +2516,7 @@ PP(pp_aelem)
     SV *sv;
 
     if ( ! SvAVOK(av) )
-	Perl_croak(aTHX_ "Can't take an element from a %s", SvDESC(av));
+	Perl_croak(aTHX_ "Can't take an element from a %s", SvDESC((SV*)av));
 
     defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
 

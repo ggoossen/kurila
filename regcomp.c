@@ -4151,7 +4151,7 @@ reStudy:
             &data, -1, NULL, NULL,
             SCF_DO_SUBSTR | SCF_WHILEM_VISITED_POS | stclass_flag,0);
 
-	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %"IVdf"\n", minlen));
+	DEBUG_EXECUTE_r( PerlIO_printf(Perl_debug_log, "minlen: %d\n", (int)minlen));
 	
         CHECK_RESTUDY_GOTO;
 
@@ -7388,7 +7388,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 	    ANYOF_FLAGS(ret) |= ANYOF_FOLD;
 	if (UTF)
 	    ANYOF_FLAGS(ret) |= ANYOF_UNICODE;
-	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %"IVdf" - %d\n", RExC_flags & RXf_PMf_UTF8, UTF));
+	DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "regclass %d - %d\n", (int)(RExC_flags & RXf_PMf_UTF8), UTF));
 	ANYOF_BITMAP_ZERO(ret);
 	listsv = newSVpvs("# comment\n");
     }
