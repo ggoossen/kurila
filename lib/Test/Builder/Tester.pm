@@ -95,13 +95,8 @@ sub import {
 # set up file handles
 ###
 
-# create some private file handles
-my $output_handle = gensym;
-my $error_handle  = gensym;
-
-# and tie them to this package
-my $out = tie *$output_handle, "Test::Builder::Tester::Tie", "STDOUT";
-my $err = tie *$error_handle,  "Test::Builder::Tester::Tie", "STDERR";
+my $out = Test::Builder::Tester::Tie->new("STDOUT");
+my $err = Test::Builder::Tester::Tie->new("STDERR");
 
 ####
 # exported functions
@@ -135,9 +130,9 @@ sub _start_testing
     $original_todo_handle    = $t->todo_output();
 
     # switch out to our own handles
-    $t->output($output_handle);
-    $t->failure_output($error_handle);
-    $t->todo_output($error_handle);
+    $t->output($out->handle);
+    $t->failure_output($err->handle);
+    $t->todo_output($err->handle);
 
     # clear the expected list
     $out->reset();
@@ -361,10 +356,10 @@ sub test_test
 
       local $_;
 
-      $t->diag(map {"$_\n"} < $out->complaint)
+      $t->diag(map {"$_\n"} $out->complaint)
 	unless %args{skip_out} || $out->check;
 
-      $t->diag(map {"$_\n"} < $err->complaint)
+      $t->diag(map {"$_\n"} $err->complaint)
 	unless %args{skip_err} || $err->check;
     }
 }
@@ -488,6 +483,20 @@ package Test::Builder::Tester::Tie;
 ##
 # add line(s) to be expected
 
+sub new {
+    my ($class, $type) = < @_;
+
+    my $self = bless \%( got => '', type => $type ), $class;
+    open my $fh, '>', \$self->{'got'} or die "$!";
+    $self->{'filehandle'} = $fh;
+    return $self;
+}
+
+sub handle {
+    my $self = shift;
+    return $self->{'filehandle'};
+}
+
 sub expect
 {
     my $self = shift;
@@ -590,11 +599,9 @@ sub complaint
 sub reset
 {
     my $self = shift;
-    %$self = %(
-              type   => $self->{type},
-              got    => '',
-              wanted => \@(),
-             );
+    seek $self->{'filehandle'}, 0, 0;
+    $self->{'got'} = '';
+    $self->{'wanted'} = \@();
 }
 
 
@@ -615,31 +622,5 @@ sub type
     my $self = shift;
     return $self->{type};
 }
-
-###
-# tie interface
-###
-
-sub PRINT  {
-    my $self = shift;
-    $self->{got} .= join '', < @_;
-}
-
-sub TIEHANDLE {
-    my($class, $type) = < @_;
-
-    my $self = bless \%(
-                   type => $type
-               ), $class;
-
-    $self->reset;
-
-    return $self;
-}
-
-sub READ {}
-sub READLINE {}
-sub GETC {}
-sub FILENO {}
 
 1;
