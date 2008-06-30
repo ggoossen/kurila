@@ -140,10 +140,6 @@ static I32 read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen);
     if (PL_op) \
 	CALLRUNOPS(aTHX);
 
-#define CALL_LIST_BODY(cv) \
-    PUSHMARK(PL_stack_sp); \
-    call_sv((SV*)(cv), G_EVAL|G_DISCARD);
-
 static void
 S_init_tls_and_interp(PerlInterpreter *my_perl)
 {
@@ -4795,7 +4791,8 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 	    {
 		SV *old_diehook = PL_diehook;
 		PL_diehook = PERL_DIEHOOK_IGNORE;
-		CALL_LIST_BODY(cv);
+		PUSHMARK(PL_stack_sp);
+		call_sv((SV*)(cv), G_EVAL|G_DISCARD|G_VOID);
 		PL_diehook = old_diehook;
 	    }
 #ifdef PERL_MAD
