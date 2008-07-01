@@ -158,18 +158,16 @@ sub qualify_to_ref ($) {
 sub delete_package ($) {
     my $pkg = shift;
 
-    no strict 'refs';
-
     # expand to full symbol table name if needed
 
     unless ($pkg =~ m/^main::.*::$/) {
         $pkg = "main$pkg"	if	$pkg =~ m/^::/;
-        $pkg = "main::$pkg"	unless	$pkg =~ m/^main::/;
         $pkg .= '::'		unless	$pkg =~ m/::$/;
     }
 
-    my($stem, $leaf) = $pkg =~ m/(.*::)(\w+::)$/;
-    my $stem_symtab = *{Symbol::qualify_to_ref($stem)}{HASH};
+    my($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
+    my $stem_symtab = Symbol::stash($stem);
+    die dump::view($stem_symtab);
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf};
 
 

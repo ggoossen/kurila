@@ -137,11 +137,11 @@ sub output_string {
   my $this = shift;
   return $this->{'output_string'} unless (nelems @_);  # GET.
   
-  require Pod::Simple::TiedOutFH;
   my $x = (defined(@_[0]) and ref(@_[0])) ? @_[0] : \( @_[0] );
   $$x = '' unless defined $$x;
   DEBUG +> 4 and print "# Output string set to $x ($$x)\n";
-  $this->{'output_fh'} = Pod::Simple::TiedOutFH->handle_on(@_[0]);
+  $this->{'output_fh'} = undef;
+  open $this->{'output_fh'}, '>>', $x or die "Failed opening filehandle $!";
   return
     $this->{'output_string'} = @_[0];
     #${ ${ $this->{'output_fh'} } };

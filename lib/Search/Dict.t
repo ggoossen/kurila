@@ -42,48 +42,31 @@ EOT
 
 use Search::Dict;
 
-open(DICT, "+>", "dict-$$") or die "Can't create dict-$$: $!";
-binmode DICT;			# To make length expected one.
-print DICT $DICT;
+open(my $dict_fh, "+>", "dict-$$") or die "Can't create dict-$$: $!";
+binmode $dict_fh;			# To make length expected one.
+print $dict_fh $DICT;
 
-my $pos = look *DICT, "Ababa";
-chomp(my $word = ~< *DICT);
+my $pos = look $dict_fh, "Ababa";
+chomp(my $word = ~< $dict_fh);
 print "not " if $pos +< 0 || $word ne "Ababa";
 print "ok 1\n";
 
-if (ord('a') +> ord('A') ) {  # ASCII
+$pos = look $dict_fh, "foo";
+chomp($word = ~< $dict_fh);
 
-    $pos = look *DICT, "foo";
-    chomp($word = ~< *DICT);
+print "not " if $pos != length($DICT);  # will search to end of file
+print "ok 2\n";
 
-    print "not " if $pos != length($DICT);  # will search to end of file
-    print "ok 2\n";
+my $pos = look $dict_fh, "abash";
+chomp($word = ~< $dict_fh);
+print "not " if $pos +< 0 || $word ne "abash";
+print "ok 3\n";
 
-    my $pos = look *DICT, "abash";
-    chomp($word = ~< *DICT);
-    print "not " if $pos +< 0 || $word ne "abash";
-    print "ok 3\n";
-
-}
-else { # EBCDIC systems e.g. os390
-
-    $pos = look *DICT, "FOO";
-    chomp($word = ~< *DICT);
-
-    print "not " if $pos != length($DICT);  # will search to end of file
-    print "ok 2\n";
-
-    my $pos = look *DICT, "Abba";
-    chomp($word = ~< *DICT);
-    print "not " if $pos +< 0 || $word ne "Abba";
-    print "ok 3\n";
-}
-
-$pos = look *DICT, "aarhus", 1, 1;
-chomp($word = ~< *DICT);
+$pos = look $dict_fh, "aarhus", 1, 1;
+chomp($word = ~< $dict_fh);
 
 print "not " if $pos +< 0 || $word ne "Aarhus";
 print "ok 4\n";
 
-close DICT or die "cannot close";
+close $dict_fh or die "cannot close";
 unlink "dict-$$";

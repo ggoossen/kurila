@@ -189,12 +189,16 @@ sub WriteConstants {
 
     my $pthx = $self->C_constant_prefix_param_defintion();
     my $athx = $self->C_constant_prefix_param();
-    my $symbol_table = C_stringify($package) . '::';
+    my $symbol_table = C_stringify($package);
 
     print $c_fh $self->header(), <<"EOADD";
 static void
 {$c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
+        ENTER;
+        SAVESPTR(PL_curstash);
+        SVcpREPLACE(PL_curstash, hash);
 	newCONSTSUB(name, value);
+        LEAVE;
 \}
 
 EOADD
@@ -275,7 +279,7 @@ BOOT:
 #ifdef dTHX
     dTHX;
 #endif
-    HV *symbol_table = get_hv("$symbol_table", TRUE);
+    HV *symbol_table = gv_stashpvn("$symbol_table", $(length $symbol_table), GV_ADD);
 #ifndef SYMBIAN
     HV *{$c_subname}_missing;
 #endif
@@ -391,8 +395,12 @@ EXPLODE
 		/* It turns out to be incredibly hard to deal with all the
 		   corner cases of sub foo (); and reporting errors correctly,
 		   so lets cheat a bit.  Start with a constant subroutine  */
+                ENTER;
+                SAVESTPR(PL_curstash);
+                HVcpREPLACE(PL_curstash, symbol_table);
 		CV *cv = newCONSTSUB(value_for_notfound->name,
 				     &PL_sv_yes);
+                LEAVE;
 		/* and then turn it into a non constant declaration only.  */
 		SvREFCNT_dec(CvXSUBANY(cv).any_ptr);
 		CvCONST_off(cv);

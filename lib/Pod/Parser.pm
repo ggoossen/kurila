@@ -1201,7 +1201,7 @@ sub parse_from_file {
         else {
             ## Must be a filehandle-ref (or else assume its a ref to an
             ## object that supports the common IO write operations).
-            %myData{_OUTFILE} = ${$outfile};
+            %myData{_OUTFILE} = $outfile;
             $out_fh = $outfile;
         }
     }
