@@ -18,8 +18,8 @@ my $output_handle = gensym;
 my $error_handle  = gensym;
 
 # and tie them to this package
-my $out = tie *$output_handle, "Test::Builder::Tester::Tie", "STDOUT";
-my $err = tie *$error_handle,  "Test::Builder::Tester::Tie", "STDERR";
+my $out = Test::Builder::Tester::Tie->new('STDOUT');
+my $err = Test::Builder::Tester::Tie->new('STDERR');
 
 # ooooh, use the test suite
 my $t = Test::Builder->new;
@@ -40,9 +40,9 @@ sub start_testing
     $original_harness_env    = %ENV{HARNESS_ACTIVE};
 
     # switch out to our own handles
-    $t->output($output_handle);
-    $t->failure_output($error_handle);
-    $t->todo_output($error_handle);
+    $t->output($out->handle);
+    $t->failure_output($err->handle);
+    $t->todo_output($err->handle);
 
     %ENV{HARNESS_ACTIVE} = 0;
 

@@ -828,7 +828,7 @@ sub _format_stack {
         }
     }
 
-    my @vals = @( @{@Stack[-1]->{vals}}[[0,1]] );
+    my @vals = @( @Stack[-1]->{vals}->[[0,1]] );
     my @vars = @( () );
     (@vars[0] = $var) =~ s/\$FOO/     \$got/;
     (@vars[1] = $var) =~ s/\$FOO/\$expected/;

@@ -2,10 +2,12 @@
 package Test::Simple::Catch;
 
 use Symbol;
-use TieOut;
-my($out_fh, $err_fh) = (gensym, gensym);
-my $out = tie *$out_fh, 'TieOut';
-my $err = tie *$err_fh, 'TieOut';
+
+my ($out, $err);
+$out = \$('');
+$err = \$('');
+open my $out_fh, '>>', $out or die;
+open my $err_fh, '>>', $err or die;
 
 use Test::Builder;
 my $t = 'Test::Builder'->new;

@@ -32,7 +32,7 @@ sub new {
 package main;
 
 my $warnings = '';
-local $^WARN_HOOK = sub { $warnings = join '', < @_ };
+local $^WARN_HOOK = sub { $warnings .= @_[0]->message; };
 
 # overloaded object as name
 my $obj = Overloaded->new('foo');
