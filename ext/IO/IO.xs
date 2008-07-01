@@ -476,7 +476,10 @@ BOOT:
     /*
      * constant subs for IO::Poll
      */
+    ENTER;
+    SAVESPTR(PL_curstash);
     stash = gv_stashpvn("IO::Poll", 8, TRUE);
+    PL_curstash = stash;
 #ifdef	POLLIN
 	newCONSTSUB("POLLIN",newSViv(POLLIN));
 #endif
@@ -514,6 +517,7 @@ BOOT:
      * constant subs for IO::Handle
      */
     stash = gv_stashpvn("IO::Handle", 10, TRUE);
+    PL_curstash = stash;
 #ifdef _IOFBF
         newCONSTSUB("_IOFBF", newSViv(_IOFBF));
 #endif
@@ -532,5 +536,6 @@ BOOT:
 #ifdef SEEK_END
         newCONSTSUB("SEEK_END", newSViv(SEEK_END));
 #endif
+    LEAVE;
 }
 

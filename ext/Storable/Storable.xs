@@ -6084,6 +6084,9 @@ PROTOTYPES: ENABLE
 BOOT:
 {
     HV *stash = gv_stashpvn("Storable", 8, GV_ADD);
+    ENTER;
+    SAVESPTR(PL_curstash);
+    HVcpREPLACE(PL_curstash, stash);
     newCONSTSUB("BIN_MAJOR", newSViv(STORABLE_BIN_MAJOR));
     newCONSTSUB("BIN_MINOR", newSViv(STORABLE_BIN_MINOR));
     newCONSTSUB("BIN_WRITE_MINOR", newSViv(STORABLE_BIN_WRITE_MINOR));
@@ -6097,6 +6100,7 @@ BOOT:
 #ifdef USE_56_INTERWORK_KLUDGE
     gv_fetchpv("Storable::interwork_56_64bit",   GV_ADDMULTI, SVt_PV);
 #endif
+    LEAVE;
 }
 
 void

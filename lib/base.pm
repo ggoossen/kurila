@@ -64,28 +64,18 @@ sub import {
 
         next if grep $_->isa($base), ($inheritor, < @bases);
 
-        if (has_version($base)) {
-            ${*{Symbol::fetch_glob($base.'::VERSION')}} = '-1, set by base.pm' 
-              unless defined ${*{Symbol::fetch_glob($base.'::VERSION')}};
-        }
-        else {
-            my $sigdie;
-            {
-                eval "require $base";
-                # Only ignore "Can't locate" errors from our eval require.
-                # Other fatal errors (syntax etc) must be reported.
-                die if $@ && $@->{description} !~ m/^Can't locate .*?/;
-                unless (%{*{Symbol::fetch_glob("$base\::")}}) {
-                    local $" = " ";
-                    die(<<ERROR);
+        {
+            eval "require $base";
+            # Only ignore "Can't locate" errors from our eval require.
+            # Other fatal errors (syntax etc) must be reported.
+            die if $@ && $@->{description} !~ m/^Can't locate .*?/;
+            unless (%{*{Symbol::fetch_glob("$base\::")}}) {
+                die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
     or make that module available in \@INC (\@INC contains: {join ' ', <@INC}).
 ERROR
-                }
             }
-            ${*{Symbol::fetch_glob($base.'::VERSION')}} = "-1, set by base.pm"
-              unless defined ${*{Symbol::fetch_glob($base.'::VERSION')}};
         }
         push @bases, $base;
 

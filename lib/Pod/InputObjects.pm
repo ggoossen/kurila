@@ -789,7 +789,8 @@ sub top {
 }
 
 ## let parse_tree() & ptree() be aliases for the 'top' method
-*parse_tree = *ptree = \&top;
+*parse_tree = \&top;
+*ptree = \&top;
 
 ##---------------------------------------------------------------------------
 

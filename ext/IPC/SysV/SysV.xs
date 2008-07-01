@@ -219,6 +219,9 @@ SHMLBA()
 BOOT:
 {
     HV *stash = gv_stashpvn("IPC::SysV", 9, GV_ADD);
+    ENTER;
+    SAVESPTR(PL_curstash);
+    SVcpREPLACE(PL_curstash, stash);
     /*
      * constant subs for IPC::SysV
      */
@@ -440,5 +443,6 @@ BOOT:
     for(i = 0 ; (name = IPC__SysV__const[i].n) ; i++) {
 	newCONSTSUB(name, newSViv(IPC__SysV__const[i].v));
     }
+    LEAVE;
 }
 

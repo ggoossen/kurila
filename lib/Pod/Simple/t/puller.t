@@ -253,7 +253,7 @@ print "# Testing pullparsing from a glob\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $!";
-$p->set_source(*IN);
+$p->set_source(\*IN);
 
 my( @t, $t );
 while($t = $p->get_token) {

@@ -215,9 +215,7 @@ PP(pp_rv2cv)
     GV *gv;
     const I32 flags = (PL_op->op_flags & OPf_SPECIAL)
 	? 0
-	: ((PL_op->op_private & (OPpLVAL_INTRO|OPpMAY_RETURN_CONSTANT)) == OPpMAY_RETURN_CONSTANT)
-	    ? GV_ADD|GV_NOEXPAND
-	    : GV_ADD;
+	: GV_ADD;
     /* We usually try to add a non-existent subroutine in case of AUTOLOAD. */
     /* (But not in defined().) */
 

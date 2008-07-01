@@ -3211,11 +3211,8 @@ S_init_main_stash(pTHX)
     gv = gv_fetchpvs("main::", GV_ADD|GV_NOTQUAL, SVt_PVHV);
     HVcpREPLACE(PL_curstash, GvHV(gv));
     hv_name_set(PL_curstash, "main", 4, 0);
-    /* If we hadn't caused another reference to "main" to be in the shared
-       string table above, then it would be worth reordering these two,
-       because otherwise all we do is delete "main" from it as a consequence
-       of the SvREFCNT_dec, only to add it again with hv_name_set */
-    hv_name_set(PL_defstash, "namespace", 9, 0);
+    /* the default stash has no name, and is thus known as :: */
+    hv_name_set(PL_defstash, "", 0, 0);
     SvREADONLY_on(gv);
     PL_incgv = gv_HVadd(gv_AVadd(gv_fetchpvs("INC", GV_ADD|GV_NOTQUAL,
 					     SVt_PVAV)));

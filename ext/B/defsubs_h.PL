@@ -74,7 +74,11 @@ sub doconst
  my $sym = shift;
  my $l = length($sym);
  print OUT <<"END";
+ ENTER;
+ SAVESPTR(PL_curstash);
+ HVcpREPLACE(PL_curstash, stash);
  newCONSTSUB("$sym",newSViv($sym)); 
  av_push(export_ok,newSVpvn("$sym",$l));
+ LEAVE;
 END
 }

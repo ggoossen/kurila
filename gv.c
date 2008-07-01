@@ -247,6 +247,8 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	GvMULTI_on(gv);
     if (doproto) {			/* Replicate part of newSUB here. */
 	ENTER;
+	SAVESPTR(PL_curstash);
+	HVcpREPLACE(PL_curstash, stash);
 	if (has_constant) {
 	    /* newCONSTSUB takes ownership of the reference from us.  */
 	    GvCV(gv) = newCONSTSUB(name, has_constant);

@@ -1429,7 +1429,6 @@ lib/Pod/Simple/t/html01.t	Pod::Simple test file
 lib/Pod/Simple/t/html02.t	Pod::Simple test file
 lib/Pod/Simple/t/html03.t	Pod::Simple test file
 lib/Pod/Simple/t/htmlbat.t	Pod::Simple test file
-lib/Pod/Simple/TiedOutFH.pm	Pod::Simple::TiedOutFH
 lib/Pod/Simple/t/items02.t	Pod::Simple test file
 lib/Pod/Simple/t/items.t	Pod::Simple test file
 lib/Pod/Simple/t/itemstar.t	Pod::Simple test file
@@ -1485,7 +1484,6 @@ lib/Pod/Simple/t/testlib2/squaa/Vliff.pm	Pod::Simple test file
 lib/Pod/Simple/t/testlib2/squaa/Wowo.pod	Pod::Simple test file
 lib/Pod/Simple/t/testlib2/Suzzle.pm		Pod::Simple test file
 lib/Pod/Simple/t/testlib3/squaa/Vliff.pm	Pod::Simple test file
-lib/Pod/Simple/t/tiedfh.t	Pod::Simple test file
 lib/Pod/Simple/t/verbatim.t		Pod::Simple test file
 lib/Pod/Simple/t/verb_fmt.t	Pod::Simple test file
 lib/Pod/Simple/t/x_nixer.t		Pod::Simple test file

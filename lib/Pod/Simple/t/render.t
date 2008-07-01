@@ -15,7 +15,6 @@ BEGIN {
 }
 
 $Pod::Simple::Text::FREAKYMODE = 1;
-use Pod::Simple::TiedOutFH ();
 
 chdir 't' unless %ENV{PERL_CORE};
 
