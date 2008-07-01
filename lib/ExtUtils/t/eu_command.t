@@ -38,8 +38,9 @@ BEGIN {
 {
     # concatenate this file with itself
     # be extra careful the regex doesn't match itself
-    use TieOut;
-    my $out = tie *STDOUT, 'TieOut';
+    my $out = '';
+    close STDOUT;
+    open STDOUT, '>>', \$out or die;
     my $self = $0;
     unless (-f $self) {
         my ($vol, $dirs, $file) = < File::Spec->splitpath($self);
@@ -51,7 +52,7 @@ BEGIN {
     @ARGV = @($self, $self);
 
     cat();
-    is( scalar( $$out =~ s/use_ok\( 'ExtUtils::Command'//g), 2, 
+    is( scalar( $out =~ s/use_ok\( 'ExtUtils::Command'//g), 2, 
         'concatenation worked' );
 
     # the truth value here is reversed -- Perl true is shell false

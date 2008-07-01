@@ -32,7 +32,7 @@ my @cd_args = @("some/dir", "command1", "command2");
         my @dirs = @( (File::Spec->updir) x 2 );
         my $expected_updir = File::Spec->catdir(< @dirs);
         
-        ::is $mm->cd(< @cd_args),
+        main::is $mm->cd(< @cd_args),
 qq{cd some/dir
 	command1
 	command2
@@ -42,7 +42,7 @@ qq{cd some/dir
     {
         local *make = sub { "dmake" };
 
-        ::is $mm->cd(< @cd_args),
+        main::is $mm->cd(< @cd_args),
 q{cd some/dir && command1
 	cd some/dir && command2};
     }

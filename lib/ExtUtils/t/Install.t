@@ -13,7 +13,6 @@ BEGIN {
 chdir 't';
 
 use strict;
-use TieOut;
 use File::Path;
 use File::Spec;
 
@@ -40,7 +39,9 @@ END {
 
 chdir 'Big-Dummy';
 
-my $stdout = tie *STDOUT, 'TieOut';
+my $stdout = '';
+close STDOUT;
+open STDOUT, '>>', \$stdout or die;
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
@@ -49,7 +50,8 @@ END { rmtree 'blib' }
 ok( -d 'blib/lib',              'pm_to_blib created blib dir' );
 ok( -r 'blib/lib/Big/Dummy.pm', '  copied .pm file' );
 ok( -r 'blib/lib/auto',         '  created autosplit dir' );
-is( $stdout->read, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
+is( $stdout, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" );
+$stdout = '';
 
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
@@ -57,7 +59,8 @@ pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
 ok( -d 'blib/lib',              'second run, blib dir still there' );
 ok( -r 'blib/lib/Big/Dummy.pm', '  .pm file still there' );
 ok( -r 'blib/lib/auto',         '  autosplit still there' );
-is( $stdout->read, "Skip blib/lib/Big/Dummy.pm (unchanged)\n" );
+is( $stdout, "Skip blib/lib/Big/Dummy.pm (unchanged)\n" );
+$stdout = '';
 
 install( \%( 'blib/lib' => 'install-test/lib/perl',
            read   => 'install-test/packlist',

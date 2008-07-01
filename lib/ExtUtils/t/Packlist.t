@@ -164,9 +164,9 @@ SKIP: {
 
 
 # packlist_file, $pl should be set from write test
-is( ExtUtils::Packlist::packlist_file(\%( packfile => 'pl' )), 'pl',
+is( ExtUtils::Packlist::packlist_file(\%( packfile => 'pl' ))[0], 'pl',
 	'packlist_file() should fetch packlist from passed hash' );
-is( ExtUtils::Packlist::packlist_file($pl), 'eplist',
+is( ExtUtils::Packlist::packlist_file($pl)[0], 'eplist',
 	'packlist_file() should fetch packlist from ExtUtils::Packlist object' );
 
 END {

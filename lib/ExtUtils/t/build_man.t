@@ -13,10 +13,9 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 9;
+use Test::More tests => 8;
 
 use File::Spec;
-use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
@@ -40,7 +39,9 @@ END {
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-ok( my $stdout = tie *STDOUT, 'TieOut' );
+my $stdout;
+close STDOUT;
+open STDOUT, '>>', \$stdout  or die;
 
 {
     local %Config{installman3dir} = File::Spec->catdir(qw(t lib));

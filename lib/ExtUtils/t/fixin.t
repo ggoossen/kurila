@@ -15,7 +15,6 @@ use File::Spec;
 
 use Test::More tests => 6;
 
-use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 

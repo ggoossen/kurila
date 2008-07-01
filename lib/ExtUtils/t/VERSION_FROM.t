@@ -16,7 +16,6 @@ use strict;
 use Test::More tests => 1;
 use MakeMaker::Test::Utils;
 use ExtUtils::MakeMaker;
-use TieOut;
 use File::Path;
 
 perl_lib();
@@ -30,7 +29,9 @@ print MPL "\$VERSION = 0\n";
 close MPL;
 END { unlink 'Version' }
 
-my $stdout = tie *STDOUT, 'TieOut' or die;
+my $stdout = '';
+close STDOUT;
+open STDOUT, '>>', \$stdout or die;
 my $mm = WriteMakefile(
     NAME         => 'Version',
     VERSION_FROM => 'Version'

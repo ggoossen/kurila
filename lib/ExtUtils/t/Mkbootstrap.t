@@ -44,16 +44,18 @@ SKIP: {
 Mkbootstrap('fakeboot');
 ok( !( -f 'fakeboot.bso' ), 'Mkbootstrap should not backup an empty file' );
 
-use TieOut;
-my $out = tie *STDOUT, 'TieOut';
+my $out = '';
+close STDOUT;
+open STDOUT, '>>', \$out or die;
 
 # with $Verbose set, it should print status messages about libraries
 $ExtUtils::Mkbootstrap::Verbose = 1;
 Mkbootstrap('');
-is( $out->read, "\tbsloadlibs=\n", 'should report libraries in Verbose mode' );
+is( $out, "\tbsloadlibs=\n", 'should report libraries in Verbose mode' );
 
+$out = '';
 Mkbootstrap('', 'foo');
-like( $out->read, qr/bsloadlibs=foo/, 'should still report libraries' );
+like( $out, qr/bsloadlibs=foo/, 'should still report libraries' );
 
 
 # if ${_[0]}_BS exists, require it
@@ -88,14 +90,14 @@ SKIP: {
 	}
 
 	# now put it back like it was
+        $out = '';
 	chmod 0777, 'dasboot.bs';
 	try{ Mkbootstrap('dasboot', 'myarg') };
 	is( $@, '', 'should not die, given good filename' );
 
 	# red and reed (a visual pun makes tests worth reading)
-	my $read = $out->read();
-	like( $read, qr/Writing dasboot.bs/, 'should print status' );
-	like( $read, qr/containing: my/, 'should print verbose status on request' );
+	like( $out, qr/Writing dasboot.bs/, 'should print status' );
+	like( $out, qr/containing: my/, 'should print verbose status on request' );
 
 	# now be tricky, and set the status for the next skip block
 	$file_is_ready = open(IN, "<", 'dasboot.bs');
@@ -118,6 +120,7 @@ SKIP: {
 
 # overwrite this file (may whack portability, but the name's too good to waste)
 $file_is_ready = open(OUT, ">", 'dasboot.bs');
+$out = '';
 
 SKIP: {
 	skip("cannot make dasboot.bs again: $!", 1) unless $file_is_ready;
@@ -139,7 +142,7 @@ SKIP: {
 	skip("cannot open dasboot.bs for reading: $!", 3) unless $file_is_ready;
 
 	my $file = do { local $/ = ~< *IN };
-	is( $out->read, "Writing dasboot.bs\n", 'should hush without Verbose set' );
+	is( $out, "Writing dasboot.bs\n", 'should hush without Verbose set' );
 
 	# and find our hidden tribute to a fine example
 	like( $file, qr/dl_findfile.+Larry/s, 'should load libraries if needed' );

@@ -196,7 +196,7 @@ static void
 {$c_subname}_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
         ENTER;
         SAVESPTR(PL_curstash);
-        SVcpREPLACE(PL_curstash, hash);
+        HVcpREPLACE(PL_curstash, hash);
 	newCONSTSUB(name, value);
         LEAVE;
 \}
@@ -396,7 +396,7 @@ EXPLODE
 		   corner cases of sub foo (); and reporting errors correctly,
 		   so lets cheat a bit.  Start with a constant subroutine  */
                 ENTER;
-                SAVESTPR(PL_curstash);
+                SAVESPTR(PL_curstash);
                 HVcpREPLACE(PL_curstash, symbol_table);
 		CV *cv = newCONSTSUB(value_for_notfound->name,
 				     &PL_sv_yes);

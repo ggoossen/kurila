@@ -335,25 +335,21 @@ sub write_and_run_extension {
   my ($name, $items, $export_names, $package, $header, $testfile, $num_tests,
       $wc_args) = < @_;
 
-  my $c = tie *C, 'TieOut';
-  my $xs = tie *XS, 'TieOut';
+  my $c = '';
+  open my $c_fh, '>>', \$c or die;
+  my $xs = '';
+  open my $xs_fh, '>>', \$xs or die;
 
-  ExtUtils::Constant::WriteConstants(C_FH => \*C,
-				     XS_FH => \*XS,
+  ExtUtils::Constant::WriteConstants(C_FH => $c_fh,
+				     XS_FH => $xs_fh,
 				     NAME => $package,
 				     NAMES => $items,
                                      PROXYSUBS => 1,
 				     < @$wc_args,
 				     );
 
-  my $C_code = $c->read();
-  my $XS_code = $xs->read();
-
-  undef $c;
-  undef $xs;
-
-  untie *C;
-  untie *XS;
+  my $C_code = $c;
+  my $XS_code = $xs;
 
   # Don't check the regeneration code if we specify extra arguments to
   # WriteConstants. (Fix this to give finer grained control if needed)
