@@ -1233,18 +1233,6 @@ lib/Locale/Maketext/t/90_utf8.t	See if Locale::Maketext works
 lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
 lib/Locale/Script.pm		Locale::Codes
 lib/Locale/Script.pod		Locale::Codes documentation
-lib/Log/Message/Config.pm	Log::Message
-lib/Log/Message/Handlers.pm	Log::Message
-lib/Log/Message/Item.pm	Log::Message
-lib/Log/Message.pm	Log::Message
-lib/Log/Message/Simple.pm	Log::Simple
-lib/Log/Message/Simple/t/01_use.t	Log::Simple tests
-lib/Log/Message/Simple/t/02_imports.t	Log::Simple tests
-lib/Log/Message/Simple/t/03_functions.t	Log::Simple tests
-lib/Log/Message/t/01_Log-Message-Config.t	Log::Message tests
-lib/Log/Message/t/02_Log-Message.t	Log::Message tests
-lib/Log/Message/t/conf/config_file	Log::Message tests
-lib/Log/Message/t/conf/LoadMe.pl	Log::Message tests
 lib/Math/Complex.pm		A Complex package
 lib/Math/Complex.t		See if Math::Complex works
 lib/Math/Trig.pm		A simple interface to complex trigonometry
