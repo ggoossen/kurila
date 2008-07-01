@@ -1,5 +1,5 @@
 #!./perl -w
-BEGIN { @INC = qw(lib) }
+BEGIN { @INC = @(qw(lib)) }
 use strict;
 
 BEGIN {
@@ -130,11 +130,11 @@ while (~< *UTILS) {
 sub pod2man {
     # @script is scripts names if we are installing manpages embedded 
     # in scripts, () otherwise
-    my($poddir, $mandir, $manext, @script) = @_;
+    my($poddir, $mandir, $manext, <@script) = <@_;
     if ($mandir eq ' ' or $mandir eq '') {
 	if (@script) {
 	    warn "Skipping installation of $poddir/$_ man page.\n"
-		foreach @script;
+		foreach <@script;
 	} else {
 	    warn "Skipping installation of $poddir man pages.\n";
 	}
@@ -151,7 +151,7 @@ sub pod2man {
     # dir ('.'), values are names relative to $poddir.
     my %modpods;
     if (@script) {
-	%modpods = (map {+"$poddir/$_", $_} @script);
+	%modpods = %(map {+"$poddir/$_", $_} < @script);
     }
     else {
 	File::Find::find(\%(no_chdir=>1,
@@ -207,8 +207,8 @@ sub pod2man {
 	push @to_process, \@($mod, $tmp, $manpage);
     }
 
-    foreach my $page (@to_process) {
-	my($pod, $tmp, $manpage) = @$page;
+    foreach my $page (<@to_process) {
+	my($pod, $tmp, $manpage) = <@$page;
 
         my $parser = Pod::Man->new( section => $manext,
                                     official=> 1,
@@ -238,10 +238,10 @@ exit 0;
 # Utility subroutines from installperl
 
 sub unlink {
-    my(@names) = @_;
+    my @names = @_;
     my $cnt = 0;
 
-    foreach my $name (@names) {
+    foreach my $name (<@names) {
 	next unless -e $name;
 	chmod 0777, $name if $^O eq 'os2';
 	print "  unlink $name\n" if %opts{verbose};
@@ -252,7 +252,7 @@ sub unlink {
 }
 
 sub link {
-    my($from,$to) = @_;
+    my($from,$to) = <@_;
     my($success) = 0;
 
     print "  ln $from $to\n" if %opts{verbose};
@@ -274,7 +274,7 @@ sub link {
 }
 
 sub rename {
-    my($from,$to) = @_;
+    my($from,$to) = <@_;
     if (-f $to and not unlink($to)) {
 	my($i);
 	for ($i = 1; $i +< 50; $i++) {
@@ -288,7 +288,7 @@ sub rename {
 }
 
 sub chmod {
-    my($mode,$name) = @_;
+    my($mode,$name) = <@_;
 
     printf "  chmod \%o \%s\n", $mode, $name if %opts{verbose};
     CORE::chmod($mode,$name) || warn sprintf("Couldn't chmod \%o \%s: $!\n",$mode,$name)
@@ -296,7 +296,7 @@ sub chmod {
 }
 
 sub samepath {
-    my($p1, $p2) = @_;
+    my($p1, $p2) = <@_;
     my($dev1, $ino1, $dev2, $ino2);
 
     if ($p1 ne $p2) {
