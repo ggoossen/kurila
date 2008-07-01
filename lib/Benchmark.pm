@@ -532,7 +532,7 @@ sub disablecache  {
 
 # --- Functions to process the 'time' data type
 
-sub new { my @t = @( <mytime, times, (nelems @_) == 2 ? @_[1] : 0);
+sub new { my @t = @( mytime, times, (nelems @_) == 2 ? @_[1] : 0);
 	  print STDERR "new={join ' ', <@t}\n" if $Debug;
 	  bless \@t; }
 
@@ -590,7 +590,7 @@ sub timestr {
     my @t = @( < @$tr );
     warn "bad time value ({join ' ', <@t})" unless (nelems @t)==6;
     my($r, $pu, $ps, $cu, $cs, $n) = < @t;
-    my($pt, $ct, $tt) = ( <$tr->cpu_p, < $tr->cpu_c, < $tr->cpu_a);
+    my($pt, $ct, $tt) = ( $tr->cpu_p, $tr->cpu_c, $tr->cpu_a);
     $f = $Default_Format unless defined $f;
     # format a time in the required style, other formats may be added here
     $style ||= $Default_Style;
