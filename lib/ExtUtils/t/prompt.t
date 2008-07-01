@@ -13,8 +13,6 @@ BEGIN {
 use strict;
 use Test::More tests => 11;
 use ExtUtils::MakeMaker;
-use TieOut;
-use TieIn;
 
 eval q{
     prompt();
@@ -28,27 +26,35 @@ try {
 like( $@->{description}, qr/^prompt function called without an argument/, 
                                             'undef message' );
 
-my $stdout = tie *STDOUT, 'TieOut' or die;
+my $stdout = \$( '' );
+open my $stdout_fh, '>>', $stdout or die;
+*STDOUT = *$stdout_fh{IO};
 
 
 %ENV{PERL_MM_USE_DEFAULT} = 1;
 is( prompt("Foo?"), '',     'no default' );
-like( $stdout->read,  qr/^Foo\?\s*\n$/,      '  question' );
+like( $$stdout,  qr/^Foo\?\s*\n$/,      '  question' );
+$$stdout = '';
 
 is( prompt("Foo?", undef), '',     'undef default' );
-like( $stdout->read,  qr/^Foo\?\s*\n$/,      '  question' );
+like( $$stdout,  qr/^Foo\?\s*\n$/,      '  question' );
+$$stdout = '';
 
 is( prompt("Foo?", 'Bar!'), 'Bar!',     'default' );
-like( $stdout->read,  qr/^Foo\? \[Bar!\]\s+Bar!\n$/,      '  question' );
+like( $$stdout,  qr/^Foo\? \[Bar!\]\s+Bar!\n$/,      '  question' );
+$$stdout = '';
 
 
 {
     %ENV{PERL_MM_USE_DEFAULT} = 0;
     close STDIN;
-    my $stdin = tie *STDIN, 'TieIn' or die;
-    $stdin->write("From STDIN");
+    my $stdin = '';
+    open my $stdin_fh, '<', \$stdin or die;
+    *STDIN = *$stdin_fh{IO};
+    $stdin .= "From STDIN";
     ok( !-t *STDIN,      'STDIN not a tty' );
 
     is( prompt("Foo?", 'Bar!'), 'From STDIN',     'from STDIN' );
-    like( $stdout->read,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
+    like( $$stdout,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
+    $$stdout = '';
 }

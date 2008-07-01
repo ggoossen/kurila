@@ -13,7 +13,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 27;
+use Test::More tests => 26;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
@@ -174,6 +174,6 @@ VERIFY
         };
         is( $warnings, '' );
         isa_ok( $mm->{VERSION}, 'version' );
-        is( $mm->{VERSION}, $version );
+        is( $mm->{VERSION}, $version, 'correct version' );
     }
 }
