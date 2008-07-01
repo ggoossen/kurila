@@ -486,11 +486,11 @@ clean :: clean_subdirs
 
     # OS specific things to clean up.  Use @dirs since we don't know
     # what might be in here.
-    push @dirs, $self->extra_clean_files;
+    push @dirs, < $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = %( map { ($_ => 1) } < @files ); @files = @( keys %f ); }
-    { my(%d) = %( map { ($_ => 1) } < @dirs );  @dirs  = @( keys %d ); }
+    { my(%f) = %( map { ($_ => 1) } grep { defined $_ } < @files ); @files = @( keys %f ); }
+    { my(%d) = %( map { ($_ => 1) } grep { defined $_ } < @dirs );  @dirs  = @( keys %d ); }
 
     push @m, map "\t$_\n", < $self->split_command('- $(RM_F)',  < @files);
     push @m, map "\t$_\n", < $self->split_command('- $(RM_RF)', < @dirs);

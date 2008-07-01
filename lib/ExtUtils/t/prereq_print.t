@@ -57,15 +57,15 @@ is( $?, 0,         '  exited normally' );
     my $PREREQ_PM = undef;  # shut up "used only once" warning.
     eval $prereq_out;
     die if $@;
-    ::is_deeply( $PREREQ_PM, \%( strict => 0 ), 'prereqs dumped' );
-    ::is( $@, '',                             '  without error' );
+    main::is_deeply( $PREREQ_PM, \%( strict => 0 ), 'prereqs dumped' );
+    main::is( $@, '',                             '  without error' );
 }
 
 
 $prereq_out = run(qq{$Perl Makefile.PL "PRINT_PREREQ=1"});
 ok( !-r $Makefile, "PRINT_PREREQ produces no $Makefile" );
 is( $?, 0,         '  exited normally' );
-::like( $prereq_out, qr/^perl\(strict\) \s* >= \s* 0 \s*$/x, 
+main::like( $prereq_out, qr/^perl\(strict\) \s* >= \s* 0 \s*$/x, 
                                                       'prereqs dumped' );
 
 
