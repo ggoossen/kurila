@@ -13,9 +13,8 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 5;
 
-use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
@@ -34,7 +33,9 @@ END {
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-ok( my $stdout = tie *STDOUT, 'TieOut' );
+my $stdout = '';
+close STDOUT;
+open STDOUT, '>>', \$stdout or die;
 
 {
     my $mm = WriteMakefile(

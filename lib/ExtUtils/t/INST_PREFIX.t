@@ -21,7 +21,6 @@ use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use ExtUtils::MakeMaker;
 use File::Spec;
-use TieOut;
 use ExtUtils::MakeMaker::Config;
 
 my $Is_VMS = $^O eq 'VMS';
@@ -45,7 +44,9 @@ END {
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-my $stdout = tie *STDOUT, 'TieOut' or die;
+my $stdout = '';
+close STDOUT;
+open STDOUT, '>>', \$stdout or die;
 
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
@@ -54,13 +55,14 @@ my $mm = WriteMakefile(
     PERL_CORE     => %ENV{PERL_CORE},
 );
 
-like( $stdout->read, qr{
+like( $stdout, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
                         Big::Liar's\ vars\n
                         INST_LIB\ =\ \S+\n
                         INST_ARCHLIB\ =\ \S+\n
                         Writing\ $Makefile\ for\ Big::Dummy\n
 }x );
+$stdout = '';
 
 is( $mm->{PREFIX}, '$(SITEPREFIX)', 'PREFIX set based on INSTALLDIRS' );
 
@@ -82,15 +84,14 @@ $mm = WriteMakefile(
     PERL_CORE     => %ENV{PERL_CORE},
     PREFIX        => $PREFIX,
 );
-like( $stdout->read, qr{
+like( $stdout, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
                         Big::Liar's\ vars\n
                         INST_LIB\ =\ \S+\n
                         INST_ARCHLIB\ =\ \S+\n
                         Writing\ $Makefile\ for\ Big::Dummy\n
 }x );
-undef $stdout;
-untie *STDOUT;
+$stdout = '';
 
 is( $mm->{PREFIX}, $PREFIX,   'PREFIX' );
 
@@ -153,7 +154,6 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(installman3dir => '');
 
     my $wibble = File::Spec->catdir(qw(wibble and such));
-    my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
@@ -175,7 +175,6 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(usevendorprefix => 1 );
     _set_config(vendorprefixexp => 'something' );
 
-    my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
                    NAME          => 'Big::Dummy',
                    VERSION_FROM  => 'lib/Big/Dummy.pm',
@@ -206,7 +205,6 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(vendorprefixexp => 'something' );
 
     my $wibble = File::Spec->catdir(qw(wibble and such));
-    my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
@@ -239,7 +237,6 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(vendorprefixexp => '' );
 
     my $wibble = File::Spec->catdir(qw(wibble and such));
-    my $stdout = tie *STDOUT, 'TieOut' or die;
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',

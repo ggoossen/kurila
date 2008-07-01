@@ -17,7 +17,6 @@ use Test::More tests => 8;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 use ExtUtils::MakeMaker;
-use TieOut;
 
 chdir 't';
 perl_lib;
@@ -40,7 +39,9 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
         $warnings = join '', < @_;
     };
 
-    my $stdout = tie *STDOUT, 'TieOut' or die;
+    my $stdout = '';
+    close STDOUT;
+    open STDOUT, '>>', \$stdout or die;
     my $mm = WriteMakefile(
                            NAME            => 'Big::Dummy',
                            VERSION_FROM    => 'lib/Big/Dummy.pm',

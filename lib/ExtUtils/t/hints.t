@@ -30,14 +30,15 @@ $self->{CCFLAGS} = 'basset hounds got long ears';
 CLOO
 close HINT;
 
-use TieOut;
 use ExtUtils::MakeMaker;
 
-my $out = tie *STDERR, 'TieOut';
+my $out;
+close STDERR;
+open STDERR, '>>', \$out or die;
 my $mm = bless \%(), 'ExtUtils::MakeMaker';
 $mm->check_hints;
 is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
-is( $out->read, "Processing hints file $hint_file\n" );
+is( $out, "Processing hints file $hint_file\n" );
 
 open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $!";
 print HINT <<'CLOO';
@@ -45,8 +46,9 @@ die "Argh!\n";
 CLOO
 close HINT;
 
+$out = '';
 $mm->check_hints;
-like( $out->read, qr/Processing hints file $hint_file\nArgh!/, 'hint files produce errors' );
+like( $out, qr/Processing hints file $hint_file\nArgh!/, 'hint files produce errors' );
 
 END {
     use File::Path;
