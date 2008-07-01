@@ -512,8 +512,8 @@ END
 
     if (! $self->{PERL_SRC} ) {
         require VMS::Filespec if $Is_VMS;
-        my($pthinks) = < $self->canonpath(%INC{'Config.pm'});
-        my($cthinks) = < $self->catfile(%Config{'archlibexp'},'Config.pm');
+        my $pthinks = $self->canonpath(%INC{'Config.pm'});
+        my $cthinks = $self->catfile(%Config{'archlibexp'},'Config.pm');
         $pthinks = VMS::Filespec::vmsify($pthinks) if $Is_VMS;
         if ($pthinks ne $cthinks &&
             !($Is_Win32 and lc($pthinks) eq lc($cthinks))) {
