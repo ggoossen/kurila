@@ -84,7 +84,7 @@ sub language2code
 #=======================================================================
 sub all_language_codes
 {
-    return keys %CODES;
+    return @( keys %CODES );
 }
 
 
@@ -95,7 +95,7 @@ sub all_language_codes
 #=======================================================================
 sub all_language_names
 {
-    return values %CODES;
+    return @( values %CODES );
 }
 
 

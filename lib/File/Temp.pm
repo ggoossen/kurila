@@ -152,7 +152,7 @@ require VMS::Stdio if $^O eq 'VMS';
 # us that Carp::Heavy won't load rather than an error telling us we
 # have run out of file handles. We either preload croak() or we
 # switch the calls to croak from _gettemp() to use die.
-try { require Carp::Heavy; };
+require Carp::Heavy;
 
 ### For the OO interface
 use base qw/ IO::Handle IO::Seekable /;
@@ -1164,9 +1164,9 @@ sub DESTROY {
     # do an unlink without test. Seems to be silly
     # to do this when we are trying to be careful
     # about security
-    _force_writable( < $self->filename ); # for windows
-    unlink1( $self, < $self->filename )
-      or unlink( <$self->filename);
+    _force_writable( $self->filename ); # for windows
+    unlink1( $self, $self->filename )
+      or unlink($self->filename);
   }
 }
 
@@ -1502,11 +1502,11 @@ sub tempdir  {
 
     if (%options{"DIR"}) {
 
-      $template = File::Spec->catdir(%options{"DIR"}, < TEMPXXX);
+      $template = File::Spec->catdir(%options{"DIR"}, TEMPXXX);
 
     } else {
 
-      $template = File::Spec->catdir( <File::Spec->tmpdir, < TEMPXXX);
+      $template = File::Spec->catdir(File::Spec->tmpdir, TEMPXXX);
 
     }
 
@@ -1759,7 +1759,7 @@ sub tmpnam {
      if $tmpdir eq '';
 
    # Use a ten character template and append to tmpdir
-   my $template = File::Spec->catfile($tmpdir, < TEMPXXX);
+   my $template = File::Spec->catfile($tmpdir, TEMPXXX);
 
    return mkstemp($template);
 }

@@ -75,8 +75,8 @@ sub shortmess_real {
 
 delete %Carp::{shortmess_jmp};
 delete %Carp::{longmess_jmp};
-*longmess_jmp  = *longmess_real;
-*shortmess_jmp = *shortmess_real;
+*longmess_jmp  = \&longmess_real;
+*shortmess_jmp = \&shortmess_real;
 
 
 sub caller_info {

@@ -15,7 +15,6 @@ BEGIN {
 use strict;
 use Test::More tests => 27;
 
-use TieOut;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
@@ -33,7 +32,9 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 {
-    ok( my $stdout = tie *STDOUT, 'TieOut' );
+    my $stdout = \$( '' );
+    open my $stdout_fh, '>>', $stdout or die;
+    *STDOUT = *{$stdout_fh}{IO};
     my $warnings = '';
     local $^WARN_HOOK = sub {
         $warnings .= @_[0]->{description};

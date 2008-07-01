@@ -85,7 +85,7 @@ sub currency2code
 #=======================================================================
 sub all_currency_codes
 {
-    return keys %CODES;
+    return @(keys %CODES);
 }
 
 
@@ -96,7 +96,7 @@ sub all_currency_codes
 #=======================================================================
 sub all_currency_names
 {
-    return values %CODES;
+    return @(values %CODES);
 }
 
 

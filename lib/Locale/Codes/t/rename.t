@@ -66,14 +66,15 @@ our @TESTS =
  'country2code("Zimbabwe")       eq "zw"',    # last in DATA segment
 );
 
-print "1..", int(nelems @TESTS), "\n";
+use Test::More;
 
-my $testid = 1;
+plan tests => (nelems @TESTS);
+
 foreach my $test (< @TESTS)
 {
-    eval "print (($test) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
-    print "not ok $testid\n" if $@;
-    ++$testid;
+    my $ok = eval "$test";
+    die if $@;
+    ok $ok;
 }
 
 exit 0;

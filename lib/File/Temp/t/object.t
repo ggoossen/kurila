@@ -64,7 +64,7 @@ ok( !-f $qfname, "temp file now gone");
 my $template = 'tmpdirXXXXXX';
 print "# Template: $template\n";
 my $tempdir = File::Temp::tempdir( $template ,
-				   DIR => < File::Spec->curdir,
+				   DIR => File::Spec->curdir,
 				   CLEANUP => 1,
 				 );
 
