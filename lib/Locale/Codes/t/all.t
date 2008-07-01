@@ -32,7 +32,7 @@ my $script;
 # Old API - without codeset specified, default to ALPHA_2
 #-----------------------------------------------------------------------
 $ok = 1;
-foreach $code ( <all_country_codes())
+foreach $code ( < all_country_codes())
 {
     $country = code2country($code);
     if (!defined $country)

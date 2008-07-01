@@ -76,7 +76,7 @@ try {
   require File::Path; File::Path->import();
   require File::Temp; File::Temp->import( qw/ :mktemp unlink0 /);
 
-  my $template = File::Spec->catfile( <File::Spec->tmpdir, 'fcmpXXXX');
+  my $template = File::Spec->catfile(File::Spec->tmpdir, 'fcmpXXXX');
   my($tfh,$filename) = < mkstemp($template);
   # NB. The trailing space is intentional (see [perl #37716])
   open my $tfhSP, ">", "$filename "

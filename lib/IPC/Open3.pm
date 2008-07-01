@@ -6,7 +6,6 @@ our ($VERSION, @ISA, @EXPORT);
 
 require Exporter;
 
-use Carp;
 use Symbol qw(gensym qualify);
 
 $VERSION	= 1.02;
@@ -148,23 +147,23 @@ our $Me = 'open3 (bug)';	# you should never see this, it's always localized
 
 sub xfork {
     my $pid = fork;
-    defined $pid or croak "$Me: fork failed: $!";
+    defined $pid or die "$Me: fork failed: $!";
     return $pid;
 }
 
 sub xpipe {
-    pipe @_[0], @_[1] or croak "$Me: pipe(" . Symbol::glob_name(@_[0]) . ", " . Symbol::glob_name(@_[1]) . ") failed: $!";
+    pipe @_[0], @_[1] or die "$Me: pipe(" . Symbol::glob_name(@_[0]) . ", " . Symbol::glob_name(@_[1]) . ") failed: $!";
 }
 
 # I tried using a * prototype character for the filehandle but it still
 # disallows a bearword while compiling under strict subs.
 
 sub xopen {
-    open @_[0], @_[1], @_[2] or croak "$Me: open(...)"; # . Symbol::glob_name($_[0]) . ", $_[1], " . Symbol::glob_name($_[2]) . ") failed: $!";
+    open @_[0], @_[1], @_[2] or die "$Me: open(...)"; # . Symbol::glob_name($_[0]) . ", $_[1], " . Symbol::glob_name($_[2]) . ") failed: $!";
 }
 
 sub xclose {
-    close @_[0] or croak "$Me: close(*" . Symbol::glob_name(@_[0]) . ") failed: $!";
+    close @_[0] or die "$Me: close(*" . Symbol::glob_name(@_[0]->*) . ") failed: $!";
 }
 
 sub fh_is_fd {
@@ -184,7 +183,7 @@ sub _open3 {
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
     if ((nelems @cmd) +> 1 and @cmd[0] eq '-') {
-	croak "Arguments don't make sense when the command is '-'"
+	die "Arguments don't make sense when the command is '-'"
     }
 
     # simulate autovivification of filehandles because
@@ -196,9 +195,9 @@ sub _open3 {
 	$dad_rdr = @_[2] = gensym unless defined $dad_rdr;
 	1; }) 
     {
-	# must strip crud for croak to add back, or looks ugly
+	# must strip crud for die to add back, or looks ugly
 	$@ =~ s/(?<=value attempted) at .*//s;
-	croak "$Me: $@";
+	die "$Me: $@";
     } 
 
     $dad_err ||= $dad_rdr;
@@ -264,7 +263,7 @@ sub _open3 {
 	return 0 if (@cmd[0] eq '-');
 	local($")=(" ");
 	exec < @cmd or do {
-	    carp "$Me: exec of {join ' ', <@cmd} failed";
+	    warn "$Me: exec of {join ' ', <@cmd} failed";
 	    try { require POSIX; POSIX::_exit(255); };
 	    exit 255;
 	};
@@ -325,7 +324,7 @@ sub _open3 {
 sub open3 {
     if ((nelems @_) +< 4) {
 	local $" = ', ';
-	croak "open3({join ' ', <@_}): not enough arguments";
+	die "open3({join ' ', <@_}): not enough arguments";
     }
     return _open3 'open3', scalar caller, < @_
 }
@@ -363,9 +362,9 @@ sub spawn_with_handles {
 
     foreach $fd (< @$fds) {
 	$fd->{handle}->fdopen($fd->{tmp_copy}, $fd->{mode});
-	$fd->{tmp_copy}->close or croak "Can't close: $!";
+	$fd->{tmp_copy}->close or die "Can't close: $!";
     }
-    croak join "\n", < @errs if (nelems @errs);
+    die join "\n", < @errs if (nelems @errs);
     return $pid;
 }
 

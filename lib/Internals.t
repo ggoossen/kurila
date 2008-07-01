@@ -1,12 +1,5 @@
 #!/usr/bin/perl -Tw
 
-BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        @INC = @( '../lib' );
-        chdir 't';
-    }
-}
-
 use Test::More tests => 74;
 
 my $ro_err = qr/^Modification of a read-only value attempted/;
@@ -54,7 +47,7 @@ like($@->message, $ro_err, q/Can't reassign read-only array/);
 
 ok( !Internals::SvREADONLY @foo, 0 );
 ok( !Internals::SvREADONLY @foo );
-try { @foo = @( qw/foo bar/ ); };
+try { @foo = @( qw/foo bar/ ); }; die if $@;
 is(scalar(nelems @foo), 2);
 is(@foo[1], 'bar');
 

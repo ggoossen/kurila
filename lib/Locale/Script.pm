@@ -133,7 +133,7 @@ sub all_script_codes
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return keys %{ $CODES->[$codeset] };
+    return @( keys %{ $CODES->[$codeset] } );
 }
 
 
@@ -146,7 +146,7 @@ sub all_script_names
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return values %{ $CODES->[$codeset] };
+    return @( values %{ $CODES->[$codeset] } );
 }
 
 

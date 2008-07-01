@@ -133,7 +133,7 @@ sub all_country_codes
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return keys %{ $CODES->[$codeset] };
+    return @( keys %{ $CODES->[$codeset] } );
 }
 
 
@@ -146,7 +146,7 @@ sub all_country_names
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return values %{ $CODES->[$codeset] };
+    return @( values %{ $CODES->[$codeset] } );
 }
 
 
@@ -180,9 +180,6 @@ sub alias_code
 
     return $alias;
 }
-
-# old name of function for backwards compatibility
-*_alias_code = *alias_code;
 
 
 #=======================================================================

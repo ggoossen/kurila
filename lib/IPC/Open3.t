@@ -50,7 +50,7 @@ STDERR->autoflush;
 print "1..22\n";
 
 # basic
-ok 1, $pid = open3 *WRITE, *READ, *ERROR, $perl, '-e', cmd_line(<<'EOF');
+ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
     $| = 1;
     print scalar ~< *STDIN;
     print STDERR "hi error\n";
@@ -66,7 +66,7 @@ ok 8, $reaped_pid == $pid, $reaped_pid;
 ok 9, $? == 0, $?;
 
 # read and error together, both named
-$pid = open3 *WRITE, *READ, *READ, $perl, '-e', cmd_line(<<'EOF');
+$pid = open3 \*WRITE, \*READ, \*READ, $perl, '-e', cmd_line(<<'EOF');
     $| = 1;
     print scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
@@ -78,7 +78,7 @@ print scalar ~< *READ;
 waitpid $pid, 0;
 
 # read and error together, error empty
-$pid = open3 *WRITE, *READ, '', $perl, '-e', cmd_line(<<'EOF');
+$pid = open3 \*WRITE, \*READ, '', $perl, '-e', cmd_line(<<'EOF');
     $| = 1;
     print scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
@@ -91,7 +91,7 @@ waitpid $pid, 0;
 
 # dup writer
 ok 14, pipe *PIPE_READ, *PIPE_WRITE;
-$pid = open3 '<&PIPE_READ', *READ, undef,
+$pid = open3 '<&PIPE_READ', \*READ, undef,
 		    $perl, '-e', cmd_line('print scalar ~< *STDIN');
 close PIPE_READ;
 print PIPE_WRITE "ok 15\n";
