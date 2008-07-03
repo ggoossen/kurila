@@ -65,20 +65,6 @@ sub shortmess_real {
     shortmess_heavy(< @_);
 };
 
-# replace the two hooks added by Carp
-
-# aliasing the whole glob rather than just the CV slot avoids 'redefined'
-# warnings, even in the presence of perl -W (as used by lib/warnings.t !)
-# However it has the potential to create infinite loops, if somehow Carp
-# is forcibly reloaded, but $INC{"Carp/Heavy.pm"} remains true.
-# Hence the extra hack of deleting the previous typeglob first.
-
-delete %Carp::{shortmess_jmp};
-delete %Carp::{longmess_jmp};
-*longmess_jmp  = \&longmess_real;
-*shortmess_jmp = \&shortmess_real;
-
-
 sub caller_info {
   my $i = shift(@_) + 1;
   package DB;
