@@ -3814,14 +3814,20 @@ PP(pp_nelems)
     dVAR; dSP;
     dTOPss;
     dTARGET;
-    AV *const av = (AV*)sv;
 
-    do_arg_check(SP);
-
-    if (SvAVOK(av)) {
-	SETi( av_len(av) + 1);
-    } else {
+    if ( ! SvOK(sv) ) {
 	SETi(0);
+	RETURN;
+    }
+
+    if (SvAVOK(sv)) {
+	SETi( av_len((AV*)sv) + 1);
+    }
+    else if (SvHVOK(sv)) {
+	SETi( 2 * HvKEYS((HV*)sv) );
+    }
+    else {
+	Perl_croak(aTHX_ "nelems expected an array or hash but got %s", Ddesc(sv));
     }
 
     RETURN;
