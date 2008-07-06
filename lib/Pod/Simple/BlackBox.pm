@@ -379,7 +379,7 @@ sub _gen_errata {
   # Return 0 or more fake-o paragraphs explaining the accumulated
   #  errors on this document.
 
-  return @() unless $self->{'errata'} and keys %{$self->{'errata'}};
+  return @() unless $self->{'errata'} and %{$self->{'errata'}};
 
   my @out;
   
