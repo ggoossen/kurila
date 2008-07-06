@@ -405,7 +405,7 @@ gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS');
 
 sub gen_op_is_macro {
     my ($op_is, $macname) = < @_;
-    if (keys %$op_is) {
+    if (%$op_is) {
 	
 	# get opnames whose numbers are lowest and highest
 	my ($first, < @rest) = sort {
@@ -776,7 +776,7 @@ aslice		array slice		ck_null		m@	A L
 
 each		each			ck_fun		%	H
 values		values			ck_fun		t%	H
-keys		keys			ck_fun		t%	H
+keys		keys			ck_fun		t%	S
 delete		delete			ck_delete	%	S
 exists		exists			ck_exists	is%	S
 rv2hv		hash dereference	ck_rvconst	dt1	
