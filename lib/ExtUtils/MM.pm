@@ -72,7 +72,7 @@ if( %Is{NW5} ) {
 %Is{Unix}   = !grep { $_ } values %Is;
 
 map { delete %Is{$_} unless %Is{$_} } keys %Is;
-_assert( keys %Is == 1 );
+_assert( nelems(%Is) == 2 );
 my($OS) = keys %Is;
 
 

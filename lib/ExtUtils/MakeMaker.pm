@@ -96,7 +96,7 @@ my %Special_Sigs = %(
  test       => 'HASH',
 );
 
-%Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x keys %Recognized_Att_Keys;
+%Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x (nelems(%Recognized_Att_Keys)/2);
 %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs;
 
 
