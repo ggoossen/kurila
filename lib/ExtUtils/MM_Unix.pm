@@ -2967,7 +2967,7 @@ sub ppd {
 PPD_HTML
 
     $ppd_xml .= "    <IMPLEMENTATION>\n";
-    foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
+    foreach my $prereq (sort keys %{$self->{PREREQ_PM} || \%()}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
         my ($dep_ver) = (join ",", (split (m/\./, $self->{PREREQ_PM}->{$prereq}), 
