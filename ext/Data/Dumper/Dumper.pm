@@ -11,29 +11,14 @@ package Data::Dumper;
 
 our $VERSION = '2.121_16';
 
-#$| = 1;
-
-;
 require Exporter;
 require overload;
-
-our $Useperl;
 
 BEGIN {
     our @ISA = @( qw(Exporter) );
     our @EXPORT = @( qw(Dumper) );
     our @EXPORT_OK = @( qw(DumperX) );
-
-    # if run under miniperl, or otherwise lacking dynamic loading,
-    # XSLoader should be attempted to load, or the pure perl flag
-    # toggled on load failure.
-    try {
-	require XSLoader;
-    };
-    $Useperl = 1 if $@;
 }
-
-XSLoader::load( 'Data::Dumper' ) unless $Useperl;
 
 # module vars and their defaults
 our $Indent     //= 2;
@@ -50,7 +35,6 @@ our $Bless      //= "bless";
 #$Expdepth   = 0         unless defined $Expdepth;
 our $Maxdepth   //= 0;
 our $Pair       //= ' => ';
-$Useperl    //= 0;
 our $Sortkeys   //= 0;
 our $Deparse    //= 0;
 
@@ -89,7 +73,6 @@ sub new {
              'bless'	=> $Bless,	# keyword to use for "bless"
 #	     expdepth   => $Expdepth,   # cutoff depth for explicit dumping
 	     maxdepth	=> $Maxdepth,   # depth beyond which we give up
-	     useperl    => $Useperl,    # use the pure Perl implementation
 	     sortkeys   => $Sortkeys,   # flag or filter for sorting hash keys
 	     deparse	=> $Deparse,	# use B::Deparse for coderefs
 	   );
@@ -175,10 +158,6 @@ sub Names {
 sub DESTROY {}
 
 sub Dump {
-    return &Dumpxs
-	unless $Data::Dumper::Useperl || (ref(@_[0]) && @_[0]->{useperl}) ||
-	       $Data::Dumper::Useqq   || (ref(@_[0]) && @_[0]->{useqq}) ||
-	       $Data::Dumper::Deparse || (ref(@_[0]) && @_[0]->{deparse});
     return &Dumpperl;
 }
 
@@ -640,11 +619,6 @@ sub Maxdepth {
   defined($v) ? do {($s->{'maxdepth'} = $v); return $s} : $s->{'maxdepth'};
 }
 
-sub Useperl {
-  my($s, $v) = < @_;
-  defined($v) ? do {($s->{'useperl'} = $v); return $s} : $s->{'useperl'};
-}
-
 sub Sortkeys {
   my($s, $v) = < @_;
   defined($v) ? do {($s->{'sortkeys'} = $v); return $s} : $s->{'sortkeys'};
@@ -1003,18 +977,6 @@ which we don't venture into a structure.  Has no effect when
 C<Data::Dumper::Purity> is set.  (Useful in debugger when we often don't
 want to see more than enough).  Default is 0, which means there is 
 no maximum depth. 
-
-=item *
-
-$Data::Dumper::Useperl  I<or>  $I<OBJ>->Useperl(I<[NEWVAL]>)
-
-Can be set to a boolean value which controls whether the pure Perl
-implementation of C<Data::Dumper> is used. The C<Data::Dumper> module is
-a dual implementation, with almost all functionality written in both
-pure Perl and also in XS ('C'). Since the XS version is much faster, it
-will always be used if possible. This option lets you override the
-default behavior, usually for testing purposes only. Default is 0, which
-means the XS implementation will be used if possible.
 
 =item *
 

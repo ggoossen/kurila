@@ -388,7 +388,7 @@ sub new {
     my %initial_att  = %$self; # record initial attributes
 
     my %unsatisfied = %();
-    foreach my $prereq (sort keys %{$self->{PREREQ_PM}}) {
+    foreach my $prereq (sort keys %{$self->{PREREQ_PM} || \%()}) {
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
         my $file = "$prereq.pm";

@@ -729,7 +729,7 @@ metafile :
 MAKE_FRAG
 
     my $prereq_pm = '';
-    foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{PREREQ_PM}} ) {
+    foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{PREREQ_PM} || \%()} ) {
         my $ver = $self->{PREREQ_PM}->{$mod};
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
