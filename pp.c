@@ -143,10 +143,7 @@ PP(pp_rv2sv)
 		if (SvROK(sv))
 		    goto wasref;
 	    }
-	    if (SvOK(sv))
-		Perl_croak(aTHX_ PL_no_symref_sv, sv, is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
-	    else
-		Perl_croak(aTHX_ PL_no_usym, is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
+	    Perl_croak(aTHX_ "Can't use %s as %s REF", Ddesc(sv), is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
 	}
 
 	sv = is_pp_rv2sv ? GvSVn(gv) : is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);
