@@ -2504,6 +2504,7 @@ t/op/index_thr.t		See if index works in another thread
 t/op/int.t			See if int works
 t/op/join.t			See if join works
 t/op/kill0.t			See if kill(0, $pid) works
+t/op/keys.t			See if keys works
 t/op/lc.t			See if lc, uc, lcfirst, ucfirst, quotemeta work
 t/op/lc_user.t			See if user-defined lc et alia work
 t/op/length.t			See if length works

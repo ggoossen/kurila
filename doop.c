@@ -636,8 +636,12 @@ Perl_do_kv(pTHX)
 	RETURN;
     }
 
-    if ( ! SvHVOK(hv) )
-	Perl_croak(aTHX_ "Not a HASH");
+    if ( ! SvHVOK(hv) ) {
+	if ( ! SvOK(hv) ) {
+	    RETURN;
+	}
+	Perl_croak(aTHX_ "keys expected a hash but got %s", Ddesc((SV*)hv));
+    }
 
     keys = hv;
     (void)hv_iterinit(keys);	/* always reset iterator regardless */
@@ -648,6 +652,7 @@ Perl_do_kv(pTHX)
     if (gimme == G_SCALAR) {
 	IV i;
 
+	Perl_croak(aTHX_ "keys in scalar context");
 	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
 	    SV * const sv = sv_newmortal();
 	    sv_upgrade(sv, SVt_PVLV);
