@@ -321,10 +321,10 @@ sub _get_titled_section {
   my $max_content_length   = delete %options{'max_content_length'};
   $max_content_length = 120 unless defined $max_content_length;
 
-  Carp::croak( "Unknown " . ((1 == keys %options) ? "option: " : "options: ")
-    . join " ", map "[$_]", sort keys %options
+  die( "Unknown " . ((2 == nelems(%options)) ? "option: " : "options: ")
+    . (join " ", map "[$_]", sort keys %options)
   )
-   if keys %options;
+   if %options;
 
   my %content_containers;
   %content_containers{'Para'} = 1;
