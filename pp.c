@@ -134,7 +134,7 @@ PP(pp_rv2sv)
 
 	sv = SvRV(sv);
     }
-    else if (SvOK(sv) {
+    else if (SvOK(sv)) {
 	gv = (GV*)sv;
 
 	if (SvTYPE(gv) != SVt_PVGV) {
