@@ -428,12 +428,12 @@ MM_REVISION = $self->{MM_REVISION}
 
     push @m, "
 # Handy lists of source code files:
-XS_FILES = ".$self->wraplist(sort keys %{$self->{XS}})."
+XS_FILES = ".$self->wraplist(sort keys %{$self->{XS} || \%()})."
 C_FILES  = ".$self->wraplist(< @{$self->{C}})."
 O_FILES  = ".$self->wraplist(< @{$self->{O_FILES}})."
 H_FILES  = ".$self->wraplist(< @{$self->{H}})."
-MAN1PODS = ".$self->wraplist(sort keys %{$self->{MAN1PODS}})."
-MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS}})."
+MAN1PODS = ".$self->wraplist(sort keys %{$self->{MAN1PODS} || \%()})."
+MAN3PODS = ".$self->wraplist(sort keys %{$self->{MAN3PODS} || \%()})."
 ";
 
 
@@ -2626,7 +2626,7 @@ sub needs_linking {
 	$self->{NEEDS_LINKING} = 1;
 	return 1;
     }
-    foreach my $child (keys %{$self->{CHILDREN}}) {
+    foreach my $child (keys %{$self->{CHILDREN} || \%()}) {
 	if ($self->{CHILDREN}->{$child}->needs_linking) {
 	    $self->{NEEDS_LINKING} = 1;
 	    return 1;

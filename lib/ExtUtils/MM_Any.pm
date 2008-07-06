@@ -685,7 +685,7 @@ sub manifypods_target {
     my $dependencies  = '';
 
     # populate manXpods & dependencies:
-    foreach my $name (keys %{$self->{MAN1PODS}}, keys %{$self->{MAN3PODS}}) {
+    foreach my $name (keys %{$self->{MAN1PODS} || \%()}, keys %{$self->{MAN3PODS} || \%()}) {
         $dependencies .= " \\\n\t$name";
     }
 
