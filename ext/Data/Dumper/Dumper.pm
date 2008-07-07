@@ -90,7 +90,7 @@ sub new {
 
   *format_refaddr  = sub {
     require Scalar::Util;
-    pack "J", < Scalar::Util::refaddr(shift);
+    pack "J", Scalar::Util::refaddr(shift);
   };
 }
 
@@ -154,8 +154,6 @@ sub Names {
     return @{$s->{names}};
   }
 }
-
-sub DESTROY {}
 
 sub Dump {
     return &Dumpperl;
@@ -235,284 +233,271 @@ sub _quote {
 # and curse if no recourse.
 #
 sub _dump {
-  my($s, $val, $name) = < @_;
-  my($sname);
-  my($out, $realpack, $realtype, $type, $ipad, $id, $blesspad);
+    my $s = @_[0];
+    my $name = @_[2];
+    my($sname);
+    my($out, $realpack, $type, $ipad, $blesspad);
 
-  $type = ref $val;
-  $out = "";
-
-  if ($type) {
-
-    # Call the freezer method if it's specified and the object has the
-    # method.  Trap errors and warn() instead of die()ing, like the XS
-    # implementation.
-    my $freezer = $s->{freezer};
-    if ($freezer and UNIVERSAL::can($val, $freezer)) {
-      try { $val->?$freezer() };
-      warn "WARNING(Freezer method call failed): {$@->message}" if $@;
-    }
-
-    require Scalar::Util;
-    $realpack = Scalar::Util::blessed($val);
-    $realtype = $realpack ? Scalar::Util::reftype($val) : ref $val;
-    $id = format_refaddr($val);
-
-    # if it has a name, we need to either look it up, or keep a tab
-    # on it so we know when we hit it later
-    if (defined($name) and length($name)) {
-      # keep a tab on it so that we dont fall into recursive pit
-      if (exists $s->{seen}->{$id}) {
-#	if ($s->{expdepth} < $s->{level}) {
-	  if ($s->{purity} and $s->{level} +> 0) {
-	    $out = ($realtype eq 'HASH')  ? '\%()' :
-	      ($realtype eq 'ARRAY') ? '\@()' :
-		'do{my $o}' ;
-	    push @post, $name . " = " . $s->{seen}->{$id}->[0];
-	  }
-	  else {
-	    $out = $s->{seen}->{$id}->[0];
-	    if ($name =~ m/^([\@\%])/) {
-	      my $start = $1;
-	      if ($out =~ m/^\\$start/) {
-		$out = substr($out, 1);
-	      }
-	      else {
-		$out = $start . '{' . $out . '}';
-	      }
-	    }
-          }
-	  return $out;
-#        }
-      }
-      else {
-        # store our name
-        $s->{seen}->{$id} = \@( (($name =~ m/^[@%]/)     ? ('\' . $name ) :
-			     ($realtype eq 'CODE' and
-			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
-			     $name          ),
-			    $val );
-      }
-    }
-    my $no_bless = 0; 
-    my $is_regex = 0;
-    if ( $realpack and re::is_regexp($val) ) {
-        $is_regex = 1;
-        $no_bless = $realpack eq 'Regexp';
-    }
-
-    # If purity is not set and maxdepth is set, then check depth: 
-    # if we have reached maximum depth, return the string
-    # representation of the thing we are currently examining
-    # at this depth (i.e., 'Foo=ARRAY(0xdeadbeef)'). 
-    if (!$s->{purity}
-	and $s->{maxdepth} +> 0
-	and $s->{level} +>= $s->{maxdepth})
-    {
-      return dump::view($val);
-    }
-
-    # we have a blessed ref
-    if ($realpack and !$no_bless) {
-      $out = $s->{'bless'} . '( ';
-      $blesspad = $s->{apad};
-      $s->{apad} .= '       ' if ($s->{indent} +>= 2);
-    }
-
-    $s->{level}++;
+    my $rval = \@_[1];
+    my $reftype = ref $$rval;
+    $out = "";
     $ipad = $s->{xpad} x $s->{level};
 
-    if ($is_regex) {
-        my $pat;
-        # This really sucks, re:regexp_pattern is in ext/re/re.xs and not in 
-        # universal.c, and even worse we cant just require that re to be loaded
-        # we *have* to use() it. 
-        # We should probably move it to universal.c for 5.10.1 and fix this.
-        # Currently we only use re::regexp_pattern when the re is blessed into another
-        # package. This has the disadvantage of meaning that a DD dump won't round trip
-        # as the pattern will be repeatedly wrapped with the same modifiers.
-        # This is an aesthetic issue so we will leave it for now, but we could use
-        # regexp_pattern() in list context to get the modifiers separately.
-        # But since this means loading the full debugging engine in process we wont
-        # bother unless its necessary for accuracy.
-        if (($realpack ne 'Regexp') && defined(*re::regexp_pattern{CODE})) {
-            $pat = re::regexp_pattern($val);
-        } else {
-            $pat = "$val";
+    my $realtype = ref::svtype($$rval);
+    if ($reftype) {
+
+        my $val = $$rval;
+        # Call the freezer method if it's specified and the object has the
+        # method.  Trap errors and warn() instead of die()ing, like the XS
+        # implementation.
+        my $freezer = $s->{freezer};
+        if ($freezer and UNIVERSAL::can($val, $freezer)) {
+            try { $val->?$freezer() };
+            warn "WARNING(Freezer method call failed): {$@->message}" if $@;
         }
-        $pat =~ s,/,\\/,g;
-        $out .= "qr/$pat/";
+
+        require Scalar::Util;
+        $realpack = Scalar::Util::blessed($val);
+        $realtype = $realpack ? Scalar::Util::reftype($val) : ref $val;
+        my $id = format_refaddr($val);
+
+        # if it has a name, we need to either look it up, or keep a tab
+        # on it so we know when we hit it later
+        if (defined($name) and length($name)) {
+            # keep a tab on it so that we dont fall into recursive pit
+            if (exists $s->{seen}->{$id}) {
+                #	if ($s->{expdepth} < $s->{level}) {
+                if ($s->{purity} and $s->{level} +> 0) {
+                    $out = ($realtype eq 'HASH')  ? '\%()' :
+                      ($realtype eq 'ARRAY') ? '\@()' :
+                        'do{my $o}' ;
+                    push @post, $name . " = " . $s->{seen}->{$id}->[0];
+                } else {
+                    $out = $s->{seen}->{$id}->[0];
+                    if ($name =~ m/^([\@\%])/) {
+                        my $start = $1;
+                        if ($out =~ m/^\\$start/) {
+                            $out = substr($out, 1);
+                        } else {
+                            $out = $start . '{' . $out . '}';
+                        }
+                    }
+                }
+                return $out;
+                #        }
+            } else {
+                # store our name
+                $s->{seen}->{$id} = \@( (($name =~ m/^[@%]/)     ? ('\' . $name ) :
+			     ($realtype eq 'CODE' and
+			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
+                                         $name          ),
+                                        $val );
+            }
+        }
+        my $no_bless = 0; 
+        my $is_regex = 0;
+        if ( $realpack and re::is_regexp($val) ) {
+            $is_regex = 1;
+            $no_bless = $realpack eq 'Regexp';
+        }
+
+        # If purity is not set and maxdepth is set, then check depth: 
+        # if we have reached maximum depth, return the string
+        # representation of the thing we are currently examining
+        # at this depth (i.e., 'Foo=ARRAY(0xdeadbeef)'). 
+        if (!$s->{purity}
+            and $s->{maxdepth} +> 0
+            and $s->{level} +>= $s->{maxdepth}) {
+            return dump::view($val);
+        }
+
+        # we have a blessed ref
+        if ($realpack and !$no_bless) {
+            $out = $s->{'bless'} . '( ';
+            $blesspad = $s->{apad};
+            $s->{apad} .= '       ' if ($s->{indent} +>= 2);
+        }
+
+        $s->{level}++;
+
+        if ($is_regex) {
+            my $pat;
+            # This really sucks, re:regexp_pattern is in ext/re/re.xs and not in 
+            # universal.c, and even worse we cant just require that re to be loaded
+            # we *have* to use() it. 
+            # We should probably move it to universal.c for 5.10.1 and fix this.
+            # Currently we only use re::regexp_pattern when the re is blessed into another
+            # package. This has the disadvantage of meaning that a DD dump won't round trip
+            # as the pattern will be repeatedly wrapped with the same modifiers.
+            # This is an aesthetic issue so we will leave it for now, but we could use
+            # regexp_pattern() in list context to get the modifiers separately.
+            # But since this means loading the full debugging engine in process we wont
+            # bother unless its necessary for accuracy.
+            if (($realpack ne 'Regexp') && defined(*re::regexp_pattern{CODE})) {
+                $pat = re::regexp_pattern($val);
+            } else {
+                $pat = "$val";
+            }
+            $pat =~ s,/,\\/,g;
+            $out .= "qr/$pat/";
+        } else {
+            $out .= '\' . $s->_dump($$val, $name); # '
+        }
+
+        $s->{level}--;
     }
-    elsif ($realtype eq 'SCALAR' || $realtype eq 'REF') {
-      if ($realpack) {
-	$out .= 'do{\(my $o = ' . $s->_dump($$val, "\$\{$name\}") . ')}';
-      }
-      else {
-	$out .= '\' . $s->_dump($$val, "\$\{$name\}");
-      }
+    elsif ($realtype eq 'REF') {
+        if ($realpack) {
+            $out .= 'do{\(my $o = ' . $s->_dump($$rval, "\$\{$name\}") . ')}';
+        } else {
+            $out .= '\' . $s->_dump($rval, "\$\{$name\}"); # '
+        }
     }
     elsif ($realtype eq 'GLOB') {
-	$out .= '\' . $s->_dump($$val, "*\{$name\}");
+        my $name = Symbol::glob_name($rval);
+        if ($name =~ m/^[A-Za-z_][\w:]*$/) {
+            $name =~ s/^main::/::/;
+            $sname = $name;
+        }
+        else {
+            $sname = $s->_dump($name, "");
+            $sname = '{' . $sname . '}';
+        }
+
+        # first, catalog the scalar
+        my $id = format_refaddr($rval);
+        if ($name ne '') {
+            if (exists $s->{seen}->{$id}) {
+                if ($s->{seen}->{$id}->[2]) {
+                    $out = $s->{seen}->{$id}->[0];
+                    #warn "[<$out]\n";
+                    return "\$\{$out\}";
+                }
+            }
+            else {
+                #warn "[>\\$name]\n";
+                $s->{seen}->{$id} = \@("\\$name", $rval);
+            }
+        }
+
+        if ($s->{purity}) {
+            my $k;
+            local ($s->{level}) = 0;
+            for $k (qw(SCALAR ARRAY HASH)) {
+                my $gval = *$rval{$k};
+                next unless defined $gval;
+                next if $k eq "SCALAR" && ! defined $$gval;  # always there
+                
+                # _dump can push into @post, so we hold our place using $postlen
+                my $postlen = scalar nelems @post;
+                @post[$postlen] = "\*$sname = ";
+                local ($s->{apad}) = " " x length(@post[$postlen]) if $s->{indent} +>= 2;
+                @post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
+            }
+        }
+        $out .= '*' . $sname;
+	$out .= '\' . $s->_dump($$rval, "*\{$name\}"); # '
+
+          if ($id) {
+              # if we made it this far, $id was added to seen list at current
+              # level, so remove it to get deep copies
+              if ($s->{deepcopy}) {
+                  delete($s->{seen}->{$id});
+              }
+              elsif ($name) {
+                  $s->{seen}->{$id}->[2] = 1;
+              }
+          }
     }
     elsif ($realtype eq 'ARRAY') {
-      my($v, $pad, $mname);
-      my($i) = 0;
-      $out .= ($name =~ m/^\@/) ? '(' : '\@(';
-      $pad = $s->{sep} . $s->{pad} . $s->{apad};
-      ($name =~ m/^\@(.*)$/) ? ($mname = "\$" . $1) : 
-	# omit -> if $foo->[0]->{bar}, but not ${$foo->[0]}->{bar}
-	($name =~ m/^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
-	  ($mname = $name . '->');
-      $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-      for $v (< @$val) {
-	$sname = $mname . '[' . $i . ']';
-	$out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
-	$out .= $pad . $ipad . $s->_dump($v, $sname);
-	$out .= "," if $i++ +< (nelems @$val) -1;
-      }
-      $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
-      $out .= ')';
+        my($v, $pad, $mname);
+        my($i) = 0;
+        $out .= '@(';
+        $pad = $s->{sep} . $s->{pad} . $s->{apad};
+        $mname = $name . '->';
+        $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
+        for $v (< @$rval) {
+            $sname = $mname . '[' . $i . ']';
+            $out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
+            $out .= $pad . $ipad . $s->_dump($v, $sname);
+            $out .= "," if $i++ +< (nelems @$rval) -1;
+        }
+        $out .= $pad . ($s->{xpad} x ($s->{level} - 1)) if $i;
+        $out .= ')';
     }
     elsif ($realtype eq 'HASH') {
-      my($k, $v, $pad, $lpad, $mname, $pair);
-      $out .= ($name =~ m/^\%/) ? '(' : '\%(';
-      $pad = $s->{sep} . $s->{pad} . $s->{apad};
-      $lpad = $s->{apad};
-      $pair = $s->{pair};
-      ($name =~ m/^\%(.*)$/) ? ($mname = "\$" . $1) :
-	# omit -> if $foo->[0]->{bar}, but not ${$foo->[0]}->{bar}
-	($name =~ m/^\\?[\%\@\*\$][^{].*[]}]$/) ? ($mname = $name) :
-	  ($mname = $name . '->');
-      $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-      my ($sortkeys, $keys, $key) = ($s->{sortkeys});
-      if ($sortkeys) {
-	if (ref($s->{sortkeys}) eq 'CODE') {
-	  $keys = $s->{sortkeys}->($val);
-	  unless (ref($keys) eq 'ARRAY') {
-	    warn "Sortkeys subroutine did not return ARRAYREF";
-	    $keys = \@();
-	  }
-	}
-	else {
-	  $keys = \@( sort keys %$val );
-	}
-      }
-      while (($k, $v) = ! $sortkeys ? (each %$val) :
-	     (nelems @$keys) ? ($key = shift(@$keys), $val->{$key}) :
-	     () ) 
-      {
-	my $nk = $s->_dump($k, "");
-	$nk = $1 if !$s->{quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
-	$sname = $mname . '{' . $nk . '}';
-	$out .= $pad . $ipad . $nk . $pair;
+        my($k, $v, $pad, $lpad, $mname, $pair);
+        $out .= '%(';
+        $pad = $s->{sep} . $s->{pad} . $s->{apad};
+        $lpad = $s->{apad};
+        $pair = $s->{pair};
+        $mname = $name . '->';
+        $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
+        my ($sortkeys, $keys, $key) = ($s->{sortkeys});
+        if ($sortkeys) {
+            if (ref($s->{sortkeys}) eq 'CODE') {
+                $keys = $s->{sortkeys}->($rval);
+                unless (ref($keys) eq 'ARRAY') {
+                    warn "Sortkeys subroutine did not return ARRAYREF";
+                    $keys = \@();
+                }
+            } else {
+                $keys = \@( sort keys %$rval );
+            }
+        }
+        while (($k, $v) = ! $sortkeys ? (each %$rval) :
+               (nelems @$keys) ? ($key = shift(@$keys), $rval->{$key}) :
+               () ) {
+            my $nk = $s->_dump($k, "");
+            $nk = $1 if !$s->{quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
+            $sname = $mname . '{' . $nk . '}';
+            $out .= $pad . $ipad . $nk . $pair;
 
-	# temporarily alter apad
-	$s->{apad} .= (" " x (length($nk) + 4)) if $s->{indent} +>= 2;
-	$out .= $s->_dump($val->{$k}, $sname) . ",";
-	$s->{apad} = $lpad if $s->{indent} +>= 2;
-      }
-      if (substr($out, -1) eq ',') {
-	chop $out;
-	$out .= $pad . ($s->{xpad} x ($s->{level} - 1));
-      }
-      $out .= ')';
+            # temporarily alter apad
+            $s->{apad} .= (" " x (length($nk) + 4)) if $s->{indent} +>= 2;
+            $out .= $s->_dump($rval->{$k}, $sname) . ",";
+            $s->{apad} = $lpad if $s->{indent} +>= 2;
+        }
+        if (substr($out, -1) eq ',') {
+            chop $out;
+            $out .= $pad . ($s->{xpad} x ($s->{level} - 1));
+        }
+        $out .= ')';
     }
     elsif ($realtype eq 'CODE') {
-      if ($s->{deparse}) {
-	require B::Deparse;
-	my $sub =  'sub ' . (B::Deparse->new)->coderef2text($val);
-	my $pad    =  $s->{sep} . $s->{pad} . $s->{apad} . $s->{xpad} x ($s->{level} - 1);
-	$sub    =~ s/\n/{$pad}/gs;
-	$out   .=  $sub;
-      } else {
-        $out .= 'sub { "DUMMY" }';
-        warn "Encountered CODE ref, using dummy placeholder" if $s->{purity};
-      }
+        if ($s->{deparse}) {
+            require B::Deparse;
+            my $sub =  'sub ' . (B::Deparse->new)->coderef2text($rval);
+            my $pad    =  $s->{sep} . $s->{pad} . $s->{apad} . $s->{xpad} x ($s->{level} - 1);
+            $sub    =~ s/\n/{$pad}/gs;
+            $out   .=  $sub;
+        } else {
+            $out .= 'sub { "DUMMY" }';
+            warn "Encountered CODE ref, using dummy placeholder" if $s->{purity};
+        }
+    }
+    elsif ($realtype eq 'PLAINVALUE') {
+        if (!defined($$rval)) {
+            $out .= "undef";
+        }
+        elsif ($$rval =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
+            $out .= $$rval;
+        }
+        else {				 # string
+            if ($s->{useqq} or $$rval =~ m/[\x[80]-\x[FF]]/) {
+                # Fall back to qq if there's Unicode
+                $out .= qquote($$rval, $s->{useqq});
+            }
+            else {
+                $out .= _quote($$rval);
+            }
+        }
     }
     else {
-      die "Can\'t handle $realtype type.";
+        die "Can\'t handle $realtype type.";
     }
-    
-    if ($realpack and !$no_bless) { # we have a blessed ref
-      $out .= ', ' . _quote($realpack) . ' )';
-      $out .= '->' . $s->{toaster} . '()'  if $s->{toaster} ne '';
-      $s->{apad} = $blesspad;
-    }
-    $s->{level}--;
 
-  }
-  else {                                 # simple scalar
-
-    my $ref = \@_[1];
-    # first, catalog the scalar
-    if ($name ne '') {
-      $id = format_refaddr($ref);
-      if (exists $s->{seen}->{$id}) {
-        if ($s->{seen}->{$id}->[2]) {
-	  $out = $s->{seen}->{$id}->[0];
-	  #warn "[<$out]\n";
-	  return "\$\{$out\}";
-	}
-      }
-      else {
-	#warn "[>\\$name]\n";
-	$s->{seen}->{$id} = \@("\\$name", $ref);
-      }
-    }
-    if (ref($ref) eq 'GLOB') {  # glob
-      my $name = Symbol::glob_name($val);
-      if ($name =~ m/^[A-Za-z_][\w:]*$/) {
-	$name =~ s/^main::/::/;
-	$sname = $name;
-      }
-      else {
-	$sname = $s->_dump($name, "");
-	$sname = '{' . $sname . '}';
-      }
-      if ($s->{purity}) {
-	my $k;
-	local ($s->{level}) = 0;
-	for $k (qw(SCALAR ARRAY HASH)) {
-	  my $gval = *$val{$k};
-	  next unless defined $gval;
-	  next if $k eq "SCALAR" && ! defined $$gval;  # always there
-
-	  # _dump can push into @post, so we hold our place using $postlen
-	  my $postlen = scalar nelems @post;
-	  @post[$postlen] = "\*$sname = ";
-	  local ($s->{apad}) = " " x length(@post[$postlen]) if $s->{indent} +>= 2;
-	  @post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
-	}
-      }
-      $out .= '*' . $sname;
-    }
-    elsif (!defined($val)) {
-      $out .= "undef";
-    }
-    elsif ($val =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
-      $out .= $val;
-    }
-    else {				 # string
-      if ($s->{useqq} or $val =~ m/[\x[80]-\x[FF]]/) {
-        # Fall back to qq if there's Unicode
-	$out .= qquote($val, $s->{useqq});
-      }
-      else {
-        $out .= _quote($val);
-      }
-    }
-  }
-  if ($id) {
-    # if we made it this far, $id was added to seen list at current
-    # level, so remove it to get deep copies
-    if ($s->{deepcopy}) {
-      delete($s->{seen}->{$id});
-    }
-    elsif ($name) {
-      $s->{seen}->{$id}->[2] = 1;
-    }
-  }
-  return $out;
+    return $out;
 }
   
 #
