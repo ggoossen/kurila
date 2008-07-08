@@ -70,7 +70,7 @@
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB PACKAGE USE
-%token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF FOR
+%token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
@@ -304,6 +304,10 @@ cond	:	IF '(' remember mexpr ')' mblock else
 /* Continue blocks */
 cont	:	/* NULL */
 			{ $$ = (OP*)NULL; }
+        |       CONTINUE block
+                        { $$ = scope($2);
+                            TOKEN_GETMAD($1,$$,'o');
+                        }
 	;
 
 /* Loops: while, until, for, and a bare block */
