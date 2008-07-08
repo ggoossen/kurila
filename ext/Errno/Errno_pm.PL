@@ -382,8 +382,20 @@ ESQ
     print "\t",$k,"\n    ))\n);\n\n";
 
     foreach $err (< @err) {
-	printf "sub \%s () \{ \%d \}\n",,$err,%err{$err};
+	printf "sub \%s () \{ \%d \}\n",$err,%err{$err};
     }
+
+    print <<'ESQ';
+my %name2no = %(
+ESQ
+
+    foreach $err (< @err) {
+	printf "    \%s => \%d,\n",$err,%err{$err};
+    }
+
+    print <<'ESQ';
+);
+ESQ
 
     print <<'ESQ';
 
@@ -393,9 +405,8 @@ sub FETCH {
     my ($self, $errname) = < @_;
     my $proto = prototype("Errno::$errname");
     my $errno = "";
-    if (defined($proto) && $proto eq "") {
-	$errno = &{*{Symbol::fetch_glob($errname)}};
-        $errno = 0 unless $! == $errno;
+    if ( exists %name2no{$errno}) {
+        $errno = 0 unless $! == %name2no{$errno};
     }
     return $errno;
 }
@@ -408,24 +419,18 @@ sub STORE {
 *DELETE = \&STORE;
 
 sub NEXTKEY {
-    my($k,$v);
-    while(($k,$v) = each %Errno::) {
-	my $proto = prototype("Errno::$k");
-	last if (defined($proto) && $proto eq "");
-    }
+    my($k,$v) = each %name2no;
     $k
 }
 
 sub FIRSTKEY {
-    my $s = scalar keys %Errno::;	# initialize iterator
+    keys %name2no;	# initialize iterator
     goto &NEXTKEY;
 }
 
 sub EXISTS {
     my ($self, $errname) = < @_;
-    my $r = ref $errname;
-    my $proto = !$r || $r eq 'CODE' ? prototype($errname) : undef;
-    defined($proto) && $proto eq "";
+    return exists %name2no{$errname};
 }
 
 tie %!, __PACKAGE__;
