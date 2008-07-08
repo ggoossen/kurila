@@ -282,6 +282,7 @@ static struct debug_tokens {
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
     { BITOROP,		TOKENTYPE_OPNUM,	"BITOROP" },
     { COLONATTR,	TOKENTYPE_NONE,		"COLONATTR" },
+    { CONTINUE,                TOKENTYPE_NONE,         "CONTINUE" },
     { DO,		TOKENTYPE_NONE,		"DO" },
     { DORDOR,		TOKENTYPE_NONE,		"DORDOR" },
     { DOROP,		TOKENTYPE_OPNUM,	"DOROP" },
@@ -4960,6 +4961,9 @@ Perl_yylex(pTHX)
 	case KEY_chop:
 	    UNI(OP_CHOP);
 
+	case KEY_continue:
+	    PREBLOCK(CONTINUE);
+
 	case KEY_chdir:
 	    /* may use HOME */
 	    (void)gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV);
@@ -8387,6 +8391,19 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
 
               goto unknown;
 
+	    case 'o':
+		if (name[2] == 'n' &&
+		    name[3] == 't' &&
+		    name[4] == 'i' &&
+		    name[5] == 'n' &&
+		    name[6] == 'u' &&
+		    name[7] == 'e')
+		    {                                   /* continue   */
+			return -KEY_continue;
+		    }
+		
+		goto unknown;
+ 
             default:
               goto unknown;
           }
