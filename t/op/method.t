@@ -94,10 +94,6 @@ is(A->d, "C::d");
 }
 is(A->d, "C::d");
 
-*A::x = *A::d;			# See if cache incorrectly follows synonyms
-A->d;
-is(try { A->x } || "nope", "nope");
-
 {
     # this test added due to bug discovery
     no strict 'refs';

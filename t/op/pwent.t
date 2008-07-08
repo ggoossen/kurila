@@ -134,10 +134,10 @@ while ( ~< *PW) {
 
 endpwent();
 
-print "# max = $max, n = $n, perfect = ", scalar keys %perfect, "\n";
+print "# max = $max, n = $n, perfect = ", nelems(@(keys %perfect)), "\n";
 
 my $not;
-if (keys %perfect == 0 && $n) {
+if ( ! %perfect && $n) {
     $max++;
     print <<EOEX;
 #

@@ -82,10 +82,10 @@ is( $f2->(), 2, 'generator 2 once more' );
     sub FETCH { ++$fetchcount; 18 };
     tie my $y, "countfetches";
     sub foo { state $x //= $y; $x++ }
-    ::is( foo(), 18, "initialisation with tied variable" );
-    ::is( foo(), 19, "increments correctly" );
-    ::is( foo(), 20, "increments correctly, twice" );
-    ::is( $fetchcount, 1, "fetch only called once" );
+    main::is( foo(), 18, "initialisation with tied variable" );
+    main::is( foo(), 19, "increments correctly" );
+    main::is( foo(), 20, "increments correctly, twice" );
+    main::is( $fetchcount, 1, "fetch only called once" );
 }
 
 # state variables are shared among closures

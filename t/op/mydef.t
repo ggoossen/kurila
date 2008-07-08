@@ -151,9 +151,9 @@ $_ = "global";
 {
     package notmain;
     our $_ = 'notmain';
-    ::ok( $::_ eq 'notmain', 'our $_ forced into main::' );
+    main::ok( $::_ eq 'notmain', 'our $_ forced into main::' );
     m/(.*)/;
-    ::ok( $1 eq 'notmain', '...m// defaults to our $_ in main::' );
+    main::ok( $1 eq 'notmain', '...m// defaults to our $_ in main::' );
 }
 
 my $file = 'dolbar1.tmp';
@@ -176,6 +176,6 @@ END { unlink $file; }
     ok( $fqdb::_ eq 'fqdb', 'fully qualified $_ is not in main' );
     ok( eval q/$fqdb::_/ eq 'fqdb', 'fully qualified, evaled $_ is not in main' );
     package fqdb;
-    ::ok( $_ ne 'fqdb', 'unqualified $_ is in main' );
-    ::ok( q/$_/ ne 'fqdb', 'unqualified, evaled $_ is in main' );
+    main::ok( $_ ne 'fqdb', 'unqualified $_ is in main' );
+    main::ok( q/$_/ ne 'fqdb', 'unqualified, evaled $_ is in main' );
 }

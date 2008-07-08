@@ -313,21 +313,21 @@ is($@, "");
 	no warnings "redefine";
 	{
 		local *f1 = sub  { "g1" };
-		::ok(f1() eq "g1", "localised sub via glob");
+		main::ok(f1() eq "g1", "localised sub via glob");
 	}
-	::ok(f1() eq "f1", "localised sub restored");
+	main::ok(f1() eq "f1", "localised sub restored");
 	{
 		local %Other::{"f1"} = sub { "h1" };
-		::ok(f1() eq "h1", "localised sub via stash");
+		main::ok(f1() eq "h1", "localised sub via stash");
 	}
-	::ok(f1() eq "f1", "localised sub restored");
+	main::ok(f1() eq "f1", "localised sub restored");
 	{
 		local %Other::{[qw/ f1 f2 /]} = (sub { "j1" }, sub { "j2" });
-		::ok(f1() eq "j1", "localised sub via stash slice");
-		::ok(f2() eq "j2", "localised sub via stash slice");
+		main::ok(f1() eq "j1", "localised sub via stash slice");
+		main::ok(f2() eq "j2", "localised sub via stash slice");
 	}
-	::ok(f1() eq "f1", "localised sub restored");
-	::ok(f2() eq "f2", "localised sub restored");
+	main::ok(f1() eq "f1", "localised sub restored");
+	main::ok(f2() eq "f2", "localised sub restored");
 }
 
 # Localising unicode keys (bug #38815)
@@ -335,7 +335,7 @@ is($@, "");
     my %h;
     %h{"\243"} = "pound";
     %h{"\302\240"} = "octects";
-    is(scalar keys %h, 2);
+    is(nelems(@( keys %h)), 2);
     {
         use utf8;
 	my $unicode = chr 256;
@@ -344,7 +344,7 @@ is($@, "");
 	local %h{$unicode} = 256;
 	local %h{$ambigous} = 160;
 
-	is(scalar keys %h, 4);
+	is(nelems(@(keys %h)), 4);
 	is(%h{"\243"}, "pound");
 	is(%h{$unicode}, 256);
 	is(%h{$ambigous}, 160);
