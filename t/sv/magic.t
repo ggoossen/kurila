@@ -374,7 +374,7 @@ if ($Is_miniperl) {
 
 # Make sure Errno hasn't been prematurely autoloaded
 
-   ok !keys %{Symbol::stash("Errno")};
+   ok ! %{Symbol::stash("Errno")};
 
 # Test auto-loading of Errno when %! is used
 

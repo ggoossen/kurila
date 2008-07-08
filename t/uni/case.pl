@@ -38,7 +38,6 @@ sub casetest {
     for my $i (sort keys %simple) {
 	%seen{$i}++;
     }
-    print "# ", scalar keys %simple, " simple mappings\n";
 
     my $both;
 
@@ -48,8 +47,6 @@ sub casetest {
 	    $both++;
 	}
     }
-    print "# ", scalar keys %$spec, " special mappings\n";
-
     exit(1) if $both;
 
     my %none;
@@ -58,12 +55,11 @@ sub casetest {
 	next if pack("U0U", $i) =~ m/\w/;
 	%none{$i}++ unless %seen{$i};
     }
-    print "# ", scalar keys %none, " noncase mappings\n";
 
     my $tests = 
-	((scalar keys %simple) +
-	 (scalar keys %$spec) +
-	 (scalar keys %none)) * nelems @funcs;
+	( (nelems(%simple)/2) +
+          (nelems(%$spec)/2) +
+          (nelems(%none)/2) ) * nelems @funcs;
     print "1..$tests\n";
 
     my $test = 1;
