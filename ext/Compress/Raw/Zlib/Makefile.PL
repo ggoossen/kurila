@@ -143,7 +143,7 @@ require ExtUtils::Constant;
     }
     close F ;
 
-    if ( keys %names )
+    if ( %names )
     {
         my $missing = join ("\n\t", sort keys %names) ;
         die "The following names are missing from \@EXPORT in Zlib.pm\n" .
