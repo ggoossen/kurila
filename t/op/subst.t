@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 119 );
+plan( tests => 120 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -22,6 +22,9 @@ ok( $_ eq 'foo', ":$_: eq :foo:" );
 $_ = "x";
 s/x/\$x $x/;
 ok( $_ eq '$x foo', ":$_: eq :\$x foo:" );
+
+dies_like(sub { my @a =~ s/aap/noot/ },
+          qr/substitute expected a plain value but got ARRAY/);
 
 $b = 'cd';
 ($a = 'abcdef') =~ s<(b$b(?:)e)>'\n$1';

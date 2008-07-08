@@ -4085,16 +4085,6 @@ key.  Will untabivy if `kurila-electric-backspace-untabify' is non-nil."
 	  (backward-delete-char-untabify arg)
 	(delete-backward-char arg)))))
 
-(defun kurila-inside-parens-p ()		;; NOT USED????
-  (condition-case ()
-      (save-excursion
-	(save-restriction
-	  (narrow-to-region (point)
-			    (progn (beginning-of-defun) (point)))
-	  (goto-char (point-max))
-	  (= (char-after (or (scan-lists (point) -1 1) (point-min))) ?\()))
-    (error nil)))
-
 (defun kurila-indent-command (&optional whole-exp)
   "Indent current line as Perl code, or in some cases insert a tab character.
 If `kurila-tab-always-indent' is non-nil (the default), always indent current
