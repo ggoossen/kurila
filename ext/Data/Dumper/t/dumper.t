@@ -93,6 +93,12 @@ is Data::Dumper->Dump(\@(@('abc', 'def')), \@('a')), <<'====' ;
 
 is Data::Dumper->Dump(\@(undef), \@('a')), '#$a = undef;' . "\n" ;
 
+is Data::Dumper->Dump(\@( bless \%( aap => 'noot' ), 'version' ), \@('a')), <<'====';
+#$a = bless( \%(
+#              "aap" => "noot"
+#            ), "version" );
+====
+
 #XXXif (0) {
 #############
 #############
