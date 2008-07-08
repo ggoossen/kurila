@@ -260,16 +260,13 @@ if ($dl_debug) {
 	    unless defined(&boot_DynaLoader);
 }
 
-1; # End of main code
-
-
 use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
             @do_expand);
 
 sub bootstrap_inherit {
     my $module = @_[0];
-    local *isa = *{Symbol::fetch_glob("$module\::ISA")};
-    local @isa = @( < @isa, 'DynaLoader');
+    my $isa_glob = Symbol::fetch_glob("$module\::ISA");
+    local @{*{$isaglob}} = @(<@{*{$isa_glob}}, 'DynaLoader');
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     bootstrap(<@_);
 }
@@ -349,7 +346,7 @@ sub bootstrap {
     # last resort, let dl_findfile have a go in all known locations
     ($file) = < dl_findfile(map("-L$_",<@dirs,<@INC), $modfname) unless $file;
 
-    die("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
+    die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', <@INC))")
 	unless $file;	# wording similar to error from 'require'
 
     <<$^O-eq-VMS>>$file = uc($file) if %Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>

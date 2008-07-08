@@ -134,16 +134,9 @@ print OUT <<'EOT';
     goto &$bootstrap_inherit;
 }
 
-# Versions of DynaLoader prior to 5.6.0 don't have this function.
 sub bootstrap_inherit {
-    package DynaLoader;
-
-    my $module = @_[0];
-    local *DynaLoader::isa = *{Symbol::fetch_glob("$module\::ISA")};
-    local @DynaLoader::isa = @(<@DynaLoader::isa, 'DynaLoader');
-    # Cannot goto due to delocalization.  Will report errors on a wrong line?
     require DynaLoader;
-    DynaLoader::bootstrap(<@_);
+    DynaLoader::bootstrap_inherit(<@_);
 }
 
 1;
