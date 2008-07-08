@@ -1923,14 +1923,6 @@ PERL_CALLCONV OP*	Perl_newFOROP(pTHX_ I32 flags, char* label, line_t forline, OP
 #define PERL_ARGS_ASSERT_NEWFOROP	\
 	assert(expr)
 
-PERL_CALLCONV OP*	Perl_newGIVENOP(pTHX_ OP* cond, OP* block, PADOFFSET defsv_off)
-			__attribute__malloc__
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_NEWGIVENOP	\
-	assert(cond); assert(block)
-
 PERL_CALLCONV OP*	Perl_newLOGOP(pTHX_ I32 optype, I32 flags, OP *first, OP *other)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
@@ -2168,13 +2160,6 @@ PERL_CALLCONV SV*	Perl_newSV_type(pTHX_ const svtype type)
 PERL_CALLCONV OP*	Perl_newUNOP(pTHX_ I32 type, I32 flags, OP* first)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
-
-PERL_CALLCONV OP*	Perl_newWHENOP(pTHX_ OP* cond, OP* block)
-			__attribute__malloc__
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_NEWWHENOP	\
-	assert(block)
 
 PERL_CALLCONV OP*	Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP* loop, I32 whileline, OP* expr, OP* block, OP* cont, I32 has_my)
 			__attribute__malloc__
@@ -4671,9 +4656,6 @@ STATIC OP*	S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **opli
 STATIC I32	S_dopoptoeval(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
 
-STATIC I32	S_dopoptogiven(pTHX_ I32 startingblock)
-			__attribute__warn_unused_result__;
-
 STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
@@ -4681,9 +4663,6 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 	assert(label)
 
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
-			__attribute__warn_unused_result__;
-
-STATIC I32	S_dopoptowhen(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
 
 STATIC void	S_save_lines(pTHX_ AV *array, SV *sv)

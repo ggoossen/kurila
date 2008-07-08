@@ -859,13 +859,6 @@ goto		goto			ck_null		ds}
 exit		exit			ck_exit		ds%	S?
 method_named	method with known name	ck_null		d$
 
-entergiven	given()			ck_null		d|
-leavegiven	leave given block	ck_null		1
-enterwhen	when()			ck_null		d|
-leavewhen	leave when block	ck_null		1
-break		break			ck_null		0
-continue	continue		ck_null		0
-
 # I/O.
 
 open		open			ck_open		ismt@	F S? L

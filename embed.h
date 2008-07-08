@@ -525,7 +525,6 @@
 #define newFORM			Perl_newFORM
 #endif
 #define newFOROP		Perl_newFOROP
-#define newGIVENOP		Perl_newGIVENOP
 #define newLOGOP		Perl_newLOGOP
 #define newLOOPEX		Perl_newLOOPEX
 #define newLOOPOP		Perl_newLOOPOP
@@ -573,7 +572,6 @@
 #define newSVsv			Perl_newSVsv
 #define newSV_type		Perl_newSV_type
 #define newUNOP			Perl_newUNOP
-#define newWHENOP		Perl_newWHENOP
 #define newWHILEOP		Perl_newWHILEOP
 #define new_stackinfo		Perl_new_stackinfo
 #define scan_vstring		Perl_scan_vstring
@@ -1256,10 +1254,8 @@
 #define docatch			S_docatch
 #define dofindlabel		S_dofindlabel
 #define dopoptoeval		S_dopoptoeval
-#define dopoptogiven		S_dopoptogiven
 #define dopoptolabel		S_dopoptolabel
 #define dopoptoloop		S_dopoptoloop
-#define dopoptowhen		S_dopoptowhen
 #define save_lines		S_save_lines
 #define doeval			S_doeval
 #define check_type_and_open	S_check_type_and_open
@@ -1930,7 +1926,6 @@
 #define pp_bit_or		Perl_pp_bit_or
 #define pp_bit_xor		Perl_pp_bit_xor
 #define pp_bless		Perl_pp_bless
-#define pp_break		Perl_pp_break
 #define pp_caller		Perl_pp_caller
 #define pp_chdir		Perl_pp_chdir
 #define pp_chmod		Perl_pp_chmod
@@ -1947,7 +1942,6 @@
 #define pp_cond_expr		Perl_pp_cond_expr
 #define pp_connect		Perl_pp_connect
 #define pp_const		Perl_pp_const
-#define pp_continue		Perl_pp_continue
 #define pp_cos			Perl_pp_cos
 #define pp_crypt		Perl_pp_crypt
 #define pp_dbstate		Perl_pp_dbstate
@@ -1965,12 +1959,10 @@
 #define pp_enetent		Perl_pp_enetent
 #define pp_enter		Perl_pp_enter
 #define pp_entereval		Perl_pp_entereval
-#define pp_entergiven		Perl_pp_entergiven
 #define pp_enteriter		Perl_pp_enteriter
 #define pp_enterloop		Perl_pp_enterloop
 #define pp_entersub		Perl_pp_entersub
 #define pp_entertry		Perl_pp_entertry
-#define pp_enterwhen		Perl_pp_enterwhen
 #define pp_eof			Perl_pp_eof
 #define pp_eprotoent		Perl_pp_eprotoent
 #define pp_epwent		Perl_pp_epwent
@@ -2080,11 +2072,9 @@
 #define pp_le			Perl_pp_le
 #define pp_leave		Perl_pp_leave
 #define pp_leaveeval		Perl_pp_leaveeval
-#define pp_leavegiven		Perl_pp_leavegiven
 #define pp_leaveloop		Perl_pp_leaveloop
 #define pp_leavesub		Perl_pp_leavesub
 #define pp_leavetry		Perl_pp_leavetry
-#define pp_leavewhen		Perl_pp_leavewhen
 #define pp_left_shift		Perl_pp_left_shift
 #define pp_length		Perl_pp_length
 #define pp_lineseq		Perl_pp_lineseq
@@ -2741,7 +2731,6 @@
 #define newFORM(a,b,c)		Perl_newFORM(aTHX_ a,b,c)
 #endif
 #define newFOROP(a,b,c,d,e,f,g)	Perl_newFOROP(aTHX_ a,b,c,d,e,f,g)
-#define newGIVENOP(a,b,c)	Perl_newGIVENOP(aTHX_ a,b,c)
 #define newLOGOP(a,b,c,d)	Perl_newLOGOP(aTHX_ a,b,c,d)
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
 #define newLOOPOP(a,b,c,d)	Perl_newLOOPOP(aTHX_ a,b,c,d)
@@ -2788,7 +2777,6 @@
 #define newSVsv(a)		Perl_newSVsv(aTHX_ a)
 #define newSV_type(a)		Perl_newSV_type(aTHX_ a)
 #define newUNOP(a,b,c)		Perl_newUNOP(aTHX_ a,b,c)
-#define newWHENOP(a,b)		Perl_newWHENOP(aTHX_ a,b)
 #define newWHILEOP(a,b,c,d,e,f,g,h)	Perl_newWHILEOP(aTHX_ a,b,c,d,e,f,g,h)
 #define new_stackinfo(a,b)	Perl_new_stackinfo(aTHX_ a,b)
 #define scan_vstring(a,b,c)	Perl_scan_vstring(aTHX_ a,b,c)
@@ -3473,10 +3461,8 @@
 #define docatch(a)		S_docatch(aTHX_ a)
 #define dofindlabel(a,b,c,d)	S_dofindlabel(aTHX_ a,b,c,d)
 #define dopoptoeval(a)		S_dopoptoeval(aTHX_ a)
-#define dopoptogiven(a)		S_dopoptogiven(aTHX_ a)
 #define dopoptolabel(a)		S_dopoptolabel(aTHX_ a)
 #define dopoptoloop(a)		S_dopoptoloop(aTHX_ a)
-#define dopoptowhen(a)		S_dopoptowhen(aTHX_ a)
 #define save_lines(a,b)		S_save_lines(aTHX_ a,b)
 #define doeval(a,b,c,d)		S_doeval(aTHX_ a,b,c,d)
 #define check_type_and_open(a)	S_check_type_and_open(aTHX_ a)
@@ -4154,7 +4140,6 @@
 #define pp_bit_or()		Perl_pp_bit_or(aTHX)
 #define pp_bit_xor()		Perl_pp_bit_xor(aTHX)
 #define pp_bless()		Perl_pp_bless(aTHX)
-#define pp_break()		Perl_pp_break(aTHX)
 #define pp_caller()		Perl_pp_caller(aTHX)
 #define pp_chdir()		Perl_pp_chdir(aTHX)
 #define pp_chmod()		Perl_pp_chmod(aTHX)
@@ -4171,7 +4156,6 @@
 #define pp_cond_expr()		Perl_pp_cond_expr(aTHX)
 #define pp_connect()		Perl_pp_connect(aTHX)
 #define pp_const()		Perl_pp_const(aTHX)
-#define pp_continue()		Perl_pp_continue(aTHX)
 #define pp_cos()		Perl_pp_cos(aTHX)
 #define pp_crypt()		Perl_pp_crypt(aTHX)
 #define pp_dbstate()		Perl_pp_dbstate(aTHX)
@@ -4189,12 +4173,10 @@
 #define pp_enetent()		Perl_pp_enetent(aTHX)
 #define pp_enter()		Perl_pp_enter(aTHX)
 #define pp_entereval()		Perl_pp_entereval(aTHX)
-#define pp_entergiven()		Perl_pp_entergiven(aTHX)
 #define pp_enteriter()		Perl_pp_enteriter(aTHX)
 #define pp_enterloop()		Perl_pp_enterloop(aTHX)
 #define pp_entersub()		Perl_pp_entersub(aTHX)
 #define pp_entertry()		Perl_pp_entertry(aTHX)
-#define pp_enterwhen()		Perl_pp_enterwhen(aTHX)
 #define pp_eof()		Perl_pp_eof(aTHX)
 #define pp_eprotoent()		Perl_pp_eprotoent(aTHX)
 #define pp_epwent()		Perl_pp_epwent(aTHX)
@@ -4304,11 +4286,9 @@
 #define pp_le()			Perl_pp_le(aTHX)
 #define pp_leave()		Perl_pp_leave(aTHX)
 #define pp_leaveeval()		Perl_pp_leaveeval(aTHX)
-#define pp_leavegiven()		Perl_pp_leavegiven(aTHX)
 #define pp_leaveloop()		Perl_pp_leaveloop(aTHX)
 #define pp_leavesub()		Perl_pp_leavesub(aTHX)
 #define pp_leavetry()		Perl_pp_leavetry(aTHX)
-#define pp_leavewhen()		Perl_pp_leavewhen(aTHX)
 #define pp_left_shift()		Perl_pp_left_shift(aTHX)
 #define pp_length()		Perl_pp_length(aTHX)
 #define pp_lineseq()		Perl_pp_lineseq(aTHX)

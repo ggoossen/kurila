@@ -468,16 +468,6 @@ struct block_loop {
 	if (CxTYPE(cx) == CXt_LOOP_FOR)					\
 	    SvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
 
-/* given/when context */
-struct block_givwhen {
-	OP *leave_op;
-};
-
-#define PUSHGIVEN(cx)							\
-	cx->blk_givwhen.leave_op = cLOGOP->op_other;
-
-#define PUSHWHEN PUSHGIVEN
-
 /* context common to subroutines, evals and loops */
 struct block {
     U8		blku_type;	/* what kind of context this is */
@@ -493,7 +483,6 @@ struct block {
 	struct block_sub	blku_sub;
 	struct block_eval	blku_eval;
 	struct block_loop	blku_loop;
-	struct block_givwhen	blku_givwhen;
     } blk_u;
 };
 #define blk_oldsp	cx_u.cx_blk.blku_oldsp
@@ -506,7 +495,6 @@ struct block {
 #define blk_sub		cx_u.cx_blk.blk_u.blku_sub
 #define blk_eval	cx_u.cx_blk.blk_u.blku_eval
 #define blk_loop	cx_u.cx_blk.blk_u.blku_loop
-#define blk_givwhen	cx_u.cx_blk.blk_u.blku_givwhen
 
 /* Enter a block. */
 #define PUSHBLOCK(cx,t,sp) CXINC, cx = &cxstack[cxstack_ix],		\
@@ -608,13 +596,7 @@ struct context {
    and a static array of context names in pp_ctl.c  */
 #define CXTYPEMASK	0xf
 #define CXt_NULL	0
-#define CXt_WHEN	1
 #define CXt_BLOCK	2
-/* When micro-optimising :-) keep GIVEN next to the LOOPs, as these 5 share a
-   jump table in pp_ctl.c
-   The first 4 don't have a 'case' in at least one switch statement in pp_ctl.c
-*/
-#define CXt_GIVEN	3
 /* This is first so that CXt_LOOP_FOR|CXt_LOOP_LAZYIV is CXt_LOOP_LAZYIV */
 #define CXt_LOOP_FOR	4
 #define CXt_LOOP_PLAIN	5

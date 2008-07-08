@@ -222,12 +222,6 @@ EXTCONST char* const PL_op_name[] = {
 	"goto",
 	"exit",
 	"method_named",
-	"entergiven",
-	"leavegiven",
-	"enterwhen",
-	"leavewhen",
-	"break",
-	"continue",
 	"open",
 	"close",
 	"pipe_op",
@@ -582,12 +576,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"goto",
 	"exit",
 	"method with known name",
-	"given()",
-	"leave given block",
-	"when()",
-	"leave when block",
-	"break",
-	"continue",
 	"open",
 	"close",
 	"pipe",
@@ -954,12 +942,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_goto),
 	MEMBER_TO_FPTR(Perl_pp_exit),
 	MEMBER_TO_FPTR(Perl_pp_method_named),
-	MEMBER_TO_FPTR(Perl_pp_entergiven),
-	MEMBER_TO_FPTR(Perl_pp_leavegiven),
-	MEMBER_TO_FPTR(Perl_pp_enterwhen),
-	MEMBER_TO_FPTR(Perl_pp_leavewhen),
-	MEMBER_TO_FPTR(Perl_pp_break),
-	MEMBER_TO_FPTR(Perl_pp_continue),
 	MEMBER_TO_FPTR(Perl_pp_open),
 	MEMBER_TO_FPTR(Perl_pp_close),
 	MEMBER_TO_FPTR(Perl_pp_pipe_op),
@@ -1323,12 +1305,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* goto */
 	MEMBER_TO_FPTR(Perl_ck_exit),	/* exit */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* method_named */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* entergiven */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* leavegiven */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* enterwhen */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* leavewhen */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* break */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* continue */
 	MEMBER_TO_FPTR(Perl_ck_open),	/* open */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* close */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* pipe_op */
@@ -1686,12 +1662,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00001a44,	/* goto */
 	0x00013644,	/* exit */
 	0x00000c40,	/* method_named */
-	0x00000640,	/* entergiven */
-	0x00000200,	/* leavegiven */
-	0x00000640,	/* enterwhen */
-	0x00000200,	/* leavewhen */
-	0x00000000,	/* break */
-	0x00000000,	/* continue */
 	0x0052c81d,	/* open */
 	0x0001d614,	/* close */
 	0x000cc814,	/* pipe_op */

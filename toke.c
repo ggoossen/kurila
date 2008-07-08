@@ -282,8 +282,6 @@ static struct debug_tokens {
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
     { BITOROP,		TOKENTYPE_OPNUM,	"BITOROP" },
     { COLONATTR,	TOKENTYPE_NONE,		"COLONATTR" },
-    { CONTINUE,		TOKENTYPE_NONE,		"CONTINUE" },
-    { DEFAULT,		TOKENTYPE_NONE,		"DEFAULT" },
     { DO,		TOKENTYPE_NONE,		"DO" },
     { DORDOR,		TOKENTYPE_NONE,		"DORDOR" },
     { DOROP,		TOKENTYPE_OPNUM,	"DOROP" },
@@ -296,7 +294,6 @@ static struct debug_tokens {
     { FUNC0,		TOKENTYPE_OPNUM,	"FUNC0" },
     { FUNC0SUB,		TOKENTYPE_OPVAL,	"FUNC0SUB" },
     { FUNC1,		TOKENTYPE_OPNUM,	"FUNC1" },
-    { GIVEN,		TOKENTYPE_IVAL,		"GIVEN" },
     { IF,		TOKENTYPE_IVAL,		"IF" },
     { LABEL,		TOKENTYPE_PVAL,		"LABEL" },
     { LOCAL,		TOKENTYPE_IVAL,		"LOCAL" },
@@ -331,7 +328,6 @@ static struct debug_tokens {
     { UNLESS,		TOKENTYPE_IVAL,		"UNLESS" },
     { UNTIL,		TOKENTYPE_IVAL,		"UNTIL" },
     { USE,		TOKENTYPE_IVAL,		"USE" },
-    { WHEN,		TOKENTYPE_IVAL,		"WHEN" },
     { WHILE,		TOKENTYPE_IVAL,		"WHILE" },
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
     { 0,		TOKENTYPE_NONE,		NULL }
@@ -4961,31 +4957,8 @@ Perl_yylex(pTHX)
 	case KEY_bless:
 	    LOP(OP_BLESS,XTERM);
 
-	case KEY_break:
-	    FUN0(OP_BREAK);
-
 	case KEY_chop:
 	    UNI(OP_CHOP);
-
-	case KEY_continue:
-	    /* When 'use switch' is in effect, continue has a dual
-	       life as a control operator. */
-	    {
-		if (!FEATURE_IS_ENABLED("switch"))
-		    PREBLOCK(CONTINUE);
-		else {
-		    /* We have to disambiguate the two senses of
-		      "continue". If the next token is a '{' then
-		      treat it as the start of a continue block;
-		      otherwise treat it as a control operator.
-		     */
-		    s = skipspace(s);
-		    if (*s == '{')
-	    PREBLOCK(CONTINUE);
-		    else
-			FUN0(OP_CONTINUE);
-		}
-	    }
 
 	case KEY_chdir:
 	    /* may use HOME */
@@ -5030,9 +5003,6 @@ Perl_yylex(pTHX)
 
 	case KEY_chroot:
 	    UNI(OP_CHROOT);
-
-	case KEY_default:
-	    PREBLOCK(DEFAULT);
 
 	case KEY_do:
 	    s = SKIPSPACE1(s);
@@ -5241,10 +5211,6 @@ Perl_yylex(pTHX)
 
 	case KEY_getlogin:
 	    FUN0(OP_GETLOGIN);
-
-	case KEY_given:
-	    pl_yylval.ival = CopLINE(PL_curcop);
-	    OPERATOR(GIVEN);
 
 	case KEY_glob:
 	    LOP(OP_GLOB,XTERM);
@@ -5958,10 +5924,6 @@ Perl_yylex(pTHX)
 
 	case KEY_vec:
 	    LOP(OP_VEC,XTERM);
-
-	case KEY_when:
-	    pl_yylval.ival = CopLINE(PL_curcop);
-	    OPERATOR(WHEN);
 
 	case KEY_while:
 	    pl_yylval.ival = CopLINE(PL_curcop);
@@ -7019,15 +6981,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
                   goto unknown;
               }
 
-            case 'h':
-              if (name[2] == 'e' &&
-                  name[3] == 'n')
-              {                                   /* when       */
-                return (all_keywords || FEATURE_IS_ENABLED("switch") ? KEY_when : 0);
-              }
-
-              goto unknown;
-
             default:
               goto unknown;
           }
@@ -7097,16 +7050,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
                   name[4] == 's')
               {                                   /* bless      */
                 return -KEY_bless;
-              }
-
-              goto unknown;
-
-            case 'r':
-              if (name[2] == 'e' &&
-                  name[3] == 'a' &&
-                  name[4] == 'k')
-              {                                   /* break      */
-                return (all_keywords || FEATURE_IS_ENABLED("switch") ? -KEY_break : 0);
               }
 
               goto unknown;
@@ -7227,17 +7170,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
             default:
               goto unknown;
           }
-
-        case 'g':
-          if (name[1] == 'i' &&
-              name[2] == 'v' &&
-              name[3] == 'e' &&
-              name[4] == 'n')
-          {                                       /* given      */
-            return (all_keywords || FEATURE_IS_ENABLED("switch") ? KEY_given : 0);
-          }
-
-          goto unknown;
 
         case 'i':
           switch (name[1])
@@ -8451,19 +8383,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
                   name[7] == 'r')
               {                                   /* closedir   */
                 return -KEY_closedir;
-              }
-
-              goto unknown;
-
-            case 'o':
-              if (name[2] == 'n' &&
-                  name[3] == 't' &&
-                  name[4] == 'i' &&
-                  name[5] == 'n' &&
-                  name[6] == 'u' &&
-                  name[7] == 'e')
-              {                                   /* continue   */
-                return -KEY_continue;
               }
 
               goto unknown;
