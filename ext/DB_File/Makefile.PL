@@ -77,7 +77,7 @@ my @names = @( qw(
     }
     close F ;
 
-    if ( keys %names )
+    if ( %names )
     {
         my $missing = join ("\n\t", sort keys %names) ;
         die "The following names are missing from \@EXPORT in DB_File.pm\n" .
