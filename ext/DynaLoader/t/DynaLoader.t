@@ -27,7 +27,7 @@ BEGIN {
     'Fcntl'      => q| ::is( ref Fcntl->can('O_BINARY'),'CODE' ) |,
 );
 
-plan tests => 22 + keys(%modules) * 3;
+plan tests => 22 + nelems(@(keys(%modules))) * 3;
 
 # Try to load the module
 use_ok( 'DynaLoader' );
@@ -117,8 +117,8 @@ for my $module (sort keys %modules) {
 }
 
 # checking internal consistency
-is( scalar nelems @DynaLoader::dl_librefs, scalar keys %modules, "checking number of items in \@dl_librefs" );
-is( scalar nelems @DynaLoader::dl_modules, scalar keys %modules, "checking number of items in \@dl_modules" );
+is( nelems @DynaLoader::dl_librefs, nelems(@( keys %modules)), "checking number of items in \@dl_librefs" );
+is( nelems @DynaLoader::dl_modules, nelems(@( keys %modules)), "checking number of items in \@dl_modules" );
 
 my @loaded_modules = @( < @DynaLoader::dl_modules );
 for my $libref (reverse < @DynaLoader::dl_librefs) {
