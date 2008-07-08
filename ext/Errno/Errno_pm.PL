@@ -221,7 +221,7 @@ sub write_errno_pm {
 
     # quick sanity check
 
-    die "No error definitions found" unless keys %err;
+    die "No error definitions found" unless %err;
 
     # create the CPP input
 
