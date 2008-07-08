@@ -55,7 +55,7 @@ sub get_keys {
 
     # if the hash has already been populated with a significant amount
     # of entries the number of mask bits can be higher
-    my $keys = scalar keys %$hr;
+    my $keys = nelems(@( keys %$hr));
     my $bits = $keys ? log($keys)/log(2) : 0;
     $bits = $min_bits if $min_bits +> $bits;
 

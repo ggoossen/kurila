@@ -1810,6 +1810,10 @@ PP(pp_subst)
 	EXTEND(SP,1);
     }
 
+    if ( SvOK(TARG) && ! SvPVOK(TARG) ) {
+	DIE(aTHX_ "substitute expected a plain value but got %s", Ddesc(TARG));
+    }
+
 #ifdef PERL_OLD_COPY_ON_WRITE
     /* Awooga. Awooga. "bool" types that are actually char are dangerous,
        because they make integers such as 256 "false".  */
