@@ -477,10 +477,7 @@ sub _dump {
         }
     }
     elsif ($realtype eq 'PLAINVALUE') {
-        if (!defined($$rval)) {
-            $out .= "undef";
-        }
-        elsif ($$rval =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
+        if ($$rval =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
             $out .= $$rval;
         }
         else {				 # string
@@ -492,6 +489,9 @@ sub _dump {
                 $out .= _quote($$rval);
             }
         }
+    }
+    elsif ($realtype eq "UNDEF") {
+        $out .= "undef";
     }
     else {
         die "Can\'t handle $realtype type.";
