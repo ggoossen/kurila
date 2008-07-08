@@ -91,6 +91,8 @@ is Data::Dumper->Dump(\@(@('abc', 'def')), \@('a')), <<'====' ;
 #     );
 ====
 
+is Data::Dumper->Dump(\@(undef), \@('a')), '#$a = undef;' . "\n" ;
+
 #XXXif (0) {
 #############
 #############
