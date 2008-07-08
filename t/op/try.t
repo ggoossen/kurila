@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..6\n";
+print "1..5\n";
 
 require './test.pl';
 
@@ -39,14 +39,3 @@ my $test = 4;
     print "not ok $test\n" if $@;
     $test++;
 }
-
-# [perl #34682] escaping an eval with last could coredump or dup output
-
-my $got = runperl (
-    prog => 
-    'no strict; sub A::TIEARRAY { L: { try { last L } } } tie my @a, q(A); warn qq(ok\n)',
-                   stderr => 1);
-$test++;
-
-print "not " unless $got =~ qr/^ok\n/;
-print "ok $test - eval and last\n"; $test++;

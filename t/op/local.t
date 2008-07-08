@@ -139,36 +139,6 @@ try {
 };
 is($m, 5);
 
-# see if localization works on tied arrays
-{
-    package TA;
-    sub TIEARRAY { bless \@(), @_[0] }
-    sub STORE { print "# STORE [{dump::view(\@_)}]\n"; @_[0]->[@_[1]] = @_[2] }
-    sub FETCH { my $v = @_[0]->[@_[1]]; print "# FETCH [{dump::view(\@_)}=$v]\n"; $v }
-    sub CLEAR { print "# CLEAR [{dump::view(\@_)}]\n"; @{@_[0]} = @( () ); }
-    sub FETCHSIZE { scalar(nelems @{@_[0]}) }
-    sub SHIFT { shift (@{@_[0]}) }
-    sub EXTEND {}
-}
-
-tie @a, 'TA';
-@a = @('a', 'b', 'c');
-{
-    local(@a[1]) = 'foo';
-    local(@a[2]) = @a[2];
-    is(@a[1], 'foo');
-    is(@a[2], 'c');
-    @a = @( () );
-}
-is(@a[1], 'b');
-is(@a[2], 'c');
-ok(!defined @a[0]);
-{
-    my $d = "{join ' ', <@a}";
-    local @a = @( < @a );
-    is("{join ' ', <@a}", $d);
-}
-
 {
     package TH;
     sub TIEHASH { bless \%(), @_[0] }

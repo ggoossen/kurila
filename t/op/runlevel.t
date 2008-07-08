@@ -218,26 +218,6 @@ END { print "foobar\n" }
 EXPECT
 foobar
 ########
-package TEST;
- 
-sub TIEARRAY {
-  return bless \@(qw(foo fee fie foe)), @_[0];
-}
-sub FETCH {
-  my ($s,$i) = < @_;
-  if ($i) {
-    goto bbb;
-  }
-bbb:
-  return $s->[$i];
-}
- 
-package main;
-tie my @bar, 'TEST';
-print join('|', @bar[[0..3]]), "\n"; 
-EXPECT
-foo|fee|fie|foe
-########
 package TH;
 sub TIEHASH { bless \%(), 'TH' }
 sub STORE { try { print "{ join ' ', @_[[1,2]]}\n" }; die "bar\n" }

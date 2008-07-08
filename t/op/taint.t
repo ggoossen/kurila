@@ -12,7 +12,7 @@ use Config;
 use File::Spec::Functions;
 
 BEGIN { require './test.pl'; }
-plan tests => 231;
+plan tests => 230;
 
 $| = 1;
 
@@ -987,9 +987,6 @@ TODO: {
     local *ENV = \%nonmagicalenv;
     dies_like(sub { system("lskdfj") },
               qr/^\%ENV is aliased to another variable while running with -T switch/);
-    local *ENV = *nonmagicalenv;
-    dies_like( sub { system("lskdfj"); },
-               qr/^\%ENV is aliased to \%nonmagicalenv while running with -T switch/);
 }
 {
     # [perl #24248]
@@ -1124,7 +1121,7 @@ TERNARY_CONDITIONALS: {
 
 {
     my @a;
-    local $::TODO = 1;
+    local $main::TODO = 1;
     @a[0] = $^X;
     my $i = 0;
     while(@a[0]=~ m/(.)/g ) {

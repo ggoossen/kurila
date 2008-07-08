@@ -223,19 +223,6 @@ is(@j[0], 1);
 }
 
 {
-    # GLOB assignment to tied element
-    sub T::TIEARRAY  { bless \@() => "T" }
-    sub T::STORE     { @_[0]->[ @_[1] ] = @_[2] }
-    sub T::FETCH     { @_[0]->[ @_[1] ] }
-    sub T::FETCHSIZE { nelems @{@_[0]} }
-    tie my @ary => "T";
-    @ary[0] = *DATA;
-    is (@ary[0], '*main::DATA');
-    my $x = readline Symbol::fetch_glob(@ary[0]);
-    is($x, "rocks\n");
-}
-
-{
     # Need some sort of die or warn to get the global destruction text if the
     # bug is still present
     my $output = runperl(prog => <<'EOPROG');

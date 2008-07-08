@@ -77,43 +77,6 @@ sub STORABLE_thaw {
 	$main::hash_hook2++;
 }
 
-package TIED_ARRAY;
-
-sub TIEARRAY {
-	my $self = bless \@(), shift;
-	return $self;
-}
-
-sub FETCH {
-	my $self = shift;
-	my ($idx) = <@_;
-	$main::array_fetch++;
-	return $self->[$idx];
-}
-
-sub STORE {
-	my $self = shift;
-	my ($idx, $value) = <@_;
-	$self->[$idx] = $value;
-}
-
-sub FETCHSIZE {
-	my $self = shift;
-	return nelems @{$self};
-}
-
-sub STORABLE_freeze {
-	my $self = shift;
-	$main::array_hook1++;
-	return join(":", <@$self);
-}
-
-sub STORABLE_thaw {
-	my ($self, $cloning, $frozen) = <@_;
-	@$self = @(split(m/:/, $frozen));
-	$main::array_hook2++;
-}
-
 package TIED_SCALAR;
 
 sub TIESCALAR {
@@ -152,7 +115,6 @@ $a = 'toto';
 $b = \$a;
 
 my $c = tie my %hash, 'TIED_HASH';
-my $d = tie my @array, 'TIED_ARRAY';
 tie my $scalar, 'TIED_SCALAR';
 
 $scalar = 'foo';

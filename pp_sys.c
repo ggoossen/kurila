@@ -779,8 +779,7 @@ PP(pp_tie)
 	    HvEITER_set((HV *)varsv, 0);
 	    break;
 	case SVt_PVAV:
-	    methname = "TIEARRAY";
-	    break;
+	    Perl_croak(aTHX_ "array may not be tied");
 	case SVt_PVGV:
 	    Perl_croak(aTHX_ "glob may not be tied");
 	default:

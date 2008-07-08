@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 110;
+plan tests => 107;
 
 $a = \%();
 bless $a, "Bob";
@@ -48,12 +48,8 @@ package main;
 $a = Alice->new();
 
 ok $a->isa("Alice");
-ok $a->isa("main::Alice");    # check that alternate class names work
-
-ok(("main::Alice"->new)->isa("Alice"));
 
 ok $a->isa("Bob");
-ok $a->isa("main::Bob");
 
 ok $a->isa("Female");
 
@@ -154,9 +150,9 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
     package Pickup;
     use UNIVERSAL qw( isa can VERSION );
 
-    ::ok isa "Pickup", 'UNIVERSAL';
-    ::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can;
-    ::ok VERSION "UNIVERSAL" ;
+    main::ok isa "Pickup", 'UNIVERSAL';
+    main::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can;
+    main::ok VERSION "UNIVERSAL" ;
 }
 
 {
@@ -168,8 +164,8 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
     sub TIESCALAR { bless \%() }
     sub FETCH { "Human" }
     tie my($x), "HumanTie";
-    ::ok $x->isa("Human");
-    ::ok $x->can("eat");
+    main::ok $x->isa("Human");
+    main::ok $x->can("eat");
 }
 
 # bugid 3284
@@ -212,9 +208,9 @@ package Bodine;
 Bodine->isa('Pig');
 *isa = \&UNIVERSAL::isa;
 try { isa(\%(), 'HASH') };
-::is($@, '', "*isa correctly found");
+main::is($@, '', "*isa correctly found");
 
 package main;
-::dies_like( sub { UNIVERSAL::DOES(\@(), "foo") },
+main::dies_like( sub { UNIVERSAL::DOES(\@(), "foo") },
              qr/Can't call method "DOES" on unblessed reference/,
              'DOES call error message says DOES, not isa' );
