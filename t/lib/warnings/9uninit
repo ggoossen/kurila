@@ -230,23 +230,23 @@ Use of uninitialized value within %mh in sin at - line 13.
 ########
 use warnings 'uninitialized';
 my (@mat, %mht, $v);
-sub X::TIEARRAY { bless \@(), 'X' }
+
 sub X::TIEHASH { bless \@(), 'X' }
 sub X::FETCH { undef }
-tie @mat, 'X';
+
 tie %mht, 'X';
 my $key1 = 'akey';
 my $key2 = 'bkey';
 my $index1 = 33;
 my $index2 = 55;
 
-$v = sin @mat[0];
-$v = @mat[0] + @mat[1];
-$v = sin @mat[1000];
-$v = @mat[1000] + @mat[1001];
 
-$v = sin @mat[$index1];
-$v = @mat[$index1] + @mat[$index2];
+
+
+
+
+
+
 
 $v = sin %mht{foo};
 $v = %mht{foo} + %mht{bar};
@@ -256,15 +256,6 @@ $v = %mht{$key1} + %mht{$key2};
 
 $v = $1+1;
 EXPECT
-Use of uninitialized value @mat[0] in sin at - line 13.
-Use of uninitialized value in addition (+) at - line 14.
-Use of uninitialized value in addition (+) at - line 14.
-Use of uninitialized value @mat[1000] in sin at - line 15.
-Use of uninitialized value in addition (+) at - line 16.
-Use of uninitialized value in addition (+) at - line 16.
-Use of uninitialized value within @mat in sin at - line 18.
-Use of uninitialized value in addition (+) at - line 19.
-Use of uninitialized value in addition (+) at - line 19.
 Use of uninitialized value %mht{"foo"} in sin at - line 21.
 Use of uninitialized value in addition (+) at - line 22.
 Use of uninitialized value in addition (+) at - line 22.

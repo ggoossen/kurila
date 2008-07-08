@@ -1658,11 +1658,6 @@ lib/Thread/Semaphore/t/01_basic.t	Thread::Semaphore tests
 lib/Thread/Semaphore/t/02_errs.t	Thread::Semaphore tests
 lib/Thread/Semaphore/t/03_nothreads.t	Thread::Semaphore tests
 lib/Thread.t			Thread extensions frontend tests
-lib/Tie/Array.pm		Base class for tied arrays
-lib/Tie/Array/push.t		Test for Tie::Array
-lib/Tie/Array/splice.t		Test for Tie::Array::SPLICE
-lib/Tie/Array/stdpush.t		Test for Tie::StdArray
-lib/Tie/Array/std.t		Test for Tie::StdArray
 lib/Tie/Handle.pm		Base class for tied handles
 lib/Tie/Handle/stdhandle_from_handle.t	Test for Tie::StdHandle/Handle backwards compat
 lib/Tie/Handle/stdhandle.t	Test for Tie::StdHandle
@@ -2457,7 +2452,6 @@ toke.c				The tokener
 t/op/arith.t			See if arithmetic works
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/auto.t			See if autoincrement et all work
-t/op/avhv.t			See if pseudo-hashes work
 t/op/bless.t			See if bless works
 t/op/bop.t			See if bitops work
 t/op/caller.pl			Tests shared between caller.t and XS op.t
@@ -2594,7 +2588,6 @@ t/op/sysio.t			See if sysread and syswrite work
 t/op/taint.t			See if tainting works
 t/op/threads_create.pl		Ancillary file for t/op/threads.t
 t/op/threads.t			Misc. tests for perl features with threads
-t/op/tiearray.t			See if tie for arrays works
 t/op/tie.t			See if tie/untie functions work
 t/op/time.t			See if time functions work
 t/op/undef.t			See if undef works

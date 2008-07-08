@@ -252,18 +252,6 @@ EXPECT
 
 #  [20020716.007] - nested FETCHES
 
-sub F1::TIEARRAY { bless \@(), 'F1' }
-sub F1::FETCH { 1 }
-my @f1;
-tie @f1, 'F1';
-
-sub F2::TIEARRAY { bless \@(2), 'F2' }
-sub F2::FETCH { my $self = shift; my $x = @f1[3]; $self }
-my @f2;
-tie @f2, 'F2';
-
-print @f2[4]->[0],"\n";
-
 sub F3::TIEHASH { bless \@(), 'F3' }
 sub F3::FETCH { 1 }
 my %f3;
@@ -301,18 +289,15 @@ ok
 # (even though they are now implemented using PVLVs.)
 package X;
 sub TIEHASH { bless \%() }
-sub TIEARRAY { bless \%() }
 sub FETCH {1}
 my (%h, @a);
 tie %h, 'X';
-tie @a, 'X';
 my $r1 = \%h{1};
-my $r2 = \@a[0];
-my $s = ref($r1) . " " . ref($r2);
+my $s = ref($r1);
 $s=~ s/\(0x\w+\)//g;
 print $s, "\n";
 EXPECT
-SCALAR SCALAR
+SCALAR
 ########
 # [perl #23287] segfault in untie
 sub TIESCALAR { bless @_[1], @_[0] }
@@ -485,15 +470,6 @@ foreach my $var ($VAR) {
 }
 EXPECT
 yes
-########
-our @a;
-sub TIEARRAY { bless \@(), 'main' }
-{
-    local @a;
-    tie @a, 'main';
-}
-print "tied\n" if tied @a;
-EXPECT
 ########
 our %h;
 sub TIEHASH { bless \@(), 'main' }

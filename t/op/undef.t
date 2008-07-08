@@ -94,8 +94,8 @@ $test = 29;
 );
 undef %hash;
 sub X::DESTROY {
-    print "not " if keys   %hash; print "ok $test\n"; $test++;
-    print "not " if values %hash; print "ok $test\n"; $test++;
+    print "not " if %hash; print "ok $test\n"; $test++;
+    print "not " if %hash; print "ok $test\n"; $test++;
     print "not " if each   %hash; print "ok $test\n"; $test++;
     print "not " if defined delete %hash{'key2'}; print "ok $test\n"; $test++;
 }

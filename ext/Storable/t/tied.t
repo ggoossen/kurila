@@ -61,31 +61,6 @@ sub NEXTKEY {
 	return each %{$self};
 }
 
-package TIED_ARRAY;
-
-sub TIEARRAY {
-	my $self = bless \@(), shift;
-	return $self;
-}
-
-sub FETCH {
-	my $self = shift;
-	my ($idx) = @_;
-	$main::array_fetch++;
-	return $self->[$idx];
-}
-
-sub STORE {
-	my $self = shift;
-	my ($idx, $value) = @_;
-	$self->[$idx] = $value;
-}
-
-sub FETCHSIZE {
-	my $self = shift;
-	return @{$self};
-}
-
 package TIED_SCALAR;
 
 sub TIESCALAR {
@@ -129,7 +104,6 @@ $a = 'toto';
 $b = \$a;
 
 our $c = tie our %hash, 'TIED_HASH';
-our $d = tie our @array, 'TIED_ARRAY';
 tie our $scalar, 'TIED_SCALAR';
 
 #$scalar = 'foo';
@@ -150,7 +124,7 @@ $scalar = 'foo';
 
 our @tied = (\$scalar, \@array, \%hash);
 our %a = ('key', 'value', 1, 0, $a, $b, 'cvar', \$a, 'scalarref', \$scalar);
-our @a = ('first', 3, -4, -3.14159, 456, 4.5, $d, \$d,
+our @a = ('first', 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a, \@array, \%hash, \@tied);
 
 ok 1, defined(our $f = freeze(\@a));

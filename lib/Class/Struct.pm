@@ -19,32 +19,6 @@ sub printem {
     else    { $print++ }
 }
 
-{
-    package Class::Struct::Tie_ISA;
-
-    sub TIEARRAY {
-        my $class = shift;
-        return bless \@(), $class;
-    }
-
-    sub STORE {
-        my ($self, $index, $value) = < @_;
-        Class::Struct::_subclass_error();
-    }
-
-    sub FETCH {
-        my ($self, $index) = < @_;
-        $self->[$index];
-    }
-
-    sub FETCHSIZE {
-        my $self = shift;
-        return scalar(nelems @$self);
-    }
-
-    sub DESTROY { }
-}
-
 sub import {
     my $self = shift;
 
@@ -86,15 +60,6 @@ sub struct {
     }
 
     _usage_error() if (nelems @decls) % 2 == 1;
-
-    # Ensure we are not, and will not be, a subclass.
-
-    my $isa = do {
-        no strict 'refs';
-        \@{*{Symbol::fetch_glob($class . '::ISA')}};
-    };
-    _subclass_error() if (nelems @$isa);
-    tie @$isa, 'Class::Struct::Tie_ISA';
 
     # Create constructor.
 

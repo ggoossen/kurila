@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..91\n";
+print "1..90\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
@@ -402,16 +402,6 @@ $test++;
 
 sub Foo {} print Foo(try {});
 print "ok ",$test++," - #20798 (used to dump core)\n";
-
-# [perl #34682] escaping an eval with last could coredump or dup output
-
-$got = runperl (
-    prog => 
-    'no strict; sub A::TIEARRAY { L: { try { last L } } } tie my @a, q(A); warn qq(ok\n)',
-stderr => 1);
-
-print "not " unless $got =~ qr/^ok\n/;
-print "ok $test - eval and last\n"; $test++;
 
 # eval undef should be the same as eval "" barring any warnings
 
