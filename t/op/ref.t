@@ -13,13 +13,6 @@ our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
 # Test glob operations.
 
 $bar = "one";
-$foo = "two";
-{
-    local(*foo) = *bar;
-    is($foo, 'one');
-}
-is ($foo, 'two');
-
 $baz = "three";
 $foo = "four";
 {
@@ -36,16 +29,6 @@ $foo = "global";
     is ($foo, 'local');
 }
 is ($foo, 'global');
-
-{
-    no strict 'refs';
-# Test fake references.
-
-    $baz = "valid";
-    $bar = 'baz';
-    $foo = 'bar';
-    is (${*{Symbol::fetch_glob(${*{Symbol::fetch_glob($foo)}})}}, 'valid');
-}
 
 # Test real references.
 
@@ -245,8 +228,6 @@ curr_test($test + 3);
 $foo = "garbage";
 { local(*bar) = "foo" }
 $bar = "glob 3";
-local(*bar) = *bar;
-is ($bar, "glob 3");
 
 our $var = "glob 4";
 $_   = \$var;
@@ -350,15 +331,6 @@ is (runperl(
     stderr => 1
 ), '', 'freeing self-referential typeglob');
 
-# using a regex in the destructor for STDOUT segfaulted because the
-# REGEX pad had already been freed (ithreads build only). The
-# object is required to trigger the early freeing of GV refs to to STDOUT
-
-like (runperl(
-    prog => 'our $x=bless \@(); sub IO::Handle::DESTROY{$_="bad";s/bad/ok/;print}',
-    stderr => 1
-      ), qr/^(ok)+$/, 'STDOUT destructor');
-
 TODO: {
     no strict 'refs';
     my $name1 = "\0Chalk";
@@ -426,7 +398,6 @@ TODO: {
 	'defined via a different NUL-containing name gives nothing');
 
     $name1 = "Left"; $name2 = "Left\0Right";
-    my $glob2 = *{Symbol::fetch_glob($name2)};
     our $glob1;
 
     is ($glob1, undef, "We get different typeglobs. In fact, undef");
@@ -450,7 +421,7 @@ is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
 {
     local $@->{description};
     try { ()[[0]]->{foo} };
-    like ( "$@->{description}", "Can't use an undefined value as a HASH reference",
+    like ( "$@->{description}", "Can't use UNDEF as a HASH REF",
            "deref of undef from list slice fails" );
 }
 

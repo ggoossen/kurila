@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 120 );
+plan( tests => 114 );
 
 our (@a, @b);
 
@@ -133,11 +133,11 @@ cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','twoface redefinition');
 
 {
   no warnings 'redefine';
-  *twoface = sub { *twoface = *Backwards_other; $a <+> $b };
+  *twoface = sub { *twoface = \&Backwards_other; $a <+> $b };
 }
 
-try { @b = @( sort twoface 4,1,9,5 ) };
-ok(($@ eq "" && "{join ' ', <@b}" eq "1 4 5 9"),'redefinition should not take effect during the sort');
+@b = @( sort twoface 4,1,9,5 );
+ok("{join ' ', <@b}" eq "1 4 5 9", 'redefinition should not take effect during the sort');
 
 {
   no warnings 'redefine';
@@ -158,13 +158,10 @@ cmp_ok($@,'eq','',q(one is not a sub));
 
 {
   my $sortsub = \&Backwards;
-  my $sortglob = *Backwards;
   my $sortglobr = \*Backwards;
   my $sortname = 'Backwards';
   @b = @( sort $sortsub 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname 1');
-  @b = @( sort $sortglob 4,1,3,2 );
-  cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname 2');
   @b = @( sort $sortname 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname 3');
   @b = @( sort $sortglobr 4,1,3,2 );
@@ -173,13 +170,10 @@ cmp_ok($@,'eq','',q(one is not a sub));
 
 {
   my $sortsub = \&Backwards_stacked;
-  my $sortglob = *Backwards_stacked;
   my $sortglobr = \*Backwards_stacked;
   my $sortname = 'Backwards_stacked';
   @b = @( sort $sortsub 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname 5');
-  @b = @( sort $sortglob 4,1,3,2 );
-  cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname 6');
   @b = @( sort $sortname 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname 7');
   @b = @( sort $sortglobr 4,1,3,2 );
@@ -189,13 +183,10 @@ cmp_ok($@,'eq','',q(one is not a sub));
 our ($sortsub, $sortglob, $sortglobr, $sortname);
 {
   local $sortsub = \&Backwards;
-  local $sortglob = *Backwards;
   local $sortglobr = \*Backwards;
   local $sortname = 'Backwards';
   @b = @( sort $sortsub 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname local 1');
-  @b = @( sort $sortglob 4,1,3,2 );
-  cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname local 2');
   @b = @( sort $sortname 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname local 3');
   @b = @( sort $sortglobr 4,1,3,2 );
@@ -204,13 +195,10 @@ our ($sortsub, $sortglob, $sortglobr, $sortname);
 
 {
   local $sortsub = \&Backwards_stacked;
-  local $sortglob = *Backwards_stacked;
   local $sortglobr = \*Backwards_stacked;
   local $sortname = 'Backwards_stacked';
   @b = @( sort $sortsub 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname local 5');
-  @b = @( sort $sortglob 4,1,3,2 );
-  cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname local 6');
   @b = @( sort $sortname 4,1,3,2 );
   cmp_ok("{join ' ', <@b}",'eq','4 3 2 1','sortname local 7');
   @b = @( sort $sortglobr 4,1,3,2 );
@@ -317,16 +305,6 @@ package main;
     sub mysort { $b cmp $a };
     @a = @( qw(b c a) ); $r1 = \@a[1]; @a = @(sort mysort < @a); $r2 = \@a[0];
     is "{join ' ', <@a}", "c b a", "inplace sort with function of lexical";
-
-    use Tie::Array;
-    my @t;
-    tie @t, 'Tie::StdArray';
-
-    @t = @( qw(b c a) ); @t = @(sort < @t);
-    is "{join ' ', <@t}", "a b c", "inplace sort of tied array";
-
-    @t = @( qw(b c a) ); @t = @(sort mysort < @t);
-    is "{join ' ', <@t}", "c b a", "inplace sort of tied array with function";
 
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
 

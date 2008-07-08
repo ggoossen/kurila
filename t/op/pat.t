@@ -45,7 +45,6 @@ use strict;
 
 BEGIN {
   require "./test.pl";
-  *iseq = *is;
 }
 
 plan 1767;
@@ -466,14 +465,14 @@ ok($b eq '9');
 {
     $c="$a";
     m/$a$a/;
-    iseq($b, '11');
+    is($b, '11');
 }
 
 our $lex_a;
 {
   use re "eval";
   m/$a$c$a/;
-  iseq($b, '14');
+  is($b, '14');
 
   local $lex_a = 2;
   my $lex_a = 43;
@@ -670,21 +669,21 @@ pos($foo)=1;
 $foo =~ m/.\G(..)/g;
 {
     local $TODO = $::running_as_thread;
-    iseq($1,'ab');
+    is($1,'ab');
 }
 
 pos($foo) += 1;
 $foo =~ m/.\G(..)/g;
 {
     local $TODO = $::running_as_thread;
-    iseq($1, 'cc');
+    is($1, 'cc');
 }
 
 pos($foo) += 1;
 $foo =~ m/.\G(..)/g;
 {
     local $TODO = $::running_as_thread;
-    iseq($1, 'de');
+    is($1, 'de');
 }
 
 {
@@ -802,7 +801,7 @@ ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
 @b = @( grep(m/\w/,< @a) );
 @c = @( grep(m/[\w]/,< @a) );
-iseq("{join ' ', <@b}","{join ' ', <@c}");
+is("{join ' ', <@b}","{join ' ', <@c}");
 }
 
 # see if backtracking optimization works correctly
@@ -2225,13 +2224,13 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     foreach (1,2,3,4) {
 	    $p++ if m/(??{ $p })/
     }
-    iseq ($p, 5, '[perl #20683] (??{ }) returns stale values');
+    is ($p, 5, '[perl #20683] (??{ }) returns stale values');
     { package P; $a=1; sub TIESCALAR { bless \@() } sub FETCH { $a++ } }
     tie $p, 'P';
     foreach (1,2,3,4) {
 	    m/(??{ $p })/
     }
-    iseq ( $p, 5, '(??{ }) returns stale values');
+    is ( $p, 5, '(??{ }) returns stale values');
 }
 
 {
@@ -2774,16 +2773,16 @@ SKIP:{
     } 
     foreach (0..2) {
         if (@fetch[$_]) {
-            iseq(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
+            is(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
         } else {
             ok(0, @names[$_]);
         }
     }
-    iseq($res,1,"$s~=/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/");
-    iseq($count,3,"Got 3 keys in \%+ via each");
-    iseq(0+nelems @k, 3, 'Got 3 keys in %+ via keys');
-    iseq("{join ' ', <@k}","A B C", "Got expected keys");
-    iseq("{join ' ', <@v}","bar baz foo", "Got expected values");
+    is($res,1,"$s~=/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/");
+    is($count,3,"Got 3 keys in \%+ via each");
+    is(0+nelems @k, 3, 'Got 3 keys in %+ via keys');
+    is("{join ' ', <@k}","A B C", "Got expected keys");
+    is("{join ' ', <@v}","bar baz foo", "Got expected values");
     eval'
         print for %+{this_key_doesnt_exist};
     '; die if $@;
@@ -2813,16 +2812,16 @@ SKIP:{
     }
     foreach (0..3) {
 	if (@fetch[$_]) {
-	    iseq(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
+	    is(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
 	} else {
 	    ok(0, @names[$_]);
 	}
     }
-    iseq($res,1,"$s~=m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/");
-    iseq($count,4,"Got 4 keys in \%+ via each -- bug 50496");
-    iseq(0+nelems @k, 4, 'Got 4 keys in %+ via keys -- bug 50496');
-    iseq("{join ' ', <@k}","A B C D", "Got expected keys -- bug 50496");
-    iseq("{join ' ', <@v}","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
+    is($res,1,"$s~=m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/");
+    is($count,4,"Got 4 keys in \%+ via each -- bug 50496");
+    is(0+nelems @k, 4, 'Got 4 keys in %+ via keys -- bug 50496');
+    is("{join ' ', <@k}","A B C D", "Got expected keys -- bug 50496");
+    is("{join ' ', <@v}","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
     eval'
 	print for %+{this_key_doesnt_exist};
     '; die if $@;
@@ -2840,7 +2839,7 @@ SKIP:{
         }
     }
     my @expect= @(qw(A:0:1 A:1:3 B:0:2 B:1:4) );
-    iseq("{join ' ', <@res}","{join ' ', <@expect}","Check \%-");
+    is("{join ' ', <@res}","{join ' ', <@expect}","Check \%-");
     eval'
         print for %-{this_key_doesnt_exist};
     '; die if $@;
@@ -2974,85 +2973,85 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $mval=0;
     my $pval=0;
     while ($str=~m/b/g) { $mval=(nelems @-) -1; $pval=(nelems @+) -1; $count++ }
-    iseq($mval,0,"\@- should be empty [RT#36046]");
-    iseq($pval,0,"\@+ should be empty [RT#36046]");
-    iseq($count,1,"should have matched once only [RT#36046]");
+    is($mval,0,"\@- should be empty [RT#36046]");
+    is($pval,0,"\@+ should be empty [RT#36046]");
+    is($count,1,"should have matched once only [RT#36046]");
 }
 
 {   # Test the (*PRUNE) pattern
     our $count = 0;
     'aaab'=~m/a+b?(?{$count++})(*FAIL)/;
-    iseq($count,9,"expect 9 for no (*PRUNE)");
+    is($count,9,"expect 9 for no (*PRUNE)");
     $count = 0;
     'aaab'=~m/a+b?(*PRUNE)(?{$count++})(*FAIL)/;
-    iseq($count,3,"expect 3 with (*PRUNE)");
+    is($count,3,"expect 3 with (*PRUNE)");
     local $_='aaab';
     $count=0;
     1 while m/.(*PRUNE)(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.(*PRUNE)/");
+    is($count,4,"/.(*PRUNE)/");
     $count = 0;
     'aaab'=~m/a+b?(??{'(*PRUNE)'})(?{$count++})(*FAIL)/;
-    iseq($count,3,"expect 3 with (*PRUNE)");
+    is($count,3,"expect 3 with (*PRUNE)");
     local $_='aaab';
     $count=0;
     1 while m/.(??{'(*PRUNE)'})(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.(*PRUNE)/");
+    is($count,4,"/.(*PRUNE)/");
 }
 {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a+b?(*SKIP)(?{$count++})(*FAIL)/;
-    iseq($count,1,"expect 1 with (*SKIP)");
+    is($count,1,"expect 1 with (*SKIP)");
     local $_='aaab';
     $count=0;
     1 while m/.(*SKIP)(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.(*SKIP)/");
+    is($count,4,"/.(*SKIP)/");
     $_='aaabaaab';
     $count=0;
     our @res= @(() );
     1 while m/(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
-    iseq($count,2,"Expect 2 with (*SKIP)" );
-    iseq("{join ' ', <@res}","aaab aaab","adjacent (*SKIP) works as expected" );
+    is($count,2,"Expect 2 with (*SKIP)" );
+    is("{join ' ', <@res}","aaab aaab","adjacent (*SKIP) works as expected" );
 }
 {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a+b?(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/;
-    iseq($count,1,"expect 1 with (*SKIP)");
+    is($count,1,"expect 1 with (*SKIP)");
     local $_='aaab';
     $count=0;
     1 while m/.(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/g;
-    iseq($count,4,"/.(*SKIP)/");
+    is($count,4,"/.(*SKIP)/");
     $_='aaabaaab';
     $count=0;
     our @res= @(() );
     1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
-    iseq($count,2,"Expect 2 with (*SKIP)" );
-    iseq("{join ' ', <@res}","aaab aaab","adjacent (*SKIP) works as expected" );
+    is($count,2,"Expect 2 with (*SKIP)" );
+    is("{join ' ', <@res}","aaab aaab","adjacent (*SKIP) works as expected" );
 }
 {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a*(*MARK:a)b?(*MARK:b)(*SKIP:a)(?{$count++})(*FAIL)/;
-    iseq($count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)");
+    is($count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)");
     local $_='aaabaaab';
     $count=0;
     our @res= @(() );
     1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g;
-    iseq($count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" );
-    iseq("{join ' ', <@res}","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" );
+    is($count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" );
+    is("{join ' ', <@res}","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" );
 }
 {   # Test the (*COMMIT) pattern
     our $count = 0;
     'aaabaaab'=~m/a+b?(*COMMIT)(?{$count++})(*FAIL)/;
-    iseq($count,1,"expect 1 with (*COMMIT)");
+    is($count,1,"expect 1 with (*COMMIT)");
     local $_='aaab';
     $count=0;
     1 while m/.(*COMMIT)(?{$count++})(*FAIL)/g;
-    iseq($count,1,"/.(*COMMIT)/");
+    is($count,1,"/.(*COMMIT)/");
     $_='aaabaaab';
     $count=0;
     our @res= @(() );
     1 while m/(a+b?)(*COMMIT)(?{$count++; push @res,$1})(*FAIL)/g;
-    iseq($count,1,"Expect 1 with (*COMMIT)" );
-    iseq("{join ' ', <@res}","aaab","adjacent (*COMMIT) works as expected" );
+    is($count,1,"Expect 1 with (*COMMIT)" );
+    is("{join ' ', <@res}","aaab","adjacent (*COMMIT) works as expected" );
 }
 {
     # Test named commits and the $REGERROR var
@@ -3067,7 +3066,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
             for my $suffix ('(*FAIL)','') 
             {
                 'aaaab'=~m/a+b$pat$suffix/;
-                iseq(
+                is(
                     $REGERROR,
                     ($suffix ? ($name ? 'foo' : "1") : ""),
                     "Test $pat and \$REGERROR $suffix"
@@ -3090,7 +3089,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
             for my $suffix ('(*FAIL)','') 
             {
                 'aaaab'=~m/a+b$pat$suffix/;
-                ::iseq(
+                main::is(
                     $REGERROR,
                     ($suffix ? ($name ? 'foo' : "1") : ""),
                     "Test $pat and \$REGERROR $suffix"
@@ -3106,7 +3105,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     for my $word (qw(bar baz bop)) {
         $REGERROR="";
         "aaaaa$word"=~m/a+(?:bar(*COMMIT:bar)|baz(*COMMIT:baz)|bop(*COMMIT:bop))(*FAIL)/;
-        iseq($REGERROR,$word);
+        is($REGERROR,$word);
     }    
 }
 {   #Regression test for perlbug 40684
@@ -3133,18 +3132,18 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
        $one=$1;
        $two=$2;
     }
-    iseq($one, '((2*3)+4-3)');
-    iseq($two, '(2*(3+4)-1*(2-3))');
-    iseq($all, 'foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))');
-    iseq($all, $_);
+    is($one, '((2*3)+4-3)');
+    is($two, '(2*(3+4)-1*(2-3))');
+    is($all, 'foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))');
+    is($all, $_);
 }
 {
     my $spaces="      ";
     local $_=join 'bar',$spaces,$spaces;
     our $count=0;
     s/(?>\s+bar)(?{$count++})//g;
-    iseq($_,$spaces,"SUSPEND final string");
-    iseq($count,1,"Optimiser should have prevented more than one match");
+    is($_,$spaces,"SUSPEND final string");
+    is($count,1,"Optimiser should have prevented more than one match");
 }
 {
     local $Message = "RT#36909 test";
@@ -3155,9 +3154,9 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
          (foo) # $^R correctly set
         (?{ "last regexp code result" })
         }x);
-        iseq($^R,'last regexp code result');
+        is($^R,'last regexp code result');
     }
-    iseq($^R,'Nothing');
+    is($^R,'Nothing');
     {
         local $^R = "Bad";
 
@@ -3165,9 +3164,9 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
          (?:foo|bar)+ # $^R correctly set
         (?{"last regexp code result"})
         }x);
-        iseq($^R,'last regexp code result');
+        is($^R,'last regexp code result');
     }
-    iseq($^R,'Nothing');
+    is($^R,'Nothing');
 
     {
         local $^R = "Bad";
@@ -3175,9 +3174,9 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
          (foo|bar)\1+ # $^R undefined
         (?{"last regexp code result"})
         }x);
-        iseq($^R,'last regexp code result');
+        is($^R,'last regexp code result');
     }
-    iseq($^R,'Nothing');
+    is($^R,'Nothing');
 
     {
         local $^R = "Bad";
@@ -3185,9 +3184,9 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
          (foo|bar)\1 # this time without the +
         (?{"last regexp code result"})
         }x);
-        iseq($^R,'last regexp code result');
+        is($^R,'last regexp code result');
     }
-    iseq($^R,'Nothing');
+    is($^R,'Nothing');
 }
 {
     local $Message="RT 22395";
@@ -3196,7 +3195,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     for my $l (10,100,1000) {
 	$count=0;
 	('a' x $l) =~ m/(.*)(?{$count++})[bc]/;
-	iseq( $count, $l + 1);
+	is( $count, $l + 1);
     }
 }
 {
@@ -3204,7 +3203,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     local $_='ab';
     our @len= @(() );
     m/(.){1,}(?{push @len,0+(nelems @-)})(.){1,}(?{})^/;
-    iseq("{join ' ', <@len}","2 2 2");
+    is("{join ' ', <@len}","2 2 2");
 }
 {
     local $Message = "RT#18209";
@@ -3220,8 +3219,8 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
         }
         # End bad block
     }
-    iseq($count,3);
-    iseq($text,' word2 word4 word6 ');
+    is($count,3);
+    is($text,' word2 word4 word6 ');
 }
 {
     # RT#6893
@@ -3232,7 +3231,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
         push @res,"$2"; 
         last if (nelems @res)+>3;
     }
-    iseq("{join ' ', <@res}","A B C","RT#6893: /g pattern shouldn't infinite loop");
+    is("{join ' ', <@res}","A B C","RT#6893: /g pattern shouldn't infinite loop");
 }
 
 {
@@ -3242,14 +3241,14 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my $time_string = "D\x{e9} C\x{e9}adaoin";
     eval $parser; die if $@;
     ok(!$@,"Test Eval worked");
-    iseq($dow_name,$time_string,"UTF8 trie common prefix extraction");
+    is($dow_name,$time_string,"UTF8 trie common prefix extraction");
 }
 
 {
     my $v;
     ($v='bar')=~m/(\w+)/g;
     $v='foo';
-    iseq("$1",'bar','$1 is safe after /g - may fail due to specialized config in pp_hot.c')
+    is("$1",'bar','$1 is safe after /g - may fail due to specialized config in pp_hot.c')
 }
 {
     local $Message = "http://nntp.perl.org/group/perl.perl5.porters/118663";
@@ -3300,11 +3299,11 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     our ($REGMARK, $REGERROR);
     our @r= @(() );
     ok('foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x);
-    iseq("{join ' ', <@r}","foo");           
-    iseq($REGMARK,"foo");
+    is("{join ' ', <@r}","foo");           
+    is($REGMARK,"foo");
     ok('foofoo' !~ m/foo (*MARK:foo) (*FAIL) /x);
     ok(!$REGMARK);
-    iseq($REGERROR,'foo');
+    is($REGERROR,'foo');
 }
 {
     my $x;
@@ -3352,7 +3351,7 @@ sub kt
     our $grabit = qr/ ([0-6][0-9]{7}) (??{ kt $1 }) [890] /x;
     $re = qr/^ ( (??{ $grabit }) ) $ /x;
     my @res = @( '0902862349' =~ $re );
-    iseq(join("-",< @res),"0902862349",
+    is(join("-",< @res),"0902862349",
         'PL_curpm is set properly on nested eval');
 
     our $qr = qr/ (o) (??{ $1 }) /x;
@@ -3391,14 +3390,14 @@ sub kt
     if ('1' =~ m/(?|(?<digit>1)|(?<digit>2))/) {
       $res = "{join ' ', <@{%- {digit}}}";
     }
-    iseq($res,"1",
+    is($res,"1",
         "Check that (?|...) doesnt cause dupe entries in the names array");
     #---
     $res="";
     if ('11' =~ m/(?|(?<digit>1)|(?<digit>2))(?&digit)/) {
       $res = "{join ' ', <@{%- {digit}}}";
     }
-    iseq($res, "1",
+    is($res, "1",
         "Check that (?&..) to a buffer inside a (?|...) goes to the leftmost");
 }
 
@@ -3415,19 +3414,19 @@ sub kt
     local $Message = "corruption of match results of qr// across scopes";
     my $qr=qr/(fo+)(ba+r)/;
     'foobar'=~m/$qr/;
-    iseq("$1$2","foobar");
+    is("$1$2","foobar");
     {
         'foooooobaaaaar'=~m/$qr/;
-        iseq("$1$2",'foooooobaaaaar');    
+        is("$1$2",'foooooobaaaaar');    
     }
-    iseq("$1$2","foobar");
+    is("$1$2","foobar");
 }
 {
     local $Message = "HORIZWS";
     local $_="\t \r\n \n \t".chr(11)."\n";
     s/\H/H/g;
     s/\h/h/g;
-    iseq($_,"\t \r\n \n \t".chr(11)."\n");
+    is($_,"\t \r\n \n \t".chr(11)."\n");
     $_="\t \r\n \n \t".chr(11)."\n";
 }
 {
@@ -3439,7 +3438,7 @@ sub kt
         foreach my $pat (< @$t) {
             foreach my $str (< @$ary) {
                 ok($str=~m/($pat)/,$pat);
-                iseq($1,$str,$pat);
+                is($1,$str,$pat);
             }
         }
     }
@@ -3476,27 +3475,27 @@ sub kt
     my $str = "$esc$hyp$hyp$esc$esc";
     my @a = @($str =~ m/\G(?:\Q$esc$esc\E|\Q$esc$hyp\E|$re)/g);
 
-    iseq(0+nelems @a,3);
-    iseq(join('=', < @a),"$esc$hyp=$hyp=$esc$esc");
+    is(0+nelems @a,3);
+    is(join('=', < @a),"$esc$hyp=$hyp=$esc$esc");
 }
 # test for keys in %+ and %-
 {
     my $_ = "abcdef";
     m/(?<foo>a)|(?<foo>b)/;
-    iseq( (join ",", sort keys %+), "foo" );
-    iseq( (join ",", sort keys %-), "foo" );
-    iseq( (join ",", sort values %+), "a" );
-    iseq( (join ",", sort map "{join ' ', <@$_}", values %-), "a " );
+    is( (join ",", sort keys %+), "foo" );
+    is( (join ",", sort keys %-), "foo" );
+    is( (join ",", sort values %+), "a" );
+    is( (join ",", sort map "{join ' ', <@$_}", values %-), "a " );
     m/(?<bar>a)(?<bar>b)(?<quux>.)/;
-    iseq( (join ",", sort keys %+), "bar,quux" );
-    iseq( (join ",", sort keys %-), "bar,quux" );
-    iseq( (join ",", sort values %+), "a,c" ); # leftmost
-    iseq( (join ",", sort map "{join ' ', <@$_}", values %-), "a b,c" );
+    is( (join ",", sort keys %+), "bar,quux" );
+    is( (join ",", sort keys %-), "bar,quux" );
+    is( (join ",", sort values %+), "a,c" ); # leftmost
+    is( (join ",", sort map "{join ' ', <@$_}", values %-), "a b,c" );
     m/(?<un>a)(?<deux>c)?/; # second buffer won't capture
-    iseq( (join ",", sort keys %+), "un" );
-    iseq( (join ",", sort keys %-), "deux,un" );
-    iseq( (join ",", sort values %+), "a" );
-    iseq( (join ",", sort map "{join ' ', <@$_}", values %-), ",a" );
+    is( (join ",", sort keys %+), "un" );
+    is( (join ",", sort keys %-), "deux,un" );
+    is( (join ",", sort values %+), "a" );
+    is( (join ",", sort map "{join ' ', <@$_}", values %-), ",a" );
 }
 
 # length() on captures, the numbered ones end up in Perl_magic_len
@@ -3504,11 +3503,11 @@ sub kt
     my $_ = "aoeu \x{e6}var ook";
     m/^ \w+ \s (?<eek>\S+)/xp;
 
-    iseq( length($^PREMATCH), 0, 'length $`' );
-    iseq( length($^POSTMATCH), 4, q[length $'] );
-    iseq( length($^MATCH), 9, 'length $&' );
-    iseq( length($1), 4, 'length $1' );
-    iseq( length(%+{eek}), 4, 'length $+{eek} == length $1' );
+    is( length($^PREMATCH), 0, 'length $`' );
+    is( length($^POSTMATCH), 4, q[length $'] );
+    is( length($^MATCH), 9, 'length $&' );
+    is( length($1), 4, 'length $1' );
+    is( length(%+{eek}), 4, 'length $+{eek} == length $1' );
 }
 
 {
@@ -3516,28 +3515,28 @@ sub kt
 
     $ok=exists(%-{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
-    iseq($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
+    is($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists(%+{x}) ? 1 : 0
         if 'bar'=~m/(?<x>foo)|bar/;
-    iseq($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
+    is($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists(%-{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
-    iseq($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
+    is($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
 
     $ok=-1;
     $ok=exists(%+{x}) ? 1 : 0
         if 'foo'=~m/(?<x>foo)|bar/;
-    iseq($ok,1,'$+{x} exists after "foo"=~m/(?<x>foo)|bar/');
+    is($ok,1,'$+{x} exists after "foo"=~m/(?<x>foo)|bar/');
 }
 {
     local $_;
     ($_ = 'abc')=~m/(abc)/g;
     $_ = '123'; 
-    iseq("$1",'abc',"/g leads to unsafe match vars: $1");
+    is("$1",'abc',"/g leads to unsafe match vars: $1");
 }
 {
     local $Message='Message-ID: <20070818091501.7eff4831@r2d2>';
@@ -3548,7 +3547,7 @@ sub kt
         'a'=~m/(a|)/;
         push @x,1;
     }
-    iseq(length($str),"0","Trie scope error, string should be empty");
+    is(length($str),"0","Trie scope error, string should be empty");
     $str="";
     my @foo = @( ('a')x5 );
     for (< @foo) {
@@ -3556,23 +3555,23 @@ sub kt
         $str .= "{join ' ', <@bar}";
         s/a|/{push @bar, 1}/;
     }
-    iseq(length($str),"0","Trie scope error, string should be empty");
+    is(length($str),"0","Trie scope error, string should be empty");
 }
 
 {
     my $a = 3; "" =~ m/(??{ $a })/;
     my $b = $a;
-    iseq($b, $a, "copy of scalar used for postponed subexpression");
+    is($b, $a, "copy of scalar used for postponed subexpression");
 }
 {
      local $Message = "\$REGMARK in replacement -- Bug #49190";
      our $REGMARK;
      my $_ = "A";
      s/(*:B)A/$REGMARK/;
-     iseq $_, "B";
+     is $_, "B";
      $_ = "CCCCBAA";
      s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g;
-     iseq $_, "ZYX";
+     is $_, "ZYX";
 }
 {
     our @ctl_n= @(() );
@@ -3592,8 +3591,8 @@ sub kt
 
     my $match= '<bla><blubb></blubb></bla>' =~ m/^$nested_tags$/;
     ok($match,'nested construct matches');
-    iseq("{join ' ', <@ctl_n}","bla blubb",'$^N inside of (?{}) works as expected');
-    iseq("{join ' ', <@plus}","bla blubb",'$+ inside of (?{}) works as expected');
+    is("{join ' ', <@ctl_n}","bla blubb",'$^N inside of (?{}) works as expected');
+    is("{join ' ', <@plus}","bla blubb",'$+ inside of (?{}) works as expected');
 }
 
 
@@ -3615,9 +3614,9 @@ sub kt
         $y = $1; # use $1, which might not be from the last match!
         $x = substr(@list[0],@-[0],@+[0]-@-[0]);
     }
-    iseq($y,' ',
+    is($y,' ',
         'pattern in a loop, failure should not affect previous success');
-    iseq($x,'ab cd',
+    is($x,'ab cd',
         'pattern in a loop, failure should not affect previous success');
 }
 
@@ -3636,13 +3635,13 @@ eval_dies_like( 'm/\k/',
     local $Message = "substitution with lookahead (possible segv)";
     $_="ns1ns1ns1";
     s/ns(?=\d)/ns_/g;
-    iseq($_,"ns_1ns_1ns_1");
+    is($_,"ns_1ns_1ns_1");
     $_="ns1";
     s/ns(?=\d)/ns_/;
-    iseq($_,"ns_1");
+    is($_,"ns_1");
     $_="123";
     s/(?=\d+)|(?<=\d)/!Bang!/g;
-    iseq($_,"!Bang!1!Bang!2!Bang!3!Bang!");
+    is($_,"!Bang!1!Bang!2!Bang!3!Bang!");
 }
 
 # [perl #45337] utf8 + "[a]a{2}" + /$.../ = panic: sv_len_utf8 cache
