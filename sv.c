@@ -4106,22 +4106,8 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 
 	av = *avp;
 	if (!av) {
-	    /* There is no AV in the offical place - try a fixup.  */
-	    MAGIC *const mg = mg_find(tsv, PERL_MAGIC_backref);
-
-	    if (mg) {
-		/* Aha. They've got it stowed in magic.  Bring it back.  */
-		av = (AV*)mg->mg_obj;
-		/* Stop mg_free decreasing the refernce count.  */
-		mg->mg_obj = NULL;
-		/* Stop mg_free even calling the destructor, given that
-		   there's no AV to free up.  */
-		mg->mg_virtual = 0;
-		sv_unmagic(tsv, PERL_MAGIC_backref);
-	    } else {
-		av = newAV();
-		AvREAL_off(av);
-	    }
+	    av = newAV();
+	    AvREAL_off(av);
 	    *avp = av;
 	}
     } else {

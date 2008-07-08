@@ -205,6 +205,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 
     PERL_ARGS_ASSERT_GV_INIT;
     assert (!(proto && has_constant));
+    assert( SvTYPE(stash) == SVt_PVHV );
 
     if (has_constant) {
 	/* The constant has to be a simple scalar type.  */
