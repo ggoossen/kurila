@@ -92,7 +92,6 @@ sub readFile
         close F ;
     }
 
-    return @strings if wantarray ;
     return join "", < @strings ;
 }
 
@@ -555,7 +554,7 @@ sub mkComplete
     my $info = $u->getHeaderInfo() ;
 
 
-    return wantarray ?  @($info, $buffer) : $buffer ;
+    return @($info, $buffer);
 }
 
 sub mkErr

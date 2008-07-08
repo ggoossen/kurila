@@ -156,7 +156,6 @@ sub getZlibParams
 
             'CRC32'     => \@(0, 1, Parse_boolean,   0),
             'ADLER32'   => \@(0, 1, Parse_boolean,   0),
-            'Merge'     => \@(1, 1, Parse_boolean,   0),
         );
     
     
@@ -177,54 +176,6 @@ sub getFileInfo
 }
 
 use IO::Seekable qw(SEEK_SET);
-
-sub createMerge
-{
-    my $self = shift ;
-    my $outValue = shift ;
-    my $outType = shift ;
-
-    my ($invClass, $error_ref) = < $self->getInverseClass();
-    eval "require $invClass" 
-        or die "aaaahhhh" ;
-
-    my $inf = $invClass->new( $outValue, 
-                             Transparent => 0, 
-                             #Strict     => 1,
-                             AutoClose   => 0,
-                             Scan        => 1)
-       or return $self->saveErrorString(undef, "Cannot create InflateScan object: $$error_ref" ) ;
-
-    my $end_offset = 0;
-    $inf->scan() 
-        or return $self->saveErrorString(undef, "Error Scanning: $$error_ref", < $inf->errorNo) ;
-    $inf->zap($end_offset) 
-        or return $self->saveErrorString(undef, "Error Zapping: $$error_ref", < $inf->errorNo) ;
-
-    my $def = *$self->{Compress} = $inf->createDeflate();
-
-    *$self->{Header} = *$inf->{Info}->{Header};
-    *$self->{UnCompSize} = *$inf->{UnCompSize}->clone();
-    *$self->{CompSize} = *$inf->{CompSize}->clone();
-    # TODO -- fix this
-    #*$self->{CompSize} = new U64(0, *$self->{UnCompSize_32bit});
-
-
-    if ( $outType eq 'buffer') 
-      { substr( ${ *$self->{Buffer} }, $end_offset, undef, '') }
-    elsif ($outType eq 'handle' || $outType eq 'filename') {
-        *$self->{FH} = *$inf->{FH} ;
-        delete *$inf->{FH};
-        *$self->{FH}->flush() ;
-        *$self->{Handle} = 1 if $outType eq 'handle';
-
-        #seek(*$self->{FH}, $end_offset, SEEK_SET) 
-        *$self->{FH}->seek($end_offset, SEEK_SET) 
-            or return $self->saveErrorString(undef, $!, $!) ;
-    }
-
-    return $def ;
-}
 
 #### zlib specific methods
 
@@ -645,42 +596,6 @@ end of the file via a call to C<seek> before any compressed data is written
 to it.  Otherwise the file pointer will not be moved.
 
 =back
-
-This parameter defaults to 0.
-
-
-
-
-
-=item C<< Merge => 0|1 >>
-
-This option is used to compress input data and append it to an existing
-compressed data stream in C<$output>. The end result is a single compressed
-data stream stored in C<$output>. 
-
-
-
-It is a fatal error to attempt to use this option when C<$output> is not an
-RFC 1951 data stream.
-
-
-
-There are a number of other limitations with the C<Merge> option:
-
-=over 5 
-
-=item 1
-
-This module needs to have been built with zlib 1.2.1 or better to work. A
-fatal error will be thrown if C<Merge> is used with an older version of
-zlib.  
-
-=item 2
-
-If C<$output> is a file or a filehandle, it must be seekable.
-
-=back
-
 
 This parameter defaults to 0.
 

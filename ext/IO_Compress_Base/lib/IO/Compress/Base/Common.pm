@@ -428,13 +428,12 @@ sub createSelfTiedObject
     my $class = shift || (caller)[[0]] ;
     my $error_ref = shift ;
 
-    my $obj = bless Symbol::gensym(), ref($class) || $class;
-    tie *$obj, $obj;
-    *$obj->{Closed} = 1 ;
+    my $obj = bless \%(), ref($class) || $class;
+    $obj->{Closed} = 1 ;
     $$error_ref = '';
-    *$obj->{Error} = $error_ref ;
+    $obj->{Error} = $error_ref ;
     my $errno = 0 ;
-    *$obj->{ErrorNo} = \$errno ;
+    $obj->{ErrorNo} = \$errno ;
 
     return $obj;
 }

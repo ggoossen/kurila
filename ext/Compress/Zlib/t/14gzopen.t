@@ -5,6 +5,9 @@ BEGIN {
 }
 
 use lib qw(t t/compress);
+
+use IO::Uncompress::Gunzip v2.006 ;
+
 use strict;
 use warnings;
 use bytes;
@@ -19,12 +22,12 @@ BEGIN {
     $extra = 1
         if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    plan tests => 250 + $extra ;
+    plan tests => 248 + $extra ;
 
-    use_ok('Compress::Zlib', 2) ;
-    use_ok('IO::Compress::Gzip::Constants') ;
 }
 
+use Compress::Zlib;
+use IO::Compress::Gzip::Constants;
 
 my $hello = <<EOM ;
 hello world
@@ -162,7 +165,7 @@ ok ! $f->gzclose ;
 
 # first create a small gzipped text file
 $name = "test.gz" ;
-my @text = (<<EOM, <<EOM, <<EOM, <<EOM) ;
+my @text = @(<<EOM, <<EOM, <<EOM, <<EOM) ;
 this is line 1
 EOM
 the second line

@@ -7,7 +7,7 @@ use Config;
 use File::Spec;
 use File::Path;
 
-use lib < File::Spec->catdir('t', 'lib');
+use lib File::Spec->catdir('t', 'lib');
 use Test::More;
 require VMS::Filespec if $^O eq 'VMS';
 
@@ -182,15 +182,15 @@ if (%ENV{PERL_CORE}) {
 
 # Make sure we can run abs_path() on files, not just directories
 my $path = 'cwd.t';
-path_ends_with( <Cwd::abs_path($path), 'cwd.t', 'abs_path() can be invoked on a file');
-path_ends_with( <Cwd::fast_abs_path($path), 'cwd.t', 'fast_abs_path() can be invoked on a file');
-path_ends_with( <Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be invoked on a file')
+path_ends_with(Cwd::abs_path($path), 'cwd.t', 'abs_path() can be invoked on a file');
+path_ends_with(Cwd::fast_abs_path($path), 'cwd.t', 'fast_abs_path() can be invoked on a file');
+path_ends_with(Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be invoked on a file')
   if $EXTRA_ABSPATH_TESTS;
 
-$path = File::Spec->catfile( <File::Spec->updir, 't', $path);
-path_ends_with( <Cwd::abs_path($path), 'cwd.t', 'abs_path() can be invoked on a file');
-path_ends_with( <Cwd::fast_abs_path($path), 'cwd.t', 'fast_abs_path() can be invoked on a file');
-path_ends_with( <Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be invoked on a file')
+$path = File::Spec->catfile(File::Spec->updir, 't', $path);
+path_ends_with(Cwd::abs_path($path), 'cwd.t', 'abs_path() can be invoked on a file');
+path_ends_with(Cwd::fast_abs_path($path), 'cwd.t', 'fast_abs_path() can be invoked on a file');
+path_ends_with(Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be invoked on a file')
   if $EXTRA_ABSPATH_TESTS;
 
 
@@ -198,10 +198,10 @@ path_ends_with( <Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be i
 SKIP: {
   my $file;
   {
-    my $root = Cwd::abs_path( <File::Spec->rootdir);	# Add drive letter?
+    my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
     opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
-    ($file) = grep {-f $_ and not -l $_} map < File::Spec->catfile($root, $_), readdir FH;
+    ($file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), readdir FH;
     closedir FH;
   }
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
@@ -220,7 +220,7 @@ SKIP: {
 
 sub bracketed_form_dir {
   return join '', map "[$_]", 
-    grep length, < File::Spec->splitdir( <File::Spec->canonpath( shift() ));
+    grep length, < File::Spec->splitdir(File::Spec->canonpath( shift() ));
 }
 
 sub dir_ends_with {
@@ -231,7 +231,7 @@ sub dir_ends_with {
 
 sub bracketed_form_path {
   return join '', map "[$_]", 
-    grep length, < File::Spec->splitpath( <File::Spec->canonpath( shift() ));
+    grep length, < File::Spec->splitpath(File::Spec->canonpath( shift() ));
 }
 
 sub path_ends_with {

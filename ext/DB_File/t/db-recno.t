@@ -87,7 +87,7 @@ sub safeUntie
     my $hashref = shift ;
     my $no_inner = 1;
     local $^WARN_HOOK = sub {-- $no_inner } ;
-    untie < @$hashref;
+    untie @$hashref;
     return $no_inner;
 }
 
@@ -803,7 +803,7 @@ EOM
     print "The 2nd last element is @h[-2]\n" ;
 
     undef $x ;
-    untie < @h ;
+    untie @h ;
 
     unlink $filename ;
   }  
@@ -888,7 +888,7 @@ EOM
       { print "$k: $v\n" }
 
     undef $H ;
-    untie < @h ;    
+    untie @h ;    
 
     unlink $file ;
   }  
@@ -1004,7 +1004,7 @@ EOM
    ok (158, ! $@);
 
    undef $db ;
-   untie < @h;
+   untie @h;
    unlink $Dfile;
 }
 
@@ -1050,7 +1050,7 @@ EOM
    ok 168, $_ eq 'fred';
 
    undef $db ;
-   untie < @h;
+   untie @h;
    unlink $Dfile;
 }
 
@@ -1173,7 +1173,7 @@ EOM
     $warned = '';
 
     undef $db ;
-    untie < @h;
+    untie @h;
     unlink $Dfile;
 }
 
@@ -1504,7 +1504,7 @@ sub test_splice {
     }
     
     undef $H;
-    untie < @h;
+    untie @h;
     
     open(TEXT, "<", $tmp) or die "cannot open $tmp: $!";
     @h = @( ~< *TEXT ); normalise < @h; chomp @h;

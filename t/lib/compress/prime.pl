@@ -36,7 +36,7 @@ EOM
 
     print "#\n# Testing $UncompressClass\n#\n";
 
-    my $compressed = mkComplete($CompressClass, $hello);
+    my ($info, $compressed) = < mkComplete($CompressClass, $hello);
     my $cc = $compressed ;
 
     plan tests => (length($compressed) * 6 * 7) + 1 + $extra ;
