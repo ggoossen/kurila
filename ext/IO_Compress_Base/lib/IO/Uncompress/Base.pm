@@ -707,12 +707,6 @@ sub UNTIE
 }
 
 
-sub getHeaderInfo
-{
-    my $self = shift ;
-    wantarray ? @{ *$self->{InfoList} } : *$self->{Info};
-}
-
 sub readBlock
 {
     my $self = shift ;
@@ -1136,18 +1130,10 @@ sub getline
 sub getlines
 {
     my $self = shift;
-    $self->croakError(*$self->{ClassName} . 
-            "::getlines: called in scalar context\n") unless wantarray;
     my($line, @lines);
     push(@lines, $line) 
         while defined($line = $self->getline);
     return @lines;
-}
-
-sub READLINE
-{
-    goto &getlines if wantarray;
-    goto &getline;
 }
 
 sub getc

@@ -6,7 +6,7 @@ use strict;
 use Cwd;
 
 use File::Spec;
-use lib < File::Spec->catdir('t', 'lib');
+use lib File::Spec->catdir('t', 'lib');
 use Test::More tests => 17;
 
 use Scalar::Util qw/tainted/;

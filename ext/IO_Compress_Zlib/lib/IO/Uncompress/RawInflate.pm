@@ -310,20 +310,6 @@ sub zap
     return 1 ;
 }
 
-sub createDeflate
-{
-    my $self  = shift ;
-    my ($def, $status) = < *$self->{Uncomp}->createDeflateStream(
-                                    -AppendOutput   => 1,
-                                    -WindowBits => - MAX_WBITS,
-                                    -CRC32      => < *$self->{Params}->value('CRC32'),
-                                    -ADLER32    => < *$self->{Params}->value('ADLER32'),
-                                );
-    
-    return wantarray ?  @($status, $def) : $def ;                                
-}
-
-
 1; 
 
 __END__

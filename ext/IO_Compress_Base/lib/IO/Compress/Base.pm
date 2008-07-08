@@ -26,10 +26,10 @@ $VERSION = '2.006';
 sub saveStatus
 {
     my $self   = shift ;
-    ${ *$self->{ErrorNo} } = shift() + 0 ;
-    ${ *$self->{Error} } = '' ;
+    ${ $self->{ErrorNo} } = shift() + 0 ;
+    ${ $self->{Error} } = '' ;
 
-    return ${ *$self->{ErrorNo} } ;
+    return ${ $self->{ErrorNo} } ;
 }
 
 
@@ -37,8 +37,8 @@ sub saveErrorString
 {
     my $self   = shift ;
     my $retval = shift ;
-    ${ *$self->{Error} } = shift() . (${*$self->{Error}} ? "\nprevious: ${*$self->{Error}}" : "") ;
-    ${ *$self->{ErrorNo} } = shift() + 0 if (nelems @_) ;
+    ${ $self->{Error} } = shift() . (${$self->{Error}} ? "\nprevious: ${$self->{Error}}" : "") ;
+    ${ $self->{ErrorNo} } = shift() + 0 if (nelems @_) ;
 
     return $retval;
 }
@@ -55,13 +55,13 @@ sub closeError
     my $self = shift ;
     my $retval = shift ;
 
-    my $errno = *$self->{ErrorNo};
-    my $error = ${ *$self->{Error} };
+    my $errno = $self->{ErrorNo};
+    my $error = ${ $self->{Error} };
 
     $self->close();
 
-    *$self->{ErrorNo} = $errno ;
-    ${ *$self->{Error} } = $error ;
+    $self->{ErrorNo} = $errno ;
+    ${ $self->{Error} } = $error ;
 
     return $retval;
 }
@@ -71,13 +71,13 @@ sub closeError
 sub error
 {
     my $self   = shift ;
-    return ${ *$self->{Error} } ;
+    return ${ $self->{Error} } ;
 }
 
 sub errorNo
 {
     my $self   = shift ;
-    return ${ *$self->{ErrorNo} } ;
+    return ${ $self->{ErrorNo} } ;
 }
 
 
@@ -87,19 +87,19 @@ sub writeAt
     my $offset = shift;
     my $data = shift;
 
-    if (defined *$self->{FH}) {
-        my $here = tell(*$self->{FH});
+    if (defined $self->{FH}) {
+        my $here = tell($self->{FH});
         return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) 
             if $here +< 0 ;
-        seek(*$self->{FH}, $offset, SEEK_SET)
+        seek($self->{FH}, $offset, SEEK_SET)
             or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
-        defined *$self->{FH}->write($data, length $data)
+        defined $self->{FH}->write($data, length $data)
             or return $self->saveErrorString(undef, $!, $!) ;
-        seek(*$self->{FH}, $here, SEEK_SET)
+        seek($self->{FH}, $here, SEEK_SET)
             or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
     }
     else {
-        substr(${ *$self->{Buffer} }, $offset, length($data), $data) ;
+        substr(${ $self->{Buffer} }, $offset, length($data), $data) ;
     }
 
     return 1;
@@ -114,17 +114,17 @@ sub output
     return 1 
         if length $data == 0 && ! $last ;
 
-    if ( *$self->{FilterEnvelope} ) {
+    if ( $self->{FilterEnvelope} ) {
         *_ = \$data;
-        &{ *$self->{FilterEnvelope} }();
+        &{ $self->{FilterEnvelope} }();
     }
 
-    if ( defined *$self->{FH} ) {
-        defined IO::Handle::write(*$self->{FH}, $data, length $data )
+    if ( defined $self->{FH} ) {
+        defined IO::Handle::write($self->{FH}, $data, length $data )
           or return $self->saveErrorString(0, $!, $!); 
     }
     else {
-        ${ *$self->{Buffer} } .= $data ;
+        ${ $self->{Buffer} } .= $data ;
     }
 
     return 1;
@@ -152,13 +152,12 @@ sub checkParams
             'Append'    => \@(1, 1, Parse_boolean,   0),
             'BinModeIn' => \@(1, 1, Parse_boolean,   0),
 
-            'FilterEnvelope' => \@(1, 1, Parse_any,   undef), <
+            'FilterEnvelope' => \@(1, 1, Parse_any,   undef),
 
-            $self->getExtraParams(),
-            *$self->{OneShot} ? < $self->getOneShotParams() 
-                              : (),
+            < $self->getExtraParams(),
+            $self->{OneShot} ? < $self->getOneShotParams() : (),
         ), 
-        < @_) or $self->croakError("{$class}: $got->{Error}")  ;
+        < @_) or die("$(dump::view($class)): $(dump::view($got->{Error}))")  ;
 
     return $got ;
 }
@@ -168,7 +167,7 @@ sub _create
     my $obj = shift;
     my $got = shift;
 
-    *$obj->{Closed} = 1 ;
+    $obj->{Closed} = 1 ;
 
     my $class = ref $obj;
     $obj->croakError("$class: Missing Output parameter")
@@ -199,19 +198,9 @@ sub _create
         *$obj->{Buffer} = \$buff ;
     }
 
-    # Merge implies Append
-    my $merge = $got->value('Merge') ;
-    my $appendOutput = $got->value('Append') || $merge ;
+    my $appendOutput = $got->value('Append');
     *$obj->{Append} = $appendOutput;
     *$obj->{FilterEnvelope} = $got->value('FilterEnvelope') ;
-
-    if ($merge)
-    {
-        # Switch off Merge mode if output file/buffer is empty/doesn't exist
-        if (($outType eq 'buffer' && length $$outValue == 0 ) ||
-            ($outType ne 'buffer' && (! -e $outValue || (-w _ && -z _))) )
-          { $merge = 0 }
-    }
 
     # If output is a file, check that it is writable
     if ($outType eq 'filename' && -e $outValue && ! -w _)
@@ -231,7 +220,6 @@ sub _create
     $obj->saveStatus(STATUS_OK) ;
 
     my $status ;
-    if (! $merge)
     {
         *$obj->{Compress} = $obj->mkComp($class, $got)
             or $obj->croakError("Failed making Compress");
@@ -270,11 +258,6 @@ sub _create
         *$obj->{Header} = $obj->mkHeader($got) ;
         $obj->output( *$obj->{Header} )
             or $obj->croakError("Failed writing header");
-    }
-    else
-    {
-        *$obj->{Compress} = $obj->createMerge($outValue, $outType)
-            or return undef;
     }
 
     *$obj->{Closed} = 0 ;
@@ -476,7 +459,7 @@ sub _wr2
             $fh = IO::File->new( "$input", "<")
                 or return $self->saveErrorString(undef, "cannot open file '$input': $!", $!) ;
         }
-        binmode $fh if *$self->{Got}->valueOrDefault('BinModeIn') ;
+        binmode $fh if $self->{Got}->valueOrDefault('BinModeIn') ;
 
         my $status ;
         my $buff ;
@@ -490,7 +473,7 @@ sub _wr2
         return $self->saveErrorString(undef, $!, $!) 
             if $status +< 0 ;
 
-        if ( (!$isFilehandle || *$self->{AutoClose}) && ! ref $input && $input ne '-')
+        if ( (!$isFilehandle || $self->{AutoClose}) && ! ref $input && $input ne '-')
         {    
             $fh->close() 
                 or return undef ;
@@ -509,16 +492,16 @@ sub addInterStream
     my $input = shift ;
     my $inputIsFilename = shift ;
 
-    if (*$self->{Got}->value('MultiStream'))
+    if ($self->{Got}->value('MultiStream'))
     {
-        $self->getFileInfo(*$self->{Got}, $input)
+        $self->getFileInfo($self->{Got}, $input)
             #if isaFilename($input) and $inputIsFilename ;
             if isaFilename($input) ;
 
         # TODO -- newStream needs to allow gzip/zip header to be modified
         return $self->newStream();
     }
-    elsif (*$self->{Got}->value('AutoFlush'))
+    elsif ($self->{Got}->value('AutoFlush'))
     {
         #return $self->flush(Z_FULL_FLUSH);
     }
@@ -549,7 +532,7 @@ sub DESTROY
     # TODO - memory leak with 5.8.0 - this isn't called until 
     #        global destruction
     #
-    %{ *$self } = %( () ) ;
+    %{ $self } = %( () ) ;
     undef $self ;
 }
 
@@ -565,7 +548,7 @@ sub syswrite
 
     my $buffer ;
     if (ref @_[0] ) {
-        $self->croakError( *$self->{ClassName} . "::write: not a scalar reference" )
+        $self->croakError( $self->{ClassName} . "::write: not a scalar reference" )
             unless ref @_[0] eq 'SCALAR' ;
         $buffer = @_[0] ;
     }
@@ -582,11 +565,11 @@ sub syswrite
 
         if ((nelems @_) +> 2) {
             $offset = @_[2] || 0;
-            $self->croakError(*$self->{ClassName} . "::write: offset outside string") 
+            $self->croakError($self->{ClassName} . "::write: offset outside string") 
                 if $offset +> $slen;
             if ($offset +< 0) {
                 $offset += $slen;
-                $self->croakError( *$self->{ClassName} . "::write: offset outside string") if $offset +< 0;
+                $self->croakError( $self->{ClassName} . "::write: offset outside string") if $offset +< 0;
             }
             my $rem = $slen - $offset;
             $len = $rem if $rem +< $len;
@@ -597,23 +580,23 @@ sub syswrite
 
     return 0 if ! defined $$buffer || length $$buffer == 0 ;
 
-    if (*$self->{Encoding}) {
-        $$buffer = *$self->{Encoding}->encode($$buffer);
+    if ($self->{Encoding}) {
+        $$buffer = $self->{Encoding}->encode($$buffer);
     }
 
     $self->filterUncompressed($buffer);
 
     my $buffer_length = defined $$buffer ? length($$buffer) : 0 ;
-    *$self->{UnCompSize}->add($buffer_length) ;
+    $self->{UnCompSize}->add($buffer_length) ;
 
     my $outBuffer='';
-    my $status = *$self->{Compress}->compr($buffer, $outBuffer) ;
+    my $status = $self->{Compress}->compr($buffer, $outBuffer) ;
 
-    return $self->saveErrorString(undef, *$self->{Compress}->{Error}, 
-                                         *$self->{Compress}->{ErrorNo})
+    return $self->saveErrorString(undef, $self->{Compress}->{Error}, 
+                                         $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
-    *$self->{CompSize}->add(length $outBuffer) ;
+    $self->{CompSize}->add(length $outBuffer) ;
 
     $self->output($outBuffer)
         or return undef;
@@ -626,7 +609,7 @@ sub print
     my $self = shift;
 
     #if (ref $self) {
-    #    $self = *$self{GLOB} ;
+    #    $self = $self{GLOB} ;
     #}
 
     if (defined $\) {
@@ -658,22 +641,22 @@ sub flush
     my $self = shift ;
 
     my $outBuffer='';
-    my $status = *$self->{Compress}->flush($outBuffer, < @_) ;
-    return $self->saveErrorString(0, *$self->{Compress}->{Error}, 
-                                    *$self->{Compress}->{ErrorNo})
+    my $status = $self->{Compress}->flush($outBuffer, < @_) ;
+    return $self->saveErrorString(0, $self->{Compress}->{Error}, 
+                                    $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
-    if ( defined *$self->{FH} ) {
-        IO::Handle::clearerr(*$self->{FH});
+    if ( defined $self->{FH} ) {
+        IO::Handle::clearerr($self->{FH});
     }
 
-    *$self->{CompSize}->add(length $outBuffer) ;
+    $self->{CompSize}->add(length $outBuffer) ;
 
     $self->output($outBuffer)
         or return 0;
 
-    if ( defined *$self->{FH} ) {
-        defined IO::Handle::flush(*$self->{FH})
+    if ( defined $self->{FH} ) {
+        defined IO::Handle::flush($self->{FH})
             or return $self->saveErrorString(0, $!, $!); 
     }
 
@@ -687,23 +670,23 @@ sub newStream
     $self->_writeTrailer()
         or return 0 ;
 
-    my $got = $self->checkParams('newStream', *$self->{Got}, < @_)
+    my $got = $self->checkParams('newStream', $self->{Got}, < @_)
         or return 0 ;    
 
     $self->ckParams($got)
         or $self->croakError("newStream: $self->{Error}");
 
-    *$self->{Header} = $self->mkHeader($got) ;
-    $self->output(*$self->{Header} )
+    $self->{Header} = $self->mkHeader($got) ;
+    $self->output($self->{Header} )
         or return 0;
     
     my $status = $self->reset() ;
-    return $self->saveErrorString(0, *$self->{Compress}->{Error}, 
-                                  *$self->{Compress}->{ErrorNo})
+    return $self->saveErrorString(0, $self->{Compress}->{Error}, 
+                                  $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
-    *$self->{UnCompSize}->reset();
-    *$self->{CompSize}->reset();
+    $self->{UnCompSize}->reset();
+    $self->{CompSize}->reset();
 
     return 1 ;
 }
@@ -711,7 +694,7 @@ sub newStream
 sub reset
 {
     my $self = shift ;
-    return *$self->{Compress}->reset() ;
+    return $self->{Compress}->reset() ;
 }
 
 sub _writeTrailer
@@ -720,11 +703,11 @@ sub _writeTrailer
 
     my $trailer = '';
 
-    my $status = *$self->{Compress}->close($trailer) ;
-    return $self->saveErrorString(0, *$self->{Compress}->{Error}, *$self->{Compress}->{ErrorNo})
+    my $status = $self->{Compress}->close($trailer) ;
+    return $self->saveErrorString(0, $self->{Compress}->{Error}, $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
-    *$self->{CompSize}->add(length $trailer) ;
+    $self->{CompSize}->add(length $trailer) ;
 
     $trailer .= $self->mkTrailer();
     defined $trailer
@@ -744,10 +727,10 @@ sub close
 {
     my $self = shift ;
 
-    return 1 if *$self->{Closed} || ! *$self->{Compress} ;
-    *$self->{Closed} = 1 ;
+    return 1 if $self->{Closed} || ! $self->{Compress} ;
+    $self->{Closed} = 1 ;
 
-    untie *$self;
+    untie $self;
 
     $self->_writeTrailer()
         or return 0 ;
@@ -758,15 +741,15 @@ sub close
     $self->output( "", 1 )
         or return 0;
 
-    if (defined *$self->{FH}) {
+    if (defined $self->{FH}) {
 
-        #if (! *$self->{Handle} || *$self->{AutoClose}) {
-        if ((! *$self->{Handle} || *$self->{AutoClose}) && ! *$self->{StdIO}) {
+        #if (! $self->{Handle} || $self->{AutoClose}) {
+        if ((! $self->{Handle} || $self->{AutoClose}) && ! $self->{StdIO}) {
             $! = 0 ;
-            close(*$self->{FH})
+            close($self->{FH})
                 or return $self->saveErrorString(0, $!, $!); 
         }
-        delete *$self->{FH} ;
+        delete $self->{FH} ;
         # This delete can set $! in older Perls, so reset the errno
         $! = 0 ;
     }
@@ -782,31 +765,31 @@ sub close
 #sub crc
 #{
 #    my $self = shift ;
-#    return *$self->{Compress}->crc32() ;
+#    return $self->{Compress}->crc32() ;
 #}
 #
 #sub msg
 #{
 #    my $self = shift ;
-#    return *$self->{Compress}->msg() ;
+#    return $self->{Compress}->msg() ;
 #}
 #
 #sub dict_adler
 #{
 #    my $self = shift ;
-#    return *$self->{Compress}->dict_adler() ;
+#    return $self->{Compress}->dict_adler() ;
 #}
 #
 #sub get_Level
 #{
 #    my $self = shift ;
-#    return *$self->{Compress}->get_Level() ;
+#    return $self->{Compress}->get_Level() ;
 #}
 #
 #sub get_Strategy
 #{
 #    my $self = shift ;
-#    return *$self->{Compress}->get_Strategy() ;
+#    return $self->{Compress}->get_Strategy() ;
 #}
 
 
@@ -814,14 +797,14 @@ sub tell
 {
     my $self = shift ;
 
-    return *$self->{UnCompSize}->get32bit() ;
+    return $self->{UnCompSize}->get32bit() ;
 }
 
 sub eof
 {
     my $self = shift ;
 
-    return *$self->{Closed} ;
+    return $self->{Closed} ;
 }
 
 
@@ -844,14 +827,14 @@ sub seek
         $target = $here + $position ;
     }
     else {
-        $self->croakError(*$self->{ClassName} . "::seek: unknown value, $whence, for whence parameter");
+        $self->croakError($self->{ClassName} . "::seek: unknown value, $whence, for whence parameter");
     }
 
     # short circuit if seeking to current offset
     return 1 if $target == $here ;    
 
     # Outlaw any attempt to seek backwards
-    $self->croakError(*$self->{ClassName} . "::seek: cannot seek backwards")
+    $self->croakError($self->{ClassName} . "::seek: cannot seek backwards")
         if $target +< $here ;
 
     # Walk the file to the new offset
@@ -868,30 +851,30 @@ sub binmode
 {
     1;
 #    my $self     = shift ;
-#    return defined *$self->{FH} 
-#            ? binmode *$self->{FH} 
+#    return defined $self->{FH} 
+#            ? binmode $self->{FH} 
 #            : 1 ;
 }
 
 sub fileno
 {
     my $self     = shift ;
-    return defined *$self->{FH} 
-            ? fileno(*$self->{FH}) 
+    return defined $self->{FH} 
+            ? fileno($self->{FH}) 
             : undef ;
 }
 
 sub opened
 {
     my $self     = shift ;
-    return ! *$self->{Closed} ;
+    return ! $self->{Closed} ;
 }
 
 sub autoflush
 {
     my $self     = shift ;
-    return defined *$self->{FH} 
-            ? *$self->{FH}->autoflush(< @_) 
+    return defined $self->{FH} 
+            ? $self->{FH}->autoflush(< @_) 
             : undef ;
 }
 

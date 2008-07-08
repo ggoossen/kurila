@@ -274,11 +274,6 @@ sub TIEHASH
     tie_hash_or_array(< @_) ;
 }
 
-sub TIEARRAY
-{
-    tie_hash_or_array(< @_) ;
-}
-
 sub CLEAR 
 {
     my $self = shift;
@@ -314,173 +309,6 @@ sub STORESIZE
     }
 }
  
-
-sub SPLICE
-{
-    my $self = shift;
-    my $offset = shift;
-    if (not defined $offset) {
-	warnings::warnif('uninitialized', 'Use of uninitialized value in splice');
-	$offset = 0;
-    }
-
-    my $no_length = ! nelems @_;
-    my $length = (nelems @_) ? shift : 0;
-    # Carping about definedness comes _after_ the OFFSET sanity check.
-    # This is so we get the same error messages as Perl's splice().
-    # 
-
-    my @list = @( < @_ );
-
-    my $size = $self->FETCHSIZE();
-    
-    # 'If OFFSET is negative then it start that far from the end of
-    # the array.'
-    # 
-    if ($offset +< 0) {
-	my $new_offset = $size + $offset;
-	if ($new_offset +< 0) {
-	    die "Modification of non-creatable array value attempted, "
-	      . "subscript $offset";
-	}
-	$offset = $new_offset;
-    }
-
-    if (not defined $length) {
-	warnings::warnif('uninitialized', 'Use of uninitialized value in splice');
-	$length = 0;
-    }
-
-    if ($offset +> $size) {
- 	$offset = $size;
-	warnings::warnif('misc', 'splice() offset past end of array')
-            if $splice_end_array;
-    }
-
-    # 'If LENGTH is omitted, removes everything from OFFSET onward.'
-    if ($no_length) {
-	$length = $size - $offset;
-    }
-
-    # 'If LENGTH is negative, leave that many elements off the end of
-    # the array.'
-    # 
-    if ($length +< 0) {
-	$length = $size - $offset + $length;
-
-	if ($length +< 0) {
-	    # The user must have specified a length bigger than the
-	    # length of the array passed in.  But perl's splice()
-	    # doesn't catch this, it just behaves as for length=0.
-	    # 
-	    $length = 0;
-	}
-    }
-
-    if ($length +> $size - $offset) {
-	$length = $size - $offset;
-    }
-
-    # $num_elems holds the current number of elements in the database.
-    my $num_elems = $size;
-
-    # 'Removes the elements designated by OFFSET and LENGTH from an
-    # array,'...
-    # 
-    my @removed = @( () );
-    foreach (0 .. $length - 1) {
-	my $old;
-	my $status = $self->get($offset, $old);
-	if ($status != 0) {
-	    my $msg = "error from Berkeley DB on get($offset, \$old)";
-	    if ($status == 1) {
-		$msg .= ' (no such element?)';
-	    }
-	    else {
-		$msg .= ": error status $status";
-		if (defined $! and $! ne '') {
-		    $msg .= ", message $!";
-		}
-	    }
-	    die $msg;
-	}
-	push @removed, $old;
-
-	$status = $self->del($offset);
-	if ($status != 0) {
-	    my $msg = "error from Berkeley DB on del($offset)";
-	    if ($status == 1) {
-		$msg .= ' (no such element?)';
-	    }
-	    else {
-		$msg .= ": error status $status";
-		if (defined $! and $! ne '') {
-		    $msg .= ", message $!";
-		}
-	    }
-	    die $msg;
-	}
-
-	-- $num_elems;
-    }
-
-    # ...'and replaces them with the elements of LIST, if any.'
-    my $pos = $offset;
-    while (defined (my $elem = shift @list)) {
-	my $old_pos = $pos;
-	my $status;
-	if ($pos +>= $num_elems) {
-	    $status = $self->put($pos, $elem);
-	}
-	else {
-	    $status = $self->put($pos, $elem, < $self->R_IBEFORE);
-	}
-
-	if ($status != 0) {
-	    my $msg = "error from Berkeley DB on put($pos, $elem, ...)";
-	    if ($status == 1) {
-		$msg .= ' (no such element?)';
-	    }
-	    else {
-		$msg .= ", error status $status";
-		if (defined $! and $! ne '') {
-		    $msg .= ", message $!";
-		}
-	    }
-	    die $msg;
-	}
-
-	die "pos unexpectedly changed from $old_pos to $pos with R_IBEFORE"
-	  if $old_pos != $pos;
-
-	++ $pos;
-	++ $num_elems;
-    }
-
-    if (wantarray) {
-	# 'In list context, returns the elements removed from the
-	# array.'
-	# 
-	return @removed;
-    }
-    elsif (defined wantarray and not wantarray) {
-	# 'In scalar context, returns the last element removed, or
-	# undef if no elements are removed.'
-	# 
-	if ((nelems @removed)) {
-	    my $last = pop @removed;
-	    return "$last";
-	}
-	else {
-	    return undef;
-	}
-    }
-    elsif (not defined wantarray) {
-	# Void context
-    }
-    else { die }
-}
-sub ::DB_File::splice { &SPLICE }
 
 sub find_dup
 {
@@ -526,7 +354,6 @@ sub get_dup
     my $flag	  = shift ;
     my $value 	  = 0 ;
     my $origkey   = $key ;
-    my $wantarray = wantarray ;
     my %values	  = %( () ) ;
     my @values    = @( () ) ;
     my $counter   = 0 ;
@@ -539,18 +366,13 @@ sub get_dup
          $status = $db->seq($key, $value, < R_NEXT()) ) {
  
         # save the value or count number of matches
-        if ($wantarray) {
-	    if ($flag)
-                { ++ %values{$value} }
-	    else
-                { push (@values, $value) }
-	}
+        if ($flag)
+          { ++ %values{$value} }
         else
-            { ++ $counter }
-     
+          { push (@values, $value) }
     }
  
-    return  @($wantarray ?  @($flag ? %values : @values) : $counter) ;
+    return  $flag ? %values : @values;
 }
 
 

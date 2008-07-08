@@ -126,13 +126,13 @@ use constant GZIP_OS_DEFAULT=> 0xFF ;
     15  => 'MVS',
     16  => 'BeOS',
     17  => 'Tandem/NSK',
-    18  => 'THEOS', <
+    18  => 'THEOS',
     GZIP_OS_DEFAULT()   => 'Unknown',
     ) ;
 
-use constant GZIP_MINIMUM_HEADER =>   pack("C4 V C C", <  
-        GZIP_ID1, < GZIP_ID2, < GZIP_CM_DEFLATED, < GZIP_FLG_DEFAULT, <
-        GZIP_MTIME_DEFAULT, < GZIP_XFL_DEFAULT, < GZIP_OS_DEFAULT) ;
+use constant GZIP_MINIMUM_HEADER =>   pack("C4 V C C",  
+        GZIP_ID1, GZIP_ID2, GZIP_CM_DEFLATED, GZIP_FLG_DEFAULT,
+        GZIP_MTIME_DEFAULT, GZIP_XFL_DEFAULT, GZIP_OS_DEFAULT) ;
 
 
 1;

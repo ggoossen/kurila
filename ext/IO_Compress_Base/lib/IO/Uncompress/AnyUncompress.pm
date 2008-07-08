@@ -212,7 +212,6 @@ IO::Uncompress::AnyUncompress - Uncompress gzip, zip, bzip2 or lzop file/buffer
 
     $data = $z->trailingData()
     $status = $z->nextStream()
-    $data = $z->getHeaderInfo()
     $z->tell()
     $z->seek($position, $whence)
     $z->binmode()
@@ -784,20 +783,6 @@ Read a single character.
 Usage is
 
     $char = $z->ungetc($string)
-
-
-
-
-=head2 getHeaderInfo
-
-Usage is
-
-    $hdr  = $z->getHeaderInfo();
-    @hdrs = $z->getHeaderInfo();
-
-This method returns either a hash reference (in scalar context) or a list
-or hash references (in array context) that contains information about each
-of the header fields in the compressed data stream(s).
 
 
 

@@ -600,7 +600,7 @@ sub fast_abs_path {
 	
 	return $dir eq File::Spec->rootdir
 	  ? File::Spec->catpath($vol, $dir, $file)
-	  : fast_abs_path( <File::Spec->catpath($vol, $dir, '')) . '/' . $file;
+	  : fast_abs_path(File::Spec->catpath($vol, $dir, '')) . '/' . $file;
     }
 
     if (!CORE::chdir($path)) {
