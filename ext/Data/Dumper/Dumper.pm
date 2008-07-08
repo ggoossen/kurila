@@ -344,6 +344,11 @@ sub _dump {
             $out .= '\' . $s->_dump($$val, $name); # '
         }
 
+        if ($realpack and !$no_bless) { # we have a blessed ref
+            $out .= ', ' . _quote($realpack) . ' )';
+            $out .= '->' . $s->{toaster} . '()'  if $s->{toaster} ne '';
+            $s->{apad} = $blesspad;
+        }
         $s->{level}--;
     }
     elsif ($realtype eq 'REF') {
