@@ -70,7 +70,6 @@ atan2
 bind
 binmode
 bless
-break
 caller
 chdir
 chmod
@@ -83,10 +82,8 @@ close
 closedir
 cmp
 connect
-continue
 cos
 crypt
-default
 defined
 delete
 die
@@ -140,7 +137,6 @@ getservbyport
 getservent
 getsockname
 getsockopt
-given
 glob
 gmtime
 goto
@@ -287,7 +283,6 @@ wait
 waitpid
 wantarray
 warn
-when
 while
 write
 x

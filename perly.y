@@ -70,8 +70,7 @@
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB PACKAGE USE
-%token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
-%token <i_tkval> GIVEN WHEN DEFAULT
+%token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF FOR
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
@@ -83,7 +82,7 @@
 %type <ival> prog progstart remember mremember
 %type <ival>  startsub startanonsub
 /* FIXME for MAD - are these two ival? */
-%type <ival> mydefsv mintro
+%type <ival> mintro
 
 %type <opval> decl subrout mysubrout package use peg
 
@@ -94,7 +93,6 @@
 %type <opval> subname proto subbody cont my_scalar
 %type <opval> subattrlist myattrlist myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
-%type <opval> switch case
 %type <p_tkval> label
 
 %nonassoc <i_tkval> PREC_LOW
@@ -153,10 +151,6 @@ remember:	/* NULL */	/* start a full lexical scope */
 			{ $$ = block_start(TRUE); }
 	;
 
-mydefsv:	/* NULL */	/* lexicalize $_ */
-			{ $$ = (I32) allocmy("$_"); }
-	;
-
 progstart:
 		{
 		    PL_parser->expect = XSTATE; $$ = block_start(TRUE);
@@ -201,10 +195,7 @@ line	:	label cond
 			{ $$ = newSTATEOP(0, PVAL($1), $2);
 			  TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
 	|	loop	/* loops add their own labels */
-	|	switch  /* ... and so do switches */
 			{ $$ = $1; }
-	|	label case
-			{ $$ = newSTATEOP(0, PVAL($1), $2); }
 	|	label ';'
 			{
 			  if (PVAL($1)) {
@@ -310,21 +301,9 @@ cond	:	IF '(' remember mexpr ')' mblock else
 			}
 	;
 
-/* Cases for a switch statement */
-case	:	WHEN '(' remember mexpr ')' mblock
-	{ $$ = block_end($3,
-		newWHENOP($4, scope($6))); }
-	|	DEFAULT block
-	{ $$ = newWHENOP(0, scope($2)); }
-	;
-
 /* Continue blocks */
 cont	:	/* NULL */
 			{ $$ = (OP*)NULL; }
-	|	CONTINUE block
-			{ $$ = scope($2);
-			  TOKEN_GETMAD($1,$$,'o');
-			}
 	;
 
 /* Loops: while, until, for, and a bare block */
@@ -422,15 +401,6 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 				 newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
 					    NOLINE, (OP*)NULL, $2, $3, 0));
 			  TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
-	;
-
-/* Switch blocks */
-switch	:	label GIVEN '(' remember mydefsv mexpr ')' mblock
-			{ PL_parser->copline = (line_t) $2;
-			    $$ = block_end($4,
-				newSTATEOP(0, PVAL($1),
-				    newGIVENOP($6, scope($8),
-					(PADOFFSET) $5) )); }
 	;
 
 /* determine whether there are any new my declarations */

@@ -647,8 +647,6 @@ S_dopoptolabel(pTHX_ const char *label)
 	case CXt_SUB:
 	case CXt_EVAL:
 	case CXt_NULL:
-	case CXt_GIVEN:
-	case CXt_WHEN:
 	    if (ckWARN(WARN_EXITING))
 		Perl_warner(aTHX_ packWARN(WARN_EXITING), "Exiting %s via %s",
 			context_name[CxTYPE(cx)], OP_NAME(PL_op));
@@ -766,52 +764,6 @@ S_dopoptoloop(pTHX_ I32 startingblock)
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found loop #%ld)\n", (long)i));
-	    return i;
-	}
-    }
-    return i;
-}
-
-STATIC I32
-S_dopoptogiven(pTHX_ I32 startingblock)
-{
-    dVAR;
-    I32 i;
-    for (i = startingblock; i >= 0; i--) {
-	register const PERL_CONTEXT *cx = &cxstack[i];
-	switch (CxTYPE(cx)) {
-	default:
-	    continue;
-	case CXt_GIVEN:
-	    DEBUG_l( Perl_deb(aTHX_ "(Found given #%ld)\n", (long)i));
-	    return i;
-	case CXt_LOOP_PLAIN:
-	    assert(!CxFOREACHDEF(cx));
-	    break;
-	case CXt_LOOP_LAZYIV:
-	case CXt_LOOP_LAZYSV:
-	case CXt_LOOP_FOR:
-	    if (CxFOREACHDEF(cx)) {
-		DEBUG_l( Perl_deb(aTHX_ "(Found foreach #%ld)\n", (long)i));
-		return i;
-	    }
-	}
-    }
-    return i;
-}
-
-STATIC I32
-S_dopoptowhen(pTHX_ I32 startingblock)
-{
-    dVAR;
-    I32 i;
-    for (i = startingblock; i >= 0; i--) {
-	register const PERL_CONTEXT *cx = &cxstack[i];
-	switch (CxTYPE(cx)) {
-	default:
-	    continue;
-	case CXt_WHEN:
-	    DEBUG_l( Perl_deb(aTHX_ "(Found when #%ld)\n", (long)i));
 	    return i;
 	}
     }
@@ -3090,53 +3042,6 @@ PP(pp_leavetry)
     RETURN;
 }
 
-PP(pp_entergiven)
-{
-    dVAR; dSP;
-    register PERL_CONTEXT *cx;
-    const I32 gimme = GIMME_V;
-    
-    ENTER;
-    SAVETMPS;
-
-    assert(0);
-
-    if (PL_op->op_targ == 0) {
-	SV ** const defsv_p = &GvSV(PL_defgv);
-	*defsv_p = newSVsv(POPs);
-	SAVECLEARSV(*defsv_p);
-    }
-    else
-    	sv_setsv(PAD_SV(PL_op->op_targ), POPs);
-
-    PUSHBLOCK(cx, CXt_GIVEN, SP);
-    PUSHGIVEN(cx);
-
-    RETURN;
-}
-
-PP(pp_leavegiven)
-{
-    dVAR; dSP;
-    register PERL_CONTEXT *cx;
-    I32 gimme;
-    SV **newsp;
-    PMOP *newpm;
-    PERL_UNUSED_CONTEXT;
-
-    POPBLOCK(cx,newpm);
-    assert(CxTYPE(cx) == CXt_GIVEN);
-
-    SP = newsp;
-    PUTBACK;
-
-    PL_curpm = newpm;   /* pop $1 et al */
-
-    LEAVE;
-
-    return NORMAL;
-}
-
 /* Helper routines used by pp_smartmatch */
 STATIC PMOP *
 S_make_matcher(pTHX_ REGEXP *re)
@@ -3570,104 +3475,6 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
     PUSHs(d); PUSHs(e);
     PUTBACK;
     return pp_seq();
-}
-
-PP(pp_enterwhen)
-{
-    dVAR; dSP;
-    register PERL_CONTEXT *cx;
-    const I32 gimme = GIMME_V;
-
-    /* This is essentially an optimization: if the match
-       fails, we don't want to push a context and then
-       pop it again right away, so we skip straight
-       to the op that follows the leavewhen.
-    */
-    if ((0 == (PL_op->op_flags & OPf_SPECIAL)) && !SvTRUEx(POPs))
-	return cLOGOP->op_other->op_next;
-
-    ENTER;
-    SAVETMPS;
-
-    PUSHBLOCK(cx, CXt_WHEN, SP);
-    PUSHWHEN(cx);
-
-    RETURN;
-}
-
-PP(pp_leavewhen)
-{
-    dVAR; dSP;
-    register PERL_CONTEXT *cx;
-    I32 gimme;
-    SV **newsp;
-    PMOP *newpm;
-
-    POPBLOCK(cx,newpm);
-    assert(CxTYPE(cx) == CXt_WHEN);
-
-    SP = newsp;
-    PUTBACK;
-
-    PL_curpm = newpm;   /* pop $1 et al */
-
-    LEAVE;
-    return NORMAL;
-}
-
-PP(pp_continue)
-{
-    dVAR;   
-    I32 cxix;
-    register PERL_CONTEXT *cx;
-    I32 inner;
-    
-    cxix = dopoptowhen(cxstack_ix); 
-    if (cxix < 0)   
-	DIE(aTHX_ "Can't \"continue\" outside a when block");
-    if (cxix < cxstack_ix)
-        dounwind(cxix);
-    
-    /* clear off anything above the scope we're re-entering */
-    inner = PL_scopestack_ix;
-    TOPBLOCK(cx);
-    if (PL_scopestack_ix < inner)
-        leave_scope(PL_scopestack[PL_scopestack_ix]);
-    PL_curcop = cx->blk_oldcop;
-    return cx->blk_givwhen.leave_op;
-}
-
-PP(pp_break)
-{
-    dVAR;   
-    I32 cxix;
-    register PERL_CONTEXT *cx;
-    I32 inner;
-    
-    cxix = dopoptogiven(cxstack_ix); 
-    if (cxix < 0) {
-	if (PL_op->op_flags & OPf_SPECIAL)
-	    DIE(aTHX_ "Can't use when() outside a topicalizer");
-	else
-	    DIE(aTHX_ "Can't \"break\" outside a given block");
-    }
-    if (CxFOREACH(&cxstack[cxix]) && (0 == (PL_op->op_flags & OPf_SPECIAL)))
-	DIE(aTHX_ "Can't \"break\" in a loop topicalizer");
-
-    if (cxix < cxstack_ix)
-        dounwind(cxix);
-    
-    /* clear off anything above the scope we're re-entering */
-    inner = PL_scopestack_ix;
-    TOPBLOCK(cx);
-    if (PL_scopestack_ix < inner)
-        leave_scope(PL_scopestack[PL_scopestack_ix]);
-    PL_curcop = cx->blk_oldcop;
-
-    if (CxFOREACH(cx))
-	return CX_LOOP_NEXTOP_GET(cx);
-    else
-	return cx->blk_givwhen.leave_op;
 }
 
 static I32

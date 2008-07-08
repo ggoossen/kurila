@@ -60,61 +60,57 @@
      UNLESS = 275,
      ELSE = 276,
      ELSIF = 277,
-     CONTINUE = 278,
-     FOR = 279,
-     GIVEN = 280,
-     WHEN = 281,
-     DEFAULT = 282,
-     LOOPEX = 283,
-     DOTDOT = 284,
-     FUNC0 = 285,
-     FUNC1 = 286,
-     FUNC = 287,
-     UNIOP = 288,
-     LSTOP = 289,
-     RELOP = 290,
-     EQOP = 291,
-     MULOP = 292,
-     ADDOP = 293,
-     DO = 294,
-     NOAMP = 295,
-     ANONARY = 296,
-     ANONHSH = 297,
-     ANONSCALAR = 298,
-     LOCAL = 299,
-     MY = 300,
-     MYSUB = 301,
-     REQUIRE = 302,
-     COLONATTR = 303,
-     PREC_LOW = 304,
-     DOROP = 305,
-     OROP = 306,
-     ANDOP = 307,
-     NOTOP = 308,
-     ASSIGNOP = 309,
-     DORDOR = 310,
-     OROR = 311,
-     ANDAND = 312,
-     BITOROP = 313,
-     BITANDOP = 314,
-     SHIFTOP = 315,
-     MATCHOP = 316,
-     SREFGEN = 317,
-     UMINUS = 318,
-     POWOP = 319,
-     POSTDEC = 320,
-     POSTINC = 321,
-     PREDEC = 322,
-     PREINC = 323,
-     ASLICE = 324,
-     HSLICE = 325,
-     DEREFAMP = 326,
-     DEREFSTAR = 327,
-     DEREFHSH = 328,
-     DEREFARY = 329,
-     DEREFSCL = 330,
-     ARROW = 331,
-     PEG = 332
+     FOR = 278,
+     LOOPEX = 279,
+     DOTDOT = 280,
+     FUNC0 = 281,
+     FUNC1 = 282,
+     FUNC = 283,
+     UNIOP = 284,
+     LSTOP = 285,
+     RELOP = 286,
+     EQOP = 287,
+     MULOP = 288,
+     ADDOP = 289,
+     DO = 290,
+     NOAMP = 291,
+     ANONARY = 292,
+     ANONHSH = 293,
+     ANONSCALAR = 294,
+     LOCAL = 295,
+     MY = 296,
+     MYSUB = 297,
+     REQUIRE = 298,
+     COLONATTR = 299,
+     PREC_LOW = 300,
+     DOROP = 301,
+     OROP = 302,
+     ANDOP = 303,
+     NOTOP = 304,
+     ASSIGNOP = 305,
+     DORDOR = 306,
+     OROR = 307,
+     ANDAND = 308,
+     BITOROP = 309,
+     BITANDOP = 310,
+     SHIFTOP = 311,
+     MATCHOP = 312,
+     SREFGEN = 313,
+     UMINUS = 314,
+     POWOP = 315,
+     POSTDEC = 316,
+     POSTINC = 317,
+     PREDEC = 318,
+     PREINC = 319,
+     ASLICE = 320,
+     HSLICE = 321,
+     DEREFAMP = 322,
+     DEREFSTAR = 323,
+     DEREFHSH = 324,
+     DEREFARY = 325,
+     DEREFSCL = 326,
+     ARROW = 327,
+     PEG = 328
    };
 #endif
 /* Tokens.  */
@@ -138,61 +134,57 @@
 #define UNLESS 275
 #define ELSE 276
 #define ELSIF 277
-#define CONTINUE 278
-#define FOR 279
-#define GIVEN 280
-#define WHEN 281
-#define DEFAULT 282
-#define LOOPEX 283
-#define DOTDOT 284
-#define FUNC0 285
-#define FUNC1 286
-#define FUNC 287
-#define UNIOP 288
-#define LSTOP 289
-#define RELOP 290
-#define EQOP 291
-#define MULOP 292
-#define ADDOP 293
-#define DO 294
-#define NOAMP 295
-#define ANONARY 296
-#define ANONHSH 297
-#define ANONSCALAR 298
-#define LOCAL 299
-#define MY 300
-#define MYSUB 301
-#define REQUIRE 302
-#define COLONATTR 303
-#define PREC_LOW 304
-#define DOROP 305
-#define OROP 306
-#define ANDOP 307
-#define NOTOP 308
-#define ASSIGNOP 309
-#define DORDOR 310
-#define OROR 311
-#define ANDAND 312
-#define BITOROP 313
-#define BITANDOP 314
-#define SHIFTOP 315
-#define MATCHOP 316
-#define SREFGEN 317
-#define UMINUS 318
-#define POWOP 319
-#define POSTDEC 320
-#define POSTINC 321
-#define PREDEC 322
-#define PREINC 323
-#define ASLICE 324
-#define HSLICE 325
-#define DEREFAMP 326
-#define DEREFSTAR 327
-#define DEREFHSH 328
-#define DEREFARY 329
-#define DEREFSCL 330
-#define ARROW 331
-#define PEG 332
+#define FOR 278
+#define LOOPEX 279
+#define DOTDOT 280
+#define FUNC0 281
+#define FUNC1 282
+#define FUNC 283
+#define UNIOP 284
+#define LSTOP 285
+#define RELOP 286
+#define EQOP 287
+#define MULOP 288
+#define ADDOP 289
+#define DO 290
+#define NOAMP 291
+#define ANONARY 292
+#define ANONHSH 293
+#define ANONSCALAR 294
+#define LOCAL 295
+#define MY 296
+#define MYSUB 297
+#define REQUIRE 298
+#define COLONATTR 299
+#define PREC_LOW 300
+#define DOROP 301
+#define OROP 302
+#define ANDOP 303
+#define NOTOP 304
+#define ASSIGNOP 305
+#define DORDOR 306
+#define OROR 307
+#define ANDAND 308
+#define BITOROP 309
+#define BITANDOP 310
+#define SHIFTOP 311
+#define MATCHOP 312
+#define SREFGEN 313
+#define UMINUS 314
+#define POWOP 315
+#define POSTDEC 316
+#define POSTINC 317
+#define PREDEC 318
+#define PREINC 319
+#define ASLICE 320
+#define HSLICE 321
+#define DEREFAMP 322
+#define DEREFSTAR 323
+#define DEREFHSH 324
+#define DEREFARY 325
+#define DEREFSCL 326
+#define ARROW 327
+#define PEG 328
 
 
 
