@@ -241,7 +241,7 @@ Ap	|bool	|do_openn	|NN GV *gv|NN const char *oname|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO *supplied_fp \
 				|NULLOK SV * const *svp|I32 num
 p	|bool	|do_print	|NULLOK SV* sv|NN PerlIO* fp
-pR	|OP*	|do_readline
+pR	|OP*	|do_readline    |NN GV* gv
 p	|I32	|do_chomp	|NN SV* sv
 p	|bool	|do_seek	|NULLOK GV* gv|Off_t pos|int whence
 Ap	|void	|do_sprintf	|NN SV* sv|I32 len|NN SV** sarg
@@ -625,7 +625,7 @@ pd	|void	|pad_free	|PADOFFSET po
 pd	|void	|pad_reset
 pd	|void	|pad_swipe	|PADOFFSET po|bool refadjust
 p	|void	|peep		|NULLOK OP* o
-dopM	|PerlIO*|start_glob	|NN SV *tmpglob|NN IO *io
+dopM	|PerlIO*|start_glob	|NN SV *tmpglob|NN GV *gv
 #if defined(USE_REENTRANT_API)
 Ap	|void	|reentrant_size
 Ap	|void	|reentrant_init
@@ -1198,9 +1198,6 @@ sR	|OP*	|no_fh_allowed|NN OP *o
 sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
 s	|bool	|looks_like_bool|NN const OP* o
-s	|OP*	|newGIVWHENOP	|NULLOK OP* cond|NN OP *block \
-				|I32 enter_opcode|I32 leave_opcode \
-				|PADOFFSET entertarg
 s	|OP*	|ref_array_or_hash|NULLOK OP* cond
 s	|void	|process_special_blocks	|NN const char *const fullname\
 					|NN GV *const gv|NN CV *const cv

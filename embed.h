@@ -1176,7 +1176,6 @@
 #define too_few_arguments	S_too_few_arguments
 #define too_many_arguments	S_too_many_arguments
 #define looks_like_bool		S_looks_like_bool
-#define newGIVWHENOP		S_newGIVWHENOP
 #define ref_array_or_hash	S_ref_array_or_hash
 #define process_special_blocks	S_process_special_blocks
 #endif
@@ -2418,7 +2417,7 @@
 #define do_openn(a,b,c,d,e,f,g,h,i)	Perl_do_openn(aTHX_ a,b,c,d,e,f,g,h,i)
 #ifdef PERL_CORE
 #define do_print(a,b)		Perl_do_print(aTHX_ a,b)
-#define do_readline()		Perl_do_readline(aTHX)
+#define do_readline(a)		Perl_do_readline(aTHX_ a)
 #define do_chomp(a)		Perl_do_chomp(aTHX_ a)
 #define do_seek(a,b,c)		Perl_do_seek(aTHX_ a,b,c)
 #endif
@@ -3375,7 +3374,6 @@
 #define too_few_arguments(a,b)	S_too_few_arguments(aTHX_ a,b)
 #define too_many_arguments(a,b)	S_too_many_arguments(aTHX_ a,b)
 #define looks_like_bool(a)	S_looks_like_bool(aTHX_ a)
-#define newGIVWHENOP(a,b,c,d,e)	S_newGIVWHENOP(aTHX_ a,b,c,d,e)
 #define ref_array_or_hash(a)	S_ref_array_or_hash(aTHX_ a)
 #define process_special_blocks(a,b,c)	S_process_special_blocks(aTHX_ a,b,c)
 #endif

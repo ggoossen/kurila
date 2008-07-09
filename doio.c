@@ -2275,11 +2275,12 @@ Moving it away shrinks pp_hot.c; shrinking pp_hot.c helps speed perl up.
 */
 
 PerlIO *
-Perl_start_glob (pTHX_ SV *tmpglob, IO *io)
+Perl_start_glob (pTHX_ SV *tmpglob, GV *gv)
 {
     dVAR;
     SV * const tmpcmd = newSV(0);
     PerlIO *fp;
+    IO * io = GvIO(gv);
 
     PERL_ARGS_ASSERT_START_GLOB;
 
@@ -2331,7 +2332,7 @@ Perl_vms_start_glob
 #endif /* !CSH */
 #endif /* !DOSISH */
 #endif /* MACOS_TRADITIONAL */
-    (void)do_openn(PL_last_in_gv, "-|", 2,
+    (void)do_openn(gv, "-|", 2,
 		   FALSE, O_RDONLY, 0, NULL, &tmpcmd, 1);
     fp = IoIFP(io);
 #endif /* !VMS */

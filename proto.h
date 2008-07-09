@@ -695,8 +695,11 @@ PERL_CALLCONV bool	Perl_do_print(pTHX_ SV* sv, PerlIO* fp)
 #define PERL_ARGS_ASSERT_DO_PRINT	\
 	assert(fp)
 
-PERL_CALLCONV OP*	Perl_do_readline(pTHX)
-			__attribute__warn_unused_result__;
+PERL_CALLCONV OP*	Perl_do_readline(pTHX_ GV* gv)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DO_READLINE	\
+	assert(gv)
 
 PERL_CALLCONV I32	Perl_do_chomp(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
@@ -2284,11 +2287,11 @@ PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_reset(pTHX);
 PERL_CALLCONV void	Perl_pad_swipe(pTHX_ PADOFFSET po, bool refadjust);
 PERL_CALLCONV void	Perl_peep(pTHX_ OP* o);
-PERL_CALLCONV PerlIO*	Perl_start_glob(pTHX_ SV *tmpglob, IO *io)
+PERL_CALLCONV PerlIO*	Perl_start_glob(pTHX_ SV *tmpglob, GV *gv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_START_GLOB	\
-	assert(tmpglob); assert(io)
+	assert(tmpglob); assert(gv)
 
 #if defined(USE_REENTRANT_API)
 PERL_CALLCONV void	Perl_reentrant_size(pTHX);
@@ -4439,11 +4442,6 @@ STATIC bool	S_looks_like_bool(pTHX_ const OP* o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_LOOKS_LIKE_BOOL	\
 	assert(o)
-
-STATIC OP*	S_newGIVWHENOP(pTHX_ OP* cond, OP *block, I32 enter_opcode, I32 leave_opcode, PADOFFSET entertarg)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_NEWGIVWHENOP	\
-	assert(block)
 
 STATIC OP*	S_ref_array_or_hash(pTHX_ OP* cond);
 STATIC void	S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv, CV *const cv)

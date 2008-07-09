@@ -1014,11 +1014,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	}
 	sv_setsv(sv,&PL_sv_undef);
 	break;
-    case '.':
-	if (GvIO(PL_last_in_gv)) {
-	    sv_setiv(sv, (IV)IoLINES(GvIOp(PL_last_in_gv)));
-	}
-	break;
     case '?':
 	{
 	    sv_setiv(sv, (IV)STATUS_CURRENT);
@@ -2467,14 +2462,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '.':
-        if (PL_localizing) {
-            if (PL_localizing == 1)
-                SAVESPTR(PL_last_in_gv);
-        }
-        else if (SvOK(sv) && GvIO(PL_last_in_gv))
-            IoLINES(GvIOp(PL_last_in_gv)) = SvIV(sv);
-        break;
     case '|':
         {
             IO * const io = GvIOp(PL_defoutgv);

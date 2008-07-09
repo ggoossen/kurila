@@ -907,17 +907,6 @@ XS(XS_error_create)
 	    if (CopLINE(cop))
 		Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf".",
 			       OutCopFILE(cop), (IV)CopLINE(cop));
-	    /* Seems that GvIO() can be untrustworthy during global destruction. */
-	    if (GvIO(PL_last_in_gv) && (SvTYPE(GvIOp(PL_last_in_gv)) == SVt_PVIO)
-		&& IoLINES(GvIOp(PL_last_in_gv)))
-		{
-		    const bool line_mode = (RsSIMPLE(PL_rs) &&
-					    SvCUR(PL_rs) == 1 && *SvPVX_const(PL_rs) == '\n');
-		    Perl_sv_catpvf(aTHX_ sv, ", <%s> %s %"IVdf,
-				   PL_last_in_gv == PL_argvgv ? "" : GvNAME(PL_last_in_gv),
-				   line_mode ? "line" : "chunk",
-				   (IV)IoLINES(GvIOp(PL_last_in_gv)));
-		}
 	    if (PL_dirty)
 		sv_catpvs(sv, " during global destruction");
 
@@ -2222,7 +2211,6 @@ XS(XS_iohandle_input_line_number)
 	SV* sv = ST(0);
         GV* gv;
         
-	const char* type; 
 	if (SvMAGICAL(sv))
 	    mg_get(sv);
 	if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVGV) {
@@ -2235,7 +2223,7 @@ XS(XS_iohandle_input_line_number)
         }
 
         if ( items == 2 ) {
-            IoLINES(GvIOp(PL_last_in_gv)) = SvIV(ST(1));
+            IoLINES(GvIOp(gv)) = SvIV(ST(1));
         }
 
         XSRETURN_IV((IV)IoLINES(GvIOp(gv)));
