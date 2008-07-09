@@ -33,7 +33,7 @@ sub configure {
 	return undef;
 
     if(exists $arg->{Local}) {
-	my $addr = sockaddr_un($arg->{Local});
+	my $addr = pack_sockaddr_un($arg->{Local});
 	$sock->bind($addr) or
 	    return undef;
     }
@@ -42,7 +42,7 @@ sub configure {
 	    return undef;
     }
     elsif(exists $arg->{Peer}) {
-	my $addr = sockaddr_un($arg->{Peer});
+	my $addr = pack_sockaddr_un($arg->{Peer});
 	$sock->connect($addr) or
 	    return undef;
     }

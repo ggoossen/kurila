@@ -81,7 +81,7 @@ if(my $pid = fork()) {
     if (defined $sock) {
 	print "ok 2\n";
 
-	print < $sock->getline();
+	print $sock->getline();
 
 	print $sock "ok 4\n";
 
@@ -103,7 +103,7 @@ if(my $pid = fork()) {
 
     print $sock "ok 3\n";
 
-    print < $sock->getline();
+    print $sock->getline();
 
     $sock->close;
 

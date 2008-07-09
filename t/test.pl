@@ -366,7 +366,7 @@ sub require_ok ($) {
     eval <<REQUIRE_OK;
 require $require;
 REQUIRE_OK
-    _ok(!$@, < _where(), "require $require");
+    _ok(!$@, _where(), "require $require");
 }
 
 sub use_ok ($) {
@@ -374,7 +374,7 @@ sub use_ok ($) {
     eval <<USE_OK;
 use $use;
 USE_OK
-    _ok(!$@, < _where(), "use $use");
+    _ok(!$@, _where(), "use $use");
 }
 
 # runperl - Runs a separate perl interpreter.

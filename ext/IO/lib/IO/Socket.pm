@@ -236,8 +236,7 @@ sub accept {
     $peer = accept($new,$sock)
 	or return;
 
-    return wantarray ?  @($new, $peer)
-    	      	     : $new;
+    return $new;
 }
 
 sub sockname {

@@ -60,10 +60,10 @@ my $udpb = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
 
 print "ok 2\n";
 
-$udpa->send("ok 4\n",0, <$udpb->sockname);
+$udpa->send("ok 4\n",0, $udpb->sockname);
 
 print "not "
-  unless compare_addr( <$udpa->peername, <$udpb->sockname, 'peername', 'sockname');
+  unless compare_addr($udpa->peername,$udpb->sockname, 'peername', 'sockname');
 print "ok 3\n";
 
 my $where = $udpb->recv(my $buf="",5);
@@ -71,7 +71,7 @@ print $buf;
 
 my @xtra = @( () );
 
-unless(compare_addr($where, <$udpa->sockname, 'recv name', 'sockname')) {
+unless(compare_addr($where,$udpa->sockname, 'recv name', 'sockname')) {
     print "not ";
     @xtra = @(0, <$udpa->sockname);
 }
