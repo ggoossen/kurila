@@ -210,7 +210,7 @@ sub xref_object {
 
 sub xref_main {
     $subname = "(main)";
-    load_pad( <comppadlist);
+    load_pad(comppadlist);
     xref( <main_start);
     while ((nelems @todo)) {
 	xref_cv(shift @todo);
@@ -317,7 +317,7 @@ sub B::GV::xref {
 	#return if $done{$$cv}++;
 	$file = $gv->FILE;
 	$line = $gv->LINE;
-	process(\@( <$gv->STASH->NAME, "&", < $gv->NAME), "subdef");
+	process(\@($gv->STASH->NAME, "&", $gv->NAME), "subdef");
 	push(@todo, $cv);
     }
 }

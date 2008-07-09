@@ -18,14 +18,14 @@ use_ok( 'B::Xref' );
 
 my $file = 'xreftest.out';
 
-open SAVEOUT, ">&", \*STDOUT or diag $!;
-close STDOUT;
+open SAVEOUT, ">&", \*STDOUT or die $!;
+close STDOUT or die;
 # line 100
 our $compilesub = B::Xref::compile("-o$file");
 ok( ref $compilesub eq 'CODE', "compile() returns a coderef ({dump::view($compilesub)})" );
 $compilesub->(); # Compile this test script
-close STDOUT;
-open STDOUT, ">&", \*SAVEOUT or diag $!;
+close STDOUT or die;
+open STDOUT, ">&", \*SAVEOUT or die $!;
 
 # Now parse the output
 # line 200

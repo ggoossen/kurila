@@ -415,7 +415,7 @@ sub base_n {
     return "-" . base_n(-$x) if $x +< 0;
     my $str = "";
     do { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
-    $str = reverse $str if $big_endian;
+    $str = join '', reverse split m//, $str if $big_endian;
     return $str;
 }
 

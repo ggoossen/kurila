@@ -918,12 +918,9 @@ void
 AvARRAY(av)
 	B::AV	av
     PPCODE:
-	if (AvFILL(av) >= 0) {
-	    SV **svp = AvARRAY(av);
-	    I32 i;
-	    for (i = 0; i <= AvFILL(av); i++)
-		XPUSHs(make_sv_object(aTHX_ sv_newmortal(), svp[i]));
-	}
+        SV *avcopy = newSV(0);
+        sv_setsv(avcopy, (SV*)av); 
+        mXPUSHs(avcopy);
 
 void
 AvARRAYelt(av, idx)
@@ -939,10 +936,6 @@ MODULE = B	PACKAGE = B::CV		PREFIX = Cv
 
 U32
 CvCONST(cv)
-	B::CV	cv
-
-B::HV
-CvSTASH(cv)
 	B::CV	cv
 
 B::GV
