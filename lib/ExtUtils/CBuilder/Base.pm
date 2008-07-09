@@ -39,7 +39,7 @@ sub add_to_cleanup {
 
 sub cleanup {
   my $self = shift;
-  foreach my $file (keys %{$self->{files_to_clean}}) {
+  foreach my $file (keys %{$self->{files_to_clean} || \%() }) {
     unlink $file;
   }
 }
