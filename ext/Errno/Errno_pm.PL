@@ -405,8 +405,8 @@ sub FETCH {
     my ($self, $errname) = < @_;
     my $proto = prototype("Errno::$errname");
     my $errno = "";
-    if ( exists %name2no{$errno}) {
-        $errno = 0 unless $! == %name2no{$errno};
+    if ( exists %name2no{$errname}) {
+        $errno = 0 unless $! == %name2no{$errname};
     }
     return $errno;
 }
