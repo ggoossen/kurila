@@ -11,6 +11,8 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_REF;
     else if (SvPVOK(sv))
         return Dt_PLAIN;
+    else if (SvIOOK(sv))
+        return Dt_IO;
     else
         return Dt_COMPLEX;
 }
@@ -24,6 +26,7 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
     case Dt_HASH: return "HASH";
     case Dt_REF: return "REF";
     case Dt_PLAIN: return "PLAINVALUE";
+    case Dt_IO: return "IO";
     case Dt_COMPLEX: return "COMPLEX";
     }
     return "COMPLEX";

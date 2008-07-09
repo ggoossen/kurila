@@ -212,7 +212,11 @@ PP(pp_readline)
 	if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV)
 	    sv = SvRV(sv);
 	else {
-	    Perl_croak(aTHX_ "readline on a non-filehandle");
+	    dSP;
+            XPUSHs(sv);
+            PUTBACK;
+            pp_rv2gv();
+            sv = *PL_stack_sp--;
 	}
     }
     return do_readline((GV*)(sv));
