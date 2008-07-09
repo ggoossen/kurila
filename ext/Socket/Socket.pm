@@ -5,7 +5,7 @@ $VERSION = "1.80";
 
 =head1 NAME
 
-Socket, sockaddr_in, sockaddr_un, inet_aton, inet_ntoa - load the C socket.h defines and structure manipulators 
+Socket, sockaddr_in, inet_aton, inet_ntoa - load the C socket.h defines and structure manipulators 
 
 =head1 SYNOPSIS
 
@@ -147,16 +147,6 @@ representing the IP address (you can use inet_ntoa() to convert the
 address to the four-dotted numeric format).  Will croak if the
 structure does not have AF_INET in the right place.
 
-=item sockaddr_un PATHNAME
-
-=item sockaddr_un SOCKADDR_UN
-
-In a list context, unpacks its SOCKADDR_UN argument and returns an array
-consisting of (PATHNAME).  In a scalar context, packs its PATHNAME
-arguments as a SOCKADDR_UN and returns it.  If this is confusing, use
-pack_sockaddr_un() and unpack_sockaddr_un() explicitly.
-These are only supported if your system has E<lt>F<sys/un.h>E<gt>.
-
 =item pack_sockaddr_un PATH
 
 Takes one argument, a pathname. Returns the sockaddr_un structure with
@@ -186,7 +176,7 @@ use XSLoader ();
 	sockaddr_family
 	pack_sockaddr_in unpack_sockaddr_in
 	pack_sockaddr_un unpack_sockaddr_un
-	sockaddr_in sockaddr_un
+	sockaddr_in
 	INADDR_ANY INADDR_BROADCAST INADDR_LOOPBACK INADDR_NONE
 	AF_802
 	AF_AAL

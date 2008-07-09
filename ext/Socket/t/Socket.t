@@ -2,6 +2,8 @@
 
 use Config;
 
+use Test::More;
+
 our $has_alarm;
 BEGIN {
     if (%Config{'extensions'} !~ m/\bSocket\b/ && 
@@ -14,7 +16,7 @@ BEGIN {
 	
 use Socket qw(:all);
 
-print "1..17\n";
+plan tests => 14;
 
 my $has_echo = $^O ne 'MSWin32';
 my $alarmed = 0;
@@ -23,17 +25,28 @@ sub alarmed  { $alarmed = 1 }
 %SIG{ALRM} = \&alarmed                    if $has_alarm;
 
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
-  print "ok 1\n";
-  
+
   arm(5);
   my $host = $^O eq 'MacOS' || ($^O eq 'irix' && %Config{osvers} == 5) ?
                  '127.0.0.1' : 'localhost';
   my $localhost = inet_aton($host);
 
-  if ($has_echo && defined $localhost && connect(T,pack_sockaddr_in(7,$localhost))){
-	arm(0);
+  SKIP:
+  {
+      if ( not ($has_echo && defined $localhost && connect(T,pack_sockaddr_in(7,$localhost)) ) ) {
 
-	print "ok 2\n";
+          print "# You're allowed to fail tests 2 and 3 if\n";
+          print "# the echo service has been disabled or if your\n";
+          print "# gethostbyname() cannot resolve your localhost.\n";
+          print "# 'Connection refused' indicates disabled echo service.\n";
+          print "# 'Interrupted system call' indicates a hanging echo service.\n";
+          print "# Error: $!\n";
+          skip "failed something", 2;
+      }
+
+      arm(0);
+
+        ok 2;
 
 	print "# Connected to " .
 		inet_ntoa(( <unpack_sockaddr_in(getpeername(T)))[[1]])."\n";
@@ -52,32 +65,32 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 	    $read = sysread(T,$buff,10,length($buff));
 	    arm(0);
 	}
-	print(($read == 0 || $buff eq "hello") ? "ok 3\n" : "not ok 3\n");
-  }
-  else {
-	print "# You're allowed to fail tests 2 and 3 if\n";
-	print "# the echo service has been disabled or if your\n";
-        print "# gethostbyname() cannot resolve your localhost.\n";
-	print "# 'Connection refused' indicates disabled echo service.\n";
-	print "# 'Interrupted system call' indicates a hanging echo service.\n";
-	print "# Error: $!\n";
-	print "ok 2 - skipped\n";
-	print "ok 3 - skipped\n";
+	ok(($read == 0 || $buff eq "hello"));
   }
 }
 else {
 	print "# Error: $!\n";
-	print "not ok 1\n";
+        ok 0;
 }
 
 if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
-  print "ok 4\n";
+    ok 1;
 
-  arm(5);
-  if ($has_echo && connect(S,pack_sockaddr_in(7,INADDR_LOOPBACK))){
+    arm(5);
+  
+  SKIP:
+    {
+        if ( not ($has_echo && connect(S,pack_sockaddr_in(7,INADDR_LOOPBACK)) ) ){
+            print "# You're allowed to fail tests 5 and 6 if\n";
+            print "# the echo service has been disabled.\n";
+            print "# 'Interrupted system call' indicates a hanging echo service.\n";
+            print "# Error: $!\n";
+            skip "echo skipped", 2;
+        }
+
         arm(0);
 
-	print "ok 5\n";
+        ok 1;
 
 	print "# Connected to " .
 		inet_ntoa(( <unpack_sockaddr_in(getpeername(S)))[[1]])."\n";
@@ -96,75 +109,33 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 	    $read = sysread(S,$buff,10,length($buff));
 	    arm(0);
 	}
-	print(($read == 0 || $buff eq "olleh") ? "ok 6\n" : "not ok 6\n");
-  }
-  else {
-	print "# You're allowed to fail tests 5 and 6 if\n";
-	print "# the echo service has been disabled.\n";
-	print "# 'Interrupted system call' indicates a hanging echo service.\n";
-	print "# Error: $!\n";
-	print "ok 5 - skipped\n";
-	print "ok 6 - skipped\n";
-  }
+	ok(($read == 0 || $buff eq "olleh"));
+    }
 }
 else {
 	print "# Error: $!\n";
-	print "not ok 4\n";
+        ok 0;
 }
 
 # warnings
-our $w;
-$^WARN_HOOK = sub {
-    ++ $w if @_[0]->{description} =~ m/^6-ARG sockaddr_in call is deprecated/ ;
-} ;
-$w = 0 ;
-sockaddr_in(1,2,3,4,5,6) ;
-print ($w == 1 ? "not ok 7\n" : "ok 7\n") ;
-use warnings 'Socket' ;
-sockaddr_in(1,2,3,4,5,6) ;
-print ($w == 1 ? "ok 8\n" : "not ok 8\n") ;
+dies_like( sub { sockaddr_in(1,2,3,4,5,6) },
+           qr/usage: .../ );
 
+is(inet_ntoa(inet_aton("10.20.30.40")), "10.20.30.40");
+is(inet_ntoa("\x{a}\x{14}\x{1e}\x{28}"), "10.20.30.40");
 # Thest that whatever we give into pack/unpack_sockaddr retains
 # the value thru the entire chain.
-if((inet_ntoa(( <unpack_sockaddr_in( <pack_sockaddr_in(100, <inet_aton("10.250.230.10"))))[[1]])) eq '10.250.230.10') {
-    print "ok 9\n"; 
-} else {
-    print "not ok 9\n"; 
-}
-print ((inet_ntoa( <inet_aton("10.20.30.40")) eq "10.20.30.40") ? "ok 10\n" : "not ok 10\n");
-print ((inet_ntoa("\x{a}\x{14}\x{1e}\x{28}") eq "10.20.30.40") ? "ok 11\n" : "not ok 11\n");
+is(inet_ntoa(unpack_sockaddr_in( pack_sockaddr_in(100, inet_aton("10.250.230.10")))[1]), '10.250.230.10');
 {
-    my ($port,$addr) = < unpack_sockaddr_in( <pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
-    print (($port == 100) ? "ok 12\n" : "not ok 12\n");
-    print ((inet_ntoa($addr) eq "10.10.10.10") ? "ok 13\n" : "not ok 13\n");
-}
-				     
-try { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") };
-print (($@->{description} =~ m/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/) ? "ok 14\n" : "not ok 14\n");
-
-if (sockaddr_family( <pack_sockaddr_in(100, <inet_aton("10.250.230.10"))) == AF_INET) {
-    print "ok 15\n";
-} else {
-    print "not ok 15\n";
+    my ($port,$addr) = < unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
+    is($port, 100);
+    is(inet_ntoa($addr), "10.10.10.10");
 }
 
-try { sockaddr_family("") };
-print (($@->{description} =~ m/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/) ? "ok 16\n" : "not ok 16\n");
+dies_like( sub { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") },
+           qr/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/ );
 
-if ($^O eq 'linux') {
-    # see if we can handle abstract sockets
-    my $test_abstract_socket = chr(0) . '/tmp/test-perl-socket';
-    my $addr = sockaddr_un ($test_abstract_socket);
-    my ($path) = < sockaddr_un ($addr);
-    if ($test_abstract_socket eq $path) {
-        print "ok 17\n";
-    }
-    else {
-	$path =~ s/\0/\\0/g;
-	print "# got <$path>\n";
-        print "not ok 17\n";
-    }
-} else {
-    # doesn't have abstract socket support
-    print "ok 17 - skipped on this platform\n";
-}
+is(sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))), AF_INET);
+
+dies_like( sub { sockaddr_family("") },
+           qr/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/ );
