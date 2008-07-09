@@ -2661,7 +2661,6 @@ t/sv/args.t			See if operations on @_ work
 t/sv/array.t			See if array operations work
 t/sv/closure.t			See if closures work
 t/sv/fh.t			See if filehandles work
-t/sv/gv.t			See if typeglobs work
 t/sv/hash.t			See if the complexity attackers are repelled
 t/sv/magic.t			See if magic variables work
 t/sv/sv_2pv.t			See if stringification (sv_2pv) works
