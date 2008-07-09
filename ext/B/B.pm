@@ -222,7 +222,8 @@ sub walksymtable {
     my $fullname;
     no strict 'refs';
     $prefix = '' unless defined $prefix;
-    while (($sym, $ref) = each %$symref) {
+    for my $sym (keys %$symref) {
+        my $ref = $symref->{$_};
         $fullname = "*main::".$prefix.$sym;
 	if ($sym =~ m/::$/) {
 	    $sym = $prefix . $sym;
