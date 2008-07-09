@@ -239,6 +239,7 @@ XS(XS_error_write_to_stderr);
 XS(XS_ref_address);
 XS(XS_ref_reftype);
 XS(XS_ref_svtype);
+XS(XS_iohandle_input_line_number);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -315,6 +316,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("ref::address", XS_ref_address, file);
     newXS("ref::reftype", XS_ref_reftype, file);
     newXS("ref::svtype", XS_ref_svtype, file);
+
+    newXSproto("iohandle::input_line_number", XS_iohandle_input_line_number, file, "$;$");
 
     PL_errorcreatehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create"))));
     PL_diehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr"))));
@@ -2203,6 +2206,39 @@ XS(XS_ref_reftype)
 	type = sv_reftype(SvRV(sv), 0);
 	mPUSHp(type, strlen(type));
 	XSRETURN(1);
+    }
+}
+
+XS(XS_iohandle_input_line_number)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items < 1 || items > 2 )
+      Perl_croak(aTHX_ "Usage: %s(%s[, %s])", "iohandle::input_line_number", "gv", "line_number");
+
+    {
+	SV* sv = ST(0);
+        GV* gv;
+        
+	const char* type; 
+	if (SvMAGICAL(sv))
+	    mg_get(sv);
+	if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVGV) {
+	    XSRETURN_UNDEF;
+	}
+        gv = (GV*)(SvRV(sv));
+
+	if ( ! GvIO(gv) ) {
+	    XSRETURN_UNDEF;
+        }
+
+        if ( items == 2 ) {
+            IoLINES(GvIOp(PL_last_in_gv)) = SvIV(ST(1));
+        }
+
+        XSRETURN_IV((IV)IoLINES(GvIOp(gv)));
     }
 }
 

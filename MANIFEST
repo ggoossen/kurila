@@ -1170,6 +1170,7 @@ lib/if.t			Tests for "use if"
 lib/integer.pm			For "use integer"
 lib/integer.t			For "use integer" testing
 lib/Internals.t			For Internals::* testing
+lib/iohandle.t                  iohandle::* testing
 lib/IO/Zlib.pm			IO::Zlib
 lib/IO/Zlib/t/basic.t		Tests for IO::Zlib
 lib/IO/Zlib/t/external.t	Tests for IO::Zlib
