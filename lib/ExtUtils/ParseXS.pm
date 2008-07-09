@@ -182,7 +182,7 @@ sub process_file {
     my $current = \$junk;
     while ( ~< *TYPEMAP) {
       next if m/^\s*		#/;
-        my $line_no = $. + 1;
+        my $line_no = iohandle::input_line_number(\*TYPEMAP) + 1;
       if (m/^INPUT\s*$/) {
 	$mode = 'Input';   $current = \$junk;  next;
       }
@@ -199,12 +199,12 @@ sub process_file {
 	# skip blank lines and comment lines
 	next if m/^$/ or m/^#/ ;
 	my($type,$kind, $proto) = m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
-	  warn("Warning: File '$typemap' Line $. '$line' TYPEMAP entry needs 2 or 3 columns\n"), next;
+	  warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next;
 	$type = TidyType($type) ;
 	%type_kind{$type} = $kind ;
 	# prototype defaults to '$'
 	$proto = "\$" unless $proto ;
-	warn("Warning: File '$typemap' Line $. '$line' Invalid prototype '$proto'\n")
+	warn("Warning: File '$typemap' Line $($line_no-1) '$line' Invalid prototype '$proto'\n")
 	  unless ValidProtoString($proto) ;
 	%proto_letter{$type} = C_string($proto) ;
       } elsif (m/^\s/) {
@@ -281,7 +281,7 @@ EOM
   local $_;
   while ( ~< $FH) {
     if (m/^=/) {
-      my $podstartline = $.;
+      my $podstartline = iohandle::input_line_number($FH);
       do {
 	if (m/^=cut\s*$/) {
 	  # We can't just write out a /* */ comment, as our embedded
@@ -298,7 +298,7 @@ EOM
 	  # concatenated until 2 steps later, so we are safe.
 	  #     - Nicholas Clark
 	  print("#if 0\n  \"Skipped embedded POD.\"\n#endif\n");
-	  printf("#line \%d \"$filepathname\"\n", $. + 1)
+	  printf("#line \%d \"$filepathname\"\n", iohandle::input_line_number($FH) + 1)
 	    if $WantLineNumbers;
 	  next firstmodule
 	}
@@ -330,7 +330,7 @@ EOF
   print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
   $lastline    = $_;
-  $lastline_no = $.;
+  $lastline_no = iohandle::input_line_number($FH);
 
  PARAGRAPH:
   while (fetch_para()) {
@@ -1508,7 +1508,7 @@ EOF
     }
 
     $lastline = $_ ;
-    $lastline_no = $. ;
+    $lastline_no = iohandle::input_line_number($FH);
 
   }
 
@@ -1654,7 +1654,7 @@ sub fetch_para {
 
     # Read next line and continuation lines
     last unless defined($lastline = ~< $FH);
-    $lastline_no = $.;
+    $lastline_no = iohandle::input_line_number($FH);
     my $tmp_line;
     $lastline .= $tmp_line
       while ($lastline =~ m/\\$/ && defined($tmp_line = ~< $FH));

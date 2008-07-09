@@ -23,9 +23,10 @@ use Carp; $^WARN_HOOK = \&Carp::cluck;
 #########################
 
 # Try sending to filehandle
-tie *FH, 'Foo';
-process_file( filename => 'XSTest.xs', output => \*FH, prototypes => 1 );
-ok tied(*FH)->content, '/is_even/', "Test that output contains some text";
+my $out = "";
+open my $fh, '>', \$out or die;
+process_file( filename => 'XSTest.xs', output => $fh, prototypes => 1 );
+ok $out, '/is_even/', "Test that output contains some text";
 
 my $source_file = 'XSTest.c';
 
@@ -45,7 +46,7 @@ if ($b->have_compiler) {
   ok $obj_file;
   ok -e $obj_file, 1, "Make sure $obj_file exists";
 
-  my $lib_file = $b->link( objects => $obj_file, module_name => $module );
+  my ($lib_file) = < $b->link( objects => $obj_file, module_name => $module );
   ok $lib_file;
   ok -e $lib_file, 1, "Make sure $lib_file exists";
 
@@ -72,8 +73,3 @@ if ($b->have_compiler) {
 
 1 while unlink $source_file;
 
-#####################################################################
-
-sub Foo::TIEHANDLE { bless \%(), 'Foo' }
-sub Foo::PRINT { shift->{buf} .= join '', < @_ }
-sub Foo::content { shift->{buf} }
