@@ -78,16 +78,16 @@ sub import {
 	    }
 	}
 	if ($type eq 'IN') {
-	    _drop_oldenc(*STDIN, < @val);
+	    _drop_oldenc(\*STDIN, < @val);
 	    $in  = join(' ', < @val);
 	}
 	elsif ($type eq 'OUT') {
-	    _drop_oldenc(*STDOUT, < @val);
+	    _drop_oldenc(\*STDOUT, < @val);
 	    $out = join(' ', < @val);
 	}
 	elsif ($type eq 'IO') {
-	    _drop_oldenc(*STDIN,  < @val);
-	    _drop_oldenc(*STDOUT, < @val);
+	    _drop_oldenc(\*STDIN,  < @val);
+	    _drop_oldenc(\*STDOUT, < @val);
 	    $in = $out = join(' ', < @val);
 	}
 	else {
