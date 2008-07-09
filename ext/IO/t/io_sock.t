@@ -62,7 +62,7 @@ if(my $pid = fork()) {
     print "ok 2\n";
 
     $sock->autoflush(1);
-    print < $sock->getline();
+    print $sock->getline();
 
     print $sock "ok 4\n";
 
@@ -88,7 +88,7 @@ if(my $pid = fork()) {
 
     print $sock "ok 3\n";
 
-    print < $sock->getline();
+    print $sock->getline();
 
     $sock->close;
 
@@ -343,8 +343,8 @@ if( $server_pid) {
    
     ### Child
     #
-  my $sock;
     SERVER_LOOP: while (1) {
+        my $sock;
 	last SERVER_LOOP unless $sock = $listen->accept;
 	# Do not print ok/not ok for this binmode() since there's
 	# a race condition with our client, just die if we fail.

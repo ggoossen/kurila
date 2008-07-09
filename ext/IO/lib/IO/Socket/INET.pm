@@ -229,7 +229,7 @@ sub configure {
 #        my $before = time() if $timeout;
 
 	undef $@;
-        if ($sock->connect( <pack_sockaddr_in($rport, $raddr))) {
+        if ($sock->connect(pack_sockaddr_in($rport, $raddr))) {
 #            ${*$sock}{'io_socket_timeout'} = $timeout;
             return $sock;
         }
@@ -254,14 +254,14 @@ sub connect {
     (nelems @_) == 2 || (nelems @_) == 3 or
        croak 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)';
     my $sock = shift;
-    return $sock->SUPER::connect((nelems @_) == 1 ? shift : < pack_sockaddr_in(< @_));
+    return $sock->SUPER::connect((nelems @_) == 1 ? shift : pack_sockaddr_in(< @_));
 }
 
 sub bind {
     (nelems @_) == 2 || (nelems @_) == 3 or
        croak 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)';
     my $sock = shift;
-    return $sock->SUPER::bind((nelems @_) == 1 ? shift : < pack_sockaddr_in(< @_))
+    return $sock->SUPER::bind((nelems @_) == 1 ? shift : pack_sockaddr_in(< @_))
 }
 
 sub sockaddr {
