@@ -98,19 +98,10 @@ if ($^O =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
     $DEFAULT_FLAGS ^|^= GLOB_NOCASE();
 }
 
-# Autoload methods go after =cut, and are processed by the autosplit program.
-
 sub bsd_glob {
     my ($pat,$flags) = < @_;
     $flags = $DEFAULT_FLAGS if (nelems @_) +< 2;
     return doglob($pat,$flags);
-}
-
-# File::Glob::glob() is deprecated because its prototype is different from
-# CORE::glob() (use bsd_glob() instead)
-sub glob {
-    splice @_, 1; # don't pass PL_glob_index as flags!
-    goto &bsd_glob;
 }
 
 ## borrowed heavily from gsar's File::DosGlob
