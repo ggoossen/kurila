@@ -393,7 +393,6 @@ if ($Is_miniperl) {
     delete %INC{"Errno.pm"};
 
     open(FOO, "<", "nonesuch"); # Generate ENOENT
-    my %errs = %( < %{*{Symbol::fetch_glob("!")}} ); # Cause Errno.pm to be loaded at run-time
     ok %{*{Symbol::fetch_glob("!")}}{ENOENT};
 }
 
