@@ -205,20 +205,17 @@ PP(pp_padsv)
 PP(pp_readline)
 {
     dVAR;
+    SV* sv;
     tryAMAGICunTARGET(iter, 0);
-    GVcpREPLACE(PL_last_in_gv, (GV*)*PL_stack_sp--);
-    if (SvTYPE(PL_last_in_gv) != SVt_PVGV) {
-	if (SvROK(PL_last_in_gv) && SvTYPE(SvRV(PL_last_in_gv)) == SVt_PVGV)
-	    GVcpREPLACE(PL_last_in_gv, (GV*)SvRV(PL_last_in_gv));
+    sv = *PL_stack_sp--;
+    if (SvTYPE(sv) != SVt_PVGV) {
+	if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV)
+	    sv = SvRV(sv);
 	else {
-	    dSP;
-	    XPUSHs((SV*)PL_last_in_gv);
-	    PUTBACK;
-	    pp_rv2gv();
-	    GVcpREPLACE(PL_last_in_gv, (GV*)(*PL_stack_sp--));
+	    Perl_croak(aTHX_ "readline on a non-filehandle");
 	}
     }
-    return do_readline();
+    return do_readline((GV*)(sv));
 }
 
 PP(pp_eq)
@@ -1258,38 +1255,17 @@ ret_no:
 }
 
 OP *
-Perl_do_readline(pTHX)
+Perl_do_readline(pTHX_ GV* gv)
 {
     dVAR; dSP; dTARGETSTACKED;
     register SV *sv;
     STRLEN tmplen = 0;
     STRLEN offset;
     PerlIO *fp;
-    register IO * const io = GvIO(PL_last_in_gv);
+    register IO * const io = GvIO(gv);
     register const I32 type = PL_op->op_type;
     const I32 gimme = GIMME_V;
 
-    if (io) {
-	MAGIC * const mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar);
-	if (mg) {
-	    PUSHMARK(SP);
-	    XPUSHs(SvTIED_obj((SV*)io, mg));
-	    PUTBACK;
-	    ENTER;
-	    if (gimme == G_ARRAY)
-		call_method("READLINES", gimme);
-	    else
-		call_method("READLINE", gimme);
-	    LEAVE;
-	    SPAGAIN;
-	    if (gimme == G_SCALAR) {
-		SV* const result = POPs;
-		SvSetSV_nosteal(TARG, result);
-		PUSHTARG;
-	    }
-	    RETURN;
-	}
-    }
     fp = NULL;
     if (io) {
 	fp = IoIFP(io);
@@ -1297,27 +1273,27 @@ Perl_do_readline(pTHX)
 	    if (IoFLAGS(io) & IOf_ARGV) {
 		if (IoFLAGS(io) & IOf_START) {
 		    IoLINES(io) = 0;
-		    if (av_len(GvAVn(PL_last_in_gv)) < 0) {
+		    if (av_len(GvAVn(gv)) < 0) {
 			IoFLAGS(io) &= ~IOf_START;
-			do_openn(PL_last_in_gv,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
-			sv_setpvn(GvSVn(PL_last_in_gv), "-", 1);
-			SvSETMAGIC(GvSV(PL_last_in_gv));
+			do_openn(gv,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
+			sv_setpvn(GvSVn(gv), "-", 1);
+			SvSETMAGIC(GvSV(gv));
 			fp = IoIFP(io);
 			goto have_fp;
 		    }
 		}
-		fp = nextargv(PL_last_in_gv);
+		fp = nextargv(gv);
 		if (!fp) { /* Note: fp != IoIFP(io) */
-		    (void)do_close(PL_last_in_gv, FALSE); /* now it does*/
+		    (void)do_close(gv, FALSE); /* now it does*/
 		}
 	    }
 	    else if (type == OP_GLOB)
-		fp = Perl_start_glob(aTHX_ POPs, io);
+		fp = Perl_start_glob(aTHX_ POPs, gv);
 	}
 	else if (type == OP_GLOB)
 	    SP--;
 	else if (ckWARN(WARN_IO) && IoTYPE(io) == IoTYPE_WRONLY) {
-	    report_evil_fh(PL_last_in_gv, io, OP_phoney_OUTPUT_ONLY);
+	    report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
 	}
     }
     if (!fp) {
@@ -1329,7 +1305,7 @@ Perl_do_readline(pTHX)
 			    "glob failed (can't start child: %s)",
 			    Strerror(errno));
 	    else
-		report_evil_fh(PL_last_in_gv, io, PL_op->op_type);
+		report_evil_fh(gv, io, PL_op->op_type);
 	}
 	if (gimme == G_SCALAR) {
 	    /* undef TARG, and push that undefined value */
@@ -1393,13 +1369,13 @@ Perl_do_readline(pTHX)
 	{
 	    PerlIO_clearerr(fp);
 	    if (IoFLAGS(io) & IOf_ARGV) {
-		fp = nextargv(PL_last_in_gv);
+		fp = nextargv(gv);
 		if (fp)
 		    continue;
-		(void)do_close(PL_last_in_gv, FALSE);
+		(void)do_close(gv, FALSE);
 	    }
 	    else if (type == OP_GLOB) {
-		if (!do_close(PL_last_in_gv, FALSE) && ckWARN(WARN_GLOB)) {
+		if (!do_close(gv, FALSE) && ckWARN(WARN_GLOB)) {
 		    Perl_warner(aTHX_ packWARN(WARN_GLOB),
 			   "glob failed (child exited with status %d%s)",
 			   (int)(STATUS_CURRENT >> 8),

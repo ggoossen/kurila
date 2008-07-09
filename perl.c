@@ -736,7 +736,6 @@ perl_destruct(pTHXx)
     PL_argvoutgv = NULL;
     PL_stdingv = NULL;
     PL_stderrgv = NULL;
-    SVcpNULL(PL_last_in_gv);
     PL_replgv = NULL;
     PL_DBgv = NULL;
     PL_DBline = NULL;

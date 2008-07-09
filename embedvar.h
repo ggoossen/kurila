@@ -153,7 +153,6 @@
 #define PL_inplace		(vTHX->Iinplace)
 #define PL_isarev		(vTHX->Iisarev)
 #define PL_known_layers		(vTHX->Iknown_layers)
-#define PL_last_in_gv		(vTHX->Ilast_in_gv)
 #define PL_lastfd		(vTHX->Ilastfd)
 #define PL_lastgotoprobe	(vTHX->Ilastgotoprobe)
 #define PL_lastscream		(vTHX->Ilastscream)
@@ -447,7 +446,6 @@
 #define PL_Iinplace		PL_inplace
 #define PL_Iisarev		PL_isarev
 #define PL_Iknown_layers	PL_known_layers
-#define PL_Ilast_in_gv		PL_last_in_gv
 #define PL_Ilastfd		PL_lastfd
 #define PL_Ilastgotoprobe	PL_lastgotoprobe
 #define PL_Ilastscream		PL_lastscream

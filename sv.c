@@ -10534,7 +10534,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_tainted		= proto_perl->Itainted;
     PL_curpm		= proto_perl->Icurpm;	/* XXX No PMOP ref count */
     PL_rs		= sv_dup_inc(proto_perl->Irs, param);
-    PL_last_in_gv	= gv_dup(proto_perl->Ilast_in_gv, param);
     PL_ofs_sv		= sv_dup_inc(proto_perl->Iofs_sv, param);
     PL_defoutgv		= gv_dup_inc(proto_perl->Idefoutgv, param);
     PL_chopset		= proto_perl->Ichopset;	/* XXX never deallocated */
@@ -11251,7 +11250,6 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_main_cv);
     SvTMPREFCNT_inc(PL_beginav);
     SvTMPREFCNT_inc(PL_unitcheckav);
-    SvTMPREFCNT_inc(PL_last_in_gv);
     SvTMPREFCNT_inc(PL_rs);
     SvTMPREFCNT_inc(PL_fdpid);
     SvTMPREFCNT_inc(PL_modglobal);

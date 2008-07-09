@@ -99,10 +99,6 @@ PERLVAR(Icurpm,		PMOP *)		/* what to do \ interps in REs from */
 
 The input record separator - C<$/> in Perl space.
 
-=for apidoc mn|GV*|PL_last_in_gv
-
-The GV which was last used for a filehandle input operation. (C<< <FH> >>)
-
 =for apidoc mn|SV*|PL_ofs_sv
 
 The output field separator - C<$,> in Perl space.
@@ -111,7 +107,6 @@ The output field separator - C<$,> in Perl space.
 */
 
 PERLVAR(Irs,		SV *)		/* input record separator $/ */
-PERLVAR(Ilast_in_gv,	GV *)		/* GV used in last <FH> */
 PERLVAR(Iofs_sv,	SV *)		/* output field separator $, */
 PERLVAR(Idefoutgv,	GV *)		/* default FH for output */
 PERLVARI(Ichopset,	const char *, " \n-")	/* $: */

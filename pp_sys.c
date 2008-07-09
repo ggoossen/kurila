@@ -365,6 +365,7 @@ PP(pp_glob)
 {
     dVAR;
     OP *result;
+    GV* gv;
     tryAMAGICunTARGET(iter, -1);
 
     /* Note that we only ever get here if File::Glob fails to load
@@ -384,8 +385,7 @@ PP(pp_glob)
     }
 #endif /* !VMS */
 
-    SAVESPTR(PL_last_in_gv);	/* We don't want this to be permanent. */
-    GVcpREPLACE(PL_last_in_gv, (GV*)*PL_stack_sp--);
+    gv = (GV*)*PL_stack_sp--;
 
     SAVESPTR(PL_rs);		/* This is not permanent, either. */
     SVcpSTEAL(PL_rs, newSVpvs("\000"));
@@ -395,7 +395,7 @@ PP(pp_glob)
 #endif	/* !CSH */
 #endif	/* !DOSISH */
 
-    result = do_readline();
+    result = do_readline( gv );
     LEAVE;
     return result;
 }
@@ -403,8 +403,7 @@ PP(pp_glob)
 PP(pp_rcatline)
 {
     dVAR;
-    GVcpREPLACE(PL_last_in_gv, cGVOP_gv);
-    return do_readline();
+    return do_readline( cGVOP_gv );
 }
 
 PP(pp_warn)
@@ -1647,7 +1646,6 @@ PP(pp_eof)
 	if (PL_op->op_flags & OPf_SPECIAL) {	/* eof() */
 	    IO *io;
 	    gv = GvEGV(PL_argvgv);
-	    GVcpREPLACE(PL_last_in_gv, gv);
 	    io = GvIO(gv);
 	    if (io && !IoIFP(io)) {
 		if ((IoFLAGS(io) & IOf_START) && av_len(GvAVn(gv)) < 0) {
@@ -1667,11 +1665,10 @@ PP(pp_eof)
 	    }
 	}
 	else
-	    gv = PL_last_in_gv;			/* eof */
+	    Perl_croak(aTHX_ "eof without arguments");
     }
     else {
 	gv = (GV*)POPs;		/* eof(FH) */
-	GVcpREPLACE(PL_last_in_gv, gv);
     }
 
     if (gv) {
@@ -1699,23 +1696,9 @@ PP(pp_tell)
     GV *gv;
     IO *io;
 
-    if (MAXARG != 0)
-	GVcpREPLACE(PL_last_in_gv, (GV*)POPs);
-    gv = PL_last_in_gv;
-
-    if (gv && (io = GvIO(gv))) {
-	MAGIC * const mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar);
-	if (mg) {
-	    PUSHMARK(SP);
-	    XPUSHs(SvTIED_obj((SV*)io, mg));
-	    PUTBACK;
-	    ENTER;
-	    call_method("TELL", G_SCALAR);
-	    LEAVE;
-	    SPAGAIN;
-	    RETURN;
-	}
-    }
+    if (MAXARG == 0)
+	Perl_croak(aTHX_ "tell called without handle");
+    gv = (GV*)POPs;
 
 #if LSEEKSIZE > IVSIZE
     PUSHn( do_tell(gv) );
@@ -1737,27 +1720,6 @@ PP(pp_sysseek)
 
     GV * const gv = (GV*)POPs;
     IO *io;
-    GVcpREPLACE(PL_last_in_gv, gv);
-
-    if (gv && (io = GvIO(gv))) {
-	MAGIC * const mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar);
-	if (mg) {
-	    PUSHMARK(SP);
-	    XPUSHs(SvTIED_obj((SV*)io, mg));
-#if LSEEKSIZE > IVSIZE
-	    mXPUSHn((NV) offset);
-#else
-	    mXPUSHi(offset);
-#endif
-	    mXPUSHi(whence);
-	    PUTBACK;
-	    ENTER;
-	    call_method("SEEK", G_SCALAR);
-	    LEAVE;
-	    SPAGAIN;
-	    RETURN;
-	}
-    }
 
     if (PL_op->op_type == OP_SEEK)
 	PUSHs(boolSV(do_seek(gv, offset, whence)));
@@ -1957,7 +1919,10 @@ PP(pp_flock)
     IO *io = NULL;
     PerlIO *fp;
     const int argtype = POPi;
-    GV * const gv = (MAXARG == 0) ? PL_last_in_gv : (GV*)POPs;
+    GV * gv;
+    if (MAXARG == 0) 
+	Perl_croak(aTHX_ "flock without filehandle");
+    gv = (GV*)POPs;
 
     if (gv && (io = GvIO(gv)))
 	fp = IoIFP(io);
