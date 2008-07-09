@@ -434,7 +434,10 @@ unpack_sockaddr_in(sin_sv)
 	port = ntohs(addr.sin_port);
 	ip_address = addr.sin_addr;
 
-	EXTEND(SP, 2);
-	PUSHs(sv_2mortal(newSViv((IV) port)));
-	PUSHs(sv_2mortal(newSVpvn((char *)&ip_address, sizeof ip_address)));
+        {
+                AV* av = newAV();
+                mXPUSHs((SV*)(av));
+                av_push(av, newSViv((IV) port));
+                av_push(av, newSVpvn((char *)&ip_address, sizeof ip_address));
 	}
+        }
