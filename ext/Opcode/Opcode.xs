@@ -364,14 +364,18 @@ PPCODE:
     int i, j, myopcode;
     const char * const bitmap = SvPV(opset, len);
     char **names = (desc) ? get_op_descs() : get_op_names();
+    AV *av;
     dMY_CXT;
+
+    av = newAV();
+    mXPUSHs((SV*)av);
 
     verify_opset(aTHX_ opset,1);
     for (myopcode=0, i=0; i < opset_len; i++) {
 	const U16 bits = bitmap[i];
 	for (j=0; j < 8 && myopcode < PL_maxo; j++, myopcode++) {
 	    if ( bits & (1 << j) )
-		XPUSHs(sv_2mortal(newSVpv(names[myopcode], 0)));
+		av_push(av, newSVpv(names[myopcode], 0));
 	}
     }
     }

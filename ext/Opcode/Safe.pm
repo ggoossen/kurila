@@ -236,7 +236,7 @@ sub share_from {
     no strict 'refs';
     # Check that 'from' package actually exists
     croak("Package \"$pkg\" does not exist")
-	unless keys %{Symbol::stash("$pkg")};
+	unless %{Symbol::stash("$pkg")};
     my $arg;
     foreach $arg (< @$vars) {
 	# catch some $safe->share($var) errors:

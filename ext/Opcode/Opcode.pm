@@ -52,7 +52,7 @@ sub opdump (;$) {
 
 sub _init_optags {
     my(%all, %seen);
-    %all{[ <opset_to_ops( <full_opset)]} = (); # keys only
+    %all{[ <opset_to_ops(full_opset)]} = (); # keys only
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section
@@ -73,7 +73,7 @@ sub _init_optags {
 	    delete %all{$_};
 	}
 	# opset will croak on invalid names
-	define_optag($tag, < opset(< @ops));
+	define_optag($tag, opset(< @ops));
     }
     close(DATA);
     warn "Untagged opnames: ".join(' ',keys %all)."\n" if %all;
@@ -335,7 +335,7 @@ invert_opset function.
 
     rv2cv anoncode prototype
 
-    entersub leavesub leavesublv return method method_named -- XXX loops via recursion?
+    entersub leavesub return method method_named -- XXX loops via recursion?
 
     leaveeval -- needed for Safe to operate, is safe without entereval
 
@@ -347,7 +347,7 @@ available memory).
 
     concat repeat join range
 
-    anonlist anonhash
+    anonlist anonhash anonscalar
 
 Note that despite the existence of this optag a memory resource attack
 may still be possible using only :base_core ops.
@@ -390,7 +390,7 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     gvsv gv gelem
 
-    padsv padav padhv padany
+    padsv padany
 
     rv2gv srefgen ref
 
@@ -411,9 +411,6 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     entertry leavetry -- can be used to 'hide' fatal errors
 
-    entergiven leavegiven
-    enterwhen leavewhen
-    break continue
     smartmatch
 
     custom -- where should this go
