@@ -88,4 +88,4 @@ $Transient::variable = 42;
 ok( defined %Transient::{variable}, 'transient variable in stash' );
 Symbol::delete_package('Transient');
 ok( !exists %Transient::{variable}, 'transient variable no longer in stash' );
-is( scalar(keys %Transient::), 0, 'transient stash is empty' );
+is( nelems(@(keys %Transient::)), 0, 'transient stash is empty' );

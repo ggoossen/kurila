@@ -167,7 +167,6 @@ sub delete_package ($) {
 
     my($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
     my $stem_symtab = Symbol::stash($stem);
-    die dump::view($stem_symtab);
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf};
 
 
