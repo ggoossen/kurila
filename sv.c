@@ -4227,7 +4227,6 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 	}
     }
     SvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
-    assert(SvREFCNT(av) == 0);
     return 0;
 }
 
