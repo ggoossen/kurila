@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-print "1..56\n";
+plan tests => 57;
 
 @A::ISA = @( 'B' );
 @B::ISA = @( 'C' );
@@ -39,6 +39,9 @@ is($obj->method(), "method");
 is($obj->?$mname(), "method");
 is($obj->method, "method");
 is($obj->?$mname, "method");
+
+dies_like( sub { @(1, 2)->method() },
+           qr/Can't call method "method" on ARRAY/ );
 
 is( A->d, "C::d");		# Update hash table;
 

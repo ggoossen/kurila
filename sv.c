@@ -2387,10 +2387,11 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
     }
     else {
 	if (isGV_with_GP(sv))
-	    Perl_croak(aTHX_ "Tried to use glob as string");
+	    Perl_croak(aTHX_ "Tried to use glob as string in %s", OP_DESC(PL_op));
 
 	if (SvTYPE(sv) == SVt_PVAV || SvTYPE(sv) == SVt_PVHV)
-	    Perl_croak(aTHX_ "%s may not be used as a string", (SvTYPE(sv) == SVt_PVAV ? "array" : "hash"));
+	    Perl_croak(aTHX_ "%s may not be used as a string in %s",
+		       Ddesc(sv), OP_DESC(PL_op) );
 
 	if (lp)
 	    *lp = 0;

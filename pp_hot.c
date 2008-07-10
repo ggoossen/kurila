@@ -2552,7 +2552,8 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (SvROK(sv))
 	ob = (SV*)SvRV(sv);
     else {
-	GV* iogv;
+	if ( ! SvPVOK(sv) )
+	    Perl_croak(aTHX_ "Can't call method \"%s\" on %s", name, Ddesc(sv));
 
 	/* this isn't a reference */
         if(SvOK(sv) && (packname = SvPV_const(sv, packlen))) {
@@ -2563,34 +2564,15 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
           }
         }
 
-	if (!SvOK(sv) ||
-	    !(packname) ||
-	    !(iogv = gv_fetchsv(sv, 0, SVt_PVIO)) ||
-	    !(ob=(SV*)GvIO(iogv)))
-	{
-	    /* this isn't the name of a filehandle either */
-	    if (!packname ||
-		((UTF8_IS_START(*packname) && DO_UTF8(sv))
-		    ? !isIDFIRST_utf8(packname)
-		    : !isIDFIRST(*packname)
-		))
-	    {
-		Perl_croak(aTHX_ "Can't call method \"%s\" %s", name,
-			   SvOK(sv) ? "without a package or object reference"
-				    : "on an undefined value");
-	    }
-	    /* assume it's a package name */
-	    stash = gv_stashpvn(packname, packlen, 0);
-	    if (!stash)
-		packsv = sv;
-            else {
-	        SV* const ref = newSViv(PTR2IV(stash));
-	        (void)hv_store(PL_stashcache, packname, packlen, ref, 0);
-	    }
-	    goto fetch;
+	/* assume it's a package name */
+	stash = gv_stashpvn(packname, packlen, 0);
+	if (!stash)
+	    packsv = sv;
+	else {
+	    SV* const ref = newSViv(PTR2IV(stash));
+	    (void)hv_store(PL_stashcache, packname, packlen, ref, 0);
 	}
-	/* it _is_ a filehandle name -- replace with a reference */
-	*(PL_stack_base + TOPMARK + 1) = sv_2mortal(newRV((SV*)iogv));
+	goto fetch;
     }
 
     /* if we got here, ob should be a reference or a glob */
