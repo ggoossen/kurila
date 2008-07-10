@@ -108,6 +108,7 @@ PP(pp_and)
 PP(pp_sassign)
 {
     dVAR; dSP; dPOPTOPssrl;
+    /* left is the source; right the destination */
 
     if (PL_op->op_private & OPpASSIGN_BACKWARDS) {
 	SV * const temp = left;
@@ -115,6 +116,7 @@ PP(pp_sassign)
     }
     if (PL_tainting && PL_tainted && !SvTAINTED(left))
 	TAINT_NOT;
+    sv_2mortal(SvREFCNT_inc(left));
     SvSetMagicSV(right, left);
     SETs(right);
     RETURN;
