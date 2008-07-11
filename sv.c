@@ -2857,7 +2857,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	av_extend( (AV*)dstr, len );
 	for (i=0; i<=len; i++) {
 	    SV** val = av_fetch( (AV*)sstr, i, 0);
-	    SV* sv = newSVsv(*val);
+	    SV* sv = val ? newSVsv(*val) : NULL;
 	    SV** didstore = av_store( (AV*)dstr, i, sv);
 	    if (magic) {
 		if (SvSMAGICAL(sv))
