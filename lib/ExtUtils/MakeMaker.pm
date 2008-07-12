@@ -571,7 +571,7 @@ END
 
 #   MakeMaker 'CONFIGURE' Parameters:
 END
-        if (scalar(keys %configure_att) +> 0) {
+        if (%configure_att) {
             foreach my $key (sort keys %configure_att){
                next if $key eq 'ARGS';
                my($v) = < neatvalue(%configure_att{$key});
