@@ -208,6 +208,7 @@ XS(XS_Internals_SvREADONLY);
 XS(XS_Internals_peek);
 XS(XS_Internals_SvREFCNT);
 XS(XS_Internals_hv_clear_placehold);
+XS(XS_Internals_refcnt_check);
 XS(XS_PerlIO_get_layers);
 XS(XS_Regexp_DESTROY);
 XS(XS_Internals_hash_seed);
@@ -282,6 +283,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
+    newXS("Internals::refcnt_check", XS_Internals_refcnt_check, file);
     newXSproto("PerlIO::get_layers",
                XS_PerlIO_get_layers, file, "*;@");
     newXS("Regexp::DESTROY", XS_Regexp_DESTROY, file);
@@ -1158,6 +1160,13 @@ XS(XS_Internals_hv_clear_placehold)
 	hv_clear_placeholders(hv);
 	XSRETURN(0);
     }
+}
+
+XS(XS_Internals_refcnt_check)
+{
+    dXSARGS;
+    refcnt_check();
+    XSRETURN(0);
 }
 
 XS(XS_Regexp_DESTROY)
