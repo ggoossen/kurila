@@ -574,7 +574,7 @@ END
         if (%configure_att) {
             foreach my $key (sort keys %configure_att){
                next if $key eq 'ARGS';
-               my($v) = < neatvalue(%configure_att{$key});
+               my $v = neatvalue(%configure_att{$key});
                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
                $v =~ s/\n+/ /g;
                push @{$self->{RESULT}}, "#     $key => $v";
