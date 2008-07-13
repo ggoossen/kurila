@@ -497,6 +497,7 @@ sub isa_ok ($$;$) {
     }
     else {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
+        local $@;
         my $rslt = try { $object->isa($class) };
         if( $@ ) {
             if( $@->message =~ m/^Can't call method "isa" on unblessed reference/ ) {
