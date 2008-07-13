@@ -109,7 +109,6 @@ function is really just a wrapper around open3().
 require IPC::Open3;
 
 sub open2 {
-    local $Carp::CarpLevel = $Carp::CarpLevel + 1;
     return IPC::Open3::_open3('open2', scalar caller,
 				@_[1], @_[0], '>&STDERR', @_[[2 .. ((nelems @_)-1)]]);
 }
