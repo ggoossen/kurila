@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..118\n";
+print "1..119\n";
 
 use strict;
 
@@ -70,16 +70,23 @@ foreach $b ( <bar()) {
 }
 print $a == 7 ? "ok" : "not ok", " 11\n";
 
+# loop over expand on empty list
+sub baz { return () }
+for ( < baz() ) {
+    print "not ";
+}
+print "ok 12\n";
+
 $loop_count = 0;
 for ("-3" .. "0") {
     $loop_count++;
 }
-print $loop_count == 4 ? "ok" : "not ok", " 12\n";
+print $loop_count == 4 ? "ok" : "not ok", " 13\n";
 
 # modifying arrays in loops is a no-no
 our @a = @(3,4);
 try { @a = @( () ) for (1,2,< @a) };
-print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok", " 13\n";
+print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok", " 14\n";
 
 # [perl #30061] double destory when same iterator variable (eg $_) used in
 # DESTROY as used in for loop that triggered the destroy
@@ -96,11 +103,11 @@ print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok",
     my %h;
     %h{foo} = bless \@(), 'X';
     delete %h{foo} for %h{foo}, 1;
-    print $x == 1 ? "ok" : "not ok", " 14 - double destroy, x=$x\n";
+    print $x == 1 ? "ok" : "not ok", " 15 - double destroy, x=$x\n";
 }
 
 # A lot of tests to check that reversed for works.
-my $test = 14;
+my $test = 15;
 sub is {
     my ($got, $expected, $name) = < @_;
     ++$test;
@@ -667,7 +674,7 @@ TODO: {
     local $TODO = "RT #2166: foreach spuriously autovivifies";
     my %h;
     foreach (%h{['a', 'b']}) {}
-    if(keys(%h)) {
+    if(%h) {
         print "not ";
     }
     print "ok $test # TODO $TODO\n";

@@ -1177,75 +1177,78 @@ PP(pp_enteriter)
 #else
     PUSHLOOP_FOR(cx, svp, MARK, 0);
 #endif
-    if (PL_op->op_flags & OPf_STACKED) {
-	SV *maybe_ary = POPs;
-	if (SvTYPE(maybe_ary) != SVt_PVAV) {
-	    dPOPss;
-	    SV * const right = maybe_ary;
-	    SvGETMAGIC(sv);
-	    SvGETMAGIC(right);
-	    if (RANGE_IS_NUMERIC(sv,right)) {
-		cx->cx_type &= ~CXTYPEMASK;
-		cx->cx_type |= CXt_LOOP_LAZYIV;
-		/* Make sure that no-one re-orders cop.h and breaks our
-		   assumptions */
-		assert(CxTYPE(cx) == CXt_LOOP_LAZYIV);
+    if (PL_op->op_flags & OPf_SPECIAL) {
+	SV * const right = POPs;
+	dPOPss;
+	SvGETMAGIC(sv);
+	SvGETMAGIC(right);
+	if (RANGE_IS_NUMERIC(sv,right)) {
+	    cx->cx_type &= ~CXTYPEMASK;
+	    cx->cx_type |= CXt_LOOP_LAZYIV;
+	    /* Make sure that no-one re-orders cop.h and breaks our
+	       assumptions */
+	    assert(CxTYPE(cx) == CXt_LOOP_LAZYIV);
 #ifdef NV_PRESERVES_UV
-		if ((SvOK(sv) && ((SvNV(sv) < (NV)IV_MIN) ||
-				  (SvNV(sv) > (NV)IV_MAX)))
-			||
-		    (SvOK(right) && ((SvNV(right) > (NV)IV_MAX) ||
-				     (SvNV(right) < (NV)IV_MIN))))
+	    if ((SvOK(sv) && ((SvNV(sv) < (NV)IV_MIN) ||
+			      (SvNV(sv) > (NV)IV_MAX)))
+		||
+		(SvOK(right) && ((SvNV(right) > (NV)IV_MAX) ||
+				 (SvNV(right) < (NV)IV_MIN))))
 #else
 		if ((SvOK(sv) && ((SvNV(sv) <= (NV)IV_MIN)
 				  ||
 		                  ((SvNV(sv) > 0) &&
-					((SvUV(sv) > (UV)IV_MAX) ||
-					 (SvNV(sv) > (NV)UV_MAX)))))
-			||
+				   ((SvUV(sv) > (UV)IV_MAX) ||
+				    (SvNV(sv) > (NV)UV_MAX)))))
+		    ||
 		    (SvOK(right) && ((SvNV(right) <= (NV)IV_MIN)
 				     ||
 				     ((SvNV(right) > 0) &&
-					((SvUV(right) > (UV)IV_MAX) ||
-					 (SvNV(right) > (NV)UV_MAX))))))
+				      ((SvUV(right) > (UV)IV_MAX) ||
+				       (SvNV(right) > (NV)UV_MAX))))))
 #endif
 		    DIE(aTHX_ "Range iterator outside integer range");
-		cx->blk_loop.state_u.lazyiv.cur = SvIV(sv);
-		cx->blk_loop.state_u.lazyiv.end = SvIV(right);
+	    cx->blk_loop.state_u.lazyiv.cur = SvIV(sv);
+	    cx->blk_loop.state_u.lazyiv.end = SvIV(right);
 #ifdef DEBUGGING
-		/* for correct -Dstv display */
-		cx->blk_oldsp = sp - PL_stack_base;
+	    /* for correct -Dstv display */
+	    cx->blk_oldsp = sp - PL_stack_base;
 #endif
-	    }
-	    else {
-		cx->cx_type &= ~CXTYPEMASK;
-		cx->cx_type |= CXt_LOOP_LAZYSV;
-		/* Make sure that no-one re-orders cop.h and breaks our
-		   assumptions */
-		assert(CxTYPE(cx) == CXt_LOOP_LAZYSV);
-		cx->blk_loop.state_u.lazysv.cur = newSVsv(sv);
-		cx->blk_loop.state_u.lazysv.end = right;
-		SvREFCNT_inc(right);
-		(void) SvPV_force_nolen(cx->blk_loop.state_u.lazysv.cur);
-		/* This will do the upgrade to SVt_PV, and warn if the value
-		   is uninitialised.  */
-		(void) SvPV_nolen_const(right);
-		/* Doing this avoids a check every time in pp_iter in pp_hot.c
-		   to replace !SvOK() with a pointer to "".  */
-		if (!SvOK(right)) {
-		    SvREFCNT_dec(right);
-		    cx->blk_loop.state_u.lazysv.end = &PL_sv_no;
-		}
+	}
+	else {
+	    cx->cx_type &= ~CXTYPEMASK;
+	    cx->cx_type |= CXt_LOOP_LAZYSV;
+	    /* Make sure that no-one re-orders cop.h and breaks our
+	       assumptions */
+	    assert(CxTYPE(cx) == CXt_LOOP_LAZYSV);
+	    cx->blk_loop.state_u.lazysv.cur = newSVsv(sv);
+	    cx->blk_loop.state_u.lazysv.end = right;
+	    SvREFCNT_inc(right);
+	    (void) SvPV_force_nolen(cx->blk_loop.state_u.lazysv.cur);
+	    /* This will do the upgrade to SVt_PV, and warn if the value
+	       is uninitialised.  */
+	    (void) SvPV_nolen_const(right);
+	    /* Doing this avoids a check every time in pp_iter in pp_hot.c
+	       to replace !SvOK() with a pointer to "".  */
+	    if (!SvOK(right)) {
+		SvREFCNT_dec(right);
+		cx->blk_loop.state_u.lazysv.end = &PL_sv_no;
 	    }
 	}
-	else /* SvTYPE(maybe_ary) == SVt_PVAV */ {
-	    cx->blk_loop.state_u.ary.ary = (AV*)maybe_ary;
-	    SvREFCNT_inc(maybe_ary);
-	    cx->blk_loop.state_u.ary.ix =
-		(PL_op->op_private & OPpITER_REVERSED) ?
-		AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
-		-1;
-	}
+    }
+    else if (PL_op->op_flags & OPf_STACKED) {
+	SV *maybe_ary = POPs;
+	if ( ! SvOK(maybe_ary) )
+	    RETURN;
+	if ( ! SvAVOK(maybe_ary) )
+	    DIE("for loop expected an array but got %s", Ddesc(maybe_ary));
+
+	cx->blk_loop.state_u.ary.ary = (AV*)maybe_ary;
+	SvREFCNT_inc(maybe_ary);
+	cx->blk_loop.state_u.ary.ix =
+	    (PL_op->op_private & OPpITER_REVERSED) ?
+	    AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
+	    -1;
     }
     else { /* iterating over items on the stack */
 	cx->blk_loop.state_u.ary.ary = NULL; /* means to use the stack */
