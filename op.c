@@ -4304,7 +4304,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
              ((BINOP*)expr)->op_first->op_type == OP_FLOP)
     {
 	/* Basically turn for($x..$y) into the same as for($x,$y), but we
-	 * set the STACKED flag to indicate that these values are to be
+	 * set the SPECIAL flag to indicate that these values are to be
 	 * treated as min/max values by 'pp_iterinit'.
 	 */
 	const UNOP* const flip = (UNOP*)((UNOP*)((BINOP*)expr)->op_first)->op_first;
@@ -4329,7 +4329,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 #endif
 	expr = (OP*)(listop);
         op_null(expr);
-	iterflags |= OPf_STACKED;
+	iterflags |= OPf_SPECIAL;
     }
     else {
         expr = mod(force_list(expr), OP_GREPSTART);
