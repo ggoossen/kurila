@@ -54,18 +54,20 @@ main::ok( qualify("x") eq "foo::x",		'qualify() with a simple identifier' );
 main::ok( qualify("x", "FOO") eq "FOO::x",	'qualify() with a package' );
 main::ok( qualify("BAR::x") eq "BAR::x",
     'qualify() with a qualified identifier' );
-main::ok( qualify("STDOUT") eq "main::STDOUT",
+main::ok( qualify("STDOUT") eq "::STDOUT",
     'qualify() with a reserved identifier' );
-main::ok( qualify("ARGV", "FOO") eq "main::ARGV",
+main::ok( qualify("ARGV", "FOO") eq "::ARGV",
     'qualify() with a reserved identifier and a package' );
 main::ok( qualify("_foo") eq "foo::_foo",
     'qualify() with an identifier starting with a _' );
-main::is( qualify("^FOO"), "main::\cFOO",
+main::is( qualify("^FOO"), "::^FOO",
     'qualify() with an identifier starting with a ^' );
 
 # Test qualify_to_ref()
 {
     main::ok( \*{qualify_to_ref("x")} \== \*foo::x, 'qualify_to_ref() with a simple identifier' );
+    main::is( qualify_to_ref("STDOUT"), \*STDOUT,
+              'qualify_to_ref() with reserved indentier is the special variable' );
 }
 
 # test fetch_glob()
