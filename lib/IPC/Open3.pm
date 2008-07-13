@@ -235,13 +235,13 @@ sub _open3 {
 	}
 
 	if ($dup_wtr) {
-	    xopen \*STDIN,  "<&", $dad_wtr if fileno(STDIN) != xfileno($dad_wtr);
+	    xopen \*STDIN,  "<&", $dad_wtr if fileno(\*STDIN) != xfileno($dad_wtr);
 	} else {
 	    xclose $dad_wtr;
 	    xopen \*STDIN,  "<&=", fileno $kid_rdr;
 	}
 	if ($dup_rdr) {
-	    xopen \*STDOUT, ">&", $dad_rdr if fileno(STDOUT) != xfileno($dad_rdr);
+	    xopen \*STDOUT, ">&", $dad_rdr if fileno(\*STDOUT) != xfileno($dad_rdr);
 	} else {
 	    xclose $dad_rdr;
 	    xopen \*STDOUT, ">&=", $kid_wtr;

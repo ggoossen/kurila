@@ -44,8 +44,8 @@ sub cmd_line {
 }
 
 my ($pid, $reaped_pid);
-STDOUT->autoflush;
-STDERR->autoflush;
+(\*STDOUT)->autoflush;
+(\*STDERR)->autoflush;
 
 print "1..22\n";
 
@@ -139,7 +139,7 @@ my $cmd = 'print(scalar(~< *STDIN))';
 $cmd = %Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
 try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($@) {
-	print "error $@\n";
+	print "error {$@->message}\n";
 	print "not ok 22\n";
 }
 else {

@@ -41,8 +41,8 @@ sub cmd_line {
 }
 
 my ($pid, $reaped_pid);
-STDOUT->autoflush;
-STDERR->autoflush;
+(\*STDOUT)->autoflush;
+(\*STDERR)->autoflush;
 
 print "1..7\n";
 
