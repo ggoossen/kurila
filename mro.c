@@ -115,6 +115,10 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
     gvp = (GV**)hv_fetchs(stash, "ISA", FALSE);
     isa = (gvp && (gv = *gvp) && isGV_with_GP(gv)) ? GvAV(gv) : NULL;
 
+    if ( isa && ! SvAVOK(isa) ) {
+	Perl_croak(aTHX_ "@ISA is not an array but %s", Ddesc((SV*)isa));
+    }
+
     /* For a better idea how the rest of this works, see the much clearer
        pure perl version in Algorithm::C3 0.01:
        http://search.cpan.org/src/STEVAN/Algorithm-C3-0.01/lib/Algorithm/C3.pm
