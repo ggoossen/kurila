@@ -10,15 +10,9 @@ $Debug = 0 unless defined $Debug;
 sub import {
     my $self = shift(@_);
     my($sym, $pkg);
-    my $void = 0;
     $pkg = (caller)[[0]];
     foreach $sym (< @_) {
-	if ($sym eq ":void") {
-	    $void = 1;
-	}
-	else {
-	    &_make_fatal($sym, $pkg, $void);
-	}
+        &_make_fatal($sym, $pkg);
     }
 };
 
@@ -31,7 +25,7 @@ sub fill_protos {
     push(@out1,\@($n,< @out)) if $seen_semi;
     push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
-    push(@out, "\@_[[$n..\@_-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
+    push(@out, "\@_[[$n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
     $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
@@ -40,52 +34,45 @@ sub fill_protos {
 }
 
 sub write_invocation {
-  my ($core, $call, $name, $void, < @argvs) = < @_;
+  my ($core, $call, $name, < @argvs) = < @_;
   if ((nelems @argvs) == 1) {		# No optional arguments
     my @argv = @( < @{@argvs[0]} );
     shift @argv;
-    return "\t" . one_invocation($core, $call, $name, $void, < @argv) . ";\n";
+    return "\t" . one_invocation($core, $call, $name, < @argv) . ";\n";
   } else {
     my $else = "\t";
     my (@out, @argv, $n);
     while ((nelems @argvs)) {
       @argv = @( < @{shift @argvs} );
       $n = shift @argv;
-      push @out, "{$else}if (\@_ == $n) \{\n";
+      push @out, "{$else}if (nelems(\@_) == $n) \{\n";
       $else = "\t\} els";
       push @out, 
-          "\t\treturn " . one_invocation($core, $call, $name, $void, < @argv) . ";\n";
+          "\t\treturn " . one_invocation($core, $call, $name, < @argv) . ";\n";
     }
     push @out, <<EOC;
 	\}
-	die "$name(\@_): Do not expect to get ", scalar \@_, " arguments";
+	die "$name(\@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
     return join '', < @out;
   }
 }
 
 sub one_invocation {
-  my ($core, $call, $name, $void, < @argv) = < @_;
-  local $" = ', ';
-  if ($void) { 
-    return qq/(defined wantarray)?$call({join ' ', <@argv}):
-              $call({join ' ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})/ . 
-           ($core ? ': $!' : ', \$! is \"$!\"') . '"'
-  } else {
-    return qq{$call({join ' ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
-           ($core ? ': $!' : ', \$! is \"$!\"') . '"';
-  }
+  my ($core, $call, $name, < @argv) = < @_;
+  return qq{$call({join ', ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} < \@_\})} . 
+    ($core ? ': $!' : ', \$! is \"$!\"') . '"';
 }
 
 sub _make_fatal {
-    my($sub, $pkg, $void) = < @_;
+    my($sub, $pkg) = < @_;
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
     $sub = "{$pkg}::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
-    print "# _make_fatal: sub=$sub pkg=$pkg name=$name void=$void\n" if $Debug;
+    print "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
@@ -111,14 +98,13 @@ sub _make_fatal {
     }
     $code = <<EOS;
 sub$real_proto \{
-	local(\$", \$!) = (', ', 0);
+	local(\$!) = (0);
 EOS
     my @protos = @( < fill_protos($proto) );
-    $code .= write_invocation($core, $call, $name, $void, < @protos);
+    $code .= write_invocation($core, $call, $name, < @protos);
     $code .= "\}\n";
     print $code if $Debug;
     {
-      no strict 'refs'; # to avoid: Can't use string (...) as a symbol ref ...
       $code = eval("package $pkg; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
@@ -154,21 +140,6 @@ C<import> routine, passing it the names of the functions to be
 replaced.  You may wrap both user-defined functions and overridable
 CORE operators (except C<exec>, C<system> which cannot be expressed
 via prototypes) in this way.
-
-If the symbol C<:void> appears in the import list, then functions
-named later in that import list raise an exception only when
-these are called in void context--that is, when their return
-values are ignored.  For example
-
-	use Fatal qw/:void open close/;
-
-	# properly checked, so no exception raised on error
-	if(open(FH, "< /bogotic") {
-		warn "bogo file, dude: $!";
-	}
-
-	# not checked, so error raises an exception
-	close FH;
 
 =head1 BUGS
 
