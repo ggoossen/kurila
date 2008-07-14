@@ -796,7 +796,7 @@ WARNING
 
     my $ok;
 
-    local @Data_Stack = @( () );
+    local @Data_Stack = @();
     if( _deep_check($got, $expected) ) {
         $ok = $tb->ok(1, $name);
     }
@@ -812,21 +812,36 @@ sub _format_stack {
     my(@Stack) = @( < @_ );
 
     my $var = '$FOO';
-    my $did_arrow = 0;
+    my $prev_ref = 0;
     foreach my $entry (< @Stack) {
         my $type = $entry->{type} || '';
         my $idx  = $entry->{'idx'};
         if( $type eq 'HASH' ) {
-            $var .= "->" unless $did_arrow++;
+            $var .= "->" if $prev_ref;
             $var .= "\{$idx\}";
+            $prev_ref = 0;
         }
         elsif( $type eq 'ARRAY' ) {
-            $var .= "->" unless $did_arrow++;
+            $var .= "->" if $prev_ref;
             $var .= "[$idx]";
+            $prev_ref = 0;
         }
         elsif( $type eq 'REF' ) {
-            $var = "\$\{$var\}";
+            if ( $prev_ref ) {
+                $var = "\$\{$var\}";
+            }
+            $prev_ref = 1;
         }
+        else {
+            if ($prev_ref) {
+                $var = '${' . $var . '}';
+                $prev_ref = 0;
+            }
+        }
+    }
+    if ($prev_ref) {
+        $var = '${' . $var . '}';
+        $prev_ref = 0;
     }
 
     my @vals = @( @Stack[-1]->{vals}->[[0,1]] );
@@ -1195,60 +1210,44 @@ sub _deep_check {
         # Quiet uninitialized value warnings when comparing undefs.
         local $^W = 0; 
 
-        # Either they're both references or both not.
-        my $both_ref = (ref $e1 and ref $e2);
-	my $not_ref  = (ref::svtype($e1) eq "PLAINVALUE" and ref::svtype($e2) eq "PLAINVALUE");
+        if( %Refs_Seen{ref::address($e1)} ) {
+            return %Refs_Seen{ref::address($e1)} eq ref::address($e2);
+        }
+        %Refs_Seen{ref::address $e1} = ref::address $e2;
 
-        if( defined $e1 xor defined $e2 ) {
+        my $type = ref::svtype($e1);
+        $type = 'DIFFERENT' unless ref::svtype($e2) eq $type;
+
+        if( $type eq 'DIFFERENT' ) {
+            push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
             $ok = 0;
         }
-        elsif ( _dne($e1) xor _dne($e2) ) {
+        elsif( $type eq 'PLAINVALUE' ) {
+            $ok = ($e1 eq $e2);
+            if ( ! $ok ) {
+                push @Data_Stack, \%( type => '', vals => \@($e1, $e2) );
+            }
+        }
+        elsif( $type eq 'ARRAY' ) {
+            $ok = _eq_array(\$e1, \$e2);
+        }
+        elsif( $type eq 'HASH' ) {
+            $ok = _eq_hash(\$e1, \$e2);
+        }
+        elsif( $type eq 'REF' ) {
+            push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
+            $ok = _deep_check($$e1, $$e2);
+            pop @Data_Stack if $ok;
+        }
+        elsif( $type eq 'UNDEF' ) {
+            $ok = 1;
+        }
+        elsif( $type eq 'COMPLEX' ) {
+            push @Data_Stack, \%( type => $type, vals => \@('...', '...') );
             $ok = 0;
         }
-        elsif ( $both_ref and ($e1 \== $e2) ) {
-            $ok = 1;
-        }
-        elsif ( $not_ref and ($e1 eq $e2) ) {
-            $ok = 1;
-        }
-	elsif ( $not_ref ) {
-	    push @Data_Stack, \%( type => '', vals => \@($e1, $e2) );
-	    $ok = 0;
-	}
         else {
-            if( %Refs_Seen{ref::address($e1)} ) {
-                return %Refs_Seen{ref::address($e1)} eq ref::address($e2);
-            }
-            %Refs_Seen{ref::address $e1} = ref::address $e2;
-
-            my $type = ref::svtype($e1);
-            $type = 'DIFFERENT' unless ref::svtype($e2) eq $type;
-
-            if( $type eq 'DIFFERENT' ) {
-                push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
-                $ok = 0;
-            }
-            elsif( $type eq 'ARRAY' ) {
-                $ok = _eq_array(\$e1, \$e2);
-            }
-            elsif( $type eq 'HASH' ) {
-                $ok = _eq_hash(\$e1, \$e2);
-            }
-            elsif( $type eq 'REF' ) {
-                push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
-                $ok = _deep_check($$e1, $$e2);
-                pop @Data_Stack if $ok;
-            }
-            elsif( $type eq 'UNDEF' ) {
-                $ok = 1;
-            }
-            elsif( $type eq 'COMPLEX' ) {
-                push @Data_Stack, \%( type => $type, vals => \@('...', '...') );
-                $ok = 0;
-            }
-	    else {
-		_whoa(1, "Unknown type '$type' in _deep_check");
-	    }
+            _whoa(1, "Unknown type '$type' in _deep_check");
         }
     }
 
