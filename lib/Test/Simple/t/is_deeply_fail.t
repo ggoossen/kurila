@@ -62,35 +62,39 @@ my $Filename = quotemeta $0;
 #line 68
 ok !is_deeply('foo', 'bar', 'plain strings');
 is( $out, "not ok 1 - plain strings\n",     'plain strings' );
-is( $err, <<ERR,                            '    right diagnostic' );
+is( $err, <<ERRHEAD . <<'ERR',                            '    right diagnostic' );
 #   Failed test 'plain strings'
 #   at $0 line 68.
-#          got: 'foo'
-#     expected: 'bar'
+ERRHEAD
+#     Structures begin differing at:
+#          $got = 'foo'
+#     $expected = 'bar'
 ERR
 
 
 #line 78
 ok !is_deeply(\%(), \@(), 'different types');
 is( $out, "not ok 2 - different types\n",   'different types' );
-like( $err, <<ERR,                          '   right diagnostic' );
+is( $err, <<ERRHEAD . <<'ERR',                          '   right diagnostic' );
 #   Failed test 'different types'
-#   at $Filename line 78.
+#   at $0 line 78.
+ERRHEAD
 #     Structures begin differing at:
-#          \\\$got = HASH\\(0x[0-9a-f]+\\)
-#     \\\$expected = ARRAY\\(0x[0-9a-f]+\\)
+#     ${     $got} = %(HASH (TODO))
+#     ${$expected} = @(ARRAY (TODO))
 ERR
 
 #line 88
 ok !is_deeply(\%( this => 42 ), \%( this => 43 ), 'hashes with different values');
 is( $out, "not ok 3 - hashes with different values\n", 
                                         'hashes with different values' );
-is( $err, <<ERR,                        '   right diagnostic' );
+is( $err, <<ERRHEAD . <<'ERR',                        '   right diagnostic' );
 #   Failed test 'hashes with different values'
 #   at $0 line 88.
+ERRHEAD
 #     Structures begin differing at:
-#          \$got->\{this\} = '42'
-#     \$expected->\{this\} = '43'
+#          $got->{this} = '42'
+#     $expected->{this} = '43'
 ERR
 
 #line 99
@@ -142,12 +146,13 @@ ERR
 #line 141
 ok !is_deeply(\42, \23,   'scalar refs');
 is( $out, "not ok 8 - scalar refs\n",   'scalar refs' );
-is( $err, <<ERR,                        '    right diagnostic' );
+is( $err, <<ERRHEAD . <<'ERR',                        '    right diagnostic' );
 #   Failed test 'scalar refs'
 #   at $0 line 141.
+ERRHEAD
 #     Structures begin differing at:
-#     \$\{     \$got\} = '42'
-#     \$\{\$expected\} = '23'
+#     ${     $got} = '42'
+#     ${$expected} = '23'
 ERR
 
 #line 151
