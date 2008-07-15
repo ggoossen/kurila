@@ -13,7 +13,7 @@ if ((%Config{'extensions'} !~ m/\bIO\b/) ){
   exit 0;
 }
 # hey, DOS users do not need this kind of common sense ;-)
-if ($^O ne 'dos' && (%Config{'extensions'} !~ m/\bFile\/Glob\b/) ){
+if ($^O ne 'dos' && (%Config{'extensions'} !~ m/\bFile-Glob\b/) ){
   print "Bail out! Perl configured without File::Glob module\n";
   exit 0;
 }
