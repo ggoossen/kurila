@@ -178,7 +178,6 @@ sub heavy_export {
 	    $type eq '$' ? \${*{Symbol::fetch_glob("{$pkg}::$sym")}} :
 	    $type eq '@' ? \@{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
 	    $type eq '%' ? \%{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
-	    $type eq '*' ?  *{Symbol::fetch_glob("{$pkg}::$sym")} :
 	    warn("Can't export symbol: $type$sym");
     }
 }

@@ -1,21 +1,13 @@
 #!./perl -i.inplace
 # note the extra switch, for the test below
 
-use Test::More tests => 43;
+use Test::More tests => 41;
 
 use English qw( -no_match_vars ) ;
 use Config;
 use Errno;
 
 is( $PID, $$, '$PID' );
-
-$_ = 1;
-is( $ARG, $_, '$ARG' );
-
-sub foo {
-	is(@ARG[0], @_[0], '@ARG' );
-}
-foo(1);
 
 "abc" =~ m/b/;
 
@@ -121,7 +113,7 @@ ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );
 
 try { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
 is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
-ok( %OS_ERROR{ENOENT}, '%OS_ERROR (ENOENT should be set)' );
+ok( %OS_ERROR_FLAGS{ENOENT}, '%OS_ERROR_FLAGS(ENOENT should be set)' );
 
 package C;
 
