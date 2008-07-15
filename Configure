@@ -21145,21 +21145,10 @@ nonxs_extensions=''
 find_extensions='
     for xxx in *; do
 	case "$xxx" in
+            util) ;;
 	    DynaLoader|dynaload) ;;
 	    *)
-	    if $test -f $xxx/$xxx.xs -o -f $xxx/$xxx.c; then
 		known_extensions="$known_extensions $1$xxx";
-	    elif $test -f $xxx/Makefile.PL; then
-		nonxs_extensions="$nonxs_extensions $1$xxx";
-	    else
-		if $test -d $xxx -a $# -lt 10; then
-		    set $1$xxx/ $*;
-		    cd "$xxx";
-		    eval $find_extensions;
-		    cd ..;
-		    shift;
-		fi;
-	    fi
 	    ;;
 	esac;
     done'
@@ -21168,12 +21157,7 @@ cd "$rsrc/ext"
 set X
 shift
 eval $find_extensions
-# Special case:  Add in modules that nest beyond the first level.
-# Currently threads/shared, since they are
-# not picked up by the recursive find above (and adding in general
-# recursive finding breaks SDBM_File/sdbm).
-# A.D. 20011025 (SDBM)
-known_extensions="$known_extensions threads/shared"
+
 set X $known_extensions
 shift
 known_extensions="$*"
@@ -21191,12 +21175,12 @@ for xxx in $known_extensions ; do
 		$define) avail_ext="$avail_ext $xxx" ;;
 		esac
 		;;
-	I18N/Langinfo|i18n_lan)
+	I18N-Langinfo|i18n_lan)
 		case "$i_langinfo$d_nl_langinfo" in
 		$define$define) avail_ext="$avail_ext $xxx" ;;
 		esac
 		;;
-	IPC/SysV|ipc/sysv)
+	IPC-SysV|ipc-sysv)
 		: XXX Do we need a useipcsysv variable here
 		case "${d_msg}${d_sem}${d_shm}" in
 		*"${define}"*) avail_ext="$avail_ext $xxx" ;;
@@ -21222,7 +21206,7 @@ for xxx in $known_extensions ; do
 		    ;;
 		esac
 		;;
-	Sys/Syslog|sys/syslog)
+	Sys-Syslog|sys-syslog)
 		: XXX syslog requires socket
 		case "$d_socket" in
 		true|$define|y) avail_ext="$avail_ext $xxx" ;;
@@ -21236,7 +21220,7 @@ for xxx in $known_extensions ; do
                         esac
 		esac
 		;;
-	threads|threads/shared)
+	threads|threads-shared)
 		# threads and threads::shared are special cases.
 		# To stop people from asking "Perl 5.8.0 was supposed
 		# to have this new fancy threads implementation but my
@@ -21255,14 +21239,14 @@ for xxx in $known_extensions ; do
 		cygwin) avail_ext="$avail_ext $xxx" ;;
 		esac
 		;;
-	XS/APItest|xs/apitest)
+	XS-APItest|xs-apitest)
 		# This is just for testing.  Skip it unless we have dynamic loading.
 
 		case "$usedl" in
 		$define) avail_ext="$avail_ext $xxx" ;;
 		esac
 		;;
-	XS/Typemap|xs/typemap)
+	XS-Typemap|xs-typemap)
 		# This is just for testing.  Skip it unless we have dynamic loading.
 		case "$usedl" in
 		$define) avail_ext="$avail_ext $xxx" ;;
@@ -21441,20 +21425,6 @@ EOM
 	none) static_ext=' ' ;;
 	*) static_ext="$ans" ;;
 	esac
-	;;
-esac
-#
-# Encode is a special case.  If we are building Encode as a static
-# extension, we need to explicitly list its subextensions as well.
-# For other nested extensions, this is handled automatically by
-# the appropriate Makefile.PL.
-case " $static_ext " in
-	*" Encode "*) # Add the subextensions of Encode
-	cd "$rsrc/ext"
-	for xxx in `ls Encode/*/Makefile.PL|awk -F/ '{print $2}'`; do
-		static_ext="$static_ext Encode/$xxx"
-	done
-	cd "$tdir"
 	;;
 esac
 
