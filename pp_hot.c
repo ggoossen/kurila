@@ -354,25 +354,9 @@ PP(pp_defined)
     }
 
     defined = FALSE;
-    switch (SvTYPE(sv)) {
-    case SVt_PVAV:
-	if (AvMAX(sv) >= 0 || SvGMAGICAL(sv) || (SvRMAGICAL(sv) && mg_find(sv, PERL_MAGIC_tied)))
-	    defined = TRUE;
-	break;
-    case SVt_PVHV:
-	if (HvARRAY(sv) || SvGMAGICAL(sv) || (SvRMAGICAL(sv) && mg_find(sv, PERL_MAGIC_tied)))
-	    defined = TRUE;
-	break;
-    case SVt_PVCV:
-	if (CvROOT(sv) || CvXSUB(sv))
-	    defined = TRUE;
-	break;
-    default:
-	SvGETMAGIC(sv);
-	if (SvOK(sv))
-	    defined = TRUE;
-	break;
-    }
+    SvGETMAGIC(sv);
+    if (SvOK(sv))
+	defined = TRUE;
 
     if (is_dor) {
         if(defined) 
