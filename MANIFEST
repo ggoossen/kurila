@@ -577,12 +577,12 @@ ext/re/t/re_funcs.t		See if exportable 're' funcs in re.xs work
 ext/re/t/regop.pl		generate debug output for various patterns
 ext/re/t/regop.t		test RE optimizations by scraping debug output
 ext/re/t/re.t			see if re pragma works
-ext/Safe/t/safe1.t		See if Safe works
-ext/Safe/t/safe2.t		See if Safe works
-ext/Safe/t/safe3.t		See if Safe works
-ext/Safe/t/safeload.t		Tests that some modules can be loaded by Safe
-ext/Safe/t/safeops.t		Tests that all ops can be trapped by Safe
-ext/Safe/t/safeuniversal.t	Tests Safe with functions from universal.c
+ext/Opcode/t/safe1.t		See if Safe works
+ext/Opcode/t/safe2.t		See if Safe works
+ext/Opcode/t/safe3.t		See if Safe works
+ext/Opcode/t/safeload.t		Tests that some modules can be loaded by Safe
+ext/Opcode/t/safeops.t		Tests that all ops can be trapped by Safe
+ext/Opcode/t/safeuniversal.t	Tests Safe with functions from universal.c
 ext/Socket/Makefile.PL		Socket extension makefile writer
 ext/Socket/Socket.pm		Socket extension Perl module
 ext/Socket/Socket.xs		Socket extension external subroutines
