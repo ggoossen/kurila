@@ -354,9 +354,15 @@ PP(pp_defined)
     }
 
     defined = FALSE;
-    SvGETMAGIC(sv);
-    if (SvOK(sv))
-	defined = TRUE;
+    if (SvTYPE(sv) == SVt_PVCV) {
+	if (CvROOT(sv) || CvXSUB(sv))
+	    defined = TRUE;
+    }
+    else {
+	SvGETMAGIC(sv);
+	if (SvOK(sv))
+	    defined = TRUE;
+    }
 
     if (is_dor) {
         if(defined) 
