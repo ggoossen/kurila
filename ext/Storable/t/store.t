@@ -45,32 +45,32 @@ ok($foo->store('store'));
 ok(open(OUT, ">>", 'store'));
 binmode OUT;
 
-ok(defined store_fd(\@a, \*::OUT));
-ok(defined nstore_fd($foo, \*::OUT));
-ok(defined nstore_fd(\%a, \*::OUT));
+ok(defined store_fd(\@a, \*OUT));
+ok(defined nstore_fd($foo, \*OUT));
+ok(defined nstore_fd(\%a, \*OUT));
 
 ok(close(OUT));
 
 ok(open(OUT, "<", 'store'));
 binmode OUT;
 
-my $r = fd_retrieve(\*::OUT);
+my $r = fd_retrieve(\*OUT);
 ok(defined $r);
 is_deeply($foo, $r);
 
-$r = fd_retrieve(\*::OUT);
+$r = fd_retrieve(\*OUT);
 ok(defined $r);
 is_deeply(\@a, $r);
 
-$r = fd_retrieve(\*main::OUT);
+$r = fd_retrieve(\*OUT);
 ok(defined $r);
 is_deeply($foo, $r);
 
-$r = fd_retrieve(\*::OUT);
+$r = fd_retrieve(\*OUT);
 ok(defined $r);
 is_deeply(\%a, $r);
 
-try { $r = fd_retrieve(\*::OUT); };
+try { $r = fd_retrieve(\*OUT); };
 ok($@);
 
 close OUT or die "Could not close: $!";
