@@ -588,7 +588,7 @@ sub GetOptionsFromArray($@) {
 			    local $@;
 			    try {
 				&{%linkage{$opt}}
-				  ( <Getopt::Long::CallBack->new
+				  (Getopt::Long::CallBack->new
 				   (name    => $opt,
 				    ctl     => $ctl,
 				    opctl   => \%opctl,
@@ -602,14 +602,16 @@ sub GetOptionsFromArray($@) {
 			};
 			print STDERR ("=> die($eval_error)\n")
 			  if $debug && $eval_error ne '';
-			if ( $eval_error =~ m/^!/ ) {
-			    if ( $eval_error =~ m/^!FINISH\b/ ) {
-				$goon = 0;
-			    }
-			}
-			elsif ( $eval_error ne '' ) {
-			    warn ($eval_error);
-			    $error++;
+                        if ($eval_error) {
+                            if ( $eval_error->message =~ m/^!/ ) {
+                                if ( $eval_error->message =~ m/^!FINISH\b/ ) {
+                                    $goon = 0;
+                                }
+                            }
+                            else {
+                                warn ($eval_error);
+                                $error++;
+                            }
 			}
 		    }
 		    else {
