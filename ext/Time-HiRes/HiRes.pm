@@ -159,8 +159,7 @@ No functions are exported by default.
 =item gettimeofday ()
 
 In array context returns a two-element array with the seconds and
-microseconds since the epoch.  In scalar context returns floating
-seconds like C<Time::HiRes::time()> (see below).
+microseconds since the epoch.
 
 =item usleep ( $useconds )
 
@@ -226,7 +225,7 @@ place).  What is going on is that the default floating point format of
 Perl only outputs 15 digits.  In this case that means ten digits
 before the decimal separator and five after.  To see the microseconds
 you can use either C<printf>/C<sprintf> with C<"%.6f">, or the
-C<gettimeofday()> function in list context, which will give you the
+C<gettimeofday()> function, which will give you the
 seconds and microseconds as two separate values.
 
 =item sleep ( $floating_seconds )
@@ -266,9 +265,7 @@ Use of interval timers may interfere with C<alarm()>, C<sleep()>,
 and C<usleep()>.  In standard-speak the "interaction is unspecified",
 which means that I<anything> may happen: it may work, it may not.
 
-In scalar context, the remaining time in the timer is returned.
-
-In list context, both the remaining time and the interval are returned.
+An array with both the remaining time and the interval is returned.
 
 There are usually three or four interval timers (signals) available: the
 C<$which> can be C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>, or
@@ -302,9 +299,7 @@ See your C<setitimer()> documentation.
 
 Return the remaining time in the interval timer specified by C<$which>.
 
-In scalar context, the remaining time is returned.
-
-In list context, both the remaining time and the interval are returned.
+An array with both the remaining time and the interval is returned.
 The interval is always what you put in using C<setitimer()>.
 
 =item clock_gettime ( $which )

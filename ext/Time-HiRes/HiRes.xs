@@ -958,19 +958,17 @@ gettimeofday()
         struct timezone Tz;
         PPCODE:
         int status;
+        AV* res;
         status = gettimeofday (&Tp, &Tz);
 
+        RESULT = sv2_mortal(newAV());
 	if (status == 0) {
 	     Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-             if (GIMME == G_ARRAY) {
-                 EXTEND(sp, 2);
-                 /* Mac OS (Classic) has unsigned time_t */
-                 PUSHs(sv_2mortal(newSVuv(Tp.tv_sec)));
-                 PUSHs(sv_2mortal(newSViv(Tp.tv_usec)));
-             } else {
-                 EXTEND(sp, 1);
-                 PUSHs(sv_2mortal(newSVnv(Tp.tv_sec + (Tp.tv_usec / NV_1E6))));
-	     }
+             /* Mac OS (Classic) has unsigned time_t */
+             res = newAV();
+             mXPUSHs((SV*)res);
+             av_push(res, newSVuv(Tp.tv_sec));
+             av_push(res, newSViv(Tp.tv_usec));
         }
 
 NV
@@ -997,16 +995,13 @@ gettimeofday()
         struct timeval Tp;
         PPCODE:
 	int status;
+        AV* res;
         status = gettimeofday (&Tp, NULL);
 	if (status == 0) {
-	     if (GIMME == G_ARRAY) {
-	         EXTEND(sp, 2);
-                 PUSHs(sv_2mortal(newSViv(Tp.tv_sec)));
-                 PUSHs(sv_2mortal(newSViv(Tp.tv_usec)));
-             } else {
-                 EXTEND(sp, 1);
-                 PUSHs(sv_2mortal(newSVnv(Tp.tv_sec + (Tp.tv_usec / NV_1E6))));
-             }
+            res = newAV();
+            mXPUSHs((SV*)res);
+            av_push(res, newSViv(Tp.tv_sec));
+            av_push(res, newSViv(Tp.tv_usec));
         }
 
 NV
@@ -1040,6 +1035,7 @@ setitimer(which, seconds, interval = 0)
 	struct itimerval newit;
 	struct itimerval oldit;
     PPCODE:
+        AV* res;
 	if (seconds < 0.0 || interval < 0.0)
 	    croak("Time::HiRes::setitimer(%"IVdf", %"NVgf", %"NVgf"): negative time not invented yet", (IV)which, seconds, interval);
 	newit.it_value.tv_sec  = (IV)seconds;
@@ -1049,12 +1045,10 @@ setitimer(which, seconds, interval = 0)
 	newit.it_interval.tv_usec =
 	  (IV)((interval - (NV)newit.it_interval.tv_sec) * NV_1E6);
 	if (setitimer(which, &newit, &oldit) == 0) {
-	  EXTEND(sp, 1);
-	  PUSHs(sv_2mortal(newSVnv(TV2NV(oldit.it_value))));
-	  if (GIMME == G_ARRAY) {
-	    EXTEND(sp, 1);
-	    PUSHs(sv_2mortal(newSVnv(TV2NV(oldit.it_interval))));
-	  }
+            res = newAV();
+            mXPUSHs((SV*)res);
+            av_push(res, newSVnv(TV2NV(oldit.it_value)));
+	    av_push(res, newSVnv(TV2NV(oldit.it_interval)));
 	}
 
 void
@@ -1064,12 +1058,13 @@ getitimer(which)
 	struct itimerval nowit;
     PPCODE:
 	if (getitimer(which, &nowit) == 0) {
-	  EXTEND(sp, 1);
-	  PUSHs(sv_2mortal(newSVnv(TV2NV(nowit.it_value))));
-	  if (GIMME == G_ARRAY) {
-	    EXTEND(sp, 1);
-	    PUSHs(sv_2mortal(newSVnv(TV2NV(nowit.it_interval))));
-	  }
+            if (TV2NV(nowit.it_value)) {
+                AV* res;
+                res = newAV();
+                mXPUSHs((SV*)res);
+                av_push(res, newSVnv(TV2NV(nowit.it_value)));
+                av_push(res, newSVnv(TV2NV(nowit.it_interval)));
+            }
 	}
 
 #endif /* #if defined(HAS_GETITIMER) && defined(HAS_SETITIMER) */
@@ -1204,6 +1199,8 @@ PROTOTYPE: ;$
 	PUTBACK;
 	ENTER;
 	PL_laststatval = -1;
+        PL_op->op_flags &= ~OPf_WANT;
+        PL_op->op_flags |= G_ARRAY;
 	(void)*(PL_ppaddr[OP_STAT])(aTHX);
 	SPAGAIN;
 	LEAVE;
