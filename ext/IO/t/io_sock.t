@@ -330,7 +330,7 @@ if( $server_pid) {
          || IO::Socket::INET->new("127.0.0.1:$serverport");
 
     if ($sock) {
-	$sock->print("done\n");
+	$sock->print("quit\n");
 	$sock->close;
 
 	print "not " if( 1 != kill 0, $server_pid);
