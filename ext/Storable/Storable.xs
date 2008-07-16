@@ -1761,15 +1761,12 @@ static AV *array_call(
 	XPUSHs(sv_2mortal(newSViv(cloning)));		/* Cloning flag */
 	PUTBACK;
 
-	count = perl_call_sv(hook, G_ARRAY);		/* Go back to Perl code */
+	count = perl_call_sv(hook, G_SCALAR);		/* Go back to Perl code */
 
 	SPAGAIN;
 
-	av = newAV();
-	for (i = count - 1; i >= 0; i--) {
-		SV *sv = POPs;
-		av_store(av, i, SvREFCNT_inc(sv));
-	}
+        assert(count == 1);
+	av = SvREFCNT_inc(POPs);
 
 	PUTBACK;
 	FREETMPS;
@@ -2779,7 +2776,6 @@ static int store_hook(
 	SvRV_set(ref, NULL);
 	SvREFCNT_dec(ref);					/* Reclaim temporary reference */
 
-	count = AvFILLp(av) + 1;
 	TRACEME(("store_hook, array holds %d items", count));
 
 	/*
@@ -2791,7 +2787,7 @@ static int store_hook(
 	 * since it's present in the cache) and recurse to store_blessed().
 	 */
 
-	if (!count) {
+	if (!SvOK(av)) {
 		/*
 		 * They must not change their mind in the middle of a serialization.
 		 */
@@ -2811,6 +2807,13 @@ static int store_hook(
 	/*
 	 * Get frozen string.
 	 */
+
+        if ( ! SvAVOK(av) )
+           Perl_croak(aTHX_ "STORAGE_freeze did not return an ARRAY but returned a %s", Ddesc((SV*)av));
+
+	count = AvFILLp(av) + 1;
+        if (count == 0)
+           Perl_croak(aTHX "STORAGE_freeze should return an ARRAY with at least one element");
 
 	ary = AvARRAY(av);
 	pv = SvPV(ary[0], len2);
