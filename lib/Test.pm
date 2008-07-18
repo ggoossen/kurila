@@ -175,20 +175,6 @@ sub plan {
 	print $TESTOUT "1..$max\n";
     }
     ++$planned;
-    print $TESTOUT "# Running under perl version $^V for $^O",
-      (chr(65) eq 'A') ? "\n" : " in a non-ASCII world\n";
-
-    print $TESTOUT "# Win32::BuildNumber ", < &Win32::BuildNumber(), "\n"
-      if defined(&Win32::BuildNumber) and defined &Win32::BuildNumber();
-
-    print $TESTOUT "# MacPerl version $MacPerl::Version\n"
-      if defined $MacPerl::Version;
-
-    printf $TESTOUT
-      "# Current time local: \%s\n# Current time GMT:   \%s\n",
-      scalar(localtime($^T)), scalar(gmtime($^T));
-
-    print $TESTOUT "# Using Test.pm version $VERSION\n";
 
     # Retval never used:
     return undef;
