@@ -5951,7 +5951,8 @@ Perl_ck_fun(pTHX_ OP *o)
 			"Useless use of %s with no values",
 			PL_op_desc[type]);
 
-		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONLIST)
+		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONLIST
+		    && kid->op_type != OP_RV2SV)
 		    bad_type(numargs, "array", PL_op_desc[type], kid);
 		mod(kid, type);
 #ifdef PERL_MAD
@@ -5959,7 +5960,8 @@ Perl_ck_fun(pTHX_ OP *o)
 #endif
 		break;
 	    case OA_HVREF:
-		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONHASH)
+		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONHASH
+		    && kid->op_type != OP_RV2SV)
 		    bad_type(numargs, "hash", PL_op_desc[type], kid);
 		mod(kid, type);
 #ifdef PERL_MAD
