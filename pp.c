@@ -3533,12 +3533,12 @@ PP(pp_exists)
     dVAR;
     dSP;
     SV *tmpsv;
-    HV *hv;
+    SV *sv;
 
     if (PL_op->op_private & OPpEXISTS_SUB) {
 	GV *gv;
-	SV * const sv = POPs;
-	CV * const cv = sv_2cv(sv, &gv, 0);
+	SV * const cvsv = POPs;
+	CV * const cv = sv_2cv(cvsv, &gv, 0);
 	if (cv)
 	    RETPUSHYES;
 	if (gv && isGV(gv) && GvCV(gv) && !GvCVGEN(gv))
@@ -3546,23 +3546,20 @@ PP(pp_exists)
 	RETPUSHNO;
     }
     tmpsv = POPs;
-    hv = (HV*)POPs;
+    sv = POPs;
 
-    if ( ! SvHVOK(hv) )
-	Perl_croak(aTHX_ "Not a HASH");
-
-    if (SvTYPE(hv) == SVt_PVHV) {
-	if (hv_exists_ent(hv, tmpsv, 0))
+    if (SvTYPE(sv) == SVt_PVHV) {
+	if (hv_exists_ent((HV*)sv, tmpsv, 0))
 	    RETPUSHYES;
     }
-    else if (SvTYPE(hv) == SVt_PVAV) {
+    else if (SvTYPE(sv) == SVt_PVAV) {
 	if (PL_op->op_flags & OPf_SPECIAL) {		/* array element */
-	    if (av_exists((AV*)hv, SvIV(tmpsv)))
+	    if (av_exists((AV*)sv, SvIV(tmpsv)))
 		RETPUSHYES;
 	}
     }
     else {
-	DIE(aTHX_ "Not a HASH reference");
+	DIE(aTHX_ "exists expected an ARRAY or a HASH but got a %d", Ddesc(sv));
     }
     RETPUSHNO;
 }
