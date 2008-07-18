@@ -71,7 +71,7 @@ EOT
 
 print OUT <<'EOT';
     my $modpname = join('/', < @modparts);
-    my $modlibname = (caller())[1];
+    my $modlibname = @(caller())[1];
     my $c = nelems @modparts;
     $modlibname =~ s,[\\/][^\\/]+$,, while $c--;	# Q&D basename
     my $file = "$modlibname/auto/$modpname/$modfname.$dl_dlext";
