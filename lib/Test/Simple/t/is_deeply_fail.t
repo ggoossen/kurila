@@ -159,12 +159,13 @@ ERR
 ok !is_deeply(\@(), \23,    'mixed scalar and array refs');
 is( $out, "not ok 9 - mixed scalar and array refs\n",
                                         'mixed scalar and array refs' );
-like( $err, <<ERR,                      '    right diagnostic' );
+is( $err, <<ERRHEAD . <<'ERR',                      '    right diagnostic' );
 #   Failed test 'mixed scalar and array refs'
-#   at $Filename line 151.
+#   at $0 line 151.
+ERRHEAD
 #     Structures begin differing at:
-#          \\\$got = ARRAY\\(0x[0-9a-f]+\\)
-#     \\\$expected = SCALAR\\(0x[0-9a-f]+\\)
+#     ${     $got} = @(ARRAY (TODO))
+#     ${$expected} = 23
 ERR
 
 
@@ -210,8 +211,8 @@ is( $err, <<ERR,                            '    right diagnostic' );
 #   Failed test 'deep structures'
 #   at $0 line 198.
 #     Structures begin differing at:
-#          \$got->\{that\}\{foo\} = Does not exist
-#     \$expected->\{that\}\{foo\} = 42
+#          \$got->\{that\}->\{foo\} = Does not exist
+#     \$expected->\{that\}->\{foo\} = 42
 ERR
 
 
@@ -248,7 +249,7 @@ ok !is_deeply(\@($a), \@(dump::view($a).'')),   "  even deep inside";
 
 #line 265
 # [rt.cpan.org 7030]
-ok !is_deeply( \%(), \%(key => \@()) ),  '[] could match non-existent values';
+ok !is_deeply( \%(), \%(key => \@()) ),  '\@() could match non-existent values';
 ok !is_deeply( \@(), \@(\@()) );
 
 
@@ -304,11 +305,12 @@ ERR
 #line 321
     ok !is_deeply( $array, $hash );
     is( $out, "not ok 24\n", 'is_deeply and different reference types' );
-    is( $err, <<ERR, 	     '  right diagnostic' );
+    is( $err, <<ERRHEAD.<<'ERR', 	     '  right diagnostic' );
 #   Failed test at $0 line 321.
 #     Structures begin differing at:
-#          \$got = {dump::view($array)}
-#     \$expected = {dump::view($hash)}
+ERRHEAD
+#     ${     $got} = @(ARRAY (TODO))
+#     ${$expected} = @(HASH (TODO))
 ERR
 
 #line 332
