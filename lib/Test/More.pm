@@ -1215,6 +1215,11 @@ sub _deep_check {
         }
         %Refs_Seen{ref::address $e1} = ref::address $e2;
 
+        if (_dne($e1) or _dne($e2)) {
+            $ok = _dne($e1) && _dne($e2);
+            return $ok;
+        }
+
         my $type = ref::svtype($e1);
         $type = 'DIFFERENT' unless ref::svtype($e2) eq $type;
 
