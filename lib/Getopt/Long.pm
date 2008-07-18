@@ -285,7 +285,7 @@ sub GetOptionsFromArray($@) {
     my ($argv, < @optionlist) = < @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
     my %opctl = %( () );		# table of option specs
-    my $pkg = $caller || (caller)[0];	# current context
+    my $pkg = $caller || @(caller)[0];	# current context
 				# Needed if linkage is omitted.
     my @ret = @( () );		# accum for non-options
     my %linkage;		# linkage

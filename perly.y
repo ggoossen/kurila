@@ -769,7 +769,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             TOKEN_GETMAD($2,$$,'a');
                         }
 	|	term '[' expr ']'          /* $array[$element] */
-			{ $$ = newBINOP(OP_AELEM, 0, $1, scalar($3));
+                        { $$ = newBINOP(OP_AELEM, 0, scalar($1), scalar($3));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
 			}
@@ -864,24 +864,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($3,$$,'[');
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,']');
-			}
-	|	'(' expr ')' '[' expr ']'            /* list element */
-			{ $$ = newBINOP(OP_AELEM, 0,
-					convert(OP_ANONLIST, 0, $2),
-					scalar($5));
-			  TOKEN_GETMAD($1,$$,'(');
-			  TOKEN_GETMAD($3,$$,')');
-			  TOKEN_GETMAD($4,$$,'[');
-			  TOKEN_GETMAD($6,$$,']');
-			}
-	|	'(' ')' '[' expr ']'            /* empty list element */
-			{ $$ = newBINOP(OP_AELEM, 0,
-					convert(OP_ANONLIST, 0, (OP*)NULL),
-					scalar($4));
-			  TOKEN_GETMAD($1,$$,'(');
-			  TOKEN_GETMAD($2,$$,')');
-			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,']');
 			}
     ;
 
