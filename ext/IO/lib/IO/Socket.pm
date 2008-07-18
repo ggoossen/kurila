@@ -98,7 +98,7 @@ sub socketpair {
     %{*$sock1}{'io_socket_type'}  = %{*$sock2}{'io_socket_type'}  = $type;
     %{*$sock1}{'io_socket_proto'} = %{*$sock2}{'io_socket_proto'} = $protocol;
 
-    ($sock1,$sock2);
+    return @($sock1, $sock2);
 }
 
 sub connect {
