@@ -47,17 +47,17 @@ my @syms = @( map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car
 push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.
-ok( join('', sort < @syms) eq join('', sort keys %Subs), 'all symbols found' );
+is( join('#', sort keys %Subs), join('#', sort < @syms), 'all symbols found' );
 
 # Make sure we only hit them each once.
 ok( (!grep $_ != 1, values %Subs), '...and found once' );
 
 # Tests for MAGIC / MOREMAGIC
-ok( B::svref_2object(\$.)->MAGIC->TYPE eq "\0", '$. has \0 magic' );
+ok( B::svref_2object(\$1)->MAGIC->TYPE eq "\0", '$1 has \0 magic' );
 {
     my $e = '';
     # Used to dump core, bug #16828
-    try { B::svref_2object(\$.)->MAGIC->MOREMAGIC->TYPE; };
+    try { B::svref_2object(\$1)->MAGIC->MOREMAGIC->TYPE; };
     like( $@->{description}, qr/Can't call method "TYPE" on an undefined value/, 
 	'$. has no more magic' );
 }
@@ -137,7 +137,7 @@ my $hv_ref = B::svref_2object(\$hv);
 is(ref $hv_ref, "$RV_class",
    "Test $RV_class return from svref_2object - hash");
 
-local *gv = *STDOUT;
+local *gv = *STDOUT{IO};
 my $gv_ref = B::svref_2object(\*gv);
 is(ref $gv_ref, "B::GV", "Test B::GV return from svref_2object");
 ok(! $gv_ref->is_empty(), "Test is_empty()");

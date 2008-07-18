@@ -51,9 +51,9 @@ while ( ~< *DATA) {
 	my $deparsed = $deparse->coderef2text( $coderef );
 	my $regex = $expected;
 	$regex =~ s/(\S+)/\Q$1/g;
-	$regex =~ s/\s+/\\s+/g;
-	$regex = '^\{\s*' . $regex . '\s*\}$';
-        like($deparsed, qr/$regex/, $testname);
+	$regex =~ s/\s+/ \\s+ /g;
+	$regex = '^ \{ \s* ' . $regex . ' \s* \} $';
+        like($deparsed, qr/$regex/x, $testname);
     }
 }
 
@@ -121,7 +121,7 @@ sub test {
    like( $res, qr/use warnings/);
 }
 my ($q,$p);
-my $x=sub { ++$q,++$p };
+my $x=sub { @( ++$q,++$p ) };
 test($x);
 eval <<EOFCODE and test($x);
    package bar;
@@ -172,14 +172,6 @@ $test /= 2 if ++$test;
     ;
 }
 ####
-# 9
-{
-    234;
-}
-continue {
-    123;
-}
-####
 # 10
 my $x;
 print $main::x;
@@ -191,6 +183,10 @@ print @main::x[1];
 # 12
 my %x;
 %x{warn()};
+####
+my($x, $y) = < @('xx', 'yy');
+####
+my @x = @( 1..10 );
 ####
 # 13
 my $foo;
