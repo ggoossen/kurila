@@ -88,7 +88,7 @@ sub _sock_info {
 
   if(defined $port) {
     my $defport = ($port =~ s,\((\d+)\)$,,) ? $1 : undef;
-    my $pnum = ($port =~ m,^(\d+)$,)[0];
+    my $pnum = @($port =~ m,^(\d+)$,)[0];
 
     @serv = @( getservbyname($port, _get_proto_name($proto) || "") )
 	if ($port =~ m,\D,);
@@ -268,14 +268,14 @@ sub sockaddr {
     (nelems @_) == 1 or croak 'usage: $sock->sockaddr()';
     my($sock) = < @_;
     my $name = $sock->sockname;
-    $name ? ( <sockaddr_in($name))[1] : undef;
+    $name ? sockaddr_in($name)[1] : undef;
 }
 
 sub sockport {
     (nelems @_) == 1 or croak 'usage: $sock->sockport()';
     my($sock) = < @_;
     my $name = $sock->sockname;
-    $name ? ( <sockaddr_in($name))[0] : undef;
+    $name ? sockaddr_in($name)[0] : undef;
 }
 
 sub sockhost {
@@ -289,14 +289,14 @@ sub peeraddr {
     (nelems @_) == 1 or croak 'usage: $sock->peeraddr()';
     my($sock) = < @_;
     my $name = $sock->peername;
-    $name ? ( <sockaddr_in($name))[1] : undef;
+    $name ? sockaddr_in($name)[1] : undef;
 }
 
 sub peerport {
     (nelems @_) == 1 or croak 'usage: $sock->peerport()';
     my($sock) = < @_;
     my $name = $sock->peername;
-    $name ? ( <sockaddr_in($name))[0] : undef;
+    $name ? sockaddr_in($name)[0] : undef;
 }
 
 sub peerhost {

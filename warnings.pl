@@ -680,18 +680,18 @@ sub __chk
 	    unless defined $offset;
     }
     else {
-        $category = (caller(1))[0] ;
+        $category = @(caller(1))[0] ;
         $offset = %Offsets{$category};
         die("package '$category' not registered for warnings")
 	    unless defined $offset ;
     }
 
-    my $this_pkg = (caller(1))[0] ;
+    my $this_pkg = @(caller(1))[0] ;
     my $i = 2 ;
     my $pkg ;
 
     if ($isobj) {
-        while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
+        while (do { { package DB; $pkg = @(caller($i++))[0] } } ) {
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;
@@ -700,7 +700,7 @@ sub __chk
         $i = 2;
     }
 
-    my $callers_bitmask = (caller($i))[9] ;
+    my $callers_bitmask = @(caller($i))[9] ;
     return ($callers_bitmask, $offset, $i) ;
 }
 

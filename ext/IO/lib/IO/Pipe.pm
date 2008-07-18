@@ -34,7 +34,7 @@ sub new {
 
 sub handles {
     (nelems @_) == 1 or croak 'usage: $pipe->handles()';
-    (IO::Pipe::End->new(), IO::Pipe::End->new());
+    return @(IO::Pipe::End->new(), IO::Pipe::End->new());
 }
 
 my $do_spawn = $^O eq 'os2' || $^O eq 'MSWin32';
