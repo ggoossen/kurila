@@ -113,7 +113,7 @@ chmod 0644, $h_file;
 open H_FILE, ">", "$h_file" or die "Can't open $h_file: $!\n";
 my $endcore_done = 0;
 while ( ~< *TMPH_FILE) {
-    print H_FILE "#ifdef PERL_CORE\n" if $. == 1;
+    print H_FILE "#ifdef PERL_CORE\n" if iohandle::input_line_number(\*TMPH_FILE) == 1;
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/) {
 	print H_FILE "#endif /* PERL_CORE */\n";
 	$endcore_done = 1;
@@ -224,7 +224,7 @@ sub make_type_tab {
     open my $fh, '<', $y_file or die "Can't open $y_file: $!\n";
     while ( ~< $fh) {
 	if (m/(\$\d+)\s*=/) {
-	    warn "$y_file:$.: dangerous assignment to $1: $_";
+	    warn "$y_file:{iohandle::input_line_number($fh)}: dangerous assignment to $1: $_";
 	}
 
 	if (m/__DEFAULT__/) {

@@ -617,8 +617,6 @@ pd	|PADOFFSET|pad_alloc	|I32 optype|U32 tmptype
 p	|PADOFFSET|allocmy	|NN const char *const name
 pdR	|PADOFFSET|pad_findmy	|NN const char* name
 Ap	|PADOFFSET|find_rundefsvoffset	|
-pR	|OP*	|oopsAV		|NN OP* o
-pR	|OP*	|oopsHV		|NN OP* o
 pd	|void	|pad_leavemy
 Apd	|SV*	|pad_sv		|PADOFFSET po
 pd	|void	|pad_free	|PADOFFSET po

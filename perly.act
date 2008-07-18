@@ -767,7 +767,7 @@ case 2:
 
   case 93:
 #line 772 "perly.y"
-    { (yyval.opval) = newBINOP(OP_AELEM, 0, oopsAV((ps[(1) - (4)].val.opval)), scalar((ps[(3) - (4)].val.opval)));
+    { (yyval.opval) = newBINOP(OP_AELEM, 0, (ps[(1) - (4)].val.opval), scalar((ps[(3) - (4)].val.opval)));
 			  TOKEN_GETMAD((ps[(2) - (4)].val.i_tkval),(yyval.opval),'[');
 			  TOKEN_GETMAD((ps[(4) - (4)].val.i_tkval),(yyval.opval),']');
 			;}
@@ -831,7 +831,7 @@ case 2:
 
   case 98:
 #line 821 "perly.y"
-    { (yyval.opval) = newBINOP(OP_HELEM, 0, oopsHV((ps[(1) - (5)].val.opval)), jmaybe((ps[(3) - (5)].val.opval)));
+    { (yyval.opval) = newBINOP(OP_HELEM, 0, (ps[(1) - (5)].val.opval), jmaybe((ps[(3) - (5)].val.opval)));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD((ps[(2) - (5)].val.i_tkval),(yyval.opval),'{');
 			  TOKEN_GETMAD((ps[(4) - (5)].val.i_tkval),(yyval.opval),';');
@@ -898,7 +898,7 @@ case 2:
   case 104:
 #line 869 "perly.y"
     { (yyval.opval) = newBINOP(OP_AELEM, 0,
-					oopsAV(convert(OP_ANONLIST, 0, (ps[(2) - (6)].val.opval))),
+					convert(OP_ANONLIST, 0, (ps[(2) - (6)].val.opval)),
 					scalar((ps[(5) - (6)].val.opval)));
 			  TOKEN_GETMAD((ps[(1) - (6)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(3) - (6)].val.i_tkval),(yyval.opval),')');
@@ -910,7 +910,7 @@ case 2:
   case 105:
 #line 878 "perly.y"
     { (yyval.opval) = newBINOP(OP_AELEM, 0,
-					oopsAV(convert(OP_ANONLIST, 0, (OP*)NULL)),
+					convert(OP_ANONLIST, 0, (OP*)NULL),
 					scalar((ps[(4) - (5)].val.opval)));
 			  TOKEN_GETMAD((ps[(1) - (5)].val.i_tkval),(yyval.opval),'(');
 			  TOKEN_GETMAD((ps[(2) - (5)].val.i_tkval),(yyval.opval),')');

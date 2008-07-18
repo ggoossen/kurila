@@ -5359,26 +5359,6 @@ Perl_newANONATTRSUB(pTHX_ I32 floor, OP *proto, OP *attrs, OP *block)
 }
 
 OP *
-Perl_oopsAV(pTHX_ OP *o)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_OOPSAV;
-
-    return o;
-}
-
-OP *
-Perl_oopsHV(pTHX_ OP *o)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_OOPSHV;
-
-    return o;
-}
-
-OP *
 Perl_newAVREF(pTHX_ OP *o)
 {
     dVAR;
