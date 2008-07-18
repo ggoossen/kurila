@@ -918,9 +918,14 @@ void
 AvARRAY(av)
 	B::AV	av
     PPCODE:
-        SV *avcopy = newSV(0);
-        sv_setsv(avcopy, (SV*)av); 
-        mXPUSHs(avcopy);
+        AV* res = newAV();
+        mXPUSHs((SV*)res);
+        if (AvFILL(av) >= 0) {
+            SV **svp = AvARRAY(av);
+            I32 i;
+            for (i = 0; i <= AvFILL(av); i++)
+                av_push(res, SvREFCNT_inc(make_sv_object(aTHX_ sv_newmortal(), svp[i])));
+        }
 
 void
 AvARRAYelt(av, idx)

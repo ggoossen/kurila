@@ -79,7 +79,7 @@ sub B::GV::SAFENAME {
 
 sub B::IV::int_value {
   my ($self) = < @_;
-  return  @(($self->FLAGS() ^&^ SVf_IVisUV()) ? $self->UVX : $self->IV);
+  return  ($self->FLAGS() ^&^ SVf_IVisUV()) ? $self->UVX : $self->IV;
 }
 
 sub B::NULL::as_string() {""}
@@ -866,11 +866,6 @@ IoIFP($io) == PerlIO_stdin() ).
 
 Like C<ARRAY>, but takes an index as an argument to get only one element,
 rather than a list of all of them.
-
-=item OFF
-
-This method is deprecated if running under Perl 5.8, and is no longer present
-if running under Perl 5.9
 
 =item AvFLAGS
 
