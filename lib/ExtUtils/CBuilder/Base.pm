@@ -212,7 +212,7 @@ sub _do_link {
   $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
     or die "error building $out from {join ' ', <@$objects}";
   
-  return @($out, @temp_files);
+  return @($out, < @temp_files);
 }
 
 
