@@ -1210,8 +1210,10 @@ frexp(x)
     PPCODE:
 	int expvar;
 	/* (We already know stack is long enough.) */
-	PUSHs(sv_2mortal(newSVnv(frexp(x,&expvar))));
-	PUSHs(sv_2mortal(newSViv(expvar)));
+        AV* res = newAV();
+        mPUSHs((SV*)res);
+	av_push(res, newSVnv(frexp(x,&expvar)));
+	av_push(res, newSViv(expvar));
 
 NV
 ldexp(x,exp)
