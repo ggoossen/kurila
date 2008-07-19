@@ -31,7 +31,7 @@ while ( ~< *DATA) {
     next unless $_;
     next if m/^#/;
     my ($keyword) = split;
-    print < &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
+    print &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
 }
 
 print $kw "\n/* ex: set ro: */\n";
@@ -82,6 +82,7 @@ close
 closedir
 cmp
 connect
+continue
 cos
 crypt
 defined
@@ -161,6 +162,7 @@ lock
 log
 lstat
 nelems
+nkeys
 m
 map
 mkdir

@@ -3827,6 +3827,27 @@ PP(pp_nelems)
     RETURN;
 }
 
+PP(pp_nkeys)
+{
+    dVAR; dSP;
+    dTOPss;
+    dTARGET;
+
+    if ( ! SvOK(sv) ) {
+	SETi(0);
+	RETURN;
+    }
+
+    if (SvHVOK(sv)) {
+	SETi( HvKEYS((HV*)sv) );
+    }
+    else {
+	Perl_croak(aTHX_ "nkeys expected a hash but got %s", Ddesc(sv));
+    }
+
+    RETURN;
+}
+
 PP(pp_splice)
 {
     dVAR; dSP; dMARK; dORIGMARK;

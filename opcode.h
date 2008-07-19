@@ -159,6 +159,7 @@ EXTCONST char* const PL_op_name[] = {
 	"each",
 	"values",
 	"keys",
+	"nkeys",
 	"delete",
 	"exists",
 	"rv2hv",
@@ -513,6 +514,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"each",
 	"values",
 	"keys",
+	"numer of keys",
 	"delete",
 	"exists",
 	"hash dereference",
@@ -879,6 +881,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_each),
 	MEMBER_TO_FPTR(Perl_do_kv),	/* Perl_pp_values */
 	MEMBER_TO_FPTR(Perl_do_kv),	/* Perl_pp_keys */
+	MEMBER_TO_FPTR(Perl_pp_nkeys),
 	MEMBER_TO_FPTR(Perl_pp_delete),
 	MEMBER_TO_FPTR(Perl_pp_exists),
 	MEMBER_TO_FPTR(Perl_pp_rv2hv),
@@ -1242,6 +1245,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* each */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* values */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* keys */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* nkeys */
 	MEMBER_TO_FPTR(Perl_ck_delete),	/* delete */
 	MEMBER_TO_FPTR(Perl_ck_exists),	/* exists */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2hv */
@@ -1599,6 +1603,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00009600,	/* each */
 	0x00009608,	/* values */
 	0x00003608,	/* keys */
+	0x00002208,	/* nkeys */
 	0x00003600,	/* delete */
 	0x00003614,	/* exists */
 	0x00000248,	/* rv2hv */
