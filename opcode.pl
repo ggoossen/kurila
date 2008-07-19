@@ -777,6 +777,7 @@ aslice		array slice		ck_null		m@	A L
 each		each			ck_fun		%	H
 values		values			ck_fun		t%	H
 keys		keys			ck_fun		t%	S
+nkeys		numer of keys		ck_fun		t1	S
 delete		delete			ck_delete	%	S
 exists		exists			ck_exists	is%	S
 rv2hv		hash dereference	ck_rvconst	dt1	

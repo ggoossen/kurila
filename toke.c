@@ -5282,6 +5282,9 @@ Perl_yylex(pTHX)
 	case KEY_nelems:
 	    UNI(OP_NELEMS);
 
+	case KEY_nkeys:
+	    UNI(OP_NKEYS);
+
 	case KEY_m:
 	    s = scan_pat(s,OP_MATCH);
 	    TERM(sublex_start(pl_yylval.ival, PL_lex_op));
@@ -7229,6 +7232,17 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
               goto unknown;
           }
 
+        case 'n':
+          if (name[1] == 'k' &&
+              name[2] == 'e' &&
+              name[3] == 'y' &&
+              name[4] == 's')
+          {                                       /* nkeys      */
+            return KEY_nkeys;
+          }
+
+          goto unknown;
+
         case 'm':
           if (name[1] == 'k' &&
               name[2] == 'd' &&
@@ -7661,6 +7675,8 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
             return KEY_nelems;
           }
 
+          goto unknown;
+
         case 'p':
           if (name[1] == 'r' &&
               name[2] == 'i' &&
@@ -7978,16 +7994,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
               {
                 switch (name[3])
                 {
-                  case 'a':
-                    if (name[4] == 'u' &&
-                        name[5] == 'l' &&
-                        name[6] == 't')
-                    {                             /* default    */
-                      return (all_keywords || FEATURE_IS_ENABLED("switch") ? KEY_default : 0);
-                    }
-
-                    goto unknown;
-
                   case 'i':
                     if (name[4] == 'n' &&
                         name[5] == 'e' &&

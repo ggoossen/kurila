@@ -170,6 +170,7 @@ Perl_pp_aslice
 Perl_pp_each
 Perl_pp_values
 Perl_pp_keys
+Perl_pp_nkeys
 Perl_pp_delete
 Perl_pp_exists
 Perl_pp_rv2hv
