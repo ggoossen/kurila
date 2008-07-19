@@ -88,7 +88,7 @@ close $packlist or die;
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
 # be lowercase. :(
 my $native_dummy = File::Spec->catfile(qw(install-test lib perl Big Dummy.pm));
-is( keys %packlist, 1 );
+is( nkeys %packlist, 1 );
 is( lc((keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
 
 

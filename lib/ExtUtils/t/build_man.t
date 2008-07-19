@@ -51,7 +51,7 @@ open STDOUT, '>>', \$stdout  or die;
         VERSION_FROM    => 'lib/Big/Dummy.pm',
     );
 
-    ok( keys %{ $mm->{MAN3PODS} } );
+    ok( %{ $mm->{MAN3PODS} } );
 }
 
 {
@@ -61,7 +61,7 @@ open STDOUT, '>>', \$stdout  or die;
         INSTALLMAN3DIR  => 'none'
     );
 
-    ok( !keys %{ $mm->{MAN3PODS} } );
+    ok( !%{ $mm->{MAN3PODS} } );
 }
 
 

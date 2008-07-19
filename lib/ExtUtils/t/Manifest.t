@@ -137,7 +137,7 @@ ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ),
 # only MANIFEST and foo are in the manifest
 $_ = 'foo';
 my $files = maniread();
-is( keys %$files, 2, 'two files found' );
+is( nkeys %$files, 2, 'two files found' );
 is( join(' ', sort { lc($a) cmp lc($b) } keys %$files), 'foo MANIFEST', 
                                         'both files found' );
 is( $_, 'foo', q{maniread() doesn't clobber $_} );
@@ -286,7 +286,7 @@ SKIP: {
 
 
 END {
-	is( unlink( keys %Files ), keys %Files, 'remove all added files' );
+	is( unlink( keys %Files ), nkeys %Files, 'remove all added files' );
 	remove_dir( 'moretest', 'copy' );
 
 	# now get rid of the parent directory

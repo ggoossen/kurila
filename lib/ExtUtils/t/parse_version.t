@@ -37,7 +37,7 @@ if( $Has_Version ) {
     %versions{q[$VERSION = v1.2.3]}               = v1.2.3;
 }
 
-plan tests => (2 * keys %versions) + 4;
+plan tests => (2 * nkeys %versions) + 4;
 
 while( my($code, $expect) = each %versions ) {
     is( parse_version_string($code), $expect, $code );

@@ -59,7 +59,7 @@ if ($^O eq 'MSWin32') {
   skip 'No splitting in split_like_shell() on Win32';
 }
 else {
-  ok (nelems @words), 2;
+  ok nelems(@words), 2;
   ok @words[0], 'foo';
   ok @words[1], 'bar';
 }
