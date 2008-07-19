@@ -180,10 +180,10 @@ sub Dumpperl {
     if (defined $name) {
       if ($name =~ m/^[*](.*)$/) {
 	if (defined $val) {
-	  $name = (ref $val eq 'ARRAY') ? ( "\@" . $1 ) :
-		  (ref $val eq 'HASH')  ? ( "\%" . $1 ) :
-		  (ref $val eq 'CODE')  ? ( "\*" . $1 ) :
-					  ( "\$" . $1 ) ;
+	  $name = (ref::svtype($val) eq 'ARRAY') ? ( '@' . $1 ) :
+		  (ref::svtype($val) eq 'HASH')  ? ( '%' . $1 ) :
+		  (ref::svtype($val) eq 'CODE')  ? ( '*' . $1 ) :
+                                                   ( '$' . $1 ) ;
 	}
 	else {
 	  $name = "\$" . $1;
