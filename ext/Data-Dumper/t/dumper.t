@@ -99,6 +99,12 @@ is Data::Dumper->Dump(\@( bless \%( aap => 'noot' ), 'version' ), \@('a')), <<'=
 #            ), "version" );
 ====
 
+is Data::Dumper->Dump(\@(%( aap => 'noot' )), \@('*mies')), <<'====';
+#%mies = %(
+#        "aap" => "noot"
+#        );
+====
+
 #XXXif (0) {
 #############
 #############
