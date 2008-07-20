@@ -30,9 +30,9 @@ my $thawed = Storable::thaw( $string );
 is( ref($thawed), 'ARRAY', 'Top level ARRAY' );
 is( scalar(nelems @$thawed), 1, 'ARRAY contains one element' );
 isa_ok( $thawed->[0], 'Foo' );
-is( scalar(keys %{$thawed->[0]}), 1, 'Foo contains one element' );
+is( nkeys(%{$thawed->[0]}), 1, 'Foo contains one element' );
 isa_ok( $thawed->[0]->{Foo}, 'Bar' );
-is( scalar(keys %{$thawed->[0]->{Foo}}), 1, 'Bar contains one element' );
+is( nkeys(%{$thawed->[0]->{Foo}}), 1, 'Bar contains one element' );
 isa_ok( $thawed->[0]->{Foo}->{Bar}, 'Foo' );
 is( $thawed->[0], $thawed->[0]->{Foo}->{Bar}, 'Circular is... well... circular' );
 

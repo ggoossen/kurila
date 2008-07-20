@@ -24,7 +24,7 @@ use Storable qw(freeze thaw);
 );
 
 my $test = 12;
-my $tests = $test + 6 + 2 * 6 * keys %::immortals;
+my $tests = $test + 6 + 2 * 6 * nkeys %::immortals;
 print "1..$tests\n";
 
 package SHORT_NAME;
@@ -37,13 +37,13 @@ sub make { bless \@(), shift }
 
 sub STORABLE_freeze {
 	my $self = shift;
-	return ("", $self);
+	return @("", $self);
 }
 
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
-	my ($x, $obj) = @_;
+	my ($x, $obj) = < @_;
 	die "STORABLE_thaw" unless $obj \== $self;
 }
 
@@ -56,7 +56,7 @@ my $name = "LONG_NAME_" . 'xxxxxxxxxxxxx::' x 14 . "final";
 eval <<EOC;
 package $name;
 
-our \@ISA = ("SHORT_NAME");
+our \@ISA = \@("SHORT_NAME");
 EOC
 die $@ if $@;
 ok 1, $@ eq '';
@@ -64,7 +64,7 @@ ok 1, $@ eq '';
 eval <<EOC;
 package {$name}_WITH_HOOK;
 
-our \@ISA = ("SHORT_NAME_WITH_HOOK");
+our \@ISA = \@("SHORT_NAME_WITH_HOOK");
 EOC
 ok 2, ! $@ ;
 
@@ -83,7 +83,7 @@ ok 3, 1;
 
 my $y = thaw $x;
 ok 4, ref $y eq 'ARRAY';
-ok 5, @{$y} == @pool;
+ok 5, nelems(@{$y}) == nelems(@pool);
 
 ok 6, ref $y->[0] eq 'SHORT_NAME';
 ok 7, ref $y->[1] eq 'SHORT_NAME_WITH_HOOK';
@@ -114,8 +114,8 @@ sub make { my $self = shift; bless \@(@_), $self }
 sub STORABLE_freeze {
   # Some reference some number of times.
   my $self = shift;
-  my ($what, $times) = @$self;
-  return ("$what$times", (%::immortals{$what}) x $times);
+  my ($what, $times) = < @$self;
+  return @("$what$times", (%::immortals{$what}) x $times);
 }
 
 sub STORABLE_thaw {
