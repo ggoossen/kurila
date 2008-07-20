@@ -134,8 +134,8 @@ use Storable ();
 
 	# Set up the error condition by deleting the normal STORABLE_thaw,
 	# and creating a STORABLE_attach.
-	*My::BadThaw::STORABLE_attach = *My::BadThaw::STORABLE_thaw;
-	*My::BadThaw::STORABLE_attach = *My::BadThaw::STORABLE_thaw; # Suppress a warning
+	*My::BadThaw::STORABLE_attach = \&My::BadThaw::STORABLE_thaw;
+	*My::BadThaw::STORABLE_attach = \&My::BadThaw::STORABLE_thaw; # Suppress a warning
 	delete %{*{Symbol::fetch_glob('My::BadThaw::')}}{STORABLE_thaw};
 
 	# Trigger the error condition

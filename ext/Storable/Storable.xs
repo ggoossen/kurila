@@ -2809,7 +2809,7 @@ static int store_hook(
 	 */
 
         if ( ! SvAVOK(av) )
-           Perl_croak(aTHX_ "STORAGE_freeze did not return an ARRAY but returned a %s", Ddesc((SV*)av));
+           Perl_croak(aTHX_ "STORAGE_freeze of %s did not return an ARRAY but returned a %s", classname, Ddesc((SV*)av));
 
 	count = AvFILLp(av) + 1;
         if (count == 0)

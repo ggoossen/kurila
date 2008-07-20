@@ -309,7 +309,7 @@ invert_opset function.
 
     rv2av aassign aelem aelemfast aslice
 
-    rv2hv helem hslice each values keys exists delete
+    rv2hv helem hslice each values keys exists delete nkeys
 
     preinc i_preinc predec i_predec postinc i_postinc postdec i_postdec
     int hex oct abs pow multiply i_multiply divide i_divide
