@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$VERSION = '1.02_02';
+our $VERSION = '1.02_02';
 
 BEGIN {
     require 'regen_lib.pl';
@@ -71,7 +71,7 @@ my $tree = \%(
 
 ###########################################################################
 sub tab {
-    my($l, $t) = @_;
+    my($l, $t) = < @_;
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
 }
@@ -84,12 +84,12 @@ my %ValueToName ;
 my %NameToValue ;
 my $index ;
 
-my %v_list = () ;
+my %v_list = %() ;
 
 sub valueWalk
 {
     my $tre = shift ;
-    my @list = () ;
+    my @list = @() ;
     my ($k, $v) ;
 
     foreach $k (sort keys %$tre) {
@@ -98,8 +98,8 @@ sub valueWalk
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 
-	my ($ver, $rest) = @{ $v } ;
-	push @{ %v_list{$ver} }, $k;
+	my ($ver, $rest) = < @{ $v } ;
+	push @{%v_list{$ver}}, $k;
 	
 	if (ref $rest)
 	  { valueWalk ($rest) }
@@ -112,7 +112,7 @@ sub orderValues
 {
     my $index = 0;
     foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
-        foreach my $name (@{ %v_list{$ver} } ) {
+        foreach my $name ( < @{ %v_list{$ver} } ) {
 	    %ValueToName{ $index } = \@( uc $name, $ver ) ;
 	    %NameToValue{ uc $name } = $index ++ ;
         }
@@ -126,7 +126,7 @@ sub orderValues
 sub walk
 {
     my $tre = shift ;
-    my @list = () ;
+    my @list = @() ;
     my ($k, $v) ;
 
     foreach $k (sort keys %$tre) {
@@ -139,11 +139,12 @@ sub walk
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 	
-	my ($ver, $rest) = @{ $v } ;
-	if (ref $rest)
-	  { push (@{ %list{$k} }, walk ($rest)) }
+	my ($ver, $rest) = < @{ $v } ;
+	if (ref $rest) {
+            push (@{ %list{$k} }, < walk ($rest));
+        }
 
-	push @list, @{ %list{$k} } ;
+	push @list, < @{ %list{$k} } ;
     }
 
    return @list ;
@@ -153,17 +154,16 @@ sub walk
 
 sub mkRange
 {
-    my @a = @_ ;
+    my @a = shift ;
     my @out = @a ;
     my $i ;
 
-
-    for ($i = 1 ; $i +< @a; ++ $i) {
+    for ($i = 1 ; $i +< nelems(@a); ++ $i) {
       	@out[$i] = ".."
           if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[$i + 1] ;
     }
 
-    my $out = join(",",@out);
+    my $out = join(",", <@out);
 
     $out =~ s/,(\.\.,)+/../g ;
     return $out;
@@ -212,11 +212,11 @@ sub printTree
 
 sub mkHex
 {
-    my ($max, @a) = @_ ;
+    my ($max, < @a) = < @_ ;
     my $mask = "\x[00]" x $max;
     my $string = "" ;
 
-    foreach (@a) {
+    foreach (< @a) {
 	vec($mask, $_, 1) = 1 ;
     }
 
@@ -291,7 +291,7 @@ my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 my $k ;
 my $last_ver = 0;
 foreach $k (sort { $a <+> $b } keys %ValueToName) {
-    my ($name, $version) = @{ %ValueToName{$k} };
+    my ($name, $version) = < @{ %ValueToName{$k} };
     print $warn "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
     print $warn tab(5, "#define WARN_$name"), "$k\n" ;
@@ -360,9 +360,9 @@ while ( ~< *DATA) {
 #$list{'all'} = [ $offset .. 8 * ($warn_size/2) - 1 ] ;
 
 $last_ver = 0;
-print $pm "our \%Offsets = (\n" ;
+print $pm "our \%Offsets = \%(\n" ;
 foreach my $k (sort { $a <+> $b } keys %ValueToName) {
-    my ($name, $version) = @{ %ValueToName{$k} };
+    my ($name, $version) = < @{ %ValueToName{$k} };
     $name = lc $name;
     $k *= 2 ;
     if ( $last_ver != $version ) {
@@ -376,29 +376,29 @@ foreach my $k (sort { $a <+> $b } keys %ValueToName) {
 
 print $pm "  );\n\n" ;
 
-print $pm "our \%Bits = (\n" ;
+print $pm "our \%Bits = %(\n" ;
 foreach $k (sort keys  %list) {
 
     my $v = %list{$k} ;
-    my @list = sort { $a <+> $b } @$v ;
+    my @list = @( sort { $a <+> $b } < @$v );
 
     print $pm tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
-		mkHex($warn_size, map $_ * 2 , @list),
+		mkHex($warn_size, map $_ * 2 , < @list),
 		'", # [', mkRange(@list), "]\n" ;
 }
 
 print $pm "  );\n\n" ;
 
-print $pm "our \%DeadBits = (\n" ;
+print $pm "our \%DeadBits = %(\n" ;
 foreach $k (sort keys  %list) {
 
     my $v = %list{$k} ;
-    my @list = sort { $a <+> $b } @$v ;
+    my @list = @( sort { $a <+> $b } < @$v );
 
     print $pm tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
-		mkHex($warn_size, map $_ * 2 + 1 , @list),
+		mkHex($warn_size, map $_ * 2 + 1 , < @list),
 		'", # [', mkRange(@list), "]\n" ;
 }
 
@@ -571,7 +571,7 @@ sub bits
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    foreach my $word ( @_ ) {
+    foreach my $word ( < @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -609,7 +609,7 @@ sub import
     
     push @_, 'all' unless @_;
 
-    foreach my $word ( @_ ) {
+    foreach my $word ( < @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -644,7 +644,7 @@ sub unimport
 
     push @_, 'all' unless @_;
 
-    foreach my $word ( @_ ) {
+    foreach my $word ( < @_ ) {
 	if ($word eq 'FATAL') {
 	    next; 
 	}
@@ -701,15 +701,15 @@ sub __chk
     }
 
     my $callers_bitmask = @(caller($i))[9] ;
-    return ($callers_bitmask, $offset, $i) ;
+    return @($callers_bitmask, $offset, $i) ;
 }
 
 sub enabled
 {
     die("Usage: warnings::enabled([category])")
-	unless @_ == 1 || @_ == 0 ;
+	unless nelems(@_) == 1 || nelems(@_) == 0 ;
 
-    my ($callers_bitmask, $offset, $i) = __chk(@_) ;
+    my ($callers_bitmask, $offset, $i) = < __chk(< @_) ;
 
     return 0 unless defined $callers_bitmask ;
     return vec($callers_bitmask, $offset, 1) ||
@@ -720,10 +720,10 @@ sub enabled
 sub warn
 {
     die("Usage: warnings::warn([category,] 'message')")
-	unless @_ == 2 || @_ == 1 ;
+	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = __chk(@_) ;
+    my ($callers_bitmask, $offset, $i) = < __chk(<@_) ;
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
 	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
@@ -733,10 +733,10 @@ sub warn
 sub warnif
 {
     die("Usage: warnings::warnif([category,] 'message')")
-	unless @_ == 2 || @_ == 1 ;
+	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = __chk(@_) ;
+    my ($callers_bitmask, $offset, $i) = <__chk(<@_) ;
 
     return
         unless defined $callers_bitmask &&

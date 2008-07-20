@@ -305,7 +305,7 @@ sub bits
 {
     # called from B::Deparse.pm
 
-    push @_, 'all' unless (nelems @_);
+    push @_, 'all' unless @_;
 
     my $mask;
     my $catmask ;
@@ -348,7 +348,7 @@ sub import
         $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
     }
     
-    push @_, 'all' unless (nelems @_);
+    push @_, 'all' unless @_;
 
     foreach my $word ( < @_ ) {
 	if ($word eq 'FATAL') {
@@ -383,7 +383,7 @@ sub unimport
         $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
     }
 
-    push @_, 'all' unless (nelems @_);
+    push @_, 'all' unless @_;
 
     foreach my $word ( < @_ ) {
 	if ($word eq 'FATAL') {
@@ -407,7 +407,7 @@ sub __chk
     my $offset ;
     my $isobj = 0 ;
 
-    if ((nelems @_)) {
+    if (@_) {
         # check the category supplied.
         $category = shift ;
         if (my $type = ref $category) {
@@ -421,19 +421,19 @@ sub __chk
 	    unless defined $offset;
     }
     else {
-        $category = (caller(1))[0] ;
+        $category = @(caller(1))[0] ;
         $offset = %Offsets{$category};
         die("package '$category' not registered for warnings")
 	    unless defined $offset ;
     }
 
-    my $this_pkg = (caller(1))[0] ;
+    my $this_pkg = @(caller(1))[0] ;
     my $i = 2 ;
     my $pkg ;
 
     if ($isobj) {
-        while (do { { package DB; $pkg = (caller($i++))[0] } } ) {
-            last unless (nelems @DB::args) && @DB::args[0] =~ m/^$category=/ ;
+        while (do { { package DB; $pkg = @(caller($i++))[0] } } ) {
+            last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;
     }
@@ -441,14 +441,14 @@ sub __chk
         $i = 2;
     }
 
-    my $callers_bitmask = (caller($i))[9] ;
-    return  @($callers_bitmask, $offset, $i) ;
+    my $callers_bitmask = @(caller($i))[9] ;
+    return @($callers_bitmask, $offset, $i) ;
 }
 
 sub enabled
 {
     die("Usage: warnings::enabled([category])")
-	unless (nelems @_) == 1 || (nelems @_) == 0 ;
+	unless nelems(@_) == 1 || nelems(@_) == 0 ;
 
     my ($callers_bitmask, $offset, $i) = < __chk(< @_) ;
 
@@ -461,10 +461,10 @@ sub enabled
 sub warn
 {
     die("Usage: warnings::warn([category,] 'message')")
-	unless (nelems @_) == 2 || (nelems @_) == 1 ;
+	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = < __chk(< @_) ;
+    my ($callers_bitmask, $offset, $i) = < __chk(<@_) ;
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
 	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
@@ -474,10 +474,10 @@ sub warn
 sub warnif
 {
     die("Usage: warnings::warnif([category,] 'message')")
-	unless (nelems @_) == 2 || (nelems @_) == 1 ;
+	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = < __chk(< @_) ;
+    my ($callers_bitmask, $offset, $i) = <__chk(<@_) ;
 
     return
         unless defined $callers_bitmask &&
