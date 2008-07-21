@@ -3838,8 +3838,20 @@ PP(pp_nkeys)
 	RETURN;
     }
 
+
     if (SvHVOK(sv)) {
-	SETi( HvKEYS((HV*)sv) );
+	int i;
+	HV* hv = (HV*)sv;
+	(void)hv_iterinit(hv);	/* always reset iterator regardless */
+	if (! SvTIED_mg(sv, PERL_MAGIC_tied) ) {
+	    i = HvKEYS(hv);
+	}
+	else {
+	    i = 0;
+	    while (hv_iternext(hv)) i++;
+	}
+
+	SETi( i );
     }
     else {
 	Perl_croak(aTHX_ "nkeys expected a hash but got %s", Ddesc(sv));

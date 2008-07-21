@@ -1255,7 +1255,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	    int blen;
 	    write_to_stderr("recursive die at ", strlen(message));
 	    write_to_stderr(filename, strlen(filename));
-	    blen = snprintf(&buffer, 10, " line %"IVdf".\n", (IV)CopLINE(cop));
+	    blen = snprintf(&buffer, 20, " line %"IVdf".\n", (IV)CopLINE(cop));
 	    write_to_stderr(&buffer, blen);
 	}
 	else {
