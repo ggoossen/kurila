@@ -294,8 +294,8 @@ sub compress($;$)
 
     my $level = ((nelems @_) == 2 ? @_[1] : Z_DEFAULT_COMPRESSION() );
 
-    $x = Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level)
-            or return undef ;
+    ($x) = < Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level);
+    $x or return undef ;
 
     $err = $x->deflate($in, $output) ;
     return undef unless $err == Z_OK() ;

@@ -191,16 +191,16 @@ sub _create
       or $obj->croakError("invalid output param");
 
     if ($outType eq 'buffer') {
-        *$obj->{Buffer} = $outValue;
+        $obj->{Buffer} = $outValue;
     }
     else {
         my $buff = "" ;
-        *$obj->{Buffer} = \$buff ;
+        $obj->{Buffer} = \$buff ;
     }
 
     my $appendOutput = $got->value('Append');
-    *$obj->{Append} = $appendOutput;
-    *$obj->{FilterEnvelope} = $got->value('FilterEnvelope') ;
+    $obj->{Append} = $appendOutput;
+    $obj->{FilterEnvelope} = $got->value('FilterEnvelope') ;
 
     # If output is a file, check that it is writable
     if ($outType eq 'filename' && -e $outValue && ! -w _)
@@ -221,25 +221,24 @@ sub _create
 
     my $status ;
     {
-        *$obj->{Compress} = $obj->mkComp($class, $got)
+        $obj->{Compress} = $obj->mkComp($class, $got)
             or $obj->croakError("Failed making Compress");
         
-        *$obj->{UnCompSize} = U64->new() ;
-        *$obj->{CompSize} = U64->new() ;
+        $obj->{UnCompSize} = U64->new() ;
+        $obj->{CompSize} = U64->new() ;
 
         if ( $outType eq 'buffer') {
-            ${ *$obj->{Buffer} }  = ''
+            ${ $obj->{Buffer} }  = ''
                 unless $appendOutput ;
         }
         else {
             if ($outType eq 'handle') {
-                *$obj->{FH} = $outValue ;
-                setBinModeOutput(*$obj->{FH}) ;
+                $obj->{FH} = $outValue ;
                 IO::Handle::flush($outValue);
-                *$obj->{Handle} = 1 ;
+                $obj->{Handle} = 1 ;
                 if ($appendOutput)
                 {
-                    seek(*$obj->{FH}, 0, SEEK_END)
+                    seek($obj->{FH}, 0, SEEK_END)
                         or return $obj->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
 
                 }
@@ -248,24 +247,24 @@ sub _create
                 my $mode = '>' ;
                 $mode = '>>'
                     if $appendOutput;
-                *$obj->{FH} = IO::File->new( "$outValue", "$mode")
+                $obj->{FH} = IO::File->new( "$outValue", "$mode")
                     or return $obj->saveErrorString(undef, "cannot open file '$outValue': $!", $!) ;
-                *$obj->{StdIO} = ($outValue eq '-'); 
-                setBinModeOutput(*$obj->{FH}) ;
+                $obj->{StdIO} = ($outValue eq '-'); 
+                setBinModeOutput($obj->{FH}) ;
             }
         }
 
-        *$obj->{Header} = $obj->mkHeader($got) ;
-        $obj->output( *$obj->{Header} )
+        $obj->{Header} = $obj->mkHeader($got) ;
+        $obj->output( $obj->{Header} )
             or $obj->croakError("Failed writing header");
     }
 
-    *$obj->{Closed} = 0 ;
-    *$obj->{AutoClose} = $got->value('AutoClose') ;
-    *$obj->{Output} = $outValue;
-    *$obj->{ClassName} = $class;
-    *$obj->{Got} = $got;
-    *$obj->{OneShot} = 0 ;
+    $obj->{Closed} = 0 ;
+    $obj->{AutoClose} = $got->value('AutoClose') ;
+    $obj->{Output} = $outValue;
+    $obj->{ClassName} = $class;
+    $obj->{Got} = $got;
+    $obj->{OneShot} = 0 ;
 
     return $obj ;
 }
@@ -293,8 +292,8 @@ sub _def
 {
     my $obj = shift ;
     
-    my $class= (caller)[[0]] ;
-    my $name = (caller(1))[[3]] ;
+    my $class= @(caller)[0] ;
+    my $name = @(caller(1))[3] ;
 
     $obj->croakError("$name: expected at least 1 parameters\n")
         unless (nelems @_) +>= 1 ;
@@ -303,12 +302,12 @@ sub _def
     my $haveOut = (nelems @_) ;
     my $output = shift ;
 
-    my $x = Validator->new($class, *$obj->{Error}, $name, $input, $output)
+    my $x = Validator->new($class, $obj->{Error}, $name, $input, $output)
         or return undef ;
 
     push @_, $output if $haveOut && $x->{Hash};
 
-    *$obj->{OneShot} = 1 ;
+    $obj->{OneShot} = 1 ;
 
     my $got = $obj->checkParams($name, undef, < @_)
         or return undef ;
@@ -382,9 +381,6 @@ sub _singleTarget
     
     if ($x->{oneInput})
     {
-        $obj->getFileInfo($x->{Got}, $input)
-            if isaFilename($input) and $inputIsFilename ;
-
         my $z = $obj->_create($x->{Got}, < @_)
             or return undef ;
 
@@ -720,7 +716,7 @@ sub _writeFinalTrailer
 {
     my $self = shift ;
 
-    return $self->output( <$self->mkFinalTrailer());
+    return $self->output($self->mkFinalTrailer());
 }
 
 sub close

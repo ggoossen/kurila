@@ -61,9 +61,9 @@ sub mkUncomp
     my $class = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Inflate::mkUncompObject( <
-                                                                $got->value('CRC32'), <
-                                                                $got->value('ADLER32'), <
+    my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Inflate::mkUncompObject(
+                                                                $got->value('CRC32'),
+                                                                $got->value('ADLER32'),
                                                                 $got->value('Scan'),
                                                             );
 

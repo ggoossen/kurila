@@ -88,29 +88,20 @@ sub setBinModeInput($)
         if  $needBinmode;
 }
 
-sub setBinModeOutput($)
-{
-    my $handle = shift ;
-
-    binmode $handle 
-        if  $needBinmode;
-}
-
 sub isaFilehandle($)
 {
-    use utf8; # Pragma needed to keep Perl 5.6.0 happy
-    return  @(defined @_[0] and 
-              @(UNIVERSAL::isa(@_[0],'GLOB') or 
-              UNIVERSAL::isa(@_[0],'IO::Handle') or
-              UNIVERSAL::isa(\@_[0],'GLOB')) 
-          )
+    return  (defined @_[0] and 
+               (UNIVERSAL::isa(@_[0],'GLOB')
+                   or UNIVERSAL::isa(@_[0],'IO::Handle')
+                     or UNIVERSAL::isa(\@_[0],'GLOB'))
+           )
 }
 
 sub isaFilename($)
 {
-    return  @(defined @_[0] and 
-           ! ref @_[0]    and 
-           UNIVERSAL::isa(\@_[0], 'SCALAR'));
+    return  (defined @_[0] and 
+               ! ref @_[0]    and 
+                 UNIVERSAL::isa(\@_[0], 'SCALAR'));
 }
 
 sub isaFileGlobString
@@ -532,7 +523,7 @@ sub IO::Compress::Base::Parameters::parse
     my $default = shift ;
 
     my $got = $self->{Got} ;
-    my $firstTime = keys %{ $got } == 0 ;
+    my $firstTime = nkeys %{ $got } == 0 ;
 
     my (@Bad) ;
     my @entered = @( () ) ;
