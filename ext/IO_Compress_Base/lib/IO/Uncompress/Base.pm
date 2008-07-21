@@ -170,16 +170,7 @@ sub smartReadExact
 sub smartEof
 {
     my ($self) = @_[0];
-    local $.; 
-
-    return 0 if length *$self->{Prime} || *$self->{PushMode};
-
-    if (defined *$self->{FH})
-     { eof(*$self->{FH}) }
-    elsif (defined *$self->{InputEvent})
-     { *$self->{EventEof} }
-    else 
-     { *$self->{BufferOffset} +>= length(${ *$self->{Buffer} }) }
+    die "WTF";
 }
 
 sub clearError
@@ -312,7 +303,7 @@ sub checkParams
                 ) ;
 
     $Valid->{TrailingData} = \@(1, 1, Parse_writable_scalar, undef)
-        if  *$self->{OneShot} ;
+        if  $self->{OneShot} ;
         
     $got->parse($Valid, < @_ ) 
         or $self->croakError("{$class}: $got->{Error}")  ;
@@ -335,7 +326,7 @@ sub _create
 
     my $inValue = shift ;
 
-    *$obj->{OneShot}           = 0 ;
+    $obj->{OneShot}           = 0 ;
 
     if (! $got)
     {
@@ -348,7 +339,7 @@ sub _create
     $obj->ckInputParam($class, $inValue, 1) 
       or return undef;
 
-    *$obj->{InNew} = 1;
+    $obj->{InNew} = 1;
 
     $obj->ckParams($got)
         or $obj->croakError("{$class}: " . *$obj->{Error});
@@ -370,59 +361,59 @@ sub _create
         else {    
             my $mode = '<';
             $mode = '+<' if $got->value('Scan');
-            *$obj->{StdIO} = ($inValue eq '-');
-            *$obj->{FH} = IO::File->new( "$inValue", $mode)
+            $obj->{StdIO} = ($inValue eq '-');
+            $obj->{FH} = IO::File->new( "$inValue", $mode)
                 or return $obj->saveErrorString(undef, "cannot open file '$inValue': $!", $!) ;
         }
         
-        *$obj->{LineNo} = $. = 0;
-        setBinModeInput(*$obj->{FH}) ;
+        #*$obj->{LineNo} = $. = 0;
+        setBinModeInput($obj->{FH}) ;
 
         my $buff = "" ;
-        *$obj->{Buffer} = \$buff ;
+        $obj->{Buffer} = \$buff ;
     }
 
     if ($got->parsed('Encode')) { 
         my $want_encoding = $got->value('Encode');
-        *$obj->{Encoding} = getEncoding($obj, $class, $want_encoding);
+        $obj->{Encoding} = getEncoding($obj, $class, $want_encoding);
     }
 
 
-    *$obj->{InputLength}       = $got->parsed('InputLength') 
+    $obj->{InputLength}       = $got->parsed('InputLength') 
                                     ? $got->value('InputLength')
                                     : undef ;
-    *$obj->{InputLengthRemaining} = $got->value('InputLength');
-    *$obj->{BufferOffset}      = 0 ;
-    *$obj->{AutoClose}         = $got->value('AutoClose');
-    *$obj->{Strict}            = $got->value('Strict');
-    *$obj->{BlockSize}         = $got->value('BlockSize');
-    *$obj->{Append}            = $got->value('Append');
-    *$obj->{AppendOutput}      = $append_mode || $got->value('Append');
-    *$obj->{ConsumeInput}      = $got->value('ConsumeInput');
-    *$obj->{Transparent}       = $got->value('Transparent');
-    *$obj->{MultiStream}       = $got->value('MultiStream');
+    $obj->{InputLengthRemaining} = $got->value('InputLength');
+    $obj->{BufferOffset}      = 0 ;
+    $obj->{AutoClose}         = $got->value('AutoClose');
+    $obj->{Strict}            = $got->value('Strict');
+    $obj->{BlockSize}         = $got->value('BlockSize');
+    $obj->{Append}            = $got->value('Append');
+    $obj->{AppendOutput}      = $append_mode || $got->value('Append');
+    $obj->{ConsumeInput}      = $got->value('ConsumeInput');
+    $obj->{Transparent}       = $got->value('Transparent');
+    $obj->{MultiStream}       = $got->value('MultiStream');
 
     # TODO - move these two into RawDeflate
-    *$obj->{Scan}              = $got->value('Scan');
-    *$obj->{ParseExtra}        = $got->value('ParseExtra') 
+    $obj->{Scan}              = $got->value('Scan');
+    $obj->{ParseExtra}        = $got->value('ParseExtra') 
                                   || $got->value('Strict')  ;
-    *$obj->{Type}              = '';
-    *$obj->{Prime}             = $got->value('Prime') || '' ;
-    *$obj->{Pending}           = '';
-    *$obj->{Plain}             = 0;
-    *$obj->{PlainBytesRead}    = 0;
-    *$obj->{InflatedBytesRead} = 0;
-    *$obj->{UnCompSize}        = U64->new();
-    *$obj->{CompSize}          = U64->new();
-    *$obj->{TotalInflatedBytesRead} = 0;
-    *$obj->{NewStream}         = 0 ;
-    *$obj->{EventEof}          = 0 ;
-    *$obj->{ClassName}         = $class ;
-    *$obj->{Params}            = $got ;
+    $obj->{Type}              = '';
+    $obj->{Prime}             = $got->value('Prime') || '' ;
+    $obj->{Pending}           = '';
+    $obj->{Plain}             = 0;
+    $obj->{PlainBytesRead}    = 0;
+    $obj->{InflatedBytesRead} = 0;
+    $obj->{UnCompSize}        = U64->new();
+    $obj->{CompSize}          = U64->new();
+    $obj->{TotalInflatedBytesRead} = 0;
+    $obj->{NewStream}         = 0 ;
+    $obj->{EventEof}          = 0 ;
+    $obj->{ClassName}         = $class ;
+    $obj->{Params}            = $got ;
 
-    if (*$obj->{ConsumeInput}) {
-        *$obj->{InNew} = 0;
-        *$obj->{Closed} = 0;
+    if ($obj->{ConsumeInput}) {
+        $obj->{InNew} = 0;
+        $obj->{Closed} = 0;
         return $obj
     }
 
@@ -433,20 +424,20 @@ sub _create
 
     if ( !  $status) {
         return undef 
-            unless *$obj->{Transparent};
+            unless $obj->{Transparent};
 
         $obj->clearError();
-        *$obj->{Type} = 'plain';
-        *$obj->{Plain} = 1;
+        $obj->{Type} = 'plain';
+        $obj->{Plain} = 1;
         #$status = $obj->mkIdentityUncomp($class, $got);
-        $obj->pushBack(*$obj->{HeaderPending})  ;
+        $obj->pushBack($obj->{HeaderPending})  ;
     }
 
-    push @{ *$obj->{InfoList} }, *$obj->{Info} ;
+    push @{ $obj->{InfoList} }, $obj->{Info} ;
 
     $obj->saveStatus(STATUS_OK) ;
-    *$obj->{InNew} = 0;
-    *$obj->{Closed} = 0;
+    $obj->{InNew} = 0;
+    $obj->{Closed} = 0;
 
     return $obj;
 }
@@ -491,22 +482,22 @@ sub _inf
     my $output = shift ;
 
 
-    my $x = Validator->new($class, *$obj->{Error}, $name, $input, $output)
+    my $x = Validator->new($class, $obj->{Error}, $name, $input, $output)
         or return undef ;
     
     push @_, $output if $haveOut && $x->{Hash};
 
-    *$obj->{OneShot} = 1 ;
+    $obj->{OneShot} = 1 ;
     
     my $got = $obj->checkParams($name, undef, < @_)
         or return undef ;
 
     if ($got->parsed('TrailingData'))
     {
-        *$obj->{TrailingData} = $got->value('TrailingData');
+        $obj->{TrailingData} = $got->value('TrailingData');
     }
 
-    *$obj->{MultiStream} = $got->value('MultiStream');
+    $obj->{MultiStream} = $got->value('MultiStream');
     $got->value('MultiStream', 0);
 
     $x->{Got} = $got ;
@@ -893,7 +884,7 @@ sub nextStream
         or return $status ;
 
     *$self->{TotalInflatedBytesRead} = 0 ;
-    *$self->{LineNo} = $. = 0;
+    #*$self->{LineNo} = $. = 0;
 
     return 1;
 }
@@ -1122,7 +1113,7 @@ sub getline
     my $current_append = *$self->{AppendOutput} ;
     *$self->{AppendOutput} = 1;
     my $lineref = $self->_getline();
-    $. = ++ *$self->{LineNo} if defined $$lineref ;
+    #$. = ++ *$self->{LineNo} if defined $$lineref ;
     *$self->{AppendOutput} = $current_append;
     return $$lineref ;
 }
@@ -1209,7 +1200,7 @@ sub close
     if (defined *$self->{FH}) {
         if ((! *$self->{Handle} || *$self->{AutoClose}) && ! *$self->{StdIO}) {
         #if ( *$self->{AutoClose}) {
-            local $.; 
+            #local $.; 
             $! = 0 ;
             $status = close(*$self->{FH});
             return $self->saveErrorString(0, $!, $!)
@@ -1308,7 +1299,7 @@ sub input_line_number
 {
     my $self = shift ;
     my $last = *$self->{LineNo};
-    $. = *$self->{LineNo} = @_[1] if (nelems @_) ;
+    #$. = *$self->{LineNo} = @_[1] if (nelems @_) ;
     return $last;
 }
 
