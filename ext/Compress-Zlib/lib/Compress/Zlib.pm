@@ -156,11 +156,11 @@ sub Compress::Zlib::gzFile::gzread
 
     my $len = defined @_[1] ? @_[1] : 4096 ; 
 
-    if ($self->gzeof() || $len == 0) {
-        # Zap the output buffer to match ver 1 behaviour.
-        @_[0] = "" ;
-        return 0 ;
-    }
+#     if ($self->gzeof() || $len == 0) {
+#         # Zap the output buffer to match ver 1 behaviour.
+#         @_[0] = "" ;
+#         return 0 ;
+#     }
 
     my $gz = $self->[0] ;
     my $status = $gz->read(@_[0], $len) ; 
@@ -294,8 +294,8 @@ sub compress($;$)
 
     my $level = ((nelems @_) == 2 ? @_[1] : Z_DEFAULT_COMPRESSION() );
 
-    $x = Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level)
-            or return undef ;
+    ($x) = < Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level);
+    $x or return undef ;
 
     $err = $x->deflate($in, $output) ;
     return undef unless $err == Z_OK() ;
@@ -319,7 +319,8 @@ sub uncompress($)
         $in = \@_[0] ;
     }
 
-    $x = Compress::Raw::Zlib::Inflate->new( -ConsumeInput => 0) or return undef ;
+    ($x) = < Compress::Raw::Zlib::Inflate->new( -ConsumeInput => 0);
+    $x or return undef ;
  
     $err = $x->inflate($in, $output) ;
     return undef unless $err == Z_STREAM_END() ;
@@ -412,10 +413,9 @@ sub memGunzip($)
         or return undef;
      
     my $bufsize = length $$string +> 4096 ? length $$string : 4096 ;
-    my $x = Compress::Raw::Zlib::Inflate->new(\%(-WindowBits => - MAX_WBITS(),
-                         -Bufsize => $bufsize)) 
-
-              or return undef;
+    my ($x) = < Compress::Raw::Zlib::Inflate->new(\%(-WindowBits => - MAX_WBITS(),
+                         -Bufsize => $bufsize));
+    $x or return undef;
 
     my $output = "" ;
     my $status = $x->inflate($string, $output);

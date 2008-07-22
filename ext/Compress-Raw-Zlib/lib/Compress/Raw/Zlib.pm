@@ -143,7 +143,7 @@ sub Compress::Raw::Zlib::Parameters::parse
     my $default = shift ;
 
     my $got = $self->{Got} ;
-    my $firstTime = keys %{ $got } == 0 ;
+    my $firstTime = nkeys %{ $got } == 0 ;
 
     my (@Bad) ;
     my @entered = @( () ) ;
@@ -320,19 +320,19 @@ sub Compress::Raw::Zlib::Parameters::value
 sub Compress::Raw::Zlib::Deflate::new
 {
     my $pkg = shift ;
-    my ($got) = < ParseParameters(0,
+    my $got = ParseParameters(0,
             \%(
-                'AppendOutput'  => \@(1, 1, < Parse_boolean,  0),
-                'CRC32'         => \@(1, 1, < Parse_boolean,  0),
-                'ADLER32'       => \@(1, 1, < Parse_boolean,  0),
-                'Bufsize'       => \@(1, 1, < Parse_unsigned, 4096),
+                'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+                'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
  
-                'Level'         => \@(1, 1, < Parse_signed,   Z_DEFAULT_COMPRESSION()),
-                'Method'        => \@(1, 1, < Parse_unsigned, Z_DEFLATED()),
-                'WindowBits'    => \@(1, 1, < Parse_signed,   MAX_WBITS()),
-                'MemLevel'      => \@(1, 1, < Parse_unsigned, MAX_MEM_LEVEL()),
-                'Strategy'      => \@(1, 1, < Parse_unsigned, Z_DEFAULT_STRATEGY()),
-                'Dictionary'    => \@(1, 1, < Parse_any,      ""),
+                'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
+                'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
+                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
+                'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
+                'Dictionary'    => \@(1, 1, Parse_any,      ""),
             ), < @_) ;
 
 
@@ -345,13 +345,13 @@ sub Compress::Raw::Zlib::Deflate::new
     $flags ^|^= FLAG_CRC    if $got->value('CRC32') ;
     $flags ^|^= FLAG_ADLER  if $got->value('ADLER32') ;
 
-    _deflateInit($flags, <
-                $got->value('Level'), < 
-                $got->value('Method'), < 
-                $got->value('WindowBits'), < 
-                $got->value('MemLevel'), < 
-                $got->value('Strategy'), < 
-                $got->value('Bufsize'), <
+    _deflateInit($flags,
+                $got->value('Level'), 
+                $got->value('Method'), 
+                $got->value('WindowBits'), 
+                $got->value('MemLevel'), 
+                $got->value('Strategy'), 
+                $got->value('Bufsize'),
                 $got->value('Dictionary')) ;
 
 }
@@ -359,16 +359,16 @@ sub Compress::Raw::Zlib::Deflate::new
 sub Compress::Raw::Zlib::Inflate::new
 {
     my $pkg = shift ;
-    my ($got) = < ParseParameters(0,
+    my $got = ParseParameters(0,
                     \%(
-                        'AppendOutput'  => \@(1, 1, < Parse_boolean,  0),
-                        'CRC32'         => \@(1, 1, < Parse_boolean,  0),
-                        'ADLER32'       => \@(1, 1, < Parse_boolean,  0),
-                        'ConsumeInput'  => \@(1, 1, < Parse_boolean,  1),
-                        'Bufsize'       => \@(1, 1, < Parse_unsigned, 4096),
+                        'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+                        'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                        'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                        'ConsumeInput'  => \@(1, 1, Parse_boolean,  1),
+                        'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                  
-                        'WindowBits'    => \@(1, 1, < Parse_signed,   MAX_WBITS()),
-                        'Dictionary'    => \@(1, 1, < Parse_any,      ""),
+                        'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                        'Dictionary'    => \@(1, 1, Parse_any,      ""),
             ), < @_) ;
 
 
@@ -382,7 +382,7 @@ sub Compress::Raw::Zlib::Inflate::new
     $flags ^|^= FLAG_ADLER  if $got->value('ADLER32') ;
     $flags ^|^= FLAG_CONSUME_INPUT if $got->value('ConsumeInput') ;
 
-    _inflateInit($flags, < $got->value('WindowBits'), < $got->value('Bufsize'), < 
+    _inflateInit($flags, $got->value('WindowBits'), $got->value('Bufsize'), 
                  $got->value('Dictionary')) ;
 }
 

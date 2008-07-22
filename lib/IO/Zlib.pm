@@ -477,7 +477,7 @@ sub READLINE
 
     return () if $self->{'file'}->gzreadline($line) +<= 0;
 
-    return $line unless wantarray;
+    return $line; # unless wantarray;
 
     my @lines = @( $line );
 
@@ -520,42 +520,45 @@ sub new
 
     _alias("new", < @_) unless $aliased; # Some call new IO::Zlib directly...
 
-    my $self = gensym();
+    my $self = bless \%(), $class;
 
-    tie *{$self}, $class, < @args;
+    if (@args) {
+        return $self->open(< @args);
+    }
 
-    return tied(${$self}) ? bless $self, $class : undef;
+    return $self;
 }
 
 sub getline
 {
     my $self = shift;
 
-    return scalar tied(*{$self})->READLINE();
+    return scalar $self->READLINE();
 }
 
 sub getlines
 {
     my $self = shift;
 
-    croak "IO::Zlib::getlines: must be called in list context"
-	unless wantarray;
-
-    return tied(*{$self})->READLINE();
+    my @lines;
+    while (defined(my $line = $self->READLINE)) {
+        push @lines, $line;
+    }
+    return @lines;
 }
 
 sub opened
 {
     my $self = shift;
 
-    return defined tied(*{$self})->{'file'};
+    return defined $self->{'file'};
 }
 
 for my $name (qw|OPEN CLOSE READ READLINE PRINT PRINTF GETC BINMODE WRITE EOF TELL SEEK FILENO|) {
     Symbol::fetch_glob(lc $name)->* =
         sub {
             my $self = shift;
-            tied(*{$self})->?$name(< @_);
+            $self->?$name(< @_);
         };
 }
 

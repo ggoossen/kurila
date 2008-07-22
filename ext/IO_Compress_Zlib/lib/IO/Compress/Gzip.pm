@@ -14,14 +14,6 @@ use IO::Compress::Base::Common  v2.006 qw(:Status :Parse createSelfTiedObject);
 use IO::Compress::Gzip::Constants v2.006 ;
 use IO::Compress::Zlib::Extra v2.006 ;
 
-BEGIN
-{
-    if (defined &utf8::downgrade ) 
-      { *noUTF8 = \&utf8::downgrade }
-    else
-      { *noUTF8 = sub {} }  
-}
-
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GzipError);
@@ -64,7 +56,7 @@ sub getExtraParams
 
     return  @(
             # zlib behaviour
-            $self->getZlibParams(),
+            < $self->getZlibParams(),
 
             # Gzip header fields
             'Minimal'   => \@(0, 1, Parse_boolean,   0),
@@ -161,8 +153,8 @@ sub ckParams
 sub mkTrailer
 {
     my $self = shift ;
-    return pack("V V", < *$self->{Compress}->crc32(), < 
-                       *$self->{UnCompSize}->get32bit());
+    return pack("V V", $self->{Compress}->crc32(), 
+                       $self->{UnCompSize}->get32bit());
 }
 
 sub getInverseClass
@@ -170,22 +162,6 @@ sub getInverseClass
     return  @('IO::Uncompress::Gunzip',
                 \$IO::Uncompress::Gunzip::GunzipError);
 }
-
-sub getFileInfo
-{
-    my $self = shift ;
-    my $params = shift;
-    my $filename = shift ;
-
-    my $defaultTime = (stat($filename))[[9]] ;
-
-    $params->value('Name' => $filename)
-        if ! $params->parsed('Name') ;
-
-    $params->value('Time' => $defaultTime) 
-        if ! $params->parsed('Time') ;
-}
-
 
 sub mkHeader
 {
@@ -256,8 +232,6 @@ sub mkHeader
 
     # HEADER CRC
     $out .= pack("v", crc32($out) ^&^ 0x00FF ) if $param->value('HeaderCRC') ;
-
-    noUTF8($out);
 
     return $out ;
 }

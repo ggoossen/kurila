@@ -61,21 +61,21 @@ sub mkUncomp
     my $class = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Inflate::mkUncompObject( <
-                                                                $got->value('CRC32'), <
-                                                                $got->value('ADLER32'), <
+    my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Inflate::mkUncompObject(
+                                                                $got->value('CRC32'),
+                                                                $got->value('ADLER32'),
                                                                 $got->value('Scan'),
                                                             );
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
 
-    *$self->{Uncomp} = $obj;
+    $self->{Uncomp} = $obj;
 
      my $magic = $self->ckMagic()
         or return 0;
 
-    *$self->{Info} = $self->readHeader($magic)
+    $self->{Info} = $self->readHeader($magic)
         or return undef ;
 
     return 1;

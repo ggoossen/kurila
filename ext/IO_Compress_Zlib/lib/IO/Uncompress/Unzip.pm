@@ -64,7 +64,7 @@ sub getExtraParams
     
     return  @(
 #            # Zip header fields
-            'Name'      => \@(1, 1, Parse_any,       undef),
+        'Name'      => \@(1, 1, Parse_any,       undef),
 
 #            'Streaming' => [1, 1, Parse_boolean,   1],
         );    
