@@ -1240,6 +1240,9 @@ sub _deep_check {
             $ok = _eq_hash(\$e1, \$e2);
         }
         elsif( $type eq 'REF' ) {
+            if ($e1 \== \$e2) {
+                return 1;
+            }
             push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
             $ok = _deep_check($$e1, $$e2);
             pop @Data_Stack if $ok;
