@@ -670,13 +670,13 @@ package PLXML::baseop_unop;
 
 sub ast {
     my $self = shift;
-    my @newkids = $self->madness('d o (');
+    my @newkids = $self->madness('wrap_open d o (');
 
     if (exists $$self{Kids}) {
 	my $arg = $$self{Kids}[0];
 	push @newkids, $arg->ast($self, @_) if defined $arg;
     }
-    push @newkids, $self->madness(')');
+    push @newkids, $self->madness(') wrap_close');
 
     return $self->newtype()->new(Kids => [@newkids]);
 }
@@ -734,7 +734,7 @@ sub ast {
 	return P5AST::listop->new(Kids => [@before,@retval]);
     }
 
-    push @retval, $self->madness('o d ( [ {');
+    push @retval, $self->madness('wrap_open o d ( [ {');
 
     my @newkids;
     for my $kid (@{$$self{Kids}}) {
@@ -751,7 +751,7 @@ sub ast {
     }
     push @retval, @newkids;
 
-    push @retval, $self->madness('} ] )');
+    push @retval, $self->madness('} ] ) wrap_close');
     return $self->newtype->new(Kids => [@retval,@after]);
 }
 
@@ -761,11 +761,11 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('o (');
+    push @newkids, $self->madness('wrap_open o (');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
-    push @newkids, $self->madness(')');
+    push @newkids, $self->madness(') wrap_close');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -2519,6 +2519,8 @@ sub ast {
 
     my @retval;
 
+    push @retval, $self->madness('wrap_open');
+
     my @newkids;
     my @kids = @{$$self{Kids}};
     if (@kids == 1 and ref $kids[0] eq 'PLXML::op_null' and $kids[0]{was} =~ /list/) {
@@ -2576,6 +2578,7 @@ sub astmethod {
     }
     my $x = "";
     my @retval;
+    push @retval, $self->madness('wrap_open');
     push @retval, @invocant;
     push @retval, $self->madness('A');
     push @retval, $dest;
@@ -2588,7 +2591,6 @@ sub astmethod {
 sub astarrow {
     my $self = shift;
     my @newkids;
-    my @retval;
     my @kids = @{$$self{Kids}};
     if (@kids == 1 and ref $kids[0] eq 'PLXML::op_null' and $kids[0]{was} =~ /list/) {
 	@kids = @{$kids[0]{Kids}};
@@ -2599,6 +2601,8 @@ sub astarrow {
     }
     my @dest = $kids[0]->ast($self, @_);
     my $x = "";
+    my @retval;
+    push @retval, $self->madness('wrap_open');
     push @retval, @dest;
     push @retval, $self->madness('a');
     push @retval, $self->madness('(');
