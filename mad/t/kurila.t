@@ -1008,7 +1008,7 @@ my @b = foo();
 ----
 sub foo { }
 my @a = @(1, 2);
-my @b = @( foo() );
+my @b = @( < foo() );
 ====
 my @a;
 for (@a) { }
@@ -1065,9 +1065,9 @@ delete @x[[0, 1]];
 0 + @(1,2);
 0 + \@(1,2);
 ----
-0 + nelems @_;
-(nelems @_) + 1;
-0 + nelems @(1,2);
+0 + nelems(@_);
+nelems(@_) + 1;
+0 + nelems(@(1,2));
 0 + \@(1,2);
 ====
 my $x = \@_;
@@ -1097,6 +1097,72 @@ foo(@a, %h, $s);
 sub foo(\@\%$) { }
 my (@a, $s, %h);
 foo(@a, %h, $s);
+====
+{
+    my %foo;
+}
+----
+{
+    my %foo;
+}
+====
+chomp(@ARGV);
+----
+chomp(@ARGV);
+====
+my @numbers;
+@numbers = sort { $a <+> $b } @numbers;
+----
+my @numbers;
+@numbers = @( sort { $a <+> $b } < @numbers );
+====
+sub foo { my @a; return @a; }
+sub bar { my $b; return $b; }
+my @b = foo();
+my ($x, $y) = foo();
+print bar() + 10;
+my ($u, $v) = (foo(), bar()); # "bar" is incorrectly assumed to be an array
+----
+sub foo { my @a; return @a; }
+sub bar { my $b; return $b; }
+my @b = @( < foo() );
+my ($x, $y) = < foo();
+print bar() + 10;
+my ($u, $v) = ( <foo(), < bar()); # "bar" is incorrectly assumed to be an array
+====
+sub foo { return qw|a b c|; }
+sub aap { my @a; @a; }
+sub noot { return (1, 2); }
+sub mies { return split m/x/, "foo"; }
+sub wim { return 1, 2; }
+sub zus { map { $_ } @_ }
+sub jet { 1, 2 }
+sub teun { return (1) }
+sub vuur { return 1 }
+sub gijs { grep { $_ } @_ }
+my %h = (1, 2);
+sub lam { keys %h }
+----
+sub foo { return @(qw|a b c|); }
+sub aap { my @a; @a; }
+sub noot { return ( @(1, 2 )); }
+sub mies { return @( split m/x/, "foo" ); }
+sub wim { return @( 1, 2 ); }
+sub zus { @( map { $_ } < @_ ) }
+sub jet { @( 1, 2 ) }
+sub teun { return (1) }
+sub vuur { return 1 }
+sub gijs { @( grep { $_ } < @_ ) }
+my %h = %(1, 2);
+sub lam { @( keys %h ) }
+====
+sub foo { };
+foo( aap => foo() );
+foo( 'aap', foo() );
+----
+sub foo { };
+foo( aap => foo() );
+foo( 'aap', < foo() );
 ====
 END
 }
