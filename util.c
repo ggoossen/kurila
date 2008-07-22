@@ -1178,32 +1178,7 @@ Perl_write_to_stderr(pTHX_ const char* message, int msglen)
 
     PERL_ARGS_ASSERT_WRITE_TO_STDERR;
 
-    if (PL_stderrgv && SvREFCNT(PL_stderrgv) 
-	&& (io = GvIO(PL_stderrgv))
-	&& (mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar))) 
     {
-	dSP;
-	ENTER;
-	SAVETMPS;
-
-	save_re_context();
-	SAVESPTR(PL_stderrgv);
-	PL_stderrgv = NULL;
-
-	PUSHSTACKi(PERLSI_MAGIC);
-
-	PUSHMARK(SP);
-	EXTEND(SP,2);
-	PUSHs(SvTIED_obj((SV*)io, mg));
-	mPUSHp(message, msglen);
-	PUTBACK;
-	call_method("PRINT", G_SCALAR);
-
-	POPSTACK;
-	FREETMPS;
-	LEAVE;
-    }
-    else {
 #ifdef USE_SFIO
 	/* SFIO can really mess with your errno */
 	const int e = errno;
