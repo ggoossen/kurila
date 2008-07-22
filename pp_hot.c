@@ -603,35 +603,7 @@ PP(pp_print)
     MAGIC *mg;
     GV * const gv = (PL_op->op_flags & OPf_STACKED) ? (GV*)*++MARK : PL_defoutgv;
 
-    if (gv && (io = GvIO(gv))
-	&& (mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar)))
-    {
-      had_magic:
-	if (MARK == ORIGMARK) {
-	    /* If using default handle then we need to make space to
-	     * pass object as 1st arg, so move other args up ...
-	     */
-	    MEXTEND(SP, 1);
-	    ++MARK;
-	    Move(MARK, MARK + 1, (SP - MARK) + 1, SV*);
-	    ++SP;
-	}
-	PUSHMARK(MARK - 1);
-	*MARK = SvTIED_obj((SV*)io, mg);
-	PUTBACK;
-	ENTER;
-	call_method("PRINT", G_SCALAR);
-	LEAVE;
-	SPAGAIN;
-	MARK = ORIGMARK + 1;
-	*MARK = *SP;
-	SP = MARK;
-	RETURN;
-    }
     if (!(io = GvIO(gv))) {
-        if ((GvEGV(gv)) && (io = GvIO(GvEGV(gv)))
-	    && (mg = SvTIED_mg((SV*)io, PERL_MAGIC_tiedscalar)))
-            goto had_magic;
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
 	    report_evil_fh(gv, io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
