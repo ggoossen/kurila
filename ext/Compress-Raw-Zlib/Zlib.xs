@@ -769,17 +769,15 @@ _inflateInit(flags, windowBits, bufsize, dictionary)
 	err = Z_MEM_ERROR ;
 
     {
-        SV* obj = sv_setref_pv(sv_newmortal(), 
+        AV* res = newAV();
+        SV* obj = sv_setref_pv(newSV(0), 
                    ix == 1 
                    ? "Compress::Raw::Zlib::inflateScanStream" 
                    :  "Compress::Raw::Zlib::inflateStream",
                    (void*)s);
-        XPUSHs(obj);
-    }
-    if (GIMME == G_ARRAY) {
-        SV * sv = sv_2mortal(newSViv(err)) ;
-	setDUALstatus(sv, err);
-        XPUSHs(sv) ;
+        mXPUSHs((SV*)res);
+        av_push(res, obj);
+        av_push(res, newSViv(err));
     }
  
 

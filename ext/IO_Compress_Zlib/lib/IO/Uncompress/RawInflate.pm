@@ -70,12 +70,12 @@ sub mkUncomp
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
 
-    *$self->{Uncomp} = $obj;
+    $self->{Uncomp} = $obj;
 
      my $magic = $self->ckMagic()
         or return 0;
 
-    *$self->{Info} = $self->readHeader($magic)
+    $self->{Info} = $self->readHeader($magic)
         or return undef ;
 
     return 1;
