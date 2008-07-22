@@ -782,8 +782,7 @@ PP(pp_tie)
 	case SVt_PVGV:
 	    Perl_croak(aTHX_ "glob may not be tied");
 	default:
-	    methname = "TIESCALAR";
-	    how = PERL_MAGIC_tiedscalar;
+	    Perl_croak(aTHX_ "scalar may not be tied");
 	    break;
     }
     items = SP - MARK++;
