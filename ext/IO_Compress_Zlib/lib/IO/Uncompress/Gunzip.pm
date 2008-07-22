@@ -68,7 +68,7 @@ sub ckMagic
     my $magic ;
     $self->smartReadExact(\$magic, GZIP_ID_SIZE);
 
-    *$self->{HeaderPending} = $magic ;
+    $self->{HeaderPending} = $magic ;
 
     return $self->HeaderError("Minimum header size is " . 
                               GZIP_MIN_HEADER_SIZE . " bytes") 
@@ -77,7 +77,7 @@ sub ckMagic
     return $self->HeaderError("Bad Magic")
         if ! isGzipMagic($magic) ;
 
-    *$self->{Type} = 'rfc1952';
+    $self->{Type} = 'rfc1952';
 
     return $magic ;
 }
@@ -97,14 +97,14 @@ sub chkTrailer
 
     # Check CRC & ISIZE 
     my ($CRC32, $ISIZE) = unpack("V V", $trailer) ;
-    *$self->{Info}->{CRC32} = $CRC32;    
-    *$self->{Info}->{ISIZE} = $ISIZE;    
+    $self->{Info}->{CRC32} = $CRC32;    
+    $self->{Info}->{ISIZE} = $ISIZE;    
 
-    if (*$self->{Strict}) {
+    if ($self->{Strict}) {
         return $self->TrailerError("CRC mismatch")
-            if $CRC32 != *$self->{Uncomp}->crc32() ;
+            if $CRC32 != $self->{Uncomp}->crc32() ;
 
-        my $exp_isize = *$self->{UnCompSize}->get32bit();
+        my $exp_isize = $self->{UnCompSize}->get32bit();
         return $self->TrailerError("ISIZE mismatch. Got $ISIZE"
                                   . ", expected $exp_isize")
             if $ISIZE != $exp_isize ;
@@ -128,7 +128,7 @@ sub _readFullGzipHeader($)
 
     $self->smartReadExact(\$magic, GZIP_ID_SIZE);
 
-    *$self->{HeaderPending} = $magic ;
+    $self->{HeaderPending} = $magic ;
 
     return $self->HeaderError("Minimum header size is " . 
                               GZIP_MIN_HEADER_SIZE . " bytes") 
@@ -139,7 +139,7 @@ sub _readFullGzipHeader($)
         if ! isGzipMagic($magic) ;
 
     my $status = $self->_readGzipHeader($magic);
-    delete *$self->{Transparent} if ! defined $status ;
+    delete $self->{Transparent} if ! defined $status ;
     return $status ;
 }
 
@@ -154,7 +154,7 @@ sub _readGzipHeader($)
                                      GZIP_MIN_HEADER_SIZE . " bytes") ;
 
     my $keep = $magic . $buffer ;
-    *$self->{HeaderPending} = $keep ;
+    $self->{HeaderPending} = $keep ;
 
     # now split out the various parts
     my ($cm, $flag, $mtime, $xfl, $os) = unpack("C C V C C", $buffer) ;
@@ -178,7 +178,7 @@ sub _readGzipHeader($)
             or return $self->TruncatedHeader("FEXTRA Body");
         $keep .= $buffer . $EXTRA ;
 
-        if ($XLEN && *$self->{'ParseExtra'}) {
+        if ($XLEN && $self->{'ParseExtra'}) {
             my $bad = IO::Compress::Zlib::Extra::parseRawExtra($EXTRA,
                                                 \@EXTRA, 1, 1);
             return $self->HeaderError($bad)
@@ -198,7 +198,7 @@ sub _readGzipHeader($)
         $keep .= $origname . GZIP_NULL_BYTE ;
 
         return $self->HeaderError("Non ISO 8859-1 Character found in Name")
-            if *$self->{Strict} && $origname =~ m/$GZIP_FNAME_INVALID_CHAR_RE/o ;
+            if $self->{Strict} && $origname =~ m/$GZIP_FNAME_INVALID_CHAR_RE/o ;
     }
 
     my $comment ;
@@ -213,7 +213,7 @@ sub _readGzipHeader($)
         $keep .= $comment . GZIP_NULL_BYTE ;
 
         return $self->HeaderError("Non ISO 8859-1 Character found in Comment")
-            if *$self->{Strict} && $comment =~ m/$GZIP_FCOMMENT_INVALID_CHAR_RE/o ;
+            if $self->{Strict} && $comment =~ m/$GZIP_FCOMMENT_INVALID_CHAR_RE/o ;
     }
 
     if ($flag ^&^ GZIP_FLG_FHCRC) {
@@ -224,7 +224,7 @@ sub _readGzipHeader($)
         my $crc16 = crc32($keep) ^&^ 0xFF ;
 
         return $self->HeaderError("CRC16 mismatch.")
-            if *$self->{Strict} && $crc16 != $HeaderCRC;
+            if $self->{Strict} && $crc16 != $HeaderCRC;
 
         $keep .= $buffer ;
     }
@@ -233,7 +233,7 @@ sub _readGzipHeader($)
     #if ($xfl) {
     #}
 
-    *$self->{Type} = 'rfc1952';
+    $self->{Type} = 'rfc1952';
 
     return \%(
         'Type'          => 'rfc1952',

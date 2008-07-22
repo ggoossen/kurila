@@ -439,41 +439,41 @@ return 1 ;
 
 sub getExtraParams
 {
-my $self = shift ;
+    my $self = shift ;
 
-use IO::Compress::Base::Common  v2.006 qw(:Parse);
-use Compress::Raw::Zlib  v2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
+    use IO::Compress::Base::Common  v2.006 qw(:Parse);
+    use Compress::Raw::Zlib  v2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
-my @Bzip2 = @( () );
+    my @Bzip2 = @( () );
 
-@Bzip2 = @( < IO::Compress::Bzip2::getExtraParams($self) )
-if defined $IO::Compress::Bzip2::VERSION;
+    @Bzip2 = @( < IO::Compress::Bzip2::getExtraParams($self) )
+      if defined $IO::Compress::Bzip2::VERSION;
 
-return  @(
-    # zlib behaviour
-    $self->getZlibParams(),
+    return  @(
+        # zlib behaviour
+        < $self->getZlibParams(),
 
-    'Stream'    => \@(1, 1, Parse_boolean,   1),
-   #'Store'     => [0, 1, Parse_boolean,   0],
-    'Method'    => \@(0, 1, Parse_unsigned,  ZIP_CM_DEFLATE),
+        'Stream'    => \@(1, 1, Parse_boolean,   1),
+        #'Store'     => [0, 1, Parse_boolean,   0],
+        'Method'    => \@(0, 1, Parse_unsigned,  ZIP_CM_DEFLATE),
 
-#            # Zip header fields
-    'Minimal'   => \@(0, 1, Parse_boolean,   0),
-    'Zip64'     => \@(0, 1, Parse_boolean,   0),
-    'Comment'   => \@(0, 1, Parse_any,       ''),
-    'ZipComment'=> \@(0, 1, Parse_any,       ''),
-    'Name'      => \@(0, 1, Parse_any,       ''),
-    'Time'      => \@(0, 1, Parse_any,       undef),
-    'exTime'    => \@(0, 1, Parse_any,       undef),
-    'ExtAttr'   => \@(0, 1, Parse_any,       0),
-    'OS_Code'   => \@(0, 1, Parse_unsigned,  $Compress::Raw::Zlib::gzip_os_code),
-
-   'TextFlag'  => \@(0, 1, Parse_boolean,   0),
-   'ExtraFieldLocal'  => \@(0, 1, Parse_any,    undef),
-   'ExtraFieldCentral'=> \@(0, 1, Parse_any,    undef),
-
-    @Bzip2,
-);
+        #            # Zip header fields
+        'Minimal'   => \@(0, 1, Parse_boolean,   0),
+        'Zip64'     => \@(0, 1, Parse_boolean,   0),
+        'Comment'   => \@(0, 1, Parse_any,       ''),
+        'ZipComment'=> \@(0, 1, Parse_any,       ''),
+        'Name'      => \@(0, 1, Parse_any,       ''),
+        'Time'      => \@(0, 1, Parse_any,       undef),
+        'exTime'    => \@(0, 1, Parse_any,       undef),
+        'ExtAttr'   => \@(0, 1, Parse_any,       0),
+        'OS_Code'   => \@(0, 1, Parse_unsigned,  $Compress::Raw::Zlib::gzip_os_code),
+        
+        'TextFlag'  => \@(0, 1, Parse_boolean,   0),
+        'ExtraFieldLocal'  => \@(0, 1, Parse_any,    undef),
+        'ExtraFieldCentral'=> \@(0, 1, Parse_any,    undef),
+        
+        < @Bzip2,
+    );
 }
 
 sub getInverseClass

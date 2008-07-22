@@ -8,7 +8,16 @@
  *
  */
 
-#include "valgrind/memcheck.h"
+#ifdef PERL_VALGRIND
+#  include "valgrind/memcheck.h"
+#else
+#  define VALGRIND_MAKE_MEM_UNDEFINED(p, s)
+#  define VALGRIND_MAKE_MEM_DEFINED(p, s)
+#  define VALGRIND_MAKE_MEM_NOACCESS(p, s)
+#  define VALGRIND_MEMPOOL_ALLOC(pool, p, s)
+#  define VALGRIND_MEMPOOL_FREE(pool, p)
+#  define VALGRIND_CREATE_MEMPOOL(pool, x, s)
+#endif
 
 #ifdef sv_flags
 #undef sv_flags		/* Convex has this in <signal.h> for sigvec() */
