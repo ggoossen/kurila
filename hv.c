@@ -1260,7 +1260,7 @@ Perl_hv_sethv(pTHX_ HV* dstr, HV* sstr)
 	return;
     hv_max = HvMAX(sstr);
 
-    if (!SvMAGICAL((SV *)sstr)) {
+    if (! (SvMAGICAL((SV *)sstr) || SvMAGICAL((SV*)dstr)) ) {
 	/* It's an ordinary hash, so copy it fast. AMS 20010804 */
 	STRLEN i;
 	const bool shared = !!HvSHAREKEYS(sstr);
