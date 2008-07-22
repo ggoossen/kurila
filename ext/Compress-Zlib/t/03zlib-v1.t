@@ -20,7 +20,7 @@ BEGIN
     $extra = 1
         if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    my $count = 401 ;
+    my $count = 262 ;
 
 
     plan tests => $count + $extra ;

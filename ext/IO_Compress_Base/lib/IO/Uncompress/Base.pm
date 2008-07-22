@@ -39,19 +39,19 @@ sub smartRead
     my $offset = 0 ;
 
 
-    if (defined *$self->{InputLength}) {
+    if (defined $self->{InputLength}) {
         return 0
-            if *$self->{InputLengthRemaining} +<= 0 ;
+            if $self->{InputLengthRemaining} +<= 0 ;
         $size = min($size, *$self->{InputLengthRemaining});
     }
 
-    if ( length *$self->{Prime} ) {
-        #$$out = substr(*$self->{Prime}, 0, $size, '') ;
-        $$out = substr(*$self->{Prime}, 0, $size) ;
-        substr(*$self->{Prime}, 0, $size,  '') ;
+    if ( length $self->{Prime} ) {
+        #$$out = substr($self->{Prime}, 0, $size, '') ;
+        $$out = substr($self->{Prime}, 0, $size) ;
+        substr($self->{Prime}, 0, $size,  '') ;
         if (length $$out == $size) {
-            *$self->{InputLengthRemaining} -= length $$out
-                if defined *$self->{InputLength};
+            $self->{InputLengthRemaining} -= length $$out
+                if defined $self->{InputLength};
 
             return length $$out ;
         }
@@ -60,41 +60,41 @@ sub smartRead
 
     my $get_size = $size - $offset ;
 
-    #if ( defined *$self->{InputLength} ) {
-    #    $get_size = min($get_size, *$self->{InputLengthRemaining});
+    #if ( defined $self->{InputLength} ) {
+    #    $get_size = min($get_size, $self->{InputLengthRemaining});
     #}
 
-    if (defined *$self->{FH})
-      { read(*$self->{FH}, $$out, $get_size, $offset) }
-    elsif (defined *$self->{InputEvent}) {
+    if (defined $self->{FH})
+      { read($self->{FH}, $$out, $get_size, $offset) }
+    elsif (defined $self->{InputEvent}) {
         my $got = 1 ;
         while (length $$out +< $size) {
             last 
-                if ($got = *$self->{InputEvent}->($$out, $get_size)) +<= 0;
+                if ($got = $self->{InputEvent}->($$out, $get_size)) +<= 0;
         }
 
         if (length $$out +> $size ) {
-            #*$self->{Prime} = substr($$out, $size, length($$out), '');
-            *$self->{Prime} = substr($$out, $size, length($$out));
+            #$self->{Prime} = substr($$out, $size, length($$out), '');
+            $self->{Prime} = substr($$out, $size, length($$out));
             substr($$out, $size, length($$out),  '');
         }
 
-       *$self->{EventEof} = 1 if $got +<= 0 ;
+       $self->{EventEof} = 1 if $got +<= 0 ;
     }
     else {
        no warnings 'uninitialized';
-       my $buf = *$self->{Buffer} ;
+       my $buf = $self->{Buffer} ;
        $$buf = '' unless defined $$buf ;
        #$$out = '' unless defined $$out ;
-       substr($$out, $offset, undef, substr($$buf, *$self->{BufferOffset}, $get_size));
-       if (*$self->{ConsumeInput})
+       substr($$out, $offset, undef, substr($$buf, $self->{BufferOffset}, $get_size));
+       if ($self->{ConsumeInput})
          { substr($$buf, 0, $get_size, '') }
        else  
-         { *$self->{BufferOffset} += length($$out) - $offset }
+         { $self->{BufferOffset} += length($$out) - $offset }
     }
 
-    *$self->{InputLengthRemaining} -= length($$out) #- $offset 
-        if defined *$self->{InputLength};
+    $self->{InputLengthRemaining} -= length($$out) #- $offset 
+        if defined $self->{InputLength};
         
     $self->saveStatus(length $$out +< 0 ? STATUS_ERROR : STATUS_OK) ;
 
@@ -107,21 +107,21 @@ sub pushBack
 
     return if ! defined @_[0] || length @_[0] == 0 ;
 
-    if (defined *$self->{FH} || defined *$self->{InputEvent} ) {
-        *$self->{Prime} = @_[0] . *$self->{Prime} ;
-        *$self->{InputLengthRemaining} += length(@_[0]);
+    if (defined $self->{FH} || defined $self->{InputEvent} ) {
+        $self->{Prime} = @_[0] . $self->{Prime} ;
+        $self->{InputLengthRemaining} += length(@_[0]);
     }
     else {
         my $len = length @_[0];
 
-        if($len +> *$self->{BufferOffset}) {
-            *$self->{Prime} = substr(@_[0], 0, $len - *$self->{BufferOffset}) . *$self->{Prime} ;
-            *$self->{InputLengthRemaining} = *$self->{InputLength};
-            *$self->{BufferOffset} = 0
+        if($len +> $self->{BufferOffset}) {
+            $self->{Prime} = substr(@_[0], 0, $len - $self->{BufferOffset}) . $self->{Prime} ;
+            $self->{InputLengthRemaining} = $self->{InputLength};
+            $self->{BufferOffset} = 0
         }
         else {
-            *$self->{InputLengthRemaining} += length(@_[0]);
-            *$self->{BufferOffset} -= length(@_[0]) ;
+            $self->{InputLengthRemaining} += length(@_[0]);
+            $self->{BufferOffset} -= length(@_[0]) ;
         }
     }
 }
@@ -134,11 +134,11 @@ sub smartSeek
     #print "smartSeek to $offset\n";
 
     # TODO -- need to take prime into account
-    if (defined *$self->{FH})
-      { *$self->{FH}->seek($offset, SEEK_SET) }
+    if (defined $self->{FH})
+      { $self->{FH}->seek($offset, SEEK_SET) }
     else {
-        *$self->{BufferOffset} = $offset ;
-        substr(${ *$self->{Buffer} }, *$self->{BufferOffset}, undef, '')
+        $self->{BufferOffset} = $offset ;
+        substr(${ $self->{Buffer} }, $self->{BufferOffset}, undef, '')
             if $truncate;
         return 1;
     }
@@ -149,15 +149,15 @@ sub smartWrite
     my $self   = shift ;
     my $out_data = shift ;
 
-    if (defined *$self->{FH}) {
+    if (defined $self->{FH}) {
         # flush needed for 5.8.0 
-        defined *$self->{FH}->write($out_data, length $out_data) &&
-        defined *$self->{FH}->flush() ;
+        defined $self->{FH}->write($out_data, length $out_data) &&
+        defined $self->{FH}->flush() ;
     }
     else {
-       my $buf = *$self->{Buffer} ;
-       substr($$buf, *$self->{BufferOffset}, length $out_data, $out_data) ;
-       *$self->{BufferOffset} += length($out_data) ;
+       my $buf = $self->{Buffer} ;
+       substr($$buf, $self->{BufferOffset}, length $out_data, $out_data) ;
+       $self->{BufferOffset} += length($out_data) ;
        return 1;
     }
 }
@@ -170,28 +170,36 @@ sub smartReadExact
 sub smartEof
 {
     my ($self) = @_[0];
-    die "WTF";
+
+    return 0 if length $self->{Prime} || $self->{PushMode};
+
+    if (defined $self->{FH})
+     { eof($self->{FH}) }
+    elsif (defined $self->{InputEvent})
+     { $self->{EventEof} }
+    else 
+     { $self->{BufferOffset} +>= length(${ $self->{Buffer} }) }
 }
 
 sub clearError
 {
     my $self   = shift ;
 
-    *$self->{ErrorNo}  =  0 ;
-    ${ *$self->{Error} } = '' ;
+    $self->{ErrorNo}  =  0 ;
+    ${ $self->{Error} } = '' ;
 }
 
 sub saveStatus
 {
     my $self   = shift ;
     my $errno = shift() + 0 ;
-    #return $errno unless $errno || ! defined *$self->{ErrorNo};
+    #return $errno unless $errno || ! defined $self->{ErrorNo};
     #return $errno unless $errno ;
 
-    *$self->{ErrorNo}  = $errno;
-    ${ *$self->{Error} } = '' ;
+    $self->{ErrorNo}  = $errno;
+    ${ $self->{Error} } = '' ;
 
-    return *$self->{ErrorNo} ;
+    return $self->{ErrorNo} ;
 }
 
 
@@ -200,12 +208,12 @@ sub saveErrorString
     my $self   = shift ;
     my $retval = shift ;
 
-    #return $retval if ${ *$self->{Error} };
+    #return $retval if ${ $self->{Error} };
 
-    ${ *$self->{Error} } = shift ;
-    *$self->{ErrorNo} = shift() + 0 if (nelems @_) ;
+    ${ $self->{Error} } = shift ;
+    $self->{ErrorNo} = shift() + 0 if (nelems @_) ;
 
-    #warn "saveErrorString: " . ${ *$self->{Error} } . " " . *$self->{Error} . "\n" ;
+    #warn "saveErrorString: " . ${ $self->{Error} } . " " . $self->{Error} . "\n" ;
     return $retval;
 }
 
@@ -222,13 +230,13 @@ sub closeError
     my $self = shift ;
     my $retval = shift ;
 
-    my $errno = *$self->{ErrorNo};
-    my $error = ${ *$self->{Error} };
+    my $errno = $self->{ErrorNo};
+    my $error = ${ $self->{Error} };
 
     $self->close();
 
-    *$self->{ErrorNo} = $errno ;
-    ${ *$self->{Error} } = $error ;
+    $self->{ErrorNo} = $errno ;
+    ${ $self->{Error} } = $error ;
 
     return $retval;
 }
@@ -236,13 +244,13 @@ sub closeError
 sub error
 {
     my $self   = shift ;
-    return ${ *$self->{Error} } ;
+    return ${ $self->{Error} } ;
 }
 
 sub errorNo
 {
     my $self   = shift ;
-    return *$self->{ErrorNo};
+    return $self->{ErrorNo};
 }
 
 sub HeaderError
@@ -634,7 +642,7 @@ sub _rd2
     my $input     = shift;
     my $output    = shift;
         
-    my $z = createSelfTiedObject($x->{Class}, *$self->{Error});
+    my $z = createSelfTiedObject($x->{Class}, $self->{Error});
     
     $z->_create($x->{Got}, 1, $input, < @_)
         or return undef ;
@@ -665,7 +673,7 @@ sub _rd2
         }
 
         last 
-            unless *$self->{MultiStream};
+            unless $self->{MultiStream};
 
         $status = $z->nextStream();
 
@@ -676,8 +684,8 @@ sub _rd2
     return $z->closeError(undef)
         if $status +< 0 ;
 
-    ${ *$self->{TrailingData} } = $z->trailingData()
-        if defined *$self->{TrailingData} ;
+    ${ $self->{TrailingData} } = $z->trailingData()
+        if defined $self->{TrailingData} ;
 
     $z->close() 
         or return undef ;
@@ -704,14 +712,14 @@ sub readBlock
     my $buff = shift ;
     my $size = shift ;
 
-    if (defined *$self->{CompressedInputLength}) {
-        if (*$self->{CompressedInputLengthRemaining} == 0) {
-            delete *$self->{CompressedInputLength};
-            *$self->{CompressedInputLengthDone} = 1;
+    if (defined $self->{CompressedInputLength}) {
+        if ($self->{CompressedInputLengthRemaining} == 0) {
+            delete $self->{CompressedInputLength};
+            $self->{CompressedInputLengthDone} = 1;
             return STATUS_OK ;
         }
-        $size = min($size, *$self->{CompressedInputLengthRemaining} );
-        *$self->{CompressedInputLengthRemaining} -= $size ;
+        $size = min($size, $self->{CompressedInputLengthRemaining} );
+        $self->{CompressedInputLengthRemaining} -= $size ;
     }
     
     my $status = $self->smartRead($buff, $size) ;
@@ -719,8 +727,8 @@ sub readBlock
         if $status +< 0  ;
 
     if ($status == 0 ) {
-        *$self->{Closed} = 1 ;
-        *$self->{EndStream} = 1 ;
+        $self->{Closed} = 1 ;
+        $self->{EndStream} = 1 ;
         return $self->saveErrorString(STATUS_ERROR, "unexpected end of file", STATUS_ERROR);
     }
 
@@ -741,47 +749,47 @@ sub _raw_read
     
     my $self = shift ;
 
-    return G_EOF if *$self->{Closed} ;
-    #return G_EOF if !length *$self->{Pending} && *$self->{EndStream} ;
-    return G_EOF if *$self->{EndStream} ;
+    return G_EOF if $self->{Closed} ;
+    #return G_EOF if !length $self->{Pending} && $self->{EndStream} ;
+    return G_EOF if $self->{EndStream} ;
 
     my $buffer = shift ;
     my $scan_mode = shift ;
 
-    if (*$self->{Plain}) {
+    if ($self->{Plain}) {
         my $tmp_buff ;
-        my $len = $self->smartRead(\$tmp_buff, *$self->{BlockSize}) ;
+        my $len = $self->smartRead(\$tmp_buff, $self->{BlockSize}) ;
         
         return $self->saveErrorString( <G_ERR, "Error reading data: $!", $!) 
                 if $len +< 0 ;
 
         if ($len == 0 ) {
-            *$self->{EndStream} = 1 ;
+            $self->{EndStream} = 1 ;
         }
         else {
-            *$self->{PlainBytesRead} += $len ;
+            $self->{PlainBytesRead} += $len ;
             $$buffer .= $tmp_buff;
         }
 
         return $len ;
     }
 
-    if (*$self->{NewStream}) {
+    if ($self->{NewStream}) {
 
         $self->gotoNextStream() +> 0
             or return G_ERR;
 
         # For the headers that actually uncompressed data, put the
         # uncompressed data into the output buffer.
-        $$buffer .=  *$self->{Pending} ;
-        my $len = length  *$self->{Pending} ;
-        *$self->{Pending} = '';
+        $$buffer .=  $self->{Pending} ;
+        my $len = length  $self->{Pending} ;
+        $self->{Pending} = '';
         return $len; 
     }
 
     my $temp_buf = '';
     my $outSize = 0;
-    my $status = $self->readBlock(\$temp_buf, *$self->{BlockSize}, $outSize) ;
+    my $status = $self->readBlock(\$temp_buf, $self->{BlockSize}, $outSize) ;
     return G_ERR
         if $status == STATUS_ERROR  ;
 
@@ -789,11 +797,11 @@ sub _raw_read
     if ($status == STATUS_OK) {
         my $beforeC_len = length $temp_buf;
         my $before_len = defined $$buffer ? length $$buffer : 0 ;
-        $status = *$self->{Uncomp}->uncompr(\$temp_buf, $buffer,
-                                    defined *$self->{CompressedInputLengthDone} || <
+        $status = $self->{Uncomp}->uncompr(\$temp_buf, $buffer,
+                                    defined $self->{CompressedInputLengthDone} ||
                                                 $self->smartEof(), $outSize);
 
-        return $self->saveErrorString( <G_ERR, *$self->{Uncomp}->{Error}, *$self->{Uncomp}->{ErrorNo})
+        return $self->saveErrorString(G_ERR, $self->{Uncomp}->{Error}, $self->{Uncomp}->{ErrorNo})
             if $self->saveStatus($status) == STATUS_ERROR;
 
         $self->postBlockChk($buffer, $before_len) == STATUS_OK
@@ -801,29 +809,29 @@ sub _raw_read
 
         $buf_len = length($$buffer) - $before_len;
     
-        *$self->{CompSize}->add($beforeC_len - length $temp_buf) ;
+        $self->{CompSize}->add($beforeC_len - length $temp_buf) ;
 
-        *$self->{InflatedBytesRead} += $buf_len ;
-        *$self->{TotalInflatedBytesRead} += $buf_len ;
-        *$self->{UnCompSize}->add($buf_len) ;
+        $self->{InflatedBytesRead} += $buf_len ;
+        $self->{TotalInflatedBytesRead} += $buf_len ;
+        $self->{UnCompSize}->add($buf_len) ;
 
         $self->filterUncompressed($buffer);
 
-        if (*$self->{Encoding}) {
-            $$buffer = *$self->{Encoding}->decode($$buffer);
+        if ($self->{Encoding}) {
+            $$buffer = $self->{Encoding}->decode($$buffer);
         }
     }
 
     if ($status == STATUS_ENDSTREAM) {
 
-        *$self->{EndStream} = 1 ;
+        $self->{EndStream} = 1 ;
         $self->pushBack($temp_buf)  ;
         $temp_buf = '';
 
         my $trailer;
-        my $trailer_size = *$self->{Info}->{TrailerLength} ;
+        my $trailer_size = $self->{Info}->{TrailerLength} ;
         my $got = 0;
-        if (*$self->{Info}->{TrailerLength})
+        if ($self->{Info}->{TrailerLength})
         {
             $got = $self->smartRead(\$trailer, $trailer_size) ;
         }
@@ -835,17 +843,17 @@ sub _raw_read
         else {
             return $self->TrailerError("trailer truncated. Expected " . 
                                       "$trailer_size bytes, got $got")
-                if *$self->{Strict};
+                if $self->{Strict};
             $self->pushBack($trailer)  ;
         }
 
         # TODO - if want to file file pointer, do it here
 
         if (! $self->smartEof()) {
-            *$self->{NewStream} = 1 ;
+            $self->{NewStream} = 1 ;
 
-            if (*$self->{MultiStream}) {
-                *$self->{EndStream} = 0 ;
+            if ($self->{MultiStream}) {
+                $self->{EndStream} = 0 ;
                 return $buf_len ;
             }
         }
@@ -861,7 +869,7 @@ sub reset
 {
     my $self = shift ;
 
-    return *$self->{Uncomp}->reset();
+    return $self->{Uncomp}->reset();
 }
 
 sub filterUncompressed
@@ -871,8 +879,8 @@ sub filterUncompressed
 #sub isEndStream
 #{
 #    my $self = shift ;
-#    return *$self->{NewStream} ||
-#           *$self->{EndStream} ;
+#    return $self->{NewStream} ||
+#           $self->{EndStream} ;
 #}
 
 sub nextStream
@@ -883,8 +891,8 @@ sub nextStream
     $status == 1
         or return $status ;
 
-    *$self->{TotalInflatedBytesRead} = 0 ;
-    #*$self->{LineNo} = $. = 0;
+    $self->{TotalInflatedBytesRead} = 0 ;
+    #$self->{LineNo} = $. = 0;
 
     return 1;
 }
@@ -893,7 +901,7 @@ sub gotoNextStream
 {
     my $self = shift ;
 
-    if (! *$self->{NewStream}) {
+    if (! $self->{NewStream}) {
         my $status = 1;
         my $buffer ;
 
@@ -906,38 +914,38 @@ sub gotoNextStream
             if $status +< 0;
     }
 
-    *$self->{NewStream} = 0 ;
-    *$self->{EndStream} = 0 ;
+    $self->{NewStream} = 0 ;
+    $self->{EndStream} = 0 ;
     $self->reset();
-    *$self->{UnCompSize}->reset();
-    *$self->{CompSize}->reset();
+    $self->{UnCompSize}->reset();
+    $self->{CompSize}->reset();
 
     my $magic = $self->ckMagic();
-    #*$self->{EndStream} = 0 ;
+    #$self->{EndStream} = 0 ;
 
     if ( ! $magic) {
-        if (! *$self->{Transparent} )
+        if (! $self->{Transparent} )
         {
-            *$self->{EndStream} = 1 ;
+            $self->{EndStream} = 1 ;
             return 0;
         }
 
         $self->clearError();
-        *$self->{Type} = 'plain';
-        *$self->{Plain} = 1;
-        $self->pushBack(*$self->{HeaderPending})  ;
+        $self->{Type} = 'plain';
+        $self->{Plain} = 1;
+        $self->pushBack($self->{HeaderPending})  ;
     }
     else
     {
-        *$self->{Info} = $self->readHeader($magic);
+        $self->{Info} = $self->readHeader($magic);
 
-        if ( ! defined *$self->{Info} ) {
-            *$self->{EndStream} = 1 ;
+        if ( ! defined $self->{Info} ) {
+            $self->{EndStream} = 1 ;
             return -1;
         }
     }
 
-    push @{ *$self->{InfoList} }, *$self->{Info} ;
+    push @{ $self->{InfoList} }, $self->{Info} ;
 
     return 1; 
 }
@@ -945,8 +953,8 @@ sub gotoNextStream
 sub streamCount
 {
     my $self = shift ;
-    return 1 if ! defined *$self->{InfoList};
-    return scalar nelems @{ *$self->{InfoList} }  ;
+    return 1 if ! defined $self->{InfoList};
+    return scalar nelems @{ $self->{InfoList} }  ;
 }
 
 sub read
@@ -958,25 +966,25 @@ sub read
     
     my $self = shift ;
 
-    return G_EOF if *$self->{Closed} ;
-    return G_EOF if !length *$self->{Pending} && *$self->{EndStream} ;
+    return G_EOF if $self->{Closed} ;
+    return G_EOF if !length $self->{Pending} && $self->{EndStream} ;
 
     my $buffer ;
 
-    #$self->croakError(*$self->{ClassName} . 
+    #$self->croakError($self->{ClassName} . 
     #            "::read: buffer parameter is read-only")
     #    if Compress::Raw::Zlib::_readonly_ref($_[0]);
 
     if (ref @_[0] ) {
-        $self->croakError(*$self->{ClassName} . "::read: buffer parameter is read-only")
+        $self->croakError($self->{ClassName} . "::read: buffer parameter is read-only")
             if readonly(${ @_[0] });
 
-        $self->croakError(*$self->{ClassName} . "::read: not a scalar reference @_[0]" )
+        $self->croakError($self->{ClassName} . "::read: not a scalar reference @_[0]" )
             unless ref @_[0] eq 'SCALAR' ;
         $buffer = @_[0] ;
     }
     else {
-        $self->croakError(*$self->{ClassName} . "::read: buffer parameter is read-only")
+        $self->croakError($self->{ClassName} . "::read: buffer parameter is read-only")
             if readonly(@_[0]);
 
         $buffer = \@_[0] ;
@@ -990,33 +998,33 @@ sub read
 
     $length = $length || 0;
 
-    $self->croakError(*$self->{ClassName} . "::read: length parameter is negative")
+    $self->croakError($self->{ClassName} . "::read: length parameter is negative")
         if $length +< 0 ;
 
-    $$buffer = '' unless *$self->{AppendOutput}  || $offset ;
+    $$buffer = '' unless $self->{AppendOutput}  || $offset ;
 
     # Short-circuit if this is a simple read, with no length
     # or offset specified.
     unless ( $length || $offset) {
-        if (length *$self->{Pending}) {
-            $$buffer .= *$self->{Pending} ;
-            my $len = length *$self->{Pending};
-            *$self->{Pending} = '' ;
+        if (length $self->{Pending}) {
+            $$buffer .= $self->{Pending} ;
+            my $len = length $self->{Pending};
+            $self->{Pending} = '' ;
             return $len ;
         }
         else {
             my $len = 0;
             $len = $self->_raw_read($buffer) 
-                while ! *$self->{EndStream} && $len == 0 ;
+                while ! $self->{EndStream} && $len == 0 ;
             return $len ;
         }
     }
 
     # Need to jump through more hoops - either length or offset 
     # or both are specified.
-    my $out_buffer = *$self->{Pending} ;
+    my $out_buffer = $self->{Pending} ;
 
-    while (! *$self->{EndStream} && length($out_buffer) +< $length)
+    while (! $self->{EndStream} && length($out_buffer) +< $length)
     {
         my $buf_len = $self->_raw_read(\$out_buffer);
         return $buf_len 
@@ -1029,8 +1037,8 @@ sub read
     return 0 
         if $length == 0 ;
 
-    *$self->{Pending} = $out_buffer;
-    $out_buffer = \*$self->{Pending} ;
+    $self->{Pending} = $out_buffer;
+    $out_buffer = \$self->{Pending} ;
 
     if ($offset) { 
         $$buffer .= "\0" x ($offset - length($$buffer))
@@ -1072,7 +1080,7 @@ sub _getline
         my $paragraph ;    
         while ($self->read($paragraph) +> 0 ) {
             if ($paragraph =~ s/^(.*?\n\n+)//s) {
-                *$self->{Pending}  = $paragraph ;
+                $self->{Pending}  = $paragraph ;
                 my $par = $1 ;
                 return \$par ;
             }
@@ -1084,12 +1092,12 @@ sub _getline
     {
         my $line ;    
         my $offset;
-        my $p = \*$self->{Pending}  ;
+        my $p = \$self->{Pending}  ;
 
-        if (length(*$self->{Pending}) && 
-                    ($offset = index(*$self->{Pending}, $/)) +>=0) {
-            my $l = substr(*$self->{Pending}, 0, $offset + length $/ );
-            substr(*$self->{Pending}, 0, $offset + length $/, '');    
+        if (length($self->{Pending}) && 
+                    ($offset = index($self->{Pending}, $/)) +>=0) {
+            my $l = substr($self->{Pending}, 0, $offset + length $/ );
+            substr($self->{Pending}, 0, $offset + length $/, '');    
             return \$l;
         }
 
@@ -1110,11 +1118,11 @@ sub _getline
 sub getline
 {
     my $self = shift;
-    my $current_append = *$self->{AppendOutput} ;
-    *$self->{AppendOutput} = 1;
+    my $current_append = $self->{AppendOutput} ;
+    $self->{AppendOutput} = 1;
     my $lineref = $self->_getline();
-    #$. = ++ *$self->{LineNo} if defined $$lineref ;
-    *$self->{AppendOutput} = $current_append;
+    #$. = ++ $self->{LineNo} if defined $$lineref ;
+    $self->{AppendOutput} = $current_append;
     return $$lineref ;
 }
 
@@ -1138,8 +1146,8 @@ sub getc
 sub ungetc
 {
     my $self = shift;
-    *$self->{Pending} = ""  unless defined *$self->{Pending} ;    
-    *$self->{Pending} = @_[0] . *$self->{Pending} ;    
+    $self->{Pending} = ""  unless defined $self->{Pending} ;    
+    $self->{Pending} = @_[0] . $self->{Pending} ;    
 }
 
 
@@ -1147,12 +1155,12 @@ sub trailingData
 {
     my $self = shift ;
 
-    if (defined *$self->{FH} || defined *$self->{InputEvent} ) {
-        return *$self->{Prime} ;
+    if (defined $self->{FH} || defined $self->{InputEvent} ) {
+        return $self->{Prime} ;
     }
     else {
-        my $buf = *$self->{Buffer} ;
-        my $offset = *$self->{BufferOffset} ;
+        my $buf = $self->{Buffer} ;
+        my $offset = $self->{BufferOffset} ;
         return substr($$buf, $offset) ;
     }
 }
@@ -1162,9 +1170,9 @@ sub eof
 {
     my $self = shift ;
 
-    return  @(*$self->{Closed} ||
-               @(!length *$self->{Pending} 
-                &&  @( $self->smartEof() || *$self->{EndStream}))) ;
+    return  @($self->{Closed} ||
+               @(!length $self->{Pending} 
+                &&  @( $self->smartEof() || $self->{EndStream}))) ;
 }
 
 sub tell
@@ -1172,14 +1180,14 @@ sub tell
     my $self = shift ;
 
     my $in ;
-    if (*$self->{Plain}) {
-        $in = *$self->{PlainBytesRead} ;
+    if ($self->{Plain}) {
+        $in = $self->{PlainBytesRead} ;
     }
     else {
-        $in = *$self->{TotalInflatedBytesRead} ;
+        $in = $self->{TotalInflatedBytesRead} ;
     }
 
-    my $pending = length *$self->{Pending} ;
+    my $pending = length $self->{Pending} ;
 
     return 0 if $pending +> $in ;
     return $in - $pending ;
@@ -1191,25 +1199,25 @@ sub close
     #        do we remember any trailing data?
     my $self = shift ;
 
-    return 1 if *$self->{Closed} ;
+    return 1 if $self->{Closed} ;
 
-    untie *$self ;
+    untie $self ;
 
     my $status = 1 ;
 
-    if (defined *$self->{FH}) {
-        if ((! *$self->{Handle} || *$self->{AutoClose}) && ! *$self->{StdIO}) {
-        #if ( *$self->{AutoClose}) {
+    if (defined $self->{FH}) {
+        if ((! $self->{Handle} || $self->{AutoClose}) && ! $self->{StdIO}) {
+        #if ( $self->{AutoClose}) {
             #local $.; 
             $! = 0 ;
-            $status = close(*$self->{FH});
+            $status = close($self->{FH});
             return $self->saveErrorString(0, $!, $!)
-                if !*$self->{InNew} && $self->saveStatus($!) != 0 ;
+                if !$self->{InNew} && $self->saveStatus($!) != 0 ;
         }
-        delete *$self->{FH} ;
+        delete $self->{FH} ;
         $! = 0 ;
     }
-    *$self->{Closed} = 1 ;
+    $self->{Closed} = 1 ;
 
     return 1;
 }
@@ -1238,24 +1246,24 @@ sub seek
     }
     elsif ($whence == SEEK_END) {
         $target = $position ;
-        $self->croakError(*$self->{ClassName} . "::seek: SEEK_END not allowed") ;
+        $self->croakError($self->{ClassName} . "::seek: SEEK_END not allowed") ;
     }
     else {
-        $self->croakError(*$self->{ClassName} ."::seek: unknown value, $whence, for whence parameter");
+        $self->croakError($self->{ClassName} ."::seek: unknown value, $whence, for whence parameter");
     }
 
     # short circuit if seeking to current offset
     return 1 if $target == $here ;    
 
     # Outlaw any attempt to seek backwards
-    $self->croakError( *$self->{ClassName} ."::seek: cannot seek backwards")
+    $self->croakError( $self->{ClassName} ."::seek: cannot seek backwards")
         if $target +< $here ;
 
     # Walk the file to the new offset
     my $offset = $target - $here ;
 
     my $got;
-    while (($got = $self->read(my $buffer, < min($offset, *$self->{BlockSize})) ) +> 0)
+    while (($got = $self->read(my $buffer, < min($offset, $self->{BlockSize})) ) +> 0)
     {
         $offset -= $got;
         last if $offset == 0 ;
@@ -1267,8 +1275,8 @@ sub seek
 sub fileno
 {
     my $self = shift ;
-    return defined *$self->{FH} 
-           ? fileno *$self->{FH} 
+    return defined $self->{FH} 
+           ? fileno $self->{FH} 
            : undef ;
 }
 
@@ -1276,30 +1284,30 @@ sub binmode
 {
     1;
 #    my $self     = shift ;
-#    return defined *$self->{FH} 
-#            ? binmode *$self->{FH} 
+#    return defined $self->{FH} 
+#            ? binmode $self->{FH} 
 #            : 1 ;
 }
 
 sub opened
 {
     my $self     = shift ;
-    return ! *$self->{Closed} ;
+    return ! $self->{Closed} ;
 }
 
 sub autoflush
 {
     my $self     = shift ;
-    return defined *$self->{FH} 
-            ? *$self->{FH}->autoflush(< @_) 
+    return defined $self->{FH} 
+            ? $self->{FH}->autoflush(< @_) 
             : undef ;
 }
 
 sub input_line_number
 {
     my $self = shift ;
-    my $last = *$self->{LineNo};
-    #$. = *$self->{LineNo} = @_[1] if (nelems @_) ;
+    my $last = $self->{LineNo};
+    #$. = $self->{LineNo} = @_[1] if (nelems @_) ;
     return $last;
 }
 

@@ -233,8 +233,6 @@ sub mkHeader
     # HEADER CRC
     $out .= pack("v", crc32($out) ^&^ 0x00FF ) if $param->value('HeaderCRC') ;
 
-    noUTF8($out);
-
     return $out ;
 }
 

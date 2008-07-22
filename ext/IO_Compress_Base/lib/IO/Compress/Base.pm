@@ -250,7 +250,6 @@ sub _create
                 $obj->{FH} = IO::File->new( "$outValue", "$mode")
                     or return $obj->saveErrorString(undef, "cannot open file '$outValue': $!", $!) ;
                 $obj->{StdIO} = ($outValue eq '-'); 
-                setBinModeOutput($obj->{FH}) ;
             }
         }
 

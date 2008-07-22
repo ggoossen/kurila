@@ -40,11 +40,11 @@ sub mkUncompObject
     return  @(undef, "Could not create Inflation object: $status", $status) 
         if $status != Z_OK ;
 
-    return bless \%('Inf'        => $inflate,
+    return @( bless \%('Inf'        => $inflate,
                   'CompSize'   => 0,
                   'UnCompSize' => 0,
                   'Error'      => '',
-                 ) ;     
+                 ) );     
     
 }
 
