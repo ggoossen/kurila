@@ -71,9 +71,9 @@ SKIP: {
 
         my $sigint_called = 0;
 
-	my $mask   = POSIX::SigSet->new( < &SIGINT);
+	my $mask   = POSIX::SigSet->new( &SIGINT);
 	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
-	sigaction( <&SIGHUP, $action);
+	sigaction(&SIGHUP, $action);
 	%SIG{'INT'} = \&SigINT;
 
 	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
@@ -141,13 +141,13 @@ like( getcwd(), qr/$pat/, 'getcwd' );
 SKIP: { 
     skip("strtod() not present", 1) unless %Config{d_strtod};
 
-    my $lc = &POSIX::setlocale( <&POSIX::LC_NUMERIC, 'C') if %Config{d_setlocale};
+    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC, 'C') if %Config{d_setlocale};
 
     # we're just checking that strtod works, not how accurate it is
     my ($n, $x) = < &POSIX::strtod('3.14159_OR_SO');
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
-    &POSIX::setlocale( <&POSIX::LC_NUMERIC, $lc) if %Config{d_setlocale};
+    &POSIX::setlocale(&POSIX::LC_NUMERIC, $lc) if %Config{d_setlocale};
 }
 
 SKIP: {
@@ -173,7 +173,7 @@ ok( &POSIX::acos(1.0) == 0.0,   'dynamic loading' );
 # didn't detect it.  If this fails, try adding
 # -DSTRUCT_TM_HASZONE to your cflags when compiling ext/POSIX/POSIX.c.
 # See ext/POSIX/hints/sunos_4.pl and ext/POSIX/hints/linux.pl 
-print < POSIX::strftime('ok 21 # %H:%M, on %m/%d/%y' . "\n", localtime());
+print POSIX::strftime('ok 21 # %H:%M, on %m/%d/%y' . "\n", localtime());
 next_test();
 
 # If that worked, validate the mini_mktime() routine's normalisation of
@@ -184,13 +184,13 @@ sub try_strftime {
     is($got, $expect, "validating mini_mktime() and strftime(): $expect");
 }
 
-my $lc = &POSIX::setlocale( <&POSIX::LC_TIME, 'C') if %Config{d_setlocale};
+my $lc = &POSIX::setlocale(&POSIX::LC_TIME, 'C') if %Config{d_setlocale};
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
 	if ($Is_W32 and ((%Config{cc} eq 'cl' and
 	                 %Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) or
-	                 ( <Win32::GetOSVersion())[1] +>= 6));
+	                 (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);
 }
@@ -201,7 +201,7 @@ try_strftime("Mon Feb 28 00:00:00 2000 059", 0,0,0, 28,1,100);
 try_strftime("Tue Feb 29 00:00:00 2000 060", 0,0,0, 0,2,100);
 try_strftime("Wed Mar 01 00:00:00 2000 061", 0,0,0, 1,2,100);
 try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
-&POSIX::setlocale( <&POSIX::LC_TIME, $lc) if %Config{d_setlocale};
+&POSIX::setlocale(&POSIX::LC_TIME, $lc) if %Config{d_setlocale};
 
 {
     for my $test (0, 1) {

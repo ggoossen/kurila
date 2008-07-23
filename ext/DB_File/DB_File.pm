@@ -279,12 +279,12 @@ sub CLEAR
     my $self = shift;
     my $key = 0 ;
     my $value = "" ;
-    my $status = $self->seq($key, $value, < R_FIRST());
+    my $status = $self->seq($key, $value, R_FIRST());
     my @keys;
  
     while ($status == 0) {
         push @keys, $key;
-        $status = $self->seq($key, $value, < R_NEXT());
+        $status = $self->seq($key, $value, R_NEXT());
     }
     foreach $key (reverse < @keys) {
         my $s = $self->del($key); 
@@ -320,9 +320,9 @@ sub find_dup
     my ($key, $value) = ($origkey, 0);
     my ($status) = 0 ;
 
-    for ($status = $db->seq($key, $value, < R_CURSOR() ) ;
+    for ($status = $db->seq($key, $value, R_CURSOR() ) ;
          $status == 0 ;
-         $status = $db->seq($key, $value, < R_NEXT() ) ) {
+         $status = $db->seq($key, $value, R_NEXT() ) ) {
 
         return 0 if $key eq $origkey and $value eq $value_wanted ;
     }
@@ -337,10 +337,10 @@ sub del_dup
  
     my $db        = shift ;
     my ($key, $value) = < @_ ;
-    my ($status) = < $db->find_dup($key, $value) ;
+    my $status = $db->find_dup($key, $value) ;
     return $status if $status != 0 ;
 
-    $status = $db->del($key, < R_CURSOR() ) ;
+    $status = $db->del($key, R_CURSOR() ) ;
     return $status ;
 }
 
@@ -361,9 +361,9 @@ sub get_dup
  
     # iterate through the database until either EOF ($status == 0)
     # or a different key is encountered ($key ne $origkey).
-    for ($status = $db->seq($key, $value, < R_CURSOR()) ;
+    for ($status = $db->seq($key, $value, R_CURSOR()) ;
 	 $status == 0 and $key eq $origkey ;
-         $status = $db->seq($key, $value, < R_NEXT()) ) {
+         $status = $db->seq($key, $value, R_NEXT()) ) {
  
         # save the value or count number of matches
         if ($flag)

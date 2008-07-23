@@ -72,7 +72,7 @@ foreach my $s (keys %classes) {
 # Expected number of tests is one each for every combination of a
 # known is<xxx> function and string listed above.
 require './test.pl';
-plan(tests => keys(%classes) * keys(%functions));
+plan(tests => nkeys(%classes) * nkeys(%functions));
 
 
 #

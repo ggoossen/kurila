@@ -3766,7 +3766,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_shared_scalar  'n' /* Shared between threads */
 #define PERL_MAGIC_tied		  'P' /* Tied array or hash */
 #define PERL_MAGIC_tiedelem	  'p' /* Tied array or hash element */
-#define PERL_MAGIC_tiedscalar	  'q' /* Tied scalar or handle */
 #define PERL_MAGIC_qr		  'r' /* precompiled qr// regex */
 #define PERL_MAGIC_sig		  'S' /* %SIG hash */
 #define PERL_MAGIC_sigelem	  's' /* %SIG hash element */

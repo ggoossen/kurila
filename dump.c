@@ -1172,7 +1172,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_dbline,         "dbline(l)" },
 	{ PERL_MAGIC_shared_scalar,  "shared_scalar(n)" },
 	{ PERL_MAGIC_tiedelem,       "tiedelem(p)" },
-	{ PERL_MAGIC_tiedscalar,     "tiedscalar(q)" },
 	{ PERL_MAGIC_qr,             "qr(r)" },
 	{ PERL_MAGIC_sigelem,        "sigelem(s)" },
 	{ PERL_MAGIC_taint,          "taint(t)" },
