@@ -602,8 +602,6 @@ $z->autoflush();
 $z->input_line_number();
 $z->newStream( [OPTS] );
 
-$z->deflateParams();
-
 $z->close() ;
 
 $ZipError ;
@@ -1438,15 +1436,6 @@ OPTS consists of any of the the options that are available when creating
 the C<$z> object.
 
 See the L</"Constructor Options"> section for more details.
-
-
-=head2 deflateParams
-
-Usage is
-
-    $z->deflateParams
-
-TODO
 
 
 =head1 Importing 

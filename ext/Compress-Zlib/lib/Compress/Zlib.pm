@@ -25,6 +25,8 @@ $VERSION = eval $VERSION;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = @( qw(
+        deflateInit inflateInit
+
         compress uncompress
 
         gzopen $gzerrno
@@ -328,6 +330,106 @@ sub uncompress($)
     return $output ;
 }
 
+
+sub deflateInit(@)
+{
+    my $got = ParseParameters(0,
+                \%(
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
+                'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
+                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
+                'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
+                'Dictionary'    => \@(1, 1, Parse_any,      ""),
+                ), < @_ ) ;
+
+    croak "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
+            $got->value('Bufsize')
+        unless $got->value('Bufsize') +>= 1;
+
+    my $obj ;
+
+    my $status = 0 ;
+    ($obj, $status) = < 
+      Compress::Raw::Zlib::_deflateInit(0,
+                $got->value('Level'), 
+                $got->value('Method'), 
+                $got->value('WindowBits'), 
+                $got->value('MemLevel'), 
+                $got->value('Strategy'), 
+                $got->value('Bufsize'),
+                $got->value('Dictionary')) ;
+
+    my $x = ($status == Z_OK() ? bless $obj, "Zlib::OldDeflate"  : undef) ;
+    return $x;
+}
+
+sub inflateInit(@)
+{
+    my $got = ParseParameters(0,
+                \%(
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                'Dictionary'    => \@(1, 1, Parse_any,      ""),
+                ), < @_) ;
+
+
+    croak "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
+            $got->value('Bufsize')
+        unless $got->value('Bufsize') +>= 1;
+
+    my $status = 0 ;
+    my $obj ;
+    ($obj, $status) = < Compress::Raw::Zlib::_inflateInit(FLAG_CONSUME_INPUT,
+                                $got->value('WindowBits'), 
+                                $got->value('Bufsize'), 
+                                $got->value('Dictionary')) ;
+
+    my $x = ($status == Z_OK() ? bless $obj, "Zlib::OldInflate"  : undef) ;
+
+    return $x;
+}
+
+package Zlib::OldDeflate ;
+
+our (@ISA);
+@ISA = @( qw(Compress::Raw::Zlib::deflateStream) );
+
+
+sub deflate
+{
+    my $self = shift ;
+    my $output ;
+
+    my $status = $self->SUPER::deflate(@_[0], $output) ;
+    return @($output, $status);
+}
+
+sub flush
+{
+    my $self = shift ;
+    my $output ;
+    my $flag = shift || Compress::Zlib::Z_FINISH();
+    my $status = $self->SUPER::flush($output, $flag) ;
+    
+    return @($output, $status);
+}
+
+package Zlib::OldInflate ;
+
+our (@ISA);
+@ISA = @( qw(Compress::Raw::Zlib::inflateStream) );
+
+sub inflate
+{
+    my $self = shift ;
+    my $output ;
+    my $status = $self->SUPER::inflate(@_[0], $output) ;
+    return @($output, $status);
+}
+
+package Compress::Zlib ;
 
 use IO::Compress::Gzip::Constants v2.006 ;
 

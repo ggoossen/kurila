@@ -179,21 +179,6 @@ use IO::Seekable qw(SEEK_SET);
 
 #### zlib specific methods
 
-sub deflateParams 
-{
-    my $self = shift ;
-
-    my $level = shift ;
-    my $strategy = shift ;
-
-    my $status = *$self->{Compress}->deflateParams(Level => $level, Strategy => $strategy) ;
-    return $self->saveErrorString(0, *$self->{Compress}->{Error}, *$self->{Compress}->{ErrorNo})
-        if $status == STATUS_ERROR;
-
-    return 1;    
-}
-
-
 
 
 1;
@@ -233,8 +218,6 @@ IO::Compress::RawDeflate - Write RFC 1951 files/buffers
     $z->autoflush();
     $z->input_line_number();
     $z->newStream( [OPTS] );
-    
-    $z->deflateParams();
     
     $z->close() ;
 
@@ -867,15 +850,6 @@ OPTS consists of any of the the options that are available when creating
 the C<$z> object.
 
 See the L</"Constructor Options"> section for more details.
-
-
-=head2 deflateParams
-
-Usage is
-
-    $z->deflateParams
-
-TODO
 
 
 =head1 Importing 
