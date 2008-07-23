@@ -468,37 +468,6 @@ sub Compress::Raw::Zlib::inflateScanStream::inflate
     return $status ;
 }
 
-sub Compress::Raw::Zlib::deflateStream::deflateParams
-{
-    my $self = shift ;
-    my ($got) = < ParseParameters(0, \%(
-                'Level'      => \@(1, 1, < Parse_signed,   undef),
-                'Strategy'   => \@(1, 1, < Parse_unsigned, undef),
-                'Bufsize'    => \@(1, 1, < Parse_unsigned, undef),
-                ), 
-                < @_) ;
-
-    croak "Compress::Raw::Zlib::deflateParams needs Level and/or Strategy"
-        unless $got->parsed('Level') + $got->parsed('Strategy') +
-            $got->parsed('Bufsize');
-
-    croak "Compress::Raw::Zlib::Inflate::deflateParams: Bufsize must be >= 1, you specified " . 
-            $got->value('Bufsize')
-        if $got->parsed('Bufsize') && $got->value('Bufsize') +<= 1;
-
-    my $flags = 0;
-    $flags ^|^= 1 if $got->parsed('Level') ;
-    $flags ^|^= 2 if $got->parsed('Strategy') ;
-    $flags ^|^= 4 if $got->parsed('Bufsize') ;
-
-    $self->_deflateParams($flags, < $got->value('Level'), < 
-                          $got->value('Strategy'), < $got->value('Bufsize'));
-
-}
-
-
-# Autoload methods go after __END__, and are processed by the autosplit program.
-
 1;
 __END__
 
@@ -514,7 +483,6 @@ Compress::Raw::Zlib - Low-Level Interface to zlib compression library
     ($d, $status) = new Compress::Raw::Zlib::Deflate( [OPT] ) ;
     $status = $d->deflate($input, $output) ;
     $status = $d->flush($output [, $flush_type]) ;
-    $d->deflateParams(OPTS) ;
     $d->deflateTune(OPTS) ;
     $d->dict_adler() ;
     $d->crc32() ;
@@ -727,14 +695,6 @@ If the C<AppendOutput> option is set to true in the constructor for
 the C<$d> object, the compressed data will be appended to C<$output>. If
 it is false, C<$output> will be truncated before any compressed data is
 written to it.
-
-=head2 B<$status = $d-E<gt>deflateParams([OPT])>
-
-Change settings for the deflate object C<$d>.
-
-The list of the valid options is shown below. Options not specified
-will remain unchanged.
-
 
 =over 5
 

@@ -198,8 +198,6 @@ IO::Compress::Deflate - Write RFC 1950 files/buffers
     $z->input_line_number();
     $z->newStream( [OPTS] );
     
-    $z->deflateParams();
-    
     $z->close() ;
 
     $DeflateError ;
@@ -865,14 +863,6 @@ the C<$z> object.
 
 See the L</"Constructor Options"> section for more details.
 
-
-=head2 deflateParams
-
-Usage is
-
-    $z->deflateParams
-
-TODO
 
 
 =head1 Importing 

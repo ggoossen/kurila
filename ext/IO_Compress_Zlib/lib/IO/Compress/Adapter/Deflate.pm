@@ -99,25 +99,6 @@ sub reset
     return STATUS_OK;    
 }
 
-sub deflateParams 
-{
-    my $self = shift ;
-
-    my $def   = $self->{Def};
-
-    my $status = $def->deflateParams(< @_);
-    $self->{ErrorNo} = $status;
-    if ($status != Z_OK)
-    {
-        $self->{Error} = "deflateParams Error: $status"; 
-        return STATUS_ERROR;
-    }
-
-    return STATUS_OK;   
-}
-
-
-
 #sub total_out
 #{
 #    my $self = shift ;

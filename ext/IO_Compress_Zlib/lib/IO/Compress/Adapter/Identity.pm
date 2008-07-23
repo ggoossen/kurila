@@ -63,13 +63,6 @@ sub reset
     return STATUS_OK;    
 }
 
-sub deflateParams 
-{
-    my $self = shift ;
-
-    return STATUS_OK;   
-}
-
 #sub total_out
 #{
 #    my $self = shift ;

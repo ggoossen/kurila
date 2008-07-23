@@ -995,50 +995,6 @@ flush(s, output, f=Z_FINISH)
 	RETVAL
 
 
-DualType
-_deflateParams(s, flags, level, strategy, bufsize)
-  	Compress::Raw::Zlib::deflateStream	s
-	int 	flags
-	int	level
-	int	strategy
-    	uLong	bufsize
-    CODE:
-	/* printf("_deflateParams(Flags %d Level %d Strategy %d Bufsize %d)\n", flags, level, strategy, bufsize); 
-	printf("Before -- Level %d, Strategy %d, Bufsize %d\n", s->Level, s->Strategy, s->bufsize); */
-	if (flags & 1)
-	    s->Level = level ;
-	if (flags & 2)
-	    s->Strategy = strategy ;
-        if (flags & 4) {
-            s->bufsize = bufsize; 
-	}
-	/* printf("After --  Level %d, Strategy %d, Bufsize %d\n", s->Level, s->Strategy, s->bufsize);*/
-#ifdef SETP_BYTE
-        s->stream.avail_in = 0; 
-        s->stream.next_out = &(s->deflateParams_out_byte) ;
-        s->stream.avail_out = 1;
-	RETVAL = deflateParams(&(s->stream), s->Level, s->Strategy);
-	s->deflateParams_out_valid = 
-		(RETVAL == Z_OK && s->stream.avail_out == 0) ;
-	/* printf("RETVAL %d, avail out %d, byte %c\n", RETVAL, s->stream.avail_out, s->deflateParams_out_byte); */
-#else
-	/* printf("Level %d Strategy %d, Prev Len %d\n", 
-                s->Level, s->Strategy, s->deflateParams_out_length); */
-        s->stream.avail_in = 0; 
-        if (s->deflateParams_out_buffer == NULL)
-            s->deflateParams_out_buffer = safemalloc(deflateParams_BUFFER_SIZE);
-        s->stream.next_out = s->deflateParams_out_buffer ;
-        s->stream.avail_out = deflateParams_BUFFER_SIZE;
-
-	RETVAL = deflateParams(&(s->stream), s->Level, s->Strategy);
-	s->deflateParams_out_length = deflateParams_BUFFER_SIZE - s->stream.avail_out;
-	/* printf("RETVAL %d, length out %d, avail %d\n", 
-                    RETVAL, s->deflateParams_out_length, s->stream.avail_out ); */
-#endif
-    OUTPUT:
-	RETVAL
-
-
 int
 get_Level(s)
         Compress::Raw::Zlib::deflateStream   s

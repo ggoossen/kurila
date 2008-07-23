@@ -25,7 +25,7 @@ BEGIN
 }
 
 
-my $Inc = join " ", map qq["-I$_"] => @INC;
+my $Inc = join " ", map qq["-I$_"] => < @INC;
 $Inc = '"-MExtUtils::testlib"'
     if ! %ENV{PERL_CORE} && eval " require ExtUtils::testlib; " ;
 
