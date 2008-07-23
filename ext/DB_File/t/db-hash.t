@@ -18,7 +18,7 @@ use Fcntl;
 
 print "1..166\n";
 
-unlink glob < "__db.*";
+unlink < glob "__db.*";
 
 sub ok
 {

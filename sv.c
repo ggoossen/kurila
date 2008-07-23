@@ -3794,20 +3794,6 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 	mg->mg_flags |= MGf_REFCOUNTED;
     }
 
-    /* Normal self-ties simply pass a null object, and instead of
-       using mg_obj directly, use the SvTIED_obj macro to produce a
-       new RV as needed.  For glob "self-ties", we are tieing the PVIO
-       with an RV obj pointing to the glob containing the PVIO.  In
-       this case, to avoid a reference loop, we need to weaken the
-       reference.
-    */
-
-    if (how == PERL_MAGIC_tiedscalar && SvTYPE(sv) == SVt_PVIO &&
-        obj && SvROK(obj) && GvIO(SvRV(obj)) == (IO*)sv)
-    {
-      sv_rvweaken(obj);
-    }
-
     mg->mg_type = how;
     mg->mg_len = namlen;
     if (name) {
@@ -3938,7 +3924,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	vtable = &PL_vtbl_pack;
 	break;
     case PERL_MAGIC_tiedelem:
-    case PERL_MAGIC_tiedscalar:
 	vtable = &PL_vtbl_packelem;
 	break;
     case PERL_MAGIC_qr:

@@ -30,8 +30,8 @@ sub foo {
 	$ok=1;
 }
 
-my $newaction=POSIX::SigAction->new(\&foo, < POSIX::SigSet->new(SIGUSR1), 0);
-my $oldaction=POSIX::SigAction->new(\&bar, < POSIX::SigSet->new(), 0);
+my $newaction=POSIX::SigAction->new(\&foo, POSIX::SigSet->new(SIGUSR1), 0);
+my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
 
 {
 	my $bad;
@@ -62,7 +62,7 @@ kill 'HUP', $$;
 ok(!$bad, "SIGHUP ignored");
 
 is(%SIG{HUP}, 'IGNORE');
-sigaction(SIGHUP, < POSIX::SigAction->new('DEFAULT'));
+sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
 is(%SIG{HUP}, 'DEFAULT');
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
@@ -75,10 +75,10 @@ ok($ok10, "SIGHUP handler called");
 
 is(ref(%SIG{HUP}), 'CODE');
 
-sigaction(SIGHUP, < POSIX::SigAction->new(\&::foo));
+sigaction(SIGHUP, POSIX::SigAction->new(\&main::foo));
 # Make sure the signal mask gets restored after sigaction croak()s.
 try {
-	my $act=POSIX::SigAction->new(\&::foo);
+	my $act=POSIX::SigAction->new(\&main::foo);
 	delete $act->{HANDLER};
 	sigaction(SIGINT, $act);
 };
@@ -115,7 +115,7 @@ SKIP: {
 	if ($^O eq 'VMS');
     $newaction=POSIX::SigAction->new(sub { $ok10=1; });
     if (try { SIGCONT; 1 }) {
-	sigaction(SIGCONT, < POSIX::SigAction->new('DEFAULT'));
+	sigaction(SIGCONT, POSIX::SigAction->new('DEFAULT'));
 	{
 	    local($^W)=0;
 	    kill 'CONT', $$;
@@ -157,7 +157,7 @@ sigaction(SIGHUP, undef, $oldaction);
 ok($oldaction->safe, "SIGHUP is safe");
 
 # SigAction handling is not safe ...
-sigaction(SIGHUP, < POSIX::SigAction->new(\&foo));
+sigaction(SIGHUP, POSIX::SigAction->new(\&foo));
 sigaction(SIGHUP, undef, $oldaction);
 ok(!$oldaction->safe, "SigAction not safe by default");
 

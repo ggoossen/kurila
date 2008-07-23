@@ -1229,9 +1229,10 @@ modf(x)
 	NV		x
     PPCODE:
 	NV intvar;
-	/* (We already know stack is long enough.) */
-	PUSHs(sv_2mortal(newSVnv(Perl_modf(x,&intvar))));
-	PUSHs(sv_2mortal(newSVnv(intvar)));
+        AV* res = newAV();
+        mPUSHs((SV*)res);
+	av_push(res, newSVnv(Perl_modf(x,&intvar)));
+	av_push(res, newSVnv(intvar));
 
 NV
 sinh(x)
@@ -1510,9 +1511,10 @@ pipe()
     PPCODE:
 	int fds[2];
 	if (pipe(fds) != -1) {
-	    EXTEND(SP,2);
-	    PUSHs(sv_2mortal(newSViv(fds[0])));
-	    PUSHs(sv_2mortal(newSViv(fds[1])));
+            AV* res = newAV();
+            mXPUSHs( (SV*)res );
+	    av_push(res, newSViv(fds[0]));
+	    av_push(res, newSViv(fds[1]));
 	}
 
 SysRet
@@ -1554,12 +1556,13 @@ uname()
 #ifdef HAS_UNAME
 	struct utsname buf;
 	if (uname(&buf) >= 0) {
-	    EXTEND(SP, 5);
-	    PUSHs(sv_2mortal(newSVpv(buf.sysname, 0)));
-	    PUSHs(sv_2mortal(newSVpv(buf.nodename, 0)));
-	    PUSHs(sv_2mortal(newSVpv(buf.release, 0)));
-	    PUSHs(sv_2mortal(newSVpv(buf.version, 0)));
-	    PUSHs(sv_2mortal(newSVpv(buf.machine, 0)));
+            AV* res = newAV();
+            mXPUSHs((SV*)res);
+	    av_push(res, newSVpv(buf.sysname, 0));
+	    av_push(res, newSVpv(buf.nodename, 0));
+	    av_push(res, newSVpv(buf.release, 0));
+	    av_push(res, newSVpv(buf.version, 0));
+	    av_push(res, newSVpv(buf.machine, 0));
 	}
 #else
 	uname((char *) 0); /* A stub to call not_here(). */
@@ -1626,17 +1629,17 @@ strtod(str)
     PREINIT:
 	double num;
 	char *unparsed;
+        AV* res;
     PPCODE:
+        res = newAV();
+        mXPUSHs((SV*)res);
 	SET_NUMERIC_LOCAL();
 	num = strtod(str, &unparsed);
-	PUSHs(sv_2mortal(newSVnv(num)));
-	if (GIMME == G_ARRAY) {
-	    EXTEND(SP, 1);
-	    if (unparsed)
-		PUSHs(sv_2mortal(newSViv(strlen(unparsed))));
-	    else
-		PUSHs(&PL_sv_undef);
-	}
+	av_push(res, newSVnv(num));
+        if (unparsed)
+            av_push(res, newSViv(strlen(unparsed)));
+        else
+            av_push(res, SvREFCNT_inc(&PL_sv_undef));
 
 void
 strtol(str, base = 0)
@@ -1646,20 +1649,19 @@ strtol(str, base = 0)
 	long num;
 	char *unparsed;
     PPCODE:
+        AV* res = newAV();
+        mXPUSHs((SV*)res);
 	num = strtol(str, &unparsed, base);
 #if IVSIZE <= LONGSIZE
 	if (num < IV_MIN || num > IV_MAX)
-	    PUSHs(sv_2mortal(newSVnv((double)num)));
+	    av_push(res, newSVnv((double)num));
 	else
 #endif
-	    PUSHs(sv_2mortal(newSViv((IV)num)));
-	if (GIMME == G_ARRAY) {
-	    EXTEND(SP, 1);
-	    if (unparsed)
-		PUSHs(sv_2mortal(newSViv(strlen(unparsed))));
-	    else
-		PUSHs(&PL_sv_undef);
-	}
+	    av_push(res, newSViv((IV)num));
+        if (unparsed)
+            av_push(res, newSViv(strlen(unparsed)));
+        else
+            av_push(res, SvREFCNT_inc(&PL_sv_undef));
 
 void
 strtoul(str, base = 0)
@@ -1669,20 +1671,19 @@ strtoul(str, base = 0)
 	unsigned long num;
 	char *unparsed;
     PPCODE:
+        AV* res = newAV();
+        mXPUSHs((SV*)res);
 	num = strtoul(str, &unparsed, base);
 #if IVSIZE <= LONGSIZE
 	if (num > IV_MAX)
-	    PUSHs(sv_2mortal(newSVnv((double)num)));
+	    av_push(res, newSVnv((double)num));
 	else
 #endif
-	    PUSHs(sv_2mortal(newSViv((IV)num)));
-	if (GIMME == G_ARRAY) {
-	    EXTEND(SP, 1);
-	    if (unparsed)
-		PUSHs(sv_2mortal(newSViv(strlen(unparsed))));
-	    else
-		PUSHs(&PL_sv_undef);
-	}
+	    av_push(res, newSViv((IV)num));
+        if (unparsed)
+            av_push(res, newSViv(strlen(unparsed)));
+        else
+            av_push(res, SvREFCNT_inc(&PL_sv_undef));
 
 void
 strxfrm(src)
@@ -1777,13 +1778,14 @@ times()
 	PPCODE:
 	struct tms tms;
 	clock_t realtime;
+        AV* res = newAV();
 	realtime = times( &tms );
-	EXTEND(SP,5);
-	PUSHs( sv_2mortal( newSViv( (IV) realtime ) ) );
-	PUSHs( sv_2mortal( newSViv( (IV) tms.tms_utime ) ) );
-	PUSHs( sv_2mortal( newSViv( (IV) tms.tms_stime ) ) );
-	PUSHs( sv_2mortal( newSViv( (IV) tms.tms_cutime ) ) );
-	PUSHs( sv_2mortal( newSViv( (IV) tms.tms_cstime ) ) );
+        mXPUSHs( (SV*) res );
+	av_push(res, newSViv( (IV) realtime ) );
+	av_push(res, newSViv( (IV) tms.tms_utime ) );
+	av_push(res, newSViv( (IV) tms.tms_stime ) );
+	av_push(res, newSViv( (IV) tms.tms_cutime ) );
+	av_push(res, newSViv( (IV) tms.tms_cstime ) );
 
 double
 difftime(time1, time2)
@@ -1849,9 +1851,10 @@ tzset()
 void
 tzname()
     PPCODE:
-	EXTEND(SP,2);
-	PUSHs(sv_2mortal(newSVpvn(tzname[0],strlen(tzname[0]))));
-	PUSHs(sv_2mortal(newSVpvn(tzname[1],strlen(tzname[1]))));
+        AV* res = newAV();
+        mXPUSHs( (SV*)res );
+        av_push(res, newSVpvn(tzname[0],strlen(tzname[0])));
+	av_push(res, newSVpvn(tzname[1],strlen(tzname[1])));
 
 SysRet
 access(filename, mode)
