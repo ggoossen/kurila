@@ -20,7 +20,7 @@ sub lexless_anon_sub {
     # Uses a closure (on $__ExPr__) to pass in the code to be executed.
     # (eval on one line to keep line numbers as expected by caller)
     eval sprintf
-    'package %s; %s strict; sub { @_=(); eval q[my $__ExPr__;] . $__ExPr__; }',
+    'package %s; %s strict; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
 		@_[0], @_[1] ? 'use' : 'no';
 }
 
@@ -43,7 +43,8 @@ my $default_root  = 0;
 # Don't share stuff like *UNIVERSAL:: otherwise code from the
 # compartment can 0wn functions in UNIVERSAL
 my $default_share = \@(qw[
-    *_
+    $_
+    @_
     &PerlIO::get_layers
     &UNIVERSAL::isa
     &UNIVERSAL::can
@@ -104,7 +105,7 @@ sub new {
 
     if (defined($root)) {
 	croak "Can't use \"$root\" as root name"
-	    if $root =~ m/^main\b/ or $root !~ m/^\w[:\w]*$/;
+	    if $root =~ m/^main\b/ or $root !~ m/^\w+::\w[:\w]*$/;
 	$obj->{Root}  = $root;
 	$obj->{Erase} = 0;
     }
@@ -140,7 +141,7 @@ sub erase {
     my ($stem, $leaf);
 
     no strict 'refs';
-    $pkg = "main::{$pkg}::";	# expand to full symbol table name
+    $pkg = "{$pkg}::";	# expand to full symbol table name
     ($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
 
     # The 'my $foo' is needed! Without it you get an
@@ -153,10 +154,16 @@ sub erase {
 
 #    delete $stem_symtab->{$leaf};
 
-    my $leaf_glob   = $stem_symtab->{$leaf};
-    my $leaf_symtab = *{$leaf_glob}{HASH};
+    delete $stem_symtab->{$leaf};
+    return;
+
+    my $leaf_globref   = \($stem_symtab->{$leaf});
+    my $leaf_symtab = *{$leaf_globref}{HASH};
 #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
-    %$leaf_symtab = %( () );
+    # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
+    for (keys %$leaf_symtab) {
+        delete $leaf_symtab->{$_};
+    }
     #delete $leaf_symtab->{'__ANON__'};
     #delete $leaf_symtab->{'foo'};
     #delete $leaf_symtab->{'main::'};
@@ -167,6 +174,7 @@ sub erase {
     } else {
         $obj->share_from('main', $default_share);
     }
+
     1;
 }
 
@@ -277,8 +285,7 @@ sub share_forget {
 
 sub varglob {
     my ($obj, $var) = < @_;
-    no strict 'refs';
-    return *{Symbol::fetch_glob($obj->root()."::$var")};
+    return Symbol::fetch_glob($obj->root()."::$var");
 }
 
 

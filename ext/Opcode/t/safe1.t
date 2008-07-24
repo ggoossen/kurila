@@ -31,16 +31,16 @@ $cpt = Safe->new() or die;
 $cpt = Safe->new() or die;
 $cpt = Safe->new() or die;
 
-$cpt = Safe->new( "Root") or die;
+$cpt = Safe->new( "My::Root") or die;
 
 foreach(1..3) {
 	our $foo = 42;
 
 	$cpt->share(qw($foo));
 
-	print ${$cpt->varglob('foo')}       == 42 ? "ok $t\n" : "not ok $t\n"; $t++;
+	print ${*{$cpt->varglob('foo')}}       == 42 ? "ok $t\n" : "not ok $t\n"; $t++;
 
-	${$cpt->varglob('foo')} = 9;
+	${*{$cpt->varglob('foo')}} = 9;
 
 	print $foo == 9	? "ok $t\n" : "not ok $t\n"; $t++;
 
@@ -60,7 +60,7 @@ foreach(1..3) {
 	# $Root::foo etc we would still see the original values!
 	# This seems to be because the compiler has created an extra ref.
 
-	print ${$cpt->varglob('foo')} ? "not ok $t\n" : "ok $t\n"; $t++;
+	print ${*{$cpt->varglob('foo')}} ? "not ok $t\n" : "ok $t\n"; $t++;
 }
 
 print "ok $last_test\n";
