@@ -8,7 +8,6 @@
  *
  */
 
-#define PERL_VALGRIND
 #ifdef PERL_VALGRIND
 #  include "valgrind/memcheck.h"
 #else
