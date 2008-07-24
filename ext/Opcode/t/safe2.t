@@ -33,7 +33,7 @@ my $cpt;
 $cpt = Safe->new() or die;
 $cpt = Safe->new() or die;
 
-$cpt = Safe->new( "Root");
+$cpt = Safe->new( "My::Root");
 
 $cpt->permit(qw(:base_io));
 
@@ -53,7 +53,7 @@ $cpt->reval(q{
     print defined($::bar)		? "not ok 5\n" : "ok 5\n";
     print defined($main::bar)		? "not ok 6\n" : "ok 6\n";
 });
-print $@ ? "not ok 7\n#$@" : "ok 7\n";
+print $@ ? "not ok 7\n#{$@->message}" : "ok 7\n";
 
 our $foo = "ok 8\n";
 our %bar = %(key => "ok 9\n");

@@ -125,7 +125,7 @@ sub new {
     # for reasons I don't completely understand, we need to share
     # the whole glob *_ rather than $_ and @_ separately, otherwise
     # @_ in non default packages within the compartment don't work.
-    $obj->share_from('main', $default_share);
+    $obj->share_from('', $default_share);
     Opcode::_safe_pkg_prep($obj->{Root}) if($Opcode::VERSION +> 1.04);
     return $obj;
 }
@@ -172,7 +172,7 @@ sub erase {
     if ($action and $action eq 'DESTROY') {
         delete $stem_symtab->{$leaf};
     } else {
-        $obj->share_from('main', $default_share);
+        $obj->share_from('', $default_share);
     }
 
     1;
@@ -243,8 +243,8 @@ sub share_from {
     croak("vars not an array ref") unless ref $vars eq 'ARRAY';
     no strict 'refs';
     # Check that 'from' package actually exists
-    croak("Package \"$pkg\" does not exist")
-	unless %{Symbol::stash("$pkg")};
+#     croak("Package \"$pkg\" does not exist")
+# 	unless %{Symbol::stash("$pkg")};
     my $arg;
     foreach $arg (< @$vars) {
 	# catch some $safe->share($var) errors:

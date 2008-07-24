@@ -303,12 +303,9 @@ PPCODE:
     SAVESPTR(PL_curstash);
     SVcpREPLACE(PL_curstash, PL_defstash);
 
-    /* defstash must itself contain a main:: so we'll add that now	*/
-    /* take care with the ref counts (was cause of long standing bug)	*/
-    /* XXX I'm still not sure if this is right, GV_ADDWARN should warn!	*/
+    /* make "main::" the default stash */
     gv = gv_fetchpv("main::", GV_ADDWARN, SVt_PVHV);
-    sv_free((SV*)GvHV(gv));
-    GvHV(gv) = (HV*)SvREFCNT_inc(PL_defstash);
+    SVcpREPLACE(PL_curstash, GvHV(gv));
 
     /* %INC must be clean for use/require in compartment */
     dummy_hv = save_hash(PL_incgv);
