@@ -84,6 +84,7 @@ typedef enum {
     Dt_ARRAY,
     Dt_HASH,
     Dt_IO,
+    Dt_GLOB,
     Dt_COMPLEX
 } datatype;
 

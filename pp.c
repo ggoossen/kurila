@@ -3390,7 +3390,7 @@ PP(pp_aslice)
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
 
     if (SvTYPE(av) != SVt_PVAV)
-	Perl_croak(aTHX_ "can't take an array slice from an %s", SvDESC((SV*)av));
+	Perl_croak(aTHX_ "can't take an array slice from an %s", Ddesc((SV*)av));
 
     if (lval && PL_op->op_private & OPpLVAL_INTRO) {
 	register SV **svp;
@@ -3763,7 +3763,7 @@ PP(pp_expand)
 
     if ( ! (SvAVOK(sv) || SvHVOK(sv)) ) {
 	if ( SvOK(sv) )
-	    Perl_croak(aTHX_ "expand operator may not be used upon a %s", SvDESC(sv));
+	    Perl_croak(aTHX_ "expand operator may not be used upon a %s", Ddesc(sv));
 	(void)POPs;
 	RETURN;
     }
