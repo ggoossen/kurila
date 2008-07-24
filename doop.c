@@ -709,7 +709,7 @@ Perl_bad_arg(pTHX_ I32 n, const char *t, const char *name, SV *arg)
     PERL_ARGS_ASSERT_BAD_ARG;
 
     Perl_croak(aTHX_ "Type of arg %d to %s must be %s (not %s)",
-	       (int)n, name, t, SvDESC(arg));
+	       (int)n, name, t, Ddesc(arg));
 }
 
 void

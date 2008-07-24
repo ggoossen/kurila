@@ -7,6 +7,8 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_ARRAY;
     else if (SvHVOK(sv))
         return Dt_HASH;
+    else if (SvTYPE(sv) == SVt_PVGV)
+        return Dt_GLOB;
     else if (SvROK(sv))
         return Dt_REF;
     else if (SvPVOK(sv))
@@ -27,6 +29,7 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
     case Dt_REF: return "REF";
     case Dt_PLAIN: return "PLAINVALUE";
     case Dt_IO: return "IO";
+    case Dt_GLOB: return "GLOB";
     case Dt_COMPLEX: return "COMPLEX";
     }
     return "COMPLEX";
@@ -86,22 +89,6 @@ static __inline__ void iiSvIOKp_on(pTHX_ SV *sv) {
     assert((SvTYPE(sv) == SVt_IV) || (SvTYPE(sv) >= SVt_PVIV));
 }
 #define SvIOKp_on(sv) iiSvIOKp_on(aTHX_ sv)
-
-static __inline__ const char* iiSvDESC(pTHX_ SV *sv) {
-  if ( ! SvOK(sv) )
-    return "undef";
-  if ( SvROK(sv) )
-    return "ref";
-  if ( SvAVOK(sv) )
-    return "array";
-  if ( SvHVOK(sv) )
-    return "hash";
-  if ( SvPVOK(sv) )
-    return "plain value";
-
-  return "unknown";
-}
-#define SvDESC(sv) iiSvDESC(aTHX_ sv)
 
 
 #define av_2mortal(av) inline_av_2mortal(aTHX_ av)
