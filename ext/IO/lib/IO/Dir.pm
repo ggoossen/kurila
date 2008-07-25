@@ -65,6 +65,12 @@ sub read {
     readdir($dh);
 }
 
+sub read_all {
+    (nelems @_) == 1 or croak 'usage: $dh->read_all()';
+    my ($dh) = < @_;
+    return @( readdir($dh) );
+}
+
 sub seek {
     (nelems @_) == 2 or croak 'usage: $dh->seek(POS)';
     my ($dh,$pos) = < @_;
@@ -113,7 +119,7 @@ sub EXISTS {
 
 sub FETCH {
     my($dh,$key) = < @_;
-    &lstat( <File::Spec->catfile(%{*$dh}{io_dir_path}, $key));
+    &lstat(File::Spec->catfile(%{*$dh}{io_dir_path}, $key));
 }
 
 sub STORE {

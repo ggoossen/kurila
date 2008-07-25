@@ -115,7 +115,7 @@ sub remove {
 
 sub handles {
     my $self = shift;
-    return values %{$self->[2]} unless (nelems @_);
+    return @( values %{$self->[2]} ) unless (nelems @_);
 
     my $events = shift || 0;
     my($fd,$ev,$io,$mask);

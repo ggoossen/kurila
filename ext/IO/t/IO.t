@@ -114,7 +114,7 @@ SKIP:
 {
 	skip("Could not write to disk", 2 ) unless $flag;
 	try { IO->import( 'fakemod' ) };
-	ok( < IO::fakemod::exists(), 'import() should import IO:: modules by name' );
+	ok( IO::fakemod::exists(), 'import() should import IO:: modules by name' );
 	is( $@, '', '... and should not call import() on imported modules' );
 }
 
