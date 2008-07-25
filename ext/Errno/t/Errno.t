@@ -1,6 +1,6 @@
 #!./perl -w
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 BEGIN {
     use_ok("Errno");
@@ -29,6 +29,9 @@ like($@->{description}, qr/^ERRNO hash is read only!/);
 
 try {delete %!{$err}};
 like($@->{description}, qr/^ERRNO hash is read only!/);
+
+$! = Errno::EINPROGRESS();
+is( %!{EINPROGRESS}, Errno::EINPROGRESS );
 
 # The following tests are in trouble if some OS picks errno values
 # through Acme::MetaSyntactic::batman
