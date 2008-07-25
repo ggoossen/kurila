@@ -406,7 +406,8 @@ sub FETCH {
     my $proto = prototype("Errno::$errname");
     my $errno = "";
     if ( exists %name2no{$errname}) {
-        $errno = 0 unless $! == %name2no{$errname};
+        $errno = %name2no{$errname};
+        $errno = 0 unless $! == $errno;
     }
     return $errno;
 }
