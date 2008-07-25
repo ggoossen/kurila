@@ -94,7 +94,7 @@ if(my $pid = fork()) {
     my $sock = $listen->accept() or die "$!";
     print "ok 5\n";
 
-    print < $sock->getline();
+    print $sock->getline();
     print $sock "ok 7\n";
 
     waitpid($pid,0);
@@ -114,7 +114,7 @@ if(my $pid = fork()) {
 
     print $sock "ok 6\n";
     sleep(1); # race condition
-    print < $sock->getline();
+    print $sock->getline();
 
     $sock->close;
 
