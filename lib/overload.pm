@@ -29,7 +29,7 @@ sub OVERLOAD {
 }
 
 sub import {
-  my $package = @(caller())[[0]];
+  my $package = @(caller())[0];
   # *{$package . "::OVERLOAD"} = \&OVERLOAD;
   shift;
   $package->overload::OVERLOAD(< @_);
