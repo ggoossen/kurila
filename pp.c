@@ -3418,9 +3418,7 @@ PP(pp_aslice)
     }
 
     if (GIMME != G_ARRAY) {
-	MARK = ORIGMARK;
-	*++MARK = SP > ORIGMARK ? *SP : &PL_sv_undef;
-	SP = MARK;
+	Perl_croak(aTHX_ "Array slice must be in list context");
     }
     RETURN;
 }
