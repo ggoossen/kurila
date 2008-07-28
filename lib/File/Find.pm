@@ -936,7 +936,7 @@ sub _find_dir($$$) {
 		    # Seen all the subdirs?
 		    # check for directoriness.
 		    # stat is faster for a file in the current directory
-		    $sub_nlink = @(lstat ($no_chdir ? $dir_pref . $FN : $FN))[[3]];
+		    $sub_nlink = @(lstat ($no_chdir ? $dir_pref . $FN : $FN))[3];
 
 		    if (-d _) {
 			--$subcount;
