@@ -16,7 +16,7 @@ sub as_heavy {
   require Exporter::Heavy;
   # Unfortunately, this does not work if the caller is aliased as *name = \&foo
   # Thus the need to create a lot of identical subroutines
-  my $c = @(caller(1))[[3]];
+  my $c = @(caller(1))[3];
   $c =~ s/.*:://;
   \&{*{Symbol::fetch_glob("Exporter::Heavy::heavy_$c")}};
 }
