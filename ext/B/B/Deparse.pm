@@ -8,7 +8,6 @@
 # but essentially none of his code remains.
 
 package B::Deparse;
-use Carp;
 use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
 	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD OPpPAD_STATE
@@ -610,14 +609,6 @@ sub compile {
 	    $self->todo($block, 0);
 	}
 	$self->stash_subs();
-	local($^DIE_HOOK) =
-	  sub {
-	      if ($self->{'curcop'}) {
-		  my $cop = $self->{'curcop'};
-		  my($line, $file) = ( <$cop->line, < $cop->file);
-		  print STDERR "While deparsing $file near line $line,\n";
-	      }
-	    };
 	$self->{'curcv'} = main_cv;
 	$self->{'curcvlex'} = undef;
 	print < $self->print_protos;
@@ -646,7 +637,7 @@ sub compile {
 sub coderef2text {
     my $self = shift;
     my $sub = shift;
-    croak "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($sub, "CODE");
+    die "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($sub, "CODE");
 
     $self->init();
     return $self->indent($self->deparse_sub(svref_2object($sub)));
@@ -744,11 +735,11 @@ sub ambient_pragmas {
 	}
 
 	else {
-	    croak "Unknown pragma type: $name";
+	    die "Unknown pragma type: $name";
 	}
     }
     if ((nelems @_)) {
-	croak "The ambient_pragmas method expects an even number of args";
+	die "The ambient_pragmas method expects an even number of args";
     }
 
     $self->{'ambient_warnings'} = $warning_bits;
@@ -761,7 +752,7 @@ sub deparse {
     my $self = shift;
     my($op, $cx) = < @_;
 
-    Carp::confess("Null op in deparse") if !defined($op)
+    die("Null op in deparse") if !defined($op)
 					|| class($op) eq "NULL";
     my $meth = "pp_" . $op->name;
     return $self->?$meth($op, $cx);
@@ -799,8 +790,8 @@ sub deparse_sub {
     my $self = shift;
     my $cv = shift;
     my $proto = "";
-Carp::confess("NULL in deparse_sub") if !defined($cv) || $cv->isa("B::NULL");
-Carp::confess("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
+    die("NULL in deparse_sub") if !defined($cv) || $cv->isa("B::NULL");
+    die("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
     local $self->{'curcop'} = $self->{'curcop'};
     if ($cv->FLAGS ^&^ SVf_POK) {
 	$proto = "(". $cv->PV . ") ";
@@ -1146,7 +1137,7 @@ BEGIN { map(%globalnames{$_}++, "SIG", "STDIN", "STDOUT", "STDERR", "INC",
 sub gv_name {
     my $self = shift;
     my $gv = shift;
-Carp::confess() unless ref($gv) eq "B::GV";
+    die "no B::GV" unless ref($gv) eq "B::GV";
     my $stash = $gv->STASH->NAME;
     my $name = $gv->SAFENAME;
     if ($stash eq 'main' && $name =~ m/^::/) {
@@ -2566,7 +2557,7 @@ sub loop_common {
 	}
 	$body = $kid->first->first->sibling; # skip OP_AND and OP_ITER
 	if (!is_state $body->first and $body->first->name ne "stub") {
-	    confess unless $var eq '$_';
+	    die unless $var eq '$_';
 	    $body = $body->first;
 	    return $self->deparse($body, 2) . " foreach ($ary)";
 	}
