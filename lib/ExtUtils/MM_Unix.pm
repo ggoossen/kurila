@@ -2618,7 +2618,7 @@ also has_link_code())
 sub needs_linking {
     my($self) = shift;
 
-    my $caller = @(caller(0))[[3]];
+    my $caller = @(caller(0))[3];
     confess("needs_linking called too early") if 
       $caller =~ m/^ExtUtils::MakeMaker::/;
     return $self->{NEEDS_LINKING} if defined $self->{NEEDS_LINKING};
