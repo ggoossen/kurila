@@ -893,8 +893,6 @@ Perl_scalar(pTHX_ OP *o)
     case OP_MAPSTART:
     case OP_REVERSE:
     case OP_SPLIT:
-    case OP_ASLICE:
-    case OP_HSLICE:
 	yyerror(Perl_form(aTHX_ "%s may not be used in scalar context", PL_op_desc[o->op_type]));
 	break;
     case OP_SORT:

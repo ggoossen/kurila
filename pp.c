@@ -3392,6 +3392,9 @@ PP(pp_aslice)
     if (SvTYPE(av) != SVt_PVAV)
 	Perl_croak(aTHX_ "can't take an array slice from an %s", Ddesc((SV*)av));
 
+    if (GIMME == G_SCALAR)
+	Perl_croak(aTHX_ "array slice may not be used in scalar context");
+
     if (lval && PL_op->op_private & OPpLVAL_INTRO) {
 	register SV **svp;
 	I32 max = -1;
@@ -3417,9 +3420,6 @@ PP(pp_aslice)
 	*MARK = svp ? *svp : &PL_sv_undef;
     }
 
-    if (GIMME != G_ARRAY) {
-	Perl_croak(aTHX_ "Array slice must be in list context");
-    }
     RETURN;
 }
 
@@ -3586,6 +3586,9 @@ PP(pp_hslice)
 
     if ( ! SvHVOK(hv) )
 	Perl_croak(aTHX_ "Not a HASH");
+
+    if (GIMME == G_SCALAR)
+	Perl_croak(aTHX_ "hash slice may not be used in scalar context");
 
     while (++MARK <= SP) {
         SV * const keysv = *MARK;
