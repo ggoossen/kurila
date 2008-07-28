@@ -1454,8 +1454,12 @@ PP(pp_helem)
 
     hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
 
-    if (SvTYPE(hv) != SVt_PVHV)
-	RETPUSHUNDEF;
+    if (SvTYPE(hv) != SVt_PVHV) {
+	if ( ! lval )
+	    RETPUSHUNDEF;
+	/* hv must be "undef" */
+	sv_upgrade((SV*)hv, SVt_PVHV);
+    }
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	MAGIC *mg;
