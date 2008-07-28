@@ -1459,7 +1459,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_AELEM:
     case OP_HELEM:
-	ref(cBINOPo->op_first, o->op_type);
+	mod(cBINOPo->op_first, o->op_type);
 	if (type == OP_ENTERSUB &&
 	     !(o->op_private & (OPpLVAL_INTRO | OPpDEREF)))
 	    o->op_private |= OPpLVAL_DEFER;
