@@ -43,14 +43,6 @@ use Exporter;
 use vars qw(@ISA @EXPORT @EXPORT_OK);
 @ISA = @( qw(Exporter) );
 
-# Exported subroutines.
-sub GetOptions(@);		# always
-sub GetOptionsFromArray($@);	# on demand
-sub GetOptionsFromString($@);	# on demand
-sub Configure(@);		# on demand
-sub HelpMessage(@);		# on demand
-sub VersionMessage(@);		# in demand
-
 BEGIN {
     # Init immediately so their contents can be used in the 'use vars' below.
     @EXPORT    = @( qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER) );
@@ -66,16 +58,6 @@ use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
 use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
-
-# Public subroutines.
-sub config(@);			# deprecated name
-
-# Private subroutines.
-sub ConfigDefaults();
-sub ParseOptionSpec($$);
-sub OptCtl($);
-sub FindOption($$$$$);
-sub ValidValue ($$$$$);
 
 ################ Local Variables ################
 
