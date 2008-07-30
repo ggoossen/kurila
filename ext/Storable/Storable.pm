@@ -83,7 +83,8 @@ sub logcarp {
 
 our %Config;
 
-sub CAN_FLOCK; my $CAN_FLOCK; sub CAN_FLOCK {
+my $CAN_FLOCK;
+sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
 	require Config; Config->import;
 	return $CAN_FLOCK =

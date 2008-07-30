@@ -12,10 +12,6 @@ use warnings;
 use File::Spec;
 use Config;
 our(@ISA, @EXPORT, @EXPORT_OK, $VERSION, $Too_Big, $Syscopy_is_copy);
-sub copy;
-sub syscopy;
-sub cp;
-sub mv;
 
 # Note that this module implements only *part* of the API defined by
 # the File/Copy.pm module of the File-Tools-2.0 package.  However, that

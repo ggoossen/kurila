@@ -574,8 +574,6 @@ sub Follow_SymLink($) {
 }
 
 our($dir, $name, $fullname, $prune);
-sub _find_dir_symlnk($$$);
-sub _find_dir($$$);
 
 # check whether or not a scalar variable is tainted
 # (code straight from the Camel, 3rd ed., page 561)

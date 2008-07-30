@@ -53,11 +53,8 @@ sub header {
 # This might actually be a return statement. Note that you are responsible
 # for any space you might need before your value, as it lets to perform
 # "tricks" such as "return KEY_" and have strings appended.
-sub assignment_clause_for_type;
 # In which case this might be an empty string
 sub return_statement_for_type {undef};
-sub return_statement_for_notdef;
-sub return_statement_for_notfound;
 
 # "#if 1" is true to a C pre-processor
 sub macro_from_name {
