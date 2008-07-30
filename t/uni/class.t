@@ -59,33 +59,33 @@ if (ord('A') == 193) {
 }
 
 # make sure it finds built-in class
-is(($str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-is(($str =~ m/(\p{l}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+is(@($str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+is(@($str =~ m/(\p{l}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 # make sure it finds user-defined class
-is(($str =~ m/(\p{main::MyUniClass}+)/)[0], '0123456789:;<=>?@ABCDEFGHIJKLMNO');
+is(@($str =~ m/(\p{main::MyUniClass}+)/)[0], '0123456789:;<=>?@ABCDEFGHIJKLMNO');
 
 # make sure it finds class in other package
-is(($str =~ m/(\p{Other::Class}+)/)[0], '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_');
+is(@($str =~ m/(\p{Other::Class}+)/)[0], '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_');
 
 # make sure it finds class in other OTHER package
-is(($str =~ m/(\p{A::B::Intersection}+)/)[0], '@ABCDEFGHIJKLMNO');
+is(@($str =~ m/(\p{A::B::Intersection}+)/)[0], '@ABCDEFGHIJKLMNO');
 
 # all of these should look in lib/unicore/bc/AL.pl
 $str = "\x{070D}\x{070E}\x{070F}\x{0710}\x{0711}";
-is(($str =~ m/(\P{BidiClass: ArabicLetter}+)/)[0], "\x{070E}\x{070F}");
-is(($str =~ m/(\P{BidiClass: AL}+)/)[0], "\x{070E}\x{070F}");
-is(($str =~ m/(\P{BC :ArabicLetter}+)/)[0], "\x{070E}\x{070F}");
-is(($str =~ m/(\P{bc=AL}+)/)[0], "\x{070E}\x{070F}");
+is(@($str =~ m/(\P{BidiClass: ArabicLetter}+)/)[0], "\x{070E}\x{070F}");
+is(@($str =~ m/(\P{BidiClass: AL}+)/)[0], "\x{070E}\x{070F}");
+is(@($str =~ m/(\P{BC :ArabicLetter}+)/)[0], "\x{070E}\x{070F}");
+is(@($str =~ m/(\P{bc=AL}+)/)[0], "\x{070E}\x{070F}");
 
 # make sure InGreek works
 $str = "[\x{038B}\x{038C}\x{038D}]";
 
-is(($str =~ m/(\p{InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
-is(($str =~ m/(\p{Script:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
-is(($str =~ m/(\p{Script=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
-is(($str =~ m/(\p{sc:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
-is(($str =~ m/(\p{sc=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
+is(@($str =~ m/(\p{InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
+is(@($str =~ m/(\p{Script:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
+is(@($str =~ m/(\p{Script=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
+is(@($str =~ m/(\p{sc:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
+is(@($str =~ m/(\p{sc=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}");
 
 use File::Spec;
 my $updir = 'File::Spec'->updir;
