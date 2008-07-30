@@ -22,9 +22,6 @@ BEGIN {
     ) );
 }
 
-sub opset (;@);
-sub opset_to_hex ($);
-sub opdump (;$);
 use subs < @EXPORT_OK;
 
 XSLoader::load 'Opcode', $VERSION;
