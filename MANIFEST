@@ -1194,6 +1194,8 @@ lib/less.pm			For "use less"
 lib/less.t			See if less support works
 lib/lib_pm.PL			For "use lib", produces lib/lib.pm
 lib/lib.t			For "use lib" testing
+lib/blib.t			For "use blib" testing
+lib/blib.pm			blib module
 lib/Locale/Codes/ChangeLog	Locale::Codes
 lib/Locale/Codes/README		Locale::Codes
 lib/Locale/Codes/t/all.t	See if Locale::Codes work
