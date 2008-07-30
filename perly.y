@@ -581,13 +581,9 @@ myattrlist:	COLONATTR THING
 
 /* Subroutine body - either null or a block */
 subbody	:	block	{ $$ = $1; }
-	|	';'	{ $$ = IF_MAD(
-				    newOP(OP_NULL,0),
-				    (OP*)NULL
-				);
-			  PL_parser->expect = XSTATE;
-			  TOKEN_GETMAD($1,$$,';');
-			}
+        |	';'	{ $$ = newOP(OP_NULL, 0);
+                          yyerror("forward subroutine declartion not allowed");
+                        }
 	;
 
 package :	PACKAGE WORD ';'
