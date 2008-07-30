@@ -13,20 +13,22 @@ use XSLoader ();
 require Exporter;
 our @ISA = @( qw(Exporter) );
 
-# walkoptree_slow comes from B.pm (you are there),
-# walkoptree comes from B.xs
-our @EXPORT_OK = @( qw(minus_c ppname save_BEGINs
-		class peekop cast_I32 cstring cchar hash
-		main_root main_start main_cv svref_2object opnumber
-		sub_generation amagic_generation perlstring
-		walkoptree_slow walkoptree walkoptree_exec walksymtable
-		parents comppadlist sv_undef compile_stats timing_info
-		begin_av init_av check_av end_av regex_padav dowarn defstash
-		curstash warnhook diehook inc_gv @optype @specialsv_name
-                unitcheck_av
-		) );
+BEGIN {
+    # walkoptree_slow comes from B.pm (you are there),
+    # walkoptree comes from B.xs
+    our @EXPORT_OK = @( qw(minus_c ppname save_BEGINs
+                           class peekop cast_I32 cstring cchar hash
+                           main_root main_start main_cv svref_2object opnumber
+                           sub_generation amagic_generation perlstring
+                           walkoptree_slow walkoptree walkoptree_exec walksymtable
+                           parents comppadlist sv_undef compile_stats timing_info
+                           begin_av init_av check_av end_av regex_padav dowarn defstash
+                           curstash warnhook diehook inc_gv @optype @specialsv_name
+                           unitcheck_av
+                      ) );
+    XSLoader::load 'B';
+}
 
-sub OPf_KIDS ();
 use strict;
 @B::SV::ISA = @( 'B::OBJECT' );
 @B::NULL::ISA = @( 'B::SV' );
@@ -302,7 +304,6 @@ sub walksymtable {
     }
 }
 
-XSLoader::load 'B';
 require B::OP;
 
 1;
