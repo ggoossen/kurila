@@ -159,13 +159,12 @@ PP(pp_rv2sv)
 	}
     }
     if (PL_op->op_private & OPpLVAL_INTRO) {
-	if (cUNOP->op_first->op_type == OP_NULL)
-	    Perl_croak(aTHX_ "panic: what is this?");
-	/* 		sv = save_scalar((GV*)TOPs); */
-	else if (gv)
+	if (gv)
 	    sv = is_pp_rv2sv ? save_scalar(gv) : is_pp_rv2av ? (SV*)save_ary(gv) : (SV*)save_hash(gv);
-	else
-	    Perl_croak(aTHX_ PL_no_localize_ref);
+	else {
+	    /* ignore localization of refs */
+/* 	    Perl_croak(aTHX_ PL_no_localize_ref); */
+	}
     }
     else if (PL_op->op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpDEREF)
