@@ -2706,6 +2706,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     /* clear the destination sv if it will be upgraded to a hash or an array */
     if ( (dtype == SVt_PVHV || dtype == SVt_PVAV || stype == SVt_PVAV || stype == SVt_PVHV)
         && dtype != stype ) {
+	/* FIXME the assignment should be done before old values ore DESTROYed */
 	Perl_sv_clear_body(aTHX_ dstr);
 	SvFLAGS(dstr) = dtype = SVt_NULL;
     }
