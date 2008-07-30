@@ -117,7 +117,6 @@ sub compare {
     return -1;
 }
 
-sub cmp;
 *cmp = \&compare;
 
 sub compare_text {

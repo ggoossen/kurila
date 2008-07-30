@@ -5,10 +5,10 @@ use vars qw($VERSION);
 $VERSION = "1.00";
 
 # subclass is supposed to implement at least these
-sub new;
-sub clone;
-sub add;
-sub digest;
+sub new { die "not implemented by subclass" }
+sub clone { die "not implemented by subclass" }
+sub add { die "not implemented by subclass" }
+sub digest { die "not implemented by subclass" }
 
 sub reset {
     my $self = shift;
