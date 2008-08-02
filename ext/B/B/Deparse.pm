@@ -2949,7 +2949,7 @@ sub slice {
     if (class($op) eq "LISTOP") {
 	$last = $op->last;
     } else { # ex-hslice inside delete()
-	for ($kid = $op->first; !null < $kid->sibling; $kid = $kid->sibling) {}
+	for ($kid = $op->first; !null $kid->sibling; $kid = $kid->sibling) {}
 	$last = $kid;
     }
     $array = $last;
