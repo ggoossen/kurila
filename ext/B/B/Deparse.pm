@@ -452,14 +452,14 @@ sub stash_subs {
     my (@ret, $stash);
     if (!defined $pack) {
 	$pack = '';
-	$stash = \%::;
+	$stash = \%{Symbol::stash('main')};
     }
     else {
 	$pack =~ s/(::)?$//;
 	$stash = \%{Symbol::stash($pack)};
     }
-    my %stash = %( < svref_2object($stash)->ARRAY );
-    while (my ($key, $val) = each %stash) {
+    for my $key (keys %$stash) {
+        my $val = svref_2object( \( $stash->{$key} ) );
 	my $class = class($val);
         if ($class eq "GV") {
 	    if (class(my $cv = $val->CV) ne "SPECIAL") {
@@ -467,7 +467,7 @@ sub stash_subs {
 		next if $$val != ${$cv->GV};   # Ignore imposters
 		$self->todo($cv, 0);
 	    }
-	    if (class( <$val->HV) ne "SPECIAL" && $key =~ m/::$/) {
+	    if (class($val->HV) ne "SPECIAL" && $key =~ m/::$/) {
 		$self->stash_subs($pack . $key)
 		    unless $pack eq '' && $key eq 'main::';
 		    # avoid infinite recursion
@@ -614,8 +614,8 @@ sub compile {
 	print < $self->print_protos;
 	@{$self->{'subs_todo'}} = @(
 	  sort {$a->[0] <+> $b->[0]} < @{$self->{'subs_todo'}} );
-	print < $self->indent( <$self->deparse_root( <main_root)), "\n"
-	  unless null < main_root;
+	print $self->indent($self->deparse_root(main_root)), "\n"
+	  unless null main_root;
 	my @text;
 	while (scalar(nelems @{$self->{'subs_todo'}})) {
 	    push @text, < $self->next_todo;
@@ -1096,12 +1096,12 @@ sub deparse_root {
     local(%$self{[qw'curstash warnings hints hinthash']})
       = %$self{[qw'curstash warnings hints hinthash']};
     my @kids;
-    return if null < $op->first; # Can happen, e.g., for Bytecode without -k
+    return if null $op->first; # Can happen, e.g., for Bytecode without -k
     for (my $kid = $op->first->sibling; !null($kid); $kid = $kid->sibling) {
 	push @kids, $kid;
     }
     $self->walk_lineseq($op, \@kids,
-			sub { print < $self->indent(@_[0].';');
+			sub { print $self->indent(@_[0].';');
 			      print "\n" unless @_[1] ==( (nelems @kids)-1);
 			  });
 }
@@ -3933,7 +3933,7 @@ sub pp_split {
     $ary = $self->stash_variable('@', < $self->gv_name($gv)) if $gv;
 
     for (; !null($kid); $kid = $kid->sibling) {
-	push @exprs, < $self->deparse($kid, 6);
+	push @exprs, $self->deparse($kid, 6);
     }
 
     # handle special case of split(), and split(' ') that compiles to /\s+/
@@ -3991,7 +3991,7 @@ sub pp_subst {
     if (null $kid) {
 	my $unbacked = re_unback($op->precomp);
 	if ($extended) {
-	    $re = re_uninterp_extended( <escape_extended_re($unbacked));
+	    $re = re_uninterp_extended(escape_extended_re($unbacked));
 	}
 	else {
 	    $re = re_uninterp(escape_str($unbacked));
