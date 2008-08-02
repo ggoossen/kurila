@@ -353,13 +353,6 @@ my $b = \(\%());
 my $c = \@();
 my $d = \(\@());
 ####
-# 52 implicit smartmatch in given/when
-given ('foo') {
-    when ('bar') { continue; }
-    when ($_ ~~ 'quux') { continue; }
-    default { 0; }
-}
-####
 # array slice
 my @array;
 @array[[1, 2]];
