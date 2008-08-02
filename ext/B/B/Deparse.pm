@@ -2156,7 +2156,7 @@ sub listop {
     if (defined $proto
 	&& $proto =~ m/^;?\*/
 	&& $kid->name eq "rv2gv") {
-	$first = $self->deparse( <$kid->first, 6);
+	$first = $self->deparse($kid->first, 6);
     }
     else {
 	$first = $self->deparse($kid, 6);
@@ -2932,7 +2932,7 @@ sub pp_helem { maybe_local(< @_, elem(< @_, "\{", "\}", "padhv")) }
 sub pp_gelem {
     my $self = shift;
     my($op, $cx) = < @_;
-    my($glob, $part) = ( <$op->first, < $op->last);
+    my($glob, $part) = ($op->first, $op->last);
     $glob = $glob->first; # skip rv2gv
     $glob = $glob->first if $glob->name eq "rv2gv"; # this one's a bug
     my $scope = is_scope($glob);
