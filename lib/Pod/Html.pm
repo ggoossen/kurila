@@ -1519,7 +1519,6 @@ sub process_puretext {
 # converted to html commands.
 #
 
-sub process_text1($$;$$);
 sub pattern ($) { @_[0] ? '\s+'.('>' x (@_[0] + 1)) : '>' }
 sub closing ($) { local($_) = shift; (defined && s/\s+\z//) ? length : 0 }
 
@@ -2079,8 +2078,6 @@ my %E2c;
 %E2c{sol}    = '/';
 %E2c{verbar} = '|';
 %E2c{amp}    = '&'; # in Tk's pods
-
-sub depod1($;$$);
 
 sub depod($){
     my $string;

@@ -1064,7 +1064,7 @@ sub form {
   # Handle formatting calls...
   my ($package, $file, $line) = caller;
     my $caller_opts = %caller_opts{$package,$file} ||= \%();
-    if (keys %$caller_opts) {
+    if (%$caller_opts) {
         $line = first { $_ +< $line } sort {$b<+>$a} keys %$caller_opts;
         $caller_opts = $caller_opts->{$line} || \%()
                 if defined $line;
