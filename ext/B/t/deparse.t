@@ -11,7 +11,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 62;
+use Test::More tests => 63;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -366,8 +366,12 @@ sub foo {
 }
 foo();
 ####
-if ($a) {
-    $b;
+my ($x, $y);
+if ($x) {
+    $y;
 } else {
-    $b * $b;
+    $y * $y;
 }
+####
+my ($x, $y, $z);
+$x = $y || $y;

@@ -1877,14 +1877,14 @@ sub assoc_class {
     }
     if ($name eq "null" and class($op) eq "UNOP"
 	and $op->first->name =~ m/^(and|x?or)$/
-	and null < $op->first->sibling)
+	and null $op->first->sibling)
     {
 	# Like all conditional constructs, OP_ANDs and OP_ORs are topped
 	# with a null that's used as the common end point of the two
 	# flows of control. For precedence purposes, ignore it.
 	# (COND_EXPRs have these too, but we don't bother with
 	# their associativity).
-	return assoc_class( <$op->first);
+	return assoc_class($op->first);
     }
     return $name . ($op->flags ^&^ OPf_STACKED ? "=" : "");
 }
