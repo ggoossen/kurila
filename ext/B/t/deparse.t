@@ -360,3 +360,8 @@ my @array;
 # hash slice
 my %hash;
 %hash{['foo', 'bar']};
+####
+sub foo {
+    43;
+}
+foo();
