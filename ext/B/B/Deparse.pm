@@ -1687,7 +1687,7 @@ sub pp_require {
     if (class($op) eq "UNOP" and $op->first->name eq "const"
 	and $op->first->private ^&^ OPpCONST_BARE)
     {
-	my $name = $self->const_sv( <$op->first)->PV;
+	my $name = $self->const_sv($op->first)->PV;
 	$name =~ s[/][::]g;
 	$name =~ s/\.pm//g;
 	return "$opname $name";
