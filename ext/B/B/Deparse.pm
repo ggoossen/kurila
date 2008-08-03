@@ -2461,9 +2461,9 @@ sub pp_list {
 
 sub is_ifelse_cont {
     my $op = shift;
-    return  @($op->name eq "null" and class($op) eq "UNOP"
-	    and $op->first->name =~ m/^(and|cond_expr)$/
-	    and is_scope( <$op->first->first->sibling));
+    return  ($op->name eq "null" and class($op) eq "UNOP"
+             and $op->first->name =~ m/^(and|cond_expr)$/
+             and is_scope($op->first->first->sibling) );
 }
 
 sub pp_cond_expr {
