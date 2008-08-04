@@ -17,16 +17,13 @@ my $warn = "";
 $^WARN_HOOK = sub { print $warn; $warn .= @_[0]->{description} . "\n" };
 
 sub uninitialized { $warn =~ s/Use of uninitialized value[^\n]+\n//s; }
-sub tiex { tie @_[0], 'main' }
-sub TIESCALAR { my $x; bless \$x }
-sub FETCH { ${@_[0]} }
-sub STORE { ${@_[0]} = @_[1] }
+sub tiex { }
 our $TODO;
 
-print "1..63\n";
+print "1..32\n";
 
 # go through all tests once normally and once with tied $x
-for my $tie ("", ", tied") {
+for my $tie ("") {
 
 { my $x; tiex $x if $tie; $x ++;     ok ! uninitialized, "postinc$tie"; }
 { my $x; tiex $x if $tie; $x --;     ok ! uninitialized, "postdec$tie"; }

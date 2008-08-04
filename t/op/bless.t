@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan (108);
+plan (100);
 
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
@@ -103,15 +103,11 @@ expected(bless(\@()), 'main', "ARRAY");
     expected($m, 'main', "ARRAY");
     is (scalar nelems @w, 0);
 
-    @w = @( () );
-    $m = bless \@(), '';
-    expected($m, 'main', "ARRAY");
-    is (scalar nelems @w, 1);
+    dies_like( sub { $m = bless \@(), '' },
+               qr/Attempt to bless to ''/ );
 
-    @w = @( () );
-    $m = bless \@(), undef;
-    expected($m, 'main', "ARRAY");
-    is (scalar nelems @w, 2);
+    dies_like( sub { $m = bless \@(), undef },
+               qr/Attempt to bless to ''/ );
 }
 
 # class is a ref
@@ -136,6 +132,6 @@ expected($c4, 'C4', "SCALAR");
     bless $x, 'pam';
     is(ref $x, 'pam');
 
-    my $a = bless \(keys %h), 'zap';
+    my $a = bless \(nkeys %h), 'zap';
     is(ref $a, 'zap');
 }
