@@ -10980,7 +10980,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	    }
 	    if (match)
 		break;
-	    return varname(gv, '%',
+	    return varname(gv, (obase->op_type == OP_HELEM ? '%' : '@'),
 			   o->op_targ, NULL, 0, FUV_SUBSCRIPT_WITHIN);
 	}
 	break;
