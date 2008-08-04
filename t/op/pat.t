@@ -47,7 +47,7 @@ BEGIN {
   require "./test.pl";
 }
 
-plan 1767;
+plan 1765;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);
@@ -2216,21 +2216,6 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
     use utf8;
     "a" =~ m/[b]/;
     ok ( "0" =~ m/\p{N}+\z/, "[perl #19767] variant test" );
-}
-
-{
-
-    my $p = 1;
-    foreach (1,2,3,4) {
-	    $p++ if m/(??{ $p })/
-    }
-    is ($p, 5, '[perl #20683] (??{ }) returns stale values');
-    { package P; $a=1; sub TIESCALAR { bless \@() } sub FETCH { $a++ } }
-    tie $p, 'P';
-    foreach (1,2,3,4) {
-	    m/(??{ $p })/
-    }
-    is ( $p, 5, '(??{ }) returns stale values');
 }
 
 {

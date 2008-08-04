@@ -29,7 +29,7 @@ sub subb {"in s"}
 @INPUT = @( ~< *DATA );
 @simple_input = @( grep m/^\s*\w+\s*\$\w+\s*[#\n]/, < @INPUT );
 
-plan 11 + (nelems @INPUT) + nelems @simple_input;
+plan 6 + (nelems @INPUT) + nelems @simple_input;
 
 sub wrn {"{join ' ', <@_}"}
 
@@ -54,31 +54,6 @@ ok $dc == 1;
 my $xxx = 'b';
 $xxx = 'c' . ($xxx || 'e');
 ok $xxx eq 'cb';
-
-{				# Check calling STORE
-  my $sc = 0;
-  sub B::TIESCALAR {bless \@(11), 'B'}
-  sub B::FETCH { -(shift->[0]) }
-  sub B::STORE { $sc++; my $o = shift; $o->[0] = 17 + shift }
-
-  my $m;
-  tie $m, 'B';
-  $m = 100;
-
-  ok $sc == 1;
-
-  my $t = 11;
-  $m = $t + 89;
-  
-  ok $sc == 2;
-  ok $m == -117;
-
-  $m += $t;
-
-  ok $sc == 3;
-  ok $m == 89;
-
-}
 
 # Chains of assignments
 
@@ -234,20 +209,13 @@ lcfirst $cstr			# lcfirst
 uc $cstr			# uc
 lc $cstr			# lc
 quotemeta $cstr			# quotemeta
-@$aref				# rv2av
 (each %h) % 2 == 1		# each
-values %h			# values
-keys %h				# keys
-%$href				# rv2hv
+nkeys %h				# nkeys
 pack "C2", $n,$n		# pack
-split m/a/, "abad"		# split
 join "a"; @a			# join
 push @a,3==6			# push
 unshift @aaa			# unshift
-reverse	@a			# reverse
-reverse	$cstr			# reverse - scal
 grep $_, 1,0,2,0,3		# grepwhile
-map "x$_", 1,0,2,0,3		# mapwhile
 subb()				# entersub
 caller				# caller
 '???'                           # warn

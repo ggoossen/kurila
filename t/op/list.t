@@ -1,7 +1,7 @@
 #!./perl
 
 require "./test.pl";
-plan( tests => 55 );
+plan( tests => 53 );
 
 our (@b, @a, @foo, @bar, $c, $d, %c, $x);
 
@@ -133,13 +133,6 @@ cmp_ok(join('',(1,2),3,(4,5)),'eq','12345','list (..).(..)');
     my @c = @( (0, undef, undef, 3)[[1, 2]] );
     cmp_ok(scalar(nelems @b),'==',scalar(nelems @c),'slice and slice');
     cmp_ok(scalar(nelems @c),'==',2,'slice len');
-
-    my %h = %(a => 1);
-    @b = @(30, scalar %h{[()]});
-    cmp_ok(join(':',< @b),'eq','30:','slice hash nil');
-
-    my $size = scalar(()[[1..1]]);
-    cmp_ok($size,'==','0','size nil');
 }
 
 {
