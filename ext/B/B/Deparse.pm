@@ -2966,7 +2966,7 @@ sub slice {
     } else {
 	$list = $self->elem_or_slice_single_index($kid);
     }
-    return ($regname eq "rv2av" ? '@' : '%') . $array . $left . $list . $right;
+    return $array . $left . $list . $right;
 }
 
 sub pp_aslice { maybe_local(< @_, slice(< @_, "[[", "]]", "rv2av", "padav")) }

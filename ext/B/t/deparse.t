@@ -11,7 +11,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 63;
+use Test::More tests => 62;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -31,7 +31,7 @@ $/ = "\n####\n";
 while ( ~< *DATA) {
     chomp;
     s/#\s*(.*)$//mg;
-    my ($num, $testname) = $1 =~ m/(\d+)\s*(.*)/;
+    my ($num, $todo, $testname) = $1 =~ m/(\d+)\s*(TODO)?\s*(.*)/;
     my ($input, $expected);
     if (m/(.*)\n>>>>\n(.*)/s) {
 	($input, $expected) = ($1, $2);
@@ -39,6 +39,8 @@ while ( ~< *DATA) {
     else {
 	($input, $expected) = ($_, $_);
     }
+
+    local our $TODO = $todo;
 
     my $coderef = eval "sub \{$input\}";
 
@@ -89,7 +91,7 @@ BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
     chomp $_;
-    our(@main::F) = split(' ', $_, 0);
+    our @F = @(split(' ', $_, 0));
     '???';
 }
 EOF
@@ -119,6 +121,9 @@ sub test {
    my $val = shift;
    my $res = B::Deparse::Wrapper::getcode($val);
    like( $res, qr/use warnings/);
+}
+sub testsub {
+    42;
 }
 my ($q,$p);
 my $x=sub { @( ++$q,++$p ) };
@@ -186,6 +191,7 @@ my %x;
 ####
 my($x, $y) = < @('xx', 'yy');
 ####
+# 0 TODO range
 my @x = @( 1..10 );
 ####
 # 13
@@ -281,11 +287,11 @@ print((reverse sort {$b <+> $a} @x));
 # 32
 print $_ foreach (reverse @main::a);
 ####
-# 33
+# 33 TODO range
 print $_ foreach (reverse 1, 2..5);
 ####
 # 34  (bug #38684)
-@main::ary = split(' ', 'foo', 0);
+@main::ary = @(split(' ', 'foo', 0));
 ####
 # 35 (bug #40055)
 do { () }; 
@@ -301,11 +307,8 @@ my $f = sub {
 # 38 (bug #43010)
 '!@$%'->();
 ####
-# 39 (ibid.)
-::();
-####
-# 40 (ibid.)
-'::::'->();
+#
+&'::'->();
 ####
 # 41 (ibid.)
 &::::;
@@ -361,17 +364,14 @@ my @array;
 my %hash;
 %hash{['foo', 'bar']};
 ####
-sub foo {
-    43;
-}
-foo();
+testsub();
 ####
-my ($x, $y);
+my($x, $y);
 if ($x) {
     $y;
 } else {
     $y * $y;
 }
 ####
-my ($x, $y, $z);
+my($x, $y, $z);
 $x = $y || $y;
