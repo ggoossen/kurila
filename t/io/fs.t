@@ -95,7 +95,7 @@ SKIP: {
     ok(link('a','b'), "link a b");
     ok(link('b','c'), "link b c");
 
-    $a_mode = (stat('a'))[2];
+    $a_mode = @(stat('a'))[2];
 
     ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
      $blksize,$blocks) = stat('c');
@@ -177,13 +177,13 @@ SKIP: {
     skip "no fchmod", 5 unless (%Config{d_fchmod} || "") eq "define";
     ok(open(my $fh, "<", "a"), "open a");
     is(chmod(0, $fh), 1, "fchmod");
-    $mode = (stat "a")[2];
+    $mode = @(stat "a")[2];
     SKIP: {
         skip "no mode checks", 1 if $skip_mode_checks;
         is($mode ^&^ 0777, 0, "perm reset");
     }
     is(chmod($newmode, "a"), 1, "fchmod");
-    $mode = (stat $fh)[2];
+    $mode = @(stat $fh)[2];
     SKIP: { 
         skip "no mode checks", 1 if $skip_mode_checks;
         is($mode ^&^ 0777, $newmode, "perm restored");

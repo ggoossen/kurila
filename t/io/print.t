@@ -8,7 +8,7 @@ print "1..21\n";
 
 {
 no strict 'refs';
-my $foo = *STDOUT;
+my $foo = *STDOUT{IO};
 print $foo "ok 1\n";
 }
 
