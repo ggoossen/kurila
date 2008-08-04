@@ -109,7 +109,7 @@ sub pack_U {
 }
 
 sub unpack_U {
-    return unpack('U*', shift(@_).pack('U*'));
+    return @( unpack('U*', shift(@_).pack('U*') ) );
 }
 
 ######
@@ -422,7 +422,7 @@ sub _varCE
     }
     else {
 	return pack(VCE_TEMPLATE, $var, @wt[[0..2]],
-	    $vbl eq 'shifted' && @wt[0]+@wt[1]+@wt[2] ? < Shift4Wt : 0);
+	    $vbl eq 'shifted' && @wt[0]+@wt[1]+@wt[2] ? Shift4Wt : 0);
     }
 }
 
@@ -465,9 +465,9 @@ sub splitEnt
     my ($str, @buf);
 
     if ($wLen) {
-	$code and croak "Preprocess breaks character positions. "
+	$code and die "Preprocess breaks character positions. "
 			. "Don't use with index(), match(), etc.";
-	$norm and croak "Normalization breaks character positions. "
+	$norm and die "Normalization breaks character positions. "
 			. "Don't use with index(), match(), etc.";
 	$str = @_[0];
     }
@@ -478,7 +478,7 @@ sub splitEnt
     }
 
     # get array of Unicode code point of string.
-    my @src = @( unpack_U($str) );
+    my @src = @( < unpack_U($str) );
 
     # rearrangement:
     # Character positions are not kept if rearranged,
@@ -582,7 +582,7 @@ sub getWt
     my $der  = $self->{derivCode};
 
     return if !defined $u;
-    return @(map( <_varCE($vbl, $_), < @{ $map->{$u} }))
+    return @(map(_varCE($vbl, $_), < @{ $map->{$u} }))
 	if $map->{$u};
 
     # JCPS must not be a contraction, then it's a code point.
@@ -802,13 +802,13 @@ sub _uideoCE_8 {
 
 sub _isUIdeo {
     my ($u, $uca_vers) = < @_;
-    return @(
+    return (
 	(CJK_UidIni +<= $u &&
 	    ($uca_vers +>= 14 ? ( $u +<= CJK_UidF41) : ($u +<= CJK_UidFin)))
 		||
 	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin)
 		||
-	 @(CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
+	(CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
     );
 }
 
@@ -838,7 +838,7 @@ sub _decompHangul {
     return  @(
 	Hangul_LBase + $li,
 	Hangul_VBase + $vi,
-	$ti ?  @(Hangul_TBase + $ti) : (),
+	$ti ? (Hangul_TBase + $ti) : (),
     );
 }
 
@@ -848,7 +848,7 @@ sub _isIllegal {
 	|| ($code +< 0 || 0x10FFFF +< $code)      # out of range
 	|| (($code ^&^ 0xFFFE) == 0xFFFE)         # ??FFF[EF] (cf. utf8.c)
 	|| (0xD800 +<= $code && $code +<= 0xDFFF) # unpaired surrogates
-	||  @(0xFDD0 +<= $code && $code +<= 0xFDEF) # other non-characters
+	|| (0xFDD0 +<= $code && $code +<= 0xFDEF) # other non-characters
     ;
 }
 
@@ -931,7 +931,7 @@ sub index
     }
     $len +< $pos
 	and return;
-    my $strE = $self->splitEnt($pos ? substr($str, $pos) : $str, < TRUE);
+    my $strE = $self->splitEnt($pos ? substr($str, $pos) : $str, TRUE);
     (nelems @$strE)
 	or return;
 
@@ -993,7 +993,7 @@ sub index
 		    @finPos[-1] = $strE->[$i]->[2];
 		} elsif ($to_be_pushed) {
 		    push @strWt, \@( \@wt );
-		    push @iniPos, $found_base ? < NOMATCHPOS : $strE->[$i]->[1];
+		    push @iniPos, $found_base ? NOMATCHPOS : $strE->[$i]->[1];
 		    @finPos[-1] = NOMATCHPOS if $found_base;
 		    push @finPos, $strE->[$i]->[2];
 		    $found_base++;

@@ -247,10 +247,10 @@ $Collator->change(level => 1);
 
 $ret = $Collator->match("P\cBe\x{300}\cBrl and PERL", "pe");
 ok($ret);
-ok($$ret eq "P\cBe\x{300}\cB");
+ok($ret eq "P\cBe\x{300}\cB");
 
-@ret = @( < $Collator->match("P\cBe\x{300}\cBrl and PERL", "pe") );
-ok(@ret[0], "P\cBe\x{300}\cB");
+$ret = $Collator->match("P\cBe\x{300}\cBrl and PERL", "pe");
+ok($ret, "P\cBe\x{300}\cB");
 
 $str = $IsEBCDIC ? "mu\x{0059}" : "mu\x{00DF}";
 $sub = $IsEBCDIC ? "m\x{00DC}ss" : "m\x{00FC}ss";
@@ -268,13 +268,13 @@ $ret = join ':', < $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
 ok($ret eq "P\cBe\x{300}\cB:pe:PE");
 
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
-ok($ret == 3);
+ok(nelems($ret) == 3);
 
 $str = "ABCDEF";
 $sub = "cde";
 $ret = $Collator->match($str, $sub);
 $str = "01234567";
-ok($ret && $$ret, "CDE");
+ok($ret, "CDE");
 
 $str = "ABCDEF";
 $sub = "cde";
@@ -295,13 +295,13 @@ $ret = join ':', < $Collator->gmatch("P\cBe\x{300}\cBrl and PERL", "pe");
 ok($ret eq "");
 
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl and PERL", "pe");
-ok($ret == 0);
+ok(nelems($ret) == 0);
 
 $ret = join ':', < $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
 ok($ret eq "pe");
 
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
-ok($ret == 1);
+ok(nelems($ret) == 1);
 
 $str = $IsEBCDIC ? "mu\x{0059}" : "mu\x{00DF}";
 $sub = $IsEBCDIC ? "m\x{00DC}ss" : "m\x{00FC}ss";
@@ -315,7 +315,7 @@ $Collator->change(< %old_level);
 
 $Collator->change(level => 1);
 
-sub strreverse { scalar reverse shift }
+sub strreverse { join '', reverse split m//, shift }
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
 $ret = $Collator->subst($str, "perl", 'Camel');

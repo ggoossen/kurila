@@ -109,7 +109,7 @@ sub inherit_fields {
 
     $dattr->[0] = (nelems @$battr);
 
-    if( keys %$dfields ) {
+    if( %$dfields ) {
         warn <<"END";
 $derived is inheriting from $base but already has its own fields!
 This will cause problems.  Be sure you use base BEFORE declaring fields.

@@ -9,7 +9,7 @@ BEGIN {
             $W++;
         }
         else {
-            warn @_[0];
+            print STDERR @_[0]->message;
         }
     };
 }
@@ -58,7 +58,7 @@ use base qw(M B2);
 # Test that multiple inheritance fails.
 package D6;
 try { 'base'->import(qw(B2 M B3)); };
-::like($@->{description}, qr/can't multiply inherit fields/i, 
+main::like($@->{description}, qr/can't multiply inherit fields/i, 
     'No multiple field inheritance');
 
 package Foo::Bar;
@@ -137,7 +137,7 @@ while(my($class, $efields) = each %EXPECT) {
         %expected_fields{$key} = $idx;
     }
 
-    ::is_deeply(\%fields, \%expected_fields, "\%FIELDS check:  $class");
+    main::is_deeply(\%fields, \%expected_fields, "\%FIELDS check:  $class");
 }
 
 # Did we get the appropriate amount of warnings?
@@ -176,7 +176,7 @@ try {
     require base;
     'base'->import(qw(E1 E2));
 };
-::like( $@->{description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
+main::like( $@->{description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
 
 
 # Test that a package with no fields can inherit from a package with
