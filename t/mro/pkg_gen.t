@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require q(./test.pl); plan(tests => 6);
+require q(./test.pl); plan(tests => 4);
 
 {
     package Foo;
@@ -27,6 +27,3 @@ $f_gen = $new_f_gen;
 @Foo::ISA = @( qw/Bar/ );
 $new_f_gen = mro::get_pkg_gen('Foo');
 ok($new_f_gen +> $f_gen, 'Foo pkg_gen incs for @ISA');
-
-undef %Foo::;
-is(mro::get_pkg_gen('Foo'), 1, "pkg_gen 1 for undef \%Pkg::");
