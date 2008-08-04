@@ -1,7 +1,7 @@
 #!./perl
 
 require './test.pl';
-plan( tests => 12 );
+plan( tests => 9 );
 
 our (@oops, @ops, %files, $not, @glops, $x);
 
@@ -34,17 +34,6 @@ cmp_ok("{join ' ', <@glops}",'eq',"{join ' ', <@oops}",'glob operator 1');
 
 @glops = @( < glob );
 cmp_ok("{join ' ', <@glops}",'eq',"{join ' ', <@oops}",'glob operator 2');
-
-# glob should still work even after the File::Glob stash has gone away
-# (this used to dump core)
-my $i = 0;
-for (1..2) {
-    eval "glob('.')";
-    ok(!length($@),"eval'ed a glob $_");
-    undef %{Symbol::stash('File::Glob')};
-    ++$i;
-}
-cmp_ok($i,'==',2,'remore File::Glob stash');
 
 # The formerly-broken test for the situation above would accidentally
 # test definedness for an assignment with a LOGOP on the right:
