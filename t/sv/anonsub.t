@@ -107,17 +107,6 @@ $x->();
 EXPECT
 ok 1
 ########
-sub X;
-sub X {
-    my $n = "ok 1\n";
-    eval 'sub Y { my $p = shift; $p->() }';
-    die $@ if $@;
-    Y(sub { print $n });
-}
-X();
-EXPECT
-ok 1
-########
 print sub { return "ok 1\n" } -> ();
 EXPECT
 ok 1
