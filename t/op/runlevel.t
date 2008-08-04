@@ -31,50 +31,6 @@ our @a = @(1, 2, 3);
 EXPECT
 Can't "last" outside a loop block at - line 3.
 ########
-package TEST;
- 
-sub TIESCALAR {
-  my $foo;
-  return bless \$foo;
-}
-sub FETCH {
-  eval 'die("test")';
-  print "still in fetch\n";
-  return ">" . $@->message() . "<";
-}
-package main;
- 
-tie my $bar, 'TEST';
-print "- $bar\n";
-EXPECT
-still in fetch
-- >test at (eval 1) line 1.
-    (eval) called at - line 8.
-    TEST::FETCH called at - line 15.
-<
-########
-package TEST;
- 
-sub TIESCALAR {
-  my $foo;
-  eval('die("foo\n")');
-  print "after eval\n";
-  return bless \$foo;
-}
-sub FETCH {
-  return "ZZZ";
-}
- 
-package main;
- 
-tie my $bar, 'TEST';
-print "- $bar\n";
-print "OK\n";
-EXPECT
-after eval
-- ZZZ
-OK
-########
 sub warnhook {
   print "WARNHOOK\n";
   eval('die("foooo\n")');
@@ -133,81 +89,6 @@ foo:
 }
 EXPECT
 Label not found for "last foo" at - line 2.
-########
-package TEST;
- 
-sub TIESCALAR {
-  my $foo;
-  return bless \$foo;
-}
-sub FETCH {
-  next;
-  return "ZZZ";
-}
-sub STORE {
-}
- 
-package main;
- 
-tie our $bar, 'TEST';
-{
-  print "- $bar\n";
-}
-print "OK\n";
-EXPECT
-Can't "next" outside a loop block at - line 8.
-    TEST::FETCH called at - line 18.
-########
-package TEST;
- 
-sub TIESCALAR {
-  my $foo;
-  return bless \$foo;
-}
-sub FETCH {
-  goto bbb;
-  return "ZZZ";
-}
- 
-package main;
- 
-tie my $bar, 'TEST';
-print "- $bar\n";
-exit;
-bbb:
-print "bbb\n";
-EXPECT
-Can't find label bbb at - line 8.
-    TEST::FETCH called at - line 15.
-########
-package TEST;
-sub TIESCALAR {
-  my $foo;
-  return bless \$foo;
-}
-sub FETCH {
-  return "fetch";
-}
-sub STORE {
-(split(m/./, 'x'x10000))[0];
-}
-package main;
-tie our $bar, 'TEST';
-$bar = "x";
-########
-package TEST;
-sub TIESCALAR {
-  my $foo;
-  next;
-  return bless \$foo;
-}
-package main;
-{
-tie my $bar, 'TEST';
-}
-EXPECT
-Can't "next" outside a loop block at - line 4.
-    TEST::TIESCALAR called at - line 9.
 ########
 our @a = @(1, 2, 3);
 foo:

@@ -260,7 +260,7 @@ our $reg_infty_p = $reg_infty + 1;
 # default value for $reg_infty from Config.pm, but have not.
 
 undef $@;
-ok( eval q(('aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $@;
+ok( eval q(@('aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $@;
 
 undef $@;
 ok( not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) ); die if $@;
