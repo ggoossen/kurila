@@ -14,7 +14,7 @@ sub VERSION { 42 }
 package Test::Version;
 
 use base qw(No::Version);
-::ok( $No::Version::VERSION =~ m/set by base\.pm/,          '$VERSION bug' );
+main::ok( $No::Version::VERSION =~ m/set by base\.pm/,          '$VERSION bug' );
 
 # Test Inverse of $VERSION bug base.pm should not clobber existing $VERSION
 package Has::Version;
@@ -24,7 +24,7 @@ BEGIN { $Has::Version::VERSION = '42' };
 package Test::Version2;
 
 use base qw(Has::Version);
-::is( $Has::Version::VERSION, 42 );
+main::is( $Has::Version::VERSION, 42 );
 
 package main;
 
@@ -69,7 +69,7 @@ like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty
     package Test::Version3;
 
     use base qw(Has::Version_0);
-    ::is( $Has::Version_0::VERSION, 0, '$VERSION==0 preserved' );
+    main::is( $Has::Version_0::VERSION, 0, '$VERSION==0 preserved' );
 }
 
 
@@ -79,5 +79,5 @@ like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty
 
     package Basilisco;
     eval q{ use base 'Schlozhauer' };
-    ::is( $@, '', 'Can coexist with a FIELDS constant' );
+    main::is( $@, '', 'Can coexist with a FIELDS constant' );
 }
