@@ -56,8 +56,8 @@ SKIP: {
 
     # same with bareword file handles
     no warnings 'once';
-    *DH = $dh;
-    *FH = $fh;
+    *DH = *$dh{IO};
+    *FH = *$fh{IO};
     ok(chdir *FH, "fchdir op bareword");
     ok(-f "chdir.t", "verify that we are in op");
     if ($has_dirfd) {

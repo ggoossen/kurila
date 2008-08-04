@@ -410,9 +410,8 @@ PP(pp_bless)
 	if (ssv && !SvGMAGICAL(ssv) && !SvAMAGIC(ssv) && SvROK(ssv))
 	    Perl_croak(aTHX_ "Attempt to bless into a reference");
 	ptr = SvPV_const(ssv,len);
-	if (len == 0 && ckWARN(WARN_MISC))
-	    Perl_warner(aTHX_ packWARN(WARN_MISC),
-		   "Explicit blessing to '' (assuming package main)");
+	if (len == 0)
+	    Perl_croak(aTHX_ "Attempt to bless to ''");
 	stash = gv_stashpvn(ptr, len, GV_ADD);
     }
 

@@ -29,9 +29,9 @@ ok( @c[4], "hasargs true with anon sub" );
 
 # Bug 20020517.003, used to dump core
 sub foo { @c = @( caller(0) ) }
-my $fooref = delete %::{foo};
-$fooref -> ();
-is( @c[3], "(unknown)", "unknown subroutine name" );
+my $fooref = \(delete %main::{foo});
+*$fooref -> ();
+is( @c[3], "main::foo", "unknown subroutine name" );
 ok( @c[4], "hasargs true with unknown sub" );
 
 print "# Tests with caller(1)\n";
@@ -58,9 +58,9 @@ is( @c[3], "main::__ANON__", "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 sub foo2 { f() }
-my $fooref2 = delete %::{foo2};
-$fooref2 -> ();
-is( @c[3], "(unknown)", "unknown subroutine name" );
+my $fooref2 = \(delete %main::{foo2});
+*$fooref2 -> ();
+is( @c[3], "main::foo2", "unknown subroutine name" );
 ok( @c[4], "hasargs true with unknown sub" );
 
 # See if caller() returns the correct warning mask
