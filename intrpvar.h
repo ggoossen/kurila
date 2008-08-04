@@ -202,14 +202,12 @@ PERLVAR(Iwarnhook,	SV *)
 /* switches */
 PERLVAR(Ipatchlevel,	SV *)
 PERLVAR(Ilocalpatches,	const char * const *)
-PERLVARI(Isplitstr,	const char *, " ")
 
 PERLVAR(Iminus_c,	bool)
 PERLVAR(Iminus_n,	bool)
 PERLVAR(Iminus_p,	bool)
 PERLVAR(Iminus_l,	bool)
 PERLVAR(Iminus_a,	bool)
-PERLVAR(Iminus_F,	bool)
 PERLVAR(Iminus_E,	bool)
 
 /*

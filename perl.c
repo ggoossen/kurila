@@ -644,17 +644,11 @@ perl_destruct(pTHXx)
 	PL_parser->rsfp = NULL;
     }
 
-    if (PL_minus_F) {
-	Safefree(PL_splitstr);
-	PL_splitstr = NULL;
-    }
-
     /* switches */
     PL_minus_n      = FALSE;
     PL_minus_p      = FALSE;
     PL_minus_l      = FALSE;
     PL_minus_a      = FALSE;
-    PL_minus_F      = FALSE;
     PL_dowarn       = G_WARN_OFF;
     PL_doextract    = FALSE;
     PL_unsafe       = FALSE;
@@ -1432,7 +1426,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #endif
 	    case ' ':
 	    case '0':
-	    case 'F':
 	    case 'a':
 	    case 'c':
 	    case 'd':
@@ -2744,12 +2737,6 @@ Perl_moreswitches(pTHX_ const char *s)
         PL_unicode = parse_unicode_opts( (const char **)&s );
 	if (PL_unicode & PERL_UNICODE_UTF8CACHEASSERT_FLAG)
 	    PL_utf8cache = -1;
-	return s;
-    case 'F':
-	PL_minus_F = TRUE;
-	PL_splitstr = ++s;
-	while (*s && !isSPACE(*s)) ++s;
-	PL_splitstr = savepvn(PL_splitstr, s - PL_splitstr);
 	return s;
     case 'a':
 	PL_minus_a = TRUE;
