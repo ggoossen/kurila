@@ -12,7 +12,7 @@ use Config;
 use File::Spec::Functions;
 
 BEGIN { require './test.pl'; }
-plan tests => 230;
+plan tests => 229;
 
 $| = 1;
 
@@ -668,7 +668,7 @@ SKIP: {
         my $sent = "foobar";
         my $rcvd;
         my $size = 2000;
-        my $id = shmget(IPC_PRIVATE, $size, S_IRWXU);
+        my $id = shmget(IPC_PRIVATE(), $size, S_IRWXU());
 
         if (defined $id) {
             if (shmwrite($id, $sent, 0, 60)) {
@@ -680,7 +680,7 @@ SKIP: {
             } else {
                 warn "# shmwrite failed: $!\n";
             }
-            shmctl($id, IPC_RMID, 0) or warn "# shmctl failed: $!\n";
+            shmctl($id, IPC_RMID(), 0) or warn "# shmctl failed: $!\n";
         } else {
             warn "# shmget failed: $!\n";
         }
@@ -697,7 +697,7 @@ SKIP: {
         skip "msg*() not available", 1 unless %Config{d_msg};
 
 	no strict 'subs';
-	my $id = msgget(IPC_PRIVATE, IPC_CREAT ^|^ S_IRWXU);
+	my $id = msgget(IPC_PRIVATE(), IPC_CREAT() ^|^ S_IRWXU());
 
 	my $sent      = "message";
 	my $type_sent = 1234;
@@ -705,8 +705,8 @@ SKIP: {
 	my $type_rcvd;
 
 	if (defined $id) {
-	    if (msgsnd($id, pack("l! a*", $type_sent, $sent), IPC_NOWAIT)) {
-		if (msgrcv($id, $rcvd, 60, 0, IPC_NOWAIT)) {
+	    if (msgsnd($id, pack("l! a*", $type_sent, $sent), IPC_NOWAIT())) {
+		if (msgrcv($id, $rcvd, 60, 0, IPC_NOWAIT())) {
 		    ($type_rcvd, $rcvd) = unpack("l! a*", $rcvd);
 		} else {
 		    warn "# msgrcv failed: $!\n";
@@ -714,7 +714,7 @@ SKIP: {
 	    } else {
 		warn "# msgsnd failed: $!\n";
 	    }
-	    msgctl($id, IPC_RMID, 0) or warn "# msgctl failed: $!\n";
+	    msgctl($id, IPC_RMID(), 0) or warn "# msgctl failed: $!\n";
 	} else {
 	    warn "# msgget failed\n";
 	}
@@ -859,35 +859,6 @@ SKIP: {
     test !$saw_warning;
 }
 
-
-{
-    # Bug ID 20010730.010
-
-    my $i = 0;
-
-    sub Tie::TIESCALAR {
-        my $class =  shift;
-        my $arg   =  shift;
-
-        bless \$arg => $class;
-    }
-
-    sub Tie::FETCH {
-        $i ++;
-        ${@_ [0]}
-    }
-
- 
-    package main;
- 
-    my $bar = "The Big Bright Green Pleasure Machine";
-    taint_these $bar;
-    tie my ($foo), Tie => $bar;
-
-    my $baz = $foo;
-
-    ok $i == 1;
-}
 
 {
     # Check that all environment variables are tainted.

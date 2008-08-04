@@ -172,31 +172,6 @@ EXPECT
 Self-ties of arrays and hashes are not supported at - line 6.
 ########
 
-# Allowed scalar self-ties
-my $destroyed = 0;
-sub Self::TIESCALAR { bless @_[1], @_[0] }
-sub Self::DESTROY   { $destroyed = 1; }
-{
-    my $c = 42;
-    tie $c, 'Self', \$c;
-}
-die "self-tied scalar not DESTROYed" unless $destroyed == 1;
-EXPECT
-########
-
-# Interaction of tie and vec
-
-my ($a, $b);
-use Tie::Scalar;
-tie $a,'Tie::StdScalar' or die;
-vec($b,1,1)=1;
-$a = $b;
-vec($a,1,1)=0;
-vec($b,1,1)=0;
-die unless $a eq $b;
-EXPECT
-########
-
 # correct unlocalisation of tied hashes (patch #16431)
 use Tie::Hash ;
 tie our %tied, 'Tie::StdHash';
@@ -222,7 +197,7 @@ print exists %ENV{FooA} ? 1 : 0, "\n";
 print exists %ENV{FooB} ? 2 : 0, "\n";
 print exists %ENV{FooC} ? 3 : 0, "\n";
 {
-    local %ENV{[qw(FooA FooC)]};
+    local %ENV{[qw(FooA FooC)]} = ();
     print exists %ENV{FooA} ? 4 : 0, "\n";
     print exists %ENV{FooB} ? 5 : 0, "\n";
     print exists %ENV{FooC} ? 6 : 0, "\n";
@@ -241,14 +216,6 @@ EXPECT
 8
 0
 ########
-#
-# FETCH freeing tie'd SV
-sub TIESCALAR { bless \@() }
-sub FETCH { *a = \1; 1 }
-tie $a, 'main';
-print $a;
-EXPECT
-########
 
 #  [20020716.007] - nested FETCHES
 
@@ -265,25 +232,7 @@ tie %f4, 'F4';
 print %f4{'foo'}->[0],"\n";
 
 EXPECT
-2
 3
-########
-# TODO test untie() from within FETCH
-package Foo;
-sub TIESCALAR { my $pkg = shift; return bless \@(@_), $pkg; }
-sub FETCH {
-  my $self = shift;
-  my ($obj, $field) = <@$self;
-  untie $obj->{$field};
-  $obj->{$field} = "Bar";
-}
-package main;
-tie $a->{foo}, "Foo", $a, "foo";
-$a->{foo}; # access once
-# the hash element should not be tied anymore
-print defined tied $a->{foo} ? "not ok" : "ok";
-EXPECT
-ok
 ########
 # the tmps returned by FETCH should appear to be SCALAR
 # (even though they are now implemented using PVLVs.)
@@ -298,146 +247,6 @@ $s=~ s/\(0x\w+\)//g;
 print $s, "\n";
 EXPECT
 SCALAR
-########
-# [perl #23287] segfault in untie
-sub TIESCALAR { bless @_[1], @_[0] }
-my $var;
-tie $var, 'main', \$var;
-untie $var;
-EXPECT
-########
-# Test case from perlmonks by runrig
-# http://www.perlmonks.org/index.pl?node_id=273490
-# "Here is what I tried. I think its similar to what you've tried
-#  above. Its odd but convienient that after untie'ing you are left with
-#  a variable that has the same value as was last returned from
-#  FETCH. (At least on my perl v5.6.1). So you don't need to pass a
-#  reference to the variable in order to set it after the untie (here it
-#  is accessed through a closure)."
-use strict;
-use warnings;
-package MyTied;
-sub TIESCALAR {
-    my ($class,$code) = <@_;
-    bless $code, $class;
-}
-sub FETCH {
-    my $self = shift;
-    print "Untie\n";
-    $self->();
-}
-package main;
-my $var;
-tie $var, 'MyTied', sub { untie $var; 4 };
-print "One\n";
-print "$var\n";
-print "Two\n";
-print "$var\n";
-print "Three\n";
-print "$var\n";
-EXPECT
-One
-Untie
-4
-Two
-4
-Three
-4
-########
-# [perl #22297] cannot untie scalar from within tied FETCH
-my $counter = 0;
-my $x = 7;
-my $ref = \$x;
-tie $x, 'Overlay', $ref, $x;
-my $y;
-$y = $x;
-$y = $x;
-$y = $x;
-$y = $x;
-#print "WILL EXTERNAL UNTIE $ref\n";
-untie $$ref;
-$y = $x;
-$y = $x;
-$y = $x;
-$y = $x;
-#print "counter = $counter\n";
-
-print (($counter == 1) ? "ok\n" : "not ok\n");
-
-package Overlay;
-
-sub TIESCALAR
-{
-        my $pkg = shift;
-        my ($ref, $val) = < @_;
-        return bless \@( $ref, $val ), $pkg;
-}
-
-sub FETCH
-{
-        my $self = shift;
-        my ($ref, $val) = < @$self;
-        #print "WILL INTERNAL UNITE $ref\n";
-        $counter++;
-        untie $$ref;
-        return $val;
-}
-EXPECT
-ok
-########
-
-# TODO [perl #948] cannot meaningfully tie $,
-package TieDollarComma;
-
-sub TIESCALAR {
-     my $pkg = shift;
-     return bless \my $x, $pkg;
-}
-
-sub STORE {
-    my $self = shift;
-    $$self = shift;
-    print "STORE set '$$self'\n";
-}
-
-sub FETCH {
-    my $self = shift;
-    print "FETCH\n";
-    return $$self;
-}
-package main;
-
-tie $,, 'TieDollarComma';
-$, = 'BOBBINS';
-print "join", "things", "up\n";
-EXPECT
-STORE set 'BOBBINS'
-FETCH
-FETCH
-joinBOBBINSthingsBOBBINSup
-empty
-########
-sub TIESCALAR { bless \%() }
-sub FETCH { my $x = 3.3; 1 if 0+$x; $x }
-tie our $h, "main";
-print $h,"\n";
-EXPECT
-3.3
-########
-sub TIESCALAR { bless \%() }
-sub FETCH { shift()->{i} ++ }
-tie our $h, "main";
-print $h.$h;
-EXPECT
-01
-########
-sub TIESCALAR { my $foo = @_[1]; bless \$foo, @_[0] }
-sub FETCH { ${@_[0]} }
-tie my $x, "main", 2;
-tie my $y, "main", 8;
-print $x ^|^ $y;
-EXPECT
-10
 ########
 # TODO Bug 36267
 
@@ -460,16 +269,6 @@ print nelems(@(keys %h)), "\n";
 EXPECT
 0
 0
-########
-# Bug 37731
-sub foo::TIESCALAR { bless \%(value => @_[1]), @_[0] }
-sub foo::FETCH { @_[0]->{value} }
-tie my $VAR, 'foo', '42';
-foreach my $var ($VAR) {
-    print +($var eq $VAR) ? "yes\n" : "no\n";
-}
-EXPECT
-yes
 ########
 our %h;
 sub TIEHASH { bless \@(), 'main' }
