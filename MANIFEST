@@ -1660,14 +1660,8 @@ lib/Thread/Semaphore/t/01_basic.t	Thread::Semaphore tests
 lib/Thread/Semaphore/t/02_errs.t	Thread::Semaphore tests
 lib/Thread/Semaphore/t/03_nothreads.t	Thread::Semaphore tests
 lib/Thread.t			Thread extensions frontend tests
-lib/Tie/Handle.pm		Base class for tied handles
-lib/Tie/Handle/stdhandle_from_handle.t	Test for Tie::StdHandle/Handle backwards compat
-lib/Tie/Handle/stdhandle.t	Test for Tie::StdHandle
 lib/Tie/Hash/NamedCapture.pm	Implements %- and %+ behaviour
 lib/Tie/Hash.pm			Base class for tied hashes
-lib/Tie/Scalar.pm		Base class for tied scalars
-lib/Tie/Scalar.t		See if Tie::Scalar works
-lib/Tie/StdHandle.pm		Tie::StdHandle
 lib/Tie/SubstrHash.pm		Compact hash for known key, value and table size
 lib/Tie/SubstrHash.t		Test for Tie::SubstrHash
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime

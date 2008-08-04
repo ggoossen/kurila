@@ -22,7 +22,7 @@ $^WARN_HOOK = sub {
 
 require './test.pl';
 
-plan(234);
+plan(232);
 
 run_tests() unless caller;
 
@@ -303,14 +303,6 @@ is($a, 'xxxxefgh');
     $x = join '', reverse split m//, $x;
     is($x, "\x[E2]dcba");
 }
-
-# replacement should work on magical values
-require Tie::Scalar;
-my %data;
-tie %data{'a'}, 'Tie::StdScalar';  # makes $data{'a'} magical
-%data{a} = "firstlast";
-is(substr(%data{'a'}, 0, 5, ""), "first");
-is(%data{'a'}, "last");
 
 # And tests for already-UTF8 one
 
