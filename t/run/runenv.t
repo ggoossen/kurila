@@ -16,7 +16,7 @@ BEGIN {
 
 BEGIN { require './test.pl'; }
 
-plan tests => 17;
+plan tests => 16;
 
 my $STDOUT = './results-0';
 my $STDERR = './results-1';
@@ -94,14 +94,11 @@ sub tryrun {
 #                    -T, tainting will be enabled, and any
 #                    subsequent options ignored.
 
-tryrun(\%(PERL5OPT => '-w'), \@('-e', 'print $::x'),
+tryrun(\%(PERL5OPT => '-w'), \@('-e', 'print $main::x'),
     "", 
     qq{Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$x in print at -e line 1.
+Use of uninitialized value \$main::x in print at -e line 1.
 });
-
-tryrun(\%(PERL5OPT => '-Mstrict'), \@('-e', 'print $::x'),
-    "", "");
 
 tryrun(\%(PERL5OPT => '-Mstrict'), \@('-e', 'print $x'),
     "", 
@@ -115,20 +112,20 @@ tryrun(\%(PERL5OPT => '-Mstrict -w'), \@('-e', 'print $x'),
 Execution of -e aborted due to compilation errors. at -e line 1.\n});
 
 # Fails in 5.6.0
-tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $::x'),
+tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $main::x'),
     "", 
     <<ERROR
 Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$x in print at -e line 1.
+Use of uninitialized value \$main::x in print at -e line 1.
 ERROR
     );
 
 # Fails in 5.6.0
-tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $::x'),
+tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $main::x'),
     "", 
     <<ERROR
 Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$x in print at -e line 1.
+Use of uninitialized value \$main::x in print at -e line 1.
 ERROR
     );
 

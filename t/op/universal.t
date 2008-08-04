@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 107;
+plan tests => 101;
 
 $a = \%();
 bless $a, "Bob";
@@ -22,7 +22,6 @@ our @ISA= @(qw(Human) );
 
 package Alice;
 our @ISA= @(qw(Bob Female) );
-sub sing;
 sub drink { return "drinking " . @_[1]  }
 sub new { bless \%() }
 
@@ -65,9 +64,6 @@ ok $a->can("eat");
 ok ! $a->can("sleep");
 ok my $ref = $a->can("drink");        # returns a coderef
 is $a->?$ref("tea"), "drinking tea"; # ... which works
-ok $ref = $a->can("sing");
-try { $a->?$ref() };
-ok $@;                                # ... but not if no actual subroutine
 
 ok (!Cedric->isa('Programmer'));
 
@@ -153,19 +149,6 @@ ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
     main::ok isa "Pickup", 'UNIVERSAL';
     main::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can;
     main::ok VERSION "UNIVERSAL" ;
-}
-
-{
-    # test isa() and can() on magic variables
-    "Human" =~ m/(.*)/;
-    ok $1->isa("Human");
-    ok $1->can("eat");
-    package HumanTie;
-    sub TIESCALAR { bless \%() }
-    sub FETCH { "Human" }
-    tie my($x), "HumanTie";
-    main::ok $x->isa("Human");
-    main::ok $x->can("eat");
 }
 
 # bugid 3284

@@ -2,11 +2,7 @@
 
 BEGIN {
     print "1..3\n";
-    *ARGV = *DATA;
+    push @ARGV, 'run/switchp.aux';
 }
-print "ok 1\n";
 print ~< *ARGV;
 print "ok 3\n";
-
-__DATA__
-ok 2 - read from aliased DATA filehandle
