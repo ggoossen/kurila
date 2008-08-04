@@ -64,7 +64,7 @@ EXPECT
 ########
 our $foo=undef; $foo->go;
 EXPECT
-Can't call method "go" on an undefined value at - line 1.
+Can't call method "go" on UNDEF at - line 1.
 ########
 BEGIN
         {
@@ -76,7 +76,7 @@ our @array;
 ########
 our $x=0x0eabcd; print $x->ref;
 EXPECT
-Can't call method "ref" without a package or object reference at - line 1.
+Can't locate object method "ref" via package "961485" (perhaps you forgot to load "961485"?) at - line 1.
 ########
 our $str;
 chop ($str .= ~< *DATA);
@@ -168,13 +168,6 @@ print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
 ok
 ########
-our $ren = 'joy';
-our $stimpy = 'happy';
-{ local %main::{ren} = *stimpy; print $ren, ' ' }
-print $ren, "\n";
-EXPECT
-happy joy
-########
 my $a = 'outer';
 eval q[ my $a = 'inner'; eval q[ print "$a " ] ];
 try { my $x = 'peace'; eval q[ print "$x\n" ] }
@@ -231,6 +224,7 @@ sub testme { my $a = "test"; { local $a = "new test"; print $a }}
 EXPECT
 Can't localize lexical variable $a at - line 1.
 ########
+# TODO
 package X;
 sub ascalar { my $r; bless \$r }
 sub DESTROY { print "destroyed\n" };
@@ -239,6 +233,7 @@ package main;
 EXPECT
 destroyed
 ########
+# TODO
 package X;
 sub anarray { bless \@() }
 sub DESTROY { print "destroyed\n" };
@@ -247,6 +242,7 @@ package main;
 EXPECT
 destroyed
 ########
+# TODO
 package X;
 sub ahash { bless \%() }
 sub DESTROY { print "destroyed\n" };
@@ -255,6 +251,7 @@ package main;
 EXPECT
 destroyed
 ########
+# TODO
 package X;
 sub aclosure { my $x; bless sub { ++$x } }
 sub DESTROY { print "destroyed\n" };
@@ -263,6 +260,7 @@ package main;
 EXPECT
 destroyed
 ########
+# TODO
 no strict "refs";
 package X;
 sub any { bless \%() }
@@ -321,7 +319,7 @@ else {
   if ($x == 0) { print "" } else { print $x }
 }
 EXPECT
-Use of uninitialized value $x in numeric eq (==) at - line 4.
+Use of uninitialized value $main::x in numeric eq (==) at - line 4.
 ########
 our $x = sub {};
 foo();
@@ -377,7 +375,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-recursive die
+recursive die at - line 3.
 ########
 # David Dyck
 # coredump in 5.7.1
