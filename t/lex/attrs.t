@@ -16,27 +16,26 @@ our ($anon1, $anon2, $anon3);
 
 sub eval_ok ($;$) {
     eval shift;
-    is( $@, '', < @_);
+    diag $@->message if $@;
+    ok( ! $@, < @_);
 }
 
 eval_ok 'sub t1 ($) : locked { @_[0]++ }';
 eval_ok 'sub t2 : locked { @_[0]++ }';
-eval_ok 'sub t3 ($) : locked ;';
-eval_ok 'sub t4 : locked ;';
 eval_ok '$anon1 = sub ($) : locked:method { @_[0]++ }';
 eval_ok '$anon2 = sub : locked : method { @_[0]++ }';
 eval_ok '$anon3 = sub : method { @_[0]->[1] }';
 
-eval 'sub e1 ($) : plugh ;';
+eval 'sub e1 ($) : plugh { 1 }';
 like $@->message, qr/^Invalid CODE attributes?: ["']?plugh["']? at/;
 
-eval 'sub e2 ($) : plugh(0,0) xyzzy ;';
+eval 'sub e2 ($) : plugh(0,0) xyzzy { 1 }';
 like $@->message, qr/^Invalid CODE attributes: ["']?plugh\(0,0\)["']? /;
 
-eval 'sub e3 ($) : plugh(0,0 xyzzy ;';
+eval 'sub e3 ($) : plugh(0,0 xyzzy { 1 }';
 like $@->message, qr/Unterminated attribute parameter in attribute list at/;
 
-eval 'sub e4 ($) : plugh + xyzzy ;';
+eval 'sub e4 ($) : plugh + xyzzy { 1 }';
 like $@->message, qr/Invalid separator character '[+]' in attribute list at/;
 
 eval 'my main $x : = 0;';
@@ -137,7 +136,7 @@ is "{join ' ', <@attrs}", "locked Z";
     sub TIESCALAR { my $x = @_[1]; bless \$x, @_[0]; }
     sub FETCH { ${@_[0]} }
     sub STORE {
-	::pass;
+	main::pass;
 	${@_[0]} = @_[1]*2;
     }
     package Tloop;
