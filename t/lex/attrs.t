@@ -94,14 +94,12 @@ sub X::MODIFY_CODE_ATTRIBUTES { die "@_[0]" }
 sub X::foo { 1 }
 *Y::bar = \&X::foo;
 *Y::bar = \&X::foo;	# second time for -w
-eval 'package Z; sub Y::bar : foo';
-like $@->message, qr/^X at /;
 
-eval 'package Z; sub Y::baz : locked {}';
-my @attrs = @( eval 'attributes::get \&Y::baz' );
+eval 'package Z; sub Y::baz : locked {}'; die if $@;
+my @attrs = eval 'attributes::get \&Y::baz';
 is "{join ' ', <@attrs}", "locked";
 
-@attrs = @( eval 'attributes::get $anon1' );
+@attrs = eval 'attributes::get $anon1'; die if $@;
 is "{join ' ', <@attrs}", "locked method";
 
 sub Z::DESTROY { }
@@ -109,39 +107,24 @@ sub Z::FETCH_CODE_ATTRIBUTES { return 'Z' }
 my $thunk = eval 'bless +sub : method locked { 1 }, "Z"';
 is ref($thunk), "Z";
 
-@attrs = @( eval 'attributes::get $thunk' );
+@attrs = eval 'attributes::get $thunk'; die if $@;
 is "{join ' ', <@attrs}", "locked method Z";
 
 # Test attributes on predeclared subroutines:
-eval 'package A; sub PS : locked';
-@attrs = @( eval 'attributes::get \&A::PS' );
+eval 'package A; sub PS : locked'; die if $@;
+@attrs = eval 'attributes::get \&A::PS';
 is "{join ' ', <@attrs}", "locked";
 
 # Test ability to modify existing sub's (or XSUB's) attributes.
-eval 'package A; sub X { @_[0] } sub X : locked';
-@attrs = @( eval 'attributes::get \&A::X' );
+eval 'package A; sub X { @_[0] } sub X : locked'; die if $@;
+@attrs = eval 'attributes::get \&A::X';
 is "{join ' ', <@attrs}", "locked";
 
 # Above not with just 'pure' built-in attributes.
 sub Z::MODIFY_CODE_ATTRIBUTES { (); }
 eval 'package Z; sub L { @_[0] } sub L : Z locked';
-@attrs = @( eval 'attributes::get \&Z::L' );
+@attrs = eval 'attributes::get \&Z::L';
 is "{join ' ', <@attrs}", "locked Z";
-
-# Begin testing attributes that tie
-
-{
-    package Ttie;
-    sub DESTROY {}
-    sub TIESCALAR { my $x = @_[1]; bless \$x, @_[0]; }
-    sub FETCH { ${@_[0]} }
-    sub STORE {
-	main::pass;
-	${@_[0]} = @_[1]*2;
-    }
-    package Tloop;
-    sub MODIFY_SCALAR_ATTRIBUTES { tie ${@_[1]}, 'Ttie', -1; return; }
-}
 
 # bug #15898
 eval 'our ${""} : foo = 1';
