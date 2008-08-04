@@ -63,10 +63,12 @@ my %old_level = %( < $Collator->change(level => 1) );
 ok($Collator->eq("A$acute", $A_acute));
 ok($Collator->eq("A", $A_acute));
 
-ok($Collator->change(level => 2)->eq($a_acute, $A_acute));
+$Collator->change(level => 2);
+ok($Collator->eq($a_acute, $A_acute));
 is($Collator->cmp("A", $A_acute), -1);
 
-is($Collator->change(< %old_level)->cmp("A", $A_acute), -1);
+$Collator->change(< %old_level);
+is($Collator->cmp("A", $A_acute), -1);
 is($Collator->cmp("A", $A_acute), -1);
 is($Collator->cmp("A", $a_acute), -1);
 is($Collator->cmp($a_acute, $A_acute), -1);
