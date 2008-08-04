@@ -4,11 +4,7 @@ our $i;
 
 BEGIN {
     print "1..2\n";
-    *ARGV = *DATA;
+    push @ARGV, 'run/switchp.aux';
     $i = 0;
 }
-print "@F[1] ",++$i,"\n";
-
-__DATA__
-not ok
-not ok 3
+print((@F[0] eq "ok" ? "ok " : "not ok "),++$i,"\n");

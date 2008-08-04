@@ -3002,30 +3002,7 @@ Perl_yylex(pTHX)
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");
 		if (PL_minus_a) {
-		    if (PL_minus_F) {
-			if ((*PL_splitstr == '/' || *PL_splitstr == '\''
-			     || *PL_splitstr == '"')
-			      && strchr(PL_splitstr + 1, *PL_splitstr))
-			    Perl_sv_catpvf(aTHX_ PL_linestr, "our @F=@(split(%s));", PL_splitstr);
-			else {
-			    /* "q\0${splitstr}\0" is legal perl. Yes, even NUL
-			       bytes can be used as quoting characters.  :-) */
-			    const char *splits = PL_splitstr;
-			    sv_catpvs(PL_linestr, "our @F=@(split(q\0");
-			    do {
-				/* Need to \ \s  */
-				if (*splits == '\\')
-				    sv_catpvn(PL_linestr, splits, 1);
-				sv_catpvn(PL_linestr, splits, 1);
-			    } while (*splits++);
-			    /* This loop will embed the trailing NUL of
-			       PL_linestr as the last thing it does before
-			       terminating.  */
-			    sv_catpvs(PL_linestr, "));");
-			}
-		    }
-		    else
-		        sv_catpvs(PL_linestr,"our @F=@(split(' '));");
+		    sv_catpvs(PL_linestr,"our @F=@(split(' '));");
 		}
 	    }
 	    if (PL_minus_E)

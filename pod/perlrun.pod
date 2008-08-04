@@ -7,7 +7,7 @@ perlrun - how to execute the Perl interpreter
 B<perl>	S<[ B<TtuUWX> ]>
 	S<[ B<-hv> ] [ B<-V>[:I<configvar>] ]>
 	S<[ B<-cw> ] [ B<-d>[B<t>][:I<debugger>] ] [ B<-D>[I<number/list>] ]>
-	S<[ B<-pna> ] [ B<-F>I<pattern> ] [ B<-l>[I<octal>] ] [ B<-0>[I<octal/hexadecimal>] ]>
+	S<[ B<-pna> ] [ B<-l>[I<octal>] ] [ B<-0>[I<octal/hexadecimal>] ]>
 	S<[ B<-I>I<dir> ] [ B<-m>[B<->]I<module> ] [ B<-M>[B<->]I<'module...'> ] [ B<-f> ]>
 	S<[ B<-C [I<number/list>] >]>
 	S<[ B<-S> ]>
@@ -274,8 +274,6 @@ is equivalent to
 	print pop(@F), "\n";
     }
 
-An alternate delimiter may be specified using B<-F>.
-
 =item B<-C [I<number/list>]>
 X<-C>
 
@@ -457,13 +455,6 @@ F<$Config{sitelib}/sitecustomize.pl> at startup (in a BEGIN block).
 This is a hook that allows the sysadmin to customize how perl behaves.
 It can for instance be used to add entries to the @INC array to make perl
 find modules in non-standard locations.
-
-=item B<-F>I<pattern>
-X<-F>
-
-specifies the pattern to split on if B<-a> is also in effect.  The
-pattern may be surrounded by C<//>, C<"">, or C<''>, otherwise it will be
-put in single quotes. You can't use literal whitespace in the pattern.
 
 =item B<-h>
 X<-h>
