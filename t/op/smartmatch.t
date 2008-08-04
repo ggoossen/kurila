@@ -8,7 +8,6 @@ use strict;
 skip_all "remove smartmach from kurila";
 exit 0;
 
-use Tie::Array;
 use Tie::Hash;
 
 # The feature mechanism is tested in t/lib/feature/smartmatch:
@@ -22,8 +21,6 @@ my $deep2 = \@(); push @$deep2, \$deep2;
 {my $const = "a constant"; sub a_const () {$const}}
 
 my @nums = @(1..10);
-tie my @tied_nums, 'Tie::StdArray';
-@tied_nums =  @(1..10);
 
 my %hash = %(foo => 17, bar => 23);
 tie my %tied_hash, 'Tie::StdHash';

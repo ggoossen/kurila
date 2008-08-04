@@ -8,7 +8,7 @@ BEGIN {
 use strict;
 use feature "state";
 
-plan tests => 62;
+plan tests => 58;
 
 ok( ! defined state $uninit, q(state vars are undef by default) );
 
@@ -73,20 +73,6 @@ my $f2 = generator();
 is( $f2->(), 1, 'generator 2' );
 is( $f1->(), 3, 'generator 1 again' );
 is( $f2->(), 2, 'generator 2 once more' );
-
-# with ties
-{
-    package countfetches;
-    our $fetchcount = 0;
-    sub TIESCALAR {bless \%()};
-    sub FETCH { ++$fetchcount; 18 };
-    tie my $y, "countfetches";
-    sub foo { state $x //= $y; $x++ }
-    main::is( foo(), 18, "initialisation with tied variable" );
-    main::is( foo(), 19, "increments correctly" );
-    main::is( foo(), 20, "increments correctly, twice" );
-    main::is( $fetchcount, 1, "fetch only called once" );
-}
 
 # state variables are shared among closures
 

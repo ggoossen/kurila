@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 18;
+plan tests => 16;
 
 dies_like(sub { for (\2) { $_ = ~< *FH } },
           qr/^Modification of a read-only value attempted$/, '[perl #19566]');
@@ -88,21 +88,9 @@ fresh_perl_is('print readline', 'foo',
 my $obj = bless \@();
 dies_like( sub { $obj .= ~< *DATA; }, qr/reference as string/, 'rcatline and refs');
 
-# bug #38631
-require Tie::Scalar;
-tie our $one, 'Tie::StdScalar', "A: ";
-tie our $two, 'Tie::StdScalar', "B: ";
-my $junk = $one;
-$one .= ~< *DATA;
-$two .= ~< *DATA;
-is( $one, "A: One\n", "rcatline works with tied scalars" );
-is( $two, "B: Two\n", "rcatline works with tied scalars" );
-
 __DATA__
 moo
 moo
  rules
  rules
 world
-One
-Two

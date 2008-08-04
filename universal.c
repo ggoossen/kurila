@@ -1478,16 +1478,8 @@ XS(XS_re_regnames)
         XSRETURN_UNDEF;
 
     av = (AV*)SvRV(ret);
-    length = av_len(av);
+    XPUSHs(sv_mortalcopy(av));
 
-    for (i = 0; i <= length; i++) {
-        entry = av_fetch(av, i, FALSE);
-        
-        if (!entry)
-            Perl_croak(aTHX_ "NULL array element in re::regnames()");
-
-        XPUSHs(*entry);
-    }
     PUTBACK;
     return;
 }
@@ -1522,57 +1514,25 @@ XS(XS_re_regexp_pattern)
         STRLEN left = 0;
         char reflags[6];
 
-        if ( GIMME_V == G_ARRAY ) {
-            /*
-               we are in list context so stringify
-               the modifiers that apply. We ignore "negative
-               modifiers" in this scenario.
-            */
-
-            const char *fptr = INT_PAT_MODS;
-            char ch;
-            U16 match_flags = (U16)((RX_EXTFLAGS(re) & PMf_COMPILETIME)
-                                    >> RXf_PMf_STD_PMMOD_SHIFT);
-
-            while((ch = *fptr++)) {
-                if(match_flags & 1) {
-                    reflags[left++] = ch;
-                }
-                match_flags >>= 1;
-            }
-
-            pattern = newSVpvn_flags(RX_PRECOMP(re),RX_PRELEN(re), SVs_TEMP);
-
-            /* return the pattern and the modifiers */
-            XPUSHs(pattern);
-            XPUSHs(newSVpvn_flags(reflags, left, SVs_TEMP));
-            XSRETURN(2);
-        } else {
-            /* Scalar, so use the string that Perl would return */
-            /* return the pattern in (?msix:..) format */
-            pattern = sv_2mortal(newSVsv((SV*)re));
-            XPUSHs(pattern);
-            XSRETURN(1);
-        }
+	/* Use the string that Perl would return */
+	/* return the pattern in (?msix:..) format */
+	pattern = sv_2mortal(newSVsv((SV*)re));
+	XPUSHs(pattern);
+	XSRETURN(1);
     } else {
         /* It ain't a regexp folks */
-        if ( GIMME_V == G_ARRAY ) {
-            /* return the empty list */
-            XSRETURN_UNDEF;
-        } else {
-            /* Because of the (?:..) wrapping involved in a
-               stringified pattern it is impossible to get a
-               result for a real regexp that would evaluate to
-               false. Therefore we can return PL_sv_no to signify
-               that the object is not a regex, this means that one
-               can say
+	/* Because of the (?:..) wrapping involved in a
+	   stringified pattern it is impossible to get a
+	   result for a real regexp that would evaluate to
+	   false. Therefore we can return PL_sv_no to signify
+	   that the object is not a regex, this means that one
+	   can say
 
-                 if (regex($might_be_a_regex) eq '(?:foo)') { }
+	   if (regex($might_be_a_regex) eq '(?:foo)') { }
 
-               and not worry about undefined values.
-            */
-            XSRETURN_NO;
-        }
+	   and not worry about undefined values.
+	*/
+	XSRETURN_NO;
     }
     /* NOT-REACHED */
 }
