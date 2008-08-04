@@ -6,7 +6,7 @@ BEGIN {
 
 # use strict;
 
-plan tests => 217;
+plan tests => 57;
 
 my @comma = @("key", "value");
 
@@ -40,8 +40,8 @@ ok (eq_array (\@(), \@temp), 'last each from comma hash');
 
 my %temp = %( < %comma );
 
-ok (keys %temp == 1, 'keys on copy of comma hash');
-ok (values %temp == 1, 'values on copy of comma hash');
+ok (nelems(@(keys %temp)) == 1, 'keys on copy of comma hash');
+ok (nelems(@(values %temp)) == 1, 'values on copy of comma hash');
 is (%temp{'k' . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{key}, "value", 'is key present? (maybe optimised)');
@@ -59,8 +59,8 @@ ok (eq_array (\@(), \@temp), 'last each from copy of comma hash');
 my @arrow = @(Key =>"Value");
 
 my %arrow = %( < @arrow );
-ok (keys %arrow == 1, 'keys on arrow hash');
-ok (values %arrow == 1, 'values on arrow hash');
+ok (nelems(@(keys %arrow)) == 1, 'keys on arrow hash');
+ok (nelems(@(values %arrow)) == 1, 'values on arrow hash');
 # defeat any tokeniser or optimiser cunning
 $key = 'ey';
 is (%arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
@@ -80,8 +80,8 @@ ok (eq_array (\@(), \@temp), 'last each from arrow hash');
 
 %temp = %( < %arrow );
 
-ok (keys %temp == 1, 'keys on copy of arrow hash');
-ok (values %temp == 1, 'values on copy of arrow hash');
+ok (nelems(@(keys %temp)) == 1, 'keys on copy of arrow hash');
+ok (nelems(@(values %temp)) == 1, 'values on copy of arrow hash');
 is (%temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
@@ -179,98 +179,6 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
               '*', 'Typeglob',);
 
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
-
-# And now UTF8
-
-foreach my $chr (60, 200, 600, 6000, 60000) {
-  # This little game may set a UTF8 flag internally. Or it may not. :-)
-    use utf8;
-
-  my ($key, $value) = (chr ($chr) . "\x{ABCD}", "$chr\x{ABCD}");
-  chop ($key, $value);
-  my @utf8c = @($key, $value);
-  my %utf8c = %( < @utf8c );
-
-  ok (keys %utf8c == 1, 'keys on utf8 comma hash');
-  ok (values %utf8c == 1, 'values on utf8 comma hash');
-  # defeat any tokeniser or optimiser cunning
-  is (%utf8c{"" . $key}, $value, 'is key present? (unoptimised)');
-  my $tempval = sprintf '%%utf8c{"\x{%x}"}', $chr;
-  is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
-  eval $tempval or die "'$tempval' gave {$@->message}";
-  is (%utf8c{@temp[0]}, $value, 'is key present? (using LHS of $tempval)');
-
-  @temp = @( < %utf8c );
-  ok (eq_array (\@utf8c, \@temp), 'list from utf8 comma hash');
-
-  @temp = @( each %utf8c );
-  ok (eq_array (\@utf8c, \@temp), 'first each from utf8 comma hash');
-  @temp = @( each %utf8c );
-  ok (eq_array (\@(), \@temp), 'last each from utf8 comma hash');
-
-  %temp = %( < %utf8c );
-
-  ok (keys %temp == 1, 'keys on copy of utf8 comma hash');
-  ok (values %temp == 1, 'values on copy of utf8 comma hash');
-  is (%temp{"" . $key}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
-  is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
-  eval $tempval or die "'$tempval' gave $@";
-  is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
-
-  @temp = @( < %temp );
-  ok (eq_array (\@temp, \@temp), 'list from copy of utf8 comma hash');
-
-  @temp = @( each %temp );
-  ok (eq_array (\@temp, \@temp), 'first each from copy of utf8 comma hash');
-  @temp = @( each %temp );
-  ok (eq_array (\@(), \@temp), 'last each from copy of utf8 comma hash');
-
-  my $assign = sprintf '("\x{%x}" => "%d")', $chr, $chr;
-  print "# $assign\n";
-  my (@utf8a) = @( eval $assign );
-
-  my %utf8a = %( < @utf8a );
-  ok (keys %utf8a == 1, 'keys on utf8 arrow hash');
-  ok (values %utf8a == 1, 'values on utf8 arrow hash');
-  # defeat any tokeniser or optimiser cunning
-  is (%utf8a{$key . ""}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '%%utf8a{"\x{%x}"}', $chr;
-  is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
-  eval $tempval or die "'$tempval' gave $@";
-  is (%utf8a{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
-
-  @temp = @( < %utf8a );
-  ok (eq_array (\@utf8a, \@temp), 'list from utf8 arrow hash');
-
-  @temp = @( each %utf8a );
-  ok (eq_array (\@utf8a, \@temp), 'first each from utf8 arrow hash');
-  @temp = @( each %utf8a );
-  ok (eq_array (\@(), \@temp), 'last each from utf8 arrow hash');
-
-  %temp = %( < %utf8a );
-
-  ok (keys %temp == 1, 'keys on copy of utf8 arrow hash');
-  ok (values %temp == 1, 'values on copy of utf8 arrow hash');
-  is (%temp{'' . $key}, $value, 'is key present? (unoptimised)');
-  $tempval = sprintf '%%temp{"\x{%x}"}', $chr;
-  is (eval $tempval, $value, "is key present? (maybe $tempval is optimised)");
-  $tempval = sprintf '@temp = @("\x{%x}" => undef)', $chr;
-  eval $tempval or die "'$tempval' gave $@";
-  is (%temp{@temp[0]}, $value, "is key present? (using LHS of $tempval)");
-
-  @temp = @( < %temp );
-  ok (eq_array (\@temp, \@temp), 'list from copy of utf8 arrow hash');
-
-  @temp = @( each %temp );
-  ok (eq_array (\@temp, \@temp), 'first each from copy of utf8 arrow hash');
-  @temp = @( each %temp );
-  ok (eq_array (\@(), \@temp), 'last each from copy of utf8 arrow hash');
-
-}
 
 # now some tests for hash assignment in scalar and list context with
 # duplicate keys [perl #24380]

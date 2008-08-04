@@ -24,7 +24,7 @@ else {
   map { %files{$_}++ } < glob("op/*");
   map { delete %files{$_} } split m/[\s\n]/, `echo op/*`;
 }
-ok( !(keys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
+ok( !(nkeys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
 
 cmp_ok($/,'eq',"\n",'sane input record separator');
 

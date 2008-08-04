@@ -2478,7 +2478,6 @@ t/op/fun.t			See if op.c:Perl_ck_fun works
 t/op/getpid.t			See if $$ and getppid work with threads
 t/op/getppid.t			See if getppid works
 t/op/glob.t			See if <*> works
-t/op/gmagic.t			See if GMAGIC works
 t/op/goto.t			See if goto works
 t/op/goto_xs.t			See if "goto &sub" works on XSUBs
 t/op/grent.t			See if getgr*() functions work
