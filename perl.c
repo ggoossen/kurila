@@ -718,8 +718,6 @@ perl_destruct(pTHXx)
     PL_envgv = NULL;
     SvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
-    SvREFCNT_dec(PL_defgv);
-    PL_defgv = NULL;
     PL_hintgv = NULL;
     SvREFCNT_dec(PL_errgv);
     PL_errgv = NULL;
@@ -849,6 +847,10 @@ perl_destruct(pTHXx)
     /* the 3 is for PL_fdpid and PL_strtab and PL_isarev */
 /*     while (sv_clean_all() > 3) */
 /* 	; */
+
+    /* clear *_ */
+    SvREFCNT_dec(PL_defgv);
+    PL_defgv = NULL;
 
     SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
     PL_fdpid = NULL;
