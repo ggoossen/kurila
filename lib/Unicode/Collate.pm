@@ -621,18 +621,18 @@ sub getWt
 	    }
 
 	    @hangulCE = @( map({
-		    $map->{$_} ? < @{ $map->{$_} } : $der->($_);
+		    $map->{$_} ? < @{ $map->{$_} } : < $der->($_);
 		} < @decH) );
 	}
-	return @(map < _varCE($vbl, $_), < @hangulCE);
+	return @(map _varCE($vbl, $_), < @hangulCE);
     }
     elsif (_isUIdeo($u, $self->{UCA_Version})) {
 	my $cjk  = $self->{overrideCJK};
-	return @(map { < _varCE($vbl, $_) }
+	return @(map { _varCE($vbl, $_) }
 	    $cjk
-		? map(pack(VCE_TEMPLATE, < NON_VAR, < @$_), < &$cjk($u))
+		? map(pack(VCE_TEMPLATE, NON_VAR, < @$_), < &$cjk($u))
 		: defined $cjk && $self->{UCA_Version} +<= 8 && $u +< 0x10000
-		    ? < _uideoCE_8($u)
+		    ? _uideoCE_8($u)
 		    : < $der->($u) );
     }
     else {
@@ -666,14 +666,14 @@ sub getSortKey
 		$preHST =~ m/V\z/ && $curHST =~ m/^L/ ||
 		$preHST =~ m/T\z/ && $curHST =~ m/^[LV]/) {
 
-		push @buf, < $self->getWtHangulTerm();
+		push @buf, $self->getWtHangulTerm();
 	    }
 	    $preHST = $curHST;
 
 	    push @buf, < $self->getWt($jcps);
 	}
 	$preHST # end at hangul
-	    and push @buf, < $self->getWtHangulTerm();
+	    and push @buf, $self->getWtHangulTerm();
     }
     else {
 	foreach my $jcps (< @$rEnt) {
@@ -765,8 +765,8 @@ sub _derivCE_14 {
     my $aaaa = $base + ($u >> 15);
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
     return
-	@( pack(VCE_TEMPLATE, < NON_VAR, $aaaa, < Min2Wt, < Min3Wt, $u),
-           pack(VCE_TEMPLATE, < NON_VAR, $bbbb,      0,      0, $u) );
+	@( pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
+           pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u) );
 }
 
 sub _derivCE_9 {
@@ -782,8 +782,8 @@ sub _derivCE_9 {
     my $aaaa = $base + ($u >> 15);
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
     return
-	@( pack(VCE_TEMPLATE, < NON_VAR, $aaaa, < Min2Wt, < Min3Wt, $u),
-           pack(VCE_TEMPLATE, < NON_VAR, $bbbb,      0,      0, $u) );
+	@( pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
+           pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u) );
 }
 
 sub _derivCE_8 {
@@ -791,13 +791,13 @@ sub _derivCE_8 {
     my $aaaa =  0xFF80 + ($code >> 15);
     my $bbbb = ($code ^&^ 0x7FFF) ^|^ 0x8000;
     return
-	@( pack(VCE_TEMPLATE, < NON_VAR, $aaaa, 2, 1, $code),
-           pack(VCE_TEMPLATE, < NON_VAR, $bbbb, 0, 0, $code) );
+	@( pack(VCE_TEMPLATE, NON_VAR, $aaaa, 2, 1, $code),
+           pack(VCE_TEMPLATE, NON_VAR, $bbbb, 0, 0, $code) );
 }
 
 sub _uideoCE_8 {
     my $u = shift;
-    return pack(VCE_TEMPLATE, < NON_VAR, $u, < Min2Wt, < Min3Wt, $u);
+    return pack(VCE_TEMPLATE, NON_VAR, $u, Min2Wt, Min3Wt, $u);
 }
 
 sub _isUIdeo {
@@ -816,7 +816,7 @@ sub _isUIdeo {
 sub getWtHangulTerm {
     my $self = shift;
     return _varCE($self->{variable},
-	pack(VCE_TEMPLATE, < NON_VAR, $self->{hangul_terminator}, 0,0,0));
+	pack(VCE_TEMPLATE, NON_VAR, $self->{hangul_terminator}, 0,0,0));
 }
 
 
