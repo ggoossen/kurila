@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 228;
+plan tests => 225;
 
 while ( ~< *DATA) {
     chomp;
@@ -42,7 +42,6 @@ close (;*)
 closedir (*)
 cmp unknown
 connect (*$)
-continue ()
 cos (_)
 crypt ($$)
 defined undef
@@ -100,7 +99,6 @@ getservbyport ($$)
 getservent ()
 getsockname (*)
 getsockopt (*$$)
-given undef
 glob undef
 gmtime (;$)
 goto undef
@@ -111,7 +109,7 @@ index ($$;$)
 int (_)
 ioctl (*$$)
 join ($@)
-keys (\%)
+keys ($)
 kill (@)
 last undef
 lc (_)
@@ -245,7 +243,6 @@ wait ()
 waitpid ($$)
 wantarray ()
 warn (@)
-when undef
 while undef
 x unknown
 xor ($$)

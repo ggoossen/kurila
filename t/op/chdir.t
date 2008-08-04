@@ -30,7 +30,7 @@ my $Cwd = abs_path;
 SKIP: {
     my ($vol,$dir) = < splitpath(abs_path,1);
     my $test_dir = $IsVMS ? 'T' : 't';
-    skip("Already in t/", 2) if ( <splitdir($dir))[-1] eq $test_dir;
+    skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
 
     ok( chdir($test_dir),     'chdir($test_dir)');
     is( < abs_path, < catdir($Cwd, $test_dir),    '  abs_path() agrees' );

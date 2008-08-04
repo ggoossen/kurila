@@ -144,7 +144,7 @@ pass ("change 8056 is thanks to Inaba Hiroto");
     %u{$u1} = 3;
     %u{$b1} = 4;
 
-    is(scalar keys %u, 2, "two different keys (byte and unicode are the same)"); 
+    is(nkeys %u, 2, "two different keys (byte and unicode are the same)"); 
     is(%u{$u0}, 2, "U+00FF=\\xC3\\xBF  -> 2");
     is(%u{$b0}, 2, "\\xC3\\xBF=U+00FF  -> 2");
     is(%u{$u1}, 4, "U+0100=\\xC4\\x80  -> 4 ");
