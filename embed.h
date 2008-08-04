@@ -608,8 +608,6 @@
 #endif
 #define find_rundefsvoffset	Perl_find_rundefsvoffset
 #ifdef PERL_CORE
-#define oopsAV			Perl_oopsAV
-#define oopsHV			Perl_oopsHV
 #define pad_leavemy		Perl_pad_leavemy
 #endif
 #define pad_sv			Perl_pad_sv
@@ -2105,6 +2103,7 @@
 #define pp_nelems		Perl_pp_nelems
 #define pp_next			Perl_pp_next
 #define pp_nextstate		Perl_pp_nextstate
+#define pp_nkeys		Perl_pp_nkeys
 #define pp_not			Perl_pp_not
 #define pp_null			Perl_pp_null
 #define pp_oct			Perl_pp_oct
@@ -2812,8 +2811,6 @@
 #endif
 #define find_rundefsvoffset()	Perl_find_rundefsvoffset(aTHX)
 #ifdef PERL_CORE
-#define oopsAV(a)		Perl_oopsAV(aTHX_ a)
-#define oopsHV(a)		Perl_oopsHV(aTHX_ a)
 #define pad_leavemy()		Perl_pad_leavemy(aTHX)
 #endif
 #define pad_sv(a)		Perl_pad_sv(aTHX_ a)
@@ -4318,6 +4315,7 @@
 #define pp_nelems()		Perl_pp_nelems(aTHX)
 #define pp_next()		Perl_pp_next(aTHX)
 #define pp_nextstate()		Perl_pp_nextstate(aTHX)
+#define pp_nkeys()		Perl_pp_nkeys(aTHX)
 #define pp_not()		Perl_pp_not(aTHX)
 #define pp_null()		Perl_pp_null(aTHX)
 #define pp_oct()		Perl_pp_oct(aTHX)

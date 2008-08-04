@@ -2269,18 +2269,6 @@ PERL_CALLCONV PADOFFSET	Perl_pad_findmy(pTHX_ const char* name)
 	assert(name)
 
 PERL_CALLCONV PADOFFSET	Perl_find_rundefsvoffset(pTHX);
-PERL_CALLCONV OP*	Perl_oopsAV(pTHX_ OP* o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_OOPSAV	\
-	assert(o)
-
-PERL_CALLCONV OP*	Perl_oopsHV(pTHX_ OP* o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_OOPSHV	\
-	assert(o)
-
 PERL_CALLCONV void	Perl_pad_leavemy(pTHX);
 PERL_CALLCONV SV*	Perl_pad_sv(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);

@@ -258,8 +258,6 @@ END_EXTERN_C
 #define PL_dirty		(*Perl_Idirty_ptr(aTHX))
 #undef  PL_doextract
 #define PL_doextract		(*Perl_Idoextract_ptr(aTHX))
-#undef  PL_doswitches
-#define PL_doswitches		(*Perl_Idoswitches_ptr(aTHX))
 #undef  PL_dowarn
 #define PL_dowarn		(*Perl_Idowarn_ptr(aTHX))
 #undef  PL_dumper_fd

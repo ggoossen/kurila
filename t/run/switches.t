@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 68);
+plan(tests => 64);
 
 use Config;
 
@@ -117,50 +117,6 @@ $r = runperl(
     prog	=> 'print for qw/foo bar/'
 );
 is( $r, 'fooxbarx', '-l with octal number' );
-
-# Tests for -s
-
-$r = runperl(
-    switches	=> \@( '-s' ),
-    prog	=> 'for (qw/abc def ghi/) {print defined ${*{Symbol::fetch_glob($_)}} ? ${*{Symbol::fetch_glob($_)}} : q(-)}',
-    args	=> \@( '--', '-abc=2', '-def', ),
-);
-is( $r, '21-', '-s switch parsing' );
-
-$filename = 'swstest.tmp';
-SKIP: {
-    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
-    print $f <<'SWTEST';
-#!perl -s
-our ($x, $y);
-BEGIN { print $x,$y; exit }
-SWTEST
-    close $f or die "Could not close: $!";
-    $r = runperl(
-	progfile    => $filename,
-	args	    => \@( '-x=foo -y' ),
-    );
-    is( $r, 'foo1', '-s on the shebang line' );
-    push @tmpfiles, $filename;
-}
-
-# Bug ID 20011106.084
-$filename = 'swsntest.tmp';
-SKIP: {
-    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
-    print $f <<'SWTEST';
-#!perl -sn
-our $x;
-BEGIN { print $x; exit }
-SWTEST
-    close $f or die "Could not close: $!";
-    $r = runperl(
-	progfile    => $filename,
-	args	    => \@( '-x=foo' ),
-    );
-    is( $r, 'foo', '-sn on the shebang line' );
-    push @tmpfiles, $filename;
-}
 
 # Tests for -m and -M
 
@@ -340,7 +296,3 @@ $r = runperl(
 );
 is( $r, "Hello, world!\n", "-E ~~" );
 
-$r = runperl(
-    switches	=> \@( '-E', '"given(undef) {when(undef) { print qq(Hello, world!\n)"}}')
-);
-is( $r, "Hello, world!\n", "-E given" );

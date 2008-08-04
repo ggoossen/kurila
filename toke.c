@@ -3266,7 +3266,6 @@ Perl_yylex(pTHX)
 			d++;
 
 		    if (*d++ == '-') {
-			const bool switches_done = PL_doswitches;
 			const U32 oldpdb = PL_perldb;
 			const bool oldn = PL_minus_n;
 			const bool oldp = PL_minus_p;
@@ -3282,14 +3281,6 @@ Perl_yylex(pTHX)
 			    }
 			    d1 = moreswitches(d1);
 			} while (d1);
-			if (PL_doswitches && !switches_done) {
-			    int argc = PL_origargc;
-			    char **argv = PL_origargv;
-			    do {
-				argc--,argv++;
-			    } while (argc && argv[0][0] == '-' && argv[0][1]);
-			    init_argv_symbols(argc,argv);
-			}
 			if ((PERLDB_LINE && !oldpdb) ||
 			    ((PL_minus_n || PL_minus_p) && !(oldn || oldp)))
 			      /* if we have already added "LINE: while (<>) {",
