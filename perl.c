@@ -655,7 +655,6 @@ perl_destruct(pTHXx)
     PL_minus_l      = FALSE;
     PL_minus_a      = FALSE;
     PL_minus_F      = FALSE;
-    PL_doswitches   = FALSE;
     PL_dowarn       = G_WARN_OFF;
     PL_doextract    = FALSE;
     PL_unsafe       = FALSE;
@@ -1445,7 +1444,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    case 'm':
 	    case 'n':
 	    case 'p':
-	    case 's':
 	    case 'u':
 	    case 'U':
 	    case 'v':
@@ -2947,11 +2945,6 @@ Perl_moreswitches(pTHX_ const char *s)
 	PL_minus_p = TRUE;
 	s++;
 	return s;
-    case 's':
-	forbid_setid('s', FALSE);
-	PL_doswitches = TRUE;
-	s++;
-	return s;
     case 't':
         if (!PL_tainting)
 	    TOO_LATE_FOR('t');
@@ -3660,7 +3653,6 @@ S_validate_suid(pTHX_ const char *validarg,
 	}
 	if (PL_statbuf.st_mode & S_IWOTH)
 	    Perl_croak(aTHX_ "Setuid/gid script is writable by world");
-	PL_doswitches = FALSE;		/* -s is insecure in suid */
 	/* PSz 13 Nov 03  But -s was caught elsewhere ... so unsetting it here is useless(?!) */
 	CopLINE_inc(PL_curcop);
 	if (sv_gets(linestr_sv, rsfp, 0) == NULL)
@@ -4251,24 +4243,6 @@ Perl_init_argv_symbols(pTHX_ register int argc, register char **argv)
     PERL_ARGS_ASSERT_INIT_ARGV_SYMBOLS;
 
     argc--,argv++;	/* skip name of script */
-    if (PL_doswitches) {
-	for (; argc > 0 && **argv == '-'; argc--,argv++) {
-	    char *s;
-	    if (!argv[0][1])
-		break;
-	    if (argv[0][1] == '-' && !argv[0][2]) {
-		argc--,argv++;
-		break;
-	    }
-	    if ((s = strchr(argv[0], '='))) {
-		const char *const start_name = argv[0] + 1;
-		sv_setpv(GvSV(gv_fetchpvn_flags(start_name, s - start_name,
-						GV_ADD | GV_NOTQUAL, SVt_PV)), s + 1);
-	    }
-	    else
-		sv_setiv(GvSV(gv_fetchpv(argv[0]+1, GV_ADD | GV_NOTQUAL, SVt_PV)),1);
-	}
-    }
     if ((PL_argvgv = gv_fetchpvs("ARGV", GV_ADD|GV_NOTQUAL, SVt_PVAV))) {
 	GvMULTI_on(PL_argvgv);
 	(void)gv_AVadd(PL_argvgv);
