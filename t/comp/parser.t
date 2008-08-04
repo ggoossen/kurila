@@ -4,10 +4,10 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 85 );
+plan( tests => 84 );
 
 eval '%@x=0;';
-like( $@->{description}, qr/^Can't modify hash dereference in repeat \(x\)/, '%@x=0' );
+like( $@->{description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
 
 # Bug 20010528.007
 eval q/"\x{"/;
@@ -182,15 +182,6 @@ eval q[
 
 like($@->{description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
 
-
-eval q[
-    my @a;
-    my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
-    @a =~ s/a/b/; # compile-time error
-    use DieDieDie;
-];
-
-like($@->{description}, qr/Can't modify/, 'croak cleanup 3' );
 
 # these might leak, or have duplicate frees, depending on the bugginess of
 # the parser stack 'fail in reduce' cleanup code. They're here mainly as

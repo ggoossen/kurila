@@ -11,7 +11,7 @@
 
 use strict;
 
-print "1..141\n";
+print "1..117\n";
 
 my $i = 1;
 
@@ -176,50 +176,6 @@ over_one_a_args((nelems @_),< @_);
 ##
 ##
 
-testing \&scalar_and_hash, '$%';
-
-sub scalar_and_hash ($%) {
-    print "# \@_ = (",join(",",< @_),")\n";
-    nelems @_;
-}
-
-print "not " unless 1 == scalar_and_hash(1);
-printf "ok \%d\n",$i++;
-
-print "not " unless 3 == scalar_and_hash(1,2,3);
-printf "ok \%d\n",$i++;
-
-print "not " unless 1 == scalar_and_hash +5;
-printf "ok \%d\n",$i++;
-
-print "not " unless 4 == &scalar_and_hash;
-printf "ok \%d\n",$i++;
-
-print "not " unless 2 == &scalar_and_hash(1,2);
-printf "ok \%d\n",$i++;
-
-print "not " unless 5 == &scalar_and_hash(1,< @_);
-printf "ok \%d\n",$i++;
-
-eval "scalar_and_hash()";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
-
-sub scalar_and_hash_a ($@) {
-    print "# \@_ = (",join(",",< @_),")\n";
-    print "not " unless (nelems @_) +>= 1 && @_[0] == 4;
-    printf "ok \%d\n",$i++;
-}
-
-scalar_and_hash_a((nelems @_));
-scalar_and_hash_a((nelems @_),1);
-scalar_and_hash_a((nelems @_),1,2);
-scalar_and_hash_a((nelems @_),< @_);
-
-##
-##
-##
-
 testing \&one_or_two, '$;$';
 
 sub one_or_two ($;$) {
@@ -270,7 +226,7 @@ one_or_two_a((nelems @_),nelems @_);
 testing \&a_sub, '&';
 
 sub a_sub (&) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
     &{@_[0]};
 }
 
@@ -288,32 +244,13 @@ printf "ok \%d\n",$i++;
 ##
 ##
 
-testing \&a_subx, '\&';
-
-sub a_subx (\&) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
-    &{@_[0]};
-}
-
-sub tmp_sub_2 { printf "ok \%d\n",$i++ }
-a_subx &tmp_sub_2;
-
-@array = @( \&tmp_sub_2 );
-eval 'a_subx @array';
-print "not " unless $@;
-printf "ok \%d\n",$i++;
-
-##
-##
-##
-
 testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
     my($sub,$array) = < @_;
     print "not " unless (nelems @_) == 2 && (nelems @{$array}) == 4;
-    print map { < &{$sub}($_) } < @{$array}
+    print map { &{$sub}($_) } < @{$array}
 }
 
 @array = @(qw(O K)," ", $i++);
@@ -327,34 +264,16 @@ print "\n";
 testing \&sub_array, '&@';
 
 sub sub_array (&@) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
     print "not " unless (nelems @_) == 5;
     my $sub = shift;
-    print map { < &{$sub}($_) } < @_
+    print map { &{$sub}($_) } < @_
 }
 
 @array = @(qw(O K)," ", $i++);
 sub_array { lc shift } < @array;
 sub_array { lc shift } ('O', 'K', ' ', $i++);
 print "\n";
-
-##
-##
-##
-
-testing \&a_hash, '%';
-
-sub a_hash (%) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
-    scalar(nelems @_);
-}
-
-print "not " unless 1 == a_hash 'a';
-printf "ok \%d\n",$i++;
-
-print "not " unless 2 == a_hash 'a','b';
-printf "ok \%d\n",$i++;
-
 ##
 ##
 ##
@@ -362,7 +281,7 @@ printf "ok \%d\n",$i++;
 testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
     print "not " unless ref(@_[0]) && @_[0]->{'a'};
     printf "ok \%d\n",$i++;
     @_[0]->{'b'} = 2;
@@ -380,7 +299,7 @@ printf "ok \%d\n",$i++;
 testing \&array_ref_plus, '\@@';
 
 sub array_ref_plus (\@@) {
-    print "# \@_ = (",join(",",map { <dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
     print "not " unless (nelems @_) == 2 && ref(@_[0]) && 1 == nelems @{@_[0]} && @_[1] eq 'x';
     printf "ok \%d\n",$i++;
     @{@_[0]} = @(qw(ok)," ",$i++,"\n");
@@ -409,24 +328,14 @@ print "ok ", $i++, "\n";
 # correctly note too-short parameter lists that don't end with '$',
 #  a possible regression.
 
-sub foo1 ($\@);
+sub foo1 ($\@) { 1 };
 eval q{ foo1 "s" };
 print "not " unless $@->message =~ m/^Not enough/;
 print "ok ", $i++, "\n";
 
-sub foo2 ($\%);
+sub foo2 ($\%) { 1 };
 eval q{ foo2 "s" };
 print "not " unless $@->message =~ m/^Not enough/;
-print "ok ", $i++, "\n";
-
-sub X::foo3;
-*X::foo3 = sub {'ok'};
-print "# $@not " unless try {X->foo3} eq 'ok';
-print "ok ", $i++, "\n";
-
-sub X::foo4 ($);
-*X::foo4 = sub ($) {'ok'};
-print "not " unless X->foo4 eq 'ok';
 print "ok ", $i++, "\n";
 
 # test if the (*) prototype allows barewords, constants, scalar expressions,
@@ -476,10 +385,6 @@ star(\*FOO, sub {
 	print "not " unless @_[0] \== \*FOO;
 	print "ok $i - star(\\*FOO)\n";
     }); $i++;
-star2 'FOO', BAR, sub {
-    print "not " unless @_[0] eq 'FOO' and @_[1] eq 'BAR';
-    print "ok $i - star2 FOO, BAR\n";
-}; $i++;
 star2(Bar::BAZ, 'FOO', sub {
 	print "not " unless @_[0] eq 'Bar::BAZ' and @_[1] eq 'FOO';
 	print "ok $i - star2(Bar::BAZ, FOO)\n"
@@ -563,7 +468,7 @@ print "ok ", $i++, "\n";
     my $myvar;
     my @myarray;
     my %myhash;
-    sub mysub { print "not calling mysub I hope\n" }
+    sub mysub { die "not calling mysub I hope\n" }
     local *myglob;
 
     sub myref (\[$@%&*]) { return dump::view(@_[0]) }
@@ -574,23 +479,12 @@ print "ok ", $i++, "\n";
     print "ok ", $i++, "\n";
     print "not " unless myref(%myhash)  =~ m/^HASH\(/;
     print "ok ", $i++, "\n";
-    print "not " unless myref(&mysub)   =~ m/^CODE\(/;
-    print "ok ", $i++, "\n";
+    print "not ok", $i++," # TODO\n";
+#    print "not " unless myref(\&mysub)   =~ m/^CODE\(/;
+#    print "ok ", $i++, "\n";
     print "not " unless myref(*myglob)  =~ m/^GLOB\(/;
     print "ok ", $i++, "\n";
 
-    eval q/sub multi1 (\[%@]) { 1 } multi1 $myvar;/;
-    print "not "
-	unless $@->message =~ m/Type of arg 1 to main::multi1 must be one of \[%\@\] /;
-    print "ok ", $i++, "\n";
-    eval q/sub multi2 (\[$*&]) { 1 } multi2 @myarray;/;
-    print "not "
-	unless $@->message =~ m/Type of arg 1 to main::multi2 must be one of \[\$\*&\] /;
-    print "ok ", $i++, "\n";
-    eval q/sub multi3 (\[$@]) { 1 } multi3 %myhash;/;
-    print "not "
-	unless $@->message =~ m/Type of arg 1 to main::multi3 must be one of \[\$\@\] /;
-    print "ok ", $i++, "\n";
     eval q/sub multi4 ($\[%]) { 1 } multi4 1, &mysub;/;
     print "not "
 	unless $@->message =~ m/Type of arg 2 to main::multi4 must be one of \[%\] /;
