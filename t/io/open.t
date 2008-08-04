@@ -12,7 +12,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 
 our ($f);
 
-plan tests => 104;
+plan tests => 98;
 
 my $Perl = which_perl();
 
@@ -32,9 +32,6 @@ my $Perl = which_perl();
     is( $b, "SomeData\n",       '       readline' );
     ok( -f $f,                  '       still a file' );
 
-    try  { die "Message" };
-    like( $@->message, qr/<\$f> line 1/, '       die message correct' );
-    
     ok( close($f),              '       close()' );
     ok( unlink("afile"),        '       unlink()' );
 }
@@ -129,8 +126,6 @@ like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
     is( $b, "SomeData\n",               '       readline' );
     ok( -f $f,                          '       still a file' );
 
-    try  { die "Message" };
-    like( $@->message, qr/<\$f> line 1/,         '       proper die message' );
     ok( close($f),                      '       close' );
 
     unlink("afile");
@@ -257,28 +252,6 @@ SKIP: {
 	warn "gimme";
 	return $line;
     }
-
-    local our $TODO = "fix variable name";
-
-    our @fh0;
-    open(@fh0[0], "<", "TEST");
-    gimme(@fh0[0]);
-    like($@->message, qr/<\@fh0\[...\]> line 1/, "autoviv fh package aelem");
-
-    our %fh1;
-    open(%fh1{k}, "<", "TEST");
-    gimme(%fh1{k});
-    like($@->message, qr/<\%fh1{...}> line 1/, "autoviv fh package helem");
-
-    my @fh2;
-    open(@fh2[0], "<", "TEST");
-    gimme(@fh2[0]);
-    like($@->message, qr/<\@fh2\[...\]> line 1/, "autoviv fh lexical aelem");
-
-    my %fh3;
-    open(%fh3{k}, "<", "TEST");
-    gimme(%fh3{k});
-    like($@->message, qr/<\%fh3{...}> line 1/, "autoviv fh lexical helem");
 }
     
 SKIP: {
