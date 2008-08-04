@@ -31,7 +31,7 @@ sub import {
 	if defined $home_stash && $home_stash ne '';
     my @badattrs;
     if ($pkgmeth) {
-	my @pkgattrs = @( < _modify_attrs($svref, < @attrs) );
+	my @pkgattrs = _modify_attrs($svref, @attrs );
 	@badattrs = @( < $pkgmeth->($home_stash, $svref, < @pkgattrs) );
 	if (!nelems @badattrs && nelems @pkgattrs) {
             require warnings;
@@ -49,7 +49,7 @@ sub import {
 	}
     }
     else {
-	@badattrs = @( < _modify_attrs($svref, < @attrs) );
+	@badattrs = _modify_attrs($svref, @attrs);
     }
     if ((nelems @badattrs)) {
 	die "Invalid $svtype attribute" .

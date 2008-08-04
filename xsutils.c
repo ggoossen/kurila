@@ -52,15 +52,16 @@ Perl_boot_core_xsutils(pTHX)
 
 #include "XSUB.h"
 
-static int
-modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
+static void
+modify_SV_attributes(pTHX_ SV *sv, AV *retlist, AV *attrlist)
 {
     dVAR;
-    SV *attr;
-    int nret;
-
-    for (nret = 0 ; numattrs && (attr = *attrlist++); numattrs--) {
+    int numattrs = av_len(attrlist);
+    int i;
+    
+    for (i = 0 ; i <= numattrs; i++) {
 	STRLEN len;
+        SV *attr = *(av_fetch(attrlist, i, FALSE));
 	const char *name = SvPV_const(attr, len);
 	const bool negated = (*name == '-');
 
@@ -124,11 +125,9 @@ modify_SV_attributes(pTHX_ SV *sv, SV **retlist, SV **attrlist, int numattrs)
 	    break;
 	}
 	/* anything recognized had a 'continue' above */
-	*retlist++ = attr;
-	nret++;
+        av_push(retlist, SvREFCNT_inc(attr));
     }
-
-    return nret;
+    return;
 }
 
 
@@ -156,23 +155,28 @@ XS(XS_attributes__modify_attrs)
 {
     dVAR;
     dXSARGS;
-    SV *rv, *sv;
+    SV *rv, *sv, *attrs, *res;
     PERL_UNUSED_ARG(cv);
 
-    if (items < 1) {
+    if (items != 2) {
 usage:
 	Perl_croak(aTHX_
 		   "Usage: attributes::_modify_attrs $reference, @attributes");
     }
 
     rv = ST(0);
+    attrs = ST(1);
     if (!(SvOK(rv) && SvROK(rv)))
 	goto usage;
+    if (!(SvAVOK(attrs)))
+	goto usage;
+        
     sv = SvRV(rv);
-    if (items > 1)
-	XSRETURN(modify_SV_attributes(aTHX_ sv, &ST(0), &ST(1), items-1));
+    res = sv_2mortal(newAV());
+    modify_SV_attributes(aTHX_ sv, res, attrs);
 
-    XSRETURN(0);
+    ST(0) = res;
+    XSRETURN(1);
 }
 
 XS(XS_attributes__fetch_attrs)
