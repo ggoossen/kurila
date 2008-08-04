@@ -31,7 +31,7 @@ sub foo6 {
     'true2' unless @_[0];
 }
 
-print "1..36\n";
+print "1..30\n";
 
 if (&foo1(0) eq '0') {print "ok 1\n";} else {print "not ok 1\n";}
 if (&foo1(1) eq 'true2') {print "ok 2\n";} else {print "not ok 2\n";}
@@ -84,6 +84,7 @@ sub ary1 {
     return @(1,2,3);
 }
 
+print "ok 23\n";
 print join(':', <&ary1) eq '1:2:3' ? "ok 24\n" : "not ok 24\n";
 
 sub ary2 {
@@ -110,77 +111,10 @@ sub somesub {
 package foo;
 &main::somesub(28, 'foo', __FILE__, __LINE__);
 
-package main;
-our $i = 28;
-open(FOO, ">","Cmd_subval.tmp");
-print FOO "blah blah\n";
-close FOO or die "Can't close Cmd_subval.tmp: $!";
-
-&file_main(*F);
-close F or die "Can't close: $!";
-&info_main;
-
-&file_package(*F);
-close F or die "Can't close: $!";
-&info_package;
-
-unlink 'Cmd_subval.tmp';
-
-sub file_main {
-        local(*F) = (nelems @_);
-
-        open(F, "<", 'Cmd_subval.tmp') || die "can't open: $!\n";
-	$i++;
-        eof F ? print "not ok $i\n" : print "ok $i\n";
-}
-
-sub info_main {
-        local(*F);
-
-        open(F, "<", 'Cmd_subval.tmp') || die "test: can't open: $!\n";
-	$i++;
-        eof F ? print "not ok $i\n" : print "ok $i\n";
-        &iseof(*F);
-	close F or die "Can't close: $!";
-}
-
-sub iseof {
-        local(*UNIQ) = (nelems @_);
-
-	$i++;
-        eof UNIQ ? print "(not ok $i)\n" : print "ok $i\n";
-}
-
-{package foo;
-
- sub main::file_package {
-        local(*F) = (nelems @_);
-
-        open(F, "<", 'Cmd_subval.tmp') || die "can't open: $!\n";
-	$main::i++;
-        eof F ? print "not ok $main::i\n" : print "ok $main::i\n";
- }
-
- sub main::info_package {
-        local(*F);
-
-        open(F, "<", 'Cmd_subval.tmp') || die "can't open: $!\n";
-	$main::i++;
-        eof F ? print "not ok $main::i\n" : print "ok $main::i\n";
-        &iseof(*F);
- }
-
- sub iseof {
-        local(*UNIQ) = (nelems @_);
-
-	$main::i++;
-        eof UNIQ ? print "not ok $main::i\n" : print "ok $main::i\n";
- }
-}
 
 sub autov { @_[0] = 23 };
 
 my $href = \%();
-print keys %$href ? 'not ' : '', "ok 35\n";
+print nkeys %$href ? 'not ' : '', "ok 29\n";
 autov($href->{b});
-print join(':', < %$href) eq 'b:23' ? '' : 'not ', "ok 36\n";
+print join(':', < %$href) eq 'b:23' ? '' : 'not ', "ok 30\n";

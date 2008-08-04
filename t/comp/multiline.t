@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan(tests => 6);
+plan(tests => 5);
 
 open(TRY, ">",'Comp.try') || (die "Can't open temp file.");
 
@@ -37,7 +37,6 @@ while ( ~< *TRY) {
 is($z, $y,  'basic multiline reading');
 
 is($count, 7,   '    line count');
-is($., 7,       '    $.' );
 
 my $out = (($^O eq 'MSWin32') || $^O eq 'NetWare' || $^O eq 'VMS') ? `type Comp.try`
     : ($^O eq 'MacOS') ? `catenate Comp.try`
