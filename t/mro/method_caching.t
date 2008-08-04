@@ -44,8 +44,6 @@ my @testsubs = @(
     sub { %MCTest::Base:: = %( () ); try { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
     sub { eval 'package MCTest::Base; sub foo { @_[1]+17 }'; is('MCTest::Derived'->foo(0), 17); },
     # 5.8.8 fails this one too
-    sub { *MCTest::Base:: = *Foo::; try { 'MCTest::Derived'->foo(0) }; like($@->{description}, qr/locate object method/); },
-    sub { *MCTest::Derived::foo = \&MCTest::Base::foo; try { MCTest::Derived::foo(0,0) }; ok(!$@); undef *MCTest::Derived::foo },
     sub { eval 'package MCTest::Base; sub foo { @_[1]+18 }'; is('MCTest::Derived'->foo(0), 18); },
 );
 
