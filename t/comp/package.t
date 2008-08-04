@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..14\n";
+print "1..8\n";
 
 {
   our $blurfl = 123;
@@ -54,22 +54,3 @@ sub foo {
 }
 
 print((foo(1))[[0]] eq 'PQR' ? "ok 8\n" : "not ok 8\n");
-
-my $Q = xyz->new();
-undef %xyz::;
-try { $a = *xyz::new{PACKAGE}; };
-print $a eq "__ANON__" ? "ok 9\n" : "not ok 9 # '$a'\n";
-
-try { $Q->param; };
-print $@->{description} =~ m/^Can't use anonymous symbol table for method lookup/ ?
-  "ok 10\n" : "not ok 10 # '$@'\n";
-
-try { "$Q" };
-print $@->message =~ qr/reference as string/ ? "ok 11\n" : "not ok 11 # '$Q'\n";
-
-print ref $Q eq "__ANON__" ? "ok 12\n" : "not ok 12 # '$Q'\n";
-
-package bug32562;
-
-print       __PACKAGE__  eq 'bug32562' ? "ok 13\n" : "not ok 13\n";
-print eval '__PACKAGE__' eq 'bug32562' ? "ok 14\n" : "not ok 14\n";

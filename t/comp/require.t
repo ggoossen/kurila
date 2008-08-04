@@ -125,7 +125,7 @@ if($@->message =~ m/Can't locate threads in \@INC/) {
 }
 
 write_file('bleah.pm', qq(die "This is an expected error";\n));
-delete %INC{"bleah.pm"}; ++$::i;
+delete %INC{"bleah.pm"}; ++$main::i;
 try { CORE::require bleah; };
 if ($@->message =~ m/^This is an expected error/) {
     print "ok $i\n";
