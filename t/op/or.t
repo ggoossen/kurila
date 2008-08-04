@@ -3,24 +3,10 @@
 # Test || in weird situations.
 
 
-package Countdown;
-
-sub TIESCALAR {
-  my $class = shift;
-  my $instance = shift || undef;
-  return bless \$instance => $class;
-}
-
-sub FETCH {
-  print "# FETCH!  ${@_[0]}\n";
-  return ${@_[0]}--;
-}
-
-
 package main;
 BEGIN { require './test.pl' };
 
-plan( tests => 8 );
+plan( tests => 5 );
 
 
 my ($a, $b, $c);
@@ -47,17 +33,3 @@ my $val = 3;
 $c = $val || $b;
 is($c, 3);
 
-tie $a, 'Countdown', $val;
-
-$c = $a;
-is($c, 3,       'Single FETCH on tied scalar');
-
-$c = $a;
-is($c, 2,       '   $tied = $var');
-
-$c = $a || $b;
-
-{
-    local our $TODO = 'Double FETCH';
-    is($c, 1,   '   $tied || $var');
-}

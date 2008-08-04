@@ -216,7 +216,7 @@ SKIP: {
         my ($cr, $filename) = < @_;
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
-             \"package $module; sub complain \{ warn q(barf) \}; \$::file = __FILE__;"
+             \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"
 	    or die $!;
         %INC{$filename} = "/custom/path/to/$filename";
         return $fh;
@@ -267,7 +267,7 @@ if ($can_fork) {
 
     @::bbblplast = @( () );
     require BBBLPLAST5;
-    is ("{join ' ', <@::bbblplast}", "0 1 2 3 4 5", "All ran");
+    is ("{join ' ', <@main::bbblplast}", "0 1 2 3 4 5", "All ran");
 
     foreach (keys %INC) {
 	delete %INC{$_} if m/^BBBLPLAST/;

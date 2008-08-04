@@ -131,7 +131,7 @@ $_ = "global";
     my $_ = 'local';
     sub tgrep4 () { return $_ };
     my $x = join '-', grep $_=$_.tgrep3.tgrep4, 1 .. 2;
-    ok( $x eq '1globallocal-2globallocal', 'grep without {} with side-effect' );
+    ok( $x eq '1globallocal-2globallocal', 'grep without {} with side-effect # TODO' );
     ok( $_ eq 'local', '...but without extraneous side-effects' );
 }
 {

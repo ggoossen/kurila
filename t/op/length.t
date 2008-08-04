@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan (tests => 28);
+plan (tests => 22);
 
 ok(length("")    == 0);
 
@@ -62,22 +62,6 @@ ok(length()      == 6);
     ok( $a eq "\x[c280c480]" && length($a) == 4 );
 }
 
-# Now for Unicode with magical vtbls
-
-{
-    require Tie::Scalar;
-    my $a;
-    tie $a, 'Tie::StdScalar';  # makes $a magical
-    
-    use utf8;
-    $a = "\x{263A}";
-
-    ok(length($a) == 1);
-
-    use bytes;
-    ok(length($a) == 3);
-}
-
 {
     # Play around with Unicode strings,
     # give a little workout to the UTF-8 length cache.
@@ -94,24 +78,13 @@ ok(length()      == 6);
     ok(length $a == 998);
 }
 
-curr_test(21);
-
-require Tie::Scalar;
-
-my $u = "ASCII";
-
-tie $u, 'Tie::StdScalar', chr 256;
-
-is(length $u, 1, "Length of a UTF-8 scalar returned from tie");
-is(length $u, 1, "Again! Again!");
-
 $^W = 1;
 
 my $warnings = 0;
 
 $^WARN_HOOK = sub {
     $warnings++;
-    warn < @_;
+    print STDERR shift->message;
 };
 
 is(length(undef), undef, "Length of literal undef");
@@ -121,12 +94,6 @@ my $u;
 is(length($u), undef, "Length of regular scalar");
 
 $u = "Gotcha!";
-
-tie $u, 'Tie::StdScalar';
-
-is(length($u), undef, "Length of tied scalar (MAGIC)");
-
-is($u, undef);
 
 {
     package U;

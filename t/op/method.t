@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 57;
+plan tests => 55;
 
 @A::ISA = @( 'B' );
 @B::ISA = @( 'C' );
@@ -97,12 +97,6 @@ is(A->d, "C::d");
 }
 is(A->d, "C::d");
 
-{
-    # this test added due to bug discovery
-    no strict 'refs';
-    is(defined(@{*{Symbol::fetch_glob("unknown_package::ISA")}}) ? "defined" : "undefined", "undefined");
-}
-
 # test that failed subroutine calls don't affect method calls
 {
     package A1;
@@ -149,27 +143,27 @@ is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
 # TODO: we need some tests for the SUPER:: pseudoclass
 
 # failed method call or UNIVERSAL::can() should not autovivify packages
-is( %::{"Foo::"} || "none", "none");  # sanity check 1
-is( %::{"Foo::"} || "none", "none");  # sanity check 2
+is( %main::{"Foo::"} || "none", "none");  # sanity check 1
+is( %main::{"Foo::"} || "none", "none");  # sanity check 2
 
-is( UNIVERSAL::can("Foo", "boogie") ? "yes":"no", "no" );
-is( %::{"Foo::"} || "none", "none");  # still missing?
+is( UNIVERSAL::can("main::Foo", "boogie") ? "yes":"no", "no" );
+is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is( Foo->UNIVERSAL::can("boogie")   ? "yes":"no", "no" );
-is( %::{"Foo::"} || "none", "none");  # still missing?
+is( main::Foo->UNIVERSAL::can("boogie")   ? "yes":"no", "no" );
+is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is( Foo->can("boogie")              ? "yes":"no", "no" );
-is( %::{"Foo::"} || "none", "none");  # still missing?
+is( main::Foo->can("boogie")              ? "yes":"no", "no" );
+is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is( eval 'Foo->boogie(); 1'         ? "yes":"no", "no" );
-is( %::{"Foo::"} || "none", "none");  # still missing?
+is( eval 'main::Foo->boogie(); 1'         ? "yes":"no", "no" );
+is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is(do { eval 'Foo->boogie()';
-	  $@->message =~ m/^\QCan't locate object method "boogie" via package "Foo" (perhaps / ? 1 : $@}, 1);
+is(do { eval 'main::Foo->boogie()';
+	  $@->message =~ m/^\QCan't locate object method "boogie" via package "main::Foo" (perhaps / ? 1 : $@}, 1);
 
-eval 'sub Foo::boogie { "yes, sir!" }';
-is( %::{"Foo::"} ? "ok" : "none", "ok");  # should exist now
-is( Foo->boogie(), "yes, sir!");
+eval 'sub main::Foo::boogie { "yes, sir!" }';
+is( %main::{"Foo::"} ? "ok" : "none", "ok");  # should exist now
+is( main::Foo->boogie(), "yes, sir!");
 
 # TODO: universal.t should test NoSuchPackage->isa()/can()
 
