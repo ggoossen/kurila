@@ -1170,16 +1170,6 @@ lib/integer.pm			For "use integer"
 lib/integer.t			For "use integer" testing
 lib/Internals.t			For Internals::* testing
 lib/iohandle.t                  iohandle::* testing
-lib/IO/Zlib.pm			IO::Zlib
-lib/IO/Zlib/t/basic.t		Tests for IO::Zlib
-lib/IO/Zlib/t/external.t	Tests for IO::Zlib
-lib/IO/Zlib/t/getc.t		Tests for IO::Zlib
-lib/IO/Zlib/t/getline.t		Tests for IO::Zlib
-lib/IO/Zlib/t/import.t		Tests for IO::Zlib
-lib/IO/Zlib/t/large.t		Tests for IO::Zlib
-lib/IO/Zlib/t/tied.t		Tests for IO::Zlib
-lib/IO/Zlib/t/uncomp1.t		Tests for IO::Zlib
-lib/IO/Zlib/t/uncomp2.t		Tests for IO::Zlib
 lib/IPC/Cmd.pm			IPC::Cmd
 lib/IPC/Cmd/t/01_IPC-Cmd.t	IPC::Cmd tests
 lib/IPC/Cmd/t/02_Interactive.t	IPC::Cmd tests
