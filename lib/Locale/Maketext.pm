@@ -39,7 +39,7 @@ sub quant {
 
   # Normal case:
   # Note that the formatting of $num is preserved.
-  return @( $handle->numf($num) . ' ' . $handle->numerate($num, < @forms) );
+  return $handle->numf($num) . ' ' . $handle->numerate($num, < @forms);
    # Most human languages put the number phrase before the qualified phrase.
 }
 
@@ -275,7 +275,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   foreach my $module_name ( map { $base_class . "::" . $_ }  < @languages ) {
     next unless length $module_name; # sanity
     next if %seen{$module_name}++        # Already been here, and it was no-go
-            || !&_try_use($module_name); # Try to use() it, but can't it.
+            || ! _try_use($module_name); # Try to use() it, but can't it.
     return $module_name->new; # Make it!
   }
 
@@ -386,8 +386,8 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
 
   my $module = @_[0];   # ASSUME sane module name!
   { no strict 'refs';
-    return @(%tried{$module} = 1)
-     if defined(%{*{Symbol::fetch_glob($module . "::Lexicon")}}) or defined(@{*{Symbol::fetch_glob($module . "::ISA")}});
+    return (%tried{$module} = 1)
+     if %{*{Symbol::fetch_glob($module . "::Lexicon")}} or @{*{Symbol::fetch_glob($module . "::ISA")}};
     # weird case: we never use'd it, but there it is!
   }
 

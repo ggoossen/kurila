@@ -1223,7 +1223,6 @@ lib/Locale/Maketext/README	Locale::Maketext
 lib/Locale/Maketext/Simple.pm	Locale::Simple
 lib/Locale/Maketext/Simple/t/0-signature.t	Locale::Simple tests
 lib/Locale/Maketext/Simple/t/1-basic.t	Locale::Simple tests
-lib/Locale/Maketext/t/01_about_verbose.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/10_make.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/20_get.t	See if Locale::Maketext works
 lib/Locale/Maketext/t/30_local.t	See if Locale::Maketext works
