@@ -53,7 +53,10 @@ is(@foo[1], 'bar');
 
 ### Read-only array element
 
-ok( !Internals::SvREADONLY @foo[2] );
+{
+    local our $TODO = 1;
+    ok( !Internals::SvREADONLY @foo[2] );
+}
 @foo[2] = 'baz';
 is(@foo[2], 'baz');
 
@@ -69,7 +72,10 @@ try { @foo[1] = 'bork'; };
 like($@->message, $ro_err, 'Read-only array element moved');
 is(@foo[1], 'baz');
 
-ok( !Internals::SvREADONLY @foo[2] );
+{
+    local our $TODO = 1;
+    ok( !Internals::SvREADONLY @foo[2] );
+}
 @foo[2] = 'qux';
 is(@foo[2], 'qux');
 
@@ -97,7 +103,7 @@ my %foo;
 
 ok( !Internals::SvREADONLY %foo );
 %foo = %('foo' => 1, 2 => 'bar');
-is(scalar(keys(%foo)), 2);
+is((nkeys(%foo)), 2);
 is(%foo{'foo'}, 1);
 
 ok(  Internals::SvREADONLY %foo, 1 );
