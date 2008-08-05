@@ -170,7 +170,7 @@ sub _batch_convert_main {
   my $mod2path = $self->find_all_pods($dirs ? $dirs : ());
   $self->muse("Done scanning.");
 
-  my $total = keys %$mod2path;
+  my $total = nkeys %$mod2path;
   unless($total) {
     $self->muse("No pod found.  Aborting batch conversion.\n");
     return $self;
@@ -221,7 +221,7 @@ sub _do_one_batch_conversion {
   my($self, $module, $mod2path, $outdir, $outfile) = < @_;
 
   my $retval;
-  my $total    = scalar keys %$mod2path;
+  my $total    = nkeys %$mod2path;
   my $infile   = $mod2path->{$module};
   my @namelets = @( grep m/\S/, split "::", $module );
         # this can stick around in the contents LoL
@@ -541,17 +541,17 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
     die "What, no name2path?!" unless $m2p;
   }
 
-  $self->muse("That's odd... no modules found!") unless keys %$m2p;
+  $self->muse("That's odd... no modules found!") unless %$m2p;
   if( DEBUG +> 4 ) {
     print "Modules found (name => path):\n";
     foreach my $m (sort {lc($a) cmp lc($b)} keys %$m2p) {
       print "  $m  %$m2p{$m}\n";
     }
-    print "(total ",     scalar(keys %$m2p), ")\n\n";
+    print "(total ",     nkeys %$m2p, ")\n\n";
   } elsif( DEBUG ) {
-    print      "Found ", scalar(keys %$m2p), " modules.\n";
+    print      "Found ", nkeys %$m2p, " modules.\n";
   }
-  $self->muse( "Found ", scalar(keys %$m2p), " modules." );
+  $self->muse( "Found ", nkeys %$m2p, " modules." );
   
   # return the Foo::Bar => /whatever/Foo/Bar.pod|pm hashref
   return $m2p;
