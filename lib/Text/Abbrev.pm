@@ -45,13 +45,8 @@ sub abbrev {
     my ($word, $hashref, $glob, %table, $returnvoid);
 
     (nelems @_) or return;   # So we don't autovivify onto @_ and trigger warning
-    if (ref(@_[0])) {           # hash reference preferably
-      $hashref = shift;
-      $returnvoid = 1;
-    } elsif (ref \@_[0] eq 'GLOB') {  # is actually a glob (deprecated)
-      $hashref = \%{shift()};
-      $returnvoid = 1;
-    }
+    $hashref = shift;
+    $returnvoid = 1;
     %{$hashref} = %( () );
 
     WORD: foreach $word (< @_) {
