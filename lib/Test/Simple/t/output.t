@@ -30,7 +30,6 @@ sub ok ($;$) {
     return $test;
 }
 
-use TieOut;
 use Test::Builder;
 my $Test = Test::Builder->new();
 
@@ -68,8 +67,9 @@ ok(@lines[1] =~ m/Hello!/);
 
 
 # Ensure stray newline in name escaping works.
-$out = tie *FAKEOUT, 'TieOut';
-$Test->output(\*FAKEOUT);
+my $output = "";
+open my $out_fh, '>>', \$output or die;
+$Test->output($out_fh);
 $Test->exported_to(__PACKAGE__);
 $Test->no_ending(1);
 $Test->plan(tests => 5);
@@ -80,7 +80,6 @@ $Test->ok(1, "ok, like\nok");
 $Test->skip("wibble\nmoof");
 $Test->todo_skip("todo\nskip\n");
 
-my $output = $out->read;
 ok( $output eq <<OUTPUT ) || print STDERR $output;
 1..5
 ok 1 - ok
