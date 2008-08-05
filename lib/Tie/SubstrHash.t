@@ -23,7 +23,7 @@ tie %a, 'Tie::SubstrHash', 3, 3, 3;
 print "not " unless %a{abc} == 123;
 print "ok 1\n";
 
-print "not " unless keys %a == 2;
+print "not " unless nkeys %a == 2;
 print "ok 2\n";
 
 delete %a{abc};
@@ -57,7 +57,7 @@ print "ok 9\n";
 
 %a = %( () );
 
-print "not " unless keys %a == 0;
+print "not " unless nkeys %a == 0;
 print "ok 10\n";
 
 # Tests 11..16 by Linc Madison.
