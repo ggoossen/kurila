@@ -18,11 +18,11 @@ BEGIN {
 
 use Test::Builder;
 use Test::More;
-use TieOut;
 
-my $output = tie *FAKEOUT, 'TieOut';
+my $output = "";
+open my $fakeout, '>>', \$output or die;
 my $TB = Test::More->builder;
-$TB->output(\*FAKEOUT);
+$TB->output($fakeout);
 
 my $Test = Test::Builder->create;
 $Test->level(0);
@@ -35,11 +35,12 @@ plan tests => 4;
 BAIL_OUT("ROCKS FALL! EVERYONE DIES!");
 
 
-$Test->is_eq( $output->read, <<'OUT' );
+$Test->is_eq( $output, <<'OUT' );
 1..4
 Bail out!  ROCKS FALL! EVERYONE DIES!
 OUT
 
+$output = "";
 $Test->is_eq( $Exit_Code, 255 );
 
 $Test->ok( $Test->can("BAILOUT"), "Backwards compat" );

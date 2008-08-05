@@ -32,10 +32,10 @@ push @Expected_Details, \%( 'ok'      => 1,
 my $out_fh  = $Test->output;
 my $todo_fh = $Test->todo_output;
 my $start_test = $Test->current_test + 1;
-require TieOut;
-tie *FH, 'TieOut';
-$Test->output(\*FH);
-$Test->todo_output(\*FH);
+my $new_out = "";
+open my $new_fh, '>>', \$new_out or die;
+$Test->output($new_fh);
+$Test->todo_output($new_fh);
 
 SKIP: {
     $Test->skip( 'just testing skip' );

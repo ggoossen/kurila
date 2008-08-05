@@ -32,7 +32,8 @@ sub try_cmp_ok {
     my $ok = cmp_ok($left, $cmp, $right);
     $TB->is_num(!!$ok, !!%expect{ok});
     
-    my $diag = $err->read;
+    my $diag = $$err;
+    $$err = "";
     if( !$ok and %expect{error} ) {
         $diag =~ s/^# //mg;
         $TB->like( $diag, "/\Q%expect{error}\E/" );
