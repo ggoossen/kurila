@@ -29,22 +29,22 @@ use Test::More tests => 5;
 my $Test = Test::More->builder;
 
 # now make a filehandle where we can send data
-use TieOut;
-my $output = tie *FAKEOUT, 'TieOut';
+my $output = "";
+open my $fakeout, '>>', \$output or die;
 
 # force diagnostic output to a filehandle, glad I added this to
 # Test::Builder :)
 my $ret;
 {
     local $TODO = 1;
-    $Test->todo_output(\*FAKEOUT);
+    $Test->todo_output($fakeout);
 
     diag("a single line");
 
     $ret = diag("multiple\n", "lines");
 }
 
-is( $output->read, <<'DIAG',   'diag() with todo_output set' );
+is( $output, <<'DIAG',   'diag() with todo_output set' );
 # a single line
 # multiple
 # lines
@@ -53,20 +53,22 @@ DIAG
 ok( !$ret, 'diag returns false' );
 
 {
-    $Test->failure_output(\*FAKEOUT);
+    $output = "";
+    $Test->failure_output($fakeout);
     $ret = diag("# foo");
 }
 $Test->failure_output(\*STDERR);
-is( $output->read, "# # foo\n", "diag() adds # even if there's one already" );
+is( $output, "# # foo\n", "diag() adds # even if there's one already" );
 ok( !$ret,  'diag returns false' );
 
 
 # [rt.cpan.org 8392]
 {
-    $Test->failure_output(\*FAKEOUT);
+    $output = "";
+    $Test->failure_output($fakeout);
     diag(qw(one two));
 }
 $Test->failure_output(\*STDERR);
-is( $output->read, <<'DIAG' );
+is( $output, <<'DIAG' );
 # onetwo
 DIAG

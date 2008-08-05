@@ -24,7 +24,7 @@ package My::Test;
 # Test::Builder's own and the ending diagnostics don't come out right.
 require Test::Builder;
 my $TB = Test::Builder->create;
-$TB->plan(tests => 17);
+$TB->plan(tests => 16);
 
 sub like ($$;$) {
     $TB->like(< @_);
@@ -36,7 +36,8 @@ sub is ($$;$) {
 
 sub main::err_ok ($) {
     my($expect) = < @_;
-    my $got = $err->read;
+    my $got = $$err;
+    $$err = "";
 
     return $TB->is_eq( $got, $expect );
 }
@@ -45,7 +46,7 @@ sub main::err_ok ($) {
 package main;
 
 require Test::More;
-my $Total = 29;
+my $Total = 27;
 Test::More->import(tests => $Total);
 
 my $tb = Test::More->builder;
@@ -228,24 +229,6 @@ ERR
 }
 
 
-# generate a $!, it changes its value by context.
--e "wibblehibble";
-my $Errno_Number = $!+0;
-my $Errno_String = $!.'';
-#line 80
-cmp_ok( $!,    'eq', '',    '       eq with stringified errno' );
-cmp_ok( $!,    '==', -1,    '       eq with numerified errno' );
-err_ok( <<ERR );
-#   Failed test '       eq with stringified errno'
-#   at $0 line 80.
-#          got: '$Errno_String'
-#     expected: ''
-#   Failed test '       eq with numerified errno'
-#   at $0 line 81.
-#          got: $Errno_Number
-#     expected: -1
-ERR
-
 #line 84
 use_ok('Hooble::mooble::yooble');
 
@@ -256,7 +239,8 @@ my $more_err_re = <<ERR;
 #     Error:  Can't locate Hooble.* in \\\@INC .*
 ERR
 
-My::Test::like($err->read, "/^$more_err_re/");
+My::Test::like($$err, "/^$more_err_re/");
+$$err = "";
 
 
 #line 85
@@ -268,7 +252,8 @@ $more_err_re = <<ERR;
 #     Error:  Can't locate ALL.* in \\\@INC .*
 ERR
 
-My::Test::like($err->read, "/^$more_err_re/");
+My::Test::like($$err, "/^$more_err_re/");
+$$err = "";
 
 
 #line 88
@@ -300,8 +285,6 @@ not ok -        !=
 not ok -        &&
 not ok -        eq with numbers
 not ok -        == with strings
-not ok -        eq with stringified errno
-not ok -        eq with numerified errno
 not ok - use Hooble::mooble::yooble;
 not ok - require ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble;
 OUT

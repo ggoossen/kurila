@@ -49,7 +49,7 @@ my %Tests = %(
              'exit.plx'                 => \@(1,      4),
             );
 
-$TB->plan( tests => scalar keys(%Tests) );
+$TB->plan( tests => nkeys(%Tests) );
 
 try { require POSIX; &POSIX::WEXITSTATUS(0) };
 if( $@ ) {

@@ -1569,7 +1569,6 @@ lib/Test/Simple/t/fail_one.t	Test::Simple test
 lib/Test/Simple/t/fail.t	Test::Simple test, test failures
 lib/Test/Simple/t/filehandles.t	Test::Simple test, STDOUT can be played with
 lib/Test/Simple/t/fork.t	Test::More fork tests
-lib/Test/Simple/t/harness_active.t	Test::Simple test
 lib/Test/Simple/t/has_plan2.t	Test::More->plan tests
 lib/Test/Simple/t/has_plan.t	Test::Builder->plan tests
 lib/Test/Simple/t/import.t	Test::More test, importing functions
