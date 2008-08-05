@@ -42,7 +42,10 @@ ok( 1, $obj );
 my $undef = Overloaded->new(undef);
 pass( $undef );
 
-is( $warnings, '' );
+{
+    local $TODO = "1";
+    is( $warnings, '' );
+}
 
 
 TODO: {

@@ -12,7 +12,6 @@ BEGIN {
 
 use strict;
 use Test::More tests => 18;
-use TieOut;
 
 BEGIN { $^W = 1; }
 
