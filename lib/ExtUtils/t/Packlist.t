@@ -68,7 +68,7 @@ ok( !(exists $pl->{data}->{bar}), 'DELETE() should delete cleanly' );
 
 
 ExtUtils::Packlist::CLEAR($pl);
-is( keys %{ $pl->{data} }, 0, 'CLEAR() should wipe out data' );
+is( nkeys %{ $pl->{data} }, 0, 'CLEAR() should wipe out data' );
 
 
 # DESTROY does nothing...
