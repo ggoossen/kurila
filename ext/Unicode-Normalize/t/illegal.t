@@ -52,7 +52,7 @@ our $unproc;  # the last starter and after
 
 sub _pack_U   { Unicode::Normalize::pack_U(< @_) }
 
-($proc, $unproc) = < splitOnLastStarter( <_pack_U(0x41, 0x300, 0x327, 0xFFFF));
+($proc, $unproc) = < splitOnLastStarter(_pack_U(0x41, 0x300, 0x327, 0xFFFF));
 ok($proc   eq _pack_U(0x41, 0x300, 0x327));
 ok($unproc eq "\x{FFFF}");
 

@@ -51,7 +51,7 @@ sub pack_U {
 }
 
 sub unpack_U {
-    return unpack('U*', shift(@_).pack('U*'));
+    return @( unpack('U*', shift(@_).pack('U*')) );
 }
 
 

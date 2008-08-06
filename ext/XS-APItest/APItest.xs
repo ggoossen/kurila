@@ -797,13 +797,15 @@ void
 rmagical_flags(sv)
     SV *sv;
     PPCODE:
+        AV* res;
 	if (!SvOK(sv) || !SvROK(sv)) { XSRETURN_UNDEF; }
+        res = newAV();
+        mXPUSHs((SV*)res);
 	sv = SvRV(sv);
-        EXTEND(SP, 3); 
-	mXPUSHu(SvFLAGS(sv) & SVs_GMG);
-	mXPUSHu(SvFLAGS(sv) & SVs_SMG);
-	mXPUSHu(SvFLAGS(sv) & SVs_RMG);
-        XSRETURN(3);
+	av_push(res, newSVuv(SvFLAGS(sv) & SVs_GMG));
+	av_push(res, newSVuv(SvFLAGS(sv) & SVs_SMG));
+	av_push(res, newSVuv(SvFLAGS(sv) & SVs_RMG));
+        XSRETURN(1);
 
 void
 BEGIN()
