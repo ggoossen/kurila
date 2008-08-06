@@ -498,7 +498,7 @@ usage: clearcache($count);
 USAGE
 
 sub clearcache    { 
-    die < usage unless (nelems @_) == 1;
+    die usage unless (nelems @_) == 1;
     delete %Cache{"@_[0]c"}; delete %Cache{"@_[0]s"}; 
 }
 
@@ -507,7 +507,7 @@ usage: clearallcache();
 USAGE
 
 sub clearallcache { 
-    die < usage if (nelems @_);
+    die usage if (nelems @_);
     %Cache = %( () ); 
 }
 
@@ -516,7 +516,7 @@ usage: enablecache();
 USAGE
 
 sub enablecache   {
-    die < usage if (nelems @_);
+    die usage if (nelems @_);
     $Do_Cache = 1; 
 }
 
@@ -525,7 +525,7 @@ usage: disablecache();
 USAGE
 
 sub disablecache  {
-    die < usage if (nelems @_);
+    die usage if (nelems @_);
     $Do_Cache = 0; 
 }
 
@@ -550,7 +550,7 @@ USAGE
 sub timediff {
     my($a, $b) = < @_;
 
-    die < usage unless ref $a and ref $b;
+    die usage unless ref $a and ref $b;
 
     my @r;
     for (my $i=0; $i +< nelems @$a; ++$i) {
@@ -568,7 +568,7 @@ USAGE
 sub timesum {
     my($a, $b) = < @_;
 
-    die < usage unless ref $a and ref $b;
+    die usage unless ref $a and ref $b;
 
     my @r;
     for (my $i=0; $i +< nelems @$a; ++$i) {
@@ -585,7 +585,7 @@ USAGE
 sub timestr {
     my($tr, $style, $f) = < @_;
 
-    die < usage unless ref $tr;
+    die usage unless ref $tr;
 
     my @t = @( < @$tr );
     warn "bad time value ({join ' ', <@t})" unless (nelems @t)==6;
@@ -615,7 +615,7 @@ sub timestr {
 
 sub timedebug {
     my($msg, $t) = < @_;
-    print STDERR "$msg", <timestr($t),"\n" if $Debug;
+    print STDERR "$msg",timestr($t),"\n" if $Debug;
 }
 
 # --- Functions implementing low-level support for timing loops
@@ -629,7 +629,7 @@ sub runloop {
 
     $n+=0; # force numeric now, so garbage won't creep into the eval
     die "negative loopcount $n" if $n+<0;
-    die < usage unless defined $c;
+    die usage unless defined $c;
     my($t0, $t1, $td); # before, after, difference
 
     # find package of caller so we can execute code there
@@ -675,7 +675,7 @@ sub timeit {
     my($n, $code) = < @_;
     my($wn, $wc, $wd);
 
-    die < usage unless defined $code and
+    die usage unless defined $code and
                      (!ref $code or ref $code eq 'CODE');
 
     printf STDERR "timeit $n $code\n" if $Debug;
@@ -713,7 +713,7 @@ USAGE
 sub countit {
     my ( $tmax, $code ) = < @_;
 
-    die < usage unless (nelems @_);
+    die usage unless (nelems @_);
 
     if ( not defined $tmax or $tmax == 0 ) {
 	$tmax = $default_for;
@@ -812,7 +812,7 @@ sub timethis{
     my($n, $code, $title, $style) = < @_;
     my($t, $forn);
 
-    die < usage unless defined $code and
+    die usage unless defined $code and
                      (!ref $code or ref $code eq 'CODE');
 
     if ( $n +> 0 ) {
@@ -828,7 +828,7 @@ sub timethis{
     local $| = 1;
     $style = "" unless defined $style;
     printf("\%10s: ", $title) unless $style eq 'none';
-    print < timestr($t, $style, $Default_Format),"\n" unless $style eq 'none';
+    print timestr($t, $style, $Default_Format),"\n" unless $style eq 'none';
 
     $n = $forn if defined $forn;
 
@@ -850,7 +850,7 @@ USAGE
 
 sub timethese{
     my($n, $alt, $style) = < @_;
-    die < usage unless ref $alt eq 'HASH';
+    die usage unless ref $alt eq 'HASH';
 
     my @names = @( sort keys %$alt );
     $style = "" unless defined $style;
@@ -897,7 +897,7 @@ sub cmpthese{
         my($count, $code) = @_[[0,1]];
         $style = @_[2] if defined @_[2];
 
-        die < usage unless ref $code eq 'HASH';
+        die usage unless ref $code eq 'HASH';
 
         $results = timethese($count, $code, ($style || "none"));
     }
