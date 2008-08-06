@@ -70,7 +70,7 @@ foreach my $in (< @in) {
     sub {
       print "# Testing with arg...\n";
       %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'PLORK';
-      return @_[0];
+      return @(@_[0]);
     },
     sub {
       print "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
