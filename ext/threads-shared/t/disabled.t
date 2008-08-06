@@ -35,7 +35,7 @@ foreach my $func (qw(cond_wait cond_signal cond_broadcast)) {
 # share() is supposed to return back it's argument as a ref.
 {
     my @array = @( qw(1 2 3 4) );
-    is_deeply( < share(@array), \@array );
+    is_deeply( share(@array), \@array );
     is( ref &share(\%()), 'HASH' );
     is( "{join ' ', <@array}", "1 2 3 4" );
 }

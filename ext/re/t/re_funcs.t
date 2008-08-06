@@ -15,7 +15,7 @@ use Test::More; # test count at bottom of file
 use re qw(regmust);
 {
     my $qr=qr/here .* there/x;
-    my ($anchored,$floating)= <regmust($qr);
+    my ($anchored,$floating)= < regmust($qr);
     is($anchored,'here',"Regmust anchored - qr//");
     is($floating,'there',"Regmust floating - qr//");
     my $foo='blah';
