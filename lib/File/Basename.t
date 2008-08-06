@@ -103,7 +103,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 {
     fileparse_set_fstype 'DOS';
     # perl5.003_18 gives C:/perl/.\
-    is((< fileparse 'C:/perl/lib')[1], 'C:/perl/');
+    is((fileparse 'C:/perl/lib')[1], 'C:/perl/');
     # perl5.003_18 gives C:\perl\
     is(dirname('C:\perl\lib\'), 'C:\perl');
 

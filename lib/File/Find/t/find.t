@@ -13,7 +13,7 @@ BEGIN {
     $^WARN_HOOK = sub { $warn_msg = @_[0]; warn "# @_[0]"; }
 }
 
-if ( $symlink_exists ) { print "1..199\n"; }
+if ( $symlink_exists ) { print "1..193\n"; }
 else                   { print "1..85\n";  }
 
 # Uncomment this to see where File::Find is chdir'ing to.  Helpful for
@@ -184,8 +184,8 @@ sub my_preprocess {
         delete %Expect_Dir{ $File::Find::dir }->{$file};
     }
     print "# --end preprocess--\n";
-    Check(scalar(keys %{%Expect_Dir{ $File::Find::dir }}) == 0);
-    if (scalar(keys %{%Expect_Dir{ $File::Find::dir }}) == 0) {
+    Check((nkeys %{%Expect_Dir{ $File::Find::dir }}) == 0);
+    if ((nkeys %{%Expect_Dir{ $File::Find::dir }}) == 0) {
         delete %Expect_Dir{ $File::Find::dir }
     }
     return @files;
@@ -338,7 +338,7 @@ delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
 
 delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
 File::Find::find( \%(wanted => \&wanted_File_Dir_prune), topdir('fa') ); 
-Check( scalar(keys %Expect_File) == 0 );
+Check( (nkeys %Expect_File) == 0 );
 
 
 print "# check re-entrancy\n";
@@ -362,7 +362,7 @@ File::Find::find( \%(wanted => sub { wanted_File_Dir_prune();
                                     {} ), File::Spec->curdir ); } ),
                                     topdir('fa') );
 
-Check( scalar(keys %Expect_File) == 0 ); 
+Check( (nkeys %Expect_File) == 0 ); 
 
 
 # no_chdir is in effect, hence we use file_path_name to specify the expected paths for %Expect_File
@@ -391,7 +391,7 @@ delete %Expect_Dir{[dir_path('fb'), dir_path('fb', 'fba') ]}
     unless $symlink_exists;
 
 File::Find::find( \%(wanted => \&wanted_File_Dir, no_chdir => 1),
-		  topdir('fa') ); Check( scalar(keys %Expect_File) == 0 );
+		  topdir('fa') ); Check( (nkeys %Expect_File) == 0 );
 
 
 %Expect_File = %( () );
@@ -414,7 +414,7 @@ File::Find::find( \%(wanted => \&wanted_File_Dir, no_chdir => 1),
 delete %Expect_Name{ file_path('.', 'fa', 'fsl') } unless $symlink_exists;
 %Expect_Dir = %( () ); 
 File::Find::finddepth( \%(wanted => \&wanted_Name), File::Spec->curdir );
-Check( scalar(keys %Expect_Name) == 0 );
+Check( (nkeys %Expect_Name) == 0 );
 
 
 # no_chdir is in effect, hence we use file_path_name to specify the
@@ -442,7 +442,7 @@ delete %Expect_File{ file_path_name('.', 'fa', 'fsl') } unless $symlink_exists;
 File::Find::finddepth( \%(wanted => \&wanted_File, no_chdir => 1),
 		     File::Spec->curdir );
 
-Check( scalar(keys %Expect_File) == 0 );
+Check( (nkeys %Expect_File) == 0 );
 
 
 print "# check preprocess\n";
@@ -461,7 +461,7 @@ print "# check preprocess\n";
 File::Find::find( \%(wanted => \&noop_wanted,
 		   preprocess => \&my_preprocess), File::Spec->curdir );
 
-Check( scalar(keys %Expect_Dir) == 0 );
+Check( (nkeys %Expect_Dir) == 0 );
 
 
 print "# check postprocess\n";
@@ -480,7 +480,7 @@ print "# check postprocess\n";
 File::Find::find( \%(wanted => \&noop_wanted,
 		   postprocess => \&my_postprocess), File::Spec->curdir );
 
-Check( scalar(keys %Expect_Dir) == 0 );
+Check( (nkeys %Expect_Dir) == 0 );
 
 {
     print "# checking argument localization\n";
@@ -492,42 +492,7 @@ Check( scalar(keys %Expect_Dir) == 0 );
     File::Find::find( sub {  } , 'fa' ) for < @foo;
     delete %pre{$_} for < @foo;
 
-    Check( scalar( keys %pre ) == 0 );
-}
-
-# see thread starting
-# http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2004-02/msg00351.html
-{
-    print "# checking that &_ and \%_ are still accessible and that\n",
-	"# tie magic on \$_ is not triggered\n";
-    
-    my $true_count;
-    my $sub = 0;
-    sub _ {
-	++$sub;
-    }
-    my $tie_called = 0;
-
-    package Foo;
-    sub STORE {
-	++$tie_called;
-    }
-    sub FETCH {return 'N'};
-    sub TIESCALAR {bless \@()};
-    package main;
-
-    Check( scalar( keys %_ ) == 0 );
-    my @foo = @( 'n' );
-    tie @foo[0], "Foo";
-
-    File::Find::find( sub { $true_count++; %_{$_}++; &_; } , 'fa' ) for < @foo;
-    untie $_;
-
-    Check( $tie_called == 0);
-    Check( scalar( keys %_ ) == $true_count );
-    Check( $sub == $true_count );
-    Check( scalar( nelems @foo ) == 1);
-    Check( @foo[0] eq 'N' );
+    Check( ( nkeys %pre ) == 0 );
 }
 
 if ( $symlink_exists ) {
@@ -542,7 +507,7 @@ if ( $symlink_exists ) {
     %Expect_Name = %( () );
     %Expect_Dir = %( () );
     File::Find::find( \%(wanted => \&wanted_File_Dir), topdir('fa', 'fsl') );
-    Check( scalar(keys %Expect_File) == 0 );
+    Check( (nkeys %Expect_File) == 0 );
 
  
     %Expect_File = %(File::Spec->curdir => 1, file_path('fa_ord') => 1,
@@ -562,7 +527,7 @@ if ( $symlink_exists ) {
     File::Find::find( \%(wanted => \&wanted_File_Dir_prune,
 		       follow_fast => 1), topdir('fa') );
 
-    Check( scalar(keys %Expect_File) == 0 );  
+    Check( (nkeys %Expect_File) == 0 );  
 
 
     # no_chdir is in effect, hence we use file_path_name to specify
@@ -593,7 +558,7 @@ if ( $symlink_exists ) {
     File::Find::find( \%(wanted => \&wanted_File_Dir, follow_fast => 1,
 		       no_chdir => 1), topdir('fa') );
 
-    Check( scalar(keys %Expect_File) == 0 );
+    Check( (nkeys %Expect_File) == 0 );
 
     %Expect_File = %( () );
 
@@ -615,7 +580,7 @@ if ( $symlink_exists ) {
     File::Find::finddepth( \%(wanted => \&wanted_Name,
 			    follow_fast => 1), topdir('fa') );
 
-    Check( scalar(keys %Expect_Name) == 0 );
+    Check( (nkeys %Expect_Name) == 0 );
 
     # no_chdir is in effect, hence we use file_path_name to specify
     # the expected paths for %Expect_File
@@ -639,7 +604,7 @@ if ( $symlink_exists ) {
     File::Find::finddepth( \%(wanted => \&wanted_File, follow_fast => 1,
 			    no_chdir => 1), topdir('fa') );
 
-    Check( scalar(keys %Expect_File) == 0 );     
+    Check( (nkeys %Expect_File) == 0 );     
 
  
     print "# check dangling symbolic links\n";
@@ -683,7 +648,7 @@ if ( $symlink_exists ) {
                            ),
                            topdir('dangling_dir_sl'), topdir('fa') );
 
-        Check( scalar(keys %Expect_File) == 0 );
+        Check( (nkeys %Expect_File) == 0 );
         Check( $warn_msg =~ m|dangling_file_sl is a dangling symbolic link| );  
         unlink file_path('fa', 'dangling_file_sl'),
                          file_path('dangling_dir_sl');
@@ -750,7 +715,7 @@ if ( $symlink_exists ) {
     File::Find::finddepth( \%(wanted => \&wanted_File_Dir, follow => 1,
                            follow_skip => 1, no_chdir => 1),
                            topdir('fa') );
-    Check( scalar(keys %Expect_File) == 0 );
+    Check( (nkeys %Expect_File) == 0 );
     unlink file_path('fa', 'fa_ord_sl');
 
 

@@ -40,7 +40,7 @@ if( $Has_Version ) {
 plan tests => (2 * nkeys %versions) + 4;
 
 while( my($code, $expect) = each %versions ) {
-    is( parse_version_string($code), $expect, $code );
+    is( ''.parse_version_string($code), $expect, $code );
 }
 
 
@@ -68,6 +68,6 @@ SKIP: {
     skip "need version.pm", 4 unless $Has_Version;
     is parse_version_string(q[ $VERSION = '1.00'; sub version { $VERSION } ]),
        '1.00';
-    is parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ]),
+    is ''.parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ]),
        qv("1.2.3");
 }

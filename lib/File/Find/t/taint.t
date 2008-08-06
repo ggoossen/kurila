@@ -28,7 +28,7 @@ BEGIN {
 				 or
 				 substr($dir,0,1) ne "/"
 				 or
-				 @(stat $dir)[[2]] ^&^ 002);
+				 @(stat $dir)[2] ^&^ 002);
     }
     %ENV{'PATH'} = join($sep,< @path);
 }
@@ -277,7 +277,7 @@ delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
 File::Find::find( \%(wanted => \&wanted_File_Dir_prune, untaint => 1,
 		   untaint_pattern => qr|^(.+)$|), topdir('fa') );
 
-is(scalar keys %Expect_File, 0, 'Found all expected files');
+is(nkeys %Expect_File, 0, 'Found all expected files');
 
 
 # don't untaint at all, should die
@@ -352,7 +352,7 @@ SKIP: {
                        no_chdir => 1, untaint => 1, untaint_pattern =>
                        qr|^(.+)$| ), topdir('fa') );
 
-    is( scalar(keys %Expect_File), 0, 'Found all files in symlink test' );
+    is( (nkeys %Expect_File), 0, 'Found all files in symlink test' );
 
 
     # don't untaint at all, should die
