@@ -205,7 +205,7 @@ sub _unix_os2_ext {
     }
 
     unless( $found ) {
-        return  @('','','','',  @($give_libs ? \@libs : ()));
+        return  @('','','','', $give_libs ? \@libs : ());
     }
     else {
         return  @("{join ' ', <@extralibs}", "{join ' ', <@bsloadlibs}", "{join ' ', <@ldloadlibs}",
