@@ -448,5 +448,5 @@ for my $test (< @tests) {
     is_deeply($info, $expected, "file_magic $name");
 
     $expected->{file} = 1;
-    is_deeply( <Storable::read_magic($data), $expected, "read magic $name");
+    is_deeply(Storable::read_magic($data), $expected, "read magic $name");
 }

@@ -13,8 +13,6 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-sub ok;
-
 use Storable qw(freeze thaw);
 
 %::immortals
@@ -109,7 +107,7 @@ ok 10, $good;
 
 package RETURNS_IMMORTALS;
 
-sub make { my $self = shift; bless \@(@_), $self }
+sub make { my $self = shift; bless \@( < @_), $self }
 
 sub STORABLE_freeze {
   # Some reference some number of times.
@@ -121,14 +119,14 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
-	my ($x, @refs) = @_;
+	my ($x, < @refs) = < @_;
 	my ($what, $times) = $x =~ m/(.)(\d+)/;
 	die "'$x' didn't match" unless defined $times;
-	main::ok ++$test, @refs == $times;
+	main::ok ++$test, nelems(@refs) == $times;
 	my $expect = %::immortals{$what};
 	die "'$x' did not give a reference" unless ref $expect;
 	my $fail;
-	foreach (@refs) {
+	foreach (< @refs) {
 	  $fail++ if $_ != $expect;
 	}
 	main::ok ++$test, !$fail;
@@ -164,7 +162,7 @@ sub make {
 
 sub STORABLE_freeze {
   my $self = shift;
-  return '';
+  return @('');
 }
 
 package main;

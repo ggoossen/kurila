@@ -58,15 +58,15 @@ print "ok 6\n";
 # Ensure refs to "undef" values are properly shared during cloning
 my $hash;
 push @{%$hash{''}}, \%$hash{a};
-print "not " unless %$hash{''}[0] == \%$hash{a};
+print "not " unless %$hash{''}->[0] \== \%$hash{a};
 print "ok 7\n";
 
 my $cloned = dclone(dclone($hash));
-print "not " unless %$cloned{''}[0] == \%$cloned{a};
+print "not " unless %$cloned{''}->[0] \== \%$cloned{a};
 print "ok 8\n";
 
 %$cloned{a} = "blah";
-print "not " unless %$cloned{''}[0] == \%$cloned{a};
+print "not " unless %$cloned{''}->[0] \== \%$cloned{a};
 print "ok 9\n";
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object

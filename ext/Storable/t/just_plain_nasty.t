@@ -39,7 +39,7 @@ BEGIN {
 		'""' => \&real,
 		fallback => 1;
     sub compare { return int(rand(3))-1 };
-    sub equal { return 1 if rand(1) > 0.5 }
+    sub equal { return 1 if rand(1) +> 0.5 }
     sub real { return "keep it so" }
 }
 
@@ -49,12 +49,12 @@ for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
                        # nasty means having a reference to the object
                        # directly within itself. otherwise it's in the
                        # second array.
-    my $nasty = [
-		 ($a[0] = bless [ ], "Banana"),
-		 ($a[1] = [ ]),
-		];
+    my $nasty = \@(
+		 (@a[0] = bless \@(), "Banana"),
+		 (@a[1] = \@()),
+		);
 
-    $a[$dbun]->[0] = $a[0];
+    @a[$dbun]->[0] = @a[0];
 
     ok(ref($nasty), "ARRAY", "Sanity found (now to play with it :->)");
 
@@ -99,7 +99,7 @@ for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
     ok($oh_dear->[0], "keep it so", "amagic ok 1");
     ok($oh_dear->[$dbun]->[0], "keep it so", "amagic ok 2");
 
-    @{$nasty} = @{$nasty}[0, 2, 1];
+    @{$nasty} = @( @{$nasty}[[0, 2, 1]] );
     headit("closure freeze BETWEEN circular overload");
     #print Dumper $nasty;
     $icicle = freeze $nasty;
@@ -110,7 +110,7 @@ for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
     ok($oh_dear->[0], "keep it so", "amagic ok 1");
     ok($oh_dear->[$dbun?2:0]->[0], "keep it so", "amagic ok 2");
 
-    @{$nasty} = @{$nasty}[1, 0, 2];
+    @{$nasty} = @( @{$nasty}[[1, 0, 2]] );
     headit("closure freeze BEFORE circular overload");
     #print Dumper $nasty;
     $icicle = freeze $nasty;

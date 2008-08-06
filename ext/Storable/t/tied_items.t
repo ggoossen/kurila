@@ -25,7 +25,6 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-sub ok;
 $^W = 0;
 
 print "1..4\n";
