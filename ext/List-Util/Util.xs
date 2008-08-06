@@ -145,10 +145,10 @@ CODE:
     bgv = gv_fetchpv("b", TRUE, SVt_PV);
     SAVESPTR(GvSV(agv));
     SAVESPTR(GvSV(bgv));
-    GvSV(agv) = ret;
+    SVcpREPLACE(GvSV(agv), ret);
     SvSetSV(ret, args[1]);
     for(index = 2 ; index < items ; index++) {
-	GvSV(bgv) = args[index];
+	SVcpREPLACE(GvSV(bgv), args[index]);
 	MULTICALL;
 	SvSetSV(ret, *PL_stack_sp);
     }

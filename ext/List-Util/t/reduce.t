@@ -67,7 +67,7 @@ is($v, 12, 'return from loop');
 # Does it work from another package?
 { package Foo;
   $a = $b;
-  ::is((List::Util::reduce {$a*$b} (1..4)), 24, 'other package');
+  main::is((List::Util::reduce {$a*$b} (1..4)), 24, 'other package');
 }
 
 # Can we undefine a reduce sub while it's running?
