@@ -3,27 +3,15 @@
 
 use strict;
 use Test;
-BEGIN { plan tests => 7}
+BEGIN { plan tests => 6}
 
 use File::Temp qw/ :POSIX unlink0 /;
 use FileHandle;
 ok(1);
 
-# TMPNAM - scalar
-
-print "# TMPNAM: in a scalar context: \n";
-my $tmpnam = tmpnam();
-
-# simply check that the file does not exist
-# Not a 100% water tight test though if another program 
-# has managed to create one in the meantime.
-ok( !(-e $tmpnam ));
-
-print "# TMPNAM file name: $tmpnam\n";
-
 # TMPNAM list context
 # Not strict posix behaviour
-(my $fh, $tmpnam) = < tmpnam();
+my($fh, $tmpnam) = < tmpnam();
 
 print "# TMPNAM: in list context: {dump::view($fh)} $tmpnam\n";
 
