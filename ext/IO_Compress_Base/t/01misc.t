@@ -1,7 +1,7 @@
 BEGIN {
     if (%ENV{PERL_CORE}) {
 	chdir 't' if -d 't';
-	@INC = ("../lib", "lib/compress");
+	@INC = @("../lib", "lib/compress");
     }
 }
 
@@ -82,7 +82,7 @@ sub My::testParseParameters()
             "wanted scalar reference";
 
     local *ABC;
-    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => *ABC) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \*ABC) ; };
     like $@->{description}, mkErr("Parameter 'Fred' not a scalar"), 
             "wanted scalar";
 

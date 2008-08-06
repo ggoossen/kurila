@@ -132,7 +132,7 @@ sub whatIsInput($;$)
     {
         #use IO::File;
         $got = 'handle';
-        @_[0] = *STDIN;
+        @_[0] = \*STDIN;
         #$_[0] = new IO::File("<-");
     }
 
@@ -146,7 +146,7 @@ sub whatIsOutput($;$)
     if (defined $got && $got eq 'filename' && defined @_[0] && @_[0] eq '-')
     {
         $got = 'handle';
-        @_[0] = *STDOUT;
+        @_[0] = \*STDOUT;
         #$_[0] = new IO::File(">-");
     }
     
