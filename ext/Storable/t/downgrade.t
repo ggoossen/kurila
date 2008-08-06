@@ -94,7 +94,7 @@ sub test_locked_hash {
   my $hash = shift;
   my @keys = @( keys %$hash );
   my ($key, $value) = each %$hash;
-  try {$hash->{$key} = reverse $value};
+  try {$hash->{$key} = 'x' . $value};
   like( $@->{description}, "/^Modification of a read-only value attempted/",
         'trying to change a locked key' );
   is ($hash->{$key}, $value, "hash should not change?");
@@ -108,10 +108,10 @@ sub test_restricted_hash {
   my $hash = shift;
   my @keys = @( keys %$hash );
   my ($key, $value) = each %$hash;
-  try {$hash->{$key} = reverse $value};
+  try {$hash->{$key} = 'x' . $value};
   is( $@, '',
         'trying to change a restricted key' );
-  is ($hash->{$key}, reverse ($value), "hash should change");
+  is ($hash->{$key}, 'x' . $value, "hash should change");
   try {$hash->{use} = 'perl'};
   like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );

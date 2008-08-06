@@ -21,8 +21,6 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-sub ok;
-
 use Storable qw(freeze thaw);
 
 print "1..16\n";
@@ -30,7 +28,7 @@ print "1..16\n";
 package OVERLOADED;
 
 use overload
-	'""' => sub { @_[0][0] };
+	'""' => sub { @_[0]->[0] };
 
 package main;
 
@@ -47,14 +45,14 @@ ok 5, "$$c" eq "77";
 
 my $d = thaw freeze \@($a, $a);
 ok 6, "$d->[0]" eq "77";
-$d->[0][0]++;
+$d->[0]->[0]++;
 ok 7, "$d->[1]" eq "78";
 
 package REF_TO_OVER;
 
 sub make {
 	my $self = bless \%(), shift;
-	my ($over) = @_;
+	my ($over) = < @_;
 	$self->{over} = $over;
 	return $self;
 }

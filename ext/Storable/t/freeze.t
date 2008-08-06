@@ -14,7 +14,6 @@ sub BEGIN {
 	unshift @INC, 't';
     }
     require 'st-dump.pl';
-    sub ok;
 }
 
 use Storable qw(freeze nfreeze thaw);

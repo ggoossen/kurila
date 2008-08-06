@@ -23,7 +23,6 @@ sub BEGIN {
 }
 
 use strict;
-sub ok;
 
 use utf8;
 

@@ -21,8 +21,6 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-sub ok;
-
 use Storable qw(freeze thaw dclone);
 
 print "1..33\n";

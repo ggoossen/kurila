@@ -190,11 +190,11 @@ sub read_magic {
 }
 
 sub BIN_VERSION_NV {
-    sprintf "\%d.\%03d", < BIN_MAJOR(), < BIN_MINOR();
+    sprintf "\%d.\%03d", BIN_MAJOR(), BIN_MINOR();
 }
 
 sub BIN_WRITE_VERSION_NV {
-    sprintf "\%d.\%03d", < BIN_MAJOR(), < BIN_WRITE_MINOR();
+    sprintf "\%d.\%03d", BIN_MAJOR(), BIN_WRITE_MINOR();
 }
 
 #

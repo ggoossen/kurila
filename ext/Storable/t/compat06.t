@@ -13,8 +13,6 @@ BEGIN {
     require 'st-dump.pl';
 }
 
-sub ok;
-
 print "1..8\n";
 
 use Storable qw(freeze nfreeze thaw);
