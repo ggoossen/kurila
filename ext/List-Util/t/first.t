@@ -38,7 +38,7 @@ is($v, 12, 'return from loop');
 
 # Does it work from another package?
 { package Foo;
-  ::is(List::Util::first(sub{$_+>4},(1..4,24)), 24, 'other package');
+  main::is(List::Util::first(sub{$_+>4},(1..4,24)), 24, 'other package');
 }
 
 # Can we undefine a first sub while it's running?

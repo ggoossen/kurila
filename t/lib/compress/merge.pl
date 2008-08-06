@@ -44,7 +44,7 @@ sub run
         title "Misc error cases";
 
         try { 'Compress::Raw::Zlib::InflateScan'->new( Bufsize => 0)} ;
-        like $@->{description}, qr/^Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified 0/, "  catch bufsize == 0";
+        like $@->message, qr/^Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified 0/, "  catch bufsize == 0";
 
         try { Compress::Raw::Zlib::inflateScanStream::createDeflateStream(undef, Bufsize => 0) } ;
         like $@->{description}, qr/^Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified 0/, "  catch bufsize == 0";

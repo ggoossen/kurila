@@ -3,7 +3,7 @@
 use Scalar::Util ();
 use Test::More  (grep { m/dualvar/ } < @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'dualvar requires XS version')
-			: (tests => 11);
+			: (tests => 9);
 
 Scalar::Util->import('dualvar');
 
@@ -32,14 +32,4 @@ ok( $var == $numstr,	'NV');
 $var = dualvar(1<<31, "");
 ok( $var == (1<<31),	'UV 1');
 ok( $var +> 0,		'UV 2');
-
-tie my $tied, 'Tied';
-$var = dualvar($tied, "ok");
-ok($var == 7.5,		'Tied num');
-ok($var eq 'ok',	'Tied str');
-
-package Tied;
-
-sub TIESCALAR { bless \%() }
-sub FETCH { 7.5 }
 

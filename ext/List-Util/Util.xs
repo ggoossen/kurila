@@ -178,7 +178,7 @@ CODE:
     SAVESPTR(GvSV(PL_defgv));
 
     for(index = 1 ; index < items ; index++) {
-	GvSV(PL_defgv) = args[index];
+	SVcpREPLACE(GvSV(PL_defgv), args[index]);
 	MULTICALL;
 	if (SvTRUE(*PL_stack_sp)) {
 	  POP_MULTICALL;

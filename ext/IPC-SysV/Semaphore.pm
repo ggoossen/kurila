@@ -127,7 +127,7 @@ sub getall {
     my $data = "";
     semctl($$self,0,GETALL,$data)
 	or return ();
-    (unpack("s!*",$data));
+    @(unpack("s!*",$data));
 }
 
 sub setall {
