@@ -80,17 +80,21 @@ PPCODE:
 {
     if ((re = SvRX(sv))) /* assign deliberate */
     {
-        SV *an = &PL_sv_no;
-        SV *fl = &PL_sv_no;
+        AV *res = newAV();
+        mXPUSHs((SV*)res);
         if (RX_ANCHORED_SUBSTR(re)) {
-            an = newSVsv(RX_ANCHORED_SUBSTR(re));
+            av_push(res, newSVsv(RX_ANCHORED_SUBSTR(re)));
+        } 
+        else {
+            av_push(res, newSVsv(&PL_sv_no));
         }
         if (RX_FLOAT_SUBSTR(re)) {
-            fl = newSVsv(RX_FLOAT_SUBSTR(re));
+            av_push(res, newSVsv(RX_FLOAT_SUBSTR(re)));
         }
-        XPUSHs(an);
-        XPUSHs(fl);
-        XSRETURN(2);
+        else {
+            av_push(res, newSVsv(&PL_sv_no));
+        }
+        XSRETURN(1);
     }
     XSRETURN_UNDEF;
 }

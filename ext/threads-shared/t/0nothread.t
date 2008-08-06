@@ -11,28 +11,28 @@ my %hash;
 sub hash
 {
     my @val = @( < @_ );
-    is(keys %hash, 0, "hash empty");
+    is(nkeys %hash, 0, "hash empty");
     %hash{0} = @val[0];
-    is(keys %hash,1, "Assign grows hash");
+    is(nkeys %hash,1, "Assign grows hash");
     is(%hash{0},@val[0],"Value correct");
     %hash{2} = @val[2];
-    is(keys %hash,2, "Assign grows hash");
+    is(nkeys %hash,2, "Assign grows hash");
     is(%hash{0},@val[0],"Value correct");
     is(%hash{2},@val[2],"Value correct");
     %hash{1} = @val[1];
-    is(keys %hash,3,"Size correct");
+    is(nkeys %hash,3,"Size correct");
     my @keys = @( keys %hash );
     is(join(',',sort < @keys),'0,1,2',"Keys correct");
     my @hval = @( %hash{[0,1,2]} );
     is_deeply(\@hval,\@val,"Values correct");
     my $val = delete %hash{1};
     is($val,@val[1],"Delete value correct");
-    is(keys %hash,2,"Size correct");
+    is(nkeys %hash,2,"Size correct");
     while (my ($k,$v) = each %hash) {
         is($v,@val[$k],"each works");
     }
     %hash = %( () );
-    is(keys %hash,0,"Clear hash");
+    is(nkeys %hash,0,"Clear hash");
 }
 
 sub array
