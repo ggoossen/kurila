@@ -150,7 +150,7 @@ else { $packfile = $self->{packfile}; }
 die("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
 open($fh, ">", "$packfile") || die("Can't open file $packfile: $!");
-foreach my $key (sort(keys(%{$self->{data}})))
+foreach my $key (sort(keys(%{$self->{data} || \%()})))
    {
        my $data = $self->{data}->{$key};
        if (%Config{userelocatableinc}) {

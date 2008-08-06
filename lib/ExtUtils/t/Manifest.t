@@ -206,7 +206,7 @@ add_file( 'MANIFEST.SKIP' => 'foo' );
 add_file( 'MANIFEST'      => "foobar\n"   );
 add_file( 'foobar'        => '123' );
 ($res, $warn) = < catch_warning( \&manicheck );
-is( $res,  undef,      'MANIFEST overrides MANIFEST.SKIP' );
+is_deeply( $res,  @(),      'MANIFEST overrides MANIFEST.SKIP' );
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
 $files = maniread;
