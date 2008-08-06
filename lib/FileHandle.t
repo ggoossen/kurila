@@ -17,7 +17,7 @@ BEGIN {
 use FileHandle;
 use strict 'subs';
 
-STDOUT->autoflush( 1);
+(\*STDOUT)->autoflush( 1);
 
 my $mystdout = FileHandle->new_from_fd( 1,"w");
 $| = 1;
@@ -58,12 +58,12 @@ print "ok 7\n";
 print "not " unless ($fh->open("TEST","r") && !$fh->tell && $fh->close);
 print "ok 8\n";
 
-STDOUT->autoflush( 0);
+(\*STDOUT)->autoflush( 0);
 
 print "not " if ($|);
 print "ok 9\n";
 
-STDOUT->autoflush( 1);
+(\*STDOUT)->autoflush( 1);
 
 print "not " unless ($|);
 print "ok 10\n";
