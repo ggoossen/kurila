@@ -45,6 +45,7 @@ sub setcolor {
   %ENV{PERL_RE_COLORS} = $colors;
  };
  if ($@) {
+     die $@;
     %ENV{PERL_RE_COLORS} ||= qq'\t\t> <\t> <\t\t';
  }
 

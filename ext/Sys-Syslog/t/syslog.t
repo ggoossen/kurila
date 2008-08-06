@@ -158,7 +158,7 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
 
         # syslog() with level "info" (as a macro), should pass
         { local $! = 1;
-          $r = try { syslog( <LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: \%m") } || 0;
+          $r = try { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: \%m") } || 0;
         }
         is( $@, '', "[$sock_type] syslog() called with level 'info' (macro)" );
         ok( $r, "[$sock_type] syslog() should return true: {dump::view($r)}" );
@@ -239,10 +239,10 @@ BEGIN { $tests += 3 + 4 * 3 }
     is( $@, '', "setlogmask() called with a null mask (second time)" );
     is( $r, $oldmask, "setlogmask() must return the same mask as previous call");
 
-    my @masks = @( <
-        LOG_MASK( <LOG_ERR()), 
-        ^~^LOG_MASK( <LOG_INFO()), 
-        LOG_MASK( <LOG_CRIT()) ^|^ LOG_MASK( <LOG_ERR()) ^|^ LOG_MASK( <LOG_WARNING()), 
+    my @masks = @(
+        LOG_MASK(LOG_ERR()), 
+        ^~^LOG_MASK(LOG_INFO()), 
+        LOG_MASK(LOG_CRIT()) ^|^ LOG_MASK(LOG_ERR()) ^|^ LOG_MASK(LOG_WARNING()), 
     );
 
     for my $newmask (< @masks) {

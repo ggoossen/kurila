@@ -861,7 +861,10 @@ splitOnLastStarter(src)
     SV *svp;
     STRLEN srclen;
     U8 *s, *e, *p;
+    AV* res;
   PPCODE:
+    res = newAV();
+    mXPUSHs((SV*)res);
     s = (U8*)sv_2pvunicode(src,&srclen);
     e = s + srclen;
     p = e;
@@ -875,9 +878,6 @@ splitOnLastStarter(src)
 	    break;
     }
 
-    svp = sv_2mortal(newSVpvn((char*)s, p - s));
-    XPUSHs(svp);
-
-    svp = sv_2mortal(newSVpvn((char*)p, e - p));
-    XPUSHs(svp);
+    av_push(res, newSVpvn((char*)s, p - s));
+    av_push(res, newSVpvn((char*)p, e - p));
 

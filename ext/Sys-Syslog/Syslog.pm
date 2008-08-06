@@ -87,7 +87,7 @@ my $transmit_ok = 0;            # flag to indicate if the last message was trans
 my $current_proto = undef;      # current mechanism used to transmit messages
 my $ident = '';                 # identifiant prepended to each message
 $facility = '';                 # current facility
-my $maskpri = LOG_UPTO( <&LOG_DEBUG);     # current log mask
+my $maskpri = LOG_UPTO(&LOG_DEBUG);     # current log mask
 
 my %options = %(
     ndelay  => 0, 
@@ -135,7 +135,7 @@ sub openlog {
     $err_sub = %options{nofatal} ? \&warnings::warnif : \&croak;
     return 1 unless %options{ndelay};
     connect_log();
-} 
+}
 
 sub closelog {
     $facility = $ident = '';
@@ -449,7 +449,7 @@ sub xlate {
 # selected order. 
 # 
 sub connect_log {
-    @fallbackMethods = @( < @connectMethods ) unless scalar nelems @fallbackMethods;
+    @fallbackMethods = @( < @connectMethods ) unless @fallbackMethods;
 
     if ($transmit_ok && $current_proto) {
         # Retry what we were on, because it has worked in the past.
@@ -627,7 +627,7 @@ sub connect_unix {
 	return 0;
     }
 
-    my $addr = sockaddr_un($syslog_path);
+    my $addr = pack_sockaddr_un($syslog_path);
     if (!$addr) {
 	push @$errs, "can't locate $syslog_path";
 	return 0;
@@ -664,7 +664,7 @@ sub connect_native {
 
     try { openlog_xs($ident, $logopt, < xlate($facility)) };
     if ($@) {
-        push @$errs, $@;
+        push @$errs, $@->message;
         return 0;
     }
 
@@ -707,7 +707,7 @@ sub connection_ok {
     my $rin = '';
     vec($rin, fileno(SYSLOG), 1) = 1;
     my $ret = select $rin, undef, $rin, 0.25;
-    return  @($ret ? 0 : 1);
+    return $ret ? 0 : 1;
 }
 
 sub disconnect_log {

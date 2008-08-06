@@ -48,15 +48,15 @@ ok($unproc, "");
 ok($proc,   "");
 ok($unproc, "A");
 
-($proc, $unproc) = < splitOnLastStarter( <_pack_U(0x41, 0x300, 0x327, 0x42));
+($proc, $unproc) = < splitOnLastStarter(_pack_U(0x41, 0x300, 0x327, 0x42));
 ok($proc,   _pack_U(0x41, 0x300, 0x327));
 ok($unproc, "B");
 
-($proc, $unproc) = < splitOnLastStarter( <_pack_U(0x4E00, 0x41, 0x301));
+($proc, $unproc) = < splitOnLastStarter(_pack_U(0x4E00, 0x41, 0x301));
 ok($proc,   _pack_U(0x4E00));
 ok($unproc, _pack_U(0x41, 0x301));
 
-($proc, $unproc) = < splitOnLastStarter( <_pack_U(0x302, 0x301, 0x300));
+($proc, $unproc) = < splitOnLastStarter(_pack_U(0x302, 0x301, 0x300));
 ok($proc,   "");
 ok($unproc, _pack_U(0x302, 0x301, 0x300));
 
