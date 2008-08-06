@@ -74,18 +74,20 @@ foreach my $line (< Config::config_re('c.*')) {
   like($line,                  qr/^c.*?=.*$/,                   'config_re' );
 }
 
-my $out = tie *STDOUT, 'FakeOut';
+my ($out1, $out2);
+{
+    my $out = \$("");
+    open my $fakeout, '>>', $out or die;
+    local *STDOUT = *$fakeout{IO};
 
-Config::config_vars('cc');	# non-regex test of essential cfg-var
-my $out1 = $$out;
-$out->clear;
+    Config::config_vars('cc');	# non-regex test of essential cfg-var
+    $out1 = $$out;
+    $$out = "";
 
-Config::config_vars('d_bork');	# non-regex, non-existent cfg-var
-my $out2 = $$out;
-$out->clear;
-
-undef $out;
-untie *STDOUT;
+    Config::config_vars('d_bork');	# non-regex, non-existent cfg-var
+    $out2 = $$out;
+    $$out = "";
+}
 
 like($out1, qr/^cc='\Q%Config{cc}\E';/, "found config_var cc");
 like($out2, qr/^d_bork='UNKNOWN';/, "config_var d_bork is UNKNOWN");
@@ -147,7 +149,7 @@ foreach my $pain ($first, < @virtual) {
   my @result = @( %Config{$pain} );
   is (nelems @result, 1, "single result for \$config('$pain')");
 
-  @result = @( Config::config_re($pain) );
+  @result = @( < Config::config_re($pain) );
   is (nelems @result, 1, "single result for config_re('$pain')");
   like (@result[0], qr/^$pain=(['"])\Q%Config{$pain}\E\1$/, # grr '
 	"which is the expected result for $pain");
