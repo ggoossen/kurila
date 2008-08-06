@@ -40,20 +40,20 @@ while ( ~< $fh) {
 }
 close $fh;
 
-plan(tests => scalar @op);
+plan(tests => nelems(@op));
 
 sub testop {
-    my ($op, $opname, $code) = @_;
+    my ($op, $opname, $code) = < @_;
     pass("$op : skipped") and return if $code =~ m/^SKIP/;
     my $c = Safe->new();
     $c->deny_only($op);
     $c->reval($code);
-    like($@->{description}, qr/'\Q$opname\E' trapped by operation mask/, $op);
+    like($@->message, qr/'\Q$opname\E' trapped by operation mask/, $op);
 }
 
-foreach (@op) {
+foreach (< @op) {
     if ($_->[2]) {
-	testop @$_;
+	testop < @$_;
     } else {
 	local $TODO = "No test yet for $_->[1]";
 	fail();
@@ -69,7 +69,6 @@ null		SKIP
 stub		SKIP
 scalar		scalar $x
 pushmark	print @x
-wantarray	wantarray
 const		42
 gvsv		SKIP (set by optimizer) $x
 gv		SKIP *x
@@ -99,7 +98,7 @@ qr		qr/foo/
 subst		s/foo/bar/
 substcont	SKIP (set by optimizer)
 sassign		$x = $y
-aassign		@x = @y
+aassign		($x) = ($y)
 chop		chop @foo
 schop		chop
 chomp		chomp @foo
