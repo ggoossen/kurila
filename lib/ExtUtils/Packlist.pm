@@ -77,7 +77,7 @@ sub FETCH
 
 sub FIRSTKEY
 {
-    my $reset = scalar(keys(%{@_[0]->{data}}));
+    keys(%{@_[0]->{data}});
     return each(%{@_[0]->{data}});
 }
 
