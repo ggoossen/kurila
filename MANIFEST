@@ -298,7 +298,6 @@ ext/IO/IO.xs			IO extension external subroutines
 ext/IO/lib/IO/Dir.pm		IO directory reading package
 ext/IO/lib/IO/File.pm		IO file handle package
 ext/IO/lib/IO/Handle.pm		IO base handle package
-ext/IO/lib/IO/Pipe.pm		IO pipe package
 ext/IO/lib/IO/Poll.pm		IO system poll() interface
 ext/IO/lib/IO/Seekable.pm	IO methods for seekable handles
 ext/IO/lib/IO/Select.pm		IO system select() interface
@@ -315,7 +314,6 @@ ext/IO/t/io_dup.t	See if dup()-related methods from IO work
 ext/IO/t/io_file.t	See if binmode()-related methods on IO::File work
 ext/IO/t/io_linenum.t	See if I/O line numbers are tracked correctly
 ext/IO/t/io_multihomed.t	See if INET sockets work with multi-homed hosts
-ext/IO/t/io_pipe.t	See if pipe()-related methods from IO work
 ext/IO/t/io_poll.t	See if poll()-related methods from IO work
 ext/IO/t/io_sel.t	See if select()-related methods from IO work
 ext/IO/t/io_sock.t	See if INET socket-related methods from IO work
