@@ -16,7 +16,7 @@ my @types = @( qw(dynamic static nonxs) );
 my %types;
 %types{[< @types]} = < @types;
 
-ok (keys %Extensions, "There are some extensions");
+ok (nkeys %Extensions, "There are some extensions");
 # Check only the 3 valid keys have been used.
 while (my ($key, $val) = each %Extensions) {
     my $raw_ext = $key;

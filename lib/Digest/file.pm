@@ -15,12 +15,11 @@ $VERSION = "1.00";
 sub digest_file_ctx {
     my $file = shift;
     croak("No digest algorithm specified") unless (nelems @_);
-    local *F;
-    open(F, "<", $file) || croak("Can't open '$file': $!");
-    binmode(F);
+    open(my $fh, "<", $file) || croak("Can't open '$file': $!");
+    binmode($fh);
     my $ctx = Digest->new(< @_);
-    $ctx->addfile(*F);
-    close(F);
+    $ctx->addfile($fh);
+    close($fh);
     return $ctx;
 }
 

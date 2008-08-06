@@ -12,7 +12,7 @@ use strict;
 
 # Some (safe?) bets.
 
-ok(keys %Config +> 500, "Config has more than 500 entries");
+ok(nkeys %Config +> 500, "Config has more than 500 entries");
 
 my ($first) = Config::config_sh() =~ m/^(\S+)=/m;
 die "Can't find first entry in Config::config_sh()" unless defined $first;
@@ -62,7 +62,7 @@ ok(exists %Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
     my @exports = @( qw(myconfig config_sh config_vars config_re) );
     Config->import(< @exports);
     foreach my $func (< @exports) {
-	::ok( __PACKAGE__->can($func), "$func exported" );
+	main::ok( __PACKAGE__->can($func), "$func exported" );
     }
 }
 
@@ -70,7 +70,7 @@ like(Config::myconfig(), qr/osname=\Q%Config{osname}\E/,   "myconfig");
 like(Config::config_sh(), qr/osname='\Q%Config{osname}\E'/, "config_sh");
 like(Config::config_sh(), qr/byteorder='[1-8]+'/,
      "config_sh has a valid byteorder");
-foreach my $line (Config::config_re('c.*')) {
+foreach my $line (< Config::config_re('c.*')) {
   like($line,                  qr/^c.*?=.*$/,                   'config_re' );
 }
 
