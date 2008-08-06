@@ -38,8 +38,6 @@ my $globbed_match ;
 
 our @MINIMAL_EXPORT = @( qw(
 	$LAST_PAREN_MATCH
-	$INPUT_LINE_NUMBER
-	$NR
 	$INPUT_RECORD_SEPARATOR
 	$RS
 	$OUTPUT_AUTOFLUSH
@@ -56,7 +54,6 @@ our @MINIMAL_EXPORT = @( qw(
 	$ERRNO
 	%ERRNO_FLAGS
 	$EXTENDED_OS_ERROR
-	$EVAL_ERROR
 	$PROCESS_ID
 	$PID
 	$REAL_USER_ID
@@ -128,7 +125,6 @@ sub import {
 	*OS_ERROR_FLAGS				= *!{HASH}	;
 	    *ERRNO_FLAGS				= *!{HASH}	;
 	*EXTENDED_OS_ERROR			= *^E{SCALAR}	;
-	*EVAL_ERROR				= *@{SCALAR}	;
 
 # Process info.
 

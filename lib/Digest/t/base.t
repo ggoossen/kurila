@@ -58,7 +58,7 @@ print F "abc" x 100, "\n";
 close(F) || die;
 
 open(F, "<", "xxtest$$") || die;
-$ctx->addfile(*F);
+$ctx->addfile(\*F);
 close(F);
 unlink("xxtest$$") || warn;
 

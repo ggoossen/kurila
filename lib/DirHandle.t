@@ -18,18 +18,18 @@ my $dot = DirHandle->new($^O eq 'MacOS' ? ':' : '.');
 
 ok(defined($dot));
 
-my @a = @( sort glob("*") );
+my @a = @( sort < glob("*") );
 my $first;
-do { $first = $dot->read } while defined($first) && $first =~ m/^\./;
+do { $first = $dot->readdir } while defined($first) && $first =~ m/^\./;
 ok(+(grep { $_ eq $first } < @a));
 
-my @b = @( sort($first, (grep {m/^[^.]/} $dot->read)) );
+my @b = @( sort($first, (grep {m/^[^.]/} < $dot->readdirs)) );
 ok(+(join("\0", < @a) eq join("\0", < @b)));
 
 $dot->rewind;
-my @c = @( sort grep {m/^[^.]/} $dot->read );
+my @c = @( sort grep {m/^[^.]/} < $dot->readdirs );
 cmp_ok(+(join("\0", < @b), 'eq', join("\0", < @c)));
 
 $dot->close;
 $dot->rewind;
-ok(!defined($dot->read));
+ok(!defined($dot->readdir));

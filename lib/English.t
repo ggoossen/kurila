@@ -1,7 +1,7 @@
 #!./perl -i.inplace
 # note the extra switch, for the test below
 
-use Test::More tests => 41;
+use Test::More tests => 39;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -58,9 +58,6 @@ is( @foo[1], 9, '$LIST_SEPARATOR' );
 
 undef $OUTPUT_RECORD_SEPARATOR;
 
-eval 'NO SUCH FUNCTION';
-like( $EVAL_ERROR->{description}, qr/syntax error/, '$EVAL_ERROR' );
-
 is( $UID, $<, '$UID' );
 is( $REAL_GROUP_ID, $^GID, '$GID' );
 is( $EUID, $>, '$EUID' );
@@ -95,8 +92,6 @@ ok( !$PERLDB, '$PERLDB should be false' );
 	like( ~< *DATA, qr/a paragraph./, '$INPUT_RECORD_SEPARATOR' );
 }
 like( ~< *DATA, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
-
-is( $INPUT_LINE_NUMBER, 2, '$INPUT_LINE_NUMBER' );
 
 my %hash;
 $SUBSCRIPT_SEPARATOR = '|';
