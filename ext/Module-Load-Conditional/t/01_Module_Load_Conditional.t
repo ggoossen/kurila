@@ -17,12 +17,9 @@ use_ok( 'Module::Load::Conditional' );
 {   $Module::Load::Conditional::VERBOSE =   
     $Module::Load::Conditional::VERBOSE = 0;
 
-    *can_load       = *Module::Load::Conditional::can_load
-                    = *Module::Load::Conditional::can_load;
-    *check_install  = *Module::Load::Conditional::check_install
-                    = *Module::Load::Conditional::check_install;
-    *requires       = *Module::Load::Conditional::requires
-                    = *Module::Load::Conditional::requires;
+    *can_load       = \&Module::Load::Conditional::can_load;
+    *check_install  = \&Module::Load::Conditional::check_install;
+    *requires       = \&Module::Load::Conditional::requires;
 }
 
 {
@@ -36,7 +33,7 @@ use_ok( 'Module::Load::Conditional' );
                             q[  Found proper version] );
 
     ### break up the specification
-    my @rv_path = @( do {
+    my @rv_path = do {
 
         ### Use the UNIX specific method, as the VMS one currently
         ### converts the file spec back to VMS format.
@@ -51,7 +48,7 @@ use_ok( 'Module::Load::Conditional' );
 
         ### and return it    
         @path;
-    } );
+    };
     
     is( %INC{'Module/Load/Conditional.pm'},            
             File::Spec::Unix->catfile(< @rv_path),
