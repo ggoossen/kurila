@@ -308,7 +308,7 @@ our %HTML_Escapes;
     }
 }; 
 
-*THITHER = $standalone ? *STDOUT : *STDERR;
+*THITHER = $standalone ? \*STDOUT : \*STDERR;
 
 my %transfmt = %( () ); 
 my $transmo = <<EOFUNC;
