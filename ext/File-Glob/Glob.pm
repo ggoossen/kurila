@@ -14,7 +14,6 @@ use XSLoader ();
 @EXPORT_OK   = @( qw(
     csh_glob
     bsd_glob
-    glob
     GLOB_ABEND
     GLOB_ALPHASORT
     GLOB_ALTDIRFUNC
@@ -51,7 +50,6 @@ use XSLoader ();
         GLOB_NOSPACE
         GLOB_QUOTE
         GLOB_TILDE
-        glob
         bsd_glob
     ) ),
 );
