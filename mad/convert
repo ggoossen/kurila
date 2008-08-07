@@ -44,7 +44,7 @@ use Fatal qw|open close|;
     my (undef, $dir, undef) = File::Basename::fileparse($filename);
     my @lib;
     push @lib, "$ENV{madpath}/lib";
-    push @lib, "./lib", "./blib/lib", "./blib/arch/", "../lib/", "./t", "../t";
+    push @lib, "./lib", "./blib/lib", "./blib/arch/", "../lib/", "./t", "../t", "$dir";
     #push @lib, $dir;
     for (keys %ENV) {
         $_ =~ m/^mad_(.*)$/ or next;
