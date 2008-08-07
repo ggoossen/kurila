@@ -54,17 +54,20 @@ hidden_ref_keys(hash)
         HV* hv;
         SV *key;
         HE *he;
+        AV *res;
     PPCODE:
 	if (!SvROK(hash) || SvTYPE(SvRV(hash)) != SVt_PVHV)
 	   croak("First argument to hidden_keys() must be an HASH reference");
 
+        res = newAV();
+        mXPUSHs((SV*)res);
 	hv = (HV*)SvRV(hash);
 
         (void)hv_iterinit(hv);
 	while((he = hv_iternext_flags(hv, HV_ITERNEXT_WANTPLACEHOLDERS))!= NULL) {
 	    key=hv_iterkeysv(he);
             if (HeVAL(he) == &PL_sv_placeholder) {
-                XPUSHs( key );
+                av_push(res, newSVsv(key));
             }
         }
 
@@ -75,16 +78,20 @@ legal_ref_keys(hash)
         HV* hv;
         SV *key;
         HE *he;
+        AV *res;
     PPCODE:
 	if (!SvROK(hash) || SvTYPE(SvRV(hash)) != SVt_PVHV)
 	   croak("First argument to legal_keys() must be an HASH reference");
+
+        res = newAV();
+        mXPUSHs((SV*)res);
 
 	hv = (HV*)SvRV(hash);
 
         (void)hv_iterinit(hv);
 	while((he = hv_iternext_flags(hv, HV_ITERNEXT_WANTPLACEHOLDERS))!= NULL) {
 	    key=hv_iterkeysv(he);
-            XPUSHs( key );
+            av_push(res, newSVsv(key));
         }
 
 void
