@@ -9,7 +9,7 @@ END { print STDERR < @warnings }
 
 
 use strict;
-use Test::More tests => 96;
+use Test::More tests => 89;
 my $TB = Test::More->builder;
 
 BEGIN { use_ok('constant'); }
@@ -35,8 +35,8 @@ is UNDEF2, undef,       '    weird way';
 is UNDEF3, undef,       '    short way';
 
 # XXX Why is this way different than the other ones?
-my @undef = @( < UNDEF1 );
-is( (nelems @undef), 1);
+my @undef = @( UNDEF1 );
+is( nelems(@undef), 1);
 is @undef[0], undef;
 
 @undef = @( < UNDEF2 );
@@ -46,19 +46,19 @@ is( (nelems @undef), 0);
 @undef = @( < EMPTY );
 is( (nelems @undef), 0);
 
-use constant COUNTDOWN	=> scalar reverse 1, 2, 3, 4, 5;
+use constant COUNTDOWN	=> '54321';
 use constant COUNTLIST	=> reverse 1, 2, 3, 4, 5;
 use constant COUNTLAST	=> ( <COUNTLIST)[[-1]];
 
 is COUNTDOWN, '54321';
 my @cl = @( < COUNTLIST );
-is (nelems @cl), 5;
+is nelems(@cl), 5;
 is COUNTDOWN, join '', < @cl;
 is COUNTLAST, 1;
 is(( <COUNTLIST)[[1]], 4);
 
 use constant ABC	=> 'ABC';
-is "abc${\( < ABC )}abc", "abcABCabc";
+is "abc${\( ABC )}abc", "abcABCabc";
 
 use constant DEF	=> 'D', 'E', chr ord 'F';
 is "d e f {join ' ', <@{\@( < DEF )}} d e f", "d e f D E F d e f";
@@ -105,14 +105,14 @@ cmp_ok E2BIG, '==', 7;
 # text may vary, so we can't test much better than this.
 cmp_ok length(E2BIG), '+>', 6;
 
-is (nelems @warnings), 0 or diag join "\n", "unexpected warning", < @warnings;
+is nelems(@warnings), 0 or diag join "\n", "unexpected warning", < @warnings;
 @warnings = @( () );		# just in case
 undef &PI;
-ok (nelems @warnings) && (@warnings[0] =~ m/Constant sub.* undefined/) or
+ok nelems(@warnings) && (@warnings[0] =~ m/Constant sub.* undefined/) or
   diag join "\n", "unexpected warning", < @warnings;
 shift @warnings;
 
-is (nelems @warnings), 0, "unexpected warning";
+is nelems(@warnings), 0, "unexpected warning";
 
 my $curr_test = $TB->current_test;
 use constant CSCALAR	=> \"ok 37\n";
@@ -124,7 +124,7 @@ my $output = $TB->output ;
 print $output ${+CSCALAR};
 print $output CHASH->{foo};
 print $output CARRAY->[1];
-print $output < CCODE->($curr_test+4);
+print $output CCODE->($curr_test+4);
 
 $TB->current_test($curr_test+4);
 
@@ -162,10 +162,10 @@ ok !%constant::declared{'main::PIE'};
 {
     package Other;
     use constant IN_OTHER_PACK => 42;
-    ::ok ::declared 'IN_OTHER_PACK';
-    ::ok %constant::declared{'Other::IN_OTHER_PACK'};
-    ::ok ::declared 'main::PI';
-    ::ok %constant::declared{'main::PI'};
+    main::ok main::declared 'IN_OTHER_PACK';
+    main::ok %constant::declared{'Other::IN_OTHER_PACK'};
+    main::ok main::declared 'main::PI';
+    main::ok %constant::declared{'main::PI'};
 }
 
 ok declared 'Other::IN_OTHER_PACK';
@@ -228,7 +228,7 @@ else {
     diag $rule, $/;
 }
 
-is (nelems @warnings), 0+nelems @Expected_Warnings;
+is nelems(@warnings), 0+nelems @Expected_Warnings;
 
 for my $idx (0..((nelems @warnings)-1)) {
     like @warnings[$idx], @Expected_Warnings[$idx];
@@ -245,8 +245,8 @@ use constant \%(
 	SPIT   => sub { shift },
 );
 
-is (nelems @{+FAMILY}), THREE;
-is (nelems @{+FAMILY}), nelems @{RFAM->[0]};
+is nelems(@{+FAMILY}), THREE;
+is nelems(@{+FAMILY}), nelems @{RFAM->[0]};
 is FAMILY->[2], RFAM->[0]->[2];
 is AGES->{FAMILY->[1]}, 28;
 is THREE**3, SPIT->((nelems @{+FAMILY})**3);
@@ -258,39 +258,6 @@ is THREE**3, SPIT->((nelems @{+FAMILY})**3);
         use constant _1_2_3 => 'allowed';
     };
     ok( $@ eq '' );
-}
-
-sub slotch ();
-
-{
-    my @warnings;
-    local $^WARN_HOOK = sub { push @warnings, < @_ };
-    eval 'use constant slotch => 3; 1' or die $@;
-
-    is ("{join ' ', <@warnings}", "", "No warnings if a prototype exists");
-
-    my $value = eval 'slotch';
-    is ($@, '');
-    is ($value, 3);
-}
-
-sub zit;
-
-{
-    my @warnings;
-    local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
-    eval 'use constant zit => 4; 1' or die $@;
-
-    # empty prototypes are reported differently in different versions
-    my $no_proto = ": none";
-
-    is(scalar nelems @warnings, 1, "1 warning");
-    like (@warnings[0], qr/^Prototype mismatch: sub main::zit$no_proto vs \(\)/,
-	  "about the prototype mismatch");
-
-    my $value = eval 'zit';
-    is ($@, '');
-    is ($value, 4);
 }
 
 $fagwoosh = 'geronimo';
@@ -316,7 +283,7 @@ $kloong = 'schlozhauer';
 
     is ("{join ' ', <@warnings}", "", "No warnings if the typeglob exists already");
 
-    @value = @( eval 'putt' );
+    @value = eval 'putt';
     is ($@, '');
     is_deeply (\@value, \@(6, 7));
 
@@ -328,7 +295,7 @@ $kloong = 'schlozhauer';
     is ($@, '');
     is ($value, undef);
 
-    @value = @( eval 'klong' );
+    @value = eval 'klong';
     is ($@, '');
-    is_deeply (\@value, \@());
+    is_deeply (\@value, \undef);
 }
