@@ -62,10 +62,10 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
 ## calling a function
 {
     our $x;
-    sub func1 { $x++; return "func1 called. args: @_" };
+    sub func1 { $x++; return "func1 called. args: {join ' ', < @_}" };
 
     BEGIN { compsub::define( compfunc1 => sub { my $op = shift;
-                                                my $cvop = B::SVOP->new('const', 0, *func1);
+                                                my $cvop = B::SVOP->new('const', 0, \&func1);
                                                 $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
                                                 return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op);
                                             } ); }
@@ -108,14 +108,14 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
                 $kid = $padsv;
             } elsif ($kid->name eq "list" or $kid->name eq "pushmark") {
                 # ignore
-            } elsif ($kid->name eq "refgen") {
+            } elsif ($kid->name eq "srefgen") {
                 # ignore, assume it is the last item in the list.
             } else {
                 die "Expected constant opcode but got " . $kid->name;
             }
             $kid = $kid->sibling;
         }
-        my $cvop = B::SVOP->new('const', 0, *parseparams);
+        my $cvop = B::SVOP->new('const', 0, \&parseparams);
         $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
         my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op);
         return $entersubop;
@@ -127,7 +127,7 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
 
     {
         sub foobar {
-            params 'foo', 'bar', \%( @_ );
+            params 'foo', 'bar', \%( < @_ );
             is $foo, 'foo-value', '$foo declared and initialized';
             is $bar, 'bar-value';
         }
