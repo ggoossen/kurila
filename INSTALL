@@ -2032,7 +2032,6 @@ make install will install the following:
 	prove		A command-line tool for running tests
 	psed		A Perl implementation of sed
 	s2p		sed-to-perl translator
-	splain		Describe Perl warnings and errors
 	xsubpp		Compiler to convert Perl XS code into C code
 
     library files
