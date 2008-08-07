@@ -43,7 +43,6 @@ sub genarray {
 
     if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
     elsif ($size +> $BigEnough) { $size = $BigEnough; }
-    @a = $size;			# preallocate array
     $items = int(sqrt($size));		# number of distinct items
     for ($i = 0; $i +< $size; ++$i) {
 	@a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
@@ -59,7 +58,7 @@ sub checkorder {
     my $status = '';			# so far, so good
     my ($i, $disorder);
 
-    for ($i = 0; $i +< @$aref-1; ++$i) {
+    for ($i = 0; $i +< nelems(@$aref)-1; ++$i) {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
@@ -77,14 +76,14 @@ sub checkorder {
 # Verify that the two array refs reference identical arrays
 
 sub checkequal {
-    my ($aref, $bref) = @_;
+    my ($aref, $bref) = < @_;
     my $status = '';
     my $i;
 
-    if (@$aref != @$bref) {
-	$status = "Sizes differ: " . @$aref . " vs " . @$bref;
+    if (nelems(@$aref) != nelems(@$bref)) {
+	$status = "Sizes differ: " . nelems(@$aref) . " vs " . nelems(@$bref);
     } else {
-	for ($i = 0; $i +< @$aref; ++$i) {
+	for ($i = 0; $i +< nelems(@$aref); ++$i) {
 	    next if ($aref->[$i] eq $bref->[$i]);
 	    $status = "Element $i differs: $aref->[$i] vs $bref->[$i]";
 	    last;
@@ -97,18 +96,18 @@ sub checkequal {
 # Test sort on arrays of various sizes (set up in @TestSizes)
 
 sub main {
-    my ($dothesort, $expect_unstable) = @_;
+    my ($dothesort, $expect_unstable) = < @_;
     my ($ts, $unsorted, @sorted, $status);
     my $unstable_num = 0;
 
-    foreach $ts (@TestSizes) {
+    foreach $ts (<@TestSizes) {
 	$unsorted = genarray($ts);
 	# Sort only on item portion of each element.
 	# There will typically be many repeated items,
 	# and their order had better be preserved.
 	@sorted = $dothesort->(sub { substr($a, 0, $RootWidth)
 				    cmp
-	                 substr($b, 0, $RootWidth) }, $unsorted);
+                                      substr($b, 0, $RootWidth) }, $unsorted);
 	$status = checkorder(\@sorted);
 	# Put the items back into the original order.
 	# The contents of the arrays had better be identical.
@@ -131,27 +130,27 @@ sub main {
 }
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub { @(sort {&{@_[0]}} @{@_[1]}) }, 0);
+main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
 
 {
     use sort qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
-    main(sub { sort {&{@_[0]}} @{@_[1]} }, 1);
+    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 1);
 }
 
 {
     use sort qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
-    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
+    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
 }
 
 {
     use sort qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
-    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
+    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
 }
 
 # Tests added to check "defaults" subpragma, and "no sort"
@@ -161,7 +160,7 @@ main(sub { @(sort {&{@_[0]}} @{@_[1]}) }, 0);
     no sort qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
-    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
+    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
 }
 
 {
@@ -175,5 +174,5 @@ main(sub { @(sort {&{@_[0]}} @{@_[1]}) }, 0);
     use sort qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
-    main(sub { sort {&{@_[0]}} @{@_[1]} }, 0);
+    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
 }
