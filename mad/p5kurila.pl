@@ -819,6 +819,116 @@ sub eval_to_try {
     }
 }
 
+sub sv_array_hash {
+    my $xml = shift;
+    for my $op ($xml->findnodes("//op_aassign")) {
+        my (undef, $right, $left) = $op->children;
+
+        next if $left->att('flags') =~ m/PARENS/;
+        my $svt;
+        $svt = $1 eq 'av' ? '@' : '%' if $left->child(1)->tag =~ m/op_(?:pad|rv2)(av|hv)/;
+        next unless $svt;
+
+        if ($right->child(1)->tag eq "op_null" 
+            and (get_madprop($right->child(1), 'round_open') || '') eq '(') {
+            set_madprop($right->child(1), 'round_open', "$svt(");
+        } else {
+            set_madprop($right, 'round_open', " $svt(");
+            set_madprop($right, 'round_close', ' )');
+        }
+    }
+
+    for my $op (map { $xml->findnodes("//op_$_") } qw|padav rv2av anonlist|) {
+        my $flags = $op->att('flags') || '';
+        my $main_prop = $op->tag eq "op_anonlist" ? 'square_open' : 'ary';
+        if ($flags =~ m/SCALAR/ and $flags !~ m/REF/) {
+            set_madprop($op, $main_prop, 'nelems(' . get_madprop($op, $main_prop));
+            set_madprop($op, 'round_open', "");
+            set_madprop($op, 'round_close', ')');
+            next;
+        }
+        next unless $flags; # only expand in list context.
+        next if ($op->att('private') || '') =~ m/INTRO/ and $flags =~ m/UNKNOWN/;
+        next if $flags =~ m/VOID/ or $op->parent->tag eq 'op_list' and $op->parent->att('flags') =~ m/VOID/;
+        next if $flags =~ m/SPECIAL/ and $op->parent->parent->tag eq "op_aassign";
+        next unless get_madprop($op, $main_prop);
+        next if $op->parent->tag =~ m/op_(aelem|push|unshift|shift|pop|splice|undef|tie|tied|delete|defined|aslice|chomp|return)/ or 
+            ($op->parent->att('was') || '') =~ m/^(aelem|aslice)$/;
+        next if $op->parent->parent->tag =~ m/op_(refgen|chomp)/;
+
+        if ($op->parent->tag eq "op_null" and $op->parent->parent->tag eq "op_join" and get_madprop($op->parent, "comma") eq '') {
+            # this is a auto generated join inside some double quoted construct.
+            set_madprop($op, $main_prop, q|{join ' ', &lt;| . get_madprop($op, $main_prop));
+            set_madprop($op, 'round_open', q||);
+            set_madprop($op, 'round_close', q|}|);
+            next;
+        }
+        set_madprop($op, $main_prop, '&lt; ' . get_madprop($op, $main_prop));
+    }
+    for my $op (map { $xml->findnodes("//op_$_") } qw|padhv rv2hv anonhash|) {
+        my $flags = $op->att('flags') || '';
+        my $main_prop = $op->tag eq "op_anonhash" ? 'curly_open' : 'hsh';
+        if ($op->att('flags') =~ m/SCALAR/ and $op->att('flags') !~ m/REF/) {
+            next; # probably hash used a boolean
+        }
+        next unless $flags =~ m/LIST/; # only expand in list context.
+        next if ($op->att('private') || '') =~ m/INTRO/ and $flags =~ m/UNKNOWN/;
+        next if $op->att('flags') =~ m/VOID/ or $op->parent->tag eq 'op_list' and $op->parent->att('flags') =~ m/VOID/;
+        next if $op->att('flags') =~ m/SPECIAL/ and $op->parent->parent->tag eq "op_aassign";
+        next unless get_madprop($op, $main_prop);
+        next if $op->parent->tag =~ m/op_(helem|each|keys|values|hslice|undef|tie|tied|delete|defined|hslice|return)/ or 
+            ($op->parent->att('was') || '') =~ m/helem|hslice/;
+        next if $op->parent->parent->tag eq "op_refgen";
+        next if (get_madprop($op, 'prototyped') || '') eq '\%';
+        set_madprop($op, $main_prop, '&lt; ' . get_madprop($op, $main_prop));
+    }
+
+    # add '<' in front of subcalls in list context.
+    for my $op (map { $xml->findnodes("//op_$_") } qw|entersub|) {
+        next unless $op->att('flags') =~ m/LIST/; # must be list context.
+
+        next if (get_madprop($op->parent, 'comma') || '') eq '=&gt;'; # skip if preceded by '=>'
+
+        set_madprop($op, 'wrap_open', ' &lt;');
+    }
+
+    # add @(...) around things which are lists in unknown context.
+    for my $op (map { $xml->findnodes(qq|//op_$_|) } qw|null split mapwhile grepwhile grep sort keys values list|) {
+        next unless ($op->att('flags') || '') =~ m/UNKNOWN/;
+        my $null_type = get_madprop($op, 'null_type') || '';
+        next unless $null_type =~ m/[(]|listop/ or $op->tag =~ m/mapwhile|grepwhile|list|keys|values/;
+
+        if ((get_madprop($op, 'null_type_first') || '') eq "quote") {
+            my $type = "quote";
+            set_madprop($op, $type."_open", '@(' . get_madprop($op, $type."_open"));
+            set_madprop($op, $type."_close", get_madprop($op, $type."_close") . ')');
+        }
+        if ($null_type eq "(") {
+            next unless $op->children > 3;
+        }
+        my $type = ($null_type eq "(" or $op->tag eq "op_list") ? "round" : "wrap";
+        set_madprop($op, $type."_open", ' @(');
+        set_madprop($op, $type."_close", ' )');
+    }
+
+    for my $op (map { $xml->findnodes(qq|//op_$_|) } qw|return|) {
+        next unless $op->children > 3;
+        set_madprop($op, 'operator', 'return @(');
+        set_madprop($op, 'round_close', ' )');
+    }
+}
+
+sub no_auto_deref {
+    my $xml = shift;
+    for my $x (qw|a h|) {
+        for my $op ($xml->findnodes("//op_${x}elem"), $xml->findnodes(qq|//op_null[\@was="${x}elem"]|)) {
+            next unless $op->child(1)->tag eq "op_rv2${x}v";
+            next if $op->child(1)->child(0)->tag eq "madprops";
+            set_madprop($op, 'arrow', '->');
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -891,9 +1001,11 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.10') {
 
 if ($from->{branch} ne "kurila" or $from->{v} < qv '1.11') {
     anon_aryhsh($twig);
+    eval_to_try($twig);
+    no_auto_deref($twig);
 }
 
-eval_to_try($twig);
+sv_array_hash($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
