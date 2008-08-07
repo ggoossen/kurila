@@ -10,7 +10,6 @@ sub OVERLOAD {
   my $package = shift;
   my %arg = %( < @_ );
   my ($sub, $fb);
-  no strict 'refs';
   % {*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
   *{Symbol::fetch_glob($package . "::()")} = \&nil; # Make it findable via fetchmethod.
   for (keys %arg) {
