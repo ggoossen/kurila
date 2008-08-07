@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';
+    @INC = @('../lib');
     require Config;
     if (%Config::Config{'uvsize'} != 8) {
         print "1..0 # Skip -- Perl configured with 32-bit ints\n";

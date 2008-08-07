@@ -362,7 +362,7 @@ exit $Exit;
 sub expr {
     $new = '"(assembly code)"' and return if m/\b__asm__\b/; # freak out.
     my $joined_args;
-    if(keys(%curargs)) {
+    if(%curargs) {
 	$joined_args = join('|', keys(%curargs));
     }
     while ($_ ne '') {
