@@ -87,6 +87,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 
     lock_keys(%hash);
     try { %hash = %( wubble => 42 ) };  # we know this will bomb
+    local $TODO = 1;
     like( $@->{description}, qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' );
     unlock_keys(%hash);
 }
@@ -97,6 +98,7 @@ is( %hash{locked}, 42,  'unlock_value' );
     lock_value(%hash, 'RO');
 
     try { %hash = %(KEY => 1) };
+    local $TODO = 1;
     like( $@->{description}, qr/^Attempt to delete readonly key 'RO' from a restricted hash/ );
 }
 
@@ -104,6 +106,7 @@ is( %hash{locked}, 42,  'unlock_value' );
     my %hash = %(KEY => 1, RO => 2);
     lock_keys(%hash);
     try { %hash = %(KEY => 1, RO => 2) };
+    local $TODO = 1;
     is( $@, '');
 }
 
@@ -112,9 +115,9 @@ is( %hash{locked}, 42,  'unlock_value' );
 {
     my %hash = %( () );
     lock_keys(%hash, qw(foo bar));
-    is( keys %hash, 0,  'lock_keys() w/keyset shouldnt add new keys' );
+    is( nkeys %hash, 0,  'lock_keys() w/keyset shouldnt add new keys' );
     %hash{foo} = 42;
-    is( keys %hash, 1 );
+    is( nkeys %hash, 1 );
     try { %hash{wibble} = 42 };
     like( $@->{description}, qr/^Attempt to access disallowed key 'wibble' in a restricted hash/,
                         'write threw error (locked)');
@@ -128,7 +131,7 @@ is( %hash{locked}, 42,  'unlock_value' );
 {
     my %hash = %(foo => 42, bar => undef, baz => 0);
     lock_keys(%hash, qw(foo bar baz up down));
-    is( keys %hash, 3,   'lock_keys() w/keyset didnt add new keys' );
+    is( nkeys %hash, 3,   'lock_keys() w/keyset didnt add new keys' );
     is_deeply( \%hash, \%( foo => 42, bar => undef, baz => 0 ),'is_deeply' );
 
     try { %hash{up} = 42; };
@@ -173,22 +176,22 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 
     lock_keys(%hash, 'first');
 
-    is (scalar keys %hash, 0, "place holder isn't a key");
+    is (nkeys %hash, 0, "place holder isn't a key");
     %hash{first} = 1;
-    is (scalar keys %hash, 1, "we now have a key");
+    is (nkeys %hash, 1, "we now have a key");
     delete %hash{first};
-    is (scalar keys %hash, 0, "now no key");
+    is (nkeys %hash, 0, "now no key");
 
     unlock_keys(%hash);
 
     %hash{interregnum} = 1.5;
-    is (scalar keys %hash, 1, "key again");
+    is (nkeys %hash, 1, "key again");
     delete %hash{interregnum};
-    is (scalar keys %hash, 0, "no key again");
+    is (nkeys %hash, 0, "no key again");
 
     lock_keys(%hash, 'second');
 
-    is (scalar keys %hash, 0, "place holder isn't a key");
+    is (nkeys %hash, 0, "place holder isn't a key");
 
     try {%hash{zeroeth} = 0};
     like ($@->{description},
@@ -198,22 +201,22 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
     like ($@->{description},
           qr/^Attempt to access disallowed key 'first' in a restricted hash/,
           'previously locked place holders should also fail');
-    is (scalar keys %hash, 0, "and therefore there are no keys");
+    is (nkeys %hash, 0, "and therefore there are no keys");
     %hash{second} = 1;
-    is (scalar keys %hash, 1, "we now have just one key");
+    is (nkeys %hash, 1, "we now have just one key");
     delete %hash{second};
-    is (scalar keys %hash, 0, "back to zero");
+    is (nkeys %hash, 0, "back to zero");
 
     unlock_keys(%hash); # We have deliberately left a placeholder.
 
     %hash{void} = undef;
     %hash{nowt} = undef;
 
-    is (scalar keys %hash, 2, "two keys, values both undef");
+    is (nkeys %hash, 2, "two keys, values both undef");
 
     lock_keys(%hash);
 
-    is (scalar keys %hash, 2, "still two keys after locking");
+    is (nkeys %hash, 2, "still two keys after locking");
 
     try {%hash{second} = -1};
     like ($@->{description},
@@ -252,8 +255,8 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
       my $message
 	= ($lock ? 'locked' : 'not locked') . ' keys ' . join ',', < @usekeys;
 
-      is (scalar keys %target, scalar keys %clean, "scalar keys for $message");
-      is (scalar values %target, scalar values %clean,
+      is (nkeys %target, nkeys %clean, "scalar keys for $message");
+      is (nelems(@( values %target)), nelems(@(values %clean)),
 	  "scalar values for $message");
       # Yes. All these sorts are necessary. Even for "identical hashes"
       # Because the data dependency of the test involves two of the strings
@@ -283,17 +286,19 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 }
 
 # Check clear works on locked empty hashes - SEGVs on 5.8.2.
-{
+TODO: {
+    todo_skip("magic", 1);
     my %hash;
     lock_hash(%hash);
     %hash = %( () );
-    ok(keys(%hash) == 0, 'clear empty lock_hash() hash');
+    ok(nkeys(%hash) == 0, 'clear empty lock_hash() hash');
 }
-{
+TODO: {
+    todo_skip("magic", 1);
     my %hash;
     lock_keys(%hash);
     %hash = %( () );
-    ok(keys(%hash) == 0, 'clear empty lock_keys() hash');
+    ok(nkeys(%hash) == 0, 'clear empty lock_keys() hash');
 }
 
 my $hash_seed = hash_seed();
@@ -327,17 +332,20 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
 	is ($counter, 0, "0 objects when hash key is deleted $state");
 	%hash{a} = undef;
 	is ($counter, 0, "Still 0 objects $state");
-	%hash = %( () );
-	is ($counter, 0, "0 objects after clear $state");
+      TODO: {
+            todo_skip("read-only", 1);
+            %hash = %( () );
+            is ($counter, 0, "0 objects after clear $state");
+        }
     }
 }
 {
     my %hash = %( map {$_,$_} qw(fwiffffff foosht teeoo) );
     lock_keys(%hash);
     delete %hash{fwiffffff};
-    is (scalar keys %hash, 2,"Count of keys after delete on locked hash");
+    is (nkeys %hash, 2,"Count of keys after delete on locked hash");
     unlock_keys(%hash);
-    is (scalar keys %hash, 2,"Count of keys after unlock");
+    is (nkeys %hash, 2,"Count of keys after unlock");
 
     my ($first, $value) = each %hash;
     is (%hash{$first}, $value, "Key has the expected value before the lock");
@@ -445,12 +453,12 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
     my @ph = @( () );
     my @lock = @('a', 'c', 'e', 'g');
     lock_keys(%hash, < @lock);
-    my $ref = all_keys(%hash, < @keys, < @ph);
+    my $ref = all_keys(%hash, @keys, @ph);
     my @crrack = @( sort(< @keys) );
     my @ooooff = @( qw(a c e) );
     my @bam = @( qw(g) );
 
-    ok(ref $ref eq ref \%hash && $ref == \%hash, 
+    ok(ref $ref eq ref \%hash && $ref \== \%hash, 
             "all_keys() - \$ref is a reference to \%hash");
     is_deeply(\@crrack, \@ooooff, "Keys are what they should be");
     is_deeply(\@ph, \@bam, "Placeholders in place");

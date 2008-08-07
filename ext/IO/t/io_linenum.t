@@ -20,9 +20,7 @@ sub lineno
 {
   my ($f) = < @_;
   my $l;
-  $l .= "$. ";
   $l .= $f->input_line_number;
-  $l .= " $.";                     # check $. before and after input_line_number
   $l;
 }
 
@@ -32,42 +30,41 @@ open (F, "<", $File) or die $!;
 my $io = IO::File->new($File) or die $!;
 
 ~< *F for (1 .. 10);
-ok(lineno($io), "10 0 10");
+ok(lineno($io), "0");
 
 $io->getline for (1 .. 5);
-ok(lineno($io), "5 5 5");
+ok(lineno($io), "5");
 
 ~< *F;
-ok(lineno($io), "11 5 11");
+ok(lineno($io), "5");
 
 $io->getline;
-ok(lineno($io), "6 6 6");
+ok(lineno($io), "6");
 
 $t = tell F;                                        # tell F; provokes a warning
-ok(lineno($io), "11 6 11");
+ok(lineno($io), "6");
 
 ~< *F;
-ok(lineno($io), "12 6 12");
+ok(lineno($io), "6");
 
 select F;
-ok(lineno($io), "12 6 12");
+ok(lineno($io), "6");
 
 ~< *F for (1 .. 10);
-ok(lineno($io), "22 6 22");
+ok(lineno($io), "6");
 
 $io->getline for (1 .. 5);
-ok(lineno($io), "11 11 11");
+ok(lineno($io), "11");
 
 $t = tell F;
 # We used to have problems here before local $. worked.
 # input_line_number() used to use select and tell.  When we did the
 # same, that mechanism broke.  It should work now.
-ok(lineno($io), "22 11 22");
+ok(lineno($io), "11");
 
 {
-  local $.;
   $io->getline for (1 .. 5);
-  ok(lineno($io), "16 16 16");
+  ok(lineno($io), "16");
 }
 
-ok(lineno($io), "22 16 22");
+ok(lineno($io), "16");
