@@ -15,8 +15,8 @@ if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
    @correct = @( grep { !m/^\./ } sort readdir(D) );
    closedir D;
 }
-my @a = @( < File::Glob::glob("*", 0) );
-@a = sort < @a;
+my @a = @( < File::Glob::bsd_glob("*", 0) );
+@a = @( sort < @a );
 if (GLOB_ERROR) {
     fail(GLOB_ERROR);
 } else {
@@ -147,17 +147,17 @@ pass("Don't panic");
     use File::Temp qw(tempdir);
     use File::Spec qw();
 
-    my($dir) = < tempdir(CLEANUP => 1)
+    my $dir = tempdir(CLEANUP => 1)
 	or die "Could not create temporary directory";
     for my $file (qw(a_dej a_ghj a_qej)) {
-	open my $fh, ">", < File::Spec->catfile($dir, $file)
+	open my $fh, ">", File::Spec->catfile($dir, $file)
 	    or die "Could not create file $dir/$file: $!";
 	close $fh;
     }
     my $cwd = Cwd::cwd();
     chdir $dir
 	or die "Could not chdir to $dir: $!";
-    my(@glob_files) = glob@( <'a*{d[e]}j');
+    my @glob_files = glob('a*{d[e]}j');
     local $TODO = "home-made glob doesn't do regexes" if $^O eq 'VMS';
     is_deeply(\@glob_files, \@('a_dej'));
     chdir $cwd
