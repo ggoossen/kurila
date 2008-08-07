@@ -158,12 +158,6 @@ sub Compress::Zlib::gzFile::gzread
 
     my $len = defined @_[1] ? @_[1] : 4096 ; 
 
-#     if ($self->gzeof() || $len == 0) {
-#         # Zap the output buffer to match ver 1 behaviour.
-#         @_[0] = "" ;
-#         return 0 ;
-#     }
-
     my $gz = $self->[0] ;
     my $status = $gz->read(@_[0], $len) ; 
     _save_gzerr($gz, 1);
@@ -239,19 +233,6 @@ sub Compress::Zlib::gzFile::gzclose
     my $status = $gz->close() ;
     my $err = _save_gzerr($gz);
     return $status ? 0 : $err;
-}
-
-sub Compress::Zlib::gzFile::gzeof
-{
-    my $self = shift ;
-    my $gz = $self->[0] ;
-
-    return 0
-        if $self->[1] ne 'inflate';
-
-    my $status = $gz->eof() ;
-    _save_gzerr($gz);
-    return $status ;
 }
 
 sub Compress::Zlib::gzFile::gzsetparams

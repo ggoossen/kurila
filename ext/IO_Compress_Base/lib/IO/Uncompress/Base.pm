@@ -1263,7 +1263,7 @@ sub seek
     my $offset = $target - $here ;
 
     my $got;
-    while (($got = $self->read(my $buffer, < min($offset, $self->{BlockSize})) ) +> 0)
+    while (($got = $self->read(my $buffer, min($offset, $self->{BlockSize})) ) +> 0)
     {
         $offset -= $got;
         last if $offset == 0 ;

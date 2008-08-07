@@ -22,7 +22,7 @@ BEGIN {
     $extra = 1
         if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    plan tests => 248 + $extra ;
+    plan tests => 179 + $extra ;
 
 }
 
@@ -64,23 +64,14 @@ ok ! $fil->gzclose ;
 
 ok $fil = gzopen($name, "rb") ;
 
-ok ! $fil->gzeof() ;
 is $gzerrno, 0, 'gzerrno is 0';
 is $fil->gztell(), 0;
 
 is $fil->gzread($uncomp), $len; 
 
 is $fil->gztell(), $len;
-ok   $fil->gzeof() ;
-
-# gzread after eof bahavior
-
-my $xyz = "123" ;
-is $fil->gzread($xyz), 0, "gzread returns 0 on eof" ;
-is $xyz, "", "gzread on eof zaps the output buffer [Match 1,x behavior]" ;
 
 ok ! $fil->gzclose ;
-ok   $fil->gzeof() ;
 
 
 1 while unlink $name ;
@@ -111,10 +102,8 @@ ok (($x = $fil->gzread($uncomp)) == $num_len) ;
 
 ok $fil->gzerror() == 0 || $fil->gzerror() == Z_STREAM_END;
 ok $gzerrno == 0 || $gzerrno == Z_STREAM_END;
-ok   $fil->gzeof() ;
 
 ok ! $fil->gzclose ;
-ok   $fil->gzeof() ;
 
 ok $gzerrno == 0
     or print "# gzerrno is $gzerrno\n" ;
@@ -145,8 +134,6 @@ ok ! $f->gzclose ;
 
 ok $f = gzopen($file, "rb") ;
  
-ok ! $f->gzeof() ;
-
 my $uncompressed ;
 is $f->gzread($uncompressed, $len), $len ;
 
@@ -155,7 +142,6 @@ ok $contents eq $uncompressed
     or print "# Length orig $len" . 
              ", Length uncompressed " . length($uncompressed) . "\n" ;
 
-ok $f->gzeof() ;
 ok ! $f->gzclose ;
 
 1 while unlink($file) ;
@@ -175,7 +161,7 @@ EOM
 the final line
 EOM
 
-$text = join("", @text) ;
+$text = join("", < @text) ;
 
 ok $fil = gzopen($name, "wb") ;
 ok $fil->gzwrite($text) == length $text ;
@@ -183,26 +169,21 @@ ok ! $fil->gzclose ;
 
 # now try to read it back in
 ok $fil = gzopen($name, "rb") ;
-ok ! $fil->gzeof() ;
 my $line = '';
-for my $i (0 .. @text -2)
+for my $i (0 .. nelems(@text) -2)
 {
     ok $fil->gzreadline($line) +> 0;
     is $line, @text[$i] ;
-    ok ! $fil->gzeof() ;
 }
 
 # now read the last line
 ok $fil->gzreadline($line) +> 0;
 is $line, @text[-1] ;
-ok $fil->gzeof() ;
 
 # read past the eof
 is $fil->gzreadline($line), 0;
 
-ok   $fil->gzeof() ;
 ok ! $fil->gzclose ;
-ok   $fil->gzeof() ;
 1 while unlink($name) ;
 
 # a text file with a very long line (bigger than the internal buffer)
@@ -215,20 +196,17 @@ ok ! $fil->gzclose ;
 
 # now try to read it back in
 ok $fil = gzopen($name, "rb") ;
-ok ! $fil->gzeof() ;
 my $i = 0 ;
-my @got = ();
+my @got = @();
 while ($fil->gzreadline($line) +> 0) {
-    @got[$i] = $line ;    
+    @got[$i] = $line ;
     ++ $i ;
 }
 is $i, 2 ;
 is @got[0], $line1 ;
 is @got[1], $line2 ;
 
-ok   $fil->gzeof() ;
 ok ! $fil->gzclose ;
-ok   $fil->gzeof() ;
 
 1 while unlink $name ;
 
@@ -244,7 +222,7 @@ ok ! $fil->gzclose ;
 
 # now try to read it back in
 ok $fil = gzopen($name, "rb") ;
-@got = () ; $i = 0 ;
+@got = @() ; $i = 0 ;
 while ($fil->gzreadline($line) +> 0) {
     @got[$i] = $line ;    
     ++ $i ;
@@ -253,7 +231,6 @@ is $i, 2 ;
 is @got[0], $line1 ;
 is @got[1], $line2 ;
 
-ok   $fil->gzeof() ;
 ok ! $fil->gzclose ;
 
 1 while unlink $name ;
@@ -279,20 +256,15 @@ ok ! $fil->gzclose ;
     
     # now try to read it back in
     ok $fil = gzopen($name, "rb"), '  gzopen for read ok' ;
-    ok ! $fil->gzeof(), '    !gzeof' ;
     cmp_ok $fil->gzreadline($line), '+>', 0, '    gzreadline' ;
     is $fil->gztell(), length $line1, '    gztell ok' ;
-    ok ! $fil->gzeof(), '    !gzeof' ;
     is $line, $line1, '    got expected line' ;
     cmp_ok $fil->gzread($line, length $line2), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($line1)+length($line2), '    gztell ok' ;
-    ok ! $fil->gzeof(), '    !gzeof' ;
     is $line, $line2, '    read expected block' ;
     cmp_ok $fil->gzread($line, length $line3), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($text), '    gztell ok' ;
-    ok   $fil->gzeof(), '    !gzeof' ;
     is $line, $line3, '    read expected block' ;
-    ok ! $fil->gzclose, '  gzclose'  ;
 }
 
 {
@@ -320,95 +292,11 @@ ok ! $fil->gzclose ;
     ok (($x = $fil->gzread($uncomp)) == $len) 
         or print "# length $x, expected $len\n" ;
 
-    ok   $fil->gzeof() ;
     ok ! $fil->gzclose ;
-    ok   $fil->gzeof() ;
 
     is $uncomp, $hello, "got expected output" ;
 }
 
-
-{
-    title "Pass gzopen a filehandle - use open" ;
-
-    my $lex = LexFile->new( my $name) ;
-
-    my $hello = "hello" ;
-    my $len = length $hello ;
-
-    open F, ">", "$name" ;
-
-    my $fil;
-    ok $fil = gzopen(*F, "wb") ;
-
-    is $fil->gzwrite($hello), $len ;
-
-    ok ! $fil->gzclose ;
-
-    open F, "<", "$name" ;
-    ok $fil = gzopen(*F, "rb") ;
-
-    my $uncmomp;
-    $x = $fil->gzread($uncomp);
-    is $x, $len ;
-
-    ok   $fil->gzeof() ;
-    ok ! $fil->gzclose ;
-    ok   $fil->gzeof() ;
-
-    is $uncomp, $hello ;
-
-
-}
-
-foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
-{
-    my $stdin = $stdio->[0];
-    my $stdout = $stdio->[1];
-
-    title "Pass gzopen a filehandle - use {dump::view($stdin)}" ;
-
-    my $lex = LexFile->new( my $name) ;
-
-    my $hello = "hello" ;
-    my $len = length $hello ;
-
-    ok open(SAVEOUT, ">&", \*STDOUT), "  save STDOUT";
-    my $dummy = fileno SAVEOUT;
-    ok open(STDOUT, ">", "$name"), "  redirect STDOUT" ;
-    
-    my $status = 0 ;
-
-    my $fil = gzopen($stdout, "wb") ;
-
-    $status = $fil && 
-              ($fil->gzwrite($hello) == $len) &&
-              ($fil->gzclose == 0) ;
-
-    open(STDOUT, ">&", \*SAVEOUT);
-
-    ok $status, "  wrote to stdout";
-
-       open(SAVEIN, "<&", \*STDIN);
-    ok open(STDIN, "<", "$name"), "  redirect STDIN";
-    $dummy = fileno SAVEIN;
-
-    ok $fil = gzopen($stdin, "rb") ;
-
-    my $uncmomp;
-    ok (($x = $fil->gzread($uncomp)) == $len) 
-        or print "# length $x, expected $len\n" ;
-
-    ok   $fil->gzeof() ;
-    ok ! $fil->gzclose ;
-    ok   $fil->gzeof() ;
-
-       open(STDIN, "<&", \*SAVEIN);
-
-    is $uncomp, $hello ;
-
-
-}
 
 {
     title 'test parameters for gzopen';
@@ -444,7 +332,6 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
     my $lex = LexFile->new( my $name) ;
     my $fil;
     ok $fil = gzopen($name, "wb"), '  gzopen for writing' ;
-    ok !$fil->gzeof(), '    !eof'; ;
     is $fil->gzread(), Z_STREAM_ERROR, "    gzread returns Z_STREAM_ERROR" ;
     ok ! $fil->gzclose, "  gzclose ok" ;
 }
@@ -531,7 +418,6 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 
     my $io = gzopen($name, "r");
     ok $io->gzseek(length($first), SEEK_CUR) ;
-    ok ! $io->gzeof;
     is $io->gztell(), length($first);
 
     ok $io->gzread($buff, 5) ;
@@ -550,7 +436,6 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
     is $io->gztell(), $here+5 ;
     ok $io->gzread($buff, 100) ;
     ok $buff eq $last ;
-    ok $io->gzeof;
 }
 
 {
@@ -581,27 +466,6 @@ foreach my $stdio ( \@('-', '-'), \@(\*STDIN, \*STDOUT))
 
     try { $u->gzseek(-1, SEEK_CUR) ; };
     like $@->{description}, mkErr("seek: cannot seek backwards");
-}
-
-{
-    title "gzread ver 1.x compat -- the output buffer is always zapped.";
-    my $lex = LexFile->new( my $name) ;
-
-    my $a = gzopen($name, "w");
-    $a->gzwrite("fred");
-    $a->gzclose ;
-
-    my $u = gzopen($name, "r");
-
-    my $buf1 ;
-    is $u->gzread($buf1, 0), 0, "  gzread returns 0";
-    ok defined $buf1, "  output buffer defined";
-    is $buf1, "", "  output buffer empty string";
-
-    my $buf2 = "qwerty";
-    is $u->gzread($buf2, 0), 0, "  gzread returns 0";
-    ok defined $buf2, "  output buffer defined";
-    is $buf2, "", "  output buffer empty string";
 }
 
 {
