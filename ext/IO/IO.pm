@@ -15,7 +15,7 @@ sub import {
     warnings::warnif('deprecated', qq{Parameterless "use IO" deprecated})
         if (nelems @_) == 0 ;
     
-    my @l = @( (nelems @_) ? < @_ : qw(Handle Seekable File Pipe Socket Dir) );
+    my @l = @( (nelems @_) ? < @_ : qw(Handle Seekable File Socket Dir) );
 
     eval join("", map { "require IO::" . @(m/(\w+)/)[0] . ";\n" } < @l)
 	or die $@;
@@ -42,7 +42,6 @@ in one go.  The IO modules belonging to the core are:
       IO::Handle
       IO::Seekable
       IO::File
-      IO::Pipe
       IO::Socket
       IO::Dir
       IO::Select
@@ -59,7 +58,7 @@ documentation.
 
     use IO;                # loads all the modules listed below
 
-The loaded modules are IO::Handle, IO::Seekable, IO::File, IO::Pipe,
+The loaded modules are IO::Handle, IO::Seekable, IO::File,
 IO::Socket, IO::Dir.  You should instead explicitly import the IO
 modules you want.
 

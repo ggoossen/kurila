@@ -12,7 +12,7 @@ use strict;
 use File::Path;
 use File::Spec;
 require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
-plan(tests => 18);
+plan(tests => 17);
 
 {
 	require XSLoader;
@@ -30,7 +30,7 @@ plan(tests => 18);
 	is( @load[0]->[1], $IO::VERSION, '... with the current .pm version' );
 }
 
-my @default = @( map { "IO/$_.pm" } qw( Handle Seekable File Pipe Socket Dir ) );
+my @default = @( map { "IO/$_.pm" } qw( Handle Seekable File Socket Dir ) );
 delete %INC{[< @default ]};
 
 my $warn = '' ;
