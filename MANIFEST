@@ -870,8 +870,6 @@ lib/CORE.pod			document the CORE namespace
 lib/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
 lib/DB.pm			Debugger API (draft)
 lib/DB.t			See if DB works
-lib/diagnostics.pm		Print verbose diagnostics
-lib/diagnostics.t		See if diagnostics.pm works
 lib/Digest/base.pm		Digest extensions
 lib/Digest/Changes		Digest changelog
 lib/Digest/file.pm		Digest extensions
