@@ -21,15 +21,6 @@ EXPECT
 Invalid type ',' in unpack at - line 4.
 Invalid type ',' in pack at - line 5.
 ########
-# pp.c
-use warnings 'uninitialized' ;
-my $a = undef ; 
-my $b = $$a;
-no warnings 'uninitialized' ;
-my $c = $$a;
-EXPECT
-Can't use an undefined value as a SCALAR reference at - line 4.
-########
 # pp_pack.c
 use warnings 'pack' ;
 sub foo { my $a = "a"; return $a . $a++ . $a++ }
@@ -38,14 +29,6 @@ no warnings 'pack' ;
 my $b = pack("p", &foo) ;
 EXPECT
 Attempt to pack pointer to temporary value at - line 4.
-########
-# pp.c
-use warnings 'misc' ;
-bless \\@(), "" ;
-no warnings 'misc' ;
-bless \\@(), "" ;
-EXPECT
-Explicit blessing to '' (assuming package main) at - line 3.
 ########
 # pp_pack.c
 use warnings 'pack' ;

@@ -1,8 +1,5 @@
   pp_sys.c 	AOK
 
-  untie attempted while %d inner references still exist	[pp_untie]
-    sub TIESCALAR { bless [] } ; tie $a, 'main'; untie $a ;
-
   fileno() on unopened filehandle abc		[pp_fileno]
     $a = "abc"; fileno($a)
 
@@ -93,59 +90,6 @@
   Non-string passed as bitmask			[pp_sselect]
 
 __END__
-# pp_sys.c [pp_untie]
-use warnings 'untie' ;
-sub TIESCALAR { bless \@() } ; 
-$b = tie $a, 'main'; 
-untie $a ;
-no warnings 'untie' ;
-our $c = tie our $d, 'main'; 
-untie $d ;
-EXPECT
-untie attempted while 1 inner references still exist at - line 5.
-########
-# pp_sys.c [pp_prtf]
-use warnings 'unopened' ;
-$a = "abc"; 
-printf $a "fred";
-no warnings 'unopened' ;
-printf $a "fred";
-EXPECT
-Can't use string ("abc") as a symbol ref while "strict refs" in use at - line 4.
-########
-# pp_sys.c [pp_prtf]
-use warnings 'closed' ;
-close STDIN ;
-printf STDIN "fred";
-opendir STDIN, ".";
-printf STDIN "fred";
-closedir STDIN;
-no warnings 'closed' ;
-printf STDIN "fred";
-opendir STDIN, ".";
-printf STDIN "fred";
-EXPECT
-printf() on closed filehandle STDIN at - line 4.
-printf() on closed filehandle STDIN at - line 6.
-	(Are you trying to call printf() on dirhandle STDIN?)
- at - line 6.
-########
-# pp_sys.c [pp_prtf]
-use warnings 'io' ;
-printf STDIN "fred";
-no warnings 'io' ;
-printf STDIN "fred";
-EXPECT
-Filehandle STDIN opened only for input at - line 3.
-########
-# pp_sys.c [pp_send]
-use warnings 'io' ;
-syswrite STDIN, "fred";
-no warnings 'io' ;
-syswrite STDIN, "fred";
-EXPECT
-Filehandle STDIN opened only for input at - line 3.
-########
 # pp_sys.c [pp_send]
 use warnings 'closed' ;
 close STDIN; 
@@ -369,7 +313,7 @@ read() on unopened filehandle NONEXISTENT at - line 20.
 # pp_sys.c [pp_binmode]
 use warnings 'unopened' ;
 binmode(BLARG);
-$a = *BLERG;binmode($a);
+$a = \*BLERG;binmode($a);
 EXPECT
 binmode() on unopened filehandle BLARG at - line 3.
 binmode() on unopened filehandle BLERG at - line 4.
@@ -388,28 +332,6 @@ close $fh;
 EXPECT
 lstat() on filehandle FH at - line 4.
 lstat() on filehandle $fh at - line 6.
-########
-# pp_sys.c [pp_getc]
-use warnings qw(unopened closed) ;
-getc FOO;
-close STDIN;
-getc STDIN;
-# Create an empty file
-my $file = 'getcwarn.tmp';
-open FH1, ">", "$file" or die "# $!"; close FH1;
-open FH2, "<", $file    or die "# $!";
-getc FH2; # Should not warn at EOF
-close FH2;
-getc FH2; # Warns, now
-unlink $file;
-no warnings qw(unopened closed) ;
-getc FOO;
-getc STDIN;
-getc FH2;
-EXPECT
-getc() on unopened filehandle FOO at - line 3.
-getc() on closed filehandle STDIN at - line 5.
-getc() on closed filehandle FH2 at - line 12.
 ########
 # pp_sys.c [pp_sselect]
 use warnings 'misc';

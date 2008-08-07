@@ -243,7 +243,7 @@ my $x;
 EXPECT
 
 ########
-# pad.c
+# TODO pad.c
 use warnings 'misc' ;
 our $x ;
 our $x ;
@@ -263,6 +263,7 @@ EXPECT
 "our" variable $x redeclared at - line 4.
 "our" variable $y redeclared at - line 5.
 ########
+# TODO
 use warnings 'misc' ;
 our $x;
 {

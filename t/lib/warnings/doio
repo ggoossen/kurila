@@ -100,7 +100,7 @@ $a = seek(STDIN,1,1);
 $a = sysseek(STDIN,1,1);
 -x STDIN ;
 stat(STDIN) ;
-$a = *fred;
+$a = \*fred;
 tell($a);
 seek($a,1,1);
 sysseek($a,1,1);
@@ -113,7 +113,7 @@ $a = seek(STDIN,1,1);
 $a = sysseek(STDIN,1,1);
 -x STDIN ;
 stat(STDIN) ;
-$a = *fred;
+$a = \*fred;
 tell($a);
 seek($a,1,1);
 sysseek($a,1,1);
@@ -137,7 +137,7 @@ print $a ;
 no warnings 'uninitialized' ;
 print $b ;
 EXPECT
-Use of uninitialized value $a in print at - line 3.
+Use of uninitialized value $main::a in print at - line 3.
 ########
 # doio.c [Perl_my_stat Perl_my_lstat]
 use warnings 'io' ;
@@ -207,19 +207,19 @@ my $filename = "./temp.dir" ;
 mkdir $filename, 0777 
   or die "Cannot create directory $filename: $!\n" ;
 {
-    local (@ARGV) = ($filename) ;
+    local @ARGV = @($filename) ;
     local ($^I) = "" ;
     my $x = ~< *ARGV ;
 }
 {
     no warnings 'inplace' ;
-    local (@ARGV) = ($filename) ;
+    local @ARGV = @($filename) ;
     local ($^I) = "" ;
     my $x = ~< *ARGV ;
 }
 {
     use warnings 'inplace' ;
-    local (@ARGV) = ($filename) ;
+    local @ARGV = @($filename) ;
     local ($^I) = "" ;
     my $x = ~< *ARGV ;
 }

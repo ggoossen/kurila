@@ -129,43 +129,6 @@ EXPECT
 ########
 # toke.c
 use warnings 'syntax' ;
-my $a =+ 2 ;
-$a =- 2 ;
-$a =* 2 ;
-$a =% 2 ;
-$a =& 2 ;
-$a =. 2 ;
-$a =^ 2 ;
-$a =| 2 ;
-$a =< 2 ;
-$a =/ 2 ;
-EXPECT
-Reversed += operator at - line 3.
-Reversed -= operator at - line 4.
-Reversed *= operator at - line 5.
-Reversed %= operator at - line 6.
-Reversed &= operator at - line 7.
-Reversed .= operator at - line 8.
-syntax error at - line 8, near "=."
-Reversed ^= operator at - line 9.
-Expected ^,&,| or ~ after a ^, but found ' ' at - line 9.
-########
-# toke.c
-no warnings 'syntax' ;
-my $a =+ 2 ;
-$a =- 2 ;
-$a =* 2 ;
-$a =% 2 ;
-$a =& 2 ;
-$a =. 2 ;
-$a =< 2 ;
-$a =/ 2 ;
-EXPECT
-syntax error at - line 8, near "=."
-No operator expected, but found '<', '<=' or '<=>' operator at - line 9.
-########
-# toke.c
-use warnings 'syntax' ;
 $_ = "ab" ; 
 s/(ab)/{\1}/;
 no warnings 'syntax' ;
@@ -178,17 +141,17 @@ Execution of - aborted due to compilation errors. at - line 7.
 ########
 # toke.c
 use warnings 'qw' ;
-our @a = qw(a, b, c) ;
+our @a = @(qw(a, b, c) );
 no warnings 'qw' ;
-@a = qw(a, b, c) ;
+@a = @(qw(a, b, c) );
 EXPECT
 Possible attempt to separate words with commas at - line 3.
 ########
 # toke.c
 use warnings 'qw' ;
-our @a = qw(a b #) ;
+our @a = @(qw(a b #) );
 no warnings 'qw' ;
-@a = qw(a b #) ;
+@a = @(qw(a b #) );
 EXPECT
 Possible attempt to put comments in qw() list at - line 3.
 ########
@@ -420,16 +383,6 @@ Misplaced _ in number at - line 42.
 123
 12.34
 12340000000000
-########
-# toke.c
-use warnings 'bareword' ;
-#line 25 "bar"
-$a = FRED:: ;
-no warnings 'bareword' ;
-#line 25 "bar"
-$a = FRED:: ;
-EXPECT
-Bareword "FRED::" refering to a package are not allowed at bar line 25.
 ########
 # toke.c
 use warnings 'ambiguous' ;
@@ -680,27 +633,6 @@ Number found where operator expected at (eval 1) line 1, near "5 6"
 	(Missing operator before  6?)
  at (eval 1) line 1.
     (eval) called at - line 3.
-########
-# toke.c
-use warnings "syntax";
-$_ = $a = 1;
-$a !=~  m/1/;
-$a !=~ m#1#;
-$a !=~m/1/;
-$a !=~ y/1//;
-$a !=~ tr/1//;
-$a !=~ s/1//;
-$a != ~/1/;
-no warnings "syntax";
-$a !=~  m/1/;
-$a !=~ m#1#;
-$a !=~m/1/;
-$a !=~ y/1//;
-$a !=~ tr/1//;
-$a !=~ s/1//;
-EXPECT
-!=~ should be !~ at - line 4.
-Unknown operator '~' found at - line 4.
 ########
 # toke.c
 our $foo :unique;
