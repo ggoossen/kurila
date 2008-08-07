@@ -56,22 +56,7 @@ my $x = 1 + @a[0] ; # a
 no warnings 'uninitialized' ;
 $x = 1 + @b[0] ; # a
 EXPECT
-Use of uninitialized value @a[0] in integer addition (+) at - line 4.
-########
-# sv.c (sv_2iv)
-package fred ;
-sub TIESCALAR { my $x ; bless \$x}
-sub FETCH { return undef }
-sub STORE { return 1 }
-package main ;
-tie my $A, 'fred' ;
-use integer ;
-use warnings 'uninitialized' ;
-$A *= 2 ;
-no warnings 'uninitialized' ;
-$A *= 2 ;
-EXPECT
-Use of uninitialized value $A in integer multiplication (*) at - line 10.
+Use of uninitialized value @main::a[0] in integer addition (+) at - line 4.
 ########
 # sv.c
 use integer ;
@@ -82,22 +67,6 @@ my $y *= 2 ; #b
 EXPECT
 Use of uninitialized value $x in integer multiplication (*) at - line 4.
 ########
-# sv.c (sv_2uv)
-package fred ;
-sub TIESCALAR { my $x ; bless \$x}
-sub FETCH { return undef }
-sub STORE { return 1 }
-package main ;
-tie my $A, 'fred' ;
-use warnings 'uninitialized' ;
-my $B = 0 ;
-$B ^|^= $A ;
-no warnings 'uninitialized' ;
-$B = 0 ;
-$B ^|^= $A ;
-EXPECT
-Use of uninitialized value $A in bitwise or (^|^) at - line 10.
-########
 # sv.c
 use warnings 'uninitialized' ;
 my $Y = 1 ;  our @a;
@@ -106,7 +75,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; our @b;
 $x = 1 ^|^ @b[$Y] ;
 EXPECT
-Use of uninitialized value within @a in bitwise or (^|^) at - line 4.
+Use of uninitialized value within @main::a in bitwise or (^|^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -116,7 +85,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; our @b;
 $x = 1 ^&^ @b[$Y] ;
 EXPECT
-Use of uninitialized value within @a in bitwise and (^&^) at - line 4.
+Use of uninitialized value within @main::a in bitwise and (^&^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -126,7 +95,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ;  our @b;
 $x = ^~^@b[$Y] ;
 EXPECT
-Use of uninitialized value within @a in 1's complement (^~^) at - line 4.
+Use of uninitialized value within @main::a in 1's complement (^~^) at - line 4.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -142,21 +111,7 @@ my $x = 1 + @a[0] ; # e
 no warnings 'uninitialized' ;
 $x = 1 + @b[0] ; # e
 EXPECT
-Use of uninitialized value @a[0] in addition (+) at - line 3.
-########
-# sv.c (sv_2nv)
-package fred ;
-sub TIESCALAR { my $x ; bless \$x}
-sub FETCH { return undef }
-sub STORE { return 1 }
-package main ;
-tie my $A, 'fred' ;
-use warnings 'uninitialized' ;
-$A *= 2 ;
-no warnings 'uninitialized' ;
-$A *= 2 ;
-EXPECT
-Use of uninitialized value $A in multiplication (*) at - line 9.
+Use of uninitialized value @main::a[0] in addition (+) at - line 3.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -182,22 +137,6 @@ $x = chop my $z ; # h
 EXPECT
 Use of uninitialized value $y in scalar chop at - line 3.
 ########
-# sv.c (sv_2pv)
-package fred ;
-sub TIESCALAR { my $x ; bless \$x}
-sub FETCH { return undef }
-sub STORE { return 1 }
-package main ;
-tie my $A, 'fred' ;
-use warnings 'uninitialized' ;
-my $B = "" ;
-$B .= $A ;
-no warnings 'uninitialized' ;
-my $C = "" ;
-$C .= $A ;
-EXPECT
-Use of uninitialized value $A in concatenation (.) or string at - line 10.
-########
 # perlbug 20011116.125
 use warnings 'uninitialized';
 $a = undef;
@@ -205,20 +144,9 @@ my $foo = join '', $a, "\n";
 $foo = "$a\n";
 $foo = "a:$a\n";
 EXPECT
-Use of uninitialized value $a in join or string at - line 4.
-Use of uninitialized value $a in concatenation (.) or string at - line 5.
-Use of uninitialized value $a in concatenation (.) or string at - line 6.
-########
-# sv.c 
-use warnings 'numeric' ;
-sub TIESCALAR{bless \@()} ; 
-sub FETCH {"def"} ; 
-tie $a,"main" ; 
-my $b = 1 + $a;
-no warnings 'numeric' ;
-my $c = 1 + $a;
-EXPECT
-Argument "def" isn't numeric in addition (+) at - line 6.
+Use of uninitialized value $main::a in join or string at - line 4.
+Use of uninitialized value $main::a in concatenation (.) or string at - line 5.
+Use of uninitialized value $main::a in concatenation (.) or string at - line 6.
 ########
 # sv.c
 use warnings 'numeric' ;
