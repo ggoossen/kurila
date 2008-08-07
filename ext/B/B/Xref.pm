@@ -173,22 +173,22 @@ sub xref {
 	warn < peekop($op), "\n" if $debug_op;
 	my $opname = $op->name;
 	if ($opname =~ m/^(or|and|mapwhile|grepwhile|range|cond_expr)$/) {
-	    xref( <$op->other);
+	    xref($op->other);
 	} elsif ($opname eq "match" || $opname eq "subst") {
-	    xref( <$op->pmreplstart);
+	    xref($op->pmreplstart);
 	} elsif ($opname eq "substcont") {
-	    xref( <$op->other->pmreplstart);
+	    xref($op->other->pmreplstart);
 	    $op = $op->other;
 	    redo;
 	} elsif ($opname eq "enterloop") {
-	    xref( <$op->redoop);
-	    xref( <$op->nextop);
-	    xref( <$op->lastop);
+	    xref($op->redoop);
+	    xref($op->nextop);
+	    xref($op->lastop);
 	} elsif ($opname eq "subst") {
-	    xref( <$op->pmreplstart);
+	    xref($op->pmreplstart);
 	} else {
 	    no strict 'refs';
-	    my $ppname = *{Symbol::fetch_glob("pp_$opname")};
+	    my $ppname = \&{*{Symbol::fetch_glob("pp_$opname")}};
 	    &$ppname($op) if defined(&$ppname);
 	}
     }
@@ -198,20 +198,20 @@ sub xref_cv {
     my $cv = shift;
     my $pack = $cv->GV->STASH->NAME;
     $subname = ($pack eq "main" ? "" : "$pack\::") . $cv->GV->NAME;
-    load_pad( <$cv->PADLIST);
-    xref( <$cv->START);
+    load_pad($cv->PADLIST);
+    xref($cv->START);
     $subname = "(main)";
 }
 
 sub xref_object {
     my $cvref = shift;
-    xref_cv( <svref_2object($cvref));
+    xref_cv(svref_2object($cvref));
 }
 
 sub xref_main {
     $subname = "(main)";
     load_pad(comppadlist);
-    xref( <main_start);
+    xref(main_start);
     while ((nelems @todo)) {
 	xref_cv(shift @todo);
     }
@@ -255,7 +255,7 @@ sub pp_gvsv {
     }
     else {
 	$gv = $op->gv;
-	$top = \@( <$gv->STASH->NAME, '$', < $gv->SAFENAME);
+	$top = \@($gv->STASH->NAME, '$', $gv->SAFENAME);
     }
     process($top, $op->private ^&^ OPpLVAL_INTRO ||
                   $op->private ^&^ OPpOUR_INTRO   ? "intro" : "used");
@@ -271,7 +271,7 @@ sub pp_gv {
     }
     else {
 	$gv = $op->gv;
-	$top = \@( <$gv->STASH->NAME, "*", < $gv->SAFENAME);
+	$top = \@($gv->STASH->NAME, "*", $gv->SAFENAME);
     }
     process($top, $op->private ^&^ OPpLVAL_INTRO ? "intro" : "used");
 }
@@ -283,7 +283,7 @@ sub pp_const {
     if ($$sv) {
 	$top = \@("?", "",
 		(class($sv) ne "SPECIAL" && $sv->FLAGS ^&^ SVf_POK)
-		? < cstring( <$sv->PV) : "?");
+		? cstring($sv->PV) : "?");
     }
     else {
 	$top = @pad[$op->targ];

@@ -66,7 +66,7 @@ SKIP: {
     our $buf = 'arb startval';
     my $ak = B::Showlex::walk_output (\$buf);
 
-    my $walker = B::Showlex::compile( $newlex, sub{my($foo,$bar)} );
+    my $walker = B::Showlex::compile( $newlex, sub{my($foo,$bar); 1} );
     $walker->();
     $na = padrep('$foo',$newlex);
     $nb = padrep('$bar',$newlex);
@@ -77,8 +77,8 @@ SKIP: {
 
     $ak = B::Showlex::walk_output (\$buf);
 
-    my $src = 'sub { my ($scalar,@arr,%hash) }';
-    my $sub = eval $src;
+    my $src = 'sub { my ($scalar,@arr,%hash); 1 }';
+    my $sub = eval $src; die if $@;
     $walker = B::Showlex::compile($sub);
     $walker->();
     $na = padrep('$scalar',$newlex);

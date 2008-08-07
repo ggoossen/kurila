@@ -123,8 +123,7 @@ my %matchers =
 my $testpkgs = \%(
     # packages to test, with expected types for named funcs
 
-    'Data::Dumper' => \%( XS => \@(qw/ bootstrap Dumpxs /),
-		      dflt => 'perl' ),
+    'Data::Dumper' => \%( dflt => 'perl' ),
     B => \%( 
 	dflt => 'constant',		# all but 47/297
 	skip => \@( 'regex_padav' ),	# threaded only
@@ -213,7 +212,7 @@ my $testpkgs = \%(
     'IO::Socket' => \%( dflt => 'constant',		# 157/190
 
 		    perl => \@(qw/ timeout socktype sockopt sockname
-			     socketpair socket sockdomain sockaddr_un
+			     socketpair socket sockdomain
 			     sockaddr_in shutdown setsockopt send
 			     register_domain recv protocol peername
 			     new listen import getsockopt croak

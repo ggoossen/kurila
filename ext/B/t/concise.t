@@ -11,7 +11,7 @@ BEGIN {
 
 use strict;
 
-plan tests => 154;
+plan tests => 153;
 
 require_ok("B::Concise");
 
@@ -128,8 +128,7 @@ sub render {
     walk_output(\my $out);
     try { B::Concise::compile(< @_)->() };
     # diag "rendering $@\n";
-    return  @($out, $@) if wantarray;
-    return $out;
+    return  @($out, $@);
 }
 
 SKIP: {
@@ -189,11 +188,6 @@ SKIP: {
     my ($res,$err);
     TODO: {
 	#local $TODO = "\tdoes this handling make sense ?";
-
-	sub declared_only;
-	($res,$err) = < render('-basic', \&declared_only);
-	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
-	      "'sub decl_only' seen as having no START");
 
 	sub defd_empty {};
 	($res,$err) = < render('-basic', \&defd_empty);

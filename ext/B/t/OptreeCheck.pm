@@ -531,7 +531,7 @@ sub getRendering {
 		$code = eval "$pkg sub \{ $code \} \}";
 	    }
 	    # return errors
-	    if ($@) { push @errs, < $@->message }
+	    if ($@) { push @errs, $@->message }
 	}
 	# set walk-output b4 compiling, which writes 'announce' line
 	walk_output(\$rendering);
@@ -563,7 +563,7 @@ sub getRendering {
     }
     $tc->{got}	   = $rendering;
     $tc->{goterrs} = \@errs if (nelems @errs);
-    return $rendering, @errs;
+    return @($rendering, @errs);
 }
 
 sub get_bcopts {
@@ -586,7 +586,7 @@ sub checkErrs {
     $tc->{goterrs} ||= \@();
     %goterrs{[< @{$tc->{goterrs}}]} = (1) x scalar nelems @{$tc->{goterrs}};
     
-    foreach my $k (keys %{$tc->{errs}}) {
+    foreach my $k (keys %{$tc->{errs} ||= \%()}) {
 	if (@got = @( grep m/^$k$/, keys %goterrs )) {
 	    delete $tc->{errs}->{$k};
 	    delete %goterrs{$_} foreach < @got;
@@ -595,7 +595,7 @@ sub checkErrs {
     $tc->{goterrs} = \%goterrs;
 
     # relook at altered
-    if (%{$tc->{errs}} or %{$tc->{goterrs}}) {
+    if (%{$tc->{errs}} or %{$tc->{goterrs} ||= \%()}) {
 	$tc->diag_or_fail();
     }
     fail("FORCED: $tc->{name}:\n") if %gOpts{fail}; # silly ?

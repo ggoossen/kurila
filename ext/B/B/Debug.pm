@@ -20,12 +20,12 @@ sub _printop {
   my $op = shift;
   my $addr = ${$op} ? $op->ppaddr : '';
   $addr =~ s/^PL_ppaddr// if $addr;
-  return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ? < class($op) : '', $addr;
+  return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ? class($op) : '', $addr;
 }
 
 sub B::OP::debug {
     my ($op) = < @_;
-    printf <<'EOT', < class($op), $$op, < $op->ppaddr, < _printop( <$op->next), < _printop( <$op->sibling), < $op->targ, < $op->type;
+    printf <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
 %s (0x%lx)
 	op_ppaddr	%s
 	op_next		%s
@@ -33,10 +33,10 @@ sub B::OP::debug {
 	op_targ		%d
 	op_type		%d
 EOT
-    printf <<'EOT', < $op->opt;
+    printf <<'EOT', $op->opt;
 	op_opt		%d
 EOT
-    printf <<'EOT', < $op->flags, < $op->private;
+    printf <<'EOT', $op->flags, $op->private;
 	op_flags	%d
 	op_private	%d
 EOT
@@ -45,19 +45,19 @@ EOT
 sub B::UNOP::debug {
     my ($op) = < @_;
     $op->B::OP::debug();
-    printf "\top_first\t\%s\n", < _printop( <$op->first);
+    printf "\top_first\t\%s\n", _printop($op->first);
 }
 
 sub B::BINOP::debug {
     my ($op) = < @_;
     $op->B::UNOP::debug();
-    printf "\top_last \t\%s\n", < _printop( <$op->last);
+    printf "\top_last \t\%s\n", _printop($op->last);
 }
 
 sub B::LOOP::debug {
     my ($op) = < @_;
     $op->B::BINOP::debug();
-    printf <<'EOT', < _printop( <$op->redoop), < _printop( <$op->nextop), < _printop( <$op->lastop);
+    printf <<'EOT', < _printop($op->redoop), _printop($op->nextop), _printop($op->lastop);
 	op_redoop	%s
 	op_nextop	%s
 	op_lastop	%s
@@ -67,13 +67,13 @@ EOT
 sub B::LOGOP::debug {
     my ($op) = < @_;
     $op->B::UNOP::debug();
-    printf "\top_other\t\%s\n", < _printop( <$op->other);
+    printf "\top_other\t\%s\n", _printop($op->other);
 }
 
 sub B::LISTOP::debug {
     my ($op) = < @_;
     $op->B::BINOP::debug();
-    printf "\top_children\t\%d\n", < $op->children;
+    printf "\top_children\t\%d\n", $op->children;
 }
 
 sub B::PMOP::debug {
@@ -96,8 +96,8 @@ sub B::PMOP::debug {
 sub B::COP::debug {
     my ($op) = < @_;
     $op->B::OP::debug();
-    my $cop_io = class( <$op->io) eq 'SPECIAL' ? '' : $op->io->as_string;
-    printf <<'EOT', < $op->label, < $op->stashpv, < $op->file, < $op->cop_seq, < $op->line, ${$op->warnings}, < cstring($cop_io);
+    my $cop_io = class($op->io) eq 'SPECIAL' ? '' : $op->io->as_string;
+    printf <<'EOT', $op->label, $op->stashpv, $op->file, $op->cop_seq, $op->line, ${$op->warnings}, cstring($cop_io);
 	cop_label	"%s"
 	cop_stashpv	"%s"
 	cop_file	"%s"
@@ -285,9 +285,9 @@ sub compile {
     my $order = shift;
     B::clearsym();
     if ($order && $order eq "exec") {
-        return sub { walkoptree_exec( <main_start, "debug") }
+        return sub { walkoptree_exec(main_start, "debug") }
     } else {
-        return sub { walkoptree( <main_root, "debug") }
+        return sub { walkoptree(main_root, "debug") }
     }
 }
 
