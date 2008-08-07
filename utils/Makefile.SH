@@ -45,7 +45,7 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift)"
 
 plextract = perlbug perlivp
 plfixlocal = h2xs h2ph perldoc pl2pm
-plfix = corelist instmodsh splain xsubpp
+plfix = corelist instmodsh xsubpp
 
 all: $(plextract) $(plfixlocal) $(plfix)
 
@@ -75,10 +75,6 @@ perldoc:	perldoc.pl ../config.sh
 perlivp:	perlivp.PL ../config.sh
 
 pl2pm:		pl2pm.pl ../config.sh
-
-splain: ../lib/diagnostics.pm ../config.sh
-	$(CPS) ../lib/diagnostics.pm $@
-	$(RUN) $(PERL) $(FIXIN) $@
 
 xsubpp: ../lib/ExtUtils/$@ ../config.sh
 	$(CPS) ../lib/ExtUtils/$@ $@
