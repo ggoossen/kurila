@@ -45,22 +45,19 @@ sub B::SV::terse {
 	. B::Concise::fmt_line(\%info, $sv,
 				 "#svclass~(?((#svaddr))?)~#svval", 0);
     chomp $s;
-    print "$s\n" unless defined wantarray;
     $s;
 }
 
 sub B::NULL::terse {
     my ($sv, $level) = (< @_, 0);
-    my $s = indent($level) . sprintf '%s (0x%lx)', < class($sv), $$sv;
-    print "$s\n" unless defined wantarray;
+    my $s = indent($level) . sprintf '%s (0x%lx)', class($sv), $$sv;
     $s;
 }
 
 sub B::SPECIAL::terse {
     my ($sv, $level) = (< @_, 0);
     my $s = indent($level)
-	. sprintf( '%s #%d %s', < class($sv), $$sv, @specialsv_name[$$sv]);
-    print "$s\n" unless defined wantarray;
+	. sprintf( '%s #%d %s', class($sv), $$sv, @specialsv_name[$$sv]);
     $s;
 }
 

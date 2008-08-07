@@ -36,9 +36,9 @@ sub shownamearray {
     for ($i = 0; $i +< $count; $i++) {
 	my $sv = @els[$i];
 	if (class($sv) ne "SPECIAL") {
-	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", < class($sv), $$sv, < $sv->PVX;
+	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX;
 	} else {
-	    printf $walkHandle "$i: \%s\n", < $sv->terse;
+	    printf $walkHandle "$i: \%s\n", $sv->terse;
 	    #printf $walkHandle "$i: \%s\n", B::Concise::concise_sv($sv);
 	}
     }
@@ -51,7 +51,7 @@ sub showvaluearray {
     my $i;
     print $walkHandle "$name has $count entries\n";
     for ($i = 0; $i +< $count; $i++) {
-	printf $walkHandle "$i: \%s\n", < @els[$i]->terse;
+	printf $walkHandle "$i: \%s\n", @els[$i]->terse;
 	#print $walkHandle "$i: %s\n", B::Concise::concise_sv($els[$i]);
     }
 }
@@ -70,9 +70,9 @@ sub newlex { # drop-in for showlex
     my @vals  = @( < $vals->ARRAY );
     my $count = (nelems @names);
     print $walkHandle "$objname Pad has $count entries\n";
-    printf $walkHandle "0: \%s\n", < @names[0]->terse unless $nosp1;
+    printf $walkHandle "0: \%s\n", @names[0]->terse unless $nosp1;
     for (my $i = 1; $i +< $count; $i++) {
-	printf $walkHandle "$i: \%s = \%s\n", < @names[$i]->terse, < @vals[$i]->terse
+	printf $walkHandle "$i: \%s = \%s\n", @names[$i]->terse, @vals[$i]->terse
 	    unless $nosp1 and @names[$i]->terse =~ m/SPECIAL/;
     }
 }

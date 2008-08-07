@@ -29,7 +29,9 @@ is( $@, '', 'compile()' );
 ok( defined &$sub, 'valid subref back from compile()' );
 
 # and point it at a real sub and hope the returned ops look alright
-my $out = tie *STDOUT, 'TieOut';
+my $out = "";
+open my $ouf_fh, '>>', \$out or die;
+*STDOUT = *$ouf_fh{IO};
 $sub = B::Terse::compile('', 'bar');
 $sub->();
 
@@ -40,7 +42,7 @@ my %ops = %( map { $_ => qr/$_ $hex$op/ }
 
 # split up the output lines into individual ops (terse is, well, terse!)
 # use an array here so $_ is modifiable
-my @lines = @( split(m/\n+/, $out->read) );
+my @lines = @( split(m/\n+/, $out) ); $out = "";
 foreach (< @lines) {
 	next unless m/\S/;
 	s/^\s+//;
@@ -54,7 +56,7 @@ foreach (< @lines) {
 	}
 }
 
-warn "# didn't find " . join(' ', keys %ops) if keys %ops;
+warn "# didn't find " . join(' ', keys %ops) if %ops;
 
 # XXX:
 # this tries to get at all tersified optypes in B::Terse

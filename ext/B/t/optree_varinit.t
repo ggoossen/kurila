@@ -16,39 +16,11 @@ BEGIN {
 }
 use OptreeCheck;
 use Config;
-plan tests	=> 22;
+plan tests	=> 17;
 SKIP: {
 skip "no perlio in this build", 22 unless %Config::Config{useperlio};
 
 pass("OPTIMIZER TESTS - VAR INITIALIZATION");
-
-checkOptree ( name	=> 'sub {my $a}',
-	      bcopts	=> '-exec',
-	      code	=> sub {my $a},
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 45 optree.t:23) v
-# 2  <0> padsv[$a:45,46] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EOT_EOT
-# 1  <;> nextstate(main 45 optree.t:23) v
-# 2  <0> padsv[$a:45,46] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
-
-checkOptree ( name	=> '-exec sub {my $a}',
-	      bcopts	=> '-exec',
-	      code	=> sub {my $a},
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 49 optree.t:52) v
-# 2  <0> padsv[$a:49,50] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EOT_EOT
-# 1  <;> nextstate(main 49 optree.t:45) v
-# 2  <0> padsv[$a:49,50] M/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
 
 checkOptree ( name	=> 'sub {our $a}',
 	      bcopts	=> '-exec',
@@ -132,72 +104,6 @@ EOT_EOT
 EONT_EONT
 
 pass("MY, OUR, LOCAL, BOTH SUB AND MAIN, = undef");
-
-checkOptree ( name	=> 'sub {my $a=undef}',
-	      code	=> sub {my $a=undef},
-	      bcopts	=> '-basic',
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-5  <1> leavesub[1 ref] K/REFC,1 ->(end)
--     <@> lineseq KP ->5
-1        <;> nextstate(main 641 optree_varinit.t:130) v ->2
-4        <2> sassign sKS/2 ->5
-2           <0> undef s ->3
-3           <0> padsv[$a:641,642] sRM*/LVINTRO ->4
-EOT_EOT
-# 5  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->5
-# 1        <;> nextstate(main 641 optree_varinit.t:130) v ->2
-# 4        <2> sassign sKS/2 ->5
-# 2           <0> undef s ->3
-# 3           <0> padsv[$a:641,642] sRM*/LVINTRO ->4
-EONT_EONT
-
-checkOptree ( name	=> 'sub {our $a=undef}',
-	      code	=> sub {our $a=undef},
-	      note	=> 'the global must be reset',
-	      bcopts	=> '-basic',
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-5  <1> leavesub[1 ref] K/REFC,1 ->(end)
--     <@> lineseq KP ->5
-1        <;> nextstate(main 26 optree.t:109) v:{ ->2
-4        <2> sassign sKS/2 ->5
-2           <0> undef s ->3
--           <1> ex-rv2sv sKRM*/17 ->4
-3              <#> gvsv[*a] s/OURINTR ->4
-EOT_EOT
-# 5  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->5
-# 1        <;> nextstate(main 446 optree_varinit.t:137) v:{ ->2
-# 4        <2> sassign sKS/2 ->5
-# 2           <0> undef s ->3
-# -           <1> ex-rv2sv sKRM*/17 ->4
-# 3              <$> gvsv(*a) s/OURINTR ->4
-EONT_EONT
-
-checkOptree ( name	=> 'sub {local $a=undef}',
-	      code	=> sub {local $a=undef},
-	      note	=> 'local not used enough to bother',
-	      bcopts	=> '-basic',
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-5  <1> leavesub[1 ref] K/REFC,1 ->(end)
--     <@> lineseq KP ->5
-1        <;> nextstate(main 28 optree.t:122) v:{ ->2
-4        <2> sassign sKS/2 ->5
-2           <0> undef s ->3
--           <1> ex-rv2sv sKRM*/129 ->4
-3              <#> gvsv[*a] s/LVINTRO ->4
-EOT_EOT
-# 5  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq KP ->5
-# 1        <;> nextstate(main 58 optree.t:141) v:{ ->2
-# 4        <2> sassign sKS/2 ->5
-# 2           <0> undef s ->3
-# -           <1> ex-rv2sv sKRM*/129 ->4
-# 3              <$> gvsv(*a) s/LVINTRO ->4
-EONT_EONT
 
 checkOptree ( name	=> 'my $a=undef',
 	      prog	=> 'my $a=undef',
