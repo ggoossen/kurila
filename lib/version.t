@@ -23,7 +23,7 @@ package version::Empty;
 use base 'version';
 our $VERSION = 0.01;
 no warnings 'redefine';
-*::qv = sub { return bless version::qv(shift), __PACKAGE__; };
+*main::qv = sub { return bless version::qv(shift), __PACKAGE__; };
 
 package version::Bad;
 use base 'version';
