@@ -9,9 +9,6 @@ package Math::Trig;
 
 use strict;
 
-use Math::Complex;
-use Math::Complex qw(:trig :pi);
-
 use vars qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 @ISA = @( qw(Exporter) );
@@ -24,8 +21,7 @@ my @angcnv = @( qw(rad2deg rad2grad
 
 my @areal = @( qw(asin_real acos_real) );
 
-@EXPORT = @(< @{%Math::Complex::EXPORT_TAGS{'trig'}},
-	   < @angcnv, < @areal);
+@EXPORT = @(< @angcnv, < @areal);
 
 my @rdlcnv = @( qw(cartesian_to_cylindrical
 		cartesian_to_spherical
@@ -54,6 +50,10 @@ my @pi = @( qw(pi pi2 pi4 pip2 pip4) );
 %EXPORT_TAGS = %('radial' => \@( < @rdlcnv ),
 	        'great_circle' => \@( < @greatcircle ),
 	        'pi'     => \@( < @pi ));
+
+sub pi () { 4 * CORE::atan2(1, 1) }
+sub pi2 () { 2 * pi }
+sub pip2 () { pi / 2 }
 
 sub _DR  () { pi2/360 }
 sub _RD  () { 360/pi2 }
@@ -98,15 +98,17 @@ sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[1] ? $d : rad2rad($d) }
 #
 
 sub acos_real {
+    my $z = @_[0];
     return 0  if @_[0] +>=  1;
     return pi if @_[0] +<= -1;
-    return acos(@_[0]);
+    return CORE::atan2(CORE::sqrt(1-$z*$z), $z);
 }
 
 sub asin_real {
+    my $z = @_[0];
     return  &pip2 if @_[0] +>=  1;
     return -&pip2 if @_[0] +<= -1;
-    return asin(@_[0]);
+    return CORE::atan2($z, CORE::sqrt(1-$z*$z));
 }
 
 sub cartesian_to_spherical {
