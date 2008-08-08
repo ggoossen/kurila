@@ -1149,8 +1149,6 @@ lib/Locale/Maketext/t/90_utf8.t	See if Locale::Maketext works
 lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
 lib/Locale/Script.pm		Locale::Codes
 lib/Locale/Script.pod		Locale::Codes documentation
-lib/Math/Complex.pm		A Complex package
-lib/Math/Complex.t		See if Math::Complex works
 lib/Math/Trig.pm		A simple interface to complex trigonometry
 lib/Math/Trig.t			See if Math::Trig works
 lib/Module/CoreList/bin/corelist	Module::CoreList
