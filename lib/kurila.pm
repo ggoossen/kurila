@@ -1,9 +1,9 @@
 package kurila;
 
-our $VERSION = v1.12;
+our $VERSION = v1.13;
 
-$^V eq "kurila-1.12"
-  or die "Perl lib version (kurila-1.12) doesn't match executable version (" . $^V . ")";
+$^V eq "kurila-1.13"
+  or die "Perl lib version (kurila-1.13) doesn't match executable version (" . $^V . ")";
 
 1;
 
@@ -15,7 +15,7 @@ kurila - Perl Kurila
 
 =head1 SYNOPSIS
 
-  use kurila 1.12;
+  use kurila v1.13;
 
 =head1 DESCRIPTION
 
