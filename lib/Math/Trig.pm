@@ -41,7 +41,7 @@ my @greatcircle = @( qw(
 
 my @pi = @( qw(pi pi2 pi4 pip2 pip4) );
 
-@EXPORT_OK = @(< @rdlcnv, < @greatcircle, < @pi, 'Inf');
+@EXPORT_OK = @(< @rdlcnv, < @greatcircle, < @pi, 'tan' );
 
 # See e.g. the following pages:
 # http://www.movable-type.co.uk/scripts/LatLong.html
@@ -51,9 +51,18 @@ my @pi = @( qw(pi pi2 pi4 pip2 pip4) );
 	        'great_circle' => \@( < @greatcircle ),
 	        'pi'     => \@( < @pi ));
 
+sub tan {
+    my ($z) = < @_;
+    my $cz = cos($z);
+    die "Division by zero in tan($z)" if $cz == 0;
+    return sin($z) / $cz;
+}
+
 sub pi () { 4 * CORE::atan2(1, 1) }
 sub pi2 () { 2 * pi }
+sub pi4 () { 4 * pi }
 sub pip2 () { pi / 2 }
+sub pip4 () { pi / 4 }
 
 sub _DR  () { pi2/360 }
 sub _RD  () { 360/pi2 }
