@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 use_ok('base');
 
@@ -12,9 +12,6 @@ use vars qw($Foo);
 sub VERSION { 42 }
 
 package Test::Version;
-
-use base qw(No::Version);
-main::ok( $No::Version::VERSION =~ m/set by base\.pm/,          '$VERSION bug' );
 
 # Test Inverse of $VERSION bug base.pm should not clobber existing $VERSION
 package Has::Version;
