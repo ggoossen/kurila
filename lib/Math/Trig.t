@@ -13,7 +13,7 @@ use Test::More;
 plan(tests => 69);
 
 use Math::Trig v1.16;
-use Math::Trig v1.16 qw(:pi Inf);
+use Math::Trig v1.16 qw(:pi);
 
 my $pip2 = pi / 2;
 
