@@ -47,7 +47,7 @@ for (< @MANIFEST) {
      $perlname =~ s!^.*\b(ext|lib)/!!;
      $perlname =~ s!\.p(m|od)$!!;
      $perlname =~ s!\b(\w+)/\1\b!$1!;
-     $perlname =~ s!/!::!g;
+     $perlname =~ s![/-]!::!g;
 
      ($name, $thing) = split m/ --? /, $title, 2;
 

@@ -23,14 +23,14 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst");
 %Targets
   = %(
      toc => "kurilatoc.pod",
-     manifest => < File::Spec->catdir($Up, "MANIFEST"),
+     manifest => File::Spec->catdir($Up, "MANIFEST"),
      perlpod => "perl.pod",
-     vms => < File::Spec->catdir($Up, "vms", "descrip_mms.template"),
-     nmake => < File::Spec->catdir($Up, "win32", "Makefile"),
-     dmake => < File::Spec->catdir($Up, "win32", "makefile.mk"),
-     podmak => < File::Spec->catdir($Up, "win32", "pod.mak"),
+     vms => File::Spec->catdir($Up, "vms", "descrip_mms.template"),
+     nmake => File::Spec->catdir($Up, "win32", "Makefile"),
+     dmake => File::Spec->catdir($Up, "win32", "makefile.mk"),
+     podmak => File::Spec->catdir($Up, "win32", "pod.mak"),
      # plan9 =>  File::Spec->catdir($Up, "plan9", "mkfile"),
-     unix => < File::Spec->catdir($Up, "Makefile.SH"),
+     unix => File::Spec->catdir($Up, "Makefile.SH"),
      # TODO: add roffitall
     );
 
@@ -163,7 +163,7 @@ close MASTER;
   }
 
   # None of these filenames will be boolean false
-  @disk_pods = glob@( <"*.pod");
+  @disk_pods = @( glob("*.pod") );
   %disk_pods{[< @disk_pods]} = < @disk_pods;
 
   # Things we copy from won't be in perl.pod
@@ -233,7 +233,6 @@ close MASTER;
       return if $file =~ m!(?:^|/)t/!;
       return if $file =~ m!lib/Attribute/Handlers/demo/!;
       return if $file =~ m!lib/Net/FTP/.+\.pm!; # Hi, Graham! :-)
-      return if $file =~ m!lib/Math/BigInt/t/!;
       return if $file =~ m!/Devel/PPPort/[Hh]arness|lib/Devel/Harness!i;
       return if $file =~ m!XS/(?:APItest|Typemap)!;
       my $pod = $file;
@@ -282,12 +281,10 @@ sub path2modname {
     local $_ = shift;
     s/\.p(m|od)$//;
     s-.*?/(lib|ext)/--;
-    s-/-::-g;
+    s![/-]!::!g;
     s/(\w+)::\1/$1/;
     return $_;
 }
-
-sub output ($);
 
 sub output_kurilatoc {
   open(OUT, ">", "kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $!";
@@ -316,7 +313,7 @@ EOPOD2B
 #' make emacs happy
 
   # All the things in the master list that happen to be pod filenames
-  podset(map {"$_->[1].pod"} grep {defined $_ && (nelems @$_) == 3 && !$_->[0]{toc_omit}} < @Master);
+  podset(map {"$_->[1].pod"} grep {defined $_ && (nelems @$_) == 3 && !$_->[0]->{toc_omit}} < @Master);
 
 
   ($_= <<"EOPOD2B") =~ s/^\t//gm && output($_);
@@ -365,8 +362,8 @@ EOPOD2B
 EOPOD2B
 
   s/^\t//gm;
-  output $_;
-  output "\n";                    # flush $LINE
+  output($_);
+  output("\n");                    # flush $LINE
 }
 
 # Below are all the auxiliary routines for generating kurilatoc.pod
@@ -382,30 +379,30 @@ sub podset {
 	if (s/^=head1 (NAME)\s*/=head2 /) {
 	    $pod = path2modname($ARGV);
 	    unhead1();
-	    output "\n \n\n=head2 ";
+	    output("\n \n\n=head2 ");
 	    $_ = ~< *ARGV;
 	    # Remove svn keyword expansions from the Perl FAQ
 	    s/ \(\$Revision: \d+ \$\)//g;
 	    if ( m/^\s*$pod\b/ ) {
 		s/$pod\.pm/$pod/;       # '.pm' in NAME !?
-		output $_;
+		output($_);
 	    } else {
 		s/^/$pod, /;
-		output $_;
+		output($_);
 	    }
 	    next;
 	}
 	if (s/^=head1 (.*)/=item $1/) {
 	    unhead2();
-	    output "=over 4\n\n" unless $inhead1;
+	    output("=over 4\n\n") unless $inhead1;
 	    $inhead1 = 1;
-	    output $_; nl(); next;
+	    output($_); nl(); next;
 	}
 	if (s/^=head2 (.*)/=item $1/) {
 	    unitem();
-	    output "=over 4\n\n" unless $inhead2;
+	    output("=over 4\n\n") unless $inhead2;
 	    $inhead2 = 1;
-	    output $_; nl(); next;
+	    output($_); nl(); next;
 	}
 	if (s/^=item ([^=].*)/$1/) {
 	    next if $pod eq 'perldiag';
@@ -416,11 +413,11 @@ sub podset {
 	    next if m/^[\d.]+$/;
 	    next if $pod eq 'perlmodlib' && m/^ftp:/;
 	    ##print "=over 4\n\n" unless $initem;
-	    output ", " if $initem;
+	    output(", ") if $initem;
 	    $initem = 1;
 	    s/\.$//;
 	    s/^-X\b/-I<X>/;
-	    output $_; next;
+	    output($_); next;
 	}
 	if (s/^=cut\s*\n//) {
 	    unhead1();
@@ -432,7 +429,7 @@ sub podset {
 sub unhead1 {
     unhead2();
     if ($inhead1) {
-	output "\n\n=back\n\n";
+	output("\n\n=back\n\n");
     }
     $inhead1 = 0;
 }
@@ -440,21 +437,21 @@ sub unhead1 {
 sub unhead2 {
     unitem();
     if ($inhead2) {
-	output "\n\n=back\n\n";
+	output("\n\n=back\n\n");
     }
     $inhead2 = 0;
 }
 
 sub unitem {
     if ($initem) {
-	output "\n\n";
+	output("\n\n");
 	##print "\n\n=back\n\n";
     }
     $initem = 0;
 }
 
 sub nl {
-    output "\n";
+    output("\n");
 }
 
 my $NEWLINE = 0;	# how many newlines have we seen recently
@@ -464,7 +461,7 @@ sub output ($) {
     for (split m/(\n)/, shift) {
 	if ($_ eq "\n") {
 	    if ($LINE) {
-		print OUT < wrap('', '', $LINE);
+		print OUT wrap('', '', $LINE);
 		$LINE = '';
 	    }
 	    if (($NEWLINE) +< 2) {

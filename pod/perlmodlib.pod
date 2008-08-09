@@ -79,10 +79,6 @@ Package for defining compilation subroutines
 
 Declare constants
 
-=item diagnostics
-
-Produce verbose warning diagnostics
-
 =item error
 
 Error Objects
@@ -201,10 +197,6 @@ don't have the gdbm library.
 
 The Perl Compiler
 
-=item B-OP
-
-Inspect and manipulate op trees.
-
 =item B::Concise
 
 Walk Perl syntax tree, printing concise info about ops
@@ -216,6 +208,10 @@ Walk Perl syntax tree, printing debug info about ops
 =item B::Deparse
 
 Perl compiler backend to produce perl code
+
+=item B::OP
+
+Inspect and manipulate op trees.
 
 =item B::Showlex
 
@@ -300,10 +296,6 @@ Dynamically load C libraries into Perl code
 =item English
 
 Use nice English (or awk) names for ugly punctuation variables
-
-=item Env
-
-Perl module that imports environment variables as scalars or arrays
 
 =item Errno
 
@@ -653,10 +645,6 @@ Supply object methods for filehandles
 
 Supply object methods for I/O handles
 
-=item IO::Pipe
-
-Supply object methods for pipes
-
 =item IO::Poll
 
 Object interface to system poll call
@@ -708,10 +696,6 @@ Read RFC 1951 files/buffers
 =item IO::Uncompress::Unzip
 
 Read zip files/buffers
-
-=item IO::Zlib
-
-IO:: style interface to L<Compress::Zlib>
 
 =item IPC::Cmd
 
@@ -773,22 +757,6 @@ Article about software localization
 
 ISO codes for script identification (ISO 15924)
 
-=item Log::Message
-
-A generic message storing mechanism;
-
-=item Log::Message::Config
-
-Configuration options for Log::Message
-
-=item Log::Message::Handlers
-
-Message handlers for Log::Message
-
-=item Log::Message::Item
-
-Message objects for Log::Message
-
 =item MIME::Base64
 
 Encoding and decoding of base64 strings
@@ -796,10 +764,6 @@ Encoding and decoding of base64 strings
 =item MIME::Base64::QuotedPrint
 
 Encoding and decoding of quoted-printable strings
-
-=item Math::Complex
-
-Complex numbers and associated mathematical functions
 
 =item Math::Trig
 
@@ -853,7 +817,7 @@ Perl interface to IEEE Std 1003.1
 
 A generic input parsing/checking mechanism.
 
-=item Perl6-Form
+=item Perl6::Form
 
 Implements the Perl 6 'form' built-in
 
@@ -1113,17 +1077,9 @@ Color screen output using ANSI escape sequences
 
 Perl termcap interface
 
-=item Term::Complete
-
-Perl word completion module
-
 =item Term::ReadLine
 
 Perl interface to various C<readline> packages.
-
-=item Term::UI
-
-Term::ReadLine UI made easy
 
 =item Test
 
@@ -1185,14 +1141,6 @@ Thread-safe queues
 
 Thread-safe semaphores
 
-=item Tie::Array
-
-Base class for tied arrays
-
-=item Tie::Handle
-
-Base class definitions for tied handles
-
 =item Tie::Hash
 
 Base class definitions for tied hashes
@@ -1200,10 +1148,6 @@ Base class definitions for tied hashes
 =item Tie::Hash::NamedCapture
 
 Named regexp capture buffers
-
-=item Tie::Scalar
-
-Base class definitions for tied scalars
 
 =item Tie::SubstrHash
 
