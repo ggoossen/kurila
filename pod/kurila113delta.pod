@@ -1,0 +1,82 @@
+=head1 NAME
+
+kurila113delta - what is new for Perl Kurila 1.13
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.12 and Perl Kurila 1.13
+
+=head1 Highlights In Perl Kurila 1.13
+
+Values passed to subroutines or elements of an array or hash are no
+longer restricted to being a scalar, but can also be arrays or hashes.
+Making it possible to use complete data structures without needing
+references.
+
+=head1 Core Enhancements
+
+=head2 Values can be any type
+
+A value can be a plain-value, array or hash. There are no distinctions
+between. The sigils are meaningless, and don't indicate anything
+containing the type
+
+=head2 expand operator C<< < >>
+
+Arrays are no longer automaticly expanded to a list. The expand
+operator C<< < >> should be used to expand an array to a list.
+
+=head2 Subroutines always return a scalar; C<wantarray> keyword removed
+
+Subroutines always return a scalar, and behave as if called in scalar
+context. As a consequence the C<wantarray> keyword has been removed.
+
+=head2 New operators C<nelems> and C<nkeys>
+
+C<nelems> returns the number of elements of an array. C<nkeys> returns
+the number of keys in a hash.
+
+=head2 Only Hashes can be tied
+
+Scalars, arrays and handles can no longer be tied.
+
+=head2 Forward subroutine declarations are no longer supported.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Extensive use of lists
+
+Lists are used in a lot of places where arrays are probably more
+appropriate.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Tied hashes with complex data
+
+Tied hashes do not work correctly with complex data
+structures. Assigning arrays or hashes to a value of tied hash might
+behave strange.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
