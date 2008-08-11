@@ -905,7 +905,7 @@ XS(XS_error_create)
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
 		if (location && SvOK(location)) {
-		    Perl_sv_catpvf(aTHX_ sv, "%s:%"IVdf":%"IVdf":",
+		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf,
 				   SvPVX_const(*av_fetch(location, 0, FALSE)),
 				   SvIV(*av_fetch(location, 1, FALSE)),
 				   SvIV(*av_fetch(location, 2, FALSE))
@@ -947,6 +947,7 @@ XS(XS_error_message)
 
 	{
 	    SV **sv;
+
 	    sv = hv_fetchs(err, "description", 0);
 	    if (sv) {
 		sv_catsv(res, *sv);

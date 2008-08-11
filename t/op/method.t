@@ -123,7 +123,7 @@ is(A->d, "C::d");
 
 # test error messages if method loading fails
 is(do { eval 'my $e = bless \%(), "E::A"; E::A->foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::A" at/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ? 1 : $@->message}, 1);
 is(do { eval 'my $e = bless \%(), "E::B"; $e->foo()';  
 	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::B" at/ ? 1 : $@}, 1);
 is(do { eval 'E::C->foo()';

@@ -6582,8 +6582,10 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	}
     fix_gv:
 	if (lref && !GvCVu(gv)) {
+	    SV* tmpsv = sv_2mortal(newSV(0));
+	    gv_efullname3(tmpsv, gv, NULL);
 	    Perl_croak(aTHX_ "Unknown named sub \"%"SVf"\"",
-		       SVfARG(sv));
+		       SVfARG(tmpsv));
 	}
 	return GvCVu(gv);
     }
