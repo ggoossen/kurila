@@ -455,8 +455,12 @@ PP(pp_die)
     if (SP - MARK >= 1) {
 	ENTER;
 	PUSHMARK(MARK);
+	XPUSHs(PL_op->op_location);
+	PUTBACK;
 	call_sv(PL_errorcreatehook, G_SCALAR);
+	SPAGAIN;
 	tmpsv = POPs;
+	PUTBACK;
 	LEAVE;
     }
     else {
@@ -469,6 +473,7 @@ PP(pp_die)
 	ENTER;
 	PUSHMARK(SP);
 	XPUSHs(newSVpvs_flags("Died", SVs_TEMP));
+	XPUSHs(PL_op->op_location);
 	PUTBACK;
 	call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
