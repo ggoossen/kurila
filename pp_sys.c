@@ -416,8 +416,12 @@ PP(pp_warn)
     if (SP - MARK >= 1) {
 	ENTER;
 	PUSHMARK(MARK);
+	XPUSHs(PL_op->op_location);
+	PUTBACK;
 	call_sv(PL_errorcreatehook, G_SCALAR);
+	SPAGAIN;
 	tmpsv = POPs;
+	PUTBACK;
 	LEAVE;
     }
     else {
@@ -432,6 +436,7 @@ PP(pp_warn)
 	ENTER;
 	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVpvs("Warning: something's wrong")));
+	XPUSHs(PL_op->op_location);
 	PUTBACK;
 	call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
@@ -610,7 +615,6 @@ PP(pp_fileno)
     GV *gv;
     IO *io;
     PerlIO *fp;
-    MAGIC  *mg;
 
     if (MAXARG < 1)
 	RETPUSHUNDEF;
@@ -1539,7 +1543,6 @@ PP(pp_tell)
 {
     dVAR; dSP; dTARGET;
     GV *gv;
-    IO *io;
 
     if (MAXARG == 0)
 	Perl_croak(aTHX_ "tell called without handle");
@@ -1564,7 +1567,6 @@ PP(pp_sysseek)
 #endif
 
     GV * const gv = (GV*)POPs;
-    IO *io;
 
     if (PL_op->op_type == OP_SEEK)
 	PUSHs(boolSV(do_seek(gv, offset, whence)));

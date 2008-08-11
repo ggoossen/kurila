@@ -34,7 +34,7 @@ sub skip {
     return 1;
 }
 
-print "1..54\n";
+print "1..52\n";
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -149,17 +149,6 @@ ok "{join ' ', <@a}" eq "foo bar baz", "{join ' ', <@a}";
 {
     local $" = ',';
     ok qq|{join $", <@a}| eq "foo,bar,baz", "{join ' ', <@a}";
-}
-
-# $;
-my %h = %( () );
-%h{'foo', 'bar'} = 1;
-ok((keys %h)[[0]] eq "foo\034bar", (keys %h)[[0]]);
-{
-    local $; = 'x';
-    %h = %( () );
-    %h{'foo', 'bar'} = 1;
-    ok((keys %h)[[0]] eq 'fooxbar', (keys %h)[[0]]);
 }
 
 # $?, $@, $$
