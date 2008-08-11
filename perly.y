@@ -679,13 +679,14 @@ argexpr	:	argexpr ','
 
 /* List operators */
 listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
-			{ $$ = convert(IVAL($1), OPf_STACKED,
-				prepend_elem(OP_LIST, newGVREF(IVAL($1),$2), $3) );
-			  TOKEN_GETMAD($1,$$,'o');
+			{ 
+                            $$ = convert(IVAL($1), OPf_STACKED,
+                                prepend_elem(OP_LIST, newGVREF(IVAL($1),$2), $3), LOCATION($1) );
+                            TOKEN_GETMAD($1,$$,'o');
 			}
 	|	FUNC '(' indirob expr ')'      /* print ($fh @args */
 			{ $$ = convert(IVAL($1), OPf_STACKED,
-				prepend_elem(OP_LIST, newGVREF(IVAL($1),$3), $4) );
+				prepend_elem(OP_LIST, newGVREF(IVAL($1),$3), $4), LOCATION($1) );
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
@@ -695,7 +696,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST,
 				    prepend_elem(OP_LIST, scalar($1), $5),
-				    newUNOP(OP_METHOD, 0, $3, $3->op_location)));
+				    newUNOP(OP_METHOD, 0, $3, $3->op_location)), $3->op_location);
 			  TOKEN_GETMAD($2,$$,'A');
 			  TOKEN_GETMAD($4,$$,'(');
 			  TOKEN_GETMAD($6,$$,')');
@@ -704,21 +705,23 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 	|	term ARROW method                     /* $foo->bar */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, scalar($1),
-				    newUNOP(OP_METHOD, 0, $3, $3->op_location)));
+				    newUNOP(OP_METHOD, 0, $3, $3->op_location)), $3->op_location);
 			  TOKEN_GETMAD($2,$$,'A');
                           APPEND_MADPROPS_PV("method", $$, '>');
 			}
 	|	LSTOP listexpr                       /* print @args */
-			{ $$ = convert(IVAL($1), 0, $2);
-			  TOKEN_GETMAD($1,$$,'o');
-                          APPEND_MADPROPS_PV("listop", $$, '>');
+                        {
+                            $$ = convert(IVAL($1), 0, $2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
+                            APPEND_MADPROPS_PV("listop", $$, '>');
 			}
 	|	FUNC '(' listexprcom ')'             /* print (@args) */
-			{ $$ = convert(IVAL($1), 0, $3);
-			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($4,$$,')');
-                          APPEND_MADPROPS_PV("func", $$, '>');
+                        { 
+                            $$ = convert(IVAL($1), 0, $3, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($4,$$,')');
+                            APPEND_MADPROPS_PV("func", $$, '>');
 			}
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
 			{
@@ -822,7 +825,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($6,$$,'}');
 			}
 	|	term '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
-                        { $$ = newBINOP(OP_HELEM, 0, $1, jmaybe($3), LOCATION($2));
+                        { $$ = newBINOP(OP_HELEM, 0, $1, scalar($3), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,';');
@@ -831,7 +834,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 	|	term ARROW '{' expr ';' '}' /* somehref->{bar();} */
 			{ $$ = newBINOP(OP_HELEM, 0,
 					ref(newHVREF($1),OP_RV2HV),
-                                jmaybe($4), LOCATION($3));
+                                scalar($4), LOCATION($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
@@ -1327,20 +1330,20 @@ scalar	:	'$' indirob
 			  TOKEN_GETMAD($1,$$,'$');
 			}
         |       ANONSCALAR expr ')'  /* $( ... ) */
-                        { $$ = convert(OP_ANONSCALAR, 0, $2);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($3,$$,']');
+                        { 
+                            $$ = convert(OP_ANONSCALAR, 0, $2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+                            TOKEN_GETMAD($3,$$,']');
 
-                          if (PL_parser->lex_brackets <= 0)
-                            yyerror("Unmatched right paren");
-                          else
-                            --PL_parser->lex_brackets;
+                            if (PL_parser->lex_brackets <= 0)
+                                yyerror("Unmatched right paren");
+                            else
+                                --PL_parser->lex_brackets;
 
-                          if (PL_parser->lex_state == LEX_INTERPNORMAL) {
-                            if ( PL_parser->lex_brackets == 0 )
-                              PL_parser->lex_state = LEX_INTERPEND;
-                          }
-
+                            if (PL_parser->lex_state == LEX_INTERPNORMAL) {
+                                if ( PL_parser->lex_brackets == 0 )
+                                    PL_parser->lex_state = LEX_INTERPEND;
+                            }
 			}
 
 	;
@@ -1350,14 +1353,16 @@ ary	:	'@' indirob
 			  TOKEN_GETMAD($1,$$,'@');
 			}
         |       ANONARY expr ')'  /* @( ... ) */
-			{ $$ = newANONLIST($2);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($3,$$,']');
+                        {
+                            $$ = newANONLIST($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+                            TOKEN_GETMAD($3,$$,']');
 			}
         |	ANONARY ')'  /* @() */
-			{ $$ = newANONLIST((OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'[');
-			  TOKEN_GETMAD($2,$$,']');
+			{
+                            $$ = newANONLIST((OP*)NULL, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+                            TOKEN_GETMAD($2,$$,']');
 			}
 	;
 
@@ -1366,14 +1371,16 @@ hsh	:	'%' indirob
 			  TOKEN_GETMAD($1,$$,'%');
 			}
 	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
-			{ $$ = newANONHASH($2);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($3,$$,'}');
+			{ 
+                            $$ = newANONHASH($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($3,$$,'}');
 			}
 	|	ANONHSH ')'	%prec '(' /* %() */
-			{ $$ = newANONHASH((OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($2,$$,'}');
+			{ 
+                            $$ = newANONHASH((OP*)NULL, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($2,$$,'}');
 			}
 	;
 

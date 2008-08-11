@@ -1771,7 +1771,7 @@ S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
     imop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL|OPf_WANT_VOID,
 		   append_elem(OP_LIST,
 			       prepend_elem(OP_LIST, pack, list(arg)),
-			       newSVOP(OP_METHOD_NAMED, 0, meth, attrs->op_location)));
+		       newSVOP(OP_METHOD_NAMED, 0, meth, attrs->op_location)), attrs->op_location);
     imop->op_private |= OPpENTERSUB_NOMOD;
 
     /* Combine the ops. */
@@ -2204,19 +2204,6 @@ Perl_localize(pTHX_ OP *o, I32 lex)
 }
 
 OP *
-Perl_jmaybe(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_JMAYBE;
-
-    if (o->op_type == OP_LIST) {
-	OP * const o2
-	    = newSVREF(newGVOP(OP_GV, 0, gv_fetchpvs(";", GV_ADD|GV_NOTQUAL, SVt_PV), NULL));
-	o = convert(OP_JOIN, 0, prepend_elem(OP_LIST, o2, o));
-    }
-    return o;
-}
-
-OP *
 Perl_fold_constants(pTHX_ register OP *o)
 {
     dVAR;
@@ -2383,13 +2370,15 @@ Perl_gen_constant_list(pTHX_ register OP *o)
 }
 
 OP *
-Perl_convert(pTHX_ I32 type, I32 flags, OP *o)
+Perl_convert(pTHX_ I32 type, I32 flags, OP *o, SV *location)
 {
     dVAR;
     if (!o || o->op_type != OP_LIST)
-	o = newLISTOP(OP_LIST, 0, o, NULL, o ? o->op_location : NULL);
-    else
+	o = newLISTOP(OP_LIST, 0, o, NULL, location);
+    else {
 	o->op_flags &= ~OPf_WANT;
+	SVcpREPLACE(o->op_location, location);
+    }
 
     if (!(PL_opargs[type] & OA_MARK))
 	op_null(cLISTOPo->op_first);
@@ -3299,7 +3288,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	veop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL,
 		       append_elem(OP_LIST,
 				   prepend_elem(OP_LIST, pack, list(version)),
-				   newSVOP(OP_METHOD_NAMED, 0, meth, version->op_location)));
+			   newSVOP(OP_METHOD_NAMED, 0, meth, version->op_location)), version->op_location);
     }
 
     /* Fake up an import/unimport */
@@ -3321,9 +3310,9 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	meth = aver
 	    ? newSVpvs_share("import") : newSVpvs_share("unimport");
 	imop = convert(OP_ENTERSUB, OPf_STACKED|OPf_SPECIAL|OPf_WANT_VOID,
-		       append_elem(OP_LIST,
-				   prepend_elem(OP_LIST, pack, list(arg)),
-				   newSVOP(OP_METHOD_NAMED, 0, meth, idop->op_location)));
+	    append_elem(OP_LIST,
+		prepend_elem(OP_LIST, pack, list(arg)),
+		newSVOP(OP_METHOD_NAMED, 0, meth, idop->op_location)), idop->op_location);
     }
 
     /* Fake up the BEGIN {}, which does its thing immediately. */
@@ -4352,7 +4341,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     }
 
     loop = (LOOP*)list(convert(OP_ENTERITER, iterflags,
-			       append_elem(OP_LIST, expr, scalar(sv))));
+	    append_elem(OP_LIST, expr, scalar(sv)), location));
     assert(!loop->op_next);
     /* for my  $x () sets OPpLVAL_INTRO;
      * for our $x () sets OPpOUR_INTRO */
@@ -5275,15 +5264,15 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 }
 
 OP *
-Perl_newANONLIST(pTHX_ OP *o)
+Perl_newANONLIST(pTHX_ OP *o, SV* location)
 {
-    return convert(OP_ANONLIST, 0, o);
+    return convert(OP_ANONLIST, 0, o, location);
 }
 
 OP *
-Perl_newANONHASH(pTHX_ OP *o)
+Perl_newANONHASH(pTHX_ OP *o, SV* location)
 {
-    return convert(OP_ANONHASH, 0, o);
+    return convert(OP_ANONHASH, 0, o, location);
 }
 
 OP *

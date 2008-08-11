@@ -139,7 +139,7 @@ ApR	|UV	|cast_uv	|NV f
 #if !defined(HAS_TRUNCATE) && !defined(HAS_CHSIZE) && defined(F_FREESP)
 ApR	|I32	|my_chsize	|int fd|Off_t length
 #endif
-pR	|OP*	|convert	|I32 optype|I32 flags|NULLOK OP* o
+pR	|OP*	|convert	|I32 optype|I32 flags|NULLOK OP* o|NULLOK SV* location
 pM	|PERL_CONTEXT*	|create_eval_scope|U32 flags
 : croak()'s first parm can be NULL.  Otherwise, mod_perl breaks.
 Afprd	|void	|croak		|NULLOK const char* pat|...
@@ -401,7 +401,6 @@ ApR	|bool	|is_utf8_print	|NN const char *p
 ApR	|bool	|is_utf8_punct	|NN const char *p
 ApR	|bool	|is_utf8_xdigit	|NN const char *p
 ApR	|bool	|is_utf8_mark	|NN const char *p
-p	|OP*	|jmaybe		|NN OP* o
 pP	|I32	|keyword	|NN const char* name|I32 len|bool all_keywords
 Ap	|void	|leave_scope	|I32 base
 EXp	|void	|lex_end
@@ -523,8 +522,8 @@ ApPa	|long	|my_htonl	|long l
 ApPa	|long	|my_ntohl	|long l
 #endif
 p	|void	|my_unexec
-Apa	|OP*	|newANONLIST	|NULLOK OP* o
-Apa	|OP*	|newANONHASH	|NULLOK OP* o
+Apa	|OP*	|newANONLIST	|NULLOK OP* o|NULLOK SV* location
+Apa	|OP*	|newANONHASH	|NULLOK OP* o|NULLOK SV* location
 Ap	|OP*	|newANONSUB	|I32 floor|NULLOK OP* proto|NULLOK OP* block
 Apa	|OP*	|newASSIGNOP	|I32 flags|NULLOK OP* left|I32 optype|NULLOK OP* right|NULLOK SV* location
 Apa	|OP*	|newCONDOP	|I32 flags|NN OP* first|NULLOK OP* trueop|NULLOK OP* falseop|NULLOK SV* location
@@ -1195,7 +1194,6 @@ s	|void	|no_bareword_allowed|NN const OP *o
 sR	|OP*	|no_fh_allowed|NN OP *o
 sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
-s	|bool	|looks_like_bool|NN const OP* o
 s	|OP*	|ref_array_or_hash|NULLOK OP* cond
 s	|void	|process_special_blocks	|NN const char *const fullname\
 					|NN GV *const gv|NN CV *const cv

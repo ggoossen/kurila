@@ -304,7 +304,7 @@ PERL_CALLCONV I32	Perl_my_chsize(pTHX_ int fd, Off_t length)
 			__attribute__warn_unused_result__;
 
 #endif
-PERL_CALLCONV OP*	Perl_convert(pTHX_ I32 optype, I32 flags, OP* o)
+PERL_CALLCONV OP*	Perl_convert(pTHX_ I32 optype, I32 flags, OP* o, SV* location)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV PERL_CONTEXT*	Perl_create_eval_scope(pTHX_ U32 flags);
@@ -1355,11 +1355,6 @@ PERL_CALLCONV bool	Perl_is_utf8_mark(pTHX_ const char *p)
 #define PERL_ARGS_ASSERT_IS_UTF8_MARK	\
 	assert(p)
 
-PERL_CALLCONV OP*	Perl_jmaybe(pTHX_ OP* o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_JMAYBE	\
-	assert(o)
-
 PERL_CALLCONV I32	Perl_keyword(pTHX_ const char* name, I32 len, bool all_keywords)
 			__attribute__pure__
 			__attribute__nonnull__(pTHX_1);
@@ -1893,11 +1888,11 @@ PERL_CALLCONV long	Perl_my_ntohl(pTHX_ long l)
 
 #endif
 PERL_CALLCONV void	Perl_my_unexec(pTHX);
-PERL_CALLCONV OP*	Perl_newANONLIST(pTHX_ OP* o)
+PERL_CALLCONV OP*	Perl_newANONLIST(pTHX_ OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newANONHASH(pTHX_ OP* o)
+PERL_CALLCONV OP*	Perl_newANONHASH(pTHX_ OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -4425,11 +4420,6 @@ STATIC OP*	S_too_many_arguments(pTHX_ OP *o, const char* name)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_TOO_MANY_ARGUMENTS	\
 	assert(o); assert(name)
-
-STATIC bool	S_looks_like_bool(pTHX_ const OP* o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_LOOKS_LIKE_BOOL	\
-	assert(o)
 
 STATIC OP*	S_ref_array_or_hash(pTHX_ OP* cond);
 STATIC void	S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv, CV *const cv)

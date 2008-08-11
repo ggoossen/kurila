@@ -339,7 +339,6 @@ package main;
 
 {
     package Oscalar;
-    use overload ('""' => \&stringify, '0+' => \&numify, fallback => 1);
 
     sub new {
 	bless \@(@_[1], @_[2]), @_[0];
@@ -348,6 +347,8 @@ package main;
     sub stringify { @_[0]->[0] }
 
     sub numify { @_[0]->[1] }
+
+    use overload ('""' => \&stringify, '0+' => \&numify, fallback => 1);
 }
 
 sub generate {
@@ -655,7 +656,6 @@ sub min {
 sub foo {(1+$a) <+> (1+$b)}
 my $refcnt = &Internals::SvREFCNT(\&foo);
 @output = @( sort foo 3,7,9 );
-package Foo;
 main::is($refcnt, &Internals::SvREFCNT(\&foo), "sort sub refcnt");
 $fail_msg = q(Modification of a read-only value attempted);
 # Sorting a read-only array in-place shouldn't be allowed

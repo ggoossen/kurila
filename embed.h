@@ -363,7 +363,6 @@
 #define is_utf8_xdigit		Perl_is_utf8_xdigit
 #define is_utf8_mark		Perl_is_utf8_mark
 #ifdef PERL_CORE
-#define jmaybe			Perl_jmaybe
 #define keyword			Perl_keyword
 #endif
 #define leave_scope		Perl_leave_scope
@@ -1173,7 +1172,6 @@
 #define no_fh_allowed		S_no_fh_allowed
 #define too_few_arguments	S_too_few_arguments
 #define too_many_arguments	S_too_many_arguments
-#define looks_like_bool		S_looks_like_bool
 #define ref_array_or_hash	S_ref_array_or_hash
 #define process_special_blocks	S_process_special_blocks
 #endif
@@ -2312,7 +2310,7 @@
 #define my_chsize(a,b)		Perl_my_chsize(aTHX_ a,b)
 #endif
 #ifdef PERL_CORE
-#define convert(a,b,c)		Perl_convert(aTHX_ a,b,c)
+#define convert(a,b,c,d)	Perl_convert(aTHX_ a,b,c,d)
 #define create_eval_scope(a)	Perl_create_eval_scope(aTHX_ a)
 #endif
 #define vcroak(a,b)		Perl_vcroak(aTHX_ a,b)
@@ -2569,7 +2567,6 @@
 #define is_utf8_xdigit(a)	Perl_is_utf8_xdigit(aTHX_ a)
 #define is_utf8_mark(a)		Perl_is_utf8_mark(aTHX_ a)
 #ifdef PERL_CORE
-#define jmaybe(a)		Perl_jmaybe(aTHX_ a)
 #define keyword(a,b,c)		Perl_keyword(aTHX_ a,b,c)
 #endif
 #define leave_scope(a)		Perl_leave_scope(aTHX_ a)
@@ -2717,8 +2714,8 @@
 #ifdef PERL_CORE
 #define my_unexec()		Perl_my_unexec(aTHX)
 #endif
-#define newANONLIST(a)		Perl_newANONLIST(aTHX_ a)
-#define newANONHASH(a)		Perl_newANONHASH(aTHX_ a)
+#define newANONLIST(a,b)	Perl_newANONLIST(aTHX_ a,b)
+#define newANONHASH(a,b)	Perl_newANONHASH(aTHX_ a,b)
 #define newANONSUB(a,b,c)	Perl_newANONSUB(aTHX_ a,b,c)
 #define newASSIGNOP(a,b,c,d,e)	Perl_newASSIGNOP(aTHX_ a,b,c,d,e)
 #define newCONDOP(a,b,c,d,e)	Perl_newCONDOP(aTHX_ a,b,c,d,e)
@@ -3370,7 +3367,6 @@
 #define no_fh_allowed(a)	S_no_fh_allowed(aTHX_ a)
 #define too_few_arguments(a,b)	S_too_few_arguments(aTHX_ a,b)
 #define too_many_arguments(a,b)	S_too_many_arguments(aTHX_ a,b)
-#define looks_like_bool(a)	S_looks_like_bool(aTHX_ a)
 #define ref_array_or_hash(a)	S_ref_array_or_hash(aTHX_ a)
 #define process_special_blocks(a,b,c)	S_process_special_blocks(aTHX_ a,b,c)
 #endif

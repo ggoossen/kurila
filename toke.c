@@ -95,6 +95,9 @@
 static int
 S_pending_ident(pTHX);
 
+static SV*
+S_curlocation(pTHX);
+
 static const char ident_too_long[] = "Identifier too long";
 static const char commaless_variable_list[] = "comma-less variable list";
 
@@ -201,26 +204,28 @@ static const char* const lex_state_names[] = {
 #   define REPORT(retval) (retval)
 #endif
 
-#define TOKEN(retval) return ( PL_bufptr = s, REPORT(retval))
-#define OPERATOR(retval) return (PL_expect = XTERM, PL_bufptr = s, REPORT(retval))
-#define AOPERATOR(retval) return ao((PL_expect = XTERM, PL_bufptr = s, REPORT(retval)))
-#define PREBLOCK(retval) return (PL_expect = XBLOCK,PL_bufptr = s, REPORT(retval))
-#define PRETERMBLOCK(retval) return (PL_expect = XTERMBLOCK,PL_bufptr = s, REPORT(retval))
-#define PREREF(retval) return (PL_expect = XREF,PL_bufptr = s, REPORT(retval))
-#define TERM(retval) return (CLINE, PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval))
-#define LOOPX(f) return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)LOOPEX))
-#define FTST(f)  return (pl_yylval.i_tkval.ival=f, PL_expect=XTERMORDORDOR, PL_bufptr=s, REPORT((int)UNIOP))
-#define FUN0(f)  return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC0))
-#define FUN1(f)  return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC1))
-#define BOop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITOROP)))
-#define BAop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITANDOP)))
-#define SHop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)SHIFTOP)))
-#define PWop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)POWOP)))
-#define PMop(f)  return(pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MATCHOP))
-#define Aop(f)   return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)ADDOP)))
-#define Mop(f)   return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MULOP)))
-#define Eop(f)   return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)EQOP))
-#define Rop(f)   return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)RELOP))
+#define SETCURLOCATION(x) { pl_yylval.i_tkval.location = S_curlocation(); x }
+
+#define TOKEN(retval) SETCURLOCATION( return ( PL_bufptr = s, REPORT(retval)); )
+#define OPERATOR(retval) SETCURLOCATION( return (PL_expect = XTERM, PL_bufptr = s, REPORT(retval)); )
+#define AOPERATOR(retval) SETCURLOCATION( return ao((PL_expect = XTERM, PL_bufptr = s, REPORT(retval))); )
+#define PREBLOCK(retval) SETCURLOCATION( return (PL_expect = XBLOCK,PL_bufptr = s, REPORT(retval)); )
+#define PRETERMBLOCK(retval) SETCURLOCATION( return (PL_expect = XTERMBLOCK,PL_bufptr = s, REPORT(retval)); )
+#define PREREF(retval) SETCURLOCATION( return (PL_expect = XREF,PL_bufptr = s, REPORT(retval)); )
+#define TERM(retval) SETCURLOCATION( return (CLINE, PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval)); )
+#define LOOPX(f) SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)LOOPEX)); )
+#define FTST(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERMORDORDOR, PL_bufptr=s, REPORT((int)UNIOP)); )
+#define FUN0(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC0)); )
+#define FUN1(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC1)); )
+#define BOop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITOROP))); )
+#define BAop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITANDOP))); )
+#define SHop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)SHIFTOP))); )
+#define PWop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)POWOP))); )
+#define PMop(f)  SETCURLOCATION( return(pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MATCHOP)); )
+#define Aop(f)   SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)ADDOP))); )
+#define Mop(f)   SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MULOP))); )
+#define Eop(f)   SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)EQOP)); )
+#define Rop(f)   SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)RELOP)); )
 
 /* This bit of chicanery makes a unary function followed by
  * a parenthesis into a function with one argument, highest precedence.
@@ -229,6 +234,7 @@ static const char* const lex_state_names[] = {
  */
 #define UNI2(f,x) { \
 	pl_yylval.i_tkval.ival = f; \
+	pl_yylval.i_tkval.location = S_curlocation();	\
 	PL_expect = x; \
 	PL_bufptr = s; \
 	PL_last_uni = PL_oldbufptr; \
@@ -243,6 +249,7 @@ static const char* const lex_state_names[] = {
 
 #define UNIBRACK(f) { \
 	pl_yylval.i_tkval.ival = f; \
+	pl_yylval.i_tkval.location = S_curlocation();	\
 	PL_bufptr = s; \
 	PL_last_uni = PL_oldbufptr; \
 	if (*s == '(') \
@@ -252,7 +259,7 @@ static const char* const lex_state_names[] = {
 	}
 
 /* grandfather return to old style */
-#define OLDLOP(f) return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)LSTOP)
+#define OLDLOP(f) SETCURLOCATION( return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)LSTOP); )
 
 #ifdef DEBUGGING
 
@@ -1206,6 +1213,7 @@ S_lop(pTHX_ I32 f, int x, char *s)
     PERL_ARGS_ASSERT_LOP;
 
     pl_yylval.i_tkval.ival = f;
+    pl_yylval.i_tkval.location = S_curlocation();
     CLINE;
     PL_expect = x;
     PL_bufptr = s;
@@ -2807,10 +2815,12 @@ Perl_yylex(pTHX)
 		}
 #endif
 		/* commas only at base level: /$a\Ub$c/ => ($a,uc(b.$c)) */
-		if (PL_lex_casemods == 1 && PL_lex_flags & LEXf_INPAT)
+		if (PL_lex_casemods == 1 && PL_lex_flags & LEXf_INPAT) {
 		    OPERATOR(',');
-		else
+		}
+		else {
 		    Aop(OP_CONCAT);
+		}
 	    }
 	    else
 		return yylex();
@@ -2871,8 +2881,9 @@ Perl_yylex(pTHX)
 	    }
 #endif
 	    /* commas only at base level: /$a\Ub$c/ => ($a,uc(b.$c)) */
-	    if (!PL_lex_casemods && (PL_lex_flags & LEXf_INPAT))
+	    if (!PL_lex_casemods && (PL_lex_flags & LEXf_INPAT)) {
 		OPERATOR(',');
+	    }
 	    else
 		Aop(OP_CONCAT);
 	}
@@ -2925,10 +2936,12 @@ Perl_yylex(pTHX)
 		}
 #endif
 		/* commas only at base level: /$a\Ub$c/ => ($a,uc(b.$c)) */
-		if (!PL_lex_casemods &&  PL_lex_flags & LEXf_INPAT)
+		if (!PL_lex_casemods &&  PL_lex_flags & LEXf_INPAT) {
 		    OPERATOR(',');
-		else
+		}
+		else {
 		    Aop(OP_CONCAT);
+		}
 	    }
 	    else {
 		PL_bufptr = s;
@@ -3461,8 +3474,9 @@ Perl_yylex(pTHX)
 	    const char tmp = *s++;
 	    if (*s == tmp) {
 		s++;
-		if (PL_expect == XOPERATOR)
+		if (PL_expect == XOPERATOR) {
 		    TERM(POSTDEC);
+		}
 		else
 		    OPERATOR(PREDEC);
 	    }
@@ -3521,8 +3535,9 @@ Perl_yylex(pTHX)
 		else
 		    TERM(ARROW);
 	    }
-	    if (PL_expect == XOPERATOR)
+	    if (PL_expect == XOPERATOR) {
 		Aop(OP_SUBTRACT);
+	    }
 	    else {
 		if (isSPACE(*s) || !isSPACE(*PL_bufptr))
 		    check_uni();
@@ -3552,13 +3567,15 @@ Perl_yylex(pTHX)
 
 	    if (*s == '+') {
 		s++;
-		if (PL_expect == XOPERATOR)
+		if (PL_expect == XOPERATOR) {
 		    TERM(POSTINC);
+		}
 		else
 		    OPERATOR(PREINC);
 	    }
-	    if (PL_expect == XOPERATOR)
+	    if (PL_expect == XOPERATOR) {
 		Aop(OP_ADD);
+	    }
 	    else {
 		if (isSPACE(*s) || !isSPACE(*PL_bufptr))
 		    check_uni();
@@ -4256,7 +4273,6 @@ Perl_yylex(pTHX)
 	    }
 	    if (PL_expect != XOPERATOR)
 		check_uni();
-	    pl_yylval.i_tkval.location = S_curlocation();
 	    Aop(OP_CONCAT);
 	}
 	/* FALL THROUGH */
@@ -5318,8 +5334,9 @@ Perl_yylex(pTHX)
 	    OPERATOR(USE);
 
 	case KEY_not:
-	    if (*s == '(' || (s = SKIPSPACE1(s), *s == '('))
+	    if (*s == '(' || (s = SKIPSPACE1(s), *s == '(')) {
 		FUN1(OP_NOT);
+	    }
 	    else
 		OPERATOR(NOTOP);
 
@@ -5542,8 +5559,9 @@ Perl_yylex(pTHX)
 
 	case KEY_s:
 	    s = scan_subst(s);
-	    if (pl_yylval.opval)
+	    if (pl_yylval.opval) {
 		TERM(sublex_start(pl_yylval.i_tkval.ival, PL_lex_op));
+	    }
 	    else
 		TOKEN(1);	/* force error */
 
