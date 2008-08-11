@@ -190,7 +190,7 @@ sub SWASHNEW_real {
 	    ## If we have, return the cached results. The cache key is the
 	    ## class and file to load.
 	    ##
-	    my $found = %Cache{$class, $file};
+	    my $found = %Cache{$class . "," . $file};
 	    if ($found and ref($found) eq $class) {
 		print STDERR "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
 		return $found;
@@ -276,7 +276,7 @@ sub SWASHNEW_real {
     ) => $class;
 
     if ($file) {
-        %Cache{$class, $file} = $SWASH;
+        %Cache{$class . "," . $file} = $SWASH;
     }
 
     return $SWASH;

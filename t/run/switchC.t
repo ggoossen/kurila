@@ -40,7 +40,7 @@ SKIP: {
 $r = runperl( switches => \@( '-CE', '-w' ),
 	      prog     => 'use utf8; warn chr(256)',
               stderr   => 1 );
-like( $r, qr/^$b at -e line 1.$/s, '-CE: UTF-8 stderr' );
+like( $r, qr/^$b at -e line 1 character \d+.$/s, '-CE: UTF-8 stderr' );
 
 $r = runperl( switches => \@( '-Co', '-w' ),
 	      prog     => 'use utf8; open(F, q(>), q(out)) or die $!; print F chr(256); close F', stderr   => 1 ); like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' ); 

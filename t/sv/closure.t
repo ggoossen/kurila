@@ -681,8 +681,8 @@ __EOF__
     sub  X::DESTROY { $flag = 1 }
     {
 	my $x;
-	BEGIN {$x = \&newsub }
 	sub newsub {};
+	BEGIN {$x = \&newsub }
 	$x = bless \%(), 'X';
     }
     # test { $flag == 1 };

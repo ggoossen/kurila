@@ -694,11 +694,12 @@ OP_new(class, type, flags)
         sv_setiv(newSVrv(ST(0), "B::OP"), PTR2IV(o));
 
 void
-OP_newstate(class, flags, label, oldo)
+OP_newstate(class, flags, label, oldo, location)
     SV * class
     I32 flags
     char * label
     B::OP oldo
+    SV* location
     SV** sparepad = NO_INIT
     OP *o = NO_INIT
     OP *saveop = NO_INIT
@@ -706,7 +707,7 @@ OP_newstate(class, flags, label, oldo)
         sparepad = PL_curpad;
         saveop = PL_op;
         PL_curpad = AvARRAY(PL_comppad);
-        o = newSTATEOP(flags, label, oldo);
+        o = newSTATEOP(flags, label, oldo, location);
         PL_curpad = sparepad;
         PL_op = saveop;
             ST(0) = sv_newmortal();
@@ -735,11 +736,12 @@ UNOP_set_first(o, first)
         o->op_first = first;
     
 void
-UNOP_new(class, type, flags, sv_first)
+UNOP_new(class, type, flags, sv_first, location)
     SV * class
     SV * type
     I32 flags
     SV * sv_first
+    SV * location
     OP *first = NO_INIT
     OP *o = NO_INIT
     I32 typenum = NO_INIT
@@ -763,7 +765,7 @@ UNOP_new(class, type, flags, sv_first)
 
         PL_curpad = AvARRAY(PL_comppad);
         typenum = op_name_to_num(type);
-        o = newUNOP(typenum, flags, first);
+        o = newUNOP(typenum, flags, first, location);
 #ifdef PERL_CUSTOM_OPS
         if (typenum == OP_CUSTOM)
             o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
@@ -789,12 +791,13 @@ BINOP_set_last(o, last)
         o->op_last = last;
 
 void
-BINOP_new(class, type, flags, sv_first, sv_last)
+BINOP_new(class, type, flags, sv_first, sv_last, location)
     SV * class
     SV * type
     I32 flags
     SV * sv_first
     SV * sv_last
+    SV * location
     OP *first = NO_INIT
     OP *last = NO_INIT
     OP *o = NO_INIT
@@ -833,9 +836,9 @@ BINOP_new(class, type, flags, sv_first, sv_last)
         PL_curpad = AvARRAY(PL_comppad);
         
         if (typenum == OP_SASSIGN || typenum == OP_AASSIGN) 
-            o = newASSIGNOP(flags, first, 0, last);
+            o = newASSIGNOP(flags, first, 0, last, location);
         else {
-            o = newBINOP(typenum, flags, first, last);
+            o = newBINOP(typenum, flags, first, last, location);
 #ifdef PERL_CUSTOM_OPS
             if (typenum == OP_CUSTOM)
                 o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
@@ -851,12 +854,13 @@ BINOP_new(class, type, flags, sv_first, sv_last)
 MODULE = B::OP    PACKAGE = B::LISTOP             PREFIX = LISTOP_
 
 void
-LISTOP_new(class, type, flags, sv_first, sv_last)
+LISTOP_new(class, type, flags, sv_first, sv_last, location)
     SV * class
     SV * type
     I32 flags
     SV * sv_first
     SV * sv_last
+    SV * location
     OP *first = NO_INIT
     OP *last = NO_INIT
     OP *o = NO_INIT
@@ -893,7 +897,7 @@ LISTOP_new(class, type, flags, sv_first, sv_last)
         I32 typenum = op_name_to_num(type);
 
         PL_curpad = AvARRAY(PL_comppad);
-        o = newLISTOP(typenum, flags, first, last);
+        o = newLISTOP(typenum, flags, first, last, location);
 #ifdef PERL_CUSTOM_OPS
         if (typenum == OP_CUSTOM)
             o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
@@ -907,12 +911,13 @@ LISTOP_new(class, type, flags, sv_first, sv_last)
 MODULE = B::OP    PACKAGE = B::LOGOP              PREFIX = LOGOP_
 
 void
-LOGOP_new(class, type, flags, sv_first, sv_last)
+LOGOP_new(class, type, flags, sv_first, sv_last, location)
     SV * class
     SV * type
     I32 flags
     SV * sv_first
     SV * sv_last
+    SV * location
     OP *first = NO_INIT
     OP *last = NO_INIT
     OP *o = NO_INIT
@@ -948,7 +953,7 @@ LOGOP_new(class, type, flags, sv_first, sv_last)
         OP* saveop   = PL_op;
         I32 typenum  = op_name_to_num(type);
         PL_curpad = AvARRAY(PL_comppad);
-        o = newLOGOP(typenum, flags, first, last);
+        o = newLOGOP(typenum, flags, first, last, location);
 #ifdef PERL_CUSTOM_OPS
         if (typenum == OP_CUSTOM)
             o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
@@ -960,12 +965,13 @@ LOGOP_new(class, type, flags, sv_first, sv_last)
         sv_setiv(newSVrv(ST(0), "B::LOGOP"), PTR2IV(o));
 
 void
-LOGOP_newcond(class, flags, sv_first, sv_last, sv_else)
+LOGOP_newcond(class, flags, sv_first, sv_last, sv_else, location)
     SV * class
     I32 flags
     SV * sv_first
     SV * sv_last
     SV * sv_else
+    SV * location
     OP *first = NO_INIT
     OP *last = NO_INIT
     OP *elseo = NO_INIT
@@ -1014,7 +1020,7 @@ LOGOP_newcond(class, flags, sv_first, sv_last, sv_else)
         SV**sparepad = PL_curpad;
         OP* saveop   = PL_op;
         PL_curpad = AvARRAY(PL_comppad);
-        o = newCONDOP(flags, first, last, elseo);
+        o = newCONDOP(flags, first, last, elseo, location);
         PL_curpad = sparepad;
         PL_op = saveop;
         }
@@ -1053,11 +1059,12 @@ SVOP_set_sv(o, ...)
         OLD_PAD;
 
 void
-SVOP_new(class, type, flags, sv)
+SVOP_new(class, type, flags, sv, location)
     SV * class
     SV * type
     I32 flags
     SV * sv
+    SV * location
     SV** sparepad = NO_INIT
     OP *o = NO_INIT
     OP *saveop = NO_INIT
@@ -1076,7 +1083,7 @@ SVOP_new(class, type, flags, sv)
             "First character to GVSV was not dollar");
         } else
             param = newSVsv(sv);
-        o = newSVOP(typenum, flags, param);
+        o = newSVOP(typenum, flags, param, location);
 #ifdef PERL_CUSTOM_OPS
         if (typenum == OP_CUSTOM)
             o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
@@ -1121,11 +1128,12 @@ LOOP_set_lastop(o, lastop)
 MODULE = B::OP    PACKAGE = B::COP                PREFIX = COP_
 
 B::COP
-COP_new(class, flags, name, sv_first)
+COP_new(class, flags, name, sv_first, location)
     SV * class
     char * name
     I32 flags
     SV * sv_first
+    SV * location
     OP *first = NO_INIT
     OP *o = NO_INIT
     CODE:
@@ -1146,7 +1154,7 @@ COP_new(class, flags, name, sv_first)
         SV**sparepad = PL_curpad;
         OP* saveop = PL_op;
         PL_curpad = AvARRAY(PL_comppad);
-        o = newSTATEOP(flags, name, first);
+        o = newSTATEOP(flags, name, first, location);
         PL_curpad = sparepad;
         PL_op = saveop;
         }
@@ -1559,7 +1567,7 @@ Cvnewsub_simple(class, name, block)
     OP* o = NO_INIT
 
     CODE:
-        o = newSVOP(OP_CONST, 0, name);
+        o = newSVOP(OP_CONST, 0, name, NULL);
         mycv = newSUB(start_subparse(0), o, Nullop, block);
         /*op_free(o); */
         RETVAL = mycv;

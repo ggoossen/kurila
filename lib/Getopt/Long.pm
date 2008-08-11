@@ -51,7 +51,7 @@ BEGIN {
 }
 
 # User visible variables.
-use vars < @EXPORT, < @EXPORT_OK;
+our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER);
 use vars qw($error $debug $major_version $minor_version);
 # Deprecated visible variables.
 use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
