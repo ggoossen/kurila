@@ -1240,6 +1240,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	return FALSE;
     }
 
+
     ENTER;
     SAVESPTR(*hook);
     *hook = PERL_DIEHOOK_IGNORE;
@@ -1290,10 +1291,14 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	    PUSHMARK(SP);
 
 	    XPUSHs(msv);
+	    if (PL_op)
+		XPUSHs(PL_op->op_location);
 
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    SPAGAIN;
 	    msv = TOPs;
+	    PUTBACK;
 	    POPSTACK;
 	    LEAVE;
 	}
@@ -1404,7 +1409,11 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	    ENTER;
 	    PUSHSTACKi(PERLSI_WARNHOOK);
 	    PUSHMARK(SP);
+
 	    XPUSHs(msv);
+	    if (PL_op)
+		XPUSHs(PL_op->op_location);
+
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;

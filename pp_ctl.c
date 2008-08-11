@@ -3050,7 +3050,7 @@ STATIC PMOP *
 S_make_matcher(pTHX_ REGEXP *re)
 {
     dVAR;
-    PMOP *matcher = (PMOP *) newPMOP(OP_MATCH, OPf_WANT_SCALAR | OPf_STACKED);
+    PMOP *matcher = (PMOP *) newPMOP(OP_MATCH, OPf_WANT_SCALAR | OPf_STACKED, NULL);
 
     PERL_ARGS_ASSERT_MAKE_MATCHER;
 

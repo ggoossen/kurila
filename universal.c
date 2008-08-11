@@ -859,10 +859,11 @@ XS(XS_error_create)
     dXSARGS;
     PERL_UNUSED_ARG(cv);
     if (items > 3)
-	Perl_croak(aTHX_ "Usage: version::new(class, version)");
+	Perl_croak(aTHX_ "Usage: error::create(message, location)");
     SP -= items;
     {
         SV *vs = ST(0);
+	SV *location = ST(1);
 	SV *rv;
 	HV *hv;
 
@@ -900,15 +901,17 @@ XS(XS_error_create)
 	     * from the sibling of PL_curcop.
 	     */
 
-	    const COP *cop = S_closest_cop(aTHX_ PL_curcop, PL_curcop->op_sibling);
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
-	    if (!cop)
-		cop = PL_curcop;
-
-	    if (CopLINE(cop))
-		Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf".",
-			       OutCopFILE(cop), (IV)CopLINE(cop));
+	    if ( items >= 2 ) {
+		if (location && SvOK(location)) {
+		    Perl_sv_catpvf(aTHX_ sv, "%s:%"IVdf":%"IVdf":",
+				   SvPVX_const(*av_fetch(location, 0, FALSE)),
+				   SvIV(*av_fetch(location, 1, FALSE)),
+				   SvIV(*av_fetch(location, 2, FALSE))
+			);
+		}
+	    }
 	    if (PL_dirty)
 		sv_catpvs(sv, " during global destruction");
 

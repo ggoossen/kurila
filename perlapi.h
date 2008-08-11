@@ -388,8 +388,6 @@ END_EXTERN_C
 #define PL_min_intro_pending	(*Perl_Imin_intro_pending_ptr(aTHX))
 #undef  PL_minus_E
 #define PL_minus_E		(*Perl_Iminus_E_ptr(aTHX))
-#undef  PL_minus_F
-#define PL_minus_F		(*Perl_Iminus_F_ptr(aTHX))
 #undef  PL_minus_a
 #define PL_minus_a		(*Perl_Iminus_a_ptr(aTHX))
 #undef  PL_minus_c
@@ -550,8 +548,6 @@ END_EXTERN_C
 #define PL_sort_RealCmp		(*Perl_Isort_RealCmp_ptr(aTHX))
 #undef  PL_sortcop
 #define PL_sortcop		(*Perl_Isortcop_ptr(aTHX))
-#undef  PL_splitstr
-#define PL_splitstr		(*Perl_Isplitstr_ptr(aTHX))
 #undef  PL_srand_called
 #define PL_srand_called		(*Perl_Isrand_called_ptr(aTHX))
 #undef  PL_stack_base
