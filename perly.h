@@ -195,17 +195,23 @@
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-    I32	ival; /* __DEFAULT__ (marker for regen_perly.pl;
+    I32 ionlyval;
+    char *pval; /* __DEFAULT__ (marker for regen_perly.pl;
 				must always be 1st union member) */
-    char *pval;
     OP *opval;
     GV *gvval;
 #ifdef PERL_IN_MADLY_C
     MADTOKEN* p_tkval;
     MADTOKEN* i_tkval;
 #else
-    char *p_tkval;
-    I32	i_tkval;
+    struct {
+        I32 ival;
+        SV *location;
+    } i_tkval;
+    struct {
+        char *pval;
+        SV *location;
+    } p_tkval;
 #endif
 #ifdef PERL_MAD
     MADTOKEN* tkval;

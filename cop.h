@@ -475,6 +475,7 @@ struct block {
     U16		blku_u16;	/* used by block_sub and block_eval (so far) */
     I32		blku_oldsp;	/* stack pointer to copy stuff down to */
     COP *	blku_oldcop;	/* old curcop pointer */
+    OP *	blku_oldop;	/* old op pointer */
     I32		blku_oldmarksp;	/* mark stack index */
     I32		blku_oldscopesp;	/* scope stack index */
     PMOP *	blku_oldpm;	/* values of pattern match vars */
@@ -487,6 +488,7 @@ struct block {
 };
 #define blk_oldsp	cx_u.cx_blk.blku_oldsp
 #define blk_oldcop	cx_u.cx_blk.blku_oldcop
+#define blk_oldop	cx_u.cx_blk.blku_oldop
 #define blk_oldmarksp	cx_u.cx_blk.blku_oldmarksp
 #define blk_oldscopesp	cx_u.cx_blk.blku_oldscopesp
 #define blk_oldpm	cx_u.cx_blk.blku_oldpm
@@ -501,6 +503,7 @@ struct block {
 	cx->cx_type		= t,					\
 	cx->blk_oldsp		= sp - PL_stack_base,			\
 	cx->blk_oldcop		= PL_curcop,				\
+	cx->blk_oldop		= PL_op,				\
 	cx->blk_oldmarksp	= PL_markstack_ptr - PL_markstack,	\
 	cx->blk_oldscopesp	= PL_scopestack_ix,			\
 	cx->blk_oldpm		= PL_curpm,				\

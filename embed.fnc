@@ -526,8 +526,8 @@ p	|void	|my_unexec
 Apa	|OP*	|newANONLIST	|NULLOK OP* o
 Apa	|OP*	|newANONHASH	|NULLOK OP* o
 Ap	|OP*	|newANONSUB	|I32 floor|NULLOK OP* proto|NULLOK OP* block
-Apa	|OP*	|newASSIGNOP	|I32 flags|NULLOK OP* left|I32 optype|NULLOK OP* right
-Apa	|OP*	|newCONDOP	|I32 flags|NN OP* first|NULLOK OP* trueop|NULLOK OP* falseop
+Apa	|OP*	|newASSIGNOP	|I32 flags|NULLOK OP* left|I32 optype|NULLOK OP* right|NULLOK SV* location
+Apa	|OP*	|newCONDOP	|I32 flags|NN OP* first|NULLOK OP* trueop|NULLOK OP* falseop|NULLOK SV* location
 Apd	|CV*	|newCONSTSUB	|NULLOK const char* name|NULLOK SV* sv
 #ifdef PERL_MAD
 Ap	|OP*	|newFORM	|I32 floor|NULLOK OP* o|NULLOK OP* block
@@ -535,16 +535,16 @@ Ap	|OP*	|newFORM	|I32 floor|NULLOK OP* o|NULLOK OP* block
 Ap	|void	|newFORM	|I32 floor|NULLOK OP* o|NULLOK OP* block
 #endif
 Apa	|OP*	|newFOROP	|I32 flags|NULLOK char* label|line_t forline \
-				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont
-Apa	|OP*	|newLOGOP	|I32 optype|I32 flags|NN OP *first|NN OP *other
+				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont|NULLOK SV* location
+Apa	|OP*	|newLOGOP	|I32 optype|I32 flags|NN OP *first|NN OP *other|NULLOK SV* location
 Apa	|OP*	|newLOOPEX	|I32 type|NN OP* label
-Apa	|OP*	|newLOOPOP	|I32 flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* block
+Apa	|OP*	|newLOOPOP	|I32 flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* block|NULLOK SV* location
 Apa	|OP*	|newNULLLIST
 Apa	|OP*	|newOP		|I32 optype|I32 flags
 Ap	|void	|newPROG	|NN OP* o
 Apa	|OP*	|newRANGE	|I32 flags|NN OP* left|NN OP* right
 Apa	|OP*	|newSLICEOP	|I32 flags|NULLOK OP* subscript|NULLOK OP* listop
-Apa	|OP*	|newSTATEOP	|I32 flags|NULLOK char* label|NULLOK OP* o
+Apa	|OP*	|newSTATEOP	|I32 flags|NULLOK char* label|NULLOK OP* o|NULLOK SV* location
 Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* o|NULLOK OP* proto|NULLOK OP* block
 ApM	|CV *	|newXS_flags	|NULLOK const char *name|NN XSUBADDR_t subaddr\
 				|NN const char *const filename \
@@ -553,9 +553,9 @@ Apd	|CV*	|newXS		|NULLOK const char *name|NN XSUBADDR_t subaddr\
 				|NN const char *filename
 AmdbR	|AV*	|newAV
 Apa	|OP*	|newAVREF	|NN OP* o
-Apa	|OP*	|newBINOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last
+Apa	|OP*	|newBINOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last|NULLOK SV* location
 Apa	|OP*	|newCVREF	|I32 flags|NULLOK OP* o
-Apa	|OP*	|newGVOP	|I32 type|I32 flags|NN GV* gv
+Apa	|OP*	|newGVOP	|I32 type|I32 flags|NN GV* gv|NULLOK SV* location
 Apa	|GV*	|newGVgen	|NN const char* pack
 Apa	|OP*	|newGVREF	|I32 type|NULLOK OP* o
 ApaR	|OP*	|newHVREF	|NN OP* o
@@ -563,17 +563,17 @@ AmdbR	|HV*	|newHV
 ApaR	|HV*	|newHVhv	|NULLOK HV *hv
 Ap	|void	|hv_sethv	|NN HV *dstr|NN HV *sstr
 Apa	|IO*	|newIO
-Apa	|OP*	|newLISTOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last
+Apa	|OP*	|newLISTOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last|NULLOK SV* location
 #ifdef USE_ITHREADS
-Apa	|OP*	|newPADOP	|I32 type|I32 flags|NN SV* sv
+Apa	|OP*	|newPADOP	|I32 type|I32 flags|NN SV* sv|NULLOK SV* location
 #endif
-Apa	|OP*	|newPMOP	|I32 type|I32 flags
-Apa	|OP*	|newPVOP	|I32 type|I32 flags|NULLOK char* pv
+Apa	|OP*	|newPMOP	|I32 type|I32 flags|NULLOK SV* location
+Apa	|OP*	|newPVOP	|I32 type|I32 flags|NULLOK char* pv|NULLOK SV* location
 Apa	|SV*	|newRV		|NN SV *const sv
 Apda	|SV*	|newRV_noinc	|NN SV *const sv
 Apda	|SV*	|newSV		|const STRLEN len
 Apa	|OP*	|newSVREF	|NN OP* o
-Apa	|OP*	|newSVOP	|I32 type|I32 flags|NN SV* sv
+Apa	|OP*	|newSVOP	|I32 type|I32 flags|NN SV* sv|NULLOK SV* location
 Apda	|SV*	|newSViv	|const IV i
 Apda	|SV*	|newSVuv	|const UV u
 Apda	|SV*	|newSVnv	|const NV n
@@ -587,9 +587,9 @@ Apa	|SV*	|vnewSVpvf	|NN const char *const pat|NULLOK va_list *const args
 Apd	|SV*	|newSVrv	|NN SV *const rv|NULLOK const char *const classname
 Apda	|SV*	|newSVsv	|NULLOK SV *const old
 Apda	|SV*	|newSV_type	|const svtype type
-Apa	|OP*	|newUNOP	|I32 type|I32 flags|NULLOK OP* first
+Apa	|OP*	|newUNOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK SV* location
 Apa	|OP*	|newWHILEOP	|I32 flags|I32 debuggable|NULLOK LOOP* loop \
-				|I32 whileline|NULLOK OP* expr|NULLOK OP* block|NULLOK OP* cont \
+				|NULLOK SV* location|NULLOK OP* expr|NULLOK OP* block|NULLOK OP* cont \
 				|I32 has_my
 Apa	|PERL_SI*|new_stackinfo|I32 stitems|I32 cxitems
 Ap	|char*	|scan_vstring	|NN const char *s|NN const char *const e \
@@ -1183,7 +1183,7 @@ s	|void	|cop_free	|NN COP *cop
 s	|OP*	|modkids	|NULLOK OP *o|I32 type
 s	|OP*	|scalarboolean	|NN OP *o
 sR	|OP*	|newDEFSVOP
-sR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp
+sR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp|NULLOK SV *location
 s	|void	|simplify_sort	|NN OP *o
 s	|const char*	|gv_ename	|NN GV *gv
 s	|OP *	|my_kid		|NULLOK OP *o|NULLOK OP *attrs|NN OP **imopsp

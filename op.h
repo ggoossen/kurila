@@ -54,6 +54,7 @@ typedef PERL_BITFIELD16 optype;
     OP*		op_next;		\
     OP*		op_sibling;		\
     OP*		(CPERLscope(*op_ppaddr))(pTHX);		\
+    SV*         op_location;            \
     MADPROP_IN_BASEOP			\
     PADOFFSET	op_targ;		\
     PERL_BITFIELD16 op_type:9;		\

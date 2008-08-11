@@ -86,7 +86,7 @@ yysymprint(pTHX_ PerlIO * const yyoutput, int yytype, const YYSTYPE * const yyva
 #   ifdef YYPRINT
 	YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
 #   else
-	YYFPRINTF (yyoutput, "0x%"UVxf, (UV)yyvaluep->ival);
+	YYFPRINTF (yyoutput, "0x%"UVxf, (UV)yyvaluep->i_tkval.ival);
 #   endif
     }
     else
@@ -139,11 +139,10 @@ yy_stack_print (pTHX_ const yy_parser *parser)
 
 	case toketype_i_tkval:
 #endif
-	case toketype_ival:
-	    PerlIO_printf(Perl_debug_log, " %8"IVdf, (IV)ps->val.ival);
+	    PerlIO_printf(Perl_debug_log, " %8"IVdf, (IV)ps->val.i_tkval.ival);
 	    break;
 	default:
-	    PerlIO_printf(Perl_debug_log, " %8"UVxf, (UV)ps->val.ival);
+	    PerlIO_printf(Perl_debug_log, " %8"UVxf, (UV)ps->val.i_tkval.ival);
 	}
     }
     PerlIO_printf(Perl_debug_log, "\n\n");
@@ -513,8 +512,9 @@ Perl_yyparse (pTHX)
 #  define DO_MAD(a) a
 #  define MAD
 #else
-#  define IVAL(i) (i)
-#  define PVAL(p) (p)
+#  define IVAL(i) (i.ival)
+#  define PVAL(p) (p.pval)
+#  define LOCATION(v) (v.location)
 #  define TOKEN_GETMAD(a,b,c)
 #  define APPEND_MADPROPS_PV(a,b,c)
 #  define TOKEN_FREE(a)
