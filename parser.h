@@ -35,6 +35,7 @@ typedef struct {
 typedef struct yy_str_info {
     SV *str_sv; /* SV holding the string */
     U16 flags;	/* flags for the lexer */
+    I32 char_offset; /* offset for character */
 } yy_str_info;
 
 typedef struct yy_parser {
@@ -72,6 +73,7 @@ typedef struct yy_parser {
     yy_str_info lex_stuff; 	/* runtime pattern from m// or s/// */
     yy_str_info lex_repl; 	/* runtime pattern from m// or s/// */
 
+    I32         lex_charoffset;  /* character offset for subpaterns. */
     I32		multi_start;	/* 1st line of multi-line string */
     I32		multi_end;	/* last line of multi-line string */
     char	multi_open;	/* delimiter of said string */
