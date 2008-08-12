@@ -208,7 +208,7 @@ line	:	label cond
 	|	label ';'
 			{
 			  if (PVAL($1)) {
-			      $$ = newSTATEOP(0, PVAL($1), newOP(OP_NULL, 0), LOCATION($1));
+			      $$ = newSTATEOP(0, PVAL($1), newOP(OP_NULL, 0, LOCATION($1)), LOCATION($1));
 			      TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L');
 			      TOKEN_GETMAD($2,((LISTOP*)$$)->op_first,';');
 			  }
@@ -490,9 +490,10 @@ decl	:	subrout
 	;
 
 peg	:	PEG
-			{ $$ = newOP(OP_NULL,0);
-			  TOKEN_GETMAD($1,$$,'p');
-                          APPEND_MADPROPS_PV("peg",$$,'>');
+                        {
+                            $$ = newOP(OP_NULL,0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'p');
+                            APPEND_MADPROPS_PV("peg",$$,'>');
 			}
 	;
 
@@ -595,8 +596,9 @@ myattrlist:	COLONATTR THING
 
 /* Subroutine body - either null or a block */
 subbody	:	block	{ $$ = $1; }
-        |	';'	{ $$ = newOP(OP_NULL, 0);
-                          yyerror("forward subroutine declartion not allowed");
+        |	';'	{
+                           $$ = newOP(OP_NULL, 0, LOCATION($1) );
+                           yyerror("forward subroutine declartion not allowed");
                         }
 	;
 
@@ -790,7 +792,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	term ARROW HSLICE expr ']' ';' '}'    /* someref->{[bar();]} */
 			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0),
+				newOP(OP_PUSHMARK, 0, LOCATION($3)),
                                 newLISTOP(OP_HSLICE, 0,
                                     list($4),
                                     ref(newHVREF($1), OP_HSLICE), LOCATION($3)));
@@ -803,7 +805,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
 			{ $$ = prepend_elem(OP_ASLICE,
-				newOP(OP_PUSHMARK, 0),
+				newOP(OP_PUSHMARK, 0, LOCATION($3)),
 				    newLISTOP(OP_ASLICE, 0,
 					list($4),
 					ref(newAVREF($1), OP_ASLICE), LOCATION($3)));
@@ -814,7 +816,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
 			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0),
+				newOP(OP_PUSHMARK, 0, LOCATION($2)),
 				    newLISTOP(OP_HSLICE, 0,
 					list($3),
 					ref($1, OP_HSLICE), LOCATION($2)));
@@ -1125,7 +1127,7 @@ term	:	termbinop
 			{ $$ = $1; }
 	|	ary ASLICE expr ']' ']'                     /* array slice */
 			{ $$ = prepend_elem(OP_ASLICE,
-                                            newOP(OP_PUSHMARK, 0),
+                                newOP(OP_PUSHMARK, 0, LOCATION($2)),
                                             newLISTOP(OP_ASLICE, 0,
                                                       list($3),
                                                       $1, LOCATION($2)));
@@ -1168,9 +1170,10 @@ term	:	termbinop
                           APPEND_MADPROPS_PV("noamp", $$, '>');
 			}
 	|	LOOPEX  /* loop exiting command (goto, last, dump, etc) */
-			{ $$ = newOP(IVAL($1), OPf_SPECIAL);
+                        {
+                            $$ = newOP(IVAL($1), OPf_SPECIAL, LOCATION($1));
 			    PL_hints |= HINT_BLOCK_SCOPE;
-			  TOKEN_GETMAD($1,$$,'o');
+                            TOKEN_GETMAD($1,$$,'o');
 			}
 	|	LOOPEX term
 			{ $$ = newLOOPEX(IVAL($1),$2);
@@ -1181,9 +1184,10 @@ term	:	termbinop
 			  TOKEN_GETMAD($1,$$,'o');
 			}
 	|	UNIOP                                /* Unary op, $_ implied */
-			{ $$ = newOP(IVAL($1), 0);
-			  TOKEN_GETMAD($1,$$,'o');
-                          APPEND_MADPROPS_PV("uniop", $$, '>');
+			{ 
+                            $$ = newOP(IVAL($1), 0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
+                            APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	UNIOP block                          /* eval { foo }* */
 			{ $$ = newUNOP(IVAL($1), 0, $2, LOCATION($1));
@@ -1196,8 +1200,9 @@ term	:	termbinop
                           APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	REQUIRE                              /* require, $_ implied */
-                        { $$ = newOP(OP_REQUIRE, IVAL($1) ? OPf_SPECIAL : 0);
-			  TOKEN_GETMAD($1,$$,'o');
+                        {
+                            $$ = newOP(OP_REQUIRE, IVAL($1) ? OPf_SPECIAL : 0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
 			}
 	|	REQUIRE term                         /* require Foo */
                         { $$ = newUNOP(OP_REQUIRE, IVAL($1) ? OPf_SPECIAL : 0, $2, LOCATION($1));
@@ -1218,14 +1223,16 @@ term	:	termbinop
                           APPEND_MADPROPS_PV("uniop", $$, '>');
                         }
 	|	FUNC0                                /* Nullary operator */
-			{ $$ = newOP(IVAL($1), 0);
-			  TOKEN_GETMAD($1,$$,'o');
+			{ 
+                            $$ = newOP(IVAL($1), 0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
 			}
 	|	FUNC0 '(' ')'
-			{ $$ = newOP(IVAL($1), 0);
-			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($3,$$,')');
+			{
+                            $$ = newOP(IVAL($1), 0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($3,$$,')');
 			}
 	|	FUNC0SUB                             /* Sub treated as nullop */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
@@ -1233,7 +1240,7 @@ term	:	termbinop
 	|	FUNC1 '(' ')'                        /* not () */
 			{ $$ = (IVAL($1) == OP_NOT)
                                 ? newUNOP(IVAL($1), 0, newSVOP(OP_CONST, 0, newSViv(0), LOCATION($1)), LOCATION($1))
-			    : newOP(IVAL($1), OPf_SPECIAL);
+                                : newOP(IVAL($1), OPf_SPECIAL, LOCATION($1));
 
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');

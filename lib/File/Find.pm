@@ -561,7 +561,7 @@ sub Follow_SymLink($) {
 	return undef unless defined $DEV;  #  dangling symbolic link
     }
 
-    if ($full_check && defined $DEV && %SLnkSeen{$DEV, $INO}++) {
+    if ($full_check && defined $DEV && %SLnkSeen{$DEV . "," . $INO}++) {
 	if ( ($follow_skip +< 1) || ((-d _) && ($follow_skip +< 2)) ) {
 	    die "$AbsName encountered a second time";
 	}

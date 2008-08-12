@@ -2730,7 +2730,7 @@
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
 #define newLOOPOP(a,b,c,d,e)	Perl_newLOOPOP(aTHX_ a,b,c,d,e)
 #define newNULLLIST()		Perl_newNULLLIST(aTHX)
-#define newOP(a,b)		Perl_newOP(aTHX_ a,b)
+#define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
 #define newPROG(a)		Perl_newPROG(aTHX_ a)
 #define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
 #define newSLICEOP(a,b,c)	Perl_newSLICEOP(aTHX_ a,b,c)

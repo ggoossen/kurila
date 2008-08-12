@@ -1944,7 +1944,7 @@ PERL_CALLCONV OP*	Perl_newNULLLIST(pTHX)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newOP(pTHX_ I32 optype, I32 flags)
+PERL_CALLCONV OP*	Perl_newOP(pTHX_ I32 optype, I32 flags, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
