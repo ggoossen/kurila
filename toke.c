@@ -6060,7 +6060,7 @@ S_pending_ident(pTHX)
 
     /* build ops for a bareword */
     pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, newSVpvn(PL_tokenbuf + 1,
-						      tokenbuf_len - 1), S_curlocation());
+	    tokenbuf_len - 1), S_curlocation());
     pl_yylval.opval->op_private = OPpCONST_ENTERED;
     gv_fetchpvn_flags(
 	    PL_tokenbuf + 1, tokenbuf_len - 1,

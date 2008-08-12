@@ -96,27 +96,27 @@ sub tryrun {
 
 tryrun(\%(PERL5OPT => '-w'), \@('-e', 'print $main::x'),
     "", 
-    qq{Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$main::x in print at -e line 1.
+    qq{Name "main::x" used only once: possible typo
+Use of uninitialized value \$main::x in print at -e line 1 character 1.
 });
 
 tryrun(\%(PERL5OPT => '-Mstrict'), \@('-e', 'print $x'),
     "", 
     qq{Global symbol "\$x" requires explicit package name at -e line 1, at end of line
-Execution of -e aborted due to compilation errors. at -e line 1.\n});
+Execution of -e aborted due to compilation errors.\n});
 
 # Fails in 5.6.0
 tryrun(\%(PERL5OPT => '-Mstrict -w'), \@('-e', 'print $x'),
     "", 
     qq{Global symbol "\$x" requires explicit package name at -e line 1, at end of line
-Execution of -e aborted due to compilation errors. at -e line 1.\n});
+Execution of -e aborted due to compilation errors.\n});
 
 # Fails in 5.6.0
 tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $main::x'),
     "", 
     <<ERROR
-Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$main::x in print at -e line 1.
+Name "main::x" used only once: possible typo
+Use of uninitialized value \$main::x in print at -e line 1 character 1.
 ERROR
     );
 
@@ -124,8 +124,8 @@ ERROR
 tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $main::x'),
     "", 
     <<ERROR
-Name "main::x" used only once: possible typo at -e line 1.
-Use of uninitialized value \$main::x in print at -e line 1.
+Name "main::x" used only once: possible typo
+Use of uninitialized value \$main::x in print at -e line 1 character 1.
 ERROR
     );
 
