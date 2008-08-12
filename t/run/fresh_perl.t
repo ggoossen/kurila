@@ -64,7 +64,7 @@ EXPECT
 ########
 our $foo=undef; $foo->go;
 EXPECT
-Can't call method "go" on UNDEF at - line 1.
+Can't call method "go" on UNDEF at - line 1 character 21.
 ########
 BEGIN
         {
@@ -76,7 +76,7 @@ our @array;
 ########
 our $x=0x0eabcd; print $x->ref;
 EXPECT
-Can't locate object method "ref" via package "961485" (perhaps you forgot to load "961485"?) at - line 1.
+Can't locate object method "ref" via package "961485" (perhaps you forgot to load "961485"?) at - line 1 character 26.
 ########
 our $str;
 chop ($str .= ~< *DATA);
@@ -132,17 +132,17 @@ our @ordered_array=sort by_number keys(%as_ary);
 ########
 BEGIN { die "phooey" }
 EXPECT
-phooey at - line 1.
+phooey at - line 1 character 9.
 BEGIN failed--compilation aborted
 ########
 BEGIN { 1/0 }
 EXPECT
-Illegal division by zero at - line 1.
+Illegal division by zero at - line 1 character 10.
 BEGIN failed--compilation aborted
 ########
 BEGIN { undef = 0 }
 EXPECT
-Modification of a read-only value attempted at - line 1.
+Modification of a read-only value attempted at - line 1 character 14.
 BEGIN failed--compilation aborted
 ########
 my @a; @a[2] = 1; for (<@a) { $_ = 2 } print "{join ' ', <@a}\n"
@@ -174,6 +174,7 @@ try { my $x = 'peace'; eval q[ print "$x\n" ] }
 EXPECT
 inner peace
 ########
+# TODO fix location
 -w
 $| = 1;
 sub foo {
@@ -219,6 +220,7 @@ EXPECT
 1
 2
 ########
+# TODO fix location
 -w
 sub testme { my $a = "test"; { local $a = "new test"; print $a }}
 EXPECT
@@ -287,7 +289,7 @@ BEGIN {
 }
 EXPECT
 foo
-bar at - line 5.
+bar at - line 5 character 5.
     main::__ANON__ called at - line 7.
 BEGIN failed--compilation aborted
 ########
@@ -319,7 +321,7 @@ else {
   if ($x == 0) { print "" } else { print $x }
 }
 EXPECT
-Use of uninitialized value $main::x in numeric eq (==) at - line 4.
+Use of uninitialized value $main::x in numeric eq (==) at - line 4 character 10.
 ########
 our $x = sub {};
 foo();
@@ -339,7 +341,7 @@ sub M { @_[0] = 2; }
 eval "C";
 M(C);
 EXPECT
-Modification of a read-only value attempted at - line 2.
+Modification of a read-only value attempted at - line 2 character 14.
     main::M called at - line 4.
 ########
 print qw(ab a\b a\\b);

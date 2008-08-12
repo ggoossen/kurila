@@ -2393,7 +2393,7 @@ S_readpipe_override(pTHX)
 	PL_lex_op = (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
 	    append_elem(OP_LIST,
 			newSVOP(OP_CONST, 0, &PL_sv_undef, S_curlocation()), /* value will be read later */
-			newCVREF(0, newGVOP(OP_GV, 0, gv_readpipe, S_curlocation()))
+			newCVREF(0, newGVOP(OP_GV, 0, gv_readpipe, S_curlocation()), S_curlocation())
 		), S_curlocation());
     }
 }
@@ -4751,7 +4751,7 @@ Perl_yylex(pTHX)
 		    }
 
 		    op_free(pl_yylval.opval);
-		    pl_yylval.opval = newCVREF(0, newGVOP(OP_GV, 0, gv, S_curlocation()));
+		    pl_yylval.opval = newCVREF(0, newGVOP(OP_GV, 0, gv, S_curlocation()), S_curlocation());
 		    pl_yylval.opval->op_private |= OPpENTERSUB_NOPAREN;
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
