@@ -53,7 +53,7 @@ our %h;
 tie %h, 'Tie::HashUntie';
 untie %h;
 EXPECT
-Untied at - line 8.
+Untied at - line 8 character 4.
     Tie::HashUntie::UNTIE called at - line 13.
 ########
 
@@ -103,7 +103,7 @@ use Tie::Hash ;
 our $a = tie our %h, 'Tie::StdHash';
 untie %h;
 EXPECT
-untie attempted while 1 inner references still exist at - line 6.
+untie attempted while 1 inner references still exist at - line 6 character 1.
 ########
 
 # strict behaviour, with 1 extra references via tied generating an error
@@ -113,7 +113,7 @@ tie our %h, 'Tie::StdHash';
 our $a = tied %h;
 untie %h;
 EXPECT
-untie attempted while 1 inner references still exist at - line 7.
+untie attempted while 1 inner references still exist at - line 7 character 1.
 ########
 
 # strict behaviour, with 1 extra references which are destroyed
@@ -142,7 +142,7 @@ $a = tie our %h, 'Tie::StdHash';
 $b = tied %h ;
 untie %h;
 EXPECT
-untie attempted while 2 inner references still exist at - line 7.
+untie attempted while 2 inner references still exist at - line 7 character 1.
 ########
 
 # strict behaviour, check scope of strictness.
@@ -169,7 +169,7 @@ sub Self::TIEHASH { bless @_[1], @_[0] }
     tie %c, 'Self', \%c;
 }
 EXPECT
-Self-ties of arrays and hashes are not supported at - line 6.
+Self-ties of arrays and hashes are not supported at - line 6 character 5.
 ########
 
 # correct unlocalisation of tied hashes (patch #16431)
@@ -187,7 +187,7 @@ tie FH, 'main';
 EXPECT
 Can't modify constant item in tie at - line 3, near "'main';"
 Bareword "FH" not allowed while "strict subs" in use at - line 3, at EOF
-Execution of - aborted due to compilation errors. at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 
 # localizing tied hash slices

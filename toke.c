@@ -6005,7 +6005,7 @@ S_pending_ident(pTHX)
                 yyerror(Perl_form(aTHX_ PL_no_myglob,
 			    PL_in_my == KEY_my ? "my" : "state", PL_tokenbuf));
 
-            pl_yylval.opval = newOP(OP_PADANY, 0);
+            pl_yylval.opval = newOP(OP_PADANY, 0, S_curlocation());
             pl_yylval.opval->op_targ = allocmy(PL_tokenbuf);
             return PRIVATEREF;
         }
@@ -6052,7 +6052,7 @@ S_pending_ident(pTHX)
                 }
             }
 
-            pl_yylval.opval = newOP(OP_PADANY, 0);
+            pl_yylval.opval = newOP(OP_PADANY, 0, S_curlocation());
             pl_yylval.opval->op_targ = tmp;
             return PRIVATEREF;
         }

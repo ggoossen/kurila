@@ -29,7 +29,7 @@ our @a = @(1, 2, 3);
   @a = @( sort { last ; } < @a );
 }
 EXPECT
-Can't "last" outside a loop block at - line 3.
+Can't "last" outside a loop block at - line 3 character 18.
 ########
 sub warnhook {
   print "WARNHOOK\n";
@@ -44,14 +44,14 @@ END
 ########
 package TEST;
  
-use overload
-     "\"\""   =>  \&str
-;
- 
 sub str {
   eval('die("test\n")');
   return "STR";
 }
+ 
+use overload
+     "\"\""   =>  \&str
+;
  
 package main;
  

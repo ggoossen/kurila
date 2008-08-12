@@ -1279,7 +1279,7 @@ Perl_scalarseq(pTHX_ OP *o)
 	    o->op_flags |= OPf_PARENS;
     }
     else
-	o = newOP(OP_STUB, 0);
+	o = newOP(OP_STUB, 0, NULL);
     return o;
 }
 
@@ -1757,7 +1757,7 @@ S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
     /* Build up the real arg-list. */
     stashsv = stash ? newSVhek(HvNAME_HEK(stash)) : &PL_sv_no;
 
-    arg = newOP(OP_PADSV, 0);
+    arg = newOP(OP_PADSV, 0, NULL);
     arg->op_targ = target->op_targ;
     arg = prepend_elem(OP_LIST,
 		       newSVOP(OP_CONST, 0, stashsv, attrs->op_location),
@@ -2025,7 +2025,7 @@ Perl_scope(pTHX_ OP *o)
     dVAR;
     if (o) {
 	if (o->op_flags & OPf_PARENS || PERLDB_NOOPT) { /* || PL_tainting) { */
-	    o = prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0), o);
+	    o = prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0, o->op_location), o);
 	    o->op_type = OP_LEAVE;
 	    o->op_ppaddr = PL_ppaddr[OP_LEAVE];
 	}
@@ -2086,7 +2086,7 @@ S_newDEFSVOP(pTHX)
 	return newSVREF(newGVOP(OP_GV, 0, PL_defgv, NULL));
     }
     else {
-	OP * const o = newOP(OP_PADSV, 0);
+	OP * const o = newOP(OP_PADSV, 0, NULL);
 	o->op_targ = offset;
 	return o;
     }
@@ -2746,7 +2746,7 @@ Perl_mad_free(pTHX_ MADPROP* mp)
 OP *
 Perl_newNULLLIST(pTHX)
 {
-    return newOP(OP_STUB, 0);
+    return newOP(OP_STUB, 0, NULL);
 }
 
 OP *
@@ -2782,7 +2782,7 @@ Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV *location)
     listop->op_first = first;
     listop->op_last = last;
     if (type == OP_LIST || type == OP_LISTLAST) {
-	OP* const pushop = newOP(OP_PUSHMARK, 0);
+	OP* const pushop = newOP(OP_PUSHMARK, 0, location);
 	pushop->op_sibling = first;
 	listop->op_first = pushop;
 	listop->op_flags |= OPf_KIDS;
@@ -2794,7 +2794,7 @@ Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV *location)
 }
 
 OP *
-Perl_newOP(pTHX_ I32 type, I32 flags)
+Perl_newOP(pTHX_ I32 type, I32 flags, SV* location)
 {
     dVAR;
     OP *o;
@@ -2806,7 +2806,7 @@ Perl_newOP(pTHX_ I32 type, I32 flags)
     o->op_latefreed = 0;
     o->op_attached = 0;
 
-    o->op_location = NULL;
+    o->op_location = SvREFCNT_inc(location);
 
     o->op_next = o;
     o->op_private = (U8)(0 | (flags >> 8));
@@ -2824,7 +2824,7 @@ Perl_newUNOP(pTHX_ I32 type, I32 flags, OP *first, SV* location)
     UNOP *unop;
 
     if (!first)
-	first = newOP(OP_STUB, 0);
+	first = newOP(OP_STUB, 0, location);
     if (PL_opargs[type] & OA_MARK)
 	first = force_list(first);
 
@@ -2850,7 +2850,7 @@ Perl_newBINOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV* location)
     NewOp(1101, binop, 1, BINOP);
 
     if (!first)
-	first = newOP(OP_NULL, 0);
+	first = newOP(OP_NULL, 0, location);
 
     binop->op_location = SvREFCNT_inc(location);
 
@@ -3719,7 +3719,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 	return o;
     }
     if (!right)
-	right = newOP(OP_UNDEF, 0);
+	right = newOP(OP_UNDEF, 0, location);
     if (right->op_type == OP_READLINE) {
 	right->op_flags |= OPf_STACKED;
 	return newBINOP(OP_NULL, flags, mod(scalar(left), OP_SASSIGN), scalar(right), location);
@@ -4118,8 +4118,8 @@ Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block, SV *locatio
     /* if block is null, the next append_elem() would put UNSTACK, a scalar
      * op, in listop. This is wrong. [perl #27024] */
     if (!block)
-	block = newOP(OP_NULL, 0);
-    listop = append_elem(OP_LINESEQ, block, newOP(OP_UNSTACK, 0));
+	block = newOP(OP_NULL, 0, location);
+    listop = append_elem(OP_LINESEQ, block, newOP(OP_UNSTACK, 0, location));
     o = new_logop(OP_AND, 0, &expr, &listop, location);
 
     if (listop)
@@ -4179,7 +4179,7 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
     }
 
     if (!block)
-	block = newOP(OP_NULL, 0);
+	block = newOP(OP_NULL, 0, location);
     else if (cont || has_my) {
 	block = scope(block);
     }
@@ -4188,7 +4188,7 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 	next = LINKLIST(cont);
     }
     if (expr) {
-	OP * const unstack = newOP(OP_UNSTACK, 0);
+	OP * const unstack = newOP(OP_UNSTACK, 0, location);
 	if (!next)
 	    next = unstack;
 	cont = append_elem(OP_LINESEQ, cont, unstack);
@@ -4358,7 +4358,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     loop = (LOOP*)PerlMemShared_realloc(loop, sizeof(LOOP));
 #endif
     loop->op_targ = padoff;
-    wop = newWHILEOP(flags, 1, loop, location, newOP(OP_ITER, 0), block, cont, 0);
+    wop = newWHILEOP(flags, 1, loop, location, newOP(OP_ITER, 0, location), block, cont, 0);
     if (madsv)
 	op_getmad(madsv, (OP*)loop, 'v');
     PL_parser->copline = forline;
@@ -4376,7 +4376,7 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
     if (type != OP_GOTO || label->op_type == OP_CONST) {
 	/* "last()" means "last" */
 	if (label->op_type == OP_STUB && (label->op_flags & OPf_PARENS))
-	    o = newOP(type, OPf_SPECIAL);
+	    o = newOP(type, OPf_SPECIAL, label->op_location);
 	else {
 	    o = newPVOP(type, 0, savesharedpv(label->op_type == OP_CONST
 					? SvPV_nolen_const(((SVOP*)label)->op_sv)
