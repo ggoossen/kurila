@@ -7070,12 +7070,16 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	 (- (char-after (match-beginning 16)) ?0)) ; headN ==> N
 	(t 5)))				; should not happen
 
-
+
 (defvar kurila-compilation-error-regexp-alist
   ;; This look like a paranoiac regexp: could anybody find a better one? (which WORKS).
-  '(("^[^\n]* \\(file\\|at\\) \\([^ \t\n]+\\) [^\n]*line \\([0-9]+\\)[\\., \n]"
-     2 3))
+  '(("^[^\n]* \\(file\\|at\\) \\([^ \t\n]+\\) [^\n]*line \\([0-9]+\\)\\(?: character \\([0-9]+\\)\\)?[\\., \n]"
+     2 3 4))
   "Alist that specifies how to match errors in perl output.")
+
+(add-to-list 'compilation-error-regexp-alist
+             '("^[^\n]* \\(file\\|at\\) \\([^ \t\n]+\\) [^\n]*line \\([0-9]+\\)\\(?: character \\([0-9]+\\)\\)?[\\., \n]"
+               2 3 4))
 
 (if (fboundp 'eval-after-load)
     (eval-after-load

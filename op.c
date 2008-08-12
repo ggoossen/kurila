@@ -5334,9 +5334,9 @@ Perl_newHVREF(pTHX_ OP *o)
 }
 
 OP *
-Perl_newCVREF(pTHX_ I32 flags, OP *o)
+Perl_newCVREF(pTHX_ I32 flags, OP *o, SV* location)
 {
-    return newUNOP(OP_RV2CV, flags, scalar(o), o->op_location);
+    return newUNOP(OP_RV2CV, flags, scalar(o), location);
 }
 
 OP *

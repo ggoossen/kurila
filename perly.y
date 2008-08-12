@@ -772,7 +772,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                         }
         |       term DEREFAMP                /* somearef->& */
                         {
-                            $$ = newCVREF(0, $1);
+                            $$ = newCVREF(0, $1, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'a');
                         }
 	|	term '[' expr ']'          /* $array[$element] */
@@ -843,7 +843,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	term ARROW '(' ')'          /* $subref->() */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-                                newCVREF(0, scalar($1)), LOCATION($2));
+                                newCVREF(0, scalar($1), LOCATION($2)), LOCATION($2));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($4,$$,')');
@@ -851,7 +851,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 	|	term ARROW '(' expr ')'     /* $subref->(@args) */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				   append_elem(OP_LIST, $4,
-				       newCVREF(0, scalar($1))), LOCATION($2));
+				       newCVREF(0, scalar($1), LOCATION($2))), LOCATION($2));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
@@ -1038,8 +1038,9 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 			    OPf_SPECIAL|OPf_STACKED,
 			    prepend_elem(OP_LIST,
 				scalar(newCVREF(
-				    (OPpENTERSUB_AMPER<<8),
-				    scalar($2)
+                                        (OPpENTERSUB_AMPER<<8),
+                                            scalar($2),
+                                            LOCATION($1)
 				)),(OP*)NULL), LOCATION($1)); dep();
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($3,$$,'(');
@@ -1052,7 +1053,8 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 				$4,
 				scalar(newCVREF(
 				    (OPpENTERSUB_AMPER<<8),
-				    scalar($2)
+                                        scalar($2),
+                                        LOCATION($1)
 				))), LOCATION($1)); dep();
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($3,$$,'(');
@@ -1061,7 +1063,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 	|	DO scalar '(' ')'                      /* do $subref () */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_SPECIAL|OPf_STACKED,
 			    prepend_elem(OP_LIST,
-				scalar(newCVREF(0,scalar($2))), (OP*)NULL), LOCATION($1)); dep();
+				scalar(newCVREF(0,scalar($2), LOCATION($1))), (OP*)NULL), LOCATION($1)); dep();
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($4,$$,')');
@@ -1070,7 +1072,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_SPECIAL|OPf_STACKED,
 			    prepend_elem(OP_LIST,
 				$4,
-				scalar(newCVREF(0,scalar($2)))), LOCATION($1)); dep();
+				scalar(newCVREF(0,scalar($2), LOCATION($1)))), LOCATION($1)); dep();
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
@@ -1320,8 +1322,9 @@ my_scalar:	scalar
 	;
 
 amper	:	'&' indirob
-			{ $$ = newCVREF(IVAL($1),$2);
-			  TOKEN_GETMAD($1,$$,'&');
+			{ 
+                            $$ = newCVREF(IVAL($1),$2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'&');
 			}
 	;
 

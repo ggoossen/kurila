@@ -537,7 +537,7 @@ sub Follow_SymLink($) {
     ($DEV, $INO)= lstat $AbsName;
 
     while (-l _) {
-	if (%SLnkSeen{$DEV, $INO}++) {
+	if (%SLnkSeen{$DEV . "," . $INO}++) {
 	    if ($follow_skip +< 2) {
 		die "$AbsName is encountered a second time";
 	    }

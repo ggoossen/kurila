@@ -1996,7 +1996,7 @@ PERL_CALLCONV OP*	Perl_newBINOP(pTHX_ I32 type, I32 flags, OP* first, OP* last, 
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newCVREF(pTHX_ I32 flags, OP* o)
+PERL_CALLCONV OP*	Perl_newCVREF(pTHX_ I32 flags, OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 

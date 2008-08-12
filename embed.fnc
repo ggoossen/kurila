@@ -553,7 +553,7 @@ Apd	|CV*	|newXS		|NULLOK const char *name|NN XSUBADDR_t subaddr\
 AmdbR	|AV*	|newAV
 Apa	|OP*	|newAVREF	|NN OP* o
 Apa	|OP*	|newBINOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last|NULLOK SV* location
-Apa	|OP*	|newCVREF	|I32 flags|NULLOK OP* o
+Apa	|OP*	|newCVREF	|I32 flags|NULLOK OP* o|NULLOK SV* location
 Apa	|OP*	|newGVOP	|I32 type|I32 flags|NN GV* gv|NULLOK SV* location
 Apa	|GV*	|newGVgen	|NN const char* pack
 Apa	|OP*	|newGVREF	|I32 type|NULLOK OP* o

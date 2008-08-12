@@ -11,7 +11,7 @@ use Test::Builder::Module;
 @EXPORT = @( qw(ok use_ok require_ok
              is isnt like unlike is_deeply dies_like
              cmp_ok
-             skip todo todo_skip
+             skip todo_skip
              pass fail
              eq_array eq_hash eq_set
              $TODO
