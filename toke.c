@@ -716,6 +716,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
 	parser->linestart = SvPVX(parser->linestr);
     parser->bufend = parser->bufptr + SvCUR(parser->linestr);
     parser->last_lop = parser->last_uni = NULL;
+    parser->lex_charoffset = 0;
 }
 
 
@@ -778,6 +779,7 @@ S_incline(pTHX_ const char *s)
     PERL_ARGS_ASSERT_INCLINE;
 
     CopLINE_inc(PL_curcop);
+    PL_parser->lex_charoffset = 0;
     if (*s++ != '#')
 	return;
     while (SPACE_OR_TAB(*s))
@@ -1364,7 +1366,7 @@ S_curlocation(pTHX_)
 	if (PL_parser)
 	    PL_parser->copline = NOLINE;
     }
-    av_push(res, newSViv((PL_bufptr - PL_linestart) + 1));
+    av_push(res, newSViv((PL_bufptr - PL_linestart + PL_parser->lex_charoffset) + 1));
     return (SV*)res;
 }
 
@@ -1606,6 +1608,7 @@ S_sublex_push(pTHX)
     SAVEI32(PL_lex_brackets);
     SAVEI32(PL_lex_casemods);
     SAVEI32(PL_lex_starts);
+    SAVEI32(PL_parser->lex_charoffset);
     SAVEI8(PL_lex_state);
     SAVEI16(PL_lex_flags);
     SAVEI16(PL_lex_inwhat);
@@ -1620,6 +1623,8 @@ S_sublex_push(pTHX)
     SAVESPTR(PL_linestr);
     SAVEGENERICPV(PL_lex_brackstack);
     SAVEGENERICPV(PL_lex_casestack);
+
+    PL_parser->lex_charoffset = PL_lex_stuff.char_offset;
 
     SVcpREPLACE(PL_linestr, PL_lex_stuff.str_sv);
     SVcpREPLACE(PL_lex_stuff.str_sv, NULL);
@@ -10103,6 +10108,9 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     term = *s;
     termlen = UTF8SKIP(s);
     Copy(s, termstr, termlen, char);
+
+    /* save the initial character offset */
+    str_info->char_offset = PL_parser->lex_charoffset + (s - PL_linestart) + 1;
 
     /* mark where we are */
     PL_multi_start = CopLINE(PL_curcop);
