@@ -73,7 +73,7 @@ exit;
 bar:
 print "bar reached\n";
 EXPECT
-Can't "goto" out of a pseudo block at - line 2.
+Can't "goto" out of a pseudo block at - line 2 character 3.
     main::foo called at - line 6.
 ########
 our @a = @(3, 2, 1);
@@ -88,7 +88,7 @@ foo:
   @a = @( sort { last foo; } < @a );
 }
 EXPECT
-Label not found for "last foo" at - line 2.
+Label not found for "last foo" at - line 4 character 18.
 ########
 our @a = @(1, 2, 3);
 foo:

@@ -4380,7 +4380,7 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
 	else {
 	    o = newPVOP(type, 0, savesharedpv(label->op_type == OP_CONST
 					? SvPV_nolen_const(((SVOP*)label)->op_sv)
-					      : ""), NULL);
+					      : ""), label->op_location);
 	}
 #ifdef PERL_MAD
 	op_getmad(label,o,'L');
