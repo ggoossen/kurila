@@ -717,6 +717,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->bufend = parser->bufptr + SvCUR(parser->linestr);
     parser->last_lop = parser->last_uni = NULL;
     parser->lex_charoffset = 0;
+    parser->lex_line_number = 0;
 }
 
 
@@ -778,8 +779,8 @@ S_incline(pTHX_ const char *s)
 
     PERL_ARGS_ASSERT_INCLINE;
 
-    CopLINE_inc(PL_curcop);
     PL_parser->lex_charoffset = 0;
+    PL_parser->lex_line_number += 1;
     if (*s++ != '#')
 	return;
     while (SPACE_OR_TAB(*s))
@@ -886,7 +887,7 @@ S_incline(pTHX_ const char *s)
 	CopFILE_free(PL_curcop);
 	CopFILE_setn(PL_curcop, s, len);
     }
-    CopLINE_set(PL_curcop, atoi(n)-1);
+    PL_parser->lex_line_number = atoi(n)-1;
 }
 
 #ifdef PERL_MAD
@@ -1359,13 +1360,7 @@ S_curlocation(pTHX)
 {
     AV* res = av_2mortal(newAV());
     av_push(res, newSVsv(CopFILESV(PL_curcop)));
-    if (PL_parser && PL_parser->copline == NOLINE)
-	av_push(res, newSViv(CopLINE(PL_curcop)));
-    else {
-	av_push(res, newSViv(PL_parser->copline));
-	if (PL_parser)
-	    PL_parser->copline = NOLINE;
-    }
+    av_push(res, newSViv(PL_parser->lex_line_number));
     av_push(res, newSViv((PL_bufptr - PL_linestart + PL_parser->lex_charoffset) + 1));
     return (SV*)res;
 }
@@ -1625,6 +1620,7 @@ S_sublex_push(pTHX)
     SAVEGENERICPV(PL_lex_casestack);
 
     PL_parser->lex_charoffset = PL_lex_stuff.char_offset;
+    PL_parser->lex_line_number = PL_lex_stuff.line_number;
 
     SVcpREPLACE(PL_linestr, PL_lex_stuff.str_sv);
     SVcpREPLACE(PL_lex_stuff.str_sv, NULL);
@@ -1642,7 +1638,6 @@ S_sublex_push(pTHX)
     *PL_lex_casestack = '\0';
     PL_lex_starts = 0;
     PL_lex_state = LEX_INTERPCONCAT;
-    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
 
     PL_lex_inwhat = PL_sublex_info.sub_inwhat;
     PL_lex_flags = PL_lex_stuff.flags;
@@ -2021,6 +2016,12 @@ S_scan_const(pTHX_ char *start)
     PERL_ARGS_ASSERT_SCAN_CONST;
 
     while (s < send) {
+	if (*s == '\n') {
+	    PL_parser->lex_line_number++;
+	    PL_parser->lex_charoffset = 0;
+	    PL_linestart = s+1;
+	}
+
 	/* skip for regexp comments /(?#comment)/ and code /(?{code})/,
 	   except for the last char, which will be done separately. */
 	if (*s == '(' && in_pat && s[1] == '?') {
@@ -2854,28 +2855,8 @@ Perl_yylex(pTHX)
 	}
 
 	PL_expect = XTERM;
-/* 	PL_lex_dojoin = (*PL_bufptr == '@'); */
 	PL_lex_dojoin = 0;
 	PL_lex_state = LEX_INTERPNORMAL;
-/* 	if (PL_lex_dojoin) { */
-/* 	    start_force(PL_curforce); */
-/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
-/* 	    force_next('<'); */
-/* 	    start_force(PL_curforce); */
-/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
-/* 	    force_next(','); */
-/* 	    start_force(PL_curforce); */
-/* 	    force_ident("\"", '$'); */
-/* 	    start_force(PL_curforce); */
-/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
-/* 	    force_next('$'); */
-/* 	    start_force(PL_curforce); */
-/* 	    NEXTVAL_NEXTTOKE.ival = 0; */
-/* 	    force_next('('); */
-/* 	    start_force(PL_curforce); */
-/* 	    NEXTVAL_NEXTTOKE.ival = OP_JOIN;	/\* emulate join($", < ...) *\/ */
-/* 	    force_next(FUNC); */
-/* 	} */
 	if (PL_lex_starts++) {
 	    s = PL_bufptr;
 #ifdef PERL_MAD
@@ -3133,7 +3114,7 @@ Perl_yylex(pTHX)
 	    update_debugger_info(PL_linestr, NULL, 0);
 	PL_bufend = SvPVX(PL_linestr) + SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;
-	if (CopLINE(PL_curcop) == 1) {
+	if (PL_parser->lex_line_number == 1) {
 	    while (s < PL_bufend && isSPACE(*s))
 		s++;
 	    if (*s == ':' && s[1] != ':') /* for csh execing sh scripts */
@@ -3936,7 +3917,7 @@ Perl_yylex(pTHX)
 	    }
 	    break;
 	}
-	pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
+	pl_yylval.i_tkval.ival = PL_parser->lex_line_number;
 	if (isSPACE(*s) || *s == '#')
 	    PL_copline = NOLINE;   /* invalidate current command line number */
 	TOKEN('{');
@@ -4096,6 +4077,7 @@ Perl_yylex(pTHX)
 		s = scan_heredoc(s);
 
 		op_type = pl_yylval.i_tkval.ival;
+		PL_lex_stuff.char_offset = 0;
 		if (op_type == OP_CONST) {
 		    /* like sublex_start, but without PL_lex_stuff going through tokeq */
 		    /* do not go through tokeq because it unescpaes slashes */
@@ -4543,9 +4525,9 @@ Perl_yylex(pTHX)
 
 		if (PL_expect == XOPERATOR) {
 		    if (PL_bufptr == PL_linestart) {
-			CopLINE_dec(PL_curcop);
+			PL_parser->lex_line_number--;
 			Perl_warner(aTHX_ packWARN(WARN_SEMICOLON), PL_warn_nosemi);
-			CopLINE_inc(PL_curcop);
+			PL_parser->lex_line_number++;
 		    }
 		    else
 			no_op("Bareword",s);
@@ -4823,7 +4805,8 @@ Perl_yylex(pTHX)
 
 	case KEY___LINE__:
             pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0,
-                                    Perl_newSVpvf(aTHX_ "%"IVdf, (IV)CopLINE(PL_curcop)), S_curlocation());
+		Perl_newSVpvf(aTHX_ "%"IVdf, (IV)PL_parser->lex_line_number),
+		S_curlocation());
 	    TERM(THING);
 
 	case KEY___PACKAGE__:
@@ -9934,7 +9917,8 @@ S_scan_heredoc(pTHX_ register char *s)
     PL_lex_stuff.flags = LEXf_HEREDOC; /* single quote delimiter is handled specially in parse */
 
     CLINE;
-    PL_multi_start = CopLINE(PL_curcop);
+    PL_lex_stuff.line_number = PL_parser->lex_line_number + 1;
+    PL_multi_start = PL_parser->lex_line_number;
     PL_multi_open = PL_multi_close = '<';
     term = *PL_tokenbuf;
     if (!outer) {
@@ -9942,10 +9926,10 @@ S_scan_heredoc(pTHX_ register char *s)
 	while (s < PL_bufend &&
 	  (*s != term || memNE(s,PL_tokenbuf,len)) ) {
 	    if (*s++ == '\n')
-		CopLINE_inc(PL_curcop);
+		PL_parser->lex_line_number++;
 	}
 	if (s >= PL_bufend) {
-	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
+	    PL_parser->lex_line_number = (line_t)PL_multi_start;
 	    missingterminator(PL_tokenbuf);
 	}
 	sv_setpvn(tmpstr,d+1,s-d);
@@ -9959,7 +9943,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	}
 #endif
 	s += len - 1;
-	CopLINE_inc(PL_curcop);	/* the preceding stmt passes a newline */
+	PL_parser->lex_line_number++;	/* the preceding stmt passes a newline */
 
 	sv_catpvn(herewas,s,PL_bufend-s);
 	sv_setsv(PL_linestr,herewas);
@@ -9981,13 +9965,13 @@ S_scan_heredoc(pTHX_ register char *s)
 #endif
 	if (!outer ||
 	 !(PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = filter_gets(PL_linestr, PL_rsfp, 0))) {
-	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
+	    PL_parser->lex_line_number = (line_t)PL_multi_start;
 	    missingterminator(PL_tokenbuf);
 	}
 #ifdef PERL_MAD
 	stuffstart = s - SvPVX(PL_linestr);
 #endif
-	CopLINE_inc(PL_curcop);
+	PL_parser->lex_line_number++;
 	PL_bufend = SvPVX(PL_linestr) + SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;
 #ifndef PERL_STRICT_CR
@@ -10020,7 +10004,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	}
     }
     s++;
-    PL_multi_end = CopLINE(PL_curcop);
+    PL_multi_end = PL_parser->lex_line_number;
     if (SvCUR(tmpstr) + 5 < SvLEN(tmpstr)) {
 	SvPV_shrink_to_cur(tmpstr);
     }
@@ -10111,9 +10095,10 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 
     /* save the initial character offset */
     str_info->char_offset = PL_parser->lex_charoffset + (s - PL_linestart) + 1;
+    str_info->line_number = PL_parser->lex_line_number;
 
     /* mark where we are */
-    PL_multi_start = CopLINE(PL_curcop);
+    PL_multi_start = PL_parser->lex_line_number;
     PL_multi_open = term;
 
     /* find corresponding closing delimiter */
@@ -10150,7 +10135,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 	    for (; s < PL_bufend; s++,to++) {
 	    	/* embedded newlines increment the current line number */
 		if (*s == '\n' && !PL_rsfp)
-		    CopLINE_inc(PL_curcop);
+		    PL_parser->lex_line_number++;
 		/* handle quoted delimiters */
 		if (escape && *s == '\\' && s+1 < PL_bufend) {
 		    *to++ = *s++;
@@ -10176,7 +10161,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 	    for (; s < PL_bufend; s++,to++) {
 	    	/* embedded newlines increment the line count */
 		if (*s == '\n' && !PL_rsfp)
-		    CopLINE_inc(PL_curcop);
+		    PL_parser->lex_line_number++;
 		/* backslashes can escape the open or closing characters */
 		if (escape && *s == '\\' && s+1 < PL_bufend) {
 		    *to++ = *s++;
@@ -10231,14 +10216,14 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 	if (!PL_rsfp ||
 	 !(PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = filter_gets(PL_linestr, PL_rsfp, 0))) {
 	    sv_free(sv);
-	    CopLINE_set(PL_curcop, (line_t)PL_multi_start);
+	    PL_parser->lex_line_number = str_info->line_number;
 	    return NULL;
 	}
 #ifdef PERL_MAD
 	stuffstart = 0;
 #endif
 	/* we read a line, so increment our line counter */
-	CopLINE_inc(PL_curcop);
+	PL_parser->lex_line_number++;
 
 	/* update debugger info */
 	if (PERLDB_LINE && PL_curstash != PL_debstash)
@@ -10268,7 +10253,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 	sv_catpvn(sv, s, termlen);
     s += termlen;
 
-    PL_multi_end = CopLINE(PL_curcop);
+    PL_multi_end = PL_parser->lex_line_number;
 
     /* if we allocated too much space, give some back */
     if (SvCUR(sv) + 5 < SvLEN(sv)) {
@@ -10700,7 +10685,7 @@ Perl_start_subparse(pTHX_ U32 flags)
     SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CvFLAGS(PL_compcv) |= flags;
 
-    PL_subline = CopLINE(PL_curcop);
+    PL_subline = PL_parser->lex_line_number;
     CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB);
     CvOUTSIDE(PL_compcv) = (CV*)SvREFCNT_inc_simple(outsidecv);
     CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
@@ -10796,12 +10781,12 @@ Perl_yyerror(pTHX_ const char *const s)
     }
     msg = sv_2mortal(newSVpv(s, 0));
     Perl_sv_catpvf(aTHX_ msg, " at %s line %"IVdf", ",
-        OutCopFILE(PL_curcop), (IV)CopLINE(PL_curcop));
+        OutCopFILE(PL_curcop), PL_parser->lex_line_number);
     if (context)
 	Perl_sv_catpvf(aTHX_ msg, "near \"%.*s\"\n", contlen, context);
     else
 	Perl_sv_catpvf(aTHX_ msg, "%s\n", where);
-    if (PL_multi_start < PL_multi_end && (U32)(CopLINE(PL_curcop) - PL_multi_end) <= 1) {
+    if (PL_multi_start < PL_multi_end && (U32)(PL_parser->lex_line_number - PL_multi_end) <= 1) {
         Perl_sv_catpvf(aTHX_ msg,
         "  (Might be a runaway multi-line %c%c string starting on line %"IVdf")\n",
                 (int)PL_multi_open,(int)PL_multi_close,(IV)PL_multi_start);
