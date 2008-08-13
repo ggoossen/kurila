@@ -670,10 +670,11 @@ OP_free(o)
         sv_setiv(SvRV(ST(0)), 0);
 
 void
-OP_new(class, type, flags)
+OP_new(class, type, flags, location)
     SV * class
     SV * type
     I32 flags
+    SV * location
     SV** sparepad = NO_INIT
     OP *o = NO_INIT
     OP *saveop = NO_INIT
@@ -683,7 +684,7 @@ OP_new(class, type, flags)
         saveop = PL_op;
         PL_curpad = AvARRAY(PL_comppad);
         typenum = op_name_to_num(type);
-        o = newOP(typenum, flags);
+        o = newOP(typenum, flags, location);
 #ifdef PERL_CUSTOM_OPS
         if (typenum == OP_CUSTOM)
             o->op_ppaddr = custom_op_ppaddr(SvPV_nolen(type));
