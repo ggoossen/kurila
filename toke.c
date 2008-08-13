@@ -1355,7 +1355,7 @@ S_force_next(pTHX_ I32 type)
  */
 
 STATIC SV*
-S_curlocation(pTHX_)
+S_curlocation(pTHX)
 {
     AV* res = av_2mortal(newAV());
     av_push(res, newSVsv(CopFILESV(PL_curcop)));
