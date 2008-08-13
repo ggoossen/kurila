@@ -175,7 +175,7 @@ while ((nelems @warning))
 # For $regex, expected:
 #   $result
 # Got:
-#   $warning
+#   {$warning->message}
 #
 not ok $count
 EOM
