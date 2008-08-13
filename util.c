@@ -1291,7 +1291,21 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 	    PUSHMARK(SP);
 
 	    XPUSHs(msv);
-	    if (PL_op)
+	    if (PL_compcv) {
+		AV* res = av_2mortal(newAV());
+		av_push(res, newSVsv(CopFILESV(PL_curcop)));
+		if (PL_parser && PL_parser->copline == NOLINE)
+		    av_push(res, newSViv(CopLINE(PL_curcop)));
+		else {
+		    av_push(res, newSViv(PL_parser->copline));
+		    if (PL_parser)
+			PL_parser->copline = NOLINE;
+		}
+		av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
+				      PL_parser->lex_charoffset) + 1));
+		XPUSHs(res);
+	    }
+	    else if (PL_op)
 		XPUSHs(PL_op->op_location);
 
 	    PUTBACK;

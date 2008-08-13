@@ -5308,6 +5308,7 @@ STATIC char*	S_force_version(pTHX_ char *s)
 #define PERL_ARGS_ASSERT_FORCE_VERSION	\
 	assert(s)
 
+STATIC SV*	S_curlocation(pTHX);
 STATIC char*	S_force_word(pTHX_ char *start, int token, int check_keyword, int allow_pack, int allow_tick)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_FORCE_WORD	\
