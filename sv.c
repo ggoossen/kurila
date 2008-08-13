@@ -8632,7 +8632,6 @@ Perl_parser_dup(pTHX_ const yy_parser *const proto, CLONE_PARAMS *const param)
     parser->lex_casestack = savepvn(proto->lex_casestack,
 		    (proto->lex_casemods < 12 ? 12 : proto->lex_casemods));
     parser->lex_defer	= proto->lex_defer;
-    parser->lex_dojoin	= proto->lex_dojoin;
     parser->lex_expect	= proto->lex_expect;
     parser->lex_flags	= proto->lex_flags;
     parser->lex_inwhat	= proto->lex_inwhat;
