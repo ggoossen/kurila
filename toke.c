@@ -37,7 +37,6 @@
 #define PL_lex_casemods		(PL_parser->lex_casemods)
 #define PL_lex_casestack        (PL_parser->lex_casestack)
 #define PL_lex_defer		(PL_parser->lex_defer)
-#define PL_lex_dojoin		(PL_parser->lex_dojoin)
 #define PL_lex_expect		(PL_parser->lex_expect)
 #define PL_lex_flags		(PL_parser->lex_flags)
 #define PL_lex_inwhat		(PL_parser->lex_inwhat)
@@ -1599,7 +1598,6 @@ S_sublex_push(pTHX)
     ENTER;
 
     PL_lex_state = PL_sublex_info.super_state;
-    SAVEBOOL(PL_lex_dojoin);
     SAVEI32(PL_lex_brackets);
     SAVEI32(PL_lex_casemods);
     SAVEI32(PL_lex_starts);
@@ -1630,7 +1628,6 @@ S_sublex_push(pTHX)
     PL_bufend += SvCUR(PL_linestr);
     PL_last_lop = PL_last_uni = NULL;
 
-    PL_lex_dojoin = FALSE;
     PL_lex_brackets = 0;
     Newx(PL_lex_brackstack, 120, char);
     Newx(PL_lex_casestack, 12, char);
@@ -1680,7 +1677,6 @@ S_sublex_done(pTHX)
 	PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart = SvPVX(PL_linestr);
 	PL_bufend += SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;
-	PL_lex_dojoin = FALSE;
 	PL_lex_brackets = 0;
 	PL_lex_casemods = 0;
 	*PL_lex_casestack = '\0';
@@ -2855,7 +2851,6 @@ Perl_yylex(pTHX)
 	}
 
 	PL_expect = XTERM;
-	PL_lex_dojoin = 0;
 	PL_lex_state = LEX_INTERPNORMAL;
 	if (PL_lex_starts++) {
 	    s = PL_bufptr;
@@ -2876,19 +2871,6 @@ Perl_yylex(pTHX)
 	return yylex();
 
     case LEX_INTERPEND:
-	if (PL_lex_dojoin) {
-	    PL_lex_dojoin = FALSE;
-	    PL_lex_state = LEX_INTERPCONCAT;
-#ifdef PERL_MAD
-	    if (PL_madskills) {
-		if (PL_thistoken)
-		    sv_free(PL_thistoken);
-		PL_thistoken = newSVpvs("");
-	    }
-#endif
-	    return REPORT(')');
-	}
-	/* FALLTHROUGH */
     case LEX_INTERPCONCAT:
 #ifdef DEBUGGING
 	if (PL_lex_brackets)
