@@ -172,7 +172,7 @@ usage:
 	goto usage;
         
     sv = SvRV(rv);
-    res = sv_2mortal(newAV());
+    res = av_2mortal(newAV());
     modify_SV_attributes(aTHX_ sv, res, attrs);
 
     ST(0) = res;
