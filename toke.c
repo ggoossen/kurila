@@ -5830,7 +5830,8 @@ Perl_yylex(pTHX)
 	    LOP(OP_SYSWRITE,XTERM);
 
 	case KEY_tr:
-	    Perl_croak(aTHX_ "tr transliteration operator is removed");
+	    yyerror("tr transliteration operator is removed");
+	    goto just_a_word;
 
 	case KEY_tell:
 	    UNI(OP_TELL);
@@ -5918,9 +5919,11 @@ Perl_yylex(pTHX)
 
 	case KEY_wantarray:
 	    yyerror(Perl_form(aTHX_ "wantarray keyword is removed"));
+	    goto just_a_word;
 
 	case KEY_write:
 	    yyerror(Perl_form(aTHX_ "write keyword is removed"));
+	    goto just_a_word;
 
 	case KEY_x:
 	    if (PL_expect == XOPERATOR)
@@ -5934,6 +5937,7 @@ Perl_yylex(pTHX)
 
 	case KEY_y:
 	    yyerror(Perl_form(aTHX_ "y transliteration operator is removed"));
+	    goto just_a_word;
 	}
     }}
 }

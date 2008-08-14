@@ -904,11 +904,11 @@ XS(XS_error_create)
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
-		if (location && SvOK(location)) {
+		if (location && SvAVOK(location)) {
 		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf".",
-				   SvPVX_const(*av_fetch(location, 0, FALSE)),
-				   SvIV(*av_fetch(location, 1, FALSE)),
-				   SvIV(*av_fetch(location, 2, FALSE))
+			SvPVX_const(*av_fetch((AV*)location, 0, FALSE)),
+			SvIV(*av_fetch((AV*)location, 1, FALSE)),
+			SvIV(*av_fetch((AV*)location, 2, FALSE))
 			);
 		}
 	    }
@@ -1168,9 +1168,9 @@ XS(XS_Internals_hv_clear_placehold)
 
 XS(XS_Internals_refcnt_check)
 {
-    dXSARGS;
+    PERL_UNUSED_CONTEXT;
+    PERL_UNUSED_ARG(cv);
     refcnt_check();
-    XSRETURN(0);
 }
 
 XS(XS_Regexp_DESTROY)
@@ -1450,10 +1450,6 @@ XS(XS_re_regnames)
     REGEXP * rx;
     U32 flags;
     SV *ret;
-    AV *av;
-    I32 length;
-    I32 i;
-    SV **entry;
     PERL_UNUSED_ARG(cv);
 
     if (items > 1)
@@ -1481,8 +1477,7 @@ XS(XS_re_regnames)
     if (!ret)
         XSRETURN_UNDEF;
 
-    av = (AV*)SvRV(ret);
-    XPUSHs(sv_mortalcopy(av));
+    XPUSHs(sv_mortalcopy(SvRV(ret)));
 
     PUTBACK;
     return;
@@ -1515,8 +1510,6 @@ XS(XS_re_regexp_pattern)
     {
         /* Housten, we have a regex! */
         SV *pattern;
-        STRLEN left = 0;
-        char reflags[6];
 
 	/* Use the string that Perl would return */
 	/* return the pattern in (?msix:..) format */
