@@ -125,7 +125,7 @@ my %valid;
 %valid{ARRAY} = %valid{HASH} = %valid{SCALAR};
 
 our ($scalar, @array, %hash);
-foreach my $value (\&foo, \$scalar, \@array, \%hash) {
+foreach my $value (\$scalar, \@array, \%hash) {
     my $type = ref $value;
     foreach my $negate ('', '-') {
 	foreach my $attr (< @code, < @other) {
