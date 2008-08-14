@@ -59,6 +59,7 @@ Perl_cast_iv
 Perl_cast_uv
 Perl_my_chsize
 Perl_croak
+Perl_croak_at
 Perl_vcroak
 Perl_croak_nocontext
 Perl_die_nocontext

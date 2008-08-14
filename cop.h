@@ -138,7 +138,6 @@ struct cop {
     BASEOP
     /* On LP64 putting this here takes advantage of the fact that BASEOP isn't
        an exact multiple of 8 bytes to save structure padding.  */
-    line_t      cop_line;       /* line # of this command */
     char *	cop_label;	/* label for this construct */
 #ifdef USE_ITHREADS
     char *	cop_stashpv;	/* package line was compiled in */
@@ -233,10 +232,6 @@ struct cop {
 #endif /* USE_ITHREADS */
 
 #define CopSTASH_ne(c,hv)	(!CopSTASH_eq(c,hv))
-#define CopLINE(c)		((c)->cop_line)
-#define CopLINE_inc(c)		(++CopLINE(c))
-#define CopLINE_dec(c)		(--CopLINE(c))
-#define CopLINE_set(c,l)	(CopLINE(c) = (l))
 
 /* OutCopFILE() is CopFILE for output (caller, die, warn, etc.) */
 #ifdef MACOS_TRADITIONAL

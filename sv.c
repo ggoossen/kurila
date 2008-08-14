@@ -2583,7 +2583,6 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 
     if (intro) {
 	GvINTRO_off(dstr);	/* one-shot flag */
-	GvLINE(dstr) = CopLINE(PL_curcop);
 	GvEGV(dstr) = (GV*)dstr;
     }
     GvMULTI_on(dstr);

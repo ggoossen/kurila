@@ -184,7 +184,7 @@ Perl_newGP(pTHX_ GV *const gv)
     gp->gp_sv = newSV(0);
 #endif
 
-    gp->gp_line = PL_curcop ? CopLINE(PL_curcop) : 0;
+    gp->gp_line = 0;
     gp->gp_file_hek = share_hek(file, len, hash);
     gp->gp_egv = gv;
     gp->gp_refcnt = 1;
@@ -1311,7 +1311,6 @@ Perl_gv_check(pTHX_ const HV *stash)
 		if (SvTYPE(gv) != SVt_PVGV || GvMULTI(gv))
 		    continue;
 		file = GvFILE(gv);
-		CopLINE_set(PL_curcop, GvLINE(gv));
 #ifdef USE_ITHREADS
 		CopFILE(PL_curcop) = (char *)file;	/* set for warning */
 #else

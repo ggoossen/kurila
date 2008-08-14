@@ -738,6 +738,8 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	av_push(av, &PL_sv_undef);
     else
 	av_push(av, newSVpv(stashname, 0));
+    sv_setsv(av, cx->blk_oldcop->op_location);
+    return av;
     av_push(av, newSVpv(OutCopFILE(cx->blk_oldcop), 0));
     av_push(av, newSViv((I32)CopLINE(cx->blk_oldcop)));
     if (CxTYPE(cx) == CXt_SUB) {
