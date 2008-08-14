@@ -1488,7 +1488,7 @@ sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *tbl|NULLOK const void *sv
 s	|void	|check_uni
 s	|void	|force_next	|I32 type
 s	|char*	|force_version	|NN char *s
-s	|SV*	|curlocation	|NN char *s
+s	|SV*	|curlocation
 s	|char*	|force_word	|NN char *start|int token|int check_keyword \
 				|int allow_pack|int allow_tick
 s	|SV*	|tokeq		|NN SV *sv
@@ -1631,8 +1631,6 @@ pd	|void	|pad_setsv	|PADOFFSET po|NN SV* sv
 pd	|void	|pad_block_start|int full
 pd	|void	|pad_tidy	|padtidy_type type
 pd 	|void	|do_dump_pad	|I32 level|NN PerlIO *file|NULLOK PADLIST *padlist|int full
-pd	|void	|pad_fixup_inner_anons|NN PADLIST *padlist|NN CV *old_cv|NN CV *new_cv
-
 pdX	|void	|pad_push	|NN PADLIST *padlist|int depth
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)

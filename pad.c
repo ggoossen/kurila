@@ -1569,44 +1569,6 @@ Perl_cv_clone(pTHX_ CV *proto)
     return cv;
 }
 
-
-/*
-=for apidoc pad_fixup_inner_anons
-
-For any anon CVs in the pad, change CvOUTSIDE of that CV from
-old_cv to new_cv if necessary. Needed when a newly-compiled CV has to be
-moved to a pre-existing CV struct.
-
-=cut
-*/
-
-void
-Perl_pad_fixup_inner_anons(pTHX_ PADLIST *padlist, CV *old_cv, CV *new_cv)
-{
-    dVAR;
-    I32 ix;
-    AV * const comppad_name = (AV*)AvARRAY(padlist)[0];
-    AV * const comppad = (AV*)AvARRAY(padlist)[1];
-    SV ** const namepad = AvARRAY(comppad_name);
-    SV ** const curpad = AvARRAY(comppad);
-
-    PERL_ARGS_ASSERT_PAD_FIXUP_INNER_ANONS;
-    PERL_UNUSED_ARG(old_cv);
-
-/*     for (ix = AvFILLp(comppad_name); ix > 0; ix--) { */
-/*         const SV * const namesv = namepad[ix]; */
-/* 	if (namesv && namesv != &PL_sv_undef */
-/* 	    && *SvPVX_const(namesv) == '&') */
-/* 	{ */
-/* 	    CV * const innercv = (CV*)curpad[ix]; */
-/* 	    assert(0); */
-/* 	    assert(CvOUTSIDE(innercv) == old_cv); */
-/* 	    CvOUTSIDE(innercv) = new_cv; */
-/* 	} */
-/*     } */
-}
-
-
 /*
 =for apidoc pad_push
 

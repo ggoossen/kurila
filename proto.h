@@ -5684,14 +5684,6 @@ PERL_CALLCONV void	Perl_do_dump_pad(pTHX_ I32 level, PerlIO *file, PADLIST *padl
 #define PERL_ARGS_ASSERT_DO_DUMP_PAD	\
 	assert(file)
 
-PERL_CALLCONV void	Perl_pad_fixup_inner_anons(pTHX_ PADLIST *padlist, CV *old_cv, CV *new_cv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_PAD_FIXUP_INNER_ANONS	\
-	assert(padlist); assert(old_cv); assert(new_cv)
-
-
 PERL_CALLCONV void	Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PAD_PUSH	\

@@ -1577,9 +1577,6 @@
 #define pad_block_start		Perl_pad_block_start
 #define pad_tidy		Perl_pad_tidy
 #define do_dump_pad		Perl_do_dump_pad
-#define pad_fixup_inner_anons	Perl_pad_fixup_inner_anons
-#endif
-#ifdef PERL_CORE
 #define pad_push		Perl_pad_push
 #endif
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
@@ -3782,9 +3779,6 @@
 #define pad_block_start(a)	Perl_pad_block_start(aTHX_ a)
 #define pad_tidy(a)		Perl_pad_tidy(aTHX_ a)
 #define do_dump_pad(a,b,c,d)	Perl_do_dump_pad(aTHX_ a,b,c,d)
-#define pad_fixup_inner_anons(a,b,c)	Perl_pad_fixup_inner_anons(aTHX_ a,b,c)
-#endif
-#ifdef PERL_CORE
 #define pad_push(a,b)		Perl_pad_push(aTHX_ a,b)
 #endif
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)

@@ -600,7 +600,6 @@ PP(pp_print)
     dVAR; dSP; dMARK; dORIGMARK;
     IO *io;
     register PerlIO *fp;
-    MAGIC *mg;
     GV * const gv = (PL_op->op_flags & OPf_STACKED) ? (GV*)*++MARK : PL_defoutgv;
 
     if (!(io = GvIO(gv))) {
