@@ -970,7 +970,18 @@ PP(pp_caller)
     else
 	mPUSHs(newSVpv(stashname, 0));
     mPUSHs(newSVpv(OutCopFILE(cx->blk_oldcop), 0));
-    mPUSHi((I32)CopLINE(cx->blk_oldcop));
+    {
+	SV**linenr = NULL;
+	SV* location = cx->blk_oldop->op_location;
+	if (location)
+	    linenr = av_fetch((AV*)location, 1, FALSE);
+	if (linenr && *linenr) {
+	    mPUSHi(SvIV(*linenr));
+	}
+	else {
+	    mPUSHi(-1);
+	}
+    }
     if (!MAXARG)
 	RETURN;
     if (CxTYPE(cx) == CXt_SUB) {
@@ -2096,11 +2107,11 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     if (IN_PERL_COMPILETIME) {
 	CopSTASH_set(&PL_compiling, PL_curstash);
     }
-    if (PERLDB_NAMEEVAL && CopLINE(PL_curcop)) {
+    if (PERLDB_NAMEEVAL) {
 	SV * const sv = sv_newmortal();
 	Perl_sv_setpvf(aTHX_ sv, "_<(%.10seval %lu)[%s:%"IVdf"]",
-		       code, (unsigned long)++PL_evalseq,
-		       CopFILE(PL_curcop), (IV)CopLINE(PL_curcop));
+	    code, (unsigned long)++PL_evalseq,
+	    CopFILE(PL_curcop), (IV)666);
 	tmpbuf = SvPVX(sv);
 	len = SvCUR(sv);
     }
@@ -2109,8 +2120,6 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
 			  (unsigned long)++PL_evalseq);
     SAVECOPFILE_FREE(&PL_compiling);
     CopFILE_set(&PL_compiling, tmpbuf+2);
-    SAVECOPLINE(&PL_compiling);
-    CopLINE_set(&PL_compiling, 1);
     /* XXX For C<eval "...">s within BEGIN {} blocks, this ends up
        deleting the eval's FILEGV from the stash before gv_check() runs
        (i.e. before run-time proper). To work around the coredump that
@@ -2318,7 +2327,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	PUTBACK;
 	return FALSE;
     }
-    CopLINE_set(&PL_compiling, 0);
     if (startop) {
 	*startop = PL_eval_root;
     } else
@@ -2758,9 +2766,6 @@ PP(pp_require)
     PUSHEVAL(cx, name);
     cx->blk_eval.retop = PL_op->op_next;
 
-    SAVECOPLINE(&PL_compiling);
-    CopLINE_set(&PL_compiling, 0);
-
     PUTBACK;
 
     if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
@@ -2816,11 +2821,11 @@ PP(pp_entereval)
 
     /* switch to eval mode */
 
-    if (PERLDB_NAMEEVAL && CopLINE(PL_curcop)) {
+    if (PERLDB_NAMEEVAL) {
 	SV * const temp_sv = sv_newmortal();
 	Perl_sv_setpvf(aTHX_ temp_sv, "_<(eval %lu)[%s:%"IVdf"]",
 		       (unsigned long)++PL_evalseq,
-		       CopFILE(PL_curcop), (IV)CopLINE(PL_curcop));
+		       CopFILE(PL_curcop), (IV)333);
 	tmpbuf = SvPVX(temp_sv);
 	len = SvCUR(temp_sv);
     }
@@ -2828,8 +2833,6 @@ PP(pp_entereval)
 	len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(eval %lu)", (unsigned long)++PL_evalseq);
     SAVECOPFILE_FREE(&PL_compiling);
     CopFILE_set(&PL_compiling, tmpbuf+2);
-    SAVECOPLINE(&PL_compiling);
-    CopLINE_set(&PL_compiling, 1);
     /* XXX For C<eval "...">s within BEGIN {} blocks, this ends up
        deleting the eval's FILEGV from the stash before gv_check() runs
        (i.e. before run-time proper). To work around the coredump that

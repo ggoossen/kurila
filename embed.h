@@ -99,6 +99,7 @@
 #define create_eval_scope	Perl_create_eval_scope
 #endif
 #define croak			Perl_croak
+#define croak_at		Perl_croak_at
 #define vcroak			Perl_vcroak
 #if defined(PERL_IMPLICIT_CONTEXT)
 #define croak_nocontext		Perl_croak_nocontext
@@ -3698,7 +3699,7 @@
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define mess_alloc()		S_mess_alloc(aTHX)
-#define vdie_croak_common(a,b)	S_vdie_croak_common(aTHX_ a,b)
+#define vdie_croak_common(a,b,c)	S_vdie_croak_common(aTHX_ a,b,c)
 #define write_no_mem()		S_write_no_mem(aTHX)
 #endif
 #endif

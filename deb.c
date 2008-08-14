@@ -60,7 +60,7 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
     dVAR;
     const char* const file = PL_curcop ? OutCopFILE(PL_curcop) : "<null>";
     const char* const display_file = file ? file : "<free>";
-    const long line = PL_curcop ? (long)CopLINE(PL_curcop) : 0;
+    const long line = 0;
 
     PERL_ARGS_ASSERT_VDEB;
 

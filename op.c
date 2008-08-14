@@ -820,12 +820,7 @@ S_scalarboolean(pTHX_ OP *o)
 
     if (o->op_type == OP_SASSIGN && cBINOPo->op_first->op_type == OP_CONST) {
 	if (ckWARN(WARN_SYNTAX)) {
-	    const line_t oldline = CopLINE(PL_curcop);
-
-	    if (PL_parser && PL_parser->copline != NOLINE)
-		CopLINE_set(PL_curcop, PL_parser->copline);
 	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "Found = in conditional, should be ==");
-	    CopLINE_set(PL_curcop, oldline);
 	}
     }
     return scalar(o);
@@ -3045,8 +3040,6 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	OP *curop;
 	if (pm->op_pmflags & PMf_EVAL) {
 	    curop = NULL;
-	    if (CopLINE(PL_curcop) < (line_t)PL_parser->multi_end)
-		CopLINE_set(PL_curcop, (line_t)PL_parser->multi_end);
 	}
 	else if (repl->op_type == OP_CONST)
 	    curop = repl;
@@ -3739,7 +3732,7 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o, SV *location)
     register COP *cop;
 
     NewOp(1101, cop, 1, COP);
-    if (PERLDB_LINE && CopLINE(PL_curcop) && PL_curstash != PL_debstash) {
+    if (PERLDB_LINE && PL_curstash != PL_debstash) {
 	cop->op_type = OP_DBSTATE;
 	cop->op_ppaddr = PL_ppaddr[ OP_DBSTATE ];
     }
@@ -3769,30 +3762,12 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o, SV *location)
 	HINTS_REFCNT_UNLOCK;
     }
 
-    if (PL_parser && PL_parser->copline == NOLINE)
-        CopLINE_set(cop, CopLINE(PL_curcop));
-    else {
-	CopLINE_set(cop, PL_parser->copline);
-	if (PL_parser)
-	    PL_parser->copline = NOLINE;
-    }
 #ifdef USE_ITHREADS
     CopFILE_set(cop, CopFILE(PL_curcop));	/* XXX share in a pvtable? */
 #else
     CopFILEGV_set(cop, CopFILEGV(PL_curcop));
 #endif
     CopSTASH_set(cop, PL_curstash);
-
-    if (PERLDB_LINE && PL_curstash != PL_debstash) {
-	AV *av = CopFILEAVx(PL_curcop);
-	if (av) {
-	    SV * const * const svp = av_fetch(av, (I32)CopLINE(cop), FALSE);
-	    if (svp && *svp != &PL_sv_undef ) {
-		(void)SvIOK_on(*svp);
-		SvIV_set(*svp, PTR2IV(cop));
-	    }
-	}
-    }
 
     return prepend_elem(OP_LINESEQ, (OP*)cop, o);
 }
@@ -3921,14 +3896,11 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
 	    break;
 	}
 	if (warnop) {
-	    const line_t oldline = CopLINE(PL_curcop);
-	    CopLINE_set(PL_curcop, PL_parser->copline);
 	    Perl_warner(aTHX_ packWARN(WARN_MISC),
 		 "Value of %s%s can be \"0\"; test with defined()",
 		 PL_op_desc[warnop],
 		 ((warnop == OP_READLINE || warnop == OP_GLOB)
 		  ? " construct" : "() operator"));
-	    CopLINE_set(PL_curcop, oldline);
 	}
     }
 
@@ -4703,11 +4675,11 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     else
 	ps = NULL;
 
-    if (!name && PERLDB_NAMEANON && CopLINE(PL_curcop)) {
+    if (!name && PERLDB_NAMEANON) {
 	SV * const sv = sv_newmortal();
 	Perl_sv_setpvf(aTHX_ sv, "%s[%s:%"IVdf"]",
 		       PL_curstash ? "__ANON__" : "__ANON__::__ANON__",
-		       CopFILE(PL_curcop), (IV)CopLINE(PL_curcop));
+		       CopFILE(PL_curcop), (IV)33);
 	aname = SvPVX_const(sv);
     }
     else
@@ -4805,13 +4777,9 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 		    || (CvCONST(cv)
 			&& (!const_sv || sv_cmp(cv_const_sv(cv), const_sv))))
 		{
-		    const line_t oldline = CopLINE(PL_curcop);
-		    if (PL_parser && PL_parser->copline != NOLINE)
-			CopLINE_set(PL_curcop, PL_parser->copline);
 		    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
 			CvCONST(cv) ? "Constant subroutine %s redefined"
 				    : "Subroutine %s redefined", name);
-		    CopLINE_set(PL_curcop, oldline);
 		}
 #ifdef PERL_MAD
 		if (!PL_minus_c)	/* keep old one around for madskills */
@@ -4985,7 +4953,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 
 	    Perl_sv_setpvf(aTHX_ sv, "%s:%ld-%ld",
 			   CopFILE(PL_curcop),
-			   (long)PL_subline, (long)CopLINE(PL_curcop));
+		(long)PL_subline, (long)333);
 	    gv_efullname3(tmpstr, gv, NULL);
 	    (void)hv_store(GvHV(PL_DBsub), SvPVX_const(tmpstr),
 		    SvCUR(tmpstr), sv, 0);
@@ -5027,8 +4995,6 @@ S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv,
 	if (strEQ(name, "BEGIN")) {
 	    const I32 oldscope = PL_scopestack_ix;
 	    ENTER;
-	    SAVECOPFILE(&PL_compiling);
-	    SAVECOPLINE(&PL_compiling);
 
 	    DEBUG_x( dump_sub(gv) );
 	    Perl_av_create_and_push(aTHX_ &PL_beginav, (SV*)cv);
@@ -5113,8 +5079,6 @@ Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
 	 SAVEVPTR(PL_curcop);
 	 PL_curcop = &PL_compiling;
     }
-    SAVECOPLINE(PL_curcop);
-    CopLINE_set(PL_curcop, PL_parser ? PL_parser->copline : NOLINE);
 
     SAVEHINTS();
     PL_hints &= ~HINT_BLOCK_SCOPE;
@@ -5219,14 +5183,10 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 		    if (stash) {
 			const char *redefined_name = HvNAME_get(stash);
 			if ( strEQ(redefined_name,"autouse") ) {
-			    const line_t oldline = CopLINE(PL_curcop);
-			    if (PL_parser && PL_parser->copline != NOLINE)
-				CopLINE_set(PL_curcop, PL_parser->copline);
 			    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
 					CvCONST(cv) ? "Constant subroutine %s redefined"
 						    : "Subroutine %s redefined"
 					,name);
-			    CopLINE_set(PL_curcop, oldline);
 			}
 		    }
 		}
@@ -6243,7 +6203,7 @@ Perl_ck_readline(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_READLINE;
 
     if (!(o->op_flags & OPf_KIDS)) {
-	Perl_croak(aTHX_ "readline expected argument");
+	Perl_croak_at(aTHX_ o->op_location, "readline expected argument");
     }
     return o;
 }
@@ -7448,13 +7408,10 @@ Perl_peep(pTHX_ register OP *o)
 		if (o->op_next->op_sibling) {
 		    const OPCODE type = o->op_next->op_sibling->op_type;
 		    if (type != OP_EXIT && type != OP_WARN && type != OP_DIE) {
-			const line_t oldline = CopLINE(PL_curcop);
-			CopLINE_set(PL_curcop, CopLINE((COP*)o->op_next));
 			Perl_warner(aTHX_ packWARN(WARN_EXEC),
 				    "Statement unlikely to be reached");
 			Perl_warner(aTHX_ packWARN(WARN_EXEC),
 				    "\t(Maybe you meant system() when you said exec()?)\n");
-			CopLINE_set(PL_curcop, oldline);
 		    }
 		}
 	    }

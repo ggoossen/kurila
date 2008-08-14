@@ -147,13 +147,6 @@ static const char* const lex_state_names[] = {
 
 #include "keywords.h"
 
-/* CLINE is a macro that ensures PL_copline has a sane value */
-
-#ifdef CLINE
-#undef CLINE
-#endif
-#define CLINE (PL_copline = (CopLINE(PL_curcop) < PL_copline ? CopLINE(PL_curcop) : PL_copline))
-
 #ifdef PERL_MAD
 #  define SKIPSPACE0(s) skipspace0(s)
 #  define SKIPSPACE1(s) skipspace1(s)
@@ -208,7 +201,7 @@ static const char* const lex_state_names[] = {
 #define PREBLOCK(retval) SETCURLOCATION( return (PL_expect = XBLOCK,PL_bufptr = s, REPORT(retval)); )
 #define PRETERMBLOCK(retval) SETCURLOCATION( return (PL_expect = XTERMBLOCK,PL_bufptr = s, REPORT(retval)); )
 #define PREREF(retval) SETCURLOCATION( return (PL_expect = XREF,PL_bufptr = s, REPORT(retval)); )
-#define TERM(retval) SETCURLOCATION( return (CLINE, PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval)); )
+#define TERM(retval) SETCURLOCATION( return (PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval)); )
 #define LOOPX(f) SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)LOOPEX)); )
 #define FTST(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERMORDORDOR, PL_bufptr=s, REPORT((int)UNIOP)); )
 #define FUN0(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC0)); )
@@ -980,7 +973,7 @@ S_update_debugger_info(pTHX_ SV *orig_sv, const char *const buf, STRLEN len)
 	    sv_setpvn(sv, buf, len);
 	(void)SvIOK_on(sv);
 	SvIV_set(sv, 0);
-	av_store(av, (I32)CopLINE(PL_curcop), sv);
+	av_store(av, 33, sv);
     }
 }
 
@@ -1213,7 +1206,6 @@ S_lop(pTHX_ I32 f, int x, char *s)
 
     pl_yylval.i_tkval.ival = f;
     pl_yylval.i_tkval.location = S_curlocation();
-    CLINE;
     PL_expect = x;
     PL_bufptr = s;
     PL_last_lop = PL_oldbufptr;
@@ -1599,10 +1591,10 @@ S_sublex_push(pTHX)
     SAVEI32(PL_lex_casemods);
     SAVEI32(PL_lex_starts);
     SAVEI32(PL_parser->lex_charoffset);
+    SAVEI32(PL_parser->lex_line_number);
     SAVEI8(PL_lex_state);
     SAVEI16(PL_lex_flags);
     SAVEI16(PL_lex_inwhat);
-    SAVECOPLINE(PL_curcop);
     SAVEPPTR(PL_bufptr);
     SAVEPPTR(PL_bufend);
     SAVEPPTR(PL_oldbufptr);
@@ -2654,7 +2646,7 @@ Perl_yylex(pTHX)
     DEBUG_T( {
 	SV* tmp = newSVpvs("");
 	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s %s\n",
-	    (IV)CopLINE(PL_curcop),
+	    PL_parser->lex_line_number,
 	    lex_state_names[PL_lex_state],
 	    exp_name[PL_expect],
 	    pv_display(tmp, s, strlen(s), 0, 60));
@@ -3300,7 +3292,7 @@ Perl_yylex(pTHX)
 	if (PL_lex_state != LEX_NORMAL || (PL_in_eval && !PL_rsfp)) {
 	    if (*s == '#' && s == PL_linestart && PL_in_eval && !PL_rsfp) {
 		/* handle eval qq[#line 1 "foo"\n ...] */
-		CopLINE_dec(PL_curcop);
+		PL_parser->lex_line_number--;
 		incline(s);
 	    }
 	    if (PL_madskills && !PL_in_eval) {
@@ -3800,7 +3792,6 @@ Perl_yylex(pTHX)
 	s = SKIPSPACE1(s);
 	TOKEN('(');
     case ';':
-	CLINE;
 	{
 	    const char tmp = *s++;
 	    OPERATOR(tmp);
@@ -4099,7 +4090,6 @@ Perl_yylex(pTHX)
 	yyerror("'>' is reserved for hashes");
 
     case '$':
-	CLINE;
 
 	if (s[1] == '#' && (isIDFIRST_lazy_if(s+2,UTF) || strchr("{$:+-", s[2]))) {
 	    yyerror("$# is not allowed");
@@ -4400,7 +4390,6 @@ Perl_yylex(pTHX)
 	      && d < PL_bufend && *d == ':' && *(d + 1) != ':') {
 	    s = d + 1;
 	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
-	    CLINE;
 	    TOKEN(LABEL);
 	}
 
@@ -4409,7 +4398,6 @@ Perl_yylex(pTHX)
 
 	/* Is this a word before a => operator? */
 	if (*d == '=' && d[1] == '>') {
-	    CLINE;
 	    pl_yylval.opval
 		= (OP*)newSVOP(OP_CONST, 0,
 			       newSVpvn(PL_tokenbuf, len), S_curlocation());
@@ -4567,7 +4555,6 @@ Perl_yylex(pTHX)
 
 		/* Presume this is going to be a bareword of some sort. */
 
-		CLINE;
 		pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv, S_curlocation());
 		pl_yylval.opval->op_private = OPpCONST_BARE;
 
@@ -4646,14 +4633,12 @@ Perl_yylex(pTHX)
 
 		/* Is this a word before a => operator? */
 		if (*s == '=' && s[1] == '>' && !pkgname) {
-		    CLINE;
 		    sv_setpv(((SVOP*)pl_yylval.opval)->op_sv, PL_tokenbuf);
 		    TERM(WORD);
 		}
 
 		/* If followed by a paren, it's certainly a subroutine. */
 		if (*s == '(') {
-		    CLINE;
 		    if (cv) {
 			d = s + 1;
 			while (SPACE_OR_TAB(*d))
@@ -5008,7 +4993,6 @@ Perl_yylex(pTHX)
 	    PREBLOCK(ELSE);
 
 	case KEY_elsif:
-	    pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
 	    OPERATOR(ELSIF);
 
 	case KEY_eq:
@@ -5056,7 +5040,6 @@ Perl_yylex(pTHX)
 
 	case KEY_for:
 	case KEY_foreach:
-	    pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
 	    s = SKIPSPACE1(s);
 	    if (PL_expect == XSTATE && isIDFIRST_lazy_if(s,UTF)) {
 		char *p = s;
@@ -5191,7 +5174,6 @@ Perl_yylex(pTHX)
 	    UNI(OP_HEX);
 
 	case KEY_if:
-	    pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
 	    OPERATOR(IF);
 
 	case KEY_index:
@@ -5868,11 +5850,9 @@ Perl_yylex(pTHX)
 	    UNI(OP_UNTIE);
 
 	case KEY_until:
-	    pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
 	    OPERATOR(UNTIL);
 
 	case KEY_unless:
-	    pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
 	    OPERATOR(UNLESS);
 
 	case KEY_unlink:
@@ -5904,7 +5884,6 @@ Perl_yylex(pTHX)
 	    LOP(OP_VEC,XTERM);
 
 	case KEY_while:
-	    pl_yylval.i_tkval.ival = CopLINE(PL_curcop);
 	    OPERATOR(WHILE);
 
 	case KEY_warn:
@@ -9899,7 +9878,6 @@ S_scan_heredoc(pTHX_ register char *s)
     }
     PL_lex_stuff.flags = LEXf_HEREDOC; /* single quote delimiter is handled specially in parse */
 
-    CLINE;
     PL_lex_stuff.line_number = PL_parser->lex_line_number + 1;
     PL_multi_start = PL_parser->lex_line_number;
     PL_multi_open = PL_multi_close = '<';
@@ -10068,8 +10046,6 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     else
 	stuffstart = start - SvPVX(PL_linestr);
 #endif
-    /* mark where we are, in case we need to report errors */
-    CLINE;
 
     /* after skipping whitespace, the next character is the terminator */
     term = *s;

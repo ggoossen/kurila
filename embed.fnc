@@ -143,6 +143,7 @@ pR	|OP*	|convert	|I32 optype|I32 flags|NULLOK OP* o|NULLOK SV* location
 pM	|PERL_CONTEXT*	|create_eval_scope|U32 flags
 : croak()'s first parm can be NULL.  Otherwise, mod_perl breaks.
 Afprd	|void	|croak		|NULLOK const char* pat|...
+Afprd	|void	|croak_at	|NULLOK SV* location|NULLOK const char* pat|...
 Apr	|void	|vcroak		|NULLOK const char* pat|NULLOK va_list* args
 #if defined(PERL_IMPLICIT_CONTEXT)
 Afnrp	|void	|croak_nocontext|NN const char* pat|...
@@ -1548,7 +1549,7 @@ s	|char*	|stdize_locale	|NN char* locs
 
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 s	|SV*	|mess_alloc
-s	|SV*    |vdie_croak_common|NULLOK const char *pat|NULLOK va_list *args
+s	|SV*    |vdie_croak_common|NULLOK SV* location|NULLOK const char *pat|NULLOK va_list *args
 sr	|char *	|write_no_mem
 #endif
 

@@ -659,7 +659,6 @@ PP(pp_undef)
 	    Newxz(gp, 1, GP);
 	    GvGP(sv) = gp_ref(gp);
 	    GvSV(sv) = newSV(0);
-	    GvLINE(sv) = CopLINE(PL_curcop);
 	    GvEGV(sv) = (GV*)sv;
 	    GvMULTI_on(sv);
 	}

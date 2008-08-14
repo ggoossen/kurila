@@ -312,6 +312,10 @@ PERL_CALLCONV void	Perl_croak(pTHX_ const char* pat, ...)
 			__attribute__noreturn__
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
+PERL_CALLCONV void	Perl_croak_at(pTHX_ SV* location, const char* pat, ...)
+			__attribute__noreturn__
+			__attribute__format__null_ok__(__printf__,pTHX_2,pTHX_3);
+
 PERL_CALLCONV void	Perl_vcroak(pTHX_ const char* pat, va_list* args)
 			__attribute__noreturn__;
 
@@ -5495,7 +5499,7 @@ STATIC char*	S_stdize_locale(pTHX_ char* locs)
 
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 STATIC SV*	S_mess_alloc(pTHX);
-STATIC SV*	S_vdie_croak_common(pTHX_ const char *pat, va_list *args);
+STATIC SV*	S_vdie_croak_common(pTHX_ SV* location, const char *pat, va_list *args);
 STATIC char *	S_write_no_mem(pTHX)
 			__attribute__noreturn__;
 

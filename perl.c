@@ -1921,7 +1921,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	}
     }
 #endif
-    CopLINE_set(PL_curcop, 0);
+    PL_parser->lex_line_number = 0;
     if (PL_e_script) {
 	SvREFCNT_dec(PL_e_script);
 	PL_e_script = NULL;
@@ -1932,7 +1932,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     if (isWARN_ONCE) {
 	SAVECOPFILE(PL_curcop);
-	SAVECOPLINE(PL_curcop);
 	gv_check(PL_defstash);
     }
 
@@ -4714,7 +4713,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 {
     dVAR;
     SV *atsv;
-    volatile const line_t oldline = PL_curcop ? CopLINE(PL_curcop) : 0;
     CV *cv;
     int ret;
     dJMPENV;
@@ -4761,7 +4759,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 	    atsv = ERRSV;
 	    if (SvTRUE(atsv)) {
 		PL_curcop = &PL_compiling;
-		CopLINE_set(PL_curcop, oldline);
 		while (PL_scopestack_ix > oldscope)
 		    LEAVE;
 		JMPENV_POP;
@@ -4801,7 +4798,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		LEAVE;
 	    FREETMPS;
 	    PL_curcop = &PL_compiling;
-	    CopLINE_set(PL_curcop, oldline);
 	    JMPENV_POP;
 	    if (PL_statusvalue && !(PL_exit_flags & PERL_EXIT_EXPECTED)) {
 		if (paramList == PL_beginav)
@@ -4818,7 +4814,6 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 	case 3:
 	    if (PL_restartop) {
 		PL_curcop = &PL_compiling;
-		CopLINE_set(PL_curcop, oldline);
 		JMPENV_JUMP(3);
 	    }
 	    PerlIO_printf(Perl_error_log, "panic: restartop\n");
