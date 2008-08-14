@@ -5542,6 +5542,7 @@ Perl_ck_try(pTHX_ OP *o)
 	    enter->op_type = OP_ENTERTRY;
 	    enter->op_ppaddr = PL_ppaddr[OP_ENTERTRY];
 	    enter->op_private = 0;
+	    enter->op_location = o->op_location;
 
 	    /* establish postfix order */
 	    enter->op_next = (OP*)enter;

@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 16;
+plan tests => 15;
 
 dies_like(sub { for (\2) { $_ = ~< *FH } },
           qr/^Modification of a read-only value attempted$/, '[perl #19566]');
@@ -80,10 +80,6 @@ SKIP: {
 fresh_perl_is('BEGIN{~< *ARGV}', '',
               \%( switches => \@('-w'), stdin => '', stderr => 1 ),
               'No ARGVOUT used only once warning');
-
-fresh_perl_is('print readline', 'foo',
-              \%( switches => \@('-w'), stdin => 'foo', stderr => 1 ),
-              'readline() defaults to *ARGV');
 
 my $obj = bless \@();
 dies_like( sub { $obj .= ~< *DATA; }, qr/reference as string/, 'rcatline and refs');
