@@ -11,8 +11,6 @@ our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total,
 
 %h{'abc'} = 'ABC';
 %h{'def'} = 'DEF';
-%h{'jkl','mno'} = "JKL\034MNO";
-%h{'a',2,3,4,5} = join("\034",'A',2,3,4,5);
 %h{'a'} = 'A';
 %h{'b'} = 'B';
 %h{'c'} = 'C';
@@ -43,8 +41,8 @@ our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total,
 @keys = @( keys %h );
 @values = @( values %h );
 
-is (((nelems @keys)-1), 29, "keys");
-is (((nelems @values)-1), 29, "values");
+is (((nelems @keys)-1), 27, "keys");
+is (((nelems @values)-1), 27, "values");
 
 $i = 0;		# stop -w complaints
 
@@ -56,10 +54,10 @@ while (($key,$value) = each(%h)) {
     }
 }
 
-is ($i, 30, "each count");
+is ($i, 28, "each count");
 
 @keys = @('blurfl', keys(%h), 'dyick');
-is (((nelems @keys)-1), 31, "added a key");
+is (((nelems @keys)-1), 29, "added a key");
 
 # test scalar each
 %hash = %( 1..20 );

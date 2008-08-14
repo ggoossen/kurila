@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 84 );
+plan( tests => 83 );
 
 eval '%@x=0;';
 like( $@->{description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
@@ -192,9 +192,6 @@ is($@, "", 'BEGIN 1' );
 
 eval q[ BEGIN { my $x; $x = 1 } ] for 1..10;
 is($@, "", 'BEGIN 2' );
-
-eval q[ BEGIN { \&foo1 } ] for 1..10;
-is($@, "", 'BEGIN 3' );
 
 eval q[ sub foo2 { } ] for 1..10;
 is($@, "", 'BEGIN 4' );
