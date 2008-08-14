@@ -1173,8 +1173,6 @@ void
 Perl_write_to_stderr(pTHX_ const char* message, int msglen)
 {
     dVAR;
-    IO *io;
-    MAGIC *mg;
 
     PERL_ARGS_ASSERT_WRITE_TO_STDERR;
 
@@ -1226,12 +1224,12 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	if (CopLINE(cop)) {
 	    const char* message = "recursive die at ";
 	    char buffer[20];
-	    char* filename = OutCopFILE(cop);
+	    const char* filename = OutCopFILE(cop);
 	    int blen;
 	    write_to_stderr("recursive die at ", strlen(message));
 	    write_to_stderr(filename, strlen(filename));
-	    blen = snprintf(&buffer, 20, " line %"IVdf".\n", (IV)CopLINE(cop));
-	    write_to_stderr(&buffer, blen);
+	    blen = snprintf((char*)&buffer, 20, " line %"IVdf".\n", (IV)CopLINE(cop));
+	    write_to_stderr((char*)&buffer, blen);
 	}
 	else {
 	    const char* message = "recursive die at unknown location\n";
@@ -1297,7 +1295,7 @@ S_vdie_croak_common(pTHX_ const char* pat, va_list* args)
 		av_push(res, newSViv(PL_parser->lex_line_number));
 		av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
 				      PL_parser->lex_charoffset) + 1));
-		XPUSHs(res);
+		XPUSHs(SVav(res));
 	    }
 	    else if (PL_op)
 		XPUSHs(PL_op->op_location);
@@ -1426,7 +1424,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 		av_push(res, newSViv(PL_parser->lex_line_number));
 		av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
 				      PL_parser->lex_charoffset) + 1));
-		XPUSHs(res);
+		XPUSHs(SVav(res));
 	    }
 	    else if (PL_op)
 		XPUSHs(PL_op->op_location);

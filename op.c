@@ -4899,8 +4899,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	CvOUTSIDE(PL_compcv) = 0;
 	CvPADLIST(cv) = CvPADLIST(PL_compcv);
 	CvPADLIST(PL_compcv) = 0;
-	/* inner references to PL_compcv must be fixed up ... */
-	pad_fixup_inner_anons(CvPADLIST(cv), PL_compcv, cv);
 	/* ... before we throw it away */
 	CVcpREPLACE(PL_compcv, cv);
 	if (PERLDB_INTER)/* Advice debugger on the new sub. */

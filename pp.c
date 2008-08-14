@@ -3383,7 +3383,7 @@ PP(pp_quotemeta)
 
 PP(pp_aslice)
 {
-    dVAR; dSP; dMARK; dORIGMARK;
+    dVAR; dSP; dMARK;
     register AV* const av = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
 

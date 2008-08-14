@@ -96,6 +96,10 @@ static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
     return (AV*)sv_2mortal((SV*)av);
 }
 
+#define SVav(av) inline_SVav(aTHX_ av)
+static __inline__ SV* inline_SVav(pTHX_ AV *av) {
+    return (SV*)av;
+}
 
 #define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
 static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
@@ -123,5 +127,3 @@ XVcpREPLACE(AV)
 #define AVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(AV, sv_d, sv_s)
 XVcpREPLACE(CV)
 #define CVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(CV, sv_d, sv_s)
-
-
