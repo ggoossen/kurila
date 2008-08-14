@@ -738,10 +738,12 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	av_push(av, &PL_sv_undef);
     else
 	av_push(av, newSVpv(stashname, 0));
-    sv_setsv(av, cx->blk_oldcop->op_location);
-    return av;
-    av_push(av, newSVpv(OutCopFILE(cx->blk_oldcop), 0));
-    av_push(av, newSViv((I32)CopLINE(cx->blk_oldcop)));
+    if (cx->blk_oldop->op_location) {
+	sv_setsv(av, cx->blk_oldop->op_location);
+    } else {
+	av_push(av, newSVpv("unknown location", 0));
+    }
+
     if (CxTYPE(cx) == CXt_SUB) {
 	GV * const cvgv = CvGV(cx->blk_sub.cv);
 	/* So is ccstack[dbcxix]. */
@@ -977,11 +979,15 @@ XS(XS_error_message)
 			    sv_catsv(res, *v);
 
 			sv_catpv(res, " called at ");
-			v = av_fetch(item, 1, 0);
+			v = av_fetch(item, 0, 0);
 			if (v && SvOK(*v))
 			    sv_catsv(res, *v);
 
 			sv_catpv(res, " line ");
+			v = av_fetch(item, 1, 0);
+			if (v && SvOK(*v))
+			    sv_catsv(res, *v);
+			sv_catpv(res, " character ");
 			v = av_fetch(item, 2, 0);
 			if (v && SvOK(*v))
 			    sv_catsv(res, *v);
