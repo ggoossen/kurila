@@ -1917,7 +1917,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    Perl_croak(aTHX_ "%s had compilation errors.", PL_origfilename);
 	else {
 	    Perl_croak(aTHX_ "Execution of %s aborted due to compilation errors.",
-		       PL_origfilename);
+		PL_origfilename);
 	}
     }
 #endif
