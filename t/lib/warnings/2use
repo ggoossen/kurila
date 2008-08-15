@@ -9,7 +9,7 @@ __END__
 use warnings 'this-should-never-be-a-warning-category' ;
 EXPECT
 Unknown warnings category 'this-should-never-be-a-warning-category' at .../warnings.pm line xxx.
-    warnings::import called at - line 3.
+    warnings::import called at - line 3 character 1.
 BEGIN failed--compilation aborted
 ########
 
@@ -21,7 +21,7 @@ use warnings 'syntax' ;
 }
 my $a =+ 1 ;
 EXPECT
-Reversed += operator at - line 8.
+Reversed += operator at - line 8 character 7.
 ########
 
 # Check compile time scope of pragma
@@ -32,7 +32,7 @@ no warnings;
 }
 my $a =+ 1 ;
 EXPECT
-Reversed += operator at - line 6.
+Reversed += operator at - line 6 character 11.
 ########
 
 # Check runtime scope of pragma
@@ -43,7 +43,7 @@ use warnings 'uninitialized' ;
 }
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 8.
+Use of uninitialized value $b in scalar chop at - line 8 character 9.
 ########
 
 # Check runtime scope of pragma
@@ -54,7 +54,7 @@ no warnings ;
 }
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6.
+Use of uninitialized value $b in scalar chop at - line 6 character 13.
 ########
 
 # Check runtime scope of pragma
@@ -65,23 +65,23 @@ no warnings ;
 }
 &$a ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6.
-    main::__ANON__ called at - line 8.
+Use of uninitialized value $b in scalar chop at - line 6 character 24.
+    main::__ANON__ called at - line 8 character 1.
 ########
 
 use warnings 'syntax' ;
 my $a =+ 1 ;
 EXPECT
-Reversed += operator at - line 3.
+Reversed += operator at - line 3 character 7.
 ########
 -w
 no warnings 'reserved' ;
 foo.bar;
 EXPECT
-Useless use of concatenation (.) or string in void context at - line 3.
+Useless use of concatenation (.) or string in void context at - line 3 character 1.
 Bareword "foo" not allowed while "strict subs" in use at - line 3, at EOF
 Bareword "bar" not allowed while "strict subs" in use at - line 3, at EOF
-Execution of - aborted due to compilation errors. at - line 3.
+Execution of - aborted due to compilation errors.
 ########
 
 --FILE-- abc
@@ -113,9 +113,9 @@ use warnings 'uninitialized' ;
 require "./abc";
 my $a ; chop $a ;
 EXPECT
-Reversed += operator at ./abc line 2.
-    (eval) called at - line 2.
-Use of uninitialized value $a in scalar chop at - line 3.
+Reversed += operator at ./abc line 2 character 7.
+    (require) called at - line 2 character 1.
+Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 
 --FILE-- abc.pm
@@ -127,9 +127,9 @@ use warnings 'uninitialized' ;
 use abc;
 my $a ; chop $a ;
 EXPECT
-Reversed += operator at abc.pm line 2.
-    (eval) called at - line 2.
-Use of uninitialized value $a in scalar chop at - line 3.
+Reversed += operator at abc.pm line 2 character 7.
+    (eval) called at - line 2 character 1.
+Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 
 # Check scope of pragma with eval
@@ -156,8 +156,8 @@ use warnings;
     my $b ; chop $b ;
 }
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 8.
-    (eval) called at - line 6.
+Use of uninitialized value $b in scalar chop at - line 8 character 17.
+    (eval) called at - line 6 character 5.
 ########
 
 # Check scope of pragma with eval
@@ -170,9 +170,9 @@ no warnings;
     my $b ; chop $b ;
 }
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 7.
-    (eval) called at - line 6.
-Use of uninitialized value $b in scalar chop at - line 9.
+Use of uninitialized value $b in scalar chop at - line 7 character 17.
+    (eval) called at - line 6 character 5.
+Use of uninitialized value $b in scalar chop at - line 9 character 13.
 ########
 
 # Check scope of pragma with eval
@@ -186,7 +186,7 @@ no warnings;
     my $b ; chop $b ;
 }
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 10.
+Use of uninitialized value $b in scalar chop at - line 10 character 13.
 ########
 
 # Check scope of pragma with eval
@@ -213,7 +213,7 @@ use warnings;
     my $a =+ 1 ;
 }
 EXPECT
-Reversed += operator at - line 8.
+Reversed += operator at - line 8 character 15.
 ########
 
 # Check scope of pragma with eval
@@ -226,8 +226,8 @@ no warnings;
     my $a =+ 1 ;
 }
 EXPECT
-Reversed += operator at - line 7.
-Reversed += operator at - line 9.
+Reversed += operator at - line 7 character 15.
+Reversed += operator at - line 9 character 11.
 ########
 
 # Check scope of pragma with eval
@@ -241,7 +241,7 @@ no warnings;
     my $a =+ 1 ;
 }
 EXPECT
-Reversed += operator at - line 10.
+Reversed += operator at - line 10 character 11.
 ########
 
 # Check scope of pragma with eval
@@ -268,8 +268,8 @@ use warnings;
     my $b ; chop $b ;
 }
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 3.
-    (eval) called at - line 6.
+Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 58.
+    (eval) called at - line 6 character 5.
 ########
 
 # Check scope of pragma with eval
@@ -282,9 +282,9 @@ no warnings;
     my $b ; chop $b ;
 }
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 2.
-    (eval) called at - line 6.
-Use of uninitialized value $b in scalar chop at - line 9.
+Use of uninitialized value $b in scalar chop at (eval 1) line 2 character 18.
+    (eval) called at - line 6 character 5.
+Use of uninitialized value $b in scalar chop at - line 9 character 13.
 ########
 
 # Check scope of pragma with eval
@@ -298,7 +298,7 @@ no warnings;
     my $b ; chop $b ;
 }
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 10.
+Use of uninitialized value $b in scalar chop at - line 10 character 13.
 ########
 
 # Check scope of pragma with eval
@@ -325,7 +325,7 @@ use warnings;
     my $a =+ 1 ;
 }
 EXPECT
-Reversed += operator at (eval 1) line 3.
+Reversed += operator at (eval 1) line 3 character 49.
     (eval) called at - line 6.
 ########
 
@@ -339,9 +339,9 @@ no warnings;
     my $a =+ 1 ;
 }
 EXPECT
-Reversed += operator at - line 9.
-Reversed += operator at (eval 1) line 2.
-    (eval) called at - line 6.
+Reversed += operator at - line 9 character 11.
+Reversed += operator at (eval 1) line 2 character 16.
+    (eval) called at - line 6 character 5.
 ########
 
 # Check scope of pragma with eval
@@ -355,7 +355,7 @@ no warnings;
     my $a =+ 1 ;
 }
 EXPECT
-Reversed += operator at - line 10.
+Reversed += operator at - line 10 character 11.
 ########
 
 # Check the additive nature of the pragma
@@ -369,6 +369,6 @@ my $c ; chop $c ;
 no warnings 'syntax' ;
 $a =+ 1 ;
 EXPECT
-Reversed += operator at - line 6.
-Use of uninitialized value $c in scalar chop at - line 9.
+Reversed += operator at - line 6 character 4.
+Use of uninitialized value $c in scalar chop at - line 9 character 9.
 ########

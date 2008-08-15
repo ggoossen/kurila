@@ -1312,7 +1312,7 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
     dVAR;
     SV* msv;
 
-    SV* location;
+    SV* location = NULL;
     if (PL_op) {
 	location = PL_op->op_location;
     }
