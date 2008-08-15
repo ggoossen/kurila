@@ -5456,6 +5456,8 @@ Perl_yylex(pTHX)
 	    }
 	    else 
 		pl_yylval.i_tkval.ival = 0;
+	    pl_yylval.i_tkval.location = S_curlocation();
+	    av_push((AV*)pl_yylval.i_tkval.location, newSVpv("(require)", 0));
 	    PL_expect = XTERM;
 	    PL_bufptr = s;
 	    PL_last_uni = PL_oldbufptr;

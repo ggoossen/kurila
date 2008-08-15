@@ -1225,10 +1225,11 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	    const char* message = "recursive die at ";
 	    char buffer[20];
 	    const char* filename = OutCopFILE(cop);
+	    IV linenr = SvIV(*av_fetch((AV*)PL_op->op_location, 1, 0));
 	    int blen;
 	    write_to_stderr("recursive die at ", strlen(message));
 	    write_to_stderr(filename, strlen(filename));
-	    blen = snprintf((char*)&buffer, 20, " line %"IVdf".\n", 33);
+	    blen = snprintf((char*)&buffer, 20, " line %"IVdf".\n", linenr);
 	    write_to_stderr((char*)&buffer, blen);
 	}
 	else {
@@ -1312,15 +1313,16 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
     SV* msv;
 
     SV* location;
-    if (PL_compcv) {
+    if (PL_op) {
+	location = PL_op->op_location;
+    }
+    else if (PL_compcv) {
 	location = SVav(av_2mortal(newAV()));
 	av_push((AV*)location, newSVsv(CopFILESV(PL_curcop)));
 	av_push((AV*)location, newSViv(PL_parser->lex_line_number));
 	av_push((AV*)location, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
     }
-    else if (PL_op)
-	location = PL_op->op_location;
     msv = vdie_croak_common(location, pat, args);
     die_where(msv);
     /* NOTREACHED */
@@ -1432,7 +1434,10 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 
 	    XPUSHs(msv);
 
-	    if (PL_compcv) {
+	    if (PL_op) {
+		XPUSHs(PL_op->op_location);
+	    }
+	    else if (PL_compcv) {
 		AV* res = av_2mortal(newAV());
 		av_push(res, newSVsv(CopFILESV(PL_curcop)));
 		av_push(res, newSViv(PL_parser->lex_line_number));
@@ -1440,8 +1445,6 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 				      PL_parser->lex_charoffset) + 1));
 		XPUSHs(SVav(res));
 	    }
-	    else if (PL_op)
-		XPUSHs(PL_op->op_location);
 
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);

@@ -33,7 +33,7 @@ if ((nelems @ARGV))
     }
   }
 else
-  { @w_files = @( sort <glob(catfile(curdir(), "lib", $pragma_name, "*")) ) }
+  { @w_files = @( sort < glob(catfile(curdir(), "lib", $pragma_name, "*")) ) }
 
 my $files = 0;
 foreach my $file (< @w_files) {

@@ -1195,9 +1195,10 @@ term	:	termbinop
                           APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	UNIOP term                           /* Unary op */
-			{ $$ = newUNOP(IVAL($1), 0, $2, LOCATION($1));
-			  TOKEN_GETMAD($1,$$,'o');
-                          APPEND_MADPROPS_PV("uniop", $$, '>');
+			{
+                            $$ = newUNOP(IVAL($1), 0, $2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
+                            APPEND_MADPROPS_PV("uniop", $$, '>');
 			}
 	|	REQUIRE                              /* require, $_ implied */
                         {
