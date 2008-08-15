@@ -2765,6 +2765,7 @@ PP(pp_require)
     PUSHBLOCK(cx, CXt_EVAL, SP);
     PUSHEVAL(cx, name);
     cx->blk_eval.retop = PL_op->op_next;
+    cx->blk_oldop = PL_op;
 
     PUTBACK;
 
