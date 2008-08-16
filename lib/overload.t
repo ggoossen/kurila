@@ -3,6 +3,17 @@
 use TestInit;
 
 package Oscalar;
+
+sub new {
+  my $foo = @_[1];
+  bless \$foo, @_[0];
+}
+
+sub stringify { "${@_[0]}" }
+sub numify { 0 + "${@_[0]}" }	# Not needed, additional overhead
+				# comparing to direct compilation based on
+				# stringify
+
 use overload ( 
 				# Anonymous subroutines:
 '+'	=>	sub { Oscalar->new( $ {@_[0]}+@_[1])},
@@ -24,16 +35,6 @@ use overload (
 '""'	=> \&stringify,
 '0+'	=> \&numify,			# Order of arguments insignificant
 );
-
-sub new {
-  my $foo = @_[1];
-  bless \$foo, @_[0];
-}
-
-sub stringify { "${@_[0]}" }
-sub numify { 0 + "${@_[0]}" }	# Not needed, additional overhead
-				# comparing to direct compilation based on
-				# stringify
 
 package main;
 
@@ -371,9 +372,9 @@ is($b, "_<oups1
   package two_face;		# Scalars with separate string and
                                 # numeric values.
   sub new { my $p = shift; bless \@(< @_), $p }
-  use overload '""' => \&str, '0+' => \&num, fallback => 1;
   sub num {shift->[1]}
   sub str {shift->[0]}
+  use overload '""' => \&str, '0+' => \&num, fallback => 1;
 }
 
 {
@@ -385,9 +386,9 @@ is($b, "_<oups1
 
 {
   package sorting;
-  use overload 'cmp' => \&comp;
   sub new { my ($p, $v) = < @_; bless \$v, $p }
   sub comp { my ($x,$y) = < @_; ($$x * 3 % 10) <+> ($$y * 3 % 10) or $$x cmp $$y }
+  use overload 'cmp' => \&comp;
 }
 {
   my @arr = @( map sorting->new($_), 0..12 );
@@ -397,9 +398,9 @@ is($b, "_<oups1
 }
 {
   package iterator;
-  use overload '<>' => \&iter;
   sub new { my ($p, $v) = < @_; bless \$v, $p }
   sub iter { my ($x) = < @_; return undef if $$x +< 0; return $$x--; }
+  use overload '<>' => \&iter;
 }
 
 # XXX iterator overload not intended to work with CORE::GLOBAL?

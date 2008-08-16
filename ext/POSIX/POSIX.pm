@@ -731,7 +731,7 @@ sub utime {
 sub load_imports {
 %EXPORT_TAGS = %(
 
-    assert_h =>	\@(qw(assert NDEBUG)),
+    assert_h =>	\@(qw(assert)),
 
     ctype_h =>	\@(qw(isalnum isalpha iscntrl isdigit isgraph islower
 		isprint ispunct isspace isupper isxdigit tolower toupper)),
@@ -803,7 +803,7 @@ sub load_imports {
 		SIGPIPE %SIGRT SIGRTMIN SIGRTMAX SIGQUIT SIGSEGV SIGSTOP
 		SIGTERM SIGTSTP SIGTTIN	SIGTTOU SIGUSR1 SIGUSR2
 		SIG_BLOCK SIG_DFL SIG_ERR SIG_IGN SIG_SETMASK SIG_UNBLOCK
-		raise sigaction signal sigpending sigprocmask sigsuspend)),
+		raise sigaction sigpending sigprocmask sigsuspend)),
 
     stdarg_h =>	\@(),
 
@@ -811,7 +811,7 @@ sub load_imports {
 
     stdio_h =>	\@(qw(BUFSIZ EOF FILENAME_MAX L_ctermid L_cuserid
 		L_tmpname NULL SEEK_CUR SEEK_END SEEK_SET
-		STREAM_MAX TMP_MAX stderr stdin stdout
+		STREAM_MAX TMP_MAX
 		clearerr fclose fdopen feof ferror fflush fgetc fgetpos
 		fgets fopen fprintf fputc fputs fread freopen
 		fscanf fseek fsetpos ftell fwrite getchar gets
@@ -852,8 +852,8 @@ sub load_imports {
 		TCOFLUSH TCOOFF TCOON TCSADRAIN TCSAFLUSH TCSANOW
 		TOSTOP VEOF VEOL VERASE VINTR VKILL VMIN VQUIT VSTART
 		VSTOP VSUSP VTIME
-		cfgetispeed cfgetospeed cfsetispeed cfsetospeed tcdrain
-		tcflow tcflush tcgetattr tcsendbreak tcsetattr )),
+		tcdrain
+		tcflow tcflush tcsendbreak )),
 
     time_h =>	\@(qw(CLK_TCK CLOCKS_PER_SEC NULL asctime clock ctime
 		difftime mktime strftime tzset tzname)),
