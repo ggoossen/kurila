@@ -6,11 +6,11 @@ plan( tests => 26 );
 
 # simple error object.
 {
-    my $err = error::create("my message"); my $line1 = __LINE__;
+    my $err = error::create("my message", @("filetest.t", 33, 11));
     ok $err, "error object created";
     is ref $err, "error";
     is $err->{description}, "my message";
-    is $err->message, "my message at ../lib/error.t line $line1.\n", "message function";
+    is $err->message, "my message at filetest.t line 33 character 11.\n", "message function";
 }
 
 # a bit more complex one, with stack trace.

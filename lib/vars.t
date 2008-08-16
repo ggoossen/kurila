@@ -15,7 +15,7 @@ $main::y = 3;
 @main::z = @( () );
 $X::x = 13;
 
-use vars qw($p @q %r *s &t);
+use vars qw($p @q %r *s);
 
 my $e = !(grep m/^Name "X::x" used only once: possible typo/, < @warns) && 'not ';
 print "{$e}ok 1\n";
@@ -39,8 +39,7 @@ $e = ! *r{HASH} && 'not ';
 print "{$e}ok 8\n";
 $e = ! %main::{s} && 'not ';
 print "{$e}ok 9\n";
-$e = ! *t{CODE} && 'not ';
-print "{$e}ok 10\n";
+print "ok 10\n";
 $e = defined %X::{q} && 'not ';
 print "{$e}ok 11\n";
 print "ok 12\n";
@@ -76,7 +75,7 @@ print "ok 22\n";
 print "ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
 my @errs = @( split m/\n/, $@->message );
-$e = (nelems @errs) != 4 && 'not ';
+$e = (nelems @errs) != 3 && 'not ';
 print "{$e}ok 24\n";
 $e = !(grep(m/^Global symbol "\$u" requires explicit package name/, < @errs))
 			&& 'not ';

@@ -88,11 +88,11 @@ Fred 1,2 ;
 sub Fred {}
 EXPECT
 Number found where operator expected at - line 3, near "Fred 1"
- at - line 3.
+ at - line 3 character 7.
 	(Do you need to predeclare Fred?)
- at - line 3.
+ at - line 3 character 7.
 syntax error at - line 3, near "Fred 1"
-Execution of - aborted due to compilation errors. at - line 4.
+Execution of - aborted due to compilation errors.
 ########
 
 # Error - not predeclaring a sub in time
@@ -101,69 +101,26 @@ use subs qw( Fred ) ;
 sub Fred {}
 EXPECT
 Number found where operator expected at - line 3, near "Fred 1"
- at - line 3.
+ at - line 3 character 7.
 	(Do you need to predeclare Fred?)
- at - line 3.
+ at - line 3 character 7.
 syntax error at - line 3, near "Fred 1"
-BEGIN not safe after errors--compilation aborted at - line 4.
-########
-
-# AOK
-use subs qw( Fred) ;
-Fred 1,2 ;
-sub Fred { print @_[0] + @_[1], "\n" }
-EXPECT
-3
+BEGIN not safe after errors--compilation aborted at - line 4 character 22.
 ########
 
 # override a built-in function
+sub open { print @_[0] + @_[1], "\n" }
 use subs qw( open ) ;
 open 1,2 ;
-sub open { print @_[0] + @_[1], "\n" }
-EXPECT
-3
-########
-
-# override a built-in function, call after definition
-use subs qw( open ) ;
-sub open { print @_[0] + @_[1], "\n" }
-open 1,2 ;
-EXPECT
-3
-########
-
-# override a built-in function, call with ()
-use subs qw( open ) ;
-open (1,2) ;
-sub open { print @_[0] + @_[1], "\n" }
-EXPECT
-3
-########
-
-# override a built-in function, call with () after definition
-use subs qw( open ) ;
-sub open { print @_[0] + @_[1], "\n" }
-open (1,2) ;
-EXPECT
-3
-########
-
---FILE-- abc
-Fred 1,2 ;
-1;
---FILE--
-use subs qw( Fred ) ;
-require "./abc" ;
-sub Fred { print @_[0] + @_[1], "\n" }
 EXPECT
 3
 ########
 
 # check that it isn't affected by block scope
+sub Fred { print @_[0] + @_[1], "\n" }
 {
     use subs qw( Fred ) ;
 }
 Fred 1, 2;
-sub Fred { print @_[0] + @_[1], "\n" }
 EXPECT
 3
