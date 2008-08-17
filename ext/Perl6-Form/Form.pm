@@ -485,7 +485,7 @@ sub segment ($\@\%$\%) {
 	my ($format, $args, $opts, $fldcnt, $argcache) = < @_;
 	my $width =
 		defined $opts->{page}->{width} ? $opts->{page}->{width} : length($format);
-	my $userdef = join("|", < @{$opts->{field}{from}}) || qr/(?!)/;
+	my $userdef = join("|", < @{$opts->{field}->{from}}) || qr/(?!)/;
 	my $bullet  = join("|", map quotemeta, < @{$opts->{bullet}}) || qr/(?!)/;
 	use re 'eval';
 	my @format;
@@ -1063,7 +1063,7 @@ use warnings::register;
 sub form {
   # Handle formatting calls...
   my ($package, $file, $line) = caller;
-    my $caller_opts = %caller_opts{$package,$file} ||= \%();
+    my $caller_opts = %caller_opts{$package.','.$file} ||= \%();
     if (%$caller_opts) {
         $line = first { $_ +< $line } sort {$b<+>$a} keys %$caller_opts;
         $caller_opts = $caller_opts->{$line} || \%()

@@ -28,7 +28,6 @@ $VERSION = "0.07";
  POLLWRNORM
  POLLRDBAND
  POLLWRBAND
- POLLNORM  
 	       ) );
 
 # [0] maps fd's to requested masks

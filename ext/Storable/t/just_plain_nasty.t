@@ -33,14 +33,14 @@ BEGIN {
 
 {
     package Banana;
+    sub compare { return int(rand(3))-1 };
+    sub equal { return 1 if rand(1) +> 0.5 }
+    sub real { return "keep it so" }
     use overload   
 	'<+>' => \&compare,
 	    '==' => \&equal,
 		'""' => \&real,
 		fallback => 1;
-    sub compare { return int(rand(3))-1 };
-    sub equal { return 1 if rand(1) +> 0.5 }
-    sub real { return "keep it so" }
 }
 
 my (@a);

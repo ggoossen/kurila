@@ -463,39 +463,6 @@ This is like C<$,> except that it applies to array and slice values
 interpolated into a double-quoted string (or similar interpreted
 string).  Default is a space.  (Mnemonic: obvious, I think.)
 
-=item $SUBSCRIPT_SEPARATOR
-
-=item $SUBSEP
-
-=item $;
-X<$;> X<$SUBSEP> X<SUBSCRIPT_SEPARATOR>
-
-The subscript separator for multidimensional array emulation.  If you
-refer to a hash element as
-
-    $foo{$a,$b,$c}
-
-it really means
-
-    $foo{join($;, $a, $b, $c)}
-
-But don't put
-
-    @foo{$a,$b,$c}	# a slice--note the @
-
-which means
-
-    ($foo{$a},$foo{$b},$foo{$c})
-
-Default is "\034", the same as SUBSEP in B<awk>.  If your
-keys contain binary data there might not be any safe value for C<$;>.
-(Mnemonic: comma (the syntactic subscript separator) is a
-semi-semicolon.  Yeah, I know, it's pretty lame, but C<$,> is already
-taken for something more important.)
-
-Consider using "real" multidimensional arrays as described
-in L<perllol>.
-
 =item @LAST_MATCH_START
 
 =item @-

@@ -156,7 +156,8 @@ require Carp::Heavy;
 
 ### For the OO interface
 use base qw/ IO::Handle IO::Seekable /;
-use overload '""' => \&STRINGIFY, fallback => 1;
+require overload;
+overload->import('""' => \&STRINGIFY, fallback => 1);
 
 # use 'our' on v5.6.0
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG $KEEP_ALL);
@@ -2344,7 +2345,8 @@ package File::Temp::Dir;
 
 use File::Path qw/ rmtree /;
 use strict;
-use overload '""' => \&STRINGIFY, fallback => 1;
+require overload;
+overload->import('""' => \&STRINGIFY, fallback => 1);
 
 # private class specifically to support tempdir objects
 # created by File::Temp->newdir

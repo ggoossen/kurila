@@ -5,14 +5,6 @@ package Pod::Simple::LinkSection;
 use strict;
 use Pod::Simple::BlackBox;
 
-use overload( # So it'll stringify nice
-  '""'   => \&Pod::Simple::BlackBox::stringify_lol,
-  'bool' => \&Pod::Simple::BlackBox::stringify_lol,
-  # '.='   => \&tack_on,  # grudgingly support
-  
-  'fallback' => 1,         # turn on cleverness
-);
-
 sub tack_on {
   @_[0] = \@('', \%(), "@_[0]" );
   return @_[0]->[2] .= @_[1];
@@ -53,6 +45,14 @@ sub new {
 
   return bless $new, $class;
 }
+
+use overload( # So it'll stringify nice
+  '""'   => \&as_string,
+  'bool' => \&as_string,
+  # '.='   => \&tack_on,  # grudgingly support
+  
+  'fallback' => 1,         # turn on cleverness
+);
 
 # Not much in this class is likely to be link-section specific --
 # but it just so happens that link-sections are about the only treelets

@@ -9,13 +9,13 @@ BEGIN {
                      lock_keys unlock_keys
                      lock_value unlock_value
                      lock_hash unlock_hash
-                     lock_keys_plus hash_locked
+                     lock_keys_plus
                      hidden_keys legal_keys
 
                      lock_ref_keys unlock_ref_keys
                      lock_ref_value unlock_ref_value
                      lock_hashref unlock_hashref
-                     lock_ref_keys_plus hashref_locked
+                     lock_ref_keys_plus
                      hidden_ref_keys legal_ref_keys
                      hv_store
 

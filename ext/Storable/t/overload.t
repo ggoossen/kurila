@@ -59,13 +59,13 @@ sub make {
 
 package OVER;
 
-use overload
-	'+'		=> \&plus,
-	'""'	=> sub { ref @_[0] };
-
 sub plus {
 	return 314;
 }
+
+use overload
+	'+'		=> \&plus,
+	'""'	=> sub { ref @_[0] };
 
 sub make {
 	my $self = bless \%(), shift;

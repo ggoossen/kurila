@@ -106,10 +106,8 @@ sub any_errata_seen {  # good for using as an exit() value...
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # Pull in some functions that, for some reason, I expect to see here too:
-BEGIN {
-  *pretty        = \&Pod::Simple::BlackBox::pretty;
-  *stringify_lol = \&Pod::Simple::BlackBox::stringify_lol;
-}
+sub pretty { Pod::Simple::BlackBox::pretty(< @_) }
+sub stringify_lol { Pod::Simple::BlackBox::stringify_lol(< @_); }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
