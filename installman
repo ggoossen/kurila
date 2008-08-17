@@ -34,7 +34,6 @@ use File::Copy;
 use File::Path qw(mkpath);
 use ExtUtils::Packlist;
 use Pod::Man;
-use subs qw(unlink chmod rename link);
 use vars qw($packlist);
 
 if (%Config{d_umask}) {
