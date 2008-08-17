@@ -34,7 +34,6 @@ my $refdump = <<'EO_DX_OUT';
     {
 3       TYPE = nextstate  ===> 4
         FLAGS = (VOID)
-        LINE = 1
         PACKAGE = "main"
     }
     {

@@ -3005,7 +3005,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	if (pm->op_pmflags & PMf_KEEP || !(PL_hints & HINT_RE_EVAL))
 	    expr = newUNOP((!(PL_hints & HINT_RE_EVAL)
 			    ? OP_REGCRESET
-			    : OP_REGCMAYBE),0,expr, NULL);
+			    : OP_REGCMAYBE),0,expr, expr->op_location);
 
 	NewOp(1101, rcop, 1, LOGOP);
 	rcop->op_type = OP_REGCOMP;
@@ -3016,6 +3016,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 			    | (reglist ? OPf_STACKED : 0);
 	rcop->op_private = 1;
 	rcop->op_other = o;
+	rcop->op_location = SvREFCNT_inc(expr->op_location);
 	if (reglist)
 	    rcop->op_targ = pad_alloc(rcop->op_type, SVs_PADTMP);
 
