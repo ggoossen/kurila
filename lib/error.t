@@ -108,9 +108,9 @@ MSG
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
     is $@->message, <<MSG ;
-Can't modify constant item in undef operator at (eval 9) line 2, at EOF
+Can't modify constant item in undef operator at (eval 9) line 1, at EOF
 Bareword \"foo\" not allowed while "strict subs" in use at (eval 9) line 1, at EOF
- at ../lib/error.t line 107.
+ at ../lib/error.t line 107 character 5.
 MSG
 }
 
@@ -119,6 +119,6 @@ MSG
     fresh_perl_is("use strict;\n\$x = 1;\n\$y = 1;\n", <<'MSG' );
 Global symbol "$x" requires explicit package name at - line 2, near "$x "
 Global symbol "$y" requires explicit package name at - line 3, near "$y "
-Execution of - aborted due to compilation errors. at - line 3.
+Execution of - aborted due to compilation errors.
 MSG
 }
