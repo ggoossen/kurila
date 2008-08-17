@@ -1220,15 +1220,16 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	return FALSE;
     }
     if ( *hook == PERL_DIEHOOK_FATAL ) {
-	const COP *cop = PL_curcop;
-	if (cop) {
+	if (PL_op && PL_op->op_location) {
+	    AV *loc = (AV*)PL_op->op_location;
 	    const char* message = "recursive die at ";
 	    char buffer[20];
-	    const char* filename = OutCopFILE(cop);
-	    IV linenr = SvIV(*av_fetch((AV*)PL_op->op_location, 1, 0));
+	    int filename_len;
+	    const char* filename = SvPV_const(*av_fetch(loc, 0, 0), filename_len);
+	    IV linenr = SvIV(*av_fetch(loc, 1, 0));
 	    int blen;
 	    write_to_stderr("recursive die at ", strlen(message));
-	    write_to_stderr(filename, strlen(filename));
+	    write_to_stderr(filename, filename_len);
 	    blen = snprintf((char*)&buffer, 20, " line %"IVdf".\n", linenr);
 	    write_to_stderr((char*)&buffer, blen);
 	}

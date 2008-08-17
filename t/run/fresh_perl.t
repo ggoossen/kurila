@@ -279,6 +279,7 @@ start
 destroyed
 destroyed
 ########
+# TODO fix trace back of "call_sv"
 BEGIN {
   $| = 1;
   $^WARN_HOOK = sub {
@@ -342,7 +343,7 @@ eval "C";
 M(C);
 EXPECT
 Modification of a read-only value attempted at - line 2 character 14.
-    main::M called at - line 4.
+    main::M called at - line 4 character 1.
 ########
 print qw(ab a\b a\\b);
 EXPECT
@@ -377,7 +378,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-recursive die at - line 3.
+(?-uxism:x) at - line 3 character 1.
 ########
 # David Dyck
 # coredump in 5.7.1
