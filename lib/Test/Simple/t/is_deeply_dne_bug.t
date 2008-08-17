@@ -30,10 +30,6 @@ BEGIN {
 {
     package Foo;
 
-    use overload
-    'eq' => \&overload_equiv,
-    '==' => \&overload_equiv;
-
     sub new {
         return bless \%(), shift;
     }
@@ -46,6 +42,11 @@ BEGIN {
 
         return 1; # change to 0 ... makes little difference
     }
+
+    use overload
+    'eq' => \&overload_equiv,
+    '==' => \&overload_equiv;
+
 }
 
 my $obj1 = Foo->new();
