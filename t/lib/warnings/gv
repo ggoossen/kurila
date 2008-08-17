@@ -11,5 +11,5 @@ __END__
 no warnings 'syntax' ;
 our @ISA = qw(Fred); joe()
 EXPECT
-Undefined subroutine &main::joe called at - line 3.
+Undefined subroutine &main::joe called at - line 3 character 22.
 ########

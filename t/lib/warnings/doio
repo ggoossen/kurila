@@ -66,7 +66,7 @@ no warnings 'io' ;
 open(G, '|-|', "$^X -e 1");
 close(G);
 EXPECT
-Can't open bidirectional pipe at - line 3.
+Can't open bidirectional pipe at - line 3 character 1.
 ########
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
@@ -74,7 +74,7 @@ open(F, "|-", "");
 no warnings 'io' ;
 open(G, "|-", "");
 EXPECT
-Missing command in piped open at - line 3.
+Missing command in piped open at - line 3 character 1.
 ########
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
@@ -82,7 +82,7 @@ open(F, "-|", "");
 no warnings 'io' ;
 open(G, "-|", "");
 EXPECT
-Missing command in piped open at - line 3.
+Missing command in piped open at - line 3 character 1.
 ########
 # doio.c [Perl_do_close] <<TODO
 use warnings 'unopened' ;
@@ -90,7 +90,7 @@ close "fred" ;
 no warnings 'unopened' ;
 close "joe" ;
 EXPECT
-close() on unopened filehandle fred at - line 3.
+close() on unopened filehandle fred at - line 3 character 1.
 ########
 # doio.c [Perl_do_tell Perl_do_seek Perl_do_sysseek Perl_my_stat]
 use warnings 'io' ;
@@ -120,16 +120,16 @@ sysseek($a,1,1);
 -x $a;
 stat($a);
 EXPECT
-tell() on closed filehandle STDIN at - line 4.
-seek() on closed filehandle STDIN at - line 5.
-sysseek() on closed filehandle STDIN at - line 6.
--x on closed filehandle STDIN at - line 7.
-stat() on closed filehandle STDIN at - line 8.
-tell() on unopened filehandle fred at - line 10.
-seek() on unopened filehandle fred at - line 11.
-sysseek() on unopened filehandle fred at - line 12.
--x on unopened filehandle fred at - line 13.
-stat() on unopened filehandle fred at - line 14.
+tell() on closed filehandle STDIN at - line 4 character 1.
+seek() on closed filehandle STDIN at - line 5 character 6.
+sysseek() on closed filehandle STDIN at - line 6 character 6.
+-x on closed filehandle STDIN at - line 7 character 4.
+stat() on closed filehandle STDIN at - line 8 character 6.
+tell() on unopened filehandle fred at - line 10 character 1.
+seek() on unopened filehandle fred at - line 11 character 1.
+sysseek() on unopened filehandle fred at - line 12 character 1.
+-x on unopened filehandle fred at - line 13 character 2.
+stat() on unopened filehandle fred at - line 14 character 1.
 ########
 # doio.c [Perl_do_print]
 use warnings 'uninitialized' ;
@@ -137,7 +137,7 @@ print $a ;
 no warnings 'uninitialized' ;
 print $b ;
 EXPECT
-Use of uninitialized value $main::a in print at - line 3.
+Use of uninitialized value $main::a in print at - line 3 character 1.
 ########
 # doio.c [Perl_my_stat Perl_my_lstat]
 use warnings 'io' ;
@@ -147,8 +147,8 @@ no warnings 'io' ;
 stat "ab\ncd";
 lstat "ab\ncd";
 EXPECT
-Unsuccessful stat on filename containing newline at - line 3.
-Unsuccessful stat on filename containing newline at - line 4.
+Unsuccessful stat on filename containing newline at - line 3 character 1.
+Unsuccessful stat on filename containing newline at - line 4 character 1.
 ########
 # doio.c [Perl_do_aexec5]
 BEGIN {
@@ -225,8 +225,8 @@ mkdir $filename, 0777
 }
 rmdir $filename ;
 EXPECT
-Can't do inplace edit: ./temp.dir is not a regular file at - line 9.
-Can't do inplace edit: ./temp.dir is not a regular file at - line 21.
+Can't do inplace edit: ./temp.dir is not a regular file at - line 9 character 12.
+Can't do inplace edit: ./temp.dir is not a regular file at - line 21 character 12.
 ########
 # doio.c [Perl_do_eof]
 use warnings 'io' ;
@@ -234,7 +234,7 @@ my $a = eof STDOUT ;
 no warnings 'io' ;
 $a = eof STDOUT ;
 EXPECT
-Filehandle STDOUT opened only for output at - line 3.
+Filehandle STDOUT opened only for output at - line 3 character 9.
 ########
 # doio.c [Perl_do_openn]
 use Config;
@@ -254,7 +254,7 @@ open BAR, '>&', \*STDOUT; # should not warn
 no warnings 'io';
 open FOO, '>', \$x;
 EXPECT
-Can't open a reference at - line 14.
+Can't open a reference at - line 14 character 1.
 ########
 # doio.c [Perl_do_openn]
 use Config;
@@ -273,7 +273,7 @@ open FH1, "<", "TEST"; close FH1;
 no warnings 'io' ;
 open FH2, "<", "TEST"; close FH2;
 EXPECT
-Filehandle STDOUT reopened as FH1 only for input at - line 14.
+Filehandle STDOUT reopened as FH1 only for input at - line 14 character 1.
 ########
 # doio.c [Perl_do_openn]
 use Config;
@@ -293,5 +293,5 @@ no warnings 'io' ;
 open my $fh2, ">", "doiowarn.tmp"; close $fh2;
 unlink "doiowarn.tmp";
 EXPECT
-Filehandle STDIN reopened as $fh1 only for output at - line 14.
+Filehandle STDIN reopened as $fh1 only for output at - line 14 character 1.
 ########

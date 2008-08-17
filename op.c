@@ -1159,7 +1159,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	break;
     }
     if (useless && ckWARN(WARN_VOID))
-	Perl_warner(aTHX_ packWARN(WARN_VOID), "Useless use of %s in void context", useless);
+	Perl_warner_at(aTHX_ o->op_location, packWARN(WARN_VOID), "Useless use of %s in void context", useless);
     return o;
 }
 
@@ -2078,7 +2078,7 @@ S_newDEFSVOP(pTHX)
     dVAR;
     const PADOFFSET offset = pad_findmy("$_");
     if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
-	return newSVREF(newGVOP(OP_GV, 0, PL_defgv, NULL));
+	return newSVREF(newGVOP(OP_GV, 0, PL_defgv, NULL), NULL);
     }
     else {
 	OP * const o = newOP(OP_PADSV, 0, NULL);
@@ -3439,7 +3439,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 }
 
 OP *
-Perl_dofile(pTHX_ OP *term, I32 force_builtin)
+Perl_dofile(pTHX_ OP *term, I32 force_builtin, SV* location)
 {
     dVAR;
     OP *doop;
@@ -3459,10 +3459,10 @@ Perl_dofile(pTHX_ OP *term, I32 force_builtin)
 	doop = ck_subr(newUNOP(OP_ENTERSUB, OPf_STACKED,
 			       append_elem(OP_LIST, term,
 					   scalar(newUNOP(OP_RV2CV, 0,
-							  newGVOP(OP_GV, 0, gv, NULL), NULL))), NULL));
+							  newGVOP(OP_GV, 0, gv, location), location))), location));
     }
     else {
-	doop = newUNOP(OP_DOFILE, 0, scalar(term), NULL);
+	doop = newUNOP(OP_DOFILE, 0, scalar(term), location);
     }
     return doop;
 }
@@ -5249,7 +5249,7 @@ Perl_newANONATTRSUB(pTHX_ I32 floor, OP *proto, OP *attrs, OP *block)
 }
 
 OP *
-Perl_newAVREF(pTHX_ OP *o)
+Perl_newAVREF(pTHX_ OP *o, SV* location)
 {
     dVAR;
 
@@ -5258,12 +5258,13 @@ Perl_newAVREF(pTHX_ OP *o)
     if (o->op_type == OP_PADANY) {
 	o->op_type = OP_PADSV;
 	o->op_ppaddr = PL_ppaddr[OP_PADSV];
+	SVcpREPLACE(o->op_location, location);
 	return o;
     }
     else if ((o->op_type == OP_RV2AV || o->op_type == OP_ANONLIST )) {
 	yyerror(Perl_form(aTHX_ "Array may not be used as a reference"));
     }
-    return newUNOP(OP_RV2AV, 0, scalar(o), o->op_location);
+    return newUNOP(OP_RV2AV, 0, scalar(o), location);
 }
 
 OP *
@@ -5275,7 +5276,7 @@ Perl_newGVREF(pTHX_ I32 type, OP *o)
 }
 
 OP *
-Perl_newHVREF(pTHX_ OP *o)
+Perl_newHVREF(pTHX_ OP *o, SV* location)
 {
     dVAR;
 
@@ -5284,12 +5285,13 @@ Perl_newHVREF(pTHX_ OP *o)
     if (o->op_type == OP_PADANY) {
 	o->op_type = OP_PADSV;
 	o->op_ppaddr = PL_ppaddr[OP_PADSV];
+	SVcpREPLACE(o->op_location, location);
 	return o;
     }
     else if (o->op_type == OP_RV2HV || o->op_type == OP_ANONHASH) {
 	yyerror(Perl_form(aTHX_ "Hash may not be used as a reference"));
     }
-    return newUNOP(OP_RV2HV, 0, scalar(o), o->op_location);
+    return newUNOP(OP_RV2HV, 0, scalar(o), location);
 }
 
 OP *
@@ -5299,7 +5301,7 @@ Perl_newCVREF(pTHX_ I32 flags, OP *o, SV* location)
 }
 
 OP *
-Perl_newSVREF(pTHX_ OP *o)
+Perl_newSVREF(pTHX_ OP *o, SV* location)
 {
     dVAR;
 
@@ -5308,9 +5310,10 @@ Perl_newSVREF(pTHX_ OP *o)
     if (o->op_type == OP_PADANY) {
 	o->op_type = OP_PADSV;
 	o->op_ppaddr = PL_ppaddr[OP_PADSV];
+	SVcpREPLACE(o->op_location, location);
 	return o;
     }
-    return newUNOP(OP_RV2SV, 0, scalar(o), o->op_location);
+    return newUNOP(OP_RV2SV, 0, scalar(o), location);
 }
 
 /* Check routines. See the comments at the top of this file for details

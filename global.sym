@@ -588,9 +588,12 @@ Perl_vivify_defelem
 Perl_seed
 Perl_report_uninit
 Perl_warn
+Perl_warn_at
 Perl_vwarn
 Perl_warner
+Perl_warner_at
 Perl_vwarner
+Perl_vwarner_at
 Perl_whichsig
 Perl_yylex
 Perl_dump_mstats

@@ -42,9 +42,9 @@ my $x ;
 my $y ;
 my $p ;
 EXPECT
-"my" variable $x masks earlier declaration in same scope at - line 4.
-"my" variable $y masks earlier declaration in same statement at - line 5.
-"my" variable $p masks earlier declaration in same scope at - line 8.
+"my" variable $x masks earlier declaration in same scope at - line 4 character 7.
+"my" variable $y masks earlier declaration in same statement at - line 5 character 15.
+"my" variable $p masks earlier declaration in same scope at - line 8 character 7.
 ########
 # pad.c
 use warnings 'misc' ;
@@ -63,9 +63,9 @@ our $q ;
 package X ;
 my $q ;
 EXPECT
-"my" variable $x masks earlier declaration in same scope at - line 4.
-"my" variable $y masks earlier declaration in same statement at - line 5.
-"my" variable $p masks earlier declaration in same scope at - line 8.
+"my" variable $x masks earlier declaration in same scope at - line 4 character 7.
+"my" variable $y masks earlier declaration in same statement at - line 5 character 16.
+"my" variable $p masks earlier declaration in same scope at - line 8 character 7.
 ########
 # pad.c
 use warnings 'misc' ;
@@ -84,9 +84,9 @@ my $q ;
 package X ;
 our $q ;
 EXPECT
-"our" variable $x masks earlier declaration in same scope at - line 4.
-"our" variable $y masks earlier declaration in same statement at - line 5.
-"our" variable $p masks earlier declaration in same scope at - line 8.
+"our" variable $x masks earlier declaration in same scope at - line 4 character 8.
+"our" variable $y masks earlier declaration in same statement at - line 5 character 16.
+"our" variable $p masks earlier declaration in same scope at - line 8 character 8.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -97,7 +97,7 @@ sub x {
       }
    }
 EXPECT
-Variable "$x" will not stay shared at - line 7.
+Variable "$x" will not stay shared at - line 7 character 7.
 ########
 # pad.c
 no warnings 'closure' ;
@@ -119,7 +119,7 @@ sub x {
       }
    }
 EXPECT
-Variable "$x" will not stay shared at - line 6.
+Variable "$x" will not stay shared at - line 6 character 19.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -133,7 +133,7 @@ sub x {
     }->();
 }
 EXPECT
-Variable "$x" will not stay shared at - line 9.
+Variable "$x" will not stay shared at - line 9 character 2.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -154,7 +154,7 @@ sub {
     sub f { $x }
 }->();
 EXPECT
-Variable "$x" is not available at - line 5.
+Variable "$x" is not available at - line 5 cahr 16.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -173,9 +173,9 @@ sub {
 }->();
 f();
 EXPECT
-Variable "$x" is not available at (eval 1) line 2.
-    (eval) called at - line 5.
-    main::f called at - line 7.
+Variable "$x" is not available at (eval 1) line 2 character 4.
+    (eval) called at - line 5 character 13.
+    main::f called at - line 7 character 1.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -197,9 +197,9 @@ sub f {
 }
 f()->();
 EXPECT
-Variable "$x" is not available at (eval 1) line 2.
-    (eval) called at - line 6.
-    main::__ANON__ called at - line 8.
+Variable "$x" is not available at (eval 1) line 2 character 4.
+    (eval) called at - line 6 chracter 11.
+    main::__ANON__ called at - line 8 chracter 4.
 ########
 use warnings 'closure' ;
 {
@@ -209,9 +209,9 @@ use warnings 'closure' ;
 }
 f2();
 EXPECT
-Variable "$x" is not available at (eval 1) line 2.
-    (eval) called at - line 5.
-    main::f2 called at - line 7.
+Variable "$x" is not available at (eval 1) line 2 character 4.
+    (eval) called at - line 5 character 14.
+    main::f2 called at - line 7 character 1.
 ########
 use warnings 'closure' ;
 for my $x (1,2,3) {
@@ -220,9 +220,9 @@ for my $x (1,2,3) {
 }
 f();
 EXPECT
-Variable "$x" is not available at (eval 4) line 2.
-    (eval) called at - line 3.
-    main::f called at - line 6.
+Variable "$x" is not available at (eval 4) line 2 character 4.
+    (eval) called at - line 3 character 13.
+    main::f called at - line 6 character 1.
 ########
 # pad.c
 no warnings 'closure' ;

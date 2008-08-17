@@ -1224,7 +1224,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	    AV *loc = (AV*)PL_op->op_location;
 	    const char* message = "recursive die at ";
 	    char buffer[20];
-	    int filename_len;
+	    STRLEN filename_len;
 	    const char* filename = SvPV_const(*av_fetch(loc, 0, 0), filename_len);
 	    IV linenr = SvIV(*av_fetch(loc, 1, 0));
 	    int blen;
@@ -1412,7 +1412,7 @@ Perl_croak_at(pTHX_ SV* location, const char *pat, ...)
 }
 
 void
-Perl_vwarn(pTHX_ const char* pat, va_list *args)
+Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
 {
     SV* msv;
 
@@ -1434,18 +1434,7 @@ Perl_vwarn(pTHX_ const char* pat, va_list *args)
 	    PUSHMARK(SP);
 
 	    XPUSHs(msv);
-
-	    if (PL_op) {
-		XPUSHs(PL_op->op_location);
-	    }
-	    else if (PL_compcv) {
-		AV* res = av_2mortal(newAV());
-		av_push(res, newSVsv(CopFILESV(PL_curcop)));
-		av_push(res, newSViv(PL_parser->lex_line_number));
-		av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
-				      PL_parser->lex_charoffset) + 1));
-		XPUSHs(SVav(res));
-	    }
+	    XPUSHs(location);
 
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);
@@ -1488,7 +1477,7 @@ Perl_warn(pTHX_ const char *pat, ...)
     va_list args;
     PERL_ARGS_ASSERT_WARN;
     va_start(args, pat);
-    vwarn(pat, &args);
+    vwarner(0, pat, &args);
     va_end(args);
 }
 
@@ -1516,16 +1505,46 @@ Perl_warner(pTHX_ U32  err, const char* pat,...)
 }
 
 void
+Perl_warner_at(pTHX_ SV* location, U32  err, const char* pat,...)
+{
+    va_list args;
+    PERL_ARGS_ASSERT_WARNER;
+    va_start(args, pat);
+    vwarner_at(location, err, pat, &args);
+    va_end(args);
+}
+
+void
 Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
+{
+    SV* location;
+    if (PL_op) {
+	location = PL_op->op_location;
+    }
+    else if (PL_compcv) {
+	AV* res = av_2mortal(newAV());
+	av_push(res, newSVsv(CopFILESV(PL_curcop)));
+	av_push(res, newSViv(PL_parser->lex_line_number));
+	av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
+		    PL_parser->lex_charoffset) + 1));
+	location = SVav(res);
+    }
+    Perl_vwarner_at(aTHX_ location, err, pat, args);
+}
+
+void
+Perl_vwarner_at(pTHX_ SV* location, U32  err, const char* pat, va_list* args)
 {
     dVAR;
     PERL_ARGS_ASSERT_VWARNER;
     if (PL_warnhook == PERL_WARNHOOK_FATAL || ckDEAD(err)) {
-	vdie(pat, args);
+	SV* msv;
+	msv = vdie_croak_common(location, pat, args);
+	die_where(msv);
 	/* NOTREACHED */
     }
     else {
-	Perl_vwarn(aTHX_ pat, args);
+	Perl_vwarn_at(aTHX_ location, pat, args);
     }
 }
 

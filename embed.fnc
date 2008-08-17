@@ -251,7 +251,7 @@ pR	|Off_t	|do_tell	|NN GV* gv
 p	|UV	|do_vecget	|NN SV* sv|I32 offset|I32 size
 p	|void	|do_vecset	|NN SV* sv
 p	|void	|do_vop		|I32 optype|NN SV* sv|NN SV* left|NN SV* right
-p	|OP*	|dofile		|NN OP* term|I32 force_builtin
+p	|OP*	|dofile		|NN OP* term|I32 force_builtin|NULLOK SV* location
 ApR	|I32	|dowantarray
 Ap	|void	|dump_all
 Ap	|void	|dump_eval
@@ -552,13 +552,13 @@ ApM	|CV *	|newXS_flags	|NULLOK const char *name|NN XSUBADDR_t subaddr\
 Apd	|CV*	|newXS		|NULLOK const char *name|NN XSUBADDR_t subaddr\
 				|NN const char *filename
 AmdbR	|AV*	|newAV
-Apa	|OP*	|newAVREF	|NN OP* o
+Apa	|OP*	|newAVREF	|NN OP* o|NULLOK SV* location
 Apa	|OP*	|newBINOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last|NULLOK SV* location
 Apa	|OP*	|newCVREF	|I32 flags|NULLOK OP* o|NULLOK SV* location
 Apa	|OP*	|newGVOP	|I32 type|I32 flags|NN GV* gv|NULLOK SV* location
 Apa	|GV*	|newGVgen	|NN const char* pack
 Apa	|OP*	|newGVREF	|I32 type|NULLOK OP* o
-ApaR	|OP*	|newHVREF	|NN OP* o
+ApaR	|OP*	|newHVREF	|NN OP* o|NULLOK SV* location
 AmdbR	|HV*	|newHV
 ApaR	|HV*	|newHVhv	|NULLOK HV *hv
 Ap	|void	|hv_sethv	|NN HV *dstr|NN HV *sstr
@@ -572,7 +572,7 @@ Apa	|OP*	|newPVOP	|I32 type|I32 flags|NULLOK char* pv|NULLOK SV* location
 Apa	|SV*	|newRV		|NN SV *const sv
 Apda	|SV*	|newRV_noinc	|NN SV *const sv
 Apda	|SV*	|newSV		|const STRLEN len
-Apa	|OP*	|newSVREF	|NN OP* o
+Apa	|OP*	|newSVREF	|NN OP* o|NULLOK SV* location
 Apa	|OP*	|newSVOP	|I32 type|I32 flags|NN SV* sv|NULLOK SV* location
 Apda	|SV*	|newSViv	|const IV i
 Apda	|SV*	|newSVuv	|const UV u
@@ -959,9 +959,12 @@ pR	|UV	|get_hash_seed
 p	|void	|report_evil_fh	|NULLOK const GV *gv|NULLOK const IO *io|I32 op
 XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
+Afpd	|void	|warn_at	|NULLOK SV* location|NN const char* pat|...
 Ap	|void	|vwarn		|NN const char* pat|NULLOK va_list* args
 Afp	|void	|warner		|U32 err|NN const char* pat|...
+Afp	|void	|warner_at	|NULLOK SV* location|U32 err|NN const char* pat|...
 Ap	|void	|vwarner	|U32 err|NN const char* pat|NULLOK va_list* args
+Ap	|void	|vwarner_at	|NULLOK SV* location|U32 err|NN const char* pat|NULLOK va_list* args
 p	|void	|watch		|NN char** addr
 Ap	|I32	|whichsig	|NN const char* sig
 p	|void	|write_to_stderr|NN const char* message|int msglen

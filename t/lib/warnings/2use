@@ -78,7 +78,7 @@ Reversed += operator at - line 3 character 7.
 no warnings 'reserved' ;
 foo.bar;
 EXPECT
-Useless use of concatenation (.) or string in void context at - line 3 character 1.
+Useless use of concatenation (.) or string in void context at - line 3 character 4.
 Bareword "foo" not allowed while "strict subs" in use at - line 3, at EOF
 Bareword "bar" not allowed while "strict subs" in use at - line 3, at EOF
 Execution of - aborted due to compilation errors.
@@ -326,7 +326,7 @@ use warnings;
 }
 EXPECT
 Reversed += operator at (eval 1) line 3 character 49.
-    (eval) called at - line 6.
+    (eval) called at - line 6 character 5.
 ########
 
 # Check scope of pragma with eval

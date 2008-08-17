@@ -964,9 +964,12 @@
 #define report_uninit		Perl_report_uninit
 #endif
 #define warn			Perl_warn
+#define warn_at			Perl_warn_at
 #define vwarn			Perl_vwarn
 #define warner			Perl_warner
+#define warner_at		Perl_warner_at
 #define vwarner			Perl_vwarner
+#define vwarner_at		Perl_vwarner_at
 #ifdef PERL_CORE
 #define watch			Perl_watch
 #endif
@@ -2424,7 +2427,7 @@
 #define do_vecget(a,b,c)	Perl_do_vecget(aTHX_ a,b,c)
 #define do_vecset(a)		Perl_do_vecset(aTHX_ a)
 #define do_vop(a,b,c,d)		Perl_do_vop(aTHX_ a,b,c,d)
-#define dofile(a,b)		Perl_dofile(aTHX_ a,b)
+#define dofile(a,b,c)		Perl_dofile(aTHX_ a,b,c)
 #endif
 #define dowantarray()		Perl_dowantarray(aTHX)
 #define dump_all()		Perl_dump_all(aTHX)
@@ -2737,13 +2740,13 @@
 #define newSUB(a,b,c,d)		Perl_newSUB(aTHX_ a,b,c,d)
 #define newXS_flags(a,b,c,d,e)	Perl_newXS_flags(aTHX_ a,b,c,d,e)
 #define newXS(a,b,c)		Perl_newXS(aTHX_ a,b,c)
-#define newAVREF(a)		Perl_newAVREF(aTHX_ a)
+#define newAVREF(a,b)		Perl_newAVREF(aTHX_ a,b)
 #define newBINOP(a,b,c,d,e)	Perl_newBINOP(aTHX_ a,b,c,d,e)
 #define newCVREF(a,b,c)		Perl_newCVREF(aTHX_ a,b,c)
 #define newGVOP(a,b,c,d)	Perl_newGVOP(aTHX_ a,b,c,d)
 #define newGVgen(a)		Perl_newGVgen(aTHX_ a)
 #define newGVREF(a,b)		Perl_newGVREF(aTHX_ a,b)
-#define newHVREF(a)		Perl_newHVREF(aTHX_ a)
+#define newHVREF(a,b)		Perl_newHVREF(aTHX_ a,b)
 #define newHVhv(a)		Perl_newHVhv(aTHX_ a)
 #define hv_sethv(a,b)		Perl_hv_sethv(aTHX_ a,b)
 #define newIO()			Perl_newIO(aTHX)
@@ -2756,7 +2759,7 @@
 #define newRV(a)		Perl_newRV(aTHX_ a)
 #define newRV_noinc(a)		Perl_newRV_noinc(aTHX_ a)
 #define newSV(a)		Perl_newSV(aTHX_ a)
-#define newSVREF(a)		Perl_newSVREF(aTHX_ a)
+#define newSVREF(a,b)		Perl_newSVREF(aTHX_ a,b)
 #define newSVOP(a,b,c,d)	Perl_newSVOP(aTHX_ a,b,c,d)
 #define newSViv(a)		Perl_newSViv(aTHX_ a)
 #define newSVuv(a)		Perl_newSVuv(aTHX_ a)
@@ -3161,6 +3164,7 @@
 #endif
 #define vwarn(a,b)		Perl_vwarn(aTHX_ a,b)
 #define vwarner(a,b,c)		Perl_vwarner(aTHX_ a,b,c)
+#define vwarner_at(a,b,c,d)	Perl_vwarner_at(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
 #define watch(a)		Perl_watch(aTHX_ a)
 #endif
