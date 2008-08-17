@@ -28,7 +28,6 @@ package Pod::Man;
 
 use strict;
 use utf8;
-use subs qw(makespace);
 use vars qw(@ISA %ESCAPES $PREAMBLE $VERSION);
 
 use Carp qw(croak);

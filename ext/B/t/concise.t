@@ -11,7 +11,7 @@ BEGIN {
 
 use strict;
 
-plan tests => 153;
+plan tests => 151;
 
 require_ok("B::Concise");
 
@@ -198,10 +198,6 @@ SKIP: {
 	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,
 	   "'sub defd_empty \{\}' seen as 2 ops: leavesub,nextstate");
 
-	($res,$err) = < render('-basic', \&not_even_declared);
-	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
-	      "'\&not_even_declared' seen as having no START");
-
 	{
 	    package Bar;
 	    our $AUTOLOAD = 'garbage';
@@ -211,10 +207,6 @@ SKIP: {
 	($res,$err) = < render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,
 	      "Bar::auto_func seen as unknown function");
-
-	($res,$err) = < render('-basic', \&Bar::auto_func);
-	like ($res, qr/coderef CODE\(0x[0-9a-fA-F]+\) has no START/,
-	      "'\&Bar::auto_func' seen as having no START");
 
 	($res,$err) = < render('-basic', \&Bar::AUTOLOAD);
 	like ($res, qr/in AUTOLOAD body: /, "found body of Bar::AUTOLOAD");

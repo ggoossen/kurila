@@ -201,14 +201,14 @@ lineseq	:	/* NULL */
 /* A "line" in the program */
 line	:	label cond
                         {
-                            $$ = newSTATEOP(0, PVAL($1), $2, LOCATION($1));
+                            $$ = newSTATEOP(0, PVAL($1), $2, $2->op_location);
                             TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
 	|	loop	/* loops add their own labels */
 			{ $$ = $1; }
 	|	label ';'
 			{
 			  if (PVAL($1)) {
-			      $$ = newSTATEOP(0, PVAL($1), newOP(OP_NULL, 0, LOCATION($1)), LOCATION($1));
+			      $$ = newSTATEOP(0, PVAL($1), newOP(OP_NULL, 0, LOCATION($2)), LOCATION($2));
 			      TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L');
 			      TOKEN_GETMAD($2,((LISTOP*)$$)->op_first,';');
 			  }
@@ -225,7 +225,7 @@ line	:	label cond
 			}
 	|	label sideff ';'
 			{
-                            $$ = newSTATEOP(0, PVAL($1), $2, LOCATION($1));
+                            $$ = newSTATEOP(0, PVAL($1), $2, $2 ? $2->op_location : LOCATION($3));
                             PL_parser->expect = XSTATE;
                             DO_MAD({
                                     /* sideff might already have a nexstate */
@@ -330,7 +330,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                         LOCATION($2), $5, $8, $9, $7), LOCATION($1)));
+                                         LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
 			  TOKEN_GETMAD($1,innerop,'L');
 			  TOKEN_GETMAD($2,innerop,'W');
 			  TOKEN_GETMAD($3,innerop,'(');
@@ -343,7 +343,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                         LOCATION($2), $5, $8, $9, $7), LOCATION($1)));
+                                         LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
 			  TOKEN_GETMAD($1,innerop,'L');
 			  TOKEN_GETMAD($2,innerop,'W');
 			  TOKEN_GETMAD($3,innerop,'(');
@@ -388,7 +388,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			  forop = newSTATEOP(0, PVAL($1),
 					    newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
 						LOCATION($2), scalar($7),
-						$12, $10, $9), LOCATION($1));
+						$12, $10, $9), LOCATION($2));
 #ifdef MAD
 			  forop = newUNOP(OP_NULL, 0, append_elem(OP_LINESEQ,
 				newSTATEOP(0,
@@ -406,7 +406,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 #else
 			  if ($5) {
 				forop = append_elem(OP_LINESEQ,
-                                    newSTATEOP(0, CopLABEL_alloc(PVAL($1)), $5, LOCATION($1)),
+                                    newSTATEOP(0, CopLABEL_alloc(PVAL($1)), $5, LOCATION($2)),
 					forop);
 			  }
 
@@ -416,7 +416,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 	|	label block cont  /* a block is a loop that happens once */
 			{ $$ = newSTATEOP(0, PVAL($1),
 				 newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                     NULL, (OP*)NULL, $2, $3, 0), LOCATION($1));
+                                     NULL, (OP*)NULL, $2, $3, 0), $2->op_location);
 			  TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
 	;
 

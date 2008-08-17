@@ -29,7 +29,7 @@ BEGIN { eval q{
     use Carp::Heavy;
 } }
 
-use Opcode 1.01, qw(
+use Opcode v1.01 qw(
     opset opset_to_ops opmask_add
     empty_opset full_opset invert_opset verify_opset
     opdesc opcodes opmask define_optag opset_to_hex
@@ -49,12 +49,9 @@ my $default_share = \@(qw[
     &UNIVERSAL::isa
     &UNIVERSAL::can
     &UNIVERSAL::VERSION
-    &utf8::is_utf8
     &utf8::valid
     &utf8::encode
     &utf8::decode
-    &utf8::upgrade
-    &utf8::downgrade
     &utf8::native_to_unicode
     &utf8::unicode_to_native
     $version::VERSION

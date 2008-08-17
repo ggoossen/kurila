@@ -119,11 +119,6 @@ our @ISA = @( qw(Exporter) );
 our @EXPORT = @( qw(collate_xfrm setlocale LC_COLLATE) );
 our @EXPORT_OK = @( qw() );
 
-use overload (
-              'fallback'	=> 1,
-              'cmp'		=> \&collate_cmp,
-             );
-
 our($LOCALE, $C);
 
 our $please_use_I18N_Collate_even_if_deprecated = 0;
@@ -188,6 +183,11 @@ sub collate_xfrm {
 sub collate_cmp {
   &C(@_[0]) cmp &C(@_[1]);
 }
+
+use overload (
+              'fallback'	=> 1,
+              'cmp'		=> \&collate_cmp,
+             );
 
 # init $LOCALE
 

@@ -1,7 +1,7 @@
 #!./perl -i.inplace
 # note the extra switch, for the test below
 
-use Test::More tests => 39;
+use Test::More tests => 37;
 
 use English qw( -no_match_vars ) ;
 use Config;
@@ -92,16 +92,6 @@ ok( !$PERLDB, '$PERLDB should be false' );
 	like( ~< *DATA, qr/a paragraph./, '$INPUT_RECORD_SEPARATOR' );
 }
 like( ~< *DATA, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
-
-my %hash;
-$SUBSCRIPT_SEPARATOR = '|';
-%hash{'d','e','f'} = 1;
-$SUBSEP = ',';
-%hash{'a', 'b', 'c'} = 1;
-my @keys = @( sort keys %hash );
-
-is( @keys[0], 'a,b,c', '$SUBSCRIPT_SEPARATOR' );
-is( @keys[1], 'd|e|f', '$SUBSCRIPT_SEPARATOR' );
 
 try { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
 ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );

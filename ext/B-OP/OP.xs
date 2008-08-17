@@ -581,11 +581,7 @@ typedef MAGIC   *B__MAGIC;
 #define OP_desc(o)	(char *)PL_op_desc[o->op_type]
 #define OP_targ(o)	o->op_targ
 #define OP_type(o)	o->op_type
-#if PERL_VERSION >= 9
-#  define OP_opt(o)	o->op_opt
-#else
-#  define OP_seq(o)	o->op_seq
-#endif
+#define OP_opt(o)	o->op_opt
 #define OP_flags(o)	o->op_flags
 #define OP_private(o)	o->op_private
 #define OP_spare(o)	o->op_spare
@@ -1261,19 +1257,9 @@ U16
 OP_type(o)
 	B::OP		o
 
-#if PERL_VERSION >= 9
-
 U8
 OP_opt(o)
 	B::OP		o
-
-#else
-
-U16
-OP_seq(o)
-	B::OP		o
-
-#endif
 
 U8
 OP_flags(o)
@@ -1283,13 +1269,17 @@ U8
 OP_private(o)
 	B::OP		o
 
-#if PERL_VERSION >= 9
-
 U8
 OP_spare(o)
 	B::OP		o
 
-#endif
+SV*
+OP_location(o)
+        B::OP           o
+    CODE:
+        RETVAL = SvREFCNT_inc(o->op_location ? o->op_location : &PL_sv_undef);
+    OUTPUT:
+        RETVAL
 
 void
 OP_oplist(o)
@@ -1479,7 +1469,6 @@ LOOP_lastop(o)
 #define COP_file(o)	CopFILE(o)
 #define COP_filegv(o)	CopFILEGV(o)
 #define COP_cop_seq(o)	o->cop_seq
-#define COP_line(o)	CopLINE(o)
 #define COP_hints(o)	CopHINTS_get(o)
 #if PERL_VERSION < 9
 #  define COP_warnings(o)  o->cop_warnings
@@ -1511,10 +1500,6 @@ COP_filegv(o)
 
 U32
 COP_cop_seq(o)
-	B::COP	o
-
-U32
-COP_line(o)
 	B::COP	o
 
 #define COP_hints_hash(o) o->cop_hints_hash

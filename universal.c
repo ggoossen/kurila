@@ -321,9 +321,9 @@ Perl_boot_core_UNIVERSAL(pTHX)
 
     newXSproto("iohandle::input_line_number", XS_iohandle_input_line_number, file, "$;$");
 
-    PL_errorcreatehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create"))));
-    PL_diehook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr"))));
-    PL_warnhook = newRV_noinc(SvREFCNT_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr"))));
+    PL_errorcreatehook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create")));
+    PL_diehook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
+    PL_warnhook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
 }
 
 

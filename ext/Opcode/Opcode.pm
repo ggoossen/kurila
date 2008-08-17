@@ -22,13 +22,11 @@ BEGIN {
     ) );
 }
 
-use subs < @EXPORT_OK;
-
 XSLoader::load 'Opcode', $VERSION;
 
 _init_optags();
 
-sub ops_to_opset { opset < @_ }	# alias for old name
+sub ops_to_opset { opset(< @_) }	# alias for old name
 
 sub opset_to_hex ($) {
     return "(invalid opset)" unless verify_opset(@_[0]);
@@ -38,7 +36,7 @@ sub opset_to_hex ($) {
 sub opdump (;$) {
 	my $pat = shift;
     # handy utility: perl -MOpcode=opdump -e 'opdump File'
-    foreach( <opset_to_ops( <full_opset)) {
+    foreach( <opset_to_ops( <full_opset())) {
         my $op = sprintf "  \%12s  \%s\n", $_, < opdesc($_);
 		next if defined $pat and $op !~ m/$pat/i;
 		print $op;
@@ -49,7 +47,7 @@ sub opdump (;$) {
 
 sub _init_optags {
     my(%all, %seen);
-    %all{[ <opset_to_ops(full_opset)]} = (); # keys only
+    %all{[ <opset_to_ops(full_opset())]} = (); # keys only
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section

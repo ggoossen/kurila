@@ -71,7 +71,6 @@ esac
 # echo "Converted $extspec to $pname"
 
 mname=`echo "$pname"   | sed -e 's!/!::!g'`
-depth=`echo "$pname"   | sed -e 's![^/][^/]*!..!g'`
 makefile=Makefile
 makeargs=''
 makeopts=''
@@ -126,11 +125,11 @@ nonxs)      makeargs="";
 esac
 
 if test ! -f $makefile ; then
-        test -f Makefile.PL && $run ../$depth/miniperl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru
+        test -f Makefile.PL && $run ../../miniperl -I../../lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru
 fi
 if test ! -f $makefile ; then
 	echo "Warning: No Makefile!"
-        echo "failed: $run ../$depth/miniperl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru"
+        echo "failed: $run ../../miniperl -I../../lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru"
 fi
 
 case "$target" in

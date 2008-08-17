@@ -172,6 +172,11 @@ sub xref {
 	warn sprintf('top = [%s, %s, %s]', < @$top) if $debug_top;
 	warn < peekop($op), "\n" if $debug_op;
 	my $opname = $op->name;
+
+        if ($op->location) {
+            $line = $op->location[1];
+        }
+
 	if ($opname =~ m/^(or|and|mapwhile|grepwhile|range|cond_expr)$/) {
 	    xref($op->other);
 	} elsif ($opname eq "match" || $opname eq "subst") {
@@ -188,8 +193,8 @@ sub xref {
 	    xref($op->pmreplstart);
 	} else {
 	    no strict 'refs';
-	    my $ppname = \&{*{Symbol::fetch_glob("pp_$opname")}};
-	    &$ppname($op) if defined(&$ppname);
+	    my $ppname = \*{Symbol::fetch_glob("pp_$opname")};
+	    &{*{$ppname}}($op) if defined(&{*{$ppname}});
 	}
     }
 }
@@ -220,7 +225,9 @@ sub xref_main {
 sub pp_nextstate {
     my $op = shift;
     $file = $op->file;
-    $line = $op->line;
+    if ($op->location) {
+        $line = $op->location[1];
+    }
     $top = UNKNOWN;
 }
 

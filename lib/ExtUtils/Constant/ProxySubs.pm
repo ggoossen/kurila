@@ -375,38 +375,19 @@ EOBOOT
 	    $add_symbol_subname($athx symbol_table, value_for_notfound->name,
 				value_for_notfound->namelen, tripwire);
 EXPLODE
-
-	    /* Need to add prototypes, else parsing will vary by platform.  */
-	    SV **sv = hv_fetch(symbol_table, value_for_notfound->name,
-			       value_for_notfound->namelen, TRUE);
-	    if (!sv) \{
-		Perl_croak($athx
-			   "Couldn't add key '\%s' to \%\%$package_sprintf_safe\::",
+            SV* namesv = sv_2mortal(newSVpvn("{$symbol_table}::", $(length($symbol_table) + 2)));
+            sv_catpvn(namesv, value_for_notfound->name, value_for_notfound->namelen);
+	    GV *gv = gv_fetchsv(namesv, GV_ADD, SVt_PVCV);
+	    if (!gv) \{
+		Perl_croak(aTHX_
+			   "Couldn't add key '{$package_sprintf_safe}::\%s'",
 			   value_for_notfound->name);
 	    \}
-	    if (!SvOK(*sv) && SvTYPE(*sv) != SVt_PVGV) \{
-		/* Nothing was here before, so mark a prototype of ""  */
-		sv_setpvn(*sv, "", 0);
-	    \} else if (SvPOK(*sv) && SvCUR(*sv) == 0) \{
-		/* There is already a prototype of "" - do nothing  */
-	    \} else \{
-		/* Someone has been here before us - have to make a real
-		   typeglob.  */
-		/* It turns out to be incredibly hard to deal with all the
-		   corner cases of sub foo (); and reporting errors correctly,
-		   so lets cheat a bit.  Start with a constant subroutine  */
-                ENTER;
-                SAVESPTR(PL_curstash);
-                HVcpREPLACE(PL_curstash, symbol_table);
-		CV *cv = newCONSTSUB(value_for_notfound->name,
-				     &PL_sv_yes);
-                LEAVE;
-		/* and then turn it into a non constant declaration only.  */
-		SvREFCNT_dec(CvXSUBANY(cv).any_ptr);
-		CvCONST_off(cv);
-		CvXSUB(cv) = NULL;
-		CvXSUBANY(cv).any_ptr = NULL;
-	    \}
+            GV* notfoundgv = gv_fetchmethod(aTHX_  symbol_table, "constant_not_found");
+            if (!notfoundgv || ! GvCV(notfoundgv)) \{
+		Perl_croak(aTHX_ "'constant_not_found' could not be found");
+            \}
+            sv_setsv((SV*)gv, sv_2mortal(newRV_inc((SV*)GvCV(notfoundgv))));
 #ifndef SYMBIAN
 	    if (!hv_store({$c_subname}_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0))
@@ -470,6 +451,12 @@ EOBOOT
        methods  */
     ++PL_sub_generation;
   \}
+
+void
+constant_not_found()
+    PPCODE:
+	Perl_croak(aTHX_ "Your vendor has not defined $package_sprintf_safe macro ???");
+
 EOBOOT
 
     print $xs_fh $explosives ? <<"EXPLODE" : <<"DONT";

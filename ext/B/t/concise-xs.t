@@ -114,7 +114,7 @@ require_ok("B::Concise");
 
 my %matchers = 
     %( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
-		      |(?-x:coderef .* has no START) }x,
+		      |(?-x: is XS code) }x,
       XS	=> qr/ is XS code/,
       perl	=> qr/ (next|db)state/,
       noSTART	=> qr/coderef .* has no START/,

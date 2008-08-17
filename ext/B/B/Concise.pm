@@ -809,7 +809,7 @@ sub concise_op {
 	my $loc = $op->file;
 	my $pathnm = $loc;
 	$loc =~ s[.*/][];
-	my $ln = $op->line;
+	my $ln = $op->location ? $op->location[1] : '-1';
 	$loc .= ":$ln";
 	my($stash, $cseq) = ($op->stash->NAME, $op->cop_seq - $cop_seq_base);
 	%h{arg} = "($label$stash $cseq $loc)";

@@ -259,6 +259,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	    if (exported_constant)
 		GvIMPORTED_CV_on(gv);
 	} else {
+	    Perl_croak(aTHX_ "creating subroutine %s", name);
 	    (void) start_subparse(0);	/* Create empty CV in compcv. */
 	    GvCV(gv) = (CV*)SvREFCNT_inc((SV*)PL_compcv);
 	}
@@ -1202,9 +1203,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	no_magicalize:
 	    break;
 
-	case ';':
-	    sv_setpvn(GvSVn(gv),"\034",1);
-	    break;
 	case ']':
 	    Perl_croak(aTHX_ "$] is obsolete. Use $^V or $kurila::VERSION");
 	case '*':
@@ -1216,6 +1214,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '`':
 	case '\'':
 	case '.':
+	case ';':
 	    Perl_croak(aTHX_ "Unknown magic variable '%c%s'",
 		       sv_type == SVt_PVAV ? '@' : sv_type == SVt_PVHV ? '%' : '$',
 		       name);

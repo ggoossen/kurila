@@ -25,7 +25,7 @@ sub ok ($;$) {
 
 BEGIN {
     $test = 1;
-    print "1..28\n";
+    print "1..26\n";
     require Exporter;
     ok( 1, 'Exporter compiled' );
 }
@@ -80,8 +80,8 @@ $seat     = 'seat';
 @wailing = @( qw(AHHHHHH) );
 %left = %( left => "right" );
 
-BEGIN {*is = \&Is};
 sub Is { 'Is' };
+BEGIN {*is = \&Is};
 
 Exporter::export_ok_tags();
 
@@ -165,28 +165,6 @@ main::ok( !defined &lifejacket, 'further denial' );
   our $VERSION = 0;
   try { More::Testing->require_version(0); 1 };
   main::ok(!$@,       'require_version(0) and $VERSION = 0');
-}
-
-{
-  package Yet::More::Testing;
-  our @ISA = @( qw(Exporter) );
-  our $VERSION = 0;
-  try { Yet::More::Testing->require_version(10); 1 };
-  main::ok($@->{description} !~ m/\(undef\)/,       'require_version(10) and $VERSION = 0');
-
-  my $warnings;
-  BEGIN {
-    local $^WARN_HOOK = sub { $warnings = join '', < @_ };
-    package Testing::Unused::Vars;
-    our @ISA = @( qw(Exporter) );
-    our @EXPORT = @( qw(this $TODO that) );
-
-    package Foo;
-    Testing::Unused::Vars->import;
-  }
-
-  main::ok( !$warnings, 'Unused variables can be exported without warning' ) ||
-    print "# $warnings\n";
 }
 
 package Moving::Target;

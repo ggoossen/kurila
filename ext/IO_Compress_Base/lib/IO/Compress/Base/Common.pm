@@ -15,8 +15,7 @@ $VERSION = '2.006';
 
 @EXPORT = @( qw( isaFilehandle isaFilename whatIsInput whatIsOutput 
               isaFileGlobString cleanFileGlobString oneTarget
-              setBinModeInput setBinModeOutput
-              ckInOutParams 
+              setBinModeInput
               createSelfTiedObject
               getEncoding
 

@@ -188,8 +188,8 @@ ok( ! exists %h{'jimmy'} ) ;
 ok(  defined %h{'abc'} ) ;
 
 %h{'def'} = 'DEF';
-%h{'jkl','mno'} = "JKL\034MNO";
-%h{'a',2,3,4,5} = join("\034",'A',2,3,4,5);
+%h{'jkl'.";".'mno'} = "JKL;MNO";
+%h{join(";", 'a',2,3,4,5)} = join(";",'A',2,3,4,5);
 %h{'a'} = 'A';
 
 #$h{'b'} = 'B';

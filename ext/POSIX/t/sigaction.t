@@ -30,6 +30,8 @@ sub foo {
 	$ok=1;
 }
 
+sub bar { }
+
 my $newaction=POSIX::SigAction->new(\&foo, POSIX::SigSet->new(SIGUSR1), 0);
 my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
 

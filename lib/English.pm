@@ -114,8 +114,6 @@ sub import {
 # Interpolation "constants".
 
 	*LIST_SEPARATOR				= *"{SCALAR}	;
-	*SUBSCRIPT_SEPARATOR			= *;{SCALAR}	;
-	    *SUBSEP				= *;{SCALAR}	;
 
 # Error status.
 
