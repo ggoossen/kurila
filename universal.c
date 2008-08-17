@@ -876,7 +876,7 @@ XS(XS_error_create)
 /* 		? HvNAME(SvSTASH(SvRV(ST(0)))) */
 /* 		: (char *)SvPV_nolen(ST(0)); */
 
-	if (sv_isobject(vs)) {
+	if (sv_derived_from(vs, "error")) {
 	    XPUSHs(vs);
 	    XSRETURN(1);
 	    return;
