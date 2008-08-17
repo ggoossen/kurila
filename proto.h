@@ -745,7 +745,7 @@ PERL_CALLCONV void	Perl_do_vop(pTHX_ I32 optype, SV* sv, SV* left, SV* right)
 #define PERL_ARGS_ASSERT_DO_VOP	\
 	assert(sv); assert(left); assert(right)
 
-PERL_CALLCONV OP*	Perl_dofile(pTHX_ OP* term, I32 force_builtin)
+PERL_CALLCONV OP*	Perl_dofile(pTHX_ OP* term, I32 force_builtin, SV* location)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DOFILE	\
 	assert(term)
@@ -1989,7 +1989,7 @@ PERL_CALLCONV CV*	Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const c
 /* PERL_CALLCONV AV*	Perl_newAV(pTHX)
 			__attribute__warn_unused_result__; */
 
-PERL_CALLCONV OP*	Perl_newAVREF(pTHX_ OP* o)
+PERL_CALLCONV OP*	Perl_newAVREF(pTHX_ OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
@@ -2022,7 +2022,7 @@ PERL_CALLCONV OP*	Perl_newGVREF(pTHX_ I32 type, OP* o)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newHVREF(pTHX_ OP* o)
+PERL_CALLCONV OP*	Perl_newHVREF(pTHX_ OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
@@ -2085,7 +2085,7 @@ PERL_CALLCONV SV*	Perl_newSV(pTHX_ const STRLEN len)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newSVREF(pTHX_ OP* o)
+PERL_CALLCONV OP*	Perl_newSVREF(pTHX_ OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
@@ -3516,6 +3516,12 @@ PERL_CALLCONV void	Perl_warn(pTHX_ const char* pat, ...)
 #define PERL_ARGS_ASSERT_WARN	\
 	assert(pat)
 
+PERL_CALLCONV void	Perl_warn_at(pTHX_ SV* location, const char* pat, ...)
+			__attribute__format__(__printf__,pTHX_2,pTHX_3)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_WARN_AT	\
+	assert(pat)
+
 PERL_CALLCONV void	Perl_vwarn(pTHX_ const char* pat, va_list* args)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_VWARN	\
@@ -3527,9 +3533,20 @@ PERL_CALLCONV void	Perl_warner(pTHX_ U32 err, const char* pat, ...)
 #define PERL_ARGS_ASSERT_WARNER	\
 	assert(pat)
 
+PERL_CALLCONV void	Perl_warner_at(pTHX_ SV* location, U32 err, const char* pat, ...)
+			__attribute__format__(__printf__,pTHX_3,pTHX_4)
+			__attribute__nonnull__(pTHX_3);
+#define PERL_ARGS_ASSERT_WARNER_AT	\
+	assert(pat)
+
 PERL_CALLCONV void	Perl_vwarner(pTHX_ U32 err, const char* pat, va_list* args)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_VWARNER	\
+	assert(pat)
+
+PERL_CALLCONV void	Perl_vwarner_at(pTHX_ SV* location, U32 err, const char* pat, va_list* args)
+			__attribute__nonnull__(pTHX_3);
+#define PERL_ARGS_ASSERT_VWARNER_AT	\
 	assert(pat)
 
 PERL_CALLCONV void	Perl_watch(pTHX_ char** addr)

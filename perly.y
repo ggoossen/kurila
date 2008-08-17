@@ -754,17 +754,17 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
         |       term DEREFARY                /* somearef->@ */
                         {
-                            $$ = newAVREF($1);
+                            $$ = newAVREF($1, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFSCL                /* somearef->$ */
                         {
-                            $$ = newSVREF($1);
+                            $$ = newSVREF($1, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFHSH                /* somearef->% */
                         {
-                            $$ = newHVREF($1);
+                            $$ = newHVREF($1, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFSTAR                /* somearef->* */
@@ -784,7 +784,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	term ARROW '[' expr ']'      /* somearef->[$element] */
 			{ $$ = newBINOP(OP_AELEM, 0,
-                                ref(newAVREF($1),OP_RV2AV),
+                                ref(newAVREF($1, LOCATION($2)),OP_RV2AV),
                                 scalar($4), LOCATION($3));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
@@ -795,7 +795,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 				newOP(OP_PUSHMARK, 0, LOCATION($3)),
                                 newLISTOP(OP_HSLICE, 0,
                                     list($4),
-                                    ref(newHVREF($1), OP_HSLICE), LOCATION($3)));
+                                    ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3)));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
@@ -808,7 +808,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 				newOP(OP_PUSHMARK, 0, LOCATION($3)),
 				    newLISTOP(OP_ASLICE, 0,
 					list($4),
-					ref(newAVREF($1), OP_ASLICE), LOCATION($3)));
+					ref(newAVREF($1, LOCATION($2)), OP_ASLICE), LOCATION($3)));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
 			  TOKEN_GETMAD($5,$$,'j');
@@ -835,7 +835,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			}
 	|	term ARROW '{' expr ';' '}' /* somehref->{bar();} */
 			{ $$ = newBINOP(OP_HELEM, 0,
-					ref(newHVREF($1),OP_RV2HV),
+                                ref(newHVREF($1, LOCATION($2)),OP_RV2HV),
                                 scalar($4), LOCATION($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
@@ -1027,8 +1027,9 @@ anonymous:
 
 /* Things called with "do" */
 termdo	:       DO term	%prec UNIOP                     /* do $filename */
-			{ $$ = dofile($2, IVAL($1));
-			  TOKEN_GETMAD($1,$$,'o');
+			{ 
+                            $$ = dofile($2, IVAL($1), LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
 			}
 	|	DO block	%prec '('               /* do { code */
                         { $$ = newUNOP(OP_NULL, OPf_SPECIAL, scope($2), LOCATION($1));
@@ -1337,8 +1338,9 @@ amper	:	'&' indirob
 	;
 
 scalar	:	'$' indirob
-			{ $$ = newSVREF($2);
-			  TOKEN_GETMAD($1,$$,'$');
+			{ 
+                            $$ = newSVREF($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'$');
 			}
         |       ANONSCALAR expr ')'  /* $( ... ) */
                         { 
@@ -1360,8 +1362,9 @@ scalar	:	'$' indirob
 	;
 
 ary	:	'@' indirob
-			{ $$ = newAVREF($2);
-			  TOKEN_GETMAD($1,$$,'@');
+			{ 
+                            $$ = newAVREF($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'@');
 			}
         |       ANONARY expr ')'  /* @( ... ) */
                         {
@@ -1378,8 +1381,9 @@ ary	:	'@' indirob
 	;
 
 hsh	:	'%' indirob
-			{ $$ = newHVREF($2);
-			  TOKEN_GETMAD($1,$$,'%');
+                        {
+                            $$ = newHVREF($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'%');
 			}
 	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
 			{ 

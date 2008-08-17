@@ -342,12 +342,12 @@ try {
 print $@->message;
 EXPECT
 Usage: warnings::warn([category,] 'message') at .../warnings.pm line xxx.
-    warnings::warn called at - line 5.
-    (eval) called at - line 4.
+    warnings::warn called at - line 5 character 5.
+    (eval) called at - line 4 character 1.
 Unknown warnings category 'fred' at .../warnings.pm line xxx.
     warnings::__chk called at .../warnings.pm line xxx.
-    warnings::warn called at - line 9.
-    (eval) called at - line 8.
+    warnings::warn called at - line 9 character 3.
+    (eval) called at - line 8 character 1.
 ########
 
 # check warnings::warnif
@@ -362,12 +362,12 @@ try {
 print $@->message;
 EXPECT
 Usage: warnings::warnif([category,] 'message') at .../warnings.pm line xxx.
-    warnings::warnif called at - line 5.
-    (eval) called at - line 4.
+    warnings::warnif called at - line 5 character 3.
+    (eval) called at - line 4 character 1.
 Unknown warnings category 'fred' at .../warnings.pm line xxx.
     warnings::__chk called at .../warnings.pm line xxx.
-    warnings::warnif called at - line 9.
-    (eval) called at - line 8.
+    warnings::warnif called at - line 9 character 3.
+    (eval) called at - line 8 character 1.
 ########
 
 --FILE-- abc.pm
@@ -381,8 +381,8 @@ use abc;
 abc::check() ;
 EXPECT
 hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 3.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 3 character 1.
 ########
 
 --FILE-- abc.pm
@@ -396,8 +396,8 @@ use abc;
 abc::check() ;
 EXPECT
 hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 3.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 3 character 1.
 ########
 
 --FILE-- abc.pm
@@ -414,9 +414,9 @@ try {
 print "[[$@]]\n";
 EXPECT
 hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 4.
-    (eval) called at - line 3.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 4 character 5.
+    (eval) called at - line 3 character 1.
 [[]]
 ########
 
@@ -434,9 +434,9 @@ try {
 print "[[{$@->message}]]\n";
 EXPECT
 [[hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 4.
-    (eval) called at - line 3.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 4 character 3.
+    (eval) called at - line 3 character 1.
 ]]
 ########
 -W
@@ -482,8 +482,8 @@ abc::check() ;
 EXPECT
 package 'abc' not registered for warnings at .../warnings.pm line xxx.
     warnings::__chk called at .../warnings.pm line xxx.
-    warnings::enabled called at abc.pm line 4.
-    abc::check called at - line 3.
+    warnings::enabled called at abc.pm line 4 character 21.
+    abc::check called at - line 3 character 1.
 ########
 
 --FILE-- abc.pm
@@ -500,8 +500,8 @@ abc::check() ;
 EXPECT
 package 'abc' not registered for warnings at .../warnings.pm line xxx.
     warnings::__chk called at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 4.
-    abc::check called at - line 3.
+    warnings::warn called at abc.pm line 4 character 3.
+    abc::check called at - line 3 character 1.
 ########
 
 --FILE-- abc.pm
@@ -518,8 +518,8 @@ abc::check() ;
 EXPECT
 package 'abc' not registered for warnings at .../warnings.pm line xxx.
     warnings::__chk called at .../warnings.pm line xxx.
-    warnings::warnif called at abc.pm line 4.
-    abc::check called at - line 3.
+    warnings::warnif called at abc.pm line 4 character 3.
+    abc::check called at - line 3 character 1.
 ########
 
 --FILE-- abc.pm
@@ -679,8 +679,8 @@ use warnings "abc" ;
 abc::check() ;
 EXPECT
 hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 4.
-    abc::check called at - line 3.
+    warnings::warn called at abc.pm line 4 character 13.
+    abc::check called at - line 3 character 1.
 ########
 
 --FILE-- abc.pm
@@ -693,8 +693,8 @@ use abc;
 abc::check() ;
 EXPECT
 hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 2.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 2 character 1.
 ########
 
 --FILE-- abc.pm
@@ -711,9 +711,9 @@ try {
 print "[[$@]]\n";
 EXPECT
 hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 4.
-    (eval) called at - line 3.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 4 character 5.
+    (eval) called at - line 3 character 1.
 [[]]
 ########
 
@@ -731,9 +731,9 @@ try {
 print "[[{$@->message}]]\n";
 EXPECT
 [[hello at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 3.
-    abc::check called at - line 4.
-    (eval) called at - line 3.
+    warnings::warn called at abc.pm line 3 character 13.
+    abc::check called at - line 4 character 3.
+    (eval) called at - line 3 character 1.
 ]]
 ########
 -W
@@ -1040,10 +1040,10 @@ EXPECT
 ok2
 ok3
 my message 1 at .../warnings.pm line xxx.
-    warnings::warn called at abc.pm line 10.
-    abc::check called at abc.pm line 16.
-    abc::in2 called at abc.pm line 17.
-    abc::in1 called at - line 3.
+    warnings::warn called at abc.pm line 10 character 3.
+    abc::check called at abc.pm line 16 character 25.
+    abc::in2 called at abc.pm line 17 character 25.
+    abc::in1 called at - line 3 character 1.
 ########
 
 --FILE-- def.pm
@@ -1079,8 +1079,8 @@ EXPECT
 ok2
 ok3
 my message 1 at .../warnings.pm line xxx.
-    warnings::warn called at def.pm line 9.
-    def::check called at def.pm line 15.
-    def::in2 called at def.pm line 16.
-    def::in1 called at abc.pm line 5.
-    abc::in1 called at - line 3.
+    warnings::warn called at def.pm line 9 character 3.
+    def::check called at def.pm line 15 character 25.
+    def::in2 called at def.pm line 16 character 25.
+    def::in1 called at abc.pm line 5 character 11.
+    abc::in1 called at - line 3 character 1.

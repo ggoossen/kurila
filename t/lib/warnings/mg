@@ -15,7 +15,7 @@ __END__
 use warnings 'signal' ;
 %SIG{FRED} = sub {};
 EXPECT
-No such signal: SIGFRED at - line 3.
+No such signal: SIGFRED at - line 3 character 11.
 ########
 # mg.c
 no warnings 'signal' ;
@@ -28,13 +28,13 @@ use warnings 'uninitialized';
 'foo' =~ m/(foo)/;
 oct $3;
 EXPECT
-Use of uninitialized value $::3 in oct at - line 4.
+Use of uninitialized value $::3 in oct at - line 4 character 1.
 ########
 # mg.c
 use warnings 'uninitialized';
 oct $3;
 EXPECT
-Use of uninitialized value $::3 in oct at - line 3.
+Use of uninitialized value $::3 in oct at - line 3 character 1.
 ########
 # mg.c
 use warnings 'uninitialized';

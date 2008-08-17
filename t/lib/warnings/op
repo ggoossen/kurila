@@ -84,7 +84,7 @@ use warnings 'syntax' ;
 no warnings 'syntax' ;
 1 if $a = 1 ;
 EXPECT
-Found = in conditional, should be == at - line 3.
+Found = in conditional, should be == at - line 3 character 14.
 ########
 # op.c
 use warnings 'void' ; close STDIN ;
@@ -92,7 +92,7 @@ my $x = sort (2,1,3);
 no warnings 'void' ;
 $x = sort (2,1,3);
 EXPECT
-Useless use of sort in scalar context at - line 3.
+Useless use of sort in scalar context at - line 3 character 22.
 ########
 # op.c
 use warnings 'void' ;
@@ -100,7 +100,7 @@ for (<@{\@(0)}) { "$_" }		# check warning isn't duplicated
 no warnings 'void' ;
 for (<@{\@(0)}) { "$_" }		# check warning isn't duplicated
 EXPECT
-Useless use of string in void context at - line 3.
+Useless use of string in void context at - line 3 character 19.
 ########
 # op.c
 use warnings 'void' ;
@@ -118,7 +118,7 @@ telldir 1 ;		# OP_TELLDIR
 no warnings 'void' ;
 telldir 1 ;		# OP_TELLDIR
 EXPECT
-Useless use of telldir in void context at - line 13.
+Useless use of telldir in void context at - line 13 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -136,7 +136,7 @@ getppid ;		# OP_GETPPID
 no warnings 'void' ;
 getppid ;		# OP_GETPPID
 EXPECT
-Useless use of getppid in void context at - line 13.
+Useless use of getppid in void context at - line 13 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -154,7 +154,7 @@ getpgrp ;		# OP_GETPGRP
 no warnings 'void' ;
 getpgrp ;		# OP_GETPGRP
 EXPECT
-Useless use of getpgrp in void context at - line 13.
+Useless use of getpgrp in void context at - line 13 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -172,7 +172,7 @@ times ;			# OP_TMS
 no warnings 'void' ;
 times ;			# OP_TMS
 EXPECT
-Useless use of times in void context at - line 13.
+Useless use of times in void context at - line 13 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -190,7 +190,7 @@ getpriority 1,2;	# OP_GETPRIORITY
 no warnings 'void' ;
 getpriority 1,2;	# OP_GETPRIORITY
 EXPECT
-Useless use of getpriority in void context at - line 13.
+Useless use of getpriority in void context at - line 13 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -208,7 +208,7 @@ getlogin ;			# OP_GETLOGIN
 no warnings 'void' ;
 getlogin ;			# OP_GETLOGIN
 EXPECT
-Useless use of getlogin in void context at - line 13.
+Useless use of getlogin in void context at - line 13 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -268,20 +268,20 @@ INIT {
    exit;
 }
 EXPECT
-Useless use of getsockname in void context at - line 24.
-Useless use of getpeername in void context at - line 25.
-Useless use of gethostbyname in void context at - line 26.
-Useless use of gethostbyaddr in void context at - line 27.
-Useless use of gethostent in void context at - line 28.
-Useless use of getnetbyname in void context at - line 29.
-Useless use of getnetbyaddr in void context at - line 30.
-Useless use of getnetent in void context at - line 31.
-Useless use of getprotobyname in void context at - line 32.
-Useless use of getprotobynumber in void context at - line 33.
-Useless use of getprotoent in void context at - line 34.
-Useless use of getservbyname in void context at - line 35.
-Useless use of getservbyport in void context at - line 36.
-Useless use of getservent in void context at - line 37.
+Useless use of getsockname in void context at - line 24 character 1.
+Useless use of getpeername in void context at - line 25 character 1.
+Useless use of gethostbyname in void context at - line 26 character 1.
+Useless use of gethostbyaddr in void context at - line 27 character 1.
+Useless use of gethostent in void context at - line 28 character 1.
+Useless use of getnetbyname in void context at - line 29 character 1.
+Useless use of getnetbyaddr in void context at - line 30 character 1.
+Useless use of getnetent in void context at - line 31 character 1.
+Useless use of getprotobyname in void context at - line 32 character 1.
+Useless use of getprotobynumber in void context at - line 33 character 1.
+Useless use of getprotoent in void context at - line 34 character 1.
+Useless use of getservbyname in void context at - line 35 character 1.
+Useless use of getservbyport in void context at - line 36 character 1.
+Useless use of getservent in void context at - line 37 character 1.
 ########
 # op.c
 use warnings 'void' ; our (@a, %a);
@@ -295,10 +295,10 @@ $a ; # OP_RV2SV
 @a ; # OP_RV2AV
 %a ; # OP_RV2HV
 EXPECT
-Useless use of a variable in void context at - line 3.
-Useless use of a variable in void context at - line 4.
-Useless use of a variable in void context at - line 5.
-Useless use of a variable in void context at - line 6.
+Useless use of a variable in void context at - line 3 character 1.
+Useless use of a variable in void context at - line 4 character 1.
+Useless use of a variable in void context at - line 5 character 1.
+Useless use of a variable in void context at - line 6 character 1.
 ########
 # op.c
 use warnings 'void' ;
@@ -317,11 +317,11 @@ no warnings 'void' ;
 "x" . "y"; # optimized to OP_CONST
 2 + 2; # optimized to OP_CONST
 EXPECT
-Useless use of a constant (abc) in void context at - line 3.
-Useless use of a constant (7) in void context at - line 4.
-Useless use of a constant (xy) in void context at - line 5.
-Useless use of a constant (4) in void context at - line 6.
-Useless use of a constant (undef) in void context at - line 8.
+Useless use of a constant (abc) in void context at - line 3 character 6.
+Useless use of a constant (7) in void context at - line 4 character 1.
+Useless use of a constant (xy) in void context at - line 5 character 4.
+Useless use of a constant (4) in void context at - line 6 character 2.
+Useless use of a constant (undef) in void context at - line 8 character 1.
 ########
 # op.c
 use warnings 'parenthesis' ;
@@ -331,13 +331,13 @@ my $x, $y or print;
 no warnings 'parenthesis' ;
 my $c, $d = (1,2);
 EXPECT
-Parentheses missing around "my" list at - line 3.
+Parentheses missing around "my" list at - line 3 character 7.
 list may not be used in scalar context at - line 3, near ");"
-Parentheses missing around "my" list at - line 4.
+Parentheses missing around "my" list at - line 4 character 9.
 Global symbol "%bar" requires explicit package name at - line 4, near ",%bar"
 Global symbol "$quux" requires explicit package name at - line 4, near ",	$quux"
 Global symbol "$y" requires explicit package name at - line 5, near ", $y "
-BEGIN not safe after errors--compilation aborted at - line 6.
+BEGIN not safe after errors--compilation aborted at - line 6 character 28.
 ########
 # op.c
 use warnings 'parenthesis' ;
@@ -345,9 +345,9 @@ our $a, $b = (1,2);
 no warnings 'parenthesis' ;
 our $c, $d = (1,2);
 EXPECT
-Parentheses missing around "our" list at - line 3.
+Parentheses missing around "our" list at - line 3 character 8.
 list may not be used in scalar context at - line 3, near ");"
-BEGIN not safe after errors--compilation aborted at - line 4.
+BEGIN not safe after errors--compilation aborted at - line 4 character 28.
 ########
 # op.c
 our ($b, $c, $d);
@@ -357,10 +357,10 @@ local *f, *g;
 no warnings 'parenthesis' ;
 local $c, $d = (1,2);
 EXPECT
-Parentheses missing around "local" list at - line 4.
+Parentheses missing around "local" list at - line 4 character 10.
 list may not be used in scalar context at - line 4, near ");"
-Parentheses missing around "local" list at - line 5.
-BEGIN not safe after errors--compilation aborted at - line 6.
+Parentheses missing around "local" list at - line 5 character 10.
+BEGIN not safe after errors--compilation aborted at - line 6 character 28.
 ########
 # op.c
 use warnings 'bareword' ;
@@ -368,7 +368,7 @@ print (ABC || 1) ;
 no warnings 'bareword' ;
 print (ABC || 1) ;
 EXPECT
-Bareword found in conditional at - line 3.
+Bareword found in conditional at - line 3 character 18.
 ########
 --FILE-- abc
 
@@ -381,7 +381,7 @@ $x = 1 if $x = ~< *FH ;
 no warnings 'misc' ;
 $x = 1 if $x = ~< *FH ;
 EXPECT
-Value of <HANDLE> construct can be "0"; test with defined() at - line 5.
+Value of <HANDLE> construct can be "0"; test with defined() at - line 5 character 24.
 ########
 # op.c
 use warnings 'misc' ;
@@ -392,7 +392,7 @@ no warnings 'misc' ;
 $x = 1 if $x = readdir FH ;
 closedir FH ;
 EXPECT
-Value of readdir() operator can be "0"; test with defined() at - line 5.
+Value of readdir() operator can be "0"; test with defined() at - line 5 character 28.
 ########
 # op.c
 use warnings 'misc' ;
@@ -401,7 +401,7 @@ $x = 1 if $x = glob("*") ;
 no warnings 'misc' ;
 $x = 1 if $x = glob("*") ;
 EXPECT
-Value of glob construct can be "0"; test with defined() at - line 4.
+Value of glob construct can be "0"; test with defined() at - line 4 character 27.
 ########
 # op.c
 use warnings 'misc' ;
@@ -410,7 +410,7 @@ $x = 1 while $x = glob("*") and 0 ;
 no warnings 'misc' ;
 $x = 1 while $x = glob("*") and 0 ;
 EXPECT
-Value of glob construct can be "0"; test with defined() at - line 4.
+Value of glob construct can be "0"; test with defined() at - line 4 character 36.
 ########
 # op.c
 use warnings 'misc' ;
@@ -421,7 +421,7 @@ no warnings 'misc' ;
 $x = 1 while $x = readdir FH and 0 ;
 closedir FH ;
 EXPECT
-Value of readdir() operator can be "0"; test with defined() at - line 5.
+Value of readdir() operator can be "0"; test with defined() at - line 5 character 37.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -430,7 +430,7 @@ sub fred {}
 no warnings 'redefine' ;
 sub fred {}
 EXPECT
-Subroutine fred redefined at - line 4.
+Subroutine fred redefined at - line 4 character 12.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -439,21 +439,21 @@ sub fred () { 1 }
 no warnings 'redefine' ;
 sub fred () { 1 }
 EXPECT
-Constant subroutine fred redefined at - line 4.
+Constant subroutine fred redefined at - line 4 character 18.
 ########
 # op.c
 no warnings 'redefine' ;
 sub fred () { 1 }
 sub fred () { 2 }
 EXPECT
-Constant subroutine fred redefined at - line 4.
+Constant subroutine fred redefined at - line 4 character 18.
 ########
 # op.c
 no warnings 'redefine' ;
 sub fred () { 1 }
 *fred = sub () { 2 };
 EXPECT
-Constant subroutine main::fred redefined at - line 4.
+Constant subroutine main::fred redefined at - line 4 character 6.
 ########
 # op.c
 BEGIN {
@@ -469,9 +469,9 @@ use warnings 'syntax' ;
 exec "$^X -e 1" ; 
 my $a
 EXPECT
-Statement unlikely to be reached at - line 13.
+Statement unlikely to be reached at - line 12 character 1.
 	(Maybe you meant system() when you said exec()?)
- at - line 13.
+ at - line 12 character 1.
 ########
 # op.c
 BEGIN {
@@ -509,16 +509,16 @@ in mainline
 in check
 in init
 in begin
-Too late to run CHECK block at abc.pm line 3.
-    (eval) called at - line 3.
-Too late to run INIT block at abc.pm line 4.
-    (eval) called at - line 3.
+Too late to run CHECK block at abc.pm line 3 character 30.
+    (require) called at - line 3 character 1.
+Too late to run INIT block at abc.pm line 4 character 28.
+    (require) called at - line 3 character 1.
 in mainline
 in begin
-Too late to run CHECK block at abc.pm line 3.
-    (eval) called at - line 4.
-Too late to run INIT block at abc.pm line 4.
-    (eval) called at - line 4.
+Too late to run CHECK block at abc.pm line 3 character 30.
+    (eval) called at - line 4 character 1.
+Too late to run INIT block at abc.pm line 4 character 28.
+    (eval) called at - line 4 character 1.
 in mainline
 in end
 in end
@@ -553,8 +553,8 @@ no warnings 'syntax' ;
 push(@x);
 unshift(@x);
 EXPECT
-Useless use of push with no values at - line 4.
-Useless use of unshift with no values at - line 5.
+Useless use of push with no values at - line 4 character 9.
+Useless use of unshift with no values at - line 5 character 12.
 ########
 # op.c
 # 20020401 mjd@plover.com at suggestion of jfriedl@yahoo.com
@@ -563,7 +563,7 @@ split m/blah/g, "blah";
 no warnings 'regexp';
 split m/blah/g, "blah";
 EXPECT
-Use of /g modifier is meaningless in split at - line 4.
+Use of /g modifier is meaningless in split at - line 4 character 24.
 ########
 # op.c
 use warnings 'precedence'; our ($c, $d);
@@ -584,13 +584,13 @@ $a = $b +>= $c ^^^ $d;
 $a = $b +<= $c ^|^ $d;
 $a = $b <+> $c ^&^ $d;
 EXPECT
-Possible precedence problem on bitwise ^&^ operator at - line 3.
-Possible precedence problem on bitwise ^^^ operator at - line 4.
-Possible precedence problem on bitwise ^|^ operator at - line 5.
-Possible precedence problem on bitwise ^&^ operator at - line 6.
-Possible precedence problem on bitwise ^^^ operator at - line 7.
-Possible precedence problem on bitwise ^|^ operator at - line 8.
-Possible precedence problem on bitwise ^&^ operator at - line 9.
+Possible precedence problem on bitwise ^&^ operator at - line 3 character 22.
+Possible precedence problem on bitwise ^^^ operator at - line 4 character 22.
+Possible precedence problem on bitwise ^|^ operator at - line 5 character 22.
+Possible precedence problem on bitwise ^&^ operator at - line 6 character 22.
+Possible precedence problem on bitwise ^^^ operator at - line 7 character 23.
+Possible precedence problem on bitwise ^|^ operator at - line 8 character 23.
+Possible precedence problem on bitwise ^&^ operator at - line 9 character 23.
 ########
 # op.c
 use integer;
@@ -611,13 +611,13 @@ $a = $b +>= $c ^^^ $d;
 $a = $b +<= $c ^|^ $d;
 $a = $b <+> $c ^&^ $d;
 EXPECT
-Possible precedence problem on bitwise ^&^ operator at - line 4.
-Possible precedence problem on bitwise ^^^ operator at - line 5.
-Possible precedence problem on bitwise ^|^ operator at - line 6.
-Possible precedence problem on bitwise ^&^ operator at - line 7.
-Possible precedence problem on bitwise ^^^ operator at - line 8.
-Possible precedence problem on bitwise ^|^ operator at - line 9.
-Possible precedence problem on bitwise ^&^ operator at - line 10.
+Possible precedence problem on bitwise ^&^ operator at - line 4 character 22.
+Possible precedence problem on bitwise ^^^ operator at - line 5 character 22.
+Possible precedence problem on bitwise ^|^ operator at - line 6 character 22.
+Possible precedence problem on bitwise ^&^ operator at - line 7 character 22.
+Possible precedence problem on bitwise ^^^ operator at - line 8 character 23.
+Possible precedence problem on bitwise ^|^ operator at - line 9 character 23.
+Possible precedence problem on bitwise ^&^ operator at - line 10 character 23.
 ########
 # op.c
 use warnings 'deprecated';
@@ -636,11 +636,11 @@ if (my $w2) { $a=1 }
 if ($a && (my $w3 = 1)) {$a = 2}
 
 EXPECT
-Deprecated use of my() in false conditional at - line 3.
-Deprecated use of my() in false conditional at - line 4.
-Deprecated use of my() in false conditional at - line 5.
-Deprecated use of my() in false conditional at - line 6.
-Deprecated use of my() in false conditional at - line 7.
-Deprecated use of my() in false conditional at - line 8.
-Deprecated use of my() in false conditional at - line 9.
+Deprecated use of my() in false conditional at - line 3 character 13.
+Deprecated use of my() in false conditional at - line 4 character 13.
+Deprecated use of my() in false conditional at - line 5 character 13.
+Deprecated use of my() in false conditional at - line 6 character 15.
+Deprecated use of my() in false conditional at - line 7 character 24.
+Deprecated use of my() in false conditional at - line 8 character 13.
+Deprecated use of my() in false conditional at - line 9 character 15.
 ########
