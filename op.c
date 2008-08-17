@@ -717,6 +717,8 @@ clear_pmop:
 	pad_free(o->op_targ);
 	o->op_targ = 0;
     }
+
+    SVcpNULL(o->op_location);
 }
 
 STATIC void
@@ -3097,6 +3099,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	    rcop->op_flags |= OPf_KIDS;
 	    rcop->op_private = 1;
 	    rcop->op_other = o;
+	    rcop->op_location = SvREFCNT_inc(o->op_location);
 
 	    /* establish postfix order */
 	    rcop->op_next = LINKLIST(repl);
@@ -4193,6 +4196,7 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 	loop->op_ppaddr = PL_ppaddr[OP_ENTERLOOP];
 	loop->op_private = 0;
 	loop->op_next = (OP*)loop;
+	loop->op_location = SvREFCNT_inc(location);
     }
 
     o = newBINOP(OP_LEAVELOOP, 0, (OP*)loop, o, location);
@@ -5533,20 +5537,15 @@ Perl_ck_try(pTHX_ OP *o)
 	}
 	else if (kid->op_type == OP_LINESEQ || kid->op_type == OP_STUB) {
 	    LOGOP *enter;
-#ifdef PERL_MAD
 	    OP* const oldo = o;
-#endif
 
 	    cUNOPo->op_first = 0;
-#ifndef PERL_MAD
-	    op_free(o);
-#endif
 
 	    NewOp(1101, enter, 1, LOGOP);
 	    enter->op_type = OP_ENTERTRY;
 	    enter->op_ppaddr = PL_ppaddr[OP_ENTERTRY];
 	    enter->op_private = 0;
-	    enter->op_location = o->op_location;
+	    enter->op_location = SvREFCNT_inc(oldo->op_location);
 
 	    /* establish postfix order */
 	    enter->op_next = (OP*)enter;
@@ -5556,6 +5555,9 @@ Perl_ck_try(pTHX_ OP *o)
 	    o->op_ppaddr = PL_ppaddr[OP_LEAVETRY];
 	    enter->op_other = o;
 	    op_getmad(oldo,o,'O');
+#ifndef PERL_MAD
+	    op_free(oldo);
+#endif
 	    return o;
 	}
     }
@@ -6124,6 +6126,7 @@ Perl_ck_grep(pTHX_ OP *o)
     gwop->op_first = listkids(o);
     gwop->op_flags |= OPf_KIDS;
     gwop->op_other = LINKLIST(kid);
+    gwop->op_location = SvREFCNT_inc(kid->op_location);
     kid->op_next = (OP*)gwop;
     offset = pad_findmy("$_");
     if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
