@@ -1436,8 +1436,6 @@ lib/sort.pm			For "use sort"
 lib/sort.t			See if "use sort" works
 lib/strict.pm			For "use strict"
 lib/strict.t			See if strictures work
-lib/subs.pm			Declare overriding subs
-lib/subs.t			See if subroutine pseudo-importation works
 lib/Symbol.pm			Symbol table manipulation routines
 lib/Symbol.t			See if Symbol works
 lib/Term/ANSIColor/ChangeLog	Term::ANSIColor
