@@ -49,7 +49,7 @@ fst $a="newa", $b="notset";
 is("$a-$b", "newa-oldb");
 
 {
-    BEGIN { compsub::define( nothing => sub { @_[0] and @_[0]->free; return B::OP->new('null', 0) } ); }
+    BEGIN { compsub::define( nothing => sub { @_[0] and @_[0]->free; return B::OP->new('null', 0, @("myop", 33, 66)) } ); }
     nothing;
 
     eval "nothing";
@@ -65,9 +65,9 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
     sub func1 { $x++; return "func1 called. args: {join ' ', < @_}" };
 
     BEGIN { compsub::define( compfunc1 => sub { my $op = shift;
-                                                my $cvop = B::SVOP->new('const', 0, \&func1);
-                                                $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
-                                                return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op);
+                                                my $cvop = B::SVOP->new('const', 0, \&func1, @('myop', 1, 1));
+                                                $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)), undef);
+                                                return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, undef);
                                             } ); }
 
     is( (compfunc1), "func1 called. args: ");
@@ -99,7 +99,7 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
                 # allocate a 'my' variable
                 my $targ = B::PAD::allocmy( '$' . ${ $kid->sv->object_2svref } );
                 # introduce the 'my' variable, and insert it into the list of argument.
-                my $padsv = B::OP->new('padsv', B::OPf_MOD);
+                my $padsv = B::OP->new('padsv', B::OPf_MOD, undef);
                 $padsv->set_private(B::OPpLVAL_INTRO);
                 $padsv->set_targ($targ);
                 $padsv->set_sibling($kid->sibling);
@@ -115,9 +115,9 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
             }
             $kid = $kid->sibling;
         }
-        my $cvop = B::SVOP->new('const', 0, \&parseparams);
-        $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)));
-        my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op);
+        my $cvop = B::SVOP->new('const', 0, \&parseparams, undef);
+        $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)), undef);
+        my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, undef);
         return $entersubop;
     }
 

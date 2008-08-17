@@ -49,7 +49,7 @@ isnt( undef, 0,             'undef isnt zero' );
 
 #line 45
 like( undef, '/.*/',        'undef is like anything' );
-warnings_like("Use of uninitialized value.* at $Filename line 45\\.\n");
+warnings_like(qr/Use of uninitialized value.* at $Filename line 45 character 57\.\n/);
 
 eq_array( \@(undef, undef), \@(undef, 23) );
 no_warnings;
@@ -69,7 +69,7 @@ no_warnings;
 
 #line 64
 cmp_ok( undef, '+<=', 2, '  undef +<= 2' );
-warnings_like("Use of uninitialized value.* at $Filename line 64\\.\n");
+warnings_like(qr/Use of uninitialized value.* at $Filename line 64 character 45\.\n/);
 
 
 
