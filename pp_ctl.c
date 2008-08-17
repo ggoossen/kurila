@@ -2313,6 +2313,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
 	    PUSHMARK(SP);
 	    XPUSHs(ERRSV);
+	    XPUSHs(PL_op->op_location);
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
@@ -2818,7 +2819,6 @@ PP(pp_entereval)
 
     ENTER;
     lex_start(sv, NULL, FALSE);
-    PL_parser->lex_line_number++;
     SAVETMPS;
 
     /* switch to eval mode */
