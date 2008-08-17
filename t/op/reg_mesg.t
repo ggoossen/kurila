@@ -136,7 +136,7 @@ while ((nelems @death))
     $result =~ s/{\#}/$marker2/;
     $result .= " at ";
     if ($@->message !~ m/^\Q$result/) {
-	print "# For $regex, expected:\n#  $result\n# Got:\n#  $@\n#\nnot ";
+	print "# For $regex, expected:\n#  $result\n# Got:\n#  {$@ && $@->message}\n#\nnot ";
     }
     print "ok $count - $regex\n";
 }

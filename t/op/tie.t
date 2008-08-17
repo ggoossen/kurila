@@ -46,15 +46,14 @@ use Tie::Hash ;
  use base 'Tie::StdHash';
  sub UNTIE
   {
-   warn "Untied";
+   print STDERR "Untied\n";
   }
 }
 our %h;
 tie %h, 'Tie::HashUntie';
 untie %h;
 EXPECT
-Untied at - line 8 character 4.
-    Tie::HashUntie::UNTIE called at - line 13.
+Untied
 ########
 
 # standard behaviour, with 1 extra reference
