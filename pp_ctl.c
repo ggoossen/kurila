@@ -2819,6 +2819,7 @@ PP(pp_entereval)
 
     ENTER;
     lex_start(sv, NULL, FALSE);
+    PL_parser->lex_line_number++;
     SAVETMPS;
 
     /* switch to eval mode */

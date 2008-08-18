@@ -108,9 +108,8 @@ MSG
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
     is $@->message, <<MSG ;
-Can't modify constant item in undef operator at (eval 9) line 1, at EOF
-Bareword \"foo\" not allowed while "strict subs" in use at (eval 9) line 1, at EOF
- at ../lib/error.t line 107 character 5.
+Can't modify constant item in undef operator at (eval 9) line 1 character 7.
+    (eval) called at ../lib/error.t line 107 character 5.
 MSG
 }
 

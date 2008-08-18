@@ -1347,13 +1347,14 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	/* grep, foreach, subcalls, refgen */
 	if (type == OP_GREPSTART || type == OP_ENTERSUB || type == OP_SREFGEN)
 	    break;
-	yyerror(Perl_form(aTHX_ "Can't modify %s in %s",
-		     (o->op_type == OP_NULL && (o->op_flags & OPf_SPECIAL)
-		      ? "do block"
-		      : (o->op_type == OP_ENTERSUB
-			? "non-lvalue subroutine call"
-			: OP_DESC(o))),
-		     type ? PL_op_desc[type] : "local"));
+	Perl_croak_at(aTHX_ o->op_location, 
+		      "Can't modify %s in %s",
+		      (o->op_type == OP_NULL && (o->op_flags & OPf_SPECIAL)
+		       ? "do block"
+		       : (o->op_type == OP_ENTERSUB
+			  ? "non-lvalue subroutine call"
+			  : OP_DESC(o))),
+		      type ? PL_op_desc[type] : "local");
 	return o;
 
     case OP_PREINC:
@@ -6000,15 +6001,14 @@ Perl_ck_fun(pTHX_ OP *o)
 	listkids(o);
     }
     else if (PL_opargs[type] & OA_DEFGV) {
-#ifdef PERL_MAD
-	OP *newop = newUNOP(type, 0, newDEFSVOP());
-	op_getmad(o,newop,'O');
-	return newop;
-#else
 	/* Ordering of these two is important to keep f_map.t passing.  */
+	OP *newop = newUNOP(type, 0, newDEFSVOP(), o->op_location);
+#ifdef PERL_MAD
+	op_getmad(o,newop,'O');
+#else
 	op_free(o);
-	return newUNOP(type, 0, newDEFSVOP(), o->op_location);
 #endif
+	return newop;
     }
 
     if (oa) {
