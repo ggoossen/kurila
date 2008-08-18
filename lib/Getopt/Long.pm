@@ -129,9 +129,7 @@ package Getopt::Long::Parser;
 
 # Store a copy of the default configuration. Since ConfigDefaults has
 # just been called, what we get from Configure is the default.
-my $default_config = do {
-    Getopt::Long::Configure ()
-};
+my $default_config = &Getopt::Long::Configure ();
 
 sub new {
     my $that = shift;
