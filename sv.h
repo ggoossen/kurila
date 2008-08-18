@@ -8,7 +8,7 @@
  *
  */
 
-#ifdef PERL_VALGRIND
+#ifdef DEBUGGING
 #  include "valgrind/memcheck.h"
 #else
 #  define VALGRIND_MAKE_MEM_UNDEFINED(p, s)
