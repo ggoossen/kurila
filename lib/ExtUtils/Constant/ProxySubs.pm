@@ -455,7 +455,7 @@ EOBOOT
 void
 constant_not_found()
     PPCODE:
-	Perl_croak(aTHX_ "Your vendor has not defined $package_sprintf_safe macro ???");
+	Perl_croak(aTHX_ "Your vendor has not defined the requested $package_sprintf_safe macro");
 
 EOBOOT
 

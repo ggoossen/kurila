@@ -83,28 +83,6 @@ END {
 chdir $dir or die $!;
 push @INC, '../../lib', '../../../lib';
 
-package TieOut;
-
-sub TIEHANDLE {
-    my $class = shift;
-    bless(\( my $ref = ''), $class);
-}
-
-sub PRINT {
-    my $self = shift;
-    $$self .= join('', < @_);
-}
-
-sub PRINTF {
-    my $self = shift;
-    $$self .= sprintf shift, < @_;
-}
-
-sub read {
-    my $self = shift;
-    return substr($$self, 0, length($$self), '');
-}
-
 package main;
 
 sub check_for_bonus_files {
@@ -624,8 +602,9 @@ $test++;
 my $notdef = try { NOTDEF; };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/Undefined subroutine .*NOTDEF called/) {
-  print "not ok $test # \$@='$@'\n";
+} elsif ($@->{description} !~ m/Your vendor has not defined the requested ExtTest macro/) {
+  warn $@->message;
+  print "not ok $test\n";
 } else {
   print "ok $test\n";
 }
