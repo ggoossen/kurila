@@ -1557,7 +1557,7 @@ sub process_text1($$;$$){
 
     if( $func eq 'B' ){
 	# B<text> - boldface
-	$res = '<strong>' . process_text1( $lev, $rstr ) . '</strong>';
+	$res = '<strong>' . &process_text1( $lev, $rstr ) . '</strong>';
 
     } elsif( $func eq 'C' ){
 	# C<code> - can be a ref or <code></code>
@@ -1581,11 +1581,11 @@ sub process_text1($$;$$){
 
     } elsif( $func eq 'F' ){
 	# F<filename> - italicize
-	$res = '<em class="file">' . process_text1( $lev, $rstr ) . '</em>';
+	$res = '<em class="file">' . &process_text1( $lev, $rstr ) . '</em>';
 
     } elsif( $func eq 'I' ){
 	# I<text> - italicize
-	$res = '<em>' . process_text1( $lev, $rstr ) . '</em>';
+	$res = '<em>' . &process_text1( $lev, $rstr ) . '</em>';
 
     } elsif( $func eq 'L' ){
 	# L<link> - link
@@ -1701,14 +1701,14 @@ sub process_text1($$;$$){
         # now we have a URL or just plain code
         $$rstr = $linktext . '>' . $$rstr;
         if( defined( $url ) ){
-            $res = "<a href=\"$url\">" . process_text1( $lev, $rstr ) . '</a>';
+            $res = "<a href=\"$url\">" . &process_text1( $lev, $rstr ) . '</a>';
         } else {
-	    $res = '<em>' . process_text1( $lev, $rstr ) . '</em>';
+	    $res = '<em>' . &process_text1( $lev, $rstr ) . '</em>';
         }
 
     } elsif( $func eq 'S' ){
 	# S<text> - non-breaking spaces
-	$res = process_text1( $lev, $rstr );
+	$res = &process_text1( $lev, $rstr );
 	$res =~ s/ /&nbsp;/g;
 
     } elsif( $func eq 'X' ){
@@ -1730,7 +1730,7 @@ sub process_text1($$;$$){
 	    $res .= $lev == 1 ? pure_text( $pt ) : inIS_text( $pt );
 	    return $res if !$3 && $lev +> 1;
             if( $3 ){
-		$res .= process_text1( $lev, $rstr, $3, closing $4 );
+		$res .= &process_text1( $lev, $rstr, $3, closing $4 );
  	    }
 	}
 	if( $lev == 1 ){
@@ -2098,7 +2098,7 @@ sub depod1($;$$){
       # skip to next begin of an interior sequence
       while( $$rstr =~ s/\A(.*?)([BCEFILSXZ])<(<+[^\S\n]+)?//s ){
          # recurse into its text
-	  $res .= $1 . depod1( $rstr, $2, closing $3);
+	  $res .= $1 . &depod1( $rstr, $2, closing $3);
       }
       $res .= $$rstr;
   } elsif( $func eq 'E' ){
@@ -2118,7 +2118,7 @@ sub depod1($;$$){
       while( $$rstr =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s ){
 	  $res .= $1;
 	  last unless $3;
-          $res .= depod1( $rstr, $3, closing $4 );
+          $res .= &depod1( $rstr, $3, closing $4 );
       }
       ## If we're here and $2 ne '>': undelimited interior sequence.
       ## Ignored, as this is called without proper indication of where we are.
