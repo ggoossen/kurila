@@ -178,8 +178,6 @@ Perl_newGP(pTHX_ GV *const gv)
     gp->gp_sv = newSV(0);
 #endif
 
-    gp->gp_line = 0;
-    gp->gp_file_hek = share_hek(file, len, hash);
     gp->gp_egv = gv;
     gp->gp_refcnt = 1;
 
@@ -1365,8 +1363,6 @@ Perl_gp_free(pTHX_ GV *gv)
         return;
     }
 
-    if (gp->gp_file_hek)
-	unshare_hek(gp->gp_file_hek);
     SvREFCNT_dec(gp->gp_sv);
     SvREFCNT_dec(gp->gp_av);
     /* FIXME - another reference loop GV -> symtab -> GV ?

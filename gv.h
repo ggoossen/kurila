@@ -17,8 +17,6 @@ struct gp {
     HV *	gp_hv;		/* hash value */
     AV *	gp_av;		/* array value */
     GV *	gp_egv;		/* effective gv, if *glob */
-    line_t	gp_line;	/* line first declared at (for -w) */
-    HEK *	gp_file_hek;	/* file first declared in (for -w) */
 };
 
 #define GvXPVGV(gv)	((XPVGV*)SvANY(gv))
@@ -116,11 +114,6 @@ INLINE1(AV*, GvAVn, GV *gv) {
 #define GvCV(gv)	(GvGP(gv)->gp_cv)
 #define GvCVGEN(gv)	(GvGP(gv)->gp_cvgen)
 #define GvCVu(gv)	(GvGP(gv)->gp_cvgen ? NULL : GvGP(gv)->gp_cv)
-
-#define GvLINE(gv)	(GvGP(gv)->gp_line)
-#define GvFILE_HEK(gv)	(GvGP(gv)->gp_file_hek)
-#define GvFILE(gv)	(GvFILE_HEK(gv) ? HEK_KEY(GvFILE_HEK(gv)) : NULL)
-#define GvFILEGV(gv)	(gv_fetchfile(GvFILE(gv)))
 
 #define GvEGV(gv)	(GvGP(gv)->gp_egv)
 #define GvENAME(gv)	GvNAME(GvEGV(gv) ? GvEGV(gv) : gv)
