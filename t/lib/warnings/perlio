@@ -31,7 +31,7 @@ use warnings 'layer';
 open(F, ">:-aa", "bb");
 close F;
 EXPECT
-Invalid separator character '-' in PerlIO layer specification -aa at - line 6.
+Invalid separator character '-' in PerlIO layer specification -aa at - line 6 character 1.
 ########
 
 # perlio [PerlIO_parse_layers]
@@ -41,7 +41,7 @@ use warnings 'layer';
 open(F, ">:aa(", "bb");
 close F;
 EXPECT
-Argument list not closed for PerlIO layer "aa(" at - line 6.
+Argument list not closed for PerlIO layer "aa(" at - line 6 character 1.
 ########
 
 --FILE-- PerlIO_test_dir/xyz.pm
@@ -55,5 +55,5 @@ open(F, ">:xyz", "bb");
 close F;
 END { 1 while unlink "bb" } # KEEP THIS WITH THE LAST TEST.
 EXPECT
-Unknown PerlIO layer "xyz" at - line 5.
+Unknown PerlIO layer "xyz" at - line 5 character 1.
 ########

@@ -33,12 +33,12 @@ __SWDTEST__
 		 progfile => $filename,
 		 args => \@('3'),
 		);
-    like($r, qr/^sub<Devel::switchd::import>;import<Devel::switchd>;DB<main,swdtest.tmp,-1>;sub<Foo::foo>;DB<Foo,swdtest.tmp,-1>;DB<Foo,swdtest.tmp,-1>;DB<Foo,swdtest.tmp,6>;sub<Bar::bar>;DB<Bar,swdtest.tmp,-1>;sub<Bar::bar>;DB<Bar,swdtest.tmp,-1>;sub<Bar::bar>;DB<Bar,swdtest.tmp,-1>;$/);
+    like($r, qr/^sub<Devel::switchd::import>;import<Devel::switchd>;DB<main,swdtest.tmp,9>;sub<Foo::foo>;DB<Foo,swdtest.tmp,5>;DB<Foo,,-1>;DB<Foo,swdtest.tmp,6>;sub<Bar::bar>;DB<Bar,swdtest.tmp,2>;sub<Bar::bar>;DB<Bar,swdtest.tmp,2>;sub<Bar::bar>;DB<Bar,swdtest.tmp,2>;$/);
     $r = runperl(
 		 switches => \@( '-Ilib', '-f', '-d:switchd=a,42' ),
 		 progfile => $filename,
 		 args => \@('4'),
 		);
-    like($r, qr/^sub<Devel::switchd::import>;import<Devel::switchd a 42>;DB<main,swdtest.tmp,-1>;sub<Foo::foo>;DB<Foo,swdtest.tmp,-1>;DB<Foo,swdtest.tmp,-1>;DB<Foo,swdtest.tmp,6>;sub<Bar::bar>;DB<Bar,swdtest.tmp,-1>;sub<Bar::bar>;DB<Bar,swdtest.tmp,-1>;sub<Bar::bar>;DB<Bar,swdtest.tmp,-1>;$/);
+    like($r, qr/^sub<Devel::switchd::import>;import<Devel::switchd a 42>;DB<main,swdtest.tmp,9>;sub<Foo::foo>;DB<Foo,swdtest.tmp,5>;DB<Foo,,-1>;DB<Foo,swdtest.tmp,6>;sub<Bar::bar>;DB<Bar,swdtest.tmp,2>;sub<Bar::bar>;DB<Bar,swdtest.tmp,2>;sub<Bar::bar>;DB<Bar,swdtest.tmp,2>;$/);
 }
 

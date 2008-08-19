@@ -55,7 +55,7 @@ use warnings;
 no warnings 'unopened' ;
 print $f $a;
 EXPECT
-Can't use string ("abc") as a symbol ref while "strict refs" in use at - line 4.
+Can't use string ("abc") as a symbol ref while "strict refs" in use at - line 4 character 1.
 ########
 # pp_hot.c [pp_print]
 use warnings 'io' ;
@@ -81,10 +81,10 @@ close (FH) or die $! ;
 close (FOO) or die $! ;
 unlink $file ;
 EXPECT
-Filehandle FH opened only for input at - line 12.
-Filehandle FOO opened only for input at - line 14.
-Filehandle FH opened only for input at - line 19.
-Filehandle FOO opened only for input at - line 20.
+Filehandle FH opened only for input at - line 12 character 1.
+Filehandle FOO opened only for input at - line 14 character 1.
+Filehandle FH opened only for input at - line 19 character 1.
+Filehandle FOO opened only for input at - line 20 character 1.
 ########
 # pp_hot.c [pp_print]
 use warnings 'closed' ;
@@ -101,10 +101,10 @@ use warnings;
 no warnings 'closed' ;
 print STDIN "anc";
 EXPECT
-print() on closed filehandle STDIN at - line 4.
-print() on closed filehandle STDIN at - line 6.
+print() on closed filehandle STDIN at - line 4 character 1.
+print() on closed filehandle STDIN at - line 6 character 1.
 	(Are you trying to call print() on dirhandle STDIN?)
- at - line 6.
+ at - line 6 character 1.
 ########
 # pp_hot.c [pp_print]
 # [ID 20020425.012] from Dave Steiner <steiner@bakerst.rutgers.edu>
@@ -114,7 +114,7 @@ my $fh = *STDOUT{IO};
 close STDOUT or die "Can't close STDOUT";
 print $fh "Shouldn't print anything, but shouldn't SEGV either\n";
 EXPECT
-print() on closed filehandle at - line 7.
+print() on closed filehandle at - line 7 character 1.
 ########
 # pp_hot.c [pp_print]
 package foo;
@@ -128,10 +128,10 @@ print $bar::fh3 42;
 open bar::FH4, "<", "nonexistent";
 print bar::FH4 42;
 EXPECT
-print() on closed filehandle $fh1 at - line 5.
-print() on closed filehandle $fh2 at - line 7.
-print() on closed filehandle $fh3 at - line 9.
-print() on closed filehandle FH4 at - line 11.
+print() on closed filehandle $fh1 at - line 5 character 1.
+print() on closed filehandle $fh2 at - line 7 character 1.
+print() on closed filehandle $fh3 at - line 9 character 1.
+print() on closed filehandle FH4 at - line 11 character 1.
 ########
 # pp_hot.c [Perl_do_readline]
 use warnings 'closed' ;
@@ -142,10 +142,10 @@ no warnings 'closed' ;
 opendir STDIN, "." ; $a = ~< *STDIN ;
 $a = ~< *STDIN ;
 EXPECT
-readline() on closed filehandle STDIN at - line 3.
-readline() on closed filehandle STDIN at - line 4.
+readline() on closed filehandle STDIN at - line 3 character 26.
+readline() on closed filehandle STDIN at - line 4 character 26.
 	(Are you trying to call readline() on dirhandle STDIN?)
- at - line 4.
+ at - line 4 character 26.
 ########
 # pp_hot.c [Perl_do_readline]
 use warnings 'io' ;
@@ -166,10 +166,10 @@ close (FH) or die $! ;
 close (FOO) or die $! ;
 unlink $file ;
 EXPECT
-Filehandle FH opened only for output at - line 5.
-Filehandle FOO opened only for output at - line 10.
-Filehandle FOO opened only for output at - line 14.
-Filehandle FH opened only for output at - line 15.
+Filehandle FH opened only for output at - line 5 character 8.
+Filehandle FOO opened only for output at - line 10 character 5.
+Filehandle FOO opened only for output at - line 14 character 5.
+Filehandle FH opened only for output at - line 15 character 5.
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 use warnings 'recursion' ;
@@ -216,107 +216,107 @@ $b = sub
 
 &$b ;
 EXPECT
-Deep recursion on anonymous subroutine at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 5.
-    main::__ANON__ called at - line 8.
+Deep recursion on anonymous subroutine at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 5 character 1.
+    main::__ANON__ called at - line 8 character 1.
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
@@ -338,9 +338,9 @@ a($x . $y);	# should warn twice
 $x .= $y;	# should warn once
 $y .= $y;	# should warn once
 EXPECT
-Use of uninitialized value $x in concatenation (.) or string at - line 5.
-Use of uninitialized value $x in concatenation (.) or string at - line 6.
-Use of uninitialized value $y in concatenation (.) or string at - line 6.
-Use of uninitialized value $y in concatenation (.) or string at - line 7.
-Use of uninitialized value $y in concatenation (.) or string at - line 8.
+Use of uninitialized value $x in concatenation (.) or string at - line 5 character 6.
+Use of uninitialized value $x in concatenation (.) or string at - line 6 character 6.
+Use of uninitialized value $y in concatenation (.) or string at - line 6 character 6.
+Use of uninitialized value $y in concatenation (.) or string at - line 7 character 4.
+Use of uninitialized value $y in concatenation (.) or string at - line 8 character 4.
 ########
