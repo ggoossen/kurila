@@ -1469,12 +1469,6 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
     CvCLONED_on(cv);
 
-#ifdef USE_ITHREADS
-    CvFILE(cv)		= CvISXSUB(proto) ? CvFILE(proto)
-					  : savepv(CvFILE(proto));
-#else
-    CvFILE(cv)		= CvFILE(proto);
-#endif
     CvGV(cv)		= CvGV(proto);
     OP_REFCNT_LOCK;
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));

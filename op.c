@@ -4412,14 +4412,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 	    PTR2UV(cv), PTR2UV(PL_comppad))
     );
 
-#ifdef USE_ITHREADS
-    if (CvFILE(cv) && !CvISXSUB(cv)) {
-	/* for XSUBs CvFILE point directly to static memory; __FILE__ */
-	Safefree(CvFILE(cv));
-    }
-    CvFILE(cv) = NULL;
-#endif
-
     if (!CvISXSUB(cv) && CvROOT(cv)) {
 	if (SvTYPE(cv) == SVt_PVCV && CvDEPTH(cv))
 	    Perl_croak(aTHX_ "Can't undef active subroutine");
@@ -5133,7 +5125,6 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
 	} else {
 	    SvPOK_off(cv);
 	}
-	CvFILE(cv) = proto_and_file + proto_len;
     } else {
 	sv_setpv((SV *)cv, proto);
     }
@@ -5203,9 +5194,6 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 	}
     }
     CvGV(cv) = gv;
-    (void)gv_fetchfile(filename);
-    CvFILE(cv) = (char *)filename; /* NOTE: not copied, as it is expected to be
-				   an external constant string */
     CvISXSUB_on(cv);
     CvXSUB(cv) = subaddr;
 
