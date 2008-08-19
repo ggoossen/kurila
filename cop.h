@@ -141,10 +141,8 @@ struct cop {
     char *	cop_label;	/* label for this construct */
 #ifdef USE_ITHREADS
     char *	cop_stashpv;	/* package line was compiled in */
-    char *	cop_file;	/* file name the following line # is from */
 #else
     HV *	cop_stash;	/* package line was compiled in */
-    GV *	cop_filegv;	/* file the following line # is from */
 #endif
     U32		cop_hints;	/* hints bits from pragmata */
     U32		cop_seq;	/* parse sequence number */
@@ -156,28 +154,7 @@ struct cop {
 };
 
 #ifdef USE_ITHREADS
-#  define CopFILE(c)		((c)->cop_file)
-#  define CopFILEGV(c)		(CopFILE(c) \
-				 ? gv_fetchfile(CopFILE(c)) : NULL)
 				 
-#  ifdef NETWARE
-#    define CopFILE_set(c,pv)	((c)->cop_file = savepv(pv))
-#    define CopFILE_setn(c,pv,l)  ((c)->cop_file = savepv((pv),(l)))
-#  else
-#    define CopFILE_set(c,pv)	((c)->cop_file = savesharedpv(pv))
-#    define CopFILE_setn(c,pv,l)  ((c)->cop_file = savesharedpvn((pv),(l)))
-#  endif
-
-#  define CopFILESV(c)		(CopFILE(c) \
-				 ? GvSV(gv_fetchfile(CopFILE(c))) : NULL)
-#  define CopFILEAV(c)		(CopFILE(c) \
-				 ? GvAV(gv_fetchfile(CopFILE(c))) : NULL)
-#  ifdef DEBUGGING
-#    define CopFILEAVx(c)	(assert(CopFILE(c)), \
-				   GvAV(gv_fetchfile(CopFILE(c))))
-#  else
-#    define CopFILEAVx(c)	(GvAV(gv_fetchfile(CopFILE(c))))
-#  endif
 #  define CopSTASHPV(c)		((c)->cop_stashpv)
 
 #  ifdef NETWARE
@@ -203,19 +180,6 @@ struct cop {
 #    define CopLABEL_alloc(pv)	((pv)?savesharedpv(pv):NULL)
 #  endif
 #else
-#  define CopFILEGV(c)		((c)->cop_filegv)
-#  define CopFILEGV_set(c,gv)	((c)->cop_filegv = (GV*)SvREFCNT_inc(gv))
-#  define CopFILE_set(c,pv)	CopFILEGV_set((c), gv_fetchfile(pv))
-#  define CopFILE_setn(c,pv,l)	CopFILEGV_set((c), gv_fetchfile_flags((pv),(l),0))
-#  define CopFILESV(c)		(CopFILEGV(c) ? GvSV(CopFILEGV(c)) : NULL)
-#  define CopFILEAV(c)		(CopFILEGV(c) ? GvAV(CopFILEGV(c)) : NULL)
-#  ifdef DEBUGGING
-#    define CopFILEAVx(c)	(assert(CopFILEGV(c)), GvAV(CopFILEGV(c)))
-#  else
-#    define CopFILEAVx(c)	(GvAV(CopFILEGV(c)))
-# endif
-#  define CopFILE(c)		(CopFILEGV(c) && GvSV(CopFILEGV(c)) \
-				    ? SvPVX_const(GvSV(CopFILEGV(c))) : NULL)
 #  define CopSTASH(c)		((c)->cop_stash)
 #  define CopLABEL(c)		((c)->cop_label)
 #  define CopSTASH_set(c,hv)	((c)->cop_stash = (hv))
@@ -232,13 +196,6 @@ struct cop {
 #endif /* USE_ITHREADS */
 
 #define CopSTASH_ne(c,hv)	(!CopSTASH_eq(c,hv))
-
-/* OutCopFILE() is CopFILE for output (caller, die, warn, etc.) */
-#ifdef MACOS_TRADITIONAL
-#  define OutCopFILE(c) MacPerl_MPWFileName(CopFILE(c))
-#else
-#  define OutCopFILE(c) CopFILE(c)
-#endif
 
 /* FIXME NATIVE_HINTS if this is changed from op_private (see perl.h)  */
 #define CopHINTS_get(c)		((c)->cop_hints + 0)

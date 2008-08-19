@@ -707,6 +707,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->last_lop = parser->last_uni = NULL;
     parser->lex_charoffset = 0;
     parser->lex_line_number = 0;
+    parser->lex_filename = NULL;
 }
 
 
@@ -719,6 +720,7 @@ Perl_parser_free(pTHX_  const yy_parser *parser)
 
     PL_curcop = parser->saved_curcop;
     SvREFCNT_dec(parser->linestr);
+    SvREFCNT_dec(parser->lex_filename);
 
     if (parser->rsfp == PerlIO_stdin())
 	PerlIO_clearerr(parser->rsfp);
@@ -809,72 +811,7 @@ S_incline(pTHX_ const char *s)
 
     if (t - s > 0) {
 	const STRLEN len = t - s;
-#ifndef USE_ITHREADS
-	SV *const temp_sv = CopFILESV(PL_curcop);
-	const char *cf;
-	STRLEN tmplen;
-
-	if (temp_sv) {
-	    cf = SvPVX(temp_sv);
-	    tmplen = SvCUR(temp_sv);
-	} else {
-	    cf = NULL;
-	    tmplen = 0;
-	}
-
-	if (tmplen > 7 && strnEQ(cf, "(eval ", 6)) {
-	    /* must copy *{"::_<(eval N)[oldfilename:L]"}
-	     * to *{"::_<newfilename"} */
-	    /* However, the long form of evals is only turned on by the
-	       debugger - usually they're "(eval %lu)" */
-	    char smallbuf[128];
-	    char *tmpbuf;
-	    GV **gvp;
-	    STRLEN tmplen2 = len;
-	    if (tmplen + 2 <= sizeof smallbuf)
-		tmpbuf = smallbuf;
-	    else
-		Newx(tmpbuf, tmplen + 2, char);
-	    tmpbuf[0] = '_';
-	    tmpbuf[1] = '<';
-	    memcpy(tmpbuf + 2, cf, tmplen);
-	    tmplen += 2;
-	    gvp = (GV**)hv_fetch(PL_defstash, tmpbuf, tmplen, FALSE);
-	    if (gvp) {
-		char *tmpbuf2;
-		GV *gv2;
-
-		if (tmplen2 + 2 <= sizeof smallbuf)
-		    tmpbuf2 = smallbuf;
-		else
-		    Newx(tmpbuf2, tmplen2 + 2, char);
-
-		if (tmpbuf2 != smallbuf || tmpbuf != smallbuf) {
-		    /* Either they malloc'd it, or we malloc'd it,
-		       so no prefix is present in ours.  */
-		    tmpbuf2[0] = '_';
-		    tmpbuf2[1] = '<';
-		}
-
-		memcpy(tmpbuf2 + 2, s, tmplen2);
-		tmplen2 += 2;
-
-		gv2 = *(GV**)hv_fetch(PL_defstash, tmpbuf2, tmplen2, TRUE);
-		if (!isGV(gv2)) {
-		    gv_init(gv2, PL_defstash, tmpbuf2, tmplen2, FALSE);
-		    /* adjust ${"::_<newfilename"} to store the new file name */
-		    GvSV(gv2) = newSVpvn(tmpbuf2 + 2, tmplen2 - 2);
-		    GvHV(gv2) = (HV*)SvREFCNT_inc(GvHV(*gvp));
-		    GvAV(gv2) = (AV*)SvREFCNT_inc(GvAV(*gvp));
-		}
-
-		if (tmpbuf2 != smallbuf) Safefree(tmpbuf2);
-	    }
-	    if (tmpbuf != smallbuf) Safefree(tmpbuf);
-	}
-#endif
-	CopFILE_free(PL_curcop);
-	CopFILE_setn(PL_curcop, s, len);
+	SVcpSTEAL(PL_parser->lex_filename, newSVpvn(s, len));
     }
     PL_parser->lex_line_number = atoi(n)-1;
 }
@@ -964,17 +901,17 @@ S_skipspace2(pTHX_ register char *s, SV **svp)
 STATIC void
 S_update_debugger_info(pTHX_ SV *orig_sv, const char *const buf, STRLEN len)
 {
-    AV *av = CopFILEAVx(PL_curcop);
-    if (av) {
-	SV * const sv = newSV_type(SVt_PVMG);
-	if (orig_sv)
-	    sv_setsv(sv, orig_sv);
-	else
-	    sv_setpvn(sv, buf, len);
-	(void)SvIOK_on(sv);
-	SvIV_set(sv, 0);
-	av_store(av, 33, sv);
-    }
+/*     AV *av = CopFILEAVx(PL_curcop); */
+/*     if (av) { */
+/* 	SV * const sv = newSV_type(SVt_PVMG); */
+/* 	if (orig_sv) */
+/* 	    sv_setsv(sv, orig_sv); */
+/* 	else */
+/* 	    sv_setpvn(sv, buf, len); */
+/* 	(void)SvIOK_on(sv); */
+/* 	SvIV_set(sv, 0); */
+/* 	av_store(av, 33, sv); */
+/*     } */
 }
 
 /*
@@ -1347,7 +1284,7 @@ STATIC SV*
 S_curlocation(pTHX)
 {
     AV* res = av_2mortal(newAV());
-    av_push(res, newSVsv(CopFILESV(PL_curcop)));
+    av_push(res, newSVsv(PL_parser->lex_filename));
     av_push(res, newSViv(PL_parser->lex_line_number));
     av_push(res, newSViv((PL_bufptr - PL_linestart + PL_parser->lex_charoffset) + 1));
     return (SV*)res;
@@ -4764,7 +4701,7 @@ Perl_yylex(pTHX)
 
 	case KEY___FILE__:
 	    pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0,
-					newSVpv(CopFILE(PL_curcop),0), S_curlocation());
+					newSVsv(PL_parser->lex_filename), S_curlocation());
 	    TERM(THING);
 
 	case KEY___LINE__:
@@ -10742,7 +10679,7 @@ Perl_yyerror(pTHX_ const char *const s)
     }
     msg = sv_2mortal(newSVpv(s, 0));
     Perl_sv_catpvf(aTHX_ msg, " at %s line %"IVdf", ",
-        OutCopFILE(PL_curcop), PL_parser->lex_line_number);
+        SvPV_nolen_const(PL_parser->lex_filename), PL_parser->lex_line_number);
     if (context)
 	Perl_sv_catpvf(aTHX_ msg, "near \"%.*s\"\n", contlen, context);
     else
@@ -10762,10 +10699,10 @@ Perl_yyerror(pTHX_ const char *const s)
     if (PL_error_count >= 10) {
 	if (PL_in_eval && SvCUR(ERRSV))
 	    Perl_croak(aTHX_ "%"SVf"%s has too many errors.\n",
-		       SVfARG(ERRSV), OutCopFILE(PL_curcop));
+		SVfARG(ERRSV), SvPV_nolen_const(PL_parser->lex_filename));
 	else
 	    Perl_croak(aTHX_ "%s has too many errors.\n",
-            OutCopFILE(PL_curcop));
+		SvPV_nolen_const(PL_parser->lex_filename));
     }
     PL_in_my = 0;
     return 0;

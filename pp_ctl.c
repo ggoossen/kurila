@@ -969,12 +969,16 @@ PP(pp_caller)
 	PUSHs(&PL_sv_undef);
     else
 	mPUSHs(newSVpv(stashname, 0));
-    mPUSHs(newSVpv(OutCopFILE(cx->blk_oldcop), 0));
     {
 	SV**linenr = NULL;
 	SV* location = cx->blk_oldop->op_location;
+	SV* filename = loc_filename(cx->blk_oldop->op_location);
 	if (location)
 	    linenr = av_fetch((AV*)location, 1, FALSE);
+	if (filename)
+	    PUSHs(filename);
+	else 
+	    PUSHs(&PL_sv_undef);
 	if (linenr && *linenr) {
 	    mPUSHi(SvIV(*linenr));
 	}
@@ -2107,19 +2111,9 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     if (IN_PERL_COMPILETIME) {
 	CopSTASH_set(&PL_compiling, PL_curstash);
     }
-    if (PERLDB_NAMEEVAL) {
-	SV * const sv = sv_newmortal();
-	Perl_sv_setpvf(aTHX_ sv, "_<(%.10seval %lu)[%s:%"IVdf"]",
-	    code, (unsigned long)++PL_evalseq,
-	    CopFILE(PL_curcop), (IV)666);
-	tmpbuf = SvPVX(sv);
-	len = SvCUR(sv);
-    }
-    else
-	len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(%.10s_eval %lu)", code,
-			  (unsigned long)++PL_evalseq);
-    SAVECOPFILE_FREE(&PL_compiling);
-    CopFILE_set(&PL_compiling, tmpbuf+2);
+    len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(%.10s_eval %lu)", code,
+	(unsigned long)++PL_evalseq);
+    SVcpSTEAL(PL_parser->lex_filename, newSVpvn(tmpbuf+2, len-2));
     /* XXX For C<eval "...">s within BEGIN {} blocks, this ends up
        deleting the eval's FILEGV from the stash before gv_check() runs
        (i.e. before run-time proper). To work around the coredump that
@@ -2224,7 +2218,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     if (PL_parser->error_count) {
 	/* were are inside an eval which already has compile errors */
 	Perl_croak(aTHX_ "%"SVf"%s compilation aborted.\n",
-		   SVfARG(ERRSV), OutCopFILE(PL_curcop));
+	    SVfARG(ERRSV), SvPV_nolen_const(PL_parser->lex_filename));
     }
 
     PL_in_eval = ((saveop && saveop->op_type == OP_REQUIRE)
@@ -2356,7 +2350,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	if (cv) {
 	    dSP;
 	    PUSHMARK(SP);
-	    XPUSHs((SV*)CopFILEGV(&PL_compiling));
+	    XPUSHs(loc_filename(PL_compiling.op_location));
 	    PUTBACK;
 	    call_sv((SV*)cv, G_DISCARD);
 	}
@@ -2447,6 +2441,7 @@ PP(pp_require)
     SV *filter_sub = NULL;
     SV *hook_sv = NULL;
     OP *op;
+    SV *filename;
 
     sv = POPs;
     name = SvPV_const(sv, len);
@@ -2691,8 +2686,7 @@ PP(pp_require)
 	    }
 	}
     }
-    SAVECOPFILE_FREE(&PL_compiling);
-    CopFILE_set(&PL_compiling, tryrsfp ? tryname : name);
+    filename = sv_2mortal(newSVpv( tryrsfp ? tryname : name, 0));
     SvREFCNT_dec(namesv);
     if (!tryrsfp) {
 	if (PL_op->op_type == OP_REQUIRE) {
@@ -2730,7 +2724,7 @@ PP(pp_require)
     /* Check whether a hook in @INC has already filled %INC */
     if (!hook_sv) {
 	(void)hv_store(GvHVn(PL_incgv),
-		       unixname, unixlen, newSVpv(CopFILE(&PL_compiling),0),0);
+	    unixname, unixlen, newSVsv(filename),0);
     } else {
 	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
 	if (!svp)
@@ -2741,6 +2735,7 @@ PP(pp_require)
     ENTER;
     SAVETMPS;
     lex_start(NULL, tryrsfp, TRUE);
+    SVcpREPLACE(PL_parser->lex_filename, filename);
 
     SAVEHINTS();
     PL_hints = DEFAULT_HINTS;
@@ -2824,18 +2819,8 @@ PP(pp_entereval)
 
     /* switch to eval mode */
 
-    if (PERLDB_NAMEEVAL) {
-	SV * const temp_sv = sv_newmortal();
-	Perl_sv_setpvf(aTHX_ temp_sv, "_<(eval %lu)[%s:%"IVdf"]",
-		       (unsigned long)++PL_evalseq,
-		       CopFILE(PL_curcop), (IV)333);
-	tmpbuf = SvPVX(temp_sv);
-	len = SvCUR(temp_sv);
-    }
-    else
-	len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(eval %lu)", (unsigned long)++PL_evalseq);
-    SAVECOPFILE_FREE(&PL_compiling);
-    CopFILE_set(&PL_compiling, tmpbuf+2);
+    len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(eval %lu)", (unsigned long)++PL_evalseq);
+    SVcpSTEAL(PL_parser->lex_filename, newSVpvn(tmpbuf+2, len-2));
     /* XXX For C<eval "...">s within BEGIN {} blocks, this ends up
        deleting the eval's FILEGV from the stash before gv_check() runs
        (i.e. before run-time proper). To work around the coredump that
@@ -2877,8 +2862,6 @@ PP(pp_entereval)
 
     /* prepare to compile string */
 
-    if (PERLDB_LINE && PL_curstash != PL_debstash)
-	save_lines(CopFILEAV(&PL_compiling), PL_parser->linestr);
     PUTBACK;
     ok = doeval(gimme, NULL, runcv, seq);
     if (PERLDB_INTER && was != (I32)PL_sub_generation /* Some subs defined here. */
