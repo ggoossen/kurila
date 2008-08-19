@@ -151,7 +151,7 @@ sub concise_stashref {
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
-	warn "err {$@->message} on $codeobj" if $@;
+	warn "err {$@->message} on {dump::view($codeobj)}" if $@;
     }
 }
 
@@ -806,7 +806,7 @@ sub concise_op {
 	my $label = $op->label;
 	%h{coplabel} = $label;
 	$label = $label ? "$label: " : "";
-	my $loc = $op->file;
+	my $loc = $op->location ? $op->location[0] : '<unknown>';
 	my $pathnm = $loc;
 	$loc =~ s[.*/][];
 	my $ln = $op->location ? $op->location[1] : '-1';

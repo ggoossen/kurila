@@ -843,18 +843,6 @@ U32
 GvCVGEN(gv)
 	B::GV	gv
 
-U32
-GvLINE(gv)
-	B::GV	gv
-
-char *
-GvFILE(gv)
-	B::GV	gv
-
-B::GV
-GvFILEGV(gv)
-	B::GV	gv
-
 MODULE = B	PACKAGE = B::GV
 
 U32
@@ -945,10 +933,6 @@ CvCONST(cv)
 
 B::GV
 CvGV(cv)
-	B::CV	cv
-
-char *
-CvFILE(cv)
 	B::CV	cv
 
 long

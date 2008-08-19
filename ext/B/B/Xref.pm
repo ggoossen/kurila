@@ -224,8 +224,8 @@ sub xref_main {
 
 sub pp_nextstate {
     my $op = shift;
-    $file = $op->file;
     if ($op->location) {
+        $line = $op->location[0];
         $line = $op->location[1];
     }
     $top = UNKNOWN;
@@ -322,8 +322,6 @@ sub B::GV::xref {
     my $cv = $gv->CV;
     if ($$cv) {
 	#return if $done{$$cv}++;
-	$file = $gv->FILE;
-	$line = $gv->LINE;
 	process(\@($gv->STASH->NAME, "&", $gv->NAME), "subdef");
 	push(@todo, $cv);
     }
