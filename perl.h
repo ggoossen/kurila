@@ -5233,7 +5233,7 @@ typedef struct am_table_short AMTS;
 #define PERLDB_ALL		(PERLDBf_SUB	| PERLDBf_LINE	|	\
 				 PERLDBf_NOOPT	| PERLDBf_INTER	|	\
 				 PERLDBf_SUBLINE| PERLDBf_SINGLE|	\
-				 PERLDBf_NAMEEVAL| PERLDBf_NAMEANON )
+				 PERLDBf_NAMEANON )
 					/* No _NONAME, _GOTO, _ASSERTION */
 #define PERLDBf_SUB		0x01	/* Debug sub enter/exit */
 #define PERLDBf_LINE		0x02	/* Keep line # */
@@ -5244,7 +5244,6 @@ typedef struct am_table_short AMTS;
 #define PERLDBf_SINGLE		0x20	/* Start with single-step on */
 #define PERLDBf_NONAME		0x40	/* For _SUB: no name of the subr */
 #define PERLDBf_GOTO		0x80	/* Report goto: call DB::goto */
-#define PERLDBf_NAMEEVAL	0x100	/* Informative names for evals */
 #define PERLDBf_NAMEANON	0x200	/* Informative names for anon subs */
 
 #define PERLDB_SUB	(PL_perldb && (PL_perldb & PERLDBf_SUB))
@@ -5255,7 +5254,6 @@ typedef struct am_table_short AMTS;
 #define PERLDB_SINGLE	(PL_perldb && (PL_perldb & PERLDBf_SINGLE))
 #define PERLDB_SUB_NN	(PL_perldb && (PL_perldb & (PERLDBf_NONAME)))
 #define PERLDB_GOTO	(PL_perldb && (PL_perldb & PERLDBf_GOTO))
-#define PERLDB_NAMEEVAL	(PL_perldb && (PL_perldb & PERLDBf_NAMEEVAL))
 #define PERLDB_NAMEANON	(PL_perldb && (PL_perldb & PERLDBf_NAMEANON))
 #define PERLDB_ASSERTION (PL_perldb && (PL_perldb & PERLDBf_ASSERTION))
 

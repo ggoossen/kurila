@@ -604,7 +604,6 @@ perl_destruct(pTHXx)
 	PerlIO_cleanup(aTHX);
 #endif
 
-	CopFILE_free(&PL_compiling);
 	CopSTASH_free(&PL_compiling);
 
 	/* The exit() function will do everything that needs doing. */
@@ -807,7 +806,6 @@ perl_destruct(pTHXx)
     PL_compiling.cop_warnings = NULL;
     SvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = NULL;
-    CopFILE_free(&PL_compiling);
     CopSTASH_free(&PL_compiling);
 
     /* Prepare to destruct main symbol table.  */
@@ -1894,6 +1892,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #endif
 
     lex_start(linestr_sv, rsfp, TRUE);
+    SVcpSTEAL(PL_parser->lex_filename, newSVpv(PL_origfilename, 0));
     PL_subname = newSVpvs("main");
 
     if (add_read_e_script)
@@ -1931,7 +1930,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	my_unexec();
 
     if (isWARN_ONCE) {
-	SAVECOPFILE(PL_curcop);
 	gv_check(PL_defstash);
     }
 
@@ -3270,8 +3268,6 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch,
 	}
     }
 
-    CopFILE_free(PL_curcop);
-    CopFILE_set(PL_curcop, PL_origfilename);
     if (*PL_origfilename == '-' && PL_origfilename[1] == '\0')
 	scriptname = (char *)"";
     if (fdscript >= 0) {
@@ -3358,7 +3354,7 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch,
 	    Perl_croak(aTHX_ "Can't open "BIT_BUCKET": %s\n", Strerror(errno));
 	else
 	    Perl_croak(aTHX_ "Can't open perl script \"%s\": %s\n",
-		    CopFILE(PL_curcop), Strerror(errno));
+		    PL_origfilename, Strerror(errno));
     }
     return fdscript;
 }

@@ -1319,7 +1319,7 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
     }
     else if (PL_compcv) {
 	location = SVav(av_2mortal(newAV()));
-	av_push((AV*)location, newSVsv(CopFILESV(PL_curcop)));
+	av_push((AV*)location, newSVsv(PL_parser->lex_filename));
 	av_push((AV*)location, newSViv(PL_parser->lex_line_number));
 	av_push((AV*)location, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
@@ -1405,7 +1405,7 @@ Perl_croak_at(pTHX_ SV* location, const char *pat, ...)
     SV* msv;
     va_list args;
     va_start(args, pat);
-    msv = vdie_croak_common(location, pat, args);
+    msv = vdie_croak_common(location, pat, &args);
     die_where(msv);
     /* NOTREACHED */
     va_end(args);
@@ -1523,7 +1523,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
     }
     else if (PL_compcv) {
 	AV* res = av_2mortal(newAV());
-	av_push(res, newSVsv(CopFILESV(PL_curcop)));
+	av_push(res, newSVsv(PL_parser->lex_filename));
 	av_push(res, newSViv(PL_parser->lex_line_number));
 	av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));

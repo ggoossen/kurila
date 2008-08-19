@@ -113,6 +113,7 @@ typedef struct hek HEK;
     ptrtype	sv_any;		/* pointer to body */	\
     U32		sv_refcnt;	/* how many references to us */	\
     U32		sv_flags;	/* what we are */  \
+    SV*         sv_location;    /* location where the scalar was declared */ \
     U32		sv_tmprefcnt	/* temporary how many references to us */
 
 #define _SV_HEAD_UNION \
@@ -227,6 +228,7 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SvANY(sv)	(sv)->sv_any
 #define SvFLAGS(sv)	(sv)->sv_flags
 #define SvREFCNT(sv)	(sv)->sv_refcnt
+#define SvLOCATION(sv)	(sv)->sv_location
 #define SvTMPREFCNT(sv)	(sv)->sv_tmprefcnt
 
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)

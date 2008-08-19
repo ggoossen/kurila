@@ -727,7 +727,6 @@ S_cop_free(pTHX_ COP* cop)
     PERL_ARGS_ASSERT_COP_FREE;
 
     CopLABEL_free(cop);
-    CopFILE_free(cop);
     CopSTASH_free(cop);
     if (! specialWARN(cop->cop_warnings))
 	PerlMemShared_free(cop->cop_warnings);
@@ -2132,7 +2131,7 @@ Perl_newPROG(pTHX_ OP *o)
 	    if (cv) {
 		dSP;
 		PUSHMARK(SP);
-		XPUSHs((SV*)CopFILEGV(&PL_compiling));
+		XPUSHs(PL_parser->lex_filename);
 		PUTBACK;
 		call_sv((SV*)cv, G_DISCARD);
 	    }
@@ -3437,6 +3436,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     ENTER;
     SAVEVPTR(PL_curcop);
     lex_start(NULL, NULL, FALSE);
+    SVcpREPLACE(PL_parser->lex_filename, newSVpv("fake begin block", 0));
     utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
 	    veop, modname, imop);
     LEAVE;
@@ -3767,11 +3767,6 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o, SV *location)
 	HINTS_REFCNT_UNLOCK;
     }
 
-#ifdef USE_ITHREADS
-    CopFILE_set(cop, CopFILE(PL_curcop));	/* XXX share in a pvtable? */
-#else
-    CopFILEGV_set(cop, CopFILEGV(PL_curcop));
-#endif
     CopSTASH_set(cop, PL_curstash);
 
     return prepend_elem(OP_LINESEQ, (OP*)cop, o);
@@ -4685,7 +4680,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	SV * const sv = sv_newmortal();
 	Perl_sv_setpvf(aTHX_ sv, "%s[%s:%"IVdf"]",
 		       PL_curstash ? "__ANON__" : "__ANON__::__ANON__",
-		       CopFILE(PL_curcop), (IV)33);
+		       "myfilename", (IV)33);
 	aname = SvPVX_const(sv);
     }
     else
@@ -4892,7 +4887,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	}
     }
     CvGV(cv) = gv;
-    CvFILE_set_from_cop(cv, PL_curcop);
+    SVcpSTEAL(SvLOCATION(cv), newSVsv(PL_curcop->op_location));
 
     if (ps)
 	sv_setpvn((SV*)cv, ps, ps_len);
@@ -4958,7 +4953,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    HV *hv;
 
 	    Perl_sv_setpvf(aTHX_ sv, "%s:%ld-%ld",
-			   CopFILE(PL_curcop),
+		"myfilename",
 		(long)PL_subline, (long)333);
 	    gv_efullname3(tmpstr, gv, NULL);
 	    (void)hv_store(GvHV(PL_DBsub), SvPVX_const(tmpstr),
@@ -5066,14 +5061,9 @@ Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
 {
     dVAR;
     CV* cv;
-#ifdef USE_ITHREADS
-    const char *const temp_p = CopFILE(PL_curcop);
-    const STRLEN len = temp_p ? strlen(temp_p) : 0;
-#else
-    SV *const temp_sv = CopFILESV(PL_curcop);
+    SV *const temp_sv = loc_filename(PL_curcop->op_location);
     STRLEN len;
     const char *const temp_p = temp_sv ? SvPV_const(temp_sv, len) : NULL;
-#endif
     char *const file = savepvn(temp_p, temp_p ? len : 0);
 
     ENTER;
@@ -5766,16 +5756,16 @@ Perl_ck_ftst(pTHX_ OP *o)
 	    o->op_private |= OPpFT_STACKED;
     }
     else {
-#ifdef PERL_MAD
 	OP* const oldo = o;
-#else
-	op_free(o);
-#endif
 	if (type == OP_FTTTY)
-	    o = newGVOP(type, OPf_REF, PL_stdingv, o->op_location);
+	    o = newGVOP(type, OPf_REF, PL_stdingv, oldo->op_location);
 	else
-	    o = newUNOP(type, 0, newDEFSVOP(), o->op_location);
+	    o = newUNOP(type, 0, newDEFSVOP(), oldo->op_location);
+#ifdef PERL_MAD
 	op_getmad(oldo,o,'O');
+#else
+	op_free(oldo);
+#endif
     }
     return o;
 }

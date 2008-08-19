@@ -156,12 +156,7 @@ Perl_newGP(pTHX_ GV *const gv)
 {
     GP *gp;
     U32 hash;
-#ifdef USE_ITHREADS
-    const char *const file
-	= (PL_curcop && CopFILE(PL_curcop)) ? CopFILE(PL_curcop) : "";
-    const STRLEN len = strlen(file);
-#else
-    SV *const temp_sv = CopFILESV(PL_curcop);
+    SV *const temp_sv = loc_filename(PL_curcop->op_location);
     const char *file;
     STRLEN len;
 
@@ -174,7 +169,6 @@ Perl_newGP(pTHX_ GV *const gv)
 	file = "";
 	len = 0;
     }
-#endif
 
     PERL_HASH(hash, file, len);
 
@@ -268,7 +262,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
         mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar($) { (shift) } sub ASDF::baz($); *ASDF::baz = \&Foo::bar */
 	assert(SvTYPE(GvCV(gv)) == SVt_PVCV);
 	CvGV(GvCV(gv)) = gv;
-	CvFILE_set_from_cop(GvCV(gv), PL_curcop);
+	SVcpREPLACE(SvLOCATION(GvCV(gv)), PL_curcop->op_location);
 	if (proto) {
 	    sv_usepvn_flags((SV*)GvCV(gv), proto, protolen,
 			    SV_HAS_TRAILING_NUL);
@@ -1305,17 +1299,9 @@ Perl_gv_check(pTHX_ const HV *stash)
 		     gv_check(hv);              /* nested package */
 	    }
 	    else if (isALPHA(*HeKEY(entry))) {
-                const char *file;
 		gv = (GV*)HeVAL(entry);
 		if (SvTYPE(gv) != SVt_PVGV || GvMULTI(gv))
 		    continue;
-		file = GvFILE(gv);
-#ifdef USE_ITHREADS
-		CopFILE(PL_curcop) = (char *)file;	/* set for warning */
-#else
-		CopFILEGV(PL_curcop)
-		    = gv_fetchfile_flags(file, HEK_LEN(GvFILE_HEK(gv)), 0);
-#endif
 		Perl_warner(aTHX_ packWARN(WARN_ONCE),
 			"Name \"%s::%s\" used only once: possible typo",
 			HvNAME_get(stash), GvNAME(gv));

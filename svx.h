@@ -127,3 +127,16 @@ XVcpREPLACE(AV)
 #define AVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(AV, sv_d, sv_s)
 XVcpREPLACE(CV)
 #define CVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(CV, sv_d, sv_s)
+
+
+/* Location retrieval */
+#define loc_filename(sv) inline_loc_filename(aTHX_ sv)
+static __inline__ SV* inline_loc_filename(pTHX_ SV *sv) {
+    SV** fn;
+    if ( ! sv || ! SvAVOK(sv) )
+        return NULL;
+    fn = av_fetch((AV*)sv, 0, 0);
+    if ( ! fn )
+        return NULL;
+    return *fn;
+}

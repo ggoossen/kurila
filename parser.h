@@ -74,6 +74,7 @@ typedef struct yy_parser {
     yy_str_info lex_repl; 	/* runtime pattern from m// or s/// */
 
     I32         lex_charoffset;  /* character offset for subpaterns. */
+    SV*         lex_filename;    /* filename being currently compiled */
     I32         lex_line_number; /* line number of the "current" token */
     I32		multi_start;	/* 1st line of multi-line string */
     I32		multi_end;	/* last line of multi-line string */

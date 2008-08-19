@@ -505,7 +505,7 @@ PerlIO_debug(const char *fmt, ...)
 	const STRLEN len2 = my_vsnprintf(buffer + len1, sizeof(buffer) - len1, fmt, ap);
 	PerlLIO_write(PL_perlio_debug_fd, buffer, len1 + len2);
 #else
-	const char *s = CopFILE(PL_curcop);
+	const char *s = SvPV_nolen_const(loc_filename(PL_curcop->op_location));
 	STRLEN len;
 	SV * const sv = Perl_newSVpvf(aTHX_ "%s:%" IVdf " ", s ? s : "(none)",
 	    (IV) 333);

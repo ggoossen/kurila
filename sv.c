@@ -232,6 +232,7 @@ S_new_SV(pTHX)
     SvANY(sv) = 0;
     SvREFCNT(sv) = 1;
     SvFLAGS(sv) = 0;
+    SvLOCATION(sv) = NULL;
     
     return sv;
 }
@@ -4601,6 +4602,7 @@ Perl_sv_clear(pTHX_ register SV *const sv)
     Perl_sv_clear_body(aTHX_ sv);
     SvFLAGS(sv) &= SVf_BREAK;
     SvFLAGS(sv) |= SVTYPEMASK;
+    SVcpNULL(SvLOCATION(sv));
 }
 
 /*
