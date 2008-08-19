@@ -978,12 +978,12 @@ PP(pp_caller)
 	if (filename)
 	    mPUSHs(newSVsv(filename));
 	else 
-	    PUSHs(&PL_sv_undef);
+	    mPUSHs(newSVpv("(unknown)", 0));
 	if (linenr && *linenr) {
 	    mPUSHi(SvIV(*linenr));
 	}
 	else {
-	    mPUSHi(-1);
+	    mPUSHi(0);
 	}
     }
     if (!MAXARG)

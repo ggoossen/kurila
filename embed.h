@@ -3357,7 +3357,7 @@
 #define cop_free(a)		S_cop_free(aTHX_ a)
 #define modkids(a,b)		S_modkids(aTHX_ a,b)
 #define scalarboolean(a)	S_scalarboolean(aTHX_ a)
-#define newDEFSVOP()		S_newDEFSVOP(aTHX)
+#define newDEFSVOP(a)		S_newDEFSVOP(aTHX_ a)
 #define new_logop(a,b,c,d,e)	S_new_logop(aTHX_ a,b,c,d,e)
 #define simplify_sort(a)	S_simplify_sort(aTHX_ a)
 #define gv_ename(a)		S_gv_ename(aTHX_ a)

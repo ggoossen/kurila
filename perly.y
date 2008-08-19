@@ -416,7 +416,7 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 	|	label block cont  /* a block is a loop that happens once */
 			{ $$ = newSTATEOP(0, PVAL($1),
 				 newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                     NULL, (OP*)NULL, $2, $3, 0), $2->op_location);
+                                     $2->op_location, (OP*)NULL, $2, $3, 0), $2->op_location);
 			  TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
 	;
 
@@ -746,7 +746,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                         /* In this and all the hash accessors, ';' is
                          * provided by the tokeniser */
 			{
-                            $$ = newBINOP(OP_GELEM, 0, $1, scalar($3), NULL);
+                            $$ = newBINOP(OP_GELEM, 0, $1, scalar($3), $1->op_location);
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,';');

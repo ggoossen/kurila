@@ -4367,7 +4367,7 @@ STATIC OP*	S_scalarboolean(pTHX_ OP *o)
 #define PERL_ARGS_ASSERT_SCALARBOOLEAN	\
 	assert(o)
 
-STATIC OP*	S_newDEFSVOP(pTHX)
+STATIC OP*	S_newDEFSVOP(pTHX_ SV* location)
 			__attribute__warn_unused_result__;
 
 STATIC OP*	S_new_logop(pTHX_ I32 type, I32 flags, OP **firstp, OP **otherp, SV *location)

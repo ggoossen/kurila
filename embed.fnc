@@ -1185,7 +1185,7 @@ sR	|I32	|is_list_assignment|NULLOK const OP *o
 s	|void	|cop_free	|NN COP *cop
 s	|OP*	|modkids	|NULLOK OP *o|I32 type
 s	|OP*	|scalarboolean	|NN OP *o
-sR	|OP*	|newDEFSVOP
+sR	|OP*	|newDEFSVOP     |NULLOK SV* location
 sR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp|NULLOK SV *location
 s	|void	|simplify_sort	|NN OP *o
 s	|const char*	|gv_ename	|NN GV *gv
