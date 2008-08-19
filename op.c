@@ -2008,7 +2008,7 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
     }
     else
 	return bind_match(type, left,
-			  pmruntime(newPMOP(OP_MATCH, 0, NULL), right, 0));
+			  pmruntime(newPMOP(OP_MATCH, 0, right->op_location), right, 0));
 }
 
 OP *
@@ -2078,15 +2078,15 @@ Perl_block_end(pTHX_ I32 floor, OP *seq)
 }
 
 STATIC OP *
-S_newDEFSVOP(pTHX)
+S_newDEFSVOP(pTHX_ SV* location)
 {
     dVAR;
     const PADOFFSET offset = pad_findmy("$_");
     if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
-	return newSVREF(newGVOP(OP_GV, 0, PL_defgv, NULL), NULL);
+	return newSVREF(newGVOP(OP_GV, 0, PL_defgv, location), location);
     }
     else {
-	OP * const o = newOP(OP_PADSV, 0, NULL);
+	OP * const o = newOP(OP_PADSV, 0, location);
 	o->op_targ = offset;
 	return o;
     }
@@ -2408,7 +2408,7 @@ Perl_append_elem(pTHX_ I32 type, OP *first, OP *last)
     if (first->op_type != (unsigned)type
 	|| (type == OP_LIST && (first->op_flags & OPf_PARENS)))
     {
-	return newLISTOP(type, 0, first, last, NULL);
+	return newLISTOP(type, 0, first, last, first->op_location);
     }
 
     if (first->op_flags & OPf_KIDS)
@@ -2489,7 +2489,7 @@ Perl_prepend_elem(pTHX_ I32 type, OP *first, OP *last)
 	return last;
     }
 
-    return newLISTOP(type, 0, first, last, NULL);
+    return newLISTOP(type, 0, first, last, first->op_location);
 }
 
 /* Constructors */
@@ -2753,7 +2753,7 @@ OP *
 Perl_force_list(pTHX_ OP *o)
 {
     if (!o || o->op_type != OP_LIST)
-	o = newLISTOP(OP_LIST, 0, o, NULL, NULL);
+	o = newLISTOP(OP_LIST, 0, o, NULL, newAV());
     op_null(o);
     return o;
 }
@@ -3322,9 +3322,9 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	NULL,
 	append_elem(OP_LINESEQ,
 	    append_elem(OP_LINESEQ,
-			newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
-			newSTATEOP(0, NULL, veop, NULL)),
-		    newSTATEOP(0, NULL, imop, NULL) ));
+		newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
+		newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
+	    newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
 
     /* The "did you use incorrect case?" warning used to be here.
      * The problem is that on case-insensitive filesystems one
@@ -4067,7 +4067,7 @@ Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block, SV *locatio
 	if (expr->op_type == OP_READLINE || expr->op_type == OP_GLOB
 	    || (expr->op_type == OP_NULL && expr->op_targ == OP_GLOB)) {
 	    expr = newUNOP(OP_DEFINED, 0,
-			   newASSIGNOP(0, newDEFSVOP(), 0, expr, location), location );
+			   newASSIGNOP(0, newDEFSVOP(location), 0, expr, location), location );
 	} else if (expr->op_flags & OPf_KIDS) {
 	    const OP * const k1 = ((UNOP*)expr)->op_first;
 	    const OP * const k2 = k1 ? k1->op_sibling : NULL;
@@ -4130,7 +4130,7 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 	if (expr->op_type == OP_READLINE || expr->op_type == OP_GLOB
 		     || (expr->op_type == OP_NULL && expr->op_targ == OP_GLOB)) {
 	    expr = newUNOP(OP_DEFINED, 0,
-			   newASSIGNOP(0, newDEFSVOP(), 0, expr, expr->op_location), expr->op_location  );
+			   newASSIGNOP(0, newDEFSVOP(location), 0, expr, expr->op_location), expr->op_location  );
 	} else if (expr->op_flags & OPf_KIDS) {
 	    const OP * const k1 = ((UNOP*)expr)->op_first;
 	    const OP * const k2 = (k1) ? k1->op_sibling : NULL;
@@ -5488,7 +5488,7 @@ Perl_ck_eval(pTHX_ OP *o)
 #else
 	op_free(o);
 #endif
-	o = newUNOP(OP_ENTEREVAL, 0, newDEFSVOP(), o->op_location);
+	o = newUNOP(OP_ENTEREVAL, 0, newDEFSVOP(o->op_location), o->op_location);
 	op_getmad(oldo,o,'O');
     }
     o->op_targ = (PADOFFSET)PL_hints;
@@ -5751,7 +5751,7 @@ Perl_ck_ftst(pTHX_ OP *o)
 	if (type == OP_FTTTY)
 	    o = newGVOP(type, OPf_REF, PL_stdingv, oldo->op_location);
 	else
-	    o = newUNOP(type, 0, newDEFSVOP(), oldo->op_location);
+	    o = newUNOP(type, 0, newDEFSVOP(o->op_location), oldo->op_location);
 #ifdef PERL_MAD
 	op_getmad(oldo,o,'O');
 #else
@@ -5790,7 +5790,7 @@ Perl_ck_fun(pTHX_ OP *o)
 	    kid = kid->op_sibling;
 	}
 	if (!kid && PL_opargs[type] & OA_DEFGV)
-	    *tokid = kid = newDEFSVOP();
+	    *tokid = kid = newDEFSVOP(o->op_location);
 
 	while (oa && kid) {
 	    numargs++;
@@ -5983,7 +5983,7 @@ Perl_ck_fun(pTHX_ OP *o)
     }
     else if (PL_opargs[type] & OA_DEFGV) {
 	/* Ordering of these two is important to keep f_map.t passing.  */
-	OP *newop = newUNOP(type, 0, newDEFSVOP(), o->op_location);
+	OP *newop = newUNOP(type, 0, newDEFSVOP(o->op_location), o->op_location);
 #ifdef PERL_MAD
 	op_getmad(o,newop,'O');
 #else
@@ -6011,7 +6011,7 @@ Perl_ck_glob(pTHX_ OP *o)
 
     o = ck_fun(o);
     if ((o->op_flags & OPf_KIDS) && !cLISTOPo->op_first->op_sibling)
-	append_elem(OP_GLOB, o, newDEFSVOP());
+	append_elem(OP_GLOB, o, newDEFSVOP(o->op_location));
 
     if (!((gv = gv_fetchpvs("glob", GV_NOTQUAL, SVt_PVCV))
 	  && GvCVu(gv) && GvIMPORTED_CV(gv)))
@@ -6055,7 +6055,7 @@ Perl_ck_glob(pTHX_ OP *o)
     }
     gv = newGVgen("main");
     gv_IOadd(gv);
-    append_elem(OP_GLOB, o, newGVOP(OP_GV, 0, gv, NULL));
+    append_elem(OP_GLOB, o, newGVOP(OP_GV, 0, gv, o->op_location));
     scalarkids(o);
     return o;
 }
@@ -6234,7 +6234,7 @@ Perl_ck_listiob(pTHX_ OP *o)
     }
 
     if (!kid)
-	append_elem(o->op_type, o, newDEFSVOP());
+	append_elem(o->op_type, o, newDEFSVOP(o->op_location));
 
     return listkids(o);
 }
@@ -6430,7 +6430,7 @@ Perl_ck_open(pTHX_ OP *o)
     }
     if (o->op_type == OP_BACKTICK) {
 	if (!(o->op_flags & OPf_KIDS)) {
-	    OP * const newop = newUNOP(OP_BACKTICK, 0, newDEFSVOP(), o->op_location);
+	    OP * const newop = newUNOP(OP_BACKTICK, 0, newDEFSVOP(o->op_location), o->op_location);
 #ifdef PERL_MAD
 	    op_getmad(o,newop,'O');
 #else
@@ -6811,7 +6811,7 @@ Perl_ck_split(pTHX_ OP *o)
     }
 
     if (!kid->op_sibling)
-	append_elem(OP_SPLIT, o, newDEFSVOP());
+	append_elem(OP_SPLIT, o, newDEFSVOP(o->op_location));
 
     kid = kid->op_sibling;
     scalar(kid);
@@ -7070,7 +7070,7 @@ Perl_ck_subr(pTHX_ OP *o)
     } /* while */
     if (o2 == cvop && proto && *proto == '_') {
 	/* generate an access to $_ */
-	o2 = newDEFSVOP();
+	o2 = newDEFSVOP(o->op_location);
 	o2->op_sibling = prev->op_sibling;
 	prev->op_sibling = o2; /* instead of cvop */
     }
@@ -7144,7 +7144,7 @@ Perl_ck_unpack(pTHX_ OP *o)
     if (kid->op_sibling) {
 	kid = kid->op_sibling;
 	if (!kid->op_sibling)
-	    kid->op_sibling = newDEFSVOP();
+	    kid->op_sibling = newDEFSVOP(o->op_location);
     }
     return ck_fun(o);
 }
