@@ -3490,49 +3490,6 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
     assert(maxlen >= 0);
     umaxlen = maxlen;
 
-    /* I was having segfault trouble under Linux 2.2.5 after a
-       parse error occured.  (Had to hack around it with a test
-       for PL_parser->error_count == 0.)  Solaris doesn't segfault --
-       not sure where the trouble is yet.  XXX */
-
-    if (NULL) { /* IoFMT_GV(datasv)) { */
-	SV *const cache = NULL; /* (SV *)IoFMT_GV(datasv); */
-	if (SvOK(cache)) {
-	    STRLEN cache_len;
-	    const char *cache_p = SvPV(cache, cache_len);
-	    STRLEN take = 0;
-
-	    if (umaxlen) {
-		/* Running in block mode and we have some cached data already.
-		 */
-		if (cache_len >= umaxlen) {
-		    /* In fact, so much data we don't even need to call
-		       filter_read.  */
-		    take = umaxlen;
-		}
-	    } else {
-		const char *const first_nl =
-		    (const char *)memchr(cache_p, '\n', cache_len);
-		if (first_nl) {
-		    take = first_nl + 1 - cache_p;
-		}
-	    }
-	    if (take) {
-		sv_catpvn(buf_sv, cache_p, take);
-		sv_chop(cache, cache_p + take);
-		/* Definately not EOF  */
-		return 1;
-	    }
-
-	    sv_catsv(buf_sv, cache);
-	    if (umaxlen) {
-		umaxlen -= cache_len;
-	    }
-	    SvOK_off(cache);
-	    read_from_cache = TRUE;
-	}
-    }
-
     /* Filter API says that the filter appends to the contents of the buffer.
        Usually the buffer is "", so the details don't matter. But if it's not,
        then clearly what it contains is already filtered by this filter, so we

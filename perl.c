@@ -2303,6 +2303,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     if (!(flags & G_NOARGS))
 	myop.op_flags |= OPf_STACKED;
     myop.op_flags |= OP_GIMME_REVERSE(flags);
+    myop.op_location = SvLOCATION(sv);
     SAVEOP();
     PL_op = (OP*)&myop;
 
