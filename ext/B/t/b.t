@@ -11,7 +11,7 @@ BEGIN {
 $|  = 1;
 use warnings;
 use strict;
-use Test::More tests => 58;
+use Test::More tests => 57;
 
 BEGIN { use_ok( 'B' ); }
 
@@ -139,7 +139,6 @@ is(ref $gv_ref, "B::GV", "Test B::GV return from svref_2object");
 ok(! $gv_ref->is_empty(), "Test is_empty()");
 is($gv_ref->NAME(), "gv", "Test NAME()");
 is($gv_ref->SAFENAME(), "gv", "Test SAFENAME()");
-like($gv_ref->FILE(), qr/b\.t$/, "Testing FILE()");
 
 # The following return B::SPECIALs.
 is(ref B::sv_yes(), "B::SPECIAL", "B::sv_yes()");

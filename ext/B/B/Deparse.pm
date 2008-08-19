@@ -297,7 +297,7 @@ sub null {
 sub todo {
     my $self = shift;
     my($cv, $is_form) = < @_;
-    return unless ($cv->FILE eq $0 || exists $self->{files}->{$cv->FILE});
+    return; # unless ($cv->location[0] eq $0 || exists $self->{files}->{$cv->location[0]});
     my $seq;
     if ($cv->OUTSIDE_SEQ) {
 	$seq = $cv->OUTSIDE_SEQ;

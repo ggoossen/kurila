@@ -1466,8 +1466,6 @@ LOOP_lastop(o)
 #define COP_label(o)	o->cop_label
 #define COP_stashpv(o)	CopSTASHPV(o)
 #define COP_stash(o)	CopSTASH(o)
-#define COP_file(o)	CopFILE(o)
-#define COP_filegv(o)	CopFILEGV(o)
 #define COP_cop_seq(o)	o->cop_seq
 #define COP_hints(o)	CopHINTS_get(o)
 #if PERL_VERSION < 9
@@ -1488,15 +1486,6 @@ COP_stashpv(o)
 B::HV
 COP_stash(o)
 	B::COP	o
-
-char *
-COP_file(o)
-	B::COP	o
-
-B::GV
-COP_filegv(o)
-       B::COP  o
-
 
 U32
 COP_cop_seq(o)
