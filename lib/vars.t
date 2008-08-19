@@ -74,7 +74,7 @@ print "ok 21\n";
 print "ok 22\n";
 print "ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
-my @errs = @( split m/\n/, $@->message );
+my @errs = @( split m/\n/, $@->{description} );
 $e = (nelems @errs) != 3 && 'not ';
 print "{$e}ok 24\n";
 $e = !(grep(m/^Global symbol "\$u" requires explicit package name/, < @errs))

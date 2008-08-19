@@ -184,9 +184,7 @@ EXPECT
 # An attempt at lvalueable barewords broke this
 tie FH, 'main';
 EXPECT
-Can't modify constant item in tie at - line 3, near "'main';"
-Bareword "FH" not allowed while "strict subs" in use at - line 3, at EOF
-Execution of - aborted due to compilation errors.
+Can't modify constant item in tie at - line 3 character 5.
 ########
 
 # localizing tied hash slices

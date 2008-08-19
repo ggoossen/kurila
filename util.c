@@ -1521,15 +1521,15 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
     if (PL_op) {
 	location = PL_op->op_location;
     }
-    else { 
+    else if (PL_compcv) {
 	AV* res = av_2mortal(newAV());
-	if (PL_compcv) {
-	    av_push(res, newSVsv(PL_parser->lex_filename));
-	    av_push(res, newSViv(PL_parser->lex_line_number));
-	    av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
-			PL_parser->lex_charoffset) + 1));
-	}
-	location = SVav(res);
+	av_push(res, newSVsv(PL_parser->lex_filename));
+	av_push(res, newSViv(PL_parser->lex_line_number));
+	av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
+		    PL_parser->lex_charoffset) + 1));
+    }
+    else {
+	location = NULL;
     }
     Perl_vwarner_at(aTHX_ location, err, pat, args);
 }
