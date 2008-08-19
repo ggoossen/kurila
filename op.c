@@ -738,8 +738,10 @@ Perl_op_null(pTHX_ OP *o)
 {
     dVAR;
 
+    SV* location;
     PERL_ARGS_ASSERT_OP_NULL;
 
+    location = SvREFCNT_inc(o->op_location);
     if (o->op_type == OP_NULL)
 	return;
     if (!PL_madskills)
@@ -747,6 +749,7 @@ Perl_op_null(pTHX_ OP *o)
     o->op_targ = o->op_type;
     o->op_type = OP_NULL;
     o->op_ppaddr = PL_ppaddr[OP_NULL];
+    o->op_location = location;
 }
 
 void
@@ -5251,11 +5254,11 @@ Perl_newAVREF(pTHX_ OP *o, SV* location)
 }
 
 OP *
-Perl_newGVREF(pTHX_ I32 type, OP *o)
+Perl_newGVREF(pTHX_ I32 type, OP *o, SV* location)
 {
     if (type == OP_MAPSTART || type == OP_GREPSTART || type == OP_SORT)
-	return newUNOP(OP_NULL, 0, o, o->op_location);
-    return ref(newUNOP(OP_RV2GV, OPf_REF, o, o->op_location), type);
+	return newUNOP(OP_NULL, 0, o, location);
+    return ref(newUNOP(OP_RV2GV, OPf_REF, o, location), type);
 }
 
 OP *

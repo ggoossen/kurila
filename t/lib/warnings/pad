@@ -154,7 +154,7 @@ sub {
     sub f { $x }
 }->();
 EXPECT
-Variable "$x" is not available at - line 5 cahr 16.
+Variable "$x" is not available at - line 5 character 16.
 ########
 # pad.c
 use warnings 'closure' ;
@@ -198,8 +198,8 @@ sub f {
 f()->();
 EXPECT
 Variable "$x" is not available at (eval 1) line 2 character 4.
-    (eval) called at - line 6 chracter 11.
-    main::__ANON__ called at - line 8 chracter 4.
+    (eval) called at - line 6 character 11.
+    main::__ANON__ called at - line 8 character 4.
 ########
 use warnings 'closure' ;
 {

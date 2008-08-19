@@ -2018,7 +2018,7 @@ PERL_CALLCONV GV*	Perl_newGVgen(pTHX_ const char* pack)
 #define PERL_ARGS_ASSERT_NEWGVGEN	\
 	assert(pack)
 
-PERL_CALLCONV OP*	Perl_newGVREF(pTHX_ I32 type, OP* o)
+PERL_CALLCONV OP*	Perl_newGVREF(pTHX_ I32 type, OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 

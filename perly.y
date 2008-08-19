@@ -683,12 +683,12 @@ argexpr	:	argexpr ','
 listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			{ 
                             $$ = convert(IVAL($1), OPf_STACKED,
-                                prepend_elem(OP_LIST, newGVREF(IVAL($1),$2), $3), LOCATION($1) );
+                                prepend_elem(OP_LIST, newGVREF(IVAL($1),$2, LOCATION($1)), $3), LOCATION($1) );
                             TOKEN_GETMAD($1,$$,'o');
 			}
 	|	FUNC '(' indirob expr ')'      /* print ($fh @args */
 			{ $$ = convert(IVAL($1), OPf_STACKED,
-				prepend_elem(OP_LIST, newGVREF(IVAL($1),$3), $4), LOCATION($1) );
+				prepend_elem(OP_LIST, newGVREF(IVAL($1),$3, LOCATION($1)), $4), LOCATION($1) );
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
@@ -769,7 +769,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                         }
         |       term DEREFSTAR                /* somearef->* */
                         {
-                            $$ = newGVREF(0, $1);
+                            $$ = newGVREF(0, $1, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'a');
                         }
         |       term DEREFAMP                /* somearef->& */
@@ -1400,8 +1400,9 @@ hsh	:	'%' indirob
 	;
 
 star	:	'*' indirob
-			{ $$ = newGVREF(0,$2);
-			  TOKEN_GETMAD($1,$$,'*');
+                        {
+                            $$ = newGVREF(0,$2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'*');
 			}
 	;
 

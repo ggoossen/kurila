@@ -557,7 +557,7 @@ Apa	|OP*	|newBINOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last|NULLOK S
 Apa	|OP*	|newCVREF	|I32 flags|NULLOK OP* o|NULLOK SV* location
 Apa	|OP*	|newGVOP	|I32 type|I32 flags|NN GV* gv|NULLOK SV* location
 Apa	|GV*	|newGVgen	|NN const char* pack
-Apa	|OP*	|newGVREF	|I32 type|NULLOK OP* o
+Apa	|OP*	|newGVREF	|I32 type|NULLOK OP* o|NULLOK SV* location
 ApaR	|OP*	|newHVREF	|NN OP* o|NULLOK SV* location
 AmdbR	|HV*	|newHV
 ApaR	|HV*	|newHVhv	|NULLOK HV *hv

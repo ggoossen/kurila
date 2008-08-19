@@ -65,7 +65,7 @@ while ($i ++ == 0)
     s/ab/{last}/ ;
 }
 EXPECT
-Exiting substitution via last at - line 7.
+Exiting substitution via last at - line 7 character 8.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
@@ -75,8 +75,8 @@ no warnings 'exiting' ;
 sub joe { last }
 { joe() }
 EXPECT
-Exiting subroutine via last at - line 3.
-    main::fred called at - line 4.
+Exiting subroutine via last at - line 3 character 12.
+    main::fred called at - line 4 character 3.
 ########
 # pp_ctl.c
 {
@@ -88,8 +88,8 @@ print STDERR $@ ;
 } 
 print STDERR $@ ;
 EXPECT
-Exiting eval via last at (eval 1) line 1.
-    (eval) called at - line 3.
+Exiting eval via last at (eval 1) line 1 character 26.
+    (eval) called at - line 3 character 3.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
@@ -105,7 +105,7 @@ while ($i ++ == 0)
     s/ab/{last fred}/ ;
 }
 EXPECT
-Exiting substitution via last at - line 7.
+Exiting substitution via last at - line 7 character 8.
 ########
 # pp_ctl.c
 use warnings 'exiting' ;
@@ -115,8 +115,8 @@ no warnings 'exiting' ;
 sub Fred { last Joe }
 Joe: { Fred() }
 EXPECT
-Exiting subroutine via last at - line 3.
-    main::fred called at - line 4.
+Exiting subroutine via last at - line 3 character 12.
+    main::fred called at - line 4 character 8.
 ########
 # pp_ctl.c
 joe:
@@ -126,8 +126,8 @@ Joe:
 { eval "no warnings 'exiting' ; last Joe;" }
 print STDERR $@ ;
 EXPECT
-Exiting eval via last at (eval 1) line 1.
-    (eval) called at - line 2.
+Exiting eval via last at (eval 1) line 1 character 26.
+    (eval) called at - line 3 character 3.
 ########
 # pp_ctl.c
 use warnings 'recursion' ;
@@ -139,108 +139,108 @@ sub fred
  
 fred()
 EXPECT
- at - line 3.
-Deep recursion on subroutine "main::fred" at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 6.
-    main::fred called at - line 9.
+ at - line 3 character 9.
+Deep recursion on subroutine "main::fred" at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 6 character 5.
+    main::fred called at - line 9 character 1.
 ########
 # pp_ctl.c
 no warnings 'recursion' ;
@@ -258,8 +258,8 @@ use warnings;
 our $foo;
 eval 'print $foo';
 EXPECT
-Use of uninitialized value $main::foo in print at (eval 1) line 1.
-    (eval) called at - line 4.
+Use of uninitialized value $main::foo in print at (eval 1) line 1 character 1.
+    (eval) called at - line 4 character 1.
 ########
 # pp_ctl.c
 use warnings;

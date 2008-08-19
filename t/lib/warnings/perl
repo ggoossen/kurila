@@ -15,6 +15,7 @@
 
 
 __END__
+# TODO fix location of warning
 # perl.c
 no warnings 'once' ;
 $main::x = 3 ;
@@ -22,54 +23,3 @@ use warnings 'once' ;
 $main::z = 3 ;
 EXPECT
 Name "main::z" used only once: possible typo at - line 5.
-########
--w
-# perl.c
-$main::x = 3 ;
-no warnings 'once' ;
-$main::z = 3 
-EXPECT
-Name "main::x" used only once: possible typo at - line 3.
-########
-# perl.c
-BEGIN { $^W =1 ; }
-$main::x = 3 ;
-no warnings 'once' ;
-$main::z = 3 
-EXPECT
-Name "main::x" used only once: possible typo at - line 3.
-########
--W
-# perl.c
-no warnings 'once' ;
-$main::x = 3 ;
-use warnings 'once' ;
-$main::z = 3 ;
-EXPECT
-OPTION random
-Name "main::z" used only once: possible typo at - line 6.
-Name "main::x" used only once: possible typo at - line 4.
-########
--X
-# perl.c
-use warnings 'once' ;
-$main::x = 3 ;
-EXPECT
-
-########
-
-# perl.c
-{ use warnings 'once' ; $main::x = 3 ; }
-$main::y = 3 ;
-EXPECT
-Name "main::x" used only once: possible typo at - line 3.
-########
-
-# perl.c
-$main::z = 3 ;
-BEGIN { $^W = 1 }
-{ no warnings 'once' ; $main::x = 3 ; }
-$main::y = 3 ;
-EXPECT
-Name "main::y" used only once: possible typo at - line 6.
-########

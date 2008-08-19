@@ -976,7 +976,7 @@ PP(pp_caller)
 	if (location)
 	    linenr = av_fetch((AV*)location, 1, FALSE);
 	if (filename)
-	    PUSHs(filename);
+	    mPUSHs(newSVsv(filename));
 	else 
 	    PUSHs(&PL_sv_undef);
 	if (linenr && *linenr) {
