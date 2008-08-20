@@ -1001,11 +1001,16 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.10') {
 
 if ($from->{branch} ne "kurila" or $from->{v} < qv '1.11') {
     anon_aryhsh($twig);
-    eval_to_try($twig);
     no_auto_deref($twig);
 }
 
-sv_array_hash($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.12') {
+    eval_to_try($twig);
+}
+
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.13') {
+    sv_array_hash($twig);
+}
 
 # print
 $twig->print( pretty_print => 'indented' );
