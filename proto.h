@@ -6093,7 +6093,7 @@ PERL_CALLCONV void	Perl_op_xmldump(pTHX_ const OP *o)
 	assert(o)
 
 
-PERL_CALLCONV MADTOKEN*	Perl_newMADTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop);
+PERL_CALLCONV MADTOKEN*	Perl_newMADTOKEN(pTHX_ I32 optype, MADPROP* madprop);
 PERL_CALLCONV void	Perl_token_free(pTHX_ MADTOKEN* tk)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_TOKEN_FREE	\

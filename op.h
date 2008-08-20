@@ -576,7 +576,6 @@ struct madprop {
 
 struct madtoken {
     I32 tk_type;
-    YYSTYPE tk_lval;
     MADPROP* tk_mad;
 };
 #endif

@@ -200,22 +200,20 @@ typedef union YYSTYPE
 				must always be 1st union member) */
     OP *opval;
     GV *gvval;
-#ifdef PERL_IN_MADLY_C
-    MADTOKEN* p_tkval;
-    MADTOKEN* i_tkval;
-#else
     struct {
         I32 ival;
         SV *location;
+#ifdef PERL_MAD
+        MADTOKEN* madtoken;
+#endif
     } i_tkval;
     struct {
         char *pval;
         SV *location;
-    } p_tkval;
-#endif
 #ifdef PERL_MAD
-    MADTOKEN* tkval;
+        MADTOKEN* madtoken;
 #endif
+    } p_tkval;
 }
 /* Line 1489 of yacc.c.  */
 	YYSTYPE;

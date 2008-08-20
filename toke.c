@@ -2363,7 +2363,7 @@ Perl_madlex(pTHX)
 
     if (!PL_thismad || PL_thismad->mad_key == '^') {	/* not forced already? */
 	if (!PL_thistoken) {
-	    if (PL_realtokenstart < 0 || !CopLINE(PL_curcop))
+	    if (PL_realtokenstart < 0 )
 		PL_thistoken = newSVpvs("");
 	    else {
 		char * const tstart = SvPVX(PL_linestr) + PL_realtokenstart;
@@ -2505,7 +2505,7 @@ Perl_madlex(pTHX)
     }
 
     /* Create new token struct.  Note: opvals return early above. */
-    pl_yylval.tkval = newMADTOKEN(optype, pl_yylval, PL_thismad);
+    pl_yylval.i_tkval.madtoken = newMADTOKEN(optype, PL_thismad);
     PL_thismad = 0;
     return optype;
 }
@@ -3255,8 +3255,8 @@ Perl_yylex(pTHX)
 	}
 	else {
 #ifdef PERL_MAD
-	    if (PL_madskills && CopLINE(PL_curcop) >= 1) {
-		if (CopLINE(PL_curcop) == 1 && s[0] == '#' && s[1] == '!') {
+	    if (PL_madskills && PL_parser->lex_line_number >= 1) {
+		if (PL_parser->lex_line_number == 1 && s[0] == '#' && s[1] == '!') {
 		    PL_faketokens = 0;
 		    s = SKIPSPACE0(s);
 		    TOKEN(PEG);	/* make sure any #! line is accessible */
@@ -3272,10 +3272,10 @@ Perl_yylex(pTHX)
 			d++;
 		    else if (d > PL_bufend) /* Found by Ilya: feed random input to Perl. */
 		      Perl_croak(aTHX_ "panic: input overflow");
-		    if (PL_madskills && CopLINE(PL_curcop) >= 1) {
+		    if (PL_madskills && PL_parser->lex_line_number >= 1) {
 			if (!PL_thiswhite)
 			    PL_thiswhite = newSVpvs("");
-			if (CopLINE(PL_curcop) == 1) {
+			if (PL_parser->lex_line_number == 1) {
 			    sv_setpvn(PL_thiswhite, "", 0);
 			    PL_faketokens = 0;
 			}
@@ -5674,7 +5674,7 @@ Perl_yylex(pTHX)
 		    CURMAD('=', PL_thisstuff);
 		    CURMAD('Q', PL_thisclose);
 		    NEXTVAL_NEXTTOKE.opval =
-			(OP*)newSVOP(OP_CONST, 0, PL_lex_stuff.str_sv);
+			(OP*)newSVOP(OP_CONST, 0, PL_lex_stuff.str_sv, S_curlocation());
 		    PL_lex_stuff.str_sv = NULL;
 		    force_next(THING);
 

@@ -501,12 +501,13 @@ Perl_yyparse (pTHX)
 
 #define dep() deprecate("\"do\" to call subroutines")
 
+#define IVAL(i) (i.ival)
+#define PVAL(p) (p.pval)
+#define LOCATION(v) (v.location)
 #ifdef PERL_IN_MADLY_C
-#  define IVAL(i) (i)->tk_lval.ival
-#  define PVAL(p) (p)->tk_lval.pval
-#  define TOKEN_GETMAD(a,b,c) token_getmad((a),(b),(c))
+#  define TOKEN_GETMAD(a,b,c) token_getmad((a.madtoken),(b),(c))
 #  define APPEND_MADPROPS_PV(a,b,c) append_madprops_pv((a),(b),(c))
-#  define TOKEN_FREE(a) token_free(a)
+#  define TOKEN_FREE(a) token_free(a.madtoken)
 #  define OP_GETMAD(a,b,c) op_getmad((a),(b),(c))
 #  define IF_MAD(a,b) (a)
 #  define DO_MAD(a) a
@@ -514,7 +515,6 @@ Perl_yyparse (pTHX)
 #else
 #  define IVAL(i) (i.ival)
 #  define PVAL(p) (p.pval)
-#  define LOCATION(v) (v.location)
 #  define TOKEN_GETMAD(a,b,c)
 #  define APPEND_MADPROPS_PV(a,b,c)
 #  define TOKEN_FREE(a)

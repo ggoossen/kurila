@@ -2211,7 +2211,6 @@ const char *
 Perl_sv_xmlpeek(pTHX_ SV *sv)
 {
     SV * const t = sv_newmortal();
-    STRLEN n_a;
     int unref = 0;
 
     PERL_ARGS_ASSERT_SV_XMLPEEK;
@@ -2525,9 +2524,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    PerlIO_printf(file, " was=\"%s\"", PL_op_name[o->op_targ]);
 	    if (o->op_targ == OP_NEXTSTATE)
 	    {
-		if (CopLINE(cCOPo))
-		    PerlIO_printf(file, " line=\"%"UVuf"\"",
-				     (UV)CopLINE(cCOPo));
 		if (CopSTASHPV(cCOPo))
 		    PerlIO_printf(file, " package=\"%s\"",
 				     CopSTASHPV(cCOPo));
@@ -2598,9 +2594,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	break;
     case OP_NEXTSTATE:
     case OP_DBSTATE:
-	if (CopLINE(cCOPo))
-	    S_xmldump_attr(aTHX_ level, file, "line=\"%"UVuf"\"",
-			     (UV)CopLINE(cCOPo));
 	if (CopSTASHPV(cCOPo))
 	    S_xmldump_attr(aTHX_ level, file, "package=\"%s\"",
 			     CopSTASHPV(cCOPo));
@@ -2640,7 +2633,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVE:
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
-    case OP_LEAVESUBLV:
     case OP_SCOPE:
 	if (o->op_private & OPpREFCOUNTED)
 	    S_xmldump_attr(aTHX_ level, file, "refcnt=\"%"UVuf"\"", (UV)o->op_targ);
