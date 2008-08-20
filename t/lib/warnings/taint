@@ -14,7 +14,7 @@ close FH ;
 chdir $a ;
 print "xxx\n" ;
 EXPECT
-Insecure dependency in chdir while running with -T switch at - line 5.
+Insecure dependency in chdir while running with -T switch at - line 5 character 1.
 ########
 -TU
 --FILE-- abc
@@ -32,8 +32,8 @@ use warnings 'taint' ;
 chdir $a ;
 print "yyy\n" ;
 EXPECT
-Insecure dependency in chdir while running with -T switch at - line 5.
-Insecure dependency in chdir while running with -T switch at - line 10.
+Insecure dependency in chdir while running with -T switch at - line 5 character 1.
+Insecure dependency in chdir while running with -T switch at - line 10 character 1.
 xxx
 yyy
 ########
@@ -53,8 +53,8 @@ use warnings 'taint' ;
 chdir $a ;
 print "yyy\n" ;
 EXPECT
-Insecure dependency in chdir while running with -t switch at - line 5.
-Insecure dependency in chdir while running with -t switch at - line 10.
+Insecure dependency in chdir while running with -t switch at - line 5 character 1.
+Insecure dependency in chdir while running with -t switch at - line 10 character 1.
 xxx
 yyy
 ########

@@ -102,10 +102,10 @@ syswrite STDIN, "fred", 1;
 opendir STDIN, ".";
 syswrite STDIN, "fred", 1;
 EXPECT
-syswrite() on closed filehandle STDIN at - line 4.
-syswrite() on closed filehandle STDIN at - line 6.
+syswrite() on closed filehandle STDIN at - line 4 character 1.
+syswrite() on closed filehandle STDIN at - line 6 character 1.
 	(Are you trying to call syswrite() on dirhandle STDIN?)
- at - line 6.
+ at - line 6 character 1.
 ########
 # pp_sys.c [pp_flock]
 use Config; 
@@ -134,12 +134,12 @@ flock STDIN, 8;
 flock FOO, 8;
 flock $a, 8;
 EXPECT
-flock() on closed filehandle STDIN at - line 16.
-flock() on closed filehandle STDIN at - line 18.
+flock() on closed filehandle STDIN at - line 16 character 1.
+flock() on closed filehandle STDIN at - line 18 character 1.
 	(Are you trying to call flock() on dirhandle STDIN?)
- at - line 18.
-flock() on unopened filehandle FOO at - line 19.
-Can't use an undefined value as a symbol reference at - line 20.
+ at - line 18 character 1.
+flock() on unopened filehandle FOO at - line 19 character 1.
+Can't use an undefined value as a symbol reference at - line 20 character 6.
 ########
 # pp_sys.c [pp_prtf pp_send pp_bind pp_connect pp_listen pp_accept pp_shutdown pp_ssockopt ppp_getpeername]
 use warnings 'io' ;
@@ -207,46 +207,46 @@ getsockopt STDIN, 1,2;
 getsockname STDIN;
 getpeername STDIN;
 EXPECT
-send() on closed socket STDIN at - line 22.
-bind() on closed socket STDIN at - line 23.
-connect() on closed socket STDIN at - line 24.
-listen() on closed socket STDIN at - line 25.
-accept() on closed socket STDIN at - line 26.
-shutdown() on closed socket STDIN at - line 27.
-setsockopt() on closed socket STDIN at - line 28.
-getsockopt() on closed socket STDIN at - line 29.
-getsockname() on closed socket STDIN at - line 30.
-getpeername() on closed socket STDIN at - line 31.
-send() on closed socket STDIN at - line 33.
+send() on closed socket STDIN at - line 22 character 1.
+bind() on closed socket STDIN at - line 23 character 1.
+connect() on closed socket STDIN at - line 24 character 1.
+listen() on closed socket STDIN at - line 25 character 1.
+accept() on closed socket STDIN at - line 26 character 1.
+shutdown() on closed socket STDIN at - line 27 character 1.
+setsockopt() on closed socket STDIN at - line 28 character 1.
+getsockopt() on closed socket STDIN at - line 29 character 1.
+getsockname() on closed socket STDIN at - line 30 character 1.
+getpeername() on closed socket STDIN at - line 31 character 1.
+send() on closed socket STDIN at - line 33 character 1.
 	(Are you trying to call send() on dirhandle STDIN?)
- at - line 33.
-bind() on closed socket STDIN at - line 34.
+ at - line 33 character 1.
+bind() on closed socket STDIN at - line 34 character 1.
 	(Are you trying to call bind() on dirhandle STDIN?)
- at - line 34.
-connect() on closed socket STDIN at - line 35.
+ at - line 34 character 1.
+connect() on closed socket STDIN at - line 35 character 1.
 	(Are you trying to call connect() on dirhandle STDIN?)
- at - line 35.
-listen() on closed socket STDIN at - line 36.
+ at - line 35 character 1.
+listen() on closed socket STDIN at - line 36 character 1.
 	(Are you trying to call listen() on dirhandle STDIN?)
- at - line 36.
-accept() on closed socket STDIN at - line 37.
+ at - line 36 character 1.
+accept() on closed socket STDIN at - line 37 character 1.
 	(Are you trying to call accept() on dirhandle STDIN?)
- at - line 37.
-shutdown() on closed socket STDIN at - line 38.
+ at - line 37 character 1.
+shutdown() on closed socket STDIN at - line 38 character 1.
 	(Are you trying to call shutdown() on dirhandle STDIN?)
- at - line 38.
-setsockopt() on closed socket STDIN at - line 39.
+ at - line 38 character 1.
+setsockopt() on closed socket STDIN at - line 39 character 1.
 	(Are you trying to call setsockopt() on dirhandle STDIN?)
- at - line 39.
-getsockopt() on closed socket STDIN at - line 40.
+ at - line 39 character 1.
+getsockopt() on closed socket STDIN at - line 40 character 1.
 	(Are you trying to call getsockopt() on dirhandle STDIN?)
- at - line 40.
-getsockname() on closed socket STDIN at - line 41.
+ at - line 40 character 1.
+getsockname() on closed socket STDIN at - line 41 character 1.
 	(Are you trying to call getsockname() on dirhandle STDIN?)
- at - line 41.
-getpeername() on closed socket STDIN at - line 42.
+ at - line 41 character 1.
+getpeername() on closed socket STDIN at - line 42 character 1.
 	(Are you trying to call getpeername() on dirhandle STDIN?)
- at - line 42.
+ at - line 42 character 1.
 ########
 # pp_sys.c [pp_stat]
 use warnings 'newline' ;
@@ -254,7 +254,8 @@ stat "abc\ndef";
 no warnings 'newline' ;
 stat "abc\ndef";
 EXPECT
-Unsuccessful stat on filename containing newline at - line 3.
+Unsuccessful stat on filename containing newline at - line 3 character 1.
+
 ########
 # pp_sys.c [pp_fttext]
 use warnings qw(unopened closed) ;
@@ -269,10 +270,10 @@ stat(STDIN);
 -T HOCUS;
 stat(POCUS);
 EXPECT
--T on closed filehandle STDIN at - line 4.
-stat() on closed filehandle STDIN at - line 5.
--T on unopened filehandle HOCUS at - line 6.
-stat() on unopened filehandle POCUS at - line 7.
+-T on closed filehandle STDIN at - line 4 character 4.
+stat() on closed filehandle STDIN at - line 5 character 6.
+-T on unopened filehandle HOCUS at - line 6 character 4.
+stat() on unopened filehandle POCUS at - line 7 character 6.
 ########
 # pp_sys.c [pp_fttext]
 use warnings 'newline' ;
@@ -280,7 +281,7 @@ use warnings 'newline' ;
 no warnings 'newline' ;
 -T "abc\ndef" ;
 EXPECT
-Unsuccessful open on filename containing newline at - line 3.
+Unsuccessful open on filename containing newline at - line 3 character 2.
 ########
 # pp_sys.c [pp_sysread]
 use warnings 'io' ;
@@ -304,19 +305,19 @@ sysread(NONEXISTENT, $a, 10);
 read(NONEXISTENT, $a, 10);
 unlink $file ;
 EXPECT
-Filehandle F opened only for output at - line 12.
-sysread() on closed filehandle F at - line 17.
-read() on closed filehandle F at - line 18.
-sysread() on unopened filehandle NONEXISTENT at - line 19.
-read() on unopened filehandle NONEXISTENT at - line 20.
+Filehandle F opened only for output at - line 12 character 9.
+sysread() on closed filehandle F at - line 17 character 1.
+read() on closed filehandle F at - line 18 character 1.
+sysread() on unopened filehandle NONEXISTENT at - line 19 character 1.
+read() on unopened filehandle NONEXISTENT at - line 20 character 1.
 ########
 # pp_sys.c [pp_binmode]
 use warnings 'unopened' ;
 binmode(BLARG);
 $a = \*BLERG;binmode($a);
 EXPECT
-binmode() on unopened filehandle BLARG at - line 3.
-binmode() on unopened filehandle BLERG at - line 4.
+binmode() on unopened filehandle BLARG at - line 3 character 1.
+binmode() on unopened filehandle BLERG at - line 4 character 14.
 ########
 # pp_sys.c [pp_lstat]
 use warnings 'io';
@@ -330,8 +331,8 @@ lstat $fh;
 close FH;
 close $fh;
 EXPECT
-lstat() on filehandle FH at - line 4.
-lstat() on filehandle $fh at - line 6.
+lstat() on filehandle FH at - line 4 character 7.
+lstat() on filehandle $fh at - line 6 character 1.
 ########
 # pp_sys.c [pp_sselect]
 use warnings 'misc';
@@ -340,7 +341,7 @@ select $x, undef, undef, 1;
 no warnings 'misc';
 select $x, undef, undef, 1;
 EXPECT
-Non-string passed as bitmask at - line 4.
+Non-string passed as bitmask at - line 4 character 1.
 ########
 use Config;
 BEGIN {
@@ -366,10 +367,10 @@ chdir BAR;
 chdir $dh;
 chdir $fh;
 EXPECT
-chdir() on unopened filehandle FOO at - line 20.
-chdir() on closed filehandle BAR at - line 21.
-chdir() on unopened filehandle $dh at - line 22.
-chdir() on closed filehandle $fh at - line 23.
+chdir() on unopened filehandle FOO at - line 20 character 1.
+chdir() on closed filehandle BAR at - line 21 character 1.
+chdir() on unopened filehandle $dh at - line 22 character 1.
+chdir() on closed filehandle $fh at - line 23 character 1.
 ########
 # pp_sys.c [pp_open]
 use warnings;
@@ -381,8 +382,8 @@ no warnings qw(io deprecated);
 open FOO, "<", "TEST";
 open $foo, "<", "TEST";
 EXPECT
-Opening dirhandle FOO also as a file at - line 5.
-Opening dirhandle $foo also as a file at - line 6.
+Opening dirhandle FOO also as a file at - line 5 character 1.
+Opening dirhandle $foo also as a file at - line 6 character 1.
 ########
 # pp_sys.c [pp_open_dir]
 use warnings;
@@ -394,6 +395,6 @@ no warnings qw(io deprecated);
 opendir FOO, ".";
 opendir $foo, ".";
 EXPECT
-Opening filehandle FOO also as a directory at - line 5.
-Opening filehandle $foo also as a directory at - line 6.
+Opening filehandle FOO also as a directory at - line 5 character 1.
+Opening filehandle $foo also as a directory at - line 6 character 1.
 ########

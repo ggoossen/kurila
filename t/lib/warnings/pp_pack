@@ -18,8 +18,8 @@ no warnings 'unpack' ;
 my @b = unpack ("A,A", "22") ;
 my $b = pack ("A,A", 1,2) ;
 EXPECT
-Invalid type ',' in unpack at - line 4.
-Invalid type ',' in pack at - line 5.
+Invalid type ',' in unpack at - line 4 character 9.
+Invalid type ',' in pack at - line 5 character 9.
 ########
 # pp_pack.c
 use warnings 'pack' ;
@@ -28,7 +28,7 @@ my $a = pack("p", &foo) ;
 no warnings 'pack' ;
 my $b = pack("p", &foo) ;
 EXPECT
-Attempt to pack pointer to temporary value at - line 4.
+Attempt to pack pointer to temporary value at - line 4 character 9.
 ########
 # pp_pack.c
 use warnings 'pack' ;
@@ -50,10 +50,10 @@ print unpack("c", pack("c", -128)), "\n";
 print unpack("c", pack("c",  127)), "\n";
 print unpack("c", pack("c",  128)), "\n";
 EXPECT
-Character in 'C' format wrapped in pack at - line 3.
-Character in 'C' format wrapped in pack at - line 3.
-Character in 'c' format wrapped in pack at - line 3.
-Character in 'c' format wrapped in pack at - line 3.
+Character in 'C' format wrapped in pack at - line 3 character 19.
+Character in 'C' format wrapped in pack at - line 6 character 14.
+Character in 'c' format wrapped in pack at - line 7 character 14.
+Character in 'c' format wrapped in pack at - line 10 character 14.
 255
 0
 255
