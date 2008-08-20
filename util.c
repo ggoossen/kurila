@@ -1527,6 +1527,7 @@ Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 	av_push(res, newSViv(PL_parser->lex_line_number));
 	av_push(res, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
+	location = (SV*)res;
     }
     else {
 	location = NULL;
