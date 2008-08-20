@@ -117,7 +117,7 @@ no warnings 'deprecated' ;
 $a = <<;
 
 EXPECT
-Use of bare << to mean <<"" is deprecated at - line 3.
+Use of bare << to mean <<"" is deprecated at - line 3 character 5.
 ########
 # toke.c
 use warnings 'syntax' ;
@@ -125,7 +125,7 @@ s/(abc)/\1/;
 no warnings 'syntax' ;
 s/(abc)/\1/;
 EXPECT
-\1 better written as $1 at - line 3.
+\1 better written as $1 at - line 3 character 3.
 ########
 # toke.c
 use warnings 'syntax' ;
@@ -135,9 +135,9 @@ no warnings 'syntax' ;
 $_ = "ab" ; 
 s/(ab)/{\1}/e;
 EXPECT
-Can't use \1 to mean $1 in expression at - line 4.
+Can't use \1 to mean $1 in expression at - line 4 character 4.
 syntax error at - line 7, near "s/(ab)/{\1}/e"
-Execution of - aborted due to compilation errors. at - line 7.
+Execution of - aborted due to compilation errors.
 ########
 # toke.c
 use warnings 'qw' ;
@@ -145,7 +145,7 @@ our @a = @(qw(a, b, c) );
 no warnings 'qw' ;
 @a = @(qw(a, b, c) );
 EXPECT
-Possible attempt to separate words with commas at - line 3.
+Possible attempt to separate words with commas at - line 3 character 12.
 ########
 # toke.c
 use warnings 'qw' ;
@@ -153,7 +153,7 @@ our @a = @(qw(a b #) );
 no warnings 'qw' ;
 @a = @(qw(a b #) );
 EXPECT
-Possible attempt to put comments in qw() list at - line 3.
+Possible attempt to put comments in qw() list at - line 3 character 12.
 ########
 # toke.c
 use warnings 'syntax' ; our $x;
@@ -164,7 +164,7 @@ print ("") // die;
 print (1+2) * 3 if 0; # only this one should warn
 print (1+2) if 0;
 EXPECT
-print (...) interpreted as function at - line 7.
+print (...) interpreted as function at - line 7 character 1.
 ########
 # toke.c
 no warnings 'syntax' ;
@@ -177,7 +177,7 @@ use warnings 'syntax' ;
 printf ("");
 printf ("") . '';
 EXPECT
-printf (...) interpreted as function at - line 4.
+printf (...) interpreted as function at - line 4 character 1.
 ########
 # toke.c
 no warnings 'syntax' ;
@@ -190,7 +190,7 @@ use warnings 'syntax' ;
 sort ("");
 sort ("") . '';
 EXPECT
-sort (...) interpreted as function at - line 4.
+sort (...) interpreted as function at - line 4 character 1.
 ########
 # toke.c
 no warnings 'syntax' ;
@@ -283,26 +283,26 @@ $a = 12.3__4; print "$a\n";
 $a = 12.34e1__2; printf("%.0f\n", $a);
 EXPECT
 OPTIONS regex
-Misplaced _ in number at - line 6.
-Misplaced _ in number at - line 11.
-Misplaced _ in number at - line 16.
-Misplaced _ in number at - line 17.
-Misplaced _ in number at - line 20.
-Misplaced _ in number at - line 21.
-Misplaced _ in number at - line 24.
-Misplaced _ in number at - line 25.
-Misplaced _ in number at - line 28.
-Misplaced _ in number at - line 29.
-Misplaced _ in number at - line 31.
-Misplaced _ in number at - line 32.
-Misplaced _ in number at - line 33.
-Misplaced _ in number at - line 35.
-Misplaced _ in number at - line 36.
-Misplaced _ in number at - line 37.
-Misplaced _ in number at - line 39.
-Misplaced _ in number at - line 40.
-Misplaced _ in number at - line 41.
-Misplaced _ in number at - line 42.
+Misplaced _ in number at - line 6 character 5.
+Misplaced _ in number at - line 11 character 7.
+Misplaced _ in number at - line 16 character 7.
+Misplaced _ in number at - line 17 character 5.
+Misplaced _ in number at - line 20 character 5.
+Misplaced _ in number at - line 21 character 7.
+Misplaced _ in number at - line 24 character 7.
+Misplaced _ in number at - line 25 character 7.
+Misplaced _ in number at - line 28 character 7.
+Misplaced _ in number at - line 29 character 5.
+Misplaced _ in number at - line 31 character 5.
+Misplaced _ in number at - line 32 character 5.
+Misplaced _ in number at - line 33 character 5.
+Misplaced _ in number at - line 35 character 5.
+Misplaced _ in number at - line 36 character 5.
+Misplaced _ in number at - line 37 character 5.
+Misplaced _ in number at - line 39 character 5.
+Misplaced _ in number at - line 40 character 5.
+Misplaced _ in number at - line 41 character 5.
+Misplaced _ in number at - line 42 character 5.
 
 123
 123
@@ -391,7 +391,7 @@ my $a = time() ;
 no warnings 'ambiguous' ;
 my $b = time() ;
 EXPECT
-Ambiguous call resolved as CORE::time(), qualify as such or use & at - line 4.
+Ambiguous call resolved as CORE::time(), qualify as such or use & at - line 4 character 9.
 ########
 # toke.c
 use warnings ;
@@ -404,13 +404,13 @@ warn "yelp";
 }
 EOE
 EXPECT
-yelp at foo line 30.
-    (eval) called at - line 3.
+yelp at foo line 30 character 18.
+    (eval) called at - line 3 character 1.
 ########
 # toke.c
 my $a = rand + 4 ;
 EXPECT
-Warning: Use of "rand" without parentheses is ambiguous at - line 2.
+Warning: Use of "rand" without parentheses is ambiguous at - line 2 character 13.
 ########
 # toke.c
 $^W = 0 ;
@@ -423,9 +423,9 @@ my $a = rand + 4 ;
 }
 $a = rand + 4 ;
 EXPECT
-Warning: Use of "rand" without parentheses is ambiguous at - line 3.
-Warning: Use of "rand" without parentheses is ambiguous at - line 8.
-Warning: Use of "rand" without parentheses is ambiguous at - line 10.
+Warning: Use of "rand" without parentheses is ambiguous at - line 3 character 13.
+Warning: Use of "rand" without parentheses is ambiguous at - line 8 character 14.
+Warning: Use of "rand" without parentheses is ambiguous at - line 10 character 10.
 ########
 # toke.c
 use warnings "ambiguous";
@@ -437,7 +437,7 @@ EXPECT
 sub fred {};
 -fred ;
 EXPECT
-Ambiguous use of -fred resolved as -&fred() at - line 3.
+Ambiguous use of -fred resolved as -&fred() at - line 3 character 2.
 ########
 # toke.c
 $^W = 0 ;
@@ -451,14 +451,14 @@ sub fred {} ;
 }
 -fred ;
 EXPECT
-Ambiguous use of -fred resolved as -&fred() at - line 4.
-Ambiguous use of -fred resolved as -&fred() at - line 9.
-Ambiguous use of -fred resolved as -&fred() at - line 11.
+Ambiguous use of -fred resolved as -&fred() at - line 4 character 2.
+Ambiguous use of -fred resolved as -&fred() at - line 9 character 6.
+Ambiguous use of -fred resolved as -&fred() at - line 11 character 2.
 ########
 # toke.c
 open FOO || time;
 EXPECT
-Precedence problem: open FOO should be open(FOO) at - line 2.
+Precedence problem: open FOO should be open(FOO) at - line 2 character 1.
 ########
 # toke.c (and [perl #16184])
 open FOO => "<&", "0"; close FOO;
@@ -476,11 +476,12 @@ open FOO || time;
 }
 open FOO || time;
 EXPECT
-Precedence problem: open FOO should be open(FOO) at - line 3.
-Precedence problem: open FOO should be open(FOO) at - line 8.
-Precedence problem: open FOO should be open(FOO) at - line 10.
+Precedence problem: open FOO should be open(FOO) at - line 3 character 1.
+Precedence problem: open FOO should be open(FOO) at - line 8 character 5.
+Precedence problem: open FOO should be open(FOO) at - line 10 character 1.
 ########
 # toke.c
+# TODO fix reporting of the location of bareword
 $^W = 0 ;
 *foo *foo ;
 {
@@ -491,17 +492,17 @@ $^W = 0 ;
 }
 *foo *foo ;
 EXPECT
-Operator or semicolon missing before *foo at - line 3.
-Ambiguous use of * resolved as operator * at - line 3.
-Operator or semicolon missing before *foo at - line 8.
-Ambiguous use of * resolved as operator * at - line 8.
-Operator or semicolon missing before *foo at - line 10.
-Ambiguous use of * resolved as operator * at - line 10.
+Operator or semicolon missing before *foo at - line 3 character 7.
+Ambiguous use of * resolved as operator * at - line 3 character 7.
+Operator or semicolon missing before *foo at - line 8 character 11.
+Ambiguous use of * resolved as operator * at - line 8 character 11.
+Operator or semicolon missing before *foo at - line 10 character 7.
+Ambiguous use of * resolved as operator * at - line 10 character 7.
 Bareword "foo" not allowed while "strict subs" in use at - line 3, at EOF
 Bareword "foo" not allowed while "strict subs" in use at - line 6, at EOF
 Bareword "foo" not allowed while "strict subs" in use at - line 8, at EOF
 Bareword "foo" not allowed while "strict subs" in use at - line 10, at EOF
-Execution of - aborted due to compilation errors. at - line 10.
+Execution of - aborted due to compilation errors.
 ########
 # toke.c
 use warnings 'misc' ;
@@ -509,15 +510,15 @@ my $a = "\m" ;
 no warnings 'misc' ;
 $a = "\m" ;
 EXPECT
-Unrecognized escape \m passed through at - line 3.
+Unrecognized escape \m passed through at - line 3 character 10.
 ########
 use warnings 'misc' ;
 my $a =~ m/[a\mb]/ ;
 no warnings 'misc' ;
 $a =~ m/[a\mb]/ ;
 EXPECT
-Unrecognized escape \m passed through at - line 2.
-Unrecognized escape \m passed through at - line 2.
+Unrecognized escape \m passed through at - line 2 character 19.
+Unrecognized escape \m passed through at - line 2 character 19.
 ########
 # toke.c
 use warnings 'portable' ;
@@ -541,9 +542,9 @@ no warnings 'portable' ;
    $a =  0037777777777 ;
    $a =  0047777777777 ;
 EXPECT
-Binary number > 0b11111111111111111111111111111111 non-portable at - line 5.
-Hexadecimal number > 0xffffffff non-portable at - line 8.
-Octal number > 037777777777 non-portable at - line 11.
+Binary number > 0b11111111111111111111111111111111 non-portable at - line 5 character 8.
+Hexadecimal number > 0xffffffff non-portable at - line 8 character 8.
+Octal number > 037777777777 non-portable at - line 11 character 8.
 ########
 # toke.c
 use warnings 'overflow' ;
@@ -567,9 +568,9 @@ no warnings 'overflow' ;
    $a =  0037777777777 ;
    $a =  002000000000000000000000;
 EXPECT
-Integer overflow in binary number at - line 5.
-Integer overflow in hexadecimal number at - line 8.
-Integer overflow in octal number at - line 11.
+Integer overflow in binary number at - line 5 character 8.
+Integer overflow in hexadecimal number at - line 8 character 8.
+Integer overflow in octal number at - line 11 character 8.
 ########
 # toke.c
 BEGIN { $^C = 1; }
@@ -577,16 +578,8 @@ use warnings 'misc';
 dump;
 CORE::dump;
 EXPECT
-dump() better written as CORE::dump() at - line 4.
+dump() better written as CORE::dump() at - line 4 character 1.
 - syntax OK
-########
-# toke.c
-use warnings 'misc';
-use subs qw/dump/;
-sub dump { print "no warning for overriden dump\n"; }
-dump;
-EXPECT
-no warning for overriden dump
 ########
 # toke.c
 # 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
@@ -597,7 +590,7 @@ no warnings 'regexp';
 "foo" =~ m/foo/c;
 "foo" =~ m/foo/cg;
 EXPECT
-Use of /c modifier is meaningless without /g at - line 4.
+Use of /c modifier is meaningless without /g at - line 4 character 10.
 ########
 # toke.c
 # 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
@@ -609,8 +602,8 @@ no warnings 'regexp';
 s/ab/ab/c;
 s/ab/ab/cg;
 EXPECT
-Use of /c modifier is meaningless in s/// at - line 5.
-Use of /c modifier is meaningless in s/// at - line 6.
+Use of /c modifier is meaningless in s/// at - line 5 character 1.
+Use of /c modifier is meaningless in s/// at - line 6 character 1.
 ########
 # toke.c
 # mandatory warning
@@ -618,8 +611,8 @@ eval q/if ($a) { } elseif ($b) { }/;
 no warnings "syntax";
 eval q/if ($a) { } elseif ($b) { }/;
 EXPECT
-elseif should be elsif at (eval 1) line 1.
-    (eval) called at - line 3.
+elseif should be elsif at (eval 1) line 1 character 13.
+    (eval) called at - line 3 character 1.
 ########
 # toke.c
 # mandatory warning
@@ -628,16 +621,16 @@ no warnings "syntax";
 eval q/5 6/;
 EXPECT
 Number found where operator expected at (eval 1) line 1, near "5 6"
- at (eval 1) line 1.
-    (eval) called at - line 3.
+ at (eval 1) line 1 character 4.
+    (eval) called at - line 3 character 1.
 	(Missing operator before  6?)
- at (eval 1) line 1.
-    (eval) called at - line 3.
+ at (eval 1) line 1 character 4.
+    (eval) called at - line 3 character 1.
 ########
 # toke.c
 our $foo :unique;
 use warnings 'deprecated';
 our $bar :unique;
 EXPECT
-Use of :unique is deprecated at - line 4.
+Use of :unique is deprecated at - line 4 character 11.
 ########
