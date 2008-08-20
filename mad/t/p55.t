@@ -129,6 +129,8 @@ for my $file (@files) {
 }
 
 __DATA__
+33
+########
 use strict;
 #ABC
 Foo->new;

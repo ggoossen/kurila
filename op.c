@@ -2497,13 +2497,12 @@ Perl_prepend_elem(pTHX_ I32 type, OP *first, OP *last)
 #ifdef PERL_MAD
  
 MADTOKEN *
-Perl_newMADTOKEN(pTHX_ I32 optype, YYSTYPE lval, MADPROP* madprop)
+Perl_newMADTOKEN(pTHX_ I32 optype, MADPROP* madprop)
 {
     MADTOKEN *tk;
     Newxz(tk, 1, MADTOKEN);
     tk->tk_type = (OPCODE)optype;
     tk->tk_type = 12345;
-    tk->tk_lval = lval;
     tk->tk_mad = madprop;
     return tk;
 }
@@ -2753,7 +2752,7 @@ OP *
 Perl_force_list(pTHX_ OP *o)
 {
     if (!o || o->op_type != OP_LIST)
-	o = newLISTOP(OP_LIST, 0, o, NULL, newAV());
+	o = newLISTOP(OP_LIST, 0, o, NULL, NULL);
     op_null(o);
     return o;
 }
@@ -3235,7 +3234,7 @@ Perl_package(pTHX_ OP *o)
 	return NULL;
     }
 
-    pegop = newOP(OP_NULL,0);
+    pegop = newOP(OP_NULL,0, o->op_location);
     op_getmad(o,pegop,'P');
     return pegop;
 #endif
@@ -3253,7 +3252,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     OP *imop;
     OP *veop;
 #ifdef PERL_MAD
-    OP *pegop = newOP(OP_NULL,0);
+    OP *pegop = newOP(OP_NULL,0, idop->op_location);
 #endif
 
     PERL_ARGS_ASSERT_UTILIZE;
@@ -5811,7 +5810,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		}
 		scalar(kid);
 #ifdef PERL_MAD
-		addmad(newMADsv('c', newSVpvn('$', 1)), &kid->op_madprop, 0);
+		addmad(newMADsv('c', newSVpvn("$", 1)), &kid->op_madprop, 0);
 #endif
 		break;
 	    case OA_LIST:
@@ -5834,7 +5833,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		    bad_type(numargs, "array", PL_op_desc[type], kid);
 		mod(kid, type);
 #ifdef PERL_MAD
-		addmad(newMADsv('c', newSVpvn('@', 1)), &kid->op_madprop, 0);
+		addmad(newMADsv('c', newSVpvn("@", 1)), &kid->op_madprop, 0);
 #endif
 		break;
 	    case OA_HVREF:
@@ -5843,7 +5842,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		    bad_type(numargs, "hash", PL_op_desc[type], kid);
 		mod(kid, type);
 #ifdef PERL_MAD
-		addmad(newMADsv('c', newSVpvn('%', 1)), &kid->op_madprop, 0);
+		addmad(newMADsv('c', newSVpvn("%", 1)), &kid->op_madprop, 0);
 #endif
 		break;
 	    case OA_CVREF:
@@ -6602,7 +6601,7 @@ Perl_ck_shift(pTHX_ OP *o)
 	argop = newUNOP(OP_RV2AV, 0,
 			scalar(newGVOP(OP_GV, 0, CvUNIQUE(PL_compcv) ? PL_argvgv : PL_defgv, o->op_location)), o->op_location);
 #ifdef PERL_MAD
-	o = newUNOP(type, 0, scalar(argop));
+	o = newUNOP(type, 0, scalar(argop), argop->op_location);
 	op_getmad(oldo,o,'O');
 	return o;
 #else
