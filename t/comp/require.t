@@ -8,12 +8,12 @@ BEGIN {
 our $i = 1;
 
 my @fjles_to_delete = @( qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
-krunch.pm krunch.pmc whap.pm whap.pmc) );
+krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm) );
 
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
 my $Is_UTF8   = ($^OPEN || "") =~ m/:utf8/;
-my $total_tests = 30;
+my $total_tests = 31;
 
 if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
@@ -201,6 +201,15 @@ EOT
     }
     print "ok ", ++$i, " [perl #49472]\n";
 }
+
+# circular require
+
+write_file("circleA.pm", 'BEGIN { require circleB } 1;');
+write_file("circleB.pm", 'require circleA; 1;');
+try { require circleA; };
+print "not " unless $@ && $@->message =~ m/Circular dependency: circleA.pm is still being compiled/;
+print "ok ", ++$i, " circular require\n";
+
 
 ##########################################
 # What follows are UTF-8 specific tests. #

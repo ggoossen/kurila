@@ -2474,11 +2474,13 @@ PP(pp_require)
 	SV * const * const svp = hv_fetch(GvHVn(PL_incgv),
 					  unixname, unixlen, 0);
 	if ( svp ) {
-	    if (*svp != &PL_sv_undef)
+	    if (SvTRUE(*svp))
 		RETPUSHYES;
-	    else
+	    else if (*svp == &PL_sv_undef)
 		DIE(aTHX_ "Attempt to reload %s aborted.\n"
 			    "Compilation failed in require", unixname);
+	    else
+		DIE(aTHX_ "Circular dependency: %s is still being compiled", unixname);
 	}
     }
 
@@ -2686,7 +2688,7 @@ PP(pp_require)
 	    }
 	}
     }
-    filename = sv_2mortal(newSVpv( tryrsfp ? tryname : name, 0));
+    filename = newSVpv( tryrsfp ? tryname : name, 0); /* fixme possible leak. */
     SvREFCNT_dec(namesv);
     if (!tryrsfp) {
 	if (PL_op->op_type == OP_REQUIRE) {
@@ -2724,12 +2726,12 @@ PP(pp_require)
     /* Check whether a hook in @INC has already filled %INC */
     if (!hook_sv) {
 	(void)hv_store(GvHVn(PL_incgv),
-	    unixname, unixlen, newSVsv(filename),0);
+	    unixname, unixlen, &PL_sv_no, 0);
     } else {
 	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
 	if (!svp)
 	    (void)hv_store(GvHVn(PL_incgv),
-			   unixname, unixlen, SvREFCNT_inc_simple(hook_sv), 0 );
+			   unixname, unixlen, &PL_sv_no, 0 );
     }
 
     ENTER;
@@ -2769,6 +2771,18 @@ PP(pp_require)
 	op = DOCATCH(PL_eval_start);
     else
 	op = PL_op->op_next;
+
+    /* mark require as finished */
+    if (!hook_sv) {
+	(void)hv_store(GvHVn(PL_incgv),
+	    unixname, unixlen, newSVsv(filename), 0);
+    } else {
+	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
+	if (!svp)
+	    (void)hv_store(GvHVn(PL_incgv),
+		unixname, unixlen, SvREFCNT_inc(hook_sv), 0 );
+    }
+    SvREFCNT_dec(filename);
 
     return op;
 }
