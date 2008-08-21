@@ -2778,7 +2778,7 @@ PP(pp_require)
 	    unixname, unixlen, newSVsv(filename), 0);
     } else {
 	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
-	if (!svp)
+	if ( ! ( svp && SvTRUE(*svp) ) )
 	    (void)hv_store(GvHVn(PL_incgv),
 		unixname, unixlen, SvREFCNT_inc(hook_sv), 0 );
     }
