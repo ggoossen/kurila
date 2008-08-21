@@ -18,11 +18,11 @@ BEGIN {
         plan skip_all => 'Non-Unix platform';
     }
     else {
-        plan tests => 108;
+        plan tests => 107;
     }
 }
 
-BEGIN { use_ok( 'ExtUtils::MM_Unix' ); }
+use ExtUtils::MM_Unix;
 
 use strict;
 use File::Spec;

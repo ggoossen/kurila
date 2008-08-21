@@ -9,7 +9,9 @@ use DirHandle;
 
 our %Config_Override;
 
-use ExtUtils::MakeMaker qw($Verbose neatvalue);
+our $Verbose;
+require ExtUtils::MakeMaker;
+ExtUtils::MakeMaker->import(qw($Verbose neatvalue));
 
 # If we make $VERSION an our variable parse_version() breaks
 use vars qw($VERSION);

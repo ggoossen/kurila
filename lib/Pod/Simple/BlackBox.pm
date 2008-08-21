@@ -22,8 +22,7 @@ package Pod::Simple::BlackBox;
 use integer; # vroom!
 use strict;
 BEGIN {
-  require Pod::Simple;
-  *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG
+  *DEBUG = sub{0} unless defined &DEBUG
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
