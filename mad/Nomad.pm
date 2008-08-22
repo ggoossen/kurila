@@ -51,6 +51,10 @@ sub xml_to_p5 {
     # Finally, walk AST to produce new program.
 
     my $text = $ast->p5text();	# returns encoded, must output raw
+
+    # remove automaticly added ';'
+    $text =~ s/^;//;
+
     return $text;
 }
 
@@ -1265,8 +1269,8 @@ sub ast {
 	return $self->$meth(@_);
     }
 
-    if (%{$self->{mp}}) {
-        my $nulltype = $$self{mp}{null_type_first} || $self->{mp}{null_type};
+    if (%{$self->{mp}}
+          and my $nulltype = $$self{mp}{null_type_first} || $self->{mp}{null_type}) {
         if (exists $astmad{$nulltype}) {
             return $astmad{$nulltype}->($self);
         }
@@ -1456,7 +1460,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('dx d ( $ )');
+    push @args, $self->madness('dx d ( $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1593,6 +1597,16 @@ sub ast {
     return ';';  # XXX literal ; should come through somewhere
 }
 
+package PLXML::op_anonscalar;
+
+sub ast {
+    my $self = shift;
+    my @newkids = $self->madness('[');
+    push @newkids, map { $_->ast() } @{$self->{Kids}};
+    push @newkids, $self->madness(']');
+    return $self->newtype->new(Kids => [@newkids]);
+}
+
 package PLXML::op_prototype;
 package PLXML::op_refgen;
 
@@ -1625,7 +1639,7 @@ sub ast {
 	return P5AST::op_stringify->new(Kids => [@newkids]);
     }
     else {
-	push @newkids, $self->madness('o [');
+	push @newkids, $self->madness('o s [');
 	for my $kid (@{$$self{Kids}}) {
 	    push @newkids, $kid->ast($self, @_);
 	}
@@ -1674,6 +1688,7 @@ package PLXML::op_readline;
 sub astnull {
     my $self = shift;
     my @retval;
+    @retval = $self->madness('o');
     if (exists $$self{mp}{q}) {
 	@retval = $self->madness('q = Q');
     }
@@ -2208,6 +2223,26 @@ package PLXML::op_values;
 package PLXML::op_keys;
 package PLXML::op_delete;
 package PLXML::op_exists;
+package PLXML::op_expand;
+
+sub ast {
+    my $self = shift;
+
+    if (my @old = $self->madness('O')) {
+        return $self->newtype->new(Kids => [@old]);
+    }
+
+    my @newkids = $self->madness('wrap_open d ( o');
+
+    if (exists $$self{Kids}) {
+	my $arg = $$self{Kids}[0];
+	push @newkids, $arg->ast($self, @_) if defined $arg;
+    }
+    push @newkids, $self->madness(') wrap_close');
+
+    return $self->newtype()->new(Kids => [@newkids]);
+}
+
 package PLXML::op_rv2hv;
 
 sub astnull {
@@ -2380,6 +2415,8 @@ sub ast {
 
 package PLXML::op_anonlist;
 package PLXML::op_anonhash;
+package PLXML::op_nkeys;
+package PLXML::op_nelems;
 package PLXML::op_splice;
 package PLXML::op_push;
 package PLXML::op_pop;
@@ -2818,7 +2855,7 @@ sub ast {
     else {
 	push @retval, '';
     }
-    if (ref $range eq 'PLXML::op_null' and $$self{flags} =~ /STACKED/) {
+    if (ref $range eq 'PLXML::op_null' and $$self{flags} =~ /SPECIAL/) {
 	my (undef,$min,$max) = @{$range->{Kids}};
 	push @retval, $min->ast($self,@_);
 	if (defined $max) {
@@ -2889,13 +2926,18 @@ sub ast {
 	else {
 	    # bypass the op_null
 	    $andor = $nextthing->{Kids}[0];
-	    eval {
-		push @newkids, $$andor{Kids}[0]->ast($self, @_);
-	    };
-	    push @newkids, $self->madness(')');
-	    eval {
-		push @newkids, $$andor{Kids}[1]->blockast($self, @_);
-	    };
+            if ($andor->{Kids}) {
+                eval {
+                    push @newkids, $$andor{Kids}[0]->ast($self, @_);
+                };
+                die if $@;
+                push @newkids, $self->madness(')');
+                eval {
+                    push @newkids, $$andor{Kids}[1]->blockast($self, @_);
+                };
+            } else {
+                push @newkids, $nextthing->ast($self, @_);
+            }
 	}
     }
     else {

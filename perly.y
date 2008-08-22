@@ -388,11 +388,11 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 						LOCATION($2), scalar($7),
 						$12, $10, $9), LOCATION($2));
 #ifdef MAD
-			  forop = append_elem(OP_LINESEQ,
-				newSTATEOP(0,
-					   CopLABEL_alloc(PVAL($1)),
-                                    ($5 ? $5 : newOP(OP_NULL, 0, LOCATION($2))), LOCATION($2) ),
-				forop);
+			  forop = newUNOP(OP_NULL, 0, append_elem(OP_LINESEQ,
+                                  newSTATEOP(0,
+                                      CopLABEL_alloc(PVAL($1)),
+                                      ($5 ? $5 : newOP(OP_NULL, 0, LOCATION($2))), LOCATION($2) ),
+                                  forop), LOCATION($2));
 
 			  TOKEN_GETMAD($2,forop,'3');
 			  TOKEN_GETMAD($3,forop,'(');

@@ -342,6 +342,15 @@ sub check { 'ck_anoncode' }
 sub flags { '$' }
 sub args { '' }
 
+package PLXML::op_anonscalar;
+
+our @ISA = ('PLXML::padop_svop');
+
+sub key { 'anonscalar' }
+sub desc { 'anonymous scalar' }
+sub check { 'ck_fun' }
+sub flags { '$' }
+sub args { '' }
 
 package PLXML::op_prototype;
 
@@ -1622,6 +1631,15 @@ sub check { 'ck_fun' }
 sub flags { '%' }
 sub args { 'H' }
 
+package PLXML::op_expand;
+
+our @ISA = ('PLXML::baseop_unop');
+
+sub key { 'expand' }
+sub desc { 'expand' }
+sub check { 'ck_fun' }
+sub flags { '%' }
+sub args { 'S' }
 
 package PLXML::op_values;
 
@@ -1644,6 +1662,25 @@ sub check { 'ck_fun' }
 sub flags { 't%' }
 sub args { 'H' }
 
+package PLXML::op_nkeys;
+
+our @ISA = ('PLXML::baseop_unop');
+
+sub key { 'nkeys' }
+sub desc { 'nkeys' }
+sub check { 'ck_fun' }
+sub flags { 't%' }
+sub args { 'H' }
+
+package PLXML::op_nelems;
+
+our @ISA = ('PLXML::baseop_unop');
+
+sub key { 'nelems' }
+sub desc { 'nelems' }
+sub check { 'ck_fun' }
+sub flags { 't%' }
+sub args { 'A' }
 
 package PLXML::op_delete;
 
@@ -1781,7 +1818,6 @@ sub desc { 'anonymous list ([])' }
 sub check { 'ck_fun' }
 sub flags { 'ms@' }
 sub args { 'L' }
-
 
 package PLXML::op_anonhash;
 

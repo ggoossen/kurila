@@ -3490,8 +3490,11 @@ S_is_list_assignment(pTHX_ register const OP *o)
     if (!o)
 	return TRUE;
 
-    if ((o->op_type == OP_NULL) && (o->op_flags & OPf_KIDS))
+    if ((o->op_type == OP_NULL) && (o->op_flags & OPf_KIDS)) {
+	if (o->op_flags & OPf_PARENS)
+	    return TRUE;
 	o = cUNOPo->op_first;
+    }
 
     flags = o->op_flags;
     type = o->op_type;
@@ -5516,7 +5519,11 @@ Perl_ck_try(pTHX_ OP *o)
 	    o->op_flags &= ~OPf_KIDS;
 	    op_null(o);
 	}
-	else if (kid->op_type == OP_LINESEQ || kid->op_type == OP_STUB) {
+	else if (kid->op_type == OP_LINESEQ 
+#ifdef PERL_MAD
+	    || kid->op_type == OP_NULL
+#endif
+	    ) {
 	    LOGOP *enter;
 	    OP* const oldo = o;
 

@@ -310,11 +310,11 @@ case 2:
 						LOCATION((ps[(2) - (12)].val.i_tkval)), scalar((ps[(7) - (12)].val.opval)),
 						(ps[(12) - (12)].val.opval), (ps[(10) - (12)].val.opval), (ps[(9) - (12)].val.ionlyval)), LOCATION((ps[(2) - (12)].val.i_tkval)));
 #ifdef MAD
-			  forop = append_elem(OP_LINESEQ,
-				newSTATEOP(0,
-					   CopLABEL_alloc(PVAL((ps[(1) - (12)].val.p_tkval))),
-                                    ((ps[(5) - (12)].val.opval) ? (ps[(5) - (12)].val.opval) : newOP(OP_NULL, 0, LOCATION((ps[(2) - (12)].val.i_tkval)))), LOCATION((ps[(2) - (12)].val.i_tkval)) ),
-				forop);
+			  forop = newUNOP(OP_NULL, 0, append_elem(OP_LINESEQ,
+                                  newSTATEOP(0,
+                                      CopLABEL_alloc(PVAL((ps[(1) - (12)].val.p_tkval))),
+                                      ((ps[(5) - (12)].val.opval) ? (ps[(5) - (12)].val.opval) : newOP(OP_NULL, 0, LOCATION((ps[(2) - (12)].val.i_tkval)))), LOCATION((ps[(2) - (12)].val.i_tkval)) ),
+                                  forop), LOCATION((ps[(2) - (12)].val.i_tkval)));
 
 			  TOKEN_GETMAD((ps[(2) - (12)].val.i_tkval),forop,'3');
 			  TOKEN_GETMAD((ps[(3) - (12)].val.i_tkval),forop,'(');

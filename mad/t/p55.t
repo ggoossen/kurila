@@ -85,7 +85,7 @@ sub p55_file {
     if ($@) {
         fail "convert xml to p5 failed file: '$file'";
         #$TODO or die;
-        #diag "error: $@";
+        diag "error: $@";
         return;
     }
     # ok($output eq $input, "p55 '$file'");
@@ -192,10 +192,10 @@ __END__
 DATA
 ########
 # split with PUSHRE
-my @prgs = split "\n########\n", ~< DATA;
+my @prgs = @( split "\n########\n", ~< DATA );
 ########
 # unless(eval { })
-unless (eval { $a }) { $a = $b }
+unless (try { $a }) { $a = $b }
 ########
 # local our $...
 local our $TODO
@@ -223,7 +223,7 @@ job system, though it's not on CPAN at the time of writing this.
 
 =cut
 ########
-@INC = qw(foo bar);
+@INC = @( qw(foo bar) );
 ########
 if (int(1.23) == 1) { print "1"; } else { print "2"; }
 ########
@@ -250,5 +250,30 @@ my $msg = "ce ºtii tu, bã ?\n";
 ########
 (stat "abc")[2];
 ########
-my $x;
-$x->foobar(1, 3) = ();
+while ( ~< *DATA) {
+      print $_;
+}
+########
+for (1..5) {
+    print $_;
+}
+########
+map { $_ } 1..5;
+########
+$( 3 );
+########
+sub () { 1 }
+########
+my %h;
+(<%h) = (1, 2);
+########
+my (<%hash) = (1,2);
+########
+my %h;
+(<%h) = < (%h);
+########
+{
+   # comment
+}
+########
+try { }
