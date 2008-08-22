@@ -47,6 +47,7 @@ print "1..7\n";
 
 use Socket;
 use IO::Socket qw(AF_INET SOCK_DGRAM INADDR_ANY);
+use IO::Socket::INET;
 
 my $udpa = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
      || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')

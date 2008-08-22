@@ -36,7 +36,7 @@ try {
     alarm 120;
 };
 
-use IO::Socket;
+use IO::Socket::INET;
 
 my $listen = IO::Socket::INET->new(Listen => 2,
 				Proto => 'tcp',
