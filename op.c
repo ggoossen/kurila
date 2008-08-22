@@ -5519,7 +5519,7 @@ Perl_ck_try(pTHX_ OP *o)
 	    o->op_flags &= ~OPf_KIDS;
 	    op_null(o);
 	}
-	else if (kid->op_type == OP_LINESEQ 
+	else if (kid->op_type == OP_LINESEQ || kid->op_type == OP_STUB
 #ifdef PERL_MAD
 	    || kid->op_type == OP_NULL
 #endif
