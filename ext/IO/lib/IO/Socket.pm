@@ -17,9 +17,6 @@ use Errno;
 
 # legacy
 
-require IO::Socket::INET;
-require IO::Socket::UNIX if ($^O ne 'epoc' && $^O ne 'symbian');
-
 @ISA = @( qw(IO::Handle) );
 
 $VERSION = "1.30_01";
