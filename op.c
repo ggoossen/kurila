@@ -3491,8 +3491,6 @@ S_is_list_assignment(pTHX_ register const OP *o)
 	return TRUE;
 
     if ((o->op_type == OP_NULL) && (o->op_flags & OPf_KIDS)) {
-	if (o->op_flags & OPf_PARENS)
-	    return TRUE;
 	o = cUNOPo->op_first;
     }
 
@@ -3521,6 +3519,9 @@ S_is_list_assignment(pTHX_ register const OP *o)
 
     if (type == OP_RV2SV)
 	return FALSE;
+
+    if (type == OP_EXPAND)
+	return TRUE;
 
     return FALSE;
 }
