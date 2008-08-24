@@ -2032,10 +2032,10 @@ PP(pp_grepwhile)
     SV** src;
 
     /* first, move source pointer to the next item in the source list */
-    src = PL_stack_base + PL_markstack_ptr[0];
+    SV** dst = PL_stack_base + (PL_markstack_ptr[0]) + 0;
+    src = PL_stack_base + PL_markstack_ptr[0] + 1;
 
     /* if there are new items, push them into the destination list */
-    SV** dst = PL_stack_base + (PL_markstack_ptr[0]) + 1;
     if (SvTRUE(POPs)) {
 	/* copy the new items down to the destination list */
 	av_push((AV*)*dst, newSVsv(POPs));

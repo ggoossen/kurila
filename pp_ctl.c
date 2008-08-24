@@ -404,12 +404,12 @@ PP(pp_grepstart)
 
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
 
-    SV* src = sv_2mortal(SvREFCNT_inc(TOPs));
+    SV* src = sv_mortalcopy(POPs);
     SV* dst = sv_2mortal(newAV());
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
-	TOPs = dst;
+	XPUSHs(dst);
 	RETURNOP(PL_op->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
@@ -417,13 +417,13 @@ PP(pp_grepstart)
     
     if ( av_len(SVav(src)) == -1 ) {
 	(void)POPMARK;
-	TOPs = dst;
+	XPUSHs(dst);
 	RETURNOP(PL_op->op_next->op_next);
     }
 
     pp_pushmark();				/* push dst */
     XPUSHs(dst);                          /* push dst */
-    XPUSHs(src);                      /* push src */
+    XPUSHs(src);                          /* push dst */
 
     ENTER;					/* enter outer scope */
 
@@ -459,13 +459,11 @@ PP(pp_mapwhile)
     SV** src;
     SV** dst;
 
-    /* first, move source pointer to the next item in the source list */
-    src = PL_stack_base + PL_markstack_ptr[-1];
+    dst = PL_stack_base + PL_markstack_ptr[-1] + 0;
+    src = PL_stack_base + PL_markstack_ptr[-1] + 1;
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
-	/* copy the new items down to the destination list */
-	dst = PL_stack_base + (PL_markstack_ptr[-1]) + 1;
 	while (items-- > 0)
 	    av_push((AV*)*dst, SvTEMP(TOPs) ? SvREFCNT_inc(POPs) : newSVsv(POPs));
     }
