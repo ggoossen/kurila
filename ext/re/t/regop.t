@@ -20,7 +20,7 @@ my @tests = @( < grep { m/\S/ } @( split m/(?=Compiling REx)/, $out) );
 shift @tests
     if @tests[0] =~ m/EXECUTING.../;
 
-plan( (nelems @tests) + 2 + ( (nelems @strs) - grep { !$_ or m/^---/ } @( < @strs) ));
+plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ } @( < @strs) )));
 
 is( scalar nelems @tests, $NUM_SECTS,
     "Expecting output for $NUM_SECTS patterns" );

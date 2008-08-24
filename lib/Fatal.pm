@@ -60,7 +60,7 @@ EOC
 
 sub one_invocation {
   my ($core, $call, $name, < @argv) = < @_;
-  return qq{$call({join ', ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} < \@_\})} . 
+  return qq{$call({join ', ', <@argv}) || die "Can't $name(\{join ', ', < map \{ dump::view(\$_) \} \@_\})} . 
     ($core ? ': $!' : ', \$! is \"$!\"') . '"';
 }
 

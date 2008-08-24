@@ -29,7 +29,7 @@ my @t;
 @t = @( < pump_it_up(qq{\n\nProk\n\n=head1 Things\n\n=cut\n\nBzorch\n\n}) );
 
 if(not(
-  ok scalar( grep { ref $_ and $_->can('type') } @( < @t)), 5
+  ok nelems( grep { ref $_ and $_->can('type') } @( < @t)), 5
 )) {
   ok 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 12 ) {ok 0}
@@ -59,7 +59,7 @@ if(not(
 ) );
 
 if(
-  not( ok scalar( grep { ref $_ and $_->can('type') } @( < @t)) => 16 )
+  not( ok nelems( grep { ref $_ and $_->can('type') } @( < @t)) => 16 )
 ) {
   ok 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 32 ) {ok 0}
