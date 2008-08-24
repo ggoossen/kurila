@@ -2040,6 +2040,9 @@ PP(pp_grepwhile)
 	/* copy the new items down to the destination list */
 	av_push((AV*)*dst, newSVsv(POPs));
     }
+    else {
+	POPs;
+    }
 
     LEAVE;					/* exit inner scope */
 

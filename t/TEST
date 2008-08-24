@@ -16,7 +16,7 @@ BEGIN { require '../lib/warnings.pm'; warnings->import() };
 %ENV{PERL_CORE} = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
-@ARGV = @( grep($_,< @ARGV) ) if $^O eq 'VMS';
+@ARGV = @( < grep($_, @ARGV) ) if $^O eq 'VMS';
 our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
@@ -102,13 +102,13 @@ sub _quote_args {
 }
 
 sub _populate_hash {
-    return @( map {$_, 1} split m/\s+/, @_[0] );
+    return @( < map {$_, 1} @( split m/\s+/, @_[0] ));
 }
 
 if ($::failed) {
     # get tests to run from TEST_FAILED
     open my $fh, "<", "TEST_FAILED";
-    push @ARGV, map { chomp; $_ } ~< $fh;
+    push @ARGV, < map { chomp; $_ } @( ~< $fh );
     close $fh;
     if ($::failed +> 1) {
         @ARGV = @(@ARGV[0]);
@@ -368,7 +368,7 @@ EOT
 			$failure ||= 'FAILED--seen duplicate leader';
 		    }
 		    $max = $1;
-		    %todo = %( map { $_ => 1 } split m/ /, $3 ) if $3;
+		    %todo = %( < map { $_ => 1 } @( split m/ /, $3 ) ) if $3;
 		    $totmax += $max;
 		    $tested_files++;
 		    if ($seen_ok) {
@@ -539,7 +539,7 @@ EOT
 	my $pct = $tested_files ? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) : "0.00";
 	my $s = $::bad_files == 1 ? "" : "s";
 	print STDERR "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
-	for my $test ( sort grep { %failed_tests{$_} } keys %failed_tests ) {
+	for my $test ( sort < grep { %failed_tests{$_} } @( keys %failed_tests ) ) {
 	    print "\t$test\n";
 	}
 	print STDERR <<'SHRDLU_1';
