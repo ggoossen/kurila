@@ -102,7 +102,7 @@ sub import {
     }
 
     # remove trailing duplicates
-    @INC = @( grep { ++%names{$_} == 1 } < @INC );
+    @INC = grep { ++%names{$_} == 1 } @INC;
     return;
 }
 
@@ -123,7 +123,7 @@ sub unimport {
     }
 
     # Remove ALL instances of each named directory.
-    @INC = @( grep { !exists %names{$_} } < @INC );
+    @INC = grep { !exists %names{$_} } @INC;
     return;
 }
 
