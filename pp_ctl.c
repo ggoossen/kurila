@@ -413,7 +413,7 @@ PP(pp_grepstart)
 	RETURNOP(PL_op->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
-	Perl_croak(aTHX_ "map expected an array but got %s", Ddesc(src));
+	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
     
     if ( av_len(SVav(src)) == -1 ) {
 	(void)POPMARK;
