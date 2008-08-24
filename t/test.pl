@@ -69,8 +69,8 @@ END {
 # messages
 sub _diag {
     return unless (nelems @_);
-    my @mess = @( map { m/^#/ ? "$_\n" : "# $_\n" }
-               map { split m/\n/ } < @_ );
+    my @mess = @( < map { m/^#/ ? "$_\n" : "# $_\n" }
+ @(               < map { split m/\n/ } @( < @_)) );
     my $func = $TODO ? \&_print : \&_print_stderr;
     $func->(< @mess);
 }
@@ -503,7 +503,7 @@ sub runperl {
 
     my $tainted = $^TAINT;
     my %args = %( < @_ );
-    exists %args{switches} && grep m/^-T$/, < @{%args{switches}} and $tainted = $tainted + 1;
+    exists %args{switches} && grep m/^-T$/, @( < @{%args{switches}}) and $tainted = $tainted + 1;
 
     if ($tainted) {
 	# We will assume that if you're running under -T, you really mean to
@@ -519,15 +519,15 @@ sub runperl {
 	    $sep = %Config{path_sep};
 	}
 
-	my @keys = @( grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV) );
+	my @keys = @( < grep {exists %ENV{$_}} @( qw(CDPATH IFS ENV BASH_ENV)) );
 	local %ENV{[< @keys]} = ();
 	# Untaint, plus take out . and empty string:
 	local %ENV{'DCL$PATH'} = $1 if $is_vms && (%ENV{'DCL$PATH'} =~ m/(.*)/s);
 	%ENV{PATH} =~ m/(.*)/s;
 	local %ENV{PATH} =
-	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
+	    join $sep, < grep { $_ ne "" and $_ ne "." and -d $_ and
 		($is_mswin or $is_vms or !(stat && (stat '_')[[2]]^&^0022)) }
-		    split quotemeta ($sep), $1;
+ @(		    split quotemeta ($sep), $1);
 	%ENV{PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
 
 	$runperl =~ m/(.*)/s;

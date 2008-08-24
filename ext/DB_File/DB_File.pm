@@ -122,8 +122,8 @@ sub TIEHASH
 {
     my $pkg = shift ;
 
-    bless \%( VALID => \%( map {$_, 1} 
-		       qw( bval cachesize psize flags lorder reclen bfname )
+    bless \%( VALID => \%( < map {$_, 1} 
+ @(		       qw( bval cachesize psize flags lorder reclen bfname ))
 		     ),
 	    GOT   => \%(),
           ), $pkg ;
@@ -225,7 +225,7 @@ push @ISA, qw(Tie::Hash Exporter);
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = @( grep m/^O_/, < @Fcntl::EXPORT );
+    my @O = @( < grep m/^O_/, @( < @Fcntl::EXPORT) );
     Fcntl->import(< @O);  # first we import what we want to export
     push(@EXPORT, < @O);
 };

@@ -597,13 +597,13 @@ sub podselect {
             ## looked like Unix command-line options.
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
-            %opts = %( map {
+            %opts = %( < map {
                 my ($key, $val) = (lc $_, %opts{$_});
                 $key =~ s/^(?=\w)/-/;
                 $key =~ m/^-se[cl]/  and  $key  = '-sections';
                 #! $key eq '-range'    and  $key .= 's';
                 ($key => $val);    
-            } (keys %opts) );
+            } @( (keys %opts)) );
 
             ## Process the options
             (exists %opts{'-output'})  and  $output = %opts{'-output'};

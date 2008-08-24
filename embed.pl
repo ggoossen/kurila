@@ -249,18 +249,18 @@ sub write_protos {
 				$prefix, $pat, $prefix, $args;
 	}
 	if ( (nelems @nonnull) ) {
-	    my @pos = @( map { $has_context ? "pTHX_$_" : $_ } < @nonnull );
-	    push @attrs, map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } < @pos;
+	    my @pos = @( < map { $has_context ? "pTHX_$_" : $_ } @( < @nonnull) );
+	    push @attrs, < map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } @( < @pos);
 	}
 	if ( (nelems @attrs) ) {
 	    $ret .= "\n";
-	    $ret .= join( "\n", map { "\t\t\t$_" } < @attrs );
+	    $ret .= join( "\n", < map { "\t\t\t$_" } @( < @attrs) );
 	}
 	$ret .= ";";
 	$ret = "/* $ret */" if $commented_out;
 	if ((nelems @names_of_nn)) {
 	    $ret .= "\n#define PERL_ARGS_ASSERT_\U$plain_func\E\t\\\n\t"
-		. join '; ', map "assert($_)", < @names_of_nn;
+		. join '; ', < map "assert($_)", @( < @names_of_nn);
 	}
 	$ret .= (nelems @attrs) ? "\n\n" : "\n";
     }

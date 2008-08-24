@@ -53,7 +53,7 @@ NOTICE
 }
 
 # detect when being built in Perl core
-if (not grep { $_ eq 'PERL_CORE=1' } < @ARGV) {
+if (not grep { $_ eq 'PERL_CORE=1' } @( < @ARGV)) {
     push @extra_params, 
         DEFINE      => '-DUSE_PPPORT_H';
 }
@@ -153,7 +153,7 @@ if(try {require ExtUtils::Constant; 1}) {
         NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
     );
 
-    my @names = @( map { ref $_ ? $_->{name} : $_ } < @levels, < @facilities, < @options );
+    my @names = @( < map { ref $_ ? $_->{name} : $_ } @( < @levels, < @facilities, < @options) );
     open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $!\n";
     print MACROS join $/, < @names;
     close(MACROS);

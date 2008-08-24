@@ -6,7 +6,7 @@ use I18N::LangTags::Detect;
 use Test;
 BEGIN { plan tests => 87 };
 
-my @in = @( grep m/\S/, split m/\n/, q{
+my @in = @( < grep m/\S/, @( split m/\n/, q{
 
 [ sv      ]  sv
 [ en      ]  en
@@ -56,7 +56,7 @@ my @in = @( grep m/\S/, split m/\n/, q{
 [ en ja       ]  en; q=0.5, ja; q=0.5
 [ fr-ca fr en ]  fr-ca, fr;q=0.8, en;q=0.7
 [ NIX ] NIX
-} );
+}) );
 
 foreach my $in (< @in) {
   $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in";

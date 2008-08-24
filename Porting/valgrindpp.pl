@@ -104,12 +104,12 @@ sub summary {
 
   for my $l (keys %$leak) {
     for my $s (keys %{$leak->{$l}}) {
-      my $ns = join '<', map {
+      my $ns = join '<', < map {
                  my($func, $file, $line) = split m/:/;
                  m/:/ ? %opt{lines}
                        ? "$func ($file:$line)" : "$func ($file)"
                      : $_
-               } split m/</, $s;
+               } @( split m/</, $s);
       %nl{$l}->{$ns}->{count}++;
       while (my($k,$v) = each %{$leak->{$l}->{$s}}) {
         %nl{$l}->{$ns}->{tests}->{$k} += $v;
@@ -123,7 +123,7 @@ sub summary {
   if (%opt{top}) {
     for my $what (qw(error leak)) {
       my @t = @( sort { %top{$b}->{$what} <+> %top{$a}->{$what} or $a cmp $b }
-              grep %top{$_}->{$what}, keys %top );
+              < grep %top{$_}->{$what}, @( keys %top) );
       (nelems @t) +> %opt{top} and splice @t, %opt{top};
       my $n = (nelems @t);
       my $s = $n +> 1 ? 's' : '';
@@ -163,7 +163,7 @@ sub summary {
       my $data = %nl{$l}->{$frames};
       my @stack = @( split m/</, $frames );
       $data->{count} +> 1 and @stack[-1] .= " [$data->{count} paths]";
-      print $fh join('', map { ' 'x4 . "$_:@stack[$_]\n" } 0 ..( (nelems @stack)-1) ), <
+      print $fh join('', < map { ' 'x4 . "$_:@stack[$_]\n" } @( 0 ..( (nelems @stack)-1)) ), <
                 format_tests($data->{tests}), "\n\n";
     }
   }
@@ -204,7 +204,7 @@ sub filter {
       chomp;
       s/^==(\d+)==\s?// and push @{%pid{$1}}, $_;
     }
-    map < @$_, values %pid;
+    map < @$_, @( values %pid);
   } );
 
   # Setup some useful regexes

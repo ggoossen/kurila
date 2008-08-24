@@ -305,7 +305,7 @@ while (defined (my $file = next_file())) {
 	    }
 	    $args = (
 		(nelems @args)
-		? "my(" . (join ',', map "\$$_", < @args) . ") = \@_;\n$t    "
+		? "my(" . (join ',', < map "\$$_", @( < @args)) . ") = \@_;\n$t    "
 		: ""
 	    );
 	    my $proto = (nelems @args) ? '' : '() ';

@@ -561,7 +561,7 @@ is_deeply (\@(keys %Benchmark::Cache), \@before_keys,
 
 
     while( my($func, $usage) = each %usage ) {
-        next if grep $func eq $_, < @takes_no_args;
+        next if grep $func eq $_, @( < @takes_no_args);
         eval "$func()";
         is( $@->{description}, $usage, "$func usage: no args" );
     }

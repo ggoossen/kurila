@@ -128,7 +128,7 @@ require ExtUtils::Constant;
 
 {
     # Check the constants above all appear in @EXPORT in Zlib.pm
-    my %names = %( map { $_, 1} < @names, 'ZLIB_VERSION' );
+    my %names = %( < map { $_, 1} @( < @names, 'ZLIB_VERSION') );
     open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
     while (~< *F)
     {
@@ -167,7 +167,7 @@ sub ParseCONFIG
     my @badkey = @( () ) ;
     my %Info = %( () ) ;
     my @Options = @( qw( INCLUDE LIB BUILD_ZLIB OLD_ZLIB GZIP_OS_CODE ) ) ;
-    my %ValidOption = %( map {$_, 1} < @Options ) ;
+    my %ValidOption = %( < map {$_, 1} @( < @Options) ) ;
     my %Parsed = %( < %ValidOption ) ;
     my $CONFIG = 'config.in' ;
 
@@ -297,9 +297,9 @@ sub zlib_files
     		 ) );
     }
     
-    @h_files = @( map { catfile($dir, $_)  } < @h_files ) ;
-    my @o_files = @( map { "$_\$(OBJ_EXT)" } 'Zlib', < @c_files );
-    @c_files = @( map { "$_.c" } 'Zlib', < @c_files ) ;
+    @h_files = @( < map { catfile($dir, $_)  } @( < @h_files) ) ;
+    my @o_files = @( < map { "$_\$(OBJ_EXT)" } @( 'Zlib', < @c_files) );
+    @c_files = @( < map { "$_.c" } @( 'Zlib', < @c_files) ) ;
 
     foreach my $file (< @c_files)
       { copy( catfile($dir, $file), '.') }
@@ -343,8 +343,8 @@ BEGIN
     \@( ''        => 255,  'Unknown OS'                   ),
   );
 
-  %OSnames = %( map { @$_[1] => @$_[2] }  
-             < @GZIP_OS_Names ) ;
+  %OSnames = %( < map { @$_[1] => @$_[2] }  
+ @(             < @GZIP_OS_Names) ) ;
 }
 
 sub getOSCode

@@ -45,7 +45,7 @@ sub have_cc
 
 # Build options for different environments
 my @conditional_params;
-if (grep { $_ eq 'PERL_CORE=1' } < @ARGV) {
+if (grep { $_ eq 'PERL_CORE=1' } @( < @ARGV)) {
     # Core
     push(@conditional_params, 'NORECURS' => 1);
 } else {

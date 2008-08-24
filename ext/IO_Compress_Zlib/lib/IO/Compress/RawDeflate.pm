@@ -51,9 +51,9 @@ $RawDeflateError = '';
     foreach (keys %EXPORT_TAGS )
     {
         push @{%EXPORT_TAGS{constants}}, 
-                 grep { !%seen{$_}++ } 
-                 < @{ %EXPORT_TAGS{$_} }
-    }
+                 < grep { !%seen{$_}++ } 
+ @(                 < @{ %EXPORT_TAGS{$_} }
+)    }
     %EXPORT_TAGS{all} = %EXPORT_TAGS{constants} ;
 }
 

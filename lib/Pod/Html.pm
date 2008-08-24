@@ -395,15 +395,15 @@ sub pod2html {
     for (< @poddata) {
 	if (m/\r/) {
 	    if (m/\r\n/) {
-		@poddata = @( map { s/\r\n/\n/g;
+		@poddata = @( < map { s/\r\n/\n/g;
 				 m/\n\n/ ?
-				     map { "$_\n\n" } split m/\n\n/ :
-				     $_ } < @poddata );
+				     < map { "$_\n\n" } @( split m/\n\n/) :
+				     $_ } @( < @poddata) );
 	    } else {
-		@poddata = @( map { s/\r/\n/g;
+		@poddata = @( < map { s/\r/\n/g;
 				 m/\n\n/ ?
-				     map { "$_\n\n" } split m/\n\n/ :
-				     $_ } < @poddata );
+				     < map { "$_\n\n" } @( split m/\n\n/) :
+				     $_ } @( < @poddata) );
 	    }
 	    last;
 	}
@@ -880,7 +880,7 @@ sub scan_podpath {
 	    $dirname = $1;
 	    opendir(DIR, $dirname) ||
 		die "$0: error opening directory $dirname: $!\n";
-	    @files = @( grep(m/(\.pod|\.pm)\z/ && ! -d $_, readdir(DIR)) );
+	    @files = @( < grep(m/(\.pod|\.pm)\z/ && ! -d $_, @( readdir(DIR))) );
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives

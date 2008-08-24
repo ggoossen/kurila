@@ -94,7 +94,7 @@ sub taint_these (@) {
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    return scalar grep { tainted($_) } < @_;
+    return scalar grep { tainted($_) } @( < @_);
 }
 sub tainted ($) {
     my $tainted = not try { @_[0], kill 0; 1};
@@ -195,9 +195,9 @@ my $TEST = catfile(curdir(), 'TEST');
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
-		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
-		     %ENV{[qw(TMP TEMP)]})[[0]]
+	$tmp = (< grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
+ @(		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
+		     %ENV{[qw(TMP TEMP)]}))[[0]]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 

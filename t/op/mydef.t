@@ -96,18 +96,18 @@ $_ = "global";
 	{ ok( our $_ eq 'global', 'our $_ still visible' ); }
 	ok( $_ == 6 || $_ == 7, 'local lexical $_ is still seen in map' );
 	{ my $_ ; ok( !defined, 'nested my $_ is undefined' ); }
-    } 6, 7;
+    } @( 6, 7);
     ok( $buf eq 'gxgx', q/...map doesn't modify outer lexical $_/ );
     ok( $_ eq 'x', '...my $_ restored outside map' );
     ok( our $_ eq 'global', '...our $_ restored outside map' );
-    map { my $_; ok( !defined, 'redeclaring $_ in map block undefs it' ); } 1;
+    map { my $_; ok( !defined, 'redeclaring $_ in map block undefs it' ); } @( 1);
 }
-{ map { my $_; ok( !defined, 'declaring $_ in map block undefs it' ); } 1; }
+{ map { my $_; ok( !defined, 'declaring $_ in map block undefs it' ); } @( 1); }
 {
     sub tmap3 () { return $_ };
     my $_ = 'local';
     sub tmap4 () { return $_ };
-    my $x = join '-', map $_.tmap3.tmap4, 1 .. 2;
+    my $x = join '-', < map $_.tmap3.tmap4, @( 1 .. 2);
     ok( $x eq '1globallocal-2globallocal', 'map without {}' );
 }
 {
@@ -121,7 +121,7 @@ $_ = "global";
 	ok( m/^[89]\z/, 'local lexical $_ is seen in grep' );
 	{ ok( our $_ eq 'global', 'our $_ still visible' ); }
 	ok( $_ == 8 || $_ == 9, 'local lexical $_ is still seen in grep' );
-    } 8, 9;
+    } @( 8, 9);
     ok( $buf eq 'gygy', q/...grep doesn't modify outer lexical $_/ );
     ok( $_ eq 'y', '...my $_ restored outside grep' );
     ok( our $_ eq 'global', '...our $_ restored outside grep' );
@@ -130,13 +130,13 @@ $_ = "global";
     sub tgrep3 () { return $_ };
     my $_ = 'local';
     sub tgrep4 () { return $_ };
-    my $x = join '-', grep $_=$_.tgrep3.tgrep4, 1 .. 2;
+    my $x = join '-', < grep $_=$_.tgrep3.tgrep4, @( 1 .. 2);
     ok( $x eq '1globallocal-2globallocal', 'grep without {} with side-effect # TODO' );
     ok( $_ eq 'local', '...but without extraneous side-effects' );
 }
 {
     for my $_ (1) {
-	my $x = grep $_, qw(a b);
+	my $x = grep $_, @( qw(a b));
 	ok( $x == 2, 'grep in scalar context' );
     }
 }

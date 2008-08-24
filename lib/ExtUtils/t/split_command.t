@@ -62,5 +62,5 @@ sub _run {
         s{\\\n}{} foreach < @cmds;
     }
 
-    return @( map { s/\n+$//; $_ } map { `$_` } < @cmds);
+    return @( < map { s/\n+$//; $_ } @( < map { `$_` } @( < @cmds)));
 }

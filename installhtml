@@ -297,7 +297,7 @@ sub parse_command_line {
     $recurse  = %Options{recurse}	    if defined %Options{recurse};
     $verbose  = %Options{verbose}	    if defined %Options{verbose};
 
-    @ignore = @( map "$podroot/$_", split(",", %Options{ignore}) ) if defined %Options{ignore};
+    @ignore = @( < map "$podroot/$_", @( split(",", %Options{ignore})) ) if defined %Options{ignore};
 }
 
 
@@ -311,7 +311,7 @@ sub create_index {
     # get the list of .html files in this directory
     opendir(DIR, $dir) ||
 	die "$0: error opening directory $dir for reading: $!\n";
-    @files = @( sort(grep(m/\.html?$/, readdir(DIR))) );
+    @files = @( sort(< grep(m/\.html?$/, @( readdir(DIR)))) );
     closedir(DIR);
 
     open(HTML, ">$html") ||
@@ -330,7 +330,7 @@ sub create_index {
 
 	# pull out the NAME section
 	my $name;
-	($name) = grep(m/name="name"/i, < @filedata);
+	($name) = < grep(m/name="name"/i, @( < @filedata));
 	($lcp1,$lcp2) = ($name =~ m,/H1>\s(\S+)\s[\s-]*(.*?)\s*$,smi);
 	if (defined $lcp1 and $lcp1 =~ m,^<P>$,i) { # Uninteresting.  Try again.
 	    ($lcp1,$lcp2) = ($name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi);
@@ -347,8 +347,8 @@ sub create_index {
 
 	next;
 
-	@index = @( grep(m/<!-- INDEX BEGIN -->.*<!-- INDEX END -->/s,
-		    < @filedata) );
+	@index = @( < grep(m/<!-- INDEX BEGIN -->.*<!-- INDEX END -->/s, @(
+		    < @filedata)) );
 	for (< @index) {
 	    s/<!-- INDEX BEGIN -->(\s*<!--)(.*)(-->\s*)<!-- INDEX END -->/$lcp2/s;
 	    s,#,$dir/$file#,g;
@@ -520,24 +520,24 @@ sub installdir {
     @pmlist  = @( () );	# .pm files to install
 
     # should files in this directory get an index?
-    $doindex = (grep($_ eq "$podroot/$dir", < @$splitdirs) ? 0 : 1);
+    $doindex = (grep($_ eq "$podroot/$dir", @( < @$splitdirs)) ? 0 : 1);
 
     opendir(DIR, "$podroot/$dir")
 	|| die "$0: error opening directory $podroot/$dir: $!\n";
 
     # find the directories to recurse on
-    @dirlist = @( map { if ($^O eq 'VMS') {m/^(.*)\.dir$/i; "$dir/$1";} else {"$dir/$_";}}
-	grep(-d "$podroot/$dir/$_" && !m/^\.{1,2}/, readdir(DIR)) ) if $recurse;
+    @dirlist = @( < map { if ($^O eq 'VMS') {m/^(.*)\.dir$/i; "$dir/$1";} else {"$dir/$_";}}
+ @(	< grep(-d "$podroot/$dir/$_" && !m/^\.{1,2}/, @( readdir(DIR)))) ) if $recurse;
     rewinddir(DIR);
 
     # find all the .pod files within the directory
-    @podlist = @( map { m/^(.*)\.pod$/; "$dir/$1" }
-	grep(! -d "$podroot/$dir/$_" && m/\.pod$/, readdir(DIR)) );
+    @podlist = @( < map { m/^(.*)\.pod$/; "$dir/$1" }
+ @(	< grep(! -d "$podroot/$dir/$_" && m/\.pod$/, @( readdir(DIR)))) );
     rewinddir(DIR);
 
     # find all the .pm files within the directory
-    @pmlist = @( map { m/^(.*)\.pm$/; "$dir/$1" }
-	grep(! -d "$podroot/$dir/$_" && m/\.pm$/, readdir(DIR)) );
+    @pmlist = @( < map { m/^(.*)\.pm$/; "$dir/$1" }
+ @(	< grep(! -d "$podroot/$dir/$_" && m/\.pm$/, @( readdir(DIR)))) );
 
     closedir(DIR);
 
@@ -550,10 +550,10 @@ sub installdir {
     foreach my $pod (< @podlist) {
 	# check if we should ignore it.
 	next if $pod =~ m(/t/); # comes from a test file
-	next if grep($_ eq "$pod.pod", < @$ignore);
+	next if grep($_ eq "$pod.pod", @( < @$ignore));
 
 	# check if a .pm files exists too
-	if (grep($_ eq $pod, < @pmlist)) {
+	if (grep($_ eq $pod, @( < @pmlist))) {
 	    print  "$0: Warning both '$podroot/$pod.pod' and "
 		. "'$podroot/$pod.pm' exist, using pod\n";
 	    push(@ignore, "$pod.pm");
@@ -565,7 +565,7 @@ sub installdir {
     foreach my $pm (< @pmlist) {
 	# check if we should ignore it.
 	next if $pm =~ m(/t/); # comes from a test file
-	next if grep($_ eq "$pm.pm", < @ignore);
+	next if grep($_ eq "$pm.pm", @( < @ignore));
 
 	runpod2html("$pm.pm", $doindex);
     }

@@ -438,7 +438,7 @@ sub fetch {
         }
 
         ### method is blacklisted ###
-        next if grep { lc $_ eq $method } < @$BLACKLIST;
+        next if grep { lc $_ eq $method } @( < @$BLACKLIST);
 
         ### method is known to fail ###
         next if $METHOD_FAIL->{$method};

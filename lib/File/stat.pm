@@ -25,10 +25,10 @@ sub import { goto &Exporter::import }
 
 use Class::Struct qw(struct);
 struct 'File::stat' => \@(
-     map { $_ => '$' } qw{
+     < map { $_ => '$' } @( qw{
 	 dev ino mode nlink uid gid rdev size
 	 atime mtime ctime blksize blocks
-     }
+     })
 );
 
 sub populate (@) {

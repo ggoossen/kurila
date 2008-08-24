@@ -142,7 +142,7 @@ $VERSION = "1.14";
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = @( grep m/^O_/, < @Fcntl::EXPORT );
+    my @O = @( < grep m/^O_/, @( < @Fcntl::EXPORT) );
     Fcntl->import(< @O);  # first we import what we want to export
     push(@EXPORT, < @O);
 };

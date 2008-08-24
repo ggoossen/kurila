@@ -112,8 +112,8 @@ sub _verify_att {
 
         my @sigs   = @( ref $sig ? < @$sig : $sig );
         my $given  = ref $val;
-        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } < @sigs ) {
-            my $takes = join " or ", map { _format_att($_) } < @sigs;
+        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } @( < @sigs) ) {
+            my $takes = join " or ", < map { _format_att($_) } @( < @sigs);
 
             my $has = _format_att($given);
             warn "WARNING: $key takes a $takes not a $has.\n".
@@ -169,7 +169,7 @@ sub eval_in_subdirs {
     use Cwd qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
-    local @INC = @( map try {abs_path($_) if -e} || $_, < @INC );
+    local @INC = @( < map try {abs_path($_) if -e} || $_, @( < @INC) );
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir (< @{$self->{DIR}}){
@@ -370,8 +370,8 @@ sub new {
 
     # PRINT_PREREQ is RedHatism.
     if ("{join ' ', <@ARGV}" =~ m/\bPRINT_PREREQ\b/) {
-        print join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
-                        sort keys %{$self->{PREREQ_PM}}), "\n";
+        print join(" ", < map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
+ @(                        sort keys %{$self->{PREREQ_PM}})), "\n";
         exit 0;
    }
 
@@ -416,8 +416,8 @@ sub new {
     }
     
      if (%unsatisfied && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join "\n", map {"    $_ %unsatisfied{$_}"} 
-                            sort { $a cmp $b } keys %unsatisfied;
+        my $failedprereqs = join "\n", < map {"    $_ %unsatisfied{$_}"} 
+ @(                            sort { $a cmp $b } keys %unsatisfied);
         die <<"END";
 MakeMaker FATAL: prerequisites not found.
 $failedprereqs
@@ -483,7 +483,7 @@ END
                     }
             }
         }
-        my @fm = @( grep m/^FIRST_MAKEFILE=/, < @ARGV );
+        my @fm = @( < grep m/^FIRST_MAKEFILE=/, @( < @ARGV) );
         parse_args($self,< @fm) if (nelems @fm);
     } else {
         parse_args($self,split(' ', %ENV{PERL_MM_OPT} || ''),< @ARGV);
@@ -725,15 +725,15 @@ sub parse_args{
         # So they can choose from the command line, which extensions they want
         # the grep enables them to have some colons too much in case they
         # have to build a list with the shell
-        $self->{DIR} = \@(grep $_, split ":", $self->{DIR});
+        $self->{DIR} = \@(< grep $_, @( split ":", $self->{DIR}));
     }
     # Turn a INCLUDE_EXT argument on the command line into an array
     if (defined $self->{INCLUDE_EXT} && ref \$self->{INCLUDE_EXT} eq 'SCALAR') {
-        $self->{INCLUDE_EXT} = \@(grep $_, split '\s+', $self->{INCLUDE_EXT});
+        $self->{INCLUDE_EXT} = \@(< grep $_, @( split '\s+', $self->{INCLUDE_EXT}));
     }
     # Turn a EXCLUDE_EXT argument on the command line into an array
     if (defined $self->{EXCLUDE_EXT} && ref \$self->{EXCLUDE_EXT} eq 'SCALAR') {
-        $self->{EXCLUDE_EXT} = \@(grep $_, split '\s+', $self->{EXCLUDE_EXT});
+        $self->{EXCLUDE_EXT} = \@(< grep $_, @( split '\s+', $self->{EXCLUDE_EXT}));
     }
 
     foreach my $mmkey (sort keys %$self){
@@ -897,7 +897,7 @@ sub flush {
       warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
 
-    my %keep = %( map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE) );
+    my %keep = %( < map { ($_ => 1) } @( qw(NEEDS_LINKING HAS_LINK_CODE)) );
 
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
         foreach (keys %$self) { # safe memory

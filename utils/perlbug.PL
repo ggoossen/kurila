@@ -47,7 +47,7 @@ while ( ~< *PATCH_LEVEL) {
     push @patches, $_ unless $_ eq 'NULL';
 }
 my $patch_desc = "'" . join("',\n    '", < @patches) . "'";
-my $patch_tags = join "", map m/(\S+)/ ? "+$1 " : (), < @patches;
+my $patch_tags = join "", < map m/(\S+)/ ? "+$1 " : (), @( < @patches);
 
 close(PATCH_LEVEL) or die "Error closing patchlevel.h: $!";
 

@@ -58,9 +58,9 @@ sub _init_optags {
 	my $tag = $1;
 
 	# Split into lines, keep only indented lines
-	my @lines = @( grep { m/^\s/    } split(m/\n/) );
+	my @lines = @( < grep { m/^\s/    } @( split(m/\n/)) );
 	foreach (< @lines) { s/--.*//  } # delete comments
-	my @ops   = @( map  { split ' ' } < @lines ); # get op words
+	my @ops   = @( < map  { split ' ' } @( < @lines) ); # get op words
 
 	foreach(< @ops) {
 	    warn "$tag - $_ already tagged in %seen{$_}\n" if %seen{$_};

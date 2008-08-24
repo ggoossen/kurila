@@ -59,7 +59,7 @@ sub is_valid_error
 }
 
 sub encode_list {
-  my @result = @( map { <_qq($_)} < @_ );
+  my @result = @( < map { <_qq($_)} @( < @_) );
   if ((nelems @result) == 1) {
     return @result;
   }
@@ -705,7 +705,7 @@ sub byteorder
   print "# byteorder test for $format\n";
   for my $value (< @_) {
     SKIP: {
-      my($nat,$be,$le) = try { map { pack $format.$_, $value } '', '>', '<' };
+      my($nat,$be,$le) = try { < map { pack $format.$_, $value } @( '', '>', '<') };
       skip "cannot pack '$format' on this perl", 5
         if is_valid_error($@);
 
@@ -761,7 +761,7 @@ SKIP: {
 
   for my $format (qw(s i l j s! i! l! q)) {
     SKIP: {
-      my($nat,$be,$le) = try { map { pack $format.$_, -1 } '', '>', '<' };
+      my($nat,$be,$le) = try { < map { pack $format.$_, -1 } @( '', '>', '<') };
       skip "cannot pack '$format' on this perl", 15
         if is_valid_error($@);
 
@@ -794,7 +794,7 @@ SKIP: {
       }
 
       for my $i (0 .. (nelems @val)-1) {
-        my($nat,$be,$le) = try { map { pack $format.$_, @val[$i] } '', '>', '<' };
+        my($nat,$be,$le) = try { < map { pack $format.$_, @val[$i] } @( '', '>', '<') };
         is($@, '');
 
         SKIP: {
@@ -1322,10 +1322,10 @@ SKIP: {
      push @codes, 'd';	# Keep the count the same
    }
 
-   push @codes, map { m/^[silqjfdp]/i ? ("$_<", "$_>") : () } < @codes;
+   push @codes, < map { m/^[silqjfdp]/i ? ("$_<", "$_>") : () } @( < @codes);
 
    my %val;
-   %val{[< @codes]} = map { m/ [Xx]  (?{ undef })
+   %val{[< @codes]} = < map { m/ [Xx]  (?{ undef })
 			| [AZa] (?{ 'something' })
 			| C     (?{ 214 })
 			| W     (?{ 188 })
@@ -1335,7 +1335,7 @@ SKIP: {
 			| [svnSiIlVNLqQjJ]  (?{ 10111 })
 			| [FfDd]  (?{ 1.36514538e67 })
 			| [pP]  (?{ "try this buffer" })
-			/x; $^R } < @codes;
+			/x; $^R } @( < @codes);
    my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
    my $end = "N4";
 
@@ -1442,7 +1442,7 @@ SKIP: {
 
 # Maybe this knowledge needs to be "global" for all of pack.t
 # Or a "can checksum" which would effectively be all the number types"
-my %cant_checksum = %( map {$_=> 1} qw(A Z u w) );
+my %cant_checksum = %( < map {$_=> 1} @( qw(A Z u w)) );
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: {
@@ -1621,8 +1621,8 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 
 {
     # use utf8 neutrality, numbers
-    for ( ( map { \@($_, -2.68) } qw(s S i I l L j J f d F D q Q
-                                   s! S! i! I! l! L! n! N! v! V!)),
+    for ( ( < map { \@($_, -2.68) } @( qw(s S i I l L j J f d F D q Q
+                                   s! S! i! I! l! L! n! N! v! V!))),
           \@('C', 253), \@('u', "\x[f8f9fafbfcfdfeff0506]"),
           \@('U', 0x300), \@('a3', "abc"), \@('a0', ''),
           \@('A3', "abc"), \@('Z3', "ghi")

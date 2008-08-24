@@ -119,7 +119,7 @@ sub guess_name {
       s/.pm$// for < @pm;
       if ((nelems @pm) == 1) { ($defpm = @pm[0]) =~ s/.pm$//; }
       elsif ((nelems @pm)) {
-        %xs = %( map { s/.xs$//; ($_,1) } glob( <'*.xs') );  ## no critic
+        %xs = %( < map { s/.xs$//; ($_,1) } @( glob( <'*.xs')) );  ## no critic
         if (keys %xs) { 
             foreach my $pm (< @pm) { 
                 $defpm = $pm, last if exists %xs{$pm}; 
@@ -501,13 +501,13 @@ CODE
     if ($self->{OBJECT} =~ m/\s/) {
         $self->{OBJECT} =~ s/(\\)?\n+\s+/ /g;
         $self->{OBJECT} = $self->wraplist(
-            map < $self->fixpath($_,0), split m/,?\s+/, $self->{OBJECT}
-        );
+            < map < $self->fixpath($_,0), @( split m/,?\s+/, $self->{OBJECT}
+)        );
     }
 
     $self->{LDFROM} = $self->wraplist(
-        map < $self->fixpath($_,0), split m/,?\s+/, $self->{LDFROM}
-    );
+        < map < $self->fixpath($_,0), @( split m/,?\s+/, $self->{LDFROM}
+)    );
 }
 
 
@@ -585,7 +585,7 @@ sub constants {
             INST_BIN INST_SCRIPT INST_LIB INST_ARCHLIB 
             PERL_LIB PERL_ARCHLIB
             PERL_INC PERL_SRC ],
-                        (map { 'INSTALL'.$_ } < $self->installvars)
+                        (< map { 'INSTALL'.$_ } @( < $self->installvars))
                       ) 
     {
         next unless defined $self->{$macro};
@@ -1321,7 +1321,7 @@ $(PERL_ARCHLIB)Config.pm : $(PERL_SRC)config.sh
 ]);
     }
 
-    push(@m, join(" ", map( <$self->fixpath($_,0),values %{$self->{XS}}))." : \$(XSUBPPDEPS)\n")
+    push(@m, join(" ", < map( <$self->fixpath($_,0), @(values %{$self->{XS}})))." : \$(XSUBPPDEPS)\n")
       if %{$self->{XS}};
 
     join('',< @m);
@@ -1361,7 +1361,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE)
 		FIRST_MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
 		MAKEAPERL=1 NORECURS=1 };
 
-	push @m, map(q[ \\\n\t\t"$_"], < @ARGV),q{
+	push @m, < map(q[ \\\n\t\t"$_"], @( < @ARGV)),q{
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE)$(USEMAKEFILE)$(MAKE_APERL_FILE) static $(MMS$TARGET)
@@ -1377,7 +1377,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 
     # The front matter of the linkcommand...
     $linkcmd = join ' ', %Config{'ld'},
-	    grep($_, %Config{[qw(large split ldflags ccdlflags)]});
+	    < grep($_, @( %Config{[qw(large split ldflags ccdlflags)]}));
     $linkcmd =~ s/\s+/ /g;
 
     # Which *.olb files could we make use of...
@@ -1417,7 +1417,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	}
 
 	%olbs{%ENV{DEFAULT}} = $_;
-    }, grep( -d $_, < @{$searchdirs || \@()}));
+    }, < grep( -d $_, @( < @{$searchdirs || \@()})));
 
     # We trust that what has been handed in as argument will be buildable
     $static = \@() unless $static;
@@ -1483,7 +1483,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     else          { $extralist = ''; }
     # Let ExtUtils::Liblist find the necessary libs for us (but skip PerlShr)
     # that's what we're building here).
-    push @optlibs, grep { !m/PerlShr/i } split ' ', +( <$self->ext())[[2]];
+    push @optlibs, < grep { !m/PerlShr/i } @( split ' ', +( <$self->ext())[[2]]);
     if ($libperl) {
 	unless (-f $libperl || -f ($libperl = $self->catfile(%Config{'installarchlib'},'CORE',$libperl))) {
 	    print STDOUT "Warning: $libperl not found\n";
@@ -1507,7 +1507,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 MAP_TARGET    = |, <$self->fixpath($target,0),'
 MAP_SHRTARGET = ', <$self->fixpath($shrtarget,0),"
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = ", $perlinc ? map('"$_" ',< @{$perlinc}) : '',"
+MAP_PERLINC   = ", $perlinc ? < map('"$_" ', @(< @{$perlinc})) : '',"
 MAP_EXTRA     = $extralist
 MAP_LIBPERL = ", <$self->fixpath($libperl,0),'
 ';
@@ -1696,7 +1696,7 @@ sub cd {
 
     $dir = vmspath($dir);
 
-    my $cmd = join "\n\t", map "$_", < @cmds;
+    my $cmd = join "\n\t", < map "$_", @( < @cmds);
 
     # No leading tab makes it look right when embedded
     my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd;
@@ -1729,7 +1729,7 @@ sub oneliner {
     $cmd = $self->escape_newlines($cmd);
 
     # Switches must be quoted else they will be lowercased.
-    $switches = join ' ', map { qq{"$_"} } < @$switches;
+    $switches = join ' ', < map { qq{"$_"} } @( < @$switches);
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd "--"};
 }
@@ -1749,8 +1749,8 @@ sub echo {
     my $opencmd = $appending ? 'Open/Append' : 'Open/Write';
 
     my @cmds = @("\$(NOECHO) $opencmd MMECHOFILE $file ");
-    push @cmds, map { '$(NOECHO) Write MMECHOFILE '.$self->quote_literal($_) } 
-                split m/\n/, $text;
+    push @cmds, < map { '$(NOECHO) Write MMECHOFILE '.$self->quote_literal($_) } 
+ @(                split m/\n/, $text);
     push @cmds, '$(NOECHO) Close MMECHOFILE';
     return @cmds;
 }
@@ -1831,7 +1831,7 @@ sub eliminate_macros {
     $self = \%() unless ref $self;
 
     if ($path =~ m/\s/) {
-      return join ' ', map { < $self->eliminate_macros($_) } split m/\s+/, $path;
+      return join ' ', < map { < $self->eliminate_macros($_) } @( split m/\s+/, $path);
     }
 
     my($npath) = < unixify($path);
@@ -1894,8 +1894,8 @@ sub fixpath {
 
     if ($path =~ m/[ \t]/) {
       return join ' ',
-             map { < $self->fixpath($_,$force_path) }
-	     split m/[ \t]+/, $path;
+             < map { < $self->fixpath($_,$force_path) }
+ @(	     split m/[ \t]+/, $path);
     }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 

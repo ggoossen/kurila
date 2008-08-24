@@ -226,7 +226,7 @@ one_or_two_a((nelems @_),nelems @_);
 testing \&a_sub, '&';
 
 sub a_sub (&) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",< map {dump::view($_)} @( < @_)),")\n";
     &{@_[0]};
 }
 
@@ -247,11 +247,11 @@ printf "ok \%d\n",$i++;
 testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",< map {dump::view($_)} @( < @_)),")\n";
     my($sub,$array) = < @_;
     print "not " unless (nelems @_) == 2 && (nelems @{$array}) == 4;
-    print map { &{$sub}($_) } < @{$array}
-}
+    print < map { &{$sub}($_) } @( < @{$array}
+)}
 
 @array = @(qw(O K)," ", $i++);
 sub_aref { lc shift } @array;
@@ -264,10 +264,10 @@ print "\n";
 testing \&sub_array, '&@';
 
 sub sub_array (&@) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",< map {dump::view($_)} @( < @_)),")\n";
     print "not " unless (nelems @_) == 5;
     my $sub = shift;
-    print map { &{$sub}($_) } < @_
+    print < map { &{$sub}($_) } @( < @_)
 }
 
 @array = @(qw(O K)," ", $i++);
@@ -281,7 +281,7 @@ print "\n";
 testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",< map {dump::view($_)} @( < @_)),")\n";
     print "not " unless ref(@_[0]) && @_[0]->{'a'};
     printf "ok \%d\n",$i++;
     @_[0]->{'b'} = 2;
@@ -299,7 +299,7 @@ printf "ok \%d\n",$i++;
 testing \&array_ref_plus, '\@@';
 
 sub array_ref_plus (\@@) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",",< map {dump::view($_)} @( < @_)),")\n";
     print "not " unless (nelems @_) == 2 && ref(@_[0]) && 1 == nelems @{@_[0]} && @_[1] eq 'x';
     printf "ok \%d\n",$i++;
     @{@_[0]} = @(qw(ok)," ",$i++,"\n");

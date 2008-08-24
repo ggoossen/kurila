@@ -132,7 +132,7 @@ sub can_use_ipc_open3   {
     ### ipc::open3 works on every platform, but it can't capture buffers
     ### on win32 :(
     return unless can_load(
-        modules => \%( map {$_ => '0.0'} qw|IPC::Open3 IO::Select Symbol| ),
+        modules => \%( < map {$_ => '0.0'} @( qw|IPC::Open3 IO::Select Symbol|) ),
         verbose => ($WARN && $verbose),
     );
     
@@ -521,12 +521,12 @@ sub _ipc_run {
         }
         push @command, $aref;
     } else {
-        @command = @( map { if( m/([<>|&])/ ) {
+        @command = @( < map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
                             \@( split m/ +/ )
                          }
-                    } split( m/\s*([<>|&])\s*/, $cmd ) );
+                    } @( split( m/\s*([<>|&])\s*/, $cmd )) );
     }
  
     ### if there's a pipe in the command, *STDIN needs to 

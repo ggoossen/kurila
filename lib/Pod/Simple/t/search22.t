@@ -86,11 +86,11 @@ skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0,
 my %count;
 for(values %$where2name) { ++%count{$_} };
 #print pretty(\%count), "\n\n";
-delete %count{[grep %count{$_} +< 2, keys %count ]};
+delete %count{[< grep %count{$_} +< 2, @( keys %count) ]};
 my $shadowed = join "|", sort keys %count;
 ok $shadowed, "hinkhonk::Glunk|hinkhonk::Vliff|perlthng|squaa::Vliff";
 
-sub thar { print "# Seen @_[0] :\n", map "#  \{$_\}\n", sort grep $where2name->{$_} eq @_[0],keys %$where2name; return; }
+sub thar { print "# Seen @_[0] :\n", < map "#  \{$_\}\n", @( sort < grep $where2name->{$_} eq @_[0], @(keys %$where2name)); return; }
 
 ok %count{'perlthng'}, 2;
 thar 'perlthng';
@@ -101,7 +101,7 @@ thar 'squaa::Vliff';
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, keys %$where2name ), 1;
+ok grep( m/squaa\.pm/, @( keys %$where2name) ), 1;
 
 ok( ($name2where->{'perlthng'}    || 'huh???'), '/[^\^]testlib1/' );
 ok( ($name2where->{'squaa::Vliff'} || 'huh???'), '/[^\^]testlib1/' );

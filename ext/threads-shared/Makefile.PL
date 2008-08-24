@@ -45,7 +45,7 @@ sub have_cc
 
 # Build options for different environments
 my @conditional_params;
-if (not grep { $_ eq 'PERL_CORE=1' } < @ARGV) {
+if (not grep { $_ eq 'PERL_CORE=1' } @( < @ARGV)) {
     # CPAN
 
     # Verify that a 'C' compiler is available

@@ -85,8 +85,8 @@ BEGIN {*is = \&Is};
 
 Exporter::export_ok_tags();
 
-my %tags     = %( map { $_ => 1 } map { < @$_ } values %EXPORT_TAGS );
-my %exportok = %( map { $_ => 1 } < @EXPORT_OK );
+my %tags     = %( < map { $_ => 1 } @( < map { < @$_ } @( values %EXPORT_TAGS)) );
+my %exportok = %( < map { $_ => 1 } @( < @EXPORT_OK) );
 my $ok = 1;
 foreach my $tag (keys %tags) {
     $ok = exists %exportok{$tag};
@@ -123,7 +123,7 @@ package Bar;
 my @imports = @( qw($seatbelt &Above stuff @wailing %left) );
 Testing->import(< @imports);
 
-main::ok( (!grep { eval "!defined $_" } map({ m/^\w/ ? "&$_" : $_ } < @imports)),
+main::ok( (!grep { eval "!defined $_" } @( < map({ m/^\w/ ? "&$_" : $_ } @( < @imports)))),
       'import by symbols' );
 
 
@@ -131,8 +131,8 @@ package Yar;
 my @tags = @( qw(:This :tray) );
 Testing->import(< @tags);
 
-main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
-             map { < @$_ } %Testing::EXPORT_TAGS{[ map { s/^://; $_ } <@tags ]}),
+main::ok( (!grep { eval "!defined $_" } @( < map { m/^\w/ ? "&$_" : $_ }
+ @(             < map { < @$_ } @( %Testing::EXPORT_TAGS{[ < map { s/^://; $_ } @( <@tags) ]})))),
       'import by tags' );
 
 
@@ -145,16 +145,16 @@ main::ok( !defined &lifejacket,     'deny import by !' );
 package Mars;
 Testing->import('/e/');
 
-main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
-            grep { m/e/ } < @Testing::EXPORT, < @Testing::EXPORT_OK),
+main::ok( (!grep { eval "!defined $_" } @( < map { m/^\w/ ? "&$_" : $_ }
+ @(            < grep { m/e/ } @( < @Testing::EXPORT, < @Testing::EXPORT_OK)))),
       'import by regex');
 
 
 package Venus;
 Testing->import('!/e/');
 
-main::ok( (!grep { eval "defined $_" } map { m/^\w/ ? "&$_" : $_ }
-            grep { m/e/ } < @Testing::EXPORT, < @Testing::EXPORT_OK),
+main::ok( (!grep { eval "defined $_" } @( < map { m/^\w/ ? "&$_" : $_ }
+ @(            < grep { m/e/ } @( < @Testing::EXPORT, < @Testing::EXPORT_OK)))),
       'deny import by regex');
 main::ok( !defined &lifejacket, 'further denial' );
 

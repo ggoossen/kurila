@@ -273,7 +273,7 @@ sub test_diag
 
     # expect the same thing, but prepended with "#     "
     local $_;
-    $err->expect(map {"# $_"} < @_)
+    $err->expect(< map {"# $_"} @( < @_))
 }
 
 =item test_test
@@ -356,10 +356,10 @@ sub test_test
 
       local $_;
 
-      $t->diag(map {"$_\n"} $out->complaint)
+      $t->diag(< map {"$_\n"} @( $out->complaint))
 	unless %args{skip_out} || $out->check;
 
-      $t->diag(map {"$_\n"} $err->complaint)
+      $t->diag(< map {"$_\n"} @( $err->complaint))
 	unless %args{skip_err} || $err->check;
     }
 }

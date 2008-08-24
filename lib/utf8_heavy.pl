@@ -210,12 +210,12 @@ sub SWASHNEW_real {
 	my @tmp = @( split(m/^/m, $list) );
 	my %seen;
 	no warnings;
-	$extras = join '', grep m/^[^0-9a-fA-F]/, < @tmp;
+	$extras = join '', < grep m/^[^0-9a-fA-F]/, @( < @tmp);
 	$list = join '',
-	    map  { $_->[1] }
-	    sort { $a->[0] <+> $b->[0] }
-	    map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) }
-	    grep { m/^([0-9a-fA-F]+)/ and not %seen{$1}++ } < @tmp; # XXX doesn't do ranges right
+	    < map  { $_->[1] }
+ @(	    sort { $a->[0] <+> $b->[0] }
+	    < map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) }
+ @(	    < grep { m/^([0-9a-fA-F]+)/ and not %seen{$1}++ } @( < @tmp))); # XXX doesn't do ranges right
     }
 
     if ($none) {

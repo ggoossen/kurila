@@ -57,8 +57,8 @@ sub other {
 }
 
 sub mkfiles {
-    my @files = @( map { "scratch$_" } < @_ );
+    my @files = @( < map { "scratch$_" } @( < @_) );
     return @files;
 }
 
-END { unlink map { ($_, "$_.bak") } < mkfiles(1..5) }
+END { unlink < map { ($_, "$_.bak") } @( < mkfiles(1..5)) }

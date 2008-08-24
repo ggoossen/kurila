@@ -27,9 +27,9 @@ my @w_files = @( () ) ;
 if ((nelems @ARGV))
   { print "ARGV = [{join ' ', <@ARGV}]\n" ;
     if ($Is_MacOS) {
-      @w_files = @( map { s#^#:lib:$pragma_name:#; $_ } < @ARGV )
+      @w_files = @( < map { s#^#:lib:$pragma_name:#; $_ } @( < @ARGV) )
     } else {
-      @w_files = @( map { s#^#./lib/$pragma_name/#; $_ } < @ARGV )
+      @w_files = @( < map { s#^#./lib/$pragma_name/#; $_ } @( < @ARGV) )
     }
   }
 else

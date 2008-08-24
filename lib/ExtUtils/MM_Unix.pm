@@ -34,7 +34,7 @@ BEGIN {
     %Is{Solaris} = $^O eq 'solaris';
     %Is{SunOS}   = %Is{SunOS4} || %Is{Solaris};
     %Is{BSD}     = ($^O =~ m/^(?:free|net|open)bsd$/ or
-                   grep( $^O eq $_, qw(bsdos interix dragonfly) )
+                   grep( $^O eq $_, @( qw(bsdos interix dragonfly)) )
                   );
 }
 
@@ -380,9 +380,9 @@ sub constants {
               INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
                    ),
-                   (map { ("INSTALL".$_,
+                   (< map { ("INSTALL".$_,
                           "DESTINSTALL".$_)
-                        } < $self->installvars),
+                        } @( < $self->installvars)),
                    qw(
               PERL_LIB    
               PERL_ARCHLIB
@@ -1100,7 +1100,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
         }
         else {
             my (@absdirs)
-                = @( reverse grep { $self->file_name_is_absolute } < $self->path );
+                = @( reverse < grep { $self->file_name_is_absolute } @( < $self->path) );
             $interpreter = '';
 
             foreach my $dir (< @absdirs) {
@@ -1252,13 +1252,13 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my($self) = < @_;
     my(%dir, %xs, %c, %h, %pl_files, %pm);
 
-    my %ignore = %( map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t) );
+    my %ignore = %( < map {( $_ => 1 )} @( qw(Makefile.PL Build.PL test.pl t)) );
 
     # ignore the distdir
     %Is{VMS} ? %ignore{"$self->{DISTVNAME}.dir"} = 1
             : %ignore{$self->{DISTVNAME}} = 1;
 
-    %ignore{[map lc, keys %ignore]} = values %ignore if %Is{VMS};
+    %ignore{[< map lc, @( keys %ignore)]} = values %ignore if %Is{VMS};
 
     foreach my $name ( <$self->lsdir($Curdir)){
 	next if $name =~ m/\#/;
@@ -1302,7 +1302,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     $self->{PM}         ||= \%pm;
 
     my @o_files = @( < @{$self->{C}} );
-    $self->{O_FILES} = \@(grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, < @o_files);
+    $self->{O_FILES} = \@(< grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @( < @o_files));
 }
 
 
@@ -1471,7 +1471,7 @@ sub init_PM {
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
     my (@pmlibdirs) = @( < @{$self->{PMLIBDIRS}} );
     @{$self->{PMLIBDIRS}} = @( () );
-    my %dir = %( map { ($_ => $_) } < @{$self->{DIR}} );
+    my %dir = %( < map { ($_ => $_) } @( < @{$self->{DIR}}) );
     foreach my $pmlibdir (< @pmlibdirs) {
 	-d $pmlibdir && !%dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }
@@ -1932,8 +1932,8 @@ sub init_PERL {
     $thisperl = $self->abs2rel($thisperl) if $self->{PERL_CORE};
 
     my @perls = @($thisperl);
-    push @perls, map { "$_%Config{exe_ext}" }
-                     ('perl', 'perl5', "perl%Config{version}");
+    push @perls, < map { "$_%Config{exe_ext}" }
+ @(                     ('perl', 'perl5', "perl%Config{version}"));
 
     # miniperl has priority over all but the cannonical perl when in the
     # core.  Otherwise its a last resort.
@@ -2212,7 +2212,7 @@ sub installbin {
     my @exefiles = @( < @{$self->{EXE_FILES}} );
     return "" unless (nelems @exefiles);
 
-    @exefiles = @( map < vmsify($_), < @exefiles ) if %Is{VMS};
+    @exefiles = @( < map < vmsify($_), @( < @exefiles) ) if %Is{VMS};
 
     my %fromto;
     for my $from (< @exefiles) {
@@ -2238,7 +2238,7 @@ realclean ::
 });
 
     # realclean can get rather large.
-    push @m, map "\t$_\n", < $self->split_command('$(RM_F)', < @to);
+    push @m, < map "\t$_\n", @( < $self->split_command('$(RM_F)', < @to));
     push @m, "\n";
 
 
@@ -2293,7 +2293,7 @@ sub lsdir {
     $dh->open($dir || ".") or return ();
     @ls = $dh->readdirs;
     $dh->close;
-    @ls = @( grep(m/$regex/, < @ls) ) if $regex;
+    @ls = @( < grep(m/$regex/, @( < @ls)) ) if $regex;
     return @ls;
 }
 
@@ -2377,7 +2377,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     # The front matter of the linkcommand...
     $linkcmd = join ' ', "\$(CC)",
-	    grep($_, %Config{[qw(ldflags ccdlflags)]});
+	    < grep($_, @( %Config{[qw(ldflags ccdlflags)]}));
     $linkcmd =~ s/\s+/ /g;
     $linkcmd =~ s,(perl\.exp),\$(PERL_INC)/$1,;
 
@@ -2432,7 +2432,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
 	use Cwd 'cwd';
 	%static{cwd() . "/" . $_}++;
-    }, grep( -d $_, < @{$searchdirs || \@()}) );
+    }, < grep( -d $_, @( < @{$searchdirs || \@()})) );
 
     # We trust that what has been handed in as argument, will be buildable
     $static = \@() unless $static;
@@ -2575,7 +2575,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 ' if $self->{OBJECT};
 
     my $newer_than_target = %Is{VMS} ? '$(MMS$SOURCE_LIST)' : '$?';
-    my $mpl_args = join " ", map qq["$_"], < @ARGV;
+    my $mpl_args = join " ", < map qq["$_"], @( < @ARGV);
 
     $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
 # We take a very conservative approach here, but it's worth it.
@@ -2901,7 +2901,7 @@ CODE
 
     my @cmds = @( < $self->split_command($pm_to_blib, < %{$self->{PM}}) );
 
-    $r .= join '', map { "\t\$(NOECHO) $_\n" } < @cmds;
+    $r .= join '', < map { "\t\$(NOECHO) $_\n" } @( < @cmds);
     $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
 
     return $r;
@@ -3169,7 +3169,7 @@ sub cd {
     my($self, $dir, < @cmds) = < @_;
 
     # No leading tab and no trailing newline makes for easier embedding
-    my $make_frag = join "\n\t", map { "cd $dir && $_" } < @cmds;
+    my $make_frag = join "\n\t", < map { "cd $dir && $_" } @( < @cmds);
 
     return $make_frag;
 }
@@ -3187,7 +3187,7 @@ sub oneliner {
     $cmd =~ s{\n+$}{};
 
     my @cmds = @( split m/\n/, $cmd );
-    $cmd = join " \n\t  -e ", map { $self->quote_literal($_) } < @cmds;
+    $cmd = join " \n\t  -e ", < map { $self->quote_literal($_) } @( < @cmds);
     $cmd = $self->escape_newlines($cmd);
 
     $switches = join ' ', < @$switches;
@@ -3570,7 +3570,7 @@ sub tool_xsubpp {
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
-    my(@tmargs) = @( map("-typemap $_", < @tmdeps) );
+    my(@tmargs) = @( < map("-typemap $_", @( < @tmdeps)) );
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{XSOPT} );
     }
@@ -3662,7 +3662,7 @@ sub writedoc {
     my($self,$what,$name,< @attribs)= < @_;
     my $time = localtime;
     print "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
-    print join "\n\n=item *\n\n", map("C<$_>",< @attribs);
+    print join "\n\n=item *\n\n", < map("C<$_>", @(< @attribs));
     print "\n\n=back\n\n";
 }
 

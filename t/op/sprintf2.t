@@ -65,7 +65,7 @@ for (int(^~^0/2+1), ^~^0, "9999999999999999999") {
 	}
     };
 
-    my $fmt = join('', map("\%$_\$s\%" . ((1 << 31)-$_) . '$s', 1..20));
+    my $fmt = join('', < map("\%$_\$s\%" . ((1 << 31)-$_) . '$s', @( 1..20)));
     my $result = sprintf $fmt, qw(a b c d);
     is($result, "abcd", "only four valid values in $fmt");
     is($warn, 36, "expected warnings");

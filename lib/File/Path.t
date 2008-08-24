@@ -273,7 +273,7 @@ SKIP: {
     is(scalar(nelems @created), 1, "create a ZZ directory");
 
     local @ARGV = @($dir);
-    rmtree( \@(grep -e $_, < @ARGV), 0, 0 );
+    rmtree( \@(< grep -e $_, @( < @ARGV)), 0, 0 );
     ok(!-e $dir, "blow it away via \@ARGV");
 }
 

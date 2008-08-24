@@ -43,7 +43,7 @@ sub doglob {
 	    push (@retval, $pat), next OUTER if $tail eq '';
 	    if ($head =~ m/[*?]/) {
 		@globdirs = @( < doglob('d', $head) );
-		push(@retval, < doglob($cond, map {"$_$sepchr$tail"} < @globdirs)),
+		push(@retval, < doglob($cond, < map {"$_$sepchr$tail"} @( < @globdirs))),
 		    next OUTER if (nelems @globdirs);
 	    }
 	    $head .= $sepchr if $head eq '' or $head =~ m/^[A-Za-z]:\z/s;
@@ -139,7 +139,7 @@ sub doglob_Mac {
 	
 		if ($tmp_head =~ m/[*?]/) { # if there are wildcards ...	
 		@globdirs = @( < doglob_Mac('d', $head) );
-		push(@retval, < doglob_Mac($cond, map {"$_$sepchr$tail"} < @globdirs)),
+		push(@retval, < doglob_Mac($cond, < map {"$_$sepchr$tail"} @( < @globdirs))),
 		    next OUTER if (nelems @globdirs);
 	    }
 		

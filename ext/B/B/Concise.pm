@@ -232,8 +232,8 @@ my $end_sym   = "\e(B"; # "\cO" respectively
 my @tree_decorations =
   @(\@("  ", "--", "+-", "|-", "| ", "`-", "-", 1),
    \@(" ", "-", "+", "+", "|", "`", "", 0),
-   \@("  ", map("$start_sym$_$end_sym", "qq", "wq", "tq", "x ", "mq", "q"), 1),
-   \@(" ", map("$start_sym$_$end_sym", "q", "w", "t", "x", "m"), "", 0),
+   \@("  ", < map("$start_sym$_$end_sym", @( "qq", "wq", "tq", "x ", "mq", "q")), 1),
+   \@(" ", < map("$start_sym$_$end_sym", @( "q", "w", "t", "x", "m")), "", 0),
   );
 
 my @render_packs; # collect -stash=<packages>
@@ -242,8 +242,8 @@ sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if ((nelems @_)) {
-	@options = @( grep { (! ref) && m/^-/ } < @_ );
-	@args = @( grep { (ref $_) || !m/^-/ } < @_ );
+	@options = @( < grep { (! ref) && m/^-/ } @( < @_) );
+	@args = @( < grep { (ref $_) || !m/^-/ } @( < @_) );
     }
     for my $o (< @options) {
 	# mode/order
@@ -591,9 +591,9 @@ our %priv; # used to display each opcode's BASEOP.op_private values
 %priv{$_}->{16} = "OURINTR" for ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter");
 %priv{$_}->{16} = "TARGMY"
-  for (map(($_,"s$_"),"chop", "chomp"),
-       map(($_,"i_$_"), "postinc", "postdec", "multiply", "divide", "modulo",
-	   "add", "subtract", "negate"), "pow", "concat", "stringify",
+  for (< map(($_,"s$_"), @("chop", "chomp")),
+       < map(($_,"i_$_"), @( "postinc", "postdec", "multiply", "divide", "modulo",
+	   "add", "subtract", "negate")), "pow", "concat", "stringify",
        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or",
        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt",
        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf",
@@ -939,7 +939,7 @@ sub tree {
 	@lines[0] = $single . @lines[0];
     }
     return @("$name$lead" . shift @lines,
-           map(" " x (length($name)+$size) . $_, < @lines));
+           < map(" " x (length($name)+$size) . $_, @( < @lines)));
 }
 
 # *** Warning: fragile kludge ahead ***

@@ -390,7 +390,7 @@ sub begin_is_use {
 	    $version = $version->PV;
 	} else {
 	    # version specified as a v-string
-	    $version = 'v'.join '.', map ord, split m//, $version->PV;
+	    $version = 'v'.join '.', < map ord, @( split m//, $version->PV);
 	}
 	$constop = $constop->sibling;
 	return if $constop->name ne "method_named";
@@ -1032,12 +1032,12 @@ sub lineseq {
     $self->walk_lineseq($root, \@ops,
 		       sub { push @exprs, @_[0]} );
 
-    my $body = join(";\n", grep {length} < @exprs);
+    my $body = join(";\n", < grep {length} @( < @exprs));
     my $subs = "";
     if (defined $root && defined $limit_seq && !$self->{'in_format'}) {
 	$subs = join "\n", < $self->seq_subs($limit_seq);
     }
-    return join(";\n", grep {length} $body, $subs);
+    return join(";\n", < grep {length} @( $body, $subs));
 }
 
 sub scopeop {
@@ -1131,8 +1131,8 @@ sub walk_lineseq {
 # The BEGIN {} is used here because otherwise this code isn't executed
 # when you run B::Deparse on itself.
 my %globalnames;
-BEGIN { map(%globalnames{$_}++, "SIG", "STDIN", "STDOUT", "STDERR", "INC",
-	    "ENV", "ARGV", "ARGVOUT", "_"); }
+BEGIN { map(%globalnames{$_}++, @( "SIG", "STDIN", "STDOUT", "STDERR", "INC",
+	    "ENV", "ARGV", "ARGVOUT", "_")); }
 
 sub gv_name {
     my $self = shift;
@@ -2800,17 +2800,17 @@ sub pp_rv2cv {
 sub list_const {
     my $self = shift;
     my($cx, < @list) = < @_;
-    my @a = @( map $self->const($_, 6), < @list );
+    my @a = @( < map $self->const($_, 6), @( < @list) );
     if ((nelems @a) == 0) {
 	return "()";
     } elsif ((nelems @a) == 1) {
 	return @a[0];
-    } elsif ( (nelems @a) +> 2 and !grep(!m/^-?\d+$/, < @a)) {
+    } elsif ( (nelems @a) +> 2 and !grep(!m/^-?\d+$/, @( < @a))) {
 	# collapse (-1,0,1,2) into (-1..2)
 	my ($s, $e) = @a[[0,-1]];
 	my $i = $s;
 	return $self->maybe_parens("$s..$e", $cx, 9)
-	  unless grep $i++ != $_, < @a;
+	  unless grep $i++ != $_, @( < @a);
     }
     return $self->maybe_parens(join(", ", < @a), $cx, 6);
 }
@@ -3055,7 +3055,7 @@ sub e_method {
 
     my $meth = $info->{method};
     $meth = '?' . $self->deparse($meth, 1) if $info->{variable_method};
-    my $args = join(", ", map { $self->deparse($_, 6) } < @{$info->{args}} );
+    my $args = join(", ", < map { $self->deparse($_, 6) } @( < @{$info->{args}}) );
     my $kid = $obj . "->" . $meth;
     if (length $args) {
 	return $kid . "(" . $args . ")"; # parens mandatory
@@ -3083,7 +3083,7 @@ sub check_proto {
 	} elsif ($chr eq ";") {
 	    $doneok = 1;
 	} elsif ($chr eq "@" or $chr eq "\%") {
-	    push @reals, map($self->deparse($_, 6), < @args);
+	    push @reals, < map($self->deparse($_, 6), @( < @args));
 	    @args = @( () );
 	} else {
 	    $arg = shift @args;
@@ -3212,10 +3212,10 @@ sub pp_entersub {
     if ($declared and defined $proto and not $amper) {
 	($amper, $args) = < $self->check_proto($proto, < @exprs);
 	if ($amper eq "&") {
-	    $args = join(", ", map($self->deparse($_, 6), < @exprs));
+	    $args = join(", ", < map($self->deparse($_, 6), @( < @exprs)));
 	}
     } else {
-	$args = join(", ", map($self->deparse($_, 6), < @exprs));
+	$args = join(", ", < map($self->deparse($_, 6), @( < @exprs)));
     }
     if ($prefix or $amper) {
 	if ($op->flags ^&^ OPf_STACKED) {
@@ -3859,9 +3859,9 @@ sub pp_regcomp {
 # osmic acid -- see osmium tetroxide
 
 my %matchwords;
-map(%matchwords{join "", sort split m//, $_} = $_, 'cig', 'cog', 'cos', 'cogs',
+map(%matchwords{join "", sort split m//, $_} = $_, @( 'cig', 'cog', 'cos', 'cogs',
     'cox', 'go', 'is', 'ism', 'iso', 'mig', 'mix', 'osmic', 'ox', 'sic',
-    'sig', 'six', 'smog', 'so', 'soc', 'sog', 'xi');
+    'sig', 'six', 'smog', 'so', 'soc', 'sog', 'xi'));
 
 sub matchop {
     my $self = shift;
@@ -3956,10 +3956,10 @@ sub pp_split {
 # bivalent grouping C=NOH [Webster's Tenth]
 
 my %substwords;
-map(%substwords{join "", sort split m//, $_} = $_, 'ego', 'egoism', 'em',
+map(%substwords{join "", sort split m//, $_} = $_, @( 'ego', 'egoism', 'em',
     'es', 'ex', 'exes', 'gee', 'go', 'goes', 'ie', 'ism', 'iso', 'me',
     'meese', 'meso', 'mig', 'mix', 'os', 'ox', 'oxime', 'see', 'seem',
-    'seg', 'sex', 'sig', 'six', 'smog', 'sog', 'some', 'xi');
+    'seg', 'sex', 'sig', 'six', 'smog', 'sog', 'some', 'xi'));
 
 sub pp_subst {
     my $self = shift;

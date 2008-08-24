@@ -28,7 +28,7 @@ BEGIN {
 use File::Spec;
 
 use_ok( 'ExtUtils::MM_OS2' );
-ok( grep( 'ExtUtils::MM_OS2',  < @MM::ISA), 
+ok( grep( 'ExtUtils::MM_OS2', @(  < @MM::ISA)), 
 	'ExtUtils::MM_OS2 should be parent of MM' );
 
 # dlsyms

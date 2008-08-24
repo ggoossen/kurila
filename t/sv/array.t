@@ -84,10 +84,10 @@ is(%bar{'how'}, 'now');
 is(%bar{'foo'}, 'bar');
 is(%bar{'how'}, 'now');
 
-@foo = @( grep(m/e/,split(' ','now is the time for all good men to come to')) );
+@foo = @( < grep(m/e/, @(split(' ','now is the time for all good men to come to'))) );
 is(join(' ',< @foo), 'the time men come');
 
-@foo = @( grep(!m/e/,split(' ','now is the time for all good men to come to')) );
+@foo = @( < grep(!m/e/, @(split(' ','now is the time for all good men to come to'))) );
 is(join(' ',< @foo), 'now is for all good to to');
 
 $foo = join('',('a','b','c','d','e','f')[[0..5]]);

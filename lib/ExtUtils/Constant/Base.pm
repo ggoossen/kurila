@@ -260,7 +260,7 @@ sub dump_names {
         if (defined $value) {
           if (ref $value) {
             $line .= ", $thing=>[\""
-              . join ('", "', map { <perl_stringify $_} < @$value) . '"]';
+              . join ('", "', < map { <perl_stringify $_} @( < @$value)) . '"]';
           } else {
             $line .= ", $thing=>\"" . perl_stringify($value) . "\"";
           }
@@ -312,8 +312,8 @@ sub assign {
   die "Can't generate code for type $type"
     unless $self->valid_type($type);
 
-  $clause .= join '', map {"$indent$_\n"}
-    $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_);
+  $clause .= join '', < map {"$indent$_\n"}
+ @(    $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_));
   chomp $post;
   if (length $post) {
     $clause .= "$post";
@@ -439,7 +439,7 @@ sub switch_clause {
   local $Text::Wrap::huge = 'overflow';
   local $Text::Wrap::columns = 80;
 
-  my @names = @( sort map {$_->{name}} < @items );
+  my @names = @( sort < map {$_->{name}} @( < @items) );
   my $leader = $indent . '/* ';
   my $follower = ' ' x length $leader;
   my $body = $indent . "/* Names all of length $namelen.  */\n";
@@ -787,7 +787,7 @@ sub C_constant {
     $default_type ||= $self->default_type();
     if (!ref $what) {
       # Convert line of the form IV,UV,NV to hash
-      $what = \%(map {$_ => 1} split m/,\s*/, ($what || ''));
+      $what = \%(< map {$_ => 1} @( split m/,\s*/, ($what || '')));
       # Figure out what types we're dealing with, and assign all unknowns to the
       # default type
     }

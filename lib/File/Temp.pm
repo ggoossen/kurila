@@ -1005,7 +1005,7 @@ sub new {
 
   # read arguments and convert keys to upper case
   my %args = %( < @_ );
-  %args = %( map { uc($_), %args{$_} } keys %args );
+  %args = %( < map { uc($_), %args{$_} } @( keys %args) );
 
   # see if they are unlinking (defaulting to yes)
   my $unlink = (exists %args{UNLINK} ? %args{UNLINK} : 1 );

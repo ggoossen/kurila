@@ -20,10 +20,10 @@ use Test::More;
 
 # these names are hardcoded in Term::Cap
 my $files = join '',
-    grep { -f $_ }
-	( %ENV{HOME} . '/.termcap', # we assume pretty UNIXy system anyway
+    < grep { -f $_ }
+ @(	( %ENV{HOME} . '/.termcap', # we assume pretty UNIXy system anyway
 	  '/etc/termcap', 
-	  '/usr/share/misc/termcap' );
+	  '/usr/share/misc/termcap' ));
 unless( $files || $^O eq 'VMS' ) {
     plan skip_all => 'no termcap available to test';
 }
@@ -54,11 +54,11 @@ SKIP: {
 	skip("-f $file fails, some tests difficult now", 2) unless -f $file;
 
 	%ENV{TERMCAP} = %ENV{TERMPATH} = $file;
-	ok( grep($file, < Term::Cap::termcap_path()), 
+	ok( grep($file, @( < Term::Cap::termcap_path())), 
 		'termcap_path() should find file from $ENV{TERMCAP}' );
 
 	%ENV{TERMCAP} = '/';
-	ok( grep($file, < Term::Cap::termcap_path()), 
+	ok( grep($file, @( < Term::Cap::termcap_path())), 
 		'termcap_path() should find file from $ENV{TERMPATH}' );
 }
 

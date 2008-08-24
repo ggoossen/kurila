@@ -54,7 +54,7 @@ sub object_file {
 
 sub arg_include_dirs {
   my $self = shift;
-  return @( map {"-I$_"} < @_ );
+  return @( < map {"-I$_"} @( < @_) );
 }
 
 sub arg_nolink { '-c' }
@@ -76,7 +76,7 @@ sub arg_exec_file {
 
 sub arg_defines {
   my ($self, < %args) = < @_;
-  return @( map "-D$_=%args{$_}", keys %args );
+  return @( < map "-D$_=%args{$_}", @( keys %args) );
 }
 
 sub compile {
@@ -131,7 +131,7 @@ sub have_compiler {
   warn $@ if $@;
   my $result = $self->{have_compiler} = $@ ? 0 : 1;
   
-  foreach (grep defined, $tmpfile, $obj_file, < @lib_files) {
+  foreach (< grep defined, @( $tmpfile, $obj_file, < @lib_files)) {
     1 while unlink;
   }
   return $result;
@@ -174,7 +174,7 @@ sub prelink {
   );
   
   # Mksymlists will create one of these files
-  return grep -e, map "%args{dl_file}.$_", qw(ext def opt);
+  return grep -e, @( < map "%args{dl_file}.$_", @( qw(ext def opt)));
 }
 
 sub link {

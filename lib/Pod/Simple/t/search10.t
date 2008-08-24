@@ -78,7 +78,7 @@ ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, keys %$where2name ), 1;
+ok grep( m/squaa\.pm/, @( keys %$where2name) ), 1;
 
 ok 1;
 

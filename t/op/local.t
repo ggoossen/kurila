@@ -121,9 +121,9 @@ is(@a[0].@a[1], "Xb");
 is(%h{'a'}, 1);
 is(%h{'b'}, 2);
 {
-    my $d = join("\n", map { "$_=>%h{$_}" } sort keys %h);
+    my $d = join("\n", < map { "$_=>%h{$_}" } @( sort keys %h));
     local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{$_}" } sort keys %h), $d);
+    is(join("\n", < map { "$_=>%h{$_}" } @( sort keys %h)), $d);
 }
 is(%h{'c'}, 3);
 
@@ -176,9 +176,9 @@ ok(! exists %h{'y'});
 ok(! exists %h{'z'});
 TODO: {
     todo_skip("Localize entire tied hash");
-    my $d = join("\n", map { "$_=>%h{$_}" } sort keys %h);
+    my $d = join("\n", < map { "$_=>%h{$_}" } @( sort keys %h));
     local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{$_}" } sort keys %h), $d);
+    is(join("\n", < map { "$_=>%h{$_}" } @( sort keys %h)), $d);
 }
 
 @a = @('a', 'b', 'c');
@@ -208,9 +208,9 @@ is(%SIG{TERM}, undef);
 cmp_ok(%SIG{INT}, '\==', \&foo);
 cmp_ok($^WARN_HOOK, '\==', \&foo);
 {
-    my $d = join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG);
+    my $d = join("\n", < map { "$_=>{dump::view(%SIG{$_})}" } @( sort keys %SIG));
     local %SIG = %( < %SIG );
-    is(join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG), $d);
+    is(join("\n", < map { "$_=>{dump::view(%SIG{$_})}" } @( sort keys %SIG)), $d);
 }
 
 # and for %ENV
@@ -238,9 +238,9 @@ ok(! exists %ENV{_B_});
 SKIP: {
     skip("Can't make list assignment to \%ENV on this system")
 	unless $list_assignment_supported;
-    my $d = join("\n", map { "$_=>%ENV{$_}" } sort keys %ENV);
+    my $d = join("\n", < map { "$_=>%ENV{$_}" } @( sort keys %ENV));
     local %ENV = %( < %ENV );
-    is(join("\n", map { "$_=>%ENV{$_}" } sort keys %ENV), $d);
+    is(join("\n", < map { "$_=>%ENV{$_}" } @( sort keys %ENV)), $d);
 }
 
 # does implicit localization in foreach skip magic?

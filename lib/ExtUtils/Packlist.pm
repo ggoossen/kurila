@@ -42,8 +42,8 @@ sub __find_relocations
 	%paths{%Config{$exp_key}}++;
     }
     # Longest prefixes go first in the alternatives
-    my $alternations = join "|", map {quotemeta $_}
-    sort {length $b <+> length $a} keys %paths;
+    my $alternations = join "|", < map {quotemeta $_}
+ @(    sort {length $b <+> length $a} keys %paths);
     qr/^($alternations)/o;
 }
 
@@ -124,7 +124,7 @@ while (defined($line = ~< $fh))
    if ($key =~ m/^(.*?)( \w+=.*)$/)
       {
       $key = $1;
-      $data = \%( map { split('=', $_) } split(' ', $2));
+      $data = \%( < map { split('=', $_) } @( split(' ', $2)));
 
       if (%Config{userelocatableinc} && $data->{relocate_as})
       {

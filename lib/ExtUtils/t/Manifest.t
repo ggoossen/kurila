@@ -25,7 +25,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 # We're going to be chdir'ing and modules are sometimes loaded on the
 # fly in this test, so we need an absolute @INC.
-@INC = @( map { File::Spec->rel2abs($_) } < @INC );
+@INC = @( < map { File::Spec->rel2abs($_) } @( < @INC) );
 
 # keep track of everything added so it can all be deleted
 my %Files;
@@ -81,8 +81,8 @@ chmod( 0744, 'foo') if %Config{'chmod'};
 # there shouldn't be a MANIFEST there
 my ($res, $warn) = < catch_warning( \&mkmanifest );
 # Canonize the order.
-$warn = join("", map { "$_|" } 
-                 sort { lc($a) cmp lc($b) } split m/\r?\n/, $warn);
+$warn = join("", < map { "$_|" } 
+ @(                 sort { lc($a) cmp lc($b) } split m/\r?\n/, $warn));
 is( $warn, "Added to MANIFEST: foo|Added to MANIFEST: MANIFEST|",
     "mkmanifest() displayed its additions" );
 
@@ -148,10 +148,10 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 manicopy( $files, 'copy', 'cp' );
 my @copies = @( () );
 find( sub { push @copies, $_ if -f }, 'copy' );
-@copies = @( map { s/\.$//; $_ } < @copies ) if $Is_VMS;  # VMS likes to put dots on
+@copies = @( < map { s/\.$//; $_ } @( < @copies) ) if $Is_VMS;  # VMS likes to put dots on
                                                    # the end of files.
 # Have to compare insensitively for non-case preserving VMS
-is_deeply( \@(sort map { lc } < @copies), \@(sort map { lc } keys %$files) );
+is_deeply( \@(sort < map { lc } @( < @copies)), \@(sort < map { lc } @( keys %$files)) );
 
 # cp would leave files readonly, so check permissions.
 foreach my $orig (< @copies) {
@@ -257,7 +257,7 @@ add_file('MANIFEST'   => 'Makefile.PL');
 maniadd(\%( foo  => 'bar' ));
 $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
-%$files = %( map { (lc $_ => $files->{$_}) } keys %$files );
+%$files = %( < map { (lc $_ => $files->{$_}) } @( keys %$files) );
 my %expect = %( 'makefile.pl' => '',
                'foo'    => 'bar'
              );

@@ -748,7 +748,7 @@ sub _rmtree {
 		if (!defined ${*{Symbol::fetch_glob("^TAINT")}} or ${*{Symbol::fetch_glob("^TAINT")}}) {
                     # Blindly untaint dir names if taint mode is
                     # active, or any perl < 5.006
-                    @files = @( map { m/\A(.*)\z/s; $1 } < readdir $d );
+                    @files = @( < map { m/\A(.*)\z/s; $1 } @( < readdir $d) );
                 }
                 else {
 		    @files = @( readdir $d );
@@ -760,10 +760,10 @@ sub _rmtree {
                 # Deleting large numbers of files from VMS Files-11
                 # filesystems is faster if done in reverse ASCIIbetical order.
                 # include '.' to '.;' from blead patch #31775
-                @files = @( map {$_ eq '.' ? '.;' : $_} reverse < @files );
+                @files = @( < map {$_ eq '.' ? '.;' : $_} @( reverse < @files) );
                 ($root = VMS::Filespec::unixify($root)) =~ s/\.dir\z//;
             }
-            @files = @( grep {$_ ne $updir and $_ ne $curdir} < @files );
+            @files = @( < grep {$_ ne $updir and $_ ne $curdir} @( < @files) );
 
             if ((nelems @files)) {
                 # remove the contained files before the directory itself

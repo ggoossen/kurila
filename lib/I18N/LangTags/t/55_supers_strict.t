@@ -8,7 +8,7 @@ BEGIN { plan tests => 19 };
 
 print "#\n# Testing strict (non-tight) insertion of super-ordinate language tags...\n#\n";
 
-my @in = @( grep m/\S/, split m/[\n\r]/, q{
+my @in = @( < grep m/\S/, @( split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en
@@ -34,7 +34,7 @@ ja pt-br-janeiro de pt fr => ja pt-br-janeiro de pt fr pt-br
 pt-br-janeiro de pt-br fr => pt-br-janeiro de pt-br fr pt
  # an odd case, since we don't filter for uniqueness in this sub
  
-} );
+}) );
 
 
 foreach my $in (< @in) {

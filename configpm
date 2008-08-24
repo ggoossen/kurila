@@ -53,8 +53,8 @@ while ($how_many_common--) {
 }
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %( map {($_,$_)}
-                 qw(dynamic_ext static_ext extensions known_extensions) );
+my %Extensions = %( < map {($_,$_)}
+ @(                 qw(dynamic_ext static_ext extensions known_extensions)) );
 
 # allowed opts as well as specifies default and initial values
 my %Allowed_Opts = %(
@@ -67,18 +67,18 @@ sub opts {
     # user specified options
     my %given_opts = %(
         # --opt=smth
-        (map {m/^--([\-_\w]+)=(.*)$/} < @ARGV),
+        (< map {m/^--([\-_\w]+)=(.*)$/} @( < @ARGV)),
         # --opt --no-opt --noopt
-        (map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} < @ARGV),
+        (< map {m/^no-?(.*)$/i?($1=>0):($_=>1)} @( < map {m/^--([\-_\w]+)$/} @( < @ARGV))),
     );
 
     my %opts = %(< %Allowed_Opts, < %given_opts);
 
-    for my $opt (grep {!exists %Allowed_Opts{$_}} keys %given_opts) {
+    for my $opt (< grep {!exists %Allowed_Opts{$_}} @( keys %given_opts)) {
         warn "option '$opt' is not recognized";
 	usage;
     }
-    @ARGV = @( grep {!m/^--/} < @ARGV );
+    @ARGV = @( < grep {!m/^--/} @( < @ARGV) );
 
     return %opts;
 }
@@ -518,13 +518,13 @@ foreach my $prefix (qw(libs libswanted)) {
 	my %lflibswanted;
 	%lflibswanted{[< @lflibswanted]} = ();
 	if ($prefix eq 'libs') {
-	    my @libs = @( grep { m/^-l(.+)/ &&
+	    my @libs = @( < grep { m/^-l(.+)/ &&
                             not exists %lflibswanted{$1} }
-		                    split(' ', fetch_string (\%(), 'libs')) );
+ @(		                    split(' ', fetch_string (\%(), 'libs'))) );
 	    $value = join(' ', < @libs);
 	} else {
-	    my @libswanted = @( grep { not exists %lflibswanted{$_} }
-	                          split(' ', fetch_string (\%(), 'libswanted')) );
+	    my @libswanted = @( < grep { not exists %lflibswanted{$_} }
+ @(	                          split(' ', fetch_string (\%(), 'libswanted'))) );
 	    $value = join(' ', < @libswanted);
 	}
     }
@@ -646,7 +646,7 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my ($f) = grep -r, qw(GNUMakefile Makefile);
+    my ($f) = < grep -r, @( qw(GNUMakefile Makefile));
     my $dll;
     if (open my $fh, '<', $f) {
 	while ( ~< $fh) {
@@ -687,7 +687,7 @@ foreach my $key (keys %Common) {
 if (%Common{byteorder}) {
     %Common{byteorder} = 'byteorder => $byteorder';
 }
-my $fast_config = join '', map { "    $_,\n" } sort values %Common;
+my $fast_config = join '', < map { "    $_,\n" } @( sort values %Common);
 
 # Sanity check needed to stop an infite loop if Config_heavy.pl fails to define
 # &launcher for some reason (eg it got truncated)

@@ -83,7 +83,7 @@ sub DB {
   &save;
   ($DB::package, $DB::filename, $DB::lineno) = caller;
 
-  return if (nelems @skippkg) and grep { $_ eq $DB::package } < @skippkg;
+  return if (nelems @skippkg) and grep { $_ eq $DB::package } @( < @skippkg);
 
   $usrctxt = "package $DB::package;";		# this won't let them modify, alas
   local(*DB::dbline) = "::_<$DB::filename";
@@ -184,7 +184,7 @@ sub register {
 sub done {
   my $s = shift;
   $s = _clientname($s) if ref($s);
-  @clients = @( grep {$_ ne $s} < @clients );
+  @clients = @( < grep {$_ ne $s} @( < @clients) );
   $s->cleanup;
 #  $running = 3 unless @clients;
   exit(0) unless (nelems @clients);
@@ -309,7 +309,7 @@ sub filesubs {
   my $s = shift;
   my $fname = shift;
   $fname = $DB::filename unless $fname;
-  return grep { %DB::sub{$_} =~ m/^$fname/ } keys %DB::sub;
+  return grep { %DB::sub{$_} =~ m/^$fname/ } @( keys %DB::sub);
 }
 
 ####
@@ -317,8 +317,8 @@ sub filesubs {
 #
 sub files {
   my $s = shift;
-  my(@f) = @( grep(m|^_<|, keys %main::) );
-  return @( map { substr($_,2) } < @f );
+  my(@f) = @( < grep(m|^_<|, @( keys %main::)) );
+  return @( < map { substr($_,2) } @( < @f) );
 }
 
 ####
@@ -338,7 +338,7 @@ sub loadfile {
   my($file, $line) = < @_;
   if (!defined %main::{'_<' . $file}) {
     my $try;
-    if (($try) = grep(m|^_<.*$file|, keys %main::)) {  
+    if (($try) = < grep(m|^_<.*$file|, @( keys %main::))) {  
       $file = substr($try,2);
     }
   }

@@ -6,7 +6,7 @@ use Test;
 BEGIN { plan tests => 26 };
 print "#\n# Testing tight insertion of super-ordinate language tags...\n#\n";
 
-my @in = @( grep m/\S/, split m/[\n\r]/, q{
+my @in = @( < grep m/\S/, @( split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en
@@ -42,9 +42,9 @@ my @in = @( grep m/\S/, split m/[\n\r]/, q{
  pt-br-janeiro de pt-br fr => pt-br-janeiro de pt-br pt fr
 # an odd case, since we don't filter for uniqueness in this sub
  
-} );
+}) );
 
-sub uniq { my %seen; return @( grep(!(%seen{$_}++), < @_) ); }
+sub uniq { my %seen; return @( < grep(!(%seen{$_}++), @( < @_)) ); }
 
 foreach my $in (< @in) {
   $in =~ s/^\s+//s;

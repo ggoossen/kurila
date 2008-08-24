@@ -49,5 +49,5 @@ find(
 			   defined $version2 &&
                            $version1 eq $version2
 		} }, < curdir);
-print map { $_, "\n" } sort < @wanted;
+print < map { $_, "\n" } @( sort < @wanted);
 

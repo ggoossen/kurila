@@ -18,7 +18,7 @@ my $a;
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } < @INC;
+my $path = join " ", < map { qq["-I$_"] } @( < @INC);
 my $redir = $Is_MacOS ? "" : "2>&1";
 
 $a = `$^X $path "-MO=Debug" -e 1 $redir`;

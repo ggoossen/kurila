@@ -12,7 +12,7 @@ use Cwd ();
 delete %ENV{[qw(BASH_ENV CDPATH ENV IFS)]};
 my @correct = @( () );
 if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
-   @correct = @( grep { !m/^\./ } sort readdir(D) );
+   @correct = @( < grep { !m/^\./ } @( sort readdir(D)) );
    closedir D;
 }
 my @a = @( < File::Glob::bsd_glob("*", 0) );
@@ -92,8 +92,8 @@ is_deeply(\@a, \@('a', 'b'));
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
-@a = @( grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, < @a );
-@a = @(grep !m/test.pl/, < @a) if $^O eq 'VMS';
+@a = @( < grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, @( < @a) );
+@a = @(< grep !m/test.pl/, @( < @a)) if $^O eq 'VMS';
 
 print "# {join ' ', <@a}\n";
 

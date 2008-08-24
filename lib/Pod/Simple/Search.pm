@@ -73,9 +73,9 @@ sub survey {
     if($self->{'dir_prefix'}) {
       $start_in = File::Spec->catdir(
         $try,
-        grep length($_), split '[\/:]+', $self->{'dir_prefix'}
-      );
-      $modname_prefix = \@(grep length($_), split m{[:/\\]}, $self->{'dir_prefix'});
+        < grep length($_), @( split '[\/:]+', $self->{'dir_prefix'}
+)      );
+      $modname_prefix = \@(< grep length($_), @( split m{[:/\\]}, $self->{'dir_prefix'}));
       $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",
         "giving $start_in (= {join ' ', <@$modname_prefix})\n";
     } else {
@@ -125,8 +125,8 @@ sub _make_search_callback {
 
   # Put the options in variables, for easy access
   my(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
-    map scalar($self->?$_()),
-     qw(laborious   verbose   shadows   limit_re   callback   progress  path2name  name2path);
+    < map scalar($self->?$_()), @(
+     qw(laborious   verbose   shadows   limit_re   callback   progress  path2name  name2path));
 
   my($file, $shortname, $isdir, $modname_bits);
   return sub {
@@ -183,7 +183,7 @@ sub _make_search_callback {
     if( !$shadows and $name2path->{$name} ) {
       $verbose and print "Not worth considering $file ",
         "-- already saw $name as ",
-        join(' ', grep($path2name->{$_} eq $name, keys %$path2name)), "\n";
+        join(' ', < grep($path2name->{$_} eq $name, @( keys %$path2name))), "\n";
       return;
     }
         
@@ -202,7 +202,7 @@ sub _make_search_callback {
       $verbose and print
        "Duplicate POD found (shadowing?): $name ($file)\n",
        "    Already seen in ",
-       join(' ', grep($path2name->{$_} eq $name, keys %$path2name)), "\n";
+       join(' ', < grep($path2name->{$_} eq $name, @( keys %$path2name))), "\n";
     } else {
       $name2path->{$name} = $file; # Noting just the first occurrence
     }
@@ -396,8 +396,8 @@ sub run {
            
           # Like in sprintf("%d.%s", map {s/_//g; $_} q$Name: release-0_55-public $ =~ /-(\d+)_([\d_]+)/)
           $_ = sprintf("v\%d.\%s",
-            map {s/_//g; $_}
-              $1 =~ m/-(\d+)_([\d_]+)/) # snare just the numeric part
+            < map {s/_//g; $_}
+ @(              $1 =~ m/-(\d+)_([\d_]+)/)) # snare just the numeric part
            if m{\$Name:\s*([^\$]+)\$}s 
           ;
           $version = $_;
@@ -455,10 +455,10 @@ sub _expand_inc {
 
   if ($^O eq 'MacOS') {
     push @$search_dirs,
-      grep $_ ne File::Spec->curdir, < $self->_mac_whammy(< @INC);
+      < grep $_ ne File::Spec->curdir, @( < $self->_mac_whammy(< @INC));
   # Any other OSs need custom handling here?
   } else {
-    push @$search_dirs, grep $_ ne File::Spec->curdir,  < @INC;
+    push @$search_dirs, < grep $_ ne File::Spec->curdir, @(  < @INC);
   }
 
   $self->{'laborious'} = 0;   # Since inc said to use INC

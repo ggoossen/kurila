@@ -19,7 +19,7 @@ die "Couldn't make an object!?" unless ok defined $x;
 $x->inc(0);
 
 $x->callback(sub {
-  print "#  ", join("  ", map "\{$_\}", < @_), "\n";
+  print "#  ", join("  ", < map "\{$_\}", @( < @_)), "\n";
   return;
 });
 
@@ -83,7 +83,7 @@ skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0,
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, keys %$where2name ), 1;
+ok grep( m/squaa\.pm/, @( keys %$where2name) ), 1;
 
 ok 1;
 

@@ -49,7 +49,7 @@ sub heavy_export {
 	    $cache_is_current = 1;
 	}
 
-	if (grep m{^[/!:]}, < @imports) {
+	if (grep m{^[/!:]}, @( < @imports)) {
 	    my $tagsref = \%{*{Symbol::fetch_glob("{$pkg}::EXPORT_TAGS")}};
 	    my $tagdata;
 	    my %imports;
@@ -75,7 +75,7 @@ sub heavy_export {
 		elsif ($spec =~ m:^/(.*)/$:){
 		    my $patn = $1;
 		    @allexports = @( keys %$export_cache ) unless (nelems @allexports); # only do keys once
-		    @names = @( grep(m/$patn/, < @allexports) ); # not anchored by default
+		    @names = @( < grep(m/$patn/, @( < @allexports)) ); # not anchored by default
 		}
 		else {
 		    @names = @($spec); # is a normal symbol name
@@ -146,7 +146,7 @@ sub heavy_export {
 	    # Build cache of symbols. Optimise the lookup by adding
 	    # barewords twice... both with and without a leading &.
 	    # (Technique could be applied to $export_cache at cost of memory)
-	    my @expanded = @( map { m/^\w/ ? ($_, '&'.$_) : $_ } < @$fail );
+	    my @expanded = @( < map { m/^\w/ ? ($_, '&'.$_) : $_ } @( < @$fail) );
 	    warn "{$pkg}::EXPORT_FAIL cached: {join ' ', <@expanded}" if $Exporter::Verbose;
 	    %{$fail_cache}{[< @expanded]} = (1) x nelems @expanded;
 	}
@@ -198,9 +198,9 @@ sub _push_tags {
     my @nontag = @( () );
     my $export_tags = \%{*{Symbol::fetch_glob("{$pkg}::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("{$pkg}::$var")}},
-	map { $export_tags->{$_} ? < @{$export_tags->{$_}} 
+	< map { $export_tags->{$_} ? < @{$export_tags->{$_}} 
                                  : do { push(@nontag,$_); $_ } }
-		(nelems @$syms) ? < @$syms : keys %$export_tags);
+ @(		(nelems @$syms) ? < @$syms : keys %$export_tags));
     if ((nelems @nontag) and $^W) {
 	# This may change to a die one day
 	warn(join(", ", < @nontag)." are not tags of $pkg");
