@@ -2029,49 +2029,46 @@ ret_no:
 PP(pp_grepwhile)
 {
     dVAR; dSP;
+    SV** src;
 
-    if (SvTRUE(POPs))
-	PL_stack_base[PL_markstack_ptr[-1]++] = PL_stack_base[*PL_markstack_ptr];
-    ++*PL_markstack_ptr;
+    /* first, move source pointer to the next item in the source list */
+    src = PL_stack_base + PL_markstack_ptr[0];
+
+    /* if there are new items, push them into the destination list */
+    SV** dst = PL_stack_base + (PL_markstack_ptr[0]) + 1;
+    if (SvTRUE(POPs)) {
+	/* copy the new items down to the destination list */
+	av_push((AV*)*dst, newSVsv(POPs));
+    }
+
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if (PL_stack_base + *PL_markstack_ptr > SP) {
-	I32 items;
+    if ( av_len(*src) == -1 ) {
 	const I32 gimme = GIMME_V;
 
 	LEAVE;					/* exit outer scope */
-	(void)POPMARK;				/* pop src */
-	items = --*PL_markstack_ptr - PL_markstack_ptr[-1];
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
-	if (gimme == G_SCALAR) {
-	    if (PL_op->op_private & OPpGREP_LEX) {
-		SV* const sv = sv_newmortal();
-		sv_setiv(sv, items);
-		PUSHs(sv);
-	    }
-	    else {
-		dTARGET;
-		XPUSHi(items);
-	    }
+	if (gimme != G_VOID) {
+	    PUSHs(*dst);
 	}
-	else if (gimme == G_ARRAY)
-	    SP += items;
 	RETURN;
     }
     else {
-	SV *src;
+	SV *srcitem;
 
 	ENTER;					/* enter inner scope */
 	SAVEVPTR(PL_curpm);
 
-	src = PL_stack_base[*PL_markstack_ptr];
-	SvTEMP_off(src);
+	/* set $_ to the new source item */
+	srcitem = av_shift(*src);
+	mXPUSHs(srcitem);
+	SvTEMP_off(srcitem);
 	if (PL_op->op_private & OPpGREP_LEX)
-	    PAD_SVl(PL_op->op_targ) = src;
+	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), srcitem);
 	else
-	    SVcpREPLACE(DEFSV, src);
+	    SVcpREPLACE(DEFSV, srcitem);
 
 	RETURNOP(cLOGOP->op_other);
     }
