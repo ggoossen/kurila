@@ -142,7 +142,7 @@ package Config;
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
 
-my %%Export_Cache = %%( map {($_ => 1)} (< @Config::EXPORT, < @Config::EXPORT_OK) );
+my %%Export_Cache = %%( < map {($_ => 1)} @(< @Config::EXPORT, < @Config::EXPORT_OK) );
 
 our %%Config;
 
@@ -151,7 +151,7 @@ sub import {
     my $pkg = shift;
     @_ = @Config::EXPORT unless @_;
 
-    my @funcs = @( grep $_ ne '%%Config', < @_ );
+    my @funcs = @( < grep $_ ne '%%Config', @_ );
     my $export_Config = (nelems @funcs) +< (nelems @_) ? 1 : 0;
 
     no strict 'refs';
@@ -486,7 +486,7 @@ EOT
 if (%need_relocation{otherlibdirs}) {
 $heavy_txt .= << 'EOT';
 s\{^(otherlibdirs=)(['"])(.*?)\2\}
- \{$1 . $2 . join ':', map \{relocate_inc($_)\} split ':', $3 . $2\}me;
+ \{$1 . $2 . join ':', < map \{relocate_inc($_)\} @( split ':', $3 . $2 )\}me;
 EOT
 }
 }
@@ -602,8 +602,8 @@ sub config_sh {
 
 sub config_re {
     my $re = shift;
-    return @(map { chomp; $_ } grep try{ m/^(?:$re)=/ }, split m/^/,
-             $Config_SH_expanded );
+    return @(<map { chomp; $_ } grep try{ m/^(?:$re)=/ }, @( split m/^/,
+             $Config_SH_expanded ));
 }
 
 sub config_vars {
@@ -618,8 +618,8 @@ sub config_vars {
 	# all config-vars are by definition \w only, any \W means regex
 	if ($qry =~ m/\W/) {
 	    my @matches = @(<config_re($qry));
-	    print map "$_$lnend", @matches ? <@matches : "$qry: not found"		if !$notag;
-	    print map { s/\w+=//; "$_$lnend" } @matches ? <@matches : "$qry: not found"	if  $notag;
+	    print < map "$_$lnend", @( @matches ? <@matches : "$qry: not found")		if !$notag;
+	    print < map { s/\w+=//; "$_$lnend" } @( @matches ? <@matches : "$qry: not found")	if  $notag;
 	} else {
 	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';
@@ -674,7 +674,7 @@ foreach my $key (keys %Common) {
 	$value =~ s!'!\\'!g;
 	$value = "'$value'";
 	if ($key eq 'otherlibdirs') {
-	    $value = "join (':', map \{relocate_inc(\$_)\} split (':', $value))";
+	    $value = "join (':', < map \{relocate_inc(\$_)\} @( split (':', $value)) )";
 	} elsif (%need_relocation{$key}) {
 	    $value = "relocate_inc($value)";
 	}
