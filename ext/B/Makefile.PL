@@ -5,7 +5,7 @@ use File::Spec;
 my $e = %Config{'exe_ext'};
 my $o = %Config{'obj_ext'};
 my $exeout_flag = '-o ';
-my $core = grep { $_ eq 'PERL_CORE=1' } < @ARGV;
+my $core = grep { $_ eq 'PERL_CORE=1' } @( < @ARGV);
 if ($^O eq 'MSWin32') {
     if (%Config{'cc'} =~ m/^cl/i) {
 	$exeout_flag = '-Fe';
@@ -41,7 +41,7 @@ sub headerpath {
 
 sub MY::postamble {
     my $headerpath = headerpath();
-    my @headers = @( map { File::Spec->catfile($headerpath, $_) } qw(op.h cop.h) );
+    my @headers = @( < map { File::Spec->catfile($headerpath, $_) } @( qw(op.h cop.h)) );
     my $noecho = shift->{NOECHO};
 
 "

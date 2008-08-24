@@ -70,7 +70,7 @@ if ($^O eq 'VMS') {
     my @result = @( split(m/,/,$result) );
     my @compare = @( split(m/,/,$compare) );
     foreach(< @compare) {
-        $count += grep {m/$_/} < @result;
+        $count += grep {m/$_/} @( < @result);
     }
     ok($count/(((nelems @result)-1)+1)-1,((nelems @compare)-1));
 }

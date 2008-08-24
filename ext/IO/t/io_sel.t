@@ -42,7 +42,7 @@ $sel->remove(\@(\*STDOUT, 5));
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 9\n";
 
-if ( grep $^O eq $_, qw(MSWin32 NetWare dos VMS riscos beos) ) {
+if ( grep $^O eq $_, @( qw(MSWin32 NetWare dos VMS riscos beos)) ) {
     for (10 .. 15) { 
         print "ok $_ # skip: 4-arg select is only valid on sockets\n"
     }

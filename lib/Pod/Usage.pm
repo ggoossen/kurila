@@ -470,13 +470,13 @@ sub pod2usage {
     ## options that were all uppercase words rather than ones that
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
-    %opts = %( map {
+    %opts = %( < map {
         my $val = %opts{$_};
         s/^(?=\w)/-/;
         m/^-msg/i   and  $_ = '-message';
         m/^-exit/i  and  $_ = '-exitval';
         lc($_) => $val;    
-    } (keys %opts) );
+    } @( (keys %opts)) );
 
     ## Now determine default -exitval and -verbose values to use
     if ((! defined %opts{"-exitval"}) && (! defined %opts{"-verbose"})) {

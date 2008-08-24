@@ -168,7 +168,7 @@ die "Could not tie: $!" unless $X;
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 
-my %noMode = %( map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
+my %noMode = %( < map { $_, 1} @( qw( amigaos MSWin32 NetWare cygwin )) ) ;
 
 ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
    || %noMode{$^O} );
@@ -1435,7 +1435,7 @@ ok(1);
    %h{"fred"} = "joe" ;
    ok( %h{"fred"} eq "joe");
 
-   try { my @r= @( grep { %h{$_} } (1, 2, 3) ) };
+   try { my @r= @( < grep { %h{$_} } @( (1, 2, 3)) ) };
    ok (174, ! $@);
 
 
@@ -1451,7 +1451,7 @@ ok(1);
 
    ok( $db->FIRSTKEY() eq "fred") ;
    
-   try { my @r= @( grep { %h{$_} } (1, 2, 3) ) };
+   try { my @r= @( < grep { %h{$_} } @( (1, 2, 3)) ) };
    ok (177, ! $@);
 
    undef $db ;

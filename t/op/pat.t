@@ -646,13 +646,13 @@ our @res = @( () );
 # List context:
 $_ = 'abcde|abcde';
 our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g );
-@res = @( map {defined $_ ? "'$_'" : 'undef'} < @res );
+@res = @( < map {defined $_ ? "'$_'" : 'undef'} @( < @res) );
 $res = "{join ' ', <@res}";
 ok(  "{join ' ', <@res}" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
 
 @res = @( () );
 @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp );
-@res = @( map {defined $_ ? "'$_'" : 'undef'} < @res );
+@res = @( < map {defined $_ ? "'$_'" : 'undef'} @( < @res) );
 $res = "{join ' ', <@res}";
 ok(  "{join ' ', <@res}" eq
   "'' 'ab' 'cde|abcde' " .
@@ -753,54 +753,54 @@ ok("{join ' ', <@res}" eq 'b b');
 
 {
 use bytes;
-@a = @( map chr,0..255 );
+@a = @( < map chr, @(0..255) );
 
-@b = @( grep(m/\S/,< @a) );
-our @c = @( grep(m/[^\s]/,< @a) );
+@b = @( < grep(m/\S/, @(< @a)) );
+our @c = @( < grep(m/[^\s]/, @(< @a)) );
 ok("{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\S/,< @a) );
-@c = @( grep(m/[\S]/,< @a) );
+@b = @( < grep(m/\S/, @(< @a)) );
+@c = @( < grep(m/[\S]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\s/,< @a) );
-@c = @( grep(m/[^\S]/,< @a) );
+@b = @( < grep(m/\s/, @(< @a)) );
+@c = @( < grep(m/[^\S]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\s/,< @a) );
-@c = @( grep(m/[\s]/,< @a) );
+@b = @( < grep(m/\s/, @(< @a)) );
+@c = @( < grep(m/[\s]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\D/,< @a) );
-@c = @( grep(m/[^\d]/,< @a) );
+@b = @( < grep(m/\D/, @(< @a)) );
+@c = @( < grep(m/[^\d]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\D/,< @a) );
-@c = @( grep(m/[\D]/,< @a) );
+@b = @( < grep(m/\D/, @(< @a)) );
+@c = @( < grep(m/[\D]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\d/,< @a) );
-@c = @( grep(m/[^\D]/,< @a) );
+@b = @( < grep(m/\d/, @(< @a)) );
+@c = @( < grep(m/[^\D]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\d/,< @a) );
-@c = @( grep(m/[\d]/,< @a) );
+@b = @( < grep(m/\d/, @(< @a)) );
+@c = @( < grep(m/[\d]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\W/,< @a) );
-@c = @( grep(m/[^\w]/,< @a) );
+@b = @( < grep(m/\W/, @(< @a)) );
+@c = @( < grep(m/[^\w]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\W/,< @a) );
-@c = @( grep(m/[\W]/,< @a) );
+@b = @( < grep(m/\W/, @(< @a)) );
+@c = @( < grep(m/[\W]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\w/,< @a) );
-@c = @( grep(m/[^\W]/,< @a) );
+@b = @( < grep(m/\w/, @(< @a)) );
+@c = @( < grep(m/[^\W]/, @(< @a)) );
 ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
 
-@b = @( grep(m/\w/,< @a) );
-@c = @( grep(m/[\w]/,< @a) );
+@b = @( < grep(m/\w/, @(< @a)) );
+@c = @( < grep(m/[\w]/, @(< @a)) );
 is("{join ' ', <@b}","{join ' ', <@c}");
 }
 
@@ -851,9 +851,9 @@ my %space = %( spc   => " ",
 	      vt    => chr(11),
 	      false => "space" );
 
-my @space0 = @( sort grep { %space{$_} =~ m/\s/ }          keys %space );
-my @space1 = @( sort grep { %space{$_} =~ m/[[:space:]]/ } keys %space );
-my @space2 = @( sort grep { %space{$_} =~ m/[[:blank:]]/ } keys %space );
+my @space0 = @( sort < grep { %space{$_} =~ m/\s/ } @(          keys %space) );
+my @space1 = @( sort < grep { %space{$_} =~ m/[[:space:]]/ } @( keys %space) );
+my @space2 = @( sort < grep { %space{$_} =~ m/[[:blank:]]/ } @( keys %space) );
 
 ok( "{join ' ', <@space0}" eq "cr ff lf spc tab" );
 
@@ -973,8 +973,8 @@ SKIP: {
 	     "\0"				=> 'Cc',
 	     );
 	
-    for my $char (map { s/^\S+ //; $_ }
-                    sort map { sprintf("\%06x", ord($_))." $_" } keys %s) {
+    for my $char (< map { s/^\S+ //; $_ }
+ @(                    sort < map { sprintf("\%06x", ord($_))." $_" } @( keys %s))) {
 	my $class = %s{$char};
 	my $code  = sprintf("\%06x", ord($char));
 	printf "#\n# 0x$code  $char\n#\n";
@@ -1351,12 +1351,12 @@ ok( chr(0x38c) =~ m/\p{IsGreek}/ ); # singleton
 ## guarantee a specific locale......
 ##
     use bytes;
-    our $AllBytes = join('', map { chr($_) } 0..255);
+    our $AllBytes = join('', < map { chr($_) } @( 0..255));
     ($x = $AllBytes) =~ s/[[:cntrl:]]//g;
-    ok($x eq join('', map { chr($_) } 0x20..0x7E, 0x80..0xFF));
+    ok($x eq join('', < map { chr($_) } @( 0x20..0x7E, 0x80..0xFF)));
 
     ($x = $AllBytes) =~ s/[^[:cntrl:]]//g;
-    ok($x eq join('', map { chr($_) } 0..0x1F, 0x7F));
+    ok($x eq join('', < map { chr($_) } @( 0..0x1F, 0x7F)));
 }
 
 # With /s modifier UTF8 chars were interpreted as bytes
@@ -2392,7 +2392,7 @@ ok(("abc" =~ m/^abc(\z)??/) && !defined($1),
     "words"=~m/(word|word|word)(?{push @got,$1})s$/i;
     ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# {join ' ', <@got}";
 
-    my @nums= @(map {int rand 1000} 1..100 );
+    my @nums= @(< map {int rand 1000} @( 1..100) );
     my $re="(".(join "|",< @nums).")";
     $re=qr/\b$re\b/;
 
@@ -2465,7 +2465,7 @@ print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
 if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     my @normal= @(qw(these are some normal words) );
     use utf8;
-    my $psycho=join "|",< @normal,map chr $_,255..20000;
+    my $psycho=join "|",< @normal,< map chr $_, @(255..20000);
     ok(('these'=~m/($psycho)/) && $1 eq 'these','Pyscho');
 } else {
     ok(1,'Skipped Psycho');
@@ -3321,7 +3321,7 @@ sub kt
          \@(qw|[[:^word:]] #@! abc|),
         ) {
         my $m = shift @$_;
-        my ($s, $f) = map { \@(split m/ */) } < @$_;
+        my ($s, $f) = < map { \@(split m/ */) } @( < @$_);
         ok(m/$m/, " $m basic match") for < @$s;
         ok(not m/$m/) for < @$f;
         ok(m/^$m$/) for < @$s;
@@ -3417,7 +3417,7 @@ sub kt
 {
     local $Message = "Various whitespace special patterns";
     my @lb=@( "\x{0D}\x{0A}",
-             map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
+             < map { chr( $_ ) } @( ( 0x0A..0x0D,0x85,0x2028,0x2029 )));
     foreach my $t (\@(\@lb,qr/\R/,qr/\R+/),){
         my $ary=shift @$t;
         foreach my $pat (< @$t) {
@@ -3470,17 +3470,17 @@ sub kt
     is( (join ",", sort keys %+), "foo" );
     is( (join ",", sort keys %-), "foo" );
     is( (join ",", sort values %+), "a" );
-    is( (join ",", sort map "{join ' ', <@$_}", values %-), "a " );
+    is( (join ",", sort < map "{join ' ', <@$_}", @( values %-)), "a " );
     m/(?<bar>a)(?<bar>b)(?<quux>.)/;
     is( (join ",", sort keys %+), "bar,quux" );
     is( (join ",", sort keys %-), "bar,quux" );
     is( (join ",", sort values %+), "a,c" ); # leftmost
-    is( (join ",", sort map "{join ' ', <@$_}", values %-), "a b,c" );
+    is( (join ",", sort < map "{join ' ', <@$_}", @( values %-)), "a b,c" );
     m/(?<un>a)(?<deux>c)?/; # second buffer won't capture
     is( (join ",", sort keys %+), "un" );
     is( (join ",", sort keys %-), "deux,un" );
     is( (join ",", sort values %+), "a" );
-    is( (join ",", sort map "{join ' ', <@$_}", values %-), ",a" );
+    is( (join ",", sort < map "{join ' ', <@$_}", @( values %-)), ",a" );
 }
 
 # length() on captures, the numbered ones end up in Perl_magic_len

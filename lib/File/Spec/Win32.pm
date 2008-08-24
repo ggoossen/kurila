@@ -69,7 +69,7 @@ variables are tainted, they are not used.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( map( %ENV{$_}, qw(TMPDIR TEMP TMP) ),
+    $tmpdir = @_[0]->_tmpdir( < map( %ENV{$_}, @( qw(TMPDIR TEMP TMP)) ),
 			      'SYS:/temp',
 			      'C:\system\temp',
 			      'C:/temp',
@@ -162,7 +162,7 @@ sub catdir {
 sub path {
     my @path = @( split(';', %ENV{PATH}) );
     s/"//g for < @path;
-    @path = @( grep length, < @path );
+    @path = @( < grep length, @( < @path) );
     unshift(@path, ".");
     return @path;
 }

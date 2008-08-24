@@ -145,13 +145,13 @@ ok((nelems @ary) == 3 &&
    @ary[2] eq "\x{FD}\x{FD}");
 
 {
-    my @a = @( map ord, split(m//, join("", map chr, (1234, 123, 2345))) );
+    my @a = @( < map ord, @( split(m//, join("", < map chr, @( (1234, 123, 2345))))) );
     is("{join ' ', <@a}", "1234 123 2345");
 }
 
 {
     my $x = 'A';
-    my @a = @( map ord, split(m/$x/, join("", map chr, (1234, ord($x), 2345))) );
+    my @a = @( < map ord, @( split(m/$x/, join("", < map chr, @( (1234, ord($x), 2345))))) );
     is("{join ' ', <@a}", "1234 2345");
 }
 

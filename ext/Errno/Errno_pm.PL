@@ -352,7 +352,7 @@ EDQ
    
     my $len = 0;
     my @err = @( sort { %err{$a} <+> %err{$b} } keys %err );
-    map { $len = length if length +> $len } < @err;
+    map { $len = length if length +> $len } @( < @err);
 
     my $j = "\@EXPORT_OK = \@( qw(" . join(" ",keys %err) . ") );\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
@@ -363,8 +363,8 @@ print <<'ESQ';
     POSIX => \@(qw(
 ESQ
 
-    my $k = join(" ", grep { exists %err{$_} } 
-	qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
+    my $k = join(" ", < grep { exists %err{$_} } 
+ @(	qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
 	EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
 	ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT
 	EEXIST EFAULT EFBIG EHOSTDOWN EHOSTUNREACH EINPROGRESS
@@ -376,7 +376,7 @@ ESQ
 	EPFNOSUPPORT EPIPE EPROCLIM EPROTONOSUPPORT EPROTOTYPE
 	ERANGE EREMOTE ERESTART EROFS ESHUTDOWN ESOCKTNOSUPPORT
 	ESPIPE ESRCH ESTALE ETIMEDOUT ETOOMANYREFS ETXTBSY
-	EUSERS EWOULDBLOCK EXDEV));
+	EUSERS EWOULDBLOCK EXDEV)));
 
     $k =~ s/(.{50,70})\s/$1\n\t/g;
     print "\t",$k,"\n    ))\n);\n\n";

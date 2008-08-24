@@ -16,7 +16,7 @@ our @dl_resolve_using;
 
 sub Mkbootstrap {
     my($baseext, < @bsloadlibs)=< @_;
-    @bsloadlibs = @( grep($_, < @bsloadlibs) ); # strip empty libs
+    @bsloadlibs = @( < grep($_, @( < @bsloadlibs)) ); # strip empty libs
 
     print STDOUT "	bsloadlibs={join ' ', <@bsloadlibs}\n" if $Verbose;
 

@@ -79,7 +79,7 @@ sub caller_info {
 
   my $sub_name = Carp::get_subname(\%call_info);
   if (%call_info{has_args}) {
-    my @args = @( map { Carp::format_arg($_)} < @DB::args );
+    my @args = @( < map { Carp::format_arg($_)} @( < @DB::args) );
     if ($MaxArgNums and (nelems @args) +> $MaxArgNums) { # More than we want to show?
       splice @args, $MaxArgNums;
       push @args, '...';

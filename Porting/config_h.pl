@@ -56,7 +56,7 @@ do {
     } while ($changed);
 
 # 30327
-for (grep m{echo .Extracting \$CONFIG_H} => < @ch) {
+for (< grep m{echo .Extracting \$CONFIG_H}, @(  < @ch)) {
     my $case = join "\n",
 	qq{case "\$CONFIG_H" in},
 	qq{already-done) echo "Not re-extracting config.h" ;;},

@@ -32,13 +32,13 @@ ok(defined($dot));
 my @a = @( sort < glob("*") );
 my $first;
 do { $first = $dot->read } while defined($first) && $first =~ m/^\./;
-ok(+(grep { $_ eq $first } < @a));
+ok(+(< grep { $_ eq $first } @( < @a)));
 
-my @b = @( sort($first, (grep {m/^[^.]/} < $dot->read_all)) );
+my @b = @( sort($first, (< grep {m/^[^.]/} @( < $dot->read_all))) );
 ok(+(join("\0", < @a) eq join("\0", < @b)));
 
 $dot->rewind;
-my @c = @( sort grep {m/^[^.]/} < $dot->read_all );
+my @c = @( sort < grep {m/^[^.]/} @( < $dot->read_all) );
 ok(+(join("\0", < @b) eq join("\0", < @c)));
 
 $dot->close;

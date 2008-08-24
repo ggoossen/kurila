@@ -79,7 +79,7 @@ char * const PL_AMG_names[NofAMmeth] = {
 EOF
 
 my $last = pop @names;
-print $c "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ } < @names;
+print $c "    \"$_\",\n" foreach < map { s/(["\\"])/\\$1/g; $_ } @( < @names);
 
 print $c <<"EOT";
     "$last"

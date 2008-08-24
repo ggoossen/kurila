@@ -363,7 +363,7 @@ sub ornaments {
     $rl_term_set = ',,,';
     return;
   }
-  @rl_term_set = @( map {$_ ? $terminal->Tputs($_,1) || '' : ''} < @ts );
+  @rl_term_set = @( < map {$_ ? $terminal->Tputs($_,1) || '' : ''} @( < @ts) );
   return $rl_term_set;
 }
 

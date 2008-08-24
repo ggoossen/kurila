@@ -224,7 +224,7 @@ sub import
 
   %^H{charnames_full} = delete %h{':full'};
   %^H{charnames_short} = delete %h{':short'};
-  %^H{charnames_scripts} = \@(map uc, keys %h);
+  %^H{charnames_scripts} = \@(< map uc, @( keys %h));
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,

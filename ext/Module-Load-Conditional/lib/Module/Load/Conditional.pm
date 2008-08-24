@@ -448,7 +448,7 @@ sub can_load {
 
             map {
                 $CACHE->{$mod}->{$_} = $mod_data->{$_}
-            } qw[version file uptodate];
+            } @( qw[version file uptodate]);
 
             push @load, $mod;
         }
@@ -517,14 +517,14 @@ sub requires {
         return undef;
     }
 
-    my $lib = join " ", map { qq["-I$_"] } < @INC;
+    my $lib = join " ", < map { qq["-I$_"] } @( < @INC);
     my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
 
     return @(  sort
-                grep { !m/^$who$/  }
-                map  { chomp; s|/|::|g; $_ }
-                grep { s|\.pm$||i; }
-            `$cmd`);
+                < grep { !m/^$who$/  }
+ @(                < map  { chomp; s|/|::|g; $_ }
+ @(                < grep { s|\.pm$||i; }
+ @(            `$cmd`))));
 }
 
 1;

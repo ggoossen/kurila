@@ -363,7 +363,7 @@ sub _maniskip {
 
     # Make sure each entry is isolated in its own parentheses, in case
     # any of them contain alternations
-    my $regex = join '|', map "(?:$_)", < @skip;
+    my $regex = join '|', < map "(?:$_)", @( < @skip);
 
     return sub { @_[0] =~ qr{$opts$regex} };
 }
@@ -555,7 +555,7 @@ my @Exceptions = @( qw(MANIFEST META.yml SIGNATURE) );
 sub best {
     my ($srcFile, $dstFile) = < @_;
 
-    my $is_exception = grep $srcFile =~ m/$_/, < @Exceptions;
+    my $is_exception = grep $srcFile =~ m/$_/, @( < @Exceptions);
     if ($is_exception or !%Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
@@ -617,7 +617,7 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    my @needed = @( grep { !exists $manifest->{$_} } keys %$additions );
+    my @needed = @( < grep { !exists $manifest->{$_} } @( keys %$additions) );
     return 1 unless (nelems @needed);
 
     open(MANIFEST, ">>", "$MANIFEST") or 

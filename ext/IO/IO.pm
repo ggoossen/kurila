@@ -17,7 +17,7 @@ sub import {
     
     my @l = @( (nelems @_) ? < @_ : qw(Handle Seekable File Socket Dir) );
 
-    eval join("", map { "require IO::" . @(m/(\w+)/)[0] . ";\n" } < @l)
+    eval join("", < map { "require IO::" . @(m/(\w+)/)[0] . ";\n" } @( < @l))
 	or die $@;
 }
 

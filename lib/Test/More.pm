@@ -448,7 +448,7 @@ sub can_ok ($@) {
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
-    $tb->diag(map "    $class->can('$_') failed\n", < @nok);
+    $tb->diag(< map "    $class->can('$_') failed\n", @( < @nok));
 
     return $ok;
 }
@@ -1172,7 +1172,7 @@ sub eq_array {
 sub _eq_array  {
     my($a1, $a2) = < @_;
 
-    if( grep !_type($_) eq 'ARRAY', $a1, $a2 ) {
+    if( grep !_type($_) eq 'ARRAY', @( $a1, $a2) ) {
         warn "eq_array passed a non-array ref";
         return 0;
     }
@@ -1291,7 +1291,7 @@ sub eq_hash {
 sub _eq_hash {
     my($a1, $a2) = < @_;
 
-    if( grep !_type($_) eq 'HASH', $a1, $a2 ) {
+    if( grep !_type($_) eq 'HASH', @( $a1, $a2) ) {
         warn "eq_hash passed a non-hash ref";
         return 0;
     }
@@ -1359,8 +1359,8 @@ sub eq_set  {
     # I don't know how references would be sorted so we just don't sort
     # them.  This means eq_set doesn't really work with refs.
     return eq_array(
-           \@(grep(ref, < @$a1), sort( grep(!ref, < @$a1) )),
-           \@(grep(ref, < @$a2), sort( grep(!ref, < @$a2) )),
+           \@(< grep(ref, @( < @$a1)), sort( < grep(!ref, @( < @$a1)) )),
+           \@(< grep(ref, @( < @$a2)), sort( < grep(!ref, @( < @$a2)) )),
     );
 }
 

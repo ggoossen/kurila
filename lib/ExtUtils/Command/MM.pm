@@ -56,7 +56,7 @@ sub test_harness {
     my @argv = @( < ExtUtils::Command::expand_wildcards(< @ARGV) );
 
     local @INC = @( < @INC );
-    unshift @INC, map { File::Spec->rel2abs($_) } < @_;
+    unshift @INC, < map { File::Spec->rel2abs($_) } @( < @_);
     Test::Harness::runtests(sort { lc $a cmp lc $b } < @argv);
 }
 

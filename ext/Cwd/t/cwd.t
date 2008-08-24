@@ -34,9 +34,9 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 {
   my @fields = @( qw(PATH IFS CDPATH ENV BASH_ENV) );
-  my $before = grep exists %ENV{$_}, < @fields;
+  my $before = grep exists %ENV{$_}, @( < @fields);
   cwd();
-  my $after = grep exists %ENV{$_}, < @fields;
+  my $after = grep exists %ENV{$_}, @( < @fields);
   is($before, $after, "cwd() shouldn't create spurious entries in \%ENV");
 }
 
@@ -52,8 +52,8 @@ my $pwd_cmd =
         "cd" :
     ($IsMacOS) ?
         "pwd" :
-        (grep { -x && -f } map { "$_/$pwd%Config{exe_ext}" }
-	                   split m/%Config{path_sep}/, %ENV{PATH})[[0]];
+        (< grep { -x && -f } @( < map { "$_/$pwd%Config{exe_ext}" }
+ @(	                   split m/%Config{path_sep}/, %ENV{PATH})))[[0]];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {
@@ -201,7 +201,7 @@ SKIP: {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
     opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
-    ($file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), readdir FH;
+    ($file) = < grep {-f $_ and not -l $_} @( < map File::Spec->catfile($root, $_), @( readdir FH));
     closedir FH;
   }
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
@@ -219,8 +219,8 @@ SKIP: {
 # directory or path comparison capability.
 
 sub bracketed_form_dir {
-  return join '', map "[$_]", 
-    grep length, < File::Spec->splitdir(File::Spec->canonpath( shift() ));
+  return join '', < map "[$_]", @( 
+    < grep length, @( < File::Spec->splitdir(File::Spec->canonpath( shift() ))));
 }
 
 sub dir_ends_with {
@@ -230,8 +230,8 @@ sub dir_ends_with {
 }
 
 sub bracketed_form_path {
-  return join '', map "[$_]", 
-    grep length, < File::Spec->splitpath(File::Spec->canonpath( shift() ));
+  return join '', < map "[$_]", @( 
+    < grep length, @( < File::Spec->splitpath(File::Spec->canonpath( shift() ))));
 }
 
 sub path_ends_with {

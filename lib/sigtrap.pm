@@ -27,16 +27,16 @@ sub import {
 	    }
 	}
 	elsif ($_ eq 'normal-signals') {
-	    unshift @_, grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
+	    unshift @_, < grep(exists %SIG{$_}, @( qw(HUP INT PIPE TERM)));
 	}
 	elsif ($_ eq 'error-signals') {
-	    unshift @_, grep(exists %SIG{$_},
-			     qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
+	    unshift @_, < grep(exists %SIG{$_}, @(
+			     qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP)));
 	}
 	elsif ($_ eq 'old-interface-signals') {
 	    unshift @_,
-	    grep(exists %SIG{$_},
-		 qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
+	    < grep(exists %SIG{$_}, @(
+		 qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP)));
 	}
     	elsif ($_ eq 'stack-trace') {
 	    $handler = \&handler_traceback;

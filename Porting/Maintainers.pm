@@ -41,7 +41,7 @@ sub get_module_pat {
 sub get_module_files {
     my $m = shift;
     sort { lc $a cmp lc $b }
-    map {
+    < map {
 	-f $_ ? # Files as-is.
 	    $_ :
 	    -d _ ? # Recurse into directories.
@@ -55,14 +55,14 @@ sub get_module_files {
 		@files;
 	    }
 	: glob( <$_) # The rest are globbable patterns.
-	} < get_module_pat($m);
+	} @( < get_module_pat($m));
 }
 
 sub get_maintainer_modules {
     my $m = shift;
     sort { lc $a cmp lc $b }
-    grep { %Modules{$_}->{MAINTAINER} eq $m }
-    keys %Modules;
+    < grep { %Modules{$_}->{MAINTAINER} eq $m }
+ @(    keys %Modules);
 }
 
 sub usage {
@@ -106,7 +106,7 @@ sub process_options {
     if ($Opened) {
 	my @raw = @( `p4 opened` );
 	die if $?;
-	@Files = @(  map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} < @raw );
+	@Files = @(  < map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} @( < @raw) );
     } else {
 	@Files = @( < @ARGV );
     }
@@ -135,7 +135,7 @@ sub show_results {
 	    if ($m =~ m/$Maintainer/io || %Maintainers{$m} =~ m/$Maintainer/io) {
 		my @modules = @( < get_maintainer_modules($m) );
 		if ($Module) {
-		    @modules = @( grep { m/$Module/io } < @modules );
+		    @modules = @( < grep { m/$Module/io } @( < @modules) );
 		}
 		if ($Files) {
 		    my @files;
@@ -203,10 +203,10 @@ sub show_results {
 	}
 
 	# If still unresolved files...
-	if (my @ToDo = @( grep { !defined %ModuleByFile{$_} } keys %ModuleByFile )) {
+	if (my @ToDo = @( < grep { !defined %ModuleByFile{$_} } @( keys %ModuleByFile) )) {
 
 	    # Cannot match what isn't there.
-	    @ToDo = @( grep { -e $_ } < @ToDo );
+	    @ToDo = @( < grep { -e $_ } @( < @ToDo) );
 
 	    if ((nelems @ToDo)) {
 		# Try prefix matching.

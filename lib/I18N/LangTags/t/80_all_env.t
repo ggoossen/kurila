@@ -16,11 +16,11 @@ print "# Make sure we can assign to ENV entries\n",
 delete %ENV{'MYORP'};
 delete %ENV{'SWUZ'};
 
-sub j { "[" . join(' ', map "\"$_\"", < @_) . "]" ;}
+sub j { "[" . join(' ', < map "\"$_\"", @( < @_)) . "]" ;}
 
 sub show {
   print "#  (Seeing \{", join(' ',
-    map(dump::view($_), < @_)), "\} at line ", (caller)[[2]], ")\n";
+    < map(dump::view($_), @( < @_))), "\} at line ", (caller)[[2]], ")\n";
   printenv();
   return @_[0] || '';
 }

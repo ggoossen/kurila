@@ -41,7 +41,7 @@ is($x, 'abcdefghijklmnopqrstuvwxyz');
 is (scalar nelems @x, 27 * 26);
 
 @x = @( '09' .. '08' );  # should produce '09', '10',... '99' (strange but true)
-is(join(",", < @x), join(",", map {sprintf "\%02d",$_} 9..99));
+is(join(",", < @x), join(",", < map {sprintf "\%02d",$_} @( 9..99)));
 
 # same test with foreach (which is a separate implementation)
 @y = @( () );
@@ -103,13 +103,13 @@ is(join(":",undef..'2'), '0:1:2');
 is(join(":",'-2'..undef), '-2:-1:0');
 
 # undef should be treated as "" for magical range
-is(join(":", map "[$_]", "".."B"), '[]');
-is(join(":", map "[$_]", undef.."B"), '[]');
-is(join(":", map "[$_]", "B"..""), '');
-is(join(":", map "[$_]", "B"..undef), '');
+is(join(":", < map "[$_]", @( "".."B")), '[]');
+is(join(":", < map "[$_]", @( undef.."B")), '[]');
+is(join(":", < map "[$_]", @( "B".."")), '');
+is(join(":", < map "[$_]", @( "B"..undef)), '');
 
 # undef..undef used to segfault
-is(join(":", map "[$_]", undef..undef), '[]');
+is(join(":", < map "[$_]", @( undef..undef)), '[]');
 
 # also test undef in foreach loops
 @foo= @(() ); push @foo, $_ for undef..2;
@@ -125,19 +125,19 @@ is(join(":", < @foo), '0:1:2');
 is(join(":", < @foo), '-2:-1:0');
 
 @foo= @(() ); push @foo, $_ for undef.."B";
-is(join(":", map "[$_]", < @foo), '[]');
+is(join(":", < map "[$_]", @( < @foo)), '[]');
 
 @foo= @(() ); push @foo, $_ for "".."B";
-is(join(":", map "[$_]", < @foo), '[]');
+is(join(":", < map "[$_]", @( < @foo)), '[]');
 
 @foo= @(() ); push @foo, $_ for "B"..undef;
-is(join(":", map "[$_]", < @foo), '');
+is(join(":", < map "[$_]", @( < @foo)), '');
 
 @foo= @(() ); push @foo, $_ for "B".."";
-is(join(":", map "[$_]", < @foo), '');
+is(join(":", < map "[$_]", @( < @foo)), '');
 
 @foo= @(() ); push @foo, $_ for undef..undef;
-is(join(":", map "[$_]", < @foo), '[]');
+is(join(":", < map "[$_]", @( < @foo)), '[]');
 
 # again with magic
 {
@@ -166,25 +166,25 @@ is(join(":", map "[$_]", < @foo), '[]');
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for undef..$1;
-    is(join(":", map "[$_]", < @foo), '[]');
+    is(join(":", < map "[$_]", @( < @foo)), '[]');
 }
 {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for ""..$1;
-    is(join(":", map "[$_]", < @foo), '[]');
+    is(join(":", < map "[$_]", @( < @foo)), '[]');
 }
 {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1..undef;
-    is(join(":", map "[$_]", < @foo), '');
+    is(join(":", < map "[$_]", @( < @foo)), '');
 }
 {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1.."";
-    is(join(":", map "[$_]", < @foo), '');
+    is(join(":", < map "[$_]", @( < @foo)), '');
 }
 
 # Test upper range limit

@@ -7,7 +7,7 @@ use utf8;
 use strict;
 
 sub unidump {
-    join " ", map { sprintf "\%04X", $_ } unpack "U*", @_[0];
+    join " ", < map { sprintf "\%04X", $_ } @( unpack "U*", @_[0]);
 }
 
 sub casetest {
@@ -15,14 +15,14 @@ sub casetest {
     # For each provided function run it, and run a version with some extra
     # characters afterwards. Use a recycling symbol, as it doesn't change case.
     my $ballast = chr (0x2672) x 3;
-    @funcs = @( map {my $f = $_;
+    @funcs = @( < map {my $f = $_;
 		  ($f,
 		   sub {my $r = $f->(@_[0] . $ballast); # Add it before
 			$r =~ s/$ballast\z//so # Remove it afterwards
 			    or die "'@_[0]' to '$r' mangled";
 			$r; # Result with $ballast removed.
 		    },
-		   )} < @funcs );
+		   )} @( < @funcs) );
 
     my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
 						      "lib", "unicore", "To"),
@@ -50,8 +50,8 @@ sub casetest {
     exit(1) if $both;
 
     my %none;
-    for my $i (map { ord } split m//,
-	       "\e !\"#\$\%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b") {
+    for my $i (< map { ord } @( split m//,
+	       "\e !\"#\$\%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b")) {
 	next if pack("U0U", $i) =~ m/\w/;
 	%none{$i}++ unless %seen{$i};
     }

@@ -16,11 +16,11 @@ is( $v,	9,	'4-arg divide');
 $v = reduce { $a / $b } 6;
 is( $v,	6,	'one arg');
 
-my @a = @( map { rand } 0 .. 20 );
+my @a = @( < map { rand } @( 0 .. 20) );
 $v = reduce { $a +< $b ? $a : $b } < @a;
 is( $v,	min(< @a),	'min');
 
-@a = @( map { pack("C", int(rand(256))) } 0 .. 20 );
+@a = @( < map { pack("C", int(rand(256))) } @( 0 .. 20) );
 $v = reduce { $a . $b } < @a;
 is( $v,	join("",< @a),	'concat');
 

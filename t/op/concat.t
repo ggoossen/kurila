@@ -49,7 +49,7 @@ print q(1..22
 # test that nul bytes get copied
 {
     my ($a, $ab)   = ("a", "a\0b");
-    my ($ua, $uab) = map pack("U0a*", $_), $a, $ab;
+    my ($ua, $uab) = < map pack("U0a*", $_), @( $a, $ab);
 
     my $ub = pack("U0a*", 'b');
 

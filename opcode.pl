@@ -427,7 +427,7 @@ sub gen_op_is_macro {
 	}
 	else {
 	    print $on join(" || \\\n\t ",
-			  map { "(op) == OP_" . uc() } sort keys %$op_is);
+			  < map { "(op) == OP_" . uc() } @( sort keys %$op_is));
 	    print $on ")\n\n";
 	}
     }

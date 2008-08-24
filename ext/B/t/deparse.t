@@ -76,7 +76,7 @@ is($val->[0], 'hello');
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } < @INC;
+my $path = join " ", < map { qq["-I$_"] } @( < @INC);
 $path .= " -MMac::err=unix" if $Is_MacOS;
 my $redir = $Is_MacOS ? "" : "2>&1";
 

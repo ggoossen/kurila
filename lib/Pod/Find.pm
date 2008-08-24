@@ -147,9 +147,9 @@ sub pod_find
                     $_ =~ s|^\./|:|;
                 }
             }
-            push(@search, grep($_ ne File::Spec->curdir, < @new_INC));
+            push(@search, < grep($_ ne File::Spec->curdir, @( < @new_INC)));
         } else {
-            push(@search, grep($_ ne File::Spec->curdir, < @INC));
+            push(@search, < grep($_ ne File::Spec->curdir, @( < @INC)));
         }
 
         %opts{-perl} = 1;
@@ -236,7 +236,7 @@ sub _check_for_duplicates {
     if(%$names_ref{$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
-            join(' ', grep(%$pods_ref{$_} eq $name, keys %$pods_ref)),"\n";
+            join(' ', < grep(%$pods_ref{$_} eq $name, @( keys %$pods_ref))),"\n";
     }
     else {
         %$names_ref{$name} = 1;

@@ -86,7 +86,7 @@ if ($FileList) {
             push @$list, $file;
         }
         my %dupe;
-        @$list = @( grep !%dupe{ $_ }++, < @$list );
+        @$list = @( < grep !%dupe{ $_ }++, @( < @$list) );
     }
     close $fh;
     die "No input or output files in '$FileList'!"
@@ -144,8 +144,8 @@ if ($FileList) {
 }
 
 foreach my $lib ('To', 'lib',
-		 map { File::Spec->catdir("lib",$_)}
-		 qw(gc_sc dt bc hst ea jt lb nt ccc)) {
+		 < map { File::Spec->catdir("lib",$_)}
+ @(		 qw(gc_sc dt bc hst ea jt lb nt ccc))) {
   next if -d $lib;
   mkdir $lib, 0755 or die "mkdir '$lib': $!";
 }
@@ -2018,8 +2018,8 @@ sub SpecialCasing_txt()
         for my $prop (sort { $a->[0] <+> $b->[0] } < @{%CaseInfo{$case}}) {
             my ($ix, $code, $to) = < @$prop;
             my $tostr =
-              join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', $to;
-            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ } unpack("U0C*", pack("U", $ix)));
+              join "", < map { sprintf "\\x\{\%s\}", $_ } @( split ' ', $to);
+            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", < map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $ix))));
 	    # Remove any single-character mappings for
 	    # the same character since we are going for
 	    # the special casing rules.
@@ -2079,8 +2079,8 @@ sub CaseFolding_txt()
 	);
     for my $code (sort { $a <+> $b } keys %Fold) {
         my $foldstr =
-          join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', %Fold{$code};
-        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ } unpack("U0C*", pack("U", $code)));
+          join "", < map { sprintf "\\x\{\%s\}", $_ } @( split ' ', %Fold{$code});
+        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", < map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $code))));
     }
     push @OUT, (
                 ");\n\n",

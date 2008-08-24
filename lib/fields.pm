@@ -119,7 +119,7 @@ sub _accessible_keys {
     my ($class) = < @_;
     return  @(
         keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
-        map( <_accessible_keys($_), < @{*{Symbol::fetch_glob($class.'::ISA')}}),
+        < map( <_accessible_keys($_), @( < @{*{Symbol::fetch_glob($class.'::ISA')}})),
     );
 }
 

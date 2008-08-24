@@ -142,7 +142,7 @@ cmp_ok(join('',(1,2),3,(4,5)),'eq','12345','list (..).(..)');
         is((nelems @_), 0, $test_name);
     }
     test_zero_args("simple list slice",      (10,11)[[2,3]]);
-    test_zero_args("grepped list slice",     grep(1, (10,11)[[2,3]]));
+    test_zero_args("grepped list slice",     < grep(1, @( (10,11)[[2,3]])));
     test_zero_args("sorted list slice",      sort((10,11)[[2,3]]));
     test_zero_args("do-returned list slice", do { (10,11)[[2,3]]; });
 }

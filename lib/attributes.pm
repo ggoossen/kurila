@@ -36,7 +36,7 @@ sub import {
 	if (!nelems @badattrs && nelems @pkgattrs) {
             require warnings;
 	    return unless warnings::enabled('reserved');
-	    @pkgattrs = @( grep { m/\A[[:lower:]]+(?:\z|\()/ } < @pkgattrs );
+	    @pkgattrs = @( < grep { m/\A[[:lower:]]+(?:\z|\()/ } @( < @pkgattrs) );
 	    if ((nelems @pkgattrs)) {
 		for my $attr (< @pkgattrs) {
 		    $attr =~ s/\(.+\z//s;

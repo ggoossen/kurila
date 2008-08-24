@@ -355,8 +355,8 @@ sub _win32_ext {
     return  @('','','','',  @($give_libs ? \@libs : ())) unless $found;
 
     # make sure paths with spaces are properly quoted
-    @extralibs = @( map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } < @extralibs );
-    @libs = @( map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } < @libs );
+    @extralibs = @( < map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @( < @extralibs) );
+    @libs = @( < map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @( < @libs) );
     $lib = join(' ',< @extralibs);
 
     # normalize back to backward slashes (to help braindead tools)
@@ -376,8 +376,8 @@ sub _vms_ext {
   my(@crtls,$crtlstr);
   @crtls = @( (%Config{'ldflags'} =~ m-/Debug-i ? %Config{'dbgprefix'} : '')
               . 'PerlShr/Share' );
-  push(@crtls, grep { not m/\(/ } split m/\s+/, %Config{'perllibs'});
-  push(@crtls, grep { not m/\(/ } split m/\s+/, %Config{'libc'});
+  push(@crtls, < grep { not m/\(/ } @( split m/\s+/, %Config{'perllibs'}));
+  push(@crtls, < grep { not m/\(/ } @( split m/\s+/, %Config{'libc'}));
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -446,7 +446,7 @@ sub _vms_ext {
         $dir = $self->catdir($cwd,$dir); 
     }
   }
-  @dirs = @( grep { length($_) } < @dirs );
+  @dirs = @( < grep { length($_) } @( < @dirs) );
   unshift(@dirs,''); # Check each $lib without additions first
 
   LIB: foreach my $lib (< @libs) {
@@ -533,8 +533,8 @@ sub _vms_ext {
   }
 
   push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
-  push @fndlibs, map { "$_/Library" } < @{%found{OLB}} if exists %found{OLB};
-  push @fndlibs, map { "$_/Share"   } < @{%found{SHR}} if exists %found{SHR};
+  push @fndlibs, < map { "$_/Library" } @( < @{%found{OLB}}) if exists %found{OLB};
+  push @fndlibs, < map { "$_/Share"   } @( < @{%found{SHR}}) if exists %found{SHR};
   my $lib = join(' ',< @fndlibs);
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;

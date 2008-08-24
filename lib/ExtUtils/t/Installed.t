@@ -218,7 +218,7 @@ SKIP: {
       unless %Config{man1direxp};
     @files = @( < $ei->files('goodmod', 'doc', %Config{man1direxp}) );
     is( scalar nelems @files, 1, '... should find doc file under given dir' );
-    is( (grep { m/foo$/ } < @files), 1, '... checking file name' );
+    is( (grep { m/foo$/ } @( < @files)), 1, '... checking file name' );
 }
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
@@ -233,7 +233,7 @@ is( scalar nelems @files, 1, '... should find doc file in correct dir' );
 like( @files[0], qr/foobar[>\]]?$/, '... checking file name' );
 @files = @( < $ei->files('goodmod') );
 is( scalar nelems @files, 2 + $mandirs, '... should find all files with no type specified' );
-my %dirnames = %( map { lc($_) => dirname($_) } < @files );
+my %dirnames = %( < map { lc($_) => dirname($_) } @( < @files) );
 
 # directories
 my @dirs = @( < $ei->directories('goodmod', 'prog', 'fake') );
@@ -246,7 +246,7 @@ SKIP: {
 }
 @dirs = @( < $ei->directories('goodmod') );
 is( scalar nelems @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = @( sort map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } < @files );
+@files = @( sort < map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } @( < @files) );
 is( join(' ', < @files), join(' ', < @dirs), '... should sort output' );
 
 # directory_tree

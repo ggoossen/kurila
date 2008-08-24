@@ -76,9 +76,9 @@ foreach my $file (
   close(IN);
   print "#   ", length(@out[-1]), " bytes pulled in.\n";
   
-  @out = @( map {
+  @out = @( < map {
                join '', pack("U*", unpack("C*", $_)) # latin1 decode.
-             } < @out ); 
+             } @( < @out) ); 
 
   for (< @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 
@@ -93,7 +93,7 @@ foreach my $file (
   if($faily) {
     ++$outfile;
     
-    my @outnames = @( map $outfile . $_ , qw(0 1) );
+    my @outnames = @( < map $outfile . $_, @(  qw(0 1)) );
     open(OUT2, ">", "@outnames[0].~out.txt") || die "Can't write-open @outnames[0].txt: $!";
 
     foreach my $out (< @out) { push @outnames, @outnames[-1];  ++@outnames[-1] };

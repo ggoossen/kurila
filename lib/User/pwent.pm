@@ -23,11 +23,11 @@ BEGIN {
 
                    ) );
     %EXPORT_TAGS = %(
-        FIELDS => \@( grep(m/^\$pw_/, < @EXPORT_OK), < @EXPORT ),
+        FIELDS => \@( < grep(m/^\$pw_/, @( < @EXPORT_OK)), < @EXPORT ),
         ALL    => \@( < @EXPORT, < @EXPORT_OK ),
     );
 }
-use vars grep m/^\$pw_/, < @EXPORT_OK;
+use vars < grep m/^\$pw_/, @( < @EXPORT_OK);
 
 #
 # XXX: these mean somebody hacked this module's source
@@ -91,7 +91,7 @@ sub _feature_init {
         %Groks{$short} = defined %Config{ "d_" . $feep };
     }
     # assume that any that are left are always there
-    for my $feep (grep m/^\$pw_/s, < @EXPORT_OK) {
+    for my $feep (< grep m/^\$pw_/s, @( < @EXPORT_OK)) {
         $feep =~ m/^\$pw_(.*)/;
         %Groks{$1} = 1 unless defined %Groks{$1};
     }
@@ -115,10 +115,10 @@ sub pw_has {
                     ? \&die
                     : sub { die("$IE {join ' ', <@_}") };
     if ((nelems @_) == 0) {
-        my @valid = @( sort grep { %Groks{$_} } keys %Groks );
+        my @valid = @( sort < grep { %Groks{$_} } @( keys %Groks) );
         return @valid;
     }
-    for my $feep (map { split } < @_) {
+    for my $feep (< map { split } @( < @_)) {
         defined %Groks{$feep}
             || $sploder->("$feep is never a valid struct pwd field");
         $cando &&= %Groks{$feep};

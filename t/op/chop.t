@@ -226,9 +226,9 @@ ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
-    map chop(+()), ('')x68;
+    map chop(+()), @( ('')x68);
     ok(1, "extend sp in pp_chop");
 
-    map chomp(+()), ('')x68;
+    map chomp(+()), @( ('')x68);
     ok(1, "extend sp in pp_chomp");
 }

@@ -162,7 +162,7 @@ sub ckMagic
     my @names = @( < @_ ) ;
 
     my $keep = ref $self ;
-    for my $class ( map { "IO::Uncompress::$_" } < @names)
+    for my $class ( < map { "IO::Uncompress::$_" } @( < @names))
     {
         bless $self => $class;
         my $magic = $self->ckMagic();

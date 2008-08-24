@@ -10,7 +10,7 @@ BEGIN {
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
 }
 
 #use strict;

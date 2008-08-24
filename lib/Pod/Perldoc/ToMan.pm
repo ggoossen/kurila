@@ -41,9 +41,9 @@ sub parse_from_file {
   
   # turn the switches into CLIs
   my $switches = join ' ',
-    map qq{"--$_=$self->{$_}"},
-      grep !m/^_/s,
-        keys %$self
+    < map qq{"--$_=$self->{$_}"}, @(
+      < grep !m/^_/s, @(
+        keys %$self))
   ;
 
   my $pod2man =

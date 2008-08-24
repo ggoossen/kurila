@@ -20,7 +20,7 @@ require VMS::Filespec if $^O eq 'VMS';
 
 
 unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } < @ARGV;
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @( < @ARGV);
 }
 
 %ENV{SKIP_FOR_CORE} = 1 if %ENV{PERL_CORE} || %ENV{MY_PERL_CORE} ;

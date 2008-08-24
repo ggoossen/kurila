@@ -30,9 +30,9 @@ sub parse_from_file {
   my $file = @_[0];
   
   my @options = @(
-    map {; $_, $self->{$_} }
-      grep !m/^_/s,
-        keys %$self )
+    < map {; $_, $self->{$_} }
+ @(      < grep !m/^_/s, @(
+        keys %$self)) )
   ;
   
   defined(&Pod::Perldoc::DEBUG)

@@ -17,13 +17,13 @@ $X::x = 13;
 
 use vars qw($p @q %r *s);
 
-my $e = !(grep m/^Name "X::x" used only once: possible typo/, < @warns) && 'not ';
+my $e = !(grep m/^Name "X::x" used only once: possible typo/, @( < @warns)) && 'not ';
 print "{$e}ok 1\n";
-$e = !(grep m/^Name "main::x" used only once: possible typo/, < @warns) && 'not ';
+$e = !(grep m/^Name "main::x" used only once: possible typo/, @( < @warns)) && 'not ';
 print "{$e}ok 2\n";
-$e = !(grep m/^Name "main::y" used only once: possible typo/, < @warns) && 'not ';
+$e = !(grep m/^Name "main::y" used only once: possible typo/, @( < @warns)) && 'not ';
 print "{$e}ok 3\n";
-$e = !(grep m/^Name "main::z" used only once: possible typo/, < @warns) && 'not ';
+$e = !(grep m/^Name "main::z" used only once: possible typo/, @( < @warns)) && 'not ';
 print "{$e}ok 4\n";
 ($e, < @warns) = (nelems @warns) != 4 && 'not ';
 print "{$e}ok 5\n";
@@ -77,12 +77,12 @@ eval '$u = 3; @v = (); %w = ()';
 my @errs = @( split m/\n/, $@->{description} );
 $e = (nelems @errs) != 3 && 'not ';
 print "{$e}ok 24\n";
-$e = !(grep(m/^Global symbol "\$u" requires explicit package name/, < @errs))
+$e = !(grep(m/^Global symbol "\$u" requires explicit package name/, @( < @errs)))
 			&& 'not ';
 print "{$e}ok 25\n";
-$e = !(grep(m/^Global symbol "\@v" requires explicit package name/, < @errs))
+$e = !(grep(m/^Global symbol "\@v" requires explicit package name/, @( < @errs)))
 			&& 'not ';
 print "{$e}ok 26\n";
-$e = !(grep(m/^Global symbol "\%w" requires explicit package name/, < @errs))
+$e = !(grep(m/^Global symbol "\%w" requires explicit package name/, @( < @errs)))
 			&& 'not ';
 print "{$e}ok 27\n";

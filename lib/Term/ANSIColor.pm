@@ -107,7 +107,7 @@ for my $attr (keys %attributes) {
 # Return the escape code for a given set of color attributes.
 sub color {
     return '' if defined %ENV{ANSI_COLORS_DISABLED};
-    my @codes = @( map { split } < @_ );
+    my @codes = @( < map { split } @( < @_) );
     my $attribute = '';
     foreach (< @codes) {
         $_ = lc $_;
@@ -169,9 +169,9 @@ sub colored {
     if (defined $EACHLINE) {
         my $attr = color (< @codes);
         join '',
-            map { $_ ne $EACHLINE ? $attr . $_ . "\e[0m" : $_ }
-                grep { length ($_) +> 0 }
-                    split (m/(\Q$EACHLINE\E)/, $string);
+            < map { $_ ne $EACHLINE ? $attr . $_ . "\e[0m" : $_ }
+ @(                < grep { length ($_) +> 0 }
+ @(                    split (m/(\Q$EACHLINE\E)/, $string)));
     } else {
         color (< @codes) . $string . "\e[0m";
     }

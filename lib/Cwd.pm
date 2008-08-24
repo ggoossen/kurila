@@ -308,7 +308,7 @@ unless ($pwd_cmd) {
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
-    my @localize = @( grep exists %ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV) );
+    my @localize = @( < grep exists %ENV{$_}, @( qw(PATH IFS CDPATH ENV BASH_ENV)) );
     local %ENV{[< @localize]} = ();
     
     my $cwd = `$pwd_cmd`;

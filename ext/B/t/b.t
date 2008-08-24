@@ -42,8 +42,8 @@ sub B::GV::find_syms {
     %main::Subs{$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }
 
-my @syms = @( map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car
-                                               BEGIN) );
+my @syms = @( < map { 'Testing::Symtable::'.$_ } @( qw(This That wibble moo car
+                                               BEGIN)) );
 push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.
@@ -53,7 +53,7 @@ push @syms, "Testing::Symtable::Foo::yarrow";
 }
 
 # Make sure we only hit them each once.
-ok( (!grep $_ != 1, values %Subs), '...and found once' );
+ok( (!grep $_ != 1, @( values %Subs)), '...and found once' );
 
 # Tests for MAGIC / MOREMAGIC
 ok( B::svref_2object(\$1)->MAGIC->TYPE eq "\0", '$1 has \0 magic' );

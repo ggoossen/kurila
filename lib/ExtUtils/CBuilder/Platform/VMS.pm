@@ -30,8 +30,8 @@ sub arg_defines {
   return  @('/define=(' 
           . join(',', 
 		 < @config_defines,
-                 map "\"$_" . ( length(%args{$_}) ? "=%args{$_}" : '') . "\"", 
-                     keys %args) 
+                 < map "\"$_" . ( length(%args{$_}) ? "=%args{$_}" : '') . "\"", @( 
+                     keys %args)) 
           . ')');
 }
 
@@ -129,8 +129,8 @@ sub _liblist_ext {
   my(@crtls,$crtlstr);
   @crtls = @( ($self->{'config'}->{'ldflags'} =~ m-/Debug-i ? $self->{'config'}->{'dbgprefix'} : '')
               . 'PerlShr/Share' );
-  push(@crtls, grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'perllibs'});
-  push(@crtls, grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'libc'});
+  push(@crtls, < grep { not m/\(/ } @( split m/\s+/, $self->{'config'}->{'perllibs'}));
+  push(@crtls, < grep { not m/\(/ } @( split m/\s+/, $self->{'config'}->{'libc'}));
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -195,7 +195,7 @@ sub _liblist_ext {
         $dir = catdir($cwd,$dir); 
     }
   }
-  @dirs = @( grep { length($_) } < @dirs );
+  @dirs = @( < grep { length($_) } @( < @dirs) );
   unshift(@dirs,''); # Check each $lib without additions first
 
   LIB: foreach $lib (< @libs) {
@@ -282,8 +282,8 @@ sub _liblist_ext {
   }
 
   push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
-  push @fndlibs, map { "$_/Library" } < @{%found{OLB}} if exists %found{OLB};
-  push @fndlibs, map { "$_/Share"   } < @{%found{SHR}} if exists %found{SHR};
+  push @fndlibs, < map { "$_/Library" } @( < @{%found{OLB}}) if exists %found{OLB};
+  push @fndlibs, < map { "$_/Share"   } @( < @{%found{SHR}}) if exists %found{SHR};
   $lib = join(' ',< @fndlibs);
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;

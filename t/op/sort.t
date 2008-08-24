@@ -17,7 +17,7 @@ our (@a, @b);
     sort { while(0) { last; }     } < @a;
 
     # Change 26011: Re: A surprising segfault
-    map scalar(sort(+())), ('')x68;
+    map scalar(sort(+())), @( ('')x68);
 }
 
 sub Backwards { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
@@ -107,11 +107,11 @@ cmp_ok($x,'eq',$expected,'sorter sub name in var 2');
 cmp_ok("{join ' ', <@b}",'eq','1 2 3 4','just sort');
 
 
-@b = @( sort grep { $_ } (4,1,3,2) );
+@b = @( sort < grep { $_ } @( (4,1,3,2)) );
 cmp_ok("{join ' ', <@b}",'eq','1 2 3 4','grep then sort');
 
 
-@b = @( sort map { $_ } (4,1,3,2) );
+@b = @( sort < map { $_ } @( (4,1,3,2)) );
 cmp_ok("{join ' ', <@b}",'eq','1 2 3 4','map then sort');
 
 
@@ -353,16 +353,16 @@ package main;
 
 sub generate {
     my $count = 0;
-    @( map { Oscalar->new($_, $count++)} qw(A A A B B B C C C) );
+    @( < map { Oscalar->new($_, $count++)} @( qw(A A A B B B C C C)) );
 }
 
 my @input = @( < &generate );
 my @output = @( sort < @input );
-is join(" ", map {0+$_} < @output), "0 1 2 3 4 5 6 7 8", "Simple stable sort";
+is join(" ", < map {0+$_} @( < @output)), "0 1 2 3 4 5 6 7 8", "Simple stable sort";
 
 @input = @( < &generate );
 @input = @(sort < @input);
-is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
+is join(" ", < map {0+$_} @( < @input)), "0 1 2 3 4 5 6 7 8",
     "Simple stable in place sort";
 
 # This won't be very interesting
@@ -372,49 +372,49 @@ is "{join ' ', <@output}", "A A A B B B C C C", 'stable $a <=> $b sort';
 
 @input = @( < &generate );
 @output = @( sort {$a cmp $b} < @input );
-is join(" ", map {0+$_} < @output), "0 1 2 3 4 5 6 7 8", 'stable $a cmp $b sort';
+is join(" ", < map {0+$_} @( < @output)), "0 1 2 3 4 5 6 7 8", 'stable $a cmp $b sort';
 
 @input = @( < &generate );
 @input = @(sort {$a cmp $b} < @input);
-is join(" ", map {0+$_} < @input), "0 1 2 3 4 5 6 7 8",
+is join(" ", < map {0+$_} @( < @input)), "0 1 2 3 4 5 6 7 8",
     'stable $a cmp $b in place sort';
 
 @input = @( < &generate );
 @output = @( sort {$b cmp $a} < @input );
-is join(" ", map {0+$_} < @output), "6 7 8 3 4 5 0 1 2", 'stable $b cmp $a sort';
+is join(" ", < map {0+$_} @( < @output)), "6 7 8 3 4 5 0 1 2", 'stable $b cmp $a sort';
 
 @input = @( < &generate );
 @input = @(sort {$b cmp $a} < @input);
-is join(" ", map {0+$_} < @input), "6 7 8 3 4 5 0 1 2",
+is join(" ", < map {0+$_} @( < @input)), "6 7 8 3 4 5 0 1 2",
     'stable $b cmp $a in place sort';
 
 @input = @( < &generate );
 @output = @( reverse sort < @input );
-is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0", "Reversed stable sort";
+is join(" ", < map {0+$_} @( < @output)), "8 7 6 5 4 3 2 1 0", "Reversed stable sort";
 
 @input = @( < &generate );
 @input = @( reverse sort < @input );
-is join(" ", map {0+$_} < @input), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @input)), "8 7 6 5 4 3 2 1 0",
     "Reversed stable in place sort";
 
 @input = @( < &generate );
 @output = @( reverse sort {$a cmp $b} < @input );
-is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @output)), "8 7 6 5 4 3 2 1 0",
     'reversed stable $a cmp $b sort';
 
 @input = @( < &generate );
 @input = @( reverse sort {$a cmp $b} < @input );
-is join(" ", map {0+$_} < @input), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @input)), "8 7 6 5 4 3 2 1 0",
     'revesed stable $a cmp $b in place sort';
 
 @input = @( < &generate );
 @output = @( reverse sort {$b cmp $a} < @input );
-is join(" ", map {0+$_} < @output), "2 1 0 5 4 3 8 7 6",
+is join(" ", < map {0+$_} @( < @output)), "2 1 0 5 4 3 8 7 6",
     'reversed stable $b cmp $a sort';
 
 @input = @( < &generate );
 @input = @( reverse sort {$b cmp $a} < @input );
-is join(" ", map {0+$_} < @input), "2 1 0 5 4 3 8 7 6",
+is join(" ", < map {0+$_} @( < @input)), "2 1 0 5 4 3 8 7 6",
     'revesed stable $b cmp $a in place sort';
 
 sub stuff {
@@ -424,12 +424,12 @@ sub stuff {
 
 @input = @( < &generate );
 @output = @( reverse sort {stuff || $a cmp $b} < @input );
-is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @output)), "8 7 6 5 4 3 2 1 0",
     'reversed stable complex sort';
 
 @input = @( < &generate );
 @input = @( reverse sort {stuff || $a cmp $b} < @input );
-is join(" ", map {0+$_} < @input), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @input)), "8 7 6 5 4 3 2 1 0",
     'revesed stable complex in place sort';
 
 sub sortr {
@@ -437,7 +437,7 @@ sub sortr {
 }
 
 @output = @( < sortr < &generate );
-is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @output)), "8 7 6 5 4 3 2 1 0",
     'reversed stable sort return list context';
 
 sub sortcmpr {
@@ -445,7 +445,7 @@ sub sortcmpr {
 }
 
 @output = @( < sortcmpr < &generate );
-is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @output)), "8 7 6 5 4 3 2 1 0",
     'reversed stable $a cmp $b sort return list context';
 
 sub sortcmprba {
@@ -453,7 +453,7 @@ sub sortcmprba {
 }
 
 @output = @( < sortcmprba < &generate );
-is join(" ", map {0+$_} < @output), "2 1 0 5 4 3 8 7 6",
+is join(" ", < map {0+$_} @( < @output)), "2 1 0 5 4 3 8 7 6",
     'reversed stable $b cmp $a sort return list context';
 
 sub sortcmprq {
@@ -461,14 +461,14 @@ sub sortcmprq {
 }
 
 @output = @( < sortcmpr < &generate );
-is join(" ", map {0+$_} < @output), "8 7 6 5 4 3 2 1 0",
+is join(" ", < map {0+$_} @( < @output)), "8 7 6 5 4 3 2 1 0",
     'reversed stable complex sort return list context';
 
 # And now with numbers
 
 sub generate1 {
     my $count = 'A';
-    @(map { Oscalar->new($count++, $_)} 0, 0, 0, 1, 1, 1, 2, 2, 2);
+    @(< map { Oscalar->new($count++, $_)} @( 0, 0, 0, 1, 1, 1, 2, 2, 2));
 }
 
 # This won't be very interesting

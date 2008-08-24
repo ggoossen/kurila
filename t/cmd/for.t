@@ -131,12 +131,12 @@ for (1,2,3) {
 }
 is ($r, '123', 'Forwards for list');
 $r = '';
-for (map {$_} < @array) {
+for (< map {$_} @( < @array)) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map');
 $r = '';
-for (map {$_} 1,2,3) {
+for (< map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map');
@@ -162,12 +162,12 @@ for (reverse 1,2,3) {
 }
 is ($r, '321', 'Reverse for list');
 $r = '';
-for (reverse map {$_} < @array) {
+for (reverse < map {$_} @( < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array via map');
 $r = '';
-for (reverse map {$_} 1,2,3) {
+for (reverse < map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via map');
@@ -193,12 +193,12 @@ for my $i (1,2,3) {
 }
 is ($r, '123', 'Forwards for list with var');
 $r = '';
-for my $i (map {$_} < @array) {
+for my $i (< map {$_} @( < @array)) {
     $r .= $i;
 }
 is ($r, 'ABC', 'Forwards for array via map with var');
 $r = '';
-for my $i (map {$_} 1,2,3) {
+for my $i (< map {$_} @( 1,2,3)) {
     $r .= $i;
 }
 is ($r, '123', 'Forwards for list via map with var');
@@ -224,12 +224,12 @@ for my $i (reverse 1,2,3) {
 }
 is ($r, '321', 'Reverse for list with var');
 $r = '';
-for my $i (reverse map {$_} < @array) {
+for my $i (reverse < map {$_} @( < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for array via map with var');
 $r = '';
-for my $i (reverse map {$_} 1,2,3) {
+for my $i (reverse < map {$_} @( 1,2,3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list via map with var');
@@ -256,12 +256,12 @@ for $_ (1,2,3) {
 }
 is ($r, '123', 'Forwards for list with explicit $_');
 $r = '';
-for $_ (map {$_} < @array) {
+for $_ (< map {$_} @( < @array)) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map with explicit $_');
 $r = '';
-for $_ (map {$_} 1,2,3) {
+for $_ (< map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map with explicit $_');
@@ -287,12 +287,12 @@ for $_ (reverse 1,2,3) {
 }
 is ($r, '321', 'Reverse for list with explicit $_');
 $r = '';
-for $_ (reverse map {$_} < @array) {
+for $_ (reverse < map {$_} @( < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array via map with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 1,2,3) {
+for $_ (reverse < map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via map with explicit $_');
@@ -320,12 +320,12 @@ for our $i (reverse 1,2,3) {
 }
 is ($r, '321', 'Reverse for list with our var');
 $r = '';
-for our $i (reverse map {$_} < @array) {
+for our $i (reverse < map {$_} @( < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for array via map with our var');
 $r = '';
-for our $i (reverse map {$_} 1,2,3) {
+for our $i (reverse < map {$_} @( 1,2,3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list via map with our var');
@@ -352,12 +352,12 @@ for ('A', reverse 1,2,3) {
 }
 is ($r, 'A321', 'Reverse for list with leading value');
 $r = '';
-for (1, reverse map {$_} < @array) {
+for (1, reverse < map {$_} @( < @array)) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array via map with leading value');
 $r = '';
-for ('A', reverse map {$_} 1,2,3) {
+for ('A', reverse < map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list via map with leading value');
@@ -383,12 +383,12 @@ for (reverse (1,2,3), 'A') {
 }
 is ($r, '321A', 'Reverse for list with trailing value');
 $r = '';
-for (reverse (map {$_} < @array), 1) {
+for (reverse (< map {$_} @( < @array)), 1) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for array via map with trailing value');
 $r = '';
-for (reverse (map {$_} 1,2,3), 'A') {
+for (reverse (< map {$_} @( 1,2,3)), 'A') {
     $r .= $_;
 }
 is ($r, '321A', 'Reverse for list via map with trailing value');
@@ -415,13 +415,13 @@ for $_ ('A', reverse 1,2,3) {
 }
 is ($r, 'A321', 'Reverse for list with leading value with explicit $_');
 $r = '';
-for $_ (1, reverse map {$_} < @array) {
+for $_ (1, reverse < map {$_} @( < @array)) {
     $r .= $_;
 }
 is ($r, '1CBA',
     'Reverse for array via map with leading value with explicit $_');
 $r = '';
-for $_ ('A', reverse map {$_} 1,2,3) {
+for $_ ('A', reverse < map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list via map with leading value with explicit $_');
@@ -447,13 +447,13 @@ for $_ (reverse (1,2,3), 'A') {
 }
 is ($r, '321A', 'Reverse for list with trailing value with explicit $_');
 $r = '';
-for $_ (reverse (map {$_} < @array), 1) {
+for $_ (reverse (< map {$_} @( < @array)), 1) {
     $r .= $_;
 }
 is ($r, 'CBA1',
     'Reverse for array via map with trailing value with explicit $_');
 $r = '';
-for $_ (reverse (map {$_} 1,2,3), 'A') {
+for $_ (reverse (< map {$_} @( 1,2,3)), 'A') {
     $r .= $_;
 }
 is ($r, '321A',
@@ -480,12 +480,12 @@ for my $i ('A', reverse 1,2,3) {
 }
 is ($r, 'A321', 'Reverse for list with leading value and var');
 $r = '';
-for my $i (1, reverse map {$_} < @array) {
+for my $i (1, reverse < map {$_} @( < @array)) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for array via map with leading value and var');
 $r = '';
-for my $i ('A', reverse map {$_} 1,2,3) {
+for my $i ('A', reverse < map {$_} @( 1,2,3)) {
     $r .= $i;
 }
 is ($r, 'A321', 'Reverse for list via map with leading value and var');
@@ -511,12 +511,12 @@ for my $i (reverse (1,2,3), 'A') {
 }
 is ($r, '321A', 'Reverse for list with trailing value and var');
 $r = '';
-for my $i (reverse (map {$_} < @array), 1) {
+for my $i (reverse (< map {$_} @( < @array)), 1) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for array via map with trailing value and var');
 $r = '';
-for my $i (reverse (map {$_} 1,2,3), 'A') {
+for my $i (reverse (< map {$_} @( 1,2,3)), 'A') {
     $r .= $i;
 }
 is ($r, '321A', 'Reverse for list via map with trailing value and var');
@@ -538,7 +538,7 @@ for (reverse 1, < @array) {
 }
 is ($r, 'CBA1', 'Reverse for value and array');
 $r = '';
-for (reverse map {$_} 1, < @array) {
+for (reverse < map {$_} @( 1, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for value and array via map');
@@ -553,12 +553,12 @@ for (reverse 'X' .. 'Z', < @array) {
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array');
 $r = '';
-for (reverse map {$_} 1 .. 3, < @array) {
+for (reverse < map {$_} @( 1 .. 3, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA321', 'Reverse for .. and array via map');
 $r = '';
-for (reverse map {$_} 'X' .. 'Z', < @array) {
+for (reverse < map {$_} @( 'X' .. 'Z', < @array)) {
     $r .= $_;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array via map');
@@ -569,7 +569,7 @@ for (reverse (< @array, 1)) {
 }
 is ($r, '1CBA', 'Reverse for array and value');
 $r = '';
-for (reverse (map {$_} < @array, 1)) {
+for (reverse (< map {$_} @( < @array, 1))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array and value via map');
@@ -580,7 +580,7 @@ for $_ (reverse 1, < @array) {
 }
 is ($r, 'CBA1', 'Reverse for value and array with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 1, < @array) {
+for $_ (reverse < map {$_} @( 1, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for value and array via map with explicit $_');
@@ -595,12 +595,12 @@ for $_ (reverse 'X' .. 'Z', < @array) {
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 1 .. 3, < @array) {
+for $_ (reverse < map {$_} @( 1 .. 3, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA321', 'Reverse for .. and array via map with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 'X' .. 'Z', < @array) {
+for $_ (reverse < map {$_} @( 'X' .. 'Z', < @array)) {
     $r .= $_;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array via map with explicit $_');
@@ -611,7 +611,7 @@ for $_ (reverse (< @array, 1)) {
 }
 is ($r, '1CBA', 'Reverse for array and value with explicit $_');
 $r = '';
-for $_ (reverse (map {$_} < @array, 1)) {
+for $_ (reverse (< map {$_} @( < @array, 1))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array and value via map with explicit $_');
@@ -623,7 +623,7 @@ for my $i (reverse 1, < @array) {
 }
 is ($r, 'CBA1', 'Reverse for value and array with var');
 $r = '';
-for my $i (reverse map {$_} 1, < @array) {
+for my $i (reverse < map {$_} @( 1, < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for value and array via map with var');
@@ -638,12 +638,12 @@ for my $i (reverse 'X' .. 'Z', < @array) {
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array with var');
 $r = '';
-for my $i (reverse map {$_} 1 .. 3, < @array) {
+for my $i (reverse < map {$_} @( 1 .. 3, < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA321', 'Reverse for .. and array via map with var');
 $r = '';
-for my $i (reverse map {$_} 'X' .. 'Z', < @array) {
+for my $i (reverse < map {$_} @( 'X' .. 'Z', < @array)) {
     $r .= $i;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array via map with var');
@@ -654,7 +654,7 @@ for my $i (reverse (< @array, 1)) {
 }
 is ($r, '1CBA', 'Reverse for array and value with var');
 $r = '';
-for my $i (reverse (map {$_} < @array, 1)) {
+for my $i (reverse (< map {$_} @( < @array, 1))) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for array and value via map with var');

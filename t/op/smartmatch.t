@@ -27,7 +27,7 @@ tie my %tied_hash, 'Tie::StdHash';
 %tied_hash = %( < %hash );
 
 # Load and run the tests
-my @tests = @( map \@(chomp and split m/\t+/, $_, 3), grep !m/^#/ && m/\S/, ~< *DATA );
+my @tests = @( < map \@(chomp and split m/\t+/, $_, 3), @( < grep !m/^#/ && m/\S/, @( ~< *DATA)) );
 plan tests => 2 * nelems @tests;
 
 for my $test (< @tests) {

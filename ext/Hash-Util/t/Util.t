@@ -244,7 +244,7 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
       for my $bits (0,1,2) {
 	push @usekeys, @keys[$bits] if $usekeys ^&^ (1 << $bits);
       }
-      my %clean = %( map {$_ => length $_} < @usekeys );
+      my %clean = %( < map {$_ => length $_} @( < @usekeys) );
       my %target;
       lock_keys ( %target, < @keys ) if $lock;
 
@@ -340,7 +340,7 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
     }
 }
 {
-    my %hash = %( map {$_,$_} qw(fwiffffff foosht teeoo) );
+    my %hash = %( < map {$_,$_} @( qw(fwiffffff foosht teeoo)) );
     lock_keys(%hash);
     delete %hash{fwiffffff};
     is (nkeys %hash, 2,"Count of keys after delete on locked hash");
@@ -368,7 +368,7 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
 }
 
 {
-    my %hash= %(map { $_ => 1 } qw( a b c d e f) );
+    my %hash= %(< map { $_ => 1 } @( qw( a b c d e f)) );
     delete %hash{c};
     lock_keys(%hash);
     ok(Internals::SvREADONLY(%hash),'lock_keys DDS/t 1');
@@ -400,7 +400,7 @@ ok($hash_seed +>= 0, "hash_seed $hash_seed");
     is("{join ' ', <@keys}","0 2 4 6 8",'lock_keys() @keys');
 }
 {
-    my %hash= %(map { $_ => 1 } qw( a b c d e f) );
+    my %hash= %(< map { $_ => 1 } @( qw( a b c d e f)) );
     delete %hash{c};
     lock_ref_keys(\%hash);
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys DDS/t');

@@ -142,7 +142,7 @@ sub termcap_path
     }
 
     # return the list of those termcaps that exist
-    return grep { defined $_ && -f $_ } < @termcap_path;
+    return grep { defined $_ && -f $_ } @( < @termcap_path);
 }
 
 =item B<Tgetent>
@@ -285,7 +285,7 @@ sub Tgetent
         }
         else
         {
-            if ( grep { -x "$_/infocmp" } split m/:/, %ENV{PATH} )
+            if ( grep { -x "$_/infocmp" } @( split m/:/, %ENV{PATH}) )
             {
                 try {
                     my $tmp = `infocmp -C 2>/dev/null`;
