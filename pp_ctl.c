@@ -464,8 +464,11 @@ PP(pp_mapwhile)
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
-	while (items-- > 0)
-	    av_push((AV*)*dst, SvTEMP(TOPs) ? SvREFCNT_inc(POPs) : newSVsv(POPs));
+	int i;
+	SP -= items;
+	for (i=1; i <= items; i++) {
+	    av_push((AV*)*dst, SvTEMP(SP[i]) ? SvREFCNT_inc(SP[i]) : newSVsv(SP[i]));
+	}
     }
     LEAVE;					/* exit inner scope */
 
