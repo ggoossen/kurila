@@ -80,9 +80,9 @@ foreach my $f (sort < @files) {
 print "# (", scalar(nelems @files), " items total)\n";
 
 # Some minimal sanity checks:
-ok scalar(grep m/\.css/i, @( < @files)) +> 5;
-ok scalar(grep m/\.html?/i, @( < @files)) +> 5;
-ok scalar grep m{squaa\W+Glunk.html?}i, @( < @files);
+ok nelems(grep m/\.css/i, @( < @files)) +> 5;
+ok nelems(grep m/\.html?/i, @( < @files)) +> 5;
+ok nelems grep m{squaa\W+Glunk.html?}i, @( < @files);
 
 # use Pod::Simple;
 # *pretty = \&Pod::Simple::BlackBox::pretty;

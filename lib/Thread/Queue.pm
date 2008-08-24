@@ -15,7 +15,7 @@ my ($make_shared, $validate_count, $validate_index);
 sub new
 {
     my $class = shift;
-    my @queue :shared = @( map { $make_shared->($_) } < @_ );
+    my @queue :shared = @( < map { $make_shared->($_) } @_ );
     return bless(\@queue, $class);
 }
 
@@ -24,7 +24,7 @@ sub enqueue
 {
     my $queue = shift;
     lock(@$queue);
-    push(@$queue, map { $make_shared->($_) } < @_)
+    push(@$queue, < map { $make_shared->($_) } @_)
         and cond_signal(@$queue);
 }
 
