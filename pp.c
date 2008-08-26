@@ -4197,7 +4197,7 @@ PP(pp_split)
     I32 base;
     const I32 gimme = GIMME_V;
     const I32 oldsave = PL_savestack_ix;
-    U32 make_mortal = SVs_TEMP;
+    U32 make_mortal = 0;
     bool multiline = 0;
     MAGIC *mg = NULL;
 
@@ -4212,40 +4212,8 @@ PP(pp_split)
 
     do_utf8 = (RX_EXTFLAGS(rx) & RXf_PMf_UTF8) != 0;
 
-#ifdef USE_ITHREADS
-    if (pm->op_pmreplrootu.op_pmtargetoff) {
-	ary = GvAVn((GV*)PAD_SVl(pm->op_pmreplrootu.op_pmtargetoff));
-    }
-#else
-    if (pm->op_pmreplrootu.op_pmtargetgv) {
-	ary = GvAVn(pm->op_pmreplrootu.op_pmtargetgv);
-    }
-#endif
-    else
-	ary = NULL;
-    if (ary) {
-	realarray = 1;
-	PUTBACK;
-	av_extend(ary,0);
-	av_clear(ary);
-	SPAGAIN;
-	if ((mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied))) {
-	    PUSHMARK(SP);
-	    XPUSHs(SvTIED_obj((SV*)ary, mg));
-	}
-	else {
-	    if (!AvREAL(ary)) {
-		I32 i;
-		AvREAL_on(ary);
-		AvREIFY_off(ary);
-		for (i = AvFILLp(ary); i >= 0; i--)
-		    AvARRAY(ary)[i] = &PL_sv_undef;	/* don't free mere refs */
-	    }
-	    /* temporarily switch stacks */
-	    SAVESWITCHSTACK(PL_curstack, ary);
-	    make_mortal = 0;
-	}
-    }
+    ary = av_2mortal(newAV());
+
     base = SP - PL_stack_base;
     orig = s;
     if (RX_EXTFLAGS(rx) & RXf_SKIPWHITE) {
@@ -4285,7 +4253,7 @@ PP(pp_split)
 		break;
 
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    XPUSHs(dstr);
+	    av_push(ary, dstr);
 
 	    /* skip the whitespace found last */
 	    if (do_utf8)
@@ -4311,7 +4279,7 @@ PP(pp_split)
 	    if (m >= strend)
 		break;
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    XPUSHs(dstr);
+	    av_push(ary, dstr);
 	    s = m;
 	}
     }
@@ -4330,7 +4298,7 @@ PP(pp_split)
 		if (m >= strend)
 		    break;
 		dstr = newSVpvn_flags(s, m-s, make_mortal);
-		XPUSHs(dstr);
+		av_push(ary, dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
 	}
@@ -4340,7 +4308,7 @@ PP(pp_split)
 			     csv, multiline ? FBMrf_MULTILINE : 0)) )
 	    {
 		dstr = newSVpvn_flags(s, m-s, make_mortal);
-		XPUSHs(dstr);
+		av_push(ary, dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
 	}
@@ -4366,7 +4334,7 @@ PP(pp_split)
 	    }
 	    m = RX_OFFS(rx)[0].start + orig;
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    XPUSHs(dstr);
+	    av_push(ary, dstr);
 	    if (RX_NPARENS(rx)) {
 		I32 i;
 		for (i = 1; i <= (I32)RX_NPARENS(rx); i++) {
@@ -4381,7 +4349,7 @@ PP(pp_split)
 		    }
 		    else
 			dstr = &PL_sv_undef;  /* undef, not "" */
-		    XPUSHs(dstr);
+		    av_push(ary, dstr);
 		}
 	    }
 	    s = RX_OFFS(rx)[0].end + orig;
@@ -4396,7 +4364,7 @@ PP(pp_split)
     if (s < strend || (iters && origlimit)) {
         const STRLEN l = strend - s;
 	dstr = newSVpvn_flags(s, l, make_mortal);
-	XPUSHs(dstr);
+	av_push(ary, dstr);
 	iters++;
     }
     else if (!origlimit) {
@@ -4411,45 +4379,7 @@ PP(pp_split)
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    if (realarray) {
-	if (!mg) {
-	    if (SvSMAGICAL(ary)) {
-		PUTBACK;
-		mg_set((SV*)ary);
-		SPAGAIN;
-	    }
-	    if (gimme == G_ARRAY) {
-		EXTEND(SP, iters);
-		Copy(AvARRAY(ary), SP + 1, iters, SV*);
-		SP += iters;
-		RETURN;
-	    }
-	}
-	else {
-	    PUTBACK;
-	    ENTER;
-	    call_method("PUSH",G_SCALAR|G_DISCARD);
-	    LEAVE;
-	    SPAGAIN;
-	    if (gimme == G_ARRAY) {
-		I32 i;
-		/* EXTEND should not be needed - we just popped them */
-		EXTEND(SP, iters);
-		for (i=0; i < iters; i++) {
-		    SV **svp = av_fetch(ary, i, FALSE);
-		    PUSHs((svp) ? *svp : &PL_sv_undef);
-		}
-		RETURN;
-	    }
-	}
-    }
-    else {
-	if (gimme == G_ARRAY)
-	    RETURN;
-    }
-
-    GETTARGET;
-    PUSHi(iters);
+    XPUSHs(ary);
     RETURN;
 }
 
