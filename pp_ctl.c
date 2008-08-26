@@ -536,6 +536,7 @@ PP(pp_flop)
 {
     dVAR; dSP;
 
+    AV* res = sv_2mortal(newAV());
     dPOPPOPssrl;
     assert(GIMME == G_ARRAY);
 
@@ -552,14 +553,11 @@ PP(pp_flop)
 	max = SvIV(right);
 	if (max >= i) {
 	    j = max - i + 1;
-	    EXTEND_MORTAL(j);
-	    EXTEND(SP, j);
 	}
 	else
 	    j = 0;
 	while (j--) {
-	    SV * const sv = sv_2mortal(newSViv(i++));
-	    PUSHs(sv);
+	    av_push(res, newSViv(i++));
 	}
     }
     else {
@@ -570,14 +568,14 @@ PP(pp_flop)
 	SV *sv = sv_mortalcopy(left);
 	SvPV_force_nolen(sv);
 	while (!SvNIOKp(sv) && SvCUR(sv) <= len) {
-	    XPUSHs(sv);
+	    av_push(res, newSVsv(sv));
 	    if (strEQ(SvPVX_const(sv),tmps))
 		break;
-	    sv = sv_2mortal(newSVsv(sv));
 	    sv_inc(sv);
 	}
     }
 
+    XPUSHs(res);
     RETURN;
 }
 
