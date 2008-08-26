@@ -1,8 +1,8 @@
 
 use Test::More 'no_plan';
 
-use Cwd             qw[cwd];
-use File::Basename  qw[basename];
+use Cwd <             qw[cwd];
+use File::Basename <  qw[basename];
 use Data::Dumper;
 
 use_ok('File::Fetch');
@@ -112,26 +112,26 @@ push @map, (
 
 
 ### parse uri tests ###
-for my $entry (<@map ) {
+for my $entry (@map ) {
     my $uri = $entry->{'uri'};
 
     my $href = File::Fetch->_parse_uri( $uri );
     ok( $href,  "Able to parse uri '$uri'" );
 
-    for my $key ( sort keys %$entry ) {
+    for my $key (@( < sort @( < keys %$entry)) ) {
         is( $href->{$key}, $entry->{$key},
                 "   '$key' ok ($entry->{$key}) for $uri");
     }
 }
 
 ### File::Fetch->new tests ###
-for my $entry (<@map) {
+for my $entry (@map) {
     my $ff = File::Fetch->new( uri => $entry->{uri} );
 
     ok( $ff,                    "Object for uri '$entry->{uri}'" );
     isa_ok( $ff, "File::Fetch", "   Object" );
 
-    for my $acc ( keys %$entry ) {
+    for my $acc (@( < keys %$entry) ) {
         is( $ff->?$acc(), $entry->{$acc},
                                 "   Accessor '$acc' ok ($entry->{$acc})" );
     }
@@ -144,14 +144,14 @@ for my $entry (<@map) {
     my $prefix = &File::Fetch::ON_UNIX ? 'file://' : 'file:///';
     my $uri = $prefix . cwd() .'/'. basename($0);
 
-    for (qw[lwp file]) {
+    for (@( <qw[lwp file])) {
         _fetch_uri( file => $uri, $_ );
     }
 }
 
 ### ftp:// tests ###
 {   my $uri = 'ftp://ftp.funet.fi/pub/CPAN/index.html';
-    for (qw[lwp netftp wget curl ncftp]) {
+    for (@( <qw[lwp netftp wget curl ncftp])) {
 
         ### STUPID STUPID warnings ###
         next if $_ eq 'ncftp' and $File::Fetch::FTP_PASSIVE
@@ -162,10 +162,10 @@ for my $entry (<@map) {
 }
 
 ### http:// tests ###
-{   for my $uri ( 'http://www.cpan.org/index.html',
-                  'http://www.cpan.org/index.html?q=1&y=2'
+{   for my $uri (@( 'http://www.cpan.org/index.html',
+                  'http://www.cpan.org/index.html?q=1&y=2')
     ) {
-        for (qw[lwp wget curl lynx]) {
+        for (@( <qw[lwp wget curl lynx])) {
             _fetch_uri( http => $uri, $_ );
         }
     }
@@ -174,7 +174,7 @@ for my $entry (<@map) {
 ### rsync:// tests ###
 {   my $uri = 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM';
 
-    for (qw[rsync]) {
+    for (@( <qw[rsync])) {
         _fetch_uri( rsync => $uri, $_ );
     }
 }

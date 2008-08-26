@@ -48,7 +48,7 @@ sub alias (@)
 {
   (nelems @_) or return %alias3;
   my $alias = ref @_[0] ? @_[0] : \%( < @_ );
-  %alias3{[keys %$alias]} = values %$alias;
+  %alias3{[ <keys %$alias]} = < values %$alias;
 } # alias
 
 sub alias_file ($)
@@ -131,7 +131,7 @@ sub charnames
     ## scripts.
     if (not nelems @off) {
       my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
-      for my $script (< @{%^H{charnames_scripts}}) {
+      for my $script ( @{%^H{charnames_scripts}}) {
         my $ucname = uc($name);
 	if ($txt =~ m/\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
 	  @off = @(@-[0], @+[0]);
@@ -224,7 +224,7 @@ sub import
 
   %^H{charnames_full} = delete %h{':full'};
   %^H{charnames_short} = delete %h{':short'};
-  %^H{charnames_scripts} = \@(map uc, keys %h);
+  %^H{charnames_scripts} = \@(< map uc, @( < keys %h));
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,
@@ -233,7 +233,7 @@ sub import
   if (warnings::enabled('utf8') && nelems @{%^H{charnames_scripts}}) {
     $txt = do "unicore/Name.pl" unless $txt;
 
-    for my $script (< @{%^H{charnames_scripts}}) {
+    for my $script ( @{%^H{charnames_scripts}}) {
       if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /) {
 	warnings::warn('utf8',  "No such script: '$script'");
       }

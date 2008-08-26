@@ -3,7 +3,7 @@
 our $tell_file;
 
 BEGIN {
-    unless(grep m/blib/, < @INC) {
+    unless(grep m/blib/, @( < @INC)) {
 	$tell_file = "TEST";
     }
     else {

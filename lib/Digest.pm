@@ -1,7 +1,7 @@
 package Digest;
 
 use strict;
-use vars qw($VERSION %MMAP $AUTOLOAD);
+use vars < qw($VERSION %MMAP $AUTOLOAD);
 
 $VERSION = "1.15";
 
@@ -28,7 +28,7 @@ sub new
     };
     $impl = \@($impl) unless ref($impl);
     my $err;
-    for  (< @$impl) {
+    for  ( @$impl) {
 	my $class = $_;
 	my @args;
 	($class, < @args) = < @$class if ref($class);

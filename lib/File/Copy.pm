@@ -21,9 +21,9 @@ our(@ISA, @EXPORT, @EXPORT_OK, $VERSION, $Too_Big, $Syscopy_is_copy);
 $VERSION = '2.11';
 
 require Exporter;
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(copy move) );
-@EXPORT_OK = @( qw(cp mv) );
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(copy move) );
+@EXPORT_OK = @( < qw(cp mv) );
 
 $Too_Big = 1024 * 1024 * 2;
 

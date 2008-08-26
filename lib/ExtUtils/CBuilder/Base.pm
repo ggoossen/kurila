@@ -6,7 +6,7 @@ use File::Basename;
 use Config;
 use Text::ParseWords;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = '0.22';
 
 sub new {
@@ -32,14 +32,14 @@ sub find_perl_interpreter {
 
 sub add_to_cleanup {
   my $self = shift;
-  foreach (< @_) {
+  foreach ( @_) {
     $self->{files_to_clean}->{$_} = 1;
   }
 }
 
 sub cleanup {
   my $self = shift;
-  foreach my $file (keys %{$self->{files_to_clean} || \%() }) {
+  foreach my $file (@( <keys %{$self->{files_to_clean} || \%() })) {
     unlink $file;
   }
 }
@@ -54,7 +54,7 @@ sub object_file {
 
 sub arg_include_dirs {
   my $self = shift;
-  return @( map {"-I$_"} < @_ );
+  return @( < map {"-I$_"} @( < @_) );
 }
 
 sub arg_nolink { '-c' }
@@ -76,7 +76,7 @@ sub arg_exec_file {
 
 sub arg_defines {
   my ($self, < %args) = < @_;
-  return @( map "-D$_=%args{$_}", keys %args );
+  return @( < map "-D$_=%args{$_}", @( < keys %args) );
 }
 
 sub compile {
@@ -131,7 +131,7 @@ sub have_compiler {
   warn $@ if $@;
   my $result = $self->{have_compiler} = $@ ? 0 : 1;
   
-  foreach (grep defined, $tmpfile, $obj_file, < @lib_files) {
+  foreach (@(< grep defined, @( $tmpfile, $obj_file, < @lib_files))) {
     1 while unlink;
   }
   return $result;
@@ -174,7 +174,7 @@ sub prelink {
   );
   
   # Mksymlists will create one of these files
-  return grep -e, map "%args{dl_file}.$_", qw(ext def opt);
+  return grep -e, @( < map "%args{dl_file}.$_", @( < qw(ext def opt)));
 }
 
 sub link {
@@ -210,7 +210,7 @@ sub _do_link {
   my @ld = @( < $self->split_like_shell($cf->{ld}) );
   
   $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
-    or die "error building $out from {join ' ', <@$objects}";
+    or die "error building $out from {join ' ', @( <@$objects)}";
   
   return @($out, < @temp_files);
 }
@@ -218,7 +218,7 @@ sub _do_link {
 
 sub do_system {
   my ($self, < @cmd) = < @_;
-  print "{join ' ', <@cmd}\n" if !$self->{quiet};
+  print "{join ' ', @( <@cmd)}\n" if !$self->{quiet};
   return !system(< @cmd);
 }
 

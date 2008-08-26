@@ -24,7 +24,7 @@ my $Error           = getErrorRef($CompressClass);
 my $UnError         = getErrorRef($UncompressClass);
 
 use Compress::Raw::Zlib;
-use IO::Handle qw(SEEK_SET SEEK_CUR SEEK_END);
+use IO::Handle < qw(SEEK_SET SEEK_CUR SEEK_END);
 
 sub myGZreadFile
 {

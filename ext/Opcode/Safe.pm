@@ -29,7 +29,7 @@ BEGIN { eval q{
     use Carp::Heavy;
 } }
 
-use Opcode v1.01 qw(
+use Opcode v1.01 < qw(
     opset opset_to_ops opmask_add
     empty_opset full_opset invert_opset verify_opset
     opdesc opcodes opmask define_optag opset_to_hex
@@ -42,7 +42,7 @@ my $default_root  = 0;
 # share *_ and functions defined in universal.c
 # Don't share stuff like *UNIVERSAL:: otherwise code from the
 # compartment can 0wn functions in UNIVERSAL
-my $default_share = \@(qw[
+my $default_share = \@( <qw[
     $_
     @_
     &PerlIO::get_layers
@@ -158,7 +158,7 @@ sub erase {
     my $leaf_symtab = *{$leaf_globref}{HASH};
 #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
     # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
-    for (keys %$leaf_symtab) {
+    for (@( <keys %$leaf_symtab)) {
         delete $leaf_symtab->{$_};
     }
     #delete $leaf_symtab->{'__ANON__'};
@@ -243,7 +243,7 @@ sub share_from {
 #     croak("Package \"$pkg\" does not exist")
 # 	unless %{Symbol::stash("$pkg")};
     my $arg;
-    foreach $arg (< @$vars) {
+    foreach $arg ( @$vars) {
 	# catch some $safe->share($var) errors:
 	my ($var, $type);
 	$type = $1 if ($var = $arg) =~ s/^(\W)//;

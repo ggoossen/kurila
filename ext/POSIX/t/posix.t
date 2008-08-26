@@ -12,7 +12,7 @@ BEGIN {
 BEGIN { require "./test.pl"; }
 plan(tests => 66);
 
-use POSIX qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
+use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
 	     errno);
 use strict 'subs';
 
@@ -204,7 +204,7 @@ try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
 &POSIX::setlocale(&POSIX::LC_TIME, $lc) if %Config{d_setlocale};
 
 {
-    for my $test (0, 1) {
+    for my $test (@(0, 1)) {
 	$! = 0;
 	# POSIX::errno is autoloaded. 
 	# Autoloading requires many system calls.

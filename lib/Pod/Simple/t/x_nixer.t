@@ -38,7 +38,7 @@ sub nixy_mergy {@_[0]->merge_text(1); @_[0]->nix_X_codes(1);}
 print "# With no F/X\n";
 
 ok( Pod::Simple::DumpAsXML->_out( "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<stuff X<thingZ<>>baz>\n"),
-  join "\n",
+  join "\n", @(
 
   '<Document>',
   '  <Para>',
@@ -63,7 +63,7 @@ ok( Pod::Simple::DumpAsXML->_out( "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<stuff X
   '    </B>',
   '  </Para>',
   '</Document>',
-  '',
+  '',)
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,7 +71,7 @@ ok( Pod::Simple::DumpAsXML->_out( "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<stuff X
 print "#  with just X-nixing...\n";
 
 ok( Pod::Simple::DumpAsXML->_out( \&nixy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<stuff X<thingZ<>>baz>\n"),
-  join "\n",
+  join "\n", @(
 
   '<Document>',
   '  <Para>',
@@ -93,7 +93,7 @@ ok( Pod::Simple::DumpAsXML->_out( \&nixy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B
   '    </B>',
   '  </Para>',
   '</Document>',
-  '',
+  '',)
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,7 +101,7 @@ ok( Pod::Simple::DumpAsXML->_out( \&nixy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B
 print "# With merging...\n";
 
 ok( Pod::Simple::DumpAsXML->_out( \&mergy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<stuff X<thingZ<>>baz>\n"),
-  join "\n",
+  join "\n", @(
 
   '<Document>',
   '  <Para>',
@@ -124,7 +124,7 @@ ok( Pod::Simple::DumpAsXML->_out( \&mergy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> 
   '    </B>',
   '  </Para>',
   '</Document>',
-  '',
+  '',)
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,7 +132,7 @@ ok( Pod::Simple::DumpAsXML->_out( \&mergy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> 
 print "# With nixing and merging...\n";
 #$d = 10;
 ok( Pod::Simple::DumpAsXML->_out( \&nixy_mergy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<stuff X<thingZ<>>baz>\n"),
-  join "\n",
+  join "\n", @(
 
   '<Document>',
   '  <Para>',
@@ -151,7 +151,7 @@ ok( Pod::Simple::DumpAsXML->_out( \&nixy_mergy, "=pod\n\nZ<>F<C<Z<>fE<111>o> I<b
   '    </B>',
   '  </Para>',
   '</Document>',
-  '',
+  '',)
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +166,7 @@ print "# Now a wee L<...> with mergy...\n";
 $d = 10;
 
 ok( Pod::Simple::DumpAsXML->_out(\&mergy, qq{=pod\n\nL<E<78>et::Ping/Ping-E<112>ong>\n}),
- join "\n",
+ join "\n", @(
 
  '<Document>',
  '  <Para>',
@@ -175,14 +175,14 @@ ok( Pod::Simple::DumpAsXML->_out(\&mergy, qq{=pod\n\nL<E<78>et::Ping/Ping-E<112>
  '    </L>',
  '  </Para>',
  '</Document>',
- ''
+ '')
 );
 
 
 print "# Now a complex tree with L's, with nixy+mergy...\n";
 
 ok( Pod::Simple::DumpAsXML->_out( \&nixy_mergy, "=pod\n\nZ<>F<C<Z<>fE<111>L<E<78>et::Ping/Ping-E<112>ong>o> I<bar>> B<stuff X<thingZ<>>baz>\n"),
-  join "\n",
+  join "\n", @(
 
   '<Document>',
   '  <Para>',
@@ -205,7 +205,7 @@ ok( Pod::Simple::DumpAsXML->_out( \&nixy_mergy, "=pod\n\nZ<>F<C<Z<>fE<111>L<E<78
   '    </B>',
   '  </Para>',
   '</Document>',
-  '',
+  '',)
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

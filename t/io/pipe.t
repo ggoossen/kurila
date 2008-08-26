@@ -51,14 +51,14 @@ SKIP: {
 
     my $raw = "abc\nrst\rxyz\r\nfoo\n";
     if (open(PIPE, "-|", "-")) {
-	$_ = join '', ~< *PIPE;
+	$_ = join '', @( ~< *PIPE);
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = @( map ord, split m//, $raw );
-	my @r1 = @( map ord, split m//, $raw1 );
+	my @r  = @( < map ord, @( < split m//, $raw) );
+	my @r1 = @( < map ord, @( < split m//, $raw1) );
         if ($raw1 eq $raw) {
-	    s/^not (ok \d+ -) .*/$1 '{join ' ',<@r1}' passes through '-|'\n/s;
+	    s/^not (ok \d+ -) .*/$1 '{join ' ', @(<@r1)}' passes through '-|'\n/s;
 	} else {
-	    s/^(not ok \d+ -) .*/$1 expect '{join ' ', <@r}', got '{join ' ', <@r1}'\n/s;
+	    s/^(not ok \d+ -) .*/$1 expect '{join ' ', @( <@r)}', got '{join ' ', @( <@r1)}'\n/s;
 	}
 	print;
 	close PIPE;        # avoid zombies
@@ -76,14 +76,14 @@ SKIP: {
 	close PIPE;        # avoid zombies
     }
     else {
-	$_ = join '', ~< *STDIN;
+	$_ = join '', @( ~< *STDIN);
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = @( map ord, split m//, $raw );
-	my @r1 = @( map ord, split m//, $raw1 );
+	my @r  = @( < map ord, @( < split m//, $raw) );
+	my @r1 = @( < map ord, @( < split m//, $raw1) );
         if ($raw1 eq $raw) {
-	    s/^not (ok \d+ -) .*/$1 '{join ' ', <@r1}' passes through '|-'\n/s;
+	    s/^not (ok \d+ -) .*/$1 '{join ' ', @( <@r1)}' passes through '|-'\n/s;
 	} else {
-	    s/^(not ok \d+ -) .*/$1 expect '{join ' ', <@r}', got '{join ' ', <@r1}'\n/s;
+	    s/^(not ok \d+ -) .*/$1 expect '{join ' ', @( <@r)}', got '{join ' ', @( <@r1)}'\n/s;
 	}
 	print;
         exec $Perl, '-e0';	# Do not run END()...

@@ -23,7 +23,7 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-use Storable qw(lock_store lock_retrieve);
+use Storable < qw(lock_store lock_retrieve);
 
 unless (&Storable::CAN_FLOCK) {
     print "1..0 # Skip: fcntl/flock emulation broken on this platform\n";

@@ -14,9 +14,9 @@ print "ok 1\n";
 # old style as reference
 our %x;
 local(%x);
-my @z = @( qw(list edit send abort gripe listen) );
+my @z = @( < qw(list edit send abort gripe listen) );
 abbrev(\%x, < @z);
-my $r = join ':', sort keys %x; 
+my $r = join ':', @( < sort @( < keys %x)); 
 print "not " if exists %x{'l'}   ||
                 exists %x{'li'}  ||
                 exists %x{'lis'};
@@ -39,7 +39,7 @@ my $test = 5;
 my %y = %( () );
 abbrev \%y, < @z;
 
-my $s = join ':', sort keys %y;
+my $s = join ':', @( < sort @( < keys %y));
 print (($r eq $s)?"ok $test\n":"not ok $test\n"); $test++;
 
 

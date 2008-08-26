@@ -15,7 +15,7 @@ my (@files, @dirs, @still_there);
 # And a test for files that should still be around
 # These are tidied up
 END {
-  foreach (< @still_there) {
+  foreach ( @still_there) {
     ok( -f $_ );
     ok( unlink( $_ ) );
     ok( !(-f $_) );
@@ -23,16 +23,16 @@ END {
 }
 
 # Loop over an array hoping that the files dont exist
-END { foreach (< @files) { ok( !(-e $_) )} }
+END { foreach ( @files) { ok( !(-e $_) )} }
 
 # And a test for directories
-END { foreach (< @dirs)  { ok( !(-d $_) )} }
+END { foreach ( @dirs)  { ok( !(-d $_) )} }
 
 # Need to make sure that the END blocks are setup before
 # the ones that File::Temp configures since END blocks are evaluated
 # in revers order and we need to check the files *after* File::Temp
 # removes them
-use File::Temp qw/ tempfile tempdir/;
+use File::Temp < qw/ tempfile tempdir/;
 
 # Now we start the tests properly
 ok(1);

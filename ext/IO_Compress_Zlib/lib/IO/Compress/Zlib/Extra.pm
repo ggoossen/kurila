@@ -148,7 +148,7 @@ sub parseExtraField
     if (ref $data eq 'ARRAY') {    
         if (ref $data->[0]) {
 
-            foreach my $pair (< @$data) {
+            foreach my $pair ( @$data) {
                 return ExtraFieldError("Not list of lists")
                     unless ref $pair eq 'ARRAY' ;
 

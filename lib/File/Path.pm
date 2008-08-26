@@ -515,10 +515,10 @@ use File::Basename ();
 use File::Spec     ();
 
 use Exporter ();
-use vars qw($VERSION @ISA @EXPORT);
+use vars < qw($VERSION @ISA @EXPORT);
 $VERSION = '2.01';
-@ISA     = @( qw(Exporter) );
-@EXPORT  = @( qw(mkpath rmtree) );
+@ISA     = @( < qw(Exporter) );
+@EXPORT  = @( < qw(mkpath rmtree) );
 
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
@@ -570,7 +570,7 @@ sub mkpath {
             ${$arg->{error}} = \@() if exists $arg->{error};
         }
         else {
-            %{$arg}{[qw(verbose mode)]} = (0, 0777);
+            %{$arg}{[ <qw(verbose mode)]} = (0, 0777);
         }
         $paths = \@(< @_);
     }
@@ -583,7 +583,7 @@ sub _mkpath {
 
     local($")=$Is_MacOS ? ":" : "/";
     my(@created,$path);
-    foreach $path (< @$paths) {
+    foreach $path ( @$paths) {
         next unless length($path);
 	$path .= '/' if $^O eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
 	# Logic wants Unix paths, so go with the flow.
@@ -646,7 +646,7 @@ sub rmtree {
             ${$arg->{result}} = \@() if exists $arg->{result};
         }
         else {
-            %{$arg}{[qw(verbose safe)]} = (0, 0);
+            %{$arg}{[ <qw(verbose safe)]} = (0, 0);
     }
         $paths = \@(< @_);
     }
@@ -658,9 +658,9 @@ sub rmtree {
         _error($arg, "cannot fetch initial working directory");
         return 0;
     };
-    for ($arg->{cwd}) { m/\A(.*)\Z/; $_ = $1 } # untaint
+    for (@($arg->{cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
 
-    %{$arg}{[qw(device inode)]} = @(stat $arg->{cwd})[[0,1]] or do {
+    %{$arg}{[ <qw(device inode)]} = @(stat $arg->{cwd})[[0,1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{cwd});
         return 0;
     };
@@ -678,7 +678,7 @@ sub _rmtree {
 
     my (@files, $root);
     ROOT_DIR:
-    foreach $root (< @$paths) {
+    foreach $root ( @$paths) {
     	if ($Is_MacOS) {
             $root  = ":$root" unless $root =~ m/:/;
             $root .= ":"      unless $root =~ m/:\z/;
@@ -748,7 +748,7 @@ sub _rmtree {
 		if (!defined ${*{Symbol::fetch_glob("^TAINT")}} or ${*{Symbol::fetch_glob("^TAINT")}}) {
                     # Blindly untaint dir names if taint mode is
                     # active, or any perl < 5.006
-                    @files = @( map { m/\A(.*)\z/s; $1 } < readdir $d );
+                    @files = @( < map { m/\A(.*)\z/s; $1 } @( < readdir $d) );
                 }
                 else {
 		    @files = @( readdir $d );
@@ -760,15 +760,15 @@ sub _rmtree {
                 # Deleting large numbers of files from VMS Files-11
                 # filesystems is faster if done in reverse ASCIIbetical order.
                 # include '.' to '.;' from blead patch #31775
-                @files = @( map {$_ eq '.' ? '.;' : $_} reverse < @files );
+                @files = @( < map {$_ eq '.' ? '.;' : $_} @( < reverse @( < @files)) );
                 ($root = VMS::Filespec::unixify($root)) =~ s/\.dir\z//;
             }
-            @files = @( grep {$_ ne $updir and $_ ne $curdir} < @files );
+            @files = @( < grep {$_ ne $updir and $_ ne $curdir} @( < @files) );
 
             if ((nelems @files)) {
                 # remove the contained files before the directory itself
                 my $narg = \%(< %$arg);
-                %{$narg}{[qw(device inode cwd prefix depth)]}
+                %{$narg}{[ <qw(device inode cwd prefix depth)]}
                     = ($device, $inode, $updir, $canon, $arg->{depth}+1);
                 $count += _rmtree($narg, \@files);
             }

@@ -53,8 +53,8 @@ while ($how_many_common--) {
 }
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %( map {($_,$_)}
-                 qw(dynamic_ext static_ext extensions known_extensions) );
+my %Extensions = %( < map {($_,$_)}
+ @( <                 qw(dynamic_ext static_ext extensions known_extensions)) );
 
 # allowed opts as well as specifies default and initial values
 my %Allowed_Opts = %(
@@ -67,18 +67,18 @@ sub opts {
     # user specified options
     my %given_opts = %(
         # --opt=smth
-        (map {m/^--([\-_\w]+)=(.*)$/} < @ARGV),
+        (< map {m/^--([\-_\w]+)=(.*)$/} @( < @ARGV)),
         # --opt --no-opt --noopt
-        (map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} < @ARGV),
+        (< map {m/^no-?(.*)$/i?($1=>0):($_=>1)} @( < map {m/^--([\-_\w]+)$/} @( < @ARGV))),
     );
 
     my %opts = %(< %Allowed_Opts, < %given_opts);
 
-    for my $opt (grep {!exists %Allowed_Opts{$_}} keys %given_opts) {
+    for my $opt (@(< grep {!exists %Allowed_Opts{$_}} @( < keys %given_opts))) {
         warn "option '$opt' is not recognized";
 	usage;
     }
-    @ARGV = @( grep {!m/^--/} < @ARGV );
+    @ARGV = @( < grep {!m/^--/} @( < @ARGV) );
 
     return %opts;
 }
@@ -303,7 +303,7 @@ die if $@;
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
-$Config_SH_expanded = join "\n", '', < @v_others;
+$Config_SH_expanded = join "\n", @( '', < @v_others);
 
 my $t = fetch_string (\%(), 'ivtype');
 my $s = fetch_string (\%(), 'ivsize');
@@ -317,7 +317,7 @@ my $f = $t eq 'long' ? 'L!' : $s == 8 ? 'Q': 'I';
 
 my $byteorder_code;
 if ($s == 4 || $s == 8) {
-    my $list = join ',', reverse(2..$s);
+    my $list = join ',', @( < reverse( @( <2..$s)));
     my $format = 'a'x$s;
     $byteorder_code = <<"EOT";
 
@@ -333,7 +333,7 @@ EOT
 my @need_relocation;
 
 if (fetch_string(\%(),'userelocatableinc')) {
-    foreach my $what (qw(prefixexp
+    foreach my $what (@( <qw(prefixexp
 
 			 archlibexp
 			 html1direxp
@@ -388,7 +388,7 @@ if (fetch_string(\%(),'userelocatableinc')) {
 			 installvendorman1dir
 			 installvendorman3dir
 			 installvendorscript
-			 )) {
+			 ))) {
 	push @need_relocation, $what if fetch_string(\%(), $what) =~ m!^\.\.\./!;
     }
 }
@@ -432,7 +432,7 @@ EOT
 if (%need_relocation) {
   my $relocations_in_common;
   # otherlibdirs only features in the hash
-  foreach (keys %need_relocation) {
+  foreach (@( <keys %need_relocation)) {
     $relocations_in_common++ if %Common{$_};
   }
   if ($relocations_in_common) {
@@ -442,7 +442,7 @@ if (%need_relocation) {
   }
 }
 
-$heavy_txt .= join('', < @non_v) . "\n";
+$heavy_txt .= join('', @( < @non_v)) . "\n";
 
 # copy config summary format from the myconfig.SH script
 $heavy_txt .= "our \$summary = <<'!END!';\n";
@@ -464,7 +464,7 @@ local *_ = \my $a;
 $_ = <<'!END!';
 EOT
 
-$heavy_txt .= join('', sort < @v_others) . "!END!\n";
+$heavy_txt .= join('', @( < sort @( < @v_others))) . "!END!\n";
 
 # Only need the dynamic byteorder code in Config.pm if 'byteorder' is one of
 # the precached keys
@@ -475,7 +475,7 @@ if (%Common{byteorder}) {
 }
 
 if ((nelems @need_relocation)) {
-$heavy_txt .= 'foreach my $what (qw(' . join (' ', < @need_relocation) .
+$heavy_txt .= 'foreach my $what (qw(' . join (' ', @( < @need_relocation)) .
       ")) \{\n" . <<'EOT';
     s/^($what=)(['"])(.*?)\2/$1 . $2 . relocate_inc($3) . $2/me;
 }
@@ -499,7 +499,7 @@ my $config_sh_len = length $_;
 our $Config_SH_expanded = "\n$_" . << 'EOVIRTUAL';
 EOT
 
-foreach my $prefix (qw(ccflags ldflags)) {
+foreach my $prefix (@( <qw(ccflags ldflags))) {
     my $value = fetch_string (\%(), $prefix);
     my $withlargefiles = fetch_string (\%(), $prefix . "_uselargefiles");
     if (defined $withlargefiles) {
@@ -508,24 +508,24 @@ foreach my $prefix (qw(ccflags ldflags)) {
     }
 }
 
-foreach my $prefix (qw(libs libswanted)) {
+foreach my $prefix (@( <qw(libs libswanted))) {
     my $value = fetch_string (\%(), $prefix);
     my $withlf = fetch_string (\%(), 'libswanted_uselargefiles');
     next unless defined $withlf;
     my @lflibswanted
-       = @( split(' ', fetch_string (\%(), 'libswanted_uselargefiles')) );
+       = @( < split(' ', fetch_string (\%(), 'libswanted_uselargefiles')) );
     if ((nelems @lflibswanted)) {
 	my %lflibswanted;
 	%lflibswanted{[< @lflibswanted]} = ();
 	if ($prefix eq 'libs') {
-	    my @libs = @( grep { m/^-l(.+)/ &&
+	    my @libs = @( < grep { m/^-l(.+)/ &&
                             not exists %lflibswanted{$1} }
-		                    split(' ', fetch_string (\%(), 'libs')) );
-	    $value = join(' ', < @libs);
+ @( <		                    split(' ', fetch_string (\%(), 'libs'))) );
+	    $value = join(' ', @( < @libs));
 	} else {
-	    my @libswanted = @( grep { not exists %lflibswanted{$_} }
-	                          split(' ', fetch_string (\%(), 'libswanted')) );
-	    $value = join(' ', < @libswanted);
+	    my @libswanted = @( < grep { not exists %lflibswanted{$_} }
+ @( <	                          split(' ', fetch_string (\%(), 'libswanted'))) );
+	    $value = join(' ', @( < @libswanted));
 	}
     }
     $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
@@ -646,7 +646,7 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my ($f) = grep -r, qw(GNUMakefile Makefile);
+    my ($f) = < grep -r, @( < qw(GNUMakefile Makefile));
     my $dll;
     if (open my $fh, '<', $f) {
 	while ( ~< $fh) {
@@ -664,7 +664,7 @@ sub TIEHASH {
 ENDOFSET
 }
 
-foreach my $key (keys %Common) {
+foreach my $key (@( <keys %Common)) {
     my $value = fetch_string (\%(), $key);
     # Is it safe on the LHS of => ?
     my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ? $key : "'$key'";
@@ -687,7 +687,7 @@ foreach my $key (keys %Common) {
 if (%Common{byteorder}) {
     %Common{byteorder} = 'byteorder => $byteorder';
 }
-my $fast_config = join '', map { "    $_,\n" } sort values %Common;
+my $fast_config = join '', @( < map { "    $_,\n" } @( < sort @( < values %Common)));
 
 # Sanity check needed to stop an infite loop if Config_heavy.pl fails to define
 # &launcher for some reason (eg it got truncated)

@@ -32,12 +32,12 @@ my $echo = $mm->oneliner(q{print <@ARGV}, \@('-l'));
 $mm->{_MAX_EXEC_LEN} = length($echo) + 15;
 is( $mm->max_exec_len, $mm->{_MAX_EXEC_LEN}, '  forced a short max_exec_len' );
 
-my @test_args = @( qw(foo bar baz yar car har ackapicklerootyjamboree) );
+my @test_args = @( < qw(foo bar baz yar car har ackapicklerootyjamboree) );
 my @cmds = @( < $mm->split_command($echo, < @test_args) );
 isnt( (nelems @cmds), 0 );
 
 my @results = @( < _run(< @cmds) );
-is( join('', < @results), join('', < @test_args));
+is( join('', @( < @results)), join('', @( < @test_args)));
 
 
 my %test_args = %( foo => 42, bar => 23, car => 'har' );
@@ -46,7 +46,7 @@ my $even_args = $mm->oneliner(q{print !((nelems @ARGV) % 2)});
 isnt( (nelems @cmds), 0 );
 
 @results = @( < _run(< @cmds) );
-like( join('', < @results ), qr/^1+$/,         'pairs preserved' );
+like( join('', @( < @results) ), qr/^1+$/,         'pairs preserved' );
 
 is( (nelems $mm->split_command($echo)), 0,  'no args means no commands' );
 
@@ -54,13 +54,13 @@ is( (nelems $mm->split_command($echo)), 0,  'no args means no commands' );
 sub _run {
     my @cmds = @( < @_ );
 
-    s{\$\(ABSPERLRUN\)}{$perl} foreach < @cmds;
+    s{\$\(ABSPERLRUN\)}{$perl} foreach  @cmds;
     if( $Is_VMS ) {
-        s{-\n}{} foreach < @cmds
+        s{-\n}{} foreach  @cmds
     }
     elsif( $Is_Win32 ) {
-        s{\\\n}{} foreach < @cmds;
+        s{\\\n}{} foreach  @cmds;
     }
 
-    return @( map { s/\n+$//; $_ } map { `$_` } < @cmds);
+    return @( < map { s/\n+$//; $_ } @( < map { `$_` } @( < @cmds)));
 }

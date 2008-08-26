@@ -135,8 +135,8 @@ sub deq { # deep-equals
     return 1;
   } elsif(UNIVERSAL::isa(@_[0], 'HASH')) {
     return 1 if $hashes_dont_matter;
-    return '' unless nelems(@(keys %{@_[0]})) == (nelems(@( keys %{@_[1]})));
-    foreach my $k (keys %{@_[0]}) {
+    return '' unless nelems(@( <keys %{@_[0]})) == (nelems(@( < keys %{@_[1]})));
+    foreach my $k (@( <keys %{@_[0]})) {
       return '' unless exists @_[1]->{$k};
       return '' unless deq(@_[0]->{$k}, @_[1]->{$k});
     }

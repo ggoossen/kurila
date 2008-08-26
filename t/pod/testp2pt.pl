@@ -3,14 +3,14 @@ package TestPodIncPlainText;
 BEGIN {
    use File::Basename;
    use File::Spec;
-   use Cwd qw(abs_path);
+   use Cwd < qw(abs_path);
    push @INC, '..';
    my $THISDIR = abs_path(dirname $0);
    unshift @INC, $THISDIR;
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
 }
 
 #use strict;
@@ -19,18 +19,18 @@ use Exporter;
 #use File::Compare;
 #use Cwd qw(abs_path);
 
-use vars qw($MYPKG @EXPORT @ISA);
+use vars < qw($MYPKG @EXPORT @ISA);
 $MYPKG = try { (caller)[[0]] };
-@EXPORT = @( qw(&testpodplaintext) );
+@EXPORT = @( < qw(&testpodplaintext) );
 BEGIN {
     require Pod::PlainText;
-    @ISA = @( qw( Pod::PlainText ) );
+    @ISA = @( < qw( Pod::PlainText ) );
     require VMS::Filespec if $^O eq 'VMS';
 }
 
 ## Hardcode settings for TERMCAP and COLUMNS so we can try to get
 ## reproducible results between environments
-%ENV{[qw(TERMCAP COLUMNS)]} = ('co=76:do=^J', 76);
+%ENV{[ <qw(TERMCAP COLUMNS)]} = ('co=76:do=^J', 76);
 
 sub catfile(@) { 'File::Spec'->catfile(< @_); }
 
@@ -62,11 +62,11 @@ sub findinclude {
     my $parentdir  = dirname $thispoddir;
     my @podincdirs = @($thispoddir, $parentdir, < @PODINCDIRS);
 
-    for (< @podincdirs) {
+    for ( @podincdirs) {
        my $incfile = catfile($_, $incname);
        return $incfile  if (-r $incfile);
     }
-    warn("*** Can't find =include file $incname in {join ' ', <@podincdirs}\n");
+    warn("*** Can't find =include file $incname in {join ' ', @( <@podincdirs)}\n");
     return "";
 }
 
@@ -82,7 +82,7 @@ sub command {
 
     ## We have an '=include' command
     my $incdebug = 1; ## debugging
-    my @incargs = @( split );
+    my @incargs = @( < split );
     if ((nelems @incargs) == 0) {
         warn("*** No filename given for '=include'\n");
         return;
@@ -144,7 +144,7 @@ sub testpodplaintext( @ ) {
 
    print "1..", scalar nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
-   for $podfile (< @testpods) {
+   for $podfile ( @testpods) {
       ($testname, $_) = < fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;

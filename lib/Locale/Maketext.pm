@@ -3,7 +3,7 @@
 
 package Locale::Maketext;
 use strict;
-use vars qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
+use vars < qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
              $USE_LITERALS $MATCH_SUPERS_TIGHTLY);
 use Carp ();
 use I18N::LangTags v0.30 ();
@@ -180,7 +180,7 @@ sub maketext {
 
   my $value;
   foreach my $h_r (
-    < @{  %isa_scan{ref($handle) || $handle} || $handle->_lex_refs  }
+     @{  %isa_scan{ref($handle) || $handle} || $handle->_lex_refs  }
   ) {
     print "* Looking up \"$phrase\" in $h_r\n" if DEBUG;
     if(exists $h_r->{$phrase}) {
@@ -253,17 +253,17 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
    # Complain if they use __PACKAGE__ as a project base class?
   
   if( (nelems @languages) ) {
-    DEBUG and print "Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
     if($USING_LANGUAGE_TAGS) {   # An explicit language-list was given!
       @languages = @(
-       map {; $_, < I18N::LangTags::alternate_language_tags($_) }
-        # Catch alternation
-       map I18N::LangTags::locale2language_tag($_),
+       < map {; $_, < I18N::LangTags::alternate_language_tags($_) }
+ @(        # Catch alternation
+       < map I18N::LangTags::locale2language_tag($_), @(
         # If it's a lg tag, fine, pass thru (untainted)
         # If it's a locale ID, try converting to a lg tag (untainted),
         # otherwise nix it.
-       < @languages );
-      DEBUG and print "Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+       < @languages)) );
+      DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
     }
   } else {
     @languages = @( < $base_class->_ambient_langprefs );
@@ -272,7 +272,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   @languages = @( < $base_class->_langtag_munging(< @languages) );
 
   my %seen;
-  foreach my $module_name ( map { $base_class . "::" . $_ }  < @languages ) {
+  foreach my $module_name (@( < map { $base_class . "::" . $_ } @(  < @languages)) ) {
     next unless length $module_name; # sanity
     next if %seen{$module_name}++        # Already been here, and it was no-go
             || ! _try_use($module_name); # Try to use() it, but can't it.
@@ -290,44 +290,44 @@ sub _langtag_munging {
   # We have all these DEBUG statements because otherwise it's hard as hell
   # to diagnose ifwhen something goes wrong.
 
-  DEBUG and print "Lgs1: ", map("<$_>", < @languages), "\n";
+  DEBUG and print "Lgs1: ", < map("<$_>", @( < @languages)), "\n";
 
   if($USING_LANGUAGE_TAGS) {
-    DEBUG and print "Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
     @languages     = @( < $base_class->_add_supers( < @languages ) );
 
     push @languages, < I18N::LangTags::panic_languages(< @languages);
     DEBUG and print "After adding panic languages:\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
 
     push @languages, < $base_class->fallback_languages;
      # You are free to override fallback_languages to return empty-list!
-    DEBUG and print "Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
 
     @languages = @(  # final bit of processing to turn them into classname things
-      map {
+      < map {
         my $it = $_;  # copy
         $it = lc($it);
         $it =~ s<-><_>g; # lc, and turn - to _
         $it =~ s<[^_a-z0-9]><>g;  # remove all but a-z0-9_
         $it;
-      } < @languages )
+      } @( < @languages) )
     ;
     DEBUG and print "Nearing end of munging:\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
   } else {
     DEBUG and print "Bypassing language-tags.\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
   }
 
   DEBUG and print "Before adding fallback classes:\n", 
-    " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+    " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
 
   push @languages, < $base_class->fallback_language_classes;
    # You are free to override that to return whatever.
 
   DEBUG and print "Finally:\n", 
-    " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+    " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
 
   return @languages;
 }
@@ -347,21 +347,21 @@ sub _add_supers {
   if(!$MATCH_SUPERS) {
     # Nothing
     DEBUG and print "Bypassing any super-matching.\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
 
   } elsif( $MATCH_SUPERS_TIGHTLY ) {
     DEBUG and print "Before adding new supers tightly:\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
     @languages = @( < I18N::LangTags::implicate_supers( < @languages ) );
     DEBUG and print "After adding new supers tightly:\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
 
   } else {
     DEBUG and print "Before adding supers to end:\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
     @languages = @( < I18N::LangTags::implicate_supers_strictly( < @languages ) );
     DEBUG and print "After adding supers to end:\n", 
-      " Lgs\@", __LINE__, ": ", map("<$_>", < @languages), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
   }
   
   return @languages;
@@ -424,7 +424,7 @@ sub _lex_refs {  # report the lexicon references for this handle's class
 
   # Implements depth(height?)-first recursive searching of superclasses.
   # In hindsight, I suppose I could have just used Class::ISA!
-  foreach my $superclass (< @{*{Symbol::fetch_glob($class . "::ISA")}}) {
+  foreach my $superclass ( @{*{Symbol::fetch_glob($class . "::ISA")}}) {
     print " Super-class search into $superclass\n" if DEBUG;
     next if $seen_r->{$superclass}++;
     push @lex_refs, < @{&_lex_refs($superclass, $seen_r)};  # call myself

@@ -6,11 +6,11 @@ our ($VERSION, @ISA, @EXPORT);
 
 require Exporter;
 
-use Symbol qw(gensym qualify);
+use Symbol < qw(gensym qualify);
 
 $VERSION	= 1.02;
-@ISA		= @( qw(Exporter) );
-@EXPORT		= @( qw(open3) );
+@ISA		= @( < qw(Exporter) );
+@EXPORT		= @( < qw(open3) );
 
 =head1 NAME
 
@@ -263,7 +263,7 @@ sub _open3 {
 	return 0 if (@cmd[0] eq '-');
 	local($")=(" ");
 	exec < @cmd or do {
-	    warn "$Me: exec of {join ' ', <@cmd} failed";
+	    warn "$Me: exec of {join ' ', @( <@cmd)} failed";
 	    try { require POSIX; POSIX::_exit(255); };
 	    exit 255;
 	};
@@ -324,7 +324,7 @@ sub _open3 {
 sub open3 {
     if ((nelems @_) +< 4) {
 	local $" = ', ';
-	die "open3({join ' ', <@_}): not enough arguments";
+	die "open3({join ' ', @( <@_)}): not enough arguments";
     }
     return _open3 'open3', scalar caller, < @_
 }
@@ -335,11 +335,11 @@ sub spawn_with_handles {
     my ($fd, $pid, @saved_fh, $saved, %saved, @errs);
     require Fcntl;
 
-    foreach $fd (< @$fds) {
+    foreach $fd ( @$fds) {
 	$fd->{tmp_copy} = IO::Handle->new_from_fd($fd->{handle}, $fd->{mode});
 	%saved{fileno $fd->{handle}} = $fd->{tmp_copy};
     }
-    foreach $fd (< @$fds) {
+    foreach $fd ( @$fds) {
 	bless $fd->{handle}, 'IO::Handle'
 	    unless try { $fd->{handle}->isa('IO::Handle') } ;
 	# If some of handles to redirect-to coincide with handles to
@@ -349,7 +349,7 @@ sub spawn_with_handles {
     }
     unless ($^O eq 'MSWin32') {
 	# Stderr may be redirected below, so we save the err text:
-	foreach $fd (< @$close_in_child) {
+	foreach $fd ( @$close_in_child) {
 	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $!"
 		unless %saved{fileno $fd}; # Do not close what we redirect!
 	}
@@ -360,11 +360,11 @@ sub spawn_with_handles {
 	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid +< 0;
     }
 
-    foreach $fd (< @$fds) {
+    foreach $fd ( @$fds) {
 	$fd->{handle}->fdopen($fd->{tmp_copy}, $fd->{mode});
 	$fd->{tmp_copy}->close or die "Can't close: $!";
     }
-    die join "\n", < @errs if (nelems @errs);
+    die join "\n", @( < @errs) if (nelems @errs);
     return $pid;
 }
 

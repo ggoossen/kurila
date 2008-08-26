@@ -8,7 +8,7 @@ use Pod::ParseUtils;
 
 # First test the hyperlinks
 
-my @links = @( qw{
+my @links = @( < qw{
   name
   name/ident
   name/"sec"

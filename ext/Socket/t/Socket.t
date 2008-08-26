@@ -14,7 +14,7 @@ BEGIN {
     $has_alarm = %Config{d_alarm};
 }
 	
-use Socket qw(:all);
+use Socket < qw(:all);
 
 plan tests => 14;
 

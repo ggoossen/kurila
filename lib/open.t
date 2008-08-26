@@ -69,7 +69,7 @@ EOE
     die if $@;
 
     open F, ">", "a";
-    my @a = @(map { chr(1 << ($_ << 2)) } 0..5); # 0x1, 0x10, .., 0x100000
+    my @a = @(< map { chr(1 << ($_ << 2)) } @( < 0..5)); # 0x1, 0x10, .., 0x100000
     unshift @a, chr(0); # ... and a null byte in front just for fun
     print F <@a;
     close F;
@@ -86,7 +86,7 @@ EOE
 
     open F, "<:utf8", "a";
     $ok = $a = 0;
-    for (<@a) {
+    for (@a) {
         unless (
 		($c = sysread(F, $b, 1)) == 1  &&
 		length($b)               == 1  &&
@@ -131,13 +131,13 @@ EOE
 		       syswrite G, $temp, 1, 1; },
 		  );
 
-    foreach my $key (sort keys %actions) {
+    foreach my $key (@( <sort @( < keys %actions))) {
 	# syswrite() on should work on characters, not bytes
 	open G, ">:utf8", "b";
 
 	print "# $key\n";
 	$ok = $a = 0;
-	for (<@a) {
+	for (@a) {
 	    unless (
 		    ($c = %actions{$key}->($_)) == 1 &&
 		    systell(*G)                == ($a += bytes::length($_))
@@ -153,7 +153,7 @@ EOE
 
 	open G, "<:utf8", "b";
 	$ok = $a = 0;
-	for (<@a) {
+	for (@a) {
 	    unless (
 		    ($c = sysread(G, $b, 1)) == 1 &&
 		    length($b)               == 1 &&

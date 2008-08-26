@@ -21,7 +21,7 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 print "1..16\n";
 

@@ -178,7 +178,7 @@ sub my_preprocess {
     my @files = @( < @_ );
     print "# --preprocess--\n";
     print "#   \$File::Find::dir => '$File::Find::dir' \n";
-    foreach my $file (< @files) {
+    foreach my $file ( @files) {
         $file =~ s/\.(dir)?$// if $^O eq 'VMS';
         print "#   $file \n";
         delete %Expect_Dir{ $File::Find::dir }->{$file};
@@ -486,11 +486,11 @@ Check( (nkeys %Expect_Dir) == 0 );
     print "# checking argument localization\n";
 
     ### this checks the fix of perlbug [19977] ###
-    my @foo = @( qw( a b c d e f ) );
-    my %pre = %( map { $_ => } < @foo );
+    my @foo = @( < qw( a b c d e f ) );
+    my %pre = %( < map { $_ => } @( < @foo) );
 
-    File::Find::find( sub {  } , 'fa' ) for < @foo;
-    delete %pre{$_} for < @foo;
+    File::Find::find( sub {  } , 'fa' ) for  @foo;
+    delete %pre{$_} for  @foo;
 
     Check( ( nkeys %pre ) == 0 );
 }
@@ -775,10 +775,10 @@ if ( $symlink_exists ) {
 
     # If we encountered the symlink first, then the entries corresponding to
     # the real name remain, if the real name first then the symlink
-    my @names = @( sort keys %Expect_File );
+    my @names = @( < sort @( < keys %Expect_File) );
     Check( (nelems @names) == 1 );
     # Normalise both to the original name
-    s/_sl// foreach < @names;
+    s/_sl// foreach  @names;
     Check (@names[0] eq file_path_name('fa', 'faa', 'faa_ord'));
     unlink file_path('fa', 'faa_sl');
 

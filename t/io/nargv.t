@@ -3,7 +3,7 @@
 print "1..5\n";
 
 my $j = 1;
-for my $i ( 1,2,5,4,3 ) {
+for my $i (@( 1,2,5,4,3) ) {
     my $file = mkfiles($i)[0];
     open(FH, ">", "$file") || die "can't create $file: $!";
     print FH "not ok " . $j++ . "\n";
@@ -15,10 +15,10 @@ for my $i ( 1,2,5,4,3 ) {
     local *ARGV;
     local $^I = '.bak';
     local $_;
-    @ARGV = @( < mkfiles(1..3) );
+    @ARGV = @( < mkfiles( <1..3) );
     my $n = 0;
     while ( ~< *ARGV) {
-	print STDOUT "# initial \@ARGV: [{join ' ', <@ARGV}]\n";
+	print STDOUT "# initial \@ARGV: [{join ' ', @( <@ARGV)}]\n";
 	if ($n++ == 2) {
 	    other();
 	}
@@ -27,10 +27,10 @@ for my $i ( 1,2,5,4,3 ) {
 }
 
 $^I = undef;
-@ARGV = @( < mkfiles(1..3) );
+@ARGV = @( < mkfiles( <1..3) );
 my $n = 0;
 while ( ~< *ARGV) {
-    print STDOUT "#final \@ARGV: [{join ' ', <@ARGV}]\n";
+    print STDOUT "#final \@ARGV: [{join ' ', @( <@ARGV)}]\n";
     if ($n++ == 2) {
 	other();
     }
@@ -51,14 +51,14 @@ sub other {
     local $_;
     @ARGV = @( < mkfiles(5, 4) );
     while ( ~< *ARGV) {
-	print STDOUT "# inner \@ARGV: [{join ' ', <@ARGV}]\n";
+	print STDOUT "# inner \@ARGV: [{join ' ', @( <@ARGV)}]\n";
 	show();
     }
 }
 
 sub mkfiles {
-    my @files = @( map { "scratch$_" } < @_ );
+    my @files = @( < map { "scratch$_" } @( < @_) );
     return @files;
 }
 
-END { unlink map { ($_, "$_.bak") } < mkfiles(1..5) }
+END { unlink < map { ($_, "$_.bak") } @( < mkfiles( <1..5)) }

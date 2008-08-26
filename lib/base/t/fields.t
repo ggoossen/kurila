@@ -8,32 +8,32 @@ BEGIN { use_ok('fields'); }
 
 package Foo;
 
-use fields qw(_no Pants who _up_yours);
-use fields qw(what);
+use fields < qw(_no Pants who _up_yours);
+use fields < qw(what);
 
 sub new { fields::new(shift) }
 sub magic_new { bless \@() }  # Doesn't 100% work, perl's problem.
 
 package main;
 
-is_deeply( \@(sort keys %Foo::FIELDS), 
-           \@(sort qw(_no Pants who _up_yours what))
+is_deeply( \@( <sort @( < keys %Foo::FIELDS)), 
+           \@( <sort @( < qw(_no Pants who _up_yours what)))
 );
 
 sub show_fields {
     my($base, $mask) = < @_;
     no strict 'refs';
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
-    return @(grep { (%fields::attr{$base}->[$fields->{$_}] ^&^ $mask) == $mask} 
-                keys %$fields);
+    return @(< grep { (%fields::attr{$base}->[$fields->{$_}] ^&^ $mask) == $mask} 
+ @( <                keys %$fields));
 }
 
-is_deeply( \@(sort < &show_fields('Foo', fields::PUBLIC)),
-           \@(sort qw(Pants who what)));
-is_deeply( \@(sort < &show_fields('Foo', fields::PRIVATE)),
-           \@(sort qw(_no _up_yours)));
+is_deeply( \@( <sort @( < &show_fields('Foo', fields::PUBLIC))),
+           \@( <sort @( < qw(Pants who what))));
+is_deeply( \@( <sort @( < &show_fields('Foo', fields::PRIVATE))),
+           \@( <sort @( < qw(_no _up_yours))));
 
-foreach (Foo->new) {
+foreach (@(Foo->new)) {
     my $obj = $_;
     my %test = %( Pants => 'Whatever', _no => 'Yeah',
                  what  => 'Ahh',      who => 'Moo',
@@ -41,7 +41,7 @@ foreach (Foo->new) {
 
     $obj->{Pants} = 'Whatever';
     $obj->{_no}   = 'Yeah';
-    %{$obj}{[qw(what who _up_yours)]} = ('Ahh', 'Moo', 'Yip');
+    %{$obj}{[ <qw(what who _up_yours)]} = ('Ahh', 'Moo', 'Yip');
 
     while(my($k,$v) = each %test) {
         is($obj->{$k}, $v);
@@ -61,7 +61,7 @@ foreach (Foo->new) {
 # check if fields autovivify
 {
     package Foo::Autoviv;
-    use fields qw(foo bar);
+    use fields < qw(foo bar);
     sub new { fields::new(@_[0]) }
 
     package main;
@@ -74,7 +74,7 @@ foreach (Foo->new) {
 
 package Test::FooBar;
 
-use fields qw(a b c);
+use fields < qw(a b c);
 
 sub new {
     my $self = fields::new(shift);

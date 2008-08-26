@@ -7,10 +7,10 @@
 print "1..7\n";
 
 my $test = 0;
-for my $i (undef, 0 .. 2, "", "0 but true") {
+for my $i (@(undef, < 0 .. 2, "", "0 but true")) {
     my $true = 1;
     my $false = 0;
-    for my $j (undef, 0 .. 2, "", "0 but true") {
+    for my $j (@(undef, < 0 .. 2, "", "0 but true")) {
 	$true &&= !(
 	    ((!$i || !$j) != !($i && $j))
 	    or (!($i || $j) != (!$i && !$j))

@@ -28,13 +28,13 @@ package Pod::Man;
 
 use strict;
 use utf8;
-use vars qw(@ISA %ESCAPES $PREAMBLE $VERSION);
+use vars < qw(@ISA %ESCAPES $PREAMBLE $VERSION);
 
-use Carp qw(croak);
+use Carp < qw(croak);
 use Pod::Simple ();
-use POSIX qw(strftime);
+use POSIX < qw(strftime);
 
-@ISA = @( qw(Pod::Simple) );
+@ISA = @( < qw(Pod::Simple) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -83,7 +83,7 @@ sub new {
     }
 
     # The =for and =begin targets that we accept.
-    $self->accept_targets (qw/man MAN roff ROFF/);
+    $self->accept_targets ( <qw/man MAN roff ROFF/);
 
     # Ensure that contiguous blocks of code are merged together.  Otherwise,
     # some of the guesswork heuristics don't work right.
@@ -123,7 +123,7 @@ sub init_fonts {
 
     # Figure out the fixed-width font.  If user-supplied, make sure that they
     # are the right length.
-    for (qw/fixed fixedbold fixeditalic fixedbolditalic/) {
+    for (@( <qw/fixed fixedbold fixeditalic fixedbolditalic/)) {
         my $font = %$self{$_};
         if (defined ($font) && (length ($font) +< 1 || length ($font) +> 2)) {
             croak qq(roff font should be 1 or 2 chars, not "$font");
@@ -193,7 +193,7 @@ sub init_page {
         unless defined %$self{indent};
 
     # Double quotes in things that will be quoted.
-    for (qw/center release/) {
+    for (@( <qw/center release/)) {
         %$self{$_} =~ s/\"/\"\"/g if %$self{$_};
     }
 }
@@ -240,7 +240,7 @@ sub method_for_element {
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start {
     my ($self, $element, $attrs) = < @_;
-    DEBUG +> 3 and print "++ $element (<", join ('> <', < %$attrs), ">)\n";
+    DEBUG +> 3 and print "++ $element (<", join ('> <', @( < %$attrs)), ">)\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, we need to accumulate the contents of the
@@ -614,7 +614,7 @@ sub switchquotes {
     # Also separate troff from nroff if there are any fixed-width fonts in use
     # to work around problems with Solaris nroff.
     my $c_is_quote = (%$self{LQUOTE} =~ m/\"/) || (%$self{RQUOTE} =~ m/\"/);
-    my $fixedpat = join '|', %{ %$self{FONTS} }{['100', '101', '110', '111']};
+    my $fixedpat = join '|', @( %{ %$self{FONTS} }{['100', '101', '110', '111']});
     $fixedpat =~ s/\\/\\\\/g;
     $fixedpat =~ s/\(/\\\(/g;
     if ($text =~ m/\"/ || $text =~ m/$fixedpat/) {
@@ -681,7 +681,7 @@ sub makespace {
 # strip special escapes from index entries.
 sub outindex {
     my ($self, $section, $index) = < @_;
-    my @entries = @( map { split m%\s*/\s*% } < @{ %$self{INDEX} } );
+    my @entries = @( < map { < split m%\s*/\s*% } @( < @{ %$self{INDEX} }) );
     return unless ($section || nelems @entries);
 
     # We're about to output all pending entries, so clear our pending queue.
@@ -691,7 +691,7 @@ sub outindex {
     # pass in their own section.  Undo some *roff formatting on headings.
     my @output;
     if ((nelems @entries)) {
-        push @output, \@( 'Xref', join (' ', < @entries) );
+        push @output, \@( 'Xref', join (' ', @( < @entries)) );
     }
     if ($section) {
         $index =~ s/\\-/-/g;
@@ -700,7 +700,7 @@ sub outindex {
     }
 
     # Print out the .IX commands.
-    for (< @output) {
+    for ( @output) {
         my ($type, $entry) = < @$_;
         $entry =~ s/\"/\"\"/g;
         $self->output (".IX $type " . '"' . $entry . '"' . "\n");
@@ -812,7 +812,7 @@ sub devise_title {
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
-        $name = join ('::', (grep { $_ ? $_ : () } < @dirs), $file);
+        $name = join ('::', @( (< grep { $_ ? $_ : () } @( < @dirs)), $file));
     }
     return  @($name, $section);
 }
@@ -852,7 +852,7 @@ sub preamble {
 
     # If name or section contain spaces, quote them (section really never
     # should, but we may as well be cautious).
-    for ($name, $section) {
+    for (@($name, $section)) {
         if (m/\s/) {
             s/\"/\"\"/g;
             $_ = '"' . $_ . '"';
@@ -945,9 +945,9 @@ sub cmd_verbatim {
     # we'll pass to .Vb as its parameter.  This tells *roff to keep that many
     # lines together.  We don't want to tell *roff to keep huge blocks
     # together.
-    my @lines = @( split (m/\n/, $text) );
+    my @lines = @( < split (m/\n/, $text) );
     my $unbroken = 0;
-    for (< @lines) {
+    for ( @lines) {
         last if m/^\s*$/;
         $unbroken++;
     }
@@ -1267,7 +1267,7 @@ sub parse_from_filehandle {
 #
 # This only works in an ASCII world.  What to do in a non-ASCII world is very
 # unclear.
-%ESCAPES{[0xA0 .. 0xFF]} = (
+%ESCAPES{[ <0xA0 .. 0xFF]} = (
     "\\ ", undef, undef, undef,            undef, undef, undef, undef,
     undef, undef, undef, undef,            undef, "\\\%", undef, undef,
 

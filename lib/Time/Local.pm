@@ -5,12 +5,12 @@ use Config;
 use strict;
 use integer;
 
-use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
+use vars < qw( $VERSION @ISA @EXPORT @EXPORT_OK );
 $VERSION   = '1.18_01';
 
-@ISA       = @( qw( Exporter ) );
-@EXPORT    = @( qw( timegm timelocal ) );
-@EXPORT_OK = @( qw( timegm_nocheck timelocal_nocheck ) );
+@ISA       = @( < qw( Exporter ) );
+@EXPORT    = @( < qw( timegm timelocal ) );
+@EXPORT_OK = @( < qw( timegm_nocheck timelocal_nocheck ) );
 
 my @MonthDays = @( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 

@@ -12,7 +12,7 @@ my $pattern = shift ;
 
 my $file ;
 
-foreach $file (< @ARGV) {
+foreach $file ( @ARGV) {
     my $gz = gzopen($file, "rb") 
          or die "Cannot open $file: $gzerrno\n" ;
 

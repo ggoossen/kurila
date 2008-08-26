@@ -21,7 +21,7 @@ BEGIN { use_ok 'Net::hostent' }
 
 # Remind me to add this to Test::More.
 sub DIE {
-    print "# {join ' ', <@_}\n";
+    print "# {join ' ', @( <@_)}\n";
     exit 1;
 }
 
@@ -51,11 +51,11 @@ SKIP: {
     skip "Windows will return the machine name instead of 'localhost'", 2
       if $^O eq 'MSWin32' or $^O eq 'NetWare' or $^O eq 'cygwin';
 
-    print "# name = " . $h->name . ", aliases = " . join (",", < @{$h->aliases}) . "\n";
+    print "# name = " . $h->name . ", aliases = " . join (",", @( < @{$h->aliases})) . "\n";
 
     my $in_alias;
     unless ($h->name =~ m/^localhost(?:\..+)?$/i) {
-        foreach (< @{$h->aliases}) {
+        foreach ( @{$h->aliases}) {
             if (m/^localhost(?:\..+)?$/i) {
                 $in_alias = 1;
                 last;
@@ -68,7 +68,7 @@ SKIP: {
     
     if ($in_alias) {
         # If we found it in the aliases before, expect to find it there again.
-        foreach (< @{$h->aliases}) {
+        foreach ( @{$h->aliases}) {
             if (m/^localhost(?:\..+)?$/i) {
                 # This time, clear the flag if we see "localhost"
                 undef $in_alias;
@@ -82,6 +82,6 @@ SKIP: {
     }
     else {
         ok( !$in_alias );
-        print "# " . $h->name . " " . join (",", < @{$h->aliases}) . "\n";
+        print "# " . $h->name . " " . join (",", @( < @{$h->aliases})) . "\n";
     }
 }

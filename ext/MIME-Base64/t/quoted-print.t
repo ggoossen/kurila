@@ -90,7 +90,7 @@ my $notests = (nelems @tests) + 15;
 print "1..$notests\n";
 
 my $testno = 0;
-for (< @tests) {
+for ( @tests) {
     $testno++;
     my ($plain, $encoded) = < @$_;
     if (ord('A') == 193) {  # EBCDIC 8 bit chars are different
@@ -167,7 +167,7 @@ print "not " unless encode_qp("foo\nbar\r\n", undef, 1) eq "foo=0Abar=0D=0A=\n";
 $testno++; print "ok $testno\n";
 
 use bytes;
-print "not " unless encode_qp(join("", map chr, 0..255), undef, 1) eq <<'EOT'; $testno++; print "ok $testno\n";
+print "not " unless encode_qp(join("", @( < map chr, @( < 0..255))), undef, 1) eq <<'EOT'; $testno++; print "ok $testno\n";
 =00=01=02=03=04=05=06=07=08=09=0A=0B=0C=0D=0E=0F=10=11=12=13=14=15=16=17=18=
 =19=1A=1B=1C=1D=1E=1F !"#$%&'()*+,-./0123456789:;<=3D>?@ABCDEFGHIJKLMNOPQRS=
 TUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=

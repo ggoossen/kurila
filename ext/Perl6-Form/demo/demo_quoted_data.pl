@@ -4,7 +4,7 @@ my $bullet = "<>";
 
 my @items = @( ~< *DATA );
 
-for my $item (< @items) {
+for my $item ( @items) {
 	print < form "\{'\{*\}'\} \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
 		        $bullet,      $item;
 }

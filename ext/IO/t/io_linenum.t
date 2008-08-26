@@ -29,10 +29,10 @@ my $t;
 open (F, "<", $File) or die $!;
 my $io = IO::File->new($File) or die $!;
 
-~< *F for (1 .. 10);
+~< *F for @( ( <1 .. 10));
 ok(lineno($io), "0");
 
-$io->getline for (1 .. 5);
+$io->getline for @( ( <1 .. 5));
 ok(lineno($io), "5");
 
 ~< *F;
@@ -50,10 +50,10 @@ ok(lineno($io), "6");
 select F;
 ok(lineno($io), "6");
 
-~< *F for (1 .. 10);
+~< *F for @( ( <1 .. 10));
 ok(lineno($io), "6");
 
-$io->getline for (1 .. 5);
+$io->getline for @( ( <1 .. 5));
 ok(lineno($io), "11");
 
 $t = tell F;
@@ -63,7 +63,7 @@ $t = tell F;
 ok(lineno($io), "11");
 
 {
-  $io->getline for (1 .. 5);
+  $io->getline for @( ( <1 .. 5));
   ok(lineno($io), "16");
 }
 

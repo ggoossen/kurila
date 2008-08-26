@@ -23,9 +23,9 @@ while( ~< *DATA ) {
     my $returned; { local $/; $returned = ~< *OUT; }
     
     unless( $returned eq $expected ) {
-       print map { s/^/\#/mg; $_; }
-               map {+$_}               # to avoid readonly values
-                   "EXPECTED:\n", $expected, "GOT:\n", $returned;
+       print < map { s/^/\#/mg; $_; }
+ @(               < map {+$_}               # to avoid readonly values
+ @(                   "EXPECTED:\n", $expected, "GOT:\n", $returned));
        print "not ";
     }
     printf "ok \%d\n", ++$test; 

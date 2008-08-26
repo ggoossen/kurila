@@ -60,7 +60,7 @@ else {
 }
 
 chdir 't';
-my $lib = File::Spec->catdir(qw(lib Test Simple sample_tests));
+my $lib = File::Spec->catdir( <qw(lib Test Simple sample_tests));
 while( my($test_name, $exit_codes) = each %Tests ) {
     my($exit_code) = $exit_codes->[$IsVMS ? 1 : 0];
 

@@ -83,7 +83,7 @@ sub DB {
   &save;
   ($DB::package, $DB::filename, $DB::lineno) = caller;
 
-  return if (nelems @skippkg) and grep { $_ eq $DB::package } < @skippkg;
+  return if (nelems @skippkg) and grep { $_ eq $DB::package } @( < @skippkg);
 
   $usrctxt = "package $DB::package;";		# this won't let them modify, alas
   local(*DB::dbline) = "::_<$DB::filename";
@@ -98,7 +98,7 @@ sub DB {
   }
 
   my ($stop, $action);
-  if (($stop,$action) = split(m/\0/,%DB::dbline{$DB::lineno})) {
+  if (($stop,$action) = < split(m/\0/,%DB::dbline{$DB::lineno})) {
     if ($stop eq '1') {
       $DB::signal ^|^= 1;
     }
@@ -121,7 +121,7 @@ sub DB {
     
     &eval if ($evalarg = DB->prestop);
     my $c;
-    for $c (< @clients) {
+    for $c ( @clients) {
       # perform any client-specific prestop actions
       &eval if ($evalarg = $c->cprestop);
       
@@ -164,7 +164,7 @@ sub save {
 }
 
 sub catch {
-  for (< @clients) { $_->awaken; }
+  for ( @clients) { $_->awaken; }
   $DB::signal = 1;
   $ready = 1;
 }
@@ -184,7 +184,7 @@ sub register {
 sub done {
   my $s = shift;
   $s = _clientname($s) if ref($s);
-  @clients = @( grep {$_ ne $s} < @clients );
+  @clients = @( < grep {$_ ne $s} @( < @clients) );
   $s->cleanup;
 #  $running = 3 unless @clients;
   exit(0) unless (nelems @clients);
@@ -245,14 +245,14 @@ sub backtrace {
   $start = 1 unless $start;
   for ($i = $start; ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i); $i++) {
     @a = @( < @DB::args );
-    for (< @a) {
+    for ( @a) {
       s/'/\\'/g;
       s/([^\0]*)/'$1'/ unless m/^-?[\d.]+$/;
       s/([\200-\377])/{sprintf("M-\%c",ord($1)^&^0177)}/g;
       s/([\0-\37\177])/{sprintf("^\%c",ord($1)^^^64)}/g;
     }
     $w = $w ? '@ = ' : '$ = ';
-    $a = $h ? '(' . join(', ', < @a) . ')' : '';
+    $a = $h ? '(' . join(', ', @( < @a)) . ')' : '';
     $e =~ s/\n\s*\;\s*\Z// if $e;
     $e =~ s/[\\\']/\\$1/g if $e;
     if ($r) {
@@ -271,7 +271,7 @@ sub backtrace {
 
 sub _outputall {
   my $c;
-  for $c (< @clients) {
+  for $c ( @clients) {
     $c->output(< @_);
   }
 }
@@ -297,7 +297,7 @@ sub subs {
     }
     return @ret;
   }
-  return @(keys %DB::sub);
+  return @( <keys %DB::sub);
 }
 
 ####
@@ -309,7 +309,7 @@ sub filesubs {
   my $s = shift;
   my $fname = shift;
   $fname = $DB::filename unless $fname;
-  return grep { %DB::sub{$_} =~ m/^$fname/ } keys %DB::sub;
+  return grep { %DB::sub{$_} =~ m/^$fname/ } @( < keys %DB::sub);
 }
 
 ####
@@ -317,8 +317,8 @@ sub filesubs {
 #
 sub files {
   my $s = shift;
-  my(@f) = @( grep(m|^_<|, keys %main::) );
-  return @( map { substr($_,2) } < @f );
+  my(@f) = @( < grep(m|^_<|, @( < keys %main::)) );
+  return @( < map { substr($_,2) } @( < @f) );
 }
 
 ####
@@ -338,7 +338,7 @@ sub loadfile {
   my($file, $line) = < @_;
   if (!defined %main::{'_<' . $file}) {
     my $try;
-    if (($try) = grep(m|^_<.*$file|, keys %main::)) {  
+    if (($try) = < grep(m|^_<.*$file|, @( < keys %main::))) {  
       $file = substr($try,2);
     }
   }
@@ -347,7 +347,7 @@ sub loadfile {
 #    _outputall("Loading file $file..");
     *DB::dbline = "::_<$file";
     $DB::filename = $file;
-    for $c (< @clients) {
+    for $c ( @clients) {
 #      print "2 ", $file, '|', $line, "\n";
       $c->showfile($file, $line);
     }
@@ -364,7 +364,7 @@ sub lineevents {
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
   for ($i = 1; $i +<=( (nelems @DB::dbline)-1); $i++) {
-    %ret{$i} = \@(@DB::dbline[$i], split(m/\0/, %DB::dbline{$i})) 
+    %ret{$i} = \@(@DB::dbline[$i], < split(m/\0/, %DB::dbline{$i})) 
       if defined %DB::dbline{$i};
   }
   return %ret;
@@ -537,7 +537,7 @@ sub output {}
 #
 # client init
 #
-for (< @clients) { $_->init }
+for ( @clients) { $_->init }
 
 %SIG{'INT'} = \&DB::catch;
 

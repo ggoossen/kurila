@@ -110,13 +110,13 @@ European character set.
 #
 # ---
 
-use POSIX qw(strxfrm LC_COLLATE);
+use POSIX < qw(strxfrm LC_COLLATE);
 use warnings::register;
 
 require Exporter;
 
-our @ISA = @( qw(Exporter) );
-our @EXPORT = @( qw(collate_xfrm setlocale LC_COLLATE) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT = @( < qw(collate_xfrm setlocale LC_COLLATE) );
 our @EXPORT_OK = @( qw() );
 
 our($LOCALE, $C);
@@ -173,7 +173,7 @@ sub collate_xfrm {
   my $s = @_[0];
   my $x = '';
   
-  for (split(m/(\000+)/, $s)) {
+  for (@( <split(m/(\000+)/, $s))) {
     $x .= (m/^\000/) ? $_ : strxfrm("$_\000");
   }
 

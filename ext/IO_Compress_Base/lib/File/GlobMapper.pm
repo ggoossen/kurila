@@ -8,7 +8,7 @@ our ($CSH_GLOB);
 
 BEGIN
 {
-        require File::Glob; File::Glob->import( qw(:glob)) ;
+        require File::Glob; File::Glob->import( < qw(:glob)) ;
         $CSH_GLOB = File::Glob::GLOB_CSH() ;
         #*globber = \&File::Glob::bsd_glob;
         *globber = \&File::Glob::csh_glob;
@@ -18,7 +18,7 @@ our ($Error);
 
 our ($VERSION, @EXPORT_OK);
 $VERSION = '0.000_02';
-@EXPORT_OK = @( qw( globmap ) );
+@EXPORT_OK = @( < qw( globmap ) );
 
 
 our ($noPreBS, $metachars, $matchMetaRE, %mapping, %wildCount);
@@ -35,7 +35,7 @@ $matchMetaRE = '[' . quotemeta($metachars) . ']';
                 ')' => ')',
            );
 
-%wildCount = %( map { $_ => 1 } qw/ * ? . { ( [ / );           
+%wildCount = %( < map { $_ => 1 } @( < qw/ * ? . { ( [ /) );           
 
 sub globmap ($$;)
 {
@@ -90,7 +90,7 @@ sub new
 
     #if (whatever)
     {
-        my $missing = grep { ! -e $_ } < @inputFiles ;
+        my $missing = grep { ! -e $_ } @( < @inputFiles) ;
 
         if ($missing)
         {
@@ -321,7 +321,7 @@ sub _getFiles
     my %outInMapping = %( () );
     my %inFiles = %( () ) ;
 
-    foreach my $inFile (< @{ $self->{InputFiles} })
+    foreach my $inFile ( @{ $self->{InputFiles} })
     {
         next if %inFiles{$inFile} ++ ;
 
@@ -356,7 +356,7 @@ sub getHash
 {
     my $self = shift ;
 
-    return \%( map { $_->[0] => $_->[1] } < @{ $self->{Pairs} } ) ;
+    return \%( < map { $_->[0] => $_->[1] } @( < @{ $self->{Pairs} }) ) ;
 }
 
 1;

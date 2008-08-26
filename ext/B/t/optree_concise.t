@@ -131,7 +131,7 @@ EONT_EONT
 checkOptree
     ( name	=> 'cmdline self-strict compile err using prog',
       prog	=> 'sort @a',
-      bcopts	=> \@(qw/ -basic -concise -exec /),
+      bcopts	=> \@( <qw/ -basic -concise -exec /),
       errs	=> 'Global symbol "@a" requires explicit package name at -e line 1.',
       expect	=> 'nextstate',
       expect_nt	=> 'nextstate',
@@ -141,7 +141,7 @@ checkOptree
 #################################
 pass("B::Concise STYLE/CALLBACK TESTS");
 
-use B::Concise qw( walk_output add_style set_style_standard add_callback );
+use B::Concise < qw( walk_output add_style set_style_standard add_callback );
 
 # new relative style, added by set_up_relative_test()
 my @stylespec =
@@ -176,7 +176,7 @@ sub set_up_relative_test {
 	    }
 	    elsif ($style eq 'scope') {
 		# supress printout entirely
-		$$format="" unless grep { $h->{name} eq $_ } < @scopeops;
+		$$format="" unless grep { $h->{name} eq $_ } @( < @scopeops);
 	    }
 	});
 }
@@ -187,7 +187,7 @@ pass("set_up_relative_test, new callback installed");
 
 #################################
 
-@scopeops = @( qw( leavesub enter leave nextstate ) );
+@scopeops = @( < qw( leavesub enter leave nextstate ) );
 add_style
 	( 'scope'  # concise copy
 	  , "#hyphseq2 (*(   (x( ;)x))*)<#classsym> "

@@ -44,7 +44,7 @@ close STDOUT;
 open STDOUT, '>>', \$stdout  or die;
 
 {
-    local %Config{installman3dir} = File::Spec->catdir(qw(t lib));
+    local %Config{installman3dir} = File::Spec->catdir( <qw(t lib));
 
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',

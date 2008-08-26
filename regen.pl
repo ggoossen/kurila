@@ -18,21 +18,21 @@ require 'regen_lib.pl';
 # safer_unlink ("warnings.h", "lib/warnings.pm");
 
 my %gen = %(
-	   'autodoc.pl'  => \@(qw[pod/perlapi.pod pod/perlintern.pod]),
-	   'embed.pl'    => \@(qw[proto.h embed.h embedvar.h global.sym
+	   'autodoc.pl'  => \@( <qw[pod/perlapi.pod pod/perlintern.pod]),
+	   'embed.pl'    => \@( <qw[proto.h embed.h embedvar.h global.sym
 				perlapi.h perlapi.c]),
-	   'keywords.pl' => \@(qw[keywords.h]),
-	   'opcode.pl'   => \@(qw[opcode.h opnames.h pp_proto.h pp.sym]),
-	   'regcomp.pl'  => \@(qw[regnodes.h]),
-	   'warnings.pl' => \@(qw[warnings.h lib/warnings.pm]),
-	   'reentr.pl'   => \@(qw[reentr.c reentr.h]),
-	   'overload.pl' => \@(qw[overload.h]),
+	   'keywords.pl' => \@( <qw[keywords.h]),
+	   'opcode.pl'   => \@( <qw[opcode.h opnames.h pp_proto.h pp.sym]),
+	   'regcomp.pl'  => \@( <qw[regnodes.h]),
+	   'warnings.pl' => \@( <qw[warnings.h lib/warnings.pm]),
+	   'reentr.pl'   => \@( <qw[reentr.c reentr.h]),
+	   'overload.pl' => \@( <qw[overload.h]),
 	   );
 
 sub do_cksum {
     my $pl = shift;
     my %cksum;
-    for my $f (< @{ %gen{$pl} }) {
+    for my $f ( @{ %gen{$pl} }) {
 	local *FH;
 	if (open(FH, "<", $f)) {
 	    local $/;
@@ -45,8 +45,8 @@ sub do_cksum {
     return %cksum;
 }
 
-foreach my $pl (qw (keywords.pl opcode.pl embed.pl
-		    regcomp.pl warnings.pl autodoc.pl reentr.pl)) {
+foreach my $pl (@( <qw (keywords.pl opcode.pl embed.pl
+		    regcomp.pl warnings.pl autodoc.pl reentr.pl))) {
   print "$^X $pl\n";
   my %cksum0;
   %cksum0 = %( < do_cksum($pl) ) unless $pl eq 'warnings.pl'; # the files were removed
@@ -54,11 +54,11 @@ foreach my $pl (qw (keywords.pl opcode.pl embed.pl
   next if $pl eq 'warnings.pl'; # the files were removed
   my %cksum1 = %( < do_cksum($pl) );
   my @chg;
-  for my $f (< @{ %gen{$pl} }) {
+  for my $f ( @{ %gen{$pl} }) {
       push(@chg, $f)
 	  if !defined(%cksum0{$f}) ||
 	     !defined(%cksum1{$f}) ||
 	     %cksum0{$f} ne %cksum1{$f};
   }
-  print "Changed: {join ' ', <@chg}\n" if (nelems @chg);
+  print "Changed: {join ' ', @( <@chg)}\n" if (nelems @chg);
 }

@@ -3,11 +3,11 @@ package ExtUtils::CBuilder::Platform::VMS;
 use strict;
 use ExtUtils::CBuilder::Base;
 
-use vars qw($VERSION @ISA);
+use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( qw(ExtUtils::CBuilder::Base) );
+@ISA = @( < qw(ExtUtils::CBuilder::Base) );
 
-use File::Spec::Functions qw(catfile catdir);
+use File::Spec::Functions < qw(catfile catdir);
 
 # We do prelink, but don't want the parent to redo it.
 
@@ -16,7 +16,7 @@ sub need_prelink { 0 }
 sub arg_defines {
   my ($self, < %args) = < @_;
 
-  s/"/""/g foreach values %args;
+  s/"/""/g foreach @( < values %args);
 
   my @config_defines;
 
@@ -28,10 +28,10 @@ sub arg_defines {
   return '' unless keys(%args) || nelems @config_defines;
 
   return  @('/define=(' 
-          . join(',', 
+          . join(',', @( 
 		 < @config_defines,
-                 map "\"$_" . ( length(%args{$_}) ? "=%args{$_}" : '') . "\"", 
-                     keys %args) 
+                 < map "\"$_" . ( length(%args{$_}) ? "=%args{$_}" : '') . "\"", @( < 
+                     keys %args))) 
           . ')');
 }
 
@@ -44,7 +44,7 @@ sub arg_include_dirs {
   }
   return unless (nelems @dirs);
 
-  return  @('/include=(' . join(',', < @dirs) . ')');
+  return  @('/include=(' . join(',', @( < @dirs)) . ')');
 }
 
 sub _do_link {
@@ -73,7 +73,7 @@ sub _do_link {
     my $optfile = 'sys$disk:[]' . @temp_files[0];
     open my $opt_fh, '>>', $optfile 
         or die "_do_link: Unable to open $optfile: $!";
-    for my $lib (< @optlibs) {print $opt_fh "$lib\n" if length $lib }
+    for my $lib ( @optlibs) {print $opt_fh "$lib\n" if length $lib }
     close $opt_fh;
 
     $objects->[-1] .= ',';
@@ -129,8 +129,8 @@ sub _liblist_ext {
   my(@crtls,$crtlstr);
   @crtls = @( ($self->{'config'}->{'ldflags'} =~ m-/Debug-i ? $self->{'config'}->{'dbgprefix'} : '')
               . 'PerlShr/Share' );
-  push(@crtls, grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'perllibs'});
-  push(@crtls, grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'libc'});
+  push(@crtls, < grep { not m/\(/ } @( < split m/\s+/, $self->{'config'}->{'perllibs'}));
+  push(@crtls, < grep { not m/\(/ } @( < split m/\s+/, $self->{'config'}->{'libc'}));
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -138,7 +138,7 @@ sub _liblist_ext {
   # which a system-wide logical may point.
   if ($self->perl_src) {
     my($lib,$locspec,$type);
-    foreach $lib (< @crtls) { 
+    foreach $lib ( @crtls) { 
       if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= $self->{'config'}->{'exe_ext'}; }
         elsif (lc $type eq '/library') { $locspec .= $self->{'config'}->{'lib_ext'}; }
@@ -148,7 +148,7 @@ sub _liblist_ext {
       }
     }
   }
-  $crtlstr = (nelems @crtls) ? join(' ',< @crtls) : '';
+  $crtlstr = (nelems @crtls) ? join(' ', @(< @crtls)) : '';
 
   unless ($potential_libs) {
     warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose;
@@ -172,19 +172,19 @@ sub _liblist_ext {
   warn "Potential libraries are '$potential_libs'\n" if $verbose;
 
   # First, sort out directories and library names in the input
-  foreach $lib (split ' ',$potential_libs) {
+  foreach $lib (@( <split ' ',$potential_libs)) {
     push(@dirs,$1),   next if $lib =~ m/^-L(.*)/;
     push(@dirs,$lib), next if $lib =~ m/[:>\]]$/;
     push(@dirs,$lib), next if -d $lib;
     push(@libs,$1),   next if $lib =~ m/^-l(.*)/;
     push(@libs,$lib);
   }
-  push(@dirs,split(' ',$self->{'config'}->{'libpth'}));
+  push(@dirs, <split(' ',$self->{'config'}->{'libpth'}));
 
   # Now make sure we've got VMS-syntax absolute directory specs
   # (We don't, however, check whether someone's hidden a relative
   # path in a logical name.)
-  foreach $dir (< @dirs) {
+  foreach $dir ( @dirs) {
     unless (-d $dir) {
       warn "Skipping nonexistent Directory $dir\n" if $verbose +> 1;
       $dir = '';
@@ -195,10 +195,10 @@ sub _liblist_ext {
         $dir = catdir($cwd,$dir); 
     }
   }
-  @dirs = @( grep { length($_) } < @dirs );
+  @dirs = @( < grep { length($_) } @( < @dirs) );
   unshift(@dirs,''); # Check each $lib without additions first
 
-  LIB: foreach $lib (< @libs) {
+  LIB: foreach $lib ( @libs) {
     if (exists %libmap{$lib}) {
       next unless length %libmap{$lib};
       $lib = %libmap{$lib};
@@ -217,10 +217,10 @@ sub _liblist_ext {
     }
     push(@variants,$lib);
     warn "Looking for $lib\n" if $verbose;
-    foreach $variant (< @variants) {
+    foreach $variant ( @variants) {
       my($fullname, $name);
 
-      foreach $dir (< @dirs) {
+      foreach $dir ( @dirs) {
         my($type);
 
         $name = "$dir$variant";
@@ -282,9 +282,9 @@ sub _liblist_ext {
   }
 
   push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
-  push @fndlibs, map { "$_/Library" } < @{%found{OLB}} if exists %found{OLB};
-  push @fndlibs, map { "$_/Share"   } < @{%found{SHR}} if exists %found{SHR};
-  $lib = join(' ',< @fndlibs);
+  push @fndlibs, < map { "$_/Library" } @( < @{%found{OLB}}) if exists %found{OLB};
+  push @fndlibs, < map { "$_/Share"   } @( < @{%found{SHR}}) if exists %found{SHR};
+  $lib = join(' ', @(< @fndlibs));
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;

@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::Recurs;
 
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 require Exporter;
-our @EXPORT = @( qw(setup_recurs teardown_recurs) );
+our @EXPORT = @( < qw(setup_recurs teardown_recurs) );
 
 use strict;
 use File::Path;
@@ -43,7 +43,7 @@ sub setup_recurs {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;
@@ -56,7 +56,7 @@ sub setup_recurs {
 }
 
 sub teardown_recurs { 
-    foreach my $file (keys %Files) {
+    foreach my $file (@( <keys %Files)) {
         my $dir = dirname($file);
         if( -e $dir ) {
             rmtree($dir) || return;

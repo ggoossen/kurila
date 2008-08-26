@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
+        @INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
     }
 }
 
@@ -19,7 +19,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use Unicode::Normalize qw(:all);
+use Unicode::Normalize < qw(:all);
 print "1..24\n";
 
 print "ok 1\n";

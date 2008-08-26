@@ -65,7 +65,7 @@ SKIP: {
 ok($sec != $xsec && $mday && $year,             'gmtime() list context');
 
 my $day_diff = $localyday - $yday;
-ok( grep({ $day_diff == $_ } (0, 1, -1, 364, 365, -364, -365)),
+ok( grep({ $day_diff == $_ } @( (0, 1, -1, 364, 365, -364, -365))),
                      'gmtime() and localtime() agree what day of year');
 
 

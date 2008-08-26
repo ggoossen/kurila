@@ -13,13 +13,13 @@ use Test::More;
 plan(tests => 69);
 
 use Math::Trig v1.16;
-use Math::Trig v1.16 qw(:pi);
+use Math::Trig v1.16 < qw(:pi);
 
 my $pip2 = pi / 2;
 
 use strict;
 
-use vars qw($x $y $z);
+use vars < qw($x $y $z);
 
 my $eps = 1e-11;
 
@@ -249,7 +249,7 @@ local %SIG{FPE} = \%( );
 
 print "# great_circle_distance with small angles\n";
 
-for my $e (qw(1e-2 1e-3 1e-4 1e-5)) {
+for my $e (@( <qw(1e-2 1e-3 1e-4 1e-5))) {
     # Can't assume == 0 because of floating point fuzz,
     # but let's hope for at least +< $e.
     cmp_ok(great_circle_distance(0, $e, 0, $e), '+<', $e);

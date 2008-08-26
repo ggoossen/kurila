@@ -12,7 +12,7 @@ for my $i (1..2000) {
 }
 
 if (opendir(OP, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
-our @D = @( grep(m/^[^\.].*\.t$/i, readdir(OP)) );
+our @D = @( < grep(m/^[^\.].*\.t$/i, @( readdir(OP))) );
 closedir(OP);
 
 open my $man, "<", "../MANIFEST" or die "Can't open ../MANIFEST: $!";
@@ -27,13 +27,13 @@ else {
       scalar nelems @D;
 }
 
-our @R = @( sort < @D );
-our @G = @( sort < glob("op/*.t") );
-@G = @( sort < glob(":op:*.t") ) if $^O eq 'MacOS';
+our @R = @( < sort @( < @D) );
+our @G = @( < sort @( < glob("op/*.t")) );
+@G = @( < sort @( < glob(":op:*.t")) ) if $^O eq 'MacOS';
 if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
-    @G = @( grep(s#.*\](\w+\.t).*#op/$1#i,glob( <"op/*.t")) );
+    @G = @( < grep(s#.*\](\w+\.t).*#op/$1#i, @(glob( <"op/*.t"))) );
 }
 while ((nelems @R) && nelems @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
 	shift(@R);

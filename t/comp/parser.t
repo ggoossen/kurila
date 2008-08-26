@@ -77,7 +77,7 @@ is( $@, '', 'PL_lex_brackstack' );
     is("{$a}\{", "A\{", "interpolation, qq//");
     is("{$a}[", "A[", "interpolation, qq//");
     my @b=@("B");
-    is("{join ' ', < @b}\{", "B\{", "interpolation, qq//");
+    is("{join ' ', @( < @b)}\{", "B\{", "interpolation, qq//");
     is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
     $c =~ m/$a(?:){/p;
@@ -87,7 +87,7 @@ is( $@, '', 'PL_lex_brackstack' );
     $c =~ s/foo/{$a}\{/;
     is($c, 'A{', "interpolation, s//.../");
     is(<<"{$a}{", "A\{ A[ B\{\n", "interpolation, here doc");
-{$a}\{ {$a}[ {join ' ', < @b}\{
+{$a}\{ {$a}[ {join ' ', @( < @b)}\{
 {$a}{
 }
 

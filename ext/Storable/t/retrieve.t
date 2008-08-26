@@ -23,7 +23,7 @@ sub BEGIN {
 }
 
 
-use Storable qw(store retrieve nstore);
+use Storable < qw(store retrieve nstore);
 
 print "1..14\n";
 

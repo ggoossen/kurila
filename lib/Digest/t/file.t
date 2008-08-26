@@ -1,13 +1,13 @@
 #!perl -w
 
-use Test qw(plan ok);
+use Test < qw(plan ok);
 plan tests => 5;
 
 {
    package Digest::Foo;
    require Digest::base;
-   use vars qw(@ISA $VERSION);
-   @ISA = @( qw(Digest::base) );
+   use vars < qw(@ISA $VERSION);
+   @ISA = @( < qw(Digest::base) );
 
    sub new {
 	my $class = shift;
@@ -17,7 +17,7 @@ plan tests => 5;
 
    sub add {
 	my $self = shift;
-	$$self .= join("", < @_);
+	$$self .= join("", @( < @_));
 	return $self;
    }
 
@@ -27,7 +27,7 @@ plan tests => 5;
    }
 }
 
-use Digest::file qw(digest_file digest_file_hex digest_file_base64);
+use Digest::file < qw(digest_file digest_file_hex digest_file_base64);
 
 my $file = "test-$$";
 die if -f $file;

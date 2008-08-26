@@ -5,17 +5,17 @@ use FileHandle;
 use File::Copy;
 use File::Spec;
 use File::Spec::Unix;
-use File::Basename              qw[dirname];
+use File::Basename <              qw[dirname];
 
-use Cwd                         qw[cwd];
-use Carp                        qw[carp];
-use IPC::Cmd                    qw[can_run run];
-use File::Path                  qw[mkpath];
-use Params::Check               qw[check];
-use Module::Load::Conditional   qw[can_load];
+use Cwd <                         qw[cwd];
+use Carp <                        qw[carp];
+use IPC::Cmd <                    qw[can_run run];
+use File::Path <                  qw[mkpath];
+use Params::Check <               qw[check];
+use Module::Load::Conditional <   qw[can_load];
 use Locale::Maketext::Simple    Style => 'gettext';
 
-use vars    qw[ $VERBOSE $PREFER_BIN $FROM_EMAIL $USER_AGENT
+use vars <    qw[ $VERBOSE $PREFER_BIN $FROM_EMAIL $USER_AGENT
                 $BLACKLIST $METHOD_FAIL $VERSION $METHODS
                 $FTP_PASSIVE $TIMEOUT $DEBUG $WARN
             ];
@@ -28,7 +28,7 @@ $VERSION        = eval $VERSION;    # avoid warnings with development releases
 $PREFER_BIN     = 0;                # XXX TODO implement
 $FROM_EMAIL     = 'File-Fetch@example.com';
 $USER_AGENT     = 'File::Fetch/$VERSION';
-$BLACKLIST      = \@(qw|ftp|);
+$BLACKLIST      = \@( <qw|ftp|);
 $METHOD_FAIL    = \%( );
 $FTP_PASSIVE    = 1;
 $TIMEOUT        = 0;
@@ -37,10 +37,10 @@ $WARN           = 1;
 
 ### methods available to fetch the file depending on the scheme
 $METHODS = \%(
-    http    => \@( qw|lwp wget curl lynx| ),
-    ftp     => \@( qw|lwp netftp wget curl ncftp ftp| ),
-    file    => \@( qw|lwp file| ),
-    rsync   => \@( qw|rsync| )
+    http    => \@( < qw|lwp wget curl lynx| ),
+    ftp     => \@( < qw|lwp netftp wget curl ncftp ftp| ),
+    file    => \@( < qw|lwp file| ),
+    rsync   => \@( < qw|rsync| )
 );
 
 ### silly warnings ###
@@ -155,7 +155,7 @@ result of $ff->output_file will be used.
         _error_msg_long => \%( no_override => 1 ),
     );
     
-    for my $method ( keys %$Tmpl ) {
+    for my $method (@( < keys %$Tmpl) ) {
         no strict 'refs';
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
@@ -177,7 +177,7 @@ result of $ff->output_file will be used.
                 "Hostname required when fetching from '\%1'", <$args->scheme));
         }
         
-        for (qw[path file]) {
+        for (@( <qw[path file])) {
             unless( $args->?$_ ) {
                 return File::Fetch->_error( <loc("No '\%1' specified",$_));
             }
@@ -335,7 +335,7 @@ sub _parse_uri {
     ### http://en.wikipedia.org/wiki/File://
     if( $href->{scheme} eq 'file' ) {
         
-        my @parts = @( split '/',$uri );
+        my @parts = @( < split '/',$uri );
 
         ### file://hostname/...
         ### file://hostname/...
@@ -370,12 +370,12 @@ sub _parse_uri {
         } 
 
         ### rebuild the path from the leftover parts;
-        $href->{path} = join '/', '', splice( @parts, $index, ((nelems @parts)-1) );
+        $href->{path} = join '/', @( '', splice( @parts, $index, ((nelems @parts)-1) ));
 
     } else {
         ### using anything but qw() in hash slices may produce warnings 
         ### in older perls :-(
-        %{$href}{[qw(host path) ]} = $uri =~ m|([^/]*)(/.*)$|s;
+        %{$href}{[ <qw(host path) ]} = $uri =~ m|([^/]*)(/.*)$|s;
     }
 
     ### split the path into file + dir ###
@@ -428,7 +428,7 @@ sub fetch {
     my $out_to = ON_WIN ? $to.'/'.$self->output_file 
                         : File::Spec->catfile( $to, < $self->output_file );
     
-    for my $method ( < @{ $METHODS->{$self->scheme} } ) {
+    for my $method (  @{ $METHODS->{$self->scheme} } ) {
         my $sub =  '_'.$method.'_fetch';
 
         unless( __PACKAGE__->can($sub) ) {
@@ -438,7 +438,7 @@ sub fetch {
         }
 
         ### method is blacklisted ###
-        next if grep { lc $_ eq $method } < @$BLACKLIST;
+        next if grep { lc $_ eq $method } @( < @$BLACKLIST);
 
         ### method is known to fail ###
         next if $METHOD_FAIL->{$method};
@@ -679,7 +679,7 @@ sub _ftp_fetch {
             "quit",
         );
 
-        foreach (< @dialog) { $fh->print($_, "\n") }
+        foreach ( @dialog) { $fh->print($_, "\n") }
         $fh->close or return;
 
         return $to;
@@ -902,7 +902,7 @@ sub _file_fetch {
     }
     
     if( $vol ) {
-        $path   = File::Spec->catdir( split m/\//, $path );
+        $path   = File::Spec->catdir( < split m/\//, $path );
         $remote = File::Spec->catpath( $vol, $path, < $self->file);
 
     } elsif( $share ) {
@@ -958,7 +958,7 @@ sub _rsync_fetch {
         ) {
 
             return $self->_error( <loc("Command \%1 failed: \%2", 
-                "{join ' ', <@$cmd}" || '', $captured || ''));
+                "{join ' ', @( <@$cmd)}" || '', $captured || ''));
         }
 
         return $to;

@@ -18,7 +18,7 @@ sub D::d {"D::d"}
 
 # First, some basic checks of method-calling syntax:
 my $obj = bless \@(), "Pack";
-sub Pack::method { shift; join(",", "method", < @_) }
+sub Pack::method { shift; join(",", @( "method", < @_)) }
 my $mname = "method";
 
 is(Pack->method("a","b","c"), "method,a,b,c");
@@ -49,7 +49,7 @@ is( A->d, "C::d");		# Update hash table;
 is(A->d, "D::d");		# Update hash table;
 
 {
-    local @A::ISA = @( qw(C) );	# Update hash table with split() assignment
+    local @A::ISA = @( < qw(C) );	# Update hash table with split() assignment
     is(A->d, "C::d");
     @A::ISA = @( 0 );
     is(try { A->d } || "fail", "fail");
@@ -176,11 +176,11 @@ sub test {
     push @main::X, 'Amajor', < @_;
 }
 package Bminor;
-use base qw(Amajor);
+use base < qw(Amajor);
 package main;
 sub Bminor::test {
     @_[0]->Bminor::SUPER::test('x', 'y');
     push @main::X, 'Bminor', < @_;
 }
 Bminor->test('y', 'z');
-is("{join ' ', <@X}", "Amajor Bminor x y Bminor Bminor y z");
+is("{join ' ', @( <@X)}", "Amajor Bminor x y Bminor Bminor y z");

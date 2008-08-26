@@ -29,7 +29,7 @@ $^W = 0;
 
 print "1..4\n";
 
-use Storable qw(dclone);
+use Storable < qw(dclone);
 
 my $h_fetches = 0;
 

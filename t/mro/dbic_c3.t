@@ -16,7 +16,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
 
 {
     package xx::DBIx::Class::Core; use mro 'c3';
-    our @ISA = @( qw/
+    our @ISA = @( < qw/
       xx::DBIx::Class::Serialize::Storable
       xx::DBIx::Class::InflateColumn
       xx::DBIx::Class::Relationship
@@ -28,19 +28,19 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
     / );
 
     package xx::DBIx::Class::InflateColumn; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class::Row / );
+    our @ISA = @( < qw/ xx::DBIx::Class::Row / );
 
     package xx::DBIx::Class::Row; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class / );
+    our @ISA = @( < qw/ xx::DBIx::Class / );
 
     package xx::DBIx::Class; use mro 'c3';
-    our @ISA = @( qw/
+    our @ISA = @( < qw/
       xx::DBIx::Class::Componentised
       xx::Class::Data::Accessor
     / );
 
     package xx::DBIx::Class::Relationship; use mro 'c3';
-    our @ISA = @( qw/
+    our @ISA = @( < qw/
       xx::DBIx::Class::Relationship::Helpers
       xx::DBIx::Class::Relationship::Accessor
       xx::DBIx::Class::Relationship::CascadeActions
@@ -50,7 +50,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
     / );
 
     package xx::DBIx::Class::Relationship::Helpers; use mro 'c3';
-    our @ISA = @( qw/
+    our @ISA = @( < qw/
       xx::DBIx::Class::Relationship::HasMany
       xx::DBIx::Class::Relationship::HasOne
       xx::DBIx::Class::Relationship::BelongsTo
@@ -58,25 +58,25 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
     / );
 
     package xx::DBIx::Class::Relationship::ProxyMethods; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class / );
+    our @ISA = @( < qw/ xx::DBIx::Class / );
 
     package xx::DBIx::Class::Relationship::Base; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class / );
+    our @ISA = @( < qw/ xx::DBIx::Class / );
 
     package xx::DBIx::Class::PK::Auto; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class / );
+    our @ISA = @( < qw/ xx::DBIx::Class / );
 
     package xx::DBIx::Class::PK; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class::Row / );
+    our @ISA = @( < qw/ xx::DBIx::Class::Row / );
 
     package xx::DBIx::Class::ResultSourceProxy::Table; use mro 'c3';
-    our @ISA = @( qw/
+    our @ISA = @( < qw/
       xx::DBIx::Class::AccessorGroup
       xx::DBIx::Class::ResultSourceProxy
     / );
 
     package xx::DBIx::Class::ResultSourceProxy; use mro 'c3';
-    our @ISA = @( qw/ xx::DBIx::Class / );
+    our @ISA = @( < qw/ xx::DBIx::Class / );
 
     package xx::Class::Data::Accessor; our @ISA = @( () ); use mro 'c3';
     package xx::DBIx::Class::Relationship::HasMany; our @ISA = @( () ); use mro 'c3';
@@ -92,7 +92,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
 
 ok(eq_array(
     mro::get_linear_isa('xx::DBIx::Class::Core'),
-    \@(qw/
+    \@( <qw/
         xx::DBIx::Class::Core
         xx::DBIx::Class::Serialize::Storable
         xx::DBIx::Class::InflateColumn

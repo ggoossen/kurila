@@ -16,7 +16,7 @@ my $Is_VMS   = $^O eq 'VMS';
 
 # first check for stupid permissions second for full, so we clean up
 # behind ourselves
-for my $perm (0111,0777) {
+for my $perm (@(0111,0777)) {
     my $path = catdir(curdir(), "mhx", "bar");
     mkpath($path);
     chmod $perm, "mhx", $path;
@@ -38,10 +38,10 @@ my $tmp_base = catdir(
 
 # invent some names
 my @dir = @(
-    catdir($tmp_base, qw(a b)),
-    catdir($tmp_base, qw(a c)),
-    catdir($tmp_base, qw(z b)),
-    catdir($tmp_base, qw(z c)),
+    catdir($tmp_base, < qw(a b)),
+    catdir($tmp_base, < qw(a c)),
+    catdir($tmp_base, < qw(z b)),
+    catdir($tmp_base, < qw(z c)),
 );
 
 # create them
@@ -52,7 +52,7 @@ is(scalar(nelems @created), 7, "created list of directories");
 # pray for no race conditions blowing them out from under us
 @created = @( < mkpath(\@($tmp_base)) );
 is(scalar(nelems @created), 0, "skipped making existing directory")
-    or diag("unexpectedly recreated {join ' ', <@created}");
+    or diag("unexpectedly recreated {join ' ', @( <@created)}");
 
 @created = @( < mkpath('') );
 is(scalar(nelems @created), 0, "Can't create a directory named ''");
@@ -80,7 +80,7 @@ is( scalar(nelems @$error), 0, 'no diagnostic captured' );
 
 @created = @( < mkpath($tmp_base, 0) );
 is(scalar(nelems @created), 0, "skipped making existing directories (old style 1)")
-    or diag("unexpectedly recreated {join ' ', <@created}");
+    or diag("unexpectedly recreated {join ' ', @( <@created)}");
 
 $dir = catdir($tmp_base,'C');
 # mkpath returns unix syntax filespecs on VMS
@@ -91,7 +91,7 @@ is(@created[0], $dir, "created directory (new style 1) cross-check");
 
 @created = @( < mkpath($tmp_base, 0, 0700) );
 is(scalar(nelems @created), 0, "skipped making existing directories (old style 2)")
-    or diag("unexpectedly recreated {join ' ', <@created}");
+    or diag("unexpectedly recreated {join ' ', @( <@created)}");
 
 $dir2 = catdir($tmp_base,'D');
 # mkpath returns unix syntax filespecs on VMS
@@ -133,7 +133,7 @@ rmtree( $dir, $dir2,
 
 is(scalar(nelems @$error), 0, "no errors unlinking a and z");
 is(scalar(nelems @$list),  4, "list contains 4 elements")
-    or diag("{join ' ', <@$list}");
+    or diag("{join ' ', @( <@$list)}");
 
 ok(-d $dir,  "dir a still exists");
 ok(-d $dir2, "dir z still exists");
@@ -221,7 +221,7 @@ SKIP: {
         or diag(< @created);
 }
 
-my $extra =  catdir(curdir(), qw(EXTRA 1 a));
+my $extra =  catdir(curdir(), < qw(EXTRA 1 a));
 
 SKIP: {
     skip "extra scenarios not set up, see eg/setup-extra-tests", 14
@@ -273,7 +273,7 @@ SKIP: {
     is(scalar(nelems @created), 1, "create a ZZ directory");
 
     local @ARGV = @($dir);
-    rmtree( \@(grep -e $_, < @ARGV), 0, 0 );
+    rmtree( \@(< grep -e $_, @( < @ARGV)), 0, 0 );
     ok(!-e $dir, "blow it away via \@ARGV");
 }
 
@@ -387,14 +387,14 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
 
 SKIP: {
     skip "extra scenarios not set up, see eg/setup-extra-tests", 11
-        unless -d catdir(qw(EXTRA 1));
+        unless -d catdir( <qw(EXTRA 1));
 
     rmtree 'EXTRA', \%(safe => 0, error => \$error);
     is( scalar(nelems @$error), 11, 'seven deadly sins' ); # well there used to be 7
 
     rmtree 'EXTRA', \%(safe => 1, error => \$error);
     is( scalar(nelems @$error), 9, 'safe is better' );
-    for (< @$error) {
+    for ( @$error) {
         ($file, $message) = each %$_;
         if ($file =~  m/[123]\z/) {
             is(index($message, 'cannot remove directory: '), 0, "failed to remove $file with rmdir")

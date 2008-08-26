@@ -10,7 +10,7 @@
 
 package Pod::InputObjects;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = 1.30;  ## Current version of this package
 
 #############################################################################
@@ -520,7 +520,7 @@ sub cmd_name {
 sub _set_child2parent_links {
    my ($self, < @children) = < @_;
    ## Make sure any sequences know who their parent is
-   for (< @children) {
+   for ( @children) {
       next  unless (ref  and  ref ne 'SCALAR');
       if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
           UNIVERSAL::can($_, 'nested'))
@@ -536,7 +536,7 @@ sub _unset_child2parent_links {
    my $self = shift;
    $self->{'-parent_sequence'} = undef;
    my $ptree = $self->{'-ptree'};
-   for (< @$ptree) {
+   for ( @$ptree) {
       next  unless (ref  and  ref ne 'SCALAR');
       $_->_unset_child2parent_links()
           if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
@@ -613,7 +613,7 @@ exactly as it appeared in the input.
 sub raw_text {
    my $self = shift;
    my $text = $self->{'-name'} . $self->{'-ldelim'};
-   for ( < $self->{'-ptree'}->children ) {
+   for (  $self->{'-ptree'}->children ) {
       $text .= (ref $_) ? $_->raw_text : $_;
    }
    $text .= $self->{'-rdelim'};
@@ -824,12 +824,12 @@ the current one.
 
 =cut
 
-use vars qw(@ptree);  ## an alias used for performance reasons
+use vars < qw(@ptree);  ## an alias used for performance reasons
 
 sub prepend {
    my $self = shift;
    local *ptree = $self;
-   for (< @_) {
+   for ( @_) {
       next  unless length;
       if ((nelems @ptree)  and  !(ref @ptree[0])  and  !(ref $_)) {
          @ptree[0] = $_ . @ptree[0];
@@ -856,7 +856,7 @@ sub append {
    my $self = shift;
    local *ptree = $self;
    my $can_append = (nelems @ptree) && !(ref @ptree[-1]);
-   for (< @_) {
+   for ( @_) {
       if (ref) {
          push @ptree, $_;
       }
@@ -884,7 +884,7 @@ exactly as it appeared in the input.
 sub raw_text {
    my $self = shift;
    my $text = "";
-   for ( < @$self ) {
+   for (  @$self ) {
       $text .= (ref $_) ? $_->raw_text : $_;
    }
    return $text;
@@ -897,7 +897,7 @@ sub raw_text {
 sub _unset_child2parent_links {
    my $self = shift;
    local *ptree = $self;
-   for (< @ptree) {
+   for ( @ptree) {
        next  unless (defined and  ref  and  ref ne 'SCALAR');
        $_->_unset_child2parent_links()
            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');

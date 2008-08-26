@@ -2,7 +2,7 @@ package O;
 
 our $VERSION = '1.00';
 
-use B qw(minus_c save_BEGINs);
+use B < qw(minus_c save_BEGINs);
 use Carp;
 
 sub import {

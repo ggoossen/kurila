@@ -8,7 +8,7 @@ use warnings;
 # then we run nroff (or whatever) on it, and then page thru the
 # (plaintext) output of THAT!
 
-use base qw(Pod::Perldoc::BaseTo);
+use base < qw(Pod::Perldoc::BaseTo);
 sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'txt' }
@@ -31,7 +31,7 @@ sub section         { shift->_perldoc_elem('section'        , < @_) }
 
 sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
-use File::Spec::Functions qw(catfile);
+use File::Spec::Functions < qw(catfile);
 
 sub parse_from_file {
   my $self = shift;
@@ -40,10 +40,10 @@ sub parse_from_file {
   my $render = $self->{'__nroffer'} || die "no nroffer set!?";
   
   # turn the switches into CLIs
-  my $switches = join ' ',
-    map qq{"--$_=$self->{$_}"},
-      grep !m/^_/s,
-        keys %$self
+  my $switches = join ' ', @(
+    < map qq{"--$_=$self->{$_}"}, @(
+      < grep !m/^_/s, @( <
+        keys %$self)))
   ;
 
   my $pod2man =
@@ -123,13 +123,13 @@ sub parse_from_file {
 
 sub ___Do_filter_nroff {
   my $self = shift;
-  my @data = @( split m/\n{2,}/, shift );
+  my @data = @( < split m/\n{2,}/, shift );
   
   shift @data while (nelems @data) and @data[0] !~ m/\S/; # Go to header
   shift @data if (nelems @data) and @data[0] =~ m/Contributed\s+Perl/; # Skip header
   pop @data if (nelems @data) and @data[-1] =~ m/^\w/; # Skip footer, like
 				# 28/Jan/99 perl 5.005, patch 53 1
-  join "\n\n", < @data;
+  join "\n\n", @( < @data);
 }
 
 1;

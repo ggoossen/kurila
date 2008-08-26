@@ -3,7 +3,7 @@
 # Tests the scoping of $^H and %^H
 
 BEGIN {
-    push @INC, qw(.);
+    push @INC, < qw(.);
 }
 
 

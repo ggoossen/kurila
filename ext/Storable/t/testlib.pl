@@ -7,7 +7,7 @@ die "Temporary file '$file' already exists" if -e $file;
 
 END { while (-f $file) {unlink $file or die "Can't unlink '$file': $!" }}
 
-use Storable qw (store retrieve freeze thaw nstore nfreeze);
+use Storable < qw (store retrieve freeze thaw nstore nfreeze);
 
 sub slurp {
   my $file = shift;

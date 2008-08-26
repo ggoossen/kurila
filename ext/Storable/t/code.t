@@ -14,12 +14,12 @@ use File::Spec v0.8;
 plan skip_all => "Fix B::Deparse to produce valid code";
 plan tests => 59;
 
-use Storable qw(retrieve store nstore freeze nfreeze thaw dclone);
+use Storable < qw(retrieve store nstore freeze nfreeze thaw dclone);
 use Safe;
 
 #$Storable::DEBUGME = 1;
 
-use vars qw($freezed $thawed @obj @res $blessed_code);
+use vars < qw($freezed $thawed @obj @res $blessed_code);
 
 $blessed_code = bless sub { "blessed" }, "Some::Package";
 { package Another::Package; sub foo { __PACKAGE__ } }
@@ -216,7 +216,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 {
     my $safe = Safe->new();
     # because of opcodes used in "use strict":
-    $safe->permit(qw(:default require caller));
+    $safe->permit( <qw(:default require caller));
     local $Storable::Eval = sub { $safe->reval(shift) };
 
     $freezed = freeze @obj[0]->[1];
@@ -247,7 +247,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     ok($@, "");
 
     if ($@ ne "") {
-        ok(0) for (1..5);
+        ok(0) for @( ( <1..5));
     } else {
 	ok($thawed->[0]->(), "JAPH");
 	ok($thawed->[1]->(), 42);
@@ -268,7 +268,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     local $Storable::Deparse = 1;
     local $Storable::Eval    = 1;
 
-    for my $sub ($short_sub, $long_sub) {
+    for my $sub (@($short_sub, $long_sub)) {
 	my $res;
 
 	$res = thaw < freeze \@($sub, $sub);

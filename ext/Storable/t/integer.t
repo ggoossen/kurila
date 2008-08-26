@@ -15,7 +15,7 @@
 use Config;
 
 use Test::More;
-use Storable qw (dclone store retrieve freeze thaw nstore nfreeze);
+use Storable < qw (dclone store retrieve freeze thaw nstore nfreeze);
 use strict;
 
 my $max_uv = ^~^0;
@@ -107,9 +107,9 @@ sub nstore_and_retrieve {
   return $copy;
 }
 
-foreach (< @processes) {
+foreach ( @processes) {
   my ($process, $sub) = < @$_;
-  foreach my $number (< @numbers) {
+  foreach my $number ( @numbers) {
     # as $number is an alias into @numbers, we don't want any side effects of
     # conversion macros affecting later runs, so pass a copy to Storable:
     my $copy1 = my $copy2 = my $copy0 = $number;

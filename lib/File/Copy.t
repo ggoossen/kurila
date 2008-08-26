@@ -16,8 +16,8 @@ use File::Copy;
 use Config;
 
 
-foreach my $code ("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
-                  "move()", "move('arg')", "move('arg', 'arg', 'arg')"
+foreach my $code (@("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
+                  "move()", "move('arg')", "move('arg', 'arg', 'arg')")
                  )
 {
     eval $code;

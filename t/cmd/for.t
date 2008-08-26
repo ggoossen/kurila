@@ -11,9 +11,9 @@ for ($i = 0; $i +<= 10; $i++) {
 }
 $y = @x[10];
 print "#1	:$y: eq :10:\n";
-$y = join(' ', < @x);
+$y = join(' ', @( < @x));
 print "#1	:$y: eq :0 1 2 3 4 5 6 7 8 9 10:\n";
-if (join(' ', < @x) eq '0 1 2 3 4 5 6 7 8 9 10') {
+if (join(' ', @( < @x)) eq '0 1 2 3 4 5 6 7 8 9 10') {
 	print "ok 1\n";
 } else {
 	print "not ok 1\n";
@@ -28,12 +28,12 @@ if ($c == 12) {print "ok 2\n";} else {print "not ok 2\n";}
 
 $foo = 3210;
 @ary = @(1,2,3,4,5);
-foreach $foo (< @ary) {
+foreach $foo ( @ary) {
 	$foo *= 2;
 }
-if (join('',< @ary) eq '246810') {print "ok 3\n";} else {print "not ok 3\n";}
+if (join('', @(< @ary)) eq '246810') {print "ok 3\n";} else {print "not ok 3\n";}
 
-for (< @ary) {
+for ( @ary) {
     s/(.*)/ok $1\n/;
 }
 
@@ -41,12 +41,12 @@ print @ary[1];
 
 # test for internal scratch array generation
 # this also tests that $foo was restored to 3210 after test 3
-for (split(' ','a b c d e')) {
+for (@( <split(' ','a b c d e'))) {
 	$foo .= $_;
 }
 if ($foo eq '3210abcde') {print "ok 5\n";} else {print "not ok 5 $foo\n";}
 
-foreach $foo (("ok 6\n","ok 7\n")) {
+foreach $foo (@(("ok 6\n","ok 7\n"))) {
 	print $foo;
 }
 
@@ -65,14 +65,14 @@ sub bar {
 }
 
 our $a = 0;
-foreach $b ( <bar()) {
+foreach $b ( bar()) {
     $a += $b;
 }
 print $a == 7 ? "ok" : "not ok", " 11\n";
 
 # loop over expand on empty list
 sub baz { return () }
-for ( < baz() ) {
+for (  baz() ) {
     print "not ";
 }
 print "ok 12\n";
@@ -85,7 +85,7 @@ print $loop_count == 4 ? "ok" : "not ok", " 13\n";
 
 # modifying arrays in loops is a no-no
 our @a = @(3,4);
-try { @a = @( () ) for (1,2,< @a) };
+try { @a = @( () ) for @( (1,2,< @a)) };
 print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok", " 14\n";
 
 # [perl #30061] double destory when same iterator variable (eg $_) used in
@@ -97,12 +97,12 @@ print $@->{description} =~ m/Use of freed value in iteration/ ? "ok" : "not ok",
     sub X::DESTROY {
 	my $o = shift;
 	$x++;
-	1 for (1);
+	1 for @( (1));
     }
 
     my %h;
     %h{foo} = bless \@(), 'X';
-    delete %h{foo} for %h{foo}, 1;
+    delete %h{foo} for @( %h{foo}, 1);
     print $x == 1 ? "ok" : "not ok", " 15 - double destroy, x=$x\n";
 }
 
@@ -121,22 +121,22 @@ sub is {
 }
 
 @array = @('A', 'B', 'C');
-for (< @array) {
+for ( @array) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array');
 $r = '';
-for (1,2,3) {
+for (@(1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list');
 $r = '';
-for (map {$_} < @array) {
+for (@(< map {$_} @( < @array))) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map');
 $r = '';
-for (map {$_} 1,2,3) {
+for (@(< map {$_} @( 1,2,3))) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map');
@@ -152,53 +152,53 @@ for ('A' .. 'C') {
 is ($r, 'ABC', 'Forwards for list via ..');
 
 $r = '';
-for (reverse < @array) {
+for (@(reverse < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array');
 $r = '';
-for (reverse 1,2,3) {
+for (@(reverse 1,2,3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list');
 $r = '';
-for (reverse map {$_} < @array) {
+for (@(reverse < map {$_} @( < @array))) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array via map');
 $r = '';
-for (reverse map {$_} 1,2,3) {
+for (@(reverse < map {$_} @( 1,2,3))) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via map');
 $r = '';
-for (reverse 1 .. 3) {
+for (@(reverse < 1 .. 3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via ..');
 $r = '';
-for (reverse 'A' .. 'C') {
+for (@(reverse < 'A' .. 'C')) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for list via ..');
 
 $r = '';
-for my $i (< @array) {
+for my $i ( @array) {
     $r .= $i;
 }
 is ($r, 'ABC', 'Forwards for array with var');
 $r = '';
-for my $i (1,2,3) {
+for my $i (@(1,2,3)) {
     $r .= $i;
 }
 is ($r, '123', 'Forwards for list with var');
 $r = '';
-for my $i (map {$_} < @array) {
+for my $i (@(< map {$_} @( < @array))) {
     $r .= $i;
 }
 is ($r, 'ABC', 'Forwards for array via map with var');
 $r = '';
-for my $i (map {$_} 1,2,3) {
+for my $i (@(< map {$_} @( 1,2,3))) {
     $r .= $i;
 }
 is ($r, '123', 'Forwards for list via map with var');
@@ -214,54 +214,54 @@ for my $i ('A' .. 'C') {
 is ($r, 'ABC', 'Forwards for list via .. with var');
 
 $r = '';
-for my $i (reverse < @array) {
+for my $i (@(reverse < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for array with var');
 $r = '';
-for my $i (reverse 1,2,3) {
+for my $i (@(reverse 1,2,3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list with var');
 $r = '';
-for my $i (reverse map {$_} < @array) {
+for my $i (@(reverse < map {$_} @( < @array))) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for array via map with var');
 $r = '';
-for my $i (reverse map {$_} 1,2,3) {
+for my $i (@(reverse < map {$_} @( 1,2,3))) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list via map with var');
 $r = '';
-for my $i (reverse 1 .. 3) {
+for my $i (@(reverse < 1 .. 3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list via .. with var');
 $r = '';
-for my $i (reverse 'A' .. 'C') {
+for my $i (@(reverse < 'A' .. 'C')) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for list via .. with var');
 
 # For some reason the generate optree is different when $_ is implicit.
 $r = '';
-for $_ (< @array) {
+for $_ ( @array) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array with explicit $_');
 $r = '';
-for $_ (1,2,3) {
+for $_ (@(1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list with explicit $_');
 $r = '';
-for $_ (map {$_} < @array) {
+for $_ (@(< map {$_} @( < @array))) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map with explicit $_');
 $r = '';
-for $_ (map {$_} 1,2,3) {
+for $_ (@(< map {$_} @( 1,2,3))) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map with explicit $_');
@@ -277,32 +277,32 @@ for $_ ('A' .. 'C') {
 is ($r, 'ABC', 'Forwards for list via .. with var with explicit $_');
 
 $r = '';
-for $_ (reverse < @array) {
+for $_ (@(reverse < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array with explicit $_');
 $r = '';
-for $_ (reverse 1,2,3) {
+for $_ (@(reverse 1,2,3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list with explicit $_');
 $r = '';
-for $_ (reverse map {$_} < @array) {
+for $_ (@(reverse < map {$_} @( < @array))) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array via map with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 1,2,3) {
+for $_ (@(reverse < map {$_} @( 1,2,3))) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via map with explicit $_');
 $r = '';
-for $_ (reverse 1 .. 3) {
+for $_ (@(reverse < 1 .. 3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via .. with var with explicit $_');
 $r = '';
-for $_ (reverse 'A' .. 'C') {
+for $_ (@(reverse < 'A' .. 'C')) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for list via .. with var with explicit $_');
@@ -310,351 +310,351 @@ is ($r, 'CBA', 'Reverse for list via .. with var with explicit $_');
 # I don't think that my is that different from our in the optree. But test a
 # few:
 $r = '';
-for our $i (reverse < @array) {
+for our $i (@(reverse < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for array with our var');
 $r = '';
-for our $i (reverse 1,2,3) {
+for our $i (@(reverse 1,2,3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list with our var');
 $r = '';
-for our $i (reverse map {$_} < @array) {
+for our $i (@(reverse < map {$_} @( < @array))) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for array via map with our var');
 $r = '';
-for our $i (reverse map {$_} 1,2,3) {
+for our $i (@(reverse < map {$_} @( 1,2,3))) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list via map with our var');
 $r = '';
-for our $i (reverse 1 .. 3) {
+for our $i (@(reverse < 1 .. 3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list via .. with our var');
 $r = '';
-for our $i (reverse 'A' .. 'C') {
+for our $i (@(reverse < 'A' .. 'C')) {
     $r .= $i;
 }
 is ($r, 'CBA', 'Reverse for list via .. with our var');
 
 
 $r = '';
-for (1, reverse < @array) {
+for (@(1, < reverse @( < @array))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array with leading value');
 $r = '';
-for ('A', reverse 1,2,3) {
+for (@('A', < reverse @( 1,2,3))) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list with leading value');
 $r = '';
-for (1, reverse map {$_} < @array) {
+for (@(1, < reverse @( < map {$_} @( < @array)))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array via map with leading value');
 $r = '';
-for ('A', reverse map {$_} 1,2,3) {
+for (@('A', < reverse @( < map {$_} @( 1,2,3)))) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list via map with leading value');
 $r = '';
-for ('A', reverse 1 .. 3) {
+for (@('A', < reverse @( < 1 .. 3))) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list via .. with leading value');
 $r = '';
-for (1, reverse 'A' .. 'C') {
+for (@(1, < reverse @( < 'A' .. 'C'))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for list via .. with leading value');
 
 $r = '';
-for (reverse (< @array), 1) {
+for (@( <reverse ( @(< @array)), 1)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for array with trailing value');
 $r = '';
-for (reverse (1,2,3), 'A') {
+for (@( <reverse ( @(1,2,3)), 'A')) {
     $r .= $_;
 }
 is ($r, '321A', 'Reverse for list with trailing value');
 $r = '';
-for (reverse (map {$_} < @array), 1) {
+for (@( <reverse ( @(< map {$_} @( < @array))), 1)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for array via map with trailing value');
 $r = '';
-for (reverse (map {$_} 1,2,3), 'A') {
+for (@( <reverse ( @(< map {$_} @( 1,2,3))), 'A')) {
     $r .= $_;
 }
 is ($r, '321A', 'Reverse for list via map with trailing value');
 $r = '';
-for (reverse (1 .. 3), 'A') {
+for (@( <reverse ( @( <1 .. 3)), 'A')) {
     $r .= $_;
 }
 is ($r, '321A', 'Reverse for list via .. with trailing value');
 $r = '';
-for (reverse ('A' .. 'C'), 1) {
+for (@( <reverse ( @( <'A' .. 'C')), 1)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for list via .. with trailing value');
 
 
 $r = '';
-for $_ (1, reverse < @array) {
+for $_ (@(1, < reverse @( < @array))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array with leading value with explicit $_');
 $r = '';
-for $_ ('A', reverse 1,2,3) {
+for $_ (@('A', < reverse @( 1,2,3))) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list with leading value with explicit $_');
 $r = '';
-for $_ (1, reverse map {$_} < @array) {
+for $_ (@(1, < reverse @( < map {$_} @( < @array)))) {
     $r .= $_;
 }
 is ($r, '1CBA',
     'Reverse for array via map with leading value with explicit $_');
 $r = '';
-for $_ ('A', reverse map {$_} 1,2,3) {
+for $_ (@('A', < reverse @( < map {$_} @( 1,2,3)))) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list via map with leading value with explicit $_');
 $r = '';
-for $_ ('A', reverse 1 .. 3) {
+for $_ (@('A', < reverse @( < 1 .. 3))) {
     $r .= $_;
 }
 is ($r, 'A321', 'Reverse for list via .. with leading value with explicit $_');
 $r = '';
-for $_ (1, reverse 'A' .. 'C') {
+for $_ (@(1, < reverse @( < 'A' .. 'C'))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for list via .. with leading value with explicit $_');
 
 $r = '';
-for $_ (reverse (< @array), 1) {
+for $_ (@( <reverse ( @(< @array)), 1)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for array with trailing value with explicit $_');
 $r = '';
-for $_ (reverse (1,2,3), 'A') {
+for $_ (@( <reverse ( @(1,2,3)), 'A')) {
     $r .= $_;
 }
 is ($r, '321A', 'Reverse for list with trailing value with explicit $_');
 $r = '';
-for $_ (reverse (map {$_} < @array), 1) {
+for $_ (@( <reverse ( @(< map {$_} @( < @array))), 1)) {
     $r .= $_;
 }
 is ($r, 'CBA1',
     'Reverse for array via map with trailing value with explicit $_');
 $r = '';
-for $_ (reverse (map {$_} 1,2,3), 'A') {
+for $_ (@( <reverse ( @(< map {$_} @( 1,2,3))), 'A')) {
     $r .= $_;
 }
 is ($r, '321A',
     'Reverse for list via map with trailing value with explicit $_');
 $r = '';
-for $_ (reverse (1 .. 3), 'A') {
+for $_ (@( <reverse ( @( <1 .. 3)), 'A')) {
     $r .= $_;
 }
 is ($r, '321A', 'Reverse for list via .. with trailing value with explicit $_');
 $r = '';
-for $_ (reverse ('A' .. 'C'), 1) {
+for $_ (@( <reverse ( @( <'A' .. 'C')), 1)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for list via .. with trailing value with explicit $_');
 
 $r = '';
-for my $i (1, reverse < @array) {
+for my $i (@(1, < reverse @( < @array))) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for array with leading value and var');
 $r = '';
-for my $i ('A', reverse 1,2,3) {
+for my $i (@('A', < reverse @( 1,2,3))) {
     $r .= $i;
 }
 is ($r, 'A321', 'Reverse for list with leading value and var');
 $r = '';
-for my $i (1, reverse map {$_} < @array) {
+for my $i (@(1, < reverse @( < map {$_} @( < @array)))) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for array via map with leading value and var');
 $r = '';
-for my $i ('A', reverse map {$_} 1,2,3) {
+for my $i (@('A', < reverse @( < map {$_} @( 1,2,3)))) {
     $r .= $i;
 }
 is ($r, 'A321', 'Reverse for list via map with leading value and var');
 $r = '';
-for my $i ('A', reverse 1 .. 3) {
+for my $i (@('A', < reverse @( < 1 .. 3))) {
     $r .= $i;
 }
 is ($r, 'A321', 'Reverse for list via .. with leading value and var');
 $r = '';
-for my $i (1, reverse 'A' .. 'C') {
+for my $i (@(1, < reverse @( < 'A' .. 'C'))) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for list via .. with leading value and var');
 
 $r = '';
-for my $i (reverse (< @array), 1) {
+for my $i (@( <reverse ( @(< @array)), 1)) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for array with trailing value and var');
 $r = '';
-for my $i (reverse (1,2,3), 'A') {
+for my $i (@( <reverse ( @(1,2,3)), 'A')) {
     $r .= $i;
 }
 is ($r, '321A', 'Reverse for list with trailing value and var');
 $r = '';
-for my $i (reverse (map {$_} < @array), 1) {
+for my $i (@( <reverse ( @(< map {$_} @( < @array))), 1)) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for array via map with trailing value and var');
 $r = '';
-for my $i (reverse (map {$_} 1,2,3), 'A') {
+for my $i (@( <reverse ( @(< map {$_} @( 1,2,3))), 'A')) {
     $r .= $i;
 }
 is ($r, '321A', 'Reverse for list via map with trailing value and var');
 $r = '';
-for my $i (reverse (1 .. 3), 'A') {
+for my $i (@( <reverse ( @( <1 .. 3)), 'A')) {
     $r .= $i;
 }
 is ($r, '321A', 'Reverse for list via .. with trailing value and var');
 $r = '';
-for my $i (reverse ('A' .. 'C'), 1) {
+for my $i (@( <reverse ( @( <'A' .. 'C')), 1)) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for list via .. with trailing value and var');
 
 
 $r = '';
-for (reverse 1, < @array) {
+for (@(reverse 1, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for value and array');
 $r = '';
-for (reverse map {$_} 1, < @array) {
+for (@(reverse < map {$_} @( 1, < @array))) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for value and array via map');
 $r = '';
-for (reverse 1 .. 3, < @array) {
+for (@(reverse < 1 .. 3, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA321', 'Reverse for .. and array');
 $r = '';
-for (reverse 'X' .. 'Z', < @array) {
+for (@(reverse < 'X' .. 'Z', < @array)) {
     $r .= $_;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array');
 $r = '';
-for (reverse map {$_} 1 .. 3, < @array) {
+for (@(reverse < map {$_} @( < 1 .. 3, < @array))) {
     $r .= $_;
 }
 is ($r, 'CBA321', 'Reverse for .. and array via map');
 $r = '';
-for (reverse map {$_} 'X' .. 'Z', < @array) {
+for (@(reverse < map {$_} @( < 'X' .. 'Z', < @array))) {
     $r .= $_;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array via map');
 
 $r = '';
-for (reverse (< @array, 1)) {
+for (@(reverse (< @array, 1))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array and value');
 $r = '';
-for (reverse (map {$_} < @array, 1)) {
+for (@(reverse (< map {$_} @( < @array, 1)))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array and value via map');
 
 $r = '';
-for $_ (reverse 1, < @array) {
+for $_ (@(reverse 1, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for value and array with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 1, < @array) {
+for $_ (@(reverse < map {$_} @( 1, < @array))) {
     $r .= $_;
 }
 is ($r, 'CBA1', 'Reverse for value and array via map with explicit $_');
 $r = '';
-for $_ (reverse 1 .. 3, < @array) {
+for $_ (@(reverse < 1 .. 3, < @array)) {
     $r .= $_;
 }
 is ($r, 'CBA321', 'Reverse for .. and array with explicit $_');
 $r = '';
-for $_ (reverse 'X' .. 'Z', < @array) {
+for $_ (@(reverse < 'X' .. 'Z', < @array)) {
     $r .= $_;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 1 .. 3, < @array) {
+for $_ (@(reverse < map {$_} @( < 1 .. 3, < @array))) {
     $r .= $_;
 }
 is ($r, 'CBA321', 'Reverse for .. and array via map with explicit $_');
 $r = '';
-for $_ (reverse map {$_} 'X' .. 'Z', < @array) {
+for $_ (@(reverse < map {$_} @( < 'X' .. 'Z', < @array))) {
     $r .= $_;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array via map with explicit $_');
 
 $r = '';
-for $_ (reverse (< @array, 1)) {
+for $_ (@(reverse (< @array, 1))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array and value with explicit $_');
 $r = '';
-for $_ (reverse (map {$_} < @array, 1)) {
+for $_ (@(reverse (< map {$_} @( < @array, 1)))) {
     $r .= $_;
 }
 is ($r, '1CBA', 'Reverse for array and value via map with explicit $_');
 
 
 $r = '';
-for my $i (reverse 1, < @array) {
+for my $i (@(reverse 1, < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for value and array with var');
 $r = '';
-for my $i (reverse map {$_} 1, < @array) {
+for my $i (@(reverse < map {$_} @( 1, < @array))) {
     $r .= $i;
 }
 is ($r, 'CBA1', 'Reverse for value and array via map with var');
 $r = '';
-for my $i (reverse 1 .. 3, < @array) {
+for my $i (@(reverse < 1 .. 3, < @array)) {
     $r .= $i;
 }
 is ($r, 'CBA321', 'Reverse for .. and array with var');
 $r = '';
-for my $i (reverse 'X' .. 'Z', < @array) {
+for my $i (@(reverse < 'X' .. 'Z', < @array)) {
     $r .= $i;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array with var');
 $r = '';
-for my $i (reverse map {$_} 1 .. 3, < @array) {
+for my $i (@(reverse < map {$_} @( < 1 .. 3, < @array))) {
     $r .= $i;
 }
 is ($r, 'CBA321', 'Reverse for .. and array via map with var');
 $r = '';
-for my $i (reverse map {$_} 'X' .. 'Z', < @array) {
+for my $i (@(reverse < map {$_} @( < 'X' .. 'Z', < @array))) {
     $r .= $i;
 }
 is ($r, 'CBAZYX', 'Reverse for .. and array via map with var');
 
 $r = '';
-for my $i (reverse (< @array, 1)) {
+for my $i (@(reverse (< @array, 1))) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for array and value with var');
 $r = '';
-for my $i (reverse (map {$_} < @array, 1)) {
+for my $i (@(reverse (< map {$_} @( < @array, 1)))) {
     $r .= $i;
 }
 is ($r, '1CBA', 'Reverse for array and value via map with var');
@@ -662,7 +662,7 @@ is ($r, '1CBA', 'Reverse for array and value via map with var');
 TODO: {
     $test++;
     local $TODO = "RT #1085: what should be output of perl -we 'print do \{ foreach (1, 2) \{ 1; \} \}'";
-    if (do {17; foreach (1, 2) { 1; } } != 17) {
+    if (do {17; foreach (@(1, 2)) { 1; } } != 17) {
         print "not ";
     }
     print "ok $test # TODO $TODO\n";
@@ -673,7 +673,7 @@ TODO: {
     no warnings 'reserved';
     local $TODO = "RT #2166: foreach spuriously autovivifies";
     my %h;
-    foreach (%h{['a', 'b']}) {}
+    foreach (@(%h{['a', 'b']})) {}
     if(%h) {
         print "not ";
     }

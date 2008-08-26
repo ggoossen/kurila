@@ -13,7 +13,7 @@ sub is {
 ', $test++;
       return 1;
     }
-    foreach ($left, $right) {
+    foreach (@($left, $right)) {
       # Comment out these regexps to map non-printables to ord if the perl under
       # test is so broken that it's not helping
 #       s/([^-+A-Za-z_0-9])/sprintf q{'.chr(%d).'}, ord $1/ge;
@@ -80,7 +80,7 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
 
 # variable interpolation
 {
-  our ($a, $b, $c, $dx) = qw(foo bar);
+  our ($a, $b, $c, $dx) = < qw(foo bar);
 
   is("$a", "foo",    "verifying assign");
   is("$a$b", "foobar", "basic concatenation");
@@ -89,11 +89,11 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
   # Array and derefence, this doesn't really belong in 'op/concat' but I
   # couldn't find a better place
 
-  my @x = @( qw|aap noot| );
+  my @x = @( < qw|aap noot| );
   my $dx = \@(< @x);
 
-  is("{join ' ', <@x}", "aap noot");
-  is("{join ' ', <@$dx}", "aap noot");
+  is("{join ' ', @( <@x)}", "aap noot");
+  is("{join ' ', @( <@$dx)}", "aap noot");
 
   # Okay, so that wasn't very challenging.  Let's go Unicode.
 

@@ -59,7 +59,7 @@ is(fibonacci(10), 89, "fibonacci(10) == 89");
 
 is(fibonacci(fibonacci(7)), 17711, "fibonacci(fibonacci(7)) == 17711");
 
-my @ack = @( qw(1 2 3 4 2 3 4 5 3 5 7 9 5 13 29 61) );
+my @ack = @( < qw(1 2 3 4 2 3 4 5 3 5 7 9 5 13 29 61) );
 
 for my $x (0..3) { 
     for my $y (0..3) {
