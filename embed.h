@@ -2406,7 +2406,7 @@
 #define do_shmio(a,b,c)		Perl_do_shmio(aTHX_ a,b,c)
 #endif
 #endif
-#define do_join(a,b,c,d)	Perl_do_join(aTHX_ a,b,c,d)
+#define do_join(a,b,c)		Perl_do_join(aTHX_ a,b,c)
 #ifdef PERL_CORE
 #define do_kv()			Perl_do_kv(aTHX)
 #define bad_arg(a,b,c,d)	Perl_bad_arg(aTHX_ a,b,c,d)

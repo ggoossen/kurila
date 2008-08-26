@@ -26,12 +26,12 @@
 #endif
 
 void
-Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV **sp)
+Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
 {
     dVAR;
-    SV ** const oldmark = mark;
-    register I32 items = sp - mark;
+    register I32 items;
     register STRLEN len;
+    register SV** mark;
     STRLEN delimlen;
 
     PERL_ARGS_ASSERT_DO_JOIN;
@@ -39,7 +39,13 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV *
     (void) SvPV_const(delim, delimlen); /* stringify and get the delimlen */
     /* SvCUR assumes it's SvPOK() and woe betide you if it's not. */
 
-    mark++;
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+    items = av_len(av) + 1;
+
+    mark = AvARRAY(av);
+
     len = (items > 0 ? (delimlen * (items - 1) ) : 0);
     SvUPGRADE(sv, SVt_PV);
     if (SvLEN(sv) < len + items) {	/* current length is way too short */
@@ -53,9 +59,8 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV *
 	}
 	SvGROW(sv, len + 1);		/* so try to pre-extend */
 
-	mark = oldmark;
-	items = sp - mark;
-	++mark;
+	mark = AvARRAY(av);
+	items = av_len(av) + 1;
     }
 
     sv_setpvn(sv, "", 0);
