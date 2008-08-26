@@ -344,7 +344,7 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    ($file) = < dl_findfile(map("-L$_",<@dirs,<@INC), $modfname) unless $file;
+    ($file) = < dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
 
     die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', <@INC))")
 	unless $file;	# wording similar to error from 'require'

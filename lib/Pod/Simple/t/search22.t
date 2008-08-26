@@ -101,7 +101,7 @@ thar 'squaa::Vliff';
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, @( < keys %$where2name) ), 1;
+ok nelems(grep( m/squaa\.pm/, keys %$where2name) ), 1;
 
 ok( ($name2where->{'perlthng'}    || 'huh???'), '/[^\^]testlib1/' );
 ok( ($name2where->{'squaa::Vliff'} || 'huh???'), '/[^\^]testlib1/' );

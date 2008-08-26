@@ -16,7 +16,7 @@ BEGIN { require '../lib/warnings.pm'; warnings->import() };
 %ENV{PERL_CORE} = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
-@ARGV = @( < grep($_, @(< @ARGV)) ) if $^O eq 'VMS';
+@ARGV = @( < grep($_, @ARGV) ) if $^O eq 'VMS';
 our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.

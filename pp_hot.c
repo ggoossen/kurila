@@ -568,7 +568,7 @@ PP(pp_join)
 {
     dVAR; dSP; dMARK; dTARGET;
     MARK++;
-    do_join(TARG, *MARK, MARK, SP);
+    do_join(TARG, *MARK, MARK[1]);
     SP = MARK;
     SETs(TARG);
     RETURN;
@@ -2039,6 +2039,9 @@ PP(pp_grepwhile)
     if (SvTRUE(POPs)) {
 	/* copy the new items down to the destination list */
 	av_push((AV*)*dst, newSVsv(POPs));
+    }
+    else {
+	POPs;
     }
 
     LEAVE;					/* exit inner scope */

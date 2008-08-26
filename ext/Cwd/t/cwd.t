@@ -37,7 +37,7 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
   my $before = grep exists %ENV{$_}, @( < @fields);
   cwd();
   my $after = grep exists %ENV{$_}, @( < @fields);
-  is($before, $after, "cwd() shouldn't create spurious entries in \%ENV");
+  is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
 }
 
 # XXX force Cwd to bootsrap its XSUBs since we have set @INC = "../lib"

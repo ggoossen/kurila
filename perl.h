@@ -3759,7 +3759,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_hintselem	  'h' /* %^H hash element */
 #define PERL_MAGIC_isa		  'I' /* @ISA array */
 #define PERL_MAGIC_isaelem	  'i' /* @ISA array element */
-#define PERL_MAGIC_nkeys	  'k' /* scalar(keys()) lvalue */
 #define PERL_MAGIC_dbfile	  'L' /* Debugger %_<filename */
 #define PERL_MAGIC_dbline	  'l' /* Debugger %_<filename element */
 #define PERL_MAGIC_shared	  'N' /* Shared between threads */
@@ -4532,7 +4531,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_isaelem,
     want_vtbl_glob,
     want_vtbl_mglob,
-    want_vtbl_nkeys,
     want_vtbl_taint,
     want_vtbl_vec,
     want_vtbl_pos,
@@ -4953,18 +4951,6 @@ MGVTBL_SET(
     PL_vtbl_mglob,
     0,
     MEMBER_TO_FPTR(Perl_magic_setmglob),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_nkeys,
-    MEMBER_TO_FPTR(Perl_magic_getnkeys),
-    MEMBER_TO_FPTR(Perl_magic_setnkeys),
     0,
     0,
     0,
