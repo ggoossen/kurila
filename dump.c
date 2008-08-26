@@ -1478,7 +1478,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     }
     sv_catpv(d, ")");
     s = SvPVX_const(d);
-
+    
     Perl_dump_indent(aTHX_ level, file, "SV = ");
     if (type < SVt_LAST) {
 	PerlIO_printf(file, "%s%s\n", svtypenames[type], s);
@@ -1491,6 +1491,22 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	PerlIO_printf(file, "UNKNOWN(0x%"UVxf") %s\n", (UV)type, s);
 	SvREFCNT_dec(d);
 	return;
+    }
+    {
+	SV* loc = SvLOCATION(sv);
+	SV* locstr = newSVpv("", 0);
+	if (loc && SvAVOK(loc)) {
+	    SV** ary = AvARRAY((AV*)loc);
+	    I32 len = av_len((AV*)loc);
+	    int i;
+	    for (i=0; i <= len; i++) {
+		if (SvPVOK(ary[i])) {
+		    sv_catsv(locstr, ary[i]);
+		    sv_catpv(locstr, " ");
+		}
+	    }
+	}
+	Perl_dump_indent(aTHX_ level, file, "  LOCATION = %s\n", SvPV_nolen_const(locstr));
     }
     if ((type >= SVt_PVIV && type != SVt_PVAV && type != SVt_PVHV
 	 && type != SVt_PVCV && !isGV_with_GP(sv))

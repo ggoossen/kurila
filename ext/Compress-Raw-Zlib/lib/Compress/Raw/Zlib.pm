@@ -21,7 +21,7 @@ BEGIN {
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = @( < qw(
+@EXPORT = qw(
         adler32 crc32
 
         ZLIB_VERSION
@@ -62,7 +62,7 @@ BEGIN {
         Z_SYNC_FLUSH
         Z_UNKNOWN
         Z_VERSION_ERROR
-) );
+);
 
 
 use constant FLAG_APPEND             => 1 ;
