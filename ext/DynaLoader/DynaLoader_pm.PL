@@ -55,14 +55,13 @@ sub _expansion {
 
 sub expand_os_specific {
     my $s = shift;
-    for (@($s)) {
-	s/<<=(.*?)>>/{eval $1}/g;
-	s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
+    $s =~ s/<<=(.*?)>>/{eval $1}/g;
+    $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
            _expansion($1,$2,$3);
         }/gs;
-	if (m/<<(=|\$\^O-)/) {die "bad <<\$^O-eq/ne-osname>> expression.".
-	    " Unclosed brackets?";
-	}
+    if ($s =~ m/<<(=|\$\^O-)/) {
+        die "bad <<\$^O-eq/ne-osname>> expression.".
+          " Unclosed brackets?";
     }
     $s;
 }
@@ -120,7 +119,7 @@ if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[qw(dlext so dlsrc)]};
+our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[<qw(dlext so dlsrc)]};
 EOT
 }
 
@@ -260,7 +259,7 @@ if ($dl_debug) {
 	    unless defined(&boot_DynaLoader);
 }
 
-use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
+use vars < qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
             @do_expand);
 
 sub bootstrap_inherit {

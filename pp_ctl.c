@@ -1211,7 +1211,7 @@ PP(pp_enteriter)
 	}
     }
     else { /* iterating over (copy of) the array on the stack */
-	SV *maybe_ary = sv_mortalcopy(POPs);
+	SV *maybe_ary = POPs;
 	if ( ! ( PL_op->op_flags & OPf_STACKED) ) {
 	    maybe_ary = sv_mortalcopy(maybe_ary);
 	}

@@ -4185,10 +4185,12 @@ PP(pp_reverse)
     ary = AvARRAY(av);
     end = ary + av_len(av);
     
-    while (ary < end) {
-	register SV * const tmp = *ary;
-	*ary++ = *end;
-	*end-- = tmp;
+    if (ary) {
+	while (ary < end) {
+	    register SV * const tmp = *ary;
+	    *ary++ = *end;
+	    *end-- = tmp;
+	}
     }
     PUSHs(av);
     RETURN;

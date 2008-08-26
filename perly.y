@@ -109,6 +109,8 @@
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> '?' ':'
+%right <i_tkval> '<'
+%nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
 %left <i_tkval> BITOROP
@@ -118,8 +120,6 @@
 %nonassoc UNIOP UNIOPSUB
 %nonassoc REQUIRE
 %nonassoc COMPSUB
-%right <i_tkval> '<'
-%nonassoc DOTDOT
 %left <i_tkval> SHIFTOP
 %left ADDOP
 %left MULOP

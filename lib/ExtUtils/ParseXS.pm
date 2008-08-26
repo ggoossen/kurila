@@ -589,7 +589,7 @@ sub process_para {
       my $args = "$orig_args ,";
       if ($args =~ m/^( (??{ $C_arg }) , )* $ /x) {
 	@args = @($args =~ m/\G ( (??{ $C_arg }) ) , /xg);
-	for (  @args ) {
+	for ( @args ) {
 	  s/^\s+//;
 	  s/\s+$//;
 	  my ($arg, $default) = m/ ( [^=]* ) ( (?: = .* )? ) /x;
