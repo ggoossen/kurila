@@ -1214,8 +1214,11 @@ PP(pp_enteriter)
 	    }
 	}
     }
-    else if (PL_op->op_flags & OPf_STACKED) {
-	SV *maybe_ary = POPs;
+    else { /* iterating over (copy of) the array on the stack */
+	SV *maybe_ary = sv_mortalcopy(POPs);
+	if ( ! ( PL_op->op_flags & OPf_STACKED) ) {
+	    maye_ary = sv_mortalcopy(maybe_ary);
+	}
 	if ( ! SvOK(maybe_ary) )
 	    RETURN;
 	if ( ! SvAVOK(maybe_ary) )
@@ -1227,15 +1230,6 @@ PP(pp_enteriter)
 	    (PL_op->op_private & OPpITER_REVERSED) ?
 	    AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
 	    -1;
-    }
-    else { /* iterating over items on the stack */
-	cx->blk_loop.state_u.ary.ary = NULL; /* means to use the stack */
-	if (PL_op->op_private & OPpITER_REVERSED) {
-	    cx->blk_loop.state_u.ary.ix = cx->blk_oldsp + 1;
-	}
-	else {
-	    cx->blk_loop.state_u.ary.ix = MARK - PL_stack_base;
-	}
     }
 
     RETURN;
