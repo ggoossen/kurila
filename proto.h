@@ -654,13 +654,12 @@ PERL_CALLCONV I32	Perl_do_shmio(pTHX_ I32 optype, SV** mark, SV** sp)
 	assert(mark); assert(sp)
 
 #endif
-PERL_CALLCONV void	Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
+PERL_CALLCONV void	Perl_do_join(pTHX_ SV *sv, SV *delim, SV *av)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3)
-			__attribute__nonnull__(pTHX_4);
+			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DO_JOIN	\
-	assert(sv); assert(delim); assert(mark); assert(sp)
+	assert(sv); assert(delim); assert(av)
 
 PERL_CALLCONV OP*	Perl_do_kv(pTHX);
 PERL_CALLCONV void	Perl_bad_arg(pTHX_ I32 n, const char* t, const char* name, SV *arg)

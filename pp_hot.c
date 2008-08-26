@@ -568,7 +568,7 @@ PP(pp_join)
 {
     dVAR; dSP; dMARK; dTARGET;
     MARK++;
-    do_join(TARG, *MARK, MARK, SP);
+    do_join(TARG, *MARK, MARK[1]);
     SP = MARK;
     SETs(TARG);
     RETURN;
