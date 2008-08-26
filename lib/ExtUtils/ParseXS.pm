@@ -693,7 +693,7 @@ sub process_para {
     # Detect CODE: blocks which use ST(n)= or XST_m*(n,v)
     #   to set explicit return values.
     $EXPLICIT_RETURN = ($CODE &&
-			("{join ' ', <@line}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
+			("{join ' ', @line}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
     $ALIAS  = grep(m/^\s*ALIAS\s*:/, @(  < @line));
     $INTERFACE  = grep(m/^\s*INTERFACE\s*:/, @(  < @line));
 

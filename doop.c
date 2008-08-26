@@ -643,12 +643,6 @@ Perl_do_kv(pTHX)
     if (gimme == G_VOID)
 	RETURN;
 
-    if (gimme == G_SCALAR) {
-	Perl_croak(aTHX_ "keys in scalar context");
-    }
-
-    EXTEND(SP, HvKEYS(keys) * (dokeys + dovalues));
-
     PUTBACK;	/* hv_iternext and hv_iterval might clobber stack_sp */
     while ((entry = hv_iternext(keys))) {
 	SPAGAIN;
@@ -662,7 +656,7 @@ Perl_do_kv(pTHX)
 	PUTBACK;
     }
     XPUSHs(res);
-    return NORMAL;
+    RETURN;
 }
 
 void
