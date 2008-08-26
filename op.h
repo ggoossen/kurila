@@ -227,7 +227,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpSORT_NUMERIC		1	/* Optimized away { $a <=> $b } */
 #define OPpSORT_INTEGER		2	/* Ditto while under "use integer" */
 #define OPpSORT_REVERSE		4	/* Reversed sort */
-#define OPpSORT_INPLACE		8	/* sort in-place; eg @a = sort @a */
 #define OPpSORT_DESCEND		16	/* Descending sort */
 #define OPpSORT_QSORT		32	/* Use quicksort (not mergesort) */
 #define OPpSORT_STABLE		64	/* Use a stable algorithm */

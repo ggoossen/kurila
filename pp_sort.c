@@ -1475,12 +1475,11 @@ PP(pp_sort)
     AV* av = NULL;
     GV *gv;
     CV *cv = NULL;
-    I32 gimme = GIMME;
+    I32 gimme = GIMME_V;
     OP* const nextop = PL_op->op_next;
     I32 overloading = 0;
     bool hasargs = FALSE;
     I32 is_xsub = 0;
-    I32 sorting_av = 0;
     const U8 priv = PL_op->op_private;
     const U8 flags = PL_op->op_flags;
     U32 sort_flags = 0;
@@ -1495,7 +1494,7 @@ PP(pp_sort)
     if ((priv & OPpSORT_STABLE) != 0)
 	sort_flags |= SORTf_STABLE;
 
-    if (gimme != G_ARRAY) {
+    if (gimme == G_VOID) {
 	SP = MARK;
 	EXTEND(SP,1);
 	RETPUSHUNDEF;
@@ -1543,35 +1542,12 @@ PP(pp_sort)
 	PL_sortcop = NULL;
     }
 
-    /* optimiser converts "@a = sort @a" to "sort \@a";
-     * in case of tied @a, pessimise: push (@a) onto stack, then assign
-     * result back to @a at the end of this function */
-    if (priv & OPpSORT_INPLACE) {
-	assert( MARK+1 == SP && *SP && SvTYPE(*SP) == SVt_PVAV);
-	(void)POPMARK; /* remove mark associated with ex-OP_AASSIGN */
-	av = (AV*)(*SP);
-	max = AvFILL(av) + 1;
-	if (SvMAGICAL(av)) {
-	    MEXTEND(SP, max);
-	    p2 = SP;
-	    for (i=0; i < max; i++) {
-		SV **svp = av_fetch(av, i, FALSE);
-		*SP++ = (svp) ? *svp : NULL;
-	    }
-	}
-	else {
-	    if (SvREADONLY(av))
-		Perl_croak(aTHX_ PL_no_modify);
-	    else
-		SvREADONLY_on(av);
-	    p1 = p2 = AvARRAY(av);
-	    sorting_av = 1;
-	}
+    av = SvAV(sv_mortalcopy(POPs));
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "Expected ARRAY but got %s", Ddesc(av));
     }
-    else {
-	p2 = MARK+1;
-	max = SP - MARK;
-   }
+    p1 = p2 = AvARRAY(av);
+    max = AvFILL(av) + 1;
 
     /* shuffle stack down, removing optional initial cv (p1!=p2), plus
      * any nulls; also stringify or converting to integer or number as
@@ -1615,8 +1591,7 @@ PP(pp_sort)
 	else
 	    max--;
     }
-    if (sorting_av)
-	AvFILLp(av) = max-1;
+    AvFILLp(av) = max-1;
 
     if (max > 1) {
 	SV **start;
@@ -1685,7 +1660,7 @@ PP(pp_sort)
 	}
 	else {
 	    MEXTEND(SP, 20);	/* Can't afford stack realloc on signal. */
-	    start = sorting_av ? AvARRAY(av) : ORIGMARK+1;
+	    start = AvARRAY(av);
 	    sortsvp(aTHX_ start, max,
 		    (priv & OPpSORT_NUMERIC)
 		        ? ( ( ( priv & OPpSORT_INTEGER) || all_SIVs)
@@ -1703,27 +1678,10 @@ PP(pp_sort)
 	    }
 	}
     }
-    if (sorting_av)
-	SvREADONLY_off(av);
-    else if (av && !sorting_av) {
-	/* simulate pp_aassign of tied AV */
-	SV** const base = ORIGMARK+1;
-	for (i=0; i < max; i++) {
-	    base[i] = newSVsv(base[i]);
-	}
-	av_clear(av);
-	av_extend(av, max);
-	for (i=0; i < max; i++) {
-	    SV * const sv = base[i];
-	    SV ** const didstore = av_store(av, i, sv);
-	    if (SvSMAGICAL(sv))
-		mg_set(sv);
-	    if (!didstore)
-		sv_2mortal(sv);
-	}
-    }
+    
     LEAVE;
-    PL_stack_sp = ORIGMARK + (sorting_av ? 0 : max);
+    PL_stack_sp = ORIGMARK;
+    *++PL_stack_sp = av;
     return nextop;
 }
 
