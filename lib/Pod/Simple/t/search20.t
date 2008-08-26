@@ -83,7 +83,7 @@ skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0,
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, @( < keys %$where2name) ), 1;
+ok nelems(grep( m/squaa\.pm/, keys %$where2name) ), 1;
 
 ok 1;
 

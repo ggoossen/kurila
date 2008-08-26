@@ -3482,9 +3482,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_mglob:
 	result = &PL_vtbl_mglob;
 	break;
-    case want_vtbl_nkeys:
-	result = &PL_vtbl_nkeys;
-	break;
     case want_vtbl_taint:
 	result = &PL_vtbl_taint;
 	break;

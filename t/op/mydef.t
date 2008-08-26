@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..66\n";
+print "1..65\n";
 
 my $test = 0;
 sub ok ($$) {
@@ -133,12 +133,6 @@ $_ = "global";
     my $x = join '-', @( < grep $_=$_.tgrep3.tgrep4, @( < 1 .. 2));
     ok( $x eq '1globallocal-2globallocal', 'grep without {} with side-effect # TODO' );
     ok( $_ eq 'local', '...but without extraneous side-effects' );
-}
-{
-    for my $_ (@(1)) {
-	my $x = grep $_, @( < qw(a b));
-	ok( $x == 2, 'grep in scalar context' );
-    }
 }
 {
     my $s = "toto";

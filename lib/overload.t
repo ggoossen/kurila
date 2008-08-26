@@ -391,9 +391,9 @@ is($b, "_<oups1
   use overload 'cmp' => \&comp;
 }
 {
-  my @arr = @( map sorting->new($_), 0..12 );
+  my @arr = map sorting->new($_), @(0..12);
   my @sorted1 = @( sort < @arr );
-  my @sorted2 = @( map $$_, < @sorted1 );
+  my @sorted2 = map $$_, @sorted1;
   is("{join ' ', <@sorted2}", '0 10 7 4 1 11 8 5 12 2 9 6 3');
 }
 {
