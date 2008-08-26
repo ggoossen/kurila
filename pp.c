@@ -4156,21 +4156,23 @@ PP(pp_unshift)
 PP(pp_reverse)
 {
     dVAR; dSP; dMARK;
-    SV ** const oldsp = SP;
+    SV * const av = sv_mortalcopy(POPs);
+    SV ** ary;
+    SV ** end;
 
-    if (GIMME == G_ARRAY) {
-	MARK++;
-	while (MARK < SP) {
-	    register SV * const tmp = *MARK;
-	    *MARK++ = *SP;
-	    *SP-- = tmp;
-	}
-	/* safe as long as stack cannot get extended in the above */
-	SP = oldsp;
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
     }
-    else {
-	Perl_croak(aTHX_ "reverse not in list context");
+
+    ary = AvARRAY(av);
+    end = ary + av_len(av);
+    
+    while (ary < end) {
+	register SV * const tmp = *ary;
+	*ary++ = *end;
+	*end-- = tmp;
     }
+    PUSHs(av);
     RETURN;
 }
 
