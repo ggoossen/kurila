@@ -630,17 +630,6 @@ Perl_do_kv(pTHX)
     const I32 dokeys =   dokv || (PL_op->op_type == OP_KEYS);
     const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES);
 
-    if (!hv) {
-	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
-	    SV * const sv = sv_newmortal();
-	    sv_upgrade(sv, SVt_PVLV);
-	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
-	    LvTARG(sv) = NULL;
-	    PUSHs(sv);
-	}
-	RETURN;
-    }
-
     if ( ! SvHVOK(hv) ) {
 	if ( ! SvOK(hv) ) {
 	    RETURN;
@@ -658,29 +647,6 @@ Perl_do_kv(pTHX)
 	IV i;
 
 	Perl_croak(aTHX_ "keys in scalar context");
-	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
-	    SV * const sv = sv_newmortal();
-	    sv_upgrade(sv, SVt_PVLV);
-	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
-	    LvTYPE(sv) = 'k';
-	    LvTARG(sv) = SvREFCNT_inc_simple(keys);
-	    PUSHs(sv);
-	    RETURN;
-	}
-
-	if (! SvTIED_mg((SV*)keys, PERL_MAGIC_tied) )
-	{
-	    i = HvKEYS(keys);
-	}
-	else {
-	    i = 0;
-	    while (hv_iternext(keys)) i++;
-	}
-	{
-	    dTARGET;
-	    PUSHi( i );
-	    RETURN;
-	}
     }
 
     EXTEND(SP, HvKEYS(keys) * (dokeys + dovalues));
