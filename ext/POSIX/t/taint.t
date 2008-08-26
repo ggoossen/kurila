@@ -9,10 +9,10 @@ BEGIN {
 }
 
 use Test::More tests => 7;
-use Scalar::Util qw/tainted/;
+use Scalar::Util < qw/tainted/;
 
 
-use POSIX qw(fcntl_h open read mkfifo);
+use POSIX < qw(fcntl_h open read mkfifo);
 use strict ;
 
 $| = 1;

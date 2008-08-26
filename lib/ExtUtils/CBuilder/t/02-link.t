@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
-    @INC = @( qw(../..) );
+    @INC = @( < qw(../..) );
   }
 }
 
@@ -63,7 +63,7 @@ if ($^O eq 'os2') {		# Analogue of LDLOADPATH...
 ok my_system($exe_file), 11;
 
 # Clean up
-for ($source_file, $object_file, $exe_file) {
+for (@($source_file, $object_file, $exe_file)) {
   s/"|'//g;
   1 while unlink;
 }

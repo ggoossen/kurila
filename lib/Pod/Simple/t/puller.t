@@ -17,8 +17,8 @@ sub pump_it_up {
   my(@t, $t);
   while($t = $p->get_token) { push @t, $t }
   print "# Count of tokens: ", scalar(nelems @t), "\n";
-  print "#  I.e., \{", join("\n#       + ",
-    map ref($_) . ": " . $_->dump, < @t), "\} \n";
+  print "#  I.e., \{", join("\n#       + ", @(
+    < map ref($_) . ": " . $_->dump, @( < @t))), "\} \n";
   return @t;
 }
 
@@ -29,7 +29,7 @@ my @t;
 @t = @( < pump_it_up(qq{\n\nProk\n\n=head1 Things\n\n=cut\n\nBzorch\n\n}) );
 
 if(not(
-  ok scalar( grep { ref $_ and $_->can('type') } < @t), 5
+  ok scalar( grep { ref $_ and $_->can('type') } @( < @t)), 5
 )) {
   ok 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 12 ) {ok 0}
@@ -59,7 +59,7 @@ if(not(
 ) );
 
 if(
-  not( ok scalar( grep { ref $_ and $_->can('type') } < @t) => 16 )
+  not( ok scalar( grep { ref $_ and $_->can('type') } @( < @t)) => 16 )
 ) {
   ok 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 32 ) {ok 0}
@@ -184,8 +184,8 @@ ok @t[4]->tagname, 'Document';
 print "# Testing pullparsing from an arrayref with terminal newlines\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-$p->set_source( \@( map "$_\n",
-  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') );
+$p->set_source( \@( < map "$_\n", @(
+  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut')) );
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {
@@ -216,8 +216,8 @@ my $p = Pod::Simple::PullParser->new;
 ok 1;
 open(OUT, ">", "temp.pod") || die "Can't write-open temp.pod: $!";
 print OUT
- map "$_\n",
-  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut'
+ < map "$_\n", @(
+  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut')
 ;
 close(OUT);
 ok 1;

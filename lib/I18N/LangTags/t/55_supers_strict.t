@@ -1,14 +1,14 @@
 
 # Time-stamp: "2004-03-30 17:49:58 AST"
 #sub I18N::LangTags::Detect::DEBUG () {10}
-use I18N::LangTags qw(implicate_supers_strictly);
+use I18N::LangTags < qw(implicate_supers_strictly);
 
 use Test;
 BEGIN { plan tests => 19 };
 
 print "#\n# Testing strict (non-tight) insertion of super-ordinate language tags...\n#\n";
 
-my @in = @( grep m/\S/, split m/[\n\r]/, q{
+my @in = @( < grep m/\S/, @( < split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en
@@ -34,10 +34,10 @@ ja pt-br-janeiro de pt fr => ja pt-br-janeiro de pt fr pt-br
 pt-br-janeiro de pt-br fr => pt-br-janeiro de pt-br fr pt
  # an odd case, since we don't filter for uniqueness in this sub
  
-} );
+}) );
 
 
-foreach my $in (< @in) {
+foreach my $in ( @in) {
   $in =~ s/^\s+//s;
   $in =~ s/\s+$//s;
   $in =~ s/#.+//s;
@@ -54,21 +54,21 @@ foreach my $in (< @in) {
     #print "{@in}{@should}\n";
   }
   my @out = @( < I18N::LangTags::implicate_supers_strictly(
-    ("{join ' ', <@in}" eq 'NIX') ? () : < @in
+    ("{join ' ', @( <@in)}" eq 'NIX') ? () : < @in
   ) );
   #print "O: ", join(' ', map "<$_>", @out), "\n";
   @out = @( 'NIX' ) unless (nelems @out);
 
   
   if( (nelems @out) == nelems @should
-      and lc( join "\e", < @out ) eq lc( join "\e", < @should )
+      and lc( join "\e", @( < @out) ) eq lc( join "\e", @( < @should) )
   ) {
-    print "#     Happily got [{join ' ', <@out}] from [$in]\n";
+    print "#     Happily got [{join ' ', @( <@out)}] from [$in]\n";
     ok 1;
   } else {
     ok 0;
-    print "#!!Got:         [{join ' ', <@out}]\n",
-          "#!! but wanted: [{join ' ', <@should}]\n",
+    print "#!!Got:         [{join ' ', @( <@out)}]\n",
+          "#!! but wanted: [{join ' ', @( <@should)}]\n",
           "#!! from \"$in\"\n#\n";
   }
 }

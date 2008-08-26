@@ -59,9 +59,9 @@ sub run {
     Carp::croak "You can call run() only on subclasses of "
      . __PACKAGE__;
   } else {
-    Carp::croak join '',
+    Carp::croak join '', @(
       "You can't call run() because ",
-      ref(@_[0]) || @_[0], " didn't define a run() method";
+      ref(@_[0]) || @_[0], " didn't define a run() method");
   }
 }
 
@@ -101,9 +101,9 @@ sub get_token {
   DEBUG +> 1 and print "\nget_token starting up on $self.\n";
   DEBUG +> 2 and print " Items in token-buffer (",
    scalar( nelems @{ $self->{'token_buffer'} } ) ,
-   ") :\n", map(
-     "    " . $_->dump . "\n", < @{ $self->{'token_buffer'} }
-   ),
+   ") :\n", < map(
+     "    " . $_->dump . "\n", @( < @{ $self->{'token_buffer'} }
+)   ),
    (nelems @{ $self->{'token_buffer'} }) ? '' : '       (no tokens)',
    "\n"
   ;
@@ -140,7 +140,7 @@ sub get_token {
       
       if(DEBUG +> 8) {
         print "* I've gotten ", scalar(nelems @lines), " lines:\n";
-        foreach my $l (< @lines) {
+        foreach my $l ( @lines) {
           if(defined $l) {
             print "  line \{$l\}\n";
           } else {
@@ -209,8 +209,8 @@ use UNIVERSAL ();
 sub unget_token {
   my $self = shift;
   DEBUG and print "Ungetting ", scalar(nelems @_), " tokens: ",
-   (nelems @_) ? "{join ' ', <@_}\n" : "().\n";
-  foreach my $t (< @_) {
+   (nelems @_) ? "{join ' ', @( <@_)}\n" : "().\n";
+  foreach my $t ( @_) {
     Carp::croak "Can't unget that, because it's not a token -- it's undef!"
      unless defined $t;
     Carp::croak "Can't unget $t, because it's not a token -- it's a string!"
@@ -322,7 +322,7 @@ sub _get_titled_section {
   $max_content_length = 120 unless defined $max_content_length;
 
   die( "Unknown " . ((2 == nelems(%options)) ? "option: " : "options: ")
-    . (join " ", map "[$_]", sort keys %options)
+    . (join " ", @( < map "[$_]", @( < sort @( < keys %options))))
   )
    if %options;
 
@@ -467,7 +467,7 @@ sub _get_titled_section {
 
 sub _handle_element_start {
   my $self = shift;   # leaving ($element_name, $attr_hash_r)
-  DEBUG +> 2 and print "++ @_[0] (", map("<$_> ", < %{@_[1]}), ")\n";
+  DEBUG +> 2 and print "++ @_[0] (", < map("<$_> ", @( < %{@_[1]})), ")\n";
   
   push @{ $self->{'token_buffer'} }, 
        $self->{'start_token_class'}->new(< @_);

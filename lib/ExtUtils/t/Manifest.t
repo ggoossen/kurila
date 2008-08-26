@@ -25,7 +25,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 # We're going to be chdir'ing and modules are sometimes loaded on the
 # fly in this test, so we need an absolute @INC.
-@INC = @( map { File::Spec->rel2abs($_) } < @INC );
+@INC = @( < map { File::Spec->rel2abs($_) } @( < @INC) );
 
 # keep track of everything added so it can all be deleted
 my %Files;
@@ -53,12 +53,12 @@ sub catch_warning {
 }
 
 sub remove_dir {
-    ok( rmdir( $_ ), "remove $_ directory" ) for < @_;
+    ok( rmdir( $_ ), "remove $_ directory" ) for  @_;
 }
 
 # use module, import functions
 BEGIN { 
-    use_ok( 'ExtUtils::Manifest', 
+    use_ok( 'ExtUtils::Manifest', < 
             qw( mkmanifest manicheck filecheck fullcheck 
                 maniread manicopy skipcheck maniadd) ); 
 }
@@ -81,8 +81,8 @@ chmod( 0744, 'foo') if %Config{'chmod'};
 # there shouldn't be a MANIFEST there
 my ($res, $warn) = < catch_warning( \&mkmanifest );
 # Canonize the order.
-$warn = join("", map { "$_|" } 
-                 sort { lc($a) cmp lc($b) } split m/\r?\n/, $warn);
+$warn = join("", @( < map { "$_|" } 
+ @( <                 sort { lc($a) cmp lc($b) } @( < split m/\r?\n/, $warn))));
 is( $warn, "Added to MANIFEST: foo|Added to MANIFEST: MANIFEST|",
     "mkmanifest() displayed its additions" );
 
@@ -121,11 +121,11 @@ catch_warning( sub {
 	@skipped = @( < skipcheck() )
 });
 
-is( join( ' ', < @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
+is( join( ' ', @( < @skipped) ), 'MANIFEST.SKIP', 'listed skipped files' );
 
 {
 	local $ExtUtils::Manifest::Quiet = 1;
-	is( join(' ', < filecheck() ), 'bar', 'listing skipped with filecheck()' );
+	is( join(' ', @( < filecheck()) ), 'bar', 'listing skipped with filecheck()' );
 }
 
 # add a subdirectory and a file there that should be found
@@ -138,7 +138,7 @@ ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ),
 $_ = 'foo';
 my $files = maniread();
 is( nkeys %$files, 2, 'two files found' );
-is( join(' ', sort { lc($a) cmp lc($b) } keys %$files), 'foo MANIFEST', 
+is( join(' ', @( < sort { lc($a) cmp lc($b) } @( < keys %$files))), 'foo MANIFEST', 
                                         'both files found' );
 is( $_, 'foo', q{maniread() doesn't clobber $_} );
 
@@ -148,13 +148,13 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 manicopy( $files, 'copy', 'cp' );
 my @copies = @( () );
 find( sub { push @copies, $_ if -f }, 'copy' );
-@copies = @( map { s/\.$//; $_ } < @copies ) if $Is_VMS;  # VMS likes to put dots on
+@copies = @( < map { s/\.$//; $_ } @( < @copies) ) if $Is_VMS;  # VMS likes to put dots on
                                                    # the end of files.
 # Have to compare insensitively for non-case preserving VMS
-is_deeply( \@(sort map { lc } < @copies), \@(sort map { lc } keys %$files) );
+is_deeply( \@( <sort @( < map { lc } @( < @copies))), \@( <sort @( < map { lc } @( < keys %$files))) );
 
 # cp would leave files readonly, so check permissions.
-foreach my $orig (< @copies) {
+foreach my $orig ( @copies) {
     my $copy = "copy/$orig";
     ok( -r $copy,               "$copy: must be readable" );
     is( -w $copy, -w $orig,     "       writable if original was" );
@@ -225,17 +225,17 @@ is( $files->{foobar}, '',    '          preserved old entries' );
     add_file('mymanifest.skip' => "^foo\n");
     add_file('mydefault.skip'  => "^my\n");
     $ExtUtils::Manifest::DEFAULT_MSKIP =
-         File::Spec->catfile($cwd, qw(mantest mydefault.skip));
-    my $skip = File::Spec->catfile($cwd, qw(mantest mymanifest.skip));
+         File::Spec->catfile($cwd, < qw(mantest mydefault.skip));
+    my $skip = File::Spec->catfile($cwd, < qw(mantest mymanifest.skip));
     add_file('MANIFEST.SKIP' =>
              "albatross\n#!include $skip\n#!include_default");
     my ($res, $warn) = < catch_warning( \&skipcheck );
-    for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
+    for (@( <qw(albatross foo foobar mymanifest.skip mydefault.skip))) {
         like( $warn, qr/Skipping \b$_\b/,
               "Skipping $_" );
     }
     ($res, $warn) = < catch_warning( \&mkmanifest );
-    for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
+    for (@( <qw(albatross foo foobar mymanifest.skip mydefault.skip))) {
         like( $warn, qr/Removed from MANIFEST: \b$_\b/,
               "Removed $_ from MANIFEST" );
     }
@@ -250,14 +250,14 @@ is( $files->{foobar}, '',    '          preserved old entries' );
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' );
     my $extsep = $Is_VMS ? '_' : '.';
-    %Files{"$_.bak"}++ for ('MANIFEST', "MANIFEST{$extsep}SKIP");
+    %Files{"$_.bak"}++ for @( ('MANIFEST', "MANIFEST{$extsep}SKIP"));
 }
 
 add_file('MANIFEST'   => 'Makefile.PL');
 maniadd(\%( foo  => 'bar' ));
 $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
-%$files = %( map { (lc $_ => $files->{$_}) } keys %$files );
+%$files = %( < map { (lc $_ => $files->{$_}) } @( < keys %$files) );
 my %expect = %( 'makefile.pl' => '',
                'foo'    => 'bar'
              );
@@ -286,7 +286,7 @@ SKIP: {
 
 
 END {
-	is( unlink( keys %Files ), nkeys %Files, 'remove all added files' );
+	is( unlink( < keys %Files ), nkeys %Files, 'remove all added files' );
 	remove_dir( 'moretest', 'copy' );
 
 	# now get rid of the parent directory

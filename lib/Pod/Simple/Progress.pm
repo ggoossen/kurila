@@ -34,7 +34,7 @@ sub reach {
   if( (my $now = time) +>= $self->{'quiet_until'}) {
     my $goal;
     my    $to = $self->{'to'};
-    print $to join('',
+    print $to join('', @(
       ($self->{'quiet_until'} == 1) ? () : '... ',
       (defined $point) ? (
         '#',
@@ -45,7 +45,7 @@ sub reach {
         $note ? ': ' : (),
       ) : (),
       $note || '',
-      "\n"
+      "\n")
     );
     $self->{'quiet_until'} = $now + $self->{'delay'};
   }

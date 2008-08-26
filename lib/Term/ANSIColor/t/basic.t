@@ -9,7 +9,7 @@
 
 BEGIN { $| = 1; print "1..16\n" }
 delete %ENV{ANSI_COLORS_DISABLED};
-use Term::ANSIColor qw(:constants color colored uncolor);
+use Term::ANSIColor < qw(:constants color colored uncolor);
 print "ok 1\n";
 
 ##############################################################################
@@ -76,10 +76,10 @@ if (colored (\@('bold', 'on_green'), "test\n", "\n", "test")
 
 # Test uncolor.
 my @names = @( < uncolor ('1;42', "\e[m", '', "\e[0m") );
-if (join ('|', < @names) eq 'bold|on_green|clear') {
+if (join ('|', @( < @names)) eq 'bold|on_green|clear') {
     print "ok 9\n";
 } else {
-    print join ('|', < @names), "\n";
+    print join ('|', @( < @names)), "\n";
     print "not ok 9\n";
 }
 

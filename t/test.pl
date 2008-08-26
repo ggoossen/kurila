@@ -69,8 +69,8 @@ END {
 # messages
 sub _diag {
     return unless (nelems @_);
-    my @mess = @( map { m/^#/ ? "$_\n" : "# $_\n" }
-               map { split m/\n/ } < @_ );
+    my @mess = @( < map { m/^#/ ? "$_\n" : "# $_\n" }
+ @(               < map { < split m/\n/ } @( < @_)) );
     my $func = $TODO ? \&_print : \&_print_stderr;
     $func->(< @mess);
 }
@@ -81,7 +81,7 @@ sub diag {
 
 sub skip_all {
     if ((nelems @_)) {
-	_print "1..0 # Skipped: {join ' ', <@_}\n";
+	_print "1..0 # Skipped: {join ' ', @( <@_)}\n";
     } else {
 	_print "1..0\n";
     }
@@ -139,7 +139,7 @@ sub _qq {
 
 # keys are the codes \n etc map to, values are 2 char strings such as \n
 my %backslash_escape;
-foreach my $x (split m//, q|nrtfa\'"|) {
+foreach my $x (@( <split m//, q|nrtfa\'"|)) {
     %backslash_escape{ord eval "\"\\$x\""} = "\\$x";
 }
 # A way to display scalars containing control characters and Unicode.
@@ -351,7 +351,7 @@ sub eq_hash {
       $fail = 1;
     }
   }
-  foreach (keys %$orig) {
+  foreach (@( <keys %$orig)) {
     # Force a hash recompute if this perl's internals can cache the hash key.
     $_ = "" . $_;
     next if (exists $suspect->{$_});
@@ -398,7 +398,7 @@ my $is_cygwin   = $^O eq 'cygwin';
 sub _quote_args {
     my ($runperl, $args) = < @_;
 
-    foreach (< @$args) {
+    foreach ( @$args) {
 	# In VMS protect with doublequotes because otherwise
 	# DCL will lowercase -- unless already doublequoted.
        $_ = q(").$_.q(") if $is_vms && !m/^\"/ && length($_) +> 0;
@@ -437,7 +437,7 @@ sub _create_runperl { # Create the string to qx in runperl().
     if (defined %args{progs}) {
 	die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
 	    unless ref %args{progs} eq "ARRAY";
-        foreach my $prog (< @{%args{progs}}) {
+        foreach my $prog ( @{%args{progs}}) {
             if ($is_mswin || $is_netware || $is_vms) {
                 $runperl .= qq ( -e "$prog" );
             }
@@ -503,7 +503,7 @@ sub runperl {
 
     my $tainted = $^TAINT;
     my %args = %( < @_ );
-    exists %args{switches} && grep m/^-T$/, < @{%args{switches}} and $tainted = $tainted + 1;
+    exists %args{switches} && grep m/^-T$/, @( < @{%args{switches}}) and $tainted = $tainted + 1;
 
     if ($tainted) {
 	# We will assume that if you're running under -T, you really mean to
@@ -519,15 +519,15 @@ sub runperl {
 	    $sep = %Config{path_sep};
 	}
 
-	my @keys = @( grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV) );
+	my @keys = @( < grep {exists %ENV{$_}} @( < qw(CDPATH IFS ENV BASH_ENV)) );
 	local %ENV{[< @keys]} = ();
 	# Untaint, plus take out . and empty string:
 	local %ENV{'DCL$PATH'} = $1 if $is_vms && (%ENV{'DCL$PATH'} =~ m/(.*)/s);
 	%ENV{PATH} =~ m/(.*)/s;
 	local %ENV{PATH} =
-	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
+	    join $sep, @( < grep { $_ ne "" and $_ ne "." and -d $_ and
 		($is_mswin or $is_vms or !(stat && (stat '_')[[2]]^&^0022)) }
-		    split quotemeta ($sep), $1;
+ @( <		    split quotemeta ($sep), $1));
 	%ENV{PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
 
 	$runperl =~ m/(.*)/s;
@@ -544,7 +544,7 @@ sub runperl {
 *run_perl = \&runperl; # Nice alias.
 
 sub DIE {
-    _print_stderr "# {join ' ', <@_}\n";
+    _print_stderr "# {join ' ', @( <@_)}\n";
     exit 1;
 }
 
@@ -599,7 +599,7 @@ sub which_perl {
 }
 
 sub unlink_all {
-    foreach my $file (< @_) {
+    foreach my $file ( @_) {
         1 while unlink $file;
         _print_stderr "# Couldn't unlink '$file': $!\n" if -f $file;
     }
@@ -717,7 +717,7 @@ sub can_ok ($@) {
     }
 
     my @nok = @( () );
-    foreach my $method (< @methods) {
+    foreach my $method ( @methods) {
         local($!, $@);  # don't interfere with caller's $@
                         # eval sometimes resets $!
         try { $proto->can($method) } || push @nok, $method;

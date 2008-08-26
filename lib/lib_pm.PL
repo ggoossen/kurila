@@ -1,5 +1,5 @@
 use Config;
-use File::Basename qw(&basename &dirname);
+use File::Basename < qw(&basename &dirname);
 use File::Spec;
 use Cwd;
 
@@ -20,11 +20,11 @@ if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $useConfig = '';
     $Config_archname = qq('%Config{archname}');
     $Config_version  = qq('%Config{version}');
-    my @Config_inc_version_list = @(
-	reverse split m/ /, %Config{inc_version_list} );
+    my @Config_inc_version_list = @( <
+	reverse @( < split m/ /, %Config{inc_version_list}) );
     $Config_inc_version_list =
 	(nelems @Config_inc_version_list) ?
-	    qq({join ' ', <@Config_inc_version_list}) : q(());
+	    qq({join ' ', @( <@Config_inc_version_list)}) : q(());
 } else {
     $useConfig = 'use Config;';
     $Config_archname = q(%Config{archname});

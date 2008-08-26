@@ -10,13 +10,13 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
+        @INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
     }
 }
 
 #########################
 
-use Unicode::Normalize qw(:all);
+use Unicode::Normalize < qw(:all);
 
 use Test;
 use strict;
@@ -28,11 +28,11 @@ BEGIN { plan tests => 112 };
 
 #########################
 
-no warnings qw(utf8);
+no warnings < qw(utf8);
 # To avoid warning in Test.pm, EXPR in ok(EXPR) must be boolean.
 
-for my $u (0xD800, 0xDFFF, 0xFDD0, 0xFDEF, 0xFEFF, 0xFFFE, 0xFFFF,
-	   0x1FFFF, 0x10FFFF, 0x110000, 0x7FFFFFFF)
+for my $u (@(0xD800, 0xDFFF, 0xFDD0, 0xFDEF, 0xFEFF, 0xFFFE, 0xFFFF,
+	   0x1FFFF, 0x10FFFF, 0x110000, 0x7FFFFFFF))
 {
     my $c = chr $u;
     ok($c eq NFD($c));  # 1

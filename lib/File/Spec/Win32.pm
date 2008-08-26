@@ -2,12 +2,12 @@ package File::Spec::Win32;
 
 use strict;
 
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @( qw(File::Spec::Unix) );
+@ISA = @( < qw(File::Spec::Unix) );
 
 # Some regexes we use for path splitting
 my $DRIVE_RX = '[a-zA-Z]:';
@@ -69,7 +69,7 @@ variables are tainted, they are not used.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( map( %ENV{$_}, qw(TMPDIR TEMP TMP) ),
+    $tmpdir = @_[0]->_tmpdir( < map( %ENV{$_}, @( < qw(TMPDIR TEMP TMP)) ),
 			      'SYS:/temp',
 			      'C:\system\temp',
 			      'C:/temp',
@@ -135,7 +135,7 @@ sub catfile {
 
     # Compatibility with File::Spec <= 3.26:
     #     catfile('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( (@_[0].'\\'), @_[[1..((nelems @_)-1)]] )
+    return _canon_cat( (@_[0].'\\'), @_[[ <1..((nelems @_)-1)]] )
         if @_[0] =~ m{^$DRIVE_RX\z}o;
 
     return _canon_cat( < @_ );
@@ -153,16 +153,16 @@ sub catdir {
 
     # Compatibility with File::Spec <= 3.26:
     #     catdir('A:', 'foo') should return 'A:\foo'.
-    return _canon_cat( (@_[0].'\\'), @_[[1..((nelems @_)-1)]] )
+    return _canon_cat( (@_[0].'\\'), @_[[ <1..((nelems @_)-1)]] )
         if @_[0] =~ m{^$DRIVE_RX\z}o;
 
     return _canon_cat( < @_ );
 }
 
 sub path {
-    my @path = @( split(';', %ENV{PATH}) );
-    s/"//g for < @path;
-    @path = @( grep length, < @path );
+    my @path = @( < split(';', %ENV{PATH}) );
+    s/"//g for  @path;
+    @path = @( < grep length, @( < @path) );
     unshift(@path, ".");
     return @path;
 }
@@ -258,14 +258,14 @@ sub splitdir {
     # simple case.
     #
     if ( $directories !~ m|[\\/]\Z(?!\n)| ) {
-        return @( split( m|[\\/]|, $directories ) );
+        return @( < split( m|[\\/]|, $directories ) );
     }
     else {
         #
         # since there was a trailing separator, add a file name to the end, 
         # then do the split, then replace it with ''.
         #
-        my( @directories )= @( split( m|[\\/]|, "{$directories}dummy" ) ) ;
+        my( @directories )= @( < split( m|[\\/]|, "{$directories}dummy" ) ) ;
         @directories[( (nelems @directories)-1) ]= '' ;
         return @directories ;
     }
@@ -387,7 +387,7 @@ sub _canon_cat(@)				# @path -> path
 	       : $first =~ s{ \A [\\/] }{}x			# root dir
 	       ? "\\"
 	       : "";
-    my $path   = join "\\", $first, < @_;
+    my $path   = join "\\", @( $first, < @_);
 
     $path =~ s#[\\/]+#\\#g;		# xx/yy --> xx\yy & xx\\yy --> xx\yy
 

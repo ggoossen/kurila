@@ -12,7 +12,7 @@ my $filename ;
 
 @ARGV = @( '-' ) unless (nelems @ARGV) ;
 
-foreach my $filename (< @ARGV) {
+foreach my $filename ( @ARGV) {
     my $buffer ;
 
     my $gz = gzopen($filename, "rb") 

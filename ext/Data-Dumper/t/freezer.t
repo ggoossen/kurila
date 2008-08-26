@@ -4,7 +4,7 @@
 # test suite yet
 
 use strict;
-use Test::More qw(no_plan);
+use Test::More < qw(no_plan);
 use Data::Dumper;
 $Data::Dumper::Freezer = 'freeze';
 

@@ -3,7 +3,7 @@ package B::Debug;
 our $VERSION = '1.05_02';
 
 use strict;
-use B qw(peekop class walkoptree walkoptree_exec
+use B < qw(peekop class walkoptree walkoptree_exec
          main_start main_root cstring sv_undef @specialsv_name);
 # <=5.008 had @specialsv_name exported from B::Asmdata
 BEGIN {
@@ -236,7 +236,7 @@ sub B::AV::debug {
     my ($av) = < @_;
     $av->B::SV::debug;
     my(@array) = @( < $av->ARRAY );
-    print "\tARRAY\t\t(", join(", ", map("0x" . $$_, < @array)), ")\n";
+    print "\tARRAY\t\t(", join(", ", @( < map("0x" . $$_, @( < @array)))), ")\n";
     printf <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
 	FILL		%d
 	MAX		%d

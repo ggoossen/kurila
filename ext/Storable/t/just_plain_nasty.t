@@ -24,7 +24,7 @@ BEGIN {
     }
 }
 
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 #$Storable::DEBUGME = 1;
 BEGIN {
@@ -45,7 +45,7 @@ BEGIN {
 
 my (@a);
 
-for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
+for my $dbun (@(1, 0)) {  # dbun - don't be utterly nasty - being utterly
                        # nasty means having a reference to the object
                        # directly within itself. otherwise it's in the
                        # second array.

@@ -7,7 +7,7 @@ my $x = \ %( aap => 'noot', mies => 'teun' );
 is $x->{aap}, 'noot', "anon hash ref construction";
 is $x->{mies}, 'teun', "anon hash ref construction";
 
-is( (join '*', sort < %( aap => 'noot', mies => 'teun' )), 'aap*mies*noot*teun', "anon hash is list in list context");
+is( (join '*', @( < sort @( < %( aap => 'noot', mies => 'teun' )))), 'aap*mies*noot*teun', "anon hash is list in list context");
 
 is %(aap => 'noot', mies => 'teun'){aap}, 'noot', "using helem directy on anon hash";
 

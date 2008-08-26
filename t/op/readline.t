@@ -6,7 +6,7 @@ BEGIN {
 
 plan tests => 15;
 
-dies_like(sub { for (\2) { $_ = ~< *FH } },
+dies_like(sub { for (@(\2)) { $_ = ~< *FH } },
           qr/^Modification of a read-only value attempted$/, '[perl #19566]');
 
 {
@@ -18,7 +18,7 @@ dies_like(sub { for (\2) { $_ = ~< *FH } },
 }
 
 # 82 is chosen to exceed the length for sv_grow in do_readline (80)
-foreach my $k (1, 82) {
+foreach my $k (@(1, 82)) {
   my $result
     = runperl (stdin => '', stderr => 1,
               prog => "our (\$x, \%a); \$x = q(k) x $k; \%a\{\$x\} = qw(v); \$_ = ~< *ARGV foreach keys \%a; print qw(end)",
@@ -28,7 +28,7 @@ foreach my $k (1, 82) {
 }
 
 
-foreach my $k (1, 21) {
+foreach my $k (@(1, 21)) {
   my $result
     = runperl (stdin => ' rules', stderr => 1,
               prog => "our (\$x, \%a); \$x = q(perl) x $k; \%a\{\$x\} = q(v); foreach (keys \%a) \{\$_ .= ~< *ARGV; print\}",
@@ -37,7 +37,7 @@ foreach my $k (1, 21) {
   is ($result, ('perl' x $k) . " rules", 'rcatline to shared sv for length ' . length('perl' x $k));
 }
 
-foreach my $l (1, 82) {
+foreach my $l (@(1, 82)) {
   my $k = $l;
   $k = 'k' x $k;
   my $copy = $k;
@@ -46,7 +46,7 @@ foreach my $l (1, 82) {
 }
 
 
-foreach my $l (1, 21) {
+foreach my $l (@(1, 21)) {
   my $k = $l;
   $k = 'perl' x $k;
   my $perl = $k;

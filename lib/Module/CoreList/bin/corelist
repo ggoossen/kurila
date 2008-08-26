@@ -84,7 +84,7 @@ use warnings;
 
 my %Opts;
 
-GetOptions(\%Opts, qw[ help|?! man! v|version:f a! d ] );
+GetOptions(\%Opts, < qw[ help|?! man! v|version:f a! d ] );
 
 pod2usage(1) if %Opts{help};
 pod2usage(-verbose=>2) if %Opts{man};
@@ -92,7 +92,7 @@ pod2usage(-verbose=>2) if %Opts{man};
 if(exists %Opts{v} ){
     if( !%Opts{v} ) {
         print "\nModule::CoreList has info on the following perl versions:\n";
-        print "$_\n" for sort keys %Module::CoreList::version;
+        print "$_\n" for @( < sort @( < keys %Module::CoreList::version));
         print "\n";
         exit 0;
     }
@@ -107,7 +107,7 @@ if(exists %Opts{v} ){
     if ( !nelems @ARGV ) {
 	print "\nThe following modules were in perl v%Opts{v} CORE\n";
 	print "$_ ", $version_hash->{$_} || " ","\n"
-	for sort keys %$version_hash;
+	for @( < sort @( < keys %$version_hash));
 	print "\n";
 	exit 0;
     }
@@ -120,7 +120,7 @@ if ( !nelems @ARGV ) {
 while ((nelems @ARGV)) {
 	my ($mod, $ver);
 	if (@ARGV[0] =~ m/=/) {
-	    ($mod, $ver) = split m/=/, shift @ARGV;
+	    ($mod, $ver) = < split m/=/, shift @ARGV;
 	} else {
 	    $mod = shift @ARGV;
 	    $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ? shift @ARGV : "";
@@ -140,7 +140,7 @@ while ((nelems @ARGV)) {
 	    }
 	    my @mod = @( < Module::CoreList->find_modules($re) );
 	    if ((nelems @mod)) {
-		module_version($_, $ver) for < @mod;
+		module_version($_, $ver) for  @mod;
 	    } else {
 		$ver ^|^= '';
 		print "\n$mod $ver has no match in CORE (or so I think)\n";
@@ -180,8 +180,8 @@ sub module_version {
     print "\n",$msg,"\n";
 
     if(defined $ret and exists %Opts{a} and %Opts{a}){
-        for my $v(
-            sort keys %Module::CoreList::version ){
+        for my $v(@( <
+            sort @( < keys %Module::CoreList::version)) ){
 
             printf "  \%-10s \%-10s\n",
                 $v,

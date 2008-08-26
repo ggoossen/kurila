@@ -12,7 +12,7 @@
 
 package Pod::Find;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = 1.34;   ## Current version of this package
 
 #############################################################################
@@ -53,9 +53,9 @@ use File::Spec;
 use File::Find;
 use Cwd;
 
-use vars qw(@ISA @EXPORT_OK $VERSION);
-@ISA = @( qw(Exporter) );
-@EXPORT_OK = @( qw(&pod_find &simplify_name &pod_where &contains_pod) );
+use vars < qw(@ISA @EXPORT_OK $VERSION);
+@ISA = @( < qw(Exporter) );
+@EXPORT_OK = @( < qw(&pod_find &simplify_name &pod_where &contains_pod) );
 
 # package global variables
 my $SIMPLIFY_RX;
@@ -138,7 +138,7 @@ sub pod_find
         if ($^O eq 'MacOS') {
             # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
             my @new_INC = @( < @INC );
-            for (< @new_INC) {
+            for ( @new_INC) {
                 if ( $_ eq '.' ) {
                     $_ = ':';
                 } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
@@ -147,9 +147,9 @@ sub pod_find
                     $_ =~ s|^\./|:|;
                 }
             }
-            push(@search, grep($_ ne File::Spec->curdir, < @new_INC));
+            push(@search, < grep($_ ne File::Spec->curdir, @( < @new_INC)));
         } else {
-            push(@search, grep($_ ne File::Spec->curdir, < @INC));
+            push(@search, < grep($_ ne File::Spec->curdir, @( < @INC)));
         }
 
         %opts{-perl} = 1;
@@ -181,7 +181,7 @@ sub pod_find
     my %names;
     my $pwd = cwd();
 
-    foreach my $try (< @search) {
+    foreach my $try ( @search) {
         unless(File::Spec->file_name_is_absolute($try)) {
             # make path absolute
             $try = File::Spec->catfile($pwd,$try);
@@ -236,7 +236,7 @@ sub _check_for_duplicates {
     if(%$names_ref{$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
-            join(' ', grep(%$pods_ref{$_} eq $name, keys %$pods_ref)),"\n";
+            join(' ', @( < grep(%$pods_ref{$_} eq $name, @( < keys %$pods_ref)))),"\n";
     }
     else {
         %$names_ref{$name} = 1;
@@ -382,7 +382,7 @@ sub pod_where {
   my $pod = shift;
 
   # Split on :: and then join the name together using File::Spec
-  my @parts = @( split (m/::/, $pod) );
+  my @parts = @( < split (m/::/, $pod) );
 
   # Get full directory list
   my @search_dirs = @( < @{ %options{'-dirs'} } );
@@ -395,7 +395,7 @@ sub pod_where {
     if ($^O eq 'MacOS' && %options{'-inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
         my @new_INC = @( < @INC );
-        for (< @new_INC) {
+        for ( @new_INC) {
             if ( $_ eq '.' ) {
                 $_ = ':';
             } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
@@ -421,11 +421,11 @@ sub pod_where {
       if -d %Config::Config{'scriptdir'};
   }
 
-  warn "Search path is: ".join(' ', < @search_dirs)."\n"
+  warn "Search path is: ".join(' ', @( < @search_dirs))."\n"
         if %options{'-verbose'};
 
   # Loop over directories
-  Dir: foreach my $dir ( < @search_dirs ) {
+  Dir: foreach my $dir (  @search_dirs ) {
 
     # Don't bother if can't find the directory
     if (-d $dir) {
@@ -438,7 +438,7 @@ sub pod_where {
         if %options{'-verbose'};
 
       # Loop over possible extensions
-      foreach my $ext ('', '.pod', '.pm', '.pl') {
+      foreach my $ext (@('', '.pod', '.pm', '.pl')) {
         my $fullext = $fullname . $ext;
         if (-f $fullext && 
          contains_pod($fullext, %options{'-verbose'}) ) {

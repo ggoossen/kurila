@@ -19,7 +19,7 @@ else {
 # These constants are common to all tests.
 # Later the sem* tests will import more for themselves.
 
-use IPC::SysV qw(IPC_PRIVATE IPC_NOWAIT IPC_STAT IPC_RMID S_IRWXU);
+use IPC::SysV < qw(IPC_PRIVATE IPC_NOWAIT IPC_STAT IPC_RMID S_IRWXU);
 use strict;
 
 my $msg;
@@ -142,7 +142,7 @@ SKIP: {
         %Config{'d_semget'} eq 'define' &&
         %Config{'d_semctl'} eq 'define';
 
-    use IPC::SysV qw(IPC_CREAT GETALL SETALL);
+    use IPC::SysV < qw(IPC_CREAT GETALL SETALL);
 
     # FreeBSD's default limit seems to be 9
     my $nsem = 5;
@@ -178,7 +178,7 @@ SKIP: {
     my $adata = "0" x $nsem;
 
     is(nelems(@data),$nsem,'right amount');
-    cmp_ok(join("",<@data),'eq',$adata,'right data');
+    cmp_ok(join("", @(<@data)),'eq',$adata,'right data');
 
     my $poke = 2;
 
@@ -191,7 +191,7 @@ SKIP: {
     @data = @(unpack("s!*",$data));
     my $bdata = "0" x $poke . "1" . "0" x ($nsem-$poke-1);
 
-    cmp_ok(join("",<@data),'eq',$bdata,'changed');
+    cmp_ok(join("", @(<@data)),'eq',$bdata,'changed');
 } # SKIP
 
 END {

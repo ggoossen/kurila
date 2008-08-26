@@ -2,7 +2,7 @@
 use strict ;
 use warnings;
 
-use vars qw( $Perl $Inc);
+use vars < qw( $Perl $Inc);
 
 sub readFile
 {
@@ -23,7 +23,7 @@ sub writeFile
     open (F, ">", "$filename") 
 	or die "Cannot open $filename: $!\n" ;
     binmode(F) if $filename =~ m/bin$/i;
-    foreach (< @strings)
+    foreach ( @strings)
       { print F }
     close F or die "Could not close: $!" ;
 }
@@ -43,7 +43,7 @@ sub ok
 }
 
 $Inc = '' ;
-foreach (< @INC)
+foreach ( @INC)
  { $Inc .= "\"-I$_\" " }
 $Inc = "-I::lib" if $^O eq 'MacOS';
 

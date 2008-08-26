@@ -13,7 +13,7 @@ use Test;
 my @them;
 BEGIN { plan('tests' => 41) };
 
-use Pod::Escapes qw(:ALL);
+use Pod::Escapes < qw(:ALL);
 ok 1;
 
 eval " binmode(STDOUT, ':utf8') ";

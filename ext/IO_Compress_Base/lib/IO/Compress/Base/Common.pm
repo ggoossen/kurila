@@ -5,15 +5,15 @@ use warnings;
 use bytes;
 
 use Carp;
-use Scalar::Util qw(blessed readonly);
+use Scalar::Util < qw(blessed readonly);
 use File::GlobMapper;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $HAS_ENCODE);
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 $VERSION = '2.006';
 
-@EXPORT = @( qw( isaFilehandle isaFilename whatIsInput whatIsOutput 
+@EXPORT = @( < qw( isaFilehandle isaFilename whatIsInput whatIsOutput 
               isaFileGlobString cleanFileGlobString oneTarget
               setBinModeInput
               createSelfTiedObject
@@ -30,7 +30,7 @@ $VERSION = '2.006';
               STATUS_ERROR
           ) );  
 
-%EXPORT_TAGS = %( Status => \@(qw( STATUS_OK
+%EXPORT_TAGS = %( Status => \@( <qw( STATUS_OK
                                  STATUS_ENDSTREAM
                                  STATUS_EOF
                                  STATUS_ERROR
@@ -331,7 +331,7 @@ sub Validator::validateInputFilenames
 {
     my $self = shift ;
 
-    foreach my $filename (< @_)
+    foreach my $filename ( @_)
     {
         $self->croakError("$self->{reportClass}: input filename is undef or null string")
             if ! defined $filename || $filename eq ''  ;
@@ -366,7 +366,7 @@ sub Validator::validateInputArray
         return $self->saveErrorString("empty array reference") ;
     }    
 
-    foreach my $element ( < @{ @_[0] } )
+    foreach my $element (  @{ @_[0] } )
     {
         my $inType  = whatIsInput($element);
     
@@ -438,7 +438,7 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-%EXPORT_TAGS{Parse} = \@(qw( ParseParameters 
+%EXPORT_TAGS{Parse} = \@( <qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar
@@ -537,7 +537,7 @@ sub IO::Compress::Base::Parameters::parse
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
  
-        foreach my $key (keys %$href) {
+        foreach my $key (@( <keys %$href)) {
             push @entered, $key ;
             push @entered, \$href->{$key} ;
         }
@@ -556,7 +556,7 @@ sub IO::Compress::Base::Parameters::parse
 
     while (my ($key, $v) = each %$default)
     {
-        croak "need 4 params [{join ' ', <@$v}]"
+        croak "need 4 params [{join ' ', @( <@$v)}]"
             if (nelems @$v) != 4 ;
 
         my ($first_only, $sticky, $type, $value) = < @$v ;
@@ -615,8 +615,8 @@ sub IO::Compress::Base::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my ($bad) = join(", ", < @Bad) ;
-        return $self->setError("unknown key value(s) {join ' ', <@Bad}") ;
+        my ($bad) = join(", ", @( < @Bad)) ;
+        return $self->setError("unknown key value(s) {join ' ', @( <@Bad)}") ;
     }
 
     return 1;

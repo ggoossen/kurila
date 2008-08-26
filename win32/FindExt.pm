@@ -5,8 +5,8 @@ our $VERSION = '1.02';
 use strict;
 use warnings;
 
-my $no = join('|',qw(GDBM_File ODBM_File NDBM_File DB_File
-		     Syslog SysV Langinfo));
+my $no = join('|', @( <qw(GDBM_File ODBM_File NDBM_File DB_File
+		     Syslog SysV Langinfo)));
 $no = qr/^(?:$no)$/i;
 
 my %ext;
@@ -28,10 +28,10 @@ sub set_static_extensions {
     %static = %( () );
     my @list = @( < @_ );
     if (@_[0] eq '*') {
-	my %excl = %( map {$_=>1} map {m/^!(.*)$/} @_[[1 .. ((nelems @_)-1)]] );
-	@list = @( grep {!exists %excl{$_}} keys %ext );
+	my %excl = %( < map {$_=>1} @( < map {m/^!(.*)$/} @( @_[[ <1 .. ((nelems @_)-1)]])) );
+	@list = @( < grep {!exists %excl{$_}} @( < keys %ext) );
     }
-    for (< @list) {
+    for ( @list) {
         %static{$_} = 1;
         %ext{$_} = 'static' if %ext{$_} && %ext{$_} eq 'dynamic';
     }
@@ -50,28 +50,28 @@ sub scan_ext
 
 sub dynamic_ext
 {
- return @( sort grep %ext{$_} eq 'dynamic',keys %ext);
+ return @( < sort @( < grep %ext{$_} eq 'dynamic', @( <keys %ext)));
 }
 
 sub static_ext
 {
- return @( sort grep %ext{$_} eq 'static',keys %ext);
+ return @( < sort @( < grep %ext{$_} eq 'static', @( <keys %ext)));
 }
 
 sub nonxs_ext
 {
- return @( sort grep %ext{$_} eq 'nonxs',keys %ext);
+ return @( < sort @( < grep %ext{$_} eq 'nonxs', @( <keys %ext)));
 }
 
 sub extensions
 {
- return @( sort grep %ext{$_} ne 'known',keys %ext);
+ return @( < sort @( < grep %ext{$_} ne 'known', @( <keys %ext)));
 }
 
 sub known_extensions
 {
  # faithfully copy Configure in not including nonxs extensions for the nonce
- return @( sort grep %ext{$_} ne 'nonxs',keys %ext);
+ return @( < sort @( < grep %ext{$_} ne 'nonxs', @( <keys %ext)));
 }
 
 sub is_static
@@ -84,9 +84,9 @@ sub is_static
 sub find_ext
 {
     opendir my $dh, '.';
-    my @items = @( grep { !m/^\.\.?$/ } readdir $dh );
+    my @items = @( < grep { !m/^\.\.?$/ } @( readdir $dh) );
     closedir $dh;
-    for my $xxx (< @items) {
+    for my $xxx ( @items) {
         if ($xxx ne "DynaLoader") {
             if (-f "$xxx/$xxx.xs" || -f "$xxx/$xxx.c" ) {
                 %ext{"@_[0]$xxx"} = %static{"@_[0]$xxx"} ? 'static' : 'dynamic';

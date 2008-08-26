@@ -8,7 +8,7 @@ use_ok('base');
 
 package No::Version;
 
-use vars qw($Foo);
+use vars < qw($Foo);
 sub VERSION { 42 }
 
 package Test::Version;
@@ -20,7 +20,7 @@ BEGIN { $Has::Version::VERSION = '42' };
 
 package Test::Version2;
 
-use base qw(Has::Version);
+use base < qw(Has::Version);
 main::is( $Has::Version::VERSION, 42 );
 
 package main;
@@ -65,7 +65,7 @@ like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty
 
     package Test::Version3;
 
-    use base qw(Has::Version_0);
+    use base < qw(Has::Version_0);
     main::is( $Has::Version_0::VERSION, 0, '$VERSION==0 preserved' );
 }
 

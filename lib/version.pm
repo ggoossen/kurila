@@ -3,7 +3,7 @@ package version;
 
 use strict;
 
-use vars qw(@ISA $VERSION $CLASS *qv);
+use vars < qw(@ISA $VERSION $CLASS *qv);
 
 $VERSION = 0.73;
 

@@ -13,7 +13,7 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 %::immortals
   = %(u => \undef,
@@ -126,7 +126,7 @@ sub STORABLE_thaw {
 	my $expect = %::immortals{$what};
 	die "'$x' did not give a reference" unless ref $expect;
 	my $fail;
-	foreach (< @refs) {
+	foreach ( @refs) {
 	  $fail++ if $_ != $expect;
 	}
 	main::ok ++$test, !$fail;
@@ -138,7 +138,7 @@ package main;
 my $count;
 foreach $count (1..3) {
   my $immortal;
-  foreach $immortal (keys %::immortals) {
+  foreach $immortal (@( <keys %::immortals)) {
     print "# $immortal x $count\n";
     my $i =  RETURNS_IMMORTALS->make ($immortal, $count);
 

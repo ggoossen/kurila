@@ -33,8 +33,8 @@ The values are the original list elements.
 
 use strict;
 
-our @ISA = @( qw(Exporter) );
-our @EXPORT = @( qw(abbrev) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT = @( < qw(abbrev) );
 
 # Usage:
 #	abbrev \%foo, LIST;
@@ -49,7 +49,7 @@ sub abbrev {
     $returnvoid = 1;
     %{$hashref} = %( () );
 
-    WORD: foreach $word (< @_) {
+    WORD: foreach $word ( @_) {
         for (my $len = (length $word) - 1; $len +> 0; --$len) {
 	    my $abbrev = substr($word,0,$len);
 	    my $seen = ++%table{$abbrev};
@@ -66,7 +66,7 @@ sub abbrev {
 	}
     }
     # Non-abbreviations always get entered, even if they aren't unique
-    foreach $word (< @_) {
+    foreach $word ( @_) {
         $hashref->{$word} = $word;
     }
     return if $returnvoid;

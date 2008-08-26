@@ -15,7 +15,7 @@ my %page = %(
 
 print < form \%(page=>\%page),
 	 '{]]]]]}  {"{*}"}  {[[[[[}',
-	 \@(1..nelems @text), \@text,  \@(1..nelems @text);
+	 \@( <1..nelems @text), \@text,  \@( <1..nelems @text);
 
 __DATA__
 To be, or not to be -- that is the question:

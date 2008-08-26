@@ -170,8 +170,8 @@ use warnings::register;
 
 require Exporter;
 use XSLoader ();
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(
 	inet_aton inet_ntoa
 	sockaddr_family
 	pack_sockaddr_in unpack_sockaddr_in
@@ -332,7 +332,7 @@ use XSLoader ();
 	UIO_MAXIOV
 ) );
 
-@EXPORT_OK = @( qw(CR LF CRLF $CR $LF $CRLF
+@EXPORT_OK = @( < qw(CR LF CRLF $CR $LF $CRLF
 
 	       IPPROTO_IP
 	       IPPROTO_IPV6
@@ -348,7 +348,7 @@ use XSLoader ();
 	       TCP_STDURG) );
 
 %EXPORT_TAGS = %(
-    crlf    => \@(qw(CR LF CRLF $CR $LF $CRLF)),
+    crlf    => \@( <qw(CR LF CRLF $CR $LF $CRLF)),
     all     => \@(< @EXPORT, < @EXPORT_OK),
 );
 

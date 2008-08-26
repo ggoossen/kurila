@@ -78,19 +78,19 @@ ok 18
 # previous line intentionally left blank.
 
 print <<E1 eq "foo\n\n" ? "ok 19\n" : "not ok 19\n";
-{join ' ', <@{\@( <<E2 )}
+{join ' ', @( <@{\@( <<E2 )}
 foo
 E2
-}
+)}
 E1
 
 print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
-{join ' ', <@{\@(
+{join ' ', @( <@{\@(
   <<E2
 foo
 E2
 )}
-}
+)}
 E1
 
 {
@@ -112,7 +112,7 @@ print "ABC" =~ m/^@ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
 print "ok 26\n";
 
 # MJD 19980425
-($X, < @X) = qw(a b c d); 
+($X, < @X) = < qw(a b c d); 
 print "d" =~ m/^@X[-1]$/ ? "ok 27\n" : "not ok 27\n";
 print "a1" !~ m/^@X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 
@@ -232,7 +232,7 @@ EOT
   # Let's make sure that normal array interpolation still works right
   # For some reason, this appears not to be tested anywhere else.
   my @a = @(1,2,3);
-  print +((">{join ' ', <@a}<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
+  print +((">{join ' ', @( <@a)}<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
   ++$test;
 
   # Ditto.

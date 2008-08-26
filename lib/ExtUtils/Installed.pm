@@ -14,7 +14,7 @@ my $DOSISH = ($^O =~ m/^(MSWin\d\d|os2|dos|mint)$/);
 
 require VMS::Filespec if $Is_VMS;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = '1.43';
 $VERSION = eval $VERSION;
 
@@ -70,7 +70,7 @@ sub _is_type {
 sub _is_under {
     my ($self, $path, < @under) = < @_;
     @under[0] = "" if (! nelems @under);
-    foreach my $dir (< @under) {
+    foreach my $dir ( @under) {
         return 1 if ($self->_is_prefix($path, $dir));
     }
 
@@ -96,8 +96,8 @@ sub new {
         $self->{':private:'}->{Config} = \%Config;
     }
     
-    for my $tuple (\@(inc_override => INC => \@( < @INC ) ),
-                   \@( extra_libs => EXTRA => \@() )) 
+    for my $tuple (@(\@(inc_override => INC => \@( < @INC ) ),
+                   \@( extra_libs => EXTRA => \@() ))) 
     {
         my ($arg,$key,$val)=< @$tuple;
         if ( %args{$arg} ) {
@@ -113,13 +113,13 @@ sub new {
     }
     {
         my %dupe;
-        @{$self->{':private:'}->{INC}} = @( grep { -e $_ && !%dupe{$_}++ }
-            < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}} );        
+        @{$self->{':private:'}->{INC}} = @( < grep { -e $_ && !%dupe{$_}++ }
+ @(            < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}}) );        
     }                
     my $perl5lib = defined %ENV{PERL5LIB} ? %ENV{PERL5LIB} : "";
 
     my @dirs = @( $self->{':private:'}->{Config}->{archlibexp},
-                 $self->{':private:'}->{Config}->{sitearchexp},
+                 $self->{':private:'}->{Config}->{sitearchexp}, <
                  split(m/\Q%Config{path_sep}\E/, $perl5lib),
                  < @{$self->{':private:'}->{EXTRA}},
                );   
@@ -127,11 +127,11 @@ sub new {
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS ) {
         $_ = VMS::Filespec::unixify($_) 
-            for < @dirs;
+            for  @dirs;
     }
 
     if ($DOSISH) {
-        s|\\|/|g for < @dirs;
+        s|\\|/|g for  @dirs;
     }
     my $archlib = @dirs[0];
     
@@ -148,7 +148,7 @@ sub new {
         # Hack of the leading bits of the paths & convert to a module name
         my $module = $File::Find::name;
         my $found;
-        for (< @dirs) {
+        for ( @dirs) {
             $found = $module =~ s!\Q$_\E/?auto/(.*)/.packlist!$1!s
                 and last;
         }            
@@ -162,7 +162,7 @@ sub new {
 
         # Find the top-level module file in @INC
         $self->{$module}->{version} = '';
-        foreach my $dir (< @{$self->{':private:'}->{INC}}) {
+        foreach my $dir ( @{$self->{':private:'}->{INC}}) {
             my $p = File::Spec->catfile($dir, $modfile);
             if (-r $p) {
                 $module = _module_name($p, $module) if $Is_VMS;
@@ -177,7 +177,7 @@ sub new {
           ExtUtils::Packlist->new($File::Find::name);
     };
     my %dupe;
-    @dirs= @( grep { -e $_ && !%dupe{$_}++ } < @dirs );
+    @dirs= @( < grep { -e $_ && !%dupe{$_}++ } @( < @dirs) );
     $self->{':private:'}->{LIBDIRS} = \@dirs;    
     find($sub, < @dirs) if (nelems @dirs);
 
@@ -218,7 +218,7 @@ sub modules {
     my ($self) = < @_;
 
     # Bug/feature of sort in scalar context requires this.
-    return @( sort grep { not m/^:private:$/ } keys %$self);
+    return @( < sort @( < grep { not m/^:private:$/ } @( < keys %$self)));
 }
 
 sub files {
@@ -231,7 +231,7 @@ sub files {
         if ($type ne "all" && $type ne "prog" && $type ne "doc");
 
     my (@files);
-    foreach my $file (keys(%{$self->{$module}->{packlist}})) {
+    foreach my $file (@( <keys(%{$self->{$module}->{packlist}}))) {
         push(@files, $file)
           if ($self->_is_type($file, $type) &&
               $self->_is_under($file, < @under));
@@ -242,16 +242,16 @@ sub files {
 sub directories {
     my ($self, $module, $type, < @under) = < @_;
     my (%dirs);
-    foreach my $file ( <$self->files($module, $type, < @under)) {
+    foreach my $file ( $self->files($module, $type, < @under)) {
         %dirs{dirname($file)}++;
     }
-    return @( sort keys %dirs);
+    return @( < sort @( < keys %dirs));
 }
 
 sub directory_tree {
     my ($self, $module, $type, < @under) = < @_;
     my (%dirs);
-    foreach my $dir ( <$self->directories($module, $type, < @under)) {
+    foreach my $dir ( $self->directories($module, $type, < @under)) {
         %dirs{$dir}++;
         my ($last) = ("");
         while ($last ne $dir) {
@@ -261,7 +261,7 @@ sub directory_tree {
             %dirs{$dir}++;
         }
     }
-    return @(sort(keys(%dirs)));
+    return @( <sort( @( <keys(%dirs))));
 }
 
 sub validate {

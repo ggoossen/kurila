@@ -38,7 +38,7 @@ $runperl .= qq{ "-I../lib"};
 my @delete;
 
 END {
-    for (< @delete) {
+    for ( @delete) {
 	unlink $_ or warn "unlink $_: $!";
     }
 }
@@ -117,7 +117,7 @@ my %subs = %(
             },
             );
 my $t = 2;
-for (qw(system qx popen)) {
+for (@( <qw(system qx popen))) {
     my $code    = %subs{$_};
     my $f       = "ff-$_-$$";
     my $command = qq{$runperl "ff-prog" "$f" "rl"};

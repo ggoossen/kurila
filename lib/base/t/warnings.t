@@ -11,13 +11,13 @@ BEGIN {
 
 {
     package Foo;
-    use fields qw(thing);
+    use fields < qw(thing);
 }
 
 {
     package Bar;
-    use fields qw(stuff);
-    use base qw(Foo);
+    use fields < qw(stuff);
+    use base < qw(Foo);
 }
 
 main::like $warnings,

@@ -33,31 +33,31 @@ package Getopt::Long;
 
 use strict;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION        =  2.37;
 # For testing versions only.
-use vars qw($VERSION_STRING);
+use vars < qw($VERSION_STRING);
 $VERSION_STRING = "2.37";
 
 use Exporter;
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-@ISA = @( qw(Exporter) );
+use vars < qw(@ISA @EXPORT @EXPORT_OK);
+@ISA = @( < qw(Exporter) );
 
 BEGIN {
     # Init immediately so their contents can be used in the 'use vars' below.
-    @EXPORT    = @( qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER) );
-    @EXPORT_OK = @( qw(&HelpMessage &VersionMessage &Configure
+    @EXPORT    = @( < qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER) );
+    @EXPORT_OK = @( < qw(&HelpMessage &VersionMessage &Configure
 		    &GetOptionsFromArray &GetOptionsFromString) );
 }
 
 # User visible variables.
 our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER);
-use vars qw($error $debug $major_version $minor_version);
+use vars < qw($error $debug $major_version $minor_version);
 # Deprecated visible variables.
-use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
+use vars < qw($autoabbrev $getopt_compat $ignorecase $bundling $order
 	    $passthrough);
 # Official invisible variables.
-use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
+use vars < qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
 
 ################ Local Variables ################
 
@@ -99,7 +99,7 @@ sub import {
     my @syms = @( () );		# symbols to import
     my @config = @( () );		# configuration
     my $dest = \@syms;		# symbols first
-    for ( < @_ ) {
+    for (  @_ ) {
 	if ( $_ eq ':config' ) {
 	    $dest = \@config;	# config next
 	    next;
@@ -108,7 +108,7 @@ sub import {
     }
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1;
-    push(@syms, qw(&GetOptions)) if (nelems @syms); # always export GetOptions
+    push(@syms, < qw(&GetOptions)) if (nelems @syms); # always export GetOptions
     $pkg->SUPER::import(< @syms);
     # And configure.
     Configure(< @config) if (nelems @config);
@@ -117,7 +117,7 @@ sub import {
 ################ Initialization ################
 
 # Values for $order. See GNU getopt.c for details.
-($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
+($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = ( <0..2);
 # Version major/minor numbers.
 ($major_version, $minor_version) = $VERSION =~ m/^(\d+)\.(\d+)/;
 
@@ -154,7 +154,7 @@ sub new {
 
     if ( %atts ) {		# Oops
 	die(__PACKAGE__.": unhandled attributes: ".
-	    join(" ", sort(keys(%atts)))."\n");
+	    join(" ", @( < sort( @( <keys(%atts)))))."\n");
     }
 
     $self;
@@ -255,7 +255,7 @@ sub GetOptionsFromString($@) {
     my $ret = GetOptionsFromArray($args, < @_);
     if ( (nelems @$args) ) {
         $ret = 0;
-        warn("GetOptionsFromString: Excess data \"{join ' ', <@$args}\" in string \"$string\"\n");
+        warn("GetOptionsFromString: Excess data \"{join ' ', @( <@$args)}\" in string \"$string\"\n");
     }
     return $ret;
 }
@@ -283,7 +283,7 @@ sub GetOptionsFromArray($@) {
 	   '$Revision: 2.74 $', ") ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
-	   "argv: ({join ' ', <@$argv})",
+	   "argv: ({join ' ', @( <@$argv)})",
 	   "\n  ",
 	   "autoabbrev=$autoabbrev,".
 	   "bundling=$bundling,",
@@ -720,7 +720,7 @@ sub GetOptionsFromArray($@) {
     # Finish.
     if ( (nelems @ret) && $order == $PERMUTE ) {
 	#  Push back accumulated arguments
-	print STDERR ("=> restoring \"", join('" "', < @ret), "\"\n")
+	print STDERR ("=> restoring \"", join('" "', @( < @ret)), "\"\n")
 	    if $debug;
 	unshift (@$argv, < @ret);
     }
@@ -731,15 +731,15 @@ sub GetOptionsFromArray($@) {
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
     my ($v) = < @_;
-    my @v = @( map { defined($_) ? ($_) : ("<undef>") } < @$v );
+    my @v = @( < map { defined($_) ? ($_) : ("<undef>") } @( < @$v) );
     "[".
-      join(",",
+      join(",", @(
 	   "\"@v[CTL_TYPE]\"",
 	   "\"@v[CTL_CNAME]\"",
 	   "\"@v[CTL_DEFAULT]\"",
 	   ("\$","\@","\%","\&")[[@v[CTL_DEST] || 0]],
 	   @v[CTL_AMIN] || '',
-	   @v[CTL_AMAX] || '',
+	   @v[CTL_AMAX] || '',)
 #	   $v[CTL_RANGE] || '',
 #	   $v[CTL_REPEAT] || '',
 	  ). "]";
@@ -784,7 +784,7 @@ sub ParseOptionSpec ($$) {
 
     my @names;
     if ( defined $names ) {
-	@names = @(  split (m/\|/, $names) );
+	@names = @( <  split (m/\|/, $names) );
 	$orig = @names[0];
     }
     else {
@@ -839,7 +839,7 @@ sub ParseOptionSpec ($$) {
 
     # Process all names. First is canonical, the rest are aliases.
     my $dups = '';
-    foreach ( < @names ) {
+    foreach (  @names ) {
 
 	$_ = lc ($_)
 	  if $ignorecase +> (($bundling && length($_) == 1) ? 1 : 0);
@@ -860,7 +860,7 @@ sub ParseOptionSpec ($$) {
     }
 
     if ( $dups && $^W ) {
-	foreach ( split(m/\n+/, $dups) ) {
+	foreach (@( < split(m/\n+/, $dups)) ) {
 	    warn($_."\n");
 	}
     }
@@ -930,22 +930,22 @@ sub FindOption ($$$$$) {
     # Try auto-abbreviation.
     elsif ( $autoabbrev ) {
 	# Sort the possible long option names.
-	my @names = @( sort(keys (%$opctl)) );
+	my @names = @( < sort( @( <keys (%$opctl))) );
 	# Downcase if allowed.
 	$opt = lc ($opt) if $ignorecase;
 	$tryopt = $opt;
 	# Turn option name into pattern.
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
-	my @hits = @( grep (m/^$pat/, < @names) );
-	print STDERR ("=> ", scalar(nelems @hits), " hits ({join ' ', <@hits}) with \"$pat\" ",
+	my @hits = @( < grep (m/^$pat/, @( < @names)) );
+	print STDERR ("=> ", scalar(nelems @hits), " hits ({join ' ', @( <@hits)}) with \"$pat\" ",
 		      "out of ", scalar(nelems @names), "\n") if $debug;
 
 	# Check for ambiguous results.
-	unless ( ((nelems @hits) +<= 1) || (grep ($_ eq $opt, < @hits) == 1) ) {
+	unless ( ((nelems @hits) +<= 1) || (grep ($_ eq $opt, @( < @hits)) == 1) ) {
 	    # See if all matches are for the same option.
 	    my %hit;
-	    foreach ( < @hits ) {
+	    foreach (  @hits ) {
 		my $hit = $_;
 		$hit = $opctl->{$hit}->[CTL_CNAME]
 		  if defined $opctl->{$hit}->[CTL_CNAME];
@@ -964,11 +964,11 @@ sub FindOption ($$$$$) {
 	    unless ( keys(%hit) == 1 ) {
 		return  @(0) if $passthrough;
 		warn ("Option ", $opt, " is ambiguous (",
-		      join(", ", < @hits), ")\n");
+		      join(", ", @( < @hits)), ")\n");
 		$error++;
 		return  @(1, undef);
 	    }
-	    @hits = @( keys(%hit) );
+	    @hits = @( < keys(%hit) );
 	}
 
 	# Complete the option name, if appropriate.
@@ -1254,7 +1254,7 @@ sub Configure (@) {
     }
 
     my $opt;
-    foreach $opt ( < @options ) {
+    foreach $opt (  @options ) {
 	my $try = lc ($opt);
 	my $action = 1;
 	if ( $try =~ m/^no_?(.*)$/s ) {

@@ -4,10 +4,10 @@ use File::Spec;
 use Test::More;
 
 # NB. For PERL_CORE to be set, taint mode must not be enabled
-my $macrosall = %ENV{PERL_CORE} ? File::Spec->catfile(qw(.. ext Sys Syslog macros.all))
+my $macrosall = %ENV{PERL_CORE} ? File::Spec->catfile( <qw(.. ext Sys Syslog macros.all))
                                 : 'macros.all';
 open(MACROS, "<", $macrosall) or plan skip_all => "can't read '$macrosall': $!";
-my @names = @( map {chomp;$_} ~< *MACROS );
+my @names = @( < map {chomp;$_} @( ~< *MACROS) );
 close(MACROS);
 plan tests => (nelems @names) * 2 + 2;
 
@@ -22,7 +22,7 @@ like( $@->{description}, "/^Undefined subroutine/", "trying a non-existing macro
 
 # Testing all macros
 if((nelems @names)) {
-    for my $name (< @names) {
+    for my $name ( @names) {
         SKIP: {
             $name =~ m/^(\w+)$/ or skip "invalid name '$name'", 2;
             $name = $1;

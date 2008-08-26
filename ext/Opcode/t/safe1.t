@@ -17,9 +17,9 @@ exit;
 
 package test;	# test from somewhere other than main
 
-use vars qw($bar);
+use vars < qw($bar);
 
-use Opcode v1.00 qw(opdesc opset opset_to_ops opset_to_hex
+use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
 	opmask_add full_opset empty_opset opcodes opmask define_optag);
 
 use Safe v1.00;
@@ -39,7 +39,7 @@ $cpt = Safe->new( "My::Root") or die;
 foreach(1..3) {
 	our $foo = 42;
 
-	$cpt->share(qw($foo));
+	$cpt->share( <qw($foo));
 
 	print ${*{$cpt->varglob('foo')}}       == 42 ? "ok $t\n" : "not ok $t\n"; $t++;
 

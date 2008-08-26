@@ -22,7 +22,7 @@ my %modules = %(
     'Time::HiRes'=> q| main::can_ok( 'Time::HiRes' => 'usleep'  ) |,
 );
 
-plan tests => nelems(@(keys(%modules))) * 3 + 5;
+plan tests => nelems(@( <keys(%modules))) * 3 + 5;
 
 # Try to load the module
 use_ok( 'XSLoader' );
@@ -44,7 +44,7 @@ like( $@->message, q{/^Can't locate loadable object for module Thwack in @INC/},
 my $extensions = %Config{'extensions'};
 $extensions =~ s|/|::|g;
 
-for my $module (sort keys %modules) {
+for my $module (@( <sort @( < keys %modules))) {
     SKIP: {
         skip "$module not available", 3 if $extensions !~ m/\b$module\b/;
 

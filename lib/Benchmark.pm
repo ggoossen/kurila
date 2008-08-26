@@ -433,9 +433,9 @@ use Exporter;
 
 our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 
-@ISA= @(qw(Exporter) );
-@EXPORT= @(qw(timeit timethis timethese timediff timestr) );
-@EXPORT_OK= @(qw(timesum cmpthese countit
+@ISA= @( <qw(Exporter) );
+@EXPORT= @( <qw(timeit timethis timethese timediff timestr) );
+@EXPORT_OK= @( <qw(timesum cmpthese countit
 	      clearcache clearallcache disablecache enablecache) );
 %EXPORT_TAGS=%( all => \@( < @EXPORT, < @EXPORT_OK ) ) ;
 
@@ -451,15 +451,15 @@ init();
 
 sub BEGIN {
     if (eval 'require Time::HiRes') {
-	Time::HiRes->import(qw(time));
+	Time::HiRes->import( <qw(time));
 	$hirestime = \&Time::HiRes::time;
     }
 }
 
 sub import {
     my $class = shift;
-    if (grep { $_ eq ":hireswallclock" } < @_) {
-	@_ = @( grep { $_ ne ":hireswallclock" } < @_ );
+    if (grep { $_ eq ":hireswallclock" } @( < @_)) {
+	@_ = @( < grep { $_ ne ":hireswallclock" } @( < @_) );
 	local $^W=0;
 	*mytime = $hirestime if defined $hirestime;
     }
@@ -533,7 +533,7 @@ sub disablecache  {
 # --- Functions to process the 'time' data type
 
 sub new { my @t = @( mytime, times, (nelems @_) == 2 ? @_[1] : 0);
-	  print STDERR "new={join ' ', <@t}\n" if $Debug;
+	  print STDERR "new={join ' ', @( <@t)}\n" if $Debug;
 	  bless \@t; }
 
 sub cpu_p { my($r,$pu,$ps,$cu,$cs) = < @{@_[0]}; $pu+$ps         ; }
@@ -588,7 +588,7 @@ sub timestr {
     die usage unless ref $tr;
 
     my @t = @( < @$tr );
-    warn "bad time value ({join ' ', <@t})" unless (nelems @t)==6;
+    warn "bad time value ({join ' ', @( <@t)})" unless (nelems @t)==6;
     my($r, $pu, $ps, $cu, $cs, $n) = < @t;
     my($pt, $ct, $tt) = ( $tr->cpu_p, $tr->cpu_c, $tr->cpu_a);
     $f = $Default_Format unless defined $f;
@@ -596,7 +596,7 @@ sub timestr {
     $style ||= $Default_Style;
     return '' if $style eq 'none';
     $style = ($ct+>0) ? 'all' : 'noc' if $style eq 'auto';
-    my $s = "{join ' ', <@t} $style"; # default for unknown style
+    my $s = "{join ' ', @( <@t)} $style"; # default for unknown style
     my $w = $hirestime ? "\%2g" : "\%2d";
     $s = sprintf("$w wallclock secs (\%$f usr \%$f sys + \%$f cusr \%$f csys = \%$f CPU)",
 			    $r,$pu,$ps,$cu,$cs,$tt) if $style eq 'all';
@@ -852,7 +852,7 @@ sub timethese{
     my($n, $alt, $style) = < @_;
     die usage unless ref $alt eq 'HASH';
 
-    my @names = @( sort keys %$alt );
+    my @names = @( < sort @( < keys %$alt) );
     $style = "" unless defined $style;
     print "Benchmark: " unless $style eq 'none';
     if ( $n +> 0 ) {
@@ -861,7 +861,7 @@ sub timethese{
     } else {
 	print "running" unless $style eq 'none';
     }
-    print " ", join(', ',< @names) unless $style eq 'none';
+    print " ", join(', ', @(< @names)) unless $style eq 'none';
     unless ( $n +> 0 ) {
 	my $for = n_to_for( $n );
 	print ", each" if $n +> 1 && $style ne 'none';
@@ -872,7 +872,7 @@ sub timethese{
     # we could save the results in an array and produce a summary here
     # sum, min, max, avg etc etc
     my %results;
-    foreach my $name (< @names) {
+    foreach my $name ( @names) {
         %results{$name} = timethis ($n, $alt -> {$name}, $name, $style);
     }
 
@@ -905,9 +905,9 @@ sub cmpthese{
     $style = "" unless defined $style;
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = @( map{ \@( $_, < @{$results->{$_}} ) } keys %$results );
+    my @vals = @( < map{ \@( $_, < @{$results->{$_}} ) } @( < keys %$results) );
 
-    for (< @vals) {
+    for ( @vals) {
 	# The epsilon fudge here is to prevent div by 0.  Since clock
 	# resolutions are much larger, it's below the noise floor.
 	my $elapsed = do {
@@ -920,7 +920,7 @@ sub cmpthese{
     }
 
     # Sort by rate
-    @vals = @(sort { $a->[7] <+> $b->[7] } < @vals);
+    @vals = @( <sort { $a->[7] <+> $b->[7] } @( < @vals));
 
     # If more than half of the rates are greater than one...
     my $display_as_rate = (nelems @vals) ? (@vals[((nelems @vals)-1)>>1]->[7] +> 1) : 0;
@@ -931,17 +931,17 @@ sub cmpthese{
     my @top_row = @( 
         '', 
 	$display_as_rate ? 'Rate' : 's/iter', 
-	map { $_->[0] } < @vals 
+	< map { $_->[0] } @( < @vals) 
     );
 
     push @rows, \@top_row;
-    @col_widths = @( map { length( $_ ) } < @top_row );
+    @col_widths = @( < map { length( $_ ) } @( < @top_row) );
 
     # Build the data rows
     # We leave the last column in even though it never has any data.  Perhaps
     # it should go away.  Also, perhaps a style for a single column of
     # percentages might be nice.
-    for my $row_val ( < @vals ) {
+    for my $row_val (  @vals ) {
 	my @row;
 
         # Column 0 = test name
@@ -1007,19 +1007,19 @@ sub cmpthese{
 
     # Equalize column widths in the chart as much as possible without
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
-    my @sorted_width_refs = @( 
-       sort { $$a <+> $$b } map { \$_ } @col_widths[[2..((nelems @col_widths)-1)]] );
+    my @sorted_width_refs = @( < 
+       sort { $$a <+> $$b } @( < map { \$_ } @( @col_widths[[ <2..((nelems @col_widths)-1)]])) );
     my $max_width = ${@sorted_width_refs[-1]};
 
     my $total = (nelems @col_widths) - 1 ;
-    for ( < @col_widths ) { $total += $_ }
+    for (  @col_widths ) { $total += $_ }
 
     STRETCHER:
     while ( $total +< 80 ) {
 	my $min_width = ${@sorted_width_refs[0]};
 	last
 	   if $min_width == $max_width;
-	for ( < @sorted_width_refs ) {
+	for (  @sorted_width_refs ) {
 	    last 
 		if $$_ +> $min_width;
 	    ++$$_;
@@ -1030,9 +1030,9 @@ sub cmpthese{
     }
 
     # Dump the output
-    my $format = join( ' ', map { "\%{$_}s" } < @col_widths ) . "\n";
+    my $format = join( ' ', @( < map { "\%{$_}s" } @( < @col_widths)) ) . "\n";
     substr( $format, 1, 0, '-' );
-    for ( < @rows ) {
+    for (  @rows ) {
 	printf $format, < @$_;
     }
 

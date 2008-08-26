@@ -14,7 +14,7 @@ use utf8;
 my @them;
 BEGIN { plan('tests' => 63) };
 
-use Pod::Escapes qw(:ALL);
+use Pod::Escapes < qw(:ALL);
 ok 1;
 
 eval " binmode(STDOUT, ':utf8') ";
@@ -23,7 +23,7 @@ print "# Pod::Escapes version $Pod::Escapes::VERSION\n";
 print "# I'm ", (chr(65) eq 'A') ? '' : 'not ', "in ASCII world.\n";
 print "#\n#------------------------\n#\n";
 
-foreach my $quotie (qw( \n \r \cm \cj \t \f \b \a \e )) {
+foreach my $quotie (@( <qw( \n \r \cm \cj \t \f \b \a \e ))) {
   my $val = eval "\"$quotie\"";
   if($@) {
     ok 0;

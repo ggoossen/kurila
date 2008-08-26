@@ -6,7 +6,7 @@ use I18N::LangTags::Detect;
 use Test;
 BEGIN { plan tests => 87 };
 
-my @in = @( grep m/\S/, split m/\n/, q{
+my @in = @( < grep m/\S/, @( < split m/\n/, q{
 
 [ sv      ]  sv
 [ en      ]  en
@@ -56,9 +56,9 @@ my @in = @( grep m/\S/, split m/\n/, q{
 [ en ja       ]  en; q=0.5, ja; q=0.5
 [ fr-ca fr en ]  fr-ca, fr;q=0.8, en;q=0.7
 [ NIX ] NIX
-} );
+}) );
 
-foreach my $in (< @in) {
+foreach my $in ( @in) {
   $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in";
   my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } );
 
@@ -66,7 +66,7 @@ foreach my $in (< @in) {
 
   local %ENV{'HTTP_ACCEPT_LANGUAGE'};
   
-  foreach my $modus (
+  foreach my $modus (@(
     sub {
       print "# Testing with arg...\n";
       %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'PLORK';
@@ -76,7 +76,7 @@ foreach my $in (< @in) {
       print "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
       %ENV{'HTTP_ACCEPT_LANGUAGE'} = @_[0];
      return();
-    },
+    },)
   ) {
     my @args = @( < &$modus($in) );
 
@@ -86,14 +86,14 @@ foreach my $in (< @in) {
 
     if(
      (nelems @out) == nelems @should
-       and lc( join "\e", < @out ) eq lc( join "\e", < @should )
+       and lc( join "\e", @( < @out) ) eq lc( join "\e", @( < @should) )
     ) {
-      print "# Happily got [{join ' ', <@out}] from [$in]\n";
+      print "# Happily got [{join ' ', @( <@out)}] from [$in]\n";
       ok 1;
     } else {
       ok 0;
-      print "#Got:         [{join ' ', <@out}]\n",
-            "# but wanted: [{join ' ', <@should}]\n",
+      print "#Got:         [{join ' ', @( <@out)}]\n",
+            "# but wanted: [{join ' ', @( <@should)}]\n",
             "# < \"$in\"\n#\n";
     }
   }

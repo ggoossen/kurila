@@ -78,6 +78,6 @@ if( 0 ) {
 plan tests => scalar nelems @Tests;
 $TB->plan(tests => (nelems @Tests) * 2);
 
-for my $test (< @Tests) {
+for my $test ( @Tests) {
     try_cmp_ok(< @$test);
 }

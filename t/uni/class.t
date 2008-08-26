@@ -53,9 +53,9 @@ use strict;
 my $str;
 
 if (ord('A') == 193) {
-    $str = join "", map chr($_), 0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D, 0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61, 0xF0 .. 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F, 0x7C, 0xC1 .. 0xC9, 0xD1 .. 0xD9, 0xE2 .. 0xE9, 0xAD, 0xE0, 0xBD, 0x5F, 0x6D, 0x79, 0x81 .. 0x89, 0x91 .. 0x96; # IBM-1047
+    $str = join "", @( < map chr($_), @( 0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D, 0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61, < 0xF0 .. 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F, 0x7C, < 0xC1 .. 0xC9, < 0xD1 .. 0xD9, < 0xE2 .. 0xE9, 0xAD, 0xE0, 0xBD, 0x5F, 0x6D, 0x79, < 0x81 .. 0x89, < 0x91 .. 0x96)); # IBM-1047
 } else {
-    $str = join "", map chr($_), 0x20 .. 0x6F;
+    $str = join "", @( < map chr($_), @( < 0x20 .. 0x6F));
 }
 
 # make sure it finds built-in class
@@ -105,14 +105,14 @@ sub char_range {
     if (ord('A') == 193 && $h1 +< 256) {
 	my $h3 = ($h2 || $h1) + 1;
 	if ($h3 - $h1 == 1) {
-	    $str = join "", pack 'U*', $h1 .. $h3; # Using pack since chr doesn't generate Unicode chars for value < 256.
+	    $str = join "", @( pack 'U*', < $h1 .. $h3); # Using pack since chr doesn't generate Unicode chars for value < 256.
 	} elsif ($h3 - $h1 +> 1) {
 	    for (my $i = $h1; $i +<= $h3; $i++) {
-		$str = join "", $str, pack 'U*', $i;
+		$str = join "", @( $str, pack 'U*', $i);
 	    }
 	}
     } else {
-	$str = join "", map { chr $_ } $h1 .. (($h2 || $h1) + 1);
+	$str = join "", @( < map { chr $_ } @( < $h1 .. (($h2 || $h1) + 1)));
     }
 
     return $str;
@@ -124,18 +124,18 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
   next unless $prop_name;
   next if $abbrev eq "gc_sc";
 
-  for (sort keys %$files) {
+  for (@( <sort @( < keys %$files))) {
     my $filename = 'File::Spec'->catfile(
       $updir => lib => unicore => lib => $abbrev => "$files->{$_}.pl"
     );
 
     next unless -e $filename;
-    my ($h1, $h2) = map hex, (split(m/\t/, (do $filename), 3))[[0,1]];
+    my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
 
     my $str = char_range($h1, $h2);
 
-    for my $p ($prop_name, $abbrev) {
-      for my $c ($files->{$_}, $_) {
+    for my $p (@($prop_name, $abbrev)) {
+      for my $c (@($files->{$_}, $_)) {
         is($str =~ m/(\p{$p: $c}+)/ && $1, substr($str, 0, -1), "$filename - $p - $c");
         is($str =~ m/(\P{$p= $c}+)/ && $1, substr($str, -1));
       }
@@ -144,19 +144,19 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
 }
 
 # General Category and Script
-for my $p ('gc', 'sc') {
+for my $p (@('gc', 'sc')) {
   while (my ($abbr) = each %{ %utf8::PropValueAlias{$p} }) {
     my $filename = 'File::Spec'->catfile(
       $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{$abbr}.pl"
     );
 
     next unless -e $filename;
-    my ($h1, $h2) = map hex, (split(m/\t/, (do $filename), 3))[[0,1]];
+    my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
 
     my $str = char_range($h1, $h2);
 
-    for my $x ($p, %( gc => 'General Category', sc => 'Script' ){$p}) {
-      for my $y ($abbr, %utf8::PropValueAlias{$p}->{$abbr}, %utf8::PVA_abbr_map{gc_sc}->{$abbr}) {
+    for my $x (@($p, %( gc => 'General Category', sc => 'Script' ){$p})) {
+      for my $y (@($abbr, %utf8::PropValueAlias{$p}->{$abbr}, %utf8::PVA_abbr_map{gc_sc}->{$abbr})) {
         is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
         is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
         SKIP: {
@@ -187,19 +187,19 @@ SKIP:
   %files{[readdir(D)]} = ();
   closedir D;
 
-  for (keys %utf8::PA_reverse) {
+  for (@( <keys %utf8::PA_reverse)) {
     my $leafname = "%utf8::PA_reverse{$_}.pl";
     next unless exists %files{$leafname};
 
     my $filename = 'File::Spec'->catfile($dirname, $leafname);
 
-    my ($h1, $h2) = map hex, (split(m/\t/, (do $filename), 3))[[0,1]];
+    my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
 
     my $str = char_range($h1, $h2);
 
-    for my $x ('gc', 'General Category') {
+    for my $x (@('gc', 'General Category')) {
       print "# $filename $x $_, %utf8::PA_reverse{$_}\n";
-      for my $y ($_, %utf8::PA_reverse{$_}) {
+      for my $y (@($_, %utf8::PA_reverse{$_})) {
 	is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
 	is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
 	test_regexp ($str, $y);
@@ -209,7 +209,7 @@ SKIP:
 }
 
 # test the blocks (InFoobar)
-for (grep %utf8::Canonical{$_} =~ m/^In/, keys %utf8::Canonical) {
+for (@(< grep %utf8::Canonical{$_} =~ m/^In/, @( < keys %utf8::Canonical))) {
   my $filename = 'File::Spec'->catfile(
     $updir => lib => unicore => lib => gc_sc => "%utf8::Canonical{$_}.pl"
   );
@@ -218,7 +218,7 @@ for (grep %utf8::Canonical{$_} =~ m/^In/, keys %utf8::Canonical) {
 
   print "# In$_ $filename\n";
 
-  my ($h1, $h2) = map hex, (split(m/\t/, (do $filename), 3))[[0,1]];
+  my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
 
   my $str = char_range($h1, $h2);
 

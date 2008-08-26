@@ -23,7 +23,7 @@ our $TODO;
 print "1..32\n";
 
 # go through all tests once normally and once with tied $x
-for my $tie ("") {
+for my $tie (@("")) {
 
 { my $x; tiex $x if $tie; $x ++;     ok ! uninitialized, "postinc$tie"; }
 { my $x; tiex $x if $tie; $x --;     ok ! uninitialized, "postdec$tie"; }

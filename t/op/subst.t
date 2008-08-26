@@ -482,7 +482,7 @@ is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
 # [perl #20682] @- not visible in replacement
 $_ = "123";
 m/(2)/;	# seed @- with something else
-s/(1)(2)(3)/{(nelems @-) -1} ({join ' ', <@-})/;
+s/(1)(2)(3)/{(nelems @-) -1} ({join ' ', @( <@-)})/;
 is($_, "3 (0 0 1 2)", '#20682 @- not visible in replacement');
 
 # [perl #20682] $^N not visible in replacement

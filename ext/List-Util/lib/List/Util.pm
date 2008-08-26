@@ -7,11 +7,11 @@
 package List::Util;
 
 use strict;
-use vars qw(@ISA @EXPORT_OK $VERSION $XS_VERSION $TESTING_PERL_ONLY);
+use vars < qw(@ISA @EXPORT_OK $VERSION $XS_VERSION $TESTING_PERL_ONLY);
 require Exporter;
 
-@ISA        = @( qw(Exporter) );
-@EXPORT_OK  = @( qw(first min max minstr maxstr reduce sum shuffle) );
+@ISA        = @( < qw(Exporter) );
+@EXPORT_OK  = @( < qw(first min max minstr maxstr reduce sum shuffle) );
 $VERSION    = "1.19";
 $XS_VERSION = $VERSION;
 $VERSION    = eval $VERSION;

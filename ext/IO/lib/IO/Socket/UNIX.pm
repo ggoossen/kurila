@@ -11,7 +11,7 @@ our(@ISA, $VERSION);
 use IO::Socket;
 use Carp;
 
-@ISA = @( qw(IO::Socket) );
+@ISA = @( < qw(IO::Socket) );
 $VERSION = "1.23";
 $VERSION = eval $VERSION;
 

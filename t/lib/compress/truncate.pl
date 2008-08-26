@@ -116,7 +116,7 @@ EOM
         title "Compressed Trailer Truncation";
         foreach my $i (length($compressed) - $trailer_size .. length($compressed) -1 )
         {
-            foreach my $lax (0, 1)
+            foreach my $lax (@(0, 1))
             {
                 my $lex = LexFile->new( my $name) ;
             

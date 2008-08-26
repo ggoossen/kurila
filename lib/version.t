@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More qw(no_plan);
+use Test::More < qw(no_plan);
 use POSIX;
 
 diag "Tests with base class" unless %ENV{PERL_CORE};
@@ -268,9 +268,9 @@ SKIP: {
 
     # test the CVS revision mode
     diag "testing CVS Revision" if $Verbose;
-    $version = $CLASS->new( qw$Revision: 1.2$);
+    $version = $CLASS->new( < qw$Revision: 1.2$);
     ok ( $version == "1.2.0", 'qw$Revision: 1.2$ == 1.2.0' );
-    $version = $CLASS->new( qw$Revision: 1.2.3.4$);
+    $version = $CLASS->new( < qw$Revision: 1.2.3.4$);
     ok ( $version == "1.2.3.4", 'qw$Revision: 1.2.3.4$ == 1.2.3.4' );
     
     # test the CPAN style reduced significant digit form

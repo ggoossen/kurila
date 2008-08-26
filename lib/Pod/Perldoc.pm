@@ -5,9 +5,9 @@ use warnings;
 use Config '%Config';
 
 use Fcntl;    # for sysopen
-use File::Spec::Functions qw(catfile catdir splitdir);
+use File::Spec::Functions < qw(catfile catdir splitdir);
 
-use vars qw($VERSION @Pagers $Bindir $Pod2man
+use vars < qw($VERSION @Pagers $Bindir $Pod2man
   $Temp_Files_Created $Temp_File_Lifetime
 );
 $VERSION = '3.14_02';
@@ -49,7 +49,7 @@ $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
 
 #..........................................................................
 { my $pager = %Config{'pager'};
-  push @Pagers, $pager if -x (split m/\s+/, $pager)[[0]] or IS_VMS;
+  push @Pagers, $pager if -x ( <split m/\s+/, $pager)[[0]] or IS_VMS;
 }
 $Bindir  = %Config{'scriptdirexp'};
 $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
@@ -60,7 +60,7 @@ $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
 #
 # Option accessors...
 
-foreach my $subname (map "opt_$_", split '', q{mhlvriFfXqnTdUL}) {
+foreach my $subname (@(< map "opt_$_", @( < split '', q{mhlvriFfXqnTdUL}))) {
   no strict 'refs';
   *{Symbol::fetch_glob($subname)} = do{ use strict 'refs';  sub () { shift->_elem($subname, < @_) } };
 }
@@ -89,7 +89,7 @@ sub opt_M_with { # specify formatter class name(s)
   return unless defined $classes and length $classes;
   DEBUG +> 4 and print "Considering new formatter classes -M$classes\n";
   my @classes_to_add;
-  foreach my $classname (split m/[,;]+/s, $classes) {
+  foreach my $classname (@( <split m/[,;]+/s, $classes)) {
     next unless $classname =~ m/\S/;
     if( $classname =~ m/^(\w+(::\w+)+)$/s ) {
       # A mildly restrictive concept of what modulenames are valid.
@@ -102,15 +102,15 @@ sub opt_M_with { # specify formatter class name(s)
   unshift @{ $self->{'formatter_classes'} }, < @classes_to_add;
   
   DEBUG +> 3 and print(
-    "Adding {join ' ', <@classes_to_add} to the list of formatter classes, "
-    . "making them {join ' ', <@{ $self->{'formatter_classes'} }}.\n"
+    "Adding {join ' ', @( <@classes_to_add)} to the list of formatter classes, "
+    . "making them {join ' ', @( <@{ $self->{'formatter_classes'} })}.\n"
   );
   
   return;
 }
 
 sub opt_V { # report version and exit
-  print join '',
+  print join '', @(
     "Perldoc v$VERSION, under perl $^V for $^O",
 
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
@@ -118,7 +118,7 @@ sub opt_V { # report version and exit
     
     (chr(65) eq 'A') ? () : " (non-ASCII)",
     
-    "\n",
+    "\n",)
   ;
   exit;
 }
@@ -157,11 +157,11 @@ sub opt_o_with { # "o" for output format
   # Figure out what class(es) that could actually mean...
   
   my @classes;
-  foreach my $prefix ("Pod::Perldoc::To", "Pod::Simple::", "Pod::") {
+  foreach my $prefix (@("Pod::Perldoc::To", "Pod::Simple::", "Pod::")) {
     # Messy but smart:
-    foreach my $stem (
+    foreach my $stem (@(
       $rest,  # Yes, try it first with the given capitalization
-      lc("$rest"), ucfirst(lc("$rest")), uc("$rest") # And then try variations
+      lc("$rest"), ucfirst(lc("$rest")), uc("$rest")) # And then try variations
 
     ) {
       push @classes, $prefix . $stem;
@@ -171,7 +171,7 @@ sub opt_o_with { # "o" for output format
     # Tidier, but misses too much:
     #push @classes, $prefix . ucfirst(lc($rest));
   }
-  $self->opt_M_with( join ";", < @classes );
+  $self->opt_M_with( join ";", @( < @classes) );
   return;
 }
 
@@ -185,7 +185,7 @@ sub run {  # to be called by the "perldoc" executable
     my @x = @( < @_ );
     while((nelems @x)) {
       @x[1] = '<undef>'  unless defined @x[1];
-      @x[1] = "{join ' ', <@{@x[1]}}" if ref( @x[1] ) eq 'ARRAY';
+      @x[1] = "{join ' ', @( <@{@x[1]})}" if ref( @x[1] ) eq 'ARRAY';
       print "  [@x[0]] => [@x[1]]\n";
       splice @x,0,2;
     }
@@ -210,7 +210,7 @@ sub new {  # yeah, nothing fancy
 sub aside {  # If we're in -v or DEBUG mode, say this.
   my $self = shift;
   if( DEBUG or $self->opt_v ) {
-    my $out = join( '',
+    my $out = join( '', @(
       DEBUG ? do {
         my $callsub = (caller(1))[[3]];
         my $package = quotemeta(__PACKAGE__ . '::');
@@ -218,7 +218,7 @@ sub aside {  # If we're in -v or DEBUG mode, say this.
          # the o is justified, as $package really won't change.
         $callsub . ": ";
       } : '',
-      < @_,
+      < @_,)
     );
     if(DEBUG) { print $out } else { print STDERR $out }
   }
@@ -229,7 +229,7 @@ sub aside {  # If we're in -v or DEBUG mode, say this.
 
 sub usage {
   my $self = shift;
-  warn "{join ' ', <@_}\n" if (nelems @_);
+  warn "{join ' ', @( <@_)}\n" if (nelems @_);
   
   # Erase evidence of previous errors (if any), so exit status is simple.
   $! = 0;
@@ -346,7 +346,7 @@ sub init {
   );
 
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
-   join ' ', map "[{join ' ', <@$_}]", < @{ $self->{'formatter_switches'} };
+   join ' ', @( < map "[{join ' ', @( <@$_)}]", @( < @{ $self->{'formatter_switches'} }));
 
   $self->{'translators'} = \@();
   $self->{'extra_search_dirs'} = \@();
@@ -380,13 +380,13 @@ sub process {
 
     my $self = shift;
     DEBUG +> 1 and print "  Beginning process.\n";
-    DEBUG +> 1 and print "  Args: {join ' ', <@{$self->{'args'}}}\n\n";
+    DEBUG +> 1 and print "  Args: {join ' ', @( <@{$self->{'args'}})}\n\n";
     if(DEBUG +> 3) {
         print "Object contents:\n";
         my @x = @( < %$self );
         while((nelems @x)) {
             @x[1] = '<undef>'  unless defined @x[1];
-            @x[1] = "{join ' ', <@{@x[1]}}" if ref( @x[1] ) eq 'ARRAY';
+            @x[1] = "{join ' ', @( <@{@x[1]})}" if ref( @x[1] ) eq 'ARRAY';
             print "  [@x[0]] => [@x[1]]\n";
             splice @x,0,2;
         }
@@ -412,7 +412,7 @@ sub process {
     my @pages;
     $self->{'pages'} = \@pages;
     if(    $self->opt_f) { @pages = @("perlfunc")               }
-    elsif( $self->opt_q) { @pages = @("perlfaq1" .. "perlfaq9") }
+    elsif( $self->opt_q) { @pages = @( <"perlfaq1" .. "perlfaq9") }
     else                 { @pages = @( < @{$self->{'args'}} );
                            # @pages = __FILE__
                            #  if @pages == 1 and $pages[0] eq 'perldoc';
@@ -431,14 +431,14 @@ sub process {
     
     if ($self->opt_l) {
         DEBUG and print "We're in -l mode, so byebye after this:\n";
-        print join("\n", < @found), "\n";
+        print join("\n", @( < @found)), "\n";
         return;
     }
 
     $self->tweak_found_pathnames(\@found);
     $self->assert_closing_stdout;
     return $self->page_module_file(< @found)  if  $self->opt_m;
-    DEBUG +> 2 and print "Found: [{join ' ', <@found}]\n";
+    DEBUG +> 2 and print "Found: [{join ' ', @( <@found)}]\n";
 
     return $self->render_and_page(\@found);
 }
@@ -453,7 +453,7 @@ sub find_good_formatter_class {
   die "WHAT?  Nothing in the formatter class list!?" unless (nelems @class_list);
   
   my $good_class_found;
-  foreach my $c (< @class_list) {
+  foreach my $c ( @class_list) {
     DEBUG +> 4 and print "Trying to load $c...\n";
     if(%class_loaded{$c}) {
       DEBUG +> 4 and print "OK, the already-loaded $c it is!\n";
@@ -504,7 +504,7 @@ sub find_good_formatter_class {
     }
   }
   
-  die "Can't find any loadable formatter class in {join ' ', <@class_list}?!\nAborting"
+  die "Can't find any loadable formatter class in {join ' ', @( <@class_list)}?!\nAborting"
     unless $good_class_found;
   
   $self->{'formatter_class'} = $good_class_found;
@@ -604,19 +604,19 @@ sub options_reading {
       unshift @{ $self->{'args'} }, <
         Text::ParseWords::shellwords( %ENV{"PERLDOC"} )
       ;
-      DEBUG +> 1 and print "  Args now: {join ' ', <@{$self->{'args'}}}\n\n";
+      DEBUG +> 1 and print "  Args now: {join ' ', @( <@{$self->{'args'}})}\n\n";
     } else {
       DEBUG +> 1 and print "  Okay, no PERLDOC setting in ENV.\n";
     }
 
     DEBUG +> 1
-     and print "  Args right before switch processing: {join ' ', <@{$self->{'args'}}}\n";
+     and print "  Args right before switch processing: {join ' ', @( <@{$self->{'args'}})}\n";
 
     Pod::Perldoc::GetOptsOO::getopts( $self, $self->{'args'}, 'YES' )
      or return $self->usage;
 
     DEBUG +> 1
-     and print "  Args after switch processing: {join ' ', <@{$self->{'args'}}}\n";
+     and print "  Args after switch processing: {join ' ', @( <@{$self->{'args'}})}\n";
 
     return $self->usage if $self->opt_h;
   
@@ -672,7 +672,7 @@ sub options_sanity {
 	warn 
 	    "Perldoc is only really meant for reading one word at a time.\n",
 	    "So these parameters are being ignored: ",
-	    join(' ', < @{$self->{'args'}}),
+	    join(' ', @( < @{$self->{'args'}})),
 	    "\n"
 		if (nelems @{$self->{'args'}}
 )    }
@@ -684,9 +684,9 @@ sub options_sanity {
 sub grand_search_init {
     my($self, $pages, < @found) = < @_;
 
-    foreach (< @$pages) {
+    foreach ( @$pages) {
         if ($self->{'podidx'} && open(PODIDX, $self->{'podidx'})) {
-            my $searchfor = catfile split '::', $_;
+            my $searchfor = catfile < split '::', $_;
             $self->aside( "Searching for '$searchfor' in $self->{'podidx'}\n" );
             local $_;
             while ( ~< *PODIDX) {
@@ -722,27 +722,27 @@ sub grand_search_init {
                 push(@searchdirs,'perl_root:[lib.pod]')  # installed pods
             }
             else {
-                push(@searchdirs, grep(-d, split(%Config{path_sep},
-                                                 %ENV{'PATH'})));
+                push(@searchdirs, < grep(-d, @( < split(%Config{path_sep},
+                                                 %ENV{'PATH'}))));
             }
         }
         my @files = @( < $self->searchfor(0,$_,< @searchdirs) );
         if ((nelems @files)) {
-            $self->aside( "Found as {join ' ', <@files}\n" );
+            $self->aside( "Found as {join ' ', @( <@files)}\n" );
         }
         else {
             # no match, try recursive search
-            @searchdirs = @( grep(!m/^\.\z/s,< @INC) );
+            @searchdirs = @( < grep(!m/^\.\z/s, @(< @INC)) );
             @files= @( < $self->searchfor(1,$_,< @searchdirs) ) if $self->opt_r;
             if ((nelems @files)) {
-                $self->aside( "Loosely found as {join ' ', <@files}\n" );
+                $self->aside( "Loosely found as {join ' ', @( <@files)}\n" );
             }
             else {
                 print STDERR "No " .
                     ($self->opt_m ? "module" : "documentation") . " found for \"$_\".\n";
                 if ( (nelems @{ $self->{'found'} }) ) {
                     print STDERR "However, try\n";
-                    for my $dir (< @{ $self->{'found'} }) {
+                    for my $dir ( @{ $self->{'found'} }) {
                         opendir(DIR, $dir) or die "opendir $dir: $!";
                         while (my $file = readdir(DIR)) {
                             next if ($file =~ m/^\./s);
@@ -807,7 +807,7 @@ sub add_formatter_option { # $self->add_formatter_option('key' => 'value');
   push @{ $self->{'formatter_switches'} }, \@( < @_ ) if (nelems @_);
 
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
-   join ' ', map "[{join ' ', <@$_}]", < @{ $self->{'formatter_switches'} };
+   join ' ', @( < map "[{join ' ', @( <@$_)}]", @( < @{ $self->{'formatter_switches'} }));
   
   return;
 }
@@ -831,7 +831,7 @@ sub pod_dirs { # @dirs = pod_dirs($translator);
 
 sub add_translator { # $self->add_translator($lang);
     my $self = shift;
-    for my $lang (< @_) {
+    for my $lang ( @_) {
         my $pack = 'POD2::' . uc($lang);
         eval "require $pack";
         if ( $@ ) {
@@ -850,7 +850,7 @@ sub add_translator { # $self->add_translator($lang);
 sub search_perlfunc {
     my($self, $found_things, $pod) = < @_;
 
-    DEBUG +> 2 and print "Search: {join ' ', <@$found_things}\n";
+    DEBUG +> 2 and print "Search: {join ' ', @( <@$found_things)}\n";
 
     my $perlfunc = shift @$found_things;
     open(PFUNC, "<", $perlfunc)               # "Funk is its own reward"
@@ -924,7 +924,7 @@ Did you mean \\Q$search_key ?
 EOD
 
     local $_;
-    foreach my $file (< @$found_things) {
+    foreach my $file ( @$found_things) {
         die "invalid file spec: $!" if $file =~ m/[<>|]/;
         open(INFAQ, "<", $file)  # XXX 5.6ism
          or die "Can't read-open $file: $!\nAborting";
@@ -969,18 +969,18 @@ sub render_findings {
     warn 
      "Perldoc is only really meant for reading one document at a time.\n",
      "So these parameters are being ignored: ",
-     join(' ', @$found_things[[1 .. (nelems @$found_things)-1]] ),
+     join(' ', @( @$found_things[[ <1 .. (nelems @$found_things)-1]]) ),
      "\n"
   }
 
   my $file = $found_things->[0];
   
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
-   join ' ', map "[{join ' ', <@$_}]", < @{ $self->{'formatter_switches'} };
+   join ' ', @( < map "[{join ' ', @( <@$_)}]", @( < @{ $self->{'formatter_switches'} }));
 
   # Set formatter options:
   if( ref $formatter ) {
-    foreach my $f (< @{ $self->{'formatter_switches'} || \@() }) {
+    foreach my $f ( @{ $self->{'formatter_switches'} || \@() }) {
       my($switch, $value, $silent_fail) = < @$f;
       if( $formatter->can($switch) ) {
         try { $formatter->?$switch( defined($value) ? $value : () ) };
@@ -1057,7 +1057,7 @@ sub unlink_if_temp_file {
   return unless defined $file and length $file;
   
   my $temp_file_list = $self->{'temp_file_list'} || return;
-  if(grep $_ eq $file, < @$temp_file_list) {
+  if(grep $_ eq $file, @( < @$temp_file_list)) {
     $self->aside("Unlinking $file\n");
     unlink($file) or warn "Odd, couldn't unlink $file: $!";
   } else {
@@ -1206,7 +1206,7 @@ sub minus_f_nocase {   # i.e., do like -f, but without regard to case
      local *DIR;
      my @p = @($dir);
      my($p,$cip);
-     foreach $p ( <splitdir $file){
+     foreach $p ( splitdir $file){
 	my $try = catfile < @p, $p;
         $self->aside("Scrutinizing $try...\n");
 	stat $try;
@@ -1215,7 +1215,7 @@ sub minus_f_nocase {   # i.e., do like -f, but without regard to case
 	    if ( $p eq $self->{'target'} ) {
 		my $tmp_path = catfile < @p;
 		my $path_f = 0;
-		for (< @{ $self->{'found'} }) {
+		for ( @{ $self->{'found'} }) {
 		    $path_f = 1 if $_ eq $tmp_path;
 		}
 		push (@{ $self->{'found'} }, $tmp_path) unless $path_f;
@@ -1261,21 +1261,21 @@ sub pagers_guessing {
     $self->{'pagers'} = \@pagers;
 
     if (IS_MSWin32) {
-        push @pagers, qw( more< less notepad );
+        push @pagers, < qw( more< less notepad );
         unshift @pagers, %ENV{PAGER}  if %ENV{PAGER};
     }
     elsif (IS_VMS) {
-        push @pagers, qw( most more less type/page );
+        push @pagers, < qw( most more less type/page );
     }
     elsif (IS_Dos) {
-        push @pagers, qw( less.exe more.com< );
+        push @pagers, < qw( less.exe more.com< );
         unshift @pagers, %ENV{PAGER}  if %ENV{PAGER};
     }
     else {
         if (IS_OS2) {
           unshift @pagers, 'less', 'cmd /c more <';
         }
-        push @pagers, qw( more less pg view cat );
+        push @pagers, < qw( more less pg view cat );
         unshift @pagers, %ENV{PAGER}  if %ENV{PAGER};
     }
 
@@ -1311,7 +1311,7 @@ sub page_module_file {
         $self->aside("Sending unpaged output to STDOUT.\n");
 	local $_;
 	my $any_error = 0;
-        foreach my $output (< @found) {
+        foreach my $output ( @found) {
 	    unless( open(TMP, "<", $output) ) {    # XXX 5.6ism
 	      warn("Can't open $output: $!");
 	      $any_error = 1;
@@ -1326,8 +1326,8 @@ sub page_module_file {
 	return $any_error; # successful
     }
 
-    foreach my $pager ( < $self->pagers ) {
-        $self->aside("About to try calling $pager {join ' ', <@found}\n");
+    foreach my $pager (  $self->pagers ) {
+        $self->aside("About to try calling $pager {join ' ', @( <@found)}\n");
         if (system($pager, < @found) == 0) {
             $self->aside("Yay, it worked.\n");
             return 0;
@@ -1341,8 +1341,8 @@ sub page_module_file {
 
     $self->aside(
       sprintf "Can't manage to find a way to page [\%s] via pagers [\%s]\n",
-      join(' ', < @found),
-      join(' ', < $self->pagers),
+      join(' ', @( < @found)),
+      join(' ', @( < $self->pagers)),
     );
     
     if (IS_VMS) { 
@@ -1367,10 +1367,10 @@ sub check_file {
       # Should never get called:
       $Carp::Verbose = 1;
       require Carp;
-      Carp::croak( join '',
+      Carp::croak( join '', @(
         "Crazy ", __PACKAGE__, " error:\n",
         "check_file must be an object_method!\n",
-        "Aborting"
+        "Aborting")
       );
     }
     
@@ -1549,7 +1549,7 @@ sub page {  # apply a pager to the output file
           #  many many corners of the OS don't like it.  So we
           #  have to force it to be "\" to make everyone happy.
 
-        foreach my $pager (< @pagers) {
+        foreach my $pager ( @pagers) {
             $self->aside("About to try calling $pager $output\n");
             if (IS_VMS) {
                 last if system("$pager $output") == 0;
@@ -1568,7 +1568,7 @@ sub searchfor {
     $s =~ s!::!/!g;
     $s = VMS::Filespec::unixify($s) if IS_VMS;
     return $s if -f $s && $self->containspod($s);
-    $self->aside( "Looking for $s in {join ' ', <@dirs}\n" );
+    $self->aside( "Looking for $s in {join ' ', @( <@dirs)}\n" );
     my $ret;
     my $i;
     my $dir;
@@ -1597,16 +1597,16 @@ sub searchfor {
 
 	if ($recurse) {
 	    opendir(D,$dir)	or die "Can't opendir $dir: $!";
-	    my @newdirs = @( map < catfile($dir, $_), grep {
+	    my @newdirs = @( < map < catfile($dir, $_), @( < grep {
 		not m/^\.\.?\z/s and
 		not m/^auto\z/s  and   # save time! don't search auto dirs
 		-d  catfile($dir, $_)
-	    } readdir D );
+	    } @( readdir D)) );
 	    closedir(D)		or die "Can't closedir $dir: $!";
 	    next unless (nelems @newdirs);
 	    # what a wicked map!
-	    @newdirs = @( map((s/\.dir\z//,$_)[[1]],< @newdirs) ) if IS_VMS;
-	    $self->aside( "Also looking in {join ' ', <@newdirs}\n" );
+	    @newdirs = @( < map((s/\.dir\z//,$_)[[1]], @(< @newdirs)) ) if IS_VMS;
+	    $self->aside( "Also looking in {join ' ', @( <@newdirs)}\n" );
 	    push(@dirs,< @newdirs);
 	}
     }
@@ -1635,7 +1635,7 @@ sub searchfor {
 sub tweak_found_pathnames {
   my($self, $found) = < @_;
   if (IS_MSWin32) {
-    foreach (< @$found) { s,/,\\,g }
+    foreach ( @$found) { s,/,\\,g }
   }
   return;
 }

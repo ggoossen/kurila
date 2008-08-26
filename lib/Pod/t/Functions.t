@@ -26,7 +26,7 @@ is( $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' );
 is( $pkg_ref, $exp_ref, '@Pod::Functions::Type_Order exported' );
 
 # Check @Type_Order
-my @catagories = @( qw(
+my @catagories = @( < qw(
     String  Regexp Math ARRAY     LIST    HASH    I/O
     Binary  File   Flow Namespace Misc    Process Modules
     Objects Socket SysV User      Network Time
@@ -35,7 +35,7 @@ my @catagories = @( qw(
 ok( eq_array( \@Type_Order, \@catagories ),
     '@Type_Order' );
 
-my @cat_keys = @( grep exists %Type_Description{ $_ } => < @Type_Order );
+my @cat_keys = @( < grep exists %Type_Description{ $_ }, @(  < @Type_Order) );
 
 ok( eq_array( \@cat_keys, \@catagories ),
     'keys() %Type_Description' );

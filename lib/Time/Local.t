@@ -75,7 +75,7 @@ $tests += 8 if %ENV{MAINTAINER};
 
 plan tests => $tests;
 
-for (< @time, < @neg_time) {
+for ( @time, < @neg_time) {
     my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
     $year -= 1900;
     $mon--;
@@ -92,12 +92,12 @@ for (< @time, < @neg_time) {
 
             my($s,$m,$h,$D,$M,$Y) = localtime($time);
 
-            is($s, $sec, "timelocal second for {join ' ', <@$_}");
-            is($m, $min, "timelocal minute for {join ' ', <@$_}");
-            is($h, $hour, "timelocal hour for {join ' ', <@$_}");
-            is($D, $mday, "timelocal day for {join ' ', <@$_}");
-            is($M, $mon, "timelocal month for {join ' ', <@$_}");
-            is($Y, $year, "timelocal year for {join ' ', <@$_}");
+            is($s, $sec, "timelocal second for {join ' ', @( <@$_)}");
+            is($m, $min, "timelocal minute for {join ' ', @( <@$_)}");
+            is($h, $hour, "timelocal hour for {join ' ', @( <@$_)}");
+            is($D, $mday, "timelocal day for {join ' ', @( <@$_)}");
+            is($M, $mon, "timelocal month for {join ' ', @( <@$_)}");
+            is($Y, $year, "timelocal year for {join ' ', @( <@$_)}");
         }
 
         {
@@ -106,17 +106,17 @@ for (< @time, < @neg_time) {
 
             my($s,$m,$h,$D,$M,$Y) = gmtime($time);
 
-            is($s, $sec, "timegm second for {join ' ', <@$_}");
-            is($m, $min, "timegm minute for {join ' ', <@$_}");
-            is($h, $hour, "timegm hour for {join ' ', <@$_}");
-            is($D, $mday, "timegm day for {join ' ', <@$_}");
-            is($M, $mon, "timegm month for {join ' ', <@$_}");
-            is($Y, $year, "timegm year for {join ' ', <@$_}");
+            is($s, $sec, "timegm second for {join ' ', @( <@$_)}");
+            is($m, $min, "timegm minute for {join ' ', @( <@$_)}");
+            is($h, $hour, "timegm hour for {join ' ', @( <@$_)}");
+            is($D, $mday, "timegm day for {join ' ', @( <@$_)}");
+            is($M, $mon, "timegm month for {join ' ', @( <@$_)}");
+            is($Y, $year, "timegm year for {join ' ', @( <@$_)}");
         }
     }
 }
 
-for (< @bad_time) {
+for ( @bad_time) {
     my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
     $year -= 1900;
     $mon--;
@@ -150,7 +150,7 @@ for (< @bad_time) {
     ok($hour == 2 || $hour == 3, 'hour should be 2 or 3');
 }
 
-for my $p (< @years) {
+for my $p ( @years) {
     my ( $year, $is_leap_year ) = < @$p;
 
     my $string = $is_leap_year ? 'is' : 'is not';

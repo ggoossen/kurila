@@ -1,21 +1,21 @@
 package Text::ParseWords;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $PERL_SINGLE_QUOTE);
+use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK $PERL_SINGLE_QUOTE);
 $VERSION = "3.26"
 ;
 
 use Exporter;
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(shellwords quotewords nested_quotewords parse_line) );
-@EXPORT_OK = @( qw(old_shellwords) );
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(shellwords quotewords nested_quotewords parse_line) );
+@EXPORT_OK = @( < qw(old_shellwords) );
 
 
 sub shellwords {
     my @lines = @_;
     my @allwords;
 
-    foreach my $line (< @lines) {
+    foreach my $line ( @lines) {
 	$line =~ s/^\s+//;
 	my @words = parse_line('\s+', 0, $line);
 	pop @words if (nelems @words) and !defined @words[-1];
@@ -31,7 +31,7 @@ sub quotewords {
     my($delim, $keep, < @lines) = < @_;
     my($line, @words, @allwords);
 
-    foreach $line (< @lines) {
+    foreach $line ( @lines) {
 	@words = @( < parse_line($delim, $keep, $line) );
 	return() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);
@@ -129,7 +129,7 @@ sub old_shellwords {
     #	@words = old_shellwords();	# defaults to $_ (and clobbers it)
 
     no warnings 'uninitialized';	# we will be testing undef strings
-    local *_ = \join('', < @_) if (nelems @_);
+    local *_ = \join('', @( < @_)) if (nelems @_);
     my (@words, $snippet);
 
     s/\A\s+//;

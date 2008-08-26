@@ -5,7 +5,7 @@
 use strict;
 use ExtUtils::Install;
 use File::Spec;
-{ package FS;  our @ISA = @( qw(File::Spec) ); }
+{ package FS;  our @ISA = @( < qw(File::Spec) ); }
 
 # Alias it for easier access
 *can_write_dir = \&ExtUtils::Install::_can_write_dir;
@@ -13,7 +13,7 @@ use File::Spec;
 use Test::More 'no_plan';
 
 
-my $dne = FS->catdir(qw(does not exist));
+my $dne = FS->catdir( <qw(does not exist));
 ok ! -e $dne;
 is_deeply \@(< can_write_dir($dne)),
           \@(1,
@@ -35,8 +35,8 @@ is_deeply \@(< can_write_dir($abs_dne)),
           );
 
 SKIP: {
-    my $exists = FS->catdir(qw(exists));
-    my $subdir = FS->catdir(qw(exists subdir));
+    my $exists = FS->catdir( <qw(exists));
+    my $subdir = FS->catdir( <qw(exists subdir));
     
     
     ok mkdir $exists;

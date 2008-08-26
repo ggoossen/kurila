@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
+        @INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
     }
 }
 
@@ -20,7 +20,7 @@ use Test;
 use strict;
 use warnings;
 BEGIN { plan tests => 14 };
-use Unicode::Normalize qw(:all);
+use Unicode::Normalize < qw(:all);
 ok(1); # If we made it this far, we're ok.
 
 sub _pack_U   { Unicode::Normalize::pack_U(< @_) }

@@ -1,12 +1,12 @@
 package ExtUtils::Constant::ProxySubs;
 
 use strict;
-use vars qw($VERSION @ISA %type_to_struct %type_from_struct %type_to_sv
+use vars < qw($VERSION @ISA %type_to_struct %type_from_struct %type_to_sv
 	    %type_to_C_value %type_is_a_problem %type_num_args
 	    %type_temporary);
 require ExtUtils::Constant::XS;
-use ExtUtils::Constant::Utils qw(C_stringify);
-use ExtUtils::Constant::XS qw(%XS_TypeSet);
+use ExtUtils::Constant::Utils < qw(C_stringify);
+use ExtUtils::Constant::XS < qw(%XS_TypeSet);
 
 $VERSION = '0.06';
 @ISA = @( 'ExtUtils::Constant::XS' );
@@ -61,7 +61,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my ($self, $type) = < @_;
-    return %type_to_C_value{$type} || sub {return @(map {ref $_ ? < @$_ : $_} < @_) };
+    return %type_to_C_value{$type} || sub {return @(< map {ref $_ ? < @$_ : $_} @( < @_)) };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -79,7 +79,7 @@ sub type_to_C_value {
      PV => \@('const char *'),
      PVN => \@('const char *', 'STRLEN'),
      );
-%type_temporary{$_} = \@($_) foreach qw(IV UV NV);
+%type_temporary{$_} = \@($_) foreach @( < qw(IV UV NV));
      
 while (my ($type, $value) = each %XS_TypeSet) {
     %type_num_args{$type}
@@ -159,7 +159,7 @@ sub WriteConstants {
     my $ARGS = \%(< @_);
 
     my ($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-	= %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
+	= %{$ARGS}{[ <qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{PROXYSUBS};
     $options = \%() unless ref $options;
@@ -288,9 +288,9 @@ EOBOOT
     my %iterator;
 
     $found->{''}
-        = \@(map {\%(< %$_, type=>'', invert_macro => 1)} < @$notfound);
+        = \@(< map {\%(< %$_, type=>'', invert_macro => 1)} @( < @$notfound));
 
-    foreach my $type (sort keys %$found) {
+    foreach my $type (@( <sort @( < keys %$found))) {
 	my $struct = %type_to_struct{$type};
 	my $type_to_value = $self->type_to_C_value($type);
 	my $number_of_args = %type_num_args{$type};
@@ -308,7 +308,7 @@ EOBOOT
 EOBOOT
 
 
-	foreach my $item (< @{$found->{$type}}) {
+	foreach my $item ( @{$found->{$type}}) {
             my ($name, $namelen, $value, $macro)
                  = < $self->name_len_value_macro($item);
 
@@ -323,8 +323,8 @@ EOBOOT
 		    "        /* This is the default value: */\n" if $type;
 		print $xs_fh "#else\n";
 	    }
-	    print $xs_fh "        \{ ", join (', ', "\"$name\"", $namelen, 
-                                              < &$type_to_value($value)), " \},\n",
+	    print $xs_fh "        \{ ", join (', ', @( "\"$name\"", $namelen, 
+                                              < &$type_to_value($value))), " \},\n",
 						 $self->macro_to_endif($macro);
 	}
 
@@ -348,7 +348,7 @@ EOBOOT
 EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
-    foreach my $type (sort keys %$found) {
+    foreach my $type (@( <sort @( < keys %$found))) {
 	print $xs_fh $self->boottime_iterator($type, %iterator{$type}, 
 					      'symbol_table',
 					      $add_symbol_subname);
@@ -402,7 +402,7 @@ DONT
 	\}
 EOBOOT
 
-    foreach my $item (< @$trouble) {
+    foreach my $item ( @$trouble) {
         my ($name, $namelen, $value, $macro)
 	    = < $self->name_len_value_macro($item);
         my $ifdef = $self->macro_to_ifdef($macro);
@@ -425,7 +425,7 @@ EOBOOT
 	# these don't fit nicely in the macro-ised generator functions
 	my $counter = 0;
 	printf $xs_fh "            \%s temp\%d;\n", $_, $counter++
-	    foreach < @{%type_temporary{$type}};
+	    foreach  @{%type_temporary{$type}};
 
 	print $xs_fh "            $item->{pre}\n" if $item->{pre};
 
@@ -433,9 +433,9 @@ EOBOOT
 	# statements, we can't declare and assign to the temporaries in one.
 	$counter = 0;
 	printf $xs_fh "            temp\%d = \%s;\n", $counter++, $_
-	    foreach < &$type_to_value($value);
+	    foreach  &$type_to_value($value);
 
-	my @tempvarnames = @( map {sprintf 'temp%d', $_} 0 .. $counter - 1 );
+	my @tempvarnames = @( < map {sprintf 'temp%d', $_} @( < 0 .. $counter - 1) );
 	printf $xs_fh <<"EOBOOT", $name, &$generator(<@tempvarnames);
 	    {$c_subname}_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);

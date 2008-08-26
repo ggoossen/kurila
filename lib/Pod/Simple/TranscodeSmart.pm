@@ -27,7 +27,7 @@ sub make_transcoder {
   die "WHAT ENCODING!?!?" unless $e;
   my $x;
   return sub {
-    foreach $x (< @_) {
+    foreach $x ( @_) {
       $x = Encode::decode($e, $x);
     }
     return;

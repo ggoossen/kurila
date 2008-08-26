@@ -159,7 +159,7 @@ close F;
 unlink('a');
 
 open F, ">:utf8", "a";
-my @a = @( map { chr(1 << ($_ << 2)) } 0..5 ); # 0x1, 0x10, .., 0x100000
+my @a = @( < map { chr(1 << ($_ << 2)) } @( < 0..5) ); # 0x1, 0x10, .., 0x100000
 unshift @a, chr(0); # ... and a null byte in front just for fun
 print F < @a;
 close F;
@@ -170,7 +170,7 @@ my $c;
 open F, "<:utf8", "a";
 $a = 0;
 my $failed;
-for (< @a) {
+for ( @a) {
     unless (($c = read(F, $b, 1) == 1)  &&
             length($b)           == 1  &&
             ord($b)              == ord($_) &&
@@ -195,8 +195,8 @@ is($failed, undef);
 	      \@( 0x0080, "utf8"  ),
 	      \@( 0x0100, "utf8"  ) );
     my $t = 34;
-    for my $u (< @a) {
-	for my $v (< @a) {
+    for my $u ( @a) {
+	for my $v ( @a) {
 	    # print "# @$u - @$v\n";
 	    open F, ">", "a";
 	    binmode(F, ":" . $u->[1]);

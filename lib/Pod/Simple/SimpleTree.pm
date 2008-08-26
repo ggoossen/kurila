@@ -4,7 +4,7 @@ package Pod::Simple::SimpleTree;
 use strict;
 use Carp ();
 use Pod::Simple ();
-use vars qw( $ATTR_PAD @ISA $VERSION $SORT_ATTRS);
+use vars < qw( $ATTR_PAD @ISA $VERSION $SORT_ATTRS);
 $VERSION = '2.02';
 BEGIN {
   @ISA = @('Pod::Simple');
@@ -29,7 +29,7 @@ sub _handle_element_start { # self, tagname, attrhash
       # first event!  set to stack, and set as root.
   }
   DEBUG +> 3 and print "Stack is now: ",
-    join(">", map $_->[0], < @{@_[0]->{'_currpos'}}), "\n";
+    join(">", @( < map $_->[0], @( < @{@_[0]->{'_currpos'}}))), "\n";
   return;
 }
 
@@ -37,7 +37,7 @@ sub _handle_element_end { # self, tagname
   DEBUG +> 2 and print "Handling @_[1] end-event\n";
   shift @{@_[0]->{'_currpos'}};
   DEBUG +> 3 and print "Stack is now: ",
-    join(">", map $_->[0], < @{@_[0]->{'_currpos'}}), "\n";
+    join(">", @( < map $_->[0], @( < @{@_[0]->{'_currpos'}}))), "\n";
   return;
 }
 

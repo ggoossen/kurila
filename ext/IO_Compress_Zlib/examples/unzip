@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use IO::File;
-use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError);
+use IO::Uncompress::RawInflate < qw(rawinflate $RawInflateError);
 
 die "Usage: zipcat file" 
     if (nelems @ARGV) != 1 ;

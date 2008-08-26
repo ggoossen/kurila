@@ -20,12 +20,12 @@ $Pod::Simple::Text::FREAKYMODE = 1;
 
 my $parser  = Pod::Simple::Text->new();
  
-foreach my $file (
+foreach my $file (@(
   "junk1.pod",
   "junk2.pod",
   "perlcyg.pod",
   "perlfaq.pod",
-  "perlvar.pod",
+  "perlvar.pod",)
 ) {
 
   unless(-e source_path($file)) {
@@ -49,13 +49,13 @@ foreach my $file (
     }
     close(IN);
 
-    for ($outstring,$compstring) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
+    for (@($outstring,$compstring)) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 
     if($outstring eq $compstring) {
       ok 1;
       next;
     } elsif( do{
-      for ($outstring, $compstring) { s/[ ]//g; };
+      for (@($outstring, $compstring)) { s/[ ]//g; };
       $outstring eq $compstring;
     }){
       print "# Differ only in whitespace.\n";

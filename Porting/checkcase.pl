@@ -16,9 +16,9 @@ find(sub {
 
 my $failed;
 
-foreach (values %files) {
+foreach (@( <values %files)) {
     if ((nelems @$_) +> 1) {
-	print join(", ", < @$_), "\n";
+	print join(", ", @( < @$_)), "\n";
 	$failed++;
     }
 }

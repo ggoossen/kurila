@@ -236,7 +236,7 @@ TEST9: {
   $ok = 0;
 
   my $first_time = 1;
-  for(1) {
+  for(@(1)) {
     if (!$first_time) {
       $ok = 1;
       last TEST9;
@@ -260,7 +260,7 @@ TEST10: {
 
   my $first_time = 1;
   my $been_in_continue = 0;
-  for(1,2) {
+  for(@(1,2)) {
     if (!$first_time) {
       $ok = $been_in_continue;
       last TEST10;
@@ -284,7 +284,7 @@ TEST11: {
   my $first_time = 1;
   my $been_in_loop = 0;
   my $been_in_continue = 0;
-  for(1) {
+  for(@(1)) {
     $been_in_loop = 1;
     if (!$first_time) {
       $ok = 0;
@@ -657,7 +657,7 @@ TEST28: {
   $ok = 0;
 
   my $first_time = 1;
-  LABEL28: for(1) {
+  LABEL28: for(@(1)) {
     if (!$first_time) {
       $ok = 1;
       last TEST28;
@@ -681,7 +681,7 @@ TEST29: {
 
   my $first_time = 1;
   my $been_in_continue = 0;
-  LABEL29: for(1,2) {
+  LABEL29: for(@(1,2)) {
     if (!$first_time) {
       $ok = $been_in_continue;
       last TEST29;
@@ -705,7 +705,7 @@ TEST30: {
   my $first_time = 1;
   my $been_in_loop = 0;
   my $been_in_continue = 0;
-  LABEL30: for(1) {
+  LABEL30: for(@(1)) {
     $been_in_loop = 1;
     if (!$first_time) {
       $ok = 0;
@@ -969,9 +969,9 @@ TODO: {
     our @a37725;
     @a37725[3] = 1; # use package var
     our $i = 2;
-    for my $x (reverse < @a37725) {
+    for my $x (@(reverse < @a37725)) {
 	$x = $i++;
     }
-    cmp_ok("{join ' ', <@a37725}",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug');
+    cmp_ok("{join ' ', @( <@a37725)}",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug');
 }
 

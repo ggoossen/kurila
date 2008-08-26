@@ -69,7 +69,7 @@ sub show_bits
 {
     my $in = shift;
     my $out = '';
-    foreach (unpack('W*', $in)) {
+    foreach (@(unpack('W*', $in))) {
         $out .= sprintf('\x%02x', $_);
     }
     return $out;

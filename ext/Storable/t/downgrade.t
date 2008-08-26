@@ -19,7 +19,7 @@ use Storable 'thaw';
 require utf8;
 
 use strict;
-use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
+use vars < qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
 
 @RESTRICT_TESTS = @('Locked hash', 'Locked hash placeholder',
                    'Locked keys', 'Locked keys placeholder',
@@ -39,7 +39,7 @@ use vars qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
   # an a circumflex, so we need to be explicit.
 
   my $a_circumflex = "\xe5"; # a byte.
-  %U_HASH = %(map {$_, $_} 'castle', "ch{$a_circumflex}teau", $utf8, chr 0x57CE);
+  %U_HASH = %(< map {$_, $_} @( 'castle', "ch{$a_circumflex}teau", $utf8, chr 0x57CE));
   plan tests => 162;
 }
 
@@ -92,7 +92,7 @@ sub thaw_fail {
 
 sub test_locked_hash {
   my $hash = shift;
-  my @keys = @( keys %$hash );
+  my @keys = @( < keys %$hash );
   my ($key, $value) = each %$hash;
   try {$hash->{$key} = 'x' . $value};
   like( $@->{description}, "/^Modification of a read-only value attempted/",
@@ -101,12 +101,12 @@ sub test_locked_hash {
   try {$hash->{use} = 'perl'};
   like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
-  ok (eq_array(\@(keys %$hash), \@keys), "Still the same keys?");
+  ok (eq_array(\@( <keys %$hash), \@keys), "Still the same keys?");
 }
 
 sub test_restricted_hash {
   my $hash = shift;
-  my @keys = @( keys %$hash );
+  my @keys = @( < keys %$hash );
   my ($key, $value) = each %$hash;
   try {$hash->{$key} = 'x' . $value};
   is( $@, '',
@@ -115,7 +115,7 @@ sub test_restricted_hash {
   try {$hash->{use} = 'perl'};
   like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
-  ok (eq_array(\@(keys %$hash), \@keys), "Still the same keys?");
+  ok (eq_array(\@( <keys %$hash), \@keys), "Still the same keys?");
 }
 
 sub test_placeholder {
@@ -137,7 +137,7 @@ thaw_hash ('Hash with utf8 flag but no utf8 keys', \%R_HASH);
 
 if (eval "use Hash::Util; 1") {
   print "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
-  for $Storable::downgrade_restricted (0, 1, undef, "cheese") {
+  for $Storable::downgrade_restricted (@(0, 1, undef, "cheese")) {
     my $hash = thaw_hash ('Locked hash', \%R_HASH);
     test_locked_hash ($hash);
     $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);

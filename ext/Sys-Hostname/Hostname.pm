@@ -6,8 +6,8 @@ use Carp;
 
 require Exporter;
 
-our @ISA     = @( qw/ Exporter / );
-our @EXPORT  = @( qw/ hostname / );
+our @ISA     = @( < qw/ Exporter / );
+our @EXPORT  = @( < qw/ hostname / );
 
 our $VERSION;
 
@@ -105,7 +105,7 @@ sub hostname {
     # method 6 - Apollo pre-SR10
     || try {
         my($a,$b,$c,$d);
-	($host,$a,$b,$c,$d)=split(m/[:\. ]/,`/com/host`,6);
+	($host,$a,$b,$c,$d)= <split(m/[:\. ]/,`/com/host`,6);
     }
 
     # bummer

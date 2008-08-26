@@ -28,7 +28,7 @@ is($foo, 'foo');
 my @foo;
 
 ok( !Internals::SvREADONLY @foo );
-@foo = @(1..3);
+@foo = @( <1..3);
 is(scalar(nelems @foo), 3);
 is(@foo[2], 3);
 
@@ -42,12 +42,12 @@ try { shift(@foo); };
 like($@->message, $ro_err, q/Can't shift read-only array/);
 try { push(@foo, 'bork'); };
 like($@->message, $ro_err, q/Can't push onto read-only array/);
-try { @foo = @( qw/foo bar/ ); };
+try { @foo = @( < qw/foo bar/ ); };
 like($@->message, $ro_err, q/Can't reassign read-only array/);
 
 ok( !Internals::SvREADONLY @foo, 0 );
 ok( !Internals::SvREADONLY @foo );
-try { @foo = @( qw/foo bar/ ); }; die if $@;
+try { @foo = @( < qw/foo bar/ ); }; die if $@;
 is(scalar(nelems @foo), 2);
 is(@foo[1], 'bar');
 

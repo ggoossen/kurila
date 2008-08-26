@@ -14,7 +14,7 @@ use Carp;
 use Exporter;
 use Errno;
 
-@ISA = @( qw(IO::Socket) );
+@ISA = @( < qw(IO::Socket) );
 $VERSION = "1.31";
 
 my $EINVAL = exists(&Errno::EINVAL) ? Errno::EINVAL() : 1;
@@ -29,7 +29,7 @@ my %proto_number;
 %proto_number{tcp}  = Socket::IPPROTO_TCP()  if defined &Socket::IPPROTO_TCP;
 %proto_number{upd}  = Socket::IPPROTO_UDP()  if defined &Socket::IPPROTO_UDP;
 %proto_number{icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP;
-my %proto_name = %( reverse < %proto_number );
+my %proto_name = %( < reverse @( < %proto_number) );
 
 sub new {
     my $class = shift;
@@ -39,7 +39,7 @@ sub new {
 
 sub _cache_proto {
     my @proto = @( < @_ );
-    for (map lc($_), @proto[0], split(' ', @proto[1])) {
+    for (@(< map lc($_), @( @proto[0], < split(' ', @proto[1])))) {
 	%proto_number{$_} = @proto[2];
     }
     %proto_name{@proto[2]} = @proto[0];
@@ -114,7 +114,7 @@ sub _error {
     {
       local($!);
       my $title = ref($sock).": ";
-      $@ = join("", @_[0] =~ m/^$title/ ? "" : $title, < @_);
+      $@ = join("", @( @_[0] =~ m/^$title/ ? "" : $title, < @_));
       $sock->close()
 	if(defined fileno($sock));
     }

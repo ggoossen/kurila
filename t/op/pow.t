@@ -18,7 +18,7 @@ my @pow = @(\@(  3, 30, 1e-14),
            \@( -3, 30, 1e-14),
 );
 my $tests;
-$tests += $_->[1] foreach < @pow;
+$tests += $_->[1] foreach  @pow;
 
 plan tests => 13 + $bits_in_uv + $tests;
 
@@ -59,7 +59,7 @@ foreach my $n (0..$bits_in_uv - 1) {
     cmp_ok ($pow, '==', $int, "2 ** $n vs 1 << $n");
 }
 
-foreach my $pow (< @pow) {
+foreach my $pow ( @pow) {
     my ($base, $max, $range) = < @$pow;
     my $expect = 1;
     foreach my $n (0..$max-1) {

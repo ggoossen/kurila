@@ -7,13 +7,13 @@ use Test::More;
 plan skip_all => "I18N::Langinfo or POSIX unavailable" 
     if %Config{'extensions'} !~ m!\bI18N/Langinfo\b!;
 
-my @constants = @( qw(ABDAY_1 DAY_1 ABMON_1 MON_1 RADIXCHAR AM_STR THOUSEP D_T_FMT D_FMT T_FMT) );
+my @constants = @( < qw(ABDAY_1 DAY_1 ABMON_1 MON_1 RADIXCHAR AM_STR THOUSEP D_T_FMT D_FMT T_FMT) );
 
 plan tests => 1 + 3 * nelems @constants;
 
 use_ok('I18N::Langinfo', 'langinfo', < @constants);
 
-for my $constant (< @constants) {
+for my $constant ( @constants) {
     SKIP: {
         my $string = try { langinfo(eval "$constant()") };
         is( $@ && $@->message, '', "calling langinfo() with $constant" );
@@ -54,7 +54,7 @@ my %want =
      );
 
     
-my @want = @( sort keys %want );
+my @want = @( < sort @( < keys %want) );
 
 print "1..", scalar nelems @want, "\n";
     

@@ -12,17 +12,17 @@ use IO::Handle;
 use Exporter ();
 our(@ISA, @EXPORT_OK, @EXPORT, $VERSION);
 
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 $VERSION = "0.07";
 
-@EXPORT = @( qw( POLLIN
+@EXPORT = @( < qw( POLLIN
 	      POLLOUT
 	      POLLERR
 	      POLLHUP
 	      POLLNVAL
 	    ) );
 
-@EXPORT_OK = @( qw(
+@EXPORT_OK = @( < qw(
  POLLPRI   
  POLLRDNORM
  POLLWRNORM
@@ -79,7 +79,7 @@ sub poll {
 
     while(($fd,$iom) = each %{$self->[0]}) {
 	$mask   = 0;
-	$mask  ^|^= $_ for values(%$iom);
+	$mask  ^|^= $_ for @( < values(%$iom));
 	push(@poll,$fd => $mask);
     }
 
@@ -114,7 +114,7 @@ sub remove {
 
 sub handles {
     my $self = shift;
-    return @( values %{$self->[2]} ) unless (nelems @_);
+    return @( < values %{$self->[2]} ) unless (nelems @_);
 
     my $events = shift || 0;
     my($fd,$ev,$io,$mask);

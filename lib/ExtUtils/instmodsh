@@ -5,7 +5,7 @@ use IO::File;
 use ExtUtils::Packlist;
 use ExtUtils::Installed;
 
-use vars qw($Inst @Modules);
+use vars < qw($Inst @Modules);
 
 
 =head1 NAME
@@ -74,13 +74,13 @@ sub do_module($) {
 sub list_installed {
     my($reply, $module) = < @_;
 
-    my $class = (split(' ', $reply))[[1]];
+    my $class = ( <split(' ', $reply))[[1]];
     $class = 'all' unless $class;
 
     my @files;
     if (try { @files = @( < $Inst->files($module, $class) ); }) {
         print("$class files in $module are:\n   ",
-              join("\n   ", < @files), "\n");
+              join("\n   ", @( < @files)), "\n");
     }
     else { 
         print($@); 
@@ -91,13 +91,13 @@ sub list_installed {
 sub list_directories {
     my($reply, $module) = < @_;
 
-    my $class = (split(' ', $reply))[[1]];
+    my $class = ( <split(' ', $reply))[[1]];
     $class = 'all' unless $class;
 
     my @dirs;
     if (try { @dirs = @( < $Inst->directories($module, $class) ); }) {
         print("$class directories in $module are:\n   ",
-              join("\n   ", < @dirs), "\n");
+              join("\n   ", @( < @dirs)), "\n");
     }
     else { 
         print($@); 
@@ -108,7 +108,7 @@ sub list_directories {
 sub create_archive {
     my($reply, $module) = < @_;
 
-    my $file = (split(' ', $reply))[[1]];
+    my $file = ( <split(' ', $reply))[[1]];
 
     if( !(defined $file and length $file) ) {
         print "No tar file specified\n";
@@ -119,7 +119,7 @@ sub create_archive {
     else {
         my($first, < @rest) = < $Inst->files($module);
         system('tar', 'cvf', $file, $first);
-        for my $f (< @rest) {
+        for my $f ( @rest) {
             system('tar', 'rvf', $file, $f);
         }
         print "Can't use tar\n" if $?;
@@ -132,7 +132,7 @@ sub validate_packlist {
 
     if (my @missing = @( < $Inst->validate($module) )) {
         print("Files missing from $module are:\n   ",
-              join("\n   ", < @missing), "\n");
+              join("\n   ", @( < @missing)), "\n");
     }
     else {
         print("$module has no missing files\n");
@@ -164,12 +164,12 @@ while (1)
       {
       $reply eq 'l' and do
          {
-         print("Installed modules are:\n   ", join("\n   ", < @Modules), "\n");
+         print("Installed modules are:\n   ", join("\n   ", @( < @Modules)), "\n");
          last CASE;
          };
       $reply =~ m/^m\s+/ and do
          {
-         do_module((split(' ', $reply))[[1]]);
+         do_module(( <split(' ', $reply))[[1]]);
          last CASE;
          };
       $reply eq 'q' and do

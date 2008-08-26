@@ -71,8 +71,8 @@ our $VERSION = '1.03';
 
 require Exporter;
 
-our @ISA = @( qw(Exporter) );
-our @EXPORT = @( qw(%Kinds %Type %Flavor %Type_Description @Type_Order) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT = @( < qw(%Kinds %Type %Flavor %Type_Description @Type_Order) );
 
 use Perl6::Form;
 
@@ -101,7 +101,7 @@ our %Type_Description = %(
     'Namespace'	=> 'Keywords altering or affecting scoping of identifiers',
 );
 
-our @Type_Order = @( qw{
+our @Type_Order = @( < qw{
     String
     Regexp
     Math
@@ -128,10 +128,10 @@ while ( ~< *DATA) {
     chomp;
     s/#.*//;
     next unless $_;
-    my($name, $type, $text) = split " ", $_, 3;
+    my($name, $type, $text) = < split " ", $_, 3;
     %Type{$name} = $type;
     %Flavor{$name} = $text;
-    for my $t ( split m/[,\s]+/, $type ) {
+    for my $t (@( < split m/[,\s]+/, $type) ) {
         push @{%Kinds{$t}}, $name;
     }
 }
@@ -140,8 +140,8 @@ close DATA;
 
 my( $typedesc, $list );
 unless (caller) {
-    foreach my $type ( < @Type_Order ) {
-	$list = join(", ", sort < @{%Kinds{$type}});
+    foreach my $type (  @Type_Order ) {
+	$list = join(", ", @( < sort @( < @{%Kinds{$type}})));
 	$typedesc = %Type_Description{$type} . ":";
 
         print < form("",
