@@ -626,9 +626,9 @@ Perl_do_kv(pTHX)
     HV *keys;
     register HE *entry;
     const I32 gimme = GIMME_V;
-    const I32 dokv =     (PL_op->op_type == OP_EXPAND);
-    const I32 dokeys =   dokv || (PL_op->op_type == OP_KEYS);
-    const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES);
+    const I32 dokeys =   (PL_op->op_type == OP_KEYS);
+    const I32 dovalues = (PL_op->op_type == OP_VALUES);
+    AV * res = av_2mortal(newAV());
 
     if ( ! SvHVOK(hv) ) {
 	if ( ! SvOK(hv) ) {
@@ -644,8 +644,6 @@ Perl_do_kv(pTHX)
 	RETURN;
 
     if (gimme == G_SCALAR) {
-	IV i;
-
 	Perl_croak(aTHX_ "keys in scalar context");
     }
 
@@ -656,21 +654,14 @@ Perl_do_kv(pTHX)
 	SPAGAIN;
 	if (dokeys) {
 	    SV* const sv = hv_iterkeysv(entry);
-	    XPUSHs(sv);	/* won't clobber stack_sp */
+	    av_push(res, newSVsv(sv));
 	}
 	if (dovalues) {
-	    SV *tmpstr;
-	    PUTBACK;
-	    tmpstr = hv_iterval(hv,entry);
-	    DEBUG_H(Perl_sv_setpvf(aTHX_ tmpstr, "%lu%%%d=%lu",
-			    (unsigned long)HeHASH(entry),
-			    (int)HvMAX(keys)+1,
-			    (unsigned long)(HeHASH(entry) & HvMAX(keys))));
-	    SPAGAIN;
-	    XPUSHs(tmpstr);
+	    av_push(res, newSVsv(hv_iterval(hv,entry)));
 	}
 	PUTBACK;
     }
+    XPUSHs(res);
     return NORMAL;
 }
 

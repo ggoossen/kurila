@@ -3793,8 +3793,24 @@ PP(pp_expand)
 	    SP += maxarg;
 	}
 	else if (SvTYPE(sv) == SVt_PVHV) {
-	    *PL_stack_sp = sv;
-	    return do_kv();
+	    HV* const hv = (HV*)sv;
+	    register HE *entry;
+
+	    (void)hv_iterinit(hv);	/* reset iterator */
+
+	    EXTEND(SP, HvKEYS(hv) * 2);
+
+	    PUTBACK;	/* hv_iternext and hv_iterval might clobber stack_sp */
+	    while ((entry = hv_iternext(hv))) {
+		SV *tmpstr;
+		SPAGAIN;
+		XPUSHs(hv_iterkeysv(entry)); /* won't extend stack */
+		PUTBACK;
+		tmpstr = hv_iterval(hv,entry);
+		SPAGAIN;
+		XPUSHs(tmpstr);
+		PUTBACK;
+	    }
 	}
     }
 

@@ -152,7 +152,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_bm:
     case PERL_MAGIC_fm:
     case PERL_MAGIC_regex_global:
-    case PERL_MAGIC_nkeys:
     case PERL_MAGIC_qr:
     case PERL_MAGIC_taint:
     case PERL_MAGIC_vec:
