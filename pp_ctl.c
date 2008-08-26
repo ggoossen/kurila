@@ -507,9 +507,7 @@ PP(pp_mapwhile)
 PP(pp_range)
 {
     dVAR;
-    if (GIMME == G_ARRAY)
-	return NORMAL;
-    DIE(aTHX_ "range operator .. can only be used in list context.");
+    return NORMAL;
 }
 
 PP(pp_flip)
@@ -517,7 +515,6 @@ PP(pp_flip)
     dVAR;
     dSP;
 
-    assert(GIMME == G_ARRAY);
     RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
 }
 
@@ -538,7 +535,6 @@ PP(pp_flop)
 
     AV* res = sv_2mortal(newAV());
     dPOPPOPssrl;
-    assert(GIMME == G_ARRAY);
 
     SvGETMAGIC(left);
     SvGETMAGIC(right);
@@ -1217,7 +1213,7 @@ PP(pp_enteriter)
     else { /* iterating over (copy of) the array on the stack */
 	SV *maybe_ary = sv_mortalcopy(POPs);
 	if ( ! ( PL_op->op_flags & OPf_STACKED) ) {
-	    maye_ary = sv_mortalcopy(maybe_ary);
+	    maybe_ary = sv_mortalcopy(maybe_ary);
 	}
 	if ( ! SvOK(maybe_ary) )
 	    RETURN;

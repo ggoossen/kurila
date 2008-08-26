@@ -3796,6 +3796,8 @@ PP(pp_expand)
 	    HV* const hv = (HV*)sv;
 	    register HE *entry;
 
+	    (void)POPs;			/* XXXX May be optimized away? */
+
 	    (void)hv_iterinit(hv);	/* reset iterator */
 
 	    EXTEND(SP, HvKEYS(hv) * 2);

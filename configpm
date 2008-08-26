@@ -136,8 +136,8 @@ package Config;
 # use strict;
 # use warnings; Pulls in Carp
 # use vars pulls in Carp
-@Config::EXPORT = @(qw(%%Config));
-@Config::EXPORT_OK = @(qw(myconfig config_sh config_vars config_re));
+@Config::EXPORT = qw(%%Config);
+@Config::EXPORT_OK = qw(myconfig config_sh config_vars config_re);
 
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
@@ -156,7 +156,7 @@ sub import {
 
     no strict 'refs';
     my $callpkg = caller(0);
-    foreach my $func (< @funcs) {
+    foreach my $func (@funcs) {
 	die qq{"$func" is not exported by the {__PACKAGE__} module\n}
              unless %%Export_Cache{$func};
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{$func};
@@ -172,10 +172,10 @@ $^V eq '%s'
 ENDOFBEG
 
 
-my @non_v    = @( () );
-my @v_others = @( () );
+my @non_v    = @();
+my @v_others = @();
 my $in_v     = 0;
-my %Data     = %( () );
+my %Data     = %();
 
 
 my %seen_quotes;
@@ -322,9 +322,9 @@ if ($s == 4 || $s == 8) {
     $byteorder_code = <<"EOT";
 
 my \$i = 0;
-foreach my \$c ($list) \{ \$i ^|^= ord(\$c); \$i <<= 8 \}
+foreach my \$c (\@($list)) \{ \$i ^|^= ord(\$c); \$i <<= 8 \}
 \$i ^|^= ord(1);
-our \$byteorder = join('', unpack('$format', pack('$f', \$i)));
+our \$byteorder = join('', @(unpack('$format', pack('$f', \$i))));
 EOT
 } else {
     $byteorder_code = "our \$byteorder = '?'x$s;\n";
@@ -608,7 +608,7 @@ sub config_re {
 
 sub config_vars {
     # implements -V:cfgvar option (see perlrun -V:)
-    foreach (<@_) {
+    foreach (@_) {
 	# find optional leading, trailing colons; and query-spec
 	my ($notag,$qry,$lncont) = m/^(:)?(.*?)(:)?$/;	# flags fore and aft, 
 	# map colon-flags to print decorations
