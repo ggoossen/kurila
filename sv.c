@@ -3911,9 +3911,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_isaelem:
 	vtable = &PL_vtbl_isaelem;
 	break;
-    case PERL_MAGIC_nkeys:
-	vtable = &PL_vtbl_nkeys;
-	break;
     case PERL_MAGIC_dbfile:
 	vtable = NULL;
 	break;
