@@ -15,7 +15,7 @@ This test verifies this behavior for nine different operators.
 #use Test::More tests => 36;
 BEGIN { require "./test.pl" }
 
-plan tests => 28;
+plan tests => 24;
 
 sub m  { return "m-".shift }
 sub q  { return "q-".shift }
@@ -51,12 +51,6 @@ can_ok( 'main', "qr" );
 isnt( qr('unqualified'), "qr-unqualified", "qr('unqualified') is oper" );
 is( main::qr('main'), "qr-main", "main::qr() is func" );
 is( &qr('amper'), "qr-amper", "&qr() is func" );
-
-# qw operator
-can_ok( 'main', "qw" );
-isnt( qw('unqualified'), "qw-unqualified", "qw('unqualified') is oper" );
-is( main::qw('main'), "qw-main", "main::qw() is func" );
-is( &qw('amper'), "qw-amper", "&qw() is func" );
 
 # qx operator
 can_ok( 'main', "qx" );

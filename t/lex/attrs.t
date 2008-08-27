@@ -128,7 +128,7 @@ our ($scalar, @array, %hash);
 foreach my $value (@(\$scalar, \@array, \%hash)) {
     my $type = ref $value;
     foreach my $negate (@('', '-')) {
-	foreach my $attr ( @code, < @other) {
+	foreach my $attr ( @( < @code, < @other )) {
 	    my $attribute = $negate . $attr;
 	    eval "use attributes __PACKAGE__, \$value, '$attribute'";
 	    if (%valid{$type}->{$attr}) {
