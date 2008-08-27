@@ -47,7 +47,7 @@ BEGIN {
   require "./test.pl";
 }
 
-plan 1765;
+plan 1655;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);
@@ -535,59 +535,6 @@ ok( not nelems @_ );
 
 @_ = @( m/(bbb)/g );
 ok( not nelems @_ );
-
-m/a(?=.$)/;
-ok( not ( (nelems @+) != 1 or (nelems @-) != 1 ) );
-
-ok( @+[0] == 2 and @-[0] == 1 );
-
-ok( not ( defined @+[1] or defined @-[1] or defined @+[2] or defined @-[2] ));
-
-m/a(a)(a)/;
-ok( (nelems @+) == 3 and (nelems @-) == 3 );
-
-ok( not (@+[0] != 3 or @-[0] != 0 ));
-
-ok( not (@+[1] != 2 or @-[1] != 1 ));
-
-ok( not (@+[2] != 3 or @-[2] != 2 ));
-
-ok( not ( defined @+[3] or defined @-[3] or defined @+[4] or defined @-[4] ));
-
-m/.(a)(b)?(a)/;
-ok( not ((nelems @+) != 4 or (nelems @-) != 4 ));
-
-ok( not (@+[0] != 3 or @-[0] != 0 ));
-
-ok( not (@+[1] != 2 or @-[1] != 1 ));
-
-ok( not (@+[3] != 3 or @-[3] != 2 ));
-
-ok( not (defined @+[2] or defined @-[2] or defined @+[4] or defined @-[4] ));
-
-m/.(a)/;
-ok( not ((nelems @+) != 2 or (nelems @-) != 2 ));
-
-ok( not (@+[0] != 2 or @-[0] != 0 ));
-
-ok( not (@+[1] != 2 or @-[1] != 1 ));
-
-ok( not ( defined @+[2] or defined @-[2] or defined @+[3] or defined @-[3] ));
-
-dies_like( sub { @+[0] = 13; },
-           qr/^Modification of a read-only value attempted/ );
-
-dies_like( sub { @-[0] = 13; },
-           qr/^Modification of a read-only value attempted/ );
-
-dies_like( sub { @+ = @(7, 6, 5); },
-           qr/^Modification of a read-only value attempted/ );
-
-dies_like( sub { @- = @( < qw(foo bar) ); },
-           qr/^Modification of a read-only value attempted/ );
-
-m/.(a)(ba*)?/;
-ok( (nelems @+) == 3 and (nelems @-) == 2 );
 
 $_ = 'aaa';
 pos = 1;
@@ -2590,12 +2537,6 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     ok("X\@A" =~ m/X@(A)/, '@(');
     ok("X\@A" =~ m/X(@)A/, '@)');
     ok("X\@A" =~ m/X@|ZA/, '@|');
-
-    ok('abc' =~ m/(.)(.)(.)/, 'the last successful match is bogus');
-    ok("A{join ',', @( <@+)}B"  =~ m/A$(join ',', @( <@+))B/,  'interpolation of @+ in /@{+}/');
-    ok("A{join ',', @( <@-)}B"  =~ m/A$(join ',', @( <@-))B/,  'interpolation of @- in /@{-}/');
-    ok("A{join ',', @( <@+)}B"  =~ m/A$(join ',', @( <@+))B/x, 'interpolation of @+ in /@{+}/x');
-    ok("A{join ',', @( <@-)}B"  =~ m/A$(join ',', @( <@-))B/x, 'interpolation of @- in /@{-}/x');
 }
 
 {
@@ -2703,133 +2644,7 @@ SKIP:{
     }
         
 }
-{
-    my $s='123453456';
-    $s=~s/(?<digits>\d+)\k<digits>/%+{digits}/;
-    ok($s eq '123456','Named capture (angle brackets) s///');
-    $s='123453456';
-    $s=~s/(?'digits'\d+)\k'digits'/%+{digits}/;
-    ok($s eq '123456','Named capture (single quotes) s///');    
-}
 
-{
-    my @ary = @(
-	pack('U', 0x00F1),            # n-tilde
-	'_'.pack('U', 0x00F1),        # _ + n-tilde
-	'c'.pack('U', 0x0327),        # c + cedilla
-	pack('U*', 0x00F1, 0x0327),   # n-tilde + cedilla
-	'a'.pack('U', 0x00B2),        # a + superscript two
-	pack('U', 0x0391),            # ALPHA
-	pack('U', 0x0391).'2',        # ALPHA + 2
-	pack('U', 0x0391).'_',        # ALPHA + _
-    );
-    for my $uni ( @ary) {
-	my ($r1, $c1, $r2, $c2) = eval qq{
-	    use utf8;
-	    scalar("..foo foo.." =~ m/(?'{$uni}'foo) \\k'{$uni}'/),
-		\%+\{{$uni}\},
-	    scalar("..bar bar.." =~ m/(?<{$uni}>bar) \\k<{$uni}>/),
-		\%+\{{$uni}\};
-	}; die if $@;
-	ok($r1,                         "Named capture UTF (?'')");
-	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
-	ok($r2,                         "Named capture UTF (?<>)");
-	ok(defined $c2 && $c2 eq 'bar', "Named capture UTF \%+");
-    }
-}
-
-{
-    my $s='foo bar baz';
-    my (@k,@v,@fetch,$res);
-    my $count= 0;
-    my @names= @( <qw($+{A} $+{B} $+{C}) );
-    if ($s=~m/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/) {
-        while (my ($k,$v)=each(%+)) {
-            $count++;
-        }
-        @k= @( <sort @( < keys(%+)) );
-        @v= @( <sort @( < values(%+)) );
-        $res=1;
-        push @fetch,
-            \@( "%+{A}", "$1" ),
-            \@( "%+{B}", "$2" ),
-            \@( "%+{C}", "$3" ),
-        ;
-    } 
-    foreach (0..2) {
-        if (@fetch[$_]) {
-            is(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
-        } else {
-            ok(0, @names[$_]);
-        }
-    }
-    is($res,1,"$s~=/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/");
-    is($count,3,"Got 3 keys in \%+ via each");
-    is(0+nelems @k, 3, 'Got 3 keys in %+ via keys');
-    is("{join ' ', @( <@k)}","A B C", "Got expected keys");
-    is("{join ' ', @( <@v)}","bar baz foo", "Got expected values");
-    eval'
-        print for %+{this_key_doesnt_exist};
-    '; die if $@;
-    ok(!$@,'lvalue %+{...} should not throw an exception');
-}
-{
-    #
-    # Almost the same as the block above, except that the capture is nested.
-    #
-    my $s = 'foo bar baz';
-    my (@k,@v,@fetch,$res);
-    my $count = 0;
-    my @names = @( < qw(%+{A} %+{B} %+{C} %+{D}) );
-    if ($s =~ m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/) {
-	while (my ($k,$v) = each(%+)) {
-	    $count++;
-	}
-	@k = @( < sort @( < keys(%+)) );
-	@v = @( < sort @( < values(%+)) );
-	$res = 1;
-	push @fetch,
-	    \@( "%+{A}", "$2" ),
-	    \@( "%+{B}", "$3" ),
-	    \@( "%+{C}", "$4" ),
-	    \@( "%+{D}", $1 ),
-	;
-    }
-    foreach (0..3) {
-	if (@fetch[$_]) {
-	    is(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
-	} else {
-	    ok(0, @names[$_]);
-	}
-    }
-    is($res,1,"$s~=m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/");
-    is($count,4,"Got 4 keys in \%+ via each -- bug 50496");
-    is(0+nelems @k, 4, 'Got 4 keys in %+ via keys -- bug 50496');
-    is("{join ' ', @( <@k)}","A B C D", "Got expected keys -- bug 50496");
-    is("{join ' ', @( <@v)}","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
-    eval'
-	print for %+{this_key_doesnt_exist};
-    '; die if $@;
-    ok(!$@,'lvalue %+{...} should not throw an exception');
-}
-{
-    my $s='foo bar baz';
-    my @res;
-    if ('1234'=~m/(?<A>1)(?<B>2)(?<A>3)(?<B>4)/) {
-        foreach my $name (@( <sort @( < keys(%-)))) {
-            my $ary = %-{$name};
-            foreach my $idx (0..(nelems @$ary)-1) {
-                push @res,"$name:$idx:$ary->[$idx]";
-            }
-        }
-    }
-    my @expect= @( <qw(A:0:1 A:1:3 B:0:2 B:1:4) );
-    is("{join ' ', @( <@res)}","{join ' ', @( <@expect)}","Check \%-");
-    eval'
-        print for %-{this_key_doesnt_exist};
-    '; die if $@;
-    ok(!$@,'lvalue %-{...} should not throw an exception');
-}
 # stress test CURLYX/WHILEM.
 #
 # This test includes varying levels of nesting, and according to
@@ -2950,17 +2765,6 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     my $reg  = "a\\c\\$c";
     local $TODO = $c eq "\0" && '\c\0';
     ok(eval("qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern");
-}
-
-{
-    my $str='abc'; 
-    my $count=0;
-    my $mval=0;
-    my $pval=0;
-    while ($str=~m/b/g) { $mval=(nelems @-) -1; $pval=(nelems @+) -1; $count++ }
-    is($mval,0,"\@- should be empty [RT#36046]");
-    is($pval,0,"\@+ should be empty [RT#36046]");
-    is($count,1,"should have matched once only [RT#36046]");
 }
 
 {   # Test the (*PRUNE) pattern
@@ -3184,13 +2988,6 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     }
 }
 {
-    local $Message = "RT#22614";
-    local $_='ab';
-    our @len= @(() );
-    m/(.){1,}(?{push @len,0+(nelems @-)})(.){1,}(?{})^/;
-    is("{join ' ', @( <@len)}","2 2 2");
-}
-{
     local $Message = "RT#18209";
     my $text = ' word1 word2 word3 word4 word5 word6 ';
 
@@ -3370,23 +3167,6 @@ sub kt
 }
 
 {
-    my $res="";
-
-    if ('1' =~ m/(?|(?<digit>1)|(?<digit>2))/) {
-      $res = "{join ' ', @( <@{%- {digit}})}";
-    }
-    is($res,"1",
-        "Check that (?|...) doesnt cause dupe entries in the names array");
-    #---
-    $res="";
-    if ('11' =~ m/(?|(?<digit>1)|(?<digit>2))(?&digit)/) {
-      $res = "{join ' ', @( <@{%- {digit}})}";
-    }
-    is($res, "1",
-        "Check that (?&..) to a buffer inside a (?|...) goes to the leftmost");
-}
-
-{
     use warnings;
     local $Message = "ASCII pattern that really is utf8";
     my @w;
@@ -3463,25 +3243,6 @@ sub kt
     is(0+nelems @a,3);
     is(join('=', @( < @a)),"$esc$hyp=$hyp=$esc$esc");
 }
-# test for keys in %+ and %-
-{
-    my $_ = "abcdef";
-    m/(?<foo>a)|(?<foo>b)/;
-    is( (join ",", @( < sort @( < keys %+))), "foo" );
-    is( (join ",", @( < sort @( < keys %-))), "foo" );
-    is( (join ",", @( < sort @( < values %+))), "a" );
-    is( (join ",", @( < sort @( < map "{join ' ', @( <@$_)}", @( < values %-)))), "a " );
-    m/(?<bar>a)(?<bar>b)(?<quux>.)/;
-    is( (join ",", @( < sort @( < keys %+))), "bar,quux" );
-    is( (join ",", @( < sort @( < keys %-))), "bar,quux" );
-    is( (join ",", @( < sort @( < values %+))), "a,c" ); # leftmost
-    is( (join ",", @( < sort @( < map "{join ' ', @( <@$_)}", @( < values %-)))), "a b,c" );
-    m/(?<un>a)(?<deux>c)?/; # second buffer won't capture
-    is( (join ",", @( < sort @( < keys %+))), "un" );
-    is( (join ",", @( < sort @( < keys %-))), "deux,un" );
-    is( (join ",", @( < sort @( < values %+))), "a" );
-    is( (join ",", @( < sort @( < map "{join ' ', @( <@$_)}", @( < values %-)))), ",a" );
-}
 
 # length() on captures, the numbered ones end up in Perl_magic_len
 {
@@ -3492,31 +3253,8 @@ sub kt
     is( length($^POSTMATCH), 4, q[length $'] );
     is( length($^MATCH), 9, 'length $&' );
     is( length($1), 4, 'length $1' );
-    is( length(%+{eek}), 4, 'length $+{eek} == length $1' );
 }
 
-{
-    my $ok=-1;
-
-    $ok=exists(%-{x}) ? 1 : 0
-        if 'bar'=~m/(?<x>foo)|bar/;
-    is($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
-
-    $ok=-1;
-    $ok=exists(%+{x}) ? 1 : 0
-        if 'bar'=~m/(?<x>foo)|bar/;
-    is($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
-
-    $ok=-1;
-    $ok=exists(%-{x}) ? 1 : 0
-        if 'foo'=~m/(?<x>foo)|bar/;
-    is($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
-
-    $ok=-1;
-    $ok=exists(%+{x}) ? 1 : 0
-        if 'foo'=~m/(?<x>foo)|bar/;
-    is($ok,1,'$+{x} exists after "foo"=~m/(?<x>foo)|bar/');
-}
 {
     local $_;
     ($_ = 'abc')=~m/(abc)/g;
@@ -3558,52 +3296,12 @@ sub kt
      s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g;
      is $_, "ZYX";
 }
-{
-    our @ctl_n= @(() );
-    our @plus= @(() );
-    our $nested_tags;
-    $nested_tags = qr{
-        <
-           (\w+)
-           (?{
-                   push @ctl_n,$^N;
-                   push @plus,$+;
-           })
-        >
-        (??{$nested_tags})*
-        </\s* \w+ \s*>
-    }x;
-
-    my $match= '<bla><blubb></blubb></bla>' =~ m/^$nested_tags$/;
-    ok($match,'nested construct matches');
-    is("{join ' ', @( <@ctl_n)}","bla blubb",'$^N inside of (?{}) works as expected');
-    is("{join ' ', @( <@plus)}","bla blubb",'$+ inside of (?{}) works as expected');
-}
 
 
 
 
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
-# Keep the following tests last -- they may crash perl
-{   
-    # RT#19049 / RT#38869
-    my @list = @(
-        'ab cdef', # matches regex
-        ( 'e' x 40000 ) .'ab c' # matches not, but 'ab c' matches part of it
-    );
-    my $y;
-    my $x;
-    foreach ( @list) {
-        m/ab(.+)cd/i; # the ignore-case seems to be important
-        $y = $1; # use $1, which might not be from the last match!
-        $x = substr(@list[0],@-[0],@+[0]-@-[0]);
-    }
-    is($y,' ',
-        'pattern in a loop, failure should not affect previous success');
-    is($x,'ab cd',
-        'pattern in a loop, failure should not affect previous success');
-}
 
 ok(("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/, "Recursive stack cracker: #24274")
     or print "# Unexpected outcome: should pass or crash perl\n";

@@ -70,7 +70,7 @@ sub import {
     shift;
 
     my %names;
-    foreach (reverse < @_) {
+    foreach (reverse @_) {
 	my $path = $_;		# we'll be modifying it, so break the alias
 	if ($path eq '') {
 	    require Carp;
