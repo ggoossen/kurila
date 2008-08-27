@@ -1143,24 +1143,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		require_tie_mod(gv, "!", newSVpvs("Errno"), "TIEHASH", 1);
 
 	    break;
-	case '-':
-	case '+':
-	GvMULTI_on(gv); /* no used once warnings here */
-        {
-            AV* const av = GvAVn(gv);
-	    SV* const avc = (*name == '+') ? (SV*)av : NULL;
-
-	    sv_magic((SV*)av, avc, PERL_MAGIC_regdata, NULL, 0);
-            sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
-            if (avc)
-                SvREADONLY_on(GvSVn(gv));
-            SvREADONLY_on(av);
-
-            if (sv_type == SVt_PVHV || sv_type == SVt_PVGV)
-                require_tie_mod(gv, name, newSVpvs("Tie::Hash::NamedCapture"), "TIEHASH", 0);
-
-            break;
-	}
 	case '|':
 	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 	    goto magicalize;
@@ -1207,6 +1189,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '\'':
 	case '.':
 	case ';':
+	case '-':
+	case '+':
 	    Perl_croak(aTHX_ "Unknown magic variable '%c%s'",
 		       sv_type == SVt_PVAV ? '@' : sv_type == SVt_PVHV ? '%' : '$',
 		       name);

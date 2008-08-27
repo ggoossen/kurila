@@ -192,27 +192,6 @@ Perl_av_fetch(pTHX_ register AV *av, I32 key, I32 lval)
     PERL_ARGS_ASSERT_AV_FETCH;
     assert(SvTYPE(av) == SVt_PVAV);
 
-    if (SvRMAGICAL(av)) {
-        if (mg_find((SV*)av, PERL_MAGIC_regdata)) {
-	    SV *sv;
-	    if (key < 0) {
-		I32 adjust_index = 1;
-		if (adjust_index) {
-		    key += AvFILL(av) + 1;
-		    if (key < 0)
-			return NULL;
-		}
-	    }
-
-            sv = sv_newmortal();
-	    sv_upgrade(sv, SVt_PVLV);
-	    mg_copy((SV*)av, sv, 0, key);
-	    LvTYPE(sv) = 't';
-	    LvTARG(sv) = sv; /* fake (SV**) */
-	    return &(LvTARG(sv));
-        }
-    }
-
     if (key < 0) {
 	key += AvFILL(av) + 1;
 	if (key < 0)
@@ -712,31 +691,6 @@ Perl_av_delete(pTHX_ AV *av, I32 key, I32 flags)
     if (SvREADONLY(av))
 	Perl_croak(aTHX_ PL_no_modify);
 
-    if (SvRMAGICAL(av)) {
-        if ((mg_find((SV*)av, PERL_MAGIC_regdata))) {
-            /* Handle negative array indices 20020222 MJD */
-            SV **svp;
-            if (key < 0) {
-                unsigned adjust_index = 1;
-                if (adjust_index) {
-                    key += AvFILL(av) + 1;
-                    if (key < 0)
-			return NULL;
-                }
-            }
-            svp = av_fetch(av, key, TRUE);
-            if (svp) {
-                sv = *svp;
-                mg_clear(sv);
-                if (mg_find(sv, PERL_MAGIC_tiedelem)) {
-                    sv_unmagic(sv, PERL_MAGIC_tiedelem); /* No longer an element */
-                    return sv;
-                }
-		return NULL;
-            }
-        }
-    }
-
     if (key < 0) {
 	key += AvFILL(av) + 1;
 	if (key < 0)
@@ -785,30 +739,6 @@ Perl_av_exists(pTHX_ AV *av, I32 key)
     dVAR;
     PERL_ARGS_ASSERT_AV_EXISTS;
     assert(SvTYPE(av) == SVt_PVAV);
-
-    if (SvRMAGICAL(av)) {
-        if (mg_find((SV*)av, PERL_MAGIC_regdata)) {
-	    SV * const sv = sv_newmortal();
-            MAGIC *mg;
-            /* Handle negative array indices 20020222 MJD */
-            if (key < 0) {
-                unsigned adjust_index = 1;
-                if (adjust_index) {
-                    key += AvFILL(av) + 1;
-                    if (key < 0)
-                        return FALSE;
-                }
-            }
-
-            mg_copy((SV*)av, sv, 0, key);
-            mg = mg_find(sv, PERL_MAGIC_tiedelem);
-            if (mg) {
-                magic_existspack(sv, mg);
-                return (bool)SvTRUE(sv);
-            }
-
-        }
-    }
 
     if (key < 0) {
 	key += AvFILL(av) + 1;

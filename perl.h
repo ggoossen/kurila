@@ -3748,9 +3748,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_overload_elem  'a' /* %OVERLOAD hash element */
 #define PERL_MAGIC_overload_table 'c' /* Holds overload table (AMT) on stash */
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
-#define PERL_MAGIC_regdata	  'D' /* Regex match position data
-					(@+ and @- vars) */
-#define PERL_MAGIC_regdatum	  'd' /* Regex match position data element */
 #define PERL_MAGIC_env		  'E' /* %ENV hash */
 #define PERL_MAGIC_envelem	  'e' /* %ENV hash element */
 #define PERL_MAGIC_fm		  'f' /* Formline ('compiled' format) */
@@ -4540,8 +4537,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_regexp,
     want_vtbl_amagic,
     want_vtbl_amagicelem,
-    want_vtbl_regdata,
-    want_vtbl_regdatum,
     want_vtbl_backref,
     want_vtbl_utf8,
     want_vtbl_symtab,
@@ -5047,30 +5042,6 @@ MGVTBL_SET(
     PL_vtbl_regexp,
     0,
     MEMBER_TO_FPTR(Perl_magic_setregexp),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_regdata,
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_regdata_cnt),
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_regdatum,
-    MEMBER_TO_FPTR(Perl_magic_regdatum_get),
-    MEMBER_TO_FPTR(Perl_magic_regdatum_set),
     0,
     0,
     0,

@@ -3890,12 +3890,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;
-    case PERL_MAGIC_regdata:
-	vtable = &PL_vtbl_regdata;
-	break;
-    case PERL_MAGIC_regdatum:
-	vtable = &PL_vtbl_regdatum;
-	break;
     case PERL_MAGIC_env:
 	vtable = &PL_vtbl_env;
 	break;
