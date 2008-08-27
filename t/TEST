@@ -582,7 +582,7 @@ SHRDLU_5
     {
         # write failed tests
         open my $fh, ">", "TEST_FAILED" or die;
-        print $fh "$_\n" for @( reverse < sort @( < keys %failed_tests));
+        print $fh "$_\n" for reverse sort @( < keys %failed_tests);
         close $fh;
     }
 

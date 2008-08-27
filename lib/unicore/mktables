@@ -275,7 +275,7 @@ sub Build_Aliases()
 
 	# The %utf8::... versions use japhy's code originally from utf8_pva.pl
 	# However, it's moved here so that we build the tables at runtime.
-	s/[ _-]//g for @( $abbrev, $name);
+	$$_ =~ s/[ _-]//g for @( \$abbrev, \$name);
 	%utf8::PropertyAlias{lc $abbrev} = $name;
 	%utf8::PA_reverse{lc $name} = $abbrev;
     }

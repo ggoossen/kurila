@@ -219,7 +219,7 @@ reify('ok');
 curr_test($t);
 
 # qw() is no longer a runtime split, it's compiletime.
-is (qw(foo bar snorfle)[[2]], 'snorfle');
+is (qw(foo bar snorfle)[2], 'snorfle');
 
 @ary = @(12,23,34,45,56);
 
