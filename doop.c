@@ -632,6 +632,7 @@ Perl_do_kv(pTHX)
 
     if ( ! SvHVOK(hv) ) {
 	if ( ! SvOK(hv) ) {
+	    XPUSHs(&PL_sv_undef);
 	    RETURN;
 	}
 	Perl_croak(aTHX_ "keys expected a hash but got %s", Ddesc((SV*)hv));

@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 106;
+plan tests => 104;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -267,13 +267,6 @@ while (m/(o.+?),/gc) {
 # local() and readonly magic variables
 
 try { local $1 = 1 };
-like($@->{description}, qr/Modification of a read-only value attempted/);
-
-try { for (@($1)) { local $_ = 1 } };
-like($@->{description}, qr/Modification of a read-only value attempted/);
-
-# make sure $1 is still read-only
-try { for (@($1)) { local $_ = 1 } };
 like($@->{description}, qr/Modification of a read-only value attempted/);
 
 # The s/// adds 'g' magic to $_, but it should remain non-readonly

@@ -95,15 +95,15 @@ is ($@, '');
 eval "use testuse v1.01";
 like ($@->message, qr/testuse version v1.1.0 required--this is only version v1.0.0/);
 
-eval "use testuse v0.9 qw(fred)";
+eval "use testuse v0.9 q(fred)";
 is ($@, '');
 is $testimport->[1], "fred";
 
-eval "use testuse v1.0 qw(joe)";
+eval "use testuse v1.0 q(joe)";
 is ($@, '');
 is $testimport->[1], "joe";
 
-eval "use testuse v1.01 qw(freda)";
+eval "use testuse v1.01 q(freda)";
 isnt( ref $@, '' );
 is $testimport->[1], "joe", "testimport is still 'joe'";
 

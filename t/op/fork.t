@@ -168,8 +168,8 @@ parent
 child
 ########
 $| = 1;
-my @a = @(1..3);
-for (<@a) {
+my @a = 1..3;
+for (@a) {
     if (fork) {
 	print "parent $_\n";
 	$_ = "[$_]";
@@ -179,7 +179,7 @@ for (<@a) {
 	$_ = "-$_-";
     }
 }
-print "{join ' ', <@a}\n";
+print "{join ' ', @a}\n";
 EXPECT
 parent 1
 child 1
@@ -205,7 +205,7 @@ child 3
 -1- -2- -3-
 ########
 $| = 1;
-foreach my $c (1,2,3) {
+foreach my $c (@(1,2,3)) {
     if (fork) {
 	print "parent $c\n";
     }
