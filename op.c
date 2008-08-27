@@ -4271,7 +4271,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 	}
 	iterpflags |= OPpITER_DEF;
     }
-    if (expr->op_type == OP_RV2SV || expr->op_type == OP_PADSV) {
+    if (expr->op_type == OP_RV2AV || expr->op_type == OP_RV2SV || expr->op_type == OP_PADSV) {
 	expr->op_flags |= OPf_SPECIAL;
 	expr = mod(force_list(expr), OP_GREPSTART);
 	iterflags |= OPf_STACKED;
