@@ -49,7 +49,7 @@ sub load {
 
     goto retry unless $module and defined &dl_load_file;
 
-    my @modparts = @( split(m/::/,$module) );
+    my @modparts = split(m/::/,$module);
     my $modfname = @modparts[-1];
 
 EOT
@@ -70,7 +70,7 @@ print OUT <<'EOT' if $^O eq 'os2';
 EOT
 
 print OUT <<'EOT';
-    my $modpname = join('/', < @modparts);
+    my $modpname = join('/', @modparts);
     my $modlibname = @(caller())[1];
     my $c = nelems @modparts;
     $modlibname =~ s,[\\/][^\\/]+$,, while $c--;	# Q&D basename
