@@ -93,8 +93,8 @@ sub charnames
   }
 
   my $ord;
-  my @off;
   my $fname;
+  my $hexstr;
 
   if ($name eq "BYTE ORDER MARK") {
     $fname = $name;
@@ -105,75 +105,48 @@ sub charnames
     ##     "0052\t\tLATIN CAPITAL LETTER R\n"
     $txt = do "unicore/Name.pl" unless $txt;
 
-    ## @off will hold the index into the code/name string of the start and
-    ## end of the name as we find it.
-
+    my $hexre = "[0-9A-Fa-f]+";
     ## If :full, look for the name exactly
-    if (%^H{charnames_full} and $txt =~ m/\t\t\Q$name\E$/m) {
-      @off = @(@-[0], @+[0]);
+    if (%^H{charnames_full} and $txt =~ m/($hexre)\t\t\Q$name\E$/m) {
+        $hexstr = $1;
     }
 
     ## If we didn't get above, and :short allowed, look for the short name.
     ## The short name is like "greek:Sigma"
-    unless (nelems @off) {
+    unless (defined $hexstr) {
       if (%^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
         my $uc_cname = uc($cname);
         my $uc_script = uc($script);
-	if ($txt =~ m/\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m) {
-	  @off = @(@-[0], @+[0]);
+	if ($txt =~ m/($hexre)\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m) {
+            $hexstr = $1;
 	}
       }
     }
 
     ## If we still don't have it, check for the name among the loaded
     ## scripts.
-    if (not nelems @off) {
+    if (not defined $hexstr) {
       my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
       for my $script ( @{%^H{charnames_scripts}}) {
         my $ucname = uc($name);
-	if ($txt =~ m/\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
-	  @off = @(@-[0], @+[0]);
-	  last;
+	if ($txt =~ m/($hexre)\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
+            $hexstr = $1;
+            last;
 	}
       }
     }
 
     ## If we don't have it by now, give up.
-    unless (nelems @off) {
+    unless ($hexstr) {
       warn "Unknown charname '$name'";
       return "\x{FFFD}";
     }
 
-    ##
-    ## Now know where in the string the name starts.
-    ## The code, in hex, is before that.
-    ##
-    ## The code can be 4-6 characters long, so we've got to sort of
-    ## go look for it, just after the newline that comes before $off[0].
-    ##
-    ## This would be much easier if unicore/Name.pl had info in
-    ## a name/code order, instead of code/name order.
-    ##
-    ## The +1 after the rindex() is to skip past the newline we're finding,
-    ## or, if the rindex() fails, to put us to an offset of zero.
-    ##
-    my $hexstart = rindex($txt, "\n", @off[0]) + 1;
-
     ## we know where it starts, so turn into number -
     ## the ordinal for the char.
-    $ord = CORE::hex substr($txt, $hexstart, @off[0] - $hexstart);
-  }
-
-  if ($^H ^&^ $bytes::hint_bits) {	# "use bytes" in effect?
-    use bytes;
-    return chr $ord if $ord +<= 255;
-    my $hex = sprintf "\%04x", $ord;
-    if (not defined $fname) {
-      $fname = substr $txt, @off[0] + 2, @off[1] - @off[0] - 2;
-    }
-    die "Character 0x$hex with name '$fname' is above 0xFF";
+    $ord = CORE::hex $hexstr;
   }
 
   no warnings 'utf8'; # allow even illegal characters

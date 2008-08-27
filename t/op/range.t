@@ -5,7 +5,7 @@ require './test.pl';
 
 use Config;
 
-plan (116);
+plan (115);
 
 our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 
@@ -52,15 +52,15 @@ is(join(",", @( < @y)), join(",", @( < @x)));
 
 # check bounds
 if (%Config{ivsize} == 8) {
-  @a = @( eval "0x7ffffffffffffffe..0x7fffffffffffffff" );
+  @a = eval "0x7ffffffffffffffe..0x7fffffffffffffff";
   $a = "9223372036854775806 9223372036854775807";
-  @b = @( eval "-0x7fffffffffffffff..-0x7ffffffffffffffe" );
+  @b = eval "-0x7fffffffffffffff..-0x7ffffffffffffffe";
   $b = "-9223372036854775807 -9223372036854775806";
 }
 else {
-  @a = @( eval "0x7ffffffe..0x7fffffff" );
+  @a = eval "0x7ffffffe..0x7fffffff";
   $a = "2147483646 2147483647";
-  @b = @( eval "-0x7fffffff..-0x7ffffffe" );
+  @b = eval "-0x7fffffff..-0x7ffffffe";
   $b = "-2147483647 -2147483646";
 }
 
@@ -336,8 +336,5 @@ foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4))) {
     };
     ok($@, 'Lower bound rejected: ' . -$ii);
 }
-
-eval 'scalar(1..3)';
-like($@->{description}, qr/range operator \.\. can only be used in list context/);
 
 # EOF

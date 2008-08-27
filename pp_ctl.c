@@ -2053,6 +2053,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     int runtime;
     CV* runcv = NULL;	/* initialise to avoid compiler warnings */
     STRLEN len;
+    OP *oldop;
 
     PERL_ARGS_ASSERT_SV_COMPILE_2OP;
 
@@ -2086,9 +2087,11 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     if (runtime)
 	runcv = find_runcv(NULL);
 
+    oldop = PL_op;
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
+    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : newAV();
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 
