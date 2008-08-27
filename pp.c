@@ -4199,7 +4199,7 @@ PP(pp_reverse)
 PP(pp_split)
 {
     dVAR; dSP; dTARG;
-    AV *ary;
+    AV *av;
     register IV limit = POPi;			/* note, negative is forever */
     SV * const sv = POPs;
     STRLEN len;
@@ -4234,7 +4234,7 @@ PP(pp_split)
 
     do_utf8 = (RX_EXTFLAGS(rx) & RXf_PMf_UTF8) != 0;
 
-    ary = av_2mortal(newAV());
+    av = av_2mortal(newAV());
 
     base = SP - PL_stack_base;
     orig = s;
@@ -4275,7 +4275,7 @@ PP(pp_split)
 		break;
 
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    av_push(ary, dstr);
+	    av_push(av, dstr);
 
 	    /* skip the whitespace found last */
 	    if (do_utf8)
@@ -4301,7 +4301,7 @@ PP(pp_split)
 	    if (m >= strend)
 		break;
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    av_push(ary, dstr);
+	    av_push(av, dstr);
 	    s = m;
 	}
     }
@@ -4320,7 +4320,7 @@ PP(pp_split)
 		if (m >= strend)
 		    break;
 		dstr = newSVpvn_flags(s, m-s, make_mortal);
-		av_push(ary, dstr);
+		av_push(av, dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
 	}
@@ -4330,7 +4330,7 @@ PP(pp_split)
 			     csv, multiline ? FBMrf_MULTILINE : 0)) )
 	    {
 		dstr = newSVpvn_flags(s, m-s, make_mortal);
-		av_push(ary, dstr);
+		av_push(av, dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
 	}
@@ -4356,7 +4356,7 @@ PP(pp_split)
 	    }
 	    m = RX_OFFS(rx)[0].start + orig;
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    av_push(ary, dstr);
+	    av_push(av, dstr);
 	    if (RX_NPARENS(rx)) {
 		I32 i;
 		for (i = 1; i <= (I32)RX_NPARENS(rx); i++) {
@@ -4371,14 +4371,14 @@ PP(pp_split)
 		    }
 		    else
 			dstr = &PL_sv_undef;  /* undef, not "" */
-		    av_push(ary, dstr);
+		    av_push(av, dstr);
 		}
 	    }
 	    s = RX_OFFS(rx)[0].end + orig;
 	}
     }
 
-    iters = (SP - PL_stack_base) - base;
+    iters = av_len(av) + 1;
     if (iters > maxiters)
 	DIE(aTHX_ "Split loop");
 
@@ -4386,22 +4386,22 @@ PP(pp_split)
     if (s < strend || (iters && origlimit)) {
         const STRLEN l = strend - s;
 	dstr = newSVpvn_flags(s, l, make_mortal);
-	av_push(ary, dstr);
+	av_push(av, dstr);
 	iters++;
     }
     else if (!origlimit) {
-	while (iters > 0 && (!TOPs || !SvANY(TOPs) || SvCUR(TOPs) == 0)) {
-	    if (TOPs && !make_mortal)
-		sv_2mortal(TOPs);
+	SV** last = av_fetch(av, iters-1, 0);
+	while (iters && (!last || !SvOK(*last) || SvCUR(*last) == 0)) {
+	    SvREFCNT_dec(av_pop(av));
 	    iters--;
-	    *SP-- = &PL_sv_undef;
+	    last = av_fetch(av, iters-1, 0);
 	}
     }
 
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    XPUSHs(ary);
+    XPUSHs(av);
     RETURN;
 }
 

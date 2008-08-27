@@ -2926,7 +2926,7 @@ Perl_yylex(pTHX)
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");
 		if (PL_minus_a) {
-		    sv_catpvs(PL_linestr,"our @F=@(split(' '));");
+		    sv_catpvs(PL_linestr,"our @F=split(' ');");
 		}
 	    }
 	    if (PL_minus_E)

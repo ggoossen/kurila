@@ -134,7 +134,7 @@ sub test ($;$) {
 my $ECHO = ($Is_MSWin32 ? ".\\echo$$" : $Is_MacOS ? ":echo$$" : ($Is_NetWare ? "echo$$" : "./echo$$"));
 END { unlink $ECHO }
 open PROG, ">", "$ECHO" or die "Can't create $ECHO: $!";
-print PROG 'print "{join q| |, <@ARGV}\n"', "\n";
+print PROG 'print "{join q| |, @ARGV}\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
 
@@ -284,7 +284,7 @@ SKIP: {
     my $arg = catfile(curdir(), "arg$$");
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
-	try { join('', <@ARGV), kill 0 };
+	try { join('', @ARGV), kill 0 };
 	exit 0 if $@->{description} =~ m/^Insecure dependency/;
 	print "# Oops: \$@ was [$@]\n";
 	exit 1;
