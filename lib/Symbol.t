@@ -25,7 +25,7 @@ $sym1 = $sym2 = undef;
 
 # Test geniosym()
 
-use Symbol qw(geniosym);
+use Symbol q(geniosym);
 
 $sym1 = geniosym;
 is( (ref $sym1), 'IO::Handle', 'got an IO ref' );
@@ -48,7 +48,7 @@ is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 # Test qualify()
 package foo;
 
-use Symbol qw(qualify qualify_to_ref);  # must import into this package too
+use Symbol < qw(qualify qualify_to_ref);  # must import into this package too
 
 main::ok( qualify("x") eq "foo::x",		'qualify() with a simple identifier' );
 main::ok( qualify("x", "FOO") eq "FOO::x",	'qualify() with a package' );

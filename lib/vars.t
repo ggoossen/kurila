@@ -47,23 +47,23 @@ EOE
 $e = $@ && 'not ';
 print "{$e}ok 13\n";
 
-eval q{use vars qw(!abc);};
+eval q{use vars q(!abc);};
 print "ok 14\n";
 $e = $@->{description} !~ m/^'!abc' is not a valid variable name/ && 'not ';
 print "{$e}ok 15\n";
 
-eval 'use vars qw($x[3])';
+eval 'use vars q($x[3])';
 $e = $@->{description} !~ m/^Can't declare individual elements of hash or array/ && 'not ';
 print "{$e}ok 16\n";
 
 { local $^W;
-  eval 'use vars qw($!)';
+  eval 'use vars q($!)';
   $e = $@->{description} !~ m/^'\$!' is not a valid variable name/ && 'not ';
   print "{$e}ok 17\n";
 };
 
 # NB the next test only works because vars.pm has already been loaded
-eval 'use warnings "vars"; use vars qw($!)';
+eval 'use warnings "vars"; use vars q($!)';
 $e = ($@ || (shift(@warns)||'') !~ m/^No need to declare built-in vars/)
 			&& 'not ';
 print "{$e}ok 18\n";

@@ -111,7 +111,7 @@ sub unimport {
     shift;
 
     my %names;
-    foreach (< @_) {
+    foreach (@_) {
 	my $path = _nativize($_);
 
 	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)

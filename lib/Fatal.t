@@ -16,7 +16,7 @@ print "ok $i\n"; ++$i;
 
 my $foo = 'FOO';
 for (@("*$foo", "\\*$foo")) {
-    eval qq{ open $_, '<', '$0' };
+    eval qq{ open $_, '<', '$0' }; die if $@;
     print "not " if $@;
     print "ok $i\n"; ++$i;
 

@@ -37,7 +37,6 @@ no warnings;
 my $globbed_match ;
 
 our @MINIMAL_EXPORT = @( < qw(
-	$LAST_PAREN_MATCH
 	$INPUT_RECORD_SEPARATOR
 	$RS
 	$OUTPUT_AUTOFLUSH
@@ -78,8 +77,6 @@ our @MINIMAL_EXPORT = @( < qw(
 	$LAST_REGEXP_CODE_RESULT
 	$EXCEPTIONS_BEING_CAUGHT
 	$LAST_SUBMATCH_RESULT
-	@LAST_MATCH_START
-	@LAST_MATCH_END
 ) );
 
 # Grandfather $NAME import
@@ -93,10 +90,7 @@ sub import {
 
 # Matching.
 
-	*LAST_PAREN_MATCH			= *+{SCALAR}	;
 	*LAST_SUBMATCH_RESULT			= *^N{SCALAR} ;
-	*LAST_MATCH_START			= *-{ARRAY} ;
-	*LAST_MATCH_END				= *+{ARRAY} ;
 
 # Input.
 

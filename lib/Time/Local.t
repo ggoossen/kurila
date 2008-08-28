@@ -75,7 +75,7 @@ $tests += 8 if %ENV{MAINTAINER};
 
 plan tests => $tests;
 
-for ( @time, < @neg_time) {
+for ( @( < @time, < @neg_time) ) {
     my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
     $year -= 1900;
     $mon--;

@@ -53,7 +53,7 @@ sub import {
   if ($args or $fail) {
     ($heavy = (m/\W/ or $args and not exists $export_cache->{$_}
                or (nelems @$fail) and $_ eq $fail->[0])) and last
-                 foreach @( (< @_));
+                 foreach @_;
   } else {
     ($heavy = m/\W/) and last
       foreach @( (< @_));

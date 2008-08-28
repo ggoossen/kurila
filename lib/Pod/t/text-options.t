@@ -25,7 +25,7 @@ while ( ~< *DATA) {
     next until $_ eq "###\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
-        my ($option, $value) = split;
+        my ($option, $value) = < split;
         %options{$option} = $value;
     }
     open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";

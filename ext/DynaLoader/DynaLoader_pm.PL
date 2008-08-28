@@ -296,7 +296,7 @@ sub bootstrap {
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
 
     <</$^O-eq-os2>>
-    my @modparts = @( split(m/::/,$module) );
+    my @modparts = split(m/::/,$module);
     my $modfname = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
@@ -311,7 +311,7 @@ sub bootstrap {
 	}
     <</$^O-eq-NetWare>>
 
-    my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,<@modparts);
+    my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,@modparts);
 
     print STDERR "DynaLoader::bootstrap for $module ",
 		       <<$^O-eq-MacOS>> "(:auto:$modpname:$modfname.$dl_dlext)\n" 

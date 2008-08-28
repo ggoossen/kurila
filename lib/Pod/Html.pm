@@ -1327,7 +1327,7 @@ sub process_pre {
     # insert spaces in place of tabs
     $rest =~ s#(.+)#{
 	    my $line = $1;
-            1 while $line =~ s/(\t+)/{' ' x ((length($1) * 8) - @-[0] % 8)}/;
+            1 while $line =~ s/^(.*?)(\t+)/$1{' ' x ((length($2) * 8 - length($1) % 8))}/;
 	    $line;
 	}#g;
 

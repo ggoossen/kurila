@@ -11,7 +11,7 @@ my $IsWin32 = $^O eq 'MSWin32';
 my $Verbose = (nelems @ARGV) ? 1 : 0;
 
 use_ok( $Class,         $_ ) for  @Funcs;
-can_ok( $Class,         $_ ) for  @Funcs, < @Meths;
+can_ok( $Class,         $_ ) for  @(< @Funcs, < @Meths);
 can_ok( __PACKAGE__,    $_ ) for  @Funcs;
 
 my $Have_IPC_Run    = $Class->can_use_ipc_run;
