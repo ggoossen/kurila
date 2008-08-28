@@ -31,14 +31,14 @@ sub stripname( $ ) {
 
 sub msgcmp( $ $ ) {
    ## filter out platform-dependent aspects of error messages
-   my ($line1, $line2) = < @_;
-   for (@($line1, $line2)) {
+   my $lines = @_;
+   for ($lines) {
       ## remove filenames from error messages to avoid any
       ## filepath naming differences between OS platforms
       s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/{"$1 ".lc($2)}/;
       s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/{lc($1)." $2"}/;
    }
-   return $line1 ne $line2;
+   return $lines[0] ne $lines[1];
 }
 
 sub testpodcheck( @ ) {

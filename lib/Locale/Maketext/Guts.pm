@@ -238,10 +238,10 @@ sub _compile {
     print "Empty code\n" if DEBUG;
     return \'';
   } elsif((nelems @code) +> 1) { # most cases, presumably!
-    unshift @code, "join '',\n";
+    unshift @code, "join '',@(\n";
   }
   unshift @code, "use strict; sub \{\n";
-  push @code, "\}\n";
+  push @code, ")\}\n";
 
   print < @code if DEBUG;
   my $sub = eval(join '', @( < @code));
