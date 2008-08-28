@@ -1660,9 +1660,8 @@ PP(pp_iter)
     /* iterate array */
     assert(CxTYPE(cx) == CXt_LOOP_FOR);
     av = cx->blk_loop.state_u.ary.ary;
-    if (!av) {
-	av_is_stack = TRUE;
-	av = PL_curstack;
+    if (! SvAVOK(av)) {
+	RETPUSHNO;
     }
     if (PL_op->op_private & OPpITER_REVERSED) {
 	if (cx->blk_loop.state_u.ary.ix <= (av_is_stack

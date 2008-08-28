@@ -34,7 +34,7 @@ sub skip {
     return 1;
 }
 
-print "1..52\n";
+print "1..48\n";
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -140,8 +140,6 @@ ok join(':', @(< @val1)) eq join(':', @(< @val2));
 ok( (nelems @val1) +> 1 );
 
 # regex vars
-'foobarbaz' =~ m/b(a)r/;
-ok $+ eq 'a', $+;
 
 # $"
 my @a = @( < qw(foo bar baz) );
@@ -394,13 +392,6 @@ ok $^TAINT == 0;
 try { $^TAINT = 1 };
 ok $^TAINT == 0;
 
-# 5.6.1 had a bug: @+ and @- were not properly interpolated
-# into double-quoted strings
-# 20020414 mjd-perl-patch+@plover.com
-"I like pie" =~ m/(I) (like) (pie)/;
-ok "{join ' ', @( <@-)}" eq  "0 0 2 7";
-ok "{join ' ', @( <@+)}" eq "10 1 6 10";
-
 # Tests for the magic get of $\
 {
     my $ok = 0;
@@ -417,18 +408,6 @@ ok "{join ' ', @( <@+)}" eq "10 1 6 10";
 	$ok = "a$\b" eq "aa\0bb";
     }
     ok $ok;
-}
-
-# Test for bug [perl #27839]
-{
-    my $x;
-    sub f {
-	"abc" =~ m/(.)./;
-	$x = "{join ' ', @( <@+)}";
-	return @+;
-    };
-    my @y = @( < f() );
-    ok( $x eq "{join ' ', @( <@y)}", "return a magic array ($x) vs ({join ' ', @( <@y)})" );
 }
 
 # Test for bug [perl #36434]

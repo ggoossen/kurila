@@ -338,7 +338,7 @@ SKIP: {
     $foo =~ m/def/;
 
     $foo =~ m/(...)(...)(...)/;
-    test not any_tainted $1, $2, $3, $+;
+    test not any_tainted $1, $2, $3;
 
     my @bar = @( $foo =~ m/(...)(...)(...)/ );
     test not any_tainted < @bar;

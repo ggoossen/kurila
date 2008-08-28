@@ -1215,17 +1215,14 @@ PP(pp_enteriter)
 	if ( ! ( PL_op->op_flags & OPf_STACKED) ) {
 	    maybe_ary = sv_mortalcopy(maybe_ary);
 	}
-	if ( ! SvOK(maybe_ary) )
-	    RETURN;
-	if ( ! SvAVOK(maybe_ary) )
+	if ( SvOK(maybe_ary) && ! SvAVOK(maybe_ary) )
 	    DIE("for loop expected an array but got %s", Ddesc(maybe_ary));
 
-	cx->blk_loop.state_u.ary.ary = (AV*)maybe_ary;
-	SvREFCNT_inc(maybe_ary);
+	cx->blk_loop.state_u.ary.ary = (AV*)SvREFCNT_inc(maybe_ary);
 	cx->blk_loop.state_u.ary.ix =
-	    (PL_op->op_private & OPpITER_REVERSED) ?
-	    AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
-	    -1;
+	    (PL_op->op_private & OPpITER_REVERSED)
+	    ? (SvAVOK(maybe_ary) ? AvFILL(maybe_ary) + 1 : -1 )
+	    : -1;
     }
 
     RETURN;
