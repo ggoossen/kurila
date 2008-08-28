@@ -6035,28 +6035,38 @@ Perl_ck_glob(pTHX_ OP *o)
     }
 #endif /* PERL_EXTERNAL_GLOB */
 
-    if (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) {
-	append_elem(OP_GLOB, o,
-		    newSVOP(OP_CONST, 0, newSViv(PL_glob_index++), o->op_location));
-	o->op_type = OP_LIST;
-	o->op_ppaddr = PL_ppaddr[OP_LIST];
-	cLISTOPo->op_first->op_type = OP_PUSHMARK;
-	cLISTOPo->op_first->op_ppaddr = PL_ppaddr[OP_PUSHMARK];
-	cLISTOPo->op_first->op_targ = 0;
-	o = newUNOP(OP_ENTERSUB, OPf_STACKED,
-		    append_elem(OP_LIST, o,
-				scalar(newUNOP(OP_RV2CV, 0,
-					       newGVOP(OP_GV, 0, gv, o->op_location),
-					       o->op_location
-					   ))), o->op_location);
-	o = newUNOP(OP_NULL, 0, ck_subr(o), o->op_location);
-	o->op_targ = OP_GLOB;		/* hint at what it used to be */
-	return o;
+    if (!(gv && GvCVu(gv) && GvIMPORTED_CV(gv))) {
+	GV *glob_gv;
+	ENTER;
+	Perl_load_module(aTHX_ PERL_LOADMOD_NOIMPORT,
+		newSVpvs("File::GlobPP"), NULL, NULL, NULL);
+	gv = gv_fetchpvs("CORE::GLOBAL::glob", 1, SVt_PVCV);
+	glob_gv = gv_fetchpvs("File::GlobPP::glob", 0, SVt_PVCV);
+	GvCV(gv) = GvCV(glob_gv);
+	SvREFCNT_inc_void((SV*)GvCV(gv));
+	GvIMPORTED_CV_on(gv);
+	LEAVE;
     }
-    gv = newGVgen("main");
-    gv_IOadd(gv);
-    append_elem(OP_GLOB, o, newGVOP(OP_GV, 0, gv, o->op_location));
-    scalarkids(o);
+
+    if ( ! (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) ) {
+	DIE("Failed loading glob routine");
+    }
+
+    append_elem(OP_GLOB, o,
+		newSVOP(OP_CONST, 0, newSViv(PL_glob_index++), o->op_location));
+    o->op_type = OP_LIST;
+    o->op_ppaddr = PL_ppaddr[OP_LIST];
+    cLISTOPo->op_first->op_type = OP_PUSHMARK;
+    cLISTOPo->op_first->op_ppaddr = PL_ppaddr[OP_PUSHMARK];
+    cLISTOPo->op_first->op_targ = 0;
+    o = newUNOP(OP_ENTERSUB, OPf_STACKED,
+		append_elem(OP_LIST, o,
+			    scalar(newUNOP(OP_RV2CV, 0,
+					   newGVOP(OP_GV, 0, gv, o->op_location),
+					   o->op_location
+				       ))), o->op_location);
+    o = newUNOP(OP_NULL, 0, ck_subr(o), o->op_location);
+    o->op_targ = OP_GLOB;           /* hint at what it used to be */
     return o;
 }
 

@@ -2273,12 +2273,6 @@ PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_reset(pTHX);
 PERL_CALLCONV void	Perl_pad_swipe(pTHX_ PADOFFSET po, bool refadjust);
 PERL_CALLCONV void	Perl_peep(pTHX_ OP* o);
-PERL_CALLCONV PerlIO*	Perl_start_glob(pTHX_ SV *tmpglob, GV *gv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_START_GLOB	\
-	assert(tmpglob); assert(gv)
-
 #if defined(USE_REENTRANT_API)
 PERL_CALLCONV void	Perl_reentrant_size(pTHX);
 PERL_CALLCONV void	Perl_reentrant_init(pTHX);

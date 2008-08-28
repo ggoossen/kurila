@@ -1544,7 +1544,7 @@ PP(pp_sort)
 
     av = SvAV(sv_mortalcopy(POPs));
     if ( ! SvAVOK(av) ) {
-	Perl_croak(aTHX_ "Expected ARRAY but got %s", Ddesc(av));
+	Perl_croak(aTHX_ "%s expected ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
     }
     p1 = p2 = AvARRAY(av);
     max = AvFILL(av) + 1;
