@@ -6,7 +6,7 @@ use warnings;
 our $VERSION = '2.07';
 
 use threads::shared;
-use Scalar::Util v1.10 qw(looks_like_number);
+use Scalar::Util v1.10 < qw(looks_like_number);
 
 # Create a new semaphore optionally with specified count (count defaults to 1)
 sub new {

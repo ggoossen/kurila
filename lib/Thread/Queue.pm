@@ -6,7 +6,7 @@ use warnings;
 our $VERSION = '2.06';
 
 use threads::shared v0.96;
-use Scalar::Util v1.10 qw(looks_like_number);
+use Scalar::Util v1.10 < qw(looks_like_number);
 
 # Predeclarations for internal functions
 my ($make_shared, $validate_count, $validate_index);

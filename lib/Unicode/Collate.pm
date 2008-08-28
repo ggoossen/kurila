@@ -1092,7 +1092,7 @@ sub gsubst
     my $cnt = 0;
 
     # Replacement is carried out from the end, then use reverse.
-    for my $pos_len (@(reverse < $self->index(@_[0], @_[1], 0, 'g'))) {
+    for my $pos_len (reverse $self->index(@_[0], @_[1], 0, 'g')) {
 	if ($code) {
 	    my $mat = substr(@_[0], $pos_len->[0], $pos_len->[1]);
 	    substr(@_[0], $pos_len->[0], $pos_len->[1], $code->($mat));

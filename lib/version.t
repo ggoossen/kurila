@@ -450,7 +450,7 @@ EOF
     open F, ">", "vvv.pm" or die "Cannot open vvv.pm: $!\n";
     print F <<"EOF";
 package vvv;
-use base qw(version);
+use base q(version);
 1;
 EOF
     close F;

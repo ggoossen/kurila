@@ -1,7 +1,7 @@
 #!./perl -i.inplace
 # note the extra switch, for the test below
 
-use Test::More tests => 37;
+use Test::More tests => 34;
 
 use English < qw( -no_match_vars ) ;
 use Config;
@@ -79,11 +79,7 @@ ok( $SYSTEM_FD_MAX +>= 2, '$SYSTEM_FD_MAX should be at least 2' );
 is( $INPLACE_EDIT, '.inplace', '$INPLACE_EDIT' );
 
 'aabbcc' =~ m/(.{2}).+(.{2})(?{ 9 })/;
-is( $LAST_PAREN_MATCH, 'cc', '$LAST_PARENT_MATCH' );
 is( $LAST_REGEXP_CODE_RESULT, 9, '$LAST_REGEXP_CODE_RESULT' );
-
-is( @LAST_MATCH_START[1], 0, '@LAST_MATCH_START' );
-is( @LAST_MATCH_END[1], 2, '@LAST_MATCH_END' );
 
 ok( !$PERLDB, '$PERLDB should be false' );
 

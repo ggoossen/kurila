@@ -1,12 +1,12 @@
 package File::Spec::VMS;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @(qw(File::Spec::Unix));
+@ISA = qw(File::Spec::Unix);
 
 use File::Basename;
 use VMS::Filespec;
@@ -324,7 +324,7 @@ sub abs2rel {
     my($path,$base) = < @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
-    for ($path, $base) { $_ = $self->canonpath($_) }
+    for (@(\$path, \$base)) { $$_ = $self->canonpath($$_) }
 
     # Are we even starting $path on the same (node::)device as $base?  Note that
     # logical paths or nodename differences may be on the "same device" 
