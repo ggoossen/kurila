@@ -334,7 +334,7 @@ sub GetOptionsFromArray($@) {
 	}
 
 	# Strip leading prefix so people can specify "--foo=i" if they like.
-	$opt = $+ if $opt =~ m/^$prefix+(.*)$/s;
+	$opt = $1 if $opt =~ m/^$prefix+(.*)$/s;
 
 	if ( $opt eq '<>' ) {
 	    if ( (defined $userlinkage)
@@ -881,7 +881,7 @@ sub FindOption ($$$$$) {
     return  @(0) unless $opt =~ m/^$prefix(.*)$/s;
     return  @(0) if $opt eq "-" && !defined $opctl->{''};
 
-    $opt = $+;
+    $opt = $2;
     my $starter = $1;
 
     print STDERR ("=> split \"$starter\"+\"$opt\"\n") if $debug;
@@ -1114,7 +1114,7 @@ sub FindOption ($$$$$) {
 
 	if ( $bundling && defined $rest
 	     && $rest =~ m/^($key_valid)($o_valid)(.*)$/si ) {
-	    ($key, $arg, $rest) = ($1, $2, $+);
+	    ($key, $arg, $rest) = ($1, $2, $3);
 	    chop($key) if $key;
 	    $arg = ($type eq 'o' && $arg =~ m/^0/) ? oct($arg) : 0+$arg;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
@@ -1162,7 +1162,7 @@ sub FindOption ($$$$$) {
 	if ( $bundling && defined $rest &&
 	     $rest =~ m/^($key_valid)($o_valid)(.*)$/s ) {
 	    $arg =~ s/_//g;
-	    ($key, $arg, $rest) = ($1, $2, $+);
+	    ($key, $arg, $rest) = ($1, $2, $3);
 	    chop($key) if $key;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
@@ -1259,7 +1259,7 @@ sub Configure (@) {
 	my $action = 1;
 	if ( $try =~ m/^no_?(.*)$/s ) {
 	    $action = 0;
-	    $try = $+;
+	    $try = $1;
 	}
 	if ( ($try eq 'default' or $try eq 'defaults') && $action ) {
 	    ConfigDefaults ();

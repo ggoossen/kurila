@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..119\n";
+print "1..43\n";
 
 use strict;
 
@@ -262,10 +262,9 @@ TODO: {
     print "ok $test # TODO $TODO\n";
 }
 
-TODO: {
+{
     $test++;
     no warnings 'reserved';
-    local $TODO = "RT #2166: foreach spuriously autovivifies";
     my %h;
     foreach (@(%h{['a', 'b']})) {}
     if(%h) {
