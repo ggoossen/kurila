@@ -294,12 +294,12 @@ use warnings 'void' ;
 time ;
 
 {
-    use warnings FATAL => qw(void) ;
+    use warnings FATAL => q(void) ;
     $a = "abc";
     length $a ;
 }
 
-join "", 1,2,3 ;
+join "", @(1,2,3);
 
 print "done\n" ;
 EXPECT
@@ -313,7 +313,7 @@ use warnings ;
 time ;
 
 {
-    use warnings FATAL => qw(void) ;
+    use warnings FATAL => < qw(void) ;
     $a = "abc";
     length $a ;
 }
