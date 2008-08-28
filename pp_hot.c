@@ -1254,11 +1254,7 @@ Perl_do_readline(pTHX_ GV* gv)
 		    (void)do_close(gv, FALSE); /* now it does*/
 		}
 	    }
-	    else if (type == OP_GLOB)
-		fp = Perl_start_glob(aTHX_ POPs, gv);
 	}
-	else if (type == OP_GLOB)
-	    SP--;
 	else if (ckWARN(WARN_IO) && IoTYPE(io) == IoTYPE_WRONLY) {
 	    report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
 	}

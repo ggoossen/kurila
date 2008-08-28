@@ -623,7 +623,6 @@ pd	|void	|pad_free	|PADOFFSET po
 pd	|void	|pad_reset
 pd	|void	|pad_swipe	|PADOFFSET po|bool refadjust
 p	|void	|peep		|NULLOK OP* o
-dopM	|PerlIO*|start_glob	|NN SV *tmpglob|NN GV *gv
 #if defined(USE_REENTRANT_API)
 Ap	|void	|reentrant_size
 Ap	|void	|reentrant_init
