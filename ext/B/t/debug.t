@@ -47,7 +47,7 @@ EOF
 } else {
     $b=<<EOF;
 leave enter nextstate label leaveloop enterloop null and defined null
-null gvsv readline rvgv gv lineseq nextstate sassign anonlist pushmark split pushre
+null gvsv readline rvgv gv lineseq nextstate sassign split pushre
 null gvsv const rvav gv nextstate subst const unstack
 EOF
 }

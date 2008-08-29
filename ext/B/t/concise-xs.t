@@ -155,7 +155,7 @@ my $testpkgs = \%(
 		     OPf_WANT_VOID OPpCONST_BARE
 		     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
 		     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
-		     OPpSORT_INPLACE OPpSORT_INTEGER OPpSORT_NUMERIC
+		     OPpSORT_INTEGER OPpSORT_NUMERIC
 		     OPpSORT_REVERSE OPpTARGET_MY 
 		     PMf_CONTINUE
 		     PMf_EVAL PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
@@ -304,7 +304,7 @@ sub test_pkg {
 	diag("fntypes: " => < Dumper($fntypes));
 	diag("$pkg stash: " => < Dumper(\%stash));
     }
-    foreach my $fn (@(reverse < sort @( < keys %stash))) {
+    foreach my $fn (reverse sort keys %stash) {
 	next if %stash{$fn} eq 'skip';
 	my $res = checkXS("{$pkg}::$fn", %stash{$fn});
 	if ($res ne '1') {

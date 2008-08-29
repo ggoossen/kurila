@@ -14,7 +14,7 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
 	 OPpTARGET_MY
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
-	 OPpSORT_REVERSE OPpSORT_INPLACE OPpSORT_DESCEND OPpITER_REVERSED
+	 OPpSORT_REVERSE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
          CVf_METHOD CVf_LOCKED
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
@@ -351,7 +351,8 @@ sub next_todo {
 sub begin_is_use {
     my ($self, $cv) = < @_;
     my $root = $cv->ROOT;
-    local < %$self{[@( <qw'curcv curcvlex')]} = ($cv);
+    local %$self{[@( <qw'curcv curcvlex')]};
+    < %$self{[@( <qw'curcv curcvlex')]} = ($cv);
 #require B::Debug;
 #B::walkoptree($cv->ROOT, "debug");
     my $lineseq = $root->first;
@@ -605,7 +606,7 @@ sub compile {
 	my @CHECKs  = @( B::check_av->isa("B::AV") ? < B::check_av->ARRAY : () );
 	my @INITs   = @( B::init_av->isa("B::AV") ? < B::init_av->ARRAY : () );
 	my @ENDs    = @( B::end_av->isa("B::AV") ? < B::end_av->ARRAY : () );
-	for my $block ( @BEGINs, < @UNITCHECKs, < @CHECKs, < @INITs, < @ENDs) {
+	for my $block ( @(< @BEGINs, < @UNITCHECKs, < @CHECKs, < @INITs, < @ENDs)) {
 	    $self->todo($block, 0);
 	}
 	$self->stash_subs();
@@ -804,8 +805,10 @@ sub deparse_sub {
 
     local($self->{'curcv'}) = $cv;
     local($self->{'curcvlex'});
-    local( <%$self{[@( <qw'curstash warnings hints hinthash')]})
-		= < %$self{[@( <qw'curstash warnings hints hinthash')]};
+    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
+    local(%$self{[@( <qw'curstash warnings hints hinthash')]});
+    < %$self{[@( <qw'curstash warnings hints hinthash')]}
+      = < @oldv;
     my $body;
     if (not null $cv->ROOT) {
 	my $lineseq = $cv->ROOT->first;
@@ -1045,8 +1048,9 @@ sub scopeop {
     my $kid;
     my @kids;
 
-    local( <%$self{[@( <qw'curstash warnings hints hinthash')]})
-		= < %$self{[@( <qw'curstash warnings hints hinthash')]} if $real_block;
+    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
+    local(%$self{[@( <qw'curstash warnings hints hinthash')]}) if $real_block;
+    < %$self{[@( <qw'curstash warnings hints hinthash')]} = < @oldv;
     if ($real_block) {
 	$kid = $op->first->sibling; # skip enter
 	if (is_miniwhile($kid)) {
@@ -1093,8 +1097,9 @@ sub pp_leave { scopeop(1, < @_); }
 sub deparse_root {
     my $self = shift;
     my($op) = < @_;
-    local( <%$self{[@( <qw'curstash warnings hints hinthash')]})
-      = < %$self{[@( <qw'curstash warnings hints hinthash')]};
+    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
+    local(%$self{[@( <qw'curstash warnings hints hinthash')]});
+    < %$self{[@( <qw'curstash warnings hints hinthash')]} = < @oldv;
     my @kids;
     return if null $op->first; # Can happen, e.g., for Bytecode without -k
     for (my $kid = $op->first->sibling; !null($kid); $kid = $kid->sibling) {
@@ -2335,9 +2340,6 @@ sub indirop {
     if ($name eq "sort" && $op->private ^&^ OPpSORT_REVERSE) {
 	$name2 = 'reverse sort';
     }
-    if ($name eq "sort" && ($op->private ^&^ OPpSORT_INPLACE)) {
-	return "@exprs[0] = $name2 $indir @exprs[0]";
-    }
 
     my $args = $indir . join(", ", @( < @exprs));
     if ($indir ne "" and $name eq "sort") {
@@ -2509,8 +2511,9 @@ sub loop_common {
     my($op, $cx, $init) = < @_;
     my $enter = $op->first;
     my $kid = $enter->sibling;
-    local( <%$self{[@( <qw'curstash warnings hints hinthash')]})
-		= < %$self{[@( <qw'curstash warnings hints hinthash')]};
+    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
+    local(%$self{[@( <qw'curstash warnings hints hinthash')]});
+    < %$self{[@( <qw'curstash warnings hints hinthash')]} = < @oldv;
     my $head = "";
     my $bare = 0;
     my $body;
@@ -2534,8 +2537,6 @@ sub loop_common {
 	{
 	    $ary = $self->deparse($ary->first->sibling, 9) . " .. " .
 	      $self->deparse($ary->first->sibling->sibling, 9);
-	} elsif ($enter->flags ^&^ OPf_STACKED) {
-	    $ary = pfixop($self, $var, '<', 21);
 	} else {
 	    $ary = $self->deparse($ary, 1);
 	}
