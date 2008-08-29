@@ -4118,13 +4118,6 @@ Perl_yylex(pTHX)
 	}
 	if (PL_lex_state == LEX_NORMAL)
 	    s = SKIPSPACE1(s);
-	if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop) && intuit_more(s)) {
-	    if (*s == '{') {
-		yyerror(Perl_form(aTHX_ "hash slice should be %%%s{[...]} instead of @%s{...}",
-				  PL_tokenbuf+1, PL_tokenbuf+1));
-		PL_tokenbuf[0] = '%';
-	    }
-	}
 	PL_pending_ident = '@';
 	TERM('@');
 

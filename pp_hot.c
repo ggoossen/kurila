@@ -759,20 +759,16 @@ PP(pp_aassign)
 	    case SVt_PVAV:
 		ary = (AV*)sv;
 		magic = SvMAGICAL(ary) != 0;
-		av_clear(ary);
-		av_extend(ary, lastrelem - relem);
+		av_fill(ary, lastrelem - relem);
 		i = 0;
 		while (relem <= lastrelem) {	/* gobble up all the rest */
-		    SV **didstore;
 		    assert(*relem);
-		    sv = newSVsv(*relem);
+		    sv = *av_fetch(ary,i++,1);
+		    sv_setsv(sv, *relem);
 		    *(relem++) = sv;
-		    didstore = av_store(ary,i++,sv);
 		    if (magic) {
 			if (SvSMAGICAL(sv))
 			    mg_set(sv);
-			if (!didstore)
-			    sv_2mortal(sv);
 		    }
 		    TAINT_NOT;
 		}
