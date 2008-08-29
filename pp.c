@@ -3596,8 +3596,11 @@ PP(pp_hslice)
 	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(slice));
 
     slice = sv_mortalcopy(slice);
+    XPUSHs(slice);
 
     SV ** ip = AvARRAY(slice);
+    if (!ip)
+	RETURN;
     SV ** ipmax = ip + av_len(slice);
 
     while (ip <= ipmax) {
@@ -3632,10 +3635,9 @@ PP(pp_hslice)
 		}
             }
         }
-        SVcpREPLACE(*ip, *svp);
+        SVcpREPLACE(*ip, svp ? *svp : newSV(0) );
 	ip++;
     }
-    XPUSHs(slice);
     RETURN;
 }
 

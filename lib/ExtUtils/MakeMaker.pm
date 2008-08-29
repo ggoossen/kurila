@@ -95,9 +95,9 @@ my %Special_Sigs = %(
  realclean  => 'HASH',
  test       => 'HASH',
 );
- <
-%Att_Sigs{[@( <keys %Recognized_Att_Keys)]} = ('') x (nelems(%Recognized_Att_Keys)/2);
- <%Att_Sigs{[@( <keys %Special_Sigs)]} = < values %Special_Sigs;
+
+< %Att_Sigs{[@( <keys %Recognized_Att_Keys)]} = ('') x (nelems(%Recognized_Att_Keys)/2);
+< %Att_Sigs{[@( <keys %Special_Sigs)]} = < values %Special_Sigs;
 
 
 sub _verify_att {
