@@ -93,7 +93,7 @@ if (try { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     print "not " unless "{join ' ', @( <@$clone_array)}" eq "{join ' ', @( <@{%tie{array}})}";
     print "ok 11\n";
     my $clone_hash = dclone %tie{hash};
-    print "not " unless $clone_hash->{1} eq %tie{hash}{1};
+    print "not " unless $clone_hash->{1} eq %tie{hash}->{1};
     print "ok 12\n";
 } else {
     print <<EOF;
