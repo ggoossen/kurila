@@ -113,11 +113,7 @@ while((nelems @st)) {
 	$in =~ s/^TEST(\d+)?\n//;
 
 	my @in = @( < split("\n", $in, -1) );
-<<<<<<< HEAD:lib/Text/TabsWrap/t/sep.t
 	@in = @((< map { "$_\n" } @( < @in[[@( <0..((nelems @in)-1)-1)]])), @in[-1]);
-=======
-	@in = @((< map { "$_\n" } @( @in[[ <0..((nelems @in)-1)-1]])), @in[-1]);
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Text/TabsWrap/t/sep.t
 	
 	my $back = wrap('   ', ' ', < @in);
 

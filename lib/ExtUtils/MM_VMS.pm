@@ -1377,11 +1377,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 
     # The front matter of the linkcommand...
     $linkcmd = join ' ', @( %Config{'ld'},
-<<<<<<< HEAD:lib/ExtUtils/MM_VMS.pm
 	    < grep($_, @( < %Config{[@( <qw(large split ldflags ccdlflags))]})));
-=======
-	    < grep($_, @( %Config{[ <qw(large split ldflags ccdlflags)]})));
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/MM_VMS.pm
     $linkcmd =~ s/\s+/ /g;
 
     # Which *.olb files could we make use of...

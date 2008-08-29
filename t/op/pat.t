@@ -3243,28 +3243,6 @@ sub kt
     is(0+nelems @a,3);
     is(join('=', @( < @a)),"$esc$hyp=$hyp=$esc$esc");
 }
-<<<<<<< HEAD:t/op/pat.t
-# test for keys in %+ and %-
-{
-    my $_ = "abcdef";
-    m/(?<foo>a)|(?<foo>b)/;
-    is( (join ",", @( < sort @( < keys %+))), "foo" );
-    is( (join ",", @( < sort @( < keys %-))), "foo" );
-    is( (join ",", @( < sort @( < values %+))), "a" );
-    is( (join ",", @( < sort @( < map "{join ' ', @( <@$_)}", @( < values %-)))), "a " );
-    m/(?<bar>a)(?<bar>b)(?<quux>.)/;
-    is( (join ",", @( < sort @( < keys %+))), "bar,quux" );
-    is( (join ",", @( < sort @( < keys %-))), "bar,quux" );
-    is( (join ",", @( < sort @( < values %+))), "a,c" ); # leftmost
-    is( (join ",", @( < sort @( < map "{join ' ', @( <@$_)}", @( < values %-)))), "a b,c" );
-    m/(?<un>a)(?<deux>c)?/; # second buffer won't capture
-    is( (join ",", @( < sort @( < keys %+))), "un" );
-    is( (join ",", @( < sort @( < keys %-))), "deux,un" );
-    is( (join ",", @( < sort @( < values %+))), "a" );
-    is( (join ",", @( < sort @( < map "{join ' ', @( <@$_)}", @( < values %-)))), ",a" );
-}
-=======
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/op/pat.t
 
 # length() on captures, the numbered ones end up in Perl_magic_len
 {

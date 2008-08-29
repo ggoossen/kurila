@@ -196,13 +196,8 @@ my $TEST = catfile(curdir(), 'TEST');
     }
     else {
 	$tmp = (< grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
-<<<<<<< HEAD:t/op/taint.t
  @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
 		     %ENV{[@( <qw(TMP TEMP))]}))[[0]]
-=======
- @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
-		     %ENV{[ <qw(TMP TEMP)]}))[[0]]
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/op/taint.t
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 

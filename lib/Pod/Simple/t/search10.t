@@ -78,11 +78,7 @@ ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-<<<<<<< HEAD:lib/Pod/Simple/t/search10.t
-ok grep( m/squaa\.pm/, @( < keys %$where2name) ), 1;
-=======
 ok nelems(grep( m/squaa\.pm/, keys %$where2name)), 1;
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Pod/Simple/t/search10.t
 
 ok 1;
 
