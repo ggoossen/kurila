@@ -18,7 +18,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME     => 'PL_FILES::Module',
     PL_FILES => \%( 'single.PL' => 'single.out',
-                    'multi.PL'  => \@(qw(1.out 2.out)),
+                    'multi.PL'  => \qw(1.out 2.out),
                     'Bar_pm.PL' => '$(INST_LIB)/PL/Bar.pm',
     )
 );
@@ -47,7 +47,7 @@ die unless PL::Foo::bar() == 42;
 
 # Had a bug where PL_FILES weren't sent the file to generate
 die "argv empty\n" unless @ARGV;
-die "too many in argv: {join ' ', <@ARGV}\n" unless nelems @ARGV == 1;
+die "too many in argv: {join ' ', @ARGV}\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
 open OUT, ">", "$file" or die $!;

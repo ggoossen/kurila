@@ -121,7 +121,7 @@ is( nelems @DynaLoader::dl_librefs, nelems(@( < keys %modules)), "checking numbe
 is( nelems @DynaLoader::dl_modules, nelems(@( < keys %modules)), "checking number of items in \@dl_modules" );
 
 my @loaded_modules = @( < @DynaLoader::dl_modules );
-for my $libref (@(reverse < @DynaLoader::dl_librefs)) {
+for my $libref (reverse @DynaLoader::dl_librefs) {
   SKIP: {
     skip "unloading unsupported on $^O", 2 if ($^O eq 'VMS' || $^O eq 'darwin');
     my $module = pop @loaded_modules;

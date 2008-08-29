@@ -35,7 +35,7 @@ while ( ~< $fh) {
 while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
-    my ($op, $opname) = split m/\t+/;
+    my ($op, $opname) = < split m/\t+/;
     push @op, \@($op, $opname, %code{$op});
 }
 close $fh;
@@ -51,7 +51,7 @@ sub testop {
     like($@->message, qr/'\Q$opname\E' trapped by operation mask/, $op);
 }
 
-foreach (< @op) {
+foreach (@op) {
     if ($_->[2]) {
 	testop < @$_;
     } else {

@@ -652,7 +652,7 @@ Perl_do_kv(pTHX)
 	    av_push(res, newSVsv(sv));
 	}
 	if (dovalues) {
-	    av_push(res, newSVsv(hv_iterval(hv,entry)));
+	    av_push(res, SvREFCNT_inc(hv_iterval(hv,entry)));
 	}
 	PUTBACK;
     }
