@@ -218,7 +218,7 @@ SKIP: {
       unless %Config{man1direxp};
     @files = @( < $ei->files('goodmod', 'doc', %Config{man1direxp}) );
     is( scalar nelems @files, 1, '... should find doc file under given dir' );
-    is( (grep { m/foo$/ } @( < @files)), 1, '... checking file name' );
+    is( nelems(grep { m/foo$/ } @( < @files)), 1, '... checking file name' );
 }
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;

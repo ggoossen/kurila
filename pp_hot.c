@@ -568,7 +568,7 @@ PP(pp_join)
 {
     dVAR; dSP; dMARK; dTARGET;
     MARK++;
-    do_join(TARG, *MARK, MARK, SP);
+    do_join(TARG, *MARK, MARK[1]);
     SP = MARK;
     SETs(TARG);
     RETURN;
@@ -1254,11 +1254,7 @@ Perl_do_readline(pTHX_ GV* gv)
 		    (void)do_close(gv, FALSE); /* now it does*/
 		}
 	    }
-	    else if (type == OP_GLOB)
-		fp = Perl_start_glob(aTHX_ POPs, gv);
 	}
-	else if (type == OP_GLOB)
-	    SP--;
 	else if (ckWARN(WARN_IO) && IoTYPE(io) == IoTYPE_WRONLY) {
 	    report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
 	}
@@ -1660,9 +1656,8 @@ PP(pp_iter)
     /* iterate array */
     assert(CxTYPE(cx) == CXt_LOOP_FOR);
     av = cx->blk_loop.state_u.ary.ary;
-    if (!av) {
-	av_is_stack = TRUE;
-	av = PL_curstack;
+    if (! SvAVOK(av)) {
+	RETPUSHNO;
     }
     if (PL_op->op_private & OPpITER_REVERSED) {
 	if (cx->blk_loop.state_u.ary.ix <= (av_is_stack
@@ -2039,6 +2034,9 @@ PP(pp_grepwhile)
     if (SvTRUE(POPs)) {
 	/* copy the new items down to the destination list */
 	av_push((AV*)*dst, newSVsv(POPs));
+    }
+    else {
+	POPs;
     }
 
     LEAVE;					/* exit inner scope */

@@ -6,7 +6,7 @@ BEGIN {
 
 plan tests => 15;
 
-dies_like(sub { for (@(\2)) { $_ = ~< *FH } },
+dies_like(sub { my $x = \2; $$x = ~< *FH; },
           qr/^Modification of a read-only value attempted$/, '[perl #19566]');
 
 {
@@ -21,7 +21,7 @@ dies_like(sub { for (@(\2)) { $_ = ~< *FH } },
 foreach my $k (@(1, 82)) {
   my $result
     = runperl (stdin => '', stderr => 1,
-              prog => "our (\$x, \%a); \$x = q(k) x $k; \%a\{\$x\} = qw(v); \$_ = ~< *ARGV foreach keys \%a; print qw(end)",
+              prog => "our (\$x, \%a); \$x = q(k) x $k; \%a\{\$x\} = q(v); \$_ = ~< *ARGV foreach keys \%a; print q(end)",
 	      );
   $result =~ s/\n\z// if $^O eq 'VMS';
   is ($result, "end", '[perl #21614] for length ' . length('k' x $k));

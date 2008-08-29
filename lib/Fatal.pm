@@ -9,9 +9,8 @@ $Debug = 0 unless defined $Debug;
 
 sub import {
     my $self = shift(@_);
-    my($sym, $pkg);
-    $pkg = (caller)[[0]];
-    foreach $sym ( @_) {
+    my $pkg = (caller)[[0]];
+    foreach my $sym (@_) {
         &_make_fatal($sym, $pkg);
     }
 };
@@ -25,7 +24,7 @@ sub fill_protos {
     push(@out1,\@($n,< @out)) if $seen_semi;
     push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
-    push(@out, "\@_[[$n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
+    push(@out, "\@_[[ < $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
     $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
@@ -52,7 +51,7 @@ sub write_invocation {
     }
     push @out, <<EOC;
 	\}
-	die "$name(\@_): Do not expect to get \$(nelems(\@_)) arguments";
+	die "$name(\$(join ' ', map \{ dump::view(\$_) \} \@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
     return join '', @( < @out);
   }
@@ -60,7 +59,7 @@ EOC
 
 sub one_invocation {
   my ($core, $call, $name, < @argv) = < @_;
-  return qq{$call({join ', ', @( <@argv)}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} < \@_\})} . 
+  return qq{$call({join ', ', @argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
     ($core ? ': $!' : ', \$! is \"$!\"') . '"';
 }
 

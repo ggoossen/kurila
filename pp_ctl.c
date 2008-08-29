@@ -413,7 +413,7 @@ PP(pp_grepstart)
 	RETURNOP(PL_op->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
-	Perl_croak(aTHX_ "map expected an array but got %s", Ddesc(src));
+	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
     
     if ( av_len(SVav(src)) == -1 ) {
 	(void)POPMARK;
@@ -464,8 +464,11 @@ PP(pp_mapwhile)
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
-	while (items-- > 0)
-	    av_push((AV*)*dst, SvTEMP(TOPs) ? SvREFCNT_inc(POPs) : newSVsv(POPs));
+	int i;
+	SP -= items;
+	for (i=1; i <= items; i++) {
+	    av_push((AV*)*dst, SvTEMP(SP[i]) ? SvREFCNT_inc(SP[i]) : newSVsv(SP[i]));
+	}
     }
     LEAVE;					/* exit inner scope */
 
@@ -504,9 +507,7 @@ PP(pp_mapwhile)
 PP(pp_range)
 {
     dVAR;
-    if (GIMME == G_ARRAY)
-	return NORMAL;
-    DIE(aTHX_ "range operator .. can only be used in list context.");
+    return NORMAL;
 }
 
 PP(pp_flip)
@@ -514,7 +515,6 @@ PP(pp_flip)
     dVAR;
     dSP;
 
-    assert(GIMME == G_ARRAY);
     RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
 }
 
@@ -533,8 +533,8 @@ PP(pp_flop)
 {
     dVAR; dSP;
 
+    AV* res = sv_2mortal(newAV());
     dPOPPOPssrl;
-    assert(GIMME == G_ARRAY);
 
     SvGETMAGIC(left);
     SvGETMAGIC(right);
@@ -549,14 +549,11 @@ PP(pp_flop)
 	max = SvIV(right);
 	if (max >= i) {
 	    j = max - i + 1;
-	    EXTEND_MORTAL(j);
-	    EXTEND(SP, j);
 	}
 	else
 	    j = 0;
 	while (j--) {
-	    SV * const sv = sv_2mortal(newSViv(i++));
-	    PUSHs(sv);
+	    av_push(res, newSViv(i++));
 	}
     }
     else {
@@ -567,14 +564,14 @@ PP(pp_flop)
 	SV *sv = sv_mortalcopy(left);
 	SvPV_force_nolen(sv);
 	while (!SvNIOKp(sv) && SvCUR(sv) <= len) {
-	    XPUSHs(sv);
+	    av_push(res, newSVsv(sv));
 	    if (strEQ(SvPVX_const(sv),tmps))
 		break;
-	    sv = sv_2mortal(newSVsv(sv));
 	    sv_inc(sv);
 	}
     }
 
+    XPUSHs(res);
     RETURN;
 }
 
@@ -1213,28 +1210,19 @@ PP(pp_enteriter)
 	    }
 	}
     }
-    else if (PL_op->op_flags & OPf_STACKED) {
+    else { /* iterating over (copy of) the array on the stack */
 	SV *maybe_ary = POPs;
-	if ( ! SvOK(maybe_ary) )
-	    RETURN;
-	if ( ! SvAVOK(maybe_ary) )
+	if ( ! ( PL_op->op_flags & OPf_STACKED) ) {
+	    maybe_ary = sv_mortalcopy(maybe_ary);
+	}
+	if ( SvOK(maybe_ary) && ! SvAVOK(maybe_ary) )
 	    DIE("for loop expected an array but got %s", Ddesc(maybe_ary));
 
-	cx->blk_loop.state_u.ary.ary = (AV*)maybe_ary;
-	SvREFCNT_inc(maybe_ary);
+	cx->blk_loop.state_u.ary.ary = (AV*)SvREFCNT_inc(maybe_ary);
 	cx->blk_loop.state_u.ary.ix =
-	    (PL_op->op_private & OPpITER_REVERSED) ?
-	    AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
-	    -1;
-    }
-    else { /* iterating over items on the stack */
-	cx->blk_loop.state_u.ary.ary = NULL; /* means to use the stack */
-	if (PL_op->op_private & OPpITER_REVERSED) {
-	    cx->blk_loop.state_u.ary.ix = cx->blk_oldsp + 1;
-	}
-	else {
-	    cx->blk_loop.state_u.ary.ix = MARK - PL_stack_base;
-	}
+	    (PL_op->op_private & OPpITER_REVERSED)
+	    ? (SvAVOK(maybe_ary) ? AvFILL(maybe_ary) + 1 : -1 )
+	    : -1;
     }
 
     RETURN;
@@ -2062,6 +2050,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     int runtime;
     CV* runcv = NULL;	/* initialise to avoid compiler warnings */
     STRLEN len;
+    OP *oldop;
 
     PERL_ARGS_ASSERT_SV_COMPILE_2OP;
 
@@ -2095,9 +2084,11 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     if (runtime)
 	runcv = find_runcv(NULL);
 
+    oldop = PL_op;
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
+    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : newAV();
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 

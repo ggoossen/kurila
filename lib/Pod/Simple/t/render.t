@@ -3,8 +3,8 @@ use strict;
 use utf8;
 use charnames ':full';
 
-use Test;
-BEGIN { plan tests => 26 };
+use Test::More;
+plan tests => 26;
 use Pod::Simple::TextContent;
 use Pod::Simple::Text;
 

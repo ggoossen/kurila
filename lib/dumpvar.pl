@@ -131,7 +131,11 @@ sub ShortArray {
   $shortmore = " ..." if $tArrayDepth +< (nelems @{@_[0]})-1 ;
   if (!grep(ref $_, @( < @{@_[0]}))) {
     $short = "0..{join ' ', @( <@{@_[0]})}-1  '" . 
+<<<<<<< HEAD:lib/dumpvar.pl
       join("' '", @( < @{@_[0]}[[@( <0..$tArrayDepth)]])) . "'$shortmore";
+=======
+      join("' '", @( @{@_[0]}[[ <0..$tArrayDepth]])) . "'$shortmore";
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/dumpvar.pl
     return $short if length $short +<= $compactDump;
   }
   undef;

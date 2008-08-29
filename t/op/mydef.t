@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..66\n";
+print "1..65\n";
 
 my $test = 0;
 sub ok ($$) {
@@ -135,12 +135,15 @@ $_ = "global";
     ok( $_ eq 'local', '...but without extraneous side-effects' );
 }
 {
+<<<<<<< HEAD:t/op/mydef.t
     for my $_ (@(1)) {
 	my $x = grep $_, @( < qw(a b));
 	ok( $x == 2, 'grep in scalar context' );
     }
 }
 {
+=======
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/op/mydef.t
     my $s = "toto";
     my $_ = "titi";
     $s =~ m/to(?{ ok( $_ eq 'toto', 'my $_ in code-match # TODO' ) })to/

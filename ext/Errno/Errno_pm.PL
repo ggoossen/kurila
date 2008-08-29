@@ -346,7 +346,7 @@ use strict;
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;
-\@ISA = \@( qw(Exporter) );
+\@ISA = qw(Exporter);
 
 EDQ
    
@@ -354,13 +354,13 @@ EDQ
     my @err = @( < sort { %err{$a} <+> %err{$b} } @( < keys %err) );
     map { $len = length if length +> $len } @( < @err);
 
-    my $j = "\@EXPORT_OK = \@( qw(" . join(" ", @( <keys %err)) . ") );\n";
+    my $j = "\@EXPORT_OK = qw(" . join(" ", @( <keys %err)) . ");\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
     print $j,"\n";
 
 print <<'ESQ';
 %EXPORT_TAGS = %(
-    POSIX => \@(qw(
+    POSIX => \qw(
 ESQ
 
     my $k = join(" ", @( < grep { exists %err{$_} } 
@@ -379,7 +379,7 @@ ESQ
 	EUSERS EWOULDBLOCK EXDEV))));
 
     $k =~ s/(.{50,70})\s/$1\n\t/g;
-    print "\t",$k,"\n    ))\n);\n\n";
+    print "\t",$k,"\n    )\n);\n\n";
 
     foreach $err ( @err) {
 	printf "sub \%s () \{ \%d \}\n",$err,%err{$err};

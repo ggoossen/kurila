@@ -134,7 +134,7 @@ sub test ($;$) {
 my $ECHO = ($Is_MSWin32 ? ".\\echo$$" : $Is_MacOS ? ":echo$$" : ($Is_NetWare ? "echo$$" : "./echo$$"));
 END { unlink $ECHO }
 open PROG, ">", "$ECHO" or die "Can't create $ECHO: $!";
-print PROG 'print "{join q| |, <@ARGV}\n"', "\n";
+print PROG 'print "{join q| |, @ARGV}\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
 
@@ -196,8 +196,13 @@ my $TEST = catfile(curdir(), 'TEST');
     }
     else {
 	$tmp = (< grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
+<<<<<<< HEAD:t/op/taint.t
  @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
 		     %ENV{[@( <qw(TMP TEMP))]}))[[0]]
+=======
+ @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
+		     %ENV{[ <qw(TMP TEMP)]}))[[0]]
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/op/taint.t
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
@@ -284,7 +289,7 @@ SKIP: {
     my $arg = catfile(curdir(), "arg$$");
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
-	try { join('', <@ARGV), kill 0 };
+	try { join('', @ARGV), kill 0 };
 	exit 0 if $@->{description} =~ m/^Insecure dependency/;
 	print "# Oops: \$@ was [$@]\n";
 	exit 1;
@@ -338,7 +343,7 @@ SKIP: {
     $foo =~ m/def/;
 
     $foo =~ m/(...)(...)(...)/;
-    test not any_tainted $1, $2, $3, $+;
+    test not any_tainted $1, $2, $3;
 
     my @bar = @( $foo =~ m/(...)(...)(...)/ );
     test not any_tainted < @bar;

@@ -57,7 +57,7 @@ $VERSION = '1.12';
                'white'      => 37,   'on_white'   => 47);
 
 # Reverse lookup.  Alphabetically first name for a sequence is preferred.
-for (@(reverse < sort @( < keys %attributes))) {
+for (reverse sort keys %attributes) {
     %attributes_r{%attributes{$_}} = $_;
 }
 

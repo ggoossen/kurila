@@ -187,19 +187,6 @@ EXPECT
 ########
 # toke.c
 use warnings 'syntax' ;
-sort ("");
-sort ("") . '';
-EXPECT
-sort (...) interpreted as function at - line 4 character 1.
-########
-# toke.c
-no warnings 'syntax' ;
-sort ("")
-EXPECT
-
-########
-# toke.c
-use warnings 'syntax' ;
 $a = eval "_123"; print "$a\n";		#( 3	string)
 $a = 1_23; print "$a\n";
 $a = 12_3; print "$a\n";
@@ -426,12 +413,6 @@ EXPECT
 Warning: Use of "rand" without parentheses is ambiguous at - line 3 character 13.
 Warning: Use of "rand" without parentheses is ambiguous at - line 8 character 14.
 Warning: Use of "rand" without parentheses is ambiguous at - line 10 character 10.
-########
-# toke.c
-use warnings "ambiguous";
-print for keys %+; # should not warn
-EXPECT
-
 ########
 # toke.c
 sub fred {};

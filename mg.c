@@ -152,7 +152,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_bm:
     case PERL_MAGIC_fm:
     case PERL_MAGIC_regex_global:
-    case PERL_MAGIC_nkeys:
     case PERL_MAGIC_qr:
     case PERL_MAGIC_taint:
     case PERL_MAGIC_vec:
@@ -441,9 +440,7 @@ Perl_mg_copy(pTHX_ SV *sv, SV *nsv, const char *key, I32 klen)
 		sv_magic(nsv,
 		     (type == PERL_MAGIC_tied)
 			? SvTIED_obj(sv, mg)
-			: (type == PERL_MAGIC_regdata && mg->mg_obj)
-			    ? sv
-			    : mg->mg_obj,
+			: mg->mg_obj,
 		     toLOWER(type), key, klen);
 		count++;
 	    }
@@ -1608,40 +1605,6 @@ Perl_magic_setamagic(pTHX_ SV *sv, MAGIC *mg)
     PERL_UNUSED_ARG(mg);
     PL_amagic_generation++;
 
-    return 0;
-}
-
-int
-Perl_magic_getnkeys(pTHX_ SV *sv, MAGIC *mg)
-{
-    HV * const hv = (HV*)LvTARG(sv);
-    I32 i = 0;
-
-    PERL_ARGS_ASSERT_MAGIC_GETNKEYS;
-    PERL_UNUSED_ARG(mg);
-
-    if (hv) {
-         (void) hv_iterinit(hv);
-         if (! SvTIED_mg((SV*)hv, PERL_MAGIC_tied))
-             i = HvKEYS(hv);
-         else {
-             while (hv_iternext(hv))
-                 i++;
-         }
-    }
-
-    sv_setiv(sv, (IV)i);
-    return 0;
-}
-
-int
-Perl_magic_setnkeys(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_ARGS_ASSERT_MAGIC_SETNKEYS;
-    PERL_UNUSED_ARG(mg);
-    if (LvTARG(sv)) {
-        hv_ksplit((HV*)LvTARG(sv), SvIV(sv));
-    }
     return 0;
 }
 

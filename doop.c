@@ -26,12 +26,12 @@
 #endif
 
 void
-Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV **sp)
+Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
 {
     dVAR;
-    SV ** const oldmark = mark;
-    register I32 items = sp - mark;
+    register I32 items;
     register STRLEN len;
+    register SV** mark;
     STRLEN delimlen;
 
     PERL_ARGS_ASSERT_DO_JOIN;
@@ -39,7 +39,13 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV *
     (void) SvPV_const(delim, delimlen); /* stringify and get the delimlen */
     /* SvCUR assumes it's SvPOK() and woe betide you if it's not. */
 
-    mark++;
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+    items = av_len(av) + 1;
+
+    mark = AvARRAY(av);
+
     len = (items > 0 ? (delimlen * (items - 1) ) : 0);
     SvUPGRADE(sv, SVt_PV);
     if (SvLEN(sv) < len + items) {	/* current length is way too short */
@@ -53,9 +59,8 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV **mark, register SV *
 	}
 	SvGROW(sv, len + 1);		/* so try to pre-extend */
 
-	mark = oldmark;
-	items = sp - mark;
-	++mark;
+	mark = AvARRAY(av);
+	items = av_len(av) + 1;
     }
 
     sv_setpvn(sv, "", 0);
@@ -621,23 +626,13 @@ Perl_do_kv(pTHX)
     HV *keys;
     register HE *entry;
     const I32 gimme = GIMME_V;
-    const I32 dokv =     (PL_op->op_type == OP_EXPAND);
-    const I32 dokeys =   dokv || (PL_op->op_type == OP_KEYS);
-    const I32 dovalues = dokv || (PL_op->op_type == OP_VALUES);
-
-    if (!hv) {
-	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
-	    SV * const sv = sv_newmortal();
-	    sv_upgrade(sv, SVt_PVLV);
-	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
-	    LvTARG(sv) = NULL;
-	    PUSHs(sv);
-	}
-	RETURN;
-    }
+    const I32 dokeys =   (PL_op->op_type == OP_KEYS);
+    const I32 dovalues = (PL_op->op_type == OP_VALUES);
+    AV * res = av_2mortal(newAV());
 
     if ( ! SvHVOK(hv) ) {
 	if ( ! SvOK(hv) ) {
+	    XPUSHs(&PL_sv_undef);
 	    RETURN;
 	}
 	Perl_croak(aTHX_ "keys expected a hash but got %s", Ddesc((SV*)hv));
@@ -649,58 +644,20 @@ Perl_do_kv(pTHX)
     if (gimme == G_VOID)
 	RETURN;
 
-    if (gimme == G_SCALAR) {
-	IV i;
-
-	Perl_croak(aTHX_ "keys in scalar context");
-	if (PL_op->op_flags & OPf_MOD) {	/* lvalue */
-	    SV * const sv = sv_newmortal();
-	    sv_upgrade(sv, SVt_PVLV);
-	    sv_magic(sv, NULL, PERL_MAGIC_nkeys, NULL, 0);
-	    LvTYPE(sv) = 'k';
-	    LvTARG(sv) = SvREFCNT_inc_simple(keys);
-	    PUSHs(sv);
-	    RETURN;
-	}
-
-	if (! SvTIED_mg((SV*)keys, PERL_MAGIC_tied) )
-	{
-	    i = HvKEYS(keys);
-	}
-	else {
-	    i = 0;
-	    while (hv_iternext(keys)) i++;
-	}
-	{
-	    dTARGET;
-	    PUSHi( i );
-	    RETURN;
-	}
-    }
-
-    EXTEND(SP, HvKEYS(keys) * (dokeys + dovalues));
-
     PUTBACK;	/* hv_iternext and hv_iterval might clobber stack_sp */
     while ((entry = hv_iternext(keys))) {
 	SPAGAIN;
 	if (dokeys) {
 	    SV* const sv = hv_iterkeysv(entry);
-	    XPUSHs(sv);	/* won't clobber stack_sp */
+	    av_push(res, newSVsv(sv));
 	}
 	if (dovalues) {
-	    SV *tmpstr;
-	    PUTBACK;
-	    tmpstr = hv_iterval(hv,entry);
-	    DEBUG_H(Perl_sv_setpvf(aTHX_ tmpstr, "%lu%%%d=%lu",
-			    (unsigned long)HeHASH(entry),
-			    (int)HvMAX(keys)+1,
-			    (unsigned long)(HeHASH(entry) & HvMAX(keys))));
-	    SPAGAIN;
-	    XPUSHs(tmpstr);
+	    av_push(res, newSVsv(hv_iterval(hv,entry)));
 	}
 	PUTBACK;
     }
-    return NORMAL;
+    XPUSHs(res);
+    RETURN;
 }
 
 void

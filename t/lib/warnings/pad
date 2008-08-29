@@ -214,7 +214,7 @@ Variable "$x" is not available at (eval 1) line 2 character 4.
     main::f2 called at - line 7 character 1.
 ########
 use warnings 'closure' ;
-for my $x (1,2,3) {
+for my $x (1..3) {
     sub f { eval '$x' }
     f();
 }

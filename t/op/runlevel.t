@@ -26,10 +26,10 @@ for ( @prgs){
 __END__
 our @a = @(1, 2, 3);
 {
-  @a = @( sort { last ; } < @a );
+  @a = sort { last ; } @a;
 }
 EXPECT
-Can't "last" outside a loop block at - line 3 character 18.
+Can't "last" outside a loop block at - line 3 character 15.
 ########
 sub warnhook {
   print "WARNHOOK\n";
@@ -67,33 +67,33 @@ sub foo {
   $a <+> $b;
 }
 our @a = @(3, 2, 0, 1);
-@a = @( sort foo < @a );
-print join(', ', < @a)."\n";
+@a = sort foo @a;
+print join(', ', @a)."\n";
 exit;
 bar:
 print "bar reached\n";
 EXPECT
 Can't "goto" out of a pseudo block at - line 2 character 3.
-    main::foo called at - line 6 character 9.
+    main::foo called at - line 6 character 6.
 ########
 our @a = @(3, 2, 1);
-@a = @( sort { eval('die("no way")') ;  $a <+> $b} < @a );
-print join(", ", < @a)."\n";
+@a = sort { eval('die("no way")') ;  $a <+> $b} @a;
+print join(", ", @a)."\n";
 EXPECT
 1, 2, 3
 ########
 our @a = @(1, 2, 3);
 foo:
 {
-  @a = @( sort { last foo; } < @a );
+  @a = sort { last foo; } @a;
 }
 EXPECT
-Label not found for "last foo" at - line 4 character 18.
+Label not found for "last foo" at - line 4 character 15.
 ########
 our @a = @(1, 2, 3);
 foo:
 {
-  @a = @( sort { exit(0) } < @a );
+  @a = sort { exit(0) } @a;
 }
 END { print "foobar\n" }
 EXPECT
@@ -101,7 +101,7 @@ foobar
 ########
 package TH;
 sub TIEHASH { bless \%(), 'TH' }
-sub STORE { try { print "{ join ' ', @_[[1,2]]}\n" }; die "bar\n" }
+sub STORE { try { print "{ join ' ', @(@_[[1,2]])}\n" }; die "bar\n" }
 tie our %h, 'TH';
 try { %h{A} = 1; print "never\n"; };
 print $@->{description};
@@ -122,7 +122,7 @@ sub d {
     my $i = 0; my @a;
     while (do { { package DB; @a = @( caller($i++) ) } } ) {
         @a = @DB::args;
-        for (<@a) { print "$_\n"; $_ = '' }
+        for (@a) { print "$_\n"; $_ = '' }
     }
 }
 EXPECT

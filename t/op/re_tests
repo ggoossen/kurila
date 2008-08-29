@@ -2,56 +2,26 @@
 # run this file via a shell glob
 __END__
 abc	abc	y	$^MATCH	abc
-abc	abc	y	@-[0]	0
-abc	abc	y	@+[0]	3
 abc	xbc	n	-	-
 abc	axc	n	-	-
 abc	abx	n	-	-
 abc	xabcy	y	$^MATCH	abc
-abc	xabcy	y	@-[0]	1
-abc	xabcy	y	@+[0]	4
 abc	ababc	y	$^MATCH	abc
-abc	ababc	y	@-[0]	2
-abc	ababc	y	@+[0]	5
 ab*c	abc	y	$^MATCH	abc
-ab*c	abc	y	@-[0]	0
-ab*c	abc	y	@+[0]	3
 ab*bc	abc	y	$^MATCH	abc
-ab*bc	abc	y	@-[0]	0
-ab*bc	abc	y	@+[0]	3
 ab*bc	abbc	y	$^MATCH	abbc
-ab*bc	abbc	y	@-[0]	0
-ab*bc	abbc	y	@+[0]	4
 ab*bc	abbbbc	y	$^MATCH	abbbbc
-ab*bc	abbbbc	y	@-[0]	0
-ab*bc	abbbbc	y	@+[0]	6
 .{1}	abbbbc	y	$^MATCH	a
-.{1}	abbbbc	y	@-[0]	0
-.{1}	abbbbc	y	@+[0]	1
 .{3,4}	abbbbc	y	$^MATCH	abbb
-.{3,4}	abbbbc	y	@-[0]	0
-.{3,4}	abbbbc	y	@+[0]	4
 ab{0,}bc	abbbbc	y	$^MATCH	abbbbc
-ab{0,}bc	abbbbc	y	@-[0]	0
-ab{0,}bc	abbbbc	y	@+[0]	6
 ab+bc	abbc	y	$^MATCH	abbc
-ab+bc	abbc	y	@-[0]	0
-ab+bc	abbc	y	@+[0]	4
 ab+bc	abc	n	-	-
 ab+bc	abq	n	-	-
 ab{1,}bc	abq	n	-	-
 ab+bc	abbbbc	y	$^MATCH	abbbbc
-ab+bc	abbbbc	y	@-[0]	0
-ab+bc	abbbbc	y	@+[0]	6
 ab{1,}bc	abbbbc	y	$^MATCH	abbbbc
-ab{1,}bc	abbbbc	y	@-[0]	0
-ab{1,}bc	abbbbc	y	@+[0]	6
 ab{1,3}bc	abbbbc	y	$^MATCH	abbbbc
-ab{1,3}bc	abbbbc	y	@-[0]	0
-ab{1,3}bc	abbbbc	y	@+[0]	6
 ab{3,4}bc	abbbbc	y	$^MATCH	abbbbc
-ab{3,4}bc	abbbbc	y	@-[0]	0
-ab{3,4}bc	abbbbc	y	@+[0]	6
 ab{4,5}bc	abbbbc	n	-	-
 ab?bc	abbc	y	$^MATCH	abbc
 ab?bc	abc	y	$^MATCH	abc
@@ -104,8 +74,6 @@ a[^]b]c	adc	y	$^MATCH	adc
 \Ba\B	-a	n	-	-
 \Ba\B	-a-	n	-	-
 \By\b	xy	y	-	-
-\By\b	xy	y	@-[0]	1
-\By\b	xy	y	@+[0]	2
 \By\b	xy	y	-	-
 \by\B	yz	y	-	-
 \By\B	xyz	y	-	-
@@ -136,10 +104,6 @@ a[\S]b	a-b	y	-	-
 ab|cd	abc	y	$^MATCH	ab
 ab|cd	abcd	y	$^MATCH	ab
 ()ef	def	y	$^MATCH-$1	ef-
-()ef	def	y	@-[0]	1
-()ef	def	y	@+[0]	3
-()ef	def	y	@-[1]	1
-()ef	def	y	@+[1]	1
 *a	-	c	-	Quantifier follows nothing
 (|*)b	-	c	-	Quantifier follows nothing
 (*)b	-	c	-	Unknown verb
@@ -152,22 +116,12 @@ a\\b	a\\b	y	$^MATCH	a\\b
 abc)	-	c	-	Unmatched )
 (abc	-	c	-	Unmatched (
 ((a))	abc	y	$^MATCH-$1-$2	a-a-a
-((a))	abc	y	@-[0]-@-[1]-@-[2]	0-0-0
-((a))	abc	y	@+[0]-@+[1]-@+[2]	1-1-1
-((a))	abc	b	{join '*', <@-}	0*0*0
-((a))	abc	b	{join '*', <@+}	1*1*1
 (a)b(c)	abc	y	$^MATCH-$1-$2	abc-a-c
-(a)b(c)	abc	y	@-[0]-@-[1]-@-[2]	0-0-2
-(a)b(c)	abc	y	@+[0]-@+[1]-@+[2]	3-1-3
 a+b+c	aabbabc	y	$^MATCH	abc
 a{1,}b{1,}c	aabbabc	y	$^MATCH	abc
 a**	-	c	-	Nested quantifiers
 a.+?c	abcabc	y	$^MATCH	abc
 (a+|b)*	ab	y	$^MATCH-$1	ab-b
-(a+|b)*	ab	y	@-[0]	0
-(a+|b)*	ab	y	@+[0]	2
-(a+|b)*	ab	y	@-[1]	1
-(a+|b)*	ab	y	@+[1]	2
 (a+|b){0,}	ab	y	$^MATCH-$1	ab-b
 (a+|b)+	ab	y	$^MATCH-$1	ab-b
 (a+|b){1,}	ab	y	$^MATCH-$1	ab-b
@@ -181,10 +135,6 @@ a*		y	$^MATCH
 ([abc])*bcd	abcd	y	$^MATCH-$1	abcd-a
 a|b|c|d|e	e	y	$^MATCH	e
 (a|b|c|d|e)f	ef	y	$^MATCH-$1	ef-e
-(a|b|c|d|e)f	ef	y	@-[0]	0
-(a|b|c|d|e)f	ef	y	@+[0]	2
-(a|b|c|d|e)f	ef	y	@-[1]	0
-(a|b|c|d|e)f	ef	y	@+[1]	1
 abcd*efg	abcdefg	y	$^MATCH	abcdefg
 ab*	xabyabbbz	y	$^MATCH	ab
 ab*	xayabbbz	y	$^MATCH	a
@@ -196,38 +146,12 @@ ab*	xayabbbz	y	$^MATCH	a
 (ab|ab*)bc	abc	y	$^MATCH-$1	abc-a
 a([bc]*)c*	abc	y	$^MATCH-$1	abc-bc
 a([bc]*)(c*d)	abcd	y	$^MATCH-$1-$2	abcd-bc-d
-a([bc]*)(c*d)	abcd	y	@-[0]	0
-a([bc]*)(c*d)	abcd	y	@+[0]	4
-a([bc]*)(c*d)	abcd	y	@-[1]	1
-a([bc]*)(c*d)	abcd	y	@+[1]	3
-a([bc]*)(c*d)	abcd	y	@-[2]	3
-a([bc]*)(c*d)	abcd	y	@+[2]	4
 a([bc]+)(c*d)	abcd	y	$^MATCH-$1-$2	abcd-bc-d
 a([bc]*)(c+d)	abcd	y	$^MATCH-$1-$2	abcd-b-cd
-a([bc]*)(c+d)	abcd	y	@-[0]	0
-a([bc]*)(c+d)	abcd	y	@+[0]	4
-a([bc]*)(c+d)	abcd	y	@-[1]	1
-a([bc]*)(c+d)	abcd	y	@+[1]	2
-a([bc]*)(c+d)	abcd	y	@-[2]	2
-a([bc]*)(c+d)	abcd	y	@+[2]	4
 a[bcd]*dcdcde	adcdcde	y	$^MATCH	adcdcde
 a[bcd]+dcdcde	adcdcde	n	-	-
 (ab|a)b*c	abc	y	$^MATCH-$1	abc-ab
-(ab|a)b*c	abc	y	@-[0]	0
-(ab|a)b*c	abc	y	@+[0]	3
-(ab|a)b*c	abc	y	@-[1]	0
-(ab|a)b*c	abc	y	@+[1]	2
 ((a)(b)c)(d)	abcd	y	$1-$2-$3-$4	abc-a-b-d
-((a)(b)c)(d)	abcd	y	@-[0]	0
-((a)(b)c)(d)	abcd	y	@+[0]	4
-((a)(b)c)(d)	abcd	y	@-[1]	0
-((a)(b)c)(d)	abcd	y	@+[1]	3
-((a)(b)c)(d)	abcd	y	@-[2]	0
-((a)(b)c)(d)	abcd	y	@+[2]	1
-((a)(b)c)(d)	abcd	y	@-[3]	1
-((a)(b)c)(d)	abcd	y	@+[3]	2
-((a)(b)c)(d)	abcd	y	@-[4]	3
-((a)(b)c)(d)	abcd	y	@+[4]	4
 [a-zA-Z_][a-zA-Z0-9_]*	alpha	y	$^MATCH	alpha
 ^a(bc+|b[eh])g|.h$	abh	y	$^MATCH-$1	bh-
 (bc+d$|ef*g.|h?i(j|k))	effgz	y	$^MATCH-$1-$2	effgz-effgz-
@@ -236,10 +160,6 @@ a[bcd]+dcdcde	adcdcde	n	-	-
 (bc+d$|ef*g.|h?i(j|k))	bcdd	n	-	-
 (bc+d$|ef*g.|h?i(j|k))	reffgz	y	$^MATCH-$1-$2	effgz-effgz-
 ((((((((((a))))))))))	a	y	$10	a
-((((((((((a))))))))))	a	y	@-[0]	0
-((((((((((a))))))))))	a	y	@+[0]	1
-((((((((((a))))))))))	a	y	@-[10]	0
-((((((((((a))))))))))	a	y	@+[10]	1
 ((((((((((a))))))))))\10	aa	y	$^MATCH	aa
 ((((((((((a))))))))))${bang}	aa	n	-	-
 ((((((((((a))))))))))${bang}	a!	y	$^MATCH	a!
@@ -274,12 +194,6 @@ a[-]?c	ac	y	$^MATCH	ac
 ((\3|b)\2(a)){2,}	bbaababbabaaaaabbaaaabba	y	$^MATCH-$1-$2-$3	bbaaaabba-bba-b-a
 #Bug #3589 - up to perl-5.6.0 matches incorrectly, from 5.6.1 not anymore
 ^((.)?a\2)+$	babadad	n	-	-
-(a)|(b)	b	y	@-[0]	0
-(a)|(b)	b	y	@+[0]	1
-(a)|(b)	b	y	x@-[1]	x
-(a)|(b)	b	y	x@+[1]	x
-(a)|(b)	b	y	@-[2]	0
-(a)|(b)	b	y	@+[2]	1
 'abc'i	ABC	y	$^MATCH	ABC
 'abc'i	XBC	n	-	-
 'abc'i	AXC	n	-	-
@@ -617,60 +531,20 @@ x(~~)*(?:(?:F)?)?	x~~	y	-	-
 ((?>[^()]+)|\([^()]*\))+	((abc(ade)ufh()()x	y	$^MATCH	abc(ade)ufh()()x
 (?<=x+)y	-	c	-	Variable length lookbehind not implemented
 a{37,17}	-	c	-	Can't do \{n,m\} with n > m
-\Z	a\nb\n	y	@-[0]	3
-\z	a\nb\n	y	@-[0]	4
-$	a\nb\n	y	@-[0]	3
-\Z	b\na\n	y	@-[0]	3
-\z	b\na\n	y	@-[0]	4
-$	b\na\n	y	@-[0]	3
-\Z	b\na	y	@-[0]	3
-\z	b\na	y	@-[0]	3
-$	b\na	y	@-[0]	3
-'\Z'm	a\nb\n	y	@-[0]	3
-'\z'm	a\nb\n	y	@-[0]	4
-'$'m	a\nb\n	y	@-[0]	1
-'\Z'm	b\na\n	y	@-[0]	3
-'\z'm	b\na\n	y	@-[0]	4
-'$'m	b\na\n	y	@-[0]	1
-'\Z'm	b\na	y	@-[0]	3
-'\z'm	b\na	y	@-[0]	3
-'$'m	b\na	y	@-[0]	1
 a\Z	a\nb\n	n	-	-
 a\z	a\nb\n	n	-	-
 a$	a\nb\n	n	-	-
-a\Z	b\na\n	y	@-[0]	2
 a\z	b\na\n	n	-	-
-a$	b\na\n	y	@-[0]	2
-a\Z	b\na	y	@-[0]	2
-a\z	b\na	y	@-[0]	2
-a$	b\na	y	@-[0]	2
 'a\Z'm	a\nb\n	n	-	-
 'a\z'm	a\nb\n	n	-	-
-'a$'m	a\nb\n	y	@-[0]	0
-'a\Z'm	b\na\n	y	@-[0]	2
 'a\z'm	b\na\n	n	-	-
-'a$'m	b\na\n	y	@-[0]	2
-'a\Z'm	b\na	y	@-[0]	2
-'a\z'm	b\na	y	@-[0]	2
-'a$'m	b\na	y	@-[0]	2
 aa\Z	aa\nb\n	n	-	-
 aa\z	aa\nb\n	n	-	-
 aa$	aa\nb\n	n	-	-
-aa\Z	b\naa\n	y	@-[0]	2
 aa\z	b\naa\n	n	-	-
-aa$	b\naa\n	y	@-[0]	2
-aa\Z	b\naa	y	@-[0]	2
-aa\z	b\naa	y	@-[0]	2
-aa$	b\naa	y	@-[0]	2
 'aa\Z'm	aa\nb\n	n	-	-
 'aa\z'm	aa\nb\n	n	-	-
-'aa$'m	aa\nb\n	y	@-[0]	0
-'aa\Z'm	b\naa\n	y	@-[0]	2
 'aa\z'm	b\naa\n	n	-	-
-'aa$'m	b\naa\n	y	@-[0]	2
-'aa\Z'm	b\naa	y	@-[0]	2
-'aa\z'm	b\naa	y	@-[0]	2
-'aa$'m	b\naa	y	@-[0]	2
 aa\Z	ac\nb\n	n	-	-
 aa\z	ac\nb\n	n	-	-
 aa$	ac\nb\n	n	-	-
@@ -710,21 +584,10 @@ aa$	b\nca	n	-	-
 ab\Z	ab\nb\n	n	-	-
 ab\z	ab\nb\n	n	-	-
 ab$	ab\nb\n	n	-	-
-ab\Z	b\nab\n	y	@-[0]	2
 ab\z	b\nab\n	n	-	-
-ab$	b\nab\n	y	@-[0]	2
-ab\Z	b\nab	y	@-[0]	2
-ab\z	b\nab	y	@-[0]	2
-ab$	b\nab	y	@-[0]	2
 'ab\Z'm	ab\nb\n	n	-	-
 'ab\z'm	ab\nb\n	n	-	-
-'ab$'m	ab\nb\n	y	@-[0]	0
-'ab\Z'm	b\nab\n	y	@-[0]	2
 'ab\z'm	b\nab\n	n	-	-
-'ab$'m	b\nab\n	y	@-[0]	2
-'ab\Z'm	b\nab	y	@-[0]	2
-'ab\z'm	b\nab	y	@-[0]	2
-'ab$'m	b\nab	y	@-[0]	2
 ab\Z	ac\nb\n	n	-	-
 ab\z	ac\nb\n	n	-	-
 ab$	ac\nb\n	n	-	-
@@ -764,21 +627,10 @@ ab$	b\nca	n	-	-
 abb\Z	abb\nb\n	n	-	-
 abb\z	abb\nb\n	n	-	-
 abb$	abb\nb\n	n	-	-
-abb\Z	b\nabb\n	y	@-[0]	2
 abb\z	b\nabb\n	n	-	-
-abb$	b\nabb\n	y	@-[0]	2
-abb\Z	b\nabb	y	@-[0]	2
-abb\z	b\nabb	y	@-[0]	2
-abb$	b\nabb	y	@-[0]	2
 'abb\Z'm	abb\nb\n	n	-	-
 'abb\z'm	abb\nb\n	n	-	-
-'abb$'m	abb\nb\n	y	@-[0]	0
-'abb\Z'm	b\nabb\n	y	@-[0]	2
 'abb\z'm	b\nabb\n	n	-	-
-'abb$'m	b\nabb\n	y	@-[0]	2
-'abb\Z'm	b\nabb	y	@-[0]	2
-'abb\z'm	b\nabb	y	@-[0]	2
-'abb$'m	b\nabb	y	@-[0]	2
 abb\Z	ac\nb\n	n	-	-
 abb\z	ac\nb\n	n	-	-
 abb$	ac\nb\n	n	-	-
@@ -981,7 +833,6 @@ x(?#	x	c	-	Sequence (?#... not terminated
 ^(.)\s+.\Z(?(1))	A B	y	$1	A	# [perl #37688]
 (?:r?)*?r|(.{2,4})	abcde	y	$1	abcd
 (?!)+?|(.{2,4})	abcde	y	$1	abcd
-^(a*?)(?!(a{6}|a{5})*$)	aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa	y	@+[1]	12	# super-linear cache bug may return 18
 ^((?>(?:aa)?b)?)	aab	y	$1	aab
 ^((?:aa)*)(?:X+((?:\d+|-)(?:X+(.+))?))?$	aaaaX5	y	$1	aaaa
 X(A|B||C|D)Y	XXXYYY	y	$^MATCH	XY	# Trie w/ NOTHING
@@ -1037,35 +888,14 @@ X(?=foo)	..XfooY..	y	pos	3
 ((?2)*)([fF]o+)	fooFoFoo	y	$1-$2	fooFo-Foo
 (<(?:[^<>]+|(?R))*>)	<<><<<><>>>>	y	$1	<<><<<><>>>>
 (?<n>foo|bar|baz)	snofooewa	y	$1	foo
-(?<n>foo|bar|baz)	snofooewa	y	%+{n}	foo
-(?<n>foo|bar|baz)(?<m>[ew]+)	snofooewa	y	%+{n}	foo
-(?<n>foo|bar|baz)(?<m>[ew]+)	snofooewa	y	%+{m}	ew
-(?<n>foo)|(?<n>bar)|(?<n>baz)	snofooewa	y	%+{n}	foo
-(?<n>foo)(??{ %+{n} })	snofooefoofoowaa	y	%+{n}	foo
 (?P<n>foo|bar|baz)	snofooewa	y	$1	foo
-(?P<n>foo|bar|baz)	snofooewa	y	%+{n}	foo
-(?P<n>foo|bar|baz)(?P<m>[ew]+)	snofooewa	y	%+{n}	foo
-(?P<n>foo|bar|baz)(?P<m>[ew]+)	snofooewa	y	%+{m}	ew
-(?P<n>foo)|(?P<n>bar)|(?P<n>baz)	snofooewa	y	%+{n}	foo
-(?P<n>foo)(??{ %+{n} })	snofooefoofoowaa	y	%+{n}	foo
 (?P<=n>foo|bar|baz)	snofooewa	c	-	Sequence (?P<=...) not recognized
 (?P<!n>foo|bar|baz)	snofooewa	c	-	Sequence (?P<!...) not recognized
 (?PX<n>foo|bar|baz)	snofooewa	c	-	Sequence (?PX<...) not recognized
 /(?'n'foo|bar|baz)/	snofooewa	y	$1	foo
-/(?'n'foo|bar|baz)/	snofooewa	y	%+{n}	foo
-/(?'n'foo|bar|baz)(?'m'[ew]+)/	snofooewa	y	%+{n}	foo
-/(?'n'foo|bar|baz)(?'m'[ew]+)/	snofooewa	y	%+{m}	ew
-/(?'n'foo)|(?'n'bar)|(?<n>baz)/	snobazewa	y	%+{n}	baz
-/(?'n'foo)(??{ %+{n} })/	snofooefoofoowaa	y	%+{n}	foo
 /(?'n'foo)\k<n>/	..foofoo..	y	$1	foo
-/(?'n'foo)\k<n>/	..foofoo..	y	%+{n}	foo
 /(?<n>foo)\k'n'/	..foofoo..	y	$1	foo
-/(?<n>foo)\k'n'/	..foofoo..	y	%+{n}	foo
-/(?:(?<n>foo)|(?<n>bar))\k<n>/	..barbar..	y	%+{n}	bar
-/^(?'main'<(?:[^<>]+|(?&crap)|(?&main))*>)(?'empty')(?'crap'!>!>!>)$/	<<!>!>!>><>>!>!>!>	y	%+{main}	<<!>!>!>><>>
 /^(?'main'<(?:[^<>]+|(?&main))*>)$/	<<><<<><>>>>	y	$1	<<><<<><>>>>
-/(?'first'(?&second)*)(?'second'[fF]o+)/	fooFoFoo	y	%+{first}-%+{second}	fooFo-Foo
-(?<A>foo)?(?(<A>)bar|nada)	foobar	y	%+{A}	foo
 (?<A>foo)?(?(<A>)bar|nada)	foo-barnada	y	$^MATCH	nada
 (?<A>foo)?(?(1)bar|nada)	foo-barnada	y	$^MATCH	nada
 (?<A>foo(?(R)bar))?(?1)	foofoobar	y	$1	foo
@@ -1219,15 +1049,7 @@ a*(*F)	aaaab	n	-	-
 
 # \k<n> preceded by a literal
 /(?'n'foo) \k<n>/	..foo foo..	y	$1	foo
-/(?'n'foo) \k<n>/	..foo foo..	y	%+{n}	foo
 /(?<n>foo) \k'n'/	..foo foo..	y	$1	foo
-/(?<n>foo) \k'n'/	..foo foo..	y	%+{n}	foo
-/(?'a1'foo) \k'a1'/	..foo foo..	y	%+{a1}	foo
-/(?<a1>foo) \k<a1>/	..foo foo..	y	%+{a1}	foo
-/(?'_'foo) \k'_'/	..foo foo..	y	%+{_}	foo
-/(?<_>foo) \k<_>/	..foo foo..	y	%+{_}	foo
-/(?'_0_'foo) \k'_0_'/	..foo foo..	y	%+{_0_}	foo
-/(?<_0_>foo) \k<_0_>/	..foo foo..	y	%+{_0_}	foo
 /(?'0'foo) bar/	..foo bar..	c	-	Sequence (?'
 /(?<0>foo) bar/	..foo bar..	c	-	Sequence (?<
 /(?'12'foo) bar/	..foo bar..	c	-	Sequence (?'
@@ -1256,19 +1078,14 @@ a*(*F)	aaaab	n	-	-
 
 # \g{...} with a name as the argument 
 /(?'n'foo) \g{n}/	..foo foo..	y	$1	foo
-/(?'n'foo) \g{n}/	..foo foo..	y	%+{n}	foo
 /(?<n>foo) \g{n}/	..foo foo..	y	$1	foo
-/(?<n>foo) \g{n}/	..foo foo..	y	%+{n}	foo
 /(?<as>as) (\w+) \g{as} (\w+)/	as easy as pie	y	$1-$2-$3	as-easy-pie
 
 # Python style named capture buffer stuff
 /(?P<n>foo)(?P=n)/	..foofoo..	y	$1	foo
-/(?P<n>foo)(?P=n)/	..foofoo..	y	%+{n}	foo
-/(?:(?P<n>foo)|(?P<n>bar))(?P=n)/	..barbar..	y	%+{n}	bar
 /^(?P<PAL>(?P<CHAR>.)((?P>PAL)|.?)(?P=CHAR))$/	madamimadam	y	$^MATCH	madamimadam
 /^(?P<PAL>(?P<CHAR>.)((?P>PAL)|.?)(?P=CHAR))$/	madamiamadam	n	-	-
 /(?P<n>foo) (?P=n)/	..foo foo..	y	$1	foo
-/(?P<n>foo) (?P=n)/	..foo foo..	y	%+{n}	foo
 /(?P<as>as) (\w+) (?P=as) (\w+)/	as easy as pie	y	$1-$2-$3	as-easy-pie
 
 #check that non identifiers as names are treated as the appropriate lookaround

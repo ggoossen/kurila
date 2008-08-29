@@ -21,5 +21,9 @@ ok( defined &ExtUtils::Liblist::ext,
     unlike( @out[2], qr/-ln0tt43r3_perl/, 'bogus library not added' );
     ok( (nelems @warn), 'had warning');
 
+<<<<<<< HEAD:lib/ExtUtils/t/Liblist.t
     is( grep(m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, @( < map { < @$_ } @( < @warn))), 1 ) || diag join "\n", @( < @warn);
+=======
+    is( nelems(grep(m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, @( < map { < @$_ } @( < @warn)))), 1 ) || diag join "\n", < @warn;
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/t/Liblist.t
 }

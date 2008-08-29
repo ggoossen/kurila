@@ -166,7 +166,11 @@ sub link {
 
   $self->add_to_cleanup(
     < grep defined, @(
+<<<<<<< HEAD:lib/ExtUtils/CBuilder/Platform/Windows.pm
     < @{\@( < %spec{[@( <qw(manifest implib explib dbg_file def_file base_file map_file))]} )}
+=======
+    < @{\@( %spec{[ <qw(manifest implib explib dbg_file def_file base_file map_file)]} )}
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/CBuilder/Platform/Windows.pm
 )  );
 
   foreach my $opt (@( < qw(output manifest implib explib dbg_file def_file map_file base_file)) ) {
@@ -189,7 +193,11 @@ sub link {
   }
 
   %spec{output} =~ s/'|"//g;
+<<<<<<< HEAD:lib/ExtUtils/CBuilder/Platform/Windows.pm
   return @( < grep defined, @( < %spec{[@( <qw[output manifest implib explib dbg_file def_file map_file base_file])]}) )
+=======
+  return @( < grep defined, @( %spec{[ <qw[output manifest implib explib dbg_file def_file map_file base_file]]}) )
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/CBuilder/Platform/Windows.pm
 }
 
 # canonize & quote paths

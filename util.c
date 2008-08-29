@@ -3482,9 +3482,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_mglob:
 	result = &PL_vtbl_mglob;
 	break;
-    case want_vtbl_nkeys:
-	result = &PL_vtbl_nkeys;
-	break;
     case want_vtbl_taint:
 	result = &PL_vtbl_taint;
 	break;
@@ -3505,12 +3502,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
 	break;
     case want_vtbl_regexp:
 	result = &PL_vtbl_regexp;
-	break;
-    case want_vtbl_regdata:
-	result = &PL_vtbl_regdata;
-	break;
-    case want_vtbl_regdatum:
-	result = &PL_vtbl_regdatum;
 	break;
     case want_vtbl_amagic:
 	result = &PL_vtbl_amagic;

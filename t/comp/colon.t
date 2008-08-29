@@ -95,7 +95,7 @@ ok 17, (not eval "qq:1" and
 	not eval "qq:echo:ohce: +>= 0");
 
 ok 18, (not eval "qw:1" and
-	eval "qw:echo: eq qw|echo|" and
+	eval "qw:echo:[0] eq qw|echo|[0]" and
 	not eval "qw:echo:ohce: +>= 0");
 
 ok 19, (not eval "qx:1" and

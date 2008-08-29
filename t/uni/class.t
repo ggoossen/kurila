@@ -52,11 +52,15 @@ use strict;
 
 my $str;
 
+<<<<<<< HEAD:t/uni/class.t
 if (ord('A') == 193) {
     $str = join "", @( < map chr($_), @( 0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D, 0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61, < 0xF0 .. 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F, 0x7C, < 0xC1 .. 0xC9, < 0xD1 .. 0xD9, < 0xE2 .. 0xE9, 0xAD, 0xE0, 0xBD, 0x5F, 0x6D, 0x79, < 0x81 .. 0x89, < 0x91 .. 0x96)); # IBM-1047
 } else {
     $str = join "", @( < map chr($_), @( < 0x20 .. 0x6F));
 }
+=======
+$str = join "", @( < map chr($_), @( < 0x20 .. 0x6F));
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/uni/class.t
 
 # make sure it finds built-in class
 is(@($str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -102,6 +106,7 @@ sub char_range {
 
     my $str;
 
+<<<<<<< HEAD:t/uni/class.t
     if (ord('A') == 193 && $h1 +< 256) {
 	my $h3 = ($h2 || $h1) + 1;
 	if ($h3 - $h1 == 1) {
@@ -114,6 +119,9 @@ sub char_range {
     } else {
 	$str = join "", @( < map { chr $_ } @( < $h1 .. (($h2 || $h1) + 1)));
     }
+=======
+    $str = join "", @( < map { chr $_ } @( < $h1 .. (($h2 || $h1) + 1)));
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/uni/class.t
 
     return $str;
 }

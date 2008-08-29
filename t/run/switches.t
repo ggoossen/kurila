@@ -125,7 +125,7 @@ SKIP: {
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!",4 );
     print $f <<'SWTESTPM';
 package swtest;
-sub import { print map "<$_>", <@_ }
+sub import { print < map "<$_>", @_ }
 1;
 SWTESTPM
     close $f or die "Could not close: $!";

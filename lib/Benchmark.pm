@@ -1008,7 +1008,11 @@ sub cmpthese{
     # Equalize column widths in the chart as much as possible without
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
     my @sorted_width_refs = @( < 
+<<<<<<< HEAD:lib/Benchmark.pm
        sort { $$a <+> $$b } @( < map { \$_ } @( < @col_widths[[@( <2..((nelems @col_widths)-1))]])) );
+=======
+       sort { $$a <+> $$b } @( < map { \$_ } @( @col_widths[[ <2..((nelems @col_widths)-1)]])) );
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Benchmark.pm
     my $max_width = ${@sorted_width_refs[-1]};
 
     my $total = (nelems @col_widths) - 1 ;

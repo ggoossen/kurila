@@ -456,8 +456,8 @@ sub process_para {
     while ((nelems @line) && @line[0] !~ m/^[^\#]/) {
       my $line = shift(@line);
       print $line, "\n";
-      next unless $line =~ m/^\#\s*((if)(?:n?def)?|elsif|else|endif)\b/;
-      my $statement = $+;
+      next unless $line =~ m/^\#\s*((?:if)(?:n?def)?|elsif|else|endif)\b/;
+      my $statement = $1;
       if ($statement eq 'if') {
 	$XSS_work_idx = (nelems @XSStack);
 	push(@XSStack, \%(type => 'if'));
@@ -589,7 +589,7 @@ sub process_para {
       my $args = "$orig_args ,";
       if ($args =~ m/^( (??{ $C_arg }) , )* $ /x) {
 	@args = @($args =~ m/\G ( (??{ $C_arg }) ) , /xg);
-	for (  @args ) {
+	for ( @args ) {
 	  s/^\s+//;
 	  s/\s+$//;
 	  my ($arg, $default) = m/ ( [^=]* ) ( (?: = .* )? ) /x;
@@ -693,7 +693,7 @@ sub process_para {
     # Detect CODE: blocks which use ST(n)= or XST_m*(n,v)
     #   to set explicit return values.
     $EXPLICIT_RETURN = ($CODE &&
-			("{join ' ', @( <@line)}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
+			("{join ' ', @line}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
     $ALIAS  = grep(m/^\s*ALIAS\s*:/, @(  < @line));
     $INTERFACE  = grep(m/^\s*INTERFACE\s*:/, @(  < @line));
 

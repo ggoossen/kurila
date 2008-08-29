@@ -132,7 +132,7 @@ require ExtUtils::Constant;
     open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
     while (~< *F)
     {
-        last if m/^ \s* \@EXPORT \s+ = \s+ \@\( \s+ qw \( /x ;
+        last if m/^ \s* \@EXPORT \s+ = \s+ qw \( /x ;
     }
 
     while (~< *F)

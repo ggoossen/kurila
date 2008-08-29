@@ -1,6 +1,6 @@
 #!/usr/old/bin/perl5.004_01 -w
 
-our @tests = @(split(m/\nEND\n/s, <<DONE));
+our @tests = split(m/\nEND\n/s, <<DONE);
 TEST 1 u
                 x
 END

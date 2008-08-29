@@ -413,7 +413,7 @@ sub jleft {
 				jleft($str, < %val, width=>$width, precropped=>1);
 				jright($str, < %val, precropped=>1);
 				my $postlen = length($post);
-				$str =~ s/(?:[ ]\{$postlen\}([ ]*)|.\{$postlen\}())$/$post$+/
+				$str =~ s/(?:[ ]\{$postlen\}([ ]*)|.\{$postlen\}())$/$post$1/
 					if $postlen;
 				@_[0] = $str;
 			}
@@ -540,7 +540,7 @@ sub segment ($\@\%$\%) {
 					= (1, \&break_verbatim, \&jverbatim)
 						if $fld =~ m/["']/ && $fld !~ m/[][><]/;
 						# was: if $fld =~ /["']/ && $fld !~ /[][]/;
-				%form{trackpos} = $fld =~ s/(\{):|:(\})/$+/g;
+				%form{trackpos} = $fld =~ s/(\{):|:(\})/$2/g;
 				%form{vjust} = $fld =~ s/=//g ? \&jmiddle
 							 : $fld =~ s/_//g ? \&jbottom
 							 :                  \&jtop
@@ -595,14 +595,15 @@ sub segment ($\@\%$\%) {
 				}
 				elsif (%form{width} == 3) {
 					$fld =~ s/^ \{ ([.,]) \} $/].[/x;
-					$fld =~ s/^ \{ (.)    \} $/$+$+$+/x;
+					$fld =~ s/^ \{ (.)    \} $/$1$1$1/x;
 				}
 				elsif (%form{width} +> 3)  {
 					$fld =~ s/^ \{ ([.,] \[)   /]$1/x;
 					$fld =~ s/^ \{ ([.,] \<)   />$1/x;
 					$fld =~ s/(\] .* [.,]) \} $/$1\[/x;
 					$fld =~ s/(\> .* [.,]) \} $/$1</x;
-					$fld =~ s/^ \{ (.) | (.) \} $/$+$+/gx;
+					$fld =~ s/^ \{ (.) /$1$1/gx;
+                                        $fld =~ s/ (.) \} $/$1$1/gx;
 				}
 
 				%form{width} = $setwidth
@@ -613,14 +614,15 @@ sub segment ($\@\%$\%) {
 				}
 				elsif (%form{width} == 3) {
 					$fld =~ s/^ \{ ([.,]) \} $/].[/x;
-					$fld =~ s/^ \{ (.)    \} $/$+$+$+/x;
+					$fld =~ s/^ \{ (.)    \} $/$1$1$1/x;
 				}
 				elsif (%form{width} +> 3)  {
 					$fld =~ s/^ \{ ([.,] \[)   /]$1/x;
 					$fld =~ s/^ \{ ([.,] \<)   />$1/x;
 					$fld =~ s/(\] .* [.,]) \} $/$1\[/x;
 					$fld =~ s/(\> .* [.,]) \} $/$1</x;
-					$fld =~ s/^ \{ (.) | (.) \} $/$+$+/gx;
+					$fld =~ s/^ \{ (.) /$1$1/gx;
+                                        $fld =~ s/ (.) \} $/$1$1/gx;
 				}
 
 				%form{width} = $setwidth
@@ -762,7 +764,11 @@ sub make_col {
 	my ($f, $opts, $maxheight, $tabular) = < @_;
 	$maxheight = min @($unlimited,
 					  < grep defined(), @( $maxheight, $f->{opts}{height}{max}));
+<<<<<<< HEAD:ext/Perl6-Form/Form.pm
 	my ($str_ref, $width) = < $f->{[@( <qw(src width))]};
+=======
+	my ($str_ref, $width) = $f->{[ <qw(src width)]};
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:ext/Perl6-Form/Form.pm
 	my @col;
 	my ($more, $text) = (1,"");
 	my $bullet = $f->{hasbullet};
@@ -783,7 +789,11 @@ sub make_col {
 		my ($text,$more,$eol) = < $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
 			$text =~ s{($f->{opts}{ws})}
+<<<<<<< HEAD:ext/Perl6-Form/Form.pm
 					  {{ my @caps = @( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
+=======
+					  {{ my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:ext/Perl6-Form/Form.pm
 						@caps = @( length($1) ? " " : "" ) unless (nelems @caps);
 						join "", @( < @caps);
 					  
@@ -1100,7 +1110,7 @@ sub form {
 				make_underline(%opts{under}, $prevformat, $currformat);
 			%opts{under} = undef;
 		}
-		push @{@section[-1]{formatters}}, $currformat;
+		push @{@section[-1]->{formatters}}, $currformat;
 		push @allformats, $currformat;
 	}
 	die scalar(nelems @_), " too many data values after last format" if (nelems @_);
@@ -1306,14 +1316,14 @@ sub break_at {
 			while ($rem +> 0 && (pos()||0) +< length()) {
 				if ($ws && m/\G ($ws) $wsnzw/gcx) {
 					my $captured;
-					if ((nelems @+) +> 2) { 		# may be extra captures...
-						for (2..(nelems @+) -1) {
-							next unless defined $$_;
-							$captured++;
-							$res .= $$_;
-							$rem -= length $$_;
-						}
-					}
+# 					if ((nelems @+) +> 2) { 		# may be extra captures...
+# 						for (2..(nelems @+) -1) {
+# 							next unless defined $$_;
+# 							$captured++;
+# 							$res .= $$_;
+# 							$rem -= length $$_;
+# 						}
+# 					}
 					unless ($captured) {
 						$res .= $1;
 						$rem--;
