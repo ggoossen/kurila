@@ -1257,13 +1257,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     # ignore the distdir
     %Is{VMS} ? %ignore{"$self->{DISTVNAME}.dir"} = 1
             : %ignore{$self->{DISTVNAME}} = 1;
-<<<<<<< HEAD:lib/ExtUtils/MM_Unix.pm
  <
     %ignore{[@(< map lc, @( < keys %ignore))]} = < values %ignore if %Is{VMS};
-=======
-
-    %ignore{[< map lc, @( < keys %ignore)]} = < values %ignore if %Is{VMS};
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/MM_Unix.pm
 
     foreach my $name ( $self->lsdir($Curdir)){
 	next if $name =~ m/\#/;
@@ -2382,11 +2377,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     # The front matter of the linkcommand...
     $linkcmd = join ' ', @( "\$(CC)",
-<<<<<<< HEAD:lib/ExtUtils/MM_Unix.pm
 	    < grep($_, @( < %Config{[@( <qw(ldflags ccdlflags))]})));
-=======
-	    < grep($_, @( %Config{[ <qw(ldflags ccdlflags)]})));
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/MM_Unix.pm
     $linkcmd =~ s/\s+/ /g;
     $linkcmd =~ s,(perl\.exp),\$(PERL_INC)/$1,;
 

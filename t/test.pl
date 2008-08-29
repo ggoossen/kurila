@@ -520,11 +520,7 @@ sub runperl {
 	}
 
 	my @keys = @( < grep {exists %ENV{$_}} @( < qw(CDPATH IFS ENV BASH_ENV)) );
-<<<<<<< HEAD:t/test.pl
 	local < %ENV{[@(< @keys)]} = ();
-=======
-	local %ENV{[< @keys]} = ();
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/test.pl
 	# Untaint, plus take out . and empty string:
 	local %ENV{'DCL$PATH'} = $1 if $is_vms && (%ENV{'DCL$PATH'} =~ m/(.*)/s);
 	%ENV{PATH} =~ m/(.*)/s;

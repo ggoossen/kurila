@@ -57,16 +57,9 @@ if (!exists &Errno::EBADF) {
     #               before pushing its return value
     # to make sure only that these obfuscated sentences will not crash.
 
-<<<<<<< HEAD:t/io/print.t
-    map print(reverse), ('')x68;
-    print "ok 20\n";
-
-    map print(+()), ('')x68;
-=======
     map print(< reverse @($_)), @(('')x68);
     print "ok 20\n";
 
     map print(+()), @(('')x68);
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/io/print.t
     print "ok 21\n";
 }

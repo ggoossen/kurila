@@ -764,11 +764,7 @@ sub make_col {
 	my ($f, $opts, $maxheight, $tabular) = < @_;
 	$maxheight = min @($unlimited,
 					  < grep defined(), @( $maxheight, $f->{opts}{height}{max}));
-<<<<<<< HEAD:ext/Perl6-Form/Form.pm
 	my ($str_ref, $width) = < $f->{[@( <qw(src width))]};
-=======
-	my ($str_ref, $width) = $f->{[ <qw(src width)]};
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:ext/Perl6-Form/Form.pm
 	my @col;
 	my ($more, $text) = (1,"");
 	my $bullet = $f->{hasbullet};
@@ -789,11 +785,7 @@ sub make_col {
 		my ($text,$more,$eol) = < $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
 			$text =~ s{($f->{opts}{ws})}
-<<<<<<< HEAD:ext/Perl6-Form/Form.pm
-					  {{ my @caps = @( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
-=======
 					  {{ my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:ext/Perl6-Form/Form.pm
 						@caps = @( length($1) ? " " : "" ) unless (nelems @caps);
 						join "", @( < @caps);
 					  

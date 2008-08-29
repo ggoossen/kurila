@@ -423,11 +423,7 @@ sub stuff {
 }
 
 @input = @( < &generate );
-<<<<<<< HEAD:t/op/sort.t
-@output = @( reverse < sort {stuff || $a cmp $b} @( < @input) );
-=======
 @output = reverse sort {stuff || $a cmp $b} @input;
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/op/sort.t
 is join(" ", @( < map {0+$_} @( < @output))), "8 7 6 5 4 3 2 1 0",
     'reversed stable complex sort';
 

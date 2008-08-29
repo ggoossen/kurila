@@ -59,11 +59,7 @@ __USAGE__
 		   File::Spec->catfile((nelems @d) ?
 				       ((nelems @d) == 1 && @d[0] eq '' ? () : < @d)
 				       : "pod", $f);
-<<<<<<< HEAD:pod/buildtoc
 	       } @( < %Targets{[@(< grep { $_ ne 'all' && %Build{$_} } @( < keys %Build))]})))),
-=======
-	       } @( %Targets{[< grep { $_ ne 'all' && %Build{$_} } @( < keys %Build)]})))),
->>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:pod/buildtoc
           "\n";
       exit(0);
   }
