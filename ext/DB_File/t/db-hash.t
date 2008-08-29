@@ -255,11 +255,10 @@ ok(28, $ok );
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 ok(29, $size +> 0 );
- <
-%h{[@( <0..200)]} = < 200..400;
-my @foo = @( < %h{[@( <0..200)]} );
-ok(30, join(':', @( <200..400)) eq join(':', @(< @foo)) );
-
+ 
+    (< %h{[0..200]}) = < 200..400;
+    my @foo = %h{[0..200]};
+    ok("30 # TODO", join(':', @( <200..400)) eq join(':', @(< @foo)) );
 
 # Now check all the non-tie specific stuff
 
@@ -412,7 +411,7 @@ ok(52, 1);
 
    require Exporter ;
    use DB_File;
-   @ISA=@(qw(DB_File));
+   @ISA=qw(DB_File);
    @EXPORT = @DB_File::EXPORT ;
 
    sub STORE { 

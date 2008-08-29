@@ -4,7 +4,7 @@ BEGIN {
     }
 }
 
-use lib qw(t t/compress);
+use lib < qw(t t/compress);
 
 use IO::Uncompress::Gunzip v2.006 ;
 
@@ -161,7 +161,7 @@ EOM
 the final line
 EOM
 
-$text = join("", < @text) ;
+$text = join("", @text) ;
 
 ok $fil = gzopen($name, "wb") ;
 ok $fil->gzwrite($text) == length $text ;
@@ -480,7 +480,7 @@ ok ! $fil->gzclose ;
     $a->gzwrite("\n\n");
     $a->gzclose ;
 
-    for my $delim ( undef, "", 0, 1, "abc", $text, "\n\n", "\n" )
+    for my $delim ( @( undef, "", 0, 1, "abc", $text, "\n\n", "\n" ) )
     {
         local $/ = $delim;
         my $u = gzopen($name, "r");

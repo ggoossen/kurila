@@ -4,7 +4,7 @@ BEGIN {
     }
 }
 
-use lib qw(t t/compress);
+use lib < qw(t t/compress);
 use strict;
 use warnings;
 use bytes;
@@ -28,7 +28,7 @@ BEGIN
     use_ok('Compress::Zlib', 2) ;
     use_ok('IO::Compress::Gzip::Constants') ;
 
-    use_ok('IO::Compress::Gzip', qw($GzipError)) ;
+    use_ok('IO::Compress::Gzip', < qw($GzipError)) ;
 }
 
 
@@ -484,7 +484,7 @@ EOM
     title "Check all bytes can be handled";
 
     my $lex = LexFile->new( my $name) ;
-    my $data = join '', < map { chr } @(0x00 .. 0xFF);
+    my $data = join '', map { chr } 0x00 .. 0xFF;
     $data .= "\r\nabd\r\n";
 
     my $fil;
@@ -556,7 +556,7 @@ EOM
     $Answer .= $X ;
      
      
-    @Answer = @( split('', $Answer) );
+    @Answer = split('', $Answer);
     # Undocumented corner -- extra byte needed to get inflate to return 
     # Z_STREAM_END when done.  
     push @Answer, " " ; 
@@ -565,7 +565,7 @@ EOM
     ok $k ;
      
     $GOT = '';
-    foreach ( < @Answer)
+    foreach ( @Answer)
     {
         ($Z, $status) = < $k->inflate($_) ;
         $GOT .= $Z ;
