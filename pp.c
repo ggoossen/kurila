@@ -3384,18 +3384,22 @@ PP(pp_aslice)
 {
     dVAR; dSP; dMARK;
     register AV* const av = (AV*)POPs;
+    register AV* slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
 
     if (SvTYPE(av) != SVt_PVAV)
 	Perl_croak(aTHX_ "can't take an array slice from an %s", Ddesc((SV*)av));
 
-    if (GIMME == G_SCALAR)
-	Perl_croak(aTHX_ "array slice may not be used in scalar context");
+    if (SvTYPE(slice) != SVt_PVAV)
+	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
+
+    slice = sv_mortalcopy(slice);
+    register SV **svpmax = AvARRAY(slice) + av_len(slice);
 
     if (lval && PL_op->op_private & OPpLVAL_INTRO) {
 	register SV **svp;
 	I32 max = -1;
-	for (svp = MARK + 1; svp <= SP; svp++) {
+	for (svp = AvARRAY(slice); svp <= svpmax; svp++) {
 	    const I32 elem = SvIV(*svp);
 	    if (elem > max)
 		max = elem;
@@ -3403,9 +3407,10 @@ PP(pp_aslice)
 	if (max > AvMAX(av))
 	    av_extend(av, max);
     }
-    while (++MARK <= SP) {
+    register SV **ip = AvARRAY(slice);
+    while (ip <= svpmax) {
 	register SV **svp;
-	I32 elem = SvIV(*MARK);
+	I32 elem = SvIV(*ip);
 	
 	svp = av_fetch(av, elem, lval);
 	if (lval) {
@@ -3414,9 +3419,11 @@ PP(pp_aslice)
 	    if (PL_op->op_private & OPpLVAL_INTRO)
 		save_aelem(av, elem, svp);
 	}
-	*MARK = svp ? *svp : &PL_sv_undef;
+	SVcpREPLACE(*ip, *svp);
+        ip++;
     }
 
+    XPUSHs(slice);
     RETURN;
 }
 
@@ -3563,6 +3570,7 @@ PP(pp_hslice)
 {
     dVAR; dSP; dMARK; dORIGMARK;
     register HV * const hv = (HV*)POPs;
+    AV * slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
     bool other_magic = FALSE;
@@ -3584,11 +3592,16 @@ PP(pp_hslice)
     if ( ! SvHVOK(hv) )
 	Perl_croak(aTHX_ "Not a HASH");
 
-    if (GIMME == G_SCALAR)
-	Perl_croak(aTHX_ "hash slice may not be used in scalar context");
+    if ( ! SvAVOK(slice) )
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(slice));
 
-    while (++MARK <= SP) {
-        SV * const keysv = *MARK;
+    slice = sv_mortalcopy(slice);
+
+    SV ** ip = AvARRAY(slice);
+    SV ** ipmax = ip + av_len(slice);
+
+    while (ip <= ipmax) {
+        SV * const keysv = *ip;
         SV **svp;
         HE *he;
         bool preeminent = FALSE;
@@ -3619,13 +3632,10 @@ PP(pp_hslice)
 		}
             }
         }
-        *MARK = svp ? *svp : &PL_sv_undef;
+        SVcpREPLACE(*ip, *svp);
+	ip++;
     }
-    if (GIMME != G_ARRAY) {
-	MARK = ORIGMARK;
-	*++MARK = SP > ORIGMARK ? *SP : &PL_sv_undef;
-	SP = MARK;
-    }
+    XPUSHs(slice);
     RETURN;
 }
 
