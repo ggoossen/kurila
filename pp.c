@@ -3394,6 +3394,12 @@ PP(pp_aslice)
 	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
 
     slice = sv_mortalcopy(slice);
+    XPUSHs(slice);
+    register SV **ip = AvARRAY(slice);
+
+    if ( ! ip )
+	RETURN;
+
     register SV **svpmax = AvARRAY(slice) + av_len(slice);
 
     if (lval && PL_op->op_private & OPpLVAL_INTRO) {
@@ -3407,7 +3413,6 @@ PP(pp_aslice)
 	if (max > AvMAX(av))
 	    av_extend(av, max);
     }
-    register SV **ip = AvARRAY(slice);
     while (ip <= svpmax) {
 	register SV **svp;
 	I32 elem = SvIV(*ip);
@@ -3423,7 +3428,6 @@ PP(pp_aslice)
         ip++;
     }
 
-    XPUSHs(slice);
     RETURN;
 }
 

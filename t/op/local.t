@@ -260,7 +260,7 @@ while (m/(o.+?),/gc) {
     %x{a} = 1;
     { local %x{b} = 1; }
     ok(! exists %x{b});
-    { local < %x{[@('c','d','e')]} = (); }
+    { local %x{[@('c','d','e')]} = @(); }
     ok(! exists %x{c});
 }
 
@@ -292,7 +292,8 @@ is($@, "");
 	}
 	main::ok(f1() eq "f1", "localised sub restored");
 	{
-		local < %Other::{[@( <qw/ f1 f2 /)]} = (sub { "j1" }, sub { "j2" });
+		local %Other::{[@( <qw/ f1 f2 /)]} = @(sub { "j1" }, sub { "j2" });
+                local $main::TODO = 1;
 		main::ok(f1() eq "j1", "localised sub via stash slice");
 		main::ok(f2() eq "j2", "localised sub via stash slice");
 	}
@@ -336,7 +337,8 @@ is($@, "");
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
-	local < %h{[@($unicode, $ambigous)]} = (256, 160);
+	local %h{[@($unicode, $ambigous)]} = @(256, 160);
+        local our $TODO = "localized hash alues";
 
 	is(nkeys %h, 4);
 	is(%h{"\243"}, "pound");
