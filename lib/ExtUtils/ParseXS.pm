@@ -456,9 +456,9 @@ sub process_para {
     while ((nelems @line) && @line[0] !~ m/^[^\#]/) {
       my $line = shift(@line);
       print $line, "\n";
-      next unless $line =~ m/^\#\s*((?:if)(?:n?def)?|elsif|else|endif)\b/;
+      next unless $line =~ m/^\#\s*(if(?:n?def)?|elsif|else|endif)\b/;
       my $statement = $1;
-      if ($statement eq 'if') {
+      if ($statement =~ m/^if/) {
 	$XSS_work_idx = (nelems @XSStack);
 	push(@XSStack, \%(type => 'if'));
       } else {

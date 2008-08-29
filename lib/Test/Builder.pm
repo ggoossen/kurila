@@ -1623,8 +1623,8 @@ sub _ending {
               unless defined $test_results->[$idx];
         }
 
-        my $num_failed = nelems( grep !$_->{'ok'}, @( 
-            @{$test_results}[[ < 0..$self->{Curr_Test}-1]]) );
+        my $num_failed = nelems( grep !$_->{'ok'},
+            @{$test_results}[[0..$self->{Curr_Test}-1]] );
 
         my $num_extra = $self->{Curr_Test} - $self->{Expected_Tests};
 

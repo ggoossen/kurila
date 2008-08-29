@@ -101,7 +101,7 @@ foobar
 ########
 package TH;
 sub TIEHASH { bless \%(), 'TH' }
-sub STORE { try { print "{ join ' ', @(@_[[1,2]])}\n" }; die "bar\n" }
+sub STORE { try { print "{ join ' ', @_[[1..2]]}\n" }; die "bar\n" }
 tie our %h, 'TH';
 try { %h{A} = 1; print "never\n"; };
 print $@->{description};
