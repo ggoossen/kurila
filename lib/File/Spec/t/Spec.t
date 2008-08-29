@@ -705,8 +705,8 @@ plan tests => scalar (nelems @tests) + 1;
 
 {
     package File::Spec::FakeWin32;
-    use vars qw(@ISA);
-    @ISA = @( qw(File::Spec::Win32) );
+    use vars < qw(@ISA);
+    @ISA = @( < qw(File::Spec::Win32) );
 
     sub _cwd { 'C:\one\two' }
 
@@ -733,7 +733,7 @@ plan tests => scalar (nelems @tests) + 1;
 ok("Win32->can('_cwd')", "Win32->can('_cwd')");
 
 # Test out the class methods
-for ( < @tests ) {
+for (  @tests ) {
    tryfunc( < @$_ ) ;
 }
 
@@ -754,7 +754,7 @@ sub tryfunc {
 
     $function =~ s/^([^\$].*->)/File::Spec::$1/;
     my $got = eval $function;
-    $got = join ',', <$got if (ref \$got) eq "ARRAY";
+    $got = join ',', @( <$got) if (ref \$got) eq "ARRAY";
 
     if ( $@ ) {
       if ( $@->{description} =~ m/^\Q$skip_exception/ ) {

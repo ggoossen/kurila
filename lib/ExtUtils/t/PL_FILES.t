@@ -37,6 +37,6 @@ cmp_ok( $?, '==', 0 );
 my $make_out = run("$make");
 is( $?, 0 ) || diag $make_out;
 
-foreach my $file (qw(single.out 1.out 2.out blib/lib/PL/Bar.pm)) {
+foreach my $file (@( <qw(single.out 1.out 2.out blib/lib/PL/Bar.pm))) {
     ok( -e $file, "$file was created" );
 }

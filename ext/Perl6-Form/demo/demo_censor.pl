@@ -1,7 +1,7 @@
 use Perl6::Form;
 
 sub obscure {
-	my $hidewords = join '|', map quotemeta, < @_;
+	my $hidewords = join '|', @( < map quotemeta, @( < @_));
 	return sub {
 		my ($data) = < @_;
 		$data =~ s/($hidewords)/{'X' x length $1}/gi;
@@ -9,7 +9,7 @@ sub obscure {
 	}
 }
 
-my $censor = obscure qw(villain plot libel treacherous murderer false deadly 'G');
+my $censor = obscure < qw(villain plot libel treacherous murderer false deadly 'G');
 my $script = do{local$/; ~< *DATA};
 
 print < form

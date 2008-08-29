@@ -3,7 +3,7 @@ package main ;
 
 use strict ;
 
-use Config qw(%Config);
+use Config < qw(%Config);
 use File::Copy;
 
 
@@ -20,7 +20,7 @@ require VMS::Filespec if $^O eq 'VMS';
 
 
 unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } < @ARGV;
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @( < @ARGV);
 }
 
 %ENV{SKIP_FOR_CORE} = 1 if %ENV{PERL_CORE} || %ENV{MY_PERL_CORE} ;
@@ -50,10 +50,10 @@ sub MY::postamble
     my $postamble = '
 
 MyTrebleCheck:
-	@echo Checking for $$^W in files: '. "{join ' ', <@files}" . q|
+	@echo Checking for $$^W in files: '. "{join ' ', @( <@files)}" . q|
 	@perl -ne '						\
 	    exit 1 if /^\s*local\s*\(\s*\$$\^W\s*\)/;		\
-         ' | . " {join ' ', <@files} || " . '				\
+         ' | . " {join ' ', @( <@files)} || " . '				\
 	(echo found unexpected $$^W ; exit 1)
 	@echo All is ok.
 
@@ -68,7 +68,7 @@ sub getPerlFiles
 
     my @files = @( () );
 
-    for my $manifest (< @manifests)
+    for my $manifest ( @manifests)
     {
         my $prefix = './';
 
@@ -165,7 +165,7 @@ sub UpDowngrade
         $our_sub = sub {
 	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
-                my $vars = join ' ', split m/\s*,\s*/, $2;
+                my $vars = join ' ', @( < split m/\s*,\s*/, $2);
                 $_ = "{$indent}use vars qw($vars);\n";
             }
 	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
@@ -178,7 +178,7 @@ sub UpDowngrade
         $our_sub = sub {
 	    if ( m/^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {
                 my $indent = $1;
-                my $vars = join ', ', split ' ', $2;
+                my $vars = join ', ', @( < split ' ', $2);
                 $_ = "{$indent}our ($vars);\n";
             }
 	    elsif ( m/^(\s*)#\s*((use|no)\s+(bytes|utf8)\s*;.*)$/)
@@ -196,7 +196,7 @@ sub UpDowngrade
           { return }
     }
 
-    foreach (< @files) {
+    foreach ( @files) {
         #if (-l $_ )
           { doUpDown($our_sub, $warn_sub, $_) }
           #else  

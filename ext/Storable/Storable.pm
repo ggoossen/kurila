@@ -11,10 +11,10 @@ package Storable;
 
 use strict;
 
-our @ISA = @( qw(Exporter DynaLoader) );
+our @ISA = @( < qw(Exporter DynaLoader) );
 
-our @EXPORT = @( qw(store retrieve) );
-our @EXPORT_OK = @( qw(
+our @EXPORT = @( < qw(store retrieve) );
+our @EXPORT_OK = @( < qw(
 	nstore store_fd nstore_fd fd_retrieve
 	freeze nfreeze thaw
 	dclone
@@ -24,7 +24,7 @@ our @EXPORT_OK = @( qw(
 ) );
 
 use FileHandle;
-use vars qw($canonical $forgive_me $VERSION);
+use vars < qw($canonical $forgive_me $VERSION);
 
 $VERSION = '2.18';
 

@@ -2,7 +2,7 @@
 
 use Config;
 
-use List::Util qw(reduce min);
+use List::Util < qw(reduce min);
 use Test::More;
 plan tests => ($::PERL_ONLY ? 20 : 22);
 
@@ -16,13 +16,13 @@ is( $v,	9,	'4-arg divide');
 $v = reduce { $a / $b } 6;
 is( $v,	6,	'one arg');
 
-my @a = @( map { rand } 0 .. 20 );
+my @a = @( < map { rand } @( < 0 .. 20) );
 $v = reduce { $a +< $b ? $a : $b } < @a;
 is( $v,	min(< @a),	'min');
 
-@a = @( map { pack("C", int(rand(256))) } 0 .. 20 );
+@a = @( < map { pack("C", int(rand(256))) } @( < 0 .. 20) );
 $v = reduce { $a . $b } < @a;
-is( $v,	join("",< @a),	'concat');
+is( $v,	join("", @(< @a)),	'concat');
 
 sub add {
   my($aa, $bb) = < @_;
@@ -67,7 +67,7 @@ is($v, 12, 'return from loop');
 # Does it work from another package?
 { package Foo;
   $a = $b;
-  main::is((List::Util::reduce {$a*$b} (1..4)), 24, 'other package');
+  main::is((List::Util::reduce {$a*$b} ( <1..4)), 24, 'other package');
 }
 
 # Can we undefine a reduce sub while it's running?
@@ -102,7 +102,7 @@ SKIP: {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
     sub mult {$a*$b}
     my $refcnt = &Internals::SvREFCNT(\&mult);
-    $v = reduce \&mult, 1..6;
+    $v = reduce \&mult, < 1..6;
     is(&Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged");
 }
 

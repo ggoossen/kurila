@@ -21,7 +21,7 @@ print "1..2\n";
 sub txt_compare {
     our ($A, $B);
     local ($/, $A, $B);
-    for (($A,$B) = < @_) { open(_, "<","$_") ? $_ = ~< *_ : die "$_ : $!"; close _ }
+    for (@(($A,$B) = < @_)) { open(_, "<","$_") ? $_ = ~< *_ : die "$_ : $!"; close _ }
     $A cmp $B;
 }
 

@@ -14,7 +14,7 @@ sub BEGIN {
 }
 
 
-use Storable qw(dclone);
+use Storable < qw(dclone);
 
 print "1..12\n";
 
@@ -38,7 +38,7 @@ print "ok 3\n";
 print "not " unless $got eq $dumped; 
 print "ok 4\n";
 
-package FOO; our @ISA = @( qw(Storable) );
+package FOO; our @ISA = @( < qw(Storable) );
 
 sub make {
 	my $self = bless \%();
@@ -90,7 +90,7 @@ if (try { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     %tie{array} = \@(1,2,3,4);
     %tie{hash} = \%(1,2,3,4);
     my $clone_array = dclone %tie{array};
-    print "not " unless "{join ' ', <@$clone_array}" eq "{join ' ', <@{%tie{array}}}";
+    print "not " unless "{join ' ', @( <@$clone_array)}" eq "{join ' ', @( <@{%tie{array}})}";
     print "ok 11\n";
     my $clone_hash = dclone %tie{hash};
     print "not " unless $clone_hash->{1} eq %tie{hash}{1};

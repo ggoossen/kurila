@@ -6,7 +6,7 @@
 #  in the README file that comes with the distribution.
 #
 
-use Storable qw(store retrieve store_fd nstore_fd fd_retrieve);
+use Storable < qw(store retrieve store_fd nstore_fd fd_retrieve);
 
 use Test::More;
 
@@ -29,7 +29,7 @@ is_deeply($root, \@a);
 
 1 while unlink 'store';
 
-package FOO; our @ISA = @( qw(Storable) );
+package FOO; our @ISA = @( < qw(Storable) );
 
 sub make {
 	my $self = bless \%();

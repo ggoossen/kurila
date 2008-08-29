@@ -2,7 +2,7 @@
 package I18N::LangTags::List;
 #  Time-stamp: "2004-10-06 23:26:21 ADT"
 use strict;
-use vars qw(%Name %Is_Disrec $Debug $VERSION);
+use vars < qw(%Name %Is_Disrec $Debug $VERSION);
 $VERSION = '0.35';
 # POD at the end.
 
@@ -93,7 +93,7 @@ sub is_decent {
     $/xs;
 
   my @supers = @( () );
-  foreach my $bit (split('-', $tag)) {
+  foreach my $bit (@( <split('-', $tag))) {
     push @supers, 
       scalar(nelems @supers) ? (@supers[-1] . '-' . $bit) : $bit;
   }
@@ -101,7 +101,7 @@ sub is_decent {
   shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s;
   return 0 unless (nelems @supers);
 
-  foreach my $f ($tag, < @supers) {
+  foreach my $f (@($tag, < @supers)) {
     return 0 if %Is_Disrec{$f};
     return 2 if %Name{$f};
      # so that decent subforms of indecent tags are decent

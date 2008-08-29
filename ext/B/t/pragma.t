@@ -2,7 +2,7 @@
 
 BEGIN {    ## no critic strict
     if ( %ENV{PERL_CORE} ) {
-	push @INC, qw(lib);
+	push @INC, < qw(lib);
     }
     else {
         unshift @INC, 't';

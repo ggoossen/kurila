@@ -34,7 +34,7 @@ sub new {
   }
 
   # By now it's a treelet:  [ 'foo', {}, ... ]
-  foreach my $x (< @$new) {
+  foreach my $x ( @$new) {
     if(ref($x || '') eq 'ARRAY') {
       $x = $class->new($x); # recurse
     } elsif(ref($x || '') eq 'HASH') {

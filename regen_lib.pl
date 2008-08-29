@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use vars qw($Is_W32 $Is_OS2 $Is_Cygwin $Is_NetWare $Needs_Write);
+use vars < qw($Is_W32 $Is_OS2 $Is_Cygwin $Is_NetWare $Needs_Write);
 use Config; # Remember, this is running using an existing perl
 use File::Compare;
 use Symbol;
@@ -22,7 +22,7 @@ sub safer_unlink {
   my $cnt = 0;
 
   my $name;
-  foreach $name (< @names) {
+  foreach $name ( @names) {
     next unless -e $name;
     chmod 0777, $name if $Needs_Write;
     ( CORE::unlink($name) and ++$cnt

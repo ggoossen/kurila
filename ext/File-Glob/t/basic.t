@@ -9,14 +9,14 @@ use Cwd ();
 
 # look for the contents of the current directory
 %ENV{PATH} = "/bin";
-delete %ENV{[qw(BASH_ENV CDPATH ENV IFS)]};
+delete %ENV{[ <qw(BASH_ENV CDPATH ENV IFS)]};
 my @correct = @( () );
 if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
-   @correct = @( grep { !m/^\./ } sort readdir(D) );
+   @correct = @( < grep { !m/^\./ } @( < sort @( readdir(D))) );
    closedir D;
 }
 my @a = @( < File::Glob::bsd_glob("*", 0) );
-@a = @( sort < @a );
+@a = @( < sort @( < @a) );
 if (GLOB_ERROR) {
     fail(GLOB_ERROR);
 } else {
@@ -92,10 +92,10 @@ is_deeply(\@a, \@('a', 'b'));
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
-@a = @( grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, < @a );
-@a = @(grep !m/test.pl/, < @a) if $^O eq 'VMS';
+@a = @( < grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, @( < @a) );
+@a = @(< grep !m/test.pl/, @( < @a)) if $^O eq 'VMS';
 
-print "# {join ' ', <@a}\n";
+print "# {join ' ', @( <@a)}\n";
 
 is_deeply(\@a, \@(($^O eq 'VMS'? 'test.' : 'TEST'), 'a', 'b'));
 
@@ -111,14 +111,14 @@ SKIP: {
 mkdir "pteerslo", 0777;
 chdir "pteerslo";
 
-my @f_names = @( sort qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl) );
-my @f_alpha = @( qw(Ax.pl aY.pl Bx.pl bY.pl Cx.pl cY.pl) );
+my @f_names = @( < sort @( < qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl)) );
+my @f_alpha = @( < qw(Ax.pl aY.pl Bx.pl bY.pl Cx.pl cY.pl) );
 if ($^O eq 'VMS') { # VMS is happily caseignorant
-    @f_alpha = @( qw(ax.pl ay.pl bx.pl by.pl cx.pl cy.pl) );
+    @f_alpha = @( < qw(ax.pl ay.pl bx.pl by.pl cx.pl cy.pl) );
     @f_names = @( < @f_alpha );
 }
 
-for (< @f_names) {
+for ( @f_names) {
     open T, ">", "$_";
     close T;
 }
@@ -126,13 +126,13 @@ for (< @f_names) {
 my $pat = "*.pl";
 
 my @g_names = @( < bsd_glob($pat, 0) );
-print "# f_names = {join ' ', <@f_names}\n";
-print "# g_names = {join ' ', <@g_names}\n";
+print "# f_names = {join ' ', @( <@f_names)}\n";
+print "# g_names = {join ' ', @( <@g_names)}\n";
 is_deeply(\@g_names, \@f_names);
 
 my @g_alpha = @( < bsd_glob($pat) );
-print "# f_alpha = {join ' ', <@f_alpha}\n";
-print "# g_alpha = {join ' ', <@g_alpha}\n";
+print "# f_alpha = {join ' ', @( <@f_alpha)}\n";
+print "# g_alpha = {join ' ', @( <@g_alpha)}\n";
 is_deeply(\@g_alpha, \@f_alpha);
 
 unlink < @f_names;
@@ -144,12 +144,12 @@ glob("*"); glob("*");
 pass("Don't panic");
 
 {
-    use File::Temp qw(tempdir);
+    use File::Temp < qw(tempdir);
     use File::Spec qw();
 
     my $dir = tempdir(CLEANUP => 1)
 	or die "Could not create temporary directory";
-    for my $file (qw(a_dej a_ghj a_qej)) {
+    for my $file (@( <qw(a_dej a_ghj a_qej))) {
 	open my $fh, ">", File::Spec->catfile($dir, $file)
 	    or die "Could not create file $dir/$file: $!";
 	close $fh;

@@ -15,7 +15,7 @@ BEGIN {
 
 print "1..8\n";
 
-use Storable qw(freeze nfreeze thaw);
+use Storable < qw(freeze nfreeze thaw);
 
 package TIED_HASH;
 

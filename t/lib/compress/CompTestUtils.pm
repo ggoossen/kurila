@@ -33,14 +33,14 @@ sub like_eval
     sub new
     {
         my $self = shift ;
-        foreach (< @_)
+        foreach ( @_)
         {
             # autogenerate the name unless if none supplied
             $_ = "tst" . $index ++ . ".tmp"
                 unless defined $_;
         }
         chmod 0777, < @_;
-        for (< @_) { 1 while unlink $_ } ;
+        for ( @_) { 1 while unlink $_ } ;
         bless \@( < @_ ), $self ;
     }
 
@@ -48,7 +48,7 @@ sub like_eval
     {
         my $self = shift ;
         chmod 0777, < @{ $self } ;
-        for (< @$self) { 1 while unlink $_ } ;
+        for ( @$self) { 1 while unlink $_ } ;
     }
 
 }
@@ -60,14 +60,14 @@ sub like_eval
     sub new
     {
         my $self = shift ;
-        foreach (< @_) { rmtree $_ }
+        foreach ( @_) { rmtree $_ }
         bless \@( < @_ ), $self ;
     }
 
     sub DESTROY
     {
         my $self = shift ;
-        foreach (< @$self) { rmtree $_ }
+        foreach ( @$self) { rmtree $_ }
     }
 }
 sub readFile
@@ -92,12 +92,12 @@ sub readFile
         close F ;
     }
 
-    return join "", < @strings ;
+    return join "", @( < @strings) ;
 }
 
 sub touch
 {
-    foreach (< @_) { writeFile($_, '') }
+    foreach ( @_) { writeFile($_, '') }
 }
 
 sub writeFile
@@ -107,7 +107,7 @@ sub writeFile
     open (F, ">", "$filename") 
         or croak "Cannot open $filename: $!\n" ;
     binmode F;
-    foreach (< @strings) {
+    foreach ( @strings) {
         no warnings ;
         print F $_ ;
     }
@@ -157,7 +157,7 @@ sub hexDump
         $offset += 16;
 
         my @array = @( unpack('C*', $data) );
-        foreach (< @array) {
+        foreach ( @array) {
             printf('%2.2x ', $_);
         }
         print "   " x (16 - nelems @array)
@@ -298,9 +298,9 @@ my %TopFuncMap = %(  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip'
                     'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp',
                  );
 
-   %TopFuncMap = %( map { ($_              => %TopFuncMap{$_}, 
+   %TopFuncMap = %( < map { ($_              => %TopFuncMap{$_}, 
                         %TopFuncMap{$_} => %TopFuncMap{$_}) } 
-                 keys %TopFuncMap ) ;
+ @( <                 keys %TopFuncMap) ) ;
 
  #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) } 
                  #keys %TopFuncMap ;
@@ -324,7 +324,7 @@ my %inverse  = %( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gu
                  'IO::Compress::DummyComp'               => 'IO::Uncompress::DummyUncomp',
              );
 
-%inverse  = %( map { ($_ => %inverse{$_}, %inverse{$_} => $_) } keys %inverse );
+%inverse  = %( < map { ($_ => %inverse{$_}, %inverse{$_} => $_) } @( < keys %inverse) );
 
 sub getInverse
 {
@@ -583,7 +583,7 @@ sub dumpObj
 
     if ((nelems @_))
     {
-        print "#\n# dumpOBJ from $file line $line {join ' ', <@_}\n" ;
+        print "#\n# dumpOBJ from $file line $line {join ' ', @( <@_)}\n" ;
     }
     else
     {
@@ -591,12 +591,12 @@ sub dumpObj
     }
 
     my $max = 0 ;;
-    foreach my $k (keys %{ *$obj })
+    foreach my $k (@( <keys %{ *$obj }))
     {
         $max = length $k if length $k +> $max ;
     }
 
-    foreach my $k (sort keys %{ *$obj })
+    foreach my $k (@( <sort @( < keys %{ *$obj })))
     {
         my $v = $obj->{$k} ;
         $v = '-undef-' unless defined $v;

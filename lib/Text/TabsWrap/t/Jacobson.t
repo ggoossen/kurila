@@ -2,7 +2,7 @@
 
 # From: Dan Jacobson <jidanni at jidanni dot org>
 
-use Text::Wrap qw(wrap $columns $huge $break);
+use Text::Wrap < qw(wrap $columns $huge $break);
 
 print "1..1\n";
 

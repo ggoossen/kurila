@@ -33,10 +33,10 @@ SKIP: {
 `$Invoke_Perl -e 1`;  # Avoid system() from a pipe from harness.  Mutter.
 is($?,0,"simple Perl invokation: POSIX success status");
 {
-  use vmsish qw(status);
+  use vmsish < qw(status);
   is(($? ^&^ 1),1, "importing vmsish [vmsish status]");
   {
-    no vmsish qw(status); # check unimport function
+    no vmsish < qw(status); # check unimport function
     is($?,0, "unimport vmsish [POSIX STATUS]");
   }
   # and lexical scoping
@@ -45,13 +45,13 @@ is($?,0,"simple Perl invokation: POSIX success status");
 is($?,0,"outer lex scope of vmsish [POSIX status]");
 
 {
-  use vmsish qw(exit);  # check import function
+  use vmsish < qw(exit);  # check import function
   is($?,0,"importing vmsish exit [POSIX status]");
 }
 
 #========== vmsish exit, messages ==========
 {
-  use vmsish qw(status);
+  use vmsish < qw(status);
 
   my $msg = do_a_perl('-e "exit 1"');
     $msg =~ s/\n/\\n/g; # keep output on one line
@@ -132,7 +132,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
      use_ok('vmsish qw(time)');
 
      # but that didn't get it in our current scope
-     use vmsish qw(time);
+     use vmsish < qw(time);
 
      $vmstime   = time;
      @vmslocal  = @( localtime($vmstime) );
@@ -157,14 +157,14 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
   my $vmsval = @vmslocal[5] * 31536000 + @vmslocal[7] * 86400 +
             @vmslocal[2] * 3600     + @vmslocal[1] * 60 + @vmslocal[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(localtime) UTC: $utcval  VMS: $vmsval");
-  print "# UTC: {join ' ', <@utclocal}\n# VMS: {join ' ', <@vmslocal}\n";
+  print "# UTC: {join ' ', @( <@utclocal)}\n# VMS: {join ' ', @( <@vmslocal)}\n";
 
   $utcval = @utcgmtime[5] * 31536000 + @utcgmtime[7] * 86400 +
             @utcgmtime[2] * 3600     + @utcgmtime[1] * 60 + @utcgmtime[0];
   $vmsval = @vmsgmtime[5] * 31536000 + @vmsgmtime[7] * 86400 +
             @vmsgmtime[2] * 3600     + @vmsgmtime[1] * 60 + @vmsgmtime[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(gmtime) UTC: $utcval  VMS: $vmsval");
-  print "# UTC: {join ' ', <@utcgmtime}\n# VMS: {join ' ', <@vmsgmtime}\n";
+  print "# UTC: {join ' ', @( <@utcgmtime)}\n# VMS: {join ' ', @( <@vmsgmtime)}\n";
 
   ok(abs($utcmtime - $vmsmtime + $offset) +<= 10,"(stat) UTC: $utcmtime  VMS: $vmsmtime");
 }
@@ -177,7 +177,7 @@ sub do_a_perl {
     open(P, ">",'vmsish_test.com') || die('not ok ?? : unable to open "vmsish_test.com" for writing');
     print P "\$ set message/facil/sever/ident/text\n";
     print P "\$ define/nolog/user sys\$error _nla0:\n";
-    print P "\$ $Invoke_Perl {join ' ', <@_}\n";
+    print P "\$ $Invoke_Perl {join ' ', @( <@_)}\n";
     close P;
     my $x = `\@vmsish_test.com`;
     unlink 'vmsish_test.com';

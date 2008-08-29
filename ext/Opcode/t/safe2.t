@@ -14,9 +14,9 @@ exit;
 # Tests Todo:
 #	'main' as root
 
-use vars qw($bar);
+use vars < qw($bar);
 
-use Opcode v1.00 qw(opdesc opset opset_to_ops opset_to_hex
+use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
 	opmask_add full_opset empty_opset opcodes opmask define_optag);
 
 use Safe v1.00;
@@ -38,7 +38,7 @@ $cpt = Safe->new() or die;
 
 $cpt = Safe->new( "My::Root");
 
-$cpt->permit(qw(:base_io));
+$cpt->permit( <qw(:base_io));
 
 $cpt->reval(q{ system("echo not ok 1"); });
 if ($@ && $@->{description} =~ m/^'?system'? trapped by operation mask/) {
@@ -61,11 +61,11 @@ print $@ ? "not ok 7\n#{$@->message}" : "ok 7\n";
 our $foo = "ok 8\n";
 our %bar = %(key => "ok 9\n");
 our @baz = @( () ); push(@baz, "o", "10"); $" = 'k ';
-our @glob = @( qw(not ok 16) );
+our @glob = @( < qw(not ok 16) );
 
-sub sayok { print "ok {join ' ', <@_}\n" }
+sub sayok { print "ok {join ' ', @( <@_)}\n" }
 
-$cpt->share(qw($foo %bar @baz sayok));
+$cpt->share( <qw($foo %bar @baz sayok));
 $cpt->share('$"') unless %Config{use5005threads};
 
 $cpt->reval(q{
@@ -84,16 +84,16 @@ $cpt->reval(q{
 });
 print $@ ? "not ok 13\n#{$@->message}" : "ok 13\n";
 $" = ' ';
-print $foo, %bar{new}, "{join ' ', <@glob}\n";
+print $foo, %bar{new}, "{join ' ', @( <@glob)}\n";
 
 $Root::foo = "not ok 17";
-@{$cpt->varglob('bar')} = @( qw(not ok 18) );
+@{$cpt->varglob('bar')} = @( < qw(not ok 18) );
 ${$cpt->varglob('foo')} = "ok 17";
 @Root::bar = @( "ok" );
 push(@Root::bar, "18"); # Two steps to prevent "Identifier used only once..."
 
 print "$Root::foo\n";
-print "{join ' ', <@{$cpt->varglob('bar')}}\n";
+print "{join ' ', @( <@{$cpt->varglob('bar')})}\n";
 
 use strict;
 

@@ -21,9 +21,9 @@ sub hash
     is(%hash{2},@val[2],"Value correct");
     %hash{1} = @val[1];
     is(nkeys %hash,3,"Size correct");
-    my @keys = @( keys %hash );
-    is(join(',',sort < @keys),'0,1,2',"Keys correct");
-    my @hval = @( %hash{[0,1,2]} );
+    my @keys = @( < keys %hash );
+    is(join(',', @( <sort @( < @keys))),'0,1,2',"Keys correct");
+    my @hval = @( < %hash{[@(0,1,2)]} );
     is_deeply(\@hval,\@val,"Values correct");
     my $val = delete %hash{1};
     is($val,@val[1],"Delete value correct");

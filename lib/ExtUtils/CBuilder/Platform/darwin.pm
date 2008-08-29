@@ -3,9 +3,9 @@ package ExtUtils::CBuilder::Platform::darwin;
 use strict;
 use ExtUtils::CBuilder::Platform::Unix;
 
-use vars qw($VERSION @ISA);
+use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( qw(ExtUtils::CBuilder::Platform::Unix) );
+@ISA = @( < qw(ExtUtils::CBuilder::Platform::Unix) );
 
 sub compile {
   my $self = shift;

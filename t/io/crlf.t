@@ -31,7 +31,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	if %ENV{PERL_CORE_MINITEST};
 	skip("no PerlIO::scalar") unless %Config{extensions} =~ m!\bPerlIO/scalar\b!;
 	require PerlIO::scalar;
-	my $fcontents = join "", map {"$_\015\012"} "a".."zzz";
+	my $fcontents = join "", @( < map {"$_\015\012"} @( < "a".."zzz"));
 	open my $fh, "<:crlf", \$fcontents;
 	local $/ = "xxx";
 	local $_ = ~< $fh;
@@ -50,7 +50,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     # Try also pushing :utf8 first so that there are other layers
     # in between (this should not matter: CRLF layers still should
     # not accumulate).
-    for my $utf8 ('', ':utf8') {
+    for my $utf8 (@('', ':utf8')) {
 	for my $binmode (1..2) {
 	    open(FOO, ">", "$file");
 	    # require PerlIO; print PerlIO::get_layers(FOO), "\n";
@@ -62,7 +62,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	    binmode(FOO);
 	    my $foo = scalar ~< *FOO;
 	    close FOO;
-	    print join(" ", "#", map { sprintf('%02x', $_) } unpack("C*", $foo)),
+	    print join(" ", @( "#", < map { sprintf('%02x', $_) } @( unpack("C*", $foo)))),
 	    "\n";
 	    ok($foo =~ m/\x0d\x0a$/);
 	    ok($foo !~ m/\x0d\x0d/);

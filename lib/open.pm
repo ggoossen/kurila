@@ -50,7 +50,7 @@ sub import {
     my ($class,< @args) = < @_;
     die("open: needs explicit list of PerlIO layers") unless (nelems @args);
     my $std;
-    my ($in,$out) = split(m/\0/,($^OPEN || "\0"), -1);
+    my ($in,$out) = < split(m/\0/,($^OPEN || "\0"), -1);
     while ((nelems @args)) {
 	my $type = shift(@args);
 	my $dscp;
@@ -64,7 +64,7 @@ sub import {
 	    $dscp = shift(@args) || '';
 	}
 	my @val;
-	foreach my $layer (split(m/\s+/,$dscp)) {
+	foreach my $layer (@( <split(m/\s+/,$dscp))) {
             $layer =~ s/^://;
             my $target = $layer;		# the layer name itself
             $target =~ s/^(\w+)\(.+\)$/$1/;	# strip parameters
@@ -79,22 +79,22 @@ sub import {
 	}
 	if ($type eq 'IN') {
 	    _drop_oldenc(\*STDIN, < @val);
-	    $in  = join(' ', < @val);
+	    $in  = join(' ', @( < @val));
 	}
 	elsif ($type eq 'OUT') {
 	    _drop_oldenc(\*STDOUT, < @val);
-	    $out = join(' ', < @val);
+	    $out = join(' ', @( < @val));
 	}
 	elsif ($type eq 'IO') {
 	    _drop_oldenc(\*STDIN,  < @val);
 	    _drop_oldenc(\*STDOUT, < @val);
-	    $in = $out = join(' ', < @val);
+	    $in = $out = join(' ', @( < @val));
 	}
 	else {
 	    die "Unknown PerlIO layer class '$type'";
 	}
     }
-    $^OPEN = join("\0", $in, $out);
+    $^OPEN = join("\0", @( $in, $out));
     if ($std) {
 	if ($in) {
 	    if ($in =~ m/:utf8\b/) {

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use Test;
-use File::Spec::Functions qw/:ALL/;
+use File::Spec::Functions < qw/:ALL/;
 plan tests => 2;
 
 ok catfile('a','b','c'), File::Spec->catfile('a','b','c');

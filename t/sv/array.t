@@ -24,42 +24,42 @@ my (@ary, @foo, @bar, $tmp, $r, $foo, %foo, $F1, $F2, $Etc, %bar, $cnt);
 
 # __END__
 @ary = @(1,2,3,4,5);
-is(join('',< @ary), '12345');
+is(join('', @(< @ary)), '12345');
 
 $tmp = @ary[(nelems @ary)-1]; pop @ary;
 is($tmp, 5);
 is((nelems @ary)-1, 3);
-is(join('',< @ary), '1234');
+is(join('', @(< @ary)), '1234');
 
 @foo = @( () );
-$r = join(',', (nelems @foo)-1, < @foo);
+$r = join(',', @( (nelems @foo)-1, < @foo));
 is($r, "-1");
 @foo[0] = '0';
-$r = join(',', (nelems @foo)-1, < @foo);
+$r = join(',', @( (nelems @foo)-1, < @foo));
 is($r, "0,0");
 @foo[2] = '2';
-$r = join(',', (nelems @foo)-1, < @foo);
+$r = join(',', @( (nelems @foo)-1, < @foo));
 is($r, "2,0,,2");
 @bar = @( () );
 @bar[0] = '0';
 @bar[1] = '1';
-$r = join(',', (nelems @bar)-1, < @bar);
+$r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "1,0,1");
 @bar = @( () );
-$r = join(',', (nelems @bar)-1, < @bar);
+$r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "-1");
 @bar[0] = '0';
-$r = join(',', (nelems @bar)-1, < @bar);
+$r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "0,0");
 @bar[2] = '2';
-$r = join(',', (nelems @bar)-1, < @bar);
+$r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "2,0,,2");
 @bar = @( () );
 @bar[0] = '0';
-$r = join(',', (nelems @bar)-1, < @bar);
+$r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "0,0");
 @bar[2] = '2';
-$r = join(',', (nelems @bar)-1, < @bar);
+$r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "2,0,,2");
 
 $foo = 'now is the time';
@@ -80,28 +80,28 @@ is(%bar{'foo'}, undef);
 (< %bar ) = (< %foo,'how','now');
 is(%bar{'foo'}, 'bar');
 is(%bar{'how'}, 'now');
-%bar{[keys %foo]} = values %foo;
+ <%bar{[@( <keys %foo)]} = < values %foo;
 is(%bar{'foo'}, 'bar');
 is(%bar{'how'}, 'now');
 
-@foo = @( grep(m/e/,split(' ','now is the time for all good men to come to')) );
-is(join(' ',< @foo), 'the time men come');
+@foo = @( < grep(m/e/, @( <split(' ','now is the time for all good men to come to'))) );
+is(join(' ', @(< @foo)), 'the time men come');
 
-@foo = @( grep(!m/e/,split(' ','now is the time for all good men to come to')) );
-is(join(' ',< @foo), 'now is for all good to to');
+@foo = @( < grep(!m/e/, @( <split(' ','now is the time for all good men to come to'))) );
+is(join(' ', @(< @foo)), 'now is for all good to to');
 
-$foo = join('',('a','b','c','d','e','f')[[0..5]]);
+$foo = join('', @(('a','b','c','d','e','f')[[ <0..5]]));
 is($foo, 'abcdef');
 
-$foo = join('',('a','b','c','d','e','f')[[0..1]]);
+$foo = join('', @(('a','b','c','d','e','f')[[ <0..1]]));
 is($foo, 'ab');
 
-$foo = join('',('a','b','c','d','e','f')[[6]]);
+$foo = join('', @(('a','b','c','d','e','f')[[6]]));
 is($foo, '');
 
 @foo = @( ('a','b','c','d','e','f')[[0,2,4]] );
 @bar = @( ('a','b','c','d','e','f')[[1,3,5]] );
-$foo = join('',(< @foo,< @bar)[[0..5]]);
+$foo = join('', @((< @foo,< @bar)[[ <0..5]]));
 is($foo, 'acebdf');
 
 $foo = ('a','b','c','d','e','f')[[0,2,4]];
@@ -117,20 +117,20 @@ is($foo, 'b');
 #curr_test(38);
 
 @foo = @( < @foo );
-is((join ' ', < @foo), "foo bar burbl blah");				# 38
+is((join ' ', @( < @foo)), "foo bar burbl blah");				# 38
 
 (undef,<@foo) = < @foo;
-is((join ' ', < @foo), "bar burbl blah");					# 39
+is((join ' ', @( < @foo)), "bar burbl blah");					# 39
 
 @foo = @('XXX',< @foo, 'YYY');
-is((join ' ', < @foo), "XXX bar burbl blah YYY");				# 40
+is((join ' ', @( < @foo)), "XXX bar burbl blah YYY");				# 40
 
-@foo = @( < ( @foo = @( qw(foo b\a\r bu\\rbl blah) ) ) );
-is((join ' ', < @foo), 'foo b\a\r bu\\rbl blah');				# 41
+@foo = @( < ( @foo = @( < qw(foo b\a\r bu\\rbl blah) ) ) );
+is((join ' ', @( < @foo)), 'foo b\a\r bu\\rbl blah');				# 41
 
-@bar = @( < ( @foo = @( qw(foo bar) ) ) );					# 42
-is((join ' ', < @foo), "foo bar");
-is((join ' ', < @bar), "foo bar");						# 43
+@bar = @( < ( @foo = @( < qw(foo bar) ) ) );					# 42
+is((join ' ', @( < @foo)), "foo bar");
+is((join ' ', @( < @bar)), "foo bar");						# 43
 
 # try the same with local
 # XXX tie-stdarray fails the tests involving local, so we use
@@ -141,10 +141,10 @@ our @bim;
 {
 
     local @bee = @( < @bee );
-    is((join ' ', < @bee), "foo bar burbl blah");				# 44
+    is((join ' ', @( < @bee)), "foo bar burbl blah");				# 44
     {
         local @bee = @('XXX',< @bee,'YYY');
-        is((join ' ', < @bee), "XXX foo bar burbl blah YYY");		# 46
+        is((join ' ', @( < @bee)), "XXX foo bar burbl blah YYY");		# 46
         {
 #             local @bee = local(@bee) = @(qw(foo bar burbl blah));
 #             is((join ' ', < @bee), "foo bar burbl blah");		# 47
@@ -155,55 +155,55 @@ our @bim;
 #             }
 #             is((join ' ', < @bee), "foo bar burbl blah");		# 50
         }
-        is((join ' ', < @bee), "XXX foo bar burbl blah YYY");		# 51
+        is((join ' ', @( < @bee)), "XXX foo bar burbl blah YYY");		# 51
     }
-    is((join ' ', < @bee), "foo bar burbl blah");				# 53
+    is((join ' ', @( < @bee)), "foo bar burbl blah");				# 53
 }
 
 # try the same with my
 {
     my @bee = @( < @bee );
-    is((join ' ', <@bee), "foo bar burbl blah");				# 54
+    is((join ' ', @( <@bee)), "foo bar burbl blah");				# 54
     {
 	my (undef,<@bee) = < @bee;
-	is((join ' ', <@bee), "bar burbl blah");				# 55
+	is((join ' ', @( <@bee)), "bar burbl blah");				# 55
 	{
 	    my @bee = @('XXX',< @bee,'YYY');
-	    is((join ' ', <@bee), "XXX bar burbl blah YYY");		# 56
+	    is((join ' ', @( <@bee)), "XXX bar burbl blah YYY");		# 56
 	    {
-		my @bee = @( my @bee = @( qw(foo bar burbl blah) ) );
-		is((join ' ', <@bee), "foo bar burbl blah");		# 57
+		my @bee = @( my @bee = @( < qw(foo bar burbl blah) ) );
+		is((join ' ', @( <@bee)), "foo bar burbl blah");		# 57
 		{
-		    my (@bim) = my(@bee) = @( qw(foo bar) );
-		    is((join ' ', <@bee), "foo bar");			# 58
-		    is((join ' ', <@bim), "foo bar");			# 59
+		    my (@bim) = my(@bee) = @( < qw(foo bar) );
+		    is((join ' ', @( <@bee)), "foo bar");			# 58
+		    is((join ' ', @( <@bim)), "foo bar");			# 59
 		}
-		is((join ' ', <@bee), "foo bar burbl blah");		# 60
+		is((join ' ', @( <@bee)), "foo bar burbl blah");		# 60
 	    }
-	    is((join ' ', <@bee), "XXX bar burbl blah YYY");		# 61
+	    is((join ' ', @( <@bee)), "XXX bar burbl blah YYY");		# 61
 	}
-	is((join ' ', <@bee), "bar burbl blah");				# 62
+	is((join ' ', @( <@bee)), "bar burbl blah");				# 62
     }
-    is((join ' ', <@bee), "foo bar burbl blah");				# 63
+    is((join ' ', @( <@bee)), "foo bar burbl blah");				# 63
 }
 
 # try the same with our (except that previous values aren't restored)
 {
     our @bee = @( < @bee );
-    is((join ' ', <@bee), "foo bar burbl blah");
+    is((join ' ', @( <@bee)), "foo bar burbl blah");
     {
 	our (undef,<@bee) = < @bee;
-	is((join ' ', <@bee), "bar burbl blah");
+	is((join ' ', @( <@bee)), "bar burbl blah");
 	{
 	    our @bee = @('XXX',< @bee,'YYY');
-	    is((join ' ', <@bee), "XXX bar burbl blah YYY");
+	    is((join ' ', @( <@bee)), "XXX bar burbl blah YYY");
 	    {
-		our @bee = our @bee = @( qw(foo bar burbl blah) );
-		is((join ' ', <@bee), "foo bar burbl blah");
+		our @bee = our @bee = @( < qw(foo bar burbl blah) );
+		is((join ' ', @( <@bee)), "foo bar burbl blah");
 		{
-		    our (@bim) = our(@bee) = @( qw(foo bar) );
-		    is((join ' ', <@bee), "foo bar");
-		    is((join ' ', <@bim), "foo bar");
+		    our (@bim) = our(@bee) = @( < qw(foo bar) );
+		    is((join ' ', @( <@bee)), "foo bar");
+		    is((join ' ', @( <@bim)), "foo bar");
 		}
 	    }
 	}
@@ -212,7 +212,7 @@ our @bim;
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify { @_[1] = $t++; print( (join ' ', <@_), "\n"); }
+sub reify { @_[1] = $t++; print( (join ' ', @( <@_)), "\n"); }
 reify('ok');
 reify('ok');
 
@@ -229,7 +229,7 @@ is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
 sub foo { "a" }
-my @foo= @( @(foo())[[0,0]] );
+my @foo= @( < @(foo())[[@(0,0)]] );
 is (@foo[1], "a");
 
 # bugid #15439 - clearing an array calls destructors which may try
@@ -255,7 +255,7 @@ my $got = runperl (
 
 
 {
-    my @a = @( 0..4 );
+    my @a = @( < 0..4 );
     is(@a[-1], 4);
     is(@a[-2], 3);
     is(@a[-5], 0);
@@ -277,11 +277,11 @@ my $got = runperl (
 
 {
     # Bug #36211
-    for (1,2) {
+    for (@(1,2)) {
 	{
 	    local our @a;
 	    is (nelems @a, 0);
-	    @a=@(1..4)
+	    @a=@( <1..4)
 	}
     }
 }
@@ -289,12 +289,12 @@ my $got = runperl (
 # more tests for AASSIGN_COMMON
 
 {
-    our($x,$y,$z) = (1..3);
+    our($x,$y,$z) = ( <1..3);
     our($y,$z) = ($x,$y);
     is("$x $y $z", "1 1 2");
 }
 {
-    our($x,$y,$z) = (1..3);
+    our($x,$y,$z) = ( <1..3);
     (our $y, our $z) = ($x,$y);
     is("$x $y $z", "1 1 2");
 }

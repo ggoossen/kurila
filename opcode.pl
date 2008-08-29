@@ -22,7 +22,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my ($key, $desc, $check, $flags, $args) = split(m/\t+/, $_, 5);
+    my ($key, $desc, $check, $flags, $args) = < split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
     warn qq[Description "$desc" duplicates %seen{$desc}\n] if %seen{$desc};
@@ -45,54 +45,54 @@ my %alias;
 
 # Format is "this function" => "does these op names"
 my @raw_alias = @(
-		 Perl_do_kv => \@(qw( keys values )),
-		 Perl_unimplemented_op => \@(qw(padany mapstart custom)),
+		 Perl_do_kv => \@( <qw( keys values )),
+		 Perl_unimplemented_op => \@( <qw(padany mapstart custom)),
 		 # All the ops with a body of { return NORMAL; }
-		 Perl_pp_null => \@(qw(scalar regcmaybe lineseq scope)),
+		 Perl_pp_null => \@( <qw(scalar regcmaybe lineseq scope)),
 
 		 Perl_pp_goto => \@('dump'),
 		 Perl_pp_require => \@('dofile'),
-		 Perl_pp_sysread => \@(qw(read recv)),
+		 Perl_pp_sysread => \@( <qw(read recv)),
 		 Perl_pp_sysseek => \@('seek'),
 		 Perl_pp_ioctl => \@('fcntl'),
 		 Perl_pp_ssockopt => \@('gsockopt'),
 		 Perl_pp_getpeername => \@('getsockname'),
 		 Perl_pp_stat => \@('lstat'),
-		 Perl_pp_ftrowned => \@(qw(fteowned ftzero ftsock ftchr ftblk
+		 Perl_pp_ftrowned => \@( <qw(fteowned ftzero ftsock ftchr ftblk
 					 ftfile ftdir ftpipe ftsuid ftsgid
  					 ftsvtx)),
 		 Perl_pp_fttext => \@('ftbinary'),
 		 Perl_pp_gmtime => \@('localtime'),
-		 Perl_pp_semget => \@(qw(shmget msgget)),
-		 Perl_pp_semctl => \@(qw(shmctl msgctl)),
-		 Perl_pp_ghostent => \@(qw(ghbyname ghbyaddr)),
-		 Perl_pp_gnetent => \@(qw(gnbyname gnbyaddr)),
-		 Perl_pp_gprotoent => \@(qw(gpbyname gpbynumber)),
-		 Perl_pp_gservent => \@(qw(gsbyname gsbyport)),
-		 Perl_pp_gpwent => \@(qw(gpwnam gpwuid)),
-		 Perl_pp_ggrent => \@(qw(ggrnam ggrgid)),
-		 Perl_pp_ftis => \@(qw(ftsize ftmtime ftatime ftctime)),
-		 Perl_pp_chown => \@(qw(unlink chmod utime kill)),
+		 Perl_pp_semget => \@( <qw(shmget msgget)),
+		 Perl_pp_semctl => \@( <qw(shmctl msgctl)),
+		 Perl_pp_ghostent => \@( <qw(ghbyname ghbyaddr)),
+		 Perl_pp_gnetent => \@( <qw(gnbyname gnbyaddr)),
+		 Perl_pp_gprotoent => \@( <qw(gpbyname gpbynumber)),
+		 Perl_pp_gservent => \@( <qw(gsbyname gsbyport)),
+		 Perl_pp_gpwent => \@( <qw(gpwnam gpwuid)),
+		 Perl_pp_ggrent => \@( <qw(ggrnam ggrgid)),
+		 Perl_pp_ftis => \@( <qw(ftsize ftmtime ftatime ftctime)),
+		 Perl_pp_chown => \@( <qw(unlink chmod utime kill)),
 		 Perl_pp_link => \@('symlink'),
-		 Perl_pp_ftrread => \@(qw(ftrwrite ftrexec fteread ftewrite
+		 Perl_pp_ftrread => \@( <qw(ftrwrite ftrexec fteread ftewrite
  					fteexec)),
-		 Perl_pp_shmwrite => \@(qw(shmread msgsnd msgrcv semop)),
+		 Perl_pp_shmwrite => \@( <qw(shmread msgsnd msgrcv semop)),
 		 Perl_pp_send => \@('syswrite'),
-		 Perl_pp_defined => \@(qw(dor dorassign)),
+		 Perl_pp_defined => \@( <qw(dor dorassign)),
                  Perl_pp_and => \@('andassign'),
 		 Perl_pp_or => \@('orassign'),
 		 Perl_pp_ucfirst => \@('lcfirst'),
-		 Perl_pp_sle => \@(qw(slt sgt sge)),
+		 Perl_pp_sle => \@( <qw(slt sgt sge)),
 		 Perl_pp_index => \@('rindex'),
 		 Perl_pp_oct => \@('hex'),
 		 Perl_pp_shift => \@('pop'),
-		 Perl_pp_sin => \@(qw(cos exp log sqrt)),
+		 Perl_pp_sin => \@( <qw(cos exp log sqrt)),
 		 Perl_pp_bit_or => \@('bit_xor'),
 		 Perl_pp_rv2sv => \@('rv2av rv2hv'),
 		);
 
 while (my ($func, $names) = splice @raw_alias, 0, 2) {
-    %alias{$_} = $func for < @$names;
+    %alias{$_} = $func for  @$names;
 }
 
 # Emit defines.
@@ -145,7 +145,7 @@ typedef enum opcode \{
 END
 
 my $i = 0;
-for (< @ops) {
+for ( @ops) {
     # print $on "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
       print $on "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n";
 }
@@ -171,7 +171,7 @@ EXTCONST char* const PL_op_name[];
 EXTCONST char* const PL_op_name[] = \{
 END
 
-for (< @ops) {
+for ( @ops) {
     print qq(\t"$_",\n);
 }
 
@@ -189,7 +189,7 @@ EXTCONST char* const PL_op_desc[];
 EXTCONST char* const PL_op_desc[] = \{
 END
 
-for (< @ops) {
+for ( @ops) {
     my($safe_desc) = %desc{$_};
 
     # Have to escape double quotes and escape characters.
@@ -239,7 +239,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 = \{
 END
 
-for (< @ops) {
+for ( @ops) {
     if (my $name = %alias{$_}) {
 	print "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
     }
@@ -274,7 +274,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 = \{
 END
 
-for (< @ops) {
+for ( @ops) {
     print "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{$_}),"), "\t/* $_ */\n";
 }
 
@@ -344,10 +344,10 @@ my %OP_IS_FT_ACCESS;
 my $OCSHIFT = 9;
 my $OASHIFT = 13;
 
-for my $op (< @ops) {
+for my $op ( @ops) {
     my $argsum = 0;
     my $flags = %flags{$op};
-    for my $flag (keys %opflags) {
+    for my $flag (@( <keys %opflags)) {
 	if ($flags =~ s/$flag//) {
 	    die "Flag collision for '$op' (%flags{$op}, $flag)"
 		if $argsum ^&^ %opflags{$flag};
@@ -358,7 +358,7 @@ for my $op (< @ops) {
 	unless exists %opclass{$flags};
     $argsum ^|^= %opclass{$flags} << $OCSHIFT;
     my $argshift = $OASHIFT;
-    for my $arg (split(' ',%args{$op})) {
+    for my $arg (@( <split(' ',%args{$op}))) {
 	if ($arg =~ m/^F/) {
 	    # record opnums of these opnames
 	    %OP_IS_SOCKET{$op}   = %opnum{$op} if $arg =~ s/s//;
@@ -408,9 +408,9 @@ sub gen_op_is_macro {
     if (%$op_is) {
 	
 	# get opnames whose numbers are lowest and highest
-	my ($first, < @rest) = sort {
+	my ($first, < @rest) = < sort {
 	    $op_is->{$a} <+> $op_is->{$b}
-	} keys %$op_is;
+	} @( < keys %$op_is);
 	
 	my $last = pop @rest;	# @rest slurped, get its last
 	die "Invalid range of ops: $first .. $last\n" unless $last;
@@ -426,8 +426,8 @@ sub gen_op_is_macro {
 	    print $on ")\n\n";
 	}
 	else {
-	    print $on join(" || \\\n\t ",
-			  map { "(op) == OP_" . uc() } sort keys %$op_is);
+	    print $on join(" || \\\n\t ", @(
+			  < map { "(op) == OP_" . uc() } @( < sort @( < keys %$op_is))));
 	    print $on ")\n\n";
 	}
     }
@@ -468,7 +468,7 @@ print $ppsym <<"END";
 END
 
 
-for (sort keys %ckname) {
+for (@( <sort @( < keys %ckname))) {
     print $pp "PERL_CKDEF(Perl_$_)\n";
     print $ppsym "Perl_$_\n";
 #OP *\t", &tab(3,$_),"(OP* o);\n";
@@ -476,7 +476,7 @@ for (sort keys %ckname) {
 
 print $pp "\n\n";
 
-for (< @ops) {
+for ( @ops) {
     next if m/^i_(pre|post)(inc|dec)$/;
     next if m/^custom$/;
     print $pp "PERL_PPDEF(Perl_pp_$_)\n";
@@ -492,7 +492,7 @@ rename_if_different $pp_proto_new, 'pp_proto.h';
 rename_if_different $pp_sym_new, 'pp.sym';
 
 END {
-  foreach ('opcode.h', 'opnames.h', 'pp_proto.h', 'pp.sym') {
+  foreach (@('opcode.h', 'opnames.h', 'pp_proto.h', 'pp.sym')) {
     1 while unlink "$_-old";
   }
 }

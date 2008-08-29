@@ -130,7 +130,7 @@ if ($^O eq 'VMS') {
   if ($bar eq "z\n") {print "ok 15\n";} else {print "not ok 15\n";}
 
   close TESTFILE;
-  1 while unlink qw(foo.bar foo.com foo.fdl);
+  1 while unlink < qw(foo.bar foo.com foo.fdl);
 } else {
   # Nobody else does this at the moment (well, maybe OS/390, but they can
   # put their own tests in) so we just punt

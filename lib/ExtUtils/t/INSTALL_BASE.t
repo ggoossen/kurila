@@ -62,7 +62,7 @@ my @installed_files =
    "../dummy-install/lib/perl5/%Config{archname}/auto/Big/Dummy/.packlist"
   );
 
-foreach my $file (< @installed_files) {
+foreach my $file ( @installed_files) {
     ok( -e $file, "  $file installed" );
     ok( -r $file, "  $file readable" );
 }

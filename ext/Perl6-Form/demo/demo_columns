@@ -1,7 +1,7 @@
 use Perl6::Form;
 
 my @files = @( ~< *DATA );
-my $files = join "", < @files;
+my $files = join "", @( < @files);
 
 print "Number of cols: ";
 my $colcount = ~< *ARGV;

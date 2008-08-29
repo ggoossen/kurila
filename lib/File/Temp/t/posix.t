@@ -5,7 +5,7 @@ use strict;
 use Test;
 BEGIN { plan tests => 6}
 
-use File::Temp qw/ :POSIX unlink0 /;
+use File::Temp < qw/ :POSIX unlink0 /;
 use FileHandle;
 ok(1);
 

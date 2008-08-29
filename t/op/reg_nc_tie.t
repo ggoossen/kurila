@@ -44,8 +44,8 @@ ok(exists %+{e}, "EXISTS");
 ok(!exists %+{d}, "EXISTS");
 
 # FIRSTKEY/NEXTKEY
-is(join('|', sort keys %+), "a|b|e", "FIRSTKEY/NEXTKEY");
+is(join('|', @( < sort @( < keys %+))), "a|b|e", "FIRSTKEY/NEXTKEY");
 
 # SCALAR
-is(nelems(@(keys %+)), 3, "SCALAR");
-is(nelems(@(keys %-)), 3, "SCALAR");
+is(nelems(@( <keys %+)), 3, "SCALAR");
+is(nelems(@( <keys %-)), 3, "SCALAR");

@@ -134,7 +134,7 @@ err_ok( <<ERR );
 ERR
 
 #line 52
-can_ok('Mooble::Hooble::Yooble', qw(this that));
+can_ok('Mooble::Hooble::Yooble', < qw(this that));
 can_ok('Mooble::Hooble::Yooble', ());
 can_ok(undef, undef);
 can_ok(\@(), "foo");

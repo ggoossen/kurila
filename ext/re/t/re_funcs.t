@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use Test::More; # test count at bottom of file
-use re qw(regmust);
+use re < qw(regmust);
 {
     my $qr=qr/here .* there/x;
     my ($anchored,$floating)= < regmust($qr);

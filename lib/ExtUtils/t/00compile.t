@@ -12,15 +12,15 @@ BEGIN {
 chdir File::Spec->updir;
 my $manifest = File::Spec->catfile('MANIFEST');
 open(MANIFEST, "<", $manifest) or die "Can't open $manifest: $!";
-my @modules = @( map { m{^lib/(\S+)}; $1 } 
-              grep { m{^lib/ExtUtils/\S*\.pm} } 
-              grep { !m{/t/} } ~< *MANIFEST );
+my @modules = @( < map { m{^lib/(\S+)}; $1 } 
+ @(              < grep { m{^lib/ExtUtils/\S*\.pm} } 
+ @(              < grep { !m{/t/} } @( ~< *MANIFEST))) );
 chomp @modules;
 close MANIFEST;
 
 chdir 'lib';
 plan tests => scalar (nelems @modules) * 2;
-foreach my $file (< @modules) {
+foreach my $file ( @modules) {
     # Make sure we look at the local files and do not reload them if
     # they're already loaded.  This avoids recompilation warnings.
     local @INC = @( < @INC );

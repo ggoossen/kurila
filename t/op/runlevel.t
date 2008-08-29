@@ -9,16 +9,16 @@
 require './test.pl';
 
 undef $/;
-our @prgs = @( split "\n########\n", ~< *DATA );
+our @prgs = @( < split "\n########\n", ~< *DATA );
 
 plan(tests => nelems @prgs);
 
-for (< @prgs){
+for ( @prgs){
     my $switch = "";
     if (s/^\s*(-\w+)//){
        $switch = $1;
     }
-    my($prog,$expected) = split(m/\nEXPECT\n/, $_);
+    my($prog,$expected) = < split(m/\nEXPECT\n/, $_);
 
     fresh_perl_is( $prog, $expected, \%( switch => $switch, stderr => 1, ) );
 }

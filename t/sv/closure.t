@@ -74,7 +74,7 @@ $bar = bizz(10);
 test {&$foo(11)-1 == &$bar()};
 
 my @foo;
-for (qw(0 1 2 3 4)) {
+for (@( <qw(0 1 2 3 4))) {
   my $i = $_;
   @foo[$_] = sub {$i = shift if (nelems @_); $i };
 }
@@ -101,7 +101,7 @@ test {
 
 sub barf {
   my @foo;
-  for (qw(0 1 2 3 4)) {
+  for (@( <qw(0 1 2 3 4))) {
     my $i = $_;
     @foo[$_] = sub {$i = shift if (nelems @_); $i };
   }
@@ -186,7 +186,7 @@ test {
 {
     use strict;
 
-    use vars qw!$test!;
+    use vars < qw!$test!;
     my($debugging, %expected, $inner_type, $where_declared, $within);
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
     my($code, $inner_sub_test, $expected, $line, $errors, $output);
@@ -208,13 +208,13 @@ test {
     );
 
     # Our innermost sub is either named or anonymous
-    for $inner_type (qw!named anon!) {
+    for $inner_type (@( <qw!named anon!)) {
       # And it may be declared at filescope, within a named
       # sub, or within an anon sub
-      for $where_declared (qw!filescope in_named in_anon!) {
+      for $where_declared (@( <qw!filescope in_named in_anon!)) {
 	# And that, in turn, may be within a foreach loop,
 	# a naked block, or another named sub
-	for $within (qw!foreach naked other_sub!) {
+	for $within (@( <qw!foreach naked other_sub!)) {
 
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
@@ -316,13 +316,13 @@ END
 	  }
 
 	  $sub_test = $test;
-	  @inners = @( qw!global_scalar global_array global_hash! ,
+	  @inners = @( < qw!global_scalar global_array global_hash! , <
 	    qw!fs_scalar fs_array fs_hash! );
 	  push @inners, 'foreach' if $within eq 'foreach';
 	  if ($where_declared ne 'filescope') {
-	    push @inners, qw!sub_scalar sub_array sub_hash!;
+	    push @inners, < qw!sub_scalar sub_array sub_hash!;
 	  }
-	  for $inner_sub_test (< @inners) {
+	  for $inner_sub_test ( @inners) {
 
 	    if ($inner_type eq 'named') {
 	      $code .= "    sub named_$sub_test "
@@ -388,7 +388,7 @@ END
 	  }
 
 	  # Now, we can actually prep to run the tests.
-	  for $inner_sub_test (< @inners) {
+	  for $inner_sub_test ( @inners) {
 	    $expected = %expected{$inner_sub_test} or
 	      die "expected $inner_sub_test missing";
 
@@ -451,8 +451,8 @@ END
 	      print PERL $code;
 	      close PERL;
 	      { local $/;
-	        $output = join '', ~< *READ;
-	        $errors = join '', ~< *READ2; }
+	        $output = join '', @( ~< *READ);
+	        $errors = join '', @( ~< *READ2); }
 	      close READ;
 	      close READ2;
 	    }
@@ -469,7 +469,7 @@ END
 	      # this process, and then foul our pipe back to parent by
 	      # redirecting output in the child.
 	      open PERL, "-", "$cmd" or die "Can't open pipe: $!\n";
-	      { local $/; $output = join '', ~< *PERL }
+	      { local $/; $output = join '', @( ~< *PERL) }
 	      close PERL;
 	    } else {
 	      my $outfile = "tout$$";  $outfile++ while -e $outfile;
@@ -489,7 +489,7 @@ END
 	  print STDERR $errors;
 	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
 	    my $lnum = 0;
-	    for $line (split '\n', $code) {
+	    for $line (@( <split '\n', $code)) {
 	      printf "\%3d:  \%s\n", ++$lnum, $line;
 	    }
 	  }
@@ -632,7 +632,7 @@ f16302();
 
 {
     my %a;
-    for my $x (7,11) {
+    for my $x (@(7,11)) {
 	%a{$x} = sub { $x=$x; sub { eval '$x' } };
     }
     test { %a{7}->()->() + %a{11}->()->() == 18 };

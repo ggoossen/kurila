@@ -5,7 +5,7 @@ BEGIN { *zorp = sub { return scalar nelems @_ } unless defined &zorp; }
 
 package Locale::Maketext;
 use strict;
-use vars qw($USE_LITERALS $GUTSPATH);
+use vars < qw($USE_LITERALS $GUTSPATH);
 
 BEGIN {
   $GUTSPATH = __FILE__;
@@ -101,15 +101,15 @@ sub _compile {
           
            #$c[-1] =~ s/^\s+//s;
            #$c[-1] =~ s/\s+$//s;
-          ($m,< @params) = split(",", @c[-1], -1);  # was /\s*,\s*/
+          ($m,< @params) = < split(",", @c[-1], -1);  # was /\s*,\s*/
           
           # A bit of a hack -- we've turned "~,"'s into DELs, so turn
           #  'em into real commas here.
           if (ord('A') == 65) { # ASCII, etc
-            foreach($m, < @params) { s/\x7F/,/g } 
+            foreach(@($m, < @params)) { s/\x7F/,/g } 
           } else {              # EBCDIC (1047, 0037, POSIX-BC)
             # Thanks to Peter Prymmer for the EBCDIC handling
-            foreach($m, < @params) { s/\x07/,/g } 
+            foreach(@($m, < @params)) { s/\x07/,/g } 
           }
           
           # Special-case handling of some method names:
@@ -155,7 +155,7 @@ sub _compile {
           pop @c; # we don't need that chunk anymore
           ++$call_count;
           
-          foreach my $p (< @params) {
+          foreach my $p ( @params) {
             if($p eq '_*') {
               # Meaning: all parameters except @_[0]
               @code[-1] .= ' @_[1 .. $#_], ';
@@ -244,8 +244,8 @@ sub _compile {
   push @code, "\}\n";
 
   print < @code if DEBUG;
-  my $sub = eval(join '', < @code);
-  die "{$@->message} while evalling" . join('', < @code) if $@; # Should be impossible.
+  my $sub = eval(join '', @( < @code));
+  die "{$@->message} while evalling" . join('', @( < @code)) if $@; # Should be impossible.
   return $sub;
 }
 

@@ -84,7 +84,7 @@ BEGIN {
     cmp_ok( abs($now - $stamp), '+<=', 1, 'checking modify time stamp' ) ||
       diag "mtime == $stamp, should be $now";
 
-    @ARGV = @( qw(newfile) );
+    @ARGV = @( < qw(newfile) );
     touch();
 
     my $new_stamp = (stat('newfile'))[[9]];
@@ -254,7 +254,7 @@ BEGIN {
     File::Spec->catfile( 'ecmddir', 'temp2', $Testfile ) ) );
     rm_f();
 
-    ok( ! -e $_, "removed $_ successfully" ) for (< @ARGV);
+    ok( ! -e $_, "removed $_ successfully" ) for @( (< @ARGV));
 
     # rm_f dir
     @ARGV = @( my $dir = File::Spec->catfile( 'ecmddir' ) );
@@ -280,13 +280,13 @@ BEGIN {
     ExtUtils::Command::dos2unix();
 
     open(FILE, "<", 'd2utest/foo');
-    is( join('', ~< *FILE), "stuff\012and thing\012", 'dos2unix' );
+    is( join('', @( ~< *FILE)), "stuff\012and thing\012", 'dos2unix' );
     close FILE;
 
     open(FILE, "<", 'd2utest/bar');
     binmode(FILE);
     ok( -B 'd2utest/bar' );
-    is( join('', ~< *FILE), $bin, 'dos2unix preserves binaries');
+    is( join('', @( ~< *FILE)), $bin, 'dos2unix preserves binaries');
     close FILE;
 }
 

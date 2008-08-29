@@ -35,9 +35,9 @@ try {
 
 package Multi;
 require IO::Socket::INET;
-our @ISA= @(qw(IO::Socket::INET) );
+our @ISA= @( <qw(IO::Socket::INET) );
 
-use Socket qw(inet_aton inet_ntoa unpack_sockaddr_in);
+use Socket < qw(inet_aton inet_ntoa unpack_sockaddr_in);
 
 sub _get_addr
 {

@@ -27,7 +27,7 @@ my $Is_Dosish = $^O =~ m/^(dos|MSWin32)$/;
 
 my $mm = bless \%(), 'MM';
 
-my $default = File::Spec->catdir(qw(this that));
+my $default = File::Spec->catdir( <qw(this that));
 
 $mm->prefixify('installbin', 'wibble', 'something', $default);
 is( $mm->{INSTALLBIN}, %Config{installbin},

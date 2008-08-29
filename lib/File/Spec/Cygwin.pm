@@ -1,12 +1,12 @@
 package File::Spec::Cygwin;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @( qw(File::Spec::Unix) );
+@ISA = @( < qw(File::Spec::Unix) );
 
 =head1 NAME
 
@@ -117,7 +117,7 @@ sub case_tolerant () {
 
   my $drive = shift;
   if (! $drive) {
-      my @flags = @( split(m/,/, Cygwin::mount_flags('/cygwin')) );
+      my @flags = @( < split(m/,/, Cygwin::mount_flags('/cygwin')) );
       my $prefix = pop(@flags);
       if (! $prefix || $prefix eq 'cygdrive') {
           $drive = '/cygdrive/c';

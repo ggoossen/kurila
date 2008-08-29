@@ -59,9 +59,9 @@ ok(exists %Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
 {
     # make sure we can export what we say we can export.
     package Foo;
-    my @exports = @( qw(myconfig config_sh config_vars config_re) );
+    my @exports = @( < qw(myconfig config_sh config_vars config_re) );
     Config->import(< @exports);
-    foreach my $func (< @exports) {
+    foreach my $func ( @exports) {
 	main::ok( __PACKAGE__->can($func), "$func exported" );
     }
 }
@@ -70,7 +70,7 @@ like(Config::myconfig(), qr/osname=\Q%Config{osname}\E/,   "myconfig");
 like(Config::config_sh(), qr/osname='\Q%Config{osname}\E'/, "config_sh");
 like(Config::config_sh(), qr/byteorder='[1-8]+'/,
      "config_sh has a valid byteorder");
-foreach my $line (< Config::config_re('c.*')) {
+foreach my $line ( Config::config_re('c.*')) {
   like($line,                  qr/^c.*?=.*$/,                   'config_re' );
 }
 
@@ -125,7 +125,7 @@ ok( exists %Config{d_fork}, "still d_fork");
 
     sub PRINT {
 	my $self = shift;
-	$$self .= join('', < @_);
+	$$self .= join('', @( < @_));
     }
 }
 
@@ -136,13 +136,13 @@ is(nelems @(%Config{sig_num_init}  =~ m/,/g), %Config{sig_size}, "sig_num_init s
 is(nelems @(%Config{sig_name_init} =~ m/,/g), %Config{sig_size}, "sig_name_init size");
 
 # Test the troublesome virtual stuff
-my @virtual = @( qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
+my @virtual = @( < qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
                     libs_nolargefiles libswanted_nolargefiles) );
 
 # Also test that the first entry in config.sh is found correctly. There was
 # special casing code for this
 
-foreach my $pain ($first, < @virtual) {
+foreach my $pain (@($first, < @virtual)) {
   # No config var is named with anything that is a regexp metachar
   ok(exists %Config{$pain}, "\$config('$pain') exists");
 
@@ -160,7 +160,7 @@ foreach my $pain ($first, < @virtual) {
 # This little bit of evil is to avoid a @ in the program, in case it confuses
 # shell 1 liners. Perl 1 rules.
 my ($path, $ver, < @orig_inc)
-  = split m/\n/,
+  = < split m/\n/,
     runperl (nolib=>1,
 	     prog=>'print qq{$^X\n$^V\n}; print qq{$_\n} while $_ = shift @INC');
 
@@ -168,12 +168,12 @@ die "This perl is $^V at $^X; other perl is $ver (at $path) "
   . '- failed to find this perl' unless $^V eq $ver;
 
 my %orig_inc;
-%orig_inc{[ < @orig_inc]} = @();
+ <%orig_inc{[@( < @orig_inc)]} = @();
 
 my $failed;
 # This is the order that directories are pushed onto @INC in perl.c:
-foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
-		     vendorarchexp vendorlibexp vendorlib_stem)) {
+foreach my $lib (@( <qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
+		     vendorarchexp vendorlibexp vendorlib_stem))) {
   my $dir = %Config{$lib};
   SKIP: {
     skip "lib $lib not in \@INC on Win32" if $^O eq 'MSWin32';

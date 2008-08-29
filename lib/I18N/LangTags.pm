@@ -4,11 +4,11 @@
 
 package I18N::LangTags;
 use strict;
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);
+use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);
 require Exporter;
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 @EXPORT = @( qw() );
-@EXPORT_OK = @( qw(is_language_tag same_language_tag
+@EXPORT_OK = @( < qw(is_language_tag same_language_tag
                 extract_language_tags super_languages
                 similarity_language_tag is_dialect_of
                 locale2language_tag alternate_language_tags
@@ -20,7 +20,7 @@ require Exporter;
 
 $VERSION = "0.35";
 
-sub uniq { my %seen; return @( grep(!(%seen{$_}++), < @_) ); } # a util function
+sub uniq { my %seen; return @( < grep(!(%seen{$_}++), @( < @_)) ); } # a util function
 
 
 =head1 NAME
@@ -143,7 +143,7 @@ sub extract_language_tags {
     ? $1 : ''
   ;
   
-  return grep(!m/^[ixIX]$/s, # 'i' and 'x' aren't good tags
+  return grep(!m/^[ixIX]$/s, @( # 'i' and 'x' aren't good tags
     $text =~ 
     m/
       \b
@@ -155,7 +155,7 @@ sub extract_language_tags {
          [a-zA-Z0-9]{1,8}  # subtag  
       )*
       \b
-    /xsg
+    /xsg)
   );
 }
 
@@ -239,8 +239,8 @@ sub similarity_language_tag {
   return undef if !defined($lang1) and !defined($lang2);
   return 0 if !defined($lang1) or !defined($lang2);
 
-  my @l1_subtags = @( split('-', $lang1) );
-  my @l2_subtags = @( split('-', $lang2) );
+  my @l1_subtags = @( < split('-', $lang1) );
+  my @l2_subtags = @( < split('-', $lang2) );
   my $similarity = 0;
 
   while((nelems @l1_subtags) and nelems @l2_subtags) {
@@ -348,20 +348,20 @@ sub super_languages {
   $lang1 =~ s/^[ix](-hakka\b)/zh$1/i; # goes the right way
    # i-hakka-bork-bjork-bjark => zh-hakka-bork-bjork-bjark
 
-  my @l1_subtags = @( split('-', $lang1) );
+  my @l1_subtags = @( < split('-', $lang1) );
 
   ## Changes in the language tagging standards may have to be reflected here.
 
   # NB: (i-sil-...)?
 
   my @supers = @( () );
-  foreach my $bit (< @l1_subtags) {
+  foreach my $bit ( @l1_subtags) {
     push @supers, 
       scalar(nelems @supers) ? (@supers[-1] . '-' . $bit) : $bit;
   }
   pop @supers if (nelems @supers);
   shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
-  return @(reverse < @supers);
+  return @( <reverse @( < @supers));
 }
 
 ###########################################################################
@@ -594,7 +594,7 @@ valid language tag.
 
 =cut
 
-my %alt = %( qw( i x   x i   I X   X I ) );
+my %alt = %( < qw( i x   x i   I X   X I ) );
 sub alternate_language_tags {
   my $tag = @_[0];
   return() unless &is_language_tag($tag);
@@ -647,36 +647,36 @@ sub alternate_language_tags {
    #  here, I'll just go crazy.
 
    # Scandinavian lgs.  All based on opinion and hearsay.
-   'sv' => \@(qw(nb no da nn)),
-   'da' => \@(qw(nb no sv nn)), # I guess
-   \@(qw(no nn nb)), \@(qw(no nn nb sv da)),
-   'is' => \@(qw(da sv no nb nn)),
-   'fo' => \@(qw(da is no nb nn sv)), # I guess
+   'sv' => \@( <qw(nb no da nn)),
+   'da' => \@( <qw(nb no sv nn)), # I guess
+   \@( <qw(no nn nb)), \@( <qw(no nn nb sv da)),
+   'is' => \@( <qw(da sv no nb nn)),
+   'fo' => \@( <qw(da is no nb nn sv)), # I guess
    
    # I think this is about the extent of tolerable intelligibility
    #  among large modern Romance languages.
-   'pt' => \@(qw(es ca it fr)), # Portuguese, Spanish, Catalan, Italian, French
-   'ca' => \@(qw(es pt it fr)),
-   'es' => \@(qw(ca it fr pt)),
-   'it' => \@(qw(es fr ca pt)),
-   'fr' => \@(qw(es it ca pt)),
+   'pt' => \@( <qw(es ca it fr)), # Portuguese, Spanish, Catalan, Italian, French
+   'ca' => \@( <qw(es pt it fr)),
+   'es' => \@( <qw(ca it fr pt)),
+   'it' => \@( <qw(es fr ca pt)),
+   'fr' => \@( <qw(es it ca pt)),
    
    # Also assume that speakers of the main Indian languages prefer
    #  to read/hear Hindi over English
-   \@(qw(
+   \@( <qw(
      as bn gu kn ks kok ml mni mr ne or pa sa sd te ta ur
    )) => 'hi',
     # Assamese, Bengali, Gujarati, [Hindi,] Kannada (Kanarese), Kashmiri,
     # Konkani, Malayalam, Meithei (Manipuri), Marathi, Nepali, Oriya,
     # Punjabi, Sanskrit, Sindhi, Telugu, Tamil, and Urdu.
-   'hi' => \@(qw(bn pa as or)),
+   'hi' => \@( <qw(bn pa as or)),
    # I welcome finer data for the other Indian languages.
    #  E.g., what should Oriya's list be, besides just Hindi?
    
    # And the panic languages for English is, of course, nil!
 
    # My guesses at Slavic intelligibility:
-   (\@(qw(ru be uk))) x 2,  # Russian, Belarusian, Ukranian
+   (\@( <qw(ru be uk))) x 2,  # Russian, Belarusian, Ukranian
    'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
    'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
 
@@ -690,8 +690,8 @@ sub alternate_language_tags {
   my($k,$v);
   while((nelems @panic)) {
     ($k,$v) = splice(@panic,0,2);
-    foreach my $k (ref($k) ? < @$k : $k) {
-      foreach my $v (ref($v) ? < @$v : $v) {
+    foreach my $k (@(ref($k) ? < @$k : $k)) {
+      foreach my $v (@(ref($v) ? < @$v : $v)) {
         push @{%Panic{$k} ||= \@()}, $v unless $k eq $v;
       }
     }
@@ -732,13 +732,13 @@ A useful construct you might consider using is:
 sub panic_languages {
   # When in panic or in doubt, run in circles, scream, and shout!
   my(@out, %seen);
-  foreach my $t (< @_) {
+  foreach my $t ( @_) {
     next unless $t;
     next if %seen{$t}++; # so we don't return it or hit it again
     # push @out, super_languages($t); # nah, keep that separate
     push @out, < @{ %Panic{lc $t} || next };
   }
-  return @(grep !%seen{$_}++,  < @out, 'en');
+  return @(< grep !%seen{$_}++, @(  < @out, 'en'));
 }
 
 #---------------------------------------------------------------------------
@@ -793,16 +793,16 @@ as far as I'm concerned) you'd use implicate_supers.
 =cut
 
 sub implicate_supers {
-  my @languages = @( grep is_language_tag($_), < @_ );
+  my @languages = @( < grep is_language_tag($_), @( < @_) );
   my %seen_encoded;
-  foreach my $lang (< @languages) {
+  foreach my $lang ( @languages) {
     %seen_encoded{ I18N::LangTags::encode_language_tag($lang) } = 1
   }
 
   my(@output_languages);
-  foreach my $lang (< @languages) {
+  foreach my $lang ( @languages) {
     push @output_languages, $lang;
-    foreach my $s ( < I18N::LangTags::super_languages($lang) ) {
+    foreach my $s (  I18N::LangTags::super_languages($lang) ) {
       # Note that super_languages returns the longest first.
       last if %seen_encoded{ I18N::LangTags::encode_language_tag($s) };
       push @output_languages, $s;
@@ -813,8 +813,8 @@ sub implicate_supers {
 }
 
 sub implicate_supers_strictly {
-  my @tags = @( grep is_language_tag($_), < @_ );
-  return uniq( < @_,   map < super_languages($_), < @_ );
+  my @tags = @( < grep is_language_tag($_), @( < @_) );
+  return uniq( < @_,   < map < super_languages($_), @( < @_) );
 }
 
 

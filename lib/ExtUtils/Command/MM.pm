@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 require Exporter;
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 
-our @EXPORT  = @( qw(test_harness pod2man perllocal_install uninstall 
+our @EXPORT  = @( < qw(test_harness pod2man perllocal_install uninstall 
                   warn_if_old_packlist) );
 our $VERSION = '6.44';
 
@@ -56,8 +56,8 @@ sub test_harness {
     my @argv = @( < ExtUtils::Command::expand_wildcards(< @ARGV) );
 
     local @INC = @( < @INC );
-    unshift @INC, map { File::Spec->rel2abs($_) } < @_;
-    Test::Harness::runtests(sort { lc $a cmp lc $b } < @argv);
+    unshift @INC, < map { File::Spec->rel2abs($_) } @( < @_);
+    Test::Harness::runtests( <sort { lc $a cmp lc $b } @( < @argv));
 }
 
 
@@ -192,7 +192,7 @@ sub perllocal_install {
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    my @mod_info = @( $Is_VMS ? split m/\|/, ~< *STDIN
+    my @mod_info = @( $Is_VMS ? < split m/\|/, ~< *STDIN
                            : < @ARGV );
 
     my $pod;

@@ -2,7 +2,7 @@ use Perl6::Form;
 
 print < form \%(single=>'^'),\%(single=>'='),\%(single=>'_'),
 		   '~~~~~~~~~',
-		   '^ _ = _ ^',
+		   '^ _ = _ ^', <
 		   qw(Like round and orient perls),
 		   '~~~~~~~~~';
 

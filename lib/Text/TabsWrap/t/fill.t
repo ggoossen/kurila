@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w -I.
 
 use strict;
-our @tests = @(split(m/\nEND\n/s, <<DONE));
+our @tests = @( <split(m/\nEND\n/s, <<DONE));
 TEST1
 Cyberdog Information
 
@@ -74,7 +74,7 @@ while ((nelems @tests)) {
 		my $oi = $in;
 		write_file("#o", $back);
 		write_file("#e", $out);
-		foreach ($in, $back, $out) {
+		foreach (@($in, $back, $out)) {
 			s/\t/^I\t/gs;
 			s/\n/\$\n/gs;
 		}

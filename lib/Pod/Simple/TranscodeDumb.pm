@@ -3,7 +3,7 @@
 
 package Pod::Simple::TranscodeDumb;
 use strict;
-use vars qw($VERSION %Supported);
+use vars < qw($VERSION %Supported);
 $VERSION = '2.02';
 # This module basically pretends it knows how to transcode, except
 #  only for null-transcodings!  We use this when Encode isn't
@@ -22,7 +22,7 @@ sub is_dumb  {1}
 sub is_smart {0}
 
 sub all_encodings {
-  return @( sort keys %Supported);
+  return @( < sort @( < keys %Supported));
 }
 
 sub encoding_is_available {
@@ -38,7 +38,7 @@ sub make_transcoder {
   die "WHAT ENCODING!?!?" unless $e;
   my $x;
   if ($e eq "latin1") {
-      return sub { return @(map { join '', map { utf8::chr($_) } unpack "C*", $_; } < @_) };
+      return sub { return @(< map { join '', @( < map { utf8::chr($_) } @( unpack "C*", $_)); } @( < @_)) };
   }
 
   return sub {;

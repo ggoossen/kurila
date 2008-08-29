@@ -1,16 +1,16 @@
 #!./miniperl
 
-use ExtUtils::ParseXS qw(process_file);
+use ExtUtils::ParseXS < qw(process_file);
 use Getopt::Long;
 
 my %args = %( () );
 
 my $usage = "Usage: xsubpp [-v] [-csuffix csuffix] [-except] [-prototypes] [-noversioncheck] [-nolinenumbers] [-nooptimize] [-noinout] [-noargtypes] [-s pattern] [-typemap typemap]... file.xs\n";
 
-Getopt::Long::Configure qw(no_auto_abbrev no_ignore_case);
+Getopt::Long::Configure < qw(no_auto_abbrev no_ignore_case);
 
-@ARGV = @( grep {$_ ne '-C++'} < @ARGV );  # Allow -C++ for backward compatibility
-GetOptions(\%args, qw(hiertype!
+@ARGV = @( < grep {$_ ne '-C++'} @( < @ARGV) );  # Allow -C++ for backward compatibility
+GetOptions(\%args, < qw(hiertype!
 		      prototypes!
 		      versioncheck!
 		      linenumbers!

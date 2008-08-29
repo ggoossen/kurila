@@ -4,7 +4,7 @@ package Test;
 
 use strict;
 
-use vars (qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), #public-ish
+use vars ( <qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), < #public-ish
           qw($TESTOUT $TESTERR %Program_Lines $told_about_diff
              $ONFAIL %todo %history $planned @FAILDETAIL) #private-ish
          );
@@ -23,8 +23,8 @@ $VERSION = '1.25';
 require Exporter;
 @ISA=@('Exporter');
 
-@EXPORT    = @( qw(&plan &ok &skip) );
-@EXPORT_OK = @( qw($ntest $TESTOUT $TESTERR) );
+@EXPORT    = @( < qw(&plan &ok &skip) );
+@EXPORT_OK = @( < qw($ntest $TESTOUT $TESTERR) );
 
 $|=1;
 $TESTOUT = *STDOUT{IO};
@@ -154,23 +154,23 @@ sub plan {
 
     _reset_globals();
 
-    _read_program( @(caller)[[1]] );
+    _read_program( < @(caller)[[@(1)]] );
 
     my $max=0;
     while ((nelems @_)) {
 	my ($k,$v) = splice(@_, 0, 2);
 	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
-	       $k eq 'failok') { for (< @$v) { %todo{$_}=1; }; }
+	       $k eq 'failok') { for ( @$v) { %todo{$_}=1; }; }
 	elsif ($k eq 'onfail') {
 	    ref $v eq 'CODE' or die "Test::plan(onfail => $v): must be CODE";
 	    $ONFAIL = $v;
 	}
 	else { warn "Test::plan(): skipping unrecognized directive '$k'" }
     }
-    my @todo = @( sort { $a <+> $b } keys %todo );
+    my @todo = @( < sort { $a <+> $b } @( < keys %todo) );
     if ((nelems @todo)) {
-	print $TESTOUT "1..$max todo ".join(' ', < @todo).";\n";
+	print $TESTOUT "1..$max todo ".join(' ', @( < @todo)).";\n";
     } else {
 	print $TESTOUT "1..$max\n";
     }
@@ -188,7 +188,7 @@ sub _read_program {
   %Program_Lines{$file} = \@( ~< *SOURCEFILE);
   close(SOURCEFILE);
 
-  foreach my $x (< @{%Program_Lines{$file}})
+  foreach my $x ( @{%Program_Lines{$file}})
    { $x =~ s/[\cm\cj\n\r]//g }
 
   unshift @{%Program_Lines{$file}}, '';
@@ -518,8 +518,8 @@ sub _diff_complain_external {
 sub _diff_complain_algdiff {
     my($result, $expected, $detail, $prefix) = < @_;
 
-    my @got = @( split(m/^/, $result) );
-    my @exp = @( split(m/^/, $expected) );
+    my @got = @( < split(m/^/, $result) );
+    my @exp = @( < split(m/^/, $expected) );
 
     my $diff_kind;
     my @diff_lines;
@@ -534,7 +534,7 @@ sub _diff_complain_algdiff {
         print $TESTERR "# $prefix ";
         if ($diff_kind eq "GOT") {
             print $TESTERR "Got $count_lines extra line$s at line $first_line:\n";
-            for my $i (< @diff_lines) {
+            for my $i ( @diff_lines) {
                 print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
         } elsif ($diff_kind eq "EXP") {
@@ -546,7 +546,7 @@ sub _diff_complain_algdiff {
                 print $TESTERR "Line $first_line is";
             }
             print $TESTERR " missing:\n";
-            for my $i (< @diff_lines) {
+            for my $i ( @diff_lines) {
                 print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
             }
         } elsif ($diff_kind eq "CH") {
@@ -558,7 +558,7 @@ sub _diff_complain_algdiff {
                 print $TESTERR "Line $first_line is";
             }
             print $TESTERR " changed:\n";
-            for my $i (< @diff_lines) {
+            for my $i ( @diff_lines) {
                 print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
                 print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }

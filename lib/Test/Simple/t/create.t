@@ -37,7 +37,7 @@ cmp_ok $more_tb, '\==', Test::Builder->new,  '       does not interfere with ->n
 pass("Changing output() of new TB doesn't interfere with singleton");
 
 ok open FILE, "<", "some_file";
-is join("", ~< *FILE), <<OUT;
+is join("", @( ~< *FILE)), <<OUT;
 1..1
 ok 1
 OUT

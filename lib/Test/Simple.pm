@@ -2,13 +2,13 @@ package Test::Simple;
 
 
 use strict 'vars';
-use vars qw($VERSION @ISA @EXPORT);
+use vars < qw($VERSION @ISA @EXPORT);
 $VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use Test::Builder::Module;
-@ISA    = @( qw(Test::Builder::Module) );
-@EXPORT = @( qw(ok) );
+@ISA    = @( < qw(Test::Builder::Module) );
+@EXPORT = @( < qw(ok) );
 
 my $CLASS = __PACKAGE__;
 

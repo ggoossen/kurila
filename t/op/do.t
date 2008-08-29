@@ -49,7 +49,7 @@ $result = do{ ok 1; 'value';};
 ok( $result eq 'value',  ":$result: eq :value:" );
 
 sub blather {
-    ok 1 foreach < @_;
+    ok 1 foreach  @_;
 }
 
 do blather("ayep","sho nuff");

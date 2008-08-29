@@ -3,7 +3,7 @@ package B::Showlex;
 our $VERSION = '1.02';
 
 use strict;
-use B qw(svref_2object comppadlist class);
+use B < qw(svref_2object comppadlist class);
 use B::Terse ();
 use B::Concise ();
 
@@ -90,9 +90,9 @@ sub showlex_main {
 }
 
 sub compile {
-    my @options = @( grep { ! ref && m/^-/ } < @_ );
-    my @args = @( grep { ref || !m/^-/ } < @_ );
-    for my $o (< @options) {
+    my @options = @( < grep { ! ref && m/^-/ } @( < @_) );
+    my @args = @( < grep { ref || !m/^-/ } @( < @_) );
+    for my $o ( @options) {
 	$newlex = 1 if $o eq "-newlex";
 	$nosp1  = 1 if $o eq "-nosp";
     }
@@ -100,7 +100,7 @@ sub compile {
     return \&showlex_main unless (nelems @args);
     return sub {
 	my $objref;
-	foreach my $objname (< @args) {
+	foreach my $objname ( @args) {
 	    next unless $objname;	# skip nulls w/o carping
 
 	    if (ref $objname) {

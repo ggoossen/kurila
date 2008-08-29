@@ -48,7 +48,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         };
     };
 
-    print STDERR $_ for < @warnings;
+    print STDERR $_ for  @warnings;
     if ( !$@ && !@warnings && defined($num_warnings) && $num_warnings == 0 ) {
         ok(1);
     }

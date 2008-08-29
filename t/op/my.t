@@ -78,7 +78,7 @@ print "ok 24\n";
 print "not " if defined $k;
 print "ok 25\n";
 
-foreach my $i (26, 27) {
+foreach my $i (@(26, 27)) {
     print "ok $i\n";
 }
 
@@ -89,8 +89,8 @@ print "ok 29\n";
 print "ok 30\n";
 
 # Found in HTML::FormatPS
-my %fonts = %( qw(nok 31) );
-for my $full (keys %fonts) {
+my %fonts = %( < qw(nok 31) );
+for my $full (@( <keys %fonts)) {
     $full =~ s/^n//;
     # Supposed to be copy-on-write via force_normal after a THINKFIRST check.
     print "$full %fonts{nok}\n";

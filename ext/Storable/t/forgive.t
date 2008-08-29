@@ -9,7 +9,7 @@
 # (C) Copyright 1997, Universitat Dortmund, all rights reserved.
 #
 
-use Storable qw(store retrieve);
+use Storable < qw(store retrieve);
 
 # problems with 5.00404 when in an BEGIN block, so this is defined here
 if (!try { require File::Spec; 1 } || $File::Spec::VERSION +< 0.8) {

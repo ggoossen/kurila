@@ -5,14 +5,14 @@ use File::Spec ();
 use Test::More 'no_plan';
 
 my $Class   = 'IPC::Cmd';
-my @Funcs   = @( qw[run can_run] );
-my @Meths   = @( qw[can_use_ipc_run can_use_ipc_open3 can_capture_buffer] );
+my @Funcs   = @( < qw[run can_run] );
+my @Meths   = @( < qw[can_use_ipc_run can_use_ipc_open3 can_capture_buffer] );
 my $IsWin32 = $^O eq 'MSWin32';
 my $Verbose = (nelems @ARGV) ? 1 : 0;
 
-use_ok( $Class,         $_ ) for < @Funcs;
-can_ok( $Class,         $_ ) for < @Funcs, < @Meths;
-can_ok( __PACKAGE__,    $_ ) for < @Funcs;
+use_ok( $Class,         $_ ) for  @Funcs;
+can_ok( $Class,         $_ ) for  @Funcs, < @Meths;
+can_ok( __PACKAGE__,    $_ ) for  @Funcs;
 
 my $Have_IPC_Run    = $Class->can_use_ipc_run;
 my $Have_IPC_Open3  = $Class->can_use_ipc_open3;
@@ -39,12 +39,12 @@ my @Prefs = @(
         \@( "$^X -v",                                  qr/gerard\s+goossen/i, ),
         \@( \@($^X, '-v'),                               qr/gerard\s+goossen/i, ),
         \@( "$^X -eprint+42 | $^X -neprint",           qr/42/,            ),
-        \@( \@($^X,qw[-eprint+42 |], $^X, qw|-neprint|), qr/42/,            ),
+        \@( \@($^X, <qw[-eprint+42 |], $^X, < qw|-neprint|), qr/42/,            ),
     );
 
     diag( "Running tests that print only to stdout" ) if $Verbose;
     ### for each configuarion
-    for my $pref ( < @Prefs ) {
+    for my $pref (  @Prefs ) {
         diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
             if $Verbose;
 
@@ -52,11 +52,11 @@ my @Prefs = @(
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         ### for each command
-        for my $aref ( < @$map ) {
+        for my $aref (  @$map ) {
             my $cmd                 = $aref->[0];
             my $regex               = $aref->[1];
 
-            my $pp_cmd = ref $cmd ? "{join ' ', <@$cmd}" : "$cmd";
+            my $pp_cmd = ref $cmd ? "{join ' ', @( <@$cmd)}" : "$cmd";
             diag( "Running '$pp_cmd' as " . (ref $cmd ? "ARRAY" : "SCALAR") ) 
                 if $Verbose;
 
@@ -93,10 +93,10 @@ my @Prefs = @(
                     ### the last 3 entries from the RV, are they array refs?
                     isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
-                    like( "{join ' ', <@{@list[2]}}", $regex,
+                    like( "{join ' ', @( <@{@list[2]})}", $regex,
                                 "   Combined buffer holds output" );
 
-                    like( "{join ' ', <@{@list[3]}}", qr/$regex/,
+                    like( "{join ' ', @( <@{@list[3]})}", qr/$regex/,
                             "   Stdout buffer filled" );
                     is( scalar( nelems @{@list[4]} ), 0,
                                     "   Stderr buffer empty" );
@@ -118,7 +118,7 @@ my @Prefs = @(
 
     diag( "Running tests that print only to stderr" ) if $Verbose;
     ### for each configuarion
-    for my $pref ( < @Prefs ) {
+    for my $pref (  @Prefs ) {
         diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
             if $Verbose;
 
@@ -126,11 +126,11 @@ my @Prefs = @(
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         ### for each command
-        for my $aref ( < @$map ) {
+        for my $aref (  @$map ) {
             my $cmd                 = $aref->[0];
             my $regex               = $aref->[1];
 
-            my $pp_cmd = ref $cmd ? "{join ' ', <@$cmd}" : "$cmd";
+            my $pp_cmd = ref $cmd ? "{join ' ', @( <@$cmd)}" : "$cmd";
             diag( "Running '$pp_cmd' as " . (ref $cmd ? "ARRAY" : "SCALAR") )
                 if $Verbose;
 
@@ -169,12 +169,12 @@ my @Prefs = @(
                     ### the last 3 entries from the RV, are they array refs?
                     isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
-                    like( "{join ' ', <@{@list[2]}}", $regex,
+                    like( "{join ' ', @( <@{@list[2]})}", $regex,
                                 "   Combined buffer holds output" );
 
                     is( scalar( nelems @{@list[3]} ), 0,
                                     "   Stdout buffer empty" );
-                    like( "{join ' ', <@{@list[4]}}", qr/$regex/,
+                    like( "{join ' ', @( <@{@list[4]})}", qr/$regex/,
                             "   Stderr buffer filled" );
                 }
             }
@@ -184,7 +184,7 @@ my @Prefs = @(
 
 ### test failures
 {   ### for each configuarion
-    for my $pref ( < @Prefs ) {
+    for my $pref (  @Prefs ) {
         diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
             if $Verbose;
 

@@ -48,12 +48,12 @@ SKIP: { # Test exit status from pod2usage()
     skip "Exit status broken on Mac OS", 1 if $^O eq 'MacOS';
     my $exit = ($^O eq 'VMS' ? 2 : 42);
     my $dev_null = File::Spec->devnull;
-    my $args = join ", ", (
+    my $args = join ", ", @( (
         "-verbose => 0", 
         "-exit    => $exit",
         "-output  => q\{$dev_null\}",
         "-input   => q\{$0\}",
-    );
+    ));
     my $cq = (($^O eq 'MSWin32'
                || $^O eq 'NetWare'
                || $^O eq 'VMS') ? '"'
@@ -62,7 +62,7 @@ SKIP: { # Test exit status from pod2usage()
     my $prg = qq[{$cq}pod2usage(\\\%( $args ))$cq];
     my @cmd = @( $^X, < @params, $prg );
 
-    print "# cmd = {join ' ', <@cmd}\n";
+    print "# cmd = {join ' ', @( <@cmd)}\n";
 
     is( system( < @cmd ) >> 8, $exit, 'Exit status of pod2usage()' );
 }

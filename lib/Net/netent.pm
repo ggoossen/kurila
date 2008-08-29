@@ -5,8 +5,8 @@ our $VERSION = '1.00';
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN { 
     use Exporter   ();
-    @EXPORT      = @( qw(getnetbyname getnetbyaddr getnet) );
-    @EXPORT_OK   = @( qw(
+    @EXPORT      = @( < qw(getnetbyname getnetbyaddr getnet) );
+    @EXPORT_OK   = @( < qw(
 			$n_name	    	@n_aliases
 			$n_addrtype 	$n_net
 		   ) );
@@ -17,7 +17,7 @@ use vars      < @EXPORT_OK;
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }
 
-use Class::Struct qw(struct);
+use Class::Struct < qw(struct);
 struct 'Net::netent' => \@(
    name		=> '$',
    aliases	=> '@',
@@ -29,7 +29,7 @@ sub populate (@) {
     return unless (nelems @_);
     my $nob = new();
     $n_name 	 =    $nob->[0]     	     = @_[0];
-    @n_aliases	 = @( @{ $nob->[1] } = @( split ' ', @_[1] ) );
+    @n_aliases	 = @( @{ $nob->[1] } = @( < split ' ', @_[1] ) );
     $n_addrtype  =    $nob->[2] 	     = @_[2];
     $n_net	 =    $nob->[3] 	     = @_[3];
     return $nob;

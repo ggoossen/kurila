@@ -54,9 +54,9 @@ my $t = Test::Builder->new;
 ###
 
 use Exporter;
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 
-our @EXPORT = @( qw(test_out test_err test_fail test_diag test_test line_num) );
+our @EXPORT = @( < qw(test_out test_err test_fail test_diag test_test line_num) );
 
 # _export_to_level and import stolen directly from Test::More.  I am
 # the king of cargo cult programming ;-)
@@ -273,7 +273,7 @@ sub test_diag
 
     # expect the same thing, but prepended with "#     "
     local $_;
-    $err->expect(map {"# $_"} < @_)
+    $err->expect(< map {"# $_"} @( < @_))
 }
 
 =item test_test
@@ -356,10 +356,10 @@ sub test_test
 
       local $_;
 
-      $t->diag(map {"$_\n"} $out->complaint)
+      $t->diag(< map {"$_\n"} @( $out->complaint))
 	unless %args{skip_out} || $out->check;
 
-      $t->diag(map {"$_\n"} $err->complaint)
+      $t->diag(< map {"$_\n"} @( $err->complaint))
 	unless %args{skip_err} || $err->check;
     }
 }
@@ -502,7 +502,7 @@ sub expect
     my $self = shift;
 
     my @checks = @( < @_ );
-    foreach my $check (< @checks) {
+    foreach my $check ( @checks) {
         $check = $self->_translate_Failed_check($check);
         push @{$self->{wanted}}, ref $check ? $check : "$check\n";
     }
@@ -533,7 +533,7 @@ sub check
 
     my @checks = @( < @{$self->{wanted}} );
     my $got = $self->{got};
-    foreach my $check (< @checks) {
+    foreach my $check ( @checks) {
         $check = "\Q$check\E" unless ($check =~ s,^/(.*)/$,$1, or ref $check);
         return 0 unless $got =~ s/^$check//;
     }
@@ -550,7 +550,7 @@ sub complaint
     my $self = shift;
     my $type   = $self->type;
     my $got    = $self->got;
-    my $wanted = join "\n", < @{$self->wanted};
+    my $wanted = join "\n", @( < @{$self->wanted});
 
     # are we running in colour mode?
     if (Test::Builder::Tester::color)

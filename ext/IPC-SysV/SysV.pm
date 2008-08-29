@@ -7,18 +7,18 @@
 package IPC::SysV;
 
 use strict;
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $XS_VERSION);
+use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $XS_VERSION);
 use Carp;
 use Config;
 
 require Exporter;
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 
 $VERSION = "1.05";
 $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
-@EXPORT_OK = @( qw(
+@EXPORT_OK = @( < qw(
 	GETALL GETNCNT GETPID GETVAL GETZCNT
 
 	IPC_ALLOC IPC_CREAT IPC_EXCL IPC_GETACL IPC_LOCKED IPC_M

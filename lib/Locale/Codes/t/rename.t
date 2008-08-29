@@ -70,7 +70,7 @@ use Test::More;
 
 plan tests => (nelems @TESTS);
 
-foreach my $test (< @TESTS)
+foreach my $test ( @TESTS)
 {
     my $ok = eval "$test";
     die if $@;

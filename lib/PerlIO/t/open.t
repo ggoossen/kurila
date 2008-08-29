@@ -17,7 +17,7 @@ BEGIN {
 
 use Test::More tests => 6;
 
-use Fcntl qw(:seek);
+use Fcntl < qw(:seek);
 
 {
     ok((open my $fh, "+>", undef), "open my \$fh, '+>', undef");

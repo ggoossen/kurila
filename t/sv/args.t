@@ -9,32 +9,32 @@ sub new1 { bless \@_ }
 {
     my $x = new1("x");
     my $y = new1("y");
-    is(join(' ', < $y->@),"y");
-    is(join(' ', < $x->@),"x");
+    is(join(' ', @( < $y->@)),"y");
+    is(join(' ', @( < $x->@)),"x");
 }
 
 sub new2 { splice @_, 0, 0, "a", "b", "c"; return \@_ }
 {
     my $x = new2("x");
     my $y = new2("y");
-    is((join ' ', <$x->@),"a b c x");
-    is((join ' ', <$y->@),"a b c y");
+    is((join ' ', @( <$x->@)),"a b c x");
+    is((join ' ', @( <$y->@)),"a b c y");
 }
 
 sub new3 { goto &new1 }
 {
     my $x = new3("x");
     my $y = new3("y");
-    is((join ' ', <$y->@),"y");
-    is((join ' ', <$x->@),"x");
+    is((join ' ', @( <$y->@)),"y");
+    is((join ' ', @( <$x->@)),"x");
 }
 
 sub new4 { goto &new2 }
 {
     my $x = new4("x");
     my $y = new4("y");
-    is((join ' ', <$x->@),"a b c x");
-    is((join ' ', <$y->@),"a b c y");
+    is((join ' ', @( <$x->@)),"a b c x");
+    is((join ' ', @( <$y->@)),"a b c y");
 }
 
 # see if POPSUB gets to see the right pad across a dounwind() with
@@ -42,7 +42,7 @@ sub new4 { goto &new2 }
 
 sub methimpl {
     my $refarg = \@_;
-    die( "got: {join ' ', <@_}\n" );
+    die( "got: {join ' ', @( <@_)}\n" );
 }
 
 sub method {
@@ -77,9 +77,9 @@ sub foo { local(@_) = @('p', 'q', 'r'); return @_ }
 sub bar { unshift @_, 'D'; @_ }
 sub baz { push @_, 'E'; return @_ }
 for (1..3) { 
-    is(join('', <foo('a', 'b', 'c')),'pqr');
-    is(join('', <bar('d')),'Dd');
-    is(join('', <baz('e')),'eE');
+    is(join('', @( <foo('a', 'b', 'c'))),'pqr');
+    is(join('', @( <bar('d'))),'Dd');
+    is(join('', @( <baz('e'))),'eE');
 } 
 
 # [perl #28032] delete $_[0] was freeing things too early

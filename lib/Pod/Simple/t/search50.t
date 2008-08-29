@@ -26,12 +26,12 @@ use Pod::Simple;
 
 my $found = 0;
 $x->callback(sub {
-  print "#  ", join("  ", map "\{$_\}", < @_), "\n";
+  print "#  ", join("  ", @( < map "\{$_\}", @( < @_))), "\n";
   ++$found;
   return;
 });
 
-print "# \@INC == {join ' ', <@INC}\n";
+print "# \@INC == {join ' ', @( <@INC)}\n";
 
 my $t = time();   my $name2where = $x->survey();
 $t = time() - $t;
@@ -46,7 +46,7 @@ my  $strictpath = $name2where->{'strict'};
 if( $strictpath ) {
   my @x = @($x->find('strict')||'(nil)', $strictpath);
   print "# Comparing \"@x[0]\" to \"@x[1]\"\n";
-  for(< @x) { s{[/\\]}{/}g; }
+  for( @x) { s{[/\\]}{/}g; }
   print "#        => \"@x[0]\" to \"@x[1]\"\n";
   ok @x[0], @x[1], " find('strict') should match survey's name2where\{strict\}";
 } else {
@@ -55,6 +55,6 @@ if( $strictpath ) {
 
 ok 1;
 print "# Byebye from ", __FILE__, "\n";
-print "# {join ' ', <@INC}\n";
+print "# {join ' ', @( <@INC)}\n";
 __END__
 

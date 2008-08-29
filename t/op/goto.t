@@ -65,7 +65,7 @@ is(curr_test(), 15, 'FINALE');
 # which always go up-scope strictly.
 my $count = 0;
 my $cond = 1;
-for (1) {
+for (@(1)) {
     if ($cond == 1) {
 	$cond = 0;
 	goto OTHER;
@@ -164,7 +164,7 @@ ok($ok, 'works correctly in a nested eval string');
     { do { goto A; A: $ok = 1 } while $false }
     ok($ok, '#20154 goto inside /do { } while ()/ loop');
     $ok = 0;
-    foreach(1) { goto A; A: $ok = 1 } continue { };
+    foreach(@(1)) { goto A; A: $ok = 1 } continue { };
     ok($ok, 'goto inside /foreach () { } continue { }/ loop');
 
     $ok = 0;
@@ -254,7 +254,7 @@ is(curr_test(), 5, 'eval "goto $x"');
 
 sub two {
     my ($pack, $file, $line) = caller;	# Should indicate original call stats.
-    is("{join ' ', <@_} $pack $file $line", "1 2 3 main $::FILE $::LINE",
+    is("{join ' ', @( <@_)} $pack $file $line", "1 2 3 main $::FILE $::LINE",
 	'autoloading mechanism.');
 }
 

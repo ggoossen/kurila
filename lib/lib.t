@@ -18,9 +18,9 @@ my $Auto_Dir;
 my $Module;
 BEGIN {
     # lib.pm is documented to only work with Unix filepaths.
-    @lib_dir  = @(qw(stuff moo));
-    $Lib_Dir  = join "/", <@lib_dir;
-    $Arch_Dir = join "/", <@lib_dir, %Config{archname};
+    @lib_dir  = @( <qw(stuff moo));
+    $Lib_Dir  = join "/", @( <@lib_dir);
+    $Arch_Dir = join "/", @( <@lib_dir, %Config{archname});
 
     # create the auto/ directory and a module
     $Auto_Dir = File::Spec->catdir(<@lib_dir, %Config{archname},'auto');
@@ -51,7 +51,7 @@ BEGIN { use_ok('Yup') }
 
 BEGIN {
     if ($^O eq 'MacOS') {
-	for ($Lib_Dir, $Arch_Dir) {
+	for (@($Lib_Dir, $Arch_Dir)) {
 	    s|/|:|g;
 	    $_ .= ":" unless m/:$/;
 	    $_ = ":$_" unless m/^:/; # we know this path is relative
@@ -59,11 +59,11 @@ BEGIN {
     }
     is( @INC[1], $Lib_Dir,          'lib adding at end of @INC' );
     is( @INC[0], $Arch_Dir,        '    auto/ dir in front of that' );
-    is( grep(m/^\Q$Lib_Dir\E$/, <@INC), 1,   '    no duplicates' );
+    is( grep(m/^\Q$Lib_Dir\E$/, @( <@INC)), 1,   '    no duplicates' );
 
     # Yes, %INC uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
-    my $path = join("/",$Lib_Dir, 'Yup.pm');
+    my $path = join("/", @($Lib_Dir, 'Yup.pm'));
     if ($^O eq 'MacOS') {
 	$path = $Lib_Dir . 'Yup.pm';
     }
@@ -83,6 +83,6 @@ unlike( do { eval 'use lib %Config{installsitelib};'; $@ || '' },
 	qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
-    is( grep(m/stuff/, <@INC), 0, 'no lib' );
+    is( grep(m/stuff/, @( <@INC)), 0, 'no lib' );
     ok( !do 'Yup.pm',           '   do() effected' );
 }

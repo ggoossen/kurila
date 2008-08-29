@@ -114,7 +114,7 @@ EOM
 sub normalise
 {
     return unless $^O eq 'cygwin' ;
-    foreach (< @_)
+    foreach ( @_)
       { s#\r\n#\n#g }     
 }
 
@@ -125,7 +125,7 @@ BEGIN
     }
  
     if ($@) {
-        *Dumper = sub { my $a = shift; return "[ {join ' ', <@{ $a }} ]" } ;
+        *Dumper = sub { my $a = shift; return "[ {join ' ', @( <@{ $a })} ]" } ;
     }          
 }
 

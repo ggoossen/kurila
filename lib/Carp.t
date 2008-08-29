@@ -6,7 +6,7 @@ BEGIN {
 
 my $Is_VMS = $^O eq 'VMS';
 
-use Carp qw(carp cluck croak confess);
+use Carp < qw(carp cluck croak confess);
 
 plan tests => 5;
 

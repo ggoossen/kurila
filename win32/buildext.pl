@@ -38,39 +38,39 @@ use FindExt;
 use Config;
 
 # @ARGV with '!' at first position are exclusions
-my %excl = %( map {$_=>1} map {m/^!(.*)$/} < @ARGV );
-@ARGV = @( grep {!m/^!/} < @ARGV );
+my %excl = %( < map {$_=>1} @( < map {m/^!(.*)$/} @( < @ARGV)) );
+@ARGV = @( < grep {!m/^!/} @( < @ARGV) );
 # @ARGV with '+' at first position are inclusions
-my %incl = %( map {$_=>1} map {m/^\+(.*)$/} < @ARGV );
-@ARGV = @( grep {!m/^\+/} < @ARGV );
+my %incl = %( < map {$_=>1} @( < map {m/^\+(.*)$/} @( < @ARGV)) );
+@ARGV = @( < grep {!m/^\+/} @( < @ARGV) );
 
 # --static/--dynamic
-my %opts = %( map {$_=>1} map {m/^--([\w\-]+)$/} < @ARGV );
-@ARGV = @( grep {!m/^--([\w\-]+)$/} < @ARGV );
+my %opts = %( < map {$_=>1} @( < map {m/^--([\w\-]+)$/} @( < @ARGV)) );
+@ARGV = @( < grep {!m/^--([\w\-]+)$/} @( < @ARGV) );
 my ($static,$dynamic) = ((exists %opts{static}?1:0),(exists %opts{dynamic}?1:0));
 if ("$static,$dynamic" eq "0,0") {
   ($static,$dynamic) = (1,1);
 }
 if (%opts{'list-static-libs'} || %opts{'create-perllibst-h'}) {
-  my @statics = @( split m/\s+/, %Config{static_ext} );
+  my @statics = @( < split m/\s+/, %Config{static_ext} );
   if (%opts{'create-perllibst-h'}) {
     open my $fh, ">", "perllibst.h"
         or die "Failed to write to perllibst.h:$!";
-    my @statics1 = @( map {local $_=$_;s/\//__/g;$_} < @statics );
-    my @statics2 = @( map {local $_=$_;s/\//::/g;$_} < @statics );
+    my @statics1 = @( < map {local $_=$_;s/\//__/g;$_} @( < @statics) );
+    my @statics2 = @( < map {local $_=$_;s/\//::/g;$_} @( < @statics) );
     print $fh "/*DO NOT EDIT\n  this file is included from perllib.c to init static extensions */\n";
-    print $fh "#ifdef STATIC1\n",(map {"    \"$_\",\n"} < @statics),"#undef STATIC1\n#endif\n";
-    print $fh "#ifdef STATIC2\n",(map {"    EXTERN_C void boot_$_ (pTHX_ CV* cv);\n"} < @statics1),"#undef STATIC2\n#endif\n";
-    print $fh "#ifdef STATIC3\n",(map {"    newXS(\"@statics2[$_]::bootstrap\", boot_@statics1[$_], file);\n"} 0 .. ((nelems @statics)-1)),"#undef STATIC3\n#endif\n";
+    print $fh "#ifdef STATIC1\n",(< map {"    \"$_\",\n"} @( < @statics)),"#undef STATIC1\n#endif\n";
+    print $fh "#ifdef STATIC2\n",(< map {"    EXTERN_C void boot_$_ (pTHX_ CV* cv);\n"} @( < @statics1)),"#undef STATIC2\n#endif\n";
+    print $fh "#ifdef STATIC3\n",(< map {"    newXS(\"@statics2[$_]::bootstrap\", boot_@statics1[$_], file);\n"} @( < 0 .. ((nelems @statics)-1))),"#undef STATIC3\n#endif\n";
     close $fh;
   } else {
     my %extralibs;
-    for (< @statics) {
+    for ( @statics) {
       open my $fh, "<", "..\\lib\\auto\\$_\\extralibs.ld" or die "can't open <..\\lib\\auto\\$_\\extralibs.ld: $!";
-      %extralibs{$_}++ for grep {m/\S/} split m/\s+/, join '', ~< $fh;
+      %extralibs{$_}++ for @( < grep {m/\S/} @( < split m/\s+/, join '', @( ~< $fh)));
     }
-    print map {s|/|\\|g;m|([^\\]+)$|;"..\\lib\\auto\\$_\\$1%Config{_a} "} < @statics;
-    print map {"$_ "} sort keys %extralibs;
+    print < map {s|/|\\|g;m|([^\\]+)$|;"..\\lib\\auto\\$_\\$1%Config{_a} "} @( < @statics);
+    print < map {"$_ "} @( < sort @( < keys %extralibs));
   }
   exit(0);
 }
@@ -86,7 +86,7 @@ if ($perl =~ m#^\.\.#) {
 my $pl2bat = "$topdir\\win32\\bin\\pl2bat";
 unless (-f "$pl2bat.bat") {
     my @args = @($perl, ("$pl2bat.pl") x 2);
-    print "{join ' ', <@args}\n";
+    print "{join ' ', @( <@args)}\n";
     system(< @args) unless defined $::Cross::platform;
 }
 my $make = shift;
@@ -99,14 +99,14 @@ my $targ  = shift;
 (my $ext = getcwd()) =~ s{/}{\\}g;
 my $code;
 FindExt::scan_ext($ext);
-FindExt::set_static_extensions(split ' ', %Config{static_ext}) if $ext ne "ext";
+FindExt::set_static_extensions( <split ' ', %Config{static_ext}) if $ext ne "ext";
 
 my @ext;
 push @ext, < FindExt::static_ext() if $static;
 push @ext, < FindExt::dynamic_ext(), < FindExt::nonxs_ext() if $dynamic;
 
 
-foreach $dir (sort < @ext)
+foreach $dir (@( <sort @( < @ext)))
  {
   if (%incl and !exists %incl{$dir}) {
     #warn "Skipping extension $ext\\$dir, not in inclusion list\n";
@@ -128,9 +128,9 @@ foreach $dir (sort < @ext)
                    ? ('LINKTYPE=static') : ()), # if ext is static
 		);
       if (defined $::Cross::platform) {
-	@perl = @(@perl[[0,1]],"-MCross=$::Cross::platform",@perl[[2..((nelems @perl)-1)]]);
+	@perl = @( <@perl[[@(0,1)]],"-MCross=$::Cross::platform", <@perl[[@( <2..((nelems @perl)-1))]]);
       }
-      print join(' ', < @perl), "\n";
+      print join(' ', @( < @perl)), "\n";
       $code = system(< @perl);
       warn "$code from $dir\'s Makefile.PL" if $code;
       $mmod = -M 'Makefile';

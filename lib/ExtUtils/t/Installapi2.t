@@ -22,7 +22,7 @@ use MakeMaker::Test::Setup::BFD;
 BEGIN { use_ok('ExtUtils::Install') }
 
 # Check exports.
-foreach my $func (qw(install uninstall pm_to_blib install_default)) {
+foreach my $func (@( <qw(install uninstall pm_to_blib install_default))) {
     can_ok(__PACKAGE__, $func);
 }
 
@@ -82,14 +82,14 @@ ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
 open(my $packlist, '<', 'install-test/packlist' ) or die;
-my %packlist = %( map { chomp;  ($_ => 1) } ~< $packlist );
+my %packlist = %( < map { chomp;  ($_ => 1) } @( ~< $packlist) );
 close $packlist or die;
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
 # be lowercase. :(
-my $native_dummy = File::Spec->catfile(qw(install-test lib perl Big Dummy.pm));
+my $native_dummy = File::Spec->catfile( <qw(install-test lib perl Big Dummy.pm));
 is( nkeys %packlist, 1 );
-is( lc((keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
+is( lc(( <keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
 
 
 # Test UNINST=1 preserving same versions in other dirs.

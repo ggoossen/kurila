@@ -1,6 +1,6 @@
 package TestCompare;
 
-use vars qw(@ISA @EXPORT $MYPKG);
+use vars < qw(@ISA @EXPORT $MYPKG);
 #use strict;
 #use diagnostics;
 use Exporter;
@@ -8,8 +8,8 @@ use File::Basename;
 use File::Spec;
 use FileHandle;
 
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(&testcmp) );
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(&testcmp) );
 $MYPKG = try { (caller)[[0]] };
 
 ##--------------------------------------------------------------------------

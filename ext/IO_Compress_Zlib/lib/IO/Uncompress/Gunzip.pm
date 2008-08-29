@@ -10,8 +10,8 @@ use bytes;
 
 use IO::Uncompress::RawInflate v2.006 ;
 
-use Compress::Raw::Zlib v2.006 qw( crc32 ) ;
-use IO::Compress::Base::Common v2.006 qw(:Status createSelfTiedObject);
+use Compress::Raw::Zlib v2.006 < qw( crc32 ) ;
+use IO::Compress::Base::Common v2.006 < qw(:Status createSelfTiedObject);
 use IO::Compress::Gzip::Constants v2.006 ;
 use IO::Compress::Zlib::Extra v2.006 ;
 
@@ -19,8 +19,8 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GunzipError);
 
-@ISA = @( qw( IO::Uncompress::RawInflate Exporter ) );
-@EXPORT_OK = @( qw( $GunzipError gunzip ) );
+@ISA = @( < qw( IO::Uncompress::RawInflate Exporter ) );
+@EXPORT_OK = @( < qw( $GunzipError gunzip ) );
 %EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ) ;
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
@@ -46,7 +46,7 @@ sub gunzip
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common  v2.006 qw(:Parse);
+    use IO::Compress::Base::Common  v2.006 < qw(:Parse);
     return  @( 'ParseExtra' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
