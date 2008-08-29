@@ -309,7 +309,11 @@ unless ($pwd_cmd) {
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
     my @localize = @( < grep exists %ENV{$_}, @( < qw(PATH IFS CDPATH ENV BASH_ENV)) );
+<<<<<<< HEAD:lib/Cwd.pm
     local < %ENV{[@(< @localize)]} = ();
+=======
+    local %ENV{[< @localize]} = ();
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Cwd.pm
     
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".

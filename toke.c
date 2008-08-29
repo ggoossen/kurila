@@ -2926,7 +2926,7 @@ Perl_yylex(pTHX)
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");
 		if (PL_minus_a) {
-		    sv_catpvs(PL_linestr,"our @F=@(split(' '));");
+		    sv_catpvs(PL_linestr,"our @F=split(' ');");
 		}
 	    }
 	    if (PL_minus_E)
@@ -5308,8 +5308,8 @@ Perl_yylex(pTHX)
 	    PL_expect = XOPERATOR;
 	    force_next(')');
 	    if (SvCUR(PL_lex_stuff.str_sv)) {
-		OP *words = NULL;
 		int warned = 0;
+		AV *av = newAV();
 		d = SvPV_force(PL_lex_stuff.str_sv, len);
 		while (len) {
 		    for (; isSPACE(*d) && len; --len, ++d)
@@ -5336,15 +5336,12 @@ Perl_yylex(pTHX)
 				/**/;
 			}
 			sv = newSVpvn(b, d-b);
-			words = append_elem(OP_LIST, words,
-					    newSVOP(OP_CONST, 0, tokeq(sv), S_curlocation()));
+			av_push(av, sv);
 		    }
 		}
-		if (words) {
-		    start_force(PL_curforce);
-		    NEXTVAL_NEXTTOKE.opval = words;
-		    force_next(THING);
-		}
+		start_force(PL_curforce);
+		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, av, S_curlocation());
+		force_next(THING);
 	    }
 	    if (PL_lex_stuff.str_sv) {
 		SvREFCNT_dec(PL_lex_stuff.str_sv);

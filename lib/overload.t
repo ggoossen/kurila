@@ -334,9 +334,9 @@ is($out, $foo);
 is($out1, q|f'o\\o|);
 is($out1, $foo1);
 is($out2, "a\afoo,\,");
-is("{join ' ', <@q}", "foo q f'o\\\\o q a\\a qq ,\\, qq");
+is("{join ' ', @q}", "foo q f'o\\\\o q a\\a qq ,\\, qq");
 is($q, 11);
-is("{join ' ', <@qr}", "b\\b qq .\\. qq");
+is("{join ' ', @qr}", "b\\b qq .\\. qq");
 is($qr, 9);
 
 our $res;
@@ -358,10 +358,10 @@ EOF
   s'first part'second part';
   s/yet another/tail here/;
 }
-is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("{join ' ', <@q1}", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
+is($out, '_<foo>_'); is($out1, q|_<f'o\\o>_|); is($out2, "_<a\a>_foo_<,\,>_"); is("{join ' ', @q1}", "foo q f'o\\\\o q a\\a qq ,\\, qq oups
  qq oups1
  q second part s tail here s");
-is("{join ' ', <@qr1}", "b\\b qq .\\. qq try it qq first part qq yet another qq");
+is("{join ' ', @qr1}", "b\\b qq .\\. qq try it qq first part qq yet another qq");
 is($res, 1);
 is($a, "_<oups
 >_");
@@ -391,10 +391,10 @@ is($b, "_<oups1
   use overload 'cmp' => \&comp;
 }
 {
-  my @arr = @( map sorting->new($_), 0..12 );
-  my @sorted1 = @( sort < @arr );
-  my @sorted2 = @( map $$_, < @sorted1 );
-  is("{join ' ', <@sorted2}", '0 10 7 4 1 11 8 5 12 2 9 6 3');
+  my @arr = map sorting->new($_), 0..12;
+  my @sorted1 = sort @arr;
+  my @sorted2 = map $$_, @sorted1;
+  is("{join ' ', @sorted2}", '0 10 7 4 1 11 8 5 12 2 9 6 3');
 }
 {
   package iterator;

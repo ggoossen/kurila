@@ -16,7 +16,7 @@ BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
       }
 
 use Text::Wrap v98.112902 ();
-$Text::Wrap::wrap = 'overflow';
+$Text::Wrap::huge = 'overflow';
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub new {
@@ -76,6 +76,7 @@ sub emit_par {
 
   $self->{'Thispara'} =~ s/\x{AD}//g if Pod::Simple::ASCII;
   my $out = Text::Wrap::wrap($indent, $indent, $self->{'Thispara'} .= "\n");
+
   $out =~ s/\x{A0}/ /g if Pod::Simple::ASCII;
   print {$self->{'output_fh'}} $out, "\n";
   $self->{'Thispara'} = '';

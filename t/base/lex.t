@@ -236,7 +236,7 @@ EOT
   ++$test;
 
   # Ditto.
-  eval(q{@nosuch = @('a', 'b', 'c'); ">{join ' ', <@nosuch}<" eq ">a b c<"}) 
+  eval(q{@nosuch = @('a', 'b', 'c'); ">{join ' ', @nosuch}<" eq ">a b c<"}) 
       || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
@@ -247,7 +247,7 @@ EOT
     *R::crackers = \@array;
   }
 
-  eval(q{makearray(); ">{join ' ', <@R::crackers}<" eq ">fish dog carrot<"})
+  eval(q{makearray(); ">{join ' ', @R::crackers}<" eq ">fish dog carrot<"})
     || print "# $@", "not ";
   print "ok $test\n";
   ++$test;

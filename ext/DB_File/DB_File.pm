@@ -188,7 +188,7 @@ BEGIN {
 }
 
 push @ISA, < qw(Tie::Hash Exporter);
-@EXPORT = @( < qw(
+@EXPORT = qw(
         $DB_BTREE $DB_HASH $DB_RECNO 
 
 	BTREEMAGIC
@@ -219,8 +219,7 @@ push @ISA, < qw(Tie::Hash Exporter);
 	R_SETCURSOR
 	R_SNAPSHOT
 	__R_UNUSED
-
-) );
+);
 
 try {
     # Make all Fcntl O_XXX constants available for importing

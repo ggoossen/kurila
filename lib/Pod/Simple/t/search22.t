@@ -101,7 +101,11 @@ thar 'squaa::Vliff';
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
+<<<<<<< HEAD:lib/Pod/Simple/t/search22.t
 ok grep( m/squaa\.pm/, @( < keys %$where2name) ), 1;
+=======
+ok nelems(grep( m/squaa\.pm/, keys %$where2name) ), 1;
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Pod/Simple/t/search22.t
 
 ok( ($name2where->{'perlthng'}    || 'huh???'), '/[^\^]testlib1/' );
 ok( ($name2where->{'squaa::Vliff'} || 'huh???'), '/[^\^]testlib1/' );

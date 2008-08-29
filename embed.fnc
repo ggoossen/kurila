@@ -229,7 +229,7 @@ p	|I32	|do_msgsnd	|NN SV** mark|NN SV** sp
 p	|I32	|do_semop	|NN SV** mark|NN SV** sp
 p	|I32	|do_shmio	|I32 optype|NN SV** mark|NN SV** sp
 #endif
-Ap	|void	|do_join	|NN SV *sv|NN SV *delim|NN SV **mark|NN SV **sp
+Ap	|void	|do_join	|NN SV *sv|NN SV *delim|NN SV *av
 p	|OP*	|do_kv
 p	|void	|bad_arg	|I32 n|NN const char* t|NN const char* name|NN SV *arg
 p	|void	|do_arg_check	|NN SV** base	
@@ -623,7 +623,6 @@ pd	|void	|pad_free	|PADOFFSET po
 pd	|void	|pad_reset
 pd	|void	|pad_swipe	|PADOFFSET po|bool refadjust
 p	|void	|peep		|NULLOK OP* o
-dopM	|PerlIO*|start_glob	|NN SV *tmpglob|NN GV *gv
 #if defined(USE_REENTRANT_API)
 Ap	|void	|reentrant_size
 Ap	|void	|reentrant_init

@@ -3793,8 +3793,26 @@ PP(pp_expand)
 	    SP += maxarg;
 	}
 	else if (SvTYPE(sv) == SVt_PVHV) {
-	    *PL_stack_sp = sv;
-	    return do_kv();
+	    HV* const hv = (HV*)sv;
+	    register HE *entry;
+
+	    (void)POPs;			/* XXXX May be optimized away? */
+
+	    (void)hv_iterinit(hv);	/* reset iterator */
+
+	    EXTEND(SP, HvKEYS(hv) * 2);
+
+	    PUTBACK;	/* hv_iternext and hv_iterval might clobber stack_sp */
+	    while ((entry = hv_iternext(hv))) {
+		SV *tmpstr;
+		SPAGAIN;
+		XPUSHs(hv_iterkeysv(entry)); /* won't extend stack */
+		PUTBACK;
+		tmpstr = hv_iterval(hv,entry);
+		SPAGAIN;
+		XPUSHs(tmpstr);
+		PUTBACK;
+	    }
 	}
     }
 
@@ -4156,28 +4174,32 @@ PP(pp_unshift)
 PP(pp_reverse)
 {
     dVAR; dSP; dMARK;
-    SV ** const oldsp = SP;
+    SV * const av = sv_mortalcopy(POPs);
+    SV ** ary;
+    SV ** end;
 
-    if (GIMME == G_ARRAY) {
-	MARK++;
-	while (MARK < SP) {
-	    register SV * const tmp = *MARK;
-	    *MARK++ = *SP;
-	    *SP-- = tmp;
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+
+    ary = AvARRAY(av);
+    end = ary + av_len(av);
+    
+    if (ary) {
+	while (ary < end) {
+	    register SV * const tmp = *ary;
+	    *ary++ = *end;
+	    *end-- = tmp;
 	}
-	/* safe as long as stack cannot get extended in the above */
-	SP = oldsp;
     }
-    else {
-	Perl_croak(aTHX_ "reverse not in list context");
-    }
+    PUSHs(av);
     RETURN;
 }
 
 PP(pp_split)
 {
     dVAR; dSP; dTARG;
-    AV *ary;
+    AV *av;
     register IV limit = POPi;			/* note, negative is forever */
     SV * const sv = POPs;
     STRLEN len;
@@ -4197,7 +4219,7 @@ PP(pp_split)
     I32 base;
     const I32 gimme = GIMME_V;
     const I32 oldsave = PL_savestack_ix;
-    U32 make_mortal = SVs_TEMP;
+    U32 make_mortal = 0;
     bool multiline = 0;
     MAGIC *mg = NULL;
 
@@ -4212,40 +4234,8 @@ PP(pp_split)
 
     do_utf8 = (RX_EXTFLAGS(rx) & RXf_PMf_UTF8) != 0;
 
-#ifdef USE_ITHREADS
-    if (pm->op_pmreplrootu.op_pmtargetoff) {
-	ary = GvAVn((GV*)PAD_SVl(pm->op_pmreplrootu.op_pmtargetoff));
-    }
-#else
-    if (pm->op_pmreplrootu.op_pmtargetgv) {
-	ary = GvAVn(pm->op_pmreplrootu.op_pmtargetgv);
-    }
-#endif
-    else
-	ary = NULL;
-    if (ary) {
-	realarray = 1;
-	PUTBACK;
-	av_extend(ary,0);
-	av_clear(ary);
-	SPAGAIN;
-	if ((mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied))) {
-	    PUSHMARK(SP);
-	    XPUSHs(SvTIED_obj((SV*)ary, mg));
-	}
-	else {
-	    if (!AvREAL(ary)) {
-		I32 i;
-		AvREAL_on(ary);
-		AvREIFY_off(ary);
-		for (i = AvFILLp(ary); i >= 0; i--)
-		    AvARRAY(ary)[i] = &PL_sv_undef;	/* don't free mere refs */
-	    }
-	    /* temporarily switch stacks */
-	    SAVESWITCHSTACK(PL_curstack, ary);
-	    make_mortal = 0;
-	}
-    }
+    av = av_2mortal(newAV());
+
     base = SP - PL_stack_base;
     orig = s;
     if (RX_EXTFLAGS(rx) & RXf_SKIPWHITE) {
@@ -4285,7 +4275,7 @@ PP(pp_split)
 		break;
 
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    XPUSHs(dstr);
+	    av_push(av, dstr);
 
 	    /* skip the whitespace found last */
 	    if (do_utf8)
@@ -4311,7 +4301,7 @@ PP(pp_split)
 	    if (m >= strend)
 		break;
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    XPUSHs(dstr);
+	    av_push(av, dstr);
 	    s = m;
 	}
     }
@@ -4330,7 +4320,7 @@ PP(pp_split)
 		if (m >= strend)
 		    break;
 		dstr = newSVpvn_flags(s, m-s, make_mortal);
-		XPUSHs(dstr);
+		av_push(av, dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
 	}
@@ -4340,7 +4330,7 @@ PP(pp_split)
 			     csv, multiline ? FBMrf_MULTILINE : 0)) )
 	    {
 		dstr = newSVpvn_flags(s, m-s, make_mortal);
-		XPUSHs(dstr);
+		av_push(av, dstr);
 		s = m + len; /* Fake \n at the end */
 	    }
 	}
@@ -4366,7 +4356,7 @@ PP(pp_split)
 	    }
 	    m = RX_OFFS(rx)[0].start + orig;
 	    dstr = newSVpvn_flags(s, m-s, make_mortal);
-	    XPUSHs(dstr);
+	    av_push(av, dstr);
 	    if (RX_NPARENS(rx)) {
 		I32 i;
 		for (i = 1; i <= (I32)RX_NPARENS(rx); i++) {
@@ -4381,14 +4371,14 @@ PP(pp_split)
 		    }
 		    else
 			dstr = &PL_sv_undef;  /* undef, not "" */
-		    XPUSHs(dstr);
+		    av_push(av, dstr);
 		}
 	    }
 	    s = RX_OFFS(rx)[0].end + orig;
 	}
     }
 
-    iters = (SP - PL_stack_base) - base;
+    iters = av_len(av) + 1;
     if (iters > maxiters)
 	DIE(aTHX_ "Split loop");
 
@@ -4396,60 +4386,22 @@ PP(pp_split)
     if (s < strend || (iters && origlimit)) {
         const STRLEN l = strend - s;
 	dstr = newSVpvn_flags(s, l, make_mortal);
-	XPUSHs(dstr);
+	av_push(av, dstr);
 	iters++;
     }
     else if (!origlimit) {
-	while (iters > 0 && (!TOPs || !SvANY(TOPs) || SvCUR(TOPs) == 0)) {
-	    if (TOPs && !make_mortal)
-		sv_2mortal(TOPs);
+	SV** last = av_fetch(av, iters-1, 0);
+	while (iters && (!last || !SvOK(*last) || SvCUR(*last) == 0)) {
+	    SvREFCNT_dec(av_pop(av));
 	    iters--;
-	    *SP-- = &PL_sv_undef;
+	    last = av_fetch(av, iters-1, 0);
 	}
     }
 
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    if (realarray) {
-	if (!mg) {
-	    if (SvSMAGICAL(ary)) {
-		PUTBACK;
-		mg_set((SV*)ary);
-		SPAGAIN;
-	    }
-	    if (gimme == G_ARRAY) {
-		EXTEND(SP, iters);
-		Copy(AvARRAY(ary), SP + 1, iters, SV*);
-		SP += iters;
-		RETURN;
-	    }
-	}
-	else {
-	    PUTBACK;
-	    ENTER;
-	    call_method("PUSH",G_SCALAR|G_DISCARD);
-	    LEAVE;
-	    SPAGAIN;
-	    if (gimme == G_ARRAY) {
-		I32 i;
-		/* EXTEND should not be needed - we just popped them */
-		EXTEND(SP, iters);
-		for (i=0; i < iters; i++) {
-		    SV **svp = av_fetch(ary, i, FALSE);
-		    PUSHs((svp) ? *svp : &PL_sv_undef);
-		}
-		RETURN;
-	    }
-	}
-    }
-    else {
-	if (gimme == G_ARRAY)
-	    RETURN;
-    }
-
-    GETTARGET;
-    PUSHi(iters);
+    XPUSHs(av);
     RETURN;
 }
 

@@ -1623,8 +1623,13 @@ sub _ending {
               unless defined $test_results->[$idx];
         }
 
+<<<<<<< HEAD:lib/Test/Builder.pm
         my $num_failed = grep !$_->{'ok'}, @( < 
                               @{$test_results}[[@( <0..$self->{Curr_Test}-1)]]);
+=======
+        my $num_failed = nelems( grep !$_->{'ok'}, @( 
+            @{$test_results}[[ < 0..$self->{Curr_Test}-1]]) );
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Test/Builder.pm
 
         my $num_extra = $self->{Curr_Test} - $self->{Expected_Tests};
 

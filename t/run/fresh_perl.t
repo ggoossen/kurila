@@ -145,14 +145,14 @@ EXPECT
 Modification of a read-only value attempted at - line 1 character 14.
 BEGIN failed--compilation aborted
 ########
-my @a; @a[2] = 1; for (<@a) { $_ = 2 } print "{join ' ', <@a}\n"
+my @a; @a[2] = 1; for (@a) { $_ = 2 } print "{join ' ', @a}\n"
 EXPECT
 2 2 2
 ########
 # used to attach defelem magic to all immortal values,
 # which made restore of local $_ fail.
 foo(2+>1);
-sub foo { bar() for <@_;  }
+sub foo { bar() for @_;  }
 sub bar { local $_; }
 print "ok\n";
 EXPECT
@@ -194,12 +194,12 @@ In foo2
 ########
 our $s = 0;
 map {#this newline here tickles the bug
-$s += $_} (1,2,4);
+$s += $_} @(1,2,4);
 print "eat flaming death\n" unless ($s == 7);
 ########
-BEGIN { @ARGV = @( qw(a b c d e) ) }
-BEGIN { print "argv <{join ' ', <@ARGV}>\nbegin <",shift,">\n" }
-END { print "end <",shift,">\nargv <{join ' ', <@ARGV}>\n" }
+BEGIN { @ARGV = qw(a b c d e) }
+BEGIN { print "argv <{join ' ', @ARGV}>\nbegin <",shift,">\n" }
+END { print "end <",shift,">\nargv <{join ' ', @ARGV}>\n" }
 INIT { print "init <",shift,">\n" }
 CHECK { print "check <",shift,">\n" }
 EXPECT
@@ -296,7 +296,7 @@ BEGIN failed--compilation aborted
 ########
 re();
 sub re {
-    my $re = join '', eval 'qr/(??{ $obj->method })/';
+    my $re = join '', @( eval 'qr/(??{ $obj->method })/' );
     $re;
 }
 EXPECT
@@ -345,7 +345,7 @@ EXPECT
 Modification of a read-only value attempted at - line 2 character 14.
     main::M called at - line 4 character 1.
 ########
-print qw(ab a\b a\\b);
+print < qw(ab a\b a\\b);
 EXPECT
 aba\ba\\b
 ########
@@ -390,12 +390,12 @@ EXPECT
 "x" =~ m/(\G?x)?/;
 ########
 # Bug 20010515.004
-my @h = @(1 .. 10);
+my @h = 1 .. 10;
 bad(<@h);
 sub bad {
    undef @h;
    print "O";
-   print for <@_;
+   print for @_;
    print "K";
 }
 EXPECT

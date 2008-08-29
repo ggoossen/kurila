@@ -66,10 +66,6 @@ Same as C<av_len()>.  Deprecated, use C<av_len()> instead.
 =cut
 */
 
-#ifndef PERL_CORE
-#  define Nullav Null(AV*)
-#endif
-
 #define AvARRAY(av)	((av)->sv_u.svu_array)
 #define AvALLOC(av)	(*((SV***)&((XPVAV*)  SvANY(av))->xav_alloc))
 #define AvMAX(av)	((XPVAV*)  SvANY(av))->xav_max

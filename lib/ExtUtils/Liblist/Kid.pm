@@ -87,7 +87,7 @@ sub _unix_os2_ext {
 	}
 
 	my($found_lib)=0;
-	foreach my $thispth ( @searchpath, < @libpath) {
+	foreach my $thispth ( @( <@searchpath, < @libpath)) {
 
 		# Try to find the full name of the library.  We need this to
 		# determine whether it's a dynamically-loadable library or not.

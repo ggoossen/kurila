@@ -95,7 +95,11 @@ if ($^O eq 'VMS') {
     push(@cmd, ldopts());
    }
    if ($borl) {
+<<<<<<< HEAD:lib/ExtUtils/t/Embed.t
      @cmd = @(@cmd[0],(< grep{m/^-[LI]/} @( <@cmd[[@( <1..((nelems @cmd)-1))]])),(< grep{!m/^-[LI]/} @( <@cmd[[@( <1..((nelems @cmd)-1))]])));
+=======
+     @cmd = @(@cmd[0],(< grep{m/^-[LI]/} @(@cmd[[ <1..((nelems @cmd)-1)]])),(< grep{!m/^-[LI]/} @(@cmd[[ <1..((nelems @cmd)-1)]])));
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/ExtUtils/t/Embed.t
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.

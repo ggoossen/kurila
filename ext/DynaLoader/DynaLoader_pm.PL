@@ -55,14 +55,13 @@ sub _expansion {
 
 sub expand_os_specific {
     my $s = shift;
-    for (@($s)) {
-	s/<<=(.*?)>>/{eval $1}/g;
-	s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
+    $s =~ s/<<=(.*?)>>/{eval $1}/g;
+    $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
            _expansion($1,$2,$3);
         }/gs;
-	if (m/<<(=|\$\^O-)/) {die "bad <<\$^O-eq/ne-osname>> expression.".
-	    " Unclosed brackets?";
-	}
+    if ($s =~ m/<<(=|\$\^O-)/) {
+        die "bad <<\$^O-eq/ne-osname>> expression.".
+          " Unclosed brackets?";
     }
     $s;
 }
@@ -120,7 +119,7 @@ if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[qw(dlext so dlsrc)]};
+our ($dl_dlext, $dl_so, $dlsrc) = %Config::Config{[<qw(dlext so dlsrc)]};
 EOT
 }
 
@@ -260,7 +259,7 @@ if ($dl_debug) {
 	    unless defined(&boot_DynaLoader);
 }
 
-use vars qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
+use vars < qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
             @do_expand);
 
 sub bootstrap_inherit {
@@ -297,7 +296,7 @@ sub bootstrap {
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
 
     <</$^O-eq-os2>>
-    my @modparts = @( split(m/::/,$module) );
+    my @modparts = split(m/::/,$module);
     my $modfname = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
@@ -312,14 +311,14 @@ sub bootstrap {
 	}
     <</$^O-eq-NetWare>>
 
-    my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,<@modparts);
+    my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,@modparts);
 
     print STDERR "DynaLoader::bootstrap for $module ",
 		       <<$^O-eq-MacOS>> "(:auto:$modpname:$modfname.$dl_dlext)\n" 
 		       <<|$^O-eq-MacOS>>"(auto/$modpname/$modfname.$dl_dlext)\n"<</$^O-eq-MacOS>>
 	if $dl_debug;
 
-    foreach (<@INC) {
+    foreach (@INC) {
 	<<$^O-eq-VMS>>chop($_ = VMS::Filespec::unixpath($_));<</$^O-eq-VMS>>
 	<<$^O-eq-MacOS>>
 	    my $path = $_;
@@ -344,9 +343,9 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    ($file) = < dl_findfile(map("-L$_",<@dirs,<@INC), $modfname) unless $file;
+    ($file) = < dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
 
-    die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', <@INC))")
+    die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', @INC))")
 	unless $file;	# wording similar to error from 'require'
 
     <<$^O-eq-VMS>>$file = uc($file) if %Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>
@@ -460,11 +459,11 @@ sub dl_findfile {
             my(@names, $name);    # what filenames to look for
 	    s/^-l//;
 	    push(@names, $_);
-            foreach $dir (<@dirs, <@dl_library_path) {
+            foreach $dir (@(<@dirs, <@dl_library_path)) {
             	next unless -d $dir;
 		$dir =~ s/^([^:]+)$/:$1/;
 		$dir =~ s/:$//;
-            	foreach $name (<@names) {
+            	foreach $name (@names) {
 	    	    my($file) = "$dir:$name";
                     print STDERR " checking in $dir for $name\n" if $dl_debug;
 		    if (-f $file) {
@@ -509,12 +508,12 @@ sub dl_findfile {
 	    @dl_library_path = map { "$drive:$_" } @dl_library_path;
 	}
 	<</$^O-eq-symbian>>
-        foreach $dir (<@dirs, <@dl_library_path) {
+        foreach $dir (@(<@dirs, <@dl_library_path)) {
             next unless -d $dir;
 	    <<$^O-eq-VMS>>
             chop($dir = VMS::Filespec::unixpath($dir));
 	    <</$^O-eq-VMS>>
-            foreach $name (<@names) {
+            foreach $name (@names) {
 		my($file) = "$dir$dirsep$name";
                 print STDERR " checking in $dir for $name\n" if $dl_debug;
 		$file = ($do_expand) ? dl_expandspec($file) : (-f $file && $file);
@@ -527,7 +526,7 @@ sub dl_findfile {
         }
     }
     if ($dl_debug) {
-        foreach(<@dirs) {
+        foreach(@dirs) {
             print STDERR " dl_findfile ignored non-existent directory: $_\n" unless -d $_;
         }
         print STDERR "dl_findfile found: @found\n";
@@ -537,7 +536,7 @@ sub dl_findfile {
 
 
 sub dl_expandspec {
-    my($spec) = @_;
+    my($spec) = < @_;
     # Optional function invoked if DynaLoader.pm sets $do_expand.
     # Most systems do not require or use this function.
     # Some systems may implement it in the dl_*.xs file in which case
@@ -566,7 +565,7 @@ sub dl_find_symbol_anywhere
 {
     my $sym = shift;
     my $libref;
-    foreach $libref (<@dl_librefs) {
+    foreach $libref (@dl_librefs) {
 	my $symref = dl_find_symbol($libref,$sym);
 	return $symref if $symref;
     }

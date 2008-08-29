@@ -381,7 +381,7 @@ sub index_as_html {
   my $level = 0;
 
   my( $target_level, $previous_tagname, $tagname, $text, $anchorname, $indent);
-  foreach my $p ( @$points, \@('head0', '(end)')) {
+  foreach my $p ( @( < @$points, \@('head0', '(end)') ) ) {
     ($tagname, $text) = < @$p;
     $anchorname = $self->section_escape($text);
     if( $tagname =~ m{^head(\d+)$} ) {

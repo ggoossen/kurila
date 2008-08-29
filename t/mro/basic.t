@@ -163,8 +163,8 @@ ok(eq_array(
     my @recurse_codes = @(
         '@MRO_R1::ISA = @("MRO_R2"); @MRO_R2::ISA = @("MRO_R1");',
         '@MRO_R3::ISA = @("MRO_R4"); push(@MRO_R4::ISA, "MRO_R3");',
-        '@MRO_R5::ISA = @("MRO_R6"); @MRO_R6::ISA = @(qw/XX MRO_R5 YY/);',
-        '@MRO_R7::ISA = @("MRO_R8"); push(@MRO_R8::ISA, qw/XX MRO_R7 YY/)',
+        '@MRO_R5::ISA = @("MRO_R6"); @MRO_R6::ISA = qw/XX MRO_R5 YY/;',
+        '@MRO_R7::ISA = @("MRO_R8"); push(@MRO_R8::ISA, < qw/XX MRO_R7 YY/)',
     );
     foreach my $code ( @recurse_codes) {
         eval $code;

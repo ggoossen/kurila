@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 114 );
+plan( tests => 101 );
 
 our (@a, @b);
 
@@ -90,13 +90,13 @@ cmp_ok("{join ' ', @( <@b)}",'eq',"4 3 2 1",'reverse 5');
 cmp_ok("{join ' ', @( <@b)}",'eq',"2 3 4 10",'sort numeric');
 
 our $sub = 'Backwards';
-$x = join('', @( < sort @( $sub < @harry)));
+$x = join('', @( < sort $sub @harry));
 $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'sorter sub name in var 1');
 
 $sub = 'Backwards_stacked';
-$x = join('', @( < sort @( $sub < @harry)));
+$x = join('', @( < sort $sub @harry));
 $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'sorter sub name in var 2');
@@ -121,14 +121,14 @@ cmp_ok("{join ' ', @( <@b)}",'eq','1 2 3 4','reverse then sort');
 
 
 sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface }
-try { @b = @( < sort @( twoface 4,1,3,2) ) };
+try { @b = @( < sort twoface @(4,1,3,2) ) };
 cmp_ok("{join ' ', @( <@b)}",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
 
 try { no warnings 'redefine'; *twoface = sub { &Backwards } };
 ok(!$@,"redefining sort subs outside the sort \$@=[$@]");
 
-try { @b = @( < sort @( twoface 4,1,3,2) ) };
+@b = @( < sort twoface @(4,1,3,2) );
 cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','twoface redefinition');
 
 {
@@ -136,7 +136,7 @@ cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','twoface redefinition');
   *twoface = sub { *twoface = \&Backwards_other; $a <+> $b };
 }
 
-@b = @( < sort @( twoface 4,1,9,5) );
+@b = @( < sort twoface @(4,1,9,5) );
 ok("{join ' ', @( <@b)}" eq "1 4 5 9", 'redefinition should not take effect during the sort');
 
 {
@@ -147,12 +147,12 @@ ok("{join ' ', @( <@b)}" eq "1 4 5 9", 'redefinition should not take effect duri
 		 $a <+> $b;
 	       };
 }
-dies_like( sub { @b = @( < sort @( twoface 4,1) ) },
+dies_like( sub { @b = @( < sort twoface @(4,1) ) },
            qr/^good/, 'twoface eval');
 
 eval <<'CODE';
     # "sort 'one', 'two'" should not try to parse "'one" as a sort sub
-    my @result = @(sort 'one', 'two');
+    my @result = sort @('one', 'two');
 CODE
 cmp_ok($@,'eq','',q(one is not a sub));
 
@@ -160,11 +160,11 @@ cmp_ok($@,'eq','',q(one is not a sub));
   my $sortsub = \&Backwards;
   my $sortglobr = \*Backwards;
   my $sortname = 'Backwards';
-  @b = @( < sort @( $sortsub 4,1,3,2) );
+  @b = @( < sort $sortsub @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname 1');
-  @b = @( < sort @( $sortname 4,1,3,2) );
+  @b = @( < sort $sortname @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname 3');
-  @b = @( < sort @( $sortglobr 4,1,3,2) );
+  @b = @( < sort $sortglobr @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname 4');
 }
 
@@ -172,11 +172,11 @@ cmp_ok($@,'eq','',q(one is not a sub));
   my $sortsub = \&Backwards_stacked;
   my $sortglobr = \*Backwards_stacked;
   my $sortname = 'Backwards_stacked';
-  @b = @( < sort @( $sortsub 4,1,3,2) );
+  @b = @( < sort $sortsub @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname 5');
-  @b = @( < sort @( $sortname 4,1,3,2) );
+  @b = @( < sort $sortname @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname 7');
-  @b = @( < sort @( $sortglobr 4,1,3,2) );
+  @b = @( < sort $sortglobr @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname 8');
 }
 
@@ -185,11 +185,11 @@ our ($sortsub, $sortglob, $sortglobr, $sortname);
   local $sortsub = \&Backwards;
   local $sortglobr = \*Backwards;
   local $sortname = 'Backwards';
-  @b = @( < sort @( $sortsub 4,1,3,2) );
+  @b = @( < sort $sortsub @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname local 1');
-  @b = @( < sort @( $sortname 4,1,3,2) );
+  @b = @( < sort $sortname @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname local 3');
-  @b = @( < sort @( $sortglobr 4,1,3,2) );
+  @b = @( < sort $sortglobr @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname local 4');
 }
 
@@ -197,11 +197,11 @@ our ($sortsub, $sortglob, $sortglobr, $sortname);
   local $sortsub = \&Backwards_stacked;
   local $sortglobr = \*Backwards_stacked;
   local $sortname = 'Backwards_stacked';
-  @b = @( < sort @( $sortsub 4,1,3,2) );
+  @b = @( < sort $sortsub @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname local 5');
-  @b = @( < sort @( $sortname 4,1,3,2) );
+  @b = @( < sort $sortname @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname local 7');
-  @b = @( < sort @( $sortglobr 4,1,3,2) );
+  @b = @( < sort $sortglobr @(4,1,3,2) );
   cmp_ok("{join ' ', @( <@b)}",'eq','4 3 2 1','sortname local 8');
 }
 
@@ -251,7 +251,7 @@ package Foo;
 main::cmp_ok("{join ' ', @( <@b)}",'eq','1996 255 90 19 5','not in main:: 1');
 
 
-@b = @( < sort @( main::Backwards_stacked < @a) );
+@b = @( < sort main::Backwards_stacked @a );
 main::cmp_ok("{join ' ', @( <@b)}",'eq','90 5 255 1996 19','not in main:: 2');
 
 
@@ -303,7 +303,7 @@ package main;
     is "{join ' ', @( <@g)}", "3 2 1", "inplace custom sort of global";
 
     sub mysort { $b cmp $a };
-    @a = @( < qw(b c a) ); $r1 = \@a[1]; @a = @( <sort @( mysort < @a)); $r2 = \@a[0];
+    @a = @( < qw(b c a) ); $r1 = \@a[1]; @a = sort mysort @a; $r2 = \@a[0];
     is "{join ' ', @( <@a)}", "c b a", "inplace sort with function of lexical";
 
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
@@ -328,9 +328,9 @@ package main;
     @g = @(2,3,1); @g = @(( <sort { $a+<$b?1:$a+>$b?-1:0 } @( < @g)),'4');
     is "{join ' ', @( <@g)}", "3 2 1 4", "un-inplace custom sort of global 2";
 
-    @a = @( < qw(b c a) ); @a = @('x', < sort @( mysort < @a));
+    @a = @( < qw(b c a) ); @a = @('x', < sort mysort @a);
     is "{join ' ', @( <@a)}", "x c b a", "un-inplace sort with function of lexical";
-    @a = @( < qw(b c a) ); @a = @(( <sort @( mysort < @a)),'x');
+    @a = @( < qw(b c a) ); @a = @((< sort mysort @a),'x');
     is "{join ' ', @( <@a)}", "c b a x", "un-inplace sort with function of lexical 2";
 }
 
@@ -389,31 +389,31 @@ is join(" ", @( < map {0+$_} @( < @input))), "6 7 8 3 4 5 0 1 2",
     'stable $b cmp $a in place sort';
 
 @input = @( < &generate );
-@output = @( reverse < sort @( < @input) );
+@output = reverse sort @( < @input);
 is join(" ", @( < map {0+$_} @( < @output))), "8 7 6 5 4 3 2 1 0", "Reversed stable sort";
 
 @input = @( < &generate );
-@input = @( reverse < sort @( < @input) );
+@input = reverse sort @input;
 is join(" ", @( < map {0+$_} @( < @input))), "8 7 6 5 4 3 2 1 0",
     "Reversed stable in place sort";
 
 @input = @( < &generate );
-@output = @( reverse < sort {$a cmp $b} @( < @input) );
+@output = reverse sort {$a cmp $b} @input;
 is join(" ", @( < map {0+$_} @( < @output))), "8 7 6 5 4 3 2 1 0",
     'reversed stable $a cmp $b sort';
 
 @input = @( < &generate );
-@input = @( reverse < sort {$a cmp $b} @( < @input) );
+@input = reverse sort {$a cmp $b} @input;
 is join(" ", @( < map {0+$_} @( < @input))), "8 7 6 5 4 3 2 1 0",
     'revesed stable $a cmp $b in place sort';
 
 @input = @( < &generate );
-@output = @( reverse < sort {$b cmp $a} @( < @input) );
+@output = reverse sort {$b cmp $a} @input;
 is join(" ", @( < map {0+$_} @( < @output))), "2 1 0 5 4 3 8 7 6",
     'reversed stable $b cmp $a sort';
 
 @input = @( < &generate );
-@input = @( reverse < sort {$b cmp $a} @( < @input) );
+@input = reverse sort {$b cmp $a} @input;
 is join(" ", @( < map {0+$_} @( < @input))), "2 1 0 5 4 3 8 7 6",
     'revesed stable $b cmp $a in place sort';
 
@@ -423,17 +423,21 @@ sub stuff {
 }
 
 @input = @( < &generate );
+<<<<<<< HEAD:t/op/sort.t
 @output = @( reverse < sort {stuff || $a cmp $b} @( < @input) );
+=======
+@output = reverse sort {stuff || $a cmp $b} @input;
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:t/op/sort.t
 is join(" ", @( < map {0+$_} @( < @output))), "8 7 6 5 4 3 2 1 0",
     'reversed stable complex sort';
 
 @input = @( < &generate );
-@input = @( reverse < sort {stuff || $a cmp $b} @( < @input) );
+@input = reverse sort {stuff || $a cmp $b} @input;
 is join(" ", @( < map {0+$_} @( < @input))), "8 7 6 5 4 3 2 1 0",
     'revesed stable complex in place sort';
 
 sub sortr {
-    @( reverse < sort @( < @_) );
+     reverse sort @_;
 }
 
 @output = @( < sortr < &generate );
@@ -441,7 +445,7 @@ is join(" ", @( < map {0+$_} @( < @output))), "8 7 6 5 4 3 2 1 0",
     'reversed stable sort return list context';
 
 sub sortcmpr {
-    return @( reverse < sort {$a cmp $b} @( < @_) );
+    return reverse sort {$a cmp $b} @_;
 }
 
 @output = @( < sortcmpr < &generate );
@@ -449,7 +453,7 @@ is join(" ", @( < map {0+$_} @( < @output))), "8 7 6 5 4 3 2 1 0",
     'reversed stable $a cmp $b sort return list context';
 
 sub sortcmprba {
-    @( reverse < sort {$b cmp $a} @( < @_) );
+    reverse sort {$b cmp $a} @_;
 }
 
 @output = @( < sortcmprba < &generate );
@@ -502,76 +506,13 @@ is "{join ' ', @( <@b)}" , "6first 6second 5first 5second", "optimized \{$b <=> 
 is "{join ' ', @( <@input)}" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
 };
 
-# These two are actually doing string cmp on 0 1 and 2
-@input = @( < &generate1 );
-@output = @( reverse < sort @( < @input) );
-is "{join ' ', @( <@output)}", "I H G F E D C B A", "Reversed stable sort";
-
-@input = @( < &generate1 );
-@input = @( reverse < sort @( < @input) );
-is "{join ' ', @( <@input)}", "I H G F E D C B A", "Reversed stable in place sort";
-
-@input = @( < &generate1 );
-@output = @( reverse < sort {$a <+> $b} @( < @input) );
-is "{join ' ', @( <@output)}", "I H G F E D C B A", 'reversed stable $a <=> $b sort';
-
-@input = @( < &generate1 );
-@input = @( reverse < sort {$a <+> $b} @( < @input) );
-is "{join ' ', @( <@input)}", "I H G F E D C B A", 'revesed stable $a <=> $b in place sort';
-
-@input = @( < &generate1 );
-@output = @( reverse < sort {$b <+> $a} @( < @input) );
-is "{join ' ', @( <@output)}", "C B A F E D I H G", 'reversed stable $b <=> $a sort';
-
-@input = @( < &generate1 );
-@input = @( reverse < sort {$b <+> $a} @( < @input) );
-is "{join ' ', @( <@input)}", "C B A F E D I H G", 'revesed stable $b <=> $a in place sort';
-
-@input = @( < &generate1 );
-@output = @( reverse < sort {stuff || $a <+> $b} @( < @input) );
-is "{join ' ', @( <@output)}", "I H G F E D C B A", 'reversed stable complex sort';
-
-@input = @( < &generate1 );
-@input = @( reverse < sort {stuff || $a <+> $b} @( < @input) );
-is "{join ' ', @( <@input)}", "I H G F E D C B A", 'revesed stable complex in place sort';
-
-sub sortnumr {
-    @(reverse < sort {$a <+> $b} @( < @_));
-}
-
-@output = @( < sortnumr < &generate1 );
-is "{join ' ', @( <@output)}", "I H G F E D C B A",
-    'reversed stable $a <=> $b sort return list context';
-
-sub sortnumrba {
-    @(reverse < sort {$b <+> $a} @( < @_));
-}
-
-@output = @( < sortnumrba < &generate1 );
-is "{join ' ', @( <@output)}", "C B A F E D I H G",
-    'reversed stable $b <=> $a sort return list context';
-
-sub sortnumrq {
-    @(reverse < sort {stuff || $a <+> $b} @( < @_));
-}
-
-@output = @( < sortnumrq < &generate1 );
-is "{join ' ', @( <@output)}", "I H G F E D C B A",
-    'reversed stable complex sort return list context';
-
-@output = @( < reverse ( @( <sort( @( <qw(C A B))), 0)) );
-is "{join ' ', @( <@output)}", "0 C B A", 'reversed sort with trailing argument';
-
-@output = @( < reverse ( @(0, < sort( @( <qw(C A B))))) );
-is "{join ' ', @( <@output)}", "C B A 0", 'reversed sort with leading argument';
-
 #dies_like( sub { @output = sort {goto sub {}} 1,2; },
 main::dies_like( sub { @output = @( < sort {goto sub {}} @( 1,2) ); },
                  qr(^Can't goto subroutine outside a subroutine),
                  'goto subr outside subr');
 
 sub goto_sub {goto sub{}}
-main::dies_like( sub { @output = @( < sort @( goto_sub 1,2) ); },
+main::dies_like( sub { @output = @( < sort goto_sub @(1,2) ); },
                  qr(^Can't goto subroutine from a sort sub),
                  'goto subr from a sort sub');
 
@@ -583,14 +524,14 @@ main::dies_like( sub { @output = @( < sort {goto label} @( 1,2) ); },
 
 
 sub goto_label {goto label}
-label: try { @output = @( < sort @( goto_label 1,2) ); };
+label: try { @output = @( < sort goto_label @(1,2) ); };
 my $fail_msg = q(Can't "goto" out of a pseudo block);
 main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'goto out of a pseudo block 2');
 
 
 
 sub self_immolate {undef &self_immolate; $a<+>$b}
-main::dies_like( sub { @output = @( < sort @( self_immolate 1,2,3) ) },
+main::dies_like( sub { @output = @( < sort self_immolate @(1,2,3) ) },
                  qr(^Can't undef active subroutine),
                  'undef active subr');
 
@@ -605,7 +546,7 @@ main::dies_like( sub { @output = @( < sort @( self_immolate 1,2,3) ) },
 	    return 1;
 	}
 	if ($n+<5) { rec($n+1); }
-	else { () = < sort @( rec 1,2); }
+	else { () = < sort rec @(1,2); }
 
 	$failed = 1 if !defined $n;
     }
@@ -619,7 +560,7 @@ main::dies_like( sub { @output = @( < sort @( self_immolate 1,2,3) ) },
 # de facto behaviour that shouldn't be broken.
 package main;
 my $answer = "good";
-() = < sort @( OtherPack::foo 1,2,3,4);
+() = < sort OtherPack::foo @(1,2,3,4);
 
 {
     package OtherPack;
@@ -678,5 +619,5 @@ main::is("{join ' ', @( <@b)}", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stac
 
 # As above, but with a sort sub rather than a sort block.
 sub ret_with_stacked { $_ = ($a<+>$b) + do {return $b <+> $a} }
-@b = @( < sort @( ret_with_stacked < 1..10) );
+@b = sort ret_with_stacked 1..10;
 main::is("{join ' ', @( <@b)}", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");

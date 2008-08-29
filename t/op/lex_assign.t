@@ -212,10 +212,10 @@ quotemeta $cstr			# quotemeta
 (each %h) % 2 == 1		# each
 nkeys %h				# nkeys
 pack "C2", $n,$n		# pack
-join "a"; @a			# join
+join "a", @a			# join
 push @a,3==6			# push
 unshift @aaa			# unshift
-grep $_, 1,0,2,0,3		# grepwhile
+'???'		# grepwhile
 subb()				# entersub
 caller				# caller
 '???'                           # warn

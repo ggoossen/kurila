@@ -148,7 +148,11 @@ sub heavy_export {
 	    # (Technique could be applied to $export_cache at cost of memory)
 	    my @expanded = @( < map { m/^\w/ ? ($_, '&'.$_) : $_ } @( < @$fail) );
 	    warn "{$pkg}::EXPORT_FAIL cached: {join ' ', @( <@expanded)}" if $Exporter::Verbose;
+<<<<<<< HEAD:lib/Exporter/Heavy.pm
  <	    %{$fail_cache}{[@(< @expanded)]} = (1) x nelems @expanded;
+=======
+	    %{$fail_cache}{[< @expanded]} = (1) x nelems @expanded;
+>>>>>>> eb746b9e6f7abf4c7e254e56405565dcb1d5f78d:lib/Exporter/Heavy.pm
 	}
 	my @failed;
 	foreach $sym ( @imports) { push(@failed, $sym) if $fail_cache->{$sym} }

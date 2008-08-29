@@ -19,54 +19,45 @@ BEGIN	{
 sub expand {
 	my @l;
 	my $pad;
-	for (@( @_[0]) ) {
-		my $s = '';
-		for (@( <split(m/^/m, $_, -1))) {
-			my $offs = 0;
-			s{\t}{{
+        my $s = '';
+        for (@( <split(m/^/m, @_[0], -1))) {
+            my $offs = 0;
+            s{\t}{{
 				$pad = $tabstop - (pos() + $offs) % $tabstop;
 				$offs += $pad - 1;
 				" " x $pad;
 			}}g;
-			$s .= $_;
-		}
-		push(@l, $s);
-	}
-	return @l[0];
+            $s .= $_;
+        }
+        return $s;
 }
 
 sub unexpand
 {
 	my (@l) = @( < @_ );
 	my @e;
-	my $x;
-	my $line;
-	my @lines;
 	my $lastbit;
 	my $ts_as_space = " "x$tabstop;
-	for $x (@(@l[0])) {
-		@lines = @( < split("\n", $x, -1) );
-		for $line ( @lines) {
-			$line = expand($line);
-			@e = @( < split(m/(.{$tabstop})/,$line,-1) );
-			$lastbit = pop(@e);
-			$lastbit = '' 
-				unless defined $lastbit;
-			$lastbit = "\t"
-				if $lastbit eq $ts_as_space;
-			for $_ ( @e) {
-				if ($debug) {
-					my $x = $_;
-					$x =~ s/\t/^I\t/gs;
-					print "sub on '$x'\n";
-				}
-				s/  +$/\t/;
-			}
-			$line = join('', @(< @e, $lastbit));
-		}
-		$x = join("\n", @( < @lines));
-	}
-	return @l[0];
+        my @lines = @( < split("\n", @l[0], -1) );
+        for ( @lines) {
+            my $line = expand($_);
+            @e = @( < split(m/(.{$tabstop})/,$line,-1) );
+            $lastbit = pop(@e);
+            $lastbit = '' 
+              unless defined $lastbit;
+            $lastbit = "\t"
+              if $lastbit eq $ts_as_space;
+            for $_ ( @e) {
+                if ($debug) {
+                    my $x = $_;
+                    $x =~ s/\t/^I\t/gs;
+                    print "sub on '$x'\n";
+                }
+                s/  +$/\t/;
+            }
+            $_ = join('', @(< @e, $lastbit));
+        }
+        return join("\n", @( < @lines));
 }
 
 1;

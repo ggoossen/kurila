@@ -140,7 +140,7 @@ Use of uninitialized value $y in scalar chop at - line 3 character 9.
 # perlbug 20011116.125
 use warnings 'uninitialized';
 $a = undef;
-my $foo = join '', $a, "\n";
+my $foo = join '', @($a, "\n");
 $foo = "$a\n";
 $foo = "a:$a\n";
 EXPECT
