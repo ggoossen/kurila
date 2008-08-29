@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 61;
+plan tests => 57;
 
 our (@foo, $foo, $c, @bar, $got, %chop, %chomp, $x, $y);
 
@@ -121,19 +121,6 @@ is ($_, "abc\x{1234}");
 $_ = "\x{1234}\x{2345}";
 chop;
 is ($_, "\x{1234}");
-
-my @stuff = @( < qw(this that) );
-is (chop( <@stuff[[@(0,1)]]), 't');
-
-# bug id 20010305.012
-@stuff = @( < qw(ab cd ef) );
-is (chop(@stuff = @( < @stuff )), 'f');
-
-@stuff = @( < qw(ab cd ef) );
-is (chop( <@stuff[[@(0, 2)]]), 'f');
-
-my %stuff = %( <1..4);
-is (chop( <%stuff{[@(1, 3)]}), '4');
 
 }
 

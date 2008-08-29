@@ -71,7 +71,7 @@ elsif ($^O ne 'MacOS')
 }
 
 
-ok( nelems(grep(m|\Q$blib_lib\E$|, @(@INC[[0,1]])))  == 1,     "  $blib_lib in \@INC");
-ok( nelems(grep(m|\Q$blib_arch\E$|, @(@INC[[0,1]]))) == 1,     "  $blib_arch in \@INC");
+ok( nelems(grep(m|\Q$blib_lib\E$|, @INC[[0..1]]))  == 1,     "  $blib_lib in \@INC");
+ok( nelems(grep(m|\Q$blib_arch\E$|, @INC[[0..1]])) == 1,     "  $blib_arch in \@INC");
 
 END { _cleanup( < @blib_dirs ); }
