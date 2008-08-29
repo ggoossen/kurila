@@ -25,10 +25,6 @@ $| = 1;
 
 # Because were are going to be changing directory before running Makefile.PL
 my $perl = $^X;
-# 5.005 doesn't have new enough File::Spec to have rel2abs. But actually we
-# only need it when $^X isn't absolute, which is going to be 5.8.0 or later
-# (where ExtUtils::Constant is in the core, and tests against the uninstalled
-# perl)
 $perl = File::Spec->rel2abs ($perl);
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
@@ -383,18 +379,18 @@ use Carp;
 
 require Exporter;
 require DynaLoader;
-use vars qw ($VERSION @ISA @EXPORT_OK);
+use vars < qw ($VERSION @ISA @EXPORT_OK);
 
 $VERSION = '0.01';
-@ISA = @(qw(Exporter DynaLoader));
+@ISA = qw(Exporter DynaLoader);
 EOT
   # Having this qw( in the here doc confuses cperl mode far too much to be
   # helpful. And I'm using cperl mode to edit this, even if you're not :-)
-  print FH "\@EXPORT_OK = \@(qw(\n";
+  print FH "\@EXPORT_OK = qw(\n";
 
   # Print the names of all our autoloaded constants
   print FH "\t$_\n" foreach @( (< @$export_names));
-  print FH "));\n";
+  print FH ");\n";
   print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
   close FH or die "close $pm: $!\n";
 
@@ -405,7 +401,7 @@ EOT
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
-use $package qw({join ' ', @( <@$export_names)});
+use $package < qw({join ' ', @( <@$export_names)});
 
 print "1..2\n";
 if (open OUTPUT, ">", "$output") \{

@@ -261,7 +261,7 @@ sub lock_hashref {
 
     lock_ref_keys($hash);
 
-    foreach my $value (@( <values %$hash)) {
+    foreach my $value (values %$hash) {
         Internals::SvREADONLY($value,1);
     }
 
@@ -271,7 +271,7 @@ sub lock_hashref {
 sub unlock_hashref {
     my $hash = shift;
 
-    foreach my $value (@( <values %$hash)) {
+    foreach my $value (values %$hash) {
         Internals::SvREADONLY($value, 0);
     }
 

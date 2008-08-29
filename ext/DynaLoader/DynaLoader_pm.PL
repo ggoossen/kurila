@@ -154,7 +154,7 @@ our @dl_modules;              # Modules we have loaded
 EOT
 
 my $cfg_dl_library_path = <<'EOT';
-push(@dl_library_path, split(' ', %Config::Config{libpth}));
+push(@dl_library_path, < split(' ', %Config::Config{libpth}));
 EOT
 
 sub dquoted_comma_list {
@@ -209,7 +209,7 @@ EOT
 my $env_dl_library_path = <<'EOT';
 if ($ldlibpthname_defined &&
     exists %ENV{$ldlibpthname}) {
-    push(@dl_library_path, split(m/$pthsep/, %ENV{$ldlibpthname}));
+    push(@dl_library_path, < split(m/$pthsep/, %ENV{$ldlibpthname}));
 }
 
 # E.g. HP-UX supports both its native SHLIB_PATH *and* LD_LIBRARY_PATH.
@@ -217,7 +217,7 @@ if ($ldlibpthname_defined &&
 if ($ldlibpthname_defined &&
     $ldlibpthname ne 'LD_LIBRARY_PATH' &&
     exists %ENV{LD_LIBRARY_PATH}) {
-    push(@dl_library_path, split(m/$pthsep/, %ENV{LD_LIBRARY_PATH}));
+    push(@dl_library_path, < split(m/$pthsep/, %ENV{LD_LIBRARY_PATH}));
 }
 EOT
 
@@ -427,7 +427,7 @@ sub dl_findfile {
     print STDERR "dl_findfile(@args)\n" if $dl_debug;
 
     # accumulate directories but process files as they appear
-    arg: foreach(<@args) {
+    arg: foreach(@args) {
         #  Special fast case: full filepath requires no search
 	<<$^O-eq-VMS>>
         if (m%[:>/\]]% && -f $_) {

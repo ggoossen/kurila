@@ -208,7 +208,7 @@ sub echo {
     if( $file ) {
         my $redirect = $appending ? '>>' : '>';
         @cmds[0] .= " $redirect $file";
-        $_ .= " >> $file" foreach @( < @cmds[[@( <1..((nelems @cmds)-1))]]);
+        $_ .= " >> $file" foreach @cmds[[1..((nelems @cmds)-1)]];
     }
 
     return @cmds;
