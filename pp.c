@@ -3419,7 +3419,7 @@ PP(pp_aslice)
 	    if (PL_op->op_private & OPpLVAL_INTRO)
 		save_aelem(av, elem, svp);
 	}
-	SVcpREPLACE(*ip, *svp);
+	SVcpREPLACE(*ip, svp ? *svp : &PL_sv_undef );
         ip++;
     }
 

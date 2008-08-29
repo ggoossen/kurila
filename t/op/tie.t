@@ -194,7 +194,7 @@ print exists %ENV{FooA} ? 1 : 0, "\n";
 print exists %ENV{FooB} ? 2 : 0, "\n";
 print exists %ENV{FooC} ? 3 : 0, "\n";
 {
-    local %ENV{[<qw(FooA FooC)]} = ();
+    local %ENV{[qw(FooA FooC)]} = ();
     print exists %ENV{FooA} ? 4 : 0, "\n";
     print exists %ENV{FooB} ? 5 : 0, "\n";
     print exists %ENV{FooC} ? 6 : 0, "\n";
