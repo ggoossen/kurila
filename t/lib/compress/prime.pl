@@ -43,7 +43,7 @@ EOM
 
     is anyUncompress(\$cc), $hello ;
 
-    for my $blocksize (1, 2, 13)
+    for my $blocksize (@(1, 2, 13))
     {
         for my $i (0 .. length($compressed) - 1)
         {

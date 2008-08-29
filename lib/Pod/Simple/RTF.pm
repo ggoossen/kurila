@@ -6,7 +6,7 @@ package Pod::Simple::RTF;
 #sub Pod::Simple::PullParser::DEBUG () {4};
 
 use strict;
-use vars qw($VERSION @ISA %Escape $WRAP %Tagmap);
+use vars < qw($VERSION @ISA %Escape $WRAP %Tagmap);
 $VERSION = '2.02';
 use Pod::Simple::PullParser ();
 BEGIN {@ISA = @('Pod::Simple::PullParser')}
@@ -19,10 +19,10 @@ $WRAP = 1 unless defined $WRAP;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub _openclose {
- return @(map {;
+ return @(< map {;
    m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
    ( $1,  "\{\\$2\n",   "/$1",  "\}" );
- } < @_);
+ } @( < @_));
 }
 
 my @_to_accept;
@@ -39,8 +39,8 @@ my @_to_accept;
   'VerbatimB=cs27\b',
   'VerbatimBI=cs28\b\i',
 
-  map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ }
-   qw[
+  < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ }
+ @( <   qw[
        underline=ul         smallcaps=scaps  shadow=shad
        superscript=super    subscript=sub    strikethrough=strike
        outline=outl         emboss=embo      engrave=impr   
@@ -48,7 +48,7 @@ my @_to_accept;
        dot-dash-underline=uldashd    dot-dot-dash-underline=uldashdd     
        double-underline=uldb         thick-underline=ulth
        word-underline=ulw            wave-underline=ulwave
-   ]
+   ])
    # But no double-strikethrough, because MSWord can't agree with the
    #  RTF spec on whether it's supposed to be \strikedl or \striked1 (!!!)
  ),
@@ -100,7 +100,7 @@ sub new {
 
   $new->accept_codes(< @_to_accept);
   $new->accept_codes('VerbatimFormatted');
-  DEBUG +> 2 and print "To accept: ", join(' ',< @_to_accept), "\n";
+  DEBUG +> 2 and print "To accept: ", join(' ', @(< @_to_accept)), "\n";
   $new->doc_lang(
     (  %ENV{'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ? $1
     : (%ENV{'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ? hex($1)
@@ -206,7 +206,7 @@ sub do_middle {      # the main work
 
     } elsif( $type eq 'start' ) {
       DEBUG +> 1 and print "  +$type ", <$token->tagname,
-        " (", map("<$_> ", < %{$token->attr_hash}), ")\n";
+        " (", < map("<$_> ", @( < %{$token->attr_hash})), ")\n";
 
       if( ($tagname = $token->tagname) eq 'Verbatim'
           or $tagname eq 'VerbatimFormatted'
@@ -262,7 +262,7 @@ sub do_middle {      # the main work
           } elsif ((nelems @to_unget) +> 40) {
             DEBUG +> 1 and print "    item-* now has too many tokens (",
               scalar(nelems @to_unget),
-              (DEBUG +> 4) ? (q<: >, map( <$_->dump, < @to_unget)) : (),
+              (DEBUG +> 4) ? (q<: >, < map( <$_->dump, @( < @to_unget))) : (),
               ") to be keepn'd.\n";
             last; # give up
           }
@@ -325,14 +325,14 @@ sub do_middle {      # the main work
 sub do_beginning {
   my $self = @_[0];
   my $fh = $self->{'output_fh'};
-  return print $fh join '', <
+  return print $fh join '', @( <
     $self->doc_init, <
     $self->font_table, <
     $self->stylesheet, <
     $self->color_table, <
     $self->doc_info, <
     $self->doc_start,
-    "\n"
+    "\n")
   ;
 }
 
@@ -481,7 +481,7 @@ END
 use integer;
 sub rtf_esc {
   my $x; # scratch
-  ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
+  ($x = (((nelems @_) == 1) ? @_[0] : join '', @( < @_))
   ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
   # Escape \, {, }, -, control chars, and 7f-ff.
   $x =~ s/([^\x[00]-\x[FF]])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
@@ -496,7 +496,7 @@ sub rtf_esc_codely {
   #  looks just like a normal dash character).
   
   my $x; # scratch
-  ($x = (((nelems @_) == 1) ? @_[0] : join '', < @_)
+  ($x = (((nelems @_) == 1) ? @_[0] : join '', @( < @_))
   ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
   # Escape \, {, }, -, control chars, and 7f-ff.
   $x =~ s/([^\x00-\xFF])/{'\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?'}/g;
@@ -504,10 +504,10 @@ sub rtf_esc_codely {
 }
 
 %Escape = %(
-  map( (chr($_),chr($_)),       # things not apparently needing escaping
-       0x20 .. 0x7E ),
-  map( (chr($_),sprintf("\\'\%02x", $_)),    # apparently escapeworthy things
-       0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, 0x7f .. 0xFF, 0x46),
+  < map( (chr($_),chr($_)), @( <       # things not apparently needing escaping
+       0x20 .. 0x7E) ),
+  < map( (chr($_),sprintf("\\'\%02x", $_)), @( <    # apparently escapeworthy things
+       0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46)),
 
   # We get to escape out 'F' so that we can send RTF files thru the mail
   # without the slightest worry that paragraphs beginning with "From"

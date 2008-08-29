@@ -9,9 +9,9 @@ our ($VERSION, @ISA, @EXPORT, %ZIP_CM_MIN_VERSIONS);
 
 $VERSION = '2.006';
 
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 
-@EXPORT= @( qw(
+@EXPORT= @( < qw(
 
     ZIP_CM_STORE
     ZIP_CM_DEFLATE

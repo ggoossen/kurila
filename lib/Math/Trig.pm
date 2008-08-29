@@ -9,28 +9,28 @@ package Math::Trig;
 
 use strict;
 
-use vars qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use vars < qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 
 $VERSION = 1.16;
 
-my @angcnv = @( qw(rad2deg rad2grad
+my @angcnv = @( < qw(rad2deg rad2grad
 		deg2rad deg2grad
 		grad2rad grad2deg) );
 
-my @areal = @( qw(asin_real acos_real) );
+my @areal = @( < qw(asin_real acos_real) );
 
 @EXPORT = @(< @angcnv, < @areal);
 
-my @rdlcnv = @( qw(cartesian_to_cylindrical
+my @rdlcnv = @( < qw(cartesian_to_cylindrical
 		cartesian_to_spherical
 		cylindrical_to_cartesian
 		cylindrical_to_spherical
 		spherical_to_cartesian
 		spherical_to_cylindrical) );
 
-my @greatcircle = @( qw(
+my @greatcircle = @( < qw(
 		     great_circle_distance
 		     great_circle_direction
 		     great_circle_bearing
@@ -39,7 +39,7 @@ my @greatcircle = @( qw(
 		     great_circle_destination
 		    ) );
 
-my @pi = @( qw(pi pi2 pi4 pip2 pip4) );
+my @pi = @( < qw(pi pi2 pi4 pip2 pip4) );
 
 @EXPORT_OK = @(< @rdlcnv, < @greatcircle, < @pi, 'tan' );
 
@@ -223,7 +223,7 @@ sub great_circle_waypoint {
 }
 
 sub great_circle_midpoint {
-    great_circle_waypoint(@_[[0..3]], 0.5);
+    great_circle_waypoint( <@_[[@( <0..3)]], 0.5);
 }
 
 sub great_circle_destination {

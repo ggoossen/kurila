@@ -7,7 +7,7 @@ BEGIN {
     }
     if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
-	@INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
+	@INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
     }
 }
 
@@ -44,13 +44,13 @@ ok($Collator->eq("", ""));
 is($Collator->cmp("", "perl"), -1);
 
 is(
-  join(':', < $Collator->sort( qw/ acha aca ada acia acka / ) ),
-  join(':',                  qw/ aca acha acia acka ada / ),
+  join(':', @( < $Collator->sort( < qw/ acha aca ada acia acka / )) ),
+  join(':', @( <                  qw/ aca acha acia acka ada /) ),
 );
 
 is(
-  join(':', < $Collator->sort( qw/ ACHA ACA ADA ACIA ACKA / ) ),
-  join(':',                  qw/ ACA ACHA ACIA ACKA ADA / ),
+  join(':', @( < $Collator->sort( < qw/ ACHA ACA ADA ACIA ACKA / )) ),
+  join(':', @( <                  qw/ ACA ACHA ACIA ACKA ADA /) ),
 );
 
 ##### 8..18
@@ -153,8 +153,8 @@ ENTRIES
 );
 
 ok(
-  join(':', < $onlyABC->sort( qw/ ABA BAC cc A Ab cAc aB / ) ),
-  join(':',                 qw/ A aB Ab ABA BAC cAc cc / ),
+  join(':', @( < $onlyABC->sort( < qw/ ABA BAC cc A Ab cAc aB / )) ),
+  join(':', @( <                 qw/ A aB Ab ABA BAC cAc cc /) ),
 );
 
 ##### 56..59
@@ -220,8 +220,8 @@ ENTRIES
 
 # defined before undefined
 
-my $sortABC = join '', <
-    $few_entries->sort(split m//, "ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
+my $sortABC = join '', @( <
+    $few_entries->sort( <split m//, "ABCDEFGHIJKLMNOPQRSTUVWXYZ "));
 
 ok($sortABC eq "PERL ABCDFGHIJKMNOQSTUVWXYZ");
 

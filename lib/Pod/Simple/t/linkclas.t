@@ -37,7 +37,7 @@ ok ref($treelet), 'Pod::Simple::LinkSection';
 print "# Testing stringification...\n";
 
 ok $treelet->stringify, 'abc';  # explicit
-ok join('', $treelet),  'abc';  # implicit
+ok join('', @( $treelet)),  'abc';  # implicit
 
 
 print "# Testing non-coreferentiality...\n";
@@ -60,7 +60,7 @@ print "# Testing non-coreferentiality...\n";
   # since we just conspicuously nuked $bare_treelet
   
   ok $treelet->stringify, 'abc';  # explicit
-  ok join('', $treelet),  'abc';  # implicit
+  ok join('', @( $treelet)),  'abc';  # implicit
 }
 
 

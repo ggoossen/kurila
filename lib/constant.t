@@ -1,7 +1,7 @@
 #!./perl -T
 
 use warnings;
-use vars qw{ @warnings $fagwoosh $putt $kloong};
+use vars < qw{ @warnings $fagwoosh $putt $kloong};
 BEGIN {				# ...and save 'em for later
     $^WARN_HOOK = sub { push @warnings, @_[0]->{description} }
 }
@@ -47,13 +47,13 @@ is( (nelems @undef), 0);
 is( (nelems @undef), 0);
 
 use constant COUNTDOWN	=> '54321';
-use constant COUNTLIST	=> reverse 1, 2, 3, 4, 5;
+use constant COUNTLIST	=> < reverse @( 1, 2, 3, 4, 5);
 use constant COUNTLAST	=> ( <COUNTLIST)[[-1]];
 
 is COUNTDOWN, '54321';
 my @cl = @( < COUNTLIST );
 is nelems(@cl), 5;
-is COUNTDOWN, join '', < @cl;
+is COUNTDOWN, join '', @( < @cl);
 is COUNTLAST, 1;
 is(( <COUNTLIST)[[1]], 4);
 
@@ -61,7 +61,7 @@ use constant ABC	=> 'ABC';
 is "abc${\( ABC )}abc", "abcABCabc";
 
 use constant DEF	=> 'D', 'E', chr ord 'F';
-is "d e f {join ' ', <@{\@( < DEF )}} d e f", "d e f D E F d e f";
+is "d e f {join ' ', @( <@{\@( < DEF )})} d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';
@@ -105,11 +105,11 @@ cmp_ok E2BIG, '==', 7;
 # text may vary, so we can't test much better than this.
 cmp_ok length(E2BIG), '+>', 6;
 
-is nelems(@warnings), 0 or diag join "\n", "unexpected warning", < @warnings;
+is nelems(@warnings), 0 or diag join "\n", @( "unexpected warning", < @warnings);
 @warnings = @( () );		# just in case
 undef &PI;
 ok nelems(@warnings) && (@warnings[0] =~ m/Constant sub.* undefined/) or
-  diag join "\n", "unexpected warning", < @warnings;
+  diag join "\n", @( "unexpected warning", < @warnings);
 shift @warnings;
 
 is nelems(@warnings), 0, "unexpected warning";
@@ -224,7 +224,7 @@ elsif ((nelems @warnings) == (nelems @Expected_Warnings) + 1) {
 else {
     my $rule = " -" x 20;
     diag "/!\\ unexpected case: ", scalar nelems @warnings, " warnings\n$rule\n";
-    diag map { "  $_" } < @warnings;
+    diag < map { "  $_" } @( < @warnings);
     diag $rule, $/;
 }
 
@@ -239,9 +239,9 @@ for my $idx (0..((nelems @warnings)-1)) {
 
 use constant \%(
 	THREE  => 3,
-	FAMILY => \@( qw( John Jane Sally ) ),
+	FAMILY => \@( < qw( John Jane Sally ) ),
 	AGES   => \%( John => 33, Jane => 28, Sally => 3 ),
-	RFAM   => \@( \@( qw( John Jane Sally ) ) ),
+	RFAM   => \@( \@( < qw( John Jane Sally ) ) ),
 	SPIT   => sub { shift },
 );
 
@@ -269,7 +269,7 @@ $kloong = 'schlozhauer';
     local $^WARN_HOOK = sub { push @warnings, < @_ };
     eval 'use constant fagwoosh => 5; 1' or die $@;
 
-    is ("{join ' ', <@warnings}", "", "No warnings if the typeglob exists already");
+    is ("{join ' ', @( <@warnings)}", "", "No warnings if the typeglob exists already");
 
     my $value = eval 'fagwoosh';
     is ($@, '');
@@ -281,7 +281,7 @@ $kloong = 'schlozhauer';
 
     eval 'use constant putt => 6, 7; 1' or die $@;
 
-    is ("{join ' ', <@warnings}", "", "No warnings if the typeglob exists already");
+    is ("{join ' ', @( <@warnings)}", "", "No warnings if the typeglob exists already");
 
     @value = eval 'putt';
     is ($@, '');
@@ -289,7 +289,7 @@ $kloong = 'schlozhauer';
 
     eval 'use constant "klong"; 1' or die $@;
 
-    is ("{join ' ', <@warnings}", "", "No warnings if the typeglob exists already");
+    is ("{join ' ', @( <@warnings)}", "", "No warnings if the typeglob exists already");
 
     $value = eval 'klong';
     is ($@, '');

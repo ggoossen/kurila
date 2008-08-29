@@ -12,7 +12,7 @@ require './test.pl';
     sub foo { return @_[1]+1 };
 
     package MCTest::Derived;
-    our @ISA = @( qw/MCTest::Base/ );
+    our @ISA = @( < qw/MCTest::Base/ );
 
     package Foo; our @FOO = @( qw// );
 }
@@ -49,4 +49,4 @@ my @testsubs = @(
 
 plan(tests => scalar(nelems @testsubs));
 
-$_->() for (< @testsubs);
+$_->() for @( (< @testsubs));

@@ -9,12 +9,12 @@ my $EPOC32 = "%ENV{EPOCROOT}epoc32";
 my $EXE = "$EPOC32\\release\\thumb\\urel\\perlapp.app";
 my $RSC = "$EPOC32\\data\\z\\system\\apps\\perlapp\\perlapp.rsc";
 
-use Fcntl qw(O_RDONLY);
+use Fcntl < qw(O_RDONLY);
 
 my %new = %($EXE => 'perlappmin.hex',
 	   $RSC => 'perlrscmin.hex');
 
-for my $fn ($EXE, $RSC) {
+for my $fn (@($EXE, $RSC)) {
     if (sysopen(my $fh, $fn, O_RDONLY)) {
 	my $buffer;
 	my $size = -s $fn;

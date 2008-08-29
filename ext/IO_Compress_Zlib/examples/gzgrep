@@ -2,7 +2,7 @@
 
 use strict ;
 use warnings ;
-use IO::Uncompress::Gunzip qw($GunzipError);
+use IO::Uncompress::Gunzip < qw($GunzipError);
 
 die "Usage: gzgrep pattern [file...]\n"
     unless (nelems @ARGV) +>= 1;
@@ -12,7 +12,7 @@ my $file ;
 
 @ARGV = @( '-' ) unless (nelems @ARGV) ;
 
-foreach $file (< @ARGV) {
+foreach $file ( @ARGV) {
     my $gz = IO::Uncompress::Gunzip->new( $file) 
          or die "Cannot uncompress $file: $GunzipError\n" ;
 

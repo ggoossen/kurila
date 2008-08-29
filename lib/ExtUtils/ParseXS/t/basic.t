@@ -5,14 +5,14 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
       or die "Can't chdir to lib/ExtUtils/ParseXS: $!";
-    @INC = @( qw(../.. ../../.. .) );
+    @INC = @( < qw(../.. ../../.. .) );
   }
 }
 use strict;
 use Test;
 BEGIN { plan tests => 10 };
 use DynaLoader;
-use ExtUtils::ParseXS qw(process_file);
+use ExtUtils::ParseXS < qw(process_file);
 use ExtUtils::CBuilder;
 ok(1); # If we made it this far, we're loaded.
 

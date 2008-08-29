@@ -46,7 +46,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
   DEBUG +> 5 and
    print "#  About to parse lines: ",
-     join(' ', map defined($_) ? "[$_]" : "EOF", < @_), "\n";
+     join(' ', @( < map defined($_) ? "[$_]" : "EOF", @( < @_))), "\n";
 
   my $paras = ($self->{'paras'} ||= \@());
    # paragraph buffer.  Because we need to defer processing of =over
@@ -56,7 +56,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
   $self->{'pod_para_count'} ||= 0;
 
   my $line;
-  foreach my $source_line (< @_) {
+  foreach my $source_line ( @_) {
     if( $self->{'source_dead'} ) {
       DEBUG +> 4 and print "# Source is dead.\n";
       last;
@@ -143,7 +143,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         }
       } else {
         DEBUG +> 5 and print "# It's a code-line.\n";
-        $code_handler->(map $_, $line, $self->{'line_count'}, $self)
+        $code_handler->(< map $_, @( $line, $self->{'line_count'}, $self))
          if $code_handler;
         # Note: this may cause code to be processed out of order relative
         #  to pods, but in order relative to cuts.
@@ -181,7 +181,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       # ++$self->{'pod_para_count'};
       $self->_ponder_paragraph_buffer();
        # by now it's safe to consider the previous paragraph as done.
-      $cut_handler->(map $_, $line, $self->{'line_count'}, $self)
+      $cut_handler->(< map $_, @( $line, $self->{'line_count'}, $self))
        if $cut_handler;
 
       # TODO: add to docs: Note: this may cause cuts to be processed out
@@ -303,14 +303,14 @@ sub _handle_encoding_line {
 
     # Note unsupported, and complain
     DEBUG and print " Encoding [$e] is unsupported.",
-      "\nSupporteds: {join ' ', <@supported}\n";
+      "\nSupporteds: {join ' ', @( <@supported)}\n";
     my $suggestion = '';
 
     # Look for a near match:
     my $norm = lc($e);
     $norm =~ s/[-_]//g;
     my $n;
-    foreach my $enc (< @supported) {
+    foreach my $enc ( @supported) {
       $n = lc($enc);
       $n =~ s/[-_]//g;
       next unless $n eq $norm;
@@ -318,10 +318,10 @@ sub _handle_encoding_line {
       last;
     }
     my $encmodver = Pod::Simple::Transcode->encmodver;
-    $enc_error = join '' =>
+    $enc_error = join '', @( 
       "This document probably does not appear as it should, because its ",
       "\"=encoding $e\" line calls for an unsupported encoding.",
-      $suggestion, "  [$encmodver\'s supported encodings are: {join ' ', <@supported}]"
+      $suggestion, "  [$encmodver\'s supported encodings are: {join ' ', @( <@supported)}]")
     ;
 
     $self->scream( $self->{'line_count'}, $enc_error );
@@ -338,7 +338,7 @@ sub _handle_encoding_second_level {
   #  have been acted one.
   my($self, $para) = < @_;
   my @x = @( < @$para );
-  my $content = join ' ', splice @x, 2;
+  my $content = join ' ', @( splice @x, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
 
@@ -382,16 +382,16 @@ sub _gen_errata {
 
   my @out;
   
-  foreach my $line (sort {$a <+> $b} keys %{$self->{'errata'}}) {
+  foreach my $line (@( <sort {$a <+> $b} @( < keys %{$self->{'errata'}}))) {
     push @out,
       \@('=item', \%('start_line' => $m), "Around line $line:"),
-      map( \@('~Para', \%('start_line' => $m, '~cooked' => 1),
+      < map( \@('~Para', \%('start_line' => $m, '~cooked' => 1),
         #['~Top', {'start_line' => $m},
         $_
         #]
-        ),
+        ), @(
         < @{$self->{'errata'}->{$line}}
-      )
+)      )
     ;
   }
   
@@ -468,7 +468,7 @@ sub _ponder_paragraph_buffer {
     $starting_contentless =
      (
        !nelems @$curr_open  
-       and nelems @$paras and ! grep $_->[0] ne '~end', < @$paras
+       and nelems @$paras and ! grep $_->[0] ne '~end', @( < @$paras)
         # i.e., if the paras is all ~ends
      )
     ;
@@ -523,7 +523,7 @@ sub _ponder_paragraph_buffer {
 
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    if(grep $_->[1]->{'~ignore'}, < @$curr_open) {
+    if(grep $_->[1]->{'~ignore'}, @( < @$curr_open)) {
       DEBUG +> 1 and
        print "Skipping $para_type paragraph because in ignore mode.\n";
       next;
@@ -762,7 +762,7 @@ sub _ponder_paragraph_buffer {
       } else {
         # An unknown directive!
         DEBUG +> 1 and printf "Unhandled directive \%s (Handled: \%s)\n",
-         $para->[0], join(' ', sort keys %{$self->{'accept_directives'}} )
+         $para->[0], join(' ', @( < sort @( < keys %{$self->{'accept_directives'}})) )
         ;
         $self->whine(
           $para->[1]->{'start_line'},
@@ -777,9 +777,9 @@ sub _ponder_paragraph_buffer {
         if(! nelems @$curr_open) {  # usual case
           DEBUG and print "Treating $para_type paragraph as such because stack is empty.\n";
         } else {
-          my @fors = @( grep $_->[0] eq '=for', < @$curr_open );
+          my @fors = @( < grep $_->[0] eq '=for', @( < @$curr_open) );
           DEBUG +> 1 and print "Containing fors: ",
-            join(',', map $_->[1]->{'target'}, < @fors), "\n";
+            join(',', @( < map $_->[1]->{'target'}, @( < @fors))), "\n";
           
           if(! nelems @fors) {
             DEBUG and print "Treating $para_type paragraph as such because stack has no =for's\n";
@@ -840,7 +840,7 @@ sub _ponder_for {
   # Fake it out as a begin/end
   my $target;
 
-  if(grep $_->[1]->{'~ignore'}, < @$curr_open) {
+  if(grep $_->[1]->{'~ignore'}, @( < @$curr_open)) {
     DEBUG +> 1 and print "Ignoring ignorable =for\n";
     return 1;
   }
@@ -880,7 +880,7 @@ sub _ponder_for {
 
 sub _ponder_begin {
   my ($self,$para,$curr_open,$paras) = < @_;
-  my $content = join ' ', splice @$para, 2;
+  my $content = join ' ', @( splice @$para, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
   unless(length($content)) {
@@ -912,9 +912,9 @@ sub _ponder_begin {
   
   my $dont_ignore; # whether this target matches us
   
-  foreach my $target_name (
+  foreach my $target_name (@( <
     split(',', $content, -1),
-    $neg ? () : '*'
+    $neg ? () : '*')
   ) {
     DEBUG +> 2 and
      print " Considering whether =begin $content matches $target_name\n";
@@ -953,7 +953,7 @@ sub _ponder_begin {
   DEBUG +> 1 and print " (Stack now: ", < $self->_dump_curr_open(), ")\n";
 
   push @$curr_open, $para;
-  if(!$dont_ignore or scalar grep $_->[1]->{'~ignore'}, < @$curr_open) {
+  if(!$dont_ignore or scalar grep $_->[1]->{'~ignore'}, @( < @$curr_open)) {
     DEBUG +> 1 and print "Ignoring ignorable =begin\n";
   } else {
     $self->{'content_seen'} ||= 1;
@@ -965,7 +965,7 @@ sub _ponder_begin {
 
 sub _ponder_end {
   my ($self,$para,$curr_open,$paras) = < @_;
-  my $content = join ' ', splice @$para, 2;
+  my $content = join ' ', @( splice @$para, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
   DEBUG and print "Ogling '=end $content' directive\n";
@@ -1016,7 +1016,7 @@ sub _ponder_end {
   }
 
   # Else it's okay to close...
-  if(grep $_->[1]->{'~ignore'}, < @$curr_open) {
+  if(grep $_->[1]->{'~ignore'}, @( < @$curr_open)) {
     DEBUG +> 1 and print "Not firing any event for this =end $content because in an ignored region\n";
     # And that may be because of this to-be-closed =for region, or some
     #  other one, but it doesn't matter.
@@ -1042,7 +1042,7 @@ sub _ponder_doc_end {
     DEBUG +> 9 and print "Stack: ", < pretty($curr_open), "\n";
     unshift @$paras, < $self->_closers_for_all_curr_open;
     # Make sure there is exactly one ~end in the parastack, at the end:
-    @$paras = @( grep $_->[0] ne '~end', < @$paras );
+    @$paras = @( < grep $_->[0] ne '~end', @( < @$paras) );
     push @$paras, $para, $para;
      # We need two -- once for the next cycle where we
      #  generate errata, and then another to be at the end
@@ -1108,7 +1108,7 @@ sub _ponder_over {
   push @$curr_open, $para;
    # yes, we reuse the paragraph as a stack item
   
-  my $content = join ' ', splice @$para, 2;
+  my $content = join ' ', @( splice @$para, 2);
   my $overness;
   if($content =~ m/^\s*$/s) {
     $para->[1]->{'indent'} = 4;
@@ -1141,7 +1141,7 @@ sub _ponder_back {
   my ($self,$para,$curr_open,$paras) = < @_;
   # TODO: fire off </item-number> or </item-bullet> or </item-text> ??
 
-  my $content = join ' ', splice @$para, 2;
+  my $content = join ' ', @( splice @$para, 2);
   if($content =~ m/\S/) {
     $self->whine(
       $para->[1]->{'start_line'},
@@ -1159,7 +1159,7 @@ sub _ponder_back {
     );
   } else {
     DEBUG +> 1 and print "=back found without a matching =over.  Stack: (",
-        join(', ', map $_->[0], < @$curr_open), ").\n";
+        join(', ', @( < map $_->[0], @( < @$curr_open))), ").\n";
     $self->whine(
       $para->[1]->{'start_line'},
       '=back without =over'
@@ -1344,7 +1344,7 @@ sub _ponder_Plain {
   ) {
     push @$para,
     < @{$self->_make_treelet(
-      join("\n", splice(@$para, 2)),
+      join("\n", @( splice(@$para, 2))),
       $para->[1]->{'start_line'}
     )};
   }
@@ -1359,7 +1359,7 @@ sub _ponder_Verbatim {
 
   $para->[1]->{'xml:space'} = 'preserve';
   for(my $i = 2; $i +< nelems @$para; $i++) {
-    foreach my $line ($para->[$i]) { # just for aliasing
+    foreach my $line (@($para->[$i])) { # just for aliasing
       while( $line =~
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
@@ -1382,12 +1382,12 @@ sub _ponder_Verbatim {
   } elsif ($self->{'codes_in_verbatim'}) {
     push @$para,
     < @{$self->_make_treelet(
-      join("\n", splice(@$para, 2)),
+      join("\n", @( splice(@$para, 2))),
       $para->[1]->{'start_line'}, $para->[1]->{'xml:space'}
     )};
     $para->[-1] =~ s/\n+$//s; # Kill any number of terminal newlines
   } else {
-    push @$para, join "\n", splice(@$para, 2) if (nelems @$para) +> 3;
+    push @$para, join "\n", @( splice(@$para, 2)) if (nelems @$para) +> 3;
     $para->[-1] =~ s/\n+$//s; # Kill any number of terminal newlines
   }
   return;
@@ -1397,7 +1397,7 @@ sub _ponder_Data {
   my ($self,$para) = < @_;
   DEBUG and print " giving data treatment...\n";
   $para->[1]->{'xml:space'} = 'preserve';
-  push @$para, join "\n", splice(@$para, 2) if (nelems @$para) +> 3;
+  push @$para, join "\n", @( splice(@$para, 2)) if (nelems @$para) +> 3;
   return;
 }
 
@@ -1412,7 +1412,7 @@ sub _traverse_treelet_bit {  # for use only by the routine above
   my $scratch;
   $self->_handle_element_start(($scratch=$name), shift @_);
   
-  foreach my $x (< @_) {
+  foreach my $x ( @_) {
     if(ref($x)) {
       &_traverse_treelet_bit($self, < @$x);
     } else {
@@ -1429,7 +1429,7 @@ sub _traverse_treelet_bit {  # for use only by the routine above
 sub _closers_for_all_curr_open {
   my $self = @_[0];
   my @closers;
-  foreach my $still_open (< @{  $self->{'curr_open'} || return  }) {
+  foreach my $still_open ( @{  $self->{'curr_open'} || return  }) {
     my @copy = @( < @$still_open );
     @copy[1] = \%(< %{ @copy[1] });
     #$copy[1]{'start_line'} = -1;
@@ -1553,7 +1553,7 @@ sub _verbatim_format {
     
     DEBUG +> 6 and print "New version of the above line is these tokens (",
       scalar(nelems @new_line), "):",
-      map( ref($_)?"<{join ' ', <@$_}> ":"<$_>", < @new_line ), "\n";
+      < map( ref($_)?"<{join ' ', @( <@$_)}> ":"<$_>", @( < @new_line) ), "\n";
     $i--; # So the next line we scrutinize is the line before the one
           #  that we just went and formatted
   }
@@ -1672,7 +1672,7 @@ sub _treelet_from_formatting_codes {
       )
     /xgo
   ) {
-    DEBUG +> 4 and print "\nParagraphic tokenstack = ({join ' ', <@stack})\n";
+    DEBUG +> 4 and print "\nParagraphic tokenstack = ({join ' ', @( <@stack)})\n";
     if(defined $1) {
       if(defined $2) {
         DEBUG +> 3 and print "Found complex start-text code \"$1\"\n";
@@ -1805,14 +1805,14 @@ sub _dump_curr_open { # return a string representation of the stack
   my $curr_open = @_[0]->{'curr_open'};
 
   return '[empty]' unless (nelems @$curr_open);
-  return join '; ',
-    map {;
+  return join '; ', @(
+    < map {;
            ($_->[0] eq '=for')
              ? ( ($_->[1]->{'~really'} || '=over')
                . ' ' . $_->[1]->{'target'})
              : $_->[0]
         }
-    < @$curr_open
+ @(    < @$curr_open))
   ;
 }
 
@@ -1841,8 +1841,8 @@ sub pretty { # adopted from Class::Classless
   my $x;
   my $out =
     # join ",\n" .
-    join ", ",
-    map {;
+    join ", ", @(
+    < map {;
     if(!defined($_)) {
       "undef";
     } elsif(ref($_) eq 'ARRAY' or ref($_) eq 'Pod::Simple::LinkSection') {
@@ -1853,9 +1853,9 @@ sub pretty { # adopted from Class::Classless
       $x;
     } elsif(ref($_) eq 'HASH') {
       my $hr = $_;
-      $x = "\{" . join(", ",
-        map(pretty($_) . '=>' . pretty($hr->{$_}),
-            sort keys %$hr ) ) . "\}" ;
+      $x = "\{" . join(", ", @(
+        < map(pretty($_) . '=>' . pretty($hr->{$_}), @( <
+            sort @( < keys %$hr)) )) ) . "\}" ;
       $x;
     } elsif(!length($_)) { q{''} # empty string
     } elsif(
@@ -1871,7 +1871,7 @@ sub pretty { # adopted from Class::Classless
          <{%pretty_form{$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']'}>g;
       qq{"$_"};
     }
-  } < @stuff;
+  } @( < @stuff));
   # $out =~ s/\n */ /g if length($out) < 75;
   return $out;
 }
@@ -1885,10 +1885,10 @@ sub pretty { # adopted from Class::Classless
 
 sub reinit {
   my $self = shift;
-  foreach (qw(source_dead source_filename doc_has_started
+  foreach (@( <qw(source_dead source_filename doc_has_started
 start_of_pod_block content_seen last_was_blank paras curr_open
 line_count pod_para_count in_pod ~tried_gen_errata errata errors_seen
-Title)) {
+Title))) {
 
     delete $self->{$_};
   }

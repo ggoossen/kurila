@@ -8,7 +8,7 @@ our $VERSION = "1.13";
 
 use XSLoader ();
 
-use Fcntl qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
+use Fcntl < qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
 	     F_SETFL F_SETLK F_SETLKW F_UNLCK F_WRLCK O_ACCMODE O_APPEND
 	     O_CREAT O_EXCL O_NOCTTY O_NONBLOCK O_RDONLY O_RDWR O_TRUNC
 	     O_WRONLY);
@@ -19,18 +19,18 @@ my $loaded;
 sub import {
     load_imports() unless $loaded++;
     my $this = shift;
-    my @list = @( map { m/^\w+_h$/ ? ":$_" : $_ } < @_ );
+    my @list = @( < map { m/^\w+_h$/ ? ":$_" : $_ } @( < @_) );
     local $Exporter::ExportLevel = 1;
     Exporter::import($this,< @list);
 }
 
 XSLoader::load 'POSIX', $VERSION;
 
-my %NON_CONSTS = %(map {($_,1)}
-                  qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
-                     WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
+my %NON_CONSTS = %(< map {($_,1)}
+ @( <                  qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
+                     WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG)));
 
-for my $name (keys %NON_CONSTS) {
+for my $name (@( <keys %NON_CONSTS)) {
     *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, @_[0]) };
 }
 
@@ -38,8 +38,8 @@ package POSIX::SigRt;
 
 use Tie::Hash;
 
-use vars qw($SIGACTION_FLAGS $_SIGRTMIN $_SIGRTMAX $_sigrtn @ISA);
-@POSIX::SigRt::ISA = @( qw(Tie::StdHash) );
+use vars < qw($SIGACTION_FLAGS $_SIGRTMIN $_SIGRTMAX $_sigrtn @ISA);
+@POSIX::SigRt::ISA = @( < qw(Tie::StdHash) );
 
 $SIGACTION_FLAGS = 0;
 
@@ -314,7 +314,7 @@ sub gets {
 }
 
 sub perror {
-    print STDERR "{join ' ', <@_}: " if (nelems @_);
+    print STDERR "{join ' ', @( <@_)}: " if (nelems @_);
     print STDERR $!,"\n";
 }
 
@@ -662,7 +662,7 @@ sub getgid {
 sub getgroups {
     usage "getgroups()" if (nelems @_) != 0;
     my %seen;
-    grep(!%seen{$_}++, split(' ', $^EGID ));
+    grep(!%seen{$_}++, @( < split(' ', $^EGID )));
 }
 
 sub getlogin {
@@ -731,14 +731,14 @@ sub utime {
 sub load_imports {
 %EXPORT_TAGS = %(
 
-    assert_h =>	\@(qw(assert)),
+    assert_h =>	\@( <qw(assert)),
 
-    ctype_h =>	\@(qw(isalnum isalpha iscntrl isdigit isgraph islower
+    ctype_h =>	\@( <qw(isalnum isalpha iscntrl isdigit isgraph islower
 		isprint ispunct isspace isupper isxdigit tolower toupper)),
 
     dirent_h =>	\@(),
 
-    errno_h =>	\@(qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
+    errno_h =>	\@( <qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
 		EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
 		ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT
 		EEXIST EFAULT EFBIG EHOSTDOWN EHOSTUNREACH EINPROGRESS
@@ -752,7 +752,7 @@ sub load_imports {
 		ESPIPE ESRCH ESTALE ETIMEDOUT ETOOMANYREFS ETXTBSY
 		EUSERS EWOULDBLOCK EXDEV errno)),
 
-    fcntl_h =>	\@(qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK
+    fcntl_h =>	\@( <qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK
 		F_SETFD F_SETFL F_SETLK F_SETLKW F_UNLCK F_WRLCK
 		O_ACCMODE O_APPEND O_CREAT O_EXCL O_NOCTTY O_NONBLOCK
 		O_RDONLY O_RDWR O_TRUNC O_WRONLY
@@ -762,7 +762,7 @@ sub load_imports {
 		S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISGID S_ISREG S_ISUID
 		S_IWGRP S_IWOTH S_IWUSR)),
 
-    float_h =>	\@(qw(DBL_DIG DBL_EPSILON DBL_MANT_DIG
+    float_h =>	\@( <qw(DBL_DIG DBL_EPSILON DBL_MANT_DIG
 		DBL_MAX DBL_MAX_10_EXP DBL_MAX_EXP
 		DBL_MIN DBL_MIN_10_EXP DBL_MIN_EXP
 		FLT_DIG FLT_EPSILON FLT_MANT_DIG
@@ -775,7 +775,7 @@ sub load_imports {
 
     grp_h =>	\@(),
 
-    limits_h =>	\@(qw( ARG_MAX CHAR_BIT CHAR_MAX CHAR_MIN CHILD_MAX
+    limits_h =>	\@( <qw( ARG_MAX CHAR_BIT CHAR_MAX CHAR_MIN CHILD_MAX
 		INT_MAX INT_MIN LINK_MAX LONG_MAX LONG_MIN MAX_CANON
 		MAX_INPUT MB_LEN_MAX NAME_MAX NGROUPS_MAX OPEN_MAX
 		PATH_MAX PIPE_BUF SCHAR_MAX SCHAR_MIN SHRT_MAX SHRT_MIN
@@ -786,18 +786,18 @@ sub load_imports {
 		_POSIX_PATH_MAX _POSIX_PIPE_BUF _POSIX_SSIZE_MAX
 		_POSIX_STREAM_MAX _POSIX_TZNAME_MAX)),
 
-    locale_h =>	\@(qw(LC_ALL LC_COLLATE LC_CTYPE LC_MESSAGES
+    locale_h =>	\@( <qw(LC_ALL LC_COLLATE LC_CTYPE LC_MESSAGES
 		    LC_MONETARY LC_NUMERIC LC_TIME NULL
 		    localeconv setlocale)),
 
-    math_h =>	\@(qw(HUGE_VAL acos asin atan ceil cosh fabs floor fmod
+    math_h =>	\@( <qw(HUGE_VAL acos asin atan ceil cosh fabs floor fmod
 		frexp ldexp log10 modf pow sinh tan tanh)),
 
     pwd_h =>	\@(),
 
-    setjmp_h =>	\@(qw(longjmp setjmp siglongjmp sigsetjmp)),
+    setjmp_h =>	\@( <qw(longjmp setjmp siglongjmp sigsetjmp)),
 
-    signal_h =>	\@(qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK
+    signal_h =>	\@( <qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK
 		SA_RESETHAND SA_RESTART SA_SIGINFO SIGABRT SIGALRM
 		SIGCHLD SIGCONT SIGFPE SIGHUP SIGILL SIGINT SIGKILL
 		SIGPIPE %SIGRT SIGRTMIN SIGRTMAX SIGQUIT SIGSEGV SIGSTOP
@@ -807,9 +807,9 @@ sub load_imports {
 
     stdarg_h =>	\@(),
 
-    stddef_h =>	\@(qw(NULL offsetof)),
+    stddef_h =>	\@( <qw(NULL offsetof)),
 
-    stdio_h =>	\@(qw(BUFSIZ EOF FILENAME_MAX L_ctermid L_cuserid
+    stdio_h =>	\@( <qw(BUFSIZ EOF FILENAME_MAX L_ctermid L_cuserid
 		L_tmpname NULL SEEK_CUR SEEK_END SEEK_SET
 		STREAM_MAX TMP_MAX
 		clearerr fclose fdopen feof ferror fflush fgetc fgetpos
@@ -819,17 +819,17 @@ sub load_imports {
 		scanf setbuf setvbuf sscanf tmpfile tmpnam
 		ungetc vfprintf vprintf vsprintf)),
 
-    stdlib_h =>	\@(qw(EXIT_FAILURE EXIT_SUCCESS MB_CUR_MAX NULL RAND_MAX
+    stdlib_h =>	\@( <qw(EXIT_FAILURE EXIT_SUCCESS MB_CUR_MAX NULL RAND_MAX
 		abort atexit atof atoi atol bsearch calloc div
 		free getenv labs ldiv malloc mblen mbstowcs mbtowc
 		qsort realloc strtod strtol strtoul wcstombs wctomb)),
 
-    string_h =>	\@(qw(NULL memchr memcmp memcpy memmove memset strcat
+    string_h =>	\@( <qw(NULL memchr memcmp memcpy memmove memset strcat
 		strchr strcmp strcoll strcpy strcspn strerror strlen
 		strncat strncmp strncpy strpbrk strrchr strspn strstr
 		strtok strxfrm)),
 
-    sys_stat_h => \@(qw(S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU
+    sys_stat_h => \@( <qw(S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU
 		S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISGID S_ISREG
 		S_ISUID S_IWGRP S_IWOTH S_IWUSR S_IXGRP S_IXOTH S_IXUSR
 		fstat mkfifo)),
@@ -838,12 +838,12 @@ sub load_imports {
 
     sys_types_h => \@(),
 
-    sys_utsname_h => \@(qw(uname)),
+    sys_utsname_h => \@( <qw(uname)),
 
-    sys_wait_h => \@(qw(WEXITSTATUS WIFEXITED WIFSIGNALED WIFSTOPPED
+    sys_wait_h => \@( <qw(WEXITSTATUS WIFEXITED WIFSIGNALED WIFSTOPPED
 		WNOHANG WSTOPSIG WTERMSIG WUNTRACED)),
 
-    termios_h => \@(qw( B0 B110 B1200 B134 B150 B1800 B19200 B200 B2400
+    termios_h => \@( <qw( B0 B110 B1200 B134 B150 B1800 B19200 B200 B2400
 		B300 B38400 B4800 B50 B600 B75 B9600 BRKINT CLOCAL
 		CREAD CS5 CS6 CS7 CS8 CSIZE CSTOPB ECHO ECHOE ECHOK
 		ECHONL HUPCL ICANON ICRNL IEXTEN IGNBRK IGNCR IGNPAR
@@ -855,10 +855,10 @@ sub load_imports {
 		tcdrain
 		tcflow tcflush tcsendbreak )),
 
-    time_h =>	\@(qw(CLK_TCK CLOCKS_PER_SEC NULL asctime clock ctime
+    time_h =>	\@( <qw(CLK_TCK CLOCKS_PER_SEC NULL asctime clock ctime
 		difftime mktime strftime tzset tzname)),
 
-    unistd_h =>	\@(qw(F_OK NULL R_OK SEEK_CUR SEEK_END SEEK_SET
+    unistd_h =>	\@( <qw(F_OK NULL R_OK SEEK_CUR SEEK_END SEEK_SET
 		STDERR_FILENO STDIN_FILENO STDOUT_FILENO W_OK X_OK
 		_PC_CHOWN_RESTRICTED _PC_LINK_MAX _PC_MAX_CANON
 		_PC_MAX_INPUT _PC_NAME_MAX _PC_NO_TRUNC _PC_PATH_MAX
@@ -882,13 +882,13 @@ sub load_imports {
 {
   # De-duplicate the export list: 
   my %export;
-  %export{[map {< @$_} values %EXPORT_TAGS]} = ();
+ <  %export{[@(< map {< @$_} @( < values %EXPORT_TAGS))]} = ();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
-  push @EXPORT, keys %export;
+  push @EXPORT, < keys %export;
 }
 
-@EXPORT_OK = @( qw(
+@EXPORT_OK = @( < qw(
 		abs
 		alarm
 		atan2
@@ -1010,5 +1010,5 @@ sub FETCH  { my $rtsig = &_check;
 	     return $oa->{HANDLER} }
 sub STORE  { my $rtsig = &_check; new($rtsig, @_[2], $SIGACTION_FLAGS) }
 sub DELETE { delete %SIG{ &_check } }
-sub CLEAR  { &_exist; delete %SIG{[&POSIX::SIGRTMIN .. &POSIX::SIGRTMAX ]} }
+sub CLEAR  { &_exist; delete %SIG{[ <&POSIX::SIGRTMIN .. &POSIX::SIGRTMAX ]} }
 sub SCALAR { &_croak; $_sigrtn + 1 }

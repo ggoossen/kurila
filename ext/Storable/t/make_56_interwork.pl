@@ -2,7 +2,7 @@
 use strict;
 
 use Config;
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 # Lilliput decreed that eggs should be eaten small end first.
 # Belfuscu welcomed the rebels who wanted to eat big end first.

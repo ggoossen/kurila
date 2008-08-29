@@ -12,10 +12,10 @@ require Exporter;
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-use vars qw($VERSION @ISA @EXPORT);
+use vars < qw($VERSION @ISA @EXPORT);
 $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA          = @( qw(Exporter) );
-@EXPORT       = @( qw(&code2language &language2code
+@ISA          = @( < qw(Exporter) );
+@EXPORT       = @( < qw(&code2language &language2code
                    &all_language_codes &all_language_names ) );
 
 #-----------------------------------------------------------------------
@@ -84,7 +84,7 @@ sub language2code
 #=======================================================================
 sub all_language_codes
 {
-    return @( keys %CODES );
+    return @( < keys %CODES );
 }
 
 
@@ -95,7 +95,7 @@ sub all_language_codes
 #=======================================================================
 sub all_language_names
 {
-    return @( values %CODES );
+    return @( < values %CODES );
 }
 
 
@@ -112,7 +112,7 @@ sub all_language_names
     {
         next unless m/\S/;
         chop;
-        ($code, $language) = split(m/:/, $_, 2);
+        ($code, $language) = < split(m/:/, $_, 2);
         %CODES{$code} = $language;
         %LANGUAGES{lc "$language"} = $code;
     }

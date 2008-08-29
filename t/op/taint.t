@@ -16,7 +16,7 @@ plan tests => 229;
 
 $| = 1;
 
-use vars qw($ipcsysv); # did we manage to load IPC::SysV?
+use vars < qw($ipcsysv); # did we manage to load IPC::SysV?
 
 my ($old_env_path, $old_env_dcl_path, $old_env_term);
 BEGIN {
@@ -32,7 +32,7 @@ BEGIN {
       try { require IPC::SysV };
       unless ($@) {
 	  $ipcsysv++;
-	  'IPC::SysV'->import(qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU IPC_NOWAIT));
+	  'IPC::SysV'->import( <qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU IPC_NOWAIT));
       }
   }
 }
@@ -49,11 +49,11 @@ my $Invoke_Perl = $Is_VMS      ? 'MCR Sys$Disk:[]Perl.exe' :
                   $Is_MacOS    ? ':perl'                :
                   $Is_NetWare  ? 'perl'                 : 
                                  './perl'               ;
-my @MoreEnv = @( qw/IFS CDPATH ENV BASH_ENV/ );
+my @MoreEnv = @( < qw/IFS CDPATH ENV BASH_ENV/ );
 
 if ($Is_VMS) {
     my (%old, $x);
-    for $x ('DCL$PATH', < @MoreEnv) {
+    for $x (@('DCL$PATH', < @MoreEnv)) {
 	(%old{$x}) = %ENV{$x} =~ m/^(.*)$/ if exists %ENV{$x};
     }
     # VMS note:  PATH and TERM are automatically created by the C
@@ -89,12 +89,12 @@ my $TAINT0;
 # This taints each argument passed. All must be lvalues.
 # Side effect: It also stringifies them. :-(
 sub taint_these (@) {
-    for (< @_) { $_ .= $TAINT }
+    for ( @_) { $_ .= $TAINT }
 }
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    return scalar grep { tainted($_) } < @_;
+    return scalar grep { tainted($_) } @( < @_);
 }
 sub tainted ($) {
     my $tainted = not try { @_[0], kill 0; 1};
@@ -102,7 +102,7 @@ sub tainted ($) {
     return $tainted;
 }
 sub all_tainted (@) {
-    for (< @_) { return 0 unless tainted $_ }
+    for ( @_) { return 0 unless tainted $_ }
     1;
 }
 
@@ -117,7 +117,7 @@ sub test ($;$) {
     } else {
 	print "not ok $curr_test\n";
         printf "# Failed test at line \%d\n", (caller)[[2]];
-	for (split m/^/m, $diag) {
+	for (@( <split m/^/m, $diag)) {
 	    print "# $_";
 	}
 	print "\n" unless
@@ -148,7 +148,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     if ($Is_MSWin32 && %Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split m/%Config{path_sep}/, %ENV{PATH}) {
+	foreach my $dir (@( <split m/%Config{path_sep}/, %ENV{PATH})) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -179,7 +179,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
-	test !nelems @vars, "{join ' ', <@vars}";
+	test !nelems @vars, "{join ' ', @( <@vars)}";
 
 	# tainted $TERM is unsafe only if it contains metachars
 	local %ENV{TERM};
@@ -195,9 +195,9 @@ my $TEST = catfile(curdir(), 'TEST');
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
-		     qw(sys$scratch /tmp /var/tmp /usr/tmp),
-		     %ENV{[qw(TMP TEMP)]})[[0]]
+	$tmp = (< grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
+ @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
+		     %ENV{[@( <qw(TMP TEMP))]}))[[0]]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
@@ -241,12 +241,12 @@ my $TEST = catfile(curdir(), 'TEST');
     taint_these($foo);
     test tainted $foo;
 
-    my @list = @( 1..10 );
+    my @list = @( < 1..10 );
     test not any_tainted < @list;
-    taint_these @list[[1,3,5,7,9]];
+    taint_these < @list[[@(1,3,5,7,9)]];
     test any_tainted < @list;
-    test all_tainted @list[[1,3,5,7,9]];
-    test not any_tainted @list[[0,2,4,6,8]];
+    test all_tainted < @list[[@(1,3,5,7,9)]];
+    test not any_tainted < @list[[@(0,2,4,6,8)]];
 
     ($foo) = $foo =~ m/(.+)/;
     test not tainted $foo;
@@ -462,7 +462,7 @@ SKIP: {
         # wildcard expansion doesn't invoke shell on VMS, so is safe
         skip "This is not VMS", 2 unless $Is_VMS;
     
-	test join('', try { glob < $foo } ) ne '', 'globbing';
+	test join('', @( try { glob < $foo }) ) ne '', 'globbing';
 	test $@ eq '', $@;
     }
 }
@@ -772,7 +772,7 @@ SKIP: {
     # bug id 20010519.003
 
     BEGIN {
-	use vars qw($has_fcntl);
+	use vars < qw($has_fcntl);
 	try { require Fcntl; Fcntl->import; };
 	unless ($@) {
 	    $has_fcntl = 1;
@@ -870,7 +870,7 @@ SKIP: {
 	    push @untainted, "# '$k' = '$v'\n";
 	}
     }
-    test( (nelems @untainted) == 0, "untainted:\n {join ' ', <@untainted}");
+    test( (nelems @untainted) == 0, "untainted:\n {join ' ', @( <@untainted)}");
 }
 
 
@@ -1183,7 +1183,7 @@ SKIP:
 
 {
     use utf8;
-    foreach my $ord (78, 163, 256) {
+    foreach my $ord (@(78, 163, 256)) {
         # 47195
         my $line = 'A1' . $TAINT . chr $ord;
         chop $line;
@@ -1195,9 +1195,9 @@ SKIP:
 
 {
     my $value = "foo bar";
-    my @values = @( split(m/\s+/, $value, 2) );
+    my @values = @( < split(m/\s+/, $value, 2) );
     ok(!tainted(@values[1]), "result of split is not tainted if input was not tainted");
-    my @values = @( split(m/\s+/, $value . $TAINT, 2) );
+    my @values = @( < split(m/\s+/, $value . $TAINT, 2) );
     ok(tainted(@values[1]), "result of split is tainted if input was tainted");
 }
 

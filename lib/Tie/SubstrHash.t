@@ -31,7 +31,7 @@ delete %a{abc};
 print "not " unless %a{bcd} == 234;
 print "ok 3\n";
 
-print "not " unless (values %a)[[0]] == 234;
+print "not " unless ( <values %a)[[0]] == 234;
 print "ok 4\n";
 
 try { %a{abcd} = 123 };
@@ -45,8 +45,8 @@ print "ok 6\n";
 try { $a = %a{abcd}; $a++  };
 print "not " unless $@ && $@->{description} =~ m/Key "abcd" is not 3 characters long/;
 print "ok 7\n";
-
-%a{[qw(abc cde)]} = qw(123 345); 
+ <
+%a{[@( <qw(abc cde))]} = < qw(123 345); 
 
 print "not " unless %a{cde} == 345;
 print "ok 8\n";

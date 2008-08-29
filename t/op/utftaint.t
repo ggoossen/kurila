@@ -6,7 +6,7 @@ use Config;
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    not try { join("",< @_), kill 0; 1 };
+    not try { join("", @(< @_)), kill 0; 1 };
 }
 sub tainted ($) {
     any_tainted < @_;
@@ -20,7 +20,7 @@ my $arg = %ENV{PATH}; # a tainted value
 use utf8;
 use constant UTF8 => "\x{1234}";
 
-for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}")) {
+for my $ary (@(\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))) {
     my $encode = $ary->[0];
     my $string = $ary->[1];
 
@@ -40,13 +40,13 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))
 
     is( tainted($rconcat), tainted($arg), "tainted: $encode, concat right");
 
-    my $ljoin = join('!', $taint, UTF8);
-    is($ljoin, join('!', $string, UTF8), "compare: $encode, join left");
+    my $ljoin = join('!', @( $taint, UTF8));
+    is($ljoin, join('!', @( $string, UTF8)), "compare: $encode, join left");
 
     is( tainted($ljoin), tainted($arg), "tainted: $encode, join left");
 
-    my $rjoin = join('!', UTF8, $taint);
-    is($rjoin, join('!', UTF8, $string), "compare: $encode, join right");
+    my $rjoin = join('!', @( UTF8, $taint));
+    is($rjoin, join('!', @( UTF8, $string)), "compare: $encode, join right");
 
     is( tainted($rjoin), tainted($arg), "tainted: $encode, join right");
 
@@ -54,7 +54,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))
 }
 
 
-for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}")) {
+for my $ary (@(\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))) {
     my $encode = $ary->[0];
 
     my $utf8 = pack('U*') . $ary->[1];
@@ -80,7 +80,7 @@ for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]"), \@(utf8 => "\x{100}"))
 }
 
 
-for my $ary (\@(ascii => 'perl'), \@(latin1 => "\x[B6]")) {
+for my $ary (@(\@(ascii => 'perl'), \@(latin1 => "\x[B6]"))) {
     my $encode = $ary->[0];
 
     my $up   = pack('U*') . $ary->[1];

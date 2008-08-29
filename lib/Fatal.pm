@@ -11,7 +11,7 @@ sub import {
     my $self = shift(@_);
     my($sym, $pkg);
     $pkg = (caller)[[0]];
-    foreach $sym (< @_) {
+    foreach $sym ( @_) {
         &_make_fatal($sym, $pkg);
     }
 };
@@ -54,13 +54,13 @@ sub write_invocation {
 	\}
 	die "$name(\@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
-    return join '', < @out;
+    return join '', @( < @out);
   }
 }
 
 sub one_invocation {
   my ($core, $call, $name, < @argv) = < @_;
-  return qq{$call({join ', ', <@argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} < \@_\})} . 
+  return qq{$call({join ', ', @( <@argv)}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} < \@_\})} . 
     ($core ? ': $!' : ', \$! is \"$!\"') . '"';
 }
 

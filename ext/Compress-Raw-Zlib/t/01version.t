@@ -4,7 +4,7 @@ BEGIN {
     }
 }
 
-use lib qw(t t/compress);
+use lib < qw(t t/compress);
 use strict ;
 use warnings ;
 

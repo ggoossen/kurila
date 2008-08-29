@@ -8,8 +8,8 @@ use warnings::register;
 our(@ISA, @EXPORT, $VERSION);
 
 require Exporter;
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(struct) );
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(struct) );
 
 $VERSION = '0.63';
 
@@ -143,7 +143,7 @@ sub struct {
 
     my( $pre, $pst, $sel );
     $cnt = 0;
-    foreach $name (< @methods){
+    foreach $name ( @methods){
         if ( do { no strict 'refs'; defined &{Symbol::fetch_glob($class . "::$name")} } ) {
             warnings::warnif("function '$name' already defined, overrides struct accessor method");
         }

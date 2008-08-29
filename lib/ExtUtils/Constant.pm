@@ -1,5 +1,5 @@
 package ExtUtils::Constant;
-use vars qw (@ISA $VERSION @EXPORT_OK %EXPORT_TAGS);
+use vars < qw (@ISA $VERSION @EXPORT_OK %EXPORT_TAGS);
 $VERSION = 0.20;
 
 =head1 NAME
@@ -94,12 +94,12 @@ use warnings;
 use strict;
 
 use Exporter;
-use ExtUtils::Constant::Utils qw(C_stringify);
-use ExtUtils::Constant::XS qw(%XS_Constant %XS_TypeSet);
+use ExtUtils::Constant::Utils < qw(C_stringify);
+use ExtUtils::Constant::XS < qw(%XS_Constant %XS_TypeSet);
 
 @ISA = @( 'Exporter' );
 
-%EXPORT_TAGS = %( 'all' => \@( qw(
+%EXPORT_TAGS = %( 'all' => \@( < qw(
 	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
 ) ) );
@@ -156,7 +156,7 @@ sub XS_constant {
 
   if (!ref $what) {
     # Convert line of the form IV,UV,NV to hash
-    $what = \%( map {$_ => 1} split m/,\s*/, ($what) );
+    $what = \%( < map {$_ => 1} @( < split m/,\s*/, ($what)) );
   }
   my $params = ExtUtils::Constant::XS->params ($what);
   my $type;
@@ -234,7 +234,7 @@ EOT
           break;
 EOT
 
-  foreach $type (sort keys %XS_Constant) {
+  foreach $type (@( <sort @( < keys %XS_Constant))) {
     # '' marks utf8 flag needed.
     next if $type eq '';
     $xs .= "\t/* Uncomment this if you need to return {$type}s\n"
@@ -293,7 +293,7 @@ ExtUtils::Constant::WriteConstants(
                                    DEFAULT_TYPE => '%args{DEFAULT_TYPE}',
                                    PROXYSUBS    => 1,
 EOT
-  foreach (qw (C_FILE XS_FILE)) {
+  foreach (@( <qw (C_FILE XS_FILE))) {
     next unless exists %args{$_};
     $result .= sprintf "                                   \%-12s => '\%s',\n",
       $_, %args{$_};

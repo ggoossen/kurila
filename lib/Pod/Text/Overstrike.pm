@@ -28,10 +28,10 @@ package Pod::Text::Overstrike;
 use Pod::Text ();
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 use utf8;
 
-@ISA = @( qw(Pod::Text) );
+@ISA = @( < qw(Pod::Text) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This

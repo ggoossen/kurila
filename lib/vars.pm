@@ -9,7 +9,7 @@ sub import {
     my $callpack = caller;
     my ($pack, < @imports) = < @_;
     my ($sym, $ch);
-    foreach (< @imports) {
+    foreach ( @imports) {
         if (($ch, $sym) = m/^([\$\@\%\*\&])(.+)/) {
 	    if ($sym =~ m/\W/) {
 		# time for a more-detailed check-up

@@ -46,7 +46,7 @@ if ($^O eq 'VMS') {
         push(@incs,$1);
     }
     $crazy =~ s#/Obj[^=/]*=[\w\$\_\-\.\[\]\:]+##i;
-    push(@cmd,"/Include=(".join(',',< @incs).")");
+    push(@cmd,"/Include=(".join(',', @(< @incs)).")");
     push(@cmd,$crazy);
     push(@cmd,"embed_test.c");
 
@@ -95,13 +95,13 @@ if ($^O eq 'VMS') {
     push(@cmd, ldopts());
    }
    if ($borl) {
-     @cmd = @(@cmd[0],(grep{m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]),(grep{!m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]));
+     @cmd = @(@cmd[0],(< grep{m/^-[LI]/} @( <@cmd[[@( <1..((nelems @cmd)-1))]])),(< grep{!m/^-[LI]/} @( <@cmd[[@( <1..((nelems @cmd)-1))]])));
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
-    my ($perl_exp) = grep { -f } qw(perl.exp ../perl.exp);
+    my ($perl_exp) = < grep { -f } @( < qw(perl.exp ../perl.exp));
     die "where is perl.exp?\n" unless defined $perl_exp;
-    for (< @cmd) {
+    for ( @cmd) {
         s!-bE:(\S+)!-bE:$perl_exp!;
     }
    }
@@ -128,16 +128,16 @@ if ($^O eq 'VMS') {
 }
 my $status;
 # On OS/2 the linker will always emit an empty line to STDOUT; filter these
-my $cmd = join ' ', < @cmd;
+my $cmd = join ' ', @( < @cmd);
 chomp($cmd); # where is the newline coming from? ldopts()?
 print "# $cmd\n";
 my @out = @( `$cmd` );
 $status = $?;
-print "# $_\n" foreach < @out;
+print "# $_\n" foreach  @out;
 
 if ($^O eq 'VMS' && !$status) {
-  print "# {join ' ', <@cmd2}\n";
-  $status = system(join(' ',< @cmd2)); 
+  print "# {join ' ', @( <@cmd2)}\n";
+  $status = system(join(' ', @(< @cmd2))); 
 }
 print (($status? 'not ': '')."ok 1\n");
 

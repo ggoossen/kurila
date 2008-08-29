@@ -8,7 +8,7 @@ use bytes;
 
 
 use IO::Compress::Base v2.006 ;
-use IO::Compress::Base::Common  v2.006 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common  v2.006 < qw(:Status createSelfTiedObject);
 use IO::Compress::Adapter::Deflate  v2.006 ;
 
 require Exporter ;
@@ -19,10 +19,10 @@ our ($VERSION, @ISA, @EXPORT_OK, %DEFLATE_CONSTANTS, %EXPORT_TAGS, $RawDeflateEr
 $VERSION = '2.006';
 $RawDeflateError = '';
 
-@ISA = @( qw(IO::Compress::Base Exporter) );
-@EXPORT_OK = @( qw( $RawDeflateError rawdeflate ) ) ;
+@ISA = @( < qw(IO::Compress::Base Exporter) );
+@EXPORT_OK = @( < qw( $RawDeflateError rawdeflate ) ) ;
 
-%EXPORT_TAGS = %( flush     => \@(qw{  
+%EXPORT_TAGS = %( flush     => \@( <qw{  
                                     Z_NO_FLUSH
                                     Z_PARTIAL_FLUSH
                                     Z_SYNC_FLUSH
@@ -30,13 +30,13 @@ $RawDeflateError = '';
                                     Z_FINISH
                                     Z_BLOCK
                               }),
-                 level     => \@(qw{  
+                 level     => \@( <qw{  
                                     Z_NO_COMPRESSION
                                     Z_BEST_SPEED
                                     Z_BEST_COMPRESSION
                                     Z_DEFAULT_COMPRESSION
                               }),
-                 strategy  => \@(qw{  
+                 strategy  => \@( <qw{  
                                     Z_FILTERED
                                     Z_HUFFMAN_ONLY
                                     Z_RLE
@@ -48,12 +48,12 @@ $RawDeflateError = '';
 
 {
     my %seen;
-    foreach (keys %EXPORT_TAGS )
+    foreach (@( <keys %EXPORT_TAGS) )
     {
         push @{%EXPORT_TAGS{constants}}, 
-                 grep { !%seen{$_}++ } 
-                 < @{ %EXPORT_TAGS{$_} }
-    }
+                 < grep { !%seen{$_}++ } 
+ @(                 < @{ %EXPORT_TAGS{$_} }
+)    }
     %EXPORT_TAGS{all} = %EXPORT_TAGS{constants} ;
 }
 
@@ -143,8 +143,8 @@ sub getZlibParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  v2.006 qw(:Parse);
-    use Compress::Raw::Zlib  v2.006 qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
+    use IO::Compress::Base::Common  v2.006 < qw(:Parse);
+    use Compress::Raw::Zlib  v2.006 < qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
     
     return  @(
@@ -175,7 +175,7 @@ sub getFileInfo
     
 }
 
-use IO::Seekable qw(SEEK_SET);
+use IO::Seekable < qw(SEEK_SET);
 
 #### zlib specific methods
 

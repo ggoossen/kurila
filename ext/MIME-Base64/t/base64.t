@@ -315,7 +315,7 @@ sub encodeTest
 
     );
 
-    for $test (< @encode_tests) {
+    for $test ( @encode_tests) {
 	my($plain, $expected) = (@$test[0], @$test[1]);
 
 	my $encoded = encode_base64($plain, '');
@@ -358,7 +358,7 @@ sub decodeTest
         \@(undef()    => ''),
     );
 
-    for $test (< @decode_tests) {
+    for $test ( @decode_tests) {
 	my($encoded, $expected) = (@$test[0], @$test[1]);
 
 	my $decoded = decode_base64($encoded);

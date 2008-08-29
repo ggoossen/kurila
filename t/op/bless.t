@@ -126,8 +126,8 @@ is ($@, '', "class is an overloaded ref");
 expected($c4, 'C4', "SCALAR");
 
 {
-    my %h = %( 1..2 );
-    my($k) = keys %h; 
+    my %h = %( < 1..2 );
+    my($k) = < keys %h; 
     my $x=\$k;
     bless $x, 'pam';
     is(ref $x, 'pam');

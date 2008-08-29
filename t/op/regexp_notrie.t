@@ -6,7 +6,7 @@ BEGIN {
 }
 
 our $qr = 1;
-for my $file ('./op/regexp.t', './t/op/regexp.t', ':op:regexp.t') {
+for my $file (@('./op/regexp.t', './t/op/regexp.t', ':op:regexp.t')) {
     if (-r $file) {
 	do $file or die $@;
 	exit;

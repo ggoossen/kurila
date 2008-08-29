@@ -27,7 +27,7 @@ my $Is_Ultrix_VAX = $^O eq 'ultrix' && `uname -m` =~ m/^VAX$/;
 
 while ( ~< *DATA) {
     s/^\s*>//; s/<\s*$//;
-    ($template, $data, $result, $comment) = split(m/<\s*>/, $_, 4);
+    ($template, $data, $result, $comment) = < split(m/<\s*>/, $_, 4);
     if ($^O eq 'os390' || $^O eq 's390') { # non-IEEE (s390 is UTS)
         $data   =~ s/([eE])96$/$163/;      # smaller exponents
         $result =~ s/([eE]\+)102$/$169/;   #  "       "
@@ -96,7 +96,7 @@ for ($i = 1; (nelems @tests); $i++) {
 	    my $vsn = defined $1 ? $1 : "0";
 	    # Only compare on the the first pair of digits, as numeric
 	    # compares don't like 2.6.10-3mdksmp or 2.6.8-24.10-default
-	    s/^(\d+(\.\d+)?).*/$1/ for $osv, $vsn;
+	    s/^(\d+(\.\d+)?).*/$1/ for @( $osv, $vsn);
 	    $skip = $vsn ? ($osv +<= $vsn ? 1 : 0) : 1;
 	}
 	$skip and $comment =~ s/$/, failure expected on $^O $osv/;

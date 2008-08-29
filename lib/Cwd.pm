@@ -169,14 +169,14 @@ L<File::chdir>
 
 use strict;
 use Exporter;
-use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
 
 $VERSION = '3.2701';
 
-@ISA = @( qw/ Exporter / );
-@EXPORT = @( qw(cwd getcwd fastcwd fastgetcwd) );
-push @EXPORT, qw(getdcwd) if $^O eq 'MSWin32';
-@EXPORT_OK = @( qw(chdir abs_path fast_abs_path realpath fast_realpath) );
+@ISA = @( < qw/ Exporter / );
+@EXPORT = @( < qw(cwd getcwd fastcwd fastgetcwd) );
+push @EXPORT, < qw(getdcwd) if $^O eq 'MSWin32';
+@EXPORT_OK = @( < qw(chdir abs_path fast_abs_path realpath fast_realpath) );
 
 # sys_cwd may keep the builtin command
 
@@ -287,9 +287,9 @@ my %METHOD_MAP =
 # are safe.  This prevents _backtick_pwd() consulting $ENV{PATH}
 # so everything works under taint mode.
 my $pwd_cmd;
-foreach my $try ('/bin/pwd',
+foreach my $try (@('/bin/pwd',
 		 '/usr/bin/pwd',
-		 '/QOpenSys/bin/pwd', # OS/400 PASE.
+		 '/QOpenSys/bin/pwd',) # OS/400 PASE.
 		) {
 
     if( -x $try ) {
@@ -308,8 +308,8 @@ unless ($pwd_cmd) {
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
-    my @localize = @( grep exists %ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV) );
-    local %ENV{[< @localize]} = ();
+    my @localize = @( < grep exists %ENV{$_}, @( < qw(PATH IFS CDPATH ENV BASH_ENV)) );
+    local < %ENV{[@(< @localize)]} = ();
     
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".
@@ -330,7 +330,7 @@ unless (%METHOD_MAP{$^O}->{cwd} or defined &cwd) {
 
     # Try again to find a pwd, this time searching the whole PATH.
     if (defined %ENV{PATH} and $os ne 'MSWin32') {  # no pwd on Windows
-	my @candidates = @( split($sep, %ENV{PATH}) );
+	my @candidates = @( < split($sep, %ENV{PATH}) );
 	while (!$found_pwd_cmd and nelems @candidates) {
 	    my $candidate = shift @candidates;
 	    $found_pwd_cmd = 1 if -x "$candidate/pwd";
@@ -401,7 +401,7 @@ sub fastcwd_ {
 	return undef unless defined $direntry; # should never happen
 	unshift(@path, $direntry);
     }
-    $path = '/' . join('/', < @path);
+    $path = '/' . join('/', @( < @path));
     if ($^O eq 'apollo') { $path = "/".$path; }
     # At this point $path may be tainted (if tainting) and chdir would fail.
     # Untaint it then check that we landed where we started.
@@ -474,15 +474,15 @@ sub chdir {
     } elsif ($newdir =~ m#^/#s) {
 	%ENV{'PWD'} = $newdir;
     } else {
-	my @curdir = @( split(m#/#,%ENV{'PWD'}) );
+	my @curdir = @( < split(m#/#,%ENV{'PWD'}) );
 	@curdir = @('') unless (nelems @curdir);
 	my $component;
-	foreach $component (split(m#/#, $newdir)) {
+	foreach $component (@( <split(m#/#, $newdir))) {
 	    next if $component eq '.';
 	    pop(@curdir),next if $component eq '..';
 	    push(@curdir,$component);
 	}
-	%ENV{'PWD'} = join('/',< @curdir) || '/';
+	%ENV{'PWD'} = join('/', @(< @curdir)) || '/';
     }
     1;
 }
@@ -735,7 +735,7 @@ sub _epoc_cwd {
 
 if (exists %METHOD_MAP{$^O}) {
   my $map = %METHOD_MAP{$^O};
-  foreach my $name (keys %$map) {
+  foreach my $name (@( <keys %$map)) {
     local $^W = 0;  # assignments trigger 'subroutine redefined' warning
     no strict 'refs';
     *{Symbol::fetch_glob($name)} = \&{$map->{$name}};

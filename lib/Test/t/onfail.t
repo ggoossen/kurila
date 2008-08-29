@@ -1,8 +1,8 @@
 # -*-perl-*-
 
 use strict;
-use Test qw($ntest plan ok $TESTOUT $TESTERR);
-use vars qw($mycnt);
+use Test < qw($ntest plan ok $TESTOUT $TESTERR);
+use vars < qw($mycnt);
 
 my $why = "zero != one";
 

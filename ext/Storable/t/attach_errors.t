@@ -227,7 +227,7 @@ use Storable ();
 		\"foo",
 		(bless \%( ), 'Foo'),
 		);
-	foreach ( < @badthings ) {
+	foreach (  @badthings ) {
 		$returnvalue = $_;
 
 		my $thawed = undef;

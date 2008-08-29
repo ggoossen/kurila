@@ -1,12 +1,12 @@
 package File::Spec::Mac;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @( qw(File::Spec::Unix) );
+@ISA = @( < qw(File::Spec::Unix) );
 
 my $macfiles;
 if ($^O eq 'MacOS') {
@@ -433,7 +433,7 @@ sub path {
 #  Under MPW, it has a meaning.
 #
     return unless exists %ENV{Commands};
-    return @(split(m/,/, %ENV{Commands}));
+    return @( <split(m/,/, %ENV{Commands}));
 }
 
 =item splitpath

@@ -2,7 +2,7 @@
 
 use Test::More tests => 3;
 
-use B qw|svref_2object|;
+use B < qw|svref_2object|;
 
 {
     # cop_io

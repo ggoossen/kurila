@@ -31,14 +31,14 @@ to the test script.
 
 =cut
 
-use base qw/ DynaLoader Exporter /;
+use base < qw/ DynaLoader Exporter /;
 
 
-use vars qw/ $VERSION @EXPORT /;
+use vars < qw/ $VERSION @EXPORT /;
 
 $VERSION = '0.02';
 
-@EXPORT = @(qw/
+@EXPORT = @( <qw/
 	   T_SV
 	   T_SVREF
 	   T_AVREF

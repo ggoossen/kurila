@@ -15,10 +15,10 @@ use Locale::Constants;
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);
 $VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA       = @( qw(Exporter) );
-@EXPORT    = @( qw(code2script script2code
+@ISA       = @( < qw(Exporter) );
+@EXPORT    = @( < qw(code2script script2code
                 all_script_codes all_script_names
 		script_code2code
 		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC) );
@@ -133,7 +133,7 @@ sub all_script_codes
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return @( keys %{ $CODES->[$codeset] } );
+    return @( < keys %{ $CODES->[$codeset] } );
 }
 
 
@@ -146,7 +146,7 @@ sub all_script_names
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return @( values %{ $CODES->[$codeset] } );
+    return @( < values %{ $CODES->[$codeset] } );
 }
 
 
@@ -165,7 +165,7 @@ sub all_script_names
     {
         next unless m/\S/;
         chop;
-        ($alpha2, $alpha3, $numeric, $script) = split(m/:/, $_, 4);
+        ($alpha2, $alpha3, $numeric, $script) = < split(m/:/, $_, 4);
 
         $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = $script;
         $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{lc "$script"} = $alpha2;

@@ -9,7 +9,7 @@ BEGIN {
     use constant IS_WIN98 => (IS_WIN32 and !Win32::IsWinNT())   ? 1 : 0;
 
     use Exporter    ();
-    use vars        qw[ @ISA $VERSION @EXPORT_OK $VERBOSE $DEBUG
+    use vars <        qw[ @ISA $VERSION @EXPORT_OK $VERBOSE $DEBUG
                         $USE_IPC_RUN $USE_IPC_OPEN3 $WARN
                     ];
 
@@ -20,14 +20,14 @@ BEGIN {
     $USE_IPC_RUN    = IS_WIN32 && !IS_WIN98;
     $USE_IPC_OPEN3  = not IS_VMS;
 
-    @ISA            = @( qw[Exporter] );
-    @EXPORT_OK      = @( qw[can_run run] );
+    @ISA            = @( < qw[Exporter] );
+    @EXPORT_OK      = @( < qw[can_run run] );
 }
 
 require Carp;
 use File::Spec;
-use Params::Check               qw[check];
-use Module::Load::Conditional   qw[can_load];
+use Params::Check <               qw[check];
+use Module::Load::Conditional <   qw[can_load];
 use Locale::Maketext::Simple    Style => 'gettext';
 
 =pod
@@ -132,7 +132,7 @@ sub can_use_ipc_open3   {
     ### ipc::open3 works on every platform, but it can't capture buffers
     ### on win32 :(
     return unless can_load(
-        modules => \%( map {$_ => '0.0'} qw|IPC::Open3 IO::Select Symbol| ),
+        modules => \%( < map {$_ => '0.0'} @( < qw|IPC::Open3 IO::Select Symbol|) ),
         verbose => ($WARN && $verbose),
     );
     
@@ -191,9 +191,9 @@ sub can_run {
         return MM->maybe_command($command);
 
     } else {
-        for my $dir (
-            (split m/\Q%Config::Config{path_sep}\E/, %ENV{PATH}),
-            File::Spec->curdir
+        for my $dir (@(
+            ( <split m/\Q%Config::Config{path_sep}\E/, %ENV{PATH}),
+            File::Spec->curdir)
         ) {           
             my $abs = File::Spec->catfile($dir, $command);
             return $abs if $abs = MM->maybe_command($abs);
@@ -308,7 +308,7 @@ sub run {
         return;
     };        
 
-    print < loc("Running [\%1]...\n", (ref $cmd ? "{join ' ', <@$cmd}" : $cmd)) if $verbose;
+    print < loc("Running [\%1]...\n", (ref $cmd ? "{join ' ', @( <@$cmd)}" : $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -365,7 +365,7 @@ sub run {
         ### in case there are pipes in there;
         ### IPC::Open3 will call exec and exec will do the right thing 
         $ok = __PACKAGE__->_open3_run( 
-                                ( ref $cmd ? "{join ' ', <@$cmd}" : $cmd ),
+                                ( ref $cmd ? "{join ' ', @( <@$cmd)}" : $cmd ),
                                 $_out_handler, $_err_handler, $verbose 
                             );
         
@@ -373,11 +373,11 @@ sub run {
     } else {
         __PACKAGE__->_debug( "# Using system(). Have buffer: $have_buffer" )
             if $DEBUG;
-        $ok = __PACKAGE__->_system_run( (ref $cmd ? "{join ' ', <@$cmd}" : $cmd), $verbose );
+        $ok = __PACKAGE__->_system_run( (ref $cmd ? "{join ' ', @( <@$cmd)}" : $cmd), $verbose );
     }
     
     ### fill the buffer;
-    $$buffer = join '', < @buffer if (nelems @buffer);
+    $$buffer = join '', @( < @buffer) if (nelems @buffer);
     
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
@@ -411,8 +411,8 @@ sub _open3_run {
     ### We'll do the same for STDOUT and STDERR. It works without
     ### duping them on non-unix derivatives, but not on win32.
     my @fds_to_dup = @( IS_WIN32 && !$verbose 
-                            ? qw[STDIN STDOUT STDERR] 
-                            : qw[STDIN]
+                            ? < qw[STDIN STDOUT STDERR] 
+                            : < qw[STDIN]
                         );
     __PACKAGE__->__dup_fds( < @fds_to_dup );
     
@@ -443,7 +443,7 @@ sub _open3_run {
     my $stderr_done = 0;
     OUTER: while ( my @ready = @( < $selector->can_read ) ) {
 
-        for my $h ( < @ready ) {
+        for my $h (  @ready ) {
             my $buf;
             
             ### $len is the amount of bytes read
@@ -510,7 +510,7 @@ sub _ipc_run {
     my @command; my $special_chars;
     if( ref $cmd ) {
         my $aref = \@();
-        for my $item (< @$cmd) {
+        for my $item ( @$cmd) {
             if( $item =~ m/([<>|&])/ ) {
                 push @command, $aref, $item;
                 $aref = \@();
@@ -521,12 +521,12 @@ sub _ipc_run {
         }
         push @command, $aref;
     } else {
-        @command = @( map { if( m/([<>|&])/ ) {
+        @command = @( < map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
-                            \@( split m/ +/ )
+                            \@( < split m/ +/ )
                          }
-                    } split( m/\s*([<>|&])\s*/, $cmd ) );
+                    } @( < split( m/\s*([<>|&])\s*/, $cmd )) );
     }
  
     ### if there's a pipe in the command, *STDIN needs to 
@@ -563,7 +563,7 @@ sub _system_run {
     my $cmd     = shift;
     my $verbose = shift || 0;
 
-    my @fds_to_dup = @( $verbose ? () : qw[STDOUT STDERR] );
+    my @fds_to_dup = @( $verbose ? () : < qw[STDOUT STDERR] );
     __PACKAGE__->__dup_fds( < @fds_to_dup );
     
     ### system returns 'true' on failure -- the exit code of the cmd
@@ -579,9 +579,9 @@ sub _system_run {
     use Symbol;
 
     my %Map = %(
-        STDOUT => \@(qw|>&|, \*STDOUT, Symbol::gensym() ),
-        STDERR => \@(qw|>&|, \*STDERR, Symbol::gensym() ),
-        STDIN  => \@(qw|<&|, \*STDIN,  Symbol::gensym() ),
+        STDOUT => \@( <qw|>&|, \*STDOUT, Symbol::gensym() ),
+        STDERR => \@( <qw|>&|, \*STDERR, Symbol::gensym() ),
+        STDIN  => \@( <qw|<&|, \*STDIN,  Symbol::gensym() ),
     );
 
     ### dups FDs and stores them in a cache
@@ -589,9 +589,9 @@ sub _system_run {
         my $self    = shift;
         my @fds     = @( < @_ );
 
-        __PACKAGE__->_debug( "# Closing the following fds: {join ' ', <@fds}" ) if $DEBUG;
+        __PACKAGE__->_debug( "# Closing the following fds: {join ' ', @( <@fds)}" ) if $DEBUG;
 
-        for my $name ( < @fds ) {
+        for my $name (  @fds ) {
             my($redir, $fh, $glob) = < @{%Map{$name}} or (
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next );
             
@@ -621,9 +621,9 @@ sub _system_run {
         my $self    = shift;
         my @fds     = @( < @_ );
 
-        __PACKAGE__->_debug( "# Reopening the following fds: {join ' ', <@fds}" ) if $DEBUG;
+        __PACKAGE__->_debug( "# Reopening the following fds: {join ' ', @( <@fds)}" ) if $DEBUG;
 
-        for my $name ( < @fds ) {
+        for my $name (  @fds ) {
             my($redir, $fh, $glob) = < @{%Map{$name}} or (
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next );
 

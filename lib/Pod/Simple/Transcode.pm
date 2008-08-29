@@ -11,10 +11,10 @@ BEGIN {
   else { *DEBUG = sub () {0}; }
 }
 
-foreach my $class (
+foreach my $class (@(
   'Pod::Simple::TranscodeSmart',
   'Pod::Simple::TranscodeDumb',
-  '',
+  '',)
 ) {
   $class or die "Couldn't load any encoding classes";
   DEBUG and print "About to try loading $class...\n";

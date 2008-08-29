@@ -5,13 +5,13 @@ use warnings;
 
 our $VERSION = '0.25';
 
-use Storable qw(dclone);
+use Storable < qw(dclone);
 
 require Exporter;
 
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 
-our @EXPORT_OK = @( qw(charinfo
+our @EXPORT_OK = @( < qw(charinfo
 		    charblock charscript
 		    charblocks charscripts
 		    charinrange
@@ -80,14 +80,14 @@ sub openunicode {
     my ($rfh, < @path) = < @_;
     my $f;
     unless (defined $$rfh) {
-	for my $d (< @INC) {
+	for my $d ( @INC) {
 	    use File::Spec;
 	    $f = File::Spec->catfile($d, "unicore", < @path);
 	    last if open($$rfh, "<", $f);
 	    undef $f;
 	}
 	croak __PACKAGE__, ": failed to find ", <
-              File::Spec->catfile(< @path), " in {join ' ', <@INC}"
+              File::Spec->catfile(< @path), " in {join ' ', @( <@INC)}"
 	    unless defined $f;
     }
     return $f;
@@ -207,7 +207,7 @@ sub charinfo {
 	unless defined $code;
     my $hexk = sprintf("\%06X", $code);
     my($rcode,$rname,$rdec);
-    foreach my $range (< @CharinfoRanges){
+    foreach my $range ( @CharinfoRanges){
       if ($range->[0] +<= $code && $code +<= $range->[1]) {
         $rcode = $hexk;
 	$rcode =~ s/^0+//;
@@ -226,13 +226,13 @@ sub charinfo {
 	    return unless defined $line;
 	    chomp $line;
 	    my %prop;
-	    %prop{[qw(
+ <	    %prop{[@( <qw(
 		     code name category
 		     combining bidi decomposition
 		     decimal digit numeric
 		     mirrored unicode10 comment
 		     upper lower title
-		    )]} = split(m/;/, $line, -1);
+		    ))]} = < split(m/;/, $line, -1);
 	    $hexk =~ s/^0+//;
 	    $hexk =  sprintf("\%04X", hex($hexk));
 	    if (%prop{code} eq $hexk) {
@@ -384,7 +384,7 @@ sub _charscripts {
 		}
 	    }
 	    close($SCRIPTSFH);
-	    @SCRIPTS = @( sort { $a->[0] <+> $b->[0] } < @SCRIPTS );
+	    @SCRIPTS = @( < sort { $a->[0] <+> $b->[0] } @( < @SCRIPTS) );
 	}
     }
 }
@@ -783,11 +783,11 @@ sub _casespec {
 			    my ($oldlower,
 				$oldtitle,
 				$oldupper,
-				$oldcondition) =
-				    %{%CASESPEC{$code}}{[qw(lower
+				$oldcondition) = <
+				    %{%CASESPEC{$code}}{[@( <qw(lower
 							   title
 							   upper
-							   condition)]};
+							   condition))]};
 			    if (defined $oldcondition) {
 				my ($oldlocale) =
 				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
@@ -864,8 +864,8 @@ sub _namedseq {
 	    while ( ~< $NAMEDSEQFH) {
 		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my ($n, $s) = ($1, $2);
-		    my @s = @( map { chr(hex($_)) } split(' ', $s) );
-		    %NAMEDSEQ{$n} = join("", < @s);
+		    my @s = @( < map { chr(hex($_)) } @( < split(' ', $s)) );
+		    %NAMEDSEQ{$n} = join("", @( < @s));
 		}
 	    }
 	    close($NAMEDSEQFH);
@@ -879,7 +879,7 @@ sub namedseq {
         return %NAMEDSEQ;
     } elsif ((nelems @_) == 1) {
         my $s = %NAMEDSEQ{ @_[0] };
-        return @( map { ord($_) } split('', $s) );
+        return @( < map { ord($_) } @( < split('', $s)) );
     }
     return;
 }

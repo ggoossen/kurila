@@ -1,14 +1,14 @@
 package ExtUtils::Mksymlists;
 
-use strict qw[ subs refs ];
+use strict < qw[ subs refs ];
 # no strict 'vars';  # until filehandles are exempted
 
 use Carp;
 use Exporter;
 use Config;
 
-our @ISA = @( qw(Exporter) );
-our @EXPORT = @( qw(&Mksymlists) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT = @( < qw(&Mksymlists) );
 our $VERSION = '6.44';
 
 sub Mksymlists {
@@ -26,10 +26,10 @@ sub Mksymlists {
         unless ( (%spec{DL_FUNCS} and keys %{%spec{DL_FUNCS}}) or
                  nelems @{%spec{FUNCLIST}});
     if (defined %spec{DL_FUNCS}) {
-        foreach my $package (keys %{%spec{DL_FUNCS}}) {
+        foreach my $package (@( <keys %{%spec{DL_FUNCS}})) {
             my($packprefix,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
-            foreach my $sym (< @{%spec{DL_FUNCS}->{$package}}) {
+            foreach my $sym ( @{%spec{DL_FUNCS}->{$package}}) {
                 if ($sym =~ m/^boot_/) {
                     push(@{%spec{FUNCLIST}},$sym);
                     $bootseen++;
@@ -46,7 +46,7 @@ sub Mksymlists {
 #    not as pseudo-builtin.
 #    require DynaLoader;
     if (defined &DynaLoader::mod2fname and not %spec{DLBASE}) {
-        %spec{DLBASE} = DynaLoader::mod2fname(\@( split(m/::/,%spec{NAME}) ));
+        %spec{DLBASE} = DynaLoader::mod2fname(\@( < split(m/::/,%spec{NAME}) ));
     }
 
     if    ($osname eq 'aix') { _write_aix(\%spec); }
@@ -67,8 +67,8 @@ sub _write_aix {
 
     open( my $exp, ">", "$data->{FILE}.exp")
         or croak("Can't create $data->{FILE}.exp: $!\n");
-    print $exp join("\n",< @{$data->{DL_VARS}}, "\n") if (nelems @{$data->{DL_VARS}});
-    print $exp join("\n",< @{$data->{FUNCLIST}}, "\n") if (nelems @{$data->{FUNCLIST}});
+    print $exp join("\n", @(< @{$data->{DL_VARS}}, "\n")) if (nelems @{$data->{DL_VARS}});
+    print $exp join("\n", @(< @{$data->{FUNCLIST}}, "\n")) if (nelems @{$data->{FUNCLIST}});
     close $exp;
 }
 
@@ -103,8 +103,8 @@ sub _write_os2 {
     print $def "CODE LOADONCALL\n";
     print $def "DATA LOADONCALL NONSHARED MULTIPLE\n";
     print $def "EXPORTS\n  ";
-    print $def join("\n  ",< @{$data->{DL_VARS}}, "\n") if (nelems @{$data->{DL_VARS}});
-    print $def join("\n  ",< @{$data->{FUNCLIST}}, "\n") if (nelems @{$data->{FUNCLIST}});
+    print $def join("\n  ", @(< @{$data->{DL_VARS}}, "\n")) if (nelems @{$data->{DL_VARS}});
+    print $def join("\n  ", @(< @{$data->{FUNCLIST}}, "\n")) if (nelems @{$data->{FUNCLIST}});
     if (%{$data->{IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
@@ -139,16 +139,16 @@ sub _write_win32 {
     # so this is only to cover the case when the extension DLL may be
     # linked to directly from C. GSAR 97-07-10
     if (%Config::Config{'cc'} =~ m/^bcc/i) {
-        for (< @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
+        for ( @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
             push @syms, "_$_", "$_ = _$_";
         }
     }
     else {
-        for (< @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
+        for ( @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
             push @syms, "$_", "_$_ = $_";
         }
     }
-    print $def join("\n  ",< @syms, "\n") if (nelems @syms);
+    print $def join("\n  ", @(< @syms, "\n")) if (nelems @syms);
     if (%{$data->{IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
@@ -184,13 +184,13 @@ sub _write_vms {
     print $opt "case_sensitive=yes\n"
         if %Config::Config{d_vms_case_sensitive_symbols};
 
-    foreach my $sym (< @{$data->{FUNCLIST}}) {
+    foreach my $sym ( @{$data->{FUNCLIST}}) {
         my $safe = $set->addsym($sym);
         if ($isvax) { print $opt "UNIVERSAL=$safe\n" }
         else        { print $opt "SYMBOL_VECTOR=($safe=PROCEDURE)\n"; }
     }
 
-    foreach my $sym (< @{$data->{DL_VARS}}) {
+    foreach my $sym ( @{$data->{DL_VARS}}) {
         my $safe = $set->addsym($sym);
         print $opt "PSECT_ATTR={$sym},PIC,OVR,RD,NOEXE,WRT,NOSHR\n";
         if ($isvax) { print $opt "UNIVERSAL=$safe\n" }

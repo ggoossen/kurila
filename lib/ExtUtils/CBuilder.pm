@@ -4,7 +4,7 @@ use File::Spec ();
 use File::Path ();
 use File::Basename ();
 
-use vars qw($VERSION @ISA);
+use vars < qw($VERSION @ISA);
 $VERSION = '0.22_01';
 $VERSION = eval $VERSION;
 
@@ -12,7 +12,7 @@ $VERSION = eval $VERSION;
 # platform we're on.  I don't know of a systematic way.  These values
 # came from the latest (bleadperl) perlport.pod.
 
-my %OSTYPES = %( qw(
+my %OSTYPES = %( < qw(
 		 aix       Unix
 		 bsdos     Unix
 		 dgux      Unix
@@ -63,13 +63,13 @@ my $load = sub {
 };
 
 {
-  my @package = @( split m/::/, __PACKAGE__ );
+  my @package = @( < split m/::/, __PACKAGE__ );
   
-  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^O) . '.pm'} < @INC) {
+  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^O) . '.pm'} @( < @INC)) {
     $load->(__PACKAGE__ . "::Platform::$^O");
     
   } elsif (exists %OSTYPES{$^O} and
-	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^O}) . '.pm'} < @INC) {
+	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^O}) . '.pm'} @( < @INC)) {
     $load->(__PACKAGE__ . "::Platform::%OSTYPES{$^O}");
     
   } else {

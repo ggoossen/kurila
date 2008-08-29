@@ -109,7 +109,7 @@ sub check_same {
       $fail = 1;
     }
   }
-  foreach (keys %$orig) {
+  foreach (@( <keys %$orig)) {
     next if (exists $suspect->{$_});
     print "# key '$_' was '$orig->{$_}' now missing\n";
     $fail = 1;
@@ -122,7 +122,7 @@ my %orig = my %inc = my %dec = my %postinc = my %postdec
 my %up = %(1=>2, ab => 'ac');
 my %down = %(1=>0, ab => -1);
 
-foreach (keys %inc) {
+foreach (@( <keys %inc)) {
   my $ans = %up{$_};
   my $up;
   try {$up = ++$_};
@@ -131,7 +131,7 @@ foreach (keys %inc) {
 
 check_same (\%orig, \%inc);
 
-foreach (keys %dec) {
+foreach (@( <keys %dec)) {
   my $ans = %down{$_};
   my $down;
   try {$down = --$_};
@@ -140,7 +140,7 @@ foreach (keys %dec) {
 
 check_same (\%orig, \%dec);
 
-foreach (keys %postinc) {
+foreach (@( <keys %postinc)) {
   my $ans = %postinc{$_};
   my $up;
   try {$up = $_++};
@@ -149,7 +149,7 @@ foreach (keys %postinc) {
 
 check_same (\%orig, \%postinc);
 
-foreach (keys %postdec) {
+foreach (@( <keys %postdec)) {
   my $ans = %postdec{$_};
   my $down;
   try {$down = $_--};
@@ -219,16 +219,16 @@ EOC
 
     if ($warn) {
 	unless (ok (scalar nelems @warnings == 2, scalar nelems @warnings)) {
-	    print STDERR "# $_" foreach < @warnings;
+	    print STDERR "# $_" foreach  @warnings;
 	}
-	foreach (< @warnings) {
+	foreach ( @warnings) {
 	    unless (ok (m/Lost precision when incrementing \d+/, $_)) {
 		print STDERR "# $_"
 	    }
 	}
     } else {
 	unless (ok (scalar nelems @warnings == 0)) {
-	    print STDERR "# {join ' ', <@$_}" foreach < @warnings;
+	    print STDERR "# {join ' ', @( <@$_)}" foreach  @warnings;
 	}
     }
 }
@@ -257,11 +257,11 @@ for my $n (47..113) {
 	    unless $start_p == $check;
     }
 
-    foreach my $warn (0, 1) {
-	foreach (\@('++$i', 'pre-inc'), \@('$i++', 'post-inc')) {
+    foreach my $warn (@(0, 1)) {
+	foreach (@(\@('++$i', 'pre-inc'), \@('$i++', 'post-inc'))) {
 	    check_some_code($start_p, $warn, < @$_);
 	}
-	foreach (\@('--$i', 'pre-dec'), \@('$i--', 'post-dec')) {
+	foreach (@(\@('--$i', 'pre-dec'), \@('$i--', 'post-dec'))) {
 	    check_some_code($start_n, $warn, < @$_);
 	}
     }

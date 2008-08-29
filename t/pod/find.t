@@ -7,7 +7,7 @@ BEGIN {
     # when running under all-utf8 settings (pod/find.t)
     # does not directly require lib/utf8.pm but regular
     # expressions will need that.
-    @INC = @( qw(../lib ../../../../../lib) );
+    @INC = @( < qw(../lib ../../../../../lib) );
   }
 }
 
@@ -20,7 +20,7 @@ BEGIN {
   use File::Spec;
 }
 
-use Pod::Find qw(pod_find pod_where);
+use Pod::Find < qw(pod_find pod_where);
 use File::Spec;
 
 # load successful
@@ -43,13 +43,13 @@ if ($^O eq 'VMS') {
 
 print "### searching $lib_dir\n";
 my %pods = %( < pod_find($lib_dir) );
-my $result = join(',', sort values %pods);
+my $result = join(',', @( < sort @( < values %pods)));
 print "### found $result\n";
 my $compare = %ENV{PERL_CORE} ? 
-  join(',', sort qw(
+  join(',', @( < sort @( < qw(
     Pod::Stuff
-))
-  : join(',', sort qw(
+))))
+  : join(',', @( < sort @( < qw(
     Pod::Checker
     Pod::Find
     Pod::InputObjects
@@ -58,7 +58,7 @@ my $compare = %ENV{PERL_CORE} ?
     Pod::PlainText
     Pod::Select
     Pod::Usage
-));
+))));
 if ($^O eq 'VMS') {
     $compare = lc($compare);
     my $undollared = $Qlib_dir;
@@ -67,10 +67,10 @@ if ($^O eq 'VMS') {
     $result =~ s/$undollared/pod::/g;
     $result =~ s/\$//g;
     my $count = 0;
-    my @result = @( split(m/,/,$result) );
-    my @compare = @( split(m/,/,$compare) );
-    foreach(< @compare) {
-        $count += grep {m/$_/} < @result;
+    my @result = @( < split(m/,/,$result) );
+    my @compare = @( < split(m/,/,$compare) );
+    foreach( @compare) {
+        $count += grep {m/$_/} @( < @result);
     }
     ok($count/(((nelems @result)-1)+1)-1,((nelems @compare)-1));
 }
@@ -105,13 +105,13 @@ my $searchpod = 'Stuff';
 print "### searching for $searchpod.pod\n";
 $result = pod_where(
   \%( -dirs => \@( 'File::Spec'->catdir(
-    %ENV{PERL_CORE} ? () : qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
+    %ENV{PERL_CORE} ? () : < qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
     -verbose => $VERBOSE ), $searchpod)
   || "undef - $searchpod.pod not found!";
 print "### found $result\n";
 
 $compare = 'File::Spec'->catfile(
-    %ENV{PERL_CORE} ? () : qw(t),
+    %ENV{PERL_CORE} ? () : < qw(t),
     'pod', 'testpods', 'lib', 'Pod' ,'Stuff.pm');
 ok(_canon($result),_canon($compare));
 

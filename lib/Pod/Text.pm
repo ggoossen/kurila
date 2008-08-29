@@ -27,15 +27,15 @@ package Pod::Text;
 
 use strict;
 use utf8;
-use vars qw(@ISA @EXPORT $VERSION);
+use vars < qw(@ISA @EXPORT $VERSION);
 
 use Exporter ();
 use Pod::Simple ();
 
-@ISA = @( qw(Pod::Simple Exporter) );
+@ISA = @( < qw(Pod::Simple Exporter) );
 
 # We have to export pod2text for backward compatibility.
-@EXPORT = @( qw(pod2text) );
+@EXPORT = @( < qw(pod2text) );
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -74,7 +74,7 @@ sub new {
     }
 
     # The =for and =begin targets that we accept.
-    $self->accept_targets (qw/text TEXT/);
+    $self->accept_targets ( <qw/text TEXT/);
 
     # Ensure that contiguous blocks of code are merged together.  Otherwise,
     # some of the guesswork heuristics don't work right.
@@ -85,7 +85,7 @@ sub new {
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
     my %opts = %( < @_ );
-    my @opts = @( map { ("opt_$_", %opts{$_}) } keys %opts );
+    my @opts = @( < map { ("opt_$_", %opts{$_}) } @( < keys %opts) );
     %$self = %(< %$self, < @opts);
 
     # Initialize various things from our parameters.
@@ -373,7 +373,7 @@ sub heading {
     $self->item ("\n\n") if defined %$self{ITEM};
     $text =~ s/\s+$//;
     if (%$self{opt_alt}) {
-        my $closemark = join '', reverse (split (m//, $marker));
+        my $closemark = join '', @( < reverse ( @( <split (m//, $marker))));
         my $margin = ' ' x %$self{opt_margin};
         $self->output ("\n" . "$margin$marker $text $closemark" . "\n\n");
     } else {

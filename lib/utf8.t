@@ -45,41 +45,41 @@ plan tests => 36;
 
     my $smiley = "\x{263a}";
 
-    for my $s ("\x{263a}",
+    for my $s (@("\x{263a}",
 	       $smiley,
 		
 	       "" . $smiley,
 	       "" . "\x{263a}",
 
 	       $smiley    . "",
-	       "\x{263a}" . "",
+	       "\x{263a}" . "",)
 	       ) {
 	my $length_chars = length($s);
 	my $length_bytes;
 	{ use bytes; $length_bytes = length($s) }
 	my @regex_chars = @( $s =~ m/(.)/g );
 	my $regex_chars = (nelems @regex_chars);
-	my @split_chars = @( split m//, $s );
+	my @split_chars = @( < split m//, $s );
 	my $split_chars = (nelems @split_chars);
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "1/1/1/3");
     }
 
-    for my $s ("\x{263a}" . "\x{263a}",
+    for my $s (@("\x{263a}" . "\x{263a}",
 	       $smiley    . $smiley,
 
 	       "\x{263a}\x{263a}",
 	       "$smiley$smiley",
 	       
 	       "\x{263a}" x 2,
-	       $smiley    x 2,
+	       $smiley    x 2,)
 	       ) {
 	my $length_chars = length($s);
 	my $length_bytes;
 	{ use bytes; $length_bytes = length($s) }
 	my @regex_chars = @( $s =~ m/(.)/g );
 	my $regex_chars = (nelems @regex_chars);
-	my @split_chars = @( split m//, $s );
+	my @split_chars = @( < split m//, $s );
 	my $split_chars = (nelems @split_chars);
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "2/2/2/6");
@@ -131,7 +131,7 @@ END
     push @i, $s = index($a, '.', $s); # next . after 70 is 72
     push @i, $s = index($a, '4');     # 40
     push @i, $s = index($a, '.', $s); # next . after 40 is 42
-    is("{join ' ', <@i}", "60 62 50 52 70 72 40 42", "utf8 heredoc index");
+    is("{join ' ', @( <@i)}", "60 62 50 52 70 72 40 42", "utf8 heredoc index");
 
     @i = @( () );
     push @i, $s = rindex($a, '6');     # 60
@@ -142,7 +142,7 @@ END
     push @i, $s = rindex($a, '.', $s); # previous . before 70 is 68
     push @i, $s = rindex($a, '4');     # 40
     push @i, $s = rindex($a, '.', $s); # previous . before 40 is 38
-    is("{join ' ', <@i}", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex");
+    is("{join ' ', @( <@i)}", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex");
 
     @i = @( () );
     push @i, $s =  index($a, '6');     # 60
@@ -154,7 +154,7 @@ END
     push @i, $s =  index($a, '7', $s); # 70
     push @i,  index($a, '.', $s);      # next     . after  70 is 72
     push @i, rindex($a, '.', $s);      # previous . before 70 is 68
-    is("{join ' ', <@i}", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex");
+    is("{join ' ', @( <@i)}", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex");
 }
 
 SKIP: {

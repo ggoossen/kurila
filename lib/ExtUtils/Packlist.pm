@@ -2,7 +2,7 @@ package ExtUtils::Packlist;
 
 use strict;
 use Config;
-use vars qw($VERSION $Relocations);
+use vars < qw($VERSION $Relocations);
 $VERSION = '1.43';
 $VERSION = eval $VERSION;
 
@@ -42,8 +42,8 @@ sub __find_relocations
 	%paths{%Config{$exp_key}}++;
     }
     # Longest prefixes go first in the alternatives
-    my $alternations = join "|", map {quotemeta $_}
-    sort {length $b <+> length $a} keys %paths;
+    my $alternations = join "|", @( < map {quotemeta $_}
+ @( <    sort {length $b <+> length $a} @( < keys %paths)));
     qr/^($alternations)/o;
 }
 
@@ -124,7 +124,7 @@ while (defined($line = ~< $fh))
    if ($key =~ m/^(.*?)( \w+=.*)$/)
       {
       $key = $1;
-      $data = \%( map { split('=', $_) } split(' ', $2));
+      $data = \%( < map { < split('=', $_) } @( < split(' ', $2)));
 
       if (%Config{userelocatableinc} && $data->{relocate_as})
       {
@@ -150,7 +150,7 @@ else { $packfile = $self->{packfile}; }
 die("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
 open($fh, ">", "$packfile") || die("Can't open file $packfile: $!");
-foreach my $key (sort(keys(%{$self->{data} || \%()})))
+foreach my $key (@( <sort( @( <keys(%{$self->{data} || \%()})))))
    {
        my $data = $self->{data}->{$key};
        if (%Config{userelocatableinc}) {
@@ -179,7 +179,7 @@ foreach my $key (sort(keys(%{$self->{data} || \%()})))
    print $fh ("$key");
    if (ref($data))
       {
-      foreach my $k (sort(keys(%$data)))
+      foreach my $k (@( <sort( @( <keys(%$data)))))
          {
          print $fh (" $k=$data->{$k}");
          }
@@ -194,7 +194,7 @@ sub validate($;$)
 my ($self, $remove) = < @_;
 $self = tied(%$self) || $self;
 my @missing;
-foreach my $key (sort(keys(%{$self->{data}})))
+foreach my $key (@( <sort( @( <keys(%{$self->{data}})))))
    {
    if (! -e $key)
       {

@@ -7,7 +7,7 @@ BEGIN {
     }
     if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
-	@INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
+	@INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
     }
 }
 
@@ -264,7 +264,7 @@ $sub = $IsEBCDIC ? "m\x{00DC}s" : "m\x{00FC}s";
 ($ret) = $Collator->match($str, $sub);
 ok($ret, undef);
 
-$ret = join ':', < $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
+$ret = join ':', @( < $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe"));
 ok($ret eq "P\cBe\x{300}\cB:pe:PE");
 
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
@@ -291,13 +291,13 @@ ok($ret, undef);
 @ret = @( < $Collator->match("P\cBe\x{300}\cBrl and PERL", "pe") );
 ok((nelems @ret) == 0);
 
-$ret = join ':', < $Collator->gmatch("P\cBe\x{300}\cBrl and PERL", "pe");
+$ret = join ':', @( < $Collator->gmatch("P\cBe\x{300}\cBrl and PERL", "pe"));
 ok($ret eq "");
 
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl and PERL", "pe");
 ok(nelems($ret) == 0);
 
-$ret = join ':', < $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
+$ret = join ':', @( < $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe"));
 ok($ret eq "pe");
 
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
@@ -315,7 +315,7 @@ $Collator->change(< %old_level);
 
 $Collator->change(level => 1);
 
-sub strreverse { join '', reverse split m//, shift }
+sub strreverse { join '', @( < reverse @( < split m//, shift)) }
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
 $ret = $Collator->subst($str, "perl", 'Camel');

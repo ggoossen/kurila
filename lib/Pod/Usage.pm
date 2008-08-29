@@ -9,7 +9,7 @@
 
 package Pod::Usage;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = "1.35";  ## Current version of this package
 
 =head1 NAME
@@ -427,11 +427,11 @@ use Config;
 use Exporter;
 use File::Spec;
 
-use vars qw(@ISA @EXPORT);
-@EXPORT = @( qw(&pod2usage) );
+use vars < qw(@ISA @EXPORT);
+@EXPORT = @( < qw(&pod2usage) );
 BEGIN {
        require Pod::Text;
-       @ISA = @( qw( Pod::Text ) );
+       @ISA = @( < qw( Pod::Text ) );
 }
 
 
@@ -470,13 +470,13 @@ sub pod2usage {
     ## options that were all uppercase words rather than ones that
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
-    %opts = %( map {
+    %opts = %( < map {
         my $val = %opts{$_};
         s/^(?=\w)/-/;
         m/^-msg/i   and  $_ = '-message';
         m/^-exit/i  and  $_ = '-exitval';
         lc($_) => $val;    
-    } (keys %opts) );
+    } @( ( <keys %opts)) );
 
     ## Now determine default -exitval and -verbose values to use
     if ((! defined %opts{"-exitval"}) && (! defined %opts{"-verbose"})) {
@@ -505,8 +505,8 @@ sub pod2usage {
                             : (($^O eq 'MacOS' || $^O eq 'VMS') ? ',' :  ":");
         my $pathspec = %opts{"-pathlist"} || %ENV{PATH} || %ENV{PERL5LIB};
 
-        my @paths = @( (ref $pathspec) ? < @$pathspec : split($pathsep, $pathspec) );
-        for my $dirname (< @paths) {
+        my @paths = @( (ref $pathspec) ? < @$pathspec : < split($pathsep, $pathspec) );
+        for my $dirname ( @paths) {
             local $_ = File::Spec->catfile($dirname, $basename) if length $dirname;
             last if (-e $_) && (%opts{"-input"} = $_);
         }
@@ -605,7 +605,7 @@ sub _handle_element_end {
         if (!%$self{USAGE_SELECT} || !nelems @{ %$self{USAGE_SELECT} }) {
            %$self{USAGE_SKIPPING} = 0;
         } else {
-          for (< @{ %$self{USAGE_SELECT} }) {
+          for ( @{ %$self{USAGE_SELECT} }) {
               if ($heading =~ m/^$_\s*$/) {
                   %$self{USAGE_SKIPPING} = 0;
                   last;

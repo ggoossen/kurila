@@ -16,7 +16,7 @@ use warnings;
 use strict;
 use Carp;
 require Tie::Hash;
-@DB_File::HASHINFO::ISA = @( qw(Tie::Hash) );
+@DB_File::HASHINFO::ISA = @( < qw(Tie::Hash) );
 
 sub new
 {
@@ -116,14 +116,14 @@ package DB_File::RECNOINFO ;
 use warnings;
 use strict ;
 
-@DB_File::RECNOINFO::ISA = @( qw(DB_File::HASHINFO) ) ;
+@DB_File::RECNOINFO::ISA = @( < qw(DB_File::HASHINFO) ) ;
 
 sub TIEHASH
 {
     my $pkg = shift ;
 
-    bless \%( VALID => \%( map {$_, 1} 
-		       qw( bval cachesize psize flags lorder reclen bfname )
+    bless \%( VALID => \%( < map {$_, 1} 
+ @( <		       qw( bval cachesize psize flags lorder reclen bfname ))
 		     ),
 	    GOT   => \%(),
           ), $pkg ;
@@ -134,7 +134,7 @@ package DB_File::BTREEINFO ;
 use warnings;
 use strict ;
 
-@DB_File::BTREEINFO::ISA = @( qw(DB_File::HASHINFO) ) ;
+@DB_File::BTREEINFO::ISA = @( < qw(DB_File::HASHINFO) ) ;
 
 sub TIEHASH
 {
@@ -183,12 +183,12 @@ BEGIN {
     if ($@) {
         $use_XSLoader = 0 ;
         require DynaLoader;
-        @ISA = @( qw(DynaLoader) );
+        @ISA = @( < qw(DynaLoader) );
     }
 }
 
-push @ISA, qw(Tie::Hash Exporter);
-@EXPORT = @( qw(
+push @ISA, < qw(Tie::Hash Exporter);
+@EXPORT = @( < qw(
         $DB_BTREE $DB_HASH $DB_RECNO 
 
 	BTREEMAGIC
@@ -225,7 +225,7 @@ push @ISA, qw(Tie::Hash Exporter);
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = @( grep m/^O_/, < @Fcntl::EXPORT );
+    my @O = @( < grep m/^O_/, @( < @Fcntl::EXPORT) );
     Fcntl->import(< @O);  # first we import what we want to export
     push(@EXPORT, < @O);
 };
@@ -286,7 +286,7 @@ sub CLEAR
         push @keys, $key;
         $status = $self->seq($key, $value, R_NEXT());
     }
-    foreach $key (reverse < @keys) {
+    foreach $key (@(reverse < @keys)) {
         my $s = $self->del($key); 
     }
 }

@@ -43,7 +43,7 @@ is(pop @ARGV   // 7, 3,	'pop @array // ... works');
 
 # Test that various syntaxes are allowed
 
-for (qw(getc pos readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
+for (@( <qw(getc pos readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f))) {
     our $foo;
     eval "sub \{ $_ // 0 \}";
     is($@, '', "$_ // ... compiles");

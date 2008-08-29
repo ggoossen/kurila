@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 use IO::File ();
-use File::Find qw(find);
-use Text::Wrap qw(wrap);
-use Getopt::Long qw(GetOptions);
-use Pod::Usage qw(pod2usage);
-use Cwd qw(cwd);
+use File::Find < qw(find);
+use Text::Wrap < qw(wrap);
+use Getopt::Long < qw(GetOptions);
+use Pod::Usage < qw(pod2usage);
+use Cwd < qw(cwd);
 use File::Spec;
 use strict;
 
@@ -16,7 +16,7 @@ my %opt = %(
   verbose => 0,
 );
 
-GetOptions(\%opt, qw(
+GetOptions(\%opt, < qw(
             dir=s
             frames=i
             hide=s@
@@ -38,7 +38,7 @@ else {
   # Check if we're in the right directory
   -d "%opt{dir}/$_" or die "$0: must be run from the perl source directory"
                          . " when --dir is not given\n"
-      for qw(t lib ext);
+      for @( < qw(t lib ext));
 }
 
 # Assemble regex for functions whose leaks should be hidden
@@ -90,9 +90,9 @@ sub summary {
 
   # Prepare the data
 
-  for my $e (keys %$error) {
-    for my $f (keys %{$error->{$e}}) {
-      my($func, $file, $line) = split m/:/, $f;
+  for my $e (@( <keys %$error)) {
+    for my $f (@( <keys %{$error->{$e}})) {
+      my($func, $file, $line) = < split m/:/, $f;
       my $nf = %opt{lines} ? "$func ($file:$line)" : "$func ($file)";
       %ne{$e}->{$nf}->{count}++;
       while (my($k,$v) = each %{$error->{$e}->{$f}}) {
@@ -102,14 +102,14 @@ sub summary {
     }
   }
 
-  for my $l (keys %$leak) {
-    for my $s (keys %{$leak->{$l}}) {
-      my $ns = join '<', map {
-                 my($func, $file, $line) = split m/:/;
+  for my $l (@( <keys %$leak)) {
+    for my $s (@( <keys %{$leak->{$l}})) {
+      my $ns = join '<', @( < map {
+                 my($func, $file, $line) = < split m/:/;
                  m/:/ ? %opt{lines}
                        ? "$func ($file:$line)" : "$func ($file)"
                      : $_
-               } split m/</, $s;
+               } @( < split m/</, $s));
       %nl{$l}->{$ns}->{count}++;
       while (my($k,$v) = each %{$leak->{$l}->{$s}}) {
         %nl{$l}->{$ns}->{tests}->{$k} += $v;
@@ -121,9 +121,9 @@ sub summary {
   # Print the Top N
 
   if (%opt{top}) {
-    for my $what (qw(error leak)) {
-      my @t = @( sort { %top{$b}->{$what} <+> %top{$a}->{$what} or $a cmp $b }
-              grep %top{$_}->{$what}, keys %top );
+    for my $what (@( <qw(error leak))) {
+      my @t = @( < sort { %top{$b}->{$what} <+> %top{$a}->{$what} or $a cmp $b }
+ @(              < grep %top{$_}->{$what}, @( < keys %top)) );
       (nelems @t) +> %opt{top} and splice @t, %opt{top};
       my $n = (nelems @t);
       my $s = $n +> 1 ? 's' : '';
@@ -144,9 +144,9 @@ sub summary {
 
   print $fh "MEMORY ACCESS ERRORS\n\n";
 
-  for my $e (sort keys %ne) {
+  for my $e (@( <sort @( < keys %ne))) {
     print $fh qq("$e"\n);
-    for my $frame (sort keys %{%ne{$e}}) {
+    for my $frame (@( <sort @( < keys %{%ne{$e}}))) {
       my $data = %ne{$e}->{$frame};
       my $count = $data->{count} +> 1 ? " [$data->{count} paths]" : '';
       print $fh ' 'x4, "$frame$count\n", <
@@ -157,13 +157,13 @@ sub summary {
 
   print $fh "\nMEMORY LEAKS\n\n";
  
-  for my $l (sort keys %nl) {
+  for my $l (@( <sort @( < keys %nl))) {
     print $fh qq("$l"\n);
-    for my $frames (sort keys %{%nl{$l}}) {
+    for my $frames (@( <sort @( < keys %{%nl{$l}}))) {
       my $data = %nl{$l}->{$frames};
-      my @stack = @( split m/</, $frames );
+      my @stack = @( < split m/</, $frames );
       $data->{count} +> 1 and @stack[-1] .= " [$data->{count} paths]";
-      print $fh join('', map { ' 'x4 . "$_:@stack[$_]\n" } 0 ..( (nelems @stack)-1) ), <
+      print $fh join('', @( < map { ' 'x4 . "$_:@stack[$_]\n" } @( < 0 ..( (nelems @stack)-1))) ), <
                 format_tests($data->{tests}), "\n\n";
     }
   }
@@ -174,7 +174,7 @@ sub format_tests {
   my $indent = ' 'x8;
 
   if (%opt{tests}) {
-    return wrap($indent, $indent, join ', ', sort keys %$tests);
+    return wrap($indent, $indent, join ', ', @( < sort @( < keys %$tests)));
   }
   else {
     my $count = keys %$tests;
@@ -204,7 +204,7 @@ sub filter {
       chomp;
       s/^==(\d+)==\s?// and push @{%pid{$1}}, $_;
     }
-    map < @$_, values %pid;
+    map < @$_, @( < values %pid);
   } );
 
   # Setup some useful regexes
@@ -244,7 +244,7 @@ sub filter {
 
       # If there's something on the stack and we've seen perl code,
       # add this memory leak to the summary data
-      (nelems @stack) and $inperl and %leak{$type}->{join '<', < @stack}->{$test}++;
+      (nelems @stack) and $inperl and %leak{$type}->{join '<', @( < @stack)}->{$test}++;
     } else {
       debug(1, "ERROR: $line\n");
 

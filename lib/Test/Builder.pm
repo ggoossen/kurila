@@ -112,7 +112,7 @@ test might be run multiple times in the same process.
 
 =cut
 
-use vars qw($Level);
+use vars < qw($Level);
 
 sub reset {
     my ($self) = < @_;
@@ -198,8 +198,8 @@ sub plan {
         }
     }
     else {
-        my @args = @( grep { defined } ($cmd, $arg) );
-        die("plan() doesn't understand {join ' ', <@args}");
+        my @args = @( < grep { defined } @( ($cmd, $arg)) );
+        die("plan() doesn't understand {join ' ', @( <@args)}");
     }
 
     return 1;
@@ -358,10 +358,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
-        %$result{['ok', 'actual_ok' ]} = ( ( $todo ? 1 : 0 ), 0 );
+ <        %$result{[@('ok', 'actual_ok') ]} = ( ( $todo ? 1 : 0 ), 0 );
     }
-    else {
-        %$result{['ok', 'actual_ok' ]} = ( 1, $test );
+    else { <
+        %$result{[@('ok', 'actual_ok') ]} = ( 1, $test );
     }
 
     $out .= "ok";
@@ -485,7 +485,7 @@ sub is_num {
 sub _is_diag {
     my($self, $got, $type, $expect) = < @_;
 
-    foreach my $val (\$got, \$expect) {
+    foreach my $val (@(\$got, \$expect)) {
         if( defined $$val ) {
             if( $type eq 'eq' ) {
                 # quote and force string context
@@ -607,8 +607,8 @@ Works just like Test::More's cmp_ok().
 =cut
 
 
-my %numeric_cmps = %( map { ($_, 1) } 
-                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>") );
+my %numeric_cmps = %( < map { ($_, 1) } 
+ @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok {
     my($self, $got, $type, $expect, $name) = < @_;
@@ -1060,7 +1060,7 @@ If set to true, no "1..N" header will be printed.
 
 =cut
 
-foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
+foreach my $attribute (@( <qw(No_Header No_Ending No_Diag))) {
     my $method = lc $attribute;
 
     my $code = sub {
@@ -1124,7 +1124,7 @@ sub diag {
 
     # Smash args together like print does.
     # Convert undef to 'undef' so its readable.
-    my $msg = join '', map { defined($_) ? $_ : 'undef' } < @msgs;
+    my $msg = join '', @( < map { defined($_) ? $_ : 'undef' } @( < @msgs));
 
     # Escape each line with a #.
     $msg =~ s/^/# /gm;
@@ -1157,7 +1157,7 @@ sub _print {
     # tests are deparsed with B::Deparse
     return if $^C;
 
-    my $msg = join '', < @msgs;
+    my $msg = join '', @( < @msgs);
 
     local($\, $", $,) = (undef, ' ', '');
     my $fh = $self->output;
@@ -1316,7 +1316,7 @@ sub _copy_io_layers {
         require PerlIO;
         my @layers = @( < PerlIO::get_layers($src) );
         
-        binmode $dest, join " ", map ":$_", < @layers if (nelems @layers);
+        binmode $dest, join " ", @( < map ":$_", @( < @layers)) if (nelems @layers);
     });
 }
 
@@ -1398,7 +1398,7 @@ Of course, test #1 is $tests[0], etc...
 sub summary {
     my($self) = shift;
 
-    return @(map { $_->{'ok'} } < @{ $self->{Test_Results} });
+    return @(< map { $_->{'ok'} } @( < @{ $self->{Test_Results} }));
 }
 
 =item B<details>
@@ -1623,8 +1623,8 @@ sub _ending {
               unless defined $test_results->[$idx];
         }
 
-        my $num_failed = grep !$_->{'ok'}, 
-                              @{$test_results}[[0..$self->{Curr_Test}-1]];
+        my $num_failed = grep !$_->{'ok'}, @( < 
+                              @{$test_results}[[@( <0..$self->{Curr_Test}-1)]]);
 
         my $num_extra = $self->{Curr_Test} - $self->{Expected_Tests};
 

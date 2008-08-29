@@ -100,7 +100,7 @@ sub main {
     my ($ts, $unsorted, @sorted, $status);
     my $unstable_num = 0;
 
-    foreach $ts (<@TestSizes) {
+    foreach $ts (@TestSizes) {
 	$unsorted = genarray($ts);
 	# Sort only on item portion of each element.
 	# There will typically be many repeated items,
@@ -130,49 +130,49 @@ sub main {
 }
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
+main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
 
 {
-    use sort qw(_qsort);
+    use sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
-    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 1);
+    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 1);
 }
 
 {
-    use sort qw(_mergesort);
+    use sort < qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
-    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
+    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
 }
 
 {
-    use sort qw(_qsort stable);
+    use sort < qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
-    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
+    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
 }
 
 # Tests added to check "defaults" subpragma, and "no sort"
 
 {
-    use sort qw(_qsort stable);
-    no sort qw(_qsort);
+    use sort < qw(_qsort stable);
+    no sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
-    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
+    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
 }
 
 {
-    use sort qw(defaults _qsort);
+    use sort < qw(defaults _qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current after defaults _qsort');
     # Not expected to be stable, so don't test for stability here
 }
 
 {
-    use sort qw(defaults stable);
+    use sort < qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
-    main(sub { @(sort {&{@_[0]}} < @{@_[1]}) }, 0);
+    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
 }

@@ -1,6 +1,6 @@
 #!./perl
 
-use List::Util qw(first);
+use List::Util < qw(first);
 use Test::More;
 plan tests => ($::PERL_ONLY ? 14 : 16);
 my $v;
@@ -17,8 +17,8 @@ $v = first { 0 };
 is($v, undef, 'no args');
 
 $v = first { ($_->[1] cmp "e") +<= 0 and ("e" cmp $_->[2]) +<= 0 }
-		\@(qw(a b c)), \@(qw(d e f)), \@(qw(g h i));
-is_deeply($v, \@(qw(d e f)), 'reference args');
+		\@( <qw(a b c)), \@( <qw(d e f)), \@( <qw(g h i));
+is_deeply($v, \@( <qw(d e f)), 'reference args');
 
 # Check that try{} inside the block works correctly
 my $i = 0;
@@ -38,7 +38,7 @@ is($v, 12, 'return from loop');
 
 # Does it work from another package?
 { package Foo;
-  main::is(List::Util::first(sub{$_+>4},(1..4,24)), 24, 'other package');
+  main::is(List::Util::first(sub{$_+>4},( <1..4,24)), 24, 'other package');
 }
 
 # Can we undefine a first sub while it's running?
@@ -73,7 +73,7 @@ SKIP: {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
     sub huge {$_+>1E6}
     my $refcnt = &Internals::SvREFCNT(\&huge);
-    $v = first \&huge, 1..6;
+    $v = first \&huge, < 1..6;
     is(&Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged");
 }
 

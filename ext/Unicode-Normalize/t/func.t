@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = @( $^O eq 'MacOS' ? qw(::lib) : qw(../lib) );
+        @INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
     }
 }
 
@@ -20,11 +20,11 @@ use Test;
 use strict;
 use warnings;
 BEGIN { plan tests => 211 };
-use Unicode::Normalize qw(:all);
+use Unicode::Normalize < qw(:all);
 ok(1); # If we made it this far, we're ok.
 
 sub _pack_U { Unicode::Normalize::pack_U(< @_) }
-sub hexU { _pack_U map hex, split ' ', shift }
+sub hexU { _pack_U < map hex, @( < split ' ', shift) }
 
 #########################
 
@@ -277,7 +277,7 @@ ok(getCompat("044032"), _pack_U(0x1100, 0x1161));
 ok(getComposite("04352", "04449"), 0xAC00);
 
 # string with 22 combining characters: (0x300..0x315)
-my $str_cc22 = _pack_U(0x3041, 0x300..0x315, 0x3042);
+my $str_cc22 = _pack_U(0x3041, < 0x300..0x315, 0x3042);
 ok(decompose($str_cc22), $str_cc22);
 ok(reorder($str_cc22), $str_cc22);
 ok(compose($str_cc22), $str_cc22);
@@ -290,7 +290,7 @@ ok(FCD($str_cc22), $str_cc22);
 ok(FCC($str_cc22), $str_cc22);
 
 # string with 40 combining characters of the same class: (0x300..0x313)x2
-my $str_cc40 = _pack_U(0x3041, 0x300..0x313, 0x300..0x313, 0x3042);
+my $str_cc40 = _pack_U(0x3041, < 0x300..0x313, < 0x300..0x313, 0x3042);
 ok(decompose($str_cc40), $str_cc40);
 ok(reorder($str_cc40), $str_cc40);
 ok(compose($str_cc40), $str_cc40);

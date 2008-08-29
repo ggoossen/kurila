@@ -6,7 +6,7 @@ require Exporter;
 use strict;
 our @ISA = @('Exporter');
 our $VERSION = '1.04';
-our @EXPORT_OK = @( qw(
+our @EXPORT_OK = @( < qw(
   %Code2USASCII
   %Name2character
   %Name2character_number
@@ -19,7 +19,7 @@ our %EXPORT_TAGS = %('ALL' => \@EXPORT_OK);
 
 #==========================================================================
 
-use vars qw(
+use vars < qw(
   %Code2USASCII
   %Name2character
   %Name2character_number
@@ -492,7 +492,7 @@ sub e2charnum {
 #--------------------------------------------------------------------------
 
 %Latin1Code_to_fallback = %( () );
-%Latin1Code_to_fallback{[0xA0 .. 0xFF]} = (
+ <%Latin1Code_to_fallback{[@( <0xA0 .. 0xFF)]} = (
 # Copied from Text/Unidecode/x00.pm:
 
 ' ', qq{!}, qq{C/}, 'PS', qq{\$?}, qq{Y=}, qq{|}, 'SS', qq{"}, qq{(c)}, 'a', qq{<<}, qq{!}, "", qq{(r)}, qq{-},

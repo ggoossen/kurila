@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use Config;
-use File::Basename qw(&basename &dirname);
+use File::Basename < qw(&basename &dirname);
 use Cwd;
 
 # List explicitly here the variables you want Configure to

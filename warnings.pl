@@ -92,7 +92,7 @@ sub valueWalk
     my @list = @() ;
     my ($k, $v) ;
 
-    foreach $k (sort keys %$tre) {
+    foreach $k (@( <sort @( < keys %$tre))) {
 	$v = $tre->{$k};
 	die "duplicate key $k\n" if defined %list{$k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
@@ -111,8 +111,8 @@ sub valueWalk
 sub orderValues
 {
     my $index = 0;
-    foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
-        foreach my $name ( < @{ %v_list{$ver} } ) {
+    foreach my $ver (@( < sort { $a <+> $b } @( < keys %v_list)) ) {
+        foreach my $name (  @{ %v_list{$ver} } ) {
 	    %ValueToName{ $index } = \@( uc $name, $ver ) ;
 	    %NameToValue{ uc $name } = $index ++ ;
         }
@@ -129,7 +129,7 @@ sub walk
     my @list = @() ;
     my ($k, $v) ;
 
-    foreach $k (sort keys %$tre) {
+    foreach $k (@( <sort @( < keys %$tre))) {
 	$v = $tre->{$k};
 	die "duplicate key $k\n" if defined %list{$k} ;
 	#$Value{$index} = uc $k ;
@@ -163,7 +163,7 @@ sub mkRange
           if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[$i + 1] ;
     }
 
-    my $out = join(",", <@out);
+    my $out = join(",", @( <@out));
 
     $out =~ s/,(\.\.,)+/../g ;
     return $out;
@@ -176,8 +176,8 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = (sort {$a <+> $b} map { length $_ } keys %$tre)[[-1]] ;
-    my @keys = sort keys %$tre ;
+    my $max = ( <sort {$a <+> $b} @( < map { length $_ } @( < keys %$tre)))[[-1]] ;
+    my @keys = sort @( < keys %$tre) ;
 
     while ($k = shift @keys) {
 	$v = $tre->{$k};
@@ -216,11 +216,11 @@ sub mkHex
     my $mask = "\x[00]" x $max;
     my $string = "" ;
 
-    foreach (< @a) {
+    foreach ( @a) {
 	vec($mask, $_, 1) = 1 ;
     }
 
-    foreach (unpack("C*", $mask)) {
+    foreach (@(unpack("C*", $mask))) {
         $string .= sprintf("\%2.2x", $_);
     }
     return "\\x[$string]";
@@ -290,7 +290,7 @@ my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 
 my $k ;
 my $last_ver = 0;
-foreach $k (sort { $a <+> $b } keys %ValueToName) {
+foreach $k (@( <sort { $a <+> $b } @( < keys %ValueToName))) {
     my ($name, $version) = < @{ %ValueToName{$k} };
     print $warn "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
@@ -361,7 +361,7 @@ while ( ~< *DATA) {
 
 $last_ver = 0;
 print $pm "our \%Offsets = \%(\n" ;
-foreach my $k (sort { $a <+> $b } keys %ValueToName) {
+foreach my $k (@( <sort { $a <+> $b } @( < keys %ValueToName))) {
     my ($name, $version) = < @{ %ValueToName{$k} };
     $name = lc $name;
     $k *= 2 ;
@@ -377,28 +377,28 @@ foreach my $k (sort { $a <+> $b } keys %ValueToName) {
 print $pm "  );\n\n" ;
 
 print $pm "our \%Bits = %(\n" ;
-foreach $k (sort keys  %list) {
+foreach $k (@( <sort @( < keys  %list))) {
 
     my $v = %list{$k} ;
-    my @list = @( sort { $a <+> $b } < @$v );
+    my @list = @( < sort { $a <+> $b } @( < @$v) );
 
     print $pm tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
-		mkHex($warn_size, map $_ * 2 , < @list),
+		mkHex($warn_size, < map $_ * 2, @(  < @list)),
 		'", # [', mkRange(@list), "]\n" ;
 }
 
 print $pm "  );\n\n" ;
 
 print $pm "our \%DeadBits = %(\n" ;
-foreach $k (sort keys  %list) {
+foreach $k (@( <sort @( < keys  %list))) {
 
     my $v = %list{$k} ;
-    my @list = @( sort { $a <+> $b } < @$v );
+    my @list = @( < sort { $a <+> $b } @( < @$v) );
 
     print $pm tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
-		mkHex($warn_size, map $_ * 2 + 1 , < @list),
+		mkHex($warn_size, < map $_ * 2 + 1, @(  < @list)),
 		'", # [', mkRange(@list), "]\n" ;
 }
 

@@ -11,7 +11,7 @@ package Pod::Perldoc::ToPod;
 use strict;
 use warnings;
 
-use base qw(Pod::Perldoc::BaseTo);
+use base < qw(Pod::Perldoc::BaseTo);
 sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'pod' }

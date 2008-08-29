@@ -25,9 +25,9 @@ use File::Basename;
 our $VERSION = '6.44';
 
 require ExtUtils::MM_Win32;
-our @ISA = @( qw(ExtUtils::MM_Win32) );
+our @ISA = @( < qw(ExtUtils::MM_Win32) );
 
-use ExtUtils::MakeMaker qw( &neatvalue );
+use ExtUtils::MakeMaker < qw( &neatvalue );
 
 %ENV{EMXSHELL} = 'sh'; # to run `commands`
 
@@ -110,10 +110,10 @@ sub platform_constants {
     # Setup Win32's constants.
     $make_frag .= $self->SUPER::platform_constants;
 
-    foreach my $macro (qw(LIBPTH BASE_IMPORT NLM_VERSION MPKTOOL 
+    foreach my $macro (@( <qw(LIBPTH BASE_IMPORT NLM_VERSION MPKTOOL 
                           TOOLPATH BOOT_SYMBOL NLM_SHORT_NAME INCLUDE PATH
                           MM_NW5_VERSION
-                      ))
+                      )))
     {
         next unless defined $self->{$macro};
         $make_frag .= "$macro = $self->{$macro}\n";

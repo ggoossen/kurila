@@ -71,7 +71,7 @@ LINE_CONT:
        chomp ($two .= "\n" . scalar ~< $in);
        goto LINE_CONT;
     }
-    s/^\s*// for ($one, $two);
+    s/^\s*// for @( ($one, $two));
     print $out "\t$one\n\t$two\n" if ($sep eq "&&");
     print $out "\t$one\n\tif errorlevel 1 $two\n" if ($sep eq "||");
     print $out "\tcd \$(_HOME_DIR)\n";

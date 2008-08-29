@@ -5,12 +5,12 @@ use Config;
 use strict;
 use integer;
 
-use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
+use vars < qw( $VERSION @ISA @EXPORT @EXPORT_OK );
 $VERSION   = '1.18_01';
 
-@ISA       = @( qw( Exporter ) );
-@EXPORT    = @( qw( timegm timelocal ) );
-@EXPORT_OK = @( qw( timegm_nocheck timelocal_nocheck ) );
+@ISA       = @( < qw( Exporter ) );
+@EXPORT    = @( < qw( timegm timelocal ) );
+@EXPORT_OK = @( < qw( timegm_nocheck timelocal_nocheck ) );
 
 my @MonthDays = @( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
@@ -62,7 +62,7 @@ sub _daygm {
     # This is written in such a byzantine way in order to avoid
     # lexical variables and sub calls, for speed
     return @_[3] + (
-        %Cheat{ pack( 'ss', @_[[ 4, 5 ]] ) } ||= do {
+        %Cheat{ pack( 'ss', < @_[[@( 4, 5) ]] ) } ||= do {
             my $month = ( @_[4] + 10 ) % 12;
             my $year  = @_[5] + 1900 - $month / 10;
 

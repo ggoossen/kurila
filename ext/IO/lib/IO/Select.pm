@@ -8,12 +8,12 @@ package IO::Select;
 
 use     strict;
 use warnings::register;
-use     vars qw($VERSION @ISA);
+use     vars < qw($VERSION @ISA);
 require Exporter;
 
 $VERSION = "1.17";
 
-@ISA = @( qw(Exporter) ); # This is only so we can do version checking
+@ISA = @( < qw(Exporter) ); # This is only so we can do version checking
 
 sub VEC_BITS () {0}
 sub FD_COUNT () {1}
@@ -72,7 +72,7 @@ sub _update
 
  my $count = 0;
  my $f;
- foreach $f (< @_)
+ foreach $f ( @_)
   {
    my $fn = $vec->_fileno($f);
    next unless defined $fn;
@@ -159,7 +159,7 @@ sub as_string  # for debugging
  $str .= " $count";
  my @handles = @( < @$vec );
  splice(@handles, 0, FIRST_FD);
- for (< @handles) {
+ for ( @handles) {
      $str .= " " . (defined($_) ? "$_" : "-");
  }
  $str;

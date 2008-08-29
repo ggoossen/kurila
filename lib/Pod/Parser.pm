@@ -9,7 +9,7 @@
 
 package Pod::Parser;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = 1.35;  ## Current version of this package
 
 #############################################################################
@@ -198,15 +198,15 @@ for the setting and unsetting of parse-options.
 
 #############################################################################
 
-use vars qw(@ISA);
+use vars < qw(@ISA);
 use strict;
 #use diagnostics;
 use Pod::InputObjects;
 use Exporter;
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 
 ## These "variables" are used as local "glob aliases" for performance
-use vars qw(%myData %myOpts @input_stack);
+use vars < qw(%myData %myOpts @input_stack);
 
 #############################################################################
 
@@ -750,7 +750,7 @@ sub parse_text {
         ## sequence name and text.
         $xseq_sub = sub {
             my ($self, $iseq) = < @_;
-            my $args = join("", < $iseq->parse_tree->children);
+            my $args = join("", @( < $iseq->parse_tree->children));
             return  $self->interior_sequence( $iseq->name, $args, $iseq);
         };
     }
@@ -774,7 +774,7 @@ sub parse_text {
     ## Iterate over all sequence starts text (NOTE: split with
     ## capturing parens keeps the delimiters)
     $_ = $text;
-    my @tokens = @( split m/([A-Z]<(?:<+\s)?)/ );
+    my @tokens = @( < split m/([A-Z]<(?:<+\s)?)/ );
     while ( (nelems @tokens) ) {
         $_ = shift @tokens;
         ## Look for the beginning of a sequence
@@ -885,7 +885,7 @@ sub interpolate {
     my($self, $text, $line_num) = < @_;
     my %parse_opts = %( -expand_seq => 'interior_sequence' );
     my $ptree = $self->parse_text( \%parse_opts, $text, $line_num );
-    return  join "", < $ptree->children();
+    return  join "", @( < $ptree->children());
 }
 
 ##---------------------------------------------------------------------------
@@ -958,7 +958,7 @@ sub parse_paragraph {
         ## and whatever sequence of characters was used to separate them
         $pfx = $1;
         $_ = substr($text, length $pfx);
-        ($cmd, $sep, $text) = split m/(\s+)/, $_, 2; 
+        ($cmd, $sep, $text) = < split m/(\s+)/, $_, 2; 
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {

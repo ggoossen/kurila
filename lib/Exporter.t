@@ -35,7 +35,7 @@ our @Exporter_Methods;
 
 BEGIN {
     # Methods which Exporter says it implements.
-    @Exporter_Methods = @( qw(import
+    @Exporter_Methods = @( < qw(import
                            export_to_level
                            require_version
                            export_fail
@@ -46,20 +46,20 @@ BEGIN {
 {
 package Testing;
 require Exporter;
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 
 # Make sure Testing can do everything its supposed to.
-foreach my $meth (< @main::Exporter_Methods) {
+foreach my $meth ( @main::Exporter_Methods) {
     main::ok( Testing->can($meth), "subclass can $meth()" );
 }
 
 our %EXPORT_TAGS = %(
-                This => \@(qw(stuff %left)),
-                That => \@(qw(Above the @wailing)),
-                tray => \@(qw(Fasten $seatbelt)),
+                This => \@( <qw(stuff %left)),
+                That => \@( <qw(Above the @wailing)),
+                tray => \@( <qw(Fasten $seatbelt)),
                );
-our @EXPORT    = @( qw(lifejacket is) );
-our @EXPORT_OK = @( qw(under &your $seat) );
+our @EXPORT    = @( < qw(lifejacket is) );
+our @EXPORT_OK = @( < qw(under &your $seat) );
 our $VERSION = '1.05';
 
 main::ok( Testing->require_version(1.05),   'require_version()' );
@@ -74,10 +74,10 @@ sub the         { 'the'         }
 sub Fasten      { 'Fasten'      }
 sub your        { 'your'        }
 sub under       { 'under'       }
-use vars qw($seatbelt $seat @wailing %left);
+use vars < qw($seatbelt $seat @wailing %left);
 $seatbelt = 'seatbelt';
 $seat     = 'seat';
-@wailing = @( qw(AHHHHHH) );
+@wailing = @( < qw(AHHHHHH) );
 %left = %( left => "right" );
 
 sub Is { 'Is' };
@@ -85,10 +85,10 @@ BEGIN {*is = \&Is};
 
 Exporter::export_ok_tags();
 
-my %tags     = %( map { $_ => 1 } map { < @$_ } values %EXPORT_TAGS );
-my %exportok = %( map { $_ => 1 } < @EXPORT_OK );
+my %tags     = %( < map { $_ => 1 } @( < map { < @$_ } @( < values %EXPORT_TAGS)) );
+my %exportok = %( < map { $_ => 1 } @( < @EXPORT_OK) );
 my $ok = 1;
-foreach my $tag (keys %tags) {
+foreach my $tag (@( <keys %tags)) {
     $ok = exists %exportok{$tag};
 }
 main::ok( $ok, 'export_ok_tags()' );
@@ -120,24 +120,24 @@ main::ok ( $got eq 'Is', 'and that it gave the correct result')
 
 }
 package Bar;
-my @imports = @( qw($seatbelt &Above stuff @wailing %left) );
+my @imports = @( < qw($seatbelt &Above stuff @wailing %left) );
 Testing->import(< @imports);
 
-main::ok( (!grep { eval "!defined $_" } map({ m/^\w/ ? "&$_" : $_ } < @imports)),
+main::ok( (!grep { eval "!defined $_" } @( < map({ m/^\w/ ? "&$_" : $_ } @( < @imports)))),
       'import by symbols' );
 
 
 package Yar;
-my @tags = @( qw(:This :tray) );
+my @tags = @( < qw(:This :tray) );
 Testing->import(< @tags);
 
-main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
-             map { < @$_ } %Testing::EXPORT_TAGS{[ map { s/^://; $_ } <@tags ]}),
+main::ok( (!grep { eval "!defined $_" } @( < map { m/^\w/ ? "&$_" : $_ }
+ @(             < map { < @$_ } @( < %Testing::EXPORT_TAGS{[@( < map { s/^://; $_ } @( <@tags)) ]})))),
       'import by tags' );
 
 
 package Arrr;
-Testing->import(qw(!lifejacket));
+Testing->import( <qw(!lifejacket));
 
 main::ok( !defined &lifejacket,     'deny import by !' );
 
@@ -145,31 +145,31 @@ main::ok( !defined &lifejacket,     'deny import by !' );
 package Mars;
 Testing->import('/e/');
 
-main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
-            grep { m/e/ } < @Testing::EXPORT, < @Testing::EXPORT_OK),
+main::ok( (!grep { eval "!defined $_" } @( < map { m/^\w/ ? "&$_" : $_ }
+ @(            < grep { m/e/ } @( < @Testing::EXPORT, < @Testing::EXPORT_OK)))),
       'import by regex');
 
 
 package Venus;
 Testing->import('!/e/');
 
-main::ok( (!grep { eval "defined $_" } map { m/^\w/ ? "&$_" : $_ }
-            grep { m/e/ } < @Testing::EXPORT, < @Testing::EXPORT_OK),
+main::ok( (!grep { eval "defined $_" } @( < map { m/^\w/ ? "&$_" : $_ }
+ @(            < grep { m/e/ } @( < @Testing::EXPORT, < @Testing::EXPORT_OK)))),
       'deny import by regex');
 main::ok( !defined &lifejacket, 'further denial' );
 
 
 {
   package More::Testing;
-  our @ISA = @( qw(Exporter) );
+  our @ISA = @( < qw(Exporter) );
   our $VERSION = 0;
   try { More::Testing->require_version(0); 1 };
   main::ok(!$@,       'require_version(0) and $VERSION = 0');
 }
 
 package Moving::Target;
-our @ISA = @( qw(Exporter) );
-our @EXPORT_OK = @( qw (foo) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT_OK = @( < qw (foo) );
 
 sub foo {"This is foo"};
 sub bar {"This is bar"};
@@ -192,7 +192,7 @@ use Exporter 'import';
 
 main::ok(\&import \== \&Exporter::import, "imported the import routine");
 
-our @EXPORT = @( qw( wibble ) );
+our @EXPORT = @( < qw( wibble ) );
 sub wibble {return "wobble"};
 
 package Use::The::Import;

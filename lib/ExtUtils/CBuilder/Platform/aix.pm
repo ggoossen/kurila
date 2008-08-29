@@ -4,9 +4,9 @@ use strict;
 use ExtUtils::CBuilder::Platform::Unix;
 use File::Spec;
 
-use vars qw($VERSION @ISA);
+use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( qw(ExtUtils::CBuilder::Platform::Unix) );
+@ISA = @( < qw(ExtUtils::CBuilder::Platform::Unix) );
 
 sub need_prelink { 1 }
 
@@ -19,7 +19,7 @@ sub link {
 
   # Massage some very naughty bits in %Config
   local $cf->{lddlflags} = $cf->{lddlflags};
-  for ($cf->{lddlflags}) {
+  for (@($cf->{lddlflags})) {
     s/\$ [(] BASEEXT [)] /$baseext/x;
     s/\$ [(] PERL_INC [)] /$perl_inc/x;
   }

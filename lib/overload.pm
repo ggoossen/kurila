@@ -2,7 +2,7 @@ package overload;
 
 our $VERSION = '1.06';
 
-use vars qw'%constants %ops';
+use vars < qw'%constants %ops';
 
 sub nil {}
 
@@ -12,7 +12,7 @@ sub OVERLOAD {
   my ($sub, $fb);
   % {*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
   *{Symbol::fetch_glob($package . "::()")} = \&nil; # Make it findable via fetchmethod.
-  for (keys %arg) {
+  for (@( <keys %arg)) {
     if ($_ eq 'fallback') {
       $fb = %arg{$_};
     } else {
@@ -38,7 +38,7 @@ sub unimport {
   my $package = (caller())[[0]];
   %{*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Upgrade the table
   shift;
-  for (< @_) {
+  for ( @_) {
     if ($_ eq 'fallback') {
       undef $ {*{Symbol::fetch_glob($package . "::()")}};
     } else {
@@ -106,7 +106,7 @@ sub mycan {				# Real can would leave stubs.
   my ($package, $meth) = < @_;
 
   my $mro = mro::get_linear_isa($package);
-  foreach my $p (< @$mro) {
+  foreach my $p ( @$mro) {
     my $fqmeth = $p . q{::} . $meth;
     return \*{Symbol::fetch_glob($fqmeth)} if defined &{Symbol::fetch_glob($fqmeth)};
   }

@@ -163,7 +163,7 @@ SKIP:{
     skip "Depends on \$^X, which doesn't work well when testing the Perl core", 
         1 if %ENV{PERL_CORE};
 
-    my %list = %( map { $_ => 1 } < requires('Carp') );
+    my %list = %( < map { $_ => 1 } @( < requires('Carp')) );
     
     my $flag;
     $flag++ unless delete %list{'Exporter'};

@@ -43,13 +43,13 @@ print q(1..22
 	$string = "abcdefghijkl$string";
     }
 
-    r2() and ok(1) for qw/ 4 5 /;
+    r2() and ok(1) for @( < qw/ 4 5 /);
 }
 
 # test that nul bytes get copied
 {
     my ($a, $ab)   = ("a", "a\0b");
-    my ($ua, $uab) = map pack("U0a*", $_), $a, $ab;
+    my ($ua, $uab) = < map pack("U0a*", $_), @( $a, $ab);
 
     my $ub = pack("U0a*", 'b');
 

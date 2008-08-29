@@ -7,8 +7,8 @@
 #  
 
 
-use Storable qw(freeze thaw dclone);
-use vars qw($debugging $verbose);
+use Storable < qw(freeze thaw dclone);
+use vars < qw($debugging $verbose);
 
 print "1..8\n";
 
@@ -83,7 +83,7 @@ print STDERR < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
 
 # Copy the hash, element by element in order of the keys
 
-foreach my $k (sort keys %a1) {
+foreach my $k (@( <sort @( < keys %a1))) {
     %a2{$k} = \%( key => "$k", "value" => %a1{$k}->{value} );
 }
 

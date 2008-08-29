@@ -24,7 +24,7 @@ BEGIN {
     }
 }
 
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 #$Storable::DEBUGME = 1;
 BEGIN {
@@ -45,7 +45,7 @@ BEGIN {
 
 my (@a);
 
-for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
+for my $dbun (@(1, 0)) {  # dbun - don't be utterly nasty - being utterly
                        # nasty means having a reference to the object
                        # directly within itself. otherwise it's in the
                        # second array.
@@ -99,7 +99,7 @@ for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
     ok($oh_dear->[0], "keep it so", "amagic ok 1");
     ok($oh_dear->[$dbun]->[0], "keep it so", "amagic ok 2");
 
-    @{$nasty} = @( @{$nasty}[[0, 2, 1]] );
+    @{$nasty} = @( < @{$nasty}[[@(0, 2, 1)]] );
     headit("closure freeze BETWEEN circular overload");
     #print Dumper $nasty;
     $icicle = freeze $nasty;
@@ -110,7 +110,7 @@ for my $dbun (1, 0) {  # dbun - don't be utterly nasty - being utterly
     ok($oh_dear->[0], "keep it so", "amagic ok 1");
     ok($oh_dear->[$dbun?2:0]->[0], "keep it so", "amagic ok 2");
 
-    @{$nasty} = @( @{$nasty}[[1, 0, 2]] );
+    @{$nasty} = @( < @{$nasty}[[@(1, 0, 2)]] );
     headit("closure freeze BEFORE circular overload");
     #print Dumper $nasty;
     $icicle = freeze $nasty;

@@ -21,21 +21,21 @@ use Test::More tests => 13;
 
 {
     package Foo::two;
-    main::use_ok("Symbol", qw(qualify));
+    main::use_ok("Symbol", < qw(qualify));
     main::ok( !defined &gensym,       '  one arg, defaults overriden' );
     main::ok( defined &qualify,       '  right function exported' );
 }
 
 {
     package Foo::three;
-    main::use_ok("Symbol", qw(gensym ungensym));
+    main::use_ok("Symbol", < qw(gensym ungensym));
     main::ok( defined &gensym && defined &ungensym,   '  multiple args' );
 }
 
 {
     package Foo::four;
     my $warn; local $^WARN_HOOK = sub { $warn .= shift; };
-    main::use_ok("constant", qw(foo bar));
+    main::use_ok("constant", < qw(foo bar));
     main::ok( defined &foo, 'constant' );
     main::is( $warn, undef, 'no warning');
 }

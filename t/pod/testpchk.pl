@@ -9,19 +9,19 @@ BEGIN {
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, map { 'File::Spec'->catfile($_, 'lib') } ($PARENTDIR, $THISDIR);
+   push @INC, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
    require VMS::Filespec if $^O eq 'VMS';
 }
 
 use Pod::Checker;
-use vars qw(@ISA @EXPORT $MYPKG);
+use vars < qw(@ISA @EXPORT $MYPKG);
 #use strict;
 #use diagnostics;
 use Exporter;
 #use File::Compare;
 
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(&testpodchecker) );
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(&testpodchecker) );
 $MYPKG = try { (caller)[[0]] };
 
 sub stripname( $ ) {
@@ -32,7 +32,7 @@ sub stripname( $ ) {
 sub msgcmp( $ $ ) {
    ## filter out platform-dependent aspects of error messages
    my ($line1, $line2) = < @_;
-   for ($line1, $line2) {
+   for (@($line1, $line2)) {
       ## remove filenames from error messages to avoid any
       ## filepath naming differences between OS platforms
       s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/{"$1 ".lc($2)}/;
@@ -59,7 +59,7 @@ sub testpodcheck( @ ) {
    print "# Running podchecker for '$testname'...\n";
    ## Compare the output against the expected result
    if ($^O eq 'VMS') {
-      for ($infile, $outfile, $cmpfile) {
+      for (@($infile, $outfile, $cmpfile)) {
          $_ = VMS::Filespec::unixify($_)  unless  ref;
       }
    }
@@ -85,7 +85,7 @@ sub testpodchecker( @ ) {
 
    print "1..", nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
-   for $podfile (< @testpods) {
+   for $podfile ( @testpods) {
       ($testname, $_) = < fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;

@@ -8,13 +8,13 @@ use File::Find;
 use File::Spec;
 use strict;
 
-use vars qw($VERSION @ISA @EXPORT_OK 
+use vars < qw($VERSION @ISA @EXPORT_OK 
           $Is_MacOS $Is_VMS 
           $Debug $Verbose $Quiet $MANIFEST $DEFAULT_MSKIP);
 
 $VERSION = '1.51_01';
 @ISA=@('Exporter');
-@EXPORT_OK = @( qw(mkmanifest
+@EXPORT_OK = @( < qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
                 manifind   maniread   manicopy   maniadd
                ) );
@@ -84,7 +84,7 @@ that are found in the existing F<MANIFEST> file in the new one.
 =cut
 
 sub _sort {
-    return @(sort { lc $a cmp lc $b } < @_);
+    return @( <sort { lc $a cmp lc $b } @( < @_));
 }
 
 sub mkmanifest {
@@ -102,7 +102,7 @@ sub mkmanifest {
     %all = %(< %$found, < %$read);
     %all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
-    foreach $file ( <_sort keys %all) {
+    foreach $file ( _sort < keys %all) {
 	if ($skip->($file)) {
 	    # Policy: only remove files if they're listed in MANIFEST.SKIP.
 	    # Don't remove files just because they don't exist.
@@ -233,7 +233,7 @@ sub skipcheck {
     my $matches = _maniskip();
 
     my @skipped = @( () );
-    foreach my $file ( <_sort keys %$found){
+    foreach my $file ( _sort < keys %$found){
         if (&$matches($file)){
             warn "Skipping $file\n";
             push @skipped, $file;
@@ -252,7 +252,7 @@ sub _check_files {
     my $found = manifind($p);
 
     my(@missfile) = @( () );
-    foreach my $file ( <_sort keys %$read){
+    foreach my $file ( _sort < keys %$read){
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
         if ($dosnames){
             $file = lc $file;
@@ -276,7 +276,7 @@ sub _check_manifest {
     my $skip  = _maniskip();
 
     my @missentry = @( () );
-    foreach my $file ( <_sort keys %$found){
+    foreach my $file ( _sort < keys %$found){
         next if $skip->($file);
         warn "Debug: manicheck checking from disk $file\n" if $Debug;
         unless ( exists $read->{$file} ) {
@@ -328,8 +328,8 @@ sub maniread {
             my($base,$dir) = < File::Basename::fileparse($file);
             # Resolve illegal file specifications in the same way as tar
             $dir =~ s/./_/g;
-            my(@pieces) = @( split(m/\./,$base) );
-            if ((nelems @pieces) +> 2) { $base = shift(@pieces) . '.' . join('_',< @pieces); }
+            my(@pieces) = @( < split(m/\./,$base) );
+            if ((nelems @pieces) +> 2) { $base = shift(@pieces) . '.' . join('_', @(< @pieces)); }
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
             $file = $okfile;
@@ -363,7 +363,7 @@ sub _maniskip {
 
     # Make sure each entry is isolated in its own parentheses, in case
     # any of them contain alternations
-    my $regex = join '|', map "(?:$_)", < @skip;
+    my $regex = join '|', @( < map "(?:$_)", @( < @skip));
 
     return sub { @_[0] =~ qr{$opts$regex} };
 }
@@ -413,7 +413,7 @@ sub _check_mskip_directives {
         warn "Problem opening $mfile: $!";
         return;
     }
-    print M $_ for (< @lines);
+    print M $_ for @( (< @lines));
     close M;
     return;
 }
@@ -469,7 +469,7 @@ sub manicopy {
 
     $target = VMS::Filespec::unixify($target) if $Is_VMS;
     File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ? undef : 0755);
-    foreach my $file (keys %$read){
+    foreach my $file (@( <keys %$read)){
     	if ($Is_MacOS) {
 	    if ($file =~ m!:!) { 
 	   	my $dir = _maccat($target, $file);
@@ -551,11 +551,11 @@ sub _manicopy_chmod {
 }
 
 # Files that are often modified in the distdir.  Don't hard link them.
-my @Exceptions = @( qw(MANIFEST META.yml SIGNATURE) );
+my @Exceptions = @( < qw(MANIFEST META.yml SIGNATURE) );
 sub best {
     my ($srcFile, $dstFile) = < @_;
 
-    my $is_exception = grep $srcFile =~ m/$_/, < @Exceptions;
+    my $is_exception = grep $srcFile =~ m/$_/, @( < @Exceptions);
     if ($is_exception or !%Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
@@ -617,13 +617,13 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    my @needed = @( grep { !exists $manifest->{$_} } keys %$additions );
+    my @needed = @( < grep { !exists $manifest->{$_} } @( < keys %$additions) );
     return 1 unless (nelems @needed);
 
     open(MANIFEST, ">>", "$MANIFEST") or 
       die "maniadd() could not open $MANIFEST: $!";
 
-    foreach my $file ( <_sort < @needed) {
+    foreach my $file ( _sort < @needed) {
         my $comment = $additions->{$file} || '';
         printf MANIFEST "\%-40s \%s\n", $file, $comment;
     }

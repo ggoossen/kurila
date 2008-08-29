@@ -10,7 +10,7 @@ use bytes;
 use IO::Compress::RawDeflate v2.006 ;
 
 use Compress::Raw::Zlib  v2.006 ;
-use IO::Compress::Base::Common  v2.006 qw(:Status :Parse createSelfTiedObject);
+use IO::Compress::Base::Common  v2.006 < qw(:Status :Parse createSelfTiedObject);
 use IO::Compress::Gzip::Constants v2.006 ;
 use IO::Compress::Zlib::Extra v2.006 ;
 
@@ -21,8 +21,8 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GzipError);
 $VERSION = '2.006';
 $GzipError = '' ;
 
-@ISA    = @( qw(IO::Compress::RawDeflate Exporter) );
-@EXPORT_OK = @( qw( $GzipError gzip ) ) ;
+@ISA    = @( < qw(IO::Compress::RawDeflate Exporter) );
+@EXPORT_OK = @( < qw( $GzipError gzip ) ) ;
 %EXPORT_TAGS = %( < %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ) ;
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');

@@ -15,7 +15,7 @@ use Safe;
 plan(tests => 4);
 
 my $c = Safe->new;
-$c->permit(qw(require caller));
+$c->permit( <qw(require caller));
 
 my $r = $c->reval(q!
     sub UNIVERSAL::isa { "pwned" }

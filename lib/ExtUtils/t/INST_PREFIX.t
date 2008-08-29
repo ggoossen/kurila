@@ -71,7 +71,7 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
+foreach my $prefix (@( <qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX))) {
     unlike( $mm->{$prefix}, qr/\$\(PREFIX\)/ );
 }
 
@@ -95,7 +95,7 @@ $stdout = '';
 
 is( $mm->{PREFIX}, $PREFIX,   'PREFIX' );
 
-foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
+foreach my $prefix (@( <qw(PERLPREFIX SITEPREFIX VENDORPREFIX))) {
     is( $mm->{$prefix}, '$(PREFIX)', "\$(PREFIX) overrides $prefix" );
 }
 
@@ -116,9 +116,9 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 # Every INSTALL* variable must start with some PREFIX.
 my %Install_Vars = %(
- PERL   => \@(qw(archlib    privlib   bin       man1dir       man3dir   script)),
- SITE   => \@(qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)),
- VENDOR => \@(qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir))
+ PERL   => \@( <qw(archlib    privlib   bin       man1dir       man3dir   script)),
+ SITE   => \@( <qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)),
+ VENDOR => \@( <qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir))
 );
 
 while( my($type, $vars) = each %Install_Vars) {
@@ -128,7 +128,7 @@ while( my($type, $vars) = each %Install_Vars) {
         skip '$Config{usevendorprefix} not set', scalar nelems @$vars
           if $type eq 'VENDOR' and !%Config{usevendorprefix};
 
-        foreach my $var (< @$vars) {
+        foreach my $var ( @$vars) {
             my $installvar = "install$var";
             my $prefix = '$('.$type.'PREFIX)';
 
@@ -153,7 +153,7 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(installman1dir => '');
     _set_config(installman3dir => '');
 
-    my $wibble = File::Spec->catdir(qw(wibble and such));
+    my $wibble = File::Spec->catdir( <qw(wibble and such));
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
@@ -204,7 +204,7 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(usevendorprefix => 'define' );
     _set_config(vendorprefixexp => 'something' );
 
-    my $wibble = File::Spec->catdir(qw(wibble and such));
+    my $wibble = File::Spec->catdir( <qw(wibble and such));
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
@@ -236,7 +236,7 @@ while( my($type, $vars) = each %Install_Vars) {
     _set_config(usevendorprefix => '' );
     _set_config(vendorprefixexp => '' );
 
-    my $wibble = File::Spec->catdir(qw(wibble and such));
+    my $wibble = File::Spec->catdir( <qw(wibble and such));
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
