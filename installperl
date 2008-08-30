@@ -35,7 +35,7 @@ use strict;
 my ($Is_VMS, $Is_W32, $Is_OS2, $Is_Cygwin, $Is_Darwin,
     $nonono, $dostrip, $versiononly, $silent, $verbose, $force,
     $otherperls, $archname, $Is_NetWare, $nwinstall, $nopods);
-use vars qw /$depth/;
+use vars < qw /$depth/;
 
 BEGIN {
     $Is_VMS = $^O eq 'VMS';
@@ -151,7 +151,7 @@ while (~< *SCRIPTS) {
 }
 close SCRIPTS;
 
-if ($scr_ext) { @scripts = @( map { "$_$scr_ext" } < @scripts); }
+if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
 
 my @pods = $nopods ? () : glob("pod/*.pod");
 
@@ -173,7 +173,7 @@ if ($^O eq 'dos') {
 }
 
 if ((-e "testcompile") && (defined(%ENV{'COMPILE'}))) {
-    push(@scripts, @( map("$_.exe", <@scripts)));
+    push(@scripts, < map("$_.exe", @scripts));
 }
 
 find(sub {
@@ -238,9 +238,9 @@ my $d_dosuid = %Config{d_dosuid};
 my $binexp = %Config{binexp};
 
 if ($Is_VMS) {  # Hang in there until File::Spec hits the big time
-    foreach ( \$installbin,     \$installscript,  \$installprivlib,
+    foreach ( @( \$installbin,     \$installscript,  \$installprivlib,
 	      \$installarchlib, \$installsitelib, \$installsitearch,
-	      \$installman1dir ) {
+	      \$installman1dir ) ) {
 	$$_ = unixify($$_);  $$_ =~ s:/$::;
     }
 }
@@ -409,7 +409,7 @@ else {
     # If they have built sperl.o...
     push(@corefiles,'sperl.o') if -f 'sperl.o';
 }
-foreach my $file (<@corefiles) {
+foreach my $file (@corefiles) {
     # HP-UX (at least) needs to maintain execute permissions
     # on dynamically-loadable libraries. So we do it for all.
     if (copy_if_diff($file,"$installarchlib/CORE/$file")) {
@@ -525,27 +525,27 @@ sub script_alias {
 # Install scripts.
 mkpath($installscript, $verbose, 0777);
 if ($versiononly) {
-    for (<@scripts) {
+    for (@scripts) {
 	(my $base = $_) =~ s#.*/##;
 	$base .= $ver;
 	copy($_,    "$installscript/$base");
 	chmod(0755, "$installscript/$base");
     }
 
-    for (<@tolink) {
-	my ($from, $to) = map { "$_$ver" } <@$_;
+    for (@tolink) {
+	my ($from, $to) = < map { "$_$ver" } @$_;
 	(my $frbase = $from) =~ s#.*/##;
 	(my $tobase = $to) =~ s#.*/##;
 	script_alias($installscript, $frbase, $tobase, $scr_ext);
     }
 } else {
-    for (<@scripts) {
+    for (@scripts) {
 	(my $base = $_) =~ s#.*/##;
 	copy($_, "$installscript/$base");
 	chmod(0755, "$installscript/$base");
     }
 
-    for (<@tolink) {
+    for (@tolink) {
 	my ($from, $to) = <@$_;
 	(my $frbase = $from) =~ s#.*/##;
 	(my $tobase = $to) =~ s#.*/##;
@@ -575,7 +575,7 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
 	}
     }
 
-    for (<@pods) {
+    for (@pods) {
 	# $_ is a name like  pod/perl.pod
 	(my $base = $_) =~ s#.*/##;
 	copy_if_diff($_, "{$installprivlib}/$pod/{$base}");
@@ -603,7 +603,7 @@ if (!$versiononly && $otherperls) {
     }
     my @otherperls;
     my %otherperls;
-    for (<@path) {
+    for (@path) {
 	next unless m,^/,;
 	# Use &samepath here because some systems have other dirs linked
 	# to $mainperldir (like SunOS)
@@ -618,7 +618,7 @@ if (!$versiononly && $otherperls) {
     if (@otherperls) {
 	warn "\nWarning: $perl appears in your path in the following " .
 	    "locations beyond where\nwe just installed it:\n";
-	for (<@otherperls) {
+	for (@otherperls) {
 	    warn "    $_\n";
 	}
 	warn "\n";
@@ -649,7 +649,7 @@ sub unlink {
 
     return nelems(@names) if $Is_VMS;
 
-    foreach my $name (<@names) {
+    foreach my $name (@names) {
 	next unless -e $name;
 	chmod 0777, $name if ($Is_OS2 || $Is_W32 || $Is_Cygwin || $Is_NetWare);
 	print "  unlink $name\n" if $verbose;
@@ -662,7 +662,7 @@ sub unlink {
 sub safe_unlink {
     return if $nonono or $Is_VMS;
     my @names = @_;
-    foreach my $name (<@names) {
+    foreach my $name (@names) {
 	next unless -e $name;
 	chmod 0777, $name if ($Is_OS2 || $Is_W32 || $Is_NetWare);
 	print "  unlink $name\n" if $verbose;
@@ -927,7 +927,7 @@ sub strip
 	push @opts, shift @args;
     }
 
-    foreach my $file (<@args) {
+    foreach my $file (@args) {
 	if (-f $file) {
 	    if ($verbose) {
 		print "  strip " . join(' ', <@opts);

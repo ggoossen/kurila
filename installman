@@ -1,5 +1,5 @@
 #!./perl -w
-BEGIN { @INC = @(qw(lib)) }
+BEGIN { @INC = @('lib') }
 use strict;
 
 BEGIN {
@@ -31,10 +31,10 @@ use Config;
 use Getopt::Long;
 use File::Find;
 use File::Copy;
-use File::Path qw(mkpath);
+use File::Path < qw(mkpath);
 use ExtUtils::Packlist;
 use Pod::Man;
-use vars qw($packlist);
+use vars < qw($packlist);
 
 if (%Config{d_umask}) {
     umask(022); # umasks like 077 aren't that useful for installations
@@ -65,7 +65,7 @@ my $usage =
 
 my %opts;
 GetOptions( \%opts,
-            qw( man1dir=s man1ext=s man3dir=s man3ext=s batchlimit=i
+            < qw( man1dir=s man1ext=s man3dir=s man3ext=s batchlimit=i
                 destdir:s notify n help silent S verbose V)) 
 	|| die $usage;
 die $usage if %opts{help};
@@ -133,7 +133,7 @@ sub pod2man {
     if ($mandir eq ' ' or $mandir eq '') {
 	if (@script) {
 	    warn "Skipping installation of $poddir/$_ man page.\n"
-		foreach <@script;
+		foreach @script;
 	} else {
 	    warn "Skipping installation of $poddir man pages.\n";
 	}
@@ -150,7 +150,7 @@ sub pod2man {
     # dir ('.'), values are names relative to $poddir.
     my %modpods;
     if (@script) {
-	%modpods = %(map {+"$poddir/$_", $_} < @script);
+	%modpods = %( < map {+"$poddir/$_", $_} @script);
     }
     else {
 	File::Find::find(\%(no_chdir=>1,
@@ -206,7 +206,7 @@ sub pod2man {
 	push @to_process, \@($mod, $tmp, $manpage);
     }
 
-    foreach my $page (<@to_process) {
+    foreach my $page (@to_process) {
 	my($pod, $tmp, $manpage) = <@$page;
 
         my $parser = Pod::Man->new( section => $manext,
@@ -240,7 +240,7 @@ sub unlink {
     my @names = @_;
     my $cnt = 0;
 
-    foreach my $name (<@names) {
+    foreach my $name (@names) {
 	next unless -e $name;
 	chmod 0777, $name if $^O eq 'os2';
 	print "  unlink $name\n" if %opts{verbose};
