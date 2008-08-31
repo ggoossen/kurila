@@ -155,7 +155,8 @@ PP(pp_rv2sv)
 	}
 	else {
 	    if ( SvOK(sv) && ! SvHVOK(sv) )
-		Perl_croak(aTHX_ "Not a HASH reference");
+		Perl_croak(aTHX_ "Expected a HASH ref but got a %s ref",
+		    Ddesc(sv));
 	}
     }
     if (PL_op->op_private & OPpLVAL_INTRO) {
