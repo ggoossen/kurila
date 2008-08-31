@@ -1,5 +1,9 @@
 #!./perl
 
+BEGIN {
+   require "./test.pl";
+}
+
 # 2s complement assumption. Won't break test, just makes the internals of
 # the SVs less interesting if were not on 2s complement system.
 my $uv_max = ^~^0;
@@ -33,19 +37,24 @@ our (@FOO, $expect);
 	$uv_big, $uv_bigi, $iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big,
 	$iv_small);
 
-$expect = 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
-print "1..$expect\n";
+$expect = 1 + 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
+plan tests => $expect;
 
-sub nok ($$$$$$$$) {
-  my ($test, $left, $threeway, $right, $result, $i, $j, $boolean) = < @_;
-  $result = defined $result ? "'$result'" : 'undef';
-  print "not ok $test # ($left <=> $right) gives: $result \$i=$i \$j=$j, $boolean disagrees\n";
+{
+    local our $TODO = "array in numeric comparison";
+    dies_like( sub { @(1,2) +< 3 },
+               qr/ARRAY can't be used as a number in numeric comparison \( \+< \)/,
+           );
 }
 
-my $ok = 0;
+sub nok ($$$$$$$) {
+  my ($left, $threeway, $right, $result, $i, $j, $boolean) = < @_;
+  $result = defined $result ? "'$result'" : 'undef';
+  fail("($left <=> $right) gives: $result \$i=$i \$j=$j, $boolean disagrees");
+}
+
 for my $i (0..((nelems @FOO)-1)) {
     for my $j ($i..((nelems @FOO)-1)) {
-	$ok++;
 	# Comparison routines may convert these internally, which would change
 	# what is used to determine the comparison on later runs. Hence copy
 	my ($i1, $i2, $i3, $i4, $i5, $i6, $i7, $i8, $i9, $i10,
@@ -64,112 +73,103 @@ for my $i (0..((nelems @FOO)-1)) {
 	       $cmp == 0  && !($i2 +< $j2) ||
 	       $cmp == 1  && !($i2 +< $j2)))
 	{
-	    print "ok $ok\n";
+            pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '<');
+	    nok($i3, '<=>', $j3, $cmp, $i, $j, '<');
 	}
-	$ok++;
 	if (!defined($cmp) ? !($i4 == $j4)
 	    : ($cmp == -1 && !($i4 == $j4) ||
 	       $cmp == 0  && $i4 == $j4 ||
 	       $cmp == 1  && !($i4 == $j4)))
 	{
-	    print "ok $ok\n";
+            pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '==');
+	    nok($i3, '<=>', $j3, $cmp, $i, $j, '==');
 	}
-	$ok++;
 	if (!defined($cmp) ? !($i5 +> $j5)
 	    : ($cmp == -1 && !($i5 +> $j5) ||
 	       $cmp == 0  && !($i5 +> $j5) ||
 	       $cmp == 1  && ($i5 +> $j5)))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '>');
+	    nok ($i3, '<=>', $j3, $cmp, $i, $j, '>');
 	}
-	$ok++;
 	if (!defined($cmp) ? !($i6 +>= $j6)
 	    : ($cmp == -1 && !($i6 +>= $j6) ||
 	       $cmp == 0  && $i6 +>= $j6 ||
 	       $cmp == 1  && $i6 +>= $j6))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '>=');
+	    nok($i3, '<=>', $j3, $cmp, $i, $j, '>=');
 	}
-	$ok++;
 	# OK, so the docs are wrong it seems. NaN != NaN
 	if (!defined($cmp) ? ($i7 != $j7)
 	    : ($cmp == -1 && $i7 != $j7 ||
 	       $cmp == 0  && !($i7 != $j7) ||
 	       $cmp == 1  && $i7 != $j7))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '!=');
+	    nok ($i3, '<=>', $j3, $cmp, $i, $j, '!=');
 	}
-	$ok++;
 	if (!defined($cmp) ? !($i8 +<= $j8)
 	    : ($cmp == -1 && $i8 +<= $j8 ||
 	       $cmp == 0  && $i8 +<= $j8 ||
 	       $cmp == 1  && !($i8 +<= $j8)))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '<=');
+	    nok ($i3, '<=>', $j3, $cmp, $i, $j, '<=');
 	}
-	$ok++;
         my $pmc =  $j16 <+> $i16; # cmp it in reverse
         # Should give -ve of other answer, or undef for NaNs
         # a + -a should be zero. not zero is truth. which avoids using ==
 	if (defined($cmp) ? !($cmp + $pmc) : !defined $pmc)
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, '<=> transposed');
+	    nok ($i3, '<=>', $j3, $cmp, $i, $j, '<=> transposed');
 	}
 
 
 	# String comparisons
-	$ok++;
 	$cmp = $i9 cmp $j9;
 	if ($cmp == -1 && !($i11 eq $j11) ||
 	    $cmp == 0  && ($i11 eq $j11) ||
 	    $cmp == 1  && !($i11 eq $j11))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'eq');
+	    nok ($i3, 'cmp', $j3, $cmp, $i, $j, 'eq');
 	}
-	$ok++;
 	if ($cmp == -1 && ($i14 ne $j14) ||
 	    $cmp == 0  && !($i14 ne $j14) ||
 	    $cmp == 1  && ($i14 ne $j14))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, 'cmp', $j3, $cmp, $i, $j, 'ne');
+	    nok ($i3, 'cmp', $j3, $cmp, $i, $j, 'ne');
 	}
-	$ok++;
         $pmc =  $j17 cmp $i17; # cmp it in reverse
         # Should give -ve of other answer
         # a + -a should be zero. not zero is truth. which avoids using ==
 	if (!($cmp + $pmc))
 	{
-	    print "ok $ok\n";
+	    pass();
 	}
 	else {
-	    nok ($ok, $i3, '<=>', $j3, $cmp, $i, $j, 'cmp transposed');
+	    nok ($i3, '<=>', $j3, $cmp, $i, $j, 'cmp transposed');
 	}
     }
 }
