@@ -3487,10 +3487,20 @@ PP(pp_delete)
 	HV * const hv = (HV*)POPs;
 	const U32 hvtype = SvTYPE(hv);
 	if (hvtype == SVt_PVHV) {			/* hash element */
-	    while (++MARK <= SP) {
-		SV * const sv = hv_delete_ent(hv, *MARK, discard, 0);
-		*MARK = sv ? sv : &PL_sv_undef;
+	    if (SP - MARK != 1) 
+		Perl_croak(aTHX_ "Delete expected a single argument");
+	    SV* slice = POPs;
+	    if ( ! SvAVOK(slice) )
+		Perl_croak(aTHX_ "hash slice expected an array as slice index, but got %s", Ddesc(slice));
+	    AV* slicecopy = sv_mortalcopy(slice);
+	    SV** items = AvARRAY(slicecopy);
+	    I32 avlen = av_len(slicecopy);
+	    I32 i;
+	    for (i = 0; i <= avlen; i++) {
+		SV * const sv = hv_delete_ent(hv, items[i], 0, 0);
+		SVcpREPLACE(items[i], sv);
 	    }
+	    XPUSHs(slicecopy);
 	}
 	else if (hvtype == SVt_PVAV) {                  /* array element */
             if (PL_op->op_flags & OPf_SPECIAL) {
