@@ -317,7 +317,7 @@ sub _open3 {
     # of it.
     xclose $dad_wtr if $dup_wtr;
 
-    select((select($dad_wtr), $| = 1)[[0]]); # unbuffer pipe
+    select(@(select($dad_wtr), $| = 1)[0]); # unbuffer pipe
     $kidpid;
 }
 

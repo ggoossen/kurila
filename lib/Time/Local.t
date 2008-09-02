@@ -58,7 +58,7 @@ my @years =
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or
 # greater).
-my $neg_epoch_ok = defined ((localtime(-259200))[[0]]) ? 1 : 0;
+my $neg_epoch_ok = defined (@(localtime(-259200))[0]) ? 1 : 0;
 
 # use vmsish 'time' makes for oddness around the Unix epoch
 if ($^O eq 'VMS') {
@@ -144,7 +144,7 @@ for ( @bad_time) {
 # treated like 03:00:00 rather than 01:00:00 - negative zone offsets used
 # to do the latter
 {
-    my $hour = (localtime(timelocal(0, 0, 2, 7, 3, 102)))[[2]];
+    my $hour = @(localtime(timelocal(0, 0, 2, 7, 3, 102)))[2];
     # testers in US/Pacific should get 3,
     # other testers should get 2
     ok($hour == 2 || $hour == 3, 'hour should be 2 or 3');

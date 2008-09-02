@@ -18,7 +18,7 @@ sub of {
     my $class = shift @_;
 
     # If no one wants the result, don't bother computing it.
-    my $hinthash = ( caller 0 )[[10]];
+    my $hinthash = @( caller 0 )[10];
     my %tags;
  <    %tags{[@( <_unpack_tags( $hinthash->{$class} )) ]} = ();
 

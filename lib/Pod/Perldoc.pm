@@ -49,7 +49,7 @@ $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
 
 #..........................................................................
 { my $pager = %Config{'pager'};
-  push @Pagers, $pager if -x ( <split m/\s+/, $pager)[[0]] or IS_VMS;
+  push @Pagers, $pager if -x (split m/\s+/, $pager)[0] or IS_VMS;
 }
 $Bindir  = %Config{'scriptdirexp'};
 $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
@@ -1605,7 +1605,7 @@ sub searchfor {
 	    closedir(D)		or die "Can't closedir $dir: $!";
 	    next unless (nelems @newdirs);
 	    # what a wicked map!
-	    @newdirs = @( < map((s/\.dir\z//,$_)[[1]], @(< @newdirs)) ) if IS_VMS;
+	    @newdirs = @(< map(@(s/\.dir\z//,$_)[1], @(< @newdirs)) ) if IS_VMS;
 	    $self->aside( "Also looking in {join ' ', @( <@newdirs)}\n" );
 	    push(@dirs,< @newdirs);
 	}

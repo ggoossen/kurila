@@ -50,7 +50,7 @@ sub id {
 
 sub remove {
     my $self = shift;
-    (semctl($$self,0,IPC_RMID,0), undef $$self)[[0]];
+    @(semctl($$self,0,IPC_RMID,0), undef $$self)[0];
 }
 
 sub getncnt {

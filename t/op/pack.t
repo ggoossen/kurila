@@ -927,7 +927,7 @@ is(join(" ", @( unpack("C*", "\x{1e2}"))), $rslt);
 is(pack('U', 0x300), "\x{300}");
 
 # does unpack U deref Unicode?
-is((unpack('U', "\x{300}"))[[0]], 0x300);
+is(@(unpack('U', "\x{300}"))[0], 0x300);
 
 # is unpack U the reverse of pack U for Unicode string?
 is("{join ' ', @( <@{\@(unpack('U*', pack('U*', 100, 200, 300)))})}", "100 200 300");
@@ -1055,7 +1055,7 @@ foreach (@(
 }
 
 {
-    is((unpack("w/a*", "\x[02]abc"))[[0]], "ab");
+    is(@(unpack("w/a*", "\x[02]abc"))[0], "ab");
 
     # "w/a*" should be seen as one unit
 

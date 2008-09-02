@@ -38,7 +38,7 @@ sub unimport {
 }
 
 sub in_effect {
-    my $hinthash = (caller(0))[[10]];
+    my $hinthash = @(caller(0))[10];
     return $hinthash->{mypragma};
 }
 
