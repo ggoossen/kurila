@@ -163,7 +163,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	}
     }
     %ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
-    delete %ENV{[< @MoreEnv]};
+    delete %ENV{[@MoreEnv]};
     %ENV{TERM} = 'dumb';
 
     test try { `$echo 1` } eq "1\n";
@@ -195,9 +195,9 @@ my $TEST = catfile(curdir(), 'TEST');
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (< grep { defined and -d and (stat '_')[[2]] ^&^ 2 }
+	$tmp = (grep { defined and -d and @(stat '_')[2] ^&^ 2 }
  @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
-		     %ENV{[@( <qw(TMP TEMP))]}))[[0]]
+		     %ENV{[@( <qw(TMP TEMP))]}))[0]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
@@ -574,9 +574,9 @@ SKIP: {
     test     tainted @xyzzy[1];
     test not tainted @xyzzy[2];
     my $red_october = sub { return @("A", "tainted" . $TAINT, "B") };
-    test not tainted (( <&$red_october)[[0]]);
-    test     tainted (( <&$red_october)[[1]]);
-    test not tainted (( <&$red_october)[[2]]);
+    test not tainted ((&$red_october)[0]);
+    test     tainted ((&$red_october)[1]);
+    test not tainted ((&$red_october)[2]);
     my @corge = @( < &$red_october );
     test not tainted @corge[0];
     test     tainted @corge[1];

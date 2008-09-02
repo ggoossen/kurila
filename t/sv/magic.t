@@ -297,7 +297,7 @@ else {
 	if ($^O =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, '<', "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
-	    my $me = ( <split m/\0/, $line)[[0]];
+	    my $me = (split m/\0/, $line)[0];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
 	    close CMDLINE;
             # perlbug #22811
@@ -306,7 +306,7 @@ else {
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
-              my $ps = (`ps -o command= -p $$`)[[-1]];
+              my $ps = @(`ps -o command= -p $$`)[-1];
               return if $?;
               chomp $ps;
               printf "# 0[\%s]ps[\%s]\n", $0, $ps;
@@ -424,7 +424,7 @@ if (!$Is_VMS) {
     try { %ENV = %(PATH => __PACKAGE__) };
     ok( $@ eq '', 'Assign a constant to a magic hash');
     $@ and print "# $@";
-    try { my %h = %( < qw(A B) ); %ENV = %(PATH => ( <keys %h)[[0]]) };
+    try { my %h = %( < qw(A B) ); %ENV = %(PATH => (keys %h)[0]) };
     ok( $@ eq '', 'Assign a shared key to a magic hash');
     $@ and print "# $@";
 }

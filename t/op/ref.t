@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-plan(109);
+plan(102);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -191,11 +191,6 @@ package main;
 # Test arrow-style method invocation.
 
 is ($object->doit("BAR"), 'bar');
-
-# Test not working indirect-object-style method invocation.
-
-eval_dies_like(q{my $object; my $foo = doit $object "FOO";},
-               qr/syntax error at/);
 
 sub BASEOBJ::doit {
     local $ref = shift;
@@ -409,28 +404,12 @@ TODO: {
     is (&{*{Symbol::fetch_glob($name2)}}, "Two");
 }
 
-# test derefs after list slice
-
-is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/o ->' );
-is ( (\%(foo => "bar"))[[0]]->{foo}, "bar", 'hash deref from list slice w/ ->' );
-is ( (\@( <qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/o ->' );
-is ( (\@( <qw/foo bar/))[[0]]->[1], "bar", 'array deref from list slice w/ ->' );
-is ( (sub {"bar"})[[0]]->(), "bar", 'code deref from list slice w/ ->' );
-
-# deref on empty list shouldn't autovivify
-{
-    local $@->{description};
-    try { ()[[0]]->{foo} };
-    like ( "$@->{description}", "Can't use UNDEF as a HASH REF",
-           "deref of undef from list slice fails" );
-}
-
 # test dereferencing errors
 {
     my $ref;
     foreach $ref (@(*STDOUT{IO})) {
 	dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
-	dies_like(sub { %$ref }, qr/Not a HASH reference/, "Hash dereference");
+	dies_like(sub { %$ref }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
 	dies_like(sub { &$ref }, qr/Not a CODE reference/, "Code dereference");
     }
 

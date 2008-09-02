@@ -1,7 +1,7 @@
 #!./perl
 
 require "./test.pl";
-plan( tests => 53 );
+plan( tests => 49 );
 
 our (@b, @a, @foo, @bar, $c, $d, %c, $x);
 
@@ -130,20 +130,8 @@ cmp_ok(join('', @((1,2),3,(4,5))),'eq','12345','list (..).(..)');
 {
     my @a = @(0, undef, undef, 3);
     my @b = @( < @a[[@(1,2)]] );
-    my @c = @( (0, undef, undef, 3)[[1, 2]] );
+    my @c = @(0, undef, undef, 3)[[1..2]];
     cmp_ok(scalar(nelems @b),'==',scalar(nelems @c),'slice and slice');
     cmp_ok(scalar(nelems @c),'==',2,'slice len');
-}
-
-{
-    # perl #39882
-    sub test_zero_args {
-        my $test_name = shift;
-        is((nelems @_), 0, $test_name);
-    }
-    test_zero_args("simple list slice",      (10,11)[[2,3]]);
-    test_zero_args("grepped list slice",     < grep(1, @( (10,11)[[2,3]])));
-    test_zero_args("sorted list slice", <      sort( @((10,11)[[2,3]])));
-    test_zero_args("do-returned list slice", do { (10,11)[[2,3]]; });
 }
 
