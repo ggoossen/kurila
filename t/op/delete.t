@@ -79,7 +79,7 @@ cmp_ok(@foo[3],'eq','c','ary c exists');
 cmp_ok(@foo[4],'eq','d','ary d exists');
 cmp_ok(@foo[5],'eq','e','ary e exists');
 
-@bar = @( delete @foo[[4,5]] );
+@bar = delete @foo[[@(4,5)]];
 
 cmp_ok(scalar(nelems @bar),'==',2,'ary deleted slice');
 cmp_ok(@bar[0],'eq','d','ary slice 1');
