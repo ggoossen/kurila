@@ -272,7 +272,7 @@ delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
                 dir_path('fab') => 1, dir_path('faba') => 1,
                 dir_path('fb') => 1, dir_path('fba') => 1);
 
-delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
+delete %Expect_Dir{[@(dir_path('fb'), dir_path('fba'))]} unless $symlink_exists;
 
 File::Find::find( \%(wanted => \&wanted_File_Dir_prune, untaint => 1,
 		   untaint_pattern => qr|^(.+)$|), topdir('fa') );

@@ -84,6 +84,6 @@ unshift @ISA, $class;
 
 sub _assert {
     my $sanity = shift;
-    die sprintf "Assert failed at \%s line \%d\n", (caller)[[1,2]] unless $sanity;
+    die sprintf "Assert failed at \%s line \%d\n", < @(caller)[[1..2]] unless $sanity;
     return;
 }

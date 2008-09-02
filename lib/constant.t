@@ -48,14 +48,14 @@ is( (nelems @undef), 0);
 
 use constant COUNTDOWN	=> '54321';
 use constant COUNTLIST	=> < reverse @( 1, 2, 3, 4, 5);
-use constant COUNTLAST	=> ( <COUNTLIST)[[-1]];
+use constant COUNTLAST	=> (COUNTLIST)[-1];
 
 is COUNTDOWN, '54321';
 my @cl = @( < COUNTLIST );
 is nelems(@cl), 5;
 is COUNTDOWN, join '', @( < @cl);
 is COUNTLAST, 1;
-is(( <COUNTLIST)[[1]], 4);
+is((COUNTLIST)[1], 4);
 
 use constant ABC	=> 'ABC';
 is "abc${\( ABC )}abc", "abcABCabc";

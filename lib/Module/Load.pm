@@ -65,7 +65,7 @@ sub _to_file{
     return $file;
 }
 
-sub _who { (caller(1))[[0]] }
+sub _who { @(caller(1))[0] }
 
 sub _is_file {
     local $_ = shift;

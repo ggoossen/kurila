@@ -44,7 +44,7 @@ while(1) {
 
 END {
     use File::Path;
-    rmtree $outdir, 0, 0;
+    rmtree $outdir;
 }
 
 ok 1;
@@ -64,7 +64,7 @@ use File::Find;
 find( sub { push @files, $File::Find::name; return }, $outdir );
 
 {
-  my $long = ( < grep m/zikzik\./i, @( < @files) )[[0]];
+  my $long = ( grep m/zikzik\./i, @( < @files) )[0];
   ok($long) or print "# How odd, no zikzik file in $outdir!?\n";
   if($long) {
     $long =~ s{zikzik\.html?$}{}s;

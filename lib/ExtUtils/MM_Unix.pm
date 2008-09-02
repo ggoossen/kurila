@@ -2950,7 +2950,7 @@ for a binary distribution.
 sub ppd {
     my($self) = < @_;
 
-    my $pack_ver = join ",", @( ( <split (m/\./, $self->{VERSION}), (0)x4)[[ <0..3]]);
+    my $pack_ver = join ",", @( < split(m/\./, $self->{VERSION}), (0)x4)[[0..3]];
 
     my $abstract = $self->{ABSTRACT} || '';
     $abstract =~ s/\n/\\n/sg;
@@ -2972,8 +2972,8 @@ PPD_HTML
     foreach my $prereq (@( <sort @( < keys %{$self->{PREREQ_PM} || \%()}))) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
-        my $dep_ver = join ",", @( ( <split (m/\./, $self->{PREREQ_PM}->{$prereq}), 
-                                    (0) x 4)[[ <0 .. 3]]);
+        my $dep_ver = join ",", @( <split (m/\./, $self->{PREREQ_PM}->{$prereq}), 
+                                   (0) x 4)[[0 .. 3]];
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
         <DEPENDENCY NAME="%s" VERSION="%s" />
 PPD_OUT

@@ -137,7 +137,7 @@ sub new {
     my %atts = %( < @_ );
 
     # Register the callers package.
-    my $self = \%( caller_pkg => (caller)[[0]] );
+    my $self = \%( caller_pkg => @(caller)[0] );
 
     bless ($self, $class);
 
@@ -251,7 +251,7 @@ sub GetOptionsFromString($@) {
     my ($string) = shift;
     require Text::ParseWords;
     my $args = \@( < Text::ParseWords::shellwords($string) );
-    $caller ||= (caller)[[0]];	# current context
+    $caller ||= @(caller)[0];	# current context
     my $ret = GetOptionsFromArray($args, < @_);
     if ( (nelems @$args) ) {
         $ret = 0;
@@ -737,7 +737,7 @@ sub OptCtl ($) {
 	   "\"@v[CTL_TYPE]\"",
 	   "\"@v[CTL_CNAME]\"",
 	   "\"@v[CTL_DEFAULT]\"",
-	   ("\$","\@","\%","\&")[[@v[CTL_DEST] || 0]],
+	   < @("\$","\@","\%","\&")[[@v[CTL_DEST] || @(0)]],
 	   @v[CTL_AMIN] || '',
 	   @v[CTL_AMAX] || '',)
 #	   $v[CTL_RANGE] || '',

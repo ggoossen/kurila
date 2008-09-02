@@ -1483,7 +1483,7 @@ sub tempdir  {
       my ($volume, $directories, undef) = < File::Spec->splitpath( $template, 1);
 
       # Last directory is then our template
-      $template = ( <File::Spec->splitdir($directories))[[-1]];
+      $template = File::Spec->splitdir($directories)[-1];
 
       # Prepend the supplied directory or temp dir
       if (%options{"DIR"}) {
