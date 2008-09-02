@@ -492,11 +492,10 @@ PP(pp_mapwhile)
 
 	/* set $_ to the new source item */
 	srcitem = av_shift(*src);
-	SvTEMP_off(srcitem);
 	if (PL_op->op_private & OPpGREP_LEX)
-	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), srcitem);
+	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem)
 	else
-	    SVcpREPLACE(DEFSV, srcitem);
+	    SVcpSTEAL(DEFSV, srcitem);
 
 	RETURNOP(cLOGOP->op_other);
     }
