@@ -1954,10 +1954,7 @@ PP(pp_ncmp)
     dVAR; dSP; dTARGET; tryAMAGICbin(ncmp,0);
 #ifndef NV_PRESERVES_UV
     if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-	const UV right = PTR2UV(SvRV(POPs));
-	const UV left = PTR2UV(SvRV(TOPs));
-	SETi((left > right) - (left < right));
-	RETURN;
+	Perl_croak(aTHX_ "reference may not be used as a number");
     }
 #endif
 #ifdef PERL_PRESERVE_IVUV
