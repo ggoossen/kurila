@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan (80);
+plan (78);
 
 #sub is { @_[0] eq @_[1] or die "different: '@_[0]' - '@_[1]'"; };
 
@@ -90,25 +90,19 @@ is(join(' ', @(< @foo)), 'the time men come');
 @foo = @( < grep(!m/e/, @( <split(' ','now is the time for all good men to come to'))) );
 is(join(' ', @(< @foo)), 'now is for all good to to');
 
-$foo = join('', @(('a','b','c','d','e','f')[[ <0..5]]));
+$foo = join('', @('a','b','c','d','e','f')[[0..5]]);
 is($foo, 'abcdef');
 
-$foo = join('', @(('a','b','c','d','e','f')[[ <0..1]]));
+$foo = join('', @('a','b','c','d','e','f')[[0..1]]);
 is($foo, 'ab');
 
-$foo = join('', @(('a','b','c','d','e','f')[[6]]));
+$foo = join('', @('a','b','c','d','e','f')[[6..6]]);
 is($foo, '');
 
-@foo = @( ('a','b','c','d','e','f')[[0,2,4]] );
-@bar = @( ('a','b','c','d','e','f')[[1,3,5]] );
-$foo = join('', @((< @foo,< @bar)[[ <0..5]]));
+@foo = @('a','b','c','d','e','f')[[@(0,2,4)]];
+@bar = @('a','b','c','d','e','f')[[@(1,3,5)]];
+$foo = join('', @(< @foo,< @bar)[[0..5]]);
 is($foo, 'acebdf');
-
-$foo = ('a','b','c','d','e','f')[[0,2,4]];
-is($foo, 'e');
-
-$foo = ('a','b','c','d','e','f')[[1]];
-is($foo, 'b');
 
 @foo = @( 'foo', 'bar', 'burbl', 'blah');
 

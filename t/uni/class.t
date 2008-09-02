@@ -115,7 +115,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
     );
 
     next unless -e $filename;
-    my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
+    my ($h1, $h2) = < map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -136,7 +136,7 @@ for my $p (@('gc', 'sc')) {
     );
 
     next unless -e $filename;
-    my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
+    my ($h1, $h2) = < map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -178,7 +178,7 @@ SKIP:
 
     my $filename = 'File::Spec'->catfile($dirname, $leafname);
 
-    my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
+    my ($h1, $h2) = < map hex, split(m/\t/, (do $filename), 3)[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -203,7 +203,7 @@ for (@(< grep %utf8::Canonical{$_} =~ m/^In/, @( < keys %utf8::Canonical))) {
 
   print "# In$_ $filename\n";
 
-  my ($h1, $h2) = < map hex, @( ( <split(m/\t/, (do $filename), 3))[[0,1]]);
+  my ($h1, $h2) = < map hex, split(m/\t/, (do $filename), 3)[[0..1]];
 
   my $str = char_range($h1, $h2);
 

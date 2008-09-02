@@ -11,7 +11,7 @@
 
 use strict;
 
-print "1..117\n";
+print "1..116\n";
 
 my $i = 1;
 
@@ -522,9 +522,4 @@ print "ok ", $i++, "\n";
 # make sure whitespace in prototypes works
 eval "sub good (\$\t\$\n\$) \{ 1; \}";
 print "not " if $@;
-print "ok ", $i++, "\n";
-
-# Ought to fail, doesn't in 5.8.1.
-eval 'sub bug (\[%@]) {  } my $array = \@(0 .. 1); bug %$array;';
-print "not " unless $@->message =~ m/Not a HASH reference/;
 print "ok ", $i++, "\n";

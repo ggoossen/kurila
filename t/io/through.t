@@ -125,7 +125,7 @@ is("{join ' ', @( <@c)}", '97 10 98 10 10 99 10 10 10', 'got expected chars');
 ok(close($fh), 'close');
 
 for my $s (1..2) {
-  my $t = ($t1, $t2)[[$s-1]];
+  my $t = @($t1, $t2)[$s-1];
   my $str = $t->{data};
   my $r = $t->{read_c};
   my $w = $t->{write_c};

@@ -326,13 +326,13 @@ my ($m1, @ma, %mh);
 our ($g1);
 
 delete @ma[$m1];
-delete @ma[[$m1, $g1]];
+delete @ma[[@($m1, $g1)]];
 delete %mh{$m1};
-delete %mh{[$m1, $g1]};
+delete %mh{[@($m1, $g1)]};
 EXPECT
 Use of uninitialized value $m1 in delete at - line 5 character 1.
-Use of uninitialized value $m1 in delete at - line 6 character 1.
-Use of uninitialized value $main::g1 in delete at - line 6 character 1.
+Use of uninitialized value in delete at - line 6 character 1.
+Use of uninitialized value in delete at - line 6 character 1.
 Use of uninitialized value $m1 in delete at - line 7 character 1.
-Use of uninitialized value $m1 in delete at - line 8 character 1.
-Use of uninitialized value $main::g1 in delete at - line 8 character 1.
+Use of uninitialized value in delete at - line 8 character 1.
+Use of uninitialized value in delete at - line 8 character 1.

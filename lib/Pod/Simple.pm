@@ -615,7 +615,7 @@ sub _wrap_up {
       ) {
         DEBUG +> 3 and print "   Merging ", $i-1,
          ":[$treelet->[$i-1]] and $i\:[$treelet->[$i]]\n";
-        $treelet->[$i-1] .= ( splice(@$treelet, $i, 1) )[[0]];
+        $treelet->[$i-1] .= @(splice(@$treelet, $i, 1))[0];
         DEBUG +> 4 and print "    Now: ", $i-1, ":[$treelet->[$i-1]]\n";
         --$i;
         next; 

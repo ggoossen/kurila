@@ -46,7 +46,7 @@ close FOO;
 
 open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 
-my($nlink, $mtime, $ctime) = (stat(*FOO))[[$NLINK, $MTIME, $CTIME]];
+my($nlink, $mtime, $ctime) = < @(stat(*FOO))[[@($NLINK, $MTIME, $CTIME)]];
 
 #nlink should if link support configured in Perl.
 SKIP: {
@@ -84,7 +84,7 @@ SKIP: {
     ok( $lnk_result,    'linked tmp testfile' );
     ok( chmod(0644, $tmpfile),             'chmoded tmp testfile' );
 
-    my($nlink, $mtime, $ctime) = (stat($tmpfile))[[$NLINK, $MTIME, $CTIME]];
+    my($nlink, $mtime, $ctime) = < @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]];
 
     SKIP: {
         skip "No link count", 1 if %Config{dont_use_nlink};
@@ -488,7 +488,7 @@ SKIP: {
     # And now for the ambigious bareword case
     ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
 	|| diag "Can't open 'TEST':  $!";
-    my $size = (stat(*DIR))[[7]];
+    my $size = @(stat(*DIR))[7];
     ok(defined $size, "stat() on bareword works");
     is($size, -s "TEST", "size returned by stat of bareword is for the file");
     ok(-f _, "ambiguous bareword uses file handle, not dir handle");
@@ -518,7 +518,7 @@ SKIP: {
 	# And now for the ambigious bareword case
 	ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
 	    || diag "Can't open 'TEST':  $!";
-	my $size = (stat(*DIR{IO}))[[7]];
+	my $size = @(stat(*DIR{IO}))[7];
 	ok(defined $size, "stat() on *THINGY\{IO\} works");
 	is($size, -s "TEST",
 	   "size returned by stat of *THINGY\{IO\} is for the file");

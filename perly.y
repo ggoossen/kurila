@@ -824,6 +824,17 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($5,$$,';');
 			  TOKEN_GETMAD($6,$$,'}');
 			}
+	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
+			{ $$ = prepend_elem(OP_ASLICE,
+				newOP(OP_PUSHMARK, 0, LOCATION($2)),
+				    newLISTOP(OP_ASLICE, 0,
+					scalar($3),
+					ref($1, OP_HSLICE), LOCATION($2)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'[');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,']');
+			}
 	|	term '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
                         { $$ = newBINOP(OP_HELEM, 0, $1, scalar($3), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
@@ -855,24 +866,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
-			}
-	|	'(' expr ')' ASLICE expr ']' ']'            /* list slice */
-			{ 
-                            $$ = newSLICEOP(0, scalar($5), $2);
-                            TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($3,$$,')');
-                            TOKEN_GETMAD($4,$$,'[');
-                            TOKEN_GETMAD($6,$$,'j');
-                            TOKEN_GETMAD($7,$$,']');
-			}
-	|	'(' ')' ASLICE expr ']' ']'                 /* empty list slice! */
-			{ 
-                            $$ = newSLICEOP(0, scalar($4), (OP*)NULL);
-                            TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($2,$$,')');
-                            TOKEN_GETMAD($3,$$,'[');
-                            TOKEN_GETMAD($5,$$,'j');
-                            TOKEN_GETMAD($6,$$,']');
 			}
     ;
 
@@ -1127,16 +1120,6 @@ term	:	termbinop
 			{ $$ = $1; }
 	|       subscripted
 			{ $$ = $1; }
-	|	ary ASLICE expr ']' ']'                     /* array slice */
-			{ $$ = prepend_elem(OP_ASLICE,
-                                newOP(OP_PUSHMARK, 0, LOCATION($2)),
-                                            newLISTOP(OP_ASLICE, 0,
-                                                      scalar($3),
-                                                      $1, LOCATION($2)));
-			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,']');
-			}
 	|	THING	%prec '('
 			{ $$ = $1; }
 	|	amper                                /* &foo; */
