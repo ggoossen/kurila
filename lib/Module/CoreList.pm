@@ -114,13 +114,13 @@ sub first_release_raw {
 sub first_release_by_date {
     my @perls = @( < &first_release_raw );
     return unless (nelems @perls);
-    return ( <sort { %released{$a} cmp %released{$b} } @( < @perls))[[0]];
+    return (sort { %released{$a} cmp %released{$b} } @( < @perls))[0];
 }
 
 sub first_release {
     my @perls = @( < &first_release_raw );
     return unless (nelems @perls);
-    return ( <sort { $a cmp $b } @( < @perls))[[0]];
+    return (sort { $a cmp $b } @( < @perls))[0];
 }
 
 sub find_modules {

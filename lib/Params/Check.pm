@@ -536,7 +536,7 @@ sub _safe_eq {
 sub _who_was_it {
     my $level = @_[0] || 0;
 
-    return (caller(2 + $CALLER_DEPTH + $level))[[3]] || 'ANON'
+    return @(caller(2 + $CALLER_DEPTH + $level))[3] || 'ANON'
 }
 
 =head2 last_error()

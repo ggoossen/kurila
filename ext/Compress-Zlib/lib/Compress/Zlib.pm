@@ -296,7 +296,7 @@ sub uncompress($)
 
     if (ref @_[0] ) {
         $in = @_[0] ;
-        croak "not a scalar reference" unless ref $in eq 'SCALAR' ;
+        die "not a scalar reference" unless ref $in eq 'SCALAR' ;
     }
     else {
         $in = \@_[0] ;

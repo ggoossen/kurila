@@ -30,7 +30,7 @@ delete %a{abc};
 
 is(%a{bcd}, 234);
 
-is(( <values %a)[[0]], 234);
+is((values %a)[0], 234);
 
 dies_like(sub { %a{abcd} = 123 },
           qr/Key "abcd" is not 3 characters long/);

@@ -485,7 +485,7 @@ sub init {
 sub debug { $Debug = (@_[1] != 0); }
 
 sub usage { 
-    my $calling_sub = (caller(1))[[3]];
+    my $calling_sub = @(caller(1))[3];
     $calling_sub =~ s/^Benchmark:://;
     return %_Usage{$calling_sub} || '';
 }

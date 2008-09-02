@@ -4110,7 +4110,7 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    OPERATOR(ANONARY);
 	}
-	if (s[1] == ':') {
+	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor */
 	    s += 2;
 	    OPERATOR(ANONARYL);

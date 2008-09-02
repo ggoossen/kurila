@@ -233,11 +233,11 @@ use Math::Trig ':radial';
 
     ok(near($lat, $pip2 - @London[1]));
 
-    my $dir3 = ( <great_circle_destination(< @London, $dir1, $dst1))[[2]];
+    my $dir3 = (great_circle_destination(< @London, $dir1, $dst1))[2];
 
     ok(near($dir3, 2.69379263839118)); # about 154.343 deg
 
-    my $dir4 = ( <great_circle_destination(< @Tokyo,  $dir2, $dst2))[[2]];
+    my $dir4 = (great_circle_destination(< @Tokyo,  $dir2, $dst2))[2];
 
     ok(near($dir4, 3.6993902625701)); # about 211.959 deg
 

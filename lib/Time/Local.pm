@@ -15,7 +15,7 @@ $VERSION   = '1.18_01';
 my @MonthDays = @( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
 # Determine breakpoint for rolling century
-my $ThisYear    = ( localtime() )[[5]];
+my $ThisYear    = @( localtime() )[5];
 my $Breakpoint  = ( $ThisYear + 50 ) % 100;
 my $NextCentury = $ThisYear - $ThisYear % 100;
 $NextCentury += 100 if $Breakpoint +< 50;

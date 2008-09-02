@@ -43,7 +43,7 @@ print $main::blurfl == 123 ? "ok 3\n" : "not ok 3\n";
 
 package main;
 
-sub c { caller(0) }
+sub c { @(caller(0)) }
 
 sub foo {
    my $s = shift;
@@ -53,4 +53,4 @@ sub foo {
    }
 }
 
-print((foo(1))[[0]] eq 'PQR' ? "ok 8\n" : "not ok 8\n");
+print(foo(1)[0] eq 'PQR' ? "ok 8\n" : "not ok 8\n");

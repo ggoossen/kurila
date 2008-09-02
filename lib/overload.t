@@ -39,8 +39,7 @@ use overload (
 package main;
 
 $| = 1;
-use Test::More tests => 133;
-
+use Test::More skip_all => "overloading is to be removed";
 
 $a = Oscalar->new( "087");
 $b= "$a";

@@ -55,7 +55,7 @@ sub struct {
     }
     else {
         $base_type = 'ARRAY';
-        $class = (caller())[[0]];
+        $class = @(caller())[0];
         @decls = @( < @_ );
     }
 

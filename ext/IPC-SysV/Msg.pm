@@ -81,7 +81,7 @@ sub set {
 
 sub remove {
     my $self = shift;
-    (msgctl($$self,IPC_RMID,0), undef $$self)[[0]];
+    @(msgctl($$self,IPC_RMID,0), undef $$self)[0];
 }
 
 sub rcv {

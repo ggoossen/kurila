@@ -40,7 +40,7 @@ MODULE
 
 END {
     # cleanup the auto/ directory we created.
-    rmtree(\@(@lib_dir[0]));
+    rmtree(@lib_dir[0]);
 }
 
 

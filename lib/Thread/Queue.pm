@@ -232,7 +232,7 @@ $validate_index = sub {
     my $index = shift;
 
     if (! looks_like_number($index) || (int($index) != $index)) {
-        my ($method) = (caller(1))[[3]];
+        my ($method) = @(caller(1))[3];
         $method =~ s/Thread::Queue:://;
         die("Invalid 'index' argument ({dump::view($index)}) to '$method' method");
     }
@@ -245,7 +245,7 @@ $validate_count = sub {
     my $count = shift;
 
     if ((! looks_like_number($count)) || (int($count) != $count) || ($count +< 1)) {
-        my ($method) = (caller(1))[[3]];
+        my ($method) = @(caller(1))[3];
         $method =~ s/Thread::Queue:://;
         $count = 'undef' if (! defined($count));
         die("Invalid 'count' argument ($count) to '$method' method");
