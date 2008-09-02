@@ -729,7 +729,7 @@ sub install { #XXX OS-SPECIFIC
         # File::Find seems to always be Unixy except on MacPerl :(
         my $current_directory= $Is_MacPerl ? $Curdir : '.';
         find(sub {
-            my ($mode,$size,$atime,$mtime) = (stat)[[2,7,8,9]];
+            my ($mode,$size,$atime,$mtime) = < @(stat)[[@:2,7,8,9]];
 
             return if !-f _;
             my $origfile = $_;
@@ -1041,7 +1041,7 @@ sub inc_uninstall {
     my($filepath,$libdir,$verbose,$dry_run,$ignore,$results) = < @_;
     my($dir);
     $ignore||="";
-    my $file = ( <File::Spec->splitpath($filepath))[[2]];
+    my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
     
     my @PERL_ENV_LIB = @( < split %Config{path_sep}, defined %ENV{'PERL5LIB'}

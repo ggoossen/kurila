@@ -745,7 +745,7 @@ sub concise_op {
 	    %h{targarglife} = %h{targarg} = "%h{targ} $refs";
 	}
     } elsif (%h{targ}) {
-	my $padname = ( <( <$curcv->PADLIST->ARRAY)[[0]]->ARRAY)[[%h{targ}]];
+	my $padname = (($curcv->PADLIST->ARRAY)[0]->ARRAY)[%h{targ}];
 	if (defined $padname and class($padname) ne "SPECIAL") {
 	    %h{targarg}  = $padname->PVX;
 	    if ($padname->FLAGS ^&^ SVf_FAKE) {
@@ -830,7 +830,7 @@ sub concise_op {
 	    my $idx = (%h{class} eq "SVOP") ? $op->targ : $op->padix;
 	    my $preferpv = %h{name} eq "method_named";
 	    if (%h{class} eq "PADOP" or !${$op->sv}) {
-		my $sv = ( <( <$curcv->PADLIST->ARRAY)[[1]]->ARRAY)[[$idx]];
+		my $sv = $curcv->PADLIST->ARRAY[1]->ARRAY[$idx];
 		%h{arg} = "[" . concise_sv($sv, \%h, $preferpv) . "]";
 		%h{targarglife} = %h{targarg} = "";
 	    } else {

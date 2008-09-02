@@ -56,7 +56,7 @@ sub compile {
   die "Missing 'source' argument to compile()" unless defined %args{source};
 
   my ($basename, $srcdir) =
-    ( < File::Basename::fileparse(%args{source}, '\.[^.]+$') )[[0,1]];
+    < (File::Basename::fileparse(%args{source}, '\.[^.]+$') )[[0..1]];
 
   $srcdir ||= File::Spec->curdir();
 
@@ -108,7 +108,7 @@ sub link {
   my $cf = $self->{config};
 
   my @objects = @( ref %args{objects} eq 'ARRAY' ? < @{%args{objects}} : %args{objects} );
-  my $to = join '', @( ( <File::Spec->splitpath(@objects[0]))[[0,1]]);
+  my $to = join '', File::Spec->splitpath(@objects[0])[[0..1]];
   $to ||= File::Spec->curdir();
 
   (my $file_base = %args{module_name}) =~ s/.*:://;

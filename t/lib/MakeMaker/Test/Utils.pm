@@ -232,7 +232,7 @@ sub calibrate_mtime {
     open(FILE, ">", "calibrate_mtime.tmp") || die $!;
     print FILE "foo";
     close FILE;
-    my($mtime) = (stat('calibrate_mtime.tmp'))[[9]];
+    my($mtime) = @(stat('calibrate_mtime.tmp'))[9];
     unlink 'calibrate_mtime.tmp';
     return $mtime;
 }

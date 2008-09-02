@@ -415,7 +415,7 @@ sub Validator::validateInputArray
 
 sub createSelfTiedObject
 {
-    my $class = shift || (caller)[[0]] ;
+    my $class = shift || die;
     my $error_ref = shift ;
 
     my $obj = bless \%(), ref($class) || $class;
@@ -472,7 +472,7 @@ sub ParseParameters
 {
     my $level = shift || 0 ; 
 
-    my $sub = (caller($level + 1))[[3]] ;
+    my $sub = @(caller($level + 1))[3] ;
     local $Carp::CarpLevel = 1 ;
     my $p = IO::Compress::Base::Parameters->new() ;
     $p->parse(< @_)

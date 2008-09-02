@@ -52,8 +52,8 @@ my $pwd_cmd =
         "cd" :
     ($IsMacOS) ?
         "pwd" :
-        (< grep { -x && -f } @( < map { "$_/$pwd%Config{exe_ext}" }
- @( <	                   split m/%Config{path_sep}/, %ENV{PATH})))[[0]];
+        (grep { -x && -f } @( < map { "$_/$pwd%Config{exe_ext}" }
+ @( <	                   split m/%Config{path_sep}/, %ENV{PATH})))[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {

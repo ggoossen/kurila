@@ -98,7 +98,7 @@ sub ParseParameters
 {
     my $level = shift || 0 ; 
 
-    my $sub = (caller($level + 1))[[3]] ;
+    my $sub = @(caller($level + 1))[3] ;
     #local $Carp::CarpLevel = 1 ;
     my $p = Compress::Raw::Zlib::Parameters->new() ;
     $p->parse(< @_)

@@ -358,11 +358,11 @@ my $d = \(\@());
 ####
 # array slice
 my @array;
-@array[[1, 2]];
+@array[[@(1, 2)]];
 ####
 # hash slice
 my %hash;
-%hash{['foo', 'bar']};
+%hash{[@('foo', 'bar')]};
 ####
 testsub();
 ####

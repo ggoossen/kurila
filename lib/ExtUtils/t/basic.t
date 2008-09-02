@@ -20,7 +20,7 @@ use File::Path;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete %ENV{[ <qw(PREFIX LIB MAKEFLAGS)]};
+delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
@@ -61,7 +61,7 @@ like( $mpl_out, qr/^Current package is: main$/m,
 ok( -e $makefile,       'Makefile exists' );
 
 # -M is flakey on VMS
-my $mtime = (stat($makefile))[[9]];
+my $mtime = @(stat($makefile))[9];
 cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }

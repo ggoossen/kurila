@@ -520,7 +520,7 @@ sub cp_if_diff {
 
 sub cp {
     my ($srcFile, $dstFile) = < @_;
-    my ($access,$mod) = (stat $srcFile)[[8,9]];
+    my ($access,$mod) = < @(stat $srcFile)[[8..9]];
 
     copy($srcFile,$dstFile);
     utime $access, $mod + ($Is_VMS ? 1 : 0), $dstFile;
@@ -546,7 +546,7 @@ sub ln {
 sub _manicopy_chmod {
     my($srcFile, $dstFile) = < @_;
 
-    my $perm = 0444 ^|^ (stat $srcFile)[[2]] ^&^ 0700;
+    my $perm = 0444 ^|^ @(stat $srcFile)[2] ^&^ 0700;
     chmod( $perm ^|^ ( $perm ^&^ 0100 ? 0111 : 0 ), $dstFile );
 }
 
