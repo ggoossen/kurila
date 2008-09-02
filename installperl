@@ -909,7 +909,7 @@ sub copy_if_diff {
 	copy($from, $to);
 	# Restore timestamps if it's a .a library or for OS/2.
 	if (!$nonono && ($Is_OS2 || $to =~ m/\.a$/)) {
-	    my ($atime, $mtime) = (stat $from)[[8,9]];
+	    my ($atime, $mtime) = < @(stat $from)[[8..9]];
 	    utime $atime, $mtime, $to;
 	}
 	1;
