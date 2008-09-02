@@ -3469,8 +3469,7 @@ Perl_dofile(pTHX_ OP *term, I32 force_builtin, SV* location)
 OP *
 Perl_newSLICEOP(pTHX_ I32 flags, OP *subscript, OP *listval)
 {
-    return newBINOP(OP_LSLICE, flags,
-	    list(force_list(subscript)),
+    return newBINOP(OP_LSLICE, flags, subscript,
 		    list(force_list(listval)), subscript->op_location );
 }
 

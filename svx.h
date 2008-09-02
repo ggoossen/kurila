@@ -96,6 +96,11 @@ static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
     return (AV*)sv_2mortal((SV*)av);
 }
 
+#define av_mortalcopy(av) inline_av_mortalcopy(aTHX_ av)
+static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
+    return (AV*)sv_mortalcopy((SV*)av);
+}
+
 #define SVav(av) inline_SVav(aTHX_ av)
 static __inline__ SV* inline_SVav(pTHX_ AV *av) {
     return (SV*)av;
@@ -104,6 +109,11 @@ static __inline__ SV* inline_SVav(pTHX_ AV *av) {
 #define SvAV(sv) inline_SvAV(aTHX_ sv)
 static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {
     return (AV*)sv;
+}
+
+#define SvHV(sv) inline_SvHV(aTHX_ sv)
+static __inline__ HV* inline_SvHV(pTHX_ SV *sv) {
+    return (HV*)sv;
 }
 
 #define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)

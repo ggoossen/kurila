@@ -3394,7 +3394,7 @@ PP(pp_aslice)
     if (SvTYPE(slice) != SVt_PVAV)
 	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
 
-    slice = sv_mortalcopy(slice);
+    slice = av_mortalcopy(slice);
     XPUSHs(slice);
     register SV **ip = AvARRAY(slice);
 
@@ -3483,45 +3483,46 @@ PP(pp_delete)
     const I32 discard = (gimme == G_VOID) ? G_DISCARD : 0;
 
     if (PL_op->op_private & OPpSLICE) {
-	dMARK; dORIGMARK;
-	HV * const hv = (HV*)POPs;
-	const U32 hvtype = SvTYPE(hv);
-	if (hvtype == SVt_PVHV) {			/* hash element */
-	    if (SP - MARK != 1) 
-		Perl_croak(aTHX_ "Delete expected a single argument");
-	    SV* slice = POPs;
-	    if ( ! SvAVOK(slice) )
-		Perl_croak(aTHX_ "hash slice expected an array as slice index, but got %s", Ddesc(slice));
-	    AV* slicecopy = sv_mortalcopy(slice);
-	    SV** items = AvARRAY(slicecopy);
-	    I32 avlen = av_len(slicecopy);
-	    I32 i;
+	dMARK;
+	SV * const sv = POPs;
+	SV* slice = POPs;
+	AV* slicecopy;
+	SV** items;
+	I32 avlen;
+
+	assert(SP == MARK); 
+
+	if ( ! SvAVOK(slice) )
+	    Perl_croak(aTHX_ "slice expected an array as slice index, but got %s", Ddesc(slice));
+
+	slicecopy = av_mortalcopy(SvAV(slice));
+	items = AvARRAY(slicecopy);
+	avlen = av_len(slicecopy);
+
+	if (PL_op->op_flags & OPf_SPECIAL) {                  /* array element */
+	    int i;
+
+	    if ( ! SvAVOK(sv) ) 
+		Perl_croak(aTHX_ "array slice expected an array but got a %s", Ddesc(sv));
+
 	    for (i = 0; i <= avlen; i++) {
-		SV * const sv = hv_delete_ent(hv, items[i], 0, 0);
-		SVcpREPLACE(items[i], sv);
+		SV * const delsv = av_delete(SvAV(sv), SvIV(items[i]), 0);
+		SVcpREPLACE(items[i], delsv);
 	    }
+	}
+	else {			/* hash element */
+	    int i;
+	    if ( ! SvHVOK(sv) )
+		Perl_croak(aTHX_ "hash slice expected an array but got a %s", Ddesc(sv));
+
+	    for (i = 0; i <= avlen; i++) {
+		SV * const delsv = hv_delete_ent(SvHV(sv), items[i], 0, 0);
+		SVcpREPLACE(items[i], delsv);
+	    }
+	}
+
+	if ( ! discard)
 	    XPUSHs(slicecopy);
-	}
-	else if (hvtype == SVt_PVAV) {                  /* array element */
-            if (PL_op->op_flags & OPf_SPECIAL) {
-                while (++MARK <= SP) {
-                    SV * const sv = av_delete((AV*)hv, SvIV(*MARK), discard);
-                    *MARK = sv ? sv : &PL_sv_undef;
-                }
-            }
-	}
-	else
-	    DIE(aTHX_ "Not a HASH reference");
-	if (discard)
-	    SP = ORIGMARK;
-	else if (gimme == G_SCALAR) {
-	    MARK = ORIGMARK;
-	    if (SP > MARK)
-		*++MARK = *SP;
-	    else
-		*++MARK = &PL_sv_undef;
-	    SP = MARK;
-	}
     }
     else {
 	SV *keysv = POPs;
