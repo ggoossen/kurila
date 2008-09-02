@@ -3507,7 +3507,7 @@ PP(pp_delete)
 
 	    for (i = 0; i <= avlen; i++) {
 		SV * const delsv = av_delete(SvAV(sv), SvIV(items[i]), 0);
-		SVcpREPLACE(items[i], delsv);
+		SVcpREPLACE(items[i], delsv ? delsv : &PL_sv_undef );
 	    }
 	}
 	else {			/* hash element */
@@ -3517,7 +3517,7 @@ PP(pp_delete)
 
 	    for (i = 0; i <= avlen; i++) {
 		SV * const delsv = hv_delete_ent(SvHV(sv), items[i], 0, 0);
-		SVcpREPLACE(items[i], delsv);
+		SVcpREPLACE(items[i], delsv ? delsv : &PL_sv_undef );
 	    }
 	}
 
