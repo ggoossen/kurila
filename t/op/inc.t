@@ -2,7 +2,7 @@
 
 # use strict;
 
-print "1..50\n";
+print "1..51\n";
 
 my $test = 1;
 
@@ -185,6 +185,9 @@ ok ($a == 2147483647, $a);
 $a = 2147483648;
 $c=$a--;
 ok ($a == 2147483647, $a);
+
+try { my $x = qw|aap noot mies|; $x++ };
+ok($@->message =~ m/increment \(\+\+\) does not work on a ARRAY/);
 
 {
     use integer;
