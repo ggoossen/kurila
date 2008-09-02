@@ -214,7 +214,7 @@ sub heavy_require_version {
 }
 
 sub heavy_export_tags {
-  _push_tags((caller)[[0]], "EXPORT",    \@_);
+  _push_tags(@(caller)[0], "EXPORT",    \@_);
 }
 
 sub heavy_export_ok_tags {

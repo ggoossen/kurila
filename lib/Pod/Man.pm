@@ -827,7 +827,7 @@ sub devise_date {
     my $input = $self->source_filename;
     my $time;
     if ($input) {
-        $time = (stat $input)[[9]] || time;
+        $time = @(stat $input)[9] || time;
     } else {
         $time = time;
     }

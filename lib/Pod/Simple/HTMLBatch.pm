@@ -413,12 +413,12 @@ sub _prep_contents_breakdown {
   foreach my $toplevel (@( <sort @( < keys %toplevel))) {
     my $fgroup = %toplevel_form_freq{$toplevel};
     %toplevel_form_freq{$toplevel} =
-    ( <
+    (
       sort { $fgroup->{$b} <+> $fgroup->{$a}  or  $a cmp $b }
  @( <        keys %$fgroup)
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
-    )[[0]];
+    )[0];
   }
 
   return @(\%toplevel, \%toplevel_form_freq);
@@ -709,7 +709,7 @@ sub _gen_css_wad {
       $this_css =~ s/\bthin\b/medium/g;
     }
     $this_css =~ s<#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])\b>
-                  |{ join '', @( '#', ($1,$2,$3)[[< @swap]]) }|g   if (nelems @swap);
+                  |{ join '', @( '#', < @($1,$2,$3)[[@swap]]) }|g   if (nelems @swap);
 
     if(   $flipmode =~ m/a/)
        { $this_css =~ s/#fff\b/#999/gi } # black -> dark grey

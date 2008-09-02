@@ -626,18 +626,7 @@ sub rmtree {
     my $paths;
 
     if ($old_style) {
-        my ($verbose, $safe);
-        ($paths, $verbose, $safe) = < @_;
-        $arg->{verbose} = defined $verbose ? $verbose : 0;
-        $arg->{safe}    = defined $safe    ? $safe    : 0;
-
-        if (defined($paths)) {
-            $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY');
-        }
-        else {
-            die ("No root path(s) specified\n");
-            return 0;
-        }
+        die "old style rm-tree is obsolete";
     }
     else {
         if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1],'HASH')) {
@@ -645,9 +634,9 @@ sub rmtree {
             ${$arg->{error}}  = \@() if exists $arg->{error};
             ${$arg->{result}} = \@() if exists $arg->{result};
         }
-        else { <
-            %{$arg}{[@( <qw(verbose safe))]} = (0, 0);
-    }
+        else {
+            < %{$arg}{[qw(verbose safe)]} = (0, 0);
+        }
         $paths = \@(< @_);
     }
 
@@ -659,8 +648,7 @@ sub rmtree {
         return 0;
     };
     for (@($arg->{cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
- <
-    %{$arg}{[@( <qw(device inode))]} = < @(stat $arg->{cwd})[[@(0,1)]] or do {
+    < %{$arg}{[@( <qw(device inode))]} = < @(stat $arg->{cwd})[[0..1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{cwd});
         return 0;
     };

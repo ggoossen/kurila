@@ -4110,6 +4110,11 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    OPERATOR(ANONARY);
 	}
+	if (s[1] == ':') {
+	    /* array constructor */
+	    s += 2;
+	    OPERATOR(ANONARYL);
+	}
 
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);

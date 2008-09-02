@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 98;
+use Test::More tests => 94;
 
 BEGIN {
     use_ok('File::Path');
@@ -100,13 +100,6 @@ $dir2 = VMS::Filespec::unixify($dir2) if $Is_VMS;
 is(scalar(nelems @created), 1, "created directory (new style 2)");
 is(@created[0], $dir2, "created directory (new style 2) cross-check");
 
-$count = rmtree($dir, 0);
-is($count, 1, "removed directory unsafe mode");
-
-$count = rmtree($dir2, 0, 1);
-my $removed = $Is_VMS ? 0 : 1;
-is($count, $removed, "removed directory safe mode");
-
 # mkdir foo ./E/../Y
 # Y should exist
 # existence of E is neither here nor there
@@ -145,17 +138,17 @@ $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
 @created = @( < mkpath($dir, undef, 0770) );
 is(scalar(nelems @created), 1, "created directory (old style 2 verbose undef)");
 is(@created[0], $dir, "created directory (old style 2 verbose undef) cross-check");
-is(rmtree($dir, undef, 0), 1, "removed directory 2 verbose undef");
+is(rmtree($dir), 1, "removed directory 2 verbose undef");
 
 @created = @( < mkpath($dir, undef) );
 is(scalar(nelems @created), 1, "created directory (old style 2a verbose undef)");
 is(@created[0], $dir, "created directory (old style 2a verbose undef) cross-check");
-is(rmtree($dir, undef), 1, "removed directory 2a verbose undef");
+is(rmtree($dir), 1, "removed directory 2a verbose undef");
 
 @created = @( < mkpath($dir, 0, undef) );
 is(scalar(nelems @created), 1, "created directory (old style 3 mode undef)");
 is(@created[0], $dir, "created directory (old style 3 mode undef) cross-check");
-is(rmtree($dir, 0, undef), 1, "removed directory 3 verbose undef");
+is(rmtree($dir), 1, "removed directory 3 verbose undef");
 
 $dir = catdir($tmp_base,'G');
 $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
@@ -265,16 +258,6 @@ SKIP: {
     is( scalar(nelems @$error), 1, q{left behind 1 out of 2 directories} );
     try { ($file, $message) = each %{$err->[0]} };
     is( $file, $dir, 'first dir reported in error' );
-}
-
-{
-    $dir = catdir($tmp_base, 'ZZ');
-    @created = @( < mkpath($dir) );
-    is(scalar(nelems @created), 1, "create a ZZ directory");
-
-    local @ARGV = @($dir);
-    rmtree( \@(< grep -e $_, @( < @ARGV)), 0, 0 );
-    ok(!-e $dir, "blow it away via \@ARGV");
 }
 
 SKIP: {
