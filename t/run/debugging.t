@@ -25,26 +25,32 @@ my $refdump = <<'EO_DX_OUT';
 {
 1   TYPE = leave  ===> DONE
     TARG = 1
+    LOCATION = -e 1 1 
     FLAGS = (VOID,KIDS,PARENS)
     PRIVATE = (REFCOUNTED)
     REFCNT = 1
     {
 2       TYPE = enter  ===> 3
+        LOCATION = -e 1 1 
     }
     {
 3       TYPE = nextstate  ===> 4
+        LOCATION = -e 1 1 
         FLAGS = (VOID)
         PACKAGE = "main"
     }
     {
 6       TYPE = print  ===> 1
+        LOCATION = -e 1 1 
         FLAGS = (VOID,KIDS)
         {
 4           TYPE = pushmark  ===> 5
+            LOCATION = -e 1 1 
             FLAGS = (SCALAR)
         }
         {
 5           TYPE = const  ===> 6
+            LOCATION = -e 1 12 
             TARG = 1@THR
             FLAGS = (SCALAR)
             SV = PV("foo"\0) [UTF8 "foo"]@NO_THR

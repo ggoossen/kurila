@@ -73,6 +73,7 @@ MSG
 reuse die at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
+reraised at ../lib/error.t line {$line1+1} character 9.
 MSG
 }
 
@@ -104,12 +105,12 @@ MSG
 
 # yyerror
 {
-    eval 'undef foo';
+    eval 'undef foo'; my $line = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
     is $@->message, <<MSG ;
 Can't modify constant item in undef operator at (eval 9) line 1 character 7.
-    (eval) called at ../lib/error.t line 107 character 5.
+    (eval) called at ../lib/error.t line $line character 5.
 MSG
 }
 

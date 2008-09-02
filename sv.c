@@ -1977,7 +1977,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
 		    return SvNV(tmpstr);
 		}
 	    }
-	    return PTR2NV(SvRV(sv));
+	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 	if (SvIsCOW(sv)) {
 	    sv_force_normal_flags(sv, 0);
@@ -2120,8 +2120,8 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
 #endif /* NV_PRESERVES_UV */
     }
     else  {
-	if (isGV_with_GP(sv)) {
-	    Perl_croak(aTHX_ "Tried to use glob as number");
+	if ( SvOK(sv) ) {
+	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 
 	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))

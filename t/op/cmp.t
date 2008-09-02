@@ -41,10 +41,8 @@ $expect = 1 + 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
 plan tests => $expect;
 
 {
-    local our $TODO = "array in numeric comparison";
     dies_like( sub { @(1,2) +< 3 },
-               qr/ARRAY can't be used as a number in numeric comparison \( \+< \)/,
-           );
+               qr/ARRAY used as a number/);
 }
 
 sub nok ($$$$$$$) {
