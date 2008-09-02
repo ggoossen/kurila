@@ -415,7 +415,7 @@ sub Validator::validateInputArray
 
 sub createSelfTiedObject
 {
-    my $class = shift || die;
+    my $class = shift || die "called without a class";
     my $error_ref = shift ;
 
     my $obj = bless \%(), ref($class) || $class;

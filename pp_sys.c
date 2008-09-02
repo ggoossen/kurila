@@ -472,6 +472,14 @@ PP(pp_die)
 	SV * const error = ERRSV;
 	if (sv_isobject(error)) {
 	    tmpsv = error;
+	    SV** desc = hv_fetchs( (HV*)SvRV(tmpsv), "notes", TRUE );
+	    if (desc) {
+		if ( ! SvPOK(*desc) )
+		    sv_setpvn(*desc, "", 0);
+		sv_catpv( *desc, "reraised at " );
+		sv_catpv( *desc, SvPV_nolen_const( loc_desc( PL_op->op_location ) ) );
+		sv_catpv( *desc, "\n" );
+	    }
 	}
     }
     if ( ! tmpsv ) {
