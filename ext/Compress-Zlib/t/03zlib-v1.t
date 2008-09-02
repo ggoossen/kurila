@@ -60,7 +60,7 @@ ok $@->{description} =~ m#not a scalar reference#
 
 try { uncompress(\@(1)); };
 ok $@->{description} =~ m#not a scalar reference#
-    or print "# $@\n" ;;
+    or print "# $@\n" ;
 
 $hello = "hello mum" ;
 my $keep_hello = $hello ;

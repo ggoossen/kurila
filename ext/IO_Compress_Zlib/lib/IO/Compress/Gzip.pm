@@ -39,7 +39,7 @@ sub new
 
 sub gzip
 {
-    my $obj = createSelfTiedObject(undef, \$GzipError);
+    my $obj = createSelfTiedObject(__PACKAGE__, \$GzipError);
     return $obj->_def(< @_);
 }
 

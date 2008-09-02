@@ -748,6 +748,22 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	else
 	    Perl_dump_indent(aTHX_ level, file, "TARG = %ld\n", (long)o->op_targ);
     }
+    {
+	SV* loc = o->op_location;
+	SV* locstr = newSVpv("", 0);
+	if (loc && SvAVOK(loc)) {
+	    SV** ary = AvARRAY((AV*)loc);
+	    I32 len = av_len((AV*)loc);
+	    int i;
+	    for (i=0; i <= len; i++) {
+		if (SvPVOK(ary[i])) {
+		    sv_catsv(locstr, ary[i]);
+		    sv_catpv(locstr, " ");
+		}
+	    }
+	}
+	Perl_dump_indent(aTHX_ level, file, "LOCATION = %s\n", SvPV_nolen_const(locstr));
+    }
 #ifdef DUMPADDR
     Perl_dump_indent(aTHX_ level, file, "ADDR = 0x%"UVxf" => 0x%"UVxf"\n", (UV)o, (UV)o->op_next);
 #endif

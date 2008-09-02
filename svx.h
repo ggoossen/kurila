@@ -155,3 +155,17 @@ static __inline__ SV* inline_loc_filename(pTHX_ SV *sv) {
         return NULL;
     return *fn;
 }
+
+/* Location retrieval */
+#define loc_desc(loc) inline_loc_desc(aTHX_ loc)
+static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
+    SV * str = sv_2mortal(newSVpv("", 0));
+    if (loc && SvAVOK(loc)) {
+        Perl_sv_catpvf(aTHX_ str, "%s line %"IVdf" character %"IVdf".",
+                       SvPVX_const(*av_fetch((AV*)loc, 0, FALSE)),
+                       SvIV(*av_fetch((AV*)loc, 1, FALSE)),
+                       SvIV(*av_fetch((AV*)loc, 2, FALSE))
+            );
+    }
+    return str;
+}
