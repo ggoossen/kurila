@@ -697,8 +697,8 @@ PP(pp_predec)
 PP(pp_postinc)
 {
     dVAR; dSP; dTARGET;
-    if (SvTYPE(TOPs) >= SVt_PVGV && SvTYPE(TOPs) != SVt_PVLV)
-	DIE(aTHX_ PL_no_modify);
+    if ( SvOK(TOPs) && ! SvPVOK(TOPs) )
+	Perl_croak(aTHX_ "increment (++) does not work on a %s", Ddesc(TOPs));
     sv_setsv(TARG, TOPs);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
         && SvIVX(TOPs) != IV_MAX)
