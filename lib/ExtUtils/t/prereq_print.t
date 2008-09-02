@@ -27,7 +27,7 @@ use MakeMaker::Test::Setup::BFD;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete %ENV{[ <qw(PREFIX LIB MAKEFLAGS)]};
+delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
 
 my $Perl = which_perl();
 my $Makefile = makefile_name();

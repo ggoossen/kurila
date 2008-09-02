@@ -339,7 +339,7 @@ sub render {
 
     my $walker = B::Concise::compile($func_name);
     try { $walker->() };
-    diag("err: $@ $buf") if $@;
+    diag("err: {$@->message} $buf") if $@;
     diag("verbose: $buf") if %opts{V};
 
     return  @($buf, $@);

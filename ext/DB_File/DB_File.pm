@@ -240,7 +240,7 @@ else
 sub tie_hash_or_array
 {
     my (@arg) = @( < @_ ) ;
-    my $tieHASH = ( (caller(1))[[3]] =~ m/TIEHASH/ ) ;
+    my $tieHASH = ( @(caller(1))[3] =~ m/TIEHASH/ ) ;
 
     use File::Spec;
     @arg[1] = File::Spec->rel2abs(@arg[1]) 

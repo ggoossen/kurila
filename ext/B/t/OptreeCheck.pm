@@ -16,7 +16,7 @@ our @EXPORT = @( < qw( checkOptree plan skip skip_all pass is like unlike
 # The approach taken is to put the hints-with-open in the golden results, and
 # flag that they need to be taken out if $^OPEN is set.
 
-if (((caller 0)[[10]]||\%())->{'open<'}) {
+if ((@(caller 0)[10]||\%())->{'open<'}) {
     $using_open = 1;
 }
 

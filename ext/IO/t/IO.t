@@ -31,7 +31,7 @@ plan(tests => 17);
 }
 
 my @default = @( < map { "IO/$_.pm" } @( < qw( Handle Seekable File Socket Dir )) );
-delete %INC{[< @default ]};
+delete %INC{[@default ]};
 
 my $warn = '' ;
 local $^WARN_HOOK = sub { $warn = @_[0]->{description} } ;

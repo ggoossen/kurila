@@ -89,7 +89,7 @@ close PACKLIST;
 # be lowercase. :(
 my $native_dummy = File::Spec->catfile( <qw(install-test lib perl Big Dummy.pm));
 is( nkeys %packlist, 1 );
-is( lc(( <keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
+is( lc((keys %packlist)[0]), lc $native_dummy, 'packlist written' );
 
 
 # Test UNINST=1 preserving same versions in other dirs.

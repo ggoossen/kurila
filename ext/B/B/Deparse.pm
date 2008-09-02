@@ -1223,8 +1223,8 @@ sub populate_curcvlex {
     }
 }
 
-sub find_scope_st { (( <find_scope(< @_))[[0]]); }
-sub find_scope_en { (( <find_scope(< @_))[[1]]); }
+sub find_scope_st { find_scope(< @_)[0]; }
+sub find_scope_en { find_scope(< @_)[1]; }
 
 # Recurses down the tree, looking for pad variable introductions and COPs
 sub find_scope {
@@ -3486,7 +3486,7 @@ sub const {
     }
     if (class($sv) eq "SPECIAL") {
 	# sv_undef, sv_yes, sv_no
-	return ('undef', '1', < $self->maybe_parens("!1", $cx, 21))[[$$sv-1]];
+	return @('undef', '1', < $self->maybe_parens("!1", $cx, 21))[$$sv-1];
     } elsif (class($sv) eq "NULL") {
        return 'undef';
     }

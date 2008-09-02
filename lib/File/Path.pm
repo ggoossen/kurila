@@ -686,7 +686,8 @@ sub _rmtree {
             : $root
         ;
 
-        my ($ldev, $lino, $perm) = < @(lstat $root)[[0..2]] or next ROOT_DIR;
+        my ($ldev, $lino, $perm) = < @(lstat $root)[[0..2]];
+        $ldev or next ROOT_DIR;
 
 	if ( -d _ ) {
             $root = VMS::Filespec::pathify($root) if $Is_VMS;

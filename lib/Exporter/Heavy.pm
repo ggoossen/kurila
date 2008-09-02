@@ -218,7 +218,7 @@ sub heavy_export_tags {
 }
 
 sub heavy_export_ok_tags {
-  _push_tags((caller)[[0]], "EXPORT_OK", \@_);
+  _push_tags(@(caller)[0], "EXPORT_OK", \@_);
 }
 
 1;

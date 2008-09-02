@@ -192,7 +192,7 @@ sub lock_ref_keys_plus {
         }
     }
     Internals::SvREADONLY(%$hash,1);
-    delete %{$hash}{[< @delete]};
+    delete %{$hash}{[@delete]};
     return $hash
 }
 

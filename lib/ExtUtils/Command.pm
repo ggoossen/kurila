@@ -90,7 +90,7 @@ sub eqtime
 {
  my ($src,$dst) = < @ARGV;
  local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
- utime((stat($src))[[8,9]],$dst);
+ utime(< @(stat($src))[[8..9]],$dst);
 }
 
 =item rm_rf
@@ -104,7 +104,7 @@ Removes files and directories - recursively (even if readonly)
 sub rm_rf
 {
  expand_wildcards();
- rmtree(\@(< grep -e $_, @(< @ARGV)),0,0);
+ rmtree(< grep -e $_, @(< @ARGV) );
 }
 
 =item rm_f
