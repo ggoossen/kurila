@@ -942,7 +942,7 @@ sub FindOption ($$$$$) {
 		      "out of ", scalar(nelems @names), "\n") if $debug;
 
 	# Check for ambiguous results.
-	unless ( ((nelems @hits) +<= 1) || nelems(grep ($_ eq $opt, @hits) == 1) ) {
+	unless ( ((nelems @hits) +<= 1) || (nelems grep ($_ eq $opt, @hits) == 1) ) {
 	    # See if all matches are for the same option.
 	    my %hit;
 	    foreach (  @hits ) {
