@@ -1443,6 +1443,8 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
     SV* to_dec = NULL;
     STRLEN len;
     const char *s;
+    bool set_to_ignore = FALSE;
+    bool set_to_default = FALSE;
 #ifdef HAS_SIGPROCMASK
     sigset_t set, save;
     SV* save_sv;
@@ -1450,11 +1452,17 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 
     PERL_ARGS_ASSERT_MAGIC_SETSIG;
 
-    if ( ! (SvTYPE(sv) == SVt_PVGV || SvROK(sv)) ) {
+    if ( SvROK(sv) ) {
+	if ( SvTYPE(SvRV(sv)) != SVt_PVCV )
+	    Perl_croak(aTHX_ "signal handler should be a code refernce, 'DEFAULT' or 'IGNORE'");
+    } else {
         const char *s = SvOK(sv) ? SvPV_force(sv,len) : "DEFAULT";
-        if ( ! (strEQ(s,"IGNORE") || strEQ(s,"DEFAULT") || !*s)) {
-            Perl_croak(aTHX_  "signal handler should be glob or reference or 'DEFAULT or 'IGNORE'");
-        }
+        if ( strEQ(s,"IGNORE") )
+	    set_to_ignore = TRUE;
+	else if (strEQ(s,"DEFAULT"))
+	    set_to_default = TRUE;
+	else
+            Perl_croak(aTHX_  "signal handler should be a code reference or 'DEFAULT or 'IGNORE'");
     }
 
     s = MgPV_const(mg,len);
@@ -1492,7 +1500,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
         PL_psig_name[i] = newSVpvn(s, len);
         SvREADONLY_on(PL_psig_name[i]);
     }
-    if (SvTYPE(sv) == SVt_PVGV || SvROK(sv)) {
+    if (SvROK(sv)) {
         if (i) {
             (void)rsignal(i, PL_csighandlerp);
 #ifdef HAS_SIGPROCMASK
@@ -1505,8 +1513,7 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
             SvREFCNT_dec(to_dec);
         return 0;
     }
-    s = SvOK(sv) ? SvPV_force(sv,len) : "DEFAULT";
-    if (strEQ(s,"IGNORE")) {
+    if (set_to_ignore) {
         if (i) {
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
             PL_sig_ignoring[i] = 1;
@@ -2690,10 +2697,10 @@ Perl_sighandler(int sig)
         PL_markstack_ptr++;             /* Protect mark. */
     if (flags & 16)
         PL_scopestack_ix += 1;
-    /* sv_2cv is too complicated, try a simpler variant first: */
+
     if (!SvROK(PL_psig_ptr[sig]) || !(cv = (CV*)SvRV(PL_psig_ptr[sig]))
         || SvTYPE(cv) != SVt_PVCV) {
-        cv = sv_2cv(PL_psig_ptr[sig], &gv, GV_ADD);
+	Perl_croak(aTHX "SIG%s handler is not valid", PL_sig_name[sig]);
     }
 
     if (!cv || !CvROOT(cv)) {
