@@ -5,36 +5,14 @@ BEGIN {
     $^WARN_HOOK = sub { die "Dying on warning: ", < @_ };
 }
 
+BEGIN {
+    require "./test.pl";
+}
+
 use warnings;
 use Config;
 
-my $test = 1;
-sub ok {
-    my($ok, $info, $todo) = < @_;
-
-    # You have to do it this way or VMS will get confused.
-    printf "\%s $test\%s\n", $ok ? "ok" : "not ok",
-                           $todo ? " # TODO $todo" : '';
-
-    unless( $ok ) {
-        printf "# Failed test at line \%d\n", (caller)[[2]];
-        print  "# $info\n" if defined $info;
-    }
-
-    $test++;
-    return $ok;
-}
-
-sub skip {
-    my($reason) = < @_;
-
-    printf "ok $test # skipped\%s\n", defined $reason ? ": $reason" : '';
-
-    $test++;
-    return 1;
-}
-
-print "1..48\n";
+plan tests => 49;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -127,11 +105,13 @@ END
 END
     close CMDPIPE;
     $? >>= 8 if $^O eq 'VMS'; # POSIX status hiding in 2nd byte
-    my $todo = ($^O eq 'os2' ? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' : '');
-    print $? ^&^ 0xFF ? "ok 6$todo\n" : "not ok 6$todo\n";
-
-    $test += 4;
+    next_test for 1..3;
+    local our $TODO = ($^O eq 'os2' ? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' : '');
+    ok($? ^&^ 0xFF);
 }
+
+dies_like( sub { %SIG{TERM} = 'foo' },
+    qr/signal handler should be a code reference or .../ );
 
 # can we slice ENV?
 my @val1 = @( < %ENV{[@( <keys(%ENV))]} );
@@ -155,13 +135,13 @@ if ($Is_MacOS) {
 }
 else {
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(0)"];
-    ok $? == 0, $?;
+    ok $? == 0, '$?';
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(1)"];
-    ok $? != 0, $?;
+    ok $? != 0, '$?';
 }
 
 try { die "foo\n" };
-ok $@->{description} eq "foo\n", $@;
+ok $@->{description} eq "foo\n", '$@';
 
 ok $$ +> 0, $$;
 try { $$++ };
@@ -236,27 +216,27 @@ EOX
 EOH
     }
     my $s1 = "\$^X is $perl, \$0 is $script\n";
-    ok open(SCRIPT, ">", "$script"), $!;
-    ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), $!;
+    ok open(SCRIPT, ">", "$script"), '$!';
+    ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), '$!';
 #!$wd/perl
 EOB
 print "\$^X is $^X, \$0 is $0\n";
 EOF
-    ok close(SCRIPT), $!;
-    ok chmod(0755, $script), $!;
+    ok close(SCRIPT), '$!';
+    ok chmod(0755, $script), '$!';
     $_ = ($Is_MacOS || $Is_VMS) ? `$perl $script` : `$script`;
     s/\.exe//i if $Is_Dos or $Is_Cygwin or $Is_os2;
     s{./$script}{$script} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\bminiperl\b}{perl}; # so that test doesn't fail with miniperl
     s{is perl}{is $perl}; # for systems where $^X is only a basename
     s{\\}{/}g;
-    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), " :$_:!=:$s1:");
+    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), ' :$_:!=:$s1:');
     $_ = `$perl $script`;
     s/\.exe//i if $Is_Dos or $Is_os2 or $Is_Cygwin;
     s{./$perl}{$perl} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\\}{/}g;
-    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), " :$_:!=:$s1: after `$perl $script`");
-    ok unlink($script), $!;
+    ok(($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1) or diag " :$_:!=:$s1: after `$perl $script`";
+    ok unlink($script) or diag $!;
 }
 
 # $], $^O, $^T
@@ -339,9 +319,10 @@ else {
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }
 
-# test case-insignificance of %ENV (these tests must be enabled only
-# when perl is compiled with -DENV_IS_CASELESS)
-if ($Is_MSWin32 || $Is_NetWare) {
+SKIP: {
+    # test case-insignificance of %ENV (these tests must be enabled only
+    # when perl is compiled with -DENV_IS_CASELESS)
+    skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
     %ENV = %( () );
     %ENV{'Foo'} = 'bar';
     %ENV{'fOo'} = 'baz';
@@ -349,9 +330,6 @@ if ($Is_MSWin32 || $Is_NetWare) {
     ok exists(%ENV{'FOo'});
     ok (delete(%ENV{'foO'}) eq 'baz');
     ok (scalar(keys(%ENV)) == 0);
-}
-else {
-    skip('no caseless %ENV support') for 1..4;
 }
 
 if ($Is_miniperl) {

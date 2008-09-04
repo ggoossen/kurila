@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 104;
+plan tests => 103;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -190,8 +190,6 @@ is(@a[0].@a[1], "Xb");
 
 # now try the same for %SIG
 
-try { %SIG{TERM} = 'foo' };
-like $@->{description}, qr/signal handler should be glob or .../;
 %SIG{INT} = \&foo;
 $^WARN_HOOK = %SIG{INT};
 {
