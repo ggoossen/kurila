@@ -386,7 +386,7 @@ sub GetOptionsFromArray($@) {
 
 	# Copy the linkage. If omitted, link to global variable.
 	if ( (nelems @optionlist) +> 0 && ref(@optionlist[0]) ) {
-	    print STDERR ("=> link \"$orig\" to @optionlist[0]\n")
+	    print STDERR ("=> link \"$orig\" to {dump::view(@optionlist[0])}\n")
 		if $debug;
 	    my $rl = ref(%linkage{$orig} = shift (@optionlist));
 
@@ -465,7 +465,8 @@ sub GetOptionsFromArray($@) {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%opctl) ) {
-	    print STDERR ($arrow, "\%opctl\{$k\} = {dump::view($v)} ", < dump::view( <OptCtl($v)), "\n");
+	    print STDERR ($arrow, "\%opctl\{$k\} = {dump::view($v)} ",
+                          dump::view(OptCtl($v)), "\n");
 	    $arrow = "   ";
 	}
     }
@@ -1000,7 +1001,7 @@ sub FindOption ($$$$$) {
     }
     # Apparently valid.
     $opt = $tryopt;
-    print STDERR ("=> found ", < OptCtl($ctl),
+    print STDERR ("=> found ", OptCtl($ctl),
 		  " for \"", $opt, "\"\n") if $debug;
 
     #### Determine argument status ####
