@@ -1234,7 +1234,7 @@ Perl_magic_getsig(pTHX_ SV *sv, MAGIC *mg)
 
     if (i > 0) {
     	if(PL_psig_ptr[i])
-    	    sv_setsv(sv,PL_psig_ptr[i]);
+    	    sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
     	else {
 	    Sighandler_t sigstate = rsignal_state(i);
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
@@ -1250,8 +1250,6 @@ Perl_magic_getsig(pTHX_ SV *sv, MAGIC *mg)
     	    	sv_setpvs(sv,"IGNORE");
     	    else
     	    	sv_setsv(sv,&PL_sv_undef);
-	    PL_psig_ptr[i] = SvREFCNT_inc_simple_NN(sv);
-    	    SvTEMP_off(sv);
     	}
     }
     return 0;
@@ -1298,7 +1296,7 @@ Perl_magic_clearsig(pTHX_ SV *sv, MAGIC *mg)
             }
             if(PL_psig_ptr[i]) {
                 SV * const to_dec=PL_psig_ptr[i];
-                PL_psig_ptr[i]=0;
+                PL_psig_ptr[i]=NULL;
                 LEAVE;
                 SvREFCNT_dec(to_dec);
             }
@@ -1466,72 +1464,63 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
     }
 
     s = MgPV_const(mg,len);
-    {
-        i = whichsig(s);        /* ...no, a brick */
-        if (i <= 0) {
-            if (ckWARN(WARN_SIGNAL))
-                Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "No such signal: SIG%s", s);
-            return 0;
-        }
+    i = whichsig(s);        /* ...no, a brick */
+    if (i <= 0) {
+	if (ckWARN(WARN_SIGNAL))
+	    Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "No such signal: SIG%s", s);
+	return 0;
+    }
 #ifdef HAS_SIGPROCMASK
-        /* Avoid having the signal arrive at a bad time, if possible. */
-        sigemptyset(&set);
-        sigaddset(&set,i);
-        sigprocmask(SIG_BLOCK, &set, &save);
-        ENTER;
-        save_sv = newSVpvn((char *)(&save), sizeof(sigset_t));
-        SAVEFREESV(save_sv);
-        SAVEDESTRUCTOR_X(restore_sigmask, save_sv);
+    /* Avoid having the signal arrive at a bad time, if possible. */
+    sigemptyset(&set);
+    sigaddset(&set,i);
+    sigprocmask(SIG_BLOCK, &set, &save);
+    ENTER;
+    save_sv = newSVpvn((char *)(&save), sizeof(sigset_t));
+    SAVEFREESV(save_sv);
+    SAVEDESTRUCTOR_X(restore_sigmask, save_sv);
 #endif
-        PERL_ASYNC_CHECK();
+    PERL_ASYNC_CHECK();
 #if defined(FAKE_PERSISTENT_SIGNAL_HANDLERS) || defined(FAKE_DEFAULT_SIGNAL_HANDLERS)
-        if (!PL_sig_handlers_initted) Perl_csighandler_init();
+    if (!PL_sig_handlers_initted) Perl_csighandler_init();
 #endif
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
-        PL_sig_ignoring[i] = 0;
+    PL_sig_ignoring[i] = 0;
 #endif
 #ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
-        PL_sig_defaulting[i] = 0;
+    PL_sig_defaulting[i] = 0;
 #endif
-        SvREFCNT_dec(PL_psig_name[i]);
-        to_dec = PL_psig_ptr[i];
-        PL_psig_ptr[i] = SvREFCNT_inc_simple_NN(sv);
-        SvTEMP_off(sv); /* Make sure it doesn't go away on us */
-        PL_psig_name[i] = newSVpvn(s, len);
-        SvREADONLY_on(PL_psig_name[i]);
-    }
+    SvREFCNT_dec(PL_psig_name[i]);
+    to_dec = PL_psig_ptr[i];
+    PL_psig_ptr[i] = NULL;
+    PL_psig_name[i] = newSVpvn(s, len);
+    SvREADONLY_on(PL_psig_name[i]);
+
     if (SvROK(sv)) {
-        if (i) {
-            (void)rsignal(i, PL_csighandlerp);
+	PL_psig_ptr[i] = SvREFCNT_inc(SvRV(sv));
+	(void)rsignal(i, PL_csighandlerp);
 #ifdef HAS_SIGPROCMASK
-            LEAVE;
+	LEAVE;
 #endif
-        }
-        else
-            *svp = SvREFCNT_inc_simple_NN(sv);
         if(to_dec)
             SvREFCNT_dec(to_dec);
         return 0;
     }
     if (set_to_ignore) {
-        if (i) {
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
-            PL_sig_ignoring[i] = 1;
-            (void)rsignal(i, PL_csighandlerp);
+	PL_sig_ignoring[i] = 1;
+	(void)rsignal(i, PL_csighandlerp);
 #else
-            (void)rsignal(i, (Sighandler_t) SIG_IGN);
+	(void)rsignal(i, (Sighandler_t) SIG_IGN);
 #endif
-        }
     }
     else {
-        if (i) {
 #ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
-            PL_sig_defaulting[i] = 1;
-            (void)rsignal(i, PL_csighandlerp);
+	PL_sig_defaulting[i] = 1;
+	(void)rsignal(i, PL_csighandlerp);
 #else
-            (void)rsignal(i, (Sighandler_t) SIG_DFL);
+	(void)rsignal(i, (Sighandler_t) SIG_DFL);
 #endif
-	}
     }
 #ifdef HAS_SIGPROCMASK
     if(i)
@@ -2682,10 +2671,10 @@ Perl_sighandler(int sig)
         flags |= 16;
 
     if (!PL_psig_ptr[sig]) {
-                PerlIO_printf(Perl_error_log, "Signal SIG%s received, but no signal handler set.\n",
-                                 PL_sig_name[sig]);
-                exit(sig);
-        }
+	PerlIO_printf(Perl_error_log, "Signal SIG%s received, but no signal handler set.\n",
+	    PL_sig_name[sig]);
+	exit(sig);
+    }
 
     /* Max number of items pushed there is 3*n or 4. We cannot fix
        infinity, so we fix 4 (in fact 5): */
@@ -2698,7 +2687,7 @@ Perl_sighandler(int sig)
     if (flags & 16)
         PL_scopestack_ix += 1;
 
-    if (!SvROK(PL_psig_ptr[sig]) || !(cv = (CV*)SvRV(PL_psig_ptr[sig]))
+    if (!(cv = (CV*)PL_psig_ptr[sig])
         || SvTYPE(cv) != SVt_PVCV) {
 	Perl_croak(aTHX "SIG%s handler is not valid", PL_sig_name[sig]);
     }
