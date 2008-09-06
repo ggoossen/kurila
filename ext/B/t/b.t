@@ -48,7 +48,6 @@ push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.
 {
-    local $TODO = 1;
     is( join('#', @( < sort @( < keys %Subs))), join('#', @( < sort @( < @syms))), 'all symbols found' );
 }
 
