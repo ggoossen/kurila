@@ -65,7 +65,7 @@ ok(!$bad, "SIGHUP ignored");
 
 is(%SIG{HUP}, 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
-is(%SIG{HUP}, 'DEFAULT');
+is(%SIG{HUP}, undef);
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
