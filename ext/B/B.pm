@@ -226,10 +226,10 @@ sub walksymtable {
     $prefix = '' unless defined $prefix;
     for my $sym (@( <keys %$symref)) {
         my $ref = $symref->{$_};
-        $fullname = "*main::".$prefix.$sym;
+        $fullname = "*".$prefix.$sym;
 	if ($sym =~ m/::$/) {
 	    $sym = $prefix . $sym;
-	    if ($sym ne "main::" && $sym ne "<none>::" && &$recurse($sym)) {
+	    if ($sym ne "<none>::" && &$recurse($sym)) {
                walksymtable(\%{*{Symbol::fetch_glob($fullname)}}, $method, $recurse, $sym);
 	    }
 	} else {
