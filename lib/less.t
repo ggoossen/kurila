@@ -16,6 +16,6 @@ no less;
 is_deeply(\@( <less->of),\@(),'more please');
 
 use less 'random acts';
-is_deeply(\@(sort < less->of),\@(sort qw(random acts)),'less random acts');
+is_deeply(\@( <sort @( < less->of)),\@( <sort @( < qw(random acts))),'less random acts');
 
 is(scalar less->of('random'),1,'less random');

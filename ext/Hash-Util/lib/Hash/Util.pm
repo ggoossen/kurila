@@ -3,11 +3,11 @@ package Hash::Util;
 use strict;
 use warnings;
 use warnings::register;
-use Scalar::Util qw(reftype);
+use Scalar::Util < qw(reftype);
 
 require Exporter;
-our @ISA        = @( qw(Exporter) );
-our @EXPORT_OK  = @( qw(
+our @ISA        = @( < qw(Exporter) );
+our @EXPORT_OK  = @( < qw(
                      fieldhash fieldhashes
 
                      all_keys
@@ -28,7 +28,7 @@ our @EXPORT_OK  = @( qw(
                     ) );
 our $VERSION    = 0.07;
 require DynaLoader;
-local @ISA = @( qw(DynaLoader) );
+local @ISA = @( < qw(DynaLoader) );
 Hash::Util->bootstrap($VERSION);
 
 sub import {
@@ -133,19 +133,19 @@ sub lock_ref_keys {
 
     Internals::hv_clear_placeholders %$hash;
     if( (nelems @keys) ) {
-        my %keys = %( map { ($_ => 1) } < @keys );
-        my %original_keys = %( map { ($_ => 1) } keys %$hash );
-        foreach my $k (keys %original_keys) {
+        my %keys = %( < map { ($_ => 1) } @( < @keys) );
+        my %original_keys = %( < map { ($_ => 1) } @( < keys %$hash) );
+        foreach my $k (@( <keys %original_keys)) {
             die "Hash has key '$k' which is not in the new key set"
               unless %keys{$k};
         }
 
-        foreach my $k (< @keys) {
+        foreach my $k ( @keys) {
             $hash->{$k} = undef unless exists $hash->{$k};
         }
         Internals::SvREADONLY %$hash, 1;
 
-        foreach my $k (< @keys) {
+        foreach my $k ( @keys) {
             delete $hash->{$k} unless %original_keys{$k};
         }
     }
@@ -185,14 +185,14 @@ sub lock_ref_keys_plus {
     my ($hash,< @keys)=< @_;
     my @delete;
     Internals::hv_clear_placeholders(%$hash);
-    foreach my $key (< @keys) {
+    foreach my $key ( @keys) {
         unless (exists($hash->{$key})) {
             $hash->{$key}=undef;
             push @delete,$key;
         }
     }
     Internals::SvREADONLY(%$hash,1);
-    delete %{$hash}{[< @delete]};
+    delete %{$hash}{[@delete]};
     return $hash
 }
 
@@ -311,7 +311,7 @@ sub lock_hashref_recurse {
     my $hash = shift;
 
     lock_ref_keys($hash);
-    foreach my $value (values %$hash) {
+    foreach my $value (@( <values %$hash)) {
         if (reftype($value) eq 'HASH') {
             lock_hashref_recurse($value);
         }
@@ -323,7 +323,7 @@ sub lock_hashref_recurse {
 sub unlock_hashref_recurse {
     my $hash = shift;
 
-    foreach my $value (values %$hash) {
+    foreach my $value (@( <values %$hash)) {
         if (reftype($value) eq 'HASH') {
             unlock_hashref_recurse($value);
         }

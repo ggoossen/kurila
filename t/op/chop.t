@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 61;
+plan tests => 57;
 
 our (@foo, $foo, $c, @bar, $got, %chop, %chomp, $x, $y);
 
@@ -23,11 +23,11 @@ sub foo {
 @foo = @("hi \n","there\n","!\n");
 @bar = @( < @foo );
 chop(@bar);
-is (join('',< @bar), 'hi there!');
+is (join('', @(< @bar)), 'hi there!');
 
 $foo = "\n";
 chop($foo, @foo);
-is (join('',$foo,< @foo), 'hi there!');
+is (join('', @($foo,< @foo)), 'hi there!');
 
 $_ = "foo\n\n";
 $got = chomp();
@@ -122,19 +122,6 @@ $_ = "\x{1234}\x{2345}";
 chop;
 is ($_, "\x{1234}");
 
-my @stuff = @( qw(this that) );
-is (chop(@stuff[[0,1]]), 't');
-
-# bug id 20010305.012
-@stuff = @( qw(ab cd ef) );
-is (chop(@stuff = @( < @stuff )), 'f');
-
-@stuff = @( qw(ab cd ef) );
-is (chop(@stuff[[0, 2]]), 'f');
-
-my %stuff = %(1..4);
-is (chop(%stuff{[1, 3]}), '4');
-
 }
 
 # chomp should not stringify references unless it decides to modify them
@@ -151,7 +138,7 @@ $/ = "\n";
 %chomp = %("One" => "One", "Two\n" => "Two", "" => "");
 %chop = %("One" => "On", "Two\n" => "Two", "" => "");
 
-foreach (keys %chomp) {
+foreach (@( <keys %chomp)) {
   my $key = $_;
   try {chomp $_};
   if ($@) {
@@ -163,7 +150,7 @@ foreach (keys %chomp) {
   }
 }
 
-foreach (keys %chop) {
+foreach (@( <keys %chop)) {
   my $key = $_;
   try {chop $_};
   if ($@) {
@@ -226,9 +213,9 @@ ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
-    map chop(+()), ('')x68;
+    map chop(+()), @( ('')x68);
     ok(1, "extend sp in pp_chop");
 
-    map chomp(+()), ('')x68;
+    map chomp(+()), @( ('')x68);
     ok(1, "extend sp in pp_chomp");
 }

@@ -91,10 +91,10 @@ print "# groups = $groups\n";
 # That is: do not \w, do not \S.
 if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
     my $gr = $1;
-    my @g0 = @( split m/, ?/, $gr );
+    my @g0 = @( < split m/, ?/, $gr );
     my @g1;
     # prefer names over numbers
-    for (< @g0) {
+    for ( @g0) {
 	# 42(zot me)
 	if (m/^(\d+)(?:\(([^)]+)\))?/) {
 	    push @g1, ($2 || $1);
@@ -108,9 +108,9 @@ if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
 	}
     }
     print "# groups=$gr\n";
-    print "# g0 = {join ' ', <@g0}\n";
-    print "# g1 = {join ' ', <@g1}\n";
-    $groups = "{join ' ', <@g1}";
+    print "# g0 = {join ' ', @( <@g0)}\n";
+    print "# g1 = {join ' ', @( <@g1)}\n";
+    $groups = "{join ' ', @( <@g1)}";
 }
 
 print "1..2\n";
@@ -121,9 +121,9 @@ $pwgid = $^GID + 0;
 
 print "# pwgid = $pwgid, pwgnam = $pwgnam\n";
 
-for (split(' ', $^GID)) {
+for (@( <split(' ', $^GID))) {
     ($group) = getgrgid($_);
-    next if (! defined $group or ! grep { $_ eq $group } < @gr) and %seen{$_}++;
+    next if (! defined $group or ! grep { $_ eq $group } @( < @gr)) and %seen{$_}++;
     if (defined $group) {
 	push(@gr, $group);
     }
@@ -132,23 +132,23 @@ for (split(' ', $^GID)) {
     }
 }
 
-print "# gr = {join ' ', <@gr}\n";
+print "# gr = {join ' ', @( <@gr)}\n";
 
 my %did;
 if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
 	# Or anybody else who can have spaces in group names.
-	$gr1 = join(' ', grep(!%did{$_}++, sort split(' ', join(' ', < @gr))));
+	$gr1 = join(' ', @( < grep(!%did{$_}++, @( < sort @( < split(' ', join(' ', @( < @gr))))))));
 } else {
 	# Don't assume that there aren't duplicate groups
-	$gr1 = join(' ', sort grep defined $_ && !%did{$_}++, < @gr);
+	$gr1 = join(' ', @( < sort @( < grep defined $_ && !%did{$_}++, @( < @gr))));
 }
 
-if (%Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
-    %basegroup{[$pwgid,$pwgnam]} = (0,0);
-} else {
-    %basegroup{[$pwgid,$pwgnam]} = (1,1);
+if (%Config{myuname} =~ m/^cygwin_nt/i) {  <# basegroup on CYGWIN_NT has id = 0.
+    %basegroup{[@($pwgid,$pwgnam)]} = (0,0);
+} else { <
+    %basegroup{[@($pwgid,$pwgnam)]} = (1,1);
 }
-$gr2 = join(' ', grep(!%basegroup{$_}++, sort split(' ',$groups)));
+$gr2 = join(' ', @( < grep(!%basegroup{$_}++, @( < sort @( < split(' ',$groups))))));
 
 my $ok1 = 0;
 if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
@@ -158,7 +158,7 @@ if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
 elsif (%Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
     # Retry in default unix mode
     %basegroup = %( $pwgid => 1, $pwgnam => 1 );
-    $gr2 = join(' ', grep(!%basegroup{$_}++, sort split(' ',$groups)));
+    $gr2 = join(' ', @( < grep(!%basegroup{$_}++, @( < sort @( < split(' ',$groups))))));
     if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
 	print "ok 1 # This Cygwin behaves like Unix (Win2k?)\n";
 	$ok1++;

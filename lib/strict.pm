@@ -18,7 +18,7 @@ vars => 0x00000400
 sub bits {
     my $bits = 0;
     my @wrong;
-    foreach my $s (< @_) {
+    foreach my $s ( @_) {
 	push @wrong, $s unless exists %bitmask{$s};
         $bits ^|^= %bitmask{$s} || 0;
     }
@@ -28,7 +28,7 @@ sub bits {
     $bits;
 }
 
-my $default_bits = bits(qw(refs subs vars));
+my $default_bits = bits( <qw(refs subs vars));
 
 sub import {
     shift;

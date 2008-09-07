@@ -9,8 +9,8 @@ our $VERSION = '1.00';
 
 BEGIN { 
     use Exporter   ();
-    @EXPORT      = @( qw(stat lstat) );
-    @EXPORT_OK   = @( qw( $st_dev	   $st_ino    $st_mode 
+    @EXPORT      = @( < qw(stat lstat) );
+    @EXPORT_OK   = @( < qw( $st_dev	   $st_ino    $st_mode 
 		       $st_nlink   $st_uid    $st_gid 
 		       $st_rdev    $st_size 
 		       $st_atime   $st_mtime  $st_ctime 
@@ -23,12 +23,12 @@ use vars < @EXPORT_OK;
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }
 
-use Class::Struct qw(struct);
+use Class::Struct < qw(struct);
 struct 'File::stat' => \@(
-     map { $_ => '$' } qw{
+     < map { $_ => '$' } @( < qw{
 	 dev ino mode nlink uid gid rdev size
 	 atime mtime ctime blksize blocks
-     }
+     })
 );
 
 sub populate (@) {

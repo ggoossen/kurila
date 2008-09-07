@@ -2,9 +2,9 @@
 package Pod::Perldoc::ToRtf;
 use strict;
 use warnings;
-use vars qw($VERSION);
+use vars < qw($VERSION);
 
-use base qw( Pod::Simple::RTF );
+use base < qw( Pod::Simple::RTF );
 
 $VERSION   # so that ->VERSION is happy
 # stop CPAN from seeing this

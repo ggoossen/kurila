@@ -38,7 +38,7 @@ sub new {
 package main;
 
 local $^DIE_HOOK = sub {
-    my($call_file, $call_line) = (caller)[[1,2]];
+    my($call_file, $call_line) = < @(caller)[1..2];
     fail("SIGDIE accidentally called");
     diag("From $call_file at $call_line");
 };

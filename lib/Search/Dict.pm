@@ -4,8 +4,8 @@ require Exporter;
 use strict;
 
 our $VERSION = '1.02';
-our @ISA = @( qw(Exporter) );
-our @EXPORT = @( qw(look) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT = @( < qw(look) );
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ sub look {
     local($_);
     my(@stat) = @( stat($fh) )
 	or return -1;
-    my($size, $blksize) = @stat[[7,11]];
+    my($size, $blksize) = < @stat[[@(7,11)]];
     $blksize ||= 8192;
     $key =~ s/[^\w\s]//g if $dict;
     $key = lc $key       if $fold;

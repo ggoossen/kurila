@@ -6,9 +6,9 @@
 
 package IPC::Msg;
 
-use IPC::SysV qw(IPC_STAT IPC_SET IPC_RMID);
+use IPC::SysV < qw(IPC_STAT IPC_SET IPC_RMID);
 use strict;
-use vars qw($VERSION);
+use vars < qw($VERSION);
 use Carp;
 
 $VERSION = "1.02";
@@ -17,7 +17,7 @@ $VERSION = eval $VERSION;
 {
     package IPC::Msg::stat;
 
-    use Class::Struct qw(struct);
+    use Class::Struct < qw(struct);
 
     struct 'IPC::Msg::stat' => \@(
 	uid	=> '$',
@@ -81,7 +81,7 @@ sub set {
 
 sub remove {
     my $self = shift;
-    (msgctl($$self,IPC_RMID,0), undef $$self)[[0]];
+    @(msgctl($$self,IPC_RMID,0), undef $$self)[0];
 }
 
 sub rcv {

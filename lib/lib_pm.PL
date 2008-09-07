@@ -1,5 +1,5 @@
 use Config;
-use File::Basename qw(&basename &dirname);
+use File::Basename < qw(&basename &dirname);
 use File::Spec;
 use Cwd;
 
@@ -20,11 +20,11 @@ if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $useConfig = '';
     $Config_archname = qq('%Config{archname}');
     $Config_version  = qq('%Config{version}');
-    my @Config_inc_version_list = @(
-	reverse split m/ /, %Config{inc_version_list} );
+    my @Config_inc_version_list = @( <
+	reverse @( < split m/ /, %Config{inc_version_list}) );
     $Config_inc_version_list =
 	(nelems @Config_inc_version_list) ?
-	    qq({join ' ', <@Config_inc_version_list}) : q(());
+	    qq({join ' ', @( <@Config_inc_version_list)}) : q(());
 } else {
     $useConfig = 'use Config;';
     $Config_archname = q(%Config{archname});
@@ -70,7 +70,7 @@ sub import {
     shift;
 
     my %names;
-    foreach (reverse < @_) {
+    foreach (reverse @_) {
 	my $path = $_;		# we'll be modifying it, so break the alias
 	if ($path eq '') {
 	    require Carp;
@@ -102,7 +102,7 @@ sub import {
     }
 
     # remove trailing duplicates
-    @INC = @( grep { ++%names{$_} == 1 } < @INC );
+    @INC = grep { ++%names{$_} == 1 } @INC;
     return;
 }
 
@@ -111,7 +111,7 @@ sub unimport {
     shift;
 
     my %names;
-    foreach (< @_) {
+    foreach (@_) {
 	my $path = _nativize($_);
 
 	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
@@ -123,7 +123,7 @@ sub unimport {
     }
 
     # Remove ALL instances of each named directory.
-    @INC = @( grep { !exists %names{$_} } < @INC );
+    @INC = grep { !exists %names{$_} } @INC;
     return;
 }
 

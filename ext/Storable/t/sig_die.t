@@ -42,4 +42,4 @@ require Storable;
 
 Storable::dclone(\%(foo => "bar"));
 
-is(join("", < @warns), "", "__DIE__ is not evil here");
+is(join("", @( < @warns)), "", "__DIE__ is not evil here");

@@ -30,7 +30,7 @@ sub BEGIN {
 }
 
 use strict;
-use vars qw($file_magic_str $other_magic $network_magic $byteorder
+use vars < qw($file_magic_str $other_magic $network_magic $byteorder
             $major $minor $minor_write $fancy);
 
 $byteorder = %Config{byteorder};
@@ -53,7 +53,7 @@ $fancy = 0;
 
 plan tests => 372 + length ($byteorder) * 4 + $fancy * 8;
 
-use Storable qw (store retrieve freeze thaw nstore nfreeze);
+use Storable < qw (store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
 use vars '$file';
 
@@ -65,7 +65,7 @@ sub test_hash {
   my $clone = shift;
   is (ref $clone, "HASH", "Get hash back");
   is (nkeys %$clone, 1, "with 1 key");
-  is ((keys %$clone)[[0]], "perl", "which is correct");
+  is ((keys %$clone)[0], "perl", "which is correct");
   is ($clone->{perl}, "rules");
 }
 
@@ -187,15 +187,15 @@ sub test_things {
     # All these are omitted from the network order header.
     # I'm not sure if it's correct to omit the byte size stuff.
     $copy = $contents;
-    substr ($copy, $file_magic + 3, length $header->{byteorder}, join '', reverse split m//, $header->{byteorder});
+    substr ($copy, $file_magic + 3, length $header->{byteorder}, join '', @( < reverse @( < split m//, $header->{byteorder})));
 
     test_corrupt ($copy, $sub, "/^Byte order is not compatible/",
                   "byte order");
     $where = $file_magic + 3 + length $header->{byteorder};
-    foreach (\@('intsize', "Integer"),
+    foreach (@(\@('intsize', "Integer"),
              \@('longsize', "Long integer"),
              \@('ptrsize', "Pointer"),
-             \@('nvsize', "Double")) {
+             \@('nvsize', "Double"))) {
       my ($key, $name) = < @$_;
       $copy = $contents;
       substr ($copy, $where++, 1, chr 0);

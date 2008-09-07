@@ -20,8 +20,8 @@ plan( tests => 26 );
     sub new_error2 { return new_error(); } $line2 = __LINE__;
     my $err = new_error2(); $line3 = __LINE__;
     is( (nelems $err->{stack}), 2);
-    is((join '**', < $err->{stack}[0]), "../lib/error.t**$line2**29**main::new_error**");
-    is((join '**', < $err->{stack}[1]), "../lib/error.t**$line3**15**main::new_error2**");
+    is((join '**', @( < $err->{stack}[0])), "../lib/error.t**$line2**29**main::new_error**");
+    is((join '**', @( < $err->{stack}[1])), "../lib/error.t**$line3**15**main::new_error2**");
     is $err->message, <<MSG ;
 my message
     main::new_error called at ../lib/error.t line $line2 character 29.
@@ -73,6 +73,7 @@ MSG
 reuse die at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
+reraised at ../lib/error.t line {$line1+1} character 9.
 MSG
 }
 
@@ -104,12 +105,12 @@ MSG
 
 # yyerror
 {
-    eval 'undef foo';
+    eval 'undef foo'; my $line = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
     is $@->message, <<MSG ;
 Can't modify constant item in undef operator at (eval 9) line 1 character 7.
-    (eval) called at ../lib/error.t line 107 character 5.
+    (eval) called at ../lib/error.t line $line character 5.
 MSG
 }
 

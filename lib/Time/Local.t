@@ -58,7 +58,7 @@ my @years =
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or
 # greater).
-my $neg_epoch_ok = defined ((localtime(-259200))[[0]]) ? 1 : 0;
+my $neg_epoch_ok = defined (@(localtime(-259200))[0]) ? 1 : 0;
 
 # use vmsish 'time' makes for oddness around the Unix epoch
 if ($^O eq 'VMS') {
@@ -75,7 +75,7 @@ $tests += 8 if %ENV{MAINTAINER};
 
 plan tests => $tests;
 
-for (< @time, < @neg_time) {
+for ( @( < @time, < @neg_time) ) {
     my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
     $year -= 1900;
     $mon--;
@@ -92,12 +92,12 @@ for (< @time, < @neg_time) {
 
             my($s,$m,$h,$D,$M,$Y) = localtime($time);
 
-            is($s, $sec, "timelocal second for {join ' ', <@$_}");
-            is($m, $min, "timelocal minute for {join ' ', <@$_}");
-            is($h, $hour, "timelocal hour for {join ' ', <@$_}");
-            is($D, $mday, "timelocal day for {join ' ', <@$_}");
-            is($M, $mon, "timelocal month for {join ' ', <@$_}");
-            is($Y, $year, "timelocal year for {join ' ', <@$_}");
+            is($s, $sec, "timelocal second for {join ' ', @( <@$_)}");
+            is($m, $min, "timelocal minute for {join ' ', @( <@$_)}");
+            is($h, $hour, "timelocal hour for {join ' ', @( <@$_)}");
+            is($D, $mday, "timelocal day for {join ' ', @( <@$_)}");
+            is($M, $mon, "timelocal month for {join ' ', @( <@$_)}");
+            is($Y, $year, "timelocal year for {join ' ', @( <@$_)}");
         }
 
         {
@@ -106,17 +106,17 @@ for (< @time, < @neg_time) {
 
             my($s,$m,$h,$D,$M,$Y) = gmtime($time);
 
-            is($s, $sec, "timegm second for {join ' ', <@$_}");
-            is($m, $min, "timegm minute for {join ' ', <@$_}");
-            is($h, $hour, "timegm hour for {join ' ', <@$_}");
-            is($D, $mday, "timegm day for {join ' ', <@$_}");
-            is($M, $mon, "timegm month for {join ' ', <@$_}");
-            is($Y, $year, "timegm year for {join ' ', <@$_}");
+            is($s, $sec, "timegm second for {join ' ', @( <@$_)}");
+            is($m, $min, "timegm minute for {join ' ', @( <@$_)}");
+            is($h, $hour, "timegm hour for {join ' ', @( <@$_)}");
+            is($D, $mday, "timegm day for {join ' ', @( <@$_)}");
+            is($M, $mon, "timegm month for {join ' ', @( <@$_)}");
+            is($Y, $year, "timegm year for {join ' ', @( <@$_)}");
         }
     }
 }
 
-for (< @bad_time) {
+for ( @bad_time) {
     my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
     $year -= 1900;
     $mon--;
@@ -144,13 +144,13 @@ for (< @bad_time) {
 # treated like 03:00:00 rather than 01:00:00 - negative zone offsets used
 # to do the latter
 {
-    my $hour = (localtime(timelocal(0, 0, 2, 7, 3, 102)))[[2]];
+    my $hour = @(localtime(timelocal(0, 0, 2, 7, 3, 102)))[2];
     # testers in US/Pacific should get 3,
     # other testers should get 2
     ok($hour == 2 || $hour == 3, 'hour should be 2 or 3');
 }
 
-for my $p (< @years) {
+for my $p ( @years) {
     my ( $year, $is_leap_year ) = < @$p;
 
     my $string = $is_leap_year ? 'is' : 'is not';

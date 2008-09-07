@@ -5,9 +5,9 @@ use Test;
 BEGIN { plan tests => 26 };
 print "#\n# Testing normal (tight) insertion of super-ordinate language tags...\n#\n";
 
-use I18N::LangTags qw(implicate_supers);
+use I18N::LangTags < qw(implicate_supers);
 
-my @in = @( grep m/\S/, split m/[\n\r]/, q{
+my @in = @( < grep m/\S/, @( < split m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en
@@ -43,11 +43,11 @@ my @in = @( grep m/\S/, split m/[\n\r]/, q{
  pt-br-janeiro de pt-br fr => pt-br-janeiro de pt-br pt fr
 # an odd case, since we don't filter for uniqueness in this sub
  
-} );
+}) );
 
-sub uniq { my %seen; return grep(!(%seen{$_}++), < @_); }
+sub uniq { my %seen; return grep(!(%seen{$_}++), @( < @_)); }
 
-foreach my $in (< @in) {
+foreach my $in ( @in) {
   $in =~ s/^\s+//s;
   $in =~ s/\s+$//s;
   $in =~ s/#.+//s;
@@ -64,21 +64,21 @@ foreach my $in (< @in) {
     #print "{@in}{@should}\n";
   }
   my @out = @( < implicate_supers(
-    ("{join ' ', <@in}" eq 'NIX') ? () : < @in
+    ("{join ' ', @( <@in)}" eq 'NIX') ? () : < @in
   ) );
   #print "O: ", join(' ', map "<$_>", @out), "\n";
   @out = @( 'NIX' ) unless (nelems @out);
 
   
   if( (nelems @out) == nelems @should
-      and lc( join "\e", < @out ) eq lc( join "\e", < @should )
+      and lc( join "\e", @( < @out) ) eq lc( join "\e", @( < @should) )
   ) {
-    print "#     Happily got [{join ' ', <@out}] from [$in]\n";
+    print "#     Happily got [{join ' ', @( <@out)}] from [$in]\n";
     ok 1;
   } else {
     ok 0;
-    print "#!!Got:         [{join ' ', <@out}]\n",
-          "#!! but wanted: [{join ' ', <@should}]\n",
+    print "#!!Got:         [{join ' ', @( <@out)}]\n",
+          "#!! but wanted: [{join ' ', @( <@should)}]\n",
           "#!! from \"$in\"\n#\n";
   }
 }

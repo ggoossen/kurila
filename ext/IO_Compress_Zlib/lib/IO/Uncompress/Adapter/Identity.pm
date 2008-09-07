@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use bytes;
 
-use IO::Compress::Base::Common  v2.006 qw(:Status);
+use IO::Compress::Base::Common  v2.006 < qw(:Status);
 
 our ($VERSION);
 

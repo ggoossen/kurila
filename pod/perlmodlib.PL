@@ -6,11 +6,11 @@ open (OUT, ">", "perlmodlib.pod") or die $!;
 my (@pragma, @mod, @MANIFEST);
 
 open (MANIFEST, "<", "../MANIFEST") or die $!;
-@MANIFEST = @( grep !m</(?:t|demo)/>, ~< *MANIFEST );
+@MANIFEST = @( < grep !m</(?:t|demo)/>, @( ~< *MANIFEST) );
 push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
     'lib/DynaLoader.pm', 'lib/XSLoader.pm';
 
-for (< @MANIFEST) {
+for ( @MANIFEST) {
      my $filename;
      next unless s|^lib/|| or m|^ext/|;
      my ($origfilename) = ($filename) = m|^(\S+)|;
@@ -49,7 +49,7 @@ for (< @MANIFEST) {
      $perlname =~ s!\b(\w+)/\1\b!$1!;
      $perlname =~ s![/-]!::!g;
 
-     ($name, $thing) = split m/ --? /, $title, 2;
+     ($name, $thing) = < split m/ --? /, $title, 2;
 
      unless ($name and $thing) {
 	 warn "$filename missing name\n"  unless $name;
@@ -121,7 +121,7 @@ The following pragmas are defined (and have their own documentation).
 
 EOF
 
-print OUT $_ for (sort < @pragma);
+print OUT $_ for @( ( <sort @( < @pragma)));
 
 print OUT <<EOF;
 =back
@@ -140,7 +140,7 @@ don't have the gdbm library.
 
 EOF
 
-print OUT $_ for (sort < @mod);
+print OUT $_ for @( ( <sort @( < @mod)));
 
 print OUT <<'EOF';
 =back

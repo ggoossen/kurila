@@ -69,7 +69,7 @@ sub show_bits
 {
     my $in = shift;
     my $out = '';
-    foreach (unpack('W*', $in)) {
+    foreach (@(unpack('W*', $in))) {
         $out .= sprintf('\x%02x', $_);
     }
     return $out;
@@ -88,7 +88,7 @@ sub check_bits
 sub testwarn {
     my $w = shift;
     my $id = shift;
-    check_bits( (caller(0))[[9]], $w, "warnings match caller ($id)");
+    check_bits( @(caller(0))[9], $w, "warnings match caller ($id)");
 }
 
 {
@@ -133,7 +133,7 @@ my $debugger_test =  q<
     return nelems @stackinfo;
 >;
 
-sub pb { return (caller(0))[[3]] }
+sub pb { return @(caller(0))[3] }
 
 my $i = eval $debugger_test;
 is( $i, 11, "do not skip over eval (and caller returns 10 elements)" );

@@ -12,9 +12,9 @@ use strict;
 use ExtUtils::MakeMaker;
 use File::Compare;
 use File::Find;
-use File::Spec::Functions qw(rel2abs abs2rel catfile catdir curdir);
+use File::Spec::Functions < qw(rel2abs abs2rel catfile catdir curdir);
 
-for (@ARGV[[0, 1]]) {
+for (@( <@ARGV[[@(0, 1)]])) {
     die "$0: '$_' does not look like Perl directory\n"
 	unless -f catfile($_, "perl.h") && -d catdir($_, "Porting");
 }
@@ -25,7 +25,7 @@ chdir @ARGV[0] or die "$0: chdir '@ARGV[0]' failed: $!\n";
 # Files to skip from the check for one reason or another,
 # usually because they pull in their version from some other file.
 my %skip;
-%skip{['./lib/Exporter/Heavy.pm']} = ();
+ <%skip{[@('./lib/Exporter/Heavy.pm')]} = ();
 
 my @wanted;
 find(
@@ -49,5 +49,5 @@ find(
 			   defined $version2 &&
                            $version1 eq $version2
 		} }, < curdir);
-print map { $_, "\n" } sort < @wanted;
+print < map { $_, "\n" } @( < sort @( < @wanted));
 

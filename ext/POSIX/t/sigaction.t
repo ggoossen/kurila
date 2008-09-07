@@ -14,7 +14,7 @@ BEGIN{
 use Test::More tests => 31;
 
 use strict;
-use vars qw/$bad $bad7 $ok10 $bad18 $ok/;
+use vars < qw/$bad $bad7 $ok10 $bad18 $ok/;
 
 $^W=1;
 
@@ -65,7 +65,7 @@ ok(!$bad, "SIGHUP ignored");
 
 is(%SIG{HUP}, 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
-is(%SIG{HUP}, 'DEFAULT');
+is(%SIG{HUP}, undef);
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);

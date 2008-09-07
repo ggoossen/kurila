@@ -19,10 +19,10 @@ print "1..2\n";
 
 # quickly compare two text files
 sub txt_compare {
-    our ($A, $B);
-    local ($/, $A, $B);
-    for (($A,$B) = < @_) { open(_, "<","$_") ? $_ = ~< *_ : die "$_ : $!"; close _ }
-    $A cmp $B;
+    local ($/);
+    my $files = @_;
+    for ($files) { open(_, "<","$_") ? $_ = ~< *_ : die "$_ : $!"; close _ }
+    $files[0] cmp $files[1];
 }
 
 # does it run?

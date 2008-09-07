@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 120 );
+plan( tests => 119 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -478,12 +478,6 @@ is("<$_> <$s>", "<> <4>", "[perl #7806]");
 # [perl #20684] returned a zero count
 $_ = "1111";
 is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
-
-# [perl #20682] @- not visible in replacement
-$_ = "123";
-m/(2)/;	# seed @- with something else
-s/(1)(2)(3)/{(nelems @-) -1} ({join ' ', <@-})/;
-is($_, "3 (0 0 1 2)", '#20682 @- not visible in replacement');
 
 # [perl #20682] $^N not visible in replacement
 $_ = "abc";

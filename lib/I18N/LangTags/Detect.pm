@@ -4,7 +4,7 @@
 package I18N::LangTags::Detect;
 use strict;
 
-use vars qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
+use vars < qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
              $USE_LITERALS $MATCH_SUPERS_TIGHTLY);
 
 BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
@@ -12,14 +12,14 @@ BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
 
 $VERSION = "1.03";
 @ISA = @( () );
-use I18N::LangTags qw(alternate_language_tags locale2language_tag);
+use I18N::LangTags < qw(alternate_language_tags locale2language_tag);
 
-sub _uniq { my %seen; return @(grep(!(%seen{$_}++), < @_)); }
+sub _uniq { my %seen; return @(< grep(!(%seen{$_}++), @( < @_))); }
 sub _normalize {
   my(@languages) = @(
-    map lc($_),
-    grep $_,
-    map {; $_, < alternate_language_tags($_) } < @_ );
+    < map lc($_), @(
+    < grep $_, @(
+    < map {; $_, < alternate_language_tags($_) } @( < @_))) );
   return _uniq(< @languages);
 }
 
@@ -40,18 +40,18 @@ sub ambient_langprefs { # always returns things untainted
   # Not running as a CGI: try to puzzle out from the environment
   my @languages;
 
-  foreach my $envname (qw( LANGUAGE LC_ALL LC_MESSAGES LANG )) {
+  foreach my $envname (@( <qw( LANGUAGE LC_ALL LC_MESSAGES LANG ))) {
     next unless %ENV{$envname};
     DEBUG and print "Noting \$$envname: %ENV{$envname}\n";
     push @languages,
-      map locale2language_tag($_),
+      < map locale2language_tag($_), @( <
         # if it's a lg tag, fine, pass thru (untainted)
         # if it's a locale ID, try converting to a lg tag (untainted),
         # otherwise nix it.
 
       split m/[,:]/,
       %ENV{$envname}
-    ;
+)    ;
     last; # first one wins
   }
   
@@ -95,7 +95,7 @@ sub http_accept_langs {
   my %pref;
   
   my $q;
-  foreach my $tag (< @in) {
+  foreach my $tag ( @in) {
     next unless $tag =~
      m/^([a-zA-Z][-a-zA-Z]+)
         (?:
@@ -117,9 +117,9 @@ sub http_accept_langs {
 
   return _normalize(
     # Read off %pref, in descending key order...
-    map < @{%pref{$_}},
+    < map < @{%pref{$_}}, @( <
     sort {$b <+> $a}
-    keys %pref
+ @( <    keys %pref))
   );
 }
 

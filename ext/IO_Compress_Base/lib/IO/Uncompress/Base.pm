@@ -7,7 +7,7 @@ use bytes;
 
 our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 #@ISA    = qw(Exporter IO::File);
-@ISA    = @( qw(Exporter ) );
+@ISA    = @( < qw(Exporter ) );
 
 
 $VERSION = '2.006';
@@ -20,8 +20,8 @@ use IO::Compress::Base::Common v2.006 ;
 
 use IO::File ;
 use Symbol;
-use Scalar::Util qw(readonly);
-use List::Util qw(min);
+use Scalar::Util < qw(readonly);
+use List::Util < qw(min);
 use Carp ;
 
 %EXPORT_TAGS = %( ( ) );
@@ -527,7 +527,7 @@ sub _inf
     if ($x->{GlobMap})
     {
         $x->{oneInput} = 1 ;
-        foreach my $pair (< @{ $x->{Pairs} })
+        foreach my $pair ( @{ $x->{Pairs} })
         {
             my ($from, $to) = < @$pair ;
             $obj->_singleTarget($x, $from, $to, < @_)
@@ -544,7 +544,7 @@ sub _inf
 
         $x->{inType} = $inFile ? 'filename' : 'buffer';
         
-        foreach my $in ($x->{oneInput} ? $input : < @$input)
+        foreach my $in (@($x->{oneInput} ? $input : < @$input))
         {
             my $out ;
             $x->{oneInput} = 1 ;
@@ -617,7 +617,7 @@ sub _singleTarget
     }
     else
     {
-        for my $element ( ($x->{inType} eq 'hash') ? keys %$input : < @$input)
+        for my $element (@( ($x->{inType} eq 'hash') ? < keys %$input : < @$input))
         {
             defined $self->_rd2($x, $element, $output) 
                 or return undef ;

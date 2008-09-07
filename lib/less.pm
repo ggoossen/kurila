@@ -5,29 +5,29 @@ use warnings;
 our $VERSION = '0.02';
 
 sub _pack_tags {
-    return join ' ', < @_;
+    return join ' ', @( < @_);
 }
 
 sub _unpack_tags {
-    return @(grep { defined and length }
-        map  { split ' ' }
-        grep {defined} < @_);
+    return @(< grep { defined and length }
+ @(        < map  { < split ' ' }
+ @(        < grep {defined} @( < @_))));
 }
 
 sub of {
     my $class = shift @_;
 
     # If no one wants the result, don't bother computing it.
-    my $hinthash = ( caller 0 )[[10]];
+    my $hinthash = @( caller 0 )[10];
     my %tags;
-    %tags{[ <_unpack_tags( $hinthash->{$class} ) ]} = ();
+ <    %tags{[@( <_unpack_tags( $hinthash->{$class} )) ]} = ();
 
     if ((nelems @_)) {
-        exists %tags{$_} and return !!1 for < @_;
+        exists %tags{$_} and return !!1 for  @_;
         return;
     }
     else {
-        return @(keys %tags);
+        return @( <keys %tags);
     }
 }
 
@@ -36,9 +36,9 @@ sub import {
 
     @_ = @( 'please' ) if not nelems @_;
     my %tags;
-    %tags{[ <_unpack_tags( < @_, %^H{$class} ) ]} = ();
+ <    %tags{[@( <_unpack_tags( < @_, %^H{$class} )) ]} = ();
 
-    %^H{$class} = _pack_tags( keys %tags );
+    %^H{$class} = _pack_tags( < keys %tags );
     return;
 }
 
@@ -47,9 +47,9 @@ sub unimport {
 
     if ((nelems @_)) {
         my %tags;
-        %tags{[ <_unpack_tags( %^H{$class} ) ]} = ();
+ <        %tags{[@( <_unpack_tags( %^H{$class} )) ]} = ();
         delete %tags{[ <_unpack_tags(< @_) ]};
-        my $new = _pack_tags( keys %tags );
+        my $new = _pack_tags( < keys %tags );
 
         if ( not length $new ) {
             delete %^H{$class};

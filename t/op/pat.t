@@ -47,7 +47,7 @@ BEGIN {
   require "./test.pl";
 }
 
-plan 1765;
+plan 1655;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);
@@ -150,24 +150,24 @@ ok( not m/^xxx {3,4}/ );
 
 $_ = "now is the time for all good men to come to.";
 @words = @( m/(\w+)/g );
-ok( join(':',< @words) eq "now:is:the:time:for:all:good:men:to:come:to" );
+ok( join(':', @(< @words)) eq "now:is:the:time:for:all:good:men:to:come:to" );
 
 @words = @( () );
 while (m/\w+/gp) {
     push(@words, $^MATCH);
 }
-ok( join(':',< @words) eq "now:is:the:time:for:all:good:men:to:come:to" );
+ok( join(':', @(< @words)) eq "now:is:the:time:for:all:good:men:to:come:to" );
 
 @words = @( () );
 pos = 0;
 while (m/to/gp) {
     push(@words, $^MATCH);
 }
-ok( join(':',< @words) eq "to:to" );
+ok( join(':', @(< @words)) eq "to:to" );
 
 pos $_ = 0;
 @words = @( m/to/g );
-ok( join(':',< @words) eq "to:to" );
+ok( join(':', @(< @words)) eq "to:to" );
 
 $_ = "abcdefghi";
 
@@ -248,7 +248,7 @@ ok($out == 1);
 
 $_ = 'foobar1 bar2 foobar3 barfoobar5 foobar6';
 our @out = @( m/(?<!foo)bar./g );
-ok("{join ' ', <@out}" eq 'bar2 barf');
+ok("{join ' ', @( <@out)}" eq 'bar2 barf');
 
 # Tests which depend on REG_INFTY
 our $reg_infty = defined %Config{reg_infty} ? %Config{reg_infty} : 32767;
@@ -285,7 +285,7 @@ eval_dies_like( qq("{$context}y" =~ m/(?<=$context)y/),
 ok(1);
 
 # Long Monsters
-for my $l (125, 140, 250, 270, 300000, 30) { # Ordered to free memory
+for my $l (@(125, 140, 250, 270, 300000, 30)) { # Ordered to free memory
   $a = 'a' x $l;
   ok("ba$a=" =~ m/a$a=/);
 
@@ -293,8 +293,8 @@ for my $l (125, 140, 250, 270, 300000, 30) { # Ordered to free memory
 }
 
 # 20000 nodes, each taking 3 words per string, and 1 per branch
-my $long_constant_len = join '|', 12120 .. 32645;
-my $long_var_len = join '|', 8120 .. 28645;
+my $long_constant_len = join '|', @( < 12120 .. 32645);
+my $long_var_len = join '|', @( < 8120 .. 28645);
 my %ans = %( 'ax13876y25677lbc' => 1,
 	 'ax13876y25677mcb' => 0, # not b.
 	 'ax13876y35677nbc' => 0, # Num too big
@@ -305,7 +305,7 @@ my %ans = %( 'ax13876y25677lbc' => 1,
 	 'ax13876y25677y21378y21378y21378kbc' => 0, # 5 runs
        );
 
-for ( keys %ans ) {
+for (@( < keys %ans) ) {
   ok( not ( %ans{$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o ));
   ok( not ( %ans{$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o ));
 }
@@ -349,7 +349,7 @@ sub matchit {
 our (@ans, $res, @ans1);
 push @ans, $res while $res = matchit;
 
-ok("{join ' ', <@ans}" eq "1 1 1");
+ok("{join ' ', @( <@ans)}" eq "1 1 1");
 
 ok( "abc" =~ m/^(??{"a"})b/ );
 
@@ -359,16 +359,16 @@ $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/;
 @ans = @ans1 = @();
 push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp;
 
-ok( "{join ' ', <@ans}" eq "1 1 1" );
+ok( "{join ' ', @( <@ans)}" eq "1 1 1" );
 
-ok( "{join ' ', <@ans1}" eq $expect );
+ok( "{join ' ', @( <@ans1)}" eq $expect );
 
 @ans = @( m/$matched/g );
 
-ok( "{join ' ', <@ans}" eq $expect );
+ok( "{join ' ', @( <@ans)}" eq $expect );
 
 @ans = @('a/b' =~ m%(.*/)?(.*)%);	# Stack may be bad
-ok( "{join ' ', <@ans}" eq 'a/ b' );
+ok( "{join ' ', @( <@ans)}" eq 'a/ b' );
 
 my $code = '{$blah = 45}';
 my $blah = 12;
@@ -376,7 +376,7 @@ dies_like( sub { m/(?$code)/ },
            qr/not allowed at runtime/);
 ok( $blah == 12 , "blah not changed by the eval" );
 
-for $code ('{$blah = 45}','=xx') {
+for $code (@('{$blah = 45}','=xx')) {
   $blah = 12;
   if ($code eq '=xx') {
       $res = try { "xx" =~ m/(?$code)/o }; die if $@;
@@ -433,14 +433,14 @@ ok(qr/\b\v$/xism eq '(?msixu:\b\v$)');
 ok(qr/\b\v$/ eq '(?u-xism:\b\v$)');
 
 $_ = 'xabcx';
-foreach my $ans ('', 'c') {
+foreach my $ans (@('', 'c')) {
   use bytes;
   m/(?<=(?=a)..)((?=c)|.)/g;
   ok($1 eq $ans);
 }
 
 $_ = 'a';
-foreach my $ans ('', 'a', '') {
+foreach my $ans (@('', 'a', '')) {
   m/^|a|$/gp;
   ok( $^MATCH eq $ans );
 }
@@ -536,63 +536,10 @@ ok( not nelems @_ );
 @_ = @( m/(bbb)/g );
 ok( not nelems @_ );
 
-m/a(?=.$)/;
-ok( not ( (nelems @+) != 1 or (nelems @-) != 1 ) );
-
-ok( @+[0] == 2 and @-[0] == 1 );
-
-ok( not ( defined @+[1] or defined @-[1] or defined @+[2] or defined @-[2] ));
-
-m/a(a)(a)/;
-ok( (nelems @+) == 3 and (nelems @-) == 3 );
-
-ok( not (@+[0] != 3 or @-[0] != 0 ));
-
-ok( not (@+[1] != 2 or @-[1] != 1 ));
-
-ok( not (@+[2] != 3 or @-[2] != 2 ));
-
-ok( not ( defined @+[3] or defined @-[3] or defined @+[4] or defined @-[4] ));
-
-m/.(a)(b)?(a)/;
-ok( not ((nelems @+) != 4 or (nelems @-) != 4 ));
-
-ok( not (@+[0] != 3 or @-[0] != 0 ));
-
-ok( not (@+[1] != 2 or @-[1] != 1 ));
-
-ok( not (@+[3] != 3 or @-[3] != 2 ));
-
-ok( not (defined @+[2] or defined @-[2] or defined @+[4] or defined @-[4] ));
-
-m/.(a)/;
-ok( not ((nelems @+) != 2 or (nelems @-) != 2 ));
-
-ok( not (@+[0] != 2 or @-[0] != 0 ));
-
-ok( not (@+[1] != 2 or @-[1] != 1 ));
-
-ok( not ( defined @+[2] or defined @-[2] or defined @+[3] or defined @-[3] ));
-
-dies_like( sub { @+[0] = 13; },
-           qr/^Modification of a read-only value attempted/ );
-
-dies_like( sub { @-[0] = 13; },
-           qr/^Modification of a read-only value attempted/ );
-
-dies_like( sub { @+ = @(7, 6, 5); },
-           qr/^Modification of a read-only value attempted/ );
-
-dies_like( sub { @- = @( qw(foo bar) ); },
-           qr/^Modification of a read-only value attempted/ );
-
-m/.(a)(ba*)?/;
-ok( (nelems @+) == 3 and (nelems @-) == 2 );
-
 $_ = 'aaa';
 pos = 1;
 my @a = @( m/\Ga/g );
-ok("{join ' ', <@a}" eq "a a");
+ok("{join ' ', @( <@a)}" eq "a a");
 
 my $str = 'abcde';
 pos $str = 2;
@@ -646,15 +593,15 @@ our @res = @( () );
 # List context:
 $_ = 'abcde|abcde';
 our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g );
-@res = @( map {defined $_ ? "'$_'" : 'undef'} < @res );
-$res = "{join ' ', <@res}";
-ok(  "{join ' ', <@res}" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
+@res = @( < map {defined $_ ? "'$_'" : 'undef'} @( < @res) );
+$res = "{join ' ', @( <@res)}";
+ok(  "{join ' ', @( <@res)}" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
 
 @res = @( () );
 @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp );
-@res = @( map {defined $_ ? "'$_'" : 'undef'} < @res );
-$res = "{join ' ', <@res}";
-ok(  "{join ' ', <@res}" eq
+@res = @( < map {defined $_ ? "'$_'" : 'undef'} @( < @res) );
+$res = "{join ' ', @( <@res)}";
+ok(  "{join ' ', @( <@res)}" eq
   "'' 'ab' 'cde|abcde' " .
   "'' 'abc' 'de|abcde' " .
   "'abcd' 'e|' 'abcde' " .
@@ -705,7 +652,7 @@ ok($1  eq 'cd');
 
 $_='123x123';
 @res = @( m/(\d*|x)/g );
-ok( ('123||x|123|' eq join '|', < @res) );
+ok( ('123||x|123|' eq join '|', @( < @res)) );
 
 # see if matching against temporaries (created via pp_helem()) is safe
 my $x = "abc";
@@ -714,13 +661,13 @@ ok( $1 eq "ok abc" );
 
 # See if $i work inside (?{}) in the presense of saved substrings and
 # changing $_
-our @a = @( qw(foo bar) );
+our @a = @( < qw(foo bar) );
 our @b = @( () );
-s/(\w)(?{push @b, $1})/,$1,/g for < @a;
+s/(\w)(?{push @b, $1})/,$1,/g for  @a;
 
-ok("{join ' ', <@b}" eq "f o o b a r");
+ok("{join ' ', @( <@b)}" eq "f o o b a r");
 
-ok("{join ' ', <@a}" eq ",f,,o,,o, ,b,,a,,r,");
+ok("{join ' ', @( <@a)}" eq ",f,,o,,o, ,b,,a,,r,");
 
 my $brackets;
 $brackets = qr{
@@ -749,59 +696,59 @@ ok( not $text =~ m/^\s*A/m );
 
 $text = "abc dbf";
 @res = @($text =~ m/.*?(b).*?\b/g);
-ok("{join ' ', <@res}" eq 'b b');
+ok("{join ' ', @( <@res)}" eq 'b b');
 
 {
 use bytes;
-@a = @( map chr,0..255 );
+@a = @( < map chr, @( <0..255) );
 
-@b = @( grep(m/\S/,< @a) );
-our @c = @( grep(m/[^\s]/,< @a) );
-ok("{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\S/, @(< @a)) );
+our @c = @( < grep(m/[^\s]/, @(< @a)) );
+ok("{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\S/,< @a) );
-@c = @( grep(m/[\S]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\S/, @(< @a)) );
+@c = @( < grep(m/[\S]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\s/,< @a) );
-@c = @( grep(m/[^\S]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\s/, @(< @a)) );
+@c = @( < grep(m/[^\S]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\s/,< @a) );
-@c = @( grep(m/[\s]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\s/, @(< @a)) );
+@c = @( < grep(m/[\s]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\D/,< @a) );
-@c = @( grep(m/[^\d]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\D/, @(< @a)) );
+@c = @( < grep(m/[^\d]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\D/,< @a) );
-@c = @( grep(m/[\D]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\D/, @(< @a)) );
+@c = @( < grep(m/[\D]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\d/,< @a) );
-@c = @( grep(m/[^\D]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\d/, @(< @a)) );
+@c = @( < grep(m/[^\D]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\d/,< @a) );
-@c = @( grep(m/[\d]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\d/, @(< @a)) );
+@c = @( < grep(m/[\d]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\W/,< @a) );
-@c = @( grep(m/[^\w]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\W/, @(< @a)) );
+@c = @( < grep(m/[^\w]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\W/,< @a) );
-@c = @( grep(m/[\W]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\W/, @(< @a)) );
+@c = @( < grep(m/[\W]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\w/,< @a) );
-@c = @( grep(m/[^\W]/,< @a) );
-ok( "{join ' ', <@b}" eq "{join ' ', <@c}");
+@b = @( < grep(m/\w/, @(< @a)) );
+@c = @( < grep(m/[^\W]/, @(< @a)) );
+ok( "{join ' ', @( <@b)}" eq "{join ' ', @( <@c)}");
 
-@b = @( grep(m/\w/,< @a) );
-@c = @( grep(m/[\w]/,< @a) );
-is("{join ' ', <@b}","{join ' ', <@c}");
+@b = @( < grep(m/\w/, @(< @a)) );
+@c = @( < grep(m/[\w]/, @(< @a)) );
+is("{join ' ', @( <@b)}","{join ' ', @( <@c)}");
 }
 
 # see if backtracking optimization works correctly
@@ -851,15 +798,15 @@ my %space = %( spc   => " ",
 	      vt    => chr(11),
 	      false => "space" );
 
-my @space0 = @( sort grep { %space{$_} =~ m/\s/ }          keys %space );
-my @space1 = @( sort grep { %space{$_} =~ m/[[:space:]]/ } keys %space );
-my @space2 = @( sort grep { %space{$_} =~ m/[[:blank:]]/ } keys %space );
+my @space0 = @( < sort @( < grep { %space{$_} =~ m/\s/ } @( <          keys %space)) );
+my @space1 = @( < sort @( < grep { %space{$_} =~ m/[[:space:]]/ } @( < keys %space)) );
+my @space2 = @( < sort @( < grep { %space{$_} =~ m/[[:blank:]]/ } @( < keys %space)) );
 
-ok( "{join ' ', <@space0}" eq "cr ff lf spc tab" );
+ok( "{join ' ', @( <@space0)}" eq "cr ff lf spc tab" );
 
-ok( "{join ' ', <@space1}" eq "cr ff lf spc tab vt" );
+ok( "{join ' ', @( <@space1)}" eq "cr ff lf spc tab vt" );
 
-ok( "{join ' ', <@space2}" eq "spc tab" );
+ok( "{join ' ', @( <@space2)}" eq "spc tab" );
 
 # bugid 20001021.005 - this caused a SEGV
 ok( undef =~ m/^([^\/]*)(.*)$/ );
@@ -940,7 +887,7 @@ ok("\x{abcd}" =~ m/\x{abcd}/);
     # bug id 20001008.001
 
     my @x = @("stra\x{DF}e 138","stra\x{DF}e 138");
-    for (< @x) {
+    for ( @x) {
 	s/(\d+)\s*([\w\-]+)/{$1 . uc $2}/;
 	my($latin) = m/^(.+)(?:\s+\d)/;
 	ok($latin eq "stra\x{DF}e");
@@ -973,8 +920,8 @@ SKIP: {
 	     "\0"				=> 'Cc',
 	     );
 	
-    for my $char (map { s/^\S+ //; $_ }
-                    sort map { sprintf("\%06x", ord($_))." $_" } keys %s) {
+    for my $char (@(< map { s/^\S+ //; $_ }
+ @( <                    sort @( < map { sprintf("\%06x", ord($_))." $_" } @( < keys %s))))) {
 	my $class = %s{$char};
 	my $code  = sprintf("\%06x", ord($char));
 	printf "#\n# 0x$code  $char\n#\n";
@@ -1111,12 +1058,12 @@ SKIP: {
 
 {
     # bugid 20010410.006
-    for my $rx (
+    for my $rx (@(
 		'm/(.*?)\{(.*?)\}/csg',
 		'm/(.*?)\{(.*?)\}/cg',
 		'm/(.*?)\{(.*?)\}/sg',
 		'm/(.*?)\{(.*?)\}/g',
-		'm/(.+?)\{(.+?)\}/csg',
+		'm/(.+?)\{(.+?)\}/csg',)
 	       )
     {
 	my($input, $i);
@@ -1351,12 +1298,12 @@ ok( chr(0x38c) =~ m/\p{IsGreek}/ ); # singleton
 ## guarantee a specific locale......
 ##
     use bytes;
-    our $AllBytes = join('', map { chr($_) } 0..255);
+    our $AllBytes = join('', @( < map { chr($_) } @( < 0..255)));
     ($x = $AllBytes) =~ s/[[:cntrl:]]//g;
-    ok($x eq join('', map { chr($_) } 0x20..0x7E, 0x80..0xFF));
+    ok($x eq join('', @( < map { chr($_) } @( < 0x20..0x7E, < 0x80..0xFF))));
 
     ($x = $AllBytes) =~ s/[^[:cntrl:]]//g;
-    ok($x eq join('', map { chr($_) } 0..0x1F, 0x7F));
+    ok($x eq join('', @( < map { chr($_) } @( < 0..0x1F, 0x7F))));
 }
 
 # With /s modifier UTF8 chars were interpreted as bytes
@@ -1369,35 +1316,35 @@ ok( chr(0x38c) =~ m/\p{IsGreek}/ ); # singleton
 }
 
 @a = @("foo\nbar" =~ m/./g);
-ok( (nelems @a) == 6 && "{join ' ', <@a}" eq "f o o b a r" );
+ok( (nelems @a) == 6 && "{join ' ', @( <@a)}" eq "f o o b a r" );
 
 @a = @("foo\nbar" =~ m/./gs);
-ok( (nelems @a) == 7 && "{join ' ', <@a}" eq "f o o \n b a r" );
+ok( (nelems @a) == 7 && "{join ' ', @( <@a)}" eq "f o o \n b a r" );
 
 @a = @("foo\nbar" =~ m/\C/g);
-ok( (nelems @a) == 7 && "{join ' ', <@a}" eq "f o o \n b a r" );
+ok( (nelems @a) == 7 && "{join ' ', @( <@a)}" eq "f o o \n b a r" );
 
 @a = @("foo\nbar" =~ m/\C/gs);
-ok( (nelems @a) == 7 && "{join ' ', <@a}" eq "f o o \n b a r" );
+ok( (nelems @a) == 7 && "{join ' ', @( <@a)}" eq "f o o \n b a r" );
 
 @a = @("foo\n\x{100}bar" =~ m/./g);
-ok( (nelems @a) == 7 && "{join ' ', <@a}" eq "f o o \x{100} b a r" );
+ok( (nelems @a) == 7 && "{join ' ', @( <@a)}" eq "f o o \x{100} b a r" );
 
 @a = @("foo\n\x{100}bar" =~ m/./gs);
-ok( (nelems @a) == 8 && "{join ' ', <@a}" eq "f o o \n \x{100} b a r" );
+ok( (nelems @a) == 8 && "{join ' ', @( <@a)}" eq "f o o \n \x{100} b a r" );
 
 ($a, $b) = ("\x[c4]", "\x[80]");
 @a = @("foo\n\x{100}bar" =~ m/\C/g);
-ok( scalar( (nelems @a) == 9 && "{join ' ', <@a}" eq "f o o \n $a $b b a r" ) );
+ok( scalar( (nelems @a) == 9 && "{join ' ', @( <@a)}" eq "f o o \n $a $b b a r" ) );
 
 @a = @("foo\n\x{100}bar" =~ m/\C/gs);
-ok(  (nelems @a) == 9 && "{join ' ', <@a}" eq "f o o \n $a $b b a r" );
+ok(  (nelems @a) == 9 && "{join ' ', @( <@a)}" eq "f o o \n $a $b b a r" );
 
 {
     # [ID 20010814.004] pos() doesn't work when using =~m// in list context
     $_ = "ababacadaea";
-    $a = join ":", m/b./gc;
-    $b = join ":", m/a./gc;
+    $a = join ":", @( m/b./gc);
+    $b = join ":", @( m/a./gc);
     $c = pos;
     ok("$a $b $c" eq 'ba:ba ad:ae 10', "$a $b $c");
 }
@@ -1834,7 +1781,7 @@ print "# some Unicode properties\n";
 	push @c, $1;
     }
 
-    ok( join("", < @c) eq $s );
+    ok( join("", @( < @c)) eq $s );
 
     my $t1 = "Q003\n\n\x{e4}\x{f6}\n\nQ004\n\n\x{e7}"; # test only chars < 256
     my $r1 = "";
@@ -1870,7 +1817,7 @@ print "# some Unicode properties\n";
     my $v = substr($u,0,1);
     my $w = substr($u,1,1);
     my %u = %( $u => $u, $v => $v, $w => $w );
-    for (keys %u) {
+    for (@( <keys %u)) {
 	my $m1 = m/^\w*$/ ? 1 : 0;
 	my $m2 = %u{$_}=~m/^\w*$/ ? 1 : 0;
 	ok( $m1 == $m2 );
@@ -1880,7 +1827,7 @@ print "# some Unicode properties\n";
 {
     print "# [ID 20020124.005]\n";
     # Fixed by #14795.
-    for my $char ("a", "\x{df}", "\x{100}"){
+    for my $char (@("a", "\x{df}", "\x{100}")){
 	$x = "$char b $char";
 	$x =~ s{($char)}{{
 	    "c" =~ m/c/;
@@ -1919,25 +1866,25 @@ print "# some Unicode properties\n";
     # try to force all float/anchored check combinations
     my $c = "\x{100}";
     my $subst;
-    for my $re (
-	"xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",
+    for my $re (@(
+	"xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",)
     ) {
 	ok( not "xxx" =~ m/$re/ );
 	ok( not +($subst = "xxx") =~ s/$re// );
     }
-    for my $re ("xx.*$c*", "$c*.*xx") {
+    for my $re (@("xx.*$c*", "$c*.*xx")) {
 	ok( "xxx" =~ m/$re/ );
 	($subst = "xxx") =~ s/$re//;
 	ok( $subst eq '' );
     }
-    for my $re ("xxy*", "y*xx") {
+    for my $re (@("xxy*", "y*xx")) {
 	ok( "xx$c" =~ m/$re/ );
 	($subst = "xx$c") =~ s/$re//;
 	ok( $subst eq $c );
 	ok( not "xy$c" =~ m/$re/ );
 	ok( not +($subst = "xy$c") =~ m/$re/ );
     }
-    for my $re ("xy$c*z", "x$c*yz") {
+    for my $re (@("xy$c*z", "x$c*yz")) {
 	ok( "xyz" =~ m/$re/ );
 	($subst = "xyz") =~ s/$re//;
 	ok( $subst eq '' );
@@ -2021,13 +1968,13 @@ ok( "e" =~ m/\P{InConsonant}/ );
 
 if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
-    for (\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" )) {
+    for (@(\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" ))) {
 	my($type, $char) = < @$_;
-	for my $len (32000, 32768, 33000) {
+	for my $len (@(32000, 32768, 33000)) {
 	    my $s = $char . "f" x $len;
 	    my $r = $s =~ m/$char([f]*)/gc;
             ok($r, " # TODO <$type x $len>");
-	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos {join ' ', <@{\@( pos($s) )}}");
+	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos {join ' ', @( <@{\@( pos($s) )})}");
 	}
     }
 } else {
@@ -2236,9 +2183,9 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
 {
     my $i;
-    ok('-1-3-5-' eq join('', split m/((??{$i++}))/, '-1-3-5-'),
+    ok('-1-3-5-' eq join('', @( < split m/((??{$i++}))/, '-1-3-5-')),
 	"[perl #21411] (??\{ .. \}) corrupts split's stack");
-    ok('a|b|c' eq join ('|', split m/(?{'WOW'})/, 'abc'),
+    ok('a|b|c' eq join ('|', @( < split m/(?{'WOW'})/, 'abc')),
        "[perl #21411] (?\{ .. \}) version of the above");
 }
 
@@ -2261,7 +2208,7 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
     package main;
     $_ = Str->new("a\x{100}/\x{100}b");
-    ok(join(":", m/\b(.)\x{100}/g) eq "a:/", "re_intuit_start and PL_bostr");
+    ok(join(":", @( m/\b(.)\x{100}/g)) eq "a:/", "re_intuit_start and PL_bostr");
 }
 
 {
@@ -2269,7 +2216,7 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
     $_ = "code:   'x' \{ '...' \}\n"; study;
     my @x; push @x, $^MATCH while m/'[^\']*'/gxp;
-    ok(join(":", < @x) eq "'x':'...'",
+    ok(join(":", @( < @x)) eq "'x':'...'",
        "[perl #17757] Parse::RecDescent triggers infinite loop");
 }
 
@@ -2352,7 +2299,7 @@ ok("  \x{1E01}x" =~ qr/\x{1E00}X/i,
 
 for (120 .. 130) {
     my $head = 'x' x $_;
-    for my $tail ('\x{0061}', '\x{1234}') {
+    for my $tail (@('\x{0061}', '\x{1234}')) {
 	ok(
 	    eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
 	    '\x{...} misparsed in regexp near 127 char EXACT limit'
@@ -2387,26 +2334,26 @@ ok(("abc" =~ m/^abc(\z)??/) && !defined($1),
 { # TRIE related
     my @got= @(() );
     "words"=~m/(word|word|word)(?{push @got,$1})s$/;
-    ok((nelems @got)==1,"TRIE optimation is working") or warn "# {join ' ', <@got}";
+    ok((nelems @got)==1,"TRIE optimation is working") or warn "# {join ' ', @( <@got)}";
     @got= @(() );
     "words"=~m/(word|word|word)(?{push @got,$1})s$/i;
-    ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# {join ' ', <@got}";
+    ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# {join ' ', @( <@got)}";
 
-    my @nums= @(map {int rand 1000} 1..100 );
-    my $re="(".(join "|",< @nums).")";
+    my @nums= @(< map {int rand 1000} @( < 1..100) );
+    my $re="(".(join "|", @(< @nums)).")";
     $re=qr/\b$re\b/;
 
-    foreach (< @nums) {
+    foreach ( @nums) {
         ok($_=~m/$re/,"Trie nums");
     }
-    $_=join " ", < @nums;
+    $_=join " ", @( < @nums);
     @got= @(() );
     push @got,$1 while m/$re/g;
 
     my %count;
-    %count{$_}++ for < @got;
+    %count{$_}++ for  @got;
     my $ok=1;
-    for (< @nums) {
+    for ( @nums) {
         $ok=0 if --%count{$_}+<0;
     }
     ok($ok,"Trie min count matches");
@@ -2463,9 +2410,9 @@ ok(("foba  ba{$s}pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
 
 print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
 if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
-    my @normal= @(qw(these are some normal words) );
+    my @normal= @( <qw(these are some normal words) );
     use utf8;
-    my $psycho=join "|",< @normal,map chr $_,255..20000;
+    my $psycho=join "|", @(< @normal,< map chr $_, @( <255..20000));
     ok(('these'=~m/($psycho)/) && $1 eq 'these','Pyscho');
 } else {
     ok(1,'Skipped Psycho');
@@ -2551,7 +2498,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     # https://rt.perl.org/rt3/Ticket/Display.html?id=39583
     
     # The printing characters
-    my @chars = @("A".."Z");
+    my @chars = @( <"A".."Z");
     my $delim = ",";
     my $size = 32771 - 4;
     my $str = '';
@@ -2590,12 +2537,6 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     ok("X\@A" =~ m/X@(A)/, '@(');
     ok("X\@A" =~ m/X(@)A/, '@)');
     ok("X\@A" =~ m/X@|ZA/, '@|');
-
-    ok('abc' =~ m/(.)(.)(.)/, 'the last successful match is bogus');
-    ok("A{join ',', <@+}B"  =~ m/A$(join ',', <@+)B/,  'interpolation of @+ in /@{+}/');
-    ok("A{join ',', <@-}B"  =~ m/A$(join ',', <@-)B/,  'interpolation of @- in /@{-}/');
-    ok("A{join ',', <@+}B"  =~ m/A$(join ',', <@+)B/x, 'interpolation of @+ in /@{+}/x');
-    ok("A{join ',', <@-}B"  =~ m/A$(join ',', <@-)B/x, 'interpolation of @- in /@{-}/x');
 }
 
 {
@@ -2680,7 +2621,7 @@ ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch");
 
 SKIP:{
     our @stack= @(() );
-    my @expect= @(qw(
+    my @expect= @( <qw(
         stuff1
         stuff2
         <stuff1>and<stuff2>
@@ -2697,139 +2638,13 @@ SKIP:{
     ok((nelems @stack)==nelems @expect)
         or skip("Won't test individual results as count isn't equal",
                 0+nelems @expect);
-    foreach my $idx (< @expect) {
+    foreach my $idx ( @expect) {
         ok(@expect[$idx] eq @stack[$idx], 
             "Expecting '$expect' at stack pos #$idx");
     }
         
 }
-{
-    my $s='123453456';
-    $s=~s/(?<digits>\d+)\k<digits>/%+{digits}/;
-    ok($s eq '123456','Named capture (angle brackets) s///');
-    $s='123453456';
-    $s=~s/(?'digits'\d+)\k'digits'/%+{digits}/;
-    ok($s eq '123456','Named capture (single quotes) s///');    
-}
 
-{
-    my @ary = @(
-	pack('U', 0x00F1),            # n-tilde
-	'_'.pack('U', 0x00F1),        # _ + n-tilde
-	'c'.pack('U', 0x0327),        # c + cedilla
-	pack('U*', 0x00F1, 0x0327),   # n-tilde + cedilla
-	'a'.pack('U', 0x00B2),        # a + superscript two
-	pack('U', 0x0391),            # ALPHA
-	pack('U', 0x0391).'2',        # ALPHA + 2
-	pack('U', 0x0391).'_',        # ALPHA + _
-    );
-    for my $uni (< @ary) {
-	my ($r1, $c1, $r2, $c2) = eval qq{
-	    use utf8;
-	    scalar("..foo foo.." =~ m/(?'{$uni}'foo) \\k'{$uni}'/),
-		\%+\{{$uni}\},
-	    scalar("..bar bar.." =~ m/(?<{$uni}>bar) \\k<{$uni}>/),
-		\%+\{{$uni}\};
-	}; die if $@;
-	ok($r1,                         "Named capture UTF (?'')");
-	ok(defined $c1 && $c1 eq 'foo', "Named capture UTF \%+");
-	ok($r2,                         "Named capture UTF (?<>)");
-	ok(defined $c2 && $c2 eq 'bar', "Named capture UTF \%+");
-    }
-}
-
-{
-    my $s='foo bar baz';
-    my (@k,@v,@fetch,$res);
-    my $count= 0;
-    my @names= @(qw($+{A} $+{B} $+{C}) );
-    if ($s=~m/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/) {
-        while (my ($k,$v)=each(%+)) {
-            $count++;
-        }
-        @k= @(sort keys(%+) );
-        @v= @(sort values(%+) );
-        $res=1;
-        push @fetch,
-            \@( "%+{A}", "$1" ),
-            \@( "%+{B}", "$2" ),
-            \@( "%+{C}", "$3" ),
-        ;
-    } 
-    foreach (0..2) {
-        if (@fetch[$_]) {
-            is(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
-        } else {
-            ok(0, @names[$_]);
-        }
-    }
-    is($res,1,"$s~=/(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz)/");
-    is($count,3,"Got 3 keys in \%+ via each");
-    is(0+nelems @k, 3, 'Got 3 keys in %+ via keys');
-    is("{join ' ', <@k}","A B C", "Got expected keys");
-    is("{join ' ', <@v}","bar baz foo", "Got expected values");
-    eval'
-        print for %+{this_key_doesnt_exist};
-    '; die if $@;
-    ok(!$@,'lvalue %+{...} should not throw an exception');
-}
-{
-    #
-    # Almost the same as the block above, except that the capture is nested.
-    #
-    my $s = 'foo bar baz';
-    my (@k,@v,@fetch,$res);
-    my $count = 0;
-    my @names = @( qw(%+{A} %+{B} %+{C} %+{D}) );
-    if ($s =~ m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/) {
-	while (my ($k,$v) = each(%+)) {
-	    $count++;
-	}
-	@k = @( sort keys(%+) );
-	@v = @( sort values(%+) );
-	$res = 1;
-	push @fetch,
-	    \@( "%+{A}", "$2" ),
-	    \@( "%+{B}", "$3" ),
-	    \@( "%+{C}", "$4" ),
-	    \@( "%+{D}", $1 ),
-	;
-    }
-    foreach (0..3) {
-	if (@fetch[$_]) {
-	    is(@fetch[$_]->[0],@fetch[$_]->[1],@names[$_]);
-	} else {
-	    ok(0, @names[$_]);
-	}
-    }
-    is($res,1,"$s~=m/(?<D>(?<A>foo)\s+(?<B>bar)?\s+(?<C>baz))/");
-    is($count,4,"Got 4 keys in \%+ via each -- bug 50496");
-    is(0+nelems @k, 4, 'Got 4 keys in %+ via keys -- bug 50496');
-    is("{join ' ', <@k}","A B C D", "Got expected keys -- bug 50496");
-    is("{join ' ', <@v}","bar baz foo foo bar baz", "Got expected values -- bug = 50496");
-    eval'
-	print for %+{this_key_doesnt_exist};
-    '; die if $@;
-    ok(!$@,'lvalue %+{...} should not throw an exception');
-}
-{
-    my $s='foo bar baz';
-    my @res;
-    if ('1234'=~m/(?<A>1)(?<B>2)(?<A>3)(?<B>4)/) {
-        foreach my $name (sort keys(%-)) {
-            my $ary = %-{$name};
-            foreach my $idx (0..(nelems @$ary)-1) {
-                push @res,"$name:$idx:$ary->[$idx]";
-            }
-        }
-    }
-    my @expect= @(qw(A:0:1 A:1:3 B:0:2 B:1:4) );
-    is("{join ' ', <@res}","{join ' ', <@expect}","Check \%-");
-    eval'
-        print for %-{this_key_doesnt_exist};
-    '; die if $@;
-    ok(!$@,'lvalue %-{...} should not throw an exception');
-}
 # stress test CURLYX/WHILEM.
 #
 # This test includes varying levels of nesting, and according to
@@ -2878,28 +2693,28 @@ if (%ENV{PERL_SKIP_PSYCHO_TEST}){
   my $ok = 1;
   my $msg = "CURLYX stress test";
   OUTER:
-  for my $a ("x","a","aa") {
-    for my $b ("x","bbb","bbbb") {
+  for my $a (@("x","a","aa")) {
+    for my $b (@("x","bbb","bbbb")) {
       my $bs = $a.$b;
-      for my $c ("x","c","cc") {
+      for my $c (@("x","c","cc")) {
         my $cs = $bs.$c;
-        for my $d ("x","d","dd") {
+        for my $d (@("x","d","dd")) {
           my $ds = $cs.$d;
-          for my $e ("x","e","ee") {
+          for my $e (@("x","e","ee")) {
             my $es = $ds.$e;
-            for my $f ("x","f","ff") {
+            for my $f (@("x","f","ff")) {
               my $fs = $es.$f;
-              for my $g ("x","g","gg") {
+              for my $g (@("x","g","gg")) {
                 my $gs = $fs.$g;
-                for my $h ("x","h","hh") {
+                for my $h (@("x","h","hh")) {
                   my $hs = $gs.$h;
-                  for my $i ("x","i","ii") {
+                  for my $i (@("x","i","ii")) {
                     my $is = $hs.$i;
-                    for my $j ("x","j","jj") {
+                    for my $j (@("x","j","jj")) {
                       my $js = $is.$j;
-                      for my $k ("x","k","kk") {
+                      for my $k (@("x","k","kk")) {
                         my $ks = $js.$k;
-                        for my $l ("x","l","ll") {
+                        for my $l (@("x","l","ll")) {
                           my $ls = $ks.$l;
                           if ($ls =~ $r) {
                             if ($ls =~ m/x/) {
@@ -2945,22 +2760,11 @@ ok("x\c_y"    !~ m/x\c\_y/,    "\_ in a pattern");
 ok("x\c\_y"   =~ m/x\c\_y/,    "\_ in a pattern");
 
 # \c\ followed by other characters
-for my $c ("z", "\0", "!", chr(254), chr(256)) {
+for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     my $targ = "a\034$c";
     my $reg  = "a\\c\\$c";
     local $TODO = $c eq "\0" && '\c\0';
     ok(eval("qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern");
-}
-
-{
-    my $str='abc'; 
-    my $count=0;
-    my $mval=0;
-    my $pval=0;
-    while ($str=~m/b/g) { $mval=(nelems @-) -1; $pval=(nelems @+) -1; $count++ }
-    is($mval,0,"\@- should be empty [RT#36046]");
-    is($pval,0,"\@+ should be empty [RT#36046]");
-    is($count,1,"should have matched once only [RT#36046]");
 }
 
 {   # Test the (*PRUNE) pattern
@@ -2995,7 +2799,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     our @res= @(() );
     1 while m/(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,2,"Expect 2 with (*SKIP)" );
-    is("{join ' ', <@res}","aaab aaab","adjacent (*SKIP) works as expected" );
+    is("{join ' ', @( <@res)}","aaab aaab","adjacent (*SKIP) works as expected" );
 }
 {   # Test the (*SKIP) pattern
     our $count = 0;
@@ -3010,7 +2814,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     our @res= @(() );
     1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,2,"Expect 2 with (*SKIP)" );
-    is("{join ' ', <@res}","aaab aaab","adjacent (*SKIP) works as expected" );
+    is("{join ' ', @( <@res)}","aaab aaab","adjacent (*SKIP) works as expected" );
 }
 {   # Test the (*SKIP) pattern
     our $count = 0;
@@ -3021,7 +2825,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     our @res= @(() );
     1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" );
-    is("{join ' ', <@res}","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" );
+    is("{join ' ', @( <@res)}","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" );
 }
 {   # Test the (*COMMIT) pattern
     our $count = 0;
@@ -3036,19 +2840,19 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     our @res= @(() );
     1 while m/(a+b?)(*COMMIT)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,1,"Expect 1 with (*COMMIT)" );
-    is("{join ' ', <@res}","aaab","adjacent (*COMMIT) works as expected" );
+    is("{join ' ', @( <@res)}","aaab","adjacent (*COMMIT) works as expected" );
 }
 {
     # Test named commits and the $REGERROR var
     our $REGERROR;
-    for my $name ('',':foo') 
+    for my $name (@('',':foo')) 
     {
-        for my $pat ("(*PRUNE$name)",
+        for my $pat (@("(*PRUNE$name)",
                      ($name? "(*MARK$name)" : "")
                      . "(*SKIP$name)",
-                     "(*COMMIT$name)")
+                     "(*COMMIT$name)"))
         {                         
-            for my $suffix ('(*FAIL)','') 
+            for my $suffix (@('(*FAIL)','')) 
             {
                 'aaaab'=~m/a+b$pat$suffix/;
                 is(
@@ -3064,14 +2868,14 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     # Test named commits and the $REGERROR var
     package Fnorble;
     our $REGERROR;
-    for my $name ('',':foo') 
+    for my $name (@('',':foo')) 
     {
-        for my $pat ("(*PRUNE$name)",
+        for my $pat (@("(*PRUNE$name)",
                      ($name? "(*MARK$name)" : "")
                      . "(*SKIP$name)",
-                     "(*COMMIT$name)")
+                     "(*COMMIT$name)"))
         {                         
-            for my $suffix ('(*FAIL)','') 
+            for my $suffix (@('(*FAIL)','')) 
             {
                 'aaaab'=~m/a+b$pat$suffix/;
                 main::is(
@@ -3087,7 +2891,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     # Test named commits and the $REGERROR var
     local $Message = "\$REGERROR";
     our $REGERROR;
-    for my $word (qw(bar baz bop)) {
+    for my $word (@( <qw(bar baz bop))) {
         $REGERROR="";
         "aaaaa$word"=~m/a+(?:bar(*COMMIT:bar)|baz(*COMMIT:baz)|bop(*COMMIT:bop))(*FAIL)/;
         is($REGERROR,$word);
@@ -3102,7 +2906,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
 }
 {
     #Mindnumbingly simple test of (*THEN)
-    for ("ABC","BAX") {
+    for (@("ABC","BAX")) {
         ok(m/A (*THEN) X | B (*THEN) C/x,"Simple (*THEN) test");
     }
 }
@@ -3124,7 +2928,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
 }
 {
     my $spaces="      ";
-    local $_=join 'bar',$spaces,$spaces;
+    local $_=join 'bar', @($spaces,$spaces);
     our $count=0;
     s/(?>\s+bar)(?{$count++})//g;
     is($_,$spaces,"SUSPEND final string");
@@ -3177,18 +2981,11 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     local $Message="RT 22395";
     local $TODO = 'Should be L+1 not L*(L+3)/2 (L=$l)';
     our $count;
-    for my $l (10,100,1000) {
+    for my $l (@(10,100,1000)) {
 	$count=0;
 	('a' x $l) =~ m/(.*)(?{$count++})[bc]/;
 	is( $count, $l + 1);
     }
-}
-{
-    local $Message = "RT#22614";
-    local $_='ab';
-    our @len= @(() );
-    m/(.){1,}(?{push @len,0+(nelems @-)})(.){1,}(?{})^/;
-    is("{join ' ', <@len}","2 2 2");
 }
 {
     local $Message = "RT#18209";
@@ -3196,7 +2993,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
 
     my @words = @('word1', 'word3', 'word5');
     my $count;
-    foreach my $word (< @words){
+    foreach my $word ( @words){
         $text =~ s/$word\s//gip; # Leave a space to seperate words in the resultant str.
         # The following block is not working.
         if($^MATCH){
@@ -3216,7 +3013,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
         push @res,"$2"; 
         last if (nelems @res)+>3;
     }
-    is("{join ' ', <@res}","A B C","RT#6893: /g pattern shouldn't infinite loop");
+    is("{join ' ', @( <@res)}","A B C","RT#6893: /g pattern shouldn't infinite loop");
 }
 
 {
@@ -3251,10 +3048,10 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     my @quants=@('*','+');
     my $doit=sub {
         my $pats= shift;
-        for (< @_) {
-            for my $pat (< @$pats) {
-                for my $quant (< @quants) {
-                    for my $tail (< @tails) {
+        for ( @_) {
+            for my $pat ( @$pats) {
+                for my $quant ( @quants) {
+                    for my $tail ( @tails) {
                         my $re = "($pat$quant\$)$tail";
                         ok(m/$re/ && $1 eq $_,"'$_'=~m/$re/");
                         ok(m/$re/m && $1 eq $_,"'$_'=~m/$re/m");
@@ -3284,7 +3081,7 @@ for my $c ("z", "\0", "!", chr(254), chr(256)) {
     our ($REGMARK, $REGERROR);
     our @r= @(() );
     ok('foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x);
-    is("{join ' ', <@r}","foo");           
+    is("{join ' ', @( <@r)}","foo");           
     is($REGMARK,"foo");
     ok('foofoo' !~ m/foo (*MARK:foo) (*FAIL) /x);
     ok(!$REGMARK);
@@ -3314,20 +3111,20 @@ sub kt
 
     # ANYOF tests
 
-    for (\@(qw|\w aA #@!|),
-         \@(qw|[abc] abc def|),
-         \@(qw|[^abc] def abc|),
-         \@(qw|[[:word:]] abc #@!|),
-         \@(qw|[[:^word:]] #@! abc|),
+    for (@(\@( <qw|\w aA #@!|),
+         \@( <qw|[abc] abc def|),
+         \@( <qw|[^abc] def abc|),
+         \@( <qw|[[:word:]] abc #@!|),
+         \@( <qw|[[:^word:]] #@! abc|),)
         ) {
         my $m = shift @$_;
-        my ($s, $f) = map { \@(split m/ */) } < @$_;
-        ok(m/$m/, " $m basic match") for < @$s;
-        ok(not m/$m/) for < @$f;
-        ok(m/^$m$/) for < @$s;
-        ok(not m/^$m$/) for < @$f;
-        ok("xxxx$_" =~ m/^.*$m$/) for < @$s;
-        ok("xxxx$_" !~ m/^.*$m$/) for < @$f;
+        my ($s, $f) = < map { \@( <split m/ */) } @( < @$_);
+        ok(m/$m/, " $m basic match") for  @$s;
+        ok(not m/$m/) for  @$f;
+        ok(m/^$m$/) for  @$s;
+        ok(not m/^$m$/) for  @$f;
+        ok("xxxx$_" =~ m/^.*$m$/) for  @$s;
+        ok("xxxx$_" !~ m/^.*$m$/) for  @$f;
     }
 }
 
@@ -3336,7 +3133,7 @@ sub kt
     our $grabit = qr/ ([0-6][0-9]{7}) (??{ kt $1 }) [890] /x;
     $re = qr/^ ( (??{ $grabit }) ) $ /x;
     my @res = @( '0902862349' =~ $re );
-    is(join("-",< @res),"0902862349",
+    is(join("-", @(< @res)),"0902862349",
         'PL_curpm is set properly on nested eval');
 
     our $qr = qr/ (o) (??{ $1 }) /x;
@@ -3361,7 +3158,7 @@ sub kt
 {
 # requirement of Unicode Technical Standard #18, 1.7 Code Points
 # cf. http://www.unicode.org/reports/tr18/#Supplementary_Characters
-    for my $u (0x7FF, 0x800, 0xFFFF, 0x10000) {
+    for my $u (@(0x7FF, 0x800, 0xFFFF, 0x10000)) {
         no warnings 'utf8'; # oops
         my $c = chr $u;
         my $x = sprintf '%04X', $u;
@@ -3370,27 +3167,10 @@ sub kt
 }
 
 {
-    my $res="";
-
-    if ('1' =~ m/(?|(?<digit>1)|(?<digit>2))/) {
-      $res = "{join ' ', <@{%- {digit}}}";
-    }
-    is($res,"1",
-        "Check that (?|...) doesnt cause dupe entries in the names array");
-    #---
-    $res="";
-    if ('11' =~ m/(?|(?<digit>1)|(?<digit>2))(?&digit)/) {
-      $res = "{join ' ', <@{%- {digit}}}";
-    }
-    is($res, "1",
-        "Check that (?&..) to a buffer inside a (?|...) goes to the leftmost");
-}
-
-{
     use warnings;
     local $Message = "ASCII pattern that really is utf8";
     my @w;
-    local $^WARN_HOOK=sub{push @w,"{join ' ', <@_}"};
+    local $^WARN_HOOK=sub{push @w,"{join ' ', @( <@_)}"};
     my $c=qq(\x{DF}); 
     ok($c=~m/$c|\x{100}/);
     ok((nelems @w)==0);
@@ -3417,11 +3197,11 @@ sub kt
 {
     local $Message = "Various whitespace special patterns";
     my @lb=@( "\x{0D}\x{0A}",
-             map { chr( $_ ) } ( 0x0A..0x0D,0x85,0x2028,0x2029 ));
-    foreach my $t (\@(\@lb,qr/\R/,qr/\R+/),){
+             < map { chr( $_ ) } @( ( < 0x0A..0x0D,0x85,0x2028,0x2029 )));
+    foreach my $t (@(\@(\@lb,qr/\R/,qr/\R+/),)){
         my $ary=shift @$t;
-        foreach my $pat (< @$t) {
-            foreach my $str (< @$ary) {
+        foreach my $pat ( @$t) {
+            foreach my $str ( @$ary) {
                 ok($str=~m/($pat)/,$pat);
                 is($1,$str,$pat);
             }
@@ -3461,26 +3241,7 @@ sub kt
     my @a = @($str =~ m/\G(?:\Q$esc$esc\E|\Q$esc$hyp\E|$re)/g);
 
     is(0+nelems @a,3);
-    is(join('=', < @a),"$esc$hyp=$hyp=$esc$esc");
-}
-# test for keys in %+ and %-
-{
-    my $_ = "abcdef";
-    m/(?<foo>a)|(?<foo>b)/;
-    is( (join ",", sort keys %+), "foo" );
-    is( (join ",", sort keys %-), "foo" );
-    is( (join ",", sort values %+), "a" );
-    is( (join ",", sort map "{join ' ', <@$_}", values %-), "a " );
-    m/(?<bar>a)(?<bar>b)(?<quux>.)/;
-    is( (join ",", sort keys %+), "bar,quux" );
-    is( (join ",", sort keys %-), "bar,quux" );
-    is( (join ",", sort values %+), "a,c" ); # leftmost
-    is( (join ",", sort map "{join ' ', <@$_}", values %-), "a b,c" );
-    m/(?<un>a)(?<deux>c)?/; # second buffer won't capture
-    is( (join ",", sort keys %+), "un" );
-    is( (join ",", sort keys %-), "deux,un" );
-    is( (join ",", sort values %+), "a" );
-    is( (join ",", sort map "{join ' ', <@$_}", values %-), ",a" );
+    is(join('=', @( < @a)),"$esc$hyp=$hyp=$esc$esc");
 }
 
 # length() on captures, the numbered ones end up in Perl_magic_len
@@ -3492,31 +3253,8 @@ sub kt
     is( length($^POSTMATCH), 4, q[length $'] );
     is( length($^MATCH), 9, 'length $&' );
     is( length($1), 4, 'length $1' );
-    is( length(%+{eek}), 4, 'length $+{eek} == length $1' );
 }
 
-{
-    my $ok=-1;
-
-    $ok=exists(%-{x}) ? 1 : 0
-        if 'bar'=~m/(?<x>foo)|bar/;
-    is($ok,1,'$-{x} exists after "bar"=~m/(?<x>foo)|bar/');
-
-    $ok=-1;
-    $ok=exists(%+{x}) ? 1 : 0
-        if 'bar'=~m/(?<x>foo)|bar/;
-    is($ok,0,'$+{x} not exists after "bar"=~m/(?<x>foo)|bar/');
-
-    $ok=-1;
-    $ok=exists(%-{x}) ? 1 : 0
-        if 'foo'=~m/(?<x>foo)|bar/;
-    is($ok,1,'$-{x} exists after "foo"=~m/(?<x>foo)|bar/');
-
-    $ok=-1;
-    $ok=exists(%+{x}) ? 1 : 0
-        if 'foo'=~m/(?<x>foo)|bar/;
-    is($ok,1,'$+{x} exists after "foo"=~m/(?<x>foo)|bar/');
-}
 {
     local $_;
     ($_ = 'abc')=~m/(abc)/g;
@@ -3528,16 +3266,16 @@ sub kt
     my $str= "";
     for(0..5){
         my @x;
-        $str .= "{join ' ', <@x}"; # this should ALWAYS be the empty string
+        $str .= "{join ' ', @( <@x)}"; # this should ALWAYS be the empty string
         'a'=~m/(a|)/;
         push @x,1;
     }
     is(length($str),"0","Trie scope error, string should be empty");
     $str="";
     my @foo = @( ('a')x5 );
-    for (< @foo) {
+    for ( @foo) {
         my @bar;
-        $str .= "{join ' ', <@bar}";
+        $str .= "{join ' ', @( <@bar)}";
         s/a|/{push @bar, 1}/;
     }
     is(length($str),"0","Trie scope error, string should be empty");
@@ -3558,52 +3296,12 @@ sub kt
      s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g;
      is $_, "ZYX";
 }
-{
-    our @ctl_n= @(() );
-    our @plus= @(() );
-    our $nested_tags;
-    $nested_tags = qr{
-        <
-           (\w+)
-           (?{
-                   push @ctl_n,$^N;
-                   push @plus,$+;
-           })
-        >
-        (??{$nested_tags})*
-        </\s* \w+ \s*>
-    }x;
-
-    my $match= '<bla><blubb></blubb></bla>' =~ m/^$nested_tags$/;
-    ok($match,'nested construct matches');
-    is("{join ' ', <@ctl_n}","bla blubb",'$^N inside of (?{}) works as expected');
-    is("{join ' ', <@plus}","bla blubb",'$+ inside of (?{}) works as expected');
-}
 
 
 
 
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
-# Keep the following tests last -- they may crash perl
-{   
-    # RT#19049 / RT#38869
-    my @list = @(
-        'ab cdef', # matches regex
-        ( 'e' x 40000 ) .'ab c' # matches not, but 'ab c' matches part of it
-    );
-    my $y;
-    my $x;
-    foreach (< @list) {
-        m/ab(.+)cd/i; # the ignore-case seems to be important
-        $y = $1; # use $1, which might not be from the last match!
-        $x = substr(@list[0],@-[0],@+[0]-@-[0]);
-    }
-    is($y,' ',
-        'pattern in a loop, failure should not affect previous success');
-    is($x,'ab cd',
-        'pattern in a loop, failure should not affect previous success');
-}
 
 ok(("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/, "Recursive stack cracker: #24274")
     or print "# Unexpected outcome: should pass or crash perl\n";

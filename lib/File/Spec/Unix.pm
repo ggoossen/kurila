@@ -79,7 +79,7 @@ trailing slash :-)
 sub catdir {
     my $self = shift;
 
-    $self->canonpath(join('/', < @_, '')); # '' because need a trailing '/'
+    $self->canonpath(join('/', @( < @_, ''))); # '' because need a trailing '/'
 }
 
 =item catfile
@@ -145,10 +145,10 @@ sub _tmpdir {
 	no strict 'refs';
 	if (${*{Symbol::fetch_glob("\cTAINT")}}) { # Check for taint mode on perl >= 5.8.0
             require Scalar::Util;
-	    @dirlist = @( grep { ! Scalar::Util::tainted($_) } < @dirlist );
+	    @dirlist = @( < grep { ! Scalar::Util::tainted($_) } @( < @dirlist) );
 	}
     }
-    foreach (< @dirlist) {
+    foreach ( @dirlist) {
 	next unless defined && -d && -w _;
 	$tmpdir = $_;
 	last;
@@ -180,7 +180,7 @@ directory. (Does not strip symlinks, only '.', '..', and equivalents.)
 
 sub no_upwards {
     my $self = shift;
-    return @( grep(!m/^\.{1,2}\z/s, < @_) );
+    return @( < grep(!m/^\.{1,2}\z/s, @( < @_)) );
 }
 
 =item case_tolerant
@@ -215,8 +215,8 @@ Takes no argument, returns the environment variable PATH as an array.
 
 sub path {
     return () unless exists %ENV{PATH};
-    my @path = @( split(':', %ENV{PATH}) );
-    foreach (< @path) { $_ = '.' if $_ eq '' }
+    my @path = @( < split(':', %ENV{PATH}) );
+    foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;
 }
 
@@ -294,7 +294,7 @@ Yields:
 =cut
 
 sub splitdir {
-    return @( split m|/|, @_[1], -1);  # Preserve trailing fields
+    return @( < split m|/|, @_[1], -1);  # Preserve trailing fields
 }
 
 
@@ -356,14 +356,14 @@ sub abs2rel {
     my($self,$path,$base) = < @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
-    ($path, $base) = map { $self->canonpath($_) } $path, $base;
+    ($path, $base) = < map { $self->canonpath($_) } @( $path, $base);
 
-    if (grep $self->file_name_is_absolute($_), $path, $base) {
-	($path, $base) = map { $self->rel2abs($_) } $path, $base;
+    if (grep $self->file_name_is_absolute($_), @( $path, $base)) {
+	($path, $base) = < map { $self->rel2abs($_) } @( $path, $base);
     }
     else {
 	# save a couple of cwd()s if both paths are relative
-	($path, $base) = map { $self->catdir('/', $_) } $path, $base;
+	($path, $base) = < map { $self->catdir('/', $_) } @( $path, $base);
     }
 
     my ($path_volume) = < $self->splitpath($path, 1);
@@ -372,8 +372,8 @@ sub abs2rel {
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume;
 
-    my $path_directories = (<$self->splitpath($path, 1))[[1]];
-    my $base_directories = (<$self->splitpath($base, 1))[[1]];
+    my $path_directories = $self->splitpath($path, 1)[1];
+    my $base_directories = $self->splitpath($base, 1)[1];
 
     # For UNC paths, the user might give a volume like //foo/bar that
     # strictly speaking has no directory portion.  Treat it as if it
@@ -492,7 +492,7 @@ sub _collapse {
     pop @dirs if (nelems @dirs) && @dirs[-1] eq '';
 
     my @collapsed;
-    foreach my $dir (< @dirs) {
+    foreach my $dir ( @dirs) {
         if( $dir eq $updir              and   # if we have an updir
             nelems @collapsed                  and   # and something to collapse
             length @collapsed[-1]       and   # and its not the rootdir

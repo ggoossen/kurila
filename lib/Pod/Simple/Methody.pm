@@ -2,7 +2,7 @@
 package Pod::Simple::Methody;
 use strict;
 use Pod::Simple ();
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 $VERSION = '2.02';
 @ISA = @('Pod::Simple');
 

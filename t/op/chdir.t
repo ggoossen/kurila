@@ -12,7 +12,7 @@ my $has_fchdir = (%Config{d_fchdir} || "") eq "define";
 
 # Might be a little early in the testing process to start using these,
 # but I can't think of a way to write this test without them.
-use File::Spec::Functions qw(:DEFAULT splitdir rel2abs splitpath);
+use File::Spec::Functions < qw(:DEFAULT splitdir rel2abs splitpath);
 
 # Can't use Cwd::abs_path() because it has different ideas about
 # path separators than File::Spec.
@@ -72,7 +72,7 @@ SKIP: {
 
     # And now the ambiguous case
     {
-	no warnings qw<io deprecated>;
+	no warnings < qw<io deprecated>;
 	ok(opendir(H, "op"), "opendir op") or $!-> diag();
 	ok(open(H, "<", "base"), "open base") or $!-> diag();
     }
@@ -103,7 +103,7 @@ SKIP: {
 }
 
 # The environment variables chdir() pays attention to.
-my @magic_envs = @( qw(HOME LOGDIR SYS$LOGIN) );
+my @magic_envs = @( < qw(HOME LOGDIR SYS$LOGIN) );
 
 sub check_env {
     my($key) = < @_;
@@ -148,7 +148,7 @@ WARNING
 
 my %Saved_Env = %( () );
 sub clean_env {
-    foreach my $env (< @magic_envs) {
+    foreach my $env ( @magic_envs) {
         %Saved_Env{$env} = %ENV{$env};
 
         # Can't actually delete SYS$ stuff on VMS.
@@ -169,9 +169,9 @@ sub clean_env {
 
 END {
     no warnings 'uninitialized';
-
+ <
     # Restore the environment for VMS (and doesn't hurt for anyone else)
-    %ENV{[< @magic_envs]} = %Saved_Env{[< @magic_envs]};
+    %ENV{[@(< @magic_envs)]} = < %Saved_Env{[@(< @magic_envs)]};
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.
@@ -179,7 +179,7 @@ END {
 }
 
 
-foreach my $key (< @magic_envs) {
+foreach my $key ( @magic_envs) {
     # We're going to be using undefs a lot here.
     no warnings 'uninitialized';
 

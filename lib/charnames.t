@@ -3,7 +3,7 @@
 my @WARN;
 
 BEGIN {
-    unless(grep m/blib/, < @INC) {
+    unless(grep m/blib/, @( < @INC)) {
 	chdir 't' if -d 't';
 	@INC = @( '../lib' );
 	require './test.pl';
@@ -26,28 +26,8 @@ print "ok 1\n";
 
 our ($res, $encoded_be, $encoded_alpha, $encoded_bet, $encoded_deseng);
 
-{
-  use bytes;			# TEST -utf8 can switch utf8 on
-
-  print "# \$res=$res \$\@='$@'\nnot "
-    if $res = eval <<'EOE'
-use charnames ":full";
-"Here: \N{CYRILLIC SMALL LETTER BE}!";
-1
-EOE
-      or $@->{description} !~ m/above 0xFF/;
-  print "ok 2\n";
-  # print "# \$res=$res \$\@='$@'\n";
-
-  print "# \$res=$res \$\@='$@'\nnot "
-    if $res = eval <<'EOE'
-use charnames 'cyrillic';
-"Here: \N{Be}!";
-1
-EOE
-      or $@->{description} !~ m/CYRILLIC CAPITAL LETTER BE.*above 0xFF/;
-  print "ok 3\n";
-}
+print "ok 2\n";
+print "ok 3\n";
 
 # If octal representation of unicode char is \0xyzt, then the utf8 is \3xy\2zt
 if (ord('A') == 65) { # as on ASCII or UTF-8 machines
@@ -74,7 +54,7 @@ sub to_bytes {
   print "not " unless to_bytes("\N{CYRILLIC SMALL LETTER BE}") eq $encoded_be;
   print "ok 4\n";
 
-  use charnames qw(cyrillic greek :short);
+  use charnames < qw(cyrillic greek :short);
 
   print "not " unless to_bytes("\N{be},\N{alpha},\N{hebrew:bet}")
     eq "$encoded_be,$encoded_alpha,$encoded_bet";
@@ -100,7 +80,7 @@ sub to_bytes {
 }
 
 {
-   use charnames qw(:full);
+   use charnames < qw(:full);
    use utf8;
 
     my $x = "\x{221b}";
@@ -111,7 +91,7 @@ sub to_bytes {
 }
 
 {
-   use charnames qw(:full);
+   use charnames < qw(:full);
    use utf8;
    print "not " unless "\x{100}\N{CENT SIGN}" eq "\x{100}"."\N{CENT SIGN}";
    print "ok 14\n";
@@ -226,7 +206,7 @@ print "ok 33\n";
     print "not " unless "\N{HORIZONTAL TABULATION}" eq "\t";
     print "ok 34\n";
 
-    print "not " unless grep { m/"HORIZONTAL TABULATION" is deprecated/ } < @WARN;
+    print "not " unless grep { m/"HORIZONTAL TABULATION" is deprecated/ } @( < @WARN);
     print "ok 35\n";
 
     no warnings 'deprecated';
@@ -234,7 +214,7 @@ print "ok 33\n";
     print "not " unless "\N{VERTICAL TABULATION}" eq "\013";
     print "ok 36\n";
 
-    print "not " if grep { m/"VERTICAL TABULATION" is deprecated/ } < @WARN;
+    print "not " if grep { m/"VERTICAL TABULATION" is deprecated/ } @( < @WARN);
     print "ok 37\n";
 }
 
@@ -269,27 +249,27 @@ print "ok 42\n";
 print "not " if defined charnames::viacode(0x110000);
 print "ok 45\n";
 
-print "not " if grep { m/you asked for U+110000/ } < @WARN;
+print "not " if grep { m/you asked for U+110000/ } @( < @WARN);
 print "ok 46\n";
 
 
 # ---- Alias extensions
 
 my $tmpfile = "tmp0000";
-my $alifile = File::Spec->catfile(File::Spec->updir, qw(lib unicore xyzzy_alias.pl));
+my $alifile = File::Spec->catfile(File::Spec->updir, < qw(lib unicore xyzzy_alias.pl));
 my $i = 0;
 1 while -e ++$tmpfile;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs;
 {   local $/ = undef;
-    @prgs = @( split "\n########\n", ~< *DATA );
+    @prgs = @( < split "\n########\n", ~< *DATA );
     }
 
 my $i = 46;
-for (< @prgs) {
-    my ($code, $exp) = ((split m/\nEXPECT\n/), '$');
-    my ($prog, $fil) = ((split m/\nFILE\n/, $code), "");
+for ( @prgs) {
+    my ($code, $exp) = (( <split m/\nEXPECT\n/), '$');
+    my ($prog, $fil) = (( <split m/\nFILE\n/, $code), "");
     $prog = "use utf8; " . $prog;
     open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $!";
     print $tmp $prog, "\n";

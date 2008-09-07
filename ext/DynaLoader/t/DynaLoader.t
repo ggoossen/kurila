@@ -8,7 +8,7 @@ my %modules;
 my $db_file;
 BEGIN {
     use Config;
-    foreach (qw/DB_File/) {
+    foreach (@( <qw/DB_File/)) {
         if (%Config{extensions} =~ m/\b$_\b/) {
             $db_file = $_;
             last;
@@ -27,7 +27,7 @@ BEGIN {
     'Fcntl'      => q| ::is( ref Fcntl->can('O_BINARY'),'CODE' ) |,
 );
 
-plan tests => 22 + nelems(@(keys(%modules))) * 3;
+plan tests => 22 + nelems(@( <keys(%modules))) * 3;
 
 # Try to load the module
 use_ok( 'DynaLoader' );
@@ -98,14 +98,14 @@ SKIP: {
     # looks pretty much Unix-like.
     skip "dl_findfile test not appropriate on $^O", 1
 	unless -d '/usr' && -f '/bin/ls';
-    cmp_ok( scalar nelems @files, '+>=', 1, "array should contain one result result or more: libc => ({join ' ', <@files})" );
+    cmp_ok( scalar nelems @files, '+>=', 1, "array should contain one result result or more: libc => ({join ' ', @( <@files)})" );
 }
 
 # Now try to load well known XS modules
 my $extensions = %Config{'dynamic_ext'};
 $extensions =~ s|/|::|g;
 
-for my $module (sort keys %modules) {
+for my $module (@( <sort @( < keys %modules))) {
     SKIP: {
         if ($extensions !~ m/\b$module\b/) {
             delete(%modules{$module});
@@ -117,11 +117,11 @@ for my $module (sort keys %modules) {
 }
 
 # checking internal consistency
-is( nelems @DynaLoader::dl_librefs, nelems(@( keys %modules)), "checking number of items in \@dl_librefs" );
-is( nelems @DynaLoader::dl_modules, nelems(@( keys %modules)), "checking number of items in \@dl_modules" );
+is( nelems @DynaLoader::dl_librefs, nelems(@( < keys %modules)), "checking number of items in \@dl_librefs" );
+is( nelems @DynaLoader::dl_modules, nelems(@( < keys %modules)), "checking number of items in \@dl_modules" );
 
 my @loaded_modules = @( < @DynaLoader::dl_modules );
-for my $libref (reverse < @DynaLoader::dl_librefs) {
+for my $libref (reverse @DynaLoader::dl_librefs) {
   SKIP: {
     skip "unloading unsupported on $^O", 2 if ($^O eq 'VMS' || $^O eq 'darwin');
     my $module = pop @loaded_modules;

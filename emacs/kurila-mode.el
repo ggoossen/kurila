@@ -7077,6 +7077,7 @@ indentation and initial hashes.  Behaves usually outside of comment."
      2 3 4))
   "Alist that specifies how to match errors in perl output.")
 
+(require 'compile)
 (add-to-list 'compilation-error-regexp-alist
              '("^[^\n]* \\(file\\|at\\) \\([^ \t\n]+\\) [^\n]*line \\([0-9]+\\)\\(?: character \\([0-9]+\\)\\)?[\\., \n]"
                2 3 4))

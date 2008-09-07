@@ -85,15 +85,15 @@ my @av = @(
 );
 
 print "1.." . ((nelems @commands) * nelems @av * 2) . "\n";
-for my $cmds (< @commands) {
-    for my $args (< @av) {
+for my $cmds ( @commands) {
+    for my $args ( @av) {
 	my @all_args;
 	my @cmds = @( defined($cmds) ? (ref($cmds) ? < @$cmds : $cmds) : () );
 	my @args = @( defined($args) ? (ref($args) ? < @$args : $args) : () );
-	print "######## [{join ' ', <@cmds}]\n";
-	print "<", join('><',
+	print "######## [{join ' ', @( <@cmds)}]\n";
+	print "<", join('><', @(
 			@cmds[((nelems @cmds)-1)],
-			map { my $x = $_; $x =~ s/"//g; $x } < @args),
+			< map { my $x = $_; $x =~ s/"//g; $x } @( < @args))),
 	      ">\n";
 	if (system(< @cmds,< @args) != 0) {
 	    print "Failed, status($?)\n";
@@ -104,8 +104,8 @@ for my $cmds (< @commands) {
 	    }
 	}
 	$^D = 0;
-	my $cmdstr = join " ", map { m/\s|^$/ && !m/\"/
-				    ? qq["$_"] : $_ } < @cmds, < @args;
+	my $cmdstr = join " ", @( < map { m/\s|^$/ && !m/\"/
+				    ? qq["$_"] : $_ } @( < @cmds, < @args));
 	print "######## '$cmdstr'\n";
 	if (system($cmdstr) != 0) {
 	    print "Failed, status($?)\n";

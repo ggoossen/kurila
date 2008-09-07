@@ -2,7 +2,7 @@ package ops;
 
 our $VERSION = '1.01';
 
-use Opcode qw(opmask_add opset invert_opset);
+use Opcode < qw(opmask_add opset invert_opset);
 
 sub import {
     shift;

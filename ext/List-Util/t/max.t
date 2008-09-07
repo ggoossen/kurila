@@ -2,7 +2,7 @@
 
 use strict;
 use Test::More tests => 5;
-use List::Util qw(max);
+use List::Util < qw(max);
 
 my $v;
 
@@ -17,7 +17,7 @@ is($v, 2, '2-arg ordered');
 $v = max(2,1);
 is($v, 2, '2-arg reverse ordered');
 
-my @a = @( map { rand() } 1 .. 20 );
-my @b = @( sort { $a <+> $b } < @a );
+my @a = @( < map { rand() } @( < 1 .. 20) );
+my @b = @( < sort { $a <+> $b } @( < @a) );
 $v = max(< @a);
 is($v, @b[-1], '20-arg random order');

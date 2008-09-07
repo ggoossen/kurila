@@ -61,7 +61,7 @@ like( $mpl_out, qr/^Current package is: main$/m,
 ok( -e $makefile,       'Makefile exists' );
 
 # -M is flakey on VMS
-my $mtime = (stat($makefile))[[9]];
+my $mtime = @(stat($makefile))[9];
 cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' );
 
 END { unlink makefile_name(), makefile_backup() }
@@ -245,7 +245,7 @@ SKIP: {
 }
 
 # Test META.yml generation
-use ExtUtils::Manifest qw(maniread);
+use ExtUtils::Manifest < qw(maniread);
 
 my $distdir  = 'Big-Dummy-0.01';
 $distdir =~ s/\./_/g if $Is_VMS;
@@ -256,7 +256,7 @@ ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
 
 ok open META, "<", $meta_yml or diag $!;
-my $meta = join '', ~< \*META;
+my $meta = join '', @( ~< \*META);
 ok close META;
 
 is $meta, <<"END";

@@ -13,10 +13,10 @@ require Exporter;
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-use vars qw($VERSION @ISA @EXPORT);
+use vars < qw($VERSION @ISA @EXPORT);
 $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA          = @( qw(Exporter) );
-@EXPORT       = @( qw(&code2currency &currency2code
+@ISA          = @( < qw(Exporter) );
+@EXPORT       = @( < qw(&code2currency &currency2code
                    &all_currency_codes &all_currency_names ) );
 
 #-----------------------------------------------------------------------
@@ -85,7 +85,7 @@ sub currency2code
 #=======================================================================
 sub all_currency_codes
 {
-    return @(keys %CODES);
+    return @( <keys %CODES);
 }
 
 
@@ -96,7 +96,7 @@ sub all_currency_codes
 #=======================================================================
 sub all_currency_names
 {
-    return @(values %CODES);
+    return @( <values %CODES);
 }
 
 
@@ -113,7 +113,7 @@ sub all_currency_names
     {
         next unless m/\S/;
         chop;
-        ($code, $currency) = split(m/:/, $_, 2);
+        ($code, $currency) = < split(m/:/, $_, 2);
         %CODES{$code} = $currency;
         %CURRENCIES{lc "$currency"} = $code;
     }

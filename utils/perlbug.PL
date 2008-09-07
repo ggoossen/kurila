@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use Config;
-use File::Basename qw(&basename &dirname);
+use File::Basename < qw(&basename &dirname);
 use Cwd;
 use File::Spec::Functions;
 
@@ -27,7 +27,7 @@ open OUT, ">", "$file" or die "Can't create $file: $!";
 open PATCH_LEVEL, "<", catfile( updir, "patchlevel.h")
     or die "Can't open patchlevel.h: $!";
 
-my $patchlevel_date = (stat *PATCH_LEVEL)[[9]];
+my $patchlevel_date = @(stat *PATCH_LEVEL)[9];
 
 while ( ~< *PATCH_LEVEL) {
     last if $_ =~ m/^\s*static\s+(?:const\s+)?char.*?local_patches\[\]\s*=\s*{\s*$/;
@@ -46,8 +46,8 @@ while ( ~< *PATCH_LEVEL) {
     s/(['\\])/\\$1/g;
     push @patches, $_ unless $_ eq 'NULL';
 }
-my $patch_desc = "'" . join("',\n    '", < @patches) . "'";
-my $patch_tags = join "", map m/(\S+)/ ? "+$1 " : (), < @patches;
+my $patch_desc = "'" . join("',\n    '", @( < @patches)) . "'";
+my $patch_tags = join "", @( < map m/(\S+)/ ? "+$1 " : (), @( < @patches));
 
 close(PATCH_LEVEL) or die "Error closing patchlevel.h: $!";
 

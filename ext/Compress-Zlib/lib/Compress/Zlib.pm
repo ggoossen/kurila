@@ -4,7 +4,7 @@ package Compress::Zlib;
 require Exporter;
 use Carp ;
 use IO::Handle ;
-use Scalar::Util qw(dualvar);
+use Scalar::Util < qw(dualvar);
 
 use IO::Compress::Base::Common v2.006 ;
 use Compress::Raw::Zlib v2.006 ;
@@ -20,11 +20,11 @@ $VERSION = '2.007';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = @( qw(
+@EXPORT = @( < qw(
         deflateInit inflateInit
 
         compress uncompress
@@ -40,8 +40,8 @@ BEGIN
 }
 
 # typeglob constants.
-for my $name (qw|DEF_WBITS MAX_MEM_LEVEL MAX_WBITS OS_CODE|,
-              grep { m/^Z_/ } < @Compress::Raw::Zlib::EXPORT) {
+for my $name (@( <qw|DEF_WBITS MAX_MEM_LEVEL MAX_WBITS OS_CODE|,
+              < grep { m/^Z_/ } @( < @Compress::Raw::Zlib::EXPORT))) {
     Symbol::fetch_glob($name)->* = \&{*{Symbol::fetch_glob("Compress::Raw::Zlib::$name")}};
 }
 
@@ -296,7 +296,7 @@ sub uncompress($)
 
     if (ref @_[0] ) {
         $in = @_[0] ;
-        croak "not a scalar reference" unless ref $in eq 'SCALAR' ;
+        die "not a scalar reference" unless ref $in eq 'SCALAR' ;
     }
     else {
         $in = \@_[0] ;
@@ -375,7 +375,7 @@ sub inflateInit(@)
 package Zlib::OldDeflate ;
 
 our (@ISA);
-@ISA = @( qw(Compress::Raw::Zlib::deflateStream) );
+@ISA = @( < qw(Compress::Raw::Zlib::deflateStream) );
 
 
 sub deflate
@@ -400,7 +400,7 @@ sub flush
 package Zlib::OldInflate ;
 
 our (@ISA);
-@ISA = @( qw(Compress::Raw::Zlib::inflateStream) );
+@ISA = @( < qw(Compress::Raw::Zlib::inflateStream) );
 
 sub inflate
 {

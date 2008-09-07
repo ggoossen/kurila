@@ -18,7 +18,7 @@ print < form
 	 "Index  Character     Appears in",
 	 \%(under=>"_"),
 	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
-      \@(1..nelems @name), \@name,       \@play;
+      \@( <1..nelems @name), \@name,       \@play;
 
 print "\n\n=================\n\n";
 
@@ -27,4 +27,4 @@ print < form
 	 "Index  Character     Appears in",
 	 \%(under=>"_"),
 	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
-      \@(1..nelems @name), \@name,       \@play;
+      \@( <1..nelems @name), \@name,       \@play;

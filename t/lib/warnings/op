@@ -87,20 +87,12 @@ EXPECT
 Found = in conditional, should be == at - line 3 character 14.
 ########
 # op.c
-use warnings 'void' ; close STDIN ;
-my $x = sort (2,1,3);
-no warnings 'void' ;
-$x = sort (2,1,3);
-EXPECT
-Useless use of sort in scalar context at - line 3 character 22.
-########
-# op.c
 use warnings 'void' ;
-for (<@{\@(0)}) { "$_" }		# check warning isn't duplicated
+for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 no warnings 'void' ;
-for (<@{\@(0)}) { "$_" }		# check warning isn't duplicated
+for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 EXPECT
-Useless use of string in void context at - line 3 character 19.
+Useless use of string in void context at - line 3 character 18.
 ########
 # op.c
 use warnings 'void' ;

@@ -1,4 +1,4 @@
-/*    perly.y
+ /*    perly.y
  *
  *    Copyright (c) 1991-2002, 2003, 2004, 2005, 2006 Larry Wall
  *
@@ -79,7 +79,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO NOAMP
-%token <i_tkval> ANONARY ANONHSH ANONSCALAR
+%token <i_tkval> ANONARY ANONARYL ANONHSH ANONSCALAR
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -109,6 +109,8 @@
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> '?' ':'
+%right <i_tkval> '<'
+%right ANONARYL
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -123,7 +125,7 @@
 %left ADDOP
 %left MULOP
 %left <i_tkval> MATCHOP
-%right <i_tkval> '!' '~' '<' UMINUS SREFGEN
+%right <i_tkval> '!' '~' UMINUS SREFGEN
 %right <i_tkval> POWOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
@@ -714,6 +716,11 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
                             TOKEN_GETMAD($1,$$,'o');
                             APPEND_MADPROPS_PV("listop", $$, '>');
 			}
+        |       ANONARYL listexpr  /* @: ... */
+                        {
+                            $$ = newANONLIST($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+			}
 	|	FUNC '(' listexprcom ')'             /* print (@args) */
                         { 
                             $$ = convert(IVAL($1), 0, $3, LOCATION($1));
@@ -791,7 +798,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			{ $$ = prepend_elem(OP_HSLICE,
 				newOP(OP_PUSHMARK, 0, LOCATION($3)),
                                 newLISTOP(OP_HSLICE, 0,
-                                    list($4),
+                                    scalar($4),
                                     ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3)));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
@@ -804,7 +811,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			{ $$ = prepend_elem(OP_ASLICE,
 				newOP(OP_PUSHMARK, 0, LOCATION($3)),
 				    newLISTOP(OP_ASLICE, 0,
-					list($4),
+					scalar($4),
 					ref(newAVREF($1, LOCATION($2)), OP_ASLICE), LOCATION($3)));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
@@ -815,13 +822,24 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			{ $$ = prepend_elem(OP_HSLICE,
 				newOP(OP_PUSHMARK, 0, LOCATION($2)),
 				    newLISTOP(OP_HSLICE, 0,
-					list($3),
+					scalar($3),
 					ref($1, OP_HSLICE), LOCATION($2)));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,';');
 			  TOKEN_GETMAD($6,$$,'}');
+			}
+	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
+			{ $$ = prepend_elem(OP_ASLICE,
+				newOP(OP_PUSHMARK, 0, LOCATION($2)),
+				    newLISTOP(OP_ASLICE, 0,
+					scalar($3),
+					ref($1, OP_HSLICE), LOCATION($2)));
+			    PL_parser->expect = XOPERATOR;
+			  TOKEN_GETMAD($2,$$,'[');
+			  TOKEN_GETMAD($4,$$,'j');
+			  TOKEN_GETMAD($5,$$,']');
 			}
 	|	term '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
                         { $$ = newBINOP(OP_HELEM, 0, $1, scalar($3), LOCATION($2));
@@ -854,22 +872,6 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'(');
 			  TOKEN_GETMAD($5,$$,')');
-			}
-	|	'(' expr ')' ASLICE expr ']' ']'            /* list slice */
-			{ $$ = newSLICEOP(0, $5, $2);
-			  TOKEN_GETMAD($1,$$,'(');
-			  TOKEN_GETMAD($3,$$,')');
-			  TOKEN_GETMAD($4,$$,'[');
-			  TOKEN_GETMAD($6,$$,'j');
-			  TOKEN_GETMAD($7,$$,']');
-			}
-	|	'(' ')' ASLICE expr ']' ']'                 /* empty list slice! */
-			{ $$ = newSLICEOP(0, $4, (OP*)NULL);
-			  TOKEN_GETMAD($1,$$,'(');
-			  TOKEN_GETMAD($2,$$,')');
-			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,'j');
-			  TOKEN_GETMAD($6,$$,']');
 			}
     ;
 
@@ -1124,16 +1126,6 @@ term	:	termbinop
 			{ $$ = $1; }
 	|       subscripted
 			{ $$ = $1; }
-	|	ary ASLICE expr ']' ']'                     /* array slice */
-			{ $$ = prepend_elem(OP_ASLICE,
-                                newOP(OP_PUSHMARK, 0, LOCATION($2)),
-                                            newLISTOP(OP_ASLICE, 0,
-                                                      list($3),
-                                                      $1, LOCATION($2)));
-			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,']');
-			}
 	|	THING	%prec '('
 			{ $$ = $1; }
 	|	amper                                /* &foo; */

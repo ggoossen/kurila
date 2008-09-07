@@ -6,10 +6,10 @@
 
 package IPC::Semaphore;
 
-use IPC::SysV qw(GETNCNT GETZCNT GETVAL SETVAL GETPID GETALL SETALL
+use IPC::SysV < qw(GETNCNT GETZCNT GETVAL SETVAL GETPID GETALL SETALL
 		 IPC_STAT IPC_SET IPC_RMID);
 use strict;
-use vars qw($VERSION);
+use vars < qw($VERSION);
 use Carp;
 
 $VERSION = "1.02";
@@ -18,7 +18,7 @@ $VERSION = eval $VERSION;
 {
     package IPC::Semaphore::stat;
 
-    use Class::Struct qw(struct);
+    use Class::Struct < qw(struct);
 
     struct 'IPC::Semaphore::stat' => \@(
 	uid	=> '$',
@@ -50,7 +50,7 @@ sub id {
 
 sub remove {
     my $self = shift;
-    (semctl($$self,0,IPC_RMID,0), undef $$self)[[0]];
+    @(semctl($$self,0,IPC_RMID,0), undef $$self)[0];
 }
 
 sub getncnt {

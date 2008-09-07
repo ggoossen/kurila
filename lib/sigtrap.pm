@@ -27,16 +27,16 @@ sub import {
 	    }
 	}
 	elsif ($_ eq 'normal-signals') {
-	    unshift @_, grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
+	    unshift @_, < grep(exists %SIG{$_}, @( < qw(HUP INT PIPE TERM)));
 	}
 	elsif ($_ eq 'error-signals') {
-	    unshift @_, grep(exists %SIG{$_},
-			     qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
+	    unshift @_, < grep(exists %SIG{$_}, @( <
+			     qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP)));
 	}
 	elsif ($_ eq 'old-interface-signals') {
 	    unshift @_,
-	    grep(exists %SIG{$_},
-		 qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
+	    < grep(exists %SIG{$_}, @( <
+		 qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP)));
 	}
     	elsif ($_ eq 'stack-trace') {
 	    $handler = \&handler_traceback;
@@ -68,7 +68,7 @@ sub import {
 	}
     }
     unless ($saw_sig) {
-	@_ = @( qw(old-interface-signals) );
+	@_ = @( < qw(old-interface-signals) );
 	goto Arg_loop;
     }
 }
@@ -93,7 +93,7 @@ sub handler_traceback {
     # Now go for broke.
     for (my $i = 1; my ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i); $i++) {
         my @a = @( () );
-	for (< @DB::args) {
+	for ( @DB::args) {
 	    s/([\'\\])/\\$1/g;
 	    s/([^\0]*)/'$1'/
 	      unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
@@ -102,7 +102,7 @@ sub handler_traceback {
 	    push(@a, $_);
 	}
 	$w = $w ? '@ = ' : '$ = ';
-	$a = $h ? '(' . join(', ', < @a) . ')' : '';
+	$a = $h ? '(' . join(', ', @( < @a)) . ')' : '';
 	$e =~ s/\n\s*\;\s*\Z// if $e;
 	$e =~ s/[\\\']/\\$1/g if $e;
 	if ($r) {

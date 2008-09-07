@@ -1607,7 +1607,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		else {
 		    ++s;
 		    opts_prog = Perl_newSVpvf(aTHX_
-					      "Config::config_vars(qw%c%s%c)",
+					      "Config::config_vars(<qw%c%s%c)",
 					      0, s, 0);
 		    s += strlen(s);
 		}
@@ -2771,7 +2771,7 @@ Perl_moreswitches(pTHX_ const char *s)
 		sv_catpvn(sv, start, s-start);
 		/* Don't use NUL as q// delimiter here, this string goes in the
 		 * environment. */
-		Perl_sv_catpvf(aTHX_ sv, " split(m/,/,q{%s});", ++s);
+		Perl_sv_catpvf(aTHX_ sv, " < split(m/,/,q{%s});", ++s);
 	    }
 	    s = end;
 	    my_setenv("PERL5DB", SvPV_nolen_const(sv));
@@ -2913,7 +2913,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	    } else {
 		sv_catpvn(sv, start, s-start);
 		/* Use NUL as q''-delimiter.  */
-		sv_catpvs(sv, " split(m/,/,q\0");
+		sv_catpvs(sv, " < split(m/,/,q\0");
 		++s;
 		sv_catpvn(sv, s, end - s);
 		sv_catpvs(sv,  "\0)");

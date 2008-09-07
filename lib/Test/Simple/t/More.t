@@ -3,7 +3,7 @@
 BEGIN {
     if( %ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = @( qw(../lib lib) );
+        @INC = @( < qw(../lib lib) );
     }
 }
 
@@ -34,12 +34,12 @@ unlike("fbar", '/^bar/',    'unlike bar');
 unlike("FooBle", '/foo/',   'foo is unlike FooBle');
 unlike("/var/local/pr0n/", '/^\/usr\/local/','regexes with slashes in unlike' );
 
-my @foo = @( qw(foo bar baz) );
+my @foo = @( < qw(foo bar baz) );
 unlike((nelems @foo), '/foo/');
 
-can_ok('Test::More', qw(require_ok use_ok ok is isnt like skip can_ok
+can_ok('Test::More', < qw(require_ok use_ok ok is isnt like skip can_ok
                         pass fail eq_array eq_hash eq_set));
-can_ok(bless(\%(), "Test::More"), qw(require_ok use_ok ok is isnt like skip 
+can_ok(bless(\%(), "Test::More"), < qw(require_ok use_ok ok is isnt like skip 
                                    can_ok pass fail eq_array eq_hash eq_set));
 
 
@@ -66,7 +66,7 @@ isa_ok(\42, 'SCALAR');
 
 pass('pass() passed');
 
-ok( eq_array(\@(qw(this that whatever)), \@(qw(this that whatever))),
+ok( eq_array(\@( <qw(this that whatever)), \@( <qw(this that whatever))),
     'eq_array with simple arrays' );
 is( (nelems @Test::More::Data_Stack), 0, '@Data_Stack not holding onto things');
 
@@ -74,23 +74,23 @@ ok( eq_hash(\%( foo => 42, bar => 23 ), \%(bar => 23, foo => 42)),
     'eq_hash with simple hashes' );
 is( (nelems @Test::More::Data_Stack), 0);
 
-ok( eq_set(\@(qw(this that whatever)), \@(qw(that whatever this))),
+ok( eq_set(\@( <qw(this that whatever)), \@( <qw(that whatever this))),
     'eq_set with simple sets' );
 is( (nelems @Test::More::Data_Stack), 0);
 
 my @complex_array1 = @(
-                      \@(qw(this that whatever)),
+                      \@( <qw(this that whatever)),
                       \%(foo => 23, bar => 42),
                       "moo",
                       "yarrow",
-                      \@(qw(498 10 29)),
+                      \@( <qw(498 10 29)),
                      );
 my @complex_array2 = @(
-                      \@(qw(this that whatever)),
+                      \@( <qw(this that whatever)),
                       \%(foo => 23, bar => 42),
                       "moo",
                       "yarrow",
-                      \@(qw(498 10 29)),
+                      \@( <qw(498 10 29)),
                      );
 
 is_deeply( \@complex_array1, \@complex_array2,    'is_deeply with arrays' );
@@ -99,9 +99,9 @@ ok( eq_array(\@complex_array1, \@complex_array2),
 ok( eq_set(\@complex_array1, \@complex_array2),
     'eq_set with complicated arrays' );
 
-my @array1 = @(qw(this that whatever),
+my @array1 = @( <qw(this that whatever),
               \%(foo => 23, bar => 42) );
-my @array2 = @(qw(this that whatever),
+my @array2 = @( <qw(this that whatever),
               \%(foo => 24, bar => 42) );
 
 ok( !eq_array(\@array1, \@array2),
@@ -113,11 +113,11 @@ ok( !eq_set(\@array1, \@array2),
 is( (nelems @Test::More::Data_Stack), 0);
 
 my %hash1 = %( foo => 23,
-              bar => \@(qw(this that whatever)),
+              bar => \@( <qw(this that whatever)),
               har => \%( foo => 24, bar => 42 ),
             );
 my %hash2 = %( foo => 23,
-              bar => \@(qw(this that whatever)),
+              bar => \@( <qw(this that whatever)),
               har => \%( foo => 24, bar => 42 ),
             );
 
@@ -125,11 +125,11 @@ is_deeply( \%hash1, \%hash2,    'is_deeply with complicated hashes' );
 ok( eq_hash(\%hash1, \%hash2),  'eq_hash with complicated hashes');
 
 %hash1 = %( foo => 23,
-           bar => \@(qw(this that whatever)),
+           bar => \@( <qw(this that whatever)),
            har => \%( foo => 24, bar => 42 ),
          );
 %hash2 = %( foo => 23,
-           bar => \@(qw(this tha whatever)),
+           bar => \@( <qw(this tha whatever)),
            har => \%( foo => 24, bar => 42 ),
          );
 

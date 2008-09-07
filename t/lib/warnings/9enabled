@@ -406,7 +406,7 @@ use warnings 'misc' ;
 sub check { warnings::warn("io", "hello") }
 1;
 --FILE--
-use warnings qw( FATAL deprecated ) ;
+use warnings < qw( FATAL deprecated ) ;
 use abc;
 try { 
     abc::check() ; 
@@ -426,7 +426,7 @@ use warnings 'misc' ;
 sub check { warnings::warn("io", "hello") }
 1;
 --FILE--
-use warnings qw( FATAL io ) ;
+use warnings < qw( FATAL io ) ;
 use abc;
 try { 
   abc::check() ; 
@@ -704,7 +704,7 @@ sub check { warnings::warn("hello") }
 1;
 --FILE--
 use abc;
-use warnings qw( FATAL deprecated ) ;
+use warnings < qw( FATAL deprecated ) ;
 try {
     abc::check() ; 
   } ;
@@ -724,7 +724,7 @@ sub check { warnings::warn("hello") }
 1;
 --FILE--
 use abc;
-use warnings qw( FATAL abc ) ;
+use warnings < qw( FATAL abc ) ;
 try { 
   abc::check() ; 
   } ;

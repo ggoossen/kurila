@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::PL_FILES;
 
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 require Exporter;
-our @EXPORT = @( qw(setup teardown) );
+our @EXPORT = @( < qw(setup teardown) );
 
 use strict;
 use File::Path;
@@ -18,7 +18,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME     => 'PL_FILES::Module',
     PL_FILES => \%( 'single.PL' => 'single.out',
-                    'multi.PL'  => \@(qw(1.out 2.out)),
+                    'multi.PL'  => \qw(1.out 2.out),
                     'Bar_pm.PL' => '$(INST_LIB)/PL/Bar.pm',
     )
 );
@@ -47,7 +47,7 @@ die unless PL::Foo::bar() == 42;
 
 # Had a bug where PL_FILES weren't sent the file to generate
 die "argv empty\n" unless @ARGV;
-die "too many in argv: {join ' ', <@ARGV}\n" unless nelems @ARGV == 1;
+die "too many in argv: {join ' ', @ARGV}\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
 open OUT, ">", "$file" or die $!;
@@ -93,7 +93,7 @@ sub setup {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;
@@ -106,7 +106,7 @@ sub setup {
 }
 
 sub teardown { 
-    foreach my $file (keys %Files) {
+    foreach my $file (@( <keys %Files)) {
         my $dir = dirname($file);
         if( -e $dir ) {
             rmtree($dir) || return;

@@ -53,7 +53,7 @@ NOTICE
 }
 
 # detect when being built in Perl core
-if (not grep { $_ eq 'PERL_CORE=1' } < @ARGV) {
+if (not grep { $_ eq 'PERL_CORE=1' } @( < @ARGV)) {
     push @extra_params, 
         DEFINE      => '-DUSE_PPPORT_H';
 }
@@ -108,12 +108,12 @@ else {
 # if possible, generate the code that handles the constants with 
 # ExtUtils::Constant, otherwise use cached copy in fallback/
 if(try {require ExtUtils::Constant; 1}) {
-    my @levels = @( qw(
+    my @levels = @( < qw(
         LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
         LOG_INFO LOG_NOTICE LOG_WARNING
     ) );
 
-    my @facilities = @(
+    my @facilities = @( <
         # standard facilities
         qw(
             LOG_AUTH LOG_AUTHPRIV LOG_CRON LOG_DAEMON LOG_FTP LOG_KERN
@@ -136,11 +136,11 @@ if(try {require ExtUtils::Constant; 1}) {
         \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
     );
 
-    my @options = @( qw(
+    my @options = @( < qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
     ) );
 
-    my @others_macros = @(
+    my @others_macros = @( <
         qw(LOG_FACMASK),
         \%( name => "_PATH_LOG", type => "PV", default => \@( "PV", qq("$_PATH_LOG") ) ),
         \%( name => "LOG_PRIMASK",     type => "IV", default => \@( "IV", 7) ),
@@ -153,13 +153,13 @@ if(try {require ExtUtils::Constant; 1}) {
         NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
     );
 
-    my @names = @( map { ref $_ ? $_->{name} : $_ } < @levels, < @facilities, < @options );
+    my @names = @( < map { ref $_ ? $_->{name} : $_ } @( < @levels, < @facilities, < @options) );
     open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $!\n";
-    print MACROS join $/, < @names;
+    print MACROS join $/, @( < @names);
     close(MACROS);
 }
 else {
-    foreach my $file ('const-c.inc', 'const-xs.inc') {
+    foreach my $file (@('const-c.inc', 'const-xs.inc')) {
         my $fallback = File::Spec->catfile('fallback', $file);
         copy($fallback, $file) or die "fatal: Can't copy $fallback to $file: $!";
     }

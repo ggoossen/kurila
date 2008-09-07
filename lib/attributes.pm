@@ -2,7 +2,7 @@ package attributes;
 
 our $VERSION = 0.08;
 
-our @EXPORT_OK = @( qw(get reftype) );
+our @EXPORT_OK = @( < qw(get reftype) );
 our @EXPORT = @( () );
 our %EXPORT_TAGS = %(ALL => \@(< @EXPORT, < @EXPORT_OK));
 
@@ -36,15 +36,15 @@ sub import {
 	if (!nelems @badattrs && nelems @pkgattrs) {
             require warnings;
 	    return unless warnings::enabled('reserved');
-	    @pkgattrs = @( grep { m/\A[[:lower:]]+(?:\z|\()/ } < @pkgattrs );
+	    @pkgattrs = @( < grep { m/\A[[:lower:]]+(?:\z|\()/ } @( < @pkgattrs) );
 	    if ((nelems @pkgattrs)) {
-		for my $attr (< @pkgattrs) {
+		for my $attr ( @pkgattrs) {
 		    $attr =~ s/\(.+\z//s;
 		}
 		my $s = (((nelems @pkgattrs) == 1) ? '' : 's');
 		warn "$svtype package attribute$s " .
 		    "may clash with future reserved word$s: " .
-		    join(' : ' , < @pkgattrs);
+		    join(' : ', @(  < @pkgattrs));
 	    }
 	}
     }
@@ -55,7 +55,7 @@ sub import {
 	die "Invalid $svtype attribute" .
 	    (( (nelems @badattrs) == 1 ) ? '' : 's') .
 	    ": " .
-	    join(' : ', < @badattrs);
+	    join(' : ', @( < @badattrs));
     }
 }
 

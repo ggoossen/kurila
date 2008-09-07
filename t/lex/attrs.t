@@ -97,10 +97,10 @@ sub X::foo { 1 }
 
 eval 'package Z; sub Y::baz : locked {}'; die if $@;
 my @attrs = eval 'attributes::get \&Y::baz';
-is "{join ' ', <@attrs}", "locked";
+is "{join ' ', @( <@attrs)}", "locked";
 
 @attrs = eval 'attributes::get $anon1'; die if $@;
-is "{join ' ', <@attrs}", "locked method", " # TODO";
+is "{join ' ', @( <@attrs)}", "locked method", " # TODO";
 
 sub Z::DESTROY { }
 sub Z::FETCH_CODE_ATTRIBUTES { return 'Z' }
@@ -108,7 +108,7 @@ my $thunk = eval 'bless +sub : method locked { 1 }, "Z"';
 is ref($thunk), "Z";
 
 @attrs = eval 'attributes::get $thunk'; die if $@;
-is "{join ' ', <@attrs}", "locked method Z", " # TODO";
+is "{join ' ', @( <@attrs)}", "locked method Z", " # TODO";
 
 # bug #15898
 eval 'our ${""} : foo = 1';
@@ -117,18 +117,18 @@ eval 'my $$foo : bar = 1';
 like $@->message, qr/Can't declare scalar dereference in "my"/;
 
 
-my @code = @( qw(locked method) );
-my @other = @( qw(shared unique) );
+my @code = @( < qw(locked method) );
+my @other = @( < qw(shared unique) );
 my %valid;
-%valid{CODE} = \%(map {$_ => 1} < @code);
-%valid{SCALAR} = \%(map {$_ => 1} < @other);
+%valid{CODE} = \%(< map {$_ => 1} @( < @code));
+%valid{SCALAR} = \%(< map {$_ => 1} @( < @other));
 %valid{ARRAY} = %valid{HASH} = %valid{SCALAR};
 
 our ($scalar, @array, %hash);
-foreach my $value (\$scalar, \@array, \%hash) {
+foreach my $value (@(\$scalar, \@array, \%hash)) {
     my $type = ref $value;
-    foreach my $negate ('', '-') {
-	foreach my $attr (< @code, < @other) {
+    foreach my $negate (@('', '-')) {
+	foreach my $attr ( @( < @code, < @other )) {
 	    my $attribute = $negate . $attr;
 	    eval "use attributes __PACKAGE__, \$value, '$attribute'";
 	    if (%valid{$type}->{$attr}) {

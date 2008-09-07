@@ -11,7 +11,7 @@ select(STDOUT); $| = 1;
 print "1..10\n";
 
 use IO::Handle;
-use IO::Poll qw(/POLL/);
+use IO::Poll < qw(/POLL/);
 
 my $poll = IO::Poll->new();
 

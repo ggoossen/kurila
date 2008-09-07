@@ -2,7 +2,7 @@
 
 use strict ;
 use warnings ;
-use IO::Compress::Gzip qw(gzip $GzipError);
+use IO::Compress::Gzip < qw(gzip $GzipError);
 
 gzip '-' => '-', Minimal => 1
   or die "gzstream: $GzipError\n" ;

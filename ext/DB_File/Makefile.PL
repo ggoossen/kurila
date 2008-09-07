@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use ExtUtils::MakeMaker ;
-use ExtUtils::Constant qw(WriteConstants);
+use ExtUtils::Constant < qw(WriteConstants);
 use Config ;
 
 # OS2 is a special case, so check for it now.
@@ -30,7 +30,7 @@ WriteMakefile(
 	'clean'		=> \%(FILES => 'constants.h constants.xs'),
 	);
 
-my @names = @( qw(
+my @names = @( < qw(
 	BTREEMAGIC
 	BTREEVERSION
 	DB_LOCK
@@ -62,11 +62,11 @@ my @names = @( qw(
 	) );
 
     # Check the constants above all appear in @EXPORT in DB_File.pm
-    my %names = %( map { $_, 1} < @names );
+    my %names = %( < map { $_, 1} @( < @names) );
     open F, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $!\n";
     while ( ~< *F)
     {
-        last if m/^\s*\@EXPORT\s+=\s+ \@\( \s+ qw\(/x ;
+        last if m/^\s*\@EXPORT\s+=\s+ qw\(/x ;
     }
 
     while ( ~< *F)
@@ -79,7 +79,7 @@ my @names = @( qw(
 
     if ( %names )
     {
-        my $missing = join ("\n\t", sort keys %names) ;
+        my $missing = join ("\n\t", @( < sort @( < keys %names))) ;
         die "The following names are missing from \@EXPORT in DB_File.pm\n" .
             "\t$missing\n" ;
     }

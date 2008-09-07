@@ -63,7 +63,7 @@ sub CLEAR {
 
 sub FETCH {
     local($self,$key) = < @_;
-    local($klen, $vlen, $tsize, $rlen) = @$self[[1..4]];
+    local($klen, $vlen, $tsize, $rlen) = < @$self[[@( <1..4)]];
     &hashkey;
     for (;;) {
 	$offset = $hash * $rlen;
@@ -82,7 +82,7 @@ sub FETCH {
 
 sub STORE {
     local($self,$key,$val) = < @_;
-    local($klen, $vlen, $tsize, $rlen) = @$self[[1..4]];
+    local($klen, $vlen, $tsize, $rlen) = < @$self[[@( <1..4)]];
     die("Table is full ($tsize->[0] elements)") if @$self[5] +> $tsize->[0];
     die(qq/Value "$val" is not $vlen characters long/)
 	if length($val) != $vlen;
@@ -115,7 +115,7 @@ sub STORE {
 
 sub DELETE {
     local($self,$key) = < @_;
-    local($klen, $vlen, $tsize, $rlen) = @$self[[1..4]];
+    local($klen, $vlen, $tsize, $rlen) = < @$self[[@( <1..4)]];
     &hashkey;
     for (;;) {
 	$offset = $hash * $rlen;
@@ -142,7 +142,7 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
     local($self) = < @_;
-    local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = @$self[[1..6]];
+    local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = < @$self[[@( <1..6)]];
     for (++$iterix; $iterix +< $tsize->[1]; ++$iterix) {
 	next unless substr(@$self[0], $iterix * $rlen, 1) eq "\2";
 	@$self[6] = $iterix;
@@ -160,7 +160,7 @@ sub hashkey {
     die(qq/Key "$key" is not $klen characters long/)
 	if length($key) != $klen;
     $hash = 2;
-    for (unpack('C*', $key)) {
+    for (@(unpack('C*', $key))) {
 	$hash = $hash * 33 + $_;
 	&_hashwrap if $hash +>= 1e13;
     }

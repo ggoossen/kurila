@@ -13,13 +13,13 @@ $| = 1;
 umask 0;
 $xref = \ "";
 $runme = $^X;
-@a = @(1..5);
-%h = %(1..6);
+@a = @( <1..5);
+%h = %( <1..6);
 $aref = \@a;
 $href = \%h;
 open OP, '-|', qq{$runme -le "print 'aaa Ok ok' for 1..100"};
 $chopit = 'aaaaaa';
-@chopar = @(113 .. 119);
+@chopar = @( <113 .. 119);
 $posstr = '123456';
 $cstr = 'aBcD.eF';
 pos $posstr = 3;
@@ -27,11 +27,11 @@ $nn = $n = 2;
 sub subb {"in s"}
 
 @INPUT = @( ~< *DATA );
-@simple_input = @( grep m/^\s*\w+\s*\$\w+\s*[#\n]/, < @INPUT );
+@simple_input = @( < grep m/^\s*\w+\s*\$\w+\s*[#\n]/, @( < @INPUT) );
 
 plan 6 + (nelems @INPUT) + nelems @simple_input;
 
-sub wrn {"{join ' ', <@_}"}
+sub wrn {"{join ' ', @( <@_)}"}
 
 # Check correct optimization of ucfirst etc
 my $a = "AB";
@@ -64,7 +64,7 @@ $zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 1 + $zzzz;
 ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
     "$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13" );
 
-for (< @INPUT) {
+for ( @INPUT) {
  SKIP: {
     ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
     $comment = $op unless defined $comment;
@@ -96,7 +96,7 @@ EOE
   }
 }
 
-for (< @simple_input) {
+for ( @simple_input) {
  SKIP:
  {
   ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
@@ -212,10 +212,10 @@ quotemeta $cstr			# quotemeta
 (each %h) % 2 == 1		# each
 nkeys %h				# nkeys
 pack "C2", $n,$n		# pack
-join "a"; @a			# join
+join "a", @a			# join
 push @a,3==6			# push
 unshift @aaa			# unshift
-grep $_, 1,0,2,0,3		# grepwhile
+'???'		# grepwhile
 subb()				# entersub
 caller				# caller
 '???'                           # warn

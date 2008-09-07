@@ -3,8 +3,8 @@ use strict;
 use utf8;
 use charnames ':full';
 
-use Test;
-BEGIN { plan tests => 26 };
+use Test::More;
+plan tests => 26;
 use Pod::Simple::TextContent;
 use Pod::Simple::Text;
 
@@ -32,12 +32,12 @@ sub source_path {
 
 my $outfile = '10000';
 
-foreach my $file (
+foreach my $file (@(
   "junk1.pod",
   "junk2.pod",
   "perlcyg.pod",
   "perlfaq.pod",
-  "perlvar.pod",
+  "perlvar.pod",)
 ) {
 
   unless(-e source_path($file)) {
@@ -56,7 +56,7 @@ foreach my $file (
   }
   
   print "#\n#\n#\n###################\n# $file\n";
-  foreach my $class ('Pod::Simple::TextContent', 'Pod::Simple::Text') {
+  foreach my $class (@('Pod::Simple::TextContent', 'Pod::Simple::Text')) {
     my $p = $class->new;
     push @out, '';
     $p->output_string(\@out[-1]);
@@ -76,11 +76,11 @@ foreach my $file (
   close(IN);
   print "#   ", length(@out[-1]), " bytes pulled in.\n";
   
-  @out = @( map {
-               join '', pack("U*", unpack("C*", $_)) # latin1 decode.
-             } < @out ); 
+  @out = @( < map {
+               join '', @( pack("U*", unpack("C*", $_))) # latin1 decode.
+             } @( < @out) ); 
 
-  for (< @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
+  for ( @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 
   my $faily = 0;
   print "#\n#Now comparing 1 and 2...\n";
@@ -93,16 +93,16 @@ foreach my $file (
   if($faily) {
     ++$outfile;
     
-    my @outnames = @( map $outfile . $_ , qw(0 1) );
+    my @outnames = @( < map $outfile . $_, @(  < qw(0 1)) );
     open(OUT2, ">", "@outnames[0].~out.txt") || die "Can't write-open @outnames[0].txt: $!";
 
-    foreach my $out (< @out) { push @outnames, @outnames[-1];  ++@outnames[-1] };
+    foreach my $out ( @out) { push @outnames, @outnames[-1];  ++@outnames[-1] };
     pop @outnames;
     printf "# Writing to \%s.txt .. \%s.txt\n", @outnames[0], @outnames[-1];
     shift @outnames;
     
     binmode(OUT2);
-    foreach my $out (< @out) {
+    foreach my $out ( @out) {
       my $outname = shift @outnames;
       open(OUT, ">", "$outname.txt") || die "Can't write-open $outname.txt: $!";
       binmode(OUT);
@@ -126,7 +126,7 @@ sub compare2 {
     ok 1;
     return 0;
   } elsif( do{
-    for (@out[0], @out[1]) { s/[ ]//g; };
+    for (@(@out[0], @out[1])) { s/[ ]//g; };
     @out[0] eq @out[1];
   }){
     print "# Differ only in whitespace.\n";

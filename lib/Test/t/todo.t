@@ -1,6 +1,6 @@
 # -*-perl-*-
 use strict;
-use Test qw(:DEFAULT $TESTOUT $TESTERR $ntest);
+use Test < qw(:DEFAULT $TESTOUT $TESTERR $ntest);
 
 ### This test is crafted in such a way as to prevent Test::Harness from
 ### seeing the todo tests, otherwise you get people sending in bug reports
@@ -10,7 +10,7 @@ open F, ">", "todo";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 my $tests = 5; 
-plan tests => $tests, todo => \@(2..$tests); 
+plan tests => $tests, todo => \@( <2..$tests); 
 
 
 # tests to go to the output file
@@ -26,7 +26,7 @@ $TESTERR = *STDERR{IO};
 $ntest = 1;
 
 open F, "<", "todo";
-my $out = join '', ~< *F;
+my $out = join '', @( ~< *F);
 close F;
 unlink "todo";
 

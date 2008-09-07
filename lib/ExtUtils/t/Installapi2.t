@@ -22,7 +22,7 @@ use MakeMaker::Test::Setup::BFD;
 BEGIN { use_ok('ExtUtils::Install') }
 
 # Check exports.
-foreach my $func (qw(install uninstall pm_to_blib install_default)) {
+foreach my $func (@( <qw(install uninstall pm_to_blib install_default))) {
     can_ok(__PACKAGE__, $func);
 }
 
@@ -82,14 +82,14 @@ ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
 open(my $packlist, '<', 'install-test/packlist' ) or die;
-my %packlist = %( map { chomp;  ($_ => 1) } ~< $packlist );
+my %packlist = %( < map { chomp;  ($_ => 1) } @( ~< $packlist) );
 close $packlist or die;
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
 # be lowercase. :(
-my $native_dummy = File::Spec->catfile(qw(install-test lib perl Big Dummy.pm));
+my $native_dummy = File::Spec->catfile( <qw(install-test lib perl Big Dummy.pm));
 is( nkeys %packlist, 1 );
-is( lc((keys %packlist)[[0]]), lc $native_dummy, 'packlist written' );
+is( lc((keys %packlist)[0]), lc $native_dummy, 'packlist written' );
 
 
 # Test UNINST=1 preserving same versions in other dirs.
@@ -198,7 +198,7 @@ close DUMMY;
   ok(-r $tfile,"install file already exists");
   ok(-r $sfile,"source file already exists");
   utime time-600, time-600, $sfile or die "utime '$sfile' failed:$!";   
-  ok( (stat $tfile)[[9]]!=(stat $sfile)[[9]],'  Times are different');
+  ok( @(stat $tfile)[9]!=@(stat $sfile)[9],'  Times are different');
   install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
@@ -206,7 +206,7 @@ close DUMMY;
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
-  ok( (stat $tfile)[[9]]==(stat$sfile)[[9]],'  Times are same');
+  ok( @(stat $tfile)[9]==@(stat$sfile)[9],'  Times are same');
   ok( !%result{install_unchanged},'  $result{install_unchanged} should be empty');
 }
 # Test nothing is copied.
@@ -219,7 +219,7 @@ close DUMMY;
   ok(-r $tfile,"install file already exists");
   ok(-r $sfile,"source file already exists");
   utime time-1200, time-1200, $sfile or die "utime '$sfile' failed:$!";   
-  ok( (stat $tfile)[[9]]!=(stat $sfile)[[9]],'  Times are different');
+  ok( @(stat $tfile)[9]!=@(stat $sfile)[9],'  Times are different');
   install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
@@ -227,7 +227,7 @@ close DUMMY;
   ok( -d 'install-test/other_lib/perl',        'install made other dir' );
   ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
   ok( -r 'install-test/packlist',              '  packlist exists' );
-  ok( (stat $tfile)[[9]]!=(stat$sfile)[[9]],'  Times are different');
+  ok( @(stat $tfile)[9]!=@(stat$sfile)[9],'  Times are different');
   ok( !%result{install},'  nothing should have been installed');
   ok( %result{install_unchanged},'  install_unchanged should be populated');
 }

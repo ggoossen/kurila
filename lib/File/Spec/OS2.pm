@@ -1,12 +1,12 @@
 package File::Spec::OS2;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @( qw(File::Spec::Unix) );
+@ISA = @( < qw(File::Spec::Unix) );
 
 sub devnull {
     return "/dev/nul";
@@ -24,8 +24,8 @@ sub file_name_is_absolute {
 sub path {
     my $path = %ENV{PATH};
     $path =~ s:\\:/:g;
-    my @path = @( split(';',$path) );
-    foreach (< @path) { $_ = '.' if $_ eq '' }
+    my @path = @( < split(';',$path) );
+    foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;
 }
 
@@ -37,19 +37,19 @@ sub _cwd {
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    my @d = @( %ENV{[qw(TMPDIR TEMP TMP)]} );	# function call could autovivivy
+    my @d = @( < %ENV{[@( <qw(TMPDIR TEMP TMP))]} );	# function call could autovivivy
     $tmpdir = @_[0]->_tmpdir( < @d, '/tmp', '/'  );
 }
 
 sub catdir {
     my $self = shift;
     my @args = @( < @_ );
-    foreach (< @args) {
+    foreach ( @args) {
 	s[\\][/]g;
         # append a backslash to each argument unless it has one there
         $_ .= "/" unless m{/$};
     }
-    return $self->canonpath(join('', < @args));
+    return $self->canonpath(join('', @( < @args)));
 }
 
 sub canonpath {
@@ -100,7 +100,7 @@ sub splitpath {
 
 sub splitdir {
     my ($self,$directories) = < @_ ;
- @(    split m|[\\/]|, $directories, -1);
+ @( <    split m|[\\/]|, $directories, -1);
 }
 
 
@@ -170,8 +170,8 @@ sub abs2rel {
     }
 
     # No need to catdir, we know these are well formed.
-    $path_directories = CORE::join( '/', < @pathchunks );
-    $base_directories = CORE::join( '/', < @basechunks );
+    $path_directories = CORE::join( '/', @( < @pathchunks) );
+    $base_directories = CORE::join( '/', @( < @basechunks) );
 
     # $base_directories now contains the directories the resulting relative
     # path must ascend out of before it can descend to $path_directory.  So, 
@@ -212,7 +212,7 @@ sub rel2abs {
         }
 
         my ( $path_directories, $path_file ) =
-            ( <$self->splitpath( $path, 1 ))[[1,2]] ;
+            < ($self->splitpath( $path, 1 ))[[1..2]] ;
 
         my ( $base_volume, $base_directories ) = <
             $self->splitpath( $base, 1 ) ;

@@ -7,7 +7,7 @@ BEGIN {
 
 print "1..2\n";
 
-use FindBin qw($Bin);
+use FindBin < qw($Bin);
 
 print "# $Bin\n";
 

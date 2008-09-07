@@ -10,12 +10,12 @@ use File::Spec;
 my($blib, $blib_arch, $blib_lib, @blib_dirs);
 
 sub _cleanup {
-    rmdir foreach reverse < @_;
+    rmdir foreach reverse @_;
     unlink "stderr" unless $^O eq 'MacOS';
 }
 
 sub _mkdirs {
-    for my $dir (< @_) {
+    for my $dir (@_) {
         next if -d $dir;
         mkdir $dir or die "Can't mkdir $dir: $!" if ! -d $dir;
     }
@@ -71,7 +71,7 @@ elsif ($^O ne 'MacOS')
 }
 
 
-ok( grep(m|\Q$blib_lib\E$|, @INC[[0,1]])  == 1,     "  $blib_lib in \@INC");
-ok( grep(m|\Q$blib_arch\E$|, @INC[[0,1]]) == 1,     "  $blib_arch in \@INC");
+ok( nelems(grep(m|\Q$blib_lib\E$|, @INC[[0..1]]))  == 1,     "  $blib_lib in \@INC");
+ok( nelems(grep(m|\Q$blib_arch\E$|, @INC[[0..1]])) == 1,     "  $blib_arch in \@INC");
 
 END { _cleanup( < @blib_dirs ); }

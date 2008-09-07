@@ -1,16 +1,16 @@
 package ExtUtils::Install;
 use strict;
 
-use vars qw(@ISA @EXPORT $VERSION $MUST_REBOOT %Config);
+use vars < qw(@ISA @EXPORT $VERSION $MUST_REBOOT %Config);
 
-use Config qw(%Config);
-use Cwd qw(cwd);
+use Config < qw(%Config);
+use Cwd < qw(cwd);
 use Exporter;
 use ExtUtils::Packlist;
-use File::Basename qw(dirname);
-use File::Compare qw(compare);
+use File::Basename < qw(dirname);
+use File::Compare < qw(compare);
 use File::Copy;
-use File::Find qw(find);
+use File::Find < qw(find);
 use File::Path;
 use File::Spec;
 
@@ -112,7 +112,7 @@ my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
 
 sub _estr(@) {
-    return join "\n",'!' x 72,< @_,'!' x 72,'';
+    return join "\n", @('!' x 72,< @_,'!' x 72,'');
 }
 
 {my %warned;
@@ -304,7 +304,7 @@ sub _get_install_skip {
     if ( ! defined $skip ) {
         print "Looking for install skip list\n"
             if $verbose+>2;
-        for my $file ( 'INSTALL.SKIP', %ENV{EU_INSTALL_SITE_SKIPFILE} ) {
+        for my $file (@( 'INSTALL.SKIP', %ENV{EU_INSTALL_SITE_SKIPFILE}) ) {
             next unless $file;
             print "\tChecking for $file\n"
                 if $verbose+>2;
@@ -338,7 +338,7 @@ sub _get_install_skip {
             if $verbose+>1;
         $skip= \@();
     }
-    warn "Got {join ' ', <@{\@(0+nelems @$skip)}} skip patterns.\n"
+    warn "Got {join ' ', @( <@{\@(0+nelems @$skip)})} skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
@@ -463,7 +463,7 @@ sub _mkpath {
             _choke < @msg;
         }
     } elsif ($show and $dry_run) {
-        print "$_\n" for < @make;
+        print "$_\n" for  @make;
     }
     
 }
@@ -689,7 +689,7 @@ sub install { #XXX OS-SPECIFIC
     my $packlist = ExtUtils::Packlist->new();
 
     local(*DIR);
-    for (qw/read write/) {
+    for (@( <qw/read write/)) {
         %pack{$_}=%from_to{$_};
         delete %from_to{$_};
     }
@@ -699,7 +699,7 @@ sub install { #XXX OS-SPECIFIC
     my @found_files;
     my %check_dirs;
     
-    MOD_INSTALL: foreach my $source (sort keys %from_to) {
+    MOD_INSTALL: foreach my $source (@( <sort @( < keys %from_to))) {
         #copy the tree to the target directory without altering
         #timestamp and permission and remember for the .packlist
         #file. The packlist file contains the absolute paths of the
@@ -729,7 +729,7 @@ sub install { #XXX OS-SPECIFIC
         # File::Find seems to always be Unixy except on MacPerl :(
         my $current_directory= $Is_MacPerl ? $Curdir : '.';
         find(sub {
-            my ($mode,$size,$atime,$mtime) = (stat)[[2,7,8,9]];
+            my ($mode,$size,$atime,$mtime) = < @(stat)[[@:2,7,8,9]];
 
             return if !-f _;
             my $origfile = $_;
@@ -740,7 +740,7 @@ sub install { #XXX OS-SPECIFIC
             my $sourcedir  = File::Spec->catdir($source, $File::Find::dir);
             my $sourcefile = File::Spec->catfile($sourcedir, $origfile);
 
-            for my $pat (< @{$skip || \@()}) {
+            for my $pat ( @{$skip || \@()}) {
                 if ( $sourcefile=~m/$pat/ ) {
                     print "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;
@@ -774,10 +774,10 @@ sub install { #XXX OS-SPECIFIC
         }, $current_directory ); 
         _chdir($cwd);
     }   
-    foreach my $targetdir (sort keys %check_dirs) {
+    foreach my $targetdir (@( <sort @( < keys %check_dirs))) {
         _mkpath( $targetdir, 0, 0755, $verbose, $dry_run );
     }
-    foreach my $found (< @found_files) {
+    foreach my $found ( @found_files) {
         my ($diff, $ffd, $origfile, $mode, $size, $atime, $mtime,
             $targetdir, $targetfile, $sourcedir, $sourcefile)= < @$found;
         
@@ -1008,7 +1008,7 @@ sub uninstall {
     # my $my_req = $self->catfile(qw(auto ExtUtils Install forceunlink.al));
     # require $my_req; # Hairy, but for the first
     my $packlist = ExtUtils::Packlist->new($fil);
-    foreach (sort(keys(%$packlist))) {
+    foreach (@( <sort( @( <keys(%$packlist))))) {
         chomp;
         print "unlink $_\n" if $verbose;
         forceunlink($_,'tryhard') unless $dry_run;
@@ -1041,22 +1041,22 @@ sub inc_uninstall {
     my($filepath,$libdir,$verbose,$dry_run,$ignore,$results) = < @_;
     my($dir);
     $ignore||="";
-    my $file = ( <File::Spec->splitpath($filepath))[[2]];
+    my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
     
-    my @PERL_ENV_LIB = @( split %Config{path_sep}, defined %ENV{'PERL5LIB'}
+    my @PERL_ENV_LIB = @( < split %Config{path_sep}, defined %ENV{'PERL5LIB'}
       ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '' );
         
     my @dirs=@( < @PERL_ENV_LIB, 
-               < @INC, 
-               %Config{[qw(archlibexp
+               < @INC, < 
+               %Config{[@( <qw(archlibexp
                           privlibexp
                           sitearchexp
-                          sitelibexp)]});        
+                          sitelibexp))]});        
     
     #warn join "\n","---",@dirs,"---";
     my $seen_ours;
-    foreach $dir ( < @dirs ) {
+    foreach $dir (  @dirs ) {
         my $canonpath = File::Spec->canonpath($dir);
         next if $canonpath eq $Curdir;
         next if %seen_dir{$canonpath}++;
@@ -1209,7 +1209,7 @@ sub DESTROY {
     unless(defined $INSTALL_ROOT) {
         my $self = shift;
         my($file,$i,$plural);
-        foreach $file (sort keys %$self) {
+        foreach $file (@( <sort @( < keys %$self))) {
             $plural = (nelems @{$self->{$file}}) +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
             for (0..(nelems @{$self->{$file}})-1) {

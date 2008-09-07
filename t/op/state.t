@@ -181,7 +181,7 @@ is( pugnax(), 42, 'scalar state assignment return value' );
 
 
 
-foreach my $forbidden (~< *DATA) {
+foreach my $forbidden (@(~< *DATA)) {
     chomp $forbidden;
     eval $forbidden;
     like $@->{description}, qr/Initialization of state variables in list context currently forbidden/, "Currently forbidden: $forbidden";
@@ -211,20 +211,20 @@ foreach my $forbidden (~< *DATA) {
     };
     is $@, '', "eval f_49522";
     # shouldn't be any 'not available' or 'not stay shared' warnings
-    ok !nelems @warnings, "suppress warnings part 1 [{join ' ', <@warnings}]";
+    ok !nelems @warnings, "suppress warnings part 1 [{join ' ', @( <@warnings)}]";
 
     @warnings = @( () );
     my $f = f_49522();
     is $f->(), 88, "state var closure 1";
     is g_49522(), 88, "state var closure 2";
-    ok !nelems @warnings, "suppress warnings part 2 [{join ' ', <@warnings}]";
+    ok !nelems @warnings, "suppress warnings part 2 [{join ' ', @( <@warnings)}]";
 
 
     @warnings = @( () );
     $f = i_49522();
     h_49522(); # initialise $t
     is $f->(), 99, "state var closure 3";
-    ok !nelems @warnings, "suppress warnings part 3 [{join ' ', <@warnings}]";
+    ok !nelems @warnings, "suppress warnings part 3 [{join ' ', @( <@warnings)}]";
 
 
 }

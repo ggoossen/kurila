@@ -30,21 +30,21 @@ sub ch_index ()
 
 my %dep = %(
     # This symbol must be defined BEFORE ...
-    BYTEORDER		=> \@( qw( UVSIZE				) ),
-    LONGSIZE		=> \@( qw( BYTEORDER			) ),
-    MULTIARCH		=> \@( qw( BYTEORDER MEM_ALIGNBYTES	) ),
-    USE_CROSS_COMPILE	=> \@( qw( BYTEORDER MEM_ALIGNBYTES	) ),
-    HAS_QUAD		=> \@( qw( I64TYPE			) ),
-    HAS_GETGROUPS	=> \@( qw( Groups_t			) ),
-    HAS_SETGROUPS	=> \@( qw( Groups_t			) ),
+    BYTEORDER		=> \@( < qw( UVSIZE				) ),
+    LONGSIZE		=> \@( < qw( BYTEORDER			) ),
+    MULTIARCH		=> \@( < qw( BYTEORDER MEM_ALIGNBYTES	) ),
+    USE_CROSS_COMPILE	=> \@( < qw( BYTEORDER MEM_ALIGNBYTES	) ),
+    HAS_QUAD		=> \@( < qw( I64TYPE			) ),
+    HAS_GETGROUPS	=> \@( < qw( Groups_t			) ),
+    HAS_SETGROUPS	=> \@( < qw( Groups_t			) ),
     );
 
 my $changed;
 do {
     $changed = 0;
-    foreach my $sym (keys %dep) {
+    foreach my $sym (@( <keys %dep)) {
 	ch_index;
-	foreach my $dep (< @{%dep{$sym}}) {
+	foreach my $dep ( @{%dep{$sym}}) {
 	    print STDERR "Check if $sym\t(%ch{$sym}) precedes $dep\t(%ch{$dep})\n";
 	    %ch{$sym} +< %ch{$dep} and next;
 	    my $ch = splice @ch, %ch{$sym}, 1;
@@ -56,11 +56,11 @@ do {
     } while ($changed);
 
 # 30327
-for (grep m{echo .Extracting \$CONFIG_H} => < @ch) {
-    my $case = join "\n",
+for (@(< grep m{echo .Extracting \$CONFIG_H}, @(  < @ch))) {
+    my $case = join "\n", @(
 	qq{case "\$CONFIG_H" in},
 	qq{already-done) echo "Not re-extracting config.h" ;;},
-	qq{*)}, "";
+	qq{*)}, "");
     s{^(?=echo .Extracting)}{$case}m;
     }
 push @ch, ";;\nesac\n";

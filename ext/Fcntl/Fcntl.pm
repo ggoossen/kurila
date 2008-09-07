@@ -60,14 +60,14 @@ our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 require Exporter;
 use XSLoader ();
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 BEGIN {
   $VERSION = "1.06";
 }
 
 # Items to export into callers namespace by default
 # (move infrequently used names to @EXPORT_OK below)
-@EXPORT = @(
+@EXPORT = @( <
   qw(
 	FD_CLOEXEC
 	F_ALLOCSP
@@ -140,7 +140,7 @@ BEGIN {
      ) );
 
 # Other items we are prepared to export if requested
-@EXPORT_OK = @( qw(
+@EXPORT_OK = @( < qw(
 	DN_ACCESS
 	DN_ATTRIB
 	DN_CREATE
@@ -192,11 +192,11 @@ BEGIN {
 ) );
 # Named groups of exports
 %EXPORT_TAGS = %(
-    'flock'   => \@(qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN)),
-    'Fcompat' => \@(qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
+    'flock'   => \@( <qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN)),
+    'Fcompat' => \@( <qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
 		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC)),
-    'seek'    => \@(qw(SEEK_SET SEEK_CUR SEEK_END)),
-    'mode'    => \@(qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
+    'seek'    => \@( <qw(SEEK_SET SEEK_CUR SEEK_END)),
+    'mode'    => \@( <qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
 		     _S_IFMT S_IFREG S_IFDIR S_IFLNK
 		     S_IFSOCK S_IFBLK S_IFCHR S_IFIFO S_IFWHT S_ENFMT
 		     S_IRUSR S_IWUSR S_IXUSR S_IRWXU

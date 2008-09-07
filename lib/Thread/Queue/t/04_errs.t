@@ -12,7 +12,7 @@ use Thread::Queue;
 
 use Test::More 'tests' => 26;
 
-my $q = Thread::Queue->new(1..10);
+my $q = Thread::Queue->new( <1..10);
 ok($q, 'New queue');
 
 try { $q->dequeue(undef); };

@@ -51,8 +51,8 @@ use strict;
 use warnings;
 our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase);
 require Exporter;
-@ISA = @( qw(Exporter) );
-@EXPORT = @( qw(fileparse fileparse_set_fstype basename dirname) );
+@ISA = @( < qw(Exporter) );
+@EXPORT = @( < qw(fileparse fileparse_set_fstype basename dirname) );
 $VERSION = "2.76";
 
 fileparse_set_fstype($^O);
@@ -121,7 +121,7 @@ sub fileparse {
 
   my($dirpath, $basename);
 
-  if (grep { $type eq $_ } qw(MSDOS DOS MSWin32 Epoc)) {
+  if (grep { $type eq $_ } @( < qw(MSDOS DOS MSWin32 Epoc))) {
     ($dirpath,$basename) = ($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
     $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
   }
@@ -160,7 +160,7 @@ sub fileparse {
   my $tail   = '';
   my $suffix = '';
   if ((nelems @suffices)) {
-    foreach $suffix (< @suffices) {
+    foreach $suffix ( @suffices) {
       my $pat = ($igncase ? '(?i)' : '') . "($suffix)\$";
       if ($basename =~ s/$pat//s) {
         $taint .= substr($suffix,0,0);
@@ -217,7 +217,7 @@ sub basename {
   # character present in string (after first stripping trailing slashes)
   _strip_trailing_sep($path);
 
-  my($basename, $dirname, $suffix) = < fileparse( $path, map("\Q$_\E",< @_) );
+  my($basename, $dirname, $suffix) = < fileparse( $path, < map("\Q$_\E", @(< @_)) );
 
   # From BSD basename(1)
   # The suffix is not stripped if it is identical to the remaining 
@@ -301,7 +301,7 @@ sub dirname {
 	}
 	$dirname .= ":" unless $dirname =~ m/:\z/;
     }
-    elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
+    elsif (grep { $type eq $_ } @( < qw(MSDOS DOS MSWin32 OS2))) { 
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
 	    ($basename,$dirname) = < fileparse $dirname;
@@ -332,7 +332,7 @@ sub _strip_trailing_sep  {
     if ($type eq 'MacOS') {
         @_[0] =~ s/([^:]):\z/$1/s;
     }
-    elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
+    elsif (grep { $type eq $_ } @( < qw(MSDOS DOS MSWin32 OS2))) { 
         @_[0] =~ s/([^:])[\\\/]*\z/$1/;
     }
     else {
@@ -368,8 +368,8 @@ call only.
 
 BEGIN {
 
-my @Ignore_Case = @( qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc) );
-my @Types = @(< @Ignore_Case, qw(Unix));
+my @Ignore_Case = @( < qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc) );
+my @Types = @(< @Ignore_Case, < qw(Unix));
 
 sub fileparse_set_fstype {
     my $old = $Fileparse_fstype;
@@ -378,12 +378,12 @@ sub fileparse_set_fstype {
         my $new_type = shift;
 
         $Fileparse_fstype = 'Unix';  # default
-        foreach my $type (< @Types) {
+        foreach my $type ( @Types) {
             $Fileparse_fstype = $type if $new_type =~ m/^$type/i;
         }
 
         $Fileparse_igncase = 
-          (grep $Fileparse_fstype eq $_, < @Ignore_Case) ? 1 : 0;
+          (grep $Fileparse_fstype eq $_, @( < @Ignore_Case)) ? 1 : 0;
     }
 
     return $old;

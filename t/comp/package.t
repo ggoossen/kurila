@@ -23,9 +23,9 @@ $ABC::dyick = 6;
 
 our $xyz = 2;
 
-our $main = join(':', sort(keys %main::));
-our $xyz = join(':', sort(keys %xyz::));
-our $ABC = join(':', sort(keys %ABC::));
+our $main = join(':', @( < sort( @( <keys %main::))));
+our $xyz = join(':', @( < sort( @( <keys %xyz::))));
+our $ABC = join(':', @( < sort( @( <keys %ABC::))));
 
 print $xyz eq 'ABC:bar:main:new:xyz' ? "ok 1\n" : "not ok 1 '$xyz'\n";
 print $ABC eq 'blurfl:dyick' ? "ok 2\n" : "not ok 2 '$ABC'\n";
@@ -43,7 +43,7 @@ print $main::blurfl == 123 ? "ok 3\n" : "not ok 3\n";
 
 package main;
 
-sub c { caller(0) }
+sub c { @(caller(0)) }
 
 sub foo {
    my $s = shift;
@@ -53,4 +53,4 @@ sub foo {
    }
 }
 
-print((foo(1))[[0]] eq 'PQR' ? "ok 8\n" : "not ok 8\n");
+print(foo(1)[0] eq 'PQR' ? "ok 8\n" : "not ok 8\n");

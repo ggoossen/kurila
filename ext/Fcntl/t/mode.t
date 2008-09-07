@@ -7,7 +7,7 @@ BEGIN {
 plan tests => 2;
 
 use File::Temp;
-use Fcntl qw(:mode);
+use Fcntl < qw(:mode);
 
 my $tmpfile = File::Temp->new;
 my $mode = @(stat "$tmpfile")[2];

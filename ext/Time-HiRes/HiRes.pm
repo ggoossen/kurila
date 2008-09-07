@@ -1,15 +1,15 @@
 package Time::HiRes;
 
 use strict;
-use vars qw($VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK);
+use vars < qw($VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK);
 
 require Exporter;
 require DynaLoader;
 
-@ISA = @( qw(Exporter DynaLoader) );
+@ISA = @( < qw(Exporter DynaLoader) );
 
-@EXPORT = @( qw( ) );
-@EXPORT_OK = @( qw (usleep sleep ualarm alarm gettimeofday time tv_interval
+@EXPORT = @();
+@EXPORT_OK = @( < qw (usleep sleep ualarm alarm gettimeofday time tv_interval
 		 getitimer setitimer nanosleep clock_gettime clock_getres
 		 clock clock_nanosleep
 		 CLOCK_HIGHRES CLOCK_MONOTONIC CLOCK_PROCESS_CPUTIME_ID
@@ -28,7 +28,7 @@ $XS_VERSION = $VERSION;
 
 sub import {
     my $this = shift;
-    for my $i (< @_) {
+    for my $i (@_) {
 	if (($i eq 'clock_getres'    && !&d_clock_getres)    ||
 	    ($i eq 'clock_gettime'   && !&d_clock_gettime)   ||
 	    ($i eq 'clock_nanosleep' && !&d_clock_nanosleep) ||

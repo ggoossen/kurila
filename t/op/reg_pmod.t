@@ -18,11 +18,11 @@ our @tests = @(
 plan tests => 4 * (nelems @tests) + 2;
 my $W = "";
 
-$^WARN_HOOK = sub { $W.=join("",< @_); };
+$^WARN_HOOK = sub { $W.=join("", @(< @_)); };
 sub _u($$) { "@_[0] is ".(defined @_[1] ? "'@_[1]'" : "undef") }
 
 $_ = '123-456-789';
-foreach my $test (< @tests) {
+foreach my $test ( @tests) {
     my ($p, $pat,$l,$m,$r) = < @$test;
     my $test_name = $p eq '/p'   ? "/$pat/p"
                   : $p eq '(?p)' ? "/(?p)$pat/"

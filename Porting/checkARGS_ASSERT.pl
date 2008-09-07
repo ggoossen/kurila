@@ -25,8 +25,8 @@ while (~< *ARGV) {
 
 my %unused;
 
-foreach (keys %declared) {
+foreach (@( <keys %declared)) {
     %unused{$_}++ unless %used{$_};
 }
 
-print $_, "\n" foreach sort keys %unused;
+print $_, "\n" foreach @( < sort @( < keys %unused));

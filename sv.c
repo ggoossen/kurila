@@ -1977,7 +1977,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
 		    return SvNV(tmpstr);
 		}
 	    }
-	    return PTR2NV(SvRV(sv));
+	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 	if (SvIsCOW(sv)) {
 	    sv_force_normal_flags(sv, 0);
@@ -2120,8 +2120,8 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
 #endif /* NV_PRESERVES_UV */
     }
     else  {
-	if (isGV_with_GP(sv)) {
-	    Perl_croak(aTHX_ "Tried to use glob as number");
+	if ( SvOK(sv) ) {
+	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 
 	if (!PL_localizing && !(SvFLAGS(sv) & SVs_PADTMP) && ckWARN(WARN_UNINITIALIZED))
@@ -3890,12 +3890,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;
-    case PERL_MAGIC_regdata:
-	vtable = &PL_vtbl_regdata;
-	break;
-    case PERL_MAGIC_regdatum:
-	vtable = &PL_vtbl_regdatum;
-	break;
     case PERL_MAGIC_env:
 	vtable = &PL_vtbl_env;
 	break;
@@ -3910,9 +3904,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_isaelem:
 	vtable = &PL_vtbl_isaelem;
-	break;
-    case PERL_MAGIC_nkeys:
-	vtable = &PL_vtbl_nkeys;
 	break;
     case PERL_MAGIC_dbfile:
 	vtable = NULL;

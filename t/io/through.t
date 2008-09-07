@@ -23,12 +23,12 @@ EOD
 my $t1 = \%( data => $data,  write_c => \@(1,2,length $data),  read_c => \@(1,2,3,length $data));
 my $t2 = \%( data => $data2, write_c => \@(1,2,length $data2), read_c => \@(1,2,3,length $data2));
 
-$_->{write_c} = \@(1..length($_->{data})),
-  $_->{read_c} = \@(1..length($_->{data})+1, 0xe000)  # Need <0xffff for REx
-    for (); # $t1, $t2;
+$_->{write_c} = \@( <1..length($_->{data})),
+  $_->{read_c} = \@( <1..length($_->{data})+1, 0xe000)  # Need <0xffff for REx
+    for @( ()); # $t1, $t2;
 
 my $c;	# len write tests, for each: one _all test, and 3 each len+2
-$c += (nelems @{$_->{write_c}}) * (1 + 3*nelems @{$_->{read_c}}) for $t1, $t2;
+$c += (nelems @{$_->{write_c}}) * (1 + 3*nelems @{$_->{read_c}}) for @( $t1, $t2);
 $c *= 3*2*2;	# $how_w, file/pipe, 2 reports
 
 $c += 6;	# Tests with sleep()...
@@ -72,7 +72,7 @@ sub testpipe ($$$$$$) {
     open $fh, '-|', qq[$Perl -we "$set_out;print for grep length, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $!";
   } elsif ($how_w eq 'print/flush') {
     # shell-neutral and miniperl-enabled autoflush? qq(\x24\x7c) eq '$|'
-    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24\\x7c = 1) or die;print for grep length, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $!";
+    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24\\x7c = 1) or die;print for grep length, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $!";
   } elsif ($how_w eq 'syswrite') {
     ### How to protect \$_
     my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \} split m/(.\{1,$write_c\})/s, qq($quoted)"];
@@ -87,7 +87,7 @@ sub testpipe ($$$$$$) {
 
 sub testfile ($$$$$$) {
   my ($str, $write_c, $read_c, $how_w, $how_r, $why) = < @_;
-  my @data = @( grep length, split m/(.{1,$write_c})/s, $str );
+  my @data = @( < grep length, @( < split m/(.{1,$write_c})/s, $str) );
 
   open my $fh, '>', 'io_io.tmp' or die;
   select $fh;
@@ -95,12 +95,12 @@ sub testfile ($$$$$$) {
       if defined $main::use_crlf && $main::use_crlf == 1;
   if ($how_w eq 'print') {	# AUTOFLUSH???
     $| = 0;
-    print $fh $_ for < @data;
+    print $fh $_ for  @data;
   } elsif ($how_w eq 'print/flush') {
     $| = 1;
-    print $fh $_ for < @data;
+    print $fh $_ for  @data;
   } elsif ($how_w eq 'syswrite') {
-    syswrite $fh, $_ for < @data;
+    syswrite $fh, $_ for  @data;
   } else {
     die "Unrecognized write: '$how_w'";
   }
@@ -121,19 +121,19 @@ my @c;
 push @c, ord $c while $c = getc $fh;
 ok(1, 'got chars');
 is(scalar nelems @c, 9, 'got 9 chars');
-is("{join ' ', <@c}", '97 10 98 10 10 99 10 10 10', 'got expected chars');
+is("{join ' ', @( <@c)}", '97 10 98 10 10 99 10 10 10', 'got expected chars');
 ok(close($fh), 'close');
 
 for my $s (1..2) {
-  my $t = ($t1, $t2)[[$s-1]];
+  my $t = @($t1, $t2)[$s-1];
   my $str = $t->{data};
   my $r = $t->{read_c};
   my $w = $t->{write_c};
-  for my $read_c (< @$r) {
-    for my $write_c (< @$w) {
-      for my $how_r (qw(readline_all readline read sysread)) {
+  for my $read_c ( @$r) {
+    for my $write_c ( @$w) {
+      for my $how_r (@( <qw(readline_all readline read sysread))) {
 	next if $how_r eq 'readline_all' and $read_c != 1;
-        for my $how_w (qw(print print/flush syswrite)) {
+        for my $how_w (@( <qw(print print/flush syswrite))) {
 	  testfile($str, $write_c, $read_c, $how_w, $how_r, $s);
 	  testpipe($str, $write_c, $read_c, $how_w, $how_r, $s);
         }

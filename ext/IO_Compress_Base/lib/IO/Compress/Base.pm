@@ -8,7 +8,7 @@ use warnings;
 use IO::Compress::Base::Common v2.006 ;
 
 use IO::File ;
-use Scalar::Util qw(blessed readonly);
+use Scalar::Util < qw(blessed readonly);
 
 #use File::Glob;
 #require Exporter ;
@@ -330,7 +330,7 @@ sub _def
     if ($x->{GlobMap})
     {
         $x->{oneInput} = 1 ;
-        foreach my $pair (< @{ $x->{Pairs} })
+        foreach my $pair ( @{ $x->{Pairs} })
         {
             my ($from, $to) = < @$pair ;
             $obj->_singleTarget($x, 1, $from, $to, < @_)
@@ -347,7 +347,7 @@ sub _def
 
         $x->{inType} = $inFile ? 'filename' : 'buffer';
         
-        foreach my $in ($x->{oneInput} ? $input : < @$input)
+        foreach my $in (@($x->{oneInput} ? $input : < @$input))
         {
             my $out ;
             $x->{oneInput} = 1 ;
@@ -396,7 +396,7 @@ sub _singleTarget
         my $keep = $x->{Got}->clone();
 
         #for my $element ( ($x->{inType} eq 'hash') ? keys %$input : @$input)
-        for my $element ( < @$input)
+        for my $element (  @$input)
         {
             my $isFilename = isaFilename($element);
 
@@ -609,15 +609,15 @@ sub print
 
     if (defined $\) {
         if (defined $,) {
-            defined $self->syswrite(join($,, < @_) . $\);
+            defined $self->syswrite(join($,, @( < @_)) . $\);
         } else {
-            defined $self->syswrite(join("", < @_) . $\);
+            defined $self->syswrite(join("", @( < @_)) . $\);
         }
     } else {
         if (defined $,) {
-            defined $self->syswrite(join($,, < @_));
+            defined $self->syswrite(join($,, @( < @_)));
         } else {
-            defined $self->syswrite(join("", < @_));
+            defined $self->syswrite(join("", @( < @_)));
         }
     }
 }

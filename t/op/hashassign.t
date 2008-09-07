@@ -19,8 +19,8 @@ my @comma = @("key", "value");
 
 # Some of these tests are (effectively) duplicated in each.t
 my %comma = %( < @comma );
-ok (nelems(@(keys %comma)) == 1, 'keys on comma hash');
-ok (nelems(@(values %comma)) == 1, 'values on comma hash');
+ok (nelems(@( <keys %comma)) == 1, 'keys on comma hash');
+ok (nelems(@( <values %comma)) == 1, 'values on comma hash');
 # defeat any tokeniser or optimiser cunning
 my $key = 'ey';
 is (%comma{"k" . $key}, "value", 'is key present? (unoptimised)');
@@ -40,8 +40,8 @@ ok (eq_array (\@(), \@temp), 'last each from comma hash');
 
 my %temp = %( < %comma );
 
-ok (nelems(@(keys %temp)) == 1, 'keys on copy of comma hash');
-ok (nelems(@(values %temp)) == 1, 'values on copy of comma hash');
+ok (nelems(@( <keys %temp)) == 1, 'keys on copy of comma hash');
+ok (nelems(@( <values %temp)) == 1, 'values on copy of comma hash');
 is (%temp{'k' . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{key}, "value", 'is key present? (maybe optimised)');
@@ -59,8 +59,8 @@ ok (eq_array (\@(), \@temp), 'last each from copy of comma hash');
 my @arrow = @(Key =>"Value");
 
 my %arrow = %( < @arrow );
-ok (nelems(@(keys %arrow)) == 1, 'keys on arrow hash');
-ok (nelems(@(values %arrow)) == 1, 'values on arrow hash');
+ok (nelems(@( <keys %arrow)) == 1, 'keys on arrow hash');
+ok (nelems(@( <values %arrow)) == 1, 'values on arrow hash');
 # defeat any tokeniser or optimiser cunning
 $key = 'ey';
 is (%arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
@@ -80,8 +80,8 @@ ok (eq_array (\@(), \@temp), 'last each from arrow hash');
 
 %temp = %( < %arrow );
 
-ok (nelems(@(keys %temp)) == 1, 'keys on copy of arrow hash');
-ok (nelems(@(values %temp)) == 1, 'values on copy of arrow hash');
+ok (nelems(@( <keys %temp)) == 1, 'keys on copy of arrow hash');
+ok (nelems(@( <values %temp)) == 1, 'values on copy of arrow hash');
 is (%temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
@@ -184,7 +184,7 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
 # duplicate keys [perl #24380]
 {
     my %h; my $x; my $ar;
-    is( (join ':', ((<%h) = (1) x 8 )), '1:1',
+    is( (join ':', @( ((<%h) = (1) x 8 ))), '1:1',
 	'hash assignment in list context removes duplicates' );
 }
 
@@ -193,13 +193,13 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
     no warnings 'once';
     my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
     our %h;
-    for my $ref (< @refs) {
+    for my $ref ( @refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
 
-    bless $_ for < @refs;
+    bless $_ for  @refs;
     %h = %( () );
-    for my $ref (< @refs) {
+    for my $ref ( @refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
 }

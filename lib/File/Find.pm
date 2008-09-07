@@ -411,8 +411,8 @@ The first fixed version of File::Find was 1.01.
 
 =cut
 
-our @ISA = @( qw(Exporter) );
-our @EXPORT = @( qw(find finddepth) );
+our @ISA = @( < qw(Exporter) );
+our @EXPORT = @( < qw(find finddepth) );
 
 
 use strict;
@@ -639,7 +639,7 @@ sub _find_opt {
     my ($abs_dir, $Is_Dir);
 
     Proc_Top_Item:
-    foreach my $TOP (< @_) {
+    foreach my $TOP ( @_) {
 	my $top_item = $TOP;
 
 	($topdev,$topino,$topmode,$topnlink) = $follow ? stat $top_item : lstat $top_item;
@@ -902,7 +902,7 @@ sub _find_dir($$$) {
 
 	if ($nlink == 2 && !$no_nlink) {
 	    # This dir has no subdirectories.
-	    for my $FN (< @filenames) {
+	    for my $FN ( @filenames) {
 		if ($Is_VMS) {
 		# Big hammer here - Compensate for VMS trailing . and .dir
 		# No win situation until this is changed, but this
@@ -928,7 +928,7 @@ sub _find_dir($$$) {
 	    # EG: directory traversal is in user sorted order, not at random.
             my $stack_top = (nelems @Stack);
 
-	    for my $FN (< @filenames) {
+	    for my $FN ( @filenames) {
 		next if $FN =~ $File::Find::skip_pattern;
 		if ($subcount +> 0 || $no_nlink) {
 		    # Seen all the subdirs?
@@ -970,7 +970,7 @@ sub _find_dir($$$) {
 		    $tmp = '[' . ('-' x ($CdLvl-$Level)) . ']';
 		}
 		else {
-		    $tmp = join('/',('..') x ($CdLvl-$Level));
+		    $tmp = join('/', @(('..') x ($CdLvl-$Level)));
 		}
 		die "Can't cd to $tmp from $dir_name"
 		    unless chdir ($tmp);
@@ -1156,7 +1156,7 @@ sub _find_dir_symlnk($$$) {
 	@filenames = @( readdir DIR );
 	closedir(DIR);
 
-	for my $FN (< @filenames) {
+	for my $FN ( @filenames) {
 	    if ($Is_VMS) {
 	    # Big hammer here - Compensate for VMS trailing . and .dir
 	    # No win situation until this is changed, but this

@@ -6,12 +6,12 @@ our($VERSION, @ISA, @EXPORT_OK, @EXPORT_FAIL, %EXPORT_TAGS,
 
 use XSLoader ();
 
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 
 # NOTE: The glob() export is only here for compatibility with 5.6.0.
 # csh_glob() should not be used directly, unless you know what you're doing.
 
-@EXPORT_OK   = @( qw(
+@EXPORT_OK   = @( < qw(
     csh_glob
     bsd_glob
     GLOB_ABEND
@@ -33,7 +33,7 @@ use XSLoader ();
 ) );
 
 %EXPORT_TAGS = %(
-    'glob' => \@( qw(
+    'glob' => \@( < qw(
         GLOB_ABEND
 	GLOB_ALPHASORT
         GLOB_ALTDIRFUNC
@@ -133,7 +133,7 @@ sub csh_glob {
     # if we're just beginning, do it all first
     if (%iter{$cxix} == 0) {
 	if ((nelems @pat)) {
-	    %entries{$cxix} = \@( map { < doglob($_, $DEFAULT_FLAGS) } < @pat );
+	    %entries{$cxix} = \@( < map { < doglob($_, $DEFAULT_FLAGS) } @( < @pat) );
 	}
 	else {
 	    %entries{$cxix} = \@( < doglob($pat, $DEFAULT_FLAGS) );

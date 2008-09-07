@@ -15,7 +15,7 @@ BEGIN {
 # use warnings;
 use strict;
 use ExtUtils::MakeMaker;
-use ExtUtils::Constant qw (C_constant);
+use ExtUtils::Constant < qw (C_constant);
 use File::Spec;
 use Cwd;
 
@@ -25,10 +25,6 @@ $| = 1;
 
 # Because were are going to be changing directory before running Makefile.PL
 my $perl = $^X;
-# 5.005 doesn't have new enough File::Spec to have rel2abs. But actually we
-# only need it when $^X isn't absolute, which is going to be 5.8.0 or later
-# (where ExtUtils::Constant is in the core, and tests against the uninstalled
-# perl)
 $perl = File::Spec->rel2abs ($perl);
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
@@ -87,7 +83,7 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = %( map {($^O eq 'VMS' ? lc($_) : $_), 1} < @_ );
+  my %expect = %( < map {($^O eq 'VMS' ? lc($_) : $_), 1} @( < @_) );
 
   my $fail;
   opendir DIR, $dir or die "opendir '$dir': $!";
@@ -113,7 +109,7 @@ sub build_and_run {
   my @perlout = @( `$runperl Makefile.PL $core` );
   if ($?) {
     print "not ok $realtest # $runperl Makefile.PL failed: $?\n";
-    print "# $_" foreach < @perlout;
+    print "# $_" foreach  @perlout;
     exit($?);
   } else {
     print "ok $realtest\n";
@@ -162,7 +158,7 @@ sub build_and_run {
   @makeout = @( `$make` );
   if ($?) {
     print "not ok $realtest # $make failed: $?\n";
-    print "# $_" foreach < @makeout;
+    print "# $_" foreach  @makeout;
     exit($?);
   } else {
     print "ok $realtest\n";
@@ -179,7 +175,7 @@ sub build_and_run {
     @makeout = @( `$makeperl` );
     if ($?) {
       print "not ok $realtest # $makeperl failed: $?\n";
-      print "# $_" foreach < @makeout;
+      print "# $_" foreach  @makeout;
       exit($?);
     } else {
       print "ok $realtest\n";
@@ -204,7 +200,7 @@ sub build_and_run {
   $realtest += $tests;
   if ($?) {
     print "not ok $realtest # $maketest failed: $?\n";
-    print "# $_" foreach < @makeout;
+    print "# $_" foreach  @makeout;
   } else {
     print "ok $realtest - maketest\n";
   }
@@ -239,7 +235,7 @@ sub build_and_run {
   @makeout = @( `$makeclean` );
   if ($?) {
     print "not ok $realtest # $make failed: $?\n";
-    print "# $_" foreach < @makeout;
+    print "# $_" foreach  @makeout;
   } else {
     print "ok $realtest\n";
   }
@@ -258,7 +254,7 @@ sub build_and_run {
   @makeout = @( `$makedistclean` );
   if ($?) {
     print "not ok $realtest # $make failed: $?\n";
-    print "# $_" foreach < @makeout;
+    print "# $_" foreach  @makeout;
   } else {
     print "ok $realtest\n";
   }
@@ -267,7 +263,7 @@ sub build_and_run {
   check_for_bonus_files ('.', < @$files, '.', '..');
 
   unless ($keep_files) {
-    foreach (< @$files) {
+    foreach ( @$files) {
       unlink $_ or warn "unlink $_: $!";
     }
   }
@@ -304,7 +300,7 @@ sub MANIFEST {
   my $manifest = "MANIFEST";
   push @files, $manifest;
   open FH, ">", "$manifest" or die "open >$manifest: $!\n";
-  print FH "$_\n" foreach < @files;
+  print FH "$_\n" foreach  @files;
   close FH or die "close $manifest: $!\n";
   return @files;
 }
@@ -383,18 +379,18 @@ use Carp;
 
 require Exporter;
 require DynaLoader;
-use vars qw ($VERSION @ISA @EXPORT_OK);
+use vars < qw ($VERSION @ISA @EXPORT_OK);
 
 $VERSION = '0.01';
-@ISA = @(qw(Exporter DynaLoader));
+@ISA = qw(Exporter DynaLoader);
 EOT
   # Having this qw( in the here doc confuses cperl mode far too much to be
   # helpful. And I'm using cperl mode to edit this, even if you're not :-)
-  print FH "\@EXPORT_OK = \@(qw(\n";
+  print FH "\@EXPORT_OK = qw(\n";
 
   # Print the names of all our autoloaded constants
-  print FH "\t$_\n" foreach (< @$export_names);
-  print FH "));\n";
+  print FH "\t$_\n" foreach @( (< @$export_names));
+  print FH ");\n";
   print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
   close FH or die "close $pm: $!\n";
 
@@ -405,7 +401,7 @@ EOT
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
-use $package qw({join ' ', <@$export_names});
+use $package < qw({join ' ', @( <@$export_names)});
 
 print "1..2\n";
 if (open OUTPUT, ">", "$output") \{
@@ -469,7 +465,7 @@ my @common_items = @(
 
 my @args = @( undef );
 push @args, \@(PROXYSUBS => 1);
-foreach my $args (< @args)
+foreach my $args ( @args)
 {
   # Simple tests
   start_tests();
@@ -520,11 +516,11 @@ EOT
                 . "SvIV_set(temp_sv, 1149);"),
               );
 
-  push @items, $_ foreach keys %compass;
+  push @items, $_ foreach @( < keys %compass);
 
   # Automatically compile the list of all the macro names, and make them
   # exported constants.
-  my @export_names = @( map {(ref $_) ? $_->{name} : $_} < @items );
+  my @export_names = @( < map {(ref $_) ? $_->{name} : $_} @( < @items) );
 
   # Exporter::Heavy (currently) isn't able to export the last 3 of these:
   push @items, < @common_items;
@@ -812,19 +808,19 @@ EOT
 # statement to bump off a character
 simple ("Singletons", "A", "AB", "ABC", "ABCD", "ABCDE");
 # Check the three code.
-simple ("Three start", qw(Bea kea Lea lea nea pea rea sea tea Wea yea Zea));
+simple ("Three start", < qw(Bea kea Lea lea nea pea rea sea tea Wea yea Zea));
 # There were 162 2 letter words in /usr/share/dict/words on FreeBSD 4.6, which
 # I felt was rather too many. So I used words with 2 vowels.
-simple ("Twos and three middle", qw(aa ae ai ea eu ie io oe era eta));
+simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta));
 # Given the choice go for the end, else the earliest point
-simple ("Three end and four symetry", qw(ean ear eat barb marm tart));
+simple ("Three end and four symetry", < qw(ean ear eat barb marm tart));
 
 
 # Need this if the single test below is rolled into @tests :
 # --$dummytest;
 print "1..$dummytest\n";
 
-write_and_run_extension < @$_ foreach < @tests;
+write_and_run_extension < @$_ foreach  @tests;
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.

@@ -39,7 +39,7 @@ Nick Ing-Simmons nik@tiuk.ti.com
 use Cwd;
 use File::Spec;
 
-use vars qw($VERSION $Verbose);
+use vars < qw($VERSION $Verbose);
 $VERSION = '1.03';
 $Verbose = 0;
 

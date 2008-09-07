@@ -30,7 +30,7 @@ require Foo;
 is( $r, "Foo.pm" );
 
 require Foo::Bar;
-is( $r, join($dirsep, "Foo", "Bar.pm") );
+is( $r, join($dirsep, @( "Foo", "Bar.pm")) );
 
 require 'Foo';
 is( $r, "Foo" );
@@ -39,7 +39,7 @@ eval "use Foo";
 is( $r, "Foo.pm" );
 
 eval "use Foo::Bar";
-is( $r, join($dirsep, "Foo", "Bar.pm") );
+is( $r, join($dirsep, @( "Foo", "Bar.pm")) );
 
 # localizing *CORE::GLOBAL::foo should revert to finding CORE::foo
 {
@@ -95,7 +95,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " @_[0]" }; }
     local $^WARN_HOOK = sub {
 	main::like( @_[0]->message, qr/^ok overriden at/ );
     };
-    BEGIN { *OverridenWarn::warn = sub { CORE::warn "{join ' ', <@_} overriden"; }; }
+    BEGIN { *OverridenWarn::warn = sub { CORE::warn "{join ' ', @( <@_)} overriden"; }; }
     package OverridenWarn;
     sub foo { "ok" }
     warn( OverridenWarn->foo() );

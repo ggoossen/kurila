@@ -312,7 +312,7 @@ sub bits
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    foreach my $word ( < @_ ) {
+    foreach my $word (  @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -350,7 +350,7 @@ sub import
     
     push @_, 'all' unless @_;
 
-    foreach my $word ( < @_ ) {
+    foreach my $word (  @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -385,7 +385,7 @@ sub unimport
 
     push @_, 'all' unless @_;
 
-    foreach my $word ( < @_ ) {
+    foreach my $word (  @_ ) {
 	if ($word eq 'FATAL') {
 	    next; 
 	}
@@ -399,7 +399,7 @@ sub unimport
     $^WARNING_BITS = $mask ;
 }
 
-my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
+my %builtin_type; < %builtin_type{[@( <qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp))]} = ();
 
 sub __chk
 {

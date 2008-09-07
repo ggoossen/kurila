@@ -16,8 +16,8 @@ use File::Copy;
 use Config;
 
 
-foreach my $code ("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
-                  "move()", "move('arg')", "move('arg', 'arg', 'arg')"
+foreach my $code (@("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
+                  "move()", "move('arg')", "move('arg', 'arg', 'arg')")
                  )
 {
     eval $code;
@@ -97,7 +97,7 @@ for my $cross_partition_test (0..1) {
   # Recheck the mtime rather than rely on utime in case we're on a
   # system where utime doesn't work or there's no mtime at all.
   # The destination file will reflect the same difficulties.
-  my $mtime = (stat("copy-$$"))[[9]];
+  my $mtime = @(stat("copy-$$"))[9];
 
   ok move("copy-$$", "file-$$"), 'move';
   ok -e "file-$$",              '  destination exists';
@@ -108,7 +108,7 @@ for my $cross_partition_test (0..1) {
   TODO: {
     local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^O eq 'VMS';
 
-    my $dest_mtime = (stat("file-$$"))[[9]];
+    my $dest_mtime = @(stat("file-$$"))[9];
     is $dest_mtime, $mtime,
       "mtime preserved by copy()". 
       ($cross_partition_test ? " while testing cross-partition" : "");

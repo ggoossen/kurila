@@ -43,11 +43,11 @@ SKIP: {
       unless nkeys %{ $pl->{data} } +> 2;
 
 	# get the first and second key
-	my ($first, $second) = keys %{ $pl->{data} };
+	my ($first, $second) = < keys %{ $pl->{data} };
 
 	# now get a couple of extra keys, to mess with the hash iterator
 	my $i = 0;
-	for (keys %{ $pl->{data} } ) {
+	for (@( <keys %{ $pl->{data} }) ) {
 		last if $i++;
 	}
 
@@ -170,5 +170,5 @@ is( ExtUtils::Packlist::packlist_file($pl)[0], 'eplist',
 	'packlist_file() should fetch packlist from ExtUtils::Packlist object' );
 
 END {
-	1 while unlink qw( eplist );
+	1 while unlink < qw( eplist );
 }

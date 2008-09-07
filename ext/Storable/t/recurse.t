@@ -21,13 +21,13 @@ sub BEGIN {
     require 'st-dump.pl';
 }
 
-use Storable qw(freeze thaw dclone);
+use Storable < qw(freeze thaw dclone);
 
 print "1..33\n";
 
 package OBJ_REAL;
 
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 my @x = @('a', 1);
 
@@ -76,7 +76,7 @@ sub STORABLE_thaw {
 
 package OBJ_SYNC2;
 
-use Storable qw(dclone);
+use Storable < qw(dclone);
 
 sub make {
 	my $self = bless \%(), shift;
@@ -107,7 +107,7 @@ sub STORABLE_thaw {
 
 package OBJ_REAL2;
 
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 my $MAX = 20;
 my $recursed = 0;
@@ -307,7 +307,7 @@ sub STORABLE_freeze {
 sub STORABLE_thaw { } # Not really used
 
 package main;
-use vars qw($refcount_ok);
+use vars < qw($refcount_ok);
 
 my $o = CLASS_OTHER->make();
 my $c2 = CLASS_2->make($o);

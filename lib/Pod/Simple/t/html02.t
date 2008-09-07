@@ -23,7 +23,7 @@ my @pairs = @(
 );
  
  
-foreach( < @pairs ) {
+foreach(  @pairs ) {
   print "# Testing pod source @$_[0] ...\n" unless $_->[0] =~ m/\n/;
   ok( x($_->[0]), $_->[1] )
 }

@@ -3,9 +3,9 @@ package ExtUtils::CBuilder::Platform::Unix;
 use strict;
 use ExtUtils::CBuilder::Base;
 
-use vars qw($VERSION @ISA);
+use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( qw(ExtUtils::CBuilder::Base) );
+@ISA = @( < qw(ExtUtils::CBuilder::Base) );
 
 sub link_executable {
   my $self = shift;

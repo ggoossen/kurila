@@ -43,7 +43,7 @@ while((nelems @from)) {
     sub {
      @_[0]->code_handler(sub { $more .= @_[1] . ":" . @_[0] . "\n"       } );
      @_[0]->cut_handler( sub { $more .= "~" . @_[1] . ":" .  @_[0]. "\n" } );
-    } => join "\n",
+    } => join "\n", @(
     "",
     "\t# This is handy...",
     "=head1 I  LIKE   PIE",
@@ -52,7 +52,7 @@ while((nelems @from)) {
     "use Test::Harness;",
     "runtests(sort glob 't/*.t');",
     "",
-    "",
+    "",)
    ))
     => scalar($exp = $expected);
   ;
@@ -61,14 +61,14 @@ while((nelems @from)) {
      "\n# ", <Pod::Simple::BlackBox::pretty($exp),"\n";
   }
   
-  ok scalar($got = $more), scalar($exp = join "\n" =>
+  ok scalar($got = $more), scalar($exp = join "\n", @( 
    "1:",
    "2:\t# This is handy...",
    "~5:=cut",
    "6:use Test::Harness;",
    "7:runtests(sort glob 't/*.t');",
    "8:",
-   "",
+   "",)
   );
   unless($got eq $exp) {
    print '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),

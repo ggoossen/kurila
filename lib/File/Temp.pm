@@ -141,7 +141,7 @@ Filehandles returned by these functions support the seekable methods.
 use strict;
 use Carp;
 use File::Spec v0.8;
-use File::Path qw/ rmtree /;
+use File::Path < qw/ rmtree /;
 use Fcntl v1.03;
 use IO::Seekable; # For SEEK_*
 use Errno;
@@ -155,23 +155,23 @@ require VMS::Stdio if $^O eq 'VMS';
 require Carp::Heavy;
 
 ### For the OO interface
-use base qw/ IO::Handle IO::Seekable /;
+use base < qw/ IO::Handle IO::Seekable /;
 require overload;
 overload->import('""' => \&STRINGIFY, fallback => 1);
 
 # use 'our' on v5.6.0
-use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG $KEEP_ALL);
+use vars < qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG $KEEP_ALL);
 
 $DEBUG = 0;
 $KEEP_ALL = 0;
 
 # We are exporting functions
 
-use base qw/Exporter/;
+use base < qw/Exporter/;
 
 # Export list - to allow fine tuning of export table
 
-@EXPORT_OK = @( qw{
+@EXPORT_OK = @( < qw{
 	      tempfile
 	      tempdir
 	      tmpnam
@@ -190,9 +190,9 @@ use base qw/Exporter/;
 # Groups of functions for export
 
 %EXPORT_TAGS = %(
-		'POSIX' => \@(qw/ tmpnam tmpfile /),
-		'mktemp' => \@(qw/ mktemp mkstemp mkstemps mkdtemp/),
-		'seekable' => \@(qw/ SEEK_SET SEEK_CUR SEEK_END /),
+		'POSIX' => \@( <qw/ tmpnam tmpfile /),
+		'mktemp' => \@( <qw/ mktemp mkstemp mkstemps mkdtemp/),
+		'seekable' => \@( <qw/ SEEK_SET SEEK_CUR SEEK_END /),
 	       );
 
 # add contents of these tags to @EXPORT
@@ -204,7 +204,7 @@ $VERSION = '0.20_01';
 
 # This is a list of characters that can be used in random filenames
 
-my @CHARS = @(qw/ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+my @CHARS = @( <qw/ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 	         a b c d e f g h i j k l m n o p q r s t u v w x y z
 	         0 1 2 3 4 5 6 7 8 9 _
 	     /);
@@ -233,7 +233,7 @@ my $OPENFLAGS = O_CREAT ^|^ O_EXCL ^|^ O_RDWR;
 my $LOCKFLAG;
 
 unless ($^O eq 'MacOS') {
-  for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
+  for my $oflag (@( <qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /)) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     no strict 'refs';
     $OPENFLAGS ^|^= $bit if try {
@@ -261,7 +261,7 @@ unless ($^O eq 'MacOS') {
 
 my $OPENTEMPFLAGS = $OPENFLAGS;
 unless ($^O eq 'MacOS') {
-  for my $oflag (qw/ TEMPORARY /) {
+  for my $oflag (@( <qw/ TEMPORARY /)) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     local($@);
     no strict 'refs';
@@ -417,12 +417,12 @@ sub _gettemp {
     } else {
 
       if ($^O eq 'VMS') {  # need volume to avoid relative dir spec
-        $parent = File::Spec->catdir($volume, @dirs[[0..((nelems @dirs)-1)-1]]);
+        $parent = File::Spec->catdir($volume, < @dirs[[@( <0..((nelems @dirs)-1)-1)]]);
         $parent = 'sys$disk:[]' if $parent eq '';
       } else {
 
 	# Put it back together without the last one
-	$parent = File::Spec->catdir(@dirs[[0..((nelems @dirs)-1)-1]]);
+	$parent = File::Spec->catdir( <@dirs[[@( <0..((nelems @dirs)-1)-1)]]);
 
 	# ...and attach the volume (no filename)
 	$parent = File::Spec->catpath($volume, $parent, '');
@@ -772,7 +772,7 @@ sub _is_verysafe {
   foreach my $pos (0.. ((nelems @dirs)-1)) {
     # Get a directory name
     my $dir = File::Spec->catpath($volume, <
-				  File::Spec->catdir(@dirs[[0.. ((nelems @dirs)-1) - $pos]]),
+				  File::Spec->catdir( <@dirs[[@( <0.. ((nelems @dirs)-1) - $pos)]]),
 				  ''
 				  );
 
@@ -876,7 +876,7 @@ sub _can_do_level {
       # Files
       my @files = @(exists %files_to_unlink{$$} ?
 		   < @{ %files_to_unlink{$$} } : () );
-      foreach my $file (< @files) {
+      foreach my $file ( @files) {
 	# close the filehandle without checking its state
 	# in order to make real sure that this is closed
 	# if its already closed then I dont care about the answer
@@ -891,7 +891,7 @@ sub _can_do_level {
       # Dirs
       my @dirs = @(exists %dirs_to_unlink{$$} ?
 		  < @{ %dirs_to_unlink{$$} } : () );
-      foreach my $dir (< @dirs) {
+      foreach my $dir ( @dirs) {
 	if (-d $dir) {
 	  rmtree($dir, $DEBUG, 0);
 	}
@@ -1005,7 +1005,7 @@ sub new {
 
   # read arguments and convert keys to upper case
   my %args = %( < @_ );
-  %args = %( map { uc($_), %args{$_} } keys %args );
+  %args = %( < map { uc($_), %args{$_} } @( < keys %args) );
 
   # see if they are unlinking (defaulting to yes)
   my $unlink = (exists %args{UNLINK} ? %args{UNLINK} : 1 );
@@ -1483,7 +1483,7 @@ sub tempdir  {
       my ($volume, $directories, undef) = < File::Spec->splitpath( $template, 1);
 
       # Last directory is then our template
-      $template = ( <File::Spec->splitdir($directories))[[-1]];
+      $template = File::Spec->splitdir($directories)[-1];
 
       # Prepend the supplied directory or temp dir
       if (%options{"DIR"}) {
@@ -1986,7 +1986,7 @@ sub cmpstat {
   return unless (nelems @fh);
 
   if (@fh[3] +> 1 && $^W) {
-    carp "unlink0: fstat found too many links; SB={join ' ', <@fh}" if $^W;
+    carp "unlink0: fstat found too many links; SB={join ' ', @( <@fh)}" if $^W;
   }
 
   # Stat the path
@@ -1999,7 +1999,7 @@ sub cmpstat {
 
   # this is no longer a file, but may be a directory, or worse
   unless (-f $path) {
-    confess "panic: $path is no longer a file: SB={join ' ', <@fh}";
+    confess "panic: $path is no longer a file: SB={join ' ', @( <@fh)}";
   }
 
   # Do comparison of each member of the array
@@ -2007,21 +2007,21 @@ sub cmpstat {
   # depending on whether it is a file or a handle.
   # Cannot simply compare all members of the stat return
   # Select the ones we can use
-  my @okstat = @(0..((nelems @fh)-1));  # Use all by default
+  my @okstat = @( <0..((nelems @fh)-1));  # Use all by default
   if ($^O eq 'MSWin32') {
     @okstat = @(1,2,3,4,5,7,8,9,10);
   } elsif ($^O eq 'os2') {
-    @okstat = @(0, 2..((nelems @fh)-1));
+    @okstat = @(0, < 2..((nelems @fh)-1));
   } elsif ($^O eq 'VMS') { # device and file ID are sufficient
     @okstat = @(0, 1);
   } elsif ($^O eq 'dos') {
-    @okstat = @(0,2..7,11..((nelems @fh)-1));
+    @okstat = @(0, <2..7, <11..((nelems @fh)-1));
   } elsif ($^O eq 'mpeix') {
-    @okstat = @(0..4,8..10);
+    @okstat = @( <0..4, <8..10);
   }
 
   # Now compare each entry explicitly by number
-  for (< @okstat) {
+  for ( @okstat) {
     print "Comparing: $_ : @fh[$_] and @path[$_]\n" if $DEBUG;
     # Use eq rather than == since rdev, blksize, and blocks (6, 11,
     # and 12) will be '' on platforms that do not support them.  This
@@ -2343,7 +2343,7 @@ security enhancements.
 
 package File::Temp::Dir;
 
-use File::Path qw/ rmtree /;
+use File::Path < qw/ rmtree /;
 use strict;
 require overload;
 overload->import('""' => \&STRINGIFY, fallback => 1);

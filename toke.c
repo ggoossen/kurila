@@ -2926,7 +2926,7 @@ Perl_yylex(pTHX)
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");
 		if (PL_minus_a) {
-		    sv_catpvs(PL_linestr,"our @F=@(split(' '));");
+		    sv_catpvs(PL_linestr,"our @F=split(' ');");
 		}
 	    }
 	    if (PL_minus_E)
@@ -4110,6 +4110,11 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    OPERATOR(ANONARY);
 	}
+	if (s[1] == ':' && s[2] != ':') {
+	    /* array constructor */
+	    s += 2;
+	    OPERATOR(ANONARYL);
+	}
 
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
@@ -4118,13 +4123,6 @@ Perl_yylex(pTHX)
 	}
 	if (PL_lex_state == LEX_NORMAL)
 	    s = SKIPSPACE1(s);
-	if ((PL_expect != XREF || PL_oldoldbufptr == PL_last_lop) && intuit_more(s)) {
-	    if (*s == '{') {
-		yyerror(Perl_form(aTHX_ "hash slice should be %%%s{[...]} instead of @%s{...}",
-				  PL_tokenbuf+1, PL_tokenbuf+1));
-		PL_tokenbuf[0] = '%';
-	    }
-	}
 	PL_pending_ident = '@';
 	TERM('@');
 
@@ -5308,8 +5306,8 @@ Perl_yylex(pTHX)
 	    PL_expect = XOPERATOR;
 	    force_next(')');
 	    if (SvCUR(PL_lex_stuff.str_sv)) {
-		OP *words = NULL;
 		int warned = 0;
+		AV *av = newAV();
 		d = SvPV_force(PL_lex_stuff.str_sv, len);
 		while (len) {
 		    for (; isSPACE(*d) && len; --len, ++d)
@@ -5336,15 +5334,12 @@ Perl_yylex(pTHX)
 				/**/;
 			}
 			sv = newSVpvn(b, d-b);
-			words = append_elem(OP_LIST, words,
-					    newSVOP(OP_CONST, 0, tokeq(sv), S_curlocation()));
+			av_push(av, sv);
 		    }
 		}
-		if (words) {
-		    start_force(PL_curforce);
-		    NEXTVAL_NEXTTOKE.opval = words;
-		    force_next(THING);
-		}
+		start_force(PL_curforce);
+		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, av, S_curlocation());
+		force_next(THING);
 	    }
 	    if (PL_lex_stuff.str_sv) {
 		SvREFCNT_dec(PL_lex_stuff.str_sv);

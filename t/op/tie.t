@@ -12,14 +12,14 @@
 $|=1;
 
 undef $/;
-our @prgs = @( split m/^########\n/m, ~< *DATA );
+our @prgs = @( < split m/^########\n/m, ~< *DATA );
 
 BEGIN { require './test.pl'; }
 plan(tests => scalar nelems @prgs);
 my $i;
-for (< @prgs){
+for ( @prgs){
     ++$i;
-    my($prog,$expected) = split(m/\nEXPECT\n/, $_, 2);
+    my($prog,$expected) = < split(m/\nEXPECT\n/, $_, 2);
     print("not ok $i # bad test format\n"), next
         unless defined $expected;
     my ($testname) = $prog =~ m/^# (.*)\n/m;
@@ -257,12 +257,12 @@ our %h;
 our %i;
 %h{b}=1;
 delete %h{b};
-print nelems(@(keys %h)), "\n";
+print nelems(keys %h), "\n";
 tie %h, 'main';
 %i{a}=1;
 %h = %i;
 untie %h;
-print nelems(@(keys %h)), "\n";
+print nelems(keys %h), "\n";
 EXPECT
 0
 0

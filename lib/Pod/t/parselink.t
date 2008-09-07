@@ -101,10 +101,10 @@ use Pod::ParseLink;
 print "ok 1\n";
 
 # Used for reporting test failures.
-my @names = @( qw(text inferred name section type) );
+my @names = @( < qw(text inferred name section type) );
 
 my $n = 2;
-for (< @TESTS) {
+for ( @TESTS) {
     my @expected = @( < @$_ );
     my $link = shift @expected;
     my @results = @( < parselink ($link) );
