@@ -2671,9 +2671,9 @@ Perl_sighandler(int sig)
         flags |= 16;
 
     if (!PL_psig_ptr[sig]) {
-	# PerlIO_printf(Perl_error_log, "Signal SIG%s received, but no signal handler set.\n",
-	#     PL_sig_name[sig]);
-	# exit(sig);
+/* 	PerlIO_printf(Perl_error_log, "Signal SIG%s received, but no signal handler set.\n", */
+/* 	    PL_sig_name[sig]); */
+/* 	exit(sig); */
 	return;
     }
 
