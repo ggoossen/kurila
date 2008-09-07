@@ -22,7 +22,7 @@ sub is_dumb  {1}
 sub is_smart {0}
 
 sub all_encodings {
-  return @( < sort @( < keys %Supported));
+  return sort keys %Supported;
 }
 
 sub encoding_is_available {

@@ -82,13 +82,13 @@ sub new {
     'index' . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION)
   );
   
-  $new->contents_page_start( join "\n", @( < grep $_, @(
+  $new->contents_page_start( join "\n", grep $_, @(
     $Pod::Simple::HTML::Doctype_decl,
     "<html><head>",
     "<title>Perl Documentation</title>",
     $Pod::Simple::HTML::Content_decl,
     "</head>",
-    "\n<body class='contentspage'>\n<h1>Perl Documentation</h1>\n"))
+    "\n<body class='contentspage'>\n<h1>Perl Documentation</h1>\n")
   ); # override if you need a different title
   
   
@@ -130,7 +130,7 @@ sub batch_convert {
     #  or, under MSWin, like "c:/thing;d:/also;c:/whatever/perl" (";"-delim!)
     require Config;
     my $ps = quotemeta( %Config::Config{'path_sep'} || ":" );
-    $dirs = \@( < grep length($_), @( < split qr/$ps/, $dirs) );
+    $dirs = \ grep length($_), split qr/$ps/, $dirs;
   }
 
   $outdir = $self->filespecsys->curdir
@@ -163,7 +163,7 @@ sub _batch_convert_main {
   }
   
   if($dirs) {
-    $self->muse(scalar(nelems @$dirs), " dirs to scan: {join ' ', @( <@$dirs)}");
+    $self->muse(scalar(nelems @$dirs), " dirs to scan: {join ' ',@$dirs}");
   } else {
     $self->muse("Scanning \@INC.  This could take a minute or two.");
   }
@@ -198,7 +198,7 @@ sub _do_all_batch_conversions {
   my($self, $mod2path, $outdir) = < @_;
   $self->{"__batch_conv_page_count"} = 0;
 
-  foreach my $module (@( <sort {lc($a) cmp lc($b)} @( < keys %$mod2path))) {
+  foreach my $module (sort {lc($a) cmp lc($b)} keys %$mod2path) {
     $self->_do_one_batch_conversion($module, $mod2path, $outdir);
     sleep($SLEEPY - 1) if $SLEEPY;
   }
@@ -223,13 +223,13 @@ sub _do_one_batch_conversion {
   my $retval;
   my $total    = nkeys %$mod2path;
   my $infile   = $mod2path->{$module};
-  my @namelets = @( < grep m/\S/, @( < split "::", $module) );
+  my @namelets = grep m/\S/, split "::", $module;
         # this can stick around in the contents LoL
   my $depth    = scalar nelems @namelets;
   die "Contentless thingie?! $module $infile" unless (nelems @namelets); #sanity
     
   $outfile  ||= do {
-    my @n = @( < @namelets );
+    my @n = @namelets;
     @n[-1] .= $HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION;
     $self->filespecsys->catfile( $outdir, < @n );
   };
@@ -291,7 +291,7 @@ sub note_for_contents_file {
   if( $self->contents_file ) {
     my $c = $self->_contents();
     push @$c,
-     \@( join("::", @( < @$namelets)), $infile, $outfile, $namelets )
+     \@( join("::", @$namelets), $infile, $outfile, $namelets )
      #            0               1         2         3
     ;
     DEBUG +> 3 and print "Noting  <@$c[[@(-1)]]\n";
@@ -356,9 +356,9 @@ sub _write_contents_start {
 sub _write_contents_middle {
   my($self, $Contents, $outfile, $toplevel2submodules, $toplevel_form_freq) = < @_;
 
-  foreach my $t (@( <sort @( < keys %$toplevel2submodules))) {
-    my @downlines = @( < sort {$a->[-1] cmp $b->[-1]}
- @(                          < @{ $toplevel2submodules->{$t} }) );
+  foreach my $t (sort keys %$toplevel2submodules) {
+    my @downlines = sort {$a->[-1] cmp $b->[-1]}
+ @{ $toplevel2submodules->{$t} };
     
     printf $Contents qq[<dt><a name="\%s">\%s</a></dt>\n<dd>\n],
       esc( $t ), esc( $toplevel_form_freq->{$t} )
@@ -367,7 +367,7 @@ sub _write_contents_middle {
     my($path, $name);
     foreach my $e ( @downlines) {
       $name = $e->[0];
-      $path = join( "/", @( '.', < map { esc($_) } @( < @{$e->[3]})) )
+      $path = join( "/", @( '.', < map { esc($_) } @{$e->[3]}) )
         . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION);
       print $Contents qq{  <a href="$path">}, esc($name), "</a>&nbsp;&nbsp;\n";
     }
@@ -410,12 +410,12 @@ sub _prep_contents_breakdown {
     push @$entry, lc($entry->[0]); # add a sort-order key to the end
   }
 
-  foreach my $toplevel (@( <sort @( < keys %toplevel))) {
+  foreach my $toplevel (sort keys %toplevel) {
     my $fgroup = %toplevel_form_freq{$toplevel};
     %toplevel_form_freq{$toplevel} =
     (
       sort { $fgroup->{$b} <+> $fgroup->{$a}  or  $a cmp $b }
- @( <        keys %$fgroup)
+        keys %$fgroup
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
     )[0];
@@ -439,7 +439,7 @@ sub makepath {
   my($self, $outdir, $namelets) = < @_;
   return unless (nelems @$namelets) +> 1;
   for my $i (0 .. ((nelems @$namelets) - 2)) {
-    my $dir = $self->filespecsys->catdir( $outdir, < @$namelets[[@( <0 .. $i)]] );
+    my $dir = $self->filespecsys->catdir( $outdir, < @$namelets[[0 .. $i]] );
     if(-e $dir) {
       die "$dir exists but not as a directory!?" unless -d $dir;
       next;
@@ -544,7 +544,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   $self->muse("That's odd... no modules found!") unless %$m2p;
   if( DEBUG +> 4 ) {
     print "Modules found (name => path):\n";
-    foreach my $m (@( <sort {lc($a) cmp lc($b)} @( < keys %$m2p))) {
+    foreach my $m (sort {lc($a) cmp lc($b)} keys %$m2p) {
       print "  $m  %$m2p{$m}\n";
     }
     print "(total ",     nkeys %$m2p, ")\n\n";
@@ -629,7 +629,7 @@ sub _spray_css {
 sub _css_wad_to_markup {
   my($self, $depth) = < @_;
   
-  my @css  = @( < @{ $self->_css_wad || return '' } );
+  my @css  = @{ $self->_css_wad || return '' };
   return '' unless (nelems @css);
   
   my $rel = 'stylesheet';
@@ -643,7 +643,7 @@ sub _css_wad_to_markup {
 
     my( $url1, $url2, $title, $type, $media) = (
       $self->_maybe_uplink( $chunk->[0], $uplink ),
-      < map { esc($_) } @( (< grep !ref($_), @( < @$chunk)))
+      < map { esc($_) } @( (< grep !ref($_), @$chunk))
     );
 
     $out .= qq{<link rel="$rel" title="$title" type="$type" href="$url1$url2" media="$media" >\n};
@@ -668,7 +668,7 @@ sub _maybe_uplink {
 sub _gen_css_wad {
   my $self = @_[0];
   my $css_template = $self->_css_template;
-  foreach my $variation (@( <
+  foreach my $variation (
 
    # Commented out for sake of concision:
    #
@@ -692,12 +692,12 @@ sub _gen_css_wad {
     010b=white_with_green_on_grey
     101an=black_with_green_on_grey
     101bn=grey_with_green_on_white
-  ])) {
+  ]) {
 
     my $outname = $variation;
     my($flipmode, < @swap) = ( ($4 || ''), $1,$2,$3)
       if $outname =~ s/^([012])([012])([[012])([a-z]*)=?//s;
-    @swap = @( () ) if '010' eq join '', @( < @swap); # 010 is a swop-no-op!
+    @swap = @( () ) if '010' eq join '', @swap; # 010 is a swop-no-op!
   
     my $this_css =
       "/* This file is autogenerated.  Do not edit.  $variation */\n\n"
@@ -722,10 +722,10 @@ sub _gen_css_wad {
   }
 
   # Now a few indexless variations:
-  foreach my $variation (@( <qw[
+  foreach my $variation (qw[
     black_with_blue_on_white  white_with_purple_on_black
     white_with_green_on_grey  grey_with_green_on_white
-  ])) {
+  ]) {
     my $outname = "indexless_$variation";
     my $this_css = join "\n", @(
       "/* This file is autogenerated.  Do not edit.  $outname */\n",
@@ -799,7 +799,7 @@ sub _gen_javascript_wad {
 sub _javascript_wad_to_markup {
   my($self, $depth) = < @_;
   
-  my @scripts  = @( < @{ $self->_javascript_wad || return '' } );
+  my @scripts  = @{ $self->_javascript_wad || return '' };
   return '' unless (nelems @scripts);
   
   my $out = '';
@@ -812,7 +812,7 @@ sub _javascript_wad_to_markup {
 
     my( $url1, $url2, $type, $media) = (
       $self->_maybe_uplink( $s->[0], $uplink ),
-      < map { esc($_) } @( (< grep !ref($_), @( < @$s)))
+      < map { esc($_) } @( (< grep !ref($_), @$s))
     );
 
     $out .= qq{<script type="$type" src="$url1$url2"></script>\n};

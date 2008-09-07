@@ -36,14 +36,14 @@ use vars < qw/ $VERSION %HTML_Escapes @LatexSections /;
 $VERSION = '0.58';
 
 # Definitions of =headN -> latex mapping
-@LatexSections = @( <qw/
+@LatexSections =qw/
 		  chapter
 		  section
 		  subsection
 		  subsubsection
 		  paragraph
 		  subparagraph
-		  /);
+		  /;
 
 # Standard escape sequences converted to Latex.
 # The Unicode name of each character is given in the comments.
@@ -908,7 +908,7 @@ __TEX_COMMENT__
 	  $_ = '%% ' . $_;
 	}
       }
-      my $makeindex = join("\n", @(< @makeidx)) . "\n";
+      my $makeindex = join("\n", @makeidx) . "\n";
 
       # Table of contents
       my $tableofcontents = '\tableofcontents';
@@ -1123,7 +1123,7 @@ sub verbatim {
     # Clean tabs. Routine taken from Tabs.pm
     # by David Muir Sharnoff muir@idiom.com,
     # slightly modified by hsmyers@sdragons.com 10/22/01
-    my @l = @( < split("\n",$paragraph) );
+    my @l = split("\n",$paragraph);
     foreach ( @l) {
       1 while s/(^|\n)([^\t\n]*)(\t+)/{
 	$1. $2 . (" " x 
@@ -1131,7 +1131,7 @@ sub verbatim {
 		   - (length($2) % 8)))
 	  }/sx;
     }
-    $paragraph = join("\n", @(< @l));
+    $paragraph = join("\n", @l);
     # End of change.
 
 
@@ -1795,7 +1795,7 @@ sub _split_delimited {
 
   $input =~ s/\n/ /gm;
   $input .= ' ';
-  foreach (@( < split ( m//, $input )) ) {
+  foreach ( split ( m//, $input ) ) {
     $token .= $_;
     if (m/\{/) {
       $depth++;

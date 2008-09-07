@@ -351,8 +351,8 @@ sub next_todo {
 sub begin_is_use {
     my ($self, $cv) = < @_;
     my $root = $cv->ROOT;
-    local %$self{[@( <qw'curcv curcvlex')]};
-    < %$self{[@( <qw'curcv curcvlex')]} = ($cv);
+    local %$self{[qw'curcv curcvlex']};
+    < %$self{[qw'curcv curcvlex']} = ($cv);
 #require B::Debug;
 #B::walkoptree($cv->ROOT, "debug");
     my $lineseq = $root->first;
@@ -391,7 +391,7 @@ sub begin_is_use {
 	    $version = $version->PV;
 	} else {
 	    # version specified as a v-string
-	    $version = 'v'.join '.', @( < map ord, @( < split m//, $version->PV));
+	    $version = 'v'.join '.', map ord, split m//, $version->PV;
 	}
 	$constop = $constop->sibling;
 	return if $constop->name ne "method_named";
@@ -459,7 +459,7 @@ sub stash_subs {
 	$pack =~ s/(::)?$//;
 	$stash = \%{Symbol::stash($pack)};
     }
-    for my $key (@( <keys %$stash)) {
+    for my $key (keys %$stash) {
         my $val = svref_2object( \( $stash->{$key} ) );
 	my $class = class($val);
         if ($class eq "GV") {
@@ -584,7 +584,7 @@ sub init {
 }
 
 sub compile {
-    my(@args) = @( < @_ );
+    my(@args) = @_;
     return sub {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
@@ -613,15 +613,15 @@ sub compile {
 	$self->{'curcv'} = main_cv;
 	$self->{'curcvlex'} = undef;
 	print < $self->print_protos;
-	@{$self->{'subs_todo'}} = @( <
-	  sort {$a->[0] <+> $b->[0]} @( < @{$self->{'subs_todo'}}) );
+	@{$self->{'subs_todo'}} =
+	  sort {$a->[0] <+> $b->[0]} @{$self->{'subs_todo'}};
 	print $self->indent($self->deparse_root(main_root)), "\n"
 	  unless null main_root;
 	my @text;
 	while (scalar(nelems @{$self->{'subs_todo'}})) {
 	    push @text, < $self->next_todo;
 	}
-	print < $self->indent(join("", @( < @text))), "\n" if (nelems @text);
+	print < $self->indent(join("", @text)), "\n" if (nelems @text);
 
 	# Print __DATA__ section, if necessary
 	my $laststash = defined $self->{'curcop'}
@@ -662,13 +662,13 @@ sub ambient_pragmas {
 
 	    my @names;
 	    if ($val eq "all") {
-		@names = @( < qw/refs subs vars/ );
+		@names = qw/refs subs vars/;
 	    }
 	    elsif (ref $val) {
-		@names = @( < @$val );
+		@names = @$val;
 	    }
 	    else {
-		@names = @( < split' ', $val );
+		@names = split' ', $val;
 	    }
 	    $hint_bits ^|^= strict::bits(< @names);
 	}
@@ -694,13 +694,13 @@ sub ambient_pragmas {
 
 	    my @names;
 	    if ($val eq 'all') {
-		@names = @( < qw/taint eval/ );
+		@names = qw/taint eval/;
 	    }
 	    elsif (ref $val) {
-		@names = @( < @$val );
+		@names = @$val;
 	    }
 	    else {
-		@names = @( < split' ',$val );
+		@names = split' ',$val;
 	    }
 	    $hint_bits ^|^= re::bits(< @names);
 	}
@@ -713,10 +713,10 @@ sub ambient_pragmas {
 
 	    my @names;
 	    if (ref $val) {
-		@names = @( < @$val );
+		@names = @$val;
 	    }
 	    else {
-		@names = @( < split m/\s+/, $val );
+		@names = split m/\s+/, $val;
 	    }
 
 	    $warning_bits = $warnings::NONE if !defined ($warning_bits);
@@ -762,7 +762,7 @@ sub deparse {
 sub indent {
     my $self = shift;
     my $txt = shift;
-    my @lines = @( < split(m/\n/, $txt) );
+    my @lines = split(m/\n/, $txt);
     my $leader = "";
     my $level = 0;
     my $line;
@@ -784,7 +784,7 @@ sub indent {
 	}
 	$line =~ s/\cK;?//g;
     }
-    return join("\n", @( < @lines));
+    return join("\n", @lines);
 }
 
 sub deparse_sub {
@@ -805,9 +805,9 @@ sub deparse_sub {
 
     local($self->{'curcv'}) = $cv;
     local($self->{'curcvlex'});
-    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
-    local(%$self{[@( <qw'curstash warnings hints hinthash')]});
-    < %$self{[@( <qw'curstash warnings hints hinthash')]}
+    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
+    local(%$self{[qw'curstash warnings hints hinthash']});
+    < %$self{[qw'curstash warnings hints hinthash']}
       = < @oldv;
     my $body;
     if (not null $cv->ROOT) {
@@ -820,7 +820,7 @@ sub deparse_sub {
 	    $body = $self->lineseq(undef, < @ops).";";
 	    my $scope_en = $self->find_scope_en($lineseq);
 	    if (defined $scope_en) {
-		my $subs = join"", @( < $self->seq_subs($scope_en));
+		my $subs = join"", $self->seq_subs($scope_en);
 		$body .= ";\n$subs" if length($subs);
 	    }
 	}
@@ -838,7 +838,7 @@ sub deparse_sub {
 	}
     }
     if (%{$self->{'global_variables'}}) {
-        $body = "our (" . (join ", ", @( < keys %{$self->{'global_variables'}})) . ");\n" . $body;
+        $body = "our (" . (join ", ", keys %{$self->{'global_variables'}}) . ");\n" . $body;
     }
     return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
@@ -1035,12 +1035,12 @@ sub lineseq {
     $self->walk_lineseq($root, \@ops,
 		       sub { push @exprs, @_[0]} );
 
-    my $body = join(";\n", @( < grep {length} @( < @exprs)));
+    my $body = join(";\n", grep {length} @exprs);
     my $subs = "";
     if (defined $root && defined $limit_seq && !$self->{'in_format'}) {
-	$subs = join "\n", @( < $self->seq_subs($limit_seq));
+	$subs = join "\n", $self->seq_subs($limit_seq);
     }
-    return join(";\n", @( < grep {length} @( $body, $subs)));
+    return join(";\n", grep {length} @( $body, $subs));
 }
 
 sub scopeop {
@@ -1048,9 +1048,9 @@ sub scopeop {
     my $kid;
     my @kids;
 
-    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
-    local(%$self{[@( <qw'curstash warnings hints hinthash')]}) if $real_block;
-    < %$self{[@( <qw'curstash warnings hints hinthash')]} = < @oldv;
+    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
+    local(%$self{[qw'curstash warnings hints hinthash']}) if $real_block;
+    < %$self{[qw'curstash warnings hints hinthash']} = < @oldv;
     if ($real_block) {
 	$kid = $op->first->sibling; # skip enter
 	if (is_miniwhile($kid)) {
@@ -1097,9 +1097,9 @@ sub pp_leave { scopeop(1, < @_); }
 sub deparse_root {
     my $self = shift;
     my($op) = < @_;
-    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
-    local(%$self{[@( <qw'curstash warnings hints hinthash')]});
-    < %$self{[@( <qw'curstash warnings hints hinthash')]} = < @oldv;
+    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
+    local(%$self{[qw'curstash warnings hints hinthash']});
+    < %$self{[qw'curstash warnings hints hinthash']} = < @oldv;
     my @kids;
     return if null $op->first; # Can happen, e.g., for Bytecode without -k
     for (my $kid = $op->first->sibling; !null($kid); $kid = $kid->sibling) {
@@ -1113,7 +1113,7 @@ sub deparse_root {
 
 sub walk_lineseq {
     my ($self, $op, $kids, $callback) = < @_;
-    my @kids = @( < @$kids );
+    my @kids = @$kids;
     for (my $i = 0; $i +< nelems @kids; $i++) {
 	my $expr = "";
 	if (is_state @kids[$i]) {
@@ -1202,8 +1202,8 @@ sub populate_curcvlex {
 	my $padlist = $cv->PADLIST;
 	# an undef CV still in lexical chain
 	next if class($padlist) eq "SPECIAL";
-	my @padlist = @( < $padlist->ARRAY );
-	my @ns = @( < @padlist[0]->ARRAY );
+	my @padlist = $padlist->ARRAY;
+	my @ns = @padlist[0]->ARRAY;
 
 	for (my $i=0; $i+<nelems @ns; ++$i) {
 	    next if class(@ns[$i]) eq "SPECIAL";
@@ -1326,7 +1326,7 @@ sub pp_nextstate {
     }
 
     # hack to check that the hint hash hasn't changed
-    if ("{join ' ', @( <@{\@( <sort @( < %{$self->{'hinthash'} || \%()}))})}" ne "{join ' ', @( <@{\@( <sort @( < %{$op->hints_hash || \%()}))})}") {
+    if ("{join ' ',@{\sort %{$self->{'hinthash'} || \%()}}}" ne "{join ' ',@{\sort %{$op->hints_hash || \%()}}}") {
 	push @text, declare_hinthash($self->{'hinthash'}, $op->hints_hash, $self->{indent_size});
 	$self->{'hinthash'} = $op->hints_hash;
     }
@@ -1339,7 +1339,7 @@ sub pp_nextstate {
 	  ' "' . $op->file, qq'"\n';
     }
 
-    return join("", @( < @text));
+    return join("", @text);
 }
 
 sub declare_warnings {
@@ -1377,13 +1377,13 @@ my %ignored_hints = %(
 sub declare_hinthash {
     my ($from, $to, $indent) = < @_;
     my @decls;
-    for my $key (@( <keys %$to)) {
+    for my $key (keys %$to) {
 	next if %ignored_hints{$key};
 	if (!defined $from->{$key} or $from->{$key} ne $to->{$key}) {
 	    push @decls, qq(\$^H\{'$key'\} = q($to->{$key}););
 	}
     }
-    for my $key (@( <keys %$from)) {
+    for my $key (keys %$from) {
 	next if %ignored_hints{$key};
 	if (!exists $to->{$key}) {
 	    push @decls, qq(delete \$^H\{'$key'\};);
@@ -1731,7 +1731,7 @@ sub anon_hash_or_list {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
     }
-    return $pre . join(", ", @( < @exprs)) . $post;
+    return $pre . join(", ", @exprs) . $post;
 }
 
 sub pp_anonlist {
@@ -2071,7 +2071,7 @@ sub pp_repeat {
 	    push @exprs, < $self->deparse($kid, 6);
 	}
 	$right = $kid;
-	$left = "(" . join(", ", @( < @exprs)). ")";
+	$left = "(" . join(", ", @exprs). ")";
     } else {
 	$left = $self->deparse_binop_left($op, $left, $prec);
     }
@@ -2180,9 +2180,9 @@ sub listop {
 	push @exprs, $self->deparse($kid, 6);
     }
     if ($parens) {
-	return "$name(" . join(", ", @( < @exprs)) . ")";
+	return "$name(" . join(", ", @exprs) . ")";
     } else {
-	return "$name " . join(", ", @( < @exprs));
+	return "$name " . join(", ", @exprs);
     }
 }
 
@@ -2341,7 +2341,7 @@ sub indirop {
 	$name2 = 'reverse sort';
     }
 
-    my $args = $indir . join(", ", @( < @exprs));
+    my $args = $indir . join(", ", @exprs);
     if ($indir ne "" and $name eq "sort") {
 	# We don't want to say "sort(f 1, 2, 3)", since perl -w will
 	# give bareword warnings in that case. Therefore if context
@@ -2381,7 +2381,7 @@ sub mapop {
 	$expr = $self->deparse($kid, 6);
 	push @exprs, $expr if defined $expr;
     }
-    return $self->maybe_parens_func($name, $code . join(", ", @( < @exprs)), $cx, 5);
+    return $self->maybe_parens_func($name, $code . join(", ", @exprs), $cx, 5);
 }
 
 sub pp_mapwhile { mapop(< @_, "map") }
@@ -2455,9 +2455,9 @@ sub pp_list {
 	push @exprs, $expr;
     }
     if ($local) {
-	return "$local(" . join(", ", @( < @exprs)) . ")";
+	return "$local(" . join(", ", @exprs) . ")";
     } else {
-	return $self->maybe_parens( join(", ", @( < @exprs)), $cx, 6);	
+	return $self->maybe_parens( join(", ", @exprs), $cx, 6);	
     }
 }
 
@@ -2511,9 +2511,9 @@ sub loop_common {
     my($op, $cx, $init) = < @_;
     my $enter = $op->first;
     my $kid = $enter->sibling;
-    my @oldv = %$self{[@( <qw'curstash warnings hints hinthash')]};
-    local(%$self{[@( <qw'curstash warnings hints hinthash')]});
-    < %$self{[@( <qw'curstash warnings hints hinthash')]} = < @oldv;
+    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
+    local(%$self{[qw'curstash warnings hints hinthash']});
+    < %$self{[qw'curstash warnings hints hinthash']} = < @oldv;
     my $head = "";
     my $bare = 0;
     my $body;
@@ -2801,19 +2801,19 @@ sub pp_rv2cv {
 sub list_const {
     my $self = shift;
     my($cx, < @list) = < @_;
-    my @a = @( < map $self->const($_, 6), @( < @list) );
+    my @a = map $self->const($_, 6), @list;
     if ((nelems @a) == 0) {
 	return "()";
     } elsif ((nelems @a) == 1) {
 	return @a[0];
-    } elsif ( (nelems @a) +> 2 and !grep(!m/^-?\d+$/, @( < @a))) {
+    } elsif ( (nelems @a) +> 2 and !grep(!m/^-?\d+$/, @a)) {
 	# collapse (-1,0,1,2) into (-1..2)
 	my ($s, $e) = < @a[[@(0,-1)]];
 	my $i = $s;
 	return $self->maybe_parens("$s..$e", $cx, 9)
-	  unless grep $i++ != $_, @( < @a);
+	  unless grep $i++ != $_, @a;
     }
-    return $self->maybe_parens(join(", ", @( < @a)), $cx, 6);
+    return $self->maybe_parens(join(", ", @a), $cx, 6);
 }
 
 sub pp_rv2av {
@@ -2963,7 +2963,7 @@ sub slice {
 	for (; !null $kid; $kid = $kid->sibling) {
 	    push @elems, $self->deparse($kid, 6);
 	}
-	$list = join(", ", @( < @elems));
+	$list = join(", ", @elems);
     } else {
 	$list = $self->elem_or_slice_single_index($kid);
     }
@@ -3056,7 +3056,7 @@ sub e_method {
 
     my $meth = $info->{method};
     $meth = '?' . $self->deparse($meth, 1) if $info->{variable_method};
-    my $args = join(", ", @( < map { $self->deparse($_, 6) } @( < @{$info->{args}})) );
+    my $args = join(", ", map { $self->deparse($_, 6) } @{$info->{args}} );
     my $kid = $obj . "->" . $meth;
     if (length $args) {
 	return $kid . "(" . $args . ")"; # parens mandatory
@@ -3084,7 +3084,7 @@ sub check_proto {
 	} elsif ($chr eq ";") {
 	    $doneok = 1;
 	} elsif ($chr eq "@" or $chr eq "\%") {
-	    push @reals, < map($self->deparse($_, 6), @( < @args));
+	    push @reals, < map($self->deparse($_, 6), @args);
 	    @args = @( () );
 	} else {
 	    $arg = shift @args;
@@ -3141,7 +3141,7 @@ sub check_proto {
     }
     return "&" if $proto and !$doneok; # too few args and no `;'
     return "&" if (nelems @args);               # too many args
-    return  @("", join ", ", @( < @reals));
+    return  @("", join ", ", @reals);
 }
 
 sub pp_entersub {
@@ -3213,10 +3213,10 @@ sub pp_entersub {
     if ($declared and defined $proto and not $amper) {
 	($amper, $args) = < $self->check_proto($proto, < @exprs);
 	if ($amper eq "&") {
-	    $args = join(", ", @( < map($self->deparse($_, 6), @( < @exprs))));
+	    $args = join(", ", map($self->deparse($_, 6), @exprs));
 	}
     } else {
-	$args = join(", ", @( < map($self->deparse($_, 6), @( < @exprs))));
+	$args = join(", ", map($self->deparse($_, 6), @exprs));
     }
     if ($prefix or $amper) {
 	if ($op->flags ^&^ OPf_STACKED) {
@@ -3409,7 +3409,7 @@ sub re_unback {
 
 sub balanced_delim {
     my($str) = < @_;
-    my @str = @( < split m//, $str );
+    my @str = split m//, $str;
     my($ar, $open, $close, $fail, $c, $cnt, $last_bs);
     for $ar (@(\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}'))) {
 	($open, $close) = < @$ar;
@@ -3555,10 +3555,10 @@ sub const {
 	} elsif (class($ref) eq "HV") {
 	    my %hash = %( < $ref->ARRAY );
 	    my @elts;
-	    for my $k (@( <sort @( < keys %hash))) {
+	    for my $k (sort keys %hash) {
 		push @elts, "$k => " . $self->const(%hash{$k}, 6);
 	    }
-	    return '\%(' . join(", ", @( < @elts)) . ")";
+	    return '\%(' . join(", ", @elts) . ")";
 	} elsif (class($ref) eq "CV") {
 	    return "sub " . $self->deparse_sub($ref);
 	}
@@ -3732,7 +3732,7 @@ sub pchr { # ASCII
 }
 
 sub collapse {
-    my(@chars) = @( < @_ );
+    my(@chars) = @_;
     my($str, $c, $tr) = ("");
     for ($c = 0; $c +< nelems @chars; $c++) {
 	$tr = @chars[$c];
@@ -3860,7 +3860,7 @@ sub pp_regcomp {
 # osmic acid -- see osmium tetroxide
 
 my %matchwords;
-map(%matchwords{join "", @( < sort @( < split m//, $_))} = $_, @( 'cig', 'cog', 'cos', 'cogs',
+map(%matchwords{join "", sort split m//, $_} = $_, @( 'cig', 'cog', 'cos', 'cogs',
     'cox', 'go', 'is', 'ism', 'iso', 'mig', 'mix', 'osmic', 'ox', 'sic',
     'sig', 'six', 'smog', 'so', 'soc', 'sog', 'xi'));
 
@@ -3944,7 +3944,7 @@ sub pp_split {
 	@exprs[0] = "' '";
     }
 
-    $expr = "split(" . join(", ", @( < @exprs)) . ")";
+    $expr = "split(" . join(", ", @exprs) . ")";
     if ($ary) {
 	return $self->maybe_parens("$ary = $expr", $cx, 7);
     } else {
@@ -3957,7 +3957,7 @@ sub pp_split {
 # bivalent grouping C=NOH [Webster's Tenth]
 
 my %substwords;
-map(%substwords{join "", @( < sort @( < split m//, $_))} = $_, @( 'ego', 'egoism', 'em',
+map(%substwords{join "", sort split m//, $_} = $_, @( 'ego', 'egoism', 'em',
     'es', 'ex', 'exes', 'gee', 'go', 'goes', 'ie', 'ism', 'iso', 'me',
     'meese', 'meso', 'mig', 'mix', 'os', 'ox', 'oxime', 'see', 'seem',
     'seg', 'sex', 'sig', 'six', 'smog', 'sog', 'some', 'xi'));

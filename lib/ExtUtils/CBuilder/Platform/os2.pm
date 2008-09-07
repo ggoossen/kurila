@@ -5,7 +5,7 @@ use ExtUtils::CBuilder::Platform::Unix;
 
 use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( < qw(ExtUtils::CBuilder::Platform::Unix) );
+@ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
 sub need_prelink { 1 }
 
@@ -14,7 +14,7 @@ sub prelink {
   my $self = shift;
   my %args = %( < @_ );
 
-  my @res = @( < $self->SUPER::prelink(< %args) );
+  my @res = $self->SUPER::prelink(< %args);
   die "Unexpected number of DEF files" unless (nelems @res) == 1;
   die "Can't find DEF file in the output"
     unless @res[0] =~ m,^(.*)\.def$,si;
@@ -30,7 +30,7 @@ sub _do_link {
       and (defined %args{module_name} and length %args{module_name})) {
 
     # DynaLoader::mod2fname() is a builtin func
-    my $lib = DynaLoader::mod2fname(\@( <split m/::/, %args{module_name}));
+    my $lib = DynaLoader::mod2fname(\split m/::/, %args{module_name});
 
     # Now know the basename, find directory parts via lib_file, or objects
     my $objs = ( (ref %args{objects}) ? %args{objects} : \@(%args{objects}) );
@@ -56,7 +56,7 @@ sub extra_link_args_after_prelink {
   # Add .DEF file to the link line
   my ($self, < %args) = < @_;
 
-  my @DEF = @( < grep m/\.def$/i, @( < @{%args{prelink_res}}) );
+  my @DEF = grep m/\.def$/i, @{%args{prelink_res}};
   die "More than one .def files created by `prelink' stage" if (nelems @DEF) +> 1;
   # XXXX No "$how" argument here, so how to test for dynamic link?
   die "No .def file created by `prelink' stage"

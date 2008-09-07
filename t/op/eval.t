@@ -255,9 +255,9 @@ fred2(49);
 
 sub do_sort {
     my $zzz = 2;
-    my @a = @( < sort
+    my @a = sort
                { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <+> $b }
- @(               2, 1) );
+ @(               2, 1);
 }
 do_sort();
 
@@ -381,7 +381,7 @@ $test++;
 {
   my %h;
   %h{a}=1;
-  foreach my $k (@( <keys %h)) {
+  foreach my $k (keys %h) {
     if (defined $k and $k eq 'a') {
       print "ok $test\n";
     } else {

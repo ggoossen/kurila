@@ -92,7 +92,7 @@ sub thaw_fail {
 
 sub test_locked_hash {
   my $hash = shift;
-  my @keys = @( < keys %$hash );
+  my @keys = keys %$hash;
   my ($key, $value) = each %$hash;
   try {$hash->{$key} = 'x' . $value};
   like( $@->{description}, "/^Modification of a read-only value attempted/",
@@ -101,12 +101,12 @@ sub test_locked_hash {
   try {$hash->{use} = 'perl'};
   like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
-  ok (eq_array(\@( <keys %$hash), \@keys), "Still the same keys?");
+  ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
 
 sub test_restricted_hash {
   my $hash = shift;
-  my @keys = @( < keys %$hash );
+  my @keys = keys %$hash;
   my ($key, $value) = each %$hash;
   try {$hash->{$key} = 'x' . $value};
   is( $@, '',
@@ -115,7 +115,7 @@ sub test_restricted_hash {
   try {$hash->{use} = 'perl'};
   like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
-  ok (eq_array(\@( <keys %$hash), \@keys), "Still the same keys?");
+  ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
 
 sub test_placeholder {

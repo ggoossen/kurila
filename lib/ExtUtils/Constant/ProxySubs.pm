@@ -61,7 +61,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my ($self, $type) = < @_;
-    return %type_to_C_value{$type} || sub {return @(< map {ref $_ ? < @$_ : $_} @( < @_)) };
+    return %type_to_C_value{$type} || sub {return map {ref $_ ? < @$_ : $_} @_ };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -79,7 +79,7 @@ sub type_to_C_value {
      PV => \@('const char *'),
      PVN => \@('const char *', 'STRLEN'),
      );
-%type_temporary{$_} = \@($_) foreach @( < qw(IV UV NV));
+%type_temporary{$_} = \@($_) foreach qw(IV UV NV);
      
 while (my ($type, $value) = each %XS_TypeSet) {
     %type_num_args{$type}
@@ -159,7 +159,7 @@ sub WriteConstants {
     my $ARGS = \%(< @_);
 
     my ($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-	= < %{$ARGS}{[@( <qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME))]};
+	= < %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{PROXYSUBS};
     $options = \%() unless ref $options;
@@ -176,9 +176,9 @@ sub WriteConstants {
     # A hash to lookup items with.
     my $items = \%();
 
-    my @items = @( < $self->normalise_items (\%(disable_utf8_duplication => 1),
+    my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
 					$default_type, $what, $items,
-					< @{$ARGS->{NAMES}}) );
+					< @{$ARGS->{NAMES}});
 
     # Partition the values by type. Also include any defaults in here
     # Everything that doesn't have a default needs alternative code for
@@ -288,9 +288,9 @@ EOBOOT
     my %iterator;
 
     $found->{''}
-        = \@(< map {\%(< %$_, type=>'', invert_macro => 1)} @( < @$notfound));
+        = \ map {\%(< %$_, type=>'', invert_macro => 1)} @$notfound;
 
-    foreach my $type (@( <sort @( < keys %$found))) {
+    foreach my $type (sort keys %$found) {
 	my $struct = %type_to_struct{$type};
 	my $type_to_value = $self->type_to_C_value($type);
 	my $number_of_args = %type_num_args{$type};
@@ -348,7 +348,7 @@ EOBOOT
 EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
-    foreach my $type (@( <sort @( < keys %$found))) {
+    foreach my $type (sort keys %$found) {
 	print $xs_fh $self->boottime_iterator($type, %iterator{$type}, 
 					      'symbol_table',
 					      $add_symbol_subname);
@@ -435,7 +435,7 @@ EOBOOT
 	printf $xs_fh "            temp\%d = \%s;\n", $counter++, $_
 	    foreach  &$type_to_value($value);
 
-	my @tempvarnames = @( < map {sprintf 'temp%d', $_} @( < 0 .. $counter - 1) );
+	my @tempvarnames = map {sprintf 'temp%d', $_} 0 .. $counter - 1;
 	printf $xs_fh <<"EOBOOT", $name, &$generator(<@tempvarnames);
 	    {$c_subname}_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);

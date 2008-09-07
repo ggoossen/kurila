@@ -1,7 +1,7 @@
 package Pod::Plainer;
 use strict;
 use Pod::Parser;
-our @ISA = @( < qw(Pod::Parser) );
+our @ISA = qw(Pod::Parser);
 our $VERSION = '0.01';
 
 our %E = %( < qw( < lt > gt ) );

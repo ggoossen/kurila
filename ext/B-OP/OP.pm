@@ -6,7 +6,7 @@ use B;
 
 require DynaLoader;
 use vars < qw( @ISA $VERSION );
-@ISA = @( < qw(DynaLoader) );
+@ISA = qw(DynaLoader);
 $VERSION = '1.10';
 
 B::OP->bootstrap($VERSION);
@@ -23,7 +23,7 @@ B::OP->bootstrap($VERSION);
 @B::PMOP::ISA = @( 'B::LISTOP' );
 @B::COP::ISA = @( 'B::OP' );
 
-@B::optype = @( < qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP) );
+@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP);
 
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 

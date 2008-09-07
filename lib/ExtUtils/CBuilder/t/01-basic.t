@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
-    @INC = @( < qw(../..) );
+    @INC = qw(../..);
   }
 }
 
@@ -52,7 +52,7 @@ for (@($source_file, $object_file, $lib_file)) {
   1 while unlink;
 }
 
-my @words = @( < $b->split_like_shell(' foo bar') );
+my @words = $b->split_like_shell(' foo bar');
 if ($^O eq 'MSWin32') {
   ok (nelems @words), 1;
   ok @words[0], ' foo bar';

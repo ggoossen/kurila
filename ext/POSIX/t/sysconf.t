@@ -11,28 +11,27 @@ use File::Spec;
 use POSIX;
 use Scalar::Util < qw(looks_like_number);
 
-sub check(@) {
-    @( < grep { eval "&$_;1" or $@->{description}!~m/vendor has not defined POSIX macro/ } @( < @_) )
+sub check(@) { grep { eval "&$_;1" or $@->{description}!~m/vendor has not defined POSIX macro/ } @_
 }       
 
-my @path_consts = @( < check < qw(
+my @path_consts = check < qw(
     _PC_CHOWN_RESTRICTED _PC_LINK_MAX _PC_NAME_MAX
     _PC_NO_TRUNC _PC_PATH_MAX
-) );
+);
 
-my @path_consts_terminal = @( < check < qw(
+my @path_consts_terminal = check < qw(
     _PC_MAX_CANON _PC_MAX_INPUT _PC_VDISABLE
-) );
+);
 
-my @path_consts_fifo = @( < check < qw(
+my @path_consts_fifo = check < qw(
     _PC_PIPE_BUF
-) );
+);
 
-my @sys_consts = @( < check < qw(
+my @sys_consts = check < qw(
     _SC_ARG_MAX _SC_CHILD_MAX _SC_CLK_TCK _SC_JOB_CONTROL
     _SC_NGROUPS_MAX _SC_OPEN_MAX _SC_PAGESIZE _SC_SAVED_IDS
     _SC_STREAM_MAX _SC_VERSION _SC_TZNAME_MAX
-) );
+);
 
 my $tests = 2 * 3 * (nelems @path_consts) +
             2 * 3 * (nelems @path_consts_terminal) +

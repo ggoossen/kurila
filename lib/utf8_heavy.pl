@@ -22,7 +22,7 @@ sub SWASHNEW_real {
     my ($class, $type, $list, $minbits, $none) = < @_;
     local $^D = 0 if $^D;
 
-    print STDERR "SWASHNEW {join ' ', @( <@_)}\n" if DEBUG;
+    print STDERR "SWASHNEW {join ' ',@_}\n" if DEBUG;
 
     ##
     ## Get the list of codepoints for the type.
@@ -207,15 +207,14 @@ sub SWASHNEW_real {
 
     my $ORIG = $list;
     if ($list) {
-	my @tmp = @( < split(m/^/m, $list) );
+	my @tmp = split(m/^/m, $list);
 	my %seen;
 	no warnings;
-	$extras = join '', @( < grep m/^[^0-9a-fA-F]/, @( < @tmp));
-	$list = join '', @(
-	    < map  { $_->[1] }
- @( <	    sort { $a->[0] <+> $b->[0] }
- @(	    < map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) }
- @(	    < grep { m/^([0-9a-fA-F]+)/ and not %seen{$1}++ } @( < @tmp))))); # XXX doesn't do ranges right
+	$extras = join '', grep m/^[^0-9a-fA-F]/, @tmp;
+	$list = join '', map  { $_->[1] }
+	    sort { $a->[0] <+> $b->[0] }
+ map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) }
+ grep { m/^([0-9a-fA-F]+)/ and not %seen{$1}++ } @tmp; # XXX doesn't do ranges right
     }
 
     if ($none) {

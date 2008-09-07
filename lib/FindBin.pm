@@ -101,9 +101,9 @@ use File::Spec;
 
 
 our ($Bin, $Script, $RealBin, $RealScript, $Dir, $RealDir);
-our @EXPORT_OK = @( < qw($Bin $Script $RealBin $RealScript $Dir $RealDir) );
-our %EXPORT_TAGS = %(ALL => \@( <qw($Bin $Script $RealBin $RealScript $Dir $RealDir)));
-our @ISA = @( < qw(Exporter) );
+our @EXPORT_OK = qw($Bin $Script $RealBin $RealScript $Dir $RealDir);
+our %EXPORT_TAGS = %(ALL => \qw($Bin $Script $RealBin $RealScript $Dir $RealDir));
+our @ISA = qw(Exporter);
 
 our $VERSION = "1.49";
 

@@ -52,7 +52,7 @@ undef $OUTPUT_FIELD_SEPARATOR;
 our $threads;
 if ($threads) { $" = "\n" } else { $LIST_SEPARATOR = "\n" };
 my @foo = @(8, 9);
-@foo = @( < split(m/\n/, join $", @( < @foo) ) );
+@foo = split(m/\n/, join $", @foo );
 is( @foo[0], 8, '$"' );
 is( @foo[1], 9, '$LIST_SEPARATOR' );
 

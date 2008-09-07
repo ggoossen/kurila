@@ -11,7 +11,7 @@ print "1..9\n";
 
 our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
 
-@ARGV = @( < qw(-Foo -baR --foo bar) );
+@ARGV = qw(-Foo -baR --foo bar);
 my $p = Getopt::Long::Parser->new(config => \@("no_ignore_case"));
 undef $opt_baR;
 undef $opt_bar;

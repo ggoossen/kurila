@@ -62,7 +62,7 @@ SKIP: {
 
 ok( -x 'op' ); # Hohum.  Are directories -x everywhere?
 
-is( "{join ' ', @( <@{\@(< grep -r, @( < qw(foo io noo op zoo)))})}", "io op" );
+is( "{join ' ',@{\ grep -r, qw(foo io noo op zoo)}}", "io op" );
 
 # Test stackability of filetest operators
 

@@ -428,10 +428,10 @@ use Exporter;
 use File::Spec;
 
 use vars < qw(@ISA @EXPORT);
-@EXPORT = @( < qw(&pod2usage) );
+@EXPORT = qw(&pod2usage);
 BEGIN {
        require Pod::Text;
-       @ISA = @( < qw( Pod::Text ) );
+       @ISA = qw( Pod::Text );
 }
 
 

@@ -20,7 +20,7 @@ ok(1, 'Testing again');
 
 {
     my $warning = '';
-    local %SIG{__WARN__} = sub { $warning = join "", @( < @_) };
+    local %SIG{__WARN__} = sub { $warning = join "", @_ };
     SKIP: {
         skip 'Just testing skip with no_plan';
         fail("So very failed");

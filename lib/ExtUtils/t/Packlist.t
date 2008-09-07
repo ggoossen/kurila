@@ -47,7 +47,7 @@ SKIP: {
 
 	# now get a couple of extra keys, to mess with the hash iterator
 	my $i = 0;
-	for (@( <keys %{ $pl->{data} }) ) {
+	for (keys %{ $pl->{data} } ) {
 		last if $i++;
 	}
 

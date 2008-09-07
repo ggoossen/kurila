@@ -30,7 +30,7 @@ my %types = %(
 
 # use Devel::Peek; Dump $pvmg;
 
-my @keys = @( < keys %types );
+my @keys = keys %types;
 plan tests => (nelems @keys) * nelems @keys;
 
 foreach my $source_type ( @keys) {

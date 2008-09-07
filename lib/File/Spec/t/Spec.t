@@ -706,7 +706,7 @@ plan tests => scalar (nelems @tests) + 1;
 {
     package File::Spec::FakeWin32;
     use vars < qw(@ISA);
-    @ISA = @( < qw(File::Spec::Win32) );
+    @ISA = qw(File::Spec::Win32);
 
     sub _cwd { 'C:\one\two' }
 
@@ -754,7 +754,7 @@ sub tryfunc {
 
     $function =~ s/^([^\$].*->)/File::Spec::$1/;
     my $got = eval $function;
-    $got = join ',', @( <$got) if (ref \$got) eq "ARRAY";
+    $got = join ',',$got if (ref \$got) eq "ARRAY";
 
     if ( $@ ) {
       if ( $@->{description} =~ m/^\Q$skip_exception/ ) {

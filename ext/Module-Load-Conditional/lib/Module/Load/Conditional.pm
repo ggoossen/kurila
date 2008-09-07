@@ -17,12 +17,12 @@ BEGIN {
     use vars <        qw[ $VERSION @ISA $VERBOSE $CACHE @EXPORT_OK 
                         $FIND_VERSION $ERROR $CHECK_INC_HASH];
     use Exporter;
-    @ISA            = @( < qw[Exporter] );
+    @ISA            = qw[Exporter];
     $VERSION        = '0.22';
     $VERBOSE        = 0;
     $FIND_VERSION   = 1;
     $CHECK_INC_HASH = 0;
-    @EXPORT_OK      = @( < qw[check_install can_load requires] );
+    @EXPORT_OK      = qw[check_install can_load requires];
 }
 
 =pod
@@ -200,7 +200,7 @@ sub check_install {
                     ($fh) = $dir->($dir, $file);
     
                 } elsif (UNIVERSAL::isa($dir, 'ARRAY')) {
-                    ($fh) = $dir->[0]->($dir, $file, < %{$dir}{[@( <1..((nelems @{$dir})-1))]})
+                    ($fh) = $dir->[0]->($dir, $file, < %{$dir}{[1..((nelems @{$dir})-1)]})
     
                 } elsif (UNIVERSAL::can($dir, 'INC')) {
                     ($fh) = $dir->INC->($dir, $file);
@@ -416,7 +416,7 @@ sub can_load {
         my $href = $args->{modules};
 
         my @load;
-        for my $mod (@( < keys %$href) ) {
+        for my $mod ( keys %$href ) {
 
             next if $CACHE->{$mod}->{usable} && !$args->{nocache};
 
@@ -448,7 +448,7 @@ sub can_load {
 
             map {
                 $CACHE->{$mod}->{$_} = $mod_data->{$_}
-            } @( < qw[version file uptodate]);
+            } qw[version file uptodate];
 
             push @load, $mod;
         }
@@ -517,14 +517,13 @@ sub requires {
         return undef;
     }
 
-    my $lib = join " ", @( < map { qq["-I$_"] } @( < @INC));
+    my $lib = join " ", map { qq["-I$_"] } @INC;
     my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
 
-    return @( <  sort @(
-                < grep { !m/^$who$/  }
- @(                < map  { chomp; s|/|::|g; $_ }
- @(                < grep { s|\.pm$||i; }
- @(            `$cmd`)))));
+    return  sort grep { !m/^$who$/  }
+ map  { chomp; s|/|::|g; $_ }
+ grep { s|\.pm$||i; }
+ @(            `$cmd`);
 }
 
 1;

@@ -17,8 +17,7 @@ sub pump_it_up {
   my(@t, $t);
   while($t = $p->get_token) { push @t, $t }
   print "# Count of tokens: ", scalar(nelems @t), "\n";
-  print "#  I.e., \{", join("\n#       + ", @(
-    < map ref($_) . ": " . $_->dump, @( < @t))), "\} \n";
+  print "#  I.e., \{", join("\n#       + ", map ref($_) . ": " . $_->dump, @t), "\} \n";
   return @t;
 }
 
@@ -26,10 +25,10 @@ my @t;
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-@t = @( < pump_it_up(qq{\n\nProk\n\n=head1 Things\n\n=cut\n\nBzorch\n\n}) );
+@t = pump_it_up(qq{\n\nProk\n\n=head1 Things\n\n=cut\n\nBzorch\n\n});
 
 if(not(
-  ok nelems( grep { ref $_ and $_->can('type') } @( < @t)), 5
+  ok nelems( grep { ref $_ and $_->can('type') } @t), 5
 )) {
   ok 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 12 ) {ok 0}
@@ -53,13 +52,13 @@ if(not(
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-@t = @( < pump_it_up(
+@t = pump_it_up(
     qq{Woowoo\n\n=over\n\n=item *\n\nStuff L<HTML::TokeParser>\n\n}
   . qq{=item *\n\nThings I<like that>\n\n=back\n\n=cut\n\n}
-) );
+);
 
 if(
-  not( ok nelems( grep { ref $_ and $_->can('type') } @( < @t)) => 16 )
+  not( ok nelems( grep { ref $_ and $_->can('type') } @t) => 16 )
 ) {
   ok 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 32 ) {ok 0}
@@ -184,8 +183,8 @@ ok @t[4]->tagname, 'Document';
 print "# Testing pullparsing from an arrayref with terminal newlines\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-$p->set_source( \@( < map "$_\n", @(
-  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut')) );
+$p->set_source( \ map "$_\n", @(
+  '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') );
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {

@@ -137,7 +137,7 @@ if ((nelems @authors)) {
       }
     }
   }
-  foreach (@( <keys %raw)) {
+  foreach (keys %raw) {
     print "E-mail $_ occurs %raw{$_} times\n" if %raw{$_} +> 1;
     $_ = lc $_;
     %authors{%map{$_} || $_}++;
@@ -181,14 +181,14 @@ if ($rank) {
   &display_ordered(\%committers);
 } elsif (%authors) {
   my %missing;
-  foreach (@( <sort @( < keys %patchers))) {
+  foreach (sort keys %patchers) {
     next if %authors{$_};
     # Sort by number of patches, then name.
     %missing{%patchers{$_}}->{$_}++;
   }
-  foreach my $patches (@( <sort {$b <+> $a} @( < keys %missing))) {
+  foreach my $patches (sort {$b <+> $a} keys %missing) {
     print "$patches patch(es)\n";
-    foreach my $author (@( <sort @( < keys %{%missing{$patches}}))) {
+    foreach my $author (sort keys %{%missing{$patches}}) {
       print "  $author\n";
     }
   }
@@ -206,7 +206,7 @@ sub display_ordered {
   my $i = (nelems @sorted);
   return unless (nelems @sorted);
   my $sum = 0;
-  foreach my $i (@($reverse ? < 0 ..( (nelems @sorted)-1) : < reverse @( < 0 ..( (nelems @sorted)-1)))) {
+  foreach my $i (@($reverse ? < 0 ..( (nelems @sorted)-1) : < reverse 0 ..( (nelems @sorted)-1))) {
     next unless @sorted[$i];
     my $prefix;
     $sum += $i * nelems @{@sorted[$i]};
@@ -217,7 +217,7 @@ sub display_ordered {
     } else {
 	$prefix = "$value:\t";
     }
-    print < wrap ($prefix, "\t", join (" ", @( < sort @( < @{@sorted[$i]}))), "\n");
+    print < wrap ($prefix, "\t", join (" ", sort @{@sorted[$i]}), "\n");
   }
 }
 

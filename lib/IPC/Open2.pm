@@ -6,8 +6,8 @@ our ($VERSION, @ISA, @EXPORT);
 require Exporter;
 
 $VERSION	= 1.02;
-@ISA		= @( < qw(Exporter) );
-@EXPORT		= @( < qw(open2) );
+@ISA		= qw(Exporter);
+@EXPORT		= qw(open2);
 
 =head1 NAME
 
@@ -110,7 +110,7 @@ require IPC::Open3;
 
 sub open2 {
     return IPC::Open3::_open3('open2', scalar caller,
-				@_[1], @_[0], '>&STDERR', < @_[[@( <2 .. ((nelems @_)-1))]]);
+				@_[1], @_[0], '>&STDERR', < @_[[2 .. ((nelems @_)-1)]]);
 }
 
 1

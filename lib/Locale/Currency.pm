@@ -15,9 +15,9 @@ require Exporter;
 #-----------------------------------------------------------------------
 use vars < qw($VERSION @ISA @EXPORT);
 $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA          = @( < qw(Exporter) );
-@EXPORT       = @( < qw(&code2currency &currency2code
-                   &all_currency_codes &all_currency_names ) );
+@ISA          = qw(Exporter);
+@EXPORT       = qw(&code2currency &currency2code
+                   &all_currency_codes &all_currency_names );
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
@@ -85,7 +85,7 @@ sub currency2code
 #=======================================================================
 sub all_currency_codes
 {
-    return @( <keys %CODES);
+    returnkeys %CODES;
 }
 
 
@@ -96,7 +96,7 @@ sub all_currency_codes
 #=======================================================================
 sub all_currency_names
 {
-    return @( <values %CODES);
+    returnvalues %CODES;
 }
 
 

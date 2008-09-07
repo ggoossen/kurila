@@ -6,7 +6,7 @@ use ExtUtils::CBuilder::Platform::Unix;
 
 use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( < qw(ExtUtils::CBuilder::Platform::Unix) );
+@ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
 sub link_executable {
   my $self = shift;

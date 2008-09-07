@@ -37,8 +37,8 @@ sub compare_addr {
 	}
 	return 0;
     }
-    my @a = @( < unpack_sockaddr_in($a) );
-    my @b = @( < unpack_sockaddr_in($b) );
+    my @a = unpack_sockaddr_in($a);
+    my @b = unpack_sockaddr_in($b);
     "@a[0]@a[1]" eq "@b[0]@b[1]";
 }
 

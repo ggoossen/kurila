@@ -33,10 +33,10 @@ ok( !defined(&abs_path),        '  nor abs_path()' );
 ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 {
-  my @fields = @( < qw(PATH IFS CDPATH ENV BASH_ENV) );
-  my $before = grep exists %ENV{$_}, @( < @fields);
+  my @fields = qw(PATH IFS CDPATH ENV BASH_ENV);
+  my $before = grep exists %ENV{$_}, @fields;
   cwd();
-  my $after = grep exists %ENV{$_}, @( < @fields);
+  my $after = grep exists %ENV{$_}, @fields;
   is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
 }
 
@@ -52,8 +52,8 @@ my $pwd_cmd =
         "cd" :
     ($IsMacOS) ?
         "pwd" :
-        (grep { -x && -f } @( < map { "$_/$pwd%Config{exe_ext}" }
- @( <	                   split m/%Config{path_sep}/, %ENV{PATH})))[0];
+        (grep { -x && -f } map { "$_/$pwd%Config{exe_ext}" }
+	                   split m/%Config{path_sep}/, %ENV{PATH})[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {
@@ -67,7 +67,7 @@ SKIP: {
 
     print "# native pwd = '$pwd_cmd'\n";
 
-    local %ENV{[@( <qw(PATH IFS CDPATH ENV BASH_ENV))]} = ();
+    local %ENV{[qw(PATH IFS CDPATH ENV BASH_ENV)]} = ();
     my ($pwd_cmd_untainted) = $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
@@ -106,13 +106,13 @@ SKIP: {
     }
 }
 
-my @test_dirs = @( < qw{_ptrslt_ _path_ _to_ _a_ _dir_} );
+my @test_dirs = qw{_ptrslt_ _path_ _to_ _a_ _dir_};
 my $Test_Dir     = File::Spec->catdir(< @test_dirs);
 
 mkpath(\@($Test_Dir), 0, 0777);
 Cwd::chdir $Test_Dir;
 
-foreach my $func (@( <qw(cwd getcwd fastcwd fastgetcwd))) {
+foreach my $func (qw(cwd getcwd fastcwd fastgetcwd)) {
   my $result = eval "$func()";
   is $@, '';
   dir_ends_with( $result, $Test_Dir, "$func()" );
@@ -201,7 +201,7 @@ SKIP: {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
     opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
-    ($file) = < grep {-f $_ and not -l $_} @( < map File::Spec->catfile($root, $_), @( readdir FH));
+    ($file) = < grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
     closedir FH;
   }
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
@@ -219,8 +219,7 @@ SKIP: {
 # directory or path comparison capability.
 
 sub bracketed_form_dir {
-  return join '', @( < map "[$_]", @( 
-    < grep length, @( < File::Spec->splitdir(File::Spec->canonpath( shift() )))));
+  return join '', map "[$_]", grep length, File::Spec->splitdir(File::Spec->canonpath( shift() ));
 }
 
 sub dir_ends_with {
@@ -230,8 +229,7 @@ sub dir_ends_with {
 }
 
 sub bracketed_form_path {
-  return join '', @( < map "[$_]", @( 
-    < grep length, @( < File::Spec->splitpath(File::Spec->canonpath( shift() )))));
+  return join '', map "[$_]", grep length, File::Spec->splitpath(File::Spec->canonpath( shift() ));
 }
 
 sub path_ends_with {

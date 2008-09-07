@@ -25,11 +25,11 @@ my @prgs = @( () ) ;
 my @w_files = @( () ) ;
 
 if ((nelems @ARGV))
-  { print "ARGV = [{join ' ', @( <@ARGV)}]\n" ;
+  { print "ARGV = [{join ' ',@ARGV}]\n" ;
     if ($Is_MacOS) {
-      @w_files = @( < map { s#^#:lib:$pragma_name:#; $_ } @( < @ARGV) )
+      @w_files = map { s#^#:lib:$pragma_name:#; $_ } @ARGV
     } else {
-      @w_files = @( < map { s#^#./lib/$pragma_name/#; $_ } @( < @ARGV) )
+      @w_files = map { s#^#./lib/$pragma_name/#; $_ } @ARGV
     }
   }
 else
@@ -99,10 +99,10 @@ for ( @prgs){
 	$todo_reason = $temp;
     }
     if ( $prog =~ m/--FILE--/) {
-        my(@files) = @( < split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ) ;
+        my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error: test $_ didn't split into pairs, got " .
-		scalar(nelems @files) . "[" . join("\%\%\%\%", @( < @files)) ."]\n"
+		scalar(nelems @files) . "[" . join("\%\%\%\%", @files) ."]\n"
 	    if (nelems @files) % 2 ;
 	while ((nelems @files) +> 2) {
 	    my $filename = shift @files ;
@@ -167,7 +167,7 @@ for ( @prgs){
     my $option_regex = 0;
     my $option_random = 0;
     if ($expected =~ s/^OPTIONS? (.+)\n//) {
-	foreach my $option (@( <split(' ', $1))) {
+	foreach my $option (split(' ', $1)) {
 	    if ($option eq 'regex') { # allow regular expressions
 		$option_regex = 1;
 	    }
@@ -218,10 +218,10 @@ sub randomMatch
     my $got = shift ;
     my $expected = shift;
 
-    my @got = @( < sort @( < split "\n", $got) ) ;
-    my @expected = @( < sort @( < split "\n", $expected) ) ;
+    my @got = sort split "\n", $got ;
+    my @expected = sort split "\n", $expected ;
 
-   return "{join ' ', @( <@got)}" eq "{join ' ', @( <@expected)}";
+   return "{join ' ',@got}" eq "{join ' ',@expected}";
 
 }
 

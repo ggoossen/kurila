@@ -6,8 +6,8 @@ use ExtUtils::Constant::Utils 'perl_stringify';
 require ExtUtils::Constant::Base;
 
 
-@ISA = @( < qw(ExtUtils::Constant::Base Exporter) );
-@EXPORT_OK = @( < qw(%XS_Constant %XS_TypeSet) );
+@ISA = qw(ExtUtils::Constant::Base Exporter);
+@EXPORT_OK = qw(%XS_Constant %XS_TypeSet);
 
 $VERSION = '0.02';
 
@@ -69,12 +69,12 @@ sub header {
   my @lines;
   push @lines, "#define PERL_constant_NOTFOUND\t$start\n"; $start++;
   push @lines, "#define PERL_constant_NOTDEF\t$start\n"; $start++;
-  foreach (@( <sort @( < keys %XS_Constant))) {
+  foreach (sort keys %XS_Constant) {
     next if $_ eq '';
     push @lines, "#define PERL_constant_IS$_\t$start\n"; $start++;
   }
 
-  return join '', @( < @lines);
+  return join '', @lines;
 }
 
 sub valid_type {
@@ -91,7 +91,7 @@ sub assignment_clause_for_type {
   if (ref $typeset) {
     die "Type $type is aggregate, but only single value given"
       if (nelems @_) == 1;
-    return @( < map {"$typeset->[$_]@_[$_];"} @( < 0 .. ((nelems @$typeset)-1)) );
+    return map {"$typeset->[$_]@_[$_];"} 0 .. ((nelems @$typeset)-1);
   } elsif (defined $typeset) {
     die "Aggregate value given for type $type"
       if (nelems @_) +> 1;
@@ -142,7 +142,7 @@ sub memEQ {
 
 sub params {
   my ($self, $what) = < @_;
-  foreach (@( <sort @( < keys %$what))) {
+  foreach (sort keys %$what) {
     warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{$_};
   }
   my $params = \%();
@@ -190,7 +190,7 @@ sub C_constant_other_params {
 sub dogfood {
   my ($self, $args, < @items) = < @_;
   my ($package, $subname, $default_type, $what, $indent, $breakout) = <
-    %{$args}{[@( <qw(package subname default_type what indent breakout))]};
+    %{$args}{[qw(package subname default_type what indent breakout)]};
   my $result = <<"EOT";
   /* When generated this function returned values for the list of names given
      in this section of perl code.  Rather than manually editing these functions

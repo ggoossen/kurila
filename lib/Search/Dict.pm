@@ -4,8 +4,8 @@ require Exporter;
 use strict;
 
 our $VERSION = '1.02';
-our @ISA = @( < qw(Exporter) );
-our @EXPORT = @( < qw(look) );
+our @ISA = qw(Exporter);
+our @EXPORT = qw(look);
 
 =head1 NAME
 

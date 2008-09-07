@@ -1,6 +1,6 @@
 #!/usr/bin/perl -I.
 
-my @tests = @( <split(m/\nEND\n/s, <<DONE));
+my @tests =split(m/\nEND\n/s, <<DONE);
 TEST1
 This 
 is
@@ -93,7 +93,7 @@ $Text::Wrap::separator = '=';
 use strict;
 my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
-my @st = @( < @tests );
+my @st = @tests;
 while ((nelems @st)) {
 	my $in = shift(@st);
 	my $out = shift(@st);
@@ -105,15 +105,15 @@ while ((nelems @st)) {
 	is($back, $out);
 }
 
-@st = @( < @tests );
+@st = @tests;
 while((nelems @st)) {
 	my $in = shift(@st);
 	my $out = shift(@st);
 
 	$in =~ s/^TEST(\d+)?\n//;
 
-	my @in = @( < split("\n", $in, -1) );
-	@in = @((< map { "$_\n" } @( < @in[[@( <0..((nelems @in)-1)-1)]])), @in[-1]);
+	my @in = split("\n", $in, -1);
+	@in = @((< map { "$_\n" } @in[[0..((nelems @in)-1)-1]]), @in[-1]);
 	
 	my $back = wrap('   ', ' ', < @in);
 

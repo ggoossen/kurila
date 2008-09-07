@@ -6,12 +6,12 @@ our($VERSION, @ISA, @EXPORT_OK, @EXPORT_FAIL, %EXPORT_TAGS,
 
 use XSLoader ();
 
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
 # NOTE: The glob() export is only here for compatibility with 5.6.0.
 # csh_glob() should not be used directly, unless you know what you're doing.
 
-@EXPORT_OK   = @( < qw(
+@EXPORT_OK   = qw(
     csh_glob
     bsd_glob
     GLOB_ABEND
@@ -30,10 +30,10 @@ use XSLoader ();
     GLOB_NOSPACE
     GLOB_QUOTE
     GLOB_TILDE
-) );
+);
 
 %EXPORT_TAGS = %(
-    'glob' => \@( < qw(
+    'glob' => \ qw(
         GLOB_ABEND
 	GLOB_ALPHASORT
         GLOB_ALTDIRFUNC
@@ -51,7 +51,7 @@ use XSLoader ();
         GLOB_QUOTE
         GLOB_TILDE
         bsd_glob
-    ) ),
+    ),
 );
 
 $VERSION = '1.06';
@@ -123,7 +123,7 @@ sub csh_glob {
 	# implementation in Perl.  Need to support a flag
 	# to disable this behavior.
 	require Text::ParseWords;
-	@pat = @( < Text::ParseWords::parse_line('\s+',0,$pat) );
+	@pat = Text::ParseWords::parse_line('\s+',0,$pat);
     }
 
     # assume global context if not provided one
@@ -133,10 +133,10 @@ sub csh_glob {
     # if we're just beginning, do it all first
     if (%iter{$cxix} == 0) {
 	if ((nelems @pat)) {
-	    %entries{$cxix} = \@( < map { < doglob($_, $DEFAULT_FLAGS) } @( < @pat) );
+	    %entries{$cxix} = \ map { < doglob($_, $DEFAULT_FLAGS) } @pat;
 	}
 	else {
-	    %entries{$cxix} = \@( < doglob($pat, $DEFAULT_FLAGS) );
+	    %entries{$cxix} = \ doglob($pat, $DEFAULT_FLAGS);
 	}
     }
 

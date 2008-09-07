@@ -288,7 +288,7 @@ is($a, 'xxxxefgh');
     $x = "\x{263a}\x{263a}";
     substr($x,0,1, "abcd");
     is($x, "abcd\x{263a}");
-    $x = join '', @( < reverse @( < split m//, $x));
+    $x = join '', reverse split m//, $x;
     is($x, "\x{263a}dcba");
 }
 {
@@ -300,7 +300,7 @@ is($a, 'xxxxefgh');
     $x = $x x 2;
     substr($x,0,1, "abcd");
     is($x, "abcd\x[E2]");
-    $x = join '', @( < reverse @( < split m//, $x));
+    $x = join '', reverse split m//, $x;
     is($x, "\x[E2]dcba");
 }
 
@@ -450,7 +450,7 @@ is($x, "\x{100}\x{200}ab");
     my $s = "ab";
     my @r; 
     @r[$_] = \ substr $s, $_, 1 for @( (0, 1));
-    is(join("", @( < map { $$_ } @( < @r))), "ab");
+    is(join("", map { $$_ } @r), "ab");
 }
 
 # [perl #24605]

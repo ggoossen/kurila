@@ -138,10 +138,10 @@ SKIP: {
     
     set_style_standard('concise');  # MUST CALL before output needed
     
-    my @options = @( < qw(
+    my @options = qw(
 		  -basic -exec -tree -compact -loose -vt -ascii
 		  -base10 -bigendian -littleendian
-		  ) );
+		  );
     foreach my $opt ( @options) {
 	my ($out) = < render($opt, $func);
 	isnt($out, '', "got output with option $opt");
@@ -191,7 +191,7 @@ SKIP: {
 
 	sub defd_empty {};
 	($res,$err) = < render('-basic', \&defd_empty);
-	my @lines = @( < split(m/\n/, $res) );
+	my @lines = split(m/\n/, $res);
 	is(scalar nelems @lines, 3,
 	   "'sub defd_empty \{\}' seen as 3 liner");
 
@@ -237,8 +237,8 @@ SKIP: {
 
     # bang at it combinatorically
     my %combos;
-    my @modes = @( < qw( -basic -exec ) );
-    my @styles = @( < qw( -concise -debug -linenoise -terse ) );
+    my @modes = qw( -basic -exec );
+    my @styles = qw( -concise -debug -linenoise -terse );
 
     # prep samples
     for my $style ( @styles) {
@@ -250,7 +250,7 @@ SKIP: {
 	}
     }
     # crosscheck that samples are all text-different
-    my @list = @( < sort @( < keys %combos) );
+    my @list = sort keys %combos;
     for my $i (0..((nelems @list)-1)) {
 	for my $j ($i+1..((nelems @list)-1)) {
 	    isnt (%combos{@list[$i]}, %combos{@list[$j]},
@@ -292,7 +292,7 @@ SKIP: {
 	}
     }
     # crosscheck that samples are all text-different
-    my @nm = @( < sort @( < keys %combos) );
+    my @nm = sort keys %combos;
     for my $i (0..((nelems @nm)-1)) {
 	for my $j ($i+1..((nelems @nm)-1)) {
 	    isnt (%combos{@nm[$i]}, %combos{@nm[$j]},

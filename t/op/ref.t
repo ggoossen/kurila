@@ -89,13 +89,13 @@ is ($refref->{"key"}->[2]->[0], 3);
 @spring[5]->[0] = 123;
 @spring[5]->[1] = 456;
 push(@{@spring[5]}, 789);
-is (join(':', @(< @{@spring[5]})), "123:456:789");
+is (join(':', @{@spring[5]}), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
 @{%spring2{"foo"}} = @(1,2,3);
 %spring2{"foo"}->[3] = 4;
-is (join(':', @(< @{%spring2{"foo"}})), "1:2:3:4");
+is (join(':', @{%spring2{"foo"}}), "1:2:3:4");
 
 # Test references to subroutines.
 
@@ -122,16 +122,16 @@ is (ref $refref, 'HASH');
 $anonhash = \%();
 is (ref $anonhash, 'HASH');
 $anonhash2 = \%(FOO => 'BAR', ABC => 'XYZ',);
-is (join('', @( < sort @( < values %$anonhash2))), 'BARXYZ');
+is (join('', sort values %$anonhash2), 'BARXYZ');
 
 # Test ->[$@%&*] derefence syntax
 {
     my $z = \66;
     is($z->$, 66);
     my $y = \@(1,2,3,4);
-    is(join(':', @( < $y->@)), "1:2:3:4");
+    is(join(':', $y->@), "1:2:3:4");
     my $x = \%( aap => 'noot', mies => "teun" );
-    is((join "*", @( < keys $x->%)), join "*", @( < keys %$x));
+    is((join "*", keys $x->%), join "*", keys %$x);
     my $w = \*foo428;
     is(Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return @_[0]; };

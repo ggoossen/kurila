@@ -32,7 +32,7 @@ ok( !$ei->_is_prefix('\foo\bar', '\bar'),
 # _is_type
 ok( $ei->_is_type(0, 'all'), '_is_type() should be true for type of "all"' );
 
-foreach my $path (@( <qw( man1dir man3dir ))) {
+foreach my $path (qw( man1dir man3dir )) {
     SKIP: {
         my $dir = %Config{$path.'exp'};
         skip("no man directory $path on this system", 2 ) unless $dir;
@@ -69,7 +69,7 @@ ok( !$ei->_is_type('whocares', 'someother'), '... nor other type anywhere' );
 # _is_under
 ok( $ei->_is_under('foo'), '_is_under() should return true with no dirs' );
 
-my @under = @( < qw( boo bar baz ) );
+my @under = qw( boo bar baz );
 ok( !$ei->_is_under('foo', < @under), '... should find no file not under dirs');
 ok( $ei->_is_under('baz', < @under),  '... should find file under dir' );
 
@@ -186,8 +186,8 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 }
 
 # modules
-$ei->{$_} = 1 for @( < qw( abc def ghi ));
-is( join(' ', @( < $ei->modules())), 'abc def ghi',
+$ei->{$_} = 1 for qw( abc def ghi );
+is( join(' ', $ei->modules()), 'abc def ghi',
     'modules() should return sorted keys' );
 
 # This didn't work for a long time due to a sort in scalar context oddity.
@@ -216,38 +216,38 @@ my @files;
 SKIP: {
     skip('no man directory man1dir on this system', 2)
       unless %Config{man1direxp};
-    @files = @( < $ei->files('goodmod', 'doc', %Config{man1direxp}) );
+    @files = $ei->files('goodmod', 'doc', %Config{man1direxp});
     is( scalar nelems @files, 1, '... should find doc file under given dir' );
-    is( nelems(grep { m/foo$/ } @( < @files)), 1, '... checking file name' );
+    is( nelems(grep { m/foo$/ } @files), 1, '... checking file name' );
 }
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @files = @( < $ei->files('goodmod', 'doc') );
+    @files = $ei->files('goodmod', 'doc');
     is( scalar nelems @files, $mandirs, '... should find all doc files with no dir' );
 }
 
-@files = @( < $ei->files('goodmod', 'prog', 'fake', 'fake2') );
+@files = $ei->files('goodmod', 'prog', 'fake', 'fake2');
 is( scalar nelems @files, 0, '... should find no doc files given wrong dirs' );
-@files = @( < $ei->files('goodmod', 'prog') );
+@files = $ei->files('goodmod', 'prog');
 is( scalar nelems @files, 1, '... should find doc file in correct dir' );
 like( @files[0], qr/foobar[>\]]?$/, '... checking file name' );
-@files = @( < $ei->files('goodmod') );
+@files = $ei->files('goodmod');
 is( scalar nelems @files, 2 + $mandirs, '... should find all files with no type specified' );
-my %dirnames = %( < map { lc($_) => dirname($_) } @( < @files) );
+my %dirnames = %( < map { lc($_) => dirname($_) } @files );
 
 # directories
-my @dirs = @( < $ei->directories('goodmod', 'prog', 'fake') );
+my @dirs = $ei->directories('goodmod', 'prog', 'fake');
 is( scalar nelems @dirs, 0, 'directories() should return no dirs if no files found' );
 
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = @( < $ei->directories('goodmod', 'doc') );
+    @dirs = $ei->directories('goodmod', 'doc');
     is( scalar nelems @dirs, $mandirs, '... should find all files files() would' );
 }
-@dirs = @( < $ei->directories('goodmod') );
+@dirs = $ei->directories('goodmod');
 is( scalar nelems @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = @( < sort @( < map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } @( < @files)) );
-is( join(' ', @( < @files)), join(' ', @( < @dirs)), '... should sort output' );
+@files = sort map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } @files;
+is( join(' ', @files), join(' ', @dirs), '... should sort output' );
 
 # directory_tree
 my $expectdirs =
@@ -257,8 +257,8 @@ my $expectdirs =
 
 SKIP: {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = @( < $ei->directory_tree('goodmod', 'doc', %Config{man1direxp} ?
-       dirname(%Config{man1direxp}) : dirname(%Config{man3direxp})) );
+    @dirs = $ei->directory_tree('goodmod', 'doc', %Config{man1direxp} ?
+       dirname(%Config{man1direxp}) : dirname(%Config{man3direxp}));
     is( scalar nelems @dirs, $expectdirs,
         'directory_tree() should report intermediate dirs to those requested' );
 }
@@ -271,7 +271,7 @@ $ei->{yesmod} = \%(
 );
 
 # these should all croak
-foreach my $sub (@( <qw( validate packlist version ))) {
+foreach my $sub (qw( validate packlist version )) {
     dies_like( sub { $ei->?$sub('nomod') },
                qr/nomod is not installed/,
                "$sub() should croak when asked about uninstalled module" );

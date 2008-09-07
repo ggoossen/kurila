@@ -74,7 +74,7 @@ $bar = bizz(10);
 test {&$foo(11)-1 == &$bar()};
 
 my @foo;
-for (@( <qw(0 1 2 3 4))) {
+for (qw(0 1 2 3 4)) {
   my $i = $_;
   @foo[$_] = sub {$i = shift if (nelems @_); $i };
 }
@@ -101,14 +101,14 @@ test {
 
 sub barf {
   my @foo;
-  for (@( <qw(0 1 2 3 4))) {
+  for (qw(0 1 2 3 4)) {
     my $i = $_;
     @foo[$_] = sub {$i = shift if (nelems @_); $i };
   }
   @foo;
 }
 
-@foo = @( < barf() );
+@foo = barf();
 test {
   &{@foo[0]}() == 0 and
   &{@foo[1]}() == 1 and
@@ -208,13 +208,13 @@ test {
     );
 
     # Our innermost sub is either named or anonymous
-    for $inner_type (@( <qw!named anon!)) {
+    for $inner_type (qw!named anon!) {
       # And it may be declared at filescope, within a named
       # sub, or within an anon sub
-      for $where_declared (@( <qw!filescope in_named in_anon!)) {
+      for $where_declared (qw!filescope in_named in_anon!) {
 	# And that, in turn, may be within a foreach loop,
 	# a naked block, or another named sub
-	for $within (@( <qw!foreach naked other_sub!)) {
+	for $within (qw!foreach naked other_sub!) {
 
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
@@ -489,7 +489,7 @@ END
 	  print STDERR $errors;
 	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
 	    my $lnum = 0;
-	    for $line (@( <split '\n', $code)) {
+	    for $line (split '\n', $code) {
 	      printf "\%3d:  \%s\n", ++$lnum, $line;
 	    }
 	  }

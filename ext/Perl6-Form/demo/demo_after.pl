@@ -26,7 +26,7 @@ Passed:
 Failed:
 	{[[[[[[[[[[[[[[[[[[[}
 .
-\@( <qw(Smith Simmons Sutton Smee)), \@( <qw(Richards Royce Raighley));
+\qw(Smith Simmons Sutton Smee), \qw(Richards Royce Raighley);
 
 
 print < form \%(interleave=>1), <<'.',
@@ -35,7 +35,7 @@ Passed:
 Failed:
 	{[[[[[[[[[[[[[[[[[[[}
 .
-\@( <qw(Smith Simmons Sutton Smee)), \@( <qw(Richards Royce Raighley));
+\qw(Smith Simmons Sutton Smee), \qw(Richards Royce Raighley);
 
 __DATA__
       *

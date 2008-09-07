@@ -15,7 +15,7 @@ BEGIN {
 }
 
 
-my @getters = @( < qw(getcflag getiflag getispeed getlflag getoflag getospeed) );
+my @getters = qw(getcflag getiflag getispeed getlflag getoflag getospeed);
 
 plan tests => 3 + 2 * (3 + NCCS() + nelems @getters);
 

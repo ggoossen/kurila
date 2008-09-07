@@ -28,7 +28,7 @@ $VERSION        = eval $VERSION;    # avoid warnings with development releases
 $PREFER_BIN     = 0;                # XXX TODO implement
 $FROM_EMAIL     = 'File-Fetch@example.com';
 $USER_AGENT     = 'File::Fetch/$VERSION';
-$BLACKLIST      = \@( <qw|ftp|);
+$BLACKLIST      = \qw|ftp|;
 $METHOD_FAIL    = \%( );
 $FTP_PASSIVE    = 1;
 $TIMEOUT        = 0;
@@ -37,10 +37,10 @@ $WARN           = 1;
 
 ### methods available to fetch the file depending on the scheme
 $METHODS = \%(
-    http    => \@( < qw|lwp wget curl lynx| ),
-    ftp     => \@( < qw|lwp netftp wget curl ncftp ftp| ),
-    file    => \@( < qw|lwp file| ),
-    rsync   => \@( < qw|rsync| )
+    http    => \ qw|lwp wget curl lynx|,
+    ftp     => \ qw|lwp netftp wget curl ncftp ftp|,
+    file    => \ qw|lwp file|,
+    rsync   => \ qw|rsync|
 );
 
 ### silly warnings ###
@@ -155,7 +155,7 @@ result of $ff->output_file will be used.
         _error_msg_long => \%( no_override => 1 ),
     );
     
-    for my $method (@( < keys %$Tmpl) ) {
+    for my $method ( keys %$Tmpl ) {
         no strict 'refs';
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
@@ -177,7 +177,7 @@ result of $ff->output_file will be used.
                 "Hostname required when fetching from '\%1'", <$args->scheme));
         }
         
-        for (@( <qw[path file])) {
+        for (qw[path file]) {
             unless( $args->?$_ ) {
                 return File::Fetch->_error( <loc("No '\%1' specified",$_));
             }
@@ -335,7 +335,7 @@ sub _parse_uri {
     ### http://en.wikipedia.org/wiki/File://
     if( $href->{scheme} eq 'file' ) {
         
-        my @parts = @( < split '/',$uri );
+        my @parts = split '/',$uri;
 
         ### file://hostname/...
         ### file://hostname/...
@@ -375,11 +375,11 @@ sub _parse_uri {
     } else { <
         ### using anything but qw() in hash slices may produce warnings 
         ### in older perls :-(
-        %{$href}{[@( <qw(host path)) ]} = $uri =~ m|([^/]*)(/.*)$|s;
+        %{$href}{[qw(host path) ]} = $uri =~ m|([^/]*)(/.*)$|s;
     }
 
     ### split the path into file + dir ###
-    {   my @parts = @( < File::Spec::Unix->splitpath( delete $href->{path} ) );
+    {   my @parts = File::Spec::Unix->splitpath( delete $href->{path} );
         $href->{path} = @parts[1];
         $href->{file} = @parts[2];
     }
@@ -438,7 +438,7 @@ sub fetch {
         }
 
         ### method is blacklisted ###
-        next if grep { lc $_ eq $method } @( < @$BLACKLIST);
+        next if grep { lc $_ eq $method } @$BLACKLIST;
 
         ### method is known to fail ###
         next if $METHOD_FAIL->{$method};
@@ -558,7 +558,7 @@ sub _netftp_fetch {
 
         ### make connection ###
         my $ftp;
-        my @options = @( <$self->host);
+        my @options =$self->host;
         push(@options, Timeout => $TIMEOUT) if $TIMEOUT;
         unless( $ftp = Net::FTP->new( < @options ) ) {
             return $self->_error( <loc("Ftp creation failed: \%1",$@));
@@ -958,7 +958,7 @@ sub _rsync_fetch {
         ) {
 
             return $self->_error( <loc("Command \%1 failed: \%2", 
-                "{join ' ', @( <@$cmd)}" || '', $captured || ''));
+                "{join ' ',@$cmd}" || '', $captured || ''));
         }
 
         return $to;

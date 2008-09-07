@@ -28,7 +28,7 @@ sub _drop_oldenc {
     # the utf8 is just a flag on the encoding layer)
     my ($h, < @new) = < @_;
     return unless (nelems @new) +>= 1 && @new[-1] =~ m/^:encoding\(.+\)$/;
-    my @old = @( < PerlIO::get_layers($h) );
+    my @old = PerlIO::get_layers($h);
     return unless (nelems @old) +>= 3 &&
 	          @old[-1] eq 'utf8' &&
                   @old[-2] =~ m/^encoding\(.+\)$/;
@@ -64,7 +64,7 @@ sub import {
 	    $dscp = shift(@args) || '';
 	}
 	my @val;
-	foreach my $layer (@( <split(m/\s+/,$dscp))) {
+	foreach my $layer (split(m/\s+/,$dscp)) {
             $layer =~ s/^://;
             my $target = $layer;		# the layer name itself
             $target =~ s/^(\w+)\(.+\)$/$1/;	# strip parameters
@@ -79,16 +79,16 @@ sub import {
 	}
 	if ($type eq 'IN') {
 	    _drop_oldenc(\*STDIN, < @val);
-	    $in  = join(' ', @( < @val));
+	    $in  = join(' ', @val);
 	}
 	elsif ($type eq 'OUT') {
 	    _drop_oldenc(\*STDOUT, < @val);
-	    $out = join(' ', @( < @val));
+	    $out = join(' ', @val);
 	}
 	elsif ($type eq 'IO') {
 	    _drop_oldenc(\*STDIN,  < @val);
 	    _drop_oldenc(\*STDOUT, < @val);
-	    $in = $out = join(' ', @( < @val));
+	    $in = $out = join(' ', @val);
 	}
 	else {
 	    die "Unknown PerlIO layer class '$type'";

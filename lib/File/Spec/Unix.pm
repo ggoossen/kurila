@@ -140,12 +140,12 @@ my $tmpdir;
 sub _tmpdir {
     return $tmpdir if defined $tmpdir;
     my $self = shift;
-    my @dirlist = @( < @_ );
+    my @dirlist = @_;
     {
 	no strict 'refs';
 	if (${*{Symbol::fetch_glob("\cTAINT")}}) { # Check for taint mode on perl >= 5.8.0
             require Scalar::Util;
-	    @dirlist = @( < grep { ! Scalar::Util::tainted($_) } @( < @dirlist) );
+	    @dirlist = grep { ! Scalar::Util::tainted($_) } @dirlist;
 	}
     }
     foreach ( @dirlist) {
@@ -180,7 +180,7 @@ directory. (Does not strip symlinks, only '.', '..', and equivalents.)
 
 sub no_upwards {
     my $self = shift;
-    return @( < grep(!m/^\.{1,2}\z/s, @( < @_)) );
+    return grep(!m/^\.{1,2}\z/s, @_);
 }
 
 =item case_tolerant
@@ -215,7 +215,7 @@ Takes no argument, returns the environment variable PATH as an array.
 
 sub path {
     return () unless exists %ENV{PATH};
-    my @path = @( < split(':', %ENV{PATH}) );
+    my @path = split(':', %ENV{PATH});
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;
 }
@@ -294,7 +294,7 @@ Yields:
 =cut
 
 sub splitdir {
-    return @( < split m|/|, @_[1], -1);  # Preserve trailing fields
+    return split m|/|, @_[1], -1;  # Preserve trailing fields
 }
 
 
@@ -383,8 +383,8 @@ sub abs2rel {
     }
 
     # Now, remove all leading components that are the same
-    my @pathchunks = @( < $self->splitdir( $path_directories ) );
-    my @basechunks = @( < $self->splitdir( $base_directories ) );
+    my @pathchunks = $self->splitdir( $path_directories );
+    my @basechunks = $self->splitdir( $base_directories );
 
     if ($base_directories eq $self->rootdir) {
       shift @pathchunks;
@@ -488,7 +488,7 @@ sub _collapse {
     my $curdir = $fs->curdir;
 
     my($vol, $dirs, $file) = < $fs->splitpath($path);
-    my @dirs = @( < $fs->splitdir($dirs) );
+    my @dirs = $fs->splitdir($dirs);
     pop @dirs if (nelems @dirs) && @dirs[-1] eq '';
 
     my @collapsed;

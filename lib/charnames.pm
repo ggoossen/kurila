@@ -48,7 +48,7 @@ sub alias (@)
 {
   (nelems @_) or return %alias3;
   my $alias = ref @_[0] ? @_[0] : \%( < @_ );
- <  %alias3{[@( <keys %$alias)]} = < values %$alias;
+ <  %alias3{[keys %$alias]} = < values %$alias;
 } # alias
 
 sub alias_file ($)
@@ -193,11 +193,11 @@ sub import
     push @args, $arg;
   }
   (nelems @args) == 0 && $promote and @args = @(":full");
- <  %h{[@(< @args)]} = (1) x nelems @args;
+ <  %h{[ @args]} = (1) x nelems @args;
 
   %^H{charnames_full} = delete %h{':full'};
   %^H{charnames_short} = delete %h{':short'};
-  %^H{charnames_scripts} = \@(< map uc, @( < keys %h));
+  %^H{charnames_scripts} = \ map uc, keys %h;
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,

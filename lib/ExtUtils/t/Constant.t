@@ -83,7 +83,7 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = %( < map {($^O eq 'VMS' ? lc($_) : $_), 1} @( < @_) );
+  my %expect = %( < map {($^O eq 'VMS' ? lc($_) : $_), 1} @_ );
 
   my $fail;
   opendir DIR, $dir or die "opendir '$dir': $!";
@@ -294,7 +294,7 @@ EOT
 }
 
 sub MANIFEST {
-  my (@files) = @( < @_ );
+  my (@files) = @_;
   ################ MANIFEST
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
@@ -401,7 +401,7 @@ EOT
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
-use $package < qw({join ' ', @( <@$export_names)});
+use $package < qw({join ' ',@$export_names});
 
 print "1..2\n";
 if (open OUTPUT, ">", "$output") \{
@@ -424,7 +424,7 @@ EOT
   close FH or die "close $testpl: $!\n";
 
   push @files, Makefile_PL($package);
-  @files = @( < MANIFEST (< @files) );
+  @files = MANIFEST (< @files);
 
   build_and_run ($num_tests, $expect, \@files);
 
@@ -516,11 +516,11 @@ EOT
                 . "SvIV_set(temp_sv, 1149);"),
               );
 
-  push @items, $_ foreach @( < keys %compass);
+  push @items, $_ foreach keys %compass;
 
   # Automatically compile the list of all the macro names, and make them
   # exported constants.
-  my @export_names = @( < map {(ref $_) ? $_->{name} : $_} @( < @items) );
+  my @export_names = map {(ref $_) ? $_->{name} : $_} @items;
 
   # Exporter::Heavy (currently) isn't able to export the last 3 of these:
   push @items, < @common_items;

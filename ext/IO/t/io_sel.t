@@ -14,7 +14,7 @@ print "ok 1\n";
 $sel->add(\@(\*STDOUT, 'foo')) == 1 or print "not ";
 print "ok 2\n";
 
-my @handles = @( < $sel->handles );
+my @handles = $sel->handles;
 print "not " unless $sel->count == 4 && (nelems @handles) == 4;
 print "ok 3\n";
 #print $sel->as_string, "\n";
@@ -42,7 +42,7 @@ $sel->remove(\@(\*STDOUT, 5));
 print "not " unless $sel->count == 0 && !defined($sel->bits);
 print "ok 9\n";
 
-if ( grep $^O eq $_, @( < qw(MSWin32 NetWare dos VMS riscos beos)) ) {
+if ( grep $^O eq $_, qw(MSWin32 NetWare dos VMS riscos beos) ) {
     for (10 .. 15) { 
         print "ok $_ # skip: 4-arg select is only valid on sockets\n"
     }
@@ -50,14 +50,14 @@ if ( grep $^O eq $_, @( < qw(MSWin32 NetWare dos VMS riscos beos)) ) {
     goto POST_SOCKET;
 }
 
-my @a = @( < $sel->can_read() );  # should return imediately
+my @a = $sel->can_read();  # should return imediately
 print "not " unless (nelems @a) == 0;
 print "ok 10\n";
 
 # we assume that we can write to STDOUT :-)
 $sel->add(\@(\*STDOUT, "ok 12\n"));
 
-@a = @( < $sel->can_write );
+@a = $sel->can_write;
 print "not " unless (nelems @a) == 1;
 print "ok 11\n";
 
@@ -66,7 +66,7 @@ print $fd $msg;
 
 $sel->add(\*STDOUT);  # update
 
-@a = @( < IO::Select::select(undef, $sel, undef, 1) );
+@a = IO::Select::select(undef, $sel, undef, 1);
 print "not " unless (nelems @a) == 3;
 print "ok 13\n";
 

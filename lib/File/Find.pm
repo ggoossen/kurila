@@ -411,8 +411,8 @@ The first fixed version of File::Find was 1.01.
 
 =cut
 
-our @ISA = @( < qw(Exporter) );
-our @EXPORT = @( < qw(find finddepth) );
+our @ISA = qw(Exporter);
+our @EXPORT = qw(find finddepth);
 
 
 use strict;
@@ -891,7 +891,7 @@ sub _find_dir($$$) {
 	}
 	@filenames = @( readdir DIR );
 	closedir(DIR);
-	@filenames = @( < $pre_process->(< @filenames) ) if $pre_process;
+	@filenames = $pre_process->(< @filenames) if $pre_process;
 	push @Stack,\@($CdLvl,$dir_name,"",-2)   if $post_process;
 
 	# default: use whatever was specifid

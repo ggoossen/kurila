@@ -54,10 +54,10 @@ use_ok( 'Pod::InputObjects' );
 
     # Pod::Parser->parse_tree() / ptree()
     
-    is( (join ':', @( <$p_p1->file_line())), '<unknown-file>:0', 
+    is( (join ':',$p_p1->file_line()), '<unknown-file>:0', 
         'Pod::Paragraph->file_line()' );
     $p_p2->{ '-file' } = 'test'; $p_p2->{ '-line' } = 3;
-    is( (join ':', @( <$p_p2->file_line())), 'test:3', 
+    is( (join ':',$p_p2->file_line()), 'test:3', 
         'Pod::Paragraph->file_line()' );
 }
 
@@ -101,7 +101,7 @@ use_ok( 'Pod::InputObjects' );
     is( $p_pt1->top( $p_pt1, $p_pt2 ), $p_pt1, 
         'set new Pod::ParseTree->top()' );
 
-    ok( eq_array( \@( < $p_pt1->children() ), \@( $p_pt1, $p_pt2) ),
+    ok( eq_array( \ $p_pt1->children(), \@( $p_pt1, $p_pt2) ),
         'Pod::ParseTree->children()' );
 
 	my $text = 'This is the test suite.';

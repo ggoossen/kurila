@@ -126,7 +126,7 @@ sub reload_loc { %Loc = %( () ) }
 sub load_loc {
     my ($class, < %args) = < @_;
 
-    my $pkg = join('::', @( < grep { defined and length } @( %args{Class}, %args{Subclass})));
+    my $pkg = join('::', grep { defined and length } @( %args{Class}, %args{Subclass}));
     return %Loc{$pkg} if exists %Loc{$pkg};
 
     try { require Locale::Maketext::Lexicon; 1 }   or return;
@@ -261,9 +261,9 @@ sub _escape {
 }
 
 sub _unescape {
-    join(',', @( < map {
+    join(',', map {
         m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ? "$1_$2$3" : $_
-    } @( < split(m/,/, @_[0]))));
+    } split(m/,/, @_[0]));
 }
 
 sub auto_path {

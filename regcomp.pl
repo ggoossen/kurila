@@ -31,7 +31,7 @@ while ( ~< *DESC) {
         foreach my $list ( @lists) {
             my ($names,$special)= <split m/:/, $list , 2;
             $special ||= "";
-            foreach my $name (@( <split m/,/,$names)) {
+            foreach my $name (split m/,/,$names) {
                 my $real= $name eq 'resume' 
                         ? "resume_$type" 
                         : "{$type}_$name";
@@ -39,7 +39,7 @@ while ( ~< *DESC) {
                 if (!$special) {
                    @suffix=@("");
                 } elsif ($special=~m/\d/) {
-                    @suffix=@( <1..$special);
+                    @suffix=1..$special;
                 } elsif ($special eq 'FAIL') {
                     @suffix=@("","_fail");
                 } else {
@@ -209,7 +209,7 @@ while (~< $fh) {
 	%reverse{$newval} = $1;
     }
 }    
-my %vrxf= %( <reverse @( < %rxfv) );
+my %vrxf= %( <reverse %rxfv );
 printf $out "\t/* Bits in extflags defined: \%032b */\n",$val;
 for (0..31) {
     my $n=%vrxf{2**$_}||"UNUSED_BIT_$_";

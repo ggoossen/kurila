@@ -4,9 +4,9 @@ require Exporter;
 
 use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);
 $VERSION = 1.09;
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(pod2html htmlify) );
-@EXPORT_OK = @( < qw(anchorify) );
+@ISA = qw(Exporter);
+@EXPORT = qw(pod2html htmlify);
+@EXPORT_OK = qw(anchorify);
 
 use Carp;
 use Config;
@@ -333,7 +333,7 @@ sub clean_data($){
 
         # have a look for all-space lines
       if( @{$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
-	    my @chunks = @( < split( m/^\s+$/m, @{$dataref}[$i] ) );
+	    my @chunks = split( m/^\s+$/m, @{$dataref}[$i] );
 	    splice( @$dataref, $i, 1, < @chunks );
 	}
     }
@@ -395,15 +395,15 @@ sub pod2html {
     for ( @poddata) {
 	if (m/\r/) {
 	    if (m/\r\n/) {
-		@poddata = @( < map { s/\r\n/\n/g;
+		@poddata = map { s/\r\n/\n/g;
 				 m/\n\n/ ?
-				     < map { "$_\n\n" } @( < split m/\n\n/) :
-				     $_ } @( < @poddata) );
+				     < map { "$_\n\n" } split m/\n\n/ :
+				     $_ } @poddata;
 	    } else {
-		@poddata = @( < map { s/\r/\n/g;
+		@poddata = map { s/\r/\n/g;
 				 m/\n\n/ ?
-				     < map { "$_\n\n" } @( < split m/\n\n/) :
-				     $_ } @( < @poddata) );
+				     < map { "$_\n\n" } split m/\n\n/ :
+				     $_ } @poddata;
 	    }
 	    last;
 	}
@@ -427,7 +427,7 @@ sub pod2html {
 	TITLE_SEARCH: {
  	    for (my $i = 0; $i +< nelems @poddata; $i++) {
 		if (@poddata[$i] =~ m/^=head1\s*NAME\b/m) {
- 		    for my $para (@( < @poddata[[@($i, $i+1)]]) ) {
+ 		    for my $para ( @poddata[[@($i, $i+1)]] ) {
 			last TITLE_SEARCH
 			    if ($Title) = $para =~ m/(\S+\s+-+.*\S)/s;
 		    }
@@ -580,7 +580,7 @@ END_OF_INDEX
 		# experimental: check for a paragraph where all lines
 		# have some ...\t...\t...\n pattern
 		if( $text =~ m/\t/ ){
-		    my @lines = @( < split( "\n", $text ) );
+		    my @lines = split( "\n", $text );
 		    if( (nelems @lines) +> 1 ){
 			my $all = 2;
 			foreach my $line (  @lines ){
@@ -629,7 +629,7 @@ END_OF_TAIL
 
 sub usage {
     my $podfile = shift;
-    warn "$0: $podfile: {join ' ', @( <@_)}\n" if (nelems @_);
+    warn "$0: $podfile: {join ' ',@_}\n" if (nelems @_);
     die <<END_OF_USAGE;
 Usage:  $0 --help --htmlroot=<name> --infile=<name> --outfile=<name>
            --podpath=<name>:...:<name> --podroot=<name>
@@ -705,8 +705,8 @@ sub parse_command_line {
     usage("-") if defined $opt_help;	# see if the user asked for help
     $opt_help = "";			# just to make -w shut-up.
 
-    @Podpath  = @( < split(":", $opt_podpath) ) if defined $opt_podpath;
-    @Libpods  = @( < split(":", $opt_libpods) ) if defined $opt_libpods;
+    @Podpath  = split(":", $opt_podpath) if defined $opt_podpath;
+    @Libpods  = split(":", $opt_libpods) if defined $opt_libpods;
 
     $Backlink = $opt_backlink if defined $opt_backlink;
     $Cachedir = $opt_cachedir if defined $opt_cachedir;
@@ -738,7 +738,7 @@ my $Saved_Cache_Key;
 
 sub get_cache {
     my($dircache, $itemcache, $podpath, $podroot, $recurse) = < @_;
-    my @cache_key_args = @( < @_ );
+    my @cache_key_args = @_;
 
     # A first-level cache:
     # Don't bother reading the cache files if they still apply
@@ -790,7 +790,7 @@ sub load_cache {
     # is it the same podpath?
     $_ = ~< *CACHE;
     chomp($_);
-    $tests++ if (join(":", @( < @$podpath)) eq $_);
+    $tests++ if (join(":", @$podpath) eq $_);
 
     # is it the same podroot?
     $_ = ~< *CACHE;
@@ -819,7 +819,7 @@ sub load_cache {
     # is it the same podpath?
     $_ = ~< *CACHE;
     chomp($_);
-    $tests++ if (join(":", @( < @$podpath)) eq $_);
+    $tests++ if (join(":", @$podpath) eq $_);
 
     # is it the same podroot?
     $_ = ~< *CACHE;
@@ -880,7 +880,7 @@ sub scan_podpath {
 	    $dirname = $1;
 	    opendir(DIR, $dirname) ||
 		die "$0: error opening directory $dirname: $!\n";
-	    @files = @( < grep(m/(\.pod|\.pm)\z/ && ! -d $_, @( readdir(DIR))) );
+	    @files = grep(m/(\.pod|\.pm)\z/ && ! -d $_, @( readdir(DIR)));
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives
@@ -925,8 +925,8 @@ sub scan_podpath {
     open(CACHE, ">", "$Itemcache") ||
 	die "$0: error open $Itemcache for writing: $!\n";
 
-    print CACHE join(":", @( < @Podpath)) . "\n$podroot\n";
-    foreach my $key (@( <keys %Items)) {
+    print CACHE join(":", @Podpath) . "\n$podroot\n";
+    foreach my $key (keys %Items) {
 	print CACHE "$key %Items{$key}\n";
     }
 
@@ -937,8 +937,8 @@ sub scan_podpath {
     open(CACHE, ">", "$Dircache") ||
 	die "$0: error open $Dircache for writing: $!\n";
 
-    print CACHE join(":", @( < @Podpath)) . "\n$podroot\n";
-    foreach my $key (@( <keys %Pages)) {
+    print CACHE join(":", @Podpath) . "\n$podroot\n";
+    foreach my $key (keys %Pages) {
 	print CACHE "$key %Pages{$key}\n";
     }
 
@@ -1280,7 +1280,7 @@ sub process_for {
 	print HTML $text;
     } elsif ($whom =~ m/^illustration$/i) {
         1 while chomp $text;
-	for my $ext (@( <qw[.png .gif .jpeg .jpg .tga .pcl .bmp])) {
+	for my $ext (qw[.png .gif .jpeg .jpg .tga .pcl .bmp]) {
 	  $text .= $ext, last if -r "$text$ext";
 	}
         print HTML qq{<p align="center"><img src="$text" alt="$text illustration" /></p>};
@@ -1372,7 +1372,7 @@ sub process_pre {
     # Look for embedded URLs and make them into links.  We don't
     # relativize them since they are best left as the author intended.
 
-    my $urls = '(' . join ('|', @( < qw{
+    my $urls = '(' . join ('|', qw{
                 http
                 telnet
 		mailto
@@ -1381,7 +1381,7 @@ sub process_pre {
                 file
                 wais
                 ftp
-            }) )
+            } )
         . ')';
 
     my $ltrs = '\w';
@@ -1451,7 +1451,7 @@ sub process_puretext {
     $trail = ($text =~ s/(\s+)\Z//s ? $1 : "");
 
     # split at space/non-space boundaries
-    @words = @( < split( m/(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text ) );
+    @words = split( m/(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text );
 
     # process each word individually
     foreach my $word ( @words) {
@@ -1509,7 +1509,7 @@ sub process_puretext {
     }
 
     # put everything back together
-    return $lead . join( '', @( < @words) ) . $trail;
+    return $lead . join( '', @words ) . $trail;
 }
 
 

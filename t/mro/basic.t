@@ -20,27 +20,27 @@ require q(./test.pl); plan(tests => 27);
     package MRO_C;
     our @ISA = @( qw// );
     package MRO_D;
-    our @ISA = @( < qw/MRO_A MRO_B MRO_C/ );
+    our @ISA = qw/MRO_A MRO_B MRO_C/;
     package MRO_E;
-    our @ISA = @( < qw/MRO_A MRO_B MRO_C/ );
+    our @ISA = qw/MRO_A MRO_B MRO_C/;
     package MRO_F;
-    our @ISA = @( < qw/MRO_D MRO_E/ );
+    our @ISA = qw/MRO_D MRO_E/;
 }
 
 ok(eq_array(
     mro::get_linear_isa('MRO_F'),
-    \@( <qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/)
+    \qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/
 ));
 
-my @isarev = @( < sort { $a cmp $b } @( < @{mro::get_isarev('MRO_B')}) );
+my @isarev = sort { $a cmp $b } @{mro::get_isarev('MRO_B')};
 ok(eq_array(
     \@isarev,
-    \@( <qw/MRO_D MRO_E MRO_F/)
+    \qw/MRO_D MRO_E MRO_F/
 ));
 
 ok(!mro::is_universal('MRO_B'));
 
-@UNIVERSAL::ISA = @( < qw/MRO_F/ );
+@UNIVERSAL::ISA = qw/MRO_F/;
 ok(mro::is_universal('MRO_B'));
 
 @UNIVERSAL::ISA = @( () );
@@ -51,7 +51,7 @@ ok(mro::is_universal('MRO_B'));
 ok(!mro::is_universal('Does_Not_Exist'));
 ok(eq_array(
     mro::get_linear_isa('Does_Not_Exist_Three'),
-    \@( <qw/Does_Not_Exist_Three/)
+    \qw/Does_Not_Exist_Three/
 ));
 
 # Assigning @ISA via globref
@@ -60,7 +60,7 @@ ok(eq_array(
     sub testfunc { return 123 }
     package MRO_TestOtherBase;
     sub testfunctwo { return 321 }
-    package MRO_M; our @ISA = @( < qw/MRO_TestBase/ );
+    package MRO_M; our @ISA = qw/MRO_TestBase/;
 }
 
 # XXX TODO (when there's a way to backtrack through a glob's aliases)
@@ -78,7 +78,7 @@ ok(eq_array(
         sub DESTROY { $x++ }
 
         package DESTROY_MRO_Baseline_Child;
-        our @ISA = @( < qw/DESTROY_MRO_Baseline/ );
+        our @ISA = qw/DESTROY_MRO_Baseline/;
     }
 
     $obj = DESTROY_MRO_Baseline->new();
@@ -100,7 +100,7 @@ ok(eq_array(
         sub new { bless \%() => shift }
 
         package DESTROY_MRO_Dynamic_Child;
-        our @ISA = @( < qw/DESTROY_MRO_Dynamic/ );
+        our @ISA = qw/DESTROY_MRO_Dynamic/;
     }
 
     $obj = DESTROY_MRO_Dynamic->new();
@@ -130,31 +130,31 @@ ok(eq_array(
     no warnings 'uninitialized';
     {
         package ISACLEAR;
-        our @ISA = @( < qw/XX YY ZZ/ );
+        our @ISA = qw/XX YY ZZ/;
     }
     # baseline
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\@( <qw/ISACLEAR XX YY ZZ/)));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\qw/ISACLEAR XX YY ZZ/));
 
     # undef the array itself
     undef @ISACLEAR::ISA;
-    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\@( <qw/ISACLEAR/)));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR'),\qw/ISACLEAR/));
 
     # Now, clear more than one package's @ISA at once
     {
         package ISACLEAR1;
-        our @ISA = @( < qw/WW XX/ );
+        our @ISA = qw/WW XX/;
 
         package ISACLEAR2;
-        our @ISA = @( < qw/YY ZZ/ );
+        our @ISA = qw/YY ZZ/;
     }
     # baseline
-    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\@( <qw/ISACLEAR1 WW XX/)));
-    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\@( <qw/ISACLEAR2 YY ZZ/)));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\qw/ISACLEAR1 WW XX/));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\qw/ISACLEAR2 YY ZZ/));
     @ISACLEAR1::ISA = @();
     @ISACLEAR2::ISA = @();
 
-    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\@( <qw/ISACLEAR1/)));
-    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\@( <qw/ISACLEAR2/)));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\qw/ISACLEAR1/));
+    ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\qw/ISACLEAR2/));
 }
 
 # Check that recursion bails out "cleanly" in a variety of cases

@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::BFD;
 
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 require Exporter;
-our @EXPORT = @( < qw(setup_recurs teardown_recurs) );
+our @EXPORT = qw(setup_recurs teardown_recurs);
 
 use strict;
 use File::Path;
@@ -114,7 +114,7 @@ sub setup_recurs {
 }
 
 sub teardown_recurs { 
-    foreach my $file (@( <keys %Files)) {
+    foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {
             rmtree($dir) || return;

@@ -18,7 +18,7 @@ BEGIN {
     }
 
     if (not defined $where) {	# Try NIS.
-	foreach my $ypcat (@( <qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat))) {
+	foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat)) {
 	    if (-x $ypcat &&
 		open(PW, "$ypcat passwd 2>/dev/null |") &&
 		defined( ~< *PW)) {
@@ -30,7 +30,7 @@ BEGIN {
     }
 
     if (not defined $where) {	# Try NetInfo.
-	foreach my $nidump (@( <qw(/usr/bin/nidump))) {
+	foreach my $nidump (qw(/usr/bin/nidump)) {
 	    if (-x $nidump &&
 		open(PW, "$nidump passwd . 2>/dev/null |") &&
 		defined( ~< *PW)) {
@@ -50,7 +50,7 @@ BEGIN {
     }
 
     if (not defined $where) {      # Try NIS+
-     foreach my $niscat (@( <qw(/bin/niscat))) {
+     foreach my $niscat (qw(/bin/niscat)) {
          if (-x $niscat &&
            open(PW, "$niscat passwd.org_dir 2>/dev/null |") &&
            defined( ~< *PW)) {
@@ -87,7 +87,7 @@ setpwent();
 while ( ~< *PW) {
     chomp;
     # LIMIT -1 so that users with empty shells don't fall off
-    my @s = @( < split m/:/, $_, -1 );
+    my @s = split m/:/, $_, -1;
     my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s);
     (my $v) = %Config{osvers} =~ m/^(\d+)/;
     if ($^O eq 'darwin' && $v +< 9) {
@@ -134,7 +134,7 @@ while ( ~< *PW) {
 
 endpwent();
 
-print "# max = $max, n = $n, perfect = ", nelems(@( <keys %perfect)), "\n";
+print "# max = $max, n = $n, perfect = ", nelems(keys %perfect), "\n";
 
 my $not;
 if ( ! %perfect && $n) {
@@ -184,7 +184,7 @@ for (1..$max) {
 }
 endpwent();
 
-print "not " unless "{join ' ', @( <@pw1)}" eq "{join ' ', @( <@pw2)}";
+print "not " unless "{join ' ',@pw1}" eq "{join ' ',@pw2}";
 print "ok ", $tst++, "\n";
 
 close(PW);

@@ -9,7 +9,7 @@
 require './test.pl';
 
 undef $/;
-our @prgs = @( < split "\n########\n", ~< *DATA );
+our @prgs = split "\n########\n", ~< *DATA;
 
 plan(tests => nelems @prgs);
 

@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::XS;
 
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 require Exporter;
-our @EXPORT = @( < qw(setup_xs teardown_xs) );
+our @EXPORT = qw(setup_xs teardown_xs);
 
 use strict;
 use File::Path;
@@ -85,7 +85,7 @@ sub setup_xs {
 }
 
 sub teardown_xs { 
-    foreach my $file (@( <keys %Files)) {
+    foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {
             rmtree($dir) || return;

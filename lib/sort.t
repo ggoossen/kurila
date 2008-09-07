@@ -130,27 +130,27 @@ sub main {
 }
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
+main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 
 {
     use sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
-    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 1);
+    main(sub {sort {&{@_[0]}} @{@_[1]} }, 1);
 }
 
 {
     use sort < qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
-    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
+    main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 }
 
 {
     use sort < qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
-    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
+    main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 }
 
 # Tests added to check "defaults" subpragma, and "no sort"
@@ -160,7 +160,7 @@ main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
     no sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
-    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
+    main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 }
 
 {
@@ -174,5 +174,5 @@ main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
     use sort < qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
-    main(sub { @( <sort {&{@_[0]}} @( < @{@_[1]})) }, 0);
+    main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 }

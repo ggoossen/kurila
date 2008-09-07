@@ -199,11 +199,11 @@ is( $ret, 'abc', 'do "abc.pl" sees return value' );
 {
     my $filename = $^O eq 'MacOS' ? ':Foo:Foo.pm' : './Foo.pm';
     #local @INC; # local fails on tied @INC
-    my @old_INC = @( < @INC ); # because local doesn't work on tied arrays
+    my @old_INC = @INC; # because local doesn't work on tied arrays
     @INC = @( sub { $filename = 'seen'; return undef; } );
     try { require $filename; };
     is( $filename, 'seen', 'the coderef sees fully-qualified pathnames' );
-    @INC = @( < @old_INC );
+    @INC = @old_INC;
 }
 
 exit if $minitest;
@@ -267,9 +267,9 @@ if ($can_fork) {
 
     @::bbblplast = @( () );
     require BBBLPLAST5;
-    is ("{join ' ', @( <@main::bbblplast)}", "0 1 2 3 4 5", "All ran");
+    is ("{join ' ',@main::bbblplast}", "0 1 2 3 4 5", "All ran");
 
-    foreach (@( <keys %INC)) {
+    foreach (keys %INC) {
 	delete %INC{$_} if m/^BBBLPLAST/;
     }
 

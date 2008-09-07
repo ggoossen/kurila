@@ -22,7 +22,7 @@ use MakeMaker::Test::Setup::BFD;
 BEGIN { use_ok('ExtUtils::Install') }
 
 # Check exports.
-foreach my $func (@( <qw(install uninstall pm_to_blib install_default))) {
+foreach my $func (qw(install uninstall pm_to_blib install_default)) {
     can_ok(__PACKAGE__, $func);
 }
 

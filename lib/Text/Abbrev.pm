@@ -33,8 +33,8 @@ The values are the original list elements.
 
 use strict;
 
-our @ISA = @( < qw(Exporter) );
-our @EXPORT = @( < qw(abbrev) );
+our @ISA = qw(Exporter);
+our @EXPORT = qw(abbrev);
 
 # Usage:
 #	abbrev \%foo, LIST;

@@ -22,7 +22,7 @@ my @cd_args = @("some/dir", "command1", "command2");
 {
     package Test::MM_Win32;
     use ExtUtils::MM_Win32;
-    our @ISA = @( < qw(ExtUtils::MM_Win32) );
+    our @ISA = qw(ExtUtils::MM_Win32);
 
     my $mm = bless \%(), 'Test::MM_Win32';
 

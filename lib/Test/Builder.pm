@@ -198,8 +198,8 @@ sub plan {
         }
     }
     else {
-        my @args = @( < grep { defined } @( ($cmd, $arg)) );
-        die("plan() doesn't understand {join ' ', @( <@args)}");
+        my @args = grep { defined } @( ($cmd, $arg));
+        die("plan() doesn't understand {join ' ',@args}");
     }
 
     return 1;
@@ -1060,7 +1060,7 @@ If set to true, no "1..N" header will be printed.
 
 =cut
 
-foreach my $attribute (@( <qw(No_Header No_Ending No_Diag))) {
+foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
     my $method = lc $attribute;
 
     my $code = sub {
@@ -1124,7 +1124,7 @@ sub diag {
 
     # Smash args together like print does.
     # Convert undef to 'undef' so its readable.
-    my $msg = join '', @( < map { defined($_) ? $_ : 'undef' } @( < @msgs));
+    my $msg = join '', map { defined($_) ? $_ : 'undef' } @msgs;
 
     # Escape each line with a #.
     $msg =~ s/^/# /gm;
@@ -1157,7 +1157,7 @@ sub _print {
     # tests are deparsed with B::Deparse
     return if $^C;
 
-    my $msg = join '', @( < @msgs);
+    my $msg = join '', @msgs;
 
     local($\, $", $,) = (undef, ' ', '');
     my $fh = $self->output;
@@ -1314,9 +1314,9 @@ sub _copy_io_layers {
     
     $self->_try(sub {
         require PerlIO;
-        my @layers = @( < PerlIO::get_layers($src) );
+        my @layers = PerlIO::get_layers($src);
         
-        binmode $dest, join " ", @( < map ":$_", @( < @layers)) if (nelems @layers);
+        binmode $dest, join " ", map ":$_", @layers if (nelems @layers);
     });
 }
 
@@ -1398,7 +1398,7 @@ Of course, test #1 is $tests[0], etc...
 sub summary {
     my($self) = shift;
 
-    return @(< map { $_->{'ok'} } @( < @{ $self->{Test_Results} }));
+    return map { $_->{'ok'} } @{ $self->{Test_Results} };
 }
 
 =item B<details>

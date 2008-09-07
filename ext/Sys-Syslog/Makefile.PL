@@ -53,7 +53,7 @@ NOTICE
 }
 
 # detect when being built in Perl core
-if (not grep { $_ eq 'PERL_CORE=1' } @( < @ARGV)) {
+if (not grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     push @extra_params, 
         DEFINE      => '-DUSE_PPPORT_H';
 }
@@ -108,10 +108,10 @@ else {
 # if possible, generate the code that handles the constants with 
 # ExtUtils::Constant, otherwise use cached copy in fallback/
 if(try {require ExtUtils::Constant; 1}) {
-    my @levels = @( < qw(
+    my @levels = qw(
         LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
         LOG_INFO LOG_NOTICE LOG_WARNING
-    ) );
+    );
 
     my @facilities = @( <
         # standard facilities
@@ -136,9 +136,9 @@ if(try {require ExtUtils::Constant; 1}) {
         \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
     );
 
-    my @options = @( < qw(
+    my @options = qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
-    ) );
+    );
 
     my @others_macros = @( <
         qw(LOG_FACMASK),
@@ -153,9 +153,9 @@ if(try {require ExtUtils::Constant; 1}) {
         NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
     );
 
-    my @names = @( < map { ref $_ ? $_->{name} : $_ } @( < @levels, < @facilities, < @options) );
+    my @names = map { ref $_ ? $_->{name} : $_ } @( < @levels, < @facilities, < @options);
     open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $!\n";
-    print MACROS join $/, @( < @names);
+    print MACROS join $/, @names;
     close(MACROS);
 }
 else {

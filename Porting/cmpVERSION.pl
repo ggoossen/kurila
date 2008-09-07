@@ -14,7 +14,7 @@ use File::Compare;
 use File::Find;
 use File::Spec::Functions < qw(rel2abs abs2rel catfile catdir curdir);
 
-for (@( <@ARGV[[@(0, 1)]])) {
+for (@ARGV[[@(0, 1)]]) {
     die "$0: '$_' does not look like Perl directory\n"
 	unless -f catfile($_, "perl.h") && -d catdir($_, "Porting");
 }
@@ -49,5 +49,5 @@ find(
 			   defined $version2 &&
                            $version1 eq $version2
 		} }, < curdir);
-print < map { $_, "\n" } @( < sort @( < @wanted));
+print < map { $_, "\n" } sort @wanted;
 

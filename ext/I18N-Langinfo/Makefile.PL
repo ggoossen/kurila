@@ -23,18 +23,18 @@ if (try {require ExtUtils::Constant; 1}) {
     \%( name=>$_, type=>"IV",
         macro=> \@("#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n",
                    "#endif\n"))
-      foreach @( < qw (ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
+      foreach qw (ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
                   ABMON_1 ABMON_10 ABMON_11 ABMON_12 ABMON_2 ABMON_3 ABMON_4
                   ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ALT_DIGITS AM_STR
                   DAY_1 DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7 D_FMT D_T_FMT ERA
                   ERA_D_FMT ERA_D_T_FMT ERA_T_FMT MON_1 MON_10 MON_11 MON_12
                   MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 NOEXPR NOSTR
-                  PM_STR T_FMT T_FMT_AMPM YESEXPR YESSTR));
+                  PM_STR T_FMT T_FMT_AMPM YESEXPR YESSTR);
   push @names,           # This lot are only enums for __SVR4_I386_ABI_L1__:
     \%(name=>$_, type=>"IV",
        macro=>\@("#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM) && defined(__SVR4_I386_ABI_L1__))\n",
                  "#endif\n"))
-      foreach @( < qw (CRNCYSTR THOUSEP RADIXCHAR));
+      foreach qw (CRNCYSTR THOUSEP RADIXCHAR);
   ExtUtils::Constant::WriteConstants(
                                      NAME => 'I18N::Langinfo',
                                      NAMES => \@names,

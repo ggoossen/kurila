@@ -100,11 +100,11 @@ foreach ( @right) {
 
 # stream socket, so our writes will become joined:
 my ($buffer, $expect);
-$expect = join '', @( < @right);
+$expect = join '', @right;
 undef $buffer;
 is (read (LEFT, $buffer, length $expect), length $expect, "read on left");
 is ($buffer, $expect, "content what we expected?");
-$expect = join '', @( < @left);
+$expect = join '', @left;
 undef $buffer;
 is (read (RIGHT, $buffer, length $expect), length $expect, "read on right");
 is ($buffer, $expect, "content what we expected?");
@@ -154,7 +154,7 @@ foreach ( @gripping) {
 
 ok (!eof LEFT, "left is not at EOF");
 
-$expect = join '', @( < @gripping);
+$expect = join '', @gripping;
 undef $buffer;
 is (read (LEFT, $buffer, length $expect), length $expect, "read on left");
 is ($buffer, $expect, "content what we expected?");
@@ -191,13 +191,13 @@ foreach ( @right) {
 
 # stream socket, so our writes will become joined:
 my ($total);
-$total = join '', @( < @right);
+$total = join '', @right;
 foreach $expect ( @right) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");
 }
-$total = join '', @( < @left);
+$total = join '', @left;
 foreach $expect ( @left) {
   undef $buffer;
   is (sysread (RIGHT, $buffer, length $total), length $expect, "read on right");
@@ -230,7 +230,7 @@ foreach ( @gripping) {
   is (syswrite (RIGHT, $_), length $_, "syswrite to right");
 }
 
-$total = join '', @( < @gripping);
+$total = join '', @gripping;
 foreach $expect ( @gripping) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");

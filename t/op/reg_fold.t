@@ -20,7 +20,7 @@ while (~< $fh) {
     push @str,$chr;
 
     foreach my $str (  @str ) {
-        my $fc = join '', @( < @fc);
+        my $fc = join '', @fc;
         my $expr="$str =~ m/$fc/ix";
         push @tests,
             qq[ok($expr,'$chr =~ m/$fc/ix - $comment')];

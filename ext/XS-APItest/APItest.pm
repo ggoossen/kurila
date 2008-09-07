@@ -11,7 +11,7 @@ use base < qw/ DynaLoader Exporter /;
 # Do not simply export all your public functions/methods/constants.
 
 # Export everything since these functions are only used by a test script
-our @EXPORT = @( < qw( print_double print_int print_long
+our @EXPORT = qw( print_double print_int print_long
 		  print_float print_long_double have_long_double print_flush
 		  mpushp mpushn mpushi mpushu
 		  mxpushp mxpushn mxpushi mxpushu
@@ -22,12 +22,12 @@ our @EXPORT = @( < qw( print_double print_int print_long
 		  my_cxt_getint my_cxt_getsv my_cxt_setint my_cxt_setsv
 		  sv_setsv_cow_hashkey_core sv_setsv_cow_hashkey_notcore
 		  rmagical_cast rmagical_flags
-) );
+);
 
 our $VERSION = '0.14';
 
 use vars '$WARNINGS_ON_BOOTSTRAP';
-use vars < map "\${$_}_called_PP", @( < qw(BEGIN UNITCHECK CHECK INIT END));
+use vars < map "\${$_}_called_PP", qw(BEGIN UNITCHECK CHECK INIT END);
 
 # Do these here to verify that XS code and Perl code get called at the same
 # times

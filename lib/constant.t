@@ -39,11 +39,11 @@ my @undef = @( UNDEF1 );
 is( nelems(@undef), 1);
 is @undef[0], undef;
 
-@undef = @( < UNDEF2 );
+@undef = UNDEF2;
 is( (nelems @undef), 0);
-@undef = @( < UNDEF3 );
+@undef = UNDEF3;
 is( (nelems @undef), 0);
-@undef = @( < EMPTY );
+@undef = EMPTY;
 is( (nelems @undef), 0);
 
 use constant COUNTDOWN	=> '54321';
@@ -51,9 +51,9 @@ use constant COUNTLIST	=> < reverse @( 1, 2, 3, 4, 5);
 use constant COUNTLAST	=> (COUNTLIST)[-1];
 
 is COUNTDOWN, '54321';
-my @cl = @( < COUNTLIST );
+my @cl = COUNTLIST;
 is nelems(@cl), 5;
-is COUNTDOWN, join '', @( < @cl);
+is COUNTDOWN, join '', @cl;
 is COUNTLAST, 1;
 is((COUNTLIST)[1], 4);
 
@@ -61,7 +61,7 @@ use constant ABC	=> 'ABC';
 is "abc${\( ABC )}abc", "abcABCabc";
 
 use constant DEF	=> 'D', 'E', chr ord 'F';
-is "d e f {join ' ', @( <@{\@( < DEF )})} d e f", "d e f D E F d e f";
+is "d e f {join ' ',@{\ DEF}} d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';
@@ -224,7 +224,7 @@ elsif ((nelems @warnings) == (nelems @Expected_Warnings) + 1) {
 else {
     my $rule = " -" x 20;
     diag "/!\\ unexpected case: ", scalar nelems @warnings, " warnings\n$rule\n";
-    diag < map { "  $_" } @( < @warnings);
+    diag < map { "  $_" } @warnings;
     diag $rule, $/;
 }
 
@@ -239,9 +239,9 @@ for my $idx (0..((nelems @warnings)-1)) {
 
 use constant \%(
 	THREE  => 3,
-	FAMILY => \@( < qw( John Jane Sally ) ),
+	FAMILY => \ qw( John Jane Sally ),
 	AGES   => \%( John => 33, Jane => 28, Sally => 3 ),
-	RFAM   => \@( \@( < qw( John Jane Sally ) ) ),
+	RFAM   => \@( \ qw( John Jane Sally ) ),
 	SPIT   => sub { shift },
 );
 
@@ -269,7 +269,7 @@ $kloong = 'schlozhauer';
     local $^WARN_HOOK = sub { push @warnings, < @_ };
     eval 'use constant fagwoosh => 5; 1' or die $@;
 
-    is ("{join ' ', @( <@warnings)}", "", "No warnings if the typeglob exists already");
+    is ("{join ' ',@warnings}", "", "No warnings if the typeglob exists already");
 
     my $value = eval 'fagwoosh';
     is ($@, '');
@@ -281,7 +281,7 @@ $kloong = 'schlozhauer';
 
     eval 'use constant putt => 6, 7; 1' or die $@;
 
-    is ("{join ' ', @( <@warnings)}", "", "No warnings if the typeglob exists already");
+    is ("{join ' ',@warnings}", "", "No warnings if the typeglob exists already");
 
     @value = eval 'putt';
     is ($@, '');
@@ -289,7 +289,7 @@ $kloong = 'schlozhauer';
 
     eval 'use constant "klong"; 1' or die $@;
 
-    is ("{join ' ', @( <@warnings)}", "", "No warnings if the typeglob exists already");
+    is ("{join ' ',@warnings}", "", "No warnings if the typeglob exists already");
 
     $value = eval 'klong';
     is ($@, '');

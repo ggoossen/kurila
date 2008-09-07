@@ -12,14 +12,14 @@ use Exporter ();
 use XSLoader ();
 
 BEGIN {
-    @ISA = @( < qw(Exporter) );
-    @EXPORT_OK = @( < qw(
+    @ISA = qw(Exporter);
+    @EXPORT_OK = qw(
 	opset ops_to_opset
 	opset_to_ops opset_to_hex invert_opset
 	empty_opset full_opset
 	opdesc opcodes opmask define_optag
 	opmask_add verify_opset opdump
-    ) );
+    );
 }
 
 XSLoader::load 'Opcode', $VERSION;
@@ -47,7 +47,7 @@ sub opdump (;$) {
 
 sub _init_optags {
     my(%all, %seen);
- <    %all{[@( <opset_to_ops(full_opset()))]} = (); # keys only
+ <    %all{[opset_to_ops(full_opset())]} = (); # keys only
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section
@@ -58,9 +58,9 @@ sub _init_optags {
 	my $tag = $1;
 
 	# Split into lines, keep only indented lines
-	my @lines = @( < grep { m/^\s/    } @( < split(m/\n/)) );
+	my @lines = grep { m/^\s/    } split(m/\n/);
 	foreach ( @lines) { s/--.*//  } # delete comments
-	my @ops   = @( < map  { < split ' ' } @( < @lines) ); # get op words
+	my @ops   = map  { < split ' ' } @lines; # get op words
 
 	foreach( @ops) {
 	    warn "$tag - $_ already tagged in %seen{$_}\n" if %seen{$_};
@@ -71,7 +71,7 @@ sub _init_optags {
 	define_optag($tag, opset(< @ops));
     }
     close(DATA);
-    warn "Untagged opnames: ".join(' ', @( <keys %all))."\n" if %all;
+    warn "Untagged opnames: ".join(' ',keys %all)."\n" if %all;
 }
 
 

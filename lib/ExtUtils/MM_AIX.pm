@@ -4,7 +4,7 @@ use strict;
 our $VERSION = '6.44';
 
 require ExtUtils::MM_Unix;
-our @ISA = @( < qw(ExtUtils::MM_Unix) );
+our @ISA = qw(ExtUtils::MM_Unix);
 
 use ExtUtils::MakeMaker < qw(neatvalue);
 
@@ -61,7 +61,7 @@ $self->{BASEEXT}.exp: Makefile.PL
 	', "DL_VARS" => ', < neatvalue($vars), q|);'
 |);
 
-    join('', @(< @m));
+    join('', @m);
 }
 
 

@@ -39,8 +39,8 @@ _MARKER_
 sub import
 {
     # Exported subroutines
-    my @EXPORT = @( < qw(share is_shared cond_wait cond_timedwait
-                    cond_signal cond_broadcast) );
+    my @EXPORT = qw(share is_shared cond_wait cond_timedwait
+                    cond_signal cond_broadcast);
     if ($threads::threads) {
         push(@EXPORT, 'bless');
     }

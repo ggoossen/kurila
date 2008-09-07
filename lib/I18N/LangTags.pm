@@ -6,21 +6,21 @@ package I18N::LangTags;
 use strict;
 use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);
 require Exporter;
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 @EXPORT = @( qw() );
-@EXPORT_OK = @( < qw(is_language_tag same_language_tag
+@EXPORT_OK = qw(is_language_tag same_language_tag
                 extract_language_tags super_languages
                 similarity_language_tag is_dialect_of
                 locale2language_tag alternate_language_tags
                 encode_language_tag panic_languages
                 implicate_supers
                 implicate_supers_strictly
-               ) );
+               );
 %EXPORT_TAGS = %('ALL' => \@EXPORT_OK);
 
 $VERSION = "0.35";
 
-sub uniq { my %seen; return @( < grep(!(%seen{$_}++), @( < @_)) ); } # a util function
+sub uniq { my %seen; return grep(!(%seen{$_}++), @_); } # a util function
 
 
 =head1 NAME
@@ -239,8 +239,8 @@ sub similarity_language_tag {
   return undef if !defined($lang1) and !defined($lang2);
   return 0 if !defined($lang1) or !defined($lang2);
 
-  my @l1_subtags = @( < split('-', $lang1) );
-  my @l2_subtags = @( < split('-', $lang2) );
+  my @l1_subtags = split('-', $lang1);
+  my @l2_subtags = split('-', $lang2);
   my $similarity = 0;
 
   while((nelems @l1_subtags) and nelems @l2_subtags) {
@@ -348,7 +348,7 @@ sub super_languages {
   $lang1 =~ s/^[ix](-hakka\b)/zh$1/i; # goes the right way
    # i-hakka-bork-bjork-bjark => zh-hakka-bork-bjork-bjark
 
-  my @l1_subtags = @( < split('-', $lang1) );
+  my @l1_subtags = split('-', $lang1);
 
   ## Changes in the language tagging standards may have to be reflected here.
 
@@ -361,7 +361,7 @@ sub super_languages {
   }
   pop @supers if (nelems @supers);
   shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
-  return @( <reverse @( < @supers));
+  returnreverse @supers;
 }
 
 ###########################################################################
@@ -647,36 +647,36 @@ sub alternate_language_tags {
    #  here, I'll just go crazy.
 
    # Scandinavian lgs.  All based on opinion and hearsay.
-   'sv' => \@( <qw(nb no da nn)),
-   'da' => \@( <qw(nb no sv nn)), # I guess
-   \@( <qw(no nn nb)), \@( <qw(no nn nb sv da)),
-   'is' => \@( <qw(da sv no nb nn)),
-   'fo' => \@( <qw(da is no nb nn sv)), # I guess
+   'sv' => \qw(nb no da nn),
+   'da' => \qw(nb no sv nn), # I guess
+   \qw(no nn nb), \qw(no nn nb sv da),
+   'is' => \qw(da sv no nb nn),
+   'fo' => \qw(da is no nb nn sv), # I guess
    
    # I think this is about the extent of tolerable intelligibility
    #  among large modern Romance languages.
-   'pt' => \@( <qw(es ca it fr)), # Portuguese, Spanish, Catalan, Italian, French
-   'ca' => \@( <qw(es pt it fr)),
-   'es' => \@( <qw(ca it fr pt)),
-   'it' => \@( <qw(es fr ca pt)),
-   'fr' => \@( <qw(es it ca pt)),
+   'pt' => \qw(es ca it fr), # Portuguese, Spanish, Catalan, Italian, French
+   'ca' => \qw(es pt it fr),
+   'es' => \qw(ca it fr pt),
+   'it' => \qw(es fr ca pt),
+   'fr' => \qw(es it ca pt),
    
    # Also assume that speakers of the main Indian languages prefer
    #  to read/hear Hindi over English
-   \@( <qw(
+   \qw(
      as bn gu kn ks kok ml mni mr ne or pa sa sd te ta ur
-   )) => 'hi',
+   ) => 'hi',
     # Assamese, Bengali, Gujarati, [Hindi,] Kannada (Kanarese), Kashmiri,
     # Konkani, Malayalam, Meithei (Manipuri), Marathi, Nepali, Oriya,
     # Punjabi, Sanskrit, Sindhi, Telugu, Tamil, and Urdu.
-   'hi' => \@( <qw(bn pa as or)),
+   'hi' => \qw(bn pa as or),
    # I welcome finer data for the other Indian languages.
    #  E.g., what should Oriya's list be, besides just Hindi?
    
    # And the panic languages for English is, of course, nil!
 
    # My guesses at Slavic intelligibility:
-   (\@( <qw(ru be uk))) x 2,  # Russian, Belarusian, Ukranian
+   (\qw(ru be uk)) x 2,  # Russian, Belarusian, Ukranian
    'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
    'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
 
@@ -738,7 +738,7 @@ sub panic_languages {
     # push @out, super_languages($t); # nah, keep that separate
     push @out, < @{ %Panic{lc $t} || next };
   }
-  return @(< grep !%seen{$_}++, @(  < @out, 'en'));
+  return grep !%seen{$_}++, @(  < @out, 'en');
 }
 
 #---------------------------------------------------------------------------
@@ -793,7 +793,7 @@ as far as I'm concerned) you'd use implicate_supers.
 =cut
 
 sub implicate_supers {
-  my @languages = @( < grep is_language_tag($_), @( < @_) );
+  my @languages = grep is_language_tag($_), @_;
   my %seen_encoded;
   foreach my $lang ( @languages) {
     %seen_encoded{ I18N::LangTags::encode_language_tag($lang) } = 1
@@ -813,8 +813,8 @@ sub implicate_supers {
 }
 
 sub implicate_supers_strictly {
-  my @tags = @( < grep is_language_tag($_), @( < @_) );
-  return uniq( < @_,   < map < super_languages($_), @( < @_) );
+  my @tags = grep is_language_tag($_), @_;
+  return uniq( < @_,   < map < super_languages($_), @_ );
 }
 
 

@@ -4,7 +4,7 @@ use strict;
 our $VERSION = '6.44';
 
 use File::Spec;
-BEGIN { our @ISA = @( < qw(File::Spec) ); }
+BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
 use ExtUtils::MakeMaker < qw($Verbose);
@@ -102,8 +102,8 @@ This is useful for code like:
 
 sub os_flavor_is {
     my $self = shift;
-    my %flavors = %( < map { ($_ => 1) } @( < $self->os_flavor) );
-    return (grep { %flavors{$_} } @( < @_)) ? 1 : 0;
+    my %flavors = %( < map { ($_ => 1) } $self->os_flavor );
+    return (grep { %flavors{$_} } @_) ? 1 : 0;
 }
 
 
@@ -203,8 +203,8 @@ sub echo {
     my($self, $text, $file, $appending) = < @_;
     $appending ||= 0;
 
-    my @cmds = @( < map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 
- @( <               split m/\n/, $text) );
+    my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 
+               split m/\n/, $text;
     if( $file ) {
         my $redirect = $appending ? '>>' : '>';
         @cmds[0] .= " $redirect $file";
@@ -230,7 +230,7 @@ arguments.  In most cases this is simply something like:
 
 sub wraplist {
     my $self = shift;
-    return join " \\\n\t", @( < @_);
+    return join " \\\n\t", @_;
 }
 
 
@@ -402,15 +402,15 @@ The blibdirs.ts target is deprecated.  Depend on blibdirs instead.
 sub blibdirs_target {
     my $self = shift;
 
-    my @dirs = @( < map { uc "\$(INST_$_)" } @( < qw(libdir archlib
+    my @dirs = map { uc "\$(INST_$_)" } qw(libdir archlib
                                            autodir archautodir
                                            bin script
                                            man1dir man3dir
-                                          )) );
+                                          );
 
-    my @exists = @( < map { $_.'$(DFSEP).exists' } @( < @dirs) );
+    my @exists = map { $_.'$(DFSEP).exists' } @dirs;
 
-    my $make = sprintf <<'MAKE', join(' ', @( < @exists));
+    my $make = sprintf <<'MAKE', join(' ', @exists);
 blibdirs : %s
 	$(NOECHO) $(NOOP)
 
@@ -444,8 +444,8 @@ sub clean {
 clean :: clean_subdirs
 |);
 
-    my @files = @( < values %{$self->{XS}} ); # .c files from *.xs files
-    my @dirs  = @( < qw(blib) );
+    my @files = values %{$self->{XS}}; # .c files from *.xs files
+    my @dirs  = qw(blib);
 
     # Normally these are all under blib but they might have been
     # redefined.
@@ -489,11 +489,11 @@ clean :: clean_subdirs
     push @dirs, < $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = %( < map { ($_ => 1) } @( < grep { defined $_ } @( < @files)) ); @files = @( < keys %f ); }
-    { my(%d) = %( < map { ($_ => 1) } @( < grep { defined $_ } @( < @dirs)) );  @dirs  = @( < keys %d ); }
+    { my(%f) = %( < map { ($_ => 1) } grep { defined $_ } @files ); @files = keys %f; }
+    { my(%d) = %( < map { ($_ => 1) } grep { defined $_ } @dirs );  @dirs  = keys %d; }
 
-    push @m, < map "\t$_\n", @( < $self->split_command('- $(RM_F)',  < @files));
-    push @m, < map "\t$_\n", @( < $self->split_command('- $(RM_RF)', < @dirs));
+    push @m, < map "\t$_\n", $self->split_command('- $(RM_F)',  < @files);
+    push @m, < map "\t$_\n", $self->split_command('- $(RM_RF)', < @dirs);
 
     # Leave Makefile.old around for realclean
     push @m, <<'MAKE';
@@ -502,7 +502,7 @@ MAKE
 
     push(@m, "\t%attribs{POSTOP}\n")   if %attribs{POSTOP};
 
-    join("", @( < @m));
+    join("", @m);
 }
 
 
@@ -613,7 +613,7 @@ subdirectory.
 sub dist_test {
     my($self) = shift;
 
-    my $mpl_args = join " ", @( < map qq["$_"], @( < @ARGV));
+    my $mpl_args = join " ", map qq["$_"], @ARGV;
 
     my $test = $self->cd('$(DISTVNAME)',
                          '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
@@ -694,7 +694,7 @@ manifypods : pure_all $dependencies
 END
 
     my @man_cmds;
-    foreach my $section (@( <qw(1 3))) {
+    foreach my $section (qw(1 3)) {
         my $pods = $self->{"MAN{$section}PODS"};
         push @man_cmds, < $self->split_command(<<CMD, < %$pods);
 	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
@@ -702,7 +702,7 @@ CMD
     }
 
     $manify .= "\t\$(NOECHO) \$(NOOP)\n" unless (nelems @man_cmds);
-    $manify .= join '', @( < map { "$_\n" } @( < @man_cmds));
+    $manify .= join '', map { "$_\n" } @man_cmds;
 
     return $manify;
 }
@@ -729,7 +729,7 @@ metafile :
 MAKE_FRAG
 
     my $prereq_pm = '';
-    foreach my $mod (@( < sort { lc $a cmp lc $b } @( < keys %{$self->{PREREQ_PM} || \%()})) ) {
+    foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{PREREQ_PM} || \%()} ) {
         my $ver = $self->{PREREQ_PM}->{$mod};
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
@@ -769,9 +769,9 @@ YAML
 
     $meta .= $self->{EXTRA_META} if $self->{EXTRA_META};
 
-    my @write_meta = @( < $self->echo($meta, 'META_new.yml') );
+    my @write_meta = $self->echo($meta, 'META_new.yml');
 
-    return sprintf <<'MAKE_FRAG', join("\n\t", @( < @write_meta));
+    return sprintf <<'MAKE_FRAG', join("\n\t", @write_meta);
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	%s
@@ -818,8 +818,8 @@ Defines the realclean target.
 sub realclean {
     my($self, < %attribs) = < @_;
 
-    my @dirs  = @( < qw($(DISTVNAME)) );
-    my @files = @( < qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD)) );
+    my @dirs  = qw($(DISTVNAME));
+    my @files = qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
 
     # Special exception for the perl core where INST_* is not in blib.
     # This cleans up the files built from the ext/ directory (all XS).
@@ -842,13 +842,13 @@ sub realclean {
     }
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = %( < map { ($_ => 1) } @( < @files) );  @files = @( < keys %f ); }
-    { my(%d) = %( < map { ($_ => 1) } @( < @dirs) );   @dirs  = @( < keys %d ); }
+    { my(%f) = %( < map { ($_ => 1) } @files );  @files = keys %f; }
+    { my(%d) = %( < map { ($_ => 1) } @dirs );   @dirs  = keys %d; }
 
-    my $rm_cmd  = join "\n\t", @( < map { "$_" } 
- @( <                    $self->split_command('- $(RM_F)',  < @files)));
-    my $rmf_cmd = join "\n\t", @( < map { "$_" } 
- @( <                    $self->split_command('- $(RM_RF)', < @dirs)));
+    my $rm_cmd  = join "\n\t", map { "$_" } 
+                    $self->split_command('- $(RM_F)',  < @files);
+    my $rmf_cmd = join "\n\t", map { "$_" } 
+                    $self->split_command('- $(RM_RF)', < @dirs);
 
     my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
 # Delete temporary files (via clean) and also delete dist files
@@ -1043,7 +1043,7 @@ sub init_INST {
 	}
     }
 
-    my @parentdir = @( < split(m/::/, $self->{PARENT_NAME}) );
+    my @parentdir = split(m/::/, $self->{PARENT_NAME});
     $self->{INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     < @parentdir);
     $self->{INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', < @parentdir);
     $self->{INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto', 
@@ -1144,7 +1144,7 @@ sub init_INSTALL_from_PREFIX {
     $self->{PREFIX}       ||= '';
 
     if( $self->{PREFIX} ) { <
-        %{$self}{[@( <qw(PERLPREFIX SITEPREFIX VENDORPREFIX))]} =
+        %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
           ('$(PREFIX)') x 3;
     }
     else {
@@ -1259,7 +1259,7 @@ sub init_INSTALL_from_PREFIX {
 
     # Special case for LIB.
     if( $self->{LIB} ) {
-        foreach my $var (@( <keys %lib_layouts)) {
+        foreach my $var (keys %lib_layouts) {
             my $Installvar = uc "install$var";
 
             if( $var =~ m/arch/ ) {
@@ -1279,7 +1279,7 @@ sub init_INSTALL_from_PREFIX {
 
     my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts);
     while( my($var, $layout) = each(%layouts) ) {
-        my($s, $t, $d, $style) = < %{$layout}{[@( <qw(s t d style))]};
+        my($s, $t, $d, $style) = < %{$layout}{[qw(s t d style)]};
         my $r = '$('.%type2prefix{$t}.')';
 
         print STDERR "Prefixing $var\n" if $Verbose +>= 2;
@@ -1310,22 +1310,22 @@ sub init_INSTALL_from_PREFIX {
 =cut
 
 my %map = %(
-           lib      => \@( <qw(lib perl5)),
+           lib      => \qw(lib perl5),
            arch     => \@('lib', 'perl5', %Config{archname}),
-           bin      => \@( <qw(bin)),
-           man1dir  => \@( <qw(man man1)),
-           man3dir  => \@( <qw(man man3)),
+           bin      => \qw(bin),
+           man1dir  => \qw(man man1),
+           man3dir  => \qw(man man3),
           );
 %map{script} = %map{bin};
 
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
  <
-    %{$self}{[@( <qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX))]} = 
+    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = 
                                                          '$(INSTALL_BASE)';
 
     my %install;
-    foreach my $thing (@( <keys %map)) {
+    foreach my $thing (keys %map) {
         foreach my $dir (@(('', 'SITE', 'VENDOR'))) {
             my $uc_thing = uc $thing;
             my $key = "INSTALL".$dir.$uc_thing;
@@ -1339,7 +1339,7 @@ sub init_INSTALL_from_INSTALL_BASE {
     %install{INSTALLARCHLIB} ||= delete %install{INSTALLARCH};
     %install{INSTALLPRIVLIB} ||= delete %install{INSTALLLIB};
 
-    foreach my $key (@( <keys %install)) {
+    foreach my $key (keys %install) {
         $self->{$key} ||= %install{$key};
     }
 
@@ -1690,13 +1690,13 @@ for iteration or building related variable sets.
 =cut
 
 sub installvars {
-    return @( <qw(PRIVLIB SITELIB  VENDORLIB
+    returnqw(PRIVLIB SITELIB  VENDORLIB
               ARCHLIB SITEARCH VENDORARCH
               BIN     SITEBIN  VENDORBIN
               SCRIPT  SITESCRIPT  VENDORSCRIPT
               MAN1DIR SITEMAN1DIR VENDORMAN1DIR
               MAN3DIR SITEMAN3DIR VENDORMAN3DIR
-             ));
+             );
 }
 
 

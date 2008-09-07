@@ -6,7 +6,7 @@ BEGIN {
 
 plan tests => 3;
 
-my @expect = @( < qw(
+my @expect = qw(
 b1
 b2
 b3
@@ -27,8 +27,8 @@ u3
 u4
 e2
 e1
-		) );
-my $expect = ":" . join(":", @( < @expect));
+		);
+my $expect = ":" . join(":", @expect);
 
 fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'Order of execution of special blocks');
 BEGIN {print ":b1"}
@@ -65,7 +65,7 @@ qw( main bar myfoo foo ), <
 # END
 qw(foo myfoo bar main  ));
 
-$expect = ":" . join(":", @( < @expect));
+$expect = ":" . join(":", @expect);
 fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes');
 our $f;
 BEGIN {$f = 'main'; print ":$f"}
@@ -97,8 +97,8 @@ INIT {print ":$f"}
 END {print ":$f"}
 SCRIPT2
 
-@expect = @( < qw(begin unitcheck check init end) );
-$expect = ":" . join(":", @( < @expect));
+@expect = qw(begin unitcheck check init end);
+$expect = ":" . join(":", @expect);
 fresh_perl_is(<<'SCRIPT3', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'can name blocks as sub FOO');
 sub BEGIN {print ":begin"}
 sub UNITCHECK {print ":unitcheck"}

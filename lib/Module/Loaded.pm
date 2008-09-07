@@ -7,7 +7,7 @@ BEGIN { use base 'Exporter';
         use vars < qw[@EXPORT $VERSION];
         
         $VERSION = '0.01';
-        @EXPORT  = @( < qw[mark_as_loaded mark_as_unloaded is_loaded] );
+        @EXPORT  = qw[mark_as_loaded mark_as_unloaded is_loaded];
 }
 
 =head1 NAME 
@@ -111,7 +111,7 @@ sub _pm_to_file {
     my $pkg = shift;
     my $pm  = shift or return;
     
-    my $file = join '/', @( < split '::', $pm);
+    my $file = join '/', split '::', $pm;
     $file .= '.pm';
     
     return $file;

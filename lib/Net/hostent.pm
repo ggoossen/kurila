@@ -5,12 +5,12 @@ our $VERSION = '1.01';
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN { 
     use Exporter   ();
-    @EXPORT      = @( < qw(gethostbyname gethostbyaddr gethost) );
-    @EXPORT_OK   = @( < qw(
+    @EXPORT      = qw(gethostbyname gethostbyaddr gethost);
+    @EXPORT_OK   = qw(
 			$h_name	    	@h_aliases
 			$h_addrtype 	$h_length
 			@h_addr_list 	$h_addr
-		   ) );
+		   );
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
 use vars      < @EXPORT_OK;
@@ -33,11 +33,11 @@ sub populate (@) {
     return unless (nelems @_);
     my $hob = new();
     $h_name 	 =    $hob->[0]     	     = @_[0];
-    @h_aliases	 = @( @{ $hob->[1] } = @( < split ' ', @_[1] ) );
+    @h_aliases	 = @( @{ $hob->[1] } = split ' ', @_[1] );
     $h_addrtype  =    $hob->[2] 	     = @_[2];
     $h_length	 =    $hob->[3] 	     = @_[3];
     $h_addr 	 =                             @_[4];
-    @h_addr_list = @( @{ $hob->[4] } = @( <          @_[[@( ( <4 .. ((nelems @_)-1))) ]] ) );
+    @h_addr_list = @( @{ $hob->[4] } =          @_[[@( ( <4 .. ((nelems @_)-1))) ]] );
     return $hob;
 } 
 

@@ -5,7 +5,7 @@ use strict;
 use Test::Builder;
 
 require Exporter;
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 
 our $VERSION = '0.78';
 
@@ -84,7 +84,7 @@ sub import {
     $test->exported_to($caller);
 
     $class->import_extra(\@_);
-    my(@imports) = @( < $class->_strip_imports(\@_) );
+    my(@imports) = $class->_strip_imports(\@_);
 
     $test->plan(< @_);
 
@@ -113,7 +113,7 @@ sub _strip_imports {
         $idx++;
     }
 
-    @$list = @( < @other );
+    @$list = @other;
 
     return @imports;
 }

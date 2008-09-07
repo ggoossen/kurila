@@ -58,8 +58,8 @@ To recreate it use the following command:
 
      $me -p $file $outfile
 
-Created at {join ' ', @( <@{\@(scalar localtime)}
-)}#########################################################################
+Created at {join ' ',@{\@(scalar localtime)}
+}#########################################################################
 __UU__
 EOFBLURB
     }

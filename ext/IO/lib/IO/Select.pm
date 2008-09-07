@@ -13,7 +13,7 @@ require Exporter;
 
 $VERSION = "1.17";
 
-@ISA = @( < qw(Exporter) ); # This is only so we can do version checking
+@ISA = qw(Exporter); # This is only so we can do version checking
 
 sub VEC_BITS () {0}
 sub FD_COUNT () {1}
@@ -157,7 +157,7 @@ sub as_string  # for debugging
  my $count = $vec->count;
  $str .= defined($bits) ? unpack("b*", $bits) : "undef";
  $str .= " $count";
- my @handles = @( < @$vec );
+ my @handles = @$vec;
  splice(@handles, 0, FIRST_FD);
  for ( @handles) {
      $str .= " " . (defined($_) ? "$_" : "-");

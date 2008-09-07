@@ -18,10 +18,10 @@ use vars < qw(
 @ISA = @('Pod::Simple::BlackBox');
 $VERSION = '3.05';
 
-@Known_formatting_codes = @( < qw(I B C L E F S X Z) ); 
-%Known_formatting_codes = %( < map(($_=>1), @( < @Known_formatting_codes)) );
-@Known_directives       = @( < qw(head1 head2 head3 head4 item over back) ); 
-%Known_directives       = %( < map(($_=>'Plain'), @( < @Known_directives)) );
+@Known_formatting_codes = qw(I B C L E F S X Z); 
+%Known_formatting_codes = %( < map(($_=>1), @Known_formatting_codes) );
+@Known_directives       = qw(head1 head2 head3 head4 item over back); 
+%Known_directives       = %( < map(($_=>'Plain'), @Known_directives) );
 $NL = $/ unless defined $NL;
 
 #-----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ sub new {
   #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
   #  . __PACKAGE__ );
   return bless \%(
-    'accept_codes'      => \%( < map( ($_=>$_), @( < @Known_formatting_codes) ) ),
+    'accept_codes'      => \%( < map( ($_=>$_), @Known_formatting_codes ) ),
     'accept_directives' => \%( < %Known_directives ),
     'accept_targets'    => \%(),
   ), $class;
@@ -208,7 +208,7 @@ sub _accept_directives {
   DEBUG +> 6 and print "$this\'s accept_directives : ", <
    pretty($this->{'accept_directives'}), "\n";
   
-  return @( < sort @( < keys %{ $this->{'accept_directives'} }));
+  return sort keys %{ $this->{'accept_directives'} };
 }
 
 #--------------------------------------------------------------------------
@@ -227,7 +227,7 @@ sub unaccept_directives {
     delete $this->{'accept_directives'}->{$d};
     DEBUG +> 2 and print "OK, won't accept \"=$d\" as directive.\n";
   }
-  return @( < sort @( < keys %{ $this->{'accept_directives'} }));
+  return sort keys %{ $this->{'accept_directives'} };
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -251,7 +251,7 @@ sub _accept_targets {
     $this->{'accept_targets'}->{$t} = $type;
     DEBUG +> 2 and print "Learning to accept \"$t\" as target of type $type\n";
   }    
-  return @( < sort @( < keys %{ $this->{'accept_targets'} }));
+  return sort keys %{ $this->{'accept_targets'} };
 }
 
 #--------------------------------------------------------------------------
@@ -265,7 +265,7 @@ sub unaccept_targets {
     delete $this->{'accept_targets'}->{$t};
     DEBUG +> 2 and print "OK, won't accept \"$t\" as target.\n";
   }    
-  return @( < sort @( < keys %{ $this->{'accept_targets'} }));
+  return sort keys %{ $this->{'accept_targets'} };
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -327,7 +327,7 @@ sub unaccept_codes { # remove some codes
     }
     
     die "But you must accept \"$new_code\" codes -- it's a builtin!"
-     if grep $new_code eq $_, @( < @Known_formatting_codes);
+     if grep $new_code eq $_, @Known_formatting_codes;
 
     delete $this->{'accept_codes'}->{$new_code};
 
@@ -500,7 +500,7 @@ sub _get_initial_item_type {
   return $para->[1]->{'~type'}  if $para->[1]->{'~type'};
 
   return $para->[1]->{'~type'} = 'text'
-   if join("\n", @( < @{$para}[[@( <2 .. (nelems @$para)-1)]])) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
+   if join("\n", @{$para}[[2 .. (nelems @$para)-1]]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
   # Else fall thru to the general case:
   return $self->_get_item_type($para);
 }
@@ -514,7 +514,7 @@ sub _get_item_type {       # mutates the item!!
 
   # Otherwise we haven't yet been to this node.  Maybe alter it...
   
-  my $content = join "\n", @( < @{$para}[[@( <2 .. (nelems @$para)-1)]]);
+  my $content = join "\n", @{$para}[[2 .. (nelems @$para)-1]];
 
   if($content =~ m/^\s*\*\s*$/s or $content =~ m/^\s*$/s) {
     # Like: "=item *", "=item   *   ", "=item"
@@ -664,11 +664,11 @@ sub _remap_sequences {
    $start_line || '[?]'
   ;
   DEBUG +> 3 and print " Map: ",
-    join('; ', @( < map "$_=" . (
-        ref($map->{$_}) ? join(",", @( < @{$map->{$_}})) : $map->{$_}
-      ), @( <
-      sort @( < keys %$map))) ),
-    ("B~C~E~F~I~L~S~X~Z" eq join '~', @( < sort @( < keys %$map)))
+    join('; ', map "$_=" . (
+        ref($map->{$_}) ? join(",", @{$map->{$_}}) : $map->{$_}
+      ),
+      sort keys %$map ),
+    ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys %$map)
      ? "  (all normal)\n" : "\n"
   ;
 
@@ -691,7 +691,7 @@ sub _remap_sequences {
         } else  {
           print "   Code $was<> maps to ",
            ref($is)
-            ? ( "tags ", < map("$_<", @( < @$is)), '...', < map('>', @( < @$is)), "\n" )
+            ? ( "tags ", < map("$_<", @$is), '...', < map('>', @$is), "\n" )
             : "tag $is<...>.\n";
         }
       }
@@ -703,7 +703,7 @@ sub _remap_sequences {
         # children of this node, but something about that seems icky.
       }
       if(ref $is) {
-        my @dynasty = @( < @$is );
+        my @dynasty = @$is;
         DEBUG +> 4 and print "    Renaming $was node to @dynasty[-1]\n"; 
         $treelet->[$i]->[0] = pop @dynasty;
         my $nugget;
@@ -782,7 +782,7 @@ sub _ponder_extend {
       return;
     }
     
-    if(grep $new_letter eq $_, @( < @Known_formatting_codes)) {
+    if(grep $new_letter eq $_, @Known_formatting_codes) {
       DEBUG +> 2 and print " $new_letter isn't a good thing to extend, because known.\n";
       $self->whine(
         $para->[1]->{'start_line'},
@@ -815,8 +815,8 @@ sub _ponder_extend {
       return;
     }
 
-    my @fallbacks  = @( < split ',', $fallbacks_one,  -1 );
-    my @elements   = @( < split ',', $elements_one, -1 );
+    my @fallbacks  = split ',', $fallbacks_one,  -1;
+    my @elements   = split ',', $elements_one, -1;
 
     foreach my $f ( @fallbacks) {
       next if exists %Known_formatting_codes{$f} or $f eq '0' or $f eq '1';
@@ -853,7 +853,7 @@ sub _ponder_extend {
       $self->{'accept_codes'}->{$new_letter}
         = ((nelems @fallbacks) == 1) ? @fallbacks[0] : \@fallbacks;
       DEBUG +> 2 and print
-       "Extensor maps $new_letter => fallbacks {join ' ', @( <@fallbacks)}.\n";
+       "Extensor maps $new_letter => fallbacks {join ' ',@fallbacks}.\n";
     }
 
   } else {
@@ -885,7 +885,7 @@ sub _treat_Zs {  # Nix Z<...>'s
         next;
       }
         
-      DEBUG +> 1 and print "Nixing Z node {join ' ', @( <@{$treelet->[$i]})}\n";
+      DEBUG +> 1 and print "Nixing Z node {join ' ',@{$treelet->[$i]}}\n";
         
       # bitch UNLESS it's empty
       unless(  (nelems @{$treelet->[$i]}) == 2
@@ -1081,7 +1081,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       
       my $link_text; # set to an arrayref if found
       my $ell = $treelet->[$i];
-      my @ell_content = @( < @$ell );
+      my @ell_content = @$ell;
       splice @ell_content,0,2; # Knock off the 'L' and {} bits
 
       DEBUG +> 3 and print " Ell content to start: ", <
@@ -1106,8 +1106,8 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
           unshift @link_text, splice @ell_content, 0, $j;
             # leaving only things at J and after
-          @ell_content = @(  < grep ref($_)||length($_), @( < @ell_content) ) ;
-          $link_text   = \@(< grep ref($_)||length($_), @( < @link_text)  );
+          @ell_content = grep ref($_)||length($_), @ell_content ;
+          $link_text   = \ grep ref($_)||length($_), @link_text;
           DEBUG +> 3 and printf
            "  So link text is \%s\n  and remaining ell content is \%s\n", <
             pretty($link_text), < pretty(< @ell_content);
@@ -1137,8 +1137,8 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
           push @section_name, splice @ell_content, 1+$j;
             # leaving only things before and including J
           
-          @ell_content  = @( < grep ref($_)||length($_), @( < @ell_content) )  ;
-          @section_name = @( < grep ref($_)||length($_), @( < @section_name) ) ;
+          @ell_content  = grep ref($_)||length($_), @ell_content  ;
+          @section_name = grep ref($_)||length($_), @section_name ;
 
           # Turn L<.../"foo"> into L<.../foo>
           if((nelems @section_name)
@@ -1179,7 +1179,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
       # Turn L<Foo Bar> into L</Foo Bar>.
       if(!$section_name and !$link_text and nelems @ell_content
-         and grep !ref($_) && m/ /s, @( < @ell_content)
+         and grep !ref($_) && m/ /s, @ell_content
       ) {
         $section_name = \@(splice @ell_content);
         # That's support for the now-deprecated syntax.
@@ -1453,7 +1453,7 @@ sub _duo {
   
   my $mutor = shift(@_) if (nelems @_) and ref(@_[0] || '') eq 'CODE';
 
-  die "But $class->_duo takes two parameters, not: {join ' ', @( <@_)}"
+  die "But $class->_duo takes two parameters, not: {join ' ',@_}"
    unless (nelems @_) == 2;
 
   my(@out);

@@ -42,8 +42,8 @@ sub doglob {
 	    #print "div: |$head|$sepchr|$tail|\n";
 	    push (@retval, $pat), next OUTER if $tail eq '';
 	    if ($head =~ m/[*?]/) {
-		@globdirs = @( < doglob('d', $head) );
-		push(@retval, < doglob($cond, < map {"$_$sepchr$tail"} @( < @globdirs))),
+		@globdirs = doglob('d', $head);
+		push(@retval, < doglob($cond, < map {"$_$sepchr$tail"} @globdirs)),
 		    next OUTER if (nelems @globdirs);
 	    }
 	    $head .= $sepchr if $head eq '' or $head =~ m/^[A-Za-z]:\z/s;
@@ -138,8 +138,8 @@ sub doglob_Mac {
 		$tmp_head =~ s/(\\*)([*?])/{$2 x ((length($1) + 1) % 2)}/g;
 	
 		if ($tmp_head =~ m/[*?]/) { # if there are wildcards ...	
-		@globdirs = @( < doglob_Mac('d', $head) );
-		push(@retval, < doglob_Mac($cond, < map {"$_$sepchr$tail"} @( < @globdirs))),
+		@globdirs = doglob_Mac('d', $head);
+		push(@retval, < doglob_Mac($cond, < map {"$_$sepchr$tail"} @globdirs)),
 		    next OUTER if (nelems @globdirs);
 	    }
 		
@@ -220,9 +220,9 @@ sub _expand_volume {
 	
 	require MacPerl; # to be verbose
 	
-	my @pat = @( < @_ );
+	my @pat = @_;
 	my @new_pat = @( () );
-	my @FSSpec_Vols = @( < MacPerl::Volumes() );
+	my @FSSpec_Vols = MacPerl::Volumes();
 	my @mounted_volumes = @( () );
 
 	foreach my $spec_vol ( @FSSpec_Vols) {		
@@ -268,7 +268,7 @@ sub _expand_volume {
 # from the pattern, unless it's a volume name pattern like "*HD:"
 #
 sub _preprocess_pattern {
-	my @pat = @( < @_ );
+	my @pat = @_;
 	
 	foreach my $p ( @pat) {
 		my $proceed;
@@ -315,7 +315,7 @@ sub glob {
     # extract patterns
     if ($pat =~ m/\s/) {
 	require Text::ParseWords;
-	@pat = @( < Text::ParseWords::parse_line('\s+',0,$pat) );
+	@pat = Text::ParseWords::parse_line('\s+',0,$pat);
     }
     else {
 	push @pat, $pat;
@@ -375,12 +375,12 @@ sub glob {
     if (%iter{$cxix} == 0) {
 	if ($^O eq 'MacOS') {
 		# first, take care of updirs and trailing colons
-		@pat = @( < _preprocess_pattern(< @pat) );
+		@pat = _preprocess_pattern(< @pat);
 		# expand volume names
-		@pat = @( < _expand_volume(< @pat) );
-		%entries{$cxix} = (nelems @pat) ? \@( <_un_escape( < doglob_Mac(1,< @pat) )) : \@();
+		@pat = _expand_volume(< @pat);
+		%entries{$cxix} = (nelems @pat) ? \_un_escape( < doglob_Mac(1,< @pat) ) : \@();
 	} else {
-		%entries{$cxix} = \@( <doglob(1,< @pat));
+		%entries{$cxix} = \doglob(1,< @pat);
     }
 	}
 

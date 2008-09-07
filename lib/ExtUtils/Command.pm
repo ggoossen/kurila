@@ -7,9 +7,9 @@ use File::Basename;
 use File::Path < qw(rmtree);
 require Exporter;
 use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
-@ISA       = @( < qw(Exporter) );
-@EXPORT    = @( < qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
-                dos2unix) );
+@ISA       = qw(Exporter);
+@EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
+                dos2unix);
 $VERSION = '1.13';
 
 my $Is_VMS = $^O eq 'VMS';
@@ -60,7 +60,7 @@ Filenames with * and ? will be glob expanded.
 my $wild_regex = $Is_VMS ? '*%' : '*?';
 sub expand_wildcards
 {
- @ARGV = @( < map(m/[$wild_regex]/o ? < glob($_) : $_, @(< @ARGV)) );
+ @ARGV = map(m/[$wild_regex]/o ? < glob($_) : $_, @ARGV);
 }
 
 
@@ -104,7 +104,7 @@ Removes files and directories - recursively (even if readonly)
 sub rm_rf
 {
  expand_wildcards();
- rmtree(< grep -e $_, @(< @ARGV) );
+ rmtree(< grep -e $_, @ARGV );
 }
 
 =item rm_f
@@ -174,7 +174,7 @@ Returns true if all moves succeeded, false otherwise.
 
 sub mv {
     expand_wildcards();
-    my @src = @( < @ARGV );
+    my @src = @ARGV;
     my $dst = pop @src;
 
     die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst);
@@ -200,7 +200,7 @@ Returns true if all copies succeeded, false otherwise.
 
 sub cp {
     expand_wildcards();
-    my @src = @( < @ARGV );
+    my @src = @ARGV;
     my $dst = pop @src;
 
     die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst);
@@ -221,7 +221,7 @@ Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 =cut 
 
 sub chmod {
-    local @ARGV = @( < @ARGV );
+    local @ARGV = @ARGV;
     my $mode = shift(@ARGV);
     expand_wildcards();
 
@@ -232,7 +232,7 @@ sub chmod {
 
             # chmod 0777, [.foo.bar] doesn't work on VMS, you have to do
             # chmod 0777, [.foo]bar.dir
-            my @dirs = @( < File::Spec->splitdir( $path ) );
+            my @dirs = File::Spec->splitdir( $path );
             @dirs[-1] .= '.dir';
             $path = File::Spec->catfile(< @dirs);
 
@@ -254,7 +254,7 @@ Creates directories, including any parent directories.
 sub mkpath
 {
  expand_wildcards();
- File::Path::mkpath(\@(< @ARGV),0,0777);
+ File::Path::mkpath(\ @ARGV,0,0777);
 }
 
 =item test_f

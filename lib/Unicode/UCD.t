@@ -324,7 +324,7 @@ is(Unicode::UCD::_getcode('U+123x'),  undef, "_getcode(x123)");
 
 use Unicode::UCD < qw(namedseq);
 
-is((join '*', @( <namedseq("KATAKANA LETTER AINU P"))), '12791*12442', "namedseq");
+is((join '*',namedseq("KATAKANA LETTER AINU P")), '12791*12442', "namedseq");
 is(namedseq("KATAKANA LETTER AINU Q")[0], undef);
 is(namedseq( <qw(foo bar)), undef);
 my @ns = namedseq("KATAKANA LETTER AINU P");
@@ -333,6 +333,6 @@ is(@ns[0], 0x31F7);
 is(@ns[1], 0x309A);
 my %ns = namedseq();
 is(%ns{"KATAKANA LETTER AINU P"}, "\x{31F7}\x{309A}");
-@ns = @( < namedseq(42) );
+@ns = namedseq(42);
 is((nelems @ns), 0);
 

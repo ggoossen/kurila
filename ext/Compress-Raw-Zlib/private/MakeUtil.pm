@@ -20,7 +20,7 @@ require VMS::Filespec if $^O eq 'VMS';
 
 
 unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @( < @ARGV);
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
 }
 
 %ENV{SKIP_FOR_CORE} = 1 if %ENV{PERL_CORE} || %ENV{MY_PERL_CORE} ;
@@ -45,15 +45,15 @@ sub MY::postamble
     return ''
         if %ENV{PERL_CORE} ;
 
-    my @files = @( < getPerlFiles('MANIFEST') );
+    my @files = getPerlFiles('MANIFEST');
 
     my $postamble = '
 
 MyTrebleCheck:
-	@echo Checking for $$^W in files: '. "{join ' ', @( <@files)}" . q|
+	@echo Checking for $$^W in files: '. "{join ' ',@files}" . q|
 	@perl -ne '						\
 	    exit 1 if /^\s*local\s*\(\s*\$$\^W\s*\)/;		\
-         ' | . " {join ' ', @( <@files)} || " . '				\
+         ' | . " {join ' ',@files} || " . '				\
 	(echo found unexpected $$^W ; exit 1)
 	@echo All is ok.
 
@@ -64,7 +64,7 @@ MyTrebleCheck:
 
 sub getPerlFiles
 {
-    my @manifests = @( < @_ ) ;
+    my @manifests = @_ ;
 
     my @files = @( () );
 
@@ -109,7 +109,7 @@ sub UpDowngrade
 {
     return if defined %ENV{TipTop};
 
-    my @files = @( < @_ ) ;
+    my @files = @_ ;
 
     # our and use bytes/utf8 is stable from 5.6.0 onward
     # warnings is stable from 5.6.1 onward
@@ -165,7 +165,7 @@ sub UpDowngrade
         $our_sub = sub {
 	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
-                my $vars = join ' ', @( < split m/\s*,\s*/, $2);
+                my $vars = join ' ', split m/\s*,\s*/, $2;
                 $_ = "{$indent}use vars qw($vars);\n";
             }
 	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
@@ -178,7 +178,7 @@ sub UpDowngrade
         $our_sub = sub {
 	    if ( m/^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {
                 my $indent = $1;
-                my $vars = join ', ', @( < split ' ', $2);
+                my $vars = join ', ', split ' ', $2;
                 $_ = "{$indent}our ($vars);\n";
             }
 	    elsif ( m/^(\s*)#\s*((use|no)\s+(bytes|utf8)\s*;.*)$/)

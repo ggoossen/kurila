@@ -175,7 +175,7 @@ sub simple_wanted {
 sub noop_wanted {}
 
 sub my_preprocess {
-    my @files = @( < @_ );
+    my @files = @_;
     print "# --preprocess--\n";
     print "#   \$File::Find::dir => '$File::Find::dir' \n";
     foreach my $file ( @files) {
@@ -486,8 +486,8 @@ Check( (nkeys %Expect_Dir) == 0 );
     print "# checking argument localization\n";
 
     ### this checks the fix of perlbug [19977] ###
-    my @foo = @( < qw( a b c d e f ) );
-    my %pre = %( < map { $_ => } @( < @foo) );
+    my @foo = qw( a b c d e f );
+    my %pre = %( < map { $_ => } @foo );
 
     File::Find::find( sub {  } , 'fa' ) for  @foo;
     delete %pre{$_} for  @foo;
@@ -775,7 +775,7 @@ if ( $symlink_exists ) {
 
     # If we encountered the symlink first, then the entries corresponding to
     # the real name remain, if the real name first then the symlink
-    my @names = @( < sort @( < keys %Expect_File) );
+    my @names = sort keys %Expect_File;
     Check( (nelems @names) == 1 );
     # Normalise both to the original name
     s/_sl// foreach  @names;

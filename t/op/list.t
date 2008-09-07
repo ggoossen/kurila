@@ -9,7 +9,7 @@ our (@b, @a, @foo, @bar, $c, $d, %c, $x);
 cmp_ok(@foo[0], '==', 1, 'first elem');
 cmp_ok(@foo[3], '==', 4, 'last elem');
 
-$_ = join(':', @(< @foo));
+$_ = join(':', @foo);
 cmp_ok($_, 'eq', '1:2:3:4', 'join list');
 
 ($a,$b,$c,$d) = (1,2,3,4);
@@ -48,11 +48,11 @@ ok(!defined($d),'short list 4 undef');
 cmp_ok(join(':', @(< @foo,< @bar)),'eq','1:1','list reassign');
 
 @foo = @bar = @(2,3);
-cmp_ok(join(':', @(join('+', @(< @foo)),join('-', @(< @bar)))),'eq','2+3:2-3','long list reassign');
+cmp_ok(join(':', @(join('+', @foo),join('-', @bar))),'eq','2+3:2-3','long list reassign');
 
 @foo = @( () );
 @foo = @( 1+2+3 );
-cmp_ok(join(':', @(< @foo)),'eq','6','scalar assign to array');
+cmp_ok(join(':', @foo),'eq','6','scalar assign to array');
 
 {
     my ($a, $b, $c);
@@ -114,10 +114,10 @@ cmp_ok(join(':', @(< @foo)),'eq','6','scalar assign to array');
 
 $x = 666;
 @a = @($x == 12345 || (1,2,3));
-cmp_ok(join('*', @(< @a)),'eq','1*2*3','logical or f');
+cmp_ok(join('*', @a),'eq','1*2*3','logical or f');
 
 @a = @($x == $x || (4,5,6));
-cmp_ok(join('*', @(< @a)),'eq','1','logical or t');
+cmp_ok(join('*', @a),'eq','1','logical or t');
 
 cmp_ok(join('', @(1,2,(3,4,5))),'eq','12345','list ..(...)');
 cmp_ok(join('', @((1,2,3,4,5))),'eq','12345','list (.....)');
@@ -129,7 +129,7 @@ cmp_ok(join('', @((1,2),3,(4,5))),'eq','12345','list (..).(..)');
 
 {
     my @a = @(0, undef, undef, 3);
-    my @b = @( < @a[[@(1,2)]] );
+    my @b = @a[[@(1,2)]];
     my @c = @(0, undef, undef, 3)[[1..2]];
     cmp_ok(scalar(nelems @b),'==',scalar(nelems @c),'slice and slice');
     cmp_ok(scalar(nelems @c),'==',2,'slice len');

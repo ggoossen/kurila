@@ -27,10 +27,10 @@ my %HoH = %(
 
 use Data::Dumper 'Dumper';
 
-warn < Dumper \@( < drill @AoA, \@(), \@(1,2)     );
-warn < Dumper \@( < drill @AoH, \@(), \@('b','c') );
-warn < Dumper \@( < drill %HoA, \@(), \@(1,2)     );
-warn < Dumper \@( < drill %HoH, \@(), \@('b','c') );
+warn < Dumper \ drill @AoA, \@(), \@(1,2);
+warn < Dumper \ drill @AoH, \@(), \@('b','c');
+warn < Dumper \ drill %HoA, \@(), \@(1,2);
+warn < Dumper \ drill %HoH, \@(), \@('b','c');
 
 my @AoHoA = @(
 	\%(a=>\@(1,11,111),b=>\@(2,22,222),c=>\@(3,33,333)),
@@ -38,12 +38,12 @@ my @AoHoA = @(
 	\%(a=>\@(7,77,777),b=>\@(8,88,888),c=>\@(9,99,999)),
 );
 
-warn < Dumper \@( < drill @AoHoA, \@(), \@('b','c') );
-warn < Dumper \@( < drill @AoHoA, \@(), \@('b','c'), \@(1,2) );
+warn < Dumper \ drill @AoHoA, \@(), \@('b','c');
+warn < Dumper \ drill @AoHoA, \@(), \@('b','c'), \@(1,2);
 
 my @AoHoAoH = @(
 	\%(a=>\@(\%(x=>1),\%(x=>11),\%(y=>111)),b=>\@(\%(x=>2),\%(y=>22),\%(x=>222)),c=>\@(\%(x=>3),\%(y=>33))),
 	\%(a=>\@(\%(x=>4),\%(x=>44),\%(y=>444)),b=>\@(\%(y=>5),\%(x=>55),\%(x=>555)),c=>\@(\%(x=>6),\%(y=>66))),
 );
 
-warn < Dumper \@( < drill @AoHoAoH, \@(), \@('b','c'), \@(0), \@('x') );
+warn < Dumper \ drill @AoHoAoH, \@(), \@('b','c'), \@(0), \@('x');

@@ -17,7 +17,7 @@ require threads;
 sub thread_it {
     # Generate things like './op/regexp.t', './t/op/regexp.t', ':op:regexp.t'
     my @paths
-	= @(join ('/', @( '.', < @_)), join ('/', @( '.', 't', < @_)), join (':', @( < @_)));
+	= @(join ('/', @( '.', < @_)), join ('/', @( '.', 't', < @_)), join (':', @_));
 		 
     for my $file ( @paths) {
 	if (-r $file) {
@@ -33,7 +33,7 @@ sub thread_it {
 	    exit;
 	}
     }
-    die "Cannot find " . join (" or ", @( < @paths)) . "\n";
+    die "Cannot find " . join (" or ", @paths) . "\n";
 }
 
 1;

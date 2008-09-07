@@ -5,7 +5,7 @@ use strict;
 use Text::ParseWords;
 use Test::More tests => 27;
 
-our @words = @( < shellwords(qq(foo "bar quiz" zoo)) );
+our @words = shellwords(qq(foo "bar quiz" zoo));
 is(@words[0], 'foo');
 is(@words[1], 'bar quiz');
 is(@words[2], 'zoo');
@@ -15,28 +15,28 @@ is(@words[2], 'zoo');
   no warnings 'uninitialized' ;
 
   # Test quotewords() with other parameters and null last field
-  @words = @( < quotewords(':+', 1, 'foo:::"bar:foo":zoo zoo:') );
-  is(join(";", @( < @words)), qq(foo;"bar:foo";zoo zoo;));
+  @words = quotewords(':+', 1, 'foo:::"bar:foo":zoo zoo:');
+  is(join(";", @words), qq(foo;"bar:foo";zoo zoo;));
 }
 
 # Test $keep eq 'delimiters' and last field zero
-@words = @( < quotewords('\s+', 'delimiters', '4 3 2 1 0') );
-is(join(";", @( < @words)), qq(4; ;3; ;2; ;1; ;0));
+@words = quotewords('\s+', 'delimiters', '4 3 2 1 0');
+is(join(";", @words), qq(4; ;3; ;2; ;1; ;0));
 
 # Big ol' nasty test (thanks, Joerk!)
 our $string = 'aaaa"bbbbb" cc\ cc \\\"dddd" eee\\\"ffff" "gg"';
 
 # First with $keep == 1
-our $result = join('|', @( < parse_line('\s+', 1, $string)));
+our $result = join('|', parse_line('\s+', 1, $string));
 is($result, 'aaaa"bbbbb"|cc\ cc|\\\"dddd" eee\\\"ffff"|"gg"');
 
 # Now, $keep == 0
-$result = join('|', @( < parse_line('\s+', 0, $string)));
+$result = join('|', parse_line('\s+', 0, $string));
 is($result, 'aaaabbbbb|cc cc|\"dddd eee\"ffff|gg');
 
 # Now test single quote behavior
 $string = q|aaaa"bbbbb" cc\ cc \\\\\\\"dddd' eee\\\\\\"ffff' gg|;
-$result = join('|', @( < parse_line('\s+', 0, $string)));
+$result = join('|', parse_line('\s+', 0, $string));
 is($result, 'aaaabbbbb|cc cc|\\\"dddd eee\\\\\\"ffff|gg');
 
 # Make sure @nested_quotewords does the right thing
@@ -66,15 +66,15 @@ is((nelems @words), 0);
   is((nelems @words), 0);
 
   # Now test empty fields
-  $result = join('|', @( <parse_line(':', 0, 'foo::0:"":::')));
+  $result = join('|',parse_line(':', 0, 'foo::0:"":::'));
   is($result, 'foo||0||||');
 
   # Test for 0 in quotes without $keep
-  $result = join('|', @( <parse_line(':', 0, ':"0":')));
+  $result = join('|',parse_line(':', 0, ':"0":'));
   is($result, '|0|');
 
   # Test for \001 in quoted string
-  $result = join('|', @( <parse_line(':', 0, ':"' . "\001" . '":')));
+  $result = join('|',parse_line(':', 0, ':"' . "\001" . '":'));
   is($result, "|\1|");
 
 }
@@ -82,36 +82,36 @@ is((nelems @words), 0);
 # Now test perlish single quote behavior
 $Text::ParseWords::PERL_SINGLE_QUOTE = 1;
 $string = q|aaaa"bbbbb" cc\ cc \\\\\"dddd' eee\\\\\"ffff' gg|;
-$result = join('|', @( <parse_line('\s+', 0, $string)));
+$result = join('|',parse_line('\s+', 0, $string));
 is($result, q<aaaabbbbb|cc cc|\\"dddd eee\\\\\"ffff|gg>);
 
 # test whitespace in the delimiters
 @words = quotewords(' ', 1, '4 3 2 1 0');
-is(join(";", @( < @words)), qq(4;3;2;1;0));
+is(join(";", @words), qq(4;3;2;1;0));
 
 # [perl #30442] Text::ParseWords does not handle backslashed newline inside quoted text
 $string = qq{"field1"	"field2\\\nstill field2"	"field3"};
 
-$result = join('|', @( <parse_line("\t", 1, $string)));
+$result = join('|',parse_line("\t", 1, $string));
 is($result, qq{"field1"|"field2\\\nstill field2"|"field3"});
 
-$result = join('|', @( <parse_line("\t", 0, $string)));
+$result = join('|',parse_line("\t", 0, $string));
 is($result, "field1|field2\nstill field2|field3");
 
 # unicode
 $string = qq{"field1"\x{1234}"field2\\\x{1234}still field2"\x{1234}"field3"};
-$result = join('|', @( <parse_line("\x{1234}", 0, $string)));
+$result = join('|',parse_line("\x{1234}", 0, $string));
 is($result, "field1|field2\x{1234}still field2|field3");
 
 # missing quote after matching regex used to hang after change #22997
 "1234" =~ m/(1)(2)(3)(4)/;
 $string = qq{"missing quote};
-$result = join('|', @( <shellwords($string)));
+$result = join('|',shellwords($string));
 is($result, "");
 
 # make sure shellwords strips out leading whitespace and trailng undefs
 # from parse_line, so it's behavior is more like /bin/sh
-$result = join('|', @( <shellwords(" aa \\  \\ bb ", " \\  ", "cc dd ee\\ ")));
+$result = join('|',shellwords(" aa \\  \\ bb ", " \\  ", "cc dd ee\\ "));
 is($result, "aa| | bb| |cc|dd|ee ");
 
 %SIG{ALRM} = sub {die "Timeout!"};

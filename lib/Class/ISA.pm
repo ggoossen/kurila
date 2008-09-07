@@ -140,10 +140,9 @@ Sean M. Burke C<sburke@cpan.org>
 
 ###########################################################################
 
-sub self_and_super_versions {
-  @( < map {
+sub self_and_super_versions { map {
         $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ? ${*{Symbol::fetch_glob("$_\::VERSION")}} : undef)
-      } @( < self_and_super_path(@_[0])))
+      } self_and_super_path(@_[0])
 }
 
 # Also consider magic like:
@@ -166,7 +165,7 @@ sub self_and_super_versions {
 
 ###########################################################################
 sub super_path {
-  my @ret = @( < &self_and_super_path(< @_) );
+  my @ret = &self_and_super_path(< @_);
   shift @ret if (nelems @ret);
   return @ret;
 }
@@ -197,8 +196,8 @@ sub self_and_super_path {
            # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
           %seen{$c}++ ? () : $c;
         }
- @(        < @{*{Symbol::fetch_glob("$current\::ISA")}}
-)    ;
+ @{*{Symbol::fetch_glob("$current\::ISA")}}
+    ;
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to
     # explore.

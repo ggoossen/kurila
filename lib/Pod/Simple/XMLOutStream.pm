@@ -33,7 +33,7 @@ sub _handle_element_start {
   DEBUG and print "++ @_[1]\n";
   print $fh "<", @_[1];
   if($SORT_ATTRS) {
-    foreach my $key (@( <sort @( < keys %{@_[2]}))) {
+    foreach my $key (sort keys %{@_[2]}) {
       unless($key =~ m/^~/s) {
         next if $key eq 'start_line' and @_[0]->{'hide_line_numbers'};
         _xml_escape($value = @_[2]->{$key});

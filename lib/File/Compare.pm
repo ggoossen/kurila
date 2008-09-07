@@ -7,9 +7,9 @@ our($VERSION, @ISA, @EXPORT, @EXPORT_OK, $Too_Big);
 require Exporter;
 
 $VERSION = '1.1005';
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(compare) );
-@EXPORT_OK = @( < qw(cmp compare_text) );
+@ISA = qw(Exporter);
+@EXPORT = qw(compare);
+@EXPORT_OK = qw(cmp compare_text);
 
 $Too_Big = 1024 * 1024 * 2;
 

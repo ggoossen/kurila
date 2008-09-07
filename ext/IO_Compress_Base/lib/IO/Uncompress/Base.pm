@@ -7,7 +7,7 @@ use bytes;
 
 our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 #@ISA    = qw(Exporter IO::File);
-@ISA    = @( < qw(Exporter ) );
+@ISA    = qw(Exporter );
 
 
 $VERSION = '2.006';

@@ -3,7 +3,7 @@ package English;
 our $VERSION = '1.04';
 
 require Exporter;
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ no warnings;
 
 my $globbed_match ;
 
-our @MINIMAL_EXPORT = @( < qw(
+our @MINIMAL_EXPORT = qw(
 	$INPUT_RECORD_SEPARATOR
 	$RS
 	$OUTPUT_AUTOFLUSH
@@ -77,15 +77,15 @@ our @MINIMAL_EXPORT = @( < qw(
 	$LAST_REGEXP_CODE_RESULT
 	$EXCEPTIONS_BEING_CAUGHT
 	$LAST_SUBMATCH_RESULT
-) );
+);
 
 # Grandfather $NAME import
 sub import {
     my $this = shift;
-    my @list = @( < grep { ! m/^-no_match_vars$/ } @( < @_) ) ;
+    my @list = grep { ! m/^-no_match_vars$/ } @_ ;
     local $Exporter::ExportLevel = 1;
     *EXPORT = \@MINIMAL_EXPORT ;
-    Exporter::import($this,< grep {s/^\$/*/} @( < @list));
+    Exporter::import($this,< grep {s/^\$/*/} @list);
 }
 
 # Matching.

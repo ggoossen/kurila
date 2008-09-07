@@ -133,16 +133,16 @@ use File::Spec;
 
 require Exporter;
 
-@ISA = @( < qw(IO::Handle IO::Seekable Exporter) );
+@ISA = qw(IO::Handle IO::Seekable Exporter);
 
 $VERSION = "1.14";
 
-@EXPORT = @( < @IO::Seekable::EXPORT );
+@EXPORT = @IO::Seekable::EXPORT;
 
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = @( < grep m/^O_/, @( < @Fcntl::EXPORT) );
+    my @O = grep m/^O_/, @Fcntl::EXPORT;
     Fcntl->import(< @O);  # first we import what we want to export
     push(@EXPORT, < @O);
 };

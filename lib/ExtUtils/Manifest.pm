@@ -14,10 +14,10 @@ use vars < qw($VERSION @ISA @EXPORT_OK
 
 $VERSION = '1.51_01';
 @ISA=@('Exporter');
-@EXPORT_OK = @( < qw(mkmanifest
+@EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
                 manifind   maniread   manicopy   maniadd
-               ) );
+               );
 
 $Is_MacOS = $^O eq 'MacOS';
 $Is_VMS   = $^O eq 'VMS';
@@ -84,7 +84,7 @@ that are found in the existing F<MANIFEST> file in the new one.
 =cut
 
 sub _sort {
-    return @( <sort { lc $a cmp lc $b } @( < @_));
+    returnsort { lc $a cmp lc $b } @_;
 }
 
 sub mkmanifest {
@@ -214,7 +214,7 @@ refs.
 =cut
 
 sub fullcheck {
-    return @(\@( <_check_files()), \@( <_check_manifest()));
+    return @(\_check_files(), \_check_manifest());
 }
 
 
@@ -328,8 +328,8 @@ sub maniread {
             my($base,$dir) = < File::Basename::fileparse($file);
             # Resolve illegal file specifications in the same way as tar
             $dir =~ s/./_/g;
-            my(@pieces) = @( < split(m/\./,$base) );
-            if ((nelems @pieces) +> 2) { $base = shift(@pieces) . '.' . join('_', @(< @pieces)); }
+            my(@pieces) = split(m/\./,$base);
+            if ((nelems @pieces) +> 2) { $base = shift(@pieces) . '.' . join('_', @pieces); }
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
             $file = $okfile;
@@ -363,7 +363,7 @@ sub _maniskip {
 
     # Make sure each entry is isolated in its own parentheses, in case
     # any of them contain alternations
-    my $regex = join '|', @( < map "(?:$_)", @( < @skip));
+    my $regex = join '|', map "(?:$_)", @skip;
 
     return sub { @_[0] =~ qr{$opts$regex} };
 }
@@ -385,7 +385,7 @@ sub _check_mskip_directives {
     }
     while ( ~< *M) {
         if (m/^#!include_default\s*$/) {
-	    if (my @default = @( < _include_mskip_file() )) {
+	    if (my @default = _include_mskip_file()) {
 	        push @lines, < @default;
 		warn "Debug: Including default MANIFEST.SKIP\n" if $Debug;
 		$flag++;
@@ -394,7 +394,7 @@ sub _check_mskip_directives {
         }
 	if (m/^#!include\s+(.*)\s*$/) {
 	    my $external_file = $1;
-	    if (my @external = @( < _include_mskip_file($external_file) )) {
+	    if (my @external = _include_mskip_file($external_file)) {
 	        push @lines, < @external;
 		warn "Debug: Including external $external_file\n" if $Debug;
 		$flag++;
@@ -469,7 +469,7 @@ sub manicopy {
 
     $target = VMS::Filespec::unixify($target) if $Is_VMS;
     File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ? undef : 0755);
-    foreach my $file (@( <keys %$read)){
+    foreach my $file (keys %$read){
     	if ($Is_MacOS) {
 	    if ($file =~ m!:!) { 
 	   	my $dir = _maccat($target, $file);
@@ -551,11 +551,11 @@ sub _manicopy_chmod {
 }
 
 # Files that are often modified in the distdir.  Don't hard link them.
-my @Exceptions = @( < qw(MANIFEST META.yml SIGNATURE) );
+my @Exceptions = qw(MANIFEST META.yml SIGNATURE);
 sub best {
     my ($srcFile, $dstFile) = < @_;
 
-    my $is_exception = grep $srcFile =~ m/$_/, @( < @Exceptions);
+    my $is_exception = grep $srcFile =~ m/$_/, @Exceptions;
     if ($is_exception or !%Config{d_link} or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
@@ -617,7 +617,7 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    my @needed = @( < grep { !exists $manifest->{$_} } @( < keys %$additions) );
+    my @needed = grep { !exists $manifest->{$_} } keys %$additions;
     return 1 unless (nelems @needed);
 
     open(MANIFEST, ">>", "$MANIFEST") or 

@@ -78,9 +78,9 @@ sub list_installed {
     $class = 'all' unless $class;
 
     my @files;
-    if (try { @files = @( < $Inst->files($module, $class) ); }) {
+    if (try { @files = $Inst->files($module, $class); }) {
         print("$class files in $module are:\n   ",
-              join("\n   ", @( < @files)), "\n");
+              join("\n   ", @files), "\n");
     }
     else { 
         print($@); 
@@ -95,9 +95,9 @@ sub list_directories {
     $class = 'all' unless $class;
 
     my @dirs;
-    if (try { @dirs = @( < $Inst->directories($module, $class) ); }) {
+    if (try { @dirs = $Inst->directories($module, $class); }) {
         print("$class directories in $module are:\n   ",
-              join("\n   ", @( < @dirs)), "\n");
+              join("\n   ", @dirs), "\n");
     }
     else { 
         print($@); 
@@ -130,9 +130,9 @@ sub create_archive {
 sub validate_packlist {
     my($reply, $module) = < @_;
 
-    if (my @missing = @( < $Inst->validate($module) )) {
+    if (my @missing = $Inst->validate($module)) {
         print("Files missing from $module are:\n   ",
-              join("\n   ", @( < @missing)), "\n");
+              join("\n   ", @missing), "\n");
     }
     else {
         print("$module has no missing files\n");
@@ -164,7 +164,7 @@ while (1)
       {
       $reply eq 'l' and do
          {
-         print("Installed modules are:\n   ", join("\n   ", @( < @Modules)), "\n");
+         print("Installed modules are:\n   ", join("\n   ", @Modules), "\n");
          last CASE;
          };
       $reply =~ m/^m\s+/ and do
@@ -186,7 +186,7 @@ while (1)
 ###############################################################################
 
 $Inst = ExtUtils::Installed->new();
-@Modules = @( < $Inst->modules() );
+@Modules = $Inst->modules();
 toplevel();
 
 ###############################################################################

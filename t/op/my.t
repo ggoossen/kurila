@@ -90,7 +90,7 @@ print "ok 30\n";
 
 # Found in HTML::FormatPS
 my %fonts = %( < qw(nok 31) );
-for my $full (@( <keys %fonts)) {
+for my $full (keys %fonts) {
     $full =~ s/^n//;
     # Supposed to be copy-on-write via force_normal after a THINKFIRST check.
     print "$full %fonts{nok}\n";

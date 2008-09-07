@@ -6,8 +6,8 @@ use warnings::register;
 use Scalar::Util < qw(reftype);
 
 require Exporter;
-our @ISA        = @( < qw(Exporter) );
-our @EXPORT_OK  = @( < qw(
+our @ISA        = qw(Exporter);
+our @EXPORT_OK  = qw(
                      fieldhash fieldhashes
 
                      all_keys
@@ -25,10 +25,10 @@ our @EXPORT_OK  = @( < qw(
 
                      hash_seed hv_store
 
-                    ) );
+                    );
 our $VERSION    = 0.07;
 require DynaLoader;
-local @ISA = @( < qw(DynaLoader) );
+local @ISA = qw(DynaLoader);
 Hash::Util->bootstrap($VERSION);
 
 sub import {
@@ -133,9 +133,9 @@ sub lock_ref_keys {
 
     Internals::hv_clear_placeholders %$hash;
     if( (nelems @keys) ) {
-        my %keys = %( < map { ($_ => 1) } @( < @keys) );
-        my %original_keys = %( < map { ($_ => 1) } @( < keys %$hash) );
-        foreach my $k (@( <keys %original_keys)) {
+        my %keys = %( < map { ($_ => 1) } @keys );
+        my %original_keys = %( < map { ($_ => 1) } keys %$hash );
+        foreach my $k (keys %original_keys) {
             die "Hash has key '$k' which is not in the new key set"
               unless %keys{$k};
         }
@@ -311,7 +311,7 @@ sub lock_hashref_recurse {
     my $hash = shift;
 
     lock_ref_keys($hash);
-    foreach my $value (@( <values %$hash)) {
+    foreach my $value (values %$hash) {
         if (reftype($value) eq 'HASH') {
             lock_hashref_recurse($value);
         }
@@ -323,7 +323,7 @@ sub lock_hashref_recurse {
 sub unlock_hashref_recurse {
     my $hash = shift;
 
-    foreach my $value (@( <values %$hash)) {
+    foreach my $value (values %$hash) {
         if (reftype($value) eq 'HASH') {
             unlock_hashref_recurse($value);
         }

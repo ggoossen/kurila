@@ -142,9 +142,9 @@ sub dump_array {
 # Dump hash table
 sub dump_hash {
 	my ($href) = < @_;
-	my $items = nelems(@( <keys %{$href}));
+	my $items = nelems(keys %{$href});
 	$dumped .= "HASH items=$items\n";
-	foreach my $key (@( <sort @( < keys %{$href}))) {
+	foreach my $key (sort keys %{$href}) {
 		$dumped .= 'KEY ';
 		&recursive_dump(\$key, undef);
 		unless (defined $href->{$key}) {

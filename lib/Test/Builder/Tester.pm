@@ -54,9 +54,9 @@ my $t = Test::Builder->new;
 ###
 
 use Exporter;
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 
-our @EXPORT = @( < qw(test_out test_err test_fail test_diag test_test line_num) );
+our @EXPORT = qw(test_out test_err test_fail test_diag test_test line_num);
 
 # _export_to_level and import stolen directly from Test::More.  I am
 # the king of cargo cult programming ;-)
@@ -73,7 +73,7 @@ sub _export_to_level
 
 sub import {
     my $class = shift;
-    my(@plan) = @( < @_ );
+    my(@plan) = @_;
 
     my $caller = caller;
 
@@ -83,7 +83,7 @@ sub import {
     my @imports = @( () );
     foreach my $idx (0..((nelems @plan)-1)) {
         if( @plan[$idx] eq 'import' ) {
-            @imports = @( < @{@plan[$idx+1]} );
+            @imports = @{@plan[$idx+1]};
             last;
         }
     }
@@ -273,7 +273,7 @@ sub test_diag
 
     # expect the same thing, but prepended with "#     "
     local $_;
-    $err->expect(< map {"# $_"} @( < @_))
+    $err->expect(< map {"# $_"} @_)
 }
 
 =item test_test
@@ -501,7 +501,7 @@ sub expect
 {
     my $self = shift;
 
-    my @checks = @( < @_ );
+    my @checks = @_;
     foreach my $check ( @checks) {
         $check = $self->_translate_Failed_check($check);
         push @{$self->{wanted}}, ref $check ? $check : "$check\n";
@@ -531,7 +531,7 @@ sub check
     # turn off warnings as these might be undef
     local $^W = 0;
 
-    my @checks = @( < @{$self->{wanted}} );
+    my @checks = @{$self->{wanted}};
     my $got = $self->{got};
     foreach my $check ( @checks) {
         $check = "\Q$check\E" unless ($check =~ s,^/(.*)/$,$1, or ref $check);
@@ -550,7 +550,7 @@ sub complaint
     my $self = shift;
     my $type   = $self->type;
     my $got    = $self->got;
-    my $wanted = join "\n", @( < @{$self->wanted});
+    my $wanted = join "\n", @{$self->wanted};
 
     # are we running in colour mode?
     if (Test::Builder::Tester::color)

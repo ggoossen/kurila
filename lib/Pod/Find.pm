@@ -54,8 +54,8 @@ use File::Find;
 use Cwd;
 
 use vars < qw(@ISA @EXPORT_OK $VERSION);
-@ISA = @( < qw(Exporter) );
-@EXPORT_OK = @( < qw(&pod_find &simplify_name &pod_where &contains_pod) );
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(&pod_find &simplify_name &pod_where &contains_pod);
 
 # package global variables
 my $SIMPLIFY_RX;
@@ -125,7 +125,7 @@ sub pod_find
     %opts{-verbose} ||= 0;
     %opts{-perl}    ||= 0;
 
-    my (@search) = @( < @_ );
+    my (@search) = @_;
 
     if(%opts{-script}) {
         require Config;
@@ -137,7 +137,7 @@ sub pod_find
     if(%opts{-inc}) {
         if ($^O eq 'MacOS') {
             # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-            my @new_INC = @( < @INC );
+            my @new_INC = @INC;
             for ( @new_INC) {
                 if ( $_ eq '.' ) {
                     $_ = ':';
@@ -147,9 +147,9 @@ sub pod_find
                     $_ =~ s|^\./|:|;
                 }
             }
-            push(@search, < grep($_ ne File::Spec->curdir, @( < @new_INC)));
+            push(@search, < grep($_ ne File::Spec->curdir, @new_INC));
         } else {
-            push(@search, < grep($_ ne File::Spec->curdir, @( < @INC)));
+            push(@search, < grep($_ ne File::Spec->curdir, @INC));
         }
 
         %opts{-perl} = 1;
@@ -236,7 +236,7 @@ sub _check_for_duplicates {
     if(%$names_ref{$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
-            join(' ', @( < grep(%$pods_ref{$_} eq $name, @( < keys %$pods_ref)))),"\n";
+            join(' ', grep(%$pods_ref{$_} eq $name, keys %$pods_ref)),"\n";
     }
     else {
         %$names_ref{$name} = 1;
@@ -382,10 +382,10 @@ sub pod_where {
   my $pod = shift;
 
   # Split on :: and then join the name together using File::Spec
-  my @parts = @( < split (m/::/, $pod) );
+  my @parts = split (m/::/, $pod);
 
   # Get full directory list
-  my @search_dirs = @( < @{ %options{'-dirs'} } );
+  my @search_dirs = @{ %options{'-dirs'} };
 
   if (%options{'-inc'}) {
 
@@ -394,7 +394,7 @@ sub pod_where {
     # Add @INC
     if ($^O eq 'MacOS' && %options{'-inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-        my @new_INC = @( < @INC );
+        my @new_INC = @INC;
         for ( @new_INC) {
             if ( $_ eq '.' ) {
                 $_ = ':';
@@ -421,7 +421,7 @@ sub pod_where {
       if -d %Config::Config{'scriptdir'};
   }
 
-  warn "Search path is: ".join(' ', @( < @search_dirs))."\n"
+  warn "Search path is: ".join(' ', @search_dirs)."\n"
         if %options{'-verbose'};
 
   # Loop over directories

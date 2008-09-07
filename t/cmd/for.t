@@ -11,9 +11,9 @@ for ($i = 0; $i +<= 10; $i++) {
 }
 $y = @x[10];
 print "#1	:$y: eq :10:\n";
-$y = join(' ', @( < @x));
+$y = join(' ', @x);
 print "#1	:$y: eq :0 1 2 3 4 5 6 7 8 9 10:\n";
-if (join(' ', @( < @x)) eq '0 1 2 3 4 5 6 7 8 9 10') {
+if (join(' ', @x) eq '0 1 2 3 4 5 6 7 8 9 10') {
 	print "ok 1\n";
 } else {
 	print "not ok 1\n";
@@ -31,7 +31,7 @@ $foo = 3210;
 foreach $foo ( @ary) {
 	$foo *= 2;
 }
-if (join('', @(< @ary)) eq '246810') {print "ok 3\n";} else {print "not ok 3\n";}
+if (join('', @ary) eq '246810') {print "ok 3\n";} else {print "not ok 3\n";}
 
 for ( @ary) {
     s/(.*)/ok $1\n/;
@@ -41,7 +41,7 @@ print @ary[1];
 
 # test for internal scratch array generation
 # this also tests that $foo was restored to 3210 after test 3
-for (@( <split(' ','a b c d e'))) {
+for (split(' ','a b c d e')) {
 	$foo .= $_;
 }
 if ($foo eq '3210abcde') {print "ok 5\n";} else {print "not ok 5 $foo\n";}
@@ -128,12 +128,12 @@ for (@(1,2,3)) {
 }
 is ($r, '123', 'Forwards for list');
 $r = '';
-for (@(< map {$_} @( < @array))) {
+for ( map {$_} @array) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map');
 $r = '';
-for (@(< map {$_} @( 1,2,3))) {
+for ( map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map');
@@ -190,12 +190,12 @@ for my $i (@(1,2,3)) {
 }
 is ($r, '123', 'Forwards for list with var');
 $r = '';
-for my $i (@(< map {$_} @( < @array))) {
+for my $i ( map {$_} @array) {
     $r .= $i;
 }
 is ($r, 'ABC', 'Forwards for array via map with var');
 $r = '';
-for my $i (@(< map {$_} @( 1,2,3))) {
+for my $i ( map {$_} @( 1,2,3)) {
     $r .= $i;
 }
 is ($r, '123', 'Forwards for list via map with var');
@@ -233,12 +233,12 @@ for $_ (@(1,2,3)) {
 }
 is ($r, '123', 'Forwards for list with explicit $_');
 $r = '';
-for $_ (@(< map {$_} @( < @array))) {
+for $_ ( map {$_} @array) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map with explicit $_');
 $r = '';
-for $_ (@(< map {$_} @( 1,2,3))) {
+for $_ ( map {$_} @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map with explicit $_');
@@ -266,7 +266,7 @@ TODO: {
     $test++;
     no warnings 'reserved';
     my %h;
-    foreach (@( <%h{[@('a', 'b')]})) {}
+    foreach (%h{[@('a', 'b')]}) {}
     if(%h) {
         print "not ";
     }

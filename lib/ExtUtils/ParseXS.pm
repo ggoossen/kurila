@@ -9,8 +9,8 @@ use strict;
 
 require Exporter;
 
-our @ISA = @( < qw(Exporter) );
-our @EXPORT_OK = @( < qw(process_file) );
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(process_file);
 
 # use strict;  # One of these days...
 
@@ -222,13 +222,13 @@ sub process_file {
     close(TYPEMAP);
   }
 
-  foreach my $value (@( <values %input_expr)) {
+  foreach my $value (values %input_expr) {
     $value =~ s/;*\s+\z//;
     # Move C pre-processor instructions to column 1 to be strictly ANSI
     # conformant. Some pre-processors are fussy about this.
     $value =~ s/^\s+#/#/mg;
   }
-  foreach my $value (@( <values %output_expr)) {
+  foreach my $value (values %output_expr) {
     # And again.
     $value =~ s/^\s+#/#/mg;
   }
@@ -239,7 +239,7 @@ sub process_file {
   $cast = qr[(?:\(\s*SV\s*\*\s*\)\s*)?]; # Optional (SV*) cast
   $size = qr[,\s* (??{ $bal }) ]x; # Third arg (to setpvn)
 
-  foreach my $key (@( <keys %output_expr)) {
+  foreach my $key (keys %output_expr) {
     BEGIN { $^H ^|^= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
 
     my ($t, $with_size, $arg, $sarg) =
@@ -254,11 +254,11 @@ sub process_file {
   }
 
   # Match an XS keyword
-  $BLOCK_re= '\s*(' . join('|', @( < qw(
+  $BLOCK_re= '\s*(' . join('|', qw(
 				   REQUIRE BOOT CASE PREINIT INPUT INIT CODE PPCODE OUTPUT
 				   CLEANUP ALIAS ATTRS PROTOTYPES PROTOTYPE VERSIONCHECK INCLUDE
 				   SCOPE INTERFACE INTERFACE_MACRO C_ARGS POSTCALL OVERLOAD FALLBACK
-				  ))) . "|$END)\\s*:";
+				  )) . "|$END)\\s*:";
 
   
   # Identify the version of xsubpp used
@@ -422,7 +422,7 @@ EOF
   if ((nelems @BootCode))
   {
     print "\n    /* Initialisation Section */\n\n" ;
-    @line = @( < @BootCode );
+    @line = @BootCode;
     print_section();
     print "\n    /* End of Initialisation Section */\n\n" ;
   }
@@ -469,18 +469,18 @@ sub process_para {
 	  push(@BootCode,     "#endif");
 	}
 	
-	my(@fns) = @( < keys %{@XSStack[-1]->{functions} || \%()} );
+	my(@fns) = keys %{@XSStack[-1]->{functions} || \%()};
 	if ($statement ne 'endif') { <
 	  # Hide the functions defined in other #if branches, and reset.
-	  %{@XSStack[-1]->{other_functions}}{[@(< @fns)]} = (1) x nelems @fns;
- <	  %{@XSStack[-1]}{[@( <qw(varname functions))]} = ('', \%());
+	  %{@XSStack[-1]->{other_functions}}{[ @fns]} = (1) x nelems @fns;
+ <	  %{@XSStack[-1]}{[qw(varname functions)]} = ('', \%());
 	} else {
 	  my($tmp) = pop(@XSStack);
 	  0 while (--$XSS_work_idx
 		   && @XSStack[$XSS_work_idx]->{type} ne 'if');
 	  # Keep all new defined functions
 	  push(@fns, < keys %{$tmp->{other_functions} || \%()});
- <	  %{@XSStack[$XSS_work_idx]->{functions}}{[@(< @fns)]} = (1) x nelems @fns;
+ <	  %{@XSStack[$XSS_work_idx]->{functions}}{[ @fns]} = (1) x nelems @fns;
 	}
       }
     }
@@ -627,11 +627,11 @@ sub process_para {
 	  %in_out{$name} = $out_type if $out_type;
 	}
       } else {
-	@args = @( < split(m/\s*,\s*/, $orig_args) );
+	@args = split(m/\s*,\s*/, $orig_args);
 	Warn("Warning: cannot parse argument list '$orig_args', fallback to split");
       }
     } else {
-      @args = @( < split(m/\s*,\s*/, $orig_args) );
+      @args = split(m/\s*,\s*/, $orig_args);
       for ( @args) {
 	if ($process_inout and s/^(IN|IN_OUTLIST|OUTLIST|IN_OUT|OUT)\s+//) {
 	  my $out_type = $1;
@@ -679,23 +679,23 @@ sub process_para {
     my $min_args = $num_args - $extra_args;
     $report_args =~ s/"/\\"/g;
     $report_args =~ s/^,\s+//;
-    my @func_args = @( < @args );
+    my @func_args = @args;
     shift @func_args if defined($class);
 
     for ( @func_args) {
       s/^/&/ if %in_out{$_};
     }
-    $func_args = join(", ", @( < @func_args));
- <    %args_match{[@(< @args)]} = < @args_num;
+    $func_args = join(", ", @func_args);
+ <    %args_match{[ @args]} = < @args_num;
 
-    $PPCODE = grep(m/^\s*PPCODE\s*:/, @( < @line));
-    $CODE = grep(m/^\s*CODE\s*:/, @( < @line));
+    $PPCODE = grep(m/^\s*PPCODE\s*:/, @line);
+    $CODE = grep(m/^\s*CODE\s*:/, @line);
     # Detect CODE: blocks which use ST(n)= or XST_m*(n,v)
     #   to set explicit return values.
     $EXPLICIT_RETURN = ($CODE &&
 			("{join ' ', @line}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
-    $ALIAS  = grep(m/^\s*ALIAS\s*:/, @(  < @line));
-    $INTERFACE  = grep(m/^\s*INTERFACE\s*:/, @(  < @line));
+    $ALIAS  = grep(m/^\s*ALIAS\s*:/, @line);
+    $INTERFACE  = grep(m/^\s*INTERFACE\s*:/, @line);
 
     $xsreturn = 1 if $EXPLICIT_RETURN;
 
@@ -873,7 +873,7 @@ EOF
       process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE|OVERLOAD");
       
       &generate_output(%var_types{$_}, %args_match{$_}, $_, $DoSetMagic)
-	for @( < grep %in_out{$_} =~ m/OUT$/, @( < keys %in_out));
+	for grep %in_out{$_} =~ m/OUT$/, keys %in_out;
       
       # all OUTPUT done, so now push the return value on the stack
       if ($gotRETVAL && $RETVAL_code) {
@@ -986,7 +986,7 @@ EOF
 	push @proto_arg, "$s\@"
 	  if $ellipsis ;
 	
-	$proto = join ("", @( < grep defined, @( < @proto_arg)));
+	$proto = join ("", grep defined, @proto_arg);
       }
       else {
 	# User has specified a prototype
@@ -1011,7 +1011,7 @@ EOF
     elsif ((nelems @Attributes)) {
       push(@InitFileCode, Q(<<"EOF"));
 #        cv = newXS(\"$pname\", XS_$Full_func_name, file);
-#        apply_attrs_string("$Package", cv, "{join ' ', @( <@Attributes)}", 0);
+#        apply_attrs_string("$Package", cv, "{join ' ',@Attributes}", 0);
 EOF
     }
     elsif ($interface) {
@@ -1036,7 +1036,7 @@ sub errors { $errors }
 
 sub standard_typemap_locations {
   # Add all the default typemap locations to the search path
-  my @tm = @( < qw(typemap) );
+  my @tm = qw(typemap);
   
   my $updir = File::Spec->updir;
   foreach my $dir (@(File::Spec->catdir(($updir) x 1), File::Spec->catdir(($updir) x 2),
@@ -1254,7 +1254,7 @@ sub INTERFACE_handler() {
 
   TrimWhitespace($in);
 
-  foreach (@( <split m/[\s,]+/, $in)) {
+  foreach (split m/[\s,]+/, $in) {
     my $name = $_;
     $name =~ s/^$Prefix//;
     %Interfaces{$name} = $_;
@@ -1533,8 +1533,8 @@ sub PopFile()
     $filepathname = $data->{Filepathname} ;
     $lastline   = $data->{LastLine} ;
     $lastline_no = $data->{LastLineNo} ;
-    @line       = @( < @{ $data->{Line} } ) ;
-    @line_no    = @( < @{ $data->{LineNo} } ) ;
+    @line       = @{ $data->{Line} } ;
+    @line_no    = @{ $data->{LineNo} } ;
 
     if ($isPipe and $? ) {
       -- $lastline_no ;
@@ -1578,7 +1578,7 @@ sub ProtoString ($)
   }
 
 sub check_cpp {
-  my @cpp = @( < grep(m/^\#\s*(?:if|e\w+)/, @( < @line)) );
+  my @cpp = grep(m/^\#\s*(?:if|e\w+)/, @line);
   if ((nelems @cpp)) {
     my ($cpp, $cpplevel);
     for $cpp ( @cpp) {
@@ -1699,7 +1699,7 @@ sub Warn
     # work out the line number
     my $line_no = @line_no[(nelems @line_no) - (nelems @line) -1] ;
 
-    print STDERR "{join ' ', @( <@_)} in $filename, line $line_no\n" ;
+    print STDERR "{join ' ',@_} in $filename, line $line_no\n" ;
   }
 
 sub blurt

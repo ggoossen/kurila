@@ -36,13 +36,13 @@ ENTRIES
 ##### 2..3
 
 is(
-  join(':', @( < $trad->sort( < qw/ acha aca ada acia acka / )) ),
-  join(':', @( <              qw/ aca acia acka acha ada /) ),
+  join(':', $trad->sort( < qw/ acha aca ada acia acka / ) ),
+  join(':',              qw/ aca acia acka acha ada / ),
 );
 
 is(
-  join(':', @( < $trad->sort( < qw/ ACHA ACA ADA ACIA ACKA / )) ),
-  join(':', @( <              qw/ ACA ACIA ACKA ACHA ADA /) ),
+  join(':', $trad->sort( < qw/ ACHA ACA ADA ACIA ACKA / ) ),
+  join(':',              qw/ ACA ACIA ACKA ACHA ADA / ),
 );
 
 ##### 4..7

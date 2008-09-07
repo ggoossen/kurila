@@ -21,9 +21,9 @@ sub foo {
 }
 
 @foo = @("hi \n","there\n","!\n");
-@bar = @( < @foo );
+@bar = @foo;
 chop(@bar);
-is (join('', @(< @bar)), 'hi there!');
+is (join('', @bar), 'hi there!');
 
 $foo = "\n";
 chop($foo, @foo);
@@ -138,7 +138,7 @@ $/ = "\n";
 %chomp = %("One" => "One", "Two\n" => "Two", "" => "");
 %chop = %("One" => "On", "Two\n" => "Two", "" => "");
 
-foreach (@( <keys %chomp)) {
+foreach (keys %chomp) {
   my $key = $_;
   try {chomp $_};
   if ($@) {
@@ -150,7 +150,7 @@ foreach (@( <keys %chomp)) {
   }
 }
 
-foreach (@( <keys %chop)) {
+foreach (keys %chop) {
   my $key = $_;
   try {chop $_};
   if ($@) {

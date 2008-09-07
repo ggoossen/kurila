@@ -6,7 +6,7 @@ our $VERSION = 6.44;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-our @ISA = @( < qw( ExtUtils::MM_Unix ) );
+our @ISA = qw( ExtUtils::MM_Unix );
 
 
 =head1 NAME

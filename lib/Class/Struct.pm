@@ -8,8 +8,8 @@ use warnings::register;
 our(@ISA, @EXPORT, $VERSION);
 
 require Exporter;
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(struct) );
+@ISA = qw(Exporter);
+@EXPORT = qw(struct);
 
 $VERSION = '0.63';
 
@@ -45,18 +45,18 @@ sub struct {
     my $base_type = ref @_[1];
     if ( $base_type eq 'HASH' ) {
         $class = shift;
-        @decls = @( < %{shift()} );
+        @decls = %{shift()};
         _usage_error() if (nelems @_);
     }
     elsif ( $base_type eq 'ARRAY' ) {
         $class = shift;
-        @decls = @( < @{shift()} );
+        @decls = @{shift()};
         _usage_error() if (nelems @_);
     }
     else {
         $base_type = 'ARRAY';
         $class = @(caller())[0];
-        @decls = @( < @_ );
+        @decls = @_;
     }
 
     _usage_error() if (nelems @decls) % 2 == 1;

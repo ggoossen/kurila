@@ -16,8 +16,8 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $InflateError);
 $VERSION = '2.006';
 $InflateError = '';
 
-@ISA    = @( < qw( IO::Uncompress::RawInflate Exporter ) );
-@EXPORT_OK = @( < qw( $InflateError inflate ) ) ;
+@ISA    = qw( IO::Uncompress::RawInflate Exporter );
+@EXPORT_OK = qw( $InflateError inflate ) ;
 %EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ) ;
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');

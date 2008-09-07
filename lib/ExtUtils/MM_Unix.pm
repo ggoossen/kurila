@@ -18,7 +18,7 @@ use vars < qw($VERSION);
 $VERSION = '6.44';
 
 require ExtUtils::MM_Any;
-our @ISA = @( < qw(ExtUtils::MM_Any) );
+our @ISA = qw(ExtUtils::MM_Any);
 
 my %Is;
 BEGIN { 
@@ -34,7 +34,7 @@ BEGIN {
     %Is{Solaris} = $^O eq 'solaris';
     %Is{SunOS}   = %Is{SunOS4} || %Is{Solaris};
     %Is{BSD}     = ($^O =~ m/^(?:free|net|open)bsd$/ or
-                   grep( $^O eq $_, @( < qw(bsdos interix dragonfly)) )
+                   grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
 }
 
@@ -163,7 +163,7 @@ sub c_o {
 	$command \$*.C
 } if !%Is{OS2} and !%Is{Win32} and !%Is{Dos}; #Case-specific
 
-    return join "", @( < @m);
+    return join "", @m;
 }
 
 =item cflags (o)
@@ -186,8 +186,8 @@ sub cflags {
     $libperl ||= $self->{LIBPERL_A} || "libperl$self->{LIB_EXT}" ;
     $libperl =~ s/\.\$\(A\)$/$self->{LIB_EXT}/;
  <
-    %cflags{[@( <qw(cc ccflags optimize shellflags))]}
-	= < %Config{[@( <qw(cc ccflags optimize shellflags))]};
+    %cflags{[qw(cc ccflags optimize shellflags)]}
+	= < %Config{[qw(cc ccflags optimize shellflags)]};
     my($optdebug) = "";
 
     %cflags{shellflags} ||= '';
@@ -244,7 +244,7 @@ sub cflags {
 	%cflags{optimize} = $optdebug;
     }
 
-    for (@( <qw(ccflags optimize perltype))) {
+    for (qw(ccflags optimize perltype)) {
         %cflags{$_} ||= '';
 	%cflags{$_} =~ s/^\s+//;
 	%cflags{$_} =~ s/\s+/ /g;
@@ -319,7 +319,7 @@ END
         push @m, uc($key) , ' = ' , $self->{uc $key}, "\n";
         %once_only{$key} = 1;
     }
-    join('', @( < @m));
+    join('', @m);
 }
 
 =item const_loadlibs (o)
@@ -338,20 +338,20 @@ sub const_loadlibs {
 # See ExtUtils::Liblist for details
 #
 };
-    for my $tmp (@( <qw/
+    for my $tmp (qw/
          EXTRALIBS LDLOADLIBS BSLOADLIBS
-         /)) {
+         /) {
         next unless defined $self->{$tmp};
         push @m, "$tmp = $self->{$tmp}\n";
     }
     # don't set LD_RUN_PATH if empty
-    for my $tmp (@( <qw/
+    for my $tmp (qw/
          LD_RUN_PATH
-         /)) {
+         /) {
         next unless $self->{$tmp};
         push @m, "$tmp = $self->{$tmp}\n";
     }
-    return join "", @( < @m);
+    return join "", @m;
 }
 
 =item constants (o)
@@ -382,7 +382,7 @@ sub constants {
                    ),
                    (< map { ("INSTALL".$_,
                           "DESTINSTALL".$_)
-                        } @( < $self->installvars)), <
+                        } $self->installvars), <
                    qw(
               PERL_LIB    
               PERL_ARCHLIB
@@ -418,11 +418,11 @@ MM_REVISION = $self->{MM_REVISION}
 # DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
 };
 
-    for my $macro (@( <qw/
+    for my $macro (qw/
               MAKE
 	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
 	      LDFROM LINKTYPE BOOTDEP
-	      /)	) 
+	      /	) 
     {
 	next unless defined $self->{$macro};
 	push @m, "$macro = $self->{$macro}\n";
@@ -430,12 +430,12 @@ MM_REVISION = $self->{MM_REVISION}
 
     push @m, "
 # Handy lists of source code files:
-XS_FILES = ".$self->wraplist( <sort @( < keys %{$self->{XS} || \%()}))."
+XS_FILES = ".$self->wraplist( <sort keys %{$self->{XS} || \%()})."
 C_FILES  = ".$self->wraplist(< @{$self->{C}})."
 O_FILES  = ".$self->wraplist(< @{$self->{O_FILES}})."
 H_FILES  = ".$self->wraplist(< @{$self->{H}})."
-MAN1PODS = ".$self->wraplist( <sort @( < keys %{$self->{MAN1PODS} || \%()}))."
-MAN3PODS = ".$self->wraplist( <sort @( < keys %{$self->{MAN3PODS} || \%()}))."
+MAN1PODS = ".$self->wraplist( <sort keys %{$self->{MAN1PODS} || \%()})."
+MAN3PODS = ".$self->wraplist( <sort keys %{$self->{MAN3PODS} || \%()})."
 ";
 
 
@@ -468,12 +468,12 @@ PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 
     push @m, "
 
-TO_INST_PM = ".$self->wraplist( <sort @( < keys %{$self->{PM}}))."
+TO_INST_PM = ".$self->wraplist( <sort keys %{$self->{PM}})."
 
 PM_TO_BLIB = ".$self->wraplist(< %{$self->{PM}})."
 ";
 
-    join('', @(< @m));
+    join('', @m);
 }
 
 
@@ -490,7 +490,7 @@ sub depend {
 	last unless defined $key;
 	push @m, "$key : $val\n";
     }
-    join "", @( < @m);
+    join "", @m;
 }
 
 
@@ -600,12 +600,12 @@ sub dist {
     my($self, < %attribs) = < @_;
 
     my $make = '';
-    foreach my $key (@( <qw( 
+    foreach my $key (qw( 
             TAR TARFLAGS ZIP ZIPFLAGS COMPRESS SUFFIX SHAR
             PREOP POSTOP TO_UNIX
             CI RCS_LABEL DIST_CP DIST_DEFAULT
             DISTNAME DISTVNAME
-           )))
+           ))
     {
         my $value = %attribs{$key} || $self->{$key};
         $make .= "$key = $value\n";
@@ -673,8 +673,8 @@ sub dist_core {
     my($self) = shift;
 
     my $make_frag = '';
-    foreach my $target (@( <qw(dist tardist uutardist tarfile zipdist zipfile 
-                           shdist)))
+    foreach my $target (qw(dist tardist uutardist tarfile zipdist zipfile 
+                           shdist))
     {
         my $method = $target.'_target';
         $make_frag .= "\n";
@@ -958,7 +958,7 @@ MAKE
 	$(CHMOD) $(PERM_RWX) $@
 MAKE
 
-    return join('', @(< @m));
+    return join('', @m);
 }
 
 =item exescan
@@ -996,9 +996,9 @@ sub find_perl {
 
     if ($trace +>= 2){
         print "Looking for perl $ver by these names:
-{join ' ', @( <@$names)}
+{join ' ',@$names}
 in these dirs:
-{join ' ', @( <@$dirs)}
+{join ' ',@$dirs}
 ";
     }
 
@@ -1058,7 +1058,7 @@ WARNING
             }
         }
     }
-    print STDOUT "Unable to find a perl $ver (by these names: {join ' ', @( <@$names)}, in these dirs: {join ' ', @( <@$dirs)})\n";
+    print STDOUT "Unable to find a perl $ver (by these names: {join ' ',@$names}, in these dirs: {join ' ',@$dirs})\n";
     0; # false and not empty
 }
 
@@ -1100,7 +1100,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
         }
         else {
             my (@absdirs)
-                = @( < reverse @( < grep { $self->file_name_is_absolute } @( < $self->path)) );
+                = reverse grep { $self->file_name_is_absolute } $self->path;
             $interpreter = '';
 
             foreach my $dir ( @absdirs) {
@@ -1252,13 +1252,13 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my($self) = < @_;
     my(%dir, %xs, %c, %h, %pl_files, %pm);
 
-    my %ignore = %( < map {( $_ => 1 )} @( < qw(Makefile.PL Build.PL test.pl t)) );
+    my %ignore = %( < map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t) );
 
     # ignore the distdir
     %Is{VMS} ? %ignore{"$self->{DISTVNAME}.dir"} = 1
             : %ignore{$self->{DISTVNAME}} = 1;
  <
-    %ignore{[@(< map lc, @( < keys %ignore))]} = < values %ignore if %Is{VMS};
+    %ignore{[ map lc, keys %ignore]} = < values %ignore if %Is{VMS};
 
     foreach my $name ( $self->lsdir($Curdir)){
 	next if $name =~ m/\#/;
@@ -1295,14 +1295,14 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     }
 
     $self->{PL_FILES}   ||= \%pl_files;
-    $self->{DIR}        ||= \@( <sort @( < keys %dir));
+    $self->{DIR}        ||= \sort keys %dir;
     $self->{XS}         ||= \%xs;
-    $self->{C}          ||= \@( <sort @( < keys %c));
-    $self->{H}          ||= \@( <sort @( < keys %h));
+    $self->{C}          ||= \sort keys %c;
+    $self->{H}          ||= \sort keys %h;
     $self->{PM}         ||= \%pm;
 
-    my @o_files = @( < @{$self->{C}} );
-    $self->{O_FILES} = \@(< grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @( < @o_files));
+    my @o_files = @{$self->{C}};
+    $self->{O_FILES} = \ grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files;
 }
 
 
@@ -1317,7 +1317,7 @@ sub init_MANPODS {
     my $self = shift;
 
     # Set up names of manual pages to generate from pods
-    foreach my $man (@( <qw(MAN1 MAN3))) {
+    foreach my $man (qw(MAN1 MAN3)) {
 	if ( $self->{"{$man}PODS"}
              or $self->{"INSTALL{$man}DIR"} =~ m/^(none|\s*)$/
         ) {
@@ -1385,7 +1385,7 @@ sub init_MAN3PODS {
     my %manifypods = %( () ); # we collect the keys first, i.e. the files
                          # we have to convert to pod
 
-    foreach my $name (@( <keys %{$self->{PM}})) {
+    foreach my $name (keys %{$self->{PM}}) {
 	if ($name =~ m/\.pod\z/ ) {
 	    %manifypods{$name} = $self->{PM}->{$name};
 	} elsif ($name =~ m/\.p[ml]\z/ ) {
@@ -1395,12 +1395,12 @@ sub init_MAN3PODS {
 	}
     }
 
-    my $parentlibs_re = join '|', @( < @{$self->{PMLIBPARENTDIRS}});
+    my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
 
     # Remove "Configure.pm" and similar, if it's not the only pod listed
     # To force inclusion, just name it "Configure.pod", or override 
     # MAN3PODS
-    foreach my $name (@( <keys %manifypods)) {
+    foreach my $name (keys %manifypods) {
 	if ($self->{PERL_CORE} and $name =~ m/(config|setup).*\.pm/is) {
 	    delete %manifypods{$name};
 	    next;
@@ -1469,9 +1469,9 @@ sub init_PM {
 
     # Avoid $_ wherever possible:
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
-    my (@pmlibdirs) = @( < @{$self->{PMLIBDIRS}} );
+    my (@pmlibdirs) = @{$self->{PMLIBDIRS}};
     @{$self->{PMLIBDIRS}} = @( () );
-    my %dir = %( < map { ($_ => $_) } @( < @{$self->{DIR}}) );
+    my %dir = %( < map { ($_ => $_) } @{$self->{DIR}} );
     foreach my $pmlibdir ( @pmlibdirs) {
 	-d $pmlibdir && !%dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }
@@ -1483,7 +1483,7 @@ sub init_PM {
     return if $self->{PM} and $self->{ARGS}->{PM};
 
     if ((nelems @{$self->{PMLIBDIRS}})){
-	print "Searching PMLIBDIRS: {join ' ', @( <@{$self->{PMLIBDIRS}})}\n"
+	print "Searching PMLIBDIRS: {join ' ',@{$self->{PMLIBDIRS}}}\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -1501,7 +1501,7 @@ sub init_PM {
             my $prefix = $self->{INST_LIBDIR};
             my $striplibpath;
 
-	    my $parentlibs_re = join '|', @( < @{$self->{PMLIBPARENTDIRS}});
+	    my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
 	    $prefix =  $self->{INST_LIB} 
                 if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
 	                                       {$1}i;
@@ -1558,7 +1558,7 @@ sub init_main {
 
     # Copied from DynaLoader:
 
-    my(@modparts) = @( < split(m/::/,$self->{NAME}) );
+    my(@modparts) = split(m/::/,$self->{NAME});
     my($modfname) = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
@@ -1750,7 +1750,7 @@ sub init_others {	# --- Initialize Other Attributes
 
     foreach my $libs (  @{$self->{LIBS}} ){
 	$libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
-	my(@libs) = @( < $self->extliblist($libs) );
+	my(@libs) = $self->extliblist($libs);
 	if (@libs[0] or @libs[1] or @libs[2]){
 	    # LD_RUN_PATH now computed by ExtUtils::Liblist
 	    ($self->{EXTRALIBS},  $self->{BSLOADLIBS}, 
@@ -1981,7 +1981,7 @@ sub init_PERL {
     $self->{PERL_CORE} = 0               unless defined $self->{PERL_CORE};
 
     # How do we run perl?
-    foreach my $perl (@( <qw(PERL FULLPERL ABSPERL))) {
+    foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
         my $run  = $perl.'RUN';
 
         $self->{$run}  = "\$($perl)";
@@ -2020,7 +2020,7 @@ sub platform_constants {
     my($self) = shift;
     my $make_frag = '';
 
-    foreach my $macro (@( <qw(MM_Unix_VERSION PERL_MALLOC_DEF)))
+    foreach my $macro (qw(MM_Unix_VERSION PERL_MALLOC_DEF))
     {
         next unless defined $self->{$macro};
         $make_frag .= "$macro = $self->{$macro}\n";
@@ -2196,7 +2196,7 @@ uninstall_from_vendordirs ::
 	$(NOECHO) $(UNINSTALL) }.$self->catfile('$(VENDORARCHEXP)','auto','$(FULLEXT)','.packlist').q{
 };
 
-    join("", @(< @m));
+    join("", @m);
 }
 
 =item installbin (o)
@@ -2209,10 +2209,10 @@ sub installbin {
     my($self) = shift;
 
     return "" unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
-    my @exefiles = @( < @{$self->{EXE_FILES}} );
+    my @exefiles = @{$self->{EXE_FILES}};
     return "" unless (nelems @exefiles);
 
-    @exefiles = @( < map < vmsify($_), @( < @exefiles) ) if %Is{VMS};
+    @exefiles = map < vmsify($_), @exefiles if %Is{VMS};
 
     my %fromto;
     for my $from ( @exefiles) {
@@ -2225,20 +2225,20 @@ sub installbin {
         $to = vmsify($to) if %Is{VMS};
 	%fromto{$from} = $to;
     }
-    my @to   = @( < values %fromto );
+    my @to   = values %fromto;
 
     my @m;
     push(@m, qq{
-EXE_FILES = {join ' ', @( <@exefiles)}
+EXE_FILES = {join ' ',@exefiles}
 
-pure_all :: {join ' ', @( <@to)}
+pure_all :: {join ' ',@to}
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
 });
 
     # realclean can get rather large.
-    push @m, < map "\t$_\n", @( < $self->split_command('$(RM_F)', < @to));
+    push @m, < map "\t$_\n", $self->split_command('$(RM_F)', < @to);
     push @m, "\n";
 
 
@@ -2257,7 +2257,7 @@ MAKE
 
     }
 
-    join "", @( < @m);
+    join "", @m;
 }
 
 
@@ -2293,7 +2293,7 @@ sub lsdir {
     $dh->open($dir || ".") or return ();
     @ls = $dh->readdirs;
     $dh->close;
-    @ls = @( < grep(m/$regex/, @( < @ls)) ) if $regex;
+    @ls = grep(m/$regex/, @ls) if $regex;
     return @ls;
 }
 
@@ -2311,7 +2311,7 @@ sub macro {
 	last unless defined $key;
 	push @m, "$key = $val\n";
     }
-    join "", @( < @m);
+    join "", @m;
 }
 
 =item makeaperl (o)
@@ -2328,16 +2328,16 @@ DynaLoader_pure_p1_c0_032.a are automatically ignored to avoid link errors.)
 sub makeaperl {
     my($self, < %attribs) = < @_;
     my($makefilename, $searchdirs, $static, $extra, $perlinc, $target, $tmp, $libperl) = <
-	%attribs{[@( <qw(MAKE DIRS STAT EXTRA INCL TARGET TMP LIBPERL))]};
+	%attribs{[qw(MAKE DIRS STAT EXTRA INCL TARGET TMP LIBPERL)]};
     my(@m);
     push @m, "
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = $target
 FULLPERL      = $self->{FULLPERL}
 ";
-    return join '', @( < @m) if $self->{PARENT};
+    return join '', @m if $self->{PARENT};
 
-    my($dir) = join ":", @( < @{$self->{DIR}});
+    my($dir) = join ":", @{$self->{DIR}};
 
     unless ($self->{MAKEAPERL}) {
 	push @m, q{
@@ -2360,7 +2360,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 #	push @m, map( " \\\n\t\t$_", @ARGV );
 	push @m, "\n";
 
-	return join '', @( < @m);
+	return join '', @m;
     }
 
 
@@ -2377,7 +2377,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     # The front matter of the linkcommand...
     $linkcmd = join ' ', @( "\$(CC)",
-	    < grep($_, @( < %Config{[@( <qw(ldflags ccdlflags))]})));
+	    < grep($_, %Config{[qw(ldflags ccdlflags)]}));
     $linkcmd =~ s/\s+/ /g;
     $linkcmd =~ s,(perl\.exp),\$(PERL_INC)/$1,;
 
@@ -2432,14 +2432,14 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
 	use Cwd 'cwd';
 	%static{cwd() . "/" . $_}++;
-    }, < grep( -d $_, @( < @{$searchdirs || \@()})) );
+    }, < grep( -d $_, @{$searchdirs || \@()}) );
 
     # We trust that what has been handed in as argument, will be buildable
     $static = \@() unless $static;
- <    %static{[@(< @{$static})]} = (1) x nelems @{$static};
+ <    %static{[ @{$static}]} = (1) x nelems @{$static};
 
     $extra = \@() unless $extra && ref $extra eq 'ARRAY';
-    for (@( <sort @( < keys %static))) {
+    for (sort keys %static) {
 	next unless m/\Q$self->{LIB_EXT}\E\z/;
 	$_ = dirname($_) . "/extralibs.ld";
 	push @$extra, $_;
@@ -2455,9 +2455,9 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 # extralibs.all are computed correctly
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = {join ' ', @( <@{$perlinc || \@()}
-)}MAP_STATIC    = ",
-join(" \\\n\t", @( reverse < sort @( < keys %static))), "
+MAP_PERLINC   = {join ' ',@{$perlinc || \@()}
+}MAP_STATIC    = ",
+join(" \\\n\t", @( reverse < sort keys %static)), "
 
 MAP_PRELIBS   = %Config{perllibs} %Config{cryptlib}
 ";
@@ -2497,7 +2497,7 @@ LLIBPERL    = $llibperl
 ";
 
     push @m, '
-$(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" \\\n\t", @( < @$extra)).'
+$(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" \\\n\t", @$extra).'
 	$(NOECHO) $(RM_F)  $@
 	$(NOECHO) $(TOUCH) $@
 ';
@@ -2554,7 +2554,7 @@ map_clean :
 	}.$self->{RM_F}.qq{ $tmp/perlmain\$(OBJ_EXT) $tmp/perlmain.c \$(MAP_TARGET) $makefilename \$(INST_ARCHAUTODIR)/extralibs.all
 };
 
-    join '', @( < @m);
+    join '', @m;
 }
 
 =item makefile (o)
@@ -2575,7 +2575,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 ' if $self->{OBJECT};
 
     my $newer_than_target = %Is{VMS} ? '$(MMS$SOURCE_LIST)' : '$?';
-    my $mpl_args = join " ", @( < map qq["$_"], @( < @ARGV));
+    my $mpl_args = join " ", map qq["$_"], @ARGV;
 
     $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
 # We take a very conservative approach here, but it's worth it.
@@ -2628,7 +2628,7 @@ sub needs_linking {
 	$self->{NEEDS_LINKING} = 1;
 	return 1;
     }
-    foreach my $child (@( <keys %{$self->{CHILDREN} || \%()})) {
+    foreach my $child (keys %{$self->{CHILDREN} || \%()}) {
 	if ($self->{CHILDREN}->{$child}->needs_linking) {
 	    $self->{NEEDS_LINKING} = 1;
 	    return 1;
@@ -2741,21 +2741,21 @@ sub pasthru {
     my($sep) = %Is{VMS} ? ',' : '';
     $sep .= "\\\n\t";
 
-    foreach my $key (@( <qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
-                     PREFIX INSTALL_BASE))
+    foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
+                     PREFIX INSTALL_BASE)
                  ) 
     {
         next unless defined $self->{$key};
 	push @pasthru, "$key=\"\$($key)\"";
     }
 
-    foreach my $key (@( <qw(DEFINE INC))) {
+    foreach my $key (qw(DEFINE INC)) {
         next unless defined $self->{$key};
 	push @pasthru, "PASTHRU_$key=\"\$(PASTHRU_$key)\"";
     }
 
-    push @m, "\nPASTHRU = ", join ($sep, @( < @pasthru)), "\n";
-    join "", @( < @m);
+    push @m, "\nPASTHRU = ", join ($sep, @pasthru), "\n";
+    join "", @m;
 }
 
 =item perl_script
@@ -2797,7 +2797,7 @@ $(PERL_ARCHLIB)/Config.pm: $(PERL_SRC)/config.sh
 	%s
 MAKE_FRAG
 
-    return join "", @( < @m) unless $self->needs_linking;
+    return join "", @m unless $self->needs_linking;
 
     push @m, q{
 PERL_HDRS = \
@@ -2846,9 +2846,9 @@ PERL_HDRS = \
 $(OBJECT) : $(PERL_HDRS)
 } if $self->{OBJECT};
 
-    push @m, join(" ", @( < values %{$self->{XS}}))." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
+    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
 
-    join "\n", @( < @m);
+    join "\n", @m;
 }
 
 
@@ -2899,9 +2899,9 @@ pm_to_blib : $(TO_INST_PM)
 pm_to_blib(\\\%( < \@ARGV ), '$autodir', '\$(PM_FILTER)')
 CODE
 
-    my @cmds = @( < $self->split_command($pm_to_blib, < %{$self->{PM}}) );
+    my @cmds = $self->split_command($pm_to_blib, < %{$self->{PM}});
 
-    $r .= join '', @( < map { "\t\$(NOECHO) $_\n" } @( < @cmds));
+    $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
     $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
 
     return $r;
@@ -2969,7 +2969,7 @@ sub ppd {
 PPD_HTML
 
     $ppd_xml .= "    <IMPLEMENTATION>\n";
-    foreach my $prereq (@( <sort @( < keys %{$self->{PREREQ_PM} || \%()}))) {
+    foreach my $prereq (sort keys %{$self->{PREREQ_PM} || \%()}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
         my $dep_ver = join ",", @( <split (m/\./, $self->{PREREQ_PM}->{$prereq}), 
@@ -3010,9 +3010,9 @@ PPD_OUT
 </SOFTPKG>
 PPD_XML
 
-    my @ppd_cmds = @( < $self->echo($ppd_xml, '$(DISTNAME).ppd') );
+    my @ppd_cmds = $self->echo($ppd_xml, '$(DISTNAME).ppd');
 
-    return sprintf <<'PPD_OUT', join "\n\t", @( < @ppd_cmds);
+    return sprintf <<'PPD_OUT', join "\n\t", @ppd_cmds;
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
 	%s
@@ -3085,7 +3085,7 @@ sub processPL {
     return "" unless $pl_files;
 
     my $m = '';
-    foreach my $plfile (@( <sort @( < keys %$pl_files))) {
+    foreach my $plfile (sort keys %$pl_files) {
         my $list = ref($pl_files->{$plfile})
                      ?  $pl_files->{$plfile}
 		     : \@($pl_files->{$plfile});
@@ -3169,7 +3169,7 @@ sub cd {
     my($self, $dir, < @cmds) = < @_;
 
     # No leading tab and no trailing newline makes for easier embedding
-    my $make_frag = join "\n\t", @( < map { "cd $dir && $_" } @( < @cmds));
+    my $make_frag = join "\n\t", map { "cd $dir && $_" } @cmds;
 
     return $make_frag;
 }
@@ -3186,11 +3186,11 @@ sub oneliner {
     $cmd =~ s{^\n+}{};
     $cmd =~ s{\n+$}{};
 
-    my @cmds = @( < split m/\n/, $cmd );
-    $cmd = join " \n\t  -e ", @( < map { $self->quote_literal($_) } @( < @cmds));
+    my @cmds = split m/\n/, $cmd;
+    $cmd = join " \n\t  -e ", map { $self->quote_literal($_) } @cmds;
     $cmd = $self->escape_newlines($cmd);
 
-    $switches = join ' ', @( < @$switches);
+    $switches = join ' ', @$switches;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --};   
 }
@@ -3306,7 +3306,7 @@ MAKE_FRAG
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
 MAKE_FRAG
 
-    join('', @( < @m));
+    join('', @m);
 }
 
 =item staticmake (o)
@@ -3397,7 +3397,7 @@ sub subdirs {
     } else {
 	push(@m, "\n# none")
     }
-    join('', @(< @m));
+    join('', @m);
 }
 
 =item test (o)
@@ -3473,7 +3473,7 @@ END
 	push @m, "test_static :: test_dynamic\n";
 	push @m, "testdb_static :: testdb_dynamic\n";
     }
-    join("", @( < @m));
+    join("", @m);
 }
 
 =item test_via_harness (override)
@@ -3515,7 +3515,7 @@ sub tools_other {
 
     # We set PM_FILTER as late as possible so it can see all the earlier
     # on macro-order sensitive makes such as nmake.
-    for my $tool (@( <qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
+    for my $tool (qw{ SHELL CHMOD CP MV NOOP NOECHO RM_F RM_RF TEST_F TOUCH 
                       UMASK_NULL DEV_NULL MKPATH EQUALIZE_TIMESTAMP 
                       ECHO ECHO_N
                       UNINST VERBINST
@@ -3525,13 +3525,13 @@ sub tools_other {
                       USEMAKEFILE
                       PM_FILTER
                       FIXIN
-                    }) ) 
+                    } ) 
     {
         next unless defined $self->{$tool};
         push @m, "$tool = $self->{$tool}\n";
     }
 
-    return join "", @( < @m);
+    return join "", @m;
 }
 
 =item tool_xsubpp (o)
@@ -3545,7 +3545,7 @@ sub tool_xsubpp {
     return "" unless $self->needs_linking;
 
     my $xsdir;
-    my @xsubpp_dirs = @( < @INC );
+    my @xsubpp_dirs = @INC;
 
     # Make sure we pick up the new xsubpp if we're building perl.
     unshift @xsubpp_dirs, $self->{PERL_LIB} if $self->{PERL_CORE};
@@ -3570,7 +3570,7 @@ sub tool_xsubpp {
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
-    my(@tmargs) = @( < map("-typemap $_", @( < @tmdeps)) );
+    my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{XSOPT} );
     }
@@ -3592,8 +3592,8 @@ XSUBPPDIR = $xsdir
 XSUBPP = \$(XSUBPPDIR)\$(DFSEP)xsubpp
 XSUBPPRUN = \$(PERLRUN) \$(XSUBPP)
 XSPROTOARG = $self->{XSPROTOARG}
-XSUBPPDEPS = {join ' ', @( <@tmdeps)} \$(XSUBPP)
-XSUBPPARGS = {join ' ', @( <@tmargs)}
+XSUBPPDEPS = {join ' ',@tmdeps} \$(XSUBPP)
+XSUBPPARGS = {join ' ',@tmargs}
 XSUBPP_EXTRA_ARGS = 
 };
 };
@@ -3648,7 +3648,7 @@ help :
 	perldoc ExtUtils::MakeMaker
 };
 
-    join('', @(< @m));
+    join('', @m);
 }
 
 =item writedoc
@@ -3662,7 +3662,7 @@ sub writedoc {
     my($self,$what,$name,< @attribs)= < @_;
     my $time = localtime;
     print "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
-    print join "\n\n=item *\n\n", @( < map("C<$_>", @(< @attribs)));
+    print join "\n\n=item *\n\n", map("C<$_>", @attribs);
     print "\n\n=back\n\n";
 }
 

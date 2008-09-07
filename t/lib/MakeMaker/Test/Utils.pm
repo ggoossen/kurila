@@ -7,15 +7,15 @@ use Config;
 use vars < qw($VERSION @ISA @EXPORT);
 
 require Exporter;
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
 $VERSION = 0.03;
 
-@EXPORT = @( < qw(which_perl perl_lib makefile_name makefile_backup
+@EXPORT = qw(which_perl perl_lib makefile_name makefile_backup
              make make_run run make_macro calibrate_mtime
              setup_mm_test_root
 	     have_compiler
-            ) );
+            );
 
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
@@ -111,7 +111,7 @@ sub perl_lib {
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
     push @libs, %ENV{PERL5LIB} if exists %ENV{PERL5LIB};
-    %ENV{PERL5LIB} = join(%Config{path_sep}, @( < @libs));
+    %ENV{PERL5LIB} = join(%Config{path_sep}, @libs);
     unshift @INC, $lib;
 }
 

@@ -51,7 +51,7 @@ sub walk_table (&@) {
 	    @args = @( $_ );
 	}
 	else {
-	    @args = @( < split m/\s*\|\s*/, $_ );
+	    @args = split m/\s*\|\s*/, $_;
 	}
 	s/\b(NN|NULLOK)\b\s+//g for  @args;
 	print $F < $function->(< @args);
@@ -138,7 +138,7 @@ removed without notice.\n\n" if $flags =~ m/x/;
 	print $fh "\t$ret\t$name\n\n";
     } else { # full usage
 	print $fh "\t$ret\t$name";
-	print $fh "(" . join(", ", @( < @args)) . ")";
+	print $fh "(" . join(", ", @args) . ")";
 	print $fh "\n\n";
     }
     print $fh "=for hackers\nFound in file $file\n\n";
@@ -210,7 +210,7 @@ walk_table {	# load documented functions into appropriate hash
     return "";
 } $doc;
 
-for (@( <sort @( < keys %docfuncs))) {
+for (sort keys %docfuncs) {
     # Have you used a full for apidoc or just a func name?
     # Have you used Ap instead of Am in the for apidoc?
     warn "Unable to place $_!\n";
@@ -243,11 +243,11 @@ _EOB_
 
 my $key;
 # case insensitive sort, with fallback for determinacy
-for $key (@( <sort { uc($a) cmp uc($b) || $a cmp $b } @( < keys %apidocs))) {
+for $key (sort { uc($a) cmp uc($b) || $a cmp $b } keys %apidocs) {
     my $section = %apidocs{$key}; 
     print $doc "\n=head1 $key\n\n=over 8\n\n";
     # Again, fallback for determinacy
-    for my $key (@( <sort { uc($a) cmp uc($b) || $a cmp $b } @( < keys %$section))) {
+    for my $key (sort { uc($a) cmp uc($b) || $a cmp $b } keys %$section) {
         docout($doc, $key, $section->{$key});
     }
     print $doc "\n=back\n";
@@ -298,10 +298,10 @@ B<they are not for use in extensions>!
 
 END
 
-for $key (@( <sort { uc($a) cmp uc($b); } @( < keys %gutsdocs))) {
+for $key (sort { uc($a) cmp uc($b); } keys %gutsdocs) {
     my $section = %gutsdocs{$key}; 
     print $guts "\n=head1 $key\n\n=over 8\n\n";
-    for my $key (@( <sort { uc($a) cmp uc($b); } @( < keys %$section))) {
+    for my $key (sort { uc($a) cmp uc($b); } keys %$section) {
         docout($guts, $key, $section->{$key});
     }
     print $guts "\n=back\n";

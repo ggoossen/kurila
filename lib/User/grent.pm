@@ -5,8 +5,8 @@ our $VERSION = '1.01';
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN { 
     use Exporter   ();
-    @EXPORT      = @( < qw(getgrent getgrgid getgrnam getgr) );
-    @EXPORT_OK   = @( < qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members) );
+    @EXPORT      = qw(getgrent getgrgid getgrnam getgr);
+    @EXPORT_OK   = qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members);
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
 use vars      < @EXPORT_OK;
@@ -26,7 +26,7 @@ sub populate (@) {
     return unless (nelems @_);
     my $gob = new();
     ($gr_name, $gr_passwd, $gr_gid) = < @$gob[[@(0,1,2)]] = < @_[[@(0,1,2)]];
-    @gr_members = @( @{$gob->[3]} = @( < split ' ', @_[3] ) );
+    @gr_members = @( @{$gob->[3]} = split ' ', @_[3] );
     return $gob;
 } 
 

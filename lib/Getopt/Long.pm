@@ -41,13 +41,13 @@ $VERSION_STRING = "2.37";
 
 use Exporter;
 use vars < qw(@ISA @EXPORT @EXPORT_OK);
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
 BEGIN {
     # Init immediately so their contents can be used in the 'use vars' below.
-    @EXPORT    = @( < qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER) );
-    @EXPORT_OK = @( < qw(&HelpMessage &VersionMessage &Configure
-		    &GetOptionsFromArray &GetOptionsFromString) );
+    @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
+    @EXPORT_OK = qw(&HelpMessage &VersionMessage &Configure
+		    &GetOptionsFromArray &GetOptionsFromString);
 }
 
 # User visible variables.
@@ -154,7 +154,7 @@ sub new {
 
     if ( %atts ) {		# Oops
 	die(__PACKAGE__.": unhandled attributes: ".
-	    join(" ", @( < sort( @( <keys(%atts)))))."\n");
+	    join(" ", sort(keys(%atts)))."\n");
     }
 
     $self;
@@ -250,12 +250,12 @@ sub GetOptions(@) {
 sub GetOptionsFromString($@) {
     my ($string) = shift;
     require Text::ParseWords;
-    my $args = \@( < Text::ParseWords::shellwords($string) );
+    my $args = \ Text::ParseWords::shellwords($string);
     $caller ||= @(caller)[0];	# current context
     my $ret = GetOptionsFromArray($args, < @_);
     if ( (nelems @$args) ) {
         $ret = 0;
-        warn("GetOptionsFromString: Excess data \"{join ' ', @( <@$args)}\" in string \"$string\"\n");
+        warn("GetOptionsFromString: Excess data \"{join ' ',@$args}\" in string \"$string\"\n");
     }
     return $ret;
 }
@@ -283,7 +283,7 @@ sub GetOptionsFromArray($@) {
 	   '$Revision: 2.74 $', ") ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
-	   "argv: ({join ' ', @( <@$argv)})",
+	   "argv: ({join ' ',@$argv})",
 	   "\n  ",
 	   "autoabbrev=$autoabbrev,".
 	   "bundling=$bundling,",
@@ -721,7 +721,7 @@ sub GetOptionsFromArray($@) {
     # Finish.
     if ( (nelems @ret) && $order == $PERMUTE ) {
 	#  Push back accumulated arguments
-	print STDERR ("=> restoring \"", join('" "', @( < @ret)), "\"\n")
+	print STDERR ("=> restoring \"", join('" "', @ret), "\"\n")
 	    if $debug;
 	unshift (@$argv, < @ret);
     }
@@ -732,7 +732,7 @@ sub GetOptionsFromArray($@) {
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
     my ($v) = < @_;
-    my @v = @( < map { defined($_) ? ($_) : ("<undef>") } @( < @$v) );
+    my @v = map { defined($_) ? ($_) : ("<undef>") } @$v;
     "[".
       join(",", @(
 	   "\"@v[CTL_TYPE]\"",
@@ -785,7 +785,7 @@ sub ParseOptionSpec ($$) {
 
     my @names;
     if ( defined $names ) {
-	@names = @( <  split (m/\|/, $names) );
+	@names =  split (m/\|/, $names);
 	$orig = @names[0];
     }
     else {
@@ -852,7 +852,7 @@ sub ParseOptionSpec ($$) {
 	if ( $spec eq '!' ) {
 	    $opctl->{"no$_"} = $entry;
 	    $opctl->{"no-$_"} = $entry;
-	    $opctl->{$_} = \@(< @$entry);
+	    $opctl->{$_} = \ @$entry;
 	    $opctl->{$_}->[CTL_TYPE] = '';
 	}
 	else {
@@ -861,7 +861,7 @@ sub ParseOptionSpec ($$) {
     }
 
     if ( $dups && $^W ) {
-	foreach (@( < split(m/\n+/, $dups)) ) {
+	foreach ( split(m/\n+/, $dups) ) {
 	    warn($_."\n");
 	}
     }
@@ -931,15 +931,15 @@ sub FindOption ($$$$$) {
     # Try auto-abbreviation.
     elsif ( $autoabbrev ) {
 	# Sort the possible long option names.
-	my @names = @( < sort( @( <keys (%$opctl))) );
+	my @names = sort(keys (%$opctl));
 	# Downcase if allowed.
 	$opt = lc ($opt) if $ignorecase;
 	$tryopt = $opt;
 	# Turn option name into pattern.
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
-	my @hits = @( < grep (m/^$pat/, @( < @names)) );
-	print STDERR ("=> ", scalar(nelems @hits), " hits ({join ' ', @( <@hits)}) with \"$pat\" ",
+	my @hits = grep (m/^$pat/, @names);
+	print STDERR ("=> ", scalar(nelems @hits), " hits ({join ' ',@hits}) with \"$pat\" ",
 		      "out of ", scalar(nelems @names), "\n") if $debug;
 
 	# Check for ambiguous results.
@@ -965,11 +965,11 @@ sub FindOption ($$$$$) {
 	    unless ( keys(%hit) == 1 ) {
 		return  @(0) if $passthrough;
 		warn ("Option ", $opt, " is ambiguous (",
-		      join(", ", @( < @hits)), ")\n");
+		      join(", ", @hits), ")\n");
 		$error++;
 		return  @(1, undef);
 	    }
-	    @hits = @( < keys(%hit) );
+	    @hits = keys(%hit);
 	}
 
 	# Complete the option name, if appropriate.
@@ -1052,7 +1052,7 @@ sub FindOption ($$$$$) {
 	}
 	if ( $type eq 'I' ) {
 	    # Fake incremental type.
-	    my @c = @( < @$ctl );
+	    my @c = @$ctl;
 	    @c[CTL_TYPE] = '+';
 	    return  @(1, $opt, \@c, 1);
 	}
@@ -1145,7 +1145,7 @@ sub FindOption ($$$$$) {
 		unshift (@$argv, defined $rest ? $starter.$rest : $arg);
 		if ( $type eq 'I' ) {
 		    # Fake incremental type.
-		    my @c = @( < @$ctl );
+		    my @c = @$ctl;
 		    @c[CTL_TYPE] = '+';
 		    return  @(1, $opt, \@c, 1);
 		}
@@ -1239,7 +1239,7 @@ sub ValidValue ($$$$$) {
 
 # Getopt::Long Configuration.
 sub Configure (@) {
-    my (@options) = @( < @_ );
+    my (@options) = @_;
 
     my $prevconfig =
       \@( $error, $debug, $major_version, $minor_version,

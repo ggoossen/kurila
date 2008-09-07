@@ -187,7 +187,7 @@ sub test_things {
     # All these are omitted from the network order header.
     # I'm not sure if it's correct to omit the byte size stuff.
     $copy = $contents;
-    substr ($copy, $file_magic + 3, length $header->{byteorder}, join '', @( < reverse @( < split m//, $header->{byteorder})));
+    substr ($copy, $file_magic + 3, length $header->{byteorder}, join '', reverse split m//, $header->{byteorder});
 
     test_corrupt ($copy, $sub, "/^Byte order is not compatible/",
                   "byte order");

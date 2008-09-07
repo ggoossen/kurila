@@ -249,7 +249,7 @@ local %SIG{FPE} = undef;
 
 print "# great_circle_distance with small angles\n";
 
-for my $e (@( <qw(1e-2 1e-3 1e-4 1e-5))) {
+for my $e (qw(1e-2 1e-3 1e-4 1e-5)) {
     # Can't assume == 0 because of floating point fuzz,
     # but let's hope for at least +< $e.
     cmp_ok(great_circle_distance(0, $e, 0, $e), '+<', $e);

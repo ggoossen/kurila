@@ -4,7 +4,7 @@ use strict;
 use vars < qw($VERSION @EXPORT_OK @ISA);
 
 @ISA = @( 'Exporter' );
-@EXPORT_OK = @( < qw(C_stringify perl_stringify) );
+@EXPORT_OK = qw(C_stringify perl_stringify);
 $VERSION = '0.01';
 
 =head1 NAME

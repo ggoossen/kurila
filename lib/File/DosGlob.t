@@ -16,10 +16,10 @@ if ($^O eq 'MacOS') {
 } else {
     $expected = $_ = "op/a*.t";
 }
-my @r = @( < glob );
+my @r = glob;
 print "not " if $_ ne $expected;
 print "ok 1\n";
-print "# |{join ' ', @( <@r)}|\nnot " if (nelems @r) +< 4;
+print "# |{join ' ',@r}|\nnot " if (nelems @r) +< 4;
 print "ok 2\n";
 
 # check if <*/*> works
@@ -29,7 +29,7 @@ if ($^O eq 'MacOS') {
     @r = glob("*/a*.t");
 }
 # atleast {argv,abbrev,anydbm,autoloader,append,arith,array,assignwarn,auto}.t
-print "# |{join ' ', @( <@r)}|\nnot " if (nelems @r) +< 9;
+print "# |{join ' ',@r}|\nnot " if (nelems @r) +< 9;
 print "ok 3\n";
 my $r = scalar nelems @r;
 

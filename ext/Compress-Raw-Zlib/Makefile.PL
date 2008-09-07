@@ -84,7 +84,7 @@ WriteMakefile(
 
 ) ;
 
-my @names = @( < qw(
+my @names = qw(
 
     DEF_WBITS
     MAX_MEM_LEVEL
@@ -121,7 +121,7 @@ my @names = @( < qw(
     Z_UNKNOWN
     Z_VERSION_ERROR
 
-) );
+);
     #ZLIB_VERNUM
 
 require ExtUtils::Constant;
@@ -145,7 +145,7 @@ require ExtUtils::Constant;
 
     if ( %names )
     {
-        my $missing = join ("\n\t", @( < sort @( < keys %names))) ;
+        my $missing = join ("\n\t", sort keys %names) ;
         die "The following names are missing from \@EXPORT in Zlib.pm\n" .
             "\t$missing\n" ;
     }
@@ -166,8 +166,8 @@ sub ParseCONFIG
     my ($k, $v) ;
     my @badkey = @( () ) ;
     my %Info = %( () ) ;
-    my @Options = @( < qw( INCLUDE LIB BUILD_ZLIB OLD_ZLIB GZIP_OS_CODE ) ) ;
-    my %ValidOption = %( < map {$_, 1} @( < @Options) ) ;
+    my @Options = qw( INCLUDE LIB BUILD_ZLIB OLD_ZLIB GZIP_OS_CODE ) ;
+    my %ValidOption = %( < map {$_, 1} @Options ) ;
     my %Parsed = %( < %ValidOption ) ;
     my $CONFIG = 'config.in' ;
 
@@ -191,13 +191,13 @@ sub ParseCONFIG
     }
     close F ;
 
-    print "Unknown keys in $CONFIG ignored [{join ' ', @( <@badkey)}]\n"
+    print "Unknown keys in $CONFIG ignored [{join ' ',@badkey}]\n"
 	if (nelems @badkey) ;
 
     # check parsed values
     my @missing = @( () ) ;
-    die "The following keys are missing from $CONFIG  [{join ' ', @( <@missing)}]\n" 
-        if @missing = @( < keys %Parsed ) ;
+    die "The following keys are missing from $CONFIG  [{join ' ',@missing}]\n" 
+        if @missing = keys %Parsed ;
 
     $ZLIB_INCLUDE = %ENV{'ZLIB_INCLUDE'} || %Info{'INCLUDE'} ;
     $ZLIB_LIB = %ENV{'ZLIB_LIB'} || %Info{'LIB'} ;
@@ -276,37 +276,37 @@ sub zlib_files
     if (-f catfile($dir, "infback.c")) {
         # zlib 1.2.0 or greater
         #
-        @h_files = @( < qw(crc32.h    inffast.h inflate.h  trees.h    zconf.in.h 
+        @h_files = qw(crc32.h    inffast.h inflate.h  trees.h    zconf.in.h 
     	              zutil.h    deflate.h inffixed.h inftrees.h zconf.h  
     		      zlib.h 
-    		 ) );
-        @c_files = @( < qw(adler32  crc32   infback  inflate  uncompr
+    		 );
+        @c_files = qw(adler32  crc32   infback  inflate  uncompr
     		      compress deflate inffast  inftrees  
     		      trees    zutil 
-    		 ) );
+    		 );
     }
     else {
         # zlib 1.1.x
     
-        @h_files = @( < qw(deflate.h  infcodes.h inftrees.h zconf.h zutil.h
+        @h_files = qw(deflate.h  infcodes.h inftrees.h zconf.h zutil.h
     		      infblock.h inffast.h  infutil.h  zlib.h
-    		 ) );
-        @c_files = @( < qw(adler32  compress crc32    uncompr
+    		 );
+        @c_files = qw(adler32  compress crc32    uncompr
     		      deflate  trees    zutil    inflate infblock
     		      inftrees infcodes infutil  inffast
-    		 ) );
+    		 );
     }
     
-    @h_files = @( < map { catfile($dir, $_)  } @( < @h_files) ) ;
-    my @o_files = @( < map { "$_\$(OBJ_EXT)" } @( 'Zlib', < @c_files) );
-    @c_files = @( < map { "$_.c" } @( 'Zlib', < @c_files) ) ;
+    @h_files = map { catfile($dir, $_)  } @h_files ;
+    my @o_files = map { "$_\$(OBJ_EXT)" } @( 'Zlib', < @c_files);
+    @c_files = map { "$_.c" } @( 'Zlib', < @c_files) ;
 
     foreach my $file ( @c_files)
       { copy( catfile($dir, $file), '.') }
     
     return  @(
         #'H'         =>  [ @h_files ],
-    	'C'         =>  \@( < @c_files ) ,
+    	'C'         =>  \ @c_files ,
         #'OBJECT'    => qq[ @o_files ],
         'OBJECT'    => q[ $(O_FILES) ],
         
@@ -344,7 +344,7 @@ BEGIN
   );
 
   %OSnames = %( < map { @$_[1] => @$_[2] }  
- @(             < @GZIP_OS_Names) ) ;
+ @GZIP_OS_Names ) ;
 }
 
 sub getOSCode

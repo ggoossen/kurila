@@ -14,7 +14,7 @@ plan tests => 10;
 
 our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
 
-@ARGV = @( < qw(-Foo -baR --foo bar) );
+@ARGV = qw(-Foo -baR --foo bar);
 undef $opt_baR;
 undef $opt_bar;
 ok(GetOptions("foo", "Foo=s"));
@@ -28,6 +28,6 @@ ok(! defined $opt_baR);
 ok(! defined $opt_bar);
 
 my $subcalled = 0;
-@ARGV = @( < qw|-callsub| );
+@ARGV = qw|-callsub|;
 GetOptions("callsub" => sub { $subcalled++ });
 is($subcalled, 1, "sub called");

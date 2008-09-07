@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::PL_FILES;
 
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 require Exporter;
-our @EXPORT = @( < qw(setup teardown) );
+our @EXPORT = qw(setup teardown);
 
 use strict;
 use File::Path;
@@ -106,7 +106,7 @@ sub setup {
 }
 
 sub teardown { 
-    foreach my $file (@( <keys %Files)) {
+    foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {
             rmtree($dir) || return;

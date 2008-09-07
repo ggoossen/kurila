@@ -20,7 +20,7 @@ SKIP: {
        if $^O eq "MacOS" || $^O eq "VMS" || $^O eq "cygwin" || $^O eq "djgpp" ||
           $^O eq "MSWin32" || $^O eq "dos" || $^O eq "interix";
     tzset();
-    my @tzname = @( < tzname() );
+    my @tzname = tzname();
     like(@tzname[0], qr/(GMT|UTC)/i, "tzset() to GMT/UTC");
     SKIP: {
         skip "Mac OS X/Darwin doesn't handle this", 1 if $^O =~ m/darwin/i;

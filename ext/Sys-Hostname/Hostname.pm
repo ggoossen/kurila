@@ -6,8 +6,8 @@ use Carp;
 
 require Exporter;
 
-our @ISA     = @( < qw/ Exporter / );
-our @EXPORT  = @( < qw/ hostname / );
+our @ISA     = qw/ Exporter /;
+our @EXPORT  = qw/ hostname /;
 
 our $VERSION;
 

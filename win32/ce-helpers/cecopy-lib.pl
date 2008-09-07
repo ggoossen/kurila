@@ -26,7 +26,7 @@ for ( @files) {
 }
 
 sub BEGIN {
- @files = @( < qw(
+ @files = qw(
     attributes.pm
     AutoLoader.pm
     AutoSplit.pm
@@ -202,5 +202,5 @@ sub BEGIN {
     Attribute/Handlers/demo/Demo.pm
     Attribute/Handlers/demo/Descriptions.pm
     Attribute/Handlers/demo/MyClass.pm
-  ) );
+  );
 }

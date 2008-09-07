@@ -19,8 +19,8 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GunzipError);
 
-@ISA = @( < qw( IO::Uncompress::RawInflate Exporter ) );
-@EXPORT_OK = @( < qw( $GunzipError gunzip ) );
+@ISA = qw( IO::Uncompress::RawInflate Exporter );
+@EXPORT_OK = qw( $GunzipError gunzip );
 %EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ) ;
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
@@ -260,7 +260,7 @@ sub _readGzipHeader($)
         'Flags'         => $flag,
         'ExtraFlags'    => $xfl,
         'ExtraFieldRaw' => $EXTRA,
-        'ExtraField'    => \@( < @EXTRA ),
+        'ExtraField'    => \ @EXTRA,
 
 
         #'CompSize'=> $compsize,

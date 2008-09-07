@@ -17,10 +17,10 @@ use Tie::Hash;
 use File::stat;
 use File::Spec;
 
-@ISA = @( < qw(Tie::Hash Exporter) );
+@ISA = qw(Tie::Hash Exporter);
 $VERSION = "1.06";
 $VERSION = eval $VERSION;
-@EXPORT_OK = @( < qw(DIR_UNLINK) );
+@EXPORT_OK = qw(DIR_UNLINK);
 
 sub DIR_UNLINK () { 1 }
 
