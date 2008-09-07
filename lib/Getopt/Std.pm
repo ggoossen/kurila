@@ -71,8 +71,8 @@ and version_mess() with the switches string as an argument.
 
 =cut
 
-our @ISA = @( < qw(Exporter) );
-our @EXPORT = @( < qw(getopt getopts) );
+our @ISA = qw(Exporter);
+our @EXPORT = qw(getopt getopts);
 our $VERSION = '1.05';
 
 our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
@@ -185,11 +185,11 @@ sub help_mess ($;$) {
 	my (@rest) = @($args =~ m/([^\s:])(?!\s*:)/g);
 	my ($help, $arg) = ('', '');
 	if ((nelems @witharg)) {
-	    $help .= "\n\tWith arguments: -" . join " -", @( < @witharg);
+	    $help .= "\n\tWith arguments: -" . join " -", @witharg;
 	    $arg = "\nSpace is not required between options and their arguments.";
 	}
 	if ((nelems @rest)) {
-	    $help .= "\n\tBoolean (without arguments): -" . join " -", @( < @rest);
+	    $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
 	}
 	my ($scr) = ($0 =~ m,([^/\\]+)$,);
 	print $h <<EOH if (nelems @_);			# Let the script override this
@@ -228,7 +228,7 @@ sub getopts ($;$) {
     local $_;
     local @EXPORT;
 
-    @args = @( < split( m/ */, $argumentative ) );
+    @args = split( m/ */, $argumentative );
     while((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s) {
 	($first,$rest) = ($1,$2);
 	if (m/^--$/) {	# early exit if --

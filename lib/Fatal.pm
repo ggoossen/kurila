@@ -35,14 +35,14 @@ sub fill_protos {
 sub write_invocation {
   my ($core, $call, $name, < @argvs) = < @_;
   if ((nelems @argvs) == 1) {		# No optional arguments
-    my @argv = @( < @{@argvs[0]} );
+    my @argv = @{@argvs[0]};
     shift @argv;
     return "\t" . one_invocation($core, $call, $name, < @argv) . ";\n";
   } else {
     my $else = "\t";
     my (@out, @argv, $n);
     while ((nelems @argvs)) {
-      @argv = @( < @{shift @argvs} );
+      @argv = @{shift @argvs};
       $n = shift @argv;
       push @out, "{$else}if (nelems(\@_) == $n) \{\n";
       $else = "\t\} els";
@@ -53,7 +53,7 @@ sub write_invocation {
 	\}
 	die "$name(\$(join ' ', map \{ dump::view(\$_) \} \@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
-    return join '', @( < @out);
+    return join '', @out;
   }
 }
 
@@ -99,7 +99,7 @@ sub _make_fatal {
 sub$real_proto \{
 	local(\$!) = (0);
 EOS
-    my @protos = @( < fill_protos($proto) );
+    my @protos = fill_protos($proto);
     $code .= write_invocation($core, $call, $name, < @protos);
     $code .= "\}\n";
     print $code if $Debug;

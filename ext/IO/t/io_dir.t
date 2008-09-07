@@ -29,17 +29,17 @@ my $DIR = $^O eq 'MacOS' ? ":" : ".";
 my $dot = IO::Dir->new( $DIR);
 ok(defined($dot));
 
-my @a = @( < sort @( < glob("*")) );
+my @a = sort glob("*");
 my $first;
 do { $first = $dot->read } while defined($first) && $first =~ m/^\./;
-ok(+(< grep { $_ eq $first } @( < @a)));
+ok(+(< grep { $_ eq $first } @a));
 
-my @b = @( < sort( @($first, (< grep {m/^[^.]/} @( < $dot->read_all)))) );
-ok(+(join("\0", @( < @a)) eq join("\0", @( < @b))));
+my @b = sort( @($first, (< grep {m/^[^.]/} $dot->read_all)));
+ok(+(join("\0", @a) eq join("\0", @b)));
 
 $dot->rewind;
-my @c = @( < sort @( < grep {m/^[^.]/} @( < $dot->read_all)) );
-ok(+(join("\0", @( < @b)) eq join("\0", @( < @c))));
+my @c = sort grep {m/^[^.]/} $dot->read_all;
+ok(+(join("\0", @b) eq join("\0", @c)));
 
 $dot->close;
 $dot->rewind;
@@ -50,7 +50,7 @@ print FH "X";
 close(FH) or die "Can't close: $!";
 
 tie my %dir, 'IO::Dir', $DIR;
-my @files = @( < keys %dir );
+my @files = keys %dir;
 
 # I hope we do not have an empty dir :-)
 ok(scalar nelems @files);

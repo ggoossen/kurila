@@ -6,13 +6,13 @@ use Time::tm;
 our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 BEGIN { 
     use Exporter   ();
-    @ISA         = @( < qw(Exporter Time::tm) );
-    @EXPORT      = @( < qw(gmtime gmctime) );
-    @EXPORT_OK   = @( < qw(  
+    @ISA         = qw(Exporter Time::tm);
+    @EXPORT      = qw(gmtime gmctime);
+    @EXPORT_OK   = qw(  
 			$tm_sec $tm_min $tm_hour $tm_mday 
 			$tm_mon $tm_year $tm_wday $tm_yday 
 			$tm_isdst
-		    ) );
+		    );
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
     $VERSION     = 1.03;
 }

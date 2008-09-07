@@ -6,7 +6,7 @@ use Config;
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    not try { join("", @(< @_)), kill 0; 1 };
+    not try { join("", @_), kill 0; 1 };
 }
 sub tainted ($) {
     any_tainted < @_;

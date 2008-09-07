@@ -19,8 +19,8 @@ print "1..10\n";
 
 our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);
 
-my @argv = @( < qw(-Foo -baR --foo bar) );
-@ARGV = @( < qw(foo bar) );
+my @argv = qw(-Foo -baR --foo bar);
+@ARGV = qw(foo bar);
 undef $opt_baR;
 undef $opt_bar;
 print (GetOptionsFromArray(\@argv, "foo", "Foo=s") ? "" : "not ", "ok 1\n");
@@ -32,4 +32,4 @@ print (((nelems @argv) == 1)         ? "" : "not ", "ok 6\n");
 print ((@argv[0] eq "bar")  ? "" : "not ", "ok 7\n");
 print (!(defined $opt_baR)  ? "" : "not ", "ok 8\n");
 print (!(defined $opt_bar)  ? "" : "not ", "ok 9\n");
-print ("{join ' ', @( <@ARGV)}" eq "foo bar" ? "" : "not ", "ok 10\n");
+print ("{join ' ',@ARGV}" eq "foo bar" ? "" : "not ", "ok 10\n");

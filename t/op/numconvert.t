@@ -83,10 +83,10 @@ my $yet_smaller_than_iv = substr 97 x 100, 0, ($l_iv - 1);
 
 my @list = @(1, $yet_smaller_than_iv, $smaller_than_iv, $max_iv, $max_iv + 1,
 	    $max_uv, $max_uv + 1);
-unshift @list, ( <reverse @( < map -$_, @( < @list))), 0; # 15 elts
-@list = @( < map "$_", @( < @list) ); # Normalize
+unshift @list, ( <reverse map -$_, @list), 0; # 15 elts
+@list = map "$_", @list; # Normalize
 
-print "# {join ' ', @( <@list)}\n";
+print "# {join ' ',@list}\n";
 
 # need to special case ++ for max_uv, as ++ "magic" on a string gives
 # another string, whereas ++ magic on a string used as a number gives
@@ -105,7 +105,7 @@ my $max_uv_p1_as_iv;
 {use integer; $max_uv_p1_as_iv = 0 + sprintf "\%s", $temp}
 my $max_uv_p1_as_uv = 0 ^|^ sprintf "\%s", $temp;
 
-my @opnames = @( < split m//, "-+UINPuinp" );
+my @opnames = split m//, "-+UINPuinp";
 
 # @list = map { 2->($_), 3->($_), 4->($_), 5->($_),  } @list; # Prepare input
 
@@ -113,8 +113,7 @@ my @opnames = @( < split m//, "-+UINPuinp" );
 #print "'@ops'\n";
 
 for my $num_chain (1..$max_chain) {
-  my @ops = @( < map \@( <split m//), @( < grep m/[4-9]/, @(
-    < map { sprintf "\%0{$num_chain}d", $_ } @( <  0 .. 10**$num_chain - 1))) );
+  my @ops = map \split m//, grep m/[4-9]/, map { sprintf "\%0{$num_chain}d", $_ }  0 .. 10**$num_chain - 1;
 
   #@ops = ([]) unless $num_chain;
   #@ops = ([6, 4]);
@@ -124,7 +123,7 @@ for my $num_chain (1..$max_chain) {
     for my $first (2..5) {
       for my $last (2..5) {
 	my $nok = 0;
-	my @otherops = @( < grep $_ +<= 3, @( < @$op) );
+	my @otherops = grep $_ +<= 3, @$op;
 	my @curops = @($op,\@otherops);
 
 	for my $num ( @list) {
@@ -194,7 +193,7 @@ for my $num_chain (1..$max_chain) {
 	    push @ans, $inpt;
 	  }
 	  if (@ans[0] ne @ans[1]) {
-	    print "# '@ans[0]' ne '@ans[1]',\t$num\t=> {join ' ', @( < @opnames[[@($first,< @{@curops[0]},$last)]])} vs {join ' ', @( < @opnames[[@($first,< @{@curops[1]},$last)]])}\n";
+	    print "# '@ans[0]' ne '@ans[1]',\t$num\t=> {join ' ', @opnames[[@($first,< @{@curops[0]},$last)]]} vs {join ' ', @opnames[[@($first,< @{@curops[1]},$last)]]}\n";
 	    # XXX ought to check that "+" was in the list of opnames
 	    if (((@ans[0] eq $max_uv_pp) and (@ans[1] eq $max_uv_p1))
 		or ((@ans[1] eq $max_uv_pp) and (@ans[0] eq $max_uv_p1))) {
@@ -219,7 +218,7 @@ for my $num_chain (1..$max_chain) {
 		     and @ans[0] eq $max_uv_p1_as_uv) {
               # as aboce
 	      print "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
-	    } elsif (grep {m/^N$/} @( < @opnames[[@(<@{@curops[0]})]])
+	    } elsif (grep {m/^N$/} @opnames[[@{@curops[0]}]]
 		     and @ans[0] == @ans[1] and @ans[0] +<= ^~^0
                      # First must be in E notation (ie not just digits) and
                      # second must still be an integer.

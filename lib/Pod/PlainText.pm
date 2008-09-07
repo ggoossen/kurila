@@ -25,7 +25,7 @@ use vars < qw(@ISA %ESCAPES $VERSION);
 
 # We inherit from Pod::Select instead of Pod::Parser so that we can be used
 # by Pod::Usage.
-@ISA = @( < qw(Pod::Select) );
+@ISA = qw(Pod::Select);
 
 $VERSION = '2.02';
 
@@ -199,7 +199,7 @@ sub textblock {
     } {{
         local $_ = $1;
         s%L</([^>]+)>%$1%g;
-        my @items = @( < split m/(?:,?\s+(?:and\s+)?)/ );
+        my @items = split m/(?:,?\s+(?:and\s+)?)/;
         my $string = "the ";
         my $i;
         for ($i = 0; $i +< nelems @items; $i++) {

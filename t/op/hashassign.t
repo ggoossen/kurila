@@ -19,8 +19,8 @@ my @comma = @("key", "value");
 
 # Some of these tests are (effectively) duplicated in each.t
 my %comma = %( < @comma );
-ok (nelems(@( <keys %comma)) == 1, 'keys on comma hash');
-ok (nelems(@( <values %comma)) == 1, 'values on comma hash');
+ok (nelems(keys %comma) == 1, 'keys on comma hash');
+ok (nelems(values %comma) == 1, 'values on comma hash');
 # defeat any tokeniser or optimiser cunning
 my $key = 'ey';
 is (%comma{"k" . $key}, "value", 'is key present? (unoptimised)');
@@ -30,7 +30,7 @@ is (%comma{key}, "value", 'is key present? (maybe optimised)');
 my @temp = @(key=>undef);
 is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
-@temp = @( < %comma );
+@temp = %comma;
 ok (eq_array (\@comma, \@temp), 'list from comma hash');
 
 @temp = @( each %comma );
@@ -40,15 +40,15 @@ ok (eq_array (\@(), \@temp), 'last each from comma hash');
 
 my %temp = %( < %comma );
 
-ok (nelems(@( <keys %temp)) == 1, 'keys on copy of comma hash');
-ok (nelems(@( <values %temp)) == 1, 'values on copy of comma hash');
+ok (nelems(keys %temp) == 1, 'keys on copy of comma hash');
+ok (nelems(values %temp) == 1, 'values on copy of comma hash');
 is (%temp{'k' . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{key}, "value", 'is key present? (maybe optimised)');
 @temp = @(key=>undef);
 is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
-@temp = @( < %temp );
+@temp = %temp;
 ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
 
 @temp = @( each %temp );
@@ -59,8 +59,8 @@ ok (eq_array (\@(), \@temp), 'last each from copy of comma hash');
 my @arrow = @(Key =>"Value");
 
 my %arrow = %( < @arrow );
-ok (nelems(@( <keys %arrow)) == 1, 'keys on arrow hash');
-ok (nelems(@( <values %arrow)) == 1, 'values on arrow hash');
+ok (nelems(keys %arrow) == 1, 'keys on arrow hash');
+ok (nelems(values %arrow) == 1, 'values on arrow hash');
 # defeat any tokeniser or optimiser cunning
 $key = 'ey';
 is (%arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
@@ -70,7 +70,7 @@ is (%arrow{Key}, "Value", 'is key present? (maybe optimised)');
 @temp = @('Key', undef);
 is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
-@temp = @( < %arrow );
+@temp = %arrow;
 ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
 
 @temp = @( each %arrow );
@@ -80,15 +80,15 @@ ok (eq_array (\@(), \@temp), 'last each from arrow hash');
 
 %temp = %( < %arrow );
 
-ok (nelems(@( <keys %temp)) == 1, 'keys on copy of arrow hash');
-ok (nelems(@( <values %temp)) == 1, 'values on copy of arrow hash');
+ok (nelems(keys %temp) == 1, 'keys on copy of arrow hash');
+ok (nelems(values %temp) == 1, 'values on copy of arrow hash');
 is (%temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
 is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
 @temp = @('Key', undef);
 is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
-@temp = @( < %temp );
+@temp = %temp;
 ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
 
 @temp = @( each %temp );

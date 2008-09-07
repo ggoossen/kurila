@@ -19,10 +19,10 @@ use strict;
 
 $VERSION = '1.26_01';
 
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(&xsinit &ldopts 
+@ISA = qw(Exporter);
+@EXPORT = qw(&xsinit &ldopts 
 	     &ccopts &ccflags &ccdlflags &perl_inc
-	     &xsi_header &xsi_protos &xsi_body) );
+	     &xsi_header &xsi_protos &xsi_body);
 
 #let's have Miniperl borrow from us instead
 #require ExtUtils::Miniperl;
@@ -50,13 +50,13 @@ sub xsinit {
     my $xsinit_proto = "pTHX";
 
     if ((nelems @_)) {
-       @mods = @( < @$mods ) if $mods;
+       @mods = @$mods if $mods;
     }
     else {
        getopts('o:s:');
        $file = $opt_o if defined $opt_o;
        $std  = $opt_s  if defined $opt_s;
-       @mods = @( < @ARGV );
+       @mods = @ARGV;
     }
     $std = 1 unless scalar nelems @mods;
 
@@ -68,7 +68,7 @@ sub xsinit {
     }
 
     push(@mods, < static_ext()) if defined $std;
-    @mods = @( < grep(!%seen{$_}++, @( < @mods)) );
+    @mods = grep(!%seen{$_}++, @mods);
 
     print $fh < &xsi_header();
     print $fh "EXTERN_C void xs_init ($xsinit_proto);\n\n";     
@@ -89,7 +89,7 @@ EOF
 }    
 
 sub xsi_protos {
-    my(@exts) = @( < @_ );
+    my(@exts) = @_;
     my(@retval,%seen);
     my $boot_proto = "pTHX_ CV* cv";
     foreach $_ ( @exts){
@@ -101,11 +101,11 @@ sub xsi_protos {
 	next if %seen{$ccode}++;
         push(@retval, $ccode);
     }
-    return join '', @( < @retval);
+    return join '', @retval;
 }
 
 sub xsi_body {
-    my(@exts) = @( < @_ );
+    my(@exts) = @_;
     my($pname,@retval,%seen);
     my($dl) = < canon('/','DynaLoader');
     push(@retval, "\tchar *file = __FILE__;\n");
@@ -127,14 +127,14 @@ sub xsi_body {
             push(@retval, $ccode) unless %seen{$ccode}++;
         }
     }
-    return join '', @( < @retval);
+    return join '', @retval;
 }
 
 sub static_ext {
     unless (scalar nelems @Extensions) {
       my $static_ext = %Config{static_ext};
       $static_ext =~ s/^\s+//;
-      @Extensions = @( < sort @( < split m/\s+/, $static_ext) );
+      @Extensions = sort split m/\s+/, $static_ext;
 	unshift @Extensions, < qw(DynaLoader);
     }
     @Extensions;
@@ -171,15 +171,15 @@ sub ldopts {
     my($dllib,$config_libs,@potential_libs,@path);
     local($") = ' ' unless $" eq ' ';
     if (scalar nelems @_) {
-       @link_args = @( < @$link_args ) if $link_args;
-       @mods = @( < @$mods ) if $mods;
+       @link_args = @$link_args if $link_args;
+       @mods = @$mods if $mods;
     }
     else {
-       @argv = @( < @ARGV );
+       @argv = @ARGV;
        #hmm
        while($_ = shift @argv) {
 	   m/^-std$/  && do { $std = 1; next; };
-	   m/^--$/    && do { @link_args = @( < @argv ); last; };
+	   m/^--$/    && do { @link_args = @argv; last; };
 	   m/^-I(.*)/ && do { $path = $1 || shift @argv; next; };
 	   push(@mods, $_); 
        }
@@ -197,9 +197,9 @@ sub ldopts {
     push(@mods, < static_ext()) if $std;
 
     my($mod,@ns,$root,$sub,$extra,$archive,@archives);
-    print STDERR "Searching ({join ' ', @( <@path)}) for archives\n" if $Verbose;
+    print STDERR "Searching ({join ' ',@path}) for archives\n" if $Verbose;
     foreach $mod ( @mods) {
-	@ns = @( < split(m/::|\/|\\/, $mod) );
+	@ns = split(m/::|\/|\\/, $mod);
 	$sub = @ns[-1];
 	$root = File::Spec->catdir(< @ns);
 	
@@ -229,7 +229,7 @@ sub ldopts {
     elsif ($^O eq 'os390' && %Config{usedl}) {
 	# Nothing for OS/390 (z/OS) dynamic.
     } else {
-	$libperl = (grep(m/^-l\w*perl\w*$/, @( < @link_args)))[0]
+	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[0]
 	    || (%Config{libperl} =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q%Config{dlext}\E)$/
 		? "-l$1" : '')
 		|| "-lperl";
@@ -244,7 +244,7 @@ sub ldopts {
     print STDERR "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose;
     my $ccdlflags = _ccdlflags();
     my $ldflags   = _ldflags();
-    my $linkage = "$ccdlflags $ldflags {join ' ', @( <@archives)} $ld_or_bs";
+    my $linkage = "$ccdlflags $ldflags {join ' ',@archives} $ld_or_bs";
     print STDERR "ldopts: '$linkage'\n" if $Verbose;
 
     return $linkage if scalar nelems @_;
@@ -279,7 +279,7 @@ sub canon {
        s:^(lib|ext)/(auto/)?::;
        s:/\w+\.\w+$::;
     }
-    map(s:/:$as:, @( < @ext)) if ($as ne '/');
+    map(s:/:$as:, @ext) if ($as ne '/');
     @ext;
 }
 

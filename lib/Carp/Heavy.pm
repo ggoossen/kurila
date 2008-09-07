@@ -69,8 +69,8 @@ sub caller_info {
   my $i = shift(@_) + 1;
   package DB;
   my %call_info;
- <  %call_info{[@( <
-    qw(pack file line sub has_args wantarray evaltext is_require))
+ <  %call_info{[
+    qw(pack file line sub has_args wantarray evaltext is_require)
   ]} = caller($i);
   
   unless (defined %call_info{pack}) {
@@ -79,13 +79,13 @@ sub caller_info {
 
   my $sub_name = Carp::get_subname(\%call_info);
   if (%call_info{has_args}) {
-    my @args = @( < map { Carp::format_arg($_)} @( < @DB::args) );
+    my @args = map { Carp::format_arg($_)} @DB::args;
     if ($MaxArgNums and (nelems @args) +> $MaxArgNums) { # More than we want to show?
       splice @args, $MaxArgNums;
       push @args, '...';
     }
     # Push the args onto the subroutine
-    $sub_name .= '(' . join (', ', @( < @args)) . ')';
+    $sub_name .= '(' . join (', ', @args) . ')';
   }
   %call_info{sub_name} = $sub_name;
   return %call_info;
@@ -108,7 +108,7 @@ sub format_arg {
 sub get_status {
     my $cache = shift;
     my $pkg = shift;
-    $cache->{$pkg} ||= \@(\%($pkg => $pkg), \@( <trusts_directly($pkg)));
+    $cache->{$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg));
     return @{$cache->{$pkg}};
 }
 
@@ -168,7 +168,7 @@ sub longmess_heavy {
 sub ret_backtrace {
   my ($i, < @error) = < @_;
   my $mess;
-  my $err = join '', @( < @error);
+  my $err = join '', @error;
   $i++;
 
   my $tid_msg = '';
@@ -189,7 +189,7 @@ sub ret_backtrace {
 
 sub ret_summary {
   my ($i, < @error) = < @_;
-  my $err = join '', @( < @error);
+  my $err = join '', @error;
   $i++;
 
   my $tid_msg = '';
@@ -265,8 +265,8 @@ sub trusts {
         next if exists $known->{$anc};
         $known->{$anc}++;
         my ($anc_knows, $anc_partial) = < get_status($cache, $anc);
-        my @found = @( < keys %$anc_knows );
- <        %$known{[@(< @found)]} = ();
+        my @found = keys %$anc_knows;
+ <        %$known{[ @found]} = ();
         push @$partial, < @$anc_partial;
     }
     return exists $known->{$parent};

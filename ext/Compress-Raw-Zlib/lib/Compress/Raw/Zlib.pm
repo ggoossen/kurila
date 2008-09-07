@@ -17,7 +17,7 @@ BEGIN {
     $VERSION = eval $VERSION;
 }
 
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
@@ -158,7 +158,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
  
-        foreach my $key (@( <keys %$href)) {
+        foreach my $key (keys %$href) {
             push @entered, $key ;
             push @entered, \$href->{$key} ;
         }
@@ -177,7 +177,7 @@ sub Compress::Raw::Zlib::Parameters::parse
 
     while (my ($key, $v) = each %$default)
     {
-        croak "need 4 params [{join ' ', @( <@$v)}]"
+        croak "need 4 params [{join ' ',@$v}]"
             if (nelems @$v) != 4 ;
 
         my ($first_only, $sticky, $type, $value) = < @$v ;
@@ -220,8 +220,8 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my ($bad) = join(", ", @( < @Bad)) ;
-        return $self->setError("unknown key value(s) {join ' ', @( <@Bad)}") ;
+        my ($bad) = join(", ", @Bad) ;
+        return $self->setError("unknown key value(s) {join ' ',@Bad}") ;
     }
 
     return 1;

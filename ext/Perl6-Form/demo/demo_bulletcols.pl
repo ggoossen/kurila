@@ -11,7 +11,7 @@ print < form
 	 "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
 		 \@items,                     \@items;
 
-my $items = join "", @( < @items);
+my $items = join "", @items;
 
 print < form
 	 "-----------------------",

@@ -60,13 +60,13 @@ push @names,
   \%(name=>$_, type=>"IV",
    macro=>\@("#if defined($_) || defined(HAS_$_) /* might be an enum */\n",
            "#endif\n"))
-foreach @( < qw (MSG_CTRUNC MSG_DONTROUTE MSG_OOB MSG_PEEK MSG_PROXY SCM_RIGHTS));
+foreach qw (MSG_CTRUNC MSG_DONTROUTE MSG_OOB MSG_PEEK MSG_PROXY SCM_RIGHTS);
 
 push @names, 
 \%(name => $_, type => "SV",
  pre=>"struct in_addr ip_address; ip_address.s_addr = htonl($_);",
  value => "sv_2mortal(newSVpvn((char *)&ip_address,sizeof ip_address ))",)
-         foreach @( < qw(INADDR_ANY INADDR_LOOPBACK INADDR_NONE INADDR_BROADCAST));
+         foreach qw(INADDR_ANY INADDR_LOOPBACK INADDR_NONE INADDR_BROADCAST);
 
 WriteConstants(
     PROXYSUBS => 1,

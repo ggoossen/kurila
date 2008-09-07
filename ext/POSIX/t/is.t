@@ -26,35 +26,35 @@ $| = 1;
 # listed, are expected to return '0' for the given string.
 my %classes =
   %(
-   'a'    => \@( < qw(print graph alnum alpha lower xdigit) ),
-   'A'    => \@( < qw(print graph alnum alpha upper xdigit) ),
-   'z'    => \@( < qw(print graph alnum alpha lower) ),
-   'Z'    => \@( < qw(print graph alnum alpha upper) ),
-   '0'    => \@( < qw(print graph alnum digit xdigit) ),
-   '9'    => \@( < qw(print graph alnum digit xdigit) ),
-   '.'    => \@( < qw(print graph punct) ),
-   '?'    => \@( < qw(print graph punct) ),
-   ' '    => \@( < qw(print space) ),
-   "\t"   => \@( < qw(cntrl space) ),
-   "\001" => \@( < qw(cntrl) ),
+   'a'    => \ qw(print graph alnum alpha lower xdigit),
+   'A'    => \ qw(print graph alnum alpha upper xdigit),
+   'z'    => \ qw(print graph alnum alpha lower),
+   'Z'    => \ qw(print graph alnum alpha upper),
+   '0'    => \ qw(print graph alnum digit xdigit),
+   '9'    => \ qw(print graph alnum digit xdigit),
+   '.'    => \ qw(print graph punct),
+   '?'    => \ qw(print graph punct),
+   ' '    => \ qw(print space),
+   "\t"   => \ qw(cntrl space),
+   "\001" => \ qw(cntrl),
 
    # Multi-character strings.  These are logically ANDed, so the
    # presence of different types of chars in one string will
    # reduce the list on the right.
-   'abc'       => \@( < qw(print graph alnum alpha lower xdigit) ),
-   'az'        => \@( < qw(print graph alnum alpha lower) ),
-   'aZ'        => \@( < qw(print graph alnum alpha) ),
-   'abc '      => \@( < qw(print) ),
+   'abc'       => \ qw(print graph alnum alpha lower xdigit),
+   'az'        => \ qw(print graph alnum alpha lower),
+   'aZ'        => \ qw(print graph alnum alpha),
+   'abc '      => \ qw(print),
 
-   '012aF'     => \@( < qw(print graph alnum xdigit) ),
+   '012aF'     => \ qw(print graph alnum xdigit),
 
-   " \t"       => \@( < qw(space) ),
+   " \t"       => \ qw(space),
 
    "abcde\001" => \@(),
 
    # An empty string. Always true (al least in old days) [bug #24554]
-   ''     => \@( < qw(print graph alnum alpha lower upper digit xdigit
-                  punct cntrl space) ),
+   ''     => \ qw(print graph alnum alpha lower upper digit xdigit
+                  punct cntrl space),
   );
 
 
@@ -62,11 +62,11 @@ my %classes =
 # a complete list of all the 'is<xxx>' functions.  At least, the ones
 # listed above.
 my %functions;
-foreach my $s (@( <keys %classes)) {
+foreach my $s (keys %classes) {
     %classes{$s} = \%( < map {
 	%functions{"is$_"}++;	# Keep track of all the 'is<xxx>' functions
 	"is$_" => 1;		# Our return value: is<xxx>($s) should pass.
-    } @( < @{%classes{$s}}) );
+    } @{%classes{$s}} );
 }
 
 # Expected number of tests is one each for every combination of a
@@ -81,8 +81,8 @@ plan(tests => nkeys(%classes) * nkeys(%functions));
 # always run all functions on every string, and expect to get 0 for the
 # character classes not listed in the given string's hash value.
 #
-foreach my $s (@( <sort @( < keys %classes))) {
-    foreach my $f (@( <sort @( < keys %functions))) {
+foreach my $s (sort keys %classes) {
+    foreach my $f (sort keys %functions) {
 	my $expected = exists %classes{$s}->{$f};
 	my $actual   = eval "POSIX::$f( \$s )";
 

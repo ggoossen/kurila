@@ -16,7 +16,7 @@ unlink "Errno.pm" if -f "Errno.pm";
 open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $!";
 select OUT;
 my $file;
-my @files = @( < get_files() );
+my @files = get_files();
 if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
@@ -213,7 +213,7 @@ sub get_files {
 	}
 	close(CPPO);
     }
-    return @( <keys %file);
+    returnkeys %file;
 }
 
 sub write_errno_pm {
@@ -236,7 +236,7 @@ sub write_errno_pm {
     }
     if ($IsMSWin32) {
 	print CPPI "#include <winsock.h>\n";
-	foreach $err (@( <keys %wsa)) {
+	foreach $err (keys %wsa) {
 	    print CPPI "#ifndef $err\n";
 	    print CPPI "#define $err WSA$err\n";
 	    print CPPI "#endif\n";
@@ -244,7 +244,7 @@ sub write_errno_pm {
 	}
     }
  
-    foreach $err (@( <keys %err)) {
+    foreach $err (keys %err) {
 	print CPPI '"',$err,'" [[',$err,']]',"\n";
     }
 
@@ -300,7 +300,7 @@ sub write_errno_pm {
 
     if ($^O eq 'beos') {
 	if (open(C, ">", "errno.c")) {
-	    my @allerrs = @( < keys %err );
+	    my @allerrs = keys %err;
 	    print C <<EOF;
 #include <errno.h>
 #include <stdio.h>
@@ -351,10 +351,10 @@ use strict;
 EDQ
    
     my $len = 0;
-    my @err = @( < sort { %err{$a} <+> %err{$b} } @( < keys %err) );
-    map { $len = length if length +> $len } @( < @err);
+    my @err = sort { %err{$a} <+> %err{$b} } keys %err;
+    map { $len = length if length +> $len } @err;
 
-    my $j = "\@EXPORT_OK = qw(" . join(" ", @( <keys %err)) . ");\n";
+    my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
     print $j,"\n";
 
@@ -363,8 +363,8 @@ print <<'ESQ';
     POSIX => \qw(
 ESQ
 
-    my $k = join(" ", @( < grep { exists %err{$_} } 
- @( <	qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
+    my $k = join(" ", grep { exists %err{$_} } 
+	qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
 	EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
 	ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT
 	EEXIST EFAULT EFBIG EHOSTDOWN EHOSTUNREACH EINPROGRESS
@@ -376,7 +376,7 @@ ESQ
 	EPFNOSUPPORT EPIPE EPROCLIM EPROTONOSUPPORT EPROTOTYPE
 	ERANGE EREMOTE ERESTART EROFS ESHUTDOWN ESOCKTNOSUPPORT
 	ESPIPE ESRCH ESTALE ETIMEDOUT ETOOMANYREFS ETXTBSY
-	EUSERS EWOULDBLOCK EXDEV))));
+	EUSERS EWOULDBLOCK EXDEV));
 
     $k =~ s/(.{50,70})\s/$1\n\t/g;
     print "\t",$k,"\n    )\n);\n\n";

@@ -158,7 +158,7 @@ push(@dl_library_path, < split(' ', %Config::Config{libpth}));
 EOT
 
 sub dquoted_comma_list {
-    join(", ", @( < map {'"'.quotemeta($_).'"'} @( < @_)));
+    join(", ", map {'"'.quotemeta($_).'"'} @_);
 }
 
 our @dl_library_path;

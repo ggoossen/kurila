@@ -93,7 +93,7 @@ sub is_decent {
     $/xs;
 
   my @supers = @( () );
-  foreach my $bit (@( <split('-', $tag))) {
+  foreach my $bit (split('-', $tag)) {
     push @supers, 
       scalar(nelems @supers) ? (@supers[-1] . '-' . $bit) : $bit;
   }

@@ -38,8 +38,8 @@ our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total,
 %h{'y'} = 'Y';
 %h{'z'} = 'Z';
 
-@keys = @( < keys %h );
-@values = @( < values %h );
+@keys = keys %h;
+@values = values %h;
 
 is (((nelems @keys)-1), 27, "keys");
 is (((nelems @values)-1), 27, "values");
@@ -84,8 +84,8 @@ is ($total, 100, "test values keys resets iterator");
 
 $i = 0;
 %h = %(a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');
-@keys = @( < keys(%h) );
-@values = @( < values(%h) );
+@keys = keys(%h);
+@values = values(%h);
 while (($key, $value) = each(%h)) {
 	if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 		$i++;
@@ -113,7 +113,7 @@ use utf8;
  <%u{[@("\x{10FFFD}")]} = "zap";
 
 my %u2;
-foreach (@( <keys %u)) {
+foreach (keys %u) {
     is (length(), 1, "Check length of " . _qq $_);
     %u2{$_} = %u{$_};
 }
@@ -125,9 +125,9 @@ $a = "\x[e3]\x[81]\x[82]"; $A = "\x{3042}";
 
 is (exists %b{$A}, '1', "hash uses byte-string");
 is (exists %u{$a}, '1', "hash uses byte-string");
-print "# %b{$_}\n" for @( < keys %b); # Used to core dump before change #8056.
+print "# %b{$_}\n" for keys %b; # Used to core dump before change #8056.
 pass ("if we got here change 8056 worked");
-print "# %u{$_}\n" for @( < keys %u); # Used to core dump before change #8056.
+print "# %u{$_}\n" for keys %u; # Used to core dump before change #8056.
 pass ("change 8056 is thanks to Inaba Hiroto");
 
 {

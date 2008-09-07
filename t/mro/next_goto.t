@@ -22,7 +22,7 @@ use mro;
     sub quux { 242 }
 
     package TTop;
-    our @ISA = @( < qw/TBase/ );
+    our @ISA = qw/TBase/;
     sub foo { shift->Proxy::next_proxy() }
     sub bar { shift->Proxy::maybe_proxy() }
     sub baz { shift->Proxy::maybe_proxy() }

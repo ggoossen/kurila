@@ -26,7 +26,7 @@ use ExtUtils::MakeMaker < qw( neatvalue );
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-our @ISA = @( < qw( ExtUtils::MM_Unix ) );
+our @ISA = qw( ExtUtils::MM_Unix );
 our $VERSION = '6.44';
 
 %ENV{EMXSHELL} = 'sh'; # to run `commands`
@@ -69,7 +69,7 @@ $self->{BASEEXT}.def: Makefile.PL
      q!, 'DL_VARS' => !, < neatvalue($vars), q!);"
 !);
     }
-    join('', @(< @m));
+    join('', @m);
 }
 
 =item replace_manpage_separator
@@ -213,7 +213,7 @@ sub platform_constants {
     my($self) = shift;
     my $make_frag = '';
 
-    foreach my $macro (@( <qw(MM_Win32_VERSION)))
+    foreach my $macro (qw(MM_Win32_VERSION))
     {
         next unless defined $self->{$macro};
         $make_frag .= "$macro = $self->{$macro}\n";
@@ -280,7 +280,7 @@ q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
 MAKE_FRAG
 
-    join('', @( < @m));
+    join('', @m);
 }
 
 
@@ -352,7 +352,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 	$(CHMOD) $(PERM_RWX) $@
 ';
 
-    join('', @(< @m));
+    join('', @m);
 }
 
 =item extra_clean_files
@@ -365,7 +365,7 @@ gcc.  Otherwise, take out all *.pdb files.
 sub extra_clean_files {
     my $self = shift;
 
-    return $GCC ?  @(@( <qw(dll.base dll.exp))) :  @('*.pdb');
+    return $GCC ?  @(qw(dll.base dll.exp)) :  @('*.pdb');
 }
 
 =item init_linker
@@ -439,7 +439,7 @@ sub oneliner {
     $cmd = $self->quote_literal($cmd);
     $cmd = $self->escape_newlines($cmd);
 
-    $switches = join ' ', @( < @$switches);
+    $switches = join ' ', @$switches;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --};
 }
@@ -494,9 +494,9 @@ sub cd {
 
     return $self->SUPER::cd($dir, < @cmds) unless $self->make eq 'nmake';
 
-    my $cmd = join "\n\t", @( < map "$_", @( < @cmds));
+    my $cmd = join "\n\t", map "$_", @cmds;
 
-    my $updirs = $self->catdir(< map { $self->updir } @( < $self->splitdir($dir)));
+    my $updirs = $self->catdir(< map { $self->updir } $self->splitdir($dir));
 
     # No leading tab and no trailing newline makes for easier embedding.
     my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs;
@@ -549,7 +549,7 @@ sub cflags {
     return '' unless $self->needs_linking();
 
     my $base = $self->SUPER::cflags($libperl);
-    foreach (@( <split m/\n/, $base)) {
+    foreach (split m/\n/, $base) {
         m/^(\S*)\s*=\s*(\S*)$/ and $self->{$1} = $2;
     };
     $self->{CCFLAGS} .= " -DPERLDLL" if ($self->{LINKTYPE} eq 'static');

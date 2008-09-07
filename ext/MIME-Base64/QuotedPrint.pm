@@ -6,8 +6,8 @@ use strict;
 use vars < qw(@ISA @EXPORT $VERSION);
 
 require Exporter;
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(encode_qp decode_qp) );
+@ISA = qw(Exporter);
+@EXPORT = qw(encode_qp decode_qp);
 
 $VERSION = "3.07";
 

@@ -9,8 +9,8 @@ use Digest ();
 use vars < qw($VERSION @ISA @EXPORT_OK);
 
 $VERSION = "1.00";
-@ISA = @( < qw(Exporter) );
-@EXPORT_OK = @( < qw(digest_file_ctx digest_file digest_file_hex digest_file_base64) );
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(digest_file_ctx digest_file digest_file_hex digest_file_base64);
 
 sub digest_file_ctx {
     my $file = shift;

@@ -17,11 +17,11 @@ use Errno;
 
 # legacy
 
-@ISA = @( < qw(IO::Handle) );
+@ISA = qw(IO::Handle);
 
 $VERSION = "1.30_01";
 
-@EXPORT_OK = @( < qw(sockatmark) );
+@EXPORT_OK = qw(sockatmark);
 
 sub import {
     my $pkg = shift;

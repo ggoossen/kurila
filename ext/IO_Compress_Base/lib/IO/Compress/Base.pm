@@ -609,15 +609,15 @@ sub print
 
     if (defined $\) {
         if (defined $,) {
-            defined $self->syswrite(join($,, @( < @_)) . $\);
+            defined $self->syswrite(join($,, @_) . $\);
         } else {
-            defined $self->syswrite(join("", @( < @_)) . $\);
+            defined $self->syswrite(join("", @_) . $\);
         }
     } else {
         if (defined $,) {
-            defined $self->syswrite(join($,, @( < @_)));
+            defined $self->syswrite(join($,, @_));
         } else {
-            defined $self->syswrite(join("", @( < @_)));
+            defined $self->syswrite(join("", @_));
         }
     }
 }

@@ -14,7 +14,7 @@ $VERSION = "5.01";
 # TODO: some basic docs
 
 sub pod2html {
-  my @args = @(< @_);
+  my @args = @_;
   
   my( $verbose, $infile, $outfile, $title );
   my $index = 1;
@@ -23,7 +23,7 @@ sub pod2html {
     my($help);
 
     my($netscape); # dummy
-    local @ARGV = @( < @args );
+    local @ARGV = @args;
     GetOptions(
       "help"       => \$help,
       "verbose!"   => \$verbose,
@@ -42,7 +42,7 @@ sub pod2html {
   
   if($verbose) {
     warn sprintf "\%s version \%s\n", __PACKAGE__, $VERSION;
-    warn "OK, processed args [{join ' ', @( <@args)}] ...\n";
+    warn "OK, processed args [{join ' ',@args}] ...\n";
     warn sprintf
       " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n",
       < map defined($_) ? $_ : "(nil)", @(

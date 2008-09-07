@@ -6,9 +6,9 @@ $VERSION = "3.26"
 ;
 
 use Exporter;
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(shellwords quotewords nested_quotewords parse_line) );
-@EXPORT_OK = @( < qw(old_shellwords) );
+@ISA = qw(Exporter);
+@EXPORT = qw(shellwords quotewords nested_quotewords parse_line);
+@EXPORT_OK = qw(old_shellwords);
 
 
 sub shellwords {
@@ -32,7 +32,7 @@ sub quotewords {
     my($line, @words, @allwords);
 
     foreach $line ( @lines) {
-	@words = @( < parse_line($delim, $keep, $line) );
+	@words = parse_line($delim, $keep, $line);
 	return() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);
     }
@@ -46,7 +46,7 @@ sub nested_quotewords {
     my($i, @allwords);
 
     for ($i = 0; $i +< nelems @lines; $i++) {
-	@{@allwords[$i]} = @( < parse_line($delim, $keep, @lines[$i]) );
+	@{@allwords[$i]} = parse_line($delim, $keep, @lines[$i]);
 	return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
     }
     return @allwords;
@@ -129,7 +129,7 @@ sub old_shellwords {
     #	@words = old_shellwords();	# defaults to $_ (and clobbers it)
 
     no warnings 'uninitialized';	# we will be testing undef strings
-    local *_ = \join('', @( < @_)) if (nelems @_);
+    local *_ = \join('', @_) if (nelems @_);
     my (@words, $snippet);
 
     s/\A\s+//;

@@ -44,7 +44,7 @@ BEGIN {
     my $self = $0;
     unless (-f $self) {
         my ($vol, $dirs, $file) = < File::Spec->splitpath($self);
-        my @dirs = @( < File::Spec->splitdir($dirs) );
+        my @dirs = File::Spec->splitdir($dirs);
         unshift(@dirs, File::Spec->updir);
         $dirs = File::Spec->catdir(< @dirs);
         $self = File::Spec->catpath($vol, $dirs, $file);
@@ -84,7 +84,7 @@ BEGIN {
     cmp_ok( abs($now - $stamp), '+<=', 1, 'checking modify time stamp' ) ||
       diag "mtime == $stamp, should be $now";
 
-    @ARGV = @( < qw(newfile) );
+    @ARGV = qw(newfile);
     touch();
 
     my $new_stamp = @(stat('newfile'))[9];
@@ -137,7 +137,7 @@ BEGIN {
 
     # change a file to read-write
     @ARGV = @( '0600', $Testfile );
-    my @orig_argv = @( < @ARGV );
+    my @orig_argv = @ARGV;
     ExtUtils::Command::chmod();
     is_deeply( \@ARGV, \@orig_argv, 'chmod preserves @ARGV' );
 
@@ -198,7 +198,7 @@ BEGIN {
     @ARGV = @( $test_dir );
     # copy a file to a nested subdirectory
     unshift @ARGV, $Testfile;
-    @orig_argv = @( < @ARGV );
+    @orig_argv = @ARGV;
     cp();
     is_deeply( \@ARGV, \@orig_argv, 'cp preserves @ARGV' );
 
@@ -212,7 +212,7 @@ BEGIN {
 
     # move a file to a subdirectory
     @ARGV = @( $Testfile, 'ecmddir' );
-    @orig_argv = @( < @ARGV );
+    @orig_argv = @ARGV;
     ok( mv() );
     is_deeply( \@ARGV, \@orig_argv, 'mv preserves @ARGV' );
 

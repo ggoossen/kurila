@@ -122,7 +122,7 @@ sub get_orig {
 
 
 sub all_orig { (keys %{@_[0]->{'__N+Map'}}); }
-sub all_trimmed { (grep { m/^\w+$/ } @( < keys %{@_[0]})); }
+sub all_trimmed { (grep { m/^\w+$/ } keys %{@_[0]}); }
 
 __END__
 

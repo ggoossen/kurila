@@ -29,8 +29,8 @@ ok($t, "made something");
 
 isa_ok($t,          'Term::ReadLine::Mock');
 
-for my $method (@( <qw( ReadLine readline addhistory IN OUT MinLine
-                    findConsole Attribs Features new )) ) {
+for my $method (qw( ReadLine readline addhistory IN OUT MinLine
+                    findConsole Attribs Features new ) ) {
     can_ok($t, $method);
 }
 

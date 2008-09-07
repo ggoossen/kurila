@@ -73,7 +73,7 @@ sub import {
                 die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
-    or make that module available in \@INC (\@INC contains: {join ' ', @( <@INC)}).
+    or make that module available in \@INC (\@INC contains: {join ' ',@INC}).
 ERROR
             }
         }

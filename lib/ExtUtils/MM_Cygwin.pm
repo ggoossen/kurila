@@ -7,7 +7,7 @@ use File::Spec;
 
 require ExtUtils::MM_Any;
 require ExtUtils::MM_Unix;
-our @ISA = @( < qw( ExtUtils::MM_Unix ) );
+our @ISA = qw( ExtUtils::MM_Unix );
 
 our $VERSION = '6.44';
 
@@ -48,7 +48,7 @@ sub cflags {
     return '' unless $self->needs_linking();
 
     my $base = $self->SUPER::cflags($libperl);
-    foreach (@( <split m/\n/, $base)) {
+    foreach (split m/\n/, $base) {
         m/^(\S*)\s*=\s*(\S*)$/ and $self->{$1} = $2;
     };
     $self->{CCFLAGS} .= " -DUSEIMPORTLIB" if (%Config{useshrplib} eq 'true');

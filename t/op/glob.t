@@ -5,35 +5,35 @@ plan( tests => 9 );
 
 our (@oops, @ops, %files, $not, @glops, $x);
 
-@oops = @ops = @( < glob("op/*") );
+@oops = @ops = glob("op/*");
 
 if ($^O eq 'MSWin32') {
   map { %files{lc($_)}++ } @( glob( <"op/*"));
-  map { delete %files{"op/$_"} } @( < split m/[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,)
+  map { delete %files{"op/$_"} } split m/[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
 }
 elsif ($^O eq 'VMS') {
   map { %files{lc($_)}++ } @( glob( <"[.op]*"));
-  map { s/;.*$//; delete %files{lc($_)}; } @( < split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,)
+  map { s/;.*$//; delete %files{lc($_)}; } split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
 }
 elsif ($^O eq 'MacOS') {
-  @oops = @ops = @( < glob ":op:*" );
-  map { %files{$_}++ } @( < glob(":op:*"));
-  map { delete %files{$_} } @( < split m/[\s\n]/, `echo :op:\x[c5]`);
+  @oops = @ops = glob ":op:*";
+  map { %files{$_}++ } glob(":op:*");
+  map { delete %files{$_} } split m/[\s\n]/, `echo :op:\x[c5]`;
 }
 else {
-  map { %files{$_}++ } @( < glob("op/*"));
-  map { delete %files{$_} } @( < split m/[\s\n]/, `echo op/*`);
+  map { %files{$_}++ } glob("op/*");
+  map { delete %files{$_} } split m/[\s\n]/, `echo op/*`;
 }
-ok( !(nkeys(%files)),'leftover op/* files' ) or diag(join(' ', @( <sort @( < keys %files))));
+ok( !(nkeys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
 
 cmp_ok($/,'eq',"\n",'sane input record separator');
 
 $_ = $^O eq 'MacOS' ? ":op:*" : "op/*";
-@glops = @( < glob $_ );
-cmp_ok("{join ' ', @( <@glops)}",'eq',"{join ' ', @( <@oops)}",'glob operator 1');
+@glops = glob $_;
+cmp_ok("{join ' ',@glops}",'eq',"{join ' ',@oops}",'glob operator 1');
 
-@glops = @( < glob );
-cmp_ok("{join ' ', @( <@glops)}",'eq',"{join ' ', @( <@oops)}",'glob operator 2');
+@glops = glob;
+cmp_ok("{join ' ',@glops}",'eq',"{join ' ',@oops}",'glob operator 2');
 
 # The formerly-broken test for the situation above would accidentally
 # test definedness for an assignment with a LOGOP on the right:

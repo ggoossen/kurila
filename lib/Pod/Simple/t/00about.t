@@ -8,7 +8,7 @@ use strict;
 use Test;
 my @modules;
 BEGIN {
-  @modules = @( < qw(
+  @modules = qw(
 
 Pod::Escapes
 
@@ -23,7 +23,7 @@ Pod::Simple::RTF	Pod::Simple::Search	Pod::Simple::SimpleTree
 Pod::Simple::Text	Pod::Simple::TextContent
 Pod::Simple::Transcode	Pod::Simple::XMLOutStream
 
-  ) );
+  );
   plan tests => 2 + nelems @modules;
 };
 

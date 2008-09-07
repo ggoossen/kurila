@@ -250,7 +250,7 @@ EONT_EONT
 
 
 checkOptree ( name	=> 'all of BEGIN END INIT CHECK UNITCHECK -exec',
-	      bcopts	=> \@( <qw/ BEGIN END INIT CHECK UNITCHECK -exec /),
+	      bcopts	=> \qw/ BEGIN END INIT CHECK UNITCHECK -exec /,
 	      prog	=> $src,
 	      < @warnings_todo,
               todo      => "kurila changes",
@@ -387,7 +387,7 @@ EONT_EONT
 
 
 checkOptree ( name	=> 'regression test for patch 25352',
-	      bcopts	=> \@( <qw/ BEGIN END INIT CHECK -exec /),
+	      bcopts	=> \qw/ BEGIN END INIT CHECK -exec /,
 	      prog	=> 'print q/foo/',
               todo      => "kurila changes",
 	      < @warnings_todo,

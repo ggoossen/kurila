@@ -19,19 +19,19 @@ $x = \*aa;
 { no strict 'refs'; local ${*{$x}};     $aa = 7; is($aa,7); undef $x; is($aa,7); }
 is($aa,1);
 
-@aa = @( < qw/a b/ );
-{ local @aa;     @aa = @( < qw/c d/ ); is("{join ' ', @( <@aa)}","c d"); }
-is("{join ' ', @( <@aa)}","a b");
-{ local @aa;   @aa = @( < qw/e f/ ); is("{join ' ', @( <@aa)}","e f"); }
-is("{join ' ', @( <@aa)}","a b");
-{ no strict 'refs'; local @{*{Symbol::fetch_glob("aa")}}; @aa = @( < qw/g h/ ); is("{join ' ', @( <@aa)}","g h"); }
-is("{join ' ', @( <@aa)}","a b");
+@aa = qw/a b/;
+{ local @aa;     @aa = qw/c d/; is("{join ' ',@aa}","c d"); }
+is("{join ' ',@aa}","a b");
+{ local @aa;   @aa = qw/e f/; is("{join ' ',@aa}","e f"); }
+is("{join ' ',@aa}","a b");
+{ no strict 'refs'; local @{*{Symbol::fetch_glob("aa")}}; @aa = qw/g h/; is("{join ' ',@aa}","g h"); }
+is("{join ' ',@aa}","a b");
 $x = \*aa;
-{ no strict 'refs'; local @{*{$x}};   @aa = @( < qw/i j/ ); is("{join ' ', @( <@aa)}","i j"); undef $x; is("{join ' ', @( <@aa)}","i j"); }
-is("{join ' ', @( <@aa)}","a b");
+{ no strict 'refs'; local @{*{$x}};   @aa = qw/i j/; is("{join ' ',@aa}","i j"); undef $x; is("{join ' ',@aa}","i j"); }
+is("{join ' ',@aa}","a b");
 $x = \*aa;
-{ no strict 'refs'; local @{*{$x}};     @aa = @( < qw/m n/ ); is("{join ' ', @( <@aa)}","m n"); undef $x; is("{join ' ', @( <@aa)}","m n"); }
-is("{join ' ', @( <@aa)}","a b");
+{ no strict 'refs'; local @{*{$x}};     @aa = qw/m n/; is("{join ' ',@aa}","m n"); undef $x; is("{join ' ',@aa}","m n"); }
+is("{join ' ',@aa}","a b");
 
 %aa = %( < qw/a b/ );
 { local %aa;     %aa = %( < qw/c d/ ); is(%aa{c},"d"); }

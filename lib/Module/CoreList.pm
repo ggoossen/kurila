@@ -95,7 +95,7 @@ sub import {
 }
 
 END {
-    print "---INC---\n", join "\n", @(  < keys %INC)
+    print "---INC---\n", join "\n", keys %INC
       if $dumpinc;
 }
 
@@ -105,29 +105,29 @@ sub first_release_raw {
 
     my @perls = @( $version
         ? < grep { exists %version{$_}->{ $module } &&
-                        %version{$_}->{ $module } +>= $version } @( < keys %version)
-        : < grep { exists %version{$_}->{ $module }             } @( < keys %version) );
+                        %version{$_}->{ $module } +>= $version } keys %version
+        : < grep { exists %version{$_}->{ $module }             } keys %version );
 
     return @perls;
 }
 
 sub first_release_by_date {
-    my @perls = @( < &first_release_raw );
+    my @perls = &first_release_raw;
     return unless (nelems @perls);
-    return (sort { %released{$a} cmp %released{$b} } @( < @perls))[0];
+    return (sort { %released{$a} cmp %released{$b} } @perls)[0];
 }
 
 sub first_release {
-    my @perls = @( < &first_release_raw );
+    my @perls = &first_release_raw;
     return unless (nelems @perls);
-    return (sort { $a cmp $b } @( < @perls))[0];
+    return (sort { $a cmp $b } @perls)[0];
 }
 
 sub find_modules {
     my $discard = shift;
     my $regex = shift;
-    my @perls = @( < @_ );
-    @perls = @( < keys %version ) unless (nelems @perls);
+    my @perls = @_;
+    @perls = keys %version unless (nelems @perls);
 
     my %mods;
     foreach ( @perls) {
@@ -135,7 +135,7 @@ sub find_modules {
             %mods{$k}++ if $k =~ $regex;
         }
     }
-    return @( < sort @( < keys %mods))
+    return sort keys %mods
 }
 
 sub find_version {
@@ -205,7 +205,7 @@ sub find_version {
     5.010000 => \@(perl => 32642),
 );
 
-for my $version (@( < sort { $a <+> $b } @( < keys %released)) ) {
+for my $version ( sort { $a <+> $b } keys %released ) {
     my $family = int ($version * 1000) / 1000;
     push @{ %families{ $family }} , $version;
 }

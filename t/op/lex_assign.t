@@ -13,13 +13,13 @@ $| = 1;
 umask 0;
 $xref = \ "";
 $runme = $^X;
-@a = @( <1..5);
+@a =1..5;
 %h = %( <1..6);
 $aref = \@a;
 $href = \%h;
 open OP, '-|', qq{$runme -le "print 'aaa Ok ok' for 1..100"};
 $chopit = 'aaaaaa';
-@chopar = @( <113 .. 119);
+@chopar =113 .. 119;
 $posstr = '123456';
 $cstr = 'aBcD.eF';
 pos $posstr = 3;
@@ -27,11 +27,11 @@ $nn = $n = 2;
 sub subb {"in s"}
 
 @INPUT = @( ~< *DATA );
-@simple_input = @( < grep m/^\s*\w+\s*\$\w+\s*[#\n]/, @( < @INPUT) );
+@simple_input = grep m/^\s*\w+\s*\$\w+\s*[#\n]/, @INPUT;
 
 plan 6 + (nelems @INPUT) + nelems @simple_input;
 
-sub wrn {"{join ' ', @( <@_)}"}
+sub wrn {"{join ' ',@_}"}
 
 # Check correct optimization of ucfirst etc
 my $a = "AB";

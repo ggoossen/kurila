@@ -29,7 +29,7 @@ is_deeply($root, \@a);
 
 1 while unlink 'store';
 
-package FOO; our @ISA = @( < qw(Storable) );
+package FOO; our @ISA = qw(Storable);
 
 sub make {
 	my $self = bless \%();

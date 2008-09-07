@@ -15,15 +15,15 @@ use warnings; # uses #3 and #4, since warnings uses Carp
 use Exporter (); # use #5
 
 our $VERSION   = "0.74";
-our @ISA       = @( < qw(Exporter) );
-our @EXPORT_OK = @( < qw( set_style set_style_standard add_callback
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw( set_style set_style_standard add_callback
 		     concise_subref concise_cv concise_main
-		     add_style walk_output compile reset_sequence ) );
+		     add_style walk_output compile reset_sequence );
 our %EXPORT_TAGS =
-    %( io	=> \@( <qw( walk_output compile reset_sequence )),
-      style	=> \@( <qw( add_style set_style_standard )),
-      cb	=> \@( <qw( add_callback )),
-      mech	=> \@( <qw( concise_subref concise_cv concise_main )),  );
+    %( io	=> \qw( walk_output compile reset_sequence ),
+      style	=> \qw( add_style set_style_standard ),
+      cb	=> \qw( add_callback ),
+      mech	=> \qw( concise_subref concise_cv concise_main ),  );
 
 # use #6
 use B < qw(class ppname main_start main_root main_cv cstring svref_2object
@@ -94,7 +94,7 @@ sub add_style {
     die "style '$newstyle' already exists, choose a new name\n"
 	if exists %style{$newstyle};
     die "expecting 3 style-format args\n" unless (nelems @args) == 3;
-    %style{$newstyle} = \@(< @args);
+    %style{$newstyle} = \ @args;
     $stylename = $newstyle; # update rendering state
 }
 
@@ -142,7 +142,7 @@ sub concise_subref {
 
 sub concise_stashref {
     my($order, $h) = < @_;
-    foreach my $k (@( <sort @( < keys %$h))) {
+    foreach my $k (sort keys %$h) {
 	next unless defined $h->{$k};
 	my $s = \($h->{$k});
 	my $coderef = *$s{CODE} or next;
@@ -242,8 +242,8 @@ sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if ((nelems @_)) {
-	@options = @( < grep { (! ref) && m/^-/ } @( < @_) );
-	@args = @( < grep { (ref $_) || !m/^-/ } @( < @_) );
+	@options = grep { (! ref) && m/^-/ } @_;
+	@args = grep { (ref $_) || !m/^-/ } @_;
     }
     for my $o ( @options) {
 	# mode/order
@@ -303,10 +303,10 @@ sub compileOpts {
 }
 
 sub compile {
-    my @args = @( < compileOpts(< @_) );
+    my @args = compileOpts(< @_);
     return sub {
-	my @newargs = @( < compileOpts(< @_) ); # accept new rendering options
-	warn "disregarding non-options: {join ' ', @( <@newargs)}\n" if (nelems @newargs);
+	my @newargs = compileOpts(< @_); # accept new rendering options
+	warn "disregarding non-options: {join ' ',@newargs}\n" if (nelems @newargs);
 
 	for ( @args) {
             my $objname = $_;
@@ -375,7 +375,7 @@ my %opclass = %('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
 	       'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#");
 
 no warnings 'qw'; # "Possible attempt to put comments..."; use #7
-my @linenoise = @( <
+my @linenoise =
   qw'#  () sc (  @? 1  $* gv *{ m$ m@ m% m? p/ *$ $  $# & a& pt \\ s\\ rf bl
      `  *? <> ?? ?/ r/ c/ // qr s/ /c y/ =  @= C  sC Cp sp df un BM po +1 +I
      -1 -I 1+ I+ 1- I- ** *  i* /  i/ %$ i% x  +  i+ -  i- .  "  << >> <  i<
@@ -390,7 +390,7 @@ my @linenoise = @( <
      co cr u. cm ut r. l@ s@ r@ mD uD oD rD tD sD wD cD f$ w$ p$ sh e$ k$ g3
      g4 s4 g5 s5 T@ C@ L@ G@ A@ S@ Hg Hc Hr Hw Mg Mc Ms Mr Sg Sc So rq do {e
      e} {t t} g6 G6 6e g7 G7 7e g8 G8 8e g9 G9 9e 6s 7s 8s 9s 6E 7E 8E 9E Pn
-     Pu GP SP EP Gn Gg GG SG EG g0 c$ lk t$ ;s n> // /= CO' );
+     Pu GP SP EP Gn Gg GG SG EG g0 c$ lk t$ ;s n> // /= CO';
 
 my $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -406,7 +406,7 @@ sub op_flags { # common flags (see BASOP.op_flags in op.h)
     push @v, "M" if $x ^&^ 32;
     push @v, "S" if $x ^&^ 64;
     push @v, "*" if $x ^&^ 128;
-    return join("", @( < @v));
+    return join("", @v);
 }
 
 sub base_n {
@@ -414,7 +414,7 @@ sub base_n {
     return "-" . base_n(-$x) if $x +< 0;
     my $str = "";
     do { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
-    $str = join '', @( < reverse @( < split m//, $str)) if $big_endian;
+    $str = join '', reverse split m//, $str if $big_endian;
     return $str;
 }
 
@@ -647,14 +647,14 @@ our %hints; # used to display each COP's op_hints values
 sub _flags {
     my($hash, $x) = < @_;
     my @s;
-    for my $flag (@( <sort {$b <+> $a} @( < keys %{$hash || \%()}))) {
+    for my $flag (sort {$b <+> $a} keys %{$hash || \%()}) {
 	if ($hash->{$flag} and $x ^&^ $flag and $x +>= $flag) {
 	    $x -= $flag;
 	    push @s, $hash->{$flag};
 	}
     }
     push @s, $x if $x;
-    return join(",", @( < @s));
+    return join(",", @s);
 }
 
 sub private_flags {
@@ -939,7 +939,7 @@ sub tree {
 	@lines[0] = $single . @lines[0];
     }
     return @("$name$lead" . shift @lines,
-           < map(" " x (length($name)+$size) . $_, @( < @lines)));
+           < map(" " x (length($name)+$size) . $_, @lines));
 }
 
 # *** Warning: fragile kludge ahead ***

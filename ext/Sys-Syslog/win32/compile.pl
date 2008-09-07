@@ -60,14 +60,14 @@ close($header);
 
 my ($hash, $f2c, %fac);
 
-for my $name (@( <sort { substr($a,0,1) cmp substr($b,0,1) || %vals{$a} <+> %vals{$b} } @( < keys %vals))) {
+for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || %vals{$a} <+> %vals{$b} } keys %vals) {
     $hash .= "    $name => %vals{$name},\n" ;
     if ($name =~ m/^CAT_(\w+)$/) {
         %fac{$1} = %vals{$name};
     }
 }
 
-for my $name (@( <sort {%fac{$a} <+> %fac{$b}} @( < keys %fac))) {
+for my $name (sort {%fac{$a} <+> %fac{$b}} keys %fac) {
     $f2c .= "    Sys::Syslog::LOG_$name() => '$name',\n";
 }    
 

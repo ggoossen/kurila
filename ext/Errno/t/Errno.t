@@ -19,7 +19,7 @@ ok(exists %!{$err});
 $! = 0;
 ok(! %!{$err});
 
-ok(join(",", @( <sort @( < keys(%!)))) eq join(",", @( <sort @( < @Errno::EXPORT_OK))));
+ok(join(",",sort keys(%!)) eq join(",",sort @Errno::EXPORT_OK));
 
 try { exists %!{''} };
 ok(! $@);

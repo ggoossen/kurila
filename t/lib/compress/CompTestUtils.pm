@@ -41,7 +41,7 @@ sub like_eval
         }
         chmod 0777, < @_;
         for ( @_) { 1 while unlink $_ } ;
-        bless \@( < @_ ), $self ;
+        bless \ @_, $self ;
     }
 
     sub DESTROY
@@ -61,7 +61,7 @@ sub like_eval
     {
         my $self = shift ;
         foreach ( @_) { rmtree $_ }
-        bless \@( < @_ ), $self ;
+        bless \ @_, $self ;
     }
 
     sub DESTROY
@@ -92,7 +92,7 @@ sub readFile
         close F ;
     }
 
-    return join "", @( < @strings) ;
+    return join "", @strings ;
 }
 
 sub touch
@@ -300,7 +300,7 @@ my %TopFuncMap = %(  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip'
 
    %TopFuncMap = %( < map { ($_              => %TopFuncMap{$_}, 
                         %TopFuncMap{$_} => %TopFuncMap{$_}) } 
- @( <                 keys %TopFuncMap) ) ;
+                 keys %TopFuncMap ) ;
 
  #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) } 
                  #keys %TopFuncMap ;
@@ -324,7 +324,7 @@ my %inverse  = %( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gu
                  'IO::Compress::DummyComp'               => 'IO::Uncompress::DummyUncomp',
              );
 
-%inverse  = %( < map { ($_ => %inverse{$_}, %inverse{$_} => $_) } @( < keys %inverse) );
+%inverse  = %( < map { ($_ => %inverse{$_}, %inverse{$_} => $_) } keys %inverse );
 
 sub getInverse
 {
@@ -402,7 +402,7 @@ sub anyUncompress
     my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
     {
-        @opts = @( < @$buffer );
+        @opts = @$buffer;
         $buffer = shift @opts;
     }
 
@@ -462,7 +462,7 @@ sub getHeaders
     my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
     {
-        @opts = @( < @$buffer );
+        @opts = @$buffer;
         $buffer = shift @opts;
     }
 
@@ -583,7 +583,7 @@ sub dumpObj
 
     if ((nelems @_))
     {
-        print "#\n# dumpOBJ from $file line $line {join ' ', @( <@_)}\n" ;
+        print "#\n# dumpOBJ from $file line $line {join ' ',@_}\n" ;
     }
     else
     {
@@ -591,12 +591,12 @@ sub dumpObj
     }
 
     my $max = 0 ;;
-    foreach my $k (@( <keys %{ *$obj }))
+    foreach my $k (keys %{ *$obj })
     {
         $max = length $k if length $k +> $max ;
     }
 
-    foreach my $k (@( <sort @( < keys %{ *$obj })))
+    foreach my $k (sort keys %{ *$obj })
     {
         my $v = $obj->{$k} ;
         $v = '-undef-' unless defined $v;

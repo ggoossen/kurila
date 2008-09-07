@@ -178,7 +178,7 @@ SKIP: {
     my $adata = "0" x $nsem;
 
     is(nelems(@data),$nsem,'right amount');
-    cmp_ok(join("", @(<@data)),'eq',$adata,'right data');
+    cmp_ok(join("",@data),'eq',$adata,'right data');
 
     my $poke = 2;
 
@@ -191,7 +191,7 @@ SKIP: {
     @data = @(unpack("s!*",$data));
     my $bdata = "0" x $poke . "1" . "0" x ($nsem-$poke-1);
 
-    cmp_ok(join("", @(<@data)),'eq',$bdata,'changed');
+    cmp_ok(join("",@data),'eq',$bdata,'changed');
 } # SKIP
 
 END {

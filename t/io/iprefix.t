@@ -18,7 +18,7 @@ for my $file ( @tfiles) {
              args => \@('>', $file) );
 }
 
-@ARGV = @( < @tfiles );
+@ARGV = @tfiles;
 
 while ( ~< *ARGV) {
     s/foo/bar/;

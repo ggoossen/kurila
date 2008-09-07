@@ -31,10 +31,10 @@ sub have_cc
     if ($@) {
         try { require Config; };   # Everyone else
     }
-    my @chunks = @( < split(m/ /, %Config::Config{cc}) );
+    my @chunks = split(m/ /, %Config::Config{cc});
     # $Config{cc} may contain args; try to find out the program part
     while ((nelems @chunks)) {
-        if (check_cc("{join ' ', @( <@chunks)}")) {
+        if (check_cc("{join ' ',@chunks}")) {
             return  @(1);   # CC command found
         }
         pop(@chunks);
@@ -45,7 +45,7 @@ sub have_cc
 
 # Build options for different environments
 my @conditional_params;
-if (grep { $_ eq 'PERL_CORE=1' } @( < @ARGV)) {
+if (grep { $_ eq 'PERL_CORE=1' } @ARGV) {
     # Core
     push(@conditional_params, 'NORECURS' => 1);
 } else {

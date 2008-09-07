@@ -23,7 +23,7 @@ EOD
 my $t1 = \%( data => $data,  write_c => \@(1,2,length $data),  read_c => \@(1,2,3,length $data));
 my $t2 = \%( data => $data2, write_c => \@(1,2,length $data2), read_c => \@(1,2,3,length $data2));
 
-$_->{write_c} = \@( <1..length($_->{data})),
+$_->{write_c} = \1..length($_->{data}),
   $_->{read_c} = \@( <1..length($_->{data})+1, 0xe000)  # Need <0xffff for REx
     for @( ()); # $t1, $t2;
 
@@ -87,7 +87,7 @@ sub testpipe ($$$$$$) {
 
 sub testfile ($$$$$$) {
   my ($str, $write_c, $read_c, $how_w, $how_r, $why) = < @_;
-  my @data = @( < grep length, @( < split m/(.{1,$write_c})/s, $str) );
+  my @data = grep length, split m/(.{1,$write_c})/s, $str;
 
   open my $fh, '>', 'io_io.tmp' or die;
   select $fh;
@@ -121,7 +121,7 @@ my @c;
 push @c, ord $c while $c = getc $fh;
 ok(1, 'got chars');
 is(scalar nelems @c, 9, 'got 9 chars');
-is("{join ' ', @( <@c)}", '97 10 98 10 10 99 10 10 10', 'got expected chars');
+is("{join ' ',@c}", '97 10 98 10 10 99 10 10 10', 'got expected chars');
 ok(close($fh), 'close');
 
 for my $s (1..2) {
@@ -131,9 +131,9 @@ for my $s (1..2) {
   my $w = $t->{write_c};
   for my $read_c ( @$r) {
     for my $write_c ( @$w) {
-      for my $how_r (@( <qw(readline_all readline read sysread))) {
+      for my $how_r (qw(readline_all readline read sysread)) {
 	next if $how_r eq 'readline_all' and $read_c != 1;
-        for my $how_w (@( <qw(print print/flush syswrite))) {
+        for my $how_w (qw(print print/flush syswrite)) {
 	  testfile($str, $write_c, $read_c, $how_w, $how_r, $s);
 	  testpipe($str, $write_c, $read_c, $how_w, $how_r, $s);
         }

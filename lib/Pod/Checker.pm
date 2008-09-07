@@ -344,8 +344,8 @@ use Exporter;
 use Pod::Parser;
 
 use vars < qw(@ISA @EXPORT);
-@ISA = @( < qw(Pod::Parser) );
-@EXPORT = @( < qw(&podchecker) );
+@ISA = qw(Pod::Parser);
+@EXPORT = qw(&podchecker);
 
 use vars < qw(%VALID_COMMANDS %VALID_SEQUENCES);
 
@@ -608,7 +608,7 @@ sub poderror {
     my %opts = %( (ref @_[0]) ? < %{shift()} : () );
 
     ## Retrieve options
-    chomp( my $msg  = (%opts{-msg} || "")."{join ' ', @( <@_)}" );
+    chomp( my $msg  = (%opts{-msg} || "")."{join ' ',@_}" );
     my $line = (exists %opts{-line}) ? " at line %opts{-line}" : "";
     my $file = (exists %opts{-file}) ? " in file %opts{-file}" : "";
     unless (exists %opts{-severity}) {
@@ -789,8 +789,8 @@ sub end_pod {
     # check the internal nodes for uniqueness. This pertains to
     # =headX, =item and X<...>
     if($self->{-warnings} && $self->{-warnings}+>1) {
-      foreach(@(< grep($self->{_unique_nodes}->{$_} +> 1, @( <
-        keys %{$self->{_unique_nodes}})))) {
+      foreach( grep($self->{_unique_nodes}->{$_} +> 1,
+        keys %{$self->{_unique_nodes}})) {
           $self->poderror(\%( -line => '-', -file => $infile,
             -severity => 'WARNING',
             -msg => "multiple occurrence of link target '$_'"));

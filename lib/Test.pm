@@ -23,8 +23,8 @@ $VERSION = '1.25';
 require Exporter;
 @ISA=@('Exporter');
 
-@EXPORT    = @( < qw(&plan &ok &skip) );
-@EXPORT_OK = @( < qw($ntest $TESTOUT $TESTERR) );
+@EXPORT    = qw(&plan &ok &skip);
+@EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
 
 $|=1;
 $TESTOUT = *STDOUT{IO};
@@ -168,9 +168,9 @@ sub plan {
 	}
 	else { warn "Test::plan(): skipping unrecognized directive '$k'" }
     }
-    my @todo = @( < sort { $a <+> $b } @( < keys %todo) );
+    my @todo = sort { $a <+> $b } keys %todo;
     if ((nelems @todo)) {
-	print $TESTOUT "1..$max todo ".join(' ', @( < @todo)).";\n";
+	print $TESTOUT "1..$max todo ".join(' ', @todo).";\n";
     } else {
 	print $TESTOUT "1..$max\n";
     }
@@ -518,8 +518,8 @@ sub _diff_complain_external {
 sub _diff_complain_algdiff {
     my($result, $expected, $detail, $prefix) = < @_;
 
-    my @got = @( < split(m/^/, $result) );
-    my @exp = @( < split(m/^/, $expected) );
+    my @got = split(m/^/, $result);
+    my @exp = split(m/^/, $expected);
 
     my $diff_kind;
     my @diff_lines;
@@ -573,7 +573,7 @@ sub _diff_complain_algdiff {
         my $kind = shift;
         &$diff_flush() if $diff_kind && $diff_kind ne $kind;
         $diff_kind = $kind;
-        push(@diff_lines, \@(< @_));
+        push(@diff_lines, \ @_);
     };
 
 

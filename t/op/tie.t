@@ -12,7 +12,7 @@
 $|=1;
 
 undef $/;
-our @prgs = @( < split m/^########\n/m, ~< *DATA );
+our @prgs = split m/^########\n/m, ~< *DATA;
 
 BEGIN { require './test.pl'; }
 plan(tests => scalar nelems @prgs);

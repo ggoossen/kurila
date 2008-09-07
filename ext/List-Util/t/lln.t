@@ -5,7 +5,7 @@ use strict;
 use Test::More tests => 14;
 use Scalar::Util < qw(looks_like_number);
 
-foreach my $num (@( <qw(1 -1 +1 1.0 +1.0 -1.0 -1.0e-12))) {
+foreach my $num (qw(1 -1 +1 1.0 +1.0 -1.0 -1.0e-12)) {
   ok(looks_like_number($num), "'$num'");
 }
 

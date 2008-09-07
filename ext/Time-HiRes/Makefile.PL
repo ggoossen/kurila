@@ -25,7 +25,7 @@ my $ld_exeext = ($^O eq 'cygwin' ||
                 (($^O eq 'vos') ? %Config{exe_ext} : '');
 
 unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @( < @ARGV);
+    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
 }
 
 use File::Spec;
@@ -95,7 +95,7 @@ __EOD__
 	    $errornull = '';
 	}
 
-        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c {join ' ', @( <@$LIBS)} $errornull"
+        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c {join ' ',@$LIBS} $errornull"
 	    unless defined $cccmd;
 
        if ($^O eq 'VMS') {
@@ -335,7 +335,7 @@ sub init {
 	do $hints;
 	if (exists $self->{LIBS}) {
 	    $LIBS = $self->{LIBS};
-	    print "Extra libraries: {join ' ', @( <@$LIBS)}...\n";
+	    print "Extra libraries: {join ' ',@$LIBS}...\n";
 	}
     }
 
@@ -732,7 +732,7 @@ sub doMakefile {
 
 sub doConstants {
     if (try {require ExtUtils::Constant; 1}) {
-	my @names = @( < qw(CLOCK_HIGHRES CLOCK_MONOTONIC
+	my @names = qw(CLOCK_HIGHRES CLOCK_MONOTONIC
 		       CLOCK_PROCESS_CPUTIME_ID
 		       CLOCK_REALTIME
 		       CLOCK_SOFTTIME
@@ -741,10 +741,10 @@ sub doConstants {
 		       CLOCKS_PER_SEC
 		       ITIMER_REAL ITIMER_VIRTUAL ITIMER_PROF
 		       ITIMER_REALPROF
-		       TIMER_ABSTIME) );
-	foreach (@( <qw (d_usleep d_ualarm d_gettimeofday d_getitimer d_setitimer
+		       TIMER_ABSTIME);
+	foreach (qw (d_usleep d_ualarm d_gettimeofday d_getitimer d_setitimer
 		     d_nanosleep d_clock_gettime d_clock_getres
-		     d_clock d_clock_nanosleep d_hires_stat))) {
+		     d_clock d_clock_nanosleep d_hires_stat)) {
 	    my $macro = $_;
 	    if ($macro =~ m/^(d_nanosleep|d_clock_gettime|d_clock_getres|d_clock|d_clock_nanosleep)$/) {
 		$macro =~ s/^d_(.+)/TIME_HIRES_\U$1/;

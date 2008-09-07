@@ -40,10 +40,8 @@ sub parse_from_file {
   my $render = $self->{'__nroffer'} || die "no nroffer set!?";
   
   # turn the switches into CLIs
-  my $switches = join ' ', @(
-    < map qq{"--$_=$self->{$_}"}, @(
-      < grep !m/^_/s, @( <
-        keys %$self)))
+  my $switches = join ' ', map qq{"--$_=$self->{$_}"}, grep !m/^_/s,
+        keys %$self
   ;
 
   my $pod2man =
@@ -123,13 +121,13 @@ sub parse_from_file {
 
 sub ___Do_filter_nroff {
   my $self = shift;
-  my @data = @( < split m/\n{2,}/, shift );
+  my @data = split m/\n{2,}/, shift;
   
   shift @data while (nelems @data) and @data[0] !~ m/\S/; # Go to header
   shift @data if (nelems @data) and @data[0] =~ m/Contributed\s+Perl/; # Skip header
   pop @data if (nelems @data) and @data[-1] =~ m/^\w/; # Skip footer, like
 				# 28/Jan/99 perl 5.005, patch 53 1
-  join "\n\n", @( < @data);
+  join "\n\n", @data;
 }
 
 1;

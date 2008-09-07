@@ -16,7 +16,7 @@ print OUT <<"END";
  */
 END
 
-foreach my $const (@( <qw(
+foreach my $const (qw(
 		      CVf_ANON
 		      CVf_CLONE
 		      CVf_CLONED
@@ -48,7 +48,7 @@ foreach my $const (@( <qw(
 		      SVt_PVHV
 		      PAD_FAKELEX_ANON
 		      PAD_FAKELEX_MULTI
-		      )))
+		      ))
  {
   doconst($const);
  }

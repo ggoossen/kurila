@@ -29,10 +29,9 @@ sub parse_from_file {
   my $self = shift;
   my $file = @_[0];
   
-  my @options = @(
-    < map {; $_, $self->{$_} }
- @(      < grep !m/^_/s, @( <
-        keys %$self)) )
+  my @options = map {; $_, $self->{$_} }
+ grep !m/^_/s,
+        keys %$self
   ;
   
   defined(&Pod::Perldoc::DEBUG)
@@ -40,7 +39,7 @@ sub parse_from_file {
    and print "About to call new Pod::Man ",
     $Pod::Man::VERSION ? "(v$Pod::Man::VERSION) " : '',
     "with options: ",
-    (nelems @options) ? "[{join ' ', @( <@options)}]" : "(nil)", "\n";
+    (nelems @options) ? "[{join ' ',@options}]" : "(nil)", "\n";
   ;
 
   Pod::Man->new(< @options)->parse_from_file(< @_);

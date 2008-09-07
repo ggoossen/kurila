@@ -99,7 +99,7 @@ for my $dbun (@(1, 0)) {  # dbun - don't be utterly nasty - being utterly
     ok($oh_dear->[0], "keep it so", "amagic ok 1");
     ok($oh_dear->[$dbun]->[0], "keep it so", "amagic ok 2");
 
-    @{$nasty} = @( < @{$nasty}[[@(0, 2, 1)]] );
+    @{$nasty} = @{$nasty}[[@(0, 2, 1)]];
     headit("closure freeze BETWEEN circular overload");
     #print Dumper $nasty;
     $icicle = freeze $nasty;
@@ -110,7 +110,7 @@ for my $dbun (@(1, 0)) {  # dbun - don't be utterly nasty - being utterly
     ok($oh_dear->[0], "keep it so", "amagic ok 1");
     ok($oh_dear->[$dbun?2:0]->[0], "keep it so", "amagic ok 2");
 
-    @{$nasty} = @( < @{$nasty}[[@(1, 0, 2)]] );
+    @{$nasty} = @{$nasty}[[@(1, 0, 2)]];
     headit("closure freeze BEFORE circular overload");
     #print Dumper $nasty;
     $icicle = freeze $nasty;

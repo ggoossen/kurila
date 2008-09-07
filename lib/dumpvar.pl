@@ -60,9 +60,8 @@ sub unctrl {
 }
 
 sub uniescape {
-    join("", @(
-	 < map { $_ +> 255 ? sprintf("\\x\{\%04X\}", $_) : chr($_) }
- @(	     unpack("U*", @_[0]))));
+    join("", map { $_ +> 255 ? sprintf("\\x\{\%04X\}", $_) : chr($_) }
+ @(	     unpack("U*", @_[0])));
 }
 
 sub stringify {
@@ -129,9 +128,9 @@ sub ShortArray {
     unless  $arrayDepth eq '' ; 
   my $shortmore = "";
   $shortmore = " ..." if $tArrayDepth +< (nelems @{@_[0]})-1 ;
-  if (!grep(ref $_, @( < @{@_[0]}))) {
-    $short = "0..{join ' ', @( <@{@_[0]})}-1  '" . 
-      join("' '", @( < @{@_[0]}[[@( <0..$tArrayDepth)]])) . "'$shortmore";
+  if (!grep(ref $_, @{@_[0]})) {
+    $short = "0..{join ' ',@{@_[0]}}-1  '" . 
+      join("' '", @{@_[0]}[[0..$tArrayDepth]]) . "'$shortmore";
     return $short if length $short +<= $compactDump;
   }
   undef;
@@ -140,14 +139,14 @@ sub ShortArray {
 sub DumpElem {
   my $short = &stringify(@_[0], ref @_[0]);
   if ($veryCompact && ref @_[0]
-      && (ref @_[0] eq 'ARRAY' and !grep(ref $_, @( < @{@_[0]})) )) {
-    my $end = "0..{join ' ', @( <@{$v})}-1  '" . 
-      join("' '", @( < @{@_[0]}[[@( <0..$tArrayDepth)]])) . "'$shortmore";
+      && (ref @_[0] eq 'ARRAY' and !grep(ref $_, @{@_[0]}) )) {
+    my $end = "0..{join ' ',@{$v}}-1  '" . 
+      join("' '", @{@_[0]}[[0..$tArrayDepth]]) . "'$shortmore";
   } elsif ($veryCompact && ref @_[0]
-      && (ref @_[0] eq 'HASH') and !grep(ref $_, @( < values %{@_[0]}))) {
+      && (ref @_[0] eq 'HASH') and !grep(ref $_, values %{@_[0]})) {
     my $end = 1;
-	  $short = $sp . "0..{join ' ', @( <@{$v})}-1  '" . 
-	    join("' '", @( < @{$v}[[@( <0..$tArrayDepth)]])) . "'$shortmore";
+	  $short = $sp . "0..{join ' ',@{$v}}-1  '" . 
+	    join("' '", @{$v}[[0..$tArrayDepth]]) . "'$shortmore";
   } else {
     print "$short\n";
     unwrap(@_[0],@_[1],@_[2]) if ref @_[0];
@@ -211,7 +210,7 @@ sub unwrap {
 
     if ( $item_type eq 'HASH' ) { 
         # Hash ref or hash-based object.
-	my @sortKeys = @( < sort @( < keys(%$v)) ) ;
+	my @sortKeys = sort keys(%$v) ;
 	undef $more ; 
 	$tHashDepth = (nelems @sortKeys)-1 ; 
 	$tHashDepth = (nelems @sortKeys)-1 +< $hashDepth-1 ? (nelems @sortKeys)-1 : $hashDepth-1
@@ -220,7 +219,7 @@ sub unwrap {
 	$shortmore = "";
 	$shortmore = ", ..." if $tHashDepth +< (nelems @sortKeys)-1 ; 
 	splice(@sortKeys, $tHashDepth+1);
-	if ($compactDump && !grep(ref $_, @( < values %{$v}))) {
+	if ($compactDump && !grep(ref $_, values %{$v})) {
 	  #$short = $sp . 
 	  #  (join ', ', 
 # Next row core dumps during require from DB on 5.000, even with map {"_"}
@@ -231,7 +230,7 @@ sub unwrap {
 	  for ( @sortKeys) {
 	    push @keys, &stringify($_) . " => " . &stringify($v->{$_});
 	  }
-	  $short .= join ', ', @( < @keys);
+	  $short .= join ', ', @keys;
 	  $short .= $shortmore;
 	  (print "$short\n"), return if length $short +<= $compactDump;
 	}
@@ -256,11 +255,10 @@ sub unwrap {
 	$shortmore = "";
 	$shortmore = " ..." if $tArrayDepth +< (nelems @$v)-1 ;
 
-	if ($compactDump && !grep(ref $_, @( < @{$v}))) {
+	if ($compactDump && !grep(ref $_, @{$v})) {
 	  if ((nelems @$v)) {
-	    $short = $sp . "0..{join ' ', @( <@{$v})}-1  " . 
-	      join(" ", @( 
-		   < map {exists $v->[$_] ? < stringify $v->[$_] : "empty"} @( ( <0..$tArrayDepth)))
+	    $short = $sp . "0..{join ' ',@{$v}}-1  " . 
+	      join(" ", map {exists $v->[$_] ? < stringify $v->[$_] : "empty"} @( ( <0..$tArrayDepth))
 		  ) . "$shortmore";
 	  } else {
 	    $short = $sp . "empty array";
@@ -407,7 +405,7 @@ sub dumpglob {
 sub dumplex {
   return if $DB::signal;
   my ($key, $val, $m, < @vars) = < @_;
-  return if (nelems @vars) && !grep( matchlex($key, $_), @( < @vars) );
+  return if (nelems @vars) && !grep( matchlex($key, $_), @vars );
   local %address;
   my $off = 0;  # It reads better this way
   my $fileno;
@@ -481,7 +479,7 @@ sub main::dumpvar {
     local $CompleteTotal = 0;
     while (($key,$val) = each(%stab)) {
       return if $DB::signal;
-      next if (nelems @vars) && !grep( matchvar($key, $_), @( < @vars) );
+      next if (nelems @vars) && !grep( matchvar($key, $_), @vars );
       if ($usageOnly) {
 	globUsage(\$val, $key)
 	  if ($package ne 'dumpvar' or $key ne 'stab')
@@ -506,7 +504,7 @@ sub scalarUsage {
 
 sub arrayUsage {		# array ref, name
   my $size = 0;
-  map {$size += scalarUsage($_)} @( < @{@_[0]});
+  map {$size += scalarUsage($_)} @{@_[0]};
   my $len = (nelems @{@_[0]});
   print "\@@_[1] = $len item", ($len +> 1 ? "s" : ""),
     " (data: $size bytes)\n"
@@ -516,8 +514,8 @@ sub arrayUsage {		# array ref, name
 }
 
 sub hashUsage {		# hash ref, name
-  my @keys = @( < keys %{@_[0]} );
-  my @values = @( < values %{@_[0]} );
+  my @keys = keys %{@_[0]};
+  my @values = values %{@_[0]};
   my $keys = arrayUsage \@keys;
   my $values = arrayUsage \@values;
   my $len = (nelems @keys);
@@ -549,7 +547,7 @@ sub packageUsage {
   local $CompleteTotal = 0;
   my ($key,$val);
   while (($key,$val) = each(%stab)) {
-    next if (nelems @vars) && !grep($key eq $_, @(< @vars));
+    next if (nelems @vars) && !grep($key eq $_, @vars);
     globUsage \$val, $key unless $package eq 'dumpvar' and $key eq 'stab';
   }
   print "String space: $TotalStrings.\n";

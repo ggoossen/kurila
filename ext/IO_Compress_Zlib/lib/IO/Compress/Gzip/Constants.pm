@@ -11,9 +11,9 @@ our ($GZIP_FNAME_INVALID_CHAR_RE, $GZIP_FCOMMENT_INVALID_CHAR_RE);
 
 $VERSION = '2.006';
 
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
-@EXPORT= @( < qw(
+@EXPORT= qw(
 
     GZIP_ID_SIZE
     GZIP_ID1
@@ -58,7 +58,7 @@ $VERSION = '2.006';
 
     GZIP_MINIMUM_HEADER
 
-    ) );
+    );
 
 # Constant names derived from RFC 1952
 

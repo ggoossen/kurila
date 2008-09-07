@@ -215,7 +215,7 @@ SWTESTPM
     like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
 
     # make sure each line we got matches the re
-    ok( !( grep !m/^i\D+size=/, @( < split m/^/, $r) ), '-V:re correct' );
+    ok( !( grep !m/^i\D+size=/, split m/^/, $r ), '-V:re correct' );
 }
 
 # Tests for -v
@@ -243,7 +243,7 @@ SWTESTPM
 
 # Tests for switches which do not exist
 
-foreach my $switch (@( <split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_"))
+foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
 {
     local $TODO = '';   # these ones should work on VMS
 
@@ -281,10 +281,10 @@ __EOF__
     chomp(my @bak = @( ~< *BAK ));
     close BAK;
 
-    is(join(":", @( < @file)),
+    is(join(":", @file),
        "bar yada dada:bada bar bing:king kong bar",
        "-i new file");
-    is(join(":", @( < @bak)),
+    is(join(":", @bak),
        "foo yada dada:bada foo bing:king kong foo",
        "-i backup file");
 }

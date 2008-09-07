@@ -18,7 +18,7 @@ our ($Error);
 
 our ($VERSION, @EXPORT_OK);
 $VERSION = '0.000_02';
-@EXPORT_OK = @( < qw( globmap ) );
+@EXPORT_OK = qw( globmap );
 
 
 our ($noPreBS, $metachars, $matchMetaRE, %mapping, %wildCount);
@@ -35,7 +35,7 @@ $matchMetaRE = '[' . quotemeta($metachars) . ']';
                 ')' => ')',
            );
 
-%wildCount = %( < map { $_ => 1 } @( < qw/ * ? . { ( [ /) );           
+%wildCount = %( < map { $_ => 1 } qw/ * ? . { ( [ / );           
 
 sub globmap ($$;)
 {
@@ -80,7 +80,7 @@ sub new
     $self->_parseOutputGlob()
         or return undef ;
     
-    my @inputFiles = @( < globber($self->{InputGlob}, $flags) ) ;
+    my @inputFiles = globber($self->{InputGlob}, $flags) ;
 
     if (GLOB_ERROR)
     {
@@ -90,7 +90,7 @@ sub new
 
     #if (whatever)
     {
-        my $missing = grep { ! -e $_ } @( < @inputFiles) ;
+        my $missing = grep { ! -e $_ } @inputFiles ;
 
         if ($missing)
         {
@@ -356,7 +356,7 @@ sub getHash
 {
     my $self = shift ;
 
-    return \%( < map { $_->[0] => $_->[1] } @( < @{ $self->{Pairs} }) ) ;
+    return \%( < map { $_->[0] => $_->[1] } @{ $self->{Pairs} } ) ;
 }
 
 1;

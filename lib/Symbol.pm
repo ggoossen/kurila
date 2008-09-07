@@ -95,16 +95,16 @@ you reload the C<Foo> module afterwards.
 use strict;
 
 require Exporter;
-our @ISA = @( < qw(Exporter) );
-our @EXPORT = @( < qw(gensym ungensym qualify qualify_to_ref) );
-our @EXPORT_OK = @( < qw(delete_package geniosym) );
+our @ISA = qw(Exporter);
+our @EXPORT = qw(gensym ungensym qualify qualify_to_ref);
+our @EXPORT_OK = qw(delete_package geniosym);
 
 our $VERSION = '1.06';
 
 my $genpkg = "Symbol";
 my $genseq = 0;
 
-my %global = %( < map {$_ => 1} @( < qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT)) );
+my %global = %( < map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) );
 
 #
 # Note that we never _copy_ the glob; we just make a ref to it.
@@ -171,7 +171,7 @@ sub delete_package ($) {
     # free all the symbols in the package
 
     my $leaf_symtab = *{$stem_symtab->{$leaf}}{HASH};
-    foreach my $name (@( <keys %$leaf_symtab)) {
+    foreach my $name (keys %$leaf_symtab) {
         undef *{Symbol::qualify_to_ref($pkg . $name)};
     }
 

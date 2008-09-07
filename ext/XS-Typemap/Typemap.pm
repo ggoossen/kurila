@@ -38,7 +38,7 @@ use vars < qw/ $VERSION @EXPORT /;
 
 $VERSION = '0.02';
 
-@EXPORT = @( <qw/
+@EXPORT =qw/
 	   T_SV
 	   T_SVREF
 	   T_AVREF
@@ -71,7 +71,7 @@ $VERSION = '0.02';
            T_OPAQUEPTR_IN_struct T_OPAQUEPTR_OUT_struct
 	   T_ARRAY
 	   T_STDIO_open T_STDIO_close T_STDIO_print
-	   /);
+	   /;
 
 
 XS::Typemap->bootstrap;

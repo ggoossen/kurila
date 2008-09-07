@@ -107,7 +107,7 @@ output the string to $FH if specified.
 if ( $^O eq 'VMS' )
 {
     chomp( my @entry = @( ~< *DATA ) );
-    $VMS_TERMCAP = join '', @( < @entry);
+    $VMS_TERMCAP = join '', @entry;
 }
 
 # Returns a list of termcap files to check.
@@ -142,7 +142,7 @@ sub termcap_path
     }
 
     # return the list of those termcaps that exist
-    return grep { defined $_ && -f $_ } @( < @termcap_path);
+    return grep { defined $_ && -f $_ } @termcap_path;
 }
 
 =item B<Tgetent>
@@ -285,7 +285,7 @@ sub Tgetent
         }
         else
         {
-            if ( grep { -x "$_/infocmp" } @( < split m/:/, %ENV{PATH}) )
+            if ( grep { -x "$_/infocmp" } split m/:/, %ENV{PATH} )
             {
                 try {
                     my $tmp = `infocmp -C 2>/dev/null`;
@@ -396,7 +396,7 @@ sub Tgetent
 
     # Precompile $entry into the object
     $entry =~ s/^[^:]*://;
-    foreach $field (@( < split( m/:[\s:\\]*/, $entry )) )
+    foreach $field ( split( m/:[\s:\\]*/, $entry ) )
     {
         if ( defined $field && $field =~ m/^(\w\w)$/ )
         {
@@ -688,7 +688,7 @@ sub Trequire
         push( @undefined, $cap )
           unless defined $self->{ '_' . $cap } && $self->{ '_' . $cap };
     }
-    croak "Terminal does not support: ({join ' ', @( <@undefined)})" if (nelems @undefined);
+    croak "Terminal does not support: ({join ' ',@undefined})" if (nelems @undefined);
 }
 
 =back

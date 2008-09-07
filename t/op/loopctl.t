@@ -972,6 +972,6 @@ TODO: {
     for my $x (@(reverse < @a37725)) {
 	$x = $i++;
     }
-    cmp_ok("{join ' ', @( <@a37725)}",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug');
+    cmp_ok("{join ' ',@a37725}",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug');
 }
 

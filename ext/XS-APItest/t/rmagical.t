@@ -20,10 +20,10 @@ my @f;
 
 rmagical_cast(\%h1, 0); # A
 rmagical_cast(\%h1, 1); # B
-@f = @( < rmagical_flags(\%h1) );
+@f = rmagical_flags(\%h1);
 ok(!@f[2], "For sv -> B -> A -> NULL, SvRMAGICAL(sv) is false");
 
 rmagical_cast(\%h2, 1); # B
 rmagical_cast(\%h2, 0); # A
-@f = @( < rmagical_flags(\%h2) );
+@f = rmagical_flags(\%h2);
 ok(!@f[2], "For sv -> A -> B -> NULL, SvRMAGICAL(sv) is false");

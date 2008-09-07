@@ -8,7 +8,7 @@ BEGIN {
 plan tests => 8;
 
 if (%Config{ebcdic} eq 'define') {
-    $_ = join "", @( < map chr($_), @( < 129..233));
+    $_ = join "", map chr($_), 129..233;
 
     # 105 characters - 52 letters = 53 backslashes
     # 105 characters + 53 backslashes = 158 characters
@@ -17,7 +17,7 @@ if (%Config{ebcdic} eq 'define') {
     # 104 non-backslash characters
     is((nelems @(m/([^\\])/g)), 104, "tr count non-backslashed");
 } else { # some ASCII descendant, then.
-    $_ = join "", @( < map chr($_), @( < 32..127));
+    $_ = join "", map chr($_), 32..127;
 
     # 96 characters - 52 letters - 10 digits - 1 underscore = 33 backslashes
     # 96 characters + 33 backslashes = 129 characters

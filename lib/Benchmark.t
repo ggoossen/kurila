@@ -212,7 +212,7 @@ is(ref ($got), 'HASH', "timethese should return a hashref");
 isa_ok($got->{Foo}, 'Benchmark', "Foo value");
 isa_ok($got->{Bar}, 'Benchmark', "Bar value");
 isa_ok($got->{Baz}, 'Benchmark', "Baz value");
-eq_set(\@( <keys %$got), \@( <qw(Foo Bar Baz)), 'should be exactly three objects');
+eq_set(\keys %$got, \qw(Foo Bar Baz), 'should be exactly three objects');
 is ($foo, $iterations, "Foo code was run $iterations times");
 is ($bar, $iterations, "Bar code was run $iterations times");
 is ($baz, $iterations, "Baz code was run $iterations times");
@@ -245,7 +245,7 @@ my $results;
     is(ref ($results), 'HASH', "timethese should return a hashref");
     isa_ok($results->{Foo}, 'Benchmark', "Foo value");
     isa_ok($results->{Bar}, 'Benchmark', "Bar value");
-    eq_set(\@( <keys %$results), \@( <qw(Foo Bar)), 'should be exactly two objects');
+    eq_set(\keys %$results, \qw(Foo Bar), 'should be exactly two objects');
     ok ($foo +> 0, "Foo code was run");
     ok ($bar +> 0, "Bar code was run");
 
@@ -342,7 +342,7 @@ sub check_graph_vs_output {
                     "check the chart layout matches the formatted output");
     unless ($all_passed) {
       print STDERR "# Something went wrong there. I got this chart:\n";
-      print STDERR "# $_\n" foreach @( < split m/\n/, $got);
+      print STDERR "# $_\n" foreach split m/\n/, $got;
     }
 }
 
@@ -514,23 +514,23 @@ sub check_graph {
 # being used, merely what's become cached.
 
 clearallcache();
-my @before_keys = @( <keys %Benchmark::Cache);
+my @before_keys =keys %Benchmark::Cache;
 $bar = 0;
 isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
-my @after5_keys = @( <keys %Benchmark::Cache);
+my @after5_keys =keys %Benchmark::Cache;
 $bar = 0;
 isa_ok(timeit(10, '++$bar'), 'Benchmark', "timeit eval");
 is ($bar, 10, "benchmarked code was run 10 times");
-ok (!eq_array (\@( <keys %Benchmark::Cache), \@after5_keys), "10 differs from 5");
+ok (!eq_array (\keys %Benchmark::Cache, \@after5_keys), "10 differs from 5");
 
 clearcache(10);
 # Hash key order will be the same if there are the same keys.
-is_deeply (\@( <keys %Benchmark::Cache), \@after5_keys,
+is_deeply (\keys %Benchmark::Cache, \@after5_keys,
            "cleared 10, only cached results for 5 should remain");
 
 clearallcache();
-is_deeply (\@( <keys %Benchmark::Cache), \@before_keys,
+is_deeply (\keys %Benchmark::Cache, \@before_keys,
            "back to square 1 when we clear the cache again?");
 
 
@@ -538,7 +538,7 @@ is_deeply (\@( <keys %Benchmark::Cache), \@before_keys,
     my %usage = %Benchmark::_Usage;
     delete %usage{runloop};  # not public, not worrying about it just now
 
-    my @takes_no_args = @( <qw(clearallcache disablecache enablecache));
+    my @takes_no_args =qw(clearallcache disablecache enablecache);
 
     my %cmpthese = %('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
                      'not result' => 'cmpthese(42)',
@@ -561,7 +561,7 @@ is_deeply (\@( <keys %Benchmark::Cache), \@before_keys,
 
 
     while( my($func, $usage) = each %usage ) {
-        next if grep $func eq $_, @( < @takes_no_args);
+        next if grep $func eq $_, @takes_no_args;
         eval "$func()";
         is( $@->{description}, $usage, "$func usage: no args" );
     }

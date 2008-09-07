@@ -19,10 +19,10 @@ our $VERSION = '6.44';
 our ($Revision) = q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
-our @ISA = @( < qw(Exporter) );
-our @EXPORT    = @( < qw(&WriteMakefile &writeMakefile $Verbose &prompt) );
-our @EXPORT_OK = @( < qw($VERSION &neatvalue &mkbootstrap &mksymlists
-                    &WriteEmptyMakefile) );
+our @ISA = qw(Exporter);
+our @EXPORT    = qw(&WriteMakefile &writeMakefile $Verbose &prompt);
+our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
+                    &WriteEmptyMakefile);
 
 # These will go away once the last of the Win32 & VMS specific code is 
 # purged.
@@ -96,8 +96,8 @@ my %Special_Sigs = %(
  test       => 'HASH',
 );
 
-< %Att_Sigs{[@( <keys %Recognized_Att_Keys)]} = ('') x (nelems(%Recognized_Att_Keys)/2);
-< %Att_Sigs{[@( <keys %Special_Sigs)]} = < values %Special_Sigs;
+< %Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x (nelems(%Recognized_Att_Keys)/2);
+< %Att_Sigs{[keys %Special_Sigs]} = < values %Special_Sigs;
 
 
 sub _verify_att {
@@ -112,8 +112,8 @@ sub _verify_att {
 
         my @sigs   = @( ref $sig ? < @$sig : $sig );
         my $given  = ref $val;
-        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } @( < @sigs) ) {
-            my $takes = join " or ", @( < map { _format_att($_) } @( < @sigs));
+        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } @sigs ) {
+            my $takes = join " or ", map { _format_att($_) } @sigs;
 
             my $has = _format_att($given);
             warn "WARNING: $key takes a $takes not a $has.\n".
@@ -169,7 +169,7 @@ sub eval_in_subdirs {
     use Cwd < qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
-    local @INC = @( < map try {abs_path($_) if -e} || $_, @( < @INC) );
+    local @INC = map try {abs_path($_) if -e} || $_, @INC;
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir ( @{$self->{DIR}}){
@@ -206,7 +206,7 @@ my $PACKNAME = 'PACK000';
 sub full_setup {
     $Verbose ||= 0;
 
-    my @attrib_help = @( < qw/
+    my @attrib_help = qw/
 
     AUTHOR ABSTRACT ABSTRACT_FROM BINARY_LOCATION
     C CAPI CCFLAGS CONFIG CONFIGURE DEFINE DIR DISTNAME DL_FUNCS DL_VARS
@@ -240,7 +240,7 @@ sub full_setup {
 
     MACPERL_SRC MACPERL_LIB MACLIBS_68K MACLIBS_PPC MACLIBS_SC MACLIBS_MRC
     MACLIBS_ALL_68K MACLIBS_ALL_PPC MACLIBS_SHARED
-        / );
+        /;
 
     # IMPORTS is used under OS/2 and Win32
 
@@ -253,7 +253,7 @@ sub full_setup {
     # in Overridable we have subroutines that are used indirectly
 
 
-    @MM_Sections = @( < 
+    @MM_Sections = 
         qw(
 
  post_initialize const_config constants platform_constants 
@@ -276,9 +276,9 @@ sub full_setup {
  dist_basics dist_core distdir dist_test dist_ci distmeta distsignature
  install force perldepend makefile staticmake test ppd
 
-          ) ); # loses section ordering
+          ); # loses section ordering
 
-    @Overridable = @( < @MM_Sections );
+    @Overridable = @MM_Sections;
     push @Overridable, < qw[
 
  libscan makeaperl needs_linking perm_rw perm_rwx
@@ -299,15 +299,15 @@ sub full_setup {
     push @Overridable, "postamble";
  <
     # All sections are valid keys.
-    %Recognized_Att_Keys{[@(< @MM_Sections)]} = (1) x nelems @MM_Sections;
+    %Recognized_Att_Keys{[ @MM_Sections]} = (1) x nelems @MM_Sections;
 
     # we will use all these variables in the Makefile
-    @Get_from_Config = @( < 
+    @Get_from_Config = 
         qw(
            ar cc cccdlflags ccdlflags dlext dlsrc exe_ext full_ar ld 
            lddlflags ldflags libc lib_ext obj_ext osname osvers ranlib 
            sitelibexp sitearchexp so
-          ) );
+          );
 
     # 5.5.3 doesn't have any concept of vendor libs
     push @Get_from_Config, < qw( vendorarchexp vendorlibexp );
@@ -326,11 +326,11 @@ sub full_setup {
     # us (the parent) for the values and will prepend "..", so that
     # all files to be installed end up below OUR ./blib
     #
-    @Prepend_parent = @( < qw(
+    @Prepend_parent = qw(
            INST_BIN INST_LIB INST_ARCHLIB INST_SCRIPT
            MAP_TARGET INST_MAN1DIR INST_MAN3DIR PERL_SRC
            PERL FULLPERL
-    ) );
+    );
 }
 
 sub writeMakefile {
@@ -358,20 +358,20 @@ sub new {
     my($key);
 
     # Store the original args passed to WriteMakefile()
-    foreach my $k (@( <keys %$self)) {
+    foreach my $k (keys %$self) {
         $self->{ARGS}->{$k} = $self->{$k};
     }
 
-    if ("{join ' ', @( <@ARGV)}" =~ m/\bPREREQ_PRINT\b/) {
+    if ("{join ' ',@ARGV}" =~ m/\bPREREQ_PRINT\b/) {
         require Data::Dumper;
-        print Data::Dumper->Dump(\@($self->{PREREQ_PM}), \@( <qw(PREREQ_PM)));
+        print Data::Dumper->Dump(\@($self->{PREREQ_PM}), \qw(PREREQ_PM));
         exit 0;
     }
 
     # PRINT_PREREQ is RedHatism.
-    if ("{join ' ', @( <@ARGV)}" =~ m/\bPRINT_PREREQ\b/) {
-        print join(" ", @( < map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
- @( <                        sort @( < keys %{$self->{PREREQ_PM}})))), "\n";
+    if ("{join ' ',@ARGV}" =~ m/\bPRINT_PREREQ\b/) {
+        print join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
+                        sort keys %{$self->{PREREQ_PM}}), "\n";
         exit 0;
    }
 
@@ -388,7 +388,7 @@ sub new {
     my %initial_att  = %$self; # record initial attributes
 
     my %unsatisfied = %();
-    foreach my $prereq (@( <sort @( < keys %{$self->{PREREQ_PM} || \%()}))) {
+    foreach my $prereq (sort keys %{$self->{PREREQ_PM} || \%()}) {
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
         my $file = "$prereq.pm";
@@ -416,8 +416,8 @@ sub new {
     }
     
      if (%unsatisfied && $self->{PREREQ_FATAL}){
-        my $failedprereqs = join "\n", @( < map {"    $_ %unsatisfied{$_}"} 
- @( <                            sort { $a cmp $b } @( < keys %unsatisfied)));
+        my $failedprereqs = join "\n", map {"    $_ %unsatisfied{$_}"} 
+                            sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
 MakeMaker FATAL: prerequisites not found.
 $failedprereqs
@@ -436,7 +436,7 @@ END
     }
 
     my $newclass = ++$PACKNAME;
-    local @Parent = @( < @Parent );    # Protect against non-local exits
+    local @Parent = @Parent;    # Protect against non-local exits
     {
         print "Blessing Object into class [$newclass]\n" if $Verbose+>=2;
         mv_all_methods("MY",$newclass);
@@ -466,15 +466,15 @@ END
                 # specification under VMS.  So, don't turn the command
                 # into a filespec, but do add a level to the path of
                 # the argument if not already absolute.
-                my @cmd = @( < split m/\s+/, $self->{$key} );
+                my @cmd = split m/\s+/, $self->{$key};
                 @cmd[1] = $self->catfile('[-]',@cmd[1])
                   unless ((nelems @cmd) +< 2) || $self->file_name_is_absolute(@cmd[1]);
-                $self->{$key} = join(' ', @( < @cmd));
+                $self->{$key} = join(' ', @cmd);
             }
         }
         if ($self->{PARENT}) {
             $self->{PARENT}->{CHILDREN}->{$newclass} = $self;
-            foreach my $opt (@( <qw(POLLUTE PERL_CORE LINKTYPE))) {
+            foreach my $opt (qw(POLLUTE PERL_CORE LINKTYPE)) {
                 if (exists $self->{PARENT}->{$opt}
                     and not exists $self->{$opt})
                     {
@@ -483,7 +483,7 @@ END
                     }
             }
         }
-        my @fm = @( < grep m/^FIRST_MAKEFILE=/, @( < @ARGV) );
+        my @fm = grep m/^FIRST_MAKEFILE=/, @ARGV;
         parse_args($self,< @fm) if (nelems @fm);
     } else {
         parse_args($self, <split(' ', %ENV{PERL_MM_OPT} || ''),< @ARGV);
@@ -556,7 +556,7 @@ END
 #   MakeMaker Parameters:
 END
 
-    foreach my $key (@( <sort @( < keys %initial_att))){
+    foreach my $key (sort keys %initial_att){
         next if $key eq 'ARGS';
 
         my $v = neatvalue(%initial_att{$key});
@@ -572,7 +572,7 @@ END
 #   MakeMaker 'CONFIGURE' Parameters:
 END
         if (%configure_att) {
-            foreach my $key (@( <sort @( < keys %configure_att))){
+            foreach my $key (sort keys %configure_att){
                next if $key eq 'ARGS';
                my $v = neatvalue(%configure_att{$key});
                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
@@ -594,7 +594,7 @@ END
     delete $self->{SKIP}; # free memory
 
     if ($self->{PARENT}) {
-        for (@( <qw/install dist dist_basics dist_core distdir dist_test dist_ci/)) {
+        for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
             $self->{SKIPHASH}->{$_} = 1;
         }
     }
@@ -617,7 +617,7 @@ END
         } else {
             my %a = %( < %{$self->{$section} || \%()} );
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
-            push @{$self->{RESULT}}, "# " . join ", ", @( < %a) if $Verbose && %a;
+            push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
             push @{$self->{RESULT}}, $self->maketext_filter(
                 $self->?$method( < %a )
             );
@@ -664,10 +664,10 @@ sub check_manifest {
     require ExtUtils::Manifest;
     # avoid warning
     $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1;
-    my(@missed) = @( < ExtUtils::Manifest::manicheck() );
+    my(@missed) = ExtUtils::Manifest::manicheck();
     if ((nelems @missed)) {
         print STDOUT "Warning: the following files are missing in your kit:\n";
-        print "\t", join "\n\t", @( < @missed);
+        print "\t", join "\n\t", @missed;
         print STDOUT "\n";
         print STDOUT "Please inform the author.\n";
     } else {
@@ -725,18 +725,18 @@ sub parse_args{
         # So they can choose from the command line, which extensions they want
         # the grep enables them to have some colons too much in case they
         # have to build a list with the shell
-        $self->{DIR} = \@(< grep $_, @( < split ":", $self->{DIR}));
+        $self->{DIR} = \ grep $_, split ":", $self->{DIR};
     }
     # Turn a INCLUDE_EXT argument on the command line into an array
     if (defined $self->{INCLUDE_EXT} && ref \$self->{INCLUDE_EXT} eq 'SCALAR') {
-        $self->{INCLUDE_EXT} = \@(< grep $_, @( < split '\s+', $self->{INCLUDE_EXT}));
+        $self->{INCLUDE_EXT} = \ grep $_, split '\s+', $self->{INCLUDE_EXT};
     }
     # Turn a EXCLUDE_EXT argument on the command line into an array
     if (defined $self->{EXCLUDE_EXT} && ref \$self->{EXCLUDE_EXT} eq 'SCALAR') {
-        $self->{EXCLUDE_EXT} = \@(< grep $_, @( < split '\s+', $self->{EXCLUDE_EXT}));
+        $self->{EXCLUDE_EXT} = \ grep $_, split '\s+', $self->{EXCLUDE_EXT};
     }
 
-    foreach my $mmkey (@( <sort @( < keys %$self))){
+    foreach my $mmkey (sort keys %$self){
         next if $mmkey eq 'ARGS';
         print STDOUT "  $mmkey => ", < neatvalue($self->{$mmkey}), "\n" if $Verbose;
         print STDOUT "'$mmkey' is not a known MakeMaker parameter name.\n"
@@ -897,10 +897,10 @@ sub flush {
       warn "rename MakeMaker.tmp => $finalname: $!";
     chmod 0644, $finalname unless $Is_VMS;
 
-    my %keep = %( < map { ($_ => 1) } @( < qw(NEEDS_LINKING HAS_LINK_CODE)) );
+    my %keep = %( < map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE) );
 
     if ($self->{PARENT} && !$self->{_KEEP_AFTER_FLUSH}) {
-        foreach (@( <keys %$self)) { # safe memory
+        foreach (keys %$self) { # safe memory
             delete $self->{$_} unless %keep{$_};
         }
     }
@@ -919,7 +919,7 @@ sub _rename {
 
 # This is an unlink for OS's where the target must be writable first.
 sub _unlink {
-    my @files = @( < @_ );
+    my @files = @_;
     chmod 0666, < @files;
     return unlink < @files;
 }
@@ -956,9 +956,9 @@ sub neatvalue {
         foreach my $elem ( @$v) {
             push @neat, "q[$elem]";
         }
-        push @m, join ", ", @( < @neat);
+        push @m, join ", ", @neat;
         push @m, "]";
-        return join "", @( < @m);
+        return join "", @m;
     }
     return dump::view($v) unless $t eq 'HASH';
     my(@m, $key, $val);
@@ -966,7 +966,7 @@ sub neatvalue {
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }
-    return '\%( '.join(', ', @(< @m))." )";
+    return '\%( '.join(', ', @m)." )";
 }
 
 sub selfdocument {
@@ -974,7 +974,7 @@ sub selfdocument {
     my(@m);
     if ($Verbose){
         push @m, "\n# Full list of MakeMaker attribute values:";
-        foreach my $key (@( <sort @( < keys %$self))){
+        foreach my $key (sort keys %$self){
             next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/;
             my($v) = < neatvalue($self->{$key});
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
@@ -982,7 +982,7 @@ sub selfdocument {
             push @m, "# $key => $v";
         }
     }
-    join "\n", @( < @m);
+    join "\n", @m;
 }
 
 1;

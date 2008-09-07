@@ -137,7 +137,7 @@ die "Could not tie: $!" unless $X;
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 
-my %noMode = %( < map { $_, 1} @( < qw( amigaos MSWin32 NetWare cygwin )) ) ;
+my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
 ok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640) ||
    %noMode{$^O} );
@@ -214,8 +214,8 @@ ok(22, $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640) );
 delete %h{'goner1'};
 $X->DELETE('goner3');
 
-my @keys = @( < keys(%h) );
-my @values = @( < values(%h) );
+my @keys = keys(%h);
+my @values = values(%h);
 
 ok(23, (nelems @keys) == 30 && (nelems @values) == 30) ;
 
@@ -258,7 +258,7 @@ ok(29, $size +> 0 );
  
     (< %h{[0..200]}) = < 200..400;
     my @foo = %h{[0..200]};
-    ok("30 # TODO", join(':', @( <200..400)) eq join(':', @(< @foo)) );
+    ok("30 # TODO", join(':',200..400) eq join(':', @foo) );
 
 # Now check all the non-tie specific stuff
 
@@ -643,7 +643,7 @@ EOM
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     %result{$name} = "$name - $count: [{join ' ', @( <@kept)}]" ;
+		     %result{$name} = "$name - $count: [{join ' ',@kept}]" ;
 		   }
     }
 
@@ -824,11 +824,11 @@ EOM
     ok(123, $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $k (@( <keys %h)) {}
+    foreach $k (keys %h) {}
     ok(124, $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $v (@( <values %h)) {}
+    foreach $v (values %h) {}
     ok(125, $bad_key == 0);
 
     undef $db ;
@@ -955,7 +955,7 @@ EOM
    %h{"fred"} = "joe" ;
    ok(137, %h{"fred"} eq "joe");
 
-   try { my @r= @( < grep { %h{$_} } @( (1, 2, 3)) ) };
+   try { my @r= grep { %h{$_} } @( (1, 2, 3)) };
    ok (138, ! $@);
 
 
@@ -971,7 +971,7 @@ EOM
 
    ok(140, $db->FIRSTKEY() eq "fred") ;
    
-   try { my @r= @( < grep { %h{$_} } @( (1, 2, 3)) ) };
+   try { my @r= grep { %h{$_} } @( (1, 2, 3)) };
    ok (141, ! $@);
 
    undef $db ;

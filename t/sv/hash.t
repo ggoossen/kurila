@@ -37,12 +37,12 @@ use constant THRESHOLD => 14;
 use constant START     => "a";
 
 # some initial hash data
-my %h2 = %( < map {$_ => 1} @( < 'a'..'cc') );
+my %h2 = %( < map {$_ => 1} 'a'..'cc' );
 
 ok (!Internals::HvREHASH(%h2), 
     "starting with pre-populated non-pathological hash (rehash flag if off)");
 
-my @keys = @( < get_keys(\%h2) );
+my @keys = get_keys(\%h2);
 %h2{$_}++ for  @keys;
 ok (Internals::HvREHASH(%h2), 
     scalar(nelems @keys) . " colliding into the same bucket keys are triggering rehash");
@@ -55,7 +55,7 @@ sub get_keys {
 
     # if the hash has already been populated with a significant amount
     # of entries the number of mask bits can be higher
-    my $keys = nelems(@( < keys %$hr));
+    my $keys = nelems( keys %$hr);
     my $bits = $keys ? log($keys)/log(2) : 0;
     $bits = $min_bits if $min_bits +> $bits;
 
@@ -90,7 +90,7 @@ sub get_keys {
 # can't do it perl, without doing some tricks
 sub hash {
     my $s = shift;
-    my @c = @( < split m//, $s );
+    my @c = split m//, $s;
     my $u = HASH_SEED;
     for ( @c) {
         # (A % M) + (B % M) == (A + B) % M

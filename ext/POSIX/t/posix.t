@@ -46,7 +46,7 @@ next_test();
 SKIP: {
     skip("no pipe() support on DOS", 2) if $Is_Dos;
 
-    our @fds = @( < POSIX::pipe() );
+    our @fds = POSIX::pipe();
     ok( @fds[0] +> $testfd,      'POSIX::pipe' );
 
     CORE::open(my $reader = \*READER, "<&=", @fds[0]);

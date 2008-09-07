@@ -49,7 +49,7 @@ my $Invoke_Perl = $Is_VMS      ? 'MCR Sys$Disk:[]Perl.exe' :
                   $Is_MacOS    ? ':perl'                :
                   $Is_NetWare  ? 'perl'                 : 
                                  './perl'               ;
-my @MoreEnv = @( < qw/IFS CDPATH ENV BASH_ENV/ );
+my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 
 if ($Is_VMS) {
     my (%old, $x);
@@ -94,7 +94,7 @@ sub taint_these (@) {
 
 # How to identify taint when you see it
 sub any_tainted (@) {
-    return scalar grep { tainted($_) } @( < @_);
+    return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
     my $tainted = not try { @_[0], kill 0; 1};
@@ -117,7 +117,7 @@ sub test ($;$) {
     } else {
 	print "not ok $curr_test\n";
         printf "# Failed test at line \%d\n", (caller)[[2]];
-	for (@( <split m/^/m, $diag)) {
+	for (split m/^/m, $diag) {
 	    print "# $_";
 	}
 	print "\n" unless
@@ -148,7 +148,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     if ($Is_MSWin32 && %Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (@( <split m/%Config{path_sep}/, %ENV{PATH})) {
+	foreach my $dir (split m/%Config{path_sep}/, %ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -179,7 +179,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
-	test !nelems @vars, "{join ' ', @( <@vars)}";
+	test !nelems @vars, "{join ' ',@vars}";
 
 	# tainted $TERM is unsafe only if it contains metachars
 	local %ENV{TERM};
@@ -197,7 +197,7 @@ my $TEST = catfile(curdir(), 'TEST');
     else {
 	$tmp = (grep { defined and -d and @(stat '_')[2] ^&^ 2 }
  @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
-		     %ENV{[@( <qw(TMP TEMP))]}))[0]
+		     %ENV{[qw(TMP TEMP)]}))[0]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
@@ -241,7 +241,7 @@ my $TEST = catfile(curdir(), 'TEST');
     taint_these($foo);
     test tainted $foo;
 
-    my @list = @( < 1..10 );
+    my @list = 1..10;
     test not any_tainted < @list;
     taint_these < @list[[@(1,3,5,7,9)]];
     test any_tainted < @list;
@@ -553,7 +553,7 @@ SKIP: {
     test not tainted @foo[0];
     test     tainted @foo[1];
     test not tainted @foo[2];
-    my @bar = @( < @foo );
+    my @bar = @foo;
     test not tainted @bar[0];
     test     tainted @bar[1];
     test not tainted @bar[2];
@@ -569,7 +569,7 @@ SKIP: {
     test not tainted ($nautilus->()[0]);
     test     tainted ($nautilus->()[1]);
     test not tainted ($nautilus->()[2]);
-    my @xyzzy = @( < &$nautilus );
+    my @xyzzy = &$nautilus;
     test not tainted @xyzzy[0];
     test     tainted @xyzzy[1];
     test not tainted @xyzzy[2];
@@ -577,7 +577,7 @@ SKIP: {
     test not tainted ((&$red_october)[0]);
     test     tainted ((&$red_october)[1]);
     test not tainted ((&$red_october)[2]);
-    my @corge = @( < &$red_october );
+    my @corge = &$red_october;
     test not tainted @corge[0];
     test     tainted @corge[1];
     test not tainted @corge[2];
@@ -870,7 +870,7 @@ SKIP: {
 	    push @untainted, "# '$k' = '$v'\n";
 	}
     }
-    test( (nelems @untainted) == 0, "untainted:\n {join ' ', @( <@untainted)}");
+    test( (nelems @untainted) == 0, "untainted:\n {join ' ',@untainted}");
 }
 
 
@@ -1195,9 +1195,9 @@ SKIP:
 
 {
     my $value = "foo bar";
-    my @values = @( < split(m/\s+/, $value, 2) );
+    my @values = split(m/\s+/, $value, 2);
     ok(!tainted(@values[1]), "result of split is not tainted if input was not tainted");
-    my @values = @( < split(m/\s+/, $value . $TAINT, 2) );
+    my @values = split(m/\s+/, $value . $TAINT, 2);
     ok(tainted(@values[1]), "result of split is tainted if input was tainted");
 }
 

@@ -43,7 +43,7 @@ print q(1..22
 	$string = "abcdefghijkl$string";
     }
 
-    r2() and ok(1) for @( < qw/ 4 5 /);
+    r2() and ok(1) for qw/ 4 5 /;
 }
 
 # test that nul bytes get copied

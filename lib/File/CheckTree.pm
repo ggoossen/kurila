@@ -7,8 +7,8 @@ use warnings;
 use strict;
 
 our $VERSION = '4.3';
-our @ISA     = @( < qw(Exporter) );
-our @EXPORT  = @( < qw(validate) );
+our @ISA     = qw(Exporter);
+our @EXPORT  = qw(validate);
 
 =head1 NAME
 
@@ -75,7 +75,7 @@ sub validate {
     $cwd = "";
     $Warnings = 0;
 
-    foreach my $check (@( <split m/\n/, @_[0])) {
+    foreach my $check (split m/\n/, @_[0]) {
         my ($testlist, @testlist);
 
         # skip blanks/comments
@@ -103,7 +103,7 @@ sub validate {
         if ($test =~ s/ ^ (!?-) (\w{2,}) \b /$1Z/x) {
             $testlist = $2;
             # split bundled tests, e.g. "ug" to 'u', 'g'
-            @testlist = @( < split(m//, $testlist) );
+            @testlist = split(m//, $testlist);
         }
         else {
             # put in placeholder Z for stand-alone test

@@ -29,7 +29,7 @@ sub _handle_element_start {
   
   print $fh   '  ' x (@_[0]->{'indent'} || 0),  "<", @_[1];
 
-  foreach my $key (@( <sort @( < keys %{@_[2]}))) {
+  foreach my $key (sort keys %{@_[2]}) {
     unless($key =~ m/^~/s) {
       next if $key eq 'start_line' and @_[0]->{'hide_line_numbers'};
       _xml_escape($value = @_[2]->{$key});

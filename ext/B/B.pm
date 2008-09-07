@@ -11,12 +11,12 @@ our $VERSION = '1.19';
 
 use XSLoader ();
 require Exporter;
-our @ISA = @( < qw(Exporter) );
+our @ISA = qw(Exporter);
 
 BEGIN {
     # walkoptree_slow comes from B.pm (you are there),
     # walkoptree comes from B.xs
-    our @EXPORT_OK = @( < qw(minus_c ppname save_BEGINs
+    our @EXPORT_OK = qw(minus_c ppname save_BEGINs
                            class peekop cast_I32 cstring cchar hash
                            main_root main_start main_cv svref_2object opnumber
                            sub_generation amagic_generation perlstring
@@ -25,7 +25,7 @@ BEGIN {
                            begin_av init_av check_av end_av regex_padav dowarn defstash
                            curstash warnhook diehook inc_gv @optype @specialsv_name
                            unitcheck_av
-                      ) );
+                      );
     XSLoader::load 'B';
 }
 
@@ -37,8 +37,8 @@ use strict;
 @B::NV::ISA = @( 'B::SV' );
 # RV is eliminated with 5.11.0, but effectively is a specialisation of IV now.
 @B::RV::ISA = @( 'B::IV' );
-@B::PVIV::ISA = @( < qw(B::PV B::IV) );
-@B::PVNV::ISA = @( < qw(B::PVIV B::NV) );
+@B::PVIV::ISA = qw(B::PV B::IV);
+@B::PVNV::ISA = qw(B::PVIV B::NV);
 @B::PVMG::ISA = @( 'B::PVNV' );
 @B::REGEXP::ISA = @( 'B::PVMG' );
 # Change in the inheritance hierarchy post 5.9.0
@@ -56,8 +56,8 @@ use strict;
 # bytecode.pl contained the following comment:
 # Nullsv *must* come first in the following so that the condition
 # ($$sv == 0) can continue to be used to test (sv == Nullsv).
-@B::specialsv_name = @( < qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
-			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD) );
+@B::specialsv_name = qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
+			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD);
 
 {
     # Stop "-w" from complaining about the lack of a real B::OBJECT class
@@ -224,7 +224,7 @@ sub walksymtable {
     my $fullname;
     no strict 'refs';
     $prefix = '' unless defined $prefix;
-    for my $sym (@( <keys %$symref)) {
+    for my $sym (keys %$symref) {
         my $ref = $symref->{$_};
         $fullname = "*".$prefix.$sym;
 	if ($sym =~ m/::$/) {

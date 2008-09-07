@@ -27,7 +27,7 @@ $iv_min = $iv_max;
 my $uv_bigi = $iv_big;
 $uv_bigi ^|^= 0x0;
 
-my @array = @( < qw(perl rules) );
+my @array = qw(perl rules);
 
 our (@FOO, $expect);
 

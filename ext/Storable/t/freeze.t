@@ -48,7 +48,7 @@ print "ok 4\n";
 print "not " unless $got eq $dumped; 
 print "ok 5\n";
 
-package FOO; our @ISA = @( < qw(Storable) );
+package FOO; our @ISA = qw(Storable);
 
 sub make {
 	my $self = bless \%();

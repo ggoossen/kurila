@@ -251,12 +251,12 @@ use SelectSaver;
 use IO ();	# Load the XS module
 
 require Exporter;
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
 $VERSION = "1.27_01";
 $VERSION = eval $VERSION;
 
-@EXPORT_OK = @( < qw(
+@EXPORT_OK = qw(
     autoflush
     output_field_separator
     output_record_separator
@@ -277,7 +277,7 @@ $VERSION = eval $VERSION;
     _IOFBF
     _IOLBF
     _IONBF
-) );
+);
 
 ################################################
 ## Constructors, destructors.

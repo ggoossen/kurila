@@ -101,13 +101,13 @@ use Pod::ParseLink;
 print "ok 1\n";
 
 # Used for reporting test failures.
-my @names = @( < qw(text inferred name section type) );
+my @names = qw(text inferred name section type);
 
 my $n = 2;
 for ( @TESTS) {
-    my @expected = @( < @$_ );
+    my @expected = @$_;
     my $link = shift @expected;
-    my @results = @( < parselink ($link) );
+    my @results = parselink ($link);
     my $okay = 1;
     for (0..4) {
         # Make sure to check undef explicitly; we don't want undef to match

@@ -338,7 +338,7 @@ sub _get_install_skip {
             if $verbose+>1;
         $skip= \@();
     }
-    warn "Got {join ' ', @( <@{\@(0+nelems @$skip)})} skip patterns.\n"
+    warn "Got {join ' ',@{\@(0+nelems @$skip)}} skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
@@ -394,7 +394,7 @@ sub _can_write_dir {
         unless defined $dir and length $dir;
 
     my ($vol, $dirs, $file) = < File::Spec->splitpath($dir,1);
-    my @dirs = @( < File::Spec->splitdir($dirs) );
+    my @dirs = File::Spec->splitdir($dirs);
     unshift @dirs, File::Spec->curdir
         unless File::Spec->file_name_is_absolute($dir);
 
@@ -689,7 +689,7 @@ sub install { #XXX OS-SPECIFIC
     my $packlist = ExtUtils::Packlist->new();
 
     local(*DIR);
-    for (@( <qw/read write/)) {
+    for (qw/read write/) {
         %pack{$_}=%from_to{$_};
         delete %from_to{$_};
     }
@@ -699,7 +699,7 @@ sub install { #XXX OS-SPECIFIC
     my @found_files;
     my %check_dirs;
     
-    MOD_INSTALL: foreach my $source (@( <sort @( < keys %from_to))) {
+    MOD_INSTALL: foreach my $source (sort keys %from_to) {
         #copy the tree to the target directory without altering
         #timestamp and permission and remember for the .packlist
         #file. The packlist file contains the absolute paths of the
@@ -774,7 +774,7 @@ sub install { #XXX OS-SPECIFIC
         }, $current_directory ); 
         _chdir($cwd);
     }   
-    foreach my $targetdir (@( <sort @( < keys %check_dirs))) {
+    foreach my $targetdir (sort keys %check_dirs) {
         _mkpath( $targetdir, 0, 0755, $verbose, $dry_run );
     }
     foreach my $found ( @found_files) {
@@ -1008,7 +1008,7 @@ sub uninstall {
     # my $my_req = $self->catfile(qw(auto ExtUtils Install forceunlink.al));
     # require $my_req; # Hairy, but for the first
     my $packlist = ExtUtils::Packlist->new($fil);
-    foreach (@( <sort( @( <keys(%$packlist))))) {
+    foreach (sort(keys(%$packlist))) {
         chomp;
         print "unlink $_\n" if $verbose;
         forceunlink($_,'tryhard') unless $dry_run;
@@ -1044,15 +1044,15 @@ sub inc_uninstall {
     my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
     
-    my @PERL_ENV_LIB = @( < split %Config{path_sep}, defined %ENV{'PERL5LIB'}
-      ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '' );
+    my @PERL_ENV_LIB = split %Config{path_sep}, defined %ENV{'PERL5LIB'}
+      ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '';
         
     my @dirs=@( < @PERL_ENV_LIB, 
                < @INC, < 
-               %Config{[@( <qw(archlibexp
+               %Config{[qw(archlibexp
                           privlibexp
                           sitearchexp
-                          sitelibexp))]});        
+                          sitelibexp)]});        
     
     #warn join "\n","---",@dirs,"---";
     my $seen_ours;
@@ -1209,7 +1209,7 @@ sub DESTROY {
     unless(defined $INSTALL_ROOT) {
         my $self = shift;
         my($file,$i,$plural);
-        foreach $file (@( <sort @( < keys %$self))) {
+        foreach $file (sort keys %$self) {
             $plural = (nelems @{$self->{$file}}) +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
             for (0..(nelems @{$self->{$file}})-1) {

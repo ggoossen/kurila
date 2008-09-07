@@ -254,7 +254,7 @@ is(curr_test(), 5, 'eval "goto $x"');
 
 sub two {
     my ($pack, $file, $line) = caller;	# Should indicate original call stats.
-    is("{join ' ', @( <@_)} $pack $file $line", "1 2 3 main $::FILE $::LINE",
+    is("{join ' ',@_} $pack $file $line", "1 2 3 main $::FILE $::LINE",
 	'autoloading mechanism.');
 }
 

@@ -253,26 +253,20 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
    # Complain if they use __PACKAGE__ as a project base class?
   
   if( (nelems @languages) ) {
-    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
     if($USING_LANGUAGE_TAGS) {   # An explicit language-list was given!
-      @languages = @(
-       < map {; $_, < I18N::LangTags::alternate_language_tags($_) }
- @(        # Catch alternation
-       < map I18N::LangTags::locale2language_tag($_), @(
-        # If it's a lg tag, fine, pass thru (untainted)
-        # If it's a locale ID, try converting to a lg tag (untainted),
-        # otherwise nix it.
-       < @languages)) );
-      DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      @languages = map {; $_, < I18N::LangTags::alternate_language_tags($_) }
+ map I18N::LangTags::locale2language_tag($_), @languages;
+      DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
     }
   } else {
-    @languages = @( < $base_class->_ambient_langprefs );
+    @languages = $base_class->_ambient_langprefs;
   }
  
-  @languages = @( < $base_class->_langtag_munging(< @languages) );
+  @languages = $base_class->_langtag_munging(< @languages);
 
   my %seen;
-  foreach my $module_name (@( < map { $base_class . "::" . $_ } @(  < @languages)) ) {
+  foreach my $module_name ( map { $base_class . "::" . $_ } @languages ) {
     next unless length $module_name; # sanity
     next if %seen{$module_name}++        # Already been here, and it was no-go
             || ! _try_use($module_name); # Try to use() it, but can't it.
@@ -290,44 +284,43 @@ sub _langtag_munging {
   # We have all these DEBUG statements because otherwise it's hard as hell
   # to diagnose ifwhen something goes wrong.
 
-  DEBUG and print "Lgs1: ", < map("<$_>", @( < @languages)), "\n";
+  DEBUG and print "Lgs1: ", < map("<$_>", @languages), "\n";
 
   if($USING_LANGUAGE_TAGS) {
-    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
-    @languages     = @( < $base_class->_add_supers( < @languages ) );
+    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
+    @languages     = $base_class->_add_supers( < @languages );
 
     push @languages, < I18N::LangTags::panic_languages(< @languages);
     DEBUG and print "After adding panic languages:\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
 
     push @languages, < $base_class->fallback_languages;
      # You are free to override fallback_languages to return empty-list!
-    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+    DEBUG and print "Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
 
-    @languages = @(  # final bit of processing to turn them into classname things
-      < map {
+    @languages = map {
         my $it = $_;  # copy
         $it = lc($it);
         $it =~ s<-><_>g; # lc, and turn - to _
         $it =~ s<[^_a-z0-9]><>g;  # remove all but a-z0-9_
         $it;
-      } @( < @languages) )
+      } @languages
     ;
     DEBUG and print "Nearing end of munging:\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
   } else {
     DEBUG and print "Bypassing language-tags.\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
   }
 
   DEBUG and print "Before adding fallback classes:\n", 
-    " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+    " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
 
   push @languages, < $base_class->fallback_language_classes;
    # You are free to override that to return whatever.
 
   DEBUG and print "Finally:\n", 
-    " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+    " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
 
   return @languages;
 }
@@ -347,21 +340,21 @@ sub _add_supers {
   if(!$MATCH_SUPERS) {
     # Nothing
     DEBUG and print "Bypassing any super-matching.\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
 
   } elsif( $MATCH_SUPERS_TIGHTLY ) {
     DEBUG and print "Before adding new supers tightly:\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
-    @languages = @( < I18N::LangTags::implicate_supers( < @languages ) );
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
+    @languages = I18N::LangTags::implicate_supers( < @languages );
     DEBUG and print "After adding new supers tightly:\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
 
   } else {
     DEBUG and print "Before adding supers to end:\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
-    @languages = @( < I18N::LangTags::implicate_supers_strictly( < @languages ) );
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
+    @languages = I18N::LangTags::implicate_supers_strictly( < @languages );
     DEBUG and print "After adding supers to end:\n", 
-      " Lgs\@", __LINE__, ": ", < map("<$_>", @( < @languages)), "\n";
+      " Lgs\@", __LINE__, ": ", < map("<$_>", @languages), "\n";
   }
   
   return @languages;

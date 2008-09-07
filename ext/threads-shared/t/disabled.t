@@ -12,7 +12,7 @@ use threads::shared;
 ok( !%INC{"threads.pm"} );
 
 # Check each faked function.
-foreach my $func (@( <qw(share cond_wait cond_signal cond_broadcast))) {
+foreach my $func (qw(share cond_wait cond_signal cond_broadcast)) {
     ok( my $func_ref = __PACKAGE__->can($func) ? 1 : 0 );
 
     eval qq{$func()};
@@ -26,25 +26,25 @@ foreach my $func (@( <qw(share cond_wait cond_signal cond_broadcast))) {
 }
 
 # These all have no return value.
-foreach my $func (@( <qw(cond_wait cond_signal cond_broadcast))) {
-    my @array = @( < qw(1 2 3 4) );
+foreach my $func (qw(cond_wait cond_signal cond_broadcast)) {
+    my @array = qw(1 2 3 4);
     is( eval qq{$func(\@array)}, undef );
-    is( "{join ' ', @( <@array)}", "1 2 3 4" );
+    is( "{join ' ',@array}", "1 2 3 4" );
 }
 
 # share() is supposed to return back it's argument as a ref.
 {
-    my @array = @( < qw(1 2 3 4) );
+    my @array = qw(1 2 3 4);
     is_deeply( share(@array), \@array );
     is( ref &share(\%()), 'HASH' );
-    is( "{join ' ', @( <@array)}", "1 2 3 4" );
+    is( "{join ' ',@array}", "1 2 3 4" );
 }
 
 # lock() should be a no-op.  The return value is currently undefined.
 {
-    my @array = @( < qw(1 2 3 4) );
+    my @array = qw(1 2 3 4);
     lock(@array);
-    is( "{join ' ', @( <@array)}", "1 2 3 4" );
+    is( "{join ' ',@array}", "1 2 3 4" );
 }
 
 # EOF

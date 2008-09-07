@@ -14,7 +14,7 @@ if (defined umask && (umask() ^&^ 0444)) {
 getopts('Dd:rlhaQe');
 use vars < qw($opt_D $opt_d $opt_r $opt_l $opt_h $opt_a $opt_Q $opt_e);
 die "-r and -a options are mutually exclusive\n" if ($opt_r and $opt_a);
-my @inc_dirs = @( < inc_dirs() ) if $opt_a;
+my @inc_dirs = inc_dirs() if $opt_a;
 
 my $Exit = 0;
 
@@ -22,17 +22,17 @@ my $Dest_dir = $opt_d || %Config{installsitearch};
 die "Destination directory $Dest_dir doesn't exist or isn't a directory\n"
     unless -d $Dest_dir;
 
-my @isatype = @( < qw(
+my @isatype = qw(
 	char	uchar	u_char
 	short	ushort	u_short
 	int	uint	u_int
 	long	ulong	u_long
 	FILE	key_t	caddr_t
 	float	double	size_t
-) );
+);
 
 my %isatype;
- <%isatype{[@(< @isatype)]} = (1) x nelems @isatype;
+ <%isatype{[ @isatype]} = (1) x nelems @isatype;
 my $inif = 0;
 my %Is_converted;
 my %bad_file = %( () );
@@ -101,7 +101,7 @@ while (defined (my $file = next_file())) {
 		    my $proto = '() ';
 		    if ($args ne '') {
 			$proto = '';
-			foreach my $arg (@( <split(m/,\s*/,$args))) {
+			foreach my $arg (split(m/,\s*/,$args)) {
 			    $arg =~ s/^\s*([^\s].*[^\s])\s*$/$1/;
 			    %curargs{$arg} = 1;
 			}
@@ -250,7 +250,7 @@ while (defined (my $file = next_file())) {
 	    s/\s+/ /g;
 	    next unless m/^\s?(typedef\s?)?enum\s?([a-zA-Z_]\w*)?\s?\{(.*)\}\s?([a-zA-Z_]\w*)?\s?;/;
 	    (my $enum_subs = $3) =~ s/\s//g;
-	    my @enum_subs = @( < split(m/,/, $enum_subs) );
+	    my @enum_subs = split(m/,/, $enum_subs);
 	    my $enum_val = -1;
 	    foreach my $enum ( @enum_subs) {
 		my ($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
@@ -296,7 +296,7 @@ while (defined (my $file = next_file())) {
 	    }
 	    my @args;
 	    if (s/^\(([^()]*)\)\s*(\w+\s*)*//) {
-		for my $arg (@( <split m/,/, $1)) {
+		for my $arg (split m/,/, $1) {
 		    if ($arg =~ m/(\w+)\s*$/) {
 			%curargs{$1} = 1;
 			push @args, $1;
@@ -305,7 +305,7 @@ while (defined (my $file = next_file())) {
 	    }
 	    $args = (
 		(nelems @args)
-		? "my(" . (join ',', @( < map "\$$_", @( < @args))) . ") = \@_;\n$t    "
+		? "my(" . (join ',', map "\$$_", @args) . ") = \@_;\n$t    "
 		: ""
 	    );
 	    my $proto = (nelems @args) ? '' : '() ';
@@ -316,7 +316,7 @@ while (defined (my $file = next_file())) {
 	    our @local_variables = @( () ); # needs to be a our(): (?{...}) bug workaround
 	    {
 		use re "eval";
-		my $typelist = join '|', @( < keys %isatype);
+		my $typelist = join '|', keys %isatype;
 		$new =~ s['
 		  (?:(?:__)?const(?:__)?\s+)?
 		  (?:(?:un)?signed\s+)?
@@ -354,7 +354,7 @@ while (defined (my $file = next_file())) {
 
 if ($opt_e && (scalar(keys %bad_file) +> 0)) {
     warn "Was unable to convert the following files:\n";
-    warn "\t" . join("\n\t", @( <sort( @( <keys %bad_file)))) . "\n";
+    warn "\t" . join("\n\t",sort(keys %bad_file)) . "\n";
 }
 
 exit $Exit;
@@ -363,7 +363,7 @@ sub expr {
     $new = '"(assembly code)"' and return if m/\b__asm__\b/; # freak out.
     my $joined_args;
     if(%curargs) {
-	$joined_args = join('|', @( < keys(%curargs)));
+	$joined_args = join('|', keys(%curargs));
     }
     while ($_ ne '') {
 	s/^\&\&// && do { $new .= " &&"; next;}; # handle && operator
@@ -422,7 +422,7 @@ sub expr {
 	# Eliminate typedefs
 	m/\(([\w\s]+)[\*\s]*\)\s*[\w\(]/ && do {
 	    my $doit = 1;
-	    foreach (@( <split m/\s+/, $1)) {  # Make sure all the words are types,
+	    foreach (split m/\s+/, $1) {  # Make sure all the words are types,
 	        unless(%isatype{$_} or $_ eq 'struct' or $_ eq 'union'){
 		    $doit = 0;
 		    last;
@@ -738,7 +738,7 @@ sub build_preamble_if_necessary
     open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $!";
 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";
 
-	foreach (@( <sort @( < keys %define))) {
+	foreach (sort keys %define) {
 	    if ($opt_D) {
 		print PREAMBLE "# $_=%define{$_}\n";
 	    }
@@ -773,8 +773,8 @@ sub build_preamble_if_necessary
 sub _extract_cc_defines
 {
     my %define;
-    my $allsymbols  = join " ", @( <
-	%Config{[@('ccsymbols', 'cppsymbols', 'cppccsymbols')]});
+    my $allsymbols  = join " ",
+	%Config{[@('ccsymbols', 'cppsymbols', 'cppccsymbols')]};
 
     # Split compiler pre-definitions into `key=value' pairs:
     while ($allsymbols =~ m/([^\s]+)=((\\\s|[^\s])+)/g) {

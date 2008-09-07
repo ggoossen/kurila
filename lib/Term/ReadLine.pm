@@ -177,7 +177,7 @@ or you can try using the 4-argument form of Term::ReadLine->new().
 use strict;
 
 package Term::ReadLine::Stub;
-our @ISA = @( < qw'Term::ReadLine::Tk Term::ReadLine::TermCap' );
+our @ISA = qw'Term::ReadLine::Tk Term::ReadLine::TermCap';
 
 $DB::emacs = $DB::emacs;	# To peacify -w
 our @rl_term_set;
@@ -325,13 +325,13 @@ if ($which) {
 # in debugger).
 our @ISA;
 if (defined &Term::ReadLine::Gnu::readline) {
-  @ISA = @( < qw(Term::ReadLine::Gnu Term::ReadLine::Stub) );
+  @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub);
 } elsif (defined &Term::ReadLine::Perl::readline) {
-  @ISA = @( < qw(Term::ReadLine::Perl Term::ReadLine::Stub) );
+  @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub);
 } elsif (defined $which && defined &{*{Symbol::fetch_glob("Term::ReadLine::$which\::readline")}}) {
   @ISA = @( "Term::ReadLine::$which" );
 } else {
-  @ISA = @( < qw(Term::ReadLine::Stub) );
+  @ISA = qw(Term::ReadLine::Stub);
 }
 
 package Term::ReadLine::TermCap;
@@ -356,14 +356,14 @@ sub ornaments {
   $rl_term_set = shift;
   $rl_term_set ||= ',,,';
   $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
-  my @ts = @( < split m/,/, $rl_term_set, 4 );
+  my @ts = split m/,/, $rl_term_set, 4;
   try { LoadTermCap };
   unless (defined $terminal) {
     warn("Cannot find termcap: $@\n") unless $Term::ReadLine::termcap_nowarn;
     $rl_term_set = ',,,';
     return;
   }
-  @rl_term_set = @( < map {$_ ? $terminal->Tputs($_,1) || '' : ''} @( < @ts) );
+  @rl_term_set = map {$_ ? $terminal->Tputs($_,1) || '' : ''} @ts;
   return $rl_term_set;
 }
 

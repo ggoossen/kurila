@@ -49,7 +49,7 @@ is( A->d, "C::d");		# Update hash table;
 is(A->d, "D::d");		# Update hash table;
 
 {
-    local @A::ISA = @( < qw(C) );	# Update hash table with split() assignment
+    local @A::ISA = qw(C);	# Update hash table with split() assignment
     is(A->d, "C::d");
     @A::ISA = @( 0 );
     is(try { A->d } || "fail", "fail");
@@ -183,4 +183,4 @@ sub Bminor::test {
     push @main::X, 'Bminor', < @_;
 }
 Bminor->test('y', 'z');
-is("{join ' ', @( <@X)}", "Amajor Bminor x y Bminor Bminor y z");
+is("{join ' ',@X}", "Amajor Bminor x y Bminor Bminor y z");

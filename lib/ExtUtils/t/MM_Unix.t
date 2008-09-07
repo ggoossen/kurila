@@ -42,7 +42,7 @@ cmp_ok ($ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least versi
 # when the following calls like canonpath, catdir etc are replaced by
 # File::Spec calls, the test's become a bit pointless
 
-foreach (@( < qw( xx/ ./xx/ xx/././xx xx///xx)) )
+foreach ( qw( xx/ ./xx/ xx/././xx xx///xx) )
   {
   is ($class->canonpath($_), File::Spec->canonpath($_), "canonpath $_");
   }
@@ -58,12 +58,12 @@ is ($class->file_name_is_absolute('Bombdadil'),
 
 is_deeply($class->path(), File::Spec->path(), 'path() same as File::Spec->path()');
 
-foreach (@( <qw/updir curdir rootdir/))
+foreach (qw/updir curdir rootdir/)
   {
   is ($class->?$_(), File::Spec->?$_(), $_ );
   }
 
-foreach (@( < qw /
+foreach ( qw /
   c_o
   clean
   const_cccmd
@@ -122,7 +122,7 @@ foreach (@( < qw /
   xs_c
   xs_cpp
   xs_o
-  /) )
+  / )
   {
       can_ok($class, $_);
   }
@@ -197,7 +197,7 @@ is ($t->perm_rwx(),'755', 'perm_rwx() is 755');
 ###############################################################################
 # post_constants, postamble, post_initialize
 
-foreach (@( <qw/ post_constants postamble post_initialize/))
+foreach (qw/ post_constants postamble post_initialize/)
   {
   is ($t->?$_(),'', "$_() is an empty string");
   }
@@ -210,7 +210,7 @@ is ($t->replace_manpage_separator('Foo/Bar'),'Foo::Bar','manpage_separator');
 ###############################################################################
 
 $t->init_linker;
-foreach (@( <qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /))
+foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
 {
     ok( exists $t->{$_}, "$_ was defined" );
     is( $t->{$_}, '', "$_ is empty on Unix"); 

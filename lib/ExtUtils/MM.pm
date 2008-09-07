@@ -7,7 +7,7 @@ our $VERSION = '6.44';
 
 require ExtUtils::Liblist;
 require ExtUtils::MakeMaker;
-our @ISA = @( < qw(ExtUtils::Liblist ExtUtils::MakeMaker) );
+our @ISA = qw(ExtUtils::Liblist ExtUtils::MakeMaker);
 
 =head1 NAME
 
@@ -37,7 +37,7 @@ away.
 {
     # Convenient alias.
     package MM;
-    our @ISA = @( < qw(ExtUtils::MM) );
+    our @ISA = qw(ExtUtils::MM);
     sub DESTROY {}
 }
 
@@ -69,9 +69,9 @@ if( %Is{NW5} ) {
 %Is{AIX}    = $^O eq 'aix';
 %Is{Darwin} = $^O eq 'darwin';
 
-%Is{Unix}   = !grep { $_ } @( < values %Is);
+%Is{Unix}   = !grep { $_ } values %Is;
 
-map { delete %Is{$_} unless %Is{$_} } @( < keys %Is);
+map { delete %Is{$_} unless %Is{$_} } keys %Is;
 _assert( nelems(%Is) == 2 );
 my($OS) = < keys %Is;
 

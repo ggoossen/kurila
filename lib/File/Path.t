@@ -45,16 +45,16 @@ my @dir = @(
 );
 
 # create them
-my @created = @( < mkpath(< @dir) );
+my @created = mkpath(< @dir);
 
 is(scalar(nelems @created), 7, "created list of directories");
 
 # pray for no race conditions blowing them out from under us
-@created = @( < mkpath(\@($tmp_base)) );
+@created = mkpath(\@($tmp_base));
 is(scalar(nelems @created), 0, "skipped making existing directory")
-    or diag("unexpectedly recreated {join ' ', @( <@created)}");
+    or diag("unexpectedly recreated {join ' ',@created}");
 
-@created = @( < mkpath('') );
+@created = mkpath('');
 is(scalar(nelems @created), 0, "Can't create a directory named ''");
 
 my $dir;
@@ -69,7 +69,7 @@ SKIP: {
         if $dir2 eq $tmp_base
             or $^O eq 'cygwin';
         
-    @created = @( < mkpath($dir2, \%(mask => 0700)) );
+    @created = mkpath($dir2, \%(mask => 0700));
     is(scalar(nelems @created), 1, "make directory with trailing parent segment");
     is(@created[0], $dir, "made parent");
 };
@@ -78,25 +78,25 @@ my $count = rmtree(\%(error => \$error));
 is( $count, 0, 'rmtree of nothing, count of zero' );
 is( scalar(nelems @$error), 0, 'no diagnostic captured' );
 
-@created = @( < mkpath($tmp_base, 0) );
+@created = mkpath($tmp_base, 0);
 is(scalar(nelems @created), 0, "skipped making existing directories (old style 1)")
-    or diag("unexpectedly recreated {join ' ', @( <@created)}");
+    or diag("unexpectedly recreated {join ' ',@created}");
 
 $dir = catdir($tmp_base,'C');
 # mkpath returns unix syntax filespecs on VMS
 $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
-@created = @( < mkpath($tmp_base, $dir) );
+@created = mkpath($tmp_base, $dir);
 is(scalar(nelems @created), 1, "created directory (new style 1)");
 is(@created[0], $dir, "created directory (new style 1) cross-check");
 
-@created = @( < mkpath($tmp_base, 0, 0700) );
+@created = mkpath($tmp_base, 0, 0700);
 is(scalar(nelems @created), 0, "skipped making existing directories (old style 2)")
-    or diag("unexpectedly recreated {join ' ', @( <@created)}");
+    or diag("unexpectedly recreated {join ' ',@created}");
 
 $dir2 = catdir($tmp_base,'D');
 # mkpath returns unix syntax filespecs on VMS
 $dir2 = VMS::Filespec::unixify($dir2) if $Is_VMS;
-@created = @( < mkpath($tmp_base, $dir, $dir2) );
+@created = mkpath($tmp_base, $dir, $dir2);
 is(scalar(nelems @created), 1, "created directory (new style 2)");
 is(@created[0], $dir2, "created directory (new style 2) cross-check");
 
@@ -104,12 +104,12 @@ is(@created[0], $dir2, "created directory (new style 2) cross-check");
 # Y should exist
 # existence of E is neither here nor there
 $dir = catdir($tmp_base, 'E', updir(), 'Y');
-@created = @( <mkpath($dir) );
+@created =mkpath($dir);
 cmp_ok(scalar(nelems @created), '+>=', 1, "made one or more dirs because of ..");
 cmp_ok(scalar(nelems @created), '+<=', 2, "made less than two dirs because of ..");
 ok( -d catdir($tmp_base, 'Y'), "directory after parent" );
 
-@created = @(< mkpath(catdir(curdir(), $tmp_base)) );
+@created = mkpath(catdir(curdir(), $tmp_base));
 is(scalar(nelems @created), 0, "nothing created")
     or diag(< @created);
 
@@ -126,7 +126,7 @@ rmtree( $dir, $dir2,
 
 is(scalar(nelems @$error), 0, "no errors unlinking a and z");
 is(scalar(nelems @$list),  4, "list contains 4 elements")
-    or diag("{join ' ', @( <@$list)}");
+    or diag("{join ' ',@$list}");
 
 ok(-d $dir,  "dir a still exists");
 ok(-d $dir2, "dir z still exists");
@@ -135,17 +135,17 @@ $dir = catdir($tmp_base,'F');
 # mkpath returns unix syntax filespecs on VMS
 $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
 
-@created = @( < mkpath($dir, undef, 0770) );
+@created = mkpath($dir, undef, 0770);
 is(scalar(nelems @created), 1, "created directory (old style 2 verbose undef)");
 is(@created[0], $dir, "created directory (old style 2 verbose undef) cross-check");
 is(rmtree($dir), 1, "removed directory 2 verbose undef");
 
-@created = @( < mkpath($dir, undef) );
+@created = mkpath($dir, undef);
 is(scalar(nelems @created), 1, "created directory (old style 2a verbose undef)");
 is(@created[0], $dir, "created directory (old style 2a verbose undef) cross-check");
 is(rmtree($dir), 1, "removed directory 2a verbose undef");
 
-@created = @( < mkpath($dir, 0, undef) );
+@created = mkpath($dir, 0, undef);
 is(scalar(nelems @created), 1, "created directory (old style 3 mode undef)");
 is(@created[0], $dir, "created directory (old style 3 mode undef) cross-check");
 is(rmtree($dir), 1, "removed directory 3 verbose undef");
@@ -153,7 +153,7 @@ is(rmtree($dir), 1, "removed directory 3 verbose undef");
 $dir = catdir($tmp_base,'G');
 $dir = VMS::Filespec::unixify($dir) if $Is_VMS;
 
-@created = @( < mkpath($dir, undef, 0200) );
+@created = mkpath($dir, undef, 0200);
 is(scalar(nelems @created), 1, "created write-only dir");
 is(@created[0], $dir, "created write-only directory cross-check");
 is(rmtree($dir), 1, "removed write-only dir");
@@ -169,19 +169,19 @@ else {
 $dir   = catdir('a', 'd1');
 $dir2  = catdir('a', 'd2');
 
-@created = @( < mkpath( $dir, 0, $dir2 ) );
+@created = mkpath( $dir, 0, $dir2 );
 is(scalar nelems @created, 3, 'new-style 3 dirs created');
 
 $count = rmtree( $dir, 0, $dir2, );
 is($count, 3, 'new-style 3 dirs removed');
 
-@created = @( < mkpath( $dir, $dir2, 1 ) );
+@created = mkpath( $dir, $dir2, 1 );
 is(scalar nelems @created, 3, 'new-style 3 dirs created (redux)');
 
 $count = rmtree( $dir, $dir2, 1 );
 is($count, 3, 'new-style 3 dirs removed (redux)');
 
-@created = @( < mkpath( $dir, $dir2 ) );
+@created = mkpath( $dir, $dir2 );
 is(scalar nelems @created, 2, 'new-style 2 dirs created');
 
 $count = rmtree( $dir, $dir2 );
@@ -207,7 +207,7 @@ SKIP: {
     ($file, $message) = each %{$error->[0]};
     is( $entry, $file, "and the message is: $message");
 
-    try {@created = @( < mkpath($entry, 0, 0700) )};
+    try {@created = mkpath($entry, 0, 0700)};
     $error = $@;
     chomp $error; # just to remove silly # in TAP output
     cmp_ok( $error, 'ne', "", "no directory created (old-style) err=$error" )
@@ -323,13 +323,13 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
     stderr_is( sub { rmtree() }, '', "rmtree no args does not carp" );
 
     stdout_is(
-        sub {@created = @( < mkpath($dir, 1) )},
+        sub {@created = mkpath($dir, 1)},
         "mkdir $base\nmkdir $dir\n",
         'mkpath verbose (old style 1)'
     );
 
     stdout_is(
-        sub {@created = @( < mkpath(\@($dir2), 1) )},
+        sub {@created = mkpath(\@($dir2), 1)},
         "mkdir $dir2\n",
         'mkpath verbose (old style 2)'
     );
@@ -341,13 +341,13 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
     );
 
     stdout_is(
-        sub {@created = @( < mkpath($dir, \%(verbose => 1, mask => 0750)) )},
+        sub {@created = mkpath($dir, \%(verbose => 1, mask => 0750))},
         "mkdir $dir\n",
         'mkpath verbose (new style 1)'
     );
 
     stdout_is(
-        sub {@created = @( < mkpath($dir2, 1, 0771) )},
+        sub {@created = mkpath($dir2, 1, 0771)},
         "mkdir $dir2\n",
         'mkpath verbose (new style 2)'
     );

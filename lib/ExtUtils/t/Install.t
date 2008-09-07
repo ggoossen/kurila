@@ -26,7 +26,7 @@ local %ENV{EU_INSTALL_ALWAYS_COPY};
 local %ENV{EU_ALWAYS_COPY};    
 
 # Check exports.
-foreach my $func (@( <qw(install uninstall pm_to_blib install_default))) {
+foreach my $func (qw(install uninstall pm_to_blib install_default)) {
     can_ok(__PACKAGE__, $func);
 }
 

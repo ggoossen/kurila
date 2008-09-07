@@ -31,7 +31,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	if %ENV{PERL_CORE_MINITEST};
 	skip("no PerlIO::scalar") unless %Config{extensions} =~ m!\bPerlIO/scalar\b!;
 	require PerlIO::scalar;
-	my $fcontents = join "", @( < map {"$_\015\012"} @( < "a".."zzz"));
+	my $fcontents = join "", map {"$_\015\012"} "a".."zzz";
 	open my $fh, "<:crlf", \$fcontents;
 	local $/ = "xxx";
 	local $_ = ~< $fh;

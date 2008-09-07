@@ -32,10 +32,10 @@ use vars < qw(@ISA @EXPORT $VERSION);
 use Exporter ();
 use Pod::Simple ();
 
-@ISA = @( < qw(Pod::Simple Exporter) );
+@ISA = qw(Pod::Simple Exporter);
 
 # We have to export pod2text for backward compatibility.
-@EXPORT = @( < qw(pod2text) );
+@EXPORT = qw(pod2text);
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
@@ -85,7 +85,7 @@ sub new {
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
     my %opts = %( < @_ );
-    my @opts = @( < map { ("opt_$_", %opts{$_}) } @( < keys %opts) );
+    my @opts = map { ("opt_$_", %opts{$_}) } keys %opts;
     %$self = %(< %$self, < @opts);
 
     # Initialize various things from our parameters.
@@ -373,7 +373,7 @@ sub heading {
     $self->item ("\n\n") if defined %$self{ITEM};
     $text =~ s/\s+$//;
     if (%$self{opt_alt}) {
-        my $closemark = join '', @( < reverse ( @( <split (m//, $marker))));
+        my $closemark = join '', reverse (split (m//, $marker));
         my $margin = ' ' x %$self{opt_margin};
         $self->output ("\n" . "$margin$marker $text $closemark" . "\n\n");
     } else {
@@ -567,7 +567,7 @@ sub pod2text {
     # we need to turn the first argument into a file handle.  Magic open will
     # handle the <&STDIN case automagically.
     if (defined @_[1]) {
-        my @fhs = @( < @_ );
+        my @fhs = @_;
         local *IN;
         unless (open (IN, "<", @fhs[0])) {
             die ("Can't open @fhs[0] for reading: $!\n");

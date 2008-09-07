@@ -21,7 +21,7 @@ can_ok( 'MM', 'os_flavor', 'os_flavor_is' );
 
 # Can't really know what the flavors are going to be, so we just
 # make sure it returns something.
-my @flavors = @( < MM->os_flavor );
+my @flavors = MM->os_flavor;
 ok( (nelems @flavors),   'os_flavor() returned something' );
 
 ok( MM->os_flavor_is(@flavors[rand nelems @flavors]), 

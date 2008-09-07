@@ -6,7 +6,7 @@ use lib File::Spec->catfile('t', 'lib');
 use Test::More;
 local $|=1;
 
-my @platforms = @( < qw(Cygwin Epoc Mac OS2 Unix VMS Win32) );
+my @platforms = qw(Cygwin Epoc Mac OS2 Unix VMS Win32);
 my $tests_per_platform = 10;
 
 plan tests => 1 + (nelems @platforms) * $tests_per_platform;
@@ -57,7 +57,7 @@ foreach my $platform ( @platforms) {
     is $module->file_name_is_absolute($base), 1, "$base is absolute on $platform";
 
     # splitdir('') -> ()
-    my @result = @( < $module->splitdir('') );
+    my @result = $module->splitdir('');
     is( (nelems @result), 0, "$platform->splitdir('') -> ()");
 
     # canonpath() -> undef

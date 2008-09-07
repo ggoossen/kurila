@@ -20,8 +20,8 @@ use vars < qw(@ISA @EXPORT $MYPKG);
 use Exporter;
 #use File::Compare;
 
-@ISA = @( < qw(Exporter) );
-@EXPORT = @( < qw(&testpodchecker) );
+@ISA = qw(Exporter);
+@EXPORT = qw(&testpodchecker);
 $MYPKG = try { (caller)[[0]] };
 
 sub stripname( $ ) {
@@ -75,7 +75,7 @@ sub testpodcheck( @ ) {
 
 sub testpodchecker( @ ) {
    my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
-   my @testpods = @( < @_ );
+   my @testpods = @_;
    my ($testname, $testdir) = ("", "");
    my ($podfile, $cmpfile) = ("", "");
    my ($outfile, $errfile) = ("", "");

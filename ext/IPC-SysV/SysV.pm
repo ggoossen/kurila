@@ -12,13 +12,13 @@ use Carp;
 use Config;
 
 require Exporter;
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
 $VERSION = "1.05";
 $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
-@EXPORT_OK = @( < qw(
+@EXPORT_OK = qw(
 	GETALL GETNCNT GETPID GETVAL GETZCNT
 
 	IPC_ALLOC IPC_CREAT IPC_EXCL IPC_GETACL IPC_LOCKED IPC_M
@@ -44,7 +44,7 @@ $VERSION = eval $VERSION;
 	S_IROTH S_IWOTH S_IRWXO
 
 	ftok
-) );
+);
 
 BOOT_XS: {
     require DynaLoader;

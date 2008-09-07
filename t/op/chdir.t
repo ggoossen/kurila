@@ -103,7 +103,7 @@ SKIP: {
 }
 
 # The environment variables chdir() pays attention to.
-my @magic_envs = @( < qw(HOME LOGDIR SYS$LOGIN) );
+my @magic_envs = qw(HOME LOGDIR SYS$LOGIN);
 
 sub check_env {
     my($key) = < @_;
@@ -171,7 +171,7 @@ END {
     no warnings 'uninitialized';
  <
     # Restore the environment for VMS (and doesn't hurt for anyone else)
-    %ENV{[@(< @magic_envs)]} = < %Saved_Env{[@(< @magic_envs)]};
+    %ENV{[ @magic_envs]} = < %Saved_Env{[ @magic_envs]};
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.

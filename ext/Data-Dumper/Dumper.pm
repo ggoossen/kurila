@@ -15,9 +15,9 @@ require Exporter;
 require overload;
 
 BEGIN {
-    our @ISA = @( < qw(Exporter) );
-    our @EXPORT = @( < qw(Dumper) );
-    our @EXPORT_OK = @( < qw(DumperX) );
+    our @ISA = qw(Exporter);
+    our @EXPORT = qw(Dumper);
+    our @EXPORT_OK = qw(DumperX);
 }
 
 # module vars and their defaults
@@ -123,7 +123,7 @@ sub Seen {
     return $s;
   }
   else {
-    return @( < map { < @$_ } @( < values %{$s->{seen}}) );
+    return map { < @$_ } values %{$s->{seen}};
   }
 }
 
@@ -133,7 +133,7 @@ sub Seen {
 sub Values {
   my($s, $v) = < @_;
   if (defined($v) && (ref($v) eq 'ARRAY'))  {
-    $s->{todump} = \@(< @$v);        # make a copy
+    $s->{todump} = \ @$v;        # make a copy
     return $s;
   }
   else {
@@ -147,7 +147,7 @@ sub Values {
 sub Names {
   my($s, $n) = < @_;
   if (defined($n) && (ref($n) eq 'ARRAY'))  {
-    $s->{names} = \@(< @$n);         # make a copy
+    $s->{names} = \ @$n;         # make a copy
     return $s;
   }
   else {
@@ -211,12 +211,12 @@ sub Dumpperl {
 
     $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{terse};
     $out .= $s->{pad} . $valstr . $s->{sep};
-    $out .= $s->{pad} . join(';' . $s->{sep} . $s->{pad}, @( < @post)) 
+    $out .= $s->{pad} . join(';' . $s->{sep} . $s->{pad}, @post) 
       . ';' . $s->{sep} if (nelems @post);
 
     push @out, $out;
   }
-  return join('', @( < @out));
+  return join('', @out);
 }
 
 # wrap string in single quotes (escaping if needed)
@@ -388,7 +388,7 @@ sub _dump {
         if ($s->{purity}) {
             my $k;
             local ($s->{level}) = 0;
-            for $k (@( <qw(SCALAR ARRAY HASH))) {
+            for $k (qw(SCALAR ARRAY HASH)) {
                 my $gval = *$rval{$k};
                 next unless defined $gval;
                 next if $k eq "SCALAR" && ! defined $$gval;  # always there
@@ -447,7 +447,7 @@ sub _dump {
                     $keys = \@();
                 }
             } else {
-                $keys = \@( < sort @( < keys %$rval) );
+                $keys = \ sort keys %$rval;
             }
         }
         while (($k, $v) = ! $sortkeys ? (each %$rval) :
@@ -509,12 +509,12 @@ sub _dump {
 # non-OO style of earlier version
 #
 sub Dumper {
-  return Data::Dumper->Dump(\@(< @_));
+  return Data::Dumper->Dump(\ @_);
 }
 
 # compat stub
 sub DumperX {
-  return Data::Dumper->Dumpxs(\@(< @_), \@());
+  return Data::Dumper->Dumpxs(\ @_, \@());
 }
 
 sub Dumpf { return Data::Dumper->Dump(< @_) }
@@ -663,7 +663,7 @@ sub qquote {
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { \@( < sort @( < keys %{@_[0]}) ) }
+sub _sortkeys { \ sort keys %{@_[0]} }
 
 1;
 __END__

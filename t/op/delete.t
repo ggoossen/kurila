@@ -32,26 +32,26 @@ ok(!(exists %foo{5}),'e absent');
 cmp_ok(%foo{1},'eq','a','a still exists');
 cmp_ok(%foo{3},'eq','c','c still exists');
 
-$foo = join('', @( <values(%foo)));
+$foo = join('',values(%foo));
 ok($foo eq 'ac' || $foo eq 'ca','remaining keys');
 
-foreach $key (@( <keys %foo)) {
+foreach $key (keys %foo) {
     delete %foo{$key};
 }
 
 %foo{'foo'} = 'x';
 %foo{'bar'} = 'y';
 
-$foo = join('', @( <values(%foo)));
+$foo = join('',values(%foo));
 ok($foo eq 'xy' || $foo eq 'yx','fresh keys');
 
 %refhash{"top"}->{"foo"} = "FOO";
 %refhash{"top"}->{"bar"} = "BAR";
 
 delete %refhash{"top"}->{"bar"};
-@list = @( < keys %{%refhash{"top"}} );
+@list = keys %{%refhash{"top"}};
 
-cmp_ok("{join ' ', @( <@list)}",'eq',"foo", 'autoviv and delete hashref');
+cmp_ok("{join ' ',@list}",'eq',"foo", 'autoviv and delete hashref');
 
 {
     my %a = %('bar', 33);
@@ -89,7 +89,7 @@ ok(!(exists @foo[5]),'ary e absent');
 cmp_ok(@foo[1],'eq','a','ary a still exists');
 cmp_ok(@foo[3],'eq','c','ary c still exists');
 
-$foo = join('', @(< @foo));
+$foo = join('', @foo);
 cmp_ok($foo,'eq','ac','ary elems');
 cmp_ok(scalar(nelems @foo),'==',4,'four is the number thou shalt count');
 
@@ -102,7 +102,7 @@ cmp_ok(scalar(nelems @foo),'==',0,'and then there were none');
 @foo[0] = 'x';
 @foo[1] = 'y';
 
-$foo = "{join ' ', @( <@foo)}";
+$foo = "{join ' ',@foo}";
 cmp_ok($foo,'eq','x y','two fresh');
 
 @refary[0]->[0] = "FOO";

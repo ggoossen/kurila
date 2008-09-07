@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
       or die "Can't chdir to lib/ExtUtils/ParseXS: $!";
-    @INC = @( < qw(../.. ../../.. .) );
+    @INC = qw(../.. ../../.. .);
   }
 }
 use strict;

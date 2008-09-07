@@ -10,10 +10,10 @@ use File::GlobMapper;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $HAS_ENCODE);
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 $VERSION = '2.006';
 
-@EXPORT = @( < qw( isaFilehandle isaFilename whatIsInput whatIsOutput 
+@EXPORT = qw( isaFilehandle isaFilename whatIsInput whatIsOutput 
               isaFileGlobString cleanFileGlobString oneTarget
               setBinModeInput
               createSelfTiedObject
@@ -28,13 +28,13 @@ $VERSION = '2.006';
               STATUS_ENDSTREAM
               STATUS_EOF
               STATUS_ERROR
-          ) );  
+          );  
 
-%EXPORT_TAGS = %( Status => \@( <qw( STATUS_OK
+%EXPORT_TAGS = %( Status => \qw( STATUS_OK
                                  STATUS_ENDSTREAM
                                  STATUS_EOF
                                  STATUS_ERROR
-                           )));
+                           ));
 
                        
 use constant STATUS_OK        => 0;
@@ -255,7 +255,7 @@ sub Validator::new
     if ($inType eq 'fileglob') # && $outType ne 'fileglob'
     {
         my $glob = cleanFileGlobString(@_[0]);
-        my @inputs = glob@( <$glob);
+        my @inputs = glob$glob;
 
         if ((nelems @inputs) == 0)
         {
@@ -274,7 +274,7 @@ sub Validator::new
         {
             $obj->validateInputFilenames(< @inputs)
                 or return undef;
-            @_[0] = \@( < @inputs ) ;
+            @_[0] = \ @inputs ;
             %data{inType} = 'filenames' ;
         }
     }
@@ -438,12 +438,11 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-%EXPORT_TAGS{Parse} = \@( <qw( ParseParameters 
+%EXPORT_TAGS{Parse} = \qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar
-                         )
-                      );              
+                         );              
 
 push @EXPORT, < @{ %EXPORT_TAGS{Parse} } ;
 
@@ -537,7 +536,7 @@ sub IO::Compress::Base::Parameters::parse
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
  
-        foreach my $key (@( <keys %$href)) {
+        foreach my $key (keys %$href) {
             push @entered, $key ;
             push @entered, \$href->{$key} ;
         }
@@ -556,7 +555,7 @@ sub IO::Compress::Base::Parameters::parse
 
     while (my ($key, $v) = each %$default)
     {
-        croak "need 4 params [{join ' ', @( <@$v)}]"
+        croak "need 4 params [{join ' ',@$v}]"
             if (nelems @$v) != 4 ;
 
         my ($first_only, $sticky, $type, $value) = < @$v ;
@@ -615,8 +614,8 @@ sub IO::Compress::Base::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my ($bad) = join(", ", @( < @Bad)) ;
-        return $self->setError("unknown key value(s) {join ' ', @( <@Bad)}") ;
+        my ($bad) = join(", ", @Bad) ;
+        return $self->setError("unknown key value(s) {join ' ',@Bad}") ;
     }
 
     return 1;
@@ -764,7 +763,7 @@ sub IO::Compress::Base::Parameters::clone
     my %got ;
 
     while (my ($k, $v) = each %{ $self->{Got} }) {
-        %got{$k} = \@( < @$v );
+        %got{$k} = \ @$v;
     }
 
     $obj->{Error} = $self->{Error};
@@ -822,7 +821,7 @@ sub reset
 sub clone
 {
     my $self = shift;
-    bless \@( < @$self ), ref $self ;
+    bless \ @$self, ref $self ;
 }
 
 sub getHigh

@@ -114,19 +114,19 @@ dies_like( sub { %SIG{TERM} = 'foo' },
     qr/signal handler should be a code reference or .../ );
 
 # can we slice ENV?
-my @val1 = @( < %ENV{[@( <keys(%ENV))]} );
-my @val2 = @( < values(%ENV) );
-ok join(':', @(< @val1)) eq join(':', @(< @val2));
+my @val1 = %ENV{[keys(%ENV)]};
+my @val2 = values(%ENV);
+ok join(':', @val1) eq join(':', @val2);
 ok( (nelems @val1) +> 1 );
 
 # regex vars
 
 # $"
-my @a = @( < qw(foo bar baz) );
-ok "{join ' ', @( <@a)}" eq "foo bar baz", "{join ' ', @( <@a)}";
+my @a = qw(foo bar baz);
+ok "{join ' ',@a}" eq "foo bar baz", "{join ' ',@a}";
 {
     local $" = ',';
-    ok qq|{join $", @( <@a)}| eq "foo,bar,baz", "{join ' ', @( <@a)}";
+    ok qq|{join $",@a}| eq "foo,bar,baz", "{join ' ',@a}";
 }
 
 # $?, $@, $$
@@ -314,7 +314,7 @@ else {
 {
     my $ok = 1;
     my $warn = '';
-    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @( < @_); };
+    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @_; };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }

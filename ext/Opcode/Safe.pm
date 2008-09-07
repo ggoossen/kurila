@@ -42,7 +42,7 @@ my $default_root  = 0;
 # share *_ and functions defined in universal.c
 # Don't share stuff like *UNIVERSAL:: otherwise code from the
 # compartment can 0wn functions in UNIVERSAL
-my $default_share = \@( <qw[
+my $default_share = \qw[
     $_
     @_
     &PerlIO::get_layers
@@ -93,7 +93,7 @@ my $default_share = \@( <qw[
     &error::message
     &error::write_to_stderr
     &Symbol::fetch_glob
-]);
+];
 
 sub new {
     my($class, $root, $mask) = < @_;
@@ -158,7 +158,7 @@ sub erase {
     my $leaf_symtab = *{$leaf_globref}{HASH};
 #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
     # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
-    for (@( <keys %$leaf_symtab)) {
+    for (keys %$leaf_symtab) {
         delete $leaf_symtab->{$_};
     }
     #delete $leaf_symtab->{'__ANON__'};
@@ -265,7 +265,7 @@ sub share_record {
     my $vars = shift;
     my $shares = \%{$obj->{Shares} ||= \%()};
  <    # Record shares using keys of $obj->{Shares}. See reinit.
-    %{$shares}{[@(< @$vars)]} = ($pkg) x nelems @$vars if (nelems @$vars);
+    %{$shares}{[ @$vars]} = ($pkg) x nelems @$vars if (nelems @$vars);
 }
 sub share_redo {
     my $obj = shift;

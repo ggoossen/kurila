@@ -25,7 +25,7 @@ my $Is_VMS = $^O eq 'VMS';
 
 # We're going to be chdir'ing and modules are sometimes loaded on the
 # fly in this test, so we need an absolute @INC.
-@INC = @( < map { File::Spec->rel2abs($_) } @( < @INC) );
+@INC = map { File::Spec->rel2abs($_) } @INC;
 
 # keep track of everything added so it can all be deleted
 my %Files;
@@ -81,15 +81,15 @@ chmod( 0744, 'foo') if %Config{'chmod'};
 # there shouldn't be a MANIFEST there
 my ($res, $warn) = < catch_warning( \&mkmanifest );
 # Canonize the order.
-$warn = join("", @( < map { "$_|" } 
- @( <                 sort { lc($a) cmp lc($b) } @( < split m/\r?\n/, $warn))));
+$warn = join("", map { "$_|" } 
+                 sort { lc($a) cmp lc($b) } split m/\r?\n/, $warn);
 is( $warn, "Added to MANIFEST: foo|Added to MANIFEST: MANIFEST|",
     "mkmanifest() displayed its additions" );
 
 # and now you see it
 ok( -e 'MANIFEST', 'create MANIFEST file' );
 
-my @list = @( < read_manifest() );
+my @list = read_manifest();
 is( (nelems @list), 2, 'check files in MANIFEST' );
 ok( ! ExtUtils::Manifest::filecheck(), 'no additional files in directory' );
 
@@ -118,14 +118,14 @@ like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 my @skipped;
 catch_warning( sub {
-	@skipped = @( < skipcheck() )
+	@skipped = skipcheck()
 });
 
-is( join( ' ', @( < @skipped) ), 'MANIFEST.SKIP', 'listed skipped files' );
+is( join( ' ', @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
 
 {
 	local $ExtUtils::Manifest::Quiet = 1;
-	is( join(' ', @( < filecheck()) ), 'bar', 'listing skipped with filecheck()' );
+	is( join(' ', filecheck() ), 'bar', 'listing skipped with filecheck()' );
 }
 
 # add a subdirectory and a file there that should be found
@@ -138,7 +138,7 @@ ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ),
 $_ = 'foo';
 my $files = maniread();
 is( nkeys %$files, 2, 'two files found' );
-is( join(' ', @( < sort { lc($a) cmp lc($b) } @( < keys %$files))), 'foo MANIFEST', 
+is( join(' ', sort { lc($a) cmp lc($b) } keys %$files), 'foo MANIFEST', 
                                         'both files found' );
 is( $_, 'foo', q{maniread() doesn't clobber $_} );
 
@@ -148,10 +148,10 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 manicopy( $files, 'copy', 'cp' );
 my @copies = @( () );
 find( sub { push @copies, $_ if -f }, 'copy' );
-@copies = @( < map { s/\.$//; $_ } @( < @copies) ) if $Is_VMS;  # VMS likes to put dots on
+@copies = map { s/\.$//; $_ } @copies if $Is_VMS;  # VMS likes to put dots on
                                                    # the end of files.
 # Have to compare insensitively for non-case preserving VMS
-is_deeply( \@( <sort @( < map { lc } @( < @copies))), \@( <sort @( < map { lc } @( < keys %$files))) );
+is_deeply( \sort map { lc } @copies, \sort map { lc } keys %$files );
 
 # cp would leave files readonly, so check permissions.
 foreach my $orig ( @copies) {
@@ -230,12 +230,12 @@ is( $files->{foobar}, '',    '          preserved old entries' );
     add_file('MANIFEST.SKIP' =>
              "albatross\n#!include $skip\n#!include_default");
     my ($res, $warn) = < catch_warning( \&skipcheck );
-    for (@( <qw(albatross foo foobar mymanifest.skip mydefault.skip))) {
+    for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
         like( $warn, qr/Skipping \b$_\b/,
               "Skipping $_" );
     }
     ($res, $warn) = < catch_warning( \&mkmanifest );
-    for (@( <qw(albatross foo foobar mymanifest.skip mydefault.skip))) {
+    for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
         like( $warn, qr/Removed from MANIFEST: \b$_\b/,
               "Removed $_ from MANIFEST" );
     }
@@ -257,7 +257,7 @@ add_file('MANIFEST'   => 'Makefile.PL');
 maniadd(\%( foo  => 'bar' ));
 $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
-%$files = %( < map { (lc $_ => $files->{$_}) } @( < keys %$files) );
+%$files = %( < map { (lc $_ => $files->{$_}) } keys %$files );
 my %expect = %( 'makefile.pl' => '',
                'foo'    => 'bar'
              );

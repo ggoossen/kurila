@@ -7,8 +7,8 @@ BEGIN {
 # don't make this lexical
 our $i = 1;
 
-my @fjles_to_delete = @( < qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
-krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm) );
+my @fjles_to_delete = qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
+krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm);
 
 
 my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;

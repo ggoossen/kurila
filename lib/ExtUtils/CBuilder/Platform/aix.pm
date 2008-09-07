@@ -6,7 +6,7 @@ use File::Spec;
 
 use vars < qw($VERSION @ISA);
 $VERSION = '0.22';
-@ISA = @( < qw(ExtUtils::CBuilder::Platform::Unix) );
+@ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
 sub need_prelink { 1 }
 

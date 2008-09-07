@@ -6,7 +6,7 @@ require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @( < qw(File::Spec::Unix) );
+@ISA = qw(File::Spec::Unix);
 
 my $macfiles;
 if ($^O eq 'MacOS') {
@@ -194,7 +194,7 @@ yields
 sub catdir {
 	my $self = shift;
 	return '' unless (nelems @_);
-	my @args = @( < @_ );
+	my @args = @_;
 	my $first_arg;
 	my $relative;
 
@@ -433,7 +433,7 @@ sub path {
 #  Under MPW, it has a meaning.
 #
     return unless exists %ENV{Commands};
-    return @( <split(m/,/, %ENV{Commands}));
+    returnsplit(m/,/, %ENV{Commands});
 }
 
 =item splitpath
@@ -680,8 +680,8 @@ sub abs2rel {
     return $path unless lc( $path_vol ) eq lc( $base_vol );
 
     # Now, remove all leading components that are the same
-    my @pathchunks = @( < $self->splitdir( $path_dirs ) );
-    my @basechunks = @( < $self->splitdir( $base_dirs ) );
+    my @pathchunks = $self->splitdir( $path_dirs );
+    my @basechunks = $self->splitdir( $base_dirs );
 	
     while ( (nelems @pathchunks) &&
 	    nelems @basechunks &&

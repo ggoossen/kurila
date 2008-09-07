@@ -13,9 +13,9 @@ our $MaxArgNums = 8;    # How many arguments to print. 0 = all.
 
 require Exporter;
 our @ISA = @('Exporter');
-our @EXPORT = @( < qw(confess croak carp) );
-our @EXPORT_OK = @( < qw(cluck verbose longmess shortmess) );
-our @EXPORT_FAIL = @( < qw(verbose) );	# hook to enable verbose mode
+our @EXPORT = qw(confess croak carp);
+our @EXPORT_OK = qw(cluck verbose longmess shortmess);
+our @EXPORT_FAIL = qw(verbose);	# hook to enable verbose mode
 
 # if the caller specifies verbose usage ("perl -MCarp=verbose script.pl")
 # then the following method will be called by the Exporter which knows

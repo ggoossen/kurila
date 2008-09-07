@@ -40,7 +40,7 @@ sub import {
   return export $pkg, $callpkg, < @_
     if $Verbose or $Debug or (nelems @$fail) +> 1;
   my $export_cache = (%Cache{$pkg} ||= \%());
-  my $args = (nelems @_) or @_ = @( < @$exports );
+  my $args = (nelems @_) or @_ = @$exports;
 
   local $_;
   if ($args and not %$export_cache) {

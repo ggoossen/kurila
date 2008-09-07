@@ -127,12 +127,12 @@ my $testpkgs = \%(
     B => \%( 
 	dflt => 'constant',		# all but 47/297
 	skip => \@( 'regex_padav' ),	# threaded only
-	perl => \@( <qw(
+	perl => \qw(
 		    walksymtable walkoptree_slow walkoptree_exec
 		    timing_info savesym peekop parents objsym debug
 		    compile_stats clearsym class
-		    )),
-	XS => \@( <qw(
+		    ),
+	XS => \qw(
 		  warnhook walkoptree_debug walkoptree 
 		  svref_2object sv_yes sv_undef sv_no save_BEGINs
 		  regex_padav ppname perlstring opnumber minus_c
@@ -140,13 +140,13 @@ my $testpkgs = \%(
 		  end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  begin_av amagic_generation sub_generation address
-                  set_main_start set_main_root fudge unitcheck_av)),
+                  set_main_start set_main_root fudge unitcheck_av),
     ),
 
     'B::Deparse' => \%( dflt => 'perl',	# 235 functions
 
-	XS => \@( <qw( svref_2object perlstring opnumber main_start
-		   main_root main_cv )),
+	XS => \qw( svref_2object perlstring opnumber main_start
+		   main_root main_cv ),
 
 	constant => \@( <qw/ ASSIGN CVf_LOCKED
 		     CVf_METHOD LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
@@ -166,8 +166,8 @@ my $testpkgs = \%(
 		 ),
 
     POSIX => \%( dflt => 'constant',			# all but 252/589
-	       skip => \@( <qw/ _POSIX_JOB_CONTROL /),	# platform varying
-	       perl => \@( <qw/ import load_imports
+	       skip => \qw/ _POSIX_JOB_CONTROL /,	# platform varying
+	       perl => \qw/ import load_imports
                             usage redef unimpl assert tolower toupper closedir
                             opendir readdir rewinddir errno creat fcntl getgrgid
                             getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
@@ -188,9 +188,9 @@ my $testpkgs = \%(
 
                             S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                             WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG
-                            /),
+                            /,
 
-	       XS => \@( <qw/ write wctomb wcstombs uname tzset tzname
+	       XS => \qw/ write wctomb wcstombs uname tzset tzname
 		      ttyname tmpnam times tcsetpgrp tcsendbreak
 		      tcgetpgrp tcflush tcflow tcdrain tanh tan
 		      sysconf strxfrm strtoul strtol strtod
@@ -206,24 +206,24 @@ my $testpkgs = \%(
 		      ctermid cosh constant close clock ceil
 		      bootstrap atan asin asctime acos access abort
 		      _exit
-		      /),
+		      /,
 	       ),
 
     'IO::Socket' => \%( dflt => 'constant',		# 157/190
 
-		    perl => \@( <qw/ timeout socktype sockopt sockname
+		    perl => \qw/ timeout socktype sockopt sockname
 			     socketpair socket sockdomain
 			     sockaddr_in shutdown setsockopt send
 			     register_domain recv protocol peername
 			     new listen import getsockopt croak
 			     connected connect configure confess close
 			     carp bind atmark accept blocking
-                             /),
+                             /,
 
-		    XS => \@( <qw/ unpack_sockaddr_un unpack_sockaddr_in
+		    XS => \qw/ unpack_sockaddr_un unpack_sockaddr_in
 			   sockatmark sockaddr_family pack_sockaddr_un
 			   pack_sockaddr_in inet_ntoa inet_aton
-			   /),
+			   /,
 		),
 );
 
@@ -251,17 +251,17 @@ if (%opts) {
     Data::Dumper->import('Dumper');
     $Data::Dumper::Sortkeys = 1;
 }
-my @argpkgs = @( < @ARGV );
+my @argpkgs = @ARGV;
 my %report;
 
 if (%opts{r}) {
     my $refpkgs = require "%opts{r}";
-    $testpkgs->{$_} = $refpkgs->{$_} foreach @( < keys %$refpkgs);
+    $testpkgs->{$_} = $refpkgs->{$_} foreach keys %$refpkgs;
 }
 
 unless (%opts{a}) {
     unless (nelems @argpkgs) {
-	foreach my $pkg (@( <sort @( < keys %$testpkgs))) {
+	foreach my $pkg (sort keys %$testpkgs) {
 	    test_pkg($pkg, $testpkgs->{$pkg});
 	}
     } else {
@@ -282,11 +282,10 @@ sub test_pkg {
     my (%stash) = %( < map
 	( ($_ => 0), @(
 	   ( < grep exists &{*{Symbol::fetch_glob("$pkg\::$_")}}	# grab CODE symbols
-, @(	        < grep !m/__ANON__/, @(		# but not anon subs
-	        < keys %{*{Symbol::fetch_glob($pkg.'::')}}		# from symbol table
-))	       ))) );
+, grep !m/__ANON__/, keys %{*{Symbol::fetch_glob($pkg.'::')}}		# from symbol table
+	       ))) );
 
-    for my $type (@( <keys %matchers)) {
+    for my $type (keys %matchers) {
 	foreach my $fn ( @{$fntypes->{$type}}) {
 	    carp "$fn can only be one of $type, %stash{$fn}\n"
 		if %stash{$fn};
@@ -295,7 +294,7 @@ sub test_pkg {
     }
     # set default type for un-named functions
     my $dflt = $fntypes->{dflt} || 'perl';
-    for my $k (@( <keys %stash)) {
+    for my $k (keys %stash) {
 	%stash{$k} = $dflt unless %stash{$k};
     }
     %stash{$_} = 'skip' foreach  @{$fntypes->{skip}};
@@ -324,7 +323,7 @@ sub checkXS {
 
     unless ($res) {
 	# test failed. return type that would give success
-	for my $m (@( <keys %matchers)) {
+	for my $m (keys %matchers) {
 	    return $m if $buf =~ %matchers{$m};
 	}
     }
@@ -352,7 +351,7 @@ sub corecheck {
 	return;
     }
     my $mods = %Module::CoreList::version{'5.009002'};
-    $mods = \@( < sort @( < keys %$mods) );
+    $mods = \ sort keys %$mods;
     print < Dumper($mods);
 
     foreach my $pkgnm ( @$mods) {
@@ -365,9 +364,9 @@ END {
 	$Data::Dumper::Indent = 1;
 	print "Corrections: ", < Dumper(\%report);
 
-	foreach my $pkg (@( <sort @( < keys %report))) {
-	    for my $type (@( <keys %matchers)) {
-		print "$pkg: $type: {join ' ', @( <@{%report{$pkg}->{$type}})}\n"
+	foreach my $pkg (sort keys %report) {
+	    for my $type (keys %matchers) {
+		print "$pkg: $type: {join ' ',@{%report{$pkg}->{$type}}}\n"
 		    if (nelems @{%report{$pkg}->{$type}});
 	    }
 	}

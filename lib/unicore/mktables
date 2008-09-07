@@ -86,7 +86,7 @@ if ($FileList) {
             push @$list, $file;
         }
         my %dupe;
-        @$list = @( < grep !%dupe{ $_ }++, @( < @$list) );
+        @$list = grep !%dupe{ $_ }++, @$list;
     }
     close $fh;
     die "No input or output files in '$FileList'!"
@@ -145,7 +145,7 @@ if ($FileList) {
 
 foreach my $lib (@('To', 'lib',
 		 < map { File::Spec->catdir("lib",$_)}
- @( <		 qw(gc_sc dt bc hst ea jt lb nt ccc)))) {
+		 qw(gc_sc dt bc hst ea jt lb nt ccc))) {
   next if -d $lib;
   mkdir $lib, 0755 or die "mkdir '$lib': $!";
 }
@@ -179,7 +179,7 @@ sub WriteIfChanged($$)
 
     $file = File::Spec->catfile(< @$file) if ref $file;
 
-    my $TextToWrite = join '', @( < $lines);
+    my $TextToWrite = join '', $lines;
     if (open IN, "<", $file) {
         local($/) = undef;
         my $PreviousText = ~< *IN;
@@ -291,8 +291,8 @@ sub Build_Aliases()
 	my ($prop, < @data) = < split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
-	    %PropValueAlias{$prop}->{@data[1]} = \@( < @data[[@(0,2)]] );
-	    %PVA_reverse{$prop}->{@data[2]} = \@( < @data[[@(0,1)]] );
+	    %PropValueAlias{$prop}->{@data[1]} = \ @data[[@(0,2)]];
+	    %PVA_reverse{$prop}->{@data[2]} = \ @data[[@(0,1)]];
 	}
 	else {
             next if @data[0] eq "n/a";
@@ -415,7 +415,7 @@ sub Table::Replace($$)
     my $Table = shift; #self
     my $New   = shift;
 
-    @$Table = @( < @$New );
+    @$Table = @$New;
 }
 
 ##
@@ -554,7 +554,7 @@ sub Table::Invert
 sub Table::Merge
 {
     shift(@_) if not ref @_[0]; ## if called as a constructor, lose the class
-    my @Tables = @( < @_ );
+    my @Tables = @_;
 
     ## Accumulate all records from all tables
     my @Records;
@@ -574,7 +574,7 @@ sub Table::Merge
         ($a->[RANGE_START] <+> $b->[RANGE_START])
           or
         ($b->[RANGE_END]   <+> $b->[RANGE_END])
-    } @( < @Records);
+    } @Records;
 
     my $New = Table->New();
 
@@ -1043,7 +1043,7 @@ sub UnicodeData_Txt()
     # LC is Ll, Lu, and Lt.
     # (used to be L& or L_, but PropValueAliases.txt defines it as LC)
     New_Prop(Is => 'LC',
-             Table->Merge( <%Cat{[@( <qw[Ll Lu Lt])]}),
+             Table->Merge( <%Cat{[qw[Ll Lu Lt]]}),
              Desc  => '[\p{Ll}\p{Lu}\p{Lt}]',
              Fuzzy => 0);
 
@@ -1083,12 +1083,12 @@ sub UnicodeData_Txt()
     ## ...and any character with a decomposition that starts with either of
     ## those code points, but only if the decomposition does not have any
     ## combining character with the "ABOVE" canonical combining class.
-    for my $code (@( <sort { $a <+> $b} @( < keys %CodeToDeco)))
+    for my $code (sort { $a <+> $b} keys %CodeToDeco)
     {
         ## Need to ensure that all decomposition characters do not have
         ## a %HexCodeToComb in %AboveCombClasses.
         my $want = 1;
-        for my $deco_hexcode (@( <split m/ /, %CodeToDeco{$code}))
+        for my $deco_hexcode (split m/ /, %CodeToDeco{$code})
         {
             if (exists %_Above_HexCodes{$deco_hexcode}) {
                 ## one of the decmposition chars has an ABOVE combination
@@ -1111,8 +1111,8 @@ sub UnicodeData_Txt()
 
     {
 	my @PVA = @( $HEADER );
-	foreach my $name (@( <qw (PropertyAlias PA_reverse PropValueAlias
-			      PVA_reverse PVA_abbr_map))) {
+	foreach my $name (qw (PropertyAlias PA_reverse PropValueAlias
+			      PVA_reverse PVA_abbr_map)) {
 	    # Should I really jump through typeglob hoops just to avoid a
 	    # symbolic reference? (%{"utf8::$name})
 	    push @PVA, "\n", "\%utf8::$name = \%(\n", <
@@ -1123,7 +1123,7 @@ sub UnicodeData_Txt()
     }
 
     # $Bidi->Write("Bidirectional.pl");
-    for (@( <keys %Bidi)) {
+    for (keys %Bidi) {
 	%Bidi{$_}->Write(
 	    \@("lib","bc","$_.pl"),
 	    "BidiClass category '%PropValueAlias{bc}->{$_}'"
@@ -1131,7 +1131,7 @@ sub UnicodeData_Txt()
     }
 
     $Comb->Write("CombiningClass.pl");
-    for (@( <keys %{ %PropValueAlias{ccc} })) {
+    for (keys %{ %PropValueAlias{ccc} }) {
 	my ($code, $name) = < @{ %PropValueAlias{ccc}->{$_} };
 	(my $c = Table->New())->Append($code);
 	$c->Write(
@@ -1141,7 +1141,7 @@ sub UnicodeData_Txt()
     }
 
     $Deco->Write("Decomposition.pl");
-    for (@( <keys %DC)) {
+    for (keys %DC) {
 	%DC{$_}->Write(
 	    \@("lib","dt","$_.pl"),
 	    "DecompositionType category '%PropValueAlias{dt}->{$_}'"
@@ -1149,7 +1149,7 @@ sub UnicodeData_Txt()
     }
 
     # $Number->Write("Number.pl");
-    for (@( <keys %Number)) {
+    for (keys %Number) {
 	%Number{$_}->Write(
 	    \@("lib","nt","$_.pl"),
 	    "NumericType category '%PropValueAlias{nt}->{$_}'"
@@ -1158,11 +1158,11 @@ sub UnicodeData_Txt()
 
     # $General->Write("Category.pl");
 
-    for my $to (@( <sort @( < keys %To))) {
+    for my $to (sort keys %To) {
         %To{$to}->Write(\@("To","$to.pl"));
     }
 
-    for (@( <keys %{ %PropValueAlias{gc} })) {
+    for (keys %{ %PropValueAlias{gc} }) {
 	New_Alias(Is => %PropValueAlias{gc}->{$_}, SameAs => $_, Fuzzy => 1);
     }
 }
@@ -1200,7 +1200,7 @@ sub LineBreak_Txt()
     # $Lbrk->Write("Lbrk.pl");
 
 
-    for (@( <keys %Lbrk)) {
+    for (keys %Lbrk) {
 	%Lbrk{$_}->Write(
 	    \@("lib","lb","$_.pl"),
 	    "Linebreak category '%PropValueAlias{lb}->{$_}'"
@@ -1241,7 +1241,7 @@ sub ArabicShaping_txt()
     # $ArabLinkGroup->Write("ArabLnkGrp.pl");
 
 
-    for (@( <keys %JoinType)) {
+    for (keys %JoinType) {
 	%JoinType{$_}->Write(
 	    \@("lib","jt","$_.pl"),
 	    "JoiningType category '%PropValueAlias{jt}->{$_}'"
@@ -1278,7 +1278,7 @@ sub EastAsianWidth_txt()
     close IN;
 
 
-    for (@( <keys %EAW)) {
+    for (keys %EAW) {
 	%EAW{$_}->Write(
 	    \@("lib","ea","$_.pl"),
 	    "EastAsianWidth category '%PropValueAlias{ea}->{$_}'"
@@ -1309,7 +1309,7 @@ sub HangulSyllableType_txt()
     }
     close IN;
 
-    for (@( <keys %HST)) {
+    for (keys %HST) {
 	%HST{$_}->Write(
 	    \@("lib","hst","$_.pl"),
 	    "HangulSyllableType category '%PropValueAlias{hst}->{$_}'"
@@ -1362,7 +1362,7 @@ sub Scripts_txt()
     my %Script;
     my $Scripts = Table->New();
 
-    for my $script (@( <sort { $a->[0] <+> $b->[0] } @( < @ScriptInfo)))
+    for my $script (sort { $a->[0] <+> $b->[0] } @ScriptInfo)
     {
         my ($first, $last, $name) = < @$script;
         $Scripts->Append($first, $name);
@@ -1471,7 +1471,7 @@ sub PropList_txt()
     my $Props = Table->New();
     my %Prop;
 
-    for my $prop (@( <sort { $a->[0] <+> $b->[0] } @( < @PropInfo)))
+    for my $prop (sort { $a->[0] <+> $b->[0] } @PropInfo)
     {
         my ($first, $last, $name) = < @$prop;
         $Props->Append($first, $name);
@@ -1487,7 +1487,7 @@ sub PropList_txt()
         }
     }
 
-    for (@( <keys %Prop)) {
+    for (keys %Prop) {
 	(my $file = %PA_reverse{$_}) =~ s/_//g;
 	# XXX I'm assuming that the names from %Prop don't suffer 8.3 clashes.
 	%BaseNames{lc $file}++;
@@ -1523,14 +1523,14 @@ sub PropList_txt()
 
     # ID_Start is Ll, Lu, Lt, Lm, Lo, Nl, and Other_ID_Start.
     New_Prop(Is => 'ID_Start',
-             Table->Merge( <%Cat{[@( <qw[Ll Lu Lt Lm Lo Nl])]}, %Prop{Other_ID_Start}),
+             Table->Merge( <%Cat{[qw[Ll Lu Lt Lm Lo Nl]]}, %Prop{Other_ID_Start}),
              Desc  => '[\p{Ll}\p{Lu}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{OtherIDStart}]',
              Fuzzy => 1);
 
     # ID_Continue is ID_Start, Mn, Mc, Nd, Pc, and Other_ID_Continue.
     New_Prop(Is => 'ID_Continue',
-             Table->Merge( <%Cat{[@( <qw[Ll Lu Lt Lm Lo Nl Mn Mc Nd Pc ])]}, <
-                          %Prop{[@( <qw[Other_ID_Start Other_ID_Continue])]}),
+             Table->Merge( <%Cat{[qw[Ll Lu Lt Lm Lo Nl Mn Mc Nd Pc ]]}, <
+                          %Prop{[qw[Other_ID_Start Other_ID_Continue]]}),
              Desc  => '[\p{ID_Start}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{OtherIDContinue}]',
              Fuzzy => 1);
 
@@ -1542,7 +1542,7 @@ sub PropList_txt()
     $Annotation->RawAppendRange(0xFFF9, 0xFFFB);
 
     New_Prop(Is => 'Default_Ignorable_Code_Point',
-             Table->Merge( <%Cat{[@( <qw[Cf Cc Cs])]},
+             Table->Merge( <%Cat{[qw[Cf Cc Cs]]},
                           %Prop{Noncharacter_Code_Point},
                           %Prop{Variation_Selector},
                           %Prop{Other_Default_Ignorable_Code_Point})
@@ -1622,7 +1622,7 @@ sub RandomlyFuzzifyName($;$)
     my $WantError = shift;  ## if true, make an error
 
     my @parts;
-    for my $part (@( <split m/[-\s_]+/, $Name))
+    for my $part (split m/[-\s_]+/, $Name)
     {
         if ((nelems @parts)) {
             if ($WantError and rand() +< 0.3) {
@@ -1643,7 +1643,7 @@ sub RandomlyFuzzifyName($;$)
             push @parts, $part;
         }
     }
-    my $new = join('', @( < @parts));
+    my $new = join('', @parts);
 
     if ($WantError) {
         if (rand() +>= 0.5) {
@@ -1682,7 +1682,7 @@ sub MakePropTestScript()
                      RandomlyFuzzifyName($Orig) => 1
                     );
 
-        for my $N (@( <keys %Names)) {
+        for my $N (keys %Names) {
             GenTests(*OUT, $N, $Table->ValidCode, $Table->InvalidCode);
         }
 
@@ -1767,7 +1767,7 @@ sub WriteAllMappings()
     {
         my %RawNameToFile; ## a per-$Type cache
 
-        for my $Name (@( <sort {length $a <+> length $b} @( < keys %{%TableInfo{$Type}})))
+        for my $Name (sort {length $a <+> length $b} keys %{%TableInfo{$Type}})
         {
             ## Note: $Name is already canonical
             my $Table   = %TableInfo{$Type}->{$Name};
@@ -1870,7 +1870,7 @@ sub WriteAllMappings()
         }
 
         ## Register aliase info
-        for my $Name (@( <sort {length $a <+> length $b} @( < keys %{%AliasInfo{$Type} || \%()})))
+        for my $Name (sort {length $a <+> length $b} keys %{%AliasInfo{$Type} || \%()})
         {
             my $Alias    = %AliasInfo{$Type}->{$Name};
             my $IsFuzzy  = %FuzzyNames{$Type}->{$Alias};
@@ -1921,7 +1921,7 @@ sub WriteAllMappings()
                   );
 
 	%Exact{InGreek} = 'InGreekA';  # this is evil kludge
-        for my $Name (@( <sort @( < keys %Exact)))
+        for my $Name (sort keys %Exact)
         {
             my $File = %Exact{$Name};
             $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
@@ -1944,7 +1944,7 @@ sub WriteAllMappings()
                    "\%utf8::Canonical = \%(\n",
                   );
         my $Trail = ""; ## used just to keep the spacing pretty
-        for my $Name (@( <sort @( < keys %Canonical)))
+        for my $Name (sort keys %Canonical)
         {
             my $File = %Canonical{$Name};
             if (%CaComment{$Name}) {
@@ -2004,7 +2004,7 @@ sub SpecialCasing_txt()
     # Now write out the special cases properties in their code point order.
     # Prepend them to the To/{Upper,Lower,Title}.pl.
 
-    for my $case (@( <qw(Lower Title Upper)))
+    for my $case (qw(Lower Title Upper))
     {
         my $NormalCase = do "To/$case.pl" || die "$0: $@\n";
 
@@ -2015,11 +2015,11 @@ sub SpecialCasing_txt()
 	     "\%utf8::ToSpec$case =\n\%(\n",
 	    );
 
-        for my $prop (@( <sort { $a->[0] <+> $b->[0] } @( < @{%CaseInfo{$case}}))) {
+        for my $prop (sort { $a->[0] <+> $b->[0] } @{%CaseInfo{$case}}) {
             my ($ix, $code, $to) = < @$prop;
             my $tostr =
-              join "", @( < map { sprintf "\\x\{\%s\}", $_ } @( < split ' ', $to));
-            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", @( < map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $ix)))));
+              join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', $to;
+            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $ix))));
 	    # Remove any single-character mappings for
 	    # the same character since we are going for
 	    # the special casing rules.
@@ -2077,10 +2077,10 @@ sub CaseFolding_txt()
 	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
 	 "\%utf8::ToSpecFold =\n\%(\n",
 	);
-    for my $code (@( <sort { $a <+> $b } @( < keys %Fold))) {
+    for my $code (sort { $a <+> $b } keys %Fold) {
         my $foldstr =
-          join "", @( < map { sprintf "\\x\{\%s\}", $_ } @( < split ' ', %Fold{$code}));
-        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", @( < map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $code)))));
+          join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', %Fold{$code};
+        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $code))));
     }
     push @OUT, (
                 ");\n\n",

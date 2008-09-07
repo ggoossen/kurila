@@ -14,9 +14,9 @@ require Exporter;
 #-----------------------------------------------------------------------
 use vars < qw($VERSION @ISA @EXPORT);
 $VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA	= @( < qw(Exporter) );
-@EXPORT = @( < qw(LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC
-		LOCALE_CODE_DEFAULT) );
+@ISA	= qw(Exporter);
+@EXPORT = qw(LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC
+		LOCALE_CODE_DEFAULT);
 
 #-----------------------------------------------------------------------
 #	Constants

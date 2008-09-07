@@ -18,7 +18,7 @@ our $i = 0;
 $|=1;
 
 undef $/;
-my @prgs = @( < split "\n########\n", ~< *DATA );
+my @prgs = split "\n########\n", ~< *DATA;
 plan(6 + scalar nelems @prgs);
 
 my $tmpfile = "asubtmp000";

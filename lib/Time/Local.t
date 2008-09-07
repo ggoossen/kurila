@@ -92,12 +92,12 @@ for ( @( < @time, < @neg_time) ) {
 
             my($s,$m,$h,$D,$M,$Y) = localtime($time);
 
-            is($s, $sec, "timelocal second for {join ' ', @( <@$_)}");
-            is($m, $min, "timelocal minute for {join ' ', @( <@$_)}");
-            is($h, $hour, "timelocal hour for {join ' ', @( <@$_)}");
-            is($D, $mday, "timelocal day for {join ' ', @( <@$_)}");
-            is($M, $mon, "timelocal month for {join ' ', @( <@$_)}");
-            is($Y, $year, "timelocal year for {join ' ', @( <@$_)}");
+            is($s, $sec, "timelocal second for {join ' ',@$_}");
+            is($m, $min, "timelocal minute for {join ' ',@$_}");
+            is($h, $hour, "timelocal hour for {join ' ',@$_}");
+            is($D, $mday, "timelocal day for {join ' ',@$_}");
+            is($M, $mon, "timelocal month for {join ' ',@$_}");
+            is($Y, $year, "timelocal year for {join ' ',@$_}");
         }
 
         {
@@ -106,12 +106,12 @@ for ( @( < @time, < @neg_time) ) {
 
             my($s,$m,$h,$D,$M,$Y) = gmtime($time);
 
-            is($s, $sec, "timegm second for {join ' ', @( <@$_)}");
-            is($m, $min, "timegm minute for {join ' ', @( <@$_)}");
-            is($h, $hour, "timegm hour for {join ' ', @( <@$_)}");
-            is($D, $mday, "timegm day for {join ' ', @( <@$_)}");
-            is($M, $mon, "timegm month for {join ' ', @( <@$_)}");
-            is($Y, $year, "timegm year for {join ' ', @( <@$_)}");
+            is($s, $sec, "timegm second for {join ' ',@$_}");
+            is($m, $min, "timegm minute for {join ' ',@$_}");
+            is($h, $hour, "timegm hour for {join ' ',@$_}");
+            is($D, $mday, "timegm day for {join ' ',@$_}");
+            is($M, $mon, "timegm month for {join ' ',@$_}");
+            is($Y, $year, "timegm year for {join ' ',@$_}");
         }
     }
 }

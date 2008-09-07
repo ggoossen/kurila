@@ -20,8 +20,8 @@ BEGIN {
     $USE_IPC_RUN    = IS_WIN32 && !IS_WIN98;
     $USE_IPC_OPEN3  = not IS_VMS;
 
-    @ISA            = @( < qw[Exporter] );
-    @EXPORT_OK      = @( < qw[can_run run] );
+    @ISA            = qw[Exporter];
+    @EXPORT_OK      = qw[can_run run];
 }
 
 require Carp;
@@ -132,7 +132,7 @@ sub can_use_ipc_open3   {
     ### ipc::open3 works on every platform, but it can't capture buffers
     ### on win32 :(
     return unless can_load(
-        modules => \%( < map {$_ => '0.0'} @( < qw|IPC::Open3 IO::Select Symbol|) ),
+        modules => \%( < map {$_ => '0.0'} qw|IPC::Open3 IO::Select Symbol| ),
         verbose => ($WARN && $verbose),
     );
     
@@ -308,7 +308,7 @@ sub run {
         return;
     };        
 
-    print < loc("Running [\%1]...\n", (ref $cmd ? "{join ' ', @( <@$cmd)}" : $cmd)) if $verbose;
+    print < loc("Running [\%1]...\n", (ref $cmd ? "{join ' ',@$cmd}" : $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -365,7 +365,7 @@ sub run {
         ### in case there are pipes in there;
         ### IPC::Open3 will call exec and exec will do the right thing 
         $ok = __PACKAGE__->_open3_run( 
-                                ( ref $cmd ? "{join ' ', @( <@$cmd)}" : $cmd ),
+                                ( ref $cmd ? "{join ' ',@$cmd}" : $cmd ),
                                 $_out_handler, $_err_handler, $verbose 
                             );
         
@@ -373,11 +373,11 @@ sub run {
     } else {
         __PACKAGE__->_debug( "# Using system(). Have buffer: $have_buffer" )
             if $DEBUG;
-        $ok = __PACKAGE__->_system_run( (ref $cmd ? "{join ' ', @( <@$cmd)}" : $cmd), $verbose );
+        $ok = __PACKAGE__->_system_run( (ref $cmd ? "{join ' ',@$cmd}" : $cmd), $verbose );
     }
     
     ### fill the buffer;
-    $$buffer = join '', @( < @buffer) if (nelems @buffer);
+    $$buffer = join '', @buffer if (nelems @buffer);
     
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
@@ -441,7 +441,7 @@ sub _open3_run {
     ### code courtesy of theorbtwo from #london.pm
     my $stdout_done = 0;
     my $stderr_done = 0;
-    OUTER: while ( my @ready = @( < $selector->can_read ) ) {
+    OUTER: while ( my @ready = $selector->can_read ) {
 
         for my $h (  @ready ) {
             my $buf;
@@ -521,12 +521,12 @@ sub _ipc_run {
         }
         push @command, $aref;
     } else {
-        @command = @( < map { if( m/([<>|&])/ ) {
+        @command = map { if( m/([<>|&])/ ) {
                             $special_chars .= $1; $_;
                          } else {
-                            \@( < split m/ +/ )
+                            \ split m/ +/
                          }
-                    } @( < split( m/\s*([<>|&])\s*/, $cmd )) );
+                    } split( m/\s*([<>|&])\s*/, $cmd );
     }
  
     ### if there's a pipe in the command, *STDIN needs to 
@@ -587,9 +587,9 @@ sub _system_run {
     ### dups FDs and stores them in a cache
     sub __dup_fds {
         my $self    = shift;
-        my @fds     = @( < @_ );
+        my @fds     = @_;
 
-        __PACKAGE__->_debug( "# Closing the following fds: {join ' ', @( <@fds)}" ) if $DEBUG;
+        __PACKAGE__->_debug( "# Closing the following fds: {join ' ',@fds}" ) if $DEBUG;
 
         for my $name (  @fds ) {
             my($redir, $fh, $glob) = < @{%Map{$name}} or (
@@ -619,9 +619,9 @@ sub _system_run {
     ### reopens FDs from the cache    
     sub __reopen_fds {
         my $self    = shift;
-        my @fds     = @( < @_ );
+        my @fds     = @_;
 
-        __PACKAGE__->_debug( "# Reopening the following fds: {join ' ', @( <@fds)}" ) if $DEBUG;
+        __PACKAGE__->_debug( "# Reopening the following fds: {join ' ',@fds}" ) if $DEBUG;
 
         for my $name (  @fds ) {
             my($redir, $fh, $glob) = < @{%Map{$name}} or (

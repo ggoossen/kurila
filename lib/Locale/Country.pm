@@ -17,11 +17,11 @@ use Locale::Constants;
 #-----------------------------------------------------------------------
 use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);
 $VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA       = @( < qw(Exporter) );
-@EXPORT    = @( < qw(code2country country2code
+@ISA       = qw(Exporter);
+@EXPORT    = qw(code2country country2code
                 all_country_codes all_country_names
 		country_code2code
-		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC) );
+		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC);
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
@@ -133,7 +133,7 @@ sub all_country_codes
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return @( < keys %{ $CODES->[$codeset] } );
+    return keys %{ $CODES->[$codeset] };
 }
 
 
@@ -146,7 +146,7 @@ sub all_country_names
 {
     my $codeset = (nelems @_) +> 0 ? shift : LOCALE_CODE_DEFAULT;
 
-    return @( < values %{ $CODES->[$codeset] } );
+    return values %{ $CODES->[$codeset] };
 }
 
 

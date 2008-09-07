@@ -5,7 +5,7 @@ use strict;
 our $VERSION = '6.44';
 
 require ExtUtils::MM_Win32;
-our @ISA = @( < qw(ExtUtils::MM_Win32) );
+our @ISA = qw(ExtUtils::MM_Win32);
 
 use ExtUtils::MakeMaker::Config;
 

@@ -261,7 +261,7 @@ sub make_type_tab {
 
     return 
 	  "\ntypedef enum \{\n\t"
-	. join(", ", @( < map "toketype_$_", @( < sort @( < keys %types))))
+	. join(", ", map "toketype_$_", sort keys %types)
 	. "\n\} toketypes;\n\n"
 	. "/* type of each token/terminal */\n"
 	. "static const toketypes yy_type_tab[] =\n\{\n"
@@ -273,13 +273,13 @@ sub make_type_tab {
 sub my_system {
     system(< @_);
     if ($? == -1) {
-	die "failed to execute command '{join ' ', @( <@_)}': $!\n";
+	die "failed to execute command '{join ' ',@_}': $!\n";
     }
     elsif ($? ^&^ 127) {
-	die sprintf "command '{join ' ', @( <@_)}' died with signal \%d\n",
+	die sprintf "command '{join ' ',@_}' died with signal \%d\n",
 	    ($? ^&^ 127);
     }
     elsif ($? >> 8) {
-	die sprintf "command '{join ' ', @( <@_)}' exited with value \%d\n", $? >> 8;
+	die sprintf "command '{join ' ',@_}' exited with value \%d\n", $? >> 8;
     }
 }

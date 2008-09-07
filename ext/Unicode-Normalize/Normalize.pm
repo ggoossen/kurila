@@ -18,9 +18,9 @@ our $PACKAGE = __PACKAGE__;
 require Exporter;
 require DynaLoader;
 
-our @ISA = @( < qw(Exporter DynaLoader) );
-our @EXPORT = @( < qw( NFC NFD NFKC NFKD ) );
-our @EXPORT_OK = @( < qw(
+our @ISA = qw(Exporter DynaLoader);
+our @EXPORT = qw( NFC NFD NFKC NFKD );
+our @EXPORT_OK = qw(
     normalize decompose reorder compose
     checkNFD checkNFKD checkNFC checkNFKC check
     getCanon getCompat getComposite getCombinClass
@@ -28,12 +28,12 @@ our @EXPORT_OK = @( < qw(
     isNFD_NO isNFC_NO isNFC_MAYBE isNFKD_NO isNFKC_NO isNFKC_MAYBE
     FCD checkFCD FCC checkFCC composeContiguous
     splitOnLastStarter
-) );
+);
 our %EXPORT_TAGS = %(
     all       => \@( < @EXPORT, < @EXPORT_OK ),
     normalize => \@( < @EXPORT, < qw/normalize decompose reorder compose/ ),
-    check     => \@( < qw/checkNFD checkNFKD checkNFC checkNFKC check/ ),
-    fast      => \@( < qw/FCD checkFCD FCC checkFCC composeContiguous/ ),
+    check     => \ qw/checkNFD checkNFKD checkNFC checkNFKC check/,
+    fast      => \ qw/FCD checkFCD FCC checkFCC composeContiguous/,
 );
 
 ######

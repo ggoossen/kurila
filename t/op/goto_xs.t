@@ -12,9 +12,9 @@ BEGIN {
     %ENV{PERL5LIB} = "../lib";
 
 # turn warnings into fatal errors
-    $^WARN_HOOK = sub { die "WARNING: {join ' ', @( <@_)}" } ;
+    $^WARN_HOOK = sub { die "WARNING: {join ' ',@_}" } ;
 
-    foreach (@( <qw(Fcntl XS::APItest))) {
+    foreach (qw(Fcntl XS::APItest)) {
 	eval "require $_"
 	or do { print "1..0\n# $_ unavailable, can't test XS goto.\n"; exit 0 }
     }

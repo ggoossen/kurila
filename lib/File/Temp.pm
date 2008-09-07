@@ -171,7 +171,7 @@ use base < qw/Exporter/;
 
 # Export list - to allow fine tuning of export table
 
-@EXPORT_OK = @( < qw{
+@EXPORT_OK = qw{
 	      tempfile
 	      tempdir
 	      tmpnam
@@ -185,14 +185,14 @@ use base < qw/Exporter/;
 	      SEEK_SET
               SEEK_CUR
               SEEK_END
-		} );
+		};
 
 # Groups of functions for export
 
 %EXPORT_TAGS = %(
-		'POSIX' => \@( <qw/ tmpnam tmpfile /),
-		'mktemp' => \@( <qw/ mktemp mkstemp mkstemps mkdtemp/),
-		'seekable' => \@( <qw/ SEEK_SET SEEK_CUR SEEK_END /),
+		'POSIX' => \qw/ tmpnam tmpfile /,
+		'mktemp' => \qw/ mktemp mkstemp mkstemps mkdtemp/,
+		'seekable' => \qw/ SEEK_SET SEEK_CUR SEEK_END /,
 	       );
 
 # add contents of these tags to @EXPORT
@@ -204,10 +204,10 @@ $VERSION = '0.20_01';
 
 # This is a list of characters that can be used in random filenames
 
-my @CHARS = @( <qw/ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+my @CHARS =qw/ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 	         a b c d e f g h i j k l m n o p q r s t u v w x y z
 	         0 1 2 3 4 5 6 7 8 9 _
-	     /);
+	     /;
 
 # Maximum number of tries to make a temp file before failing
 
@@ -233,7 +233,7 @@ my $OPENFLAGS = O_CREAT ^|^ O_EXCL ^|^ O_RDWR;
 my $LOCKFLAG;
 
 unless ($^O eq 'MacOS') {
-  for my $oflag (@( <qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /)) {
+  for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     no strict 'refs';
     $OPENFLAGS ^|^= $bit if try {
@@ -261,7 +261,7 @@ unless ($^O eq 'MacOS') {
 
 my $OPENTEMPFLAGS = $OPENFLAGS;
 unless ($^O eq 'MacOS') {
-  for my $oflag (@( <qw/ TEMPORARY /)) {
+  for my $oflag (qw/ TEMPORARY /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     local($@);
     no strict 'refs';
@@ -408,7 +408,7 @@ sub _gettemp {
 
     # The parent is then $directories without the last directory
     # Split the directory and put it back together again
-    my @dirs = @( < File::Spec->splitdir($directories) );
+    my @dirs = File::Spec->splitdir($directories);
 
     # If @dirs only has one entry (i.e. the directory template) that means
     # we are in the current directory
@@ -417,12 +417,12 @@ sub _gettemp {
     } else {
 
       if ($^O eq 'VMS') {  # need volume to avoid relative dir spec
-        $parent = File::Spec->catdir($volume, < @dirs[[@( <0..((nelems @dirs)-1)-1)]]);
+        $parent = File::Spec->catdir($volume, < @dirs[[0..((nelems @dirs)-1)-1]]);
         $parent = 'sys$disk:[]' if $parent eq '';
       } else {
 
 	# Put it back together without the last one
-	$parent = File::Spec->catdir( <@dirs[[@( <0..((nelems @dirs)-1)-1)]]);
+	$parent = File::Spec->catdir( <@dirs[[0..((nelems @dirs)-1)-1]]);
 
 	# ...and attach the volume (no filename)
 	$parent = File::Spec->catpath($volume, $parent, '');
@@ -766,13 +766,13 @@ sub _is_verysafe {
   # can handle ../ in a directory tree
   # Sometimes splitdir() returns a blank at the end
   # so we will probably check the bottom directory twice in some cases
-  my @dirs = @( < File::Spec->splitdir($directories) );
+  my @dirs = File::Spec->splitdir($directories);
 
   # Concatenate one less directory each time around
   foreach my $pos (0.. ((nelems @dirs)-1)) {
     # Get a directory name
     my $dir = File::Spec->catpath($volume, <
-				  File::Spec->catdir( <@dirs[[@( <0.. ((nelems @dirs)-1) - $pos)]]),
+				  File::Spec->catdir( <@dirs[[0.. ((nelems @dirs)-1) - $pos]]),
 				  ''
 				  );
 
@@ -1005,7 +1005,7 @@ sub new {
 
   # read arguments and convert keys to upper case
   my %args = %( < @_ );
-  %args = %( < map { uc($_), %args{$_} } @( < keys %args) );
+  %args = %( < map { uc($_), %args{$_} } keys %args );
 
   # see if they are unlinking (defaulting to yes)
   my $unlink = (exists %args{UNLINK} ? %args{UNLINK} : 1 );
@@ -1986,7 +1986,7 @@ sub cmpstat {
   return unless (nelems @fh);
 
   if (@fh[3] +> 1 && $^W) {
-    carp "unlink0: fstat found too many links; SB={join ' ', @( <@fh)}" if $^W;
+    carp "unlink0: fstat found too many links; SB={join ' ',@fh}" if $^W;
   }
 
   # Stat the path
@@ -1999,7 +1999,7 @@ sub cmpstat {
 
   # this is no longer a file, but may be a directory, or worse
   unless (-f $path) {
-    confess "panic: $path is no longer a file: SB={join ' ', @( <@fh)}";
+    confess "panic: $path is no longer a file: SB={join ' ',@fh}";
   }
 
   # Do comparison of each member of the array
@@ -2007,7 +2007,7 @@ sub cmpstat {
   # depending on whether it is a file or a handle.
   # Cannot simply compare all members of the stat return
   # Select the ones we can use
-  my @okstat = @( <0..((nelems @fh)-1));  # Use all by default
+  my @okstat =0..((nelems @fh)-1);  # Use all by default
   if ($^O eq 'MSWin32') {
     @okstat = @(1,2,3,4,5,7,8,9,10);
   } elsif ($^O eq 'os2') {

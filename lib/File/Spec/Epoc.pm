@@ -6,7 +6,7 @@ use vars < qw($VERSION @ISA);
 $VERSION = '3.2701';
 
 require File::Spec::Unix;
-@ISA = @( < qw(File::Spec::Unix) );
+@ISA = qw(File::Spec::Unix);
 
 =head1 NAME
 

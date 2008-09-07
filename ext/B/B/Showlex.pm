@@ -29,7 +29,7 @@ sub walk_output { # updates $walkHandle
 
 sub shownamearray {
     my ($name, $av) = < @_;
-    my @els = @( < $av->ARRAY );
+    my @els = $av->ARRAY;
     my $count = (nelems @els);
     my $i;
     print $walkHandle "$name has $count entries\n";
@@ -46,7 +46,7 @@ sub shownamearray {
 
 sub showvaluearray {
     my ($name, $av) = < @_;
-    my @els = @( < $av->ARRAY );
+    my @els = $av->ARRAY;
     my $count = (nelems @els);
     my $i;
     print $walkHandle "$name has $count entries\n";
@@ -66,8 +66,8 @@ my ($newlex, $nosp1); # rendering state vars
 
 sub newlex { # drop-in for showlex
     my ($objname, $names, $vals) = < @_;
-    my @names = @( < $names->ARRAY );
-    my @vals  = @( < $vals->ARRAY );
+    my @names = $names->ARRAY;
+    my @vals  = $vals->ARRAY;
     my $count = (nelems @names);
     print $walkHandle "$objname Pad has $count entries\n";
     printf $walkHandle "0: \%s\n", @names[0]->terse unless $nosp1;
@@ -90,8 +90,8 @@ sub showlex_main {
 }
 
 sub compile {
-    my @options = @( < grep { ! ref && m/^-/ } @( < @_) );
-    my @args = @( < grep { ref || !m/^-/ } @( < @_) );
+    my @options = grep { ! ref && m/^-/ } @_;
+    my @args = grep { ref || !m/^-/ } @_;
     for my $o ( @options) {
 	$newlex = 1 if $o eq "-newlex";
 	$nosp1  = 1 if $o eq "-nosp";

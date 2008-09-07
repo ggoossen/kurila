@@ -26,12 +26,12 @@ use Pod::Simple;
 
 my $found = 0;
 $x->callback(sub {
-  print "#  ", join("  ", @( < map "\{$_\}", @( < @_))), "\n";
+  print "#  ", join("  ", map "\{$_\}", @_), "\n";
   ++$found;
   return;
 });
 
-print "# \@INC == {join ' ', @( <@INC)}\n";
+print "# \@INC == {join ' ',@INC}\n";
 
 my $t = time();   my $name2where = $x->survey();
 $t = time() - $t;
@@ -55,6 +55,6 @@ if( $strictpath ) {
 
 ok 1;
 print "# Byebye from ", __FILE__, "\n";
-print "# {join ' ', @( <@INC)}\n";
+print "# {join ' ',@INC}\n";
 __END__
 

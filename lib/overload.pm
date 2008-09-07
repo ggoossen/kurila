@@ -12,7 +12,7 @@ sub OVERLOAD {
   my ($sub, $fb);
   % {*{Symbol::fetch_glob($package . "::OVERLOAD")}}{dummy}++; # Register with magic by touching.
   *{Symbol::fetch_glob($package . "::()")} = \&nil; # Make it findable via fetchmethod.
-  for (@( <keys %arg)) {
+  for (keys %arg) {
     if ($_ eq 'fallback') {
       $fb = %arg{$_};
     } else {

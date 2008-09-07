@@ -39,7 +39,7 @@ sub add_to_cleanup {
 
 sub cleanup {
   my $self = shift;
-  foreach my $file (@( <keys %{$self->{files_to_clean} || \%() })) {
+  foreach my $file (keys %{$self->{files_to_clean} || \%() }) {
     unlink $file;
   }
 }
@@ -54,7 +54,7 @@ sub object_file {
 
 sub arg_include_dirs {
   my $self = shift;
-  return @( < map {"-I$_"} @( < @_) );
+  return map {"-I$_"} @_;
 }
 
 sub arg_nolink { '-c' }
@@ -76,7 +76,7 @@ sub arg_exec_file {
 
 sub arg_defines {
   my ($self, < %args) = < @_;
-  return @( < map "-D$_=%args{$_}", @( < keys %args) );
+  return map "-D$_=%args{$_}", keys %args;
 }
 
 sub compile {
@@ -87,23 +87,23 @@ sub compile {
 
   %args{object_file} ||= $self->object_file(%args{source});
   
-  my @include_dirs = @( < $self->arg_include_dirs
+  my @include_dirs = $self->arg_include_dirs
     (< @{%args{include_dirs} || \@()},
-     $self->perl_inc()) );
+     $self->perl_inc());
   
-  my @defines = @( < $self->arg_defines( < %{%args{defines} || \%()} ) );
+  my @defines = $self->arg_defines( < %{%args{defines} || \%()} );
   
-  my @extra_compiler_flags = @( < $self->split_like_shell(%args{extra_compiler_flags}) );
-  my @cccdlflags = @( < $self->split_like_shell($cf->{cccdlflags}) );
-  my @ccflags = @( < $self->split_like_shell($cf->{ccflags}) );
-  my @optimize = @( < $self->split_like_shell($cf->{optimize}) );
+  my @extra_compiler_flags = $self->split_like_shell(%args{extra_compiler_flags});
+  my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
+  my @ccflags = $self->split_like_shell($cf->{ccflags});
+  my @optimize = $self->split_like_shell($cf->{optimize});
   my @flags = @(< @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags,
 	       $self->arg_nolink,
 	       < @ccflags, < @optimize,
 	       < $self->arg_object_file(%args{object_file}),
 	      );
   
-  my @cc = @( < $self->split_like_shell($cf->{cc}) );
+  my @cc = $self->split_like_shell($cf->{cc});
   
   $self->do_system(< @cc, < @flags, %args{source})
     or die "error building %args{object_file} from '%args{source}'";
@@ -126,12 +126,12 @@ sub have_compiler {
   my ($obj_file, @lib_files);
   try {
     $obj_file = $self->compile(source => $tmpfile);
-    @lib_files = @( < $self->link(objects => $obj_file, module_name => 'compilet') );
+    @lib_files = $self->link(objects => $obj_file, module_name => 'compilet');
   };
   warn $@ if $@;
   my $result = $self->{have_compiler} = $@ ? 0 : 1;
   
-  foreach (@(< grep defined, @( $tmpfile, $obj_file, < @lib_files))) {
+  foreach ( grep defined, @( $tmpfile, $obj_file, < @lib_files)) {
     1 while unlink;
   }
   return $result;
@@ -174,7 +174,7 @@ sub prelink {
   );
   
   # Mksymlists will create one of these files
-  return grep -e, @( < map "%args{dl_file}.$_", @( < qw(ext def opt)));
+  return grep -e, map "%args{dl_file}.$_", qw(ext def opt);
 }
 
 sub link {
@@ -197,20 +197,20 @@ sub _do_link {
   my $out = %args{$type} || $self->?$type($objects->[0]);
   
   my @temp_files;
-  @temp_files = @( <
+  @temp_files =
     $self->prelink(< %args,
-		   dl_name => %args{module_name}) ) if %args{lddl} && $self->need_prelink;
+		   dl_name => %args{module_name}) if %args{lddl} && $self->need_prelink;
   
   my @linker_flags = @( <$self->split_like_shell(%args{extra_linker_flags}), <
 		      $self->extra_link_args_after_prelink(< %args, dl_name => %args{module_name},
 							   prelink_res => \@temp_files));
 
   my @output = @( %args{lddl} ? < $self->arg_share_object_file($out) : < $self->arg_exec_file($out) );
-  my @shrp = @( < $self->split_like_shell($cf->{shrpenv}) );
-  my @ld = @( < $self->split_like_shell($cf->{ld}) );
+  my @shrp = $self->split_like_shell($cf->{shrpenv});
+  my @ld = $self->split_like_shell($cf->{ld});
   
   $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
-    or die "error building $out from {join ' ', @( <@$objects)}";
+    or die "error building $out from {join ' ',@$objects}";
   
   return @($out, < @temp_files);
 }
@@ -218,7 +218,7 @@ sub _do_link {
 
 sub do_system {
   my ($self, < @cmd) = < @_;
-  print "{join ' ', @( <@cmd)}\n" if !$self->{quiet};
+  print "{join ' ',@cmd}\n" if !$self->{quiet};
   return !system(< @cmd);
 }
 

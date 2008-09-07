@@ -25,8 +25,8 @@ sub getoutput
     close(IN);
     my $exit = $?>>8;
     s/^/#/ for  @out;
-    print "#EXIT=$exit OUTPUT=+++#{join '', @( <@out)}#+++\n";
-    return @($exit, join("", @(< @out)));
+    print "#EXIT=$exit OUTPUT=+++#{join '',@out}#+++\n";
+    return @($exit, join("", @out));
   }
   # child
   open(STDERR, ">&", \*STDOUT);

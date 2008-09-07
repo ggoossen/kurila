@@ -235,8 +235,8 @@ EOT
 sub B::AV::debug {
     my ($av) = < @_;
     $av->B::SV::debug;
-    my(@array) = @( < $av->ARRAY );
-    print "\tARRAY\t\t(", join(", ", @( < map("0x" . $$_, @( < @array)))), ")\n";
+    my(@array) = $av->ARRAY;
+    print "\tARRAY\t\t(", join(", ", map("0x" . $$_, @array)), ")\n";
     printf <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
 	FILL		%d
 	MAX		%d

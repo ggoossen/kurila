@@ -18,7 +18,7 @@ if ($Is_NetWare) {
 $Needs_Write = $Is_OS2 || $Is_W32 || $Is_Cygwin || $Is_NetWare;
 
 sub safer_unlink {
-  my @names = @( < @_ );
+  my @names = @_;
   my $cnt = 0;
 
   my $name;

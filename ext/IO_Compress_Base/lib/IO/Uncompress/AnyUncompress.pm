@@ -16,8 +16,8 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyUncompressError);
 $VERSION = '2.006';
 $AnyUncompressError = '';
 
-@ISA = @( < qw( IO::Uncompress::Base Exporter ) );
-@EXPORT_OK = @( < qw( $AnyUncompressError anyuncompress ) ) ;
+@ISA = qw( IO::Uncompress::Base Exporter );
+@EXPORT_OK = qw( $AnyUncompressError anyuncompress ) ;
 %EXPORT_TAGS = %( < %IO::Uncompress::Base::DEFLATE_CONSTANTS ) ;
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
@@ -90,7 +90,7 @@ sub mkUncomp
 
         *$self->{Uncomp} = $obj;
         
-        my @possible = @( < qw( Inflate Gunzip Unzip ) );
+        my @possible = qw( Inflate Gunzip Unzip );
         unshift @possible, 'RawInflate' 
             if $got->value('RawInflate');
 
@@ -159,10 +159,10 @@ sub mkUncomp
 sub ckMagic
 {
     my $self = shift;
-    my @names = @( < @_ ) ;
+    my @names = @_ ;
 
     my $keep = ref $self ;
-    for my $class (@( < map { "IO::Uncompress::$_" } @( < @names)))
+    for my $class ( map { "IO::Uncompress::$_" } @names)
     {
         bless $self => $class;
         my $magic = $self->ckMagic();

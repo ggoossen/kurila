@@ -8,8 +8,8 @@ require "./test.pl";
 our $VERSION = '0.02';
 
 # now export checkOptree, and those test.pl functions used by tests
-our @EXPORT = @( < qw( checkOptree plan skip skip_all pass is like unlike
-		  require_ok runperl) );
+our @EXPORT = qw( checkOptree plan skip skip_all pass is like unlike
+		  require_ok runperl);
 
 
 # The hints flags will differ if $^OPEN is set.
@@ -323,10 +323,10 @@ our %gOpts = 	# values are replaced at runtime !!
      # array values are one-of selections, with 1st value as default
      #  array: 2nd value is used as help-str, 1st val (still) default
      help	=> \@(0, 'provides help and exits', 0),
-     testmode	=> \@( <qw/ native cross both /),
+     testmode	=> \qw/ native cross both /,
 
      # reporting mode for rendering errs
-     report	=> \@( <qw/ diag fail print /),
+     report	=> \qw/ diag fail print /,
      errcont	=> \@(1, 'if 1, tests match even if report is fail', 0),
 
      # fixup for VMS, cygwin, which dont have stderr b4 stdout
@@ -380,10 +380,10 @@ sub getCmdLine {	# import assistant
 	     turn on a flag by typing its name,
 	     select a value from list by typing name=val.\n    }, <
 	  mydumper(\%gOpts))
-	if grep m/help/, @( < @ARGV);
+	if grep m/help/, @ARGV;
 
     # replace values for each key !! MUST MARK UP %gOpts
-    foreach my $opt (@( <keys %gOpts)) {
+    foreach my $opt (keys %gOpts) {
 
 	# scan ARGV for known params
 	if (ref %gOpts{$opt} eq 'ARRAY') {
@@ -394,10 +394,10 @@ sub getCmdLine {	# import assistant
 	    # uhh this WORKS. but it's inscrutable
 	    # grep s/$opt=(\w+)/grep {$_ eq $1} @ARGV and $gOpts{$opt}=$1/e, @ARGV;
 	    my $tval;  # temp
-	    if (grep s/$opt=(\w+)/{$tval=$1}/, @( < @ARGV)) {
+	    if (grep s/$opt=(\w+)/{$tval=$1}/, @ARGV) {
 		# check val before accepting
-		my @allowed = @( < @{%gOpts{$opt}} );
-		if (grep { $_ eq $tval } @( < @allowed)) {
+		my @allowed = @{%gOpts{$opt}};
+		if (grep { $_ eq $tval } @allowed) {
 		    %gOpts{$opt} = $tval;
 		}
 		else {die "invalid value: '$tval' for $opt\n"}
@@ -410,10 +410,10 @@ sub getCmdLine {	# import assistant
         else { # handle scalars
 
 	    # if 'opt' is present, true
-	    %gOpts{$opt} = (grep m/^$opt/, @( < @ARGV)) ? 1 : 0;
+	    %gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
 
 	    # override with 'foo' if 'opt=foo' appears
-	    grep s/$opt=(.*)/{%gOpts{$opt}=$1}/, @( < @ARGV);
+	    grep s/$opt=(.*)/{%gOpts{$opt}=$1}/, @ARGV;
 	}
      }
     print("$0 heres current state:\n", < mydumper(\%gOpts))
@@ -461,7 +461,7 @@ sub newTestCases {
     $tc->label();
 
     # cpy globals into each test
-    foreach my $k (@( <keys %gOpts)) {
+    foreach my $k (keys %gOpts) {
 	if (%gOpts{$k}) {
 	    $tc->{$k} = %gOpts{$k} unless defined $tc->{$k};
 	}
@@ -473,7 +473,7 @@ sub newTestCases {
 	}
 	elsif (ref $tc->{errs} eq 'ARRAY') {
 	    my %errs;
- <	    %errs{[@(< @{$tc->{errs}})]} = (1) x nelems @{$tc->{errs}};
+ <	    %errs{[ @{$tc->{errs}}]} = (1) x nelems @{$tc->{errs}};
 	    $tc->{errs} = \%errs;
 	}
 	elsif (ref $tc->{errs} eq 'Regexp') {
@@ -489,9 +489,9 @@ sub label {
     return $tc->{name} if $tc->{name};
 
     my $buf = (ref $tc->{bcopts}) 
-	? join(',', @( < @{$tc->{bcopts}})) : $tc->{bcopts};
+	? join(',', @{$tc->{bcopts}}) : $tc->{bcopts};
 
-    foreach (@( <qw( note prog code ))) {
+    foreach (qw( note prog code )) {
 	$buf .= " $_: $tc->{$_}" if $tc->{$_} and not ref $tc->{$_};
     }
     return $tc->{name} = $buf;
@@ -505,7 +505,7 @@ sub getRendering {
     fail("getRendering: code or prog is required")
 	unless $tc->{code} or $tc->{prog} or $tc->{Dx};
 
-    my @opts = @( < get_bcopts($tc) );
+    my @opts = get_bcopts($tc);
     my $rendering = ''; # suppress "Use of uninitialized value in open"
     my @errs;		# collect errs via 
 
@@ -584,10 +584,10 @@ sub checkErrs {
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
     $tc->{goterrs} ||= \@();
- <    %goterrs{[@(< @{$tc->{goterrs}})]} = (1) x scalar nelems @{$tc->{goterrs}};
+ <    %goterrs{[ @{$tc->{goterrs}}]} = (1) x scalar nelems @{$tc->{goterrs}};
     
-    foreach my $k (@( <keys %{$tc->{errs} ||= \%()})) {
-	if (@got = @( < grep m/^$k$/, @( < keys %goterrs) )) {
+    foreach my $k (keys %{$tc->{errs} ||= \%()}) {
+	if (@got = grep m/^$k$/, keys %goterrs) {
 	    delete $tc->{errs}->{$k};
 	    delete %goterrs{$_} foreach  @got;
 	}
@@ -606,12 +606,12 @@ sub diag_or_fail {
     my $tc = shift;
 
     my @lines;
-    push @lines, "got unexpected:", < sort @( < keys %{$tc->{goterrs}}) if %{$tc->{goterrs}};
-    push @lines, "missed expected:", < sort @( < keys %{$tc->{errs}})   if %{$tc->{errs}};
+    push @lines, "got unexpected:", < sort keys %{$tc->{goterrs}} if %{$tc->{goterrs}};
+    push @lines, "missed expected:", < sort keys %{$tc->{errs}}   if %{$tc->{errs}};
 
     if ((nelems @lines)) {
 	unshift @lines, $tc->{name};
-	my $report = join("\n", @( < @lines));
+	my $report = join("\n", @lines);
 
 	if    (%gOpts{report} eq 'diag')	{ _diag ($report) }
 	elsif (%gOpts{report} eq 'fail')	{ fail  ($report) }
@@ -777,12 +777,12 @@ sub reduceDiffs {
 
     my $tc	= shift;
     my $got	= $tc->{got};
-    my @got	= @( < split(m/\n/, $got) );
+    my @got	= split(m/\n/, $got);
     my $want	= $tc->{wantstr};
-    my @want	= @( < split(m/\n/, $want) );
+    my @want	= split(m/\n/, $want);
 
     # split rexstr into units that should eat leading lines.
-    my @rexs = @( < map qr/$_/, @( < split (m/\n/, $tc->{rexstr})) );
+    my @rexs = map qr/$_/, split (m/\n/, $tc->{rexstr});
 
     foreach my $rex ( @rexs) {
         my $exp = shift @want;
@@ -892,7 +892,7 @@ sub runSelftest {
     # OR regexs plugged into the expect* text (which defeat conversions)
     my $tc = shift;
 
-    for my $provenance (@( <qw/ expect expect_nt /)) {
+    for my $provenance (qw/ expect expect_nt /) {
 	#next unless $tc->{$provenance};
 
 	$tc->mkCheckRex($provenance);
@@ -913,7 +913,7 @@ sub mydumper {
 	    print "half hearted attempt:\n";
 	    foreach my $it ( @_) {
 		if (ref $it eq 'HASH') {
-		    print " $_ => $it->{$_}\n" foreach @( < sort @( < keys %$it));
+		    print " $_ => $it->{$_}\n" foreach sort keys %$it;
 		}
 	    }
 	    return;
@@ -1002,7 +1002,7 @@ sub OptreeCheck::gentest {
 
 
 sub OptreeCheck::processExamples {
-    my @files = @( < @_ );
+    my @files = @_;
 
     # gets array of paragraphs, which should be code-samples.  Theyre
     # turned into optreeCheck tests,

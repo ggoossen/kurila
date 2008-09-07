@@ -18,7 +18,7 @@ sub terse {
 }
 
 sub compile {
-    my @args = @( < @_ );
+    my @args = @_;
     my $order = (nelems @args) ? shift(@args) : "";
     $order = "-exec" if $order eq "exec";
     unshift @args, $order if $order ne "";

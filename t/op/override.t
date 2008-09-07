@@ -95,7 +95,7 @@ BEGIN { *Rgs::readpipe = sub ($) { ++$r . " @_[0]" }; }
     local $^WARN_HOOK = sub {
 	main::like( @_[0]->message, qr/^ok overriden at/ );
     };
-    BEGIN { *OverridenWarn::warn = sub { CORE::warn "{join ' ', @( <@_)} overriden"; }; }
+    BEGIN { *OverridenWarn::warn = sub { CORE::warn "{join ' ',@_} overriden"; }; }
     package OverridenWarn;
     sub foo { "ok" }
     warn( OverridenWarn->foo() );

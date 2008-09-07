@@ -9,9 +9,9 @@ $VERSION = '3.2701';
 
 require Exporter;
 
-@ISA = @( < qw(Exporter) );
+@ISA = qw(Exporter);
 
-@EXPORT = @( < qw(
+@EXPORT = qw(
 	canonpath
 	catdir
 	catfile
@@ -21,9 +21,9 @@ require Exporter;
 	no_upwards
 	file_name_is_absolute
 	path
-) );
+);
 
-@EXPORT_OK = @( < qw(
+@EXPORT_OK = qw(
 	devnull
 	tmpdir
 	splitpath
@@ -32,7 +32,7 @@ require Exporter;
 	abs2rel
 	rel2abs
 	case_tolerant
-) );
+);
 
 %EXPORT_TAGS = %( ALL => \@( < @EXPORT_OK, < @EXPORT ) );
 

@@ -96,13 +96,13 @@ sub new {
         $self->{':private:'}->{Config} = \%Config;
     }
     
-    for my $tuple (@(\@(inc_override => INC => \@( < @INC ) ),
+    for my $tuple (@(\@(inc_override => INC => \ @INC ),
                    \@( extra_libs => EXTRA => \@() ))) 
     {
         my ($arg,$key,$val)=< @$tuple;
         if ( %args{$arg} ) {
             try {
-                $self->{':private:'}->{$key} = \@( < @{%args{$arg}} );
+                $self->{':private:'}->{$key} = \ @{%args{$arg}};
             } or Carp::croak(
                 "The '$arg' parameter must be an array reference."
             );
@@ -113,8 +113,8 @@ sub new {
     }
     {
         my %dupe;
-        @{$self->{':private:'}->{INC}} = @( < grep { -e $_ && !%dupe{$_}++ }
- @(            < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}}) );        
+        @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{$_}++ }
+ @(            < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}});        
     }                
     my $perl5lib = defined %ENV{PERL5LIB} ? %ENV{PERL5LIB} : "";
 
@@ -177,7 +177,7 @@ sub new {
           ExtUtils::Packlist->new($File::Find::name);
     };
     my %dupe;
-    @dirs= @( < grep { -e $_ && !%dupe{$_}++ } @( < @dirs) );
+    @dirs= grep { -e $_ && !%dupe{$_}++ } @dirs;
     $self->{':private:'}->{LIBDIRS} = \@dirs;    
     find($sub, < @dirs) if (nelems @dirs);
 
@@ -218,7 +218,7 @@ sub modules {
     my ($self) = < @_;
 
     # Bug/feature of sort in scalar context requires this.
-    return @( < sort @( < grep { not m/^:private:$/ } @( < keys %$self)));
+    return sort grep { not m/^:private:$/ } keys %$self;
 }
 
 sub files {
@@ -231,7 +231,7 @@ sub files {
         if ($type ne "all" && $type ne "prog" && $type ne "doc");
 
     my (@files);
-    foreach my $file (@( <keys(%{$self->{$module}->{packlist}}))) {
+    foreach my $file (keys(%{$self->{$module}->{packlist}})) {
         push(@files, $file)
           if ($self->_is_type($file, $type) &&
               $self->_is_under($file, < @under));
@@ -245,7 +245,7 @@ sub directories {
     foreach my $file ( $self->files($module, $type, < @under)) {
         %dirs{dirname($file)}++;
     }
-    return @( < sort @( < keys %dirs));
+    return sort keys %dirs;
 }
 
 sub directory_tree {
@@ -261,7 +261,7 @@ sub directory_tree {
             %dirs{$dir}++;
         }
     }
-    return @( <sort( @( <keys(%dirs))));
+    returnsort(keys(%dirs));
 }
 
 sub validate {

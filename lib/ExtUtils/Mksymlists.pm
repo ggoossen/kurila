@@ -7,8 +7,8 @@ use Carp;
 use Exporter;
 use Config;
 
-our @ISA = @( < qw(Exporter) );
-our @EXPORT = @( < qw(&Mksymlists) );
+our @ISA = qw(Exporter);
+our @EXPORT = qw(&Mksymlists);
 our $VERSION = '6.44';
 
 sub Mksymlists {
@@ -26,7 +26,7 @@ sub Mksymlists {
         unless ( (%spec{DL_FUNCS} and keys %{%spec{DL_FUNCS}}) or
                  nelems @{%spec{FUNCLIST}});
     if (defined %spec{DL_FUNCS}) {
-        foreach my $package (@( <keys %{%spec{DL_FUNCS}})) {
+        foreach my $package (keys %{%spec{DL_FUNCS}}) {
             my($packprefix,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
             foreach my $sym ( @{%spec{DL_FUNCS}->{$package}}) {
@@ -46,7 +46,7 @@ sub Mksymlists {
 #    not as pseudo-builtin.
 #    require DynaLoader;
     if (defined &DynaLoader::mod2fname and not %spec{DLBASE}) {
-        %spec{DLBASE} = DynaLoader::mod2fname(\@( < split(m/::/,%spec{NAME}) ));
+        %spec{DLBASE} = DynaLoader::mod2fname(\ split(m/::/,%spec{NAME}));
     }
 
     if    ($osname eq 'aix') { _write_aix(\%spec); }

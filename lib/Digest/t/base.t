@@ -7,7 +7,7 @@ plan tests => 12;
    package LenDigest;
    require Digest::base;
    use vars < qw(@ISA);
-   @ISA = @( < qw(Digest::base) );
+   @ISA = qw(Digest::base);
 
    sub new {
 	my $class = shift;
@@ -17,7 +17,7 @@ plan tests => 12;
 
    sub add {
 	my $self = shift;
-	$$self .= join("", @( < @_));
+	$$self .= join("", @_);
 	return $self;
    }
 

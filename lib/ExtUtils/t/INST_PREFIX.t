@@ -71,7 +71,7 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-foreach my $prefix (@( <qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX))) {
+foreach my $prefix (qw(PREFIX PERLPREFIX SITEPREFIX VENDORPREFIX)) {
     unlike( $mm->{$prefix}, qr/\$\(PREFIX\)/ );
 }
 
@@ -95,7 +95,7 @@ $stdout = '';
 
 is( $mm->{PREFIX}, $PREFIX,   'PREFIX' );
 
-foreach my $prefix (@( <qw(PERLPREFIX SITEPREFIX VENDORPREFIX))) {
+foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
     is( $mm->{$prefix}, '$(PREFIX)', "\$(PREFIX) overrides $prefix" );
 }
 
@@ -116,9 +116,9 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 # Every INSTALL* variable must start with some PREFIX.
 my %Install_Vars = %(
- PERL   => \@( <qw(archlib    privlib   bin       man1dir       man3dir   script)),
- SITE   => \@( <qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)),
- VENDOR => \@( <qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir))
+ PERL   => \qw(archlib    privlib   bin       man1dir       man3dir   script),
+ SITE   => \qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir),
+ VENDOR => \qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)
 );
 
 while( my($type, $vars) = each %Install_Vars) {

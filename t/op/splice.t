@@ -2,9 +2,9 @@
 
 print "1..18\n";
 
-our @a = @( <1..10);
+our @a =1..10;
 
-sub j { join(":", @(< @_)) }
+sub j { join(":", @_) }
 
 print "not " unless j(splice(@a,nelems @a,0,11,12)) eq "" && j(< @a) eq j( <1..12);
 print "ok 1\n";

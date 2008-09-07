@@ -406,9 +406,9 @@ store(\%(), $file);
     my %attrs = %(
         nvsize  => 5.006, 
         ptrsize => 5.005, 
-        < map {$_ => 5.004} @( < qw(byteorder intsize longsize))
+        < map {$_ => 5.004} qw(byteorder intsize longsize)
     );
-    for my $attr (@( <keys %attrs)) {
+    for my $attr (keys %attrs) {
         is($info->{$attr}, %Config{$attr}, "$attr match Config");
     }
 }
@@ -427,7 +427,7 @@ nstore(\%(), $file);
     ok($info->{minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
 
     ok($info->{netorder}, "no netorder");
-    for (@( <qw(byteorder intsize longsize ptrsize nvsize))) {
+    for (qw(byteorder intsize longsize ptrsize nvsize)) {
 	ok(!exists $info->{$_}, "no $_");
     }
 }

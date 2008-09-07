@@ -7,8 +7,8 @@ $VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use Test::Builder::Module;
-@ISA    = @( < qw(Test::Builder::Module) );
-@EXPORT = @( < qw(ok use_ok require_ok
+@ISA    = qw(Test::Builder::Module);
+@EXPORT = qw(ok use_ok require_ok
              is isnt like unlike is_deeply dies_like
              cmp_ok
              skip todo_skip
@@ -19,7 +19,7 @@ use Test::Builder::Module;
              can_ok  isa_ok
              diag
              BAIL_OUT
-            ) );
+            );
 
 
 =head1 NAME
@@ -448,7 +448,7 @@ sub can_ok ($@) {
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
-    $tb->diag(< map "    $class->can('$_') failed\n", @( < @nok));
+    $tb->diag(< map "    $class->can('$_') failed\n", @nok);
 
     return $ok;
 }
@@ -655,7 +655,7 @@ DIAGNOSTIC
 
 sub _eval {
     my($code) = shift;
-    my @args = @( < @_ );
+    my @args = @_;
 
     # Work around oddities surrounding resetting of $@ by immediately
     # storing it.
@@ -809,7 +809,7 @@ WARNING
 }
 
 sub _format_stack {
-    my(@Stack) = @( < @_ );
+    my(@Stack) = @_;
 
     my $var = '$FOO';
     my $prev_ref = 0;
@@ -844,7 +844,7 @@ sub _format_stack {
         $prev_ref = 0;
     }
 
-    my @vals = @( < @Stack[-1]->{vals}->[[@(0,1)]] );
+    my @vals = @Stack[-1]->{vals}->[[@(0,1)]];
     my @vars = @( () );
     (@vars[0] = $var) =~ s/\$FOO/     \$got/;
     (@vars[1] = $var) =~ s/\$FOO/\$expected/;
@@ -867,7 +867,7 @@ sub _type {
 
     return '' if !ref $thing;
 
-    for my $type (@( <qw(ARRAY HASH REF SCALAR GLOB CODE Regexp))) {
+    for my $type (qw(ARRAY HASH REF SCALAR GLOB CODE Regexp)) {
         return $type if UNIVERSAL::isa($thing, $type);
     }
 
@@ -1299,8 +1299,8 @@ sub _eq_hash {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $bigger = (nelems @( < keys %$a1 )) +> (nelems @( < keys %$a2 )) ? $a1 : $a2;
-    foreach my $k (@( <keys %$bigger)) {
+    my $bigger = (nelems keys %$a1) +> (nelems keys %$a2) ? $a1 : $a2;
+    foreach my $k (keys %$bigger) {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
 
@@ -1359,8 +1359,8 @@ sub eq_set  {
     # I don't know how references would be sorted so we just don't sort
     # them.  This means eq_set doesn't really work with refs.
     return eq_array(
-           \@(< grep(ref, @( < @$a1)), < sort( @( < grep(!ref, @( < @$a1))) )),
-           \@(< grep(ref, @( < @$a2)), < sort( @( < grep(!ref, @( < @$a2))) )),
+           \@(< grep(ref, @$a1), < sort( grep(!ref, @$a1) )),
+           \@(< grep(ref, @$a2), < sort( grep(!ref, @$a2) )),
     );
 }
 

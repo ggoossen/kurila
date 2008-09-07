@@ -61,9 +61,9 @@ print $@ ? "not ok 7\n#{$@->message}" : "ok 7\n";
 our $foo = "ok 8\n";
 our %bar = %(key => "ok 9\n");
 our @baz = @( () ); push(@baz, "o", "10"); $" = 'k ';
-our @glob = @( < qw(not ok 16) );
+our @glob = qw(not ok 16);
 
-sub sayok { print "ok {join ' ', @( <@_)}\n" }
+sub sayok { print "ok {join ' ',@_}\n" }
 
 $cpt->share( <qw($foo %bar @baz sayok));
 $cpt->share('$"') unless %Config{use5005threads};
@@ -84,16 +84,16 @@ $cpt->reval(q{
 });
 print $@ ? "not ok 13\n#{$@->message}" : "ok 13\n";
 $" = ' ';
-print $foo, %bar{new}, "{join ' ', @( <@glob)}\n";
+print $foo, %bar{new}, "{join ' ',@glob}\n";
 
 $Root::foo = "not ok 17";
-@{$cpt->varglob('bar')} = @( < qw(not ok 18) );
+@{$cpt->varglob('bar')} = qw(not ok 18);
 ${$cpt->varglob('foo')} = "ok 17";
 @Root::bar = @( "ok" );
 push(@Root::bar, "18"); # Two steps to prevent "Identifier used only once..."
 
 print "$Root::foo\n";
-print "{join ' ', @( <@{$cpt->varglob('bar')})}\n";
+print "{join ' ',@{$cpt->varglob('bar')}}\n";
 
 use strict;
 
@@ -103,7 +103,7 @@ print 1 ? "ok 20\n" : "not ok 20\n";
 my $m1 = $cpt->mask;
 $cpt->trap("negate");
 my $m2 = $cpt->mask;
-my @masked = @( < opset_to_ops($m1) );
+my @masked = opset_to_ops($m1);
 print $m2 eq opset("negate", < @masked) ? "ok 21\n" : "not ok 21\n";
 
 print try { $cpt->mask("a bad mask") } ? "not ok 22\n" : "ok 22\n";
@@ -113,7 +113,7 @@ print $cpt->reval("2 + 2") == 4 ? "ok 23\n" : "not ok 23\n";
 $cpt->mask( <empty_opset);
 my $t_scalar = $cpt->reval('print wantarray ? "not ok 24\n" : "ok 24\n"');
 print $cpt->reval('our @ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
-my @t_array  = @( < $cpt->reval('print wantarray ? "ok 26\n" : "not ok 26\n"; (2,3,4)') );
+my @t_array  = $cpt->reval('print wantarray ? "ok 26\n" : "not ok 26\n"; (2,3,4)');
 print @t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
 
 my $t_scalar2 = $cpt->reval('die "foo bar"; 1');

@@ -31,7 +31,7 @@ sub getopts {
   $args ||= \@ARGV;
 
   $target->aside(
-    "Starting switch processing.  Scanning arguments [{join ' ', @( <@$args)}]\n"
+    "Starting switch processing.  Scanning arguments [{join ' ',@$args}]\n"
   ) if $target->can('aside');
 
   return unless (nelems @$args);
@@ -95,7 +95,7 @@ sub getopts {
   
 
   $target->aside(
-    "Ending switch processing.  Args are [{join ' ', @( <@$args)}] with $error_count errors.\n"
+    "Ending switch processing.  Args are [{join ' ',@$args}] with $error_count errors.\n"
   ) if $target->can('aside');
 
   $error_count == 0;

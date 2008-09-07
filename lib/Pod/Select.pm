@@ -240,8 +240,8 @@ use strict;
 use Pod::Parser v1.04;
 use vars < qw(@ISA @EXPORT $MAX_HEADING_LEVEL);
 
-@ISA = @( < qw(Pod::Parser) );
-@EXPORT = @( < qw(&podselect) );
+@ISA = qw(Pod::Parser);
+@EXPORT = qw(&podselect);
 
 ## Maximum number of heading levels supported for '=headN' directives
 *MAX_HEADING_LEVEL = \3;
@@ -303,7 +303,7 @@ level, then C<undef> is returned.
 sub curr_headings {
     my $self = shift;
     $self->_init_headings()  unless (defined $self->{_SECTION_HEADINGS});
-    my @headings = @( < @{ $self->{_SECTION_HEADINGS} } );
+    my @headings = @{ $self->{_SECTION_HEADINGS} };
     return ((nelems @_) +> 0  and  @_[0] =~ m/^\d+$/) ? @headings[@_[0] - 1] : @headings;
 }
 
@@ -336,7 +336,7 @@ use vars < qw(@selected_sections);
 
 sub select {
     my $self = shift;
-    my @sections = @( < @_ );
+    my @sections = @_;
     local *myData = $self;
     local $_;
 
@@ -439,7 +439,7 @@ This method should I<not> normally be overridden by subclasses.
 
 sub match_section {
     my $self = shift;
-    my (@headings) = @( < @_ );
+    my (@headings) = @_;
     local *myData = $self;
 
     ## Return true if no restrictions were explicitly specified
@@ -448,7 +448,7 @@ sub match_section {
     return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
 
     ## Default any unspecified sections to the current one
-    my @current_headings = @( < $self->curr_headings() );
+    my @current_headings = $self->curr_headings();
     for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
         (defined @headings[$i])  or  @headings[$i] = @current_headings[$i];
     }
@@ -579,7 +579,7 @@ filenames are given).
 =cut 
 
 sub podselect {
-    my(@argv) = @( < @_ );
+    my(@argv) = @_;
     my %defaults = %( () );
     my $pod_parser = Pod::Select->new(< %defaults);
     my $num_inputs = 0;
@@ -673,7 +673,7 @@ sub _compile_section_spec {
     s|\\/|\002|g;   ## handle escaped forward slashes
 
     ## Parse the regexs for the heading titles
-    @regexs = @( < split('/', $_, $MAX_HEADING_LEVEL) );
+    @regexs = split('/', $_, $MAX_HEADING_LEVEL);
 
     ## Set default regex for ommitted levels
     for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
@@ -699,7 +699,7 @@ sub _compile_section_spec {
             $_ = '!' . $_  if ($negated);
         }
     }
-    return  (! $bad_regexs) ? \@( < @regexs ) : undef;
+    return  (! $bad_regexs) ? \ @regexs : undef;
 }
 
 ##---------------------------------------------------------------------------

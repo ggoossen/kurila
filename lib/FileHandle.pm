@@ -6,11 +6,11 @@ our($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 $VERSION = "2.01";
 
 require IO::File;
-@ISA = @( < qw(IO::File) );
+@ISA = qw(IO::File);
 
-@EXPORT = @( < qw(_IOFBF _IOLBF _IONBF) );
+@EXPORT = qw(_IOFBF _IOLBF _IONBF);
 
-@EXPORT_OK = @( < qw(
+@EXPORT_OK = qw(
     pipe
 
     autoflush
@@ -23,7 +23,7 @@ require IO::File;
     printf
     getline
     getlines
-) );
+);
 
 #
 # Everything we're willing to export, we must first import.
@@ -40,14 +40,14 @@ IO::Handle->import(< grep { !defined(&$_) } @( < @EXPORT, < @EXPORT_OK));
 
     my %import = %(
 	'IO::Handle' =>
-	    \@( <qw(new_from_fd fdopen close fileno getc ungetc gets
-		eof flush error clearerr setbuf setvbuf _open_mode_string)),
+	    \qw(new_from_fd fdopen close fileno getc ungetc gets
+		eof flush error clearerr setbuf setvbuf _open_mode_string),
 	'IO::Seekable' =>
-	    \@( <qw(seek tell getpos setpos)),
+	    \qw(seek tell getpos setpos),
 	'IO::File' =>
-	    \@( <qw(new new_tmpfile open))
+	    \qw(new new_tmpfile open)
     );
-    for my $pkg (@( <keys %import)) {
+    for my $pkg (keys %import) {
 	for my $func ( @{%import{$pkg}}) {
 	    my $c = *{Symbol::fetch_glob("{$pkg}::$func")}{CODE}
 		or die "{$pkg}::$func missing";

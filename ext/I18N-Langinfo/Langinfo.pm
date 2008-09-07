@@ -7,11 +7,11 @@ use Carp;
 require Exporter;
 require DynaLoader;
 
-our @ISA = @( < qw(Exporter DynaLoader) );
+our @ISA = qw(Exporter DynaLoader);
 
-our @EXPORT = @( < qw(langinfo) );
+our @EXPORT = qw(langinfo);
 
-our @EXPORT_OK = @( < qw(
+our @EXPORT_OK = qw(
 	ABDAY_1
 	ABDAY_2
 	ABDAY_3
@@ -69,7 +69,7 @@ our @EXPORT_OK = @( < qw(
 	T_FMT_AMPM
 	YESEXPR
 	YESSTR
-) );
+);
 
 our $VERSION = '0.02';
 
