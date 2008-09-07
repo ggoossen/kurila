@@ -31,7 +31,7 @@ my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
 my $Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
 
 my($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
-   $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = (0..12);
+   $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = ( <0..12);
 
 my $Curdir = File::Spec->curdir;
 
@@ -46,7 +46,7 @@ close FOO;
 
 open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 
-my($nlink, $mtime, $ctime) = (stat(*FOO))[[$NLINK, $MTIME, $CTIME]];
+my($nlink, $mtime, $ctime) = < @(stat(*FOO))[[@($NLINK, $MTIME, $CTIME)]];
 
 #nlink should if link support configured in Perl.
 SKIP: {
@@ -84,7 +84,7 @@ SKIP: {
     ok( $lnk_result,    'linked tmp testfile' );
     ok( chmod(0644, $tmpfile),             'chmoded tmp testfile' );
 
-    my($nlink, $mtime, $ctime) = (stat($tmpfile))[[$NLINK, $MTIME, $CTIME]];
+    my($nlink, $mtime, $ctime) = < @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]];
 
     SKIP: {
         skip "No link count", 1 if %Config{dont_use_nlink};
@@ -245,20 +245,20 @@ SKIP: {
     # you running the test, so let's censor that one away.
     # Similar remarks hold for stderr.
     $DEV =~ s{^[cpls].+?\sstdout$}{}m;
-    @DEV = @(  grep { $_ ne 'stdout' } < @DEV );
+    @DEV = @(  < grep { $_ ne 'stdout' } @( < @DEV) );
     $DEV =~ s{^[cpls].+?\sstderr$}{}m;
-    @DEV = @(  grep { $_ ne 'stderr' } < @DEV );
+    @DEV = @(  < grep { $_ ne 'stderr' } @( < @DEV) );
 
     # /dev/printer is also naughty: in IRIX it shows up as
     # Srwx-----, not srwx------.
     $DEV =~ s{^.+?\sprinter$}{}m;
-    @DEV = @(  grep { $_ ne 'printer' } < @DEV );
+    @DEV = @(  < grep { $_ ne 'printer' } @( < @DEV) );
 
     # If running as root, we will see .files in the ls result,
     # and readdir() will see them always.  Potential for conflict,
     # so let's weed them out.
     $DEV =~ s{^.+?\s\..+?$}{}m;
-    @DEV = @(  grep { ! m{^\..+$} } < @DEV );
+    @DEV = @(  < grep { ! m{^\..+$} } @( < @DEV) );
 
     # Irix ls -l marks sockets with 'S' while 's' is a 'XENIX semaphore'.
     if ($^O eq 'irix') {
@@ -267,7 +267,7 @@ SKIP: {
 
     my $try = sub {
 	my @c1 = @( eval qq[\$DEV =~ m/^@_[0].*/mg] );
-	my @c2 = @( eval qq[grep \{ @_[1] "/dev/\$_" \} < \@DEV] );
+	my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \} \@DEV];
 	my $c1 = nelems @c1;
 	my $c2 = nelems @c2;
 	is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");
@@ -294,10 +294,10 @@ SKIP: {
 
     # Find a set of directories that's very likely to have setuid files
     # but not likely to be *all* setuid files.
-    my @bin = @( grep {-d && -r && -x} qw(/sbin /usr/sbin /bin /usr/bin) );
+    my @bin = @( < grep {-d && -r && -x} @( < qw(/sbin /usr/sbin /bin /usr/bin)) );
     skip "Can't find a setuid file to test with", 3 unless (nelems @bin);
 
-    for my $bin (< @bin) {
+    for my $bin ( @bin) {
         opendir BIN, $bin or die "Can't opendir $bin: $!";
         while (defined($_ = readdir BIN)) {
             $_ = "$bin/$_";
@@ -458,9 +458,9 @@ unlink $f;
 ok (open(S, ">", "$f"), 'can create tmp file');
 close S or die;
 my @a = @( stat $f );
-print "# time=$^T, stat=({join ' ', <@a})\n";
+print "# time=$^T, stat=({join ' ', @( <@a)})\n";
 my @b = @(-M _, -A _, -C _);
-print "# -MAC=({join ' ', <@b})\n";
+print "# -MAC=({join ' ', @( <@b)})\n";
 ok( (-M _) +< 0, 'negative -M works');
 ok( (-A _) +< 0, 'negative -A works');
 ok( (-C _) +< 0, 'negative -C works');
@@ -488,7 +488,7 @@ SKIP: {
     # And now for the ambigious bareword case
     ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
 	|| diag "Can't open 'TEST':  $!";
-    my $size = (stat(*DIR))[[7]];
+    my $size = @(stat(*DIR))[7];
     ok(defined $size, "stat() on bareword works");
     is($size, -s "TEST", "size returned by stat of bareword is for the file");
     ok(-f _, "ambiguous bareword uses file handle, not dir handle");
@@ -518,7 +518,7 @@ SKIP: {
 	# And now for the ambigious bareword case
 	ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
 	    || diag "Can't open 'TEST':  $!";
-	my $size = (stat(*DIR{IO}))[[7]];
+	my $size = @(stat(*DIR{IO}))[7];
 	ok(defined $size, "stat() on *THINGY\{IO\} works");
 	is($size, -s "TEST",
 	   "size returned by stat of *THINGY\{IO\} is for the file");

@@ -4,11 +4,11 @@ use strict;
 use File::Copy;
 use File::Compare;
 use File::Basename;
-use File::Path qw(rmtree);
+use File::Path < qw(rmtree);
 require Exporter;
-use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
-@ISA       = @( qw(Exporter) );
-@EXPORT    = @( qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
+use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+@ISA       = @( < qw(Exporter) );
+@EXPORT    = @( < qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
                 dos2unix) );
 $VERSION = '1.13';
 
@@ -60,7 +60,7 @@ Filenames with * and ? will be glob expanded.
 my $wild_regex = $Is_VMS ? '*%' : '*?';
 sub expand_wildcards
 {
- @ARGV = @( map(m/[$wild_regex]/o ? < glob($_) : $_,< @ARGV) );
+ @ARGV = @( < map(m/[$wild_regex]/o ? < glob($_) : $_, @(< @ARGV)) );
 }
 
 
@@ -90,7 +90,7 @@ sub eqtime
 {
  my ($src,$dst) = < @ARGV;
  local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
- utime((stat($src))[[8,9]],$dst);
+ utime(< @(stat($src))[[8..9]],$dst);
 }
 
 =item rm_rf
@@ -104,7 +104,7 @@ Removes files and directories - recursively (even if readonly)
 sub rm_rf
 {
  expand_wildcards();
- rmtree(\@(grep -e $_,< @ARGV),0,0);
+ rmtree(< grep -e $_, @(< @ARGV) );
 }
 
 =item rm_f
@@ -118,7 +118,7 @@ Removes files (even if readonly)
 sub rm_f {
     expand_wildcards();
 
-    foreach my $file (< @ARGV) {
+    foreach my $file ( @ARGV) {
         next unless -f $file;
 
         next if _unlink($file);
@@ -133,7 +133,7 @@ sub rm_f {
 
 sub _unlink {
     my $files_unlinked = 0;
-    foreach my $file (< @_) {
+    foreach my $file ( @_) {
         my $delete_count = 0;
         $delete_count++ while unlink $file;
         $files_unlinked++ if $delete_count;
@@ -153,7 +153,7 @@ Makes files exist, with current timestamp
 sub touch {
     my $t    = time;
     expand_wildcards();
-    foreach my $file (< @ARGV) {
+    foreach my $file ( @ARGV) {
         open(FILE, ">>","$file") || die "Cannot write $file:$!";
         close(FILE);
         utime($t,$t,$file);
@@ -180,7 +180,7 @@ sub mv {
     die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst);
 
     my $nok = 0;
-    foreach my $src (< @src) {
+    foreach my $src ( @src) {
         $nok ||= !move($src,$dst);
     }
     return !$nok;
@@ -206,7 +206,7 @@ sub cp {
     die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst);
 
     my $nok = 0;
-    foreach my $src (< @src) {
+    foreach my $src ( @src) {
         $nok ||= !copy($src,$dst);
     }
     return $nok;
@@ -240,7 +240,7 @@ sub chmod {
         }
     }
 
-    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ',$mode,< @ARGV).":$!";
+    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', @($mode,< @ARGV)).":$!";
 }
 
 =item mkpath

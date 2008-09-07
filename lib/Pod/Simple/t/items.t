@@ -117,7 +117,7 @@ ok( $x->_out("\n=over 19\n\n=item Foo\n\nStuff\n\n=cut\n\nCrunk\nZorp\n\n=item B
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 print "# Now testing nesting...\n";
-ok( $x->_out(join "\n\n", '',
+ok( $x->_out(join "\n\n", @( '',
   '=over',
     '=item *',
     'Stuff',
@@ -130,8 +130,8 @@ ok( $x->_out(join "\n\n", '',
     '=back',
     '=item *',
     'Bar I<baz>!',
-    '=back', ''
-  ), join '',
+    '=back', '')
+  ), join '', @(
    '<Document>',
    '<over-bullet indent="4">',
      '<item-bullet>Stuff</item-bullet>',
@@ -140,12 +140,12 @@ ok( $x->_out(join "\n\n", '',
        '<item-number number="2">Bar <I>baz</I>!</item-number>',
      '</over-number>',
      '<item-bullet>Bar <I>baz</I>!</item-bullet>',
-   '</over-bullet></Document>'
+   '</over-bullet></Document>')
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ok( $x->_out( join "\n\n", '', '', 
+ok( $x->_out( join "\n\n", @( '', '', 
   '=over',
     '=item *',
     'Stuff',
@@ -163,8 +163,8 @@ ok( $x->_out( join "\n\n", '', '',
     '=item *',
     'Bar I<baz>!',
   '=back',
-  '', ''
-  ), join '',
+  '', '')
+  ), join '', @(
    '<Document>',
    '<over-bullet indent="4">',
      '<item-bullet>Stuff</item-bullet>',
@@ -179,7 +179,7 @@ ok( $x->_out( join "\n\n", '', '',
        '<item-number number="2">Bar <I>baz</I>!</item-number>',
      '</over-number>',
      '<item-bullet>Bar <I>baz</I>!</item-bullet>',
-   '</over-bullet></Document>'
+   '</over-bullet></Document>')
 );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,7 +187,7 @@ ok( $x->_out( join "\n\n", '', '',
 $d = 11;
 print "# Now checking that document-end closes things right...\n";
 
-ok( $x->_out( join "\n\n", '', '', 
+ok( $x->_out( join "\n\n", @( '', '', 
   '=over',
     '=item *',
     'Stuff',
@@ -198,8 +198,8 @@ ok( $x->_out( join "\n\n", '', '',
         '=over 19',
         'Gleiven',
         'Squim F<.thingrc>!',
-  '', ''
-  ), join '',
+  '', '')
+  ), join '', @(
    '<Document>',
    '<over-bullet indent="4">',
      '<item-bullet>Stuff</item-bullet>',
@@ -211,7 +211,7 @@ ok( $x->_out( join "\n\n", '', '',
          '<Para>Squim <F>.thingrc</F>!</Para>',
        '</over-block>',
      '</over-number>',
-   '</over-bullet></Document>'
+   '</over-bullet></Document>')
 );
 
 

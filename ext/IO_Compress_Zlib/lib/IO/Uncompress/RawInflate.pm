@@ -6,7 +6,7 @@ use warnings;
 use bytes;
 
 use Compress::Raw::Zlib  v2.006 ;
-use IO::Compress::Base::Common  v2.006 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common  v2.006 < qw(:Status createSelfTiedObject);
 
 use IO::Uncompress::Base  v2.006 ;
 use IO::Uncompress::Adapter::Inflate  v2.006 ;
@@ -20,8 +20,8 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $RawInflateEr
 $VERSION = '2.006';
 $RawInflateError = '';
 
-@ISA    = @( qw( IO::Uncompress::Base Exporter ) );
-@EXPORT_OK = @( qw( $RawInflateError rawinflate ) ) ;
+@ISA    = @( < qw( IO::Uncompress::Base Exporter ) );
+@EXPORT_OK = @( < qw( $RawInflateError rawinflate ) ) ;
 %DEFLATE_CONSTANTS = %( () );
 %EXPORT_TAGS = %( < %IO::Uncompress::Base::EXPORT_TAGS ) ;
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;

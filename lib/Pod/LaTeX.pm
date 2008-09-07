@@ -26,17 +26,17 @@ C<Pod::LaTeX> is a derived class from L<Pod::Select|Pod::Select>.
 
 use strict;
 require Pod::ParseUtils;
-use base qw/ Pod::Select /;
+use base < qw/ Pod::Select /;
 
 # use Data::Dumper; # for debugging
 use Carp;
 
-use vars qw/ $VERSION %HTML_Escapes @LatexSections /;
+use vars < qw/ $VERSION %HTML_Escapes @LatexSections /;
 
 $VERSION = '0.58';
 
 # Definitions of =headN -> latex mapping
-@LatexSections = @(qw/
+@LatexSections = @( <qw/
 		  chapter
 		  section
 		  subsection
@@ -904,11 +904,11 @@ __TEX_COMMENT__
 		    );
 
       unless ($self->MakeIndex) {
-	foreach (< @makeidx) {
+	foreach ( @makeidx) {
 	  $_ = '%% ' . $_;
 	}
       }
-      my $makeindex = join("\n",< @makeidx) . "\n";
+      my $makeindex = join("\n", @(< @makeidx)) . "\n";
 
       # Table of contents
       my $tableofcontents = '\tableofcontents';
@@ -1072,7 +1072,7 @@ sub command {
 
     # The first line contains the format and the rest is the
     # raw code.
-    my ($format, $chunk) = split(m/\n/, $rawpara, 2);
+    my ($format, $chunk) = < split(m/\n/, $rawpara, 2);
 
     # If we have got some latex code print it out immediately
     # unmodified. Else do nothing.
@@ -1123,15 +1123,15 @@ sub verbatim {
     # Clean tabs. Routine taken from Tabs.pm
     # by David Muir Sharnoff muir@idiom.com,
     # slightly modified by hsmyers@sdragons.com 10/22/01
-    my @l = @( split("\n",$paragraph) );
-    foreach (< @l) {
+    my @l = @( < split("\n",$paragraph) );
+    foreach ( @l) {
       1 while s/(^|\n)([^\t\n]*)(\t+)/{
 	$1. $2 . (" " x 
 		  (8 * length($3)
 		   - (length($2) % 8)))
 	  }/sx;
     }
-    $paragraph = join("\n",< @l);
+    $paragraph = join("\n", @(< @l));
     # End of change.
 
 
@@ -1183,7 +1183,7 @@ sub textblock {
     $paragraph =~ s/\s$//;
 
     # Split the string into 2 parts
-    my ($name, $purpose) = split(m/\s+-\s+/, $expansion,2);
+    my ($name, $purpose) = < split(m/\s+-\s+/, $expansion,2);
 
     # Now prevent this from triggering until a new head1 NAME is set
     $self->{_CURRENT_HEAD1} = '_NAME';
@@ -1795,7 +1795,7 @@ sub _split_delimited {
 
   $input =~ s/\n/ /gm;
   $input .= ' ';
-  foreach ( split ( m//, $input ) ) {
+  foreach (@( < split ( m//, $input )) ) {
     $token .= $_;
     if (m/\{/) {
       $depth++;
@@ -1807,7 +1807,7 @@ sub _split_delimited {
     }
   }
 
-  foreach  (< @output) {
+  foreach  ( @output) {
     if (length($s) +< $limit) {
       $s .= $_;
     } else {

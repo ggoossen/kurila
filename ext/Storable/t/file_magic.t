@@ -2,8 +2,8 @@
 
 use strict;
 use Test::More;
-use Storable qw(store nstore);
-use Config qw(%Config);
+use Storable < qw(store nstore);
+use Config < qw(%Config);
 
 # The @tests array below was create by the following program
 my $dummy = <<'EOT';
@@ -406,9 +406,9 @@ store(\%(), $file);
     my %attrs = %(
         nvsize  => 5.006, 
         ptrsize => 5.005, 
-        map {$_ => 5.004} qw(byteorder intsize longsize)
+        < map {$_ => 5.004} @( < qw(byteorder intsize longsize))
     );
-    for my $attr (keys %attrs) {
+    for my $attr (@( <keys %attrs)) {
         is($info->{$attr}, %Config{$attr}, "$attr match Config");
     }
 }
@@ -427,12 +427,12 @@ nstore(\%(), $file);
     ok($info->{minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
 
     ok($info->{netorder}, "no netorder");
-    for (qw(byteorder intsize longsize ptrsize nvsize)) {
+    for (@( <qw(byteorder intsize longsize ptrsize nvsize))) {
 	ok(!exists $info->{$_}, "no $_");
     }
 }
 
-for my $test (< @tests) {
+for my $test ( @tests) {
     my($data, $expected) = < @$test;
     open(FH, ">", "$file") || die "Can't create $file: $!";
     binmode(FH);

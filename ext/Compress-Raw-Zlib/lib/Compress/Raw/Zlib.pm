@@ -17,11 +17,11 @@ BEGIN {
     $VERSION = eval $VERSION;
 }
 
-@ISA = @( qw(Exporter) );
+@ISA = @( < qw(Exporter) );
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
-@EXPORT = @( qw(
+@EXPORT = qw(
         adler32 crc32
 
         ZLIB_VERSION
@@ -62,7 +62,7 @@ BEGIN {
         Z_SYNC_FLUSH
         Z_UNKNOWN
         Z_VERSION_ERROR
-) );
+);
 
 
 use constant FLAG_APPEND             => 1 ;
@@ -98,7 +98,7 @@ sub ParseParameters
 {
     my $level = shift || 0 ; 
 
-    my $sub = (caller($level + 1))[[3]] ;
+    my $sub = @(caller($level + 1))[3] ;
     #local $Carp::CarpLevel = 1 ;
     my $p = Compress::Raw::Zlib::Parameters->new() ;
     $p->parse(< @_)
@@ -158,7 +158,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
  
-        foreach my $key (keys %$href) {
+        foreach my $key (@( <keys %$href)) {
             push @entered, $key ;
             push @entered, \$href->{$key} ;
         }
@@ -177,7 +177,7 @@ sub Compress::Raw::Zlib::Parameters::parse
 
     while (my ($key, $v) = each %$default)
     {
-        croak "need 4 params [{join ' ', <@$v}]"
+        croak "need 4 params [{join ' ', @( <@$v)}]"
             if (nelems @$v) != 4 ;
 
         my ($first_only, $sticky, $type, $value) = < @$v ;
@@ -220,8 +220,8 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my ($bad) = join(", ", < @Bad) ;
-        return $self->setError("unknown key value(s) {join ' ', <@Bad}") ;
+        my ($bad) = join(", ", @( < @Bad)) ;
+        return $self->setError("unknown key value(s) {join ' ', @( <@Bad)}") ;
     }
 
     return 1;

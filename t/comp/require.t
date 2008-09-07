@@ -7,7 +7,7 @@ BEGIN {
 # don't make this lexical
 our $i = 1;
 
-my @fjles_to_delete = @( qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
+my @fjles_to_delete = @( < qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
 krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm) );
 
 
@@ -65,7 +65,7 @@ print "ok ",$i++,"\n";
 
 my $flag_file = 'bleah.flg';
 # run-time error in require
-for my $expected_compile (1,0) {
+for my $expected_compile (@(1,0)) {
     write_file($flag_file, 1);
     print "not " unless -e $flag_file;
     print "ok ",$i++,"\n";
@@ -226,7 +226,7 @@ my $utf8 = utf8::chr(0xFEFF);
 $i++; do_require(qq({$utf8}print "ok $i\n"; 1;\n));
 
 END {
-    foreach my $file (< @fjles_to_delete) {
+    foreach my $file ( @fjles_to_delete) {
 	1 while unlink $file;
     }
 }

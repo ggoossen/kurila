@@ -394,17 +394,37 @@ Perl_rxres_free(pTHX_ void **rsp)
 PP(pp_grepstart)
 {
     dVAR; dSP;
-    SV *src;
+    SV *srcitem;
 
     if (PL_stack_base + *PL_markstack_ptr == SP) {
 	(void)POPMARK;
-	if (GIMME_V == G_SCALAR)
-	    mXPUSHi(0);
+	mXPUSHs(newAV());
 	RETURNOP(PL_op->op_next->op_next);
     }
+
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
+
+    SV* src = sv_mortalcopy(POPs);
+    SV* dst = sv_2mortal(newAV());
+
+    if ( ! SvOK(src) ) {
+	(void)POPMARK;
+	XPUSHs(dst);
+	RETURNOP(PL_op->op_next->op_next);
+    }
+    if ( ! SvAVOK(src) )
+	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
+    
+    if ( av_len(SVav(src)) == -1 ) {
+	(void)POPMARK;
+	XPUSHs(dst);
+	RETURNOP(PL_op->op_next->op_next);
+    }
+
     pp_pushmark();				/* push dst */
-    pp_pushmark();				/* push src */
+    XPUSHs(dst);                          /* push dst */
+    XPUSHs(src);                          /* push dst */
+
     ENTER;					/* enter outer scope */
 
     SAVETMPS;
@@ -415,12 +435,13 @@ PP(pp_grepstart)
     ENTER;					/* enter inner scope */
     SAVEVPTR(PL_curpm);
 
-    src = PL_stack_base[*PL_markstack_ptr];
-    SvTEMP_off(src);
+    srcitem = av_shift(SVav(src));
+    if (PL_op->op_type == OP_GREPSTART)
+	mXPUSHs(srcitem);
     if (PL_op->op_private & OPpGREP_LEX)
-	SVcpREPLACE(PAD_SVl(PL_op->op_targ), src);
+	SVcpREPLACE(PAD_SVl(PL_op->op_targ), srcitem);
     else
-	SVcpREPLACE(DEFSV, src);
+	SVcpREPLACE(DEFSV, srcitem);
 
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
@@ -438,100 +459,43 @@ PP(pp_mapwhile)
     SV** src;
     SV** dst;
 
-    /* first, move source pointer to the next item in the source list */
-    ++PL_markstack_ptr[-1];
+    dst = PL_stack_base + PL_markstack_ptr[-1] + 0;
+    src = PL_stack_base + PL_markstack_ptr[-1] + 1;
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
-	/* might need to make room back there first */
-	if (items > PL_markstack_ptr[-1] - PL_markstack_ptr[-2]) {
-	    /* XXX this implementation is very pessimal because the stack
-	     * is repeatedly extended for every set of items.  Is possible
-	     * to do this without any stack extension or copying at all
-	     * by maintaining a separate list over which the map iterates
-	     * (like foreach does). --gsar */
-
-	    /* everything in the stack after the destination list moves
-	     * towards the end the stack by the amount of room needed */
-	    shift = items - (PL_markstack_ptr[-1] - PL_markstack_ptr[-2]);
-
-	    /* items to shift up (accounting for the moved source pointer) */
-	    count = (SP - PL_stack_base) - (PL_markstack_ptr[-1] - 1);
-
-	    /* This optimization is by Ben Tilly and it does
-	     * things differently from what Sarathy (gsar)
-	     * is describing.  The downside of this optimization is
-	     * that leaves "holes" (uninitialized and hopefully unused areas)
-	     * to the Perl stack, but on the other hand this
-	     * shouldn't be a problem.  If Sarathy's idea gets
-	     * implemented, this optimization should become
-	     * irrelevant.  --jhi */
-            if (shift < count)
-                shift = count; /* Avoid shifting too often --Ben Tilly */
-
-	    EXTEND(SP,shift);
-	    src = SP;
-	    dst = (SP += shift);
-	    PL_markstack_ptr[-1] += shift;
-	    *PL_markstack_ptr += shift;
-	    while (count--)
-		*dst-- = *src--;
-	}
-	/* copy the new items down to the destination list */
-	dst = PL_stack_base + (PL_markstack_ptr[-2] += items) - 1;
-	if (gimme == G_ARRAY) {
-	    while (items-- > 0)
-		*dst-- = SvTEMP(TOPs) ? POPs : sv_mortalcopy(POPs);
-	}
-	else {
-	    /* scalar context: we don't care about which values map returns
-	     * (we use undef here). And so we certainly don't want to do mortal
-	     * copies of meaningless values. */
-	    while (items-- > 0) {
-		(void)POPs;
-		*dst-- = &PL_sv_undef;
-	    }
+	int i;
+	SP -= items;
+	for (i=1; i <= items; i++) {
+	    av_push((AV*)*dst, SvTEMP(SP[i]) ? SvREFCNT_inc(SP[i]) : newSVsv(SP[i]));
 	}
     }
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if (PL_markstack_ptr[-1] > *PL_markstack_ptr) {
+    if ( av_len(*src) == -1 ) {
 
 	(void)POPMARK;				/* pop top */
 	LEAVE;					/* exit outer scope */
-	(void)POPMARK;				/* pop src */
-	items = --*PL_markstack_ptr - PL_markstack_ptr[-1];
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
-	if (gimme == G_SCALAR) {
-	    if (PL_op->op_private & OPpGREP_LEX) {
-		SV* sv = sv_newmortal();
-		sv_setiv(sv, items);
-		PUSHs(sv);
-	    }
-	    else {
-		dTARGET;
-		XPUSHi(items);
-	    }
+	if (gimme != G_VOID) {
+	    PUSHs(*dst);
 	}
-	else if (gimme == G_ARRAY)
-	    SP += items;
 	RETURN;
     }
     else {
-	SV *src;
+	SV *srcitem;
 
 	ENTER;					/* enter inner scope */
 	SAVEVPTR(PL_curpm);
 
 	/* set $_ to the new source item */
-	src = PL_stack_base[PL_markstack_ptr[-1]];
-	SvTEMP_off(src);
+	srcitem = av_shift(*src);
 	if (PL_op->op_private & OPpGREP_LEX)
-	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), src);
+	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem)
 	else
-	    SVcpREPLACE(DEFSV, src);
+	    SVcpSTEAL(DEFSV, srcitem);
 
 	RETURNOP(cLOGOP->op_other);
     }
@@ -542,9 +506,7 @@ PP(pp_mapwhile)
 PP(pp_range)
 {
     dVAR;
-    if (GIMME == G_ARRAY)
-	return NORMAL;
-    DIE(aTHX_ "range operator .. can only be used in list context.");
+    return NORMAL;
 }
 
 PP(pp_flip)
@@ -552,7 +514,6 @@ PP(pp_flip)
     dVAR;
     dSP;
 
-    assert(GIMME == G_ARRAY);
     RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
 }
 
@@ -571,8 +532,8 @@ PP(pp_flop)
 {
     dVAR; dSP;
 
+    AV* res = sv_2mortal(newAV());
     dPOPPOPssrl;
-    assert(GIMME == G_ARRAY);
 
     SvGETMAGIC(left);
     SvGETMAGIC(right);
@@ -587,14 +548,11 @@ PP(pp_flop)
 	max = SvIV(right);
 	if (max >= i) {
 	    j = max - i + 1;
-	    EXTEND_MORTAL(j);
-	    EXTEND(SP, j);
 	}
 	else
 	    j = 0;
 	while (j--) {
-	    SV * const sv = sv_2mortal(newSViv(i++));
-	    PUSHs(sv);
+	    av_push(res, newSViv(i++));
 	}
     }
     else {
@@ -605,14 +563,14 @@ PP(pp_flop)
 	SV *sv = sv_mortalcopy(left);
 	SvPV_force_nolen(sv);
 	while (!SvNIOKp(sv) && SvCUR(sv) <= len) {
-	    XPUSHs(sv);
+	    av_push(res, newSVsv(sv));
 	    if (strEQ(SvPVX_const(sv),tmps))
 		break;
-	    sv = sv_2mortal(newSVsv(sv));
 	    sv_inc(sv);
 	}
     }
 
+    XPUSHs(res);
     RETURN;
 }
 
@@ -1251,28 +1209,19 @@ PP(pp_enteriter)
 	    }
 	}
     }
-    else if (PL_op->op_flags & OPf_STACKED) {
+    else { /* iterating over (copy of) the array on the stack */
 	SV *maybe_ary = POPs;
-	if ( ! SvOK(maybe_ary) )
-	    RETURN;
-	if ( ! SvAVOK(maybe_ary) )
+	if ( ! ( PL_op->op_flags & OPf_STACKED) ) {
+	    maybe_ary = sv_mortalcopy(maybe_ary);
+	}
+	if ( SvOK(maybe_ary) && ! SvAVOK(maybe_ary) )
 	    DIE("for loop expected an array but got %s", Ddesc(maybe_ary));
 
-	cx->blk_loop.state_u.ary.ary = (AV*)maybe_ary;
-	SvREFCNT_inc(maybe_ary);
+	cx->blk_loop.state_u.ary.ary = (AV*)SvREFCNT_inc(maybe_ary);
 	cx->blk_loop.state_u.ary.ix =
-	    (PL_op->op_private & OPpITER_REVERSED) ?
-	    AvFILL(cx->blk_loop.state_u.ary.ary) + 1 :
-	    -1;
-    }
-    else { /* iterating over items on the stack */
-	cx->blk_loop.state_u.ary.ary = NULL; /* means to use the stack */
-	if (PL_op->op_private & OPpITER_REVERSED) {
-	    cx->blk_loop.state_u.ary.ix = cx->blk_oldsp + 1;
-	}
-	else {
-	    cx->blk_loop.state_u.ary.ix = MARK - PL_stack_base;
-	}
+	    (PL_op->op_private & OPpITER_REVERSED)
+	    ? (SvAVOK(maybe_ary) ? AvFILL(maybe_ary) + 1 : -1 )
+	    : -1;
     }
 
     RETURN;
@@ -2100,6 +2049,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     int runtime;
     CV* runcv = NULL;	/* initialise to avoid compiler warnings */
     STRLEN len;
+    OP *oldop;
 
     PERL_ARGS_ASSERT_SV_COMPILE_2OP;
 
@@ -2133,9 +2083,11 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     if (runtime)
 	runcv = find_runcv(NULL);
 
+    oldop = PL_op;
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
+    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : newAV();
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 

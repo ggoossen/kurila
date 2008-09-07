@@ -1,5 +1,5 @@
 BEGIN {
-    push @INC, qw(uni .);
+    push @INC, < qw(uni .);
     require "case.pl";
 }
 

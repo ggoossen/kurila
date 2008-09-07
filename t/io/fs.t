@@ -225,7 +225,7 @@ is($foo, 1, "utime");
 check_utime_result();
 
 utime undef, undef, 'b';
-($atime,$mtime) = (stat 'b')[[8, 9]];
+($atime,$mtime) = < @(stat 'b')[[8..9]];
 print "# utime undef, undef --> $atime, $mtime\n";
 isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
@@ -263,7 +263,7 @@ sub check_utime_result {
 		print "# Maybe stat() cannot get the correct atime, ".
 		    "as happens via NFS on linux?\n";
 		$foo = (utime 400000000,500000000 + 2*$delta,'b');
-		my ($new_atime, $new_mtime) = (stat('b'))[[8,9]];
+		my ($new_atime, $new_mtime) = < @(stat('b'))[[8..9]];
 		print "# newatime - $new_atime  nemtime - $new_mtime\n";
 		if ($new_atime == $atime && $new_mtime - $mtime == $delta) {
 		    pass("atime - accounted for possible NFS/glibc2.2 bug on linux");
@@ -448,10 +448,10 @@ ok(-d 'tmp1', "rename on directories working");
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
-    map chmod(+()), ('')x68;
+    map chmod(+()), @( ('')x68);
     ok(1, "extend sp in pp_chmod");
 
-    map chown(+()), ('')x68;
+    map chown(+()), @( ('')x68);
     ok(1, "extend sp in pp_chown");
 }
 

@@ -11,7 +11,7 @@ use Carp::Heavy ();
 
 BEGIN {
     if ($^O ne 'VMS') {
-	for (keys %ENV) { # untaint ENV
+	for (@( <keys %ENV)) { # untaint ENV
 	    (%ENV{$_}) = %ENV{$_} =~ m/(.*)/;
 	}
     }
@@ -19,7 +19,7 @@ BEGIN {
     # Remove insecure directories from PATH
     my @path;
     my $sep = %Config{path_sep};
-    foreach my $dir (split(m/\Q$sep/,%ENV{'PATH'}))
+    foreach my $dir (@( <split(m/\Q$sep/,%ENV{'PATH'})))
     {
 	##
 	## Match the directory taint tests in mg.c::Perl_magic_setenv()
@@ -30,7 +30,7 @@ BEGIN {
 				 or
 				 @(stat $dir)[2] ^&^ 002);
     }
-    %ENV{'PATH'} = join($sep,< @path);
+    %ENV{'PATH'} = join($sep, @(< @path));
 }
 
 use Test::More tests => 45;
@@ -272,7 +272,7 @@ delete %Expect_File{ file_path('fsl') } unless $symlink_exists;
                 dir_path('fab') => 1, dir_path('faba') => 1,
                 dir_path('fb') => 1, dir_path('fba') => 1);
 
-delete %Expect_Dir{[dir_path('fb'), dir_path('fba') ]} unless $symlink_exists;
+delete %Expect_Dir{[@(dir_path('fb'), dir_path('fba'))]} unless $symlink_exists;
 
 File::Find::find( \%(wanted => \&wanted_File_Dir_prune, untaint => 1,
 		   untaint_pattern => qr|^(.+)$|), topdir('fa') );

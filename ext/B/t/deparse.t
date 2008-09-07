@@ -76,7 +76,7 @@ is($val->[0], 'hello');
 my $Is_VMS = $^O eq 'VMS';
 my $Is_MacOS = $^O eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } < @INC;
+my $path = join " ", @( < map { qq["-I$_"] } @( < @INC));
 $path .= " -MMac::err=unix" if $Is_MacOS;
 my $redir = $Is_MacOS ? "" : "2>&1";
 
@@ -91,7 +91,7 @@ BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
     chomp $_;
-    our @F = @(split(' ', $_, 0));
+    our @F = split(' ', $_, 0);
     '???';
 }
 EOF
@@ -358,11 +358,11 @@ my $d = \(\@());
 ####
 # array slice
 my @array;
-@array[[1, 2]];
+@array[[@(1, 2)]];
 ####
 # hash slice
 my %hash;
-%hash{['foo', 'bar']};
+%hash{[@('foo', 'bar')]};
 ####
 testsub();
 ####

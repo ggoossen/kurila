@@ -15,7 +15,7 @@ BEGIN {
 
 print "1..8\n";
 
-use Storable qw(freeze nfreeze thaw);
+use Storable < qw(freeze nfreeze thaw);
 
 package TIED_HASH;
 
@@ -113,8 +113,8 @@ ok 7, our $hash_fetch == 2;
 
 my $num = $r->num;
 my $ok = 1;
-for (my $i = 0; $i +< @$num; $i++) {
-	do { $ok = 0; last } unless $num->[$i] == $y->num->[$i];
+for my $i (0..nelems(@$num)-1) {
+    do { $ok = 0; last } unless $num->[$i] == $y->num->[$i];
 }
 ok 8, $ok;
 

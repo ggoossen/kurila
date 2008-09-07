@@ -50,7 +50,7 @@ unlink($PATH) or $^O eq 'os2' or die "Can't unlink $PATH: $!";
 $| = 1;
 print "1..5\n";
 
-use IO::Socket;
+use IO::Socket::UNIX;
 
 my $listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0);
 

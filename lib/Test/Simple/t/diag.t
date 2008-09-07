@@ -66,7 +66,7 @@ ok( !$ret,  'diag returns false' );
 {
     $output = "";
     $Test->failure_output($fakeout);
-    diag(qw(one two));
+    diag( <qw(one two));
 }
 $Test->failure_output(\*STDERR);
 is( $output, <<'DIAG' );

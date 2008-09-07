@@ -9,7 +9,7 @@
 
 package Pod::Checker;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = 1.43;  ## Current version of this package
 
 use Pod::ParseUtils; ## for hyperlinks and lists
@@ -343,11 +343,11 @@ use strict;
 use Exporter;
 use Pod::Parser;
 
-use vars qw(@ISA @EXPORT);
-@ISA = @( qw(Pod::Parser) );
-@EXPORT = @( qw(&podchecker) );
+use vars < qw(@ISA @EXPORT);
+@ISA = @( < qw(Pod::Parser) );
+@EXPORT = @( < qw(&podchecker) );
 
-use vars qw(%VALID_COMMANDS %VALID_SEQUENCES);
+use vars < qw(%VALID_COMMANDS %VALID_SEQUENCES);
 
 my %VALID_COMMANDS = %(
     'pod'    =>  1,
@@ -608,7 +608,7 @@ sub poderror {
     my %opts = %( (ref @_[0]) ? < %{shift()} : () );
 
     ## Retrieve options
-    chomp( my $msg  = (%opts{-msg} || "")."{join ' ', <@_}" );
+    chomp( my $msg  = (%opts{-msg} || "")."{join ' ', @( <@_)}" );
     my $line = (exists %opts{-line}) ? " at line %opts{-line}" : "";
     my $file = (exists %opts{-file}) ? " in file %opts{-file}" : "";
     unless (exists %opts{-severity}) {
@@ -760,7 +760,7 @@ sub end_pod {
     # check validity of document internal hyperlinks
     # first build the node names from the paragraph text
     my %nodes;
-    foreach( <$self->node()) {
+    foreach( $self->node()) {
         %nodes{$_} = 1;
         if(m/^(\S+)\s+\S/) {
             # we have more than one word. Use the first as a node, too.
@@ -768,10 +768,10 @@ sub end_pod {
             %nodes{$1} ||= 2; # derived node
         }
     }
-    foreach( <$self->idx()) {
+    foreach( $self->idx()) {
         %nodes{$_} = 3; # index node
     }
-    foreach( <$self->hyperlink()) {
+    foreach( $self->hyperlink()) {
         my ($line,$link) = < @$_;
         # _TODO_ what if there is a link to the page itself by the name,
         # e.g. in Tk::Pod : L<Tk::Pod/"DESCRIPTION">
@@ -789,8 +789,8 @@ sub end_pod {
     # check the internal nodes for uniqueness. This pertains to
     # =headX, =item and X<...>
     if($self->{-warnings} && $self->{-warnings}+>1) {
-      foreach(grep($self->{_unique_nodes}->{$_} +> 1,
-        keys %{$self->{_unique_nodes}})) {
+      foreach(@(< grep($self->{_unique_nodes}->{$_} +> 1, @( <
+        keys %{$self->{_unique_nodes}})))) {
           $self->poderror(\%( -line => '-', -file => $infile,
             -severity => 'WARNING',
             -msg => "multiple occurrence of link target '$_'"));
@@ -1071,7 +1071,7 @@ sub _check_ptree {
     local($_);
     my $text = '';
     # process each node in the parse tree
-    foreach(< @$ptree) {
+    foreach( @$ptree) {
         # regular text chunk
         unless(ref) {
             # count the unescaped angle brackets
@@ -1161,7 +1161,7 @@ sub _check_ptree {
             }
             $link->line($line); # remember line
             if($self->{-warnings}) {
-                foreach my $w ( <$link->warning()) {
+                foreach my $w ( $link->warning()) {
                     $self->poderror(\%( -line => $line, -file => $file,
                         -severity => 'WARNING', 
                         -msg => $w ));

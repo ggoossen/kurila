@@ -17,7 +17,7 @@ chdir 't';
 use strict;
 use Test::More tests => 4;
 
-use ExtUtils::MakeMaker qw(WriteEmptyMakefile);
+use ExtUtils::MakeMaker < qw(WriteEmptyMakefile);
 
 can_ok __PACKAGE__, 'WriteEmptyMakefile';
 

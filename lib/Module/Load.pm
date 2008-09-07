@@ -20,7 +20,7 @@ sub load (*;@)  {
     } else {
         LOAD: {
             my $err;
-            for my $flag ( qw[1 0] ) {
+            for my $flag (@( < qw[1 0]) ) {
                 my $file = _to_file( $mod, $flag);
                 try { require $file };
                 $@ ? $err .= $@->message : last LOAD;
@@ -46,11 +46,11 @@ sub _to_file{
     local $_    = shift;
     my $pm      = shift || '';
 
-    my @parts = @( split m/::/ );
+    my @parts = @( < split m/::/ );
 
     ### because of [perl #19213], see caveats ###
     my $file = $^O eq 'MSWin32'
-                    ? join "/", < @parts
+                    ? join "/", @( < @parts)
                     : File::Spec->catfile( < @parts );
 
     $file   .= '.pm' if $pm;
@@ -65,7 +65,7 @@ sub _to_file{
     return $file;
 }
 
-sub _who { (caller(1))[[0]] }
+sub _who { @(caller(1))[0] }
 
 sub _is_file {
     local $_ = shift;

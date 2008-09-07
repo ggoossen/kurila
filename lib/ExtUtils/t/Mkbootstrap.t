@@ -11,7 +11,7 @@ BEGIN {
 }
 chdir 't';
 
-use vars qw( $required );
+use vars < qw( $required );
 use Test::More tests => 18;
 
 BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }
@@ -154,5 +154,5 @@ close OUT;
 
 END {
 	# clean things up, even on VMS
-	1 while unlink(qw( mkboot.bso boot_BS dasboot.bs .bs ));
+	1 while unlink( <qw( mkboot.bso boot_BS dasboot.bs .bs ));
 }

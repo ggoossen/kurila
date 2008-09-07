@@ -11,11 +11,11 @@ BEGIN {
   die "Oi! No! Don't change this test so that Carp is used before Storable"
     if defined &Carp::carp;
 }
-use Storable qw(freeze thaw);
+use Storable < qw(freeze thaw);
 
 print "1..2\n";
 
-for my $test (1,2) {
+for my $test (@(1,2)) {
   try {thaw "\xFF\xFF"};
   if ($@->{description} =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
     {

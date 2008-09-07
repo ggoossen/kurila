@@ -50,7 +50,7 @@ sub explain {
 #
 EOM
     }
-    print "1..0 # Skip: {join ' ', <@_}\n" if (nelems @_);
+    print "1..0 # Skip: {join ' ', @( <@_)}\n" if (nelems @_);
 }
 
 $| = 1;
@@ -94,7 +94,7 @@ close(BIG) or
 
 my @s1 = @( stat("big1") );
 
-print "# s1 = {join ' ', <@s1}\n";
+print "# s1 = {join ' ', @( <@s1)}\n";
 
 open(BIG, ">", "big2") or
     do { warn "open big2 failed: $!\n"; bye };
@@ -109,7 +109,7 @@ close(BIG) or
 
 my @s2 = @( stat("big2") );
 
-print "# s2 = {join ' ', <@s2}\n";
+print "# s2 = {join ' ', @( <@s2)}\n";
 
 zap();
 
@@ -161,7 +161,7 @@ unless ($print && $close) {
 
 @s = @( stat("big") );
 
-print "# {join ' ', <@s}\n";
+print "# {join ' ', @( <@s)}\n";
 
 unless (@s[7] == 5_000_000_003) {
     explain("kernel/fs not configured to use large files?");

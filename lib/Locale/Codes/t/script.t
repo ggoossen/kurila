@@ -84,7 +84,7 @@ use Test::More;
 
 plan tests => (nelems @TESTS);
 
-foreach my $test (< @TESTS)
+foreach my $test ( @TESTS)
 {
     diag($test->[0]);
     my $ok = eval "$test->[0]";

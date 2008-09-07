@@ -30,8 +30,8 @@ sub BEGIN {
 }
 
 
-use Storable qw(dclone freeze thaw);
-use Hash::Util qw(lock_hash unlock_value);
+use Storable < qw(dclone freeze thaw);
+use Hash::Util < qw(lock_hash unlock_value);
 
 print "1..100\n";
 
@@ -61,12 +61,12 @@ sub testit {
   my $cloner = shift;
   my $copy = &$cloner($hash);
 
-  my @in_keys = @( sort keys %$hash );
-  my @out_keys = @( sort keys %$copy );
-  unless (ok ++$test, "{join ' ', <@in_keys}" eq "{join ' ', <@out_keys}") {
+  my @in_keys = @( < sort @( < keys %$hash) );
+  my @out_keys = @( < sort @( < keys %$copy) );
+  unless (ok ++$test, "{join ' ', @( <@in_keys)}" eq "{join ' ', @( <@out_keys)}") {
     print "# Failed: keys mis-match after deep clone.\n";
-    print "# Original keys: {join ' ', <@in_keys}\n";
-    print "# Copy's keys: {join ' ', <@out_keys}\n";
+    print "# Original keys: {join ' ', @( <@in_keys)}\n";
+    print "# Copy's keys: {join ' ', @( <@out_keys)}\n";
   }
 
   # $copy = $hash;	# used in initial debug of the tests
@@ -96,8 +96,8 @@ sub testit {
     "value for key 'undef' is undefined";
 }
 
-for $Storable::canonical (0, 1) {
-  for my $cloner (\&dclone, \&freeze_thaw) {
+for $Storable::canonical (@(0, 1)) {
+  for my $cloner (@(\&dclone, \&freeze_thaw)) {
     print "# \$Storable::canonical = $Storable::canonical\n";
     testit (\%hash, $cloner);
     my $object = \%hash;

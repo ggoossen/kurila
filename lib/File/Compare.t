@@ -16,7 +16,7 @@ BEGIN {
 
 print "1..13\n";
 
-use File::Compare qw(compare compare_text);
+use File::Compare < qw(compare compare_text);
 
 print "ok 1\n";
 
@@ -74,7 +74,7 @@ my @donetests;
 try {
   require File::Spec; File::Spec->import();
   require File::Path; File::Path->import();
-  require File::Temp; File::Temp->import( qw/ :mktemp unlink0 /);
+  require File::Temp; File::Temp->import( < qw/ :mktemp unlink0 /);
 
   my $template = File::Spec->catfile(File::Spec->tmpdir, 'fcmpXXXX');
   my($tfh,$filename) = < mkstemp($template);

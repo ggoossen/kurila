@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant v0.11 'WriteConstants';
 
-my @names = @(qw(
+my @names = @( <qw(
 	       DN_ACCESS DN_MODIFY DN_CREATE DN_DELETE DN_RENAME
 	       DN_ATTRIB DN_MULTISHOT FAPPEND FASYNC FCREAT FDEFER
 	       FDSYNC FD_CLOEXEC FEXCL FLARGEFILE FNDELAY FNONBLOCK

@@ -5,36 +5,14 @@ BEGIN {
     $^WARN_HOOK = sub { die "Dying on warning: ", < @_ };
 }
 
+BEGIN {
+    require "./test.pl";
+}
+
 use warnings;
 use Config;
 
-my $test = 1;
-sub ok {
-    my($ok, $info, $todo) = < @_;
-
-    # You have to do it this way or VMS will get confused.
-    printf "\%s $test\%s\n", $ok ? "ok" : "not ok",
-                           $todo ? " # TODO $todo" : '';
-
-    unless( $ok ) {
-        printf "# Failed test at line \%d\n", (caller)[[2]];
-        print  "# $info\n" if defined $info;
-    }
-
-    $test++;
-    return $ok;
-}
-
-sub skip {
-    my($reason) = < @_;
-
-    printf "ok $test # skipped\%s\n", defined $reason ? ": $reason" : '';
-
-    $test++;
-    return 1;
-}
-
-print "1..52\n";
+plan tests => 49;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -127,28 +105,28 @@ END
 END
     close CMDPIPE;
     $? >>= 8 if $^O eq 'VMS'; # POSIX status hiding in 2nd byte
-    my $todo = ($^O eq 'os2' ? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' : '');
-    print $? ^&^ 0xFF ? "ok 6$todo\n" : "not ok 6$todo\n";
-
-    $test += 4;
+    next_test for 1..3;
+    local our $TODO = ($^O eq 'os2' ? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' : '');
+    ok($? ^&^ 0xFF);
 }
 
+dies_like( sub { %SIG{TERM} = 'foo' },
+    qr/signal handler should be a code reference or .../ );
+
 # can we slice ENV?
-my @val1 = @( %ENV{[keys(%ENV)]} );
-my @val2 = @( values(%ENV) );
-ok join(':',< @val1) eq join(':',< @val2);
+my @val1 = @( < %ENV{[@( <keys(%ENV))]} );
+my @val2 = @( < values(%ENV) );
+ok join(':', @(< @val1)) eq join(':', @(< @val2));
 ok( (nelems @val1) +> 1 );
 
 # regex vars
-'foobarbaz' =~ m/b(a)r/;
-ok $+ eq 'a', $+;
 
 # $"
-my @a = @( qw(foo bar baz) );
-ok "{join ' ', <@a}" eq "foo bar baz", "{join ' ', <@a}";
+my @a = @( < qw(foo bar baz) );
+ok "{join ' ', @( <@a)}" eq "foo bar baz", "{join ' ', @( <@a)}";
 {
     local $" = ',';
-    ok qq|{join $", <@a}| eq "foo,bar,baz", "{join ' ', <@a}";
+    ok qq|{join $", @( <@a)}| eq "foo,bar,baz", "{join ' ', @( <@a)}";
 }
 
 # $?, $@, $$
@@ -157,13 +135,13 @@ if ($Is_MacOS) {
 }
 else {
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(0)"];
-    ok $? == 0, $?;
+    ok $? == 0, '$?';
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(1)"];
-    ok $? != 0, $?;
+    ok $? != 0, '$?';
 }
 
 try { die "foo\n" };
-ok $@->{description} eq "foo\n", $@;
+ok $@->{description} eq "foo\n", '$@';
 
 ok $$ +> 0, $$;
 try { $$++ };
@@ -238,27 +216,27 @@ EOX
 EOH
     }
     my $s1 = "\$^X is $perl, \$0 is $script\n";
-    ok open(SCRIPT, ">", "$script"), $!;
-    ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), $!;
+    ok open(SCRIPT, ">", "$script"), '$!';
+    ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), '$!';
 #!$wd/perl
 EOB
 print "\$^X is $^X, \$0 is $0\n";
 EOF
-    ok close(SCRIPT), $!;
-    ok chmod(0755, $script), $!;
+    ok close(SCRIPT), '$!';
+    ok chmod(0755, $script), '$!';
     $_ = ($Is_MacOS || $Is_VMS) ? `$perl $script` : `$script`;
     s/\.exe//i if $Is_Dos or $Is_Cygwin or $Is_os2;
     s{./$script}{$script} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\bminiperl\b}{perl}; # so that test doesn't fail with miniperl
     s{is perl}{is $perl}; # for systems where $^X is only a basename
     s{\\}{/}g;
-    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), " :$_:!=:$s1:");
+    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), ' :$_:!=:$s1:');
     $_ = `$perl $script`;
     s/\.exe//i if $Is_Dos or $Is_os2 or $Is_Cygwin;
     s{./$perl}{$perl} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\\}{/}g;
-    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), " :$_:!=:$s1: after `$perl $script`");
-    ok unlink($script), $!;
+    ok(($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1) or diag " :$_:!=:$s1: after `$perl $script`";
+    ok unlink($script) or diag $!;
 }
 
 # $], $^O, $^T
@@ -299,7 +277,7 @@ else {
 	if ($^O =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, '<', "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
-	    my $me = (split m/\0/, $line)[[0]];
+	    my $me = (split m/\0/, $line)[0];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
 	    close CMDLINE;
             # perlbug #22811
@@ -308,7 +286,7 @@ else {
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
-              my $ps = (`ps -o command= -p $$`)[[-1]];
+              my $ps = @(`ps -o command= -p $$`)[-1];
               return if $?;
               chomp $ps;
               printf "# 0[\%s]ps[\%s]\n", $0, $ps;
@@ -329,21 +307,22 @@ else {
 	       || ($^O eq 'freebsd' && $ps =~ m/^(?:perl: )?x(?: \(perl\))?$/),
 		       'altering $0 is effective (testing with `ps`)');
 	} else {
-	    skip("\$0 check only on Linux and FreeBSD") for 0, 1;
+	    skip("\$0 check only on Linux and FreeBSD") for @( 0, 1);
 	}
 }
 
 {
     my $ok = 1;
     my $warn = '';
-    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', < @_; };
+    local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @( < @_); };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
 }
 
-# test case-insignificance of %ENV (these tests must be enabled only
-# when perl is compiled with -DENV_IS_CASELESS)
-if ($Is_MSWin32 || $Is_NetWare) {
+SKIP: {
+    # test case-insignificance of %ENV (these tests must be enabled only
+    # when perl is compiled with -DENV_IS_CASELESS)
+    skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
     %ENV = %( () );
     %ENV{'Foo'} = 'bar';
     %ENV{'fOo'} = 'baz';
@@ -351,9 +330,6 @@ if ($Is_MSWin32 || $Is_NetWare) {
     ok exists(%ENV{'FOo'});
     ok (delete(%ENV{'foO'}) eq 'baz');
     ok (scalar(keys(%ENV)) == 0);
-}
-else {
-    skip('no caseless %ENV support') for 1..4;
 }
 
 if ($Is_miniperl) {
@@ -394,13 +370,6 @@ ok $^TAINT == 0;
 try { $^TAINT = 1 };
 ok $^TAINT == 0;
 
-# 5.6.1 had a bug: @+ and @- were not properly interpolated
-# into double-quoted strings
-# 20020414 mjd-perl-patch+@plover.com
-"I like pie" =~ m/(I) (like) (pie)/;
-ok "{join ' ', <@-}" eq  "0 0 2 7";
-ok "{join ' ', <@+}" eq "10 1 6 10";
-
 # Tests for the magic get of $\
 {
     my $ok = 0;
@@ -419,18 +388,6 @@ ok "{join ' ', <@+}" eq "10 1 6 10";
     ok $ok;
 }
 
-# Test for bug [perl #27839]
-{
-    my $x;
-    sub f {
-	"abc" =~ m/(.)./;
-	$x = "{join ' ', <@+}";
-	return @+;
-    };
-    my @y = @( < f() );
-    ok( $x eq "{join ' ', <@y}", "return a magic array ($x) vs ({join ' ', <@y})" );
-}
-
 # Test for bug [perl #36434]
 if (!$Is_VMS) {
     our @ISA;
@@ -445,7 +402,7 @@ if (!$Is_VMS) {
     try { %ENV = %(PATH => __PACKAGE__) };
     ok( $@ eq '', 'Assign a constant to a magic hash');
     $@ and print "# $@";
-    try { my %h = %( qw(A B) ); %ENV = %(PATH => (keys %h)[[0]]) };
+    try { my %h = %( < qw(A B) ); %ENV = %(PATH => (keys %h)[0]) };
     ok( $@ eq '', 'Assign a shared key to a magic hash');
     $@ and print "# $@";
 }

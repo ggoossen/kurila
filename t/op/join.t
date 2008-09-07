@@ -1,24 +1,24 @@
 #!./perl
 
-print "1..22\n";
+print "1..10\n";
 
 my @x = @(1, 2, 3);
-if (join(':',< @x) eq '1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
+if (join(':', @(< @x)) eq '1:2:3') {print "ok 1\n";} else {print "not ok 1\n";}
 
-if (join('',1,2,3) eq '123') {print "ok 2\n";} else {print "not ok 2\n";}
+if (join('', @(1,2,3)) eq '123') {print "ok 2\n";} else {print "not ok 2\n";}
 
-if (join(':',split(m/ /,"1 2 3")) eq '1:2:3') {print "ok 3\n";} else {print "not ok 3\n";}
+if (join(':', @( <split(m/ /,"1 2 3"))) eq '1:2:3') {print "ok 3\n";} else {print "not ok 3\n";}
 
 my $f = 'a';
-$f = join ',', 'b', $f, 'e';
+$f = join ',', @( 'b', $f, 'e');
 if ($f eq 'b,a,e') {print "ok 4\n";} else {print "# '$f'\nnot ok 4\n";}
 
 $f = 'a';
-$f = join ',', $f, 'b', 'e';
+$f = join ',', @( $f, 'b', 'e');
 if ($f eq 'a,b,e') {print "ok 5\n";} else {print "not ok 5\n";}
 
 $f = 'a';
-$f = join $f, 'b', 'e', 'k';
+$f = join $f, @( 'b', 'e', 'k');
 if ($f eq 'baeak') {print "ok 6\n";} else {print "# '$f'\nnot ok 6\n";}
 
 print "ok 7\n";
@@ -27,80 +27,10 @@ print "ok 8\n";
 # 9,10 and for multiple read of undef
 { my $s = 5;
   local ($^W, $^WARN_HOOK) = ( 1, sub { $s+=4 } );
-  my $r = join ':', 'a', undef, $s, 'b', undef, $s, 'c';
-  print "# expected 'a::9:b::13:c' got '$r'\nnot " if $r ne 'a::9:b::13:c';
+  my $r = join ':', @( 'a', undef, $s, 'b', undef, $s, 'c');
+  print "# expected '13' got '$s'\nnot " if $s != 13;
   print "ok 9\n";
-  my $r = join '', 'a', undef, $s, 'b', undef, $s, 'c';
-  print "# expected 'a17b21c' got '$r'\nnot " if $r ne 'a17b21c';
+  my $r = join '', @( 'a', undef, $s, 'b', undef, $s, 'c');
+  print "# expected '21' got '$s'\nnot " if $s != 21;
   print "ok 10\n";
 };
-
-use utf8;
-
-{ my $s = join("", chr(0x1234), chr(0xff));
-  print "not " unless length($s) == 2 && $s eq "\x{1234}\x{ff}";
-  print "ok 11\n";
-}
-
-{ my $s = join(chr(0xff), chr(0x1234), "");
-  print "not " unless length($s) == 2 && $s eq "\x{1234}\x{ff}";
-  print "ok 12\n";
-}
-
-{ my $s = join(chr(0x1234), chr(0xff), chr(0x2345));
-  print "not " unless length($s) == 3 && $s eq "\x{ff}\x{1234}\x{2345}";
-  print "ok 13\n";
-}
-
-{ 
-    my $s = join(chr(0xff), chr(0x1234), chr(0xfe));
-    print "not " unless length($s) == 3 && $s eq "\x{1234}\x{ff}\x{fe}";
-    print "ok 14\n";
-}
-
-{ # [perl #24846] $jb2 should be in bytes, not in utf8.
-  my $b = "abc\304";
-  my $u = "abc\x{0100}";
-
-  sub join_into_my_variable {
-    my $r = join("", < @_);
-    return $r;
-  }
-
-  my $jb1 = join_into_my_variable("", $b);
-  my $ju1 = join_into_my_variable("", $u);
-  my $jb2 = join_into_my_variable("", $b);
-  my $ju2 = join_into_my_variable("", $u);
-
-  {
-      use bytes;
-      print "not " unless $jb1 eq $b;
-      print "ok 15\n";
-  }
-  print "not " unless $jb1 eq $b;
-  print "ok 16\n";
-
-  {
-      use bytes;
-      print "not " unless $ju1 eq $u;
-      print "ok 17\n";
-  }
-  print "not " unless $ju1 eq $u;
-  print "ok 18\n";
-
-  {
-      use bytes;
-      print "not " unless $jb2 eq $b;
-      print "ok 19\n";
-  }
-  print "not " unless $jb2 eq $b;
-  print "ok 20\n";
-
-  {
-      use bytes;
-      print "not " unless $ju2 eq $u;
-      print "ok 21\n";
-  }
-  print "not " unless $ju2 eq $u;
-  print "ok 22\n";
-}

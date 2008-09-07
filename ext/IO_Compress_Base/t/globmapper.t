@@ -5,7 +5,7 @@ BEGIN {
     }
 }
 
-use lib qw(t t/compress);
+use lib < qw(t t/compress);
 use strict ;
 use warnings ;
 
@@ -72,21 +72,21 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
     my $gm = File::GlobMapper->new("$tmpDir/ab*.tmp", "*X");
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX)),
-          \@(map { "$tmpDir/$_" } qw(abc2.tmp abc2.tmpX)),
-          \@(map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmpX)),
+        \@( \@(<map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX)),
+          \@(<map { "$tmpDir/$_" } qw(abc2.tmp abc2.tmpX)),
+          \@(<map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmpX)),
         ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-        \%( map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX
+        \%( < map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmpX
                                   abc2.tmp abc2.tmpX
                                   abc3.tmp abc3.tmpX),
         ), "  got mapping";
@@ -99,19 +99,19 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 );
 
     my $gm = File::GlobMapper->new("$tmpDir/abc2.tmp", "$tmpDir/abc2.tmp");
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_.tmp" } qw(abc2 abc2)),
+        \@( \@(< map { "$tmpDir/$_.tmp" } qw(abc2 abc2)),
         ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-        \%( map { "$tmpDir/$_.tmp" } qw(abc2 abc2),
+        \%( < map { "$tmpDir/$_.tmp" } qw(abc2 abc2),
         ), "  got mapping";
 }
 
@@ -122,7 +122,7 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 );
 
     my $gm = File::GlobMapper->new("$tmpDir/abc\{1,3\}.tmp", "*.X");
     #diag "Input pattern is $gm->{InputPattern}";
@@ -130,8 +130,8 @@ BEGIN
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmp.X)),
-          \@(map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmp.X)),
+        \@( \@(< map { "$tmpDir/$_" } qw(abc1.tmp abc1.tmp.X)),
+          \@(< map { "$tmpDir/$_" } qw(abc3.tmp abc3.tmp.X)),
         ), "  got mapping";
 
     $gm = File::GlobMapper->new("$tmpDir/abc\{1,3\}.tmp", "$tmpDir/X.#1.X")
@@ -141,8 +141,8 @@ BEGIN
 
     $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X.1.X)),
-          \@(map { "$tmpDir/$_" } qw(abc3.tmp X.3.X)),
+        \@( \@(<map { "$tmpDir/$_" } qw(abc1.tmp X.1.X)),
+          \@(< map { "$tmpDir/$_" } qw(abc3.tmp X.3.X)),
         ), "  got mapping";
 
 }
@@ -155,7 +155,7 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
     my $gm = File::GlobMapper->new("$tmpDir/*b(*).tmp", "$tmpDir/X-#2-#1-X");
     ok $gm, "  created GlobMapper object" 
@@ -163,9 +163,9 @@ BEGIN
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
-          \@(map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
-          \@(map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
+        \@( \@(<map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
+          \@(<map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
+          \@(<map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
         ), "  got mapping";
 }
 
@@ -176,16 +176,16 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 );
 
     my $gm = File::GlobMapper->new("$tmpDir/?b(*).tmp", "$tmpDir/X-#2-#1-X");
     ok $gm, "  created GlobMapper object" ;
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
-          \@(map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
-          \@(map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
+        \@( \@(<map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
+          \@(<map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
+          \@(<map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
         ), "  got mapping";
 }
 
@@ -196,7 +196,7 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 );
 
     my $gm = File::GlobMapper->new("./$tmpDir/?b[a-z]*.tmp", "./$tmpDir/X-#3-#2-#1-X");
     ok $gm, "  created GlobMapper object" ;
@@ -204,9 +204,9 @@ BEGIN
     #diag "Input pattern is $gm->{InputPattern}";
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "./$tmpDir/$_" } qw(abc1.tmp X-1-c-a-X)),
-          \@(map { "./$tmpDir/$_" } qw(abc2.tmp X-2-c-a-X)),
-          \@(map { "./$tmpDir/$_" } qw(abc3.tmp X-3-c-a-X)),
+        \@( \@(<map { "./$tmpDir/$_" } qw(abc1.tmp X-1-c-a-X)),
+          \@(<map { "./$tmpDir/$_" } qw(abc2.tmp X-2-c-a-X)),
+          \@(<map { "./$tmpDir/$_" } qw(abc3.tmp X-3-c-a-X)),
         ), "  got mapping";
 }
 
@@ -224,11 +224,11 @@ BEGIN
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X)), ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X)), ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-        \%( map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X) ), "  got mapping";
+        \%( <map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X) ), "  got mapping";
 
 }
 
@@ -239,7 +239,7 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc def) ;
+    touch <map { "$tmpDir/$_.tmp" } qw( abc def) ;
 
     my $gm = File::GlobMapper->new("$tmpDir/*.tmp", "$tmpDir/fred");
     ok ! $gm, "  did not create GlobMapper object" ;
@@ -249,7 +249,7 @@ BEGIN
     #my $map = $gm->getFileMap() ;
     #is @{ $map }, 1, "  returned 1 maps";
     #is_deeply $map,
-    #\@( \@(map { "$tmpDir/$_" } qw(abc1 abc.X)), ), "  got mapping";
+    #\@( \@(<map { "$tmpDir/$_" } qw(abc1 abc.X)), ), "  got mapping";
 }
 
 {
@@ -259,16 +259,16 @@ BEGIN
     my $lex = LexDir->new( $tmpDir);
     mkdir $tmpDir, 0777 ;
 
-    touch map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
+    touch < map { "$tmpDir/$_.tmp" } qw( abc1 abc2 abc3 ) ;
 
     my $map = File::GlobMapper::globmap("$tmpDir/*b*.tmp", "$tmpDir/X-#2-#1-X");
     ok $map, "  got map" 
         or diag $File::GlobMapper::Error ;
 
     is_deeply $map,
-        \@( \@(map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
-          \@(map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
-          \@(map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
+        \@( \@(<map { "$tmpDir/$_" } qw(abc1.tmp X-c1-a-X)),
+          \@(<map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
+          \@(<map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
         ), "  got mapping";
 }
 

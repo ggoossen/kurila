@@ -47,15 +47,15 @@ is($a, '',              'x=0');
 
 my @x = @(1,2,3);
 
-is(join('', (<@x) x 4),      '123123123123',         '(@x) x Y');
-is(join('', (<@x,()) x 4),   '123123123123',         '(@x,()) x Y');
-is(join('', (<@x,1) x 4),    '1231123112311231',     '(@x,1) x Y');
-is(join(':', () x 4),       '',                     '() x Y');
-is(join(':', (9) x 4),      '9:9:9:9',              '(X) x Y');
-is(join(':', (9,9) x 4),    '9:9:9:9:9:9:9:9',      '(X,X) x Y');
-is(join('', (split(m//,"123")) x 2), '123123',       'split and x');
+is(join('', @((<@x) x 4)),      '123123123123',         '(@x) x Y');
+is(join('', @((<@x,()) x 4)),   '123123123123',         '(@x,()) x Y');
+is(join('', @((<@x,1) x 4)),    '1231123112311231',     '(@x,1) x Y');
+is(join(':', @(() x 4)),       '',                     '() x Y');
+is(join(':', @((9) x 4)),      '9:9:9:9',              '(X) x Y');
+is(join(':', @((9,9) x 4)),    '9:9:9:9:9:9:9:9',      '(X,X) x Y');
+is(join('', @((< split(m//,"123")) x 2)), '123123',       'split and x');
 
-is(join('', (<@x) x -14),    '',                     '(@x) x -14');
+is(join('', @((<@x) x -14)),    '',                     '(@x) x -14');
 
 
 # This test is actually testing for Digital C compiler optimizer bug,
@@ -131,7 +131,7 @@ is(77, scalar ((1,7)x2),    'stack truncation');
 # perlbug 20011113.110 works in 5.6.1, broken in 5.7.2
 {
     my $x= \@(("foo") x 2);
-    is( join('', <@$x), 'foofoo', 'list repeat in anon array ref broken [ID 20011113.110]' );
+    is( join('', @$x), 'foofoo', 'list repeat in anon array ref broken [ID 20011113.110]' );
 }
 
 # [ID 20010809.028] x operator not copying elements in 'for' list?
@@ -139,11 +139,11 @@ is(77, scalar ((1,7)x2),    'stack truncation');
     local our $TODO = "x operator not copying elements in 'for' list? [ID 20010809.028]";
     my $x = 'abcd';
     my $y = '';
-    for (($x =~ m/./g) x 2) {
+    for (@(($x =~ m/./g) x 2)) {
 	$y .= chop;
     }
     is($y, 'abcdabcd');
 }
 
 # [perl #35885]
-is( (join ',', (qw(a b c) x 3)), 'a,b,c,a,b,c,a,b,c', 'x on qw produces list' );
+is( (join ',', @((<qw(a b c)) x 3)), 'a,b,c,a,b,c,a,b,c', 'x on qw produces list' );

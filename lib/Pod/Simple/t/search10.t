@@ -67,18 +67,18 @@ $p =~ s/^/#  /mg;
 print $p;
 
 {
-my $names = join "|", sort values %$where2name;
+my $names = join "|", @( < sort @( < values %$where2name));
 ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 }
 
 {
-my $names = join "|", sort keys %$name2where;
+my $names = join "|", @( < sort @( < keys %$name2where));
 ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 }
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, keys %$where2name ), 1;
+ok nelems(grep( m/squaa\.pm/, keys %$where2name)), 1;
 
 ok 1;
 

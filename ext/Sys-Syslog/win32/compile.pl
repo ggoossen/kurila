@@ -60,20 +60,20 @@ close($header);
 
 my ($hash, $f2c, %fac);
 
-for my $name (sort { substr($a,0,1) cmp substr($b,0,1) || %vals{$a} <+> %vals{$b} } keys %vals) {
+for my $name (@( <sort { substr($a,0,1) cmp substr($b,0,1) || %vals{$a} <+> %vals{$b} } @( < keys %vals))) {
     $hash .= "    $name => %vals{$name},\n" ;
     if ($name =~ m/^CAT_(\w+)$/) {
         %fac{$1} = %vals{$name};
     }
 }
 
-for my $name (sort {%fac{$a} <+> %fac{$b}} keys %fac) {
+for my $name (@( <sort {%fac{$a} <+> %fac{$b}} @( < keys %fac))) {
     $f2c .= "    Sys::Syslog::LOG_$name() => '$name',\n";
 }    
 
 # write the Sys::Syslog::Win32 module
 open my $out, '>', "Win32.pm" or die "fatal: Can't write Win32.pm: $!";
-my $template = join '', ~< *DATA;
+my $template = join '', @( ~< *DATA);
 $template =~ s/__CONSTANT__/$hash/;
 $template =~ s/__F2C__/$f2c/;
 $template =~ s/__NAME_VER__/$name/;

@@ -15,9 +15,9 @@ use File::Spec;
 # File::Temp since this END block must be evaluated after the
 # END block configured by File::Temp
 my @files; # list of files to remove
-END { foreach (< @files) { ok( !(-e $_) )} }
+END { foreach ( @files) { ok( !(-e $_) )} }
 
-use File::Temp qw/ tempfile unlink0 /;
+use File::Temp < qw/ tempfile unlink0 /;
 ok(1);
 
 # The high security tests must currently be skipped on some platforms

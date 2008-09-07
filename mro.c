@@ -141,8 +141,6 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
         while(items--) {
             SV* const isa_item = *isa_ptr++;
 	    if ( ! SvPVOK(isa_item) ) {
-		sv_dump(isa_item);
-		refcnt_check();
 		Perl_croak(aTHX_ "@ISA element which is not an plain value");
 	    }
 	    {

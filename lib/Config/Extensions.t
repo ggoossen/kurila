@@ -12,9 +12,9 @@ BEGIN {use_ok 'Config::Extensions', '%Extensions'};
 
 use Config;
 
-my @types = @( qw(dynamic static nonxs) );
+my @types = @( < qw(dynamic static nonxs) );
 my %types;
-%types{[< @types]} = < @types;
+ <%types{[@(< @types)]} = < @types;
 
 ok (nkeys %Extensions, "There are some extensions");
 # Check only the 3 valid keys have been used.

@@ -10,8 +10,8 @@ use Config;
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN {
     use Exporter   ();
-    @EXPORT      = @( qw(getpwent getpwuid getpwnam getpw) );
-    @EXPORT_OK   = @( qw(
+    @EXPORT      = @( < qw(getpwent getpwuid getpwnam getpw) );
+    @EXPORT_OK   = @( < qw(
                         pw_has
 
                         $pw_name    $pw_passwd  $pw_uid  $pw_gid
@@ -23,11 +23,11 @@ BEGIN {
 
                    ) );
     %EXPORT_TAGS = %(
-        FIELDS => \@( grep(m/^\$pw_/, < @EXPORT_OK), < @EXPORT ),
+        FIELDS => \@( < grep(m/^\$pw_/, @( < @EXPORT_OK)), < @EXPORT ),
         ALL    => \@( < @EXPORT, < @EXPORT_OK ),
     );
 }
-use vars grep m/^\$pw_/, < @EXPORT_OK;
+use vars < grep m/^\$pw_/, @( < @EXPORT_OK);
 
 #
 # XXX: these mean somebody hacked this module's source
@@ -38,7 +38,7 @@ my $IE = "[INTERNAL ERROR]";
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }
 
-use Class::Struct qw(struct);
+use Class::Struct < qw(struct);
 struct 'User::pwent' => \@(
     name    => '$',         # pwent[0]
     passwd  => '$',         # pwent[1]
@@ -71,10 +71,10 @@ struct 'User::pwent' => \@(
 # know about.  we do not use /^pw_?/, but just the tails.
 sub _feature_init {
     our %Groks;         # whether build system knew how to do this feature
-    for my $feep ( qw{
+    for my $feep (@( < qw{
                          pwage      pwchange   pwclass    pwcomment
                          pwexpire   pwgecos    pwpasswd   pwquota
-                     }
+                     })
                  )
     {
         my $short = $feep =~ m/^pw(.*)/
@@ -91,7 +91,7 @@ sub _feature_init {
         %Groks{$short} = defined %Config{ "d_" . $feep };
     }
     # assume that any that are left are always there
-    for my $feep (grep m/^\$pw_/s, < @EXPORT_OK) {
+    for my $feep (@(< grep m/^\$pw_/s, @( < @EXPORT_OK))) {
         $feep =~ m/^\$pw_(.*)/;
         %Groks{$1} = 1 unless defined %Groks{$1};
     }
@@ -113,12 +113,12 @@ sub pw_has {
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
                     ? \&die
-                    : sub { die("$IE {join ' ', <@_}") };
+                    : sub { die("$IE {join ' ', @( <@_)}") };
     if ((nelems @_) == 0) {
-        my @valid = @( sort grep { %Groks{$_} } keys %Groks );
+        my @valid = @( < sort @( < grep { %Groks{$_} } @( < keys %Groks)) );
         return @valid;
     }
-    for my $feep (map { split } < @_) {
+    for my $feep (@(< map { < split } @( < @_))) {
         defined %Groks{$feep}
             || $sploder->("$feep is never a valid struct pwd field");
         $cando &&= %Groks{$feep};

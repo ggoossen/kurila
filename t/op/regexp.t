@@ -42,8 +42,8 @@ my $file;
 
 use strict;
 use warnings FATAL=>"all";
-use vars qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
-use vars qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
+use vars < qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
+use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
 
 
 BEGIN {
@@ -71,8 +71,8 @@ BEGIN {
 
 use strict;
 use warnings FATAL=>"all";
-use vars qw($iters $numtests $bang $ffff $nulnul $OP);
-use vars qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
+use vars < qw($iters $numtests $bang $ffff $nulnul $OP);
+use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
 
 
 if (!defined $file) {
@@ -102,7 +102,7 @@ printf "1..\%d\n# $iters iterations\n", scalar nelems @tests;
 
 my $test;
 TEST:
-foreach (< @tests) {
+foreach ( @tests) {
     $test++;
     if (!m/\S/ || m/^\s*#/ || m/^__END__$/) {
         print "ok $test # (Blank line or comment)\n";
@@ -111,13 +111,13 @@ foreach (< @tests) {
     }
     chomp;
     s/\\n/\n/g;
-    my ($pat, $subject, $result, $repl, $expect, $reason) = split(m/\t/,$_,6);
+    my ($pat, $subject, $result, $repl, $expect, $reason) = < split(m/\t/,$_,6);
     if ($result =~ m/c/ and %ENV{PERL_VALGRIND}) {
         print "ok $test # TODO fix memory leak with compilation error\n";
         next;
     }
     $reason = '' unless defined $reason;
-    my $input = join(':',$pat,$subject,$result,$repl,$expect);
+    my $input = join(':', @($pat,$subject,$result,$repl,$expect));
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
     $pat =~ s/\$\{(\w+)\}/{eval '$'.$1}/g;
     $pat =~ s/\\n/\n/g;
@@ -129,7 +129,7 @@ foreach (< @tests) {
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
     $result =~ s/B//i unless $skip;
 
-    for my $study ('', 'study $subject') {
+    for my $study (@('', 'study $subject')) {
 	# Need to make a copy, else the utf8::upgrade of an alreay studied
 	# scalar confuses things.
 	my $subject = $subject;
@@ -178,7 +178,7 @@ EOFCODE
 	    # Probably we should annotate specific tests with which warnings
 	    # categories they're known to trigger, and hence should be
 	    # disabled just for that test
-	    no warnings qw(uninitialized regexp);
+	    no warnings < qw(uninitialized regexp);
 	    eval $code;
 	}
 	my $err = $@;

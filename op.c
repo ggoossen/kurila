@@ -889,14 +889,7 @@ Perl_scalar(pTHX_ OP *o)
 	PL_curcop = &PL_compiling;
 	break;
     case OP_LIST:
-    case OP_MAPSTART:
-    case OP_REVERSE:
-    case OP_SPLIT:
 	yyerror(Perl_form(aTHX_ "%s may not be used in scalar context", PL_op_desc[o->op_type]));
-	break;
-    case OP_SORT:
-	if (ckWARN(WARN_VOID))
-	    Perl_warner(aTHX_ packWARN(WARN_VOID), "Useless use of sort in scalar context");
 	break;
     case OP_ANONLIST:
 	break;
@@ -3476,8 +3469,7 @@ Perl_dofile(pTHX_ OP *term, I32 force_builtin, SV* location)
 OP *
 Perl_newSLICEOP(pTHX_ I32 flags, OP *subscript, OP *listval)
 {
-    return newBINOP(OP_LSLICE, flags,
-	    list(force_list(subscript)),
+    return newBINOP(OP_LSLICE, flags, subscript,
 		    list(force_list(listval)), subscript->op_location );
 }
 
@@ -3491,8 +3483,6 @@ S_is_list_assignment(pTHX_ register const OP *o)
 	return TRUE;
 
     if ((o->op_type == OP_NULL) && (o->op_flags & OPf_KIDS)) {
-	if (o->op_flags & OPf_PARENS)
-	    return TRUE;
 	o = cUNOPo->op_first;
     }
 
@@ -3521,6 +3511,9 @@ S_is_list_assignment(pTHX_ register const OP *o)
 
     if (type == OP_RV2SV)
 	return FALSE;
+
+    if (type == OP_EXPAND)
+	return TRUE;
 
     return FALSE;
 }
@@ -4277,7 +4270,9 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 	}
 	iterpflags |= OPpITER_DEF;
     }
-    if (expr->op_type == OP_EXPAND) {
+    if (expr->op_type == OP_RV2AV || expr->op_type == OP_RV2SV 
+	|| expr->op_type == OP_PADSV || expr->op_type == OP_ASLICE
+	|| expr->op_type == OP_VALUES ) {
 	expr->op_flags |= OPf_SPECIAL;
 	expr = mod(force_list(expr), OP_GREPSTART);
 	iterflags |= OPf_STACKED;
@@ -5519,7 +5514,7 @@ Perl_ck_try(pTHX_ OP *o)
 	    o->op_flags &= ~OPf_KIDS;
 	    op_null(o);
 	}
-	else if (kid->op_type == OP_LINESEQ 
+	else if (kid->op_type == OP_LINESEQ || kid->op_type == OP_STUB
 #ifdef PERL_MAD
 	    || kid->op_type == OP_NULL
 #endif
@@ -6041,28 +6036,38 @@ Perl_ck_glob(pTHX_ OP *o)
     }
 #endif /* PERL_EXTERNAL_GLOB */
 
-    if (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) {
-	append_elem(OP_GLOB, o,
-		    newSVOP(OP_CONST, 0, newSViv(PL_glob_index++), o->op_location));
-	o->op_type = OP_LIST;
-	o->op_ppaddr = PL_ppaddr[OP_LIST];
-	cLISTOPo->op_first->op_type = OP_PUSHMARK;
-	cLISTOPo->op_first->op_ppaddr = PL_ppaddr[OP_PUSHMARK];
-	cLISTOPo->op_first->op_targ = 0;
-	o = newUNOP(OP_ENTERSUB, OPf_STACKED,
-		    append_elem(OP_LIST, o,
-				scalar(newUNOP(OP_RV2CV, 0,
-					       newGVOP(OP_GV, 0, gv, o->op_location),
-					       o->op_location
-					   ))), o->op_location);
-	o = newUNOP(OP_NULL, 0, ck_subr(o), o->op_location);
-	o->op_targ = OP_GLOB;		/* hint at what it used to be */
-	return o;
+    if (!(gv && GvCVu(gv) && GvIMPORTED_CV(gv))) {
+	GV *glob_gv;
+	ENTER;
+	Perl_load_module(aTHX_ PERL_LOADMOD_NOIMPORT,
+		newSVpvs("File::GlobPP"), NULL, NULL, NULL);
+	gv = gv_fetchpvs("CORE::GLOBAL::glob", 1, SVt_PVCV);
+	glob_gv = gv_fetchpvs("File::GlobPP::glob", 0, SVt_PVCV);
+	GvCV(gv) = GvCV(glob_gv);
+	SvREFCNT_inc_void((SV*)GvCV(gv));
+	GvIMPORTED_CV_on(gv);
+	LEAVE;
     }
-    gv = newGVgen("main");
-    gv_IOadd(gv);
-    append_elem(OP_GLOB, o, newGVOP(OP_GV, 0, gv, o->op_location));
-    scalarkids(o);
+
+    if ( ! (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) ) {
+	DIE("Failed loading glob routine");
+    }
+
+    append_elem(OP_GLOB, o,
+		newSVOP(OP_CONST, 0, newSViv(PL_glob_index++), o->op_location));
+    o->op_type = OP_LIST;
+    o->op_ppaddr = PL_ppaddr[OP_LIST];
+    cLISTOPo->op_first->op_type = OP_PUSHMARK;
+    cLISTOPo->op_first->op_ppaddr = PL_ppaddr[OP_PUSHMARK];
+    cLISTOPo->op_first->op_targ = 0;
+    o = newUNOP(OP_ENTERSUB, OPf_STACKED,
+		append_elem(OP_LIST, o,
+			    scalar(newUNOP(OP_RV2CV, 0,
+					   newGVOP(OP_GV, 0, gv, o->op_location),
+					   o->op_location
+				       ))), o->op_location);
+    o = newUNOP(OP_NULL, 0, ck_subr(o), o->op_location);
+    o->op_targ = OP_GLOB;           /* hint at what it used to be */
     return o;
 }
 
@@ -7499,89 +7504,6 @@ Perl_peep(pTHX_ register OP *o)
 		    }
 		}
 	    }
-
-	    /* make @a = sort @a act in-place */
-
-	    oright = cUNOPx(oright)->op_sibling;
-	    if (!oright)
-		break;
-	    if (oright->op_type == OP_NULL) { /* skip sort block/sub */
-		oright = cUNOPx(oright)->op_sibling;
-	    }
-
-	    if (!oright ||
-		(oright->op_type != OP_RV2AV)
-		|| oright->op_next != o
-		|| (oright->op_private & OPpLVAL_INTRO)
-	    )
-		break;
-
-	    /* o2 follows the chain of op_nexts through the LHS of the
-	     * assign (if any) to the aassign op itself */
-	    o2 = o->op_next;
-	    if (!o2 || o2->op_type != OP_NULL)
-		break;
-	    o2 = o2->op_next;
-	    if (!o2 || o2->op_type != OP_PUSHMARK)
-		break;
-	    o2 = o2->op_next;
-	    if (o2 && o2->op_type == OP_GV)
-		o2 = o2->op_next;
-	    if (!o2
-		|| (o2->op_type != OP_RV2AV)
-		|| (o2->op_private & OPpLVAL_INTRO)
-	    )
-		break;
-	    oleft = o2;
-	    o2 = o2->op_next;
-	    if (!o2 || o2->op_type != OP_NULL)
-		break;
-	    o2 = o2->op_next;
-	    if (!o2 || o2->op_type != OP_AASSIGN
-		    || (o2->op_flags & OPf_WANT) != OPf_WANT_VOID)
-		break;
-
-	    /* check that the sort is the first arg on RHS of assign */
-
-	    o2 = cUNOPx(o2)->op_first;
-	    if (!o2 || o2->op_type != OP_NULL)
-		break;
-	    o2 = cUNOPx(o2)->op_first;
-	    if (!o2 || o2->op_type != OP_PUSHMARK)
-		break;
-	    if (o2->op_sibling != o)
-		break;
-
-	    /* check the array is the same on both sides */
-	    if (oleft->op_type == OP_RV2AV) {
-		if (oright->op_type != OP_RV2AV
-		    || !cUNOPx(oright)->op_first
-		    || cUNOPx(oright)->op_first->op_type != OP_GV
-		    ||  cGVOPx_gv(cUNOPx(oleft)->op_first) !=
-		       	cGVOPx_gv(cUNOPx(oright)->op_first)
-		)
-		    break;
-	    }
-	    else 
-		break;
-
-	    /* transfer MODishness etc from LHS arg to RHS arg */
-	    oright->op_flags = oleft->op_flags;
-	    o->op_private |= OPpSORT_INPLACE;
-
-	    /* excise push->gv->rv2av->null->aassign */
-	    o2 = o->op_next->op_next;
-	    op_null(o2); /* PUSHMARK */
-	    o2 = o2->op_next;
-	    if (o2->op_type == OP_GV) {
-		op_null(o2); /* GV */
-		o2 = o2->op_next;
-	    }
-	    op_null(o2); /* RV2AV or PADAV */
-	    o2 = o2->op_next->op_next;
-	    op_null(o2); /* AASSIGN */
-
-	    o->op_next = o2->op_next;
 
 	    break;
 	}

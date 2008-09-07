@@ -57,9 +57,9 @@ if (!exists &Errno::EBADF) {
     #               before pushing its return value
     # to make sure only that these obfuscated sentences will not crash.
 
-    map print(reverse), ('')x68;
+    map print(< reverse @($_)), @(('')x68);
     print "ok 20\n";
 
-    map print(+()), ('')x68;
+    map print(+()), @(('')x68);
     print "ok 21\n";
 }

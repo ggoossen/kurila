@@ -2,13 +2,13 @@ package Test::More;
 
 use strict;
 
-use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
+use vars < qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
 $VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use Test::Builder::Module;
-@ISA    = @( qw(Test::Builder::Module) );
-@EXPORT = @( qw(ok use_ok require_ok
+@ISA    = @( < qw(Test::Builder::Module) );
+@EXPORT = @( < qw(ok use_ok require_ok
              is isnt like unlike is_deeply dies_like
              cmp_ok
              skip todo_skip
@@ -438,7 +438,7 @@ sub can_ok ($@) {
     }
 
     my @nok = @( () );
-    foreach my $method (< @methods) {
+    foreach my $method ( @methods) {
         $tb->_try(sub { $proto->can($method) }) or push @nok, $method;
     }
 
@@ -448,7 +448,7 @@ sub can_ok ($@) {
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
-    $tb->diag(map "    $class->can('$_') failed\n", < @nok);
+    $tb->diag(< map "    $class->can('$_') failed\n", @( < @nok));
 
     return $ok;
 }
@@ -768,7 +768,7 @@ along these lines.
 
 =cut
 
-use vars qw(@Data_Stack %Refs_Seen);
+use vars < qw(@Data_Stack %Refs_Seen);
 my $DNE = bless \@(), 'Does::Not::Exist';
 
 sub _dne {
@@ -813,7 +813,7 @@ sub _format_stack {
 
     my $var = '$FOO';
     my $prev_ref = 0;
-    foreach my $entry (< @Stack) {
+    foreach my $entry ( @Stack) {
         my $type = $entry->{type} || '';
         my $idx  = $entry->{'idx'};
         if( $type eq 'HASH' ) {
@@ -844,13 +844,13 @@ sub _format_stack {
         $prev_ref = 0;
     }
 
-    my @vals = @( @Stack[-1]->{vals}->[[0,1]] );
+    my @vals = @( < @Stack[-1]->{vals}->[[@(0,1)]] );
     my @vars = @( () );
     (@vars[0] = $var) =~ s/\$FOO/     \$got/;
     (@vars[1] = $var) =~ s/\$FOO/\$expected/;
 
     my $out = "Structures begin differing at:\n";
-    foreach my $val (< @vals) {
+    foreach my $val ( @vals) {
         $val = _dne($val)    ? "Does not exist" : dump::view($val);
     }
 
@@ -867,7 +867,7 @@ sub _type {
 
     return '' if !ref $thing;
 
-    for my $type (qw(ARRAY HASH REF SCALAR GLOB CODE Regexp)) {
+    for my $type (@( <qw(ARRAY HASH REF SCALAR GLOB CODE Regexp))) {
         return $type if UNIVERSAL::isa($thing, $type);
     }
 
@@ -1172,7 +1172,7 @@ sub eq_array {
 sub _eq_array  {
     my($a1, $a2) = < @_;
 
-    if( grep !_type($_) eq 'ARRAY', $a1, $a2 ) {
+    if( grep !_type($_) eq 'ARRAY', @( $a1, $a2) ) {
         warn "eq_array passed a non-array ref";
         return 0;
     }
@@ -1291,7 +1291,7 @@ sub eq_hash {
 sub _eq_hash {
     my($a1, $a2) = < @_;
 
-    if( grep !_type($_) eq 'HASH', $a1, $a2 ) {
+    if( grep !_type($_) eq 'HASH', @( $a1, $a2) ) {
         warn "eq_hash passed a non-hash ref";
         return 0;
     }
@@ -1299,8 +1299,8 @@ sub _eq_hash {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $bigger = (nelems @( keys %$a1 )) +> (nelems @( keys %$a2 )) ? $a1 : $a2;
-    foreach my $k (keys %$bigger) {
+    my $bigger = (nelems @( < keys %$a1 )) +> (nelems @( < keys %$a2 )) ? $a1 : $a2;
+    foreach my $k (@( <keys %$bigger)) {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
 
@@ -1359,8 +1359,8 @@ sub eq_set  {
     # I don't know how references would be sorted so we just don't sort
     # them.  This means eq_set doesn't really work with refs.
     return eq_array(
-           \@(grep(ref, < @$a1), sort( grep(!ref, < @$a1) )),
-           \@(grep(ref, < @$a2), sort( grep(!ref, < @$a2) )),
+           \@(< grep(ref, @( < @$a1)), < sort( @( < grep(!ref, @( < @$a1))) )),
+           \@(< grep(ref, @( < @$a2)), < sort( @( < grep(!ref, @( < @$a2))) )),
     );
 }
 

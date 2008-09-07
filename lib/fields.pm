@@ -8,7 +8,7 @@ unless( eval q{require warnings::register; warnings::register->import; 1} ) {
         Carp::carp(< @_);
     }
 }
-use vars qw(%attr $VERSION);
+use vars < qw(%attr $VERSION);
 
 $VERSION = '2.13';
 
@@ -47,7 +47,7 @@ sub import {
         # Looks like a possible module reload...
         $next = $fattr->[0];
     }
-    foreach my $f (< @_) {
+    foreach my $f ( @_) {
         my $fno = $fields->{$f};
 
         # Allow the module to be reloaded so long as field positions
@@ -81,14 +81,14 @@ sub inherit {
 
 sub _dump  # sometimes useful for debugging
 {
-    for my $pkg (sort keys %attr) {
+    for my $pkg (@( <sort @( < keys %attr))) {
         print "\n$pkg";
         if ((nelems @{*{Symbol::fetch_glob("$pkg\::ISA")}})) {
-            print " (", join(", ", < @{*{Symbol::fetch_glob("$pkg\::ISA")}}), ")";
+            print " (", join(", ", @( < @{*{Symbol::fetch_glob("$pkg\::ISA")}})), ")";
         }
         print "\n";
         my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
-        for my $f (sort {$fields->{$a} <+> $fields->{$b}} keys %$fields) {
+        for my $f (@( <sort {$fields->{$a} <+> $fields->{$b}} @( < keys %$fields))) {
             my $no = $fields->{$f};
             print "   $no: $f";
             my $fattr = %attr{$pkg}->[$no];
@@ -97,7 +97,7 @@ sub _dump  # sometimes useful for debugging
                 push(@a, "public")    if $fattr ^&^ PUBLIC;
                 push(@a, "private")   if $fattr ^&^ PRIVATE;
                 push(@a, "inherited") if $fattr ^&^ INHERITED;
-                print "\t(", join(", ", < @a), ")";
+                print "\t(", join(", ", @( < @a)), ")";
             }
             print "\n";
         }
@@ -117,9 +117,9 @@ sub new {
 
 sub _accessible_keys {
     my ($class) = < @_;
-    return  @(
+    return  @( <
         keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
-        map( <_accessible_keys($_), < @{*{Symbol::fetch_glob($class.'::ISA')}}),
+        < map( <_accessible_keys($_), @( < @{*{Symbol::fetch_glob($class.'::ISA')}})),
     );
 }
 

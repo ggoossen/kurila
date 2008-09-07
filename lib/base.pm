@@ -1,9 +1,9 @@
 package base;
 
 use strict;
-no strict qw(refs subs);
+no strict < qw(refs subs);
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = '2.13';
 
 # constant.pm is slow
@@ -57,12 +57,12 @@ sub import {
     my $inheritor = caller(0);
 
     my @bases;
-    foreach my $base (< @_) {
+    foreach my $base ( @_) {
         if ( $inheritor eq $base ) {
             warn "Class '$inheritor' tried to inherit from itself\n";
         }
 
-        next if grep $_->isa($base), ($inheritor, < @bases);
+        next if grep $_->isa($base), @( ($inheritor, < @bases));
 
         {
             eval "require $base";
@@ -73,7 +73,7 @@ sub import {
                 die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
-    or make that module available in \@INC (\@INC contains: {join ' ', <@INC}).
+    or make that module available in \@INC (\@INC contains: {join ' ', @( <@INC)}).
 ERROR
             }
         }

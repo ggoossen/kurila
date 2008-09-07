@@ -9,7 +9,7 @@ BEGIN {
 
 use Locale::Maketext::Simple;
 ok(Locale::Maketext::Simple->VERSION);
-ok(loc("Just [_1] Perl [_2]", qw(another hacker)), "Just another Perl hacker");
+ok(loc("Just [_1] Perl [_2]", < qw(another hacker)), "Just another Perl hacker");
 
 {
     local $^W; # shuts up 'redefined' warnings
@@ -17,7 +17,7 @@ ok(loc("Just [_1] Perl [_2]", qw(another hacker)), "Just another Perl hacker");
     Locale::Maketext::Simple->import(Style => 'gettext');
 }
 
-ok(loc("Just \%1 Perl \%2", qw(another hacker)), "Just another Perl hacker");
+ok(loc("Just \%1 Perl \%2", < qw(another hacker)), "Just another Perl hacker");
 ok(loc_lang('fr'));
 ok(loc("Just \%quant(\%1,Perl hacker)", 1), "Just 1 Perl hacker");
 ok(loc("Just \%quant(\%1,Perl hacker)", 2), "Just 2 Perl hackers");

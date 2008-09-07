@@ -26,7 +26,7 @@ use strict;
 
 use utf8;
 
-use Storable qw(thaw freeze);
+use Storable < qw(thaw freeze);
 
 print "1..5\n";
 
@@ -34,7 +34,7 @@ my $x = chr(1234);
 ok 1, $x eq ${thaw freeze \$x};
 
 # Long scalar
-$x = join '', map {chr $_} (0..1023);
+$x = join '', @( < map {chr $_} @( ( <0..1023)));
 ok 2, $x eq ${thaw freeze \$x};
 
 # Char in the range 127-255 (probably) in utf8

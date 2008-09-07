@@ -19,7 +19,7 @@ die "Couldn't make an object!?" unless ok defined $x;
 $x->inc(0);
 
 $x->callback(sub {
-  print "#  ", join("  ", map "\{$_\}", < @_), "\n";
+  print "#  ", join("  ", @( < map "\{$_\}", @( < @_))), "\n";
   return;
 });
 
@@ -68,14 +68,14 @@ $p =~ s/^/#  /mg;
 print $p;
 
 {
-my $names = join "|", sort values %$where2name;
+my $names = join "|", @( < sort @( < values %$where2name));
 skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0, 
      $names, 
      "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
 }
 
 {
-my $names = join "|", sort keys %$name2where;
+my $names = join "|", @( < sort @( < keys %$name2where));
 skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0, 
      $names, 
      "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
@@ -83,7 +83,7 @@ skip $^O eq 'VMS' ? '-- case may or may not be preserved' : 0,
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok grep( m/squaa\.pm/, keys %$where2name ), 1;
+ok nelems(grep( m/squaa\.pm/, keys %$where2name) ), 1;
 
 ok 1;
 

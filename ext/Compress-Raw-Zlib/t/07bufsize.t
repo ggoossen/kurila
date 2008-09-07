@@ -4,7 +4,7 @@ BEGIN {
     }
 }
 
-use lib qw(t t/compress);
+use lib < qw(t t/compress);
 use strict;
 use warnings;
 use bytes;
@@ -60,7 +60,7 @@ for my $i (1 .. 13)
     is $x->total_out(), 0, "  total_out == 0" ;
 
     my $out ;
-    foreach (<@hello)
+    foreach (@hello)
     {
         $status = $x->deflate($_, $out) ;
         last unless $status == Z_OK ;
@@ -90,7 +90,7 @@ for my $i (1 .. 13)
     my $GOT = '';
     my $Z;
     $Z = 1 ;#x 2000 ;
-    foreach (<@Answer)
+    foreach (@Answer)
     {
         $status = $k->inflate($_, $GOT) ;
         last if $status == Z_STREAM_END or $status != Z_OK ;

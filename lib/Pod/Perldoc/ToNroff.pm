@@ -5,7 +5,7 @@ use warnings;
 
 # This is unlike ToMan.pm in that it emits the raw nroff source!
 
-use base qw(Pod::Perldoc::BaseTo);
+use base < qw(Pod::Perldoc::BaseTo);
 
 sub is_pageable        { 1 }  # well, if you ask for it...
 sub write_with_binmode { 0 }
@@ -30,9 +30,9 @@ sub parse_from_file {
   my $file = @_[0];
   
   my @options = @(
-    map {; $_, $self->{$_} }
-      grep !m/^_/s,
-        keys %$self )
+    < map {; $_, $self->{$_} }
+ @(      < grep !m/^_/s, @( <
+        keys %$self)) )
   ;
   
   defined(&Pod::Perldoc::DEBUG)
@@ -40,7 +40,7 @@ sub parse_from_file {
    and print "About to call new Pod::Man ",
     $Pod::Man::VERSION ? "(v$Pod::Man::VERSION) " : '',
     "with options: ",
-    (nelems @options) ? "[{join ' ', <@options}]" : "(nil)", "\n";
+    (nelems @options) ? "[{join ' ', @( <@options)}]" : "(nil)", "\n";
   ;
 
   Pod::Man->new(< @options)->parse_from_file(< @_);

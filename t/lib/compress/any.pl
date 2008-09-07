@@ -30,9 +30,9 @@ sub run
     no strict 'refs';
     my $AnyError = \${Symbol::fetch_glob( "IO::Uncompress::{$AnyClass}::{$AnyClass}Error") };
 
-    for my $trans ( 0, 1 )
+    for my $trans (@( 0, 1) )
     {
-        for my $file ( 0, 1 )
+        for my $file (@( 0, 1) )
         {
             title "$AnyClass(Transparent => $trans, File=>$file) with $CompressClass" ;
             my $string = "some text" x 100 ;

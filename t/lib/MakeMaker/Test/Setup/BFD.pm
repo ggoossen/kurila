@@ -1,8 +1,8 @@
 package MakeMaker::Test::Setup::BFD;
 
-our @ISA = @( qw(Exporter) );
+our @ISA = @( < qw(Exporter) );
 require Exporter;
-our @EXPORT = @( qw(setup_recurs teardown_recurs) );
+our @EXPORT = @( < qw(setup_recurs teardown_recurs) );
 
 use strict;
 use File::Path;
@@ -30,12 +30,12 @@ END
 use ExtUtils::MakeMaker;
 
 # This will interfere with the PREREQ_PRINT tests.
-printf "Current package is: \%s\n", __PACKAGE__ unless (join " ", <@ARGV) =~ m/PREREQ/;
+printf "Current package is: \%s\n", __PACKAGE__ unless (join " ", @ARGV) =~ m/PREREQ/;
 
 WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    EXE_FILES     => \@(qw(bin/program)),
+    EXE_FILES     => \qw(bin/program),
     PREREQ_PM     => \%( strict => 0 ),
     ABSTRACT_FROM => 'lib/Big/Dummy.pm',
     AUTHOR        => 'Michael G Schwern <schwern@pobox.com>',
@@ -101,7 +101,7 @@ sub setup_recurs {
 
     while(my($file, $text) = each %Files) {
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, split m{\/}, $file);
+        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file);
 
         my $dir = dirname($file);
         mkpath $dir;
@@ -114,7 +114,7 @@ sub setup_recurs {
 }
 
 sub teardown_recurs { 
-    foreach my $file (keys %Files) {
+    foreach my $file (@( <keys %Files)) {
         my $dir = dirname($file);
         if( -e $dir ) {
             rmtree($dir) || return;

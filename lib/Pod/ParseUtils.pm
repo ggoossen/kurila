@@ -9,7 +9,7 @@
 
 package Pod::ParseUtils;
 
-use vars qw($VERSION);
+use vars < qw($VERSION);
 $VERSION = 1.35;   ## Current version of this package
 
 =head1 NAME
@@ -674,7 +674,7 @@ not found.
 
 sub find_page {
     my ($self,$page) = < @_;
-    foreach(< @$self) {
+    foreach( @$self) {
         if($_->page() eq $page) {
             return $_;
         }
@@ -796,7 +796,7 @@ sub find_node {
     my @search;
     push(@search, < @{$self->{-nodes}}) if($self->{-nodes});
     push(@search, < @{$self->{-idx}}) if($self->{-idx});
-    foreach(< @search) {
+    foreach( @search) {
         if($_->[0] eq $node) {
             return $_->[1]; # id
         }

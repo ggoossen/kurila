@@ -1,12 +1,12 @@
 package File::Spec::VMS;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';
 
-@ISA = @(qw(File::Spec::Unix));
+@ISA = qw(File::Spec::Unix);
 
 use File::Basename;
 use VMS::Filespec;
@@ -90,7 +90,7 @@ cases (e.g. elements other than the first being absolute filespecs).
 sub catdir {
     my $self = shift;
     my $dir = pop;
-    my @dirs = @( grep {defined() && length()} < @_ );
+    my @dirs = @( < grep {defined() && length()} @_ );
 
     my $rslt;
     if (@dirs) {
@@ -124,7 +124,7 @@ VMS-syntax file specification.
 sub catfile {
     my $self = shift;
     my $file = $self->canonpath(pop());
-    my @files = @(grep {defined() && length()} < @_);
+    my @files = @(< grep {defined() && length()} @_);
 
     my $rslt;
     if (@files) {
@@ -319,12 +319,12 @@ Use VMS syntax when converting filespecs.
 sub abs2rel {
     my $self = shift;
     return vmspath(File::Spec::Unix::abs2rel( $self, < @_ ))
-        if grep m{/}, < @_;
+        if grep m{/}, @_;
 
     my($path,$base) = < @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
-    for ($path, $base) { $_ = $self->canonpath($_) }
+    for (@(\$path, \$base)) { $$_ = $self->canonpath($$_) }
 
     # Are we even starting $path on the same (node::)device as $base?  Note that
     # logical paths or nodename differences may be on the "same device" 
@@ -402,7 +402,7 @@ sub rel2abs {
 
         # Split up paths
         my ( $path_directories, $path_file ) =
-            ($self->splitpath( $path ))[[1,2]] ;
+            < ($self->splitpath( $path ))[[1..2]] ;
 
         my ( $base_volume, $base_directories ) =
             $self->splitpath( $base ) ;

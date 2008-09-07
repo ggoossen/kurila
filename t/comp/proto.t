@@ -11,7 +11,7 @@
 
 use strict;
 
-print "1..117\n";
+print "1..116\n";
 
 my $i = 1;
 
@@ -28,7 +28,7 @@ sub testing (&$) {
     printf "ok \%d\n",$i++;
 }
 
-@_ = @( qw(a b c d) );
+@_ = @( < qw(a b c d) );
 my @array;
 my %hash;
 
@@ -39,7 +39,7 @@ my %hash;
 testing \&no_proto, undef;
 
 sub no_proto {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     scalar(nelems @_)
 }
 
@@ -66,7 +66,7 @@ printf "ok \%d\n",$i++;
 testing \&no_args, '';
 
 sub no_args () {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     scalar(nelems @_)
 }
 
@@ -96,7 +96,7 @@ printf "ok \%d\n",$i++;
 testing \&one_args, '$';
 
 sub one_args ($) {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     scalar(nelems @_)
 }
 
@@ -121,7 +121,7 @@ print "not " unless $@;
 printf "ok \%d\n",$i++;
 
 sub one_a_args ($) {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     print "not " unless (nelems @_) == 1 && @_[0] == 4;
     printf "ok \%d\n",$i++;
 }
@@ -135,7 +135,7 @@ one_a_args((nelems @_));
 testing \&over_one_args, '$@';
 
 sub over_one_args ($@) {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     scalar(nelems @_)
 }
 
@@ -162,7 +162,7 @@ print "not " unless $@;
 printf "ok \%d\n",$i++;
 
 sub over_one_a_args ($@) {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     print "not " unless (nelems @_) +>= 1 && @_[0] == 4;
     printf "ok \%d\n",$i++;
 }
@@ -179,7 +179,7 @@ over_one_a_args((nelems @_),< @_);
 testing \&one_or_two, '$;$';
 
 sub one_or_two ($;$) {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     scalar(nelems @_)
 }
 
@@ -210,7 +210,7 @@ print "not " unless $@;
 printf "ok \%d\n",$i++;
 
 sub one_or_two_a ($;$) {
-    print "# \@_ = (",join(",",< @_),")\n";
+    print "# \@_ = (",join(",", @(< @_)),")\n";
     print "not " unless (nelems @_) +>= 1 && @_[0] == 4;
     printf "ok \%d\n",$i++;
 }
@@ -226,7 +226,7 @@ one_or_two_a((nelems @_),nelems @_);
 testing \&a_sub, '&';
 
 sub a_sub (&) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",", @(< map {dump::view($_)} @( < @_))),")\n";
     &{@_[0]};
 }
 
@@ -247,13 +247,13 @@ printf "ok \%d\n",$i++;
 testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",", @(< map {dump::view($_)} @( < @_))),")\n";
     my($sub,$array) = < @_;
     print "not " unless (nelems @_) == 2 && (nelems @{$array}) == 4;
-    print map { &{$sub}($_) } < @{$array}
-}
+    print < map { &{$sub}($_) } @( < @{$array}
+)}
 
-@array = @(qw(O K)," ", $i++);
+@array = @( <qw(O K)," ", $i++);
 sub_aref { lc shift } @array;
 print "\n";
 
@@ -264,13 +264,13 @@ print "\n";
 testing \&sub_array, '&@';
 
 sub sub_array (&@) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",", @(< map {dump::view($_)} @( < @_))),")\n";
     print "not " unless (nelems @_) == 5;
     my $sub = shift;
-    print map { &{$sub}($_) } < @_
+    print < map { &{$sub}($_) } @( < @_)
 }
 
-@array = @(qw(O K)," ", $i++);
+@array = @( <qw(O K)," ", $i++);
 sub_array { lc shift } < @array;
 sub_array { lc shift } ('O', 'K', ' ', $i++);
 print "\n";
@@ -281,7 +281,7 @@ print "\n";
 testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",", @(< map {dump::view($_)} @( < @_))),")\n";
     print "not " unless ref(@_[0]) && @_[0]->{'a'};
     printf "ok \%d\n",$i++;
     @_[0]->{'b'} = 2;
@@ -299,10 +299,10 @@ printf "ok \%d\n",$i++;
 testing \&array_ref_plus, '\@@';
 
 sub array_ref_plus (\@@) {
-    print "# \@_ = (",join(",",map {dump::view($_)} < @_),")\n";
+    print "# \@_ = (",join(",", @(< map {dump::view($_)} @( < @_))),")\n";
     print "not " unless (nelems @_) == 2 && ref(@_[0]) && 1 == nelems @{@_[0]} && @_[1] eq 'x';
     printf "ok \%d\n",$i++;
-    @{@_[0]} = @(qw(ok)," ",$i++,"\n");
+    @{@_[0]} = @( <qw(ok)," ",$i++,"\n");
 }
 
 @array = @('a');
@@ -448,7 +448,7 @@ sub sreftest (\$$) {
 # Byacc generates the string "syntax error".  Bison gives the
 # string "parse error".
 #
-for my $p ( "", qw{ () ($) ($@) ($%) ($;$) (&) (&\@) (&@) (%) (\%) (\@) } ) {
+for my $p (@( "", < qw{ () ($) ($@) ($%) ($;$) (&) (&\@) (&@) (%) (\%) (\@) }) ) {
   no warnings 'prototype';
   my $eval = "sub evaled_subroutine $p \{ &void *; \}";
   eval $eval;
@@ -522,9 +522,4 @@ print "ok ", $i++, "\n";
 # make sure whitespace in prototypes works
 eval "sub good (\$\t\$\n\$) \{ 1; \}";
 print "not " if $@;
-print "ok ", $i++, "\n";
-
-# Ought to fail, doesn't in 5.8.1.
-eval 'sub bug (\[%@]) {  } my $array = \@(0 .. 1); bug %$array;';
-print "not " unless $@->message =~ m/Not a HASH reference/;
 print "ok ", $i++, "\n";

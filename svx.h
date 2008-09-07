@@ -96,9 +96,24 @@ static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
     return (AV*)sv_2mortal((SV*)av);
 }
 
+#define av_mortalcopy(av) inline_av_mortalcopy(aTHX_ av)
+static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
+    return (AV*)sv_mortalcopy((SV*)av);
+}
+
 #define SVav(av) inline_SVav(aTHX_ av)
 static __inline__ SV* inline_SVav(pTHX_ AV *av) {
     return (SV*)av;
+}
+
+#define SvAV(sv) inline_SvAV(aTHX_ sv)
+static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {
+    return (AV*)sv;
+}
+
+#define SvHV(sv) inline_SvHV(aTHX_ sv)
+static __inline__ HV* inline_SvHV(pTHX_ SV *sv) {
+    return (HV*)sv;
 }
 
 #define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
@@ -139,4 +154,18 @@ static __inline__ SV* inline_loc_filename(pTHX_ SV *sv) {
     if ( ! fn )
         return NULL;
     return *fn;
+}
+
+/* Location retrieval */
+#define loc_desc(loc) inline_loc_desc(aTHX_ loc)
+static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
+    SV * str = sv_2mortal(newSVpv("", 0));
+    if (loc && SvAVOK(loc)) {
+        Perl_sv_catpvf(aTHX_ str, "%s line %"IVdf" character %"IVdf".",
+                       SvPVX_const(*av_fetch((AV*)loc, 0, FALSE)),
+                       SvIV(*av_fetch((AV*)loc, 1, FALSE)),
+                       SvIV(*av_fetch((AV*)loc, 2, FALSE))
+            );
+    }
+    return str;
 }

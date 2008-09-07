@@ -9,7 +9,7 @@ BEGIN { plan tests => 9 }
 
 use File::Spec;
 use File::Path;
-use File::Temp qw/ :mktemp unlink0 /;
+use File::Temp < qw/ :mktemp unlink0 /;
 use FileHandle;
 
 ok(1);

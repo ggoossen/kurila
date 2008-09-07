@@ -22,7 +22,7 @@ sub handle_file {
     my $file    = shift or die "Need file\n". usage();
     my $outfile = shift || '';
     $file = vms_check_name($file) if $^O eq 'VMS';
-    my $mode    = (stat($file))[[2]] ^&^ 07777;
+    my $mode    = @(stat($file))[2] ^&^ 07777;
 
     open my $fh, "<", $file
         or do { warn "Could not open input file $file: $!"; exit 0 };
@@ -35,7 +35,7 @@ sub handle_file {
             $outfile = $file;
             $outfile =~ s/\.packed\z//;
         }
-        my ($head, $body) = split m/__UU__\n/, $str;
+        my ($head, $body) = < split m/__UU__\n/, $str;
         die "Can't unpack malformed data in '$file'\n"
             if !$head;
         $outstr = unpack 'u', $body;
@@ -58,8 +58,8 @@ To recreate it use the following command:
 
      $me -p $file $outfile
 
-Created at {join ' ', <@{\@(scalar localtime)}
-}#########################################################################
+Created at {join ' ', @( <@{\@(scalar localtime)}
+)}#########################################################################
 __UU__
 EOFBLURB
     }
@@ -99,7 +99,7 @@ sub bulk_process {
     my $lines = 0;
     while( my $line = ~< $fh ) {
         chomp $line;
-        my ($file) = split m/\s+/, $line;
+        my ($file) = < split m/\s+/, $line;
 
         $lines++;
 

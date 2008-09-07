@@ -304,8 +304,8 @@ PP(pp_eq)
 PP(pp_preinc)
 {
     dVAR; dSP;
-    if (SvTYPE(TOPs) >= SVt_PVGV && SvTYPE(TOPs) != SVt_PVLV)
-	DIE(aTHX_ PL_no_modify);
+    if ( SvOK(TOPs) && ! SvPVOK(TOPs) )
+	Perl_croak(aTHX_ "increment (++) does not work on a %s", Ddesc(TOPs));
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
         && SvIVX(TOPs) != IV_MAX)
     {
@@ -568,7 +568,7 @@ PP(pp_join)
 {
     dVAR; dSP; dMARK; dTARGET;
     MARK++;
-    do_join(TARG, *MARK, MARK, SP);
+    do_join(TARG, *MARK, MARK[1]);
     SP = MARK;
     SETs(TARG);
     RETURN;
@@ -759,20 +759,16 @@ PP(pp_aassign)
 	    case SVt_PVAV:
 		ary = (AV*)sv;
 		magic = SvMAGICAL(ary) != 0;
-		av_clear(ary);
-		av_extend(ary, lastrelem - relem);
+		av_fill(ary, lastrelem - relem);
 		i = 0;
 		while (relem <= lastrelem) {	/* gobble up all the rest */
-		    SV **didstore;
 		    assert(*relem);
-		    sv = newSVsv(*relem);
+		    sv = *av_fetch(ary,i++,1);
+		    sv_setsv(sv, *relem);
 		    *(relem++) = sv;
-		    didstore = av_store(ary,i++,sv);
 		    if (magic) {
 			if (SvSMAGICAL(sv))
 			    mg_set(sv);
-			if (!didstore)
-			    sv_2mortal(sv);
 		    }
 		    TAINT_NOT;
 		}
@@ -1254,11 +1250,7 @@ Perl_do_readline(pTHX_ GV* gv)
 		    (void)do_close(gv, FALSE); /* now it does*/
 		}
 	    }
-	    else if (type == OP_GLOB)
-		fp = Perl_start_glob(aTHX_ POPs, gv);
 	}
-	else if (type == OP_GLOB)
-	    SP--;
 	else if (ckWARN(WARN_IO) && IoTYPE(io) == IoTYPE_WRONLY) {
 	    report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
 	}
@@ -1660,9 +1652,8 @@ PP(pp_iter)
     /* iterate array */
     assert(CxTYPE(cx) == CXt_LOOP_FOR);
     av = cx->blk_loop.state_u.ary.ary;
-    if (!av) {
-	av_is_stack = TRUE;
-	av = PL_curstack;
+    if (! SvAVOK(av)) {
+	RETPUSHNO;
     }
     if (PL_op->op_private & OPpITER_REVERSED) {
 	if (cx->blk_loop.state_u.ary.ix <= (av_is_stack
@@ -2029,49 +2020,49 @@ ret_no:
 PP(pp_grepwhile)
 {
     dVAR; dSP;
+    SV** src;
 
-    if (SvTRUE(POPs))
-	PL_stack_base[PL_markstack_ptr[-1]++] = PL_stack_base[*PL_markstack_ptr];
-    ++*PL_markstack_ptr;
+    /* first, move source pointer to the next item in the source list */
+    SV** dst = PL_stack_base + (PL_markstack_ptr[0]) + 0;
+    src = PL_stack_base + PL_markstack_ptr[0] + 1;
+
+    /* if there are new items, push them into the destination list */
+    if (SvTRUE(POPs)) {
+	/* copy the new items down to the destination list */
+	av_push((AV*)*dst, newSVsv(POPs));
+    }
+    else {
+	POPs;
+    }
+
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if (PL_stack_base + *PL_markstack_ptr > SP) {
-	I32 items;
+    if ( av_len(*src) == -1 ) {
 	const I32 gimme = GIMME_V;
 
 	LEAVE;					/* exit outer scope */
-	(void)POPMARK;				/* pop src */
-	items = --*PL_markstack_ptr - PL_markstack_ptr[-1];
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
-	if (gimme == G_SCALAR) {
-	    if (PL_op->op_private & OPpGREP_LEX) {
-		SV* const sv = sv_newmortal();
-		sv_setiv(sv, items);
-		PUSHs(sv);
-	    }
-	    else {
-		dTARGET;
-		XPUSHi(items);
-	    }
+	if (gimme != G_VOID) {
+	    PUSHs(*dst);
 	}
-	else if (gimme == G_ARRAY)
-	    SP += items;
 	RETURN;
     }
     else {
-	SV *src;
+	SV *srcitem;
 
 	ENTER;					/* enter inner scope */
 	SAVEVPTR(PL_curpm);
 
-	src = PL_stack_base[*PL_markstack_ptr];
-	SvTEMP_off(src);
+	/* set $_ to the new source item */
+	srcitem = av_shift(*src);
+	mXPUSHs(srcitem);
+	SvTEMP_off(srcitem);
 	if (PL_op->op_private & OPpGREP_LEX)
-	    PAD_SVl(PL_op->op_targ) = src;
+	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), srcitem);
 	else
-	    SVcpREPLACE(DEFSV, src);
+	    SVcpREPLACE(DEFSV, srcitem);
 
 	RETURNOP(cLOGOP->op_other);
     }

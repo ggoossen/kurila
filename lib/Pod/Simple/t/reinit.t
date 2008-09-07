@@ -1,7 +1,7 @@
 
 use strict;
-use Test;
-BEGIN { plan tests => 5 };
+use Test::More;
+plan tests => 5;
 
 sub source_path {
     my $file = shift;
@@ -20,12 +20,12 @@ $Pod::Simple::Text::FREAKYMODE = 1;
 
 my $parser  = Pod::Simple::Text->new();
  
-foreach my $file (
+foreach my $file (@(
   "junk1.pod",
   "junk2.pod",
   "perlcyg.pod",
   "perlfaq.pod",
-  "perlvar.pod",
+  "perlvar.pod",)
 ) {
 
   unless(-e source_path($file)) {
@@ -35,35 +35,34 @@ foreach my $file (
   }
 
     my $precooked = source_path($file);
-    my $outstring;
-    my $compstring;
+    my $strings = @(undef, undef);
     $precooked =~ s<\.pod><o.txt>s;
     $parser->reinit;
-    $parser->output_string(\$outstring);
+    $parser->output_string(\$strings[0]);
     $parser->parse_file( source_path($file));
 
     open(IN, "<", $precooked) or die "Can't read-open $precooked: $!";
     {
       local $/;
-      $compstring = ~< *IN;
+      $strings[1] = ~< *IN;
     }
     close(IN);
 
-    for ($outstring,$compstring) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
+    for ($strings) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 
-    if($outstring eq $compstring) {
+    if($strings[0] eq $strings[1]) {
       ok 1;
       next;
     } elsif( do{
-      for ($outstring, $compstring) { s/[ ]//g; };
-      $outstring eq $compstring;
+      for ($strings) { s/[ ]//g; };
+      $strings[0] eq $strings[1];
     }){
       print "# Differ only in whitespace.\n";
       ok 1;
       next;
     } else {
     
-      my $x = $outstring ^^^ $compstring;
+      my $x = $strings[0] ^^^ $strings[1];
       $x =~ m/^(\x00*)/s or die;
       my $at = length($1);
       print "# Difference at byte $at...\n";
@@ -71,13 +70,13 @@ foreach my $file (
         $at -= 5;
       }
       {
-        print "# ", substr($outstring,$at,20), "\n";
-        print "# ", substr($compstring,$at,20), "\n";
+        print "# ", substr($strings[0],$at,20), "\n";
+        print "# ", substr($strings[1],$at,20), "\n";
         print "#      ^...";
       }
     
       ok 0;
-      printf "# Unequal lengths \%s and \%s\n", length($outstring), length($compstring);
+      printf "# Unequal lengths \%s and \%s\n", length($strings[0]), length($strings[1]);
       next;
     }
   }

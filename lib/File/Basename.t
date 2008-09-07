@@ -5,7 +5,7 @@ use Test::More tests => 64;
 BEGIN { use_ok 'File::Basename' }
 
 # import correctly?
-can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
+can_ok( __PACKAGE__, < qw( basename fileparse dirname fileparse_set_fstype ) );
 
 ### Testing Unix
 {
@@ -155,7 +155,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
 
     # How to identify taint when you see it
     sub any_tainted (@) {
-        return ! try { eval("#" . substr(join("", @_), 0, 0)); 1 };
+        return ! try { eval("#" . substr(join("", @( @_)), 0, 0)); 1 };
     }
 
     sub tainted ($) {
@@ -163,7 +163,7 @@ can_ok( __PACKAGE__, qw( basename fileparse dirname fileparse_set_fstype ) );
     }
 
     sub all_tainted (@) {
-        for (@_) { return 0 unless tainted $_ }
+        for (@(@_)) { return 0 unless tainted $_ }
         1;
     }
 

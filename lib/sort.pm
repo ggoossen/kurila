@@ -65,7 +65,7 @@ sub current {
 	push @sort, 'stable'    if %^H{sort} ^&^ $sort::stable_bit;
     }
     push @sort, 'mergesort' unless (nelems @sort);
-    join(' ', < @sort);
+    join(' ', @( < @sort));
 }
 
 1;

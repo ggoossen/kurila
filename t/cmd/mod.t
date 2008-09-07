@@ -17,21 +17,21 @@ our ($x, @x, @y);
 
 $x = 0;
 do {@x[$x] = $x;} while ($x++) +< 10;
-if (join(' ',< @x) eq '0 1 2 3 4 5 6 7 8 9 10') {
+if (join(' ', @(< @x)) eq '0 1 2 3 4 5 6 7 8 9 10') {
 	print "ok 5\n";
 } else {
-	print "not ok 5 {join ' ', <@x}\n";
+	print "not ok 5 {join ' ', @( <@x)}\n";
 }
 
 $x = 15;
 $x = 10 while $x +< 10;
 if ($x == 15) {print "ok 6\n";} else {print "not ok 6\n";}
 
-@y[$_] = $_ * 2 foreach < @x;
-if (join(' ',< @y) eq '0 2 4 6 8 10 12 14 16 18 20') {
+@y[$_] = $_ * 2 foreach  @x;
+if (join(' ', @(< @y)) eq '0 2 4 6 8 10 12 14 16 18 20') {
 	print "ok 7\n";
 } else {
-	print "not ok 7 {join ' ', <@y}\n";
+	print "not ok 7 {join ' ', @( <@y)}\n";
 }
 
 open(foo, "<",'./TEST') || open(foo, "<",'TEST') || open(foo, "<",'t/TEST');
@@ -53,5 +53,5 @@ print "ok 12\n" unless $x +> 0;
 print "not ok 12\n" if $x +> 0;
 
 # This used to cause a segfault
-$x = "".("".do{"foo" for (1)});
+$x = "".("".do{"foo" for @( (1))});
 print "ok 13\n";

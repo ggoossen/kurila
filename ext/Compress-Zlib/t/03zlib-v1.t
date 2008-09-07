@@ -4,7 +4,7 @@ BEGIN {
     }
 }
 
-use lib qw(t t/compress);
+use lib < qw(t t/compress);
 use strict;
 use warnings;
 use bytes;
@@ -28,7 +28,7 @@ BEGIN
     use_ok('Compress::Zlib', 2) ;
     use_ok('IO::Compress::Gzip::Constants') ;
 
-    use_ok('IO::Compress::Gzip', qw($GzipError)) ;
+    use_ok('IO::Compress::Gzip', < qw($GzipError)) ;
 }
 
 
@@ -60,7 +60,7 @@ ok $@->{description} =~ m#not a scalar reference#
 
 try { uncompress(\@(1)); };
 ok $@->{description} =~ m#not a scalar reference#
-    or print "# $@\n" ;;
+    or print "# $@\n" ;
 
 $hello = "hello mum" ;
 my $keep_hello = $hello ;
@@ -556,7 +556,7 @@ EOM
     $Answer .= $X ;
      
      
-    @Answer = @( split('', $Answer) );
+    @Answer = split('', $Answer);
     # Undocumented corner -- extra byte needed to get inflate to return 
     # Z_STREAM_END when done.  
     push @Answer, " " ; 
@@ -565,7 +565,7 @@ EOM
     ok $k ;
      
     $GOT = '';
-    foreach ( < @Answer)
+    foreach ( @Answer)
     {
         ($Z, $status) = < $k->inflate($_) ;
         $GOT .= $Z ;

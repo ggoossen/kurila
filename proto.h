@@ -654,13 +654,12 @@ PERL_CALLCONV I32	Perl_do_shmio(pTHX_ I32 optype, SV** mark, SV** sp)
 	assert(mark); assert(sp)
 
 #endif
-PERL_CALLCONV void	Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
+PERL_CALLCONV void	Perl_do_join(pTHX_ SV *sv, SV *delim, SV *av)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3)
-			__attribute__nonnull__(pTHX_4);
+			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DO_JOIN	\
-	assert(sv); assert(delim); assert(mark); assert(sp)
+	assert(sv); assert(delim); assert(av)
 
 PERL_CALLCONV OP*	Perl_do_kv(pTHX);
 PERL_CALLCONV void	Perl_bad_arg(pTHX_ I32 n, const char* t, const char* name, SV *arg)
@@ -2274,12 +2273,6 @@ PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_reset(pTHX);
 PERL_CALLCONV void	Perl_pad_swipe(pTHX_ PADOFFSET po, bool refadjust);
 PERL_CALLCONV void	Perl_peep(pTHX_ OP* o);
-PERL_CALLCONV PerlIO*	Perl_start_glob(pTHX_ SV *tmpglob, GV *gv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_START_GLOB	\
-	assert(tmpglob); assert(gv)
-
 #if defined(USE_REENTRANT_API)
 PERL_CALLCONV void	Perl_reentrant_size(pTHX);
 PERL_CALLCONV void	Perl_reentrant_init(pTHX);

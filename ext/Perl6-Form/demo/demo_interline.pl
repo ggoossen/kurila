@@ -9,7 +9,7 @@ my @data = @(
 print form
 	'      Rank Name         Serial Number',
 	'{]]]]]]]]} {[[[[[[[[[}     {IIIII}', <
-	drill @data, \@(), \@(qw{rank name num});
+	drill @data, \@(), \@( <qw{rank name num});
 
 print "\n\n";
 
@@ -17,6 +17,6 @@ print form
 	'      Rank Name         Serial Number',
 	\%(under=>"="),
 	'{]]]]]]]]} {[[[[[[[[[}     {IIIII}', <
-	drill @data, \@(), \@(qw{rank name num});
+	drill @data, \@(), \@( <qw{rank name num});
 
 print "\n\n";

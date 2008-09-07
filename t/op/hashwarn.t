@@ -6,7 +6,7 @@ plan( tests => 8 );
 use strict;
 use warnings;
 
-use vars qw{ @warnings };
+use vars < qw{ @warnings };
 
 BEGIN {
     $^WARN_HOOK = sub { push @warnings, @_[0]->message };
@@ -20,7 +20,7 @@ my $fail_not_hr   = 'Not a HASH reference at ';
 
 {
     @warnings = @( () );
-    my (<%hash) = 1..3;
+    my (<%hash) = < 1..3;
     cmp_ok(scalar(nelems @warnings),'==',1,'odd count');
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'odd msg');
 
@@ -30,15 +30,15 @@ my $fail_not_hr   = 'Not a HASH reference at ';
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg');
 
     @warnings = @( () );
-    dies_like( sub { %hash = %( \%( 1..3 ) ); }, qr/reference as string/ );
+    dies_like( sub { %hash = %( \%( < 1..3 ) ); }, qr/reference as string/ );
 
     @warnings = @( () );
-    dies_like( sub { %hash = %( \@( 1..3 ) ); }, qr/reference as string/ );
+    dies_like( sub { %hash = %( \@( < 1..3 ) ); }, qr/reference as string/ );
 
     @warnings = @( () );
     dies_like( sub { %hash = %( sub { print "fenice" } ); }, qr/reference as string/ );
 
     @warnings = @( () );
-    $_ = \%( 1..10 );
+    $_ = \%( < 1..10 );
     cmp_ok(scalar(nelems @warnings),'==',0,'hashref assign');
 }
