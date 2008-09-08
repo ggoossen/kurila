@@ -25,7 +25,7 @@ sub new {
     if (!ref(@_[0] || '')) { # most common case: one bare string
       return bless \@('', \%(), @_[0] ), $class;
     } elsif( ref(@_[0] || '') eq 'ARRAY') {
-      $new = \ @{ @_[0] };
+      $new = \$: @{ @_[0] };
     } else {
       Carp::croak( "$class new() doesn't know to clone $new" );
     }

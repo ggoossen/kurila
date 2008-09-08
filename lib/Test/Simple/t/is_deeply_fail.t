@@ -110,7 +110,7 @@ is( $err, <<ERR,                        '    right diagnostic' );
 ERR
 
 #line 110
-ok !is_deeply(\1..9, \1..10,    'arrays of different length');
+ok !is_deeply(\(1..9), \(1..10),    'arrays of different length');
 is( $out, "not ok 5 - arrays of different length\n",
                                         'arrays of different length' );
 is( $err, <<ERR,                        '    right diagnostic' );
@@ -194,12 +194,12 @@ ERR
 # is_deeply([$a1], [$b1], 'deep mixed scalar refs');
 
 my $foo = \%(
-           this => \1..10,
+           this => \(1..10),
            that => \%( up => "down", left => "right" ),
           );
 
 my $bar = \%(
-           this => \1..10,
+           this => \(1..10),
            that => \%( up => "down", left => "right", foo => 42 ),
           );
 

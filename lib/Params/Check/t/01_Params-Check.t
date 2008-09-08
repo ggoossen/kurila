@@ -316,7 +316,7 @@ use constant TRUE   => sub { 1 };
         gender      => 'M',
         married     => 1,
         age         => 21,
-        id_list     => \1..3,
+        id_list     => \(1..3),
         phone       => '555-8844',
     );
 

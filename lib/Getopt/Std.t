@@ -40,12 +40,14 @@ ok( %opt{h} && %opt{k},		'options -h and -k set' );
 is( %opt{i}, 'j',		q/option -i is 'j'/ );
 ok( !defined $opt_i,		'$opt_i still undefined' );
 
-# Try illegal options, but avoid printing of the error message
-$^WARN_HOOK = sub { $warning = @_[0] };
-@ARGV = qw(-h help);
+{
+    # Try illegal options, but avoid printing of the error message
+    local $^WARN_HOOK = sub { $warning = @_[0] };
+    @ARGV = qw(-h help);
 
-ok( !getopts("xf:y"),		'getopts fails for an illegal option' );
-ok( $warning->{description} eq "Unknown option: h\n", 'user warned' );
+    ok( !getopts("xf:y"),		'getopts fails for an illegal option' );
+    ok( $warning->{description} eq "Unknown option: h\n", 'user warned' );
+}
 
 # Then try the Getopt::Long module
 

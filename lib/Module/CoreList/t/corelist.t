@@ -29,13 +29,13 @@ is(Module::CoreList->first_release('File::Spec'), 5.00405,
 is(Module::CoreList->first_release('File::Spec', 0.82), 5.006_001,
    "File::Spec reached 0.82 with 5.006_001");
 
-is_deeply(\ sort keys %Module::CoreList::released,
-          \ sort keys %Module::CoreList::version,
+is_deeply(\(sort keys %Module::CoreList::released),
+          \(sort keys %Module::CoreList::version),
           "have a note of everythings release");
 
-is_deeply( \ map {
+is_deeply( \(map {
     exists %Module::CoreList::version{ $_ }->{FindExt} ? $_ : ()
-} keys %Module::CoreList::version,
+} keys %Module::CoreList::version),
            \@(), "FindExt shouldn't get included rt#6922" );
 
 

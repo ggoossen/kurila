@@ -852,7 +852,7 @@ sub ParseOptionSpec ($$) {
 	if ( $spec eq '!' ) {
 	    $opctl->{"no$_"} = $entry;
 	    $opctl->{"no-$_"} = $entry;
-	    $opctl->{$_} = \ @$entry;
+	    $opctl->{$_} = \$: @$entry;
 	    $opctl->{$_}->[CTL_TYPE] = '';
 	}
 	else {
