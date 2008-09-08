@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test;
+use Test::More;
 
 # Grab all of the plain routines from File::Spec
 use File::Spec < @File::Spec::EXPORT_OK ;
@@ -730,7 +730,7 @@ plan tests => scalar (nelems @tests) + 1;
 }
 
 
-ok("Win32->can('_cwd')", "Win32->can('_cwd')");
+is("Win32->can('_cwd')", "Win32->can('_cwd')");
 
 # Test out the class methods
 for (  @tests ) {
@@ -743,6 +743,7 @@ for (  @tests ) {
 # an expected result. Works with functions that return scalars or arrays.
 #
 sub tryfunc {
+  SKIP: {
     my $function = shift ;
     my $expected = shift ;
     my $platform = shift ;
@@ -762,10 +763,11 @@ sub tryfunc {
       }
       else {
         die if $@;
-	ok $@, '', $function;
+	is $@, '', $function;
       }
       return;
     }
 
-    ok $got, $expected, $function;
+    is $got, $expected, $function;
+}
 }

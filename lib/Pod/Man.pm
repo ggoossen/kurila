@@ -831,7 +831,7 @@ sub devise_date {
     } else {
         $time = time;
     }
-    return strftime ('%Y-%m-%d', localtime $time);
+    return strftime('%Y-%m-%d', localtime $time);
 }
 
 # Print out the preamble and the title.  The meaning of the arguments to .TH

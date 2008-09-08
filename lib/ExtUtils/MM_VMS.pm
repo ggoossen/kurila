@@ -1080,7 +1080,7 @@ a lot of commands.
 =cut
 
 sub extra_clean_files {
-    returnqw(
+    return qw(
               *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) *.Opt $(BASEEXT).bso
               .MM_Tmp
              );

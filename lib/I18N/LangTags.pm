@@ -361,7 +361,7 @@ sub super_languages {
   }
   pop @supers if (nelems @supers);
   shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
-  returnreverse @supers;
+  return reverse @supers;
 }
 
 ###########################################################################
