@@ -261,7 +261,7 @@ sub directory_tree {
             %dirs{$dir}++;
         }
     }
-    returnsort(keys(%dirs));
+    return sort(keys(%dirs));
 }
 
 sub validate {

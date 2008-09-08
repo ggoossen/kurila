@@ -469,7 +469,7 @@ sub process_para {
 	  push(@BootCode,     "#endif");
 	}
 	
-	my(@fns) = keys %{@XSStack[-1]->{functions} || \%()};
+	my @fns = keys %{@XSStack[-1]->{functions} || \%()};
 	if ($statement ne 'endif') { <
 	  # Hide the functions defined in other #if branches, and reset.
 	  %{@XSStack[-1]->{other_functions}}{[ @fns]} = (1) x nelems @fns;

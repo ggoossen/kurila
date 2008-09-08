@@ -1326,7 +1326,8 @@ sub pp_nextstate {
     }
 
     # hack to check that the hint hash hasn't changed
-    if ("{join ' ',@{\sort %{$self->{'hinthash'} || \%()}}}" ne "{join ' ',@{\sort %{$op->hints_hash || \%()}}}") {
+    if (join(' ', sort @: < %{$self->{'hinthash'} || \%()}) 
+          ne join(' ', sort @: < %{$op->hints_hash || \%()})) {
 	push @text, declare_hinthash($self->{'hinthash'}, $op->hints_hash, $self->{indent_size});
 	$self->{'hinthash'} = $op->hints_hash;
     }
