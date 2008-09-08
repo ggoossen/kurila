@@ -84,7 +84,7 @@ that are found in the existing F<MANIFEST> file in the new one.
 =cut
 
 sub _sort {
-    returnsort { lc $a cmp lc $b } @_;
+    return sort { lc $a cmp lc $b } @_;
 }
 
 sub mkmanifest {

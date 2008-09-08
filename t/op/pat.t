@@ -3111,11 +3111,11 @@ sub kt
 
     # ANYOF tests
 
-    for (@(\qw|\w aA #@!|,
-         \qw|[abc] abc def|,
-         \qw|[^abc] def abc|,
-         \qw|[[:word:]] abc #@!|,
-         \qw|[[:^word:]] #@! abc|,)
+    for ( map { \$($$_) } @(\qw|\w aA #@!|,
+                          \qw|[abc] abc def|,
+                          \qw|[^abc] def abc|,
+                          \qw|[[:word:]] abc #@!|,
+                          \qw|[[:^word:]] #@! abc|,)
         ) {
         my $m = shift @$_;
         my ($s, $f) = < map { \split m/ */ } @$_;

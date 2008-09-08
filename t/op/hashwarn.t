@@ -33,7 +33,7 @@ my $fail_not_hr   = 'Not a HASH reference at ';
     dies_like( sub { %hash = %( \%( < 1..3 ) ); }, qr/reference as string/ );
 
     @warnings = @( () );
-    dies_like( sub { %hash = %( \ 1..3 ); }, qr/reference as string/ );
+    dies_like( sub { %hash = %( \( 1..3 ) ); }, qr/reference as string/ );
 
     @warnings = @( () );
     dies_like( sub { %hash = %( sub { print "fenice" } ); }, qr/reference as string/ );

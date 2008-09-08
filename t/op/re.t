@@ -15,11 +15,11 @@ use re < qw(is_regexp regexp_pattern
 }
 
 if ('1234' =~ m/(?:(?<A>\d)|(?<C>!))(?<B>\d)(?<A>\d)(?<B>\d)/){
-    my @names = sort regnames();
+    my @names = sort $( regnames() );
     is("{join ' ',@names}","A B","regnames");
-    @names = sort regnames(0);
+    @names = sort $( regnames(0) );
     is("{join ' ',@names}","A B","regnames");
-    @names = sort regnames(1);
+    @names = sort $( regnames(1) );
     is("{join ' ',@names}","A B C","regnames");
     is(join("", @{regname("A",1)}),"13");
     is(join("", @{regname("B",1)}),"24");

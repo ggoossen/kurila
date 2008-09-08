@@ -213,7 +213,7 @@ sub get_files {
 	}
 	close(CPPO);
     }
-    returnkeys %file;
+    return keys %file;
 }
 
 sub write_errno_pm {

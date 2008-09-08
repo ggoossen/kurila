@@ -10,7 +10,7 @@ my $x = %('aap', 'noot', 'mies', 'teun');
 is join('*', sort keys($x)), 'aap*mies';
 $x = %();
 is join('*', keys($x)), '';
-is join('*', keys(undef)), '';
+is keys(undef), undef;
 sub foo { return %('aap', 'noot'); }
 is join('*', keys(foo)), 'aap';
 
