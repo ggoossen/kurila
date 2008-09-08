@@ -1690,7 +1690,7 @@ for iteration or building related variable sets.
 =cut
 
 sub installvars {
-    returnqw(PRIVLIB SITELIB  VENDORLIB
+    return qw(PRIVLIB SITELIB  VENDORLIB
               ARCHLIB SITEARCH VENDORARCH
               BIN     SITEBIN  VENDORBIN
               SCRIPT  SITESCRIPT  VENDORSCRIPT

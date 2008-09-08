@@ -664,9 +664,9 @@ sub _rmtree {
     my $curdir = File::Spec->curdir();
     my $updir  = File::Spec->updir();
 
-    my (@files, $root);
+    my (@files);
     ROOT_DIR:
-    foreach $root ( @$paths) {
+    foreach my $root ($(@$paths)) {
     	if ($Is_MacOS) {
             $root  = ":$root" unless $root =~ m/:/;
             $root .= ":"      unless $root =~ m/:\z/;
