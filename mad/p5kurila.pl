@@ -929,6 +929,120 @@ sub no_auto_deref {
     }
 }
 
+sub map_array {
+    my $xml = shift;
+    for my $map ($xml->findnodes("//op_mapstart"), $xml->findnodes("//op_grepstart")) {
+        if ($map->att('flags') =~ m/\bLIST\b/) {
+            set_madprop($map->parent, 'operator', '&lt; ' . get_madprop($map->parent, 'operator'));
+        }
+
+        my $block = $map->child(1);
+        my $args = $map->child(2);
+        # set_madprop($block, 'wrap_close', ',');
+
+        my $xargs = XML::Twig::Elt->new("op_null");
+        $args->replace_with($xargs);
+        while ($map->children > 3) {
+            $map->child(-1)->move($xargs);
+        }
+        $args->move($xargs);
+        set_madprop($xargs, 'wrap_open', '@(', wsbefore => ' ');
+        set_madprop($xargs, 'wrap_close', ')');
+        if (get_madprop($args, 'comma')) {
+            set_madprop($args, 'comma', '');
+            set_madprop($block, 'wrap_close', ',');
+        }
+    }
+
+    for my $map (map { $xml->findnodes("//$_") } qw|op_sort op_split op_reverse op_keys op_values op_range|) {
+        if (($map->att('flags')||'') =~ m/\bLIST\b/) {
+            set_madprop($map, 'wrap_open', ' &lt;' . (get_madprop($map, 'wrap_open') || ''));
+        }
+    }
+
+    for my $map ($xml->findnodes("//op_null")) {
+        next unless get_madprop($map, "quote_open");
+        if ($map->att('flags') =~ m/\bLIST\b/) {
+            set_madprop($map, 'wrap_open', ' &lt;' . (get_madprop($map, 'wrap_open') || ''));
+        }
+    }
+
+    for my $map (map { $xml->findnodes("//$_") } qw|op_sort op_reverse|) {
+        next if $map->tag eq "op_sort" and $map->att('flags') =~ m/\bSPECIAL\b/;
+        my $args = $map->child(2);
+        my $xargs = XML::Twig::Elt->new("op_null");
+        $args->replace_with($xargs);
+        while ($map->children > 3) {
+            $map->child(-1)->move($xargs);
+        }
+        $args->move($xargs);
+        set_madprop($xargs, 'wrap_open', '@(', wsbefore => ' ');
+        set_madprop($xargs, 'wrap_close', ')');
+    }
+
+    for my $map (map { $xml->findnodes("//$_") } qw|op_join op_sort|) {
+        next if $map->tag eq "op_sort" and not $map->att('flags') =~ m/\bSPECIAL\b/;
+        my $preargs = $map->child(2);
+        my $args = $map->child(3);
+        my $xargs = XML::Twig::Elt->new("op_null");
+        $args->replace_with($xargs);
+        while ($map->children > 4) {
+            $map->child(-1)->move($xargs);
+        }
+        $args->move($xargs);
+        set_madprop($xargs, 'wrap_open', '@(', wsbefore => ' ');
+        set_madprop($xargs, 'wrap_close', ')');
+
+        if (get_madprop($args, 'comma')) {
+            set_madprop($xargs, 'wrap_open', ', @(', wsbefore => '');
+            set_madprop($args, 'comma', '');
+        }
+    }
+
+    for my $leaveloop ($xml->findnodes("//op_leaveloop")) {
+        next unless (get_madprop($leaveloop, 'while') || get_madprop($leaveloop, 'whilepost') || '') =~ m/^for/;
+        my $op_enteriter = $leaveloop->child(1);
+        next if $op_enteriter->att('flags') =~ m/\bSPECIAL\b/; # skip ranges
+        my $x = ($op_enteriter->child(0)->tag eq "madprops") ? $op_enteriter->child(2) : $op_enteriter->child(1);
+        next unless $x->tag eq "op_null";
+        my $what = $x->child(1);
+        if ($what->tag eq "op_expand") {
+            set_madprop($what, "operator", '');
+        }
+        else {
+            my $nwhat = XML::Twig::Elt->new("op_null");
+            if (get_madprop($leaveloop, 'whilepost')) {
+                set_madprop($nwhat, 'wrap_open', ' @(');
+            } else {
+                set_madprop($nwhat, 'wrap_open', '@(');
+            }
+            set_madprop($nwhat, 'wrap_close', ')');
+            $what->replace_with($nwhat);
+            while ($x->children > 2) {
+                $x->child(-1)->move($nwhat);
+            }
+            $what->move($nwhat);
+        }
+    }
+
+    for my $slice (map { $xml->findnodes("//$_",) } qw|op_aslice op_hslice|) {
+        my $indices = $slice->child(2);
+        my $thing = $slice->child(3);
+
+        my $ni = XML::Twig::Elt->new("op_null");
+        set_madprop($ni, 'wrap_open', '@(');
+        set_madprop($ni, 'wrap_close', ')');
+        $indices->replace_with($ni);
+        $indices->move($ni);
+
+        my $nt = XML::Twig::Elt->new("op_null");
+        set_madprop($nt, 'wrap_open', ' &lt;');
+        $thing->replace_with($nt);
+        $thing->move($nt);
+    }
+}
+
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1011,6 +1125,8 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.12') {
 if ($from->{branch} ne "kurila" or $from->{v} < qv '1.13') {
     sv_array_hash($twig);
 }
+
+map_array($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );

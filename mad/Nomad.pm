@@ -691,6 +691,8 @@ sub ast {
     my $self = shift;
     my @newkids;
 
+    push @newkids, $self->madness('wrap_open');
+
     my $left = $$self{Kids}[0];
     push @newkids, $left->ast($self, @_);
 
@@ -1118,7 +1120,7 @@ BEGIN {
                 local $::curenc = 0;
                 push @kids, $self->madness('=');
             }
-	    return P5AST::quote->new(Kids => [$self->madness('q'), @kids, $self->madness('Q')])
+	    return P5AST::quote->new(Kids => [$self->madness('wrap_open q'), @kids, $self->madness('Q wrap_close')])
 	},
 	'value' => sub {				# random literal
 	    my $self = shift;
@@ -1279,9 +1281,11 @@ sub ast {
 
     # Do something generic.
     my @newkids;
+    push @newkids, $self->madness('wrap_open');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
+    push @newkids, $self->madness('wrap_close');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -1433,6 +1437,7 @@ sub ast {
     my $self = shift;
     my @newkids;
     push @newkids, $self->madness('X K');
+    push @newkids, $astmad{'quote'}->($self, @_);
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -1516,7 +1521,10 @@ sub ast {
 
     my @newkids;
     push @newkids, $self->madness('dx d ( * $');
-    push @newkids, $$self{Kids}[0]->ast();
+    for (@{$self->{Kids}}) {
+        push @newkids, $_->ast($self,@_);
+    }
+    # push @newkids, $$self{Kids}[0]->ast();
     push @newkids, $self->madness(') a');
     return $self->newtype->new(Kids => [@newkids]);
 }
