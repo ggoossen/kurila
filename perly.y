@@ -79,7 +79,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO NOAMP
-%token <i_tkval> ANONARY ANONARYL ANONHSH ANONSCALAR
+%token <i_tkval> ANONARY ANONARYL ANONHSH ANONSCALAR ANONSCALARL
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 
@@ -110,7 +110,7 @@
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> '?' ':'
 %right <i_tkval> '<'
-%right ANONARYL
+%right ANONARYL ANONSCALARL
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -719,6 +719,11 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
         |       ANONARYL listexpr  /* @: ... */
                         {
                             $$ = newANONLIST($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+			}
+        |       ANONSCALARL listexpr  /* $: ... */
+                        {
+                            $$ = convert(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
 			}
 	|	FUNC '(' listexprcom ')'             /* print (@args) */
@@ -1334,7 +1339,7 @@ scalar	:	'$' indirob
 			}
         |       ANONSCALAR expr ')'  /* $( ... ) */
                         { 
-                            $$ = convert(OP_ANONSCALAR, 0, $2, LOCATION($1));
+                            $$ = convert(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($3,$$,']');
 
