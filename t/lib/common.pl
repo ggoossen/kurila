@@ -99,7 +99,7 @@ for ( @prgs){
 	$todo_reason = $temp;
     }
     if ( $prog =~ m/--FILE--/) {
-        my(@files) = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
+        my @files = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
 	shift @files ;
 	die "Internal error: test $_ didn't split into pairs, got " .
 		scalar(nelems @files) . "[" . join("\%\%\%\%", @files) ."]\n"

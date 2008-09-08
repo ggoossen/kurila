@@ -323,7 +323,7 @@ sub todo_skip {
 
 sub eq_array {
     my ($ra, $rb) = < @_;
-    return 0 unless (nelems @$ra) == nelems @$rb;
+    return 0 unless (nelems @$ra) == nelems(@$rb);
     for my $i (0..(nelems @$ra)-1) {
 	next     if !defined $ra->[$i] && !defined $rb->[$i];
 	return 0 if !defined $ra->[$i];
