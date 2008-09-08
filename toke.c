@@ -4032,6 +4032,12 @@ Perl_yylex(pTHX)
 	    yyerror("$# is not allowed");
 	}
 
+	if (s[1] == ':' && s[2] != ':') {
+	    /* anon scalar constructor */
+	    s += 2;
+	    OPERATOR(ANONSCALARL);
+	}
+
 	if (s[1] == '(') {
 	    /* anon scalar constructor */
 	    s += 2;
