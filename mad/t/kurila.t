@@ -19,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.11';
-my $to = 'kurila-1.12';
+my $from = 'kurila-1.13';
+my $to = 'kurila-1.14';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -36,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_array_hash();
+t_map_array();
 die;
+t_array_hash();
 t_eval_to_try();
 t_anon_aryhsh();
 t_strict_vars();
@@ -1198,6 +1199,123 @@ foo( 'aap', foo() );
 sub foo { };
 foo( aap => foo() );
 foo( 'aap', < foo() );
+====
+END
+}
+
+sub t_map_array {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my @x = @( map { $_ + 1 } (1, 2, 3) );
+----
+my @x = @( < map { $_ + 1 } @( (1, 2, 3)) );
+====
+my @x = @( grep { $_ % 2 } (1, 2, 3) );
+----
+my @x = @( < grep { $_ % 2 } @( (1, 2, 3)) );
+====
+my @x = @( grep -r, qw|file1 file2|);
+----
+my @x = @( < grep -r, @( < qw|file1 file2|));
+====
+( grep -r, qw|file1 file2|) ? 1 : 0;
+----
+( grep -r, @( < qw|file1 file2|)) ? 1 : 0;
+====
+map { $_ + 1 } < foo();
+----
+map { $_ + 1 } @( < foo());
+====
+map { $_ } unpack "C*", "abc";
+----
+map { $_ } @( unpack "C*", "abc");
+====
+map { $_ + 1 } 1, 2, 3;
+----
+map { $_ + 1 } @( 1, 2, 3);
+====
+my @x = @( sort { $a <+> $b } (3, 1, 2) );
+----
+my @x = @( < sort { $a <+> $b } @( (3, 1, 2)) );
+====
+my @x = @( sort { $a[0] cmp $b[0] } 3, 1, 2 );
+----
+my @x = @( < sort { $a[0] cmp $b[0] } @( 3, 1, 2) );
+====
+my @x = @( sort (3, 1, 2) );
+----
+my @x = @( < sort ( @(3, 1, 2)) );
+====
+join '*', 1, 2;
+----
+join '*', @( 1, 2);
+====
+my ($a, $b) = split m/-/, 'a-b-c';
+----
+my ($a, $b) = < split m/-/, 'a-b-c';
+====
+my @x = @( reverse (3, 1, 2) );
+----
+my @x = @( < reverse ( @(3, 1, 2)) );
+====
+my @x = @( keys $a );
+----
+my @x = @( < keys $a );
+====
+my @x = @( values $a );
+----
+my @x = @( < values $a );
+====
+my @x = @(1..10);
+----
+my @x = @( <1..10);
+====
+my @x = @(qw|aap noot mies|);
+----
+my @x = @( <qw|aap noot mies|);
+====
+my @x;
+for (< @x) { $_++; }
+----
+my @x;
+for ( @x) { $_++; }
+====
+for (foo()) { $_++; }
+----
+for (@(foo())) { $_++; }
+====
+for ('aap', 'noot', 'mies') { $_++; }
+----
+for (@('aap', 'noot', 'mies')) { $_++; }
+====
+my %h;
+foreach (keys %h) { $_++; }
+----
+my %h;
+foreach (@( <keys %h)) { $_++; }
+====
+my %h;
+$_++ foreach keys %h;
+----
+my %h;
+$_++ foreach @( < keys %h);
+====
+for (1..10) { print $_; }
+----
+for (1..10) { print $_; }
+====
+my @a;
+for my $i ( < @a ) { print $_; }
+----
+my @a;
+for my $i (  @a ) { print $_; }
+====
+my (<$b) = $a->[[3,4,7]];
+----
+my (<$b) = < $a->[[@(3,4,7)]];
+====
+my (<$b) = $a->{[3,4,7]};
+----
+my (<$b) = < $a->{[@(3,4,7)]};
 ====
 END
 }
