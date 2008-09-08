@@ -151,7 +151,7 @@ find( sub { push @copies, $_ if -f }, 'copy' );
 @copies = map { s/\.$//; $_ } @copies if $Is_VMS;  # VMS likes to put dots on
                                                    # the end of files.
 # Have to compare insensitively for non-case preserving VMS
-is_deeply( \sort map { lc } @copies, \sort map { lc } keys %$files );
+is_deeply( \(sort map { lc } @copies), \(sort map { lc } keys %$files) );
 
 # cp would leave files readonly, so check permissions.
 foreach my $orig ( @copies) {

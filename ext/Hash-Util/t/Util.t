@@ -263,12 +263,12 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
       # colliding on the same bucket, so the iterator order (output of keys,
       # values, each) depends on the addition order in the hash. And locking
       # the keys of the hash involves behind the scenes key additions.
-      is_deeply( \sort keys %target , \sort keys %clean,
+      is_deeply( (sort keys %target) , (sort keys %clean),
 		 "list keys for $message");
-      is_deeply( \sort values %target , \sort values %clean,
+      is_deeply( (sort values %target) , (sort values %clean),
 		 "list values for $message");
 
-      is_deeply( \sort %target , \sort %clean,
+      is_deeply( (sort @: < %target) , (sort @: < %clean ),
 		 "hash in list context for $message");
 
       my (@clean, @target);
@@ -279,7 +279,7 @@ like( $@->{description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in 
 	push @target, $k, $v;
       }
 
-      is_deeply( \sort @target , \sort @clean,
+      is_deeply( (sort @target) , (sort @clean),
 		 "iterating with each for $message");
     }
   }

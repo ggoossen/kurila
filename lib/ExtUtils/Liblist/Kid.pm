@@ -45,7 +45,7 @@ sub _unix_os2_ext {
     # this is a rewrite of Andy Dougherty's extliblist in perl
 
     my(@searchpath); # from "-L/path" entries in $potential_libs
-    my(@libpath) = split " ", %Config{'libpth'};
+    my @libpath = split " ", %Config{'libpth'};
     my(@ldloadlibs, @bsloadlibs, @extralibs, @ld_run_path, %ld_run_path_seen);
     my(@libs, %libs_seen);
     my($fullname, @fullname);
@@ -112,7 +112,7 @@ sub _unix_os2_ext {
 
 		#TODO: iterate through the directory instead of sorting
 
-		$fullname = "$thispth/" .sort { my($ma) = $a;
+		$fullname = "$thispth/" . (sort { my($ma) = $a;
 			my($mb) = $b;
 			$ma =~ s/[A-Za-z]+/0/g;
 			$ma =~ s/\b(\d)\b/0$1/g;
@@ -121,7 +121,7 @@ sub _unix_os2_ext {
 			while (length($ma) +< length($mb)) { $ma .= ".00"; }
 			while (length($mb) +< length($ma)) { $mb .= ".00"; }
 			# Comparison deliberately backwards
-			$mb cmp $ma;} @fullname[0];
+			$mb cmp $ma;} @fullname )[0];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
 		 && ((%Config{'dlsrc'} ne "dl_dld.xs") || ($thislib eq "m"))){
 	    } elsif (-f ($fullname="$thispth/lib{$thislib}_s$Config_libext")

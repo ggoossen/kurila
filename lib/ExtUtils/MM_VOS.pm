@@ -32,7 +32,7 @@ Cleanup VOS core files
 =cut
 
 sub extra_clean_files {
-    returnqw(*.kp);
+    return qw(*.kp);
 }
 
 
