@@ -16,7 +16,7 @@ sub magic_new { bless \@() }  # Doesn't 100% work, perl's problem.
 
 package main;
 
-is_deeply( \sort keys %Foo::FIELDS, 
+is_deeply( \(sort keys %Foo::FIELDS), 
            \sort qw(_no Pants who _up_yours what)
 );
 
@@ -28,9 +28,9 @@ sub show_fields {
                 keys %$fields;
 }
 
-is_deeply( \sort &show_fields('Foo', fields::PUBLIC),
+is_deeply( \sort(&show_fields('Foo', fields::PUBLIC)),
            \sort qw(Pants who what));
-is_deeply( \sort &show_fields('Foo', fields::PRIVATE),
+is_deeply( \sort(&show_fields('Foo', fields::PRIVATE)),
            \sort qw(_no _up_yours));
 
 foreach (@(Foo->new)) {

@@ -27,7 +27,7 @@ sub of {
         return;
     }
     else {
-        returnkeys %tags;
+        return keys %tags;
     }
 }
 

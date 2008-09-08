@@ -30,8 +30,8 @@ is (%comma{key}, "value", 'is key present? (maybe optimised)');
 my @temp = @(key=>undef);
 is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
-@temp = %comma;
-ok (eq_array (\@comma, \@temp), 'list from comma hash');
+@temp = @( < %comma );
+ok (eq_array(\@comma, \@temp), 'list from comma hash');
 
 @temp = @( each %comma );
 ok (eq_array (\@comma, \@temp), 'first each from comma hash');
@@ -48,7 +48,7 @@ is (%temp{key}, "value", 'is key present? (maybe optimised)');
 @temp = @(key=>undef);
 is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
-@temp = %temp;
+@temp = @( < %temp );
 ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
 
 @temp = @( each %temp );
@@ -70,7 +70,7 @@ is (%arrow{Key}, "Value", 'is key present? (maybe optimised)');
 @temp = @('Key', undef);
 is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
-@temp = %arrow;
+@temp = @( < %arrow );
 ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
 
 @temp = @( each %arrow );
@@ -88,7 +88,7 @@ is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
 @temp = @('Key', undef);
 is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
-@temp = %temp;
+@temp = @:< %temp;
 ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
 
 @temp = @( each %temp );

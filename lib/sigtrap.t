@@ -31,7 +31,7 @@ cmp_ok( %SIG{FAKE2}, '\==',\&sigtrap::handler_traceback, 'install traceback hand
 my @normal =qw( HUP INT PIPE TERM );
  <%SIG{[@normal]} = '' x (nelems @normal);
 sigtrap->import('normal-signals');
-is( nelems grep { ref $_ } %SIG{[@normal]}, nelems(@normal), 'check normal-signals set' );
+is( nelems(grep { ref $_ } %SIG{[@normal]}), nelems(@normal), 'check normal-signals set' );
 
 my @error =qw( ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP );
  <%SIG{[@error]} = '' x (nelems @error);
