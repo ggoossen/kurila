@@ -4110,26 +4110,15 @@ PP(pp_push)
 {
     dVAR; dSP; dMARK; dORIGMARK; dTARGET;
     register AV * const ary = (AV*)*++MARK;
-    const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
 
     do_arg_check(MARK);
 
-    if (SvTYPE(ary) != SVt_PVAV) {
-	Perl_croak(aTHX_ "First argument must be an array");
+    if ( ! SvAVOK(ary) ) {
+	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
+	    OP_DESC(PL_op), Ddesc(ary));
     }
 
-    if (mg) {
-	*MARK-- = SvTIED_obj((SV*)ary, mg);
-	PUSHMARK(MARK);
-	PUTBACK;
-	ENTER;
-	call_method("PUSH",G_SCALAR|G_DISCARD);
-	LEAVE;
-	SPAGAIN;
-	SP = ORIGMARK;
-	PUSHi( AvFILL(ary) + 1 );
-    }
-    else {
+    {
 	PL_delaymagic = DM_DELAY;
 	for (++MARK; MARK <= SP; MARK++) {
 	    SV * const sv = newSV(0);
