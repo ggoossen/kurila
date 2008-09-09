@@ -101,8 +101,8 @@ static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
     return (AV*)sv_mortalcopy((SV*)av);
 }
 
-#define SVav(av) inline_SVav(aTHX_ av)
-static __inline__ SV* inline_SVav(pTHX_ AV *av) {
+#define AvSV(av) inline_AvSV(aTHX_ av)
+static __inline__ SV* inline_AvSV(pTHX_ AV *av) {
     return (SV*)av;
 }
 

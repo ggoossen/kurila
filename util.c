@@ -1318,11 +1318,12 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
 	location = PL_op->op_location;
     }
     else if (PL_compcv) {
-	location = SVav(av_2mortal(newAV()));
-	av_push((AV*)location, newSVsv(PL_parser->lex_filename));
-	av_push((AV*)location, newSViv(PL_parser->lex_line_number));
-	av_push((AV*)location, newSViv((PL_parser->bufptr - PL_parser->linestart +
+	AV* locav = av_2mortal(newAV());
+	av_push(locav, newSVsv(PL_parser->lex_filename));
+	av_push(locav, newSViv(PL_parser->lex_line_number));
+	av_push(locav, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
+	location = AvSV(locav);
     }
     msv = vdie_croak_common(location, pat, args);
     die_where(msv);
