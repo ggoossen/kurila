@@ -5294,12 +5294,6 @@ STATIC void	S_sv_release_COW(pTHX_ SV *sv, const char *pvx, SV *after)
 #  endif
 STATIC SV *	S_more_sv(pTHX);
 STATIC void *	S_more_bodies(pTHX_ const svtype sv_type);
-STATIC void	S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_GLOB_ASSIGN_GLOB	\
-	assert(dstr); assert(sstr)
-
 STATIC void	S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);

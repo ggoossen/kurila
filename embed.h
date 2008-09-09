@@ -1430,7 +1430,6 @@
 #ifdef PERL_CORE
 #define more_sv			S_more_sv
 #define more_bodies		S_more_bodies
-#define glob_assign_glob	S_glob_assign_glob
 #define glob_assign_ref		S_glob_assign_ref
 #define ptr_table_find		S_ptr_table_find
 #endif
@@ -3634,7 +3633,6 @@
 #ifdef PERL_CORE
 #define more_sv()		S_more_sv(aTHX)
 #define more_bodies(a)		S_more_bodies(aTHX_ a)
-#define glob_assign_glob(a,b,c)	S_glob_assign_glob(aTHX_ a,b,c)
 #define glob_assign_ref(a,b)	S_glob_assign_ref(aTHX_ a,b)
 #define ptr_table_find		S_ptr_table_find
 #endif

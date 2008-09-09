@@ -1481,8 +1481,6 @@ sM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
 #  endif
 s	|SV *	|more_sv
 s	|void *	|more_bodies	|const svtype sv_type
-s	|void	|glob_assign_glob|NN SV *const dstr|NN SV *const sstr \
-		|const int dtype
 s	|void	|glob_assign_ref|NN SV *const dstr|NN SV *const sstr
 sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *tbl|NULLOK const void *sv
 #endif

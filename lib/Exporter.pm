@@ -546,5 +546,4 @@ a sample list of such modules.
 This library is free software. You can redistribute it
 and/or modify it under the same terms as Perl itself.
 
->>>>>>> eb7c9bc0060810071e601f18c06cc64d575afc2b:lib/Exporter.pm
 =cut
