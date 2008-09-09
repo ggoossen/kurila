@@ -87,18 +87,11 @@ sub find_op_cop {
     return $COP;
 }
 
-{
-
-    # Make B::NULL objects evaluate as false.
-    package B::NULL;
-    use overload 'bool' => sub () { !!0 };
-}
-
 sub _find_op_cop {
     my ( $op, $name ) = < @_;
 
     # Fail on B::NULL or whatever.
-    return 0 if not $op;
+    return 0 if not $op or $op->isa("B::NULL");
 
     # Succeed when we find our match.
     return 1 if $op->name =~ $name;

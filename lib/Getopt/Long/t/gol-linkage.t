@@ -2,13 +2,6 @@
 
 no strict;
 
-BEGIN {
-    if (%ENV{PERL_CORE}) {
-	@INC = @( '../lib' );
-	chdir 't';
-    }
-}
-
 use Getopt::Long;
 
 print "1..33\n";

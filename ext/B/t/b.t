@@ -11,7 +11,7 @@ BEGIN {
 $|  = 1;
 use warnings;
 use strict;
-use Test::More tests => 57;
+use Test::More tests => 56;
 
 BEGIN { use_ok( 'B' ); }
 
@@ -162,15 +162,4 @@ is(B::opnumber("chop"), 34, "Testing opnumber with opname (chop)");
     my $sg = B::sub_generation();
     *UNIVERSAL::hand_waving = sub { };
     ok( $sg +< B::sub_generation(), "sub_generation increments" );
-}
-
-{
-    my $ag = B::amagic_generation();
-    {
-
-        package Whatever;
-        require overload;
-        overload->import( '""' => sub {"What? You want more?!"} );
-    }
-    ok( $ag +< B::amagic_generation(), "amagic_generation increments" );
 }
