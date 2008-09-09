@@ -7477,10 +7477,6 @@ Perl_peep(pTHX_ register OP *o)
 	}
 
 	case OP_SORT: {
-	    /* will point to RV2AV or PADSV op on LHS/RHS of assign */
-	    OP *oleft;
-	    OP *o2;
-
 	    /* check that RHS of sort is a single plain array */
 	    OP *oright = cUNOPo->op_first;
 	    if (!oright || oright->op_type != OP_PUSHMARK)

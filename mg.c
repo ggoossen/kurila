@@ -1433,7 +1433,6 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
 {
     dVAR;
     I32 i;
-    SV** svp = NULL;
     /* Need to be careful with SvREFCNT_dec(), because that can have side
      * effects (due to closures). We must make sure that the new disposition
      * is in place before it is called.

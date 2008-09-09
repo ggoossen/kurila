@@ -2032,13 +2032,14 @@ PP(pp_grepwhile)
 	av_push((AV*)*dst, newSVsv(POPs));
     }
     else {
-	POPs;
+	/* discard item */
+	(void)POPs;
     }
 
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if ( av_len(*src) == -1 ) {
+    if ( av_len(SvAV(*src)) == -1 ) {
 	const I32 gimme = GIMME_V;
 
 	LEAVE;					/* exit outer scope */
@@ -2056,7 +2057,7 @@ PP(pp_grepwhile)
 	SAVEVPTR(PL_curpm);
 
 	/* set $_ to the new source item */
-	srcitem = av_shift(*src);
+	srcitem = av_shift(SvAV(*src));
 	mXPUSHs(srcitem);
 	SvTEMP_off(srcitem);
 	if (PL_op->op_private & OPpGREP_LEX)

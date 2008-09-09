@@ -2507,19 +2507,6 @@ Perl_sv_2bool(pTHX_ register SV *const sv)
 }
 
 /*
-=for apidoc sv_utf8_upgrade
-
-Obsolete function which used to:
-Converts the PV of an SV to its UTF-8-encoded form.
-
-=for apidoc sv_utf8_upgrade_flags
-
-Obsolete function which used to:
-Converts the PV of an SV to its UTF-8-encoded form.
-
-=for apidoc sv_utf8_downgrade
-
-Obsolete function which used to:
 
 =for apidoc sv_setsv
 
@@ -2554,14 +2541,6 @@ copy-ish functions and macros use this underneath.
 
 =cut
 */
-
-static void
-S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
-{
-    PERL_ARGS_ASSERT_GLOB_ASSIGN_GLOB;
-
-    Perl_croak(aTHX_ "glob to glob assignment have been removed");
-}
 
 static void
 S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
@@ -2808,7 +2787,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     case SVt_PVLV:
     case SVt_PVGV:
 	if (isGV_with_GP(sstr) && dtype <= SVt_PVGV) {
-	    glob_assign_glob(dstr, sstr, dtype);
+	    Perl_croak(aTHX_ "glob to glob assignment have been removed");
 	    return;
 	}
 	/* SvVALID means that this PVGV is playing at being an FBM.  */
@@ -2820,7 +2799,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    if (SvTYPE(sstr) != stype) {
 		stype = SvTYPE(sstr);
 		if (isGV_with_GP(sstr) && stype == SVt_PVGV && dtype <= SVt_PVGV) {
-		    glob_assign_glob(dstr, sstr, dtype);
+		    Perl_croak(aTHX_ "glob to glob assignment have been removed");
 		    return;
 		}
 	    }
@@ -2885,7 +2864,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 		GvMULTI_on(dstr);
 		return;
 	    }
-	    glob_assign_glob(dstr, sstr, dtype);
+	    Perl_croak(aTHX_ "glob to glob assignment have been removed");
 	    return;
 	}
 
