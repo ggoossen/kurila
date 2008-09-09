@@ -37,23 +37,23 @@ BEGIN {use_ok( "File::Temp" ); }
 # Open tempfile in some directory, unlink at end
 my $fh = File::Temp->new( SUFFIX => '.txt');
 
-ok( (-f "$fh"), "File $fh exists"  );
+ok( (-f $fh->filename), "File exists"  );
 # Should still be around after closing
-ok( close( $fh ), "Close file $fh" );
-ok( (-f "$fh"), "File $fh still exists after close" );
+ok( close( $fh ), "Close file \$fh" );
+ok( (-f $fh->filename), "File \$fh still exists after close" );
 # Check again at exit
-push(@files, "$fh");
+push(@files, $fh->filename);
 
 # OO tempdir
 my $tdir = File::Temp->newdir();
-my $dirname = "$tdir"; # Stringify overload
-ok( -d $dirname, "Directory $tdir exists");
+my $dirname = $tdir->dirname;
+ok( -d $dirname, "Directory \$tdir exists");
 undef $tdir;
 ok( !-d $dirname, "Directory should now be gone");
 
 # Quick basic tempfile test
 my $qfh = File::Temp->new();
-my $qfname = "$qfh";
+my $qfname = $qfh->filename;
 ok (-f $qfname, "temp file exists");
 undef $qfh;
 ok( !-f $qfname, "temp file now gone");
@@ -79,18 +79,18 @@ $fh = File::Temp->new(
 		     SUFFIX => '.dat',);
 
 ok( $fh->unlink_on_destroy, "should unlink");
-print "# TEMPFILE: Created $fh\n";
+print "# TEMPFILE: Created \$fh\n";
 
-ok( (-f "$fh"), "File $fh exists in tempdir?");
-push(@files, "$fh");
+ok( (-f $fh->filename), "File \$fh exists in tempdir?");
+push(@files, $fh->filename);
 
 # Test tempfile
 # ..and again (without unlinking it)
 $fh = File::Temp->new( DIR => $tempdir, UNLINK => 0);
 
-print "# TEMPFILE: Created $fh\n";
-ok( (-f "$fh" ), "Second file $fh exists in tempdir [nounlink]?");
-push(@files, "$fh");
+print "# TEMPFILE: Created \$fh\n";
+ok( (-f $fh->filename ), "Second file \$fh exists in tempdir [nounlink]?");
+push(@files, $fh->filename);
 
 # and another (with template)
 
@@ -98,31 +98,31 @@ $fh = File::Temp->new( TEMPLATE => 'helloXXXXXXX',
 		      DIR => $tempdir,
 		      SUFFIX => '.dat',);
 
-print "# TEMPFILE: Created $fh\n";
+print "# TEMPFILE: Created \$fh\n";
 
-ok( (-f "$fh"), "File $fh exists? [from template]" );
-push(@files, "$fh");
+ok( (-f $fh->filename), "File \$fh exists? [from template]" );
+push(@files, $fh->filename);
 
 
 # Create a temporary file that should stay around after
 # it has been closed
 $fh = File::Temp->new( TEMPLATE => 'permXXXXXXX', UNLINK => 0);
 
-print "# TEMPFILE: Created $fh\n";
-ok( -f "$fh", "File $fh exists?" );
-ok( close( $fh ), "Close file $fh" );
+print "# TEMPFILE: Created \$fh\n";
+ok( -f $fh->filename, "File \$fh exists?" );
+ok( close( $fh ), "Close file \$fh" );
 ok( ! $fh->unlink_on_destroy, "should not unlink");
-push( @still_there, "$fh"); # check at END
+push( @still_there, $fh->filename); # check at END
 
 # Now create a temp file that will remain when the object
 # goes out of scope because of $KEEP_ALL
 $fh = File::Temp->new( TEMPLATE => 'permXXXXXXX', UNLINK => 1);
 
-print "# TEMPFILE: Created $fh\n";
-ok( -f "$fh", "File $fh exists?" );
-ok( close( $fh ), "Close file $fh" );
+print "# TEMPFILE: Created \$fh\n";
+ok( -f $fh->filename, "File \$fh exists?" );
+ok( close( $fh ), "Close file \$fh" );
 ok( $fh->unlink_on_destroy, "should unlink (in principal)");
-push( @still_there, "$fh"); # check at END
+push( @still_there, $fh->filename); # check at END
 $File::Temp::KEEP_ALL = 1;
 
 # Make sure destructors run
