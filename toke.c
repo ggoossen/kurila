@@ -2561,7 +2561,7 @@ Perl_yylex(pTHX)
     DEBUG_T( {
 	SV* tmp = newSVpvs("");
 	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s %s\n",
-	    PL_parser->lex_line_number,
+	    (IV)PL_parser->lex_line_number,
 	    lex_state_names[PL_lex_state],
 	    exp_name[PL_expect],
 	    pv_display(tmp, s, strlen(s), 0, 60));
@@ -5318,7 +5318,7 @@ Perl_yylex(pTHX)
 		    }
 		}
 		start_force(PL_curforce);
-		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, av, S_curlocation());
+		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, AvSV(av), S_curlocation());
 		force_next(THING);
 	    }
 	    if (PL_lex_stuff.str_sv) {
@@ -10648,7 +10648,7 @@ Perl_yyerror(pTHX_ const char *const s)
     }
     msg = sv_2mortal(newSVpv(s, 0));
     Perl_sv_catpvf(aTHX_ msg, " at %s line %"IVdf", ",
-        SvPV_nolen_const(PL_parser->lex_filename), PL_parser->lex_line_number);
+        SvPV_nolen_const(PL_parser->lex_filename), (IV)PL_parser->lex_line_number);
     if (context)
 	Perl_sv_catpvf(aTHX_ msg, "near \"%.*s\"\n", contlen, context);
     else

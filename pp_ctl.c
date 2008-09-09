@@ -415,7 +415,7 @@ PP(pp_grepstart)
     if ( ! SvAVOK(src) )
 	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
     
-    if ( av_len(SVav(src)) == -1 ) {
+    if ( av_len(SvAV(src)) == -1 ) {
 	(void)POPMARK;
 	XPUSHs(dst);
 	RETURNOP(PL_op->op_next->op_next);
@@ -435,7 +435,7 @@ PP(pp_grepstart)
     ENTER;					/* enter inner scope */
     SAVEVPTR(PL_curpm);
 
-    srcitem = av_shift(SVav(src));
+    srcitem = av_shift(SvAV(src));
     if (PL_op->op_type == OP_GREPSTART)
 	mXPUSHs(srcitem);
     if (PL_op->op_private & OPpGREP_LEX)
