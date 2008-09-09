@@ -1505,8 +1505,6 @@ sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims|NN yy_str_in
 sR	|char*	|scan_subst	|NN char *start
 s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 				|int allow_package|NN STRLEN *slp
-s	|void	|update_debugger_info|NULLOK SV *orig_sv \
-				|NULLOK const char *const buf|STRLEN len
 sR	|char*	|skipspace	|NN char *s
 sR	|char*	|swallow_bom	|NN char *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
