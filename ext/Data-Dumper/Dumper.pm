@@ -12,7 +12,6 @@ package Data::Dumper;
 our $VERSION = '2.121_16';
 
 require Exporter;
-require overload;
 
 BEGIN {
     our @ISA = qw(Exporter);

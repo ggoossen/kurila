@@ -1434,7 +1434,7 @@ sub _out {
 
   my $out = '';
   $parser->output_string( \$out );
-  DEBUG and print " _out to ", \$out, "\n";
+  DEBUG and print " _out to ", dump::view(\$out), "\n";
   
   $mutor->($parser) if $mutor;
 

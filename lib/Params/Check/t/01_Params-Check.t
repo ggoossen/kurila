@@ -2,10 +2,7 @@ use strict;
 use Test::More 'no_plan';
 
 ### use && import ###
-BEGIN {
-    use_ok( 'Params::Check' );
-    Params::Check->import( <qw|check last_error allow|);
-}    
+use Params::Check < qw|check last_error allow|;
 
 ### verbose is good for debugging ###
 $Params::Check::VERBOSE = $Params::Check::VERBOSE = @ARGV[0] ? 1 : 0;

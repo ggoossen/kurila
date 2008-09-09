@@ -817,7 +817,7 @@ sub _ponder_paragraph_buffer {
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       $para->[0] =~ s/^[~=]//s;
 
-      DEBUG and print "\n", < pretty($para), "\n";
+      DEBUG and print "\n", pretty($para), "\n";
 
       # traverse the treelet (which might well be just one string scalar)
       $self->{'content_seen'} ||= 1;
@@ -1408,11 +1408,11 @@ sub _traverse_treelet_bit {  # for use only by the routine above
   $self->_handle_element_start(($scratch=$name), shift @_);
   
   foreach my $x ( @_) {
-    if(ref($x)) {
-      &_traverse_treelet_bit($self, < @$x);
-    } else {
-      $self->_handle_text($x);
-    }
+      if(ref($x)) {
+          &_traverse_treelet_bit($self, < @$x);
+      } else {
+          $self->_handle_text($x);
+      }
   }
   
   $self->_handle_element_end($scratch=$name);

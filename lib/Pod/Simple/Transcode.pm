@@ -20,7 +20,7 @@ foreach my $class (@(
   DEBUG and print "About to try loading $class...\n";
   eval "require $class;";
   if($@) {
-    DEBUG and print "Couldn't load $class: $@\n";
+    DEBUG and print "Couldn't load $class: {$@->message}\n";
   } else {
     DEBUG and print "OK, loaded $class.\n";
     @ISA = @($class);
