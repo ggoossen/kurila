@@ -2656,9 +2656,9 @@ void
 Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 {
     dVAR;
-    register U32 sflags;
-    register int dtype;
-    register svtype stype;
+    U32 sflags;
+    svtype dtype;
+    svtype stype;
 
     PERL_ARGS_ASSERT_SV_SETSV_FLAGS;
 
@@ -2711,6 +2711,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 		break;
 	    case SVt_PVGV:
 		goto end_of_first_switch;
+	    default:
+		break;
 	    }
 	    (void)SvIOK_only(dstr);
 	    SvIV_set(dstr,  SvIVX(sstr));
@@ -2742,6 +2744,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 		break;
 	    case SVt_PVGV:
 		goto end_of_first_switch;
+	    default:
+		break;
 	    }
 	    SvNV_set(dstr, SvNVX(sstr));
 	    (void)SvNOK_only(dstr);

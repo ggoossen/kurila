@@ -3384,6 +3384,8 @@ PP(pp_aslice)
     register AV* const av = (AV*)POPs;
     register AV* slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
+    SV **sliceitem;
+    SV **slicemax;
 
     if (SvTYPE(av) != SVt_PVAV)
 	Perl_croak(aTHX_ "can't take an array slice from an %s", Ddesc((SV*)av));
@@ -3392,18 +3394,18 @@ PP(pp_aslice)
 	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
 
     slice = av_mortalcopy(slice);
-    XPUSHs(slice);
-    register SV **ip = AvARRAY(slice);
+    XPUSHs(AvSV(slice));
+    sliceitem = AvARRAY(slice);
 
-    if ( ! ip )
+    if ( ! sliceitem )
 	RETURN;
 
-    register SV **svpmax = AvARRAY(slice) + av_len(slice);
+    slicemax = AvARRAY(slice) + av_len(slice);
 
     if (lval && PL_op->op_private & OPpLVAL_INTRO) {
 	register SV **svp;
 	I32 max = -1;
-	for (svp = AvARRAY(slice); svp <= svpmax; svp++) {
+	for (svp = AvARRAY(slice); svp <= slicemax; svp++) {
 	    const I32 elem = SvIV(*svp);
 	    if (elem > max)
 		max = elem;
@@ -3411,9 +3413,9 @@ PP(pp_aslice)
 	if (max > AvMAX(av))
 	    av_extend(av, max);
     }
-    while (ip <= svpmax) {
+    while (sliceitem <= slicemax) {
 	register SV **svp;
-	I32 elem = SvIV(*ip);
+	I32 elem = SvIV(*sliceitem);
 	
 	svp = av_fetch(av, elem, lval);
 	if (lval) {
@@ -3422,8 +3424,8 @@ PP(pp_aslice)
 	    if (PL_op->op_private & OPpLVAL_INTRO)
 		save_aelem(av, elem, svp);
 	}
-	SVcpREPLACE(*ip, svp ? *svp : &PL_sv_undef );
-        ip++;
+	SVcpREPLACE(*sliceitem, svp ? *svp : &PL_sv_undef );
+        sliceitem++;
     }
 
     RETURN;
@@ -3519,7 +3521,7 @@ PP(pp_delete)
 	}
 
 	if ( ! discard)
-	    XPUSHs(slicecopy);
+	    XPUSHs(AvSV(slicecopy));
     }
     else {
 	SV *keysv = POPs;
@@ -3587,6 +3589,8 @@ PP(pp_hslice)
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
     bool other_magic = FALSE;
+    SV ** sliceitem;
+    SV ** slicemax;
 
     if (localizing) {
         MAGIC *mg;
@@ -3606,18 +3610,18 @@ PP(pp_hslice)
 	Perl_croak(aTHX_ "Not a HASH");
 
     if ( ! SvAVOK(slice) )
-	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(slice));
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSV(slice)));
 
-    slice = sv_mortalcopy(slice);
-    XPUSHs(slice);
+    slice = av_mortalcopy(slice);
+    XPUSHs(AvSV(slice));
 
-    SV ** ip = AvARRAY(slice);
-    if (!ip)
+    sliceitem = AvARRAY(slice);
+    if (!sliceitem)
 	RETURN;
-    SV ** ipmax = ip + av_len(slice);
+    slicemax = sliceitem + av_len(slice);
 
-    while (ip <= ipmax) {
-        SV * const keysv = *ip;
+    while (sliceitem <= slicemax) {
+        SV * const keysv = *sliceitem;
         SV **svp;
         HE *he;
         bool preeminent = FALSE;
@@ -3648,8 +3652,8 @@ PP(pp_hslice)
 		}
             }
         }
-        SVcpREPLACE(*ip, svp ? *svp : newSV(0) );
-	ip++;
+        SVcpREPLACE(*sliceitem, svp ? *svp : newSV(0) );
+	sliceitem++;
     }
     RETURN;
 }
@@ -4115,7 +4119,7 @@ PP(pp_push)
 
     if ( ! SvAVOK(ary) ) {
 	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
-	    OP_DESC(PL_op), Ddesc(ary));
+	    OP_DESC(PL_op), Ddesc(AvSV(ary)));
     }
 
     {
@@ -4197,7 +4201,7 @@ PP(pp_reverse)
     }
 
     ary = AvARRAY(av);
-    end = ary + av_len(av);
+    end = ary + av_len(SvAV(av));
     
     if (ary) {
 	while (ary < end) {
@@ -4229,13 +4233,10 @@ PP(pp_split)
     I32 maxiters = slen + 10;
     const char *orig;
     const I32 origlimit = limit;
-    I32 realarray = 0;
     I32 base;
-    const I32 gimme = GIMME_V;
     const I32 oldsave = PL_savestack_ix;
     U32 make_mortal = 0;
     bool multiline = 0;
-    MAGIC *mg = NULL;
 
 #ifdef DEBUGGING
     Copy(&LvTARGOFF(POPs), &pm, 1, PMOP*);
@@ -4415,7 +4416,7 @@ PP(pp_split)
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    XPUSHs(av);
+    XPUSHs(AvSV(av));
     RETURN;
 }
 
