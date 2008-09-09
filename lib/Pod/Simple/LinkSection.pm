@@ -46,14 +46,6 @@ sub new {
   return bless $new, $class;
 }
 
-use overload( # So it'll stringify nice
-  '""'   => \&as_string,
-  'bool' => \&as_string,
-  # '.='   => \&tack_on,  # grudgingly support
-  
-  'fallback' => 1,         # turn on cleverness
-);
-
 # Not much in this class is likely to be link-section specific --
 # but it just so happens that link-sections are about the only treelets
 # that are exposed to the user.

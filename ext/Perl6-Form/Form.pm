@@ -496,7 +496,7 @@ sub segment ($\@\%$\%) {
 						    | ($nestedbraces)			 (?{fldvals($^N,undef)})
 						  )
 					  /gcsx) {
-		push @format, < litval(), < fldvals();
+            push @format, < litval(), < fldvals();
 	}
 	push @format, substr ($format, pos($format)||0);
 	my $args_req = int((nelems @format)/3);
@@ -1370,18 +1370,8 @@ sub break_at {
 # }
 
 package Perl6::Form::Rule::Fail;
-use overload
-	'""'   => sub{ undef },
-	'0+'   => sub{ undef },
-	'bool' => sub{ 0 },
-;
 
 package Perl6::Form::Rule::Okay;
-use overload
-	'""'   => sub{ @_[0][0] },
-	'0+'   => sub{ @_[0][0] },
-	'bool' => sub{ 1 },
-;
 
 1;
 __END__

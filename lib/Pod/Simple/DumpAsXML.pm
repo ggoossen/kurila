@@ -24,7 +24,6 @@ sub new {
 sub _handle_element_start {
   # ($self, $element_name, $attr_hash_r)
   my $fh = @_[0]->{'output_fh'};
-  my($key, $value);
   DEBUG and print "++ @_[1]\n";
   
   print $fh   '  ' x (@_[0]->{'indent'} || 0),  "<", @_[1];
@@ -32,7 +31,11 @@ sub _handle_element_start {
   foreach my $key (sort keys %{@_[2]}) {
     unless($key =~ m/^~/s) {
       next if $key eq 'start_line' and @_[0]->{'hide_line_numbers'};
-      _xml_escape($value = @_[2]->{$key});
+      my $value = @_[2]->{$key};
+      if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/) {
+          $value = $value->as_string;
+      }
+      _xml_escape($value);
       print $fh ' ', $key, '="', $value, '"';
     }
   }

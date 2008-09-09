@@ -29,25 +29,18 @@ sub new {
 sub _handle_element_start {
   # ($self, $element_name, $attr_hash_r)
   my $fh = @_[0]->{'output_fh'};
-  my($key, $value);
   DEBUG and print "++ @_[1]\n";
   print $fh "<", @_[1];
-  if($SORT_ATTRS) {
-    foreach my $key (sort keys %{@_[2]}) {
+  foreach my $key (sort keys %{@_[2]}) {
       unless($key =~ m/^~/s) {
-        next if $key eq 'start_line' and @_[0]->{'hide_line_numbers'};
-        _xml_escape($value = @_[2]->{$key});
-        print $fh $ATTR_PAD, $key, '="', $value, '"';
+          next if $key eq 'start_line' and @_[0]->{'hide_line_numbers'};
+          my $value = @_[2]->{$key};
+          if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/) {
+              $value = $value->as_string;
+          }
+          _xml_escape($value);
+          print $fh $ATTR_PAD, $key, '="', $value, '"';
       }
-    }
-  } else { # faster
-    while(($key,$value) = each %{@_[2]}) {
-      unless($key =~ m/^~/s) {
-        next if $key eq 'start_line' and @_[0]->{'hide_line_numbers'};
-        _xml_escape($value);
-        print $fh $ATTR_PAD, $key, '="', $value, '"';
-      }
-    }
   }
   print $fh ">";
   return;
