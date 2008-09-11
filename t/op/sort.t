@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 101 );
+plan( tests => 77 );
 
 our (@a, @b);
 
@@ -334,174 +334,17 @@ package main;
     is "{join ' ',@a}", "c b a x", "un-inplace sort with function of lexical 2";
 }
 
-# Test optimisations of reversed sorts. As we now guarantee stability by
-# default, # optimisations which do not provide this are bogus.
-
-{
-    package Oscalar;
-
-    sub new {
-	bless \@(@_[1], @_[2]), @_[0];
-    }
-
-    sub stringify { @_[0]->[0] }
-
-    sub numify { @_[0]->[1] }
-
-    use overload ('""' => \&stringify, '0+' => \&numify, fallback => 1);
-}
-
-sub generate {
-    my $count = 0;
- map { Oscalar->new($_, $count++)} qw(A A A B B B C C C);
-}
-
-my @input = &generate;
-my @output = sort @input;
-is join(" ", map {0+$_} @output), "0 1 2 3 4 5 6 7 8", "Simple stable sort";
-
-@input = &generate;
-@input =sort @input;
-is join(" ", map {0+$_} @input), "0 1 2 3 4 5 6 7 8",
-    "Simple stable in place sort";
-
-# This won't be very interesting
-@input = &generate;
-@output = sort {$a <+> $b} @input;
-is "{join ' ',@output}", "A A A B B B C C C", 'stable $a <=> $b sort';
-
-@input = &generate;
-@output = sort {$a cmp $b} @input;
-is join(" ", map {0+$_} @output), "0 1 2 3 4 5 6 7 8", 'stable $a cmp $b sort';
-
-@input = &generate;
-@input =sort {$a cmp $b} @input;
-is join(" ", map {0+$_} @input), "0 1 2 3 4 5 6 7 8",
-    'stable $a cmp $b in place sort';
-
-@input = &generate;
-@output = sort {$b cmp $a} @input;
-is join(" ", map {0+$_} @output), "6 7 8 3 4 5 0 1 2", 'stable $b cmp $a sort';
-
-@input = &generate;
-@input =sort {$b cmp $a} @input;
-is join(" ", map {0+$_} @input), "6 7 8 3 4 5 0 1 2",
-    'stable $b cmp $a in place sort';
-
-@input = &generate;
-@output = reverse sort @input;
-is join(" ", map {0+$_} @output), "8 7 6 5 4 3 2 1 0", "Reversed stable sort";
-
-@input = &generate;
-@input = reverse sort @input;
-is join(" ", map {0+$_} @input), "8 7 6 5 4 3 2 1 0",
-    "Reversed stable in place sort";
-
-@input = &generate;
-@output = reverse sort {$a cmp $b} @input;
-is join(" ", map {0+$_} @output), "8 7 6 5 4 3 2 1 0",
-    'reversed stable $a cmp $b sort';
-
-@input = &generate;
-@input = reverse sort {$a cmp $b} @input;
-is join(" ", map {0+$_} @input), "8 7 6 5 4 3 2 1 0",
-    'revesed stable $a cmp $b in place sort';
-
-@input = &generate;
-@output = reverse sort {$b cmp $a} @input;
-is join(" ", map {0+$_} @output), "2 1 0 5 4 3 8 7 6",
-    'reversed stable $b cmp $a sort';
-
-@input = &generate;
-@input = reverse sort {$b cmp $a} @input;
-is join(" ", map {0+$_} @input), "2 1 0 5 4 3 8 7 6",
-    'revesed stable $b cmp $a in place sort';
-
-sub stuff {
-    # Something complex enough to defeat any constant folding optimiser
-    $$ - $$;
-}
-
-@input = &generate;
-@output = reverse sort {stuff || $a cmp $b} @input;
-is join(" ", map {0+$_} @output), "8 7 6 5 4 3 2 1 0",
-    'reversed stable complex sort';
-
-@input = &generate;
-@input = reverse sort {stuff || $a cmp $b} @input;
-is join(" ", map {0+$_} @input), "8 7 6 5 4 3 2 1 0",
-    'revesed stable complex in place sort';
-
-sub sortr {
-     reverse sort @_;
-}
-
-@output = sortr < &generate;
-is join(" ", map {0+$_} @output), "8 7 6 5 4 3 2 1 0",
-    'reversed stable sort return list context';
-
-sub sortcmpr {
-    return reverse sort {$a cmp $b} @_;
-}
-
-@output = sortcmpr < &generate;
-is join(" ", map {0+$_} @output), "8 7 6 5 4 3 2 1 0",
-    'reversed stable $a cmp $b sort return list context';
-
-sub sortcmprba {
-    reverse sort {$b cmp $a} @_;
-}
-
-@output = sortcmprba < &generate;
-is join(" ", map {0+$_} @output), "2 1 0 5 4 3 8 7 6",
-    'reversed stable $b cmp $a sort return list context';
-
-sub sortcmprq {
-    @(reverse < sort {stuff || $a cmp $b} @_);
-}
-
-@output = sortcmpr < &generate;
-is join(" ", map {0+$_} @output), "8 7 6 5 4 3 2 1 0",
-    'reversed stable complex sort return list context';
-
-# And now with numbers
-
-sub generate1 {
-    my $count = 'A';
- map { Oscalar->new($count++, $_)} @( 0, 0, 0, 1, 1, 1, 2, 2, 2);
-}
-
-# This won't be very interesting
-@input = &generate1;
-@output = sort {$a cmp $b} @input;
-is "{join ' ',@output}", "A B C D E F G H I", 'stable $a cmp $b sort';
-
-@input = &generate1;
-@output = sort {$a <+> $b} @input;
-is "{join ' ',@output}", "A B C D E F G H I", 'stable $a <=> $b sort';
-
-@input = &generate1;
-@input =sort {$a <+> $b} @input;
-is "{join ' ',@input}", "A B C D E F G H I", 'stable $a <=> $b in place sort';
-
-@input = &generate1;
-@output = sort {$b <+> $a} @input;
-is "{join ' ',@output}", "G H I D E F A B C", 'stable $b <=> $a sort';
-
-@input = &generate1;
-@input =sort {$b <+> $a} @input;
-is "{join ' ',@input}", "G H I D E F A B C", 'stable $b <=> $a in place sort';
-
 # test that optimized {$b cmp $a} and {$b <=> $a} remain stable
 # (new in 5.9) without overloading
 { no warnings;
-@input = qw/5first 6first 5second 6second/;
+my @input = qw/5first 6first 5second 6second/;
 @b = sort { $b <+> $a }@input;
 is "{join ' ',@b}" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
 @input =sort {$b <+> $a} @input;
 is "{join ' ',@input}" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
 };
 
+my @output;
 #dies_like( sub { @output = sort {goto sub {}} 1,2; },
 main::dies_like( sub { @output = sort {goto sub {}} @( 1,2); },
                  qr(^Can't goto subroutine outside a subroutine),

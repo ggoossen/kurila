@@ -42,26 +42,6 @@ EXPECT
 WARNHOOK
 END
 ########
-package TEST;
- 
-sub str {
-  eval('die("test\n")');
-  return "STR";
-}
- 
-use overload
-     "\"\""   =>  \&str
-;
- 
-package main;
- 
-our $bar = bless \%(), 'TEST';
-print "$bar\n";
-print "OK\n";
-EXPECT
-STR
-OK
-########
 sub foo {
   goto bar if $a == 0 || $b == 0;
   $a <+> $b;

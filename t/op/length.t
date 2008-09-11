@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan (tests => 22);
+plan (tests => 21);
 
 ok(length("")    == 0);
 
@@ -94,16 +94,5 @@ my $u;
 is(length($u), undef, "Length of regular scalar");
 
 $u = "Gotcha!";
-
-{
-    package U;
-    use overload '""' => sub {return undef;};
-}
-
-my $uo = bless \@(), 'U';
-
-is(length($uo), undef, "Length of overloaded reference");
-
-# ok(!defined $uo); Turns you can't test this. FIXME for pp_defined?
 
 is($warnings, 0, "There were no warnings");
