@@ -37,15 +37,20 @@ our (@FOO, $expect);
 	$uv_big, $uv_bigi, $iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big,
 	$iv_small);
 
-$expect = 2 + 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
+$expect = 5 + 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
 plan tests => $expect;
 
 {
     dies_like( sub { @(1,2) +< 3 },
                qr/ARRAY used as a number/);
 
-    dies_like( sub { \(2) +< \(3) },
-               qr/REF used as a number/);
+    for my $sub ( @: sub { \2 +< \3 },
+                  sub { \2 +<= \3 },
+                  sub { \2 +> \3 },
+                  sub { \2 +>= \3 } ) {
+        dies_like( sub { $sub->() },
+                   qr/REF used as a number/);
+    }
 }
 
 sub nok ($$$$$$$) {
