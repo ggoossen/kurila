@@ -1608,16 +1608,6 @@ PP(pp_lt)
 	}
     }
 #endif
-#ifndef NV_PRESERVES_UV
-#ifdef PERL_PRESERVE_IVUV
-    else
-#endif
-    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-	SP--;
-	SETs(boolSV(SvRV(TOPs) < SvRV(TOPp1s)));
-	RETURN;
-    }
-#endif
     {
 #if defined(NAN_COMPARE_BROKEN) && defined(Perl_isnan)
       dPOPTOPnnrl;
@@ -1687,16 +1677,6 @@ PP(pp_gt)
 		RETURN;
 	    }
 	}
-    }
-#endif
-#ifndef NV_PRESERVES_UV
-#ifdef PERL_PRESERVE_IVUV
-    else
-#endif
-    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-        SP--;
-        SETs(boolSV(SvRV(TOPs) > SvRV(TOPp1s)));
-        RETURN;
     }
 #endif
     {
