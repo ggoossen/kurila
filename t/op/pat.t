@@ -47,7 +47,7 @@ BEGIN {
   require "./test.pl";
 }
 
-plan 1655;
+plan 1653;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);
@@ -763,17 +763,6 @@ ok("\n\n" =~ m/\n+ $ \n/x);
   dies_like( sub { \@() =~ m/^ARRAY/ },
              qr/Tried to stringify a reference/);
 }
-
-eval << 'EOE'; die if $@;
-{
- package S;
- use overload '""' => sub { 'Object S' };
- sub new { bless \@() }
-}
-$a = 'S'->new;
-EOE
-
-ok(($a and $a =~ m/^Object\sS/), '$a');
 
 # test result of match used as match (!)
 ok( 'a1b' =~ ('xyz' =~ m/y/) );
@@ -2199,16 +2188,6 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
 {
     ok("\x{100}\n" =~ m/\x{100}\n$/, "UTF8 length cache and fbm_compile");  
-}
-
-{
-    package Str;
-    use overload q/""/ => sub { ${@_[0]}; };
-    sub new { my ($c, $v) = < @_; bless \$v, $c; }
-
-    package main;
-    $_ = Str->new("a\x{100}/\x{100}b");
-    ok(join(":", @( m/\b(.)\x{100}/g)) eq "a:/", "re_intuit_start and PL_bostr");
 }
 
 {

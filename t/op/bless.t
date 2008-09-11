@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan (100);
+plan (95);
 
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
@@ -114,16 +114,6 @@ expected(bless(\@()), 'main', "ARRAY");
 $a1 = bless \%(), "A4";
 $b1 = try { bless \%(), $a1 };
 like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
-
-# class is an overloaded ref
-{
-    package H4;
-    use overload '""' => sub { "C4" };
-}
-my $h1 = bless \%(), "H4";
-my $c4 = try { bless \$test, $h1 };
-is ($@, '', "class is an overloaded ref");
-expected($c4, 'C4', "SCALAR");
 
 {
     my %h = %( < 1..2 );

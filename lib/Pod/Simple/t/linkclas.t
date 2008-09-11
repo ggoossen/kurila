@@ -3,7 +3,7 @@
 
 use strict;
 use Test::More;
-plan tests => 8;
+plan tests => 6;
 
 #use Pod::Simple::Debug (6);
 
@@ -31,7 +31,6 @@ is ref($treelet), 'Pod::Simple::LinkSection';
 print "# Testing stringification...\n";
 
 is $treelet->stringify, 'abc';  # explicit
-is join('', @( $treelet)),  'abc';  # implicit
 
 
 print "# Testing non-coreferentiality...\n";
@@ -54,7 +53,6 @@ print "# Testing non-coreferentiality...\n";
   # since we just conspicuously nuked $bare_treelet
   
   is $treelet->stringify, 'abc';  # explicit
-  is join('', @( $treelet)),  'abc';  # implicit
 }
 
 
