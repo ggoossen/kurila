@@ -1838,13 +1838,6 @@ PP(pp_ge)
 PP(pp_ne)
 {
     dVAR; dSP; tryAMAGICbinSET(ne,0);
-#ifndef NV_PRESERVES_UV
-    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-        SP--;
-	SETs(boolSV(SvRV(TOPs) != SvRV(TOPp1s)));
-	RETURN;
-    }
-#endif
 #ifdef PERL_PRESERVE_IVUV
     if (SvIOK(TOPs)) {
 	if (SvIOK(TOPm1s)) {
@@ -1912,11 +1905,6 @@ PP(pp_ne)
 PP(pp_ncmp)
 {
     dVAR; dSP; dTARGET; tryAMAGICbin(ncmp,0);
-#ifndef NV_PRESERVES_UV
-    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-	Perl_croak(aTHX_ "reference may not be used as a number");
-    }
-#endif
 #ifdef PERL_PRESERVE_IVUV
     /* Fortunately it seems NaN isn't IOK */
     if (SvIOK(TOPs)) {
