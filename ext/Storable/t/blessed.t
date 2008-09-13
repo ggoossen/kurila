@@ -127,7 +127,7 @@ sub STORABLE_thaw {
 	die "'$x' did not give a reference" unless ref $expect;
 	my $fail;
 	foreach ( @refs) {
-	  $fail++ if $_ != $expect;
+	  $fail++ if $_ \!= $expect;
 	}
 	main::ok ++$test, !$fail;
 }
