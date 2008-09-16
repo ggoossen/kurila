@@ -1396,6 +1396,9 @@ sub init_VERSION {
 
     # strip blanks
     if (defined $self->{VERSION}) {
+        if (ref $self->{VERSION} and $self->{VERSION}->isa('version')) {
+            $self->{VERSION} = $self->{VERSION}->stringify;
+        }
         $self->{VERSION} =~ s/^\s+//;
         $self->{VERSION} =~ s/\s+$//;
     }

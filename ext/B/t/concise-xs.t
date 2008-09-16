@@ -139,7 +139,7 @@ my $testpkgs = \%(
 		  main_start main_root main_cv init_av inc_gv hash
 		  end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
-		  begin_av amagic_generation sub_generation address
+		  begin_av sub_generation address
                   set_main_start set_main_root fudge unitcheck_av),
     ),
 

@@ -1,20 +1,9 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = @( '../lib' );
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
-chdir 't';
 
 use Test::More;
 use ExtUtils::MakeMaker;
-
-my $Has_Version = eval 'require version; "version"->import; 1';
+use version;
 
 my %versions = %(q[$VERSION = '1.00']        => '1.00',
                 q[*VERSION = \'1.01']       => '1.01',
@@ -32,17 +21,16 @@ my %versions = %(q[$VERSION = '1.00']        => '1.00',
                 q[our $VERSION = '1.23';]       => '1.23',
                );
 
-if( $Has_Version ) {
-    %versions{q[use version; $VERSION = v1.2.3;]} = v1.2.3;
-    %versions{q[$VERSION = v1.2.3]}               = v1.2.3;
-}
-
-plan tests => (2 * nkeys %versions) + 4;
+plan tests => (2 * nkeys %versions) + 8;
 
 while( my($code, $expect) = each %versions ) {
-    is( ''.parse_version_string($code), $expect, $code );
+    is( parse_version_string($code), $expect, $code );
 }
 
+for my $v (@: @(q[use version; $VERSION = v1.2.3;], v1.2.3),
+           @(q[$VERSION = v1.2.3], v1.2.3)) {
+    is( parse_version_string($v[0])->stringify, $v[1]->stringify, $v[0]);
+}
 
 sub parse_version_string {
     my $code = shift;
@@ -64,10 +52,9 @@ sub parse_version_string {
 # This is a specific test to see if a version subroutine in the $VERSION
 # declaration confuses later calls to the version class.
 # [rt.cpan.org 30747]
-SKIP: {
-    skip "need version.pm", 4 unless $Has_Version;
+{
     is parse_version_string(q[ $VERSION = '1.00'; sub version { $VERSION } ]),
        '1.00';
-    is ''.parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ]),
-       qv("1.2.3");
+    is parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ])->stringify,
+       qv("1.2.3")->stringify;
 }

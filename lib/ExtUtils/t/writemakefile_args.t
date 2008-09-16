@@ -13,7 +13,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More tests => 26;
+use Test::More tests => 24;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
@@ -154,26 +154,20 @@ VERIFY
 
         my $version = version->new("1.2.3");
         $warnings = '';
-        try {
-            $mm = WriteMakefile(
+        $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => $version,
-            );
-        };
+        );
         is( $warnings, '' );
-        isa_ok( $mm->{VERSION}, 'version' );
-        is( $mm->{VERSION}, $version );
+        is( $mm->{VERSION}, $version->stringify );
 
         $warnings = '';
         $version = qv('1.2.3');
-        try {
-            $mm = WriteMakefile(
+        $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => $version,
-            );
-        };
+        );
         is( $warnings, '' );
-        isa_ok( $mm->{VERSION}, 'version' );
-        is( $mm->{VERSION}, $version, 'correct version' );
+        is( $mm->{VERSION}, $version->stringify, 'correct version' );
     }
 }
