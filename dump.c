@@ -1219,8 +1219,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_bm)         s = "bm";
             else if (v == &PL_vtbl_uvar)       s = "uvar";
             else if (v == &PL_vtbl_defelem)    s = "defelem";
-	    else if (v == &PL_vtbl_amagic)     s = "amagic";
-	    else if (v == &PL_vtbl_amagicelem) s = "amagicelem";
 	    else if (v == &PL_vtbl_backref)    s = "backref";
 	    else if (v == &PL_vtbl_utf8)       s = "utf8";
             else if (v == &PL_vtbl_hintselem)  s = "hintselem";
@@ -1419,7 +1417,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     if (flags & SVf_READONLY)	sv_catpv(d, "READONLY,");
     if (flags & SVf_BREAK)	sv_catpv(d, "BREAK,");
 
-    if (flags & SVf_AMAGIC)	sv_catpv(d, "OVERLOAD,");
     if (flags & SVp_IOK)	sv_catpv(d, "pIOK,");
     if (flags & SVp_NOK)	sv_catpv(d, "pNOK,");
     if (flags & SVp_POK)	sv_catpv(d, "pPOK,");

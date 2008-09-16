@@ -11,11 +11,8 @@ my @fjles_to_delete = qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
 krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm);
 
 
-my $Is_EBCDIC = (ord('A') == 193) ? 1 : 0;
-my $Is_UTF8   = ($^OPEN || "") =~ m/:utf8/;
-my $total_tests = 31;
+my $total_tests = 27;
 
-if ($Is_EBCDIC || $Is_UTF8) { $total_tests -= 3; }
 print "1..$total_tests\n";
 
 sub do_require {
@@ -37,21 +34,6 @@ sub write_file {
 eval 'require 5.005';
 print "not " unless $@;
 print "ok ",$i++,"\n";
-
-print "not " unless (v5.5.1 cmp v5.5) +> 0;
-print "ok ",$i++,"\n";
-
-{
-    print "not " unless v5.5.640 eq "v5.5.640";
-    print "ok ",$i++,"\n";
-
-    print "not " unless v7.15 eq "v7.15";
-    print "ok ",$i++,"\n";
-
-    print "not "
-      unless v1.20.300.4000.50000.600000 eq "v1.20.300.4000.50000.600000";
-    print "ok ",$i++,"\n";
-}
 
 # interaction with pod (see the eof)
 write_file('bleah.pm', "print 'ok $i\n'; 1;\n");
@@ -217,8 +199,6 @@ print "ok ", ++$i, " circular require\n";
 ##########################################
 
 # UTF-encoded things - skipped on EBCDIC machines and on UTF-8 input
-
-if ($Is_EBCDIC || $Is_UTF8) { exit; }
 
 require utf8;
 my $utf8 = utf8::chr(0xFEFF);

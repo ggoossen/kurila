@@ -253,8 +253,6 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("UNIVERSAL::DOES",            XS_UNIVERSAL_DOES,        file);
     newXS("UNIVERSAL::VERSION", 	XS_UNIVERSAL_VERSION, 	  file);
     {
-	/* register the overloading (type 'A') magic */
-	PL_amagic_generation++;
 	/* Make it findable via fetchmethod */
 	newXS("version::()", XS_version_noop, file);
 	newXS("version::new", XS_version_new, file);
@@ -1982,32 +1980,6 @@ XS(XS_dump_view)
     }
 
     if (SvROK(sv)) {
-/* 	sv_setpv(retsv, "REF"); */
-
-/*             if (SvAMAGIC(sv)) { */
-/* 		SV *const tmpstr = AMG_CALLun(sv,string); */
-/* 		if (tmpstr && (!SvROK(tmpstr) || (SvRV(tmpstr) != SvRV(sv)))) { */
-/* 		    /\* Unwrap this:  *\/ */
-/* 		    /\* char *pv = lp ? SvPV(tmpstr, *lp) : SvPV_nolen(tmpstr); */
-/* 		     *\/ */
-
-/* 		    char *pv; */
-/* 		    if ((SvFLAGS(tmpstr) & (SVf_POK)) == SVf_POK) { */
-/* 			if (flags & SV_CONST_RETURN) { */
-/* 			    pv = (char *) SvPVX_const(tmpstr); */
-/* 			} else { */
-/* 			    pv = (flags & SV_MUTABLE_RETURN) */
-/* 				? SvPVX_mutable(tmpstr) : SvPVX(tmpstr); */
-/* 			} */
-/* 			if (lp) */
-/* 			    *lp = SvCUR(tmpstr); */
-/* 		    } else { */
-/* 			pv = sv_2pv_flags(tmpstr, lp, flags); */
-/* 		    } */
-/* 		    return pv; */
-/* 		} */
-/* 	    } */
-/* 	    { */
 		STRLEN len;
 		char *retval;
 		char *buffer;

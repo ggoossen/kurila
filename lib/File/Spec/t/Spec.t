@@ -712,7 +712,7 @@ plan tests => scalar (nelems @tests) + 1;
 
     # Some funky stuff to override Cwd::getdcwd() for testing purposes,
     # in the limited scope of the rel2abs() method.
-    if ($Cwd::VERSION && $Cwd::VERSION +> v2.17) {  # Avoid a 'used only once' warning
+    if ($Cwd::VERSION) {  # Avoid a 'used only once' warning
 	local $^W;
 	*rel2abs = sub {
 	    my $self = shift;

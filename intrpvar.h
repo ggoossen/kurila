@@ -447,8 +447,6 @@ PERLVAR(Ihints,		U32)		/* pragma-tic compile-time flags */
 
 PERLVAR(Idebug,		VOL U32)	/* flags given to -D switch */
 
-PERLVARI(Iamagic_generation,	long,	0)
-
 
 #if defined (PERL_UTF8_CACHE_ASSERT) || defined (DEBUGGING)
 #  define PERL___I -1

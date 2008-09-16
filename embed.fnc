@@ -98,7 +98,6 @@ END_EXTERN_C
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
 #  include "pp_proto.h"
-Ap	|SV*	|amagic_call	|NN SV* left|NN SV* right|int method|int dir
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
 ApR	|CV*	|gv_handler	|NULLOK HV* stash|I32 id
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
@@ -445,7 +444,6 @@ p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_regdatum_get|NN SV* sv|NN MAGIC* mg
 pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setamagic|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdbline|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setenv	|NN SV* sv|NN MAGIC* mg
@@ -1303,9 +1301,6 @@ sR	|SV*	|method_common	|NN SV* meth|NULLOK U32* hashp
 #if defined(PERL_IN_PP_SORT_C) || defined(PERL_DECL_PROT)
 s	|I32	|sv_ncmp	|NN SV *const a|NN SV *const b
 s	|I32	|sv_i_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|amagic_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|amagic_i_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|amagic_cmp	|NN SV *const str1|NN SV *const str2
 s	|I32	|sortcv		|NN SV *const a|NN SV *const b
 s	|I32	|sortcv_xsub	|NN SV *const a|NN SV *const b
 s	|I32	|sortcv_stacked	|NN SV *const a|NN SV *const b

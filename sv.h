@@ -373,7 +373,7 @@ perform the upgrade if necessary.  See C<svtype>.
 
 #define PRIVSHIFT 4	/* (SVp_?OK >> PRIVSHIFT) == SVf_?OK */
 
-#define SVf_AMAGIC	0x10000000  /* has magical overloaded methods */
+#define SVf_NOTUSED	0x10000000  /* has magical overloaded methods */
 
 /* Some private flags. */
 
@@ -814,38 +814,6 @@ in gv.h: */
 #define SvRMAGICAL(sv)		(SvFLAGS(sv) & SVs_RMG)
 #define SvRMAGICAL_on(sv)	(SvFLAGS(sv) |= SVs_RMG)
 #define SvRMAGICAL_off(sv)	(SvFLAGS(sv) &= ~SVs_RMG)
-
-#define SvAMAGIC(sv)		(SvROK(sv) && (SvFLAGS(SvRV(sv)) & SVf_AMAGIC))
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvAMAGIC_on(sv)	({ SV * const kloink = sv;		\
-				   assert(SvROK(kloink));		\
-				   SvFLAGS(SvRV(kloink)) |= SVf_AMAGIC;	\
-				})
-#  define SvAMAGIC_off(sv)	({ SV * const kloink = sv;		\
-				   if(SvROK(kloink))			\
-					SvFLAGS(SvRV(kloink)) &= ~SVf_AMAGIC;\
-				})
-#else
-#  define SvAMAGIC_on(sv)	(SvFLAGS(SvRV(sv)) |= SVf_AMAGIC)
-#  define SvAMAGIC_off(sv) \
-	(SvROK(sv) && (SvFLAGS(SvRV(sv)) &= ~SVf_AMAGIC))
-#endif
-
-/*
-=for apidoc Am|char*|SvGAMAGIC|SV* sv
-
-Returns true if the SV has get magic or overloading. If either is true then
-the scalar is active data, and has the potential to return a new value every
-time it is accessed. Hence you must be careful to only read it once per user
-logical operation and work with that returned value. If neither is true then
-the scalar's value cannot change unless written to.
-
-=cut
-*/
-
-#define SvGAMAGIC(sv)           (SvGMAGICAL(sv) || SvAMAGIC(sv))
-
-#define Gv_AMG(stash)           (PL_amagic_generation && Gv_AMupdate(stash))
 
 #define SvWEAKREF(sv)		((SvFLAGS(sv) & (SVf_ROK|SVprv_WEAKREF)) \
 				  == (SVf_ROK|SVprv_WEAKREF))

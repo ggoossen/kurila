@@ -281,7 +281,7 @@ sub check_install {
         ### ie ones containing _ as well. This addresses bug report
         ### #29348: Version compare logic doesn't handle alphas?
         $href->{uptodate} = 
-            qv( $args->{version} ) +<= qv( $href->{version} ) ? 1 : 0;
+            version->new( $args->{version} )->vcmp( $href->{version} ) +<= 0;
     }
 
     return $href;

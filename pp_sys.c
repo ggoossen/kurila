@@ -366,7 +366,6 @@ PP(pp_glob)
     dVAR;
     OP *result;
     GV* gv;
-    tryAMAGICunTARGET(iter, -1);
 
     /* Note that we only ever get here if File::Glob fails to load
      * without at the same time croaking, for some reason, or if
@@ -1387,7 +1386,7 @@ PP(pp_send)
 
 	if (IN_CODEPOINTS) {
 		/* The SV really is UTF-8.  */
-		if (SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
+		if (SvGMAGICAL(bufsv)) {
 		    /* Don't call sv_len_utf8 again because it will call magic
 		       or overloading a second time, and we might get back a
 		       different result.  */
@@ -1432,7 +1431,7 @@ PP(pp_send)
 	    length = blen_chars - offset;
 	if (IN_CODEPOINTS) {
 	    /* Here we convert length from characters to bytes.  */
-	    if (SvGMAGICAL(bufsv) || SvAMAGIC(bufsv)) {
+	    if (SvGMAGICAL(bufsv)) {
 		/* Either we had to convert the SV, or the SV is magical, or
 		   the SV has overloading, in which case we can't or mustn't
 		   or mustn't call it again.  */

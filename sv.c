@@ -1710,13 +1710,7 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
     } else if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
 	return_rok:
-	    if (SvAMAGIC(sv)) {
-		SV * const tmpstr=AMG_CALLun(sv,numer);
-		if (tmpstr && (!SvROK(tmpstr) || (SvRV(tmpstr) != SvRV(sv)))) {
-		    return SvIV(tmpstr);
-		}
-	    }
-	    Perl_croak(aTHX_ "Can't coerce reference to number");
+	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 	if (SvIsCOW(sv)) {
 	    sv_force_normal_flags(sv, 0);
@@ -1823,13 +1817,7 @@ Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
     } else if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
 	return_rok:
-	    if (SvAMAGIC(sv)) {
-		SV *const tmpstr = AMG_CALLun(sv,numer);
-		if (tmpstr && (!SvROK(tmpstr) || (SvRV(tmpstr) != SvRV(sv)))) {
-		    return SvUV(tmpstr);
-		}
-	    }
-	    return PTR2UV(SvRV(sv));
+	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 	if (SvIsCOW(sv)) {
 	    sv_force_normal_flags(sv, 0);
@@ -1971,12 +1959,6 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
     } else if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
 	return_rok:
-	    if (SvAMAGIC(sv)) {
-		SV *const tmpstr = AMG_CALLun(sv,numer);
-                if (tmpstr && (!SvROK(tmpstr) || (SvRV(tmpstr) != SvRV(sv)))) {
-		    return SvNV(tmpstr);
-		}
-	    }
 	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 	if (SvIsCOW(sv)) {
@@ -2162,11 +2144,6 @@ Perl_sv_2num(pTHX_ register SV *const sv)
     PERL_ARGS_ASSERT_SV_2NUM;
 
     if (SvROK(sv)) {
-	if (SvAMAGIC(sv)) {
-	    SV * const tmpsv = AMG_CALLun(sv,numer);
-	    if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
-		return sv_2num(tmpsv);
-	}
 	Perl_croak(aTHX_ "Reference can't be used as a number");
     }
     if (SvAVOK(sv))
@@ -2286,29 +2263,6 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
     } else if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
 	return_rok:
-            if (SvAMAGIC(sv)) {
-		SV *const tmpstr = AMG_CALLun(sv,string);
-		if (tmpstr && (!SvROK(tmpstr) || (SvRV(tmpstr) != SvRV(sv)))) {
-		    /* Unwrap this:  */
-		    /* char *pv = lp ? SvPV(tmpstr, *lp) : SvPV_nolen(tmpstr);
-		     */
-
-		    char *pv;
-		    if ((SvFLAGS(tmpstr) & (SVf_POK)) == SVf_POK) {
-			if (flags & SV_CONST_RETURN) {
-			    pv = (char *) SvPVX_const(tmpstr);
-			} else {
-			    pv = (flags & SV_MUTABLE_RETURN)
-				? SvPVX_mutable(tmpstr) : SvPVX(tmpstr);
-			}
-			if (lp)
-			    *lp = SvCUR(tmpstr);
-		    } else {
-			pv = sv_2pv_flags(tmpstr, lp, flags);
-		    }
-		    return pv;
-		}
-	    }
 	    {
 		const SV *const referent = (SV*)SvRV(sv);
 
@@ -2473,11 +2427,6 @@ Perl_sv_2bool(pTHX_ register SV *const sv)
     if (!SvOK(sv))
 	return 0;
     if (SvROK(sv)) {
-	if (SvAMAGIC(sv)) {
-	    SV * const tmpsv = AMG_CALLun(sv,bool_);
-	    if (tmpsv && (!SvROK(tmpsv) || (SvRV(tmpsv) != SvRV(sv))))
-		return (bool)SvTRUE(tmpsv);
-	}
 	return SvRV(sv) != 0;
     }
     if (SvPOKp(sv)) {
@@ -2678,8 +2627,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     }
     stype = SvTYPE(sstr);
     dtype = SvTYPE(dstr);
-
-    (void)SvAMAGIC_off(dstr);
 
     /* clear the destination sv if it will be upgraded to a hash or an array */
     if ( (dtype == SVt_PVHV || dtype == SVt_PVAV || stype == SVt_PVAV || stype == SVt_PVHV)
@@ -3861,12 +3808,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_sv:
 	vtable = &PL_vtbl_sv;
 	break;
-    case PERL_MAGIC_overload:
-        vtable = &PL_vtbl_amagic;
-        break;
-    case PERL_MAGIC_overload_elem:
-        vtable = &PL_vtbl_amagicelem;
-        break;
     case PERL_MAGIC_overload_table:
         vtable = &PL_vtbl_ovrld;
         break;
@@ -4397,36 +4338,29 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     if (SvOBJECT(sv)) {
 	if (PL_defstash) {		/* Still have a symbol table? */
 	    dSP;
-	    HV* stash;
-	    do {	
-		CV* destructor;
-		stash = SvSTASH(sv);
-		destructor = StashHANDLER(stash,DESTROY);
-		if (destructor) {
-		    SV* const tmpref = newRV(sv);
-	            SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
-		    ENTER;
-		    PUSHSTACKi(PERLSI_DESTROY);
-		    EXTEND(SP, 2);
-		    PUSHMARK(SP);
-		    PUSHs(tmpref);
-		    PUTBACK;
-		    call_sv((SV*)destructor, G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
+	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
+	    if (destructor) {
+		SV* const tmpref = newRV(sv);
+		SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
+		ENTER;
+		PUSHSTACKi(PERLSI_DESTROY);
+		EXTEND(SP, 2);
+		PUSHMARK(SP);
+		PUSHs(tmpref);
+		PUTBACK;
+		call_sv((SV*)GvCV(destructor), G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
 		
-		
-		    POPSTACK;
-		    SPAGAIN;
-		    LEAVE;
-		    if(SvREFCNT(tmpref) < 2) {
-		        /* tmpref is not kept alive! */
-		        SvREFCNT(sv)--;
-			SvRV_set(tmpref, NULL);
-			SvROK_off(tmpref);
-		    }
-		    SvREFCNT_dec(tmpref);
+		POPSTACK;
+		SPAGAIN;
+		LEAVE;
+		if(SvREFCNT(tmpref) < 2) {
+		    /* tmpref is not kept alive! */
+		    SvREFCNT(sv)--;
+		    SvRV_set(tmpref, NULL);
+		    SvROK_off(tmpref);
 		}
-	    } while (SvOBJECT(sv) && SvSTASH(sv) != stash);
-
+		SvREFCNT_dec(tmpref);
+	    }
 
 	    if (SvREFCNT(sv)) {
 		if (PL_in_clean_objs)
@@ -5733,8 +5667,6 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 		Perl_croak(aTHX_ PL_no_modify);
 	}
 	if (SvROK(sv)) {
-	    if (SvAMAGIC(sv) && AMG_CALLun(sv,inc))
-		return;
 	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
@@ -5896,8 +5828,6 @@ Perl_sv_dec(pTHX_ register SV *const sv)
 		Perl_croak(aTHX_ PL_no_modify);
 	}
 	if (SvROK(sv)) {
-	    if (SvAMAGIC(sv) && AMG_CALLun(sv,dec))
-		return;
 	    Perl_croak(aTHX_ "Can't coerce reference to number");
 	}
     }
@@ -6528,9 +6458,6 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
     default:
 	SvGETMAGIC(sv);
 	if (SvROK(sv)) {
-	    SV * const *sp = &sv;	/* Used in tryAMAGICunDEREF macro. */
-	    tryAMAGICunDEREF(to_cv);
-
 	    sv = SvRV(sv);
 	    if (SvTYPE(sv) == SVt_PVCV) {
 		cv = (CV*)sv;
@@ -6801,7 +6728,6 @@ Perl_newSVrv(pTHX_ SV *const rv, const char *const classname)
     new_SV(sv);
 
     SV_CHECK_THINKFIRST_COW_DROP(rv);
-    (void)SvAMAGIC_off(rv);
 
     if (SvTYPE(rv) >= SVt_PVMG) {
 	const U32 refcnt = SvREFCNT(rv);
@@ -6987,11 +6913,6 @@ Perl_sv_bless(pTHX_ SV *const sv, HV *const stash)
 	++PL_sv_objcount;
     SvUPGRADE(tmpRef, SVt_PVMG);
     SvSTASH_set(tmpRef, (HV*)SvREFCNT_inc_simple(stash));
-
-    if (Gv_AMG(stash))
-	SvAMAGIC_on(sv);
-    else
-	(void)SvAMAGIC_off(sv);
 
     if(SvSMAGICAL(tmpRef))
         if(mg_find(tmpRef, PERL_MAGIC_ext) || mg_find(tmpRef, PERL_MAGIC_uvar))
@@ -8805,20 +8726,7 @@ Perl_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *const param)
 	nmg->mg_len	= mg->mg_len;
 	nmg->mg_ptr	= mg->mg_ptr;	/* XXX random ptr? */
 	if (mg->mg_ptr && mg->mg_type != PERL_MAGIC_regex_global) {
-	    if (mg->mg_len > 0) {
-		nmg->mg_ptr	= SAVEPVN(mg->mg_ptr, mg->mg_len);
-		if (mg->mg_type == PERL_MAGIC_overload_table &&
-			AMT_AMAGIC((AMT*)mg->mg_ptr))
-		{
-		    const AMT * const amtp = (AMT*)mg->mg_ptr;
-		    AMT * const namtp = (AMT*)nmg->mg_ptr;
-		    I32 i;
-		    for (i = 1; i < NofAMmeth; i++) {
-			namtp->table[i] = cv_dup_inc(amtp->table[i], param);
-		    }
-		}
-	    }
-	    else if (mg->mg_len == HEf_SVKEY)
+	    if (mg->mg_len == HEf_SVKEY)
 		nmg->mg_ptr	= (char*)sv_dup_inc((SV*)mg->mg_ptr, param);
 	}
 	if ((mg->mg_flags & MGf_DUP) && mg->mg_virtual && mg->mg_virtual->svt_dup) {
@@ -10304,8 +10212,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 #endif
 
     PL_hints		= proto_perl->Ihints;
-
-    PL_amagic_generation	= proto_perl->Iamagic_generation;
 
 #ifdef USE_LOCALE_NUMERIC
     PL_numeric_name	= SAVEPV(proto_perl->Inumeric_name);

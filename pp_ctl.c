@@ -97,15 +97,6 @@ PP(pp_regcomp)
 	tmpstr = PAD_SV(ARGTARG);
 	sv_setpvn(tmpstr, "", 0);
 	while (++MARK <= SP) {
-	    if (PL_amagic_generation) {
-		SV *sv;
-		if ((SvAMAGIC(tmpstr) || SvAMAGIC(*MARK)) &&
-		    (sv = amagic_call(tmpstr, *MARK, concat_amg, AMGf_assign)))
-		{
-		   sv_setsv(tmpstr, sv);
-		   continue;
-		}
-	    }
 	    sv_catsv(tmpstr, *MARK);
 	}
     	SvSETMAGIC(tmpstr);
@@ -3101,8 +3092,6 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 #   define SM_SEEN_OTHER(sv) hv_exists_ent(seen_other, \
 	sv_2mortal(newSViv(PTR2IV(sv))), 0)
 
-    tryAMAGICbinSET(smart, 0);
-    
     SP -= 2;	/* Pop the values */
 
     /* Take care only to invoke mg_get() once for each argument. 

@@ -2252,7 +2252,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 		if (lookahead.howlen == e_number) count = lookahead.length;
 		else {
 		    if (items > 0) {
-			if (SvGAMAGIC(*beglist)) {
+			if (SvGMAGICAL(*beglist)) {
 			    /* Avoid reading the active data more than once
 			       by copying it to a temporary.  */
 			    STRLEN len;
