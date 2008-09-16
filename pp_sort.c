@@ -1559,18 +1559,12 @@ PP(pp_sort)
 		if (priv & OPpSORT_NUMERIC) {
 		    if (priv & OPpSORT_INTEGER) {
 			if (!SvIOK(*p1)) {
-			    if (SvAMAGIC(*p1))
-				overloading = 1;
-			    else
-				(void)sv_2iv(*p1);
+			    (void)sv_2iv(*p1);
 			}
 		    }
 		    else {
 			if (!SvNSIOK(*p1)) {
-			    if (SvAMAGIC(*p1))
-				overloading = 1;
-			    else
-				(void)sv_2nv(*p1);
+			    (void)sv_2nv(*p1);
 			}
 			if (all_SIVs && !SvSIOK(*p1))
 			    all_SIVs = 0;
@@ -1578,11 +1572,8 @@ PP(pp_sort)
 		}
 		else {
 		    if (!SvPOK(*p1)) {
-			if (SvAMAGIC(*p1))
-			    overloading = 1;
-			else
-			    (void)sv_2pv_flags(*p1, 0,
-					       SV_GMAGIC|SV_CONST_RETURN);
+			(void)sv_2pv_flags(*p1, 0,
+			    SV_GMAGIC|SV_CONST_RETURN);
 		    }
 		}
 	    }
@@ -1664,9 +1655,9 @@ PP(pp_sort)
 	    sortsvp(aTHX_ start, max,
 		    (priv & OPpSORT_NUMERIC)
 		        ? ( ( ( priv & OPpSORT_INTEGER) || all_SIVs)
-			    ? ( overloading ? S_amagic_i_ncmp : S_sv_i_ncmp)
-			    : ( overloading ? S_amagic_ncmp : S_sv_ncmp ) )
-			: ( overloading ? (SVCOMPARE_t)S_amagic_cmp : (SVCOMPARE_t)sv_cmp_static ),
+			    ? S_sv_i_ncmp
+			    : S_sv_ncmp )
+			: (SVCOMPARE_t)sv_cmp_static,
 		    sort_flags);
 	}
 	if ((priv & OPpSORT_REVERSE) != 0) {
@@ -1807,75 +1798,7 @@ S_sv_i_ncmp(pTHX_ SV *const a, SV *const b)
     return iv1 < iv2 ? -1 : iv1 > iv2 ? 1 : 0;
 }
 
-#define tryCALL_AMAGICbin(left,right,meth) \
-    (PL_amagic_generation && (SvAMAGIC(left)||SvAMAGIC(right))) \
-	? amagic_call(left, right, CAT2(meth,_amg), 0) \
-	: NULL;
-
 #define SORT_NORMAL_RETURN_VALUE(val)  (((val) > 0) ? 1 : ((val) ? -1 : 0))
-
-static I32
-S_amagic_ncmp(pTHX_ register SV *const a, register SV *const b)
-{
-    dVAR;
-    SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp);
-
-    PERL_ARGS_ASSERT_AMAGIC_NCMP;
-
-    if (tmpsv) {
-        if (SvIOK(tmpsv)) {
-            const I32 i = SvIVX(tmpsv);
-            return SORT_NORMAL_RETURN_VALUE(i);
-        }
-	else {
-	    const NV d = SvNV(tmpsv);
-	    return SORT_NORMAL_RETURN_VALUE(d);
-	}
-     }
-     return S_sv_ncmp(aTHX_ a, b);
-}
-
-static I32
-S_amagic_i_ncmp(pTHX_ register SV *const a, register SV *const b)
-{
-    dVAR;
-    SV * const tmpsv = tryCALL_AMAGICbin(a,b,ncmp);
-
-    PERL_ARGS_ASSERT_AMAGIC_I_NCMP;
-
-    if (tmpsv) {
-        if (SvIOK(tmpsv)) {
-            const I32 i = SvIVX(tmpsv);
-            return SORT_NORMAL_RETURN_VALUE(i);
-        }
-	else {
-	    const NV d = SvNV(tmpsv);
-	    return SORT_NORMAL_RETURN_VALUE(d);
-	}
-    }
-    return S_sv_i_ncmp(aTHX_ a, b);
-}
-
-static I32
-S_amagic_cmp(pTHX_ register SV *const str1, register SV *const str2)
-{
-    dVAR;
-    SV * const tmpsv = tryCALL_AMAGICbin(str1,str2,scmp);
-
-    PERL_ARGS_ASSERT_AMAGIC_CMP;
-
-    if (tmpsv) {
-        if (SvIOK(tmpsv)) {
-            const I32 i = SvIVX(tmpsv);
-            return SORT_NORMAL_RETURN_VALUE(i);
-        }
-	else {
-	    const NV d = SvNV(tmpsv);
-	    return SORT_NORMAL_RETURN_VALUE(d);
-	}
-    }
-    return sv_cmp(str1, str2);
-}
 
 /*
  * Local variables:

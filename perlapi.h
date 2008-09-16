@@ -162,8 +162,6 @@ END_EXTERN_C
 #define PL_Sv			(*Perl_ISv_ptr(aTHX))
 #undef  PL_Xpv
 #define PL_Xpv			(*Perl_IXpv_ptr(aTHX))
-#undef  PL_amagic_generation
-#define PL_amagic_generation	(*Perl_Iamagic_generation_ptr(aTHX))
 #undef  PL_an
 #define PL_an			(*Perl_Ian_ptr(aTHX))
 #undef  PL_argvgv

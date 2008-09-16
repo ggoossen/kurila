@@ -393,67 +393,7 @@ Does not use C<TARG>.  See also C<XPUSHu>, C<mPUSHu> and C<PUSHu>.
 	    tmps_grow(n);						\
     } STMT_END
 
-#define AMGf_noright	1
-#define AMGf_noleft	2
-#define AMGf_assign	4
-#define AMGf_unary	8
-
-#define tryAMAGICbinW_var(meth_enum,assign,set) STMT_START { \
-	    SV* const left = *(sp-1); \
-	    SV* const right = *(sp); \
-	    if ((SvAMAGIC(left)||SvAMAGIC(right))) {\
-		SV * const tmpsv = amagic_call(left, \
-				   right, \
-				   (meth_enum), \
-				   (assign)? AMGf_assign: 0); \
-		if (tmpsv) { \
-		    SPAGAIN; \
-		    (void)POPs; set(tmpsv); RETURN; } \
-		} \
-	} STMT_END
-
-#define tryAMAGICbinW(meth,assign,set) \
-    tryAMAGICbinW_var(CAT2(meth,_amg),assign,set)
-
-#define tryAMAGICbin_var(meth_enum,assign) \
-		tryAMAGICbinW_var(meth_enum,assign,SETsv)
-#define tryAMAGICbin(meth,assign) \
-		tryAMAGICbin_var(CAT2(meth,_amg),assign)
-
-#define tryAMAGICbinSET(meth,assign) tryAMAGICbinW(meth,assign,SETs)
-
-#define tryAMAGICbinSET_var(meth_enum,assign) \
-    tryAMAGICbinW_var(meth_enum,assign,SETs)
-
-#define AMG_CALLun_var(sv,meth_enum) amagic_call(sv,&PL_sv_undef,  \
-					meth_enum,AMGf_noright | AMGf_unary)
-#define AMG_CALLun(sv,meth) AMG_CALLun_var(sv,CAT2(meth,_amg))
-
-#define AMG_CALLbinL(left,right,meth) \
-            amagic_call(left,right,CAT2(meth,_amg),AMGf_noright)
-
-#define tryAMAGICunW_var(meth_enum,set,shift,ret) STMT_START { \
-	    SV* tmpsv; \
-	    SV* arg= sp[shift]; \
-          if(0) goto am_again;  /* shut up unused warning */ \
-	  am_again: \
-	    if ((SvAMAGIC(arg))&&\
-		(tmpsv=AMG_CALLun_var(arg,(meth_enum)))) {\
-	       SPAGAIN; if (shift) sp += shift; \
-	       set(tmpsv); ret; } \
-	} STMT_END
-#define tryAMAGICunW(meth,set,shift,ret) \
-	tryAMAGICunW_var(CAT2(meth,_amg),set,shift,ret)
-
 #define FORCE_SETs(sv) STMT_START { sv_setsv(TARG, (sv)); SETTARG; } STMT_END
-
-#define tryAMAGICun_var(meth_enum) tryAMAGICunW_var(meth_enum,SETsvUN,0,RETURN)
-#define tryAMAGICun(meth)	tryAMAGICun_var(CAT2(meth,_amg))
-#define tryAMAGICunSET(meth)	tryAMAGICunW(meth,SETs,0,RETURN)
-#define tryAMAGICunTARGET(meth, shift)					\
-	STMT_START { dSP; sp--; 	/* get TARGET from below PL_stack_sp */		\
-	    { dTARGETSTACKED; 						\
-		{ dSP; tryAMAGICunW(meth,FORCE_SETs,shift,RETURN);}}} STMT_END
 
 #define setAGAIN(ref)	\
     STMT_START {					\
@@ -465,10 +405,6 @@ Does not use C<TARG>.  See also C<XPUSHu>, C<mPUSHu> and C<PUSHu>.
 	    goto am_again;				\
 	}						\
     } STMT_END
-
-#define tryAMAGICunDEREF(meth) tryAMAGICunW(meth,setAGAIN,0,(void)0)
-#define tryAMAGICunDEREF_var(meth_enum) \
-	tryAMAGICunW_var(meth_enum,setAGAIN,0,(void)0)
 
 #define opASSIGN (PL_op->op_flags & OPf_STACKED)
 #define SETsv(sv)	STMT_START {					\

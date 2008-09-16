@@ -43,7 +43,6 @@
 #endif
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
-#define amagic_call		Perl_amagic_call
 #define Gv_AMupdate		Perl_Gv_AMupdate
 #define gv_handler		Perl_gv_handler
 #ifdef PERL_CORE
@@ -419,7 +418,6 @@
 #define magic_regdatum_get	Perl_magic_regdatum_get
 #define magic_regdatum_set	Perl_magic_regdatum_set
 #define magic_set		Perl_magic_set
-#define magic_setamagic		Perl_magic_setamagic
 #define magic_setdbline		Perl_magic_setdbline
 #define magic_setdefelem	Perl_magic_setdefelem
 #define magic_setenv		Perl_magic_setenv
@@ -1283,9 +1281,6 @@
 #ifdef PERL_CORE
 #define sv_ncmp			S_sv_ncmp
 #define sv_i_ncmp		S_sv_i_ncmp
-#define amagic_ncmp		S_amagic_ncmp
-#define amagic_i_ncmp		S_amagic_i_ncmp
-#define amagic_cmp		S_amagic_cmp
 #define sortcv			S_sortcv
 #define sortcv_xsub		S_sortcv_xsub
 #define sortcv_stacked		S_sortcv_stacked
@@ -2258,7 +2253,6 @@
 #endif
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
-#define amagic_call(a,b,c,d)	Perl_amagic_call(aTHX_ a,b,c,d)
 #define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
 #define gv_handler(a,b)		Perl_gv_handler(aTHX_ a,b)
 #ifdef PERL_CORE
@@ -2621,7 +2615,6 @@
 #define magic_regdatum_get(a,b)	Perl_magic_regdatum_get(aTHX_ a,b)
 #define magic_regdatum_set(a,b)	Perl_magic_regdatum_set(aTHX_ a,b)
 #define magic_set(a,b)		Perl_magic_set(aTHX_ a,b)
-#define magic_setamagic(a,b)	Perl_magic_setamagic(aTHX_ a,b)
 #define magic_setdbline(a,b)	Perl_magic_setdbline(aTHX_ a,b)
 #define magic_setdefelem(a,b)	Perl_magic_setdefelem(aTHX_ a,b)
 #define magic_setenv(a,b)	Perl_magic_setenv(aTHX_ a,b)
@@ -3483,9 +3476,6 @@
 #ifdef PERL_CORE
 #define sv_ncmp(a,b)		S_sv_ncmp(aTHX_ a,b)
 #define sv_i_ncmp(a,b)		S_sv_i_ncmp(aTHX_ a,b)
-#define amagic_ncmp(a,b)	S_amagic_ncmp(aTHX_ a,b)
-#define amagic_i_ncmp(a,b)	S_amagic_i_ncmp(aTHX_ a,b)
-#define amagic_cmp(a,b)		S_amagic_cmp(aTHX_ a,b)
 #define sortcv(a,b)		S_sortcv(aTHX_ a,b)
 #define sortcv_xsub(a,b)	S_sortcv_xsub(aTHX_ a,b)
 #define sortcv_stacked(a,b)	S_sortcv_stacked(aTHX_ a,b)

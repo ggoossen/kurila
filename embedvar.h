@@ -63,7 +63,6 @@
 #define PL_StdIO		(vTHX->IStdIO)
 #define PL_Sv			(vTHX->ISv)
 #define PL_Xpv			(vTHX->IXpv)
-#define PL_amagic_generation	(vTHX->Iamagic_generation)
 #define PL_an			(vTHX->Ian)
 #define PL_argvgv		(vTHX->Iargvgv)
 #define PL_argvout_stack	(vTHX->Iargvout_stack)
@@ -353,7 +352,6 @@
 #define PL_IStdIO		PL_StdIO
 #define PL_ISv			PL_Sv
 #define PL_IXpv			PL_Xpv
-#define PL_Iamagic_generation	PL_amagic_generation
 #define PL_Ian			PL_an
 #define PL_Iargvgv		PL_argvgv
 #define PL_Iargvout_stack	PL_argvout_stack

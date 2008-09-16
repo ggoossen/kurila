@@ -621,12 +621,12 @@ sub use_ok ($;@) {
     my($pack,$filename,$line) = caller;
 
     my $code;
-    if( (nelems @imports) == 1 and @imports[0] =~ m/^v\d+(?:\.\d+)?$/ ) {
+    if( (nelems @imports) == 1 and ref @imports[0] and @imports[0]->isa('version') ) {
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         $code = <<USE;
 package $pack;
-use $module @imports[0];
+use $module {@imports[0]->stringify};
 1;
 USE
     }

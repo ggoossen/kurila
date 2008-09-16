@@ -145,7 +145,7 @@ PP(pp_unstack)
 
 PP(pp_concat)
 {
-  dVAR; dSP; dATARGET; tryAMAGICbin(concat,opASSIGN);
+  dVAR; dSP; dATARGET;
   {
     dPOPTOPssrl;
     STRLEN rlen;
@@ -208,7 +208,6 @@ PP(pp_readline)
 {
     dVAR;
     SV* sv;
-    tryAMAGICunTARGET(iter, 0);
     sv = *PL_stack_sp--;
     if (SvTYPE(sv) != SVt_PVGV) {
 	if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV)
@@ -226,14 +225,7 @@ PP(pp_readline)
 
 PP(pp_eq)
 {
-    dVAR; dSP; tryAMAGICbinSET(eq,0);
-#ifndef NV_PRESERVES_UV
-    if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
-        SP--;
-	SETs(boolSV(SvRV(TOPs) == SvRV(TOPp1s)));
-	RETURN;
-    }
-#endif
+    dVAR; dSP;
 #ifdef PERL_PRESERVE_IVUV
 
     {
@@ -380,7 +372,6 @@ PP(pp_defined)
 PP(pp_add)
 {
     dVAR; dSP; dATARGET; bool useleft; SV *svl, *svr;
-    tryAMAGICbin(add,opASSIGN);
     svl = sv_2num(TOPm1s);
     svr = sv_2num(TOPs);
     useleft = USE_LEFT(svl);
@@ -2193,10 +2184,6 @@ PP(pp_entersub)
 	    DIE(aTHX_ PL_no_symref, sym, "a subroutine");
 	}
   got_rv:
-	{
-	    SV * const * sp = &sv;		/* Used in tryAMAGICunDEREF macro. */
-	    tryAMAGICunDEREF(to_cv);
-	}	
 	cv = (CV*)SvRV(sv);
 	if (SvTYPE(cv) == SVt_PVCV)
 	    break;

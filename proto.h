@@ -125,12 +125,6 @@ END_EXTERN_C
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
 #  include "pp_proto.h"
-PERL_CALLCONV SV*	Perl_amagic_call(pTHX_ SV* left, SV* right, int method, int dir)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_AMAGIC_CALL	\
-	assert(left); assert(right)
-
 PERL_CALLCONV bool	Perl_Gv_AMupdate(pTHX_ HV* stash)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_AMUPDATE	\
@@ -1578,12 +1572,6 @@ PERL_CALLCONV int	Perl_magic_set(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SET	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_setamagic(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETAMAGIC	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV int	Perl_magic_setdbline(pTHX_ SV* sv, MAGIC* mg)
@@ -4736,24 +4724,6 @@ STATIC I32	S_sv_i_ncmp(pTHX_ SV *const a, SV *const b)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SV_I_NCMP	\
 	assert(a); assert(b)
-
-STATIC I32	S_amagic_ncmp(pTHX_ SV *const a, SV *const b)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_AMAGIC_NCMP	\
-	assert(a); assert(b)
-
-STATIC I32	S_amagic_i_ncmp(pTHX_ SV *const a, SV *const b)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_AMAGIC_I_NCMP	\
-	assert(a); assert(b)
-
-STATIC I32	S_amagic_cmp(pTHX_ SV *const str1, SV *const str2)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_AMAGIC_CMP	\
-	assert(str1); assert(str2)
 
 STATIC I32	S_sortcv(pTHX_ SV *const a, SV *const b)
 			__attribute__nonnull__(pTHX_1)

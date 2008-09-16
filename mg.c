@@ -1591,18 +1591,6 @@ Perl_magic_clearisa(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-int
-Perl_magic_setamagic(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    PERL_ARGS_ASSERT_MAGIC_SETAMAGIC;
-    PERL_UNUSED_ARG(sv);
-    PERL_UNUSED_ARG(mg);
-    PL_amagic_generation++;
-
-    return 0;
-}
-
 /* caller is responsible for stack switching/cleanup */
 STATIC int
 S_magic_methcall(pTHX_ SV *sv, const MAGIC *mg, const char *meth, I32 flags, int n, SV *val)

@@ -150,16 +150,14 @@
 #define SX_BLESS	C(17)	/* Object is blessed */
 #define SX_IX_BLESS	C(18)	/* Object is blessed, classname given by index */
 #define SX_HOOK		C(19)	/* Stored via hook, user-defined */
-#define SX_OVERLOAD	C(20)	/* Overloaded reference */
-#define SX_TIED_KEY	C(21)	/* Tied magic key forthcoming */
-#define SX_TIED_IDX	C(22)	/* Tied magic index forthcoming */
-#define SX_UTF8STR	C(23)	/* UTF-8 string forthcoming (small) */
-#define SX_LUTF8STR	C(24)	/* UTF-8 string forthcoming (large) */
-#define SX_FLAG_HASH	C(25)	/* Hash with flags forthcoming (size, flags, key/flags/value triplet list) */
-#define SX_CODE         C(26)   /* Code references as perl source code */
-#define SX_WEAKREF	C(27)	/* Weak reference to object forthcoming */
-#define SX_WEAKOVERLOAD	C(28)	/* Overloaded weak reference */
-#define SX_ERROR	C(29)	/* Error */
+#define SX_TIED_KEY	C(20)	/* Tied magic key forthcoming */
+#define SX_TIED_IDX	C(21)	/* Tied magic index forthcoming */
+#define SX_UTF8STR	C(22)	/* UTF-8 string forthcoming (small) */
+#define SX_LUTF8STR	C(23)	/* UTF-8 string forthcoming (large) */
+#define SX_FLAG_HASH	C(24)	/* Hash with flags forthcoming (size, flags, key/flags/value triplet list) */
+#define SX_CODE         C(25)   /* Code references as perl source code */
+#define SX_WEAKREF	C(26)	/* Weak reference to object forthcoming */
+#define SX_ERROR	C(27)	/* Error */
 
 /*
  * Those are only used to retrieve "old" pre-0.6 binary images.
@@ -1077,7 +1075,6 @@ static SV *retrieve_sv_no(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_blessed(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_idx_blessed(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname);
-static SV *retrieve_overloaded(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_key(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_tied_idx(pTHX_ stcxt_t *cxt, const char *cname);
 static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname);
@@ -1106,7 +1103,6 @@ static const sv_retrieve_t sv_retrieve[] = {
 	(sv_retrieve_t)retrieve_blessed,	/* SX_BLESS */
 	(sv_retrieve_t)retrieve_idx_blessed,	/* SX_IX_BLESS */
 	(sv_retrieve_t)retrieve_hook,		/* SX_HOOK */
-	(sv_retrieve_t)retrieve_overloaded,	/* SX_OVERLOAD */
 	(sv_retrieve_t)retrieve_tied_key,	/* SX_TIED_KEY */
 	(sv_retrieve_t)retrieve_tied_idx,	/* SX_TIED_IDX */
 	(sv_retrieve_t)retrieve_scalar, 	/* SX_UTF8STR */
@@ -1114,7 +1110,6 @@ static const sv_retrieve_t sv_retrieve[] = {
 	(sv_retrieve_t)retrieve_flag_hash,	/* SX_HASH */
 	(sv_retrieve_t)retrieve_code,		/* SX_CODE */
 	(sv_retrieve_t)retrieve_weakref,	/* SX_WEAKREF */
-	(sv_retrieve_t)retrieve_weakoverloaded,	/* SX_WEAKOVERLOAD */
 	(sv_retrieve_t)retrieve_other,		/* SX_ERROR */
 };
 
@@ -1846,11 +1841,7 @@ static int store_ref(pTHX_ stcxt_t *cxt, SV *sv)
 
 	if (SvOBJECT(sv)) {
 		HV *stash = (HV *) SvSTASH(sv);
-		if (stash && Gv_AMG(stash)) {
-			TRACEME(("ref (0x%"UVxf") is overloaded", PTR2UV(sv)));
-			PUTMARK(is_weak ? SX_WEAKOVERLOAD : SX_OVERLOAD);
-		} else
-			PUTMARK(is_weak ? SX_WEAKREF : SX_REF);
+                PUTMARK(is_weak ? SX_WEAKREF : SX_REF);
 	} else
 		PUTMARK(is_weak ? SX_WEAKREF : SX_REF);
 
@@ -4354,93 +4345,6 @@ static SV *retrieve_weakref(pTHX_ stcxt_t *cxt, const char *cname)
 }
 
 /*
- * retrieve_overloaded
- *
- * Retrieve reference to some other scalar with overloading.
- * Layout is SX_OVERLOAD <object>, with SX_OVERLOAD already read.
- */
-static SV *retrieve_overloaded(pTHX_ stcxt_t *cxt, const char *cname)
-{
-	SV *rv;
-	SV *sv;
-	HV *stash;
-
-	TRACEME(("retrieve_overloaded (#%d)", cxt->tagnum));
-
-	/*
-	 * Same code as retrieve_ref(), duplicated to avoid extra call.
-	 */
-
-	rv = NEWSV(10002, 0);
-	SEEN(rv, cname, 0);		/* Will return if rv is null */
-	sv = retrieve(aTHX_ cxt, 0);	/* Retrieve <object> */
-	if (!sv)
-		return (SV *) 0;	/* Failed */
-
-	/*
-	 * WARNING: breaks RV encapsulation.
-	 */
-
-	sv_upgrade(rv, SVt_IV);
-	SvRV_set(rv, sv);				/* $rv = \$sv */
-	SvROK_on(rv);
-
-	/*
-	 * Restore overloading magic.
-	 */
-
-	stash = SvTYPE(sv) ? (HV *) SvSTASH (sv) : 0;
-	if (!stash) {
-		CROAK(("Cannot restore overloading on %s(0x%"UVxf
-		       ") (package <unknown>)",
-		       sv_reftype(sv, FALSE),
-		       PTR2UV(sv)));
-	}
-	if (!Gv_AMG(stash)) {
-	        const char *package = HvNAME_get(stash);
-		TRACEME(("No overloading defined for package %s", package));
-		TRACEME(("Going to load module '%s'", package));
-		load_module(PERL_LOADMOD_NOIMPORT, newSVpv(package, 0), Nullsv);
-		if (!Gv_AMG(stash)) {
-			CROAK(("Cannot restore overloading on %s(0x%"UVxf
-			       ") (package %s) (even after a \"require %s;\")",
-			       sv_reftype(sv, FALSE),
-			       PTR2UV(sv),
-			       package, package));
-		}
-	}
-
-	SvAMAGIC_on(rv);
-
-	TRACEME(("ok (retrieve_overloaded at 0x%"UVxf")", PTR2UV(rv)));
-
-	return rv;
-}
-
-/*
- * retrieve_weakoverloaded
- *
- * Retrieve weak overloaded reference to some other scalar.
- * Layout is SX_WEAKOVERLOADED <object>, with SX_WEAKOVERLOADED already read.
- */
-static SV *retrieve_weakoverloaded(pTHX_ stcxt_t *cxt, const char *cname)
-{
-	SV *sv;
-
-	TRACEME(("retrieve_weakoverloaded (#%d)", cxt->tagnum));
-
-	sv = retrieve_overloaded(aTHX_ cxt, cname);
-	if (sv) {
-#ifdef SvWEAKREF
-		sv_rvweaken(sv);
-#else
-		WEAKREF_CROAK();
-#endif
-	}
-	return sv;
-}
-
-/*
  * retrieve_tied_array
  *
  * Retrieve tied array
@@ -5905,30 +5809,9 @@ static SV *do_retrieve(
 		}
 	}
 
-	/*
-	 * If reference is overloaded, restore behaviour.
-	 *
-	 * NB: minor glitch here: normally, overloaded refs are stored specially
-	 * so that we can croak when behaviour cannot be re-installed, and also
-	 * avoid testing for overloading magic at each reference retrieval.
-	 *
-	 * Unfortunately, the root reference is implicitely stored, so we must
-	 * check for possible overloading now.  Furthermore, if we don't restore
-	 * overloading, we cannot croak as if the original ref was, because we
-	 * have no way to determine whether it was an overloaded ref or not in
-	 * the first place.
-	 *
-	 * It's a pity that overloading magic is attached to the rv, and not to
-	 * the underlying sv as blessing is.
-	 */
-
 	if (SvOBJECT(sv)) {
 		HV *stash = (HV *) SvSTASH(sv);
 		SV *rv = newRV_noinc(sv);
-		if (stash && Gv_AMG(stash)) {
-			SvAMAGIC_on(rv);
-			TRACEME(("restored overloading on root reference"));
-		}
 		TRACEME(("ended do_retrieve() with an object"));
 		return rv;
 	}

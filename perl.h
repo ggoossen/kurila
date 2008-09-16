@@ -4535,8 +4535,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_uvar,
     want_vtbl_defelem,
     want_vtbl_regexp,
-    want_vtbl_amagic,
-    want_vtbl_amagicelem,
     want_vtbl_backref,
     want_vtbl_utf8,
     want_vtbl_symtab,
@@ -5051,30 +5049,6 @@ MGVTBL_SET(
 );
 
 MGVTBL_SET(
-    PL_vtbl_amagic,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setamagic),
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setamagic),
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_amagicelem,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setamagic),
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setamagic),
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
     PL_vtbl_backref,
     0,
     0,
@@ -5144,15 +5118,6 @@ typedef struct am_table_short AMTS;
 #define AMGfallNEVER	1
 #define AMGfallNO	2
 #define AMGfallYES	3
-
-#define AMTf_AMAGIC		1
-#define AMTf_OVERLOADED		2
-#define AMT_AMAGIC(amt)		((amt)->flags & AMTf_AMAGIC)
-#define AMT_AMAGIC_on(amt)	((amt)->flags |= AMTf_AMAGIC)
-#define AMT_AMAGIC_off(amt)	((amt)->flags &= ~AMTf_AMAGIC)
-#define AMT_OVERLOADED(amt)	((amt)->flags & AMTf_OVERLOADED)
-#define AMT_OVERLOADED_on(amt)	((amt)->flags |= AMTf_OVERLOADED)
-#define AMT_OVERLOADED_off(amt)	((amt)->flags &= ~AMTf_OVERLOADED)
 
 #define StashHANDLER(stash,meth)	gv_handler((stash),CAT2(meth,_amg))
 

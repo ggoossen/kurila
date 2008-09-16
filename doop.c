@@ -50,7 +50,7 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
     SvUPGRADE(sv, SVt_PV);
     if (SvLEN(sv) < len + items) {	/* current length is way too short */
 	while (items-- > 0) {
-	    if (*mark && !SvGAMAGIC(*mark) && SvOK(*mark)) {
+	    if (*mark && !SvGMAGICAL(*mark) && SvOK(*mark)) {
 		STRLEN tmplen;
 		SvPV_const(*mark, tmplen);
 		len += tmplen;

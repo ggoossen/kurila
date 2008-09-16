@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-plan(102);
+plan(100);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -228,21 +228,6 @@ our $var = "glob 4";
 $_   = \$var;
 is ($$_, 'glob 4');
 
-
-# test if reblessing during destruction results in more destruction
-$test = curr_test();
-{
-    package A;
-    sub new { bless \%(), shift }
-    DESTROY { print "# destroying 'A'\nok ", $test + 1, "\n" }
-    package _B;
-    sub new { bless \%(), shift }
-    DESTROY { print "# destroying '_B'\nok $test\n"; bless shift, 'A' }
-    package main;
-    my $b = _B->new;
-}
-curr_test($test + 2);
-
 # test if @_[0] is properly protected in DESTROY()
 
 {
@@ -258,7 +243,7 @@ curr_test($test + 2);
     };
     package C;
     sub new { bless \%(), shift }
-    DESTROY { @_[0] = 'foo' }
+    sub DESTROY { @_[0] = 'foo' }
     {
 	print "# should generate an error...\n";
 	my $c = C->new;
