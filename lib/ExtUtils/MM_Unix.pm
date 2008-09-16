@@ -2716,6 +2716,9 @@ sub parse_version {
         |;
         local $^W = 0;
         $result = eval($eval);  ## no critic
+        if (ref $result) {
+            $result = $result->stringify;
+        }
         warn "Could not eval '$eval' in $parsefile: {$@->message}" if $@;
         last;
     }
