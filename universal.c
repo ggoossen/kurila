@@ -192,11 +192,6 @@ XS(XS_version_numify);
 XS(XS_version_normal);
 XS(XS_version_vcmp);
 XS(XS_version_boolean);
-#ifdef HASATTRIBUTE_NORETURN
-XS(XS_version_noop) __attribute__noreturn__;
-#else
-XS(XS_version_noop);
-#endif
 XS(XS_version_is_alpha);
 XS(XS_version_qv);
 XS(XS_utf8_valid);
@@ -254,20 +249,12 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("UNIVERSAL::VERSION", 	XS_UNIVERSAL_VERSION, 	  file);
     {
 	/* Make it findable via fetchmethod */
-	newXS("version::()", XS_version_noop, file);
 	newXS("version::new", XS_version_new, file);
-	newXS("version::(\"\"", XS_version_stringify, file);
 	newXS("version::stringify", XS_version_stringify, file);
-	newXS("version::(0+", XS_version_numify, file);
 	newXS("version::numify", XS_version_numify, file);
 	newXS("version::normal", XS_version_normal, file);
-	newXS("version::(cmp", XS_version_vcmp, file);
-	newXS("version::(<+>", XS_version_vcmp, file);
 	newXS("version::vcmp", XS_version_vcmp, file);
-	newXS("version::(bool", XS_version_boolean, file);
 	newXS("version::boolean", XS_version_boolean, file);
-	newXS("version::(nomethod", XS_version_noop, file);
-	newXS("version::noop", XS_version_noop, file);
 	newXS("version::is_alpha", XS_version_is_alpha, file);
 	newXS("version::qv", XS_version_qv, file);
     }
@@ -608,8 +595,8 @@ XS(XS_version_vcmp)
      dVAR;
      dXSARGS;
      PERL_UNUSED_ARG(cv);
-     if (items < 1)
-	  Perl_croak(aTHX_ "Usage: version::vcmp(lobj, ...)");
+     if (items != 2)
+	  Perl_croak(aTHX_ "Usage: lobj->vcmp(robj)");
      SP -= items;
      {
 	  SV *	lobj;
@@ -624,7 +611,6 @@ XS(XS_version_vcmp)
 	       SV	*rs;
 	       SV	*rvs;
 	       SV * robj = ST(1);
-	       const IV	 swap = (IV)SvIV(ST(2));
 
 	       if ( ! sv_derived_from(robj, "version") )
 	       {
@@ -632,14 +618,7 @@ XS(XS_version_vcmp)
 	       }
 	       rvs = SvRV(robj);
 
-	       if ( swap )
-	       {
-		    rs = newSViv(vcmp(rvs,lobj));
-	       }
-	       else
-	       {
-		    rs = newSViv(vcmp(lobj,rvs));
-	       }
+	       rs = newSViv(vcmp(lobj,rvs));
 
 	       mPUSHs(rs);
 	  }
@@ -666,22 +645,6 @@ XS(XS_version_boolean)
     }
     else
 	Perl_croak(aTHX_ "lobj is not of type version");
-}
-
-XS(XS_version_noop)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items < 1)
-	Perl_croak(aTHX_ "Usage: version::noop(lobj, ...)");
-    if (sv_derived_from(ST(0), "version"))
-	Perl_croak(aTHX_ "operation not supported with version object");
-    else
-	Perl_croak(aTHX_ "lobj is not of type version");
-#ifndef HASATTRIBUTE_NORETURN
-    XSRETURN_EMPTY;
-#endif
 }
 
 XS(XS_version_is_alpha)
