@@ -338,7 +338,7 @@ sub _parse_version {
 
         print( $@ ? "Error: $@\n" : "Result: $rv\n" ) if $verbose;
 
-        return $rv;
+        return version->new($rv);
     }
     
     ### unable to find a version in this string
@@ -429,7 +429,7 @@ sub can_load {
             ### #29348: Version compare logic doesn't handle alphas?
             if (    !$args->{nocache}
                     && defined $CACHE->{$mod}->{usable}
-                    && (qv($CACHE->{$mod}->{version}||0) +>= qv($href->{$mod}))
+                    && (qv($CACHE->{$mod}->{version}||0)->vcmp(qv($href->{$mod})) +>= 0)
             ) {
                 $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod);
                 last BLOCK;
