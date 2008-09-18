@@ -29,7 +29,7 @@ use_ok( 'Module::Load::Conditional' );
                 );
 
     ok( $rv->{uptodate},    q[Verify self] );
-    is( $rv->{version}, $Module::Load::Conditional::VERSION,  
+    is( $rv->{version}->stringify, $Module::Load::Conditional::VERSION,  
                             q[  Found proper version] );
 
     ### break up the specification
@@ -91,7 +91,7 @@ use_ok( 'Module::Load::Conditional' );
 {   my $rv = check_install( module => 'InPod' );
     ok( $rv,                        'Testing $VERSION in POD' );
     ok( $rv->{version},             "   Version found" );
-    is( $rv->{version}, 2,          "   Version is correct" );
+    is( $rv->{version}->stringify, 2,          "   Version is correct" );
 }
 
 ### test beta/developer release versions

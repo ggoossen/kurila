@@ -12,27 +12,8 @@ use_ok( $Class );
 {   for my $str (  __PACKAGE__->_succeed ) {
         my $res = $Class->?$Meth( $str, $Verbose );
         ok( defined $res,       "String '$str' identified as version string" );
-        
-        ### XXX version.pm 0.69 pure perl fails tests under 5.6.2.
-        ### XXX version.pm <= 0.69 do not have a complete overload 
-        ### implementation, which causes the following error:
-        ### $ perl -Mversion -le'qv(1)+0'
-        ### Operation "+": no method found,
-        ###        left argument in overloaded package version,
-        ###        right argument has no overloaded magic at -e line 1
-        ### so we do the comparison ourselves, and then feed it to
-        ### the Test::More::ok().
-        ###
-        ### Mailed jpeacock and p5p about both issues on 25-1-2007:
-        ###     http://xrl.us/uem7
-        ###     (http://www.xray.mpe.mpg.de/mailing-lists/
-        ###         perl5-porters/2007-01/msg00805.html)
 
-        ### Quell "Argument isn't numeric in gt" warnings...
-        my $bool = do { local $^W; $res +> 0 };
-        
-        ok( $bool,              "   Version is '$res'" );
-        isnt( $res, '0.0',      "   Not the default value" );
+        is( $res->vcmp(0), 1,              "   Version is '{$res->stringify}'" );
     }             
 }
 
