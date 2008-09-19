@@ -72,20 +72,12 @@ my $default_share = \qw[
     &Tie::Hash::NamedCapture::SCALAR
     &Tie::Hash::NamedCapture::flags
     &UNIVERSAL::DOES
-    &version::()
     &version::new
-    &version::(""
     &version::stringify
-    &version::(0+
     &version::numify
     &version::normal
-    &version::(cmp
-    &version::(<+>
     &version::vcmp
-    &version::(bool
     &version::boolean
-    &version::(nomethod
-    &version::noop
     &version::is_alpha
     &version::qv
     &re::regexp_pattern
