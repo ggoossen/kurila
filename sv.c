@@ -11055,8 +11055,9 @@ do_sv_tmprefcnt(pTHX_ SV *const sv)
 	av_tmprefcnt((AV*)sv);
 	break;
     case SVt_PVLV:
-	if (LvTYPE(sv) != 't') /* unless tie: unrefcnted fake SV**  */
+	if (LvTYPE(sv) != 't' && LvTYPE(sv) != 'T') /* unless tie: unrefcnted fake SV**  */
 	    SvTMPREFCNT_inc(LvTARG(sv));
+	break;
     case SVt_PVGV:
 	if (isGV_with_GP(sv)) {
 	    gp_tmprefcnt((GV*)sv);
