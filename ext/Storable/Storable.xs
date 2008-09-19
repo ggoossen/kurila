@@ -150,14 +150,16 @@
 #define SX_BLESS	C(17)	/* Object is blessed */
 #define SX_IX_BLESS	C(18)	/* Object is blessed, classname given by index */
 #define SX_HOOK		C(19)	/* Stored via hook, user-defined */
-#define SX_TIED_KEY	C(20)	/* Tied magic key forthcoming */
-#define SX_TIED_IDX	C(21)	/* Tied magic index forthcoming */
-#define SX_UTF8STR	C(22)	/* UTF-8 string forthcoming (small) */
-#define SX_LUTF8STR	C(23)	/* UTF-8 string forthcoming (large) */
-#define SX_FLAG_HASH	C(24)	/* Hash with flags forthcoming (size, flags, key/flags/value triplet list) */
-#define SX_CODE         C(25)   /* Code references as perl source code */
-#define SX_WEAKREF	C(26)	/* Weak reference to object forthcoming */
-#define SX_ERROR	C(27)	/* Error */
+#define SX_ERROR_20	C(20)	/* removed */
+#define SX_TIED_KEY	C(21)	/* Tied magic key forthcoming */
+#define SX_TIED_IDX	C(22)	/* Tied magic index forthcoming */
+#define SX_UTF8STR	C(23)	/* UTF-8 string forthcoming (small) */
+#define SX_LUTF8STR	C(24)	/* UTF-8 string forthcoming (large) */
+#define SX_FLAG_HASH	C(25)	/* Hash with flags forthcoming (size, flags, key/flags/value triplet list) */
+#define SX_CODE         C(26)   /* Code references as perl source code */
+#define SX_WEAKREF	C(27)	/* Weak reference to object forthcoming */
+#define SX_ERROR_28	C(28)	/* deprecated: Weak reference to object forthcoming */
+#define SX_ERROR	C(29)	/* Error */
 
 /*
  * Those are only used to retrieve "old" pre-0.6 binary images.
@@ -1103,13 +1105,15 @@ static const sv_retrieve_t sv_retrieve[] = {
 	(sv_retrieve_t)retrieve_blessed,	/* SX_BLESS */
 	(sv_retrieve_t)retrieve_idx_blessed,	/* SX_IX_BLESS */
 	(sv_retrieve_t)retrieve_hook,		/* SX_HOOK */
+	(sv_retrieve_t)retrieve_other,	        /* SX_ERROR_20 */
 	(sv_retrieve_t)retrieve_tied_key,	/* SX_TIED_KEY */
 	(sv_retrieve_t)retrieve_tied_idx,	/* SX_TIED_IDX */
 	(sv_retrieve_t)retrieve_scalar, 	/* SX_UTF8STR */
 	(sv_retrieve_t)retrieve_lscalar,   	/* SX_LUTF8STR */
 	(sv_retrieve_t)retrieve_flag_hash,	/* SX_HASH */
 	(sv_retrieve_t)retrieve_code,		/* SX_CODE */
-	(sv_retrieve_t)retrieve_weakref,	/* SX_WEAKREF */
+        (sv_retrieve_t)retrieve_weakref,        /* SX_WEAKREF */
+	(sv_retrieve_t)retrieve_other,	        /* SX_ERROR_29 */
 	(sv_retrieve_t)retrieve_other,		/* SX_ERROR */
 };
 
@@ -5611,6 +5615,10 @@ static SV *retrieve(pTHX_ stcxt_t *cxt, const char *cname)
         }
 
 first_time:		/* Will disappear when support for old format is dropped */
+
+        if ((type == SX_ERROR_20) || (type == SX_ERROR_28)) {
+            CROAK(("Storable binary has overloaded data which is not supported in kurila"));
+        }
 
 	/*
 	 * Okay, first time through for this one.

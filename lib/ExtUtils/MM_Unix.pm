@@ -2457,7 +2457,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 MAP_LINKCMD   = $linkcmd
 MAP_PERLINC   = {join ' ',@{$perlinc || \@()}
 }MAP_STATIC    = ",
-join(" \\\n\t", @( reverse < sort keys %static)), "
+join(" \\\n\t", reverse sort keys %static), "
 
 MAP_PRELIBS   = %Config{perllibs} %Config{cryptlib}
 ";
