@@ -10,10 +10,7 @@ $| = 1;
 
 our $Message = "Noname test";
 
-BEGIN {
-    require "utf8.pm";
-    require "utf8_heavy.pl";
-}
+use utf8;
 
 our %Config;
 eval 'use Config';          #  Defaults assumed if this fails
