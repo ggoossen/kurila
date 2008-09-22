@@ -2049,12 +2049,13 @@ PP(pp_grepwhile)
 
 	/* set $_ to the new source item */
 	srcitem = av_shift(SvAV(*src));
-	mXPUSHs(srcitem);
+	XPUSHs(srcitem);
 	SvTEMP_off(srcitem);
-	if (PL_op->op_private & OPpGREP_LEX)
-	    SVcpREPLACE(PAD_SVl(PL_op->op_targ), srcitem);
+	if (PL_op->op_private & OPpGREP_LEX) {
+	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem);
+	}
 	else
-	    SVcpREPLACE(DEFSV, srcitem);
+	    SVcpSTEAL(DEFSV, srcitem);
 
 	RETURNOP(cLOGOP->op_other);
     }
