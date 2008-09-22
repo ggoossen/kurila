@@ -527,7 +527,8 @@ subrout	:	SUB startsub subname proto subattrlist subbody
 			      $6->op_madprop = 0;
 			    }
 #else
-			  newATTRSUB($2, $3, $4, $5, $6);
+			  CV* new = newATTRSUB($2, $3, $4, $5, $6);
+                          SvREFCNT_dec(new);
 			  $$ = (OP*)NULL;
 #endif
 			}
