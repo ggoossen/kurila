@@ -4774,13 +4774,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 			CvCONST(cv) ? "Constant subroutine %s redefined"
 				    : "Subroutine %s redefined", name);
 		}
-#ifdef PERL_MAD
-		if (!PL_minus_c)	/* keep old one around for madskills */
-#endif
-		    {
-			/* (PL_madskills unset in used file.) */
-			SvREFCNT_dec(cv);
-		    }
 		cv = NULL;
 	    }
 	}
@@ -4868,7 +4861,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     else {
 	cv = PL_compcv;
 	if (name) {
-	    GvCV(gv) = (CV*)SvREFCNT_inc(cv);
+	    CVcpREPLACE(GvCV(gv), cv);
 	    if (PL_madskills) {
 		if (strEQ(name, "import")) {
 		    Perl_warner(aTHX_ packWARN(WARN_VOID), "%lx\n", (long)cv);
