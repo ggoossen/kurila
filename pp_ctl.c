@@ -428,11 +428,12 @@ PP(pp_grepstart)
 
     srcitem = av_shift(SvAV(src));
     if (PL_op->op_type == OP_GREPSTART)
-	mXPUSHs(srcitem);
-    if (PL_op->op_private & OPpGREP_LEX)
-	SVcpREPLACE(PAD_SVl(PL_op->op_targ), srcitem);
+	XPUSHs(srcitem);
+    if (PL_op->op_private & OPpGREP_LEX) {
+	SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem);
+    }
     else
-	SVcpREPLACE(DEFSV, srcitem);
+	SVcpSTEAL(DEFSV, srcitem);
 
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
