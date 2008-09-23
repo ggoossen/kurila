@@ -1,0 +1,71 @@
+=head1 NAME
+
+kurila114delta - what is new for Perl Kurila 1.14
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.13 and Perl Kurila 1.14
+
+=head1 Highlights In Perl Kurila 1.14
+
+Continuing where the previous release stopped, this one makes the
+built-in functions use arrays.
+
+=head1 Core Enhancements
+
+=head2 Built-in function using arrays
+
+C<map>, C<join>, C<grep>, C<for>, C<sort>, C<reverse>, C<split>,
+C<keys>, C<values>, C<..>, C<qw>, C<[[ ]]>, C<{[ ]}> all return arrays
+and/or expect arrays as arguments instead of lists.
+
+=head2 Circular dependencies are not allowed
+
+Requires a module which is still being compiled will produce an error.
+
+=head2 Error reporting reports error to the exact position, including character offset
+
+All operations have specific location information, including the character position
+
+=head2 Removal overloading
+
+Overloading has been removed.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Memory leaks
+
+Lists are used in a lot of places where arrays are probably more
+appropriate.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Tied hashes with complex data
+
+Tied hashes do not work correctly with complex data
+structures. Assigning arrays or hashes to a value of tied hash might
+behave strange.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
