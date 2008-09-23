@@ -1042,6 +1042,15 @@ sub map_array {
     }
 }
 
+sub simplify_array {
+    my $xml = shift;
+
+    for my $alop ($xml->find_nodes("//op_anonlist")) {
+        next unless $alop->children_count == 3;
+        next unless $alop->child(2)->tag eq "op_expand";
+        $alop->child(2)->child(1)->replace($alop);
+    }
+}
 
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
@@ -1127,6 +1136,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.13') {
 }
 
 map_array($twig);
+#simplify_array($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
