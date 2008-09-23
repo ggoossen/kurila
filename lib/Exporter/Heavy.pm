@@ -39,7 +39,7 @@ sub _rebuild_cache {
 sub heavy_export {
 
     my($pkg, $callpkg, < @imports) = < @_;
-    my($type, $sym, $cache_is_current, $oops);
+    my($type, $cache_is_current, $oops);
     my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("{$pkg}::EXPORT")}},
                                    %Exporter::Cache{$pkg} ||= \%());
 
@@ -53,10 +53,10 @@ sub heavy_export {
 	    my $tagsref = \%{*{Symbol::fetch_glob("{$pkg}::EXPORT_TAGS")}};
 	    my $tagdata;
 	    my %imports;
-	    my($remove, $spec, @names, @allexports);
+	    my($remove, @names, @allexports);
 	    # negated first item implies starting with default set:
 	    unshift @imports, ':DEFAULT' if @imports[0] =~ m/^!/;
-	    foreach $spec ( @imports){
+	    foreach my $spec ( @imports){
 		$remove = $spec =~ s/^!//;
 
 		if ($spec =~ s/^://){
@@ -85,7 +85,7 @@ sub heavy_export {
 		    if $Exporter::Verbose;
 
 		if ($remove) {
-		   foreach $sym ( @names) { delete %imports{$sym} } 
+		   foreach my $sym ( @names) { delete %imports{$sym} } 
 		}
 		else { <
 		    %imports{[ @names]} = (1) x nelems @names;
@@ -95,7 +95,7 @@ sub heavy_export {
 	}
 
         my @carp;
-	foreach $sym ( @imports) {
+	foreach my $sym ( @imports) {
 	    if (!$export_cache->{$sym}) {
 		if ($sym =~ m/^\d/) {
 		    $pkg->VERSION($sym); # inherit from UNIVERSAL
@@ -151,10 +151,10 @@ sub heavy_export {
  <	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}
 	my @failed;
-	foreach $sym ( @imports) { push(@failed, $sym) if $fail_cache->{$sym} }
+	foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{$sym} }
 	if ((nelems @failed)) {
 	    @failed = $pkg->export_fail(< @failed);
-	    foreach $sym ( @failed) {
+	    foreach my $sym ( @failed) {
 		warn(qq["$sym" is not implemented by the $pkg module ]
 			. "on this architecture");
 	    }
@@ -167,7 +167,7 @@ sub heavy_export {
     warn "Importing into $callpkg from $pkg: ",
 		join(", ",sort @imports) if $Exporter::Verbose;
 
-    foreach $sym ( @imports) {
+    foreach my $sym ( @imports) {
 	# shortcut for the common case of no type character
 	(*{Symbol::fetch_glob("{$callpkg}::$sym")} = \&{*{Symbol::fetch_glob("{$pkg}::$sym")}}, next)
 	    unless $sym =~ s/^(\W)//;

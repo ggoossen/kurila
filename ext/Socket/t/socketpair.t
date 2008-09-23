@@ -192,13 +192,13 @@ foreach ( @right) {
 # stream socket, so our writes will become joined:
 my ($total);
 $total = join '', @right;
-foreach $expect ( @right) {
+foreach my $expect ( @right) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");
 }
 $total = join '', @left;
-foreach $expect ( @left) {
+foreach my $expect ( @left) {
   undef $buffer;
   is (sysread (RIGHT, $buffer, length $total), length $expect, "read on right");
   is ($buffer, $expect, "content what we expected?");
@@ -231,7 +231,7 @@ foreach ( @gripping) {
 }
 
 $total = join '', @gripping;
-foreach $expect ( @gripping) {
+foreach my $expect ( @gripping) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");

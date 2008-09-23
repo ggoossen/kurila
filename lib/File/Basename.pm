@@ -158,9 +158,8 @@ sub fileparse {
       
 
   my $tail   = '';
-  my $suffix = '';
   if ((nelems @suffices)) {
-    foreach $suffix ( @suffices) {
+    foreach my $suffix ( @suffices) {
       my $pat = ($igncase ? '(?i)' : '') . "($suffix)\$";
       if ($basename =~ s/$pat//s) {
         $taint .= substr($suffix,0,0);

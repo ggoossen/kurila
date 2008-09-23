@@ -750,8 +750,7 @@ my %Cat;
 ## thing as we have to run under miniperl
 sub simple_dumper {
     my @lines;
-    my $item;
-    foreach $item ( @_) {
+    foreach my $item ( @_) {
 	if (ref $item) {
 	    if (ref $item eq 'ARRAY') {
 		push @lines, '\@('."\n", < simple_dumper (< @$item), "),\n";

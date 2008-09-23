@@ -373,7 +373,7 @@ dies_like( sub { m/(?$code)/ },
            qr/not allowed at runtime/);
 ok( $blah == 12 , "blah not changed by the eval" );
 
-for $code (@('{$blah = 45}','=xx')) {
+for my $code (@('{$blah = 45}','=xx')) {
   $blah = 12;
   if ($code eq '=xx') {
       $res = try { "xx" =~ m/(?$code)/o }; die if $@;

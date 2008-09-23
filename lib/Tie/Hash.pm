@@ -219,7 +219,7 @@ sub CLEAR {
 	push @keys, $key;
 	$key = $self->NEXTKEY(< @_, $key);
     }
-    foreach $key ( @keys) {
+    foreach my $key ( @keys) {
 	$self->DELETE(< @_, $key);
     }
 }

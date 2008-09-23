@@ -92,7 +92,7 @@ sub xsi_protos {
     my(@exts) = @_;
     my(@retval,%seen);
     my $boot_proto = "pTHX_ CV* cv";
-    foreach $_ ( @exts){
+    foreach my $_ ( @exts){
         my($pname) = < canon('/', $_);
         my($mname, $cname);
         ($mname = $pname) =~ s!/!::!g;
@@ -112,7 +112,7 @@ sub xsi_body {
     push(@retval, "\tdXSUB_SYS;\n");
     push(@retval, "\n");
 
-    foreach $_ ( @exts){
+    foreach my $_ ( @exts){
         my($pname) = < canon('/', $_);
         my($mname, $cname, $ccode);
         ($mname = $pname) =~ s!/!::!g;
@@ -196,9 +196,9 @@ sub ldopts {
 
     push(@mods, < static_ext()) if $std;
 
-    my($mod,@ns,$root,$sub,$extra,$archive,@archives);
+    my(@ns,$root,$sub,$extra,$archive,@archives);
     print STDERR "Searching ({join ' ',@path}) for archives\n" if $Verbose;
-    foreach $mod ( @mods) {
+    foreach my $mod ( @mods) {
 	@ns = split(m/::|\/|\\/, $mod);
 	$sub = @ns[-1];
 	$root = File::Spec->catdir(< @ns);

@@ -360,16 +360,6 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($8,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR scalar '(' remember mexpr ')' mblock cont
-			{ OP *innerop;
-			  $$ = block_end($5,
-			     innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
-                                 mod($3, OP_ENTERLOOP), $6, $8, $9, LOCATION($2)));
-			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first,'L');
-			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
-			  TOKEN_GETMAD($4,((LISTOP*)innerop)->op_first->op_sibling,'(');
-			  TOKEN_GETMAD($7,((LISTOP*)innerop)->op_first->op_sibling,')');
-			}
 	|	label FOR '(' remember mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($4,

@@ -332,14 +332,14 @@ sub open3 {
 sub spawn_with_handles {
     my $fds = shift;		# Fields: handle, mode, open_as
     my $close_in_child = shift;
-    my ($fd, $pid, @saved_fh, $saved, %saved, @errs);
+    my ($pid, @saved_fh, $saved, %saved, @errs);
     require Fcntl;
 
-    foreach $fd ( @$fds) {
+    foreach my $fd ( @$fds) {
 	$fd->{tmp_copy} = IO::Handle->new_from_fd($fd->{handle}, $fd->{mode});
 	%saved{fileno $fd->{handle}} = $fd->{tmp_copy};
     }
-    foreach $fd ( @$fds) {
+    foreach my $fd ( @$fds) {
 	bless $fd->{handle}, 'IO::Handle'
 	    unless try { $fd->{handle}->isa('IO::Handle') } ;
 	# If some of handles to redirect-to coincide with handles to
@@ -349,7 +349,7 @@ sub spawn_with_handles {
     }
     unless ($^O eq 'MSWin32') {
 	# Stderr may be redirected below, so we save the err text:
-	foreach $fd ( @$close_in_child) {
+	foreach my $fd ( @$close_in_child) {
 	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $!"
 		unless %saved{fileno $fd}; # Do not close what we redirect!
 	}
@@ -360,7 +360,7 @@ sub spawn_with_handles {
 	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid +< 0;
     }
 
-    foreach $fd ( @$fds) {
+    foreach my $fd ( @$fds) {
 	$fd->{handle}->fdopen($fd->{tmp_copy}, $fd->{mode});
 	$fd->{tmp_copy}->close or die "Can't close: $!";
     }

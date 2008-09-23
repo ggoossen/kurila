@@ -42,14 +42,14 @@ our @EXPORT = qw(abbrev);
 #	$long = $foo{$short};
 
 sub abbrev {
-    my ($word, $hashref, $glob, %table, $returnvoid);
+    my ($hashref, $glob, %table, $returnvoid);
 
     (nelems @_) or return;   # So we don't autovivify onto @_ and trigger warning
     $hashref = shift;
     $returnvoid = 1;
     %{$hashref} = %( () );
 
-    WORD: foreach $word ( @_) {
+    WORD: foreach my $word ( @_) {
         for (my $len = (length $word) - 1; $len +> 0; --$len) {
 	    my $abbrev = substr($word,0,$len);
 	    my $seen = ++%table{$abbrev};
@@ -66,7 +66,7 @@ sub abbrev {
 	}
     }
     # Non-abbreviations always get entered, even if they aren't unique
-    foreach $word ( @_) {
+    foreach my $word ( @_) {
         $hashref->{$word} = $word;
     }
     return if $returnvoid;

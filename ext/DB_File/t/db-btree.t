@@ -44,9 +44,8 @@ sub lexical
     my(@b) = @( unpack ("C*", $b) ) ;
 
     my $len = ((nelems @a) +> nelems @b ? (nelems @b) : nelems @a) ;
-    my $i = 0 ;
 
-    foreach $i ( 0 .. $len -1) {
+    foreach my $i ( 0 .. $len -1) {
         return @a[$i] - @b[$i] if @a[$i] != @b[$i] ;
     }
 
@@ -1333,11 +1332,11 @@ EOM
     ok( $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $k (keys %h) {}
+    foreach my $k (keys %h) {}
     ok( $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $v (values %h) {}
+    foreach my $v (values %h) {}
     ok( $bad_key == 0);
 
     undef $db ;

@@ -470,7 +470,7 @@ sub _expand_inc {
 sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   my @them;
   (undef,< @them) = < @_;
-  for $_ ( @them) {
+  for my $_ ( @them) {
     if ( $_ eq '.' ) {
       $_ = ':';
     } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {

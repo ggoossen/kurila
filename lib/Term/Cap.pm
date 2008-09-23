@@ -207,7 +207,7 @@ sub Tgetent
     $self = \%() unless defined $self;
     bless $self, $class;
 
-    my ( $term, $cap, $search, $field, $max, $tmp_term, $TERMCAP );
+    my ( $term, $cap, $search, $max, $tmp_term, $TERMCAP );
     local ( $termpat, $state, $first, $entry );    # used inside eval
     local $_;
 
@@ -396,7 +396,7 @@ sub Tgetent
 
     # Precompile $entry into the object
     $entry =~ s/^[^:]*://;
-    foreach $field ( split( m/:[\s:\\]*/, $entry ) )
+    foreach my $field ( split( m/:[\s:\\]*/, $entry ) )
     {
         if ( defined $field && $field =~ m/^(\w\w)$/ )
         {
@@ -682,8 +682,8 @@ found.
 sub Trequire
 {    ## public
     my $self = shift;
-    my ( $cap, @undefined );
-    foreach $cap ( @_)
+    my ( @undefined );
+    foreach my $cap ( @_)
     {
         push( @undefined, $cap )
           unless defined $self->{ '_' . $cap } && $self->{ '_' . $cap };

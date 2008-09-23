@@ -137,7 +137,8 @@ thaw_hash ('Hash with utf8 flag but no utf8 keys', \%R_HASH);
 
 if (eval "use Hash::Util; 1") {
   print "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
-  for $Storable::downgrade_restricted (@(0, 1, undef, "cheese")) {
+  for my $downgrade (@(0, 1, undef, "cheese")) {
+    $Storable::downgrade_restricted = $downgrade;
     my $hash = thaw_hash ('Locked hash', \%R_HASH);
     test_locked_hash ($hash);
     $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);

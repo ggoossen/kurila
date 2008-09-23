@@ -97,10 +97,10 @@ sub checkequal {
 
 sub main {
     my ($dothesort, $expect_unstable) = < @_;
-    my ($ts, $unsorted, @sorted, $status);
+    my ($unsorted, @sorted, $status);
     my $unstable_num = 0;
 
-    foreach $ts (@TestSizes) {
+    foreach my $ts (@TestSizes) {
 	$unsorted = genarray($ts);
 	# Sort only on item portion of each element.
 	# There will typically be many repeated items,

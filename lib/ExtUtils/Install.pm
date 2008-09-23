@@ -1039,7 +1039,6 @@ removed and values of the source files they would shadow.
 
 sub inc_uninstall {
     my($filepath,$libdir,$verbose,$dry_run,$ignore,$results) = < @_;
-    my($dir);
     $ignore||="";
     my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
@@ -1056,7 +1055,7 @@ sub inc_uninstall {
     
     #warn join "\n","---",@dirs,"---";
     my $seen_ours;
-    foreach $dir (  @dirs ) {
+    foreach my $dir (  @dirs ) {
         my $canonpath = File::Spec->canonpath($dir);
         next if $canonpath eq $Curdir;
         next if %seen_dir{$canonpath}++;
@@ -1208,8 +1207,8 @@ sub add {
 sub DESTROY {
     unless(defined $INSTALL_ROOT) {
         my $self = shift;
-        my($file,$i,$plural);
-        foreach $file (sort keys %$self) {
+        my($i,$plural);
+        foreach my $file (sort keys %$self) {
             $plural = (nelems @{$self->{$file}}) +> 1 ? "s" : "";
             print "## Differing version$plural of $file found. You might like to\n";
             for (0..(nelems @{$self->{$file}})-1) {

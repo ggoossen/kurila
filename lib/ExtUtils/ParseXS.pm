@@ -1580,8 +1580,8 @@ sub ProtoString ($)
 sub check_cpp {
   my @cpp = grep(m/^\#\s*(?:if|e\w+)/, @line);
   if ((nelems @cpp)) {
-    my ($cpp, $cpplevel);
-    for $cpp ( @cpp) {
+    my ($cpplevel);
+    for my $cpp ( @cpp) {
       if ($cpp =~ m/^\#\s*if/) {
 	$cpplevel++;
       } elsif (!$cpplevel) {

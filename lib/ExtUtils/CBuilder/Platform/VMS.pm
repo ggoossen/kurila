@@ -137,8 +137,8 @@ sub _liblist_ext {
   # to insure that the copy in the local tree is used, rather than one to
   # which a system-wide logical may point.
   if ($self->perl_src) {
-    my($lib,$locspec,$type);
-    foreach $lib ( @crtls) { 
+    my($locspec,$type);
+    foreach my $lib ( @crtls) { 
       if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= $self->{'config'}->{'exe_ext'}; }
         elsif (lc $type eq '/library') { $locspec .= $self->{'config'}->{'lib_ext'}; }
@@ -155,7 +155,7 @@ sub _liblist_ext {
     return  @('', '', $crtlstr, '',  @($give_libs ? \@() : ()));
   }
 
-  my(@dirs,@libs,$dir,$lib,%found,@fndlibs,$ldlib);
+  my(@dirs,@libs,%found,@fndlibs,$ldlib);
   my $cwd = cwd();
   my($so,$lib_ext,$obj_ext) = < %{$self->{'config'}}{[@('so','lib_ext','obj_ext')]};
   # List of common Unix library names and their VMS equivalents
@@ -172,7 +172,7 @@ sub _liblist_ext {
   warn "Potential libraries are '$potential_libs'\n" if $verbose;
 
   # First, sort out directories and library names in the input
-  foreach $lib (split ' ',$potential_libs) {
+  foreach my $lib (split ' ',$potential_libs) {
     push(@dirs,$1),   next if $lib =~ m/^-L(.*)/;
     push(@dirs,$lib), next if $lib =~ m/[:>\]]$/;
     push(@dirs,$lib), next if -d $lib;
@@ -184,7 +184,7 @@ sub _liblist_ext {
   # Now make sure we've got VMS-syntax absolute directory specs
   # (We don't, however, check whether someone's hidden a relative
   # path in a logical name.)
-  foreach $dir ( @dirs) {
+  foreach my $dir ( @dirs) {
     unless (-d $dir) {
       warn "Skipping nonexistent Directory $dir\n" if $verbose +> 1;
       $dir = '';
@@ -198,13 +198,13 @@ sub _liblist_ext {
   @dirs = grep { length($_) } @dirs;
   unshift(@dirs,''); # Check each $lib without additions first
 
-  LIB: foreach $lib ( @libs) {
+  LIB: foreach my $lib ( @libs) {
     if (exists %libmap{$lib}) {
       next unless length %libmap{$lib};
       $lib = %libmap{$lib};
     }
 
-    my(@variants,$variant,$cand);
+    my(@variants,$cand);
     my($ctype) = '';
 
     # If we don't have a file type, consider it a possibly abbreviated name and
@@ -217,10 +217,10 @@ sub _liblist_ext {
     }
     push(@variants,$lib);
     warn "Looking for $lib\n" if $verbose;
-    foreach $variant ( @variants) {
+    foreach my $variant ( @variants) {
       my($fullname, $name);
 
-      foreach $dir ( @dirs) {
+      foreach my $dir ( @dirs) {
         my($type);
 
         $name = "$dir$variant";
@@ -284,7 +284,7 @@ sub _liblist_ext {
   push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
   push @fndlibs, < map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
   push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
-  $lib = join(' ', @fndlibs);
+  my $lib = join(' ', @fndlibs);
 
   $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;

@@ -234,8 +234,7 @@ sub share_from {
     # Check that 'from' package actually exists
 #     croak("Package \"$pkg\" does not exist")
 # 	unless %{Symbol::stash("$pkg")};
-    my $arg;
-    foreach $arg ( @$vars) {
+    foreach my $arg ( @$vars) {
 	# catch some $safe->share($var) errors:
 	my ($var, $type);
 	$type = $1 if ($var = $arg) =~ s/^(\W)//;

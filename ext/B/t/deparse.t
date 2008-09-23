@@ -11,7 +11,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 62;
+use Test::More tests => 61;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -241,12 +241,6 @@ while ($i) { my $z = 1; } continue { $i = 99; }
 ####
 # 23
 foreach my $i (1, 2) {
-    my $z = 1;
-}
-####
-# 24
-my $i;
-foreach $i (1, 2) {
     my $z = 1;
 }
 ####

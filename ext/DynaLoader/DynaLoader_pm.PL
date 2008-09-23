@@ -419,7 +419,7 @@ sub dl_findfile {
     # This function does not automatically consider the architecture
     # or the perl library auto directories.
     my (@args) = @_;
-    my (@dirs,  $dir);   # which directories to search
+    my (@dirs);   # which directories to search
     my (@found);         # full paths to real files we have found
     #my $dl_ext= <<=to_string(%Config::Config{'dlext'})>>; # %Config::Config{'dlext'} suffix for perl extensions
     #my $dl_so = <<=to_string(%Config::Config{'so'})>>; # %Config::Config{'so'} suffix for shared libraries
@@ -459,7 +459,7 @@ sub dl_findfile {
             my(@names, $name);    # what filenames to look for
 	    s/^-l//;
 	    push(@names, $_);
-            foreach $dir (@(<@dirs, <@dl_library_path)) {
+            foreach my $dir (@(<@dirs, <@dl_library_path)) {
             	next unless -d $dir;
 		$dir =~ s/^([^:]+)$/:$1/;
 		$dir =~ s/:$//;
@@ -486,7 +486,7 @@ sub dl_findfile {
 	<</$^O-eq-VMS>>
 
         #  Only files should get this far...
-        my(@names, $name);    # what filenames to look for
+        my(@names);    # what filenames to look for
         if (m:-l: ) {          # convert -lname to appropriate library name
             s/-l//;
             push(@names,"lib$_.$dl_so");
@@ -508,12 +508,12 @@ sub dl_findfile {
 	    @dl_library_path = map { "$drive:$_" } @dl_library_path;
 	}
 	<</$^O-eq-symbian>>
-        foreach $dir (@(<@dirs, <@dl_library_path)) {
+        foreach my $dir (@(<@dirs, <@dl_library_path)) {
             next unless -d $dir;
 	    <<$^O-eq-VMS>>
             chop($dir = VMS::Filespec::unixpath($dir));
 	    <</$^O-eq-VMS>>
-            foreach $name (@names) {
+            foreach my $name (@names) {
 		my($file) = "$dir$dirsep$name";
                 print STDERR " checking in $dir for $name\n" if $dl_debug;
 		$file = ($do_expand) ? dl_expandspec($file) : (-f $file && $file);
@@ -564,8 +564,7 @@ sub dl_expandspec {
 sub dl_find_symbol_anywhere
 {
     my $sym = shift;
-    my $libref;
-    foreach $libref (@dl_librefs) {
+    foreach my $libref (@dl_librefs) {
 	my $symref = dl_find_symbol($libref,$sym);
 	return $symref if $symref;
     }

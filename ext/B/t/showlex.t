@@ -39,7 +39,7 @@ if ($is_thread) {
 # v1.01 tests
 
 my ($na,$nb,$nc);	# holds regex-strs
-my ($out, $newlex);	# output, option-flag
+my ($out);	# output, option-flag
 
 sub padrep {
     my ($varname,$newlex) = < @_;
@@ -48,7 +48,7 @@ sub padrep {
 	: "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
 }
 
-for $newlex (@('', '-newlex')) {
+for my $newlex (@('', '-newlex')) {
 
     $out = runperl ( switches => \@("-MO=Showlex,$newlex"),
 		     prog => 'my ($a,$b)', stderr => 1 );

@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 103;
+plan tests => 101;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -132,16 +132,6 @@ $a = 'outer';
 if (1) { local $a = 'inner' }
 is($a, 'outer');
 
-# see if localization works when scope unwinds
-local $m = 5;
-try {
-    for $m (@(6)) {
-	local $m = 7;
-	die "bye";
-    }
-};
-is($m, 5);
-
 {
     package TH;
     sub TIEHASH { bless \%(), @_[0] }
@@ -268,8 +258,7 @@ try { local $1 = 1 };
 like($@->{description}, qr/Modification of a read-only value attempted/);
 
 # The s/// adds 'g' magic to $_, but it should remain non-readonly
-try { for(@("a")) { for $x (@(1,2)) { local $_="b"; s/(.*)/+$1/ } } };
-is($@, "");
+for(@("a")) { for my $x (@(1,2)) { local $_="b"; s/(.*)/+$1/ } };
 
 # sub localisation
 {

@@ -1254,8 +1254,7 @@ sub Configure (@) {
 	  $longprefix ) = < @{shift(@options)};
     }
 
-    my $opt;
-    foreach $opt (  @options ) {
+    foreach my $opt (  @options ) {
 	my $try = lc ($opt);
 	my $action = 1;
 	if ( $try =~ m/^no_?(.*)$/s ) {

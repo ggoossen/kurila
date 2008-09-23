@@ -391,8 +391,7 @@ TODO: {
 
 # test dereferencing errors
 {
-    my $ref;
-    foreach $ref (@(*STDOUT{IO})) {
+    foreach my $ref (@(*STDOUT{IO})) {
 	dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
 	dies_like(sub { %$ref }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
 	dies_like(sub { &$ref }, qr/Not a CODE reference/, "Code dereference");

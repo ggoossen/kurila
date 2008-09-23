@@ -98,11 +98,11 @@ sub mkmanifest {
     open M, ">", "$MANIFEST" or die "Could not open $MANIFEST: $!";
     my $skip = _maniskip();
     my $found = manifind();
-    my($key,$val,$file,%all);
+    my($key,$val,%all);
     %all = %(< %$found, < %$read);
     %all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
-    foreach $file ( _sort < keys %all) {
+    foreach my $file ( _sort < keys %all) {
 	if ($skip->($file)) {
 	    # Policy: only remove files if they're listed in MANIFEST.SKIP.
 	    # Don't remove files just because they don't exist.
