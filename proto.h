@@ -3829,11 +3829,6 @@ PERL_CALLCONV void	Perl_newMYSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, O
 			__attribute__noreturn__;
 
 #endif
-PERL_CALLCONV OP *	Perl_my_attrs(pTHX_ OP *o, OP *attrs)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_MY_ATTRS	\
-	assert(o)
-
 PERL_CALLCONV void	Perl_boot_core_xsutils(pTHX);
 #if defined(USE_ITHREADS)
 PERL_CALLCONV PERL_CONTEXT*	Perl_cx_dup(pTHX_ PERL_CONTEXT* cx, I32 ix, I32 max, CLONE_PARAMS* param)

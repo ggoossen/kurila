@@ -1042,7 +1042,6 @@
 #define newMYSUB		Perl_newMYSUB
 #endif
 #ifdef PERL_CORE
-#define my_attrs		Perl_my_attrs
 #define boot_core_xsutils	Perl_boot_core_xsutils
 #endif
 #if defined(USE_ITHREADS)
@@ -3227,7 +3226,6 @@
 #define newMYSUB(a,b,c,d,e)	Perl_newMYSUB(aTHX_ a,b,c,d,e)
 #endif
 #ifdef PERL_CORE
-#define my_attrs(a,b)		Perl_my_attrs(aTHX_ a,b)
 #define boot_core_xsutils()	Perl_boot_core_xsutils(aTHX)
 #endif
 #if defined(USE_ITHREADS)
