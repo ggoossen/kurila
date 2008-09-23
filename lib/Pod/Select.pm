@@ -365,8 +365,7 @@ sub select {
     local *selected_sections = %myData{_SELECTED_SECTIONS};
 
     ## Compile each spec
-    my $spec;
-    for $spec ( @sections) {
+    for my $spec ( @sections) {
         if ( defined($_ = &_compile_section_spec($spec)) ) {
             ## Store them in our sections array
             push(@selected_sections, $_);
@@ -454,8 +453,8 @@ sub match_section {
     }
 
     ## Look for a match against the specified section expressions
-    my ($section_spec, $regex, $negated, $match);
-    for $section_spec (  @{$selections} ) {
+    my ($regex, $negated, $match);
+    for my $section_spec (  @{$selections} ) {
         ##------------------------------------------------------
         ## Each portion of this spec must match in order for
         ## the spec to be matched. So we will start with a 

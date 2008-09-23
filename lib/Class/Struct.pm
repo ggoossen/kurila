@@ -143,7 +143,7 @@ sub struct {
 
     my( $pre, $pst, $sel );
     $cnt = 0;
-    foreach $name ( @methods){
+    foreach my $name ( @methods){
         if ( do { no strict 'refs'; defined &{Symbol::fetch_glob($class . "::$name")} } ) {
             warnings::warnif("function '$name' already defined, overrides struct accessor method");
         }

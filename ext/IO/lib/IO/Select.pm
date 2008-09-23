@@ -71,8 +71,7 @@ sub _update
  $bits = '' unless defined $bits;
 
  my $count = 0;
- my $f;
- foreach $f ( @_)
+ foreach my $f ( @_)
   {
    my $fn = $vec->_fileno($f);
    next unless defined $fn;

@@ -479,9 +479,8 @@ sub stash_subs {
 
 sub print_protos {
     my $self = shift;
-    my $ar;
     my @ret;
-    foreach $ar ( @{$self->{'protos_todo'}}) {
+    foreach my $ar ( @{$self->{'protos_todo'}}) {
 	my $proto = (defined $ar->[1] ? " (". $ar->[1] . ")" : "");
 	push @ret, "sub " . $ar->[0] .  "$proto;\n";
     }
@@ -765,8 +764,7 @@ sub indent {
     my @lines = split(m/\n/, $txt);
     my $leader = "";
     my $level = 0;
-    my $line;
-    for $line ( @lines) {
+    for my $line ( @lines) {
 	my $cmd = substr($line, 0, 1);
 	if ($cmd eq "\t" or $cmd eq "\b") {
 	    $level += ($cmd eq "\t" ? 1 : -1) * $self->{'indent_size'};
@@ -3411,11 +3409,11 @@ sub re_unback {
 sub balanced_delim {
     my($str) = < @_;
     my @str = split m//, $str;
-    my($ar, $open, $close, $fail, $c, $cnt, $last_bs);
-    for $ar (@(\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}'))) {
+    my($open, $close, $fail, $cnt, $last_bs);
+    for my $ar (@(\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}'))) {
 	($open, $close) = < @$ar;
 	$fail = 0; $cnt = 0; $last_bs = 0;
-	for $c ( @str) {
+	for my $c ( @str) {
 	    if ($c eq $open) {
 		$fail = 1 if $last_bs;
 		$cnt++;
@@ -3677,21 +3675,21 @@ sub pp_stringify { maybe_targmy(< @_, \&dquote) }
 # note that tr(from)/to/ is OK, but not tr/from/(to)
 sub double_delim {
     my($from, $to) = < @_;
-    my($succeed, $delim);
+    my($succeed);
     if ($from !~ m[/] and $to !~ m[/]) {
 	return "/$from/$to/";
     } elsif (($succeed, $from) = < balanced_delim($from) and $succeed) {
 	if (($succeed, $to) = < balanced_delim($to) and $succeed) {
 	    return "$from$to";
 	} else {
-	    for $delim (@('/', '"', '#')) { # note no `'' -- s''' is special
+	    for my $delim (@('/', '"', '#')) { # note no `'' -- s''' is special
 		return "$from$delim$to$delim" if index($to, $delim) == -1;
 	    }
 	    $to =~ s[/][\\/]g;
 	    return "$from/$to/";
 	}
     } else {
-	for $delim (@('/', '"', '#')) { # note no '
+	for my $delim (@('/', '"', '#')) { # note no '
 	    return "$delim$from$delim$to$delim"
 		if index($to . $from, $delim) == -1;
 	}

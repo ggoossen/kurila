@@ -29,9 +29,9 @@ sub shellwords {
 
 sub quotewords {
     my($delim, $keep, < @lines) = < @_;
-    my($line, @words, @allwords);
+    my(@words, @allwords);
 
-    foreach $line ( @lines) {
+    foreach my $line ( @lines) {
 	@words = parse_line($delim, $keep, $line);
 	return() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);

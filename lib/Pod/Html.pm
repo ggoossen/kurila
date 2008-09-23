@@ -850,8 +850,8 @@ sub load_cache {
 #
 sub scan_podpath {
     my($podroot, $recurse, $append) = < @_;
-    my($pwd, $dir);
-    my($libpod, $dirname, $pod, @files, @poddata);
+    my($pwd);
+    my($dirname, @files, @poddata);
 
     unless($append) {
 	%Items = %( () );
@@ -862,12 +862,12 @@ sub scan_podpath {
     $pwd = getcwd();
     chdir($podroot)
 	|| die "$0: error changing to directory $podroot: $!\n";
-    foreach $dir ( @Podpath) {
+    foreach my $dir ( @Podpath) {
 	scan_dir($dir, $recurse);
     }
 
     # scan the pods listed in @Libpods for =item directives
-    foreach $libpod ( @Libpods) {
+    foreach my $libpod ( @Libpods) {
 	# if the page isn't defined then we won't know where to find it
 	# on the system.
 	next unless defined %Pages{$libpod} && %Pages{$libpod};
@@ -884,7 +884,7 @@ sub scan_podpath {
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives
-	    foreach $pod ( @files) {
+	    foreach my $pod ( @files) {
 		open(POD, "<", "$dirname/$pod") ||
 		    die "$0: error opening $dirname/$pod for input: $!\n";
 		@poddata = @( ~< *POD );
@@ -903,7 +903,7 @@ sub scan_podpath {
 	} elsif (%Pages{$libpod} =~ m/([^:]*\.pod):/ ||
 		 %Pages{$libpod} =~ m/([^:]*\.pm):/) {
 	    # scan the .pod or .pm file for =item directives
-	    $pod = $1;
+	    my $pod = $1;
 	    open(POD, "<", "$pod") ||
 		die "$0: error opening $pod for input: $!\n";
 	    @poddata = @( ~< *POD );
@@ -1064,13 +1064,13 @@ sub scan_headings {
 #
 sub scan_items {
     my( $itemref, $pod, < @poddata ) = < @_;
-    my($i, $item);
+    my( $item);
     local $_;
 
     $pod =~ s/\.pod\z//;
     $pod .= ".html" if $pod;
 
-    foreach $i (0..(nelems @poddata)-1) {
+    foreach my $i (0..(nelems @poddata)-1) {
 	my $txt = depod( @poddata[$i] );
 
 	# figure out what kind of item it is.

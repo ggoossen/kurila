@@ -165,14 +165,14 @@ sub Dump {
 our @post;
 sub Dumpperl {
   my($s) = shift;
-  my(@out, $val, $name);
+  my(@out, $name);
   my($i) = 0;
   local(@post);
   init_refaddr_format();
 
   $s = $s->new(< @_) unless ref $s;
 
-  for $val ( @{$s->{todump}}) {
+  for my $val ( @{$s->{todump}}) {
     my $out = "";
     @post = @();
     $name = $s->{names}->[$i++];
@@ -385,9 +385,8 @@ sub _dump {
         }
 
         if ($s->{purity}) {
-            my $k;
             local ($s->{level}) = 0;
-            for $k (qw(SCALAR ARRAY HASH)) {
+            for my $k (qw(SCALAR ARRAY HASH)) {
                 my $gval = *$rval{$k};
                 next unless defined $gval;
                 next if $k eq "SCALAR" && ! defined $$gval;  # always there
@@ -414,13 +413,13 @@ sub _dump {
           }
     }
     elsif ($realtype eq 'ARRAY') {
-        my($v, $pad, $mname);
+        my($pad, $mname);
         my($i) = 0;
         $out .= '@(';
         $pad = $s->{sep} . $s->{pad} . $s->{apad};
         $mname = $name . '->';
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-        for $v ( @$rval) {
+        for my $v ( @$rval) {
             $sname = $mname . '[' . $i . ']';
             $out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
             $out .= $pad . $ipad . $s->_dump($v, $sname);

@@ -135,10 +135,8 @@ sub STORABLE_thaw {
 package main;
 
 # $Storable::DEBUGME = 1;
-my $count;
-foreach $count (1..3) {
-  my $immortal;
-  foreach $immortal (keys %::immortals) {
+foreach my $count (1..3) {
+  foreach my $immortal (keys %::immortals) {
     print "# $immortal x $count\n";
     my $i =  RETURNS_IMMORTALS->make ($immortal, $count);
 

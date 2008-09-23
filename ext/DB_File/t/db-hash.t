@@ -824,11 +824,11 @@ EOM
     ok(123, $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $k (keys %h) {}
+    foreach my $k (keys %h) {}
     ok(124, $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $v (values %h) {}
+    foreach my $v (values %h) {}
     ok(125, $bad_key == 0);
 
     undef $db ;

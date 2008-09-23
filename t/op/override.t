@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 18;
+plan tests => 17;
 
 #
 # This file tries to test builtin override using CORE::GLOBAL
@@ -110,11 +110,8 @@ BEGIN { *OverridenPop::pop = sub { main::is( @_[0]->[0], "ok" ) }; }
 }
 
 {
-    try {
-        local *CORE::GLOBAL::require = sub {
-            CORE::require(@_[0]);
-        }        ;
-        require Text::ParseWords;
-    };
-    is $@, '';
+    local *CORE::GLOBAL::require = sub {
+        CORE::require(@_[0]);
+    }        ;
+    require Text::ParseWords;
 }

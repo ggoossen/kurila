@@ -52,8 +52,8 @@ my $Invoke_Perl = $Is_VMS      ? 'MCR Sys$Disk:[]Perl.exe' :
 my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 
 if ($Is_VMS) {
-    my (%old, $x);
-    for $x (@('DCL$PATH', < @MoreEnv)) {
+    my (%old);
+    for my $x (@('DCL$PATH', < @MoreEnv)) {
 	(%old{$x}) = %ENV{$x} =~ m/^(.*)$/ if exists %ENV{$x};
     }
     # VMS note:  PATH and TERM are automatically created by the C

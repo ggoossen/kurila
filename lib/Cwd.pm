@@ -476,8 +476,7 @@ sub chdir {
     } else {
 	my @curdir = split(m#/#,%ENV{'PWD'});
 	@curdir = @('') unless (nelems @curdir);
-	my $component;
-	foreach $component (split(m#/#, $newdir)) {
+	foreach my $component (split(m#/#, $newdir)) {
 	    next if $component eq '.';
 	    pop(@curdir),next if $component eq '..';
 	    push(@curdir,$component);

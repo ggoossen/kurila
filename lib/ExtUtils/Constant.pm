@@ -159,7 +159,6 @@ sub XS_constant {
     $what = \%( < map {$_ => 1} split m/,\s*/, ($what) );
   }
   my $params = ExtUtils::Constant::XS->params ($what);
-  my $type;
 
   my $xs = <<"EOT";
 void
@@ -234,7 +233,7 @@ EOT
           break;
 EOT
 
-  foreach $type (sort keys %XS_Constant) {
+  foreach my $type (sort keys %XS_Constant) {
     # '' marks utf8 flag needed.
     next if $type eq '';
     $xs .= "\t/* Uncomment this if you need to return {$type}s\n"

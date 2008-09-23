@@ -96,7 +96,8 @@ sub testit {
     "value for key 'undef' is undefined";
 }
 
-for $Storable::canonical (@(0, 1)) {
+for my $canonical  (@(0, 1)) {
+  $Storable::canonical = $canonical;
   for my $cloner (@(\&dclone, \&freeze_thaw)) {
     print "# \$Storable::canonical = $Storable::canonical\n";
     testit (\%hash, $cloner);

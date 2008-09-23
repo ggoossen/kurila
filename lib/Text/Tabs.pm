@@ -47,7 +47,7 @@ sub unexpand
               unless defined $lastbit;
             $lastbit = "\t"
               if $lastbit eq $ts_as_space;
-            for $_ ( @e) {
+            for my $_ ( @e) {
                 if ($debug) {
                     my $x = $_;
                     $x =~ s/\t/^I\t/gs;

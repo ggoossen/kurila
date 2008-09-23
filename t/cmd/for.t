@@ -1,10 +1,10 @@
 #!./perl
 
-print "1..43\n";
+print "1..37\n";
 
 use strict;
 
-our ($i, @x, $y, $c, $foo, @ary, $loop_count, @array, $r, $TODO);
+our ($i, @x, $y, $c, @ary, $loop_count, @array, $r, $TODO);
 
 for ($i = 0; $i +<= 10; $i++) {
     @x[$i] = $i;
@@ -26,32 +26,29 @@ for (;;) {
 }
 if ($c == 12) {print "ok 2\n";} else {print "not ok 2\n";}
 
-$foo = 3210;
-@ary = @(1,2,3,4,5);
-foreach $foo ( @ary) {
-	$foo *= 2;
-}
-if (join('', @ary) eq '246810') {print "ok 3\n";} else {print "not ok 3\n";}
-
 for ( @ary) {
     s/(.*)/ok $1\n/;
 }
 
 print @ary[1];
 
+print "ok 3\n";
+print "ok 4\n";
+
 # test for internal scratch array generation
 # this also tests that $foo was restored to 3210 after test 3
+my $foo = "3210";
 for (split(' ','a b c d e')) {
 	$foo .= $_;
 }
 if ($foo eq '3210abcde') {print "ok 5\n";} else {print "not ok 5 $foo\n";}
 
-foreach $foo (@(("ok 6\n","ok 7\n"))) {
+foreach my $foo (@(("ok 6\n","ok 7\n"))) {
 	print $foo;
 }
 
 sub foo {
-    for $i (1..5) {
+    for my $i (1..5) {
 	return $i if @_[0] == $i;
     }
 }
@@ -65,7 +62,7 @@ sub bar {
 }
 
 our $a = 0;
-foreach $b ( bar()) {
+foreach my $b ( bar()) {
     $a += $b;
 }
 print $a == 7 ? "ok" : "not ok", " 11\n";
@@ -220,38 +217,6 @@ for my $i (reverse @(1,2,3)) {
     $r .= $i;
 }
 is ($r, '321', 'Reverse for list with var');
-
-# For some reason the generate optree is different when $_ is implicit.
-$r = '';
-for $_ ( @array) {
-    $r .= $_;
-}
-is ($r, 'ABC', 'Forwards for array with explicit $_');
-$r = '';
-for $_ (@(1,2,3)) {
-    $r .= $_;
-}
-is ($r, '123', 'Forwards for list with explicit $_');
-$r = '';
-for $_ ( map {$_} @array) {
-    $r .= $_;
-}
-is ($r, 'ABC', 'Forwards for array via map with explicit $_');
-$r = '';
-for $_ ( map {$_} @( 1,2,3)) {
-    $r .= $_;
-}
-is ($r, '123', 'Forwards for list via map with explicit $_');
-$r = '';
-for $_ (1 .. 3) {
-    $r .= $_;
-}
-is ($r, '123', 'Forwards for list via .. with var with explicit $_');
-$r = '';
-for $_ ('A' .. 'C') {
-    $r .= $_;
-}
-is ($r, 'ABC', 'Forwards for list via .. with var with explicit $_');
 
 TODO: {
     $test++;

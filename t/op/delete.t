@@ -3,7 +3,7 @@
 require "./test.pl";
 plan( tests => 38 );
 
-my (@foo, %foo, $foo, @bar, $key, @refary, %refhash, @list);
+my (@foo, %foo, $foo, @bar, @refary, %refhash, @list);
 
 # delete() on hash elements
 
@@ -35,7 +35,7 @@ cmp_ok(%foo{3},'eq','c','c still exists');
 $foo = join('',values(%foo));
 ok($foo eq 'ac' || $foo eq 'ca','remaining keys');
 
-foreach $key (keys %foo) {
+foreach my $key (keys %foo) {
     delete %foo{$key};
 }
 
@@ -93,7 +93,7 @@ $foo = join('', @foo);
 cmp_ok($foo,'eq','ac','ary elems');
 cmp_ok(scalar(nelems @foo),'==',4,'four is the number thou shalt count');
 
-foreach $key (0 .. ((nelems @foo)-1)) {
+foreach my $key (0 .. ((nelems @foo)-1)) {
     delete @foo[$key];
 }
 

@@ -1205,8 +1205,8 @@ sub minus_f_nocase {   # i.e., do like -f, but without regard to case
      
      local *DIR;
      my @p = @($dir);
-     my($p,$cip);
-     foreach $p ( splitdir $file){
+     my($cip);
+     foreach my $p ( splitdir $file){
 	my $try = catfile < @p, $p;
         $self->aside("Scrutinizing $try...\n");
 	stat $try;

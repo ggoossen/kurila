@@ -285,7 +285,7 @@ sub CLEAR
         push @keys, $key;
         $status = $self->seq($key, $value, R_NEXT());
     }
-    foreach $key (reverse @keys) {
+    foreach my $key (reverse @keys) {
         my $s = $self->del($key); 
     }
 }

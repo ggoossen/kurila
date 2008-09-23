@@ -96,9 +96,8 @@ sub fill
 {
 	my ($ip, $xp, < @raw) = < @_;
 	my @para;
-	my $pp;
 
-	for $pp (split(m/\n\s+/, join("\n", @raw))) {
+	for my $pp (split(m/\n\s+/, join("\n", @raw))) {
 		$pp =~ s/\s+/ /g;
 		my $x = wrap($ip, $xp, $pp);
 		push(@para, $x);

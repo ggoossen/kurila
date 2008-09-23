@@ -9,13 +9,13 @@
 use Config;
 require './test.pl'; # for runperl()
 
-print "1..187\n";
+print "1..181\n";
 
 my $test = 1;
 sub test (&) {
   my $ok = &{@_[0]};
   print $ok ? "ok $test\n" : "not ok $test\n";
-  printf "# Failed at line \%d\n", (caller)[[2]] unless $ok;
+  printf "# Failed at line \%d\n", @(caller)[2] unless $ok;
   $test++;
 }
 
@@ -187,9 +187,9 @@ test {
     use strict;
 
     use vars < qw!$test!;
-    my($debugging, %expected, $inner_type, $where_declared, $within);
+    my($debugging, %expected);
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
-    my($code, $inner_sub_test, $expected, $line, $errors, $output);
+    my($code, $expected, $errors, $output);
     my(@inners, $sub_test, $pid);
     $debugging = 1 if defined(@ARGV[0]) and @ARGV[0] eq '-debug';
 
@@ -204,17 +204,16 @@ test {
 	'sub_scalar'	=> 7001,
 	'sub_array'	=> 8101,
 	'sub_hash'	=> 9004,
-	'foreach'	=> 10011,
     );
 
     # Our innermost sub is either named or anonymous
-    for $inner_type (qw!named anon!) {
+    for my $inner_type (qw!named anon!) {
       # And it may be declared at filescope, within a named
       # sub, or within an anon sub
-      for $where_declared (qw!filescope in_named in_anon!) {
+      for my $where_declared (qw!filescope in_named in_anon!) {
 	# And that, in turn, may be within a foreach loop,
 	# a naked block, or another named sub
-	for $within (qw!foreach naked other_sub!) {
+	for my $within (qw!foreach naked other_sub!) {
 
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
@@ -263,7 +262,7 @@ END_MARK_TWO
     sub test (&) \{
       my \$ok = &\{\@_[0]\};
       print \$ok ? "ok \$test\n" : "not ok \$test\n";
-      printf "# Failed at line \\\%d\n", (caller)[2] unless \$ok;
+      printf "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;
     \}
 \}
@@ -303,9 +302,8 @@ END
 
 	  if ($within eq 'foreach') {
 	    $code .= '
-      my $foreach = 12000;
       my @list = @(10000, 10010);
-      foreach $foreach (@list) {
+      foreach my $foreach (@list) {
     ' # }
 	  } elsif ($within eq 'naked') {
 	    $code .= "  \{ # naked block\n"	# }
@@ -318,11 +316,10 @@ END
 	  $sub_test = $test;
 	  @inners = @( < qw!global_scalar global_array global_hash! , <
 	    qw!fs_scalar fs_array fs_hash! );
-	  push @inners, 'foreach' if $within eq 'foreach';
 	  if ($where_declared ne 'filescope') {
 	    push @inners, < qw!sub_scalar sub_array sub_hash!;
 	  }
-	  for $inner_sub_test ( @inners) {
+	  for my $inner_sub_test ( @inners) {
 
 	    if ($inner_type eq 'named') {
 	      $code .= "    sub named_$sub_test "
@@ -351,8 +348,6 @@ END
 	      $code .= '{ ++%fs_hash{6002} }'
 	    } elsif ($inner_sub_test eq 'sub_hash') {
 	      $code .= '{ ++%sub_hash{9002} }'
-	    } elsif ($inner_sub_test eq 'foreach') {
-	      $code .= '{ ++$foreach }'
 	    } else {
 	      die "What was $inner_sub_test?"
 	    }
@@ -388,7 +383,7 @@ END
 	  }
 
 	  # Now, we can actually prep to run the tests.
-	  for $inner_sub_test ( @inners) {
+	  for my $inner_sub_test ( @inners) {
 	    $expected = %expected{$inner_sub_test} or
 	      die "expected $inner_sub_test missing";
 
@@ -489,7 +484,7 @@ END
 	  print STDERR $errors;
 	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
 	    my $lnum = 0;
-	    for $line (split '\n', $code) {
+	    for my $line (split '\n', $code) {
 	      printf "\%3d:  \%s\n", ++$lnum, $line;
 	    }
 	  }
