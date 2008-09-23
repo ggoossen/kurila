@@ -111,6 +111,8 @@ at git://dev.tty.nl/perl
 
 =over 4
 
+=item L<kurila114delta> What is new for Perl Kurila 1.14
+
 =item L<kurila113delta> What is new for Perl Kurila 1.13
 
 =item L<kurila112delta> What is new for Perl Kurila 1.12
