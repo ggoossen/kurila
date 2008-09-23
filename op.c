@@ -1898,41 +1898,26 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 }
 
 OP *
-Perl_my_attrs(pTHX_ OP *o, OP *attrs)
+Perl_my(pTHX_ OP *o)
 {
     dVAR;
     OP *rops;
     int maybe_scalar = 0;
 
-    PERL_ARGS_ASSERT_MY_ATTRS;
+    PERL_ARGS_ASSERT_MY;
 
-/* [perl #17376]: this appears to be premature, and results in code such as
-   C< our(%x); > executing in list mode rather than void mode */
     maybe_scalar = 1;
-    if (attrs)
-	SAVEFREEOP(attrs);
     rops = NULL;
-    o = my_kid(o, attrs, &rops);
+    o = my_kid(o, NULL, &rops);
     if (rops) {
 	if (maybe_scalar && o->op_type == OP_PADSV) {
 	    o = append_list(OP_LISTLAST, (LISTOP*)rops, (LISTOP*)o);
-/* 	    o = append_list(OP_LISTLAST, (LISTOP*)o, (LISTOP*)(NULL)); */
-/* 	    o = append_list(OP_LIST, (LISTOP*)rops, (LISTOP*)o); */
-/* 	    o->op_private |= OPpLVAL_INTRO; */
 	}
 	else
 	    o = append_list(OP_LIST, (LISTOP*)o, (LISTOP*)rops);
     }
     PL_parser->in_my = FALSE;
     return o;
-}
-
-OP *
-Perl_my(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_MY;
-
-    return my_attrs(o, NULL);
 }
 
 OP *
