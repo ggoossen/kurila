@@ -316,45 +316,6 @@ Useless use of a constant (4) in void context at - line 6 character 2.
 Useless use of a constant (undef) in void context at - line 8 character 1.
 ########
 # op.c
-use warnings 'parenthesis' ;
-my $a, $b = (1,2);
-my @foo,%bar,	$quux; # there's a TAB here
-my $x, $y or print;
-no warnings 'parenthesis' ;
-my $c, $d = (1,2);
-EXPECT
-Parentheses missing around "my" list at - line 3 character 7.
-list may not be used in scalar context at - line 3, near ");"
-Parentheses missing around "my" list at - line 4 character 9.
-Global symbol "%bar" requires explicit package name at - line 4, near ",%bar"
-Global symbol "$quux" requires explicit package name at - line 4, near ",	$quux"
-Global symbol "$y" requires explicit package name at - line 5, near ", $y "
-BEGIN not safe after errors--compilation aborted at - line 6 character 28.
-########
-# op.c
-use warnings 'parenthesis' ;
-our $a, $b = (1,2);
-no warnings 'parenthesis' ;
-our $c, $d = (1,2);
-EXPECT
-Parentheses missing around "our" list at - line 3 character 8.
-list may not be used in scalar context at - line 3, near ");"
-BEGIN not safe after errors--compilation aborted at - line 4 character 28.
-########
-# op.c
-our ($b, $c, $d);
-use warnings 'parenthesis' ;
-local $a, $b = (1,2);
-local *f, *g;
-no warnings 'parenthesis' ;
-local $c, $d = (1,2);
-EXPECT
-Parentheses missing around "local" list at - line 4 character 10.
-list may not be used in scalar context at - line 4, near ");"
-Parentheses missing around "local" list at - line 5 character 10.
-BEGIN not safe after errors--compilation aborted at - line 6 character 28.
-########
-# op.c
 use warnings 'bareword' ;
 print (ABC || 1) ;
 no warnings 'bareword' ;

@@ -1908,14 +1908,7 @@ Perl_my_attrs(pTHX_ OP *o, OP *attrs)
 
 /* [perl #17376]: this appears to be premature, and results in code such as
    C< our(%x); > executing in list mode rather than void mode */
-#if 0
-    if (o->op_flags & OPf_PARENS)
-	list(o);
-    else
-	maybe_scalar = 1;
-#else
     maybe_scalar = 1;
-#endif
     if (attrs)
 	SAVEFREEOP(attrs);
     rops = NULL;
@@ -2143,51 +2136,8 @@ Perl_localize(pTHX_ OP *o, I32 lex)
     PERL_ARGS_ASSERT_LOCALIZE;
 
     if (o->op_flags & OPf_PARENS)
-/* [perl #17376]: this appears to be premature, and results in code such as
-   C< our(%x); > executing in list mode rather than void mode */
-#if 0
-	list(o);
-#else
 	NOOP;
-#endif
-    else {
-	if ( PL_parser->bufptr > PL_parser->oldbufptr
-	    && PL_parser->bufptr[-1] == ','
-	    && ckWARN(WARN_PARENTHESIS))
-	{
-	    char *s = PL_parser->bufptr;
-	    bool sigil = FALSE;
 
-	    /* some heuristics to detect a potential error */
-	    while (*s && (strchr(", \t\n", *s)))
-		s++;
-
-	    while (1) {
-		if (*s && strchr("@$%*", *s) && *++s
-		       && (isALNUM(*s) || UTF8_IS_CONTINUED(*s))) {
-		    s++;
-		    sigil = TRUE;
-		    while (*s && (isALNUM(*s) || UTF8_IS_CONTINUED(*s)))
-			s++;
-		    while (*s && (strchr(", \t\n", *s)))
-			s++;
-		}
-		else
-		    break;
-	    }
-	    if (sigil && (*s == ';' || *s == '=')) {
-		Perl_warner(aTHX_ packWARN(WARN_PARENTHESIS),
-				"Parentheses missing around \"%s\" list",
-				lex
-				    ? (PL_parser->in_my == KEY_our
-					? "our"
-					: PL_parser->in_my == KEY_state
-					    ? "state"
-					    : "my")
-				    : "local");
-	    }
-	}
-    }
     if (lex)
 	o = my(o);
     else

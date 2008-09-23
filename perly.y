@@ -95,7 +95,7 @@
 %type <opval> argexpr nexpr texpr iexpr mexpr mnexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
-%type <opval> subattrlist myattrlist myattrterm myterm
+%type <opval> subattrlist myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
 %type <p_tkval> label
 
@@ -564,22 +564,6 @@ proto	:	/* NULL */
 subattrlist:	/* NULL */
 			{ $$ = (OP*)NULL; }
 	|	COLONATTR THING
-			{ $$ = $2;
-			  TOKEN_GETMAD($1,$$,':');
-                          APPEND_MADPROPS_PV("attrlist",$$,'>');
-			}
-	|	COLONATTR
-			{ $$ = IF_MAD(
-                                newOP(OP_NULL, 0, LOCATION($1)),
-				    (OP*)NULL
-				);
-			  TOKEN_GETMAD($1,$$,':');
-                          APPEND_MADPROPS_PV("attrlist",$$,'>');
-			}
-	;
-
-/* List of attributes for a "my" variable declaration */
-myattrlist:	COLONATTR THING
 			{ $$ = $2;
 			  TOKEN_GETMAD($1,$$,':');
                           APPEND_MADPROPS_PV("attrlist",$$,'>');
@@ -1262,17 +1246,10 @@ term	:	termbinop
 	;
 
 /* "my" declarations, with optional attributes */
-myattrterm:	MY myterm myattrlist
-			{ $$ = my_attrs($2,$3);
-			  DO_MAD(
-			      TOKEN_GETMAD($1,$$,'d');
-			      append_madprops($3->op_madprop, $$, 'a');
-			      $3->op_madprop = 0;
-			  )
-			}
-	|	MY myterm
-			{ $$ = localize($2,IVAL($1));
-			  TOKEN_GETMAD($1,$$,'d');
+myattrterm:  MY myterm
+			{ 
+                            $$ = localize($2,IVAL($1));
+                            TOKEN_GETMAD($1,$$,'d');
 			}
 	;
 
