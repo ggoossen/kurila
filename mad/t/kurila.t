@@ -36,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_map_array();
+t_array_simplify();
 die;
+t_map_array();
 t_array_hash();
 t_eval_to_try();
 t_anon_aryhsh();
@@ -1317,5 +1318,13 @@ my (<$b) = $a->{[3,4,7]};
 ----
 my (<$b) = < $a->{[@(3,4,7)]};
 ====
+END
+}
+
+sub t_array_simplify {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my $x = @( < $a );
+----
+my $x = $a;
 END
 }
