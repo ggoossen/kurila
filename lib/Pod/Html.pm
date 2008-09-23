@@ -1133,7 +1133,7 @@ sub emit_item_tag($$$){
 
     print HTML '<strong>';
     if (%Items_Named{$item}++) {
-	print HTML < process_text( \$otext );
+	print HTML process_text( \$otext );
     } else {
         my $name = $item;
         $name = anchorify($name);
@@ -1327,7 +1327,7 @@ sub process_pre {
     # insert spaces in place of tabs
     $rest =~ s#(.+)#{
 	    my $line = $1;
-            1 while $line =~ s/^(.*?)(\t+)/$1{' ' x ((length($2) * 8 - length($1) % 8))}/;
+            1 while $line =~ s/^(.*?)(\t+)/{$1 . ' ' x ((length($2) * 8 - length($1) % 8))}/;
 	    $line;
 	}#g;
 
