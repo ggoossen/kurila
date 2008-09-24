@@ -5665,9 +5665,9 @@ Perl_yylex(pTHX)
 		    PL_expect = attrful;
 		else if (*s != '{' && key == KEY_sub) {
 		    if (!have_name)
-			Perl_croak(aTHX_ "Illegal declaration of anonymous subroutine");
+			yyerror("Illegal declaration of anonymous subroutine");
 		    else if (*s != ';')
-			Perl_croak(aTHX_ "Illegal declaration of subroutine %"SVf, SVfARG(PL_subname));
+			yyerror(Perl_form(aTHX_ "Illegal declaration of subroutine %"SVf, SVfARG(PL_subname)));
 		}
 
 #ifdef PERL_MAD
