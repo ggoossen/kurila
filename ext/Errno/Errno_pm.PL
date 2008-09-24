@@ -15,7 +15,6 @@ my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 unlink "Errno.pm" if -f "Errno.pm";
 open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $!";
 select OUT;
-my $file;
 my @files = get_files();
 if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
@@ -23,7 +22,7 @@ if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     # all in .c file and process that instead.
     open INCS, ">", 'includes.c' or
 	die "Cannot open includes.c";
-    foreach $file ( @files) {
+    foreach my $file ( @files) {
 	next if $file eq 'errno.c';
 	next unless -f $file;
 	print INCS qq[#include "$file"\n];
@@ -33,7 +32,7 @@ if (%Config{gccversion} ne '' && $^O eq 'MSWin32') {
     unlink 'includes.c';
 }
 else {
-    foreach $file ( @files) {
+    foreach my $file ( @files) {
 	process_file($file);
     }
 }
@@ -217,7 +216,6 @@ sub get_files {
 }
 
 sub write_errno_pm {
-    my $err;
 
     # quick sanity check
 
@@ -236,7 +234,7 @@ sub write_errno_pm {
     }
     if ($IsMSWin32) {
 	print CPPI "#include <winsock.h>\n";
-	foreach $err (keys %wsa) {
+	foreach my $err (keys %wsa) {
 	    print CPPI "#ifndef $err\n";
 	    print CPPI "#define $err WSA$err\n";
 	    print CPPI "#endif\n";
@@ -244,7 +242,7 @@ sub write_errno_pm {
 	}
     }
  
-    foreach $err (keys %err) {
+    foreach my $err (keys %err) {
 	print CPPI '"',$err,'" [[',$err,']]',"\n";
     }
 
@@ -381,7 +379,7 @@ ESQ
     $k =~ s/(.{50,70})\s/$1\n\t/g;
     print "\t",$k,"\n    )\n);\n\n";
 
-    foreach $err ( @err) {
+    foreach my $err ( @err) {
 	printf "sub \%s () \{ \%d \}\n",$err,%err{$err};
     }
 
@@ -389,7 +387,7 @@ ESQ
 my %name2no = %(
 ESQ
 
-    foreach $err ( @err) {
+    foreach my $err ( @err) {
 	printf "    \%s => \%d,\n",$err,%err{$err};
     }
 
