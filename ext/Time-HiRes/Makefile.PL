@@ -766,8 +766,7 @@ sub doConstants {
                                            PROXYSUBS => 1,
 					  );
     } else {
-        my $file;
-	foreach $file (@('const-c.inc', 'const-xs.inc')) {
+	foreach my $file (@('const-c.inc', 'const-xs.inc')) {
 	    my $fallback = File::Spec->catfile('fallback', $file);
 	    local $/;
 	    open IN, "<$fallback" or die "Can't open $fallback: $!";
