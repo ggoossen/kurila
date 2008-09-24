@@ -10570,6 +10570,9 @@ Perl_yywarn(pTHX_ const char *const s)
 
     PERL_ARGS_ASSERT_YYWARN;
 
+    if (PL_error_count)
+	return 0; /* no warning if we already have an error */
+
     PL_in_eval |= EVAL_WARNONLY;
     yyerror(s);
     PL_in_eval &= ~EVAL_WARNONLY;
