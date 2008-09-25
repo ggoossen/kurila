@@ -216,7 +216,7 @@ sub split_into_char {
     my $uni = shift;
     my $len = length($uni);
     my @ary;
-    for(my $i = 0; $i +< $len; ++$i) {
+    for my $i (0..$len-1) {
 	push @ary, ord(substr($uni,$i,1));
     }
     return @ary;
@@ -367,10 +367,10 @@ EOF
 
     foreach my $p (sort { $a <+> $b } keys %val) {
 	next if ! %val{ $p };
-	for (my $r = 0; $r +< 256; $r++) {
+	for my $r (0..255) {
 	    next if ! %val{ $p }->{ $r };
 	    printf "static $type {$head}_\%02x_\%02x [256] = \{\n", $p, $r;
-	    for (my $c = 0; $c +< 256; $c++) {
+	    for my $c (0..255) {
 		print "\t", defined %val{$p}->{$r}->{$c}
 		    ? "($type)".%val{$p}->{$r}->{$c}
 		    : $null;
@@ -383,7 +383,7 @@ EOF
     foreach my $p (sort { $a <+> $b } keys %val) {
 	next if ! %val{ $p };
 	printf "static $type* {$head}_\%02x [256] = \{\n", $p;
-	for (my $r = 0; $r +< 256; $r++) {
+	for my $r (0..255) {
 	    print %val{ $p }->{ $r }
 		? sprintf("{$head}_\%02x_\%02x", $p, $r)
 		: "NULL";
@@ -393,7 +393,7 @@ EOF
 	print "\};\n\n";
     }
     print "static $type** $head [] = \{\n";
-    for (my $p = 0; $p +<= 0x10; $p++) {
+    for my $p (0..0x10) {
 	print %val{ $p } ? sprintf("{$head}_\%02x", $p) : "NULL";
 	print ','  if $p != 0x10;
 	print "\n";
