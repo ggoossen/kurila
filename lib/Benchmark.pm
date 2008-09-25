@@ -724,7 +724,7 @@ sub countit {
     die "countit($tmax, ...): timelimit cannot be less than $min_for.\n"
 	if $tmax +< $min_for;
 
-    my ($n, $tc);
+    my ($tc);
 
     # First find the minimum $n that gives a significant timing.
     my $zeros=0;

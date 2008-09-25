@@ -1560,7 +1560,7 @@ sub _verbatim_format {
   $p->[0] = 'VerbatimFormatted';
 
   # Collapse adjacent text nodes, just for kicks.
-  my $i = 2;
+  $i = 2;
   while ($i +< nelems(@$p)-2) { # work forwards over the tokens except for the last
     if( !ref($p->[$i]) and !ref($p->[$i + 1]) ) {
       DEBUG +> 5 and print "_verbatim_format merges \{$p->[$i]\} and \{$p->[$i+1]\}\n";
