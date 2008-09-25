@@ -201,8 +201,7 @@ sub textblock {
         s%L</([^>]+)>%$1%g;
         my @items = split m/(?:,?\s+(?:and\s+)?)/;
         my $string = "the ";
-        my $i;
-        for ($i = 0; $i +< nelems @items; $i++) {
+        for my $i (0 .. nelems(@items)-1) {
             $string .= @items[$i];
             $string .= ", " if (nelems @items) +> 2 && $i != (nelems @items)-1;
             $string .= " and " if ($i == (nelems @items) - 2);

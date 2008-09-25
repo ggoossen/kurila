@@ -54,7 +54,7 @@ sub make {
 	$self->{h} = $h;
 	$self->{ref} = \%hash;
 	my @pool;
-	for (my $i = 0; $i +< 5; $i++) {
+	for my $i (0..4) {
 		push(@pool, SIMPLE->make($i));
 	}
 	$self->{obj} = \@pool;

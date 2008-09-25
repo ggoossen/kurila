@@ -828,7 +828,7 @@ sub _rmtree {
                 }
             print "unlink $canon\n" if $arg->{verbose};
 	    # delete all versions under VMS
-	    for (;;) {
+	    while (1) {
                 if (unlink $root) {
                     push @{${$arg->{result}}}, $root if $arg->{result};
                 }

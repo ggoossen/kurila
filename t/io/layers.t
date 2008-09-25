@@ -107,7 +107,7 @@ SKIP: {
 	}
 	my $n = scalar @$expected;
 	is(scalar @$result, $n, "$id - layers == $n");
-	for (my $i = 0; $i +< $n; $i++) {
+	for my $i (0 .. $n -1) {
 	    my $j = $expected->[$i];
 	    if (ref $j eq 'CODE') {
 		ok($j->($result->[$i]), "$id - $i is ok");

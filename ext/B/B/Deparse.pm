@@ -414,10 +414,12 @@ sub begin_is_use {
     return unless $self->const_sv($svop)->PV eq $module;
 
     # Pull out the arguments
-    for ($svop=$svop->sibling; $svop->name ne "method_named";
-		$svop = $svop->sibling) {
+    $svop=$svop->sibling;
+    while ($svop->name ne "method_named") {
 	$args .= ", " if length($args);
 	$args .= $self->deparse($svop, 6);
+
+        $svop = $svop->sibling;
     }
 
     my $use = 'use';
@@ -812,8 +814,10 @@ sub deparse_sub {
 	my $lineseq = $cv->ROOT->first;
 	if ($lineseq->name eq "lineseq") {
 	    my @ops;
-	    for(my$o=$lineseq->first; $$o; $o=$o->sibling) {
+	    my$o=$lineseq->first;
+            while ($$o) {
 		push @ops, $o;
+                $o=$o->sibling;
 	    }
 	    $body = $self->lineseq(undef, < @ops).";";
 	    my $scope_en = $self->find_scope_en($lineseq);
@@ -1070,8 +1074,9 @@ sub scopeop {
     } else {
 	$kid = $op->first;
     }
-    for (; !null($kid); $kid = $kid->sibling) {
+    while(!null($kid)) {
 	push @kids, $kid;
+        $kid = $kid->sibling;
     }
     if ($cx +> 0) { # inside an expression, (a do {} while for lineseq)
         if ($cx == 26) { # inside double quote
@@ -1100,8 +1105,10 @@ sub deparse_root {
     < %$self{[qw'curstash warnings hints hinthash']} = < @oldv;
     my @kids;
     return if null $op->first; # Can happen, e.g., for Bytecode without -k
-    for (my $kid = $op->first->sibling; !null($kid); $kid = $kid->sibling) {
+    my $kid = $op->first->sibling;
+    while (!null($kid)) {
 	push @kids, $kid;
+        $kid = $kid->sibling;
     }
     $self->walk_lineseq($op, \@kids,
 			sub { print $self->indent(@_[0].';');
@@ -1112,7 +1119,8 @@ sub deparse_root {
 sub walk_lineseq {
     my ($self, $op, $kids, $callback) = < @_;
     my @kids = @$kids;
-    for (my $i = 0; $i +< nelems @kids; $i++) {
+    my $i = 0;
+    while ( $i +< nelems(@kids) ) {
 	my $expr = "";
 	if (is_state @kids[$i]) {
 	    $expr = $self->deparse(@kids[$i++], 0);
@@ -1128,6 +1136,8 @@ sub walk_lineseq {
 	$expr .= $self->deparse(@kids[$i], ((nelems @kids) != 1)/2);
 	$expr =~ s/;\n?\z//;
 	$callback->($expr, $i);
+    } continue {
+        $i++;
     }
 }
 
@@ -1196,14 +1206,15 @@ sub lex_in_scope {
 
 sub populate_curcvlex {
     my $self = shift;
-    for (my $cv = $self->{'curcv'}; class($cv) eq "CV"; $cv = $cv->OUTSIDE) {
+    my $cv = $self->{'curcv'};
+    while (class($cv) eq "CV") {
 	my $padlist = $cv->PADLIST;
 	# an undef CV still in lexical chain
 	next if class($padlist) eq "SPECIAL";
 	my @padlist = $padlist->ARRAY;
 	my @ns = @padlist[0]->ARRAY;
 
-	for (my $i=0; $i+<nelems @ns; ++$i) {
+	for my $i (0 .. nelems(@ns) -1) {
 	    next if class(@ns[$i]) eq "SPECIAL";
 	    next if @ns[$i]->FLAGS ^&^ SVpad_OUR;  # Skip "our" vars
 	    if (class(@ns[$i]) eq "PV") {
@@ -1218,6 +1229,8 @@ sub populate_curcvlex {
 
 	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
 	}
+    } continue {
+        $cv = $cv->OUTSIDE;
     }
 }
 
@@ -1232,7 +1245,8 @@ sub find_scope {
 
     my @queue = @($op);
     while(my $op = shift @queue ) {
-	for (my $o=$op->first; $$o; $o=$o->sibling) {
+	my $o=$op->first;
+        while ($$o) {
 	    if ($o->name =~ m/^pad.v$/ && $o->private ^&^ OPpLVAL_INTRO) {
 		my $s = int($self->padname_sv($o->targ)->COP_SEQ_RANGE_LOW);
 		my $e = $self->padname_sv($o->targ)->COP_SEQ_RANGE_HIGH;
@@ -1248,7 +1262,9 @@ sub find_scope {
 	    }
 	    elsif ($o->flags ^&^ OPf_KIDS) {
 		unshift (@queue, $o);
-	    }
+	    };
+
+            $o=$o->sibling;
 	}
     }
 
@@ -1726,9 +1742,11 @@ sub anon_hash_or_list {
                           "anonhash" => \@('%(',')')){$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
-    for (; !null($op); $op = $op->sibling) {
+    while (!null($op)) {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
+
+        $op = $op->sibling;
     }
     return $pre . join(", ", @exprs) . $post;
 }
@@ -2066,8 +2084,9 @@ sub pp_repeat {
     if (null($right)) { # list repeat; count is inside left-side ex-list
 	my $kid = $left->first->sibling; # skip pushmark
 	my @exprs;
-	for (; !null( <$kid->sibling); $kid = $kid->sibling) {
+	while (!null($kid->sibling)) {
 	    push @exprs, < $self->deparse($kid, 6);
+            $kid = $kid->sibling;
 	}
 	$right = $kid;
 	$left = "(" . join(", ", @exprs). ")";
@@ -2175,8 +2194,9 @@ sub listop {
 	push @exprs, < $self->deparse( <$kid->first, 6);
 	$kid = $kid->sibling;
     }
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	push @exprs, $self->deparse($kid, 6);
+        $kid = $kid->sibling;
     }
     if ($parens) {
 	return "$name(" . join(", ", @exprs) . ")";
@@ -2331,9 +2351,10 @@ sub indirop {
     elsif ($name eq "sort" && $op->private ^&^ OPpSORT_DESCEND) {
 	$indir = '{$b cmp $a} ';
     }
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	$expr = $self->deparse($kid, 6);
 	push @exprs, $expr;
+        $kid = $kid->sibling;
     }
     my $name2 = $name;
     if ($name eq "sort" && $op->private ^&^ OPpSORT_REVERSE) {
@@ -2376,9 +2397,10 @@ sub mapop {
 	$code = $self->deparse($code, 24) . ", ";
     }
     $kid = $kid->sibling;
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	$expr = $self->deparse($kid, 6);
 	push @exprs, $expr if defined $expr;
+        $kid = $kid->sibling;
     }
     return $self->maybe_parens_func($name, $code . join(", ", @exprs), $cx, 5);
 }
@@ -2393,9 +2415,9 @@ sub pp_list {
     my($op, $cx) = < @_;
     my($expr, @exprs);
     my $kid = $op->first->sibling; # skip pushmark
-    my $lop;
     my $local = "either"; # could be local(...), my(...), state(...) or our(...)
-    for ($lop = $kid; !null($lop); $lop = $lop->sibling) {
+    my $lop = $kid;
+    while (!null($lop)) {
 	# This assumes that no other private flags equal 128, and that
 	# OPs that store things other than flags in their op_private,
 	# like OP_AELEMFAST, won't be immediate children of a list.
@@ -2435,10 +2457,12 @@ sub pp_list {
 	    ($local = "", last) if $local =~ m/^(?:my|our|state)$/;
 	    $local = "local";
 	}
+    } continue {
+        $lop = $lop->sibling;
     }
     $local = "" if $local eq "either"; # no point if it's all undefs
     return $self->deparse($kid, $cx) if null $kid->sibling and not $local;
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	if ($local) {
 	    if (class($kid) eq "UNOP" and $kid->first->name eq "gvsv") {
 		$lop = $kid->first;
@@ -2452,6 +2476,8 @@ sub pp_list {
 	    $expr = $self->deparse($kid, 6);
 	}
 	push @exprs, $expr;
+
+        $kid = $kid->sibling;
     }
     if ($local) {
 	return "$local(" . join(", ", @exprs) . ")";
@@ -2590,8 +2616,9 @@ sub loop_common {
 	my $state = $body->first;
 	my $cuddle = $self->{'cuddle'};
 	my @states;
-	for (; $$state != $$cont; $state = $state->sibling) {
+	while ($$state != $$cont) {
 	    push @states, $state;
+            $state = $state->sibling;
 	}
 	$body = $self->lineseq(undef, < @states);
 	if (defined $cond and not is_scope $cont and $self->{'expand'} +< 3) {
@@ -2945,22 +2972,26 @@ sub slice {
     my $self = shift;
     my ($op, $cx, $left, $right, $regname, $padname) = < @_;
     my $last;
-    my(@elems, $kid, $array, $list);
+    my(@elems, $array, $list);
     if (class($op) eq "LISTOP") {
 	$last = $op->last;
     } else { # ex-hslice inside delete()
-	for ($kid = $op->first; !null $kid->sibling; $kid = $kid->sibling) {}
+	my $kid = $op->first;
+        while (!null $kid->sibling) {
+            $kid = $kid->sibling;
+        }
 	$last = $kid;
     }
     $array = $last;
     $array = $array->first
 	if $array->name eq $regname or $array->name eq "null";
     $array = $self->elem_or_slice_array_name($array,$left,$padname,0);
-    $kid = $op->first->sibling; # skip pushmark
+    my $kid = $op->first->sibling; # skip pushmark
     if ($kid->name eq "list") {
 	$kid = $kid->first->sibling; # skip list, pushmark
-	for (; !null $kid; $kid = $kid->sibling) {
+	while (!null $kid) {
 	    push @elems, $self->deparse($kid, 6);
+            $kid = $kid->sibling;
 	}
 	$list = join(", ", @elems);
     } else {
@@ -3014,15 +3045,16 @@ sub _method {
 	$kid = $kid->first->sibling; # skip pushmark
 	$obj = $kid;
 	$kid = $kid->sibling;
-	for (; not null $kid; $kid = $kid->sibling) {
+	while (not null $kid) {
 	    push @exprs, $kid;
+            $kid = $kid->sibling;
 	}
     } else {
 	$obj = $kid;
 	$kid = $kid->sibling;
-	for (; !null ($kid->sibling) && $kid->name ne "method_named";
-	      $kid = $kid->sibling) {
-	    push @exprs, $kid
+	while (!null ($kid->sibling) && $kid->name ne "method_named") {
+	    push @exprs, $kid;
+            $kid = $kid->sibling;
 	}
 	$meth = $kid;
     }
@@ -3158,8 +3190,9 @@ sub pp_entersub {
     }
     $kid = $op->first;
     $kid = $kid->first->sibling; # skip ex-list, pushmark
-    for (; not null $kid->sibling; $kid = $kid->sibling) {
+    while (not null $kid->sibling) {
 	push @exprs, $kid;
+        $kid = $kid->sibling;
     }
     my $simple = 0;
     my $proto = undef;
@@ -3491,8 +3524,10 @@ sub const {
     }
     # convert a version object into the "v1.2.3" string in its V magic
     if ($sv->FLAGS ^&^ SVs_RMG) {
-	for (my $mg = $sv->MAGIC; $mg; $mg = $mg->MOREMAGIC) {
+	my $mg = $sv->MAGIC;
+        while ($mg) {
 	    return $mg->PTR if $mg->TYPE eq 'V';
+            $mg = $mg->MOREMAGIC;
 	}
     }
 
@@ -3562,11 +3597,13 @@ sub const {
 	    return "sub " . $self->deparse_sub($ref);
 	}
 	if ($ref->FLAGS ^&^ SVs_SMG) {
-	    for (my $mg = $ref->MAGIC; $mg; $mg = $mg->MOREMAGIC) {
+	    my $mg = $ref->MAGIC;
+            while ($mg) {
 		if ($mg->TYPE eq 'r') {
 		    my $re = re_uninterp( <escape_str( <re_unback( <$mg->precomp)));
 		    return single_delim("qr", "", $re);
 		}
+                $mg = $mg->MOREMAGIC;
 	    }
 	}
 	
@@ -3732,18 +3769,21 @@ sub pchr { # ASCII
 
 sub collapse {
     my(@chars) = @_;
-    my($str, $c, $tr) = ("");
-    for ($c = 0; $c +< nelems @chars; $c++) {
+    my($str, $tr) = ("");
+    my $c = 0;
+    while ($c +< nelems @chars) {
 	$tr = @chars[$c];
 	$str .= pchr($tr);
 	if ($c +<=( (nelems @chars)-1) - 2 and @chars[$c + 1] == $tr + 1 and
 	    @chars[$c + 2] == $tr + 2)
 	{
-	    for (; $c +<=( (nelems @chars)-1)-1 and @chars[$c + 1] == @chars[$c] + 1; $c++)
-	      {}
+	    while( $c +<=( (nelems @chars)-1)-1 and @chars[$c + 1] == @chars[$c] + 1 ) {
+                $c++;
+            }
 	    $str .= "-";
 	    $str .= pchr(@chars[$c]);
 	}
+        $c++;
     }
     return $str;
 }
@@ -3932,8 +3972,9 @@ sub pp_split {
     }
     $ary = $self->stash_variable('@', < $self->gv_name($gv)) if $gv;
 
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	push @exprs, $self->deparse($kid, 6);
+        $kid = $kid->sibling;
     }
 
     # handle special case of split(), and split(' ') that compiles to /\s+/

@@ -91,7 +91,8 @@ sub handler_traceback {
     syswrite(STDERR, "\n", 1);
 
     # Now go for broke.
-    for (my $i = 1; my ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i); $i++) {
+    my $i = 1;
+    while (my ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i)) {
         my @a = @( () );
 	for ( @DB::args) {
 	    s/([\'\\])/\\$1/g;
@@ -115,6 +116,8 @@ sub handler_traceback {
 	$f = "file `$f'" unless $f eq '-e';
 	my $mess = "$w$s$a called from $f line $l\n";
 	syswrite(STDERR, $mess, length($mess));
+
+        $i++;
     }
     kill 'ABRT', $$;
 }

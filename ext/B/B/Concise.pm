@@ -438,8 +438,10 @@ sub walk_topdown {
     my($op, $sub, $level) = < @_;
     $sub->($op, $level);
     if ($op->flags ^&^ OPf_KIDS) {
-	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
+	my $kid = $op->first;
+        while ($$kid) {
 	    walk_topdown($kid, $sub, $level + 1);
+            $kid = $kid->sibling;
 	}
     }
     elsif (class($op) eq "PMOP") {
@@ -469,7 +471,7 @@ sub walk_exec {
     my @lines;
     my @todo = @(\@($top, \@lines));
     while ((nelems @todo) and my($op, $targ) = < @{shift @todo}) {
-	for (; $$op; $op = $op->next) {
+	while ($$op) {
 	    last if %opsseen{$$op}++;
 	    push @$targ, $op;
 	    my $name = $op->name;
@@ -486,6 +488,8 @@ sub walk_exec {
                 %labels{${$op->lastop}} = "LAST";
                 %labels{${$op->redoop}} = "REDO";
 	    }
+
+            $op = $op->next;
 	}
     }
     walklines(\@lines, 0);
@@ -496,7 +500,7 @@ sub sequence {
     my($op) = < @_;
     my $oldop = 0;
     return if class($op) eq "NULL" or exists %sequence_num{$$op};
-    for (; $$op; $op = $op->next) {
+    while ($$op) {
 	last if exists %sequence_num{$$op};
 	my $name = $op->name;
 	if ($name =~ m/^(null|scalar|lineseq|scope)$/) {
@@ -524,6 +528,7 @@ sub sequence {
 	    }
 	}
 	$oldop = $op;
+        $op = $op->next;
     }
 }
 
@@ -912,18 +917,21 @@ sub tree {
     my $op = shift;
     my $level = shift;
     my $style = @tree_decorations[$tree_style];
-    my($space, $single, $kids, $kid, $nokid, $last, $lead, $size) = < @$style;
+    my($space, $single, $kids, $nokid, $last, $lead, $size) = < @$style;
     my $name = concise_op($op, $level, $treefmt);
     if (not $op->flags ^&^ OPf_KIDS) {
 	return $name . "\n";
     }
     my @lines;
-    for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
+    my $kid = $op->first;
+    while ($$kid) {
 	push @lines, < tree($kid, $level+1);
+        $kid = $kid->sibling;
     }
-    my $i;
-    for ($i = ((nelems @lines)-1); substr(@lines[$i], 0, 1) eq " "; $i--) {
+    my $i = (nelems @lines)-1;
+    while (substr(@lines[$i], 0, 1) eq " ") {
 	@lines[$i] = $space . @lines[$i];
+        $i--;
     }
     if ($i +> 0) {
 	@lines[$i] = $last . @lines[$i];

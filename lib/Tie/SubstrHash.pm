@@ -65,7 +65,7 @@ sub FETCH {
     local($self,$key) = < @_;
     local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
     &hashkey;
-    for (;;) {
+    while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
@@ -89,7 +89,7 @@ sub STORE {
     my $writeoffset;
 
     &hashkey;
-    for (;;) {
+    while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
@@ -117,7 +117,7 @@ sub DELETE {
     local($self,$key) = < @_;
     local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
     &hashkey;
-    for (;;) {
+    while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
@@ -143,10 +143,14 @@ sub FIRSTKEY {
 sub NEXTKEY {
     local($self) = < @_;
     local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = < @$self[[1..6]];
-    for (++$iterix; $iterix +< $tsize->[1]; ++$iterix) {
+    ++$iterix;
+    while ($iterix +< $tsize->[1]) {
 	next unless substr(@$self[0], $iterix * $rlen, 1) eq "\2";
 	@$self[6] = $iterix;
 	return substr(@$self[0], $iterix * $rlen + 1, $klen);
+    }
+    continue {
+        ++$iterix;
     }
     @$self[6] = -1;
     undef;
@@ -202,15 +206,19 @@ sub findgteprime { # find the smallest prime integer greater than or equal to
     my $sqrtnumsquared = $sqrtnum * $sqrtnum;
 
   NUM:
-    for (;; $num += 2) {
+    while (1) {
 	if ($sqrtnumsquared +< $num) {
 	    $sqrtnum++;
 	    $sqrtnumsquared = $sqrtnum * $sqrtnum;
 	}
-        for ($i = 3; $i +<= $sqrtnum; $i += 2) {
+        $i = 3;
+        while ($i +<= $sqrtnum) {
             next NUM unless $num % $i;
+            $i += 2;
         }
         return $num;
+    } continue {
+        $num += 2;
     }
 }
 

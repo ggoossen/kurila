@@ -26,7 +26,6 @@ print "# Testing VerbatimFormatted...\n";
     #   What do you want?  i like pie. [or whatever]
     # #:^^^^^^^^^^^^^^^^^              /////////////         
 
-
 &ok( Pod::Simple::XMLOutStream->_out(\&with_vf,
 q{=pod
 

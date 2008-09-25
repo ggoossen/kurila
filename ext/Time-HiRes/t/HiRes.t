@@ -468,7 +468,8 @@ if ($have_ualarm) {
  N: {
      do {
 	 my $t0 = time();
-	 for ($i = 0; $i +< $DelayN; $i++) { }
+	 my $i = 0;
+         while ($i +< $DelayN) { $i++ }
 	 my $t1 = time();
 	 my $dt = $t1 - $t0;
 	 print "# N = $DelayN, t1 = $t1, t0 = $t0, dt = $dt\n";
@@ -481,8 +482,8 @@ if ($have_ualarm) {
     my $Delay = sub {
 	my $c = (nelems @_) ? shift : 1;
 	my $n = $c * $DelayN;
-	my $i;
-	for ($i = 0; $i +< $n; $i++) { }
+	my $i = 0;
+	while ($i +< $n) { $i++ }
     };
 
     # Next setup a periodic timer (the two-argument alarm() of
@@ -588,7 +589,8 @@ if ($have_clock) {
     my @clock = @( clock() );
     print "# clock = {join ' ', @clock}\n";
     for my $i (1..3) {
-	for (my $j = 0; $j +< 1e6; $j++) { }
+	my $j = 0;
+        while ($j +< 1e6) { $j++ }
 	push @clock, clock();
 	print "# clock = {join ' ', @clock}\n";
     }
@@ -661,7 +663,7 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
     my $ai = 0;
     my $mi = 0;
     my $ss = 0;
-    for (my $i = 1; $i +< nelems @atime; $i++) {
+    for my $i (1 .. nelems(@atime) -1) {
 	if (@atime[$i] +>= @atime[$i-1]) {
 	    $ai++;
 	}
@@ -669,7 +671,7 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 	    $ss++;
 	}
     }
-    for (my $i = 1; $i +< nelems @mtime; $i++) {
+    for my $i (1 .. nelems(@mtime) -1) {
 	if (@mtime[$i] +>= @mtime[$i-1]) {
 	    $mi++;
 	}

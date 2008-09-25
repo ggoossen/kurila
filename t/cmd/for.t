@@ -4,9 +4,9 @@ print "1..37\n";
 
 use strict;
 
-our ($i, @x, $y, $c, @ary, $loop_count, @array, $r, $TODO);
+our (@x, $y, $c, @ary, $loop_count, @array, $r, $TODO);
 
-for ($i = 0; $i +<= 10; $i++) {
+for my $i (0..10) {
     @x[$i] = $i;
 }
 $y = @x[10];
@@ -19,12 +19,7 @@ if (join(' ', @x) eq '0 1 2 3 4 5 6 7 8 9 10') {
 	print "not ok 1\n";
 }
 
-$i = $c = 0;
-for (;;) {
-	$c++;
-	last if $i++ +> 10;
-}
-if ($c == 12) {print "ok 2\n";} else {print "not ok 2\n";}
+@ary = @(1, 2);
 
 for ( @ary) {
     s/(.*)/ok $1\n/;

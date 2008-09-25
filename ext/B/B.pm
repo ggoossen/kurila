@@ -122,8 +122,10 @@ sub walkoptree_slow {
     if ($$op && ($op->flags ^&^ OPf_KIDS)) {
 	my $kid;
 	unshift(@parents, $op);
-	for ($kid = $op->first; $$kid; $kid = $kid->sibling) {
+	$kid = $op->first;
+        while ($$kid) {
 	    walkoptree_slow($kid, $method, $level + 1);
+            $kid = $kid->sibling;
 	}
 	shift @parents;
     }
@@ -171,7 +173,7 @@ sub walkoptree_exec {
     $level ||= 0;
     my ($sym, $ppname);
     my $prefix = "    " x $level;
-    for (; $$op; $op = $op->next) {
+    while ($$op) {
 	$sym = objsym($op);
 	if (defined($sym)) {
 	    print $prefix, "goto $sym\n";
@@ -214,6 +216,8 @@ sub walkoptree_exec {
 		print $prefix, "\}\n";
 	    }
 	}
+
+        $op = $op->next;
     }
 }
 

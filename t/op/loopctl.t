@@ -31,7 +31,7 @@
 #
 #  -- .robin. <robin@kitsite.com>  2001-03-13
 require "./test.pl";
-plan( tests => 47 );
+plan( tests => 38 );
 
 my $ok;
 
@@ -324,81 +324,6 @@ TEST12: {
   $ok = 1;
 }
 cmp_ok($ok,'==',1,'no label on for(@array) last');
-
-TEST13: {
-
-  $ok = 0;
-
-  for(my $first_time = 1; 1;) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST13;
-    }
-    $ok = 0;
-    $first_time=0;
-
-    redo;
-    last TEST13;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'no label on for(;;)');
-
-TEST14: {
-
-  $ok = 0;
-
-  for(my $first_time = 1; 1; $first_time=0) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST14;
-    }
-    $ok = 0;
-    next;
-    last TEST14;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'no label on for(;;) successful next');
-
-TEST15: {
-
-  $ok = 0;
-
-  my $x=1;
-  my $been_in_loop = 0;
-  for(my $first_time = 1; $x--;) {
-    $been_in_loop = 1;
-    if (!$first_time) {
-      $ok = 0;
-      last TEST15;
-    }
-    $ok = 0;
-    $first_time = 0;
-    next;
-    last TEST15;
-  }
-  $ok = $been_in_loop;
-}
-cmp_ok($ok,'==',1,'no label on for(;;) unsuccessful next');
-
-TEST16: {
-
-  $ok = 0;
-
-  for(my $first_time = 1; 1; last TEST16) {
-    if (!$first_time) {
-      $ok = 0;
-      last TEST16;
-    }
-    $ok = 0;
-    $first_time = 0;
-    last;
-    last TEST16;
-  }
-  $ok = 1;
-}
-cmp_ok($ok,'==',1,'no label on for(;;) last');
 
 TEST17: {
 
@@ -746,81 +671,6 @@ TEST31: {
 }
 cmp_ok($ok,'==',1,'label on for(@array) last');
 
-TEST32: {
-
-  $ok = 0;
-
-  LABEL32: for(my $first_time = 1; 1;) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST32;
-    }
-    $ok = 0;
-    $first_time=0;
-
-    redo LABEL32;
-    last TEST32;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'label on for(;;)');
-
-TEST33: {
-
-  $ok = 0;
-
-  LABEL33: for(my $first_time = 1; 1; $first_time=0) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST33;
-    }
-    $ok = 0;
-    next LABEL33;
-    last TEST33;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'label on for(;;) successful next');
-
-TEST34: {
-
-  $ok = 0;
-
-  my $x=1;
-  my $been_in_loop = 0;
-  LABEL34: for(my $first_time = 1; $x--;) {
-    $been_in_loop = 1;
-    if (!$first_time) {
-      $ok = 0;
-      last TEST34;
-    }
-    $ok = 0;
-    $first_time = 0;
-    next LABEL34;
-    last TEST34;
-  }
-  $ok = $been_in_loop;
-}
-cmp_ok($ok,'==',1,'label on for(;;) unsuccessful next');
-
-TEST35: {
-
-  $ok = 0;
-
-  LABEL35: for(my $first_time = 1; 1; last TEST16) {
-    if (!$first_time) {
-      $ok = 0;
-      last TEST35;
-    }
-    $ok = 0;
-    $first_time = 0;
-    last LABEL35;
-    last TEST35;
-  }
-  $ok = 1;
-}
-cmp_ok($ok,'==',1,'label on for(;;) last');
-
 TEST36: {
 
   $ok = 0;
@@ -955,13 +805,6 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 	cmp_ok($x,'==',1,"until/redo lexical life");
 	last;
     }
-    for ($i = 1; my $x = $i; ) {
-	$i++;
-	redo if $i == 2;
-	cmp_ok($x,'==',1,"for/redo lexical life");
-	last;
-    }
-
 }
 
 TODO: {

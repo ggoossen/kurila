@@ -248,8 +248,8 @@ ok(27, $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i +< 200; $i++) { %h{$i + 0} = $i + 0; }
-for ($i = 1; $i +< 200; $i++) { $ok = 0 unless %h{$i} == $i; }
+for my $i (1..199) { %h{$i + 0} = $i + 0; }
+for my $i (1..199) { $ok = 0 unless %h{$i} == $i; }
 ok(28, $ok );
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -1101,9 +1101,8 @@ EOM
 
     my %bad = %( () ) ;
     $key = '';
-    for ($status = $db->seq($key, $value, R_FIRST ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT ) ) {
+    my $status = $db->seq($key, $value, R_FIRST );
+    while ( $status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{$key} && defined $value && 
@@ -1113,6 +1112,8 @@ EOM
         else {
             %bad{$key} = $value ;
         }
+
+        $status = $db->seq($key, $value, R_NEXT );
     }
     
     ok 157, nkeys %bad == 0 ;
@@ -1189,9 +1190,8 @@ EOM
     my %bad = %( () ) ;
     my $key = '';
     my $value = '';
-    for ($status = $db->seq($key, $value, R_FIRST ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT ) ) {
+   $status = $db->seq($key, $value, R_FIRST );
+   while ( $status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{$key} && defined $value && 
@@ -1201,6 +1201,8 @@ EOM
         else {
             %bad{$key} = $value ;
         }
+
+        $status = $db->seq($key, $value, R_NEXT );
     }
     
     ok 164, $_ eq 'fred';

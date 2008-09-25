@@ -17,13 +17,15 @@ while (($now = time) == $beg) { sleep 1 }
 
 ok($now +> $beg && $now - $beg +< 10,             'very basic time test');
 
-our $i;
-for ($i = 0; $i +< 1_000_000; $i++) {
+our $i = 0;
+while ($i +< 1_000_000) {
     for my $j (1..100) {}; # burn some user cycles
     my ($nowuser, $nowsys) = times;
     $i = 2_000_000 if $nowuser +> $beguser && ( $nowsys +>= $begsys ||
                                             (!$nowsys && !$begsys));
     last if time - $beg +> 20;
+
+    $i++;
 }
 
 ok($i +>= 2_000_000, 'very basic times test');

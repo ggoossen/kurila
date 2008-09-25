@@ -553,7 +553,7 @@ sub timediff {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for (my $i=0; $i +< nelems @$a; ++$i) {
+    for my $i (0 .. nelems(@$a) -1) {
 	push(@r, $a->[$i] - $b->[$i]);
     }
     #die "Bad timediff(): ($r[1] + $r[2]) <= 0 (@$a[1,2]|@$b[1,2])\n"
@@ -571,7 +571,7 @@ sub timesum {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for (my $i=0; $i +< nelems @$a; ++$i) {
+    for my $i (0 .. nelems(@$a) -1) {
  	push(@r, $a->[$i] + $b->[$i]);
     }
     bless \@r;
@@ -728,7 +728,8 @@ sub countit {
 
     # First find the minimum $n that gives a significant timing.
     my $zeros=0;
-    for ($n = 1; ; $n *= 2 ) {
+    my $n = 1;
+    while (1) {
 	my $td = timeit($n, $code);
 	$tc = $td->[1] + $td->[2];
 	if ( $tc +<= 0 and $n +> 1024 ) {
@@ -738,6 +739,7 @@ sub countit {
 	    $zeros = 0;
 	}
 	last if $tc +> 0.1;
+        $n *= 2;
     }
 
     my $nmin = $n;
@@ -978,7 +980,7 @@ sub cmpthese{
 
         # Columns 2..N = performance ratios
 	my $skip_rest = 0;
-	for ( my $col_num = 0 ; $col_num +< nelems @vals ; ++$col_num ) {
+	for my $col_num (0 .. nelems(@vals) -1) {
 	    my $col_val = @vals[$col_num];
 	    my $out;
 	    if ( $skip_rest ) {

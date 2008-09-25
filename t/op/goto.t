@@ -8,7 +8,7 @@ BEGIN {
 
 use warnings;
 use strict;
-plan tests => 57;
+plan tests => 50;
 our $TODO;
 
 our $foo;
@@ -85,36 +85,6 @@ for (@(1)) {
 }
 is($count, 2, 'end of loop');
 
-# Does goto work correctly within a for(;;) loop?
-#  (BUG ID 20010309.004)
-
-for(my $i=0;!$i++;) {
-  my $x=1;
-  goto label;
-  label: is($x, 1, 'goto inside a for(;;) loop body from inside the body');
-}
-
-# Does goto work correctly going *to* a for(;;) loop?
-#  (make sure it doesn't skip the initializer)
-
-my ($z, $y) = (0);
-FORL1: for ($y=1; $z;) {
-    ok($y, 'goto a for(;;) loop, from outside (does initializer)');
-    goto TEST19}
-($y,$z) = (0, 1);
-goto FORL1;
-
-# Even from within the loop?
-TEST19: $z = 0;
-FORL2: for($y=1; 1;) {
-  if ($z) {
-    ok($y, 'goto a for(;;) loop, from inside (does initializer)');
-    last;
-  }
-  ($y, $z) = (0, 1);
-  goto FORL2;
-}
-
 # Does goto work correctly within a try block?
 #  (BUG ID 20000313.004) - [perl #2359]
 $ok = 0;
@@ -174,11 +144,6 @@ ok($ok, 'works correctly in a nested eval string');
     }
     a();
     ok($ok, '#19061 loop label wiped away by goto');
-
-    $ok = 0;
-    my $p;
-    for ($p=1;$p && goto A;$p=0) { A: $ok = 1 }
-    ok($ok, 'weird case of goto and for(;;) loop');
 }
 
 # bug #9990 - don't prematurely free the CV we're &going to.
@@ -188,18 +153,6 @@ sub f1 {
     goto sub { $x=0; ok(1,"don't prematurely free CV\n") }
 }
 f1();
-
-# bug #22181 - this used to coredump or make $x undefined, due to
-# erroneous popping of the inner BLOCK context
-
-undef $ok;
-for ($count=0; $count+<2; $count++) {
-    my $x = 1;
-    goto LABEL29;
-    LABEL29:
-    $ok = $x;
-}
-is($ok, 1, 'goto in for(;;) with continuation');
 
 # bug #22299 - goto in require doesn't find label
 
@@ -397,25 +350,6 @@ sub a32039 { @_=@("foo"); goto &b32039; }
 sub b32039 { goto &c32039; }
 sub c32039 { is(@_[0], 'foo', 'chained &goto') }
 a32039();
-
-# [perl #35214] next and redo re-entered the loop with the wrong cop,
-# causing a subsequent goto to crash
-
-{
-    my $r = runperl(
-		stderr => 1,
-		prog =>
-'for ($_=0;$_+<3;$_++){A: if($_==1){next} if($_==2){$_++;goto A}}print qq(ok\n)'
-    );
-    is($r, "ok\n", 'next and goto');
-
-    $r = runperl(
-		stderr => 1,
-		prog =>
-'for ($_=0;$_+<3;$_++){A: if($_==1){$_++;redo} if($_==2){$_++;goto A}}print qq(ok\n)'
-    );
-    is($r, "ok\n", 'redo and goto');
-}
 
 # goto &foo not allowed in evals
 

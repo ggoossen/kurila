@@ -66,7 +66,7 @@ is($q->pending(), 7, 'Queue count');
     my $tary2 = $q->dequeue();
     ok($tary2, 'Thread got item');
     is(ref($tary2), 'ARRAY', 'Item is array ref');
-    for (my $ii=0; $ii +< nelems @ary2; $ii++) {
+    for my $ii (0 .. nelems(@ary2) -1) {
         is(@$tary2[$ii], @ary2[$ii], 'Shared array element check');
     }
 

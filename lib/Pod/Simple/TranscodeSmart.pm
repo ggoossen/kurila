@@ -25,9 +25,8 @@ sub encmodver {
 sub make_transcoder {
   my($e) = @_[1];
   die "WHAT ENCODING!?!?" unless $e;
-  my $x;
   return sub {
-    foreach $x ( @_) {
+    foreach my $x ( @_) {
       $x = Encode::decode($e, $x);
     }
     return;

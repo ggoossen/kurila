@@ -15,8 +15,10 @@ BEGIN {
     # for casual testing.  There are some cutoffs (~256)
     # in pp_sort that should be tested, but 10_000 is ample.
     $WellSoaked = 10_000;			# <= $BigEnough
-    for (my $ts = 3; $ts +< $WellSoaked; $ts *= 10**(1/3)) {
+    my $ts = 3;
+    while ($ts +< $WellSoaked) {
 	push(@TestSizes, int($ts));		# about 3 per decade
+        $ts *= 10**(1/3);
     }
 }
 
@@ -38,13 +40,13 @@ use Test::More tests => (nelems @TestSizes) * 2	# sort() tests
 
 sub genarray {
     my $size = int(shift);		# fractions not welcome
-    my ($items, $i);
+    my ($items);
     my @a;
 
     if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
     elsif ($size +> $BigEnough) { $size = $BigEnough; }
     $items = int(sqrt($size));		# number of distinct items
-    for ($i = 0; $i +< $size; ++$i) {
+    for my $i (0 .. $size -1) {
 	@a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
     }
     return \@a;
@@ -56,9 +58,9 @@ sub genarray {
 sub checkorder {
     my $aref = shift;
     my $status = '';			# so far, so good
-    my ($i, $disorder);
+    my ($disorder);
 
-    for ($i = 0; $i +< nelems(@$aref)-1; ++$i) {
+    for my $i (0 .. nelems(@$aref)-2) {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
@@ -78,12 +80,11 @@ sub checkorder {
 sub checkequal {
     my ($aref, $bref) = < @_;
     my $status = '';
-    my $i;
 
     if (nelems(@$aref) != nelems(@$bref)) {
 	$status = "Sizes differ: " . nelems(@$aref) . " vs " . nelems(@$bref);
     } else {
-	for ($i = 0; $i +< nelems(@$aref); ++$i) {
+	for my $i (0 .. nelems(@$aref) -1) {
 	    next if ($aref->[$i] eq $bref->[$i]);
 	    $status = "Element $i differs: $aref->[$i] vs $bref->[$i]";
 	    last;
