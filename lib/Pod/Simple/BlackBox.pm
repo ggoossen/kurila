@@ -844,7 +844,7 @@ sub _ponder_for {
     return 1;
   }
 
-  for(my $i = 2; $i +< nelems @$para; ++$i) {
+  for my $i (2 .. nelems(@$para) -1) {
     if($para->[$i] =~ s/^\s*(\S+)\s*//s) {
       $target = $1;
       last;
@@ -1357,7 +1357,7 @@ sub _ponder_Verbatim {
   DEBUG and print " giving verbatim treatment...\n";
 
   $para->[1]->{'xml:space'} = 'preserve';
-  for(my $i = 2; $i +< nelems @$para; $i++) {
+  for my $i (2 .. nelems(@$para) -1) {
       while( $para->[$i] =~
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
@@ -1455,7 +1455,7 @@ sub _verbatim_format {
   
   my $formatting;
 
-  for(my $i = 2; $i +< nelems @$p; $i++) { # work backwards over the lines
+  for my $i (2 .. nelems(@$p) -1) { # work backwards over the lines
     DEBUG and print "_verbatim_format appends a newline to $i: $p->[$i]\n";
     $p->[$i] .= "\n";
      # Unlike with simple Verbatim blocks, we don't end up just doing
@@ -1465,13 +1465,14 @@ sub _verbatim_format {
 
   if( DEBUG +> 4 ) {
     print "<<\n";
-    for(my $i = (nelems @$p)-1; $i +>= 2; $i--) { # work backwards over the lines
-      print "_verbatim_format $i: $p->[$i]";
+    for my $i (reverse(2..(nelems @$p)-1)) { # work backwards over the lines
+        print "_verbatim_format $i: $p->[$i]";
     }
     print ">>\n";
   }
 
-  for(my $i = (nelems @$p)-1; $i +> 2; $i--) {
+  my $i = nelems(@$p)-1;
+  while ($i +>= 2) {
     # work backwards over the lines, except the first (#2)
     
     #next unless $p->[$i]   =~ m{^#:([ \^\/\%]*)\n?$}s
@@ -1552,20 +1553,25 @@ sub _verbatim_format {
     $i--; # So the next line we scrutinize is the line before the one
           #  that we just went and formatted
   }
+  continue {
+      $i--;
+  }
 
   $p->[0] = 'VerbatimFormatted';
 
   # Collapse adjacent text nodes, just for kicks.
-  for( my $i = 2; $i +> (nelems @$p)-1; $i++ ) { # work forwards over the tokens except for the last
+  my $i = 2;
+  while ($i +< nelems(@$p)-2) { # work forwards over the tokens except for the last
     if( !ref($p->[$i]) and !ref($p->[$i + 1]) ) {
       DEBUG +> 5 and print "_verbatim_format merges \{$p->[$i]\} and \{$p->[$i+1]\}\n";
       $p->[$i] .= splice @$p, $i+1, 1; # merge
       --$i;  # and back up
     }
+    $i++;
   }
 
   # Now look for the last text token, and remove the terminal newline
-  for( my $i = (nelems @$p)-1; $i +>= 2; $i-- ) {
+  for my $i (reverse( 2 .. (nelems @$p)-1 )) {
     # work backwards over the tokens, even the first
     if( !ref($p->[$i]) ) {
       if($p->[$i] =~ s/\n$//s) {
@@ -1784,7 +1790,7 @@ sub stringify_lol {  # function: stringify_lol($lol)
 sub _stringify_lol {  # the real recursor
   my($lol, $to) = < @_;
   use UNIVERSAL ();
-  for(my $i = 2; $i +< nelems @$lol; ++$i) {
+  for my $i (2 .. nelems(@$lol) -1) {
     if( ref($lol->[$i] || '') and UNIVERSAL::isa($lol->[$i], 'ARRAY') ) {
       _stringify_lol( $lol->[$i], $to);  # recurse!
     } else {

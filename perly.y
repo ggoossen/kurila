@@ -92,7 +92,7 @@
 
 %type <opval> block mblock lineseq line loop cond else
 %type <opval> expr term subscripted scalar ary hsh star amper sideff
-%type <opval> argexpr nexpr texpr iexpr mexpr mnexpr miexpr
+%type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
 %type <opval> subattrlist myattrterm myterm
@@ -370,39 +370,6 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR '(' remember mnexpr ';' texpr ';' mintro mnexpr ')'
-	    	    mblock
-			/* basically fake up an initialize-while lineseq */
-			{ OP *forop;
-			  PL_parser->copline = (line_t)IVAL($2);
-			  forop = newSTATEOP(0, PVAL($1),
-					    newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-						LOCATION($2), scalar($7),
-						$12, $10, $9), LOCATION($2));
-#ifdef MAD
-			  forop = newUNOP(OP_NULL, 0, append_elem(OP_LINESEQ,
-                                  newSTATEOP(0,
-                                      CopLABEL_alloc(PVAL($1)),
-                                      ($5 ? $5 : newOP(OP_NULL, 0, LOCATION($2))), LOCATION($2) ),
-                                  forop), LOCATION($2));
-
-			  TOKEN_GETMAD($2,forop,'3');
-			  TOKEN_GETMAD($3,forop,'(');
-			  TOKEN_GETMAD($6,forop,'1');
-			  TOKEN_GETMAD($8,forop,'2');
-			  TOKEN_GETMAD($11,forop,')');
-			  TOKEN_GETMAD($1,forop,'L');
-                          APPEND_MADPROPS_PV("cfor", forop, '>');
-#else
-			  if ($5) {
-				forop = append_elem(OP_LINESEQ,
-                                    newSTATEOP(0, CopLABEL_alloc(PVAL($1)), $5, LOCATION($2)),
-					forop);
-			  }
-
-
-#endif
-			  $$ = block_end($4, forop); }
 	|	label block cont  /* a block is a loop that happens once */
 			{ $$ = newSTATEOP(0, PVAL($1),
 				 newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
@@ -415,12 +382,6 @@ mintro	:	/* NULL */
 			{ $$ = (PL_min_intro_pending &&
 			    PL_max_intro_pending >=  PL_min_intro_pending);
 			  intro_my(); }
-
-/* Normal expression */
-nexpr	:	/* NULL */
-			{ $$ = (OP*)NULL; }
-	|	sideff
-	;
 
 /* Boolean expression */
 texpr	:	/* NULL means true */
@@ -437,10 +398,6 @@ iexpr	:	expr
 
 /* Expression with its own lexical scope */
 mexpr	:	expr
-			{ $$ = $1; intro_my(); }
-	;
-
-mnexpr	:	nexpr
 			{ $$ = $1; intro_my(); }
 	;
 

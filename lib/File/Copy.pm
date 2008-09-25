@@ -166,14 +166,16 @@ sub copy {
     }
 
     $! = 0;
-    for (;;) {
+    while (1) {
 	my ($r, $w, $t);
        defined($r = sysread($from_h, $buf, $size))
 	    or goto fail_inner;
 	last unless $r;
-	for ($w = 0; $w +< $r; $w += $t) {
-           $t = syswrite($to_h, $buf, $r - $w, $w)
-		or goto fail_inner;
+	$w = 0;
+        while ($w +< $r) {
+            $t = syswrite($to_h, $buf, $r - $w, $w)
+              or goto fail_inner;
+            $w += $t;
 	}
     }
 

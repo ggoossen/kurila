@@ -425,7 +425,7 @@ sub pod2html {
     # put a title in the HTML file if one wasn't specified
     if ($Title eq '') {
 	TITLE_SEARCH: {
- 	    for (my $i = 0; $i +< nelems @poddata; $i++) {
+ 	    for my $i (0 .. nelems(@poddata) -1) {
 		if (@poddata[$i] =~ m/^=head1\s*NAME\b/m) {
  		    for my $para ( @poddata[[@($i, $i+1)]] ) {
 			last TITLE_SEARCH
@@ -438,7 +438,7 @@ sub pod2html {
     }
     if (!$Title and $Podfile =~ m/\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
- 	for (my $i = 0; $i +< nelems @poddata; $i++) {
+ 	for my $i (0 .. nelems(@poddata) -1) {
 	    last if ($Title) = @poddata[$i] =~ m/^=head[12]\s*(.*)/;
 	}
 	warn "adopted '$Title' as title for $Podfile\n"

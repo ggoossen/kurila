@@ -793,8 +793,7 @@ sub devise_title {
         my ($volume, $dirs, $file) = < File::Spec->splitpath ($name);
         my @dirs = File::Spec->splitdir ($dirs);
         my $cut = 0;
-        my $i;
-        for ($i = 0; $i +< nelems @dirs; $i++) {
+        for my $i (0 .. nelems(@dirs) -1) {
             if (@dirs[$i] =~ m/perl/) {
                 $cut = $i + 1;
                 $cut++ if (@dirs[$i + 1] && @dirs[$i + 1] eq 'lib');

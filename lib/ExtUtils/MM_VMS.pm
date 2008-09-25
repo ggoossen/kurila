@@ -266,10 +266,12 @@ sub maybe_command {
     my(@exts) = @('',%Config{'exe_ext'},'.exe','.com');
 
     if ($file !~ m![/:>\]]!) {
-        for (my $i = 0; defined %ENV{"DCL\$PATH;$i"}; $i++) {
+        my $i = 0;
+        while (defined %ENV{"DCL\$PATH;$i"}) {
             my $dir = %ENV{"DCL\$PATH;$i"};
             $dir .= ':' unless $dir =~ m%[\]:]$%;
             push(@dirs,$dir);
+            $i++;
         }
         push(@dirs,'Sys$System:');
         foreach my $dir ( @dirs) {

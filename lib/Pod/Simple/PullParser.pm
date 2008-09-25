@@ -120,7 +120,8 @@ sub get_token {
        
       DEBUG and print "$self 's source is filehandle $fh.\n";
       # Read those many lines at a time
-      for(my $i = Pod::Simple::MANY_LINES; $i--;) {
+      my $i = Pod::Simple::MANY_LINES;
+      while (1) {
         DEBUG +> 3 and print " Fetching a line from source filehandle $fh...\n";
         local $/ = $Pod::Simple::NL;
         push @lines, scalar( ~< $fh); # readline
@@ -136,6 +137,7 @@ sub get_token {
         # TODO: look to see if $lines[-1] is =encoding, and if so,
         # do horribly magic things
 
+        $i--;
       }
       
       if(DEBUG +> 8) {

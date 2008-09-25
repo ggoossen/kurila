@@ -31,7 +31,8 @@ ok ((33023 >> 7) == 257);
 ok ((^~^0 +> 0 && do { use integer; ^~^0 } == -1));
 
 my $bits = 0;
-for (my $i = ^~^0; $i; $i >>= 1) { ++$bits; }
+my $i = ^~^0; 
+while ($i) { $bits++; $i >>= 1; }
 my $cusp = 1 << ($bits - 1);
 
 

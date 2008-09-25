@@ -2480,7 +2480,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     my $str = '';
 
     # create some random junk. Inefficient, but it works.
-    for (my $i = 0 ; $i +< $size ; $i++) {
+    for my $i (0 .. $size -1) {
         $str .= @chars[int(rand(nelems @chars))];
     }
 

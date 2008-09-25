@@ -282,8 +282,8 @@ ok( $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i +< 200; $i++) { %h{$i + 0} = $i + 0; }
-for ($i = 1; $i +< 200; $i++) { $ok = 0 unless %h{$i} == $i; }
+for my $i (1..199) { %h{$i + 0} = $i + 0; }
+for my $i (1..199) { $ok = 0 unless %h{$i} == $i; }
 ok( $ok);
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -1018,10 +1018,11 @@ EOM
     # iterate through the btree using seq
     # and print each key/value pair.
     $key = $value = 0 ;
-    for ($status = $x->seq($key, $value, R_FIRST) ;
-         $status == 0 ;
-         $status = $x->seq($key, $value, R_NEXT) )
-      {  print "$key	-> $value\n" }
+    $status = $x->seq($key, $value, R_FIRST);
+    while ($status == 0 ) {
+         print "$key	-> $value\n";
+         $status = $x->seq($key, $value, R_NEXT);
+     }
  
  
     undef $x ;
@@ -1199,11 +1200,11 @@ EOM
 
     $key = $value = 0 ;
     print "IN ORDER\n" ;
-    for ($st = $x->seq($key, $value, R_FIRST) ;
-	 $st == 0 ;
-         $st = $x->seq($key, $value, R_NEXT) )
-	
-      {  print "$key	-> $value\n" }
+    $st = $x->seq($key, $value, R_FIRST);
+    while ($st == 0) {
+        print "$key	-> $value\n";
+        $st = $x->seq($key, $value, R_NEXT);
+    }
  
     print "\nPARTIAL MATCH\n" ;
 
@@ -1584,9 +1585,8 @@ ok(1);
 
     my %bad = %( () ) ;
     $key = '';
-    for ($status = $db->seq($key, $value, R_FIRST ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT ) ) {
+    $status = $db->seq($key, $value, R_FIRST );
+    while ($status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{$key} && defined $value && 
@@ -1596,6 +1596,8 @@ ok(1);
         else {
             %bad{$key} = $value ;
         }
+
+        $status = $db->seq($key, $value, R_NEXT );
     }
     
     ok nkeys %bad == 0 ;

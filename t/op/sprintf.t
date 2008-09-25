@@ -62,7 +62,7 @@ $^WARN_HOOK = sub {
     }
 };
 
-for ($i = 1; (nelems @tests); $i++) {
+for my  $i (1 .. nelems(@tests)) {
     ($template, $evalData, $result, $comment, $data) = < @{shift @tests};
     $w = undef;
     $x = sprintf(">$template<", < @$evalData);

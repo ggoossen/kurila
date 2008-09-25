@@ -381,14 +381,14 @@ sub fastcwd_ {
 
     my($orig_cdev, $orig_cino) = stat('.');
     ($cdev, $cino) = ($orig_cdev, $orig_cino);
-    for (;;) {
+    while (1) {
 	my $direntry;
 	($odev, $oino) = ($cdev, $cino);
 	CORE::chdir('..') || return undef;
 	($cdev, $cino) = stat('.');
 	last if $odev == $cdev && $oino == $cino;
 	opendir(my $dir, '.') || return undef;
-	for (;;) {
+	while (1) {
 	    $direntry = readdir($dir);
 	    last unless defined $direntry;
 	    next if $direntry eq '.';

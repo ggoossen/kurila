@@ -276,7 +276,7 @@ sub _init_headings {
     ## Initialize current section heading titles if necessary
     unless (defined %myData{_SECTION_HEADINGS}) {
         local *section_headings = %myData{_SECTION_HEADINGS} = \@();
-        for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
+        for my $i (0..$MAX_HEADING_LEVEL-1) {
             @section_headings[$i] = '';
         }
     }
@@ -448,7 +448,7 @@ sub match_section {
 
     ## Default any unspecified sections to the current one
     my @current_headings = $self->curr_headings();
-    for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
+    for my $i (0..$MAX_HEADING_LEVEL-1) {
         (defined @headings[$i])  or  @headings[$i] = @current_headings[$i];
     }
 
@@ -462,7 +462,7 @@ sub match_section {
         ## the results of matching a given element of the spec.
         ##------------------------------------------------------
         $match = 1;
-        for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
+        for my $i (0..$MAX_HEADING_LEVEL-1) {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
             $match  ^&^= ($negated ? (@headings[$i] !~ m/$regex/)
@@ -510,7 +510,7 @@ sub is_selected {
         ## Reset the current section heading at this level
         %myData{_SECTION_HEADINGS}->[$level - 1] = $heading;
         ## Reset subsection headings of this one to empty
-        for (my $i = $level; $i +< $MAX_HEADING_LEVEL; ++$i) {
+        for my $i ($level .. $MAX_HEADING_LEVEL -1) {
             %myData{_SECTION_HEADINGS}->[$i] = '';
         }
     }
@@ -675,7 +675,7 @@ sub _compile_section_spec {
     @regexs = split('/', $_, $MAX_HEADING_LEVEL);
 
     ## Set default regex for ommitted levels
-    for (my $i = 0; $i +< $MAX_HEADING_LEVEL; ++$i) {
+    for my $i (0 .. $MAX_HEADING_LEVEL -1) {
         @regexs[$i]  = '.*'  unless ((defined @regexs[$i])
                                      && (length @regexs[$i]));
     }

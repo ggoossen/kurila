@@ -11,7 +11,7 @@ BEGIN {
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 61;
+use Test::More tests => 58;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -219,21 +219,6 @@ $x=1 for @a;
 >>>>
 my($x, @a);
 $x = 1 foreach (@a);
-####
-# 19
-for (my $i = 0; $i +< 2;) {
-    my $z = 1;
-}
-####
-# 20
-for (my $i = 0; $i +< 2; ++$i) {
-    my $z = 1;
-}
-####
-# 21
-for (my $i = 0; $i +< 2; ++$i) {
-    my $z = 1;
-}
 ####
 # 22
 my $i;

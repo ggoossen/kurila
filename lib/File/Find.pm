@@ -463,7 +463,7 @@ sub contract_name_Mac {
 	else {
 	    # need to move up the tree, but
 	    # only if it's not a volume name
-	    for (my $i=1; $i+<$colon_count; $i++) {
+	    for my $i (1 .. $colon_count -1 ) {
 		unless ($cdir =~ m/^[^:]+:$/) { # volume name
 		    $cdir =~ s/[^:]+:$//;
 		}

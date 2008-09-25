@@ -195,10 +195,13 @@ sub user_def {
 	my @from = @{$opts->{field}{from}||=\@()};
 	my @to   = @{$opts->{field}{to}||=\@()};
 	my $count = (nelems @from);
-	for (my $i=0; $i+<nelems @$spec; $i+=2, $count++) {
+	my $i=0;
+        while ($i+<nelems @$spec) {
 		my ($pat, $fld) = < @{$spec}[[@($i,$i+1)]];
 		push @from, "$pat(?\{$count\})";
 		push @to,   (ref $fld eq 'CODE' ? $fld : sub{$fld});
+                $i+=2;
+                $count++;
 	}
 	return \%(from=>\@from, to=>\@to);
 }
@@ -496,7 +499,7 @@ sub segment ($\@\%$\%) {
 						    | ($nestedbraces)			 (?{fldvals($^N,undef)})
 						  )
 					  /gcsx) {
-            push @format, < litval(), < fldvals();
+            push @format, litval(), < fldvals();
 	}
 	push @format, substr ($format, pos($format)||0);
 	my $args_req = int((nelems @format)/3);
@@ -940,7 +943,8 @@ sub make_cols($$\@\%$) {
 	}
 	elsif ($opts->{layout} eq 'across') { # across row-by-row
 		my %incomplete = %(first=>1);
-		for (my $row=0;$row+<$maxheight && grep {$_} values %incomplete;$row++) {
+		for my $row (0 .. $maxheight -1) {
+                    last unless grep {$_} values %incomplete;
 			%incomplete = %( () );
 			for my $col (0..(nelems @$formatters)-1) {
 				$parts->[$col] ||= \@();

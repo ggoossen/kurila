@@ -11,7 +11,6 @@ our (@a, @b);
 # these shouldn't hang
 {
     no warnings;
-    sort { for ($_ = 0;; $_++) {} } @a;
     sort { while(1) {}            } @a;
     sort { while(1) { last; }     } @a;
     sort { while(0) { last; }     } @a;

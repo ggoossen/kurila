@@ -487,7 +487,7 @@ sub _gettemp {
 
 
   # Now try MAX_TRIES time to open the file
-  for (my $i = 0; $i +< MAX_TRIES; $i++) {
+  for my $i ( 0 .. MAX_TRIES -1) {
 
     # Try to open the file if requested
     if (%options{"open"}) {

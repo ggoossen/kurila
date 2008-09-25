@@ -484,22 +484,25 @@ sub splitEnt
     # Character positions are not kept if rearranged,
     # then neglected if $wLen is true.
     if ($reH && ! $wLen) {
-	for (my $i = 0; $i +< nelems @src; $i++) {
+	my $i = 0;
+        while ($i +< nelems @src) {
 	    if (exists $reH->{ @src[$i] } && $i + 1 +< nelems @src) {
 		(@src[$i], @src[$i+1]) = (@src[$i+1], @src[$i]);
 		$i++;
 	    }
+            $i++;
 	}
     }
 
     # remove a code point marked as a completely ignorable.
-    for (my $i = 0; $i +< nelems @src; $i++) {
+    for my $i (0 .. nelems(@src) -1) {
 	@src[$i] = undef
 	    if _isIllegal(@src[$i]) || ($ver9 &&
 		$map->{ @src[$i] } && (nelems @{ $map->{ @src[$i] } }) == 0);
     }
 
-    for (my $i = 0; $i +< nelems @src; $i++) {
+    my $i = 0;
+    while ($i +< nelems @src) {
 	my $jcps = @src[$i];
 
 	# skip removed code point
@@ -518,7 +521,8 @@ sub splitEnt
 	    my $jcpsLen = 1;
 	    my $maxLen = $max->{$jcps};
 
-	    for (my $p = $i + 1; $jcpsLen +< $maxLen && $p +< nelems @src; $p++) {
+	    for my $p ($i + 1 .. nelems(@src) -1) {
+                last unless $jcpsLen +< $maxLen;
 		next if ! defined @src[$p];
 		$temp_jcps .= CODE_SEP . @src[$p];
 		$jcpsLen++;
@@ -541,7 +545,7 @@ sub splitEnt
 		my $preCC = 0;
 		my $curCC = 0;
 
-		for (my $p = $i + 1; $p +< nelems @src; $p++) {
+		for my $p ($i + 1 .. nelems(@src) -1) {
 		    next if ! defined @src[$p];
 		    $curCC = $CVgetCombinClass->(@src[$p]);
 		    last unless $curCC;
@@ -565,6 +569,10 @@ sub splitEnt
 	}
 
 	push @buf, $wLen ? \@($jcps, $i_orig, $i + 1) : $jcps;
+
+    }
+    continue {
+        $i++;
     }
     return \@buf;
 }
@@ -722,7 +730,7 @@ sub getSortKey
     }
 
     if ($self->{backwardsFlag}) {
-	for (my $v = MinLevel; $v +<= MaxLevel; $v++) {
+	for my $v (MinLevel .. MaxLevel) {
 	    if ($self->{backwardsFlag} ^&^ (1 << $v)) {
 		@{ @ret[$v-1] } = reverse @{ @ret[$v-1] };
 	    }
@@ -747,7 +755,7 @@ sub sort {
     my $obj = shift;
     return map { $_[1] }
            sort { $a[0] cmp $b[0] }
- map { @( $obj->getSortKey($_), $_) } @_;
+             map { @( $obj->getSortKey($_), $_) } @_;
 }
 
 
@@ -965,7 +973,8 @@ sub index
     my $end = (nelems @$strE) - 1;
 
     $last_is_variable = FALSE; # reuse
-    for (my $i = 0; $i +<= $end; ) { # no $i++
+    my $i = 0;
+    while ($i +<= $end) { # no $i++
 	my $found_base = 0;
 
 	# fetch a grapheme

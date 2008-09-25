@@ -70,7 +70,7 @@ our @good = @(0,1,1,2,3,5,8,13,21,34,55,89);
 
 our $foo;
 
-for (our $i = 1; $i +<= 10; $i++) {
+for my $i (1..10) {
     $foo = $i + 12;
     if (&fib($i) == @good[$i]) {
 	print "ok $foo\n";

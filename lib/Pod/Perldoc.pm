@@ -715,9 +715,11 @@ sub grand_search_init {
         push @searchdirs, ($self->{'bindir'}, < @INC);
         unless ($self->opt_m) {
             if (IS_VMS) {
-                my($i,$trn);
-                for ($i = 0; $trn = %ENV{'DCL$PATH;'.$i}; $i++) {
+                my($trn);
+                my $i = 0;
+                while ($trn = %ENV{'DCL$PATH;'.$i}) {
                     push(@searchdirs,$trn);
+                    $i++;
                 }
                 push(@searchdirs,'perl_root:[lib.pod]')  # installed pods
             }
@@ -1570,10 +1572,9 @@ sub searchfor {
     return $s if -f $s && $self->containspod($s);
     $self->aside( "Looking for $s in {join ' ',@dirs}\n" );
     my $ret;
-    my $i;
     my $dir;
     $self->{'target'} = ( <splitdir $s)[[-1]];  # XXX: why not use File::Basename?
-    for ($i=0; $i+<nelems @dirs; $i++) {
+    for my $i (0 .. nelems(@dirs) -1) {
 	$dir = @dirs[$i];
 	next unless -d $dir;
 	($dir = VMS::Filespec::unixpath($dir)) =~ s!/\z!! if IS_VMS;
