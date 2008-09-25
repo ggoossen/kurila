@@ -528,6 +528,7 @@ sub sequence {
 	    }
 	}
 	$oldop = $op;
+    } continue {
         $op = $op->next;
     }
 }
