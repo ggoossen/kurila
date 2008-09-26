@@ -684,9 +684,9 @@ sub options_sanity {
 sub grand_search_init {
     my($self, $pages, < @found) = < @_;
 
-    foreach ( @$pages) {
+    foreach my $page ( @$pages) {
         if ($self->{'podidx'} && open(PODIDX, $self->{'podidx'})) {
-            my $searchfor = catfile < split '::', $_;
+            my $searchfor = catfile < split '::', $page;
             $self->aside( "Searching for '$searchfor' in $self->{'podidx'}\n" );
             local $_;
             while ( ~< *PODIDX) {
@@ -697,11 +697,11 @@ sub grand_search_init {
             next;
         }
 
-        $self->aside( "Searching for $_\n" );
+        $self->aside( "Searching for $page\n" );
 
         if ($self->opt_F) {
-            next unless -r;
-            push @found, $_ if $self->opt_m or $self->containspod($_);
+            next unless -r $page;
+            push @found, $page if $self->opt_m or $self->containspod($page);
             next;
         }
 
@@ -728,20 +728,20 @@ sub grand_search_init {
                                                  %ENV{'PATH'})));
             }
         }
-        my @files = $self->searchfor(0,$_,< @searchdirs);
+        my @files = $self->searchfor(0,$page,< @searchdirs);
         if ((nelems @files)) {
             $self->aside( "Found as {join ' ',@files}\n" );
         }
         else {
             # no match, try recursive search
             @searchdirs = grep(!m/^\.\z/s, @INC);
-            @files= $self->searchfor(1,$_,< @searchdirs) if $self->opt_r;
+            @files= $self->searchfor(1,$page,< @searchdirs) if $self->opt_r;
             if ((nelems @files)) {
                 $self->aside( "Loosely found as {join ' ',@files}\n" );
             }
             else {
                 print STDERR "No " .
-                    ($self->opt_m ? "module" : "documentation") . " found for \"$_\".\n";
+                    ($self->opt_m ? "module" : "documentation") . " found for \"$page\".\n";
                 if ( (nelems @{ $self->{'found'} }) ) {
                     print STDERR "However, try\n";
                     for my $dir ( @{ $self->{'found'} }) {
@@ -749,7 +749,7 @@ sub grand_search_init {
                         while (my $file = readdir(DIR)) {
                             next if ($file =~ m/^\./s);
                             $file =~ s/\.(pm|pod)\z//;  # XXX: badfs
-                            print STDERR "\tperldoc $_\::$file\n";
+                            print STDERR "\tperldoc $page\::$file\n";
                         }
                         closedir(DIR)    or die "closedir $dir: $!";
                     }
