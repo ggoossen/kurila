@@ -60,7 +60,7 @@ sub commentless {
 }
 
 
-for (my $x=0; $x +< nelems @got; $x++) {
+for my $x (0 .. nelems(@got) -1 ) {
     ok commentless(@got[$x]), commentless(@expect[$x]."\n");
 }
 
