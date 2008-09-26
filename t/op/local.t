@@ -257,9 +257,6 @@ while (m/(o.+?),/gc) {
 try { local $1 = 1 };
 like($@->{description}, qr/Modification of a read-only value attempted/);
 
-# The s/// adds 'g' magic to $_, but it should remain non-readonly
-for(@("a")) { for my $x (@(1,2)) { local $_="b"; s/(.*)/+$1/ } };
-
 # sub localisation
 {
 	package Other;
