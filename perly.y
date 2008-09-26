@@ -90,6 +90,8 @@
 
 %type <opval> decl subrout mysubrout package use peg
 
+%type <opval> mydef
+
 %type <opval> block mblock lineseq line loop cond else
 %type <opval> expr term subscripted scalar ary hsh star amper sideff
 %type <opval> argexpr texpr iexpr mexpr miexpr
@@ -360,15 +362,15 @@ loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($8,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR '(' remember mexpr ')' mblock cont
+	|	label FOR remember mydef '(' mexpr ')' mblock cont
 			{ OP *innerop;
-			  $$ = block_end($4,
+			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
-                                 (OP*)NULL, $5, $7, $8, LOCATION($2)));
+                                 $4, $6, $8, $9, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'(');
-			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,')');
+			  TOKEN_GETMAD($7,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
 	|	label block cont  /* a block is a loop that happens once */
 			{ $$ = newSTATEOP(0, PVAL($1),
@@ -1218,6 +1220,12 @@ myterm	:	'(' expr ')'
 	|	ary 	%prec '('
 			{ $$ = $1; }
 	;
+
+mydef :   /* NULL */
+			{ 
+                            $$ = newOP(OP_PADSV, 0, NULL);
+                            $$->op_targ = allocmy("$_");
+                        }
 
 /* Basic list expressions */
 listexpr:	/* NULL */ %prec PREC_LOW
