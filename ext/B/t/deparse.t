@@ -90,9 +90,11 @@ BEGIN { $^I = ".bak"; }
 BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
-    chomp $_;
-    our @F = split(' ', $_, 0);
-    '???';
+    do {
+        chomp $_;
+        our @F = split(' ', $_, 0);
+        '???'
+    };
 }
 EOF
 $b =~ s/(LINE:)/sub BEGIN {
