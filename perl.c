@@ -2331,7 +2331,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	PL_op = (OP*)&method_op;
     }
 
-    if (!(flags & G_EVAL)) {
+if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
 	CALL_BODY_SUB((OP*)&myop);
 	retval = PL_stack_sp - (PL_stack_base + oldmark);

@@ -14,7 +14,6 @@ for my $i (@( 1,2,5,4,3) ) {
 {
     local *ARGV;
     local $^I = '.bak';
-    local $_;
     @ARGV = mkfiles( <1..3);
     my $n = 0;
     while ( ~< *ARGV) {
@@ -22,7 +21,7 @@ for my $i (@( 1,2,5,4,3) ) {
 	if ($n++ == 2) {
 	    other();
 	}
-	show();
+	show($_);
     }
 }
 
@@ -34,10 +33,11 @@ while ( ~< *ARGV) {
     if ($n++ == 2) {
 	other();
     }
-    show();
+    show($_);
 }
 
 sub show {
+    my $_ = shift;
     #warn "$ARGV: $_";
     s/^not //;
     print;
@@ -48,11 +48,10 @@ sub other {
     print STDOUT "# Calling other\n";
     local *ARGV;
     local *ARGVOUT;
-    local $_;
     @ARGV = mkfiles(5, 4);
     while ( ~< *ARGV) {
 	print STDOUT "# inner \@ARGV: [{join ' ',@ARGV}]\n";
-	show();
+	show($_);
     }
 }
 

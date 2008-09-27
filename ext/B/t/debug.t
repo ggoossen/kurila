@@ -47,8 +47,8 @@ EOF
 } else {
     $b=<<EOF;
 leave enter nextstate label leaveloop enterloop null and defined null
-null gvsv readline rvgv gv lineseq nextstate sassign split pushre
-null gvsv const rvav gv nextstate subst const unstack
+padsv readline rvgv gv lineseq leave enter nextstate sassign split pushre
+padsv const rvav gv nextstate subst const unstack
 EOF
 }
 $b=~s/\n/ /g;$b=~s/\s+/ /g;
