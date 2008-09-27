@@ -1511,11 +1511,12 @@ EOF
     # non-blank line
 
     # skip leading blank lines
-    while ( ~< $FH) {
-      last unless m/^\s*$/ ;
+    my $line;
+    while ($line = ~< $FH) {
+      last unless $line =~ m/^\s*$/ ;
     }
 
-    $lastline = $_ ;
+    $lastline = $line ;
     $lastline_no = iohandle::input_line_number($FH);
 
   }
