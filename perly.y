@@ -326,17 +326,33 @@ cont	:	/* NULL */
 	;
 
 /* Loops: while, until, for, and a bare block */
-loop	:	label WHILE '(' remember texpr ')' mintro mblock cont
-			{ OP *innerop;
+loop	:	label WHILE remember '(' texpr ')'
+			{
+                            /* insert "defined $_ = " before "~< $fh" */
+                            if ($5->op_type == OP_READLINE) {
+                                OP* mydef;
+                                mydef = newOP(OP_PADSV, 0, NULL);
+                                mydef->op_targ = allocmy("$_");
+                                $$ = newUNOP(OP_DEFINED, 0,
+                                    newASSIGNOP(0, mydef,
+                                        0, $5, $5->op_location), $5->op_location );
+                            }
+                            else {
+                                $$ = $5;
+                            }
+                        }
+                    mintro mblock cont
+			{
+                            OP *innerop;
                             PL_parser->copline = (line_t)IVAL($2);
-			    $$ = block_end($4,
-				   newSTATEOP(0, PVAL($1),
-				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                         LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
-			  TOKEN_GETMAD($1,innerop,'L');
-			  TOKEN_GETMAD($2,innerop,'W');
-			  TOKEN_GETMAD($3,innerop,'(');
-			  TOKEN_GETMAD($6,innerop,')');
+			    $$ = block_end($3,
+                                newSTATEOP(0, PVAL($1),
+                                    innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+                                        LOCATION($2), $<opval>7, $9, $10, $8), LOCATION($2)));
+                            TOKEN_GETMAD($1,innerop,'L');
+                            TOKEN_GETMAD($2,innerop,'W');
+                            TOKEN_GETMAD($4,innerop,'(');
+                            TOKEN_GETMAD($6,innerop,')');
 			}
 
 	|	label UNTIL '(' remember iexpr ')' mintro mblock cont

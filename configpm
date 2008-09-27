@@ -46,7 +46,7 @@ my $how_many_common = 22;
 my %Common;
 
 while ($how_many_common--) {
-    $_ = ~< *DATA;
+    my $_ = ~< *DATA;
     chomp;
     m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
     %Common{$1} = $1;
@@ -182,7 +182,7 @@ my %seen_quotes;
 {
   my ($name, $val);
   open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $!";
-  while ( ~< *CONFIG_SH) {
+  while (~< *CONFIG_SH) {
     next if m:^#!/bin/sh:;
 
     # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
@@ -837,6 +837,7 @@ my $text = 0;
 $/ = '';
 
 sub process {
+  my $_ = shift;
   if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m) {
     my $c = substr $1, 0, 1;
     unless (%seen{$c}++) {
@@ -893,7 +894,7 @@ if (%Opts{glossary}) {
     ~< *GLOS;				# Skip the "DO NOT EDIT"
     ~< *GLOS;				# Skip the preamble
   while ( ~< *GLOS) {
-    process;
+    process($_);
     print CONFIG_POD;
   }
 }

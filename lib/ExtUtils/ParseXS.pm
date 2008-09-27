@@ -278,11 +278,13 @@ EOM
     if $WantLineNumbers;
 
   firstmodule:
-  local $_;
-  while ( ~< $FH) {
+  my $line;
+  while ($line = ~< $FH) {
+    $_ = $line;
     if (m/^=/) {
       my $podstartline = iohandle::input_line_number($FH);
       do {
+        $_ = $line;
 	if (m/^=cut\s*$/) {
 	  # We can't just write out a /* */ comment, as our embedded
 	  # POD might itself be in a comment. We can't put a /**/
@@ -303,7 +305,7 @@ EOM
 	  next firstmodule
 	}
 	
-      } while ( ~< $FH);
+      } while ($line = ~< $FH);
       # At this point $. is at end of file so die won't state the start
       # of the problem, and as we haven't yet read any lines &death won't
       # show the correct line in the message either.
@@ -315,7 +317,7 @@ EOM
     
     print $_;
   }
-  unless (defined $_) {
+  unless (defined $line) {
     warn "Didn't find a 'MODULE ... PACKAGE ... PREFIX' line\n";
     exit 0; # Not a fatal error for the caller process
   }
@@ -329,7 +331,7 @@ EOF
 
   print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
-  $lastline    = $_;
+  $lastline    = $line;
   $lastline_no = iohandle::input_line_number($FH);
 
  PARAGRAPH:
