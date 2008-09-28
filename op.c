@@ -6533,13 +6533,15 @@ Perl_ck_shift(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_SHIFT;
 
     if (!(o->op_flags & OPf_KIDS)) {
-	OP *argop;
 	/* FIXME - this can be refactored to reduce code in #ifdefs  */
 #ifdef PERL_MAD
 	OP * const oldo = o;
 #endif
-	argop = newUNOP(OP_RV2AV, 0,
-			scalar(newGVOP(OP_GV, 0, CvUNIQUE(PL_compcv) ? PL_argvgv : PL_defgv, o->op_location)), o->op_location);
+
+	const PADOFFSET offset = pad_findmy("@_");
+	OP * const argop = newOP(OP_PADSV, 0, o->op_location);
+	argop->op_targ = offset;
+
 #ifdef PERL_MAD
 	o = newUNOP(type, 0, scalar(argop), argop->op_location);
 	op_getmad(oldo,o,'O');

@@ -212,7 +212,6 @@ struct block_sub {
     OP *	retop;	/* op to execute on exit from sub */
     /* Above here is the same for sub and eval.  */
     CV *	cv;
-    AV *	savearray;
     AV *	argarray;
     I32		olddepth;
     PAD		*oldcomppad;
@@ -250,12 +249,6 @@ struct block_sub {
 	cx->blk_u16 = 0;
 
 
-#define POP_SAVEARRAY()						\
-    STMT_START {							\
-	SvREFCNT_dec(GvAV(PL_defgv));					\
-	GvAV(PL_defgv) = cx->blk_sub.savearray;				\
-    } STMT_END
-
 /* junk in @_ spells trouble when cloning CVs and in pp_caller(), so don't
  * leave any (a fast av_clear(ary), basically) */
 #define CLEAR_ARGARRAY(ary) \
@@ -272,7 +265,6 @@ struct block_sub {
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\
 	if (CxHASARGS(cx)) {						\
-	    POP_SAVEARRAY();						\
 	    /* abandon @_ if it got reified */				\
 	    if (AvREAL(cx->blk_sub.argarray)) {				\
 		const SSize_t fill = AvFILLp(cx->blk_sub.argarray);	\

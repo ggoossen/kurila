@@ -1664,8 +1664,6 @@ PP(pp_goto)
 		items = AvFILLp(av) + 1;
 		EXTEND(SP, items+1); /* @_ could have been extended. */
 		Copy(AvARRAY(av), SP + 1, items, SV*);
-		SvREFCNT_dec(GvAV(PL_defgv));
-		GvAV(PL_defgv) = cx->blk_sub.savearray;
 		CLEAR_ARGARRAY(av);
 		/* abandon @_ if it got reified */
 		if (AvREAL(av)) {
@@ -1737,8 +1735,6 @@ PP(pp_goto)
 		{
 		    AV* const av = (AV*)PAD_SVl(0);
 
-		    cx->blk_sub.savearray = GvAV(PL_defgv);
-		    GvAV(PL_defgv) = (AV*)SvREFCNT_inc_simple(av);
 		    CX_CURPAD_SAVE(cx->blk_sub);
 		    cx->blk_sub.argarray = av;
 
