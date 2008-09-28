@@ -46,7 +46,7 @@ sub methimpl {
 }
 
 sub method {
-    &methimpl;
+    &methimpl( < @_ );
 }
 
 sub trymethod {

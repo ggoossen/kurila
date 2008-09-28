@@ -115,7 +115,7 @@ sub connect {
 
 	    undef $!;
 	    if (!$sel->can_write($timeout)) {
-		$err = $! || (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT : 1);
+		$err = $! || (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT( < @_ ) : 1);
 		$@ = "connect: timeout";
 	    }
 	    elsif (!connect($sock,$addr) &&
@@ -225,7 +225,7 @@ sub accept {
 
 	unless ( @( $sel->can_read($timeout) ) ) {
 	    $@ = 'accept: timeout';
-	    $! = (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT : 1);
+	    $! = (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT( < @_ ) : 1);
 	    return;
 	}
     }

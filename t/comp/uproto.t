@@ -56,7 +56,7 @@ g($expected);
 $_ = $expected;
 g();
 g;
-undef $expected; &g; # $_ not passed
+undef $expected; &g( < @_ ); # $_ not passed
 { $expected = my $_ = "bar"; g() }
 
 eval q{ sub wrong1 (_$); wrong1(1,2) };

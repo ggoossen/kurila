@@ -3237,7 +3237,7 @@ sub max_exec_len {
     my $self = shift;
 
     if (!defined $self->{_MAX_EXEC_LEN}) {
-        if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX }) {
+        if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX( < @_ ) }) {
             $self->{_MAX_EXEC_LEN} = $arg_max;
         }
         else {      # POSIX minimum exec size

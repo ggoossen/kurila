@@ -100,7 +100,7 @@ Testing->import;
 
 main::ok( defined &lifejacket,      'simple import' );
 
-my $got = try {&lifejacket};
+my $got = try {&lifejacket( < @_ )};
 main::ok ( $@ eq "", 'check we can call the imported subroutine')
   or print STDERR "# \$\@ is $@\n";
 main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')

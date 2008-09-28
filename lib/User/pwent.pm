@@ -170,7 +170,7 @@ sub _populate (@) {
 sub getpwent ( ) { _populate(CORE::getpwent()) }
 sub getpwnam ($) { _populate(CORE::getpwnam(shift)) }
 sub getpwuid ($) { _populate(CORE::getpwuid(shift)) }
-sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ? &getpwuid : &getpwnam }
+sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ? &getpwuid( < @_ ) : &getpwnam( < @_ ) }
 
 _feature_init();
 

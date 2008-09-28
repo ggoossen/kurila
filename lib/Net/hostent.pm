@@ -56,7 +56,7 @@ sub gethost($) {
 	require Socket;
 	&gethostbyaddr( <Socket::inet_aton(shift));
     } else {
-	&gethostbyname;
+	&gethostbyname( < @_ );
     } 
 } 
 

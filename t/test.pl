@@ -498,7 +498,7 @@ sub _create_runperl { # Create the string to qx in runperl().
 sub runperl {
     die "test.pl:runperl() does not take a hashref"
 	if ref @_[0] and ref @_[0] eq 'HASH';
-    my $runperl = &_create_runperl;
+    my $runperl = &_create_runperl( < @_ );
     my $result;
 
     my $tainted = $^TAINT;

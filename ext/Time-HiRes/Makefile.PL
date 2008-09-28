@@ -813,6 +813,6 @@ EOM
     }
 }
 
-&main;
+&main( < @_ );
 
 # EOF

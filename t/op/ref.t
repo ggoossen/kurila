@@ -103,7 +103,7 @@ is (join(':', @{%spring2{"foo"}}), "1:2:3:4");
     my $called;
     sub mysub { $called++; }
     $subref = \&mysub;
-    &$subref;
+    &$subref( < @_ );
     is ($called, 1);
 }
 
@@ -385,7 +385,7 @@ TODO: {
     *{Symbol::fetch_glob($name1)} = sub {"One"};
     *{Symbol::fetch_glob($name2)} = sub {"Two"};
 
-    is (&{*{Symbol::fetch_glob($name1)}}, "One");
+    is (&{*{Symbol::fetch_glob($name1)}}( < @_ ), "One");
     is (&{*{Symbol::fetch_glob($name2)}}, "Two");
 }
 

@@ -71,9 +71,9 @@ SKIP: {
 
         my $sigint_called = 0;
 
-	my $mask   = POSIX::SigSet->new( &SIGINT);
+	my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ));
 	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
-	sigaction(&SIGHUP, $action);
+	sigaction(&SIGHUP( < @_ ), $action);
 	%SIG{'INT'} = \&SigINT;
 
 	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
@@ -118,9 +118,9 @@ SKIP: {
 
 SKIP: {
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE;
-    skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless &_POSIX_OPEN_MAX;
+    skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless &_POSIX_OPEN_MAX( < @_ );
 
-    ok( &_POSIX_OPEN_MAX +>= 16, "The minimum allowed values according to susv2" );
+    ok( &_POSIX_OPEN_MAX( < @_ ) +>= 16, "The minimum allowed values according to susv2" );
 
 }
 
@@ -141,13 +141,13 @@ like( getcwd(), qr/$pat/, 'getcwd' );
 SKIP: { 
     skip("strtod() not present", 1) unless %Config{d_strtod};
 
-    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC, 'C') if %Config{d_setlocale};
+    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if %Config{d_setlocale};
 
     # we're just checking that strtod works, not how accurate it is
     my ($n, $x) = < &POSIX::strtod('3.14159_OR_SO');
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
-    &POSIX::setlocale(&POSIX::LC_NUMERIC, $lc) if %Config{d_setlocale};
+    &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if %Config{d_setlocale};
 }
 
 SKIP: {
@@ -184,7 +184,7 @@ sub try_strftime {
     is($got, $expect, "validating mini_mktime() and strftime(): $expect");
 }
 
-my $lc = &POSIX::setlocale(&POSIX::LC_TIME, 'C') if %Config{d_setlocale};
+my $lc = &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), 'C') if %Config{d_setlocale};
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
@@ -201,7 +201,7 @@ try_strftime("Mon Feb 28 00:00:00 2000 059", 0,0,0, 28,1,100);
 try_strftime("Tue Feb 29 00:00:00 2000 060", 0,0,0, 0,2,100);
 try_strftime("Wed Mar 01 00:00:00 2000 061", 0,0,0, 1,2,100);
 try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
-&POSIX::setlocale(&POSIX::LC_TIME, $lc) if %Config{d_setlocale};
+&POSIX::setlocale(&POSIX::LC_TIME( < @_ ), $lc) if %Config{d_setlocale};
 
 {
     for my $test (@(0, 1)) {

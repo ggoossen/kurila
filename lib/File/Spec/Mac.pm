@@ -355,8 +355,8 @@ sub rootdir {
 #  volume is returned, since that's the closest in concept.
 #
     return '' unless $macfiles;
-    my $system = Mac::Files::FindFolder( <&Mac::Files::kOnSystemDisk, <
-	&Mac::Files::kSystemFolderType);
+    my $system = Mac::Files::FindFolder( <&Mac::Files::kOnSystemDisk( < @_ ), <
+	&Mac::Files::kSystemFolderType( < @_ ));
     $system =~ s/:.*\Z(?!\n)/:/s;
     return $system;
 }

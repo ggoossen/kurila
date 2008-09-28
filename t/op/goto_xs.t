@@ -81,19 +81,19 @@ print(($ret == $value) ? "ok 7\n" : "not ok 7\n# ($ret != $value)\n");
 ### tests where the args are not on stack but in GvAV(defgv) (ie, @_)
 
 # test "goto &function_constant" from a sub called without arglist
-sub call_goto_const { &goto_const; }
+sub call_goto_const { &goto_const( < @_ ); }
 
 $ret = call_goto_const($VALID);
 print(($ret == $value) ? "ok 8\n" : "not ok 8\n# ($ret != $value)\n");
 
 # test "goto &$function_package_and_name" from a sub called without arglist
-sub call_goto_name1 { &goto_name1; }
+sub call_goto_name1 { &goto_name1( < @_ ); }
 
 $ret = call_goto_name1($VALID);
 print(($ret == $value) ? "ok 9\n" : "not ok 9\n# ($ret != $value)\n");
 
 # test "goto &$function_ref" from a sub called without arglist
-sub call_goto_ref { &goto_ref; }
+sub call_goto_ref { &goto_ref( < @_ ); }
 
 $ret = call_goto_ref($VALID);
 print(($ret == $value) ? "ok 10\n" : "not ok 10\n# ($ret != $value)\n");

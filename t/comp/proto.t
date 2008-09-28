@@ -49,7 +49,7 @@ printf "ok \%d\n",$i++;
 print "not " unless 1 == no_proto(5);
 printf "ok \%d\n",$i++;
 
-print "not " unless 4 == &no_proto;
+print "not " unless 4 == &no_proto( < @_ );
 printf "ok \%d\n",$i++;
 
 print "not " unless 1 == no_proto +6;
@@ -79,7 +79,7 @@ printf "ok \%d\n",$i++;
 print "not " unless 5 == no_args +5;
 printf "ok \%d\n",$i++;
 
-print "not " unless 4 == &no_args;
+print "not " unless 4 == &no_args( < @_ );
 printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &no_args(1,2);
@@ -106,7 +106,7 @@ printf "ok \%d\n",$i++;
 print "not " unless 1 == one_args +5;
 printf "ok \%d\n",$i++;
 
-print "not " unless 4 == &one_args;
+print "not " unless 4 == &one_args( < @_ );
 printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &one_args(1,2);
@@ -148,7 +148,7 @@ printf "ok \%d\n",$i++;
 print "not " unless 1 == over_one_args +5;
 printf "ok \%d\n",$i++;
 
-print "not " unless 4 == &over_one_args;
+print "not " unless 4 == &over_one_args( < @_ );
 printf "ok \%d\n",$i++;
 
 print "not " unless 2 == &over_one_args(1,2);
@@ -192,7 +192,7 @@ printf "ok \%d\n",$i++;
 print "not " unless 1 == one_or_two +5;
 printf "ok \%d\n",$i++;
 
-print "not " unless 4 == &one_or_two;
+print "not " unless 4 == &one_or_two( < @_ );
 printf "ok \%d\n",$i++;
 
 print "not " unless 3 == &one_or_two(1,2,3);
@@ -227,7 +227,7 @@ testing \&a_sub, '&';
 
 sub a_sub (&) {
     print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
-    &{@_[0]};
+    &{@_[0]}( < @_ );
 }
 
 sub tmp_sub_1 { printf "ok \%d\n",$i++ }

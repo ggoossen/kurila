@@ -30,7 +30,7 @@ sub getoutput
   }
   # child
   open(STDERR, ">&", \*STDOUT);
-  &$code;
+  &$code( < @_ );
   print "--NORMAL-RETURN--\n";
   exit 0;
 }

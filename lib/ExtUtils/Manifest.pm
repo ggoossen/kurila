@@ -530,7 +530,7 @@ sub cp {
 
 sub ln {
     my ($srcFile, $dstFile) = < @_;
-    return &cp if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
+    return &cp( < @_ ) if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
     link($srcFile, $dstFile);
 
     unless( _manicopy_chmod($srcFile, $dstFile) ) {
