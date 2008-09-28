@@ -46,7 +46,7 @@ bar:
     $ok = 1;
 }
 
-&foo;
+&foo( < @_ );
 ok($ok, 'goto in sub');
 
 sub bar {
@@ -54,7 +54,7 @@ sub bar {
     eval "goto $x";
 }
 
-&bar;
+&bar( < @_ );
 exit;
 
 FINALE:

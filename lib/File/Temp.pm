@@ -691,8 +691,8 @@ sub _is_safe {
   # use 022 to check writability
   # Do it with S_IWOTH and S_IWGRP for portability (maybe)
   # mode is in info[2]
-  if ((@info[2] ^&^ &Fcntl::S_IWGRP) ||   # Is group writable?
-      (@info[2] ^&^ &Fcntl::S_IWOTH) ) {  # Is world writable?
+  if ((@info[2] ^&^ &Fcntl::S_IWGRP( < @_ )) ||   # Is group writable?
+      (@info[2] ^&^ &Fcntl::S_IWOTH( < @_ )) ) {  # Is world writable?
     # Must be a directory
     unless (-d $path) {
       $$err_ref = "Path ($path) is not a directory"

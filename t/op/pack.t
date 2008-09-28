@@ -371,7 +371,7 @@ sub foo { my $a = "a"; return $a . $a++ . $a++ }
       local $^WARN_HOOK = sub {
           $warning = @_[0]->message;
       };
-      my $junk = pack("p", &foo);
+      my $junk = pack("p", &foo( < @_ ));
   }
 
   like($warning, qr/temporary val/);

@@ -64,7 +64,7 @@ sub CLEAR {
 sub FETCH {
     local($self,$key) = < @_;
     local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
-    &hashkey;
+    &hashkey( < @_ );
     while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
@@ -76,7 +76,7 @@ sub FETCH {
 	elsif (substr($record, 1, $klen) eq $key) {
 	    return substr($record, 1+$klen, $vlen);
 	}
-	&rehash;
+	&rehash( < @_ );
     }
 }
 
@@ -88,7 +88,7 @@ sub STORE {
 	if length($val) != $vlen;
     my $writeoffset;
 
-    &hashkey;
+    &hashkey( < @_ );
     while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
@@ -109,14 +109,14 @@ sub STORE {
 	    substr(@$self[0], $offset, $rlen, $record);
 	    return;
 	}
-	&rehash;
+	&rehash( < @_ );
     }
 }
 
 sub DELETE {
     local($self,$key) = < @_;
     local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
-    &hashkey;
+    &hashkey( < @_ );
     while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
@@ -130,14 +130,14 @@ sub DELETE {
 	    return substr($record, 1+$klen, $vlen);
 	    --@$self[5];
 	}
-	&rehash;
+	&rehash( < @_ );
     }
 }
 
 sub FIRSTKEY {
     local($self) = < @_;
     @$self[6] = -1;
-    &NEXTKEY;
+    &NEXTKEY( < @_ );
 }
 
 sub NEXTKEY {
@@ -166,9 +166,9 @@ sub hashkey {
     $hash = 2;
     for (@(unpack('C*', $key))) {
 	$hash = $hash * 33 + $_;
-	&_hashwrap if $hash +>= 1e13;
+	&_hashwrap( < @_ ) if $hash +>= 1e13;
     }
-    &_hashwrap if $hash +>= $tsize->[1];
+    &_hashwrap( < @_ ) if $hash +>= $tsize->[1];
     $hash = 1 unless $hash;
     $hashbase = $hash;
 }

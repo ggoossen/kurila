@@ -307,7 +307,7 @@ sub jleft {
 		1 while $rem+>0 && $str =~ s/( +)/{($rem--+>0?" ":"").$1}/g;
 		@_[0] = join '', reverse split m//, $str;
 	}
-	&jleft;
+	&jleft( < @_ );
  }
 
  sub jsingle {

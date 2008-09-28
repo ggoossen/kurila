@@ -87,7 +87,7 @@ my $transmit_ok = 0;            # flag to indicate if the last message was trans
 my $current_proto = undef;      # current mechanism used to transmit messages
 my $ident = '';                 # identifiant prepended to each message
 $facility = '';                 # current facility
-my $maskpri = LOG_UPTO(&LOG_DEBUG);     # current log mask
+my $maskpri = LOG_UPTO(&LOG_DEBUG( < @_ ));     # current log mask
 
 my %options = %(
     ndelay  => 0, 
@@ -163,8 +163,8 @@ sub setlogsock {
 	if (not defined $syslog_path) {
 	    my @try = qw(/dev/log /dev/conslog);
 
-            if (length &_PATH_LOG) {        # Undefined _PATH_LOG is "".
-		unshift @try, < &_PATH_LOG;
+            if (length &_PATH_LOG( < @_ )) {        # Undefined _PATH_LOG is "".
+		unshift @try, < &_PATH_LOG( < @_ );
             }
 
 	    for my $try ( @try) {
@@ -197,7 +197,7 @@ sub setlogsock {
         }
 
     } elsif (lc $setsock eq 'pipe') {
-        for my $path (@($syslog_path, < &_PATH_LOG, "/dev/log")) {
+        for my $path (@($syslog_path, < &_PATH_LOG( < @_ ), "/dev/log")) {
             next unless defined $path and length $path and -p $path and -w _;
             $syslog_path = $path;
             last
@@ -278,7 +278,7 @@ sub syslog {
 	if ($num +< 0) {
 	    croak "syslog: invalid level/facility: $_"
 	}
-	elsif ($num +<= &LOG_PRIMASK) {
+	elsif ($num +<= &LOG_PRIMASK( < @_ )) {
 	    croak "syslog: too many levels given: $_" if defined $numpri;
 	    $numpri = $num;
 	    return 0 unless LOG_MASK($numpri) ^&^ $maskpri;
@@ -595,7 +595,7 @@ sub connect_stream {
 sub connect_pipe {
     my ($errs) = < @_;
 
-    $syslog_path ||= &_PATH_LOG || "/dev/log";
+    $syslog_path ||= &_PATH_LOG( < @_ ) || "/dev/log";
 
     if (not -w $syslog_path) {
         push @$errs, "$syslog_path is not writable";

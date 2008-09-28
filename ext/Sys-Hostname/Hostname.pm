@@ -72,7 +72,7 @@ sub hostname {
     try {
 	require "syscall.ph";
 	$host = "\0" x 65; ## preload scalar
-	syscall(&SYS_gethostname, $host, 65) == 0;
+	syscall(&SYS_gethostname( < @_ ), $host, 65) == 0;
     }
 
     # method 2a - syscall using systeminfo instead of gethostname
@@ -81,7 +81,7 @@ sub hostname {
 	require "sys/syscall.ph";
 	require "sys/systeminfo.ph";
 	$host = "\0" x 65; ## preload scalar
-	syscall(&SYS_systeminfo, < &SI_HOSTNAME, $host, 65) != -1;
+	syscall(&SYS_systeminfo( < @_ ), < &SI_HOSTNAME( < @_ ), $host, 65) != -1;
     }
 
     # method 3 - trusty old hostname command

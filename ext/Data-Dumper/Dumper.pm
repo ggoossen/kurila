@@ -155,7 +155,7 @@ sub Names {
 }
 
 sub Dump {
-    return &Dumpperl;
+    return &Dumpperl( < @_ );
 }
 
 #

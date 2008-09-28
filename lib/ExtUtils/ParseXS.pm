@@ -536,7 +536,7 @@ sub process_para {
     }
 
     if (check_keyword("BOOT")) {
-      &check_cpp;
+      &check_cpp( < @_ );
       push (@BootCode, "#line @line_no[(nelems @line_no) - nelems @line] \"$filepathname\"")
 	if $WantLineNumbers && @line[0] !~ m/^\s*#\s*line\b/;
       push (@BootCode, < @line, "") ;
@@ -771,9 +771,9 @@ EOF
     push(@line, "$END:");
     push(@line_no, @line_no[-1]);
     $_ = '';
-    &check_cpp;
+    &check_cpp( < @_ );
     while ((nelems @line)) {
-      &CASE_handler if check_keyword("CASE");
+      &CASE_handler( < @_ ) if check_keyword("CASE");
       print Q(<<"EOF");
 #   $except [[
 EOF

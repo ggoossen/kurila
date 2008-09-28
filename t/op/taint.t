@@ -574,7 +574,7 @@ SKIP: {
     test     tainted @xyzzy[1];
     test not tainted @xyzzy[2];
     my $red_october = sub { return @("A", "tainted" . $TAINT, "B") };
-    test not tainted ((&$red_october)[0]);
+    test not tainted ((&$red_october( < @_ ))[0]);
     test     tainted ((&$red_october)[1]);
     test not tainted ((&$red_october)[2]);
     my @corge = &$red_october;
@@ -784,55 +784,55 @@ SKIP: {
 
 	my $evil = "foo" . $TAINT;
 
-	dies_not( sub { sysopen(my $ro, $evil, &O_RDONLY) } );
+	dies_not( sub { sysopen(my $ro, $evil, &O_RDONLY( < @_ )) } );
 	
-	dies_like( sub { sysopen(my $wo, $evil, &O_WRONLY) },
+	dies_like( sub { sysopen(my $wo, $evil, &O_WRONLY( < @_ )) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $rw, $evil, &O_RDWR) },
+	dies_like( sub { sysopen(my $rw, $evil, &O_RDWR( < @_ )) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $ap, $evil, &O_APPEND) },
+	dies_like( sub { sysopen(my $ap, $evil, &O_APPEND( < @_ )) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $cr, $evil, &O_CREAT) },
+	dies_like( sub { sysopen(my $cr, $evil, &O_CREAT( < @_ )) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $tr, $evil, &O_TRUNC) },
+	dies_like( sub { sysopen(my $tr, $evil, &O_TRUNC( < @_ )) },
                    qr/^Insecure dependency/);
 	
-        dies_not( sub { sysopen(my $ro, "foo", &O_RDONLY ^|^ $TAINT0) } );
+        dies_not( sub { sysopen(my $ro, "foo", &O_RDONLY( < @_ ) ^|^ $TAINT0) } );
 	
-	dies_like( sub { sysopen(my $wo, "foo", &O_WRONLY ^|^ $TAINT0) },
+	dies_like( sub { sysopen(my $wo, "foo", &O_WRONLY( < @_ ) ^|^ $TAINT0) },
                    qr/^Insecure dependency/);
 
-	dies_like( sub { sysopen(my $rw, "foo", &O_RDWR ^|^ $TAINT0) },
+	dies_like( sub { sysopen(my $rw, "foo", &O_RDWR( < @_ ) ^|^ $TAINT0) },
                    qr/^Insecure dependency/);
 
-	dies_like( sub { sysopen(my $ap, "foo", &O_APPEND ^|^ $TAINT0) },
+	dies_like( sub { sysopen(my $ap, "foo", &O_APPEND( < @_ ) ^|^ $TAINT0) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $cr, "foo", &O_CREAT ^|^ $TAINT0) },
+	dies_like( sub { sysopen(my $cr, "foo", &O_CREAT( < @_ ) ^|^ $TAINT0) },
                    qr/^Insecure dependency/);
 
-	dies_like( sub { sysopen(my $tr, "foo", &O_TRUNC ^|^ $TAINT0) },
+	dies_like( sub { sysopen(my $tr, "foo", &O_TRUNC( < @_ ) ^|^ $TAINT0) },
                    qr/^Insecure dependency/);
 
-	dies_not( sub { sysopen(my $ro, "foo", &O_RDONLY, $TAINT0) } );
+	dies_not( sub { sysopen(my $ro, "foo", &O_RDONLY( < @_ ), $TAINT0) } );
 	
-	dies_like( sub { sysopen(my $wo, "foo", &O_WRONLY, $TAINT0) },
+	dies_like( sub { sysopen(my $wo, "foo", &O_WRONLY( < @_ ), $TAINT0) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $rw, "foo", &O_RDWR, $TAINT0) },
+	dies_like( sub { sysopen(my $rw, "foo", &O_RDWR( < @_ ), $TAINT0) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $ap, "foo", &O_APPEND, $TAINT0) },
+	dies_like( sub { sysopen(my $ap, "foo", &O_APPEND( < @_ ), $TAINT0) },
                    qr/^Insecure dependency/);
 	
-	dies_like( sub { sysopen(my $cr, "foo", &O_CREAT, $TAINT0) },
+	dies_like( sub { sysopen(my $cr, "foo", &O_CREAT( < @_ ), $TAINT0) },
                    qr/^Insecure dependency/);
 
-	dies_like( sub { sysopen(my $tr, "foo", &O_TRUNC, $TAINT0) },
+	dies_like( sub { sysopen(my $tr, "foo", &O_TRUNC( < @_ ), $TAINT0) },
                    qr/^Insecure dependency/);
 	
 	unlink("foo"); # not unlink($evil), because that would fail...

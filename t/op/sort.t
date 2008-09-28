@@ -119,12 +119,12 @@ cmp_ok("{join ' ',@b}",'eq','1 2 3 4','reverse then sort');
 
 
 
-sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface }
+sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface( < @_ ) }
 try { @b = sort twoface @(4,1,3,2) };
 cmp_ok("{join ' ',@b}",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
 
-try { no warnings 'redefine'; *twoface = sub { &Backwards } };
+try { no warnings 'redefine'; *twoface = sub { &Backwards( < @_ ) } };
 ok(!$@,"redefining sort subs outside the sort \$@=[$@]");
 
 @b = sort twoface @(4,1,3,2);

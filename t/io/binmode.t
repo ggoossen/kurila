@@ -36,5 +36,5 @@ SKIP: {
     no warnings 'io', 'once';
     $! = 0;
     binmode(B);
-    ok($! == &Errno::EBADF);
+    ok($! == &Errno::EBADF( < @_ ));
 }

@@ -83,7 +83,7 @@ push @map, (
         path    => '/tmp/',
         file    => 'foo.txt',
     ),    
-) if not &File::Fetch::ON_WIN and not &File::Fetch::ON_VMS;
+) if not &File::Fetch::ON_WIN( < @_ ) and not &File::Fetch::ON_VMS( < @_ );
 
 ### these only on win32
 push @map, (
@@ -108,7 +108,7 @@ push @map, (
         path    => '/tmp/',
         file    => 'foo.txt',
     ),    
-) if &File::Fetch::ON_WIN;
+) if &File::Fetch::ON_WIN( < @_ );
 
 
 ### parse uri tests ###
@@ -141,7 +141,7 @@ for my $entry (@map) {
 
 ### file:// tests ###
 {
-    my $prefix = &File::Fetch::ON_UNIX ? 'file://' : 'file:///';
+    my $prefix = &File::Fetch::ON_UNIX( < @_ ) ? 'file://' : 'file:///';
     my $uri = $prefix . cwd() .'/'. basename($0);
 
     for (qw[lwp file]) {

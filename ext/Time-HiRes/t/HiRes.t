@@ -11,15 +11,15 @@ print "ok 1\n";
 
 use strict;
 
-my $have_gettimeofday	 = &Time::HiRes::d_gettimeofday;
-my $have_usleep		 = &Time::HiRes::d_usleep;
-my $have_nanosleep	 = &Time::HiRes::d_nanosleep;
-my $have_ualarm		 = &Time::HiRes::d_ualarm;
-my $have_clock_gettime	 = &Time::HiRes::d_clock_gettime;
-my $have_clock_getres	 = &Time::HiRes::d_clock_getres;
-my $have_clock_nanosleep = &Time::HiRes::d_clock_nanosleep;
-my $have_clock           = &Time::HiRes::d_clock;
-my $have_hires_stat      = &Time::HiRes::d_hires_stat;
+my $have_gettimeofday	 = &Time::HiRes::d_gettimeofday( < @_ );
+my $have_usleep		 = &Time::HiRes::d_usleep( < @_ );
+my $have_nanosleep	 = &Time::HiRes::d_nanosleep( < @_ );
+my $have_ualarm		 = &Time::HiRes::d_ualarm( < @_ );
+my $have_clock_gettime	 = &Time::HiRes::d_clock_gettime( < @_ );
+my $have_clock_getres	 = &Time::HiRes::d_clock_getres( < @_ );
+my $have_clock_nanosleep = &Time::HiRes::d_clock_nanosleep( < @_ );
+my $have_clock           = &Time::HiRes::d_clock( < @_ );
+my $have_hires_stat      = &Time::HiRes::d_hires_stat( < @_ );
 
 sub has_symbol {
     my $symbol = shift;
@@ -235,7 +235,7 @@ unless (   defined &Time::HiRes::gettimeofday
     use Time::HiRes < qw(time alarm sleep);
     try { require POSIX };
     my $use_sigaction =
-	!$@ && defined &POSIX::sigaction && &POSIX::SIGALRM +> 0;
+	!$@ && defined &POSIX::sigaction && &POSIX::SIGALRM( < @_ ) +> 0;
 
     my ($f, $r, $i, $not, $ok);
 
@@ -252,12 +252,12 @@ unless (   defined &Time::HiRes::gettimeofday
     my $oldaction;
     if ($use_sigaction) {
 	$oldaction = POSIX::SigAction->new();
-	printf "# sigaction tick, ALRM = \%d\n", &POSIX::SIGALRM;
+	printf "# sigaction tick, ALRM = \%d\n", &POSIX::SIGALRM( < @_ );
 
 	# Perl's deferred signals may be too wimpy to break through
 	# a restartable select(), so use POSIX::sigaction if available.
 
-	POSIX::sigaction(&POSIX::SIGALRM,
+	POSIX::sigaction(&POSIX::SIGALRM( < @_ ),
 			 POSIX::SigAction->new(\&tick),
 			 $oldaction)
 	    or die "Error setting SIGALRM handler with sigaction: $!\n";
@@ -311,7 +311,7 @@ unless (   defined &Time::HiRes::gettimeofday
     }
 
     if ($use_sigaction) {
-	POSIX::sigaction(&POSIX::SIGALRM, $oldaction);
+	POSIX::sigaction(&POSIX::SIGALRM( < @_ ), $oldaction);
     } else {
 	alarm(0); # can't cancel usig %SIG
     }
@@ -334,25 +334,25 @@ unless (   defined &Time::HiRes::setitimer
     my $r = \@( <Time::HiRes::gettimeofday());
 
     %SIG{VTALRM} = sub {
-	$i ? $i-- : setitimer(&ITIMER_VIRTUAL, 0);
+	$i ? $i-- : setitimer(&ITIMER_VIRTUAL( < @_ ), 0);
 	print "# Tick! $i ", Time::HiRes::tv_interval($r), "\n";
     };	
 
     print "# setitimer: ", join(" ", setitimer(ITIMER_VIRTUAL, 0.5, 0.4)), "\n";
 
     # Assume interval timer granularity of $limit * 0.5 seconds.  Too bold?
-    my $virt = getitimer(&ITIMER_VIRTUAL);
+    my $virt = getitimer(&ITIMER_VIRTUAL( < @_ ));
     print "not " unless defined $virt && abs($virt[0] / 0.5) - 1 +< $limit;
     print "ok 18\n";
 
     print "# getitimer: ", join(" ", getitimer(ITIMER_VIRTUAL)), "\n";
 
-    while (getitimer(&ITIMER_VIRTUAL)) {
+    while (getitimer(&ITIMER_VIRTUAL( < @_ ))) {
 	my $j;
 	for (1..1000) { $j++ } # Can't be unbreakable, must test getitimer().
     }
 
-    $virt = getitimer(&ITIMER_VIRTUAL);
+    $virt = getitimer(&ITIMER_VIRTUAL( < @_ ));
     print "not " unless not defined $virt;
     print "ok 19\n";
 
@@ -526,11 +526,11 @@ if ($have_clock_gettime &&
  TRY: {
 	for my $try (1..3) {
 	    print "# CLOCK_REALTIME: try = $try\n";
-	    my $t0 = clock_gettime(&CLOCK_REALTIME);
+	    my $t0 = clock_gettime(&CLOCK_REALTIME( < @_ ));
 	    use Time::HiRes < qw(sleep);
 	    my $T = 1.5;
 	    sleep($T);
-	    my $t1 = clock_gettime(&CLOCK_REALTIME);
+	    my $t1 = clock_gettime(&CLOCK_REALTIME( < @_ ));
 	    if ($t0 +> 0 && $t1 +> $t0) {
 		print "# t1 = $t1, t0 = $t0\n";
 		my $dt = $t1 - $t0;
@@ -573,7 +573,7 @@ if ($have_clock_getres) {
 if ($have_clock_nanosleep &&
     has_symbol('CLOCK_REALTIME')) {
     my $s = 1.5e9;
-    my $t = clock_nanosleep(&CLOCK_REALTIME, $s);
+    my $t = clock_nanosleep(&CLOCK_REALTIME( < @_ ), $s);
     my $r = abs(1 - $t / $s);
     if ($r +< 2 * $limit) {
 	print "ok 32\n";
@@ -639,7 +639,7 @@ if ($have_ualarm) {
 if ($^O =~ m/^(cygwin|MSWin)/) {
     print "# $^O: timestamps may not be good enough\n";
     skip 38;
-} elsif (&Time::HiRes::d_hires_stat) {
+} elsif (&Time::HiRes::d_hires_stat( < @_ )) {
     my @stat;
     my @atime;
     my @mtime;

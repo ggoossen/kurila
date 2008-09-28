@@ -42,7 +42,7 @@ sub callf { f(); }
 callf();
 is( @c[3], "main::callf", "subroutine name" );
 ok( @c[4], "hasargs true with callf()" );
-&callf;
+&callf( < @_ );
 ok( !@c[4], "hasargs false with &callf" );
 
 try { f() };

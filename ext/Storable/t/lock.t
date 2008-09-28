@@ -25,7 +25,7 @@ sub BEGIN {
 
 use Storable < qw(lock_store lock_retrieve);
 
-unless (&Storable::CAN_FLOCK) {
+unless (&Storable::CAN_FLOCK( < @_ )) {
     print "1..0 # Skip: fcntl/flock emulation broken on this platform\n";
 	exit 0;
 }

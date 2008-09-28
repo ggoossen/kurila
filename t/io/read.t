@@ -33,5 +33,5 @@ SKIP: {
     $! = 0;
     no warnings 'unopened';
     read(B,$b,1);
-    ok($! == &Errno::EBADF);
+    ok($! == &Errno::EBADF( < @_ ));
 }

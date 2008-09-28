@@ -49,7 +49,7 @@ print defined %ary ? "ok 18\n" : "not ok 18\n";
 
 sub foo { print "ok 19\n"; }
 
-&foo || print "not ok 19\n";
+&foo( < @_ ) || print "not ok 19\n";
 
 print defined &foo ? "ok 20\n" : "not ok 20\n";
 undef &foo;
