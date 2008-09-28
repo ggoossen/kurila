@@ -1387,6 +1387,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     SvGROW(linestr_sv, 80);
     sv_setpvn(linestr_sv,"",0);
 
+    PL_cop_seqmax = 1;
+
     sv = newSVpvs("");		/* first used for -I flags */
     SAVEFREESV(sv);
     init_main_stash();
