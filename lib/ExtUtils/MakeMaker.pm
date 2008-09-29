@@ -428,7 +428,7 @@ END
     
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
-            %configure_att = %( < %{&{$self->{CONFIGURE}}} );
+            %configure_att = %( < %{ $self->{CONFIGURE}->( < @_ ) } );
             $self = \%( < %$self, < %configure_att );
         } else {
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
