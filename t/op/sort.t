@@ -88,18 +88,6 @@ cmp_ok("{join ' ',@b}",'eq',"4 3 2 1",'reverse 5');
 @b = sort {$a <+> $b;} @a;
 cmp_ok("{join ' ',@b}",'eq',"2 3 4 10",'sort numeric');
 
-our $sub = 'Backwards';
-$x = join('', sort $sub @harry);
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
-
-cmp_ok($x,'eq',$expected,'sorter sub name in var 1');
-
-$sub = 'Backwards_stacked';
-$x = join('', sort $sub @harry);
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
-
-cmp_ok($x,'eq',$expected,'sorter sub name in var 2');
-
 # literals, combinations
 
 @b = sort ( @(4,1,3,2));
@@ -123,46 +111,11 @@ sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface( < 
 try { @b = sort twoface @(4,1,3,2) };
 cmp_ok("{join ' ',@b}",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
-
-try { no warnings 'redefine'; *twoface = sub { &Backwards( < @_ ) } };
-ok(!$@,"redefining sort subs outside the sort \$@=[$@]");
-
-@b = sort twoface @(4,1,3,2);
-cmp_ok("{join ' ',@b}",'eq','4 3 2 1','twoface redefinition');
-
-{
-  no warnings 'redefine';
-  *twoface = sub { *twoface = \&Backwards_other; $a <+> $b };
-}
-
-@b = sort twoface @(4,1,9,5);
-ok("{join ' ',@b}" eq "1 4 5 9", 'redefinition should not take effect during the sort');
-
-{
-  no warnings 'redefine';
-  *twoface = sub {
-                 eval 'sub twoface { $a <+> $b }';
-		 die($@ eq "" ? "good\n" : "bad\n");
-		 $a <+> $b;
-	       };
-}
-dies_like( sub { @b = sort twoface @(4,1) },
-           qr/^good/, 'twoface eval');
-
-eval <<'CODE';
-    # "sort 'one', 'two'" should not try to parse "'one" as a sort sub
-    my @result = sort @('one', 'two');
-CODE
-cmp_ok($@,'eq','',q(one is not a sub));
-
 {
   my $sortsub = \&Backwards;
   my $sortglobr = \*Backwards;
-  my $sortname = 'Backwards';
   @b = sort $sortsub @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 1');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 3');
   @b = sort $sortglobr @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 4');
 }
@@ -170,24 +123,18 @@ cmp_ok($@,'eq','',q(one is not a sub));
 {
   my $sortsub = \&Backwards_stacked;
   my $sortglobr = \*Backwards_stacked;
-  my $sortname = 'Backwards_stacked';
   @b = sort $sortsub @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 5');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 7');
   @b = sort $sortglobr @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 8');
 }
 
-our ($sortsub, $sortglob, $sortglobr, $sortname);
+our ($sortsub, $sortglob, $sortglobr);
 {
   local $sortsub = \&Backwards;
   local $sortglobr = \*Backwards;
-  local $sortname = 'Backwards';
   @b = sort $sortsub @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 1');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 3');
   @b = sort $sortglobr @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 4');
 }
@@ -195,11 +142,8 @@ our ($sortsub, $sortglob, $sortglobr, $sortname);
 {
   local $sortsub = \&Backwards_stacked;
   local $sortglobr = \*Backwards_stacked;
-  local $sortname = 'Backwards_stacked';
   @b = sort $sortsub @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 5');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 7');
   @b = sort $sortglobr @(4,1,3,2);
   cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 8');
 }
@@ -248,11 +192,6 @@ package Foo;
 @a = @( 5, 19, 1996, 255, 90 );
 @b = sort { $b <+> $a } @a;
 main::cmp_ok("{join ' ',@b}",'eq','1996 255 90 19 5','not in main:: 1');
-
-
-@b = sort main::Backwards_stacked @a;
-main::cmp_ok("{join ' ',@b}",'eq','90 5 255 1996 19','not in main:: 2');
-
 
 # check if context for sort arguments is handled right
 

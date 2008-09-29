@@ -53,7 +53,7 @@ like( $r, qr/^256(?:\r?\n)?$/s, '-Ci: auto-UTF-8 open for input' );
 
 require utf8;
 $r = runperl( switches => \@( '-CA', '-w' ),
-	      prog     => 'use utf8; print ord shift',
+	      prog     => 'use utf8; print ord shift(@ARGV)',
               stderr   => 1,
               args     => \@( utf8::chr(256) ) );
 like( $r, qr/^256(?:\r?\n)?$/s, '-CA: @ARGV' );

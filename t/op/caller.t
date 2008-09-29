@@ -3,7 +3,7 @@
 
 BEGIN {
     require './test.pl';
-    plan( tests => 77 );
+    plan( tests => 76 );
 }
 
 use strict;
@@ -42,8 +42,6 @@ sub callf { f(); }
 callf();
 is( @c[3], "main::callf", "subroutine name" );
 ok( @c[4], "hasargs true with callf()" );
-&callf( < @_ );
-ok( !@c[4], "hasargs false with &callf" );
 
 try { f() };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
