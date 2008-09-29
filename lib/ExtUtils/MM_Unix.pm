@@ -1825,7 +1825,7 @@ CODE
     $self->{WARN_IF_OLD_PACKLIST} ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
     $self->{FIXIN}              ||= 
-      q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"};
+      q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"};
 
     $self->{UMASK_NULL}         ||= "umask 0";
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
