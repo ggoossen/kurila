@@ -131,7 +131,7 @@ Usage $0: [switches]
 EOT
 	exit;
     }
-    shift;
+    shift @ARGV;
 }
 
 $versiononly = 1 if %Config{versiononly} && !defined $versiononly;
