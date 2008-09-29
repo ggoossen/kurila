@@ -198,10 +198,10 @@ $s += $_} @(1,2,4);
 print "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }
-BEGIN { print "argv <{join ' ', @ARGV}>\nbegin <",shift,">\n" }
-END { print "end <",shift,">\nargv <{join ' ', @ARGV}>\n" }
-INIT { print "init <",shift,">\n" }
-CHECK { print "check <",shift,">\n" }
+BEGIN { print "argv <{join ' ', @ARGV}>\nbegin <",shift(@ARGV),">\n" }
+END { print "end <",shift(@ARGV),">\nargv <{join ' ', @ARGV}>\n" }
+INIT { print "init <",shift(@ARGV),">\n" }
+CHECK { print "check <",shift(@ARGV),">\n" }
 EXPECT
 argv <a b c d e>
 begin <a>

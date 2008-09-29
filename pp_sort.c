@@ -1521,12 +1521,6 @@ PP(pp_sort)
 		if (cv && CvISXSUB(cv)) {
 		    is_xsub = 1;
 		}
-		else if (gv) {
-		    SV *tmpstr = sv_newmortal();
-		    gv_efullname3(tmpstr, gv, NULL);
-		    DIE(aTHX_ "Undefined sort subroutine \"%"SVf"\" called",
-			SVfARG(tmpstr));
-		}
 		else {
 		    DIE(aTHX_ "Undefined subroutine in sort");
 		}

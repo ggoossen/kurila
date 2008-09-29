@@ -60,8 +60,8 @@ sub file_eq {
 # child processes
 open PROG, ">", "ff-prog" or die "open ff-prog: $!";
 print PROG <<'EOF';
-my $f = shift;
-my $str = shift;
+my $f = shift(@ARGV);
+my $str = shift(@ARGV);
 open OUT, ">>", "$f" or die "open $f: $!";
 print OUT $str;
 close OUT;

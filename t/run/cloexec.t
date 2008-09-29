@@ -76,7 +76,7 @@ make_tmp_file($tmpfile2, $tmpfile2_contents);
 # $Child_prog is the program run by the child that inherits the fd.
 # Note: avoid using ' or " in $Child_prog since it is run with -e
 my $Child_prog = <<'CHILD_PROG';
-my $fd = shift;
+my $fd = shift(@ARGV);
 print qq{childfd=$fd\n};
 open INHERIT, qq{<&=}, qq{$fd} or die qq{open $fd: $!};
 my $line = ~< *INHERIT;
