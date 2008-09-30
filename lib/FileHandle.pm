@@ -29,7 +29,7 @@ require IO::File;
 # Everything we're willing to export, we must first import.
 #
 require IO::Handle;
-IO::Handle->import(< grep { !defined(&$_) } @( < @EXPORT, < @EXPORT_OK));
+IO::Handle->import(< grep { $_ ne 'pipe' } @( < @EXPORT, < @EXPORT_OK));
 
 #
 # Some people call "FileHandle::function", so all the functions

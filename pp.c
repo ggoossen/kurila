@@ -295,6 +295,10 @@ PP(pp_prototype)
 		DIE(aTHX_ "Can't find an opnumber for \"%s\"", s+6);
 	    }
 	}
+	else {
+	    /* CORE::<op> */
+	    
+	}
     }
     cv = sv_2cv(TOPs, &gv, 0);
     if (cv && SvPOK(cv))

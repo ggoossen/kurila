@@ -11,7 +11,7 @@
 
 use strict;
 
-print "1..113\n";
+print "1..116\n";
 
 my $i = 1;
 
@@ -318,6 +318,9 @@ print "ok ", $i++, "\n";
 print "not " if defined prototype('CORE::system');
 print "ok ", $i++, "\n";
 
+print "# CORE::open => ($p)\nnot " if ($p = prototype('CORE::open')) ne '*;$@';
+print "ok ", $i++, "\n";
+
 print "# CORE:Foo => ($p), \$@ => `$@'\nnot " 
     if defined ($p = try { prototype('CORE::Foo') or 1 }) or $@->message !~ m/^Can't find an opnumber/;
 print "ok ", $i++, "\n";
@@ -452,6 +455,14 @@ for my $p (@( "", < qw{ () ($) ($@) ($%) ($;$) (&) (&\@) (&@) (%) (\%) (\@) }) )
   print "# eval[$eval]\nnot " unless $@ && $@->message =~ m/(parse|syntax) error/i;
   print "ok ", $i++, "\n";
 }
+
+# Not $$;$;$
+print "not " unless prototype "CORE::substr" eq '$$;$$';
+print "ok ", $i++, "\n";
+
+# recv takes a scalar reference for its second argument
+print "not " unless prototype "CORE::recv" eq '*\$$$';
+print "ok ", $i++, "\n";
 
 {
     my $myvar;

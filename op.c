@@ -3243,9 +3243,8 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     }
 
     /* Fake up the BEGIN {}, which does its thing immediately. */
-    newATTRSUB(floor,
-	       newSVOP(OP_CONST, 0, newSVpvs_share("BEGIN"), idop->op_location),
-	NULL,
+    newSUB(floor,
+	newSVOP(OP_CONST, 0, newSVpvs_share("BEGIN"), idop->op_location),
 	NULL,
 	append_elem(OP_LINESEQ,
 	    append_elem(OP_LINESEQ,

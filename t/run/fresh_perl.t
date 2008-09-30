@@ -125,11 +125,6 @@ print;
 EXPECT
 oo
 ########
-sub by_number { $a <+> $b; };# inline function for sort below
-our %as_ary;
-%as_ary{0}="a0";
-our @ordered_array=sort by_number keys(%as_ary);
-########
 BEGIN { die "phooey" }
 EXPECT
 phooey at - line 1 character 9.

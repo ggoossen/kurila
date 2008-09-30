@@ -97,7 +97,7 @@
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
-%type <opval> subattrlist myattrterm myterm
+%type <opval> myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
 %type <p_tkval> label
 
@@ -462,37 +462,35 @@ peg	:	PEG
 	;
 
 /* Unimplemented "my sub foo { }" */
-mysubrout:	MYSUB startsub subname proto subattrlist subbody
+mysubrout:	MYSUB startsub subname proto subbody
 			{ 
 #ifdef MAD
-			  $$ = newMYSUB($2, $3, $4, $5, $6);
+			  $$ = newMYSUB($2, $3, $4, NULL, $5);
 			  TOKEN_GETMAD($1,$$,'d');
 #else
-			  newMYSUB($2, $3, $4, $5, $6);
+			  newMYSUB($2, $3, $4, NULL, $5);
 			  $$ = (OP*)NULL;
 #endif
 			}
 	;
 
 /* Subroutine definition */
-subrout	:	SUB startsub subname proto subattrlist subbody
+subrout	:	SUB startsub subname proto subbody
 			{
 #ifdef MAD
 			  {
 			      OP* o = newSVOP(OP_ANONCODE, 0,
-                                  (SV*)newATTRSUB($2, $3, $4, $5, $6), LOCATION($1));
+                                  (SV*)newATTRSUB($2, $3, $4, NULL, $5), LOCATION($1));
 			      $$ = newOP(OP_NULL,0, LOCATION($1));
 			      op_getmad(o,$$,'&');
 			      op_getmad($3,$$,'n');
 			      op_getmad($4,$$,'s');
-			      op_getmad($5,$$,'a');
 			      TOKEN_GETMAD($1,$$,'d');
-			      append_madprops($6->op_madprop, $$, 0);
                               APPEND_MADPROPS_PV("sub", $$, '<');
-			      $6->op_madprop = 0;
+			      $5->op_madprop = 0;
 			    }
 #else
-			  CV* new = newATTRSUB($2, $3, $4, $5, $6);
+			  CV* new = newATTRSUB($2, $3, $4, NULL, $5);
                           SvREFCNT_dec(new);
 			  $$ = (OP*)NULL;
 #endif
@@ -523,24 +521,6 @@ subname	:	WORD	{ const char *const name = SvPV_nolen_const(((SVOP*)$1)->op_sv);
 proto	:	/* NULL */
 			{ $$ = (OP*)NULL; }
 	|	THING
-	;
-
-/* Optional list of subroutine attributes */
-subattrlist:	/* NULL */
-			{ $$ = (OP*)NULL; }
-	|	COLONATTR THING
-			{ $$ = $2;
-			  TOKEN_GETMAD($1,$$,':');
-                          APPEND_MADPROPS_PV("attrlist",$$,'>');
-			}
-	|	COLONATTR
-			{ $$ = IF_MAD(
-                                newOP(OP_NULL, 0, LOCATION($1)),
-				    (OP*)NULL
-				);
-			  TOKEN_GETMAD($1,$$,':');
-                          APPEND_MADPROPS_PV("attrlist",$$,'>');
-			}
 	;
 
 /* Subroutine body - either null or a block */
@@ -969,12 +949,11 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 
 /* Constructors for anonymous data */
 anonymous:
-	ANONSUB startanonsub proto subattrlist block	%prec '('
+	ANONSUB startanonsub proto block	%prec '('
 			{
-			  $$ = newANONATTRSUB($2, $3, $4, $5);
+			  $$ = newANONATTRSUB($2, $3, NULL, $4);
 			  TOKEN_GETMAD($1,$$,'o');
 			  OP_GETMAD($3,$$,'s');
-			  OP_GETMAD($4,$$,'a');
 			}
 
     ;

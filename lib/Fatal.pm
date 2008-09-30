@@ -71,15 +71,13 @@ sub _make_fatal {
     $sub = "{$pkg}::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
+    $sub = Symbol::fetch_glob($sub);
     print "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
 	$proto = prototype $sref;
 	$call = '&$sref';
-    } elsif ($sub eq $ini && $sub !~ m/^CORE::GLOBAL::/) {
-	# Stray user subroutine
-	die "$sub is not a Perl subroutine" 
     } else {			# CORE subroutine
         $proto = try { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
@@ -107,7 +105,7 @@ EOS
       $code = eval("package $pkg; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
-      *{Symbol::fetch_glob($sub)} = $code;
+      *{$sub} = $code;
     }
 }
 
