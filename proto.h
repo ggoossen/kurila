@@ -4361,8 +4361,8 @@ STATIC const char*	S_gv_ename(pTHX_ GV *gv)
 #define PERL_ARGS_ASSERT_GV_ENAME	\
 	assert(gv)
 
-STATIC OP *	S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
-			__attribute__nonnull__(pTHX_3);
+STATIC OP *	S_my_kid(pTHX_ OP *o, OP **imopsp)
+			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MY_KID	\
 	assert(imopsp)
 
