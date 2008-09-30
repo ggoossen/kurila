@@ -103,7 +103,6 @@ ApR	|CV*	|gv_handler	|NULLOK HV* stash|I32 id
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
 p	|OP*	|append_list	|I32 optype|NULLOK LISTOP* first|NULLOK LISTOP* last
 p	|I32	|apply		|I32 type|NN SV** mark|NN SV** sp
-ApM	|void	|apply_attrs_string|NN const char *stashpv|NN CV *cv|NN const char *attrstr|STRLEN len
 Apd	|void	|av_clear	|NN AV *av
 Apd	|SV*	|av_delete	|NN AV *av|I32 key|I32 flags
 ApdR	|bool	|av_exists	|NN AV *av|I32 key
@@ -1185,8 +1184,6 @@ s	|void	|simplify_sort	|NN OP *o
 s	|const char*	|gv_ename	|NN GV *gv
 s	|OP *	|my_kid		|NULLOK OP *o|NN OP **imopsp
 s	|OP *	|dup_attrlist	|NN OP *o
-s	|void	|apply_attrs	|NN HV *stash|NN SV *target|NULLOK OP *attrs|bool for_my
-s	|void	|apply_attrs_my	|NN HV *stash|NN OP *target|NULLOK OP *attrs|NN OP **imopsp
 s	|void	|bad_type	|I32 n|NN const char *t|NN const char *name|NN const OP *kid
 s	|void	|no_bareword_allowed|NN const OP *o
 sR	|OP*	|no_fh_allowed|NN OP *o

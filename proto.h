@@ -141,13 +141,6 @@ PERL_CALLCONV I32	Perl_apply(pTHX_ I32 type, SV** mark, SV** sp)
 #define PERL_ARGS_ASSERT_APPLY	\
 	assert(mark); assert(sp)
 
-PERL_CALLCONV void	Perl_apply_attrs_string(pTHX_ const char *stashpv, CV *cv, const char *attrstr, STRLEN len)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_APPLY_ATTRS_STRING	\
-	assert(stashpv); assert(cv); assert(attrstr)
-
 PERL_CALLCONV void	Perl_av_clear(pTHX_ AV *av)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_AV_CLEAR	\
@@ -4370,19 +4363,6 @@ STATIC OP *	S_dup_attrlist(pTHX_ OP *o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DUP_ATTRLIST	\
 	assert(o)
-
-STATIC void	S_apply_attrs(pTHX_ HV *stash, SV *target, OP *attrs, bool for_my)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_APPLY_ATTRS	\
-	assert(stash); assert(target)
-
-STATIC void	S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_4);
-#define PERL_ARGS_ASSERT_APPLY_ATTRS_MY	\
-	assert(stash); assert(target); assert(imopsp)
 
 STATIC void	S_bad_type(pTHX_ I32 n, const char *t, const char *name, const OP *kid)
 			__attribute__nonnull__(pTHX_2)

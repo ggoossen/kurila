@@ -50,7 +50,6 @@
 #define append_list		Perl_append_list
 #define apply			Perl_apply
 #endif
-#define apply_attrs_string	Perl_apply_attrs_string
 #define av_clear		Perl_av_clear
 #define av_delete		Perl_av_delete
 #define av_exists		Perl_av_exists
@@ -1164,8 +1163,6 @@
 #define gv_ename		S_gv_ename
 #define my_kid			S_my_kid
 #define dup_attrlist		S_dup_attrlist
-#define apply_attrs		S_apply_attrs
-#define apply_attrs_my		S_apply_attrs_my
 #define bad_type		S_bad_type
 #define no_bareword_allowed	S_no_bareword_allowed
 #define no_fh_allowed		S_no_fh_allowed
@@ -2257,7 +2254,6 @@
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)
 #define apply(a,b,c)		Perl_apply(aTHX_ a,b,c)
 #endif
-#define apply_attrs_string(a,b,c,d)	Perl_apply_attrs_string(aTHX_ a,b,c,d)
 #define av_clear(a)		Perl_av_clear(aTHX_ a)
 #define av_delete(a,b,c)	Perl_av_delete(aTHX_ a,b,c)
 #define av_exists(a,b)		Perl_av_exists(aTHX_ a,b)
@@ -3348,8 +3344,6 @@
 #define gv_ename(a)		S_gv_ename(aTHX_ a)
 #define my_kid(a,b)		S_my_kid(aTHX_ a,b)
 #define dup_attrlist(a)		S_dup_attrlist(aTHX_ a)
-#define apply_attrs(a,b,c,d)	S_apply_attrs(aTHX_ a,b,c,d)
-#define apply_attrs_my(a,b,c,d)	S_apply_attrs_my(aTHX_ a,b,c,d)
 #define bad_type(a,b,c,d)	S_bad_type(aTHX_ a,b,c,d)
 #define no_bareword_allowed(a)	S_no_bareword_allowed(aTHX_ a)
 #define no_fh_allowed(a)	S_no_fh_allowed(aTHX_ a)
