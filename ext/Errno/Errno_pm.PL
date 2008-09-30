@@ -401,7 +401,6 @@ sub TIEHASH { bless \@() }
 
 sub FETCH {
     my ($self, $errname) = < @_;
-    my $proto = prototype("Errno::$errname");
     my $errno = "";
     if ( exists %name2no{$errname}) {
         $errno = %name2no{$errname};

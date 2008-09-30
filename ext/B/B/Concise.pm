@@ -344,8 +344,7 @@ sub compile {
 		} else {
 		    $objname = "main::" . $objname unless $objname =~ m/::/;
 		    print $walkHandle "$objname:\n";
-		    no strict 'refs';
-		    unless (exists &$objname) {
+		    unless (exists &{*{Symbol::fetch_glob($objname)}}) {
 			print $walkHandle "err: unknown function ($objname)\n";
 			return;
 		    }

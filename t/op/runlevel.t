@@ -42,20 +42,6 @@ EXPECT
 WARNHOOK
 END
 ########
-sub foo {
-  goto bar if $a == 0 || $b == 0;
-  $a <+> $b;
-}
-our @a = @(3, 2, 0, 1);
-@a = sort foo @a;
-print join(', ', @a)."\n";
-exit;
-bar:
-print "bar reached\n";
-EXPECT
-Can't "goto" out of a pseudo block at - line 2 character 3.
-    main::foo called at - line 6 character 6.
-########
 our @a = @(3, 2, 1);
 @a = sort { eval('die("no way")') ;  $a <+> $b} @a;
 print join(", ", @a)."\n";

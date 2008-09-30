@@ -250,7 +250,7 @@ sub SWASHNEW_real {
 		if ($c eq 'utf8') {
 		    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);
 		}
-		elsif (exists &$name) {
+		elsif (exists &{*{Symbol::fetch_glob($name)}}) {
 		    $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0);
 		}
 		elsif ($c =~ m/^([0-9a-fA-F]+)/) {

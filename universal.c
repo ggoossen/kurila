@@ -1850,7 +1850,7 @@ XS(XS_dump_view)
 	/* this will need EBCDICification */
 	STRLEN charlen = 0;
 	for (s = src; s < send; s += charlen) {
-	    const UV k = utf8_to_uvchr(s, &charlen);
+	    const UV k = utf8n_to_uvchr(s, UTF8_MAXBYTES, &charlen, UTF8_ALLOW_ANY | UTF8_CHECK_ONLY );
 
 	    if (k == 0 || s + charlen > send ) {
 		/* invalid character escape: \x[XX] */
@@ -1891,7 +1891,7 @@ XS(XS_dump_view)
 	    *r++ = '"';
 
 	    for (s = src; s < send; s += charlen) {
-		const UV k = utf8_to_uvchr(s, &charlen);
+		const UV k = utf8n_to_uvchr(s, UTF8_MAXBYTES, &charlen, UTF8_ALLOW_ANY | UTF8_CHECK_ONLY );
 
 		if (k == 0 || s + charlen > send ) {
 		    /* invalid character */

@@ -1,17 +1,9 @@
 #!./perl
 
-BEGIN {
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-}
-
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 58;
+use Test::More tests => 56;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -162,22 +154,6 @@ $test /= 2 if ++$test;
 ####
 # 6
 1;
-####
-# 7
-{
-    my $test = sub : method {
-	my $x;
-    }
-    ;
-}
-####
-# 8
-{
-    my $test = sub : locked method {
-	my $x;
-    }
-    ;
-}
 ####
 # 10
 my $x;

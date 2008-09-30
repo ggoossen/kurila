@@ -244,8 +244,8 @@ unless ($^O eq 'MacOS') {
   }
   # Special case O_EXLOCK
   $LOCKFLAG = try {
-    local %SIG{__DIE__} = sub {};
-    local %SIG{__WARN__} = sub {};
+    local $^DIE_HOOK = sub {};
+    local $^WARN_HOOK = sub {};
     &Fcntl::O_EXLOCK();
   };
 }

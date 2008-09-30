@@ -15,7 +15,7 @@ while ( ~< *DATA) {
 	like( $@->{description}, qr/Can't find an opnumber for/, $keyword );
     }
     else {
-	is( "(".prototype("CORE::".$keyword).")", $proto, $keyword );
+	is( "(".prototype(\&{*{Symbol::fetch_glob("CORE::".$keyword)}}).")", $proto, $keyword );
     }
 }
 
