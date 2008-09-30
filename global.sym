@@ -33,7 +33,6 @@ Perl_get_context
 Perl_set_context
 Perl_Gv_AMupdate
 Perl_gv_handler
-Perl_apply_attrs_string
 Perl_av_clear
 Perl_av_delete
 Perl_av_exists
