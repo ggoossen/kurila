@@ -1822,7 +1822,7 @@ Perl_apply_attrs_string(pTHX_ const char *stashpv, CV *cv,
 }
 
 STATIC OP *
-S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
+S_my_kid(pTHX_ OP *o, OP **imopsp)
 {
     dVAR;
     I32 type;
@@ -1834,14 +1834,14 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 
     type = o->op_type;
     if (PL_madskills && type == OP_NULL && o->op_flags & OPf_KIDS) {
-	(void)my_kid(cUNOPo->op_first, attrs, imopsp);
+	(void)my_kid(cUNOPo->op_first, imopsp);
 	return o;
     }
 
     if (type == OP_LIST) {
         OP *kid;
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
-	    my_kid(kid, attrs, imopsp);
+	    my_kid(kid, imopsp);
     } else if (type == OP_UNDEF
 #ifdef PERL_MAD
 	       || type == OP_STUB
@@ -1849,7 +1849,7 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 	       ) {
 	return o;
     } else if (type == OP_EXPAND) {
-	my_kid(cUNOPo->op_first, attrs, imopsp);
+	my_kid(cUNOPo->op_first, imopsp);
     }
     else if (type == OP_RV2SV ||	/* "our" declaration */
 	       type == OP_RV2AV ||
@@ -1860,14 +1860,6 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 			PL_parser->in_my == KEY_our
 			    ? "our"
 			    : PL_parser->in_my == KEY_state ? "state" : "my"));
-	} else if (attrs) {
-	    GV * const gv = cGVOPx_gv(cUNOPo->op_first);
-	    PL_parser->in_my = FALSE;
-	    apply_attrs(GvSTASH(gv),
-			(type == OP_RV2SV ? GvSV(gv) :
-			 type == OP_RV2AV ? (SV*)GvAV(gv) :
-			 type == OP_RV2HV ? (SV*)GvHV(gv) : (SV*)gv),
-			attrs, FALSE);
 	}
 	o->op_private |= OPpOUR_INTRO;
 	return o;
@@ -1881,14 +1873,6 @@ S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 			    ? "our"
 			    : PL_parser->in_my == KEY_state ? "state" : "my"));
 	return o;
-    }
-    else if (attrs && type != OP_PUSHMARK) {
-	HV *stash;
-
-	PL_parser->in_my = FALSE;
-
-	stash = PL_curstash;
-	apply_attrs_my(stash, o, attrs, imopsp);
     }
     o->op_flags |= OPf_MOD;
     o->op_private |= OPpLVAL_INTRO;
@@ -1908,7 +1892,7 @@ Perl_my(pTHX_ OP *o)
 
     maybe_scalar = 1;
     rops = NULL;
-    o = my_kid(o, NULL, &rops);
+    o = my_kid(o, &rops);
     if (rops) {
 	if (maybe_scalar && o->op_type == OP_PADSV) {
 	    o = append_list(OP_LISTLAST, (LISTOP*)rops, (LISTOP*)o);
