@@ -358,8 +358,6 @@ my %globvar;
 readvars %intrp,  'intrpvar.h','I';
 readvars %globvar, 'perlvars.h','G';
 
-my $sym;
-
 sub undefine ($) {
     my ($sym) = < @_;
     "#undef  $sym\n";
@@ -459,7 +457,7 @@ if ($ifdef_state) {
     print $em "#endif\n";
 }
 
-for $sym (sort keys %ppsym) {
+for my $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
     print $em hide($sym, "Perl_$sym");
 }
@@ -537,7 +535,7 @@ if ($ifdef_state) {
     print $em "#endif\n";
 }
 
-for $sym (sort keys %ppsym) {
+for my $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
     if ($sym =~ m/^ck_/) {
 	print $em hide("$sym(a)", "Perl_$sym(aTHX_ a)");
@@ -671,7 +669,7 @@ print $em do_not_edit ("embedvar.h"), <<'END';
 
 END
 
-for $sym (sort keys %intrp) {
+for my $sym (sort keys %intrp) {
     print $em multon($sym,'I','vTHX->');
 }
 
@@ -683,7 +681,7 @@ print $em <<'END';
 
 END
 
-for $sym (sort keys %intrp) {
+for my $sym (sort keys %intrp) {
     print $em multoff($sym,'I');
 }
 
@@ -699,7 +697,7 @@ print $em <<'END';
 
 END
 
-for $sym (sort keys %globvar) {
+for my $sym (sort keys %globvar) {
     print $em multon($sym,   'G','my_vars->');
     print $em multon("G$sym",'', 'my_vars->');
 }
@@ -710,7 +708,7 @@ print $em <<'END';
 
 END
 
-for $sym (sort keys %globvar) {
+for my $sym (sort keys %globvar) {
     print $em multoff($sym,'G');
 }
 
@@ -722,7 +720,7 @@ print $em <<'END';
 
 END
 
-for $sym (sort @extvars) {
+for my $sym (sort @extvars) {
     print $em hide($sym,"PL_$sym");
 }
 
@@ -843,11 +841,11 @@ END_EXTERN_C
 
 EOT
 
-foreach $sym (sort keys %intrp) {
+foreach my $sym (sort keys %intrp) {
     print $capih bincompat_var('I',$sym);
 }
 
-foreach $sym (sort keys %globvar) {
+foreach my $sym (sort keys %globvar) {
     print $capih bincompat_var('G',$sym);
 }
 

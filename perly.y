@@ -480,7 +480,7 @@ subrout	:	SUB startsub subname proto subbody
 #ifdef MAD
 			  {
 			      OP* o = newSVOP(OP_ANONCODE, 0,
-                                  (SV*)newATTRSUB($2, $3, $4, NULL, $5), LOCATION($1));
+                                  (SV*)newSUB($2, $3, $4, $5), LOCATION($1));
 			      $$ = newOP(OP_NULL,0, LOCATION($1));
 			      op_getmad(o,$$,'&');
 			      op_getmad($3,$$,'n');
@@ -490,7 +490,7 @@ subrout	:	SUB startsub subname proto subbody
 			      $5->op_madprop = 0;
 			    }
 #else
-			  CV* new = newATTRSUB($2, $3, $4, NULL, $5);
+			  CV* new = newSUB($2, $3, $4, $5);
                           SvREFCNT_dec(new);
 			  $$ = (OP*)NULL;
 #endif
@@ -666,7 +666,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			}
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
 			{
-			  $<opval>$ = newANONATTRSUB($2, 0, (OP*)NULL, $3); }
+			  $<opval>$ = newANONSUB($2, 0, $3); }
 		    listexpr		%prec LSTOP  /* ... @bar */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				 append_elem(OP_LIST,
@@ -951,7 +951,7 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 anonymous:
 	ANONSUB startanonsub proto block	%prec '('
 			{
-			  $$ = newANONATTRSUB($2, $3, NULL, $4);
+			  $$ = newANONSUB($2, $3, $4);
 			  TOKEN_GETMAD($1,$$,'o');
 			  OP_GETMAD($3,$$,'s');
 			}

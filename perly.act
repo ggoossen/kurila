@@ -410,7 +410,7 @@ case 2:
 #ifdef MAD
 			  {
 			      OP* o = newSVOP(OP_ANONCODE, 0,
-                                  (SV*)newATTRSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), NULL, (ps[(5) - (5)].val.opval)), LOCATION((ps[(1) - (5)].val.i_tkval)));
+                                  (SV*)newSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval)), LOCATION((ps[(1) - (5)].val.i_tkval)));
 			      (yyval.opval) = newOP(OP_NULL,0, LOCATION((ps[(1) - (5)].val.i_tkval)));
 			      op_getmad(o,(yyval.opval),'&');
 			      op_getmad((ps[(3) - (5)].val.opval),(yyval.opval),'n');
@@ -420,7 +420,7 @@ case 2:
 			      (ps[(5) - (5)].val.opval)->op_madprop = 0;
 			    }
 #else
-			  CV* new = newATTRSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), NULL, (ps[(5) - (5)].val.opval));
+			  CV* new = newSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval));
                           SvREFCNT_dec(new);
 			  (yyval.opval) = (OP*)NULL;
 #endif
@@ -638,7 +638,7 @@ case 2:
   case 76:
 #line 668 "perly.y"
     {
-			  (yyval.opval) = newANONATTRSUB((ps[(2) - (3)].val.ionlyval), 0, (OP*)NULL, (ps[(3) - (3)].val.opval)); ;}
+			  (yyval.opval) = newANONSUB((ps[(2) - (3)].val.ionlyval), 0, (ps[(3) - (3)].val.opval)); ;}
     break;
 
   case 77:
@@ -1025,7 +1025,7 @@ case 2:
   case 119:
 #line 953 "perly.y"
     {
-			  (yyval.opval) = newANONATTRSUB((ps[(2) - (4)].val.ionlyval), (ps[(3) - (4)].val.opval), NULL, (ps[(4) - (4)].val.opval));
+			  (yyval.opval) = newANONSUB((ps[(2) - (4)].val.ionlyval), (ps[(3) - (4)].val.opval), (ps[(4) - (4)].val.opval));
 			  TOKEN_GETMAD((ps[(1) - (4)].val.i_tkval),(yyval.opval),'o');
 			  OP_GETMAD((ps[(3) - (4)].val.opval),(yyval.opval),'s');
 			;}
