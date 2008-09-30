@@ -4571,12 +4571,6 @@ Perl_newMYSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 CV *
 Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 {
-    return Perl_newATTRSUB(aTHX_ floor, o, proto, NULL, block);
-}
-
-CV *
-Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
-{
     dVAR;
     const char *aname;
     GV *gv;
@@ -4590,7 +4584,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
        full GV and CV.  If anything is present then it will take a full CV to
        store it.  */
     const I32 gv_fetch_flags
-	= (block || attrs || (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
+	= (block || (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
 	   || PL_madskills)
 	? GV_ADDMULTI : GV_ADDMULTI | GV_NOINIT;
     const char * const name = o ? SvPV_nolen_const(cSVOPo->op_sv) : NULL;
@@ -4622,8 +4616,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    SAVEFREEOP(o);
 	if (proto)
 	    SAVEFREEOP(proto);
-	if (attrs)
-	    SAVEFREEOP(attrs);
     }
 
     if (SvTYPE(gv) != SVt_PVGV) {	/* Maybe prototype now, and had at
@@ -4654,7 +4646,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
     }
 #endif
 
-    if (!block || !ps || *ps || attrs
+    if (!block || !ps || *ps
 	|| (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
 #ifdef PERL_MAD
 	|| block->op_type == OP_NULL
@@ -4685,7 +4677,7 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 #ifdef PERL_MAD
 		 || block->op_type == OP_NULL
 #endif
-		 )&& !attrs) {
+		 )) {
 		if (CvFLAGS(PL_compcv)) {
 		    /* might have had built-in attrs applied */
 		    CvFLAGS(cv) |= (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS);
@@ -4735,36 +4727,6 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    goto install_block;
 	op_free(block);
 	goto done;
-    }
-    if (attrs) {
-	HV *stash;
-	SV *rcv;
-
-	/* Need to do a C<use attributes $stash_of_cv,\&cv,@attrs>
-	 * before we clobber PL_compcv.
-	 */
-	if (cv && (!block
-#ifdef PERL_MAD
-		    || block->op_type == OP_NULL
-#endif
-		    )) {
-	    rcv = (SV*)cv;
-	    /* Might have had built-in attributes applied -- propagate them. */
-	    CvFLAGS(cv) |= (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS);
-	    if (CvGV(cv) && GvSTASH(CvGV(cv)))
-		stash = GvSTASH(CvGV(cv));
-	    else
-		stash = PL_curstash;
-	}
-	else {
-	    /* possibly about to re-define existing subr -- ignore old cv */
-	    rcv = (SV*)PL_compcv;
-	    if (name && GvSTASH(gv))
-		stash = GvSTASH(gv);
-	    else
-		stash = PL_curstash;
-	}
-	apply_attrs(stash, rcv, attrs, FALSE);
     }
     if (cv) {				/* must reuse cv if autoloaded */
 	if (
@@ -5147,15 +5109,9 @@ Perl_newANONHASH(pTHX_ OP *o, SV* location)
 OP *
 Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
-    return newANONATTRSUB(floor, proto, NULL, block);
-}
-
-OP *
-Perl_newANONATTRSUB(pTHX_ I32 floor, OP *proto, OP *attrs, OP *block)
-{
     return newUNOP(OP_SREFGEN, 0,
 	newSVOP(OP_ANONCODE, 0,
-		(SV*)newATTRSUB(floor, 0, proto, attrs, scalar(block)), block->op_location), block->op_location);
+		(SV*)newSUB(floor, 0, proto, scalar(block)), block->op_location), block->op_location);
 }
 
 OP *

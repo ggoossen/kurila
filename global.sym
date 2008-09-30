@@ -647,8 +647,6 @@ Perl_sv_force_normal
 Perl_sv_force_normal_flags
 Perl_tmps_grow
 Perl_sv_rvweaken
-Perl_newANONATTRSUB
-Perl_newATTRSUB
 Perl_newMYSUB
 Perl_cx_dup
 Perl_si_dup

@@ -1034,8 +1034,6 @@
 #ifdef PERL_CORE
 #define magic_killbackrefs	Perl_magic_killbackrefs
 #endif
-#define newANONATTRSUB		Perl_newANONATTRSUB
-#define newATTRSUB		Perl_newATTRSUB
 #ifdef PERL_MAD
 #define newMYSUB		Perl_newMYSUB
 #else
@@ -3218,8 +3216,6 @@
 #ifdef PERL_CORE
 #define magic_killbackrefs(a,b)	Perl_magic_killbackrefs(aTHX_ a,b)
 #endif
-#define newANONATTRSUB(a,b,c,d)	Perl_newANONATTRSUB(aTHX_ a,b,c,d)
-#define newATTRSUB(a,b,c,d,e)	Perl_newATTRSUB(aTHX_ a,b,c,d,e)
 #ifdef PERL_MAD
 #define newMYSUB(a,b,c,d,e)	Perl_newMYSUB(aTHX_ a,b,c,d,e)
 #else
