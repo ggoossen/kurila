@@ -2683,10 +2683,7 @@ Perl_sighandler(int sig)
     if (!cv || !CvROOT(cv)) {
         if (ckWARN(WARN_SIGNAL))
             Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "SIG%s handler \"%s\" not defined.\n",
-                PL_sig_name[sig], (gv ? GvENAME(gv)
-                                : ((cv && CvGV(cv))
-                                   ? GvENAME(CvGV(cv))
-                                   : "__ANON__")));
+                PL_sig_name[sig], loc_desc(SvLOCATION(gv)));
         goto cleanup;
     }
 

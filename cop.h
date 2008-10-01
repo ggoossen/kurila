@@ -223,7 +223,7 @@ struct block_sub {
  * decremented by LEAVESUB, the other by LEAVE. */
 
 #define PUSHSUB_BASE(cx)						\
-	ENTRY_PROBE(GvENAME(CvGV(cv)),		       			\
+	ENTRY_PROBE(NULL,		       			\
 		CopFILE((COP*)CvSTART(cv)),				\
 		CopLINE((COP*)CvSTART(cv)));				\
 									\
@@ -260,7 +260,7 @@ struct block_sub {
 
 #define POPSUB(cx,sv)							\
     STMT_START {							\
-	RETURN_PROBE(GvENAME(CvGV((CV*)cx->blk_sub.cv)),		\
+	RETURN_PROBE(NULL,		\
 		CopFILE((COP*)CvSTART((CV*)cx->blk_sub.cv)),		\
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\

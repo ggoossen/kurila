@@ -19,7 +19,6 @@ typedef U16 cv_flags_t;
 	OP *	xcv_root;							\
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
-    GV *	xcv_gv;								\
     AV *	xcv_padlist;							\
     CV *	xcv_outside;							\
     U32		xcv_outside_seq; /* the COP sequence (at the point of our	\
@@ -60,7 +59,6 @@ Null CV pointer.
 #define CvROOT(sv)	((XPVCV*)SvANY(sv))->xcv_root_u.xcv_root
 #define CvXSUB(sv)	((XPVCV*)SvANY(sv))->xcv_root_u.xcv_xsub
 #define CvXSUBANY(sv)	((XPVCV*)SvANY(sv))->xcv_start_u.xcv_xsubany
-#define CvGV(sv)	((XPVCV*)SvANY(sv))->xcv_gv
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define CvDEPTH(sv) (*({const CV *_cv = (CV *)sv; \
 			  assert(SvTYPE(_cv) == SVt_PVCV);	 \

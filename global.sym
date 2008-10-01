@@ -298,6 +298,8 @@ Perl_newRANGE
 Perl_newSLICEOP
 Perl_newSTATEOP
 Perl_newSUB
+Perl_process_special_block
+Perl_newNAMEDSUB
 Perl_newXS_flags
 Perl_newXS
 Perl_newAV

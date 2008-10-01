@@ -532,6 +532,8 @@
 #define newSLICEOP		Perl_newSLICEOP
 #define newSTATEOP		Perl_newSTATEOP
 #define newSUB			Perl_newSUB
+#define process_special_block	Perl_process_special_block
+#define newNAMEDSUB		Perl_newNAMEDSUB
 #define newXS_flags		Perl_newXS_flags
 #define newXS			Perl_newXS
 #define newAVREF		Perl_newAVREF
@@ -1169,7 +1171,6 @@
 #define too_few_arguments	S_too_few_arguments
 #define too_many_arguments	S_too_many_arguments
 #define ref_array_or_hash	S_ref_array_or_hash
-#define process_special_blocks	S_process_special_blocks
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
@@ -2721,7 +2722,9 @@
 #define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
 #define newSLICEOP(a,b,c)	Perl_newSLICEOP(aTHX_ a,b,c)
 #define newSTATEOP(a,b,c,d)	Perl_newSTATEOP(aTHX_ a,b,c,d)
-#define newSUB(a,b,c,d)		Perl_newSUB(aTHX_ a,b,c,d)
+#define newSUB(a,b,c)		Perl_newSUB(aTHX_ a,b,c)
+#define process_special_block(a,b)	Perl_process_special_block(aTHX_ a,b)
+#define newNAMEDSUB(a,b,c,d)	Perl_newNAMEDSUB(aTHX_ a,b,c,d)
 #define newXS_flags(a,b,c,d,e)	Perl_newXS_flags(aTHX_ a,b,c,d,e)
 #define newXS(a,b,c)		Perl_newXS(aTHX_ a,b,c)
 #define newAVREF(a,b)		Perl_newAVREF(aTHX_ a,b)
@@ -3350,7 +3353,6 @@
 #define too_few_arguments(a,b)	S_too_few_arguments(aTHX_ a,b)
 #define too_many_arguments(a,b)	S_too_many_arguments(aTHX_ a,b)
 #define ref_array_or_hash(a)	S_ref_array_or_hash(aTHX_ a)
-#define process_special_blocks(a,b,c)	S_process_special_blocks(aTHX_ a,b,c)
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)

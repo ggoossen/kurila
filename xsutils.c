@@ -250,8 +250,6 @@ usage:
 	const HV *stash = NULL;
 	switch (SvTYPE(sv)) {
 	case SVt_PVCV:
-	    if (CvGV(sv) && isGV(CvGV(sv)) && GvSTASH(CvGV(sv)))
-		stash = GvSTASH(CvGV(sv));
 	    break;
 	case SVt_PVGV:
 	    if (GvGP(sv) && GvESTASH((GV*)sv))

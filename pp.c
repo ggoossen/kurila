@@ -629,15 +629,7 @@ PP(pp_undef)
 	hv_undef((HV*)sv);
 	break;
     case SVt_PVCV:
-	if (cv_const_sv((CV*)sv) && ckWARN(WARN_MISC))
-	    Perl_warner(aTHX_ packWARN(WARN_MISC), "Constant subroutine %s undefined",
-		 CvANON((CV*)sv) ? "(anonymous)" : GvENAME(CvGV((CV*)sv)));
-	{
-	    /* let user-undef'd sub keep its identity */
-	    GV* const gv = CvGV((CV*)sv);
-	    cv_undef((CV*)sv);
-	    CvGV((CV*)sv) = gv;
-	}
+	cv_undef((CV*)sv);
 	break;
     case SVt_PVGV:
 	if (SvFAKE(sv))

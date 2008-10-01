@@ -1953,7 +1953,13 @@ PERL_CALLCONV OP*	Perl_newSTATEOP(pTHX_ I32 flags, char* label, OP* o, SV* locat
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV CV*	Perl_newSUB(pTHX_ I32 floor, OP* o, OP* proto, OP* block);
+PERL_CALLCONV CV*	Perl_newSUB(pTHX_ I32 floor, OP* proto, OP* block);
+PERL_CALLCONV void	Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCK	\
+	assert(cv)
+
+PERL_CALLCONV CV*	Perl_newNAMEDSUB(pTHX_ I32 floor, OP* o, OP* proto, OP* block);
 PERL_CALLCONV CV *	Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr, const char *const filename, const char *const proto, U32 flags)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
@@ -4397,13 +4403,6 @@ STATIC OP*	S_too_many_arguments(pTHX_ OP *o, const char* name)
 	assert(o); assert(name)
 
 STATIC OP*	S_ref_array_or_hash(pTHX_ OP* cond);
-STATIC void	S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv, CV *const cv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCKS	\
-	assert(fullname); assert(gv); assert(cv)
-
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 PERL_CALLCONV void*	Perl_Slab_Alloc(pTHX_ size_t sz)
