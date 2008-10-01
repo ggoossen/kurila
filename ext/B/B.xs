@@ -927,10 +927,6 @@ U32
 CvCONST(cv)
 	B::CV	cv
 
-B::GV
-CvGV(cv)
-	B::CV	cv
-
 long
 CvDEPTH(cv)
 	B::CV	cv
