@@ -4429,6 +4429,8 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 
     cv = newSUB(floor, proto, block);
 
+    SVcpREPLACE(SvLOCATION(cv), o->op_location);
+
     /* If the subroutine has no body, no attributes, and no builtin attributes
        then it's just a sub declaration, and we may be able to get away with
        storing with a placeholder scalar in the symbol table, rather than a
@@ -4470,6 +4472,8 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 	SvREFCNT_dec(GvCV(gv));
     }
     GvCV(gv) = SvREFCNT_inc(cv);
+
+    av_store(SvLOCATION((SV*)cv), 3, SvREFCNT_inc(cSVOPo->op_sv));
 
     GvCVGEN(gv) = 0;
     mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar { (shift)+1 } */
