@@ -1410,13 +1410,13 @@ S_cv_dump(pTHX_ const CV *cv, const char *title)
 		  (CvANON(cv) ? "ANON"
 		   : (cv == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(cv) ? "UNIQUE"
-		   : CvGV(cv) ? GvNAME(CvGV(cv)) : "UNDEFINED"),
+		   : "SUB"),
 		  PTR2UV(outside),
 		  (!outside ? "null"
 		   : CvANON(outside) ? "ANON"
 		   : (outside == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(outside) ? "UNIQUE"
-		   : CvGV(outside) ? GvNAME(CvGV(outside)) : "UNDEFINED"));
+		   : "UNDEFINED"));
 
     PerlIO_printf(Perl_debug_log,
 		    "    PADLIST = 0x%"UVxf"\n", PTR2UV(padlist));
@@ -1480,7 +1480,6 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
     CvCLONED_on(cv);
 
-    CvGV(cv)		= CvGV(proto);
     OP_REFCNT_LOCK;
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;

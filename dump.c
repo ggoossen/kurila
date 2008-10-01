@@ -478,7 +478,7 @@ Perl_sv_peek(pTHX_ SV *sv)
     }
     type = SvTYPE(sv);
     if (type == SVt_PVCV) {
-	Perl_sv_catpvf(aTHX_ t, "CV(%s)", CvGV(sv) ? GvNAME(CvGV(sv)) : "");
+	Perl_sv_catpvf(aTHX_ t, "CV()");
 	goto finish;
     } else if (type < SVt_LAST) {
 	sv_catpv(t, svshorttypenames[type]);
@@ -1773,7 +1773,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 				 (IV)CvXSUBANY(sv).any_i32);
 	    }
 	}
- 	do_gvgv_dump(level, file, "  GVGV::GV", CvGV(sv));
 	Perl_dump_indent(aTHX_ level, file, "  DEPTH = %"IVdf"\n", (IV)CvDEPTH(sv));
 	Perl_dump_indent(aTHX_ level, file, "  FLAGS = 0x%"UVxf"\n", (UV)CvFLAGS(sv));
 	Perl_dump_indent(aTHX_ level, file, "  OUTSIDE_SEQ = %"UVuf"\n", (UV)CvOUTSIDE_SEQ(sv));
@@ -1789,7 +1788,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 			 : CvANON(outside) ? "ANON"
 			 : (outside == PL_main_cv) ? "MAIN"
 			 : CvUNIQUE(outside) ? "UNIQUE"
-			 : CvGV(outside) ? GvNAME(CvGV(outside)) : "UNDEFINED"));
+			 : "UNDEFINED"));
 	}
 	if (nest < maxnest && (CvCLONE(sv) || CvCLONED(sv)))
 	    do_sv_dump(level+1, file, (SV*)CvOUTSIDE(sv), nest+1, maxnest, dumpops, pvlim);
@@ -2348,10 +2347,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	sv_catpv(t, " HV=\"");
 	break;
     case SVt_PVCV:
-	if (CvGV(sv))
-	    Perl_sv_catpvf(aTHX_ t, " CV=\"(%s)\"", GvNAME(CvGV(sv)));
-	else
-	    sv_catpv(t, " CV=\"()\"");
+	sv_catpv(t, " CV=\"()\"");
 	goto finish;
     case SVt_PVGV:
 	sv_catpv(t, " GV=\"");

@@ -4781,8 +4781,17 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		s = PL_bufptr;
-		goto really_sub;
+		char* name = PL_bufptr;
+
+		s = skipspace(s);
+		if (*s != '{') {
+		    yyerror("Illegal declaration of special block");
+		}
+
+		pl_yylval.i_tkval.ival = tmp;
+
+		PL_expect = XBLOCK;
+		TOKEN(SPECIALBLOCK);
 	    }
 	    goto just_a_word;
 

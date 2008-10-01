@@ -542,7 +542,9 @@ Ap	|void	|newPROG	|NN OP* o
 Apa	|OP*	|newRANGE	|I32 flags|NN OP* left|NN OP* right
 Apa	|OP*	|newSLICEOP	|I32 flags|NULLOK OP* subscript|NULLOK OP* listop
 Apa	|OP*	|newSTATEOP	|I32 flags|NULLOK char* label|NULLOK OP* o|NULLOK SV* location
-Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* o|NULLOK OP* proto|NULLOK OP* block
+Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* proto|NULLOK OP* block
+Ap	|void	|process_special_block	|const I32 key|NN CV *const cv
+Ap	|CV*	|newNAMEDSUB		|I32 floor|NULLOK OP* o|NULLOK OP* proto|NULLOK OP* block
 ApM	|CV *	|newXS_flags	|NULLOK const char *name|NN XSUBADDR_t subaddr\
 				|NN const char *const filename \
 				|NULLOK const char *const proto|U32 flags
@@ -1190,8 +1192,6 @@ sR	|OP*	|no_fh_allowed|NN OP *o
 sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
 s	|OP*	|ref_array_or_hash|NULLOK OP* cond
-s	|void	|process_special_blocks	|NN const char *const fullname\
-					|NN GV *const gv|NN CV *const cv
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 Apa	|void*	|Slab_Alloc	|size_t sz

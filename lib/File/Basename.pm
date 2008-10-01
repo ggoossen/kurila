@@ -364,11 +364,12 @@ call only.
 
 =cut
 
+my (@Ignore_Case, @Types);
 
 BEGIN {
-
-my @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc);
-my @Types = @(< @Ignore_Case, < qw(Unix));
+    @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc);
+    @Types = @(< @Ignore_Case, < qw(Unix));
+}
 
 sub fileparse_set_fstype {
     my $old = $Fileparse_fstype;
@@ -386,8 +387,6 @@ sub fileparse_set_fstype {
     }
 
     return $old;
-}
-
 }
 
 

@@ -82,6 +82,7 @@
 %token <i_tkval> ANONARY ANONARYL ANONHSH ANONSCALAR ANONSCALARL
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
+%token <i_tkval> SPECIALBLOCK
 
 %type <ionlyval> prog progstart remember mremember
 %type <ionlyval>  startsub startanonsub
@@ -478,23 +479,27 @@ mysubrout:	MYSUB startsub subname proto subbody
 subrout	:	SUB startsub subname proto subbody
 			{
 #ifdef MAD
-			  {
-			      OP* o = newSVOP(OP_ANONCODE, 0,
-                                  (SV*)newSUB($2, $3, $4, $5), LOCATION($1));
-			      $$ = newOP(OP_NULL,0, LOCATION($1));
-			      op_getmad(o,$$,'&');
-			      op_getmad($3,$$,'n');
-			      op_getmad($4,$$,'s');
-			      TOKEN_GETMAD($1,$$,'d');
-                              APPEND_MADPROPS_PV("sub", $$, '<');
-			      $5->op_madprop = 0;
-			    }
+                            OP* o = newSVOP(OP_ANONCODE, 0,
+                                (SV*)newNAMEDSUB($2, $3, $4, $5), LOCATION($1));
+                            $$ = newOP(OP_NULL,0, LOCATION($1));
+                            op_getmad(o,$$,'&');
+                            op_getmad($3,$$,'n');
+                            op_getmad($4,$$,'s');
+                            TOKEN_GETMAD($1,$$,'d');
+                            APPEND_MADPROPS_PV("sub", $$, '<');
+                            $5->op_madprop = 0;
 #else
-			  CV* new = newSUB($2, $3, $4, $5);
-                          SvREFCNT_dec(new);
-			  $$ = (OP*)NULL;
+                            CV* new = newNAMEDSUB($2, $3, $4, $5);
+                            SvREFCNT_dec(new);
+                            $$ = (OP*)NULL;
 #endif
 			}
+        |       SPECIALBLOCK startsub subbody
+                        {
+                            CV* new = newSUB($2, NULL, $3);
+                            process_special_block(IVAL($1), new);
+                            $$ = (OP*)NULL;
+                        }
 	;
 
 startsub:	/* NULL */	/* start a regular subroutine scope */

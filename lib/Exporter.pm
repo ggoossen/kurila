@@ -13,16 +13,13 @@ our (%Cache);
 #$Carp::Internal{Exporter} = 1;
 
 sub as_heavy {
-  require Exporter::Heavy;
-  # Unfortunately, this does not work if the caller is aliased as *name = \&foo
-  # Thus the need to create a lot of identical subroutines
-  my $c = @(caller(1))[3];
-  $c =~ s/.*:://;
-  \&{*{Symbol::fetch_glob("Exporter::Heavy::heavy_$c")}};
+    my $name = shift;
+    require Exporter::Heavy;
+    \&{*{Symbol::fetch_glob("Exporter::Heavy::heavy_$name")}};
 }
 
 sub export {
-  goto &{as_heavy()};
+  goto &{as_heavy("export")};
 }
 
 sub import {
@@ -75,19 +72,19 @@ sub export_fail {
 # Otherwise we could have aliased them to export().
 
 sub export_to_level {
-  goto &{as_heavy()};
+  goto &{as_heavy("export_to_level")};
 }
 
 sub export_tags {
-  goto &{as_heavy()};
+  goto &{as_heavy("export_tags")};
 }
 
 sub export_ok_tags {
-  goto &{as_heavy()};
+  goto &{as_heavy("export_ok_tags")};
 }
 
 sub require_version {
-  goto &{as_heavy()};
+  goto &{as_heavy("require_version")};
 }
 
 1;

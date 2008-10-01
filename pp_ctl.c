@@ -939,18 +939,18 @@ PP(pp_caller)
     if (!MAXARG)
 	RETURN;
     if (CxTYPE(cx) == CXt_SUB) {
-	GV * const cvgv = CvGV(ccstack[cxix].blk_sub.cv);
-	/* So is ccstack[dbcxix]. */
-	if (isGV(cvgv)) {
-	    SV * const sv = newSV(0);
-	    gv_efullname3(sv, cvgv, NULL);
-	    mPUSHs(sv);
-	    PUSHs(boolSV(CxHASARGS(cx)));
-	}
-	else {
+/* 	GV * const cvgv = CvGV(ccstack[cxix].blk_sub.cv); */
+/* 	/\* So is ccstack[dbcxix]. *\/ */
+/* 	if (isGV(cvgv)) { */
+/* 	    SV * const sv = newSV(0); */
+/* 	    gv_efullname3(sv, cvgv, NULL); */
+/* 	    mPUSHs(sv); */
+/* 	    PUSHs(boolSV(CxHASARGS(cx))); */
+/* 	} */
+/* 	else { */
 	    PUSHs(newSVpvs_flags("(unknown)", SVs_TEMP));
 	    PUSHs(boolSV(CxHASARGS(cx)));
-	}
+/* 	} */
     }
     else {
 	PUSHs(newSVpvs_flags("(eval)", SVs_TEMP));
@@ -1625,16 +1625,6 @@ PP(pp_goto)
 
 	retry:
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
-		const GV * const gv = CvGV(cv);
-		if (gv) {
-		    SV *tmpstr;
-		    /* autoloaded stub? */
-		    if (cv != GvCV(gv) && (cv = GvCV(gv)))
-			goto retry;
-		    tmpstr = sv_newmortal();
-		    gv_efullname3(tmpstr, gv, NULL);
-		    DIE(aTHX_ "Goto undefined subroutine &%"SVf"", SVfARG(tmpstr));
-		}
 		DIE(aTHX_ "Goto undefined subroutine");
 	    }
 

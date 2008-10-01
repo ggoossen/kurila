@@ -3095,14 +3095,15 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     }
 
     /* Fake up the BEGIN {}, which does its thing immediately. */
-    newSUB(floor,
-	newSVOP(OP_CONST, 0, newSVpvs_share("BEGIN"), idop->op_location),
+    CV* cv = newSUB(floor,
 	NULL,
 	append_elem(OP_LINESEQ,
 	    append_elem(OP_LINESEQ,
 		newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
 		newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
 	    newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
+
+    process_special_block(KEY_BEGIN, cv);
 
     /* The "did you use incorrect case?" warning used to be here.
      * The problem is that on case-insensitive filesystems one
@@ -4211,7 +4212,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 	LEAVE;
     }
     SvPOK_off((SV*)cv);		/* forget prototype */
-    CvGV(cv) = NULL;
 
     pad_undef(cv);
 
@@ -4421,11 +4421,73 @@ Perl_newMYSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 }
 
 CV *
-Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
+Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 {
     dVAR;
-    const char *aname;
     GV *gv;
+    register CV *cv = NULL;
+
+    cv = newSUB(floor, proto, block);
+
+    /* If the subroutine has no body, no attributes, and no builtin attributes
+       then it's just a sub declaration, and we may be able to get away with
+       storing with a placeholder scalar in the symbol table, rather than a
+       full GV and CV.  If anything is present then it will take a full CV to
+       store it.  */
+    const I32 gv_fetch_flags =  GV_ADDMULTI ;
+    const char * const name = SvPV_nolen_const(cSVOPo->op_sv);
+
+    gv = gv_fetchsv(cSVOPo->op_sv, gv_fetch_flags, SVt_PVCV);
+
+    if (!PL_madskills) {
+	if (o)
+	    SAVEFREEOP(o);
+    }
+
+    if (SvTYPE(gv) != SVt_PVGV) {	/* Maybe prototype now, and had at
+					   maximum a prototype before. */
+	if (SvTYPE(gv) > SVt_NULL) {
+	    if (!SvPOK((SV*)gv) && !(SvIOK((SV*)gv) && SvIVX((SV*)gv) == -1)
+		&& ckWARN_d(WARN_PROTOTYPE))
+	    {
+		Perl_warner(aTHX_ packWARN(WARN_PROTOTYPE), "Runaway prototype");
+	    }
+	}
+
+	SVcpNULL(PL_compcv);
+	cv = NULL;
+	return NULL;
+    }
+
+    if (GvCV(gv)) {				/* must reuse cv if autoloaded */
+	CV* existing_cv = GvCV(gv);
+	/* transfer PL_compcv to cv */
+	cv_undef(existing_cv);
+	CvFLAGS(existing_cv) = CvFLAGS(PL_compcv);
+	CVcpREPLACE(CvOUTSIDE(existing_cv), CvOUTSIDE(PL_compcv));
+	CvOUTSIDE_SEQ(existing_cv) = CvOUTSIDE_SEQ(PL_compcv);
+	CvOUTSIDE(PL_compcv) = 0;
+	CvPADLIST(existing_cv) = CvPADLIST(PL_compcv);
+	CvPADLIST(PL_compcv) = 0;
+	/* ... before we throw it away */
+	CVcpREPLACE(PL_compcv, existing_cv);
+	if (PERLDB_INTER)/* Advice debugger on the new sub. */
+	  ++PL_sub_generation;
+    }
+    else {
+	GvCV(gv) = SvREFCNT_inc(cv);
+    }
+
+    GvCVGEN(gv) = 0;
+    mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar { (shift)+1 } */
+
+    return cv;
+}
+
+CV *
+Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
+{
+    dVAR;
     const char *ps;
     STRLEN ps_len;
     register CV *cv = NULL;
@@ -4439,7 +4501,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 	= (block || (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
 	   || PL_madskills)
 	? GV_ADDMULTI : GV_ADDMULTI | GV_NOINIT;
-    const char * const name = o ? SvPV_nolen_const(cSVOPo->op_sv) : NULL;
 
     if (proto) {
 	assert(proto->op_type == OP_CONST);
@@ -4448,55 +4509,12 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     else
 	ps = NULL;
 
-    if (!name && PERLDB_NAMEANON) {
-	SV * const sv = sv_newmortal();
-	Perl_sv_setpvf(aTHX_ sv, "%s[%s:%"IVdf"]",
-		       PL_curstash ? "__ANON__" : "__ANON__::__ANON__",
-		       "myfilename", (IV)33);
-	aname = SvPVX_const(sv);
-    }
-    else
-	aname = NULL;
-
-    gv = name ? gv_fetchsv(cSVOPo->op_sv, gv_fetch_flags, SVt_PVCV)
-	: gv_fetchpv(aname ? aname
-		     : (PL_curstash ? "__ANON__" : "__ANON__::__ANON__"),
-		     gv_fetch_flags, SVt_PVCV);
-
     if (!PL_madskills) {
-	if (o)
-	    SAVEFREEOP(o);
 	if (proto)
 	    SAVEFREEOP(proto);
     }
 
-    if (SvTYPE(gv) != SVt_PVGV) {	/* Maybe prototype now, and had at
-					   maximum a prototype before. */
-	if (SvTYPE(gv) > SVt_NULL) {
-	    if (!SvPOK((SV*)gv) && !(SvIOK((SV*)gv) && SvIVX((SV*)gv) == -1)
-		&& ckWARN_d(WARN_PROTOTYPE))
-	    {
-		Perl_warner(aTHX_ packWARN(WARN_PROTOTYPE), "Runaway prototype");
-	    }
-	    cv_ckproto_len((CV*)gv, NULL, ps, ps_len);
-	}
-	if (ps)
-	    sv_setpvn((SV*)gv, ps, ps_len);
-	else
-	    sv_setiv((SV*)gv, -1);
-
-	SVcpNULL(PL_compcv);
-	cv = NULL;
-	goto done;
-    }
-
-    cv = (!name || GvCVGEN(gv)) ? NULL : GvCV(gv);
-
-#ifdef GV_UNIQUE_CHECK
-    if (cv && GvUNIQUE(gv) && SvREADONLY(cv)) {
-        Perl_croak(aTHX_ "Can't define subroutine %s (GV is unique)", name);
-    }
-#endif
+    cv = NULL;
 
     if (!block || !ps || *ps
 	|| (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
@@ -4508,118 +4526,16 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     else
 	const_sv = op_const_sv(block, NULL);
 
-    if (cv) {
-        const bool exists = CvROOT(cv) || CvXSUB(cv);
-
-#ifdef GV_UNIQUE_CHECK
-        if (exists && GvUNIQUE(gv)) {
-            Perl_croak(aTHX_ "Can't redefine unique subroutine %s", name);
-        }
-#endif
-
-        /* if the subroutine doesn't exist and wasn't pre-declared
-         * with a prototype, assume it will be AUTOLOADed,
-         * skipping the prototype check
-         */
-        if (exists || SvPOK(cv))
-	    cv_ckproto_len(cv, gv, ps, ps_len);
-	/* already defined (or promised)? */
-	if (exists || GvASSUMECV(gv)) {
-	    if ((!block
-#ifdef PERL_MAD
-		 || block->op_type == OP_NULL
-#endif
-		 )) {
-		if (CvFLAGS(PL_compcv)) {
-		    /* might have had built-in attrs applied */
-		    CvFLAGS(cv) |= (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS);
-		}
-		/* just a "sub foo;" when &foo is already defined */
-		SAVEFREESV(PL_compcv);
-		PL_compcv = NULL;
-		goto done;
-	    }
-	    if (block
-#ifdef PERL_MAD
-		&& block->op_type != OP_NULL
-#endif
-		) {
-		if (ckWARN(WARN_REDEFINE)
-		    || (CvCONST(cv)
-			&& (!const_sv || sv_cmp(cv_const_sv(cv), const_sv))))
-		{
-		    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
-			CvCONST(cv) ? "Constant subroutine %s redefined"
-				    : "Subroutine %s redefined", name);
-		}
-		cv = NULL;
-	    }
-	}
-    }
     if (const_sv) {
 	SvREFCNT_inc_simple_void_NN(const_sv);
-	if (cv) {
-	    assert(!CvROOT(cv) && !CvCONST(cv));
-	    sv_setpvn((SV*)cv, "", 0);  /* prototype is "" */
-	    CvXSUBANY(cv).any_ptr = const_sv;
-	    CvXSUB(cv) = const_sv_xsub;
-	    CvCONST_on(cv);
-	    CvISXSUB_on(cv);
-	}
-	else {
-	    GvCV(gv) = NULL;
-	    cv = newCONSTSUB(name, const_sv);
-	}
-        mro_method_changed_in( /* sub Foo::Bar () { 123 } */
-            (CvGV(cv) && GvSTASH(CvGV(cv)))
-                ? GvSTASH(CvGV(cv))
-	        : PL_curstash
-        );
+	cv = newCONSTSUB(NULL, const_sv);
 	if (PL_madskills)
 	    goto install_block;
 	op_free(block);
 	goto done;
     }
-    if (cv) {				/* must reuse cv if autoloaded */
-	if (
-#ifdef PERL_MAD
-	    (
-#endif
-	     !block
-#ifdef PERL_MAD
-	     || block->op_type == OP_NULL) && !PL_madskills
-#endif
-	     ) {
-	    /* got here with just attrs -- work done, so bug out */
-	    goto done;
-	}
-	/* transfer PL_compcv to cv */
-	cv_undef(cv);
-	CvFLAGS(cv) = CvFLAGS(PL_compcv);
-	CVcpREPLACE(CvOUTSIDE(cv), CvOUTSIDE(PL_compcv));
-	CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(PL_compcv);
-	CvOUTSIDE(PL_compcv) = 0;
-	CvPADLIST(cv) = CvPADLIST(PL_compcv);
-	CvPADLIST(PL_compcv) = 0;
-	/* ... before we throw it away */
-	CVcpREPLACE(PL_compcv, cv);
-	if (PERLDB_INTER)/* Advice debugger on the new sub. */
-	  ++PL_sub_generation;
-    }
-    else {
-	cv = PL_compcv;
-	if (name) {
-	    CVcpREPLACE(GvCV(gv), cv);
-	    if (PL_madskills) {
-		if (strEQ(name, "import")) {
-		    Perl_warner(aTHX_ packWARN(WARN_VOID), "%lx\n", (long)cv);
-		}
-	    }
-	    GvCVGEN(gv) = 0;
-            mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar { (shift)+1 } */
-	}
-    }
-    CvGV(cv) = gv;
+
+    cv = PL_compcv;
     SVcpSTEAL(SvLOCATION(cv), newSVsv(PL_curcop->op_location));
 
     if (ps)
@@ -4628,21 +4544,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     if (PL_parser && PL_parser->error_count) {
 	op_free(block);
 	block = NULL;
-	if (name) {
-	    const char *s = strrchr(name, ':');
-	    s = s ? s+1 : name;
-	    if (strEQ(s, "BEGIN")) {
-		const char not_safe[] =
-		    "BEGIN not safe after errors--compilation aborted";
-		if (PL_in_eval & EVAL_KEEPERR)
-		    Perl_croak(aTHX_ not_safe);
-		else {
-		    /* force display of errors found but not reported */
-		    sv_catpv(ERRSV, not_safe);
-		    Perl_croak(aTHX_ "%"SVf, SVfARG(ERRSV));
-		}
-	    }
-	}
     }
  install_block:
     if (!block)
@@ -4677,37 +4578,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 	    CvCONST_on(cv);
     }
 
-    if (name || aname) {
-	if (PERLDB_SUBLINE && PL_curstash != PL_debstash) {
-	    SV * const sv = newSV(0);
-	    SV * const tmpstr = sv_newmortal();
-	    GV * const db_postponed = gv_fetchpvs("DB::postponed",
-						  GV_ADDMULTI, SVt_PVHV);
-	    HV *hv;
-
-	    Perl_sv_setpvf(aTHX_ sv, "%s:%ld-%ld",
-		"myfilename",
-		(long)PL_subline, (long)333);
-	    gv_efullname3(tmpstr, gv, NULL);
-	    (void)hv_store(GvHV(PL_DBsub), SvPVX_const(tmpstr),
-		    SvCUR(tmpstr), sv, 0);
-	    hv = GvHVn(db_postponed);
-	    if (HvFILL(hv) > 0 && hv_exists(hv, SvPVX_const(tmpstr), SvCUR(tmpstr))) {
-		CV * const pcv = GvCV(db_postponed);
-		if (pcv) {
-		    dSP;
-		    PUSHMARK(SP);
-		    XPUSHs(tmpstr);
-		    PUTBACK;
-		    call_sv((SV*)pcv, G_DISCARD);
-		}
-	    }
-	}
-
-	if (name && ! (PL_parser && PL_parser->error_count))
-	    process_special_blocks(name, gv, cv);
-    }
-
   done:
     if (PL_parser)
 	PL_parser->copline = NOLINE;
@@ -4716,67 +4586,46 @@ Perl_newSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     return cv;
 }
 
-STATIC void
-S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv,
-			 CV *const cv)
+void
+Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 {
-    const char *const colon = strrchr(fullname,':');
-    const char *const name = colon ? colon + 1 : fullname;
+    PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCK;
 
-    PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCKS;
+    switch(key) {
+    case KEY_BEGIN:
+    {
+	const I32 oldscope = PL_scopestack_ix;
+	ENTER;
 
-    if (*name == 'B') {
-	if (strEQ(name, "BEGIN")) {
-	    const I32 oldscope = PL_scopestack_ix;
-	    ENTER;
+	Perl_av_create_and_push(aTHX_ &PL_beginav, (SV*)cv);
+	call_list(oldscope, PL_beginav);
 
-	    DEBUG_x( dump_sub(gv) );
-	    Perl_av_create_and_push(aTHX_ &PL_beginav, (SV*)cv);
-	    GvCV(gv) = 0;		/* cv has been hijacked */
-	    call_list(oldscope, PL_beginav);
-
-	    PL_curcop = &PL_compiling;
-	    CopHINTS_set(&PL_compiling, PL_hints);
-	    LEAVE;
-	}
-	else
-	    return;
-    } else {
-	if (*name == 'E') {
-	    if strEQ(name, "END") {
-		DEBUG_x( dump_sub(gv) );
-		Perl_av_create_and_unshift_one(aTHX_ &PL_endav, (SV*)cv);
-	    } else
-		return;
-	} else if (*name == 'U') {
-	    if (strEQ(name, "UNITCHECK")) {
-		/* It's never too late to run a unitcheck block */
-		Perl_av_create_and_unshift_one(aTHX_ &PL_unitcheckav, (SV*)cv);
-	    }
-	    else
-		return;
-	} else if (*name == 'C') {
-	    if (strEQ(name, "CHECK")) {
-		if (PL_main_start && ckWARN(WARN_VOID))
-		    Perl_warner(aTHX_ packWARN(WARN_VOID),
-				"Too late to run CHECK block");
-		Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, (SV*)cv);
-	    }
-	    else
-		return;
-	} else if (*name == 'I') {
-	    if (strEQ(name, "INIT")) {
-		if (PL_main_start && ckWARN(WARN_VOID))
-		    Perl_warner(aTHX_ packWARN(WARN_VOID),
-				"Too late to run INIT block");
-		Perl_av_create_and_push(aTHX_ &PL_initav, (SV*)cv);
-	    }
-	    else
-		return;
-	} else
-	    return;
-	DEBUG_x( dump_sub(gv) );
-	GvCV(gv) = 0;		/* cv has been hijacked */
+	PL_curcop = &PL_compiling;
+	CopHINTS_set(&PL_compiling, PL_hints);
+	LEAVE;
+        break;
+    }
+    case KEY_END:
+	Perl_av_create_and_unshift_one(aTHX_ &PL_endav, (SV*)cv);
+	break;
+    case KEY_UNITCHECK:
+	/* It's never too late to run a unitcheck block */
+	Perl_av_create_and_unshift_one(aTHX_ &PL_unitcheckav, (SV*)cv);
+	break;
+    case KEY_CHECK:
+	if (PL_main_start && ckWARN(WARN_VOID))
+	    Perl_warner(aTHX_ packWARN(WARN_VOID),
+		"Too late to run CHECK block");
+	Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, (SV*)cv);
+	break;
+    case KEY_INIT:
+	if (PL_main_start && ckWARN(WARN_VOID))
+	    Perl_warner(aTHX_ packWARN(WARN_VOID),
+		"Too late to run INIT block");
+	Perl_av_create_and_push(aTHX_ &PL_initav, (SV*)cv);
+	break;
+    default:
+	Perl_croak(aTHX_ "end");
     }
 }
 
@@ -4905,19 +4754,10 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 	    /* already defined (or promised) */
 	    /* XXX It's possible for this HvNAME_get to return null, and get passed into strEQ */
 	    if (ckWARN(WARN_REDEFINE)) {
-		GV * const gvcv = CvGV(cv);
-		if (gvcv) {
-		    HV * const stash = GvSTASH(gvcv);
-		    if (stash) {
-			const char *redefined_name = HvNAME_get(stash);
-			if ( strEQ(redefined_name,"autouse") ) {
-			    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
-					CvCONST(cv) ? "Constant subroutine %s redefined"
-						    : "Subroutine %s redefined"
-					,name);
-			}
-		    }
-		}
+		Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
+		    CvCONST(cv) ? "Constant subroutine %s redefined"
+		    : "Subroutine %s redefined"
+		    ,name);
 	    }
 	    SvREFCNT_dec(cv);
 	    cv = NULL;
@@ -4934,13 +4774,10 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
             mro_method_changed_in(GvSTASH(gv)); /* newXS */
 	}
     }
-    CvGV(cv) = gv;
     CvISXSUB_on(cv);
     CvXSUB(cv) = subaddr;
 
-    if (name)
-	process_special_blocks(name, gv, cv);
-    else
+    if ( ! name)
 	CvANON_on(cv);
 
     return cv;
@@ -4963,7 +4800,7 @@ Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
     return newUNOP(OP_SREFGEN, 0,
 	newSVOP(OP_ANONCODE, 0,
-		(SV*)newSUB(floor, 0, proto, scalar(block)), block->op_location), block->op_location);
+		(SV*)newSUB(floor, proto, scalar(block)), block->op_location), block->op_location);
 }
 
 OP *
@@ -5778,6 +5615,8 @@ Perl_ck_glob(pTHX_ OP *o)
 		newSVpvs("File::GlobPP"), NULL, NULL, NULL);
 	gv = gv_fetchpvs("CORE::GLOBAL::glob", 1, SVt_PVCV);
 	glob_gv = gv_fetchpvs("File::GlobPP::glob", 0, SVt_PVCV);
+	if ( ! glob_gv )
+	    Perl_croak_at(aTHX_ o->op_location, "Failed loading File::GlobPP::glob");
 	GvCV(gv) = GvCV(glob_gv);
 	SvREFCNT_inc_void((SV*)GvCV(gv));
 	GvIMPORTED_CV_on(gv);
@@ -6612,7 +6451,6 @@ Perl_ck_subr(pTHX_ OP *o)
 	    else {
 		if (SvPOK(cv)) {
 		    STRLEN len;
-		    namegv = CvANON(cv) ? gv : CvGV(cv);
 		    proto = SvPV((SV*)cv, len);
 		    proto_end = proto + len;
 		}

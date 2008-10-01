@@ -9213,14 +9213,10 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		    CvROOT(dstr) = OpREFCNT_inc(CvROOT(dstr));
 		OP_REFCNT_UNLOCK;
 		if (CvCONST(dstr) && CvISXSUB(dstr)) {
-		    CvXSUBANY(dstr).any_ptr = GvUNIQUE(CvGV(dstr)) ?
-			SvREFCNT_inc(CvXSUBANY(dstr).any_ptr) :
-			sv_dup_inc((SV *)CvXSUBANY(dstr).any_ptr, param);
+		    CvXSUBANY(dstr).any_ptr = sv_dup_inc((SV *)CvXSUBANY(dstr).any_ptr, param);
 		}
 		/* don't dup if copying back - CvGV isn't refcounted, so the
 		 * duped GV may never be freed. A bit of a hack! DAPM */
-		CvGV(dstr)	= (param->flags & CLONEf_JOIN_IN) ?
-		    NULL : gv_dup(CvGV(dstr), param) ;
 		PAD_DUP(CvPADLIST(dstr), CvPADLIST(sstr), param);
 		CvOUTSIDE(dstr)	=
 		    cv_dup_inc(CvOUTSIDE(dstr), param);

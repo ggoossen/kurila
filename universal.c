@@ -706,16 +706,8 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     }
 
     if (CxTYPE(cx) == CXt_SUB) {
-	GV * const cvgv = CvGV(cx->blk_sub.cv);
 	/* So is ccstack[dbcxix]. */
-	if (isGV(cvgv)) {
-	    SV * const sv = newSV(0);
-	    gv_efullname3(sv, cvgv, NULL);
-	    av_push(av, sv);
-	}
-	else {
-	    av_push(av, newSVpvs("(unknown)"));
-	}
+	av_push(av, newSVpvs("(sub)"));
     }
     else {
 	av_push(av, newSVpvs("(eval)"));
