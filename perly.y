@@ -514,12 +514,9 @@ startanonsub:	/* NULL */	/* start an anonymous subroutine scope */
 	;
 
 /* Name of a subroutine - must be a bareword, could be special */
-subname	:	WORD	{ const char *const name = SvPV_nolen_const(((SVOP*)$1)->op_sv);
-			  if (strEQ(name, "BEGIN") || strEQ(name, "END")
-			      || strEQ(name, "INIT") || strEQ(name, "CHECK")
-			      || strEQ(name, "UNITCHECK"))
-			      CvSPECIAL_on(PL_compcv);
-			  $$ = $1; }
+subname	:	WORD	{
+			  $$ = $1;
+                        }
 	;
 
 /* Subroutine prototype */
@@ -550,19 +547,17 @@ package :	PACKAGE WORD ';'
 			}
 	;
 
-use	:	USE startsub
-			{ CvSPECIAL_on(PL_compcv); /* It's a BEGIN {} */ }
-		    THING WORD listexpr ';'
+use	:	USE startsub THING WORD listexpr ';'
 			{ 
 #ifdef MAD
-			  $$ = utilize(IVAL($1), $2, $4, $5, $6);
+			  $$ = utilize(IVAL($1), $2, $3, $4, $5);
 			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($7,$$,';');
+			  TOKEN_GETMAD($6,$$,';');
 			  if (PL_parser->rsfp_filters &&
 				      AvFILLp(PL_parser->rsfp_filters) >= 0)
 			      APPEND_MADPROPS_PV("sourcefilter", $$, '!');
 #else
-			  utilize(IVAL($1), $2, $4, $5, $6);
+			  utilize(IVAL($1), $2, $3, $4, $5);
 			  $$ = (OP*)NULL;
 #endif
 			}
