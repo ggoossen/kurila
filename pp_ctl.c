@@ -939,18 +939,12 @@ PP(pp_caller)
     if (!MAXARG)
 	RETURN;
     if (CxTYPE(cx) == CXt_SUB) {
-/* 	GV * const cvgv = CvGV(ccstack[cxix].blk_sub.cv); */
-/* 	/\* So is ccstack[dbcxix]. *\/ */
-/* 	if (isGV(cvgv)) { */
-/* 	    SV * const sv = newSV(0); */
-/* 	    gv_efullname3(sv, cvgv, NULL); */
-/* 	    mPUSHs(sv); */
-/* 	    PUSHs(boolSV(CxHASARGS(cx))); */
-/* 	} */
-/* 	else { */
-	    PUSHs(newSVpvs_flags("(unknown)", SVs_TEMP));
-	    PUSHs(boolSV(CxHASARGS(cx)));
-/* 	} */
+	CV* cv = cx->blk_sub.cv;
+	SV** name = NULL;
+	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
+	    name = av_fetch(SvLOCATION(cv), 3, FALSE);
+	mPUSHs( name ? newSVsv(*name) : &PL_sv_undef );
+	PUSHs(boolSV(CxHASARGS(cx)));
     }
     else {
 	PUSHs(newSVpvs_flags("(eval)", SVs_TEMP));
