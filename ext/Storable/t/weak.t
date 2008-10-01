@@ -8,7 +8,7 @@
 
 use Config;
 
-sub BEGIN {
+BEGIN {
   if (%ENV{PERL_CORE}){
     chdir('t') if -d 't';
     @INC = @('.', '../lib', '../ext/Storable/t');
@@ -16,25 +16,12 @@ sub BEGIN {
     # This lets us distribute Test::More in t/
     unshift @INC, 't';
   }
-  if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-    print "1..0 # Skip: Storable was not built\n";
-    exit 0;
-  }
-  if (%Config{extensions} !~ m/\bList\/Util\b/) {
-    print "1..0 # Skip: List::Util was not built\n";
-    exit 0;
-  }
-
-  require Scalar::Util;
-  Scalar::Util->import(qw(weaken isweak));
-  if (grep { m/weaken/ } < @Scalar::Util::EXPORT_FAIL) {
-    print("1..0 # Skip: No support for weaken in Scalar::Util\n");
-    exit 0;
-  }
 }
 
+use Scalar::Util < qw(weaken isweak);
+
 use Test::More 'no_plan';
-use Storable qw (store retrieve freeze thaw nstore nfreeze);
+use Storable < qw(store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
 use vars '$file';
 use strict;
@@ -60,18 +47,7 @@ my $w = \@($r);
 weaken $w->[0];
 ok (isweak($w->[0]), "element 0 is a weak reference");
 
-package OVERLOADED;
-
-use overload
-	'""' => sub { @_[0]->[0] };
-
 package main;
-
-$a = bless \@(77), 'OVERLOADED';
-
-my $o = \@($a, $a);
-weaken $o->[0];
-ok (isweak($o->[0]), "element 0 is a weak reference");
 
 my @tests = @(
 \@($s1,
@@ -109,21 +85,9 @@ my @tests = @(
   }
 }
 ),
-\@($o,
-sub {
-  my ($clone, $what) = < @_;
-  isa_ok($clone,'ARRAY');
-  isa_ok($clone->[0],'OVERLOADED');
-  isa_ok($clone->[1],'OVERLOADED');
-  ok(isweak $clone->[0], "Element 0 is weak");
-  ok(!isweak $clone->[1], "Element 1 isn't weak");
-  is ("$clone->[0]", 77, "Element 0 stringifies to 77");
-  is ("$clone->[1]", 77, "Element 1 stringifies to 77");
-}
-),
 );
 
-foreach (< @tests) {
+foreach (@tests) {
   my ($input, $testsub) = < @$_;
 
   tester($input, sub {return shift}, $testsub, 'nothing');

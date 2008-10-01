@@ -18,7 +18,7 @@
 
 use Config;
 
-sub BEGIN {
+BEGIN {
     if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
