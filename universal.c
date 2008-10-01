@@ -709,7 +709,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	/* So is ccstack[dbcxix]. */
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
-	if (SvLOCATION(cv))
+	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
 	    name = av_fetch(SvLOCATION(cv), 3, FALSE);
 	av_push(av, name ? newSVsv(*name) : &PL_sv_undef );
     }
