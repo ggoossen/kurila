@@ -6442,6 +6442,9 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	*gvp = NULL;
 	return NULL;
     }
+
+    SvGETMAGIC(sv);
+
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
 	*gvp = NULL;
@@ -6456,7 +6459,6 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	goto fix_gv;
 
     default:
-	SvGETMAGIC(sv);
 	if (SvROK(sv)) {
 	    sv = SvRV(sv);
 	    if (SvTYPE(sv) == SVt_PVCV) {
@@ -6469,18 +6471,8 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	    else
 		Perl_croak(aTHX_ "Not a subroutine reference");
 	}
-	else if (isGV(sv))
-	    gv = (GV*)sv;
 	else
-	    gv = gv_fetchsv(sv, lref, SVt_PVCV);
-	*gvp = gv;
-	if (!gv) {
-	    return NULL;
-	}
-	/* Some flags to gv_fetchsv mean don't really create the GV  */
-	if (SvTYPE(gv) != SVt_PVGV) {
-	    return NULL;
-	}
+	    Perl_croak(aTHX_ "Not a subroutine reference");
     fix_gv:
 	if (lref && !GvCVu(gv)) {
 	    SV* tmpsv = sv_2mortal(newSV(0));

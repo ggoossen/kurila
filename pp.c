@@ -287,6 +287,7 @@ PP(pp_prototype)
 		    str[n - 1] = '_';
 		str[n++] = '\0';
 		ret = newSVpvn_flags(str, n - 1, SVs_TEMP);
+		goto set;
 	    }
 	    else if (code)		/* Non-Overridable */
 		goto set;
@@ -294,10 +295,6 @@ PP(pp_prototype)
 	      nonesuch:
 		DIE(aTHX_ "Can't find an opnumber for \"%s\"", s+6);
 	    }
-	}
-	else {
-	    /* CORE::<op> */
-	    
 	}
     }
     cv = sv_2cv(TOPs, &gv, 0);
