@@ -156,7 +156,7 @@ close DUMMY;
   local %ENV{PERL5LIB} = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
-  local %SIG{__WARN__}=sub { push @warn,< @_; return };
+  local $^WARN_HOOK = sub { push @warn,< @_; return };
   my $ok=try {
     install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',

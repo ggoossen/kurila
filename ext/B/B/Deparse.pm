@@ -3233,7 +3233,8 @@ sub pp_entersub {
 		 defined %{Symbol::stash($self->{'curstash'})}{$kid}
 		 && !exists
 		     $self->{'subs_deparsed'}->{$self->{'curstash'}."::".$kid}
-		 && defined prototype $self->{'curstash'}."::".$kid
+		 && defined prototype(
+                     \&{*{Symbol::fetch_glob($self->{'curstash'}."::".$kid)}})
 	       );
 	if (!$declared && defined($proto)) {
 	    # Avoid "too early to check prototype" warning

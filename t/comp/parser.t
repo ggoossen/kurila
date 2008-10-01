@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 83 );
+plan( tests => 82 );
 
 eval '%@x=0;';
 like( $@->{description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
@@ -142,8 +142,6 @@ pass();
 # tests for "Bad name"
 eval q{ foo::$bar };
 like( $@->{description}, qr/Bad name after foo::/, 'Bad name after foo::' );
-eval q{ foo''bar };
-like( $@->{description}, qr/syntax error .* near "foo''/, q|Bad name after foo'| );
 
 # test for ?: context error
 eval q{($a ? $x : ($y)) = 5};
