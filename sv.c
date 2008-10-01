@@ -2629,7 +2629,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     dtype = SvTYPE(dstr);
 
     /* clear the destination sv if it will be upgraded to a hash or an array */
-    if ( (dtype == SVt_PVHV || dtype == SVt_PVAV || stype == SVt_PVAV || stype == SVt_PVHV)
+    if ( ( dtype == SVt_PVHV || dtype == SVt_PVAV  || dtype == SVt_PVCV
+	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
         && dtype != stype ) {
 	/* FIXME the assignment should be done before old values ore DESTROYed */
 	Perl_sv_clear_body(aTHX_ dstr);
@@ -2720,6 +2721,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	break;
     case SVt_PVAV:
     case SVt_PVHV:
+    case SVt_PVCV:
 	if (dtype != stype)
 	    sv_upgrade(dstr, stype);
 	break;
@@ -2800,9 +2802,15 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    SvSETMAGIC( dstr );
 	PL_delaymagic = 0;
 	
-    } else if (dtype == SVt_PVHV) {
+    }
+    else if (dtype == SVt_PVHV) {
 	hv_sethv( (HV*)dstr, (HV*)sstr);
-    } else if (sflags & SVf_ROK) {
+    }
+    else if (dtype == SVt_PVCV) {
+	CvFLAGS(dstr) = CvFLAGS(sstr);
+	SvANY(dstr) = SvANY(sstr);
+    }
+    else if (sflags & SVf_ROK) {
 	if (isGV_with_GP(dstr) && dtype == SVt_PVGV
 	    && SvTYPE(SvRV(sstr)) == SVt_PVGV) {
 	    sstr = SvRV(sstr);

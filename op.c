@@ -4459,24 +4459,17 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 	return NULL;
     }
 
-    if (GvCV(gv)) {				/* must reuse cv if autoloaded */
-	CV* existing_cv = GvCV(gv);
-	/* transfer PL_compcv to cv */
-	cv_undef(existing_cv);
-	CvFLAGS(existing_cv) = CvFLAGS(PL_compcv);
-	CVcpREPLACE(CvOUTSIDE(existing_cv), CvOUTSIDE(PL_compcv));
-	CvOUTSIDE_SEQ(existing_cv) = CvOUTSIDE_SEQ(PL_compcv);
-	CvOUTSIDE(PL_compcv) = 0;
-	CvPADLIST(existing_cv) = CvPADLIST(PL_compcv);
-	CvPADLIST(PL_compcv) = 0;
-	/* ... before we throw it away */
-	CVcpREPLACE(PL_compcv, existing_cv);
-	if (PERLDB_INTER)/* Advice debugger on the new sub. */
-	  ++PL_sub_generation;
+    if (GvCV(gv)) {
+	if (ckWARN(WARN_REDEFINE)) {
+	    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
+		CvCONST(cv)
+		? "Constant subroutine %s redefined"
+		: "Subroutine %s redefined",
+		name);
+	}
+	SvREFCNT_dec(GvCV(gv));
     }
-    else {
-	GvCV(gv) = SvREFCNT_inc(cv);
-    }
+    GvCV(gv) = SvREFCNT_inc(cv);
 
     GvCVGEN(gv) = 0;
     mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar { (shift)+1 } */
