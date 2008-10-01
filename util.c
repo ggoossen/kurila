@@ -1198,7 +1198,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 {
     dVAR;
     GV *gv;
-    CV *cv;
+    CV *cv = NULL;
     SV **const hook = warn ? &PL_warnhook : &PL_diehook;
     /* sv_2cv might call Perl_croak() or Perl_warner() */
     SV * const oldhook = *hook;
@@ -1244,7 +1244,8 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     ENTER;
     SAVESPTR(*hook);
     *hook = PERL_DIEHOOK_IGNORE;
-    cv = sv_2cv(oldhook, &gv, 0);
+    if (SvOK(oldhook))
+	cv = sv_2cv(oldhook, &gv, 0);
     LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
 	dSP;
