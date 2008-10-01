@@ -6,7 +6,7 @@
 #  in the README file that comes with the distribution.
 #
 
-sub BEGIN {
+BEGIN {
     if (%ENV{PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     }

@@ -48,9 +48,10 @@ sub import {
   # Try very hard not to use {} and hence have to  enter scope on the foreach
   # We bomb out of the loop with last as soon as heavy is set.
   if ($args or $fail) {
-    ($heavy = (m/\W/ or $args and not exists $export_cache->{$_}
-               or (nelems @$fail) and $_ eq $fail->[0])) and last
-                 foreach @_;
+      for (@_) {
+          ($heavy = (m/\W/ or $args and not exists $export_cache->{$_}
+                       or (nelems @$fail) and $_ eq $fail->[0])) and last;
+      }
   } else {
     ($heavy = m/\W/) and last
       foreach @( (< @_));

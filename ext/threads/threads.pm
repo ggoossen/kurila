@@ -116,13 +116,6 @@ sub async (&;@)
     goto &create;
 }
 
-# Thread object equality checking
-use overload (
-    '==' => \&equal,
-    '!=' => sub { ! equal(< @_) },
-    'fallback' => 1
-);
-
 1;
 
 __END__

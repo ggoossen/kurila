@@ -8,7 +8,7 @@
 
 use Config;
 
-sub BEGIN {
+BEGIN {
     if (%ENV{PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     } else {

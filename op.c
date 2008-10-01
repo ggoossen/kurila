@@ -6424,7 +6424,6 @@ Perl_ck_subr(pTHX_ OP *o)
     const char *proto = NULL;
     const char *proto_end = NULL;
     CV *cv = NULL;
-    GV *namegv = NULL;
     int optional = 0;
     I32 arg = 0;
     I32 contextclass = 0;
@@ -6477,7 +6476,7 @@ Perl_ck_subr(pTHX_ OP *o)
 	    o3 = o2;
 	if (proto) {
 	    if (proto >= proto_end)
-		return too_many_arguments(o, gv_ename(namegv));
+		return too_many_arguments(o, "subroutine");
 
 	    switch (*proto) {
 	    case ';':
@@ -6506,7 +6505,7 @@ Perl_ck_subr(pTHX_ OP *o)
 		if (o3->op_type != OP_SREFGEN && o3->op_type != OP_UNDEF)
 		    bad_type(arg,
 			arg == 1 ? "block or sub {}" : "sub {}",
-			gv_ename(namegv), o3);
+			"subroutine", o3);
 		break;
 	    case '*':
 		/* '*' allows any scalar type, including bareword */
@@ -6577,7 +6576,7 @@ Perl_ck_subr(pTHX_ OP *o)
 			 while (*--p != '[');
 			 bad_type(arg, Perl_form(aTHX_ "one of %.*s",
 						 (int)(end - p), p),
-				  gv_ename(namegv), o3);
+				  "subroutine", o3);
 		     } else
 			  goto oops;
 		     break;
@@ -6585,13 +6584,13 @@ Perl_ck_subr(pTHX_ OP *o)
 		     if (o3->op_type == OP_RV2GV)
 			  goto wrapref;
 		     if (!contextclass)
-			  bad_type(arg, "symbol", gv_ename(namegv), o3);
+			  bad_type(arg, "symbol", "subroutine", o3);
 		     break;
 		case '&':
 		     if (o3->op_type == OP_ENTERSUB)
 			  goto wrapref;
 		     if (!contextclass)
-			  bad_type(arg, "subroutine entry", gv_ename(namegv),
+			  bad_type(arg, "subroutine entry", "subroutine",
 				   o3);
 		     break;
 		case '$':
@@ -6601,21 +6600,21 @@ Perl_ck_subr(pTHX_ OP *o)
 			o3->op_type == OP_AELEM)
 			 goto wrapref;
 		    if (!contextclass)
-			bad_type(arg, "scalar", gv_ename(namegv), o3);
+			bad_type(arg, "scalar", "subroutine", o3);
 		     break;
 		case '@':
 		    if (o3->op_type == OP_RV2AV ||
 			o3->op_type == OP_PADSV)
 			 goto wrapref;
 		    if (!contextclass)
-			bad_type(arg, "array", gv_ename(namegv), o3);
+			bad_type(arg, "array", "subroutine", o3);
 		    break;
 		case '%':
 		    if (o3->op_type == OP_RV2HV ||
 			o3->op_type == OP_PADSV)
 			 goto wrapref;
 		    if (!contextclass)
-			 bad_type(arg, "hash", gv_ename(namegv), o3);
+			 bad_type(arg, "hash", "subroutine", o3);
 		    break;
 		wrapref:
 		    {
@@ -6642,7 +6641,7 @@ Perl_ck_subr(pTHX_ OP *o)
 	    default:
 	      oops:
 		Perl_croak(aTHX_ "Malformed prototype for %s: %"SVf,
-			   gv_ename(namegv), SVfARG(cv));
+			   "subroutine", SVfARG(cv));
 	    }
 	}
 	else
@@ -6659,7 +6658,7 @@ Perl_ck_subr(pTHX_ OP *o)
     }
     if (proto && !optional && proto_end > proto &&
 	(*proto != '<' && *proto != '@' && *proto != ';' && *proto != '_'))
-	return too_few_arguments(o, gv_ename(namegv));
+	return too_few_arguments(o, "subroutine");
     if(delete_op) {
 #ifdef PERL_MAD
 	OP * const oldo = o;

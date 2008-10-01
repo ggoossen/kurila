@@ -6,7 +6,7 @@
 #  in the README file that comes with the distribution.
 #
 
-sub BEGIN {
+BEGIN {
     chdir('t') if -d 't';
     if (%ENV{PERL_CORE}){
 	@INC = @('.', '../lib', '../ext/Storable/t');
