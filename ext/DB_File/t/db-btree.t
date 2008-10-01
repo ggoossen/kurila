@@ -263,7 +263,7 @@ ok( ((nelems @keys)-1) == 31) ;
 
 #Check that the keys can be retrieved in order
 my @b = keys %h ;
-my @c = sort lexical @b ;
+my @c = sort \&lexical, @b ;
 is_deeply(\@b, \@c);
 
 %h{'foo'} = '';

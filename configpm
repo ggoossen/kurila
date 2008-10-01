@@ -159,7 +159,7 @@ sub import {
     foreach my $func (@funcs) {
 	die qq{"$func" is not exported by the {__PACKAGE__} module\n}
              unless %%Export_Cache{$func};
-	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{$func};
+	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
 
     *{Symbol::fetch_glob("$callpkg\::Config")} = \%%Config if $export_Config;

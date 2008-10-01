@@ -44,8 +44,8 @@ sub load {
     my($module) = @_[0];
 
     # work with static linking too
-    my $b = "$module\::bootstrap";
-    goto &$b if defined &$b;
+    my $b = Symbol::fetch_glob("$module\::bootstrap");
+    goto &{*{$b}} if defined &{*{$b}};
 
     goto retry unless $module and defined &dl_load_file;
 
