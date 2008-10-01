@@ -182,7 +182,7 @@ static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
     return str;
 }
 
-#define SvNAME(loc) inline_SvNAME(aTHX_ sv)
+#define SvNAME(sv) inline_SvNAME(aTHX_ sv)
 static __inline__ SV* inline_SvNAME(pTHX_ SV *sv) {
     return loc_name(SvLOCATION(sv));
 }
