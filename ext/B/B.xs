@@ -462,6 +462,10 @@ U32
 SvMAGICAL(sv)
 	B::SV	sv
 
+SV*
+SvLOCATION(sv)
+	B::SV	sv
+
 MODULE = B	PACKAGE = B::IV		PREFIX = Sv
 
 IV
