@@ -451,10 +451,6 @@ SvREFCNT(sv)
 	B::SV	sv
 
 U32
-SvFLAGS(sv)
-	B::SV	sv
-
-U32
 SvPOK(sv)
 	B::SV	sv
 
@@ -573,28 +569,6 @@ SvRV(sv)
         }
     OUTPUT:
         RETVAL
-
-void
-SvPV(sv)
-	B::PV	sv
-    CODE:
-        ST(0) = sv_newmortal();
-        if( SvPOK(sv) ) {
-	    /* FIXME - we need a better way for B to identify PVs that are
-	       in the pads as variable names.  */
-	    if((SvLEN(sv) && SvCUR(sv) >= SvLEN(sv))) {
-		/* It claims to be longer than the space allocated for it -
-		   presuambly it's a variable name in the pad  */
-		sv_setpv(ST(0), SvPV_nolen_const(sv));
-	    } else {
-		sv_setpvn(ST(0), SvPVX_const(sv), SvCUR(sv));
-	    }
-        }
-        else {
-            /* XXX for backward compatibility, but should fail */
-            /* croak( "argument is not SvPOK" ); */
-            sv_setpvn(ST(0), NULL, 0);
-        }
 
 # This used to read 257. I think that that was buggy - should have been 258.
 # (The "\0", the flags byte, and 256 for the table.  Not that anything
