@@ -206,8 +206,6 @@ usage:
 	    XPUSHs(newSVpvs_flags("locked", SVs_TEMP));
 	if (cvflags & CVf_METHOD)
 	    XPUSHs(newSVpvs_flags("method", SVs_TEMP));
-        if (GvUNIQUE(CvGV((CV*)sv)))
-	    XPUSHs(newSVpvs_flags("unique", SVs_TEMP));
 	break;
     case SVt_PVGV:
 	if (GvUNIQUE(sv))

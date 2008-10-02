@@ -165,7 +165,7 @@ T_PTRDESC
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			{$ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]},
 			\"$var\", \"$ntype\")
 T_REFREF
 	if (SvROK($arg)) \{
