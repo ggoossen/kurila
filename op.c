@@ -7228,10 +7228,6 @@ const_sv_xsub(pTHX_ CV* cv)
     dXSARGS;
     if (items != 0) {
 	NOOP;
-#if 0
-        Perl_croak(aTHX_ "usage: %s::%s()",
-                   HvNAME_get(GvSTASH(CvGV(cv))), GvNAME(CvGV(cv)));
-#endif
     }
     EXTEND(sp, 1);
     ST(0) = (SV*)XSANY.any_ptr;
