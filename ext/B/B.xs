@@ -465,6 +465,10 @@ SvMAGICAL(sv)
 SV*
 SvLOCATION(sv)
 	B::SV	sv
+    CODE:
+        RETVAL = SvREFCNT_inc(SvLOCATION(sv));
+    OUTPUT:
+        RETVAL
 
 MODULE = B	PACKAGE = B::IV		PREFIX = Sv
 
