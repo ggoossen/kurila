@@ -4473,7 +4473,9 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     }
     GvCV(gv) = SvREFCNT_inc(cv);
 
-    av_store(SvLOCATION((SV*)cv), 3, SvREFCNT_inc(cSVOPo->op_sv));
+    SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
+    sv_catpvf(namesv, "::%s", name);
+    av_store(SvLOCATION((SV*)cv), 3, namesv);
 
     GvCVGEN(gv) = 0;
     mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar { (shift)+1 } */
