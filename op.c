@@ -4779,6 +4779,9 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
     if ( ! name)
 	CvANON_on(cv);
 
+    SvLOCATION(cv) = newAV();
+    av_store(SvLOCATION((SV*)cv), 3, newSVpv(name, 0));
+
     return cv;
 }
 
