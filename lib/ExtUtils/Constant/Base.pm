@@ -847,7 +847,7 @@ sub C_constant {
         }
       } elsif ((nelems @{@by_length[$i]}) +< $breakout) {
         $body .= $self->switch_clause (\%(indent=>4),
-				       $i, $items, < @$(@by_length[$i]));
+				       $i, $items, < @{@by_length[$i]});
       } else {
         # Only use the minimal set of parameters actually needed by the types
         # of the names of this length.

@@ -275,7 +275,6 @@ MPOLLUTE = $pollute
 
 }
 
-
 =item const_cccmd (o)
 
 Returns the full compiler call for C programs and stores the
@@ -430,12 +429,12 @@ MM_REVISION = $self->{MM_REVISION}
 
     push @m, "
 # Handy lists of source code files:
-XS_FILES = ".$self->wraplist( <sort keys %$($self->{XS} || \%()))."
-C_FILES  = ".$self->wraplist(< @$($self->{C}))."
-O_FILES  = ".$self->wraplist(< @$($self->{O_FILES}))."
-H_FILES  = ".$self->wraplist(< @$($self->{H}))."
-MAN1PODS = ".$self->wraplist( <sort keys %$($self->{MAN1PODS} || \%()))."
-MAN3PODS = ".$self->wraplist( <sort keys %$($self->{MAN3PODS} || \%()))."
+XS_FILES = ".$self->wraplist( <sort keys %{$self->{XS} || \%()})."
+C_FILES  = ".$self->wraplist(< @{$self->{C}})."
+O_FILES  = ".$self->wraplist(< @{$self->{O_FILES}})."
+H_FILES  = ".$self->wraplist(< @{$self->{H}})."
+MAN1PODS = ".$self->wraplist( <sort keys %{$self->{MAN1PODS} || \%()})."
+MAN3PODS = ".$self->wraplist( <sort keys %{$self->{MAN3PODS} || \%()})."
 ";
 
 
@@ -468,9 +467,9 @@ PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 
     push @m, "
 
-TO_INST_PM = ".$self->wraplist( <sort keys %$($self->{PM}))."
+TO_INST_PM = ".$self->wraplist( <sort keys %{$self->{PM}})."
 
-PM_TO_BLIB = ".$self->wraplist(< %$($self->{PM}))."
+PM_TO_BLIB = ".$self->wraplist(< %{$self->{PM}})."
 ";
 
     join('', @m);
@@ -1483,7 +1482,7 @@ sub init_PM {
     return if $self->{PM} and $self->{ARGS}->{PM};
 
     if ((nelems @{$self->{PMLIBDIRS}})){
-	print "Searching PMLIBDIRS: $(join ' ',@$($self->{PMLIBDIRS}))\n"
+	print "Searching PMLIBDIRS: $(join ' ',@{$self->{PMLIBDIRS}})\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -1528,7 +1527,7 @@ sub init_DIRFILESEP {
 
     $self->{DIRFILESEP} = '/';
 }
-    
+
 
 =item init_main
 
@@ -2455,7 +2454,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 # extralibs.all are computed correctly
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = $(join ' ',@$($perlinc || \@())
+MAP_PERLINC   = $(join ' ',@{$perlinc || \@()}
 )MAP_STATIC    = ",
 join(" \\\n\t", reverse sort keys %static), "
 
@@ -2849,7 +2848,7 @@ PERL_HDRS = \
 $(OBJECT) : $(PERL_HDRS)
 } if $self->{OBJECT};
 
-    push @m, join(" ", values %$($self->{XS}))." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
+    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
 
     join "\n", @m;
 }
@@ -3678,7 +3677,7 @@ Defines the suffix rules to compile XS files to C.
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();
-    '
+    return '
 .xs.c:
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
 ';

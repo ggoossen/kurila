@@ -4590,6 +4590,18 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 {
     PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCK;
 
+    if (PL_parser && PL_parser->error_count) {
+	const char not_safe[] =
+	    "BEGIN not safe after errors--compilation aborted";
+	if (PL_in_eval & EVAL_KEEPERR)
+	    Perl_croak(aTHX_ not_safe);
+	else {
+	    /* force display of errors found but not reported */
+	                   sv_catpv(ERRSV, not_safe);
+			   Perl_croak(aTHX_ "%"SVf, SVfARG(ERRSV));
+	}
+    }
+
     switch(key) {
     case KEY_BEGIN:
     {
