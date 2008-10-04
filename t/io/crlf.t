@@ -16,17 +16,17 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     ok(open(FOO,"<:crlf",$file));
 
     my $text;
-    { local $/; $text = ~< *FOO }
+    do { local $/; $text = ~< *FOO };
     is(count_chars($text, "\015\012"), 0);
     is(count_chars($text, "\n"), 2000);
 
     binmode(FOO);
     seek(FOO,0,0);
-    { local $/; $text = ~< *FOO }
+    do { local $/; $text = ~< *FOO };
     is(count_chars($text, "\015\012"), 2000);
 
     SKIP:
-    {
+    do {
 	skip("miniperl can't rely on loading PerlIO::scalar")
 	if %ENV{PERL_CORE_MINITEST};
 	skip("no PerlIO::scalar") unless %Config{extensions} =~ m!\bPerlIO/scalar\b!;
@@ -40,7 +40,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	$/ = "\n";
 	my $s = ( ~< $fh ) . ~< $fh;
 	ok($s eq "\nxxy\n");
-    }
+    };
 
     ok(close(FOO));
 

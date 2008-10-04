@@ -245,7 +245,7 @@ ok($out == 1);
 
 $_ = 'foobar1 bar2 foobar3 barfoobar5 foobar6';
 our @out = @( m/(?<!foo)bar./g );
-ok("{join ' ',@out}" eq 'bar2 barf');
+ok("$(join ' ',@out)" eq 'bar2 barf');
 
 # Tests which depend on REG_INFTY
 our $reg_infty = defined %Config{reg_infty} ? %Config{reg_infty} : 32767;
@@ -275,7 +275,7 @@ eval_dies_like( "'aaa' =~ m/a\{1,$reg_infty_p\}/",
 
 undef $@;
 our $context = 'x' x 256;
-eval_dies_like( qq("{$context}y" =~ m/(?<=$context)y/),
+eval_dies_like( qq("$($context)y" =~ m/(?<=$context)y/),
                 qr%^\QLookbehind longer than 255 not% );
 
 # removed test
@@ -346,7 +346,7 @@ sub matchit {
 our (@ans, $res, @ans1);
 push @ans, $res while $res = matchit;
 
-ok("{join ' ',@ans}" eq "1 1 1");
+ok("$(join ' ',@ans)" eq "1 1 1");
 
 ok( "abc" =~ m/^(??{"a"})b/ );
 
@@ -356,16 +356,16 @@ $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/;
 @ans = @ans1 = @();
 push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp;
 
-ok( "{join ' ',@ans}" eq "1 1 1" );
+ok( "$(join ' ',@ans)" eq "1 1 1" );
 
-ok( "{join ' ',@ans1}" eq $expect );
+ok( "$(join ' ',@ans1)" eq $expect );
 
 @ans = @( m/$matched/g );
 
-ok( "{join ' ',@ans}" eq $expect );
+ok( "$(join ' ',@ans)" eq $expect );
 
 @ans = @('a/b' =~ m%(.*/)?(.*)%);	# Stack may be bad
-ok( "{join ' ',@ans}" eq 'a/ b' );
+ok( "$(join ' ',@ans)" eq 'a/ b' );
 
 my $code = '{$blah = 45}';
 my $blah = 12;
@@ -459,14 +459,14 @@ $b = 7;
 m/$a$a/;
 ok($b eq '9');
 
-{
+do {
     $c="$a";
     m/$a$a/;
     is($b, '11');
-}
+};
 
 our $lex_a;
-{
+do {
   use re "eval";
   m/$a$c$a/;
   is($b, '14');
@@ -485,9 +485,9 @@ our $lex_a;
   dies_like( sub { m/$a$c$a/ },
              qr/Eval-group not allowed/ );
   ok($b eq '14');
-}
+};
 
-{
+do {
   local $lex_a = 2;
   my $lex_a = 43;
   my $lex_b = 17;
@@ -496,19 +496,19 @@ our $lex_a;
   ok($lex_res eq '1');
   ok($lex_a eq '44');
   ok($lex_c eq '43');
-}
+};
 
-{
+do {
   package aa;
   $c = 2;
   $::c = 3;
   '' =~ m/(?{ $c = 4 })/;
   main::ok($c == 4);
-}
-{
+};
+do {
   local $TODO = "lexical scope?";
   ok($c == 3, "lexical scope?");
-}
+};
 
 eval_dies_like('q(a:[b]:) =~ m/[x[:foo:]]/',
                qr/POSIX class \[:foo:\] unknown in regex/);
@@ -536,7 +536,7 @@ ok( not nelems @_ );
 $_ = 'aaa';
 pos = 1;
 my @a = @( m/\Ga/g );
-ok("{join ' ',@a}" eq "a a");
+ok("$(join ' ',@a)" eq "a a");
 
 my $str = 'abcde';
 pos $str = 2;
@@ -549,10 +549,10 @@ ok( $str =~ m/^..\G/ );
 
 ok( not ( $str =~ m/^...\G/ ));
 
-{
+do {
     local $TODO = $::running_as_thread;
     ok($str =~ m/.\G./p and $^MATCH eq 'bc');
-}
+};
 
 ok( $str =~ m/\G../p and $^MATCH eq 'cd' );
 
@@ -591,14 +591,14 @@ our @res = @( () );
 $_ = 'abcde|abcde';
 our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g );
 @res = map {defined $_ ? "'$_'" : 'undef'} @res;
-$res = "{join ' ',@res}";
-ok(  "{join ' ',@res}" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
+$res = "$(join ' ',@res)";
+ok(  "$(join ' ',@res)" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
 
 @res = @( () );
 @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp );
 @res = map {defined $_ ? "'$_'" : 'undef'} @res;
-$res = "{join ' ',@res}";
-ok(  "{join ' ',@res}" eq
+$res = "$(join ' ',@res)";
+ok(  "$(join ' ',@res)" eq
   "'' 'ab' 'cde|abcde' " .
   "'' 'abc' 'de|abcde' " .
   "'abcd' 'e|' 'abcde' " .
@@ -611,29 +611,29 @@ $foo='aabbccddeeffgg';
 pos($foo)=1;
 
 $foo =~ m/.\G(..)/g;
-{
+do {
     local $TODO = $::running_as_thread;
     is($1,'ab');
-}
+};
 
 pos($foo) += 1;
 $foo =~ m/.\G(..)/g;
-{
+do {
     local $TODO = $::running_as_thread;
     is($1, 'cc');
-}
+};
 
 pos($foo) += 1;
 $foo =~ m/.\G(..)/g;
-{
+do {
     local $TODO = $::running_as_thread;
     is($1, 'de');
-}
+};
 
-{
+do {
     local $TODO = $::running_as_thread;
     ok($foo =~ m/\Gef/g);
-}
+};
 
 undef pos $foo;
 
@@ -662,9 +662,9 @@ our @a = qw(foo bar);
 our @b = @( () );
 s/(\w)(?{push @b, $1})/,$1,/g for  @a;
 
-ok("{join ' ',@b}" eq "f o o b a r");
+ok("$(join ' ',@b)" eq "f o o b a r");
 
-ok("{join ' ',@a}" eq ",f,,o,,o, ,b,,a,,r,");
+ok("$(join ' ',@a)" eq ",f,,o,,o, ,b,,a,,r,");
 
 my $brackets;
 $brackets = qr{
@@ -693,60 +693,60 @@ ok( not $text =~ m/^\s*A/m );
 
 $text = "abc dbf";
 @res = @($text =~ m/.*?(b).*?\b/g);
-ok("{join ' ',@res}" eq 'b b');
+ok("$(join ' ',@res)" eq 'b b');
 
-{
+do {
 use bytes;
 @a = map chr,0..255;
 
 @b = grep(m/\S/, @a);
 our @c = grep(m/[^\s]/, @a);
-ok("{join ' ',@b}" eq "{join ' ',@c}");
+ok("$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\S/, @a);
 @c = grep(m/[\S]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\s/, @a);
 @c = grep(m/[^\S]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\s/, @a);
 @c = grep(m/[\s]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\D/, @a);
 @c = grep(m/[^\d]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\D/, @a);
 @c = grep(m/[\D]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\d/, @a);
 @c = grep(m/[^\D]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\d/, @a);
 @c = grep(m/[\d]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\W/, @a);
 @c = grep(m/[^\w]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\W/, @a);
 @c = grep(m/[\W]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\w/, @a);
 @c = grep(m/[^\W]/, @a);
-ok( "{join ' ',@b}" eq "{join ' ',@c}");
+ok( "$(join ' ',@b)" eq "$(join ' ',@c)");
 
 @b = grep(m/\w/, @a);
 @c = grep(m/[\w]/, @a);
-is("{join ' ',@b}","{join ' ',@c}");
-}
+is("$(join ' ',@b)","$(join ' ',@c)");
+};
 
 # see if backtracking optimization works correctly
 ok("\n\n" =~ m/\n  $ \n/x);
@@ -755,11 +755,11 @@ ok("\n\n" =~ m/\n* $ \n/x);
 
 ok("\n\n" =~ m/\n+ $ \n/x);
 
-{
+do {
   local $TODO = "stringy";
   dies_like( sub { \@() =~ m/^ARRAY/ },
              qr/Tried to stringify a reference/);
-}
+};
 
 # test result of match used as match (!)
 ok( 'a1b' =~ ('xyz' =~ m/y/) );
@@ -767,11 +767,11 @@ ok( 'a1b' =~ ('xyz' =~ m/y/) );
 ok( 'a1b' =~ ('xyz' =~ m/t/) );
 
 our $w = 0;
-{
+do {
     local $^WARN_HOOK = sub { $w = 1 };
     local $^W = 1;
 	$w = 1 if ("1\n" x 102) =~ m/^\s*\n/m;
-}
+};
 ok( not $w );
 
 my %space = %( spc   => " ",
@@ -788,17 +788,17 @@ my @space0 = sort grep { %space{$_} =~ m/\s/ }          keys %space;
 my @space1 = sort grep { %space{$_} =~ m/[[:space:]]/ } keys %space;
 my @space2 = sort grep { %space{$_} =~ m/[[:blank:]]/ } keys %space;
 
-ok( "{join ' ',@space0}" eq "cr ff lf spc tab" );
+ok( "$(join ' ',@space0)" eq "cr ff lf spc tab" );
 
-ok( "{join ' ',@space1}" eq "cr ff lf spc tab vt" );
+ok( "$(join ' ',@space1)" eq "cr ff lf spc tab vt" );
 
-ok( "{join ' ',@space2}" eq "spc tab" );
+ok( "$(join ' ',@space2)" eq "spc tab" );
 
 # bugid 20001021.005 - this caused a SEGV
 ok( undef =~ m/^([^\/]*)(.*)$/ );
 
 # unicode.
-{
+do {
     use utf8;
     my $x = "\x{65e5}";
     no utf8;
@@ -809,7 +809,7 @@ ok( undef =~ m/^([^\/]*)(.*)$/ );
     ok("$y" eq "(?u-xism:^.\$)", "unicode-modifier stringified.");
     eval_dies_like( q|no utf8; $x =~ m/\x{65e5}/|,
                     qr/\\x\{\} not allowed outside Unicode match/);
-}
+};
 
 use utf8;
 
@@ -848,28 +848,28 @@ if (m/(\C)/g) {
     ok(0);
 }
 
-{
+do {
   # japhy -- added 03/03/2001
   () = (my $str = "abc") =~ m/(...)/;
   $str = "def";
   ok($1 eq "abc");
-}
+};
 
 # The 242 and 243 go with the 244 and 245.
 # The trick is that in EBCDIC the explicit numeric range should match
 # (as also in non-EBCDIC) but the explicit alphabetic range should not match.
 
-{
+do {
     no utf8;
     ok("\x[8e]" =~ m/[\x[89]-\x[91]]/);
     ok("\x[ce]" =~ m/[\x[c9]-\x[d1]]/);
-}
+};
 
 ok("\x{ab}" =~ m/\x{ab}/);
 
 ok("\x{abcd}" =~ m/\x{abcd}/);
 
-{
+do {
     # bug id 20001008.001
 
     my @x = @("stra\x{DF}e 138","stra\x{DF}e 138");
@@ -881,9 +881,9 @@ ok("\x{abcd}" =~ m/\x{abcd}/);
 	use utf8; # needed for the raw UTF-8
 	$latin =~ s!(s)tr(?:aß|s+e)!$1tr.!; # \303\237 after the a
     }
-}
+};
 
-SKIP: {
+SKIP: do {
     use charnames ":full";
 
     # This is far from complete testing, there are dozens of character
@@ -1016,9 +1016,9 @@ SKIP: {
 	    ok( $char =~ m/\P{IsWord}/);
 	}
     }
-}
+};
 
-{
+do {
     $_ = "abc\x{100}\x{200}\x{300}\x{380}\x{400}defg";
 
     if (m/(.\x{300})./p) {
@@ -1030,9 +1030,9 @@ SKIP: {
     } else {
 	for (576..580) { ok(0); }
     }
-}
+};
 
-{
+do {
     # bug id 20010306.008
 
     $a = "a\x{1234}";
@@ -1040,9 +1040,9 @@ SKIP: {
     $a =~ m/\w/; # used to core dump
 
     ok(1);
-}
+};
 
-{
+do {
     # bugid 20010410.006
     for my $rx (@(
 		'm/(.*?)\{(.*?)\}/csg',
@@ -1065,17 +1065,17 @@ SKIP: {
 EOT
 	ok( $i == 2 );
     }
-}
+};
 
-{
+do {
     # from Robin Houston
 
     my $x = "\x{10FFFD}";
     $x =~ s/(.)/$1/g;
     ok( ord($x) == 0x10FFFD && length($x) == 1 );
-}
+};
 
-{
+do {
     my $x = "\x{7f}";
 
     ok( not $x =~ m/[\x{80}-\x{ff}]/ );
@@ -1085,9 +1085,9 @@ EOT
     ok( $x =~ m/\P{InLatin1Supplement}/ );
     ok( not $x =~ m/\p{InLatinExtendedA}/ );
     ok( $x =~ m/\P{InLatinExtendedA}/ );
-}
+};
 
-{
+do {
     my $x = "\x{80}";
 
     ok( $x =~ m/[\x{80}-\x{ff}]/ );
@@ -1097,9 +1097,9 @@ EOT
     ok( not$x =~ m/\P{InLatin1Supplement}/ );
     ok( not $x =~ m/\p{InLatinExtendedA}/ );
     ok( $x =~ m/\P{InLatinExtendedA}/ );
-}
+};
 
-{
+do {
     my $x = "\x{ff}";
 
     ok( $x =~ m/[\x{80}-\x{ff}]/ );
@@ -1109,9 +1109,9 @@ EOT
     ok( not $x =~ m/\P{InLatin1Supplement}/ );
     ok( not $x =~ m/\p{InLatinExtendedA}/ );
     ok( $x =~ m/\P{InLatinExtendedA}/ );
-}
+};
 
-{
+do {
     my $x = "\x{100}";
 
     ok( not $x =~ m/[\x{80}-\x{ff}]/ );
@@ -1121,9 +1121,9 @@ EOT
     ok( $x =~ m/\P{InLatin1Supplement}/ );
     ok( $x =~ m/\p{InLatinExtendedA}/ );
     ok( not $x =~ m/\P{InLatinExtendedA}/ );
-}
+};
 
-{
+do {
     # from japhy
     my $w;
     use warnings;    
@@ -1170,11 +1170,11 @@ EOT
     $w = "";
     eval 'qr/(?ogc)/'; die if $@;
     ok( $w =~ m/^Useless \(\?o\).*\nUseless \(\?g\).*\nUseless \(\?c\)/ );
-}
+};
 
 # More Unicode "class" tests
 
-{
+do {
     use charnames ':full';
 
     ok( "\N{LATIN CAPITAL LETTER A}" =~ m/\p{InBasicLatin}/ );
@@ -1182,7 +1182,7 @@ EOT
     ok( "\N{LATIN CAPITAL LETTER A WITH MACRON}" =~ m/\p{InLatinExtendedA}/ );
     ok( "\N{LATIN SMALL LETTER B WITH STROKE}" =~ m/\p{InLatinExtendedB}/ );
     ok( "\N{KATAKANA LETTER SMALL A}" =~ m/\p{InKatakana}/ );
-}
+};
 
 $_ = "foo";
 
@@ -1210,7 +1210,7 @@ ok(test_o('abc','..(.)') eq 'a');
 # 635..639: ID 20010619.003 (only the space character is
 # supposed to be [:print:], not the whole isprint()).
 
-{
+do {
 use bytes;
 ok( not "\n"     =~ m/[[:print:]]/ );
 ok( not "\t"     =~ m/[[:print:]]/ );
@@ -1219,7 +1219,7 @@ ok( not "\t"     =~ m/[[:print:]]/ );
 ok( not "\014"  =~ m/[[:print:]]/ );
 ok( not "\r"    =~ m/[[:print:]]/ );
 ok( " " =~ m/[[:print:]]/ );
-}
+};
 
 ##
 ## Test basic $^N usage outside of a regex
@@ -1239,9 +1239,9 @@ ok($x =~ m/(?:c(d)e)(?:f)/ and $^N eq  "d" );
 ok($x =~ m/(?:([abc])|([def]))*/ and $^N eq  "f" );
 ok($x =~ m/(?:([ace])|([bdf]))*/ and $^N eq  "f" );
 ok($x =~ m/(([ace])|([bd]))*/    and $^N eq  "e" );
-{
+do {
   ok($x =~ m/(([ace])|([bdf]))*/   and $^N eq  "f" );
-}
+};
 ## test to see if $^N is automatically localized -- it should now
 ## have the value set in test 653
 ok($^N eq  "e" );
@@ -1276,7 +1276,7 @@ ok( chr(0x38a) =~ m/\p{IsGreek}/ ); # range
 ok( chr(0x38b) =~ m/\P{IsGreek}/ ); # not there
 ok( chr(0x38c) =~ m/\p{IsGreek}/ ); # singleton
 
-{
+do {
 ##
 ## Test [:cntrl:]...
 ##
@@ -1290,52 +1290,52 @@ ok( chr(0x38c) =~ m/\p{IsGreek}/ ); # singleton
 
     ($x = $AllBytes) =~ s/[^[:cntrl:]]//g;
     ok($x eq join('', map { chr($_) } @( < 0..0x1F, 0x7F)));
-}
+};
 
 # With /s modifier UTF8 chars were interpreted as bytes
-{
+do {
     my $a = "Hello \x{263A} World";
     
     my @a = @($a =~ m/./gs);
     
     ok( (nelems @a) == 13 );
-}
+};
 
 @a = @("foo\nbar" =~ m/./g);
-ok( (nelems @a) == 6 && "{join ' ',@a}" eq "f o o b a r" );
+ok( (nelems @a) == 6 && "$(join ' ',@a)" eq "f o o b a r" );
 
 @a = @("foo\nbar" =~ m/./gs);
-ok( (nelems @a) == 7 && "{join ' ',@a}" eq "f o o \n b a r" );
+ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" );
 
 @a = @("foo\nbar" =~ m/\C/g);
-ok( (nelems @a) == 7 && "{join ' ',@a}" eq "f o o \n b a r" );
+ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" );
 
 @a = @("foo\nbar" =~ m/\C/gs);
-ok( (nelems @a) == 7 && "{join ' ',@a}" eq "f o o \n b a r" );
+ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" );
 
 @a = @("foo\n\x{100}bar" =~ m/./g);
-ok( (nelems @a) == 7 && "{join ' ',@a}" eq "f o o \x{100} b a r" );
+ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \x{100} b a r" );
 
 @a = @("foo\n\x{100}bar" =~ m/./gs);
-ok( (nelems @a) == 8 && "{join ' ',@a}" eq "f o o \n \x{100} b a r" );
+ok( (nelems @a) == 8 && "$(join ' ',@a)" eq "f o o \n \x{100} b a r" );
 
 ($a, $b) = ("\x[c4]", "\x[80]");
 @a = @("foo\n\x{100}bar" =~ m/\C/g);
-ok( scalar( (nelems @a) == 9 && "{join ' ',@a}" eq "f o o \n $a $b b a r" ) );
+ok( scalar( (nelems @a) == 9 && "$(join ' ',@a)" eq "f o o \n $a $b b a r" ) );
 
 @a = @("foo\n\x{100}bar" =~ m/\C/gs);
-ok(  (nelems @a) == 9 && "{join ' ',@a}" eq "f o o \n $a $b b a r" );
+ok(  (nelems @a) == 9 && "$(join ' ',@a)" eq "f o o \n $a $b b a r" );
 
-{
+do {
     # [ID 20010814.004] pos() doesn't work when using =~m// in list context
     $_ = "ababacadaea";
     $a = join ":", @( m/b./gc);
     $b = join ":", @( m/a./gc);
     $c = pos;
     ok("$a $b $c" eq 'ba:ba ad:ae 10', "$a $b $c");
-}
+};
 
-{
+do {
     # [ID 20010407.006] matching utf8 return values from functions does not work
 
     package ID_20010407_006;
@@ -1352,10 +1352,10 @@ ok(  (nelems @a) == 9 && "{join ' ',@a}" eq "f o o \n $a $b b a r" );
 
     x  =~ m/(..)/; $y = $1;
     main::ok( length($y) == 2 && $y eq $x );
-}
+};
 
 
-{
+do {
     # Check that \x## works. 5.6.1 and 5.005_03 fail some of these.
     no utf8;
     $x = "\x[4e]" . "E";
@@ -1402,18 +1402,18 @@ ok(  (nelems @a) == 9 && "{join ' ',@a}" eq "f o o \n $a $b b a r" );
     $x = "\x[09]" . "_b";
     ok ($x =~ m/^[\x[09]_b]{3}$/, "\\x9_b isn't to be treated as \\x9b");
 
-}
+};
 
-{
+do {
     # high bit bug -- japhy
     no utf8;
     my $x = "ab\200d";
     ok( $x =~ m/.*?\200/ );
-}
+};
 
 print "# some Unicode properties\n";
 
-{
+do {
     # Dashes, underbars, case.
     ok( "\x{80}" =~ m/\p{in-latin1_SUPPLEMENT}/ );
 
@@ -1423,9 +1423,9 @@ print "# some Unicode properties\n";
     # No ^In, dashes, case, dash, any intervening (word-break) whitespace.
     # (well, newlines don't work...)
     ok( "\x{80}" =~ m/\p{latin-1   supplement}/ );
-}
+};
 
-{
+do {
     ok( "a" =~ m/\pL/ );
     ok( "a" =~ m/\p{IsLl}/ );
     ok( not "a" =~ m/\p{IsLu}/ );
@@ -1446,42 +1446,42 @@ print "# some Unicode properties\n";
     ok( "A" =~ m/\P{IsLl}/ );
     ok( not "A" =~ m/\P{Lu}/ );
     ok( "A" =~ m/\P{Ll}/ );
-}
+};
 
-{
+do {
     ok( not "a" =~ m/\p{Common}/ );
     ok( "1" =~ m/\p{Common}/ );
-}
+};
 
-{
+do {
     ok( not "a"       =~ m/\p{Inherited}/ );
     ok( "\x{300}" =~ m/\p{Inherited}/ );
-}
+};
 
-{
+do {
     # L& and LC are the same
     ok( "a" =~ m/\p{LC}/ and "a" =~ m/\p{L&}/ );
     ok( not "1" =~ m/\p{LC}/ or "1" =~ m/\p{L&}/ );
-}
+};
 
-{
+do {
     ok( "a" =~ m/\p{Lowercase Letter}/ );
     ok( not "A" =~ m/\p{lowercaseletter}/ );
-}
+};
 
-{
+do {
     ok( "\x{AC00}" =~ m/\p{HangulSyllables}/ );
-}
+};
 
-{
+do {
     # Script=, Block=, Category=
 
     ok( "\x{0100}" =~ m/\p{Script=Latin}/ );
     ok( "\x{0100}" =~ m/\p{Block=LatinExtendedA}/ );
     ok( "\x{0100}" =~ m/\p{Category=UppercaseLetter}/ );
-}
+};
 
-{
+do {
     print "# the basic character classes and Unicode \n";
 
     # 0100;LATIN CAPITAL LETTER A WITH MACRON;Lu;0;L;0041 0304;;;;N;LATIN CAPITAL LETTER A MACRON;;;0101;
@@ -1492,9 +1492,9 @@ print "# some Unicode properties\n";
 
     # 1680;OGHAM SPACE MARK;Zs;0;WS;;;;;N;;;;;
     ok( "\x{1680}" =~ m/\s/ );
-}
+};
 
-{
+do {
     print "# folding matches and Unicode\n";
 
     ok( "a\x{100}" =~ m/A/i );
@@ -1517,9 +1517,9 @@ print "# some Unicode properties\n";
     ok( "\x{100}a" =~ m/[\x{100}]/i );
     ok( "\x{101}a" =~ m/[\x{101}]/i );
     ok( "\x{100}a" =~ m/[\x{101}]/i );
-}
+};
 
-{
+do {
     use charnames ':full';
 
     use utf8;
@@ -1551,9 +1551,9 @@ print "# some Unicode properties\n";
     ok( $UPPER =~ m/$lower/i   );
     ok( $lower =~ m/[$UPPER]/i );
     ok( $UPPER =~ m/[$lower]/i );
-}
+};
 
-{
+do {
     use warnings;
     use charnames ':full';
     
@@ -1564,9 +1564,9 @@ print "# some Unicode properties\n";
 
     # Before #13843 this was failing by matching falsely.
     ok( not "_:$char:_" =~ m/_:$SIGMA:_/i );
-}
+};
 
-{
+do {
     print "# \\X\n";
 
     use charnames ':full';
@@ -1580,16 +1580,16 @@ print "# some Unicode properties\n";
     ok( "\N{LATIN CAPITAL LETTER E}\N{COMBINING GRAVE ACCENT}!" =~
 	m/^(\X)!/ &&
 	$1 eq "\N{LATIN CAPITAL LETTER E}\N{COMBINING GRAVE ACCENT}" );
-}
+};
 
-{
+do {
     print "#\\C and \\X\n";
 
     ok( "!abc!" =~ m/a\Cc/ );
     ok( "!abc!" =~ m/a\Xc/ );
-}
+};
 
-{
+do {
     print "# FINAL SIGMA\n";
 
     my $SIGMA = "\x{03A3}"; # CAPITAL
@@ -1619,9 +1619,9 @@ print "# some Unicode properties\n";
     ok( $sigma =~ m/[$SIGMA]/i );
     ok( $sigma =~ m/[$Sigma]/i );
     ok( $sigma =~ m/[$sigma]/i );
-}
+};
 
-{
+do {
     print "# parlez-vous?\n";
 
     use charnames ':full';
@@ -1676,35 +1676,35 @@ print "# some Unicode properties\n";
     ok( "franc\N{COMBINING CEDILLA}ais" =~
 	  m/fran(?:c\N{COMBINING CEDILLA}?|\N{LATIN SMALL LETTER C WITH CEDILLA})ais/p &&
 	$^MATCH eq "franc\N{COMBINING CEDILLA}ais" );
-}
+};
 
-{
+do {
     print "# Does lingering (and useless) UTF8 flag mess up /i matching?\n";
 
-    {
+    do {
 	my $regex  = "ABcde";
 	my $string = "abcDE\x{100}";
 	chop($string);
 	ok($string =~ m/$regex/i);
-    }
+    };
 
-    {
+    do {
 	my $regex  = "ABcde\x{100}";
 	my $string = "abcDE";
 	chop($regex);
 	ok($string =~ m/$regex/i);
-    }
+    };
 
-    {
+    do {
 	my $regex  = "ABcde\x{100}";
 	my $string = "abcDE\x{100}";
 	chop($regex);
 	chop($string);
 	ok($string =~ m/$regex/i)
-    }
-}
+    };
+};
 
-{
+do {
     print "# more SIGMAs\n";
 
     my $SIGMA = "\x{03A3}"; # CAPITAL
@@ -1720,9 +1720,9 @@ print "# some Unicode properties\n";
     ok( ":$S3:" =~ m/:(([$SIGMA])+):/i && $1 eq $S3 && $2 eq $sigma );
     ok( ":$S3:" =~ m/:(([$Sigma])+):/i && $1 eq $S3 && $2 eq $sigma );
     ok( ":$S3:" =~ m/:(([$sigma])+):/i && $1 eq $S3 && $2 eq $sigma );
-}
+};
 
-{
+do {
     print "# LATIN SMALL LETTER SHARP S\n";
 
     use charnames ':full';
@@ -1741,18 +1741,18 @@ print "# some Unicode properties\n";
 
     ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/ss/i);
     ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/SS/i);
-}
+};
 
-{
+do {
     print "# more whitespace: U+0085, U+2028, U+2029\n";
 
     # U+0085 needs to be forced to be Unicode, the \x{100} does that.
     ok( "<\x{100}\x{0085}>" =~ m/<\x{100}\s>/ );
     ok( "<\x{2028}>" =~ m/<\s>/ );
     ok( "<\x{2029}>" =~ m/<\s>/ );
-}
+};
 
-{
+do {
     print "# . with /s should work on characters, as opposed to bytes\n";
 
     my $s = "\x{e4}\x{100}";
@@ -1782,9 +1782,9 @@ print "# some Unicode properties\n";
     }
     $r2 =~ s/\x{100}//;
     ok( $r1 eq $r2 );
-}
+};
 
-{
+do {
     print "# Unicode lookbehind\n";
 
     local $TODO = "variable length lookbehehind";
@@ -1793,9 +1793,9 @@ print "# some Unicode properties\n";
     #print "A\x{200}\x{300}B" =~ m/(?<=A..)B/ ? "ok 852\n" : "not ok 852\n";
     #print "\x{400}AB"        =~ m/(?<=\x{400}.)B/ ? "ok 853\n" : "not ok 853\n";
     #print "\x{500\x{600}}B"  =~ m/(?<=\x{500}.)B/ ? "ok 854\n" : "not ok 854\n";
-}
+};
 
-{
+do {
     print "# UTF-8 hash keys and /\$/\n";
     # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-01/msg01327.html
 
@@ -1808,9 +1808,9 @@ print "# some Unicode properties\n";
 	my $m2 = %u{$_}=~m/^\w*$/ ? 1 : 0;
 	ok( $m1 == $m2 );
     }
-}
+};
 
-{
+do {
     print "# [ID 20020124.005]\n";
     # Fixed by #14795.
     for my $char (@("a", "\x{df}", "\x{100}")){
@@ -1821,16 +1821,16 @@ print "# some Unicode properties\n";
 	}}g;
 	ok( substr($x,0,1) eq substr($x,-1,1) );
    }
-}
+};
 
-{
+do {
     print "# SEGV in s/// and UTF-8\n";
     my $s = "s#\x{100}" x 4;
     $s =~ s/[^\w]/ /g;
     ok( $s eq "s \x{100}" x 4 );
-}
+};
 
-{
+do {
     print "# UTF-8 bug (maybe alreayd known?)\n";
     my $u;
 
@@ -1844,9 +1844,9 @@ print "# some Unicode properties\n";
 
     $u =~ s/\x{100}/e/g;
     ok( $u eq "feeber" );
-}
+};
 
-{
+do {
     print "# UTF-8 bug with s///\n";
     # check utf8/non-utf8 mixtures
     # try to force all float/anchored check combinations
@@ -1875,9 +1875,9 @@ print "# some Unicode properties\n";
 	($subst = "xyz") =~ s/$re//;
 	ok( $subst eq '' );
     }
-}
+};
 
-{
+do {
     print "# qr/.../x\n";
 
     my $R = qr/ A B C # D E/x;
@@ -1885,14 +1885,14 @@ print "# some Unicode properties\n";
     ok( try {"ABCDE" =~ $R} ); die if $@;
     ok( try {"ABCDE" =~ m/$R/} ); die if $@;
     ok( try {"ABCDE" =~ m/($R)/} ); die if $@;
-}
+};
 
-{
+do {
     print "# illegal Unicode properties\n";
 
     ok( not eval qq* "a" =~ m/\pq / *      ); die if $@;
     ok( not eval qq* "a" =~ m/\p\{qrst\} / * ); die if $@;
-}
+};
 
 print "# user-defined character properties\n";
 
@@ -1960,7 +1960,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
 	    my $s = $char . "f" x $len;
 	    my $r = $s =~ m/$char([f]*)/gc;
             ok($r, " # TODO <$type x $len>");
-	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos {join ' ',@{\@( pos($s) )}}");
+	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $(join ' ',@$(\@( pos($s) )))");
 	}
     }
 } else {
@@ -1987,12 +1987,12 @@ ok("a$x" =~ m/^a(??{$a})\z/ ,
 ok(length(qr/##/x) == 13 ,
       "## in qr// doesn't corrupt memory [perl #17776]");
 
-{ use re 'eval';
+do { use re 'eval';
 
 ok("$x$x" =~ m/^$x(??{$x})\z/ ,
       "postponed utf8 string in utf8 re matches utf8");
 
-} # no re 'eval'
+}; # no re 'eval'
 
 print "# more user-defined character properties\n";
 
@@ -2037,16 +2037,16 @@ ok("A" =~ m/\p{ASCII_Hex_Digit}/, "'A' is ASCII_Hex_Digit");
 ok("-" =~ m/\p{AsciiHexAndDash}/, "'-' is AsciiHexAndDash");
 ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash");
 
-{
+do {
     print "# Change #18179\n";
     # previously failed with "panic: end_shift
     my $s = "\x{100}" x 5;
     my $ok = $s =~ m/(\x{100}{4})/;
     my($ord, $len) = (ord $1, length $1);
     ok($ok && $ord == 0x100 && $len == 4, "[#18179] $ok/$ord/$len");
-}
+};
 
-{
+do {
     print "# [perl #15763]\n";
 
     $a = "x\x{100}";
@@ -2092,9 +2092,9 @@ ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash");
 
     ok($a !~ m/^\C\C\C\C\y/, q{don't match four \Cy});
     ok($a !~ m/^\C{4}y/,     q{don't match \C{4}y});
-}
+};
 
-{
+do {
     local $\;
     $_ = 'aaaaaaaaaa';
     chop $_; $\="\n";
@@ -2102,7 +2102,7 @@ ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash");
     ok(m/[^\d]+/, "m/[^\d]/ utf8");
     ok(do {$a = $_; $_ =~ s/[^\s]+/./g}, "s/[^\s]/ utf8");
     ok(do {$a = $_; $a =~ s/[^\d]+/./g}, "s/[^\s]/ utf8");
-}
+};
 
 ok("\x{100}" =~ m/\x{100}/, "[perl #15397]");
 ok("\x{100}" =~ m/(\x{100})/, "[perl #15397]");
@@ -2124,16 +2124,16 @@ ok("bbac"   =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 ok("bbbac"  =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
-{
+do {
     # [perl #18232]
     "\x{100}" =~ m/(.)/;
     ok( $1 eq "\x{100}", '$1 is utf-8 [perl #18232]' );
-    { 'a' =~ m/./; }
+    do { 'a' =~ m/./; };
     ok( $1 eq "\x{100}", '$1 is still utf-8' );
     ok( $1 eq "\x[C4]\x[80]", '$1 is also non-utf-8' );
-}
+};
 
-{
+do {
     use utf8;
     my $attr = 'Name-1' ;
 
@@ -2143,15 +2143,15 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
 
     $attr =~ m/^$/;
     ok( $attr =~ $PredNameHyphen, "[perl #19767] original test" );
-}
+};
 
-{
+do {
     use utf8;
     "a" =~ m/[b]/;
     ok ( "0" =~ m/\p{N}+\z/, "[perl #19767] variant test" );
-}
+};
 
-{
+do {
   # Subject: Odd regexp behavior
   # From: Markus Kuhn <Markus.Kuhn@cl.cam.ac.uk>
   # Date: Wed, 26 Feb 2003 16:53:12 +0000
@@ -2165,41 +2165,41 @@ ok("bbbbac" =~ m/$pattern/ && $1 eq 'a', "[perl #3547]");
   ok($x eq "b k", "Markus Kuhn 2003-02-26");
 
   ok("\x{2019}" =~ m/\S/, "Markus Kuhn 2003-02-26");
-}
+};
 
-{
+do {
     my $i;
     ok('-1-3-5-' eq join('', split m/((??{$i++}))/, '-1-3-5-'),
 	"[perl #21411] (??\{ .. \}) corrupts split's stack");
     ok('a|b|c' eq join ('|', split m/(?{'WOW'})/, 'abc'),
        "[perl #21411] (?\{ .. \}) version of the above");
-}
+};
 
-{
+do {
     # XXX DAPM 13-Apr-06. Recursive split is still broken. It's only luck it
     # hasn't been crashing. Disable this test until it is fixed properly.
     # XXX also check what it returns rather than just doing ok(1,...)
     # split /(?{ split "" })/, "abc";
     ok(1,'cache_re & "(?{": it dumps core in 5.6.1 & 5.8.0');
-}
+};
 
-{
+do {
     ok("\x{100}\n" =~ m/\x{100}\n$/, "UTF8 length cache and fbm_compile");  
-}
+};
 
-{
+do {
     $_ = "code:   'x' \{ '...' \}\n"; study;
 
     $_ = "code:   'x' \{ '...' \}\n"; study;
     my @x; push @x, $^MATCH while m/'[^\']*'/gxp;
     ok(join(":", @x) eq "'x':'...'",
        "[perl #17757] Parse::RecDescent triggers infinite loop");
-}
+};
 
-{
+do {
     my $re = qq/^([^X]*)X/;
     ok("\x{100}X" =~ m/$re/, "S_cl_and ANYOF_UNICODE & ANYOF_INVERTED");
-}
+};
 
 # bug #22354
 sub func ($) {
@@ -2235,7 +2235,7 @@ ok("  \x{10428}" =~ qr/\x{10400}/i,
 ok("  \x{1E01}x" =~ qr/\x{1E00}X/i,
    '<20030808193656.5109.1@llama.ni-s.u-net.com>');
 
-{
+do {
     # [perl #23769] Unicode regex broken on simple example
     # regrepeat() didn't handle UTF-8 EXACT case right.
 
@@ -2271,7 +2271,7 @@ ok("  \x{1E01}x" =~ qr/\x{1E00}X/i,
 
     ok("\x{c4}\x{c4}\x{c4}" !~ m/(\x{100}+)/, "[perl #23769] don't match first byte of utf8 representation");
     ok("\x{c4}\x{c4}\x{c4}" !~ m/(\x{100}+?)/, "[perl #23769] don't match first byte of utf8 representation");
-}
+};
 
 for (120 .. 130) {
     my $head = 'x' x $_;
@@ -2307,13 +2307,13 @@ ok(("abc" =~ m/^abc(\z)??/) && !defined($1),
 
 
 
-{ # TRIE related
+do { # TRIE related
     my @got= @(() );
     "words"=~m/(word|word|word)(?{push @got,$1})s$/;
-    ok((nelems @got)==1,"TRIE optimation is working") or warn "# {join ' ',@got}";
+    ok((nelems @got)==1,"TRIE optimation is working") or warn "# $(join ' ',@got)";
     @got= @(() );
     "words"=~m/(word|word|word)(?{push @got,$1})s$/i;
-    ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# {join ' ',@got}";
+    ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# $(join ' ',@got)";
 
     my @nums= map {int rand 1000} 1..100;
     my $re="(".(join "|", @nums).")";
@@ -2333,7 +2333,7 @@ ok(("abc" =~ m/^abc(\z)??/) && !defined($1),
         $ok=0 if --%count{$_}+<0;
     }
     ok($ok,"Trie min count matches");
-}
+};
 
 
 # TRIE related
@@ -2353,7 +2353,7 @@ ok(("foba  \x{10428}foo" =~ qr/(foo|\x{10400}foo|bar)/i) &&  $1 eq "\x{10428}foo
 ok(("foba  \x{1E01}xfoo" =~ qr/(foo|\x{1E00}Xfoo|bar)/i) &&  $1 eq "\x{1E01}xfoo",
    "TRIEF + LATIN SMALL/CAPITAL LETTER A WITH RING BELOW + 'X'");
 
-{# TRIE related
+do {# TRIE related
 
 use charnames ':full';
 
@@ -2376,12 +2376,12 @@ ok(("foba  ba$s" =~ qr/(foo|BaSS|bar)/i)
     &&  $1 eq "ba$s",
    "TRIEF + LATIN SMALL LETTER SHARP S =~ SS # TODO");
 
-ok(("foba  ba{$s}pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
-    &&  $1 eq "ba{$s}pxySS$s$s",
+ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
+    &&  $1 eq "ba$($s)pxySS$s$s",
    "COMMON PREFIX TRIEF + LATIN SMALL LETTER SHARP S # TODO");
 
    
-}
+};
 
 
 print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
@@ -2396,16 +2396,16 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
 
 # [perl #37038] Global regular matches generate invalid pointers
 
-{
+do {
     my $s = "abcd";
     $s =~ m/(..)(..)/g;
     $s = $1;
     $s = $2;
     ok($s eq 'cd',
        "# assigning to original string should not corrupt match vars");
-}
+};
 
-{
+do {
     package wooosh;
     sub gloople {
       "!";
@@ -2415,27 +2415,27 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     my $aeek = bless \%(), 'wooosh';
     try {$aeek->gloople() =~ m/(.)/g;}; die if $@;
     ok($@ eq "", "//g match against return value of sub") or print "# $@\n";
-}
+};
 
-{
+do {
     sub gloople {
       "!";
     }
     try {gloople() =~ m/(.)/g;}; die if $@;
     ok($@ eq "", "# 26410 didn't affect sub calls for some reason")
 	or print "# $@\n";
-}
+};
 
 # [perl #37836] Simple Regex causes SEGV when run on specific data
-{
+do {
     no warnings 'utf8';
     $_ = pack('U0C2', 0xa2, 0xf8); # ill-formed UTF-8
     my $ret = 0;
     try { $ret = s/[\0]+//g }; die if $@;
     ok($ret == 0, "ill-formed UTF-8 doesn't match NUL in class");
-}
+};
 
-{ # [perl #38293] chr(65535) should be allowed in regexes
+do { # [perl #38293] chr(65535) should be allowed in regexes
     no warnings 'utf8'; # to allow non-characters
     my($c, $r, $s);
 
@@ -2468,9 +2468,9 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     $s = "\x{ffff}!";
     $s =~ s/\B!//;
     ok($s eq "\x{ffff}", "U+FFFF, NBOUND");
-} # non-characters end
+}; # non-characters end
 
-{
+do {
     # https://rt.perl.org/rt3/Ticket/Display.html?id=39583
     
     # The printing characters
@@ -2494,9 +2494,9 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     ok($matched,'pattern matches');
     ok(length($str)==0,"Empty string");
     ok(defined($res) && length($res)==$size,"\$1 is correct size");
-}
+};
 
-{ # related to [perl #27940]
+do { # related to [perl #27940]
     ok("\0-A"  =~ m/\c@-A/, '@- should not be interpolated in a pattern');
     ok("\0\0A" =~ m/\c@+A/, '@+ should not be interpolated in a pattern');
     ok("X\@-A"  =~ m/X@-A/, '@- should not be interpolated in a pattern');
@@ -2513,9 +2513,9 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
     ok("X\@A" =~ m/X@(A)/, '@(');
     ok("X\@A" =~ m/X(@)A/, '@)');
     ok("X\@A" =~ m/X@|ZA/, '@|');
-}
+};
 
-{
+do {
     use lib 'lib';
     use Cname;
 
@@ -2528,14 +2528,14 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
         undef $@;
         eval 'BEGIN { use warnings; $^WARN_HOOK = sub { $warning = @_[0]->message }; }' . "\n"
           . $code; die if $@;
-        ok( $warning =~ m/$warn_pat/, "expected warning: {dump::view($warn_pat)}, got: {dump::view($warning)}" );
+        ok( $warning =~ m/$warn_pat/, "expected warning: $(dump::view($warn_pat)), got: $(dump::view($warning))" );
       };
     }
 
     ok('fooB'=~m/\N{foo}[\N{B}\N{b}]/,"Passthrough charname");
     my $handle=make_must_warn('Escape sequence did not correspond to one character');
     $handle->('q(xxWxx) =~ m/[\N{WARN}]/');
-    {
+    do {
         my $code;
         my $w="";
         local $^WARN_HOOK = sub { $w.=shift->message };
@@ -2553,7 +2553,7 @@ EOFTEST
             "Got expected zero length warning");
         warn $code;                    
         
-    }
+    };
     $handle= make_must_warn('Zero length escape sequence in character class replaced with');
     $handle->('qq(\0) =~ m/[\N{EMPTY-STR}XY]/');
     ok('AB'=~m/(\N{EVIL})/ && $1 eq 'A',"Charname caching $1");
@@ -2561,8 +2561,8 @@ EOFTEST
     ok('xy'=~m/x\N{EMPTY-STR}y/, 'Empty string charname produces NOTHING node');
     ok(''=~m/\N{EMPTY-STR}/, 'Empty string charname produces NOTHING node 2');
         
-}
-{
+};
+do {
     print "# MORE LATIN SMALL LETTER SHARP S\n";
 
     use charnames ':full';
@@ -2589,13 +2589,13 @@ EOFTEST
     ok("\N{SPACE}\N{U+0041}\N{SPACE}\N{U+0042} 3"=~
        m/[\N{SPACE}\N{U+0041}][\N{SPACE}\N{U+0042}]/,
         'Intermixed named and unicode escapes');     
-}
+};
 $brackets = qr{
 	         {  (?> [^{}]+ | (??{ $brackets }) )* }
 	      }x;
 ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch");
 
-SKIP:{
+SKIP:do {
     our @stack= @(() );
     my @expect=qw(
         stuff1
@@ -2619,7 +2619,7 @@ SKIP:{
             "Expecting '$expect' at stack pos #$idx");
     }
         
-}
+};
 
 # stress test CURLYX/WHILEM.
 #
@@ -2743,7 +2743,7 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     ok(eval("qq/$targ/ =~ m/$reg/"), "\\c\\ in pattern");
 }
 
-{   # Test the (*PRUNE) pattern
+do {   # Test the (*PRUNE) pattern
     our $count = 0;
     'aaab'=~m/a+b?(?{$count++})(*FAIL)/;
     is($count,9,"expect 9 for no (*PRUNE)");
@@ -2761,8 +2761,8 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     $count=0;
     1 while m/.(??{'(*PRUNE)'})(?{$count++})(*FAIL)/g;
     is($count,4,"/.(*PRUNE)/");
-}
-{   # Test the (*SKIP) pattern
+};
+do {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a+b?(*SKIP)(?{$count++})(*FAIL)/;
     is($count,1,"expect 1 with (*SKIP)");
@@ -2775,9 +2775,9 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     our @res= @(() );
     1 while m/(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,2,"Expect 2 with (*SKIP)" );
-    is("{join ' ',@res}","aaab aaab","adjacent (*SKIP) works as expected" );
-}
-{   # Test the (*SKIP) pattern
+    is("$(join ' ',@res)","aaab aaab","adjacent (*SKIP) works as expected" );
+};
+do {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a+b?(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/;
     is($count,1,"expect 1 with (*SKIP)");
@@ -2790,9 +2790,9 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     our @res= @(() );
     1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,2,"Expect 2 with (*SKIP)" );
-    is("{join ' ',@res}","aaab aaab","adjacent (*SKIP) works as expected" );
-}
-{   # Test the (*SKIP) pattern
+    is("$(join ' ',@res)","aaab aaab","adjacent (*SKIP) works as expected" );
+};
+do {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a*(*MARK:a)b?(*MARK:b)(*SKIP:a)(?{$count++})(*FAIL)/;
     is($count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)");
@@ -2801,9 +2801,9 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     our @res= @(() );
     1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" );
-    is("{join ' ',@res}","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" );
-}
-{   # Test the (*COMMIT) pattern
+    is("$(join ' ',@res)","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" );
+};
+do {   # Test the (*COMMIT) pattern
     our $count = 0;
     'aaabaaab'=~m/a+b?(*COMMIT)(?{$count++})(*FAIL)/;
     is($count,1,"expect 1 with (*COMMIT)");
@@ -2816,9 +2816,9 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     our @res= @(() );
     1 while m/(a+b?)(*COMMIT)(?{$count++; push @res,$1})(*FAIL)/g;
     is($count,1,"Expect 1 with (*COMMIT)" );
-    is("{join ' ',@res}","aaab","adjacent (*COMMIT) works as expected" );
-}
-{
+    is("$(join ' ',@res)","aaab","adjacent (*COMMIT) works as expected" );
+};
+do {
     # Test named commits and the $REGERROR var
     our $REGERROR;
     for my $name (@('',':foo')) 
@@ -2839,8 +2839,8 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
             }
         }
     }      
-}    
-{
+};    
+do {
     # Test named commits and the $REGERROR var
     package Fnorble;
     our $REGERROR;
@@ -2862,8 +2862,8 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
             }
         }
     }      
-}    
-{
+};    
+do {
     # Test named commits and the $REGERROR var
     local $Message = "\$REGERROR";
     our $REGERROR;
@@ -2872,22 +2872,22 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
         "aaaaa$word"=~m/a+(?:bar(*COMMIT:bar)|baz(*COMMIT:baz)|bop(*COMMIT:bop))(*FAIL)/;
         is($REGERROR,$word);
     }    
-}
-{   #Regression test for perlbug 40684
+};
+do {   #Regression test for perlbug 40684
     local $Message = "RT#40684 tests:";
     my $s = "abc\ndef";
     my $rex = qr'^abc$'m;
     ok($s =~ m/$rex/);
     ok($s =~ m/^abc$/m);
-}
-{
+};
+do {
     #Mindnumbingly simple test of (*THEN)
     for (@("ABC","BAX")) {
         ok(m/A (*THEN) X | B (*THEN) C/x,"Simple (*THEN) test");
     }
-}
+};
 
-{
+do {
     local $Message = "Relative Recursion";
     my $parens=qr/(\((?:[^()]++|(?-1))*+\))/;
     local $_='foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))';
@@ -2901,28 +2901,28 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     is($two, '(2*(3+4)-1*(2-3))');
     is($all, 'foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))');
     is($all, $_);
-}
-{
+};
+do {
     my $spaces="      ";
     local $_=join 'bar', @($spaces,$spaces);
     our $count=0;
     s/(?>\s+bar)(?{$count++})//g;
     is($_,$spaces,"SUSPEND final string");
     is($count,1,"Optimiser should have prevented more than one match");
-}
-{
+};
+do {
     local $Message = "RT#36909 test";
     $^R = 'Nothing';
-    {
+    do {
         local $^R = "Bad";
         ok('x foofoo y' =~ m{
          (foo) # $^R correctly set
         (?{ "last regexp code result" })
         }x);
         is($^R,'last regexp code result');
-    }
+    };
     is($^R,'Nothing');
-    {
+    do {
         local $^R = "Bad";
 
         ok('x foofoo y' =~ m{
@@ -2930,30 +2930,30 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
         (?{"last regexp code result"})
         }x);
         is($^R,'last regexp code result');
-    }
+    };
     is($^R,'Nothing');
 
-    {
+    do {
         local $^R = "Bad";
         ok('x foofoo y' =~ m{
          (foo|bar)\1+ # $^R undefined
         (?{"last regexp code result"})
         }x);
         is($^R,'last regexp code result');
-    }
+    };
     is($^R,'Nothing');
 
-    {
+    do {
         local $^R = "Bad";
         ok('x foofoo y' =~ m{
          (foo|bar)\1 # this time without the +
         (?{"last regexp code result"})
         }x);
         is($^R,'last regexp code result');
-    }
+    };
     is($^R,'Nothing');
-}
-{
+};
+do {
     local $Message="RT 22395";
     local $TODO = 'Should be L+1 not L*(L+3)/2 (L=$l)';
     our $count;
@@ -2962,8 +2962,8 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
 	('a' x $l) =~ m/(.*)(?{$count++})[bc]/;
 	is( $count, $l + 1);
     }
-}
-{
+};
+do {
     local $Message = "RT#18209";
     my $text = ' word1 word2 word3 word4 word5 word6 ';
 
@@ -2979,8 +2979,8 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     }
     is($count,3);
     is($text,' word2 word4 word6 ');
-}
-{
+};
+do {
     # RT#6893
     local $_= qq(A\nB\nC\n); 
     my @res;
@@ -2989,10 +2989,10 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
         push @res,"$2"; 
         last if (nelems @res)+>3;
     }
-    is("{join ' ',@res}","A B C","RT#6893: /g pattern shouldn't infinite loop");
-}
+    is("$(join ' ',@res)","A B C","RT#6893: /g pattern shouldn't infinite loop");
+};
 
-{
+do {
     # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
     my $dow_name= "nada";
     my $parser = "use utf8; (\$dow_name) = \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;";
@@ -3000,15 +3000,15 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     eval $parser; die if $@;
     ok(!$@,"Test Eval worked");
     is($dow_name,$time_string,"UTF8 trie common prefix extraction");
-}
+};
 
-{
+do {
     my $v;
     ($v='bar')=~m/(\w+)/g;
     $v='foo';
     is("$1",'bar','$1 is safe after /g - may fail due to specialized config in pp_hot.c')
-}
-{
+};
+do {
     local $Message = "http://nntp.perl.org/group/perl.perl5.porters/118663";
     my $qr_barR1 = qr/(bar)\g-1/;
     ok("foobarbarxyz" =~ $qr_barR1);
@@ -3017,8 +3017,8 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     ok("foobarbarxyz" =~ qr/(foo)(bar)\g{-1}xyz/);
     ok("foobarbarxyz" =~ qr/(foo$qr_barR1)xyz/);
     ok("foobarbarxyz" =~ qr/(foo(bar)\g{-1})xyz/);
-} 
-{
+}; 
+do {
     local $Message = "RT#41010";
     my @tails=@('','(?(1))','(|)','()?');    
     my @quants=@('*','+');
@@ -3050,20 +3050,20 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     my @dstrs=@('12345');
     $doit->(\@spats,< @sstrs);
     $doit->(\@dpats,< @dstrs);
-}
+};
 
-{
+do {
     local $Message = "\$REGMARK";
     our ($REGMARK, $REGERROR);
     our @r= @(() );
     ok('foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x);
-    is("{join ' ',@r}","foo");           
+    is("$(join ' ',@r)","foo");           
     is($REGMARK,"foo");
     ok('foofoo' !~ m/foo (*MARK:foo) (*FAIL) /x);
     ok(!$REGMARK);
     is($REGERROR,'foo');
-}
-{
+};
+do {
     my $x;
     $x = "abc.def.ghi.jkl";
     $x =~ s/.*\K\..*//;
@@ -3076,13 +3076,13 @@ for my $c (@("z", "\0", "!", chr(254), chr(256))) {
     $x = "abcde";
     $x =~ s/(.)\K/$1/g;
     ok($x eq "aabbccddee");
-}
+};
 sub kt
 {
     return '4' if @_[0] eq '09028623';
 }
 
-{
+do {
     use bytes;
 
     # ANYOF tests
@@ -3102,9 +3102,9 @@ sub kt
         ok("xxxx$_" =~ m/^.*$m$/) for  @$s;
         ok("xxxx$_" !~ m/^.*$m$/) for  @$f;
     }
-}
+};
 
-{   # Nested EVAL using PL_curpm (via $1 or friends)
+do {   # Nested EVAL using PL_curpm (via $1 or friends)
     my $re;
     our $grabit = qr/ ([0-6][0-9]{7}) (??{ kt $1 }) [890] /x;
     $re = qr/^ ( (??{ $grabit }) ) $ /x;
@@ -3115,9 +3115,9 @@ sub kt
     our $qr = qr/ (o) (??{ $1 }) /x;
     ok( 'boob'=~m/( b (??{ $qr }) b )/x && 1,
         "PL_curpm, nested eval");
-}
+};
 
-{
+do {
     use charnames ":full";
     ok("\N{ROMAN NUMERAL ONE}" =~ m/\p{Alphabetic}/, "I =~ Alphabetic");
     ok("\N{ROMAN NUMERAL ONE}" =~ m/\p{Uppercase}/,  "I =~ Uppercase");
@@ -3129,48 +3129,48 @@ sub kt
     ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{Lowercase}/,  "i =~ Lowercase");
     ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{IDStart}/,    "i =~ ID_Start");
     ok("\N{SMALL ROMAN NUMERAL ONE}" =~ m/\p{IDContinue}/, "i =~ ID_Continue");
-}
+};
 
-{
+do {
 # requirement of Unicode Technical Standard #18, 1.7 Code Points
 # cf. http://www.unicode.org/reports/tr18/#Supplementary_Characters
     for my $u (@(0x7FF, 0x800, 0xFFFF, 0x10000)) {
         no warnings 'utf8'; # oops
         my $c = chr $u;
         my $x = sprintf '%04X', $u;
-        ok( "A{$c}B" =~ m/A[\0-\x{10000}]B/, "unicode range - $x");
+        ok( "A$($c)B" =~ m/A[\0-\x{10000}]B/, "unicode range - $x");
     }
-}
+};
 
-{
+do {
     use warnings;
     local $Message = "ASCII pattern that really is utf8";
     my @w;
-    local $^WARN_HOOK=sub{push @w,"{join ' ',@_}"};
+    local $^WARN_HOOK=sub{push @w,"$(join ' ',@_)"};
     my $c=qq(\x{DF}); 
     ok($c=~m/$c|\x{100}/);
     ok((nelems @w)==0);
-}    
-{
+};    
+do {
     local $Message = "corruption of match results of qr// across scopes";
     my $qr=qr/(fo+)(ba+r)/;
     'foobar'=~m/$qr/;
     is("$1$2","foobar");
-    {
+    do {
         'foooooobaaaaar'=~m/$qr/;
         is("$1$2",'foooooobaaaaar');    
-    }
+    };
     is("$1$2","foobar");
-}
-{
+};
+do {
     local $Message = "HORIZWS";
     local $_="\t \r\n \n \t".chr(11)."\n";
     s/\H/H/g;
     s/\h/h/g;
     is($_,"\t \r\n \n \t".chr(11)."\n");
     $_="\t \r\n \n \t".chr(11)."\n";
-}
-{
+};
+do {
     local $Message = "Various whitespace special patterns";
     my @lb=@( "\x{0D}\x{0A}",
              < map { chr( $_ ) } @( ( < 0x0A..0x0D,0x85,0x2028,0x2029 )));
@@ -3183,8 +3183,8 @@ sub kt
             }
         }
     }
-}
-{
+};
+do {
     local $Message = "Check that \\xDF match properly in its various forms";
     # test that \xDF matches properly. this is pretty hacky stuff,
     # but its actually needed. the malarky with '-' is to prevent
@@ -3205,8 +3205,8 @@ sub kt
                "\"$sstr\"=~m/\\x\{DF\}/i # TODO multi-char folding");
         }
     }
-}
-{
+};
+do {
     use bytes;
     local $Message = "BBC(Bleadperl Breaks CPAN) Today: String::Multibyte";
     my $re  = qr/(?:[\x[00]-\x[FF]]{4})/;
@@ -3218,10 +3218,10 @@ sub kt
 
     is(0+nelems @a,3);
     is(join('=', @a),"$esc$hyp=$hyp=$esc$esc");
-}
+};
 
 # length() on captures, the numbered ones end up in Perl_magic_len
-{
+do {
     my $_ = "aoeu \x{e6}var ook";
     m/^ \w+ \s (?<eek>\S+)/xp;
 
@@ -3229,20 +3229,20 @@ sub kt
     is( length($^POSTMATCH), 4, q[length $'] );
     is( length($^MATCH), 9, 'length $&' );
     is( length($1), 4, 'length $1' );
-}
+};
 
-{
+do {
     local $_;
     ($_ = 'abc')=~m/(abc)/g;
     $_ = '123'; 
     is("$1",'abc',"/g leads to unsafe match vars: $1");
-}
-{
+};
+do {
     local $Message='Message-ID: <20070818091501.7eff4831@r2d2>';
     my $str= "";
     for(0..5){
         my @x;
-        $str .= "{join ' ',@x}"; # this should ALWAYS be the empty string
+        $str .= "$(join ' ',@x)"; # this should ALWAYS be the empty string
         'a'=~m/(a|)/;
         push @x,1;
     }
@@ -3251,18 +3251,18 @@ sub kt
     my @foo = @( ('a')x5 );
     for ( @foo) {
         my @bar;
-        $str .= "{join ' ',@bar}";
+        $str .= "$(join ' ',@bar)";
         s/a|/{push @bar, 1}/;
     }
     is(length($str),"0","Trie scope error, string should be empty");
-}
+};
 
-{
+do {
     my $a = 3; "" =~ m/(??{ $a })/;
     my $b = $a;
     is($b, $a, "copy of scalar used for postponed subexpression");
-}
-{
+};
+do {
      local $Message = "\$REGMARK in replacement -- Bug #49190";
      our $REGMARK;
      my $_ = "A";
@@ -3271,7 +3271,7 @@ sub kt
      $_ = "CCCCBAA";
      s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g;
      is $_, "ZYX";
-}
+};
 
 
 
@@ -3289,7 +3289,7 @@ ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/,
 eval_dies_like( 'm/\k/',
                 qr/\QSequence \k... not terminated in regex;\E/);
 
-{
+do {
     use bytes;
     local $Message = "substitution with lookahead (possible segv)";
     $_="ns1ns1ns1";
@@ -3301,16 +3301,16 @@ eval_dies_like( 'm/\k/',
     $_="123";
     s/(?=\d+)|(?<=\d)/!Bang!/g;
     is($_,"!Bang!1!Bang!2!Bang!3!Bang!");
-}
+};
 
 # [perl #45337] utf8 + "[a]a{2}" + /$.../ = panic: sv_len_utf8 cache
 
-{
+do {
     local $^UTF8CACHE = -1;
     use utf8;
     my $s="[a]a\{2\}";
     ok("aaa" =~ m/$s/, "#45337");
-}
+};
 
 } # end of sub pat_tests
 

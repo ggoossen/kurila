@@ -306,8 +306,8 @@ sub array_ref_plus (\@@) {
 }
 
 @array = @('a');
-{ my @more = @('x');
-  array_ref_plus @array, < @more; }
+do { my @more = @('x');
+  array_ref_plus @array, < @more; };
 print "not " unless (nelems @array) == 4;
 print < @array;
 
@@ -437,12 +437,12 @@ sub sreftest (\$$) {
     print "not " unless ref @_[0];
     print "ok @_[1] - sreftest\n";
 }
-{
+do {
     our (%helem, @aelem);
     sreftest my $sref, $i++;
     sreftest(%helem{$i}, $i++);
     sreftest @aelem[0], $i++;
-}
+};
 
 # test prototypes when they are evaled and there is a syntax error
 # Byacc generates the string "syntax error".  Bison gives the
@@ -464,7 +464,7 @@ print "ok ", $i++, "\n";
 print "not " unless prototype "CORE::recv" eq '*\$$$';
 print "ok ", $i++, "\n";
 
-{
+do {
     my $myvar;
     my @myarray;
     my %myhash;
@@ -494,10 +494,10 @@ print "ok ", $i++, "\n";
 	unless $@->message =~ m/Type of arg 1 to main::multi5 must be one of \[\$\@\] /
 	    && $@->message =~ m/Not enough arguments/;
     print "ok ", $i++, "\n";
-}
+};
 
 # check that obviously bad prototypes are getting warnings
-{
+do {
   use warnings 'syntax';
   my $warn = "";
   local $^WARN_HOOK = sub { $warn .= @_[0]->{description} . "\n" };
@@ -517,7 +517,7 @@ print "ok ", $i++, "\n";
   eval 'sub badproto4 (@ $b ar) { 1; }';
   print "not " unless $warn =~ m/Illegal character in prototype for main::badproto4 : \@\$bar/;
   print "ok ", $i++, "\n";
-}
+};
 
 # make sure whitespace in prototypes works
 eval "sub good (\$\t\$\n\$) \{ 1; \}";

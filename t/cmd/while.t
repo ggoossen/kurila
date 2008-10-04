@@ -63,9 +63,9 @@ unlink 'Cmd_while.tmp' || `/bin/rm Cmd_While.tmp`;
 #if ($x < 10) {print "ok 10\n";} else {print "not ok 10\n";}
 
 my $i = 9;
-{
+do {
     $i++;
-}
+};
 print "ok $i\n";
 
 # Check curpm is reset when jumping out of a scope
@@ -75,20 +75,20 @@ while (1) {
   $i++;
   print "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
   print "ok $i\n";
-  {                             # Localize changes to $` and friends
+  do {                             # Localize changes to $` and friends
     'end' =~ m/end/p;
     redo WHILE if $i == 11;
     next WHILE if $i == 12;
     # 13 do a normal loop
     last WHILE if $i == 14;
-  }
+  };
 }
 $i++;
 print "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
 print "ok $i\n";
 
 # check that scope cleanup happens right when there's a continue block
-{
+do {
     my $var = 16;
     while (my $i = ++$var) {
 	next if $i == 17;
@@ -98,10 +98,10 @@ print "ok $i\n";
     continue {
         print "ok ", $var-1, "\nok $i\n";
     }
-}
+};
 
 our $l;
-{
+do {
     local $l = 18;
     {
         local $l = 0
@@ -109,9 +109,9 @@ our $l;
     continue {
         print "ok $l\n"
     }
-}
+};
 
-{
+do {
     local $l = 19;
     my $x = 0;
     while (!$x++) {
@@ -120,10 +120,10 @@ our $l;
     continue {
         print "ok $l\n"
     }
-}
+};
 
 $i = 20;
-{
+do {
     while (1) {
 	my $x;
 	print $x if defined $x;
@@ -137,4 +137,4 @@ $i = 20;
     continue {
         print "ok $i\n"; ++$i;
     }
-}
+};

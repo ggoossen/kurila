@@ -60,5 +60,5 @@ foreach my $pl (qw (keywords.pl opcode.pl embed.pl
 	     !defined(%cksum1{$f}) ||
 	     %cksum0{$f} ne %cksum1{$f};
   }
-  print "Changed: {join ' ',@chg}\n" if (nelems @chg);
+  print "Changed: $(join ' ',@chg)\n" if (nelems @chg);
 }

@@ -51,7 +51,7 @@ for my $newlex (@('', '-newlex')) {
 
     print $out if $verbose;
 
-SKIP: {
+SKIP: do {
     skip "no perlio in this build", 5
     unless %Config::Config{useperlio};
 
@@ -86,7 +86,7 @@ SKIP: {
     my $asub = sub {
 	my ($self,< %props)=< @_;
 	my $total;
-	{ # inner block vars
+	do { # inner block vars
 	    my (@fib)=@(1,2);
 	    for my $i (2..9) {
 		@fib[$i] = @fib[$i-2] + @fib[$i-1];
@@ -94,7 +94,7 @@ SKIP: {
 	    for my $i(0..10) {
 		$total += $i;
 	    }
-	}
+	};
     };
     $walker = B::Showlex::compile($asub, $newlex, -nosp);
     $walker->();
@@ -103,5 +103,5 @@ SKIP: {
     $walker = B::Concise::compile($asub, '-exec');
     $walker->();
 
-}
+};
 }

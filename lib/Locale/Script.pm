@@ -155,7 +155,7 @@ sub all_script_names
 # initialisation code - stuff the DATA into the ALPHA2 hash
 #
 #=======================================================================
-{
+do {
     my   ($alpha2, $alpha3, $numeric);
     my    $script;
     local $_;
@@ -185,7 +185,7 @@ sub all_script_names
     }
 
     close(DATA);
-}
+};
 
 1;
 

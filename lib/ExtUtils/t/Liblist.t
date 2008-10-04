@@ -11,7 +11,7 @@ BEGIN {
 ok( defined &ExtUtils::Liblist::ext, 
     'ExtUtils::Liblist::ext() defined for backwards compat' );
 
-{
+do {
     my @warn;
     local $^WARN_HOOK = sub {push @warn, \@(@_[0]->{description})};
 
@@ -22,4 +22,4 @@ ok( defined &ExtUtils::Liblist::ext,
     ok( (nelems @warn), 'had warning');
 
     is( nelems(grep(m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, map { < @$_ } @warn)), 1 ) || diag join "\n", < @warn;
-}
+};

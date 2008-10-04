@@ -99,7 +99,7 @@ while ( ~< *PW) {
     if ((nelems @s)) {
 	push @{ %seen{$name_s} }, iohandle::input_line_number(\*PW);
     } else {
-	warn "# Your $where line {iohandle::input_line_number(\*PW)} is empty.\n";
+	warn "# Your $where line $(iohandle::input_line_number(\*PW)) is empty.\n";
 	next;
     }
     if ($n == $max) {
@@ -184,7 +184,7 @@ for (1..$max) {
 }
 endpwent();
 
-print "not " unless "{join ' ',@pw1}" eq "{join ' ',@pw2}";
+print "not " unless "$(join ' ',@pw1)" eq "$(join ' ',@pw2)";
 print "ok ", $tst++, "\n";
 
 close(PW);

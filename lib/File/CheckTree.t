@@ -29,7 +29,7 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 #### TEST 1 -- No warnings ####
 # usings both relative and full paths, indented comments
 
-{
+do {
     my ($num_warnings, $path_to_README);
     $path_to_README = File::Spec->rel2abs('README');
 
@@ -55,12 +55,12 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     else {
         ok(0);
     }
-}
+};
 
 
 #### TEST 2 -- One warning ####
 
-{
+do {
     my ($num_warnings, @warnings);
 
     local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
@@ -82,14 +82,14 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     else {
         ok(0);
     }
-}
+};
 
 
 #### TEST 3 -- Multiple warnings ####
 # including first warning only from a bundle of tests,
 # generic "|| warn", default "|| warn" and "|| warn '...' "
 
-{
+do {
     my ($num_warnings, @warnings);
 
     local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
@@ -115,12 +115,12 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     else {
         ok(0);
     }
-}
+};
 
 
 #### TEST 4 -- cd directive ####
 # cd directive followed by relative paths, followed by full paths
-{
+do {
     my ($num_warnings, @warnings, $path_to_libFile, $path_to_dist);
     $path_to_libFile = File::Spec->rel2abs(File::Spec->catdir('lib','File'));
     $path_to_dist    = File::Spec->rel2abs(File::Spec->curdir);
@@ -151,12 +151,12 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     else {
         ok(0);
     }
-}
+};
 
 
 #### TEST 5 -- Exception ####
 # test with generic "|| die"
-{
+do {
     my $num_warnings;
 
     try {
@@ -174,12 +174,12 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     else {
         ok(0, "$@");
     }
-}
+};
 
 
 #### TEST 6 -- Exception ####
 # test with "|| die 'my error message'"
-{
+do {
     my $num_warnings;
 
     try {
@@ -197,10 +197,10 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
     else {
         ok(0);
     }
-}
+};
 
 #### TEST 7 -- Quoted file names ####
-{
+do {
     my $num_warnings;
     try {
         $num_warnings = validate q{
@@ -216,10 +216,10 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
         ok(0);
 	print STDERR $@;
     };
-}
+};
 
 #### TEST 8 -- Malformed query ####
-{
+do {
     my $num_warnings;
     try {
         $num_warnings = validate q{
@@ -229,4 +229,4 @@ chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
 
     # We got a syntax error for a malformed file query
     like ( $@->message, qr/syntax error/);
-}
+};

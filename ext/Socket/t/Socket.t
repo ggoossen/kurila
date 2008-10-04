@@ -32,7 +32,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
   my $localhost = inet_aton($host);
 
   SKIP:
-  {
+  do {
       if ( not ($has_echo && defined $localhost && connect(T,pack_sockaddr_in(7,$localhost)) ) ) {
 
           print "# You're allowed to fail tests 2 and 3 if\n";
@@ -66,7 +66,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 	    arm(0);
 	}
 	ok(($read == 0 || $buff eq "hello"));
-  }
+  };
 }
 else {
 	print "# Error: $!\n";
@@ -79,7 +79,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
     arm(5);
   
   SKIP:
-    {
+    do {
         if ( not ($has_echo && connect(S,pack_sockaddr_in(7,INADDR_LOOPBACK)) ) ){
             print "# You're allowed to fail tests 5 and 6 if\n";
             print "# the echo service has been disabled.\n";
@@ -110,7 +110,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 	    arm(0);
 	}
 	ok(($read == 0 || $buff eq "olleh"));
-    }
+    };
 }
 else {
 	print "# Error: $!\n";
@@ -126,11 +126,11 @@ is(inet_ntoa("\x{a}\x{14}\x{1e}\x{28}"), "10.20.30.40");
 # Thest that whatever we give into pack/unpack_sockaddr retains
 # the value thru the entire chain.
 is(inet_ntoa(unpack_sockaddr_in( pack_sockaddr_in(100, inet_aton("10.250.230.10")))[1]), '10.250.230.10');
-{
+do {
     my ($port,$addr) = < unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
     is($port, 100);
     is(inet_ntoa($addr), "10.10.10.10");
-}
+};
 
 dies_like( sub { inet_ntoa("\x{a}\x{14}\x{1e}\x{190}") },
            qr/^Bad arg length for Socket::inet_ntoa, length is 5, should be 4/ );

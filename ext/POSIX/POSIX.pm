@@ -314,7 +314,7 @@ sub gets {
 }
 
 sub perror {
-    print STDERR "{join ' ',@_}: " if (nelems @_);
+    print STDERR "$(join ' ',@_): " if (nelems @_);
     print STDERR $!,"\n";
 }
 
@@ -879,14 +879,14 @@ sub load_imports {
 );
 
 # Exporter::export_tags();
-{
+do {
   # De-duplicate the export list: 
   my %export;
  <  %export{[ map {< @$_} values %EXPORT_TAGS]} = ();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
   push @EXPORT, < keys %export;
-}
+};
 
 @EXPORT_OK = qw(
 		abs

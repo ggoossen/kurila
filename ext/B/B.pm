@@ -59,10 +59,10 @@ use strict;
 @B::specialsv_name = qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
 			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD);
 
-{
+do {
     # Stop "-w" from complaining about the lack of a real B::OBJECT class
     package B::OBJECT;
-}
+};
 
 sub B::GV::SAFENAME {
   my $name = (shift())->NAME;
@@ -242,7 +242,7 @@ sub walksymtable {
     }
 }
 
-{
+do {
     package B::Section;
     my $output_fh;
     my %sections;
@@ -306,7 +306,7 @@ sub walksymtable {
 	    }
 	}
     }
-}
+};
 
 require B::OP;
 

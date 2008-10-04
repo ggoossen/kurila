@@ -253,7 +253,7 @@ sub move {
 
     ($tosz1,$tomt1) = < @(stat($to))[[@:7,9]];  # just in case rename did something
 
-    {
+    do {
         local $@;
         try {
             copy($from,$to) or die;
@@ -262,7 +262,7 @@ sub move {
             unlink($from)   or die;
         };
         return 1 unless $@;
-    }
+    };
     ($sts,$ossts) = ($! + 0, $^E + 0);
 
     ($tosz2,$tomt2) = (< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;

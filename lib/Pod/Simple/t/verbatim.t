@@ -48,7 +48,7 @@ ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n quux\n"),
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-{
+do {
 my $it =
 qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim><head1>Foo</head1><Verbatim\nxml:space="preserve"> quux\nquum</Verbatim></Document>}
 ;
@@ -86,7 +86,7 @@ ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n=cut\n\nsom
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-}
+};
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

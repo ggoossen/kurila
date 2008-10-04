@@ -53,7 +53,7 @@ is(qq{ \{ 1 \} }, ' { 1 } ', " curly braces inside curly braces");
 
 is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
 
-{
+do {
     local $^WARN_HOOK = sub { };
     is (eval '"\x53"', chr 83);
     is (eval '"\x4EE"', chr (78) . 'E');
@@ -62,9 +62,9 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
     is (eval '"\xx"', chr (0) . 'x');	# This will warn
     is (eval '"\xx9"', chr (0) . 'x9');	# This will warn. \x9 is tab in EBCDIC too?
     is (eval '"\x9_E"', chr (9) . '_E');	# This will warn
-}
+};
 
-{
+do {
   require utf8;
   is ("\x{0065}", utf8::chr(101));
   is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
@@ -76,10 +76,10 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
   use charnames ':full';
   is ("\N{LATIN SMALL LETTER A}", "a");
   is ("\N{NEL}", utf8::chr(0x85));
-}
+};
 
 # variable interpolation
-{
+do {
   our ($a, $b, $c, $dx) = < qw(foo bar);
 
   is("$a", "foo",    "verifying assign");
@@ -92,36 +92,36 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
   my @x = qw|aap noot|;
   my $dx = \ @x;
 
-  is("{join ' ',@x}", "aap noot");
-  is("{join ' ',@$dx}", "aap noot");
+  is("$(join ' ',@x)", "aap noot");
+  is("$(join ' ',@$dx)", "aap noot");
 
   # Okay, so that wasn't very challenging.  Let's go Unicode.
 
-  {
+  do {
     use utf8;
     # bug id 20000819.004 
 
     $_ = $dx = "\x{10f2}";
     s/($dx)/$dx$1/;
-    {
+    do {
         is($_,  "$dx$dx","bug id 20000819.004, back");
-    }
+    };
 
     $_ = $dx = "\x{10f2}";
     s/($dx)/$1$dx/;
-    {
+    do {
         is($_,  "$dx$dx","bug id 20000819.004, front");
-    }
+    };
 
     $dx = "\x{10f2}";
     $_  = "\x{10f2}\x{10f2}";
     s/($dx)($dx)/$1$2/;
-    {
+    do {
         is($_,  "$dx$dx","bug id 20000819.004, front and back");
-    }
-  }
+    };
+  };
 
-  {
+  do {
     # bug id 20000901.092
     # test that undef left and right of utf8 results in a valid string
 
@@ -132,7 +132,7 @@ is (eval "qq\x{263A}foo\x{263A}", 'foo', "Unicode delimeters");
     is($a,  "\x{1ff}", "bug id 20000901.092, undef left");
     $a .= undef;
     is($a,  "\x{1ff}", "bug id 20000901.092, undef right");
-  }
+  };
 
-}
+};
   

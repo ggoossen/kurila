@@ -88,7 +88,7 @@ open(F, ">&", \*DUPOUT) or die "Cannot dup stdout back: $!";
 
 curr_test(13);
 
-SKIP: {
+SKIP: do {
     skip("need perlio", 14) unless %Config{useperlio};
     
     ok(open(F, ">&", 'STDOUT'));
@@ -124,11 +124,11 @@ SKIP: {
     close F; # flush second
 
     open(G, "<", "dup$$") or die;
-    {
+    do {
 	my $line;
 	$line = ~< *G; chomp $line; is($line, "ggg");
 	$line = ~< *G; chomp $line; is($line, "fff");
-    }
+    };
     close G;
 
     open UTFOUT, '>:utf8', "dup$$" or die $!;
@@ -142,13 +142,13 @@ SKIP: {
     close UTFOUT;
     close UTFDUP;
     open(UTFIN, "<:utf8", "dup$$") or die $!;
-    {
+    do {
 	my $line;
 	$line = ~< *UTFIN; is($line, $message);
 	$line = ~< *UTFIN; is($line, $message);
 	$line = ~< *UTFIN; is($line, $message);
-    }
+    };
     close UTFIN;
 
     END { 1 while unlink "dup$$" }
-}
+};

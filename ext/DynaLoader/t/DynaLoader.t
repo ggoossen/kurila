@@ -40,17 +40,17 @@ can_ok( 'DynaLoader' => 'dl_install_xsub'         ); # defined in XS section
 can_ok( 'DynaLoader' => 'dl_load_file'            ); # defined in XS section
 can_ok( 'DynaLoader' => 'dl_load_flags'           ); # defined in Perl section
 can_ok( 'DynaLoader' => 'dl_undef_symbols'        ); # defined in XS section
-SKIP: {
+SKIP: do {
     skip "unloading unsupported on $^O", 1 if ($^O eq 'VMS' || $^O eq 'darwin');
     can_ok( 'DynaLoader' => 'dl_unload_file'          ); # defined in XS section
-}
+};
 
-TODO: {
+TODO: do {
 local $TODO = "Test::More::can_ok() seems to have trouble dealing with AutoLoaded functions";
 can_ok( 'DynaLoader' => 'dl_expandspec'           ); # defined in AutoLoaded section
 can_ok( 'DynaLoader' => 'dl_findfile'             ); # defined in AutoLoaded section
 can_ok( 'DynaLoader' => 'dl_find_symbol_anywhere' ); # defined in AutoLoaded section
-}
+};
 
 
 # Check error messages
@@ -74,10 +74,10 @@ is( $@, '', "calling DynaLoader::dl_load_file() with undefined argument" );     
 my ($dlhandle, $dlerr);
 try { $dlhandle = DynaLoader::dl_load_file("egg_bacon_sausage_and_spam") };
 $dlerr = DynaLoader::dl_error();
-SKIP: {
+SKIP: do {
     skip "dl_load_file() does not attempt to load file on VMS (and thus does not fail) when \@dl_require_symbols is empty", 1 if $^O eq 'VMS';
     ok( !$dlhandle, "calling DynaLoader::dl_load_file() without an existing library should fail" );
-}
+};
 ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" );
 
 # Checking for any particular error messages or numeric codes
@@ -85,7 +85,7 @@ ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" );
 # dl_load_file() is not even guaranteed to set the $! or the $^E.
 
 # ... dl_findfile()
-SKIP: {
+SKIP: do {
     my @files = @( () );
     try { @files = DynaLoader::dl_findfile("c") };
     is( $@, '', "calling dl_findfile()" );
@@ -98,22 +98,22 @@ SKIP: {
     # looks pretty much Unix-like.
     skip "dl_findfile test not appropriate on $^O", 1
 	unless -d '/usr' && -f '/bin/ls';
-    cmp_ok( scalar nelems @files, '+>=', 1, "array should contain one result result or more: libc => ({join ' ',@files})" );
-}
+    cmp_ok( scalar nelems @files, '+>=', 1, "array should contain one result result or more: libc => ($(join ' ',@files))" );
+};
 
 # Now try to load well known XS modules
 my $extensions = %Config{'dynamic_ext'};
 $extensions =~ s|/|::|g;
 
 for my $module (sort keys %modules) {
-    SKIP: {
+    SKIP: do {
         if ($extensions !~ m/\b$module\b/) {
             delete(%modules{$module});
             skip "$module not available", 3;
         }
         eval "use $module";
         is( $@ && $@->message, '', "loading $module" );
-    }
+    };
 }
 
 # checking internal consistency
@@ -122,12 +122,12 @@ is( nelems @DynaLoader::dl_modules, nelems( keys %modules), "checking number of 
 
 my @loaded_modules = @DynaLoader::dl_modules;
 for my $libref (reverse @DynaLoader::dl_librefs) {
-  SKIP: {
+  SKIP: do {
     skip "unloading unsupported on $^O", 2 if ($^O eq 'VMS' || $^O eq 'darwin');
     my $module = pop @loaded_modules;
     my $r = try { DynaLoader::dl_unload_file($libref) };
     is( $@, '', "calling dl_unload_file() for $module" );
     is( $r,  1, " - unload was successful" );
-  }
+  };
 }
 

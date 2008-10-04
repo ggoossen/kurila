@@ -424,7 +424,7 @@ sub pod2html {
 
     # put a title in the HTML file if one wasn't specified
     if ($Title eq '') {
-	TITLE_SEARCH: {
+	TITLE_SEARCH: do {
  	    for my $i (0 .. nelems(@poddata) -1) {
 		if (@poddata[$i] =~ m/^=head1\s*NAME\b/m) {
  		    for my $para ( @poddata[[@($i, $i+1)]] ) {
@@ -434,7 +434,7 @@ sub pod2html {
 		}
 
 	    }
-	}
+	};
     }
     if (!$Title and $Podfile =~ m/\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
@@ -629,7 +629,7 @@ END_OF_TAIL
 
 sub usage {
     my $podfile = shift;
-    warn "$0: $podfile: {join ' ',@_}\n" if (nelems @_);
+    warn "$0: $podfile: $(join ' ',@_)\n" if (nelems @_);
     die <<END_OF_USAGE;
 Usage:  $0 --help --htmlroot=<name> --infile=<name> --outfile=<name>
            --podpath=<name>:...:<name> --podroot=<name>
@@ -1387,7 +1387,7 @@ sub process_pre {
     my $ltrs = '\w';
     my $gunk = '/#~:.?+=&%@!\-';
     my $punc = '.:!?\-;';
-    my $any  = "{$ltrs}{$gunk}{$punc}";
+    my $any  = "$($ltrs)$($gunk)$($punc)";
 
     $rest =~ s{
 	\b			# start at word boundary
@@ -1647,7 +1647,7 @@ sub process_text1($$;$$){
         # failing this, we try to find the next best thing...
         my( $url, $ltext, $fid );
 
-        RESOLVE: {
+        RESOLVE: do {
             if( defined $ident ){
                 ## try to resolve $ident as an item
 	        ( $url, $fid ) = < coderef( $page, $ident );
@@ -1696,7 +1696,7 @@ sub process_text1($$;$$){
             # warning; show some text.
             $linktext = $opar unless defined $linktext;
             warn "$0: $Podfile: cannot resolve L<$opar> in paragraph $Paragraph.\n" unless $Quiet;
-        }
+        };
 
         # now we have a URL or just plain code
         $$rstr = $linktext . '>' . $$rstr;
@@ -2127,7 +2127,7 @@ sub depod1($;$$){
   return $res;
 }
 
-{
+do {
     my %seen;   # static fragment record hash
 
 sub fragment_id_readable {
@@ -2162,7 +2162,7 @@ sub fragment_id_readable {
     }
 
     $text;
-}}
+}};
 
 my @HC;
 sub fragment_id_obfuscated {  # This was the old "_2d_2d__"

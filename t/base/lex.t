@@ -93,17 +93,17 @@ E2
 }
 E1
 
-{
+do {
     $foo = 'FOO';
     $bar = 'BAR';
     %foo{$bar} = 'BAZ';
     @ary[0] = 'ABC';
-}
+};
 
 print "%foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
 
-print "{$foo}\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
-print "{%foo{$bar}}" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
+print "$($foo)\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
+print "$(%foo{$bar})" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
@@ -127,7 +127,7 @@ print $foo;
 # Tests for new extended control-character variables
 # MJD 19990227
 
-{ no strict 'refs';
+do { no strict 'refs';
   my $CX = "^X";
   my $CXY  ="^RE_TRIE_MAXBUF";
   ${*{Symbol::fetch_glob($CX)}} = 17;
@@ -187,7 +187,7 @@ print $foo;
   print "ok 41\n";
 
   
-}
+};
 
 # see if eval '', s///e, and heredocs mix
 
@@ -200,7 +200,7 @@ sub T {
 
 my $test = 42;
 
-{
+do {
 # line 42 "plink"
     local $_ = "not ok ";
     eval q{
@@ -215,14 +215,14 @@ EOT
     print "not ok $test # TODO heredoc inside quoted construct\n" if $@; $test++;
     T '^main:plink:53$', $test++;
     print "ok 44\nok 45\nok 46\n";
-}
+};
 #line 218 "lex.t"
 
 # tests 47--51 start here
 # tests for new array interpolation semantics:
 # arrays now *always* interpolate into "..." strings.
 # 20000522 MJD (mjd@plover.com)
-{
+do {
   my $test = 47;
   our (@nosuch, @a, @example);
   eval(q(">{join ' ', < @nosuch}<" eq "><")) || print "# $@", "not ";
@@ -232,7 +232,7 @@ EOT
   # Let's make sure that normal array interpolation still works right
   # For some reason, this appears not to be tested anywhere else.
   my @a = @(1,2,3);
-  print +((">{join ' ',@a}<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
+  print +((">$(join ' ',@a)<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
   ++$test;
 
   # Ditto.
@@ -251,7 +251,7 @@ EOT
     || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
-}
+};
 
 # Tests 52-54
 # => should only quote foo::bar if it isn't a real sub. AMS, 20010621

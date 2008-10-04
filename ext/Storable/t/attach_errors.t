@@ -29,7 +29,7 @@ use Storable ();
 
 
 # Good Case - should not die
-{
+do {
 	my $goodfreeze = bless \%(), 'My::GoodFreeze';
 	my $frozen = undef;
 	try {
@@ -51,12 +51,12 @@ use Storable ();
 		my ($class, $clone, $string) = < @_;
 		return bless \%( ), 'My::GoodFreeze';
 	}
-}
+};
 
 
 
 # Error Case - should die on freeze
-{
+do {
 	my $badfreeze = bless \%(), 'My::BadFreeze';
 	try {
 		Storable::freeze( $badfreeze );
@@ -78,7 +78,7 @@ use Storable ();
 		my ($class, $clone, $string) = < @_;
 		return bless \%( ), 'My::BadFreeze';
 	}
-}
+};
 
 
 
@@ -93,7 +93,7 @@ use Storable ();
 
 
 # Good Case - should not die
-{
+do {
 	my $goodthaw = bless \%(), 'My::GoodThaw';
 	my $frozen = undef;
 	try {
@@ -118,12 +118,12 @@ use Storable ();
 		my ($class, $clone, $string) = < @_;
 		return bless \%( 'foo' => 'bar' ), 'My::GoodThaw';
 	}
-}
+};
 
 
 
 # Bad Case - should die on thaw
-{
+do {
 	# Create the frozen string normally
 	my $badthaw = bless \%( ), 'My::BadThaw';
 	my $frozen = undef;
@@ -161,7 +161,7 @@ use Storable ();
 		my ($class, $clone, $string) = < @_;
 		return bless \%( 'foo' => 'bar' ), 'My::BadThaw';
 	}
-}
+};
 
 
 
@@ -174,7 +174,7 @@ use Storable ();
 
 
 # Good Case - should not die
-{
+do {
 	my $goodattach = bless \%( ), 'My::GoodAttach';
 	my $frozen = Storable::freeze( $goodattach );
 	ok( $frozen, 'My::GoodAttach return as expected' );
@@ -203,12 +203,12 @@ use Storable ();
 	BEGIN {
 		our @ISA = @( 'My::GoodAttach' );
 	}
-}
+};
 
 
 
 # Bad Cases - die on thaw
-{
+do {
 	my $returnvalue = undef;
 
 	# Create and freeze the object
@@ -252,4 +252,4 @@ use Storable ();
 
 		return $returnvalue;
 	}
-}
+};

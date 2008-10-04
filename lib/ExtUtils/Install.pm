@@ -115,12 +115,12 @@ sub _estr(@) {
     return join "\n", @('!' x 72,< @_,'!' x 72,'');
 }
 
-{my %warned;
+do {my %warned;
 sub _warnonce(@) {
     my $first=shift;
     my $msg=_estr "WARNING: $first",< @_;
     warn $msg unless %warned{$msg}++;
-}}
+}};
 
 sub _choke(@) {
     my $first=shift;
@@ -338,7 +338,7 @@ sub _get_install_skip {
             if $verbose+>1;
         $skip= \@();
     }
-    warn "Got {join ' ',@{\@(0+nelems @$skip)}} skip patterns.\n"
+    warn "Got $(join ' ',@$(\@(0+nelems @$skip))) skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
@@ -351,7 +351,7 @@ Abstract a -w check that tries to use POSIX::access() if possible.
 
 =cut
 
-{
+do {
     my  $has_posix;
     sub _have_write_access {
         my $dir=shift;
@@ -364,7 +364,7 @@ Abstract a -w check that tries to use POSIX::access() if possible.
             return -w $dir;
         }
     }
-}
+};
 
 =pod
 

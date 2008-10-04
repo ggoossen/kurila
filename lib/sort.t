@@ -9,7 +9,7 @@ BEGIN {
     $BigWidth  = 6;				# Digits in $BigEnough-1
     $BigEnough = 10**$BigWidth;			# Largest array we'll attempt
     $RootWidth = int(($BigWidth+1)/2);		# Digits in sqrt($BigEnough-1)
-    $ItemFormat = "\%0{$RootWidth}d\%0{$BigWidth}d";	# Array item format
+    $ItemFormat = "\%0$($RootWidth)d\%0$($BigWidth)d";	# Array item format
     @TestSizes = @(0, 1, 2);			# Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)
@@ -133,47 +133,47 @@ sub main {
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
 main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 
-{
+do {
     use sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 1);
-}
+};
 
-{
+do {
     use sort < qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};
 
-{
+do {
     use sort < qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};
 
 # Tests added to check "defaults" subpragma, and "no sort"
 
-{
+do {
     use sort < qw(_qsort stable);
     no sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};
 
-{
+do {
     use sort < qw(defaults _qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current after defaults _qsort');
     # Not expected to be stable, so don't test for stability here
-}
+};
 
-{
+do {
     use sort < qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};

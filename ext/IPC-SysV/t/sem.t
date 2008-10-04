@@ -29,7 +29,7 @@ use IPC::SysV < qw(
 );
 use IPC::Semaphore;
 
-SKIP: {
+SKIP: do {
 
 my $sem =
     IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU ^|^ S_IRWXG ^|^ S_IRWXO ^|^ IPC_CREAT);
@@ -73,4 +73,4 @@ END {
     }
 }
 
-} # SKIP
+}; # SKIP

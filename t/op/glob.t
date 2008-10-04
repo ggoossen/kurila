@@ -30,19 +30,19 @@ cmp_ok($/,'eq',"\n",'sane input record separator');
 
 $_ = $^O eq 'MacOS' ? ":op:*" : "op/*";
 @glops = glob $_;
-cmp_ok("{join ' ',@glops}",'eq',"{join ' ',@oops}",'glob operator 1');
+cmp_ok("$(join ' ',@glops)",'eq',"$(join ' ',@oops)",'glob operator 1');
 
 @glops = glob;
-cmp_ok("{join ' ',@glops}",'eq',"{join ' ',@oops}",'glob operator 2');
+cmp_ok("$(join ' ',@glops)",'eq',"$(join ' ',@oops)",'glob operator 2');
 
 # The formerly-broken test for the situation above would accidentally
 # test definedness for an assignment with a LOGOP on the right:
-{
+do {
     my $f = 0;
     my $ok = 1;
     $ok = 0, undef $f while $x = $f||$f;
     ok($ok,'test definedness with LOGOP');
-}
+};
 
 cmp_ok(scalar(nelems @oops),'+>',0,'glob globbed something');
 

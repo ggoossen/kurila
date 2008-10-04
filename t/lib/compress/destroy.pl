@@ -29,7 +29,7 @@ sub run
 
     title "Testing $CompressClass";
 
-    {
+    do {
         # Check that the class destructor will call close
 
         my $lex = LexFile->new( my $name) ;
@@ -40,16 +40,16 @@ this is a test
 EOM
 
 
-        {
+        do {
           ok my $x = $CompressClass-> new( $name, -AutoClose => 1)  ;
 
           ok $x->write($hello) ;
-        }
+        };
 
         is anyUncompress($name), $hello ;
-    }
+    };
 
-    {
+    do {
         # Tied filehandle destructor
 
 
@@ -62,14 +62,14 @@ EOM
 
         my $fh = 'IO::File'->new( "$name", ">") ;
 
-        {
+        do {
           ok my $x = $CompressClass-> new( $fh, -AutoClose => 1)  ;
 
           $x->write($hello) ;
-        }
+        };
 
         ok anyUncompress($name) eq $hello ;
-    }
+    };
 }
 
 1;

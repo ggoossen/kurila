@@ -59,37 +59,37 @@ like( $@->{description}, qr/Final \$ should be \\\$ or \$name/, q($ at end of ""
 is( "\Q\Q\Q\Q\Q\Q\Q\Q\Q\Q\Q\Q\Qa", "a", "PL_lex_casestack" );
 
 try {
-{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
-{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{\%(
-)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {
+do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {
+do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {\%(
+)};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
+};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
+};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
 };
 is( $@, '', 'PL_lex_brackstack' );
 
-{
+do {
     # tests for bug #20716
     our ($a, @b);
     undef $a;
     undef @b;
     my $a="A";
-    is("{$a}\{", "A\{", "interpolation, qq//");
-    is("{$a}[", "A[", "interpolation, qq//");
+    is("$($a)\{", "A\{", "interpolation, qq//");
+    is("$($a)[", "A[", "interpolation, qq//");
     my @b=@("B");
-    is("{join ' ', @b}\{", "B\{", "interpolation, qq//");
+    is("$(join ' ', @b)\{", "B\{", "interpolation, qq//");
     is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
     $c =~ m/$a(?:){/p;
     is($^MATCH, 'A{', "interpolation, m//");
     $c =~ s/$a\{/foo/;
     is($c, 'foo', "interpolation, s/...//");
-    $c =~ s/foo/{$a}\{/;
+    $c =~ s/foo/$($a)\{/;
     is($c, 'A{', "interpolation, s//.../");
     is(<<"{$a}{", "A\{ A[ B\{\n", "interpolation, here doc");
-{$a}\{ {$a}[ {join ' ', @b}\{
+$($a)\{ $($a)[ $(join ' ', @b)\{
 {$a}{
-}
+};
 
 eval q{ sub a(;; &) { } a { } };
 is($@, '', "';&' sub prototype confuses the lexer");
@@ -104,7 +104,7 @@ print(
 pass();
 
 # Bug #24212
-{
+do {
     local $^WARN_HOOK = sub { }; # silence mandatory warning
     eval q{ my $x = -F 1; };
     like( $@->{description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
@@ -113,22 +113,22 @@ pass();
 	'-42',
 	'-F calls the F function'
     );
-}
+};
 
 # Bug #24762
-{
+do {
     eval q{ *foo{CODE} ? 1 : 0 };
     is( $@, '', "glob subscript in conditional" );
-}
+};
 
 # Bug #25824
-{
+do {
     eval q{ sub f { @a=@b=@c;  {use} } };
     like( $@->{description}, qr/syntax error/, "use without body" );
-}
+};
 
 # [perl #2738] perl segfautls on input
-{
+do {
     eval q{ sub _ <> {} };
     like($@->{description}, qr/Illegal declaration of subroutine main::_/, "readline operator as prototype");
 
@@ -137,7 +137,7 @@ pass();
 
     eval q{ sub _ __FILE__ {} };
     like($@->{description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
-}
+};
 
 # tests for "Bad name"
 eval q{ foo::$bar };
@@ -278,14 +278,14 @@ eval <<'EOSTANZA'; die $@ if $@;
 check(qr/^Great hail!.*no more\.$/, 61, "Overflow both small buffer checks");
 EOSTANZA
 
-{
+do {
     my @x = @( 'string' );
     is(eval q{ "@x[0]->strung" }, 'string->strung',
 	'literal -> after an array subscript within ""');
     @x = @( \@('string') );
     # this used to give "string"
     dies_like( sub { "@x[0]-> [0]" }, qr/reference as string/ );
-}
+};
 
 __END__
 # Don't add new tests HERE. See note above

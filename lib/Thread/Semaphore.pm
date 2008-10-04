@@ -13,7 +13,7 @@ sub new {
     my $class = shift;
     my $val = @_ ? shift : 1;
     if (! looks_like_number($val) || (int($val) != $val)) {
-        die("Semaphore initializer is not an integer: {dump::view($val)}");
+        die("Semaphore initializer is not an integer: $(dump::view($val))");
     }
     return bless(\$val, $class);
 }

@@ -169,12 +169,12 @@ sub Compress::Zlib::gzFile::gzreadline
     my $self = shift ;
 
     my $gz = $self->[0] ;
-    {
+    do {
         # Maintain backward compatibility with 1.x behaviour
         # It didn't support $/, so this can't either.
         local $/ = "\n" ;
         @_[0] = $gz->getline() ; 
-    }
+    };
     _save_gzerr($gz, 1);
     return defined @_[0] ? length @_[0] : 0 ;
 }

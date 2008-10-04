@@ -211,7 +211,7 @@ use UNIVERSAL ();
 sub unget_token {
   my $self = shift;
   DEBUG and print "Ungetting ", scalar(nelems @_), " tokens: ",
-   (nelems @_) ? "{join ' ',@_}\n" : "().\n";
+   (nelems @_) ? "$(join ' ',@_)\n" : "().\n";
   foreach my $t ( @_) {
     Carp::croak "Can't unget that, because it's not a token -- it's undef!"
      unless defined $t;
@@ -256,11 +256,11 @@ sub set_source {
     Carp::croak("Can't use empty-string as a source for set_source");
   } else {  # It's a filename!
     DEBUG and print "$self 's source is filename @_[0]\n";
-    {
+    do {
       local *PODSOURCE;
       open(PODSOURCE, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $!";
       $handle = *PODSOURCE{IO};
-    }
+    };
     $self->{'source_filename'} = @_[0];
     DEBUG and print "  Its name is @_[0].\n";
 

@@ -8,7 +8,7 @@ use POSIX < qw(strftime setlocale LC_TIME);
 use Socket ':all';
 require Exporter;
 
-{
+do {
     our $VERSION = '0.24';
     our @ISA = qw(Exporter);
 
@@ -67,7 +67,7 @@ require Exporter;
         push @ISA, 'DynaLoader';
         Sys::Syslog->bootstrap($VERSION);
     };
-}
+};
 
 
 # 

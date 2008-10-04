@@ -118,14 +118,14 @@ while (defined (my $file = next_file())) {
 			$new =~ s/(['\\])/\\$1/g;   #']);
 			if ($opt_h) {
 			    print OUT $t,
-                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    {$args}eval q($new);\n$t\}' unless defined(\&$name);\n";
+                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
                             $eval_index++;
 			} else {
 			    print OUT $t,
-                            "eval 'sub $name $proto\{\n$t    {$args}eval q($new);\n$t\}' unless defined(\&$name);\n";
+                            "eval 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
 			}
 		    } else {
-                      print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t{$args}eval q($new);\n    \}\n\}\n";
+                      print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t$($args)eval q($new);\n    \}\n\}\n";
 		    }
 		    %curargs = %( () );
 		} else {
@@ -314,7 +314,7 @@ while (defined (my $file = next_file())) {
 	    expr();
 	    # try to find and perlify local C variables
 	    our @local_variables = @( () ); # needs to be a our(): (?{...}) bug workaround
-	    {
+	    do {
 		use re "eval";
 		my $typelist = join '|', keys %isatype;
 		$new =~ s['
@@ -335,7 +335,7 @@ while (defined (my $file = next_file())) {
 		  (?\{ push {join ' ', <@local_variables}, $1 \})
 		  ]
 		 [my \$$1;]gx;
-	     }
+	     };
 	    $new =~ s/&$_\b/\$$_/g for  @local_variables;
 	    $new =~ s/(["\\])/\\$1/g;       #"]);
 	    # now that's almost like a macro (we hope)

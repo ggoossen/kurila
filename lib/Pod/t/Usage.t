@@ -25,7 +25,7 @@ pod2usage(\%( -verbose => 0, -exit => 'noexit', -output => $fake_out_fh,
             -message => $msg ));
 is( $$fake_out, "$msg\n$vbl_0", '-message parameter' );
 
-SKIP: {
+SKIP: do {
     my( $file, $path ) = < fileparse( $0 );
     skip( 'File in current directory', 2 ) if -e $file; 
     $$fake_out = '';
@@ -42,9 +42,9 @@ SKIP: {
                     -pathlist => $path ));
     };
     is( $$fake_out, $vbl_0, '-pathlist parameter' );
-}
+};
 
-SKIP: { # Test exit status from pod2usage()
+SKIP: do { # Test exit status from pod2usage()
     skip "Exit status broken on Mac OS", 1 if $^O eq 'MacOS';
     my $exit = ($^O eq 'VMS' ? 2 : 42);
     my $dev_null = File::Spec->devnull;
@@ -58,14 +58,14 @@ SKIP: { # Test exit status from pod2usage()
                || $^O eq 'NetWare'
                || $^O eq 'VMS') ? '"'
               : "");
-    my @params = @( "{$cq}-I../lib$cq",  "{$cq}-MPod::Usage$cq", '-e' );
-    my $prg = qq[{$cq}pod2usage(\\\%( $args ))$cq];
+    my @params = @( "$($cq)-I../lib$cq",  "$($cq)-MPod::Usage$cq", '-e' );
+    my $prg = qq[$($cq)pod2usage(\\\%( $args ))$cq];
     my @cmd = @( $^X, < @params, $prg );
 
-    print "# cmd = {join ' ',@cmd}\n";
+    print "# cmd = $(join ' ',@cmd)\n";
 
     is( system( < @cmd ) >> 8, $exit, 'Exit status of pod2usage()' );
-}
+};
 
 # Test verbose level 1
 my $vbl_1 = << 'EOMSG';

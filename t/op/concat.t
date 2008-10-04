@@ -16,7 +16,7 @@ sub ok {
 print q(1..22
 );
 
-{
+do {
   our ($a, $b, $c);
 
   $a = 'ab' . 'c';	# compile time
@@ -31,12 +31,12 @@ print q(1..22
   $_ = $a;
   $_ .= $b;
   ok($_ eq 'abcdef');
-}
+};
 
 # test that when right argument of concat is UTF8, and is the same
 # variable as the target, and the left argument is not UTF8, it no
 # longer frees the wrong string.
-{
+do {
     sub r2 {
 	my $string = '';
 	$string .= pack("U0a*", 'mnopqrstuvwx');
@@ -44,10 +44,10 @@ print q(1..22
     }
 
     r2() and ok(1) for qw/ 4 5 /;
-}
+};
 
 # test that nul bytes get copied
-{
+do {
     my ($a, $ab)   = ("a", "a\0b");
     my ($ua, $uab) = < map pack("U0a*", $_), @( $a, $ab);
 
@@ -84,10 +84,10 @@ print q(1..22
     my $t8 = $ua; $t8 = $uab . $t8;
     
     ok(scalar eval '$t8 =~ m/$ub/');
-}
+};
 
 
-{
+do {
     # ID 20001020.006
     use utf8;
 
@@ -113,9 +113,9 @@ print q(1..22
     # For symmetry with the above.
     try{"\x{1234}$pi"};
     ok(!$@, "bug id 20001020.006, constant right");
-}
+};
 
-{
+do {
     # concat should not upgrade its arguments.
     use utf8;
     my($l, $r, $c);
@@ -124,17 +124,17 @@ print q(1..22
     ok($l.$r eq $c, "concat utf8 and byte");
     ok($l eq "\x{101}", "right not changed after concat");
     ok($r eq "\x[fe]", "left not changed after concat");
-}
+};
 
-{
+do {
     my $a; ($a .= 5) . 6;
     ok($a == 5, '($a .= 5) . 6 - present since 5.000');
-}
+};
 
-{
+do {
     # [perl #24508] optree construction bug
     sub strfoo { "x" }
     my ($x, $y);
     $y = ($x = '' . strfoo()) . "y";
     ok( "$x,$y" eq "x,xy", 'figures out correct target' );
-}
+};

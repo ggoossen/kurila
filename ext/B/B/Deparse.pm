@@ -318,7 +318,7 @@ sub next_todo {
     my $cv = $ent->[1];
     my $gv = $cv->GV;
     my $name = $self->gv_name($gv);
-    {
+    do {
 	$self->{'subs_declared'}->{$name} = 1;
 	if ($name eq "BEGIN") {
 	    my $use_dec = $self->begin_is_use($cv);
@@ -343,8 +343,8 @@ sub next_todo {
 	    }
 	    $name =~ s/^\Q$stash\E::(?!\z|.*::)//;
 	}
-        return "{$p}{$l}sub $name " . $self->deparse_sub($cv);
-    }
+        return "$($p)$($l)sub $name " . $self->deparse_sub($cv);
+    };
 }
 
 # Return a "use" declaration for this BEGIN block, if appropriate
@@ -557,7 +557,7 @@ sub new {
     return $self;
 }
 
-{
+do {
     # Mask out the bits that L<warnings::register> uses
     my $WARN_MASK;
     BEGIN {
@@ -566,7 +566,7 @@ sub new {
     sub WARN_MASK () {
 	return $WARN_MASK;
     }
-}
+};
 
 # Initialise the contextual information, either from
 # defaults provided with the ambient_pragmas method,
@@ -679,10 +679,10 @@ sub ambient_pragmas {
 	    || $name eq 'utf8') {
 	    require "$name.pm";
 	    if ($val) {
-		$hint_bits ^|^= ${%::{"{$name}::"}->{"hint_bits"}};
+		$hint_bits ^|^= ${%::{"$($name)::"}->{"hint_bits"}};
 	    }
 	    else {
-		$hint_bits ^&^= ^~^${%::{"{$name}::"}->{"hint_bits"}};
+		$hint_bits ^&^= ^~^${%::{"$($name)::"}->{"hint_bits"}};
 	    }
 	}
 
@@ -840,7 +840,7 @@ sub deparse_sub {
 	}
     }
     if (%{$self->{'global_variables'}}) {
-        $body = "our (" . (join ", ", keys %{$self->{'global_variables'}}) . ");\n" . $body;
+        $body = "our (" . (join ", ", keys %$($self->{'global_variables'})) . ");\n" . $body;
     }
     return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
@@ -3225,7 +3225,7 @@ sub pp_entersub {
     # Doesn't matter how many prototypes there are, if
     # they haven't happened yet!
     my $declared;
-    {
+    do {
 	no strict 'refs';
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}->{$kid}
@@ -3240,7 +3240,7 @@ sub pp_entersub {
 	    # Avoid "too early to check prototype" warning
 	    ($amper, $proto) = ('&');
 	}
-    }
+    };
 
     my $args;
     if ($declared and defined $proto and not $amper) {
@@ -3292,7 +3292,7 @@ sub uninterp {
     return $str;
 }
 
-{
+do {
 my $bal;
 BEGIN {
     use re "eval";
@@ -3359,7 +3359,7 @@ sub re_uninterp_extended {
 
     return $str;
 }
-}
+};
 
 my %unctrl = # portable to to EBCDIC
     %(
@@ -3572,7 +3572,7 @@ sub const {
 	my $str = "$nv";
 	if ($str != $nv) {
 	    # failing that, try using more precision
-	    $str = sprintf("\%.{$max_prec}g", $nv);
+	    $str = sprintf("\%.$($max_prec)g", $nv);
 #	    if (pack("F", $str) ne pack("F", $nv)) {
 	    if ($str != $nv) {
 		# not representable in decimal with whatever sprintf()

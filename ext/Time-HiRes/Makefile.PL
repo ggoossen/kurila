@@ -95,7 +95,7 @@ __EOD__
 	    $errornull = '';
 	}
 
-        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c {join ' ',@$LIBS} $errornull"
+        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c $(join ' ',@$LIBS) $errornull"
 	    unless defined $cccmd;
 
        if ($^O eq 'VMS') {
@@ -335,7 +335,7 @@ sub init {
 	do $hints;
 	if (exists $self->{LIBS}) {
 	    $LIBS = $self->{LIBS};
-	    print "Extra libraries: {join ' ',@$LIBS}...\n";
+	    print "Extra libraries: $(join ' ',@$LIBS)...\n";
 	}
     }
 

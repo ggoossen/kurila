@@ -96,7 +96,7 @@ while ( ~< *GR) {
     if ((nelems @s)) {
 	push @{ %seen{$name_s} }, iohandle::input_line_number(\*GR);
     } else {
-	warn "# Your $where line {iohandle::input_line_number(\*GR)} is empty.\n";
+	warn "# Your $where line $(iohandle::input_line_number(\*GR)) is empty.\n";
 	next;
     }
     if ($n == $max) {
@@ -182,6 +182,6 @@ for (1..$max) {
 }
 endgrent();
 
-is("{join ' ',@gr1}", "{join ' ',@gr2}");
+is("$(join ' ',@gr1)", "$(join ' ',@gr2)");
 
 close(GR);

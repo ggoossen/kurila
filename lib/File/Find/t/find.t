@@ -482,7 +482,7 @@ File::Find::find( \%(wanted => \&noop_wanted,
 
 Check( (nkeys %Expect_Dir) == 0 );
 
-{
+do {
     print "# checking argument localization\n";
 
     ### this checks the fix of perlbug [19977] ###
@@ -493,7 +493,7 @@ Check( (nkeys %Expect_Dir) == 0 );
     delete %pre{$_} for  @foo;
 
     Check( ( nkeys %pre ) == 0 );
-}
+};
 
 if ( $symlink_exists ) {
     print "# --- symbolic link tests --- \n";
@@ -620,7 +620,7 @@ if ( $symlink_exists ) {
     }      
     unlink file_path('dangling_file');
 
-    { 
+    do { 
         # these tests should also emit a warning
 	use warnings;
 
@@ -653,7 +653,7 @@ if ( $symlink_exists ) {
         unlink file_path('fa', 'dangling_file_sl'),
                          file_path('dangling_dir_sl');
 
-    }
+    };
 
 
     print "# check recursion\n";

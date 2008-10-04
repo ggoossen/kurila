@@ -17,19 +17,19 @@ This tests the classic diamond inheritence pattern.
 
 =cut
 
-{
+do {
     package Diamond_A;
     use mro 'c3'; 
     sub bar { 'Diamond_A::bar' }        
     sub baz { 'Diamond_A::baz' }
-}
-{
+};
+do {
     package Diamond_B;
     use base 'Diamond_A';
     use mro 'c3';    
     sub baz { 'Diamond_B::baz => ' . (shift)->next::method() }         
-}
-{
+};
+do {
     package Diamond_C;
     use mro 'c3';    
     use base 'Diamond_A';     
@@ -38,8 +38,8 @@ This tests the classic diamond inheritence pattern.
     
     sub woz { 'Diamond_C::woz' }
     sub maybe { 'Diamond_C::maybe' }         
-}
-{
+};
+do {
     package Diamond_D;
     use base ('Diamond_B', 'Diamond_C');
     use mro 'c3'; 
@@ -54,7 +54,7 @@ This tests the classic diamond inheritence pattern.
     sub maybe { 'Diamond_D::maybe => ' . ((shift)->maybe::next::method() || 0) }
     sub moybe { 'Diamond_D::moybe => ' . ((shift)->maybe::next::method() || 0) }             
 
-}
+};
 
 ok(eq_array(
     mro::get_linear_isa('Diamond_D'),

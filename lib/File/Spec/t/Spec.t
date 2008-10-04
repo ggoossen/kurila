@@ -703,7 +703,7 @@ my @tests = @(
 
 plan tests => scalar (nelems @tests) + 1;
 
-{
+do {
     package File::Spec::FakeWin32;
     use vars < qw(@ISA);
     @ISA = qw(File::Spec::Win32);
@@ -727,7 +727,7 @@ plan tests => scalar (nelems @tests) + 1;
 	};
 	*rel2abs = *rel2abs; # Avoid a 'used only once' warning
     }
-}
+};
 
 
 is("Win32->can('_cwd')", "Win32->can('_cwd')");
@@ -743,7 +743,7 @@ for (  @tests ) {
 # an expected result. Works with functions that return scalars or arrays.
 #
 sub tryfunc {
-  SKIP: {
+  SKIP: do {
     my $function = shift ;
     my $expected = shift ;
     my $platform = shift ;
@@ -769,5 +769,5 @@ sub tryfunc {
     }
 
     is $got, $expected, $function;
-}
+};
 }

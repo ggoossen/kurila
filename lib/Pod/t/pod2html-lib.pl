@@ -22,7 +22,7 @@ sub convert_n_test {
 
 
     my ($expect, $result);
-    {
+    do {
 	local $/;
 	# expected
 	$expect = ~< *DATA;
@@ -35,7 +35,7 @@ sub convert_n_test {
 	open my $in, "<", $outfile or die "cannot open $outfile: $!";
 	$result = ~< $in;
 	close $in;
-    }
+    };
 
     ok($expect eq $result, $testname) or do {
 	my $diff = '/bin/diff';

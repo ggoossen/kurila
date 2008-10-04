@@ -71,10 +71,10 @@ is($_, "1|-|10||20||||||");
 is("$a|$b", "2|4");
 
 # .. even for locals?
-{
+do {
   local(undef, $a, undef, $b) = < qw(1 2 3 4);
   is("$a|$b", "2|4");
-}
+};
 
 # check splitting of null string
 $_ = join('|', @( < split(m/x/,   '',-1), 'Z'));
@@ -121,9 +121,9 @@ is($_, "ab\n:cd\n:ef\n");
 # see if @a = @b = split(...) optimization works
 @list1 = @list2 = split ('p',"a p b c p");
 ok((nelems @list1) == nelems @list2 &&
-   "{join ' ',@list1}" eq "{join ' ',@list2}" &&
+   "$(join ' ',@list1)" eq "$(join ' ',@list2)" &&
    (nelems @list1) == 2 &&
-   "{join ' ',@list1}" eq "a   b c ");
+   "$(join ' ',@list1)" eq "a   b c ");
 
 # zero-width assertion
 $_ = join ':', split m/(?=\w)/, "rm b";
@@ -144,18 +144,18 @@ ok((nelems @ary) == 3 &&
    @ary[1] eq "\x{FE}\x{FE}"     &&
    @ary[2] eq "\x{FD}\x{FD}");
 
-{
+do {
     my @a = map ord, split(m//, join("", map chr, @( (1234, 123, 2345))));
-    is("{join ' ',@a}", "1234 123 2345");
-}
+    is("$(join ' ',@a)", "1234 123 2345");
+};
 
-{
+do {
     my $x = 'A';
     my @a = map ord, split(m/$x/, join("", map chr, @( (1234, ord($x), 2345))));
-    is("{join ' ',@a}", "1234 2345");
-}
+    is("$(join ' ',@a)", "1234 2345");
+};
 
-{
+do {
     # bug id 20000427.003 
 
     use warnings;
@@ -170,12 +170,12 @@ ok((nelems @ary) == 3 &&
     }
 
     is($r, " U+B36C U+5A8C U+FF5B U+5079 U+505B");
-}
+};
 
-{
+do {
     my $s = "\x20\x40\x{80}\x{100}\x{80}\x40\x20";
 
-  SKIP: {
+  SKIP: do {
     if (ord('A') == 193) {
 	skip("EBCDIC", 1);
     } else {
@@ -184,7 +184,7 @@ ok((nelems @ary) == 3 &&
 	my ($a, $b, $c) = < split(m/\x40/, $s);
 	ok($a eq "\x20" && $b eq "\x{80}\x{100}\x{80}" && $c eq $a);
     }
-  }
+  };
 
     my ($a, $b) = < split(m/\x{100}/, $s);
     ok($a eq "\x20\x40\x{80}" && $b eq "\x{80}\x40\x20");
@@ -192,20 +192,20 @@ ok((nelems @ary) == 3 &&
     my ($a, $b) = < split(m/\x{80}\x{100}\x{80}/, $s);
     ok($a eq "\x20\x40" && $b eq "\x40\x20");
 
-  SKIP: {
+  SKIP: do {
     if (ord('A') == 193) {
 	skip("EBCDIC", 1);
     }  else {
 	my ($a, $b) = < split(m/\x40\x{80}/, $s);
 	ok($a eq "\x20" && $b eq "\x{100}\x{80}\x40\x20");
     }
-  }
+  };
 
     my ($a, $b, $c) = < split(m/[\x40\x{80}]+/, $s);
     ok($a eq "\x20" && $b eq "\x{100}" && $c eq "\x20");
-}
+};
 
-{
+do {
     # 20001205.014
 
     my $a = "ABC\x{263A}";
@@ -218,16 +218,16 @@ ok((nelems @ary) == 3 &&
 
     $a =~ s/^A/Z/;
     ok(length($a) == 4 && $a eq "ZBC\x{263A}");
-}
+};
 
-{
+do {
     no utf8;
     my @a = split(m/\xFE/, "\x[FF]\x[FE]\x[FD]");
 
     ok((nelems @a) == 2 && @a[0] eq "\x[FF]" && @a[1] eq "\x[FD]");
-}
+};
 
-{
+do {
     # check that PMf_WHITE is cleared after \s+ is used
     # reported in <20010627113312.RWGY6087.viemta06@localhost>
     my $r;
@@ -235,25 +235,25 @@ ok((nelems @ary) == 3 &&
 	$r = join ':', split($pat, "hello cruel world");
     }
     is($r, "he:o cruel world");
-}
+};
 
 
-{
+do {
     # split /(A)|B/, "1B2" should return (1, undef, 2)
     my @x = split m/(A)|B/, "1B2";
     ok(@x[0] eq '1' and (not defined @x[1]) and @x[2] eq '2');
-}
+};
 
-{
+do {
     # [perl #17064]
     my $warn;
     local $^WARN_HOOK = sub { $warn = join '', @_; chomp $warn };
     my $char = "\x{10f1ff}";
     my @a = split m/\r?\n/, "$char\n";
     ok((nelems @a) == 1 && @a[0] eq $char && !defined($warn));
-}
+};
 
-{
+do {
     # [perl #18195]
     for my $u (@(0, 1)) {
 	for my $a (@(0, 1)) {
@@ -264,16 +264,16 @@ ok((nelems @ary) == 3 &&
 	    is(join (':', @d), 'readin:database:readout', "[perl #18195]");
 	}
     }
-}
+};
 
-{
+do {
     $p="a,b";
     utf8::encode $p;
     try { @a=split(m/[, ]+/,$p) };
-    is ("$@-{join ' ',@a}-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
-}
+    is ("$@-$(join ' ',@a)-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
+};
 
-{
+do {
     # [perl #28938]
     # assigning off the end of the array after a split could leave garbage
     # in the inner elements
@@ -283,8 +283,8 @@ ok((nelems @ary) == 3 &&
     @a[3]=1;
     $x = \@a[2];
     is (ref $x, 'SCALAR', '#28938 - garbage after extend');
-}
-{
+};
+do {
     # check the special casing of split /\s/ and unicode
     use charnames < qw(:full);
     # below test data is extracted from
@@ -331,9 +331,9 @@ ok((nelems @ary) == 3 &&
         my @r3 = split(m/\s+/, $s2);
         ok((nelems @r3) == 3 && join('-', @r3) eq "-:A:-:B", "$msg - /\\s+/ No.2");
     }
-}
+};
 
-{
+do {
     my $src = "ABC \0 FOO \0  XYZ";
     my @s = split(" \0 ", $src);
     my @r = split(m/ \0 /, $src);
@@ -342,4 +342,4 @@ ok((nelems @ary) == 3 &&
     is(@s[1], "FOO");
     is(@s[2]," XYZ");
     is(join(':', @s), join(':', @r));
-}
+};

@@ -32,18 +32,18 @@ read($testfd, my $buffer, 4) if $testfd +> 2;
 is( $buffer, "#!./",                      '    with read' );
 
 TODO:
-{
+do {
     local our $TODO = "read to array element not working";
 
     our @buffer;
     read($testfd, @buffer[1], 5) if $testfd +> 2;
     is( @buffer[1], "perl\n",	               '    read to array element' );
-}
+};
 
 write(1,"ok 4\nnot ok 4\n", 5);
 next_test();
 
-SKIP: {
+SKIP: do {
     skip("no pipe() support on DOS", 2) if $Is_Dos;
 
     our @fds = POSIX::pipe();
@@ -56,9 +56,9 @@ SKIP: {
     print ~< $reader;
     close $reader;
     next_test();
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("no sigaction support on win32/dos", 6) if $Is_W32 || $Is_Dos;
 
     my $sigset = POSIX::SigSet->new( 1, 3);
@@ -66,7 +66,7 @@ SKIP: {
     ok(! $sigset->ismember(1),  'POSIX::SigSet->delset' );
     ok(  $sigset->ismember(3),  'POSIX::SigSet->ismember' );
 
-    SKIP: {
+    SKIP: do {
         skip("no kill() support on Mac OS", 4) if $Is_MacOS;
 
         my $sigint_called = 0;
@@ -113,16 +113,16 @@ SKIP: {
         # The order of the above tests is very important, so
         # we use literal prints and hard coded numbers.
         next_test() for 1..4;
-    }
-}
+    };
+};
 
-SKIP: {
+SKIP: do {
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE;
     skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless &_POSIX_OPEN_MAX( < @_ );
 
     ok( &_POSIX_OPEN_MAX( < @_ ) +>= 16, "The minimum allowed values according to susv2" );
 
-}
+};
 
 my $pat;
 if ($Is_MacOS) {
@@ -138,7 +138,7 @@ like( getcwd(), qr/$pat/, 'getcwd' );
 
 # Check string conversion functions.
 
-SKIP: { 
+SKIP: do { 
     skip("strtod() not present", 1) unless %Config{d_strtod};
 
     my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if %Config{d_setlocale};
@@ -148,23 +148,23 @@ SKIP: {
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
     &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if %Config{d_setlocale};
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("strtol() not present", 2) unless %Config{d_strtol};
 
     my ($n, $x) = < &POSIX::strtol('21_PENGUINS');
     is($n, 21, 'strtol() number');
     is($x, 9,  '         unparsed chars');
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("strtoul() not present", 2) unless %Config{d_strtoul};
 
     my ($n, $x) = < &POSIX::strtoul('88_TEARS');
     is($n, 88, 'strtoul() number');
     is($x, 6,  '          unparsed chars');
-}
+};
 
 # Pick up whether we're really able to dynamically load everything.
 ok( &POSIX::acos(1.0) == 0.0,   'dynamic loading' );
@@ -186,14 +186,14 @@ sub try_strftime {
 
 my $lc = &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), 'C') if %Config{d_setlocale};
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
-SKIP: {
+SKIP: do {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
 	if ($Is_W32 and ((%Config{cc} eq 'cl' and
 	                 %Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) or
 	                 (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);
-}
+};
 try_strftime("Fri Mar 01 00:00:00 1996 061", 0,0,-24, 31,1,96);
 try_strftime("Sun Feb 28 00:00:00 1999 059", 0,0,0, 28,1,99);
 try_strftime("Mon Mar 01 00:00:00 1999 060", 0,0,24, 28,1,99);
@@ -203,7 +203,7 @@ try_strftime("Wed Mar 01 00:00:00 2000 061", 0,0,0, 1,2,100);
 try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
 &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), $lc) if %Config{d_setlocale};
 
-{
+do {
     for my $test (@(0, 1)) {
 	$! = 0;
 	# POSIX::errno is autoloaded. 
@@ -216,13 +216,13 @@ try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
         # Force numeric context.
 	is( $errno + 0, $foo + 0,     'autoloading and errno() mix' );
     }
-}
+};
 
-SKIP: {
+SKIP: do {
   skip("no kill() support on Mac OS", 1) if $Is_MacOS;
   is (eval "kill 0", 0, "check we have CORE::kill")
     or print "\$\@ is " . _qq($@) . "\n";
-}
+};
 
 # Check that we can import the POSIX kill routine
 POSIX->import ('kill');

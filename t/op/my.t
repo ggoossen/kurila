@@ -10,8 +10,8 @@ sub foo {
     my $d;
     $c = "ok 3\n";
     $d = "ok 4\n";
-    { my($a, undef, $c) = ("ok 9\n", "not ok 10\n", "ok 10\n");
-      ($x, $y) = ($a, $c); }
+    do { my($a, undef, $c) = ("ok 9\n", "not ok 10\n", "ok 10\n");
+      ($x, $y) = ($a, $c); };
     print $a, $b;
     $c . $d;
 }
@@ -32,7 +32,7 @@ sub foo2 {
     my(@c, %d);
     @c = @( "ok 13\n" );
     %d{''} = "ok 14\n";
-    { my($a,< @c) = ("ok 19\n", "ok 20\n"); ($x, $y) = ($a, < @c); }
+    do { my($a,< @c) = ("ok 19\n", "ok 20\n"); ($x, $y) = ($a, < @c); };
     print $a, < @b;
     @c[0] . %d{''};
 }
@@ -113,7 +113,7 @@ print "not " if $@;
 print "ok 34\n";
 
 # my $foo = undef should always assign [perl #37776]
-{
+do {
     my $count = 35;
     loop:
     my $test = undef;
@@ -121,4 +121,4 @@ print "ok 34\n";
     print "ok $count\n";
     $test = 42;
     goto loop if ++$count +< 37;
-}
+};

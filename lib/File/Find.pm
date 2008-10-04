@@ -750,7 +750,7 @@ sub _find_opt {
 	    $name = $abs_dir . $_; # $File::Find::name
 	    $_ = $name if $no_chdir;
 
-	    { $wanted_callback->() }; # protect against wild "next"
+	    do { $wanted_callback->() };; # protect against wild "next"
 
 	}
 
@@ -843,7 +843,7 @@ sub _find_dir($$$) {
 	    $_= ($no_chdir ? $dir_name : $dir_rel ); # $_
 	    # prune may happen here
 	    $prune= 0;
-	    { $wanted_callback->() };	# protect against wild "next"
+	    do { $wanted_callback->() };;	# protect against wild "next"
 	    next if $prune;
 	}
 
@@ -915,7 +915,7 @@ sub _find_dir($$$) {
 		
 		$name = $dir_pref . $FN; # $File::Find::name
 		$_ = ($no_chdir ? $name : $FN); # $_
-		{ $wanted_callback->() }; # protect against wild "next"
+		do { $wanted_callback->() };; # protect against wild "next"
 	    }
 
 	}
@@ -947,13 +947,13 @@ sub _find_dir($$$) {
 		    else {
 			$name = $dir_pref . $FN; # $File::Find::name
 			$_= ($no_chdir ? $name : $FN); # $_
-			{ $wanted_callback->() }; # protect against wild "next"
+			do { $wanted_callback->() };; # protect against wild "next"
 		    }
 		}
 		else {
 		    $name = $dir_pref . $FN; # $File::Find::name
 		    $_= ($no_chdir ? $name : $FN); # $_
-		    { $wanted_callback->() }; # protect against wild "next"
+		    do { $wanted_callback->() };; # protect against wild "next"
 		}
 	    }
 	}
@@ -1028,7 +1028,7 @@ sub _find_dir($$$) {
 			substr($_, (length($_) == 2 ? -1 : -2), undef, '');
 		    }
 		}
-		{ $wanted_callback->() }; # protect against wild "next"
+		do { $wanted_callback->() };; # protect against wild "next"
 	     }
 	     else {
 		push @Stack,\@($CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth;
@@ -1117,7 +1117,7 @@ sub _find_dir_symlnk($$$) {
 	    # prune may happen here
 	    $prune= 0;
 	    lstat($_); # make sure  file tests with '_' work
-	    { $wanted_callback->() }; # protect against wild "next"
+	    do { $wanted_callback->() };; # protect against wild "next"
 	    next if $prune;
 	}
 
@@ -1183,7 +1183,7 @@ sub _find_dir_symlnk($$$) {
 	        $fullname = undef;
 	        $name = $dir_pref . $FN;
 	        $_ = ($no_chdir ? $name : $FN);
-	        { $wanted_callback->() };
+	        do { $wanted_callback->() };;
 	        next;
 	    }
 
@@ -1200,7 +1200,7 @@ sub _find_dir_symlnk($$$) {
 		$fullname = $new_loc; # $File::Find::fullname
 		$name = $dir_pref . $FN; # $File::Find::name
 		$_ = ($no_chdir ? $name : $FN); # $_
-		{ $wanted_callback->() }; # protect against wild "next"
+		do { $wanted_callback->() };; # protect against wild "next"
 	    }
 	}
 
@@ -1249,7 +1249,7 @@ sub _find_dir_symlnk($$$) {
 		}
 
 		lstat($_); # make sure file tests with '_' work
-		{ $wanted_callback->() }; # protect against wild "next"
+		do { $wanted_callback->() };; # protect against wild "next"
 	    }
 	    else {
 		push @Stack,\@($dir_loc, $updir_loc, $p_dir, $dir_rel,-1)  if  $bydepth;
@@ -1326,10 +1326,10 @@ unless ($File::Find::dont_use_nlink) {
 # We need a function that checks if a scalar is tainted. Either use the
 # Scalar::Util module's tainted() function or our (slower) pure Perl
 # fallback is_tainted_pp()
-{
+do {
     local $@;
     try { require Scalar::Util };
     *is_tainted = $@ ? \&is_tainted_pp : \&Scalar::Util::tainted;
-}
+};
 
 1;

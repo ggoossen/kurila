@@ -387,12 +387,12 @@ sub parse_file {
   } elsif(!length $source) {
     die("Can't use empty-string as a source for parse_file");
   } else {
-    {
+    do {
       local *PODSOURCE;
       open(PODSOURCE, "<", "$source") || die "Can't open $source: $!";
       $self->{'source_filename'} = $source;
       $source = *PODSOURCE{IO};
-    }
+    };
     $self->_init_fh_source($source);
   }
   # By here, $source is a FH.
@@ -668,7 +668,7 @@ sub _remap_sequences {
   ;
   DEBUG +> 3 and print " Map: ",
     join('; ', map "$_=" . (
-        ref($map->{$_}) ? join(",", @{$map->{$_}}) : $map->{$_}
+        ref($map->{$_}) ? join(",", @$($map->{$_})) : $map->{$_}
       ),
       sort keys %$map ),
     ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys %$map)
@@ -860,7 +860,7 @@ sub _ponder_extend {
       $self->{'accept_codes'}->{$new_letter}
         = ((nelems @fallbacks) == 1) ? @fallbacks[0] : \@fallbacks;
       DEBUG +> 2 and print
-       "Extensor maps $new_letter => fallbacks {join ' ',@fallbacks}.\n";
+       "Extensor maps $new_letter => fallbacks $(join ' ',@fallbacks).\n";
     }
 
   } else {
@@ -893,7 +893,7 @@ sub _treat_Zs {  # Nix Z<...>'s
               next;
           }
         
-          DEBUG +> 1 and print "Nixing Z node {join ' ',@{$treelet->[$i]}}\n";
+          DEBUG +> 1 and print "Nixing Z node $(join ' ',@$($treelet->[$i]))\n";
         
           # bitch UNLESS it's empty
           unless (  (nelems @{$treelet->[$i]}) == 2
@@ -1468,7 +1468,7 @@ sub _duo {
   
   my $mutor = shift(@_) if (nelems @_) and ref(@_[0] || '') eq 'CODE';
 
-  die "But $class->_duo takes two parameters, not: {join ' ',@_}"
+  die "But $class->_duo takes two parameters, not: $(join ' ',@_)"
    unless (nelems @_) == 2;
 
   my(@out);

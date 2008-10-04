@@ -49,14 +49,14 @@ open(OTHER, "<", 'TEST') || (die "Can't open TEST: $!");
 binmode OTHER if (($^O eq 'MSWin32') || ($^O eq 'NetWare'));
 
 close(OTHER);
-{
+do {
     no warnings 'closed';
     if (tell(OTHER) == -1)  { print "ok 15\n"; } else { print "not ok 15\n"; }
-}
-{
+};
+do {
     no warnings 'unopened';
     if (tell(ETHER) == -1)  { print "ok 16\n"; } else { print "not ok 16\n"; }
-}
+};
 
 print "ok $_\n" for 17..23;
 

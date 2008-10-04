@@ -14,19 +14,19 @@ our $TODO = "Figure out what to do with Carp";
 
 ok 1;
 
-{ local $^WARN_HOOK = sub {
+do { local $^WARN_HOOK = sub {
     like @_[0]->message, qr/ok (\d+)\n at.+\b(?i:carp\.t) line \d+/, 'ok 2\n' };
 
   carp  "ok 2\n";
 
-}
+};
 
-{ local $^WARN_HOOK = sub {
+do { local $^WARN_HOOK = sub {
     like @_[0]->message, qr/(\d+) at.+\b(?i:carp\.t) line \d+$/, 'carp 3' };
 
   carp 3;
 
-}
+};
 
 sub sub_4 {
 
@@ -39,11 +39,11 @@ cluck 4;
 
 sub_4;
 
-{ local $^DIE_HOOK = sub {
+do { local $^DIE_HOOK = sub {
     like @_[0]->message, qr/^(\d+) at.+\b(?i:carp\.t) line \d+\n\teval \Q{...}\E called at.+\b(?i:carp\.t) line \d+$/, 'croak 5' };
 
   try { croak 5 };
-}
+};
 
 sub sub_6 {
     local $^DIE_HOOK = sub {

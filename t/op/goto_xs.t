@@ -12,7 +12,7 @@ BEGIN {
     %ENV{PERL5LIB} = "../lib";
 
 # turn warnings into fatal errors
-    $^WARN_HOOK = sub { die "WARNING: {join ' ',@_}" } ;
+    $^WARN_HOOK = sub { die "WARNING: $(join ' ',@_)" } ;
 
     foreach (qw(Fcntl XS::APItest)) {
 	eval "require $_"
@@ -91,12 +91,12 @@ use XS::APItest < qw(mycroak);
 
 sub goto_croak { goto &mycroak }
 
-{
+do {
     my $e;
     for (1..4) {
 	try { goto_croak("boo$_\n") };
 	$e .= $@->{description};
     }
     print $e eq "boo1\nboo2\nboo3\nboo4\n" ? "ok 11\n" : "not ok 11\n";
-}
+};
 

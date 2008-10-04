@@ -15,11 +15,11 @@ ok(!defined(fileno($a)));
 select select $a;
 ok(defined *{$a});
 
-{
+do {
     no strict 'refs';
     my $b = \*SYM001;
     ok(open($b, ">&", \*STDOUT));
     ok(defined *{$b});
     ok(close $b);
-}
+};
 

@@ -1,6 +1,6 @@
 #!./perl
 
-{
+do {
     my $wide = "\x{100}";
     use bytes;
     my $ordwide = ord($wide);
@@ -12,7 +12,7 @@
     elsif ($ordwide != 196) {
 	printf "# v256 starts with 0x\%02x\n", $ordwide;
     }
-}
+};
 
 no utf8;
 
@@ -130,7 +130,7 @@ my @MK = split(m/\n/, <<__EOMK__);
 __EOMK__
 
 # 104..181
-{
+do {
     my $id;
 
     my $x_warn;
@@ -140,7 +140,7 @@ __EOMK__
     };
 
     sub moan {
-	print "$id: {join ' ',@_}";
+	print "$id: $(join ' ',@_)";
     }
 
     sub warn_unpack_U {
@@ -161,13 +161,13 @@ __EOMK__
 		my $nhex = (nelems @hex);
 		moan "amount of hex ($nhex) not equal to byteslen ($byteslen)\n";
 	    }
-	    {
+	    do {
 		use bytes;
 		my $bytesbyteslen = length($bytes);
 		unless ($bytesbyteslen == $byteslen) {
 		    moan "bytes length() ($bytesbyteslen) not equal to $byteslen\n";
 		}
-	    }
+	    };
 	    my $warn = warn_unpack_U($bytes);
 	    if ($okay eq 'y') {
 		if ($warn) {
@@ -186,4 +186,4 @@ __EOMK__
 	    moan "unknown format\n";
 	}
     }
-}
+};

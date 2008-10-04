@@ -264,7 +264,7 @@ foreach my $dir ( @splithead) {
     # now rewrite the file
     open(H, ">$file.html") ||
 	die "$0: error opening $file.html for output: $!\n";
-    print H "{join ' ',@data}", "\n";
+    print H "$(join ' ',@data)", "\n";
     close(H);
 }
 
@@ -272,7 +272,7 @@ foreach my $dir ( @splithead) {
 
 
 sub usage {
-    warn "$0: {join ' ',@_}\n" if (nelems @_);
+    warn "$0: $(join ' ',@_)\n" if (nelems @_);
     die $usage;
 }
 

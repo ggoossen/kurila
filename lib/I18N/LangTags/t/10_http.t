@@ -88,12 +88,12 @@ foreach my $in ( @in) {
      (nelems @out) == nelems @should
        and lc( join "\e", @(<@out) ) eq lc( join "\e", @should )
     ) {
-      print "# Happily got [{join ' ',@(<@out)}] from [$in]\n";
+      print "# Happily got [$(join ' ',@(<@out))] from [$in]\n";
       ok 1;
     } else {
       ok 0;
-      print "#Got:         [{join ' ',@out}]\n",
-            "# but wanted: [{join ' ',@should}]\n",
+      print "#Got:         [$(join ' ',@out)]\n",
+            "# but wanted: [$(join ' ',@should)]\n",
             "# < \"$in\"\n#\n";
     }
   }

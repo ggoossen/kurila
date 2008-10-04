@@ -11,7 +11,7 @@ use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print "# Pod::Simple version $Pod::Simple::VERSION\n";
 
-{
+do {
 my @output_lines = split m/[\cm\cj]+/, Pod::Simple::XMLOutStream->_out( q{
 
 =encoding koi8-r
@@ -33,13 +33,13 @@ if(grep m/Unknown directive/i, @output_lines ) {
   ok 1;
 }
 
-}
+};
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 print "# Now a control group, to make sure that =fishbladder DOES\n",
       "#  cause an 'unknown directive' error...\n";
       
-{
+do {
 my @output_lines = split m/[\cm\cj]+/, Pod::Simple::XMLOutStream->_out( q{
 
 =fishbladder
@@ -61,7 +61,7 @@ if(grep m/Unknown directive/i, @output_lines ) {
     < map("#==> $_\n", @output_lines), "#\n#\n";
 }
 
-}
+};
 
 
 

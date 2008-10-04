@@ -83,7 +83,7 @@ sub new {
   return bless($s, $c);
 }
 
-{
+do {
   # Packed numeric addresses take less memory. Plus pack is faster than sprintf
   *init_refaddr_format = sub {};
 
@@ -91,7 +91,7 @@ sub new {
     require Scalar::Util;
     pack "J", Scalar::Util::refaddr(shift);
   };
-}
+};
 
 #
 # add-to or query the table of already seen references
@@ -202,11 +202,11 @@ sub Dumpperl {
     }
 
     my $valstr;
-    {
+    do {
       local($s->{apad}) = $s->{apad};
       $s->{apad} .= ' ' x (length($name) + 3) if $s->{indent} +>= 2;
       $valstr = $s->_dump($val, $name);
-    }
+    };
 
     $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{terse};
     $out .= $s->{pad} . $valstr . $s->{sep};
@@ -632,7 +632,7 @@ my %esc = %(
 sub qquote {
   local($_) = shift;
   s/([\\\"\@\$\{\}])/\\$1/g;
-  my $bytes; { use bytes; $bytes = length }
+  my $bytes; do { use bytes; $bytes = length };
   s/([^\x[00]-\x[7f]])/{'\x'.sprintf("[\%02x]",ord($1))}/g if $bytes +> length;
   return qq("$_") unless 
     m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit

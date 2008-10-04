@@ -68,7 +68,7 @@ my $r = 0;
 
 BEGIN { $tests += 8 }
 # try to open a syslog using a Unix or stream socket
-SKIP: {
+SKIP: do {
     skip "can't connect to Unix socket: _PATH_LOG unavailable", 8
       unless -e Sys::Syslog::_PATH_LOG();
 
@@ -78,13 +78,13 @@ SKIP: {
 
     try { setlogsock($sock_type) };
     is( $@, '', "setlogsock() called with '$sock_type'" );
-    TODO: {
+    TODO: do {
         local $TODO = "minor bug";
         ok( $r, "setlogsock() should return true: '$r'" );
-    }
+    };
 
     # open syslog with a "local0" facility
-    SKIP: {
+    SKIP: do {
         # openlog()
         $r = try { openlog('perl', 'ndelay', 'local0') } || 0;
         skip "can't connect to syslog", 6 if $@ and $@->{description} =~ m/^no connection to syslog available/;
@@ -100,15 +100,15 @@ SKIP: {
         $r = try { closelog() } || 0;
         is( $@, '', "closelog()" );
         ok( $r, "closelog() should return true: '$r'" );
-    }
-}
+    };
+};
 
 
 BEGIN { $tests += 20 * 8 }
 # try to open a syslog using all the available connection methods
 my @passed = @( () );
 for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
-    SKIP: {
+    SKIP: do {
         skip "the 'stream' mechanism because a previous mechanism with similar interface succeeded", 20 
             if $sock_type eq 'stream' and grep {m/pipe|unix/} @passed;
 
@@ -128,56 +128,56 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
         $r = try { openlog('perl', '', 'local0') } || 0;
         skip "can't connect to syslog", 16 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' and without option 'ndelay'" );
-        ok( $r, "[$sock_type] openlog() should return true: {dump::view($r)}" );
+        ok( $r, "[$sock_type] openlog() should return true: $(dump::view($r))" );
 
         # openlog() with the option NDELAY
         $r = try { openlog('perl', 'ndelay', 'local0') } || 0;
         skip "can't connect to syslog", 14 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' with option 'ndelay'" );
-        ok( $r, "[$sock_type] openlog() should return true: {dump::view($r)}" );
+        ok( $r, "[$sock_type] openlog() should return true: $(dump::view($r))" );
 
         # syslog() with negative level, should fail
         $r = try { syslog(-1, "$test_string by connecting to a $sock_type socket") } || 0;
         like( $@->{description}, '/^syslog: invalid level\/facility: /', "[$sock_type] syslog() called with level -1" );
-        ok( !$r, "[$sock_type] syslog() should return false: {dump::view($r)}" );
+        ok( !$r, "[$sock_type] syslog() should return false: $(dump::view($r))" );
 
         # syslog() with levels "info" and "notice" (as a strings), should fail
         $r = try { syslog('info,notice', "$test_string by connecting to a $sock_type socket") } || 0;
         like( $@->{description}, '/^syslog: too many levels given: notice/', "[$sock_type] syslog() called with level 'info,notice'" );
-        ok( !$r, "[$sock_type] syslog() should return false: {dump::view($r)}" );
+        ok( !$r, "[$sock_type] syslog() should return false: $(dump::view($r))" );
 
         # syslog() with facilities "local0" and "local1" (as a strings), should fail
         $r = try { syslog('local0,local1', "$test_string by connecting to a $sock_type socket") } || 0;
         like( $@->{description}, '/^syslog: too many facilities given: local1/', "[$sock_type] syslog() called with level 'local0,local1'" );
-        ok( !$r, "[$sock_type] syslog() should return false: {dump::view($r)}" );
+        ok( !$r, "[$sock_type] syslog() should return false: $(dump::view($r))" );
 
         # syslog() with level "info" (as a string), should pass
         $r = try { syslog('info', "$test_string by connecting to a $sock_type socket") } || 0;
         is( $@, '', "[$sock_type] syslog() called with level 'info' (string)" );
-        ok( $r, "[$sock_type] syslog() should return true: {dump::view($r)}" );
+        ok( $r, "[$sock_type] syslog() should return true: $(dump::view($r))" );
 
         # syslog() with level "info" (as a macro), should pass
-        { local $! = 1;
+        do { local $! = 1;
           $r = try { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: \%m") } || 0;
-        }
+        };
         is( $@, '', "[$sock_type] syslog() called with level 'info' (macro)" );
-        ok( $r, "[$sock_type] syslog() should return true: {dump::view($r)}" );
+        ok( $r, "[$sock_type] syslog() should return true: $(dump::view($r))" );
 
         push @passed, $sock_type;
 
-        SKIP: {
+        SKIP: do {
             skip "skipping closelog() tests for 'console'", 2 if $sock_type eq 'console';
             # closelog()
             $r = try { closelog() } || 0;
             is( $@, '', "[$sock_type] closelog()" );
             ok( $r, "[$sock_type] closelog() should return true: '$r'" );
-        }
-    }
+        };
+    };
 }
 
 
 BEGIN { $tests += 10 }
-SKIP: {
+SKIP: do {
     skip "not testing setlogsock('stream') on Win32", 10 if $is_Win32;
     skip "the 'unix' mechanism works, so the tests will likely fail with the 'stream' mechanism", 10 
         if grep {m/unix/} @passed;
@@ -216,7 +216,7 @@ SKIP: {
     ok( !$r, "setlogsock() should return false: '$r'" );
 
     # setlogsock() with "stream" and a local file
-    SKIP: {
+    SKIP: do {
         my $logfile = "test.log";
         open(LOG, ">", "$logfile") or skip "can't create file '$logfile': $!", 2;
         close(LOG);
@@ -224,13 +224,13 @@ SKIP: {
         is( $@, '', "setlogsock() called, with 'stream' and '$logfile' (file exists)" );
         ok( $r, "setlogsock() should return true: '$r'" );
         unlink($logfile);
-    }
-}
+    };
+};
 
 
 BEGIN { $tests += 3 + 4 * 3 }
 # setlogmask()
-{
+do {
     my $oldmask = 0;
 
     $oldmask = try { setlogmask(0) } || 0;
@@ -254,4 +254,4 @@ BEGIN { $tests += 3 + 4 * 3 }
         is( $r, $newmask, "setlogmask() must return the new mask");
         setlogmask($oldmask);
     }
-}
+};

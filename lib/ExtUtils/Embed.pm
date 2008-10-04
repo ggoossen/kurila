@@ -97,7 +97,7 @@ sub xsi_protos {
         my($mname, $cname);
         ($mname = $pname) =~ s!/!::!g;
         ($cname = $pname) =~ s!/!__!g;
-	my($ccode) = "EXTERN_C void boot_{$cname} ($boot_proto);\n";
+	my($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n";
 	next if %seen{$ccode}++;
         push(@retval, $ccode);
     }
@@ -120,10 +120,10 @@ sub xsi_body {
         if ($pname eq $dl){
             # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
             # boot_DynaLoader is called directly in DynaLoader.pm
-            $ccode = "\t/* DynaLoader is a special case */\n\tnewXS(\"{$mname}::boot_{$cname}\", boot_{$cname}, file);\n";
+            $ccode = "\t/* DynaLoader is a special case */\n\tnewXS(\"$($mname)::boot_$($cname)\", boot_$($cname), file);\n";
             push(@retval, $ccode) unless %seen{$ccode}++;
         } else {
-            $ccode = "\tnewXS(\"{$mname}::bootstrap\", boot_{$cname}, file);\n";
+            $ccode = "\tnewXS(\"$($mname)::bootstrap\", boot_$($cname), file);\n";
             push(@retval, $ccode) unless %seen{$ccode}++;
         }
     }
@@ -197,13 +197,13 @@ sub ldopts {
     push(@mods, < static_ext()) if $std;
 
     my(@ns,$root,$sub,$extra,$archive,@archives);
-    print STDERR "Searching ({join ' ',@path}) for archives\n" if $Verbose;
+    print STDERR "Searching ($(join ' ',@path)) for archives\n" if $Verbose;
     foreach my $mod ( @mods) {
 	@ns = split(m/::|\/|\\/, $mod);
 	$sub = @ns[-1];
 	$root = File::Spec->catdir(< @ns);
 	
-	print STDERR "searching for '{$sub}{$lib_ext}'\n" if $Verbose;
+	print STDERR "searching for '$($sub)$($lib_ext)'\n" if $Verbose;
 	foreach ( @path) {
 	    next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
 	    push @archives, $archive;
@@ -244,7 +244,7 @@ sub ldopts {
     print STDERR "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose;
     my $ccdlflags = _ccdlflags();
     my $ldflags   = _ldflags();
-    my $linkage = "$ccdlflags $ldflags {join ' ',@archives} $ld_or_bs";
+    my $linkage = "$ccdlflags $ldflags $(join ' ',@archives) $ld_or_bs";
     print STDERR "ldopts: '$linkage'\n" if $Verbose;
 
     return $linkage if scalar nelems @_;

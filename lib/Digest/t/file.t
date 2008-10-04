@@ -3,7 +3,7 @@
 use Test < qw(plan ok);
 plan tests => 5;
 
-{
+do {
    package Digest::Foo;
    require Digest::base;
    use vars < qw(@ISA $VERSION);
@@ -25,7 +25,7 @@ plan tests => 5;
 	my $self = shift;
 	return sprintf "\%04d", length($$self);
    }
-}
+};
 
 use Digest::file < qw(digest_file digest_file_hex digest_file_base64);
 

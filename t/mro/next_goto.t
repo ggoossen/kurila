@@ -7,7 +7,7 @@ require q(./test.pl); plan(tests => 4);
 
 use mro;
 
-{
+do {
     package Proxy;
     our @ISA = @( qw// );
     sub next_proxy { goto &next::method }
@@ -27,7 +27,7 @@ use mro;
     sub bar { shift->Proxy::maybe_proxy() }
     sub baz { shift->Proxy::maybe_proxy() }
     sub quux { shift->Proxy::can_proxy()->() }
-}
+};
 
 is(TTop->foo, 42, 'proxy next::method via goto');
 is(TTop->bar, 24, 'proxy maybe::next::method via goto');

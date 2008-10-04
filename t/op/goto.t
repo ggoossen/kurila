@@ -109,7 +109,7 @@ is($@, "", '...and $@ still not set');
 
 # Test that goto works in nested eval-string
 $ok = 0;
-{eval q{
+do {eval q{
   eval q{
     goto LABEL22;
   };
@@ -119,10 +119,10 @@ $ok = 0;
   LABEL22: $ok = 1;
 };
 $ok = 0 if $@;
-}
+};
 ok($ok, 'works correctly in a nested eval string');
 
-{
+do {
     my $false = 0;
     my $count;
 
@@ -131,7 +131,7 @@ ok($ok, 'works correctly in a nested eval string');
     ok($ok, '#20357 goto inside /{ } continue { }/ loop');
 
     $ok = 0;
-    { do { goto A; A: $ok = 1 } while $false }
+    do { do { goto A; A: $ok = 1 } while $false };
     ok($ok, '#20154 goto inside /do { } while ()/ loop');
     $ok = 0;
     foreach(@(1)) { goto A; A: $ok = 1 } continue { };
@@ -139,12 +139,12 @@ ok($ok, 'works correctly in a nested eval string');
 
     $ok = 0;
     sub a {
-	A: { if ($false) { redo A; B: $ok = 1; redo A; } }
+	A: do { if ($false) { redo A; B: $ok = 1; redo A; } };
 	goto B unless $count++;
     }
     a();
     ok($ok, '#19061 loop label wiped away by goto');
-}
+};
 
 # bug #9990 - don't prematurely free the CV we're &going to.
 
@@ -207,7 +207,7 @@ is(curr_test(), 5, 'eval "goto $x"');
 
 sub two {
     my ($pack, $file, $line) = caller;	# Should indicate original call stats.
-    is("{join ' ',@_} $pack $file $line", "1 2 3 main $::FILE $::LINE",
+    is("$(join ' ',@_) $pack $file $line", "1 2 3 main $::FILE $::LINE",
 	'autoloading mechanism.');
 }
 
@@ -223,31 +223,31 @@ $::FILE = __FILE__;
 $::LINE = __LINE__ + 1;
 &one(1,2,3);
 
-{
+do {
     my $wherever = 'NOWHERE';
     try { goto $wherever };
     like($@->{description}, qr/Can't find label NOWHERE/, 'goto NOWHERE sets $@');
-}
+};
 
 # see if a modified @_ propagates
-{
+do {
   my $i;
   package Foo;
   sub DESTROY	{ my $s = shift; main::is($s->[0], $i, "destroy $i"); }
   sub show	{ main::is(+nelems @_, 5, "show $i",); }
   sub start	{ push @_, 1, "foo", \%(); goto &show; }
   for (1..3)	{ $i = $_; start(bless(\@($_)), 'bar'); }
-}
+};
 
-{
+do {
     my $wherever = 'FINALE';
     goto $wherever;
-}
+};
 fail('goto $wherever');
 
 moretests:
 # test goto duplicated labels.
-{
+do {
     my $z = 0;
     try {
 	$z = 0;
@@ -277,17 +277,17 @@ moretests:
 
     $z = 0;
   L2: 
-    { 
+    do { 
 	$z += 10;
 	is($z, 10, 'prefer this scope (block body) to outer scope (block entry)');
 	goto L2 if $z == 10;
 	$z += 10;
       L2:
 	is($z, 10, 'prefer this scope: second');
-    }
+    };
 
 
-    { 
+    do { 
 	$z = 0;
 	while (1) {
 	  L3: # not inner scope
@@ -299,10 +299,10 @@ moretests:
 	$z += 10;
       L3: # this scope !
 	is($z, 10, 'prefer this scope to inner scope: second');
-    }
+    };
 
   L4: # not outer scope
-    { 
+    do { 
 	$z = 0;
 	while (1) {
 	  L4: # not inner scope
@@ -314,9 +314,9 @@ moretests:
 	$z += 10;
       L4: # this scope !
 	is($z, 1, 'prefer this scope to inner,outer scopes: second');
-    }
+    };
 
-    {
+    do {
 	my $loop = 0;
 	for my $x (0..1) { 
 	  L2: # without this, fails 1 (middle) out of 3 iterations
@@ -327,8 +327,8 @@ moretests:
 		"same label, multiple times in same scope (choose 1st) $loop");
 	    goto L2 if $z == 10 and not $loop++;
 	}
-    }
-}
+    };
+};
 
 # deep recursion with gotos eventually caused a stack reallocation
 # which messed up buggy internals that didn't expect the stack to move
@@ -362,15 +362,15 @@ like($@->{description}, qr/Can't goto subroutine from an eval-block/, 'eval bloc
 
 # [perl #36521] goto &foo in warn handler could defeat recursion avoider
 
-{
+do {
     my $r = runperl(
 		stderr => 1,
 		prog => 'my $d; my $w = sub { return if $d++; warn q(bar)}; local $^WARN_HOOK = sub { goto &$w; }; warn q(foo);'
     );
     like($r, qr/recursive die/, "goto &foo in warn");
-}
+};
 
-TODO: {
+TODO: do {
     local $TODO = "[perl #43403] goto() from an if to an else doesn't undo local () changes";
     our $global = "unmodified";
     if ($global) { # true but not constant-folded
@@ -379,5 +379,5 @@ TODO: {
     } else {
          ELSE: is($global, "unmodified");
     }
-}
+};
 

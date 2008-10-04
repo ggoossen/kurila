@@ -74,9 +74,9 @@ sub TEST {
 
 sub SKIP_TEST {
     my $reason = shift;
-  SKIP: {
+  SKIP: do {
         skip $reason, 3;
-    }
+    };
 }
 
 $TMAX = 8; $XS = 0;

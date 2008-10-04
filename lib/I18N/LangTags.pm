@@ -635,7 +635,7 @@ sub alternate_language_tags {
 
 ###########################################################################
 
-{
+do {
   # Init %Panic...
   
   my @panic = @(  # MUST all be lowercase!
@@ -696,7 +696,7 @@ sub alternate_language_tags {
       }
     }
   }
-}
+};
 
 =item * the function @langs = panic_languages(@accept_languages)
 

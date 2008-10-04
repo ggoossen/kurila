@@ -52,9 +52,9 @@ sub parse_version_string {
 # This is a specific test to see if a version subroutine in the $VERSION
 # declaration confuses later calls to the version class.
 # [rt.cpan.org 30747]
-{
+do {
     is parse_version_string(q[ $VERSION = '1.00'; sub version { $VERSION } ]),
        '1.00';
     is parse_version_string(q[ use version; $VERSION = version->new("1.2.3") ]),
        qv("1.2.3")->stringify;
-}
+};

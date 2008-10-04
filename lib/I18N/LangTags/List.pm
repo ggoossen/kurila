@@ -7,7 +7,7 @@ $VERSION = '0.35';
 # POD at the end.
 
 #----------------------------------------------------------------------
-{
+do {
 # read the table out of our own POD!
   my $seeking = 1;
   my $count = 0;
@@ -31,7 +31,7 @@ $VERSION = '0.35';
     }
   }
   die "No tags read??" unless $count;
-}
+};
 #----------------------------------------------------------------------
 
 sub name {

@@ -89,7 +89,7 @@ sub new
     }
 
     #if (whatever)
-    {
+    do {
         my $missing = grep { ! -e $_ } @inputFiles ;
 
         if ($missing)
@@ -97,7 +97,7 @@ sub new
             $Error = "$missing input files do not exist";
             return undef ;
         }
-    }
+    };
 
     $self->{InputFiles} = \@inputFiles ;
 

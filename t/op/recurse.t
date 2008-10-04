@@ -72,7 +72,7 @@ my ($x, $y, $z) = (18, 12, 6);
 
 is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 
-{
+do {
     sub get_first1 {
 	get_list1(< @_)->[0];
     }
@@ -84,9 +84,9 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
     }
     my $x = get_first1(1);
     ok($x, "premature FREETMPS (change 5699)");
-}
+};
 
-{
+do {
     sub get_first2 {
 	return get_list2(< @_)->[0];
     }
@@ -98,9 +98,9 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
     }
     my $x = get_first2(1);
     ok($x, "premature FREETMPS (change 5699)");
-}
+};
 
-{
+do {
     local $^W = 0; # We do not need recursion depth warning.
 
     sub sillysum {
@@ -108,10 +108,10 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
     }
 
     is(sillysum(1000), 1000*1001/2, "recursive sum of 1..1000");
-}
+};
 
 # check ok for recursion depth > 65536
-{
+do {
     my $r;
     try { 
 	$r = runperl(
@@ -119,7 +119,7 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 		     stderr => 1,
 		     prog => q{our $d=0; our $e=1; sub c { ++$d; if ($d +> 66000) { $e=0 } else { c(); c() unless $d % 32768 } --$d } c(); exit $e});
     };
-  SKIP: {
+  SKIP: do {
       skip("Out of memory -- increase your data/heap?", 2)
 	  if $r =~ m/Out of memory/i;
       is($r, '', "64K deep recursion - no output expected");
@@ -130,6 +130,6 @@ is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
           is($?, 0, "64K deep recursion - no coredump expected");
       }
 
-  }
-}
+  };
+};
 

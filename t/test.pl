@@ -81,7 +81,7 @@ sub diag {
 
 sub skip_all {
     if ((nelems @_)) {
-	_print "1..0 # Skipped: {join ' ',@_}\n";
+	_print "1..0 # Skipped: $(join ' ',@_)\n";
     } else {
 	_print "1..0\n";
     }
@@ -197,12 +197,12 @@ sub cmp_ok ($$$@) {
     my($got, $type, $expected, $name, < @mess) = < @_;
 
     my $pass;
-    {
+    do {
         local $^W = 0;
         local($@,$!);   # don't interfere with $@
                         # eval() sometimes resets $!
         $pass = eval "\$got $type \$expected";
-    }
+    };
     unless ($pass) {
         # It seems Irix long doubles can have 2147483648 and 2147483648
         # that stringify to the same thing but are acutally numerically
@@ -544,7 +544,7 @@ sub runperl {
 *run_perl = \&runperl; # Nice alias.
 
 sub DIE {
-    _print_stderr "# {join ' ',@_}\n";
+    _print_stderr "# $(join ' ',@_)\n";
     exit 1;
 }
 
@@ -794,7 +794,7 @@ sub dies_like(&$;$) {
 sub eval_dies_like($$;$) {
     my ($e, $qr, $name) = < @_;
   TODO:
-    {
+    do {
         todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{PERL_VALGRIND};
         
         eval "$e";
@@ -805,7 +805,7 @@ sub eval_dies_like($$;$) {
             return ok(0, $name);
         }
         return like_yn(0, $err->{description}, $qr );
-    }
+    };
 }
 
 1;

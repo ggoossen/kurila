@@ -13,7 +13,7 @@ our $VERSION = '1.06';
 my $pkg = __PACKAGE__;
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
     my (undef, $f, $l) = caller;
-    die("Incorrect use of pragma '{__PACKAGE__}' at $f line $l.\n");
+    die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
 }
 
 =head1 NAME
@@ -432,7 +432,7 @@ sub __chk
     my $pkg ;
 
     if ($isobj) {
-        while (do { { package DB; $pkg = @(caller($i++))[0] } } ) {
+        while (do { do { package DB; $pkg = @(caller($i++))[0] }; } ) {
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;

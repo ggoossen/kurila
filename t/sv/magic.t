@@ -123,11 +123,11 @@ ok( (nelems @val1) +> 1 );
 
 # $"
 my @a = qw(foo bar baz);
-ok "{join ' ',@a}" eq "foo bar baz", "{join ' ',@a}";
-{
+ok "$(join ' ',@a)" eq "foo bar baz", "$(join ' ',@a)";
+do {
     local $" = ',';
-    ok qq|{join $",@a}| eq "foo,bar,baz", "{join ' ',@a}";
-}
+    ok qq|$(join $",@a)| eq "foo,bar,baz", "$(join ' ',@a)";
+};
 
 # $?, $@, $$
 if ($Is_MacOS) {
@@ -150,7 +150,7 @@ ok $@->{description} =~ m/^Modification of a read-only value attempted/;
 our ($wd, $script);
 
 # $^X and $0
-{
+do {
     if ($^O eq 'qnx') {
 	chomp($wd = `/usr/bin/fullpath -t`);
     }
@@ -237,7 +237,7 @@ EOF
     s{\\}{/}g;
     ok(($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1) or diag " :$_:!=:$s1: after `$perl $script`";
     ok unlink($script) or diag $!;
-}
+};
 
 # $], $^O, $^T
 ok $^O;
@@ -245,10 +245,10 @@ ok $^T +> 850000000, $^T;
 
 # Test change 25062 is working
 my $orig_osname = $^O;
-{
+do {
 local $^I = '.bak';
 ok($^O eq $orig_osname, 'Assigning $^I does not clobber $^O');
-}
+};
 $^O = $orig_osname;
 
 if ($Is_VMS || $Is_Dos || $Is_MacOS) {
@@ -311,15 +311,15 @@ else {
 	}
 }
 
-{
+do {
     my $ok = 1;
     my $warn = '';
     local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @_; };
     $! = undef;
     ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
-}
+};
 
-SKIP: {
+SKIP: do {
     # test case-insignificance of %ENV (these tests must be enabled only
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
@@ -330,7 +330,7 @@ SKIP: {
     ok exists(%ENV{'FOo'});
     ok (delete(%ENV{'foO'}) eq 'baz');
     ok (scalar(keys(%ENV)) == 0);
-}
+};
 
 if ($Is_miniperl) {
     skip ("miniperl can't rely on loading \%Errno") for 1..2;
@@ -371,22 +371,22 @@ try { $^TAINT = 1 };
 ok $^TAINT == 0;
 
 # Tests for the magic get of $\
-{
+do {
     my $ok = 0;
     # [perl #19330]
-    {
+    do {
 	local $\ = undef;
 	$\++; $\++;
 	$ok = $\ eq 2;
-    }
+    };
     ok $ok;
     $ok = 0;
-    {
+    do {
 	local $\ = "a\0b";
 	$ok = "a$\b" eq "aa\0bb";
-    }
+    };
     ok $ok;
-}
+};
 
 # Test for bug [perl #36434]
 if (!$Is_VMS) {

@@ -61,19 +61,19 @@ print $@->{description} =~ m/^Modification of a read/ ? "ok 22\n" : "not ok 22\n
 try { $1 = undef };
 print $@->{description} =~ m/^Modification of a read/ ? "ok 23\n" : "not ok 23\n";
 
-{
+do {
     require Tie::Hash;
     tie my %foo, 'Tie::StdHash';
     print defined %foo ? "ok 24\n" : "not ok 24\n";
     %foo = %( a => 1 );
     print defined %foo ? "ok 25\n" : "not ok 25\n";
-}
+};
 
-{
+do {
     # [perl #17753] segfault when undef'ing unquoted string constant
     eval 'undef tcp';
     print $@->{description} =~ m/^Can't modify constant item/ ? "ok 26\n" : "not ok 26\n";
-}
+};
 
 # bugid 3096
 # undefing a hash may free objects with destructors that then try to

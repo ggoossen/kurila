@@ -177,7 +177,7 @@ sub Compress::Raw::Zlib::Parameters::parse
 
     while (my ($key, $v) = each %$default)
     {
-        croak "need 4 params [{join ' ',@$v}]"
+        croak "need 4 params [$(join ' ',@$v)]"
             if (nelems @$v) != 4 ;
 
         my ($first_only, $sticky, $type, $value) = < @$v ;
@@ -221,7 +221,7 @@ sub Compress::Raw::Zlib::Parameters::parse
  
     if ((nelems @Bad)) {
         my ($bad) = join(", ", @Bad) ;
-        return $self->setError("unknown key value(s) {join ' ',@Bad}") ;
+        return $self->setError("unknown key value(s) $(join ' ',@Bad)") ;
     }
 
     return 1;

@@ -25,7 +25,7 @@ $r = runperl( switches => \@( '-CO', '-w' ),
               stderr   => 1 );
 like( $r, qr/^$b(?:\r?\n)?$/s, '-CO: no warning on UTF-8 output' );
 
-SKIP: {
+SKIP: do {
     if (exists %ENV{PERL_UNICODE} &&
 	(%ENV{PERL_UNICODE} eq "" || %ENV{PERL_UNICODE} =~ m/[SO]/)) {
 	skip(qq[cannot test with PERL_UNICODE locale "" or /[SO]/], 1);
@@ -35,7 +35,7 @@ SKIP: {
 		  stderr   => 1,
 		  stdin    => $b );
     like( $r, qr/^256(?:\r?\n)?$/s, '-CI: read in UTF-8 input' );
-}
+};
 
 $r = runperl( switches => \@( '-CE', '-w' ),
 	      prog     => 'use utf8; warn chr(256)',

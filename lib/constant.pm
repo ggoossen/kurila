@@ -82,9 +82,9 @@ sub import {
 	    die("Constant name '$name' has invalid characters");
 	}
 
-	{
+	do {
 	    no strict 'refs';
-	    my $full_name = "{$pkg}::$name";
+	    my $full_name = "$($pkg)::$name";
 	    %declared{$full_name}++;
 	    if ($multiple || (nelems @_) == 1) {
 		my $scalar = $multiple ? $constants->{$name} : @_[0];
@@ -95,7 +95,7 @@ sub import {
 	    } else {
 		*{Symbol::fetch_glob($full_name)} = sub () { };
 	    }
-	}
+	};
     }
 }
 

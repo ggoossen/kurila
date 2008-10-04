@@ -23,7 +23,7 @@ sub bits {
         $bits ^|^= %bitmask{$s} || 0;
     }
     if ((nelems @wrong)) {
-        die("Unknown 'strict' tag(s) '{dump::view(\@wrong)}'");
+        die("Unknown 'strict' tag(s) '$(dump::view(\@wrong))'");
     }
     $bits;
 }

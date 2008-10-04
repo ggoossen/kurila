@@ -431,7 +431,7 @@ sub checkOptree {
     my ($rendering);
 
     print "checkOptree args: ", <mydumper($tc) if $tc->{dump};
-    SKIP: {
+    SKIP: do {
 	skip("$tc->{skip} $tc->{name}", 1) if $tc->{skip};
 
 	return runSelftest($tc) if %gOpts{selftest};
@@ -449,7 +449,7 @@ sub checkOptree {
 	    $tc->mkCheckRex($want);
 	    $tc->mylike();
 	}
-    }
+    };
     return;
 }
 
@@ -525,11 +525,11 @@ sub getRendering {
 	    # treat as source, and wrap into subref 
 	    #  in caller's package ( to test arg-fixup, comment next line)
 	    my $pkg = '{ package '.caller(1) .';';
-	    {
+	    do {
 		no strict;
 		no warnings;
 		$code = eval "$pkg sub \{ $code \} \}";
-	    }
+	    };
 	    # return errors
 	    if ($@) { push @errs, $@->message }
 	}

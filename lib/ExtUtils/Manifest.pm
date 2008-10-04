@@ -507,14 +507,14 @@ sub cp_if_diff {
 	if (-e $to) {
 	    unlink($to) or die "unlink $to: $!";
 	}
-        STRICT_SWITCH: {
+        STRICT_SWITCH: do {
 	    best($from,$to), last STRICT_SWITCH if $how eq 'best';
 	    cp($from,$to), last STRICT_SWITCH if $how eq 'cp';
 	    ln($from,$to), last STRICT_SWITCH if $how eq 'ln';
 	    die("ExtUtils::Manifest::cp_if_diff " .
 		  "called with illegal how argument [$how]. " .
 		  "Legal values are 'best', 'cp', and 'ln'.");
-	}
+	};
     }
 }
 

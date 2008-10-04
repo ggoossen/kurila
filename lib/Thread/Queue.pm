@@ -234,7 +234,7 @@ $validate_index = sub {
     if (! looks_like_number($index) || (int($index) != $index)) {
         my ($method) = @(caller(1))[3];
         $method =~ s/Thread::Queue:://;
-        die("Invalid 'index' argument ({dump::view($index)}) to '$method' method");
+        die("Invalid 'index' argument ($(dump::view($index))) to '$method' method");
     }
 
     return $index;

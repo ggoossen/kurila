@@ -106,7 +106,7 @@ if(
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-{
+do {
 print "# Testing unget_token\n";
 
 my $p = Pod::Simple::PullParser->new;
@@ -117,7 +117,7 @@ my $t;
 $t = $p->get_token;
 ok $t && $t->type, 'start';
 ok $t && $t->tagname, 'Document';
-print "# ungetting ({dump::view($t)}).\n";
+print "# ungetting ($(dump::view($t))).\n";
 $p->unget_token($t);
 ok 1;
 
@@ -131,7 +131,7 @@ ok $t && $t->type, 'start';
 ok $t && $t->tagname, 'Para';
 push @to_save, $t;
 
-print "# ungetting ({dump::view(\@to_save)}.\n";
+print "# ungetting ($(dump::view(\@to_save)).\n";
 $p->unget_token(< @to_save);
 splice @to_save;
 
@@ -146,12 +146,12 @@ ok $t && $t->tagname, 'Para';
 
 ok 1;
 
-}
+};
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-{
+do {
 print "# Testing pullparsing from an arrayref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
@@ -175,11 +175,11 @@ ok @t[2]->text,    'Lala zaza';
 ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
 
-}
+};
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-{
+do {
 print "# Testing pullparsing from an arrayref with terminal newlines\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
@@ -204,12 +204,12 @@ ok @t[2]->text,    'Lala zaza';
 ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
 
-}
+};
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 END { unlink "temp.pod" }
-{
+do {
 print "# Testing pullparsing from a file\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
@@ -243,11 +243,11 @@ ok @t[2]->text,    'Lala zaza';
 ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
 
-}
+};
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-{
+do {
 print "# Testing pullparsing from a glob\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
@@ -274,11 +274,11 @@ ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
 close(IN);
 
-}
+};
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-{
+do {
 print "# Testing pullparsing from a globref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
@@ -305,11 +305,11 @@ ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
 close(IN);
 
-}
+};
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-{
+do {
 print "# Testing pullparsing from a filehandle\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
@@ -336,7 +336,7 @@ ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
 close(IN);
 
-}
+};
 
 
 

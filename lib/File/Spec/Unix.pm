@@ -141,13 +141,13 @@ sub _tmpdir {
     return $tmpdir if defined $tmpdir;
     my $self = shift;
     my @dirlist = @_;
-    {
+    do {
 	no strict 'refs';
 	if (${*{Symbol::fetch_glob("\cTAINT")}}) { # Check for taint mode on perl >= 5.8.0
             require Scalar::Util;
 	    @dirlist = grep { ! Scalar::Util::tainted($_) } @dirlist;
 	}
-    }
+    };
     foreach ( @dirlist) {
 	next unless defined && -d && -w _;
 	$tmpdir = $_;

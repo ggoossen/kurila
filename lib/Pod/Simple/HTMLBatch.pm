@@ -163,7 +163,7 @@ sub _batch_convert_main {
   }
   
   if($dirs) {
-    $self->muse(scalar(nelems @$dirs), " dirs to scan: {join ' ',@$dirs}");
+    $self->muse(scalar(nelems @$dirs), " dirs to scan: $(join ' ',@$dirs)");
   } else {
     $self->muse("Scanning \@INC.  This could take a minute or two.");
   }
@@ -331,7 +331,7 @@ sub _write_contents_start {
   my($self, $Contents, $outfile) = < @_;
   my $starter = $self->contents_page_start || '';
   
-  {
+  do {
     my $css_wad = $self->_css_wad_to_markup(1);
     if( $css_wad ) {
       $starter =~ s{(</head>)}{\n$css_wad\n$1}i;  # otherwise nevermind
@@ -341,7 +341,7 @@ sub _write_contents_start {
     if( $javascript_wad ) {
       $starter =~ s{(</head>)}{\n$javascript_wad\n$1}i;   # otherwise nevermind
     }
-  }
+  };
 
   unless(print $Contents $starter, "<dl class='superindex'>\n" ) {
     warn "Couldn't print to $outfile: $!\nAbort writing to $outfile at all";
@@ -367,7 +367,7 @@ sub _write_contents_middle {
     my($path, $name);
     foreach my $e ( @downlines) {
       $name = $e->[0];
-      $path = join( "/", @( '.', < map { esc($_) } @{$e->[3]}) )
+      $path = join( "/", @( '.', < map { esc($_) } @$($e->[3])) )
         . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION);
       print $Contents qq{  <a href="$path">}, esc($name), "</a>&nbsp;&nbsp;\n";
     }
@@ -529,7 +529,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   my($self, $dirs) = < @_;
 
   my $m2p;
-  {
+  do {
     my $search = $SEARCH_CLASS->new;
     DEBUG and print "Searching via $search\n";
     $search->verbose(1) if DEBUG +> 10;
@@ -539,7 +539,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
     $search->survey(  $dirs ? < @$dirs : () );
     $m2p = $search->name2path;
     die "What, no name2path?!" unless $m2p;
-  }
+  };
 
   $self->muse("That's odd... no modules found!") unless %$m2p;
   if( DEBUG +> 4 ) {

@@ -688,7 +688,7 @@ sub Trequire
         push( @undefined, $cap )
           unless defined $self->{ '_' . $cap } && $self->{ '_' . $cap };
     }
-    croak "Terminal does not support: ({join ' ',@undefined})" if (nelems @undefined);
+    croak "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined);
 }
 
 =back

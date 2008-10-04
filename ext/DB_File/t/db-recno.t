@@ -28,7 +28,7 @@ sub ok
     return $result ;
 }
 
-{
+do {
     package Redirect ;
     use Symbol ;
 
@@ -48,7 +48,7 @@ sub ok
 	close $self->[0] ;
 	select($self->[1]) ;
     }
-}
+};
 
 sub docat
 {
@@ -120,12 +120,12 @@ sub normalise
 
 BEGIN 
 { 
-    { 
+    do { 
         try { require Data::Dumper ; Data::Dumper->import() } ; 
-    }
+    };
  
     if ($@) {
-        *Dumper = sub { my $a = shift; return "[ {join ' ',@{ $a }} ]" } ;
+        *Dumper = sub { my $a = shift; return "[ $(join ' ',@$( $a )) ]" } ;
     }          
 }
 

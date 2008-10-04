@@ -34,7 +34,7 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst");
      # TODO: add roffitall
     );
 
-{
+do {
   my @files = keys %Targets;
   my $filesopts = join(" | ", map { "--build-$_" } @( "all", < sort @files));
   my $showfiles;
@@ -63,7 +63,7 @@ __USAGE__
           "\n";
       exit(0);
   }
-}
+};
 
 # Don't copy these top level READMEs
 %Ignore
@@ -149,7 +149,7 @@ if (defined $delta_source) {
 close MASTER;
 
 # Sanity cross check
-{
+do {
   my (%disk_pods, @disk_pods);
   my (@manipods, %manipods);
   my (@manireadmes, %manireadmes);
@@ -219,10 +219,10 @@ close MASTER;
     warn "$0: $i is known by perl.pod but does not exist\n"
       unless %disk_pods{$i};
   }
-}
+};
 
 # Find all the mdoules
-{
+do {
   my @modpods;
   find \&getpods => < qw(../lib ../ext);
 
@@ -272,7 +272,7 @@ close MASTER;
       %Modules{$name} = $_;
     }
   }
-}
+};
 
 # OK. Now a lot of ancillary function definitions follow
 # Main program returns at "Do stuff"
@@ -506,7 +506,7 @@ sub generate_perlpod {
   $maxlength += 2;
   $maxlength = ($maxlength + 3) ^&^ ^~^3;
   # sprintf gives $1.....$2 where ... are spaces:
-  return unexpand (< map {ref $_ ? sprintf "\%-{$maxlength}s\%s\n", < @$_ : $_}
+  return unexpand (< map {ref $_ ? sprintf "\%-$($maxlength)s\%s\n", < @$_ : $_}
  @output);
 }
 

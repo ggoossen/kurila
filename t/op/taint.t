@@ -81,10 +81,10 @@ EndOfCleanup
 my $TAINT = substr($^X, 0, 0);
 #   A tainted zero, useful for tainting numbers
 my $TAINT0;
-{
+do {
     no warnings;
     $TAINT0 = 0 + $TAINT;
-}
+};
 
 # This taints each argument passed. All must be lvalues.
 # Side effect: It also stringifies them. :-(
@@ -143,7 +143,7 @@ my $TEST = catfile(curdir(), 'TEST');
 # First, let's make sure that Perl is checking the dangerous
 # environment variables. Maybe they aren't set yet, so we'll
 # taint them ourselves.
-{
+do {
     %ENV{'DCL$PATH'} = '' if $Is_VMS;
 
     if ($Is_MSWin32 && %Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
@@ -168,7 +168,7 @@ my $TEST = catfile(curdir(), 'TEST');
 
     test try { `$echo 1` } eq "1\n";
 
-    SKIP: {
+    SKIP: do {
         skip "Environment tainting tests skipped", 4
           if $Is_MSWin32 || $Is_NetWare || $Is_VMS || $Is_Dos || $Is_MacOS;
 
@@ -179,7 +179,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
-	test !nelems @vars, "{join ' ',@vars}";
+	test !nelems @vars, "$(join ' ',@vars)";
 
 	# tainted $TERM is unsafe only if it contains metachars
 	local %ENV{TERM};
@@ -188,7 +188,7 @@ my $TEST = catfile(curdir(), 'TEST');
 	%ENV{TERM} = 'e=mc2' . $TAINT;
 	test !try { `$echo 1` };
 	like( $@->{description}, qr/^Insecure \$ENV{TERM}/ );
-    }
+    };
 
     my $tmp;
     if ($^O eq 'os2' || $^O eq 'amigaos' || $Is_MSWin32 || $Is_NetWare || $Is_Dos) {
@@ -201,34 +201,34 @@ my $TEST = catfile(curdir(), 'TEST');
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
-    SKIP: {
+    SKIP: do {
         skip "all directories are writeable", 2 unless $tmp;
 
 	local %ENV{PATH} = $tmp;
 	test !try { `$echo 1` };
 	test $@->{description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         skip "This is not VMS", 4 unless $Is_VMS;
 
 	%ENV{'DCL$PATH'} = $TAINT;
 	test  try { `$echo 1` } eq '';
 	test $@->{description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
-	SKIP: {
+	SKIP: do {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
 	    %ENV{'DCL$PATH'} = $tmp;
 	    test try { `$echo 1` } eq '';
 	    test $@->{description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
-	}
+	};
 	%ENV{'DCL$PATH'} = '';
-    }
-}
+    };
+};
 
 # Let's see that we can taint and untaint as needed.
-{
+do {
     my $foo = $TAINT;
     test tainted $foo;
 
@@ -255,7 +255,7 @@ my $TEST = catfile(curdir(), 'TEST');
     test not tainted $foo;
     test $foo eq 'bar';
 
-    {
+    do {
       use re 'taint';
 
       ($foo) = ('bar' . $TAINT) =~ m/(.+)/;
@@ -265,7 +265,7 @@ my $TEST = catfile(curdir(), 'TEST');
       $foo = $1 if ('bar' . $TAINT) =~ m/(.+)/;
       test tainted $foo;
       test $foo eq 'bar';
-    }
+    };
 
     $foo = $1 if 'bar' =~ m/(.+)$TAINT/;
     test tainted $foo;
@@ -277,10 +277,10 @@ my $TEST = catfile(curdir(), 'TEST');
     ($pi) = $pi =~ m/(\d+\.\d+)/;
     test not tainted $pi;
     test sprintf("\%.5f", $pi) eq '3.14159';
-}
+};
 # How about command-line arguments? The problem is that we don't
 # always get some, so we'll run another process with some.
-SKIP: {
+SKIP: do {
     my $arg = catfile(curdir(), "arg$$");
     open PROG, ">", "$arg" or die "Can't create $arg: $!";
     print PROG q{
@@ -293,10 +293,10 @@ SKIP: {
     print `$Invoke_Perl "-T" $arg and some suspect arguments`;
     test !$?, "Exited with status $?";
     unlink $arg;
-}
+};
 
 # Reading from a file should be tainted
-{
+do {
     test open(FILE, "<", $TEST), "Couldn't open '$TEST': $!";
 
     my $block;
@@ -305,11 +305,11 @@ SKIP: {
     close FILE;
     test tainted $block;
     test tainted $line;
-}
+};
 
 # Globs should be forbidden, except under VMS,
 #   which doesn't spawn an external program.
-SKIP: {
+SKIP: do {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
     my @globs = @( try { glob( <"*") } );
@@ -317,21 +317,21 @@ SKIP: {
 
     @globs = @( try { glob < '*' } );
     test (nelems @globs) == 0 && $@->{description} =~ m/^Insecure dependency/;
-}
+};
 
 # Output of commands should be tainted
-{
+do {
     my $foo = `$echo abc`;
     test tainted $foo;
-}
+};
 
 # Certain system variables should be tainted
-{
+do {
     test all_tainted $^X, $0;
-}
+};
 
 # Results of matching should all be untainted
-{
+do {
     my $foo = "abcdefghi" . $TAINT;
     test tainted $foo;
 
@@ -345,10 +345,10 @@ SKIP: {
 
     test tainted $foo;	# $foo should still be tainted!
     test $foo eq "abcdefghi";
-}
+};
 
 # Operations which affect files can't use tainted data.
-{
+do {
     dies_like( sub { chmod 0, $TAINT }, qr/^Insecure dependency/);
 
     # There is no feature test in %Config{} for truncate,
@@ -365,30 +365,30 @@ SKIP: {
     dies_like( sub { utime $TAINT },
                qr/^Insecure dependency/);
 
-    SKIP: {
+    SKIP: do {
         skip "chown() is not available", 2 unless %Config{d_chown};
 
 	dies_like( sub { chown -1, -1, $TAINT },
                    qr/^Insecure dependency/);
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         skip "link() is not available", 2 unless %Config{d_link};
 
 	dies_like( sub { link $TAINT, '' },
                    qr/^Insecure dependency/);
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         skip "symlink() is not available", 2 unless %Config{d_symlink};
 
 	dies_like( sub { symlink $TAINT, '' },
                    qr/^Insecure dependency/);
-    }
-}
+    };
+};
 
 # Operations which affect directories can't use tainted data.
-{
+do {
     dies_like( sub { mkdir "foo".$TAINT, 0755.$TAINT0 },
                qr/^Insecure dependency/);
 
@@ -398,16 +398,16 @@ SKIP: {
     dies_like( sub { chdir "foo".$TAINT },
                qr/^Insecure dependency/);
 
-    SKIP: {
+    SKIP: do {
         skip "chroot() is not available", 2 unless %Config{d_chroot};
 
 	dies_like( sub { chroot $TAINT },
                    qr/^Insecure dependency/);
-    }
-}
+    };
+};
 
 # Some operations using files can't use tainted data.
-{
+do {
     my $foo = "imaginary library" . $TAINT;
     dies_like( sub { require $foo },
                qr/^Insecure dependency/);
@@ -430,13 +430,13 @@ SKIP: {
 
     dies_like( sub { open FOO, ">", "$foo" },
                qr/^Insecure dependency/);
-}
+};
 
 # Commands to the system can't use tainted data
-{
+do {
     my $foo = $TAINT;
 
-    SKIP: {
+    SKIP: do {
         skip "open('|') is not available", 4 if $^O eq 'amigaos';
 
 	dies_like( sub { open FOO, "|-", "x$foo" },
@@ -444,7 +444,7 @@ SKIP: {
 
 	dies_like( sub { open FOO, "-|", "x$foo" },
                    qr/^Insecure dependency/);
-    }
+    };
 
     dies_like( sub { exec $TAINT },
                qr/^Insecure dependency/);
@@ -458,45 +458,45 @@ SKIP: {
     dies_like( sub { `$echo 1$foo` },
                qr/^Insecure dependency/);
 
-    SKIP: {
+    SKIP: do {
         # wildcard expansion doesn't invoke shell on VMS, so is safe
         skip "This is not VMS", 2 unless $Is_VMS;
     
 	test join('', @( try { glob < $foo }) ) ne '', 'globbing';
 	test $@ eq '', $@;
-    }
-}
+    };
+};
 
 # Operations which affect processes can't use tainted data.
-{
+do {
     dies_like( sub { kill 0, $TAINT },
                qr/^Insecure dependency/);
 
-    SKIP: {
+    SKIP: do {
         skip "setpgrp() is not available", 2 unless %Config{d_setpgrp};
 
 	dies_like( sub { setpgrp 0, $TAINT0 },
                    qr/^Insecure dependency/);
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         skip "setpriority() is not available", 2 unless %Config{d_setprior};
 
 	dies_like( sub { setpriority 0, $TAINT0, $TAINT0 },
                    qr/^Insecure dependency/);
-    }
-}
+    };
+};
 
 # Some miscellaneous operations can't use tainted data.
-{
-    SKIP: {
+do {
+    SKIP: do {
         skip "syscall() is not available", 2 unless %Config{d_syscall};
 
 	dies_like( sub { syscall $TAINT },
                    qr/^Insecure dependency/);
-    }
+    };
 
-    {
+    do {
 	my $foo = "x" x 979;
 	taint_these $foo;
 	local *FOO;
@@ -507,28 +507,28 @@ SKIP: {
 	dies_like( sub { ioctl FOO, $TAINT0, $foo },
                    qr/^Insecure dependency/);
 
-        SKIP: {
+        SKIP: do {
             skip "fcntl() is not available", 2 unless %Config{d_fcntl};
 
 	    dies_like( sub { fcntl FOO, $TAINT0, $foo },
                        qr/^Insecure dependency/);
-	}
+	};
 
 	close FOO;
-    }
-}
+    };
+};
 
 # Some tests involving references
-{
+do {
     my $foo = 'abc' . $TAINT;
     my $fooref = \$foo;
     test not tainted $fooref;
     test tainted $$fooref;
     test tainted $foo;
-}
+};
 
 # Some tests involving assignment
-{
+do {
     my $foo = $TAINT0;
     my $bar = $foo;
     test all_tainted $foo, $bar;
@@ -545,10 +545,10 @@ SKIP: {
     test tainted($bar /= 1);
     test tainted($bar--);
     test $bar == 0;
-}
+};
 
 # Test assignment and return of lists
-{
+do {
     my @foo = @("A", "tainted" . $TAINT, "B");
     test not tainted @foo[0];
     test     tainted @foo[1];
@@ -581,12 +581,12 @@ SKIP: {
     test not tainted @corge[0];
     test     tainted @corge[1];
     test not tainted @corge[2];
-}
+};
 
 # Test for system/library calls returning string data of dubious origin.
-{
+do {
     # No reliable %Config check for getpw*
-    SKIP: {
+    SKIP: do {
         skip "getpwent() is not available", 1 unless 
           try { setpwent(); getpwent() };
 
@@ -603,9 +603,9 @@ SKIP: {
 	          and not tainted @getpwent[7]
 		  and     tainted @getpwent[8]);	# shell
 	endpwent();
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         # pretty hard to imagine not
         skip "readdir() is not available", 1 unless %Config{d_readdir};
 
@@ -614,9 +614,9 @@ SKIP: {
 	my $readdir = readdir(D);
 	test tainted $readdir;
 	closedir(D);
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         skip "readlink() or symlink() is not available" unless 
           %Config{d_readlink} && %Config{d_symlink};
 
@@ -629,21 +629,21 @@ SKIP: {
 	my $readlink = readlink($symlink);
 	test tainted $readlink;
 	unlink($symlink);
-    }
-}
+    };
+};
 
 # test bitwise ops (regression bug)
-{
+do {
     my $why = "y";
     my $j = "x" ^|^ $why;
     test not tainted $j;
     $why = $TAINT."y";
     $j = "x" ^|^ $why;
     test     tainted $j;
-}
+};
 
 # test target of substitution (regression bug)
-{
+do {
     my $why = $TAINT."y";
     $why =~ s/y/z/;
     test     tainted $why;
@@ -654,14 +654,14 @@ SKIP: {
 
     $why =~ s/e/{'-'.$$}/g;
     test     tainted $why;
-}
+};
 
 
-SKIP: {
+SKIP: do {
     skip "no IPC::SysV", 2 unless $ipcsysv;
 
     # test shmread
-    SKIP: {
+    SKIP: do {
         skip "shm*() not available", 1 unless %Config{d_shm};
 
         no strict 'subs';
@@ -689,11 +689,11 @@ SKIP: {
           $rcvd eq $sent;
 
         test tainted $rcvd;
-    }
+    };
 
 
     # test msgrcv
-    SKIP: {
+    SKIP: do {
         skip "msg*() not available", 1 unless %Config{d_msg};
 
 	no strict 'subs';
@@ -719,16 +719,16 @@ SKIP: {
 	    warn "# msgget failed\n";
 	}
 
-        SKIP: {
+        SKIP: do {
             skip "SysV message queue operation failed", 1
               unless $rcvd eq $sent && $type_sent == $type_rcvd;
 
 	    test tainted $rcvd;
-	}
-    }
-}
+	};
+    };
+};
 
-{
+do {
     # bug id 20001004.006
 
     open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
@@ -739,9 +739,9 @@ SKIP: {
     ok tainted($a) && tainted($b) && !defined($b);
 
     close IN;
-}
+};
 
-{
+do {
     # bug id 20001004.007
 
     open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
@@ -766,9 +766,9 @@ SKIP: {
        !tainted($e->{b}->{d});
 
     close IN;
-}
+};
 
-{
+do {
     # bug id 20010519.003
 
     BEGIN {
@@ -779,7 +779,7 @@ SKIP: {
 	}
     }
 
-    SKIP: {
+    SKIP: do {
         skip "no Fcntl", 18 unless $has_fcntl;
 
 	my $evil = "foo" . $TAINT;
@@ -836,10 +836,10 @@ SKIP: {
                    qr/^Insecure dependency/);
 	
 	unlink("foo"); # not unlink($evil), because that would fail...
-    }
-}
+    };
+};
 
-{
+do {
     # bug 20010526.004
 
     use warnings;
@@ -857,10 +857,10 @@ SKIP: {
     fmi(248);
 
     test !$saw_warning;
-}
+};
 
 
-{
+do {
     # Check that all environment variables are tainted.
     my @untainted;
     while (my ($k, $v) = each %ENV) {
@@ -870,8 +870,8 @@ SKIP: {
 	    push @untainted, "# '$k' = '$v'\n";
 	}
     }
-    test( (nelems @untainted) == 0, "untainted:\n {join ' ',@untainted}");
-}
+    test( (nelems @untainted) == 0, "untainted:\n $(join ' ',@untainted)");
+};
 
 
 ok( $^TAINT == 1, '$^TAINT is on' );
@@ -881,7 +881,7 @@ ok( $^TAINT,  '$^TAINT is not assignable' );
 ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
     'Assigning to $^TAINT fails' );
 
-{
+do {
     # bug 20011111.105
     
     my $re1 = qr/x$TAINT/;
@@ -892,18 +892,18 @@ ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
     
     my $re3 = "$re2";
     test tainted $re3;
-}
+};
 
-SKIP: {
+SKIP: do {
     skip "system \{\} has different semantics on Win32", 1 if $Is_MSWin32;
 
     # bug 20010221.005
     local %ENV{PATH} .= $TAINT;
     dies_like(sub { system { "echo" } "/arg0", "arg1" },
               qr/^Insecure \$ENV/);
-}
+};
 
-TODO: {
+TODO: do {
     todo_skip 'tainted %ENV warning occludes tainted arguments warning', 22
       if $Is_VMS;
 
@@ -932,7 +932,7 @@ TODO: {
     };
     test !$@;
 
-    SKIP: {
+    SKIP: do {
         skip "no exec() on MacOS Classic" if $Is_MacOS;
 
 	try { 
@@ -940,26 +940,26 @@ TODO: {
             exec("lskdfj does not exist","with","args"); 
         };
 	test !$@;
-    }
+    };
 
     # If you add tests here update also the above skip block for VMS.
-}
+};
 
-{
+do {
     # [ID 20020704.001] taint propagation failure
     use re 'taint';
     $TAINT =~ m/(.*)/;
     test tainted(my $foo = $1);
-}
+};
 
-{
+do {
     # [perl #24291] this used to dump core
     our %nonmagicalenv = %( PATH => "util" );
     local *ENV = \%nonmagicalenv;
     dies_like(sub { system("lskdfj") },
               qr/^\%ENV is aliased to another variable while running with -T switch/);
-}
-{
+};
+do {
     # [perl #24248]
     $TAINT =~ m/(.*)/;
     test !tainted($1);
@@ -1000,9 +1000,9 @@ TODO: {
     test !tainted($^O);
     eval_dies_like( '$^O = $^X',
                     qr/Insecure dependency in/ );
-}
+};
 
-EFFECTIVELY_CONSTANTS: {
+EFFECTIVELY_CONSTANTS: do {
     my $tainted_number = 12 + $TAINT0;
     test tainted( $tainted_number );
 
@@ -1010,9 +1010,9 @@ EFFECTIVELY_CONSTANTS: {
     my $tainted_product = $tainted_number * 0;
     test tainted( $tainted_product );
     test $tainted_product == 0;
-}
+};
 
-TERNARY_CONDITIONALS: {
+TERNARY_CONDITIONALS: do {
     my $tainted_true  = $TAINT . "blah blah blah";
     my $tainted_false = $TAINT0;
     test tainted( $tainted_true );
@@ -1036,9 +1036,9 @@ TERNARY_CONDITIONALS: {
     $result = $tainted_false ? $tainted_whatever : $untainted_whatever;
     test $result eq "The Fabulous Johnny Cash";
     test !tainted( $result );
-}
+};
 
-{
+do {
     # rt.perl.org 5900  $1 remains tainted if...
     # 1) The regular expression contains a scalar variable AND
     # 2) The regular expression appears in an elsif clause
@@ -1057,12 +1057,12 @@ TERNARY_CONDITIONALS: {
     elsif ( my @bar = @( $foo =~ m/([$valid_chars]+)/o ) ) {
         test not any_tainted < @bar;
     }
-}
+};
 
 # at scope exit, a restored localised value should have its old
 # taint status, not the taint status of the current statement
 
-{
+do {
     our $x99 = $^X;
     test tainted $x99;
 
@@ -1071,26 +1071,26 @@ TERNARY_CONDITIONALS: {
 
     my $c = do { local $x99; $^X };
     test not tainted $x99;
-}
-{
+};
+do {
     our $x99 = $^X;
     test tainted $x99;
 
     my $c = do { local $x99; '' };
     test tainted $x99;
-}
+};
 
 # an mg_get of a tainted value during localization shouldn't taint the
 # statement
 
-{
+do {
     try { local $0, eval '1' };
     test $@ eq '';
-}
+};
 
 # [perl #8262] //g loops infinitely on tainted data
 
-{
+do {
     my @a;
     local $main::TODO = 1;
     @a[0] = $^X;
@@ -1099,22 +1099,22 @@ TERNARY_CONDITIONALS: {
 	last if $i++ +> 10000;
     }
     cmp_ok $i, '+<', 10000, "infinite m//g";
-}
+};
 
 SKIP:
-{
+do {
     my $got_dualvar;
     eval 'use Scalar::Util "dualvar"; $got_dualvar++';
     skip "No Scalar::Util::dualvar" unless $got_dualvar;
     my $a = Scalar::Util::dualvar(3, $^X);
     my $b = $a + 5;
     is ($b, 8, "Arithmetic on tainted dualvars works");
-}
+};
 
 # opening '|-' should not trigger $ENV{PATH} check
 
-{
-    SKIP: {
+do {
+    SKIP: do {
 	skip "fork() is not available", 3 unless %Config{'d_fork'};
 	skip "opening |- is not stable on threaded OpenBSD with taint", 3
             if %Config{useithreads} && $Is_OpenBSD;
@@ -1138,10 +1138,10 @@ SKIP:
 	    close $pipe;
 	};
 	test $@->{description} =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
-    }
-}
+    };
+};
 
-{
+do {
     # tests for tainted format in s?printf
     dies_like( sub { printf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in printf/, q/printf doesn't like tainted formats/);
@@ -1151,9 +1151,9 @@ SKIP:
                qr/^Insecure dependency in sprintf/, q/sprintf doesn't like tainted formats/);
     try { sprintf("# \%s\n", $TAINT . "foo") };
     ok(!$@, q/sprintf accepts other tainted args/);
-}
+};
 
-{
+do {
     # 40708
     my $n  = 7e9;
     8e9 - $n;
@@ -1163,9 +1163,9 @@ SKIP:
     $val = $TAINT;
     $val = $n;
     is ($val, '7000000000', 'Assignment to tainted variable');
-}
+};
 
-{
+do {
     my $val = 0;
     my $tainted = '1' . $TAINT;
     dies_like( sub { $val = eval $tainted; },
@@ -1179,9 +1179,9 @@ SKIP:
 
     dies_like( sub { eval $tainted },
                qr/^Insecure dependency in eval/);
-}
+};
 
-{
+do {
     use utf8;
     foreach my $ord (@(78, 163, 256)) {
         # 47195
@@ -1191,18 +1191,18 @@ SKIP:
         $line =~ m/(A\S*)/;
         ok(!tainted($1), "\\S match with chr $ord");
     }
-}
+};
 
-{
+do {
     my $value = "foo bar";
     my @values = split(m/\s+/, $value, 2);
     ok(!tainted(@values[1]), "result of split is not tainted if input was not tainted");
     my @values = split(m/\s+/, $value . $TAINT, 2);
     ok(tainted(@values[1]), "result of split is tainted if input was tainted");
-}
+};
 
 # This may bomb out with the alarm signal so keep it last
-SKIP: {
+SKIP: do {
     skip "No alarm()"  unless %Config{d_alarm};
     # Test from RT #41831]
     # [PATCH] Bug & fix: hang when using study + taint mode (perl 5.6.1, 5.8.x)
@@ -1229,6 +1229,6 @@ END
     }
 
     alarm(0);
-}
+};
 __END__
 # Keep the previous test last

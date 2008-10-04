@@ -123,10 +123,10 @@ catch_warning( sub {
 
 is( join( ' ', @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
 
-{
+do {
 	local $ExtUtils::Manifest::Quiet = 1;
 	is( join(' ', filecheck() ), 'bar', 'listing skipped with filecheck()' );
-}
+};
 
 # add a subdirectory and a file there that should be found
 ok( mkdir( 'moretest', 0777 ), 'created moretest directory' );
@@ -182,14 +182,14 @@ chomp($warn);
 like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 
 # tell ExtUtils::Manifest to use a different file
-{
+do {
 	local $ExtUtils::Manifest::MANIFEST = 'albatross'; 
 	($res, $warn) = < catch_warning( \&mkmanifest );
 	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
 
 	# add the new file to the list of files to be deleted
 	%Files{'albatross'}++;
-}
+};
 
 
 # Make sure MANIFEST.SKIP is using complete relative paths
@@ -219,7 +219,7 @@ is( $files->{yarrow}, 'hock','          with comment' );
 is( $files->{foobar}, '',    '          preserved old entries' );
 
 # test including an external manifest.skip file in MANIFEST.SKIP
-{
+do {
     maniadd(\%( foo => undef , albatross => undef,
               'mymanifest.skip' => undef, 'mydefault.skip' => undef));
     add_file('mymanifest.skip' => "^foo\n");
@@ -250,8 +250,8 @@ is( $files->{foobar}, '',    '          preserved old entries' );
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' );
     my $extsep = $Is_VMS ? '_' : '.';
-    %Files{"$_.bak"}++ for @( ('MANIFEST', "MANIFEST{$extsep}SKIP"));
-}
+    %Files{"$_.bak"}++ for @( ('MANIFEST', "MANIFEST$($extsep)SKIP"));
+};
 
 add_file('MANIFEST'   => 'Makefile.PL');
 maniadd(\%( foo  => 'bar' ));
@@ -266,7 +266,7 @@ is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline');
 #add_file('MANIFEST'   => 'Makefile.PL');
 #maniadd(\%( foo => 'bar' ));
 
-SKIP: {
+SKIP: do {
     chmod( 0400, 'MANIFEST' );
     skip "Can't make MANIFEST read-only", 2 if -w 'MANIFEST';
 
@@ -282,7 +282,7 @@ SKIP: {
                  "maniadd() dies if it can't open the MANIFEST" );
 
     chmod( 0600, 'MANIFEST' );
-}
+};
 
 
 END {

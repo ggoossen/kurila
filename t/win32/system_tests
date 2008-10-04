@@ -90,7 +90,7 @@ for my $cmds ( @commands) {
 	my @all_args;
 	my @cmds = @( defined($cmds) ? (ref($cmds) ? < @$cmds : $cmds) : () );
 	my @args = @( defined($args) ? (ref($args) ? < @$args : $args) : () );
-	print "######## [{join ' ',@cmds}]\n";
+	print "######## [$(join ' ',@cmds)]\n";
 	print "<", join('><', @(
 			@cmds[((nelems @cmds)-1)],
 			< map { my $x = $_; $x =~ s/"//g; $x } @args)),

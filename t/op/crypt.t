@@ -23,10 +23,10 @@ BEGIN {
 # bets, given alternative encryption/hashing schemes like MD5,
 # C2 (or higher) security schemes, and non-UNIX platforms.
 
-SKIP: {
+SKIP: do {
 	skip ("VOS crypt ignores salt.", 1) if ($^O eq 'vos');
 	ok(substr(crypt("ab", "cd"), 2) ne substr(crypt("ab", "ce"), 2), "salt makes a difference");
-}
+};
 
 use utf8;
 

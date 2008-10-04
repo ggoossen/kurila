@@ -63,7 +63,7 @@ my @files;
 use File::Find;
 find( sub { push @files, $File::Find::name; return }, $outdir );
 
-{
+do {
   my $long = ( grep m/zikzik\./i, @files )[0];
   ok($long) or print "# How odd, no zikzik file in $outdir!?\n";
   if($long) {
@@ -71,7 +71,7 @@ find( sub { push @files, $File::Find::name; return }, $outdir );
     for( @files) { substr($_, 0, length($long), '') }
     @files = grep length($_), @files;
   }
-}
+};
 
 print "#Produced in $outdir ...\n";
 foreach my $f (sort @files) {

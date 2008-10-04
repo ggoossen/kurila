@@ -80,7 +80,7 @@ print "ok 14\n";
 # [perl #30061] double destory when same iterator variable (eg $_) used in
 # DESTROY as used in for loop that triggered the destroy
 
-{
+do {
 
     my $x = 0;
     sub X::DESTROY {
@@ -93,7 +93,7 @@ print "ok 14\n";
     %h{foo} = bless \@(), 'X';
     delete %h{foo} for @( %h{foo}, 1);
     print $x == 1 ? "ok" : "not ok", " 15 - double destroy, x=$x\n";
-}
+};
 
 # A lot of tests to check that reversed for works.
 my $test = 15;
@@ -213,16 +213,16 @@ for my $i (reverse @(1,2,3)) {
 }
 is ($r, '321', 'Reverse for list with var');
 
-TODO: {
+TODO: do {
     $test++;
     local $TODO = "RT #1085: what should be output of perl -we 'print do \{ foreach (1, 2) \{ 1; \} \}'";
     if (do {17; foreach (@(1, 2)) { 1; } } != 17) {
         print "not ";
     }
     print "ok $test # TODO $TODO\n";
-}
+};
 
-{
+do {
     $test++;
     no warnings 'reserved';
     my %h;
@@ -231,4 +231,4 @@ TODO: {
         print "not ";
     }
     print "ok $test # TODO $TODO\n";
-}
+};

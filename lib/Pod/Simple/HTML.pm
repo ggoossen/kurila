@@ -353,13 +353,13 @@ sub do_middle {
   # Namely, divert all content to a string, which we output after the index.
   my $fh = $self->output_fh;
   my $content = '';
-  {
+  do {
     # Our horrible bait and switch:
     $self->output_string( \$content );
     $self->_do_middle_main_loop;
     $self->abandon_output_string();
     $self->output_fh($fh);
-  }
+  };
   print $fh $self->index_as_html();
   print $fh $content;
 
@@ -574,7 +574,7 @@ sub do_pod_link {
   DEBUG and printf "Resolving \"\%s\" \"\%s\"...\n",
    $to || "(nil)",  $section || "(nil)";
    
-  {
+  do {
     # An early hack:
     my $complete_url = $self->resolve_pod_link_by_table($to, $section);
     if( $complete_url ) {
@@ -585,7 +585,7 @@ sub do_pod_link {
       DEBUG +> 4 and print " resolve_pod_link_by_table(T,S)", 
        " didn't return anything interesting.\n";
     }
-  }
+  };
 
   if(defined $to and length $to) {
     # Give this routine first hack again

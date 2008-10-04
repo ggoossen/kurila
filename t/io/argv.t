@@ -12,7 +12,7 @@ open(TRY, ">", 'Io_argv1.tmp') || (die "Can't open temp file: $!");
 print TRY "a line\n";
 close TRY or die "Could not close: $!";
 
-{
+do {
     my $x = runperl(
 	prog	=> 'while (~< *ARGV) { print $_; }',
 	stdin	=> "foo\n",
@@ -25,14 +25,14 @@ close TRY or die "Could not close: $!";
 	stdin	=> "foo\n",
     );
     is($x, "foo\n", '   from just STDIN');
-}
+};
 
-{
+do {
     # 5.10 stopped autovivifying scalars in globs leading to a
     # segfault when $ARGV is written to.
     runperl( prog => 'eof()', stdin => "nothing\n" );
     is( 0+$?, 0, q(eof() doesn't segfault) );
-}
+};
 
 open(TRY, ">", 'Io_argv1.tmp') or die "Can't open temp file: $!";
 close TRY or die "Could not close: $!";
@@ -57,10 +57,10 @@ undef $^I;
 
 ok( eof TRY );
 
-{
+do {
     no warnings 'once';
     ok( eof NEVEROPENED,    'eof() true on unopened filehandle' );
-}
+};
 
 open STDIN, "<", 'Io_argv1.tmp' or die $!;
 @ARGV = @( () );
@@ -81,7 +81,7 @@ ok( !eof() );
 close ARGV or die $!;
 ok( eof(),      'eof() true after closing ARGV' );
 
-{
+do {
     local $/;
     open F, "<", 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $!";
     ~< *F;	# set $. = 1
@@ -97,7 +97,7 @@ ok( eof(),      'eof() true after closing ARGV' );
     ok( defined( ~< *F) );
     is( ~< *F, undef );
     close F or die "Could not close: $!";
-}
+};
 
 END {
     1 while unlink 'Io_argv1.tmp', 'Io_argv1.tmp_bak',

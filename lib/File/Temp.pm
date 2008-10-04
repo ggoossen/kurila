@@ -845,7 +845,7 @@ sub _can_do_level {
 
 # Status is not referred to since all the magic is done with an END block
 
-{
+do {
   # Will set up two lexical variables to contain all the files to be
   # removed. One array for files, another for directories They will
   # only exist in this block.
@@ -953,7 +953,7 @@ sub _can_do_level {
   }
 
 
-}
+};
 
 =head1 OBJECT-ORIENTED INTERFACE
 
@@ -1977,14 +1977,14 @@ sub cmpstat {
   # closed the file. Can not turn off warnings without using $^W
   # unless we upgrade to 5.006 minimum requirement
   my @fh;
-  {
+  do {
     local ($^W) = 0;
     @fh = @( stat $fh );
-  }
+  };
   return unless (nelems @fh);
 
   if (@fh[3] +> 1 && $^W) {
-    carp "unlink0: fstat found too many links; SB={join ' ',@fh}" if $^W;
+    carp "unlink0: fstat found too many links; SB=$(join ' ',@fh)" if $^W;
   }
 
   # Stat the path
@@ -1997,7 +1997,7 @@ sub cmpstat {
 
   # this is no longer a file, but may be a directory, or worse
   unless (-f $path) {
-    confess "panic: $path is no longer a file: SB={join ' ',@fh}";
+    confess "panic: $path is no longer a file: SB=$(join ' ',@fh)";
   }
 
   # Do comparison of each member of the array
@@ -2170,7 +2170,7 @@ simply examine the return value of C<safe_level>.
 
 =cut
 
-{
+do {
   # protect from using the variable itself
   my $LEVEL = STANDARD;
   sub safe_level {
@@ -2187,7 +2187,7 @@ simply examine the return value of C<safe_level>.
     }
     return $LEVEL;
   }
-}
+};
 
 =item TopSystemUID
 
@@ -2210,7 +2210,7 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
 
 =cut
 
-{
+do {
   my $TopSystemUID = 10;
   $TopSystemUID = 197108 if $^O eq 'interix'; # "Administrator"
   sub top_system_uid {
@@ -2223,7 +2223,7 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
     }
     return $TopSystemUID;
   }
-}
+};
 
 =item B<$KEEP_ALL>
 

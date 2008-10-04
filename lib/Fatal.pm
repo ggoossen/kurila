@@ -44,7 +44,7 @@ sub write_invocation {
     while ((nelems @argvs)) {
       @argv = @{shift @argvs};
       $n = shift @argv;
-      push @out, "{$else}if (nelems(\@_) == $n) \{\n";
+      push @out, "$($else)if (nelems(\@_) == $n) \{\n";
       $else = "\t\} els";
       push @out, 
           "\t\treturn " . one_invocation($core, $call, $name, < @argv) . ";\n";
@@ -59,7 +59,7 @@ EOC
 
 sub one_invocation {
   my ($core, $call, $name, < @argv) = < @_;
-  return qq{$call({join ', ', @argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
+  return qq{$call($(join ', ', @argv)) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
     ($core ? ': $!' : ', \$! is \"$!\"') . '"';
 }
 
@@ -68,7 +68,7 @@ sub _make_fatal {
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
-    $sub = "{$pkg}::$sub" unless $sub =~ m/::/;
+    $sub = "$($pkg)::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     $sub = Symbol::fetch_glob($sub);
@@ -101,12 +101,12 @@ EOS
     $code .= write_invocation($core, $call, $name, < @protos);
     $code .= "\}\n";
     print $code if $Debug;
-    {
+    do {
       $code = eval("package $pkg; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
       *{$sub} = $code;
-    }
+    };
 }
 
 1;

@@ -45,7 +45,7 @@ is( $t, 5, 'incremented state var, list syntax' );
 sub nesting {
     state $foo //= 10;
     my $t;
-    { state $bar //= 12; $t = ++$bar }
+    do { state $bar //= 12; $t = ++$bar };
     ++$foo;
     return  @($foo, $t);
 }
@@ -147,28 +147,28 @@ is( pugnax(), 42, 'scalar state assignment return value' );
 #
 # Redefine.
 #
-{
+do {
     state $x = "one";
     no warnings;
     state $x = "two";
     is $x, "two", "masked"
-}
+};
 
 # normally closureless anon subs share a CV and pad. If the anon sub has a
 # state var, this would mean that it is shared. Check that this doesn't
 # happen
 
-{
+do {
     my @f;
     push @f, sub { state $x; ++$x } for 1..2;
     @f[0]->() for 1..10;
     is @f[0]->(), 11;
     is @f[1]->(), 1;
-}
+};
 
 # each copy of an anon sub should get its own 'once block'
 
-{
+do {
     my $x; # used to force a closure
     my @f;
     push @f, sub { $x=0; state $s ||= @_[0]; $s } for 1..2;
@@ -176,7 +176,7 @@ is( pugnax(), 42, 'scalar state assignment return value' );
     is @f[0]->(2), 1;
     is @f[1]->(3), 3;
     is @f[1]->(4), 3;
-}
+};
 
 
 
@@ -189,7 +189,7 @@ foreach my $forbidden (@(~< *DATA)) {
 
 # [perl #49522] state variable not available
 
-{
+do {
     my @warnings;
     local $^WARN_HOOK = sub { push @warnings, @_[0]->message };
 
@@ -211,23 +211,23 @@ foreach my $forbidden (@(~< *DATA)) {
     };
     is $@, '', "eval f_49522";
     # shouldn't be any 'not available' or 'not stay shared' warnings
-    ok !nelems @warnings, "suppress warnings part 1 [{join ' ',@warnings}]";
+    ok !nelems @warnings, "suppress warnings part 1 [$(join ' ',@warnings)]";
 
     @warnings = @( () );
     my $f = f_49522();
     is $f->(), 88, "state var closure 1";
     is g_49522(), 88, "state var closure 2";
-    ok !nelems @warnings, "suppress warnings part 2 [{join ' ',@warnings}]";
+    ok !nelems @warnings, "suppress warnings part 2 [$(join ' ',@warnings)]";
 
 
     @warnings = @( () );
     $f = i_49522();
     h_49522(); # initialise $t
     is $f->(), 99, "state var closure 3";
-    ok !nelems @warnings, "suppress warnings part 3 [{join ' ',@warnings}]";
+    ok !nelems @warnings, "suppress warnings part 3 [$(join ' ',@warnings)]";
 
 
-}
+};
 
 
 __DATA__

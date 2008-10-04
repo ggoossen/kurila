@@ -54,7 +54,7 @@ B::Concise->import( <qw( set_style set_style_standard add_callback
 # test that walk_output rejects non-HANDLE args
 foreach my $foo (@("string", \@(), \%())) {
     try {  walk_output($foo) };
-    isnt ($@ && $@->message, '', "walk_output() rejects arg {dump::view($foo)}");
+    isnt ($@ && $@->message, '', "walk_output() rejects arg $(dump::view($foo))");
     $@=''; # clear the fail for next test
 }
 # test accessor mode when arg undefd or 0
@@ -63,17 +63,17 @@ foreach my $foo (@(undef, 0)) {
     is ($handle, \*STDOUT, "walk_output set to STDOUT (default)");
 }
 
-{   # any object that can print should be ok for walk_output
+do {   # any object that can print should be ok for walk_output
     package Hugo;
     sub new { my $foo = bless \%() };
     sub print { CORE::print < @_ }
-}
+};
 my $foo = Hugo->new();	# suggested this API fix
 try {  walk_output($foo) };
 is ($@, '', "walk_output() accepts obj that can print");
 
 # test that walk_output accepts a HANDLE arg
-SKIP: {
+SKIP: do {
     skip("no perlio in this build", 4)
         unless %Config::Config{useperlio};
 
@@ -89,7 +89,7 @@ SKIP: {
     my $junk = "non-empty";
     try {  walk_output(\$junk) };
     is ($@, '', "walk_output() accepts ref-to-non-empty-scalar");
-}
+};
 
 ## add_style
 my @stylespec;
@@ -131,7 +131,7 @@ sub render {
     return  @($out, $@);
 }
 
-SKIP: {
+SKIP: do {
     # tests output to GLOB, using perlio feature directly
     skip "no perlio on this build", 127
 	unless %Config::Config{useperlio};
@@ -151,12 +151,12 @@ SKIP: {
     
     my $treegen = B::Concise::compile('-basic', $func); # reused
     
-    { # test output into a package global string (sprintf-ish)
+    do { # test output into a package global string (sprintf-ish)
 	our $thing;
 	walk_output(\$thing);
 	$treegen->();
 	ok($thing, "walk_output to our SCALAR, output seen");
-    }
+    };
     
     # test walkoutput acceptance of a scalar-bound IO handle
     open (my $fh, '>', \my $buf);
@@ -186,7 +186,7 @@ SKIP: {
     #      -> &CODE(0x84840cc) in ???
 
     my ($res,$err);
-    TODO: {
+    TODO: do {
 	#local $TODO = "\tdoes this handling make sense ?";
 
 	sub defd_empty {};
@@ -198,11 +198,11 @@ SKIP: {
 	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,
 	   "'sub defd_empty \{\}' seen as 2 ops: leavesub,nextstate");
 
-	{
+	do {
 	    package Bar;
 	    our $AUTOLOAD = 'garbage';
 	    sub AUTOLOAD { print "# in AUTOLOAD body: $AUTOLOAD\n" }
-	}
+	};
         no strict 'subs';
 	($res,$err) = < render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,
@@ -211,13 +211,13 @@ SKIP: {
 	($res,$err) = < render('-basic', \&Bar::AUTOLOAD);
 	like ($res, qr/in AUTOLOAD body: /, "found body of Bar::AUTOLOAD");
 
-    }
-    {
+    };
+    do {
         no strict 'subs';
         ($res,$err) = < render('-basic', 'Foo::bar');
         like ($res, qr/unknown function \(Foo::bar\)/,
               "BC::compile detects fn-name as unknown function");
-    }
+    };
 
     # v.62 tests
 
@@ -346,7 +346,7 @@ SKIP: {
 		 "$mode$style VS $style/$mode are the same" );
 	}
     }
-}
+};
 
 
 # test -stash and -src rendering

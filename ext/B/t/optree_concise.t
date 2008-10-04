@@ -21,7 +21,7 @@ use Config;
 
 my $tests = 10;
 plan tests => $tests;
-SKIP: {
+SKIP: do {
 skip "no perlio in this build", $tests unless %Config::Config{useperlio};
 
 $^WARN_HOOK = sub {
@@ -196,5 +196,5 @@ add_style
 	  , "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"
 	 );
 
-} #skip
+}; #skip
 

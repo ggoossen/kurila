@@ -51,15 +51,15 @@ ok($foo eq 'xy' || $foo eq 'yx','fresh keys');
 delete %refhash{"top"}->{"bar"};
 @list = keys %{%refhash{"top"}};
 
-cmp_ok("{join ' ',@list}",'eq',"foo", 'autoviv and delete hashref');
+cmp_ok("$(join ' ',@list)",'eq',"foo", 'autoviv and delete hashref');
 
-{
+do {
     my %a = %('bar', 33);
     my $b = \%a{bar};
     my $c = \delete %a{bar};
 
     ok($b \== $c,'a b c equivalent');
-}
+};
 
 # delete() on array elements
 
@@ -102,7 +102,7 @@ cmp_ok(scalar(nelems @foo),'==',0,'and then there were none');
 @foo[0] = 'x';
 @foo[1] = 'y';
 
-$foo = "{join ' ',@foo}";
+$foo = "$(join ' ',@foo)";
 cmp_ok($foo,'eq','x y','two fresh');
 
 @refary[0]->[0] = "FOO";
@@ -112,28 +112,28 @@ delete @refary[0]->[3];
 
 cmp_ok( scalar(nelems @{@refary[0]}),'==',1,'one down');
 
-{
+do {
     no strict 'subs';
     my @a = @( 33 );
     my $b = \@a[0];
     my $c = \delete @a['bar'];
 
     ok($b \== $c,'b c also equivalent');
-}
+};
 
-{
+do {
     my %h;
     my ($x,$y) = (1, scalar delete %h{[@()]});
     ok(!nelems($y),q([perl #29127] scalar delete of empty slice returned garbage));
-}
+};
 
-{
+do {
     my $x = 0;
     sub X::DESTROY { $x++ }
-    {
+    do {
 	my @a;
 	@a[0] = bless \@(), 'X';
 	my $y = delete @a[0];
-    }
+    };
     cmp_ok($x,'==',1,q([perl #30733] array delete didn't free returned element));
-}
+};

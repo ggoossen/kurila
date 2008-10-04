@@ -43,7 +43,7 @@ BEGIN {
 }
 
 
-{
+do {
 package Testing;
 require Exporter;
 our @ISA = qw(Exporter);
@@ -93,8 +93,8 @@ foreach my $tag (keys %tags) {
 }
 main::ok( $ok, 'export_ok_tags()' );
 
-}
-{
+};
+do {
 package Foo;
 Testing->import;
 
@@ -118,7 +118,7 @@ main::ok ( $got eq 'Is', 'and that it gave the correct result')
   or print STDERR "# expected 'Is', got " .
   (defined $got ? "'$got'" : "undef") . "\n";
 
-}
+};
 package Bar;
 my @imports = qw($seatbelt &Above stuff @wailing %left);
 Testing->import(< @imports);
@@ -159,13 +159,13 @@ main::ok( (!grep { eval "defined $_" } map { m/^\w/ ? "&$_" : $_ }
 main::ok( !defined &lifejacket, 'further denial' );
 
 
-{
+do {
   package More::Testing;
   our @ISA = qw(Exporter);
   our $VERSION = 0;
   try { More::Testing->require_version(0); 1 };
   main::ok(!$@,       'require_version(0) and $VERSION = 0');
-}
+};
 
 package Moving::Target;
 our @ISA = qw(Exporter);

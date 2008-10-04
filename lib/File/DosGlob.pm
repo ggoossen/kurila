@@ -325,7 +325,7 @@ sub glob {
     #   abc3 will be the original {3} (and drop the {}).
     #   abc1 abc2 will be put in @appendpat.
     # This was just the esiest way, not nearly the best.
-    REHASH: {
+    REHASH: do {
 	my @appendpat = @( () );
 	for ( @pat) {
 	    # There must be a "," I.E. abc{efg} is not what we want.
@@ -359,7 +359,7 @@ sub glob {
 	    }
 	    goto REHASH;
 	}
-    }
+    };
     for (  @pat ) {
 	s/\\{/\{/g;
 	s/\\}/\}/g;
@@ -389,7 +389,7 @@ sub glob {
     return @{delete %entries{$cxix}};
 }
 
-{
+do {
     no strict 'refs';
 
     sub import {
@@ -399,7 +399,7 @@ sub glob {
     my $callpkg = ($sym =~ s/^GLOBAL_//s ? 'CORE::GLOBAL' : caller(0));
     *{Symbol::fetch_glob($callpkg.'::'.$sym)} = \&{*{Symbol::fetch_glob($pkg.'::'.$sym)}} if $sym eq 'glob';
     }
-}
+};
 1;
 
 __END__

@@ -26,7 +26,7 @@ use vars < qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
                   );
 %R_HASH = %(perl => 'rules');
 
-{
+do {
   # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
   # is stored in utf8, not bytes.
   # "\xdf" is y diaresis in EBCDIC (except for cp875, but so far no-one seems
@@ -39,15 +39,15 @@ use vars < qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
   # an a circumflex, so we need to be explicit.
 
   my $a_circumflex = "\xe5"; # a byte.
-  %U_HASH = %(< map {$_, $_} @( 'castle', "ch{$a_circumflex}teau", $utf8, chr 0x57CE));
+  %U_HASH = %(< map {$_, $_} @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE));
   plan tests => 162;
-}
+};
 
 $UTF8_CROAK = "/^Cannot retrieve UTF8 data in non-UTF8 perl/";
 $RESTRICTED_CROAK = "/^Cannot retrieve restricted hash/";
 
 my %tests;
-{
+do {
   local $/ = "\n\nend\n";
   while ( ~< *DATA) {
     next unless m/\S/s;
@@ -60,7 +60,7 @@ my %tests;
     my $data = unpack 'u', $3;
     %tests{$2} = $data;
   }
-}
+};
 
 # use Data::Dumper; $Data::Dumper::Useqq = 1; print Dumper \%tests;
 sub thaw_hash {
@@ -168,14 +168,14 @@ if (eval "use Hash::Util; 1") {
   thaw_fail ('Locked keys placeholder', $RESTRICTED_CROAK);
 }
 
-{
+do {
   use utf8;
   print "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
   thaw_scalar ('Short 8 bit utf8 data', "\x{DF}", 1);
   thaw_scalar ('Long 8 bit utf8 data', "\x{DF}" x 256, 1);
   thaw_scalar ('Short 24 bit utf8 data', chr 0xC0FFEE);
   thaw_scalar ('Long 24 bit utf8 data', chr (0xC0FFEE) x 256);
-}
+};
 
 print "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";
 thaw_fail ('Hash with utf8 keys', qr/WASUTF8 flag not supported/ );

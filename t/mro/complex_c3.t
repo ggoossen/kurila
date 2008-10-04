@@ -49,7 +49,7 @@ KJIHGFEDABC
 
 =cut
 
-{
+do {
     package Test::A; use mro 'c3';
 
     package Test::B; use mro 'c3';
@@ -82,7 +82,7 @@ KJIHGFEDABC
     package Test::K; use mro 'c3';
     use base < qw/Test::J Test::I/;
     sub testmeth { shift->next::method }
-}
+};
 
 ok(eq_array(
     mro::get_linear_isa('Test::A'),

@@ -308,7 +308,7 @@ sub run {
         return;
     };        
 
-    print < loc("Running [\%1]...\n", (ref $cmd ? "{join ' ',@$cmd}" : $cmd)) if $verbose;
+    print < loc("Running [\%1]...\n", (ref $cmd ? "$(join ' ',@$cmd)" : $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -365,7 +365,7 @@ sub run {
         ### in case there are pipes in there;
         ### IPC::Open3 will call exec and exec will do the right thing 
         $ok = __PACKAGE__->_open3_run( 
-                                ( ref $cmd ? "{join ' ',@$cmd}" : $cmd ),
+                                ( ref $cmd ? "$(join ' ',@$cmd)" : $cmd ),
                                 $_out_handler, $_err_handler, $verbose 
                             );
         
@@ -373,7 +373,7 @@ sub run {
     } else {
         __PACKAGE__->_debug( "# Using system(). Have buffer: $have_buffer" )
             if $DEBUG;
-        $ok = __PACKAGE__->_system_run( (ref $cmd ? "{join ' ',@$cmd}" : $cmd), $verbose );
+        $ok = __PACKAGE__->_system_run( (ref $cmd ? "$(join ' ',@$cmd)" : $cmd), $verbose );
     }
     
     ### fill the buffer;
@@ -575,7 +575,7 @@ sub _system_run {
     return 1;
 }
 
-{   use File::Spec;
+do {   use File::Spec;
     use Symbol;
 
     my %Map = %(
@@ -589,7 +589,7 @@ sub _system_run {
         my $self    = shift;
         my @fds     = @_;
 
-        __PACKAGE__->_debug( "# Closing the following fds: {join ' ',@fds}" ) if $DEBUG;
+        __PACKAGE__->_debug( "# Closing the following fds: $(join ' ',@fds)" ) if $DEBUG;
 
         for my $name (  @fds ) {
             my($redir, $fh, $glob) = < @{%Map{$name}} or (
@@ -621,7 +621,7 @@ sub _system_run {
         my $self    = shift;
         my @fds     = @_;
 
-        __PACKAGE__->_debug( "# Reopening the following fds: {join ' ',@fds}" ) if $DEBUG;
+        __PACKAGE__->_debug( "# Reopening the following fds: $(join ' ',@fds)" ) if $DEBUG;
 
         for my $name (  @fds ) {
             my($redir, $fh, $glob) = < @{%Map{$name}} or (
@@ -638,7 +638,7 @@ sub _system_run {
         return 1;                
     
     }
-}    
+};    
 
 sub _debug {
     my $self    = shift;

@@ -52,29 +52,29 @@ like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty
 eval q{use base 'reallyReAlLyNotexists'};
 like( $@->{description}, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
                                           '  still empty on 2nd load');
-{
+do {
     my $warning;
     local $^WARN_HOOK = sub { $warning = shift };
     eval q{package HomoGenous; use base 'HomoGenous';};
     like($warning->{description}, qr/^Class 'HomoGenous' tried to inherit from itself/,
                                           '  self-inheriting');
-}
+};
 
-{
+do {
     BEGIN { $Has::Version_0::VERSION = 0 }
 
     package Test::Version3;
 
     use base < qw(Has::Version_0);
     main::is( $Has::Version_0::VERSION, 0, '$VERSION==0 preserved' );
-}
+};
 
 
-{
+do {
     package Schlozhauer;
     use constant FIELDS => 6;
 
     package Basilisco;
     eval q{ use base 'Schlozhauer' };
     main::is( $@, '', 'Can coexist with a FIELDS constant' );
-}
+};
