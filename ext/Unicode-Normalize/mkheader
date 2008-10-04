@@ -301,7 +301,7 @@ my $compinit =
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
     $compinit .= join ",\n", map sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{$_}),
-	    sort $($a <+> $b ) keys %$( %CompList{$i} );
+	    sort { $a <+> $b } keys %{ %CompList{$i} };
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 

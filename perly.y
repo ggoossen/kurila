@@ -389,10 +389,10 @@ loop	:	label WHILE remember '(' texpr ')'
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($7,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label DO block cont  /* a block is a loop that happens once */
+	|	label block cont  /* a block is a loop that happens once */
 			{ $$ = newSTATEOP(0, PVAL($1),
 				 newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                     $3->op_location, (OP*)NULL, $3, $4, 0), $3->op_location);
+                                     $2->op_location, (OP*)NULL, $2, $3, 0), $2->op_location);
 			  TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
 	;
 
@@ -963,6 +963,11 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 			{ 
                             $$ = dofile($2, IVAL($1), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
+			}
+	|	DO block	%prec '('               /* do { code */
+                        { $$ = newUNOP(OP_NULL, OPf_SPECIAL, scope($2), LOCATION($1));
+			  TOKEN_GETMAD($1,$$,'D');
+                          APPEND_MADPROPS_PV("do",$$,'>');
 			}
         ;
 

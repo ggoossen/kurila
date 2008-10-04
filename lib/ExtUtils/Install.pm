@@ -338,7 +338,7 @@ sub _get_install_skip {
             if $verbose+>1;
         $skip= \@();
     }
-    warn "Got $(join ' ',@$(\@(0+nelems @$skip))) skip patterns.\n"
+    warn "Got $(nelems @$skip) skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
