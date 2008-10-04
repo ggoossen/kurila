@@ -94,17 +94,17 @@ while (($key, $value) = each(%h)) {
 is ($i, 5);
 
 our @tests = @(&next_test( < @_ ), &next_test( < @_ ), &next_test( < @_ ));
-{
+do {
     package Obj;
     sub DESTROY { print "ok @::tests[1] # DESTROY called\n"; }
-    {
+    do {
 	my $h = \%( A => bless \@(), __PACKAGE__ );
         while (my($k,$v) = each %$h) {
 	    print "ok @::tests[0]\n" if $k eq 'A' and ref($v) eq 'Obj';
 	}
-    }
+    };
     print "ok @::tests[2]\n";
-}
+};
 
 # Check for Unicode hash keys.
 use utf8;
@@ -130,7 +130,7 @@ pass ("if we got here change 8056 worked");
 print "# %u{$_}\n" for keys %u; # Used to core dump before change #8056.
 pass ("change 8056 is thanks to Inaba Hiroto");
 
-{
+do {
     my %u;
     my $u0 = pack("U0U", 0x00FF);
     my $b0 = "\x[C3]\x[BF]";          # 0xCB 0xBF is U+00FF in UTF-8
@@ -147,4 +147,4 @@ pass ("change 8056 is thanks to Inaba Hiroto");
     is(%u{$b0}, 2, "\\xC3\\xBF=U+00FF  -> 2");
     is(%u{$u1}, 4, "U+0100=\\xC4\\x80  -> 4 ");
     is(%u{$b1}, 4, "\\xC4\\x80=U+0100  -> 4");
-}
+};

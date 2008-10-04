@@ -124,7 +124,7 @@ sub _unix_os2_ext {
 			$mb cmp $ma;} @fullname )[0];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
 		 && ((%Config{'dlsrc'} ne "dl_dld.xs") || ($thislib eq "m"))){
-	    } elsif (-f ($fullname="$thispth/lib{$thislib}_s$Config_libext")
+	    } elsif (-f ($fullname="$thispth/lib$($thislib)_s$Config_libext")
                  && (! %Config{'archname'} =~ m/RM\d\d\d-svr4/)
 		 && ($thislib .= "_s") ){ # we must explicitly use _s version
 	    } elsif (-f ($fullname="$thispth/lib$thislib$Config_libext")){
@@ -207,7 +207,7 @@ sub _unix_os2_ext {
         return  @('','','','', $give_libs ? \@libs : ());
     }
     else {
-        return  @("{join ' ',@extralibs}", "{join ' ',@bsloadlibs}", "{join ' ',@ldloadlibs}",
+        return  @("$(join ' ',@extralibs)", "$(join ' ',@bsloadlibs)", "$(join ' ',@ldloadlibs)",
                 join(":", @ld_run_path),  @($give_libs ? \@libs : ()));
     }
 }
@@ -462,7 +462,7 @@ sub _vms_ext {
     # a like-named executable image (e.g. -lperl resolves to perlshr.exe
     # before perl.exe).
     if ($lib !~ m/\.[^:>\]]*$/) {
-      push(@variants,"{$lib}shr","{$lib}rtl","{$lib}lib");
+      push(@variants,"$($lib)shr","$($lib)rtl","$($lib)lib");
       push(@variants,"lib$lib") if $lib !~ m/[:>\]]/;
     }
     push(@variants,$lib);

@@ -18,13 +18,13 @@ my $out = `$Perl -le "print q(Hello)"`;
 is( $out, "Hello\n",                      '`` worked' );
 like( $warning, qr/^Insecure .* $Tmsg/, '    taint warn' );
 
-{
+do {
     no warnings 'taint';
     $warning = '';
     my $out = `$Perl -le "print q(Hello)"`;
     is( $out, "Hello\n",                      '`` worked' );
     is( $warning, '',                       '   no warnings "taint"' );
-}
+};
 
 # Get ourselves a tainted variable.
 my $file = $0;

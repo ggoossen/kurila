@@ -48,7 +48,7 @@ cmp_ok( $count, '==', 2 );
 is( $buf, "\x{200}\x{100}\x[c2]\x[a3]" );
 close(F);
 
-{
+do {
     $a = chr(300); # This *is* UTF-encoded
     $b = chr(130); # This also.
 
@@ -74,18 +74,18 @@ close(F);
     binmode(F,":utf8"); # turn UTF-8-ness back on
     print F $a;
     my $y;
-    { my $x = tell(F);
-      { use bytes; $y = length($a);}
+    do { my $x = tell(F);
+      do { use bytes; $y = length($a);};
       cmp_ok( $x, '==', $y );
-  }
+  };
 
     print F $b,"\n";
 
-    {
+    do {
 	my $x = tell(F);
         $y += 3;
 	cmp_ok( $x, '==', $y );
-    }
+    };
 
     close F;
 
@@ -107,14 +107,14 @@ close(F);
 
     # Now let's make it suffer.
     my $w;
-    {
+    do {
 	use warnings 'utf8';
 	local $^WARN_HOOK = sub { $w = @_[0] };
 	print F $a;
         ok( (!$@));
 	ok( ! $w, , "No 'Wide character in print' warning" );
-    }
-}
+    };
+};
 
 # Hm. Time to get more evil.
 open F, ">:utf8", "a" or die $!;
@@ -145,7 +145,7 @@ is( $x, $a . bytes::chr(130) );
 
 # Now we have a deformed file.
 
-SKIP: {
+SKIP: do {
 	my @warnings;
 	open F, "<:utf8", "a" or die $!;
 	$x = ~< *F; chomp $x;
@@ -153,7 +153,7 @@ SKIP: {
 	try { sprintf "\%vd\n", $x };
 	is (nelems @warnings, 1);
 	like (@warnings[0], qr/Malformed UTF-8 character \(unexpected continuation byte 0x82, with no preceding start byte/);
-}
+};
 
 close F;
 unlink('a');
@@ -189,7 +189,7 @@ for ( @a) {
 close F;
 is($failed, undef);
 
-{
+do {
     my @a = @( \@( 0x007F, "bytes" ),
 	      \@( 0x0080, "bytes" ),
 	      \@( 0x0080, "utf8"  ),
@@ -215,9 +215,9 @@ is($failed, undef);
 	}
     }
     # last test here 49
-}
+};
 
-{
+do {
     # [perl #23428] Somethings rotten in unicode semantics
     open F, ">", "a";
     binmode F, ":utf8";
@@ -225,11 +225,11 @@ is($failed, undef);
     close F;
     is( ord($a), 0x100, '23428 syswrite should not downgrade scalar' );
     like( $a, qr/^\w+/, '23428 syswrite should not downgrade scalar' );
-}
+};
 
 # sysread() and syswrite() tested in lib/open.t since Fcntl is used
 
-{
+do {
     # <FH> on a :utf8 stream should complain immediately with -w
     # if it finds bad UTF-8 (:encoding(utf8) works this way)
     use warnings 'utf8';
@@ -252,7 +252,7 @@ is($failed, undef);
     like( $@->message, qr/utf8 "\\x$chrF6" does not map to Unicode .+/,
 	  "<:utf8 rcatline must warn about bad utf8");
     close F;
-}
+};
 
 END {
     1 while unlink "a";

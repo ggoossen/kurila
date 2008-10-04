@@ -430,12 +430,12 @@ MM_REVISION = $self->{MM_REVISION}
 
     push @m, "
 # Handy lists of source code files:
-XS_FILES = ".$self->wraplist( <sort keys %{$self->{XS} || \%()})."
-C_FILES  = ".$self->wraplist(< @{$self->{C}})."
-O_FILES  = ".$self->wraplist(< @{$self->{O_FILES}})."
-H_FILES  = ".$self->wraplist(< @{$self->{H}})."
-MAN1PODS = ".$self->wraplist( <sort keys %{$self->{MAN1PODS} || \%()})."
-MAN3PODS = ".$self->wraplist( <sort keys %{$self->{MAN3PODS} || \%()})."
+XS_FILES = ".$self->wraplist( <sort keys %$($self->{XS} || \%()))."
+C_FILES  = ".$self->wraplist(< @$($self->{C}))."
+O_FILES  = ".$self->wraplist(< @$($self->{O_FILES}))."
+H_FILES  = ".$self->wraplist(< @$($self->{H}))."
+MAN1PODS = ".$self->wraplist( <sort keys %$($self->{MAN1PODS} || \%()))."
+MAN3PODS = ".$self->wraplist( <sort keys %$($self->{MAN3PODS} || \%()))."
 ";
 
 
@@ -468,9 +468,9 @@ PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
 
     push @m, "
 
-TO_INST_PM = ".$self->wraplist( <sort keys %{$self->{PM}})."
+TO_INST_PM = ".$self->wraplist( <sort keys %$($self->{PM}))."
 
-PM_TO_BLIB = ".$self->wraplist(< %{$self->{PM}})."
+PM_TO_BLIB = ".$self->wraplist(< %$($self->{PM}))."
 ";
 
     join('', @m);
@@ -996,9 +996,9 @@ sub find_perl {
 
     if ($trace +>= 2){
         print "Looking for perl $ver by these names:
-{join ' ',@$names}
+$(join ' ',@$names)
 in these dirs:
-{join ' ',@$dirs}
+$(join ' ',@$dirs)
 ";
     }
 
@@ -1058,7 +1058,7 @@ WARNING
             }
         }
     }
-    print STDOUT "Unable to find a perl $ver (by these names: {join ' ',@$names}, in these dirs: {join ' ',@$dirs})\n";
+    print STDOUT "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
     0; # false and not empty
 }
 
@@ -1318,13 +1318,13 @@ sub init_MANPODS {
 
     # Set up names of manual pages to generate from pods
     foreach my $man (qw(MAN1 MAN3)) {
-	if ( $self->{"{$man}PODS"}
-             or $self->{"INSTALL{$man}DIR"} =~ m/^(none|\s*)$/
+	if ( $self->{"$($man)PODS"}
+             or $self->{"INSTALL$($man)DIR"} =~ m/^(none|\s*)$/
         ) {
-            $self->{"{$man}PODS"} ||= \%();
+            $self->{"$($man)PODS"} ||= \%();
         }
         else {
-            my $init_method = "init_{$man}PODS";
+            my $init_method = "init_$($man)PODS";
             $self->?$init_method();
 	}
     }
@@ -1483,7 +1483,7 @@ sub init_PM {
     return if $self->{PM} and $self->{ARGS}->{PM};
 
     if ((nelems @{$self->{PMLIBDIRS}})){
-	print "Searching PMLIBDIRS: {join ' ',@{$self->{PMLIBDIRS}}}\n"
+	print "Searching PMLIBDIRS: $(join ' ',@$($self->{PMLIBDIRS}))\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -2229,9 +2229,9 @@ sub installbin {
 
     my @m;
     push(@m, qq{
-EXE_FILES = {join ' ',@exefiles}
+EXE_FILES = $(join ' ',@exefiles)
 
-pure_all :: {join ' ',@to}
+pure_all :: $(join ' ',@to)
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
@@ -2455,8 +2455,8 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 # extralibs.all are computed correctly
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = {join ' ',@{$perlinc || \@()}
-}MAP_STATIC    = ",
+MAP_PERLINC   = $(join ' ',@$($perlinc || \@())
+)MAP_STATIC    = ",
 join(" \\\n\t", reverse sort keys %static), "
 
 MAP_PRELIBS   = %Config{perllibs} %Config{cryptlib}
@@ -2849,7 +2849,7 @@ PERL_HDRS = \
 $(OBJECT) : $(PERL_HDRS)
 } if $self->{OBJECT};
 
-    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
+    push @m, join(" ", values %$($self->{XS}))." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
 
     join "\n", @m;
 }
@@ -3595,8 +3595,8 @@ XSUBPPDIR = $xsdir
 XSUBPP = \$(XSUBPPDIR)\$(DFSEP)xsubpp
 XSUBPPRUN = \$(PERLRUN) \$(XSUBPP)
 XSPROTOARG = $self->{XSPROTOARG}
-XSUBPPDEPS = {join ' ',@tmdeps} \$(XSUBPP)
-XSUBPPARGS = {join ' ',@tmargs}
+XSUBPPDEPS = $(join ' ',@tmdeps) \$(XSUBPP)
+XSUBPPARGS = $(join ' ',@tmargs)
 XSUBPP_EXTRA_ARGS = 
 };
 };

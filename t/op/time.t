@@ -43,7 +43,7 @@ ok(localtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
    'localtime(), scalar context'
   );
 
-SKIP: {
+SKIP: do {
     # This conditional of "No tzset()" is stolen from ext/POSIX/t/time.t
     skip "No tzset()", 1
         if $^O eq "MacOS" || $^O eq "VMS" || $^O eq "cygwin" ||
@@ -56,9 +56,9 @@ SKIP: {
 %ENV{TZ} = "GMT+5";
 my ($sec,$min,$hour2,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
 ok($hour != $hour2,                             'changes to $ENV{TZ} respected');
-}
+};
 
-SKIP: {
+SKIP: do {
     skip "No gmtime()", 3 unless $does_gmtime;
 
 ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($beg);
@@ -78,4 +78,4 @@ ok(gmtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
                /x,
    'gmtime(), scalar context'
   );
-}
+};

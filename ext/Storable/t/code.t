@@ -22,12 +22,12 @@ use Safe;
 use vars < qw($freezed $thawed @obj @res $blessed_code);
 
 $blessed_code = bless sub { "blessed" }, "Some::Package";
-{ package Another::Package; sub foo { __PACKAGE__ } }
+do { package Another::Package; sub foo { __PACKAGE__ } };
 
-{
+do {
     no strict; # to make the life for Safe->reval easier
     sub code { "JAPH" }
-}
+};
 
 local *FOO;
 
@@ -129,7 +129,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 #   $Storable::Eval
 #   $Storable::Deparse
 
-{
+do {
     local $Storable::Eval = 0;
 
     for my $i (0 .. 1) {
@@ -138,9 +138,9 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	try { $thawed  = thaw $freezed };
 	ok($@, qr/Can\'t eval/);
     }
-}
+};
 
-{
+do {
 
     local $Storable::Deparse = 0;
     for my $i (0 .. 1) {
@@ -148,9 +148,9 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	try { $freezed = freeze @obj[$i] };
 	ok($@, qr/Can\'t store CODE items/);
     }
-}
+};
 
-{
+do {
     local $Storable::Eval = 0;
     local $Storable::forgive_me = 1;
     for my $i (0 .. 4) {
@@ -160,9 +160,9 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	ok($@, "");
 	ok($$thawed, qr/^sub/);
     }
-}
+};
 
-{
+do {
     local $Storable::Deparse = 0;
     local $Storable::forgive_me = 1;
 
@@ -178,9 +178,9 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 
     ok($@, "");
     ok($freezed ne '');
-}
+};
 
-{
+do {
     my $safe = Safe->new();
     local $Storable::Eval = sub { $safe->reval(shift) };
 
@@ -211,9 +211,9 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	try { $thawed = thaw $freezed };
 	ok($@, qr/(trapped|Code sub)/);
     }
-}
+};
 
-{
+do {
     my $safe = Safe->new();
     # because of opcodes used in "use strict":
     $safe->permit( <qw(:default require caller));
@@ -224,10 +224,10 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     try { $thawed = thaw $freezed };
     ok($@, "");
     ok($thawed->(), 42);
-}
+};
 
-{
-    {
+do {
+    do {
 	package MySafe;
 	sub new { bless \%(), shift }
 	sub reval {
@@ -237,7 +237,7 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	    my $coderef = eval $source;
 	    $coderef;
 	}
-    }
+    };
 
     my $safe = MySafe->new();
     local $Storable::Eval = sub { $safe->reval(@_[0]) };
@@ -255,9 +255,9 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	ok($thawed->[3]->(), "Another::Package");
 	ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     }
-}
+};
 
-{
+do {
     # Check internal "seen" code
     my $short_sub = sub { "short sub" }; # for SX_SCALAR
     # for SX_LSCALAR
@@ -283,4 +283,4 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 	ok(int($res->[2]), int($res->[3]));
     }
 
-}
+};

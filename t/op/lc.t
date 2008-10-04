@@ -35,15 +35,15 @@ is(lc($b)         , "hello\.\* world",      'lc');
 use utf8;
 
 my ($x100, $x101);
-{
+do {
     use utf8;
     $x100 = "\x{100}";
     $x101 = "\x{101}";
-}
+};
 
-$a = "{$x100}{$x101}Aa";
-$b = "{$x101}{$x100}aA";
-{
+$a = "$($x100)$($x101)Aa";
+$b = "$($x101)$($x100)aA";
+do {
     use utf8;
 
 # \x{100} is LATIN CAPITAL LETTER A WITH MACRON; its bijective lowercase is
@@ -73,22 +73,22 @@ $b = "{$x101}{$x100}aA";
 
     local our $TODO="no utf8 lc";
 
-    is("\Q$a\E."      , "{$x100}{$x101}Aa.", '\Q\E ${x100}${x101}Aa');
+    is("\Q$a\E."      , "$($x100)$($x101)Aa.", '\Q\E ${x100}${x101}Aa');
 
-    is(quotemeta($a)  , "{$x100}{$x101}Aa",  'quotemeta');
-    is(ucfirst($a)    , "{$x100}{$x101}Aa",  'ucfirst');
-    is(lcfirst($a)    , "{$x100}{$x101}Aa",  'lcfirst');
-    is(uc($a)         , "{$x100}{$x101}AA",  'uc');
-    is(lc($a)         , "{$x100}{$x101}aa",  'lc');
+    is(quotemeta($a)  , "$($x100)$($x101)Aa",  'quotemeta');
+    is(ucfirst($a)    , "$($x100)$($x101)Aa",  'ucfirst');
+    is(lcfirst($a)    , "$($x100)$($x101)Aa",  'lcfirst');
+    is(uc($a)         , "$($x100)$($x101)AA",  'uc');
+    is(lc($a)         , "$($x100)$($x101)aa",  'lc');
 
-    is("\Q$b\E."      , "{$x101}{$x100}aA.", '\Q\E ${x101}${x100}aA');
+    is("\Q$b\E."      , "$($x101)$($x100)aA.", '\Q\E ${x101}${x100}aA');
 
-    is(quotemeta($b)  , "{$x101}{$x100}aA",  'quotemeta');
-    is(ucfirst($b)    , "{$x101}{$x100}aA",  'ucfirst');
-    is(lcfirst($b)    , "{$x101}{$x100}aA",  'lcfirst');
-    is(uc($b)         , "{$x101}{$x100}AA",  'uc');
-    is(lc($b)         , "{$x101}{$x100}aa",  'lc');
-}
+    is(quotemeta($b)  , "$($x101)$($x100)aA",  'quotemeta');
+    is(ucfirst($b)    , "$($x101)$($x100)aA",  'ucfirst');
+    is(lcfirst($b)    , "$($x101)$($x100)aA",  'lcfirst');
+    is(uc($b)         , "$($x101)$($x100)AA",  'uc');
+    is(lc($b)         , "$($x101)$($x100)aa",  'lc');
+};
 
 # \x{DF} is LATIN SMALL LETTER SHARP S, its uppercase is SS or \x{53}\x{53};
 # \x{149} is LATIN SMALL LETTER N PRECEDED BY APOSTROPHE, its uppercase is
@@ -97,21 +97,21 @@ $b = "{$x101}{$x100}aA";
 # In EBCDIC \x{DF} is LATIN SMALL LETTER Y WITH DIAERESIS,
 # and it's uppercase is \x{178}, LATIN CAPITAL LETTER Y WITH DIAERESIS.
 
-{
+do {
     local our $TODO="multibyte uppercase";
     use utf8;
     is(uc("\x{DF}aB\x{149}cD") , "SSAB\x{2BC}NCD",
        "multicharacter uppercase");
-}
+};
 
 # The \x{DF} is its own lowercase, ditto for \x{149}.
 # There are no single character -> multiple characters lowercase mappings.
 
-{
+do {
     use utf8;
     is(lc("\x{DF}aB\x{149}cD") , "\x{DF}ab\x{149}cd",
        "multicharacter lowercase");
-}
+};
 
 # titlecase is used for \u / ucfirst.
 
@@ -127,11 +127,11 @@ use utf8;
 $a = "\x{587}";
 
 is(lc("\x{587}") , "\x{587}",        "ligature lowercase");
-{
+do {
     local our $TODO="ligature special case";
     is(ucfirst("\x{587}") , "\x{535}\x{582}", "ligature titlecase");
     is(uc("\x{587}") , "\x{535}\x{552}", "ligature uppercase");
-}
+};
 
 # mktables had problems where many-to-one case mappings didn't work right.
 # The lib/uni/fold.t should give the fourth folding, "casefolding", a good
@@ -178,7 +178,7 @@ for my $a (@(0,1)) {
     is(uc($1), "ABCDEFGH", "[perl #18931]");
 }
 
-{
+do {
     foreach (@(0, 1)) {
         local our $TODO = "fix lc";
 	$a = "\x{a}"."\x{101}";
@@ -186,7 +186,7 @@ for my $a (@(0,1)) {
 	$a =~ s/^(\s*)(\w*)/{"$1".ucfirst($2)}/;
 	is($a, "\x{a}", "[perl #18857]");
     } 
-}
+};
 
 
 # [perl #38619] Bug in lc and uc (interaction between UTF-8, substr, and lc/uc)

@@ -17,25 +17,25 @@ This tests the classic diamond inheritence pattern.
 
 =cut
 
-{
+do {
     package Diamond_A;
     sub hello { 'Diamond_A::hello' }
-}
-{
+};
+do {
     package Diamond_B;
     use base 'Diamond_A';
-}
-{
+};
+do {
     package Diamond_C;
     use base 'Diamond_A';     
     
     sub hello { 'Diamond_C::hello' }
-}
-{
+};
+do {
     package Diamond_D;
     use base ('Diamond_B', 'Diamond_C');
     use mro 'c3';
-}
+};
 
 ok(eq_array(
     mro::get_linear_isa('Diamond_D'),

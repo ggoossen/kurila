@@ -34,7 +34,7 @@ while ( ~< *DESC) {
             foreach my $name (split m/,/,$names) {
                 my $real= $name eq 'resume' 
                         ? "resume_$type" 
-                        : "{$type}_$name";
+                        : "$($type)_$name";
                 my @suffix;
                 if (!$special) {
                    @suffix=@("");

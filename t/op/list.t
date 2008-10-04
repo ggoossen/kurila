@@ -54,7 +54,7 @@ cmp_ok(join(':', @(join('+', @foo),join('-', @bar))),'eq','2+3:2-3','long list r
 @foo = @( 1+2+3 );
 cmp_ok(join(':', @foo),'eq','6','scalar assign to array');
 
-{
+do {
     my ($a, $b, $c);
     for my $x (0..2) {
         ($a, $b, $c) = 
@@ -78,9 +78,9 @@ cmp_ok(join(':', @foo),'eq','6','scalar assign to array');
             cmp_ok($c,'eq','i','ternary for c 3');
         }
     }
-}
+};
 
-{
+do {
     my ($a, $b, $c);
     for my $x (0..2) {
         ($a, $b, $c) = do {
@@ -110,7 +110,7 @@ cmp_ok(join(':', @foo),'eq','6','scalar assign to array');
             cmp_ok($c,'eq','i','block for c 3');
         }
     }
-}
+};
 
 $x = 666;
 @a = @($x == 12345 || (1,2,3));
@@ -127,11 +127,11 @@ cmp_ok(join('', @(1,2,(3,4),5)),'eq','12345','list ..(..).');
 cmp_ok(join('', @(1,2,3,(4),5)),'eq','12345','list ...(.).');
 cmp_ok(join('', @((1,2),3,(4,5))),'eq','12345','list (..).(..)');
 
-{
+do {
     my @a = @(0, undef, undef, 3);
     my @b = @a[[@(1,2)]];
     my @c = @(0, undef, undef, 3)[[1..2]];
     cmp_ok(scalar(nelems @b),'==',scalar(nelems @c),'slice and slice');
     cmp_ok(scalar(nelems @c),'==',2,'slice len');
-}
+};
 

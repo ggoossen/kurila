@@ -126,7 +126,7 @@ my @names = qw(
 
 require ExtUtils::Constant;
 
-{
+do {
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = %( < map { $_, 1} @( < @names, 'ZLIB_VERSION') );
     open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
@@ -159,7 +159,7 @@ require ExtUtils::Constant;
                                        XS_FILE  => 'constants.xs',
                                        PROXYSUBS => 1,
                                     );
-} 
+}; 
 
 sub ParseCONFIG
 {
@@ -191,12 +191,12 @@ sub ParseCONFIG
     }
     close F ;
 
-    print "Unknown keys in $CONFIG ignored [{join ' ',@badkey}]\n"
+    print "Unknown keys in $CONFIG ignored [$(join ' ',@badkey)]\n"
 	if (nelems @badkey) ;
 
     # check parsed values
     my @missing = @( () ) ;
-    die "The following keys are missing from $CONFIG  [{join ' ',@missing}]\n" 
+    die "The following keys are missing from $CONFIG  [$(join ' ',@missing)]\n" 
         if @missing = keys %Parsed ;
 
     $ZLIB_INCLUDE = %ENV{'ZLIB_INCLUDE'} || %Info{'INCLUDE'} ;

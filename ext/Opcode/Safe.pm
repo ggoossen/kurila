@@ -130,7 +130,7 @@ sub erase {
     my ($stem, $leaf);
 
     no strict 'refs';
-    $pkg = "{$pkg}::";	# expand to full symbol table name
+    $pkg = "$($pkg)::";	# expand to full symbol table name
     ($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
 
     # The 'my $foo' is needed! Without it you get an

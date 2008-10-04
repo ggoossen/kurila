@@ -62,9 +62,9 @@ $t = tell F;
 # same, that mechanism broke.  It should work now.
 ok(lineno($io), "11");
 
-{
+do {
   $io->getline for @( ( <1 .. 5));
   ok(lineno($io), "16");
-}
+};
 
 ok(lineno($io), "16");

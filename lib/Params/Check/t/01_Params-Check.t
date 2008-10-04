@@ -13,7 +13,7 @@ use constant FALSE  => sub { 0 };
 use constant TRUE   => sub { 1 };
 
 ### allow tests ###
-{   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
+do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
     ok( allow( $0, $0),         "   Allow based on string" );
     ok( allow( 42, \@(0,42) ),    "   Allow based on list" );
     ok( allow( 42, \@(50,sub{1})),"   Allow based on list containing sub");
@@ -25,10 +25,10 @@ use constant TRUE   => sub { 1 };
     ok(!allow( 42, FALSE ),     "   Disallowing based on constant sub" );
 
     ### check that allow short circuits where required 
-    {   my $sub_called;
+    do {   my $sub_called;
         allow( 1, \@( 1, sub { $sub_called++ } ) );
         ok( !$sub_called,       "Allow short-circuits properly" );
-    }        
+    };        
 
     ### check if the subs for allow get what you expect ###
     for my $thing (@(1,'foo',\@(1))) {
@@ -36,48 +36,48 @@ use constant TRUE   => sub { 1 };
            sub { is_deeply(+shift,$thing,  "Allow coderef gets proper args") } 
         );
     }
-}
+};
 ### default tests ###
-{   
+do {   
     my $tmpl =  \%(
         foo => \%( default => 1 )
     );
     
     ### empty args first ###
-    {   my $args = check( $tmpl, \%() );
+    do {   my $args = check( $tmpl, \%() );
 
         ok( $args,              "check() call with empty args" );
         is( $args->{'foo'}, 1,  "   got default value" );
-    }
+    };
     
     ### now provide an alternate value ###
-    {   my $try  = \%( foo => 2 );
+    do {   my $try  = \%( foo => 2 );
         my $args = check( $tmpl, $try );
         
         ok( $args,              "check() call with defined args" );
         is_deeply( $args, $try, "   found provided value in rv" );
-    }
+    };
 
     ### now provide a different case ###
-    {   my $try  = \%( FOO => 2 );
+    do {   my $try  = \%( FOO => 2 );
         my $args = check( $tmpl, $try );
         ok( $args,              "check() call with alternate case" );
         is( $args->{foo}, 2,    "   found provided value in rv" );
-    }
+    };
 
     ### now see if we can strip leading dashes ###
-    {   local $Params::Check::STRIP_LEADING_DASHES = 1;
+    do {   local $Params::Check::STRIP_LEADING_DASHES = 1;
         my $try  = \%( -foo => 2 );
         my $get  = \%( foo  => 2 );
         
         my $args = check( $tmpl, $try );
         ok( $args,              "check() call with leading dashes" );
         is_deeply( $args, $get, "   found provided value in rv" );
-    }
-}
+    };
+};
 
 ### preserve case tests ###
-{   my $tmpl = \%( Foo => \%( default => 1 ) );
+do {   my $tmpl = \%( Foo => \%( default => 1 ) );
     
     for (@(1,0)) {
         local $Params::Check::PRESERVE_CASE = $_;
@@ -88,32 +88,32 @@ use constant TRUE   => sub { 1 };
         ok( $rv,                "check() call using PRESERVE_CASE: $_" );
         is_deeply($rv, $expect, "   found provided value in rv" );
     }             
-}
+};
 
 
 ### unknown tests ###
-{   
+do {   
     ### disallow unknowns ###
-    {        
+    do {        
         my $rv = check( \%(), \%( foo => 42 ) );
     
         is_deeply( $rv, \%(),     "check() call with unknown arguments" ); 
         like( last_error(), qr/^Key 'foo' is not a valid key/,
                                 "   warning recorded ok" );
-    }
+    };
     
     ### allow unknown ###
-    {
+    do {
         local   $Params::Check::ALLOW_UNKNOWN = 1;
         my $rv = check( \%(), \%( foo => 42 ) );        
         
         is_deeply( $rv, \%( foo => 42 ),
                                 "check call() with unknown args allowed" );
-    }
-}
+    };
+};
 
 ### store tests ###
-{   my $foo;
+do {   my $foo;
     my $tmpl = \%(
         foo => \%( store => \$foo )
     );
@@ -129,10 +129,10 @@ use constant TRUE   => sub { 1 };
         is( $foo, 42,               "   found provided value in variable" );
         is( $rv->{foo}, $expect,    "   found provided value in variable" );
     }
-}    
+};    
 
 ### no_override tests ###
-{   my $tmpl = \%(
+do {   my $tmpl = \%(
         foo => \%( no_override => 1, default => 42 ),
     );
     
@@ -142,10 +142,10 @@ use constant TRUE   => sub { 1 };
 
     like( last_error(), qr/^You are not allowed to override key/, 
                                 "   warning recorded ok" );
-}
+};
 
 ### strict_type tests ###
-{   my @list = @(
+do {   my @list = @(
         \@( \%( strict_type => 1, default => \@() ),  0 ),
         \@( \%( default => \@() ),                    1 ),
     );
@@ -157,42 +157,42 @@ use constant TRUE   => sub { 1 };
         local   $Params::Check::STRICT_TYPE = $aref->[1];
                 
         ### proper value ###    
-        {   my $rv = check( $tmpl, \%( foo => \@() ) );
+        do {   my $rv = check( $tmpl, \%( foo => \@() ) );
             ok( $rv,                "check() call with strict_type enabled" );
             is( ref $rv->{foo}, 'ARRAY',
                                     "   found provided value in rv" );
-        }
+        };
         
         ### improper value ###
-        {   my $rv = check( $tmpl, \%( foo => \%() ) );
+        do {   my $rv = check( $tmpl, \%( foo => \%() ) );
             ok( !$rv,               "check() call with strict_type violated" );
             like( last_error(), qr/^Key 'foo' needs to be of type 'ARRAY'/, 
                                     "   warning recorded ok" );
-        }
+        };
     }
-}          
+};          
 
 ### required tests ###
-{   my $tmpl = \%(
+do {   my $tmpl = \%(
         foo => \%( required => 1 )
     );
     
     ### required value provided ###
-    {   my $rv = check( $tmpl, \%( foo => 42 ) );
+    do {   my $rv = check( $tmpl, \%( foo => 42 ) );
         ok( $rv,                    "check() call with required key" );
         is( $rv->{foo}, 42,         "   found provided value in rv" );
-    }
+    };
     
     ### required value omitted ###
-    {   my $rv = check( $tmpl, \%( ) );
+    do {   my $rv = check( $tmpl, \%( ) );
         ok( !$rv,                   "check() call with required key omitted" );
         like( last_error, qr/^Required option 'foo' is not provided/,
                                     "   warning recorded ok" );            
-    }
-}
+    };
+};
 
 ### defined tests ###
-{   my @list = @(
+do {   my @list = @(
         \@( \%( defined => 1, default => 1 ),  0 ),
         \@( \%( default => 1 ),                1 ),
     );
@@ -204,22 +204,22 @@ use constant TRUE   => sub { 1 };
         local   $Params::Check::ONLY_ALLOW_DEFINED = $aref->[1];
                 
         ### value provided defined ###
-        {   my $rv = check( $tmpl, \%( foo => 42 ) );
+        do {   my $rv = check( $tmpl, \%( foo => 42 ) );
             ok( $rv,                "check() call with defined key" );
             is( $rv->{foo}, 42,     "   found provided value in rv" );
-        }
+        };
         
         ### value provided undefined ###
-        {   my $rv = check( $tmpl, \%( foo => undef ) );
+        do {   my $rv = check( $tmpl, \%( foo => undef ) );
             ok( !$rv,               "check() call with defined key undefined" );
             like( last_error, qr/^Key 'foo' must be defined when passed/,
                                     "   warning recorded ok" );
-        }                                             
+        };                                             
     }
-}
+};
 
 ### check + allow tests ###
-{   ### check if the subs for allow get what you expect ###
+do {   ### check if the subs for allow get what you expect ###
     for my $thing (@(1,'foo',\@(1))) {
         my $tmpl = \%(
             foo => \%( allow =>
@@ -231,23 +231,23 @@ use constant TRUE   => sub { 1 };
         my $rv = check( $tmpl, \%( foo => $thing ) );
         ok( $rv,                    "check() call using allow key" );  
     }
-}
+};
 
 ### invalid key tests 
-{   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
+do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
     
     for my $val (@( 1, 'foo', \@(), bless(\%(),__PACKAGE__)) ) {
         my $rv      = check( $tmpl, \%( foo => $val ) );
-        my $text    = "Key 'foo' ({dump::view($val)}) is of invalid type";
+        my $text    = "Key 'foo' ($(dump::view($val))) is of invalid type";
         my $re      = quotemeta $text;
         
         ok(!$rv,                    "check() fails with unalllowed value" );
         like(last_error(), qr/$re/, "   $text" );
     }
-}
+};
 
 ### warnings fatal test
-{   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
+do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
 
     local $Params::Check::WARNINGS_FATAL = 1;
 
@@ -256,10 +256,10 @@ use constant TRUE   => sub { 1 };
     ok( $@,             "Call dies with fatal toggled" );
     like( $@->{description},           qr/invalid type/,
                             "   error stored ok" );
-}
+};
 
 ### store => \$foo tests
-{   ### quell warnings
+do {   ### quell warnings
     local $^WARN_HOOK = sub {};
     
     my $tmpl = \%( foo => \%( store => '' ) );
@@ -267,10 +267,10 @@ use constant TRUE   => sub { 1 };
     
     my $re = quotemeta q|Store variable for 'foo' is not a reference!|;
     like(last_error(), qr/$re/, "Caught non-reference 'store' variable" );
-}    
+};    
 
 ### edge case tests ###
-{   ### if key is not provided, and value is '', will P::C treat
+do {   ### if key is not provided, and value is '', will P::C treat
     ### that correctly? 
     my $tmpl = \%( foo => \%( default => '' ) );
     my $rv   = check( $tmpl, \%() );
@@ -280,10 +280,10 @@ use constant TRUE   => sub { 1 };
     ok( defined $rv->{foo},     "   rv defined" );
     ok( !$rv->{foo},            "   rv false" );
     is( $rv->{foo}, '',         "   rv = '' " );
-}
+};
 
 ### big template test ###
-{
+do {
     my $lastname;
     
     ### the template to check against ###
@@ -326,10 +326,10 @@ use constant TRUE   => sub { 1 };
     is_deeply( $rv, $get,   "   found provided values in rv" );
     is( $rv->{lastname}, $lastname, 
                             "   found provided values in rv" );
-}
+};
 
 ### $Params::Check::CALLER_DEPTH test
-{
+do {
     sub wrapper { check  ( < @_ ) };
     sub inner   { wrapper( < @_ ) };
     sub outer   { inner  ( < @_ ) };
@@ -343,11 +343,11 @@ use constant TRUE   => sub { 1 };
 
     like( last_error, qr/for .*::inner by .*::outer$/,
                             "right caller with CALLER_DEPTH" );
-}
+};
 
 ### test: #23824: Bug concering the loss of the last_error 
 ### message when checking recursively.
-{   ok( 1,                      "Test last_error() on recursive check() call" ); 
+do {   ok( 1,                      "Test last_error() on recursive check() call" ); 
     
     ### allow sub to call
     my $clear   = sub { check( \%(), \%() ) if shift; 1; };
@@ -364,5 +364,5 @@ use constant TRUE   => sub { 1 };
     
         ok( last_error(),       "   last_error() with recurse: $recurse" );
     }
-}
+};
 

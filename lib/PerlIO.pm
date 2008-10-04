@@ -17,7 +17,7 @@ sub import
     }
    else
     {
-     $layer = "{$class}::$layer";
+     $layer = "$($class)::$layer";
     }
    eval "require $layer";
    warn "failed loading $layer\: {$@->message}" if $@;

@@ -83,7 +83,7 @@ $neg7 = -7.0;
 ok (^~^ $neg7 == 6);
 
 # [perl #37616] Bug in &= (string) and/or m//
-{
+do {
     $a = "aa";
     $a ^&^= "a";
     ok($a =~ m/a+$/, 'ASCII "a" is NUL-terminated');
@@ -92,9 +92,9 @@ ok (^~^ $neg7 == 6);
     $b = "bb\x{100}";
     $b ^&^= "b";
     ok($b =~ m/b+$/, 'Unicode "b" is NUL-terminated');
-}
+};
 
-{
+do {
     $a = "\x[0101]" x 0x101;
     $b = "\x[FF]" x 0x100;
 
@@ -115,4 +115,4 @@ ok (^~^ $neg7 == 6);
     is( ($a ^^^ $b), ($b ^^^ $a) );
     $c = $a; $c ^^^= $b;
     is( $c, ($a ^^^ $b) );
-}
+};

@@ -14,7 +14,7 @@ use File::Spec;
 require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 plan(tests => 17);
 
-{
+do {
 	require XSLoader;
 
 	my @load;
@@ -28,7 +28,7 @@ plan(tests => 17);
 	ok( < @load, 'IO should call XSLoader::load()' );
 	is( @load[0]->[0], 'IO', '... loading the IO library' );
 	is( @load[0]->[1], $IO::VERSION, '... with the current .pm version' );
-}
+};
 
 my @default = map { "IO/$_.pm" } qw( Handle Seekable File Socket Dir );
 delete %INC{[@default ]};
@@ -36,43 +36,43 @@ delete %INC{[@default ]};
 my $warn = '' ;
 local $^WARN_HOOK = sub { $warn = @_[0]->{description} } ;
 
-{
+do {
     no warnings ;
     IO->import();
     is( $warn, '', "... import default, should not warn");
     $warn = '' ;
-}
+};
 
-{
+do {
     local $^W = 0;
     IO->import();
     is( $warn, '', "... import default, should not warn");
     $warn = '' ;
-}
+};
 
-{
+do {
     local $^W = 1;
     IO->import();
     like( $warn, qr/^Parameterless "use IO" deprecated/, 
               "... import default, should warn");
     $warn = '' ;
-}
+};
 
-{
+do {
     use warnings 'deprecated' ;
     IO->import(); 
     like( $warn, qr/^Parameterless "use IO" deprecated/, 
               "... import default, should warn");
     $warn = '' ;
-}
+};
 
-{
+do {
     use warnings ;
     IO->import();
     like( $warn, qr/^Parameterless "use IO" deprecated/,
               "... import default, should warn");
     $warn = '' ;
-}
+};
 
 foreach my $default ( @default)
 {
@@ -111,12 +111,12 @@ if ( -d $fakedir or mkpath( $fakedir ))
 }
 
 SKIP:
-{
+do {
 	skip("Could not write to disk", 2 ) unless $flag;
 	try { IO->import( 'fakemod' ) };
 	ok( IO::fakemod::exists(), 'import() should import IO:: modules by name' );
 	is( $@, '', '... and should not call import() on imported modules' );
-}
+};
 
 END
 {

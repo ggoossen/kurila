@@ -5,16 +5,16 @@ use warnings;
 
 require q(./test.pl); plan(tests => 12);
 
-{
+do {
 
-    {
+    do {
         package Foo;
         use strict;
         use warnings;
         use mro 'c3';
         sub new { bless \%(), @_[0] }
         sub bar { 'Foo::bar' }
-    }
+    };
 
     # call the submethod in the direct instance
 
@@ -26,68 +26,68 @@ require q(./test.pl); plan(tests => 12);
 
     # fail calling it from a subclass
 
-    {
+    do {
         package Bar;
         use strict;
         use warnings;
         use mro 'c3';
         our @ISA = @('Foo');
-    }  
+    };  
     
     my $bar = Bar->new();
     isa_ok($bar, 'Bar');
     isa_ok($bar, 'Foo');    
     
     # test it working with with Sub::Name
-    SKIP: {    
+    SKIP: do {    
         eval 'use Sub::Name';
         skip("Sub::Name is required for this test", 3) if $@;
     
         my $m = sub { (shift)->next::method() };
         Sub::Name::subname('Bar::bar', $m);
-        {
+        do {
             no strict 'refs';
             *{Symbol::fetch_glob('Bar::bar')} = $m;
-        }
+        };
 
         can_ok($bar, 'bar');
         my $value = try { $bar->bar() };
         ok(!$@, '... calling bar() succedded') || diag($@);
         is($value, 'Foo::bar', '... got the right return value too');
-    }
+    };
     
     # test it failing without Sub::Name
-    {
+    do {
         package Baz;
         use strict;
         use warnings;
         use mro 'c3';
         our @ISA = @('Foo');
-    }      
+    };      
     
     my $baz = Baz->new();
     isa_ok($baz, 'Baz');
     isa_ok($baz, 'Foo');    
     
-    {
+    do {
         my $m = sub { (shift)->next::method() };
-        {
+        do {
             no strict 'refs';
             *{Symbol::fetch_glob('Baz::bar')} = $m;
-        }
+        };
 
         try { $baz->bar() };
         ok($@, '... calling bar() with next::method failed') || diag($@);
-    }
+    };
 
     # Test with non-existing class (used to segfault)
-    {
+    do {
         package Qux;
         use mro;
         sub foo { No::Such::Class->next::can }
-    }
+    };
 
     try { Qux->foo() };
     is($@, '', "->next::can on non-existing package name");
 
-}
+};

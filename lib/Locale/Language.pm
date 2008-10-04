@@ -102,7 +102,7 @@ sub all_language_names
 #=======================================================================
 # initialisation code - stuff the DATA into the CODES hash
 #=======================================================================
-{
+do {
     my    $code;
     my    $language;
     local $_;
@@ -118,7 +118,7 @@ sub all_language_names
     }
 
     close(DATA);
-}
+};
 
 1;
 

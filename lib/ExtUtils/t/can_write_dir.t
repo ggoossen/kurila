@@ -5,7 +5,7 @@
 use strict;
 use ExtUtils::Install;
 use File::Spec;
-{ package FS;  our @ISA = qw(File::Spec); }
+do { package FS;  our @ISA = qw(File::Spec); };
 
 # Alias it for easier access
 *can_write_dir = \&ExtUtils::Install::_can_write_dir;
@@ -34,7 +34,7 @@ is_deeply \ can_write_dir($abs_dne),
              FS->rel2abs(FS->catdir('does', 'not', 'exist'))),
           );
 
-SKIP: {
+SKIP: do {
     my $exists = FS->catdir( <qw(exists));
     my $subdir = FS->catdir( <qw(exists subdir));
     
@@ -58,4 +58,4 @@ SKIP: {
                $exists,
                @($subdir)
               );
-}
+};

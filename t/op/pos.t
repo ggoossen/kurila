@@ -26,5 +26,5 @@ is($x, "0123 5678910?");
 
 $x = "123 56"; $x =~ m/ /g;
 is(pos($x), 4);
-{ local $x }
+do { local $x };
 is(pos($x), 4);

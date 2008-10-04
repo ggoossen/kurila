@@ -48,18 +48,18 @@ foreach (@(Foo->new)) {
     }
 }
 
-{
+do {
     local $^WARN_HOOK = sub {
         return if @_[0] =~ m/^Pseudo-hashes are deprecated/ 
     };
     my $phash;
     try { $phash = fields::phash(name => "Joe", rank => "Captain") };
     like $@->{description}, qr/^Pseudo-hashes have been removed from Perl/;
-}
+};
 
 
 # check if fields autovivify
-{
+do {
     package Foo::Autoviv;
     use fields < qw(foo bar);
     sub new { fields::new(@_[0]) }
@@ -70,7 +70,7 @@ foreach (@(Foo->new)) {
     $a->{bar} = \%( A => 'ok' );
     is( $a->{foo}->[1],    'ok' );
     is( $a->{bar}->{A},, 'ok' );
-}
+};
 
 package Test::FooBar;
 
@@ -84,10 +84,10 @@ sub new {
 
 package main;
 
-{
+do {
     my $x = Test::FooBar->new( a => 1, b => 2);
 
     is(ref $x, 'Test::FooBar', 'x is a Test::FooBar');
     ok(exists $x->{a}, 'x has a');
     ok(exists $x->{b}, 'x has b');
-}
+};

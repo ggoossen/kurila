@@ -48,9 +48,9 @@ $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
 
 
 #..........................................................................
-{ my $pager = %Config{'pager'};
+do { my $pager = %Config{'pager'};
   push @Pagers, $pager if -x (split m/\s+/, $pager)[0] or IS_VMS;
-}
+};
 $Bindir  = %Config{'scriptdirexp'};
 $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
 
@@ -102,8 +102,8 @@ sub opt_M_with { # specify formatter class name(s)
   unshift @{ $self->{'formatter_classes'} }, < @classes_to_add;
   
   DEBUG +> 3 and print(
-    "Adding {join ' ',@classes_to_add} to the list of formatter classes, "
-    . "making them {join ' ',@{ $self->{'formatter_classes'} }}.\n"
+    "Adding $(join ' ',@classes_to_add) to the list of formatter classes, "
+    . "making them $(join ' ',@$( $self->{'formatter_classes'} )).\n"
   );
   
   return;
@@ -185,7 +185,7 @@ sub run {  # to be called by the "perldoc" executable
     my @x = @_;
     while((nelems @x)) {
       @x[1] = '<undef>'  unless defined @x[1];
-      @x[1] = "{join ' ',@{@x[1]}}" if ref( @x[1] ) eq 'ARRAY';
+      @x[1] = "$(join ' ',@$(@x[1]))" if ref( @x[1] ) eq 'ARRAY';
       print "  [@x[0]] => [@x[1]]\n";
       splice @x,0,2;
     }
@@ -229,7 +229,7 @@ sub aside {  # If we're in -v or DEBUG mode, say this.
 
 sub usage {
   my $self = shift;
-  warn "{join ' ',@_}\n" if (nelems @_);
+  warn "$(join ' ',@_)\n" if (nelems @_);
   
   # Erase evidence of previous errors (if any), so exit status is simple.
   $! = 0;
@@ -346,7 +346,7 @@ sub init {
   );
 
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
-   join ' ', map "[{join ' ',@$_}]", @{ $self->{'formatter_switches'} };
+   join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
 
   $self->{'translators'} = \@();
   $self->{'extra_search_dirs'} = \@();
@@ -380,13 +380,13 @@ sub process {
 
     my $self = shift;
     DEBUG +> 1 and print "  Beginning process.\n";
-    DEBUG +> 1 and print "  Args: {join ' ',@{$self->{'args'}}}\n\n";
+    DEBUG +> 1 and print "  Args: $(join ' ',@$($self->{'args'}))\n\n";
     if(DEBUG +> 3) {
         print "Object contents:\n";
         my @x = %$self;
         while((nelems @x)) {
             @x[1] = '<undef>'  unless defined @x[1];
-            @x[1] = "{join ' ',@{@x[1]}}" if ref( @x[1] ) eq 'ARRAY';
+            @x[1] = "$(join ' ',@$(@x[1]))" if ref( @x[1] ) eq 'ARRAY';
             print "  [@x[0]] => [@x[1]]\n";
             splice @x,0,2;
         }
@@ -438,13 +438,13 @@ sub process {
     $self->tweak_found_pathnames(\@found);
     $self->assert_closing_stdout;
     return $self->page_module_file(< @found)  if  $self->opt_m;
-    DEBUG +> 2 and print "Found: [{join ' ',@found}]\n";
+    DEBUG +> 2 and print "Found: [$(join ' ',@found)]\n";
 
     return $self->render_and_page(\@found);
 }
 
 #..........................................................................
-{
+do {
 
 my( %class_seen, %class_loaded );
 sub find_good_formatter_class {
@@ -504,7 +504,7 @@ sub find_good_formatter_class {
     }
   }
   
-  die "Can't find any loadable formatter class in {join ' ',@class_list}?!\nAborting"
+  die "Can't find any loadable formatter class in $(join ' ',@class_list)?!\nAborting"
     unless $good_class_found;
   
   $self->{'formatter_class'} = $good_class_found;
@@ -513,7 +513,7 @@ sub find_good_formatter_class {
   return;
 }
 
-}
+};
 #..........................................................................
 
 sub formatter_sanity_check {
@@ -604,19 +604,19 @@ sub options_reading {
       unshift @{ $self->{'args'} }, <
         Text::ParseWords::shellwords( %ENV{"PERLDOC"} )
       ;
-      DEBUG +> 1 and print "  Args now: {join ' ',@{$self->{'args'}}}\n\n";
+      DEBUG +> 1 and print "  Args now: $(join ' ',@$($self->{'args'}))\n\n";
     } else {
       DEBUG +> 1 and print "  Okay, no PERLDOC setting in ENV.\n";
     }
 
     DEBUG +> 1
-     and print "  Args right before switch processing: {join ' ',@{$self->{'args'}}}\n";
+     and print "  Args right before switch processing: $(join ' ',@$($self->{'args'}))\n";
 
     Pod::Perldoc::GetOptsOO::getopts( $self, $self->{'args'}, 'YES' )
      or return $self->usage;
 
     DEBUG +> 1
-     and print "  Args after switch processing: {join ' ',@{$self->{'args'}}}\n";
+     and print "  Args after switch processing: $(join ' ',@$($self->{'args'}))\n";
 
     return $self->usage if $self->opt_h;
   
@@ -730,14 +730,14 @@ sub grand_search_init {
         }
         my @files = $self->searchfor(0,$page,< @searchdirs);
         if ((nelems @files)) {
-            $self->aside( "Found as {join ' ',@files}\n" );
+            $self->aside( "Found as $(join ' ',@files)\n" );
         }
         else {
             # no match, try recursive search
             @searchdirs = grep(!m/^\.\z/s, @INC);
             @files= $self->searchfor(1,$page,< @searchdirs) if $self->opt_r;
             if ((nelems @files)) {
-                $self->aside( "Loosely found as {join ' ',@files}\n" );
+                $self->aside( "Loosely found as $(join ' ',@files)\n" );
             }
             else {
                 print STDERR "No " .
@@ -809,7 +809,7 @@ sub add_formatter_option { # $self->add_formatter_option('key' => 'value');
   push @{ $self->{'formatter_switches'} }, \ @_ if (nelems @_);
 
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
-   join ' ', map "[{join ' ',@$_}]", @{ $self->{'formatter_switches'} };
+   join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
   
   return;
 }
@@ -852,7 +852,7 @@ sub add_translator { # $self->add_translator($lang);
 sub search_perlfunc {
     my($self, $found_things, $pod) = < @_;
 
-    DEBUG +> 2 and print "Search: {join ' ',@$found_things}\n";
+    DEBUG +> 2 and print "Search: $(join ' ',@$found_things)\n";
 
     my $perlfunc = shift @$found_things;
     open(PFUNC, "<", $perlfunc)               # "Funk is its own reward"
@@ -978,7 +978,7 @@ sub render_findings {
   my $file = $found_things->[0];
   
   DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
-   join ' ', map "[{join ' ',@$_}]", @{ $self->{'formatter_switches'} };
+   join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
 
   # Set formatter options:
   if( ref $formatter ) {
@@ -1008,7 +1008,7 @@ sub render_findings {
   );
 
   # Now, finally, do the formatting!
-  {
+  do {
     local $^W = $^W;
     if(DEBUG() or $self->opt_v) {
       # feh, let 'em see it
@@ -1019,7 +1019,7 @@ sub render_findings {
     }
           
     try {  $formatter->parse_from_file( $file, $out_fh )  };
-  }
+  };
   
   warn "Error while formatting with $formatter_class:\n $@\n" if $@;
   DEBUG +> 2 and print "Back from formatting with $formatter_class\n";
@@ -1329,7 +1329,7 @@ sub page_module_file {
     }
 
     foreach my $pager (  $self->pagers ) {
-        $self->aside("About to try calling $pager {join ' ',@found}\n");
+        $self->aside("About to try calling $pager $(join ' ',@found)\n");
         if (system($pager, < @found) == 0) {
             $self->aside("Yay, it worked.\n");
             return 0;
@@ -1570,7 +1570,7 @@ sub searchfor {
     $s =~ s!::!/!g;
     $s = VMS::Filespec::unixify($s) if IS_VMS;
     return $s if -f $s && $self->containspod($s);
-    $self->aside( "Looking for $s in {join ' ',@dirs}\n" );
+    $self->aside( "Looking for $s in $(join ' ',@dirs)\n" );
     my $ret;
     my $dir;
     $self->{'target'} = ( <splitdir $s)[[-1]];  # XXX: why not use File::Basename?
@@ -1607,7 +1607,7 @@ sub searchfor {
 	    next unless (nelems @newdirs);
 	    # what a wicked map!
 	    @newdirs = map(@(s/\.dir\z//,$_)[1], @newdirs) if IS_VMS;
-	    $self->aside( "Also looking in {join ' ',@newdirs}\n" );
+	    $self->aside( "Also looking in $(join ' ',@newdirs)\n" );
 	    push(@dirs,< @newdirs);
 	}
     }
@@ -1615,7 +1615,7 @@ sub searchfor {
 }
 
 #..........................................................................
-{
+do {
   my $already_asserted;
   sub assert_closing_stdout {
     my $self = shift;
@@ -1629,7 +1629,7 @@ sub searchfor {
     $already_asserted = 1;
     return;
   }
-}
+};
 
 #..........................................................................
 

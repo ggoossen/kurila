@@ -140,17 +140,17 @@ for my $entry (@map) {
 ### fetch() tests ###
 
 ### file:// tests ###
-{
+do {
     my $prefix = &File::Fetch::ON_UNIX( < @_ ) ? 'file://' : 'file:///';
     my $uri = $prefix . cwd() .'/'. basename($0);
 
     for (qw[lwp file]) {
         _fetch_uri( file => $uri, $_ );
     }
-}
+};
 
 ### ftp:// tests ###
-{   my $uri = 'ftp://ftp.funet.fi/pub/CPAN/index.html';
+do {   my $uri = 'ftp://ftp.funet.fi/pub/CPAN/index.html';
     for (qw[lwp netftp wget curl ncftp]) {
 
         ### STUPID STUPID warnings ###
@@ -159,32 +159,32 @@ for my $entry (@map) {
 
         _fetch_uri( ftp => $uri, $_ );
     }
-}
+};
 
 ### http:// tests ###
-{   for my $uri (@( 'http://www.cpan.org/index.html',
+do {   for my $uri (@( 'http://www.cpan.org/index.html',
                   'http://www.cpan.org/index.html?q=1&y=2')
     ) {
         for (qw[lwp wget curl lynx]) {
             _fetch_uri( http => $uri, $_ );
         }
     }
-}
+};
 
 ### rsync:// tests ###
-{   my $uri = 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM';
+do {   my $uri = 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM';
 
     for (qw[rsync]) {
         _fetch_uri( rsync => $uri, $_ );
     }
-}
+};
 
 sub _fetch_uri {
     my $type    = shift;
     my $uri     = shift;
     my $method  = shift or return;
 
-    SKIP: {
+    SKIP: do {
         skip "'$method' fetching tests disabled under perl core", 4
                 if %ENV{PERL_CORE};
     
@@ -198,7 +198,7 @@ sub _fetch_uri {
     
         my $file = $ff->fetch( to => 'tmp' );
     
-        SKIP: {
+        SKIP: do {
             skip "You do not have '$method' installed/available", 3
                 if $File::Fetch::METHOD_FAIL->{$method} &&
                    $File::Fetch::METHOD_FAIL->{$method};
@@ -209,8 +209,8 @@ sub _fetch_uri {
                                 "   File has expected name" );
     
             unlink $file;
-        }
-    }
+        };
+    };
 }
 
 

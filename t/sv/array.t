@@ -132,11 +132,11 @@ is((join ' ', @bar), "foo bar");						# 43
 
 our @bee = @( 'foo', 'bar', 'burbl', 'blah');
 our @bim;
-{
+do {
 
     local @bee = @bee;
     is((join ' ', @bee), "foo bar burbl blah");				# 44
-    {
+    do {
         local @bee = @('XXX',< @bee,'YYY');
         is((join ' ', @bee), "XXX foo bar burbl blah YYY");		# 46
         {
@@ -150,59 +150,59 @@ our @bim;
 #             is((join ' ', < @bee), "foo bar burbl blah");		# 50
         }
         is((join ' ', @bee), "XXX foo bar burbl blah YYY");		# 51
-    }
+    };
     is((join ' ', @bee), "foo bar burbl blah");				# 53
-}
+};
 
 # try the same with my
-{
+do {
     my @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");				# 54
-    {
+    do {
 	my (undef,<@bee) = < @bee;
 	is((join ' ',@bee), "bar burbl blah");				# 55
-	{
+	do {
 	    my @bee = @('XXX',< @bee,'YYY');
 	    is((join ' ',@bee), "XXX bar burbl blah YYY");		# 56
-	    {
+	    do {
 		my @bee = @( my @bee = qw(foo bar burbl blah) );
 		is((join ' ',@bee), "foo bar burbl blah");		# 57
-		{
+		do {
 		    my (@bim) = my(@bee) = qw(foo bar);
 		    is((join ' ',@bee), "foo bar");			# 58
 		    is((join ' ',@bim), "foo bar");			# 59
-		}
+		};
 		is((join ' ',@bee), "foo bar burbl blah");		# 60
-	    }
+	    };
 	    is((join ' ',@bee), "XXX bar burbl blah YYY");		# 61
-	}
+	};
 	is((join ' ',@bee), "bar burbl blah");				# 62
-    }
+    };
     is((join ' ',@bee), "foo bar burbl blah");				# 63
-}
+};
 
 # try the same with our (except that previous values aren't restored)
-{
+do {
     our @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");
-    {
+    do {
 	our (undef,<@bee) = < @bee;
 	is((join ' ',@bee), "bar burbl blah");
-	{
+	do {
 	    our @bee = @('XXX',< @bee,'YYY');
 	    is((join ' ',@bee), "XXX bar burbl blah YYY");
-	    {
+	    do {
 		our @bee = our @bee = qw(foo bar burbl blah);
 		is((join ' ',@bee), "foo bar burbl blah");
-		{
+		do {
 		    our (@bim) = our(@bee) = qw(foo bar);
 		    is((join ' ',@bee), "foo bar");
 		    is((join ' ',@bim), "foo bar");
-		}
-	    }
-	}
-    }
-}
+		};
+	    };
+	};
+    };
+};
 
 # make sure reification behaves
 my $t = curr_test();
@@ -239,16 +239,16 @@ my $got = runperl (
 	stderr => 1
     );
 
-{
+do {
     local our $TODO = 1;
     $got =~ s/\n/ /g;
     is ($got, '');
-}
+};
 
 # Test negative and funky indices.
 
 
-{
+do {
     my @a = 0..4;
     is(@a[-1], 4);
     is(@a[-2], 3);
@@ -259,38 +259,38 @@ my $got = runperl (
     is(@a[2.9]  , 2);
     is(@a[undef], 0);
     is(@a["3rd"], 3);
-}
+};
 
 
-{
+do {
     my @a;
     eval '@a[-1] = 0';
     like $@->message,
       qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0";
-}
+};
 
-{
+do {
     # Bug #36211
     for (@(1,2)) {
-	{
+	do {
 	    local our @a;
 	    is (nelems @a, 0);
 	    @a=1..4
-	}
+	};
     }
-}
+};
 
 # more tests for AASSIGN_COMMON
 
-{
+do {
     our($x,$y,$z) = ( <1..3);
     our($y,$z) = ($x,$y);
     is("$x $y $z", "1 1 2");
-}
-{
+};
+do {
     our($x,$y,$z) = ( <1..3);
     (our $y, our $z) = ($x,$y);
     is("$x $y $z", "1 1 2");
-}
+};
 
 "We're included by lib/Tie/Array/std.t so we need to return something true";

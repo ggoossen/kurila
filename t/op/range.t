@@ -19,13 +19,13 @@ is(join(':', @foo[[@foo[0]..5]]), '2:c:d:e:6');
 @bar[[2..4]] = ('c','d','e');
 is(join(':', @bar[[1..5]]), ':c:d:e:');
 
-TODO: {
+TODO: do {
    todo_skip("slices in the middle of a list assignment", 1);
    eval <<'TODO'; die if $@;
    ($a, < @bcd[[@( <0..2)]],$e) = ('a','b','c','d','e');
    is(join(':', @($a, < @bcd[[@( <0..2)]],$e)), 'a:b:c:d:e');
 TODO
-}
+};
 
 $x = 0;
 for (1..100) {
@@ -69,31 +69,31 @@ else {
   $b = "-2147483647 -2147483646";
 }
 
-is ("{join ' ',@a}", $a);
+is ("$(join ' ',@a)", $a);
 
-is ("{join ' ',@b}", $b);
+is ("$(join ' ',@b)", $b);
 
 # check magic
-{
+do {
     my $bad = 0;
     local $^WARN_HOOK = sub { $bad = 1 };
     my $x = 'a-e';
     $x =~ s/(\w)-(\w)/{join ':', $1 .. $2}/;
     is ($x, 'a:b:c:d:e');
-}
+};
 
 # Should use magical autoinc only when both are strings
-{
+do {
     my $scalar = (() = < "0"..-1);
     is ($scalar, 0);
-}
-{
+};
+do {
     my $fail = 0;
     for my $x ("0"..-1) {
 	$fail++;
     }
     is ($fail, 0);
-}
+};
 
 # [#18165] Should allow "-4".."0", broken by #4730. (AMS 20021031)
 is(join(":","-4".."0")     , "-4:-3:-2:-1:0");
@@ -145,52 +145,52 @@ is(join(":", map "[$_]", @foo), '');
 is(join(":", map "[$_]", @foo), '[]');
 
 # again with magic
-{
+do {
     my @a =1..3;
     @foo= @(() ); push @foo, $_ for undef..((nelems @a)-1);
     is(join(":", @foo), '0:1:2');
-}
-{
+};
+do {
     my @a = @( () );
     @foo= @(() ); push @foo, $_ for ((nelems @a)-1)..undef;
     is(join(":", @foo), '-1:0');
-}
-{
+};
+do {
     local $1;
     "2" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for undef..$1;
     is(join(":", @foo), '0:1:2');
-}
-{
+};
+do {
     local $1;
     "-2" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1..undef;
     is(join(":", @foo), '-2:-1:0');
-}
-{
+};
+do {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for undef..$1;
     is(join(":", map "[$_]", @foo), '[]');
-}
-{
+};
+do {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for ""..$1;
     is(join(":", map "[$_]", @foo), '[]');
-}
-{
+};
+do {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1..undef;
     is(join(":", map "[$_]", @foo), '');
-}
-{
+};
+do {
     local $1;
     "B" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1.."";
     is(join(":", map "[$_]", @foo), '');
-}
+};
 
 # Test upper range limit
 my $MAX_INT = ^~^0>>1;
@@ -237,7 +237,7 @@ foreach my $ii (-3 .. 3) {
     }
 }
 
-{
+do {
     my $first;
     try {
         my $lim=0;
@@ -250,7 +250,7 @@ foreach my $ii (-3 .. 3) {
     };
     ok(! $@, 'Range accepted');
     ok(! defined($first), 'Range ineffectual');
-}
+};
 
 foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4))) {
     try {
@@ -317,7 +317,7 @@ foreach my $ii (-3 .. 3) {
     }
 }
 
-{
+do {
     my $first;
     try {
         my $lim=0;
@@ -330,7 +330,7 @@ foreach my $ii (-3 .. 3) {
     };
     ok(! $@, 'Range accepted');
     ok(! defined($first), 'Range ineffectual');
-}
+};
 
 foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4))) {
     try {

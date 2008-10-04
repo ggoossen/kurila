@@ -58,10 +58,10 @@ is COUNTLAST, 1;
 is((COUNTLIST)[1], 4);
 
 use constant ABC	=> 'ABC';
-is "abc${\( ABC )}abc", "abcABCabc";
+is "abc$$(\( ABC ))abc", "abcABCabc";
 
 use constant DEF	=> 'D', 'E', chr ord 'F';
-is "d e f {join ' ',@{\ DEF}} d e f", "d e f D E F d e f";
+is "d e f $(join ' ',@$(\ DEF)) d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';
@@ -74,10 +74,10 @@ is MESS, q('"'\"'"\);
 is length(MESS), 8;
 
 use constant TRAILING	=> '12 cats';
-{
+do {
     local $^W;
     cmp_ok TRAILING, '==', 12;
-}
+};
 is TRAILING, '12 cats';
 
 use constant LEADING	=> " \t1234";
@@ -91,10 +91,10 @@ is ZERO1, '0';
 is ZERO2, '0';
 is ZERO3, '0.0';
 
-{
+do {
     package Other;
     use constant PI	=> 3.141;
-}
+};
 
 cmp_ok(abs(PI - 3.1416), '+<', 0.0001);
 is Other::PI, 3.141;
@@ -149,7 +149,7 @@ sub declared ($) {
     my $name = shift;
     $name =~ s/^::/main::/;
     my $pkg = caller;
-    my $full_name = $name =~ m/::/ ? $name : "{$pkg}::$name";
+    my $full_name = $name =~ m/::/ ? $name : "$($pkg)::$name";
     %constant::declared{$full_name};
 }
 
@@ -159,14 +159,14 @@ ok %constant::declared{'main::PI'};
 ok !declared 'PIE';
 ok !%constant::declared{'main::PIE'};
 
-{
+do {
     package Other;
     use constant IN_OTHER_PACK => 42;
     main::ok main::declared 'IN_OTHER_PACK';
     main::ok %constant::declared{'Other::IN_OTHER_PACK'};
     main::ok main::declared 'main::PI';
     main::ok %constant::declared{'main::PI'};
-}
+};
 
 ok declared 'Other::IN_OTHER_PACK';
 ok %constant::declared{'Other::IN_OTHER_PACK'};
@@ -252,24 +252,24 @@ is AGES->{FAMILY->[1]}, 28;
 is THREE**3, SPIT->((nelems @{+FAMILY})**3);
 
 # Allow name of digits/underscores only if it begins with underscore
-{
+do {
     use warnings FATAL => 'constant';
     eval q{
         use constant _1_2_3 => 'allowed';
     };
     ok( $@ eq '' );
-}
+};
 
 $fagwoosh = 'geronimo';
 $putt = 'leutwein';
 $kloong = 'schlozhauer';
 
-{
+do {
     my @warnings;
     local $^WARN_HOOK = sub { push @warnings, < @_ };
     eval 'use constant fagwoosh => 5; 1' or die $@;
 
-    is ("{join ' ',@warnings}", "", "No warnings if the typeglob exists already");
+    is ("$(join ' ',@warnings)", "", "No warnings if the typeglob exists already");
 
     my $value = eval 'fagwoosh';
     is ($@, '');
@@ -281,7 +281,7 @@ $kloong = 'schlozhauer';
 
     eval 'use constant putt => 6, 7; 1' or die $@;
 
-    is ("{join ' ',@warnings}", "", "No warnings if the typeglob exists already");
+    is ("$(join ' ',@warnings)", "", "No warnings if the typeglob exists already");
 
     @value = eval 'putt';
     is ($@, '');
@@ -289,7 +289,7 @@ $kloong = 'schlozhauer';
 
     eval 'use constant "klong"; 1' or die $@;
 
-    is ("{join ' ',@warnings}", "", "No warnings if the typeglob exists already");
+    is ("$(join ' ',@warnings)", "", "No warnings if the typeglob exists already");
 
     $value = eval 'klong';
     is ($@, '');
@@ -298,4 +298,4 @@ $kloong = 'schlozhauer';
     @value = eval 'klong';
     is ($@, '');
     is_deeply (\@value, \undef);
-}
+};

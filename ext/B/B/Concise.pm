@@ -151,7 +151,7 @@ sub concise_stashref {
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
-	warn "err {$@->message} on {dump::view($codeobj)}" if $@;
+	warn "err {$@->message} on $(dump::view($codeobj))" if $@;
     }
 }
 
@@ -306,7 +306,7 @@ sub compile {
     my @args = compileOpts(< @_);
     return sub {
 	my @newargs = compileOpts(< @_); # accept new rendering options
-	warn "disregarding non-options: {join ' ',@newargs}\n" if (nelems @newargs);
+	warn "disregarding non-options: $(join ' ',@newargs)\n" if (nelems @newargs);
 
 	for ( @args) {
             my $objname = $_;
@@ -621,7 +621,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
 %priv{$_}->{2} = "FTACCESS"
   for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"));
 %priv{"entereval"}->{2} = "HAS_HH";
-{
+do {
   # Stacked filetests are post 5.8.x
   %priv{$_}->{4} = "FTSTACKED"
     for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
@@ -632,7 +632,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
   # Lexical $_ is post 5.8.x
   %priv{$_}->{2} = "GREPLEX"
     for @( ("mapwhile", "mapstart", "grepwhile", "grepstart"));
-}
+};
 
 our %hints; # used to display each COP's op_hints values
  <

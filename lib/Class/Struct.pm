@@ -94,7 +94,7 @@ sub struct {
         $type = @decls[$idx+1];
         push( @methods, $name );
         if( $base_type eq 'HASH' ){
-            $elem = "\{'{$class}::$name'\}";
+            $elem = "\{'$($class)::$name'\}";
         }
         elsif( $base_type eq 'ARRAY' ){
             $elem = "[$cnt]";
@@ -160,7 +160,7 @@ sub struct {
                 ++$cnt;
             }
             elsif( $base_type eq 'HASH' ){
-                $elem = "\{'{$class}::$name'\}";
+                $elem = "\{'$($class)::$name'\}";
             }
             if( defined %arrays{$name} ){
                 $out .= "    my \$i;\n";

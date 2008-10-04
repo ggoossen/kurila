@@ -42,7 +42,7 @@ is( @lines[3], '-e syntax OK', 'O.pm should not munge perl output without -qq');
 @lines = get_lines( < @args );
 isnt( @lines[1], 'Compiling!', 'Output should not be printed with -q switch' );
 
-SKIP: {
+SKIP: do {
 	skip( '-q redirection does not work without PerlIO', 2)
 		unless %Config{useperlio};
 	is( @lines[1], "[Compiling!", '... but should be in $O::BEGIN_output' );
@@ -50,7 +50,7 @@ SKIP: {
 	@args[1] = '-MO=-qq,success,foo,bar';
 	@lines = get_lines( < @args );
 	is( scalar nelems @lines, 3, '-qq should suppress even the syntax OK message' );
-}
+};
 
 @args[1] = '-MO=success,fail';
 @lines = get_lines( < @args );

@@ -185,11 +185,11 @@ ok !defined $x->msg() ;
 ok $x->total_in() == 0 ;
 ok $x->total_out() == 0 ;
 $Answer = '';
-{
+do {
     ($X, $status) = < $x->deflate($hello) ;
 
     $Answer .= $X ;
-}
+};
  
 ok $status == Z_OK ;
 
@@ -292,7 +292,7 @@ ok $hello eq $Z ;
 title 'inflate - check remaining buffer after Z_STREAM_END';
 # ===================================================
  
-{
+do {
     ok $x = deflateInit(-Level => Z_BEST_COMPRESSION ) ;
  
     ($X, $status) = < $x->deflate($hello) ;
@@ -317,10 +317,10 @@ title 'inflate - check remaining buffer after Z_STREAM_END';
     ok $hello eq $Z . $T ;
     ok $last eq "appendage" ;
 
-}
+};
 
 title 'memGzip & memGunzip';
-{
+do {
     my $name = "test.gz" ;
     my $buffer = <<EOM;
 some sample 
@@ -478,9 +478,9 @@ EOM
     substr($bad, -4, 4, "\x[FF]" x 4) ;
     $ungzip = Compress::Zlib::memGunzip(\$bad) ;
     ok ! defined $ungzip ;
-}
+};
 
-{
+do {
     title "Check all bytes can be handled";
 
     my $lex = LexFile->new( my $name) ;
@@ -505,10 +505,10 @@ EOM
     ok ! $fil->gzclose();
     ok $input eq $data;
 
-}
+};
 
 title 'memGunzip with a gzopen created file';
-{
+do {
     my $name = "test.gz" ;
     my $buffer = <<EOM;
 some sample 
@@ -528,9 +528,9 @@ EOM
     ok defined $unc ;
     ok $buffer eq $unc ;
     1 while unlink $name ;
-}
+};
 
-{
+do {
 
     # Check - MAX_WBITS
     # =================
@@ -576,9 +576,9 @@ EOM
     ok $status == Z_STREAM_END ;
     ok $GOT eq $hello ;
     
-}
+};
 
-{
+do {
     # error cases
 
     try { deflateInit(-Level) };
@@ -621,9 +621,9 @@ EOM
 #    ok $@ =~ /^gzopen: file parameter is not a filehandle or filename at/
 #	or print "# $@\n" ;
 
-}
+};
 
-{
+do {
     title 'CRC32' ;
 
     # CRC32 of this data should have the high bit set
@@ -633,9 +633,9 @@ EOM
 
     my $crc = crc32($data) ;
     is $crc, $expected_crc;
-}
+};
 
-{
+do {
     title 'Adler32' ;
 
     # adler of this data should have the high bit set
@@ -646,9 +646,9 @@ EOM
     my $expected_crc = 0xAAD60AC7 ; # 2866154183 
     my $crc = adler32($data) ;
     is $crc, $expected_crc;
-}
+};
 
-{
+do {
     # memGunzip - input > 4K
 
     my $contents = '' ;
@@ -664,10 +664,10 @@ EOM
     is length $out, length $contents ;
 
     
-}
+};
 
 
-{
+do {
     # memGunzip Header Corruption Tests
 
     my $string = <<EOM;
@@ -679,39 +679,39 @@ EOM
     ok $x->write($string) ;
     ok  $x->close ;
 
-    {
+    do {
         title "Header Corruption - Fingerprint wrong 1st byte" ;
         my $buffer = $good ;
         substr($buffer, 0, 1, 'x') ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
-    }
+    };
 
-    {
+    do {
         title "Header Corruption - Fingerprint wrong 2nd byte" ;
         my $buffer = $good ;
         substr($buffer, 1, 1, "\x[FF]") ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
-    }
+    };
 
-    {
+    do {
         title "Header Corruption - CM not 8";
         my $buffer = $good ;
         substr($buffer, 2, 1, 'x') ;
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
-    }
+    };
 
-    {
+    do {
         title "Header Corruption - Use of Reserved Flags";
         my $buffer = $good ;
         substr($buffer, 3, 1, "\x[ff]");
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
-    }
+    };
 
-}
+};
 
 for my $index ( GZIP_MIN_HEADER_SIZE + 1 ..  GZIP_MIN_HEADER_SIZE + GZIP_FEXTRA_HEADER_SIZE + 1)
 {
@@ -785,7 +785,7 @@ EOM
     ok ! Compress::Zlib::memGunzip(\$truncated) ;
 }
 
-{
+do {
     title "memGunzip can cope with a gzip header with all possible fields";
     my $string = <<EOM;
 some text
@@ -807,10 +807,10 @@ EOM
     ok my $got = Compress::Zlib::memGunzip($buffer) 
         or diag "gzerrno is $gzerrno" ;
     is $got, $string ;
-}
+};
 
 
-{
+do {
     # Trailer Corruption tests
 
     my $string = <<EOM;
@@ -835,15 +835,15 @@ EOM
 
     }
 
-    {
+    do {
         title "Trailer Corruption - Length Wrong, CRC Correct" ;
         my $buffer = $good ;
         substr($buffer, -4, 4, pack('V', 1234));
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
-    }
+    };
 
-    {
+    do {
         title "Trailer Corruption - Length Wrong, CRC Wrong" ;
         my $buffer = $good ;
         substr($buffer, -4, 4, pack('V', 1234));
@@ -851,8 +851,8 @@ EOM
 
         ok ! Compress::Zlib::memGunzip(\$buffer) ;
 
-    }
-}
+    };
+};
 
 
 sub slurp
@@ -888,7 +888,7 @@ sub trickle
     return $input;
 }
 
-{
+do {
 
     title "Append & MultiStream Tests";
     # rt.24041
@@ -925,9 +925,9 @@ sub trickle
 
     is slurp($name), $data1 . $data2 . $trailing, "got expected data from slurp" ;
     is trickle($name), $data1 . $data2 . $trailing, "got expected data from trickle" ;
-}
+};
 
-{
+do {
     title "gzclose & gzflush return codes";
     # rt.29215
 
@@ -943,4 +943,4 @@ sub trickle
     is $status, Z_STREAM_ERROR;
     ok ! $fil->gzflush(), "flush ok" ;
     ok ! $fil->gzclose(), "Closed";
-}
+};

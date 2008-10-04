@@ -379,10 +379,10 @@ sub jleft {
 				unless $orig = -$orig;
 		}
 		my ($fail, $str);
-		{
+		do {
 			local $^WARN_HOOK = sub { $fail = 1 };
 			$str = sprintf('%*.*f',%val{width},$places,$orig);
-		}
+		};
 		if ($fail) {
 			@_[0] = $huh;
 		}
@@ -1235,7 +1235,7 @@ sub section {
     my @section;
     for my $row (  @$structure ) {
 		local $,=",";
-        my $type = ref $row or die "Too many indices (starting with [{join ' ',@index}])";
+        my $type = ref $row or die "Too many indices (starting with [$(join ' ',@index)])";
         if ($type eq 'HASH') {
 			@index = keys %$row unless (nelems @index);
             push @{@section[$_]}, $row->{@index[$_]} for 0..(nelems @index)-1;

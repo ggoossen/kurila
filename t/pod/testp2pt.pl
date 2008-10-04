@@ -66,7 +66,7 @@ sub findinclude {
        my $incfile = catfile($_, $incname);
        return $incfile  if (-r $incfile);
     }
-    warn("*** Can't find =include file $incname in {join ' ',@podincdirs}\n");
+    warn("*** Can't find =include file $incname in $(join ' ',@podincdirs)\n");
     return "";
 }
 

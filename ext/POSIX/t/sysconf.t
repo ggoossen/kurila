@@ -56,7 +56,7 @@ sub _check_and_report {
     my ($eval_status, $return_val, $description) = < @_;
     my $success = defined($return_val) || $! == 0;
     is( $eval_status, '', $description );
-    SKIP: {
+    SKIP: do {
 	skip "terminal constants set errno on QNX", 1
 	    if $^O eq 'nto' and $description =~ $TTY;
         ok( $success, "\tchecking that the returned value is defined (" 
@@ -64,16 +64,16 @@ sub _check_and_report {
                         . " or that errno is clear ("
                         . (!($!+0) ? "it is)" : "it isn't, it's $!)"))
                         );
-    }
-    SKIP: {
+    };
+    SKIP: do {
         skip "constant not implemented on $^O or no limit in effect", 1 
             if !defined($return_val);
         ok( looks_like_number($return_val), "\tchecking that the returned value looks like a number" );
-    }
+    };
 }
 
 # testing fpathconf() on a non-terminal file
-SKIP: {
+SKIP: do {
     my $fd = POSIX::open($testdir, O_RDONLY)
         or skip "could not open test directory '$testdir' ($!)",
 	  3 * nelems @path_consts;
@@ -85,7 +85,7 @@ SKIP: {
     }
     
     POSIX::close($fd);
-}
+};
 
 # testing pathconf() on a non-terminal file
 for my $constant ( @path_consts) {
@@ -94,7 +94,7 @@ for my $constant ( @path_consts) {
         _check_and_report( $@, $r, qq[calling pathconf("$testdir", $constant)] );
 }
 
-SKIP: {
+SKIP: do {
     my $n = 2 * 3 * nelems @path_consts_terminal;
 
     -c $TTY
@@ -120,15 +120,15 @@ SKIP: {
 	$r = try { pathconf( $TTY, eval "$constant()" ) };
 	_check_and_report( $@, $r, qq[calling pathconf($TTY, $constant)] );
     }
-}
+};
 
 my $fifo = "fifo$$";
 
-SKIP: {
+SKIP: do {
     try { mkfifo($fifo, 0666) }
 	or skip("could not create fifo $fifo ($!)", 2 * 3 * nelems @path_consts_fifo);
 
-  SKIP: {
+  SKIP: do {
       my $fd = POSIX::open($fifo, O_RDWR)
 	  or skip("could not open $fifo ($!)", 3 * nelems @path_consts_fifo);
 
@@ -139,7 +139,7 @@ SKIP: {
       }
     
       POSIX::close($fd);
-  }
+  };
 
   # testing pathconf() on a fifo file
   for my $constant ( @path_consts_fifo) {
@@ -147,19 +147,19 @@ SKIP: {
       $r = try { pathconf( $fifo, eval "$constant()" ) };
       _check_and_report( $@, $r, qq[calling pathconf($fifo, $constant)] );
   }
-}
+};
 
 END {
     1 while unlink($fifo);
 }
 
-SKIP: {
+SKIP: do {
     if($^O eq 'cygwin') {
         pop @sys_consts;
         skip("No _SC_TZNAME_MAX on Cygwin", 3);
     }
         
-}
+};
 # testing sysconf()
 for my $constant ( @sys_consts) {
 	$! = 0;

@@ -7,7 +7,7 @@ no warnings 'prototype'; # we do a lot of this
 
 require './test.pl';
 
-{
+do {
     package MCTest::Base;
     sub foo { return @_[1]+1 };
 
@@ -15,7 +15,7 @@ require './test.pl';
     our @ISA = qw/MCTest::Base/;
 
     package Foo; our @FOO = @( qw// );
-}
+};
 
 # These are various ways of re-defining MCTest::Base::foo and checking whether the method is cached when it shouldn't be
 my @testsubs = @(

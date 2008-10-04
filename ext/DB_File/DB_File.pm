@@ -52,7 +52,7 @@ sub FETCH
     return $self->{GOT}->{$key} if exists $self->{VALID}->{$key}  ;
 
     my $pkg = ref $self ;
-    croak "{$pkg}::FETCH - Unknown element '$key'" ;
+    croak "$($pkg)::FETCH - Unknown element '$key'" ;
 }
 
 
@@ -73,7 +73,7 @@ sub STORE
     }
     
     my $pkg = ref $self ;
-    croak "{$pkg}::STORE - Unknown element '$key'" ;
+    croak "$($pkg)::STORE - Unknown element '$key'" ;
 }
 
 sub DELETE 
@@ -104,7 +104,7 @@ sub NotHere
     my $self = shift ;
     my $method = shift ;
 
-    croak ref($self) . " does not define the method {$method}" ;
+    croak ref($self) . " does not define the method $($method)" ;
 }
 
 sub FIRSTKEY { my $self = shift ; $self->NotHere("FIRSTKEY") }
@@ -178,7 +178,7 @@ require Tie::Hash;
 require Exporter;
 BEGIN {
     $use_XSLoader = 1 ;
-    { try { require XSLoader } ; }
+    do { try { require XSLoader } ; };
 
     if ($@) {
         $use_XSLoader = 0 ;

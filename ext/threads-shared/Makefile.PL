@@ -34,7 +34,7 @@ sub have_cc
     my @chunks = split(m/ /, %Config::Config{cc});
     # $Config{cc} may contain args; try to find out the program part
     while ((nelems @chunks)) {
-        if (check_cc("{join ' ',@chunks}")) {
+        if (check_cc("$(join ' ',@chunks)")) {
             return  @(1);   # CC command found
         }
         pop(@chunks);

@@ -23,7 +23,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 
 # Make sure when Makefile.PL's break, they issue a warning.
 # Also make sure Makefile.PL's in subdirs still have '.' in @INC.
-{
+do {
     my $stdout;
     close STDOUT;
     open *STDOUT, '>>', \$stdout or die "$!";
@@ -37,4 +37,4 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
     like( $@->{description}, 
           qr{^ERROR from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},
           'Makefile.PL death in subdir warns' );
-}
+};

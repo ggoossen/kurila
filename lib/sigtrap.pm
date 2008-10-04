@@ -22,7 +22,7 @@ sub import {
 	if (m/^[A-Z][A-Z0-9]*$/) {
 	    $saw_sig++;
 	    unless ($untrapped and %SIG{$_} and %SIG{$_} ne 'DEFAULT') {
-		print "Installing handler {dump::view($handler)} for $_\n" if $Verbose;
+		print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
 		%SIG{$_} = $handler;
 	    }
 	}

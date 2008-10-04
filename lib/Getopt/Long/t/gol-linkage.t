@@ -47,7 +47,7 @@ print ((@ARGV[0] eq "bar")   ? "" : "not ", "ok 25\n");
 print (!(exists %lnk{foo})   ? "" : "not ", "ok 26\n");
 print (!(exists %lnk{baR})   ? "" : "not ", "ok 27\n");
 print (!(exists %lnk{bar})   ? "" : "not ", "ok 28\n");
-{
+do {
     my $errors;
     %lnk = %( () );
     local $^WARN_HOOK= sub { $errors.= @_[0]->{description} };
@@ -69,5 +69,5 @@ print (!(exists %lnk{bar})   ? "" : "not ", "ok 28\n");
     print (($errors eq '') ? "" : "not ", "ok 30\n");
     print ((defined %lnk{Foo})   ? "" : "not ", "ok 31\n");
     print ((%lnk{Foo} eq "-baR") ? "" : "not ", "ok 32\n");
-}
+};
 

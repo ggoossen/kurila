@@ -18,7 +18,7 @@ my $fail_odd_anon = 'Odd number of elements in anonymous hash at ';
 my $fail_ref      = 'Reference found where even-sized list expected at ';
 my $fail_not_hr   = 'Not a HASH reference at ';
 
-{
+do {
     @warnings = @( () );
     my (<%hash) = < 1..3;
     cmp_ok(scalar(nelems @warnings),'==',1,'odd count');
@@ -41,4 +41,4 @@ my $fail_not_hr   = 'Not a HASH reference at ';
     @warnings = @( () );
     $_ = \%( < 1..10 );
     cmp_ok(scalar(nelems @warnings),'==',0,'hashref assign');
-}
+};

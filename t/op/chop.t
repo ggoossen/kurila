@@ -107,7 +107,7 @@ is ($_, "ab\n");
 
 # Go Unicode.
 
-{
+do {
     use utf8;
 
 $_ = "abc\x{1234}";
@@ -122,7 +122,7 @@ $_ = "\x{1234}\x{2345}";
 chop;
 is ($_, "\x{1234}");
 
-}
+};
 
 # chomp should not stringify references unless it decides to modify them
 $_ = \@();
@@ -172,7 +172,7 @@ ok($@->{description} =~ m/Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x, $y) = (1, 2);';
 ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
 
-{
+do {
     use utf8;
     # returns length in code-points, but not in bytes.
     $/ = "\x{100}";
@@ -197,9 +197,9 @@ ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
     no utf8;
     $a = "A$/";
     is( chomp($a), 4);
-}
+};
 
-{
+do {
     # [perl #36569] chop fails on decoded string with trailing nul
     my $asc = "perl\0";
     my $utf = "perl".pack('U',0); # marked as utf8
@@ -207,9 +207,9 @@ ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
     is(chop($utf), "\0", "chopping utf8 NUL");
     is($asc, "perl", "chopped ascii NUL");
     is($utf, "perl", "chopped utf8 NUL");
-}
+};
 
-{
+do {
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
@@ -218,4 +218,4 @@ ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
 
     map chomp(+()), @( ('')x68);
     ok(1, "extend sp in pp_chomp");
-}
+};

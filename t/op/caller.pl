@@ -34,7 +34,7 @@ sub dooot {
 	is(hint_fetch('dooot', 1), 54);
     }
 }
-{
+do {
     is(hint_fetch('dooot'), undef);
     is(hint_fetch('thikoosh'), undef);
     BEGIN {
@@ -49,33 +49,33 @@ sub dooot {
     BEGIN {
 	%^H{dooot} = 42;
     }
-    {
-	{
+    do {
+	do {
 	    BEGIN {
 		%^H{dooot} = 6 * 9;
 	    }
 	    is(hint_fetch('dooot'), 54);
 	    is(hint_fetch('thikoosh'), "SKREECH");
-	    {
+	    do {
 		BEGIN {
 		    delete %^H{dooot};
 		}
 		is(hint_fetch('dooot'), undef);
 		ok(!hint_exists('dooot'));
 		is(hint_fetch('thikoosh'), "SKREECH");
-	    }
+	    };
 	    dooot();
-	}
+	};
 	is(hint_fetch('dooot'), 6 * 7);
 	is(hint_fetch('thikoosh'), "SKREECH");
-    }
+    };
     is(hint_fetch('dooot'), 6 * 7);
     is(hint_fetch('thikoosh'), "SKREECH");
-}
+};
 
 print "# which now works inside evals\n";
 
-{
+do {
     BEGIN {
 	%^H{dooot} = 42;
     }
@@ -95,9 +95,9 @@ print "# which now works inside evals\n";
     is(hint_fetch('dooot'), 54);
     eval "is(hint_fetch('dooot'), 54); 1" or die $@;
 EOE
-}
+};
 
-{
+do {
     BEGIN {
 	%^H{dooot} = "FIP\0FOP\0FIDDIT\0FAP";
     }
@@ -112,9 +112,9 @@ EOE
 	%^H{dooot} = ^~^0;
     }
     cmp_ok(hint_fetch('dooot'), '+>', 42, "Can do UVs");
-}
+};
 
-{
+do {
     use utf8;
     my ($k1, $k2, $k3, $k4);
     BEGIN {
@@ -142,9 +142,9 @@ EOE
     }
     is(hint_fetch($k3), 4, "Octect sequences and UTF-8 are always the same");
     is(hint_fetch($k4), 4, "Octect sequences and UTF-8 are always the same");
-}
+};
 
-{
+do {
     my ($k1, $k2, $k3);
     BEGIN {
 	($k1, $k2, $k3) = ("\0", "\0\0", "\0\0\0");
@@ -166,6 +166,6 @@ EOE
     is(hint_fetch($k1), "a", "Keys with the same hash value don't clash");
     is(hint_fetch($k2), "b", "Keys with the same hash value don't clash");
     is(hint_fetch($k3), "c", "Keys with the same hash value don't clash");
-}
+};
 
 1;

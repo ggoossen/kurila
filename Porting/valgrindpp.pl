@@ -128,7 +128,7 @@ sub summary {
       my $n = (nelems @t);
       my $s = $n +> 1 ? 's' : '';
       my $prev = 0;
-      print $fh "Top $n test scripts for {$what}s:\n\n";
+      print $fh "Top $n test scripts for $($what)s:\n\n";
       for my $i (1 .. $n) {
         $n = %top{@t[$i-1]}->{$what};
         $s = $n +> 1 ? 's' : '';

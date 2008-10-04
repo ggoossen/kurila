@@ -22,7 +22,7 @@ except TypeError:
 
 =cut
 
-{
+do {
     package X;
     
     package Y;
@@ -32,7 +32,7 @@ except TypeError:
     
     package YX;
     our @ISA = @('Y', 'X');
-}
+};
 
 try { @Z::ISA = @('XY', 'YX') };
 like($@->{description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');

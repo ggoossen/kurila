@@ -45,7 +45,7 @@ ok(near(rad2deg(pi), 180));
 
 use Math::Trig ':radial';
 
-{
+do {
     my ($r,$t,$z) = < cartesian_to_cylindrical(1,1,1);
 
     ok(near($r, sqrt(2)));
@@ -69,9 +69,9 @@ use Math::Trig ':radial';
     ok(near($x, 1));
     ok(near($y, 1));
     ok(near($z, 0));
-}
+};
 
-{
+do {
     my ($r,$t,$f) = < cartesian_to_spherical(1,1,1);
 
     ok(near($r, sqrt(3)));
@@ -95,9 +95,9 @@ use Math::Trig ':radial';
     ok(near($x, 1));
     ok(near($y, 1));
     ok(near($z, 0));
-}
+};
 
-{
+do {
     my ($r,$t,$z) = < cylindrical_to_spherical( <spherical_to_cylindrical(1,1,1));
 
     ok(near($r, 1));
@@ -109,9 +109,9 @@ use Math::Trig ':radial';
     ok(near($r, 1));
     ok(near($t, 1));
     ok(near($z, 1));
-}
+};
 
-{
+do {
     use Math::Trig 'great_circle_distance';
 
     ok(near(great_circle_distance(0, 0, 0, pi/2), pi/2));
@@ -125,9 +125,9 @@ use Math::Trig ':radial';
     my $km = great_circle_distance(< @L, < @T, 6378);
 
     ok(near($km, 9605.26637021388));
-}
+};
 
-{
+do {
     my $R2D = 57.295779513082320876798154814169;
 
     sub frac { @_[0] - int(@_[0]) }
@@ -140,9 +140,9 @@ use Math::Trig ':radial';
 
     my $posit_degrees = rad2deg(-10000, 1);
     ok(near($posit_degrees, -10000*$R2D));
-}
+};
 
-{
+do {
     use Math::Trig 'great_circle_direction';
 
     ok(near(great_circle_direction(0, 0, 0, pi/2), pi));
@@ -242,7 +242,7 @@ use Math::Trig ':radial';
     ok(near($dir4, 3.6993902625701)); # about 211.959 deg
 
     ok(near($dst1, $dst2));
-}
+};
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
 local %SIG{FPE} = undef;

@@ -30,7 +30,7 @@ foreach my $platform ( @platforms) {
   my $module = "File::Spec::$platform";
   
  SKIP:
-  {
+  do {
     eval "require $module; 1";
 
     skip "Can't load $module", $tests_per_platform
@@ -99,7 +99,7 @@ foreach my $platform ( @platforms) {
     $base = $module->catpath('', $module->catdir($module->rootdir, 'foo'), '');
     $result = $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
-  }
+  };
 }
 
 sub volumes_differ {

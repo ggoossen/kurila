@@ -37,7 +37,7 @@ sub saveErrorString
 {
     my $self   = shift ;
     my $retval = shift ;
-    ${ $self->{Error} } = shift() . (${$self->{Error}} ? "\nprevious: ${$self->{Error}}" : "") ;
+    ${ $self->{Error} } = shift() . ($$($self->{Error}) ? "\nprevious: $$($self->{Error})" : "") ;
     ${ $self->{ErrorNo} } = shift() + 0 if (nelems @_) ;
 
     return $retval;
@@ -124,7 +124,7 @@ sub output
           or return $self->saveErrorString(0, $!, $!); 
     }
     else {
-        ${ $self->{Buffer} } .= $data ;
+        $$( $self->{Buffer} ) .= $data ;
     }
 
     return 1;
@@ -214,13 +214,13 @@ sub _create
     }
 
     $obj->ckParams($got)
-        or $obj->croakError("{$class}: " . $obj->error());
+        or $obj->croakError("$($class): " . $obj->error());
 
 
     $obj->saveStatus(STATUS_OK) ;
 
     my $status ;
-    {
+    do {
         $obj->{Compress} = $obj->mkComp($class, $got)
             or $obj->croakError("Failed making Compress");
         
@@ -256,7 +256,7 @@ sub _create
         $obj->{Header} = $obj->mkHeader($got) ;
         $obj->output( $obj->{Header} )
             or $obj->croakError("Failed writing header");
-    }
+    };
 
     $obj->{Closed} = 0 ;
     $obj->{AutoClose} = $got->value('AutoClose') ;

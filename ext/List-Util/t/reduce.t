@@ -65,10 +65,10 @@ $v = reduce {while(1) {return $a+$b} } 2,4,6;
 is($v, 12, 'return from loop');
 
 # Does it work from another package?
-{ package Foo;
+do { package Foo;
   $a = $b;
   main::is((List::Util::reduce {$a*$b} ( <1..4)), 24, 'other package');
-}
+};
 
 # Can we undefine a reduce sub while it's running?
 sub self_immolate {undef &self_immolate; 1}
@@ -83,7 +83,7 @@ sub self_updating { local $^W; *self_updating = sub{1} ;1 }
 try { $v = reduce \&self_updating, 1,2; };
 is($@, '', 'redefine self');
 
-{ my $failed = 0;
+do { my $failed = 0;
 
     sub rec { my $n = shift;
         if (!defined($n)) {  # No arg means we're being called by reduce()
@@ -95,21 +95,21 @@ is($@, '', 'redefine self');
 
     rec(1);
     ok(!$failed, 'from active sub');
-}
+};
 
 # Calling a sub from reduce should leave its refcount unchanged.
-SKIP: {
+SKIP: do {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
     sub mult {$a*$b}
     my $refcnt = &Internals::SvREFCNT(\&mult);
     $v = reduce \&mult, < 1..6;
     is(&Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged");
-}
+};
 
 # The remainder of the tests are only relevant for the XS
 # implementation. The Perl-only implementation behaves differently
 # (and more flexibly) in a way that we can't emulate from XS.
-if (!$::PERL_ONLY) { SKIP: {
+if (!$::PERL_ONLY) { SKIP: do {
 
     $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
     skip("Poor man's MULTICALL can't cope", 2)
@@ -123,4 +123,4 @@ if (!$::PERL_ONLY) { SKIP: {
     try {()= <reduce{goto sub{}} 1,2;};
     like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
-} }
+}; }

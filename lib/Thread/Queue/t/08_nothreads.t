@@ -52,7 +52,7 @@ $q->enqueue($sref1, $sref2, $qux);
 is($q->pending(), 7, 'Queue count');
 
 # Process items in queue
-{
+do {
     is($q->pending(), 7, 'Queue count in thread');
 
     my $ref = $q->peek(3);
@@ -97,7 +97,7 @@ is($q->pending(), 7, 'Queue count');
     is($q->pending(), 0, 'Empty queue');
     my $nothing = $q->dequeue_nb();
     ok(! defined($nothing), 'Nothing on queue');
-}
+};
 
 # Check results of thread's activities
 is($q->pending(), 0, 'Empty queue');

@@ -11,18 +11,18 @@ is( $PID, $$, '$PID' );
 
 "abc" =~ m/b/;
 
-{
+do {
 our ($PREMATCH, $MATCH, $POSTMATCH);
 
 ok( !$PREMATCH, '$PREMATCH undefined' );
 ok( !$MATCH, '$MATCH undefined' );
 ok( !$POSTMATCH, '$POSTMATCH undefined' );
-}
+};
 
 $OFS = " ";
 $ORS = "\n";
 
-{
+do {
 	local(*IN, *OUT);
 	if ($^O ne 'dos') {
 	    pipe(IN, 'OUT');
@@ -45,7 +45,7 @@ $ORS = "\n";
 
 	# chomp is true because $ORS is "\n"
 	ok( chomp($foo), '$ORS should be \n' );
-}
+};
 
 undef $OUTPUT_FIELD_SEPARATOR;
 
@@ -83,10 +83,10 @@ is( $LAST_REGEXP_CODE_RESULT, 9, '$LAST_REGEXP_CODE_RESULT' );
 
 ok( !$PERLDB, '$PERLDB should be false' );
 
-{
+do {
 	local $INPUT_RECORD_SEPARATOR = "\n\n";
 	like( ~< *DATA, qr/a paragraph./, '$INPUT_RECORD_SEPARATOR' );
-}
+};
 like( ~< *DATA, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
 
 try { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
@@ -102,12 +102,12 @@ use English < qw( -no_match_vars ) ;
 
 "abc" =~ m/b/;
 
-{
+do {
   our ($PREMATCH, $MATCH, $POSTMATCH);
   main::ok( !$PREMATCH, '$PREMATCH disabled' );
   main::ok( !$MATCH, '$MATCH disabled' );
   main::ok( !$POSTMATCH, '$POSTMATCH disabled' );
-}
+};
 
 __END__
 This is a line.

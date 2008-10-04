@@ -29,7 +29,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 ok( binmode(STDOUT, ":raw"),    '  raw' );
 ok( binmode(STDOUT, ":crlf"),   '  and crlf' );
 
-SKIP: {
+SKIP: do {
     skip "minitest", 1 if %ENV{PERL_CORE_MINITEST};
     skip "no EBADF", 1 if (!exists &Errno::EBADF);
 
@@ -37,4 +37,4 @@ SKIP: {
     $! = 0;
     binmode(B);
     ok($! == &Errno::EBADF( < @_ ));
-}
+};

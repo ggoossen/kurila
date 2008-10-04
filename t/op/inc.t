@@ -158,7 +158,7 @@ foreach (keys %postdec) {
 
 check_same (\%orig, \%postdec);
 
-{
+do {
     no warnings 'uninitialized';
     my ($x, $y);
     try {
@@ -175,7 +175,7 @@ check_same (\%orig, \%postdec);
     };
     ok($p == -1, $p);
     ok($@ eq '', $@);
-}
+};
 
 $a = 2147483648;
 $c=--$a;
@@ -189,14 +189,14 @@ ok ($a == 2147483647, $a);
 try { my $x = qw|aap noot mies|; $x++ };
 ok($@->message =~ m/increment \(\+\+\) does not work on a ARRAY/);
 
-{
+do {
     use integer;
     my $x = 0;
     $x++;
     ok ($x == 1, "(void) i_postinc");
     $x--;
     ok ($x == 0, "(void) i_postdec");
-}
+};
 
 # I'm sure that there's an IBM format with a 48 bit mantissa
 # IEEE doubles have a 53 bit mantissa
@@ -231,7 +231,7 @@ EOC
 	}
     } else {
 	unless (ok (scalar nelems @warnings == 0)) {
-	    print STDERR "# {join ' ',@$_}" foreach  @warnings;
+	    print STDERR "# $(join ' ',@$_)" foreach  @warnings;
 	}
     }
 }

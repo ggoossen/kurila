@@ -11,7 +11,7 @@ my @tmpfiles = @( () );
 END { unlink < @tmpfiles }
 
 my $filename = 'swdtest.tmp';
-SKIP: {
+SKIP: do {
 	open my $f, ">", "$filename"
 	    or skip( "Can't write temp file $filename: $!" );
 	print $f <<'__SWDTEST__';
@@ -40,5 +40,5 @@ __SWDTEST__
 		 args => \@('4'),
 		);
     like($r, qr/^import<Devel::switchd a 42>;$/);
-}
+};
 

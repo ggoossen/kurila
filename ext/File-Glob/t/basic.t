@@ -25,7 +25,7 @@ if (GLOB_ERROR) {
 
 # look up the user's home directory
 # should return a list with one item, and not set ERROR
-SKIP: {
+SKIP: do {
     my ($name, $home);
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS'
 	|| $^O eq 'os2' || $^O eq 'beos';
@@ -43,7 +43,7 @@ SKIP: {
     } else {
 	is_deeply (\@a, \@($home));
     }
-}
+};
 
 # check backslashing
 # should return a list with one item, and not set ERROR
@@ -58,14 +58,14 @@ if (GLOB_ERROR) {
 # should return an empty list
 # XXX since errfunc is NULL on win32, this test is not valid there
 @a = bsd_glob("asdfasdf", 0);
-SKIP: {
+SKIP: do {
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare';
     is_deeply(\@a, \@());
-}
+};
 
 # check bad protections
 # should return an empty list, and set ERROR
-SKIP: {
+SKIP: do {
     skip $^O, 2 if $^O eq 'mpeix' or $^O eq 'MSWin32' or $^O eq 'NetWare'
 	or $^O eq 'os2' or $^O eq 'VMS' or $^O eq 'cygwin';
     skip "AFS", 2 if Cwd::cwd() =~ m#^%Config{'afsroot'}#s;
@@ -79,7 +79,7 @@ SKIP: {
 
     isnt(GLOB_ERROR, 0);
     is_deeply(\@a, \@());
-}
+};
 
 # check for csh style globbing
 @a = bsd_glob('{a,b}', GLOB_BRACE ^|^ GLOB_NOMAGIC);
@@ -95,17 +95,17 @@ is_deeply(\@a, \@('a', 'b'));
 @a = grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
 @a = grep !m/test.pl/, @a if $^O eq 'VMS';
 
-print "# {join ' ',@a}\n";
+print "# $(join ' ',@a)\n";
 
 is_deeply(\@a, \@(($^O eq 'VMS'? 'test.' : 'TEST'), 'a', 'b'));
 
 # "~" should expand to $ENV{HOME}
 %ENV{HOME} = "sweet home";
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
-SKIP: {
+SKIP: do {
     skip $^O, 1 if $^O eq "MacOS";
     is_deeply(\@a, \@(%ENV{HOME}));
-}
+};
 
 # GLOB_ALPHASORT (default) should sort alphabetically regardless of case
 mkdir "pteerslo", 0777;
@@ -126,13 +126,13 @@ for ( @f_names) {
 my $pat = "*.pl";
 
 my @g_names = bsd_glob($pat, 0);
-print "# f_names = {join ' ',@f_names}\n";
-print "# g_names = {join ' ',@g_names}\n";
+print "# f_names = $(join ' ',@f_names)\n";
+print "# g_names = $(join ' ',@g_names)\n";
 is_deeply(\@g_names, \@f_names);
 
 my @g_alpha = bsd_glob($pat);
-print "# f_alpha = {join ' ',@f_alpha}\n";
-print "# g_alpha = {join ' ',@g_alpha}\n";
+print "# f_alpha = $(join ' ',@f_alpha)\n";
+print "# g_alpha = $(join ' ',@g_alpha)\n";
 is_deeply(\@g_alpha, \@f_alpha);
 
 unlink < @f_names;
@@ -143,7 +143,7 @@ rmdir "pteerslo";
 glob("*"); glob("*");
 pass("Don't panic");
 
-{
+do {
     use File::Temp < qw(tempdir);
     use File::Spec qw();
 
@@ -162,4 +162,4 @@ pass("Don't panic");
     is_deeply(\@glob_files, \@('a_dej'));
     chdir $cwd
 	or die "Could not chdir back to $cwd: $!";
-}
+};

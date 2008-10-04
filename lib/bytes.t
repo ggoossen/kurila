@@ -19,7 +19,7 @@ is(rindex($a, "\x{100}"), 0, "rindex sanity check");
 is(bytes::length($a), 2,  "bytes::length sanity check");
 is(bytes::chr(0x100), chr(0),  "bytes::chr sanity check");
 
-{
+do {
     use bytes;
     my $b = chr(0x100); # affected by 'use bytes'
     is(ord($b), 0, "chr truncates under use bytes");
@@ -27,11 +27,11 @@ is(bytes::chr(0x100), chr(0),  "bytes::chr sanity check");
     is(bytes::ord($b), 0, "bytes::ord truncated under use bytes");
     is(bytes::length($b), 1, "bytes::length truncated under use bytes");
     is(bytes::substr($b, 0, 1), "\0", "bytes::substr truncated under use bytes");
-}
+};
 
 my $c = chr(0x100);
 
-{
+do {
     use bytes;
     if (ord('A') == 193) { # EBCDIC?
 	is(ord($c), 0x8c, "ord under use bytes looks at the 1st byte");
@@ -58,10 +58,10 @@ my $c = chr(0x100);
         is(bytes::rindex($c, "\xc4"), 0, "bytes::rindex under use bytes looks at bytes");
     }
     
-}
+};
 
-{
+do {
     fresh_perl_like ('use bytes; bytes::moo()',
 		     qr/Undefined subroutine &bytes::moo/, \%(stderr=>1),
 		    "Check Carp is loaded for AUTOLOADing errors")
-}
+};

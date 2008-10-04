@@ -39,7 +39,7 @@ no utf8; # Ironic, no?
 
 plan tests => 36;
 
-{
+do {
     # bug id 20000730.004
     use utf8;
 
@@ -56,7 +56,7 @@ plan tests => 36;
 	       ) {
 	my $length_chars = length($s);
 	my $length_bytes;
-	{ use bytes; $length_bytes = length($s) }
+	do { use bytes; $length_bytes = length($s) };
 	my @regex_chars = @( $s =~ m/(.)/g );
 	my $regex_chars = (nelems @regex_chars);
 	my @split_chars = split m//, $s;
@@ -76,7 +76,7 @@ plan tests => 36;
 	       ) {
 	my $length_chars = length($s);
 	my $length_bytes;
-	{ use bytes; $length_bytes = length($s) }
+	do { use bytes; $length_bytes = length($s) };
 	my @regex_chars = @( $s =~ m/(.)/g );
 	my $regex_chars = (nelems @regex_chars);
 	my @split_chars = split m//, $s;
@@ -84,10 +84,10 @@ plan tests => 36;
 	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
 	   "2/2/2/6");
     }
-}
+};
 
 
-{
+do {
     local our $TODO = "use utf8; passed to eval";
     use utf8;
     my $w = 0;
@@ -95,7 +95,7 @@ plan tests => 36;
     my $x = eval q/"\\/ . "\x{100}" . q/"/;
    
     ok($w == 0 && $x eq "\x{100}");
-}
+};
 
 #
 # bug fixed by change #17928
@@ -103,7 +103,7 @@ plan tests => 36;
 # before the patch, the eval died with an error like:
 #   "my" variable $strict::VERSION can't be in a package
 #
-SKIP: {
+SKIP: do {
     skip("Embedded UTF-8 does not work in EBCDIC", 1) if ord("A") == 193;
     ok('' eq runperl(prog => <<'CODE'), "change #17928");
 	my $code = qq{ my \$\xe3\x83\x95\xe3\x83\xbc = 5; };
@@ -113,9 +113,9 @@ SKIP: {
 	print $@ if $@;
     }
 CODE
-}
+};
 
-{
+do {
     use utf8;
     $a = <<'END';
 0 ....... 1 ....... 2 ....... 3 ....... 4 ....... 5 ....... 6 ....... 7 ....... 
@@ -131,7 +131,7 @@ END
     push @i, $s = index($a, '.', $s); # next . after 70 is 72
     push @i, $s = index($a, '4');     # 40
     push @i, $s = index($a, '.', $s); # next . after 40 is 42
-    is("{join ' ',@i}", "60 62 50 52 70 72 40 42", "utf8 heredoc index");
+    is("$(join ' ',@i)", "60 62 50 52 70 72 40 42", "utf8 heredoc index");
 
     @i = @( () );
     push @i, $s = rindex($a, '6');     # 60
@@ -142,7 +142,7 @@ END
     push @i, $s = rindex($a, '.', $s); # previous . before 70 is 68
     push @i, $s = rindex($a, '4');     # 40
     push @i, $s = rindex($a, '.', $s); # previous . before 40 is 38
-    is("{join ' ',@i}", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex");
+    is("$(join ' ',@i)", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex");
 
     @i = @( () );
     push @i, $s =  index($a, '6');     # 60
@@ -154,19 +154,19 @@ END
     push @i, $s =  index($a, '7', $s); # 70
     push @i,  index($a, '.', $s);      # next     . after  70 is 72
     push @i, rindex($a, '.', $s);      # previous . before 70 is 68
-    is("{join ' ',@i}", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex");
-}
+    is("$(join ' ',@i)", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex");
+};
 
-SKIP: {
+SKIP: do {
     skip("Embedded UTF-8 does not work in EBCDIC", 1) if ord("A") == 193;
     use utf8;
     eval qq{is(q \xc3\xbc test \xc3\xbc, qq\xc2\xb7 test \xc2\xb7,
 	       "utf8 quote delimiters [perl #16823]");};
-}
+};
 
 # Test the "internals".
 
-{
+do {
     use utf8;
     my $a = "A";
     my $b = chr(0x0FF);
@@ -197,25 +197,25 @@ SKIP: {
     is($a, "A",       "basic");
     is($b, "\x{FF}",    "beyond");
     is($c, "\x{100}", "unicode");
-}
+};
 
-{
+do {
     use utf8;
     try {utf8::encode("£")};
     is($@, '', "utf8::encode is a NO-OP");
-}
+};
 
-{
+do {
     fresh_perl_like ('use utf8; utf8::moo()',
 		     qr/Undefined subroutine &utf8::moo/, \%(stderr=>1),
 		    "Check Carp is loaded for AUTOLOADing errors")
-}
+};
 
-{
+do {
     # failure of is_utf8_char() without NATIVE_TO_UTF on EBCDIC (0260..027F)
     use utf8;
     ok(utf8::valid(chr(0x250)), "0x250");
     ok(utf8::valid(chr(0x260)), "0x260");
     ok(utf8::valid(chr(0x270)), "0x270");
     ok(utf8::valid(chr(0x280)), "0x280");
-}
+};

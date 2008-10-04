@@ -18,7 +18,7 @@ use Tie::Hash;
 my $deep1 = \@(); push @$deep1, \$deep1;
 my $deep2 = \@(); push @$deep2, \$deep2;
 
-{my $const = "a constant"; sub a_const () {$const}}
+do {my $const = "a constant"; sub a_const () {$const}};
 
 my @nums =1..10;
 
@@ -49,7 +49,7 @@ sub match_test {
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
     die "{$@->message} in '$tstr'" if $@;
-    ok( ($yn =~ m/!/ xor $res), "$tstr: {dump::view($res)}");
+    ok( ($yn =~ m/!/ xor $res), "$tstr: $(dump::view($res))");
 }
 
 

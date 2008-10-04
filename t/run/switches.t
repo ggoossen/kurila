@@ -79,7 +79,7 @@ is( $r, "(\066)[\066]", '$/ set at compile-time' );
 # Tests for -c
 
 my $filename = 'swctest.tmp';
-SKIP: {
+SKIP: do {
     local $TODO = '';   # this one works on VMS
 
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
@@ -108,7 +108,7 @@ SWTEST
 	'-c'
     );
     push @tmpfiles, $filename;
-}
+};
 
 # Tests for -l
 
@@ -121,7 +121,7 @@ is( $r, 'fooxbarx', '-l with octal number' );
 # Tests for -m and -M
 
 $filename = 'swtest.pm';
-SKIP: {
+SKIP: do {
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!",4 );
     print $f <<'SWTESTPM';
 package swtest;
@@ -144,10 +144,10 @@ SWTESTPM
 	prog	    => '1',
     );
 
-    {
+    do {
         local $TODO = '';  # this one works on VMS
         is( $r, '', '-m' );
-    }
+    };
     $r = runperl(
 	switches    => \@( '-mswtest=foo,bar' ),
 	prog	    => '1',
@@ -182,11 +182,11 @@ SWTESTPM
 		   prog => 'die "oops"' ),
 	  qr/Module name required with -M option\b/,
   	  "-M- not allowed" );
-}
+};
 
 # Tests for -V
 
-{
+do {
     local $TODO = '';   # these ones should work on VMS
 
     # basic perl -V should generate significant output.
@@ -216,11 +216,11 @@ SWTESTPM
 
     # make sure each line we got matches the re
     ok( !( grep !m/^i\D+size=/, split m/^/, $r ), '-V:re correct' );
-}
+};
 
 # Tests for -v
 
-{
+do {
     local $TODO = '';   # these ones should work on VMS
 
     my (undef, $v) = < split m/-/, $^V;
@@ -228,18 +228,18 @@ SWTESTPM
 	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q%Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
           '-v looks okay' );
 
-}
+};
 
 # Tests for -h
 
-{
+do {
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => \@('-h') ),
 	  qr/Usage: .+(?i:perl(?:%Config{_exe})?).+switches.+programfile.+arguments/,
           '-h looks okay' );
 
-}
+};
 
 # Tests for switches which do not exist
 
@@ -256,7 +256,7 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
 
 # Tests for -i
 
-{
+do {
     local $TODO = '';   # these ones should work on VMS
 
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
@@ -287,7 +287,7 @@ __EOF__
     is(join(":", @bak),
        "foo yada dada:bada foo bing:king kong foo",
        "-i backup file");
-}
+};
 
 # Tests for -E
 

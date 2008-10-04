@@ -302,7 +302,7 @@ sub read_table {
     }
     if (!defined $f) {
 	$f = File::Spec->catfile(< @Path, $self->{table});
-	croak("$PACKAGE: Can't locate $f in \@INC (\@INC contains: {join ' ',@INC})");
+	croak("$PACKAGE: Can't locate $f in \@INC (\@INC contains: $(join ' ',@INC))");
     }
 
     while (my $line = ~< $fh) {

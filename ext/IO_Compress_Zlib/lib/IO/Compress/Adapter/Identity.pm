@@ -31,9 +31,9 @@ sub compr
         $self->{UnCompSize} = $self->{CompSize} ;
 
         if ( ref @_[1] ) 
-          { ${ @_[1] } .= ${ @_[0] } }
+          { $$( @_[1] ) .= $$( @_[0] ) }
         else
-          { @_[1] .= ${ @_[0] } }
+          { @_[1] .= $$( @_[0] ) }
     }
 
     return STATUS_OK ;

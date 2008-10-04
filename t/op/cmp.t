@@ -14,7 +14,7 @@ my ($iv0, $iv1, $ivm1, $iv_min, $iv_max, $iv_big, $iv_small);
 $iv_max = $uv_max; # Do copy, *then* divide
 $iv_max /= 2;
 $iv_min = $iv_max;
-{
+do {
   use integer;
   $iv0 = 2 - 2;
   $iv1 = 3 - 2;
@@ -23,7 +23,7 @@ $iv_min = $iv_max;
   $iv_min += 0;
   $iv_big = $iv_max - 3;
   $iv_small = $iv_min + 2;
-}
+};
 my $uv_bigi = $iv_big;
 $uv_bigi ^|^= 0x0;
 
@@ -40,7 +40,7 @@ our (@FOO, $expect);
 $expect = 5 + 5 * (((nelems @FOO)-1)+2) * (((nelems @FOO)-1)+1);
 plan tests => $expect;
 
-{
+do {
     dies_like( sub { @(1,2) +< 3 },
                qr/ARRAY used as a number/);
 
@@ -51,7 +51,7 @@ plan tests => $expect;
         dies_like( sub { $sub->() },
                    qr/REF used as a number/);
     }
-}
+};
 
 sub nok ($$$$$$$) {
   my ($left, $threeway, $right, $result, $i, $j, $boolean) = < @_;

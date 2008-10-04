@@ -24,7 +24,7 @@ sub like_eval
     like $@->{description}, nelems @_ ;
 }
 
-{
+do {
     package LexFile ;
 
     our ($index);
@@ -51,9 +51,9 @@ sub like_eval
         for ( @$self) { 1 while unlink $_ } ;
     }
 
-}
+};
 
-{
+do {
     package LexDir ;
 
     use File::Path;
@@ -69,7 +69,7 @@ sub like_eval
         my $self = shift ;
         foreach ( @$self) { rmtree $_ }
     }
-}
+};
 sub readFile
 {
     my $f = shift ;
@@ -583,7 +583,7 @@ sub dumpObj
 
     if ((nelems @_))
     {
-        print "#\n# dumpOBJ from $file line $line {join ' ',@_}\n" ;
+        print "#\n# dumpOBJ from $file line $line $(join ' ',@_)\n" ;
     }
     else
     {

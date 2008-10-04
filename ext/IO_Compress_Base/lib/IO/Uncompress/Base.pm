@@ -314,10 +314,10 @@ sub checkParams
         if  $self->{OneShot} ;
         
     $got->parse($Valid, < @_ ) 
-        or $self->croakError("{$class}: $got->{Error}")  ;
+        or $self->croakError("$($class): $got->{Error}")  ;
 
     $self->postCheckParams($got) 
-        or $self->croakError("{$class}: " . $self->error())  ;
+        or $self->croakError("$($class): " . $self->error())  ;
 
     return $got;
 }
@@ -350,7 +350,7 @@ sub _create
     $obj->{InNew} = 1;
 
     $obj->ckParams($got)
-        or $obj->croakError("{$class}: " . *$obj->{Error});
+        or $obj->croakError("$($class): " . *$obj->{Error});
 
     if ($inType eq 'buffer' || $inType eq 'code') {
         *$obj->{Buffer} = $inValue ;        
@@ -1089,7 +1089,7 @@ sub _getline
     }
 
     # $/ isn't empty, or a reference, so it's Line Mode.
-    {
+    do {
         my $line ;    
         my $offset;
         my $p = \$self->{Pending}  ;
@@ -1112,7 +1112,7 @@ sub _getline
         }
 
         return \$line;
-    }
+    };
 }
 
 sub getline

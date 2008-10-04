@@ -182,14 +182,14 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
 
 # now some tests for hash assignment in scalar and list context with
 # duplicate keys [perl #24380]
-{
+do {
     my %h; my $x; my $ar;
     is( (join ':', @( ((<%h) = (1) x 8 ))), '1:1',
 	'hash assignment in list context removes duplicates' );
-}
+};
 
 # test stringification of keys
-{
+do {
     no warnings 'once';
     my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
     our %h;
@@ -202,4 +202,4 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
     for my $ref ( @refs) {
         dies_like( sub { %h{$ref} }, qr/reference as string/ );
     }
-}
+};

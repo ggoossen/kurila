@@ -27,18 +27,18 @@ sub abs_path {
 my $Cwd = abs_path;
 
 # Let's get to a known position
-SKIP: {
+SKIP: do {
     my ($vol,$dir) = < splitpath(abs_path,1);
     my $test_dir = $IsVMS ? 'T' : 't';
     skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
 
     ok( chdir($test_dir),     'chdir($test_dir)');
     is( < abs_path, < catdir($Cwd, $test_dir),    '  abs_path() agrees' );
-}
+};
 
 $Cwd = abs_path;
 
-SKIP: {
+SKIP: do {
     skip("no fchdir", 16) unless $has_fchdir;
     my $has_dirfd = (%Config{d_dirfd} || %Config{d_dir_dd_fd} || "") eq "define";
     ok(opendir(my $dh, "."), "opendir .");
@@ -71,11 +71,11 @@ SKIP: {
     ok(-d "op", "verify that we are back");
 
     # And now the ambiguous case
-    {
+    do {
 	no warnings < qw<io deprecated>;
 	ok(opendir(H, "op"), "opendir op") or $!-> diag();
 	ok(open(H, "<", "base"), "open base") or $!-> diag();
-    }
+    };
     if ($has_dirfd) {
 	ok(chdir(*H), "fchdir to op");
 	ok(-f "chdir.t", "verify that we are in 'op'");
@@ -85,22 +85,22 @@ SKIP: {
 	try { chdir(*H); };
 	like($@->{description}, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
-	SKIP: {
+	SKIP: do {
 	    skip("dirfd is unimplemented");
-	}
+	};
     }
     ok(closedir(H), "closedir");
     ok(chdir(*H), "fchdir to base");
     ok(-f "cond.t", "verify that we are in 'base'");
     chdir ".." or die $!;
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("has fchdir", 1) if $has_fchdir;
     opendir(my $dh, "op");
     try { chdir($dh); };
     like($@->{description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
-}
+};
 
 # The environment variables chdir() pays attention to.
 my @magic_envs = qw(HOME LOGDIR SYS$LOGIN);
@@ -189,7 +189,7 @@ foreach my $key ( @magic_envs) {
     check_env($key);
 }
 
-{
+do {
     clean_env;
     if (($IsVMS || $IsMacOS) && !%Config{'d_setenv'}) {
         pass("Can't reset HOME, so chdir() test meaningless");
@@ -197,4 +197,4 @@ foreach my $key ( @magic_envs) {
         ok( !chdir(),                   'chdir() w/o any ENV set' );
     }
     is( abs_path, $Cwd,             '  abs_path() agrees' );
-}
+};

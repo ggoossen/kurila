@@ -15,19 +15,19 @@ our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
 $bar = "one";
 $baz = "three";
 $foo = "four";
-{
+do {
     local(*foo) = 'baz';
     is ($foo, 'three');
-}
+};
 is ($foo, 'four');
 
 $foo = "global";
-{
+do {
     local(*foo);
     is ($foo, undef);
     $foo = "local";
     is ($foo, 'local');
-}
+};
 is ($foo, 'global');
 
 # Test real references.
@@ -55,10 +55,10 @@ for my $i (@(3,1,2,0)) {
 print < @a;
 print @{@ref[1]}[0];
 print < @{@ref[2]}[[@(0)]];
-{
+do {
     no strict 'refs';
     print < @{*{Symbol::fetch_glob('d')}};
-}
+};
 curr_test($test+4);
 
 # Test references to references.
@@ -99,13 +99,13 @@ is (join(':', @{%spring2{"foo"}}), "1:2:3:4");
 
 # Test references to subroutines.
 
-{
+do {
     my $called;
     sub mysub { $called++; }
     $subref = \&mysub;
     &$subref( < @_ );
     is ($called, 1);
-}
+};
 
 $subrefref = \\&mysub2;
 is ( $$subrefref->("GOOD"), "good");
@@ -125,7 +125,7 @@ $anonhash2 = \%(FOO => 'BAR', ABC => 'XYZ',);
 is (join('', sort values %$anonhash2), 'BARXYZ');
 
 # Test ->[$@%&*] derefence syntax
-{
+do {
     my $z = \66;
     is($z->$, 66);
     my $y = \@(1,2,3,4);
@@ -136,7 +136,7 @@ is (join('', sort values %$anonhash2), 'BARXYZ');
     is(Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return @_[0]; };
     is($v->(55), 55);
-}
+};
 
 # Test bless operator.
 
@@ -206,13 +206,13 @@ sub larry::DESTROY { print "# larry\nok $test\n"; }
 sub curly::DESTROY { print "# curly\nok ", $test + 1, "\n"; }
 sub moe::DESTROY   { print "# moe\nok ", $test + 2, "\n"; }
 
-{
+do {
     my ($joe, @curly, %larry);
     my $moe = bless \$joe, 'moe';
     my $curly = bless \@curly, 'curly';
     my $larry = bless \%larry, 'larry';
     print "# leaving block\n";
-}
+};
 
 print "# left block\n";
 curr_test($test + 3);
@@ -221,7 +221,7 @@ curr_test($test + 3);
 
 
 $foo = "garbage";
-{ local(*bar) = "foo" }
+do { local(*bar) = "foo" };
 $bar = "glob 3";
 
 our $var = "glob 4";
@@ -230,7 +230,7 @@ is ($$_, 'glob 4');
 
 # test if @_[0] is properly protected in DESTROY()
 
-{
+do {
     my $test = curr_test();
     my $i = 0;
     local $^DIE_HOOK = sub {
@@ -244,15 +244,15 @@ is ($$_, 'glob 4');
     package C;
     sub new { bless \%(), shift }
     sub DESTROY { @_[0] = 'foo' }
-    {
+    do {
 	print "# should generate an error...\n";
 	my $c = C->new;
-    }
+    };
     print "# good, didn't recurse\n";
-}
+};
 
 # test if refgen behaves with autoviv magic
-{
+do {
     my @a;
     @a[1] = "good";
     my $got;
@@ -261,7 +261,7 @@ is ($$_, 'glob 4');
 	$got .= ';';
     }
     is ($got, ";good;");
-}
+};
 
 # This test is the reason for postponed destruction in sv_unref
 $a = \@(1,2,3);
@@ -285,13 +285,13 @@ foreach my $lexical (@('', 'my $a; ')) {
 
 $test = curr_test();
 sub x::DESTROY {print "ok ", $test + shift->[0], "\n"}
-{ my $a1 = bless \@(3),"x";
+do { my $a1 = bless \@(3),"x";
   my $a2 = bless \@(2),"x";
-  { my $a3 = bless \@(1),"x";
+  do { my $a3 = bless \@(1),"x";
     my $a4 = bless \@(0),"x";
     567;
-  }
-}
+  };
+};
 curr_test($test+4);
 
 is (runperl (switches=> \@('-l'),
@@ -311,7 +311,7 @@ is (runperl(
     stderr => 1
 ), '', 'freeing self-referential typeglob');
 
-TODO: {
+TODO: do {
     no strict 'refs';
     my $name1 = "\0Chalk";
     my $name2 = "\0Cheese";
@@ -387,10 +387,10 @@ TODO: {
 
     is (&{*{Symbol::fetch_glob($name1)}}( < @_ ), "One");
     is (&{*{Symbol::fetch_glob($name2)}}, "Two");
-}
+};
 
 # test dereferencing errors
-{
+do {
     foreach my $ref (@(*STDOUT{IO})) {
 	dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
 	dies_like(sub { %$ref }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
@@ -402,7 +402,7 @@ TODO: {
     is($@, '', "Glob dereference of PVIO is acceptable");
 
     cmp_ok($ref, '\==', *{$ref}{IO}, "IO slot of the temporary glob is set correctly");
-}
+};
 
 # Bit of a hack to make test.pl happy. There are 3 more tests after it leaves.
 $test = curr_test();
@@ -416,12 +416,12 @@ package FINALE;
 
 our ($ref3, $ref1);
 
-{
+do {
     $ref3 = bless \@("ok $test2\n");	# package destruction
     my $ref2 = bless \@("ok $test1\n");	# lexical destruction
     local $ref1 = bless \@("ok $test\n");	# dynamic destruction
     1;					# flush any temp values on stack
-}
+};
 
 DESTROY {
     print @_[0]->[0];

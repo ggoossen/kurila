@@ -27,10 +27,10 @@ sub s  { return "s-".shift }
 
 # m operator
 can_ok( 'main', "m" );
-SILENCE_WARNING: { # Complains because $_ is undef
+SILENCE_WARNING: do { # Complains because $_ is undef
     no warnings;
     isnt( m('unqualified'), "m-unqualified", "m('unqualified') is oper" );
-}
+};
 is( main::m('main'), "m-main", "main::m() is func" );
 is( &m('amper'), "m-amper", "&m() is func" );
 
@@ -56,13 +56,13 @@ is( &qr('amper'), "qr-amper", "&qr() is func" );
 can_ok( 'main', "qx" );
 eval "qx('unqualified'".
      ($^O eq 'MSWin32' ? " 2>&1)" : ")");
-SKIP: {
+SKIP: do {
     skip("external command not portable on VMS", 1) if $^O eq 'VMS';
-    TODO: {
+    TODO: do {
 	local our $TODO = $^O eq 'MSWin32' ? "Tainting of PATH not working of Windows" : $TODO;
 	like( $@->{description}, qr/^Insecure/, "qx('unqualified') doesn't work" );
-    }
-}
+    };
+};
 is( main::qx('main'), "qx-main", "main::qx() is func" );
 is( &qx('amper'), "qx-amper", "&qx() is func" );
 

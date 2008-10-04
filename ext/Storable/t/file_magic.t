@@ -389,7 +389,7 @@ like($@->{description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
 is(Storable::file_magic(__FILE__), undef, "not an image");
 
 store(\%(), $file);
-{
+do {
     my $info = Storable::file_magic($file);
     unlink($file);
     ok($info, "got info");
@@ -411,10 +411,10 @@ store(\%(), $file);
     for my $attr (keys %attrs) {
         is($info->{$attr}, %Config{$attr}, "$attr match Config");
     }
-}
+};
 
 nstore(\%(), $file);
-{
+do {
     my $info = Storable::file_magic($file);
     unlink($file);
     ok($info, "got info");
@@ -430,7 +430,7 @@ nstore(\%(), $file);
     for (qw(byteorder intsize longsize ptrsize nvsize)) {
 	ok(!exists $info->{$_}, "no $_");
     }
-}
+};
 
 for my $test ( @tests) {
     my($data, $expected) = < @$test;

@@ -12,7 +12,7 @@ anonymous subroutine.
 
 =cut
 
-{
+do {
     package A;
     use mro 'c3'; 
 
@@ -23,9 +23,9 @@ anonymous subroutine.
     sub bar {
       return 'A::bar';
     }
-}
+};
 
-{
+do {
     package B;
     use base 'A';
     use mro 'c3'; 
@@ -46,7 +46,7 @@ anonymous subroutine.
       };
       return (shift)->?$code1;
     }
-}
+};
 
 is(B->foo, "B::foo => A::foo",
    'method resolved inside anonymous sub');

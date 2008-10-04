@@ -370,7 +370,7 @@ sub e2charnum {
 
 
 # Fill out %Name2character...
-{
+do {
   %Name2character = %( () );
   my($name, $number);
   while( ($name, $number) = each %Name2character_number) {
@@ -385,7 +385,7 @@ sub e2charnum {
   %Name2character{'apos'}   = "'";
   %Name2character{'sol' }   = '/';
   %Name2character{'verbar'} = '|';
-}
+};
 
 #--------------------------------------------------------------------------
 
@@ -504,7 +504,7 @@ sub e2charnum {
 
 );
 
-{
+do {
   # Now stuff %Latin1Char_to_fallback:
   %Latin1Char_to_fallback = %( () );
   my($k,$v);
@@ -512,7 +512,7 @@ sub e2charnum {
     %Latin1Char_to_fallback{chr $k} = $v;
     #print chr($k), ' => ', $v, "\n";
   }
-}
+};
 
 #--------------------------------------------------------------------------
 1;

@@ -89,7 +89,7 @@ sub testwarn {
     check_bits( @(caller(0))[9], $w, "warnings match caller ($id)");
 }
 
-{
+do {
     use bytes;
     no warnings;
     # Build the warnings mask dynamically
@@ -116,7 +116,7 @@ sub testwarn {
     BEGIN { check_bits( $^WARNING_BITS, $registered,
 			'warning bits on via "use warnings::register"' ) }
     testwarn($registered, 'following w::r');
-}
+};
 
 
 # The next two cases test for a bug where caller ignored evals if

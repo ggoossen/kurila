@@ -27,10 +27,10 @@ ok( ref($stat), 'should build a stat object' );
 is( $stat->dev, @stat[0], "device number in position 0" );
 
 # On OS/2 (fake) ino is not constant, it is incremented each time
-SKIP: {
+SKIP: do {
 	skip('inode number is not constant on OS/2', 1) if $^O eq 'os2';
 	is( $stat->ino, @stat[1], "inode number in position 1" );
-}
+};
 
 is( $stat->mode, @stat[2], "file mode in position 2" );
 

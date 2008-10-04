@@ -259,7 +259,7 @@ sub _code2codeset
 # initialisation code - stuff the DATA into the ALPHA2 hash
 #
 #=======================================================================
-{
+do {
     my   ($alpha2, $alpha3, $numeric);
     my   (@countries);
     local $_;
@@ -298,7 +298,7 @@ sub _code2codeset
     }
 
     close(DATA);
-}
+};
 
 1;
 

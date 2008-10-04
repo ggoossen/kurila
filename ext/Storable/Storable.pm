@@ -32,9 +32,9 @@ $VERSION = '2.18';
 # Use of Log::Agent is optional
 #
 
-{
+do {
     eval "use Log::Agent";
-}
+};
 
 #
 # They might miss :flock in Fcntl

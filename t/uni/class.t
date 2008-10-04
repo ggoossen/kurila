@@ -144,10 +144,10 @@ for my $p (@('gc', 'sc')) {
       for my $y (@($abbr, %utf8::PropValueAlias{$p}->{$abbr}, %utf8::PVA_abbr_map{gc_sc}->{$abbr})) {
         is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
         is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
-        SKIP: {
+        SKIP: do {
 	  skip("surrogate", 1) if $abbr eq 'cs';
  	  test_regexp ($str, $y);
-        }
+        };
       }
     }
   }
@@ -155,7 +155,7 @@ for my $p (@('gc', 'sc')) {
 
 # test extra properties (ASCII_Hex_Digit, Bidi_Control, etc.)
 SKIP:
-{
+do {
   skip "Can't reliably derive class names from file names", 576 if $^O eq 'VMS';
 
   # On case tolerant filesystems, Cf.pl will cause a -e test for cf.pl to
@@ -191,7 +191,7 @@ SKIP:
       }
     }
   }
-}
+};
 
 # test the blocks (InFoobar)
 for ( grep %utf8::Canonical{$_} =~ m/^In/, keys %utf8::Canonical) {
@@ -209,11 +209,11 @@ for ( grep %utf8::Canonical{$_} =~ m/^In/, keys %utf8::Canonical) {
 
   my $blk = $_;
 
-  SKIP: {
+  SKIP: do {
     skip($blk, 2) if $blk =~ m/surrogates/i;
     test_regexp ($str, $blk);
     $blk =~ s/^In/Block:/;
     test_regexp ($str, $blk);
-  }
+  };
 }
 

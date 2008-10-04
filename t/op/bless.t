@@ -10,7 +10,7 @@ our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
 sub expected {
     my($object, $package, $type) = < @_;
-    print "# {dump::view($object)} $package $type\n";
+    print "# $(dump::view($object)) $package $type\n";
     is(ref($object), $package);
     my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/;
     like(dump::view($object), $r);
@@ -52,7 +52,7 @@ bless $a1, "A2";
 expected($a1, "A2", "HASH");
 
 # local and my
-{
+do {
     local $a1 = bless $a1, "A3";	# should rebless outer $a1
     local $b1 = bless \@(), "B3";
     my $c1 = bless $c1, "C3";		# should rebless outer $c1
@@ -61,7 +61,7 @@ expected($a1, "A2", "HASH");
     expected($b1, "B3", "ARRAY");
     expected($c1, "C3", "SCALAR");
     expected($d1, "D3", "GLOB");
-}
+};
 expected($a1, "A3", "HASH");
 expected($b1, "B", "ARRAY");
 expected($c1, "C3", "SCALAR");
@@ -70,7 +70,7 @@ expected($d1, "D", "GLOB");
 # class is magic
 "E" =~ m/(.)/;
 expected(bless(\%(), $1), "E", "HASH");
-{
+do {
     local $! = 1;
     my $string = "$!";
     $! = 2;	# attempt to avoid cached string
@@ -78,24 +78,24 @@ expected(bless(\%(), $1), "E", "HASH");
     expected(bless(\%(), $!), $string, "HASH");
 
 # ref is ref to magic
-    {
-	{
+    do {
+	do {
 	    package F;
 	    sub test { main::is(${@_[0]}, $string) }
-	}
+	};
 	$! = 2;
 	$f1 = bless \$!, "F";
 	$! = 1;
 	$f1->test;
-    }
-}
+    };
+};
 
 # ref is magic
 ### example of magic variable that is a reference??
 
 # no class, or empty string (with a warning), or undef (with two)
 expected(bless(\@()), 'main', "ARRAY");
-{
+do {
     local $^WARN_HOOK = sub { push @w, @_[0]->message };
     use warnings;
 
@@ -108,14 +108,14 @@ expected(bless(\@()), 'main', "ARRAY");
 
     dies_like( sub { $m = bless \@(), undef },
                qr/Attempt to bless to ''/ );
-}
+};
 
 # class is a ref
 $a1 = bless \%(), "A4";
 $b1 = try { bless \%(), $a1 };
 like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
 
-{
+do {
     my %h = %( < 1..2 );
     my($k) = < keys %h; 
     my $x=\$k;
@@ -124,4 +124,4 @@ like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
 
     my $a = bless \(nkeys %h), 'zap';
     is(ref $a, 'zap');
-}
+};

@@ -102,7 +102,7 @@ sub compile {
 	    next unless $objname;	# skip nulls w/o carping
 
 	    if (ref $objname) {
-		print $walkHandle "B::Showlex::compile({dump::view($objname)})\n";
+		print $walkHandle "B::Showlex::compile($(dump::view($objname)))\n";
 		$objref = $objname;
                 $objname = dump::view($objname);
 	    } else {

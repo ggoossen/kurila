@@ -145,7 +145,7 @@ sub load_loc {
     eval "
 	package $pkg;
 	use base 'Locale::Maketext';
-        \%{$pkg}::Lexicon = ( '_AUTO' => 1 );
+        \%$($pkg)::Lexicon = ( '_AUTO' => 1 );
 	Locale::Maketext::Lexicon->import(\{
 	    'i-default' => [ 'Auto' ],
 	    '*'	=> [ Gettext => \$pattern ],

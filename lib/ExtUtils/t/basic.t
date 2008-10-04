@@ -68,13 +68,13 @@ END { unlink makefile_name(), makefile_backup() }
 
 my $make = make_run();
 
-{
+do {
     # Supress 'make manifest' noise
     local %ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
     my $manifest_out = run("$make manifest");
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
     ok( -s 'MANIFEST',      '  its not empty' ) or diag $manifest_out;
-}
+};
 
 END { unlink 'MANIFEST'; }
 
@@ -83,7 +83,7 @@ my $ppd_out = run("$make ppd");
 is( $?, 0,                      '  exited normally' ) || diag $ppd_out;
 ok( open(PPD, "<", 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
-{ local $/; $ppd_html = ~< *PPD }
+do { local $/; $ppd_html = ~< *PPD };
 close PPD;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0,01,0,0">}m, 
                                                            '  <SOFTPKG>' );
@@ -108,7 +108,7 @@ like( $ppd_html, qr{^\s*</SOFTPKG>}m,                      '  </SOFTPKG>');
 END { unlink 'Big-Dummy.ppd' }
 
 
-SKIP: {
+SKIP: do {
     skip 'Test::Harness required for "make test"', 5 if not eval 'require Test::Harness; 1';
 
     my $test_out = run("$make test");
@@ -123,7 +123,7 @@ SKIP: {
     like( $test_out, qr/All tests successful/,  '  successful' );
     is( $?, 0,                                  '  exited normally' ) ||
       diag $test_out;
-}
+};
 
 
 my $install_out = run("$make install");
@@ -149,7 +149,7 @@ ok( %files{'.packlist'},    '  packlist created'   );
 ok( %files{'perllocal.pod'},'  perllocal.pod created' );
 
 
-SKIP: {
+SKIP: do {
     skip 'VMS install targets do not preserve $(PREFIX)', 9 if $Is_VMS;
 
     $install_out = run("$make install PREFIX=elsewhere");
@@ -166,10 +166,10 @@ SKIP: {
     ok( %files{'.packlist'},    '  packlist created'   );
     ok( %files{'perllocal.pod'},'  perllocal.pod created' );
     rmtree('elsewhere');
-}
+};
 
 
-SKIP: {
+SKIP: do {
     skip 'VMS install targets do not preserve $(DESTDIR)', 11 if $Is_VMS;
 
     $install_out = run("$make install PREFIX= DESTDIR=other");
@@ -192,9 +192,9 @@ SKIP: {
 
     ok( open(PERLLOCAL, "<", %files{'perllocal.pod'} ) ) || 
         diag("Can't open %files{'perllocal.pod'}: $!");
-    { local $/;
+    do { local $/;
       unlike( ~< *PERLLOCAL, qr/other/, 'DESTDIR should not appear in perllocal');
-    }
+    };
     close PERLLOCAL;
 
 # TODO not available in the min version of Test::Harness we require
@@ -207,10 +207,10 @@ SKIP: {
 #    close PACKLIST;
 
     rmtree('other');
-}
+};
 
 
-SKIP: {
+SKIP: do {
     skip 'VMS install targets do not preserve $(PREFIX)', 10 if $Is_VMS;
 
     $install_out = run("$make install PREFIX=elsewhere DESTDIR=other/");
@@ -229,7 +229,7 @@ SKIP: {
     ok( %files{'.packlist'},    '  packlist created'   );
     ok( %files{'perllocal.pod'},'  perllocal.pod created' );
     rmtree('other');
-}
+};
 
 
 my $dist_out = run("$make dist");
@@ -238,11 +238,11 @@ is( $?, 0, 'dist' ) || diag($dist_out);
 my $distdir_out2 = run("$make distdir");
 is( $?, 0, 'distdir' ) || diag($distdir_out2);
 
-SKIP: {
+SKIP: do {
     skip 'Test::Harness required for "make disttest"', 1 if not eval 'require Test::Harness; 1';
     my $dist_test_out = run("$make disttest");
     is( $?, 0, 'disttest' ) || diag($dist_test_out);
-}
+};
 
 # Test META.yml generation
 use ExtUtils::Manifest < qw(maniread);

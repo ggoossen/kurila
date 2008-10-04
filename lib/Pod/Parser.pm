@@ -849,7 +849,7 @@ sub parse_text {
        ($rdelim = $ldelim) =~ s/</>/g;
        $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
        pop @seq_stack;
-       my $errmsg = "*** ERROR: unterminated {$cmd}{$ldelim}...{$rdelim}".
+       my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
                     " at line $line in file $file\n";
        (ref $errorsub) and &{$errorsub}($errmsg)
            or (defined $errorsub) and $self->?$errorsub($errmsg)

@@ -533,7 +533,7 @@ sub disablecache  {
 # --- Functions to process the 'time' data type
 
 sub new { my @t = @( mytime, times, (nelems @_) == 2 ? @_[1] : 0);
-	  print STDERR "new={join ' ',@t}\n" if $Debug;
+	  print STDERR "new=$(join ' ',@t)\n" if $Debug;
 	  bless \@t; }
 
 sub cpu_p { my($r,$pu,$ps,$cu,$cs) = < @{@_[0]}; $pu+$ps         ; }
@@ -588,7 +588,7 @@ sub timestr {
     die usage unless ref $tr;
 
     my @t = @$tr;
-    warn "bad time value ({join ' ',@t})" unless (nelems @t)==6;
+    warn "bad time value ($(join ' ',@t))" unless (nelems @t)==6;
     my($r, $pu, $ps, $cu, $cs, $n) = < @t;
     my($pt, $ct, $tt) = ( $tr->cpu_p, $tr->cpu_c, $tr->cpu_a);
     $f = $Default_Format unless defined $f;
@@ -596,7 +596,7 @@ sub timestr {
     $style ||= $Default_Style;
     return '' if $style eq 'none';
     $style = ($ct+>0) ? 'all' : 'noc' if $style eq 'auto';
-    my $s = "{join ' ',@t} $style"; # default for unknown style
+    my $s = "$(join ' ',@t) $style"; # default for unknown style
     my $w = $hirestime ? "\%2g" : "\%2d";
     $s = sprintf("$w wallclock secs (\%$f usr \%$f sys + \%$f cusr \%$f csys = \%$f CPU)",
 			    $r,$pu,$ps,$cu,$cs,$tt) if $style eq 'all';
@@ -1032,7 +1032,7 @@ sub cmpthese{
     }
 
     # Dump the output
-    my $format = join( ' ', map { "\%{$_}s" } @col_widths ) . "\n";
+    my $format = join( ' ', map { "\%$($_)s" } @col_widths ) . "\n";
     substr( $format, 1, 0, '-' );
     for (  @rows ) {
 	printf $format, < @$_;

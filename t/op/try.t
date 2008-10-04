@@ -13,7 +13,7 @@ try {
 my $test = 4;
 
 # return from try {} should clear $@ correctly
-{
+do {
     my $status = try {
 	try { die };
 	print "# eval \{ return \} test\n";
@@ -22,11 +22,11 @@ my $test = 4;
     print "not " if $@;
     print "ok $test\n";
     $test++;
-}
+};
 
 # Check that eval catches bad goto calls
 #   (BUG ID 20010305.003)
-{
+do {
     try {
 	try { goto foo; };
 	print ($@ ? "ok $test\n" : "not ok $test\n");
@@ -38,4 +38,4 @@ my $test = 4;
     };
     print "not ok $test\n" if $@;
     $test++;
-}
+};

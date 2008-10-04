@@ -56,7 +56,7 @@ try {
 
 # check whether eval EXPR determines value of EXPR correctly
 
-{
+do {
   print "ok 17\n";
   print "ok 18\n";
   print "ok 19\n";
@@ -64,7 +64,7 @@ try {
   print "ok 21\n";
   print "ok 22\n";
   print "ok 23\n";
-}
+};
 
 my $b = 'wrong';
 my $X = sub {
@@ -114,12 +114,12 @@ eval <<'EOT'; die if $@;
      eval @_[0]; die if $@;
   }
 EOT
-{
+do {
     my $ok = 'not ok';
     do_eval3('print "$ok ' . $x++ . '\n"');
     do_eval3('eval q[print "$ok ' . $x++ . '\n"]');
     do_eval3('sub { eval q[print "$ok ' . $x++ . '\n"] }->()');
-}
+};
 
 # can recursive subroutine-call inside eval'' see its own lexicals?
 sub recurse {
@@ -133,10 +133,10 @@ sub recurse {
     print "ok $l\n";
   }
 }
-{
+do {
   local $^WARN_HOOK = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
   recurse($x-5);
-}
+};
 $x++;
 
 # do closures created within eval bind correctly?
@@ -154,21 +154,21 @@ $x++;
 # does lexical search terminate correctly at subroutine boundary?
 $main::r = "ok $x\n";
 sub terminal { eval 'our $r; print $r' }
-{
+do {
    my $r = "not ok $x\n";
    eval 'terminal($r)';
-}
+};
 $x++;
 
 # does scalar eval"" pop stack correctly?
-{
+do {
     my $c = eval "(1,2)x10";
     print $c eq '2222222222' ? "ok $x\n" : "# $c\nnot ok $x\n";
     $x++;
-}
+};
 
 # return from try {} should clear $@ correctly
-{
+do {
     my $status = try {
 	try { die };
 	print "# eval \{ return \} test\n";
@@ -177,10 +177,10 @@ $x++;
     print "not " if $@;
     print "ok $x\n";
     $x++;
-}
+};
 
 # ditto for eval ""
-{
+do {
     my $status = eval q{
 	eval q{ die };
 	print "# eval q{ return } test\n";
@@ -189,13 +189,13 @@ $x++;
     print "not " if $@;
     print "ok $x\n";
     $x++;
-}
+};
 
 print "ok 40\n";
 
 # Check that eval catches bad goto calls
 #   (BUG ID 20010305.003)
-{
+do {
     try {
 	try { goto foo; };
 	print ($@ ? "ok 41\n" : "not ok 41\n");
@@ -206,11 +206,11 @@ print "ok 40\n";
 	}
     };
     print "not ok 41\n" if $@;
-}
+};
 
 # Make sure that "my $$x" is forbidden
 # 20011224 MJD
-{
+do {
   eval q{my $$x};
   print $@ ? "ok 42\n" : "not ok 42\n";
   eval q{my @$x};
@@ -219,14 +219,14 @@ print "ok 40\n";
   print $@ ? "ok 44\n" : "not ok 44\n";
   eval q{my $$$x};
   print $@ ? "ok 45\n" : "not ok 45\n";
-}
+};
 
 # [ID 20020623.002] eval "" doesn't clear $@
-{
+do {
     $@ = 5;
     eval q{};
     print length($@) ? "not ok 46\t# \$\@ = '$@'\n" : "ok 46\n";
-}
+};
 
 # DAPM Nov-2002. Perl should now capture the full lexical context during
 # evals.
@@ -248,7 +248,7 @@ eval q{
     }
 };
 fred2(49);
-{ my $zzz = 2; fred2(50) }
+do { my $zzz = 2; fred2(50) };
 
 # sort() starts a new context stack. Make sure we can still find
 # the lexically enclosing sub
@@ -295,7 +295,7 @@ $r = 0;
 eval'$r = fred3(5)';
 print $r == 120 ? 'ok' : 'not ok', " 58\n";
 $r = 0;
-{ my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
+do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };;
 print $r == 120 ? 'ok' : 'not ok', " 59\n";
 
 # check that goto &sub within evals doesn't leak lexical scope
@@ -324,16 +324,16 @@ eval q{
     fred5();
 };
 fred5();
-{ my $yyy = 88; my $zzz = 99; fred5(); }
+do { my $yyy = 88; my $zzz = 99; fred5(); };
 eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
 
 # [perl #9728] used to dump core
-{
+do {
    my $eval = eval 'sub { eval q|sub { %S }| }';
    $eval->(\%());
    print "ok $test\n";
    $test++;
-}
+};
 
 # evals that appear in the DB package should see the lexical scope of the
 # thing outside DB that called them (usually the debugged code), rather
@@ -341,7 +341,7 @@ eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
 
 $test=79;
 our $x = 1;
-{
+do {
     my $x=2;
     sub db1	{ $x; eval '$x' }
     sub DB::db2	{ $x; eval '$x' }
@@ -351,8 +351,8 @@ our $x = 1;
     sub db5	{ my $x=4; eval '$x' }
     package main;
     sub db6	{ my $x=4; eval '$x' }
-}
-{
+};
+do {
     my $x = 3;
     print db1()     == 2 ? 'ok' : 'not ok', " $test\n"; $test++;
     print DB::db2() == 2 ? 'ok' : 'not ok', " $test\n"; $test++;
@@ -360,7 +360,7 @@ our $x = 1;
     print DB::db4() == 3 ? 'ok' : 'not ok', " $test # TODO\n"; $test++;
     print DB::db5() == 3 ? 'ok' : 'not ok', " $test # TODO\n"; $test++;
     print db6()     == 4 ? 'ok' : 'not ok', " $test\n"; $test++;
-}
+};
 require './test.pl';
 our $NO_ENDING = 1;
 # [perl #19022] used to end up with shared hash warnings
@@ -378,7 +378,7 @@ $test++;
 
 # And a buggy way of fixing #19022 made this fail - $k became undef after the
 # eval for a build with copy on write
-{
+do {
   my %h;
   %h{a}=1;
   foreach my $k (keys %h) {
@@ -398,17 +398,17 @@ $test++;
     }
     $test++;
   }
-}
+};
 
 sub Foo {} print Foo(try {});
 print "ok ",$test++," - #20798 (used to dump core)\n";
 
 # eval undef should be the same as eval "" barring any warnings
 
-{
+do {
     local $@ = "foo";
     eval undef;
     print "not " unless $@ eq "";
     print "ok $test # eval undef \n"; $test++;
-}
+};
 

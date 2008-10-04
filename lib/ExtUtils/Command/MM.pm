@@ -116,7 +116,7 @@ sub pod2man {
     # compatibility.
     delete %options{lax};
 
-    do {{  # so 'next' works
+    do {do {  # so 'next' works
         my ($pod, $man) = splice(@ARGV, 0, 2);
 
         next if ((-e $man) &&
@@ -133,7 +133,7 @@ sub pod2man {
             chmod(oct(%options{perm_rw}), $man)
               or do { warn("chmod %options{perm_rw} $man: $!\n"); next };
         }
-    }} while (nelems @ARGV);
+    };} while (nelems @ARGV);
 
     return 1;
 }

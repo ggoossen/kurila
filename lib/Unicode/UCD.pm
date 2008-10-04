@@ -87,7 +87,7 @@ sub openunicode {
 	    undef $f;
 	}
 	croak __PACKAGE__, ": failed to find ", <
-              File::Spec->catfile(< @path), " in {join ' ',@INC}"
+              File::Spec->catfile(< @path), " in $(join ' ',@INC)"
 	    unless defined $f;
     }
     return $f;

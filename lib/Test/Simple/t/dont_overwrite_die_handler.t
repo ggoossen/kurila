@@ -9,7 +9,7 @@ BEGIN {
 
 use Test::More tests => 1;
 
-{
+do {
     local $TODO = "CV refernce changed";
     ok $^DIE_HOOK \== $handler, 'existing DIE handler not overridden';
-}
+};

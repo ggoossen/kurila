@@ -11,7 +11,7 @@ This tests the use of an eval{} block to wrap a next::method call.
 
 =cut
 
-{
+do {
     package A;
     use mro 'c3'; 
 
@@ -19,9 +19,9 @@ This tests the use of an eval{} block to wrap a next::method call.
       die 'A::foo died';
       return 'A::foo succeeded';
     }
-}
+};
 
-{
+do {
     package B;
     use base 'A';
     use mro 'c3'; 
@@ -35,7 +35,7 @@ This tests the use of an eval{} block to wrap a next::method call.
         return $@->{description};
       }
     }
-}
+};
 
 like(B->foo, 
    qr/^A::foo died/, 

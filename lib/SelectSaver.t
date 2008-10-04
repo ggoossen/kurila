@@ -12,10 +12,10 @@ use SelectSaver;
 open(FOO, ">", "foo-$$") || die;
 
 print "ok 1\n";
-{
+do {
     my $saver = SelectSaver->new(*FOO);
     print "foo\n";
-}
+};
 
 # Get data written to file
 open(FOO, "<", "foo-$$") || die;

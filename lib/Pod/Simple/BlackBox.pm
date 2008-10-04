@@ -176,7 +176,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
     if($line =~ m/^=cut/s) {
       # here ends the pod block, and therefore the previous pod para
-      DEBUG +> 1 and print "Noting =cut at line %{$self}{'line_count'}\n";
+      DEBUG +> 1 and print "Noting =cut at line %$($self){'line_count'}\n";
       $self->{'in_pod'} = 0;
       # ++$self->{'pod_para_count'};
       $self->_ponder_paragraph_buffer();
@@ -189,12 +189,12 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       
     } elsif($line =~ m/^\s*$/s) {  # it's a blank line
       if(!$self->{'start_of_pod_block'} and nelems @$paras and $paras->[-1]->[0] eq '~Verbatim') {
-        DEBUG +> 1 and print "Saving blank line at line %{$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Saving blank line at line %$($self){'line_count'}\n";
         push @{$paras->[-1]}, $line;
       }  # otherwise it's not interesting
       
       if(!$self->{'start_of_pod_block'} and !$self->{'last_was_blank'}) {
-        DEBUG +> 1 and print "Noting para ends with blank line at %{$self}{'line_count'}\n"; 
+        DEBUG +> 1 and print "Noting para ends with blank line at %$($self){'line_count'}\n"; 
       }
       
       $self->{'last_was_blank'} = 1;
@@ -213,18 +213,18 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
          # by now it's safe to consider the previous paragraph as done.
                 
         push @$paras, $new; # the new incipient paragraph
-        DEBUG +> 1 and print "Starting new @{$paras}[-1]->[0] para at line %{$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Starting new @$($paras)[-1]->[0] para at line %$($self){'line_count'}\n";
         
       } elsif($line =~ m/^\s/s) {
 
         if(!$self->{'start_of_pod_block'} and nelems @$paras and $paras->[-1]->[0] eq '~Verbatim') {
-          DEBUG +> 1 and print "Resuming verbatim para at line %{$self}{'line_count'}\n";
+          DEBUG +> 1 and print "Resuming verbatim para at line %$($self){'line_count'}\n";
           push @{$paras->[-1]}, $line;
         } else {
           ++$self->{'pod_para_count'};
           $self->_ponder_paragraph_buffer();
            # by now it's safe to consider the previous paragraph as done.
-          DEBUG +> 1 and print "Starting verbatim para at line %{$self}{'line_count'}\n";
+          DEBUG +> 1 and print "Starting verbatim para at line %$($self){'line_count'}\n";
           push @$paras, \@('~Verbatim', \%('start_line' => $self->{'line_count'}), $line);
         }
       } else {
@@ -232,14 +232,14 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         $self->_ponder_paragraph_buffer();
          # by now it's safe to consider the previous paragraph as done.
         push @$paras, \@('~Para',  \%('start_line' => $self->{'line_count'}), $line);
-        DEBUG +> 1 and print "Starting plain para at line %{$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Starting plain para at line %$($self){'line_count'}\n";
       }
       $self->{'last_was_blank'} = $self->{'start_of_pod_block'} = 0;
 
     } else {
       # It's a non-blank line /continuing/ the current para
       if((nelems @$paras)) {
-        DEBUG +> 2 and print "Line %{$self}{'line_count'} continues current paragraph\n";
+        DEBUG +> 2 and print "Line %$($self){'line_count'} continues current paragraph\n";
         push @{$paras->[-1]}, $line;
       } else {
         # Unexpected case!
@@ -303,7 +303,7 @@ sub _handle_encoding_line {
 
     # Note unsupported, and complain
     DEBUG and print " Encoding [$e] is unsupported.",
-      "\nSupporteds: {join ' ',@supported}\n";
+      "\nSupporteds: $(join ' ',@supported)\n";
     my $suggestion = '';
 
     # Look for a near match:
@@ -321,7 +321,7 @@ sub _handle_encoding_line {
     $enc_error = join '', @( 
       "This document probably does not appear as it should, because its ",
       "\"=encoding $e\" line calls for an unsupported encoding.",
-      $suggestion, "  [$encmodver\'s supported encodings are: {join ' ',@supported}]")
+      $suggestion, "  [$encmodver\'s supported encodings are: $(join ' ',@supported)]")
     ;
 
     $self->scream( $self->{'line_count'}, $enc_error );
@@ -370,7 +370,7 @@ sub _handle_encoding_second_level {
 
 #~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`
 
-{
+do {
 my $m = -321;   # magic line number
 
 sub _gen_errata {
@@ -416,7 +416,7 @@ sub _gen_errata {
   return @out;
 }
 
-}
+};
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -757,7 +757,7 @@ sub _ponder_paragraph_buffer {
       } elsif( $para_type =~ s/^=//s
         and defined( $para_type = $self->{'accept_directives'}->{$para_type} )
       ) {
-        DEBUG +> 1 and print " Pondering known directive @{$para}[0] as $para_type\n";
+        DEBUG +> 1 and print " Pondering known directive @$($para)[0] as $para_type\n";
       } else {
         # An unknown directive!
         DEBUG +> 1 and printf "Unhandled directive \%s (Handled: \%s)\n",
@@ -1549,7 +1549,7 @@ sub _verbatim_format {
     
     DEBUG +> 6 and print "New version of the above line is these tokens (",
       scalar(nelems @new_line), "):",
-      < map( ref($_)?"<{join ' ',@$_}> ":"<$_>", @new_line ), "\n";
+      < map( ref($_)?"<$(join ' ',@$_)> ":"<$_>", @new_line ), "\n";
     $i--; # So the next line we scrutinize is the line before the one
           #  that we just went and formatted
   }
@@ -1673,7 +1673,7 @@ sub _treelet_from_formatting_codes {
       )
     /xgo
   ) {
-    DEBUG +> 4 and print "\nParagraphic tokenstack = ({join ' ',@stack})\n";
+    DEBUG +> 4 and print "\nParagraphic tokenstack = ($(join ' ',@stack))\n";
     if(defined $1) {
       if(defined $2) {
         DEBUG +> 3 and print "Found complex start-text code \"$1\"\n";

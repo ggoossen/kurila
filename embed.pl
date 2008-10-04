@@ -268,7 +268,7 @@ sub write_protos {
 }
 
 # generates global.sym (API export list)
-{
+do {
   my %seen;
   sub write_global_sym {
       my $ret = "";
@@ -285,7 +285,7 @@ sub write_protos {
       }
       $ret;
   }
-}
+};
 
 
 our $unflagged_pointers;
@@ -372,7 +372,7 @@ sub hide ($$) {
 sub bincompat_var ($$) {
     my ($pfx, $sym) = < @_;
     my $arg = ($pfx eq 'G' ? 'NULL' : 'aTHX');
-    undefine("PL_$sym") . hide("PL_$sym", "(*Perl_{$pfx}{$sym}_ptr($arg))");
+    undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))");
 }
 
 sub multon ($$$) {

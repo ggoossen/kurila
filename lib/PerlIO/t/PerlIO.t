@@ -68,7 +68,7 @@ ok(close($binfh));
 ok(close($utffh));
 
 # magic temporary file via 3 arg open with undef
-{
+do {
     ok( open(my $x,"+<",undef), 'magic temp file via 3 arg open with undef');
     ok( defined fileno($x),     '       fileno' );
 
@@ -87,10 +87,10 @@ ok(close($utffh));
     # report after STDOUT is restored
     ok($status, '       re-open STDOUT');
     close OLDOUT;
-}
+};
 
 # in-memory open
-{
+do {
     my $var;
     ok( open(my $x,"+<",\$var), 'magic in-memory file via 3 arg open with \$var');
     ok( defined fileno($x),     '       fileno' );
@@ -103,7 +103,7 @@ ok(close($utffh));
     is( scalar ~< $x, "ok\n",    '       readline' );
     ok( tell($x) +>= 3,          '       tell' );
 
-  TODO: {
+  TODO: do {
         local $TODO = "broken";
 
         # test in-memory open over STDOUT
@@ -122,8 +122,8 @@ ok(close($utffh));
         #close STDERR;
         ok( open(STDERR,">",\$var), '       open STDERR into in-memory var');
         open STDERR, ">&",  \*OLDERR or die "cannot dup OLDERR: $!";
-    }
-}
+    };
+};
 
 
 END {

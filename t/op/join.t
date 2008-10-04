@@ -25,7 +25,7 @@ print "ok 7\n";
 print "ok 8\n";
 
 # 9,10 and for multiple read of undef
-{ my $s = 5;
+do { my $s = 5;
   local ($^W, $^WARN_HOOK) = ( 1, sub { $s+=4 } );
   my $r = join ':', @( 'a', undef, $s, 'b', undef, $s, 'c');
   print "# expected '13' got '$s'\nnot " if $s != 13;
@@ -33,4 +33,4 @@ print "ok 8\n";
   my $r = join '', @( 'a', undef, $s, 'b', undef, $s, 'c');
   print "# expected '21' got '$s'\nnot " if $s != 21;
   print "ok 10\n";
-};
+};;

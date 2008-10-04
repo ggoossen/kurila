@@ -27,18 +27,18 @@ sub new { bless \%() }
 
 $Alice::VERSION = 2.718;
 
-{
+do {
     package Cedric;
     our @ISA;
     use base < qw(Human);
-}
+};
 
-{
+do {
     package Programmer;
     our $VERSION = 1.667;
 
     sub write_perl { 1 }
-}
+};
 
 package main;
 
@@ -73,10 +73,10 @@ push(@Cedric::ISA,'Programmer');
 
 ok (Cedric->isa('Programmer'));
 
-{
+do {
     package Alice;
     'base'->import('Programmer');
-}
+};
 
 ok $a->isa('Programmer');
 ok $a->isa("Female");
@@ -142,14 +142,14 @@ ok ! $a->can("export_tags");	# a method in Exporter
 
 ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
 
-{
+do {
     package Pickup;
     use UNIVERSAL < qw( isa can VERSION );
 
     main::ok isa "Pickup", 'UNIVERSAL';
     main::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can;
     main::ok VERSION "UNIVERSAL" ;
-}
+};
 
 # bugid 3284
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching

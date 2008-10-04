@@ -235,7 +235,7 @@ ok ! $fil->gzclose ;
 
 1 while unlink $name ;
 
-{
+do {
 
     title 'mix gzread and gzreadline';
     
@@ -265,9 +265,9 @@ ok ! $fil->gzclose ;
     cmp_ok $fil->gzread($line, length $line3), '+>', 0, '    gzread ok' ;
     is $fil->gztell(), length($text), '    gztell ok' ;
     is $line, $line3, '    read expected block' ;
-}
+};
 
-{
+do {
     title "Pass gzopen a filehandle - use IO::File" ;
 
     my $lex = LexFile->new( my $name) ;
@@ -295,10 +295,10 @@ ok ! $fil->gzclose ;
     ok ! $fil->gzclose ;
 
     is $uncomp, $hello, "got expected output" ;
-}
+};
 
 
-{
+do {
     title 'test parameters for gzopen';
     my $lex = LexFile->new( my $name) ;
 
@@ -324,9 +324,9 @@ ok ! $fil->gzclose ;
 
     $fil = gzopen($name, "wbh") ;
     ok $fil, '  gzopen with mode "wbh" is ok' ;
-}
+};
 
-{
+do {
     title 'Read operations when opened for writing';
 
     my $lex = LexFile->new( my $name) ;
@@ -334,9 +334,9 @@ ok ! $fil->gzclose ;
     ok $fil = gzopen($name, "wb"), '  gzopen for writing' ;
     is $fil->gzread(), Z_STREAM_ERROR, "    gzread returns Z_STREAM_ERROR" ;
     ok ! $fil->gzclose, "  gzclose ok" ;
-}
+};
 
-{
+do {
     title 'write operations when opened for reading';
 
     my $lex = LexFile->new( my $name) ;
@@ -348,13 +348,13 @@ ok ! $fil->gzclose ;
 
     ok $fil = gzopen($name, "rb"), "  gzopen for reading" ;
     is $fil->gzwrite(), Z_STREAM_ERROR, "  gzwrite returns Z_STREAM_ERROR" ;
-}
+};
 
-{
+do {
     title 'read/write a non-readable/writable file';
 
     SKIP:
-    {
+    do {
         my $lex = LexFile->new( my $name) ;
         writeFile($name, "abc");
         chmod 0444, $name ;
@@ -370,10 +370,10 @@ ok ! $fil->gzclose ;
             diag " gzerrno $gzerrno\n";
 
         chmod 0777, $name ;
-    }
+    };
 
     SKIP:
-    {
+    do {
         my $lex = LexFile->new( my $name) ;
         skip "Cannot create non-readable file", 3 
             if $^O eq 'cygwin';
@@ -390,11 +390,11 @@ ok ! $fil->gzclose ;
         ok !$fil, "  gzopen returns undef" ;
         ok $gzerrno, "  gzerrno ok";
         chmod 0777, $name ;
-    }
+    };
 
-}
+};
 
-{
+do {
     title "gzseek" ;
 
     my $buff ;
@@ -436,9 +436,9 @@ ok ! $fil->gzclose ;
     is $io->gztell(), $here+5 ;
     ok $io->gzread($buff, 100) ;
     ok $buff eq $last ;
-}
+};
 
-{
+do {
     # seek error cases
     my $lex = LexFile->new( my $name) ;
 
@@ -466,9 +466,9 @@ ok ! $fil->gzclose ;
 
     try { $u->gzseek(-1, SEEK_CUR) ; };
     like $@->{description}, mkErr("seek: cannot seek backwards");
-}
+};
 
-{
+do {
     title 'gzreadline does not support $/';
 
     my $lex = LexFile->new( my $name );
@@ -490,4 +490,4 @@ ok ! $fil->gzclose ;
         ok ! $u->gzclose, "  closed" ;
         is $/, $delim, '  $/ unchanged by gzreadline';
     }
-}
+};

@@ -263,7 +263,7 @@ sub _open3 {
 	return 0 if (@cmd[0] eq '-');
 	local($")=(" ");
 	exec < @cmd or do {
-	    warn "$Me: exec of {join ' ',@cmd} failed";
+	    warn "$Me: exec of $(join ' ',@cmd) failed";
 	    try { require POSIX; POSIX::_exit(255); };
 	    exit 255;
 	};
@@ -324,7 +324,7 @@ sub _open3 {
 sub open3 {
     if ((nelems @_) +< 4) {
 	local $" = ', ';
-	die "open3({join ' ',@_}): not enough arguments";
+	die "open3($(join ' ',@_)): not enough arguments";
     }
     return _open3 'open3', scalar caller, < @_
 }

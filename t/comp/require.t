@@ -123,7 +123,7 @@ sub write_file_not_thing {
 EOT
 }
 
-{
+do {
     # Right. We really really need Config here.
     require Config;
     die "Failed to load Config for some reason"
@@ -168,7 +168,7 @@ EOT
     } else {
 	print "not ok $pmc_dies\n";
     }
-}
+};
 
 # circular require
 
@@ -189,7 +189,7 @@ print "ok ", ++$i, " circular require\n";
 require utf8;
 my $utf8 = utf8::chr(0xFEFF);
 
-$i++; do_require(qq({$utf8}print "ok $i\n"; 1;\n));
+$i++; do_require(qq($($utf8)print "ok $i\n"; 1;\n));
 
 END {
     foreach my $file ( @fjles_to_delete) {

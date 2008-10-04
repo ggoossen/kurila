@@ -36,7 +36,7 @@ else {
     mkdir "[]", 0;
     @a = File::Glob::glob("\\[\\]", GLOB_QUOTE);
     rmdir "[]";
-    print "# returned {join ' ',@a}\nnot " unless (nelems @a) == 1;
+    print "# returned $(join ' ',@a)\nnot " unless (nelems @a) == 1;
     print "ok 6\n";
     @a = bsd_glob("op\\*", GLOB_QUOTE);
     print "not " if (nelems @a) == 0;
