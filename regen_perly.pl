@@ -37,11 +37,11 @@ use strict;
 my $bison = 'bison';
 
 if ((nelems @ARGV) +>= 2 and @ARGV[0] eq '-b') {
-    shift;
-    $bison = shift;
+    shift(@ARGV);
+    $bison = shift(@ARGV);
 }
 
-my $y_file = shift || 'perly.y';
+my $y_file = shift(@ARGV) || 'perly.y';
 
 usage unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/;
 
