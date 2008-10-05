@@ -31,7 +31,7 @@
 #
 #  -- .robin. <robin@kitsite.com>  2001-03-13
 require "./test.pl";
-plan( tests => 38 );
+plan( tests => 33 );
 
 my $ok;
 
@@ -324,60 +324,6 @@ TEST12: do {
   $ok = 1;
 };
 cmp_ok($ok,'==',1,'no label on for(@array) last');
-
-TEST17: do {
-
-  $ok = 0;
-  my $first_time = 1;
-
-  {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST17;
-    }
-    $ok = 0;
-    $first_time=0;
-
-    redo;
-    last TEST17;
-  }
-  continue {
-    $ok = 0;
-    last TEST17;
-  }
-  $ok = 0;
-};
-cmp_ok($ok,'==',1,'no label on bare block');
-
-TEST18: do {
-
-  $ok = 0;
-  {
-    next;
-    last TEST18;
-  }
-  continue {
-    $ok = 1;
-    last TEST18;
-  }
-  $ok = 0;
-};
-cmp_ok($ok,'==',1,'no label on bare block next');
-
-TEST19: do {
-
-  $ok = 0;
-  {
-    last;
-    last TEST19;
-  }
-  continue {
-    $ok = 0;
-    last TEST19;
-  }
-  $ok = 1;
-};
-cmp_ok($ok,'==',1,'no label on bare block last');
 
 ### Now do it all again with labels
 
@@ -676,7 +622,7 @@ TEST36: do {
   $ok = 0;
   my $first_time = 1;
 
-  LABEL36: {
+  LABEL36: do {
     if (!$first_time) {
       $ok = 1;
       last TEST36;
@@ -686,41 +632,18 @@ TEST36: do {
 
     redo LABEL36;
     last TEST36;
-  }
-  continue {
-    $ok = 0;
-    last TEST36;
-  }
+  };
   $ok = 0;
 };
 cmp_ok($ok,'==',1,'label on bare block');
 
-TEST37: do {
-
-  $ok = 0;
-  LABEL37: {
-    next LABEL37;
-    last TEST37;
-  }
-  continue {
-    $ok = 1;
-    last TEST37;
-  }
-  $ok = 0;
-};
-cmp_ok($ok,'==',1,'label on bare block next');
-
 TEST38: do {
 
   $ok = 0;
-  LABEL38: {
+  LABEL38: do {
     last LABEL38;
     last TEST38;
-  }
-  continue {
-    $ok = 0;
-    last TEST38;
-  }
+  };
   $ok = 1;
 };
 cmp_ok($ok,'==',1,'label on bare block last');
@@ -775,17 +698,11 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 do {
     my $n=10; my $late_free = 0;
     sub X::DESTROY { $late_free++ if $n +< 0 };
+  LOOP:
     do {
 	($n-- && bless \%(), 'X') && redo;
     };
     cmp_ok($late_free,'==',0,"bug 27206: redo memory leak");
-
-    $n = 10; $late_free = 0;
-    {
-	($n-- && bless \%(), 'X') && redo;
-    }
-    continue { }
-    cmp_ok($late_free,'==',0,"bug 27206: redo with continue memory leak");
 };
 
 # ensure that redo doesn't clear a lexical declared in the condition
