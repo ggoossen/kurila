@@ -58,10 +58,10 @@ is COUNTLAST, 1;
 is((COUNTLIST)[1], 4);
 
 use constant ABC	=> 'ABC';
-is "abc$$(\( ABC ))abc", "abcABCabc";
+is "abc$( ABC )abc", "abcABCabc";
 
 use constant DEF	=> 'D', 'E', chr ord 'F';
-is "d e f $(join ' ',@$(\ DEF)) d e f", "d e f D E F d e f";
+is "d e f $(join ' ', DEF) d e f", "d e f D E F d e f";
 
 use constant SINGLE	=> "'";
 use constant DOUBLE	=> '"';

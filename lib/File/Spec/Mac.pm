@@ -645,7 +645,7 @@ sub _resolve_updirs {
 	my $proceed;
 
 	# resolve any updirs, e.g. "HD:tmp::file" -> "HD:file"
-	do {
+	{
 		$proceed = ($path =~ s/^(.*):[^:]+::(.*?)\z/$1:$2/);
 	} while ($proceed);
 

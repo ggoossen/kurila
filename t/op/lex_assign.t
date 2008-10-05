@@ -90,7 +90,7 @@ EOE
       if ($@->{description} =~ m/is unimplemented/) {
         skip("$comment: unimplemented", 1);
       } else {
-        fail("error: {$@->message}");
+        fail("error: $($@->message)");
       }
     }
   };
@@ -118,7 +118,7 @@ EOE
     } elsif ($@->{description} =~ m/Can't (modify|take log of 0)/) {
       skip("skipping $comment: syntax not good for selfassign", 1);
     } else {
-      fail("error: {$@->message}");
+      fail("error: $($@->message)");
     }
   }
  };

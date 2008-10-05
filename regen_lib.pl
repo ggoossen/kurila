@@ -63,7 +63,7 @@ sub safer_open {
 
 sub safer_close {
     my $fh = shift;
-    close $fh or die 'Error closing ' . *$($fh)->{SCALAR} . ": $!";
+    close $fh or die 'Error closing ' . *{$fh}->{SCALAR} . ": $!";
 }
 
 1;

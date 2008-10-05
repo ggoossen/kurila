@@ -73,7 +73,7 @@ sub numf {
    #  backtrack so it un-eats the rightmost three, and then we
    #  insert the comma there.
 
-  $num =~ s<(.,)><{$1 eq ',' ? '.' : ','}>g if ref($handle) and $handle->{'numf_comma'};
+  $num =~ s<(.,)><$($1 eq ',' ? '.' : ',')>g if ref($handle) and $handle->{'numf_comma'};
    # This is just a lame hack instead of using Number::Format
   return $num;
 }

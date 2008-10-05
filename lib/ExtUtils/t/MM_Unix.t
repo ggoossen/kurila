@@ -170,10 +170,10 @@ is ($t->libscan('Fatty'), 'Fatty', 'libscan on something not a VC file' );
 # maybe_command
 
 open(FILE, ">", "command"); print FILE "foo"; close FILE;
-SKIP: {
-skip ("no separate execute mode", 1) if ($^O eq "vos");
-ok (!$t->maybe_command('command') ,"non executable file isn't a command");
-}
+SKIP: do {
+    skip ("no separate execute mode", 1) if ($^O eq "vos");
+    ok (!$t->maybe_command('command') ,"non executable file isn't a command");
+};
 
 chmod 0755, "command";
 ok ($t->maybe_command('command'),        "executable file is a command");
@@ -217,7 +217,7 @@ foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
 }
 
 
-{
+do {
     $t->{CCFLAGS} = '-DMY_THING';
     $t->{LIBPERL_A} = 'libperl.a';
     $t->{LIB_EXT}   = '.a';
@@ -226,5 +226,5 @@ foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
 
     # Brief bug where CCFLAGS was being blown away
     is( $t->{CCFLAGS}, '-DMY_THING',    'cflags retains CCFLAGS' );
-}
+};
 

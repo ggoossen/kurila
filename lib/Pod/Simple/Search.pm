@@ -473,7 +473,7 @@ sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   for my $_ ( @them) {
     if ( $_ eq '.' ) {
       $_ = ':';
-    } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
+    } elsif ( $_ =~ s|^((?:\.\./)+)|$(':' x (length($1)/3))| ) {
       $_ = ':'. $_;
     } else {
       $_ =~ s|^\./|:|;
@@ -639,7 +639,7 @@ sub _state_as_string {
   return '' unless ref $self;
   my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" );
   foreach my $k (sort keys %$self) {
-    push @out, "  $(dump::view($k)) => {dump::view($self->{$k})}\n";
+    push @out, "  $(dump::view($k)) => $(dump::view($self->{$k}))\n";
   }
   push @out, "\}\n";
   my $x = join '', @out;

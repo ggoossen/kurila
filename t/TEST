@@ -495,7 +495,7 @@ EOT
 	}
 
 	if (defined $failure) {
-	    print "{$te}$failure\n";
+	    print "$($te)$failure\n";
 	    $::bad_files++;
 	    if ($test =~ m/^base/) {
 		die "Failed a basic test ($test) -- cannot continue.\n";
@@ -512,11 +512,11 @@ EOT
 		else {
 		    $elapsed = "";
 		}
-		print "{$te}ok$elapsed\n";
+		print "$($te)ok$elapsed\n";
 		$good_files++;
 	    }
 	    else {
-		print "{$te}skipped\n";
+		print "$($te)skipped\n";
 		$tested_files -= 1;
 	    }
 	}

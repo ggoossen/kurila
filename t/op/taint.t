@@ -134,7 +134,7 @@ sub test ($;$) {
 my $ECHO = ($Is_MSWin32 ? ".\\echo$$" : $Is_MacOS ? ":echo$$" : ($Is_NetWare ? "echo$$" : "./echo$$"));
 END { unlink $ECHO }
 open PROG, ">", "$ECHO" or die "Can't create $ECHO: $!";
-print PROG 'print "{join q| |, @ARGV}\n"', "\n";
+print PROG 'print "$(join q| |, @ARGV)\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
 
@@ -652,7 +652,7 @@ do {
     $why =~ s/$z/zee/;
     test     tainted $why;
 
-    $why =~ s/e/{'-'.$$}/g;
+    $why =~ s/e/$('-'.$$)/g;
     test     tainted $why;
 };
 

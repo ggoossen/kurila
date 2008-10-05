@@ -2,7 +2,7 @@
 
 use List::Util < qw(first);
 use Test::More;
-plan tests => ($::PERL_ONLY ? 14 : 16);
+plan tests => ($::PERL_ONLY ? 13 : 15);
 my $v;
 
 ok(defined &first,	'defined');
@@ -85,10 +85,6 @@ if (!$::PERL_ONLY) { SKIP: do {
     $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
     skip("Poor man's MULTICALL can't cope", 2)
       if !$List::Util::REAL_MULTICALL;
-
-    # Can we goto a label from the 'first' sub?
-    try {()= <first{goto foo} 1,2; foo: 1};
-    like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
     try {()= <first{goto sub{}} 1,2;};

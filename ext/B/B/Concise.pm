@@ -151,7 +151,7 @@ sub concise_stashref {
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
-	warn "err {$@->message} on $(dump::view($codeobj))" if $@;
+	warn "err $($@->message) on $(dump::view($codeobj))" if $@;
     }
 }
 
@@ -541,26 +541,26 @@ sub fmt_line {    # generate text-line for op.
     return '' if $hr->{goto} and $hr->{goto} eq '-';	# no goto nowhere
 
     # spec: (?(text1#varText2)?)
-    $text =~ s/\(\?\(([^\#]*?)\#(\w+)([^\#]*?)\)\?\)/{
-	$hr->{$2} ? $1.$hr->{$2}.$3 : ""}/g;
+    $text =~ s/\(\?\(([^\#]*?)\#(\w+)([^\#]*?)\)\?\)/$(
+	$hr->{$2} ? $1.$hr->{$2}.$3 : "" )/g;
 
     # spec: (x(exec_text;basic_text)x)
-    $text =~ s/\(x\((.*?);(.*?)\)x\)/{$order eq "exec" ? $1 : $2}/gs;
+    $text =~ s/\(x\((.*?);(.*?)\)x\)/$( $order eq "exec" ? $1 : $2 )/gs;
 
     # spec: (*(text)*)
-    $text =~ s/\(\*\(([^;]*?)\)\*\)/{$1 x $level}/gs;
+    $text =~ s/\(\*\(([^;]*?)\)\*\)/$( $1 x $level )/gs;
 
     # spec: (*(text1;text2)*)
-    $text =~ s/\(\*\((.*?);(.*?)\)\*\)/{$1 x ($level - 1) . $2 x ($level+>0)}/gs;
+    $text =~ s/\(\*\((.*?);(.*?)\)\*\)/$( $1 x ($level - 1) . $2 x ($level+>0) )/gs;
 
     # convert #Var to tag=>val form: Var\t#var
-    $text =~ s/\#([A-Z][a-z]+)(\d+)?/{"\t" . ucfist($1) . "\t" . lc("#$1$2")
-}/gs;
+    $text =~ s/\#([A-Z][a-z]+)(\d+)?/$( "\t" . ucfist($1) . "\t" . lc("#$1$2")
+)/gs;
 
     # spec: #varN
-    $text =~ s/\#([a-zA-Z]+)(\d+)/{sprintf("\%-$2s", $hr->{$1})}/g;
+    $text =~ s/\#([a-zA-Z]+)(\d+)/$( sprintf("\%-$2s", $hr->{$1}) )/g;
 
-    $text =~ s/\#([a-zA-Z]+)/{$hr->{$1}}/g;	# populate #var's
+    $text =~ s/\#([a-zA-Z]+)/$( $hr->{$1} )/g;	# populate #var's
     $text =~ s/[ \t]*~+[ \t]*/ /g;		# squeeze tildes
 
     $text = "# $hr->{src}\n$text" if $show_src and $hr->{src};

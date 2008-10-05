@@ -58,12 +58,12 @@ like( $res, qr/"FUNCLIST" => .+funclist/,
 like( $res, qr/"IMPORTS" => .+imports/, '... and allow parameter options too' );
 
 my $can_write;
-{
-	local *OUT;
-	$can_write = open(OUT, ">", 'tmp_imp');
-}
+do {
+    local *OUT;
+    $can_write = open(OUT, ">", 'tmp_imp');
+};
 
-SKIP: {
+SKIP: do {
 	skip("Cannot write test files: $!", 7) unless $can_write;
 
 	$mm->{IMPORTS} = \%( foo => 'bar' );
@@ -110,36 +110,36 @@ SKIP: {
 	local $@->{description};
 	try { $mm->dlsyms() };
 	is( $@, '', '... should not die if both syscalls succeed' );
-}
+};
 
 # static_lib
-{
-	my $called = 0;
+do {
+    my $called = 0;
 
-	# avoid "used only once"
-	local *ExtUtils::MM_Unix::static_lib;
-	*ExtUtils::MM_Unix::static_lib = sub {
-		$called++;
-		return "\n\ncalled static_lib\n\nline2\nline3\n\nline4";
-	};
+    # avoid "used only once"
+    local *ExtUtils::MM_Unix::static_lib;
+    *ExtUtils::MM_Unix::static_lib = sub {
+        $called++;
+        return "\n\ncalled static_lib\n\nline2\nline3\n\nline4";
+    };
 
-	my $args = bless(\%( IMPORTS => \%(), ), 'MM');
+    my $args = bless(\%( IMPORTS => \%(), ), 'MM');
 
-	# without IMPORTS as a populated hash, there will be no extra data
-	my $ret = ExtUtils::MM_OS2::static_lib( $args );
-	is( $called, 1, 'static_lib() should call parent method' );
-	like( $ret, qr/^called static_lib/m,
-		'... should return parent data unless IMPORTS exists' );
+    # without IMPORTS as a populated hash, there will be no extra data
+    my $ret = ExtUtils::MM_OS2::static_lib( $args );
+    is( $called, 1, 'static_lib() should call parent method' );
+    like( $ret, qr/^called static_lib/m,
+          '... should return parent data unless IMPORTS exists' );
 
-	$args->{IMPORTS} = \%( foo => 1);
-	$ret = ExtUtils::MM_OS2::static_lib( $args );
-	is( $called, 2, '... should call parent method if extra imports passed' );
-	like( $ret, qr/^called static_lib\n\t\$\(AR\) \$\(AR_STATIC_ARGS\)/m, 
-		'... should append make tags to first line from parent method' );
-	like( $ret, qr/\$@\n\n\nline2\nline3\n\nline4/m, 
-		'... should include remaining data from parent method' );
+    $args->{IMPORTS} = \%( foo => 1);
+    $ret = ExtUtils::MM_OS2::static_lib( $args );
+    is( $called, 2, '... should call parent method if extra imports passed' );
+    like( $ret, qr/^called static_lib\n\t\$\(AR\) \$\(AR_STATIC_ARGS\)/m, 
+          '... should append make tags to first line from parent method' );
+    like( $ret, qr/\$@\n\n\nline2\nline3\n\nline4/m, 
+          '... should include remaining data from parent method' );
 
-}
+};
 
 # replace_manpage_separator
 my $sep = '//a///b//c/de';
@@ -147,7 +147,7 @@ is( ExtUtils::MM_OS2->replace_manpage_separator($sep), '.a.b.c.de',
 	'replace_manpage_separator() should turn multiple slashes into periods' );
 
 # maybe_command
-{
+do {
 	local *DIR;
 	my ($dir, $noext, $exe, $cmd);
 	my $found = 0;
@@ -213,32 +213,33 @@ is( ExtUtils::MM_OS2->replace_manpage_separator($sep), '.a.b.c.de',
 		last if $found == 4;
 	}
 
-	SKIP: {
+	SKIP: do {
 		skip('No appropriate directory found', 1) unless defined $dir;
 		is( ExtUtils::MM_OS2->maybe_command( $dir ), undef, 
 			'maybe_command() should ignore directories' );
-	}
+	};
 
-	SKIP: {
-		skip('No non-exension command found', 1) unless defined $noext;
-		is( ExtUtils::MM_OS2->maybe_command( $noext ), $noext,
-			'maybe_command() should find executable lacking file extension' );
-	}
+      SKIP:
+        do {
+            skip('No non-exension command found', 1) unless defined $noext;
+            is( ExtUtils::MM_OS2->maybe_command( $noext ), $noext,
+                'maybe_command() should find executable lacking file extension' );
+        };
 
-	SKIP: {
-		skip('No .exe command found', 1) unless defined $exe;
-		(my $noexe = $exe) =~ s/\.exe\z//;
-		is( ExtUtils::MM_OS2->maybe_command( $noexe ), $exe,
-			'maybe_command() should find .exe file lacking extension' );
-	}
+      SKIP: do {
+            skip('No .exe command found', 1) unless defined $exe;
+            (my $noexe = $exe) =~ s/\.exe\z//;
+            is( ExtUtils::MM_OS2->maybe_command( $noexe ), $exe,
+                'maybe_command() should find .exe file lacking extension' );
+	};
 
-	SKIP: {
-		skip('No .cmd command found', 1) unless defined $cmd;
-		(my $nocmd = $cmd) =~ s/\.cmd\z//;
-		is( ExtUtils::MM_OS2->maybe_command( $nocmd ), $cmd,
-			'maybe_command() should find .cmd file lacking extension' );
-	}
-}
+      SKIP: do {
+            skip('No .cmd command found', 1) unless defined $cmd;
+            (my $nocmd = $cmd) =~ s/\.cmd\z//;
+            is( ExtUtils::MM_OS2->maybe_command( $nocmd ), $cmd,
+                'maybe_command() should find .cmd file lacking extension' );
+	};
+};
 
 # file_name_is_absolute
 ok( ExtUtils::MM_OS2->file_name_is_absolute( 's:/' ), 
@@ -255,7 +256,7 @@ $mm->init_linker;
 is( $mm->{PERL_ARCHIVE}, '$(PERL_INC)/libperl$(LIB_EXT)', 'PERL_ARCHIVE' );
 
 # PERL_ARCHIVE_AFTER
-{
+do {
 	my $aout = 0;
 	local *OS2::is_aout;
 	*OS2::is_aout = \$aout;
@@ -267,7 +268,7 @@ is( $mm->{PERL_ARCHIVE}, '$(PERL_INC)/libperl$(LIB_EXT)', 'PERL_ARCHIVE' );
 	is( $mm->{PERL_ARCHIVE_AFTER}, 
             '$(PERL_INC)/libperl_override$(LIB_EXT)', 
 		'... and has libperl_override if it is set' );
-}
+};
 
 # EXPORT_LIST
 is( $mm->{EXPORT_LIST}, '$(BASEEXT).def', 

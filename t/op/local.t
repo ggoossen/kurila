@@ -135,11 +135,11 @@ is($a, 'outer');
 do {
     package TH;
     sub TIEHASH { bless \%(), @_[0] }
-    sub STORE { print "# STORE [{dump::view(\@_)}]\n"; @_[0]->{@_[1]} = @_[2] }
-    sub FETCH { my $v = @_[0]->{@_[1]}; print "# FETCH [{dump::view(\@_)}=$v]\n"; $v }
-    sub EXISTS { print "# EXISTS [{dump::view(\@_)}]\n"; exists @_[0]->{@_[1]}; }
-    sub DELETE { print "# DELETE [{dump::view(\@_)}]\n"; delete @_[0]->{@_[1]}; }
-    sub CLEAR { print "# CLEAR [{dump::view(< @_)}]\n"; %{@_[0]} = %( () ); }
+    sub STORE { print "# STORE [$(dump::view(\@_))]\n"; @_[0]->{@_[1]} = @_[2] }
+    sub FETCH { my $v = @_[0]->{@_[1]}; print "# FETCH [$(dump::view(\@_))=$v]\n"; $v }
+    sub EXISTS { print "# EXISTS [$(dump::view(\@_))]\n"; exists @_[0]->{@_[1]}; }
+    sub DELETE { print "# DELETE [$(dump::view(\@_))]\n"; delete @_[0]->{@_[1]}; }
+    sub CLEAR { print "# CLEAR [$(dump::view(< @_))]\n"; %{@_[0]} = %( () ); }
     sub FIRSTKEY { print "# FIRSTKEY [$(join ' ',@_)]\n"; keys %{@_[0]}; each %{@_[0]} }
     sub NEXTKEY { print "# NEXTKEY [$(join ' ',@_)]\n"; each %{@_[0]} }
 };
@@ -196,9 +196,9 @@ is(%SIG{TERM}, undef);
 cmp_ok(%SIG{INT}, '\==', \&foo);
 cmp_ok($^WARN_HOOK, '\==', \&foo);
 do {
-    my $d = join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG);
+    my $d = join("\n", map { "$_=>$(dump::view(%SIG{$_}))" } sort keys %SIG);
     local %SIG = %( < %SIG );
-    is(join("\n", map { "$_=>{dump::view(%SIG{$_})}" } sort keys %SIG), $d);
+    is(join("\n", map { "$_=>$(dump::view(%SIG{$_}))" } sort keys %SIG), $d);
 };
 
 # and for %ENV

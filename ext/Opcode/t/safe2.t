@@ -56,7 +56,7 @@ $cpt->reval(q{
     print defined($main::bar)		? "not ok 5\n" : "ok 5\n";
     print defined($main::bar)		? "not ok 6\n" : "ok 6\n";
 });
-print $@ ? "not ok 7\n#{$@->message}" : "ok 7\n";
+print $@ ? "not ok 7\n#$($@->message)" : "ok 7\n";
 
 our $foo = "ok 8\n";
 our %bar = %(key => "ok 9\n");
@@ -82,7 +82,7 @@ $cpt->reval(q{
     %bar{new} = "ok 15\n";
     @glob = @(qw(ok 16));
 });
-print $@ ? "not ok 13\n#{$@->message}" : "ok 13\n";
+print $@ ? "not ok 13\n#$($@->message)" : "ok 13\n";
 $" = ' ';
 print $foo, %bar{new}, "$(join ' ',@glob)\n";
 
@@ -93,7 +93,7 @@ ${$cpt->varglob('foo')} = "ok 17";
 push(@Root::bar, "18"); # Two steps to prevent "Identifier used only once..."
 
 print "$Root::foo\n";
-print "$(join ' ',@$($cpt->varglob('bar')))\n";
+print join(' ',@{$cpt->varglob('bar')}) . "\n";
 
 use strict;
 

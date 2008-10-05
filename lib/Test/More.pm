@@ -510,7 +510,7 @@ sub isa_ok ($$;$) {
                 die <<WHOA;
 WHOA! I tried to call ->isa on your object and got some weird error.
 Here's the error.
-{$@->message}
+$($@->message)
 WHOA
             }
         }

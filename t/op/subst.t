@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 119 );
+plan( tests => 118 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -158,11 +158,11 @@ $x ne $x || s/bb/x/;
 ok( $_ eq 'aaaXXXXxb' );
 
 $_ = 'abc123xyz';
-s/(\d+)/{$1*2}/;              # yields 'abc246xyz'
+s/(\d+)/$($1*2)/;              # yields 'abc246xyz'
 ok( $_ eq 'abc246xyz' );
-s/(\d+)/{sprintf("\%5d",$1)}/; # yields 'abc  246xyz'
+s/(\d+)/$(sprintf("\%5d",$1))/; # yields 'abc  246xyz'
 ok( $_ eq 'abc  246xyz' );
-s/(\w)/{$1 x 2}/g;            # yields 'aabbcc  224466xxyyzz'
+s/(\w)/$($1 x 2)/g;            # yields 'aabbcc  224466xxyyzz'
 ok( $_ eq 'aabbcc  224466xxyyzz' );
 
 # test recursive substitutions
@@ -180,7 +180,7 @@ sub var {
 }
 sub exp_vars { 
     my($str,$level) = < @_;
-    $str =~ s/\$\((\w+)\)/{var($1, $level+1)}/g; # can recurse
+    $str =~ s/\$\((\w+)\)/$(var($1, $level+1))/g; # can recurse
     #warn "exp_vars $level = '$str'\n";
     $str;
 }
@@ -191,8 +191,8 @@ ok( exp_vars('$(DIR)',0)             eq '$(UNDEFINEDNAME)/xxx' );
 ok( exp_vars('foo $(DIR)/yyy bar',0) eq 'foo $(UNDEFINEDNAME)/xxx/yyy bar' );
 
 $_ = "abcd";
-s/(..)/{$x = $1; m#.#
-}/g;
+s/(..)/$( do { $x = $1; m#.#
+} )/g;
 ok( $x eq "cd", 'a match nested in the RHS of a substitution' );
 
 # Subst and lookbehind
@@ -304,17 +304,14 @@ $_ = 'aaaa';
 $snum = s/\ba/./g;
 ok( $_ eq '.aaa' && $snum == 1 );
 
-eval q% s/a/{ "b"}}/ %;
-like( $@->{description}, qr/Unmatched right curly bracket/ );
-
-eval q% ($_ = "x") =~ s/(.)/{"$1 "}/ %;
+eval q% ($_ = "x") =~ s/(.)/$("$1 ")/ %;
 ok( $_ eq "x " and !length $@ );
 $x = $x = 'interp';
-eval q% ($_ = "x") =~ s/x(($x)*)/{eval "$1"}/ %;
+eval q% ($_ = "x") =~ s/x(($x)*)/$(eval "$1")/ %;
 ok( $_ eq '' and !length $@ );
 
 $_ = "C:/";
-ok( !s/^([a-z]:)/{uc($1)}/ );
+ok( !s/^([a-z]:)/$(uc($1))/ );
 
 $_ = "Charles Bronson";
 $snum = s/\B\w//g;
@@ -373,7 +370,7 @@ do {
     is(length($a), 2, "SADAHIRO utf8 s///");
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/{"\x{FF}"}/;
+    $a =~ s/\x{101}/$("\x{FF}")/;
     like($a, qr/\x{FF}/);
     is(length($a), 2);
 
@@ -383,7 +380,7 @@ do {
     is(length($a), 4);
 
     $a = "\x{100}\x{101}";
-    $a =~ s/\x{101}/{"\x{FF}\x{FF}\x{FF}"}/;
+    $a =~ s/\x{101}/$("\x{FF}\x{FF}\x{FF}")/;
     like($a, qr/\x{FF}\x{FF}\x{FF}/);
     is(length($a), 4);
 
@@ -393,7 +390,7 @@ do {
     is(length($a), 2);
 
     $a = "\x{FF}\x{101}";
-    $a =~ s/\x{FF}/{"\x{100}"}/;
+    $a =~ s/\x{FF}/$("\x{100}")/;
     like($a, qr/\x{100}/);
     is(length($a), 2);
 
@@ -403,7 +400,7 @@ do {
     is(length($a), 1);
 
     $a = "\x{FF}";
-    $a =~ s/\x{FF}/{"\x{100}"}/;
+    $a =~ s/\x{FF}/$("\x{100}")/;
     like($a, qr/\x{100}/);
     is(length($a), 1);
 };
@@ -462,7 +459,7 @@ is("<$_> <$s>", "<> <4>", "[perl #7806]");
 do {
     local $^W = 0;
     $_="abcdef\n";
-    s!.!{''}!g;
+    s!.!$('')!g;
     is($_, "\n", "[perl #19048]");
 };
 
@@ -477,18 +474,18 @@ do {
 
 # [perl #20684] returned a zero count
 $_ = "1111";
-is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
+is(s/(??{1})/$(2)/g, 4, '#20684 s/// with (??{..}) inside');
 
 # [perl #20682] $^N not visible in replacement
 $_ = "abc";
-m/(a)/; s/(b)|(c)/-{$^N}/g;
-is($_,'a-b-c','#20682 $^N not visible in replacement');
+m/(a)/; s/(b)|(c)/-$($^N)/g;
+is($_,'a-b-c','# TODO #20682 $^N not visible in replacement');
 
 # [perl #22351] perl bug with 'e' substitution modifier
 my $name = "chris";
 do {
     no warnings 'uninitialized';
-    $name =~ s/hr/{''}/;
+    $name =~ s/hr/$('')/;
 };
 is($name, "cis", q[#22351 bug with 'e' substitution modifier]);
 

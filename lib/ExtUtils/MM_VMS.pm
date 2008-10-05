@@ -1323,7 +1323,7 @@ $(PERL_ARCHLIB)Config.pm : $(PERL_SRC)config.sh
 ]);
     }
 
-    push(@m, join(" ", map( <$self->fixpath($_,0),values %$($self->{XS})))." : \$(XSUBPPDEPS)\n")
+    push(@m, join(" ", map( <$self->fixpath($_,0),values %{$self->{XS}}))." : \$(XSUBPPDEPS)\n")
       if %{$self->{XS}};
 
     join('', @m);

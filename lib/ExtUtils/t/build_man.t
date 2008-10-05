@@ -43,7 +43,7 @@ my $stdout;
 close STDOUT;
 open STDOUT, '>>', \$stdout  or die;
 
-{
+do {
     local %Config{installman3dir} = File::Spec->catdir( <qw(t lib));
 
     my $mm = WriteMakefile(
@@ -52,9 +52,9 @@ open STDOUT, '>>', \$stdout  or die;
     );
 
     ok( %{ $mm->{MAN3PODS} } );
-}
+};
 
-{
+do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -62,10 +62,10 @@ open STDOUT, '>>', \$stdout  or die;
     );
 
     ok( !%{ $mm->{MAN3PODS} } );
-}
+};
 
 
-{
+do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -73,10 +73,10 @@ open STDOUT, '>>', \$stdout  or die;
     );
 
     is_deeply( $mm->{MAN3PODS}, \%( ) );
-}
+};
 
 
-{
+do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -84,4 +84,4 @@ open STDOUT, '>>', \$stdout  or die;
     );
 
     is_deeply( $mm->{MAN3PODS}, \%( "Foo.pm" => "Foo.1" ) );
-}
+};

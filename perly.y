@@ -245,12 +245,17 @@ sideff	:	error
 			}
 	|	expr WHILE expr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, LOCATION($2));
+                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, FALSE, LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'w');
+			}
+	|	block WHILE expr
+                        {
+                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, TRUE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
 	|	expr UNTIL iexpr
 			{ 
-                            $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, LOCATION($2));
+                            $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
 	|	expr FOR expr
@@ -944,15 +949,16 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 	|	DO block %prec '('               /* do { code */
                         {
                             $$ = newSTATEOP(0, NULL,
-                                newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                    LOCATION($1), (OP*)NULL, $2, NULL, 0),
+                                scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+                                        LOCATION($1), (OP*)NULL, $2, NULL, 0)),
                                 LOCATION($1));
+                            $$ = scope($$);
                         }
 	|	LABEL DO block %prec '('               /* do { code */
                         {
                             $$ = newSTATEOP(0, PVAL($1),
-                                newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                    LOCATION($2), (OP*)NULL, $3, NULL, 0),
+                                scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+                                        LOCATION($2), (OP*)NULL, $3, NULL, 0)),
                                 LOCATION($2));
                             TOKEN_GETMAD($1,$$,'L');
 			}

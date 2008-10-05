@@ -283,7 +283,7 @@ firstmodule:
     $_ = $line;
     if (m/^=/) {
       my $podstartline = iohandle::input_line_number($FH);
-      do {
+      {
         $_ = $line;
 	if (m/^=cut\s*$/) {
 	  # We can't just write out a /* */ comment, as our embedded
@@ -1085,7 +1085,7 @@ sub check_keyword {
 
 sub print_section {
     # the "do" is required for right semantics
-    do { $_ = shift(@line) } while !m/\S/ && nelems @line;
+    { $_ = shift(@line) } while !m/\S/ && nelems @line;
 
     print("#line ", @line_no[(nelems @line_no) - (nelems @line) -1], " \"$filepathname\"\n")
 	if $WantLineNumbers && !m/^\s*#\s*line\b/ && !m/^#if XSubPPtmp/;

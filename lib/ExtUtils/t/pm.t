@@ -37,7 +37,7 @@ my $stdout = '';
 close STDOUT;
 open STDOUT, '>>', \$stdout or die;
 
-{
+do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -45,4 +45,4 @@ open STDOUT, '>>', \$stdout or die;
     );
 
     is_deeply( $mm->{PM},  \%( wibble => 'woof' ) );
-}
+};

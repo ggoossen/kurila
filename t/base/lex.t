@@ -78,19 +78,18 @@ ok 18
 # previous line intentionally left blank.
 
 print <<E1 eq "foo\n\n" ? "ok 19\n" : "not ok 19\n";
-{join ' ',@{\@( <<E2 )}
+$( <<E2
 foo
 E2
-}
+)
 E1
 
 print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
-{join ' ',@{\@(
+$(
   <<E2
 foo
 E2
-)}
-}
+)
 E1
 
 do {
@@ -119,7 +118,7 @@ print "a1" !~ m/^@X[-1]$/ ? "ok 28\n" : "not ok 28\n";
 print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ? "ok 29\n" : "not ok 29\n");
 
 $foo = "not ok 30\n";
-$foo =~ s/^not /{substr(<<EOF, 0, 0)}/;
+$foo =~ s/^not /$(substr(<<EOF, 0, 0))/;
   Ignored
 EOF
 print $foo;
@@ -225,7 +224,7 @@ EOT
 do {
   my $test = 47;
   our (@nosuch, @a, @example);
-  eval(q(">{join ' ', < @nosuch}<" eq "><")) || print "# $@", "not ";
+  eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
 
@@ -236,7 +235,7 @@ do {
   ++$test;
 
   # Ditto.
-  eval(q{@nosuch = @('a', 'b', 'c'); ">{join ' ', @nosuch}<" eq ">a b c<"}) 
+  eval(q{@nosuch = @('a', 'b', 'c'); ">$(join ' ', @nosuch)<" eq ">a b c<"}) 
       || print "# $@", "not ";
   print "ok $test\n";
   ++$test;
@@ -247,7 +246,7 @@ do {
     *R::crackers = \@array;
   }
 
-  eval(q{makearray(); ">{join ' ', @R::crackers}<" eq ">fish dog carrot<"})
+  eval(q{makearray(); ">$(join ' ', @R::crackers)<" eq ">fish dog carrot<"})
     || print "# $@", "not ";
   print "ok $test\n";
   ++$test;

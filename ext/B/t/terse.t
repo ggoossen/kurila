@@ -8,9 +8,9 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 16;
+use Test::More tests => 15;
 
-use_ok( 'B::Terse' );
+use B::Terse;
 
 # indent should return a string indented four spaces times the argument
 is( B::Terse::indent(2), ' ' x 8, 'indent with an argument' );

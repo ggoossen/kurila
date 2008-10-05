@@ -1990,7 +1990,7 @@ S_scan_const(pTHX_ char *start)
 
 	/* embedded code */
 	if ( (*s == '{' || *s == '}') && ! in_pat) {
-	    Perl_croak(aTHX_ "{ in string is obsolete");
+	    yyerror("{ in string is obsolete");
 	}
 
 	/* End of else if chain - OP_TRANS rejoin rest */

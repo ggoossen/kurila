@@ -122,7 +122,7 @@ my %Install_Vars = %(
 );
 
 while( my($type, $vars) = each %Install_Vars) {
-    SKIP: {
+    SKIP: do {
         skip "VMS must expand macros in INSTALL* vars", scalar nelems @$vars 
           if $Is_VMS;    
         skip '$Config{usevendorprefix} not set', scalar nelems @$vars
@@ -132,7 +132,7 @@ while( my($type, $vars) = each %Install_Vars) {
             my $installvar = "install$var";
             my $prefix = '$('.$type.'PREFIX)';
 
-            SKIP: {
+          SKIP: do {
                 skip uc($installvar).' set to another INSTALL variable', 1
                   if $mm->{uc $installvar} =~ m/^\$\(INSTALL.*\)$/;
 
@@ -142,14 +142,14 @@ while( my($type, $vars) = each %Install_Vars) {
                                     !%Config{$installvar};
                 like( $mm->{uc $installvar}, qr/^\Q$prefix\E/, 
                       "$prefix + $var" );
-            }
+            };
         }
-    }
+    };
 }
 
 # Check that when installman*dir isn't set in Config no man pages
 # are generated.
-{
+do {
     _set_config(installman1dir => '');
     _set_config(installman3dir => '');
 
@@ -165,11 +165,11 @@ while( my($type, $vars) = each %Install_Vars) {
 
     is( $mm->{INSTALLMAN1DIR}, $wibble );
     is( $mm->{INSTALLMAN3DIR}, 'none'  );
-}
+};
 
 # Check that when installvendorman*dir is set in Config it is honored
 # [rt.cpan.org 2949]
-{
+do {
     _set_config(installvendorman1dir => File::Spec->catdir('foo','bar') );
     _set_config(installvendorman3dir => '' );
     _set_config(usevendorprefix => 1 );
@@ -190,11 +190,11 @@ while( my($type, $vars) = each %Install_Vars) {
                       'installvendorman1dir (in %Config) not modified' );
     isnt( $mm->{INSTALLVENDORMAN3DIR}, '', 
                       'installvendorman3dir (not in %Config) set'  );
-}
+};
 
 # Check that when installsiteman*dir isn't set in Config it falls back
 # to installman*dir
-{
+do {
     _set_config(installman1dir => File::Spec->catdir('foo', 'bar') );
     _set_config(installman3dir => File::Spec->catdir('foo', 'baz') );
     _set_config(installsiteman1dir => '' );
@@ -213,20 +213,20 @@ while( my($type, $vars) = each %Install_Vars) {
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
     is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') );
-    SKIP: {
+  SKIP: do {
         skip "VMS must expand macros in INSTALL* vars", 4 if $Is_VMS;
 
         is( $mm->{INSTALLSITEMAN1DIR},   '$(INSTALLMAN1DIR)' );
         is( $mm->{INSTALLSITEMAN3DIR},   '$(INSTALLMAN3DIR)' );
         is( $mm->{INSTALLVENDORMAN1DIR}, '$(INSTALLMAN1DIR)' );
         is( $mm->{INSTALLVENDORMAN3DIR}, '$(INSTALLMAN3DIR)' );
-    }
-}
+    };
+};
 
 
 # Check that when usevendoprefix and installvendorman*dir aren't set in 
 # Config it leaves them unset.
-{
+do {
     _set_config(installman1dir => File::Spec->catdir('foo', 'bar') );
     _set_config(installman3dir => File::Spec->catdir('foo', 'baz') );
     _set_config(installsiteman1dir => '' );
@@ -245,14 +245,14 @@ while( my($type, $vars) = each %Install_Vars) {
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
     is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') );
-    SKIP: {
+  SKIP: do {
         skip "VMS must expand macros in INSTALL* vars", 2 if $Is_VMS;
         is( $mm->{INSTALLSITEMAN1DIR},   '$(INSTALLMAN1DIR)' );
         is( $mm->{INSTALLSITEMAN3DIR},   '$(INSTALLMAN3DIR)' );
-    }
+    };
     is( $mm->{INSTALLVENDORMAN1DIR}, '' );
     is( $mm->{INSTALLVENDORMAN3DIR}, '' );
-}
+};
 
 
 sub _set_config {

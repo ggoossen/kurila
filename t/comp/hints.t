@@ -101,7 +101,7 @@ do {
             %^H{y} = 1;
         );
         if ($@) {
-            print "not ok\n{$@->message}\n";
+            print "not ok\n$($@->message)\n";
         }
     }
 };

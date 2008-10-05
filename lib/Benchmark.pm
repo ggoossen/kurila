@@ -648,7 +648,7 @@ sub runloop {
 	$subcode = "sub \{ for (1 .. $n) \{ package $pack; $c;\} \}";
         $subref  = _doeval($subcode);
     }
-    die "runloop unable to compile '$c': {$@->message}\ncode: $subcode\n" if $@;
+    die "runloop unable to compile '$c': $($@->message)\ncode: $subcode\n" if $@;
     print STDERR "runloop $n '$subcode'\n" if $Debug;
 
     # Wait for the user timer to tick.  This makes the error range more like 
