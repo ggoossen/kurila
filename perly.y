@@ -228,13 +228,14 @@ line	:	label cond
 			}
 	|	label sideff ';'
 			{
+                            SV* loc = $2 ? $2->op_location : LOCATION($3);
                             if (PVAL($1)) {
                                 $$ = newSTATEOP(0, PVAL($1),
                                     newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        $2->op_location, (OP*)NULL, $2, NULL, 0), $2 ? $2->op_location : LOCATION($3));
+                                        loc, (OP*)NULL, $2, NULL, 0), loc);
                             } 
                             else {
-                                $$ = newSTATEOP(0, NULL, $2, $2 ? $2->op_location : LOCATION($3));
+                                $$ = newSTATEOP(0, NULL, $2, loc);
                             }
                             PL_parser->expect = XSTATE;
                             TOKEN_GETMAD($1,$$,'L');
