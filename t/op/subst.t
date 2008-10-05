@@ -481,7 +481,7 @@ is(s/(??{1})/{2}/g, 4, '#20684 s/// with (??{..}) inside');
 
 # [perl #20682] $^N not visible in replacement
 $_ = "abc";
-m/(a)/; s/(b)|(c)/-$($^N)/g;
+m/(a)/; s/(b)|(c)/-{$^N}/g;
 is($_,'a-b-c','#20682 $^N not visible in replacement');
 
 # [perl #22351] perl bug with 'e' substitution modifier
@@ -510,6 +510,6 @@ do {
     s/(((((((((x)))))))))(y)/${*{Symbol::fetch_glob(10)}}/;
     is($_,"y","RT#6006: \$_ eq '$_'");
     $_ = "xr";
-    s/(((((((((x)))))))))(r)/fooba$$(*$(Symbol::fetch_glob(10)))/;
+    s/(((((((((x)))))))))(r)/fooba${*{Symbol::fetch_glob(10)}}/;
     is($_,"foobar","RT#6006: \$_ eq '$_'");
 };

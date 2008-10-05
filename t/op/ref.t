@@ -170,7 +170,7 @@ $string = "good";
 $main::anonhash2 = "foo";
 $string = "";
 
-DESTROY {
+sub DESTROY {
     return unless $string;
     main::is ($string, 'good');
 
@@ -423,7 +423,7 @@ do {
     1;					# flush any temp values on stack
 };
 
-DESTROY {
+sub DESTROY {
     print @_[0]->[0];
 }
 
