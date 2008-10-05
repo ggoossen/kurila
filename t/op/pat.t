@@ -1960,7 +1960,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
 	    my $s = $char . "f" x $len;
 	    my $r = $s =~ m/$char([f]*)/gc;
             ok($r, " # TODO <$type x $len>");
-	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $(join ' ',@$(\@( pos($s) )))");
+	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $( pos($s) )");
 	}
     }
 } else {
@@ -2540,14 +2540,14 @@ do {
         my $w="";
         local $^WARN_HOOK = sub { $w.=shift->message };
         eval($code=<<'EOFTEST') or die "$@\n$code\n";
-        {
+        do {
             use warnings;
             
             #1234
             ok("\0" !~ m/[\N{EMPTY-STR}XY]/,
                 "Zerolength charname in charclass doesnt match \0");
             1;
-        }
+        };
 EOFTEST
         ok($w=~m/Zero length.*replacement character/,
             "Got expected zero length warning");

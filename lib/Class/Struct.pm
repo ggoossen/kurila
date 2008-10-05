@@ -74,7 +74,7 @@ sub struct {
     my $got_class = 0;
     my $out = '';
 
-    $out = "\{\n  package $class;\n  sub new \{\n";
+    $out = "do \{\n  package $class;\n  sub new \{\n";
     $out .= "    my (\$class, < \%init) = < \@_;\n";
     $out .= "    \$class = __PACKAGE__ unless \@_;\n";
 
@@ -144,7 +144,7 @@ sub struct {
     my( $pre, $pst, $sel );
     $cnt = 0;
     foreach my $name ( @methods){
-        if ( do { no strict 'refs'; defined &{Symbol::fetch_glob($class . "::$name")} } ) {
+        if ( defined &{Symbol::fetch_glob($class . "::$name")} ) {
             warnings::warnif("function '$name' already defined, overrides struct accessor method");
         }
         else {
@@ -182,7 +182,7 @@ sub struct {
             $out .= "  \}\n";
         }
     }
-    $out .= "\}\n1;\n";
+    $out .= "\};\n1;\n";
 
     print $out if $print;
     my $result = eval $out;

@@ -195,7 +195,7 @@ sub eval_in_x {
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: {$@->message}";
+        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message)";
     }
 }
 
@@ -546,7 +546,7 @@ END
 # This Makefile is for the $self->{NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# {dump::view($VERSION)} (Revision: $Revision) from the contents of
+# $(dump::view($VERSION)) (Revision: $Revision) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -605,7 +605,7 @@ END
         $self->eval_in_subdirs if (nelems @{$self->{DIR}});
     }
 
-    foreach my $section (  @MM_Sections ){
+    foreach my $section (  @MM_Sections ) {
         # Support for new foo_target() methods.
         my $method = $section;
         $method .= '_target' unless $self->can($method);
@@ -685,10 +685,10 @@ sub parse_args{
         my($name, $value) = ($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
-                [{$1 ?
-                 ((getpwnam($1))[[7]] || "~$1") :
-                 (getpwuid($>))[[7]]
-                 }]x;
+                [$($1 ?
+                   ((getpwnam($1))[[7]] || "~$1") :
+                   (getpwuid($>))[[7]]
+                 )]x;
         }
 
         # Remember the original args passed it.  It will be useful later.

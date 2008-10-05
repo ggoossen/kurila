@@ -202,44 +202,27 @@ lineseq	:	/* NULL */
 	;
 
 /* A "line" in the program */
-line	:	label cond
+line	:	cond
                         {
-                            $$ = newSTATEOP(0, PVAL($1), $2, $2->op_location);
-                            TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
+                            $$ = newSTATEOP(0, NULL, $1, $1->op_location);
+                        }
 	|	loop	/* loops add their own labels */
 			{ $$ = $1; }
-	|	label ';'
-			{
-			  if (PVAL($1)) {
-			      $$ = newSTATEOP(0, PVAL($1), newOP(OP_NULL, 0, LOCATION($2)), LOCATION($2));
-			      TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L');
-			      TOKEN_GETMAD($2,((LISTOP*)$$)->op_first,';');
-			  }
-			  else {
-			      $$ = IF_MAD(
-                                  newOP(OP_NULL, 0, LOCATION($2)),
-					(OP*)NULL);
-                              PL_parser->copline = NOLINE;
-			      TOKEN_FREE($1);
-			      TOKEN_GETMAD($2,$$,';');
-			      APPEND_MADPROPS_PV("nullstatement",$$,'>');
-			  }
-			  PL_parser->expect = XSTATE;
-			}
-	|	label sideff ';'
-			{
-                            SV* loc = $2 ? $2->op_location : LOCATION($3);
-                            if (PVAL($1)) {
-                                $$ = newSTATEOP(0, PVAL($1),
-                                    newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        loc, (OP*)NULL, $2, NULL, 0), loc);
-                            } 
-                            else {
-                                $$ = newSTATEOP(0, NULL, $2, loc);
-                            }
+        |       ';'
+                        {
+                            $$ = IF_MAD( newOP(OP_NULL, 0, LOCATION($1)),
+                                    (OP*)NULL);
+                            PL_parser->copline = NOLINE;
+                            TOKEN_GETMAD($1,$$,';');
+                            APPEND_MADPROPS_PV("nullstatement",$$,'>');
                             PL_parser->expect = XSTATE;
-                            TOKEN_GETMAD($1,$$,'L');
-                            TOKEN_GETMAD($3,$$,';');
+                        }
+	|	sideff ';'
+			{
+                            SV* loc = $1 ? $1->op_location : LOCATION($2);
+                            $$ = newSTATEOP(0, NULL, $1, loc);
+                            PL_parser->expect = XSTATE;
+                            TOKEN_GETMAD($2,$$,';');
                         }
 	;
 
@@ -960,9 +943,18 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 			}
 	|	DO block %prec '('               /* do { code */
                         {
-                            $$ = newUNOP(OP_NULL, OPf_SPECIAL, scope($2), LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'D');
-                            APPEND_MADPROPS_PV("do",$$,'>');
+                            $$ = newSTATEOP(0, NULL,
+                                newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+                                    LOCATION($1), (OP*)NULL, $2, NULL, 0),
+                                LOCATION($1));
+                        }
+	|	LABEL DO block %prec '('               /* do { code */
+                        {
+                            $$ = newSTATEOP(0, PVAL($1),
+                                newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+                                    LOCATION($2), (OP*)NULL, $3, NULL, 0),
+                                LOCATION($2));
+                            TOKEN_GETMAD($1,$$,'L');
 			}
         ;
 

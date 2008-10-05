@@ -48,7 +48,7 @@ if (open(TCOUT, ">", "tcout")) {
 my $path = join '', Term::Cap::termcap_path();
 is( $path, $files, 'termcap_path() should find default files' );
 
-SKIP: {
+SKIP: do {
 	# this is ugly, but -f $0 really *ought* to work
 	skip("-f $file fails, some tests difficult now", 2) unless -f $file;
 
@@ -59,7 +59,7 @@ SKIP: {
 	%ENV{TERMCAP} = '/';
 	ok( grep($file, Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMPATH}' );
-}
+};
 
 # make a Term::Cap "object"
 my $t = \%(
@@ -115,7 +115,7 @@ is( $warn, '', 'Tgetent() should not work if OSPEED is provided' );
 is( $vals->{PADDING}, 200, 'Tgetent() should set slow PADDING when needed' );
 
 
-SKIP: {
+SKIP: do {
         skip('Tgetent() bad termcap test, since using a fixed termcap',1)
               if $^O eq 'VMS';
         # now see if lines 177 or 180 will fail
@@ -124,9 +124,9 @@ SKIP: {
         %ENV{TERMCAP} = '';
         try { $t = Term::Cap->Tgetent($vals) };
         isnt( $@, '', 'Tgetent() should catch bad termcap file' );
-}
+};
 
-SKIP: {
+SKIP: do {
 	skip( "Can't write 'tcout' file for tests", 9 ) unless $writable;
 
 	# it won't find the termtype in this fake file, so it should croak
@@ -155,11 +155,11 @@ SKIP: {
 	# and it should have set these two fields
 	is( $t->{_pc}, "\0", 'should set _pc field correctly' );
 	is( $t->{_bc}, "\b", 'should set _bc field correctly' );
-}
+};
 
 # Windows hack
 SKIP:
-{
+do {
    skip("QNX's termcap database does not contain an entry for dumb terminals",
         1) if $^O eq 'nto';
 
@@ -170,7 +170,7 @@ SKIP:
 
    my $foo = Term::Cap->Tgetent();
    is($foo->{TERM} ,'dumb','Windows gets "dumb" by default');
-}
+};
 
 # Tgoto has comments on the expected formats
 $t->{_test} = "a\%d";

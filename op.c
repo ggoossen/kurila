@@ -4602,6 +4602,8 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 	}
     }
 
+    CvSPECIAL_on(cv);
+
     switch(key) {
     case KEY_BEGIN:
     {
@@ -4745,9 +4747,7 @@ CV *
 Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 {
     dVAR;
-    GV * const gv = gv_fetchpv(name ? name :
-			(PL_curstash ? "__ANON__" : "__ANON__::__ANON__"),
-			GV_ADDMULTI, SVt_PVCV);
+    GV * const gv = name ? gv_fetchpv(name, GV_ADDMULTI, SVt_PVCV) : NULL;
     register CV *cv;
 
     PERL_ARGS_ASSERT_NEWXS;
@@ -4755,36 +4755,27 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
     if (!subaddr)
 	Perl_croak(aTHX_ "panic: no address for '%s' in '%s'", name, filename);
 
-    if ((cv = (name ? GvCV(gv) : NULL))) {
-	if (GvCVGEN(gv)) {
-	    /* just a cached method */
-	    SvREFCNT_dec(cv);
-	    cv = NULL;
-	}
-	else if (CvROOT(cv) || CvXSUB(cv) || GvASSUMECV(gv)) {
-	    /* already defined (or promised) */
-	    /* XXX It's possible for this HvNAME_get to return null, and get passed into strEQ */
+    if (gv) {
+	if (GvCV(gv)) {
 	    if (ckWARN(WARN_REDEFINE)) {
 		Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
-		    CvCONST(cv) ? "Constant subroutine %s redefined"
-		    : "Subroutine %s redefined"
-		    ,name);
+		    CvCONST(GvCV(gv))
+		    ? "Constant subroutine %s redefined"
+		    : "Subroutine %s redefined",
+		    name);
 	    }
-	    SvREFCNT_dec(cv);
-	    cv = NULL;
+	    SvREFCNT_dec(GvCV(gv));
 	}
     }
 
-    if (cv)				/* must reuse cv if autoloaded */
-	cv_undef(cv);
-    else {
-	cv = (CV*)newSV_type(SVt_PVCV);
-	if (name) {
-	    GvCV(gv) = cv;
-	    GvCVGEN(gv) = 0;
-            mro_method_changed_in(GvSTASH(gv)); /* newXS */
-	}
+    cv = (CV*)newSV_type(SVt_PVCV);
+
+    if (gv) {
+	GvCV(gv) = SvREFCNT_inc(cv);
+	GvCVGEN(gv) = 0;
+	mro_method_changed_in(GvSTASH(gv)); /* newXS */
     }
+
     CvISXSUB_on(cv);
     CvXSUB(cv) = subaddr;
 

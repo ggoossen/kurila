@@ -157,7 +157,7 @@ sub import {
     no strict 'refs';
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
-	die qq{"$func" is not exported by the {__PACKAGE__} module\n}
+	die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
              unless %%Export_Cache{$func};
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
@@ -456,7 +456,7 @@ my $summary_expanded;
 
 sub myconfig {
     return $summary_expanded if $summary_expanded;
-    ($summary_expanded = $summary) =~ s!\$(\w+)!{ my $c = %Config::Config{$1}; defined($c) ? $c : 'undef' }!g;
+    ($summary_expanded = $summary) =~ s!\$(\w+)!$( do { my $c = %Config::Config{$1}; defined($c) ? $c : 'undef' } )!g;
     $summary_expanded;
 }
 
@@ -624,7 +624,7 @@ sub config_vars {
 	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';
 	    $v = 'undef' unless defined $v;
-	    print "{$prfx}'{$v}'$lnend";
+	    print "$($prfx)'$($v)'$lnend";
 	}
     }
 }

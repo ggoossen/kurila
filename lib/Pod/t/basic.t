@@ -91,7 +91,7 @@ for my $translator (sort keys %translators) {
         rename ('out.tmp', "out.%translators{$translator}")
             or die "Cannot rename out.tmp: $!\n";
     }
-    {
+    do {
         local $/;
         open (MASTER, "<", source_path ("basic.%translators{$translator}"))
             or die "Cannot open basic.%translators{$translator}: $!\n";
@@ -115,6 +115,6 @@ for my $translator (sort keys %translators) {
             print "not ok $n\n";
             print "# Non-matching output left in out.%translators{$translator}\n";
         }
-    }
+    };
     $n++;
 }

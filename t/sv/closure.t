@@ -257,7 +257,7 @@ END_MARK_TWO
     print "not ok: got unexpected warning \$msg\\n";
 \} \}
 
-\{
+do \{
     my \$test = $test;
     sub test (&) \{
       my \$ok = &\{\@_[0]\};
@@ -265,7 +265,7 @@ END_MARK_TWO
       printf "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;
     \}
-\}
+\};
 
 # some of the variables which the closure will access
 our \$global_scalar = 1000;

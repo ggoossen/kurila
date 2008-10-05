@@ -194,7 +194,7 @@ package main;
 
 do {
     my $w = 0;
-    local %SIG{__WARN__} = sub { $w++ };
+    local %^WARN_HOOK = sub { $w++ };
     
     B9->_mk_obj();
     # used tp emit a warning that pseudohashes are deprecated, because

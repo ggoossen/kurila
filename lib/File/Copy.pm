@@ -187,21 +187,27 @@ sub copy {
 
     # All of these contortions try to preserve error messages...
   fail_inner:
-    if ($closeto) {
-	$status = $!;
-	$! = 0;
-       close $to_h;
-	$! = $status unless $!;
-    }
+    do {
+        if ($closeto) {
+            $status = $!;
+            $! = 0;
+            close $to_h;
+            $! = $status unless $!;
+        }
+    };
   fail_open2:
-    if ($closefrom) {
-	$status = $!;
-	$! = 0;
-       close $from_h;
-	$! = $status unless $!;
-    }
+    do {
+        if ($closefrom) {
+            $status = $!;
+            $! = 0;
+            close $from_h;
+            $! = $status unless $!;
+        }
+    };
   fail_open1:
-    return 0;
+    do {
+        return 0;
+    };
 }
 
 sub move {

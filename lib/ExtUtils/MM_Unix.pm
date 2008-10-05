@@ -2718,7 +2718,7 @@ sub parse_version {
         if (ref $result) {
             $result = $result->stringify;
         }
-        warn "Could not eval '$eval' in $parsefile: {$@->message}" if $@;
+        warn "Could not eval '$eval' in $parsefile: $($@->message)" if $@;
         last;
     }
     close $fh;

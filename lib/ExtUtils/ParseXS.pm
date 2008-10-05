@@ -277,8 +277,8 @@ EOM
   print("#line 1 \"$filepathname\"\n")
     if $WantLineNumbers;
 
-  firstmodule:
   my $line;
+firstmodule:
   while ($line = ~< $FH) {
     $_ = $line;
     if (m/^=/) {
@@ -1726,7 +1726,7 @@ sub death
 sub evalqq {
     my $x = shift;
     my $ex = eval qq/"$x"/;
-    die "error in '$x': {$@->message}" if $@;
+    die "error in '$x': $($@->message)" if $@;
     return $ex;
 }
 

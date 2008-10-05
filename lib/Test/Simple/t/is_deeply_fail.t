@@ -298,7 +298,7 @@ ERR
 
 
 # rt.cpan.org 8865
-{
+do {
     my $array = \@();
     my $hash  = \%();
 
@@ -324,12 +324,12 @@ ERRHEAD
 #     ${$expected->[0]} = %(HASH (TODO))
 ERR
 
-}
+};
 
 
 # rt.cpan.org 14746
-{
-  TODO: {
+do {
+  TODO: do {
         $TB->todo_skip("different subs", 2);
         last TODO;
 
@@ -342,13 +342,13 @@ ERR
 #          \\\$got = CODE\\(0x[0-9a-f]+\\)
 #     \\\$expected = CODE\\(0x[0-9a-f]+\\)
 ERR
-    }
+    };
 
     use Symbol;
     my $glob1 = gensym;
     my $glob2 = gensym;
 
-  TODO: {
+  TODO: do {
         $TB->todo_skip("different subs", 2);
         last TODO;
 #line 357
@@ -361,5 +361,5 @@ ERR
 #     \\\$expected = GLOB\\(0x[0-9a-f]+\\)
 ERR
 
-    }
-}
+    };
+};

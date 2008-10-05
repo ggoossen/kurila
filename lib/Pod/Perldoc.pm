@@ -103,7 +103,7 @@ sub opt_M_with { # specify formatter class name(s)
   
   DEBUG +> 3 and print(
     "Adding $(join ' ',@classes_to_add) to the list of formatter classes, "
-    . "making them $(join ' ',@$( $self->{'formatter_classes'} )).\n"
+    . "making them $(join ' ',@{ $self->{'formatter_classes'} }).\n"
   );
   
   return;
@@ -185,7 +185,7 @@ sub run {  # to be called by the "perldoc" executable
     my @x = @_;
     while((nelems @x)) {
       @x[1] = '<undef>'  unless defined @x[1];
-      @x[1] = "$(join ' ',@$(@x[1]))" if ref( @x[1] ) eq 'ARRAY';
+      @x[1] = "$(join ' ',@{@x[1]})" if ref( @x[1] ) eq 'ARRAY';
       print "  [@x[0]] => [@x[1]]\n";
       splice @x,0,2;
     }
@@ -380,13 +380,13 @@ sub process {
 
     my $self = shift;
     DEBUG +> 1 and print "  Beginning process.\n";
-    DEBUG +> 1 and print "  Args: $(join ' ',@$($self->{'args'}))\n\n";
+    DEBUG +> 1 and print "  Args: $(join ' ',@{$self->{'args'}})\n\n";
     if(DEBUG +> 3) {
         print "Object contents:\n";
         my @x = %$self;
         while((nelems @x)) {
             @x[1] = '<undef>'  unless defined @x[1];
-            @x[1] = "$(join ' ',@$(@x[1]))" if ref( @x[1] ) eq 'ARRAY';
+            @x[1] = join ' ',@{@x[1]} if ref( @x[1] ) eq 'ARRAY';
             print "  [@x[0]] => [@x[1]]\n";
             splice @x,0,2;
         }
@@ -604,19 +604,19 @@ sub options_reading {
       unshift @{ $self->{'args'} }, <
         Text::ParseWords::shellwords( %ENV{"PERLDOC"} )
       ;
-      DEBUG +> 1 and print "  Args now: $(join ' ',@$($self->{'args'}))\n\n";
+      DEBUG +> 1 and print "  Args now: $(join ' ',@{$self->{'args'}})\n\n";
     } else {
       DEBUG +> 1 and print "  Okay, no PERLDOC setting in ENV.\n";
     }
 
     DEBUG +> 1
-     and print "  Args right before switch processing: $(join ' ',@$($self->{'args'}))\n";
+     and print "  Args right before switch processing: $(join ' ',@{$self->{'args'}})\n";
 
     Pod::Perldoc::GetOptsOO::getopts( $self, $self->{'args'}, 'YES' )
      or return $self->usage;
 
     DEBUG +> 1
-     and print "  Args after switch processing: $(join ' ',@$($self->{'args'}))\n";
+     and print "  Args after switch processing: $(join ' ',@{$self->{'args'}})\n";
 
     return $self->usage if $self->opt_h;
   

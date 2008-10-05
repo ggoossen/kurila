@@ -26,15 +26,15 @@ main::is( $Has::Version::VERSION, 42 );
 package main;
 
 my $eval1 = q{
-  {
+  do {
     package Eval1;
-    {
+    do {
       package Eval2;
       use base 'Eval1';
       $Eval2::VERSION = "1.02";
-    }
+    };
     $Eval1::VERSION = "1.01";
-  }
+  };
 };
 
 eval $eval1;

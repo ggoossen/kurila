@@ -37,9 +37,9 @@ open my $new_fh, '>>', \$new_out or die;
 $Test->output($new_fh);
 $Test->todo_output($new_fh);
 
-SKIP: {
+SKIP: do {
     $Test->skip( 'just testing skip' );
-}
+};
 push @Expected_Details, \%( 'ok'      => 1,
                           actual_ok => 1,
                           name      => '',
@@ -47,7 +47,7 @@ push @Expected_Details, \%( 'ok'      => 1,
                           reason    => 'just testing skip',
                         );
 
-TODO: {
+TODO: do {
     local $TODO = 'i need a todo';
     $Test->ok( 0, 'a test to todo!' );
 
@@ -59,7 +59,7 @@ TODO: {
                             );
 
     $Test->todo_skip( 'i need both' );
-}
+};
 push @Expected_Details, \%( 'ok'      => 1,
                           actual_ok => 0,
                           name      => '',
@@ -97,11 +97,11 @@ is_deeply( \@details, \@Expected_Details );
 
 
 # This test has to come last because it thrashes the test details.
-{
+do {
     my $curr_test = $Test->current_test;
     $Test->current_test(4);
     my @details = $Test->details();
 
     $Test->current_test($curr_test);
     $Test->is_num( scalar nelems @details, 4 );
-}
+};

@@ -24,7 +24,7 @@ is( @c[3], "(eval)", "subroutine name in an eval ''" );
 ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { @c = @( caller(0) ) } -> ();
-is( @c[3], "main::__ANON__", "anonymous subroutine name" );
+is( @c[3], undef, "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 # Bug 20020517.003, used to dump core
@@ -52,7 +52,7 @@ is( @c[3], "(eval)", "subroutine name in an eval ''" );
 ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { f() } -> ();
-is( @c[3], "main::__ANON__", "anonymous subroutine name" );
+is( @c[3], undef, "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 sub foo2 { f() }
