@@ -31,21 +31,19 @@ sub any {@_[0]->accept_target_as_text('*')}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print "# Testing non-matching complaint...\n";
-{
+do {
+    my $out;
+    ok( ($out = $x->_out( "=pod\n\nI like pie.\n\n=begin mojojojo\n\nStuff\n\n=end blorp\n\nYup.\n"))
+          =~ m/POD ERRORS/
+      ) or print "# Didn't contain POD ERRORS:\n#  $out\n";
 
-my $out;
-ok( ($out = $x->_out( "=pod\n\nI like pie.\n\n=begin mojojojo\n\nStuff\n\n=end blorp\n\nYup.\n"))
-  =~ m/POD ERRORS/
-) or print "# Didn't contain POD ERRORS:\n#  $out\n";
-
-ok( ($out = $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nStuff\n\n=end :blorp\n\nYup.\n"))
-  =~ m/POD ERRORS/
-) or print "# Didn't contain POD ERRORS:\n#  $out\n";
-ok( ($out = $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\n=begin :zaz\n\nStuff\n\n=end :blorp\n\nYup.\n"))
-  =~ m/POD ERRORS/
-) or print "# Didn't contain POD ERRORS:\n#  $out\n";
-
-}
+    ok( ($out = $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nStuff\n\n=end :blorp\n\nYup.\n"))
+          =~ m/POD ERRORS/
+      ) or print "# Didn't contain POD ERRORS:\n#  $out\n";
+    ok( ($out = $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\n=begin :zaz\n\nStuff\n\n=end :blorp\n\nYup.\n"))
+          =~ m/POD ERRORS/
+      ) or print "# Didn't contain POD ERRORS:\n#  $out\n";
+};
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

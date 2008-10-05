@@ -474,6 +474,6 @@ EXPECT
 sub { @_ = @(3); fork ? die "1" : die "1" }->(2);
 EXPECT
 1 at - line 2 character 35.
-    main::__ANON__ called at - line 2 character 44.
+     called at - line 2 character 44.
 1 at - line 2 character 25.
-    main::__ANON__ called at - line 2 character 44.
+     called at - line 2 character 44.

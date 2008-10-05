@@ -139,7 +139,7 @@ do {
     do {
         local @bee = @('XXX',< @bee,'YYY');
         is((join ' ', @bee), "XXX foo bar burbl blah YYY");		# 46
-        {
+        do {
 #             local @bee = local(@bee) = @(qw(foo bar burbl blah));
 #             is((join ' ', < @bee), "foo bar burbl blah");		# 47
 #             {
@@ -148,7 +148,7 @@ do {
 #                 is((join ' ', < @bim), "foo bar");			# 49
 #             }
 #             is((join ' ', < @bee), "foo bar burbl blah");		# 50
-        }
+        };
         is((join ' ', @bee), "XXX foo bar burbl blah YYY");		# 51
     };
     is((join ' ', @bee), "foo bar burbl blah");				# 53

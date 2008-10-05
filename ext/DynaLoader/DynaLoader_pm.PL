@@ -55,10 +55,10 @@ sub _expansion {
 
 sub expand_os_specific {
     my $s = shift;
-    $s =~ s/<<=(.*?)>>/{eval $1}/g;
-    $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/{
-           _expansion($1,$2,$3);
-        }/gs;
+    $s =~ s/<<=(.*?)>>/$(eval $1)/g;
+    $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/$(
+            _expansion($1,$2,$3)
+        )/gs;
     if ($s =~ m/<<(=|\$\^O-)/) {
         die "bad <<\$^O-eq/ne-osname>> expression.".
           " Unclosed brackets?";
@@ -368,7 +368,11 @@ sub bootstrap {
 
     <<$^O-eq-darwin>>
     if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
-        goto boot; #extension library has already been loaded, e.g. darwin
+        #extension library has already been loaded, e.g. darwin
+        my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
+        # See comment block above
+        push(@dl_shared_objects, $file); # record files loaded
+        return &$xs(<@args);
     }
     <</$^O-eq-darwin>>
 
@@ -394,12 +398,10 @@ sub bootstrap {
 
     push(@dl_modules, $module); # record loaded module
 
-  boot:
     my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
 
     # See comment block above
-
-	push(@dl_shared_objects, $file); # record files loaded
+    push(@dl_shared_objects, $file); # record files loaded
 
     &$xs(<@args);
 }

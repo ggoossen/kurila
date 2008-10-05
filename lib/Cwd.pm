@@ -522,8 +522,8 @@ sub _perl_abs_path
 
     $cwd = '';
     $dotdots = $start;
-    do
-    {
+    my $once;
+    while ( ! $once++ || defined $dir) {
 	$dotdots .= '/..';
 	@pst = @cst;
         my $parent;
@@ -544,22 +544,21 @@ sub _perl_abs_path
 	}
 	else
 	{
-	    do
-	    {
+            my $inner_once;
+	    while (! $inner_once++ || $dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
+		   @tst[1] != @pst[1]) {
 		unless (defined ($dir = readdir($parent)))
 	        {
-		    war("readdir($dotdots): $!");
+		    warn("readdir($dotdots): $!");
 		    closedir($parent);
 		    return '';
 		}
 		@tst[0] = @pst[0]+1 unless (@tst = @( lstat("$dotdots/$dir") ))
 	    }
-	    while ($dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
-		   @tst[1] != @pst[1]);
 	}
 	$cwd = (defined $dir ? "$dir" : "" ) . "/$cwd" ;
 	closedir($parent);
-    } while (defined $dir);
+    }
     chop($cwd) unless $cwd eq '/'; # drop the trailing /
     $cwd;
 }

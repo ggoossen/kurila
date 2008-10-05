@@ -367,7 +367,7 @@ sub _write_contents_middle {
     my($path, $name);
     foreach my $e ( @downlines) {
       $name = $e->[0];
-      $path = join( "/", @( '.', < map { esc($_) } @$($e->[3])) )
+      $path = join( "/", @( '.', < map { esc($_) } @{$e->[3]}) )
         . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION);
       print $Contents qq{  <a href="$path">}, esc($name), "</a>&nbsp;&nbsp;\n";
     }

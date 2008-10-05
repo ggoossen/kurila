@@ -81,21 +81,21 @@ END
     open( CMDPIPE, "|-", "$PERL");
     print CMDPIPE <<'END';
 
-    { package X;
+    do { package X;
 	sub DESTROY {
 	    kill "INT",$$;
 	}
-    }
+    };
     sub x {
 	my $x=bless \@(), 'X';
 	return sub { $x };
     }
     $| = 1;		# command buffering
     %SIG{"INT"} = \&ok5;
-    {
+    do {
 	local %SIG{"INT"}=x();
 	print ""; # Needed to expose failure in 5.8.0 (why?)
-    }
+    };
     sleep 1;
     delete %SIG{"INT"};
     kill "INT",$$; sleep 1;

@@ -22,11 +22,11 @@ sub expand {
         my $s = '';
         for (split(m/^/m, @_[0], -1)) {
             my $offs = 0;
-            s{\t}{{
+            s{\t}{$( do {
 				$pad = $tabstop - (pos() + $offs) % $tabstop;
 				$offs += $pad - 1;
 				" " x $pad;
-			}}g;
+			} )}g;
             $s .= $_;
         }
         return $s;

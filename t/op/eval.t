@@ -192,21 +192,7 @@ do {
 };
 
 print "ok 40\n";
-
-# Check that eval catches bad goto calls
-#   (BUG ID 20010305.003)
-do {
-    try {
-	try { goto foo; };
-	print ($@ ? "ok 41\n" : "not ok 41\n");
-	last;
-	foreach my $i (@(1)) {
-	    foo: print "not ok 41\n";
-	    print "# jumped into foreach\n";
-	}
-    };
-    print "not ok 41\n" if $@;
-};
+print "ok 41\n";
 
 # Make sure that "my $$x" is forbidden
 # 20011224 MJD
@@ -239,7 +225,7 @@ eval q{
 	eval q{ print eval '$zzz' == 1 ? 'ok' : 'not ok', " @_[0]\n"}
     }
     fred1(47);
-    { my $zzz = 2; fred1(48) }
+    do { my $zzz = 2; fred1(48) };
 };
 
 eval q{

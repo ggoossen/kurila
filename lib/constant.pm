@@ -83,7 +83,6 @@ sub import {
 	}
 
 	do {
-	    no strict 'refs';
 	    my $full_name = "$($pkg)::$name";
 	    %declared{$full_name}++;
 	    if ($multiple || (nelems @_) == 1) {

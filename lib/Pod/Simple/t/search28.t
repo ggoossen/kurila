@@ -72,10 +72,10 @@ $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
 print $p;
 
-{
+do {
 my $names = join "|", sort values %$where2name;
 ok $names, "Zonk::Pronk|perlzuk|zikzik";
-}
+};
 
 
 print "# OK, bye from ", __FILE__, "\n";

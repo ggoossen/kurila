@@ -68,10 +68,10 @@ $x->limit_glob($glob);
 my $name2where = $x->survey($here1, $here2, $here3);
 my $where2name = $x->path2name;
 
-{
+do {
 my $names = join "|", sort values %$where2name;
 ok $names, "perlzuk|zikzik";
-}
+};
 
 
 print "# OK, bye from ", __FILE__, "\n";

@@ -865,7 +865,7 @@ XS(XS_error_create)
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
-		if (location && SvAVOK(location)) {
+		if (location && SvAVOK(location) && av_len(location) >= 2) {
 		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf".",
 			SvPVX_const(*av_fetch((AV*)location, 0, FALSE)),
 			SvIV(*av_fetch((AV*)location, 1, FALSE)),

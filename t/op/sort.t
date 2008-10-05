@@ -300,13 +300,6 @@ main::dies_like( sub { @output = sort {goto label} @( 1,2); },
 
 
 
-sub goto_label {goto label}
-label: try { @output = sort goto_label @(1,2); };
-my $fail_msg = q(Can't "goto" out of a pseudo block);
-main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'goto out of a pseudo block 2');
-
-
-
 sub self_immolate {undef &self_immolate; $a<+>$b}
 main::dies_like( sub { @output = sort self_immolate @(1,2,3) },
                  qr(^Can't undef active subroutine),
@@ -375,7 +368,7 @@ sub foo {(1+$a) <+> (1+$b)}
 my $refcnt = &Internals::SvREFCNT(\&foo);
 @output = sort @( foo 3,7,9);
 main::is($refcnt, &Internals::SvREFCNT(\&foo), "sort sub refcnt");
-$fail_msg = q(Modification of a read-only value attempted);
+my $fail_msg = q(Modification of a read-only value attempted);
 # Sorting a read-only array in-place shouldn't be allowed
 my @readonly =1..10;
 Internals::SvREADONLY(@readonly, 1);

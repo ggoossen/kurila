@@ -310,6 +310,7 @@ sub _win32_ext {
 
 	my $secondpass = 0;
     LOOKAGAIN:
+        do { };
 
         # look for the file itself
 	if (-f) {

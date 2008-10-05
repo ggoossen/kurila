@@ -40,10 +40,10 @@ while ( ~< *DATA) {
     close OUT;
     open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     my $output;
-    {
+    do {
         local $/;
         $output = ~< *TMP;
-    }
+    };
     close TMP;
     unlink ('tmp.pod', 'out.tmp');
     my $expected = '';

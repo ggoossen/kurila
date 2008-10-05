@@ -2203,7 +2203,8 @@ PP(pp_entersub)
 
   retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
-	DIE(aTHX_ "Undefined subroutine called");
+	DIE(aTHX_ "Undefined subroutine called",
+	    SvPVX_const(loc_desc(SvLOCATION(cv))));
     }
 
     gimme = GIMME_V;

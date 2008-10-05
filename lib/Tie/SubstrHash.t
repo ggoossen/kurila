@@ -41,13 +41,13 @@ dies_like(sub { %a{abc} = 1234 },
 dies_like(sub { $a = %a{abcd}; $a++  },
           qr/Key "abcd" is not 3 characters long/);
 
-{
+do {
     local $TODO = "hash list assignment";
     < %a{[@( <qw(abc cde))]} = < qw(123 345); 
     is(%a{cde}, 345);
     dies_like(sub { %a{def} = 456 },
               qr/Table is full \(3 elements\)/);
-}
+};
 
 %a = %( () );
 

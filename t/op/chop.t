@@ -9,7 +9,7 @@ plan tests => 57;
 our (@foo, $foo, $c, @bar, $got, %chop, %chomp, $x, $y);
 
 $_ = 'abc';
-$c = do foo();
+$c = foo();
 is ($c . $_, 'cab', 'optimized');
 
 $_ = 'abc';
