@@ -34,12 +34,12 @@ my $b = ExtUtils::CBuilder->new(quiet => $quiet);
 ok $b;
 
 my $source_file = File::Spec->catfile('t', 'compilet.c');
-{
+do {
   local *FH;
   open FH, ">", "$source_file" or die "Can't create $source_file: $!";
   print FH "int main(void) \{ return 11; \}\n";
   close FH;
-}
+};
 ok -e $source_file;
 
 # Compile

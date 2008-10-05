@@ -401,7 +401,7 @@ EOT
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
 use strict;
-use $package < qw({join ' ',@$export_names});
+use $package < qw($(join ' ',@$export_names));
 
 print "1..2\n";
 if (open OUTPUT, ">", "$output") \{
@@ -740,8 +740,8 @@ sub explict_call_constant {
   my ($string, $expect) = < @_;
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
-\{
-  my (\$error, \$got) = {$package}::constant ('$string');\n;
+do \{
+  my (\$error, \$got) = $($package)::constant ('$string');\n;
 EOT
 
   if (defined $expect) {
@@ -751,8 +751,8 @@ EOT
     print "not ok $dummytest # error '\$error', expect '$expect', got '\$got'\n";
   \} else \{
     print "ok $dummytest\n";
-    \}
   \}
+\};
 EOT
   } else {
     # Error expected.
@@ -766,7 +766,7 @@ EOT
   }
   $dummytest++;
   return $test_body . <<'EOT';
-}
+};
 EOT
 }
 

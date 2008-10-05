@@ -4,7 +4,7 @@ use Config;
 
 use List::Util < qw(reduce min);
 use Test::More;
-plan tests => ($::PERL_ONLY ? 20 : 22);
+plan tests => ($::PERL_ONLY ? 19 : 21);
 
 my $v = reduce {};
 
@@ -114,10 +114,6 @@ if (!$::PERL_ONLY) { SKIP: do {
     $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
     skip("Poor man's MULTICALL can't cope", 2)
       if !$List::Util::REAL_MULTICALL;
-
-    # Can we goto a label from the reduction sub?
-    try {()= <reduce{goto foo} 1,2; foo: 1};
-    like($@->{description}, qr/^Can't "goto" out of a pseudo block/, "goto label");
 
     # Can we goto a subroutine?
     try {()= <reduce{goto sub{}} 1,2;};

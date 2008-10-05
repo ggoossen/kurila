@@ -78,7 +78,6 @@ print "ok 14\n";
 $fd = $w->[0];
 print $fd "ok 15\n";
 
-POST_SOCKET:
 # Test new exists() method
 $sel->exists(\*STDIN) and print "not ";
 print "ok 16\n";

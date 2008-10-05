@@ -179,7 +179,7 @@ for (@a) {
 	$_ = "-$_-";
     }
 }
-print "{join ' ', @a}\n";
+print "$(join ' ', @a)\n";
 EXPECT
 parent 1
 child 1

@@ -51,7 +51,7 @@ unlink $Makefile;
 my $prereq_out = run(qq{$Perl Makefile.PL "PREREQ_PRINT=1"});
 ok( !-r $Makefile, "PREREQ_PRINT produces no $Makefile" );
 is( $?, 0,         '  exited normally' );
-{
+do {
     package _Prereq::Print;
     no strict;
     my $PREREQ_PM = undef;  # shut up "used only once" warning.
@@ -59,7 +59,7 @@ is( $?, 0,         '  exited normally' );
     die if $@;
     main::is_deeply( $PREREQ_PM, \%( strict => 0 ), 'prereqs dumped' );
     main::is( $@, '',                             '  without error' );
-}
+};
 
 
 $prereq_out = run(qq{$Perl Makefile.PL "PRINT_PREREQ=1"});

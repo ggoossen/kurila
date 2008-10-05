@@ -625,17 +625,16 @@ sub write_linker_script {
   # specified as the startup file and any others are shifted into the
   # beginning of the list of objects.
   if ( %spec{startup} && nelems @{%spec{startup}} ) {
-    print SCRIPT 'STARTUP(' . shift( @$(%spec{startup}) ) . ")\n";
+    print SCRIPT 'STARTUP(' . shift( @{%spec{startup}} ) . ")\n";
     unshift @{%spec{objects}},
       < @{delete %spec{startup} || \@()};
   }
 
-  print SCRIPT 'INPUT(' . join( ',', @$(delete %spec{objects}  || \@())
-  ) . ")\n";
+  print SCRIPT 'INPUT(' . join( ',', @{delete %spec{objects}  || \@()} ) . ")\n";
 
   print SCRIPT 'INPUT(' . join( ' ', @(
      (delete %spec{libperl}  || ''),
-    < @$(delete %spec{perllibs} || \@()),)
+    < @{delete %spec{perllibs} || \@()},)
   ) . ")\n";
 
   close SCRIPT;

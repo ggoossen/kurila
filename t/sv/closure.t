@@ -545,7 +545,7 @@ test {1};
 # can lead to stack corruption
 do {
     my $x = "foooobar";
-    $x =~ s/o/{''}/g;
+    $x =~ s/o/$('')/g;
     test { $x eq 'fbar' }
 };
 

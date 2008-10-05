@@ -20,19 +20,19 @@ BEGIN
     $extra = 1
         if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    plan tests => 58 + $extra ;
-
-    use_ok('File::GlobMapper') ; 
+    plan tests => 57 + $extra ;
 }
 
-{
+use File::GlobMapper;
+
+do {
     title "Error Cases" ;
 
     my $gm;
 
     for my $delim ( qw/ ( ) { } [ ] / )
     {
-        $gm = File::GlobMapper->new("{$delim}abc", '*.X');
+        $gm = File::GlobMapper->new("$($delim)abc", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
             "  catch unmatched $delim";
@@ -40,16 +40,14 @@ BEGIN
 
     for my $delim ( qw/ ( ) [ ] / )
     {
-        $gm = File::GlobMapper->new("\{{$delim}abc\}", '*.X');
+        $gm = File::GlobMapper->new("\{$($delim)abc\}", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
             "  catch unmatched $delim inside \{\}";
     }
+};
 
-    
-}
-
-{
+do {
     title "input glob matches zero files";
 
     my $tmpDir = 'td';
@@ -63,9 +61,9 @@ BEGIN
 
     my $hash = $gm->getHash() ;
     is_deeply $hash, \%(), "  zero maps" ;
-}
+};
 
-{
+do {
     title 'test wildcard mapping of * in destination';
 
     my $tmpDir = 'td';
@@ -90,9 +88,9 @@ BEGIN
                                   abc2.tmp abc2.tmpX
                                   abc3.tmp abc3.tmpX),
         ), "  got mapping";
-}
+};
 
-{
+do {
     title 'no wildcards in input or destination';
 
     my $tmpDir = 'td';
@@ -113,9 +111,9 @@ BEGIN
     is_deeply $hash,
         \%( < map { "$tmpDir/$_.tmp" } qw(abc2 abc2),
         ), "  got mapping";
-}
+};
 
-{
+do {
     title 'test wildcard mapping of {} in destination';
 
     my $tmpDir = 'td';
@@ -145,10 +143,10 @@ BEGIN
           \@(< map { "$tmpDir/$_" } qw(abc3.tmp X.3.X)),
         ), "  got mapping";
 
-}
+};
 
 
-{
+do {
     title 'test wildcard mapping of multiple * to #';
 
     my $tmpDir = 'td';
@@ -167,9 +165,9 @@ BEGIN
           \@(<map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
           \@(<map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
         ), "  got mapping";
-}
+};
 
-{
+do {
     title 'test wildcard mapping of multiple ? to #';
 
     my $tmpDir = 'td';
@@ -187,9 +185,9 @@ BEGIN
           \@(<map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
           \@(<map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
         ), "  got mapping";
-}
+};
 
-{
+do {
     title 'test wildcard mapping of multiple ?,* and [] to #';
 
     my $tmpDir = 'td';
@@ -208,9 +206,9 @@ BEGIN
           \@(<map { "./$tmpDir/$_" } qw(abc2.tmp X-2-c-a-X)),
           \@(<map { "./$tmpDir/$_" } qw(abc3.tmp X-3-c-a-X)),
         ), "  got mapping";
-}
+};
 
-{
+do {
     title 'input glob matches a file multiple times';
 
     my $tmpDir = 'td';
@@ -230,9 +228,9 @@ BEGIN
     is_deeply $hash,
         \%( <map { "$tmpDir/$_" } qw(abc.tmp abc.tmp.X) ), "  got mapping";
 
-}
+};
 
-{
+do {
     title 'multiple input files map to one output file';
 
     my $tmpDir = 'td';
@@ -250,9 +248,9 @@ BEGIN
     #is @{ $map }, 1, "  returned 1 maps";
     #is_deeply $map,
     #\@( \@(<map { "$tmpDir/$_" } qw(abc1 abc.X)), ), "  got mapping";
-}
+};
 
-{
+do {
     title "globmap" ;
 
     my $tmpDir = 'td';
@@ -270,7 +268,7 @@ BEGIN
           \@(<map { "$tmpDir/$_" } qw(abc2.tmp X-c2-a-X)),
           \@(<map { "$tmpDir/$_" } qw(abc3.tmp X-c3-a-X)),
         ), "  got mapping";
-}
+};
 
 # TODO
 # test each of the wildcard metacharacters can be mapped to the output filename

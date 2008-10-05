@@ -183,11 +183,11 @@ do {
 do {
     my $status = eval q{
 	eval q{ die };
-	print "# eval q{ return } test\n";
+	print "# eval ' return ' test\n";
 	return; # removing this changes behavior
     };
     print "not " if $@;
-    print "ok $x\n";
+    print "ok $x - return from eval\n";
     $x++;
 };
 
@@ -270,7 +270,7 @@ eval q{
     eval '$r = fred3(5)';
     print $r == 120 ? 'ok' : 'not ok', " 54\n";
     $r = 0;
-    { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
+    do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
     print $r == 120 ? 'ok' : 'not ok', " 55\n";
 };
 my $r = fred3(5);

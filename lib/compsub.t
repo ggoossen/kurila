@@ -48,21 +48,21 @@ $b = "oldb";
 fst $a="newa", $b="notset";
 is("$a-$b", "newa-oldb");
 
-{
+do {
     BEGIN { compsub::define( nothing => sub { @_[0] and @_[0]->free; return B::OP->new('null', 0, @("myop", 33, 66)) } ); }
     nothing;
 
     eval "nothing";
     ok ! $@, "compsub in run-time eval";
-}
+};
 eval "nothing";
 like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
 
 
 ## calling a function
-{
+do {
     our $x;
-    sub func1 { $x++; return "func1 called. args: {join ' ', @_}" };
+    sub func1 { $x++; return "func1 called. args: $(join ' ', @_)" };
 
     BEGIN { compsub::define( compfunc1 => sub { my $op = shift;
                                                 my $cvop = B::SVOP->new('const', 0, \&func1, @('myop', 1, 1));
@@ -75,10 +75,10 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
     is( (compfunc1 1, 2, 3), "func1 called. args: 1 2 3");
     is( (compfunc1(1, 2, 3)), "func1 called. args: 1 2 3");
     is( (compfunc1(1, 2), 3), "func1 called. args: 1 2 3");
-}
+};
 
 ## parsing params, and declaring lexical variables.
-{
+do {
     # assumes argument like: 'foo' => \$foo, 'bar' => \$bar, { @_ }
     sub parseparams {
         my $values = pop @_;
@@ -125,7 +125,7 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
         compsub::define( params => \&compparams )
     }
 
-    {
+    do {
         sub foobar {
             params 'foo', 'bar', \%( < @_ );
             is $foo, 'foo-value', '$foo declared and initialized';
@@ -133,5 +133,5 @@ like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical sco
         }
 
         foobar( foo => "foo-value", bar => "bar-value" );
-    }
-}
+    };
+};

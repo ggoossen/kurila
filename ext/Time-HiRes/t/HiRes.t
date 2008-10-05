@@ -66,7 +66,7 @@ if ($have_fork) {
 	    my $ppid = getppid();
 	    print "# I am the timer process $$, sleeping for $waitfor seconds...\n";
 	    sleep($waitfor);
-	    warn "\n$0: overall time allowed for tests ({$waitfor}s) exceeded!\n";
+	    warn "\n$0: overall time allowed for tests ($($waitfor)s) exceeded!\n";
 	    print "# Terminating main process $ppid...\n";
 	    kill('TERM', $ppid);
 	    print "# This is the timer process $$, over and out.\n";
@@ -112,7 +112,7 @@ sub ok {
     }
     else {
 	print "not ok $n\n";
-    	print "# {join ' ', @info}\n" if @info;
+    	print "# $(join ' ', @info)\n" if @info;
     }
 }
 
@@ -160,10 +160,10 @@ else {
 }
 
 # Two-arg tv_interval() is always available.
-{
+do {
     my $f = tv_interval \@(5, 100_000), \@(10, 500_000);
     ok 9, abs($f - 5.4) +< 0.001, $f;
-}
+};
 
 unless ($have_gettimeofday) {
     skip 10;
@@ -465,8 +465,8 @@ if ($have_ualarm) {
     use Time::HiRes < qw(time);
     my $DelayN = 1024;
     my $i;
- N: {
-     do {
+ N: do {
+     {
 	 my $t0 = time();
 	 my $i = 0;
          while ($i +< $DelayN) { $i++ }
@@ -476,7 +476,7 @@ if ($have_ualarm) {
 	 last N if $dt +> $T;
 	 $DelayN *= 2;
      } while (1);
- }
+ };
 
     # The time-burner which takes at least T (default 1) seconds.
     my $Delay = sub {
@@ -523,7 +523,7 @@ if ($have_clock_gettime &&
     # are SUPPOSED TO support CLOCK_REALTIME.
     has_symbol('CLOCK_REALTIME')) {
     my $ok = 0;
- TRY: {
+  TRY: do {
 	for my $try (1..3) {
 	    print "# CLOCK_REALTIME: try = $try\n";
 	    my $t0 = clock_gettime(&CLOCK_REALTIME( < @_ ));
@@ -547,7 +547,7 @@ if ($have_clock_gettime &&
 	    printf "# Sleeping for \%.6f seconds...\n", $r;
 	    sleep($r);
 	}
-    }
+    };
     if ($ok) {
 	print "ok 30\n";
     } else {
@@ -587,12 +587,12 @@ if ($have_clock_nanosleep &&
 
 if ($have_clock) {
     my @clock = @( clock() );
-    print "# clock = {join ' ', @clock}\n";
+    print "# clock = $(join ' ', @clock)\n";
     for my $i (1..3) {
 	my $j = 0;
         while ($j +< 1e6) { $j++ }
 	push @clock, clock();
-	print "# clock = {join ' ', @clock}\n";
+	print "# clock = $(join ' ', @clock)\n";
     }
     if (@clock[0] +>= 0 &&
 	@clock[1] +> @clock[0] &&
@@ -658,8 +658,8 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 	push @atime, @stat[8];
     }
     1 while unlink $$;
-    print "# mtime = {join ' ', @mtime}\n";
-    print "# atime = {join ' ', @atime}\n";
+    print "# mtime = $(join ' ', @mtime)\n";
+    print "# atime = $(join ' ', @atime)\n";
     my $ai = 0;
     my $mi = 0;
     my $ss = 0;

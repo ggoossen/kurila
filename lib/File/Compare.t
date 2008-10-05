@@ -100,7 +100,7 @@ try {
   @donetests[2] = compare('README', "$filename ");
   unlink "$filename ";
 };
-print "# problem '{$@->message}' when testing with a temporary file\n" if $@;
+print "# problem '$($@->message)' when testing with a temporary file\n" if $@;
 
 if ((nelems @donetests) == 3) {
   print "not " unless @donetests[0] == 0;

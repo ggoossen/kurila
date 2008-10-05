@@ -874,7 +874,7 @@ do {
 
     my @x = @("stra\x{DF}e 138","stra\x{DF}e 138");
     for ( @x) {
-	s/(\d+)\s*([\w\-]+)/{$1 . uc $2}/;
+	s/(\d+)\s*([\w\-]+)/$($1 . uc $2)/;
 	my($latin) = m/^(.+)(?:\s+\d)/;
 	ok($latin eq "stra\x{DF}e");
 	$latin =~ s/stra\x{DF}e/straße/; # \303\237 after the 2nd a
@@ -1815,10 +1815,10 @@ do {
     # Fixed by #14795.
     for my $char (@("a", "\x{df}", "\x{100}")){
 	$x = "$char b $char";
-	$x =~ s{($char)}{{
+	$x =~ s{($char)}{$( do {
 	    "c" =~ m/c/;
 	    "x";
-	}}g;
+	})}g;
 	ok( substr($x,0,1) eq substr($x,-1,1) );
    }
 };
@@ -2207,8 +2207,8 @@ sub func ($) {
     ok( "a\nb" =~ m/^b/m, "@_[0] - with /m" );
 }
 func "standalone";
-$_ = "x"; s/x/{func "in subst"}/;
-$_ = "x"; s/x/{func "in multiline subst"}/m;
+$_ = "x"; s/x/$(func "in subst")/;
+$_ = "x"; s/x/$(func "in multiline subst")/m;
 #$_ = "x"; /x(?{func "in regexp"})/;
 #$_ = "x"; /x(?{func "in multiline regexp"})/m;
 
@@ -3252,7 +3252,7 @@ do {
     for ( @foo) {
         my @bar;
         $str .= "$(join ' ',@bar)";
-        s/a|/{push @bar, 1}/;
+        s/a|/$(push @bar, 1)/;
     }
     is(length($str),"0","Trie scope error, string should be empty");
 };

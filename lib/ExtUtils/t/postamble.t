@@ -33,7 +33,7 @@ END {
 ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
         diag("chdir failed: $!");
 
-{
+do {
     my $warnings = '';
     local $^WARN_HOOK = sub {
         $warnings = join '', @_;
@@ -51,7 +51,7 @@ ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
                                               )
                           );
     is( $warnings, '', 'postamble argument not warned about' );
-}
+};
 
 sub MY::postamble {
     my($self, < %extra) = < @_;
@@ -67,8 +67,9 @@ OUT
 
 
 ok( open(MAKEFILE, "<", $Makefile) ) or diag "Can't open $Makefile: $!";
-{ local $/; 
-  like( ~< *MAKEFILE, qr/^\# This makes sure the postamble gets written\n/m,
-        'postamble added to the Makefile' );
-}
+do {
+    local $/; 
+    like( ~< *MAKEFILE, qr/^\# This makes sure the postamble gets written\n/m,
+          'postamble added to the Makefile' );
+};
 close MAKEFILE;

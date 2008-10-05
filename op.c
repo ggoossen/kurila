@@ -3833,13 +3833,11 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
 }
 
 OP *
-Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block, SV *location)
+    Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
 {
     dVAR;
     OP* listop;
     OP* o;
-    const bool once = block && block->op_flags & OPf_SPECIAL &&
-      (block->op_type == OP_ENTERSUB || block->op_type == OP_NULL);
 
     PERL_UNUSED_ARG(debuggable);
 
@@ -6437,6 +6435,7 @@ Perl_ck_subr(pTHX_ OP *o)
     I32 contextclass = 0;
     const char *e = NULL;
     bool delete_op = 0;
+    SV** namesv;
 
     PERL_ARGS_ASSERT_CK_SUBR;
 
@@ -6472,6 +6471,8 @@ Perl_ck_subr(pTHX_ OP *o)
     }
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	o->op_private |= OPpENTERSUB_DB;
+    if (cv && SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
+	namesv = av_fetch(SvLOCATION(cv), 3, 0);
     while (o2 != cvop) {
 	OP* o3;
 	if (PL_madskills && o2->op_type == OP_STUB) {
@@ -6484,7 +6485,8 @@ Perl_ck_subr(pTHX_ OP *o)
 	    o3 = o2;
 	if (proto) {
 	    if (proto >= proto_end)
-		return too_many_arguments(o, "subroutine");
+		return too_many_arguments(o, 
+		    namesv ? SvPVX_const(*namesv) : "subroutine");
 
 	    switch (*proto) {
 	    case ';':
@@ -6649,7 +6651,7 @@ Perl_ck_subr(pTHX_ OP *o)
 	    default:
 	      oops:
 		Perl_croak(aTHX_ "Malformed prototype for %s: %"SVf,
-			   "subroutine", SVfARG(cv));
+		    (namesv ? SvPVX_const(*namesv) : "subroutine"), SVfARG(cv));
 	    }
 	}
 	else
@@ -6665,8 +6667,9 @@ Perl_ck_subr(pTHX_ OP *o)
 	prev->op_sibling = o2; /* instead of cvop */
     }
     if (proto && !optional && proto_end > proto &&
-	(*proto != '<' && *proto != '@' && *proto != ';' && *proto != '_'))
-	return too_few_arguments(o, "subroutine");
+	(*proto != '<' && *proto != '@' && *proto != ';' && *proto != '_')) {
+	return too_few_arguments(o, namesv ? SvPVX_const(*namesv) : "subroutine" );
+    }
     if(delete_op) {
 #ifdef PERL_MAD
 	OP * const oldo = o;

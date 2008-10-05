@@ -37,7 +37,7 @@ is( ExtUtils::Packlist::FETCH($pl, 'foo'), 'bar', 'check FETCH()' );
 
 
 # test FIRSTKEY and NEXTKEY
-SKIP: {
+SKIP: do {
 	$pl->{data}->{bar} = 'baz';
 	skip('not enough keys to test FIRSTKEY', 2)
       unless nkeys %{ $pl->{data} } +> 2;
@@ -57,7 +57,7 @@ SKIP: {
 
 	is( ExtUtils::Packlist::NEXTKEY($pl), $second,
 		'and NEXTKEY() should also be consistent' );
-}
+};
 
 
 ok( ExtUtils::Packlist::EXISTS($pl, 'bar'), 'EXISTS() should find keys' );
@@ -85,18 +85,18 @@ ok( $file_is_ready, 'write() can write a file' );
 
 local *IN;
 
-SKIP: {
+SKIP: do {
 	skip('cannot write files, some tests difficult', 3) unless $file_is_ready;
 
 	# set this file to read-only
 	chmod 0444, 'eplist';
 
-	SKIP: {
+	SKIP: do {
 	    skip("cannot write readonly files", 1) if -w 'eplist';
 
 	    try { ExtUtils::Packlist::write(\%(), 'eplist') };
 	    like( $@->{description}, qr/Can't open file/, 'write() should croak on open failure' );
-	}
+	};
 
 	#'now set it back (tick here fixes vim syntax highlighting ;)
 	chmod 0777, 'eplist';
@@ -115,7 +115,7 @@ SKIP: {
 	is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
 
 	$file_is_ready = open(IN, "<", 'eplist');
-}
+};
 
 
 try { ExtUtils::Packlist::read(\%()) };
@@ -128,7 +128,7 @@ like( $@->{description}, qr/^Can't open file/, 'read() should croak with bad pac
 
 
 # and more read() tests
-SKIP: {
+SKIP: do {
 	skip("cannot open file for reading: $!", 5) unless $file_is_ready;
 	my $file = do { local $/ = ~< *IN };
 
@@ -160,7 +160,7 @@ SKIP: {
 
 	# one more new() test, to see if it calls read() successfully
 	$pl = ExtUtils::Packlist->new('eplist');
-}
+};
 
 
 # packlist_file, $pl should be set from write test

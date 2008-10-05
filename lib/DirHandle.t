@@ -20,7 +20,7 @@ ok(defined($dot));
 
 my @a = sort glob("*");
 my $first;
-do { $first = $dot->readdir } while defined($first) && $first =~ m/^\./;
+{ $first = $dot->readdir } while defined($first) && $first =~ m/^\./;
 ok(+(< grep { $_ eq $first } @a));
 
 my @b = sort( @($first, (< grep {m/^[^.]/} $dot->readdirs)));

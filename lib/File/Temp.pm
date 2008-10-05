@@ -624,10 +624,10 @@ sub _replace_XX {
   # Alternatively, could simply set $ignore to length($path)-1
   # Don't want to always use substr when not required though.
   if ($ignore) {
-      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/{@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ]}/g;
+      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/$(@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ])/g;
       substr($path, 0, - $ignore, $x);
   } else {
-    $path =~ s/X(?=X*\z)/{@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ]}/g;
+    $path =~ s/X(?=X*\z)/$(@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ])/g;
   }
   return $path;
 }

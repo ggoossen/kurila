@@ -840,7 +840,7 @@ sub deparse_sub {
 	}
     }
     if (%{$self->{'global_variables'}}) {
-        $body = "our (" . (join ", ", keys %$($self->{'global_variables'})) . ");\n" . $body;
+        $body = "our (" . (join ", ", keys %{$self->{'global_variables'}}) . ");\n" . $body;
     }
     return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
@@ -3327,7 +3327,7 @@ sub re_uninterp {
           | \\[uUlLQE]
           )
 
-	/{defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"}/xg;
+	/$(defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3")/xg;
 
     return $str;
 }
@@ -3355,7 +3355,7 @@ sub re_uninterp_extended {
           | \\[uUlLQE]
           )
 
-	/{defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"}/xg;
+	/$(defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3")/xg;
 
     return $str;
 }
@@ -3399,7 +3399,7 @@ my %unctrl = # portable to to EBCDIC
 # character escapes, but not delimiters that might need to be escaped
 sub escape_str { # ASCII, UTF8
     my($str) = < @_;
-    $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1}/g;
+    $str =~ s/(.)/$(ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1)/g;
     $str =~ s/\a/\\a/g;
 #    $str =~ s/\cH/\\b/g; # \b means something different in a regex
     $str =~ s/\t/\\t/g;
@@ -3407,8 +3407,8 @@ sub escape_str { # ASCII, UTF8
     $str =~ s/\e/\\e/g;
     $str =~ s/\f/\\f/g;
     $str =~ s/\r/\\r/g;
-    $str =~ s/([\cA-\cZ])/{%unctrl{$1}}/g;
-    $str =~ s/([[:^print:]])/{sprintf("\\\%03o", ord($1))}/g;
+    $str =~ s/([\cA-\cZ])/$(%unctrl{$1})/g;
+    $str =~ s/([[:^print:]])/$(sprintf("\\\%03o", ord($1)))/g;
     return $str;
 }
 
@@ -3416,9 +3416,9 @@ sub escape_str { # ASCII, UTF8
 # Leave whitespace unmangled.
 sub escape_extended_re {
     my($str) = < @_;
-    $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1}/g;
-    $str =~ s/([[:^print:]])/{
-	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1))}/g;
+    $str =~ s/(.)/$(ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1)/g;
+    $str =~ s/([[:^print:]])/$(
+	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1)))/g;
     $str =~ s/\n/\n\f/g;
     return $str;
 }

@@ -55,6 +55,6 @@ defsubs.h :: $(join ' ',@headers) defsubs_h.PL
 sub MY::processPL {
     my $text = shift->SUPER::processPL(< @_);
     # Append our extra parameter
-    $text =~ s/^(\t.*defsubs_h\.PL.*)/{$1 . ' ' . headerpath()}/m;
+    $text =~ s/^(\t.*defsubs_h\.PL.*)/$1 $(headerpath())/m;
     $text;
 }

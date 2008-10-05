@@ -48,12 +48,12 @@ like( $@->message, qr/Cannot find blib/, 'Fails if blib directory not found' );
 
 _mkdirs( < @blib_dirs );
 
-{
+do {
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings = join '', @_ };
     use_ok('blib');
     is( $warnings, '',  'use blib is nice and quiet' );
-}
+};
 
 is( nelems(@INC), 3, '@INC now has 3 elements' );
 is( @INC[2],    '../lib',       'blib added to the front of @INC' );

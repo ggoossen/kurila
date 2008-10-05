@@ -125,7 +125,7 @@ BEGIN
     };
  
     if ($@) {
-        *Dumper = sub { my $a = shift; return "[ $(join ' ',@$( $a )) ]" } ;
+        *Dumper = sub { my $a = shift; return "[ $(join ' ',@{ $a }) ]" } ;
     }          
 }
 

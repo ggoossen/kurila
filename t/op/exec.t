@@ -43,7 +43,7 @@ is( $exit, 0, '  exited 0' );
 my $quote = $Is_VMS || $Is_Win32 ? '"' : '';
 $tnum = curr_test();
 $exit = system $Perl, '-le', 
-               "{$quote}print q<ok $tnum - system(PROG, LIST)>{$quote}";
+               "$($quote)print q<ok $tnum - system(PROG, LIST)>$($quote)";
 next_test();
 is( $exit, 0, '  exited 0' );
 
@@ -125,5 +125,5 @@ TODO: do {
 };
 
 my $test = curr_test();
-exec $Perl, '-le', qq{{$quote}print 'ok $test - exec PROG, LIST'{$quote}};
+exec $Perl, '-le', qq{$($quote)print 'ok $test - exec PROG, LIST'$($quote)};
 fail("This should never be reached if the exec() worked");

@@ -423,7 +423,7 @@ sub Tgetent
             next if defined $self->{ '_' . ( $cap = $1 ) };
             $_ = $2;
             s/\\E/\033/g;
-            s/\\(\d\d\d)/{pack('c',oct($1) ^&^ 0177)}/g;
+            s/\\(\d\d\d)/$(pack('c',oct($1) ^&^ 0177))/g;
             s/\\n/\n/g;
             s/\\r/\r/g;
             s/\\t/\t/g;
@@ -431,7 +431,7 @@ sub Tgetent
             s/\\f/\f/g;
             s/\\\^/\377/g;
             s/\^\?/\177/g;
-            s/\^(.)/{pack('c',ord($1) ^&^ 31)}/g;
+            s/\^(.)/$(pack('c',ord($1) ^&^ 31))/g;
             s/\\(.)/$1/g;
             s/\377/^/g;
             $self->{ '_' . $cap } = $_;

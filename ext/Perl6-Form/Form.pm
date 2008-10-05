@@ -304,7 +304,7 @@ sub jleft {
 	unless (%val{last}) {
 		my $rem = %val{width}-length($str);
 		$str = join '', reverse split m//, $str;
-		1 while $rem+>0 && $str =~ s/( +)/{($rem--+>0?" ":"").$1}/g;
+		1 while $rem+>0 && $str =~ s/( +)/$(($rem--+>0?" ":"").$1)/g;
 		@_[0] = join '', reverse split m//, $str;
 	}
 	&jleft( < @_ );
@@ -408,7 +408,7 @@ sub jleft {
 				$str =~ s/^/$pre/;
 				if (%val{pre} =~ m/^0+$/) {
 					$str =~ s{^((\D*)(\d.*))\.}
-						     {{$2 . ("0"  x ($whole-length $1)) . "$3."}};
+						     {$($2 . ("0"  x ($whole-length $1)) . "$3.")};
 					%val{pre} = " ";
 				}
 				$str =~ s/^(.*)\./$1$point/;
@@ -505,163 +505,163 @@ sub segment ($\@\%$\%) {
 	my $args_req = int((nelems @format)/3);
 	my (@formatters,@starred,@vstarred);
 	for my $i (0..$args_req) {
-		my ($literal,$field,$userdef) = < @format[[3*$i..3*$i+2]];
-		$literal =~ s/\\\{/\{/g;
-		push @formatters, \%( < %std_literal,
-							width => length($literal),
-							src	  => \$literal,
-						  );
-		$width -= length($literal);
-		if (defined $field) {
-			my %form;
-			my %fldopts = %( < %$opts );
-			$fldcnt++;
-			my ($setwidth, $setplaces, $checkwidth, $checkplaces);
-			if (defined $userdef) {
-				if ($userdef +< 0) {
-					%form{isbullet} = \"$field";
-				}
-				else {
-					my ($from,$to) =
-						< map $_->[$userdef], $opts->{field}->{[@('from','to')]};
-					$field = $to->( <perl6_match($field,$from),\%fldopts);
-				}
-			}
-			my $fld = $field;
-			my ($precurr, $incurr, $postcurr) = ("")x3;
-			%form{width} = length $field;
-			if (%form{isbullet}) {
-				%form{vjust} = \&jtop;
-				%form{hjust} = \&jbullet;
-				%form{break} = \&break_bullet;
-				%form{src}   = \@();
-				(%form{bullethole} = $field) =~ s/./ /gs;
-			}
-			else {
-				%form{stretch} = !%form{isbullet} && $fld =~ s/[+]//;
- <				%form{[qw(verbatim break hjust)]}
-					= (1, \&break_verbatim, \&jverbatim)
-						if $fld =~ m/["']/ && $fld !~ m/[][><]/;
-						# was: if $fld =~ /["']/ && $fld !~ /[][]/;
-				%form{trackpos} = $fld =~ s/(\{):|:(\})/$2/g;
-				%form{vjust} = $fld =~ s/=//g ? \&jmiddle
-							 : $fld =~ s/_//g ? \&jbottom
-							 :                  \&jtop
-							 ;
+            my ($literal,$field,$userdef) = < @format[[3*$i..3*$i+2]];
+            $literal =~ s/\\\{/\{/g;
+            push @formatters, \%( < %std_literal,
+                                  width => length($literal),
+                                  src	  => \$literal,
+                              );
+            $width -= length($literal);
+            if (defined $field) {
+                my %form;
+                my %fldopts = %( < %$opts );
+                $fldcnt++;
+                my ($setwidth, $setplaces, $checkwidth, $checkplaces);
+                if (defined $userdef) {
+                    if ($userdef +< 0) {
+                        %form{isbullet} = \"$field";
+                    }
+                    else {
+                        my ($from,$to) =
+                          < map $_->[$userdef], $opts->{field}->{[@('from','to')]};
+                        $field = $to->( <perl6_match($field,$from),\%fldopts);
+                    }
+                }
+                my $fld = $field;
+                my ($precurr, $incurr, $postcurr) = ("")x3;
+                %form{width} = length $field;
+                if (%form{isbullet}) {
+                    %form{vjust} = \&jtop;
+                    %form{hjust} = \&jbullet;
+                    %form{break} = \&break_bullet;
+                    %form{src}   = \@();
+                    (%form{bullethole} = $field) =~ s/./ /gs;
+                }
+                else {
+                    %form{stretch} = !%form{isbullet} && $fld =~ s/[+]//;
+                    < %form{[qw(verbatim break hjust)]}
+                      = (1, \&break_verbatim, \&jverbatim)
+                        if $fld =~ m/["']/ && $fld !~ m/[][><]/;
+                    # was: if $fld =~ /["']/ && $fld !~ /[][]/;
+                    %form{trackpos} = $fld =~ s/(\{):|:(\})/$2/g;
+                    %form{vjust} = $fld =~ s/=//g ? \&jmiddle
+                      : $fld =~ s/_//g ? \&jbottom
+                        :                  \&jtop
+                          ;
 
-				$DB::single=1;
-                my ($checkwidth, $extras) = $fld =~ m/\(\s*(\d+[.,]?\d*)\s*\)/g;
-				die "Too many width specifications in $field" if $extras;
-				if ($checkwidth) {
-					$checkplaces = $checkwidth =~ s/[.,](\d+)// && $1;
-					for (@($fld)) {
-						s{([][><I|Vv"']) (\(\s*\d+[.,]?\d*\s*\))}
-						 {{ $1 . ($1 x length $2) }}x and last;
-						s{(\(\s*\d+[.,]?\d*\s*\)) ([][><I|V"'])}
-						 {{ ($2 x length $1) . $2 }}x and last;
-						s{(> [.,]) (\(\s*\d+[.,]?\d*\s*\))}
-						 {{ $1 . ('<' x length $2) }}x and last;
-						s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] <)}
-						 {{ ('>' x length $1) . $2 }}x and last;
-						s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] \[)}
-						 {{ (']' x length $1) . $2 }}x and last;
-						s{(\(\s*\d+[.,]?\d*\s*\))}
-						 {{ '[' x length $1 }}x and last;
-					}
-				}
+                    $DB::single=1;
+                    my ($checkwidth, $extras) = $fld =~ m/\(\s*(\d+[.,]?\d*)\s*\)/g;
+                    die "Too many width specifications in $field" if $extras;
+                    if ($checkwidth) {
+                        $checkplaces = $checkwidth =~ s/[.,](\d+)// && $1;
+                        for (@($fld)) {
+                            s{([][><I|Vv"']) (\(\s*\d+[.,]?\d*\s*\))}
+                             {$( $1 . ($1 x length $2) )}x and last;
+                            s{(\(\s*\d+[.,]?\d*\s*\)) ([][><I|V"'])}
+                             {$( ($2 x length $1) . $2 )}x and last;
+                            s{(> [.,]) (\(\s*\d+[.,]?\d*\s*\))}
+                             {$( $1 . ('<' x length $2) )}x and last;
+                            s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] <)}
+                             {$( ('>' x length $1) . $2 )}x and last;
+                            s{(\(\s*\d+[.,]?\d*\s*\)) ([.,] \[)}
+                             {$( (']' x length $1) . $2 )}x and last;
+                            s{(\(\s*\d+[.,]?\d*\s*\))}
+                             {$( '[' x length $1 )}x and last;
+                        }
+                    }
 
-                ($setwidth, $extras) = $fld =~ m/\{\s*(\d+[.,]?\d*|\*)\s*\}/g
-								   and $fld =~ s/\{\s*(\d+[.,]?\d*|\*)\s*\}//;
-				die "Too many width specifications in $field"
-					if $extras || $setwidth && $checkwidth;
-				if ($setwidth && $setwidth =~ s/[.,](\d+)//) {
-					$setplaces = $1 || 0;
-				}
+                    ($setwidth, $extras) = $fld =~ m/\{\s*(\d+[.,]?\d*|\*)\s*\}/g
+                      and $fld =~ s/\{\s*(\d+[.,]?\d*|\*)\s*\}//;
+                    die "Too many width specifications in $field"
+                      if $extras || $setwidth && $checkwidth;
+                    if ($setwidth && $setwidth =~ s/[.,](\d+)//) {
+                        $setplaces = $1 || 0;
+                    }
 
-				for (@(\@($checkwidth, $checkplaces), \@($setwidth, $setplaces))) {
-					die "Can't fit $_->[1] decimal place",($_->[1]!=1?'s':''),
-						  " in a $_->[0]-character field" 
-							  if defined($_->[0]) && defined($_->[1])
-							  && $_->[0] ne '*'
-							  && $_->[0] +<= $_->[1];
-				}
+                    for (@(\@($checkwidth, $checkplaces), \@($setwidth, $setplaces))) {
+                        die "Can't fit $_->[1] decimal place",($_->[1]!=1?'s':''),
+                          " in a $_->[0]-character field" 
+                            if defined($_->[0]) && defined($_->[1])
+                              && $_->[0] ne '*'
+                                && $_->[0] +<= $_->[1];
+                    }
 
-				$precurr =
-					$fld =~ s/$precurrpat/{$1.($3 x length $2).$3}/  ? "$2" : "";
-				$incurr =
-					$fld =~ m/$incurrpat/                           ? "$2" : "";
-				$postcurr =
-					$fld =~ s/$postcurrpat/{$1.($1 x length $2).$3}/ ? "$2" : "";
+                    $precurr =
+                      $fld =~ s/$precurrpat/$($1.($3 x length $2).$3)/  ? "$2" : "";
+                    $incurr =
+                      $fld =~ m/$incurrpat/                           ? "$2" : "";
+                    $postcurr =
+                      $fld =~ s/$postcurrpat/$($1.($1 x length $2).$3)/ ? "$2" : "";
 
-				if (%form{width} == 2) {
-					$fld = '[[';
-				}
-				elsif (%form{width} == 3) {
-					$fld =~ s/^ \{ ([.,]) \} $/].[/x;
-					$fld =~ s/^ \{ (.)    \} $/$1$1$1/x;
-				}
-				elsif (%form{width} +> 3)  {
-					$fld =~ s/^ \{ ([.,] \[)   /]$1/x;
-					$fld =~ s/^ \{ ([.,] \<)   />$1/x;
-					$fld =~ s/(\] .* [.,]) \} $/$1\[/x;
-					$fld =~ s/(\> .* [.,]) \} $/$1</x;
-					$fld =~ s/^ \{ (.) /$1$1/gx;
-                                        $fld =~ s/ (.) \} $/$1$1/gx;
-				}
+                    if (%form{width} == 2) {
+                        $fld = '[[';
+                    }
+                    elsif (%form{width} == 3) {
+                        $fld =~ s/^ \{ ([.,]) \} $/].[/x;
+                        $fld =~ s/^ \{ (.)    \} $/$1$1$1/x;
+                    }
+                    elsif (%form{width} +> 3)  {
+                        $fld =~ s/^ \{ ([.,] \[)   /]$1/x;
+                        $fld =~ s/^ \{ ([.,] \<)   />$1/x;
+                        $fld =~ s/(\] .* [.,]) \} $/$1\[/x;
+                        $fld =~ s/(\> .* [.,]) \} $/$1</x;
+                        $fld =~ s/^ \{ (.) /$1$1/gx;
+                        $fld =~ s/ (.) \} $/$1$1/gx;
+                    }
 
-				%form{width} = $setwidth
-					if defined $setwidth && $setwidth ne '*';
+                    %form{width} = $setwidth
+                      if defined $setwidth && $setwidth ne '*';
 
-				if (%form{width} == 2) {
-					$fld = '[[';
-				}
-				elsif (%form{width} == 3) {
-					$fld =~ s/^ \{ ([.,]) \} $/].[/x;
-					$fld =~ s/^ \{ (.)    \} $/$1$1$1/x;
-				}
-				elsif (%form{width} +> 3)  {
-					$fld =~ s/^ \{ ([.,] \[)   /]$1/x;
-					$fld =~ s/^ \{ ([.,] \<)   />$1/x;
-					$fld =~ s/(\] .* [.,]) \} $/$1\[/x;
-					$fld =~ s/(\> .* [.,]) \} $/$1</x;
-					$fld =~ s/^ \{ (.) /$1$1/gx;
-                                        $fld =~ s/ (.) \} $/$1$1/gx;
-				}
+                    if (%form{width} == 2) {
+                        $fld = '[[';
+                    }
+                    elsif (%form{width} == 3) {
+                        $fld =~ s/^ \{ ([.,]) \} $/].[/x;
+                        $fld =~ s/^ \{ (.)    \} $/$1$1$1/x;
+                    }
+                    elsif (%form{width} +> 3)  {
+                        $fld =~ s/^ \{ ([.,] \[)   /]$1/x;
+                        $fld =~ s/^ \{ ([.,] \<)   />$1/x;
+                        $fld =~ s/(\] .* [.,]) \} $/$1\[/x;
+                        $fld =~ s/(\> .* [.,]) \} $/$1</x;
+                        $fld =~ s/^ \{ (.) /$1$1/gx;
+                        $fld =~ s/ (.) \} $/$1$1/gx;
+                    }
 
-				%form{width} = $setwidth
-					if defined $setwidth && $setwidth ne '*';
-			}
+                    %form{width} = $setwidth
+                      if defined $setwidth && $setwidth ne '*';
+                }
 
-			if ($setwidth && $setwidth eq '*')	{
-				push @{%form{verbatim} ? \@vstarred : \@starred}, \%form;
-			}
-			else {
-				$width -= %form{width}
-			}
+                if ($setwidth && $setwidth eq '*')	{
+                    push @{%form{verbatim} ? \@vstarred : \@starred}, \%form;
+                }
+                else {
+                    $width -= %form{width}
+                }
 
-			%form{line} = 1 unless %form{isbullet} || $fld =~ m/[][IV"]/;
+                %form{line} = 1 unless %form{isbullet} || $fld =~ m/[][IV"]/;
 
-			%form{hjust} ||= %form{width} == 1					 ? \&jsingle
-					 	   : ($fld =~ m/^(?:<+|\[+)$/)			 ? \&jleft
-					 	   : ($fld =~ m/^(?:>+|\]+)$/)			 ? \&jright
-			         	   : ($fld =~ m/^(?:I+|\|+|>+<+|\]+\[+)$/)? \&jcentre
-			         	   : ($fld =~ m/^(?:<+>+|\[+\]+)$/)		 ? \&jfull
-			         	   : ($fld =~ m/^(?:V+)$/)				 ?
-													joverflow(%form, %fldopts)
-			         	   : ($fld =~ m/^(?: [>,' 0]*  \.          [<0]*
-										  | [],' 0]*  \.          [[0]*
-			         	                  | [>.' 0]*  \,          [<0]*
-										  | [].' 0]*  \,          [[0]*
-										  | [>.,' 0]* \Q$incurr\E [<0]*
-										  | [].,' 0]* \Q$incurr\E [[0]*
-									    )$/x)                     	? do {
-									  %form{break}=\&break_nl;
-									  jnum($fld,$precurr,$incurr,$postcurr,
-										   %form{width},\%fldopts,
-										   $setplaces, $checkplaces)
-																		}
-					 	   : die "Field $fldcnt is of unknown type: $field"
-					 	   ;
+                %form{hjust} ||= %form{width} == 1					 ? \&jsingle
+                  : ($fld =~ m/^(?:<+|\[+)$/)			 ? \&jleft
+                    : ($fld =~ m/^(?:>+|\]+)$/)			 ? \&jright
+                      : ($fld =~ m/^(?:I+|\|+|>+<+|\]+\[+)$/)? \&jcentre
+                        : ($fld =~ m/^(?:<+>+|\[+\]+)$/)		 ? \&jfull
+                          : ($fld =~ m/^(?:V+)$/)				 ?
+                            joverflow(%form, %fldopts)
+                              : ($fld =~ m/^(?: [>,' 0]*  \.          [<0]*
+                                           | [],' 0]*  \.          [[0]*
+                                           | [>.' 0]*  \,          [<0]*
+                                           | [].' 0]*  \,          [[0]*
+                                           | [>.,' 0]* \Q$incurr\E [<0]*
+                                           | [].,' 0]* \Q$incurr\E [[0]*
+                                           )$/x)                     	? do {
+                                               %form{break}=\&break_nl;
+                                               jnum($fld,$precurr,$incurr,$postcurr,
+                                                    %form{width},\%fldopts,
+                                                    $setplaces, $checkplaces)
+                                           }
+                                             : die "Field $fldcnt is of unknown type: $field"
+                                               ;
 
 			%form{break}=\&break_nl if %form{stretch};
 
@@ -787,12 +787,11 @@ sub make_col {
 		}
 		my ($text,$more,$eol) = < $f->{break}->($str_ref,$width,$f->{opts}{ws});
 		if ($f->{opts}{ws}) {
-			$text =~ s{($f->{opts}{ws})}
-					  {{ my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
-						@caps = @( length($1) ? " " : "" ) unless (nelems @caps);
-						join "", @caps;
-					  
-}}g;
+                    $text =~ s{($f->{opts}{ws})}
+                              {$( do { my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
+				 @caps = @( length($1) ? " " : "" ) unless (nelems @caps);
+				 join "", @caps;
+                               })}g;
 		}
 		$text .= "\r" if $eol;
 		push @col, $text;
@@ -1051,11 +1050,12 @@ sub make_underline {
 	my $trail = "$1"^|^"\n";
 	for my $l (@($nextline, $prevline)) {
 		$l = join "", map {$_->{literal} ? ${$_->{src}} : '*'x$_->{width} } @$l;
-		$l =~ s{(.)}{{$1 =~ m/\s/ ? "\0" : "\1"}}gs;
+		$l =~ s{(.)}{$($1 =~ m/\s/ ? "\0" : "\1")}gs;
 	}
 	$nextline ^|^= $prevline;
 	$nextline =~ s{\0}{ }g;
-	$nextline =~ s{(\cA+)}{{my $len=length($1); substr($under x $len,0,$len)}}g;
+	$nextline =~ s{(\cA+)}{$( do { my $len=length($1);
+                                       substr($under x $len,0,$len) } )}g;
 	$nextline .= $trail;
 	return \@(\%( < %std_literal, width => length($nextline), src => \$nextline ));
 }

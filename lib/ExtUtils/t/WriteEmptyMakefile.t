@@ -25,7 +25,7 @@ try { WriteEmptyMakefile("something"); };
 like $@->{description}, qr/Need an even number of args/;
 
 
-{
+do {
     my $stdout = '';
     close STDOUT;
     open STDOUT, '>>', \$stdout or die;
@@ -38,4 +38,4 @@ like $@->{description}, qr/Need an even number of args/;
         FIRST_MAKEFILE  => "wibble",
     );
     ok -e 'wibble';
-}
+};

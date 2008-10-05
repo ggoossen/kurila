@@ -176,7 +176,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
     if($line =~ m/^=cut/s) {
       # here ends the pod block, and therefore the previous pod para
-      DEBUG +> 1 and print "Noting =cut at line %$($self){'line_count'}\n";
+      DEBUG +> 1 and print "Noting =cut at line %{$self}{'line_count'}\n";
       $self->{'in_pod'} = 0;
       # ++$self->{'pod_para_count'};
       $self->_ponder_paragraph_buffer();
@@ -189,12 +189,12 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       
     } elsif($line =~ m/^\s*$/s) {  # it's a blank line
       if(!$self->{'start_of_pod_block'} and nelems @$paras and $paras->[-1]->[0] eq '~Verbatim') {
-        DEBUG +> 1 and print "Saving blank line at line %$($self){'line_count'}\n";
+        DEBUG +> 1 and print "Saving blank line at line %{$self}{'line_count'}\n";
         push @{$paras->[-1]}, $line;
       }  # otherwise it's not interesting
       
       if(!$self->{'start_of_pod_block'} and !$self->{'last_was_blank'}) {
-        DEBUG +> 1 and print "Noting para ends with blank line at %$($self){'line_count'}\n"; 
+        DEBUG +> 1 and print "Noting para ends with blank line at %{$self}{'line_count'}\n"; 
       }
       
       $self->{'last_was_blank'} = 1;
@@ -213,18 +213,18 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
          # by now it's safe to consider the previous paragraph as done.
                 
         push @$paras, $new; # the new incipient paragraph
-        DEBUG +> 1 and print "Starting new @$($paras)[-1]->[0] para at line %$($self){'line_count'}\n";
+        DEBUG +> 1 and print "Starting new @$($paras)[-1]->[0] para at line %{$self}{'line_count'}\n";
         
       } elsif($line =~ m/^\s/s) {
 
         if(!$self->{'start_of_pod_block'} and nelems @$paras and $paras->[-1]->[0] eq '~Verbatim') {
-          DEBUG +> 1 and print "Resuming verbatim para at line %$($self){'line_count'}\n";
+          DEBUG +> 1 and print "Resuming verbatim para at line %{$self}{'line_count'}\n";
           push @{$paras->[-1]}, $line;
         } else {
           ++$self->{'pod_para_count'};
           $self->_ponder_paragraph_buffer();
            # by now it's safe to consider the previous paragraph as done.
-          DEBUG +> 1 and print "Starting verbatim para at line %$($self){'line_count'}\n";
+          DEBUG +> 1 and print "Starting verbatim para at line %{$self}{'line_count'}\n";
           push @$paras, \@('~Verbatim', \%('start_line' => $self->{'line_count'}), $line);
         }
       } else {
@@ -232,14 +232,14 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         $self->_ponder_paragraph_buffer();
          # by now it's safe to consider the previous paragraph as done.
         push @$paras, \@('~Para',  \%('start_line' => $self->{'line_count'}), $line);
-        DEBUG +> 1 and print "Starting plain para at line %$($self){'line_count'}\n";
+        DEBUG +> 1 and print "Starting plain para at line %{$self}{'line_count'}\n";
       }
       $self->{'last_was_blank'} = $self->{'start_of_pod_block'} = 0;
 
     } else {
       # It's a non-blank line /continuing/ the current para
       if((nelems @$paras)) {
-        DEBUG +> 2 and print "Line %$($self){'line_count'} continues current paragraph\n";
+        DEBUG +> 2 and print "Line %{$self}{'line_count'} continues current paragraph\n";
         push @{$paras->[-1]}, $line;
       } else {
         # Unexpected case!
@@ -295,7 +295,7 @@ sub _handle_encoding_line {
       $self->{'_transcoder'}->(< @x);
     };
     $@ && die( $enc_error =
-      "Really unexpected error setting up encoding $e: {$@->message}\nAborting"
+      "Really unexpected error setting up encoding $e: $($@->message)\nAborting"
     );
 
   } else {
@@ -1362,7 +1362,7 @@ sub _ponder_Verbatim {
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
         # one setting everywhere, and 8th wins.
-        s/^([^\t]*)(\t+)/{$1.(" " x ((length($2)<<3)-(length($1)^&^7)))}/
+        s/^([^\t]*)(\t+)/$($1.(" " x ((length($2)<<3)-(length($1)^&^7))))/
       ) {}
       # TODO: whinge about (or otherwise treat) unindented or overlong lines
   }
@@ -1866,7 +1866,7 @@ sub pretty { # adopted from Class::Classless
     } else {
         s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
          #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
-         <{%pretty_form{$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']'}>g;
+         <$(%pretty_form{$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']')>g;
       qq{"$_"};
     }
   } @stuff;

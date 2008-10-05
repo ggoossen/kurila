@@ -45,7 +45,7 @@ like( $$stdout,  qr/^Foo\? \[Bar!\]\s+Bar!\n$/,      '  question' );
 $$stdout = '';
 
 
-{
+do {
     %ENV{PERL_MM_USE_DEFAULT} = 0;
     close STDIN;
     my $stdin = '';
@@ -57,4 +57,4 @@ $$stdout = '';
     is( prompt("Foo?", 'Bar!'), 'From STDIN',     'from STDIN' );
     like( $$stdout,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
     $$stdout = '';
-}
+};

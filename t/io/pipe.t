@@ -101,7 +101,7 @@ SKIP: do {
             close WRITER;
             while( ~< *READER) {
                 s/^not //;
-                s/([A-Z])/{lc($1)}/g;
+                s/([A-Z])/$(lc($1))/g;
                 print;
             }
             close READER;     # avoid zombies

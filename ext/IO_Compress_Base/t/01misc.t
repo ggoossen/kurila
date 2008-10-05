@@ -64,8 +64,8 @@ sub My::testParseParameters()
             "wanted signed, got 'abc'";
 
 
-    SKIP:
-    {
+  SKIP:
+    do {
         use Config;
 
         skip 'readonly + threads', 1
@@ -74,7 +74,7 @@ sub My::testParseParameters()
         try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
         like $@->{description}, mkErr("Parameter 'Fred' not writable"), 
                 "wanted writable, got readonly";
-    }
+    };
 
     my @xx;
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \@xx) ; };
@@ -125,7 +125,7 @@ undef) ;
 My::testParseParameters();
 
 
-{
+do {
     title "isaFilename" ;
     ok   isaFilename("abc"), "'abc' isaFilename";
 
@@ -133,9 +133,9 @@ My::testParseParameters();
     ok ! isaFilename(\@()),    "[] ! isaFilename";
     $main::X = 1; $main::X = $main::X ;
     ok ! isaFilename(*X),    "glob ! isaFilename";
-}
+};
 
-{
+do {
     title "whatIsInput" ;
 
     my $lex = LexFile->new( my $out_file) ;
@@ -152,9 +152,9 @@ My::testParseParameters();
     is whatIsInput(sub { 1 }, 1), 'code',     "Match code";
     is whatIsInput(sub { 1 }),    ''   ,      "Don't match code";
 
-}
+};
 
-{
+do {
     title "whatIsOutput" ;
 
     my $lex = LexFile->new( my $out_file) ;
@@ -171,11 +171,11 @@ My::testParseParameters();
     is whatIsOutput(sub { 1 }, 1), 'code',     "Match code";
     is whatIsOutput(sub { 1 }),    ''   ,      "Don't match code";
 
-}
+};
 
 # U64
 
-{
+do {
     title "U64" ;
 
     my $x = U64->new();
@@ -250,4 +250,4 @@ My::testParseParameters();
     ok !$x->equal($z), "  ! equal";
 
     title "U64 - pack_V" ;
-}
+};

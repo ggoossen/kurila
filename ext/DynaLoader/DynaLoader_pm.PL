@@ -369,7 +369,7 @@ sub bootstrap {
     <<$^O-eq-darwin>>
     if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
         #extension library has already been loaded, e.g. darwin
-        my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
+        my $xs = dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file);
         # See comment block above
         push(@dl_shared_objects, $file); # record files loaded
         return &$xs(<@args);
@@ -398,7 +398,7 @@ sub bootstrap {
 
     push(@dl_modules, $module); # record loaded module
 
-    my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
+    my $xs = dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file);
 
     # See comment block above
     push(@dl_shared_objects, $file); # record files loaded

@@ -245,7 +245,7 @@ sub _compile {
 
   print < @code if DEBUG;
   my $sub = eval(join '', @code);
-  die "{$@->message} while evalling" . join('', @code) if $@; # Should be impossible.
+  die "$($@->message) while evalling" . join('', @code) if $@; # Should be impossible.
   return $sub;
 }
 

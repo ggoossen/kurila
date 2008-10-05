@@ -94,7 +94,7 @@ for ( @prgs){
     if ($todo_reason && $todo_reason =~ s/^\?//) {
 	my $temp = eval $todo_reason;
 	if ($@) {
-	    die "# In TODO code reason:\n# $todo_reason\n{$@->message}";
+	    die "# In TODO code reason:\n# $todo_reason\n$($@->message)";
 	}
 	$todo_reason = $temp;
     }

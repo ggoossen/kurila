@@ -7,23 +7,13 @@ print "1..51\n";
 my $test = 1;
 
 sub ok {
-  my ($pass, $wrong, $err) = < @_;
+  my ($pass, $err) = < @_;
   if ($pass) {
     print "ok $test\n";
     $test = $test + 1; # Would be doubleplusbad to use ++ in the ++ test.
     return 1;
   } else {
-    if ($err) {
-      chomp $err;
-      print "not ok $test # $err\n";
-    } else {
-      if (defined $wrong) {
-        $wrong = ", got $wrong";
-      } else {
-        $wrong = '';
-      }
-      printf "not ok $test # line \%d$wrong\n", (caller)[[2]];
-    }
+      printf "not ok $test # line \%d\n", @(caller)[2];
   }
   $test = $test + 1;
   return;
@@ -35,63 +25,63 @@ sub ok {
 
 my $a = 2147483647;
 my $c=$a++;
-ok ($a == 2147483648, $a);
+ok ($a == 2147483648);
 
 $a = 2147483647;
 $c=++$a;
-ok ($a == 2147483648, $a);
+ok ($a == 2147483648);
 
 $a = 2147483647;
 $a=$a+1;
-ok ($a == 2147483648, $a);
+ok ($a == 2147483648);
 
 $a = -2147483648;
 $c=$a--;
-ok ($a == -2147483649, $a);
+ok ($a == -2147483649);
 
 $a = -2147483648;
 $c=--$a;
-ok ($a == -2147483649, $a);
+ok ($a == -2147483649);
 
 $a = -2147483648;
 $a=$a-1;
-ok ($a == -2147483649, $a);
+ok ($a == -2147483649);
 
 $a = 2147483648;
 $a = -$a;
 $c=$a--;
-ok ($a == -2147483649, $a);
+ok ($a == -2147483649);
 
 $a = 2147483648;
 $a = -$a;
 $c=--$a;
-ok ($a == -2147483649, $a);
+ok ($a == -2147483649);
 
 $a = 2147483648;
 $a = -$a;
 $a=$a-1;
-ok ($a == -2147483649, $a);
+ok ($a == -2147483649);
 
 $a = 2147483648;
 $b = -$a;
 $c=$b--;
-ok ($b == -$a-1, $a);
+ok ($b == -$a-1);
 
 $a = 2147483648;
 $b = -$a;
 $c=--$b;
-ok ($b == -$a-1, $a);
+ok ($b == -$a-1);
 
 $a = 2147483648;
 $b = -$a;
 $b=$b-1;
-ok ($b == -(++$a), $a);
+ok ($b == -(++$a));
 
 $a = undef;
-ok ($a++ eq '0', do { $a=undef; $a++ }, "postinc undef returns '0'");
+ok ($a++ eq '0', "postinc undef returns '0'");
 
 $a = undef;
-ok (!defined($a--), do { $a=undef; $a-- }, "postdec undef returns undef");
+ok (!defined($a--), "postdec undef returns undef");
 
 # Verify that shared hash keys become unshared.
 
