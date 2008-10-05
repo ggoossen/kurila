@@ -930,10 +930,10 @@ is(pack('U', 0x300), "\x{300}");
 is(@(unpack('U', "\x{300}"))[0], 0x300);
 
 # is unpack U the reverse of pack U for Unicode string?
-is("$(join ' ',@$(\@(unpack('U*', pack('U*', 100, 200, 300)))))", "100 200 300");
+is("$(join ' ', @: unpack('U*', pack('U*', 100, 200, 300)))", "100 200 300");
 
 # is unpack U the reverse of pack U for byte string?
-is("$(join ' ',@$(\@(unpack('U*', pack('U*', 100, 200)))))", "100 200");
+is("$(join ' ', @: unpack('U*', pack('U*', 100, 200)))", "100 200");
 };
 
 SKIP: do {
@@ -941,10 +941,10 @@ SKIP: do {
 
     use utf8;
     # does pack U0C create Unicode?
-    is("$(join ' ',@$(\@(pack('U0C*', 100, 195, 136))))", "\x{64}"."\x{c8}");
+    is("$(join ' ', @: pack('U0C*', 100, 195, 136))", "\x{64}"."\x{c8}");
 
     # does pack C0U create characters?
-    is("$(join ' ',@$(\@(pack('C0U*', 100, 200))))", pack("C*", 100, 195, 136));
+    is("$(join ' ', @: pack('C0U*', 100, 200))", pack("C*", 100, 195, 136));
 
     # does unpack U0U on byte data warn?
     do {

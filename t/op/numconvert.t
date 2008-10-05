@@ -193,7 +193,7 @@ for my $num_chain (1..$max_chain) {
 	    push @ans, $inpt;
 	  }
 	  if (@ans[0] ne @ans[1]) {
-	    print "# '@ans[0]' ne '@ans[1]',\t$num\t=> $(join ' ', @opnames[[@($first,< @$(@curops[0]),$last)]]) vs $(join ' ', @opnames[[@($first,< @$(@curops[1]),$last)]])\n";
+	    print "# '@ans[0]' ne '@ans[1]',\t$num\t=> $(join ' ', @opnames[[@($first,< @{@curops[0]},$last)]]) vs $(join ' ', @opnames[[@($first,< @{@curops[1]},$last)]])\n";
 	    # XXX ought to check that "+" was in the list of opnames
 	    if (((@ans[0] eq $max_uv_pp) and (@ans[1] eq $max_uv_p1))
 		or ((@ans[1] eq $max_uv_pp) and (@ans[0] eq $max_uv_p1))) {
