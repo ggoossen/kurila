@@ -228,20 +228,18 @@ line	:	label cond
 			}
 	|	label sideff ';'
 			{
-                            $$ = newSTATEOP(0, PVAL($1), $2, $2 ? $2->op_location : LOCATION($3));
+                            if (PVAL($1)) {
+                                $$ = newSTATEOP(0, PVAL($1),
+                                    newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
+                                        $2->op_location, (OP*)NULL, $2, NULL, 0), $2 ? $2->op_location : LOCATION($3));
+                            } 
+                            else {
+                                $$ = newSTATEOP(0, NULL, $2, $2 ? $2->op_location : LOCATION($3));
+                            }
                             PL_parser->expect = XSTATE;
-                            DO_MAD({
-                                    /* sideff might already have a nexstate */
-                                    OP* op = ((LISTOP*)$$)->op_first;
-                                    if (op) {
-                                        while (op->op_sibling &&
-                                            op->op_sibling->op_type == OP_NEXTSTATE)
-                                            op = op->op_sibling;
-                                        TOKEN_GETMAD($1,op,'L');
-                                        TOKEN_GETMAD($3,op,';');
-                                    }
-                                })
-                                }
+                            TOKEN_GETMAD($1,$$,'L');
+                            TOKEN_GETMAD($3,$$,';');
+                        }
 	;
 
 /* An expression which may have a side-effect */
@@ -389,11 +387,6 @@ loop	:	label WHILE remember '(' texpr ')'
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($7,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label block cont  /* a block is a loop that happens once */
-			{ $$ = newSTATEOP(0, PVAL($1),
-				 newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                     $2->op_location, (OP*)NULL, $2, $3, 0), $2->op_location);
-			  TOKEN_GETMAD($1,((LISTOP*)$$)->op_first,'L'); }
 	;
 
 /* determine whether there are any new my declarations */
@@ -964,10 +957,11 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
                             $$ = dofile($2, IVAL($1), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
 			}
-	|	DO block	%prec '('               /* do { code */
-                        { $$ = newUNOP(OP_NULL, OPf_SPECIAL, scope($2), LOCATION($1));
-			  TOKEN_GETMAD($1,$$,'D');
-                          APPEND_MADPROPS_PV("do",$$,'>');
+	|	DO block %prec '('               /* do { code */
+                        {
+                            $$ = newUNOP(OP_NULL, OPf_SPECIAL, scope($2), LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'D');
+                            APPEND_MADPROPS_PV("do",$$,'>');
 			}
         ;
 

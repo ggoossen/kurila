@@ -7,10 +7,6 @@
 
 $| = 1;
 
-# for testing TEST only
-BEGIN { require '../lib/strict.pm'; strict->import() };
-BEGIN { require '../lib/warnings.pm'; warnings->import() };
-
 # Let tests know they're running in the perl core.  Useful for modules
 # which live dual lives on CPAN.
 %ENV{PERL_CORE} = 1;
@@ -20,7 +16,7 @@ BEGIN { require '../lib/warnings.pm'; warnings->import() };
 our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
-{
+do {
     my @argv = @( () );
     foreach my $iargv ( @ARGV) {
 	push( @argv, $iargv ), next unless $iargv =~ m/^-(\S+)$/;
@@ -39,7 +35,7 @@ our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 	}
     }
     @ARGV = @( < @argv );
-}
+};
 
 chdir 't' if -f 't/TEST';
 
@@ -247,14 +243,14 @@ EOT
     my $totmax = 0;
     my %failed_tests;
 
-    {
+    do {
         # read previously failed tests
         if (-e 'TEST_FAILED') {
             open my $fh, "<", "TEST_FAILED" or die;
             while ( ~< $fh) { chomp; %failed_tests{$_} = 0; }
             close $fh;
         }
-    }
+    };
 
     while (my $test = shift @tests) {
         my $test_start_time = $show_elapsed_time ? Time::HiRes::time() : 0;
@@ -579,12 +575,12 @@ SHRDLU_5
 	}
     }
 
-    {
+    do {
         # write failed tests
         open my $fh, ">", "TEST_FAILED" or die;
         print $fh "$_\n" for reverse sort @( < keys %failed_tests);
         close $fh;
-    }
+    };
 
     my ($user,$sys,$cuser,$csys) = times;
     print sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",

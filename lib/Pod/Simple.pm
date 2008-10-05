@@ -668,7 +668,7 @@ sub _remap_sequences {
   ;
   DEBUG +> 3 and print " Map: ",
     join('; ', map "$_=" . (
-        ref($map->{$_}) ? join(",", @$($map->{$_})) : $map->{$_}
+        ref($map->{$_}) ? join(",", @{$map->{$_}}) : $map->{$_}
       ),
       sort keys %$map ),
     ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys %$map)
@@ -893,7 +893,7 @@ sub _treat_Zs {  # Nix Z<...>'s
               next;
           }
         
-          DEBUG +> 1 and print "Nixing Z node $(join ' ',@$($treelet->[$i]))\n";
+          DEBUG +> 1 and print "Nixing Z node $(join ' ',@{$treelet->[$i]})\n";
         
           # bitch UNLESS it's empty
           unless (  (nelems @{$treelet->[$i]}) == 2

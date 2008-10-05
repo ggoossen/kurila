@@ -30,7 +30,7 @@ do {
     try {
 	try { goto foo; };
 	print ($@ ? "ok $test\n" : "not ok $test\n");
-	last;
+	return;
 	foreach my $i (@(1)) {
 	    foo: print "not ok $test\n";
 	    print "# jumped into foreach\n";
