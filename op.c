@@ -358,9 +358,10 @@ S_no_bareword_allowed(pTHX_ const OP *o)
 {
     PERL_ARGS_ASSERT_NO_BAREWORD_ALLOWED;
 
-    yyerror(Perl_form(aTHX_
-		      "Bareword \"%"SVf"\" not allowed while \"strict subs\" in use",
-		      SVfARG(cSVOPo_sv)));
+    Perl_croak_at(aTHX_
+	o->op_location,
+	"Bareword \"%"SVf"\" not allowed while \"strict subs\" in use",
+	SVfARG(cSVOPo_sv));
 }
 
 /* "register" allocation */
