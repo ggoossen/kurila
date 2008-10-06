@@ -398,7 +398,8 @@ sub bootstrap {
 
     push(@dl_modules, $module); # record loaded module
 
-    my $xs = dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file);
+    my $xs = do { no warnings 'redefine';
+                  dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file); };
 
     # See comment block above
     push(@dl_shared_objects, $file); # record files loaded
