@@ -46,6 +46,7 @@ Level 0                 0 | A |                (more specialized)
 do {
     package Test::O;
     use mro 'c3'; 
+    our @ISA;
     
     package Test::F;   
     use mro 'c3';  

@@ -31,10 +31,6 @@ do {
 	try { goto foo; };
 	print ($@ ? "ok $test\n" : "not ok $test\n");
 	return;
-	foreach my $i (@(1)) {
-	    foo: print "not ok $test\n";
-	    print "# jumped into foreach\n";
-	}
     };
     print "not ok $test\n" if $@;
     $test++;

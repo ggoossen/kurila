@@ -258,6 +258,11 @@ sideff	:	error
                             $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
+	|	block UNTIL iexpr
+                        {
+                            $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, TRUE, LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'w');
+			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL, (line_t)IVAL($2),
 					(OP*)NULL, $3, $1, (OP*)NULL, LOCATION($2));

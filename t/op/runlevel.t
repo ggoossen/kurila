@@ -25,9 +25,9 @@ for ( @prgs){
 
 __END__
 our @a = @(1, 2, 3);
-{
+do {
   @a = sort { last ; } @a;
-}
+};
 EXPECT
 Can't "last" outside a loop block at - line 3 character 15.
 ########
@@ -50,24 +50,24 @@ EXPECT
 ########
 our @a = @(1, 2, 3);
 foo:
-{
+do {
   @a = sort { last foo; } @a;
-}
+};
 EXPECT
 Label not found for "last foo" at - line 4 character 15.
 ########
 our @a = @(1, 2, 3);
 foo:
-{
+do {
   @a = sort { exit(0) } @a;
-}
+};
 END { print "foobar\n" }
 EXPECT
 foobar
 ########
 package TH;
 sub TIEHASH { bless \%(), 'TH' }
-sub STORE { try { print "{ join ' ', @_[[1..2]]}\n" }; die "bar\n" }
+sub STORE { try { print join(' ', @_[[1..2]]) . "\n" }; die "bar\n" }
 tie our %h, 'TH';
 try { %h{A} = 1; print "never\n"; };
 print $@->{description};
@@ -86,7 +86,7 @@ f();
 
 sub d {
     my $i = 0; my @a;
-    while (do { { package DB; @a = @( caller($i++) ) } } ) {
+    while (do { package DB; @a = @( caller($i++) ) } ) {
         @a = @DB::args;
         for (@a) { print "$_\n"; $_ = '' }
     }

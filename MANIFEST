@@ -2327,12 +2327,6 @@ t/mro/complex_c3.t		mro tests
 t/mro/dbic_c3.t			mro tests
 t/mro/inconsistent_c3.t		mro tests
 t/mro/method_caching.t		mro tests
-t/mro/next_edgecases.t		mro tests
-t/mro/next_goto.t		mro tests
-t/mro/next_inanon.t		mro tests
-t/mro/next_ineval.t		mro tests
-t/mro/next_method.t		mro tests
-t/mro/next_skip.t		mro tests
 t/mro/pkg_gen.t		mro tests
 t/mro/recursion_c3.t		mro tests
 t/mro/vulcan_c3.t		mro tests

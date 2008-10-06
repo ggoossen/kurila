@@ -448,7 +448,7 @@ $heavy_txt .= join('', @non_v) . "\n";
 $heavy_txt .= "our \$summary = <<'!END!';\n";
 open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $!";
 1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/;
-do { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
+{ $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
 close(*MYCONFIG);
 
 $heavy_txt .= "\n!END!\n" . <<'EOT';
