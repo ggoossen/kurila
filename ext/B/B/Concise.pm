@@ -412,7 +412,7 @@ sub base_n {
     my $x = shift;
     return "-" . base_n(-$x) if $x +< 0;
     my $str = "";
-    do { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
+    { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
     $str = join '', reverse split m//, $str if $big_endian;
     return $str;
 }
@@ -987,7 +987,7 @@ sub tree {
 # Remember, this needs to stay the last things in the module.
 
 # Why is this different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^O eq 'MacOS' ? 15 : 14;
+my $cop_seq_mnum = $^O eq 'MacOS' ? 14 : 13;
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
 
 1;

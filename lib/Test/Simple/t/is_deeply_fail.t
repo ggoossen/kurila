@@ -273,7 +273,7 @@ is( $err, <<ERR,        '  right diagnostic');
 #   Failed test at $0 line 286.
 #     Structures begin differing at:
 #          \$got = 23
-#     \$expected = {dump::view($ref)}
+#     \$expected = $(dump::view($ref))
 ERR
 
 #line 296
@@ -282,7 +282,7 @@ is( $out, "not ok 22\n", 'ref vs scalar' );
 is( $err, <<ERR,        '  right diagnostic');
 #   Failed test at $0 line 296.
 #     Structures begin differing at:
-#          \$got = {dump::view($ref)}
+#          \$got = $(dump::view($ref))
 #     \$expected = 23
 ERR
 
