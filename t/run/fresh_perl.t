@@ -140,7 +140,7 @@ EXPECT
 Modification of a read-only value attempted at - line 1 character 14.
 BEGIN failed--compilation aborted
 ########
-my @a; @a[2] = 1; for (@a) { $_ = 2 } print "{join ' ', @a}\n"
+my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT
 2 2 2
 ########
@@ -175,8 +175,8 @@ $s += $_} @(1,2,4);
 print "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }
-BEGIN { print "argv <{join ' ', @ARGV}>\nbegin <",shift(@ARGV),">\n" }
-END { print "end <",shift(@ARGV),">\nargv <{join ' ', @ARGV}>\n" }
+BEGIN { print "argv <$(join ' ', @ARGV)>\nbegin <",shift(@ARGV),">\n" }
+END { print "end <",shift(@ARGV),">\nargv <$(join ' ', @ARGV)>\n" }
 INIT { print "init <",shift(@ARGV),">\n" }
 CHECK { print "check <",shift(@ARGV),">\n" }
 EXPECT

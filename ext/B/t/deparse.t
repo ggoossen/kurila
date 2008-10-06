@@ -37,7 +37,7 @@ while ( ~< *DATA) {
     my $coderef = eval "sub \{$input\}";
 
     if ($@ and $@->{description}) {
-	diag("$num deparsed: {$@->message}");
+	diag("$num deparsed: $($@->message)");
         diag("input: '$input'");
 	ok(0, $testname);
     }
@@ -60,7 +60,7 @@ is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 use constant cr => \@('hello');
 my $string = "sub " . $deparse->coderef2text(\&cr);
 my $subref = eval $string;
-die "Failed eval '$string': {$@->message}" if $@;
+die "Failed eval '$string': $($@->message)" if $@;
 my $val = $subref->() or diag $string;
 is(ref($val), 'ARRAY');
 is($val->[0], 'hello');
@@ -89,11 +89,11 @@ LINE: while (defined($_ = ~< *ARGV)) {
     };
 }
 EOF
-$b =~ s/(LINE:)/sub BEGIN {
+$b =~ s/(LINE:)/sub BEGIN \{
     'MacPerl'->bootstrap;
     'OSA'->bootstrap;
     'XL'->bootstrap;
-}
+\}
 $1/ if $Is_MacOS;
 is($a, $b);
 
@@ -136,11 +136,11 @@ __DATA__
 1;
 ####
 # 3
-{
+do {
     no warnings;
     '???';
     2;
-}
+};
 ####
 # 4
 my $test;

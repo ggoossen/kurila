@@ -19,9 +19,9 @@ From the parrot test t/pmc/object-meths.t
 =cut
 
 do {
-    package t::lib::A; use mro 'c3';
-    package t::lib::B; use mro 'c3';
-    package t::lib::E; use mro 'c3';
+    package t::lib::A; use mro 'c3'; our @ISA;
+    package t::lib::B; use mro 'c3'; our @ISA;
+    package t::lib::E; use mro 'c3'; our @ISA;
     package t::lib::C; use mro 'c3'; use base ('t::lib::A', 't::lib::B');
     package t::lib::D; use mro 'c3'; use base ('t::lib::A', 't::lib::E');
     package t::lib::F; use mro 'c3'; use base ('t::lib::C', 't::lib::D');

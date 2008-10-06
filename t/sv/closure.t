@@ -9,7 +9,7 @@
 use Config;
 require './test.pl'; # for runperl()
 
-print "1..181\n";
+print "1..133\n";
 
 my $test = 1;
 sub test (&) {
@@ -213,7 +213,7 @@ do {
       for my $where_declared (qw!filescope in_named in_anon!) {
 	# And that, in turn, may be within a foreach loop,
 	# a naked block, or another named sub
-	for my $within (qw!foreach naked other_sub!) {
+	for my $within (qw!foreach other_sub!) {
 
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
@@ -305,8 +305,6 @@ END
       my @list = @(10000, 10010);
       foreach my $foreach (@list) {
     ' # }
-	  } elsif ($within eq 'naked') {
-	    $code .= "  \{ # naked block\n"	# }
 	  } elsif ($within eq 'other_sub') {
 	    $code .= "  sub inner_sub \{\n"	# }
 	  } else {
