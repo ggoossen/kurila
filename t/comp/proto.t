@@ -11,9 +11,9 @@
 
 use strict;
 
-print "1..116\n";
+BEGIN { require "./test.pl" }
 
-my $i = 1;
+plan tests => 116;
 
 sub testing (&$) {
     my $p = prototype(shift);
@@ -22,10 +22,8 @@ sub testing (&$) {
     print '#' x 25,"\n";
     print '# Testing ',$what,"\n";
     print '#' x 25,"\n";
-    print "not "
-	if((defined($p) && defined($c) && $p ne $c)
-	   || (defined($p) != defined($c)));
-    printf "ok \%d\n",$i++;
+    ok ( not ((defined($p) && defined($c) && $p ne $c)
+                || (defined($p) != defined($c))) );
 }
 
 @_ = qw(a b c d);
@@ -43,20 +41,15 @@ sub no_proto {
     scalar(nelems @_)
 }
 
-print "not " unless 0 == no_proto();
-printf "ok \%d\n",$i++;
+ok( 0 == no_proto() );
 
-print "not " unless 1 == no_proto(5);
-printf "ok \%d\n",$i++;
+ok( 1 == no_proto(5) );
 
-print "not " unless 4 == &no_proto( < @_ );
-printf "ok \%d\n",$i++;
+ok( 4 == &no_proto( < @_ ) );
 
-print "not " unless 1 == no_proto +6;
-printf "ok \%d\n",$i++;
+ok( 1 == no_proto +6 );
 
-print "not " unless 4 == no_proto(< @_);
-printf "ok \%d\n",$i++;
+ok( 4 == no_proto(< @_) );
 
 ##
 ##
@@ -70,24 +63,18 @@ sub no_args () {
     scalar(nelems @_)
 }
 
-print "not " unless 0 == no_args();
-printf "ok \%d\n",$i++;
+ok( 0 == no_args() );
 
-print "not " unless 0 == no_args;
-printf "ok \%d\n",$i++;
+ok( 0 == no_args );
 
-print "not " unless 5 == no_args +5;
-printf "ok \%d\n",$i++;
+ok( 5 == no_args +5 );
 
-print "not " unless 4 == &no_args( < @_ );
-printf "ok \%d\n",$i++;
+ok( 4 == &no_args( < @_ ) );
 
-print "not " unless 2 == &no_args(1,2);
-printf "ok \%d\n",$i++;
+ok( 2 == &no_args(1,2) );
 
 eval "no_args(1)";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 ##
 ##
@@ -100,25 +87,19 @@ sub one_args ($) {
     scalar(nelems @_)
 }
 
-print "not " unless 1 == one_args(1);
-printf "ok \%d\n",$i++;
+ok( 1 == one_args(1) );
 
-print "not " unless 1 == one_args +5;
-printf "ok \%d\n",$i++;
+ok( 1 == one_args +5 );
 
-print "not " unless 4 == &one_args( < @_ );
-printf "ok \%d\n",$i++;
+ok( 4 == &one_args( < @_ ) );
 
-print "not " unless 2 == &one_args(1,2);
-printf "ok \%d\n",$i++;
+ok( 2 == &one_args(1,2) );
 
 eval "one_args(1,2)";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 eval "one_args()";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 sub one_a_args ($) {
     print "# \@_ = (",join(",", @_),")\n";
@@ -139,32 +120,19 @@ sub over_one_args ($@) {
     scalar(nelems @_)
 }
 
-print "not " unless 1 == over_one_args(1);
-printf "ok \%d\n",$i++;
-
-print "not " unless 2 == over_one_args(1,2);
-printf "ok \%d\n",$i++;
-
-print "not " unless 1 == over_one_args +5;
-printf "ok \%d\n",$i++;
-
-print "not " unless 4 == &over_one_args( < @_ );
-printf "ok \%d\n",$i++;
-
-print "not " unless 2 == &over_one_args(1,2);
-printf "ok \%d\n",$i++;
-
-print "not " unless 5 == &over_one_args(1,< @_);
-printf "ok \%d\n",$i++;
+ok( 1 == over_one_args(1) );
+ok( 2 == over_one_args(1,2) );
+ok( 1 == over_one_args +5 );
+ok( 4 == &over_one_args( < @_ ) );
+ok( 2 == &over_one_args(1,2) );
+ok( 5 == &over_one_args(1,< @_) );
 
 eval "over_one_args()";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 sub over_one_a_args ($@) {
     print "# \@_ = (",join(",", @_),")\n";
-    print "not " unless (nelems @_) +>= 1 && @_[0] == 4;
-    printf "ok \%d\n",$i++;
+    ok(  (nelems @_) +>= 1 && @_[0] == 4 );
 }
 
 over_one_a_args((nelems @_));
@@ -183,36 +151,22 @@ sub one_or_two ($;$) {
     scalar(nelems @_)
 }
 
-print "not " unless 1 == one_or_two(1);
-printf "ok \%d\n",$i++;
-
-print "not " unless 2 == one_or_two(1,3);
-printf "ok \%d\n",$i++;
-
-print "not " unless 1 == one_or_two +5;
-printf "ok \%d\n",$i++;
-
-print "not " unless 4 == &one_or_two( < @_ );
-printf "ok \%d\n",$i++;
-
-print "not " unless 3 == &one_or_two(1,2,3);
-printf "ok \%d\n",$i++;
-
-print "not " unless 5 == &one_or_two(1,< @_);
-printf "ok \%d\n",$i++;
+ok( 1 == one_or_two(1) );
+ok( 2 == one_or_two(1,3) );
+ok( 1 == one_or_two +5 );
+ok( 4 == &one_or_two( < @_ ) );
+ok( 3 == &one_or_two(1,2,3) );
+ok( 5 == &one_or_two(1,< @_) );
 
 eval "one_or_two()";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 eval "one_or_two(1,2,3)";
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 sub one_or_two_a ($;$) {
     print "# \@_ = (",join(",", @_),")\n";
-    print "not " unless (nelems @_) +>= 1 && @_[0] == 4;
-    printf "ok \%d\n",$i++;
+    ok( (nelems @_) +>= 1 && @_[0] == 4 );
 }
 
 one_or_two_a((nelems @_));
@@ -237,8 +191,7 @@ a_sub \&tmp_sub_1;
 
 @array = @( \&tmp_sub_1 );
 eval 'a_sub @array';
-print "not " unless $@;
-printf "ok \%d\n",$i++;
+ok( $@ );
 
 ##
 ##
@@ -249,7 +202,7 @@ testing \&sub_aref, '&\@';
 sub sub_aref (&\@) {
     print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
     my($sub,$array) = < @_;
-    print "not " unless (nelems @_) == 2 && (nelems @{$array}) == 4;
+    ok( (nelems @_) == 2 && (nelems @{$array}) == 4 );
     print < map { &{$sub}($_) } @{$array}
 }
 

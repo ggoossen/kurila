@@ -338,7 +338,7 @@ sub render {
 
     my $walker = B::Concise::compile($func_name);
     try { $walker->() };
-    diag("err: {$@->message} $buf") if $@;
+    diag("err: $($@->message) $buf") if $@;
     diag("verbose: $buf") if %opts{V};
 
     return  @($buf, $@);
@@ -366,7 +366,7 @@ END {
 
 	foreach my $pkg (sort keys %report) {
 	    for my $type (keys %matchers) {
-		print "$pkg: $type: $(join ' ',@$(%report{$pkg}->{$type}))\n"
+		print "$pkg: $type: $(join ' ',@{%report{$pkg}->{$type}})\n"
 		    if (nelems @{%report{$pkg}->{$type}});
 	    }
 	}
