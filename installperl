@@ -260,9 +260,9 @@ if (!$Is_VMS) {
 -x 'perl' . $exe_ext	|| die "perl isn't executable!\n";
 }
 else {
--x $ndbg . 'perl' . $exe_ext	|| die "{$ndbg}perl$exe_ext isn't executable!\n";
+-x $ndbg . 'perl' . $exe_ext	|| die "$($ndbg)perl$exe_ext isn't executable!\n";
     if ($dbg) {
-        -x $dbg . 'perl' . $exe_ext	|| die "{$dbg}perl$exe_ext isn't executable!\n";
+        -x $dbg . 'perl' . $exe_ext	|| die "$($dbg)perl$exe_ext isn't executable!\n";
     }
 }
 -x 'suidperl' . $exe_ext|| die "suidperl isn't executable!\n" if $d_dosuid;
@@ -311,9 +311,9 @@ if ($Is_VMS) {
     safe_unlink("$installbin/$dbg$perl$exe_ext");
     copy("$dbg$perl$exe_ext", "$installbin/$dbg$perl$exe_ext");
     chmod(0755, "$installbin/$dbg$perl$exe_ext");
-    safe_unlink("$installbin/{$dbg}{$perl}shr$exe_ext");
-    copy("{$dbg}{$perl}shr$exe_ext", "$installbin/{$dbg}{$perl}shr$exe_ext");
-    chmod(0755, "$installbin/{$dbg}{$perl}shr$exe_ext");
+    safe_unlink("$installbin/$($dbg)$($perl)shr$exe_ext");
+    copy("$($dbg)$($perl)shr$exe_ext", "$installbin/$($dbg)$($perl)shr$exe_ext");
+    chmod(0755, "$installbin/$($dbg)$($perl)shr$exe_ext");
     if ($ndbg) {
         safe_unlink("$installbin/$ndbg$perl$exe_ext");
         copy("$ndbg$perl$exe_ext", "$installbin/$ndbg$perl$exe_ext");
@@ -558,16 +558,16 @@ if ($versiononly) {
 
 my $pod = ($Is_Cygwin || $Is_Darwin || $Is_VMS || $Is_W32) ? 'pods' : 'pod';
 if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
-    mkpath("{$installprivlib}/$pod", $verbose, 0777);
+    mkpath("$($installprivlib)/$pod", $verbose, 0777);
 
     # If Perl 5.003's perldiag.pod is there, rename it.
-    if (open POD, "<", "{$installprivlib}/$pod/perldiag.pod") {
+    if (open POD, "<", "$($installprivlib)/$pod/perldiag.pod") {
 	read POD, $_, 4000;
 	close POD;
 	# Some of Perl 5.003's diagnostic messages ended with periods.
 	if (m/^=.*\.$/m) {
-	    my ($from, $to) = ("{$installprivlib}/$pod/perldiag.pod",
-			       "{$installprivlib}/$pod/perldiag-5.003.pod");
+	    my ($from, $to) = ("$($installprivlib)/$pod/perldiag.pod",
+			       "$($installprivlib)/$pod/perldiag-5.003.pod");
 	    print "  rename $from $to";
 	    rename($from, $to)
 		or warn "Couldn't rename $from to $to: $!\n"
@@ -578,7 +578,7 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
     for (@pods) {
 	# $_ is a name like  pod/perl.pod
 	(my $base = $_) =~ s#.*/##;
-	copy_if_diff($_, "{$installprivlib}/$pod/{$base}");
+	copy_if_diff($_, "$($installprivlib)/$pod/$($base)");
     }
 
 }
@@ -710,7 +710,7 @@ sub link {
 	$packlist->{$xto} = \%( from => $xfrom, type => 'link' );
     };
     if ($@) {
-	warn "Replacing link() with File::Copy::copy(): {$@->message}";
+	warn "Replacing link() with File::Copy::copy(): $($@->message)";
 	print $verbose ? "  cp $from $xto\n" : "  $xto\n" unless $silent;
 	print "  creating new version of $xto\n"
 		 if $Is_VMS and -e $to and !$silent;
