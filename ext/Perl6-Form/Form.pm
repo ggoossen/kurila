@@ -393,7 +393,7 @@ sub jleft {
 				my $group = shift @groups;
 				if ($group) {
 					$w =~ s/(\d)(\d\{$group\})\z/$1$comma$2/;
-					do {
+					{
 						$group = shift @groups if (nelems @groups);
 					} while $group && $w =~ s/(?<!,)(\d)(\d\{$group\})(?!\d)/$1$comma$2/;
 				}

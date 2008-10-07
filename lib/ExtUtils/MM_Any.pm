@@ -147,7 +147,7 @@ sub split_command {
     my $len_left = int($self->max_exec_len * 0.70);
     $len_left -= length $self->_expand_macros($cmd);
 
-    do {
+    {
         my $arg_str = '';
         my @next_args;
         while( @next_args = @( splice(@args, 0, 2) ) ) {

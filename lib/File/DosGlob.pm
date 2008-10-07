@@ -273,7 +273,7 @@ sub _preprocess_pattern {
 	foreach my $p ( @pat) {
 		my $proceed;
 		# resolve any updirs, e.g. "*HD:t?p::a*" -> "*HD:a*"
-		do {
+		{
 			$proceed = ($p =~ s/^(.*):[^:]+::(.*?)\z/$1:$2/);  
 		} while ($proceed);
 		# remove a single trailing colon, e.g. ":*:" -> ":*"
