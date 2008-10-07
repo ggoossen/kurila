@@ -116,7 +116,7 @@ sub pod2man {
     # compatibility.
     delete %options{lax};
 
-    {  # so 'next' works
+    do {  # so 'next' works
         my ($pod, $man) = splice(@ARGV, 0, 2);
 
         next if ((-e $man) &&
