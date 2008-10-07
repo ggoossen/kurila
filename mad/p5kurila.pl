@@ -212,6 +212,7 @@ sub is_in_string {
     return 1 if $op->tag eq "op_stringify" or
       ($op->tag eq "op_null" and ($op->att('was') || '') eq "stringify");
     return 1 if $op->tag eq "op_concat";
+    return 1 if $op->tag eq "op_substcont";
 
     return $op->parent && is_in_string($op->parent);
 }
@@ -1052,6 +1053,39 @@ sub simplify_array {
     }
 }
 
+sub ampcall {
+    my $xml = shift;
+
+    for my $esop ($xml->find_nodes("//op_entersub")) {
+        next unless $esop->att('private') =~ m/\bAMPER\b/;
+        next unless $esop->att('flags') !~ m/\bSTACKED\b/;
+        set_madprop($esop, 'round_open', '( &lt; @_ ');
+        set_madprop($esop, 'round_close', ')');
+    }
+}
+
+sub doblock {
+    my $xml = shift;
+
+    for my $lineseq ($xml->find_nodes("//op_lineseq")) {
+        next unless (get_madprop($lineseq, 'curly_open')||'') eq "\{";
+        next if $lineseq->att('flags') =~ m/\bATTACHED\b/;
+        next unless $lineseq->parent->tag eq "op_leaveloop";
+        set_madprop($lineseq, 'curly_open', "do \{");
+        set_madprop($lineseq, 'curly_close', "\};");
+    }
+
+    for my $scope ($xml->find_nodes("//op_scope"),
+                   $xml->find_nodes("//op_leave")) {
+        next unless is_in_string($scope);
+        next unless (get_madprop($scope, 'curly_open')||'') eq "\{";
+        next if $scope->att('flags') =~ m/\bLIST\b/;
+        next if $scope->parent->tag =~ m/^op_rv2/;
+        set_madprop($scope, 'curly_open', "\$(");
+        set_madprop($scope, 'curly_close', ")");
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1135,8 +1169,13 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.13') {
     sv_array_hash($twig);
 }
 
-map_array($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.14') {
+    map_array($twig);
+}
 #simplify_array($twig);
+
+#ampcall($twig);
+doblock($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
