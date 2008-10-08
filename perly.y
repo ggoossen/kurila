@@ -730,11 +730,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($7,$$,'}');
 			}
 	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
-			{ $$ = prepend_elem(OP_ASLICE,
-				newOP(OP_PUSHMARK, 0, LOCATION($3)),
-				    newLISTOP(OP_ASLICE, 0,
+			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($4),
-					ref(newAVREF($1, LOCATION($2)), OP_ASLICE), LOCATION($3)));
+					ref(newAVREF($1, LOCATION($2)), OP_ASLICE), LOCATION($3));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
 			  TOKEN_GETMAD($5,$$,'j');
@@ -753,11 +751,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($6,$$,'}');
 			}
 	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
-			{ $$ = prepend_elem(OP_ASLICE,
-				newOP(OP_PUSHMARK, 0, LOCATION($2)),
-				    newLISTOP(OP_ASLICE, 0,
+			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($3),
-					ref($1, OP_HSLICE), LOCATION($2)));
+					ref($1, OP_HSLICE), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,'j');

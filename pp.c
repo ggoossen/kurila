@@ -2138,7 +2138,7 @@ PP(pp_negate)
 
 PP(pp_not)
 {
-    dVAR; dSP;
+    dVAR;
     *PL_stack_sp = boolSV(!SvTRUE(*PL_stack_sp));
     return NORMAL;
 }
@@ -3311,7 +3311,7 @@ PP(pp_quotemeta)
 
 PP(pp_aslice)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     register AV* const av = (AV*)POPs;
     register AV* slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);

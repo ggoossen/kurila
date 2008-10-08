@@ -1160,9 +1160,7 @@
 #define newDEFSVOP		S_newDEFSVOP
 #define new_logop		S_new_logop
 #define simplify_sort		S_simplify_sort
-#define gv_ename		S_gv_ename
 #define my_kid			S_my_kid
-#define dup_attrlist		S_dup_attrlist
 #define bad_type		S_bad_type
 #define no_bareword_allowed	S_no_bareword_allowed
 #define no_fh_allowed		S_no_fh_allowed
@@ -3340,9 +3338,7 @@
 #define newDEFSVOP(a)		S_newDEFSVOP(aTHX_ a)
 #define new_logop(a,b,c,d,e)	S_new_logop(aTHX_ a,b,c,d,e)
 #define simplify_sort(a)	S_simplify_sort(aTHX_ a)
-#define gv_ename(a)		S_gv_ename(aTHX_ a)
 #define my_kid(a,b)		S_my_kid(aTHX_ a,b)
-#define dup_attrlist(a)		S_dup_attrlist(aTHX_ a)
 #define bad_type(a,b,c,d)	S_bad_type(aTHX_ a,b,c,d)
 #define no_bareword_allowed(a)	S_no_bareword_allowed(aTHX_ a)
 #define no_fh_allowed(a)	S_no_fh_allowed(aTHX_ a)
