@@ -5862,6 +5862,8 @@ Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 
     PERL_ARGS_ASSERT_GET_DB_SUB;
 
+    PERL_UNUSED_ARG(svp);
+
     save_item(dbsv);
     if (!PERLDB_SUB_NN) {
 	SV * const tmp = newRV((SV*)cv);
