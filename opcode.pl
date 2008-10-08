@@ -769,7 +769,7 @@ quotemeta	quotemeta		ck_fun		stu%	S?
 rv2av		array dereference	ck_rvconst	dt1	
 aelemfast	constant array element	ck_null		s$	A S
 aelem		array element		ck_null		s2	A S
-aslice		array slice		ck_null		m@	A L
+aslice		array slice		ck_null		@	A S
 
 # Hashes.
 

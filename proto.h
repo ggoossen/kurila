@@ -4346,20 +4346,10 @@ STATIC void	S_simplify_sort(pTHX_ OP *o)
 #define PERL_ARGS_ASSERT_SIMPLIFY_SORT	\
 	assert(o)
 
-STATIC const char*	S_gv_ename(pTHX_ GV *gv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_GV_ENAME	\
-	assert(gv)
-
 STATIC OP *	S_my_kid(pTHX_ OP *o, OP **imopsp)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MY_KID	\
 	assert(imopsp)
-
-STATIC OP *	S_dup_attrlist(pTHX_ OP *o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DUP_ATTRLIST	\
-	assert(o)
 
 STATIC void	S_bad_type(pTHX_ I32 n, const char *t, const char *name, const OP *kid)
 			__attribute__nonnull__(pTHX_2)
