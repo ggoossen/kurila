@@ -19,10 +19,10 @@ EXPECT
 ########
 -X
 # nolint: check runtime $^W is zapped
-{
+do {
   $^W = 1 ;
   close STDIN ; print STDIN "abc" ;
-}
+};
 EXPECT
 
 ########
@@ -37,19 +37,19 @@ EXPECT
 ########
 -X
 # nolint: check "no warnings" is zapped
-{
+do {
   use warnings ;
   close STDIN ; print STDIN "abc" ;
-}
+};
 EXPECT
 
 ########
 -Xw
 # nolint: check combination of -w and -X
-{
+do {
   $^W = 1 ;
   close STDIN ; print STDIN "abc" ;
-}
+};
 EXPECT
 
 ########
@@ -108,108 +108,108 @@ EXPECT
 -X
 # Check scope of pragma with eval
 use warnings;
-{
+do {
     no warnings ;
     eval '
         my $b ; chop $b ;
     '; print STDERR $@ ;
     my $b ; chop $b ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 use warnings;
-{
+do {
     no warnings ;
     eval q[ 
         use warnings 'uninitialized' ;
         my $b ; chop $b ;
     ]; print STDERR $@;
     my $b ; chop $b ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 no warnings;
-{
+do {
     use warnings 'uninitialized' ;
     eval '
         my $b ; chop $b ;
     '; print STDERR $@ ;
     my $b ; chop $b ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 no warnings;
-{
+do {
     use warnings 'uninitialized' ;
     eval '
         no warnings ;
         my $b ; chop $b ;
     '; print STDERR $@ ;
     my $b ; chop $b ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 use warnings;
-{
+do {
     no warnings ;
     eval '
         my $a =+ 1 ;
     '; print STDERR $@ ;
     my $a =+ 1 ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 use warnings;
-{
+do {
     no warnings ;
     eval q[ 
         use warnings 'syntax' ;
         my $a =+ 1 ;
     ]; print STDERR $@;
     my $a =+ 1 ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 no warnings;
-{
+do {
     use warnings 'syntax' ;
     eval '
         my $a =+ 1 ;
     '; print STDERR $@;
     my $a =+ 1 ;
-}
+};
 EXPECT
 
 ########
 -X
 # Check scope of pragma with eval
 no warnings;
-{
+do {
     use warnings 'syntax' ;
     eval '
         no warnings ;
         my $a =+ 1 ;
     '; print STDERR $@;
     my $a =+ 1 ;
-}
+};
 EXPECT
 
 ########
