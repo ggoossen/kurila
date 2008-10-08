@@ -965,13 +965,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    /* NOTE: No support for tied ISA */
 		}
 		break;
-	    case 'O':
-		if (strEQ(name2, "VERLOAD")) {
-		    HV* const hv = GvHVn(gv);
-		    GvMULTI_on(gv);
-		    hv_magic(hv, NULL, PERL_MAGIC_overload);
-		}
-		break;
 	    case 'S':
 		if (strEQ(name2, "IG")) {
 		    HV *hv;
