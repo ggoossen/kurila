@@ -401,7 +401,6 @@
 #define magic_clearpack		Perl_magic_clearpack
 #define magic_clearsig		Perl_magic_clearsig
 #define magic_existspack	Perl_magic_existspack
-#define magic_freeovrld		Perl_magic_freeovrld
 #define magic_get		Perl_magic_get
 #define magic_getdefelem	Perl_magic_getdefelem
 #define magic_getnkeys		Perl_magic_getnkeys
@@ -2593,7 +2592,6 @@
 #define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
 #define magic_clearsig(a,b)	Perl_magic_clearsig(aTHX_ a,b)
 #define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
-#define magic_freeovrld(a,b)	Perl_magic_freeovrld(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
 #define magic_getnkeys(a,b)	Perl_magic_getnkeys(aTHX_ a,b)

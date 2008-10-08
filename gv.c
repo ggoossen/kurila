@@ -1374,19 +1374,7 @@ Perl_gp_tmprefcnt(pTHX_ GV *gv)
     SvTMPREFCNT_inc(gp->gp_cv);
 }
 
-int
-Perl_magic_freeovrld(pTHX_ SV *sv, MAGIC *mg)
-{
-    AMT * const amtp = (AMT*)mg->mg_ptr;
-    PERL_UNUSED_ARG(sv);
-
-    PERL_ARGS_ASSERT_MAGIC_FREEOVRLD;
-
- return 0;
-}
-
 /* Updates and caches the CV's */
-
 
 CV*
 Perl_gv_handler(pTHX_ HV *stash, I32 id)
