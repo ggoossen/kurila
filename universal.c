@@ -690,7 +690,7 @@ XS(XS_version_qv)
 
 STATIC
 AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
-    AV* av = (AV*)sv_2mortal((SV*)newAV());
+    AV* av = av_2mortal(newAV());
     const char *stashname;
     
     stashname = CopSTASHPV(cx->blk_oldcop);
@@ -700,7 +700,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     else
 	av_push(av, newSVpv(stashname, 0));
     if (cx->blk_oldop->op_location) {
-	sv_setsv(av, cx->blk_oldop->op_location);
+	sv_setsv(AvSV(av), cx->blk_oldop->op_location);
     } else {
 	av_push(av, newSVpv("unknown location", 0));
     }
@@ -710,7 +710,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	    name = av_fetch(SvLOCATION(cv), 3, FALSE);
+	    name = av_fetch(SvAV(SvLOCATION(cv)), 3, FALSE);
 	av_push(av, name ? newSVsv(*name) : &PL_sv_undef );
     }
     else {
@@ -779,41 +779,6 @@ STATIC AV* S_error_backtrace(pTHX)
     return trace;
 }
 
-STATIC const COP*
-S_closest_cop(pTHX_ const COP *cop, const OP *o)
-{
-    dVAR;
-    PERL_ARGS_ASSERT_CLOSEST_COP;
-    /* Look for PL_op starting from o.  cop is the last COP we've seen. */
-
-    if (!o || o == PL_op)
-	return cop;
-
-    if (o->op_flags & OPf_KIDS) {
-	const OP *kid;
-	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling) {
-	    const COP *new_cop;
-
-	    /* If the OP_NEXTSTATE has been optimised away we can still use it
-	     * the get the file and line number. */
-
-	    if (kid->op_type == OP_NULL && kid->op_targ == OP_NEXTSTATE)
-		cop = (const COP *)kid;
-
-	    /* Keep searching, and return when we've found something. */
-
-	    new_cop = S_closest_cop(aTHX_ cop, kid);
-	    if (new_cop)
-		return new_cop;
-	}
-    }
-
-    /* Nothing found. */
-
-    return NULL;
-}
-
-
 XS(XS_error_create)
 {
     dVAR;
@@ -865,7 +830,7 @@ XS(XS_error_create)
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
-		if (location && SvAVOK(location) && av_len(location) >= 2) {
+		if (location && SvAVOK(location) && av_len(SvAV(location)) >= 2) {
 		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf".",
 			SvPVX_const(*av_fetch((AV*)location, 0, FALSE)),
 			SvIV(*av_fetch((AV*)location, 1, FALSE)),

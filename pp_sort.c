@@ -1477,7 +1477,6 @@ PP(pp_sort)
     CV *cv = NULL;
     I32 gimme = GIMME_V;
     OP* const nextop = PL_op->op_next;
-    I32 overloading = 0;
     bool hasargs = FALSE;
     I32 is_xsub = 0;
     const U8 priv = PL_op->op_private;
@@ -1538,7 +1537,8 @@ PP(pp_sort)
 
     av = SvAV(sv_mortalcopy(POPs));
     if ( ! SvAVOK(av) ) {
-	Perl_croak(aTHX_ "%s expected ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+	Perl_croak(aTHX_ "%s expected ARRAY but got %s", 
+	    OP_DESC(PL_op), Ddesc(AvSV(av)));
     }
     p1 = p2 = AvARRAY(av);
     max = AvFILL(av) + 1;
@@ -1664,7 +1664,7 @@ PP(pp_sort)
     
     LEAVE;
     PL_stack_sp = ORIGMARK;
-    *++PL_stack_sp = av;
+    *++PL_stack_sp = AvSV(av);
     return nextop;
 }
 

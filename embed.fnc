@@ -1269,7 +1269,6 @@ sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **opli
 sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
 sR	|I32	|dopoptoloop	|I32 startingblock
-s	|void	|save_lines	|NULLOK AV *array|NN SV *sv
 s	|bool	|doeval		|int gimme|NULLOK OP** startop|NULLOK CV* outside|U32 seq
 sR	|PerlIO *|check_type_and_open|NN const char *name
 #ifndef PERL_DISABLE_PMC
@@ -1521,7 +1520,6 @@ s	|void	|printbuf	|NN const char *const fmt|NN const char *const s
 
 #if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 s	|bool|isa_lookup	|NULLOK HV *stash|NN const char * const name|NULLOK const HV * const name_stash
-s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 #endif
 
 #if defined(PERL_IN_LOCALE_C) || defined(PERL_DECL_PROT)

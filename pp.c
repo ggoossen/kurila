@@ -4144,7 +4144,7 @@ PP(pp_reverse)
 
 PP(pp_split)
 {
-    dVAR; dSP; dTARG;
+    dVAR; dSP;
     AV *av;
     register IV limit = POPi;			/* note, negative is forever */
     SV * const sv = POPs;
