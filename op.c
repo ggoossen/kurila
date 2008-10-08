@@ -4721,9 +4721,16 @@ Perl_newANONHASH(pTHX_ OP *o, SV* location)
 OP *
 Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
+    CV* cv = newSUB(floor, proto, scalar(block));
+    SVcpREPLACE(SvLOCATION(cv), block->op_location);
+    if (SvAVOK(SvLOCATION((SV*)cv))) {
+	SV* namesv = newSVpv(HvNAME_get(PL_curstash), 0);
+	sv_catpvf(namesv, "::__ANON__");
+	av_store(SvAV(SvLOCATION((SV*)cv)), 3, namesv);
+    }
     return newUNOP(OP_SREFGEN, 0,
-	newSVOP(OP_ANONCODE, 0,
-		(SV*)newSUB(floor, proto, scalar(block)), block->op_location), block->op_location);
+	newSVOP(OP_ANONCODE, 0, (SV*)cv, block->op_location),
+	block->op_location);
 }
 
 OP *
