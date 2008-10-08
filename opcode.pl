@@ -781,7 +781,7 @@ delete		delete			ck_delete	%	S
 exists		exists			ck_exists	is%	S
 rv2hv		hash dereference	ck_rvconst	dt1	
 helem		hash element		ck_null		s2	H S
-hslice		hash slice		ck_null		m@	H L
+hslice		hash slice		ck_null		@	H A
 
 # Explosives and implosives.
 

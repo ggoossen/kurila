@@ -3413,14 +3413,11 @@ PP(pp_delete)
     const I32 discard = (gimme == G_VOID) ? G_DISCARD : 0;
 
     if (PL_op->op_private & OPpSLICE) {
-	dMARK;
 	SV * const sv = POPs;
 	SV* slice = POPs;
 	AV* slicecopy;
 	SV** items;
 	I32 avlen;
-
-	assert(SP == MARK); 
 
 	if ( ! SvAVOK(slice) )
 	    Perl_croak(aTHX_ "slice expected an array as slice index, but got %s", Ddesc(slice));
@@ -3514,7 +3511,7 @@ PP(pp_exists)
 
 PP(pp_hslice)
 {
-    dVAR; dSP; dMARK; dORIGMARK;
+    dVAR; dSP;
     register HV * const hv = (HV*)POPs;
     AV * slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
