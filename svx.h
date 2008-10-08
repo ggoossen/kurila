@@ -116,6 +116,11 @@ static __inline__ HV* inline_SvHV(pTHX_ SV *sv) {
     return (HV*)sv;
 }
 
+#define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
+static __inline__ CV* inline_CvREFCNT_inc(pTHX_ CV* cv) {
+    return (CV*)SvREFCNT_inc((SV*)cv);
+}
+
 #define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
 static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
   SvREFCNT_inc(sv_s);
