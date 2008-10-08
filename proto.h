@@ -1469,12 +1469,6 @@ PERL_CALLCONV int	Perl_magic_existspack(pTHX_ SV* sv, const MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_EXISTSPACK	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_freeovrld(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_FREEOVRLD	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_get(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
