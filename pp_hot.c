@@ -2201,7 +2201,6 @@ PP(pp_entersub)
     ENTER;
     SAVETMPS;
 
-  retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
 	DIE(aTHX_ "Undefined subroutine called",
 	    SvPVX_const(loc_desc(SvLOCATION(cv))));

@@ -518,20 +518,6 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
     }
 }
 
-/* These two are static helpers for next::method and friends,
-   and re-implement a bunch of the code from pp_caller() in
-   a more efficient manner for this particular usage.
-*/
-
-STATIC I32
-__dopoptosub_at(const PERL_CONTEXT *cxstk, I32 startingblock) {
-    I32 i;
-    for (i = startingblock; i >= 0; i--) {
-        if(CxTYPE((PERL_CONTEXT*)(&cxstk[i])) == CXt_SUB) return i;
-    }
-    return i;
-}
-
 #include "XSUB.h"
 
 XS(XS_mro_get_linear_isa);
