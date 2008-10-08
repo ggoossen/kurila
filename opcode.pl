@@ -807,7 +807,7 @@ pop		pop			ck_shift	s%	A?
 shift		shift			ck_shift	s%	A?
 unshift		unshift			ck_fun		imsT@	A L
 sort		sort			ck_sort		dm@	C? L
-reverse		reverse			ck_fun		mt@	L
+reverse		reverse			ck_fun		t@	S
 
 grepstart	grep			ck_grep		dm@	C L
 grepwhile	grep iterator		ck_null		dt|	

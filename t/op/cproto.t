@@ -167,7 +167,7 @@ ref (_)
 rename ($$)
 require undef
 return undef
-reverse (@)
+reverse ($)
 rewinddir (*)
 rindex ($$;$)
 rmdir (_)

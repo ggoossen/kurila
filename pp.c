@@ -4119,7 +4119,7 @@ PP(pp_unshift)
 
 PP(pp_reverse)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     SV * const av = sv_mortalcopy(POPs);
     SV ** ary;
     SV ** end;
