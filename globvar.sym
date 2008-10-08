@@ -35,8 +35,6 @@ simple
 utf8skip
 uuemap
 varies
-vtbl_amagic
-vtbl_amagicelem
 vtbl_backref
 vtbl_bm
 vtbl_dbline
