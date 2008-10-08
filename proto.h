@@ -4596,11 +4596,6 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
 
-STATIC void	S_save_lines(pTHX_ AV *array, SV *sv)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_SAVE_LINES	\
-	assert(sv)
-
 STATIC bool	S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq);
 STATIC PerlIO *	S_check_type_and_open(pTHX_ const char *name)
 			__attribute__warn_unused_result__
@@ -5405,11 +5400,6 @@ STATIC bool	S_isa_lookup(pTHX_ HV *stash, const char * const name, const HV * co
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_ISA_LOOKUP	\
 	assert(name)
-
-STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CLOSEST_COP	\
-	assert(cop)
 
 #endif
 

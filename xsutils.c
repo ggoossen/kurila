@@ -24,7 +24,6 @@
 
 /* package attributes; */
 PERL_XS_EXPORT_C void XS_attributes_reftype(pTHX_ CV *cv);
-PERL_XS_EXPORT_C void XS_attributes__modify_attrs(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_attributes__guess_stash(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_attributes__fetch_attrs(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_attributes_bootstrap(pTHX_ CV *cv);
@@ -52,86 +51,6 @@ Perl_boot_core_xsutils(pTHX)
 
 #include "XSUB.h"
 
-static void
-modify_SV_attributes(pTHX_ SV *sv, AV *retlist, AV *attrlist)
-{
-    dVAR;
-    int numattrs = av_len(attrlist);
-    int i;
-    
-    for (i = 0 ; i <= numattrs; i++) {
-	STRLEN len;
-        SV *attr = *(av_fetch(attrlist, i, FALSE));
-	const char *name = SvPV_const(attr, len);
-	const bool negated = (*name == '-');
-
-	if (negated) {
-	    name++;
-	    len--;
-	}
-	switch (SvTYPE(sv)) {
-	case SVt_PVCV:
-	    switch ((int)len) {
-	    case 6:
-		switch (name[3]) {
-		case 'k':
-		    if (memEQ(name, "locked", 6)) {
-			if (negated)
-			    CvFLAGS((CV*)sv) &= ~CVf_LOCKED;
-			else
-			    CvFLAGS((CV*)sv) |= CVf_LOCKED;
-			continue;
-		    }
-		    break;
-		case 'h':
-		    if (memEQ(name, "method", 6)) {
-			if (negated)
-			    CvFLAGS((CV*)sv) &= ~CVf_METHOD;
-			else
-			    CvFLAGS((CV*)sv) |= CVf_METHOD;
-			continue;
-		    }
-		    break;
-		}
-		break;
-	    }
-	    break;
-	default:
-	    switch ((int)len) {
-	    case 6:
-		switch (name[5]) {
-		case 'd':
-		    if (memEQ(name, "share", 5)) {
-			if (negated)
-			    Perl_croak(aTHX_ "A variable may not be unshared");
-			SvSHARE(sv);
-                        continue;
-                    }
-		    break;
-		case 'e':
-		    if (memEQ(name, "uniqu", 5)) {
-			if (SvTYPE(sv) == SVt_PVGV) {
-			    if (negated) {
-				GvUNIQUE_off(sv);
-			    } else {
-				GvUNIQUE_on(sv);
-			    }
-			}
-			/* Hope this came from toke.c if not a GV. */
-                        continue;
-                    }
-                }
-            }
-	    break;
-	}
-	/* anything recognized had a 'continue' above */
-        av_push(retlist, SvREFCNT_inc(attr));
-    }
-    return;
-}
-
-
-
 /* package attributes; */
 
 XS(XS_attributes_bootstrap)
@@ -143,40 +62,11 @@ XS(XS_attributes_bootstrap)
     if( items > 1 )
         Perl_croak(aTHX_ "Usage: attributes::bootstrap $module");
 
-    newXS("attributes::_modify_attrs",	XS_attributes__modify_attrs,	file);
     newXSproto("attributes::_guess_stash", XS_attributes__guess_stash, file, "$");
     newXSproto("attributes::_fetch_attrs", XS_attributes__fetch_attrs, file, "$");
     newXSproto("attributes::reftype",	XS_attributes_reftype,	file, "$");
 
     XSRETURN(0);
-}
-
-XS(XS_attributes__modify_attrs)
-{
-    dVAR;
-    dXSARGS;
-    SV *rv, *sv, *attrs, *res;
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 2) {
-usage:
-	Perl_croak(aTHX_
-		   "Usage: attributes::_modify_attrs $reference, @attributes");
-    }
-
-    rv = ST(0);
-    attrs = ST(1);
-    if (!(SvOK(rv) && SvROK(rv)))
-	goto usage;
-    if (!(SvAVOK(attrs)))
-	goto usage;
-        
-    sv = SvRV(rv);
-    res = av_2mortal(newAV());
-    modify_SV_attributes(aTHX_ sv, res, attrs);
-
-    ST(0) = res;
-    XSRETURN(1);
 }
 
 XS(XS_attributes__fetch_attrs)
