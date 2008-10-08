@@ -5066,7 +5066,7 @@ MGVTBL_SET(
     0,
     0,
     0,
-    MEMBER_TO_FPTR(Perl_magic_freeovrld),
+    0,
     0,
     0,
     0

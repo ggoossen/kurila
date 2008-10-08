@@ -44,7 +44,6 @@
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
 #define Gv_AMupdate		Perl_Gv_AMupdate
-#define gv_handler		Perl_gv_handler
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
 #define append_list		Perl_append_list
@@ -2248,7 +2247,6 @@
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
 #define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
-#define gv_handler(a,b)		Perl_gv_handler(aTHX_ a,b)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)

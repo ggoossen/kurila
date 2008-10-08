@@ -99,7 +99,6 @@ END_EXTERN_C
 START_EXTERN_C
 #  include "pp_proto.h"
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
-ApR	|CV*	|gv_handler	|NULLOK HV* stash|I32 id
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
 p	|OP*	|append_list	|I32 optype|NULLOK LISTOP* first|NULLOK LISTOP* last
 p	|I32	|apply		|I32 type|NN SV** mark|NN SV** sp
