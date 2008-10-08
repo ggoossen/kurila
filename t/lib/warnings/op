@@ -321,7 +321,7 @@ print (ABC || 1) ;
 no warnings 'bareword' ;
 print (ABC || 1) ;
 EXPECT
-Bareword found in conditional at - line 3 character 18.
+Bareword found in conditional at - line 3 character 17.
 ########
 --FILE-- abc
 
@@ -391,13 +391,6 @@ sub fred () { 1 }
 sub fred () { 1 }
 no warnings 'redefine' ;
 sub fred () { 1 }
-EXPECT
-Constant subroutine fred redefined at - line 4 character 18.
-########
-# op.c
-no warnings 'redefine' ;
-sub fred () { 1 }
-sub fred () { 2 }
 EXPECT
 Constant subroutine fred redefined at - line 4 character 18.
 ########

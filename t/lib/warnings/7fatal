@@ -4,10 +4,10 @@ __END__
 
 # Check compile time warning
 use warnings FATAL => 'syntax' ;
-{
+do {
     no warnings ;
     $a =+ 1 ;
-}
+};
 $a =+ 1 ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -16,10 +16,10 @@ Reversed += operator at - line 8 character 4.
 
 # Check compile time warning
 use warnings FATAL => 'all' ;
-{
+do {
     no warnings ;
     my $a =+ 1 ;
-}
+};
 my $a =+ 1 ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -28,10 +28,10 @@ Reversed += operator at - line 8 character 7.
 
 # Check runtime scope of pragma
 use warnings FATAL => 'uninitialized' ;
-{
+do {
     no warnings ;
     my $b ; chop $b ;
-}
+};
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -40,10 +40,10 @@ Use of uninitialized value $b in scalar chop at - line 8 character 9.
 
 # Check runtime scope of pragma
 use warnings FATAL => 'all' ;
-{
+do {
     no warnings ;
     my $b ; chop $b ;
-}
+};
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -52,10 +52,10 @@ Use of uninitialized value $b in scalar chop at - line 8 character 9.
 
 # Check runtime scope of pragma
 no warnings ;
-{
+do {
     use warnings FATAL => 'uninitialized' ;
     $a = sub { my $b ; chop $b ; }
-}
+};
 &$a ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -65,10 +65,10 @@ Use of uninitialized value $b in scalar chop at - line 6 character 24.
 
 # Check runtime scope of pragma
 no warnings ;
-{
+do {
     use warnings FATAL => 'all' ;
     $a = sub { my $b ; chop $b ; }
-}
+};
 &$a ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -131,7 +131,7 @@ no warnings ;
 try {
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
-}; print STDERR "-- {$@->message}" ;
+}; print STDERR "-- $($@->message)" ;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -144,7 +144,7 @@ The End.
 use warnings FATAL => 'uninitialized' ;
 try {
     my $b ; chop $b ;
-}; print STDERR "-- {$@->message}" ;
+}; print STDERR "-- $($@->message)" ;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -170,7 +170,7 @@ no warnings ;
 try {
     use warnings FATAL => 'syntax' ;
     $a =+ 1 ;
-}; print STDERR "-- {$@->message}" ;
+}; print STDERR "-- $($@->message)" ;
 $a =+ 1 ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -181,7 +181,7 @@ Reversed += operator at - line 6 character 8.
 use warnings FATAL => 'syntax' ;
 try {
     $a =+ 1 ;
-}; print STDERR "-- {$@->message}" ;
+}; print STDERR "-- $($@->message)" ;
 $a =+ 1 ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -216,7 +216,7 @@ no warnings ;
 eval q[ 
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
-]; print STDERR "-- {$@->message}";
+]; print STDERR "-- $($@->message)";
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -229,7 +229,7 @@ The End.
 use warnings FATAL => 'uninitialized' ;
 eval '
     my $b ; chop $b ;
-'; print STDERR "-- {$@->message}" ;
+'; print STDERR "-- $($@->message)" ;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -255,7 +255,7 @@ no warnings ;
 eval q[ 
     use warnings FATAL => 'syntax' ;
     $a =+ 1 ;
-]; print STDERR "-- {$@->message}";
+]; print STDERR "-- $($@->message)";
 $a =+ 1 ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -268,7 +268,7 @@ The End.
 use warnings FATAL => 'syntax' ;
 eval '
     $a =+ 1 ;
-'; print STDERR "-- {$@->message}";
+'; print STDERR "-- $($@->message)";
 print STDERR "The End.\n" ;
 EXPECT
 -- Reversed += operator at (eval 1) line 2 character 9.
@@ -281,7 +281,7 @@ use warnings FATAL => 'syntax' ;
 eval '
     no warnings ;
     $a =+ 1 ;
-'; print STDERR "-- {$@->message}";
+'; print STDERR "-- $($@->message)";
 $a =+ 1 ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -293,11 +293,11 @@ use warnings 'void' ;
 
 time ;
 
-{
+do {
     use warnings FATAL => q(void) ;
     $a = "abc";
     length $a ;
-}
+};
 
 join "", @(1,2,3);
 
@@ -312,11 +312,11 @@ use warnings ;
 
 time ;
 
-{
+do {
     use warnings FATAL => < qw(void) ;
     $a = "abc";
     length $a ;
-}
+};
 
 join "", 1,2,3 ;
 
@@ -327,14 +327,14 @@ Useless use of length in void context at - line 9 character 5.
 ########
 
 use warnings FATAL => 'all';
-{
+do {
     no warnings;
     my $b ; chop $b;
-    {
+    do {
         use warnings ;
         my $b ; chop $b;
-    }
-}
+    };
+};
 my $b ; chop $b;
 print STDERR "The End.\n" ;
 EXPECT
@@ -343,14 +343,14 @@ Use of uninitialized value $b in scalar chop at - line 11 character 9.
 ########
 
 use warnings FATAL => 'all';
-{
+do {
     no warnings FATAL => 'all';
     my $b ; chop $b;
-    {
+    do {
         use warnings ;
         my $b ; chop $b;
-    }
-}
+    };
+};
 my $b ; chop $b;
 print STDERR "The End.\n" ;
 EXPECT
@@ -359,13 +359,13 @@ Use of uninitialized value $b in scalar chop at - line 11 character 9.
 ########
 
 use warnings FATAL => 'all';
-{
+do {
     no warnings 'syntax';
-    {
+    do {
         use warnings ;
         my $b ; chop $b;
-    }
-}
+    };
+};
 my $b ; chop $b;
 print STDERR "The End.\n" ;
 EXPECT

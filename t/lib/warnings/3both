@@ -8,9 +8,9 @@ sub fred {
     my $b ; 
     chop $b ;
 }
-{ local $^W = 0 ;
+do { local $^W = 0 ;
   fred() ;
-}
+};
 
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 6 character 5.
@@ -23,9 +23,9 @@ sub fred {
     my $b ; 
     chop $b ;
 }
-{ $^W = 0 ;
+do { $^W = 0 ;
   fred() ;
-}
+};
 
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 6 character 5.
@@ -38,9 +38,9 @@ sub fred {
     my $b ; 
     chop $b ;
 }
-{ local $^W = 1 ;
+do { local $^W = 1 ;
   fred() ;
-}
+};
 
 EXPECT
 
@@ -52,9 +52,9 @@ sub fred {
     my $b ; 
     chop $b ;
 }
-{ $^W = 1 ;
+do { $^W = 1 ;
   fred() ;
-}
+};
 
 EXPECT
 
@@ -176,11 +176,11 @@ EXPECT
 
 # Check interaction of $^W and use warnings
 BEGIN {  $^W = 1 }
-{
+do {
     no warnings ;
     my $b ; 
     chop $b ;
-}
+};
 my $b ;
 chop $b ;
 EXPECT
@@ -189,11 +189,11 @@ Use of uninitialized value $b in scalar chop at - line 10 character 1.
 
 # Check interaction of $^W and use warnings
 BEGIN {  $^W = 0 }
-{
+do {
     use warnings ;
     my $b ; 
     chop $b ;
-}
+};
 my $b ;
 chop $b ;
 EXPECT
@@ -202,13 +202,13 @@ Use of uninitialized value $b in scalar chop at - line 7 character 5.
 
 # Check scope of pragma with eval
 BEGIN {  $^W = 1 }
-{
+do {
     no warnings ;
     eval '
         my $b ; chop $b ;
     '; print STDERR $@ ;
     my $b ; chop $b ;
-}
+};
 EXPECT
 
 ########
@@ -216,14 +216,14 @@ EXPECT
 # Check scope of pragma with eval
 BEGIN {  $^W = 1 }
 use warnings;
-{
+do {
     no warnings ;
     eval q[ 
         use warnings 'uninitialized' ;
         my $b ; chop $b ;
     ]; print STDERR $@;
     my $b ; chop $b ;
-}
+};
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 58.
     (eval) called at - line 7 character 5.
@@ -231,13 +231,13 @@ Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 58.
 
 # Check scope of pragma with eval
 BEGIN {  $^W = 0 }
-{
+do {
     use warnings 'uninitialized' ;
     eval '
         my $b ; chop $b ;
     '; print STDERR $@ ;
     my $b ; chop $b ;
-}
+};
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 2 character 18.
     (eval) called at - line 6 character 5.
@@ -246,27 +246,27 @@ Use of uninitialized value $b in scalar chop at - line 9 character 13.
 
 # Check scope of pragma with eval
 BEGIN {  $^W = 0 }
-{
+do {
     use warnings 'uninitialized' ;
     eval '
         no warnings ;
         my $b ; chop $b ;
     '; print STDERR $@ ;
     my $b ; chop $b ;
-}
+};
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 10 character 13.
 ########
 
 # Check scope of pragma with eval
 BEGIN {  $^W = 1 }
-{
+do {
     no warnings ;
     eval '
         my $a =+ 1 ;
     '; print STDERR $@ ;
     my $a =+ 1 ;
-}
+};
 EXPECT
 
 ########
