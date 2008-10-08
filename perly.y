@@ -717,11 +717,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($5,$$,']');
 			}
 	|	term ARROW HSLICE expr ']' ';' '}'    /* someref->{[bar();]} */
-			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0, LOCATION($3)),
-                                newLISTOP(OP_HSLICE, 0,
+			{ $$ = newLISTOP(OP_HSLICE, 0,
                                     scalar($4),
-                                    ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3)));
+                                    ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
@@ -739,11 +737,9 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($6,$$,']');
 			}
 	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
-			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0, LOCATION($2)),
-				    newLISTOP(OP_HSLICE, 0,
+			{ $$ = newLISTOP(OP_HSLICE, 0,
 					scalar($3),
-					ref($1, OP_HSLICE), LOCATION($2)));
+					ref($1, OP_HSLICE), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,'j');
@@ -753,7 +749,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($3),
-					ref($1, OP_HSLICE), LOCATION($2));
+					ref($1, OP_ASLICE), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,'j');
