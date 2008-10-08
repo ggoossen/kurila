@@ -4781,8 +4781,6 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		char* name = PL_bufptr;
-
 		s = skipspace(s);
 		if (*s != '{') {
 		    yyerror("Illegal declaration of special block");

@@ -3061,16 +3061,18 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 		newSVOP(OP_METHOD_NAMED, 0, meth, idop->op_location)), idop->op_location);
     }
 
-    /* Fake up the BEGIN {}, which does its thing immediately. */
-    CV* cv = newSUB(floor,
-	NULL,
-	append_elem(OP_LINESEQ,
+    {
+	/* Fake up the BEGIN {}, which does its thing immediately. */
+	CV* cv = newSUB(floor,
+	    NULL,
 	    append_elem(OP_LINESEQ,
-		newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
-		newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
-	    newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
-
-    process_special_block(KEY_BEGIN, cv);
+		append_elem(OP_LINESEQ,
+		    newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
+		    newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
+		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
+	
+	process_special_block(KEY_BEGIN, cv);
+    }
 
     /* The "did you use incorrect case?" warning used to be here.
      * The problem is that on case-insensitive filesystems one
@@ -4392,10 +4394,6 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     GV *gv;
     register CV *cv = NULL;
 
-    cv = newSUB(floor, proto, block);
-
-    SVcpREPLACE(SvLOCATION(cv), o->op_location);
-
     /* If the subroutine has no body, no attributes, and no builtin attributes
        then it's just a sub declaration, and we may be able to get away with
        storing with a placeholder scalar in the symbol table, rather than a
@@ -4403,6 +4401,10 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
        store it.  */
     const I32 gv_fetch_flags =  GV_ADDMULTI ;
     const char * const name = SvPV_nolen_const(cSVOPo->op_sv);
+
+    cv = newSUB(floor, proto, block);
+
+    SVcpREPLACE(SvLOCATION(cv), o->op_location);
 
     gv = gv_fetchsv(cSVOPo->op_sv, gv_fetch_flags, SVt_PVCV);
 
@@ -4436,11 +4438,13 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 	}
 	SvREFCNT_dec(GvCV(gv));
     }
-    GvCV(gv) = SvREFCNT_inc(cv);
+    GvCV(gv) = CvREFCNT_inc(cv);
 
-    SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
-    sv_catpvf(namesv, "::%s", GvNAME_get(gv));
-    av_store(SvLOCATION((SV*)cv), 3, namesv);
+    {
+	SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
+	sv_catpvf(namesv, "::%s", GvNAME_get(gv));
+	av_store(SvLOCATION((SV*)cv), 3, namesv);
+    }
 
     GvCVGEN(gv) = 0;
     mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar { (shift)+1 } */
@@ -4456,15 +4460,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     STRLEN ps_len;
     register CV *cv = NULL;
     SV *const_sv;
-    /* If the subroutine has no body, no attributes, and no builtin attributes
-       then it's just a sub declaration, and we may be able to get away with
-       storing with a placeholder scalar in the symbol table, rather than a
-       full GV and CV.  If anything is present then it will take a full CV to
-       store it.  */
-    const I32 gv_fetch_flags
-	= (block || (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
-	   || PL_madskills)
-	? GV_ADDMULTI : GV_ADDMULTI | GV_NOINIT;
 
     if (proto) {
 	assert(proto->op_type == OP_CONST);
@@ -4736,7 +4731,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
     cv = (CV*)newSV_type(SVt_PVCV);
 
     if (gv) {
-	GvCV(gv) = SvREFCNT_inc(cv);
+	GvCV(gv) = CvREFCNT_inc(cv);
 	GvCVGEN(gv) = 0;
 	mro_method_changed_in(GvSTASH(gv)); /* newXS */
     }
@@ -4747,7 +4742,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
     if ( ! name)
 	CvANON_on(cv);
 
-    SvLOCATION(cv) = newAV();
+    SvLOCATION(cv) = AvSV(newAV());
     av_store(SvLOCATION((SV*)cv), 3, newSVpv(name, 0));
 
     return cv;
