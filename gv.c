@@ -1376,24 +1376,6 @@ Perl_gp_tmprefcnt(pTHX_ GV *gv)
 
 /* Updates and caches the CV's */
 
-CV*
-Perl_gv_handler(pTHX_ HV *stash, I32 id)
-{
-    dVAR;
-    MAGIC *mg;
-    AMT *amtp;
-    U32 newgen;
-    struct mro_meta* stash_meta;
-
-    if (!stash || !HvNAME_get(stash))
-        return NULL;
-
-    stash_meta = HvMROMETA(stash);
-    newgen = PL_sub_generation + stash_meta->pkg_gen + stash_meta->cache_gen;
-
-    return NULL;
-}
-
 void
 Perl_gv_name_set(pTHX_ GV *gv, const char *name, U32 len, U32 flags)
 {

@@ -130,9 +130,6 @@ PERL_CALLCONV bool	Perl_Gv_AMupdate(pTHX_ HV* stash)
 #define PERL_ARGS_ASSERT_GV_AMUPDATE	\
 	assert(stash)
 
-PERL_CALLCONV CV*	Perl_gv_handler(pTHX_ HV* stash, I32 id)
-			__attribute__warn_unused_result__;
-
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
 PERL_CALLCONV OP*	Perl_append_list(pTHX_ I32 optype, LISTOP* first, LISTOP* last);
 PERL_CALLCONV I32	Perl_apply(pTHX_ I32 type, SV** mark, SV** sp)
