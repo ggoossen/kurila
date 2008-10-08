@@ -121,12 +121,13 @@ do {
 };
 
 do {
-  my $sortsub = \&Backwards_stacked;
-  my $sortglobr = \*Backwards_stacked;
-  @b = sort $sortsub @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 5');
-  @b = sort $sortglobr @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 8');
+    local our $TODO = 'decide how sort gets its arguments';
+    my $sortsub = \&Backwards_stacked;
+    my $sortglobr = \*Backwards_stacked;
+    @b = sort $sortsub, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 5');
+    @b = sort $sortglobr, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 8');
 };
 
 our ($sortsub, $sortglob, $sortglobr);
@@ -140,12 +141,13 @@ do {
 };
 
 do {
-  local $sortsub = \&Backwards_stacked;
-  local $sortglobr = \*Backwards_stacked;
-  @b = sort $sortsub @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 5');
-  @b = sort $sortglobr @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 8');
+    local our $TODO = 'decide how sort gets its arguments';
+    local $sortsub = \&Backwards_stacked;
+    local $sortglobr = \*Backwards_stacked;
+    @b = sort $sortsub, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 5');
+    @b = sort $sortglobr, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 8');
 };
 
 ## exercise sort builtins... ($a <=> $b already tested)
@@ -200,7 +202,7 @@ main::cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','not in main:: 1');
 do {
     package Bar;
     sub compare { $a cmp $b }
-    sub reenter { my @force = sort @( compare < qw/a b/) }
+    sub reenter { my @force = sort \&compare, qw/a b/ }
 };
 do {
     my($def, $init) = (0, 0);
@@ -240,10 +242,6 @@ do {
     $r1 = \@g[1]; @g =sort { $a+<$b?1:$a+>$b?-1:0 } @g; $r2 = \@g[0];
     is "$(join ' ',@g)", "3 2 1", "inplace custom sort of global";
 
-    sub mysort { $b cmp $a };
-    @a = qw(b c a); $r1 = \@a[1]; @a = sort mysort @a; $r2 = \@a[0];
-    is "$(join ' ',@a)", "c b a", "inplace sort with function of lexical";
-
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
 
     @g = @(3,2,1); @g = @('0', < sort @g);
@@ -265,11 +263,6 @@ do {
     is "$(join ' ',@g)", "0 3 2 1", "un-inplace custom sort of global";
     @g = @(2,3,1); @g = @(( <sort { $a+<$b?1:$a+>$b?-1:0 } @g),'4');
     is "$(join ' ',@g)", "3 2 1 4", "un-inplace custom sort of global 2";
-
-    @a = qw(b c a); @a = @('x', < sort mysort @a);
-    is "$(join ' ',@a)", "x c b a", "un-inplace sort with function of lexical";
-    @a = qw(b c a); @a = @((< sort mysort @a),'x');
-    is "$(join ' ',@a)", "c b a x", "un-inplace sort with function of lexical 2";
 };
 
 # test that optimized {$b cmp $a} and {$b <=> $a} remain stable
@@ -288,25 +281,6 @@ main::dies_like( sub { @output = sort {goto sub {}} @( 1,2); },
                  qr(^Can't goto subroutine outside a subroutine),
                  'goto subr outside subr');
 
-sub goto_sub {goto sub{}}
-main::dies_like( sub { @output = sort goto_sub @(1,2); },
-                 qr(^Can't goto subroutine from a sort sub),
-                 'goto subr from a sort sub');
-
-
-main::dies_like( sub { @output = sort {goto label} @( 1,2); },
-           qr(^Can't "goto" out of a pseudo block),
-           'goto out of a pseudo block 1');
-
-
-
-sub self_immolate {undef &self_immolate; $a<+>$b}
-main::dies_like( sub { @output = sort self_immolate @(1,2,3) },
-                 qr(^Can't undef active subroutine),
-                 'undef active subr');
-
-
-
 do {
     my $failed = 0;
 
@@ -316,7 +290,7 @@ do {
 	    return 1;
 	}
 	if ($n+<5) { rec($n+1); }
-	else { () = < sort rec @(1,2); }
+	else { () = < sort \&rec, @(1,2); }
 
 	$failed = 1 if !defined $n;
     }
@@ -330,7 +304,7 @@ do {
 # de facto behaviour that shouldn't be broken.
 package main;
 my $answer = "good";
-() = < sort OtherPack::foo @(1,2,3,4);
+() = < sort \&OtherPack::foo, @(1,2,3,4);
 
 do {
     package OtherPack;

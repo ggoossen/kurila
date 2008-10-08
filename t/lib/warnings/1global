@@ -139,19 +139,19 @@ EXPECT
 Use of uninitialized value $b in scalar chop at - line 4 character 9.
 ########
 
-{
+do {
     local ($^W) = 1;
-}
+};
 my $b ; chop $b ;
 EXPECT
 
 ########
 
 my $a ; chop $a ;
-{
+do {
     local ($^W) = 1;
     my $b ; chop $b ;
-}
+};
 my $c ; chop $c ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 5 character 13.
@@ -179,17 +179,17 @@ EXPECT
 ########
 
 sub fred { my $b ; chop $b ;}
-{ local $^W = 0 ;
+do { local $^W = 0 ;
   fred() ;
-}
+};
 EXPECT
 
 ########
 
 sub fred { my $b ; chop $b ;}
-{ local $^W = 1 ;
+do { local $^W = 1 ;
   fred() ;
-}
+};
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 2 character 20.
     main::fred called at - line 4 character 3.

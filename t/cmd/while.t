@@ -103,12 +103,12 @@ do {
 our $l;
 do {
     local $l = 18;
-    {
+    do {
         local $l = 0
     }
     continue {
         print "ok $l\n"
-    }
+    };
 };
 
 do {

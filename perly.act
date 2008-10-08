@@ -1033,8 +1033,8 @@ case 2:
     {
                             (yyval.opval) = newSTATEOP(0, NULL,
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION((ps[(1) - (2)].val.i_tkval)), (OP*)NULL, (ps[(2) - (2)].val.opval), NULL, 0)),
-                                LOCATION((ps[(1) - (2)].val.i_tkval)));
+                                        LOCATION((ps[(1) - (3)].val.i_tkval)), (OP*)NULL, (ps[(2) - (3)].val.opval), (ps[(3) - (3)].val.opval), 0)),
+                                LOCATION((ps[(1) - (3)].val.i_tkval)));
                             (yyval.opval) = scope((yyval.opval));
                         ;}
     break;
@@ -1042,11 +1042,11 @@ case 2:
   case 123:
 #line 963 "perly.y"
     {
-                            (yyval.opval) = newSTATEOP(0, PVAL((ps[(1) - (3)].val.p_tkval)),
+                            (yyval.opval) = newSTATEOP(0, PVAL((ps[(1) - (4)].val.p_tkval)),
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION((ps[(2) - (3)].val.i_tkval)), (OP*)NULL, (ps[(3) - (3)].val.opval), NULL, 0)),
-                                LOCATION((ps[(2) - (3)].val.i_tkval)));
-                            TOKEN_GETMAD((ps[(1) - (3)].val.p_tkval),(yyval.opval),'L');
+                                        LOCATION((ps[(2) - (4)].val.i_tkval)), (OP*)NULL, (ps[(3) - (4)].val.opval), (ps[(4) - (4)].val.opval), 0)),
+                                LOCATION((ps[(2) - (4)].val.i_tkval)));
+                            TOKEN_GETMAD((ps[(1) - (4)].val.p_tkval),(yyval.opval),'L');
 			;}
     break;
 

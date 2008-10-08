@@ -101,6 +101,8 @@ ok( $@ );
 eval "one_args()";
 ok( $@ );
 
+our $i;
+
 sub one_a_args ($) {
     print "# \@_ = (",join(",", @_),")\n";
     print "not " unless (nelems @_) == 1 && @_[0] == 4;
