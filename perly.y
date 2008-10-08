@@ -951,19 +951,19 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
                             $$ = dofile($2, IVAL($1), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
 			}
-	|	DO block %prec '('               /* do { code */
+	|	DO block cont %prec '('               /* do { code */
                         {
                             $$ = newSTATEOP(0, NULL,
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION($1), (OP*)NULL, $2, NULL, 0)),
+                                        LOCATION($1), (OP*)NULL, $2, $3, 0)),
                                 LOCATION($1));
                             $$ = scope($$);
                         }
-	|	LABEL DO block %prec '('               /* do { code */
+	|	LABEL DO block cont %prec '('               /* do { code */
                         {
                             $$ = newSTATEOP(0, PVAL($1),
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION($2), (OP*)NULL, $3, NULL, 0)),
+                                        LOCATION($2), (OP*)NULL, $3, $4, 0)),
                                 LOCATION($2));
                             TOKEN_GETMAD($1,$$,'L');
 			}

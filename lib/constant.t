@@ -106,13 +106,10 @@ cmp_ok E2BIG, '==', 7;
 cmp_ok length(E2BIG), '+>', 6;
 
 is nelems(@warnings), 0 or diag join "\n", @( "unexpected warning", < @warnings);
-@warnings = @( () );		# just in case
-undef &PI;
-ok nelems(@warnings) && (@warnings[0] =~ m/Constant sub.* undefined/) or
-  diag join "\n", @( "unexpected warning", < @warnings);
-shift @warnings;
 
 is nelems(@warnings), 0, "unexpected warning";
+
+ok 1;
 
 my $curr_test = $TB->current_test;
 use constant CSCALAR	=> \"ok 37\n";

@@ -303,9 +303,9 @@ sub _parseOutputGlob
     my $noPreBS = '(?<!\\)' ; # no preceeding backslash
     #warn "noPreBS = '$noPreBS'\n";
 
-    #$string =~ s/${noPreBS}\$(\d)/\${$1}/g;
-    $string =~ s/$noPreBS(?:)#(\d)/\{\$$1\}/g;
-    $string =~ s#$noPreBS(?:)\*#\{\$inFile\}#g;
+    #$string =~ s/${noPreBS}\$(\d)/\$\$($1)/g;
+    $string =~ s/$noPreBS(?:)#(\d)/\$(\$$1)/g;
+    $string =~ s#$noPreBS(?:)\*#\$(\$inFile)#g;
     $string = '"' . $string . '"';
 
     #print "OUTPUT '$self->{OutputGlob}' => '$string'\n";
