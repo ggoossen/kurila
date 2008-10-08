@@ -1027,8 +1027,6 @@ The current kinds of Magic Virtual Tables are:
     \0 PERL_MAGIC_sv             vtbl_sv         Special scalar variable
     A  PERL_MAGIC_overload       vtbl_amagic     %OVERLOAD hash
     a  PERL_MAGIC_overload_elem  vtbl_amagicelem %OVERLOAD hash element
-    c  PERL_MAGIC_overload_table (none)          Holds overload table (AMT)
-                                                 on stash
     B  PERL_MAGIC_bm             vtbl_bm         Boyer-Moore (fast string search)
     D  PERL_MAGIC_regdata        vtbl_regdata    Regex match position data
                                                  (@+ and @- vars)

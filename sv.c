@@ -3816,9 +3816,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_sv:
 	vtable = &PL_vtbl_sv;
 	break;
-    case PERL_MAGIC_overload_table:
-        vtable = &PL_vtbl_ovrld;
-        break;
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;
