@@ -2360,7 +2360,6 @@ t/op/exec.t			See if exec, system and qx work
 t/op/exp.t			See if math functions work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
-t/op/fun.t			See if op.c:Perl_ck_fun works
 t/op/getpid.t			See if $$ and getppid work with threads
 t/op/getppid.t			See if getppid works
 t/op/glob.t			See if <*> works
