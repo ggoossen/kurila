@@ -305,17 +305,6 @@ Perl_Slab_Free(pTHX_ void *op)
 
 #define RETURN_UNLIMITED_NUMBER (PERL_INT_MAX / 2)
 
-STATIC const char*
-S_gv_ename(pTHX_ GV *gv)
-{
-    SV* const tmpsv = sv_newmortal();
-
-    PERL_ARGS_ASSERT_GV_ENAME;
-
-    gv_efullname3(tmpsv, gv, NULL);
-    return SvPV_nolen_const(tmpsv);
-}
-
 STATIC OP *
 S_no_fh_allowed(pTHX_ OP *o)
 {
@@ -1657,37 +1646,6 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
     }
     return scalar(o);
 
-}
-
-STATIC OP *
-S_dup_attrlist(pTHX_ OP *o)
-{
-    dVAR;
-    OP *rop;
-
-    PERL_ARGS_ASSERT_DUP_ATTRLIST;
-
-    /* An attrlist is either a simple OP_CONST or an OP_LIST with kids,
-     * where the first kid is OP_PUSHMARK and the remaining ones
-     * are OP_CONST.  We need to push the OP_CONST values.
-     */
-    if (o->op_type == OP_CONST)
-	rop = newSVOP(OP_CONST, o->op_flags, SvREFCNT_inc_NN(cSVOPo->op_sv), o->op_location);
-#ifdef PERL_MAD
-    else if (o->op_type == OP_NULL)
-	rop = NULL;
-#endif
-    else {
-	assert((o->op_type == OP_LIST) && (o->op_flags & OPf_KIDS));
-	rop = NULL;
-	for (o = cLISTOPo->op_first; o; o=o->op_sibling) {
-	    if (o->op_type == OP_CONST)
-		rop = append_elem(OP_LIST, rop,
-				  newSVOP(OP_CONST, o->op_flags,
-					  SvREFCNT_inc_NN(cSVOPo->op_sv), o->op_location));
-	}
-    }
-    return rop;
 }
 
 STATIC OP *
@@ -4440,10 +4398,10 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     }
     GvCV(gv) = CvREFCNT_inc(cv);
 
-    {
+    if (SvAVOK(SvLOCATION((SV*)cv))) {
 	SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
 	sv_catpvf(namesv, "::%s", GvNAME_get(gv));
-	av_store(SvLOCATION((SV*)cv), 3, namesv);
+	av_store(SvAV(SvLOCATION((SV*)cv)), 3, namesv);
     }
 
     GvCVGEN(gv) = 0;
@@ -4743,7 +4701,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 	CvANON_on(cv);
 
     SvLOCATION(cv) = AvSV(newAV());
-    av_store(SvLOCATION((SV*)cv), 3, newSVpv(name, 0));
+    av_store(SvAV(SvLOCATION((SV*)cv)), 3, newSVpv(name, 0));
 
     return cv;
 }
@@ -6434,7 +6392,7 @@ Perl_ck_subr(pTHX_ OP *o)
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	o->op_private |= OPpENTERSUB_DB;
     if (cv && SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	namesv = av_fetch(SvLOCATION(cv), 3, 0);
+	namesv = av_fetch(SvAV(SvLOCATION(cv)), 3, 0);
     while (o2 != cvop) {
 	OP* o3;
 	if (PL_madskills && o2->op_type == OP_STUB) {
