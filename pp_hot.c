@@ -2333,16 +2333,18 @@ PP(pp_entersub)
 void
 Perl_sub_crush_depth(pTHX_ CV *cv)
 {
+    SV** name = NULL;
+    SV* loc;
+
     PERL_ARGS_ASSERT_SUB_CRUSH_DEPTH;
 
-    if (CvANON(cv))
-	Perl_warner(aTHX_ packWARN(WARN_RECURSION), "Deep recursion on anonymous subroutine");
-    else {
-	SV* const tmpstr = sv_newmortal();
-	gv_efullname3(tmpstr, NULL, NULL);
-	Perl_warner(aTHX_ packWARN(WARN_RECURSION), "Deep recursion on subroutine \"%"SVf"\"",
-		    SVfARG(tmpstr));
+    loc = SvLOCATION((SV*)cv);
+    if (loc && SvAVOK(loc)) {
+	name = av_fetch(SvAV(loc), 3, FALSE);
     }
+    Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
+	"Deep recursion on subroutine \"%"SVf"\"",
+	(name ? SvPVX_const(*name) : "(unknown)" ));
 }
 
 PP(pp_aelem)
