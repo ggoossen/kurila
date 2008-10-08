@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 82 );
+plan( tests => 81 );
 
 eval '%@x=0;';
 like( $@->{description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
@@ -20,10 +20,6 @@ like( $@->{description}, qr/^Missing right brace on \\N/,
 eval q/"\Nfoo"/;
 like( $@->{description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
-
-eval "a.b.c.d.e.f;sub";
-like( $@->{description}, qr/^Illegal declaration of anonymous subroutine/,
-    'found by Markov chain stress testing' );
 
 # Bug 20010831.001
 eval '($a, b) = (1, 2);';
