@@ -113,19 +113,20 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
             if $sock_type eq 'stream' and grep {m/pipe|unix/} @passed;
 
         # setlogsock() called with an arrayref
-        $r = try { setlogsock(\@($sock_type)) } || 0;
+        $r = try { setlogsock(\@($sock_type)) } || 0; die $@->message if $@;
         skip "can't use '$sock_type' socket", 20 unless $r;
         is( $@, '', "[$sock_type] setlogsock() called with ['$sock_type']" );
         ok( $r, "[$sock_type] setlogsock() should return true: '$r'" );
 
         # setlogsock() called with a single argument
-        $r = try { setlogsock($sock_type) } || 0;
+        $r = try { setlogsock($sock_type) } || 0; die $@->message if $@;
         skip "can't use '$sock_type' socket", 18 unless $r;
         is( $@, '', "[$sock_type] setlogsock() called with '$sock_type'" );
         ok( $r, "[$sock_type] setlogsock() should return true: '$r'" );
 
         # openlog() without option NDELAY
         $r = try { openlog('perl', '', 'local0') } || 0;
+        diag $@->message if $@;
         skip "can't connect to syslog", 16 if $@ and $@->{description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' and without option 'ndelay'" );
         ok( $r, "[$sock_type] openlog() should return true: $(dump::view($r))" );
