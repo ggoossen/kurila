@@ -9,7 +9,7 @@ END { print STDERR < @warnings }
 
 
 use strict;
-use Test::More tests => 89;
+use Test::More tests => 88;
 my $TB = Test::More->builder;
 
 BEGIN { use_ok('constant'); }
@@ -192,7 +192,6 @@ eval q{
 my @Expected_Warnings = 
   @(
    qr/^Constant name 'BEGIN' is a Perl keyword/,
-   qr/^Constant subroutine BEGIN redefined/,
    qr/^Constant name 'INIT' is a Perl keyword/,
    qr/^Constant name 'CHECK' is a Perl keyword/,
    qr/^Constant name 'UNITCHECK' is a Perl keyword/,
