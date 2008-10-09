@@ -470,6 +470,7 @@ PP(pp_die)
     else {
 	SV * const error = ERRSV;
 	if (sv_isobject(error)) {
+	    tmpsv = error;
 	    SV** desc = hv_fetchs( (HV*)SvRV(error), "notes", TRUE );
 	    if (desc) {
 		if ( ! SvPOK(*desc) )
