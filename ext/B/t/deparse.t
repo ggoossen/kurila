@@ -139,7 +139,7 @@ __DATA__
 do {
     no warnings;
     '???';
-    2;
+    2
 };
 ####
 # 4
@@ -183,10 +183,10 @@ my $foo = "Ab\x{100}\200\x{200}\377Cd\000Ef\x{1000}\cA\x{2000}\cZ";
 my $foo = "Ab\304\200\200\310\200\377Cd\000Ef\341\200\200\cA\342\200\200\cZ";
 ####
 # 15
-s/x/{ 'y' }/;
+s/x/$( 'y' )/;
 ####
 # 16 - various lypes of loop
-{ my $x; }
+do { my $x };
 ####
 # 17
 while (1) { my $k; }
@@ -231,7 +231,7 @@ foreach our $i (1, 2) {
 ####
 # 29
 my @x;
-print reverse sort(@x);
+print reverse(sort(@x));
 ####
 # 30
 my @x;
@@ -239,7 +239,7 @@ print((sort {$b cmp $a} @x));
 ####
 # 31
 my @x;
-print((reverse sort {$b <+> $a} @x));
+print reverse((sort {$b <+> $a} @x));
 ####
 # 32
 print $_ foreach (reverse @main::a);
@@ -287,13 +287,13 @@ my $bar;
 state $x = 42;
 ####
 # 47 state var assignment
-{
+do {
     my $y = (state $x = 42);
-}
+};
 >>>>
-{
-    my $y = state $x = 42;
-}
+do {
+    my $y = state $x = 42
+};
 ####
 # 48 state vars in anoymous subroutines
 $main::a = sub {
@@ -303,9 +303,9 @@ $main::a = sub {
 ;
 ####
 # 49 match
-{
-    $main::a =~ m/foo/;
-}
+do {
+    $main::a =~ m/foo/
+};
 ####
 # 51 Anonymous arrays and hashes, and references to them
 my $a = \%();

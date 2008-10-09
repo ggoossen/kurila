@@ -1072,7 +1072,12 @@ sub scopeop {
 	    return "$body $name $cond";
 	}
     } else {
-	$kid = $op->first;
+        if ($op->last->name eq "scope") {
+            $kid = $op->last->first->last;
+        }
+        else {
+            $kid = $op->first;
+        }
     }
     while(!null($kid)) {
 	push @kids, $kid;
@@ -1755,6 +1760,12 @@ sub pp_anonlist {
     my $self = shift;
     my ($op, $cx) = < @_;
     return $self->anon_hash_or_list($op, $cx);
+}
+
+sub pp_anonscalar {
+    my $self = shift;
+    my ($op, $cx) = < @_;
+    return "\$( " . $self->deparse($op->first, 6) . " )";
 }
 
 *pp_anonhash = \&pp_anonlist;
@@ -2986,7 +2997,7 @@ sub slice {
     $array = $array->first
 	if $array->name eq $regname or $array->name eq "null";
     $array = $self->elem_or_slice_array_name($array,$left,$padname,0);
-    my $kid = $op->first->sibling; # skip pushmark
+    my $kid = $op->first;
     if ($kid->name eq "list") {
 	$kid = $kid->first->sibling; # skip list, pushmark
 	while (!null $kid) {

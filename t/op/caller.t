@@ -52,7 +52,7 @@ is( @c[3], "(eval)", "subroutine name in an eval ''" );
 ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { f() } -> ();
-is( @c[3], undef, "anonymous subroutine name" );
+is( @c[3], 'main::__ANON__', "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 sub foo2 { f() }

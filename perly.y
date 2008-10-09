@@ -640,7 +640,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			}
         |       ANONSCALARL listexpr  /* $: ... */
                         {
-                            $$ = convert(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
+                            $$ = newUNOP(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
 			}
 	|	FUNC '(' listexprcom ')'             /* print (@args) */
@@ -1212,7 +1212,7 @@ scalar	:	'$' indirob
 			}
         |       ANONSCALAR expr ')'  /* $( ... ) */
                         { 
-                            $$ = convert(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
+                            $$ = newUNOP(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($3,$$,']');
 
