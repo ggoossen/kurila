@@ -12,7 +12,7 @@ $| = 1;
 %ENV{PERL_CORE} = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
-@ARGV = @( < grep($_, @ARGV) ) if $^O eq 'VMS';
+@ARGV = grep($_, @ARGV) if $^O eq 'VMS';
 our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
@@ -34,7 +34,7 @@ do {
 	    $::deparse_opts = $1;
 	}
     }
-    @ARGV = @( < @argv );
+    @ARGV = @argv;
 };
 
 chdir 't' if -f 't/TEST';
@@ -72,7 +72,7 @@ my $updir  = File::Spec->updir;
 sub _find_tests {
     my($dir) = < @_;
     opendir my $dirh, $dir or die "Trouble opening $dir: $!";
-    foreach my $f (@( <sort { $a cmp $b } @( readdir $dirh))) {
+    foreach my $f (sort { $a cmp $b } @( readdir $dirh)) {
 	next if $f eq $curdir or $f eq $updir or
 	    $f =~ m/^(?:CVS|RCS|SCCS|\.svn)$/;
 
@@ -88,7 +88,7 @@ sub _quote_args {
     my ($args) = < @_;
     my $argstring = '';
 
-    foreach (@( <split(m/\s+/,$args))) {
+    foreach (split(m/\s+/,$args)) {
        # In VMS protect with doublequotes because otherwise
        # DCL will lowercase -- unless already doublequoted.
        $_ = q(").$_.q(") if ($^O eq 'VMS') && !m/^\"/ && length($_) +> 0;
@@ -98,7 +98,7 @@ sub _quote_args {
 }
 
 sub _populate_hash {
-    return @( < map {$_, 1} @( < split m/\s+/, @_[0]) );
+    return map {$_, 1} split m/\s+/, @_[0];
 }
 
 if ($::failed) {
@@ -112,7 +112,7 @@ if ($::failed) {
 }
 
 unless (nelems @ARGV) {
-    foreach my $dir (@( <qw(base comp cmd run io lex sv op uni mro))) {
+    foreach my $dir (qw(base comp cmd run io lex sv op uni mro)) {
 	_find_tests($dir);
     }
     _find_tests("lib") unless $::core;
@@ -136,7 +136,7 @@ unless (nelems @ARGV) {
 	}
 	if (%extensions) {
 	    if (%known_extensions) {
-		foreach (@( <keys %known_extensions)) {
+		foreach (keys %known_extensions) {
 		    %skip{$_}++ unless %extensions{$_};
 		}
 	    } else {
@@ -228,7 +228,7 @@ EOT
       }
     }
     my $maxlen = 0;
-    foreach (@( <%::path_to_name{[@(< @tests)]})) {
+    foreach (@( <%::path_to_name{[@tests]})) {
 	s/\.\w+\z/./;
 	my $len = length ;
 	$maxlen = $len if $len +> $maxlen;
@@ -364,7 +364,7 @@ EOT
 			$failure ||= 'FAILED--seen duplicate leader';
 		    }
 		    $max = $1;
-		    %todo = %( < map { $_ => 1 } @( < split m/ /, $3) ) if $3;
+		    %todo = %( < map { $_ => 1 } split m/ /, $3) if $3;
 		    $totmax += $max;
 		    $tested_files++;
 		    if ($seen_ok) {
@@ -535,7 +535,7 @@ EOT
 	my $pct = $tested_files ? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) : "0.00";
 	my $s = $::bad_files == 1 ? "" : "s";
 	print STDERR "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
-	for my $test (@( < sort @( < grep { %failed_tests{$_} } @( < keys %failed_tests))) ) {
+	for my $test (sort grep { %failed_tests{$_} } keys %failed_tests) {
 	    print "\t$test\n";
 	}
 	print STDERR <<'SHRDLU_1';
@@ -578,7 +578,7 @@ SHRDLU_5
     do {
         # write failed tests
         open my $fh, ">", "TEST_FAILED" or die;
-        print $fh "$_\n" for reverse sort @( < keys %failed_tests);
+        print $fh "$_\n" for reverse sort keys %failed_tests;
         close $fh;
     };
 
