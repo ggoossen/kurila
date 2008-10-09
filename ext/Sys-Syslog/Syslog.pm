@@ -81,10 +81,11 @@ my $syslog_send;                # coderef of the function used to send messages
 my $syslog_path = undef;        # syslog path for "stream" and "unix" mechanisms
 my $syslog_xobj = undef;        # if defined, holds the external object used to send messages
 my $transmit_ok = 0;            # flag to indicate if the last message was transmited
+my $sock_timeout  = 0;          # socket timeout, see below
 my $current_proto = undef;      # current mechanism used to transmit messages
 my $ident = '';                 # identifiant prepended to each message
 $facility = '';                 # current facility
-my $maskpri = LOG_UPTO(&LOG_DEBUG( < @_ ));     # current log mask
+my $maskpri = LOG_UPTO(LOG_DEBUG());     # current log mask
 
 my %options = %(
     ndelay  => 0, 
@@ -112,6 +113,8 @@ if (not $@) {
 
 my @defaultMethods = @connectMethods;
 my @fallbackMethods = @( () );
+
+$sock_timeout = 0.25 if $^O =~ m/darwin/;
 
 # coderef for a nicer handling of errors
 my $err_sub = %options{nofatal} ? \&warnings::warnif : sub { die shift; };
@@ -275,7 +278,7 @@ sub syslog {
 	if ($num +< 0) {
 	    die "syslog: invalid level/facility: $_"
 	}
-	elsif ($num +<= &LOG_PRIMASK( < @_ )) {
+	elsif ($num +<= LOG_PRIMASK()) {
 	    die "syslog: too many levels given: $_" if defined $numpri;
 	    $numpri = $num;
 	    return 0 unless LOG_MASK($numpri) ^&^ $maskpri;
@@ -298,13 +301,13 @@ sub syslog {
 
     if ($mask =~ m/\%m/) {
         # escape percent signs for sprintf()
-        $error =~ s/%/\%\%/g if (nelems @_);
+        $error =~ s/%/\%\%/g if @_;
         # replace %m with $error, if preceded by an even number of percent signs
         $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g;
     }
 
     $mask .= "\n" unless $mask =~ m/\n$/;
-    $message = (nelems @_) ? sprintf($mask, < @_) : $mask;
+    $message = @_ ? sprintf($mask, < @_) : $mask;
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
     chomp $message if $^O =~ m/darwin/;
@@ -333,7 +336,7 @@ sub syslog {
     # then we'll get ECONNREFUSED on the send). So what we
     # want to do at this point is to fallback onto a different
     # connection method.
-    while (scalar nelems @fallbackMethods || $syslog_send) {
+    while (@fallbackMethods || $syslog_send) {
 	if ($failed && (time - $fail_time) +> 60) {
 	    # it's been a while... maybe things have been fixed
 	    @fallbackMethods = @( () );
@@ -379,7 +382,7 @@ sub _syslog_send_console {
 	    return 1;
 	} else {
 	    if (waitpid($pid, 0) +>= 0) {
-	    	return  @($? >> 8);
+	    	return  $? >> 8;
 	    } else {
 		# it's possible that the caller has other
 		# plans for SIGCHLD, so let's not interfere
@@ -703,7 +706,7 @@ sub connection_ok {
 
     my $rin = '';
     vec($rin, fileno(SYSLOG), 1) = 1;
-    my $ret = select $rin, undef, $rin, 0.25;
+    my $ret = select $rin, undef, $rin, $sock_timeout;
     return $ret ? 0 : 1;
 }
 
