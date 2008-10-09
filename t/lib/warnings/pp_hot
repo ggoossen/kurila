@@ -177,7 +177,7 @@ sub fred
 { 
     fred() if $a++ +< 200
 } 
-{
+do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print "ok\n";
@@ -185,7 +185,7 @@ sub fred
     }
   };
   fred();
-}
+};
 EXPECT
 ok
 ########
@@ -195,7 +195,7 @@ sub fred
 { 
     fred() if $a++ +< 200
 } 
-{
+do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print "ok\n";
@@ -203,7 +203,7 @@ sub fred
     }
   };
   fred();
-}
+};
 EXPECT
 
 ########
@@ -216,7 +216,7 @@ $b = sub
 
 &$b ;
 EXPECT
-Deep recursion on anonymous subroutine at - line 5 character 1.
+Deep recursion on subroutine "main::__ANON__" at - line 5 character 1.
     main::__ANON__ called at - line 5 character 1.
     main::__ANON__ called at - line 5 character 1.
     main::__ANON__ called at - line 5 character 1.

@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 77 );
+plan( tests => 57 );
 
 our (@a, @b);
 
@@ -359,9 +359,4 @@ main::is("$(join ' ',@b)", "1 2 3 4 5 6 7 8 9 10", "return within loop");
 # Using return() should be okay even if there are other items
 # on the stack at the time.
 @b = sort {$_ = ($a<+>$b) + do{return $b<+> $a}} 1..10;
-main::is("$(join ' ',@b)", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");
-
-# As above, but with a sort sub rather than a sort block.
-sub ret_with_stacked { $_ = ($a<+>$b) + do {return $b <+> $a} }
-@b = sort \&ret_with_stacked, 1..10;
 main::is("$(join ' ',@b)", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");
