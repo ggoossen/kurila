@@ -608,7 +608,7 @@ case 2:
   case 75:
 #line 642 "perly.y"
     {
-                            (yyval.opval) = convert(OP_ANONSCALAR, 0, scalar((ps[(2) - (2)].val.opval)), LOCATION((ps[(1) - (2)].val.i_tkval)));
+                            (yyval.opval) = newUNOP(OP_ANONSCALAR, 0, scalar((ps[(2) - (2)].val.opval)), LOCATION((ps[(1) - (2)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'[');
 			;}
     break;
@@ -1412,7 +1412,7 @@ case 2:
   case 178:
 #line 1214 "perly.y"
     { 
-                            (yyval.opval) = convert(OP_ANONSCALAR, 0, scalar((ps[(2) - (3)].val.opval)), LOCATION((ps[(1) - (3)].val.i_tkval)));
+                            (yyval.opval) = newUNOP(OP_ANONSCALAR, 0, scalar((ps[(2) - (3)].val.opval)), LOCATION((ps[(1) - (3)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'[');
                             TOKEN_GETMAD((ps[(3) - (3)].val.i_tkval),(yyval.opval),']');
 

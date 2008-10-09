@@ -628,7 +628,7 @@ prototype	subroutine prototype	ck_null		s%	S
 srefgen		single ref constructor	ck_null		fs1	S
 ref		reference-type operator	ck_fun		stu%	S?
 bless		bless			ck_fun		s@	S S?
-anonscalar	anonymous scalar ($())	ck_fun		$	S
+anonscalar	anonymous scalar ($())	ck_fun		1	S
 
 # Pushy I/O.
 
