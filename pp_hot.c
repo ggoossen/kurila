@@ -2343,7 +2343,7 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 	name = av_fetch(SvAV(loc), 3, FALSE);
     }
     Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
-	"Deep recursion on subroutine \"%"SVf"\"",
+	"Deep recursion on subroutine \"%s\"",
 	(name ? SvPVX_const(*name) : "(unknown)" ));
 }
 
