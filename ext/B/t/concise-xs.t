@@ -148,7 +148,7 @@ my $testpkgs = \%(
 	XS => \qw( svref_2object perlstring opnumber main_start
 		   main_root main_cv ),
 
-	constant => \@( <qw/ ASSIGN CVf_LOCKED
+	constant => \qw/ ASSIGN CVf_LOCKED
 		     CVf_METHOD LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
 		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
 		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
@@ -162,7 +162,7 @@ my $testpkgs = \%(
 		     PMf_MULTILINE PMf_SINGLELINE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
 		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN OPpPAD_STATE
-		     /, 'RXf_SKIPWHITE'),
+		     RXf_SKIPWHITE/,
 		 ),
 
     POSIX => \%( dflt => 'constant',			# all but 252/589
