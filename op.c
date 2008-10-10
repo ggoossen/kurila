@@ -4689,7 +4689,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
     cv = (CV*)newSV_type(SVt_PVCV);
 
     if (gv) {
-	GvCV(gv) = CvREFCNT_inc(cv);
+	GvCV(gv) = cv;
 	GvCVGEN(gv) = 0;
 	mro_method_changed_in(GvSTASH(gv)); /* newXS */
     }
