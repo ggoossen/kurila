@@ -428,6 +428,7 @@ S_op_destroy(pTHX_ OP *o)
 	o->op_latefreed = 1;
 	return;
     }
+    SVcpNULL(o->op_location);
     FreeOp(o);
 }
 
