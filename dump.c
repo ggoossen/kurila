@@ -704,8 +704,8 @@ S_sequence_num(pTHX_ const OP *o)
     if (!o) return 0;
     op = newSVuv(PTR2UV(o));
     key = SvPV_const(op, len);
-    SVcpNULL(op);
     seq = hv_fetch(Sequence, key, len, 0);
+    SVcpNULL(op);
     return seq ? SvUV(*seq): 0;
 }
 
