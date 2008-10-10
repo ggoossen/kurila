@@ -751,19 +751,22 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     {
 	SV* loc = o->op_location;
-	SV* locstr = sv_2mortal(newSVpv("", 0));
+	Perl_dump_indent(aTHX_ level, file, "  LOCATION = ");
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
 	    int i;
 	    for (i=0; i <= len; i++) {
-		if (SvPVOK(ary[i])) {
-		    sv_catsv(locstr, ary[i]);
-		    sv_catpv(locstr, " ");
+		if (SvPOK(ary[i])) {
+		    PerlIO_write(file, SvPVX_const(ary[i]), SvCUR(ary[i]));
 		}
+		else if (SvIOK(ary[i])) {
+		    PerlIO_printf(file, "%"IVdf, (IV)SvIVX(ary[i]));
+		}
+		PerlIO_write(file, STR_WITH_LEN(" "));
 	    }
 	}
-	Perl_dump_indent(aTHX_ level, file, "LOCATION = %s\n", SvPV_nolen_const(locstr));
+	PerlIO_printf(file, "\n");
     }
 #ifdef DUMPADDR
     Perl_dump_indent(aTHX_ level, file, "ADDR = 0x%"UVxf" => 0x%"UVxf"\n", (UV)o, (UV)o->op_next);
@@ -1500,19 +1503,22 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     }
     {
 	SV* loc = SvLOCATION(sv);
-	SV* locstr = sv_2mortal(newSVpv("", 0));
+	Perl_dump_indent(aTHX_ level, file, "  LOCATION = ");
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
 	    int i;
 	    for (i=0; i <= len; i++) {
-		if (SvPVOK(ary[i])) {
-		    sv_catsv(locstr, ary[i]);
-		    sv_catpv(locstr, " ");
+		if (SvPOK(ary[i])) {
+		    PerlIO_write(file, SvPVX_const(ary[i]), SvCUR(ary[i]));
 		}
+		else if (SvIOK(ary[i])) {
+		    PerlIO_printf(file, "%"IVdf, (IV)SvIVX(ary[i]));
+		}
+		PerlIO_write(file, STR_WITH_LEN(" "));
 	    }
 	}
-	Perl_dump_indent(aTHX_ level, file, "  LOCATION = %s\n", SvPV_nolen_const(locstr));
+	PerlIO_printf(file, "\n");
     }
     if ((type >= SVt_PVIV && type != SVt_PVAV && type != SVt_PVHV
 	 && type != SVt_PVCV && !isGV_with_GP(sv))
