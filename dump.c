@@ -615,7 +615,7 @@ S_sequence(pTHX_ register const OP *o)
 
     for (; o; o = o->op_next) {
 	STRLEN len;
-	SV * const op = newSVuv(PTR2UV(o));
+	SV * const op = sv_2mortal(newSVuv(PTR2UV(o)));
 	const char * const key = SvPV_const(op, len);
 
 	if (hv_exists(Sequence, key, len))
@@ -704,6 +704,7 @@ S_sequence_num(pTHX_ const OP *o)
     if (!o) return 0;
     op = newSVuv(PTR2UV(o));
     key = SvPV_const(op, len);
+    SVcpNULL(op);
     seq = hv_fetch(Sequence, key, len, 0);
     return seq ? SvUV(*seq): 0;
 }
@@ -750,7 +751,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     {
 	SV* loc = o->op_location;
-	SV* locstr = newSVpv("", 0);
+	SV* locstr = sv_2mortal(newSVpv("", 0));
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
@@ -780,6 +781,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     S_dump_op_mad(aTHX_ level, file, o);
     S_dump_op_rest(aTHX_ level, file, o);
+    SVcpNULL(Sequence);
 }
     
 STATIC SV* S_dump_op_flags(pTHX_ const OP* o)
@@ -981,7 +983,7 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
     PERL_UNUSED_ARG(o);
 #else
     if (PL_madskills && o->op_madprop) {
-	SV * const tmpsv = newSVpvn("", 0);
+	SV * const tmpsv = sv_2mortal(newSVpvn("", 0));
 	MADPROP* mp = o->op_madprop;
 	Perl_dump_indent(aTHX_ level, file, "MADPROPS = {\n");
 	level++;
@@ -1013,8 +1015,6 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	level--;
 	Perl_dump_indent(aTHX_ level, file, "}\n");
-
-	SvREFCNT_dec(tmpsv);
     }
 #endif
 }
@@ -1033,9 +1033,8 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 #else
 	if ( ! PL_op->op_flags & OPf_SPECIAL) { /* not lexical */
 	    if (cSVOPo->op_sv) {
-		SV * const tmpsv = newSV(0);
+		SV * const tmpsv = sv_2mortal(newSV(0));
 		ENTER;
-		SAVEFREESV(tmpsv);
 		gv_fullname3(tmpsv, (GV*)cSVOPo->op_sv, NULL);
 		Perl_dump_indent(aTHX_ level, file, "GV = %s\n",
 				 SvPV_nolen_const(tmpsv));
@@ -1502,7 +1501,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     }
     {
 	SV* loc = SvLOCATION(sv);
-	SV* locstr = newSVpv("", 0);
+	SV* locstr = sv_2mortal(newSVpv("", 0));
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
