@@ -781,7 +781,6 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     S_dump_op_mad(aTHX_ level, file, o);
     S_dump_op_rest(aTHX_ level, file, o);
-    SVcpNULL(Sequence);
 }
     
 STATIC SV* S_dump_op_flags(pTHX_ const OP* o)

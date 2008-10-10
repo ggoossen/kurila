@@ -525,8 +525,6 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
     if (type == OP_NULL)
 	type = (OPCODE)o->op_targ;
 
-    /* COP* is not cleared by op_clear() so that we may track line
-     * numbers etc even after null() */
     if (type == OP_NEXTSTATE || type == OP_DBSTATE) {
 	SvTMPREFCNT_inc(((COP*)o)->cop_hints_hash);
     }
@@ -631,16 +629,14 @@ Perl_op_clear(pTHX_ OP *o)
 		cPADOPo->op_padix = 0;
 	    }
 #else
-	    SvREFCNT_dec(cSVOPo->op_sv);
-	    cSVOPo->op_sv = NULL;
+	    SVcpNULL(cSVOPo->op_sv);
 #endif
 	}
 	break;
     case OP_METHOD_NAMED:
     case OP_CONST:
     case OP_HINTSEVAL:
-	SvREFCNT_dec(cSVOPo->op_sv);
-	cSVOPo->op_sv = NULL;
+	SVcpNULL(cSVOPo->op_sv);
 #ifdef USE_ITHREADS
 	/** Bug #15654
 	  Even if op_clear does a pad_free for the target of the op,
@@ -731,9 +727,10 @@ Perl_op_null(pTHX_ OP *o)
     SV* location;
     PERL_ARGS_ASSERT_OP_NULL;
 
-    location = SvREFCNT_inc(o->op_location);
     if (o->op_type == OP_NULL)
 	return;
+
+    location = SvREFCNT_inc(o->op_location);
     if (!PL_madskills)
 	op_clear(o);
     o->op_targ = o->op_type;
@@ -3816,7 +3813,7 @@ OP *
     o->op_flags |= flags;
     o = scope(o);
     o->op_flags |= OPf_SPECIAL;	/* suppress POPBLOCK curpm restoration*/
-    o->op_location = SvREFCNT_inc(location);
+    SVcpREPLACE(o->op_location, location);
     return o;
 }
 

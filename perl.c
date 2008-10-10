@@ -678,8 +678,9 @@ perl_destruct(pTHXx)
     Safefree(PL_osname);	/* $^O */
     PL_osname = NULL;
 
-    SvREFCNT_dec(PL_statname);
-    PL_statname = NULL;
+    SVcpNULL(PL_op_sequence);
+
+    SVcpNULL(PL_statname);
     PL_statgv = NULL;
 
     /* defgv, aka *_ should be taken care of elsewhere */
