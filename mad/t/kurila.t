@@ -36,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_block();
+t_lval_vec();
 die;
+t_block();
 t_ampcall();
 t_array_simplify();
 t_map_array();
@@ -1374,5 +1375,17 @@ s/x/{ ord($1) }/;
 "" . join('*', @{$_});
 s/x/$( ord($1) )/;
 "x $($a) - $($@->message) y";
+====
+my $x .= do { 3 };
+----
+my $x .= do { 3 };
+END
+}
+
+sub t_lval_vec {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+vec($a, 1, 1) = 1;
+----
+vec($a, 1, 1, 1);
 END
 }
