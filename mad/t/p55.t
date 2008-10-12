@@ -30,6 +30,8 @@ use IO::Handle;
 
 use Nomad;
 
+my $version = "kurila-1.14";
+
 sub p55 {
     my ($input, $msg) = @_;
 
@@ -46,7 +48,7 @@ sub p55 {
         ok 0, "$msg" or $TODO or die;
         return;
     }
-    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.10" ) };
+    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => $version ) };
     diag($@) if $@;
     is($output, $input, $msg) or $TODO or die;
 }
@@ -81,7 +83,7 @@ sub p55_file {
         fail "MAD dump failure of '$file'";
         return;
     }
-    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => "kurila-1.9" ) };
+    my $output = eval { Nomad::xml_to_p5( input => "tmp.xml", version => $version ) };
     if ($@) {
         fail "convert xml to p5 failed file: '$file'";
         #$TODO or die;
@@ -94,6 +96,11 @@ sub p55_file {
 
 undef $/;
 my @prgs = split m/^########\n/m, <DATA>;
+
+{
+    use bytes;
+    push @prgs, qq{# utf8 test\nuse bytes;\n"\xE8"};
+}
 
 use bytes;
 
@@ -142,13 +149,11 @@ my $x = pi;
 ########
 sub ok($$) { }
 #BEGIN { ok(1, 2, ); }
-########
-for (my $i=0; $i+<3; $i++) { }
-########
-for (; $a+<3; $a++) { }
-########
+#######
 #
-s//{m#.#}/g;
+s//$(m#.#)/g;
+########
+BEGIN { 1; }
 ########
 # Reduced test case from t/io/layers.t
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
@@ -181,8 +186,11 @@ BEGIN {
 }
 use foobar;
 ########
+1; # 1
+2; # 2;
+########
 # operator with modify TARGET_MY
-my ($nc_attempt, $within);
+my ($nc_attempt, $within)  ;
 $nc_attempt = 0+ ($within eq 'other_sub') ;
 ########
 # __END__ section
@@ -279,3 +287,8 @@ my %h;
 try { }
 ########
 binmode ':foo', $a;
+########
+# TODO substitute with $(..)
+my $str = shift;
+$str =~ s{(foo)}{$(sprintf("=\%02X", ord($1)))}g;
+$str;

@@ -1034,26 +1034,28 @@ BEGIN {
 	    my @newkids;
 	    my @module = $self->madness('U') or die "use should have 'U' madness";
 	    my @args = $self->madness('A');
-	    my $module = $module[-1]{Kids}[-1];
-	    if ($module->uni eq 'bytes') {
-		$::curenc = Nomad::encnum('iso-8859-1');
-	    }
-	    elsif ($module->uni eq 'utf8') {
-		if ($$self{mp}{o} eq 'no') {
-		    $::curenc = 0;
-		}
-		else {
-		    $::curenc = Nomad::encnum('utf-8');
-		}
-	    }
-	    elsif ($module->uni eq 'encoding') {
-		if ($$self{mp}{o} eq 'no') {
-		    $::curenc = Nomad::encnum('iso-8859-1');
-		}
-		else {
-		    $::curenc = Nomad::encnum(eval $args[0]->p5text); # XXX bletch
-		}
-	    }
+            if ( $::version->{branch} ne 'kurila') {
+                my $module = $module[-1]{Kids}[-1];
+                if ($module->uni eq 'bytes') {
+                    $::curenc = Nomad::encnum('iso-8859-1');
+                }
+                elsif ($module->uni eq 'utf8') {
+                    if ($$self{mp}{o} eq 'no') {
+                        $::curenc = 0;
+                    }
+                    else {
+                        $::curenc = Nomad::encnum('utf-8');
+                    }
+                }
+                elsif ($module->uni eq 'encoding') {
+                    if ($$self{mp}{o} eq 'no') {
+                        $::curenc = Nomad::encnum('iso-8859-1');
+                    }
+                    else {
+                        $::curenc = Nomad::encnum(eval $args[0]->p5text); # XXX bletch
+                    }
+                }
+            }
 	    # (Surrounding {} ends up here if use is only thing in block.)
 	    push @newkids, $self->madness('{ o');
 	    push @newkids, @module;

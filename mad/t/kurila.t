@@ -19,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.13';
-my $to = 'kurila-1.14';
+my $from = 'kurila-1.14';
+my $to = 'kurila-1.15';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -36,8 +36,11 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_array_simplify();
+t_lval_vec();
 die;
+t_block();
+t_ampcall();
+t_array_simplify();
 t_map_array();
 t_array_hash();
 t_eval_to_try();
@@ -1326,5 +1329,63 @@ sub t_array_simplify {
 my $x = @( < $a );
 ----
 my $x = $a;
+END
+}
+
+sub t_ampcall {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo { }
+&foo;
+&foo();
+foo;
+----
+sub foo { }
+&foo( < @_ );
+&foo();
+foo;
+END
+}
+
+sub t_block {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+{ 1; }
+----
+do { 1; };
+====
+map { $_ } 1..10;
+while (1) { 1 };
+sub { 1 };
+{ 1 }
+SKIP: { 1 }
+----
+map { $_ } 1..10;
+while (1) { 1 };
+sub { 1 };
+do { 1 };
+SKIP: do { 1 };
+====
+"{1}";
+"" . join('*', map { $_ } 1..5);
+"" . join('*', @{$_});
+s/x/{ ord($1) }/;
+"x {$a} - {$@->message} y";
+----
+"$(1)";
+"" . join('*', map { $_ } 1..5);
+"" . join('*', @{$_});
+s/x/$( ord($1) )/;
+"x $($a) - $($@->message) y";
+====
+my $x .= do { 3 };
+----
+my $x .= do { 3 };
+END
+}
+
+sub t_lval_vec {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+vec($a, 1, 1) = 1;
+----
+vec($a, 1, 1, 1);
 END
 }
