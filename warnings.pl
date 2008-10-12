@@ -90,10 +90,9 @@ sub valueWalk
 {
     my $tre = shift ;
     my @list = @() ;
-    my ($k, $v) ;
 
-    foreach $k (sort keys %$tre) {
-	$v = $tre->{$k};
+    foreach my $k (sort keys %$tre) {
+	my $v = $tre->{$k};
 	die "duplicate key $k\n" if defined %list{$k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
@@ -127,10 +126,9 @@ sub walk
 {
     my $tre = shift ;
     my @list = @() ;
-    my ($k, $v) ;
 
-    foreach $k (sort keys %$tre) {
-	$v = $tre->{$k};
+    foreach my $k (sort keys %$tre) {
+	my $v = $tre->{$k};
 	die "duplicate key $k\n" if defined %list{$k} ;
 	#$Value{$index} = uc $k ;
 	die "Can't find key '$k'"
@@ -156,9 +154,8 @@ sub mkRange
 {
     my @a = shift ;
     my @out = @a ;
-    my $i ;
 
-    for ($i = 1 ; $i +< nelems(@a); ++ $i) {
+    for my $i (1..nelems(@a)-1) {
       	@out[$i] = ".."
           if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[$i + 1] ;
     }
@@ -217,7 +214,7 @@ sub mkHex
     my $string = "" ;
 
     foreach ( @a) {
-	vec($mask, $_, 1) = 1 ;
+	vec($mask, $_, 1 => 1);
     }
 
     foreach (@(unpack("C*", $mask))) {
@@ -288,9 +285,8 @@ walk ($tree) ;
 $index *= 2 ;
 my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 
-my $k ;
 my $last_ver = 0;
-foreach $k (sort { $a <+> $b } keys %ValueToName) {
+foreach my $k (sort { $a <+> $b } keys %ValueToName) {
     my ($name, $version) = < @{ %ValueToName{$k} };
     print $warn "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
@@ -377,7 +373,7 @@ foreach my $k (sort { $a <+> $b } keys %ValueToName) {
 print $pm "  );\n\n" ;
 
 print $pm "our \%Bits = %(\n" ;
-foreach $k (sort keys  %list) {
+foreach my $k (sort keys  %list) {
 
     my $v = %list{$k} ;
     my @list = sort { $a <+> $b } @$v;
@@ -391,7 +387,7 @@ foreach $k (sort keys  %list) {
 print $pm "  );\n\n" ;
 
 print $pm "our \%DeadBits = %(\n" ;
-foreach $k (sort keys  %list) {
+foreach my $k (sort keys  %list) {
 
     my $v = %list{$k} ;
     my @list = sort { $a <+> $b } @$v;
@@ -430,7 +426,7 @@ our $VERSION = '1.06';
 my $pkg = __PACKAGE__;
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
     my (undef, $f, $l) = caller;
-    die("Incorrect use of pragma '{__PACKAGE__}' at $f line $l.\n");
+    die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
 }
 
 =head1 NAME
@@ -558,7 +554,7 @@ See L<perlmodlib/Pragmatic Modules> and L<perllexwarn>.
 
 KEYWORDS
 
-our $All = "" ; vec($All, %Offsets{'all'}, 2) = 3 ;
+our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3);
 
 sub bits
 {
@@ -571,7 +567,7 @@ sub bits
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    foreach my $word ( < @_ ) {
+    foreach my $word ( @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -609,7 +605,7 @@ sub import
     
     push @_, 'all' unless @_;
 
-    foreach my $word ( < @_ ) {
+    foreach my $word ( @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -644,7 +640,7 @@ sub unimport
 
     push @_, 'all' unless @_;
 
-    foreach my $word ( < @_ ) {
+    foreach my $word ( @_ ) {
 	if ($word eq 'FATAL') {
 	    next; 
 	}
@@ -658,7 +654,7 @@ sub unimport
     $^WARNING_BITS = $mask ;
 }
 
-my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
+my %builtin_type; < %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
 
 sub __chk
 {
@@ -691,7 +687,7 @@ sub __chk
     my $pkg ;
 
     if ($isobj) {
-        while (do { { package DB; $pkg = @(caller($i++))[0] } } ) {
+        while (do { package DB; $pkg = @(caller($i++))[0] } ) {
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;

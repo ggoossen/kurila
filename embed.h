@@ -2402,7 +2402,7 @@
 #define do_sysseek(a,b,c)	Perl_do_sysseek(aTHX_ a,b,c)
 #define do_tell(a)		Perl_do_tell(aTHX_ a)
 #define do_vecget(a,b,c)	Perl_do_vecget(aTHX_ a,b,c)
-#define do_vecset(a)		Perl_do_vecset(aTHX_ a)
+#define do_vecset()		Perl_do_vecset(aTHX)
 #define do_vop(a,b,c,d)		Perl_do_vop(aTHX_ a,b,c,d)
 #define dofile(a,b,c)		Perl_dofile(aTHX_ a,b,c)
 #endif

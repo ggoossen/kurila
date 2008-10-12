@@ -249,30 +249,26 @@ Perl_do_vecget(pTHX_ SV *sv, I32 offset, I32 size)
  * utf8-valid any more
  */
 void
-Perl_do_vecset(pTHX_ SV *sv)
+Perl_do_vecset(pTHX)
 {
-    dVAR;
-    register I32 offset, bitoffs = 0;
-    register I32 size;
+    dVAR; dSP;
+    register I32 bitoffs = 0;
     register unsigned char *s;
-    register UV lval;
     I32 mask;
     STRLEN targlen;
     STRLEN len;
-    SV * const targ = LvTARG(sv);
-
-    PERL_ARGS_ASSERT_DO_VECSET;
+    UV lval = POPu;
+    register const IV size   = POPi;
+    register IV offset = POPi;
+    register SV * const targ = POPs;
 
     if (!targ)
 	return;
     s = (unsigned char*)SvPV_force(targ, targlen);
 
     (void)SvPOK_only(targ);
-    lval = SvUV(sv);
-    offset = LvTARGOFF(sv);
     if (offset < 0)
 	Perl_croak(aTHX_ "Negative offset to vec in lvalue context");
-    size = LvTARGLEN(sv);
     if (size < 1 || (size & (size-1))) /* size < 1 or not a power of two */
 	Perl_croak(aTHX_ "Illegal number of bits in vec");
 
@@ -326,6 +322,7 @@ Perl_do_vecset(pTHX_ SV *sv)
 #endif
     }
     SvSETMAGIC(targ);
+    PUSHs(targ);
 }
 
 void

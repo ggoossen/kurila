@@ -299,7 +299,7 @@ our $NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0";
 our $LAST_BIT = 94 ;
 our $BYTES    = 12 ;
 
-our $All = "" ; vec($All, %Offsets{'all'}, 2) = 3 ;
+our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3);
 
 sub bits
 {
@@ -312,7 +312,7 @@ sub bits
     my $fatal = 0 ;
     my $no_fatal = 0 ;
 
-    foreach my $word (  @_ ) {
+    foreach my $word ( @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -350,7 +350,7 @@ sub import
     
     push @_, 'all' unless @_;
 
-    foreach my $word (  @_ ) {
+    foreach my $word ( @_ ) {
 	if ($word eq 'FATAL') {
 	    $fatal = 1;
 	    $no_fatal = 0;
@@ -385,7 +385,7 @@ sub unimport
 
     push @_, 'all' unless @_;
 
-    foreach my $word (  @_ ) {
+    foreach my $word ( @_ ) {
 	if ($word eq 'FATAL') {
 	    next; 
 	}
@@ -432,7 +432,7 @@ sub __chk
     my $pkg ;
 
     if ($isobj) {
-        while (do { do { package DB; $pkg = @(caller($i++))[0] }; } ) {
+        while (do { package DB; $pkg = @(caller($i++))[0] } ) {
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
         }
 	$i -= 2 ;
