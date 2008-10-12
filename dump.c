@@ -1157,7 +1157,6 @@ Perl_gv_dump(pTHX_ GV *gv)
 static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_sv,             "sv(\\0)" },
 	{ PERL_MAGIC_rhash,          "rhash(%)" },
-	{ PERL_MAGIC_pos,            "pos(.)" },
 	{ PERL_MAGIC_symtab,         "symtab(:)" },
 	{ PERL_MAGIC_backref,        "backref(<)" },
 	{ PERL_MAGIC_bm,             "bm(B)" },
@@ -1213,7 +1212,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_mglob)      s = "mglob";
             else if (v == &PL_vtbl_taint)      s = "taint";
             else if (v == &PL_vtbl_vec)        s = "vec";
-            else if (v == &PL_vtbl_pos)        s = "pos";
             else if (v == &PL_vtbl_bm)         s = "bm";
             else if (v == &PL_vtbl_uvar)       s = "uvar";
             else if (v == &PL_vtbl_defelem)    s = "defelem";

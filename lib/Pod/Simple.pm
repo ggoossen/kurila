@@ -346,10 +346,7 @@ sub parse_string_document {
   my @lines;
   foreach my $line_group ( @_) {
     next unless defined $line_group and length $line_group;
-    pos($line_group) = 0;
-    while($line_group =~
-      m/([^\n\r]*)((?:\r?\n)?)/g
-    ) {
+    while($line_group =~ m/([^\n\r]*)((?:\r?\n)?)/g ) {
       #print(">> $1\n"),
       $self->parse_lines($1)
        if length($1) or length($2)

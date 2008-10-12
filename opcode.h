@@ -1160,7 +1160,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_defined),	/* defined */
 	MEMBER_TO_FPTR(Perl_ck_lfun),	/* undef */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* study */
-	MEMBER_TO_FPTR(Perl_ck_lfun),	/* pos */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* pos */
 	MEMBER_TO_FPTR(Perl_ck_lfun),	/* preinc */
 	MEMBER_TO_FPTR(Perl_ck_lfun),	/* i_preinc */
 	MEMBER_TO_FPTR(Perl_ck_lfun),	/* predec */
@@ -1518,7 +1518,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00013694,	/* defined */
 	0x00013604,	/* undef */
 	0x00013684,	/* study */
-	0x0001368c,	/* pos */
+	0x0013368c,	/* pos */
 	0x00002264,	/* preinc */
 	0x00002254,	/* i_preinc */
 	0x00002264,	/* predec */

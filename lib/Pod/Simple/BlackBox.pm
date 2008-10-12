@@ -1671,7 +1671,7 @@ sub _treelet_from_formatting_codes {
           )+
         )
       )
-    /xgo
+    /xg
   ) {
     DEBUG +> 4 and print "\nParagraphic tokenstack = ($(join ' ',@stack))\n";
     if(defined $1) {
@@ -1698,14 +1698,14 @@ sub _treelet_from_formatting_codes {
         # We saw " >>>>" but needed only ">".  Back pos up.
         DEBUG +> 4 and print " And that's more than we needed to close simple.\n";
         push @{ @lineage[-1] }, $3; # That was a for-real space, too.
-        pos($para) = pos($para) - length($4) + 1;
+        pos($para, pos($para) - length($4) + 1);
       } elsif(@stack[-1] == length($4)) {
         # We found " >>>>", and it was exactly what we needed.  Commonest case.
         DEBUG +> 4 and print " And that's exactly what we needed to close complex.\n";
       } elsif(@stack[-1] +< length($4)) {
         # We saw " >>>>" but needed only " >>".  Back pos up.
         DEBUG +> 4 and print " And that's more than we needed to close complex.\n";
-        pos($para) = pos($para) - length($4) + @stack[-1];
+        pos($para, pos($para) - length($4) + @stack[-1]);
       } else {
         # We saw " >>>>" but needed " >>>>>>".  So this is all just stuff!
         DEBUG +> 4 and print " But it's really just stuff, because we needed more.\n";
