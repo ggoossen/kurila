@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan (95);
+plan (91);
 
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
@@ -38,8 +38,6 @@ $e1 = bless sub { 1 }, "E";
 expected($e1, "E", "CODE");
 $f1 = bless \\@(), "F";
 expected($f1, "F", "REF");
-$g1 = bless \vec("test", 1, 2), "G";
-expected($g1, "G", "LVALUE");
 
 # blessing ref to object doesn't modify object
 

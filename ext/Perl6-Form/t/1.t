@@ -1,2 +1,4 @@
 use Test::More tests => 1;
-BEGIN { use_ok('Perl6::Form') };
+use Perl6::Form;
+
+ok 1;
