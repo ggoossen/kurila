@@ -1866,7 +1866,7 @@ Perl_magic_setvec(pTHX_ SV *sv, MAGIC *mg)
 {
     PERL_ARGS_ASSERT_MAGIC_SETVEC;
     PERL_UNUSED_ARG(mg);
-    do_vecset(sv);      /* XXX slurp this routine */
+    do_vecset();      /* XXX slurp this routine */
     return 0;
 }
 

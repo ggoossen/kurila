@@ -6,7 +6,7 @@ plan( tests => 25 );
 our ($foo, $Vec, $bar, $baz);
 is(vec($foo,0,1), 0);
 is(length($foo), undef);
-vec($foo,0,1) = 1;
+vec($foo,0,1,1);
 is(length($foo), 1);
 is(unpack('C',$foo), 1);
 is(vec($foo,0,1), 1);

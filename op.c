@@ -1431,7 +1431,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (type != OP_SASSIGN)
 	    goto nomod;
 	goto lvalue_func;
-    case OP_VEC:
       lvalue_func:
 	if (o->op_flags & OPf_KIDS)
 	    mod(cBINOPo->op_first->op_sibling, type);
