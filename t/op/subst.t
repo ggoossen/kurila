@@ -265,22 +265,22 @@ ok( $_ eq $foo && $snum == 41 );
 $t = 'aaaaaaaaa'; 
 
 $_ = $t;
-pos = 6;
+pos($_, 6);
 $snum = s/\Ga/xx/g;
 ok( $_ eq 'aaaaaaxxxxxx' && $snum == 3 );
 
 $_ = $t;
-pos = 6;
+pos($_, 6);
 $snum = s/\Ga/x/g;
 ok( $_ eq 'aaaaaaxxx' && $snum == 3 );
 
 $_ = $t;
-pos = 6;
+pos($_, 6);
 s/\Ga/xx/;
 ok( $_ eq 'aaaaaaxxaa' );
 
 $_ = $t;
-pos = 6;
+pos($_, 6);
 s/\Ga/x/;
 ok( $_ eq 'aaaaaaxaa' );
 

@@ -82,12 +82,12 @@ sub _update
 	 next;
      }
      $vec->[FD_COUNT]++;
-     vec($bits, $fn, 1) = 1;
+     vec($bits, $fn, 1, 1);
      $vec->[$i] = $f;
    } else {      # remove
      next unless defined $vec->[$i];
      $vec->[FD_COUNT]--;
-     vec($bits, $fn, 1) = 0;
+     vec($bits, $fn, 1, 0);
      $vec->[$i] = undef;
    }
    $count++;

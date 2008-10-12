@@ -238,7 +238,7 @@ until undef
 use undef
 utime (@)
 values (\%)
-vec ($$$)
+vec ($$$;$)
 wait ()
 waitpid ($$)
 wantarray ()

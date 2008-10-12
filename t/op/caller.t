@@ -96,10 +96,10 @@ do {
     my ($default, $registered);
     BEGIN {
 	for my $i (0..$warnings::LAST_BIT/2 - 1) {
-	    vec($default, $i, 2) = 1;
+	    vec($default, $i, 2, 1);
 	}
 	$registered = $default;
-	vec($registered, $warnings::LAST_BIT/2, 2) = 1;
+	vec($registered, $warnings::LAST_BIT/2, 2, 1);
     }
     BEGIN { check_bits( $^WARNING_BITS, "\0" x 12, 'all bits off via "no warnings"' ) }
     testwarn("\0" x 12, 'no bits');
