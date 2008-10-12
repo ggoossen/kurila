@@ -523,8 +523,8 @@ sub use_pkg_version {
 }
 
 sub lvalue_subs {
-    my $xml = shift;
-    for my $op ($xml->findnodes(qq|//op_substr|)) {
+    my ($xml, $opname) = @_;
+    for my $op ($xml->findnodes(qq|//op_$opname|)) {
         next unless ($op->parent->tag eq "op_sassign");
         next unless $op->pos == 3;
         my $assign = $op->parent;
@@ -1081,6 +1081,7 @@ sub doblock {
         next unless (get_madprop($scope, 'curly_open')||'') eq "\{";
         next if $scope->att('flags') =~ m/\bLIST\b/;
         next if $scope->parent->tag =~ m/^op_rv2/;
+        next if (get_madprop($scope->parent, 'do') || '') eq "do";
         set_madprop($scope, 'curly_open', "\$(");
         set_madprop($scope, 'curly_close', ")");
     }
@@ -1133,7 +1134,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < v1.5) {
 if ($from->{branch} ne "kurila" or $from->{v} < v1.6) {
     remove_vstring( $twig );
     use_pkg_version($twig);
-    lvalue_subs( $twig );
+    lvalue_subs( $twig, "substr" );
 }
 
 #pointy_anon_hash( $twig );
@@ -1175,7 +1176,8 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.14') {
 #simplify_array($twig);
 
 #ampcall($twig);
-doblock($twig);
+#doblock($twig);
+lvalue_subs( $twig, "vec" );
 
 # print
 $twig->print( pretty_print => 'indented' );
