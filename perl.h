@@ -3744,9 +3744,6 @@ Gid_t getegid (void);
  */
 
 #define PERL_MAGIC_sv		  '\0' /* Special scalar variable */
-#define PERL_MAGIC_overload	  'A' /* %OVERLOAD hash */
-#define PERL_MAGIC_overload_elem  'a' /* %OVERLOAD hash element */
-#define PERL_MAGIC_overload_table 'c' /* Holds overload table (AMT) on stash */
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
 #define PERL_MAGIC_env		  'E' /* %ENV hash */
 #define PERL_MAGIC_envelem	  'e' /* %ENV hash element */
@@ -5055,18 +5052,6 @@ MGVTBL_SET(
     0,
     0,
     MEMBER_TO_FPTR(Perl_magic_killbackrefs),
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_ovrld,
-    0,
-    0,
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_freeovrld),
     0,
     0,
     0

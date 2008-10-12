@@ -31,7 +31,7 @@ my $has_perlio = !try {
 
 my $tmpfile = 'Op_read.tmp';
 
-{
+do {
     use utf8;
     my $value = "\x{236a}" x 3; # e2.8d.aa x 3
 
@@ -72,6 +72,6 @@ my $tmpfile = 'Op_read.tmp';
         is($buffer, $expect);
         close FH;
     }
-}
+};
 
 END { 1 while unlink $tmpfile }

@@ -551,7 +551,7 @@ It is exported upon request.
 
 =cut
 
-{   $_ERROR_STRING = '';
+do {   $_ERROR_STRING = '';
 
     sub _store_error {
         my($err, $verbose, $offset) = < @_[[0..2]];
@@ -569,7 +569,7 @@ It is exported upon request.
     }
 
     sub last_error { $_ERROR_STRING }
-}
+};
 
 1;
 

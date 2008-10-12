@@ -87,7 +87,7 @@ sub openunicode {
 	    undef $f;
 	}
 	croak __PACKAGE__, ": failed to find ", <
-              File::Spec->catfile(< @path), " in {join ' ',@INC}"
+              File::Spec->catfile(< @path), " in $(join ' ',@INC)"
 	    unless defined $f;
     }
     return $f;
@@ -377,7 +377,7 @@ sub _charscripts {
 		if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
 		    my ($lo, $hi) = (hex($1), $2 ? hex($2) : hex($1));
 		    my $script = lc($3);
-		    $script =~ s/\b(\w)/{uc($1)}/g;
+		    $script =~ s/\b(\w)/$(uc($1))/g;
 		    my $subrange = \@( $lo, $hi, $script );
 		    push @SCRIPTS, $subrange;
 		    push @{%SCRIPTS{$script}}, $subrange;

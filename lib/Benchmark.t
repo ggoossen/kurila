@@ -71,13 +71,13 @@ my $in_onesec = $onesec->iters;
 print "# $in_onesec iterations\n";
 ok ($in_onesec +> 0, "iters returned positive iterations");
 
-{
+do {
   my $difference = $in_onesec - $estimate;
   my $actual = abs ($difference / $in_onesec);
   ok ($actual +< $delta, "is $in_onesec within $delta of estimate ($estimate)");
   print "# $in_onesec is between " . ($delta / 2) .
     " and $delta of estimate. Not that safe.\n" if $actual +> $delta/2;
-}
+};
 
 # I found that the eval'ed version was 3 times faster than the coderef.
 # (now it has a different ballast value)
@@ -102,7 +102,7 @@ isnt ($default, '', 'timestr ($diff)');
 my $auto = timestr ($diff, 'auto');
 is ($auto, $default, 'timestr ($diff, "auto") matches timestr ($diff)');
 
-{
+do {
     my $all = timestr ($diff, 'all');
     like ($all, $All_Pattern, 'timestr ($diff, "all")');
     print "# $all\n";
@@ -125,7 +125,7 @@ is ($auto, $default, 'timestr ($diff, "auto") matches timestr ($diff)');
 
     like (timestr ($diff, 'all', 'E'), 
           qr/(\d+) +wallclock secs? +\( *\d\.\d+E[-+]?\d\d\d? +usr +\d\.\d+E[-+]?\d\d\d? +sys +\+ +\d\.\d+E[-+]?\d\d\d? +cusr +\d\.\d+E[-+]?\d\d\d? +csys += +\d\.\d+E[-+]?\d\d\d? +CPU\)/, 'timestr ($diff, "all", "E") [sprintf format of "E"]');
-}
+};
 
 my $out = "";
 open my $out_fh, '>>', \$out or die;
@@ -181,7 +181,7 @@ $got = $out;
 like ($got, qr/^$title:/, 'specify title');
 like ($got, $Nop_Pattern, 'specify format as nop');
 
-{
+do {
     $foo = 0;
     $out = "";
     select($out_fh);
@@ -200,7 +200,7 @@ like ($got, $Nop_Pattern, 'specify format as nop');
     $got =~ s/^[ \t\n]+//s; # Remove all the whitespace from the beginning
 
     is ($got, '', "format 'none' should suppress output");
-}
+};
 
 $foo = $bar = $baz = 0;
 $out = "";
@@ -233,7 +233,7 @@ my $code_to_test =  \%( Foo => sub {$foo+=fib($ballast-2)},
                       Bar => sub {$bar+=fib($ballast)});
 # Keep these for later.
 my $results;
-{
+do {
     $foo = $bar = 0;
     $out = "";
     select($out_fh);
@@ -255,7 +255,7 @@ my $results;
     # Remove any warnings about having too few iterations.
     $got =~ s/\(warning:[^\)]+\)//gs;
     ok ($got !~ m/[^ \t\n]/, "format 'none' should suppress output");
-}
+};
 my $graph_dissassembly =
     qr!^[ \t]+(\S+)[ \t]+(\w+)[ \t]+(\w+)[ \t]*		# Title line
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-+)[ \t]+(-?\d+%)[ \t]*
@@ -355,7 +355,7 @@ sub check_graph {
     check_graph_consistency (<@$title, <@$row1, <@$row2);
 }
 
-{
+do {
     $out = "";
     select($out_fh);
     my $start = times;
@@ -375,10 +375,10 @@ sub check_graph {
     like ($got, $Default_Pattern, 'should find default format somewhere');
     like ($got, $graph_dissassembly, "Should find the output graph somewhere");
     check_graph_vs_output ($chart, $got);
-}
+};
 
 # Not giving auto should suppress timethese results.
-{
+do {
     $out = "";
     select($out_fh);
     my $start = times;
@@ -398,9 +398,9 @@ sub check_graph {
     unlike ($got, $Default_Pattern, 'should not find default format somewhere');
     like ($got, $graph_dissassembly, "Should find the output graph somewhere");
     check_graph_vs_output ($chart, $got);
-}
+};
 
-{
+do {
     $foo = $bar = 0;
     $out = "";
     select($out_fh);
@@ -419,9 +419,9 @@ sub check_graph {
     like ($got, $Nop_Pattern, 'specify format as nop');
     like ($got, $graph_dissassembly, "Should find the output graph somewhere");
     check_graph_vs_output ($chart, $got);
-}
+};
 
-{
+do {
     $foo = $bar = 0;
     $out = "";
     select($out_fh);
@@ -440,9 +440,9 @@ sub check_graph {
     # a big clue as to why, from the previous test's diagnostic
     is (ref $chart->[0], 'ARRAY', "output should be an array of arrays");
     check_graph (<@$chart);
-}
+};
 
-{
+do {
     $foo = $bar = 0;
     $out = "";
     select($out_fh);
@@ -455,9 +455,9 @@ sub check_graph {
     ok ($got !~ m/\.\.\./s, 'check that there is no title');
     like ($got, $graph_dissassembly, "Should find the output graph somewhere");
     check_graph_vs_output ($chart, $got);
-}
+};
 
-{
+do {
     $foo = $bar = 0;
     $out = "";
     select($out_fh);
@@ -473,11 +473,11 @@ sub check_graph {
     # a big clue as to why, from the previous test's diagnostic
     is (ref $chart->[0], 'ARRAY', "output should be an array of arrays");
     check_graph (<@$chart);
-}
+};
 
 ###}my $out = tie *OUT, 'TieOut'; my ($got); ###
 
-{
+do {
     my $debug = "";
     open my $debug_fh, '>>', \$debug or die;
     local *STDERR = *$debug_fh{IO};
@@ -507,7 +507,7 @@ sub check_graph {
     is ($bar, 5, "benchmarked code was run 5 times");
     is ($debug, '', "There was no debug output debug disabled");
 
-}
+};
 
 # To check the cache we are poking where we don't belong, inside the namespace.
 # The way benchmark is written We can't actually check whehter the cache is
@@ -534,7 +534,7 @@ is_deeply (\keys %Benchmark::Cache, \@before_keys,
            "back to square 1 when we clear the cache again?");
 
 
-{   # Check usage error messages
+do {   # Check usage error messages
     my %usage = %Benchmark::_Usage;
     delete %usage{runloop};  # not public, not worrying about it just now
 
@@ -570,4 +570,4 @@ is_deeply (\keys %Benchmark::Cache, \@before_keys,
         eval "$func(42)";
         is( $@->{description}, %usage{$func}, "$func usage: with args" );
     }
-}
+};

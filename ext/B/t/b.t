@@ -42,14 +42,13 @@ sub B::GV::find_syms {
     %main::Subs{$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }
 
-my @syms = map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car
-                                               BEGIN);
+my @syms = map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car);
 push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.
-{
+do {
     is( join('#', sort keys %Subs), join('#', sort @syms), 'all symbols found' );
-}
+};
 
 # Make sure we only hit them each once.
 ok( (!grep $_ != 1, values %Subs), '...and found once' );
@@ -157,9 +156,9 @@ is(B::class(bless \%(), "Wibble::Bibble"), "Bibble", "Testing B::class()");
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()");
 is(B::opnumber("chop"), 34, "Testing opnumber with opname (chop)");
 
-{
+do {
     no warnings 'once';
     my $sg = B::sub_generation();
     *UNIVERSAL::hand_waving = sub { };
     ok( $sg +< B::sub_generation(), "sub_generation increments" );
-}
+};

@@ -139,7 +139,7 @@ my $cmd = 'print(scalar(~< *STDIN))';
 $cmd = %Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
 try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($@) {
-	print "error {$@->message}\n";
+	print "error $($@->message)\n";
 	print "not ok 22\n";
 }
 else {

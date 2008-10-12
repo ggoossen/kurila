@@ -2629,7 +2629,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     dtype = SvTYPE(dstr);
 
     /* clear the destination sv if it will be upgraded to a hash or an array */
-    if ( (dtype == SVt_PVHV || dtype == SVt_PVAV || stype == SVt_PVAV || stype == SVt_PVHV)
+    if ( ( dtype == SVt_PVHV || dtype == SVt_PVAV  || dtype == SVt_PVCV
+	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
         && dtype != stype ) {
 	/* FIXME the assignment should be done before old values ore DESTROYed */
 	Perl_sv_clear_body(aTHX_ dstr);
@@ -2720,6 +2721,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	break;
     case SVt_PVAV:
     case SVt_PVHV:
+    case SVt_PVCV:
 	if (dtype != stype)
 	    sv_upgrade(dstr, stype);
 	break;
@@ -2800,9 +2802,15 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    SvSETMAGIC( dstr );
 	PL_delaymagic = 0;
 	
-    } else if (dtype == SVt_PVHV) {
+    }
+    else if (dtype == SVt_PVHV) {
 	hv_sethv( (HV*)dstr, (HV*)sstr);
-    } else if (sflags & SVf_ROK) {
+    }
+    else if (dtype == SVt_PVCV) {
+	CvFLAGS(dstr) = CvFLAGS(sstr);
+	SvANY(dstr) = SvANY(sstr);
+    }
+    else if (sflags & SVf_ROK) {
 	if (isGV_with_GP(dstr) && dtype == SVt_PVGV
 	    && SvTYPE(SvRV(sstr)) == SVt_PVGV) {
 	    sstr = SvRV(sstr);
@@ -3808,9 +3816,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_sv:
 	vtable = &PL_vtbl_sv;
 	break;
-    case PERL_MAGIC_overload_table:
-        vtable = &PL_vtbl_ovrld;
-        break;
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;
@@ -6442,6 +6447,9 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	*gvp = NULL;
 	return NULL;
     }
+
+    SvGETMAGIC(sv);
+
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
 	*gvp = NULL;
@@ -6456,7 +6464,6 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	goto fix_gv;
 
     default:
-	SvGETMAGIC(sv);
 	if (SvROK(sv)) {
 	    sv = SvRV(sv);
 	    if (SvTYPE(sv) == SVt_PVCV) {
@@ -6469,18 +6476,8 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	    else
 		Perl_croak(aTHX_ "Not a subroutine reference");
 	}
-	else if (isGV(sv))
-	    gv = (GV*)sv;
 	else
-	    gv = gv_fetchsv(sv, lref, SVt_PVCV);
-	*gvp = gv;
-	if (!gv) {
-	    return NULL;
-	}
-	/* Some flags to gv_fetchsv mean don't really create the GV  */
-	if (SvTYPE(gv) != SVt_PVGV) {
-	    return NULL;
-	}
+	    Perl_croak(aTHX_ "Not a subroutine reference");
     fix_gv:
 	if (lref && !GvCVu(gv)) {
 	    SV* tmpsv = sv_2mortal(newSV(0));
@@ -9221,14 +9218,10 @@ Perl_sv_dup(pTHX_ const SV *sstr, CLONE_PARAMS* param)
 		    CvROOT(dstr) = OpREFCNT_inc(CvROOT(dstr));
 		OP_REFCNT_UNLOCK;
 		if (CvCONST(dstr) && CvISXSUB(dstr)) {
-		    CvXSUBANY(dstr).any_ptr = GvUNIQUE(CvGV(dstr)) ?
-			SvREFCNT_inc(CvXSUBANY(dstr).any_ptr) :
-			sv_dup_inc((SV *)CvXSUBANY(dstr).any_ptr, param);
+		    CvXSUBANY(dstr).any_ptr = sv_dup_inc((SV *)CvXSUBANY(dstr).any_ptr, param);
 		}
 		/* don't dup if copying back - CvGV isn't refcounted, so the
 		 * duped GV may never be freed. A bit of a hack! DAPM */
-		CvGV(dstr)	= (param->flags & CLONEf_JOIN_IN) ?
-		    NULL : gv_dup(CvGV(dstr), param) ;
 		PAD_DUP(CvPADLIST(dstr), CvPADLIST(sstr), param);
 		CvOUTSIDE(dstr)	=
 		    cv_dup_inc(CvOUTSIDE(dstr), param);
@@ -9280,8 +9273,6 @@ Perl_cx_dup(pTHX_ PERL_CONTEXT *cxs, I32 ix, I32 max, CLONE_PARAMS* param)
 					   ? av_dup_inc(ncx->blk_sub.argarray,
 							param)
 					   : NULL);
-		ncx->blk_sub.savearray	= av_dup_inc(ncx->blk_sub.savearray,
-						     param);
 		ncx->blk_sub.oldcomppad = (PAD*)ptr_table_fetch(PL_ptr_table,
 					   ncx->blk_sub.oldcomppad);
 		break;

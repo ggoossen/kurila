@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 3;
+plan tests => 2;
 
 my @expect = qw(
 b1
@@ -34,9 +34,9 @@ fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \@(''), stdin => '', stderr => 
 BEGIN {print ":b1"}
 END {print ":e1"}
 BEGIN {print ":b2"}
-{
+do {
     BEGIN {BEGIN {print ":b3"}; print ":b4"}
-}
+};
 CHECK {print ":c1"}
 INIT {print ":i1"}
 UNITCHECK {print ":u1"}
@@ -82,27 +82,17 @@ INIT {print ":$f"}
 END {print ":$f"}
 package foo;
 our $f;
-{
+do {
     my $f;
     BEGIN {$f = 'myfoo'; print ":$f"}
     UNITCHECK {print ":$f"}
     CHECK {print ":$f"}
     INIT {print ":$f"}
     END {print ":$f"}
-}
+};
 BEGIN {$f = "foo";print ":$f"}
 UNITCHECK {print ":$f"}
 CHECK {print ":$f"}
 INIT {print ":$f"}
 END {print ":$f"}
 SCRIPT2
-
-@expect = qw(begin unitcheck check init end);
-$expect = ":" . join(":", @expect);
-fresh_perl_is(<<'SCRIPT3', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'can name blocks as sub FOO');
-sub BEGIN {print ":begin"}
-sub UNITCHECK {print ":unitcheck"}
-sub CHECK {print ":check"}
-sub INIT {print ":init"}
-sub END {print ":end"}
-SCRIPT3

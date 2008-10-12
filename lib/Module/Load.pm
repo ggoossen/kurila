@@ -8,7 +8,7 @@ use File::Spec ();
 sub import {
     my $who = _who();
 
-    *{Symbol::fetch_glob("{$who}::load")} = \&load;
+    *{Symbol::fetch_glob("$($who)::load")} = \&load;
 }
 
 sub load (*;@)  {
@@ -18,7 +18,7 @@ sub load (*;@)  {
     if( _is_file( $mod ) ) {
         require $mod;
     } else {
-        LOAD: {
+        LOAD: do {
             my $err;
             for my $flag ( qw[1 0] ) {
                 my $file = _to_file( $mod, $flag);
@@ -26,7 +26,7 @@ sub load (*;@)  {
                 $@ ? $err .= $@->message : last LOAD;
             }
             die $err if $err;
-        }
+        };
     }
     __PACKAGE__->_export_to_level(1, $mod, < @_) if (nelems @_);
 }

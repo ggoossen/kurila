@@ -6,7 +6,7 @@ BEGIN {
 
 plan(tests => 39);
 
-sub f($$_) { my $x = shift; is("{join ' ',@_}", $x) }
+sub f($$_) { my $x = shift; is("$(join ' ',@_)", $x) }
 
 our $undef;
 our $foo = "FOO";
@@ -30,7 +30,7 @@ like( $@->message, qr/Not enough arguments for main::f at/ );
 eval q{ f(1,2,3,4) };
 like( $@->message, qr/Too many arguments for main::f at/ );
 
-{
+do {
     my $_ = "quarante-deux";
     $foo = "FOO";
     $bar = "BAR";
@@ -43,7 +43,7 @@ like( $@->message, qr/Too many arguments for main::f at/ );
     f("FOOBAR quarante-deux", ($foo . $bar));
     f("FOOBAR quarante-deux", ($foo .= $bar));
     f("FOOBAR quarante-deux", $foo);
-}
+};
 
 &f(""); # no error
 
@@ -56,8 +56,8 @@ g($expected);
 $_ = $expected;
 g();
 g;
-undef $expected; &g; # $_ not passed
-{ $expected = my $_ = "bar"; g() }
+undef $expected; &g( < @_ ); # $_ not passed
+do { $expected = my $_ = "bar"; g() };
 
 eval q{ sub wrong1 (_$); wrong1(1,2) };
 like( $@->message, qr/Malformed prototype for main::wrong1/, 'wrong1' );
@@ -71,7 +71,7 @@ opt("seen");
 sub unop (_) { is(@_[0], 11, "unary op") }
 unop 11, 22; # takes only the first parameter into account
 
-sub mymkdir (_;$) { is("{join ' ',@_}", $expected, "mymkdir") }
+sub mymkdir (_;$) { is("$(join ' ',@_)", $expected, "mymkdir") }
 $expected = $_ = "mydir"; mymkdir();
 mymkdir($expected = "foo");
 $expected = "foo 493"; mymkdir foo => 0755;
@@ -82,8 +82,8 @@ sub double(_) { @_[0] *= 2 }
 $_ = 21;
 double();
 is( $_, 42, '$_ is modifiable' );
-{
+do {
     my $_ = 22;
     double();
     is( $_, 44, 'my $_ is modifiable' );
-}
+};

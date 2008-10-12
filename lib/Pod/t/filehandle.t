@@ -39,10 +39,10 @@ while ( ~< *DATA) {
     open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
-    {
+    do {
         local $/;
         $output = ~< *OUT;
-    }
+    };
     close OUT;
     my $expected = '';
     while ( ~< *DATA) {
@@ -62,10 +62,10 @@ while ( ~< *DATA) {
     close IN;
     close OUT;
     open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
-    {
+    do {
         local $/;
         $output = ~< *OUT;
-    }
+    };
     close OUT;
     unlink ('tmp.pod', 'out.tmp');
     $expected = '';

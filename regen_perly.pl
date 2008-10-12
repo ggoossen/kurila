@@ -37,11 +37,11 @@ use strict;
 my $bison = 'bison';
 
 if ((nelems @ARGV) +>= 2 and @ARGV[0] eq '-b') {
-    shift;
-    $bison = shift;
+    shift(@ARGV);
+    $bison = shift(@ARGV);
 }
 
-my $y_file = shift || 'perly.y';
+my $y_file = shift(@ARGV) || 'perly.y';
 
 usage unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/;
 
@@ -81,7 +81,7 @@ my_system("$bison -d -o $tmpc_file $y_file");
 
 open CTMPFILE, "<", $tmpc_file or die "Can't open $tmpc_file: $!\n";
 my $clines;
-{ local $/; $clines = ~< *CTMPFILE; }
+do { local $/; $clines = ~< *CTMPFILE; };
 die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file;
 close CTMPFILE;
@@ -224,7 +224,7 @@ sub make_type_tab {
     open my $fh, '<', $y_file or die "Can't open $y_file: $!\n";
     while ( ~< $fh) {
 	if (m/(\$\d+)\s*=/) {
-	    warn "$y_file:{iohandle::input_line_number($fh)}: dangerous assignment to $1: $_";
+	    warn "$y_file:$(iohandle::input_line_number($fh)): dangerous assignment to $1: $_";
 	}
 
 	if (m/__DEFAULT__/) {
@@ -253,9 +253,9 @@ sub make_type_tab {
 	or die "Can't extract yytname[] from table string\n";
     my $fields = $1;
     $fields =~ s{"([^"]+)"}
-		{{ "toketype_" .
+		{$( "toketype_" .
 		    (defined %tokens{$1} ? %tokens{$1} : $default_token)
-		}}g;
+		)}g;
     $fields =~ s/, \s* 0 \s* $//x
 	or die "make_type_tab: couldn't delete trailing ',0'\n";
 
@@ -273,13 +273,13 @@ sub make_type_tab {
 sub my_system {
     system(< @_);
     if ($? == -1) {
-	die "failed to execute command '{join ' ',@_}': $!\n";
+	die "failed to execute command '$(join ' ',@_)': $!\n";
     }
     elsif ($? ^&^ 127) {
-	die sprintf "command '{join ' ',@_}' died with signal \%d\n",
+	die sprintf "command '$(join ' ',@_)' died with signal \%d\n",
 	    ($? ^&^ 127);
     }
     elsif ($? >> 8) {
-	die sprintf "command '{join ' ',@_}' exited with value \%d\n", $? >> 8;
+	die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $? >> 8;
     }
 }

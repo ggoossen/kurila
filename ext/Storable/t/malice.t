@@ -15,7 +15,7 @@
 
 use Config;
 
-sub BEGIN {
+BEGIN {
     if (%ENV{PERL_CORE}){
 	chdir('t') if -d 't';
 	@INC = @('.', '../lib', '../ext/Storable/t');
@@ -81,11 +81,11 @@ sub test_header {
     is ($header->{byteorder}, $byteorder, "byte order");
     is ($header->{intsize}, %Config{intsize}, "int size");
     is ($header->{longsize}, %Config{longsize}, "long size");
- SKIP: {
+ SKIP: do {
 	skip ("No \$Config\{prtsize\} on this perl version ($^V)", 1)
 	    unless defined %Config{ptrsize};
 	is ($header->{ptrsize}, %Config{ptrsize}, "long size");
-    }
+    };
     is ($header->{nvsize}, %Config{nvsize} || %Config{doublesize} || 8,
         "nv size"); # 5.00405 doesn't even have doublesize in config.
   }
@@ -156,7 +156,7 @@ sub test_things {
   # )
   my $minor4 = $header->{minor} + 4;
   substr ($copy, $file_magic + 1, 1, chr $minor4);
-  {
+  do {
     # Now by default newer minor version numbers are not a pain.
     $clone = &$sub($copy);
     is ($@, "", "by default no error on higher minor");
@@ -166,7 +166,7 @@ sub test_things {
     test_corrupt ($copy, $sub,
                   "/^Storable binary image v$header->{major}\.$minor4 more recent than I am \\(v$header->{major}\.$minor\\)/",
                   "higher minor");
-  }
+  };
 
   $copy = $contents;
   my $major1 = $header->{major} + 1;
@@ -229,13 +229,13 @@ sub test_things {
                 "/^Storable binary image v$header->{major}.$minor4 contains data of type 255. This Storable is v$header->{major}.$minor and can only handle data types up to 28/",
                 "bogus tag, minor plus 4");
   # And check again that this croak is not delayed:
-  {
+  do {
     # local $Storable::DEBUGME = 1;
     local $Storable::accept_future_minor = 0;
     test_corrupt ($copy, $sub,
                   "/^Storable binary image v$header->{major}\.$minor4 more recent than I am \\(v$header->{major}\.$minor\\)/",
                   "higher minor");
-  }
+  };
 }
 
 ok (defined store(\%hash, $file));
@@ -293,7 +293,7 @@ test_things($stored, \&freeze_and_thaw, 'string', 1);
 
 # Test that the bug fixed by #20587 doesn't affect us under some older
 # Perl. AMS 20030901
-{
+do {
     chop(my $a = chr(0xDF).chr(256));
     my %a = %(chr(0xDF) => 1);
     %a{$a}++;
@@ -301,7 +301,7 @@ test_things($stored, \&freeze_and_thaw, 'string', 1);
     # If we were built with -DDEBUGGING, the assert() should have killed
     # us, which will probably alert the user that something went wrong.
     ok(1);
-}
+};
 
 # Unusual in that the empty string is stored with an SX_LSCALAR marker
 my $hash = store_and_retrieve("pst0\5\6\3\0\0\0\1\1\0\0\0\0\0\0\0\5empty");

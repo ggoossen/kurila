@@ -136,7 +136,7 @@ $status = $?;
 print "# $_\n" foreach  @out;
 
 if ($^O eq 'VMS' && !$status) {
-  print "# {join ' ',@cmd2}\n";
+  print "# $(join ' ',@cmd2)\n";
   $status = system(join(' ', @cmd2)); 
 }
 print (($status? 'not ': '')."ok 1\n");

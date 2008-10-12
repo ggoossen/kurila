@@ -21,7 +21,7 @@ isa_ok $more_tb, 'Test::Builder';
 cmp_ok $more_tb, '\==', Test::More->builder, 'create does not interfere with ->builder';
 cmp_ok $more_tb, '\==', Test::Builder->new,  '       does not interfere with ->new';
 
-{
+do {
     my $new_tb  = Test::Builder->create;
 
     isa_ok $new_tb,  'Test::Builder';
@@ -32,7 +32,7 @@ cmp_ok $more_tb, '\==', Test::Builder->new,  '       does not interfere with ->n
 
     $new_tb->plan(tests => 1);
     $new_tb->ok(1);
-}
+};
 
 pass("Changing output() of new TB doesn't interfere with singleton");
 

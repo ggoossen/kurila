@@ -145,7 +145,7 @@ sub load_loc {
     eval "
 	package $pkg;
 	use base 'Locale::Maketext';
-        \%{$pkg}::Lexicon = ( '_AUTO' => 1 );
+        \%$($pkg)::Lexicon = ( '_AUTO' => 1 );
 	Locale::Maketext::Lexicon->import(\{
 	    'i-default' => [ 'Auto' ],
 	    '*'	=> [ Gettext => \$pattern ],
@@ -178,11 +178,11 @@ sub load_loc {
                     |
                         ([1-9]\d*|\*)           # 4 - variable
                     )
-            }{{
+            }{$(
                 $1 ? $1
                    : $2 ? "\[$2,"._unescape($3)."]"
                         : "[_$4]"
-            }}gx;
+            )}gx;
 	    return $lh->maketext($str, < @_);
 	};
     }
@@ -205,7 +205,7 @@ sub default_loc {
             $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
                      {$1\%$2}g;
             $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
-                     {{"$1\%$2(" . _escape($3) . ')'}}g;
+                     {$("$1\%$2(" . _escape($3) . ')')}g;
 	    _default_gettext($str, < @_);
 	};
     }
@@ -241,7 +241,7 @@ sub _default_gettext {
 		[^)]*		#     and other ignorable params
 	    \)			#   closing function call
 	)			# closing either one of
-    }{{
+    }{$( do {
 	my $digit = $2 || shift;
 	$digit . (
 	    $1 ? (
@@ -250,7 +250,7 @@ sub _default_gettext {
 		''
 	    ) : ''
 	);
-    }}gx;
+    })}gx;
     return $str;
 };
 

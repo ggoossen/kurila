@@ -5,16 +5,16 @@ BEGIN { require './test.pl'; }
 plan( tests => 26 );
 
 # simple error object.
-{
+do {
     my $err = error::create("my message", @("filetest.t", 33, 11));
     ok $err, "error object created";
     is ref $err, "error";
     is $err->{description}, "my message";
     is $err->message, "my message at filetest.t line 33 character 11.\n", "message function";
-}
+};
 
 # a bit more complex one, with stack trace.
-{
+do {
     my ($line1, $line2, $line3);
     sub new_error { return error::create("my message"); } $line1 = __LINE__;
     sub new_error2 { return new_error(); } $line2 = __LINE__;
@@ -27,10 +27,10 @@ my message
     main::new_error called at ../lib/error.t line $line2 character 29.
     main::new_error2 called at ../lib/error.t line $line3 character 15.
 MSG
-}
+};
 
 # creating the error object using 'die' inside an 'eval'
-{
+do {
     my ($line1, $line2);
     try { $line1 = __LINE__;
            $line2 = __LINE__; die "foobar";
@@ -42,10 +42,10 @@ MSG
 foobar at ../lib/error.t line $line2 character 31.
     (eval) called at ../lib/error.t line $line1 character 5.
 MSG
-}
+};
 
 # creating the error object using 'die' inside an 'eval' in an 'eval'
-{
+do {
     my $err;
     my ($line1, $line2);
     try { $line2 = __LINE__;
@@ -59,10 +59,10 @@ my die at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
 MSG
-}
+};
 
 # die without arguments, reuses $@
-{
+do {
     my ($line1, $line2);
     try { $line2 = __LINE__;
         try { die "reuse die"; }; $line1 = __LINE__;
@@ -73,12 +73,12 @@ MSG
 reuse die at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
-reraised at ../lib/error.t line {$line1+1} character 9.
+reraised at ../lib/error.t line $($line1+1) character 9.
 MSG
-}
+};
 
 # Internal Perl_croak routines also make error objects
-{
+do {
     my $line1;
     try { my $foo = "xx"; $$foo; }; $line1 = __LINE__;
     is defined $@, 1, '$@ is set';
@@ -87,24 +87,24 @@ MSG
 Can't use PLAINVALUE as a SCALAR REF at ../lib/error.t line $line1 character 26.
     (eval) called at ../lib/error.t line $line1 character 5.
 MSG
-}
+};
 
 # Writing the standard message
-{
+do {
     fresh_perl_is("die 'foobar'",
                   'foobar at - line 1 character 1.');
-}
+};
 
 # Compilation error
-{
+do {
     fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
 foobar at - line 1 character 9.
 BEGIN failed--compilation aborted
 MSG
-}
+};
 
 # yyerror
-{
+do {
     eval 'undef foo'; my $line = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
@@ -112,13 +112,13 @@ MSG
 Can't modify constant item in undef operator at (eval 9) line 1 character 7.
     (eval) called at ../lib/error.t line $line character 5.
 MSG
-}
+};
 
 # Compilation error with '#line X'
-{
+do {
     fresh_perl_is("use strict;\n\$x = 1;\n\$y = 1;\n", <<'MSG' );
 Global symbol "$x" requires explicit package name at - line 2, near "$x "
 Global symbol "$y" requires explicit package name at - line 3, near "$y "
 Execution of - aborted due to compilation errors.
 MSG
-}
+};

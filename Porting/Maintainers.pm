@@ -142,10 +142,10 @@ sub show_results {
 		    for my $module ( @modules) {
 			push @files, < get_module_files($module);
 		    }
-		    printf "\%-15s {join ' ',@files}\n", $m;
+		    printf "\%-15s $(join ' ',@files)\n", $m;
 		} else {
 		    if ($Module) {
-			printf "\%-15s {join ' ',@modules}\n", $m;
+			printf "\%-15s $(join ' ',@modules)\n", $m;
 		    } else {
 			printf "\%-15s %Maintainers{$m}\n", $m;
 		    }
@@ -157,7 +157,7 @@ sub show_results {
 	    if ($m =~ m/$Module/io) {
 		if ($Files) {
 		    my @files = get_module_files($m);
-		    printf "\%-15s {join ' ',@files}\n", $m;
+		    printf "\%-15s $(join ' ',@files)\n", $m;
 		} else {
 		    printf "\%-15s %Modules{$m}->{MAINTAINER}\n", $m;
 		}

@@ -29,26 +29,26 @@ isa_ok( $termios, "POSIX::Termios", "\tchecking the type of the object" );
 
 # testing getattr()
 
-SKIP: {
+SKIP: do {
     -t *STDIN or skip("STDIN not a tty", 2);
     $r = try { $termios->getattr(0) };
     is( $@, '', "calling getattr(0)" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );
-}
+};
 
-SKIP: {
+SKIP: do {
     -t *STDOUT or skip("STDOUT not a tty", 2);
     $r = try { $termios->getattr(1) };
     is( $@, '', "calling getattr(1)" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );
-}
+};
 
-SKIP: {
+SKIP: do {
     -t *STDERR or skip("STDERR not a tty", 2);
     $r = try { $termios->getattr(2) };
     is( $@, '', "calling getattr(2)" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );
-}
+};
 
 # testing getcc()
 for my $i (0..NCCS()-1) {

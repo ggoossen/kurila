@@ -608,7 +608,7 @@ sub poderror {
     my %opts = %( (ref @_[0]) ? < %{shift()} : () );
 
     ## Retrieve options
-    chomp( my $msg  = (%opts{-msg} || "")."{join ' ',@_}" );
+    chomp( my $msg  = (%opts{-msg} || "")."$(join ' ',@_)" );
     my $line = (exists %opts{-line}) ? " at line %opts{-line}" : "";
     my $file = (exists %opts{-file}) ? " in file %opts{-file}" : "";
     unless (exists %opts{-severity}) {

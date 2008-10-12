@@ -22,7 +22,7 @@ sub import {
 	if (m/^[A-Z][A-Z0-9]*$/) {
 	    $saw_sig++;
 	    unless ($untrapped and %SIG{$_} and %SIG{$_} ne 'DEFAULT') {
-		print "Installing handler {dump::view($handler)} for $_\n" if $Verbose;
+		print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
 		%SIG{$_} = $handler;
 	    }
 	}
@@ -91,14 +91,15 @@ sub handler_traceback {
     syswrite(STDERR, "\n", 1);
 
     # Now go for broke.
-    for (my $i = 1; my ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i); $i++) {
+    my $i = 1;
+    while (my ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i)) {
         my @a = @( () );
 	for ( @DB::args) {
 	    s/([\'\\])/\\$1/g;
 	    s/([^\0]*)/'$1'/
 	      unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
-	    s/([\200-\377])/{sprintf("M-\%c",ord($1)^&^0177)}/g;
-	    s/([\0-\37\177])/{sprintf("^\%c",ord($1)^^^64)}/g;
+	    s/([\200-\377])/$(sprintf("M-\%c",ord($1)^&^0177))/g;
+	    s/([\0-\37\177])/$(sprintf("^\%c",ord($1)^^^64))/g;
 	    push(@a, $_);
 	}
 	$w = $w ? '@ = ' : '$ = ';
@@ -115,6 +116,8 @@ sub handler_traceback {
 	$f = "file `$f'" unless $f eq '-e';
 	my $mess = "$w$s$a called from $f line $l\n";
 	syswrite(STDERR, $mess, length($mess));
+
+        $i++;
     }
     kill 'ABRT', $$;
 }

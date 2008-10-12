@@ -1990,7 +1990,7 @@ S_scan_const(pTHX_ char *start)
 
 	/* embedded code */
 	if ( (*s == '{' || *s == '}') && ! in_pat) {
-	    break;
+	    yyerror("{ in string is obsolete");
 	}
 
 	/* End of else if chain - OP_TRANS rejoin rest */
@@ -3710,7 +3710,7 @@ Perl_yylex(pTHX)
     case ')':
 	{
 	    const char tmp = *s++;
-	    s = SKIPSPACE1(s);
+/* 	    s = SKIPSPACE1(s); */
 	    if (*s == '{' && PL_expect != XOPERATOR)
 		PREBLOCK(tmp);
 	    TERM(tmp);
@@ -4200,9 +4200,6 @@ Perl_yylex(pTHX)
 
     case '\\':
 	s++;
-	if (PL_lex_inwhat && isDIGIT(*s) && ckWARN(WARN_SYNTAX))
-	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),"Can't use \\%c to mean $%c in expression",
-			*s, *s);
 	if (PL_expect == XOPERATOR) {
 	    if (*s == '=' && s[1] == '=') {
 		s += 2;
@@ -4781,8 +4778,15 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		s = PL_bufptr;
-		goto really_sub;
+		s = skipspace(s);
+		if (*s != '{') {
+		    yyerror("Illegal declaration of special block");
+		}
+
+		pl_yylval.i_tkval.ival = tmp;
+
+		PL_expect = XBLOCK;
+		TOKEN(SPECIALBLOCK);
 	    }
 	    goto just_a_word;
 
@@ -5665,9 +5669,9 @@ Perl_yylex(pTHX)
 		    PL_expect = attrful;
 		else if (*s != '{' && key == KEY_sub) {
 		    if (!have_name)
-			Perl_croak(aTHX_ "Illegal declaration of anonymous subroutine");
+			yyerror("Illegal declaration of anonymous subroutine");
 		    else if (*s != ';')
-			Perl_croak(aTHX_ "Illegal declaration of subroutine %"SVf, SVfARG(PL_subname));
+			yyerror(Perl_form(aTHX_ "Illegal declaration of subroutine %"SVf, SVfARG(PL_subname)));
 		}
 
 #ifdef PERL_MAD
@@ -10569,6 +10573,9 @@ Perl_yywarn(pTHX_ const char *const s)
     dVAR;
 
     PERL_ARGS_ASSERT_YYWARN;
+
+    if (PL_error_count)
+	return 0; /* no warning if we already have an error */
 
     PL_in_eval |= EVAL_WARNONLY;
     yyerror(s);

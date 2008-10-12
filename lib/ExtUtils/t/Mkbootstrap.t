@@ -25,7 +25,7 @@ if (open(OUT, ">", 'mkboot.bs')) {
 	close OUT;
 }
 
-SKIP: {
+SKIP: do {
 	skip("could not make dummy .bs file: $!", 2) unless $file_is_ready;
 
 	Mkbootstrap('mkboot');
@@ -37,7 +37,7 @@ SKIP: {
 	}
 
 	is( $file_is_ready, 'meaningless text', 'backup should be a perfect copy' );
-}
+};
 
 
 # if it doesn't exist or is zero bytes in size, it won't be backed up
@@ -61,7 +61,7 @@ like( $out, qr/bsloadlibs=foo/, 'should still report libraries' );
 # if ${_[0]}_BS exists, require it
 $file_is_ready = open(OUT, ">", 'boot_BS');
 
-SKIP: {
+SKIP: do {
 	skip("cannot open boot_BS for writing: $!", 1) unless $file_is_ready;
 
 	print OUT '$main::required = 1';
@@ -69,25 +69,25 @@ SKIP: {
 	Mkbootstrap('boot');
 
 	ok( $required, 'baseext_BS file should be require()d' );
-}
+};
 
 
 # if there are any arguments, open a file named baseext.bs
 $file_is_ready = open(OUT, ">", 'dasboot.bs');
 
-SKIP: {
+SKIP: do {
 	skip("cannot make dasboot.bs: $!", 5) unless $file_is_ready;
 
 	# if it can't be opened for writing, we want to prove that it'll die
 	close OUT;
 	chmod 0444, 'dasboot.bs';
 
-	SKIP: {
+	SKIP: do {
 	    skip("cannot write readonly files", 1) if -w 'dasboot.bs'; 
 
 	    try{ Mkbootstrap('dasboot', 1) };
 	    like( $@->{description}, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
-	}
+	};
 
 	# now put it back like it was
         $out = '';
@@ -102,10 +102,10 @@ SKIP: {
 	# now be tricky, and set the status for the next skip block
 	$file_is_ready = open(IN, "<", 'dasboot.bs');
 	ok( $file_is_ready, 'should have written a new .bs file' );
-}
+};
 
 
-SKIP: {
+SKIP: do {
 	skip("cannot read .bs file: $!", 2) unless $file_is_ready;
 
 	my $file = do { local $/ = ~< *IN };
@@ -115,14 +115,14 @@ SKIP: {
 
 	# should print arguments within this array
 	like( $file, qr/qw\(myarg\);/, 'should have written array to file' );
-}
+};
 
 
 # overwrite this file (may whack portability, but the name's too good to waste)
 $file_is_ready = open(OUT, ">", 'dasboot.bs');
 $out = '';
 
-SKIP: {
+SKIP: do {
 	skip("cannot make dasboot.bs again: $!", 1) unless $file_is_ready;
 	close OUT;
 
@@ -136,9 +136,9 @@ SKIP: {
 	is( $@, '', 'should be able to open a file again');
 
 	$file_is_ready = open(IN, "<", 'dasboot.bs');
-}
+};
 
-SKIP: {
+SKIP: do {
 	skip("cannot open dasboot.bs for reading: $!", 3) unless $file_is_ready;
 
 	my $file = do { local $/ = ~< *IN };
@@ -147,7 +147,7 @@ SKIP: {
 	# and find our hidden tribute to a fine example
 	like( $file, qr/dl_findfile.+Larry/s, 'should load libraries if needed' );
 	like( $file, qr/Wall\n1;\n/ms, 'should write $DynaLoader::bscode if set' );
-}
+};
 
 close IN;
 close OUT;

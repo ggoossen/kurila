@@ -24,14 +24,14 @@ plan(tests => 22);
 my $Perl = which_perl();
 
 my $exit;
-SKIP: {
+SKIP: do {
     skip("bug/feature of pdksh", 2) if $^O eq 'os2';
 
     my $tnum = curr_test();
     $exit = system qq{$Perl -le "print q\{ok $tnum - interp system(EXPR)"\}};
     next_test();
     is( $exit, 0, '  exited 0' );
-}
+};
 
 my $tnum = curr_test();
 $exit = system qq{$Perl -le "print q\{ok $tnum - split & direct system(EXPR)"\}};
@@ -43,7 +43,7 @@ is( $exit, 0, '  exited 0' );
 my $quote = $Is_VMS || $Is_Win32 ? '"' : '';
 $tnum = curr_test();
 $exit = system $Perl, '-le', 
-               "{$quote}print q<ok $tnum - system(PROG, LIST)>{$quote}";
+               "$($quote)print q<ok $tnum - system(PROG, LIST)>$($quote)";
 next_test();
 is( $exit, 0, '  exited 0' );
 
@@ -55,7 +55,7 @@ my $echo_out = `$Perl -e "print 'ok'" | $Perl -le "print ~< *STDIN"`;
 $echo_out =~ s/\n\n/\n/g;
 is( $echo_out, "ok\n", 'piped echo emulation');
 
-{
+do {
     # here we check if extra newlines are going to be slapped on
     # piped output.
     local $TODO = 'VMS sticks newlines on everything' if $Is_VMS;
@@ -75,12 +75,12 @@ is( $echo_out, "ok\n", 'piped echo emulation');
     is( scalar `$Perl -le "print 'ok'" | $Perl -e "print ~< *STDIN"`, 
         "ok\n", 'extra newlines on outgoing pipes');
 
-    {
+    do {
 	local($/) = \2;       
 	my $out = runperl(prog => 'print q{1234}');
 	is($out, "1234", 'ignore $/ when capturing output in scalar context');
-    }
-}
+    };
+};
 
 
 is( system(qq{$Perl -e "exit 0"}), 0,     'Explicit exit of 0' );
@@ -106,12 +106,12 @@ is( <<`END`,                    "ok\n",     '<<`HEREDOC`' );
 $Perl -le "print 'ok'"
 END
 
-{
+do {
     my $_ = qq($Perl -le "print 'ok'");
     is( readpipe, "ok\n", 'readpipe default argument' );
-}
+};
 
-TODO: {
+TODO: do {
     my $tnum = curr_test();
     if( $^O =~ m/Win32/ ) {
         print "not ok $tnum - exec failure doesn't terminate process " .
@@ -122,8 +122,8 @@ TODO: {
 
     ok( !exec("lskdjfalksdjfdjfkls"), 
         "exec failure doesn't terminate process");
-}
+};
 
 my $test = curr_test();
-exec $Perl, '-le', qq{{$quote}print 'ok $test - exec PROG, LIST'{$quote}};
+exec $Perl, '-le', qq{$($quote)print 'ok $test - exec PROG, LIST'$($quote)};
 fail("This should never be reached if the exec() worked");

@@ -42,16 +42,16 @@ $diff = time - $start_time;
 # alarm time might be one second less than you said.
 is( $@->{description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs system()' );
 
-{
+do {
     local our $TODO = "Why does system() block alarm() on $^O?"
 		if $^O eq 'VMS' || $^O eq'MacOS' || $^O eq 'dos';
     ok( abs($diff - 3) +<= 1,   "   right time (waited $diff secs for 3-sec alarm)" );
-}
+};
 
 
-{
+do {
     local %SIG{"ALRM"} = sub { die };
     try { alarm(1); my $x = qx($Perl -e "sleep 3") };
     chomp (my $foo = "foo\n");
     ok($foo eq "foo", '[perl #33928] chomp() fails after alarm(), `sleep`');
-}
+};

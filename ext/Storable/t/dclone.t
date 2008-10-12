@@ -6,7 +6,7 @@
 #  in the README file that comes with the distribution.
 #
 
-sub BEGIN {
+BEGIN {
     if (%ENV{PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     }
@@ -90,7 +90,7 @@ if (try { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     %tie{array} = \@(1,2,3,4);
     %tie{hash} = \%(1,2,3,4);
     my $clone_array = dclone %tie{array};
-    print "not " unless "{join ' ',@$clone_array}" eq "{join ' ',@{%tie{array}}}";
+    print "not " unless join(' ',@$clone_array) eq join(' ',@{%tie{array}});
     print "ok 11\n";
     my $clone_hash = dclone %tie{hash};
     print "not " unless $clone_hash->{1} eq %tie{hash}->{1};

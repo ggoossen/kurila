@@ -66,15 +66,15 @@ $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
 print $p;
 
-{
+do {
 my $names = join "|", sort values %$where2name;
 ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
-}
+};
 
-{
+do {
 my $names = join "|", sort keys %$name2where;
 ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
-}
+};
 
 ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
 

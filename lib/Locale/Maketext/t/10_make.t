@@ -6,13 +6,13 @@ print "# Hi there...\n";
 ok 1;
 
 # declare some classes...
-{
+do {
   package Woozle;
   our @ISA = @('Locale::Maketext');
   sub dubbil   { return @_[1] * 2 }
   sub numerate { return @_[2] . 'en' }
-}
-{
+};
+do {
   package Woozle::elx;
   our @ISA = @('Woozle');
   our %Lexicon = %(
@@ -21,7 +21,7 @@ ok 1;
    'd4' => 'hoo [*,_1,zaz]',
   );
   keys %Lexicon; # dodges the 'used only once' warning
-}
+};
 
 our $lh;
 ok defined( $lh = Woozle->get_handle('elx') ) && ref($lh);

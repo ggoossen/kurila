@@ -166,14 +166,16 @@ sub copy {
     }
 
     $! = 0;
-    for (;;) {
+    while (1) {
 	my ($r, $w, $t);
        defined($r = sysread($from_h, $buf, $size))
 	    or goto fail_inner;
 	last unless $r;
-	for ($w = 0; $w +< $r; $w += $t) {
-           $t = syswrite($to_h, $buf, $r - $w, $w)
-		or goto fail_inner;
+	$w = 0;
+        while ($w +< $r) {
+            $t = syswrite($to_h, $buf, $r - $w, $w)
+              or goto fail_inner;
+            $w += $t;
 	}
     }
 
@@ -185,21 +187,27 @@ sub copy {
 
     # All of these contortions try to preserve error messages...
   fail_inner:
-    if ($closeto) {
-	$status = $!;
-	$! = 0;
-       close $to_h;
-	$! = $status unless $!;
-    }
+    do {
+        if ($closeto) {
+            $status = $!;
+            $! = 0;
+            close $to_h;
+            $! = $status unless $!;
+        }
+    };
   fail_open2:
-    if ($closefrom) {
-	$status = $!;
-	$! = 0;
-       close $from_h;
-	$! = $status unless $!;
-    }
+    do {
+        if ($closefrom) {
+            $status = $!;
+            $! = 0;
+            close $from_h;
+            $! = $status unless $!;
+        }
+    };
   fail_open1:
-    return 0;
+    do {
+        return 0;
+    };
 }
 
 sub move {
@@ -251,7 +259,7 @@ sub move {
 
     ($tosz1,$tomt1) = < @(stat($to))[[@:7,9]];  # just in case rename did something
 
-    {
+    do {
         local $@;
         try {
             copy($from,$to) or die;
@@ -260,7 +268,7 @@ sub move {
             unlink($from)   or die;
         };
         return 1 unless $@;
-    }
+    };
     ($sts,$ossts) = ($! + 0, $^E + 0);
 
     ($tosz2,$tomt2) = (< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;

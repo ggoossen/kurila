@@ -11,9 +11,9 @@ use Scalar::Util v1.10 < qw(looks_like_number);
 # Create a new semaphore optionally with specified count (count defaults to 1)
 sub new {
     my $class = shift;
-    my $val :shared = @_ ? shift : 1;
+    my $val = @_ ? shift : 1;
     if (! looks_like_number($val) || (int($val) != $val)) {
-        die("Semaphore initializer is not an integer: {dump::view($val)}");
+        die("Semaphore initializer is not an integer: $(dump::view($val))");
     }
     return bless(\$val, $class);
 }

@@ -17,7 +17,7 @@ like($dumped_foo, qr/frozed/,
      "Dumped string has the key added by Freezer.");
 
 # run the same tests with useperl.  this always worked
-{
+do {
     local $Data::Dumper::Useperl = 1;
     my $foo = Test1->new("foo");
     my $dumped_foo = Dumper($foo);
@@ -25,46 +25,46 @@ like($dumped_foo, qr/frozed/,
        "Use of freezer sub which returns non-ref worked with useperl");
     like($dumped_foo, qr/frozed/, 
          "Dumped string has the key added by Freezer with useperl.");
-}
+};
 
 # test for warning when an object doesn't have a freeze()
-{
+do {
     my $warned = 0;
     local $^WARN_HOOK = sub { $warned++ };
     my $bar = Test2->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 0, "A missing freeze() shouldn't warn.");
-}
+};
 
 
 # run the same test with useperl, which always worked
-{
+do {
     local $Data::Dumper::Useperl = 1;
     my $warned = 0;
     local $^WARN_HOOK = sub { $warned++ };
     my $bar = Test2->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 0, "A missing freeze() shouldn't warn with useperl");
-}
+};
 
 # a freeze() which die()s should still trigger the warning
-{
+do {
     my $warned = 0;
     local $^WARN_HOOK = sub { $warned++; };
     my $bar = Test3->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 1, "A freeze() which die()s should warn.");
-}
+};
 
 # the same should work in useperl
-{
+do {
     local $Data::Dumper::Useperl = 1;
     my $warned = 0;
     local $^WARN_HOOK = sub { $warned++; };
     my $bar = Test3->new("bar");
     my $dumped_bar = Dumper($bar);
     is($warned, 1, "A freeze() which die()s should warn with useperl.");
-}
+};
 
 # a package with a freeze() which returns a non-ref
 package Test1;

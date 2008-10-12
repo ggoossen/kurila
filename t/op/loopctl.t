@@ -31,11 +31,11 @@
 #
 #  -- .robin. <robin@kitsite.com>  2001-03-13
 require "./test.pl";
-plan( tests => 47 );
+plan( tests => 33 );
 
 my $ok;
 
-TEST1: {
+TEST1: do {
 
   $ok = 0;
 
@@ -56,10 +56,10 @@ TEST1: {
     last TEST1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'no label on while()');
 
-TEST2: {
+TEST2: do {
 
   $ok = 0;
 
@@ -80,10 +80,10 @@ TEST2: {
     $been_in_continue = 1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'no label on while() successful next');
 
-TEST3: {
+TEST3: do {
 
   $ok = 0;
 
@@ -106,10 +106,10 @@ TEST3: {
     $been_in_continue = 1;
   }
   $ok = $been_in_loop && $been_in_continue;
-}
+};
 cmp_ok($ok,'==',1,'no label on while() unsuccessful next');
 
-TEST4: {
+TEST4: do {
 
   $ok = 0;
 
@@ -130,10 +130,10 @@ TEST4: {
     last TEST4;
   }
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'no label on while() last');
 
-TEST5: {
+TEST5: do {
 
   $ok = 0;
 
@@ -154,10 +154,10 @@ TEST5: {
     last TEST5;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'no label on until()');
 
-TEST6: {
+TEST6: do {
 
   $ok = 0;
 
@@ -178,10 +178,10 @@ TEST6: {
     $been_in_continue = 1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'no label on until() successful next');
 
-TEST7: {
+TEST7: do {
 
   $ok = 0;
 
@@ -204,10 +204,10 @@ TEST7: {
     $been_in_continue = 1;
   }
   $ok = $been_in_loop && $been_in_continue;
-}
+};
 cmp_ok($ok,'==',1,'no label on until() unsuccessful next');
 
-TEST8: {
+TEST8: do {
 
   $ok = 0;
 
@@ -228,10 +228,10 @@ TEST8: {
     last TEST8;
   }
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'no label on until() last');
 
-TEST9: {
+TEST9: do {
 
   $ok = 0;
 
@@ -251,10 +251,10 @@ TEST9: {
     last TEST9;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'no label on for(@array)');
 
-TEST10: {
+TEST10: do {
 
   $ok = 0;
 
@@ -274,10 +274,10 @@ TEST10: {
     $been_in_continue = 1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'no label on for(@array) successful next');
 
-TEST11: {
+TEST11: do {
 
   $ok = 0;
 
@@ -299,10 +299,10 @@ TEST11: {
     $been_in_continue = 1;
   }
   $ok = $been_in_loop && $been_in_continue;
-}
+};
 cmp_ok($ok,'==',1,'no label on for(@array) unsuccessful next');
 
-TEST12: {
+TEST12: do {
 
   $ok = 0;
 
@@ -322,141 +322,12 @@ TEST12: {
     last TEST12;
   }
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'no label on for(@array) last');
-
-TEST13: {
-
-  $ok = 0;
-
-  for(my $first_time = 1; 1;) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST13;
-    }
-    $ok = 0;
-    $first_time=0;
-
-    redo;
-    last TEST13;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'no label on for(;;)');
-
-TEST14: {
-
-  $ok = 0;
-
-  for(my $first_time = 1; 1; $first_time=0) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST14;
-    }
-    $ok = 0;
-    next;
-    last TEST14;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'no label on for(;;) successful next');
-
-TEST15: {
-
-  $ok = 0;
-
-  my $x=1;
-  my $been_in_loop = 0;
-  for(my $first_time = 1; $x--;) {
-    $been_in_loop = 1;
-    if (!$first_time) {
-      $ok = 0;
-      last TEST15;
-    }
-    $ok = 0;
-    $first_time = 0;
-    next;
-    last TEST15;
-  }
-  $ok = $been_in_loop;
-}
-cmp_ok($ok,'==',1,'no label on for(;;) unsuccessful next');
-
-TEST16: {
-
-  $ok = 0;
-
-  for(my $first_time = 1; 1; last TEST16) {
-    if (!$first_time) {
-      $ok = 0;
-      last TEST16;
-    }
-    $ok = 0;
-    $first_time = 0;
-    last;
-    last TEST16;
-  }
-  $ok = 1;
-}
-cmp_ok($ok,'==',1,'no label on for(;;) last');
-
-TEST17: {
-
-  $ok = 0;
-  my $first_time = 1;
-
-  {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST17;
-    }
-    $ok = 0;
-    $first_time=0;
-
-    redo;
-    last TEST17;
-  }
-  continue {
-    $ok = 0;
-    last TEST17;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'no label on bare block');
-
-TEST18: {
-
-  $ok = 0;
-  {
-    next;
-    last TEST18;
-  }
-  continue {
-    $ok = 1;
-    last TEST18;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'no label on bare block next');
-
-TEST19: {
-
-  $ok = 0;
-  {
-    last;
-    last TEST19;
-  }
-  continue {
-    $ok = 0;
-    last TEST19;
-  }
-  $ok = 1;
-}
-cmp_ok($ok,'==',1,'no label on bare block last');
 
 ### Now do it all again with labels
 
-TEST20: {
+TEST20: do {
 
   $ok = 0;
 
@@ -477,10 +348,10 @@ TEST20: {
     last TEST20;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on while()');
 
-TEST21: {
+TEST21: do {
 
   $ok = 0;
 
@@ -501,10 +372,10 @@ TEST21: {
     $been_in_continue = 1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on while() successful next');
 
-TEST22: {
+TEST22: do {
 
   $ok = 0;
 
@@ -527,10 +398,10 @@ TEST22: {
     $been_in_continue = 1;
   }
   $ok = $been_in_loop && $been_in_continue;
-}
+};
 cmp_ok($ok,'==',1,'label on while() unsuccessful next');
 
-TEST23: {
+TEST23: do {
 
   $ok = 0;
 
@@ -551,10 +422,10 @@ TEST23: {
     last TEST23;
   }
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'label on while() last');
 
-TEST24: {
+TEST24: do {
 
   $ok = 0;
 
@@ -575,10 +446,10 @@ TEST24: {
     last TEST24;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on until()');
 
-TEST25: {
+TEST25: do {
 
   $ok = 0;
 
@@ -599,10 +470,10 @@ TEST25: {
     $been_in_continue = 1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on until() successful next');
 
-TEST26: {
+TEST26: do {
 
   $ok = 0;
 
@@ -625,10 +496,10 @@ TEST26: {
     $been_in_continue = 1;
   }
   $ok = $been_in_loop && $been_in_continue;
-}
+};
 cmp_ok($ok,'==',1,'label on until() unsuccessful next');
 
-TEST27: {
+TEST27: do {
 
   $ok = 0;
 
@@ -649,10 +520,10 @@ TEST27: {
     last TEST8;
   }
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'label on until() last');
 
-TEST28: {
+TEST28: do {
 
   $ok = 0;
 
@@ -672,10 +543,10 @@ TEST28: {
     last TEST28;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on for(@array)');
 
-TEST29: {
+TEST29: do {
 
   $ok = 0;
 
@@ -695,10 +566,10 @@ TEST29: {
     $been_in_continue = 1;
   }
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on for(@array) successful next');
 
-TEST30: {
+TEST30: do {
 
   $ok = 0;
 
@@ -720,10 +591,10 @@ TEST30: {
     $been_in_continue = 1;
   }
   $ok = $been_in_loop && $been_in_continue;
-}
+};
 cmp_ok($ok,'==',1,'label on for(@array) unsuccessful next');
 
-TEST31: {
+TEST31: do {
 
   $ok = 0;
 
@@ -743,90 +614,15 @@ TEST31: {
     last TEST31;
   }
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'label on for(@array) last');
 
-TEST32: {
-
-  $ok = 0;
-
-  LABEL32: for(my $first_time = 1; 1;) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST32;
-    }
-    $ok = 0;
-    $first_time=0;
-
-    redo LABEL32;
-    last TEST32;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'label on for(;;)');
-
-TEST33: {
-
-  $ok = 0;
-
-  LABEL33: for(my $first_time = 1; 1; $first_time=0) {
-    if (!$first_time) {
-      $ok = 1;
-      last TEST33;
-    }
-    $ok = 0;
-    next LABEL33;
-    last TEST33;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'label on for(;;) successful next');
-
-TEST34: {
-
-  $ok = 0;
-
-  my $x=1;
-  my $been_in_loop = 0;
-  LABEL34: for(my $first_time = 1; $x--;) {
-    $been_in_loop = 1;
-    if (!$first_time) {
-      $ok = 0;
-      last TEST34;
-    }
-    $ok = 0;
-    $first_time = 0;
-    next LABEL34;
-    last TEST34;
-  }
-  $ok = $been_in_loop;
-}
-cmp_ok($ok,'==',1,'label on for(;;) unsuccessful next');
-
-TEST35: {
-
-  $ok = 0;
-
-  LABEL35: for(my $first_time = 1; 1; last TEST16) {
-    if (!$first_time) {
-      $ok = 0;
-      last TEST35;
-    }
-    $ok = 0;
-    $first_time = 0;
-    last LABEL35;
-    last TEST35;
-  }
-  $ok = 1;
-}
-cmp_ok($ok,'==',1,'label on for(;;) last');
-
-TEST36: {
+TEST36: do {
 
   $ok = 0;
   my $first_time = 1;
 
-  LABEL36: {
+  LABEL36: do {
     if (!$first_time) {
       $ok = 1;
       last TEST36;
@@ -836,46 +632,23 @@ TEST36: {
 
     redo LABEL36;
     last TEST36;
-  }
-  continue {
-    $ok = 0;
-    last TEST36;
-  }
+  };
   $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'label on bare block');
 
-TEST37: {
+TEST38: do {
 
   $ok = 0;
-  LABEL37: {
-    next LABEL37;
-    last TEST37;
-  }
-  continue {
-    $ok = 1;
-    last TEST37;
-  }
-  $ok = 0;
-}
-cmp_ok($ok,'==',1,'label on bare block next');
-
-TEST38: {
-
-  $ok = 0;
-  LABEL38: {
+  LABEL38: do {
     last LABEL38;
     last TEST38;
-  }
-  continue {
-    $ok = 0;
-    last TEST38;
-  }
+  };
   $ok = 1;
-}
+};
 cmp_ok($ok,'==',1,'label on bare block last');
 
-TEST39: {
+TEST39: do {
     $ok = 0;
     my ($x, $y, $z) = (1,1,1);
     one39: while ($x--) {
@@ -896,25 +669,25 @@ TEST39: {
       }
       $ok = 0;
     }
-}
+};
 cmp_ok($ok,'==',1,'nested constructs');
 
 sub test_last_label { last TEST40 }
 
-TEST40: {
+TEST40: do {
     $ok = 1;
     test_last_label();
     $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'dynamically scoped label');
 
 sub test_last { last }
 
-TEST41: {
+TEST41: do {
     $ok = 1;
     test_last();
     $ok = 0;
-}
+};
 cmp_ok($ok,'==',1,'dynamically scoped');
 
 
@@ -922,25 +695,19 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 # Ensure that the temporary object is freed each time round the loop,
 # rather then all 10 of them all being freed right at the end
 
-{
+do {
     my $n=10; my $late_free = 0;
     sub X::DESTROY { $late_free++ if $n +< 0 };
-    {
+  LOOP:
+    do {
 	($n-- && bless \%(), 'X') && redo;
-    }
+    };
     cmp_ok($late_free,'==',0,"bug 27206: redo memory leak");
-
-    $n = 10; $late_free = 0;
-    {
-	($n-- && bless \%(), 'X') && redo;
-    }
-    continue { }
-    cmp_ok($late_free,'==',0,"bug 27206: redo with continue memory leak");
-}
+};
 
 # ensure that redo doesn't clear a lexical declared in the condition
 
-{
+do {
     my $i = 1;
     while (my $x = $i) {
 	$i++;
@@ -955,16 +722,9 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 	cmp_ok($x,'==',1,"until/redo lexical life");
 	last;
     }
-    for ($i = 1; my $x = $i; ) {
-	$i++;
-	redo if $i == 2;
-	cmp_ok($x,'==',1,"for/redo lexical life");
-	last;
-    }
+};
 
-}
-
-TODO: {
+TODO: do {
     todo_skip("modification of readonly value", 1);
     our @a37725;
     @a37725[3] = 1; # use package var
@@ -972,6 +732,6 @@ TODO: {
     for my $x (@(reverse < @a37725)) {
 	$x = $i++;
     }
-    cmp_ok("{join ' ',@a37725}",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug');
-}
+    cmp_ok("$(join ' ',@a37725)",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug');
+};
 

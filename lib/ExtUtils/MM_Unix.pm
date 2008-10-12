@@ -275,7 +275,6 @@ MPOLLUTE = $pollute
 
 }
 
-
 =item const_cccmd (o)
 
 Returns the full compiler call for C programs and stores the
@@ -996,9 +995,9 @@ sub find_perl {
 
     if ($trace +>= 2){
         print "Looking for perl $ver by these names:
-{join ' ',@$names}
+$(join ' ',@$names)
 in these dirs:
-{join ' ',@$dirs}
+$(join ' ',@$dirs)
 ";
     }
 
@@ -1058,7 +1057,7 @@ WARNING
             }
         }
     }
-    print STDOUT "Unable to find a perl $ver (by these names: {join ' ',@$names}, in these dirs: {join ' ',@$dirs})\n";
+    print STDOUT "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
     0; # false and not empty
 }
 
@@ -1318,13 +1317,13 @@ sub init_MANPODS {
 
     # Set up names of manual pages to generate from pods
     foreach my $man (qw(MAN1 MAN3)) {
-	if ( $self->{"{$man}PODS"}
-             or $self->{"INSTALL{$man}DIR"} =~ m/^(none|\s*)$/
+	if ( $self->{"$($man)PODS"}
+             or $self->{"INSTALL$($man)DIR"} =~ m/^(none|\s*)$/
         ) {
-            $self->{"{$man}PODS"} ||= \%();
+            $self->{"$($man)PODS"} ||= \%();
         }
         else {
-            my $init_method = "init_{$man}PODS";
+            my $init_method = "init_$($man)PODS";
             $self->?$init_method();
 	}
     }
@@ -1483,7 +1482,7 @@ sub init_PM {
     return if $self->{PM} and $self->{ARGS}->{PM};
 
     if ((nelems @{$self->{PMLIBDIRS}})){
-	print "Searching PMLIBDIRS: {join ' ',@{$self->{PMLIBDIRS}}}\n"
+	print "Searching PMLIBDIRS: $(join ' ',@{$self->{PMLIBDIRS}})\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -1528,7 +1527,7 @@ sub init_DIRFILESEP {
 
     $self->{DIRFILESEP} = '/';
 }
-    
+
 
 =item init_main
 
@@ -1825,7 +1824,7 @@ CODE
     $self->{WARN_IF_OLD_PACKLIST} ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
     $self->{FIXIN}              ||= 
-      q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift)"};
+      q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"};
 
     $self->{UMASK_NULL}         ||= "umask 0";
     $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
@@ -2229,9 +2228,9 @@ sub installbin {
 
     my @m;
     push(@m, qq{
-EXE_FILES = {join ' ',@exefiles}
+EXE_FILES = $(join ' ',@exefiles)
 
-pure_all :: {join ' ',@to}
+pure_all :: $(join ' ',@to)
 	\$(NOECHO) \$(NOOP)
 
 realclean ::
@@ -2455,8 +2454,8 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 # extralibs.all are computed correctly
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = {join ' ',@{$perlinc || \@()}
-}MAP_STATIC    = ",
+MAP_PERLINC   = $(join ' ',@{$perlinc || \@()}
+)MAP_STATIC    = ",
 join(" \\\n\t", reverse sort keys %static), "
 
 MAP_PRELIBS   = %Config{perllibs} %Config{cryptlib}
@@ -2719,7 +2718,7 @@ sub parse_version {
         if (ref $result) {
             $result = $result->stringify;
         }
-        warn "Could not eval '$eval' in $parsefile: {$@->message}" if $@;
+        warn "Could not eval '$eval' in $parsefile: $($@->message)" if $@;
         last;
     }
     close $fh;
@@ -3237,7 +3236,7 @@ sub max_exec_len {
     my $self = shift;
 
     if (!defined $self->{_MAX_EXEC_LEN}) {
-        if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX }) {
+        if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX( < @_ ) }) {
             $self->{_MAX_EXEC_LEN} = $arg_max;
         }
         else {      # POSIX minimum exec size
@@ -3595,8 +3594,8 @@ XSUBPPDIR = $xsdir
 XSUBPP = \$(XSUBPPDIR)\$(DFSEP)xsubpp
 XSUBPPRUN = \$(PERLRUN) \$(XSUBPP)
 XSPROTOARG = $self->{XSPROTOARG}
-XSUBPPDEPS = {join ' ',@tmdeps} \$(XSUBPP)
-XSUBPPARGS = {join ' ',@tmargs}
+XSUBPPDEPS = $(join ' ',@tmdeps) \$(XSUBPP)
+XSUBPPARGS = $(join ' ',@tmargs)
 XSUBPP_EXTRA_ARGS = 
 };
 };
@@ -3678,7 +3677,7 @@ Defines the suffix rules to compile XS files to C.
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();
-    '
+    return '
 .xs.c:
 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc && $(MV) $*.xsc $*.c
 ';

@@ -34,11 +34,11 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
 # [rt.cpan.org 26234]
-{
+do {
     local $/ = "foo";
     local $\ = "bar";
     MY->fixin("bin/program");
     is $/, "foo", '$/ not clobbered';
     is $\, "bar", '$\ not clobbered';
-}
+};
 

@@ -78,7 +78,6 @@ print "ok 14\n";
 $fd = $w->[0];
 print $fd "ok 15\n";
 
-POST_SOCKET:
 # Test new exists() method
 $sel->exists(\*STDIN) and print "not ";
 print "ok 16\n";
@@ -115,17 +114,17 @@ $^WARN_HOOK = sub {
       if @_[0]->{description} =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
     } ;
 $w = 0 ;
-{
+do {
 no warnings 'IO::Select' ;
 IO::Select::has_error();
-}
+};
 print "not " unless $w == 0 ;
 $w = 0 ;
 print "ok 22\n" ;
-{
+do {
 use warnings 'IO::Select' ;
 IO::Select::has_error();
-}
+};
 print "not " unless $w == 1 ;
 $w = 0 ;
 print "ok 23\n" ;

@@ -41,7 +41,7 @@ sub uncompr
         $self->{ADLER32} = Compress::Zlib::adler32(@_[0],  $self->{ADLER32})
             if $self->{wantADLER32};
 
-        ${ @_[1] } .= ${ @_[0] };
+        $$( @_[1] ) .= $$( @_[0] );
         ${ @_[0] } = "";
     }
 

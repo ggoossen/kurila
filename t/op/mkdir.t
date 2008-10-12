@@ -23,7 +23,7 @@ like($!, qr/cannot find|such|exist|not found|not a directory|unknown/i);
 ok(mkdir('blurfl'));
 ok(rmdir('blurfl'));
 
-SKIP: {
+SKIP: do {
     # trailing slashes will be removed before the system call to mkdir
     # but we don't care for MacOS ...
     skip("MacOS", 4) if $^O eq 'MacOS';
@@ -31,7 +31,7 @@ SKIP: {
     ok(-d 'blurfl');
     ok(rmdir('blurfl///'));
     ok(!-d 'blurfl');
-}
+};
 
 # test default argument
 
@@ -42,11 +42,11 @@ ok(rmdir);
 ok(!-d);
 $_ = 'lfrulb';
 
-{
+do {
     my $_ = 'blurfl';
     ok(mkdir);
     ok(-d);
     ok(-d 'blurfl');
     ok(!-d 'lfrulb');
     ok(rmdir);
-}
+};

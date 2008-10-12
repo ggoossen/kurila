@@ -37,13 +37,13 @@ cmp_ok( $sym1, '\==', *FOO{IO}, 'assigns into glob OK' );
 
 is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 
-{
+do {
     local $^W=1;		# 5.005 compat.
     my $warn;
     local $^WARN_HOOK = sub { $warn .= @_[0]->{description} };
     readline *FOO;
     like( $warn, qr/unopened filehandle/, 'warns like an unopened filehandle' );
-}
+};
 
 # Test qualify()
 package foo;
@@ -64,11 +64,11 @@ main::is( qualify("^FOO"), "::^FOO",
     'qualify() with an identifier starting with a ^' );
 
 # Test qualify_to_ref()
-{
+do {
     main::ok( \*{qualify_to_ref("x")} \== \*foo::x, 'qualify_to_ref() with a simple identifier' );
     main::is( qualify_to_ref("STDOUT"), \*STDOUT,
               'qualify_to_ref() with reserved indentier is the special variable' );
-}
+};
 
 # test fetch_glob()
 
@@ -86,11 +86,11 @@ main::is( Symbol::glob_name(*main::FOO), "main::FOO", "glob_name");
 
 # tests for delete_package
 package main;
-TODO: {
+TODO: do {
     todo_skip("fix delete_package", 2);
     $Transient::variable = 42;
     ok( defined %Transient::{variable}, 'transient variable in stash' );
     Symbol::delete_package('Transient');
     ok( !exists %Transient::{variable}, 'transient variable no longer in stash' );
     is( nelems(@(keys %Transient::)), 0, 'transient stash is empty' );
-}
+};

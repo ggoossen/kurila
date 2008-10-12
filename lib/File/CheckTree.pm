@@ -145,7 +145,7 @@ sub validate {
                           /$1 || valmess('$3', '$2', \$file)/x;
             }
 
-            {
+            do {
                 # count warnings, either from valmess or '-r || warn "my msg"'
                 # also, call any pre-existing signal handler for __WARN__
                 my $orig_sigwarn = $^WARN_HOOK;
@@ -170,7 +170,7 @@ sub validate {
                     }
                     die $err;
                 }
-            }
+            };
 
             # stop on 1st warning within a bundle of tests
             last if $Warnings +> $oldwarnings;

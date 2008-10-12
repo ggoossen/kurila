@@ -116,12 +116,12 @@ sub have_compiler {
   return $self->{have_compiler} if defined $self->{have_compiler};
   
   my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
-  {
+  do {
     local *FH;
     open FH, ">", "$tmpfile" or die "Can't create $tmpfile: $!";
     print FH "int boot_compilet() \{ return 1; \}\n";
     close FH;
-  }
+  };
 
   my ($obj_file, @lib_files);
   try {
@@ -210,7 +210,7 @@ sub _do_link {
   my @ld = $self->split_like_shell($cf->{ld});
   
   $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
-    or die "error building $out from {join ' ',@$objects}";
+    or die "error building $out from $(join ' ',@$objects)";
   
   return @($out, < @temp_files);
 }
@@ -218,7 +218,7 @@ sub _do_link {
 
 sub do_system {
   my ($self, < @cmd) = < @_;
-  print "{join ' ',@cmd}\n" if !$self->{quiet};
+  print "$(join ' ',@cmd)\n" if !$self->{quiet};
   return !system(< @cmd);
 }
 

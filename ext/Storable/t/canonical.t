@@ -48,7 +48,7 @@ our @fixed_strings = @("January", "February", "March", "April", "May", "June",
 # (deeper levels contain scalars, references to hashes or references to arrays);
 
 our (%a1, %a2);
-for (my $i = 0; $i +< $hashsize; $i++) {
+for my $i (0 .. $hashsize -1) {
 	my($k) = int(rand(1_000_000));
 	$k = MD5->hexhash($k) if $gotmd5 and int(rand(2));
 	%a1{$k} = \%( key => "$k", "value" => $i );

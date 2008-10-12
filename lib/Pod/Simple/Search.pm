@@ -77,7 +77,7 @@ sub survey {
       );
       $modname_prefix = \ grep length($_), split m{[:/\\]}, $self->{'dir_prefix'};
       $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",
-        "giving $start_in (= {join ' ',@$modname_prefix})\n";
+        "giving $start_in (= $(join ' ',@$modname_prefix))\n";
     } else {
       $start_in = $try;
     }
@@ -296,7 +296,7 @@ sub _recurse_dir {
   $recursor = sub {
     my($dir_long, $dir_bare) = < @_;
     if( (nelems @$modname_bits) +>= 10 ) {
-      $verbose and print "Too deep! [{join ' ',@$modname_bits}]\n";
+      $verbose and print "Too deep! [$(join ' ',@$modname_bits)]\n";
       return;
     }
 
@@ -470,10 +470,10 @@ sub _expand_inc {
 sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   my @them;
   (undef,< @them) = < @_;
-  for $_ ( @them) {
+  for my $_ ( @them) {
     if ( $_ eq '.' ) {
       $_ = ':';
-    } elsif ( $_ =~ s|^((?:\.\./)+)|{':' x (length($1)/3)}| ) {
+    } elsif ( $_ =~ s|^((?:\.\./)+)|$(':' x (length($1)/3))| ) {
       $_ = ':'. $_;
     } else {
       $_ =~ s|^\./|:|;
@@ -523,7 +523,7 @@ sub find {
 
   # Split on :: and then join the name together using File::Spec
   my @parts = split m/::/, $pod;
-  $verbose and print "Chomping \{$pod\} => \{{join ' ',@parts}\}\n";
+  $verbose and print "Chomping \{$pod\} => \{$(join ' ',@parts)\}\n";
 
   #@search_dirs = File::Spec->curdir unless @search_dirs;
   
@@ -637,9 +637,9 @@ sub _accessorize {  # A simple-minded method-maker
 sub _state_as_string {
   my $self = @_[0];
   return '' unless ref $self;
-  my @out = @( "\{\n  # State of {dump::view($self)} ...\n" );
+  my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" );
   foreach my $k (sort keys %$self) {
-    push @out, "  {dump::view($k)} => {dump::view($self->{$k})}\n";
+    push @out, "  $(dump::view($k)) => $(dump::view($self->{$k}))\n";
   }
   push @out, "\}\n";
   my $x = join '', @out;

@@ -10,7 +10,7 @@ my @ary1 = @( qw/foo bar baz/ );
 push(@ary1, \@( 1..3 ), \%( 'qux' => 99 ));
 
 # Shared array
-my @ary2 :shared = @(99, 21, 86);
+my @ary2 = @(99, 21, 86);
 
 # Regular hash-based object
 my $obj1 = \%(
@@ -52,7 +52,7 @@ $q->enqueue($sref1, $sref2, $qux);
 is($q->pending(), 7, 'Queue count');
 
 # Process items in queue
-{
+do {
     is($q->pending(), 7, 'Queue count in thread');
 
     my $ref = $q->peek(3);
@@ -66,7 +66,7 @@ is($q->pending(), 7, 'Queue count');
     my $tary2 = $q->dequeue();
     ok($tary2, 'Thread got item');
     is(ref($tary2), 'ARRAY', 'Item is array ref');
-    for (my $ii=0; $ii +< nelems @ary2; $ii++) {
+    for my $ii (0 .. nelems(@ary2) -1) {
         is(@$tary2[$ii], @ary2[$ii], 'Shared array element check');
     }
 
@@ -97,7 +97,7 @@ is($q->pending(), 7, 'Queue count');
     is($q->pending(), 0, 'Empty queue');
     my $nothing = $q->dequeue_nb();
     ok(! defined($nothing), 'Nothing on queue');
-}
+};
 
 # Check results of thread's activities
 is($q->pending(), 0, 'Empty queue');

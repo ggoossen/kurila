@@ -259,7 +259,6 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 
         mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar($) { (shift) } sub ASDF::baz($); *ASDF::baz = \&Foo::bar */
 	assert(SvTYPE(GvCV(gv)) == SVt_PVCV);
-	CvGV(GvCV(gv)) = gv;
 	SVcpREPLACE(SvLOCATION(GvCV(gv)), PL_curcop->op_location);
 	if (proto) {
 	    sv_usepvn_flags((SV*)GvCV(gv), proto, protolen,
@@ -862,12 +861,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			     (sv_type == SVt_PVAV && !GvIMPORTED_AV(*gvp)) ||
 			     (sv_type == SVt_PVHV && !GvIMPORTED_HV(*gvp)) )
 		    {
-			Perl_warn(aTHX_ "Variable \"%c%s\" is not imported",
-			    sv_type == SVt_PVAV ? '@' :
-			    sv_type == SVt_PVHV ? '%' : '$',
-			    name);
-			if (GvCVu(*gvp))
-			    Perl_warn(aTHX_ "\t(Did you mean &%s instead?)\n", name);
 			stash = NULL;
 		    }
 		}
@@ -970,13 +963,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    GvMULTI_on(gv);
 		    sv_magic((SV*)av, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
 		    /* NOTE: No support for tied ISA */
-		}
-		break;
-	    case 'O':
-		if (strEQ(name2, "VERLOAD")) {
-		    HV* const hv = GvHVn(gv);
-		    GvMULTI_on(gv);
-		    hv_magic(hv, NULL, PERL_MAGIC_overload);
 		}
 		break;
 	    case 'S':
@@ -1381,37 +1367,7 @@ Perl_gp_tmprefcnt(pTHX_ GV *gv)
     SvTMPREFCNT_inc(gp->gp_cv);
 }
 
-int
-Perl_magic_freeovrld(pTHX_ SV *sv, MAGIC *mg)
-{
-    AMT * const amtp = (AMT*)mg->mg_ptr;
-    PERL_UNUSED_ARG(sv);
-
-    PERL_ARGS_ASSERT_MAGIC_FREEOVRLD;
-
- return 0;
-}
-
 /* Updates and caches the CV's */
-
-
-CV*
-Perl_gv_handler(pTHX_ HV *stash, I32 id)
-{
-    dVAR;
-    MAGIC *mg;
-    AMT *amtp;
-    U32 newgen;
-    struct mro_meta* stash_meta;
-
-    if (!stash || !HvNAME_get(stash))
-        return NULL;
-
-    stash_meta = HvMROMETA(stash);
-    newgen = PL_sub_generation + stash_meta->pkg_gen + stash_meta->cache_gen;
-
-    return NULL;
-}
 
 void
 Perl_gv_name_set(pTHX_ GV *gv, const char *name, U32 len, U32 flags)

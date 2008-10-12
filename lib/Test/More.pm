@@ -510,7 +510,7 @@ sub isa_ok ($$;$) {
                 die <<WHOA;
 WHOA! I tried to call ->isa on your object and got some weird error.
 Here's the error.
-{$@->message}
+$($@->message)
 WHOA
             }
         }
@@ -626,7 +626,7 @@ sub use_ok ($;@) {
         # for it to work with non-Exporter based modules.
         $code = <<USE;
 package $pack;
-use $module {@imports[0]->stringify};
+use $module $(@imports[0]->stringify);
 1;
 USE
     }
@@ -644,7 +644,7 @@ USE
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
-    Error:  {$eval_error->message}
+    Error:  $($eval_error->message)
 DIAGNOSTIC
 
     }
@@ -714,7 +714,7 @@ REQUIRE
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to require '$module'.
-    Error:  {$eval_error->message}
+    Error:  $($eval_error->message)
 DIAGNOSTIC
 
     }
@@ -1206,7 +1206,7 @@ sub _deep_check {
     # circular.
     local %Refs_Seen = %( < %Refs_Seen );
 
-    {
+    do {
         # Quiet uninitialized value warnings when comparing undefs.
         local $^W = 0; 
 
@@ -1257,7 +1257,7 @@ sub _deep_check {
         else {
             _whoa(1, "Unknown type '$type' in _deep_check");
         }
-    }
+    };
 
     return $ok;
 }

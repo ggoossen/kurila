@@ -34,7 +34,7 @@ is $treelet->stringify, 'abc';  # explicit
 
 
 print "# Testing non-coreferentiality...\n";
-{
+do {
   my @stack = @($bare_treelet);
   my $this;
   while((nelems @stack)) {
@@ -53,7 +53,7 @@ print "# Testing non-coreferentiality...\n";
   # since we just conspicuously nuked $bare_treelet
   
   is $treelet->stringify, 'abc';  # explicit
-}
+};
 
 
 print "# Byebye...\n";

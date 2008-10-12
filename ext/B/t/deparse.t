@@ -1,31 +1,23 @@
 #!./perl
 
-BEGIN {
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-}
-
 use warnings;
 use strict;
 use feature ":5.10";
-use Test::More tests => 62;
+use Test::More tests => 56;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
 ok($deparse);
 
 # Tell B::Deparse about our ambient pragmas
-{ my ($hint_bits, $warning_bits, $hinthash);
+do { my ($hint_bits, $warning_bits, $hinthash);
  BEGIN { ($hint_bits, $warning_bits, $hinthash) = ($^H, $^WARNING_BITS, \%^H); }
  $deparse->ambient_pragmas (
      hint_bits    => $hint_bits,
      warning_bits => $warning_bits,
      '%^H'	  => $hinthash,
  );
-}
+};
 
 $/ = "\n####\n";
 while ( ~< *DATA) {
@@ -45,7 +37,7 @@ while ( ~< *DATA) {
     my $coderef = eval "sub \{$input\}";
 
     if ($@ and $@->{description}) {
-	diag("$num deparsed: {$@->message}");
+	diag("$num deparsed: $($@->message)");
         diag("input: '$input'");
 	ok(0, $testname);
     }
@@ -68,7 +60,7 @@ is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
 use constant cr => \@('hello');
 my $string = "sub " . $deparse->coderef2text(\&cr);
 my $subref = eval $string;
-die "Failed eval '$string': {$@->message}" if $@;
+die "Failed eval '$string': $($@->message)" if $@;
 my $val = $subref->() or diag $string;
 is(ref($val), 'ARRAY');
 is($val->[0], 'hello');
@@ -90,16 +82,18 @@ BEGIN { $^I = ".bak"; }
 BEGIN { $^W = 1; }
 BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
-    chomp $_;
-    our @F = split(' ', $_, 0);
-    '???';
+    do {
+        chomp $_;
+        our @F = split(' ', $_, 0);
+        '???'
+    };
 }
 EOF
-$b =~ s/(LINE:)/sub BEGIN {
+$b =~ s/(LINE:)/sub BEGIN \{
     'MacPerl'->bootstrap;
     'OSA'->bootstrap;
     'XL'->bootstrap;
-}
+\}
 $1/ if $Is_MacOS;
 is($a, $b);
 
@@ -142,11 +136,11 @@ __DATA__
 1;
 ####
 # 3
-{
+do {
     no warnings;
     '???';
-    2;
-}
+    2
+};
 ####
 # 4
 my $test;
@@ -160,22 +154,6 @@ $test /= 2 if ++$test;
 ####
 # 6
 1;
-####
-# 7
-{
-    my $test = sub : method {
-	my $x;
-    }
-    ;
-}
-####
-# 8
-{
-    my $test = sub : locked method {
-	my $x;
-    }
-    ;
-}
 ####
 # 10
 my $x;
@@ -205,10 +183,10 @@ my $foo = "Ab\x{100}\200\x{200}\377Cd\000Ef\x{1000}\cA\x{2000}\cZ";
 my $foo = "Ab\304\200\200\310\200\377Cd\000Ef\341\200\200\cA\342\200\200\cZ";
 ####
 # 15
-s/x/{ 'y' }/;
+s/x/$( 'y' )/;
 ####
 # 16 - various lypes of loop
-{ my $x; }
+do { my $x };
 ####
 # 17
 while (1) { my $k; }
@@ -220,33 +198,12 @@ $x=1 for @a;
 my($x, @a);
 $x = 1 foreach (@a);
 ####
-# 19
-for (my $i = 0; $i +< 2;) {
-    my $z = 1;
-}
-####
-# 20
-for (my $i = 0; $i +< 2; ++$i) {
-    my $z = 1;
-}
-####
-# 21
-for (my $i = 0; $i +< 2; ++$i) {
-    my $z = 1;
-}
-####
 # 22
 my $i;
 while ($i) { my $z = 1; } continue { $i = 99; }
 ####
 # 23
 foreach my $i (1, 2) {
-    my $z = 1;
-}
-####
-# 24
-my $i;
-foreach $i (1, 2) {
     my $z = 1;
 }
 ####
@@ -274,7 +231,7 @@ foreach our $i (1, 2) {
 ####
 # 29
 my @x;
-print reverse sort(@x);
+print reverse(sort(@x));
 ####
 # 30
 my @x;
@@ -282,7 +239,7 @@ print((sort {$b cmp $a} @x));
 ####
 # 31
 my @x;
-print((reverse sort {$b <+> $a} @x));
+print reverse((sort {$b <+> $a} @x));
 ####
 # 32
 print $_ foreach (reverse @main::a);
@@ -330,13 +287,13 @@ my $bar;
 state $x = 42;
 ####
 # 47 state var assignment
-{
+do {
     my $y = (state $x = 42);
-}
+};
 >>>>
-{
-    my $y = state $x = 42;
-}
+do {
+    my $y = state $x = 42
+};
 ####
 # 48 state vars in anoymous subroutines
 $main::a = sub {
@@ -346,9 +303,9 @@ $main::a = sub {
 ;
 ####
 # 49 match
-{
-    $main::a =~ m/foo/;
-}
+do {
+    $main::a =~ m/foo/
+};
 ####
 # 51 Anonymous arrays and hashes, and references to them
 my $a = \%();

@@ -44,7 +44,7 @@ sub write_invocation {
     while ((nelems @argvs)) {
       @argv = @{shift @argvs};
       $n = shift @argv;
-      push @out, "{$else}if (nelems(\@_) == $n) \{\n";
+      push @out, "$($else)if (nelems(\@_) == $n) \{\n";
       $else = "\t\} els";
       push @out, 
           "\t\treturn " . one_invocation($core, $call, $name, < @argv) . ";\n";
@@ -59,7 +59,7 @@ EOC
 
 sub one_invocation {
   my ($core, $call, $name, < @argv) = < @_;
-  return qq{$call({join ', ', @argv}) || die "Can't $name(\{join ', ', map \{ dump::view(\$_) \} \@_\})} . 
+  return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \} \@_))} . 
     ($core ? ': $!' : ', \$! is \"$!\"') . '"';
 }
 
@@ -68,18 +68,16 @@ sub _make_fatal {
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
-    $sub = "{$pkg}::$sub" unless $sub =~ m/::/;
+    $sub = "$($pkg)::$sub" unless $sub =~ m/::/;
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
+    $sub = Symbol::fetch_glob($sub);
     print "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
 	$proto = prototype $sref;
 	$call = '&$sref';
-    } elsif ($sub eq $ini && $sub !~ m/^CORE::GLOBAL::/) {
-	# Stray user subroutine
-	die "$sub is not a Perl subroutine" 
     } else {			# CORE subroutine
         $proto = try { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
@@ -103,12 +101,12 @@ EOS
     $code .= write_invocation($core, $call, $name, < @protos);
     $code .= "\}\n";
     print $code if $Debug;
-    {
+    do {
       $code = eval("package $pkg; $code");
       die if $@;
       no warnings;   # to avoid: Subroutine foo redefined ...
-      *{Symbol::fetch_glob($sub)} = $code;
-    }
+      *{$sub} = $code;
+    };
 }
 
 1;

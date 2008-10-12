@@ -8,7 +8,7 @@ use Module::Load;
 use Test::More tests => 13;
 
 
-{
+do {
     my $mod = 'Must::Be::Loaded';
     my $file = Module::Load::_to_file($mod,1);
 
@@ -16,9 +16,9 @@ use Test::More tests => 13;
 
     is( $@, '', qq[Loading module '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
-}
+};
 
-{
+do {
     my $mod = 'LoadMe.pl';
     my $file = Module::Load::_to_file($mod);
 
@@ -26,9 +26,9 @@ use Test::More tests => 13;
 
     is( $@, '', qq[Loading File '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
-}
+};
 
-{
+do {
     my $mod = 'LoadIt';
     my $file = Module::Load::_to_file($mod,1);
 
@@ -36,9 +36,9 @@ use Test::More tests => 13;
 
     is( $@, '', qq[Loading Ambigious Module '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
-}
+};
 
-{
+do {
     my $mod = 'ToBeLoaded';
     my $file = Module::Load::_to_file($mod);
 
@@ -46,10 +46,10 @@ use Test::More tests => 13;
 
     is( $@ && $@->message, '', qq[Loading Ambigious File '$mod'] );
     ok( defined(%INC{$file}), q[... found in %INC] );
-}
+};
 
 ### Test importing functions ###
-{   my $mod     = 'TestModule';
+do {   my $mod     = 'TestModule';
     my @funcs   = qw[func1 func2];
     
     try { load $mod, < @funcs };
@@ -59,4 +59,4 @@ use Test::More tests => 13;
         ok( $mod->can($func),           "$mod -> can( $func )" );
         ok( __PACKAGE__->can($func),    "we -> can ( $func )"  ); 
     }        
-}    
+};    

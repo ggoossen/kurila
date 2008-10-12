@@ -27,11 +27,11 @@ is($b,"\000\000\000\000_"); # otherwise probably "\000bcd_"
 
 unlink 'a';
 
-SKIP: {
+SKIP: do {
     skip "no EBADF", 1 if (!exists &Errno::EBADF);
 
     $! = 0;
     no warnings 'unopened';
     read(B,$b,1);
-    ok($! == &Errno::EBADF);
-}
+    ok($! == &Errno::EBADF( < @_ ));
+};

@@ -28,7 +28,7 @@ sub run
     my $TopFuncName     = getTopFuncName($CompressClass);
 
 
-    my @MultiValues     = @( < getMultiValues($CompressClass) );
+    my @MultiValues     = getMultiValues($CompressClass);
 
     foreach my $bit ($CompressClass, $UncompressClass,
                      'IO::Uncompress::AnyUncompress',
@@ -522,7 +522,7 @@ sub run
         my @expected = @("data1", "data2");
         my @uexpected = @("data1", "data2");
 
-        my @keep = @( < @input ) ;
+        my @keep =  @input;
 
         {
             title "$TopType - From Array Ref to Array Ref" ;
@@ -555,7 +555,7 @@ sub run
                 my $got = anyUncompress(\@( \$output, MultiStream => $ms ));
 
                 is $got, join('', < @uexpected), "  Got Expected uncompressed data";
-                my @headers = @( < getHeaders(\$output) );
+                my @headers = getHeaders(\$output);
                 is (nelems @headers), $ms ? (nelems @input) : 1, "  Header count ok";
             }
 
@@ -573,7 +573,7 @@ sub run
                 my $got = anyUncompress(\@( $file3, MultiStream => $ms ));
 
                 is $got, join('', < @uexpected), "  Got Expected uncompressed data";
-                my @headers = @( < getHeaders($file3) );
+                my @headers = getHeaders($file3);
                 is (nelems @headers), $ms ? (nelems @input) : 1, "  Header count ok";
             }
 
@@ -595,7 +595,7 @@ sub run
                 my $got = anyUncompress(\@( $file3, MultiStream => $ms ));
 
                 is $got, join('', < @uexpected), "  Got Expected uncompressed data";
-                my @headers = @( < getHeaders($file3) );
+                my @headers = getHeaders($file3);
                 is (nelems @headers), $ms ? (nelems @input) : 1, "  Header count ok";
             }
         }
@@ -872,8 +872,8 @@ sub run
                 ok &$Func("<$tmpDir1/a*.tmp>" => "<$tmpDir2/a#1.tmp>"), '  Compressed ok' 
                     or diag $$Error ;
 
-                my @copy = @( < @expected );
-                for my $file (< @outFiles)
+                my @copy = @expected;
+                for my $file (@outFiles)
                 {
                     is anyUncompress($file), shift @copy, "  got expected from $file" ;
                 }

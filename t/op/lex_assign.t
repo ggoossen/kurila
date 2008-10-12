@@ -31,7 +31,7 @@ sub subb {"in s"}
 
 plan 6 + (nelems @INPUT) + nelems @simple_input;
 
-sub wrn {"{join ' ',@_}"}
+sub wrn {"$(join ' ',@_)"}
 
 # Check correct optimization of ucfirst etc
 my $a = "AB";
@@ -43,7 +43,7 @@ my $dc = 0;
 sub A::DESTROY {$dc += 1}
 $a=8;
 my $b;
-{ my $c = 6; $b = bless \$c, "A"}
+do { my $c = 6; $b = bless \$c, "A"};
 
 ok $dc == 0;
 
@@ -65,7 +65,7 @@ ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
     "$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13" );
 
 for ( @INPUT) {
- SKIP: {
+ SKIP: do {
     ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
     $comment = $op unless defined $comment;
     chomp;
@@ -90,15 +90,15 @@ EOE
       if ($@->{description} =~ m/is unimplemented/) {
         skip("$comment: unimplemented", 1);
       } else {
-        fail("error: {$@->message}");
+        fail("error: $($@->message)");
       }
     }
-  }
+  };
 }
 
 for ( @simple_input) {
  SKIP:
- {
+ do {
   ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
   chomp;
@@ -118,10 +118,10 @@ EOE
     } elsif ($@->{description} =~ m/Can't (modify|take log of 0)/) {
       skip("skipping $comment: syntax not good for selfassign", 1);
     } else {
-      fail("error: {$@->message}");
+      fail("error: $($@->message)");
     }
   }
- }
+ };
 }
 
 try {

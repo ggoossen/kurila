@@ -80,40 +80,40 @@ for ( @( < @time, < @neg_time) ) {
     $year -= 1900;
     $mon--;
 
- SKIP: {
+ SKIP: do {
         skip '1970 test on VOS fails.', 12
             if $^O eq 'vos' && $year == 70;
         skip 'this platform does not support negative epochs.', 12
             if $year +< 70 && ! $neg_epoch_ok;
 
-        {
+        do {
             my $year_in = $year +< 70 ? $year + 1900 : $year;
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in);
 
             my($s,$m,$h,$D,$M,$Y) = localtime($time);
 
-            is($s, $sec, "timelocal second for {join ' ',@$_}");
-            is($m, $min, "timelocal minute for {join ' ',@$_}");
-            is($h, $hour, "timelocal hour for {join ' ',@$_}");
-            is($D, $mday, "timelocal day for {join ' ',@$_}");
-            is($M, $mon, "timelocal month for {join ' ',@$_}");
-            is($Y, $year, "timelocal year for {join ' ',@$_}");
-        }
+            is($s, $sec, "timelocal second for $(join ' ',@$_)");
+            is($m, $min, "timelocal minute for $(join ' ',@$_)");
+            is($h, $hour, "timelocal hour for $(join ' ',@$_)");
+            is($D, $mday, "timelocal day for $(join ' ',@$_)");
+            is($M, $mon, "timelocal month for $(join ' ',@$_)");
+            is($Y, $year, "timelocal year for $(join ' ',@$_)");
+        };
 
-        {
+        do {
             my $year_in = $year +< 70 ? $year + 1900 : $year;
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in);
 
             my($s,$m,$h,$D,$M,$Y) = gmtime($time);
 
-            is($s, $sec, "timegm second for {join ' ',@$_}");
-            is($m, $min, "timegm minute for {join ' ',@$_}");
-            is($h, $hour, "timegm hour for {join ' ',@$_}");
-            is($D, $mday, "timegm day for {join ' ',@$_}");
-            is($M, $mon, "timegm month for {join ' ',@$_}");
-            is($Y, $year, "timegm year for {join ' ',@$_}");
-        }
-    }
+            is($s, $sec, "timegm second for $(join ' ',@$_)");
+            is($m, $min, "timegm minute for $(join ' ',@$_)");
+            is($h, $hour, "timegm hour for $(join ' ',@$_)");
+            is($D, $mday, "timegm day for $(join ' ',@$_)");
+            is($M, $mon, "timegm month for $(join ' ',@$_)");
+            is($Y, $year, "timegm year for $(join ' ',@$_)");
+        };
+    };
 }
 
 for ( @bad_time) {
@@ -126,7 +126,7 @@ for ( @bad_time) {
     like($@ && $@->{description}, qr/.*out of range.*/, 'invalid time caused an error');
 }
 
-{
+do {
     is(timelocal(0,0,1,1,0,90) - timelocal(0,0,0,1,0,90), 3600,
        'one hour difference between two calls to timelocal');
 
@@ -136,19 +136,19 @@ for ( @bad_time) {
     # Diff beween Jan 1, 1980 and Mar 1, 1980 = (31 + 29 = 60 days)
     is(timegm(0,0,0, 1, 2, 80) - timegm(0,0,0, 1, 0, 80), 60 * 24 * 3600,
        '60 day difference between two calls to timegm');
-}
+};
 
 # bugid #19393
 # At a DST transition, the clock skips forward, eg from 01:59:59 to
 # 03:00:00. In this case, 02:00:00 is an invalid time, and should be
 # treated like 03:00:00 rather than 01:00:00 - negative zone offsets used
 # to do the latter
-{
+do {
     my $hour = @(localtime(timelocal(0, 0, 2, 7, 3, 102)))[2];
     # testers in US/Pacific should get 3,
     # other testers should get 2
     ok($hour == 2 || $hour == 3, 'hour should be 2 or 3');
-}
+};
 
 for my $p ( @years) {
     my ( $year, $is_leap_year ) = < @$p;
@@ -159,7 +159,7 @@ for my $p ( @years) {
 }
 
 SKIP:
-{
+do {
     skip 'this platform does not support negative epochs.', 6
         unless $neg_epoch_ok;
 
@@ -182,7 +182,7 @@ SKIP:
 
     try { timegm(0,0,0,29,1,96) };
     is($@, '', 'no error with leap day of 1996 (year passed as 96)');
-}
+};
 
 if (%ENV{MAINTAINER}) {
     require POSIX;

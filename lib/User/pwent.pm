@@ -113,7 +113,7 @@ sub pw_has {
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
                     ? \&die
-                    : sub { die("$IE {join ' ',@_}") };
+                    : sub { die("$IE $(join ' ',@_)") };
     if ((nelems @_) == 0) {
         my @valid = sort grep { %Groks{$_} } keys %Groks;
         return @valid;
@@ -170,7 +170,7 @@ sub _populate (@) {
 sub getpwent ( ) { _populate(CORE::getpwent()) }
 sub getpwnam ($) { _populate(CORE::getpwnam(shift)) }
 sub getpwuid ($) { _populate(CORE::getpwuid(shift)) }
-sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ? &getpwuid : &getpwnam }
+sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ? &getpwuid( < @_ ) : &getpwnam( < @_ ) }
 
 _feature_init();
 

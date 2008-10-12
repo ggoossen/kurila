@@ -207,7 +207,7 @@ sub Tgetent
     $self = \%() unless defined $self;
     bless $self, $class;
 
-    my ( $term, $cap, $search, $field, $max, $tmp_term, $TERMCAP );
+    my ( $term, $cap, $search, $max, $tmp_term, $TERMCAP );
     local ( $termpat, $state, $first, $entry );    # used inside eval
     local $_;
 
@@ -396,7 +396,7 @@ sub Tgetent
 
     # Precompile $entry into the object
     $entry =~ s/^[^:]*://;
-    foreach $field ( split( m/:[\s:\\]*/, $entry ) )
+    foreach my $field ( split( m/:[\s:\\]*/, $entry ) )
     {
         if ( defined $field && $field =~ m/^(\w\w)$/ )
         {
@@ -423,7 +423,7 @@ sub Tgetent
             next if defined $self->{ '_' . ( $cap = $1 ) };
             $_ = $2;
             s/\\E/\033/g;
-            s/\\(\d\d\d)/{pack('c',oct($1) ^&^ 0177)}/g;
+            s/\\(\d\d\d)/$(pack('c',oct($1) ^&^ 0177))/g;
             s/\\n/\n/g;
             s/\\r/\r/g;
             s/\\t/\t/g;
@@ -431,7 +431,7 @@ sub Tgetent
             s/\\f/\f/g;
             s/\\\^/\377/g;
             s/\^\?/\177/g;
-            s/\^(.)/{pack('c',ord($1) ^&^ 31)}/g;
+            s/\^(.)/$(pack('c',ord($1) ^&^ 31))/g;
             s/\\(.)/$1/g;
             s/\377/^/g;
             $self->{ '_' . $cap } = $_;
@@ -682,13 +682,13 @@ found.
 sub Trequire
 {    ## public
     my $self = shift;
-    my ( $cap, @undefined );
-    foreach $cap ( @_)
+    my ( @undefined );
+    foreach my $cap ( @_)
     {
         push( @undefined, $cap )
           unless defined $self->{ '_' . $cap } && $self->{ '_' . $cap };
     }
-    croak "Terminal does not support: ({join ' ',@undefined})" if (nelems @undefined);
+    croak "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined);
 }
 
 =back

@@ -50,7 +50,7 @@ sub getnet($) {
 	require Socket;
 	&getnetbyaddr( <Socket::inet_aton(shift));
     } else {
-	&getnetbyname;
+	&getnetbyname( < @_ );
     } 
 } 
 

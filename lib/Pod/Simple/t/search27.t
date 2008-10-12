@@ -72,12 +72,12 @@ $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
 print $p;
 
-{
+do {
 my $names = join "|", sort keys %$name2where;
 ok $names, "squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo";
-}
+};
 
-{
+do {
 my $names = join "|", sort values %$where2name;
 ok $names, "squaa|squaa::Glunk|squaa::Vliff|squaa::Vliff|squaa::Vliff|squaa::Wowo";
 
@@ -92,7 +92,7 @@ sub thar { print "# Seen @_[0] :\n", < map "#  \{$_\}\n", sort grep $where2name-
 
 ok %count{'squaa::Vliff'}, 3;
 thar 'squaa::Vliff';
-}
+};
 
 
 ok   $name2where->{'squaa'};  # because squaa.pm IS squaa*

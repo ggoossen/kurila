@@ -66,7 +66,7 @@ sub findinclude {
        my $incfile = catfile($_, $incname);
        return $incfile  if (-r $incfile);
     }
-    warn("*** Can't find =include file $incname in {join ' ',@podincdirs}\n");
+    warn("*** Can't find =include file $incname in $(join ' ',@podincdirs)\n");
     return "";
 }
 
@@ -136,7 +136,7 @@ sub testpodplaintext( @ ) {
    my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
    my @testpods = @_;
    my ($testname, $testdir) = ("", "");
-   my ($podfile, $cmpfile) = ("", "");
+   my $cmpfile = "";
    my ($outfile, $errfile) = ("", "");
    my $passes = 0;
    my $failed = 0;
@@ -144,7 +144,7 @@ sub testpodplaintext( @ ) {
 
    print "1..", scalar nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
-   for $podfile ( @testpods) {
+   for my $podfile ( @testpods) {
       ($testname, $_) = < fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;

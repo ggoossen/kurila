@@ -32,13 +32,15 @@ sub linklist {
     my $o = shift;
     if ( $o->can("first") and $o->first and ${ $o->first } ) {
         $o->next( < $o->first->linklist );
-        for ( my $kid = $o->first; $$kid; $kid = $kid->sibling ) {
+        my $kid = $o->first;
+        while ($$kid) {
             if ( ${ $kid->sibling } ) {
                 $kid->next( < $kid->sibling->linklist );
             }
             else {
                 $kid->next($o);
             }
+            $kid = $kid->sibling;
         }
     }
     else {

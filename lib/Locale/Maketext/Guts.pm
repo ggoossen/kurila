@@ -25,7 +25,7 @@ sub _compile {
   my(@c) = @(''); # "chunks" -- scratch.
   my $call_count = 0;
   my $big_pile = '';
-  {
+  do {
     my $in_group = 0; # start out outside a group
     my($m, @params); # scratch
     
@@ -222,7 +222,7 @@ sub _compile {
         @c[-1] .= $1;
       }
     }
-  }
+  };
 
   if($call_count) {
     undef $big_pile; # Well, nevermind that.
@@ -245,7 +245,7 @@ sub _compile {
 
   print < @code if DEBUG;
   my $sub = eval(join '', @code);
-  die "{$@->message} while evalling" . join('', @code) if $@; # Should be impossible.
+  die "$($@->message) while evalling" . join('', @code) if $@; # Should be impossible.
   return $sub;
 }
 

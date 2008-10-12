@@ -111,7 +111,7 @@ sub wanted_File_Dir {
 }
 
 sub wanted_File_Dir_prune {
-    &wanted_File_Dir;
+    &wanted_File_Dir( < @_ );
     $File::Find::prune=1 if  $_ eq 'faba';
 }
 
@@ -240,14 +240,14 @@ MkDir( dir_path('fb'), 0770  );
 touch( file_path('fb', 'fb_ord') );
 MkDir( dir_path('fb', 'fba'), 0770  );
 touch( file_path('fb', 'fba', 'fba_ord') );
-SKIP: {
+SKIP: do {
 	skip "Creating symlink", 1, unless $symlink_exists;
 if ($^O eq 'MacOS') {
       ok( symlink(':fb',':fa:fsl'), 'Created symbolic link' );
 } else {
       ok( symlink('../fb','fa/fsl'), 'Created symbolic link' );
 }
-}
+};
 touch( file_path('fa', 'fa_ord') );
 
 MkDir( dir_path('fa', 'faa'), 0770  );
@@ -316,7 +316,7 @@ like( $@->{description}, qr|insecure cwd|, 'Bad untaint pattern causes death in 
 chdir($cwd_untainted);
 
 
-SKIP: {
+SKIP: do {
     skip "Symbolic link tests", 17, unless $symlink_exists;
     print "# --- symbolic link tests --- \n";
     $FastFileTests_OK= 1;
@@ -384,4 +384,4 @@ SKIP: {
     like( $@->{description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
 
     chdir($cwd_untainted);
-}
+};

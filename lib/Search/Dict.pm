@@ -90,7 +90,7 @@ sub look {
     seek($fh,$min,0)
 	or return -1;
     ~< $fh if $min;
-    for (;;) {
+    while (1) {
 	$min = tell($fh);
 	defined($_ = ~< $fh)
 	    or last;

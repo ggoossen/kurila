@@ -207,7 +207,7 @@ Please pick a \u$name from the following:
 
 EOF
 	my $err = 0;
-	do {
+	{
 	    if ($err++ > 5) {
 		die "Invalid $name: aborting.\n";
 	    }
@@ -420,7 +420,7 @@ EOF
 	}
 
 	my $err = 0;
-	do {
+	{
 	    print "Subject: ";
 	    $subject = <>;
 	    chomp $subject;

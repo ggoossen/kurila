@@ -26,12 +26,12 @@ foreach my $code (@("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
 
 
 for my $cross_partition_test (0..1) {
-  {
+  do {
     # Simulate a cross-partition copy/move by forcing rename to
     # fail.
     no warnings 'redefine';
     *CORE::GLOBAL::rename = sub { 0 } if $cross_partition_test;
-  }
+  };
 
   # First we create a file
   open(F, ">", "file-$$") or die;
@@ -105,14 +105,14 @@ for my $cross_partition_test (0..1) {
   open(R, "<", "file-$$") or die; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'contents preserved';
 
-  TODO: {
+  TODO: do {
     local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^O eq 'VMS';
 
     my $dest_mtime = @(stat("file-$$"))[9];
     is $dest_mtime, $mtime,
       "mtime preserved by copy()". 
       ($cross_partition_test ? " while testing cross-partition" : "");
-  }
+  };
 
   # trick: create lib/ if not exists - not needed in Perl core
   unless (-d 'lib') { mkdir 'lib' or die; }
@@ -127,14 +127,14 @@ for my $cross_partition_test (0..1) {
   is $foo, "ok\n", 'copy over the same file works';
   unlink "lib/file-$$" or die "unlink: $!";
 
-  { 
+  do { 
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= @_[0]->{description} };
     ok copy("file-$$", "file-$$"), 'copy(fn, fn) succeeds';
 
     like $warnings, qr/are identical/, 'but warns';
     ok -s "file-$$", 'contents preserved';
-  }
+  };
 
   move "file-$$", "lib";
   open(R, "<", "lib/file-$$") or die "open lib/file-$$: $!"; $foo = ~< *R; close(R);
@@ -142,7 +142,7 @@ for my $cross_partition_test (0..1) {
   ok !-e "file-$$", 'file moved indeed';
   unlink "lib/file-$$" or die "unlink: $!";
 
-  SKIP: {
+  SKIP: do {
     skip "Testing symlinks", 3 unless %Config{d_symlink};
 
     open(F, ">", "file-$$") or die $!;
@@ -160,9 +160,9 @@ for my $cross_partition_test (0..1) {
 
     unlink "symlink-$$";
     unlink "file-$$";
-  }
+  };
 
-  SKIP: {
+  SKIP: do {
     skip "Testing hard links", 3 
          if !%Config{d_link} or $^O eq 'MSWin32' or $^O eq 'cygwin';
 
@@ -181,7 +181,7 @@ for my $cross_partition_test (0..1) {
 
     unlink "hardlink-$$";
     unlink "file-$$";
-  }
+  };
 }
 
 

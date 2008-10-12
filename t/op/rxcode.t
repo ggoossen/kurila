@@ -72,13 +72,13 @@ cmp_ok( scalar(nelems @var), '==', 0, '..nothing pushed (package)' );
 unlike( 'abc', qr/^a(?{push @var,113})b(?{push @var,114})$/, 'abc !~ ab$ (push package var)' );
 cmp_ok( scalar(nelems @var), '==', 0, '..still nothing pushed (package)' );
 
-{
+do {
     local $^R = undef;
     ok( 'ac' =~ m/^a(?{30})(?:b(?{31})|c(?{32}))?/, 'ac =~ a(?:b|c)?' );
     ok( $^R == 32, '$^R == 32' );
-}
-{
+};
+do {
     local $^R = undef;
     ok( 'abbb' =~ m/^a(?{36})(?:b(?{37})|c(?{38}))+/, 'abbbb =~ a(?:b|c)+' );
     ok( $^R == 37, '$^R == 37' ) or print "# \$^R=$^R\n";
-}
+};

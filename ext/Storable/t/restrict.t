@@ -6,7 +6,7 @@
 #  in the README file that comes with the distribution.
 #
 
-sub BEGIN {
+BEGIN {
     chdir('t') if -d 't';
     if (%ENV{PERL_CORE}){
 	@INC = @('.', '../lib', '../ext/Storable/t');
@@ -63,10 +63,10 @@ sub testit {
 
   my @in_keys = sort keys %$hash;
   my @out_keys = sort keys %$copy;
-  unless (ok ++$test, "{join ' ',@in_keys}" eq "{join ' ',@out_keys}") {
+  unless (ok ++$test, join(' ',@in_keys) eq join(' ',@out_keys)) {
     print "# Failed: keys mis-match after deep clone.\n";
-    print "# Original keys: {join ' ',@in_keys}\n";
-    print "# Copy's keys: {join ' ',@out_keys}\n";
+    print "# Original keys: $(join ' ',@in_keys)\n";
+    print "# Copy's keys: $(join ' ',@out_keys)\n";
   }
 
   # $copy = $hash;	# used in initial debug of the tests
@@ -96,7 +96,8 @@ sub testit {
     "value for key 'undef' is undefined";
 }
 
-for $Storable::canonical (@(0, 1)) {
+for my $canonical  (@(0, 1)) {
+  $Storable::canonical = $canonical;
   for my $cloner (@(\&dclone, \&freeze_thaw)) {
     print "# \$Storable::canonical = $Storable::canonical\n";
     testit (\%hash, $cloner);

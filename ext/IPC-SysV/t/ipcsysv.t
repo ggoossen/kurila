@@ -50,7 +50,7 @@ EOM
 
 my $perm = S_IRWXU;
 
-SKIP: {
+SKIP: do {
 
 skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
     %Config{'d_msgget'} eq 'define' &&
@@ -134,9 +134,9 @@ EOM
 This failure was to be expected because the subtest #2 failed.
 EOM
      }
-} # SKIP
+}; # SKIP
 
-SKIP: {
+SKIP: do {
 
     skip('lacking d_semget d_semctl', 11) unless
         %Config{'d_semget'} eq 'define' &&
@@ -192,7 +192,7 @@ SKIP: {
     my $bdata = "0" x $poke . "1" . "0" x ($nsem-$poke-1);
 
     cmp_ok(join("",@data),'eq',$bdata,'changed');
-} # SKIP
+}; # SKIP
 
 END {
     msgctl($msg,IPC_RMID,0)       if defined $msg;

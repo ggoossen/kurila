@@ -69,10 +69,10 @@ sub test_outtmp {
     open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
     while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
-    {
+    do {
         local $/;
         $output = ~< *OUT;
-    }
+    };
     close OUT;
     if ($output eq $expected) {
         print "ok $n\n";

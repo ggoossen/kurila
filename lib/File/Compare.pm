@@ -101,20 +101,26 @@ sub compare {
     
   # All of these contortions try to preserve error messages...
   fail_inner:
-    close($to_fh) || goto fail_open2 if $closeto;
-    close($from_fh) || goto fail_open1 if $closefrom;
+    do {
+        close($to_fh) || goto fail_open2 if $closeto;
+        close($from_fh) || goto fail_open1 if $closefrom;
+    };
 
     return 1;
 
   fail_open2:
-    if ($closefrom) {
-	my $status = $!;
-	$! = 0;
-	close $from_fh;
-	$! = $status unless $!;
-    }
+    do {
+        if ($closefrom) {
+            my $status = $!;
+            $! = 0;
+            close $from_fh;
+            $! = $status unless $!;
+        }
+    };
   fail_open1:
-    return -1;
+    do {
+        return -1;
+    }
 }
 
 *cmp = \&compare;

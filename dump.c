@@ -478,7 +478,7 @@ Perl_sv_peek(pTHX_ SV *sv)
     }
     type = SvTYPE(sv);
     if (type == SVt_PVCV) {
-	Perl_sv_catpvf(aTHX_ t, "CV(%s)", CvGV(sv) ? GvNAME(CvGV(sv)) : "");
+	Perl_sv_catpvf(aTHX_ t, "CV()");
 	goto finish;
     } else if (type < SVt_LAST) {
 	sv_catpv(t, svshorttypenames[type]);
@@ -615,7 +615,7 @@ S_sequence(pTHX_ register const OP *o)
 
     for (; o; o = o->op_next) {
 	STRLEN len;
-	SV * const op = newSVuv(PTR2UV(o));
+	SV * const op = sv_2mortal(newSVuv(PTR2UV(o)));
 	const char * const key = SvPV_const(op, len);
 
 	if (hv_exists(Sequence, key, len))
@@ -705,6 +705,7 @@ S_sequence_num(pTHX_ const OP *o)
     op = newSVuv(PTR2UV(o));
     key = SvPV_const(op, len);
     seq = hv_fetch(Sequence, key, len, 0);
+    SVcpNULL(op);
     return seq ? SvUV(*seq): 0;
 }
 
@@ -750,19 +751,22 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     {
 	SV* loc = o->op_location;
-	SV* locstr = newSVpv("", 0);
+	Perl_dump_indent(aTHX_ level, file, "  LOCATION = ");
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
 	    int i;
 	    for (i=0; i <= len; i++) {
-		if (SvPVOK(ary[i])) {
-		    sv_catsv(locstr, ary[i]);
-		    sv_catpv(locstr, " ");
+		if (SvPOK(ary[i])) {
+		    PerlIO_write(file, SvPVX_const(ary[i]), SvCUR(ary[i]));
 		}
+		else if (SvIOK(ary[i])) {
+		    PerlIO_printf(file, "%"IVdf, (IV)SvIVX(ary[i]));
+		}
+		PerlIO_write(file, STR_WITH_LEN(" "));
 	    }
 	}
-	Perl_dump_indent(aTHX_ level, file, "LOCATION = %s\n", SvPV_nolen_const(locstr));
+	PerlIO_printf(file, "\n");
     }
 #ifdef DUMPADDR
     Perl_dump_indent(aTHX_ level, file, "ADDR = 0x%"UVxf" => 0x%"UVxf"\n", (UV)o, (UV)o->op_next);
@@ -981,7 +985,7 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
     PERL_UNUSED_ARG(o);
 #else
     if (PL_madskills && o->op_madprop) {
-	SV * const tmpsv = newSVpvn("", 0);
+	SV * const tmpsv = sv_2mortal(newSVpvn("", 0));
 	MADPROP* mp = o->op_madprop;
 	Perl_dump_indent(aTHX_ level, file, "MADPROPS = {\n");
 	level++;
@@ -1013,8 +1017,6 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	level--;
 	Perl_dump_indent(aTHX_ level, file, "}\n");
-
-	SvREFCNT_dec(tmpsv);
     }
 #endif
 }
@@ -1033,9 +1035,8 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 #else
 	if ( ! PL_op->op_flags & OPf_SPECIAL) { /* not lexical */
 	    if (cSVOPo->op_sv) {
-		SV * const tmpsv = newSV(0);
+		SV * const tmpsv = sv_2mortal(newSV(0));
 		ENTER;
-		SAVEFREESV(tmpsv);
 		gv_fullname3(tmpsv, (GV*)cSVOPo->op_sv, NULL);
 		Perl_dump_indent(aTHX_ level, file, "GV = %s\n",
 				 SvPV_nolen_const(tmpsv));
@@ -1159,7 +1160,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_pos,            "pos(.)" },
 	{ PERL_MAGIC_symtab,         "symtab(:)" },
 	{ PERL_MAGIC_backref,        "backref(<)" },
-	{ PERL_MAGIC_overload,       "overload(A)" },
 	{ PERL_MAGIC_bm,             "bm(B)" },
 	{ PERL_MAGIC_env,            "env(E)" },
 	{ PERL_MAGIC_hints,          "hints(H)" },
@@ -1169,8 +1169,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_tied,           "tied(P)" },
 	{ PERL_MAGIC_sig,            "sig(S)" },
 	{ PERL_MAGIC_uvar,           "uvar(U)" },
-	{ PERL_MAGIC_overload_elem,  "overload_elem(a)" },
-	{ PERL_MAGIC_overload_table, "overload_table(c)" },
 	{ PERL_MAGIC_envelem,        "envelem(e)" },
 	{ PERL_MAGIC_fm,             "fm(f)" },
 	{ PERL_MAGIC_regex_global,   "regex_global(g)" },
@@ -1505,19 +1503,22 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
     }
     {
 	SV* loc = SvLOCATION(sv);
-	SV* locstr = newSVpv("", 0);
+	Perl_dump_indent(aTHX_ level, file, "  LOCATION = ");
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
 	    int i;
 	    for (i=0; i <= len; i++) {
-		if (SvPVOK(ary[i])) {
-		    sv_catsv(locstr, ary[i]);
-		    sv_catpv(locstr, " ");
+		if (SvPOK(ary[i])) {
+		    PerlIO_write(file, SvPVX_const(ary[i]), SvCUR(ary[i]));
 		}
+		else if (SvIOK(ary[i])) {
+		    PerlIO_printf(file, "%"IVdf, (IV)SvIVX(ary[i]));
+		}
+		PerlIO_write(file, STR_WITH_LEN(" "));
 	    }
 	}
-	Perl_dump_indent(aTHX_ level, file, "  LOCATION = %s\n", SvPV_nolen_const(locstr));
+	PerlIO_printf(file, "\n");
     }
     if ((type >= SVt_PVIV && type != SVt_PVAV && type != SVt_PVHV
 	 && type != SVt_PVCV && !isGV_with_GP(sv))
@@ -1773,7 +1774,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 				 (IV)CvXSUBANY(sv).any_i32);
 	    }
 	}
- 	do_gvgv_dump(level, file, "  GVGV::GV", CvGV(sv));
 	Perl_dump_indent(aTHX_ level, file, "  DEPTH = %"IVdf"\n", (IV)CvDEPTH(sv));
 	Perl_dump_indent(aTHX_ level, file, "  FLAGS = 0x%"UVxf"\n", (UV)CvFLAGS(sv));
 	Perl_dump_indent(aTHX_ level, file, "  OUTSIDE_SEQ = %"UVuf"\n", (UV)CvOUTSIDE_SEQ(sv));
@@ -1789,7 +1789,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 			 : CvANON(outside) ? "ANON"
 			 : (outside == PL_main_cv) ? "MAIN"
 			 : CvUNIQUE(outside) ? "UNIQUE"
-			 : CvGV(outside) ? GvNAME(CvGV(outside)) : "UNDEFINED"));
+			 : "UNDEFINED"));
 	}
 	if (nest < maxnest && (CvCLONE(sv) || CvCLONED(sv)))
 	    do_sv_dump(level+1, file, (SV*)CvOUTSIDE(sv), nest+1, maxnest, dumpops, pvlim);
@@ -2348,10 +2348,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	sv_catpv(t, " HV=\"");
 	break;
     case SVt_PVCV:
-	if (CvGV(sv))
-	    Perl_sv_catpvf(aTHX_ t, " CV=\"(%s)\"", GvNAME(CvGV(sv)));
-	else
-	    sv_catpv(t, " CV=\"()\"");
+	sv_catpv(t, " CV=\"()\"");
 	goto finish;
     case SVt_PVGV:
 	sv_catpv(t, " GV=\"");

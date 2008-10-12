@@ -287,6 +287,7 @@ PP(pp_prototype)
 		    str[n - 1] = '_';
 		str[n++] = '\0';
 		ret = newSVpvn_flags(str, n - 1, SVs_TEMP);
+		goto set;
 	    }
 	    else if (code)		/* Non-Overridable */
 		goto set;
@@ -628,15 +629,7 @@ PP(pp_undef)
 	hv_undef((HV*)sv);
 	break;
     case SVt_PVCV:
-	if (cv_const_sv((CV*)sv) && ckWARN(WARN_MISC))
-	    Perl_warner(aTHX_ packWARN(WARN_MISC), "Constant subroutine %s undefined",
-		 CvANON((CV*)sv) ? "(anonymous)" : GvENAME(CvGV((CV*)sv)));
-	{
-	    /* let user-undef'd sub keep its identity */
-	    GV* const gv = CvGV((CV*)sv);
-	    cv_undef((CV*)sv);
-	    CvGV((CV*)sv) = gv;
-	}
+	cv_undef((CV*)sv);
 	break;
     case SVt_PVGV:
 	if (SvFAKE(sv))
@@ -2145,7 +2138,7 @@ PP(pp_negate)
 
 PP(pp_not)
 {
-    dVAR; dSP;
+    dVAR;
     *PL_stack_sp = boolSV(!SvTRUE(*PL_stack_sp));
     return NORMAL;
 }
@@ -3318,7 +3311,7 @@ PP(pp_quotemeta)
 
 PP(pp_aslice)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     register AV* const av = (AV*)POPs;
     register AV* slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
@@ -3420,14 +3413,11 @@ PP(pp_delete)
     const I32 discard = (gimme == G_VOID) ? G_DISCARD : 0;
 
     if (PL_op->op_private & OPpSLICE) {
-	dMARK;
 	SV * const sv = POPs;
 	SV* slice = POPs;
 	AV* slicecopy;
 	SV** items;
 	I32 avlen;
-
-	assert(SP == MARK); 
 
 	if ( ! SvAVOK(slice) )
 	    Perl_croak(aTHX_ "slice expected an array as slice index, but got %s", Ddesc(slice));
@@ -3521,7 +3511,7 @@ PP(pp_exists)
 
 PP(pp_hslice)
 {
-    dVAR; dSP; dMARK; dORIGMARK;
+    dVAR; dSP;
     register HV * const hv = (HV*)POPs;
     AV * slice = (AV*)POPs;
     register const I32 lval = (PL_op->op_flags & OPf_MOD);
@@ -4129,7 +4119,7 @@ PP(pp_unshift)
 
 PP(pp_reverse)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     SV * const av = sv_mortalcopy(POPs);
     SV ** ary;
     SV ** end;
@@ -4154,7 +4144,7 @@ PP(pp_reverse)
 
 PP(pp_split)
 {
-    dVAR; dSP; dTARG;
+    dVAR; dSP;
     AV *av;
     register IV limit = POPi;			/* note, negative is forever */
     SV * const sv = POPs;

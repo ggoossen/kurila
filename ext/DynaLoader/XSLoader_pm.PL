@@ -44,10 +44,14 @@ sub load {
     my($module) = @_[0];
 
     # work with static linking too
-    my $b = "$module\::bootstrap";
-    goto &$b if defined &$b;
+    my $b = Symbol::fetch_glob("$module\::bootstrap");
+    goto &{*{$b}} if defined &{*{$b}};
 
-    goto retry unless $module and defined &dl_load_file;
+    unless ($module and defined &dl_load_file) {
+        my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
+                                XSLoader->can('bootstrap_inherit');
+        goto &$bootstrap_inherit;
+    }
 
     my @modparts = split(m/::/,$module);
     my $modfname = @modparts[-1];
@@ -81,7 +85,11 @@ print OUT <<'EOT';
     my $bs = $file;
     $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
 
-    goto retry if not -f $file or -s $bs;
+    if (not -f $file or -s $bs) {
+        my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
+                                XSLoader->can('bootstrap_inherit');
+        goto &$bootstrap_inherit;
+    }
 
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
@@ -121,17 +129,11 @@ print OUT <<'EOT';
 
     push(@DynaLoader::dl_modules, $module); # record loaded module
 
-  boot:
-    my $xs = dl_install_xsub("{$module}::bootstrap", $boot_symbol_ref, $file);
+    my $xs = dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file);
 
     # See comment block above
     push(@DynaLoader::dl_shared_objects, $file); # record files loaded
     return &$xs(<@_);
-
-  retry:
-    my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
-                            XSLoader->can('bootstrap_inherit');
-    goto &$bootstrap_inherit;
 }
 
 sub bootstrap_inherit {

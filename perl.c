@@ -678,8 +678,9 @@ perl_destruct(pTHXx)
     Safefree(PL_osname);	/* $^O */
     PL_osname = NULL;
 
-    SvREFCNT_dec(PL_statname);
-    PL_statname = NULL;
+    SVcpNULL(PL_op_sequence);
+
+    SVcpNULL(PL_statname);
     PL_statgv = NULL;
 
     /* defgv, aka *_ should be taken care of elsewhere */
@@ -1387,6 +1388,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     SvGROW(linestr_sv, 80);
     sv_setpvn(linestr_sv,"",0);
 
+    PL_cop_seqmax = 1;
+
     sv = newSVpvs("");		/* first used for -I flags */
     SAVEFREESV(sv);
     init_main_stash();
@@ -1594,15 +1597,15 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			      "our @env = @( map { \"$_=\\\"%ENV{$_}\\\"\" } "
-			      "sort grep {m/^PERL/} keys %ENV ); ");
+			      "our @env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
+			      "sort grep {m/^PERL/} keys %ENV; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
 			      "push @env, \"CYGWIN=\\\"%ENV{CYGWIN}\\\"\";");
 #endif
 		    sv_catpvs(opts_prog, 
-			      "print \"  \\%ENV:\\n    {join ' ', <@env}\\n\" if @env;"
-			      "print \"  \\@INC:\\n    {join ' ', <@INC}\\n\";");
+			      "print \"  \\%ENV:\\n    $(join ' ', @env)\\n\" if @env;"
+			      "print \"  \\@INC:\\n    $(join ' ', @INC)\\n\";");
 		}
 		else {
 		    ++s;
@@ -2174,7 +2177,7 @@ Perl_get_cvn_flags(pTHX_ const char *name, STRLEN len, I32 flags)
 	SV *const sv = newSVpvn(name,len);
     	return newSUB(start_subparse(0),
 		      newSVOP(OP_CONST, 0, sv, NULL),
-		      NULL, NULL);
+		      NULL);
     }
     if (gv)
 	return GvCVu(gv);
@@ -2331,7 +2334,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	PL_op = (OP*)&method_op;
     }
 
-    if (!(flags & G_EVAL)) {
+if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
 	CALL_BODY_SUB((OP*)&myop);
 	retval = PL_stack_sp - (PL_stack_base + oldmark);

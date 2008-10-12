@@ -46,7 +46,7 @@ like( $@->{description}, qr/^$error/, 'filetest dies with missing subpragma on u
 eval "no filetest";
 like( $@->{description}, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
 
-SKIP: {
+SKIP: do {
     # A real test for filetest.
     # This works for systems with /usr/bin/chflags (i.e. BSD4.4 systems).
     my $chflags = "/usr/bin/chflags";
@@ -67,28 +67,28 @@ SKIP: {
     };
     skip("Errors in test using chflags: $@", 4) if $@;
 
-    {
+    do {
 	use filetest 'access';
-    SKIP: {
+    SKIP: do {
 	    skip("No tests on effective user id", 1)
 		if $skip_eff_user_tests;
 	    is(-w $tstfile, undef, "$tstfile should not be recognized as writable");
-	}
+	};
 	is(-W $tstfile, undef, "$tstfile should not be recognized as writable");
-    }
+    };
 
-    {
+    do {
 	no filetest 'access';
-    SKIP: {
+    SKIP: do {
 	    skip("No tests on effective user id", 1)
 		if $skip_eff_user_tests;
 	    is(-w $tstfile, 1, "$tstfile should be recognized as writable");
-	}
+	};
 	is(-W $tstfile, 1, "$tstfile should be recognized as writable");
-    }
+    };
 
     # cleanup
     system($chflags, "nouchg", $tstfile);
     unlink $tstfile;
     warn "Can't remove $tstfile: $!" if -e $tstfile;
-}
+};

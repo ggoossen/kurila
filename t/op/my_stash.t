@@ -8,10 +8,10 @@ plan tests => 7;
 
 use constant MyClass => 'Foo::Bar::Biz::Baz';
 
-{
+do {
     package Foo::Bar::Biz::Baz;
     1;
-}
+};
 
 for (qw(Foo Foo:: MyClass __PACKAGE__)) {
     eval "sub \{ my $_ \$obj = shift; \}";

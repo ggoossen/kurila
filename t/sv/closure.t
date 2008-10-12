@@ -9,13 +9,13 @@
 use Config;
 require './test.pl'; # for runperl()
 
-print "1..187\n";
+print "1..133\n";
 
 my $test = 1;
 sub test (&) {
   my $ok = &{@_[0]};
   print $ok ? "ok $test\n" : "not ok $test\n";
-  printf "# Failed at line \%d\n", (caller)[[2]] unless $ok;
+  printf "# Failed at line \%d\n", @(caller)[2] unless $ok;
   $test++;
 }
 
@@ -171,7 +171,7 @@ test {
   @foo[4]->()->(4)
 };
 
-{
+do {
     my $w;
     $w = sub {
 	my ($i) = < @_;
@@ -179,17 +179,17 @@ test {
 	sub { $w };
     };
     $w->(10);
-}
+};
 
 # Additional tests by Tom Phoenix <rootbeer@teleport.com>.
 
-{
+do {
     use strict;
 
     use vars < qw!$test!;
-    my($debugging, %expected, $inner_type, $where_declared, $within);
+    my($debugging, %expected);
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
-    my($code, $inner_sub_test, $expected, $line, $errors, $output);
+    my($code, $expected, $errors, $output);
     my(@inners, $sub_test, $pid);
     $debugging = 1 if defined(@ARGV[0]) and @ARGV[0] eq '-debug';
 
@@ -204,17 +204,16 @@ test {
 	'sub_scalar'	=> 7001,
 	'sub_array'	=> 8101,
 	'sub_hash'	=> 9004,
-	'foreach'	=> 10011,
     );
 
     # Our innermost sub is either named or anonymous
-    for $inner_type (qw!named anon!) {
+    for my $inner_type (qw!named anon!) {
       # And it may be declared at filescope, within a named
       # sub, or within an anon sub
-      for $where_declared (qw!filescope in_named in_anon!) {
+      for my $where_declared (qw!filescope in_named in_anon!) {
 	# And that, in turn, may be within a foreach loop,
 	# a naked block, or another named sub
-	for $within (qw!foreach naked other_sub!) {
+	for my $within (qw!foreach other_sub!) {
 
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
@@ -258,15 +257,15 @@ END_MARK_TWO
     print "not ok: got unexpected warning \$msg\\n";
 \} \}
 
-\{
+do \{
     my \$test = $test;
     sub test (&) \{
       my \$ok = &\{\@_[0]\};
       print \$ok ? "ok \$test\n" : "not ok \$test\n";
-      printf "# Failed at line \\\%d\n", (caller)[2] unless \$ok;
+      printf "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;
     \}
-\}
+\};
 
 # some of the variables which the closure will access
 our \$global_scalar = 1000;
@@ -303,12 +302,9 @@ END
 
 	  if ($within eq 'foreach') {
 	    $code .= '
-      my $foreach = 12000;
       my @list = @(10000, 10010);
-      foreach $foreach (@list) {
+      foreach my $foreach (@list) {
     ' # }
-	  } elsif ($within eq 'naked') {
-	    $code .= "  \{ # naked block\n"	# }
 	  } elsif ($within eq 'other_sub') {
 	    $code .= "  sub inner_sub \{\n"	# }
 	  } else {
@@ -318,11 +314,10 @@ END
 	  $sub_test = $test;
 	  @inners = @( < qw!global_scalar global_array global_hash! , <
 	    qw!fs_scalar fs_array fs_hash! );
-	  push @inners, 'foreach' if $within eq 'foreach';
 	  if ($where_declared ne 'filescope') {
 	    push @inners, < qw!sub_scalar sub_array sub_hash!;
 	  }
-	  for $inner_sub_test ( @inners) {
+	  for my $inner_sub_test ( @inners) {
 
 	    if ($inner_type eq 'named') {
 	      $code .= "    sub named_$sub_test "
@@ -351,8 +346,6 @@ END
 	      $code .= '{ ++%fs_hash{6002} }'
 	    } elsif ($inner_sub_test eq 'sub_hash') {
 	      $code .= '{ ++%sub_hash{9002} }'
-	    } elsif ($inner_sub_test eq 'foreach') {
-	      $code .= '{ ++$foreach }'
 	    } else {
 	      die "What was $inner_sub_test?"
 	    }
@@ -388,7 +381,7 @@ END
 	  }
 
 	  # Now, we can actually prep to run the tests.
-	  for $inner_sub_test ( @inners) {
+	  for my $inner_sub_test ( @inners) {
 	    $expected = %expected{$inner_sub_test} or
 	      die "expected $inner_sub_test missing";
 
@@ -450,9 +443,9 @@ END
 	      close WRITE2;
 	      print PERL $code;
 	      close PERL;
-	      { local $/;
+	      do { local $/;
 	        $output = join '', @( ~< *READ);
-	        $errors = join '', @( ~< *READ2); }
+	        $errors = join '', @( ~< *READ2); };
 	      close READ;
 	      close READ2;
 	    }
@@ -469,27 +462,27 @@ END
 	      # this process, and then foul our pipe back to parent by
 	      # redirecting output in the child.
 	      open PERL, "-", "$cmd" or die "Can't open pipe: $!\n";
-	      { local $/; $output = join '', @( ~< *PERL) }
+	      do { local $/; $output = join '', @( ~< *PERL) };
 	      close PERL;
 	    } else {
 	      my $outfile = "tout$$";  $outfile++ while -e $outfile;
 	      push @tmpfiles, $outfile;
 	      system "$cmd >$outfile";
-	      { local $/; open IN, "<", $outfile; $output = ~< *IN; close IN }
+	      do { local $/; open IN, "<", $outfile; $output = ~< *IN; close IN };
 	    }
 	    if ($?) {
 	      printf "not ok: exited with error code \%04X\n", $?;
 	      $debugging or do { 1 while unlink < @tmpfiles };
 	      exit;
 	    }
-	    { local $/; open IN, "<", $errfile; $errors = ~< *IN; close IN }
+	    do { local $/; open IN, "<", $errfile; $errors = ~< *IN; close IN };
 	    1 while unlink < @tmpfiles;
 	  }
 	  print $output;
 	  print STDERR $errors;
 	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
 	    my $lnum = 0;
-	    for $line (split '\n', $code) {
+	    for my $line (split '\n', $code) {
 	      printf "\%3d:  \%s\n", ++$lnum, $line;
 	    }
 	  }
@@ -500,15 +493,15 @@ END
       }	# End of foreach $where_declared
     }	# End of foreach $inner_type
 
-}
+};
 
-{
+do {
     # The following dumps core with perl <= 5.8.0 (bugid 9535) ...
     our $some_var;
     BEGIN { our $vanishing_pad = sub { eval @_[0] } }
     $some_var = 123;
     test { our $vanishing_pad->( '$some_var' ) == 123 };
-}
+};
 
 our ($newvar, @a, $x);
 
@@ -548,36 +541,36 @@ test {1};
 
 # [perl #17605] found that an empty block called in scalar context
 # can lead to stack corruption
-{
+do {
     my $x = "foooobar";
-    $x =~ s/o/{''}/g;
+    $x =~ s/o/$('')/g;
     test { $x eq 'fbar' }
-}
+};
 
 # DAPM 24-Nov-02
 # SvFAKE lexicals should be visible thoughout a function.
 # On <= 5.8.0, the third test failed,  eg bugid #18286
 
-{
+do {
     my $x = 1;
     sub fake {
 		test { sub {eval'$x'}->() == 1 };
-	{ $x;	test { sub {eval'$x'}->() == 1 } }
+	do { $x;	test { sub {eval'$x'}->() == 1 } };
 		test { sub {eval'$x'}->() == 1 };
     }
-}
+};
 fake();
 
 # undefining a sub shouldn't alter visibility of outer lexicals
 
-{
+do {
     $x = 1;
     my $x = 2;
     sub tmp { sub { eval '$x' } }
     my $a = tmp();
     undef &tmp;
     test { $a->() == 2 };
-}
+};
 
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
@@ -596,11 +589,11 @@ sub linger {
 	sub { $y; };
     };
 }
-{
+do {
     my $watch = '1';
     linger(\$watch);
     test { $watch eq '12' }
-}
+};
 
 # bugid 10085
 # obj not freed early enough
@@ -609,36 +602,36 @@ sub linger2 {
     my $obj = Watch->new(@_[0], '2');
     sub { sub { $obj } };
 }   
-{
+do {
     my $watch = '1';
     linger2(\$watch);
     test { $watch eq '12' }
-}
+};
 
 # bugid 16302 - named subs didn't capture lexicals on behalf of inner subs
 
-{
+do {
     my $x = 1;
     sub f16302 {
 	sub {
 	    test { defined $x and $x == 1 }
 	}->();
     }
-}
+};
 f16302();
 
 # The presence of an eval should turn cloneless anon subs into clonable
 # subs - otherwise the CvOUTSIDE of that sub may be wrong
 
-{
+do {
     my %a;
     for my $x (@(7,11)) {
 	%a{$x} = sub { $x=$x; sub { eval '$x' } };
     }
     test { %a{7}->()->() + %a{11}->()->() == 18 };
-}
+};
 
-{
+do {
    # bugid #23265 - this used to coredump during destruction of PL_maincv
    # and its children
 
@@ -661,9 +654,9 @@ __EOF__
     my $got = runperl(progfile => $progfile);
     test { chomp $got; $got eq "yxx" };
     END { 1 while unlink $progfile }
-}
+};
 
-{
+do {
     # bugid #24914 = used to coredump restoring PL_comppad in the
     # savestack, due to the early freeing of the anon closure
 
@@ -671,24 +664,24 @@ __EOF__
 'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print qq(ok\n)'
     );
     test { $got eq "ok\n" };
-}
+};
 
 # After newsub is redefined outside the BEGIN, it's CvOUTSIDE should point
 # to main rather than BEGIN, and BEGIN should be freed.
 
-{
+do {
     my $flag = 0;
     sub  X::DESTROY { $flag = 1 }
-    {
+    do {
 	my $x;
 	sub newsub {};
 	BEGIN {$x = \&newsub }
 	$x = bless \%(), 'X';
-    }
+    };
     # test { $flag == 1 };
     print "not ok $test # TODO cleanup sub freeing\n";
     $test++;
-}
+};
 
 
 

@@ -33,14 +33,14 @@ is(ord("\x{1234}"), 0x1234, 'compile time ord \x{....}');
 $x = "\x{1234}";
 is(ord($x), 0x1234, 'runtime ord \x{....}');
 
-{
+do {
     my $x = "\x{101}";
     use bytes;
     is(ord($x), 196, "ord using bytes, returns the first byte");
     is(chr(256), "\x[00]", "chr using bytes, only returns modulo 0x100");
-}
+};
 
-{
+do {
     no warnings 'utf8'; # avoid Unicode warnings
 
 # The following code points are some interesting steps.
@@ -72,4 +72,4 @@ is(ord($x), 0x1234, 'runtime ord \x{....}');
     is(ord(chr(0x110000)), 0x110000, '0x110000');
     is(ord(chr(0x1FFFFF)), 0x1FFFFF, 'last four-byte char in UTF-8');
     is(ord(chr(0x200000)), 0x200000, 'first five-byte char in UTF-8');
-}
+};

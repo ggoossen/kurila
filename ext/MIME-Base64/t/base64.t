@@ -19,7 +19,6 @@ my $testno = 1;
 # instead of "for my $test (...)" , which is my preference.
 # Not sure which perl version has started supporting.  MIME::Base64
 # was supposed to work with very old perl5, right?
-my $test;
 
 encodeTest();
 decodeTest();
@@ -315,7 +314,7 @@ sub encodeTest
 
     );
 
-    for $test ( @encode_tests) {
+    for my $test ( @encode_tests) {
 	my($plain, $expected) = (@$test[0], @$test[1]);
 
 	my $encoded = encode_base64($plain, '');
@@ -358,7 +357,7 @@ sub decodeTest
         \@(undef()    => ''),
     );
 
-    for $test ( @decode_tests) {
+    for my $test ( @decode_tests) {
 	my($encoded, $expected) = (@$test[0], @$test[1]);
 
 	my $decoded = decode_base64($encoded);

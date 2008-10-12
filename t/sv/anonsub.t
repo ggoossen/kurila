@@ -64,7 +64,7 @@ sub test_invalid_decl {
 
 test_invalid_decl('sub;');
 test_invalid_decl('sub ($) ;');
-test_invalid_decl('{ $x = sub }');
+test_invalid_decl('do { my $x = sub }');
 test_invalid_decl('sub ($) && 1');
 test_invalid_decl('sub ($) : lvalue;',' # TODO');
 

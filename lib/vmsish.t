@@ -13,7 +13,7 @@ my $Invoke_Perl = qq(MCR $perl "-I[-.lib]");
 BEGIN { require "./test.pl"; }
 plan(tests => 25);
 
-SKIP: {
+SKIP: do {
     skip("tests for non-VMS only", 1) if $^O eq 'VMS';
 
     no utf8;
@@ -24,33 +24,33 @@ SKIP: {
 
     # make sure that all those 'use vmsish' calls didn't do anything.
     is( $Orig_Bits, $^H,    'use vmsish a no-op' );
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("tests for VMS only", 24) unless $^O eq 'VMS';
 
 #========== vmsish status ==========
 `$Invoke_Perl -e 1`;  # Avoid system() from a pipe from harness.  Mutter.
 is($?,0,"simple Perl invokation: POSIX success status");
-{
+do {
   use vmsish < qw(status);
   is(($? ^&^ 1),1, "importing vmsish [vmsish status]");
-  {
+  do {
     no vmsish < qw(status); # check unimport function
     is($?,0, "unimport vmsish [POSIX STATUS]");
-  }
+  };
   # and lexical scoping
   is(($? ^&^ 1),1,"lex scope of vmsish [vmsish status]");
-}
+};
 is($?,0,"outer lex scope of vmsish [POSIX status]");
 
-{
+do {
   use vmsish < qw(exit);  # check import function
   is($?,0,"importing vmsish exit [POSIX status]");
-}
+};
 
 #========== vmsish exit, messages ==========
-{
+do {
   use vmsish < qw(status);
 
   my $msg = do_a_perl('-e "exit 1"');
@@ -102,11 +102,11 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
   $msg =~ s/\n/\\n/g; # keep output on one line
   ok(($msg !~ m/ABORT/),"compile ERR exit, vmsish hushed, DCL error message check");
   unlink 'vmsish_test.pl';
-}
+};
 
 
 #========== vmsish time ==========
-{
+do {
   my($utctime, @utclocal, @utcgmtime, $utcmtime,
      $vmstime, @vmslocal, @vmsgmtime, $vmsmtime,
      $utcval,  $vmaval, $offset);
@@ -128,7 +128,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
   close TMP;
   END { 1 while unlink $file; }
 
-  {
+  do {
      use_ok('vmsish qw(time)');
 
      # but that didn't get it in our current scope
@@ -138,7 +138,7 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
      @vmslocal  = @( localtime($vmstime) );
      @vmsgmtime = @( gmtime($vmstime) );
      $vmsmtime  = (stat $file)[[9]];
-  }
+  };
   $utctime   = time;
   @utclocal  = @( localtime($vmstime) );
   @utcgmtime = @( gmtime($vmstime) );
@@ -157,18 +157,18 @@ is($?,0,"outer lex scope of vmsish [POSIX status]");
   my $vmsval = @vmslocal[5] * 31536000 + @vmslocal[7] * 86400 +
             @vmslocal[2] * 3600     + @vmslocal[1] * 60 + @vmslocal[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(localtime) UTC: $utcval  VMS: $vmsval");
-  print "# UTC: {join ' ',@utclocal}\n# VMS: {join ' ',@vmslocal}\n";
+  print "# UTC: $(join ' ',@utclocal)\n# VMS: $(join ' ',@vmslocal)\n";
 
   $utcval = @utcgmtime[5] * 31536000 + @utcgmtime[7] * 86400 +
             @utcgmtime[2] * 3600     + @utcgmtime[1] * 60 + @utcgmtime[0];
   $vmsval = @vmsgmtime[5] * 31536000 + @vmsgmtime[7] * 86400 +
             @vmsgmtime[2] * 3600     + @vmsgmtime[1] * 60 + @vmsgmtime[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(gmtime) UTC: $utcval  VMS: $vmsval");
-  print "# UTC: {join ' ',@utcgmtime}\n# VMS: {join ' ',@vmsgmtime}\n";
+  print "# UTC: $(join ' ',@utcgmtime)\n# VMS: $(join ' ',@vmsgmtime)\n";
 
   ok(abs($utcmtime - $vmsmtime + $offset) +<= 10,"(stat) UTC: $utcmtime  VMS: $vmsmtime");
-}
-}
+};
+};
 
 #====== need this to make sure error messages come out, even if
 #       they were turned off in invoking procedure
@@ -177,7 +177,7 @@ sub do_a_perl {
     open(P, ">",'vmsish_test.com') || die('not ok ?? : unable to open "vmsish_test.com" for writing');
     print P "\$ set message/facil/sever/ident/text\n";
     print P "\$ define/nolog/user sys\$error _nla0:\n";
-    print P "\$ $Invoke_Perl {join ' ',@_}\n";
+    print P "\$ $Invoke_Perl $(join ' ',@_)\n";
     close P;
     my $x = `\@vmsish_test.com`;
     unlink 'vmsish_test.com';

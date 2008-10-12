@@ -630,8 +630,7 @@ sub write_linker_script {
       < @{delete %spec{startup} || \@()};
   }
 
-  print SCRIPT 'INPUT(' . join( ',', @{delete %spec{objects}  || \@()}
-  ) . ")\n";
+  print SCRIPT 'INPUT(' . join( ',', @{delete %spec{objects}  || \@()} ) . ")\n";
 
   print SCRIPT 'INPUT(' . join( ' ', @(
      (delete %spec{libperl}  || ''),

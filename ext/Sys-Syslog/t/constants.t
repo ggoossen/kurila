@@ -14,19 +14,19 @@ plan tests => (nelems @names) * 2 + 2;
 my $callpack = my $testpack = 'Sys::Syslog';
 eval "use $callpack";
 
-eval "{$callpack}::This()";
+eval "$($callpack)::This()";
 like( $@->{description}, "/^Undefined subroutine/", "trying a non-existing macro");
 
-eval "{$callpack}::NOSUCHNAME()";
+eval "$($callpack)::NOSUCHNAME()";
 like( $@->{description}, "/^Undefined subroutine/", "trying a non-existing macro");
 
 # Testing all macros
 if((nelems @names)) {
     for my $name ( @names) {
-        SKIP: {
+        SKIP: do {
             $name =~ m/^(\w+)$/ or skip "invalid name '$name'", 2;
             $name = $1;
-            my $v = eval "{$callpack}::$name()";
+            my $v = eval "$($callpack)::$name()";
 
             if(defined $v and $v =~ m/^\d+$/) {
                 is( $@, '', "calling the constant $name as a function" );
@@ -37,6 +37,6 @@ if((nelems @names)) {
                     "calling the constant via its name" );
                 skip "irrelevant test in this case", 1
             }
-        }
+        };
     }
 }

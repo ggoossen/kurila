@@ -13,10 +13,10 @@ use warnings;
 
 my ($cSH, $ch, < @ch, < %ch) = ("config_h.SH");
 open $ch, "<", "$cSH" or die "Cannot open $cSH: $!\n";
-{   local $/ = "\n\n";
+do {   local $/ = "\n\n";
     @ch = @( ~< $ch );
     close  $ch;
-    }
+    };
 
 sub ch_index ()
 {

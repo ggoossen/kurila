@@ -431,7 +431,7 @@ use abc;
 try { 
   abc::check() ; 
 } ;
-print "[[{$@->message}]]\n";
+print "[[$($@->message)]]\n";
 EXPECT
 [[hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
@@ -728,7 +728,7 @@ use warnings < qw( FATAL abc ) ;
 try { 
   abc::check() ; 
   } ;
-print "[[{$@->message}]]\n";
+print "[[$($@->message)]]\n";
 EXPECT
 [[hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.

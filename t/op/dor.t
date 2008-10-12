@@ -31,15 +31,19 @@ $x = '';
 $x //= 0;
 is($x, '', 		'//=: left-hand operand defined but empty');
 
-@ARGV = @(undef, 0, 3);
-is(shift       // 7, 7,	'shift // ... works');
-is(shift()     // 7, 0,	'shift() // ... works');
-is(shift @ARGV // 7, 3,	'shift @array // ... works');
+aap(undef, 0, 3);
+sub aap {
+    is(shift       // 7, 7,	'shift // ... works');
+    is(shift()     // 7, 0,	'shift() // ... works');
+    is(shift @_ // 7, 3,	'shift @array // ... works');
+}
 
-@ARGV = @(3, 0, undef);
-is(pop         // 7, 7,	'pop // ... works');
-is(pop()       // 7, 0,	'pop() // ... works');
-is(pop @ARGV   // 7, 3,	'pop @array // ... works');
+noot(3, 0, undef);
+sub noot {
+    is(pop         // 7, 7,	'pop // ... works');
+    is(pop()       // 7, 0,	'pop() // ... works');
+    is(pop @_   // 7, 3,	'pop @array // ... works');
+}
 
 # Test that various syntaxes are allowed
 

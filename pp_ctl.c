@@ -386,17 +386,19 @@ PP(pp_grepstart)
 {
     dVAR; dSP;
     SV *srcitem;
+    SV *src;
+    SV *dst;
 
     if (PL_stack_base + *PL_markstack_ptr == SP) {
 	(void)POPMARK;
-	mXPUSHs(newAV());
+	mXPUSHs(AvSV(newAV()));
 	RETURNOP(PL_op->op_next->op_next);
     }
 
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
 
-    SV* src = sv_mortalcopy(POPs);
-    SV* dst = sv_2mortal(newAV());
+    src = sv_mortalcopy(POPs);
+    dst = sv_2mortal(AvSV(newAV()));
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
@@ -446,13 +448,11 @@ PP(pp_mapwhile)
     dVAR; dSP;
     const I32 gimme = GIMME_V;
     I32 items = (SP - PL_stack_base) - *PL_markstack_ptr; /* how many new items */
-    I32 count;
-    I32 shift;
-    SV** src;
+    AV* src;
     SV** dst;
 
     dst = PL_stack_base + PL_markstack_ptr[-1] + 0;
-    src = PL_stack_base + PL_markstack_ptr[-1] + 1;
+    src = SvAV(*(PL_stack_base + PL_markstack_ptr[-1] + 1));
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
@@ -465,7 +465,7 @@ PP(pp_mapwhile)
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if ( av_len(*src) == -1 ) {
+    if ( av_len(src) == -1 ) {
 
 	(void)POPMARK;				/* pop top */
 	LEAVE;					/* exit outer scope */
@@ -483,7 +483,7 @@ PP(pp_mapwhile)
 	SAVEVPTR(PL_curpm);
 
 	/* set $_ to the new source item */
-	srcitem = av_shift(*src);
+	srcitem = av_shift(src);
 	if (PL_op->op_private & OPpGREP_LEX)
 	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem)
 	else
@@ -524,7 +524,7 @@ PP(pp_flop)
 {
     dVAR; dSP;
 
-    AV* res = sv_2mortal(newAV());
+    AV* res = av_2mortal(newAV());
     dPOPPOPssrl;
 
     SvGETMAGIC(left);
@@ -562,7 +562,7 @@ PP(pp_flop)
 	}
     }
 
-    XPUSHs(res);
+    XPUSHs(AvSV(res));
     RETURN;
 }
 
@@ -939,18 +939,12 @@ PP(pp_caller)
     if (!MAXARG)
 	RETURN;
     if (CxTYPE(cx) == CXt_SUB) {
-	GV * const cvgv = CvGV(ccstack[cxix].blk_sub.cv);
-	/* So is ccstack[dbcxix]. */
-	if (isGV(cvgv)) {
-	    SV * const sv = newSV(0);
-	    gv_efullname3(sv, cvgv, NULL);
-	    mPUSHs(sv);
-	    PUSHs(boolSV(CxHASARGS(cx)));
-	}
-	else {
-	    PUSHs(newSVpvs_flags("(unknown)", SVs_TEMP));
-	    PUSHs(boolSV(CxHASARGS(cx)));
-	}
+	CV* cv = cx->blk_sub.cv;
+	SV** name = NULL;
+	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
+	    name = av_fetch(SvAV(SvLOCATION(cv)), 3, FALSE);
+	mPUSHs( name ? newSVsv(*name) : &PL_sv_undef );
+	PUSHs(boolSV(CxHASARGS(cx)));
     }
     else {
 	PUSHs(newSVpvs_flags("(eval)", SVs_TEMP));
@@ -1623,18 +1617,7 @@ PP(pp_goto)
 	    I32 oldsave;
 	    bool reified = 0;
 
-	retry:
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
-		const GV * const gv = CvGV(cv);
-		if (gv) {
-		    SV *tmpstr;
-		    /* autoloaded stub? */
-		    if (cv != GvCV(gv) && (cv = GvCV(gv)))
-			goto retry;
-		    tmpstr = sv_newmortal();
-		    gv_efullname3(tmpstr, gv, NULL);
-		    DIE(aTHX_ "Goto undefined subroutine &%"SVf"", SVfARG(tmpstr));
-		}
 		DIE(aTHX_ "Goto undefined subroutine");
 	    }
 
@@ -1664,8 +1647,6 @@ PP(pp_goto)
 		items = AvFILLp(av) + 1;
 		EXTEND(SP, items+1); /* @_ could have been extended. */
 		Copy(AvARRAY(av), SP + 1, items, SV*);
-		SvREFCNT_dec(GvAV(PL_defgv));
-		GvAV(PL_defgv) = cx->blk_sub.savearray;
 		CLEAR_ARGARRAY(av);
 		/* abandon @_ if it got reified */
 		if (AvREAL(av)) {
@@ -1737,8 +1718,6 @@ PP(pp_goto)
 		{
 		    AV* const av = (AV*)PAD_SVl(0);
 
-		    cx->blk_sub.savearray = GvAV(PL_defgv);
-		    GvAV(PL_defgv) = (AV*)SvREFCNT_inc_simple(av);
 		    CX_CURPAD_SAVE(cx->blk_sub);
 		    cx->blk_sub.argarray = av;
 
@@ -1946,31 +1925,6 @@ PP(pp_exit)
 
 /* Eval. */
 
-STATIC void
-S_save_lines(pTHX_ AV *array, SV *sv)
-{
-    const char *s = SvPVX_const(sv);
-    const char * const send = SvPVX_const(sv) + SvCUR(sv);
-    I32 line = 1;
-
-    PERL_ARGS_ASSERT_SAVE_LINES;
-
-    while (s && s < send) {
-	const char *t;
-	SV * const tmpstr = newSV_type(SVt_PVMG);
-
-	t = strchr(s, '\n');
-	if (t)
-	    t++;
-	else
-	    t = send;
-
-	sv_setpvn(tmpstr, s, t - s);
-	av_store(array, line++, tmpstr);
-	s = t;
-    }
-}
-
 STATIC OP *
 S_docatch(pTHX_ OP *o)
 {
@@ -2079,7 +2033,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
-    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : newAV();
+    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : AvSV(newAV());
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 
@@ -3438,7 +3392,6 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
     STRLEN got_len;
     const char *got_p = NULL;
     const char *prune_from = NULL;
-    bool read_from_cache = FALSE;
     STRLEN umaxlen;
 
     PERL_ARGS_ASSERT_RUN_USER_FILTER;

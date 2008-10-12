@@ -37,7 +37,7 @@ sub bits ($) {
 }
 
 # First, let's see whether randbits is set right
-{
+do {
     my($max, $min, $sum);	# Characteristics of rand
     my($off, $shouldbe);	# Problems with randbits
     my($dev, $bits);		# Number of one bits
@@ -197,11 +197,11 @@ DIAG
     print "#\n# If you are having random number troubles,\n";
     print "# see the hints within the test script for more\n";
     printf "# information on why this might fail. [ %.3f ]\n", $dev;
-}
+};
 
 
 # Now, let's see whether rand accepts its argument
-{
+do {
     my($max, $min);
     $max = $min = rand(100);
     for (1..$reps) {
@@ -235,5 +235,5 @@ DIAG
     # rand($_). (In case somebody got overzealous.)
     # 
     ok($r +< 1,        'rand() without args is under 1');
-}
+};
 

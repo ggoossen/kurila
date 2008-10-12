@@ -3,7 +3,7 @@
 use Test < qw(plan ok);
 plan tests => 12;
 
-{
+do {
    package LenDigest;
    require Digest::base;
    use vars < qw(@ISA);
@@ -28,7 +28,7 @@ plan tests => 12;
 	$$self = "";
 	return sprintf "$first\%04d", $len;
    }
-}
+};
 
 my $ctx = LenDigest->new;
 ok($ctx->digest, "X0000");

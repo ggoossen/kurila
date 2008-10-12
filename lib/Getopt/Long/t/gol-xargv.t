@@ -32,4 +32,4 @@ print (((nelems @argv) == 1)         ? "" : "not ", "ok 6\n");
 print ((@argv[0] eq "bar")  ? "" : "not ", "ok 7\n");
 print (!(defined $opt_baR)  ? "" : "not ", "ok 8\n");
 print (!(defined $opt_bar)  ? "" : "not ", "ok 9\n");
-print ("{join ' ',@ARGV}" eq "foo bar" ? "" : "not ", "ok 10\n");
+print ("$(join ' ',@ARGV)" eq "foo bar" ? "" : "not ", "ok 10\n");

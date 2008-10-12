@@ -36,7 +36,7 @@ sub foo {
     $z = $x - $y;
 }
 
-{
+do {
 
     # Pragmas don't appear til they're used.
     my $cop = find_op_cop( \&foo, qr/multiply/ );
@@ -46,9 +46,9 @@ sub foo {
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
     ok( not( exists $hints_hash->{mypragma} ), q[! exists mypragma] );
-}
+};
 
-{
+do {
 
     # Pragmas can be fetched.
     my $cop = find_op_cop( \&foo, qr/add/ );
@@ -58,9 +58,9 @@ sub foo {
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
     is( $hints_hash->{mypragma}, 42, q[mypragma => 42] );
-}
+};
 
-{
+do {
 
     # Pragmas can be changed.
     my $cop = find_op_cop( \&foo, qr/subtract/ );
@@ -70,7 +70,7 @@ sub foo {
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
     is( $hints_hash->{mypragma}, 0, q[mypragma => 0] );
-}
+};
 exit;
 
 our $COP;

@@ -50,10 +50,10 @@ sub MY::postamble
     my $postamble = '
 
 MyTrebleCheck:
-	@echo Checking for $$^W in files: '. "{join ' ',@files}" . q|
+	@echo Checking for $$^W in files: '. "$(join ' ',@files)" . q|
 	@perl -ne '						\
 	    exit 1 if /^\s*local\s*\(\s*\$$\^W\s*\)/;		\
-         ' | . " {join ' ',@files} || " . '				\
+         ' | . " $(join ' ',@files) || " . '				\
 	(echo found unexpected $$^W ; exit 1)
 	@echo All is ok.
 
@@ -166,7 +166,7 @@ sub UpDowngrade
 	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
                 my $vars = join ' ', split m/\s*,\s*/, $2;
-                $_ = "{$indent}use vars qw($vars);\n";
+                $_ = "$($indent)use vars qw($vars);\n";
             }
 	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {
@@ -179,7 +179,7 @@ sub UpDowngrade
 	    if ( m/^(\s*)use\s+vars\s+qw\((.*?)\)/ ) {
                 my $indent = $1;
                 my $vars = join ', ', split ' ', $2;
-                $_ = "{$indent}our ($vars);\n";
+                $_ = "$($indent)our ($vars);\n";
             }
 	    elsif ( m/^(\s*)#\s*((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {
@@ -198,7 +198,7 @@ sub UpDowngrade
 
     foreach ( @files) {
         #if (-l $_ )
-          { doUpDown($our_sub, $warn_sub, $_) }
+          do { doUpDown($our_sub, $warn_sub, $_) };
           #else  
           #{ doUpDownViaCopy($our_sub, $warn_sub, $_) }
     }
@@ -251,7 +251,7 @@ sub doUpDownViaCopy
 
     my @keep = @( () );
 
-    {
+    do {
         open F, "<", "$file"
             or die "Cannot open $file: $!\n" ;
         while ( ~< *F)
@@ -273,14 +273,14 @@ sub doUpDownViaCopy
               { push @keep, $_ }
         }
         close F;
-    }
+    };
 
-    {
+    do {
         open F, ">", "$file"
             or die "Cannot open $file: $!\n";
         print F < @keep ;
         close F;
-    }
+    };
 }
 
 package MakeUtil ;

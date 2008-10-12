@@ -63,7 +63,7 @@ for ( @prgs){
     $results =~ s/^\n*Process terminated by SIG\w+\n?//mg
 	if $^O eq 'os2';
     my @results = sort split m/\n/, $results;
-    if ( "{join ' ',@results}" ne "{join ' ',@expected}" ) {
+    if ( "$(join ' ',@results)" ne "$(join ' ',@expected)" ) {
 	print STDERR "PROG: $switch\n$prog\n";
 	print STDERR "EXPECTED:\n$expected\n";
 	print STDERR "GOT:\n$results\n";
@@ -179,7 +179,7 @@ for (@a) {
 	$_ = "-$_-";
     }
 }
-print "{join ' ', @a}\n";
+print "$(join ' ', @a)\n";
 EXPECT
 parent 1
 child 1

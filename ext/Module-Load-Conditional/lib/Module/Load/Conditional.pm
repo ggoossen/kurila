@@ -264,13 +264,13 @@ sub check_install {
 
     ### only complain if we're expected to find a version higher than 0.0 anyway
     if( $FIND_VERSION and not defined $href->{version} ) {
-        {   ### don't warn about the 'not numeric' stuff ###
+        do {   ### don't warn about the 'not numeric' stuff ###
             local $^W;
 
             ### if we got here, we didn't find the version
             warn < loc(q[Could not check version on '%1'], $args->{module} )
                     if $args->{verbose} and $args->{version} +> 0;
-        }
+        };
         $href->{uptodate} = 1;
 
     } else {
@@ -412,7 +412,7 @@ sub can_load {
     $CACHE ||= \%(); # in case it was undef'd
 
     my $error;
-    BLOCK: {
+    BLOCK: do {
         my $href = $args->{modules};
 
         my @load;
@@ -479,7 +479,7 @@ sub can_load {
             }
         }
 
-    } # BLOCK
+    }; # BLOCK
 
     if( defined $error ) {
         $ERROR = $error;

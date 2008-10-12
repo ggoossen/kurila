@@ -8,14 +8,14 @@ ok 1;
 print "# --- Making sure that Perl globals are localized ---\n";
 
 # declare a class...
-{
+do {
   package Woozle;
   our @ISA = @('Locale::Maketext');
   our %Lexicon = %(
     _AUTO => 1
   );
   keys %Lexicon; # dodges the 'used only once' warning
-}
+};
 
 my $lh;
 print "# Basic sanity:\n";

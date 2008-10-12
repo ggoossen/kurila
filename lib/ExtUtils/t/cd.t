@@ -19,14 +19,14 @@ use Test::More tests => 4;
 
 my @cd_args = @("some/dir", "command1", "command2");
 
-{
+do {
     package Test::MM_Win32;
     use ExtUtils::MM_Win32;
     our @ISA = qw(ExtUtils::MM_Win32);
 
     my $mm = bless \%(), 'Test::MM_Win32';
 
-    {
+    do {
         local *make = sub { "nmake" };
 
         my @dirs = @( (File::Spec->updir) x 2 );
@@ -37,24 +37,24 @@ qq{cd some/dir
 	command1
 	command2
 	cd $expected_updir};
-    }
+    };
     
-    {
+    do {
         local *make = sub { "dmake" };
 
         main::is $mm->cd(< @cd_args),
 q{cd some/dir && command1
 	cd some/dir && command2};
-    }
-}
+    };
+};
 
-{
+do {
     is +ExtUtils::MM_Unix->cd(< @cd_args),
 q{cd some/dir && command1
 	cd some/dir && command2};
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("VMS' cd requires vmspath which is only on VMS", 1) unless $Is_VMS;
     
     use ExtUtils::MM_VMS;
@@ -64,4 +64,4 @@ q{startdir = F$Environment("Default")
 	command1
 	command2
 	Set Default 'startdir'};
-}
+};

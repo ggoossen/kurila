@@ -244,8 +244,8 @@ unless ($^O eq 'MacOS') {
   }
   # Special case O_EXLOCK
   $LOCKFLAG = try {
-    local %SIG{__DIE__} = sub {};
-    local %SIG{__WARN__} = sub {};
+    local $^DIE_HOOK = sub {};
+    local $^WARN_HOOK = sub {};
     &Fcntl::O_EXLOCK();
   };
 }
@@ -487,7 +487,7 @@ sub _gettemp {
 
 
   # Now try MAX_TRIES time to open the file
-  for (my $i = 0; $i +< MAX_TRIES; $i++) {
+  for my $i ( 0 .. MAX_TRIES -1) {
 
     # Try to open the file if requested
     if (%options{"open"}) {
@@ -624,10 +624,10 @@ sub _replace_XX {
   # Alternatively, could simply set $ignore to length($path)-1
   # Don't want to always use substr when not required though.
   if ($ignore) {
-      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/{@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ]}/g;
+      (my $x = substr($path, 0, - $ignore)) =~ s/X(?=X*\z)/$(@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ])/g;
       substr($path, 0, - $ignore, $x);
   } else {
-    $path =~ s/X(?=X*\z)/{@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ]}/g;
+    $path =~ s/X(?=X*\z)/$(@CHARS[ int( rand( ((nelems @CHARS)-1) ) ) ])/g;
   }
   return $path;
 }
@@ -691,8 +691,8 @@ sub _is_safe {
   # use 022 to check writability
   # Do it with S_IWOTH and S_IWGRP for portability (maybe)
   # mode is in info[2]
-  if ((@info[2] ^&^ &Fcntl::S_IWGRP) ||   # Is group writable?
-      (@info[2] ^&^ &Fcntl::S_IWOTH) ) {  # Is world writable?
+  if ((@info[2] ^&^ &Fcntl::S_IWGRP( < @_ )) ||   # Is group writable?
+      (@info[2] ^&^ &Fcntl::S_IWOTH( < @_ )) ) {  # Is world writable?
     # Must be a directory
     unless (-d $path) {
       $$err_ref = "Path ($path) is not a directory"
@@ -845,7 +845,7 @@ sub _can_do_level {
 
 # Status is not referred to since all the magic is done with an END block
 
-{
+do {
   # Will set up two lexical variables to contain all the files to be
   # removed. One array for files, another for directories They will
   # only exist in this block.
@@ -953,7 +953,7 @@ sub _can_do_level {
   }
 
 
-}
+};
 
 =head1 OBJECT-ORIENTED INTERFACE
 
@@ -1977,14 +1977,14 @@ sub cmpstat {
   # closed the file. Can not turn off warnings without using $^W
   # unless we upgrade to 5.006 minimum requirement
   my @fh;
-  {
+  do {
     local ($^W) = 0;
     @fh = @( stat $fh );
-  }
+  };
   return unless (nelems @fh);
 
   if (@fh[3] +> 1 && $^W) {
-    carp "unlink0: fstat found too many links; SB={join ' ',@fh}" if $^W;
+    carp "unlink0: fstat found too many links; SB=$(join ' ',@fh)" if $^W;
   }
 
   # Stat the path
@@ -1997,7 +1997,7 @@ sub cmpstat {
 
   # this is no longer a file, but may be a directory, or worse
   unless (-f $path) {
-    confess "panic: $path is no longer a file: SB={join ' ',@fh}";
+    confess "panic: $path is no longer a file: SB=$(join ' ',@fh)";
   }
 
   # Do comparison of each member of the array
@@ -2170,7 +2170,7 @@ simply examine the return value of C<safe_level>.
 
 =cut
 
-{
+do {
   # protect from using the variable itself
   my $LEVEL = STANDARD;
   sub safe_level {
@@ -2187,7 +2187,7 @@ simply examine the return value of C<safe_level>.
     }
     return $LEVEL;
   }
-}
+};
 
 =item TopSystemUID
 
@@ -2210,7 +2210,7 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
 
 =cut
 
-{
+do {
   my $TopSystemUID = 10;
   $TopSystemUID = 197108 if $^O eq 'interix'; # "Administrator"
   sub top_system_uid {
@@ -2223,7 +2223,7 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
     }
     return $TopSystemUID;
   }
-}
+};
 
 =item B<$KEEP_ALL>
 

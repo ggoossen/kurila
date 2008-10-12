@@ -464,7 +464,7 @@ sub eliminate_macros {
             $npath = "$head$macro$tail";
         }
     }
-    if ($complex) { $npath =~ s#\cB(.*?)\cB#\${$1}#gs; }
+    if ($complex) { $npath =~ s#\cB(.*?)\cB#\$$1#gs; }
     $npath;
 }
 

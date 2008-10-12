@@ -58,7 +58,7 @@ print <<__EOH__;
 # UTF8_STDIN = $UTF8_STDIN
 __EOH__
 
-SKIP: {
+SKIP: do {
     # FIXME - more of these could be tested without Encode or full perl
     skip("This perl does not have Encode", $NTEST)
 	unless " %Config{extensions} " =~ m/ Encode /;
@@ -107,7 +107,7 @@ SKIP: {
 	}
 	my $n = scalar @$expected;
 	is(scalar @$result, $n, "$id - layers == $n");
-	for (my $i = 0; $i +< $n; $i++) {
+	for my $i (0 .. $n -1) {
 	    my $j = $expected->[$i];
 	    if (ref $j eq 'CODE') {
 		ok($j->($result->[$i]), "$id - $i is ok");
@@ -194,7 +194,7 @@ SKIP: {
 
     close F;
 
-    {
+    do {
 	use open(IN => ":crlf", OUT => ":encoding(cp1252)");
 
 	open F, "<", "afile";
@@ -210,7 +210,7 @@ SKIP: {
 
 	close F;
 	close G;
-    }
+    };
 
     # Check that PL_sigwarn's reference count is correct, and that 
     # &PerlIO::Layer::NoWarnings isn't prematurely freed.
@@ -220,4 +220,4 @@ print ref *PerlIO::Layer::NoWarnings{CODE};
 EOT
 
     1 while unlink "afile";
-}
+};

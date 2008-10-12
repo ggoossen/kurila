@@ -582,8 +582,8 @@ sub _mkpath {
     my $paths = shift;
 
     local($")=$Is_MacOS ? ":" : "/";
-    my(@created,$path);
-    foreach $path ( @$paths) {
+    my(@created);
+    foreach my $path ( @$paths) {
         next unless length($path);
 	$path .= '/' if $^O eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
 	# Logic wants Unix paths, so go with the flow.
@@ -828,7 +828,7 @@ sub _rmtree {
                 }
             print "unlink $canon\n" if $arg->{verbose};
 	    # delete all versions under VMS
-	    for (;;) {
+	    while (1) {
                 if (unlink $root) {
                     push @{${$arg->{result}}}, $root if $arg->{result};
                 }

@@ -62,28 +62,28 @@ T_SVREF
 	    $var = (SV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a reference\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\")
 T_AVREF
 	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
 	    $var = (AV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not an array reference\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\")
 T_HVREF
 	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
 	    $var = (HV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a hash reference\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\")
 T_CVREF
 	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVCV)
 	    $var = (CV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a code reference\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\")
 T_SYSRET
 	$var NOT IMPLEMENTED
@@ -128,44 +128,44 @@ T_PTRREF
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a reference\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\")
 T_REF_IV_REF
-	if (sv_isa($arg, \"{$ntype}\")) \{
+	if (sv_isa($arg, \"$($ntype)\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type *, tmp);
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_REF_IV_PTR
-	if (sv_isa($arg, \"{$ntype}\")) \{
+	if (sv_isa($arg, \"$($ntype)\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type, tmp);
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_PTROBJ
-	if (sv_derived_from($arg, \"{$ntype}\")) \{
+	if (sv_derived_from($arg, \"$($ntype)\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = INT2PTR($type,tmp);
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_PTRDESC
-	if (sv_isa($arg, \"{$ntype}\")) \{
+	if (sv_isa($arg, \"$($ntype)\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    {$type}_desc = (\U{$type}_DESC\E*) tmp;
 	    $var = {$type}_desc->ptr;
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_REFREF
 	if (SvROK($arg)) \{
@@ -174,16 +174,16 @@ T_REFREF
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a reference\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\")
 T_REFOBJ
-	if (sv_isa($arg, \"{$ntype}\")) \{
+	if (sv_isa($arg, \"$($ntype)\")) \{
 	    IV tmp = SvIV((SV*)SvRV($arg));
 	    $var = *INT2PTR($type,tmp);
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			{$ALIAS?q[GvNAME(CvGV(cv))]:qq[\"$pname\"]},
+			$($ALIAS?q[SvPVX_const(SvNAME(cv))]:qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_OPAQUE
 	$var = *($type *)SvPV_nolen($arg)
@@ -268,13 +268,13 @@ T_PTR
 T_PTRREF
 	sv_setref_pv($arg, Nullch, (void*)$var);
 T_REF_IV_REF
-	sv_setref_pv($arg, \"{$ntype}\", (void*)new $ntype($var));
+	sv_setref_pv($arg, \"$($ntype)\", (void*)new $ntype($var));
 T_REF_IV_PTR
-	sv_setref_pv($arg, \"{$ntype}\", (void*)$var);
+	sv_setref_pv($arg, \"$($ntype)\", (void*)$var);
 T_PTROBJ
-	sv_setref_pv($arg, \"{$ntype}\", (void*)$var);
+	sv_setref_pv($arg, \"$($ntype)\", (void*)$var);
 T_PTRDESC
-	sv_setref_pv($arg, \"{$ntype}\", (void*)new\U{$type}_DESC\E($var));
+	sv_setref_pv($arg, \"$($ntype)\", (void*)new\U{$type}_DESC\E($var));
 T_REFREF
 	NOT_IMPLEMENTED
 T_REFOBJ

@@ -35,7 +35,7 @@ BEGIN {
     use_ok( 'ExtUtils::Command' );
 }
 
-{
+do {
     # concatenate this file with itself
     # be extra careful the regex doesn't match itself
     my $out = '';
@@ -105,7 +105,7 @@ BEGIN {
     eqtime();
     ok( -s $Testfile, "eqtime doesn't clear the file being equalized" );
 
-    SKIP: {
+    SKIP: do {
         if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' ||
             $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
             $^O eq 'MacOS'
@@ -133,7 +133,7 @@ BEGIN {
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
             ($^O eq 'vos' ? 0700 : 0200), 'change a file to write-only' );
-    }
+    };
 
     # change a file to read-write
     @ARGV = @( '0600', $Testfile );
@@ -145,7 +145,7 @@ BEGIN {
         ($^O eq 'vos' ? 0700 : 0600), 'change a file to read-write' );
 
 
-    SKIP: {
+    SKIP: do {
         if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' ||
             $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
             $^O eq 'MacOS' || $^O eq 'vos'
@@ -181,7 +181,7 @@ BEGIN {
         @ARGV = @('testdir');
         rm_rf;
         ok( ! -e 'testdir', 'rm_rf can delete a read-only dir' );
-    }
+    };
 
 
     # mkpath
@@ -226,7 +226,7 @@ BEGIN {
     like( $@->{description}, qr/Too many arguments/, 'mv croaks on error' );
 
     # Test expand_wildcards()
-    {
+    do {
         my $file = $Testfile;
         @ARGV = @( () );
         chdir 'ecmddir';
@@ -247,7 +247,7 @@ BEGIN {
         is_deeply( \@ARGV, \@($file), 'expanded wildcard * successfully' );
 
         chdir File::Spec->updir;
-    }
+    };
 
     # remove some files
     my @files = @( @ARGV = @( File::Spec->catfile( 'ecmddir', $Testfile ),
@@ -260,10 +260,10 @@ BEGIN {
     @ARGV = @( my $dir = File::Spec->catfile( 'ecmddir' ) );
     rm_rf();
     ok( ! -e $dir, "removed $dir successfully" );
-}
+};
 
-{
-    { local @ARGV = @( 'd2utest' ); mkpath; }
+do {
+    do { local @ARGV = @( 'd2utest' ); mkpath; };
     open(FILE, ">", 'd2utest/foo');
     binmode(FILE);
     print FILE "stuff\015\012and thing\015\012";
@@ -288,7 +288,7 @@ BEGIN {
     ok( -B 'd2utest/bar' );
     is( join('', @( ~< *FILE)), $bin, 'dos2unix preserves binaries');
     close FILE;
-}
+};
 
 END {
     1 while unlink $Testfile, 'newfile';

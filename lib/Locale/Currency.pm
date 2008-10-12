@@ -103,7 +103,7 @@ sub all_currency_names
 #=======================================================================
 # initialisation code - stuff the DATA into the CODES hash
 #=======================================================================
-{
+do {
     my    $code;
     my    $currency;
     local $_;
@@ -119,7 +119,7 @@ sub all_currency_names
     }
 
     close(DATA);
-}
+};
 
 1;
 

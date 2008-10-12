@@ -273,7 +273,7 @@ is( $err, <<ERR,        '  right diagnostic');
 #   Failed test at $0 line 286.
 #     Structures begin differing at:
 #          \$got = 23
-#     \$expected = {dump::view($ref)}
+#     \$expected = $(dump::view($ref))
 ERR
 
 #line 296
@@ -282,7 +282,7 @@ is( $out, "not ok 22\n", 'ref vs scalar' );
 is( $err, <<ERR,        '  right diagnostic');
 #   Failed test at $0 line 296.
 #     Structures begin differing at:
-#          \$got = {dump::view($ref)}
+#          \$got = $(dump::view($ref))
 #     \$expected = 23
 ERR
 
@@ -298,7 +298,7 @@ ERR
 
 
 # rt.cpan.org 8865
-{
+do {
     my $array = \@();
     my $hash  = \%();
 
@@ -324,12 +324,12 @@ ERRHEAD
 #     ${$expected->[0]} = %(HASH (TODO))
 ERR
 
-}
+};
 
 
 # rt.cpan.org 14746
-{
-  TODO: {
+do {
+  TODO: do {
         $TB->todo_skip("different subs", 2);
         last TODO;
 
@@ -342,13 +342,13 @@ ERR
 #          \\\$got = CODE\\(0x[0-9a-f]+\\)
 #     \\\$expected = CODE\\(0x[0-9a-f]+\\)
 ERR
-    }
+    };
 
     use Symbol;
     my $glob1 = gensym;
     my $glob2 = gensym;
 
-  TODO: {
+  TODO: do {
         $TB->todo_skip("different subs", 2);
         last TODO;
 #line 357
@@ -361,5 +361,5 @@ ERR
 #     \\\$expected = GLOB\\(0x[0-9a-f]+\\)
 ERR
 
-    }
-}
+    };
+};

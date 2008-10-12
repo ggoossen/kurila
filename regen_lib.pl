@@ -21,8 +21,7 @@ sub safer_unlink {
   my @names = @_;
   my $cnt = 0;
 
-  my $name;
-  foreach $name ( @names) {
+  foreach my $name ( @names) {
     next unless -e $name;
     chmod 0777, $name if $Needs_Write;
     ( CORE::unlink($name) and ++$cnt

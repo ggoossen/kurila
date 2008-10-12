@@ -34,14 +34,14 @@ is((nelems @empty_l), 0);
 my @full_l1  = opset_to_ops(full_opset);
 is((nelems @full_l1), opcodes());
 my @full_l2 = @full_l1;	# = opcodes();	# XXX to be fixed
-is("{join ' ',@full_l1}", "{join ' ',@full_l2}");
+is("$(join ' ',@full_l1)", "$(join ' ',@full_l2)");
 
 @empty_l = opset_to_ops(opset(':none'));
 is((nelems @empty_l), 0);
 
 my @full_l3 = opset_to_ops(opset(':all'));
 is((nelems @full_l1), nelems @full_l3);
-is("{join ' ',@full_l1}", "{join ' ',@full_l3}");
+is("$(join ' ',@full_l1)", "$(join ' ',@full_l3)");
 
 # --- define_optag
 

@@ -1477,7 +1477,6 @@ PP(pp_sort)
     CV *cv = NULL;
     I32 gimme = GIMME_V;
     OP* const nextop = PL_op->op_next;
-    I32 overloading = 0;
     bool hasargs = FALSE;
     I32 is_xsub = 0;
     const U8 priv = PL_op->op_private;
@@ -1521,12 +1520,6 @@ PP(pp_sort)
 		if (cv && CvISXSUB(cv)) {
 		    is_xsub = 1;
 		}
-		else if (gv) {
-		    SV *tmpstr = sv_newmortal();
-		    gv_efullname3(tmpstr, gv, NULL);
-		    DIE(aTHX_ "Undefined sort subroutine \"%"SVf"\" called",
-			SVfARG(tmpstr));
-		}
 		else {
 		    DIE(aTHX_ "Undefined subroutine in sort");
 		}
@@ -1544,7 +1537,8 @@ PP(pp_sort)
 
     av = SvAV(sv_mortalcopy(POPs));
     if ( ! SvAVOK(av) ) {
-	Perl_croak(aTHX_ "%s expected ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+	Perl_croak(aTHX_ "%s expected ARRAY but got %s", 
+	    OP_DESC(PL_op), Ddesc(AvSV(av)));
     }
     p1 = p2 = AvARRAY(av);
     max = AvFILL(av) + 1;
@@ -1624,8 +1618,6 @@ PP(pp_sort)
 			/* This is mostly copied from pp_entersub */
 			AV * const av = (AV*)PAD_SVl(0);
 
-			cx->blk_sub.savearray = GvAV(PL_defgv);
-			GvAV(PL_defgv) = (AV*)SvREFCNT_inc_simple(av);
 			CX_CURPAD_SAVE(cx->blk_sub);
 			cx->blk_sub.argarray = av;
 		    }
@@ -1672,7 +1664,7 @@ PP(pp_sort)
     
     LEAVE;
     PL_stack_sp = ORIGMARK;
-    *++PL_stack_sp = av;
+    *++PL_stack_sp = AvSV(av);
     return nextop;
 }
 

@@ -62,7 +62,7 @@ $^WARN_HOOK = sub {
     }
 };
 
-for ($i = 1; (nelems @tests); $i++) {
+for my  $i (1 .. nelems(@tests)) {
     ($template, $evalData, $result, $comment, $data) = < @{shift @tests};
     $w = undef;
     $x = sprintf(">$template<", < @$evalData);
@@ -116,7 +116,7 @@ for ($i = 1; (nelems @tests); $i++) {
 		   # Suppress tests with modulo of exponent >= 100 on platforms
 		   # which can't handle such magnitudes (or where we can't tell).
 		   ((!try {require POSIX}) || # Costly: only do this if we must!
-			(length(&POSIX::DBL_MAX) - rindex(&POSIX::DBL_MAX, '+')) == 3))
+			(length(&POSIX::DBL_MAX( < @_ )) - rindex(&POSIX::DBL_MAX( < @_ ), '+')) == 3))
 	{
 		print("ok $i # >$template< >$data< >$result<",
 			  " Suppressed: exponent out of range?\n");

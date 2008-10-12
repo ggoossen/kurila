@@ -71,8 +71,7 @@ sub _update
  $bits = '' unless defined $bits;
 
  my $count = 0;
- my $f;
- foreach $f ( @_)
+ foreach my $f ( @_)
   {
    my $fn = $vec->_fileno($f);
    next unless defined $fn;
@@ -198,7 +197,7 @@ sub select
                 defined $w ? scalar(nelems @$w)-1 : 0,
                 defined $e ? scalar(nelems @$e)-1 : 0);
 
-   for( ; $i +>= FIRST_FD ; $i--)
+   while($i +>= FIRST_FD)
     {
      my $j = $i - FIRST_FD;
      push(@r, $r->[$i])
@@ -207,6 +206,7 @@ sub select
         if defined $wb && defined $w->[$i] && vec($wb, $j, 1);
      push(@e, $e->[$i])
         if defined $eb && defined $e->[$i] && vec($eb, $j, 1);
+     $i--;
     }
 
    @result = @(\@r, \@w, \@e);
@@ -220,10 +220,9 @@ sub handles
  my $vec = shift;
  my $bits = shift;
  my @h = @( () );
- my $i;
  my $max = scalar(nelems @$vec) - 1;
 
- for ($i = FIRST_FD; $i +<= $max; $i++)
+ for my $i (FIRST_FD .. $max)
   {
    next unless defined $vec->[$i];
    push(@h, $vec->[$i])

@@ -98,11 +98,11 @@ sub mkmanifest {
     open M, ">", "$MANIFEST" or die "Could not open $MANIFEST: $!";
     my $skip = _maniskip();
     my $found = manifind();
-    my($key,$val,$file,%all);
+    my($key,$val,%all);
     %all = %(< %$found, < %$read);
     %all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
-    foreach $file ( _sort < keys %all) {
+    foreach my $file ( _sort < keys %all) {
 	if ($skip->($file)) {
 	    # Policy: only remove files if they're listed in MANIFEST.SKIP.
 	    # Don't remove files just because they don't exist.
@@ -151,7 +151,7 @@ sub manifind {
 	return if -d $_;
 	
         if( $Is_VMS ) {
-            $name =~ s#(.*)\.$#{ lc($1) }#;
+            $name =~ s#(.*)\.$#$( lc($1) )#;
             $name = uc($name) if $name =~ m/^MANIFEST(\.SKIP)?$/i;
         }
 	$found->{$name} = "";
@@ -256,8 +256,8 @@ sub _check_files {
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
         if ($dosnames){
             $file = lc $file;
-            $file =~ s=(\.(\w|-)+)={substr ($1,0,4)}=g;
-            $file =~ s=((\w|-)+)={substr ($1,0,8)}=g;
+            $file =~ s=(\.(\w|-)+)=$(substr ($1,0,4))=g;
+            $file =~ s=((\w|-)+)=$(substr ($1,0,8))=g;
         }
         unless ( exists $found->{$file} ) {
             warn "No such file: $file\n" unless $Quiet;
@@ -321,7 +321,7 @@ sub maniread {
 
         if ($Is_MacOS) {
             $file = _macify($file);
-            $file =~ s/\\([0-3][0-7][0-7])/{sprintf("\%c", oct($1))}/g;
+            $file =~ s/\\([0-3][0-7][0-7])/$(sprintf("\%c", oct($1)))/g;
         }
         elsif ($Is_VMS) {
             require File::Basename;
@@ -507,14 +507,14 @@ sub cp_if_diff {
 	if (-e $to) {
 	    unlink($to) or die "unlink $to: $!";
 	}
-        STRICT_SWITCH: {
+        STRICT_SWITCH: do {
 	    best($from,$to), last STRICT_SWITCH if $how eq 'best';
 	    cp($from,$to), last STRICT_SWITCH if $how eq 'cp';
 	    ln($from,$to), last STRICT_SWITCH if $how eq 'ln';
 	    die("ExtUtils::Manifest::cp_if_diff " .
 		  "called with illegal how argument [$how]. " .
 		  "Legal values are 'best', 'cp', and 'ln'.");
-	}
+	};
     }
 }
 
@@ -530,7 +530,7 @@ sub cp {
 
 sub ln {
     my ($srcFile, $dstFile) = < @_;
-    return &cp if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
+    return &cp( < @_ ) if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
     link($srcFile, $dstFile);
 
     unless( _manicopy_chmod($srcFile, $dstFile) ) {
@@ -593,7 +593,7 @@ sub _unmacify {
     return $file unless $Is_MacOS;
 
     $file =~ s|^:||;
-    $file =~ s|([/ \n])|{sprintf("\\\%03o", unpack("c", $1))}|g;
+    $file =~ s|([/ \n])|$(sprintf("\\\%03o", unpack("c", $1)))|g;
     $file =~ s|:|/|g;
 
     $file;

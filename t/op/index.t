@@ -63,7 +63,7 @@ is(rindex("abc", "", 2), 2);
 is(rindex("abc", "", 3), 3);
 is(rindex("abc", "", 4), 3);
 
-{
+do {
     # utf8
     use utf8;
     $a = "foo \x{1234}bar";
@@ -81,9 +81,9 @@ is(rindex("abc", "", 4), 3);
     is(bytes::rindex($a, "\x{1234}"), 4);
     is(bytes::rindex($a, "foo",    ), 0);
     is(bytes::rindex($a, "bar",    ), 7);
-}
+};
 
-{
+do {
     use utf8;
     my $needle = "\x{1230}\x{1270}";
     my @needles = @("\x{1230}", "\x{1270}");
@@ -100,9 +100,9 @@ is(rindex("abc", "", 4), 3);
 	my $b = index ( $haystack, $_ );
 	is($a, $b, q{[perl #22375] 'split'/'index' problem for utf8});
     }
-}
+};
 
-{
+do {
     use utf8;
 
     my $a = "\x{80000000}";
@@ -115,6 +115,6 @@ is(rindex("abc", "", 4), 3);
 
     local $^UTF8CACHE = -1;
     is(index($t, 'xyz'), 4, "0xfffffffd and utf8cache");
-}
+};
 
 }

@@ -147,7 +147,7 @@ sub _handle_text {
 sub method_for_element {
     my ($self, $element) = < @_;
     $element =~ s/-/_/;
-    $element =~ s/([A-Z])/{lc($1)}/g;
+    $element =~ s/([A-Z])/$(lc($1))/g;
     $element =~ s/[^_a-z0-9]//g;
     return $element;
 }
@@ -346,7 +346,7 @@ sub cmd_verbatim {
     my ($self, $attrs, $text) = < @_;
     $self->item if defined %$self{ITEM};
     return if $text =~ m/^\s*$/;
-    $text =~ s/^(\n*)(\s*\S+)/{$1 . (' ' x %$self{MARGIN}) . $2}/gm;
+    $text =~ s/^(\n*)(\s*\S+)/$($1 . (' ' x %$self{MARGIN}) . $2)/gm;
     $text =~ s/\s*$/\n\n/;
     $self->output ($text);
     return '';

@@ -533,7 +533,7 @@ sub disablecache  {
 # --- Functions to process the 'time' data type
 
 sub new { my @t = @( mytime, times, (nelems @_) == 2 ? @_[1] : 0);
-	  print STDERR "new={join ' ',@t}\n" if $Debug;
+	  print STDERR "new=$(join ' ',@t)\n" if $Debug;
 	  bless \@t; }
 
 sub cpu_p { my($r,$pu,$ps,$cu,$cs) = < @{@_[0]}; $pu+$ps         ; }
@@ -553,7 +553,7 @@ sub timediff {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for (my $i=0; $i +< nelems @$a; ++$i) {
+    for my $i (0 .. nelems(@$a) -1) {
 	push(@r, $a->[$i] - $b->[$i]);
     }
     #die "Bad timediff(): ($r[1] + $r[2]) <= 0 (@$a[1,2]|@$b[1,2])\n"
@@ -571,7 +571,7 @@ sub timesum {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for (my $i=0; $i +< nelems @$a; ++$i) {
+    for my $i (0 .. nelems(@$a) -1) {
  	push(@r, $a->[$i] + $b->[$i]);
     }
     bless \@r;
@@ -588,7 +588,7 @@ sub timestr {
     die usage unless ref $tr;
 
     my @t = @$tr;
-    warn "bad time value ({join ' ',@t})" unless (nelems @t)==6;
+    warn "bad time value ($(join ' ',@t))" unless (nelems @t)==6;
     my($r, $pu, $ps, $cu, $cs, $n) = < @t;
     my($pt, $ct, $tt) = ( $tr->cpu_p, $tr->cpu_c, $tr->cpu_a);
     $f = $Default_Format unless defined $f;
@@ -596,7 +596,7 @@ sub timestr {
     $style ||= $Default_Style;
     return '' if $style eq 'none';
     $style = ($ct+>0) ? 'all' : 'noc' if $style eq 'auto';
-    my $s = "{join ' ',@t} $style"; # default for unknown style
+    my $s = "$(join ' ',@t) $style"; # default for unknown style
     my $w = $hirestime ? "\%2g" : "\%2d";
     $s = sprintf("$w wallclock secs (\%$f usr \%$f sys + \%$f cusr \%$f csys = \%$f CPU)",
 			    $r,$pu,$ps,$cu,$cs,$tt) if $style eq 'all';
@@ -641,14 +641,14 @@ sub runloop {
 
     my ($subcode, $subref);
     if (ref $c eq 'CODE') {
-	$subcode = "sub \{ for (1 .. $n) \{ local \$_; package $pack; &\$c; \} \}";
+	$subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c; \} \}";
         $subref  = eval $subcode;
     }
     else {
-	$subcode = "sub \{ for (1 .. $n) \{ local \$_; package $pack; $c;\} \}";
+	$subcode = "sub \{ for (1 .. $n) \{ package $pack; $c;\} \}";
         $subref  = _doeval($subcode);
     }
-    die "runloop unable to compile '$c': {$@->message}\ncode: $subcode\n" if $@;
+    die "runloop unable to compile '$c': $($@->message)\ncode: $subcode\n" if $@;
     print STDERR "runloop $n '$subcode'\n" if $Debug;
 
     # Wait for the user timer to tick.  This makes the error range more like 
@@ -724,11 +724,12 @@ sub countit {
     die "countit($tmax, ...): timelimit cannot be less than $min_for.\n"
 	if $tmax +< $min_for;
 
-    my ($n, $tc);
+    my ($tc);
 
     # First find the minimum $n that gives a significant timing.
     my $zeros=0;
-    for ($n = 1; ; $n *= 2 ) {
+    my $n = 1;
+    while (1) {
 	my $td = timeit($n, $code);
 	$tc = $td->[1] + $td->[2];
 	if ( $tc +<= 0 and $n +> 1024 ) {
@@ -738,6 +739,7 @@ sub countit {
 	    $zeros = 0;
 	}
 	last if $tc +> 0.1;
+        $n *= 2;
     }
 
     my $nmin = $n;
@@ -978,7 +980,7 @@ sub cmpthese{
 
         # Columns 2..N = performance ratios
 	my $skip_rest = 0;
-	for ( my $col_num = 0 ; $col_num +< nelems @vals ; ++$col_num ) {
+	for my $col_num (0 .. nelems(@vals) -1) {
 	    my $col_val = @vals[$col_num];
 	    my $out;
 	    if ( $skip_rest ) {
@@ -1030,7 +1032,7 @@ sub cmpthese{
     }
 
     # Dump the output
-    my $format = join( ' ', map { "\%{$_}s" } @col_widths ) . "\n";
+    my $format = join( ' ', map { "\%$($_)s" } @col_widths ) . "\n";
     substr( $format, 1, 0, '-' );
     for (  @rows ) {
 	printf $format, < @$_;

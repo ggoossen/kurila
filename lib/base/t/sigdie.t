@@ -12,7 +12,7 @@ use Test::More tests => 1;
 
 use base;
 
-{
+do {
     package Test::SIGDIE;
 
     local $^DIE_HOOK = sub { 
@@ -24,4 +24,4 @@ use base;
 
     main::like($@->{description}, qr/^Base class package "Huh::Boo" is empty/, 
          'Base class empty error message');
-}
+};

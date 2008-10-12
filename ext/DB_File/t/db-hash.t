@@ -31,7 +31,7 @@ sub ok
     return $result ;
 }
 
-{
+do {
     package Redirect ;
     use Symbol ;
 
@@ -51,7 +51,7 @@ sub ok
 	close $self->[0] ;
 	select($self->[1]) ;
     }
-}
+};
 
 sub docat_del
 { 
@@ -248,8 +248,8 @@ ok(27, $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i +< 200; $i++) { %h{$i + 0} = $i + 0; }
-for ($i = 1; $i +< 200; $i++) { $ok = 0 unless %h{$i} == $i; }
+for my $i (1..199) { %h{$i + 0} = $i + 0; }
+for my $i (1..199) { $ok = 0 unless %h{$i} == $i; }
 ok(28, $ok );
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
@@ -288,10 +288,10 @@ $status = $X->del('q') ;
 ok(36, $status == 0 );
 
 # Make sure that the key deleted, cannot be retrieved
-{
+do {
     no warnings 'uninitialized' ;
     ok(37, %h{'q'} eq undef );
-}
+};
 
 # Attempting to delete a non-existant key should fail
 
@@ -375,7 +375,7 @@ ok(48, $status == -1 );
 undef $X ;
 untie %h ;
 
-{
+do {
     # check ability to override the default hashing
     my %x ;
     my $filename = "xyz" ;
@@ -388,11 +388,11 @@ untie %h ;
     untie %x ;
     unlink $filename ;
     ok(51, $::count +>0) ;
-}
+};
 
 ok(52, 1);
 
-{
+do {
    # sub-class test
 
    package Another ;
@@ -486,9 +486,9 @@ EOM
     untie(%h);
     unlink "SubDB.pm", "dbhash.tmp" ;
 
-}
+};
 
-{
+do {
    # DBM Filter tests
    use warnings ;
    use strict ;
@@ -621,9 +621,9 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
-{    
+do {    
     # DBM Filter with a closure
 
     use warnings ;
@@ -643,7 +643,7 @@ EOM
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     %result{$name} = "$name - $count: [{join ' ',@kept}]" ;
+		     %result{$name} = "$name - $count: [$(join ' ',@kept)]" ;
 		   }
     }
 
@@ -685,9 +685,9 @@ EOM
     undef $db ;
     untie %h;
     unlink $Dfile;
-}		
+};		
 
-{
+do {
    # DBM Filter recursion detection
    use warnings ;
    use strict ;
@@ -704,14 +704,14 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
 
-{
+do {
    # Examples from the POD
 
   my $file = "xyzt" ;
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     use warnings FATAL => < qw(all);
@@ -742,7 +742,7 @@ EOM
     untie %h ;
 
     unlink "fruit" ;
-  }  
+  };  
 
   ok(117, docat_del($file) eq <<'EOM') ;
 Banana Exists
@@ -752,9 +752,9 @@ tomato -> red
 banana -> yellow
 EOM
    
-}
+};
 
-{
+do {
     # Bug ID 20001013.009
     #
     # test that $hash{KEY} = undef doesn't produce the warning
@@ -773,9 +773,9 @@ EOM
     ok(118, $a eq "") ;
     untie %h ;
     unlink $Dfile;
-}
+};
 
-{
+do {
     # test that %hash = () doesn't produce the warning
     #     Argument "" isn't numeric in entersub
     use warnings ;
@@ -792,9 +792,9 @@ EOM
     ok(119, $a eq "") ;
     untie %h ;
     unlink $Dfile;
-}
+};
 
-{
+do {
     # When iterating over a tied hash using "each", the key passed to FETCH
     # will be recycled and passed to NEXTKEY. If a Source Filter modifies the
     # key in FETCH via a filter_fetch_key method we need to check that the
@@ -824,26 +824,26 @@ EOM
     ok(123, $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $k (keys %h) {}
+    foreach my $k (keys %h) {}
     ok(124, $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $v (values %h) {}
+    foreach my $v (values %h) {}
     ok(125, $bad_key == 0);
 
     undef $db ;
     untie %h ;
     unlink $Dfile;
-}
+};
 
-{
+do {
     # now an error to pass 'hash' a non-code reference
     my $dbh = DB_File::HASHINFO->new() ;
 
     try { $dbh->{hash} = 2 };
     ok(126, $@->{description} =~ m/^Key 'hash' not associated with a code reference at/);
 
-}
+};
 
 
 #{
@@ -872,7 +872,7 @@ EOM
 #ok(127, 1);
 #ok(128, 1);
 
-{
+do {
     # Check that two hash's don't interact
     my %hash1 ;
     my %hash2 ;
@@ -905,9 +905,9 @@ EOM
     ok(131, safeUntie \%hash1);
     ok(132, safeUntie \%hash2);
     unlink $Dfile, $Dfile2;
-}
+};
 
-{
+do {
     # Passing undef for flags and/or mode when calling tie could cause 
     #     Use of uninitialized value in subroutine entry
     
@@ -932,9 +932,9 @@ EOM
 
     untie %hash1;
     unlink $Dfile;
-}
+};
 
-{
+do {
    # Check that DBM Filter can cope with read-only $_
 
    use warnings ;
@@ -977,9 +977,9 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
-{
+do {
    # Check low-level API works with filter
 
    use warnings ;
@@ -1023,10 +1023,10 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
 
-{
+do {
     # Regression Test for bug 30237
     # Check that substr can be used in the key to db_put
     # and that db_put does not trigger the warning
@@ -1101,9 +1101,8 @@ EOM
 
     my %bad = %( () ) ;
     $key = '';
-    for ($status = $db->seq($key, $value, R_FIRST ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT ) ) {
+    my $status = $db->seq($key, $value, R_FIRST );
+    while ( $status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{$key} && defined $value && 
@@ -1113,6 +1112,8 @@ EOM
         else {
             %bad{$key} = $value ;
         }
+
+        $status = $db->seq($key, $value, R_NEXT );
     }
     
     ok 157, nkeys %bad == 0 ;
@@ -1142,9 +1143,9 @@ EOM
     undef $db ;
     untie %h;
     unlink $Dfile;
-}
+};
 
-{
+do {
    # Check filter + substr
 
    use warnings ;
@@ -1156,12 +1157,12 @@ EOM
    ok(162, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
 
-   {
+   do {
        $db->filter_fetch_key   (sub { lc $_ } );
        $db->filter_store_key   (sub { uc $_ } );
        $db->filter_fetch_value (sub { lc $_ } );
        $db->filter_store_value (sub { uc $_ } );
-   }
+   };
 
    $_ = 'fred';
 
@@ -1189,9 +1190,8 @@ EOM
     my %bad = %( () ) ;
     my $key = '';
     my $value = '';
-    for ($status = $db->seq($key, $value, R_FIRST ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT ) ) {
+   $status = $db->seq($key, $value, R_FIRST );
+   while ( $status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{$key} && defined $value && 
@@ -1201,6 +1201,8 @@ EOM
         else {
             %bad{$key} = $value ;
         }
+
+        $status = $db->seq($key, $value, R_NEXT );
     }
     
     ok 164, $_ eq 'fred';
@@ -1212,6 +1214,6 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
 exit ;

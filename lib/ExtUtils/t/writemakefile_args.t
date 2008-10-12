@@ -31,7 +31,7 @@ END {
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-{
+do {
     my $stdout = \$( '' );
     open my $stdout_fh, '>>', $stdout or die;
     *STDOUT = *{$stdout_fh}{IO};
@@ -148,7 +148,7 @@ VERIFY
     like( $warnings, '/^WARNING: VERSION takes a version object or string/number not a Some::Class object/' );
 
 
-    SKIP: {
+    SKIP: do {
         skip("Can't test version objects",6) unless try { require version };
         version->import;
 
@@ -169,5 +169,5 @@ VERIFY
         );
         is( $warnings, '' );
         is( $mm->{VERSION}, $version->stringify, 'correct version' );
-    }
-}
+    };
+};

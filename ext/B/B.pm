@@ -59,10 +59,10 @@ use strict;
 @B::specialsv_name = qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
 			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD);
 
-{
+do {
     # Stop "-w" from complaining about the lack of a real B::OBJECT class
     package B::OBJECT;
-}
+};
 
 sub B::GV::SAFENAME {
   my $name = (shift())->NAME;
@@ -70,8 +70,8 @@ sub B::GV::SAFENAME {
   # The regex below corresponds to the isCONTROLVAR macro
   # from toke.c
 
-  $name =~ s/^([\cA-\cZ\c\\c[\c]\c?\c_\c^])/{"^".
-	chr( utf8::unicode_to_native( 64 ^^^ ord($1) ))}/;
+  $name =~ s/^([\cA-\cZ\c\\c[\c]\c?\c_\c^])/$("^".
+	chr( utf8::unicode_to_native( 64 ^^^ ord($1) )))/;
 
   # When we say unicode_to_native we really mean ascii_to_native,
   # which matters iff this is a non-ASCII platform (EBCDIC).
@@ -122,8 +122,10 @@ sub walkoptree_slow {
     if ($$op && ($op->flags ^&^ OPf_KIDS)) {
 	my $kid;
 	unshift(@parents, $op);
-	for ($kid = $op->first; $$kid; $kid = $kid->sibling) {
+	$kid = $op->first;
+        while ($$kid) {
 	    walkoptree_slow($kid, $method, $level + 1);
+            $kid = $kid->sibling;
 	}
 	shift @parents;
     }
@@ -171,7 +173,7 @@ sub walkoptree_exec {
     $level ||= 0;
     my ($sym, $ppname);
     my $prefix = "    " x $level;
-    for (; $$op; $op = $op->next) {
+    while ($$op) {
 	$sym = objsym($op);
 	if (defined($sym)) {
 	    print $prefix, "goto $sym\n";
@@ -214,6 +216,8 @@ sub walkoptree_exec {
 		print $prefix, "\}\n";
 	    }
 	}
+
+        $op = $op->next;
     }
 }
 
@@ -238,7 +242,7 @@ sub walksymtable {
     }
 }
 
-{
+do {
     package B::Section;
     my $output_fh;
     my %sections;
@@ -295,14 +299,14 @@ sub walksymtable {
 	    chomp;
 	    s/^(.*?)\t//;
 	    if ($1 eq $name) {
-		s{(s\\_[0-9a-f]+)} {{
-		    exists($sym->{$1}) ? $sym->{$1} : $default;
-		}}g;
+		s{(s\\_[0-9a-f]+)} {$(
+		    exists($sym->{$1}) ? $sym->{$1} : $default
+		)}g;
 		printf $fh $format, $_;
 	    }
 	}
     }
-}
+};
 
 require B::OP;
 

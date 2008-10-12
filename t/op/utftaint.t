@@ -121,7 +121,7 @@ for my $ary (@(\@(ascii => 'perl'), \@(latin1 => "\x[B6]"))) {
     is( tainted($taint), tainted($arg), "tainted: $encode, downgrade down");
 }
 
-{
+do {
     fresh_perl_is('use utf8; $a = substr $^X, 0, 0; m/\x{100}/i; m/$a\x{100}/i || print q,ok,',
 		  'ok', \%(switches => \@("-T", "-l")),
 		  "matching a regexp is taint agnostic");
@@ -129,4 +129,4 @@ for my $ary (@(\@(ascii => 'perl'), \@(latin1 => "\x[B6]"))) {
     fresh_perl_is('use utf8; $a = substr $^X, 0, 0; m/$a\x{100}/i || print q,ok,',
 		  'ok', \%(switches => \@("-T", "-l")),
 		  "therefore swash_init should be taint agnostic");
-}
+};

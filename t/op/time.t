@@ -17,13 +17,15 @@ while (($now = time) == $beg) { sleep 1 }
 
 ok($now +> $beg && $now - $beg +< 10,             'very basic time test');
 
-our $i;
-for ($i = 0; $i +< 1_000_000; $i++) {
+our $i = 0;
+while ($i +< 1_000_000) {
     for my $j (1..100) {}; # burn some user cycles
     my ($nowuser, $nowsys) = times;
     $i = 2_000_000 if $nowuser +> $beguser && ( $nowsys +>= $begsys ||
                                             (!$nowsys && !$begsys));
     last if time - $beg +> 20;
+
+    $i++;
 }
 
 ok($i +>= 2_000_000, 'very basic times test');
@@ -41,7 +43,7 @@ ok(localtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
    'localtime(), scalar context'
   );
 
-SKIP: {
+SKIP: do {
     # This conditional of "No tzset()" is stolen from ext/POSIX/t/time.t
     skip "No tzset()", 1
         if $^O eq "MacOS" || $^O eq "VMS" || $^O eq "cygwin" ||
@@ -54,9 +56,9 @@ SKIP: {
 %ENV{TZ} = "GMT+5";
 my ($sec,$min,$hour2,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($beg);
 ok($hour != $hour2,                             'changes to $ENV{TZ} respected');
-}
+};
 
-SKIP: {
+SKIP: do {
     skip "No gmtime()", 3 unless $does_gmtime;
 
 ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($beg);
@@ -76,4 +78,4 @@ ok(gmtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
                /x,
    'gmtime(), scalar context'
   );
-}
+};

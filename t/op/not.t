@@ -16,7 +16,7 @@ is(! 1, not 1);
 is(! 0, not 0);
 
 # test the return of !
-{
+do {
     my $not0 = ! 0;
     my $not1 = ! 1;
 
@@ -28,10 +28,10 @@ is(! 0, not 0);
     ok($not1 eq '');
     ok($not1 == 0);
     ok($not0 == 1);
-}
+};
 
 # test the return of not
-{
+do {
     my $not0 = not 0;
     my $not1 = not 1;
 
@@ -43,4 +43,4 @@ is(! 0, not 0);
     ok($not1 eq '');
     ok($not1 == 0);
     ok($not0 == 1);
-}
+};

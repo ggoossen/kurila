@@ -48,22 +48,22 @@ is( A->d, "C::d");		# Update hash table;
 *B::d = \&D::d;			# Import now.
 is(A->d, "D::d");		# Update hash table;
 
-{
+do {
     local @A::ISA = qw(C);	# Update hash table with split() assignment
     is(A->d, "C::d");
     @A::ISA = @( 0 );
     is(try { A->d } || "fail", "fail");
-}
+};
 is(A->d, "D::d");
 
-{
+do {
     local *B::d;
     eval 'sub B::d {"B::d1"}';	# Import now.
     is(A->d, "B::d1");	# Update hash table;
     undef &B::d;
     dies_like( sub { A->d },
                m/Undefined subroutine/ );
-}
+};
 
 is(A->d, "D::d");		# Back to previous state
 
@@ -91,14 +91,14 @@ is(A->d, "B::d4");		# Update hash table;
 delete %B::{d};			# Should work without any help too
 is(A->d, "C::d");
 
-{
+do {
     local *C::d;
     is(try { A->d } || "nope", "nope");
-}
+};
 is(A->d, "C::d");
 
 # test that failed subroutine calls don't affect method calls
-{
+do {
     package A1;
     sub foo { "foo" }
     package A2;
@@ -107,7 +107,7 @@ is(A->d, "C::d");
     is(A2->foo(), "foo");
     is(do { eval 'A2::foo()'; $@ ? 1 : 0}, 1);
     is(A2->foo(), "foo");
-}
+};
 
 ## This test was totally misguided.  It passed before only because the
 ## code to determine if a package was loaded used to look for the hash
@@ -183,4 +183,4 @@ sub Bminor::test {
     push @main::X, 'Bminor', < @_;
 }
 Bminor->test('y', 'z');
-is("{join ' ',@X}", "Amajor Bminor x y Bminor Bminor y z");
+is("$(join ' ',@X)", "Amajor Bminor x y Bminor Bminor y z");

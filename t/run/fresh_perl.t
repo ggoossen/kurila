@@ -125,11 +125,6 @@ print;
 EXPECT
 oo
 ########
-sub by_number { $a <+> $b; };# inline function for sort below
-our %as_ary;
-%as_ary{0}="a0";
-our @ordered_array=sort by_number keys(%as_ary);
-########
 BEGIN { die "phooey" }
 EXPECT
 phooey at - line 1 character 9.
@@ -145,7 +140,7 @@ EXPECT
 Modification of a read-only value attempted at - line 1 character 14.
 BEGIN failed--compilation aborted
 ########
-my @a; @a[2] = 1; for (@a) { $_ = 2 } print "{join ' ', @a}\n"
+my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT
 2 2 2
 ########
@@ -174,34 +169,16 @@ try { my $x = 'peace'; eval q[ print "$x\n" ] }
 EXPECT
 inner peace
 ########
-# TODO fix location
--w
-$| = 1;
-sub foo {
-    print "In foo1\n";
-    eval 'sub foo { print "In foo2\n" }';
-    print "Exiting foo1\n";
-}
-foo;
-foo;
-EXPECT
-In foo1
-Subroutine foo redefined at (eval 1) line 1.
-    (eval) called at - line 4.
-    main::foo called at - line 7.
-Exiting foo1
-In foo2
-########
 our $s = 0;
 map {#this newline here tickles the bug
 $s += $_} @(1,2,4);
 print "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }
-BEGIN { print "argv <{join ' ', @ARGV}>\nbegin <",shift,">\n" }
-END { print "end <",shift,">\nargv <{join ' ', @ARGV}>\n" }
-INIT { print "init <",shift,">\n" }
-CHECK { print "check <",shift,">\n" }
+BEGIN { print "argv <$(join ' ', @ARGV)>\nbegin <",shift(@ARGV),">\n" }
+END { print "end <",shift(@ARGV),">\nargv <$(join ' ', @ARGV)>\n" }
+INIT { print "init <",shift(@ARGV),">\n" }
+CHECK { print "check <",shift(@ARGV),">\n" }
 EXPECT
 argv <a b c d e>
 begin <a>
@@ -219,12 +196,6 @@ select STDERR; $| = 1; print fileno STDERR or die $!;
 EXPECT
 1
 2
-########
-# TODO fix location
--w
-sub testme { my $a = "test"; { local $a = "new test"; print $a }}
-EXPECT
-Can't localize lexical variable $a at - line 1.
 ########
 # TODO
 package X;
@@ -331,12 +302,6 @@ print "ok\n";
 EXPECT
 ok
 ########
-sub f { my $a = 1; my $b = 2; my $c = 3; my $d = 4; next }
-my $x = "foo";
-{ f } continue { print $x, "\n" }
-EXPECT
-foo
-########
 sub C () { 1 }
 sub M { @_[0] = 2; }
 eval "C";
@@ -365,11 +330,11 @@ ok 2
 # lexicals outside an eval"" should be visible inside subroutine definitions
 # within it
 eval <<'EOT'; die $@ if $@;
-{
+do {
     my $X = "ok\n";
     eval 'sub Y { print $X }'; die $@ if $@;
     Y();
-}
+};
 EOT
 EXPECT
 ok
@@ -409,10 +374,10 @@ ok
 ######## (?{...}) compilation bounces on PL_rs
 -0
 our $x;
-{
+do {
   m/(?{ $x })/;
   # {
-}
+};
 BEGIN { print "ok\n" }
 EXPECT
 ok

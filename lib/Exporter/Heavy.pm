@@ -29,7 +29,7 @@ sub _rebuild_cache {
     my ($pkg, $exports, $cache) = < @_;
     s/^&// foreach  @$exports;
  <    %{$cache}{[ @$exports]} = (1) x nelems @$exports;
-    my $ok = \@{*{Symbol::fetch_glob("{$pkg}::EXPORT_OK")}};
+    my $ok = \@{*{Symbol::fetch_glob("$($pkg)::EXPORT_OK")}};
     if ((nelems @$ok)) {
 	s/^&// foreach  @$ok;
  <	%{$cache}{[ @$ok]} = (1) x nelems @$ok;
@@ -39,8 +39,8 @@ sub _rebuild_cache {
 sub heavy_export {
 
     my($pkg, $callpkg, < @imports) = < @_;
-    my($type, $sym, $cache_is_current, $oops);
-    my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("{$pkg}::EXPORT")}},
+    my($type, $cache_is_current, $oops);
+    my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
                                    %Exporter::Cache{$pkg} ||= \%());
 
     if ((nelems @imports)) {
@@ -50,13 +50,13 @@ sub heavy_export {
 	}
 
 	if (grep m{^[/!:]}, @imports) {
-	    my $tagsref = \%{*{Symbol::fetch_glob("{$pkg}::EXPORT_TAGS")}};
+	    my $tagsref = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
 	    my $tagdata;
 	    my %imports;
-	    my($remove, $spec, @names, @allexports);
+	    my($remove, @names, @allexports);
 	    # negated first item implies starting with default set:
 	    unshift @imports, ':DEFAULT' if @imports[0] =~ m/^!/;
-	    foreach $spec ( @imports){
+	    foreach my $spec ( @imports){
 		$remove = $spec =~ s/^!//;
 
 		if ($spec =~ s/^://){
@@ -67,7 +67,7 @@ sub heavy_export {
 			@names = @$tagdata;
 		    }
 		    else {
-			warn qq["$spec" is not defined in \%{$pkg}::EXPORT_TAGS];
+			warn qq["$spec" is not defined in \%$($pkg)::EXPORT_TAGS];
 			++$oops;
 			next;
 		    }
@@ -81,11 +81,11 @@ sub heavy_export {
 		    @names = @($spec); # is a normal symbol name
 		}
 
-		warn "Import ".($remove ? "del":"add").": {join ' ',@names} "
+		warn "Import ".($remove ? "del":"add").": $(join ' ',@names) "
 		    if $Exporter::Verbose;
 
 		if ($remove) {
-		   foreach $sym ( @names) { delete %imports{$sym} } 
+		   foreach my $sym ( @names) { delete %imports{$sym} } 
 		}
 		else { <
 		    %imports{[ @names]} = (1) x nelems @names;
@@ -95,7 +95,7 @@ sub heavy_export {
 	}
 
         my @carp;
-	foreach $sym ( @imports) {
+	foreach my $sym ( @imports) {
 	    if (!$export_cache->{$sym}) {
 		if ($sym =~ m/^\d/) {
 		    $pkg->VERSION($sym); # inherit from UNIVERSAL
@@ -131,14 +131,14 @@ sub heavy_export {
 	    }
 	}
 	if ($oops) {
-	    die("{join ' ', @carp}Can't continue after import errors");
+	    die("$(join ' ', @carp)Can't continue after import errors");
 	}
     }
     else {
 	@imports = @$exports;
     }
 
-    my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("{$pkg}::EXPORT_FAIL")}},
+    my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")}},
                               %Exporter::FailCache{$pkg} ||= \%());
 
     if ((nelems @$fail)) {
@@ -147,14 +147,14 @@ sub heavy_export {
 	    # barewords twice... both with and without a leading &.
 	    # (Technique could be applied to $export_cache at cost of memory)
 	    my @expanded = map { m/^\w/ ? ($_, '&'.$_) : $_ } @$fail;
-	    warn "{$pkg}::EXPORT_FAIL cached: {join ' ',@expanded}" if $Exporter::Verbose;
+	    warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose;
  <	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}
 	my @failed;
-	foreach $sym ( @imports) { push(@failed, $sym) if $fail_cache->{$sym} }
+	foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{$sym} }
 	if ((nelems @failed)) {
 	    @failed = $pkg->export_fail(< @failed);
-	    foreach $sym ( @failed) {
+	    foreach my $sym ( @failed) {
 		warn(qq["$sym" is not implemented by the $pkg module ]
 			. "on this architecture");
 	    }
@@ -167,17 +167,17 @@ sub heavy_export {
     warn "Importing into $callpkg from $pkg: ",
 		join(", ",sort @imports) if $Exporter::Verbose;
 
-    foreach $sym ( @imports) {
+    foreach my $sym ( @imports) {
 	# shortcut for the common case of no type character
-	(*{Symbol::fetch_glob("{$callpkg}::$sym")} = \&{*{Symbol::fetch_glob("{$pkg}::$sym")}}, next)
+	(*{Symbol::fetch_glob("$($callpkg)::$sym")} = \&{*{Symbol::fetch_glob("$($pkg)::$sym")}}, next)
 	    unless $sym =~ s/^(\W)//;
 	$type = $1;
 	no warnings 'once';
-	*{Symbol::fetch_glob("{$callpkg}::$sym")} =
-	    $type eq '&' ? \&{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
-	    $type eq '$' ? \${*{Symbol::fetch_glob("{$pkg}::$sym")}} :
-	    $type eq '@' ? \@{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
-	    $type eq '%' ? \%{*{Symbol::fetch_glob("{$pkg}::$sym")}} :
+	*{Symbol::fetch_glob("$($callpkg)::$sym")} =
+	    $type eq '&' ? \&{*{Symbol::fetch_glob("$($pkg)::$sym")}} :
+	    $type eq '$' ? \${*{Symbol::fetch_glob("$($pkg)::$sym")}} :
+	    $type eq '@' ? \@{*{Symbol::fetch_glob("$($pkg)::$sym")}} :
+	    $type eq '%' ? \%{*{Symbol::fetch_glob("$($pkg)::$sym")}} :
 	    warn("Can't export symbol: $type$sym");
     }
 }
@@ -196,8 +196,8 @@ sub heavy_export_to_level
 sub _push_tags {
     my($pkg, $var, $syms) = < @_;
     my @nontag = @( () );
-    my $export_tags = \%{*{Symbol::fetch_glob("{$pkg}::EXPORT_TAGS")}};
-    push(@{*{Symbol::fetch_glob("{$pkg}::$var")}},
+    my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
+    push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
 	< map { $export_tags->{$_} ? < @{$export_tags->{$_}} 
                                  : do { push(@nontag,$_); $_ } }
  @(		(nelems @$syms) ? < @$syms : < keys %$export_tags));

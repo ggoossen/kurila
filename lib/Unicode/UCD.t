@@ -309,18 +309,18 @@ is(Unicode::UCD::_getcode('x123'),    undef, "_getcode(x123)");
 is(Unicode::UCD::_getcode('0x123x'),  undef, "_getcode(x123)");
 is(Unicode::UCD::_getcode('U+123x'),  undef, "_getcode(x123)");
 
-{
+do {
     my $r1 = charscript('Latin');
     my $n1 = nelems @$r1;
     is($n1, 35, "number of ranges in Latin script (Unicode 5.0.0)");
     shift @$r1 while @$r1;
     my $r2 = charscript('Latin');
     is((nelems @$r2), $n1, "modifying results should not mess up internal caches");
-}
+};
 
-{
+do {
 	is(charinfo(0xdeadbeef), undef, "[perl #23273] warnings in Unicode::UCD");
-}
+};
 
 use Unicode::UCD < qw(namedseq);
 

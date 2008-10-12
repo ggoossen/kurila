@@ -19,7 +19,7 @@ my $tcount = 0;
 sub ok {
   $tcount++;
   my $not = @_[0] ? '' : 'not ';
-  print "{$not}ok $tcount\n";
+  print "$($not)ok $tcount\n";
 }
 
 print "1..10\n";
@@ -31,7 +31,7 @@ ok(defined($dot));
 
 my @a = sort glob("*");
 my $first;
-do { $first = $dot->read } while defined($first) && $first =~ m/^\./;
+{ $first = $dot->read } while defined($first) && $first =~ m/^\./;
 ok(+(< grep { $_ eq $first } @a));
 
 my @b = sort( @($first, (< grep {m/^[^.]/} $dot->read_all)));

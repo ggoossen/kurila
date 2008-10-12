@@ -70,7 +70,7 @@ our @good = @(0,1,1,2,3,5,8,13,21,34,55,89);
 
 our $foo;
 
-for (our $i = 1; $i +<= 10; $i++) {
+for my $i (1..10) {
     $foo = $i + 12;
     if (&fib($i) == @good[$i]) {
 	print "ok $foo\n";
@@ -85,7 +85,7 @@ sub ary1 {
 }
 
 print "ok 23\n";
-print join(':',&ary1) eq '1:2:3' ? "ok 24\n" : "not ok 24\n";
+print join(':',&ary1( < @_ )) eq '1:2:3' ? "ok 24\n" : "not ok 24\n";
 
 sub ary2 {
     do {
@@ -97,7 +97,7 @@ sub ary2 {
 
 print "ok 25\n";
 
-our $x = join(':',&ary2);
+our $x = join(':',&ary2( < @_ ));
 print $x eq '1:2:3' ? "ok 26\n" : "not ok 26 $x\n";
 
 sub somesub {

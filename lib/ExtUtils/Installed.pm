@@ -111,11 +111,11 @@ sub new {
             $self->{':private:'}->{$key} = $val;
         }
     }
-    {
+    do {
         my %dupe;
         @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{$_}++ }
  @(            < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}});        
-    }                
+    };                
     my $perl5lib = defined %ENV{PERL5LIB} ? %ENV{PERL5LIB} : "";
 
     my @dirs = @( $self->{':private:'}->{Config}->{archlibexp},

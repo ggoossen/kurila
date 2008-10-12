@@ -9,14 +9,16 @@ BEGIN {
     $BigWidth  = 6;				# Digits in $BigEnough-1
     $BigEnough = 10**$BigWidth;			# Largest array we'll attempt
     $RootWidth = int(($BigWidth+1)/2);		# Digits in sqrt($BigEnough-1)
-    $ItemFormat = "\%0{$RootWidth}d\%0{$BigWidth}d";	# Array item format
+    $ItemFormat = "\%0$($RootWidth)d\%0$($BigWidth)d";	# Array item format
     @TestSizes = @(0, 1, 2);			# Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)
     # in pp_sort that should be tested, but 10_000 is ample.
     $WellSoaked = 10_000;			# <= $BigEnough
-    for (my $ts = 3; $ts +< $WellSoaked; $ts *= 10**(1/3)) {
+    my $ts = 3;
+    while ($ts +< $WellSoaked) {
 	push(@TestSizes, int($ts));		# about 3 per decade
+        $ts *= 10**(1/3);
     }
 }
 
@@ -38,13 +40,13 @@ use Test::More tests => (nelems @TestSizes) * 2	# sort() tests
 
 sub genarray {
     my $size = int(shift);		# fractions not welcome
-    my ($items, $i);
+    my ($items);
     my @a;
 
     if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
     elsif ($size +> $BigEnough) { $size = $BigEnough; }
     $items = int(sqrt($size));		# number of distinct items
-    for ($i = 0; $i +< $size; ++$i) {
+    for my $i (0 .. $size -1) {
 	@a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
     }
     return \@a;
@@ -56,9 +58,9 @@ sub genarray {
 sub checkorder {
     my $aref = shift;
     my $status = '';			# so far, so good
-    my ($i, $disorder);
+    my ($disorder);
 
-    for ($i = 0; $i +< nelems(@$aref)-1; ++$i) {
+    for my $i (0 .. nelems(@$aref)-2) {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
@@ -78,12 +80,11 @@ sub checkorder {
 sub checkequal {
     my ($aref, $bref) = < @_;
     my $status = '';
-    my $i;
 
     if (nelems(@$aref) != nelems(@$bref)) {
 	$status = "Sizes differ: " . nelems(@$aref) . " vs " . nelems(@$bref);
     } else {
-	for ($i = 0; $i +< nelems(@$aref); ++$i) {
+	for my $i (0 .. nelems(@$aref) -1) {
 	    next if ($aref->[$i] eq $bref->[$i]);
 	    $status = "Element $i differs: $aref->[$i] vs $bref->[$i]";
 	    last;
@@ -97,10 +98,10 @@ sub checkequal {
 
 sub main {
     my ($dothesort, $expect_unstable) = < @_;
-    my ($ts, $unsorted, @sorted, $status);
+    my ($unsorted, @sorted, $status);
     my $unstable_num = 0;
 
-    foreach $ts (@TestSizes) {
+    foreach my $ts (@TestSizes) {
 	$unsorted = genarray($ts);
 	# Sort only on item portion of each element.
 	# There will typically be many repeated items,
@@ -132,47 +133,47 @@ sub main {
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
 main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
 
-{
+do {
     use sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 1);
-}
+};
 
-{
+do {
     use sort < qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};
 
-{
+do {
     use sort < qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};
 
 # Tests added to check "defaults" subpragma, and "no sort"
 
-{
+do {
     use sort < qw(_qsort stable);
     no sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};
 
-{
+do {
     use sort < qw(defaults _qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current after defaults _qsort');
     # Not expected to be stable, so don't test for stability here
-}
+};
 
-{
+do {
     use sort < qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
     main(sub {sort {&{@_[0]}} @{@_[1]} }, 0);
-}
+};

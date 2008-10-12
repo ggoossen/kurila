@@ -56,7 +56,7 @@ sub canonpath {
     my ($self,$path) = < @_;
     return unless defined $path;
 
-    $path =~ s/^([a-z]:)/{lc($1)}/s;
+    $path =~ s/^([a-z]:)/$(lc($1))/s;
     $path =~ s|\\|/|g;
     $path =~ s|([^/])/+|$1/|g;                  # xx////xx  -> xx/xx
     $path =~ s|(/\.)+/|/|g;                     # xx/././xx -> xx/xx

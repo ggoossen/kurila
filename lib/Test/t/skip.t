@@ -27,7 +27,7 @@ my @T = @( ~< *F );
 chop @T;
 my @expect = split m/\n+/, join('', @( ~< *DATA));
 ok (nelems @T), 4;
-for (my $x=0; $x +< nelems @T; $x++) {
+for my $x (0 .. nelems(@T)-1) {
     ok @T[$x], @expect[$x];
 }
 

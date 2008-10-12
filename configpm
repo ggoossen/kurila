@@ -46,7 +46,7 @@ my $how_many_common = 22;
 my %Common;
 
 while ($how_many_common--) {
-    $_ = ~< *DATA;
+    my $_ = ~< *DATA;
     chomp;
     m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
     %Common{$1} = $1;
@@ -157,9 +157,9 @@ sub import {
     no strict 'refs';
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
-	die qq{"$func" is not exported by the {__PACKAGE__} module\n}
+	die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
              unless %%Export_Cache{$func};
-	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{$func};
+	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
 
     *{Symbol::fetch_glob("$callpkg\::Config")} = \%%Config if $export_Config;
@@ -179,10 +179,10 @@ my %Data     = %();
 
 
 my %seen_quotes;
-{
+do {
   my ($name, $val);
   open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $!";
-  while ( ~< *CONFIG_SH) {
+  while (~< *CONFIG_SH) {
     next if m:^#!/bin/sh:;
 
     # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
@@ -226,7 +226,7 @@ my %seen_quotes;
     %seen_quotes{$quote}++;
   }
   close *CONFIG_SH;
-}
+};
 
 # This is somewhat grim, but I want the code for parsing config.sh here and
 # now so that I can expand $Config{ivsize} and $Config{ivtype}
@@ -448,7 +448,7 @@ $heavy_txt .= join('', @non_v) . "\n";
 $heavy_txt .= "our \$summary = <<'!END!';\n";
 open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $!";
 1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/;
-do { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
+{ $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
 close(*MYCONFIG);
 
 $heavy_txt .= "\n!END!\n" . <<'EOT';
@@ -456,7 +456,7 @@ my $summary_expanded;
 
 sub myconfig {
     return $summary_expanded if $summary_expanded;
-    ($summary_expanded = $summary) =~ s!\$(\w+)!{ my $c = %Config::Config{$1}; defined($c) ? $c : 'undef' }!g;
+    ($summary_expanded = $summary) =~ s!\$(\w+)!$( do { my $c = %Config::Config{$1}; defined($c) ? $c : 'undef' } )!g;
     $summary_expanded;
 }
 
@@ -504,7 +504,7 @@ foreach my $prefix (qw(ccflags ldflags)) {
     my $withlargefiles = fetch_string (\%(), $prefix . "_uselargefiles");
     if (defined $withlargefiles) {
         $value =~ s/\Q$withlargefiles\E\b//;
-        $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
+        $heavy_txt .= "$($prefix)_nolargefiles='$value'\n";
     }
 }
 
@@ -528,7 +528,7 @@ foreach my $prefix (qw(libs libswanted)) {
 	    $value = join(' ', @libswanted);
 	}
     }
-    $heavy_txt .= "{$prefix}_nolargefiles='$value'\n";
+    $heavy_txt .= "$($prefix)_nolargefiles='$value'\n";
 }
 
 $heavy_txt .= "EOVIRTUAL\n";
@@ -624,7 +624,7 @@ sub config_vars {
 	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
 						   : 'UNKNOWN';
 	    $v = 'undef' unless defined $v;
-	    print "{$prfx}'{$v}'$lnend";
+	    print "$($prfx)'$($v)'$lnend";
 	}
     }
 }
@@ -837,6 +837,7 @@ my $text = 0;
 $/ = '';
 
 sub process {
+  my $_ = shift;
   if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m) {
     my $c = substr $1, 0, 1;
     unless (%seen{$c}++) {
@@ -893,7 +894,7 @@ if (%Opts{glossary}) {
     ~< *GLOS;				# Skip the "DO NOT EDIT"
     ~< *GLOS;				# Skip the preamble
   while ( ~< *GLOS) {
-    process;
+    process($_);
     print CONFIG_POD;
   }
 }
@@ -918,12 +919,12 @@ print "written $Config_POD\n";
 
 my $orig_config_txt = "";
 my $orig_heavy_txt = "";
-{
+do {
     local $/;
     my $fh;
     $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM;
     $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy;
-}
+};
 
 if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
     open *CONFIG, ">", $Config_PM or die "Can't open $Config_PM: $!\n";

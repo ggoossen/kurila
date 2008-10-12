@@ -64,8 +64,8 @@ sub CLEAR {
 sub FETCH {
     local($self,$key) = < @_;
     local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
-    &hashkey;
-    for (;;) {
+    &hashkey( < @_ );
+    while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
@@ -76,7 +76,7 @@ sub FETCH {
 	elsif (substr($record, 1, $klen) eq $key) {
 	    return substr($record, 1+$klen, $vlen);
 	}
-	&rehash;
+	&rehash( < @_ );
     }
 }
 
@@ -88,8 +88,8 @@ sub STORE {
 	if length($val) != $vlen;
     my $writeoffset;
 
-    &hashkey;
-    for (;;) {
+    &hashkey( < @_ );
+    while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
@@ -109,15 +109,15 @@ sub STORE {
 	    substr(@$self[0], $offset, $rlen, $record);
 	    return;
 	}
-	&rehash;
+	&rehash( < @_ );
     }
 }
 
 sub DELETE {
     local($self,$key) = < @_;
     local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
-    &hashkey;
-    for (;;) {
+    &hashkey( < @_ );
+    while (1) {
 	$offset = $hash * $rlen;
 	$record = substr(@$self[0], $offset, $rlen);
 	if (ord($record) == 0) {
@@ -130,23 +130,27 @@ sub DELETE {
 	    return substr($record, 1+$klen, $vlen);
 	    --@$self[5];
 	}
-	&rehash;
+	&rehash( < @_ );
     }
 }
 
 sub FIRSTKEY {
     local($self) = < @_;
     @$self[6] = -1;
-    &NEXTKEY;
+    &NEXTKEY( < @_ );
 }
 
 sub NEXTKEY {
     local($self) = < @_;
     local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = < @$self[[1..6]];
-    for (++$iterix; $iterix +< $tsize->[1]; ++$iterix) {
+    ++$iterix;
+    while ($iterix +< $tsize->[1]) {
 	next unless substr(@$self[0], $iterix * $rlen, 1) eq "\2";
 	@$self[6] = $iterix;
 	return substr(@$self[0], $iterix * $rlen + 1, $klen);
+    }
+    continue {
+        ++$iterix;
     }
     @$self[6] = -1;
     undef;
@@ -162,9 +166,9 @@ sub hashkey {
     $hash = 2;
     for (@(unpack('C*', $key))) {
 	$hash = $hash * 33 + $_;
-	&_hashwrap if $hash +>= 1e13;
+	&_hashwrap( < @_ ) if $hash +>= 1e13;
     }
-    &_hashwrap if $hash +>= $tsize->[1];
+    &_hashwrap( < @_ ) if $hash +>= $tsize->[1];
     $hash = 1 unless $hash;
     $hashbase = $hash;
 }
@@ -202,15 +206,19 @@ sub findgteprime { # find the smallest prime integer greater than or equal to
     my $sqrtnumsquared = $sqrtnum * $sqrtnum;
 
   NUM:
-    for (;; $num += 2) {
+    while (1) {
 	if ($sqrtnumsquared +< $num) {
 	    $sqrtnum++;
 	    $sqrtnumsquared = $sqrtnum * $sqrtnum;
 	}
-        for ($i = 3; $i +<= $sqrtnum; $i += 2) {
+        $i = 3;
+        while ($i +<= $sqrtnum) {
             next NUM unless $num % $i;
+            $i += 2;
         }
         return $num;
+    } continue {
+        $num += 2;
     }
 }
 

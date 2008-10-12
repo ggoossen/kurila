@@ -471,7 +471,7 @@ PP(pp_die)
 	SV * const error = ERRSV;
 	if (sv_isobject(error)) {
 	    tmpsv = error;
-	    SV** desc = hv_fetchs( (HV*)SvRV(tmpsv), "notes", TRUE );
+	    SV** desc = hv_fetchs( (HV*)SvRV(error), "notes", TRUE );
 	    if (desc) {
 		if ( ! SvPOK(*desc) )
 		    sv_setpvn(*desc, "", 0);

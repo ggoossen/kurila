@@ -387,12 +387,12 @@ sub parse_file {
   } elsif(!length $source) {
     die("Can't use empty-string as a source for parse_file");
   } else {
-    {
+    do {
       local *PODSOURCE;
       open(PODSOURCE, "<", "$source") || die "Can't open $source: $!";
       $self->{'source_filename'} = $source;
       $source = *PODSOURCE{IO};
-    }
+    };
     $self->_init_fh_source($source);
   }
   # By here, $source is a FH.
@@ -402,10 +402,12 @@ sub parse_file {
   my($i, @lines);
   until( $self->{'source_dead'} ) {
     splice @lines;
-    for($i = MANY_LINES; $i--;) {  # read those many lines at a time
+    $i = MANY_LINES;
+    while (1) {  # read those many lines at a time
       local $/ = $NL;
       push @lines, scalar( ~< $source );  # readline
       last unless defined @lines[-1];
+      $i--;
        # but pass thru the undef, which will set source_dead to true
     }
     $self->parse_lines(< @lines);
@@ -599,10 +601,11 @@ sub _wrap_up {
   ;    
   
 
-  my($i, $treelet);
+  my($treelet);
   while($treelet = shift @stack) {
     DEBUG +> 3 and print " Considering children of this $treelet->[0] node...\n";
-    for($i = 2; $i +< nelems @$treelet; ++$i) { # iterate over children
+    my $i = 2;
+    while ( $i +< nelems(@$treelet) ) { # iterate over children
       DEBUG +> 3 and print " Considering child at $i ", < pretty($treelet->[$i]), "\n";
       if($nixx and ref $treelet->[$i] and $treelet->[$i]->[0] eq 'X') {
         DEBUG +> 3 and print "   Nixing X node at $i\n";
@@ -617,8 +620,7 @@ sub _wrap_up {
          ":[$treelet->[$i-1]] and $i\:[$treelet->[$i]]\n";
         $treelet->[$i-1] .= @(splice(@$treelet, $i, 1))[0];
         DEBUG +> 4 and print "    Now: ", $i-1, ":[$treelet->[$i-1]]\n";
-        --$i;
-        next; 
+        next;
         # since we just pulled the possibly last node out from under
         #  ourselves, we can't just redo()
 
@@ -638,6 +640,7 @@ sub _wrap_up {
           }
         }
       }
+      $i++;
     }
   }
   DEBUG +> 2 and print "End of _wrap_up traversal.\n\n";
@@ -674,10 +677,11 @@ sub _remap_sequences {
 
   # A recursive algorithm implemented iteratively!  Whee!
   
-  my($is, $was, $i, $treelet); # scratch
+  my($is, $was, $treelet); # scratch
   while($treelet = shift @stack) {
     DEBUG +> 3 and print " Considering children of this $treelet->[0] node...\n";
-    for($i = 2; $i +< nelems @$treelet; ++$i) { # iterate over children
+    my $i = 2;
+    while ( $i +< nelems(@$treelet) ) { # iterate over children
       next unless ref $treelet->[$i];  # text nodes are uninteresting
       
       DEBUG +> 4 and print "  Noting child $i : $treelet->[$i]->[0]<...>\n";
@@ -730,6 +734,9 @@ sub _remap_sequences {
         # otherwise it's unremarkable
         unshift @stack, $treelet->[$i];  # just recurse
       }
+    }
+    continue {
+        $i++;
     }
   }
   
@@ -853,7 +860,7 @@ sub _ponder_extend {
       $self->{'accept_codes'}->{$new_letter}
         = ((nelems @fallbacks) == 1) ? @fallbacks[0] : \@fallbacks;
       DEBUG +> 2 and print
-       "Extensor maps $new_letter => fallbacks {join ' ',@fallbacks}.\n";
+       "Extensor maps $new_letter => fallbacks $(join ' ',@fallbacks).\n";
     }
 
   } else {
@@ -872,32 +879,34 @@ sub _ponder_extend {
 sub _treat_Zs {  # Nix Z<...>'s
   my($self,< @stack) = < @_;
 
-  my($i, $treelet);
+  my($treelet);
   my $start_line = @stack[0]->[1]->{'start_line'};
 
   # A recursive algorithm implemented iteratively!  Whee!
 
-  while($treelet = shift @stack) {
-    for($i = 2; $i +< nelems @$treelet; ++$i) { # iterate over children
-      next unless ref $treelet->[$i];  # text nodes are uninteresting
-      unless($treelet->[$i]->[0] eq 'Z') {
-        unshift @stack, $treelet->[$i]; # recurse
-        next;
+  while ($treelet = shift @stack) {
+      my $i = 2;
+      while ($i +< nelems(@$treelet)) { # iterate over children
+          next unless ref $treelet->[$i]; # text nodes are uninteresting
+          unless($treelet->[$i]->[0] eq 'Z') {
+              unshift @stack, $treelet->[$i]; # recurse
+              next;
+          }
+        
+          DEBUG +> 1 and print "Nixing Z node $(join ' ',@{$treelet->[$i]})\n";
+        
+          # bitch UNLESS it's empty
+          unless (  (nelems @{$treelet->[$i]}) == 2
+                      or ((nelems @{$treelet->[$i]}) == 3 and $treelet->[$i]->[2] eq '')
+                  ) {
+              $self->whine( $start_line, "A non-empty Z<>" );
+          }                     # but kill it anyway
+        
+          splice(@$treelet, $i, 1); # thereby just nix this node.
+          --$i;
+      } continue {
+          $i++;
       }
-        
-      DEBUG +> 1 and print "Nixing Z node {join ' ',@{$treelet->[$i]}}\n";
-        
-      # bitch UNLESS it's empty
-      unless(  (nelems @{$treelet->[$i]}) == 2
-           or ((nelems @{$treelet->[$i]}) == 3 and $treelet->[$i]->[2] eq '')
-      ) {
-        $self->whine( $start_line, "A non-empty Z<>" );
-      }      # but kill it anyway
-        
-      splice(@$treelet, $i, 1); # thereby just nix this node.
-      --$i;
-        
-    }
   }
   
   return;
@@ -977,13 +986,13 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
   my($self,< @stack) = < @_;
 
-  my($i, $treelet);
+  my($treelet);
   my $start_line = @stack[0]->[1]->{'start_line'};
 
   # A recursive algorithm implemented iteratively!  Whee!
 
   while($treelet = shift @stack) {
-    for(my $i = 2; $i +< nelems @$treelet; ++$i) {
+    for my $i (2 .. nelems(@$treelet) -1) {
       # iterate over children of current tree node
       next unless ref $treelet->[$i];  # text nodes are uninteresting
       unless($treelet->[$i]->[0] eq 'L') {
@@ -1092,7 +1101,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       # Like L<I like the strictness|strict>
       DEBUG +> 3 and
          print "  Peering at L content for a '|' ...\n";
-      for(my $j = 0; $j +< nelems @ell_content; ++$j) {
+      for my $j (0 .. nelems(@ell_content) -1) {
         next if ref @ell_content[$j];
         DEBUG +> 3 and
          print "    Peering at L-content text bit \"@ell_content[$j]\" for a '|'.\n";
@@ -1121,7 +1130,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       # Like L<Foo::Bar/Object Methods>
       my $section_name;  # set to arrayref if found
       DEBUG +> 3 and print "  Peering at L-content for a '/' ...\n";
-      for(my $j = 0; $j +< nelems @ell_content; ++$j) {
+      for my $j (0 .. nelems(@ell_content) -1) {
         next if ref @ell_content[$j];
         DEBUG +> 3 and
          print "    Peering at L-content text bit \"@ell_content[$j]\" for a '/'.\n";
@@ -1258,7 +1267,8 @@ sub _treat_Es {
   #my @ells_to_tweak;
 
   while($treelet = shift @stack) {
-    for(my $i = 2; $i +< nelems @$treelet; ++$i) { # iterate over children
+    my $i = 2;
+    while ($i +< nelems(@$treelet)) { # iterate over children
       next unless ref $treelet->[$i];  # text nodes are uninteresting
       if($treelet->[$i]->[0] eq 'L') {
         # SPECIAL STUFF for semi-processed L<>'s
@@ -1321,6 +1331,9 @@ sub _treat_Es {
 
       splice(@$treelet, $i, 1, $replacer); # no need to back up $i, tho
     }
+    continue {
+        $i++;
+    }
   }
 
   return;
@@ -1351,7 +1364,8 @@ sub _change_S_to_nbsp { #  a recursive function
   $in_s ||= $is_s; # So in_s is on either by this being an S element,
                    #  or by an ancestor being an S element.
 
-  for(my $i = 2; $i +< nelems @$treelet; ++$i) {
+  my $i = 2;
+  while ( $i +< nelems(@$treelet) ) {
     if(ref $treelet->[$i]) {
       if( _change_S_to_nbsp( $treelet->[$i], $in_s ) ) {
         my $to_pull_up = $treelet->[$i];
@@ -1371,6 +1385,7 @@ sub _change_S_to_nbsp { #  a recursive function
        # at all.  But if you do want to implement hyphenation, I guess
        # that you'd better have nbsp_for_S off.
     }
+    $i++;
   }
 
   return $is_s;
@@ -1453,7 +1468,7 @@ sub _duo {
   
   my $mutor = shift(@_) if (nelems @_) and ref(@_[0] || '') eq 'CODE';
 
-  die "But $class->_duo takes two parameters, not: {join ' ',@_}"
+  die "But $class->_duo takes two parameters, not: $(join ' ',@_)"
    unless (nelems @_) == 2;
 
   my(@out);

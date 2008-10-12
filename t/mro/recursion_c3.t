@@ -18,7 +18,7 @@ into an infinite loop
 =cut
 
 # initial setup, everything sane
-{
+do {
     package K;
     use mro 'c3';
     our @ISA = qw/J I/;
@@ -52,7 +52,7 @@ into an infinite loop
     package A;
     use mro 'c3';
     our @ISA = @( qw// );
-}
+};
 
 # A series of 8 abberations that would cause infinite loops,
 #  each one undoing the work of the previous

@@ -163,7 +163,7 @@ sub _batch_convert_main {
   }
   
   if($dirs) {
-    $self->muse(scalar(nelems @$dirs), " dirs to scan: {join ' ',@$dirs}");
+    $self->muse(scalar(nelems @$dirs), " dirs to scan: $(join ' ',@$dirs)");
   } else {
     $self->muse("Scanning \@INC.  This could take a minute or two.");
   }
@@ -331,7 +331,7 @@ sub _write_contents_start {
   my($self, $Contents, $outfile) = < @_;
   my $starter = $self->contents_page_start || '';
   
-  {
+  do {
     my $css_wad = $self->_css_wad_to_markup(1);
     if( $css_wad ) {
       $starter =~ s{(</head>)}{\n$css_wad\n$1}i;  # otherwise nevermind
@@ -341,7 +341,7 @@ sub _write_contents_start {
     if( $javascript_wad ) {
       $starter =~ s{(</head>)}{\n$javascript_wad\n$1}i;   # otherwise nevermind
     }
-  }
+  };
 
   unless(print $Contents $starter, "<dl class='superindex'>\n" ) {
     warn "Couldn't print to $outfile: $!\nAbort writing to $outfile at all";
@@ -529,7 +529,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   my($self, $dirs) = < @_;
 
   my $m2p;
-  {
+  do {
     my $search = $SEARCH_CLASS->new;
     DEBUG and print "Searching via $search\n";
     $search->verbose(1) if DEBUG +> 10;
@@ -539,7 +539,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
     $search->survey(  $dirs ? < @$dirs : () );
     $m2p = $search->name2path;
     die "What, no name2path?!" unless $m2p;
-  }
+  };
 
   $self->muse("That's odd... no modules found!") unless %$m2p;
   if( DEBUG +> 4 ) {
@@ -705,11 +705,11 @@ sub _gen_css_wad {
 
     # Only look at three-digitty colors, for now at least.
     if( $flipmode =~ m/n/ ) {
-      $this_css =~ s/(#[0-9a-fA-F]{3})\b/{_color_negate($1)}/g;
+      $this_css =~ s/(#[0-9a-fA-F]{3})\b/$(_color_negate($1))/g;
       $this_css =~ s/\bthin\b/medium/g;
     }
     $this_css =~ s<#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])\b>
-                  |{ join '', @( '#', < @($1,$2,$3)[[@swap]]) }|g   if (nelems @swap);
+                  |$( join '', @( '#', < @($1,$2,$3)[[@swap]]) )|g   if (nelems @swap);
 
     if(   $flipmode =~ m/a/)
        { $this_css =~ s/#fff\b/#999/gi } # black -> dark grey
@@ -743,8 +743,8 @@ sub _gen_css_wad {
 
 sub _color_negate {
   my $x = lc @_[0];
-  $x =~ s/([0123456789abcdef])/{ 
-     %( < qw| 0 f 1 e 2 d 3 c 4 b 5 a 6 9 7 8 8 7 9 6 a 5 b 4 c 3 d 2 e 1 f 0 | ){$1} }/g;
+  $x =~ s/([0123456789abcdef])/$( 
+     %( < qw| 0 f 1 e 2 d 3 c 4 b 5 a 6 9 7 8 8 7 9 6 a 5 b 4 c 3 d 2 e 1 f 0 | ){$1} )/g;
   return $x;
 }
 
