@@ -43,7 +43,6 @@ sub wrap
 
 	use re 'taint';
 
-	pos($t) = 0;
 	while ($t !~ m/\G(?:$break)*\Z/gc) {
 		if ($t =~ m/\G([^\n]{0,$ll})($break|\n+|\z)/xmgc) {
 			$r .= $unexpand 
