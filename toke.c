@@ -5259,7 +5259,7 @@ Perl_yylex(pTHX)
 	    UNIDOR(OP_POP);
 
 	case KEY_pos:
-	    UNIDOR(OP_POS);
+	    LOP(OP_POS,XTERM);
 	
 	case KEY_pack:
 	    LOP(OP_PACK,XTERM);

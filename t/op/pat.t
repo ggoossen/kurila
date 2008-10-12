@@ -156,13 +156,13 @@ while (m/\w+/gp) {
 ok( join(':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" );
 
 @words = @( () );
-pos = 0;
+pos($_, 0);
 while (m/to/gp) {
     push(@words, $^MATCH);
 }
 ok( join(':', @words) eq "to:to" );
 
-pos $_ = 0;
+pos($_, 0);
 @words = @( m/to/g );
 ok( join(':', @words) eq "to:to" );
 
@@ -212,14 +212,14 @@ $x=m/abc/gp;
 ok( $x and $^PREMATCH eq "abcfoo" );
 $x=m/abc/gp;
 ok( $x == 0 );
-pos = 0;
+pos($_, 0);
 $x=m/ABC/gip;
 ok( $x and $^PREMATCH eq "" );
 $x=m/ABC/gip;
 ok( $x and $^PREMATCH eq "abcfoo" );
 $x=m/ABC/gi;
 ok( $x == 0 );
-pos = 0;
+pos($_, 0);
 $x=m/abc/gp;
 ok( $x and $^POSTMATCH eq "fooabcbar" );
 $x=m/abc/gp;
@@ -229,7 +229,7 @@ $_ .= '';
 ok( scalar nelems @x == 2 );
 
 $_ = "abdc";
-pos $_ = 2;
+pos($_, 2);
 m/\Gc/gc;
 ok( (pos $_) == 2 );
 m/\Gc/g;
@@ -534,12 +534,12 @@ ok( not nelems @_ );
 ok( not nelems @_ );
 
 $_ = 'aaa';
-pos = 1;
+pos($_, 1);
 my @a = @( m/\Ga/g );
 ok("$(join ' ',@a)" eq "a a");
 
 my $str = 'abcde';
-pos $str = 2;
+pos($str, 2);
 
 ok( not ($str =~ m/^\G/ ));
 
@@ -562,9 +562,9 @@ ok( $str =~ m/b(?{$foo = $_; $bar = pos})c/
     and $foo eq 'abcde' and $bar eq 2 );
 
 undef $foo; undef $bar;
-pos $str = undef;
+pos($str, undef);
 ok( $str =~ m/b(?{$foo = $_; $bar = pos})c/g
-    and $foo eq 'abcde' and $bar eq 2 and pos $str eq 3 );
+    and $foo eq 'abcde' and $bar eq 2 and pos($str) eq 3 );
 
 $_ = $str;
 
@@ -577,7 +577,7 @@ ok(  m/b(?{$foo = $_; $bar = pos})c/g
 	and $foo eq 'abcde' and $bar eq 2 and pos eq 3 );
 
 undef $foo; undef $bar;
-pos = undef;
+pos($_, undef);
 1 while m/b(?{$foo = $_; $bar = pos})c/g;
 ok(  $foo eq 'abcde' and $bar eq 2 and not defined pos );
 
@@ -608,7 +608,7 @@ ok(  "$(join ' ',@res)" eq
 #Some more \G anchor checks
 $foo='aabbccddeeffgg';
 
-pos($foo)=1;
+pos($foo, 1);
 
 $foo =~ m/.\G(..)/g;
 do {
@@ -616,14 +616,14 @@ do {
     is($1,'ab');
 };
 
-pos($foo) += 1;
+pos($foo, pos($foo) + 1);
 $foo =~ m/.\G(..)/g;
 do {
     local $TODO = $::running_as_thread;
     is($1, 'cc');
 };
 
-pos($foo) += 1;
+pos($foo, pos($foo) + 1);
 $foo =~ m/.\G(..)/g;
 do {
     local $TODO = $::running_as_thread;
@@ -635,7 +635,7 @@ do {
     ok($foo =~ m/\Gef/g);
 };
 
-undef pos $foo;
+pos($foo, undef);
 
 $foo=~m/\G(..)/g;
 ok($1  eq 'aa');
@@ -643,7 +643,7 @@ ok($1  eq 'aa');
 $foo=~m/\G(..)/g;
 ok($1  eq 'bb');
 
-pos($foo)=5;
+pos($foo, 5);
 $foo=~m/\G(..)/g;
 ok($1  eq 'cd');
 
@@ -681,11 +681,11 @@ ok(1); # Did we survive?
 ok( $1 eq "\{ and \}" );
 
 $_ = "a-a\nxbb";
-pos=1;
+pos($_, 1);
 ok( not m/^-.*bb/mg );
 
 our $text = "aaXbXcc";
-pos($text)=0;
+pos($text, 0);
 ok( not $text =~ m/\GXb*X/g );
 
 $text = "xA\n" x 500;

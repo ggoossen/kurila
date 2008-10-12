@@ -158,7 +158,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
     case PERL_MAGIC_defelem:
-    case PERL_MAGIC_pos:
     case PERL_MAGIC_backref:
     case PERL_MAGIC_rhash:
     case PERL_MAGIC_symtab:
@@ -1815,90 +1814,6 @@ Perl_magic_setdbline(pTHX_ SV *sv, MAGIC *mg)
                 o->op_flags &= ~OPf_SPECIAL;
         }
     }
-    return 0;
-}
-
-int
-Perl_magic_getpos(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    SV* const lsv = LvTARG(sv);
-
-    PERL_ARGS_ASSERT_MAGIC_GETPOS;
-    PERL_UNUSED_ARG(mg);
-
-    if (SvTYPE(lsv) >= SVt_PVMG && SvMAGIC(lsv)) {
-        MAGIC * const found = mg_find(lsv, PERL_MAGIC_regex_global);
-        if (found && found->mg_len >= 0) {
-            I32 i = found->mg_len;
-            if (DO_UTF8(lsv))
-                sv_pos_b2u(lsv, &i);
-            sv_setiv(sv, i);
-            return 0;
-        }
-    }
-    SvOK_off(sv);
-    return 0;
-}
-
-int
-Perl_magic_setpos(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    SV* const lsv = LvTARG(sv);
-    SSize_t pos;
-    STRLEN len;
-    STRLEN ulen = 0;
-    MAGIC* found;
-
-    PERL_ARGS_ASSERT_MAGIC_SETPOS;
-    PERL_UNUSED_ARG(mg);
-
-    if (SvTYPE(lsv) >= SVt_PVMG && SvMAGIC(lsv))
-        found = mg_find(lsv, PERL_MAGIC_regex_global);
-    else
-        found = NULL;
-    if (!found) {
-        if (!SvOK(sv))
-            return 0;
-#ifdef PERL_OLD_COPY_ON_WRITE
-    if (SvIsCOW(lsv))
-        sv_force_normal_flags(lsv, 0);
-#endif
-        found = sv_magicext(lsv, NULL, PERL_MAGIC_regex_global, &PL_vtbl_mglob,
-                            NULL, 0);
-    }
-    else if (!SvOK(sv)) {
-        found->mg_len = -1;
-        return 0;
-    }
-    len = SvPOK(lsv) ? SvCUR(lsv) : sv_len(lsv);
-
-    pos = SvIV(sv);
-
-    if (DO_UTF8(lsv)) {
-        ulen = sv_len_utf8(lsv);
-        if (ulen)
-            len = ulen;
-    }
-
-    if (pos < 0) {
-        pos += len;
-        if (pos < 0)
-            pos = 0;
-    }
-    else if (pos > (SSize_t)len)
-        pos = len;
-
-    if (ulen) {
-        I32 p = pos;
-        sv_pos_u2b(lsv, &p, 0);
-        pos = p;
-    }
-
-    found->mg_len = pos;
-    found->mg_flags &= ~MGf_MINMATCH;
-
     return 0;
 }
 

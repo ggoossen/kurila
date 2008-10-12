@@ -238,8 +238,8 @@ sub SWASHNEW_real {
     }
 
     my @extras;
-    for my $x (@($extras)) {
-	pos $x = 0;
+    do {
+        my $x = $extras;
 	while ($x =~ m/^([^0-9a-fA-F\n])(.*)/mg) {
 	    my $char = $1;
 	    my $name = $2;
@@ -261,7 +261,7 @@ sub SWASHNEW_real {
 		$bits = $subobj->{BITS} if $bits +< $subobj->{BITS};
 	    }
 	}
-    }
+    };
 
     print STDERR "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG;
 

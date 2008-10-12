@@ -175,16 +175,61 @@ PP(pp_pos)
 {
     dVAR; dSP; dTARGET; dPOPss;
 
-    do_arg_check(SP-1);
+    do_arg_check(SP - MAXARG + 1);
 
-    if (PL_op->op_flags & OPf_MOD) {
-	TARG = sv_newmortal();
-	sv_upgrade(TARG, SVt_PVLV);
-	sv_magic(TARG, NULL, PERL_MAGIC_pos, NULL, 0);
+    if (MAXARG > 1) {
+	SSize_t pos;
+	STRLEN len;
+	STRLEN ulen = 0;
+	MAGIC* found;
+	SV* lsv = POPs;
 
-	LvTYPE(TARG) = '.';
-	LvTARG(TARG) = SvREFCNT_inc_simple(sv);
-	PUSHs(TARG);	/* no SvSETMAGIC */
+	if (SvTYPE(lsv) >= SVt_PVMG && SvMAGIC(lsv))
+	    found = mg_find(lsv, PERL_MAGIC_regex_global);
+	else
+	    found = NULL;
+	if (!found) {
+	    if (!SvOK(sv))
+		RETPUSHUNDEF;
+#ifdef PERL_OLD_COPY_ON_WRITE
+	    if (SvIsCOW(lsv))
+		sv_force_normal_flags(lsv, 0);
+#endif
+	    found = sv_magicext(lsv, NULL, PERL_MAGIC_regex_global, &PL_vtbl_mglob,
+		NULL, 0);
+	}
+	else if (!SvOK(sv)) {
+	    found->mg_len = -1;
+	    RETPUSHUNDEF;
+	}
+	len = SvPOK(lsv) ? SvCUR(lsv) : sv_len(lsv);
+
+	pos = SvIV(sv);
+
+	if (IN_CODEPOINTS) {
+	    ulen = sv_len_utf8(lsv);
+	    if (ulen)
+		len = ulen;
+	}
+
+	if (pos < 0) {
+	    pos += len;
+	    if (pos < 0)
+		pos = 0;
+	}
+	else if (pos > (SSize_t)len)
+	    pos = len;
+
+	if (ulen) {
+	    I32 p = pos;
+	    sv_pos_u2b(lsv, &p, 0);
+	    pos = p;
+	}
+
+	found->mg_len = pos;
+	found->mg_flags &= ~MGf_MINMATCH;
+
+	PUSHi(pos);
 	RETURN;
     }
     else {
