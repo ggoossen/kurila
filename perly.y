@@ -378,7 +378,7 @@ loop	:	label WHILE remember '(' texpr ')'
                                  $4, $6, $8, $9, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
-			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'(');
+			  TOKEN_GETMAD($5,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($7,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
 	;
@@ -466,15 +466,14 @@ mysubrout:	MYSUB startsub subname proto subbody
 subrout	:	SUB startsub subname proto subbody
 			{
 #ifdef MAD
-                            OP* o = newSVOP(OP_ANONCODE, 0,
-                                (SV*)newNAMEDSUB($2, $3, $4, $5), LOCATION($1));
                             $$ = newOP(OP_NULL,0, LOCATION($1));
-                            op_getmad(o,$$,'&');
                             op_getmad($3,$$,'n');
                             op_getmad($4,$$,'s');
+                            op_getmad($5,$$,'&');
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
-                            $5->op_madprop = 0;
+                            CV* new = newNAMEDSUB($2, $3, $4, $5);
+                            /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB($2, $3, $4, $5);
                             SvREFCNT_dec(new);
@@ -483,9 +482,20 @@ subrout	:	SUB startsub subname proto subbody
 			}
         |       SPECIALBLOCK startsub subbody
                         {
+#ifdef MAD
+                            $$ = newOP(OP_NULL,0, LOCATION($1));
+                            op_getmad($3,$$,'&');
+                            TOKEN_GETMAD($1,$$,'d');
+                            APPEND_MADPROPS_PV("sub", $$, '<');
                             CV* new = newSUB($2, NULL, $3);
                             process_special_block(IVAL($1), new);
+                            /* SvREFCNT_dec(new);  leak reference */
+#else
+                            CV* new = newSUB($2, NULL, $3);
+                            process_special_block(IVAL($1), new);
+                            SvREFCNT_dec(new);
                             $$ = (OP*)NULL;
+#endif
                         }
 	;
 
