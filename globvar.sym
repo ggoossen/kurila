@@ -49,7 +49,6 @@ vtbl_mutex
 vtbl_nkeys
 vtbl_pack
 vtbl_packelem
-vtbl_pos
 vtbl_regdata
 vtbl_regdatum
 vtbl_regexp

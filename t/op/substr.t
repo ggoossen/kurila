@@ -476,7 +476,7 @@ do {
 do {
     my $text  = "0123456789\x{ED} ";
     my $pos = 5;
-    pos($text) = $pos;
+    pos($text, $pos);
     my $a = substr($text, $pos, $pos);
     is(substr($text,$pos,1), $pos);
 

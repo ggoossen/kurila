@@ -661,7 +661,7 @@ schomp		scalar chomp		ck_null		sTu%	S?
 defined		defined operator	ck_defined	isu%	S?
 undef		undef operator		ck_lfun		s%	S?
 study		study			ck_fun		su%	S?
-pos		match position		ck_lfun		stu%	S?
+pos		match position		ck_fun		stu%	S? S?
 
 preinc		preincrement (++)		ck_lfun		dIs1	S
 i_preinc	integer preincrement (++)	ck_lfun		dis1	S
